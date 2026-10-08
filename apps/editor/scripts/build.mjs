@@ -38,11 +38,17 @@ html = replaceOnce(html, '<script src="/theme-init.js"></script>', '<script src=
 html = replaceOnce(html, '<title>rhwp-studio</title>', '<title>주니 문서 편집기 · 개발판</title>', 'title');
 html = replaceOnce(html, '<div id="studio-root">', '<div id="studio-root">\n    <div id="joouni-title"><strong>주니 문서 편집기</strong><span>한글 2024 호환성 개발판</span></div>', 'titlebar');
 html = replaceOnce(html, '</head>', '  <link rel="stylesheet" href="/src/joouni/editor.css" />\n</head>', 'css');
-await writeFile(join(root, 'index.html'), html);
+await writeFile(join(root, 'editor.html'), html);
+await cp(join(app, 'src/shell.html'), join(root, 'index.html'));
 let main = await readFile(join(root, 'src/main.ts'), 'utf8');
+main = replaceOnce(main, 'confirmSaveBeforeReplacingDocument, fileCommands', 'confirmSaveBeforeReplacingDocument, saveCurrentDocument, fileCommands', 'host save import');
+main = replaceOnce(main, "return params.has('url');", "return params.has('url') || params.get('skipRecovery') === '1';", 'tab recovery');
 main = "import { installDesktopHost } from './joouni/desktop-host';\nimport { installHangulChrome } from './joouni/chrome-2024';\n" + main;
 main = replaceOnce(main, "const initPromise = initialize();", `const initPromise = initialize();
-installDesktopHost({ wasm, eventBus, documentState, ready: initPromise });
+installDesktopHost({ wasm, eventBus, documentState, ready: initPromise,
+  save: () => saveCurrentDocument(commandServices),
+  discard: async () => { await autosaveManager.discardCurrentDraft('tab-discard'); documentState.markClean('tab-discard'); },
+});
 void initPromise.then(() => installHangulChrome({ wasm, eventBus, documentState, automation }));`, 'desktop host');
 await writeFile(join(root, 'src/main.ts'), main);
 let documentTitle = await readFile(join(root, 'src/ui/document-title.ts'), 'utf8');
@@ -51,6 +57,7 @@ await writeFile(join(root, 'src/ui/document-title.ts'), documentTitle);
 
 // 저장할 Blob에 문서 버전을 연결해 저장 중 발생한 새 편집을 clean 처리하지 않는다.
 let fileCommands = (await readFile(join(root, 'src/command/commands/file.ts'), 'utf8')).replace(/\r\n/g, '\n');
+fileCommands = "import { confirmDownload } from '../../joouni/download-save';\n" + fileCommands;
 fileCommands = replaceOnce(fileCommands,
   'blob: new Blob([artifact.bytes as unknown as BlobPart], {\n      type: SAVE_FORMAT_DETAILS[format].mimeType,\n    }),',
   `blob: Object.assign(new Blob([artifact.bytes as unknown as BlobPart], {
@@ -62,7 +69,25 @@ fileCommands = replaceOnce(fileCommands,
 fileCommands = replaceOnce(fileCommands,
   'const downloadName = await promptFallbackName(saveName, format);',
   'const downloadName = saveName;', 'single save-as dialog');
+fileCommands = replaceOnce(fileCommands,
+  'if (!downloadName) return;\n    persistDownloadWithContentLoss(',
+  'if (!downloadName) return;\n    if (!await confirmDownload(payload.blob, downloadName)) return;\n    persistDownloadWithContentLoss(', 'confirm save-as download');
+fileCommands = replaceOnce(fileCommands,
+  "if (!downloadName) return 'cancelled';\n    persistDownloadWithContentLoss(",
+  "if (!downloadName) return 'cancelled';\n    if (!await confirmDownload(payload.blob, downloadName)) return 'cancelled';\n    persistDownloadWithContentLoss(", 'confirm save download');
+fileCommands = fileCommands.replaceAll('() => downloadBlob(payload.blob, downloadName)', '() => {}');
+fileCommands = replaceOnce(fileCommands,
+  "services.eventBus.emit('create-new-document');",
+  `if (new URLSearchParams(location.search).get('child') === '1' && window.parent !== window) {
+        window.parent.postMessage({ type: 'joouni:new-document' }, location.origin);
+      } else services.eventBus.emit('create-new-document');`, 'new document tab');
 await writeFile(join(root, 'src/command/commands/file.ts'), fileCommands);
+let fileSystem = (await readFile(join(root, 'src/command/file-system-access.ts'), 'utf8')).replace(/\r\n/g, '\n');
+fileSystem = "import { writeSnapshot } from '../joouni/save-guard';\n" + fileSystem;
+fileSystem = replaceOnce(fileSystem,
+  'const writable = await handle.createWritable();\n  await writable.write(blob);\n  await writable.close();',
+  'await writeSnapshot(handle, blob);', 'save transaction guard');
+await writeFile(join(root, 'src/command/file-system-access.ts'), fileSystem);
 await build({
   configFile: false, root, base: './', publicDir: join(root, 'public'),
   define: { __APP_VERSION__: JSON.stringify('0.8.7'), __RHWP_DISABLE_EXTERNAL_WEBFONTS__: 'true', __RHWP_HWPCTRL__: 'false' },
@@ -72,7 +97,9 @@ await build({
     '@wasm': join(app, 'node_modules/@rhwp/core'),
     '@rhwp/hwpctrl/studio-plugin': join(upstream, 'npm/hwpctrl-ocx/src/studio-plugin.mjs'),
   } },
-  build: { outDir: join(app, 'dist'), emptyOutDir: true, assetsInlineLimit: 0, chunkSizeWarningLimit: 3000 },
+  build: { outDir: join(app, 'dist'), emptyOutDir: true, assetsInlineLimit: 0, chunkSizeWarningLimit: 3000,
+    rolldownOptions: { input: { index: join(root, 'index.html'), editor: join(root, 'editor.html') } },
+  },
 });
 const sha256 = data => createHash('sha256').update(data).digest('hex');
 const evidence = {

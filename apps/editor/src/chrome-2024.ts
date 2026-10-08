@@ -15,7 +15,7 @@ const tabs: Record<string, Group[]> = {
     { label: '확대/축소', commands: ['view:zoom-dialog', 'view:zoom-fit-page', 'view:zoom-fit-width', 'view:zoom-100'] },
   ],
   insert: [
-    { label: '개체', commands: ['insert:image', 'insert:table', 'insert:shape', 'insert:textbox', 'insert:equation'] },
+    { label: '개체', commands: ['insert:image', 'table:create', 'insert:shape', 'insert:textbox', 'insert:equation'] },
     { label: '글자와 연결', commands: ['insert:symbols', 'insert:hyperlink', 'insert:bookmark'] },
     { label: '주석', commands: ['insert:footnote', 'insert:endnote', 'page:header-create', 'page:footer-create'] },
   ],
@@ -30,7 +30,7 @@ const tabs: Record<string, Group[]> = {
   ],
   review: [{ label: '문서 검토', commands: ['edit:compare-documents', 'edit:document-history'] }],
   table: [
-    { label: '표와 셀', commands: ['insert:table', 'table:cell-props'] },
+    { label: '표와 셀', commands: ['table:create', 'table:cell-props'] },
     { label: '셀 편집', commands: ['table:cell-merge', 'table:cell-split', 'table:insert-row-col', 'table:delete-row-col', 'table:cell-height-equal', 'table:cell-width-equal'] },
   ],
   tool: [{ label: '설정', commands: ['tool:options', 'file:about'] }],
@@ -57,7 +57,7 @@ export function installHangulChrome({ wasm, eventBus, documentState, automation 
   const commandButton = (id: string, compact = false) => {
     const command = commands.get(id);
     // 등록되지 않은 명령을 작동하는 버튼처럼 표시하지 않는다.
-    if (!command) return null;
+    if (!command) throw new Error(`연결할 수 없는 편집 명령: ${id}`);
     const button = document.createElement('button');
     button.type = 'button'; button.className = compact ? 'j-quick-button' : 'j-command-button';
     button.dataset.jCommand = id;
@@ -125,6 +125,51 @@ export function installHangulChrome({ wasm, eventBus, documentState, automation 
   }
   document.getElementById('style-bar')!.prepend(quick);
 
+  const area = document.getElementById('editor-area')!;
+  const workspace = document.createElement('div'); workspace.id = 'joouni-workspace';
+  area.before(workspace); workspace.append(area);
+  const panel = document.createElement('aside'); panel.id = 'joouni-style-panel'; panel.setAttribute('aria-label', '스타일 작업 창');
+  const panelHeader = document.createElement('div'); panelHeader.className = 'j-panel-header';
+  const panelTitle = document.createElement('strong'); panelTitle.textContent = '스타일';
+  const closePanel = document.createElement('button'); closePanel.type = 'button'; closePanel.textContent = '×'; closePanel.setAttribute('aria-label', '스타일 작업 창 닫기');
+  const togglePanel = document.createElement('button'); togglePanel.type = 'button'; togglePanel.className = 'j-panel-toggle'; togglePanel.textContent = '스타일 창'; togglePanel.setAttribute('aria-controls', panel.id);
+  const setPanel = (open: boolean) => {
+    panel.hidden = !open; togglePanel.setAttribute('aria-expanded', String(open));
+    try { localStorage.setItem('joouni-style-panel', String(open)); } catch { /* 개인 보기 설정 */ }
+    window.dispatchEvent(new Event('resize'));
+  };
+  closePanel.addEventListener('click', () => setPanel(false));
+  togglePanel.addEventListener('click', () => setPanel(panel.hidden !== false));
+  menu.append(togglePanel);
+  panelHeader.append(panelTitle, closePanel);
+  const styleList = document.createElement('div'); styleList.className = 'j-style-list'; styleList.setAttribute('role', 'listbox'); styleList.setAttribute('aria-label', '문서 스타일');
+  const editStyle = document.createElement('button'); editStyle.className = 'j-edit-styles'; editStyle.textContent = '스타일 편집…';
+  editStyle.addEventListener('click', () => run('format:style-dialog'));
+  panel.append(panelHeader, styleList, editStyle); workspace.append(panel);
+  const styleSelect = document.getElementById('style-name') as HTMLSelectElement;
+  let styleSignature = '';
+  function syncStyles() {
+    const signature = [...styleSelect.options].map(option => `${option.value}:${option.textContent}`).join('|');
+    if (signature !== styleSignature) {
+      styleSignature = signature; styleList.replaceChildren();
+      for (const option of styleSelect.options) {
+        const button = document.createElement('button'); button.type = 'button'; button.className = 'j-style-option';
+        button.setAttribute('role', 'option'); button.dataset.styleValue = option.value;
+        button.textContent = option.textContent; button.addEventListener('mousedown', event => event.preventDefault());
+        button.addEventListener('click', () => { automation.execute('format:apply-style', { styleId: Number(option.value) }); syncStyles(); });
+        styleList.append(button);
+      }
+    }
+    for (const button of styleList.querySelectorAll<HTMLElement>('[data-style-value]')) {
+      button.setAttribute('aria-selected', String(button.dataset.styleValue === styleSelect.value));
+    }
+  }
+  let initiallyOpen = true;
+  try { initiallyOpen = localStorage.getItem('joouni-style-panel') !== 'false'; } catch { /* 기본 보기 */ }
+  setPanel(initiallyOpen);
+  new MutationObserver(syncStyles).observe(styleSelect, { childList: true });
+  eventBus.on('cursor-style-changed', syncStyles);
+
   const documentBar = document.createElement('div'); documentBar.id = 'joouni-document-tabs';
   const current = document.createElement('span'); current.className = 'j-document-tab';
   current.setAttribute('aria-label', '현재 문서');
@@ -142,6 +187,7 @@ export function installHangulChrome({ wasm, eventBus, documentState, automation 
     const context = automation.getContext();
     const tableItem = menu.querySelector<HTMLElement>('[data-menu="table"]');
     if (tableItem) tableItem.hidden = !context.inTable && !context.inTableObjectSelection;
+    syncStyles();
   }
   eventBus.on('command-state-changed', refresh);
   eventBus.on('document-mutated', refresh);

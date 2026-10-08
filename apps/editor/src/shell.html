@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>주니 문서 편집기</title>
+  <script src="/joouni-boot.js"></script>
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/src/joouni/shell.css" />
+</head>
+<body>
+  <main id="documents" aria-label="편집 문서"></main>
+  <nav id="document-tabs" aria-label="열린 문서">
+    <div id="document-tab-list" role="tablist" aria-label="문서 탭"></div>
+    <button id="new-document" type="button" title="새 문서 (Alt+N)" aria-label="새 문서 탭">+</button>
+    <span id="shell-status" role="status">로컬 문서 편집기</span>
+  </nav>
+  <dialog id="close-document">
+    <form method="dialog">
+      <h2>변경 내용을 저장할까요?</h2>
+      <p id="close-document-name"></p>
+      <p class="hint">저장하지 않고 닫으면 마지막 저장 이후의 변경 내용이 사라집니다.</p>
+      <div class="dialog-actions">
+        <button value="save" autofocus>저장하고 닫기</button>
+        <button value="discard">저장하지 않음</button>
+        <button value="cancel">취소</button>
+      </div>
+    </form>
+  </dialog>
+  <script type="module" src="/src/joouni/shell.ts"></script>
+</body>
+</html>

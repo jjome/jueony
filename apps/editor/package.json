@@ -6,7 +6,8 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "preview": "node scripts/serve.mjs",
-    "test:smoke": "node scripts/smoke.mjs",
+    "typecheck": "tsc --project .build/studio/tsconfig.json --pretty false",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
     "tauri": "tauri"
   },
   "devDependencies": {

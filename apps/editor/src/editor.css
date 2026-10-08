@@ -35,7 +35,29 @@
 .j-document-tab { min-width: 130px; padding: 5px 20px; background: #fff; border-right: 1px solid #d5dce4; border-top: 2px solid #159aca; font: 11px 'Malgun Gothic', sans-serif; }
 .j-document-tab.is-dirty { color: #c24a44; }
 .j-validation-label { margin-left: auto; padding-right: 12px; color: #9097a1; font-size: 10px; }
+:root[data-joouni-child="true"] #joouni-document-tabs { display: none; }
+#joouni-workspace { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+#joouni-workspace #editor-area { flex: 1; min-width: 0; }
+#joouni-style-panel { flex: 0 0 200px; width: 200px; background: #fafbfc; border-left: 1px solid #d9dfe7; display: flex; flex-direction: column; }
+#joouni-style-panel[hidden] { display: none; }
+.j-panel-header { padding: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
+.j-panel-header strong { font-weight: 500; }
+.j-panel-header button { background: none; border: 0; color: #768390; cursor: pointer; }
+.j-style-list { flex: 1; overflow-y: auto; padding: 0 10px; }
+.j-style-option { display: block; width: 100%; min-height: 37px; text-align: left; border: 0; padding: 8px 12px; background: transparent; font: 11px 'Malgun Gothic', sans-serif; color: #404d58; cursor: pointer; }
+.j-style-option::before { content: '¶'; display: inline-block; width: 25px; color: #a7b0b8; }
+.j-style-option[aria-selected="true"] { background: #e5e8ec; }
+.j-style-option:hover { background: #edf3f9; }
+.j-edit-styles { border: 1px solid #cdd5df; background: white; padding: 7px; margin: 10px; font-size: 11px; color: #455c74; cursor: pointer; }
+.j-panel-toggle { margin-left: auto; border: 0; background: none; padding: 0 12px; color: #6b7c8c; font: 11px 'Malgun Gothic', sans-serif; cursor: pointer; }
 #joouni-busy {
   position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center;
   background: #ffffff99; color: #24354a; font: 14px 'Malgun Gothic', sans-serif;
 }
+#joouni-download-confirm { width: 440px; border: 1px solid #b8c4d2; border-radius: 4px; padding: 24px; color: #263647; font: 13px 'Malgun Gothic', sans-serif; }
+#joouni-download-confirm::backdrop { background: #26374d44; }
+#joouni-download-confirm h2 { font-size: 16px; margin: 0 0 18px; }
+#joouni-download-confirm p { line-height: 1.7; overflow-wrap: anywhere; }
+.j-download-buttons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.j-download-buttons button { padding: 7px 12px; border: 1px solid #bcc7d3; background: #f6f8fb; border-radius: 2px; cursor: pointer; }
+.j-download-buttons button[value="saved"] { background: #087fae; border-color: #087fae; color: white; }

@@ -17,6 +17,7 @@ export function serve(port = 4173) {
       response.setHeader('Content-Type', types[extname(path)] ?? 'application/octet-stream');
       response.setHeader('Cache-Control', 'no-store');
       response.setHeader('X-Content-Type-Options', 'nosniff');
+      response.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'");
       response.end(request.method === 'HEAD' ? undefined : bytes);
     } catch { response.writeHead(404).end('Not found'); }
   });

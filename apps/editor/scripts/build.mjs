@@ -1,0 +1,86 @@
+import { cp, mkdir, readFile, writeFile, readdir } from 'node:fs/promises';
+import { resolve, dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+import { build } from 'vite';
+
+const app = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const upstream = resolve(app, '../../upstream/rhwp-source');
+const expectedCommit = '1a76570e833917d15817415a53c09ad61ab3203f';
+const commit = execFileSync('git', ['-C', upstream, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+if (commit !== expectedCommit) throw new Error(`참조 커밋이 다릅니다: ${commit}`);
+const root = join(app, '.build/studio');
+await mkdir(root, { recursive: true });
+await cp(join(upstream, 'rhwp-studio/src'), join(root, 'src'), { recursive: true });
+await cp(join(upstream, 'rhwp-studio/types'), join(root, 'types'), { recursive: true });
+const tsconfig = JSON.parse(await readFile(join(upstream, 'rhwp-studio/tsconfig.json'), 'utf8'));
+tsconfig.compilerOptions.paths['@wasm/*'] = ['../../node_modules/@rhwp/core/*'];
+await writeFile(join(root, 'tsconfig.json'), JSON.stringify(tsconfig, null, 2));
+// Windows Git 체크아웃의 fonts 항목은 심볼릭 링크 대신 텍스트 파일일 수 있다.
+await mkdir(join(root, 'public'), { recursive: true });
+for (const entry of await readdir(join(upstream, 'rhwp-studio/public'))) {
+  if (entry === 'fonts' || entry.startsWith('rhwp')) continue;
+  await cp(join(upstream, 'rhwp-studio/public', entry), join(root, 'public', entry), { recursive: true });
+}
+await cp(join(upstream, 'assets/fonts'), join(root, 'public/fonts'), { recursive: true });
+await cp(join(app, 'src'), join(root, 'src/joouni'), { recursive: true });
+await cp(join(app, 'src/boot.js'), join(root, 'public/joouni-boot.js'));
+await cp(join(upstream, 'LICENSE'), join(root, 'public/LICENSE.rhwp.txt'));
+await cp(join(upstream, 'THIRD_PARTY_LICENSES.md'), join(root, 'public/THIRD_PARTY_LICENSES.rhwp.md'));
+
+function replaceOnce(text, before, after, label) {
+  if (text.split(before).length !== 2) throw new Error(`소스 패치 기준 불일치: ${label}`);
+  return text.replace(before, after);
+}
+let html = await readFile(join(upstream, 'rhwp-studio/index.html'), 'utf8');
+html = replaceOnce(html, '<script src="/theme-init.js"></script>', '<script src="/joouni-boot.js"></script>\n  <script src="/theme-init.js"></script>', 'boot');
+html = replaceOnce(html, '<title>rhwp-studio</title>', '<title>주니 문서 편집기 · 개발판</title>', 'title');
+html = replaceOnce(html, '<div id="studio-root">', '<div id="studio-root">\n    <div id="joouni-title"><strong>주니 문서 편집기</strong><span>한글 2024 호환성 개발판</span></div>', 'titlebar');
+html = replaceOnce(html, '</head>', '  <link rel="stylesheet" href="/src/joouni/editor.css" />\n</head>', 'css');
+await writeFile(join(root, 'index.html'), html);
+let main = await readFile(join(root, 'src/main.ts'), 'utf8');
+main = "import { installDesktopHost } from './joouni/desktop-host';\nimport { installHangulChrome } from './joouni/chrome-2024';\n" + main;
+main = replaceOnce(main, "const initPromise = initialize();", `const initPromise = initialize();
+installDesktopHost({ wasm, eventBus, documentState, ready: initPromise });
+void initPromise.then(() => installHangulChrome({ wasm, eventBus, documentState, automation }));`, 'desktop host');
+await writeFile(join(root, 'src/main.ts'), main);
+let documentTitle = await readFile(join(root, 'src/ui/document-title.ts'), 'utf8');
+documentTitle = documentTitle.replaceAll('rhwp-studio', '주니 문서 편집기');
+await writeFile(join(root, 'src/ui/document-title.ts'), documentTitle);
+
+// 저장할 Blob에 문서 버전을 연결해 저장 중 발생한 새 편집을 clean 처리하지 않는다.
+let fileCommands = (await readFile(join(root, 'src/command/commands/file.ts'), 'utf8')).replace(/\r\n/g, '\n');
+fileCommands = replaceOnce(fileCommands,
+  'blob: new Blob([artifact.bytes as unknown as BlobPart], {\n      type: SAVE_FORMAT_DETAILS[format].mimeType,\n    }),',
+  `blob: Object.assign(new Blob([artifact.bytes as unknown as BlobPart], {
+      type: SAVE_FORMAT_DETAILS[format].mimeType,
+    }), { joouniRevision: (window as any).joouniEditor?.revision() }),`, 'save revision');
+fileCommands = replaceOnce(fileCommands,
+  "console.warn('[file:save] File System Access API 실패, 폴백:', error);\n    return { method: 'fallback', handle: null, fileName: suggestedName };",
+  "console.error('[file:save]', error);\n    alert('저장하지 못했습니다. 문서는 수정 상태로 유지됩니다.\\n' + String(error));\n    return 'cancelled';", 'save failure');
+fileCommands = replaceOnce(fileCommands,
+  'const downloadName = await promptFallbackName(saveName, format);',
+  'const downloadName = saveName;', 'single save-as dialog');
+await writeFile(join(root, 'src/command/commands/file.ts'), fileCommands);
+await build({
+  configFile: false, root, base: './', publicDir: join(root, 'public'),
+  define: { __APP_VERSION__: JSON.stringify('0.8.7'), __RHWP_DISABLE_EXTERNAL_WEBFONTS__: 'true', __RHWP_HWPCTRL__: 'false' },
+  resolve: { alias: {
+    '@': join(root, 'src'),
+    '@wasm/rhwp.js': join(app, 'node_modules/@rhwp/core/rhwp.js'),
+    '@wasm': join(app, 'node_modules/@rhwp/core'),
+    '@rhwp/hwpctrl/studio-plugin': join(upstream, 'npm/hwpctrl-ocx/src/studio-plugin.mjs'),
+  } },
+  build: { outDir: join(app, 'dist'), emptyOutDir: true, assetsInlineLimit: 0, chunkSizeWarningLimit: 3000 },
+});
+const sha256 = data => createHash('sha256').update(data).digest('hex');
+const evidence = {
+  applicationId: 'joouni-editor',
+  sourceCommit: commit, enginePackage: '@rhwp/core@0.8.7', builtAt: new Date().toISOString(),
+  engineWasmSha256: sha256(await readFile(join(app, 'node_modules/@rhwp/core/rhwp_bg.wasm'))),
+  buildScriptSha256: sha256(await readFile(fileURLToPath(import.meta.url))),
+  sourceBuild: false, note: 'Rust 엔진은 공식 npm WASM 바이너리 사용. 이 빌드에서 Rust 엔진을 재컴파일하지 않음.',
+};
+await writeFile(join(app, 'dist/build-evidence.json'), JSON.stringify(evidence, null, 2));
+console.log(JSON.stringify(evidence, null, 2));

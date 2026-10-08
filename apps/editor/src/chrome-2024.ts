@@ -2,6 +2,7 @@ import type { AutomationHost } from '../automation/host';
 import type { WasmBridge } from '../core/wasm-bridge';
 import type { EventBus } from '../core/event-bus';
 import type { DocumentDirtyState } from '../core/document-dirty-state';
+import { fallbackIcon } from './icons';
 
 type Group = { label: string; commands: string[] };
 const tabs: Record<string, Group[]> = {
@@ -67,8 +68,8 @@ export function installHangulChrome({ wasm, eventBus, documentState, automation 
     const existing = document.querySelector(`[data-cmd="${id}"] .tb-sprite, [data-cmd="${id}"] .md-icon`);
     const iconClass = existing ? [...existing.classList].find(value => value.startsWith('icon-')) : null;
     icon.className = `tb-sprite ${iconClass ?? command.icon ?? ''}`;
-    if (!iconClass && !command.icon) { icon.className = 'j-letter-icon'; icon.textContent = command.label.slice(0, 1); }
-    button.append(icon);
+    if (!iconClass && !command.icon) button.append(fallbackIcon(id));
+    else button.append(icon);
     if (!compact) {
       const label = document.createElement('span'); label.textContent = command.label.replace(/\([A-Z]\)/g, '').replace(/\.\.\.$/, '');
       button.append(label);

@@ -1,0 +1,202 @@
+TAP version 13
+# Subtest: 문서 에이전트 공개 API는 exact RPC 메서드와 파라미터를 사용한다
+ok 1 - 문서 에이전트 공개 API는 exact RPC 메서드와 파라미터를 사용한다
+  ---
+  duration_ms: 2.3971
+  type: 'test'
+  ...
+# Subtest: 문서 에이전트 공개 API는 capability가 없으면 요청 전에 실패한다
+ok 2 - 문서 에이전트 공개 API는 capability가 없으면 요청 전에 실패한다
+  ---
+  duration_ms: 0.5022
+  type: 'test'
+  ...
+# Subtest: 문서 에이전트 공개 API는 extra key와 잘못된 SHA를 요청 전에 거부한다
+ok 3 - 문서 에이전트 공개 API는 extra key와 잘못된 SHA를 요청 전에 거부한다
+  ---
+  duration_ms: 0.3962
+  type: 'test'
+  ...
+# Subtest: 문서 에이전트 공개 API는 malformed 응답을 명시적으로 거부한다
+ok 4 - 문서 에이전트 공개 API는 malformed 응답을 명시적으로 거부한다
+  ---
+  duration_ms: 0.3929
+  type: 'test'
+  ...
+# Subtest: 문서 변경 이벤트는 capability와 strict v1 payload를 사용한다
+ok 5 - 문서 변경 이벤트는 capability와 strict v1 payload를 사용한다
+  ---
+  duration_ms: 0.5137
+  type: 'test'
+  ...
+# Subtest: 문서 변경 이벤트는 모든 listener에 한 번 전달하고 stale epoch/seq를 버린다
+ok 6 - 문서 변경 이벤트는 모든 listener에 한 번 전달하고 stale epoch/seq를 버린다
+  ---
+  duration_ms: 0.1977
+  type: 'test'
+  ...
+# Subtest: exportHwpVerify uses the documented export timeout
+ok 7 - exportHwpVerify uses the documented export timeout
+  ---
+  duration_ms: 0.6032
+  type: 'test'
+  ...
+# Subtest: README getHmlSaveState 절은 HmlSaveState 선언과 같은 필드를 문서화한다
+ok 8 - README getHmlSaveState 절은 HmlSaveState 선언과 같은 필드를 문서화한다
+  ---
+  duration_ms: 2.2428
+  type: 'test'
+  ...
+# Subtest: README getHmlSaveState 절은 실재하지 않는 반환 필드를 문서화하지 않는다
+ok 9 - README getHmlSaveState 절은 실재하지 않는 반환 필드를 문서화하지 않는다
+  ---
+  duration_ms: 0.1881
+  type: 'test'
+  ...
+# Subtest: loadFile sends the embed dialog default while preserving explicit choices
+ok 10 - loadFile sends the embed dialog default while preserving explicit choices
+  ---
+  duration_ms: 2.1233
+  type: 'test'
+  ...
+# Subtest: a correlated malformed v1 response fails explicitly instead of timing out
+ok 11 - a correlated malformed v1 response fails explicitly instead of timing out
+  ---
+  duration_ms: 39.7322
+  type: 'test'
+  ...
+# Subtest: notify-saved-v1 광고 시 notifySaved는 fileName을 전달하고 결과를 반환한다
+ok 12 - notify-saved-v1 광고 시 notifySaved는 fileName을 전달하고 결과를 반환한다
+  ---
+  duration_ms: 25.1684
+  type: 'test'
+  ...
+# Subtest: notify-saved-v1 미광고 시 notifySaved는 요청 없이 명시적으로 실패한다
+ok 13 - notify-saved-v1 미광고 시 notifySaved는 요청 없이 명시적으로 실패한다
+  ---
+  duration_ms: 1.0596
+  type: 'test'
+  ...
+# Subtest: index.d.ts는 notifySaved 선언과 저장 계약 JSDoc을 포함한다
+ok 14 - index.d.ts는 notifySaved 선언과 저장 계약 JSDoc을 포함한다
+  ---
+  duration_ms: 0.4767
+  type: 'test'
+  ...
+# Subtest: renderer-diagnostics-v1 keeps its original backend enum
+ok 15 - renderer-diagnostics-v1 keeps its original backend enum
+  ---
+  duration_ms: 0.6152
+  type: 'test'
+  ...
+# Subtest: additive renderer selection represents auto requests
+ok 16 - additive renderer selection represents auto requests
+  ---
+  duration_ms: 0.1255
+  type: 'test'
+  ...
+# Subtest: a correlated response protocol mismatch fails explicitly instead of timing out
+ok 17 - a correlated response protocol mismatch fails explicitly instead of timing out
+  ---
+  duration_ms: 13.5127
+  type: 'test'
+  ...
+# Subtest: EditorTransport는 exact origin의 v1 port로 binary를 caller detach 없이 전송한다
+ok 18 - EditorTransport는 exact origin의 v1 port로 binary를 caller detach 없이 전송한다
+  ---
+  duration_ms: 15.2699
+  type: 'test'
+  ...
+# Subtest: EditorTransport는 50 MiB v1 loadFile binary를 number array 없이 전송한다
+ok 19 - EditorTransport는 50 MiB v1 loadFile binary를 number array 없이 전송한다
+  ---
+  duration_ms: 9.9511
+  type: 'test'
+  ...
+# Subtest: EditorTransport는 legacy fallback에서도 source/origin이 맞는 응답만 받는다
+ok 20 - EditorTransport는 legacy fallback에서도 source/origin이 맞는 응답만 받는다
+  ---
+  duration_ms: 10.5158
+  type: 'test'
+  ...
+# Subtest: EditorTransport.destroy는 pending request를 거부한다
+ok 21 - EditorTransport.destroy는 pending request를 거부한다
+  ---
+  duration_ms: 0.7387
+  type: 'test'
+  ...
+# Subtest: EditorTransport는 bound v1 session의 documentChanged event만 전달한다
+ok 22 - EditorTransport는 bound v1 session의 documentChanged event만 전달한다
+  ---
+  duration_ms: 14.1016
+  type: 'test'
+  ...
+# Subtest: EditorTransport는 document-agent recovered 오류 필드를 보존한다
+ok 23 - EditorTransport는 document-agent recovered 오류 필드를 보존한다
+  ---
+  duration_ms: 0.5437
+  type: 'test'
+  ...
+# Subtest: EditorTransport는 일반 요청 10초와 load/export 60초 기본 timeout을 구분한다
+ok 24 - EditorTransport는 일반 요청 10초와 load/export 60초 기본 timeout을 구분한다
+  ---
+  duration_ms: 0.1287
+  type: 'test'
+  ...
+# Subtest: EditorTransport session은 randomUUID가 없을 때도 안전한 난수만 사용한다
+ok 25 - EditorTransport session은 randomUUID가 없을 때도 안전한 난수만 사용한다
+  ---
+  duration_ms: 0.1481
+  type: 'test'
+  ...
+# Subtest: EditorTransport는 구조화된 version 협상 오류를 legacy fallback 없이 전달한다
+ok 26 - EditorTransport는 구조화된 version 협상 오류를 legacy fallback 없이 전달한다
+  ---
+  duration_ms: 1.2507
+  type: 'test'
+  ...
+# Subtest: EditorTransport.destroy는 진행 중인 handshake도 한 번 거부한다
+ok 27 - EditorTransport.destroy는 진행 중인 handshake도 한 번 거부한다
+  ---
+  duration_ms: 0.3721
+  type: 'test'
+  ...
+# Subtest: EditorTransport는 malformed v1 response를 완료 응답으로 처리하지 않는다
+ok 28 - EditorTransport는 malformed v1 response를 완료 응답으로 처리하지 않는다
+  ---
+  duration_ms: 0.8725
+  type: 'test'
+  ...
+# Subtest: createEditor 연결 실패는 생성한 iframe과 transport를 정리한다
+ok 29 - createEditor 연결 실패는 생성한 iframe과 transport를 정리한다
+  ---
+  duration_ms: 0.7163
+  type: 'test'
+  ...
+# Subtest: createEditor는 지원하지 않는 renderer를 iframe 생성 전에 거부한다
+ok 30 - createEditor는 지원하지 않는 renderer를 iframe 생성 전에 거부한다
+  ---
+  duration_ms: 0.1898
+  type: 'test'
+  ...
+# Subtest: createEditor는 HTTP(S)가 아닌 studioUrl 실패 시 iframe을 남기지 않는다
+ok 31 - createEditor는 HTTP(S)가 아닌 studioUrl 실패 시 iframe을 남기지 않는다
+  ---
+  duration_ms: 0.2357
+  type: 'test'
+  ...
+# Subtest: EditorTransport는 동기 postMessage 실패 시 pending과 timer를 정리한다
+ok 32 - EditorTransport는 동기 postMessage 실패 시 pending과 timer를 정리한다
+  ---
+  duration_ms: 0.5833
+  type: 'test'
+  ...
+1..32
+# tests 32
+# suites 0
+# pass 32
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 219.0274

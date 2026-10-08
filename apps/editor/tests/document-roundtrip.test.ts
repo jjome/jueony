@@ -30,3 +30,23 @@ test('저장하고 탭 닫기에서 생성한 HWP가 본문을 포함한다', as
   const doc = new HwpDocument(await readFile(new URL('../fixtures/save-and-close.hwp', import.meta.url)));
   try { assert.deepEqual(textOf(doc), [['저장 후 탭 닫기 검증']]); } finally { doc.free(); }
 });
+
+for (const extension of ['hwp', 'hwpx']) {
+  test(`${extension}: UI에서 만든 3×3 표와 9개 셀 내용을 재저장 후에도 보존한다`, async () => {
+    const original = await readFile(new URL(`../fixtures/schedule-table.${extension}`, import.meta.url));
+    const doc = new HwpDocument(original);
+    try {
+      for (const bytes of [original, doc.exportHwp(), doc.exportHwpx()]) {
+        const reopened = new HwpDocument(bytes);
+        try {
+          assert.deepEqual(JSON.parse(reopened.getTableDimensions(0, 1, 0)), { rowCount: 3, colCount: 3, cellCount: 9 });
+          const expected = ['구분', '담당', '기한', '계획 수립', '총무팀', '10월 15일', '자료 검토', '담당 부서', '10월 20일'];
+          for (let cell = 0; cell < expected.length; cell++) {
+            assert.equal(reopened.getCellParagraphCount(0, 1, 0, cell), 1);
+            assert.equal(reopened.getTextInCell(0, 1, 0, cell, 0, 0, reopened.getCellParagraphLength(0, 1, 0, cell, 0)), expected[cell]);
+          }
+        } finally { reopened.free(); }
+      }
+    } finally { doc.free(); }
+  });
+}

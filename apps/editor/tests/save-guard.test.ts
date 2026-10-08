@@ -1,12 +1,39 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { assertSaveRevision, writeSnapshot } from '../src/save-guard.ts';
+import { assertSaveRevision, writeSnapshot, rememberFileSnapshot } from '../src/save-guard.ts';
 
 test('저장 대기 중 문서 교체나 수정이 발생하면 거절한다', () => {
   assert.doesNotThrow(() => assertSaveRevision('1:8', '1:8'));
   assert.throws(() => assertSaveRevision('1:8', '1:9'));
   assert.throws(() => assertSaveRevision('1:8', '2:8'));
   assert.throws(() => assertSaveRevision(undefined, '1:8'));
+});
+
+test('외부 프로그램이 원본을 바꾸면 덮어쓰기를 시작하지 않는다', async () => {
+  let disk = new Blob(['원본']);
+  let writes = 0;
+  const handle = {
+    getFile: async () => disk,
+    createWritable: async () => {
+      writes++;
+      return { write: async () => {}, close: async () => {} };
+    },
+  };
+  await rememberFileSnapshot(handle, new Uint8Array(await disk.arrayBuffer()));
+  disk = new Blob(['외부 수정']);
+  const root = { inert: false };
+  Object.assign(globalThis, {
+    window: { joouniEditor: { revision: () => '1:8' } },
+    document: {
+      getElementById: () => root,
+      createElement: () => ({ setAttribute() {}, remove() {} }),
+      body: { append() {} },
+    },
+  });
+  await assert.rejects(writeSnapshot(handle, Object.assign(new Blob(['내 편집']), { joouniRevision: '1:8' })), /원본 파일을 변경/);
+  assert.equal(writes, 0);
+  assert.equal(await disk.text(), '외부 수정');
+  assert.equal(root.inert, false);
 });
 
 test('쓰기 실패와 저장 중 수정 시 close하지 않고 abort하며 입력 잠금을 복원한다', async () => {

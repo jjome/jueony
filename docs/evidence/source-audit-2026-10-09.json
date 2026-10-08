@@ -1,0 +1,83 @@
+{
+  "verifiedDate": "2026-10-09",
+  "timezone": "Asia/Seoul",
+  "purpose": "Source and design audit only",
+  "gongmuwon": {
+    "path": "upstream/gongmuwon",
+    "url": "https://github.com/Kminer2053/gongmuwon.git",
+    "branch": "main",
+    "commit": "ef84271059eb178a08e4a358d761dab10ada7a78",
+    "version": "0.1.14",
+    "tag": "v0.1.14",
+    "missingHeadObjects": 0,
+    "workingTree": "clean"
+  },
+  "rhwp": {
+    "path": "upstream/rhwp-source",
+    "url": "https://github.com/edwardkim/rhwp.git",
+    "branch": "main",
+    "commit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "version": "0.8.7",
+    "tag": "v0.8.7",
+    "checkout": "shallow partial Git repository with full working-tree checkout; all HEAD objects present; not an offline build bundle",
+    "develCommit": "5168e3256ad58eda425d84fdd4d67e9b47bb74b1",
+    "develComparedPaths": [
+      "LICENSE",
+      "npm/editor",
+      "rhwp-studio/src/document-agent",
+      "rhwp-studio/src/embed",
+      "rhwp-studio/src/plugin",
+      "rhwp-studio/src/main.ts"
+    ],
+    "develDifferencesInComparedPaths": 0,
+    "trackedFiles": 41624,
+    "missingHeadObjects": 0,
+    "sparseExcludedPaths": 0,
+    "workingTree": "clean"
+  },
+  "checks": {
+    "editorContractTests": "32 passed; 0 failed; 0 skipped; Node 22.22.2 on Windows",
+    "backendTests": "NOT_RUN - required Python dependencies not installed",
+    "wasmAndTauri": "NOT_RUN",
+    "hancomReopen": "NOT_RUN",
+    "institutionApi": "NOT_RUN"
+  },
+  "files": [
+    {
+      "path": "upstream/gongmuwon/LICENSE",
+      "sha256": "3bbb5569445184740e695879ec599996a4cf40ebf499e7c725dad094a289607a"
+    },
+    {
+      "path": "upstream/gongmuwon/package-lock.json",
+      "sha256": "19b6e1886129e6f720ffe8a0643ea452cc96e36178295f74584cdb8807136f30"
+    },
+    {
+      "path": "upstream/gongmuwon/services/sidecar/pyproject.toml",
+      "sha256": "940f3fb40ad2a630226bda41835d127f63c1e02386d071c3d2feb02400d4d263"
+    },
+    {
+      "path": "upstream/gongmuwon/services/sidecar/src/gongmu_sidecar/public_doc_templates/LICENSE.public-doc-to-hwpx",
+      "sha256": "c5f2fb1e51a903346e1a9e7dd4012856cb36d1b0886a828657554beeefa6380d"
+    },
+    {
+      "path": "upstream/rhwp-source/LICENSE",
+      "sha256": "d6ea0e91bf1e6136b606e288e7e22dc44e39b4f087d4bdcde2bd0d8aaf5314dd"
+    },
+    {
+      "path": "upstream/rhwp-source/Cargo.lock",
+      "sha256": "fb7bb5f4f8baf2e7c3d4f4dff8106e4fb6aaec0a9a8e1f4e1b463ea44a9f0ad2"
+    },
+    {
+      "path": "upstream/rhwp-source/npm/editor/package.json",
+      "sha256": "4bb86e25f1cf68a8f77ad5b2f1c62088df64db070a4b8c118b9135832d4f9b85"
+    },
+    {
+      "path": "upstream/rhwp-source/rhwp-studio/package-lock.json",
+      "sha256": "3adb82267bc6512e6eb901224f227c1f32c382981e9c2e5d409ea18b12604efd"
+    },
+    {
+      "path": "upstream/rhwp-source/THIRD_PARTY_LICENSES.md",
+      "sha256": "ad324d500b8165dc6b2b77ee0805f741891690cb510c2c9fb806e24f70addb6d"
+    }
+  ]
+}

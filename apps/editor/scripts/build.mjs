@@ -10,6 +10,9 @@ const upstream = resolve(app, '../../upstream/rhwp-source');
 const expectedCommit = '1a76570e833917d15817415a53c09ad61ab3203f';
 const commit = execFileSync('git', ['-C', upstream, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 if (commit !== expectedCommit) throw new Error(`참조 커밋이 다릅니다: ${commit}`);
+const sourceChanges = execFileSync('git', ['-C', upstream, 'status', '--porcelain', '--untracked-files=all', '--',
+  'rhwp-studio', 'assets/fonts', 'npm/hwpctrl-ocx', 'LICENSE', 'THIRD_PARTY_LICENSES.md'], { encoding: 'utf8' }).trim();
+if (sourceChanges) throw new Error('참조 소스에 변경이 있습니다. 기준 커밋과 같은 소스로 빌드해 주세요.');
 const root = join(app, '.build/studio');
 await mkdir(root, { recursive: true });
 await cp(join(upstream, 'rhwp-studio/src'), join(root, 'src'), { recursive: true });
@@ -28,6 +31,10 @@ await cp(join(app, 'src'), join(root, 'src/joouni'), { recursive: true });
 await cp(join(app, 'src/boot.js'), join(root, 'public/joouni-boot.js'));
 await cp(join(upstream, 'LICENSE'), join(root, 'public/LICENSE.rhwp.txt'));
 await cp(join(upstream, 'THIRD_PARTY_LICENSES.md'), join(root, 'public/THIRD_PARTY_LICENSES.rhwp.md'));
+await mkdir(join(root, 'public/licenses'), { recursive: true });
+for (const [name, file] of [['canvaskit-wasm', 'LICENSE'], ['@noble/hashes', 'LICENSE'], ['@rhwp/core', 'LICENSE']]) {
+  await cp(join(app, 'node_modules', name, file), join(root, 'public/licenses', name.replaceAll('/', '-') + '.txt'));
+}
 
 function replaceOnce(text, before, after, label) {
   if (text.split(before).length !== 2) throw new Error(`소스 패치 기준 불일치: ${label}`);
@@ -36,6 +43,8 @@ function replaceOnce(text, before, after, label) {
 let html = await readFile(join(upstream, 'rhwp-studio/index.html'), 'utf8');
 html = replaceOnce(html, '<script src="/theme-init.js"></script>', '<script src="/joouni-boot.js"></script>\n  <script src="/theme-init.js"></script>', 'boot');
 html = replaceOnce(html, '<title>rhwp-studio</title>', '<title>주니 문서 편집기 · 개발판</title>', 'title');
+html = html.replaceAll('rhwp-studio 문서 편집기', '주니 문서 편집기');
+html = html.replace('data-i18n="ui.studioHeader.srLabel"', '');
 html = replaceOnce(html, '<div id="studio-root">', '<div id="studio-root">\n    <div id="joouni-title"><strong>주니 문서 편집기</strong><span>한글 2024 호환성 개발판</span></div>', 'titlebar');
 html = replaceOnce(html, '</head>', '  <link rel="stylesheet" href="/src/joouni/editor.css" />\n</head>', 'css');
 await writeFile(join(root, 'editor.html'), html);
@@ -83,7 +92,10 @@ fileCommands = replaceOnce(fileCommands,
       } else services.eventBus.emit('create-new-document');`, 'new document tab');
 await writeFile(join(root, 'src/command/commands/file.ts'), fileCommands);
 let fileSystem = (await readFile(join(root, 'src/command/file-system-access.ts'), 'utf8')).replace(/\r\n/g, '\n');
-fileSystem = "import { writeSnapshot } from '../joouni/save-guard';\n" + fileSystem;
+fileSystem = "import { writeSnapshot, rememberFileSnapshot } from '../joouni/save-guard';\n" + fileSystem;
+fileSystem = replaceOnce(fileSystem,
+  'const file = await handle.getFile();\n  return {\n    name: file.name,\n    bytes: new Uint8Array(await file.arrayBuffer()),',
+  'const file = await handle.getFile();\n  const bytes = new Uint8Array(await file.arrayBuffer());\n  await rememberFileSnapshot(handle, bytes);\n  return {\n    name: file.name,\n    bytes,', 'source file fingerprint');
 fileSystem = replaceOnce(fileSystem,
   'const writable = await handle.createWritable();\n  await writable.write(blob);\n  await writable.close();',
   'await writeSnapshot(handle, blob);', 'save transaction guard');
@@ -102,11 +114,16 @@ await build({
   },
 });
 const sha256 = data => createHash('sha256').update(data).digest('hex');
+const customSource = [];
+for (const name of (await readdir(join(app, 'src'))).sort()) customSource.push(name, await readFile(join(app, 'src', name), 'utf8'));
 const evidence = {
   applicationId: 'joouni-editor',
   sourceCommit: commit, enginePackage: '@rhwp/core@0.8.7', builtAt: new Date().toISOString(),
   engineWasmSha256: sha256(await readFile(join(app, 'node_modules/@rhwp/core/rhwp_bg.wasm'))),
   buildScriptSha256: sha256(await readFile(fileURLToPath(import.meta.url))),
+  customSourceSha256: sha256(customSource.join('\n')),
+  applicationSourceCommit: execFileSync('git', ['-C', app, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
+  applicationSourceDirty: Boolean(execFileSync('git', ['-C', app, 'status', '--porcelain', '--', '.'], { encoding: 'utf8' }).trim()),
   sourceBuild: false, note: 'Rust 엔진은 공식 npm WASM 바이너리 사용. 이 빌드에서 Rust 엔진을 재컴파일하지 않음.',
 };
 await writeFile(join(app, 'dist/build-evidence.json'), JSON.stringify(evidence, null, 2));

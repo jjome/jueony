@@ -1,0 +1,18 @@
+{
+  "passed": 13,
+  "checks": [
+    "GET /",
+    "GET /editor.html",
+    "GET /build-evidence.json",
+    "HEAD 본문 없음",
+    "경로 거부 /../README.md",
+    "경로 거부 /%2e%2e/README.md",
+    "경로 거부 /%5cWindows/win.ini",
+    "경로 거부 /C:/Windows/win.ini",
+    "경로 거부 /%00",
+    "경로 거부 /%FF",
+    "외부 Host 거부",
+    "쓰기 요청 거부",
+    "WASM MIME 및 바이트 무결성"
+  ]
+}

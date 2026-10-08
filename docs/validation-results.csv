@@ -1,0 +1,17 @@
+case_id,fixture_id,input_format,source_sha256,output_kind,output_path,output_sha256,app_commit,rhwp_commit,windows_build,webview2_version,hancom_product_build,font_manifest,check,status,reviewer,evidence_path,notes
+V01,C01,hwp,,,,,,1a76570e833917d15817415a53c09ad61ab3203f,,,,,offline_cold_start,NOT_RUN,,,planning_template_only
+V01,C01,hwpx,,,,,,1a76570e833917d15817415a53c09ad61ab3203f,,,,,offline_cold_start,NOT_RUN,,,planning_template_only
+V03,C01,hwp,,noop,,,,1a76570e833917d15817415a53c09ad61ab3203f,,,,,hancom_reopen_and_layout,NOT_RUN,,,input_and_output_not_created
+V03,C01,hwpx,,noop,,,,1a76570e833917d15817415a53c09ad61ab3203f,,,,,hancom_reopen_and_layout,NOT_RUN,,,input_and_output_not_created
+V06,C01,hwp,,applied,,,,1a76570e833917d15817415a53c09ad61ab3203f,,,,,hancom_reopen_and_layout,NOT_RUN,,,input_and_output_not_created
+V06,C01,hwpx,,applied,,,,1a76570e833917d15817415a53c09ad61ab3203f,,,,,hancom_reopen_and_layout,NOT_RUN,,,input_and_output_not_created
+V07,C01,hwp,,reverted,,,,1a76570e833917d15817415a53c09ad61ab3203f,,,,,hancom_reopen_and_layout,NOT_RUN,,,input_and_output_not_created
+V07,C01,hwpx,,reverted,,,,1a76570e833917d15817415a53c09ad61ab3203f,,,,,hancom_reopen_and_layout,NOT_RUN,,,input_and_output_not_created
+V11,C02,hwp,,,,,,1a76570e833917d15817415a53c09ad61ab3203f,,,,,page_count_change_rejection,NOT_RUN,,,planning_template_only
+V11,C02,hwpx,,,,,,1a76570e833917d15817415a53c09ad61ab3203f,,,,,page_count_change_rejection,NOT_RUN,,,planning_template_only
+V15,C03,hwp,,applied,,,,1a76570e833917d15817415a53c09ad61ab3203f,,,,,non_target_objects_preserved,NOT_RUN,,,planning_template_only
+V15,C03,hwpx,,applied,,,,1a76570e833917d15817415a53c09ad61ab3203f,,,,,non_target_objects_preserved,NOT_RUN,,,planning_template_only
+V10,C04,hwp,,,,,,1a76570e833917d15817415a53c09ad61ab3203f,,,,,unsupported_target_rejection,NOT_RUN,,,planning_template_only
+V10,C04,hwpx,,,,,,1a76570e833917d15817415a53c09ad61ab3203f,,,,,unsupported_target_rejection,NOT_RUN,,,planning_template_only
+V12,C01,both,,,,,,1a76570e833917d15817415a53c09ad61ab3203f,,,,,save_failure_preserves_original_and_dirty,NOT_RUN,,,planning_template_only
+V13,C01,both,,,,,,1a76570e833917d15817415a53c09ad61ab3203f,,,,,save_edit_race,NOT_RUN,,,planning_template_only

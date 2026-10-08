@@ -1,0 +1,89 @@
+{
+  "recordedAtUtc": "2026-10-08T20:51:15.532462+00:00",
+  "frontendBuild": {
+    "applicationId": "joouni-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@rhwp/core@0.8.7",
+    "builtAt": "2026-10-08T20:49:24.248Z",
+    "engineWasmSha256": "54cf95014312e605c51b98eb9021247ea79ef2bbd0a7080e11c011d0246e3989",
+    "buildScriptSha256": "f3cd9c6a86f4740cd65d8308f031cf56a7af772a02a14b93a47163249e9ddf71",
+    "customSourceSha256": "f61022dc4165692712d07f9f746be1744bd07f78e127966211121a7dcf45193b",
+    "applicationSourceCommit": "6891bb19f2fca5aa7a1e01b47ea54a05932b726b",
+    "applicationSourceDirty": false,
+    "sourceBuild": false,
+    "note": "Rust 엔진은 공식 npm WASM 바이너리 사용. 이 빌드에서 Rust 엔진을 재컴파일하지 않음."
+  },
+  "launcher": {
+    "path": "build/windows-preview/JoouniEditor.exe",
+    "bytes": 280576,
+    "sha256": "02676892000ffa189cb824ceaa5d02ea720c376a592261f4d6ea42b8bc704cf1",
+    "compile": "PASS",
+    "serveOnlyRuntime": "PASS",
+    "browserAppLaunchViaExe": "NOT_RUN",
+    "rustUnitTestExecutable": "OS_POLICY_BLOCKED"
+  },
+  "checks": {
+    "typescript": "PASS",
+    "appTests": {
+      "passed": 8,
+      "failed": 0
+    },
+    "launcherHttp": {
+      "passed": 13,
+      "failed": 0
+    },
+    "tauriBuild": "OS_POLICY_BLOCKED",
+    "hancom2024Reopen": "NOT_RUN",
+    "windowsIme": "NOT_RUN",
+    "osNetworkDisconnectedRun": "NOT_RUN",
+    "institutionApi": "NOT_RUN"
+  },
+  "uiChecked": [
+    "HWPX reopen",
+    "Korean text and Enter paragraphs",
+    "undo with document tabs",
+    "cancel closing dirty tab",
+    "download confirmed save and close",
+    "style outline 1",
+    "16pt bold center title",
+    "3x3 table, nine cells, Tab navigation",
+    "HWP and HWPX downloads"
+  ],
+  "knownIssues": [
+    "Unattributed MutationObserver.observe error on initial IAB page load; editor window error collector did not capture a stack.",
+    "Hancom font substitutions and unsupported objects require independent layout review.",
+    "Tauri/WebView2 native host not compiled or exercised."
+  ],
+  "fixtures": [
+    {
+      "path": "apps/editor/fixtures/save-and-close.hwp",
+      "bytes": 12800,
+      "sha256": "67a81e235aa6919b9b7e4422ae3660de3a74fe4ebcd5ab563c870a02f2a010c7",
+      "hancomValidation": "NOT_RUN"
+    },
+    {
+      "path": "apps/editor/fixtures/schedule-table.hwp",
+      "bytes": 13312,
+      "sha256": "85b29b887a410651545b2b597f8cf32cbe99e20c1607c33a724d3202d728ded3",
+      "hancomValidation": "NOT_RUN"
+    },
+    {
+      "path": "apps/editor/fixtures/schedule-table.hwpx",
+      "bytes": 8111,
+      "sha256": "1b623738fff9aa738dd2dbf07e67e3a8d57e92f2f9299b522c0d8b6e69dee0b2",
+      "hancomValidation": "NOT_RUN"
+    },
+    {
+      "path": "apps/editor/fixtures/three-paragraphs.hwp",
+      "bytes": 13312,
+      "sha256": "e271fa484c3e4f3d042473c934525137e7bf89885c86c66abc746b965cae2c5f",
+      "hancomValidation": "NOT_RUN"
+    },
+    {
+      "path": "apps/editor/fixtures/three-paragraphs.hwpx",
+      "bytes": 7553,
+      "sha256": "1f789360beda3016d6782d55b4b913f4d75e45a0a5f949aedaaaca8d0072e682",
+      "hancomValidation": "NOT_RUN"
+    }
+  ]
+}

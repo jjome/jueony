@@ -25,6 +25,8 @@
 
 ## 실제 검증 증거
 
+[빌드 기록](evidence/editor-build-2026-10-09.txt), [테스트 로그](evidence/editor-tests-2026-10-09.txt), [런처 검사](evidence/launcher-http-2026-10-09.json), [파일 해시와 검증 상태](evidence/editor-validation-2026-10-09.json)를 함께 보관한다. [표 작성 화면](evidence/editor-table-2026-10-09.jpg)과 [최종 시작 화면](evidence/editor-final-2026-10-09.jpg)도 포함한다.
+
 앱 테스트 `apps/editor/tests`의 8개 검사가 통과했다. 본문 3개 문단의 텍스트와 경계, 3×3 표의 9개 셀, 양쪽 형식 재저장, 저장 후 닫기의 실제 생성 파일, 저장 버전 충돌·외부 파일 변경·쓰기 실패를 검사한다. `fixtures`는 UI에서 만든 합성 문서다. 같은 rhwp 엔진으로 검증했으며 독립된 한글 판정이 아니다.
 
 Rust 런처의 HTTP 통합 검사 13개는 화면·메타데이터·WASM 제공과 MIME/해시, HEAD, 경로 이탈·잘못된 Host·POST 거부를 확인했다. 외부 요청 허용 범위는 CSP로 제한하며 정적 서버에 문서 읽기/쓰기 API는 없다. 운영체제의 인터넷 연결을 끊은 상태에서 앱 전체·브라우저 전체 네트워크를 계측한 검수는 하지 않았다.

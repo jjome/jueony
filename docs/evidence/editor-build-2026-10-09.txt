@@ -1,0 +1,32 @@
+vite v8.3.2 building client environment for production...
+transforming...
+[plugin rolldown:vite-resolve] Module "fs" has been externalized for browser compatibility, imported by "C:/Users/jjome/Documents/work/joouni/apps/editor/node_modules/canvaskit-wasm/bin/canvaskit.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin rolldown:vite-resolve] Module "path" has been externalized for browser compatibility, imported by "C:/Users/jjome/Documents/work/joouni/apps/editor/node_modules/canvaskit-wasm/bin/canvaskit.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+✓ 284 modules transformed.
+rendering chunks...
+computing gzip size...
+apps/editor/dist/index.html                                      1.43 kB │ gzip:     0.74 kB
+apps/editor/dist/editor.html                                    87.86 kB │ gzip:    11.57 kB
+apps/editor/dist/assets/canvaskit-SCAxUyCS.wasm              7,317.34 kB │ gzip: 2,989.78 kB
+apps/editor/dist/assets/rhwp_bg-BkVWMBaR.wasm               11,821.75 kB │ gzip: 4,461.90 kB
+apps/editor/dist/assets/index-i4zeIfnZ.css                       1.85 kB │ gzip:     0.80 kB
+apps/editor/dist/assets/editor-DoRzZ7Un.css                    118.76 kB │ gzip:    20.76 kB
+apps/editor/dist/assets/modulepreload-polyfill-P2Xu9kJm.js       0.67 kB │ gzip:     0.38 kB
+apps/editor/dist/assets/index-Ch7Pe75e.js                        3.18 kB │ gzip:     1.48 kB
+apps/editor/dist/assets/canvaskit-renderer-BFyQRRu4.js         247.51 kB │ gzip:    74.61 kB
+apps/editor/dist/assets/editor-Ba8MUjXR.js                   2,130.42 kB │ gzip:   443.49 kB
+
+✓ built in 573ms
+{
+  "applicationId": "joouni-editor",
+  "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+  "enginePackage": "@rhwp/core@0.8.7",
+  "builtAt": "2026-10-08T20:49:24.248Z",
+  "engineWasmSha256": "54cf95014312e605c51b98eb9021247ea79ef2bbd0a7080e11c011d0246e3989",
+  "buildScriptSha256": "f3cd9c6a86f4740cd65d8308f031cf56a7af772a02a14b93a47163249e9ddf71",
+  "customSourceSha256": "f61022dc4165692712d07f9f746be1744bd07f78e127966211121a7dcf45193b",
+  "applicationSourceCommit": "6891bb19f2fca5aa7a1e01b47ea54a05932b726b",
+  "applicationSourceDirty": false,
+  "sourceBuild": false,
+  "note": "Rust 엔진은 공식 npm WASM 바이너리 사용. 이 빌드에서 Rust 엔진을 재컴파일하지 않음."
+}

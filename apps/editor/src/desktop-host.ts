@@ -9,6 +9,7 @@ export function installDesktopHost({ wasm, eventBus, documentState, ready, save,
   // 부모 탭 호스트도 같은 엔진의 상태와 저장 명령을 사용한다.
   (window as any).jueonyEditor = {
     ready, revision, save, discard,
+    fileHandle: () => wasm.currentFileHandle,
     busy: () => Boolean(document.getElementById('jueony-busy') || document.getElementById('jueony-download-confirm')) || document.documentElement.classList.contains('rhwp-busy'),
     state: () => ({ name: wasm.fileName, pageCount: wasm.pageCount, dirty: documentState.isDirty(), revision: revision() }),
   };

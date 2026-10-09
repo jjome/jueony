@@ -3,7 +3,7 @@ const fail=(m:string):never=>{throw new Error(m);};
 const object=(v:unknown):Record<string,unknown>=>{if(!v||typeof v!=='object'||Array.isArray(v))return fail('응답이 JSON 객체가 아닙니다.');return v as Record<string,unknown>;};
 function keys(o:Record<string,unknown>, allowed:string[]){if(Object.keys(o).some(k=>!allowed.includes(k)))fail('지원하지 않는 응답 필드입니다.');}
 function string(v:unknown,max=16000){if(typeof v!=='string'||v.length>max||/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/u.test(v))return fail('텍스트 형식/길이가 잘못되었습니다.');return v;}
-function paragraphs(v:unknown){if(!Array.isArray(v)||!v.length||v.length>100)return fail('문단은 1~100개여야 합니다.');return v.map(t=>{const s=string(t);if(/[\r\n\t]/.test(s))fail('문단별 텍스트에 줄바꿈/탭을 넣지 마세요.');return s;});}
+function paragraphs(v:unknown){if(!Array.isArray(v)||!v.length||v.length>100)return fail('문단은 1~100개여야 합니다.');return v.map(t=>{const s=string(t);if(Array.from(s).length>4000)fail('AI가 만드는 한 문단은 4,000자 이내입니다.');if(/[\r\n\t]/.test(s))fail('문단별 텍스트에 줄바꿈/탭을 넣지 마세요.');return s;});}
 export function validateGeneration(raw:unknown,snapshot:Snapshot,sourceIds:string[]):Generation{
  const g=object(raw);keys(g,['message','operations','sourceIds']);const message=string(g.message,6000);
  if(!Array.isArray(g.sourceIds)||g.sourceIds.some(s=>typeof s!=='string'||!sourceIds.includes(s)))fail('알 수 없는 출처입니다.');
@@ -22,6 +22,7 @@ export function validateGeneration(raw:unknown,snapshot:Snapshot,sourceIds:strin
   if(!Number.isSafeInteger(start)||!Number.isSafeInteger(count)||(start as number)<0||(count as number)<0||(start as number)+(count as number)>Array.from(target!.text).length)fail('텍스트 범위가 문단을 벗어납니다.');
   if(kind==='delete_body_text'){if(!count)fail('삭제 범위가 비어 있습니다.');return {kind,target:id,start:start as number,count:count as number};}
   const text=string(o.text);if(/[\r\n\t]/.test(text))fail('줄바꿈은 문단 삽입 명령으로 처리해야 합니다.');total+=text.length;
+  if(Array.from(target!.text).length-(count as number)+Array.from(text).length>4000)fail('수정 결과의 한 문단은 4,000자 이내입니다.');
   if(!count&&!text)fail('변경이 없는 명령입니다.');
   return {kind,target:id,start:start as number,count:count as number,text};
  });
@@ -45,6 +46,17 @@ export function executeBodyOperations(wasm:any, snapshot:Snapshot, ops:EditOp[])
   const n=snapshot.nodes.find(n=>n.id===(op.kind==='insert_body_paragraphs'?op.after:op.target))!;
   if(wasm.getTextRange(n.section,n.paragraph,0,wasm.getParagraphLength(n.section,n.paragraph))!==n.text)throw new Error('대상 문단 원문이 달라졌습니다.');
   if(op.kind==='insert_body_paragraphs'){append(n.section,n.paragraph,op.paragraphs);}
-  else check(wasm.replaceText(n.section,n.paragraph,op.start,op.count,op.kind==='delete_body_text'?'':op.text));
+  else {
+   const charShape=parsed(wasm.getCharPropertiesAt(n.section,n.paragraph,0)).charShapeId;
+   const paraShape=parsed(wasm.getParaPropertiesAt(n.section,n.paragraph)).paraShapeId;
+   if(!Number.isInteger(charShape)||!Number.isInteger(paraShape))throw new Error('원래 문단 서식을 확인하지 못했습니다.');
+   const replacement=op.kind==='delete_body_text'?'':op.text;
+   const original=Array.from(n.text),expected=[...original.slice(0,op.start),replacement,...original.slice(op.start+op.count)].join('');
+   check(wasm.replaceText(n.section,n.paragraph,op.start,op.count,replacement));
+   const length=wasm.getParagraphLength(n.section,n.paragraph);
+   if(length)check(wasm.setCharShapeId(n.section,n.paragraph,0,length,charShape));
+   check(wasm.setParaShapeId(n.section,n.paragraph,paraShape));
+   if(wasm.getTextRange(n.section,n.paragraph,0,length)!==expected)throw new Error('편집 결과가 명령과 다릅니다.');
+  }
  }
 }

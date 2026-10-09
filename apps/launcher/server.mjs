@@ -17,7 +17,7 @@ const registry=new Map([['openai-compatible',createOpenAICompatible]]);
 const csp="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'";
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.wasm':'application/wasm','.woff2':'font/woff2','.woff':'font/woff','.ttf':'font/ttf','.otf':'font/otf','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.ico':'image/x-icon'};
 function reply(res,status,data,type='application/json'){res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':csp,'Referrer-Policy':'no-referrer'});res.end(type==='application/json'?JSON.stringify(data):data);}
-function caller(req){const origin=req.headers.origin;if(origin)return origins.has(origin);let ref;try{ref=new URL(req.headers.referer).origin;}catch{}return req.headers['sec-fetch-site']==='same-origin'&&['cors','same-origin'].includes(req.headers['sec-fetch-mode']);}
+function caller(req){const origin=req.headers.origin;if(origin)return origins.has(origin);return req.headers['sec-fetch-site']==='same-origin'&&['cors','same-origin'].includes(req.headers['sec-fetch-mode']);}
 function authorized(req){const supplied=req.headers['x-jueony-token'];return typeof supplied==='string'&&supplied.length===token.length&&timingSafeEqual(Buffer.from(supplied),Buffer.from(token));}
 async function body(req){if(req.headers['content-type']!=='application/json')throw new Error('JSON 요청이 필요합니다.');let size=0;const parts=[];for await(const chunk of req){size+=chunk.length;if(size>2_000_000)throw new Error('요청 크기 제한을 넘었습니다.');parts.push(chunk);}return JSON.parse(Buffer.concat(parts).toString('utf8'));}
 let active=0;
@@ -31,6 +31,7 @@ const server=http.createServer({maxHeaderSize:16384,requestTimeout:15000,headers
    if(path==='/api/session'&&req.method==='GET'&&req.headers['x-jueony-bootstrap']==='1'){reply(res,200,{token});return;}
    if(req.method!=='POST'||!authorized(req)){reply(res,403,{error:'세션 인증이 필요합니다. 앱을 다시 열어 주세요.'});return;}
    const data=await body(req);
+   if(path==='/api/clear-credentials'){configs.clear();reply(res,200,{cleared:true});return;}
    if(path==='/api/configure'){
     const config=data.config;
     if(!config||typeof config.id!=='string'||config.id.length>100||!registry.has(config.adapterId))throw new Error('지원하지 않는 제공자 설정입니다.');

@@ -1,3 +1,4 @@
+import { rememberFileSnapshot } from '../save-guard';
 import { collectTargetEvidence } from '../../document-agent/controller';
 import { assertRevision, executeBodyOperations, validateGeneration } from './edit-schema.ts';
 import { plainSnapshot } from './model.ts';
@@ -31,7 +32,7 @@ export function installAgentBridge(d:Deps){
  }
  Object.assign(api,{
   snapshot,
-  async open(bytes:Uint8Array,name:string,handle:any=null,dirty=false){await d.ready;if(api.busy()||applying)throw new Error('문서 작업 중입니다.');await d.load(bytes,name,handle);if(dirty)d.documentState.markDirty('workspace-recovery');},
+  async open(bytes:Uint8Array,name:string,handle:any=null,dirty=false){await d.ready;if(api.busy()||applying)throw new Error('문서 작업 중입니다.');await d.load(bytes,name,handle);if(handle)await rememberFileSnapshot(handle,bytes);if(dirty)d.documentState.markDirty('workspace-recovery');},
   recovery(){if(applying||composing||api.busy())return null;d.input()?.flushDeferredPaginationIfNeeded('jueony-recovery');return {name:d.wasm.fileName,dirty:d.documentState.isDirty(),bytes:d.wasm.fileName.toLowerCase().endsWith('.hwpx')?d.wasm.exportHwpx():d.wasm.exportHwp()};},
   async readReference(bytes:Uint8Array){await d.ready;const {HwpDocument}=d.wasm.getWasmModuleExports();const doc=new HwpDocument(bytes);try{return textOf(doc);}finally{doc.free();}},
   async apply(runId:string,base:Snapshot,generation:Generation):Promise<Receipt>{
@@ -66,7 +67,7 @@ export function installAgentBridge(d:Deps){
    if(input?.history?.peekUndoTop()?.type!=='snapshot:jueony:'+receipt.runId)throw new Error('요청 이후 편집 이력이 달라져 이 요청만 되돌릴 수 없습니다.');
    const result=d.automation.execute('edit:undo');if(!result.ok)throw new Error('되돌리기 실패');
    await d.render();if(plainSnapshot(snapshot())!==receipt.before)throw new Error('되돌림 결과를 확인하지 못했습니다.');
-   applied.delete(receipt.runId);
+   // Keep the request ID consumed after undo; replay must use a new run ID.
   },
  });
 }

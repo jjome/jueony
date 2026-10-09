@@ -27,6 +27,20 @@ test('여러 위치 교체/삭제/삽입과 snapshot 되돌림이 앞뒤 문단�
  assert.equal(doc.getControls(),controls);assert.equal(doc.getPageDef(0),page);doc.restoreSnapshot(id);assert.deepEqual(text(doc),before.nodes.map(n=>n.text));doc.discardSnapshot(id);
  }finally{doc.free();}
 });
+test('이모지 앞뒤 Unicode 범위 교체와 빈 문단 삭제를 보존한다',()=>{
+ const doc=HwpDocument.createEmpty();doc.createBlankDocument();doc.insertText(0,0,0,'가😀나다');
+ try{executeBodyOperations(doc,snapshot(doc),[{kind:'replace_body_text',target:'s0p0',start:1,count:1,text:'🌿'}]);assert.deepEqual(text(doc),['가🌿나다']);
+ executeBodyOperations(doc,snapshot(doc),[{kind:'delete_body_text',target:'s0p0',start:0,count:4}]);assert.deepEqual(text(doc),['']);assert.equal(doc.getParagraphCount(0),1);
+ }finally{doc.free();}
+});
+test('본문 전체 교체가 균일한 원래 글자·문단 서식을 보존한다',()=>{
+ const doc=HwpDocument.createEmpty();doc.createBlankDocument();doc.insertText(0,0,0,'굵은 원문');
+ try{doc.applyCharFormat(0,0,0,doc.getParagraphLength(0,0),JSON.stringify({bold:true}));const char=JSON.parse(doc.getCharPropertiesAt(0,0,0)).charShapeId,para=JSON.parse(doc.getParaPropertiesAt(0,0)).paraShapeId;
+ executeBodyOperations(doc,snapshot(doc),[{kind:'replace_body_text',target:'s0p0',start:0,count:5,text:'수정된 제목 😀'}]);
+ for(let i=0;i<doc.getParagraphLength(0,0);i++)assert.equal(JSON.parse(doc.getCharPropertiesAt(0,0,i)).charShapeId,char);
+ assert.equal(JSON.parse(doc.getParaPropertiesAt(0,0)).paraShapeId,para);
+ }finally{doc.free();}
+});
 test('명령 전체 사전 검사에서 알 수 없는 명령·범위·출처·중복 대상을 거부한다',()=>{
  const doc=HwpDocument.createEmpty();doc.createBlankDocument();try{const s=snapshot(doc);
  for(const operations of [[{kind:'shell',command:'anything'}],[{kind:'delete_body_text',target:'s0p0',start:0,count:1}],[{kind:'create_document',paragraphs:['a\nb']}],[{kind:'insert_body_paragraphs',after:'s0p0',paragraphs:['a']},{kind:'insert_body_paragraphs',after:'s0p0',paragraphs:['b']}]])assert.throws(()=>validateGeneration({message:'',sourceIds:[],operations},s,[]));

@@ -1,4 +1,4 @@
-param([string]$OutputName = 'jueony-preview')
+param([string]$OutputName = 'jueony-mvp')
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $env:RUSTUP_HOME = Join-Path $projectRoot '.tools/rustup'
@@ -20,7 +20,7 @@ if (Test-Path -LiteralPath $rustNotice) {
     Copy-Item -LiteralPath $rustNotice -Destination (Join-Path $output 'Rust-COPYRIGHT-library.html') -Force
 }
 $voltaNodes = Join-Path $env:LOCALAPPDATA 'Volta/tools/image/node'
-$installedNode = Get-ChildItem -LiteralPath $voltaNodes -Directory | Sort-Object { [version]$_.Name } -Descending | Select-Object -First 1
+$installedNode = Get-ChildItem -LiteralPath $voltaNodes -Directory | Where-Object { ([version]$_.Name).Major -eq 22 } | Sort-Object { [version]$_.Name } -Descending | Select-Object -First 1
 if (-not $installedNode) { throw '실행 묶음에 포함할 Node.js 22 이상이 필요합니다.' }
 $runtimePath = Join-Path $output 'runtime'
 New-Item -ItemType Directory -Force $runtimePath | Out-Null
@@ -28,4 +28,15 @@ Copy-Item -LiteralPath (Join-Path $installedNode.FullName 'node.exe') -Destinati
 Copy-Item -LiteralPath (Join-Path $installedNode.FullName 'LICENSE') -Destination (Join-Path $runtimePath 'LICENSE.Node.txt') -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/launcher/server.mjs') -Destination $output -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/launcher/providers') -Destination $output -Recurse -Force
+$nodeVersion = & (Join-Path $runtimePath 'node.exe') --version
+$manifest = [ordered]@{
+    createdAt = (Get-Date).ToUniversalTime().ToString('o')
+    nodeVersion = $nodeVersion
+    nodeSha256 = (Get-FileHash -LiteralPath (Join-Path $runtimePath 'node.exe') -Algorithm SHA256).Hash
+    launcherSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'JueonyEditor.exe') -Algorithm SHA256).Hash
+    serverSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'server.mjs') -Algorithm SHA256).Hash
+    adapterSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'providers/openai-compatible.mjs') -Algorithm SHA256).Hash
+    frontend = Get-Content -LiteralPath (Join-Path $output 'dist/build-evidence.json') -Raw | ConvertFrom-Json
+}
+$manifest | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $output 'bundle-evidence.json') -Encoding utf8
 Write-Output "실행 파일: $output\JueonyEditor.exe"

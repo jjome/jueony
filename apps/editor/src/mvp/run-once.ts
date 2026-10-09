@@ -9,10 +9,10 @@ export async function runOnce(options:{runId:string;context:LLMInput;model:Model
  check();options.state('validating');
  assertRevision(options.context.document.revision,options.editor.snapshot().revision);
  const result=validateGeneration(raw,options.context.document,options.context.references.map(s=>s.id));
- if(!result.operations.length)return {message:result.message,receipt:undefined};
+ if(!result.operations.length)return {message:result.message,sourceIds:result.sourceIds,receipt:undefined};
  let editor=options.editor,base=options.context.document;
  if(result.operations[0].kind==='create_document'){check();editor=await options.createDocument();base=editor.snapshot();}
  check();options.state('applying');
  const receipt=await editor.apply(options.runId,base,result);
- return {message:result.message,receipt};
+ return {message:result.message,sourceIds:result.sourceIds,receipt};
 }

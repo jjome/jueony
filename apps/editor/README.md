@@ -4,7 +4,7 @@
 
 ## 실행
 
-프로젝트 루트의 Start-Jueony.cmd 또는 build/jueony-mvp/JueonyEditor.exe를 실행한다. 묶음의 dist, runtime, server.mjs, providers, LICENSE와 고지 파일을 함께 유지한다. Edge/Chrome이 필요하며 Node.js 22 런타임은 동봉했다. Rust 런처가 127.0.0.1:4173에서 로컬 서버를 시작하고 편집 창을 연다. 이전 정적 서버가 같은 포트를 점유 중이면 이전 창의 문서를 저장하고 서버를 종료한 뒤 실행한다.
+프로젝트 루트 또는 build/jueony-mvp의 Start-Jueony.cmd를 실행한다. 묶음의 dist, runtime, server.mjs, providers, LICENSE와 고지 파일을 함께 유지한다. Edge/Chrome이 필요하며 Node.js 22 런타임은 동봉했다. PowerShell 스크립트가 127.0.0.1:4173에서 동봉한 Node 서버를 시작하고 편집 창을 연다. 새 Rust exe는 컴파일했으나 이 PC의 OS 애플리케이션 제어에 실행이 차단되었다. 이전 정적 서버가 같은 포트를 점유 중이면 이전 창의 문서를 저장하고 서버를 종료한 뒤 실행한다.
 
 업무와 채팅을 만들고 로컬 폴더를 연결한다. 원본을 복사하거나 이동하지 않으며 연결 해제도 원본을 삭제하지 않는다. 파일/폴더를 체크한 경우에만 요청 자료로 읽는다. HWP/HWPX와 UTF-8 TXT/MD를 지원한다. PDF/DOCX/XLSX/OCR은 미지원이다.
 
@@ -59,7 +59,7 @@ JUEONY_TEST_URL로 대상 URL을 바꿀 수 있다. 이 값은 검증 스크립�
 
 자동 검사: 앱/엔진 19, 서버 7, UI 통합 18. 네이티브 Windows 폴더 선택기는 OPFS 핸들로 대체해 검사했다. 한국어 IME, 실제 한글, 실제 기관 API, OS 전체 인터넷 차단 검수는 별도다. 엔진의 중간/렌더/rollback 실패 주입과 강제 종료 복구도 남았다.
 
-Rust 런처는 std로 빌드한다. HTTP/TLS 의존성과 Tauri 호스트 빌드는 이 PC의 Windows 애플리케이션 제어에 막혀 현재 경로는 동봉한 Node 표준 서버를 사용한다. 정책을 변경하지 않았다. 설치 서비스나 자동 시작을 등록하지 않는다.
+Rust 런처는 std로 빌드한다. HTTP/TLS 의존성과 Tauri 호스트 빌드는 이 PC의 Windows 애플리케이션 제어에 막혀 현재 경로는 PowerShell 시작 스크립트와 동봉한 Node 표준 서버를 사용한다. 정책을 변경하지 않았다. 설치 서비스나 자동 시작을 등록하지 않는다.
 
 ## 문서와 고지
 

@@ -4,7 +4,7 @@
 
 ## 실행과 첫 사용
 
-프로젝트 루트의 [Start-Jueony.cmd](../Start-Jueony.cmd)를 실행한다. 현재 실행 묶음은 `build/jueony-mvp/JueonyEditor.exe`다. exe만 옮기지 말고 같은 폴더의 dist, runtime, server.mjs, providers, 고지 파일을 함께 유지한다. Edge 또는 Chrome이 필요하다. Node.js 22.22.2는 묶음에 포함하므로 사용자가 따로 설치할 필요는 없다. 기존 `build/jueony-preview` 묶음은 보존했다.
+프로젝트 루트의 [Start-Jueony.cmd](../Start-Jueony.cmd)를 실행한다. 현재 기본 실행 진입점은 `build/jueony-mvp/Start-Jueony.cmd`다. PowerShell이 동봉한 Node 서버를 시작한다. `JueonyEditor.exe`도 컴파일했지만 이 PC의 Windows 애플리케이션 제어가 새 exe 실행을 차단했다. 폴더를 옮길 때는 cmd/ps1, dist, runtime, server.mjs, providers, 고지 파일을 함께 유지한다. Edge 또는 Chrome이 필요하다. Node.js 22.22.2는 묶음에 포함하므로 사용자가 따로 설치할 필요는 없다. 기존 `build/jueony-preview` 묶음은 보존했다.
 
 1. 왼쪽 ＋로 업무를 만들고 폴더를 여러 개 연결한다. 연결은 원본을 등록하는 동작이다.
 2. 업무 안에서 새 채팅을 만든다. 채팅 이름은 두 번 눌러 변경한다. 가운데 경계를 드래그하거나 위/아래 키로 조절한다.
@@ -66,11 +66,11 @@ API 설정은 OpenAI 호환 **Chat Completions** 규격이다. `https://기관�
 | 엔진 읽기/적용/undo·명령 schema | `src/mvp/editor-bridge.ts`, `edit-schema.ts` |
 | 인증된 루프백 서버·provider registry | `apps/launcher/server.mjs` |
 | 요청/인증/응답/오류 변환 | `apps/launcher/providers/openai-compatible.mjs` |
-| Windows 시작·번들 | `apps/launcher/main.rs`, `scripts/Build-Standalone.ps1` |
+| Windows 시작·번들 | `scripts/Start-Jueony.ps1`, `Build-Standalone.ps1`; 별도 Rust 런처 `apps/launcher/main.rs` |
 
 추가 adapter는 registry에 등록하고 공통 입력을 받아 `{message, sourceIds, operations}`를 반환한다. 제공자 wire format은 해당 파일 안에서만 다룬다. 현재 프런트 설정 UI는 OpenAI 호환 하나만 노출한다. 다른 인증 형태를 추가할 때 설정 항목과 지원 목록은 늘려야 하지만 Agent·업무 저장·편집기는 재작성하지 않는다.
 
-Rust HTTP/TLS 의존성의 빌드 프로그램이 이 PC의 Windows 애플리케이션 제어에 막혔다. 보안 설정을 완화하지 않고 **Rust 실행기 + 동봉한 Node 표준 HTTP/fetch/TLS 서버 + 기존 Rust/WASM 편집 엔진**으로 구현했다. 서버용 외부 npm 패키지를 추가하지 않았다. Node 배포본의 전체 LICENSE와 원래 엔진/폰트 고지를 포함한다.
+Rust HTTP/TLS 의존성의 빌드 프로그램이 이 PC의 Windows 애플리케이션 제어에 막혔다. 보안 설정을 완화하지 않고 동봉한 Node 표준 HTTP/fetch/TLS 서버와 기존 Rust/WASM 편집 엔진으로 구현했다. 최종 Rust 런처 exe도 실행 차단을 확인하여 현재 시작 경로는 PowerShell 스크립트를 사용한다. Node 배포 실행 파일과 이 스크립트 경로는 실제 실행했다. 서버용 외부 npm 패키지를 추가하지 않았다. Node 배포본의 전체 LICENSE와 원래 엔진/폰트 고지를 포함한다.
 
 서버는 127.0.0.1에만 바인딩하며 Host, Origin/fetch metadata, 부트스트랩 헤더, 난수 토큰을 검사한다. CSP의 connect-src는 self다. 모델 호출은 등록한 endpoint로만 보내고 redirect를 따르지 않는다. 기관 관리자의 endpoint allowlist, 인증서 배포, 브라우저 자체 통신 제어와 암호화 저장 정책은 아직 제품화하지 않았다.
 
@@ -81,7 +81,7 @@ Rust HTTP/TLS 의존성의 빌드 프로그램이 이 PC의 Windows 애플리케
 - 앱/엔진 테스트 **19 통과**: 기존 저장 보호, HWP/HWPX 재파싱, 새 초안, 여러 위치 수정, 이모지 범위, 원래 균일 서식, 명령/출처 거부, 업무·채팅 문맥, 취소/전환/충돌.
 - 서버 검사 **7 통과**: 인증·Host/Origin, 두 모델 선택 전달, endpoint/redirect 제한, 오류 키 제거, HTTP 취소, 정적 경로와 CSP, 키 삭제.
 - headless Edge UI 검사 **18 통과**: 3영역·두 폴더·채팅/업무 격리·실제 문서 변경·요청 undo·취소·동시 변경 차단·HWPX 트리 열기·미저장 참고 자료·키 비저장/삭제·재실행·직접 키보드 입력.
-- TypeScript 검사, Vite 빌드, Rust 런처 빌드를 실행한다. 번들 최종 소스/런타임 해시는 `build/jueony-mvp/bundle-evidence.json`에 기록한다.
+- TypeScript 검사, Vite 빌드, Rust 런처 빌드를 실행했다. 컴파일과 exe 실행은 구분하며 새 exe 실행은 OS 정책에 차단되었다. 번들 최종 소스/런타임 해시는 `build/jueony-mvp/bundle-evidence.json`에 기록한다.
 
 UI 검증의 모델 서버는 **결정적인 로컬 HTTP 테스트 fixture**다. 실제 추론 모델 호출이나 품질 검증이 아니다. 폴더 연결은 브라우저 OPFS 디렉터리 핸들로 API를 검사했으며 실제 Windows 폴더 선택 대화상자·권한 재승인을 조작한 검사가 아니다. 직접 키보드 입력은 Chromium 입력 경로 검사이며 한국어 IME 조합 검사가 아니다. 페이지에서 외부 자산 요청을 계측하지만 OS 네트워크를 실제로 차단하거나 Edge 자체 통신 전체를 감사한 것은 아니다.
 

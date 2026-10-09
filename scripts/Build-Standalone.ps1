@@ -25,9 +25,16 @@ $installedNode = Get-ChildItem -LiteralPath $voltaNodes -Directory | Where-Objec
 if (-not $installedNode) { throw '실행 묶음에 포함할 Node.js 22 이상이 필요합니다.' }
 $runtimePath = Join-Path $output 'runtime'
 New-Item -ItemType Directory -Force $runtimePath | Out-Null
-Copy-Item -LiteralPath (Join-Path $installedNode.FullName 'node.exe') -Destination $runtimePath -Force
+$sourceNode = Join-Path $installedNode.FullName 'node.exe'
+$targetNode = Join-Path $runtimePath 'node.exe'
+if (-not (Test-Path -LiteralPath $targetNode) -or (Get-FileHash -LiteralPath $sourceNode).Hash -ne (Get-FileHash -LiteralPath $targetNode).Hash) {
+    Copy-Item -LiteralPath $sourceNode -Destination $targetNode -Force
+}
 Copy-Item -LiteralPath (Join-Path $installedNode.FullName 'LICENSE') -Destination (Join-Path $runtimePath 'LICENSE.Node.txt') -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/launcher/server.mjs') -Destination $output -Force
+Copy-Item -LiteralPath (Join-Path $projectRoot 'scripts/Start-Jueony.ps1') -Destination (Join-Path $output 'Start-Jueony.ps1') -Force
+$startCmd = "@echo off" + [Environment]::NewLine + 'powershell.exe -NoProfile -File "%~dp0Start-Jueony.ps1"' + [Environment]::NewLine + 'if errorlevel 1 pause' + [Environment]::NewLine
+[IO.File]::WriteAllText((Join-Path $output 'Start-Jueony.cmd'), $startCmd, [Text.Encoding]::ASCII)
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/launcher/providers') -Destination $output -Recurse -Force
 $nodeVersion = & (Join-Path $runtimePath 'node.exe') --version
 $manifest = [ordered]@{

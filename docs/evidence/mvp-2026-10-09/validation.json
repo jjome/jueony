@@ -1,0 +1,74 @@
+{
+  "date": "2026-10-09",
+  "testedApplicationCommit": "4a6a806a44bf7b2e38c808d0b88da37d050c3aef",
+  "unitTests": 19,
+  "serverTests": 7,
+  "uiChecks": 18,
+  "typecheck": "PASS",
+  "actualProvider": "NOT_RUN: endpoint/model/credential not supplied",
+  "hancom": "NOT_RUN: independent validation pending",
+  "nativeLauncher": "Compiled; execution blocked by Windows Application Control",
+  "runtime": "Bundled Node.js v22.22.2 via PowerShell",
+  "files": [
+    {
+      "name": "01-created.hwp",
+      "bytes": 13312,
+      "sha256": "A18761C8AF56A75BE1A716A34C56E19D5F1CC8B466979CBEC9673E95BE0583C4"
+    },
+    {
+      "name": "01-created.hwpx",
+      "bytes": 7463,
+      "sha256": "D3CBF9E72386A787F24D8F9DA874A33F25E07C265BC83AA30F812B77B78176D7"
+    },
+    {
+      "name": "02-applied.hwp",
+      "bytes": 13312,
+      "sha256": "E4EEE33B5BB5483E2B9B039794C9EB9D9B9378BC0B7EFAA733326E59197AB4F3"
+    },
+    {
+      "name": "02-applied.hwpx",
+      "bytes": 7493,
+      "sha256": "B21A943F53F0FE3351DB0BFD2E901F4523B2D613A18BE6B9C9308403D041B77E"
+    },
+    {
+      "name": "03-reverted.hwp",
+      "bytes": 13312,
+      "sha256": "A18761C8AF56A75BE1A716A34C56E19D5F1CC8B466979CBEC9673E95BE0583C4"
+    },
+    {
+      "name": "03-reverted.hwpx",
+      "bytes": 7463,
+      "sha256": "D3CBF9E72386A787F24D8F9DA874A33F25E07C265BC83AA30F812B77B78176D7"
+    },
+    {
+      "name": "workspace.png",
+      "bytes": 97629,
+      "sha256": "E49460DFCC0DB61832E153F077881A92809378B8B4E83F48A0B762EDB0E1A6F1"
+    },
+    {
+      "name": "result.json",
+      "bytes": 1954,
+      "sha256": "3878A44224C963AAF1871FDBC1320684A8E5EEBBE8250F374FEE182B33C8A22E"
+    },
+    {
+      "name": "build.txt",
+      "bytes": 1666,
+      "sha256": "2D81925991BCA15DEC015BEE1CF3AFF2A3C8DDF4E0C81BABBE2BEB6B732568AA"
+    },
+    {
+      "name": "unit-tests.txt",
+      "bytes": 4640,
+      "sha256": "63E4BFCBA1AFCCE86F74C560006D96F22AC468BCA9B3D0BE0D054E14D20CF1CD"
+    },
+    {
+      "name": "server-tests.txt",
+      "bytes": 1756,
+      "sha256": "153A4283ED2C5A68A46E65F1D80A7A41959C6328146C20F80BB4EF901413C346"
+    },
+    {
+      "name": "ui-tests.txt",
+      "bytes": 960,
+      "sha256": "97F3E22AA70AB0685C7A50A841AF39B3233E3D4D59F7F26C9C45637047C19792"
+    }
+  ]
+}

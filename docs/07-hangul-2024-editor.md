@@ -6,7 +6,7 @@
 
 ## 아침에 실행할 위치
 
-루트 `Start-Jueony.cmd`는 현재 `build/jueony-mvp/JueonyEditor.exe`를 실행한다. 아래는 이전 `build/jueony-preview` 묶음의 기록이다. `dist` 폴더를 옆에 둔다. Edge 또는 Chrome 설치가 필요하며 Node.js·Python은 실행에 필요하지 않다. 폴더를 옮길 때는 `jueony-preview` 전체를 함께 복사한다. 설치·배포·자동 시작 등록은 하지 않았다.
+루트 `Start-Jueony.cmd`는 현재 새 MVP 실행 스크립트로 동봉한 Node 서버를 시작한다. 아래는 이전 `build/jueony-preview` 묶음의 기록이다. `dist` 폴더를 옆에 둔다. Edge 또는 Chrome 설치가 필요하며 Node.js·Python은 실행에 필요하지 않다. 폴더를 옮길 때는 `jueony-preview` 전체를 함께 복사한다. 설치·배포·자동 시작 등록은 하지 않았다.
 
 ## 구현 상태
 

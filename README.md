@@ -12,7 +12,7 @@
 
 프로젝트명은 **Jueony**이며, 현재 로컬 루트는 `C:\Users\jjome\Documents\work\jueony`다. [이름 변경 기록](docs/08-project-name.md)을 참고한다.
 
-프로젝트 루트의 **[Start-Jueony.cmd](Start-Jueony.cmd)**를 더블클릭한다. 준비된 `build/jueony-mvp/JueonyEditor.exe`가 로컬 서버를 시작하고 Edge 또는 Chrome의 독립 창을 연다. 실행 묶음에는 WASM·글꼴·자산과 Node.js 22 런타임이 들어 있어 Node.js를 별도로 설치할 필요가 없다. 브라우저는 PC에 설치되어 있어야 한다.
+프로젝트 루트의 **[Start-Jueony.cmd](Start-Jueony.cmd)**를 더블클릭한다. PowerShell 실행 스크립트가 준비된 `build/jueony-mvp`의 동봉 런타임으로 로컬 서버를 시작하고 Edge 또는 Chrome의 독립 창을 연다. 새 Rust exe는 컴파일했으나 이 PC의 애플리케이션 제어가 실행을 차단하여 기본 진입점은 cmd 스크립트다. 실행 묶음에는 WASM·글꼴·자산과 Node.js 22 런타임이 들어 있어 Node.js를 별도로 설치할 필요가 없다. 브라우저는 PC에 설치되어 있어야 한다.
 
 - 왼쪽에서 업무·독립 채팅을 만들고 여러 폴더를 연결한다. 가운데의 AI 연결 설정에서 실제 endpoint·모델·키를 등록하면 채팅 요청을 오른쪽 문서에 직접 반영한다.
 - 새 문서, HWP/HWPX 열기, 본문 입력, 제목 서식, 문단 정렬, 표 삽입·셀 입력, 되돌리기/다시 실행을 사용한다.
@@ -22,7 +22,7 @@
 
 [최신 MVP 실행·지원 범위·검증 결과](docs/12-mvp-implementation.md), [개발·빌드 방법](apps/editor/README.md)을 먼저 읽는다. 복잡한 원본 문서는 사본으로 검수한다. 현재 빌드의 글꼴 대체와 미지원 개체 때문에 한글에서의 지면·개체 보존을 별도로 확인해야 한다.
 
-문서 엔진과 실행기는 Rust, 화면·Agent는 TypeScript, 로컬 API는 동봉한 Node 서버로 구성했다. **rhwp가 열린 문서 상태를 소유**한다. workspace·채팅·명시 자료·OpenAI 호환 adapter·여러 본문 위치 직접 편집·요청 undo를 연결했다. 실제 기관 LLM은 endpoint와 인증정보가 없어 검증 대기이며 AI 표·서식·개체·쪽 설정은 미지원이다. 키는 서버 메모리에만 보관하며 연결 설정에서 삭제한다. 실제 모델/한글 독립 검수까지 완료한 제품으로 보고하지 않는다.
+문서 엔진은 Rust/WASM, 화면·Agent는 TypeScript, 로컬 API는 동봉한 Node 서버다. 현재 실행 진입점은 PowerShell이며 별도 Rust 런처 소스도 유지한다. **rhwp가 열린 문서 상태를 소유**한다. workspace·채팅·명시 자료·OpenAI 호환 adapter·여러 본문 위치 직접 편집·요청 undo를 연결했다. 실제 기관 LLM은 endpoint와 인증정보가 없어 검증 대기이며 AI 표·서식·개체·쪽 설정은 미지원이다. 키는 서버 메모리에만 보관하며 연결 설정에서 삭제한다. 실제 모델/한글 독립 검수까지 완료한 제품으로 보고하지 않는다.
 
 ## 프로젝트 문서
 

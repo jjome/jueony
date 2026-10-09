@@ -1,4 +1,4 @@
-param([string]$OutputName = 'jueony-mvp')
+﻿param([string]$OutputName = 'jueony-mvp')
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $env:RUSTUP_HOME = Join-Path $projectRoot '.tools/rustup'
@@ -12,6 +12,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Rust 런처 빌드 실패' }
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/dist') -Destination $output -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/fixtures') -Destination $output -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/README.md') -Destination (Join-Path $output 'README.md') -Force
+Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/12-mvp-implementation.md') -Destination (Join-Path $output 'MVP-GUIDE.md') -Force
 foreach ($notice in @('LICENSE.txt', 'THIRD_PARTY_NOTICES.md')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot $notice) -Destination (Join-Path $output $notice) -Force
 }

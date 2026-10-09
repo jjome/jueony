@@ -192,4 +192,10 @@ split.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown'].includes(e.key))
 window.addEventListener('message',event=>{if(event.origin!==location.origin)return;const tab=tabs.find(t=>t.frame.contentWindow===event.source);if(!tab)return;if(event.data?.type==='jueony:status')refreshTab(tab);if(event.data?.type==='jueony:new-document'&&tab===activeTab&&cancelNavigation())void newTab().catch(error);});
 window.addEventListener('beforeunload',event=>{if(persistError||running||tabs.some(t=>t.persistError||t.api?.state().dirty)){event.preventDefault();event.returnValue='';}});
 async function start(){await store.open();state=await store.load();if(!state.workspaces.length)addWorkspace(state,'내 업무');if(!state.workspaces.some(w=>w.id===state.activeWorkspaceId))state.activeWorkspaceId=state.workspaces[0].id;render();await switchWorkspace(state.activeWorkspaceId);status('로컬 업무 준비 완료 · AI 연결 설정에서 모델을 등록하세요.');}
-void start().catch(error);
+// One writer per browser profile/origin prevents whole-state writes from
+// competing application windows from overwriting each other's workspaces.
+void navigator.locks.request('jueony-workspace-writer',{ifAvailable:true},async lock=>{
+ if(!lock){$('app-shell').inert=true;$<HTMLButtonElement>('connection-settings').disabled=true;status('다른 Jueony 창이 열려 있습니다. 기존 창을 사용하거나 닫은 뒤 이 창을 새로고침해 주세요.');return;}
+ await start();
+ await new Promise<void>(()=>{});
+}).catch(error);

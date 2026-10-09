@@ -1,6 +1,6 @@
 # Jueony — 공무원용 AI 문서 편집기
 
-폐쇄망 Windows PC에서 업무별 자료와 대화를 관리하고, 가운데 채팅의 요청으로 오른쪽 HWP/HWPX 문서를 AI와 함께 직접 편집하는 프로그램을 만든다. **현재는 한글 2024를 기준으로 기본 편집기부터 만드는 개발판**이다. 소스 조사 이후 사용자의 후속 지시에 따라 로컬 실행·편집·저장 구현에 착수했다. 한글 2024 전체 기능·화면·파일 호환성 100%를 달성한 상태는 아니다.
+폐쇄망 Windows PC에서 업무별 자료와 대화를 관리하고, 가운데 채팅의 요청으로 오른쪽 HWP/HWPX 문서를 AI와 함께 직접 편집하는 프로그램을 만든다. **현재는 업무·채팅과 실제 문서 편집을 연결한 본문 중심 MVP 개발판**이다. 소스 조사 이후 사용자의 후속 지시에 따라 로컬 실행·편집·저장 구현에 착수했다. 한글 2024 전체 기능·화면·파일 호환성 100%를 달성한 상태는 아니다.
 
 ## 이용허락
 
@@ -12,21 +12,23 @@
 
 프로젝트명은 **Jueony**이며, 현재 로컬 루트는 `C:\Users\jjome\Documents\work\jueony`다. [이름 변경 기록](docs/08-project-name.md)을 참고한다.
 
-프로젝트 루트의 **[Start-Jueony.cmd](Start-Jueony.cmd)**를 더블클릭한다. 준비된 `build/jueony-preview/JueonyEditor.exe`가 로컬 서버를 시작하고 Edge 또는 Chrome의 독립 창을 연다. 실행 묶음에는 WASM·글꼴·자산이 들어 있어 Node.js 없이 실행할 수 있다. 브라우저는 PC에 설치되어 있어야 한다.
+프로젝트 루트의 **[Start-Jueony.cmd](Start-Jueony.cmd)**를 더블클릭한다. 준비된 `build/jueony-mvp/JueonyEditor.exe`가 로컬 서버를 시작하고 Edge 또는 Chrome의 독립 창을 연다. 실행 묶음에는 WASM·글꼴·자산과 Node.js 22 런타임이 들어 있어 Node.js를 별도로 설치할 필요가 없다. 브라우저는 PC에 설치되어 있어야 한다.
 
+- 왼쪽에서 업무·독립 채팅을 만들고 여러 폴더를 연결한다. 가운데의 AI 연결 설정에서 실제 endpoint·모델·키를 등록하면 채팅 요청을 오른쪽 문서에 직접 반영한다.
 - 새 문서, HWP/HWPX 열기, 본문 입력, 제목 서식, 문단 정렬, 표 삽입·셀 입력, 되돌리기/다시 실행을 사용한다.
 - 아래쪽 문서 탭과 오른쪽 스타일 창이 있다. 탭마다 문서·커서·undo 이력을 유지한다.
 - 일반 Edge/Chrome에서는 파일 선택 대화상자로 열고 저장한다. 다운로드 모드에서는 파일 저장을 확인한 후 **저장 확인**을 눌러야 수정 상태가 해제된다.
 - 검수할 예제는 [기본 HWP](apps/editor/fixtures/three-paragraphs.hwp), [기본 HWPX](apps/editor/fixtures/three-paragraphs.hwpx), [표 HWP](apps/editor/fixtures/schedule-table.hwp), [표 HWPX](apps/editor/fixtures/schedule-table.hwpx)다.
 
-[현재 구현 범위와 아침 검수 순서](docs/07-hangul-2024-editor.md), [개발·빌드 방법](apps/editor/README.md)을 먼저 읽는다. 복잡한 원본 문서는 사본으로 검수한다. 현재 빌드의 글꼴 대체와 미지원 개체 때문에 한글에서의 지면·개체 보존을 별도로 확인해야 한다.
+[최신 MVP 실행·지원 범위·검증 결과](docs/12-mvp-implementation.md), [개발·빌드 방법](apps/editor/README.md)을 먼저 읽는다. 복잡한 원본 문서는 사본으로 검수한다. 현재 빌드의 글꼴 대체와 미지원 개체 때문에 한글에서의 지면·개체 보존을 별도로 확인해야 한다.
 
-문서 엔진과 실행기는 Rust, 편집 화면은 TypeScript로 구성했다. **rhwp가 열린 문서 상태를 소유**한다. AI·workspace·기관 API는 아직 앱에 연결하지 않았다. 최신 MVP 목표는 업무별 폴더·독립 채팅·실제 모델 선택을 연결하고 같은 열린 문서의 여러 위치를 직접 편집하는 것이다. 변경 확인과 되돌리기를 제공하며, 단일 문단 선택·매번 승인을 제품의 기본 흐름으로 두지 않는다. 현재는 이 범위를 작업 문서에 추가한 단계다.
+문서 엔진과 실행기는 Rust, 화면·Agent는 TypeScript, 로컬 API는 동봉한 Node 서버로 구성했다. **rhwp가 열린 문서 상태를 소유**한다. workspace·채팅·명시 자료·OpenAI 호환 adapter·여러 본문 위치 직접 편집·요청 undo를 연결했다. 실제 기관 LLM은 endpoint와 인증정보가 없어 검증 대기이며 AI 표·서식·개체·쪽 설정은 미지원이다. 키는 서버 메모리에만 보관하며 연결 설정에서 삭제한다. 실제 모델/한글 독립 검수까지 완료한 제품으로 보고하지 않는다.
 
 ## 프로젝트 문서
 
 | 문서 | 다루는 결정 |
 | --- | --- |
+| [MVP 구현 결과와 사용법](docs/12-mvp-implementation.md) | 현재 실행 묶음, 지원 범위, 확장 위치, 검증 한계, 한글 검수용 문서 |
 | [Workspace·채팅·AI 직접 편집 MVP](docs/11-workspace-agent-mvp-plan.md) | 최신 방향: M00~M12 작업, Ports and Adapters, 직접 적용·undo, V01~V28 수용 검사 |
 | [기본 편집기 보강 작업 계획](docs/10-basic-editor-work-plan.md) | 구현 전 작업 지시서: 13개 작업, 완료 기준, 의존 관계, [54개 검사 목록](docs/basic-editor-checklist.csv) |
 | [현재 한글 2024 편집기 개발판](docs/07-hangul-2024-editor.md) | 실행, 구현 상태, 실측 검증, 아침 검수와 남은 과제 |
@@ -50,7 +52,11 @@
 
 두 참조 저장소는 해당 커밋의 전체 작업 파일을 확보했다. rhwp는 분석용 부분 복제로 시작한 뒤 전체 체크아웃으로 확장했으며, 41,624개 tracked 파일에 누락된 HEAD 객체와 sparse 제외 경로가 없다. Git 이력은 shallow 상태이므로 전체 과거 커밋을 받은 것은 아니다. **소스 확보와 실행 가능한 오프라인 빌드 묶음 준비는 별개다.** 기존 `upstream/rhwp`의 별도 소스 중심 사본은 보존했으며, 이 문서의 전체 참조 기준 경로는 `upstream/rhwp-source`다.
 
-## 이번 검증 결과
+## 최신 MVP 검증 결과
+
+앱/엔진 **19개**, 로컬 API **7개**, headless Edge 통합 **18개**가 통과했다. 타입 검사·빌드도 수행했다. 모델은 실제 LLM과 구분한 로컬 HTTP fixture, 폴더는 OPFS 핸들로 검증했다. [세부 결과와 미검증 항목](docs/12-mvp-implementation.md), [28개 수용 검사 상태](docs/mvp-acceptance-results.csv)를 참고한다.
+
+## 기본 편집기 단계의 이전 검증 결과
 
 - rhwp `npm/editor` 기존 계약 테스트: **32 통과, 실패 0, 건너뜀 0**. [실행 로그](docs/evidence/rhwp-editor-tests-2026-10-09.txt)
 - gongmuwon 백엔드 테스트: 필요한 Python 의존성이 설치되어 있지 않아 이번에는 미실행.

@@ -19,7 +19,7 @@ const page=await browser.newPage();const errors=[],externalRequests=[];page.on('
 const results=[];const downloads=await browser.target().createCDPSession();
 const activeFrame=async()=>{const h=await page.$('.editor-frame:not([hidden])');return h.contentFrame();};
 async function saveArtifact(stage,expected){
- const dir=resolve(evidence,'downloads',stage);await mkdir(dir,{recursive:true});
+ const dir=resolve(evidence,'downloads',stage+'-'+Date.now());await mkdir(dir,{recursive:true});
  await downloads.send('Browser.setDownloadBehavior',{behavior:'allow',downloadPath:dir});
  await page.click('#save-document');const frame=await activeFrame();
  await frame.waitForFunction(()=>document.querySelector('.modal-overlay input[type=text]')||document.getElementById('jueony-download-confirm'));
@@ -42,6 +42,7 @@ try{
  await page.goto(appUrl+'?storage=download');
  await page.waitForFunction(()=>[...document.querySelectorAll('.editor-frame')].some(f=>f.contentWindow?.jueonyEditor?.snapshot)&&document.getElementById('app-status').textContent.includes('준비 완료'),{timeout:60000});
  assert.equal((await snapshot()).nodes.length,1);pass('three panes and live editor ready');
+ const duplicate=await browser.newPage();await duplicate.goto(appUrl);await duplicate.waitForFunction(()=>document.getElementById('app-status').textContent.includes('다른 Jueony 창'));assert.equal(await duplicate.$eval('#app-shell',e=>e.inert),true);await duplicate.close();pass('second window cannot overwrite workspace storage');
  await page.click('#connection-settings');await page.type('#config-label','검증용 호환 서버');await page.type('#config-endpoint','http://127.0.0.1:4194/v1');await page.type('#config-model','fixture-model');await page.type('#config-key','test-only-secret');await page.click('#model-form button[type=submit]');
  await page.waitForFunction(()=>!document.getElementById('model-dialog').open);pass('provider and model configuration');
  const fixture=[...await readFile('fixtures/three-paragraphs.hwpx')];

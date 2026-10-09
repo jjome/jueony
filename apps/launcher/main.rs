@@ -121,7 +121,7 @@ fn run() -> io::Result<()> {
     if node.is_file() && server.is_file() {
         if !existing_editor() {
             let mut command = Command::new(&node);
-            command.arg(&server).current_dir(base);
+            command.arg(&server).current_dir(base).env("JUEONY_DIST", &root).env("JUEONY_PORT", "4173");
             #[cfg(windows)]
             command.creation_flags(0x08000000);
             command.spawn()?;

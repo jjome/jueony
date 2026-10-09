@@ -1,4 +1,4 @@
-param([switch]$BrowserTab)
+﻿param([switch]$BrowserTab)
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $appRoot = Join-Path $projectRoot 'apps/editor'

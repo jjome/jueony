@@ -1,5 +1,8 @@
 #![cfg_attr(not(test), windows_subsystem = "windows")]
 
+#[cfg(windows)]
+use std::os::windows::process::CommandExt;
+
 use std::{
     env, fs,
     io::{self, Read, Write},
@@ -81,10 +84,10 @@ fn existing_editor() -> bool {
     let Ok(address) = ADDRESS.parse() else { return false; };
     let Ok(mut stream) = TcpStream::connect_timeout(&address, Duration::from_secs(1)) else { return false; };
     let _ = stream.set_read_timeout(Some(Duration::from_secs(2)));
-    if stream.write_all(b"GET /build-evidence.json HTTP/1.1\r\nHost: 127.0.0.1:4173\r\nConnection: close\r\n\r\n").is_err() { return false; }
+    if stream.write_all(b"GET /api/health HTTP/1.1\r\nHost: 127.0.0.1:4173\r\nConnection: close\r\n\r\n").is_err() { return false; }
     let mut response = String::new();
     if stream.take(65536).read_to_string(&mut response).is_err() { return false; }
-    response.contains("\"applicationId\": \"jueony-editor\"")
+    response.contains("\"application\":\"jueony\"") && response.contains("\"apiVersion\":1")
 }
 
 fn open_editor() -> io::Result<()> {
@@ -112,6 +115,24 @@ fn run() -> io::Result<()> {
     let executable = env::current_exe()?;
     let root = executable.parent().ok_or_else(|| io::Error::other("실행 경로 오류"))?.join("dist").canonicalize()?;
     if !root.join("editor.html").is_file() { return Err(io::Error::other("dist 폴더가 없습니다.")); }
+    let base = executable.parent().unwrap();
+    let node = base.join("runtime/node.exe");
+    let server = base.join("server.mjs");
+    if node.is_file() && server.is_file() {
+        if !existing_editor() {
+            let mut command = Command::new(&node);
+            command.arg(&server).current_dir(base);
+            #[cfg(windows)]
+            command.creation_flags(0x08000000);
+            command.spawn()?;
+            for _ in 0..50 {
+                if existing_editor() { break; }
+                std::thread::sleep(Duration::from_millis(100));
+            }
+            if !existing_editor() { return Err(io::Error::other("로컬 업무 서버 시작 실패")); }
+        }
+        return if serve_only { Ok(()) } else { open_editor() };
+    }
     let listener = match TcpListener::bind(ADDRESS) {
         Ok(listener) => listener,
         Err(error) if error.kind() == io::ErrorKind::AddrInUse && existing_editor() => {

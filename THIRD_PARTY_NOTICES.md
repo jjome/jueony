@@ -11,6 +11,7 @@ Jueony의 자체 부분에는 [개인·비업무용 이용허락](LICENSE.txt)�
 | `@noble/hashes` | MIT, Copyright (c) 2022 Paul Miller | 빌드의 `dist/licenses/@noble-hashes.txt` |
 | `canvaskit-wasm` 및 Skia 구성요소 | 패키지의 BSD 계열 고지 및 포함된 별도 조건 | 빌드의 `dist/licenses/canvaskit-wasm.txt` 및 rhwp 부속 고지 |
 | 포함 글꼴 및 기타 rhwp 구성요소 | OFL 등 자산별 라이선스 | 빌드의 `dist/THIRD_PARTY_LICENSES.rhwp.md`, `dist/fonts/FONTS.md`, 글꼴별 고지 |
+| Node.js 22 실행환경과 내장 구성요소 | Node.js MIT 및 배포본에 포함된 개별 고지 | 실행 묶음의 `runtime/LICENSE.Node.txt`; 실제 버전은 빌드 기록으로 확인 |
 | Rust 표준 라이브러리 | Rust 배포본에 포함된 구성요소별 조건 | 실행 묶음의 `Rust-COPYRIGHT-library.html` |
 
 rhwp 소스 기준은 [커밋 1a76570](https://github.com/edwardkim/rhwp/tree/1a76570e833917d15817415a53c09ad61ab3203f)이다. 빌드 스크립트가 Studio 소스를 복사하고 Jueony의 화면·탭·저장 보호 연결을 추가한다. 이 수정은 rhwp 원본의 MIT 고지를 대체하지 않는다.

@@ -60,12 +60,13 @@ await cp(join(app, 'src/shell.html'), join(root, 'index.html'));
 let main = await readFile(join(root, 'src/main.ts'), 'utf8');
 main = replaceOnce(main, 'confirmSaveBeforeReplacingDocument, fileCommands', 'confirmSaveBeforeReplacingDocument, saveCurrentDocument, fileCommands', 'host save import');
 main = replaceOnce(main, "return params.has('url');", "return params.has('url') || params.get('skipRecovery') === '1';", 'tab recovery');
-main = "import { installDesktopHost } from './jueony/desktop-host';\nimport { installHangulChrome } from './jueony/chrome-2024';\n" + main;
+main = "import { installAgentBridge } from './jueony/mvp/editor-bridge';\nimport { installDesktopHost } from './jueony/desktop-host';\nimport { installHangulChrome } from './jueony/chrome-2024';\n" + main;
 main = replaceOnce(main, "const initPromise = initialize();", `const initPromise = initialize();
 installDesktopHost({ wasm, eventBus, documentState, ready: initPromise,
   save: () => saveCurrentDocument(commandServices),
   discard: async () => { await autosaveManager.discardCurrentDraft('tab-discard'); documentState.markClean('tab-discard'); },
 });
+installAgentBridge({ wasm, eventBus, documentState, ready: initPromise, automation, input: () => inputHandler, render: () => canvasView!.refreshDocumentAgentMutation(), load: (bytes, name, handle) => loadBytes(bytes, name, handle) });
 void initPromise.then(() => installHangulChrome({ wasm, eventBus, documentState, automation }));`, 'desktop host');
 await writeFile(join(root, 'src/main.ts'), main);
 let documentTitle = await readFile(join(root, 'src/ui/document-title.ts'), 'utf8');
@@ -125,7 +126,14 @@ await build({
 });
 const sha256 = data => createHash('sha256').update(data).digest('hex');
 const customSource = [];
-for (const name of (await readdir(join(app, 'src'))).sort()) customSource.push(name, await readFile(join(app, 'src', name), 'utf8'));
+async function collectSource(directory, prefix = '') {
+ for (const entry of (await readdir(directory, { withFileTypes: true })).sort((a,b)=>a.name.localeCompare(b.name))) {
+  const name = prefix + entry.name;
+  if (entry.isDirectory()) await collectSource(join(directory, entry.name), name + '/');
+  else customSource.push(name, await readFile(join(directory, entry.name), 'utf8'));
+ }
+}
+await collectSource(join(app, 'src'));
 const evidence = {
   applicationId: 'jueony-editor',
   sourceCommit: commit, enginePackage: '@rhwp/core@0.8.7', builtAt: new Date().toISOString(),

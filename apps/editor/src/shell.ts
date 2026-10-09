@@ -1,120 +1,182 @@
-export {};
+import {WorkspaceStore} from './mvp/store.ts';
+import {addWorkspace,addChat,chatOf,uid,appendMessage} from './mvp/model.ts';
+import type {AppState,Receipt,Run,SavedDocument,ModelConfig,Snapshot} from './mvp/model.ts';
+import {permission,readReferences} from './mvp/references.ts';
+import type {Reference} from './mvp/references.ts';
+import {LocalLLMPort} from './mvp/llm.ts';
+import {buildContext} from './mvp/context.ts';
+import {runOnce} from './mvp/run-once.ts';
 
-type EditorApi = {
-  state(): { name: string; dirty: boolean; pageCount: number; revision: string };
-  save(): Promise<string>;
-  discard(): Promise<void>;
-  busy(): boolean;
-};
-type Tab = { id: number; frame: HTMLIFrameElement; wrapper: HTMLElement; button: HTMLButtonElement; close: HTMLButtonElement };
-const documents = document.getElementById('documents')!;
-const list = document.getElementById('document-tab-list')!;
-const dialog = document.getElementById('close-document') as HTMLDialogElement;
-const status = document.getElementById('shell-status')!;
-const tabs: Tab[] = [];
-let active: Tab | undefined;
-let counter = 0;
-let closing = false;
-const api = (tab: Tab) => (tab.frame.contentWindow as any)?.jueonyEditor as EditorApi | undefined;
-
-function refresh(tab: Tab) {
-  const state = api(tab)?.state();
-  const name = !state?.name || state.name === '새 문서.hwp' ? `빈 문서 ${tab.id}` : state.name;
-  tab.button.textContent = name;
-  tab.button.classList.toggle('is-dirty', state?.dirty ?? false);
-  tab.close.setAttribute('aria-label', `${name} 탭 닫기`);
-  tab.button.title = name + (state?.dirty ? ' · 저장하지 않은 변경 내용' : '');
-  if (tab === active) {
-    document.title = `${name} - Jueony 문서 편집기`;
-    status.textContent = new URLSearchParams(location.search).get('storage') === 'download'
-      ? '다운로드 저장 검증 모드' : '로컬 문서 편집기';
+const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
+const store=new WorkspaceStore(),port=new LocalLLMPort();
+let state:AppState,activeTab:Tab|undefined,restoring=false,persistError=false;
+let running:{controller:AbortController;run:Run}|undefined;
+type Tab={id:string;workspaceId:string;frame:HTMLIFrameElement;wrapper:HTMLElement;button:HTMLButtonElement;ready:Promise<any>;api:any;closed:boolean;handle?:FileSystemFileHandle;timer?:number;persist:Promise<void>};
+const tabs:Tab[]=[];const loaded=new Set<string>();let selected:Reference[]=[];
+const status=(text:string)=>{$('app-status').textContent=text;$('app-status').title=text;};
+const error=(e:unknown)=>status(e instanceof Error?e.message:String(e));
+const work=()=>state.workspaces.find(w=>w.id===state.activeWorkspaceId)!;
+const chat=()=>chatOf(state,work().id,work().activeChatId);
+const button=(label:string,action:()=>unknown)=>{const b=document.createElement('button');b.textContent=label;b.type='button';b.onclick=()=>{try{void Promise.resolve(action()).catch(error);}catch(e){error(e);}};return b;};
+const on=(id:string,action:()=>unknown)=>$(id).addEventListener('click',()=>{try{void Promise.resolve(action()).catch(error);}catch(e){error(e);}});
+async function persist(){try{await store.save(state);persistError=false;}catch(e){persistError=true;throw e;}}
+function cancelNavigation(){if(running?.run.status==='applying'){status('문서 적용이 끝난 뒤 전환해 주세요.');return false;}running?.controller.abort();return true;}
+function options(select:HTMLSelectElement,items:{value:string;text:string}[],value?:string){select.replaceChildren(...items.map(item=>{const o=document.createElement('option');o.value=item.value;o.textContent=item.text;return o;}));if(value&&items.some(x=>x.value===value))select.value=value;}
+function renderModels(){
+ const group=(m:ModelConfig)=>m.label+' | '+m.endpoint;
+ const providers=[...new Set(state.models.map(group))];
+ const selectedModel=state.models.find(m=>m.id===chat().modelId)??state.models[0];
+ options($('provider-select'),providers.length?providers.map(value=>({value,text:value.split(' | ')[0]})):[{value:'',text:'AI 연결 필요'}],selectedModel?group(selectedModel):undefined);
+ const models=state.models.filter(m=>group(m)===($('provider-select') as HTMLSelectElement).value);
+ options($('model-select'),models.length?models.map(m=>({value:m.id,text:m.modelId})):[{value:'',text:'모델 등록'}],selectedModel?.id);
+}
+function render(){
+ options($('workspace-select'),state.workspaces.map(w=>({value:w.id,text:w.name})),work().id);
+ $('chat-title').textContent=chat().title;
+ $('chat-list').replaceChildren(...state.chats.filter(c=>c.workspaceId===work().id).map(c=>{const b=button(c.title,async()=>{if(!cancelNavigation())return;work().activeChatId=c.id;selected=[];render();await renderFolders();await persist();});b.className='chat-item'+(c.id===chat().id?' active':'');b.ondblclick=async()=>{const title=prompt('채팅 이름',c.title);if(title?.trim()){c.title=title.trim();render();await persist().catch(error);}};return b;}));
+ renderModels();renderMessages();renderReferences();
+ $('sidebar').style.setProperty('--chat-share',state.split+'%');$('sidebar-split').setAttribute('aria-valuenow',String(state.split));
+ for(const tab of tabs){const visible=tab.workspaceId===work().id;tab.wrapper.hidden=!visible;tab.frame.hidden=!visible||tab!==activeTab;}
+}
+function renderMessages(){
+ const target=$('messages');target.replaceChildren();
+ if(!chat().messages.length){const hint=document.createElement('div');hint.className='empty-chat';hint.textContent='자료를 연결하고 업무를 시작하세요.\nAI는 오른쪽의 열린 문서를 직접 편집합니다.';target.append(hint);}
+ for(const m of chat().messages){
+  const card=document.createElement('article');card.className='message '+m.role;
+  const role=document.createElement('div');role.className='role';role.textContent=m.role==='user'?'나':'Jueony';
+  const text=document.createElement('div');text.textContent=m.text;card.append(role,text);
+  const run=state.runs.find(r=>r.id===m.runId&&r.workspaceId===work().id&&r.chatId===chat().id);
+  if(run&&m.role==='assistant'){
+   const meta=document.createElement('div');meta.className='run-meta';meta.textContent=run.status+(run.sources.length?' · 사용 자료: '+run.sources.map(s=>s.name+' ('+s.characters+'자)').join(', '):' · 참고 파일 없음');card.append(meta);
+   if(run.receipt){const actions=document.createElement('div');actions.className='message-actions';actions.append(button('변경 확인',()=>{$('diff-before').textContent=run.receipt!.before;$('diff-after').textContent=run.receipt!.after;($('change-dialog') as HTMLDialogElement).showModal();}),button('요청 되돌리기',async()=>{if(running)throw new Error('진행 중 요청을 먼저 중지해 주세요.');const tab=tabs.find(t=>t.id===run.documentId&&t.workspaceId===run.workspaceId);if(!tab)throw new Error('열린 문서에서만 되돌릴 수 있습니다. 재시작 후에는 보존된 문서를 직접 편집해 주세요.');selectTab(tab);await tab.api.undoRequest(run.receipt);await persistTab(tab);status('이 요청의 변경을 되돌렸습니다.');}));card.append(actions);}
   }
+  target.append(card);
+ }
+ target.scrollTop=target.scrollHeight;
 }
-
-function select(tab: Tab) {
-  active = tab;
-  for (const candidate of tabs) {
-    const selected = candidate === tab;
-    candidate.frame.hidden = !selected;
-    candidate.wrapper.classList.toggle('is-active', selected);
-    candidate.button.setAttribute('aria-selected', String(selected));
-  }
-  refresh(tab);
-  tab.frame.contentWindow?.dispatchEvent(new Event('resize'));
+function renderReferences(){$('reference-summary').textContent=selected.length?'이번 요청 참고: '+selected.map(s=>s.path).join(', '):'참고 파일 없음 · 폴더 트리에서 체크하세요.';}
+async function renderFolders(){
+ const container=$('folder-tree');container.replaceChildren();const workspaceId=work().id;
+ for(const folder of state.folders.filter(f=>f.workspaceId===workspaceId)){
+  const root=document.createElement('div');root.className='folder-root';container.append(root);
+  const row=document.createElement('div');row.className='folder-row';root.append(row);
+  const children=document.createElement('div');children.className='folder-children';
+  let expanded=false;
+  row.append(button('▸ '+folder.name,async()=>{if(!await permission(folder.handle,true))throw new Error('폴더 접근 권한이 없습니다. 다시 연결해 주세요.');expanded=!expanded;children.hidden=!expanded;if(expanded){children.replaceChildren();await entries(folder.handle,children,folder.name,folder.id,workspaceId);}}));
+  const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.title='폴더를 이번 요청 참고 자료로 지정';checkbox.checked=selected.some(r=>r.id===folder.id);checkbox.onchange=()=>choose(checkbox.checked,{id:folder.id,workspaceId,rootId:folder.id,path:folder.name,handle:folder.handle});row.prepend(checkbox);
+  row.append(button('해제',async()=>{if(!cancelNavigation())return;state.folders=state.folders.filter(f=>f.id!==folder.id);selected=selected.filter(r=>r.rootId!==folder.id);await persist();renderReferences();await renderFolders();status('폴더 연결을 해제했습니다. 원본은 그대로 있습니다.');}));
+  root.append(children);
+  if(!await permission(folder.handle)){const note=document.createElement('div');note.className='folder-warning';note.textContent='폴더 이름을 눌러 접근 권한을 다시 확인하세요.';root.append(note);}
+ }
+ if(!container.children.length){const p=document.createElement('p');p.className='hint';p.textContent='로컬 폴더를 연결해 자료를 탐색하세요.';container.append(p);}
 }
-
-function newDocument() {
-  // 열린 엔진을 제거했다가 재구성하지 않아 undo와 커서가 탭별로 유지된다.
-  const id = ++counter;
-  const frame = document.createElement('iframe');
-  frame.className = 'editor-frame'; frame.title = `문서 ${id} 편집기`; frame.id = `editor-${id}`;
-  const url = new URL('./editor.html', location.href);
-  url.searchParams.set('child', '1');
-  if (id > 1) url.searchParams.set('skipRecovery', '1');
-  if (new URLSearchParams(location.search).get('storage') === 'download') url.searchParams.set('storage', 'download');
-  frame.src = url.href;
-  const wrapper = document.createElement('div'); wrapper.className = 'document-tab-wrap';
-  const button = document.createElement('button'); button.className = 'document-tab'; button.type = 'button';
-  button.setAttribute('role', 'tab'); button.setAttribute('aria-controls', frame.id);
-  const close = document.createElement('button'); close.className = 'close-tab'; close.type = 'button'; close.textContent = '×';
-  const tab: Tab = { id, frame, wrapper, button, close };
-  tabs.push(tab); wrapper.append(button, close); list.append(wrapper); documents.append(frame);
-  button.addEventListener('click', () => select(tab));
-  close.addEventListener('click', () => { void closeTab(tab); });
-  frame.addEventListener('load', () => refresh(tab));
-  select(tab);
+function choose(checked:boolean,reference:Reference){selected=selected.filter(s=>s.id!==reference.id);if(checked)selected.push(reference);renderReferences();}
+async function entries(dir:any,parent:HTMLElement,path:string,rootId:string,workspaceId:string){
+ const list:[string,any][]=[];for await(const entry of dir.entries()){if(list.length>=1000)throw new Error('한 폴더의 표시는 1,000개로 제한됩니다. 하위 폴더를 연결해 주세요.');list.push(entry);}list.sort((a,b)=>Number(b[1].kind==='directory')-Number(a[1].kind==='directory')||a[0].localeCompare(b[0],'ko'));
+ for(const [name,handle] of list){
+  const childPath=path+'/'+name,id=rootId+'/'+childPath,row=document.createElement('div');row.className='folder-row';parent.append(row);
+  const cb=document.createElement('input');cb.type='checkbox';cb.title='참고 자료 지정';cb.checked=selected.some(s=>s.id===id);cb.onchange=()=>choose(cb.checked,{id,workspaceId,rootId,path:childPath,handle});row.append(cb);
+  let expanded=false;const children=document.createElement('div');children.className='folder-children';children.hidden=true;
+  const label=button((handle.kind==='directory'?'▸ ':'')+name,async()=>{if(workspaceId!==work().id)return;if(handle.kind==='directory'){expanded=!expanded;children.hidden=!expanded;if(expanded){children.replaceChildren();await entries(handle,children,childPath,rootId,workspaceId);}}else if(/\.(hwp|hwpx)$/i.test(name)){await openHandle(handle);}else status('이 파일은 참고 자료로 체크할 수 있습니다. 문서 편집기는 HWP/HWPX만 엽니다.');});label.className='file-label';label.title=childPath;row.append(label);parent.append(children);
+ }
 }
-
-async function closeTab(tab: Tab, replaceEmpty = true): Promise<boolean> {
-  if (closing || api(tab)?.busy()) return false;
-  closing = true;
-  try {
-    const editor = api(tab);
-    if (editor?.state().dirty) {
-      select(tab);
-      document.getElementById('close-document-name')!.textContent = editor.state().name;
-      dialog.returnValue = 'cancel';
-      const choice = new Promise<string>(resolve => dialog.addEventListener('close', () => resolve(dialog.returnValue), { once: true }));
-      dialog.showModal();
-      const action = await choice;
-      if (action === 'save') {
-        if (await editor.save() !== 'saved' || editor.state().dirty) return false;
-      } else if (action === 'discard') {
-        await editor.discard();
-      } else return false;
-    }
-    const index = tabs.indexOf(tab);
-    tabs.splice(index, 1); tab.frame.remove(); tab.wrapper.remove();
-    if (tabs.length && active === tab) select(tabs[Math.min(index, tabs.length - 1)]);
-    if (!tabs.length && replaceEmpty) newDocument();
-    return true;
-  } finally { closing = false; }
+function refreshTab(tab:Tab){
+ if(tab.closed||!tab.api)return;const s=tab.api.state();tab.button.textContent=s.name;tab.button.classList.toggle('is-dirty',s.dirty);
+ if(tab===activeTab){document.title=work().name+' · '+s.name+' — Jueony';$('shell-status').textContent=s.dirty?'수정됨':'저장됨';}
+ clearTimeout(tab.timer);tab.timer=window.setTimeout(()=>void persistTab(tab).catch(error),1400);
 }
-
-window.addEventListener('message', event => {
-  if (event.origin !== location.origin) return;
-  const tab = tabs.find(candidate => candidate.frame.contentWindow === event.source);
-  if (!tab || !event.data || typeof event.data !== 'object') return;
-  if (event.data.type === 'jueony:status') refresh(tab);
-  if (event.data.type === 'jueony:new-document') newDocument();
-});
-window.addEventListener('beforeunload', event => {
-  if (!tabs.some(tab => api(tab)?.state().dirty)) return;
-  event.preventDefault(); event.returnValue = '';
-});
-document.getElementById('new-document')!.addEventListener('click', newDocument);
-document.addEventListener('keydown', event => {
-  if (event.altKey && event.code === 'KeyN') { event.preventDefault(); newDocument(); }
-});
-const tauriWindow = (window as any).__TAURI__?.window?.getCurrentWindow();
-let approvedClose = false;
-if (tauriWindow) {
-  void tauriWindow.onCloseRequested(async (event: any) => {
-    if (approvedClose) return;
-    event.preventDefault();
-    for (const tab of [...tabs]) if (!await closeTab(tab, false)) return;
-    approvedClose = true;
-    await tauriWindow.close();
-  });
+function selectTab(tab:Tab){activeTab=tab;work().activeDocumentId=tab.id;for(const t of tabs){t.frame.hidden=t!==tab;t.wrapper.hidden=t.workspaceId!==work().id;t.wrapper.classList.toggle('is-active',t===tab);t.button.setAttribute('aria-selected',String(t===tab));}refreshTab(tab);tab.frame.contentWindow?.dispatchEvent(new Event('resize'));void persist().catch(error);}
+async function newTab(workspaceId=work().id,saved?:SavedDocument){
+ const frame=document.createElement('iframe');const wrapper=document.createElement('div');wrapper.className='document-tab-wrap';
+ const tab:Tab={id:saved?.id??uid(),workspaceId,frame,wrapper,button:button('문서 준비 중…',()=>{if(cancelNavigation())selectTab(tab);}),closed:false,api:null,ready:Promise.resolve(null),persist:Promise.resolve()};
+ tab.button.className='document-tab';tab.button.setAttribute('role','tab');
+ const close=button('×',()=>closeTab(tab));close.className='close-tab';close.setAttribute('aria-label','문서 닫기');wrapper.append(tab.button,close);
+ frame.className='editor-frame';frame.title='한글 문서 편집기';const url=new URL('./editor.html',location.href);url.searchParams.set('child','1');url.searchParams.set('skipRecovery','1');if(new URLSearchParams(location.search).get('storage')==='download')url.searchParams.set('storage','download');frame.src=url.href;
+ tabs.push(tab);$('documents').append(frame);$('document-tab-list').append(wrapper);
+ tab.ready=new Promise((resolve,reject)=>{const started=Date.now();const timer=setInterval(()=>{const api=(frame.contentWindow as any)?.jueonyEditor;if(api?.snapshot){clearInterval(timer);Promise.resolve(api.ready).then(async()=>{
+ for(let i=0;i<300;i++){if(!api.busy()&&api.state().pageCount>0){tab.api=api;resolve(api);return;}await new Promise(r=>setTimeout(r,100));}
+ throw new Error('문서 초기화가 완료되지 않았습니다.');
+}).catch(reject);}else if(tab.closed||Date.now()-started>45000){clearInterval(timer);reject(new Error('편집기 준비 실패. 문서 탭을 다시 열어 주세요.'));}},100);});
+ if(workspaceId===work().id)selectTab(tab);else frame.hidden=true;
+ const api=await tab.ready;
+ if(saved){await api.open(saved.bytes,saved.name,null,saved.dirty);status('최근 문서를 복원했습니다. 복원 문서는 다른 이름으로 저장해 주세요.');}
+ refreshTab(tab);return tab;
 }
-newDocument();
+async function persistTab(tab:Tab){
+ if(tab.closed||!tab.api)return;clearTimeout(tab.timer);
+ const snapshot=tab.api.recovery();if(!snapshot){tab.timer=window.setTimeout(()=>void persistTab(tab).catch(error),1500);return;}
+ const data:SavedDocument={id:tab.id,workspaceId:tab.workspaceId,updatedAt:Date.now(),...snapshot};
+ tab.persist=tab.persist.catch(()=>{}).then(()=>store.saveDocument(data));await tab.persist;
+}
+async function openHandle(handle:FileSystemFileHandle){
+ if(!cancelNavigation())return;if(!await permission(handle,true))throw new Error('파일 접근 권한이 없습니다.');
+ for(const tab of tabs.filter(t=>t.workspaceId===work().id&&t.handle)){if(await handle.isSameEntry(tab.handle!)){selectTab(tab);return;}}
+ const file=await handle.getFile();if(file.size>64*1024*1024)throw new Error('MVP 문서 열기는 64MB까지 지원합니다.');
+ const tab=await newTab();await tab.api.open(new Uint8Array(await file.arrayBuffer()),file.name,handle);tab.handle=handle;await persistTab(tab);status('문서를 열었습니다.');
+}
+async function closeTab(tab:Tab){
+ if(!cancelNavigation()||!tab.api||tab.api.busy())return;
+ if(tab.api.state().dirty){
+  selectTab(tab);const dialog=$<HTMLDialogElement>('close-document');$('close-document-name').textContent=tab.api.state().name;dialog.returnValue='cancel';const choice=new Promise<string>(resolve=>dialog.addEventListener('close',()=>resolve(dialog.returnValue),{once:true}));dialog.showModal();const action=await choice;
+  if(action==='cancel'||!action)return;if(action==='save'){if(await tab.api.save()!=='saved'||tab.api.state().dirty)return;}else if(action==='discard')await tab.api.discard();
+ }
+ clearTimeout(tab.timer);await tab.persist;tab.closed=true;await store.removeDocument(tab.id);tabs.splice(tabs.indexOf(tab),1);tab.frame.remove();tab.wrapper.remove();
+ const next=tabs.find(t=>t.workspaceId===work().id);if(next)selectTab(next);else await newTab();
+}
+async function switchWorkspace(id:string){
+ if(restoring||!cancelNavigation())return;restoring=true;
+ try{if(activeTab)await persistTab(activeTab);state.activeWorkspaceId=id;selected=[];activeTab=undefined;render();
+  if(!loaded.has(id)){loaded.add(id);const documents=await store.documents(id);for(const saved of documents)await newTab(id,saved);}
+  const tab=tabs.find(t=>t.workspaceId===id&&t.id===work().activeDocumentId)??tabs.find(t=>t.workspaceId===id)??await newTab(id);selectTab(tab);render();await renderFolders();await persist();
+ }finally{restoring=false;}
+}
+function updateRun(){const busy=Boolean(running);$<HTMLButtonElement>('send-request').disabled=busy;$<HTMLButtonElement>('cancel-run').disabled=!busy||running?.run.status==='applying';$('run-status').textContent=running?running.run.status:'지원: 새 초안 · 본문 삽입/교체/삭제';}
+async function send(){
+ const input=$<HTMLTextAreaElement>('request-input');const request=input.value.trim();if(!request||running||restoring)return;
+ const model=state.models.find(m=>m.id===$<HTMLSelectElement>('model-select').value);if(!model)throw new Error('먼저 AI 연결을 등록해 주세요.');
+ const original=activeTab;if(!original?.api)throw new Error('문서 준비를 기다려 주세요.');
+ const workspaceId=work().id,chatId=chat().id,run:Run={id:uid(),workspaceId,chatId,documentId:original.id,status:'preparing_context',model:{adapterId:model.adapterId,label:model.label,endpoint:model.endpoint,modelId:model.modelId},sources:[],createdAt:Date.now()};
+ const controller=new AbortController();running={controller,run};state.runs.push(run);appendMessage(state,workspaceId,chatId,{id:uid(),role:'user',text:request,runId:run.id});input.value='';renderMessages();updateRun();
+ try{
+  await persist();const snapshot:Snapshot=original.api.snapshot();
+  const references=await readReferences([...selected],state.folders,workspaceId,bytes=>original.api.readReference(bytes),controller.signal);
+  run.sources=references.map(({text,...source})=>source);
+  const context=buildContext(state,workspaceId,chatId,snapshot,references,request);
+  const result=await runOnce({runId:run.id,context,model,port,editor:original.api,signal:controller.signal,
+   isCurrent:()=>work().id===workspaceId&&chat().id===chatId&&activeTab?.id===run.documentId,
+   createDocument:async()=>{const tab=await newTab(workspaceId);run.documentId=tab.id;return tab.api;},
+   state:s=>{run.status=s;updateRun();void persist().catch(error);}});
+  run.status='completed';run.receipt=result.receipt;
+  appendMessage(state,workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:result.message+'\n\n'+(result.receipt?result.receipt.operationCount+'개 명령을 실제 문서에 적용했습니다. 파일 저장은 별도로 실행하세요.':'문서에 적용한 변경은 없습니다.')});
+  const tab=tabs.find(t=>t.id===run.documentId);if(tab)await persistTab(tab);status('AI 요청이 완료되었습니다.');
+ }catch(e){
+  const name=e instanceof Error?e.name:'';run.status=controller.signal.aborted||name==='AbortError'?'cancelled':name==='ConflictError'?'conflict':name==='PartialApplyError'?'failed_partial':name==='RolledBackError'?'failed_rolled_back':'failed_no_change';run.error=e instanceof Error?e.message:'실행 오류';
+  appendMessage(state,workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:run.error});error(e);
+ }finally{running=undefined;await persist().catch(error);renderMessages();updateRun();}
+}
+on('add-workspace',async()=>{if(!cancelNavigation())return;const name=prompt('새 업무 이름');if(!name?.trim())return;const w=addWorkspace(state,name);await switchWorkspace(w.id);});
+on('rename-workspace',async()=>{const name=prompt('업무 이름',work().name);if(name?.trim()){work().name=name.trim();render();await persist();}});
+$('workspace-select').addEventListener('change',()=>void switchWorkspace($<HTMLSelectElement>('workspace-select').value).catch(error));
+on('add-chat',async()=>{if(!cancelNavigation())return;addChat(state,work().id,'새 채팅');selected=[];render();await renderFolders();await persist();});
+on('add-folder',async()=>{const picker=(window as any).showDirectoryPicker;if(!picker)throw new Error('폴더 연결은 Jueony 실행기의 Edge/Chrome 창에서 지원합니다.');const handle=await picker({mode:'read'});const workspaceId=work().id;for(const f of state.folders.filter(f=>f.workspaceId===workspaceId))if(await handle.isSameEntry(f.handle)){status('이미 연결한 폴더입니다.');return;}state.folders.push({id:uid(),workspaceId,name:handle.name,handle});await persist();await renderFolders();status('폴더를 연결했습니다. 아직 자료를 분석하지 않았습니다.');});
+on('refresh-folders',renderFolders);
+on('toggle-sidebar',()=>$('app-shell').classList.toggle('sidebar-hidden'));
+on('new-document',async()=>{if(cancelNavigation())await newTab();});
+on('open-document',async()=>{const picker=(window as any).showOpenFilePicker;if(picker){const [handle]=await picker({types:[{description:'한글 문서',accept:{'application/octet-stream':['.hwp','.hwpx']}}]});await openHandle(handle);}else{const file=document.createElement('input');file.type='file';file.accept='.hwp,.hwpx';file.onchange=async()=>{const f=file.files?.[0];if(f&&cancelNavigation()){try{const tab=await newTab();await tab.api.open(new Uint8Array(await f.arrayBuffer()),f.name);await persistTab(tab);}catch(e){error(e);}}};file.click();}});
+on('save-document',async()=>{if(running?.run.status==='applying')return;if(activeTab?.api){const tab=activeTab;const result=await tab.api.save();await persistTab(tab);status(result==='saved'?'파일에 저장했습니다.':'저장을 완료하지 않았습니다.');}});
+$('request-form').addEventListener('submit',e=>{e.preventDefault();void send().catch(error);});
+on('cancel-run',()=>running?.controller.abort());
+$('provider-select').addEventListener('change',()=>{const value=$<HTMLSelectElement>('provider-select').value;const m=state.models.find(m=>m.label+' | '+m.endpoint===value);chat().modelId=m?.id;renderModels();void persist().catch(error);});
+$('model-select').addEventListener('change',()=>{chat().modelId=$<HTMLSelectElement>('model-select').value;void persist().catch(error);});
+on('connection-settings',()=>{const config=state.models.find(m=>m.id===$<HTMLSelectElement>('model-select').value);$<HTMLInputElement>('config-label').value=config?.label??'';$<HTMLInputElement>('config-endpoint').value=config?.endpoint??'';$<HTMLInputElement>('config-model').value=config?.modelId??'';$<HTMLInputElement>('config-key').value='';$('config-status').textContent='다시 시작했다면 같은 연결의 키를 다시 입력해 주세요.';$<HTMLDialogElement>('model-dialog').showModal();});
+on('close-settings',()=>{$<HTMLInputElement>('config-key').value='';$<HTMLDialogElement>('model-dialog').close();});
+$('model-form').addEventListener('submit',e=>{e.preventDefault();void(async()=>{const endpoint=$<HTMLInputElement>('config-endpoint').value.trim(),modelId=$<HTMLInputElement>('config-model').value.trim();const existing=state.models.find(m=>m.endpoint===endpoint&&m.modelId===modelId);const config:ModelConfig={id:existing?.id??uid(),adapterId:'openai-compatible',label:$<HTMLInputElement>('config-label').value.trim(),endpoint,modelId};try{await port.configure(config,$<HTMLInputElement>('config-key').value);if(existing)Object.assign(existing,config);else state.models.push(config);chat().modelId=config.id;await persist();renderModels();$<HTMLDialogElement>('model-dialog').close();status('연결을 등록했습니다. 실제 요청 시 모델과 인증을 확인합니다.');}catch(e){$('config-status').textContent=e instanceof Error?e.message:String(e);}finally{$<HTMLInputElement>('config-key').value='';}})();});
+const split=$('sidebar-split');let dragging=false;
+split.addEventListener('pointerdown',e=>{dragging=true;split.setPointerCapture(e.pointerId);});
+split.addEventListener('pointermove',e=>{if(!dragging)return;const rect=$('sidebar').getBoundingClientRect();state.split=Math.max(20,Math.min(75,Math.round((e.clientY-rect.top)/rect.height*100)));$('sidebar').style.setProperty('--chat-share',state.split+'%');split.setAttribute('aria-valuenow',String(state.split));});
+split.addEventListener('pointerup',()=>{dragging=false;void persist().catch(error);});
+split.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();state.split=Math.max(20,Math.min(75,state.split+(e.key==='ArrowUp'?-3:3)));$('sidebar').style.setProperty('--chat-share',state.split+'%');void persist().catch(error);}});
+window.addEventListener('message',event=>{if(event.origin!==location.origin)return;const tab=tabs.find(t=>t.frame.contentWindow===event.source);if(!tab)return;if(event.data?.type==='jueony:status')refreshTab(tab);if(event.data?.type==='jueony:new-document'&&tab===activeTab&&cancelNavigation())void newTab().catch(error);});
+window.addEventListener('beforeunload',event=>{if(persistError||running||tabs.some(t=>t.api?.state().dirty)){event.preventDefault();event.returnValue='';}});
+async function start(){await store.open();state=await store.load();if(!state.workspaces.length)addWorkspace(state,'내 업무');if(!state.workspaces.some(w=>w.id===state.activeWorkspaceId))state.activeWorkspaceId=state.workspaces[0].id;render();await switchWorkspace(state.activeWorkspaceId);status('로컬 업무 준비 완료 · AI 연결 설정에서 모델을 등록하세요.');}
+void start().catch(error);

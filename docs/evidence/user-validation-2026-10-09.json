@@ -1,0 +1,27 @@
+{
+  "reportedAtLocalDate": "2026-10-09",
+  "source": "사용자가 이 대화에서 보고한 확인 결과",
+  "checks": [
+    {
+      "check": "hancom_reopen_saved_file",
+      "status": "USER_REPORTED_PASS",
+      "statement": "한글에서 저장 파일 재 열기를 성공했어",
+      "inputFormat": null,
+      "outputFormat": null,
+      "documentName": null,
+      "appCommit": null,
+      "hancomBuild": null,
+      "independentEvidence": null
+    },
+    {
+      "check": "korean_text_input",
+      "status": "USER_REPORTED_PASS",
+      "statement": "한글입력도 성공 했어",
+      "ime": null,
+      "appCommit": null,
+      "testedInputCases": null,
+      "independentEvidence": null
+    }
+  ],
+  "scope": "사용자가 시험한 사례의 성공 보고다. HWP와 HWPX 양쪽, 복잡한 조판 보존, 모든 IME 조합/한자 입력, 무수정·수정·되돌림 저장 전체를 검증한 것으로 확대하지 않는다."
+}

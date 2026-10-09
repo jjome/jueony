@@ -1,5 +1,15 @@
 # 편집 엔진 연결 설계
 
+## 현행 MVP 연결 기준 — 2026-10-09 추가
+
+최신 구현 기준은 [Workspace·채팅·AI MVP 계획](11-workspace-agent-mvp-plan.md)의 4~8절이다. 기존 TypeScript shell과 Rust 런처·로컬 Studio/WASM을 재사용한다. 왼쪽 업무/채팅/폴더, 가운데 채팅, 오른쪽 편집기를 구성하며 사용자와 AI가 같은 열린 engine을 사용한다.
+
+LLM은 `UI → Application/Agent → LLM Port ← Provider Adapter`로 분리한다. Context·단일 실행 제어·문서 Tool·실행 기록을 나누고, 전체 문서 snapshot과 여러 위치의 검증된 명령 묶음을 추가한다. 기본 동작은 직접 적용이며 결과 확인·undo·버전 충돌·부분 실패 처리가 이를 뒷받침한다.
+
+아래는 초기 단일 문단 기술 검증을 위한 설계 기록이다. React/Tauri/Python/SQLite 도입, 선택 문단 중심 전송, mock/매번 승인 흐름을 현재 MVP의 필수 요건으로 적용하지 않는다. 문서 소유권·명령 검증·안전한 저장 원칙은 유지하고 최신 세부 계약은 11번 문서를 우선한다.
+
+## 초기 연결 설계 기록
+
 열린 문서의 유일한 내용 기준은 rhwp Studio가 소유한 WASM 문서다. 호스트 앱은 파일 경로·업무·대화·수정안·저장 결과를 관리한다. Python은 참고 자료의 추출·검색과 새 문서 생성에 사용한다. Python이 열린 원본을 직접 patch하거나 별도의 rhwp 인스턴스로 같은 문서를 수정하는 경로는 만들지 않는다.
 
 ## 구성과 책임

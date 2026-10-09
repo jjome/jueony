@@ -7,14 +7,20 @@ export function installDesktopHost({ wasm, eventBus, documentState, ready, save,
   eventBus.on('document-mutated', () => sequence++);
   const revision = () => `${wasm.documentGeneration}:${sequence}`;
   // 부모 탭 호스트도 같은 엔진의 상태와 저장 명령을 사용한다.
-  (window as any).joouniEditor = {
+  (window as any).jueonyEditor = {
     ready, revision, save, discard,
-    busy: () => Boolean(document.getElementById('joouni-busy') || document.getElementById('joouni-download-confirm')) || document.documentElement.classList.contains('rhwp-busy'),
+    busy: () => Boolean(document.getElementById('jueony-busy') || document.getElementById('jueony-download-confirm')) || document.documentElement.classList.contains('rhwp-busy'),
     state: () => ({ name: wasm.fileName, pageCount: wasm.pageCount, dirty: documentState.isDirty(), revision: revision() }),
   };
+  // 이름 변경 전에 열린 부모 탭도 새 문서의 dirty/save 상태를 읽을 수 있어야 한다.
+  // 기존 창을 닫기 전까지 유지하는 이전 호스트 프로토콜의 호환 별칭이다.
+  (window as any).joouniEditor = (window as any).jueonyEditor;
   const child = new URLSearchParams(location.search).get('child') === '1' && window.parent !== window;
   if (child) {
-    const notify = () => window.parent.postMessage({ type: 'joouni:status' }, location.origin);
+    const notify = () => {
+      window.parent.postMessage({ type: 'jueony:status' }, location.origin);
+      window.parent.postMessage({ type: 'joouni:status' }, location.origin);
+    };
     eventBus.on('document-dirty-changed', notify);
     eventBus.on('document-mutated', notify);
     new MutationObserver(notify).observe(document.querySelector('title')!, { childList: true });
@@ -72,9 +78,9 @@ export function installDesktopHost({ wasm, eventBus, documentState, ready, save,
   let closeApproved = false;
   const appWindow = tauri.window.getCurrentWindow();
   void appWindow.onCloseRequested(async (event: any) => {
-    if (document.getElementById('joouni-busy') || (!closeApproved && documentState.isDirty())) {
+    if (document.getElementById('jueony-busy') || (!closeApproved && documentState.isDirty())) {
       event.preventDefault();
-      if (document.getElementById('joouni-busy')) return;
+      if (document.getElementById('jueony-busy')) return;
       if (confirm('저장하지 않은 변경 내용이 있습니다. 변경 내용을 버리고 종료할까요?')) {
         closeApproved = true;
         await appWindow.close();

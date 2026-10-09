@@ -3,12 +3,12 @@ import { assertSaveRevision } from './save-guard';
 // Downloads have no browser API that confirms a completed disk write. Keep the
 // frame and recovery draft alive until the user has checked the saved file.
 export async function confirmDownload(blob: Blob, fileName: string): Promise<boolean> {
-  const revision = () => (window as any).joouniEditor.revision() as string;
-  const expected = (blob as any).joouniRevision;
+  const revision = () => (window as any).jueonyEditor.revision() as string;
+  const expected = (blob as any).jueonyRevision;
   assertSaveRevision(expected, revision());
-  if (document.getElementById('joouni-download-confirm')) return false;
+  if (document.getElementById('jueony-download-confirm')) return false;
   const dialog = document.createElement('dialog');
-  dialog.id = 'joouni-download-confirm';
+  dialog.id = 'jueony-download-confirm';
   const form = document.createElement('form'); form.method = 'dialog';
   const heading = document.createElement('h2'); heading.textContent = '다운로드한 파일을 확인해 주세요';
   const name = document.createElement('p'); name.textContent = fileName;

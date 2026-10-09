@@ -23,6 +23,7 @@ const passed = [];
 for (const path of ['/', '/editor.html', '/build-evidence.json']) {
   const response = await request(path);
   assert.equal(response.status, 200); assert.ok(response.body.length > 0);
+  if (path === '/build-evidence.json') assert.equal(JSON.parse(response.body.toString()).applicationId, 'jueony-editor');
   assert.match(response.header, /connect-src 'self'/); assert.match(response.header, /frame-ancestors 'self'/);
   passed.push(`GET ${path}`);
 }

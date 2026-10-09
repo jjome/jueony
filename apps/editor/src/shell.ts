@@ -15,7 +15,7 @@ const tabs: Tab[] = [];
 let active: Tab | undefined;
 let counter = 0;
 let closing = false;
-const api = (tab: Tab) => (tab.frame.contentWindow as any)?.joouniEditor as EditorApi | undefined;
+const api = (tab: Tab) => (tab.frame.contentWindow as any)?.jueonyEditor as EditorApi | undefined;
 
 function refresh(tab: Tab) {
   const state = api(tab)?.state();
@@ -25,7 +25,7 @@ function refresh(tab: Tab) {
   tab.close.setAttribute('aria-label', `${name} 탭 닫기`);
   tab.button.title = name + (state?.dirty ? ' · 저장하지 않은 변경 내용' : '');
   if (tab === active) {
-    document.title = `${name} - 주니 문서 편집기`;
+    document.title = `${name} - Jueony 문서 편집기`;
     status.textContent = new URLSearchParams(location.search).get('storage') === 'download'
       ? '다운로드 저장 검증 모드' : '로컬 문서 편집기';
   }
@@ -95,8 +95,8 @@ window.addEventListener('message', event => {
   if (event.origin !== location.origin) return;
   const tab = tabs.find(candidate => candidate.frame.contentWindow === event.source);
   if (!tab || !event.data || typeof event.data !== 'object') return;
-  if (event.data.type === 'joouni:status') refresh(tab);
-  if (event.data.type === 'joouni:new-document') newDocument();
+  if (event.data.type === 'jueony:status') refresh(tab);
+  if (event.data.type === 'jueony:new-document') newDocument();
 });
 window.addEventListener('beforeunload', event => {
   if (!tabs.some(tab => api(tab)?.state().dirty)) return;

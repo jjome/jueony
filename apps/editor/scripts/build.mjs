@@ -27,8 +27,8 @@ for (const entry of await readdir(join(upstream, 'rhwp-studio/public'))) {
   await cp(join(upstream, 'rhwp-studio/public', entry), join(root, 'public', entry), { recursive: true });
 }
 await cp(join(upstream, 'assets/fonts'), join(root, 'public/fonts'), { recursive: true });
-await cp(join(app, 'src'), join(root, 'src/joouni'), { recursive: true });
-await cp(join(app, 'src/boot.js'), join(root, 'public/joouni-boot.js'));
+await cp(join(app, 'src'), join(root, 'src/jueony'), { recursive: true });
+await cp(join(app, 'src/boot.js'), join(root, 'public/jueony-boot.js'));
 await cp(join(upstream, 'LICENSE'), join(root, 'public/LICENSE.rhwp.txt'));
 await cp(join(upstream, 'THIRD_PARTY_LICENSES.md'), join(root, 'public/THIRD_PARTY_LICENSES.rhwp.md'));
 await mkdir(join(root, 'public/licenses'), { recursive: true });
@@ -41,18 +41,18 @@ function replaceOnce(text, before, after, label) {
   return text.replace(before, after);
 }
 let html = await readFile(join(upstream, 'rhwp-studio/index.html'), 'utf8');
-html = replaceOnce(html, '<script src="/theme-init.js"></script>', '<script src="/joouni-boot.js"></script>\n  <script src="/theme-init.js"></script>', 'boot');
-html = replaceOnce(html, '<title>rhwp-studio</title>', '<title>주니 문서 편집기 · 개발판</title>', 'title');
-html = html.replaceAll('rhwp-studio 문서 편집기', '주니 문서 편집기');
+html = replaceOnce(html, '<script src="/theme-init.js"></script>', '<script src="/jueony-boot.js"></script>\n  <script src="/theme-init.js"></script>', 'boot');
+html = replaceOnce(html, '<title>rhwp-studio</title>', '<title>Jueony 문서 편집기 · 개발판</title>', 'title');
+html = html.replaceAll('rhwp-studio 문서 편집기', 'Jueony 문서 편집기');
 html = html.replace('data-i18n="ui.studioHeader.srLabel"', '');
-html = replaceOnce(html, '<div id="studio-root">', '<div id="studio-root">\n    <div id="joouni-title"><strong>주니 문서 편집기</strong><span>한글 2024 호환성 개발판</span></div>', 'titlebar');
-html = replaceOnce(html, '</head>', '  <link rel="stylesheet" href="/src/joouni/editor.css" />\n</head>', 'css');
+html = replaceOnce(html, '<div id="studio-root">', '<div id="studio-root">\n    <div id="jueony-title"><strong>Jueony 문서 편집기</strong><span>한글 2024 호환성 개발판</span></div>', 'titlebar');
+html = replaceOnce(html, '</head>', '  <link rel="stylesheet" href="/src/jueony/editor.css" />\n</head>', 'css');
 await writeFile(join(root, 'editor.html'), html);
 await cp(join(app, 'src/shell.html'), join(root, 'index.html'));
 let main = await readFile(join(root, 'src/main.ts'), 'utf8');
 main = replaceOnce(main, 'confirmSaveBeforeReplacingDocument, fileCommands', 'confirmSaveBeforeReplacingDocument, saveCurrentDocument, fileCommands', 'host save import');
 main = replaceOnce(main, "return params.has('url');", "return params.has('url') || params.get('skipRecovery') === '1';", 'tab recovery');
-main = "import { installDesktopHost } from './joouni/desktop-host';\nimport { installHangulChrome } from './joouni/chrome-2024';\n" + main;
+main = "import { installDesktopHost } from './jueony/desktop-host';\nimport { installHangulChrome } from './jueony/chrome-2024';\n" + main;
 main = replaceOnce(main, "const initPromise = initialize();", `const initPromise = initialize();
 installDesktopHost({ wasm, eventBus, documentState, ready: initPromise,
   save: () => saveCurrentDocument(commandServices),
@@ -61,17 +61,17 @@ installDesktopHost({ wasm, eventBus, documentState, ready: initPromise,
 void initPromise.then(() => installHangulChrome({ wasm, eventBus, documentState, automation }));`, 'desktop host');
 await writeFile(join(root, 'src/main.ts'), main);
 let documentTitle = await readFile(join(root, 'src/ui/document-title.ts'), 'utf8');
-documentTitle = documentTitle.replaceAll('rhwp-studio', '주니 문서 편집기');
+documentTitle = documentTitle.replaceAll('rhwp-studio', 'Jueony 문서 편집기');
 await writeFile(join(root, 'src/ui/document-title.ts'), documentTitle);
 
 // 저장할 Blob에 문서 버전을 연결해 저장 중 발생한 새 편집을 clean 처리하지 않는다.
 let fileCommands = (await readFile(join(root, 'src/command/commands/file.ts'), 'utf8')).replace(/\r\n/g, '\n');
-fileCommands = "import { confirmDownload } from '../../joouni/download-save';\n" + fileCommands;
+fileCommands = "import { confirmDownload } from '../../jueony/download-save';\n" + fileCommands;
 fileCommands = replaceOnce(fileCommands,
   'blob: new Blob([artifact.bytes as unknown as BlobPart], {\n      type: SAVE_FORMAT_DETAILS[format].mimeType,\n    }),',
   `blob: Object.assign(new Blob([artifact.bytes as unknown as BlobPart], {
       type: SAVE_FORMAT_DETAILS[format].mimeType,
-    }), { joouniRevision: (window as any).joouniEditor?.revision() }),`, 'save revision');
+    }), { jueonyRevision: (window as any).jueonyEditor?.revision() }),`, 'save revision');
 fileCommands = replaceOnce(fileCommands,
   "console.warn('[file:save] File System Access API 실패, 폴백:', error);\n    return { method: 'fallback', handle: null, fileName: suggestedName };",
   "console.error('[file:save]', error);\n    alert('저장하지 못했습니다. 문서는 수정 상태로 유지됩니다.\\n' + String(error));\n    return 'cancelled';", 'save failure');
@@ -88,11 +88,13 @@ fileCommands = fileCommands.replaceAll('() => downloadBlob(payload.blob, downloa
 fileCommands = replaceOnce(fileCommands,
   "services.eventBus.emit('create-new-document');",
   `if (new URLSearchParams(location.search).get('child') === '1' && window.parent !== window) {
+        window.parent.postMessage({ type: 'jueony:new-document' }, location.origin);
+        // 이름 변경 전에 열린 부모 창의 탭 생성도 지원한다.
         window.parent.postMessage({ type: 'joouni:new-document' }, location.origin);
       } else services.eventBus.emit('create-new-document');`, 'new document tab');
 await writeFile(join(root, 'src/command/commands/file.ts'), fileCommands);
 let fileSystem = (await readFile(join(root, 'src/command/file-system-access.ts'), 'utf8')).replace(/\r\n/g, '\n');
-fileSystem = "import { writeSnapshot, rememberFileSnapshot } from '../joouni/save-guard';\n" + fileSystem;
+fileSystem = "import { writeSnapshot, rememberFileSnapshot } from '../jueony/save-guard';\n" + fileSystem;
 fileSystem = replaceOnce(fileSystem,
   'const file = await handle.getFile();\n  return {\n    name: file.name,\n    bytes: new Uint8Array(await file.arrayBuffer()),',
   'const file = await handle.getFile();\n  const bytes = new Uint8Array(await file.arrayBuffer());\n  await rememberFileSnapshot(handle, bytes);\n  return {\n    name: file.name,\n    bytes,', 'source file fingerprint');
@@ -117,7 +119,7 @@ const sha256 = data => createHash('sha256').update(data).digest('hex');
 const customSource = [];
 for (const name of (await readdir(join(app, 'src'))).sort()) customSource.push(name, await readFile(join(app, 'src', name), 'utf8'));
 const evidence = {
-  applicationId: 'joouni-editor',
+  applicationId: 'jueony-editor',
   sourceCommit: commit, enginePackage: '@rhwp/core@0.8.7', builtAt: new Date().toISOString(),
   engineWasmSha256: sha256(await readFile(join(app, 'node_modules/@rhwp/core/rhwp_bg.wasm'))),
   buildScriptSha256: sha256(await readFile(fileURLToPath(import.meta.url))),

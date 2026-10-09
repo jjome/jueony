@@ -3,7 +3,7 @@
 window.addEventListener('error', event => {
   if (event.error?.stack) console.error('[editor]', event.error.stack);
 });
-if (new URLSearchParams(location.search).get('child') === '1') document.documentElement.dataset.joouniChild = 'true';
+if (new URLSearchParams(location.search).get('child') === '1') document.documentElement.dataset.jueonyChild = 'true';
 try {
   if (!localStorage.getItem('rhwp-settings')) {
     localStorage.setItem('rhwp-settings', JSON.stringify({theme:{mode:'light',skin:'default',skinChosen:true}}));

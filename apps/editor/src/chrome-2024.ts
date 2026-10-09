@@ -41,18 +41,18 @@ const tabs: Record<string, Group[]> = {
 export function installHangulChrome({ wasm, eventBus, documentState, automation }: {
   wasm: WasmBridge; eventBus: EventBus; documentState: DocumentDirtyState; automation: AutomationHost;
 }) {
-  if (document.getElementById('joouni-ribbon')) return;
+  if (document.getElementById('jueony-ribbon')) return;
   const commands = new Map(automation.listCommands().map(command => [command.id, command]));
   const menu = document.getElementById('menu-bar')!;
   const ribbon = document.createElement('div');
-  ribbon.id = 'joouni-ribbon'; ribbon.setAttribute('role', 'region'); ribbon.setAttribute('aria-label', '기본 도구 상자');
+  ribbon.id = 'jueony-ribbon'; ribbon.setAttribute('role', 'region'); ribbon.setAttribute('aria-label', '기본 도구 상자');
   document.getElementById('icon-toolbar')!.before(ribbon);
-  document.getElementById('icon-toolbar')!.classList.add('joouni-original-toolbar');
+  document.getElementById('icon-toolbar')!.classList.add('jueony-original-toolbar');
   let currentTab = 'edit';
   const tabButtons = new Map<string, HTMLButtonElement>();
   const run = (id: string) => {
     const result = automation.execute(id, undefined, { allowDialog: true });
-    if (!result.ok && result.reason !== 'disabled') console.warn('[joouni command]', id, result);
+    if (!result.ok && result.reason !== 'disabled') console.warn('[jueony command]', id, result);
     refresh();
   };
   const commandButton = (id: string, compact = false) => {
@@ -127,16 +127,16 @@ export function installHangulChrome({ wasm, eventBus, documentState, automation 
   document.getElementById('style-bar')!.prepend(quick);
 
   const area = document.getElementById('editor-area')!;
-  const workspace = document.createElement('div'); workspace.id = 'joouni-workspace';
+  const workspace = document.createElement('div'); workspace.id = 'jueony-workspace';
   area.before(workspace); workspace.append(area);
-  const panel = document.createElement('aside'); panel.id = 'joouni-style-panel'; panel.setAttribute('aria-label', '스타일 작업 창');
+  const panel = document.createElement('aside'); panel.id = 'jueony-style-panel'; panel.setAttribute('aria-label', '스타일 작업 창');
   const panelHeader = document.createElement('div'); panelHeader.className = 'j-panel-header';
   const panelTitle = document.createElement('strong'); panelTitle.textContent = '스타일';
   const closePanel = document.createElement('button'); closePanel.type = 'button'; closePanel.textContent = '×'; closePanel.setAttribute('aria-label', '스타일 작업 창 닫기');
   const togglePanel = document.createElement('button'); togglePanel.type = 'button'; togglePanel.className = 'j-panel-toggle'; togglePanel.textContent = '스타일 창'; togglePanel.setAttribute('aria-controls', panel.id);
   const setPanel = (open: boolean) => {
     panel.hidden = !open; togglePanel.setAttribute('aria-expanded', String(open));
-    try { localStorage.setItem('joouni-style-panel', String(open)); } catch { /* 개인 보기 설정 */ }
+    try { localStorage.setItem('jueony-style-panel', String(open)); } catch { /* 개인 보기 설정 */ }
     window.dispatchEvent(new Event('resize'));
   };
   closePanel.addEventListener('click', () => setPanel(false));
@@ -166,12 +166,12 @@ export function installHangulChrome({ wasm, eventBus, documentState, automation 
     }
   }
   let initiallyOpen = true;
-  try { initiallyOpen = localStorage.getItem('joouni-style-panel') !== 'false'; } catch { /* 기본 보기 */ }
+  try { initiallyOpen = localStorage.getItem('jueony-style-panel') !== 'false'; } catch { /* 기본 보기 */ }
   setPanel(initiallyOpen);
   new MutationObserver(syncStyles).observe(styleSelect, { childList: true });
   eventBus.on('cursor-style-changed', syncStyles);
 
-  const documentBar = document.createElement('div'); documentBar.id = 'joouni-document-tabs';
+  const documentBar = document.createElement('div'); documentBar.id = 'jueony-document-tabs';
   const current = document.createElement('span'); current.className = 'j-document-tab';
   current.setAttribute('aria-label', '현재 문서');
   documentBar.append(current);

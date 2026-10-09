@@ -1,10 +1,10 @@
-# 주니 문서 편집기 개발판
+# Jueony 문서 편집기 개발판
 
 한글 2024 Windows를 기준으로 만드는 로컬 HWP/HWPX 편집기다. rhwp 0.8.7의 Rust/WASM 엔진과 Studio를 바탕으로 문서 탭, 탭별 도구 상자, 스타일 창, 저장 보호를 추가했다. **한글 2024 전체 기능·화면·호환성이 같은 제품으로 검증한 것은 아니다.**
 
 ## 실행과 저장
 
-프로젝트 루트 `Start-Editor.cmd` 또는 준비된 묶음의 `JoouniEditor.exe`를 실행한다. 실행 파일 옆의 `dist` 폴더가 필요하다. Rust 런처가 `127.0.0.1:4173`에 정적 자산만 제공하고 설치된 Edge/Chrome의 독립 창을 연다. Node.js가 필요 없는 실행 경로다. AI나 외부 Studio 사이트에 연결하지 않는다. 브라우저 자체 통신까지 포함한 OS 수준 폐쇄망 검수는 별도다.
+프로젝트 루트 `Start-Jueony.cmd` 또는 준비된 묶음의 `JueonyEditor.exe`를 실행한다. 실행 파일 옆의 `dist` 폴더가 필요하다. Rust 런처가 `127.0.0.1:4173`에 정적 자산만 제공하고 설치된 Edge/Chrome의 독립 창을 연다. Node.js가 필요 없는 실행 경로다. AI나 외부 Studio 사이트에 연결하지 않는다. 브라우저 자체 통신까지 포함한 OS 수준 폐쇄망 검수는 별도다.
 
 일반 Edge/Chrome에서는 File System Access API의 열기·저장 대화상자를 사용한다. 선택한 원본의 SHA-256을 기억하고, 원본이 다른 프로그램에서 바뀌었으면 저장을 거부한다. 저장 중에는 입력을 막고 문서 버전을 검사한다. 이 경로의 실제 Windows 파일 선택 UI 조작은 아직 미검증이며 저장 보호 로직을 단위 시험했다. 디스크 교체 직전의 외부 프로세스 경쟁까지 원자적으로 막는 파일 잠금은 없다.
 
@@ -26,7 +26,7 @@ npm test
 # 프로젝트 루트에서:
 .\scripts\Build-Standalone.ps1
 # Node 개발 서버:
-.\scripts\Start-Editor.ps1
+.\scripts\Start-Jueony.ps1
 ```
 
 Windows 실행기는 프로젝트 내부 Rust 1.93.1과 VS C++ 도구를 사용한다. `scripts/Build-Standalone.ps1` 실행 전에 이미 실행 중인 같은 exe를 종료해야 한다. `dist/build-evidence.json`에 참조 커밋, 자체 코드 해시, 엔진 WASM 해시를 기록한다. 엔진은 공식 `@rhwp/core@0.8.7` 배포 WASM이며 이 빌드에서 Rust 엔진 자체를 다시 컴파일한 것은 아니다.

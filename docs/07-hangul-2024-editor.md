@@ -4,7 +4,7 @@
 
 ## 아침에 실행할 위치
 
-루트 `Start-Editor.cmd`를 더블클릭한다. 실제 실행 파일은 `build/windows-preview/JoouniEditor.exe`다. `dist` 폴더를 옆에 둔다. Edge 또는 Chrome 설치가 필요하며 Node.js·Python은 실행에 필요하지 않다. 폴더를 옮길 때는 `windows-preview` 전체를 함께 복사한다. 설치·배포·자동 시작 등록은 하지 않았다.
+루트 `Start-Jueony.cmd`를 더블클릭한다. 실제 실행 파일은 `build/jueony-preview/JueonyEditor.exe`다. `dist` 폴더를 옆에 둔다. Edge 또는 Chrome 설치가 필요하며 Node.js·Python은 실행에 필요하지 않다. 폴더를 옮길 때는 `jueony-preview` 전체를 함께 복사한다. 설치·배포·자동 시작 등록은 하지 않았다.
 
 ## 구현 상태
 

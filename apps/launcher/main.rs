@@ -84,7 +84,7 @@ fn existing_editor() -> bool {
     if stream.write_all(b"GET /build-evidence.json HTTP/1.1\r\nHost: 127.0.0.1:4173\r\nConnection: close\r\n\r\n").is_err() { return false; }
     let mut response = String::new();
     if stream.take(65536).read_to_string(&mut response).is_err() { return false; }
-    response.contains("\"applicationId\": \"joouni-editor\"")
+    response.contains("\"applicationId\": \"jueony-editor\"")
 }
 
 fn open_editor() -> io::Result<()> {

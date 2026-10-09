@@ -1,10 +1,12 @@
-# 공무원용 AI 문서 편집기 프로젝트
+# Jueony — 공무원용 AI 문서 편집기
 
 폐쇄망 Windows PC에서 HWP와 HWPX를 편집하고, 업무 자료에 근거한 AI 수정안을 검토하여 적용하는 프로그램이다. **현재는 한글 2024를 기준으로 기본 편집기부터 만드는 개발판**이다. 소스 조사 이후 사용자의 후속 지시에 따라 로컬 실행·편집·저장 구현에 착수했다. 한글 2024 전체 기능·화면·파일 호환성 100%를 달성한 상태는 아니다.
 
 ## 바로 실행
 
-프로젝트 루트의 **[Start-Editor.cmd](Start-Editor.cmd)**를 더블클릭한다. 준비된 `build/windows-preview/JoouniEditor.exe`가 로컬 서버를 시작하고 Edge 또는 Chrome의 독립 창을 연다. 실행 묶음에는 WASM·글꼴·자산이 들어 있어 Node.js 없이 실행할 수 있다. 브라우저는 PC에 설치되어 있어야 한다.
+프로젝트명은 **Jueony**다. 현재 루트 폴더의 이름 변경은 Windows의 사용 중 잠금으로 보류되어 있다. Codex를 닫은 뒤 `Rename-Folder-to-Jueony.cmd`를 실행하면 된다. [이름 변경 내역과 마무리 방법](docs/08-project-name.md)을 참고한다.
+
+프로젝트 루트의 **[Start-Jueony.cmd](Start-Jueony.cmd)**를 더블클릭한다. 준비된 `build/jueony-preview/JueonyEditor.exe`가 로컬 서버를 시작하고 Edge 또는 Chrome의 독립 창을 연다. 실행 묶음에는 WASM·글꼴·자산이 들어 있어 Node.js 없이 실행할 수 있다. 브라우저는 PC에 설치되어 있어야 한다.
 
 - 새 문서, HWP/HWPX 열기, 본문 입력, 제목 서식, 문단 정렬, 표 삽입·셀 입력, 되돌리기/다시 실행을 사용한다.
 - 아래쪽 문서 탭과 오른쪽 스타일 창이 있다. 탭마다 문서·커서·undo 이력을 유지한다.

@@ -20,13 +20,13 @@ try {
     } else void request.continue();
   });
   await page.goto(`http://127.0.0.1:${server.address().port}`, { waitUntil: 'networkidle0' });
-  await page.waitForFunction(() => window.joouniEditor);
-  await page.evaluate(() => window.joouniEditor.ready);
+  await page.waitForFunction(() => window.jueonyEditor);
+  await page.evaluate(() => window.jueonyEditor.ready);
   await page.keyboard.down('Alt'); await page.keyboard.press('KeyN'); await page.keyboard.up('Alt');
-  await page.waitForFunction(() => window.joouniEditor.state().pageCount > 0);
+  await page.waitForFunction(() => window.jueonyEditor.state().pageCount > 0);
   await mkdir(resolve(app, 'evidence'), { recursive: true });
   await page.screenshot({ path: resolve(app, 'evidence/editor-first.png') });
-  const state = await page.evaluate(() => ({ state: window.joouniEditor.state(), inputs: [...document.querySelectorAll('textarea,canvas')].map(e => ({tag:e.tagName,id:e.id,class:e.className,rect:JSON.stringify(e.getBoundingClientRect())})), text: document.body.innerText.slice(-2500) }));
+  const state = await page.evaluate(() => ({ state: window.jueonyEditor.state(), inputs: [...document.querySelectorAll('textarea,canvas')].map(e => ({tag:e.tagName,id:e.id,class:e.className,rect:JSON.stringify(e.getBoundingClientRect())})), text: document.body.innerText.slice(-2500) }));
   const report = { state, errors, failures, external };
   await writeFile(resolve(app, 'evidence/probe.json'), JSON.stringify(report, null, 2));
   console.log(JSON.stringify(report, null, 2));

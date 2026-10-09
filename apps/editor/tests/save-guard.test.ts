@@ -23,14 +23,14 @@ test('외부 프로그램이 원본을 바꾸면 덮어쓰기를 시작하지 �
   disk = new Blob(['외부 수정']);
   const root = { inert: false };
   Object.assign(globalThis, {
-    window: { joouniEditor: { revision: () => '1:8' } },
+    window: { jueonyEditor: { revision: () => '1:8' } },
     document: {
       getElementById: () => root,
       createElement: () => ({ setAttribute() {}, remove() {} }),
       body: { append() {} },
     },
   });
-  await assert.rejects(writeSnapshot(handle, Object.assign(new Blob(['내 편집']), { joouniRevision: '1:8' })), /원본 파일을 변경/);
+  await assert.rejects(writeSnapshot(handle, Object.assign(new Blob(['내 편집']), { jueonyRevision: '1:8' })), /원본 파일을 변경/);
   assert.equal(writes, 0);
   assert.equal(await disk.text(), '외부 수정');
   assert.equal(root.inert, false);
@@ -41,14 +41,14 @@ test('쓰기 실패와 저장 중 수정 시 close하지 않고 abort하며 입�
   const root = { inert: false };
   let overlays = 0;
   Object.assign(globalThis, {
-    window: { joouniEditor: { revision: () => revision } },
+    window: { jueonyEditor: { revision: () => revision } },
     document: {
       getElementById: () => root,
       createElement: () => ({ setAttribute() {}, remove() { overlays--; } }),
       body: { append() { overlays++; } },
     },
   });
-  const blob = Object.assign(new Blob(['본문']), { joouniRevision: '1:8' });
+  const blob = Object.assign(new Blob(['본문']), { jueonyRevision: '1:8' });
   const calls: string[] = [];
   const handle = { createWritable: async () => ({
     write: async () => { calls.push('write'); revision = '1:9'; },

@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $appRoot = Join-Path $projectRoot 'apps/editor'
 if (-not (Test-Path (Join-Path $appRoot 'dist/index.html'))) {
-    throw '편집기 빌드가 없습니다. scripts/Build-Editor.ps1을 먼저 실행해 주세요.'
+    throw '편집기 빌드가 없습니다. scripts/Build-Jueony.ps1을 먼저 실행해 주세요.'
 }
 $nodePath = (Get-Command node -ErrorAction SilentlyContinue).Source
 $voltaNodes = Join-Path $env:LOCALAPPDATA 'Volta/tools/image/node'
@@ -16,7 +16,7 @@ $port = 4173
 $running = $false
 try {
     $result = Invoke-RestMethod "http://127.0.0.1:$port/build-evidence.json" -TimeoutSec 2
-    $running = $result.applicationId -eq 'joouni-editor'
+    $running = $result.applicationId -eq 'jueony-editor'
     if (-not $running) { throw '다른 프로그램이 4173 포트를 사용 중입니다.' }
 } catch [System.Net.Http.HttpRequestException] {
     $running = $false
@@ -30,7 +30,7 @@ if (-not $running) {
     for ($attempt = 0; $attempt -lt 30; $attempt++) {
         try {
             $result = Invoke-RestMethod "http://127.0.0.1:$port/build-evidence.json" -TimeoutSec 1
-            if ($result.applicationId -eq 'joouni-editor') { $running = $true; break }
+            if ($result.applicationId -eq 'jueony-editor') { $running = $true; break }
         } catch { Start-Sleep -Milliseconds 200 }
     }
     if (-not $running) { throw '편집기 서버 시작에 실패했습니다. apps/editor/evidence/preview-error.log를 확인해 주세요.' }

@@ -23,15 +23,15 @@ async function assertFileUnchanged(handle: Handle) {
 let saving = false;
 
 export async function writeSnapshot(handle: Handle, blob: Blob) {
-  const getRevision = () => (window as any).joouniEditor.revision() as string;
-  const expected = (blob as any).joouniRevision;
+  const getRevision = () => (window as any).jueonyEditor.revision() as string;
+  const expected = (blob as any).jueonyRevision;
   assertSaveRevision(expected, getRevision());
   if (saving) throw new Error('이미 저장 중입니다.');
   saving = true;
   const root = document.getElementById('studio-root')!;
   const wasInert = root.inert;
   root.inert = true;
-  const overlay = Object.assign(document.createElement('div'), { id: 'joouni-busy', textContent: '문서를 저장하고 있습니다…' });
+  const overlay = Object.assign(document.createElement('div'), { id: 'jueony-busy', textContent: '문서를 저장하고 있습니다…' });
   overlay.setAttribute('role', 'status');
   document.body.append(overlay);
   let writable: Writable | undefined;

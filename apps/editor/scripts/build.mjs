@@ -6,6 +6,11 @@ import { execFileSync } from 'node:child_process';
 import { build } from 'vite';
 
 const app = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const projectRoot = resolve(app, '../..');
+const licenseText = await readFile(join(projectRoot, 'LICENSE.txt'), 'utf8');
+if (licenseText !== await readFile(join(app, 'LICENSE.txt'), 'utf8')) {
+  throw new Error('루트와 앱의 LICENSE.txt가 다릅니다. 같은 약관 원문으로 동기화해 주세요.');
+}
 const upstream = resolve(app, '../../upstream/rhwp-source');
 const expectedCommit = '1a76570e833917d15817415a53c09ad61ab3203f';
 const commit = execFileSync('git', ['-C', upstream, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
@@ -25,6 +30,9 @@ await mkdir(join(root, 'public'), { recursive: true });
 for (const entry of await readdir(join(upstream, 'rhwp-studio/public'))) {
   if (entry === 'fonts' || entry.startsWith('rhwp')) continue;
   await cp(join(upstream, 'rhwp-studio/public', entry), join(root, 'public', entry), { recursive: true });
+}
+for (const name of ['LICENSE.txt', 'THIRD_PARTY_NOTICES.md']) {
+  await cp(join(projectRoot, name), join(root, 'public', name));
 }
 await cp(join(upstream, 'assets/fonts'), join(root, 'public/fonts'), { recursive: true });
 await cp(join(app, 'src'), join(root, 'src/jueony'), { recursive: true });

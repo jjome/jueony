@@ -2,9 +2,15 @@
 
 폐쇄망 Windows PC에서 HWP와 HWPX를 편집하고, 업무 자료에 근거한 AI 수정안을 검토하여 적용하는 프로그램이다. **현재는 한글 2024를 기준으로 기본 편집기부터 만드는 개발판**이다. 소스 조사 이후 사용자의 후속 지시에 따라 로컬 실행·편집·저장 구현에 착수했다. 한글 2024 전체 기능·화면·파일 호환성 100%를 달성한 상태는 아니다.
 
+## 이용허락
+
+자체 코드·자산에는 **[Jueony Personal Use License 1.0](LICENSE.txt)**이 적용된다. 개인의 사적·비업무용 사용은 무료다. **행정·직무·조직 업무, 상업적 사용, 프로그램 수정·수정본 사용 및 유무상 재배포에는 별도의 사전 서면 허락이 필요하다.** 문서 편집과 프로그램 코드 수정은 구분한다.
+
+제3자 오픈소스·글꼴 등에는 각각의 원래 라이선스가 우선한다. [제3자 고지](THIRD_PARTY_NOTICES.md)와 [적용 기록](docs/09-licensing.md)을 참고한다. 기관용 개발이라는 제품 목표가 기관의 무료 사용을 허가하는 것은 아니다. 기관 사용은 별도 계약 대상으로 둔다.
+
 ## 바로 실행
 
-프로젝트명은 **Jueony**다. 현재 루트 폴더의 이름 변경은 Windows의 사용 중 잠금으로 보류되어 있다. Codex를 닫은 뒤 `Rename-Folder-to-Jueony.cmd`를 실행하면 된다. [이름 변경 내역과 마무리 방법](docs/08-project-name.md)을 참고한다.
+프로젝트명은 **Jueony**이며, 현재 로컬 루트는 `C:\Users\jjome\Documents\work\jueony`다. [이름 변경 기록](docs/08-project-name.md)을 참고한다.
 
 프로젝트 루트의 **[Start-Jueony.cmd](Start-Jueony.cmd)**를 더블클릭한다. 준비된 `build/jueony-preview/JueonyEditor.exe`가 로컬 서버를 시작하고 Edge 또는 Chrome의 독립 창을 연다. 실행 묶음에는 WASM·글꼴·자산이 들어 있어 Node.js 없이 실행할 수 있다. 브라우저는 PC에 설치되어 있어야 한다.
 

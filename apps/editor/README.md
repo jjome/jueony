@@ -45,6 +45,9 @@ Windows 실행기는 프로젝트 내부 Rust 1.93.1과 VS C++ 도구를 사용�
 
 ## 저작권과 라이선스
 
+Jueony 자체 부분에는 [개인·비업무용 약관](LICENSE.txt)이 적용된다. 행정·직무·조직 업무, 상업적 사용, 프로그램 수정과 유무상 재배포에는 별도 허락이 필요하다. 제3자 구성요소의 원래 라이선스와 법정 예외는 우선한다. 실행 묶음에는 `LICENSE.txt`와 `THIRD_PARTY_NOTICES.md`가 포함된다.
+
+
 rhwp의 MIT 고지는 `LICENSE.rhwp.txt`, 원본 부속 고지는 `dist/THIRD_PARTY_LICENSES.rhwp.md`, 폰트 설명·고지는 `dist/fonts`, npm 런타임 고지는 `dist/licenses`에 유지한다. Rust 표준 라이브러리 고지는 실행 묶음에 복사한다. 상용 한컴/Windows 글꼴을 새로 추출해 포함하지 않았다. 최종 기관 배포의 전체 SBOM·고지는 배포 구성 확정 후 재검토한다.
 
 화면 기준은 [한글 2024 공식 화면 도움말](https://help.hancom.com/hoffice130/ko-KR/Hwp/hwpbase/screen.htm)과 [도구 상자 설명](https://help.hancom.com/hoffice130/ko-KR/Hwp/view/toolbar/toolbar.htm)이다. 원본 기능을 사용한다는 사실과 한글과 동일하게 검증됐다는 주장은 구분한다.

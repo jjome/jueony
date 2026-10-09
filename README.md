@@ -27,6 +27,7 @@
 
 | 문서 | 다루는 결정 |
 | --- | --- |
+| [기본 편집기 보강 작업 계획](docs/10-basic-editor-work-plan.md) | 구현 전 작업 지시서: 13개 작업, 완료 기준, 의존 관계, [54개 검사 목록](docs/basic-editor-checklist.csv) |
 | [현재 한글 2024 편집기 개발판](docs/07-hangul-2024-editor.md) | 실행, 구현 상태, 실측 검증, 아침 검수와 남은 과제 |
 | [제품 요구사항과 초기 범위](docs/01-product-requirements.md) | 사용자 흐름, 자료 범위, 첫 검증과 초기 제품의 구분 |
 | [저장소 재검증과 재사용 판단](docs/02-source-audit.md) | 현재 커밋, 코드 근거, 재사용 모듈과 신규 개발 |

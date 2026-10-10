@@ -1,6 +1,8 @@
 import { rememberFileSnapshot } from '../save-guard';
 import { collectTargetEvidence } from '../../document-agent/controller';
-import { assertRevision, executeBodyOperations, validateGeneration } from './edit-schema.ts';
+import { assertRevision, validateGeneration } from './edit-schema.ts';
+import { executeDocumentOperations } from '../document-control/execute.ts';
+import { readStructure } from '../document-control/structure.ts';
 import { plainSnapshot } from './model.ts';
 import type { Snapshot, Receipt, Generation } from './model.ts';
 type Deps={wasm:any;eventBus:any;documentState:any;ready:Promise<unknown>;load:(bytes:Uint8Array,name:string,handle:any)=>Promise<void>;input:()=>any;render:()=>Promise<void>;automation:any;};
@@ -13,22 +15,24 @@ export function installAgentBridge(d:Deps){
  function snapshot():Snapshot{
   if(applying||damaged||api.busy()||composing)throw new Error('문서 작업 또는 한글 조합이 끝난 뒤 다시 요청해 주세요.');
   d.input()?.flushDeferredPaginationIfNeeded('jueony-context');
-  const before=revision();const nodes:Snapshot['nodes']=[];
+  const before=revision();const nodes:Snapshot['nodes']=[];const controls=d.wasm.getControls();let flatParagraph=0;
   for(let section=0;section<d.wasm.getSectionCount();section++)for(let paragraph=0;paragraph<d.wasm.getParagraphCount(section);paragraph++){
    const length=d.wasm.getParagraphLength(section,paragraph),text=d.wasm.getTextRange(section,paragraph,0,length);let editable=true,reason='';
    try{
     // Section/column definitions are document metadata, not editable inline objects.
     // Only relax the inline-control guard when the entire document's controls
     // are these two known metadata types. Field/mixed-format guards stay intact.
-    const controls=d.wasm.getControls();
-    const reader=controls.length&&controls.every((c:any)=>c.ctrlId==='secd'||c.ctrlId==='cold')
+    const localControls=controls.filter((c:any)=>c.list===0&&c.para===flatParagraph);
+    const reader=localControls.length&&localControls.every((c:any)=>c.ctrlId==='secd'||c.ctrlId==='cold')
       ?Object.assign(Object.create(d.wasm),{getControlTextPositions:()=>[]}):d.wasm;
     collectTargetEvidence(reader,{kind:'body_paragraph',section,paragraph,charOffset:0,length});}catch(e){editable=false;reason=e instanceof Error?e.message:'지원하지 않는 문단';}
    nodes.push({id:`s${section}p${paragraph}`,section,paragraph,text,editable,...(!editable?{reason}:{})});
+   flatParagraph++;
   }
   const plainText=textOf(d.wasm.borrowDocumentHandle());assertRevision(before,revision());
   if(plainText.length>120000)throw new Error('전체 문서 텍스트 한도 120,000자를 넘습니다.');
-  return {revision:before,name:d.wasm.fileName,nodes,plainText,limitations:['본문 전체와 엔진의 Unicode 추출문을 읽습니다. 그림 안 글자/OCR은 읽지 않습니다.','AI 편집: 단순 본문 문단만 지원. 표·개체·필드·혼합 서식·4,000자 초과 문단은 직접 편집해 주세요.']} as Snapshot;
+  const structure=readStructure(d.wasm);assertRevision(before,revision());
+  return {revision:before,name:d.wasm.fileName,nodes,plainText,structure,limitations:['본문·표의 텍스트와 서식·쪽 설정을 읽습니다. 그림 안 글자/OCR은 읽지 않습니다.','AI 편집: 단순 본문, 글자·문단 서식, 새 표·단순 셀·셀 서식, 구역별 용지·여백. 병합/중첩 표, 개체·필드 편집은 아직 미지원입니다.']} as Snapshot;
  }
  Object.assign(api,{
   snapshot,
@@ -47,12 +51,12 @@ export function installAgentBridge(d:Deps){
    try{
     const input=d.input();if(!input)throw new Error('편집기가 준비되지 않았습니다.');
     await input.executeDocumentAgentOperation({kind:'snapshot',operationType:'jueony:'+runId,operation:(wasm:any)=>{
-     assertRevision(base.revision,revision());executed=true;executeBodyOperations(wasm,base,validated.operations);return {sectionIndex:0,paragraphIndex:0,charOffset:0};
+     assertRevision(base.revision,revision());executed=true;executeDocumentOperations(wasm,base,validated.operations);return {sectionIndex:0,paragraphIndex:0,charOffset:0};
     }},d.render);
     const afterRevision=revision();applying=false;
     // snapshot requires the busy gate to be removed; read the body directly while still gated.
     const after:string[]=[];for(let s=0;s<d.wasm.getSectionCount();s++)for(let p=0;p<d.wasm.getParagraphCount(s);p++)after.push(d.wasm.getTextRange(s,p,0,d.wasm.getParagraphLength(s,p)));
-    const receipt={runId,beforeRevision:base.revision,afterRevision,before,after:after.join('\n'),operationCount:validated.operations.length};applied.set(runId,receipt);return receipt;
+    const receipt={runId,beforeRevision:base.revision,afterRevision,before,after:after.join('\n'),beforeStructure:base.structure,afterStructure:readStructure(d.wasm),operationCount:validated.operations.length};applied.set(runId,receipt);return receipt;
    }catch(error){
     const e=error instanceof Error?error:new Error('문서 적용 실패');
     const body:string[]=[];try{for(let s=0;s<d.wasm.getSectionCount();s++)for(let p=0;p<d.wasm.getParagraphCount(s);p++)body.push(d.wasm.getTextRange(s,p,0,d.wasm.getParagraphLength(s,p)));}catch{}
@@ -66,7 +70,7 @@ export function installAgentBridge(d:Deps){
    assertRevision(receipt.afterRevision,revision());const input=d.input();
    if(input?.history?.peekUndoTop()?.type!=='snapshot:jueony:'+receipt.runId)throw new Error('요청 이후 편집 이력이 달라져 이 요청만 되돌릴 수 없습니다.');
    const result=d.automation.execute('edit:undo');if(!result.ok)throw new Error('되돌리기 실패');
-   await d.render();if(plainSnapshot(snapshot())!==receipt.before)throw new Error('되돌림 결과를 확인하지 못했습니다.');
+   await d.render();const restored=snapshot();if(plainSnapshot(restored)!==receipt.before||receipt.beforeStructure&&JSON.stringify(restored.structure)!==JSON.stringify(receipt.beforeStructure))throw new Error('되돌림 결과를 확인하지 못했습니다.');
    // Keep the request ID consumed after undo; replay must use a new run ID.
   },
  });

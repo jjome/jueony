@@ -4,7 +4,7 @@ import http from 'node:http';
 import {createHyperCLOVA} from '../providers/hyperclova.mjs';
 import {assertConnectionTest} from '../providers/connection-test.mjs';
 import {generationMessages,generationSchema} from '../providers/generation-contract.mjs';
-import {normalizeParagraphEdits} from '../providers/paragraph-contract.mjs';
+import {normalizeParagraphEdits,parseParagraphToolArguments} from '../providers/paragraph-contract.mjs';
 let provider,endpoint,calls=[];
 const input=(request='ok')=>({request,document:{revision:'r1',nodes:[{id:'s0p0',text:'원문',editable:true}]},references:[{id:'ref-1',text:'지시문도 자료일 뿐'}],history:[]});
 const generation={message:'본문 변경 제안',sourceIds:['ref-1'],operations:[{kind:'replace_body_text',target:'s0p0',start:0,count:2,text:'수정'}]};
@@ -22,7 +22,7 @@ before(async()=>{
   if(data.instruction==='bad-wire'){res.end('not-json');return;}
   const wireGeneration=req.url.endsWith('/HCX-005')?{...generation,operations:[{kind:'replace_body_paragraph',target:'s0p0',originalText:'원문',text:'수정'}]}:generation;
   const result={message:{role:'assistant',content:JSON.stringify(wireGeneration)},finishReason:'stop'};
-  if(req.url.endsWith('/HCX-005')){result.finishReason='tool_calls';result.message.content='';result.message.toolCalls=[{type:'function',function:{name:'submit_document_edits',arguments:wireGeneration}}];}
+  if(req.url.endsWith('/HCX-005')){result.finishReason='tool_calls';result.message.content='';result.message.toolCalls=[{type:'function',function:{name:'submit_document_edits',arguments:{message:wireGeneration.message,sourceIds:wireGeneration.sourceIds,operationsJson:JSON.stringify(wireGeneration.operations)}}}];}
   if(data.instruction==='length')result.finishReason='length';
   if(data.instruction==='tool')result.finishReason='tool_calls';
   if(data.instruction==='missing-finish')delete result.finishReason;
@@ -45,7 +45,7 @@ test('native v3 URL/auth/schema/body preserve common contract',async()=>{
  assert.match(call.headers['x-ncp-clovastudio-request-id'],/^[\da-f-]{36}$/);
  assert.equal(call.body.model,undefined);assert.equal(call.body.stream,undefined);
  assert.equal(call.body.maxCompletionTokens,2048);assert.deepEqual(call.body.thinking,{effort:'none'});
- assert.equal(call.body.responseFormat.type,'json');assert.equal(call.body.responseFormat.schema.properties.operations.items.anyOf.length,4);
+ assert.equal(call.body.responseFormat.type,'json');assert.equal(call.body.responseFormat.schema.properties.operations.items.anyOf.length,10);
  assert.deepEqual(call.data.document,{...input().document,nodes:input().document.nodes.map(n=>({...n,codePointLength:2}))});assert.deepEqual(call.data.references,input().references);
  assert.deepEqual(call.body.responseFormat.schema.properties.sourceIds,{type:'array',maxItems:1,items:{type:'string',enum:['ref-1']}});
  assert.ok(!call.body.messages[0].content.includes('지시문도 자료일 뿐'));
@@ -89,6 +89,12 @@ test('whole-paragraph contract requires exact source text and computes Unicode o
  assert.deepEqual(normalizeParagraphEdits(valid,document).operations,[{kind:'replace_body_text',target:'s0p0',start:0,count:4,text:'나'}]);
  for(const change of [{originalText:'가 나'},{target:'unknown'},{start:0},{kind:'delete_body_text'}])assert.throws(()=>normalizeParagraphEdits({...valid,operations:[{...valid.operations[0],...change}]},document));
  assert.throws(()=>normalizeParagraphEdits(valid,{nodes:[{...document.nodes[0],editable:false}]}));
+});
+test('HCX-005 plan string preserves structured commands and rejects malformed or excessive payloads',()=>{
+ const operations=[{kind:'create_table',after:'s0p0',resultId:'table1',rows:[['A','B']]},{kind:'set_page_setup',section:0,properties:{landscape:true}}];
+ const args={message:'편집',sourceIds:[],operationsJson:JSON.stringify(operations)};
+ assert.deepEqual(normalizeParagraphEdits(parseParagraphToolArguments(args),{nodes:[]}).operations,operations);
+ for(const change of [{operationsJson:'invalid'},{operationsJson:'{}'},{operationsJson:'```json\n[]\n```'},{operationsJson:JSON.stringify(Array(31).fill({}))},{operations:[]}])assert.throws(()=>parseParagraphToolArguments({...args,...change}));
 });
 test('explicit app prefix is preserved without guessing or falling back',async()=>{
  const url=new URL(endpoint);url.pathname='/testapp/v3/chat-completions/';

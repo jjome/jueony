@@ -1,4 +1,5 @@
-import type { Snapshot, Generation, EditOp } from './model.ts';
+import type { Snapshot, Generation, EditOp, BodyOp } from './model.ts';
+import { controlKinds, validateControlOperations } from '../document-control/operations.ts';
 const fail=(m:string):never=>{throw new Error(m);};
 const object=(v:unknown):Record<string,unknown>=>{if(!v||typeof v!=='object'||Array.isArray(v))return fail('응답이 JSON 객체가 아닙니다.');return v as Record<string,unknown>;};
 function keys(o:Record<string,unknown>, allowed:string[]){if(Object.keys(o).some(k=>!allowed.includes(k)))fail('지원하지 않는 응답 필드입니다.');}
@@ -9,8 +10,11 @@ export function validateGeneration(raw:unknown,snapshot:Snapshot,sourceIds:strin
  if(!Array.isArray(g.sourceIds)||g.sourceIds.some(s=>typeof s!=='string'||!sourceIds.includes(s)))fail('알 수 없는 출처입니다.');
  if(!Array.isArray(g.operations)||g.operations.length>30)fail('명령은 최대 30개입니다.');
  const touched=new Set<string>();let total=0;
+ const structural=(g.operations as any[]).filter(o=>o&&controlKinds.includes(o.kind));
+ if(structural.length)validateControlOperations(structural,snapshot);
  const operations:EditOp[]=(g.operations as unknown[]).map(value=>{
   const o=object(value);const kind=o.kind;
+  if(controlKinds.includes(kind as string))return o as EditOp;
   if(kind==='create_document'){keys(o,['kind','paragraphs']);if(g.operations instanceof Array&&g.operations.length!==1)fail('새 문서 작성은 다른 명령과 함께 실행할 수 없습니다.');const p=paragraphs(o.paragraphs);total+=p.join('').length;return {kind,paragraphs:p};}
   const id=string(kind==='insert_body_paragraphs'?o.after:o.target,100);
   const target=snapshot.nodes.find(n=>n.id===id);if(!target||!target.editable)fail('없는 대상 또는 현재 AI 편집을 지원하지 않는 문단입니다.');
@@ -31,13 +35,14 @@ export function validateGeneration(raw:unknown,snapshot:Snapshot,sourceIds:strin
 }
 export function assertRevision(expected:string,actual:string){if(expected!==actual){const e=new Error('요청 후 문서가 변경되었습니다. 최신 문서로 다시 요청해 주세요.');e.name='ConflictError';throw e;}}
 export function executeBodyOperations(wasm:any, snapshot:Snapshot, ops:EditOp[]){
+ if(ops.some(o=>controlKinds.includes(o.kind)))throw new Error('구조 명령은 DocumentControl 실행기를 사용해야 합니다.');
  const parsed=(v:any)=>typeof v==='string'?JSON.parse(v):v;
  const check=(v:any)=>{const r=parsed(v);if(r?.ok===false)throw new Error('편집 엔진이 명령을 거절했습니다.');return r;};
  const append=(section:number,paragraph:number,values:string[])=>{
   let at=paragraph;
   for(const value of values){check(wasm.splitParagraph(section,at,wasm.getParagraphLength(section,at)));at++;if(value)check(wasm.insertText(section,at,0,value));}
  };
- const ordered=[...ops].sort((a,b)=>{const at=(o:EditOp)=>o.kind==='create_document'?undefined:snapshot.nodes.find(n=>n.id===(o.kind==='insert_body_paragraphs'?o.after:o.target));const x=at(a),y=at(b);return (y?.section??0)-(x?.section??0)||(y?.paragraph??0)-(x?.paragraph??0);});
+ const ordered=[...ops as BodyOp[]].sort((a,b)=>{const at=(o:BodyOp)=>o.kind==='create_document'?undefined:snapshot.nodes.find(n=>n.id===(o.kind==='insert_body_paragraphs'?o.after:o.target));const x=at(a),y=at(b);return (y?.section??0)-(x?.section??0)||(y?.paragraph??0)-(x?.paragraph??0);});
  for(const op of ordered){
   if(op.kind==='create_document'){
    if(wasm.getSectionCount()!==1||wasm.getParagraphCount(0)!==1||wasm.getParagraphLength(0,0)!==0)throw new Error('새 빈 문서에서만 초안을 작성할 수 있습니다.');

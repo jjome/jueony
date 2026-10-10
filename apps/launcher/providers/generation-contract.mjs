@@ -1,3 +1,4 @@
+import { controlSchemas, CONTROL_SYSTEM } from './control-contract.mjs';
 export function generationMessages(input,system=SYSTEM){
  if(!input||typeof input.request!=='string'||input.request.length>12000||!Array.isArray(input.document?.nodes)||!Array.isArray(input.references)||!Array.isArray(input.history))throw Object.assign(new Error('모델 입력 형식이 올바르지 않습니다.'),{safeMessage:'모델 입력 형식이 올바르지 않습니다.'});
  if(JSON.stringify(input).length>1_500_000)throw Object.assign(new Error('모델 입력이 너무 큽니다.'),{safeMessage:'모델 입력이 너무 큽니다.'});
@@ -24,6 +25,7 @@ export function generationSchema(referenceIds=[]){
    object({kind:kind('insert_body_paragraphs'),after:text,paragraphs}),
    object({kind:kind('replace_body_text'),target:text,start:integer,count:integer,text}),
    object({kind:kind('delete_body_text'),target:text,start:integer,count:integer}),
+   ...controlSchemas(),
   ]}},
  });
 }
@@ -38,4 +40,4 @@ Use only the exact IDs in document.nodes with editable=true. At most ONE operati
 sourceIds contains ONLY IDs from references, never document node IDs. When references is empty, sourceIds MUST be []. Reading the current document does not add a source ID.
 Each node has codePointLength computed by the application. For wording changes (including removing a prefix), prefer replacing the whole paragraph: start=0, count=node.codePointLength, text=the complete desired paragraph. Do not estimate Korean character counts or combine a partial count with full replacement text. Preserve all unchanged text. For example, for node.text="미저장 주민 교육 계획" with codePointLength=12, removing "미저장 " means start=0,count=12,text="주민 교육 계획". Spaces count as characters.
 Do not invent dates, years, budgets, names, or other factual details missing from the user instruction or references; mark them as 미정 or 확인 필요. Describe the edits as proposed, not already completed. The application alone reports successful execution and saving.
-No AI table, style, move, object or page commands are currently implemented. When asked for unsupported work explain the limitation in message with operations:[]; do not silently replace it with another action. Never claim edits or saves have succeeded: the application will execute and report the result. No automatic saving. Do not return markdown fences.`;
+When asked for unsupported work explain the limitation in message with operations:[]; do not silently replace it with another action. Never claim edits or saves have succeeded: the application will execute and report the result. No automatic saving. Do not return markdown fences.` + CONTROL_SYSTEM;

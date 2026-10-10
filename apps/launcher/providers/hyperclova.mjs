@@ -1,6 +1,6 @@
 import {randomUUID} from 'node:crypto';
 import {generationSchema, generationMessages} from './generation-contract.mjs';
-import {PARAGRAPH_SYSTEM,paragraphTool,normalizeParagraphEdits} from './paragraph-contract.mjs';
+import {PARAGRAPH_SYSTEM,paragraphTool,normalizeParagraphEdits,parseParagraphToolArguments} from './paragraph-contract.mjs';
 
 const fail=(code,message)=>{const error=new Error(message);error.code=code;error.safeMessage=message;throw error;};
 
@@ -52,7 +52,7 @@ export function createHyperCLOVA(config,key){
   if(config.modelId==='HCX-005'){
    const calls=wire.result?.message?.toolCalls;
    if(wire.result?.finishReason!=='tool_calls'||wire.result?.message?.role!=='assistant'||!Array.isArray(calls)||calls.length!==1||calls[0].type!=='function'||calls[0].function?.name!=='submit_document_edits')fail('invalid_response','CLOVA Studio가 정해진 편집안 도구를 반환하지 않았습니다. 문서를 변경하지 않았습니다.');
-   return normalizeParagraphEdits(calls[0].function.arguments,input.document);
+   return normalizeParagraphEdits(parseParagraphToolArguments(calls[0].function.arguments),input.document);
   }
   if(wire.result?.finishReason!=='stop'||wire.result?.message?.role!=='assistant')fail('invalid_response','CLOVA Studio 응답이 정상 종료되지 않았습니다. 문서를 변경하지 않았습니다.');
   const content=wire.result.message.content;

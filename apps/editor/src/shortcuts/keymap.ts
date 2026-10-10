@@ -3,9 +3,10 @@
  * Do not assign a browser workaround to a different Hangul command's key.
  */
 export type Scope = 'document' | 'table' | 'cells' | 'object';
-export type Binding = { keys: string; command: string; label: string; scope: Scope; params?: Record<string, unknown> };
+export type Binding = { keys: string; command: string; label: string; scope: Scope; params?: Record<string, unknown>; nativeClipboard?: boolean };
 const binding = (keys: string, command: string, label: string, scope: Scope = 'document', params?: Record<string, unknown>): Binding => ({ keys, command, label, scope, ...(params ? { params } : {}) });
 export const hangulBindings: Binding[] = [
+  ...[['Ctrl+C', 'edit:copy', '복사하기'], ['Ctrl+X', 'edit:cut', '오려 두기'], ['Ctrl+V', 'edit:paste', '붙이기'], ['Shift+Delete', 'edit:cut', '오려 두기'], ['Shift+Insert', 'edit:paste', '붙이기']].map(([keys, command, label]) => ({ ...binding(keys, command, label), nativeClipboard: true })),
   binding('Alt+N', 'file:new-doc', '새 문서'),
   binding('Ctrl+Alt+T', 'file:new-doc', '새 탭'),
   binding('Alt+O', 'file:open', '불러오기'),
@@ -14,6 +15,9 @@ export const hangulBindings: Binding[] = [
   binding('Alt+P', 'file:print', '인쇄'), binding('Ctrl+P', 'file:print', '인쇄'),
   binding('Ctrl+F4', 'ext:jueony-close', '문서 닫기'),
   binding('Ctrl+O', 'pending:insert-document', '문서 끼워 넣기'),
+  ...(['PageUp', 'PageDown', 'Home', 'End'] as const).map((key, i) => binding('Ctrl+' + key, 'ext:jueony-navigate', ['문서 처음', '문서 끝', '화면 첫 줄', '화면 끝줄'][i], 'document', { edge: ['document-start', 'document-end', 'screen-start', 'screen-end'][i] })),
+  binding('Alt+Home', 'ext:jueony-navigate', '문단 처음', 'document', { edge: 'paragraph-start' }),
+  binding('Alt+End', 'ext:jueony-navigate', '문단 끝', 'document', { edge: 'paragraph-end' }),
   binding('Ctrl+Z', 'edit:undo', '되돌리기'), binding('Ctrl+Shift+Z', 'edit:redo', '다시 실행'),
   binding('Ctrl+Y', 'ext:jueony-delete-line', '한 줄 지우기'), binding('Alt+Y', 'ext:jueony-delete-line-end', '줄 뒤 지우기'),
   binding('Ctrl+T', 'ext:jueony-delete-word', '한 단어 지우기'),
@@ -95,6 +99,7 @@ export class HangulKeyResolver {
     }
     const found = this.find(stroke, ctx);
     if (found) return e.repeat ? { handled: true } : { handled: true, binding: found };
+    if ((e.ctrlKey || e.altKey) && hangulBindings.some(b => b.keys === stroke)) return { handled: true, hint: '현재 선택 문맥에서 사용할 수 없는 단축키입니다.' };
     if (hangulBindings.some(b => b.keys.startsWith(stroke + ','))) {
       this.pending = { prefix: stroke, until: now + 3000 };
       return { handled: true, hint: stroke + ' → 다음 키 (Esc 취소)' };

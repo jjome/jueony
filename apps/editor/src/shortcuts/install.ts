@@ -4,7 +4,7 @@ import { defaultShortcuts } from '../../command/shortcut-map';
 export function installHangulKeys({ automation, registry, input, eventBus }: { automation: any; registry: any; input: () => any; eventBus: any }) {
   const resolver = new HangulKeyResolver();
   // Keep the engine fallback consistent as well (IME and submode handlers use it).
-  defaultShortcuts.splice(0, defaultShortcuts.length, ...hangulBindings.filter(b => b.scope === 'document' && !b.keys.includes(',') && !b.command.startsWith('pending:')).map(b => {
+  defaultShortcuts.splice(0, defaultShortcuts.length, ...hangulBindings.filter(b => b.scope === 'document' && !b.keys.includes(',') && !b.command.startsWith('pending:') && !b.nativeClipboard).map(b => {
     const parts = b.keys.split('+'), key = parts.at(-1)!;
     return [{ key: key.toLowerCase(), ...(/^[A-Z]$/.test(key) ? { code: 'Key' + key } : {}), ctrl: parts.includes('Ctrl'), alt: parts.includes('Alt'), shift: parts.includes('Shift') }, b.command] as typeof defaultShortcuts[number];
   }));
@@ -15,17 +15,38 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
   const register = (id: string, label: string, execute: (services: any, params?: any) => void, bodyOnly = false) => registry.register({
     id, label, canExecute: (c: any) => c.hasDocument && c.isEditable && !c.isFormMode && (!bodyOnly || (!c.inTable && !c.inCellSelectionMode && !c.inPictureObjectSelection && !c.inTableObjectSelection && !input()?.cursor?.isInHeaderFooter?.() && !input()?.cursor?.isInFootnote?.() && !input()?.cursor?.isInTextBox?.())), execute,
   });
-  register('ext:jueony-normal', '보통 모양', () => eventBus.emit('format-char', { bold: false, italic: false, underline: false, strikethrough: false, outline: false, shadow: false, emboss: false, engrave: false, superscript: false, subscript: false }));
+  register('ext:jueony-normal', '보통 모양', () => eventBus.emit('format-char', { bold: false, italic: false, underline: false, strikethrough: false, outlineType: 0, shadowType: 0, emboss: false, engrave: false, superscript: false, subscript: false }));
   register('ext:jueony-color', '글자색', (_s, p) => { if (!/^#[\da-f]{6}$/i.test(p?.textColor ?? '')) throw new Error('글자색 형식 오류'); eventBus.emit('format-char', { textColor: p.textColor }); });
   for (const [id, label, mode] of [['ext:jueony-delete-line', '한 줄 지우기', 'line'], ['ext:jueony-delete-line-end', '줄 뒤 지우기', 'end'], ['ext:jueony-delete-word', '한 단어 지우기', 'word']]) {
     register(id, label, () => {
       const ih = input(), cursor = ih.cursor; ih.flushDeferredPaginationIfNeeded('hangul-shortcut');
       cursor.clearSelection(); if (mode === 'line') cursor.moveToLineStart(); cursor.setAnchor();
       if (mode === 'word') cursor.moveToWordBoundary(1); else cursor.moveToLineEnd();
+      if (mode === 'line') {
+        const pos = cursor.getPosition();
+        if (pos.charOffset === ih.wasm.getParagraphLength(pos.sectionIndex, pos.paragraphIndex)) cursor.moveHorizontal(1);
+      }
       if (cursor.hasSelection()) ih.deleteSelection();
       ih.updateCaret(); ih.focus();
     }, true);
   }
+  register('ext:jueony-navigate', '한글 커서 이동', (_s, p) => {
+    const ih = input(), cursor = ih.cursor; ih.flushDeferredPaginationIfNeeded('hangul-navigation');
+    cursor.clearSelection();
+    if (p.edge === 'document-start') cursor.moveToDocumentStart();
+    else if (p.edge === 'document-end') cursor.moveToDocumentEnd();
+    else if (p.edge === 'paragraph-start' || p.edge === 'paragraph-end') {
+      const pos = cursor.getPosition(); cursor.moveTo({ ...pos, charOffset: p.edge === 'paragraph-start' ? 0 : ih.wasm.getParagraphLength(pos.sectionIndex, pos.paragraphIndex) });
+    } else {
+      const container = ih.container as HTMLElement, rect = container.getBoundingClientRect();
+      const x = rect.left + rect.width / 2, fromTop = p.edge === 'screen-start';
+      for (let offset = 8; offset < rect.height; offset += 8) {
+        const hit = ih.hitTestFromClientPoint(x, fromTop ? rect.top + offset : rect.bottom - offset);
+        if (hit && hit.parentParaIndex === undefined) { cursor.moveToHit(hit); if (fromTop) cursor.moveToLineStart(); else cursor.moveToLineEnd(); break; }
+      }
+    }
+    ih.updateCaret(); ih.focus();
+  }, true);
   registry.register({ id: 'ext:jueony-close', label: '문서 닫기', canExecute: () => window.parent !== window, execute: () => window.parent.postMessage({ type: 'jueony:close-document' }, location.origin) });
   const labels = new Map<string, string[]>();
   for (const b of hangulBindings) { if (!labels.has(b.command)) labels.set(b.command, []); labels.get(b.command)!.push(b.keys); }
@@ -50,12 +71,14 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
     if (event.isComposing || ih?.isComposing || event.keyCode === 229) {
       if (event.ctrlKey || event.altKey) {
         const candidate = resolver.resolve({ key: event.key, code: event.code, ctrlKey: event.ctrlKey, altKey: event.altKey, shiftKey: event.shiftKey, metaKey: event.metaKey, repeat: event.repeat, isComposing: false }, { table: c.inTable || c.inCellSelectionMode, cells: c.inCellSelectionMode, object: c.inPictureObjectSelection || c.inTableObjectSelection });
-        if (candidate.handled) { event.preventDefault(); event.stopImmediatePropagation(); hint('한글 조합을 마친 뒤 단축키를 다시 사용하세요.'); }
+        if (candidate.handled && !candidate.binding?.nativeClipboard) { event.preventDefault(); event.stopImmediatePropagation(); hint('한글 조합을 마친 뒤 단축키를 다시 사용하세요.'); }
       }
       resolver.reset(); return;
     }
     const result = resolver.resolve(event, { table: c.inTable || c.inCellSelectionMode, cells: c.inCellSelectionMode, object: c.inPictureObjectSelection || c.inTableObjectSelection });
     if (!result.handled) return;
+    // Trusted native clipboard events carry HWP/HTML/text data and OS consent.
+    if (result.binding?.nativeClipboard) return;
     event.preventDefault(); event.stopImmediatePropagation();
     if ((window as any).jueonyEditor?.busy() || document.getElementById('studio-root')?.inert) { hint('문서 작업이 끝난 뒤 단축키를 사용하세요.'); resolver.reset(); return; }
     if (result.hint) hint(result.hint);

@@ -1,3 +1,4 @@
+import {describeStructure} from './document-control/describe.ts';
 import {WorkspaceStore} from './mvp/store.ts';
 import {addWorkspace,addChat,chatOf,uid,appendMessage} from './mvp/model.ts';
 import type {AppState,Receipt,Run,SavedDocument,ModelConfig,Snapshot} from './mvp/model.ts';
@@ -63,7 +64,12 @@ function renderMessages(){
   if(run&&m.role==='assistant'){
    const meta=document.createElement('div');meta.className='run-meta';meta.textContent=runLabels[run.status]+(run.sources.length?' · 전달한 자료: '+run.sources.map(s=>s.name+' ('+s.characters+'자)').join(', '):' · 참고 파일 없음');card.append(meta);
    if(run.sources.length){const detail=document.createElement('details'),summary=document.createElement('summary');summary.textContent='자료 범위와 출처';detail.append(summary);for(const source of run.sources){const info=document.createElement('div');info.textContent=source.name+' · '+source.characters+'자 · '+(run.usedSourceIds?.includes(source.id)?'모델이 참조 표시':'모델에 전달')+'\n'+(source.limitation??'UTF-8 텍스트 전체');detail.append(info);}card.append(detail);}
-   if(run.receipt){const actions=document.createElement('div');actions.className='message-actions';actions.append(button('변경 확인',()=>{$('diff-before').textContent=run.receipt!.before;$('diff-after').textContent=run.receipt!.after;($('change-dialog') as HTMLDialogElement).showModal();}),button('요청 되돌리기',async()=>{if(running)throw new Error('진행 중 요청을 먼저 중지해 주세요.');const tab=tabs.find(t=>t.id===run.documentId&&t.workspaceId===run.workspaceId);if(!tab)throw new Error('열린 문서에서만 되돌릴 수 있습니다. 재시작 후에는 보존된 문서를 직접 편집해 주세요.');selectTab(tab);await tab.api.undoRequest(run.receipt);await persistTab(tab);status('이 요청의 변경을 되돌렸습니다.');}));card.append(actions);}
+   if(run.receipt){const actions=document.createElement('div');actions.className='message-actions';actions.append(button('변경 확인',()=>{
+    const receipt=run.receipt!;$('diff-before').textContent=receipt.before;$('diff-after').textContent=receipt.after;
+    $('structure-diff').hidden=JSON.stringify(receipt.beforeStructure)===JSON.stringify(receipt.afterStructure);
+    $('structure-diff-text').textContent='변경 전\n'+describeStructure(receipt.beforeStructure)+'\n\n변경 후\n'+describeStructure(receipt.afterStructure);
+    ($('change-dialog') as HTMLDialogElement).showModal();
+   }),button('요청 되돌리기',async()=>{if(running)throw new Error('진행 중 요청을 먼저 중지해 주세요.');const tab=tabs.find(t=>t.id===run.documentId&&t.workspaceId===run.workspaceId);if(!tab)throw new Error('열린 문서에서만 되돌릴 수 있습니다. 재시작 후에는 보존된 문서를 직접 편집해 주세요.');selectTab(tab);await tab.api.undoRequest(run.receipt);await persistTab(tab);status('이 요청의 변경을 되돌렸습니다.');}));card.append(actions);}
   }
   target.append(card);
  }
@@ -150,7 +156,7 @@ async function switchWorkspace(id:string){
   const tab=tabs.find(t=>t.workspaceId===id&&t.id===previousDocumentId)??tabs.find(t=>t.workspaceId===id)??await newTab(id);selectTab(tab);render();await renderFolders();await persist();
  }finally{restoring=false;}
 }
-function updateRun(){const busy=Boolean(running);$<HTMLButtonElement>('send-request').disabled=busy;$<HTMLButtonElement>('cancel-run').disabled=!busy||running?.run.status==='applying';$('run-status').textContent=running?runLabels[running.run.status]:'지원: 새 초안 · 본문 삽입/교체/삭제';}
+function updateRun(){const busy=Boolean(running);$<HTMLButtonElement>('send-request').disabled=busy;$<HTMLButtonElement>('cancel-run').disabled=!busy||running?.run.status==='applying';$('run-status').textContent=running?runLabels[running.run.status]:'지원: 본문 · 서식 · 표 · 용지/여백';}
 async function send(){
  const input=$<HTMLTextAreaElement>('request-input');const request=input.value.trim();if(!request||running||restoring)return;
  const model=state.models.find(m=>m.id===$<HTMLSelectElement>('model-select').value);if(!model)throw new Error('먼저 AI 연결을 등록해 주세요.');

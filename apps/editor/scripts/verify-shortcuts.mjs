@@ -31,14 +31,20 @@ try {
   assert.equal(await page.evaluate(() => window.jueonyEditor.revision()), before); checks.push('dialog input does not delete document text');
   await press('Escape'); await page.waitForFunction(() => !document.querySelector('.modal-overlay'));
   await focus();
-  // Verify the renderer boundary separately: Chromium can reserve Ctrl+N before DOM delivery.
-  await page.evaluate(() => { const el = document.querySelector('[aria-label="문서 편집 입력"]'); for (const [key, code, ctrlKey] of [['n', 'KeyN', true], ['t', 'KeyT', false]]) el.dispatchEvent(new KeyboardEvent('keydown', { key, code, ctrlKey, bubbles: true, cancelable: true })); });
-  await page.waitForSelector('.modal-overlay'); checks.push('Ctrl+N,T renderer event mapping opens table creation (not native key delivery)');
+  await press('Control+N'); await press('T');
+  const delivered = await page.waitForSelector('.modal-overlay', { timeout: 1500 }).then(() => true, () => false);
+  if (!delivered) await page.evaluate(() => { const el = document.querySelector('[aria-label="문서 편집 입력"]'); for (const [key, code, ctrlKey] of [['n', 'KeyN', true], ['t', 'KeyT', false]]) el.dispatchEvent(new KeyboardEvent('keydown', { key, code, ctrlKey, bubbles: true, cancelable: true })); });
+  await page.waitForSelector('.modal-overlay'); checks.push(delivered ? 'Ctrl+N,T browser key input opens table creation (physical Windows key delivery still unverified)' : 'Ctrl+N,T renderer event mapping opens table creation (browser reserved key)');
   await press('Escape'); await page.waitForFunction(() => !document.querySelector('.modal-overlay'));
   await focus(); const original = await page.evaluate(() => window.jueonyEditor.snapshot().nodes.map(n => n.text));
-  await press('Control+Home'); await press('Control+Y');
-  assert.notDeepEqual(await page.evaluate(() => window.jueonyEditor.snapshot().nodes.map(n => n.text)), original);
+  await press('Control+PageUp'); await press('Control+Y');
+  assert.deepEqual(await page.evaluate(() => window.jueonyEditor.snapshot().nodes.map(n => n.text)), original.slice(1));
   await press('Control+Z'); assert.deepEqual(await page.evaluate(() => window.jueonyEditor.snapshot().nodes.map(n => n.text)), original); checks.push('Ctrl+Y deletes real line and undo restores text');
+  await press('Control+PageDown'); await page.keyboard.type('끝');
+  assert.equal(await page.evaluate(() => window.jueonyEditor.snapshot().nodes.at(-1).text), original.at(-1) + '끝');
+  await press('Control+Z'); await press('Control+PageUp'); await page.keyboard.type('처음');
+  assert.equal(await page.evaluate(() => window.jueonyEditor.snapshot().nodes[0].text), '처음' + original[0]);
+  await press('Control+Z'); checks.push('Ctrl+PageUp/PageDown navigate to real document boundaries');
   await mkdir('evidence/shortcuts', { recursive: true });
   await page.screenshot({ path: 'evidence/shortcuts/editor.png', fullPage: true });
   assert.deepEqual(errors, []);

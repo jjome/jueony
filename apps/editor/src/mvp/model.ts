@@ -1,12 +1,15 @@
 export type BodyNode = { id: string; section: number; paragraph: number; text: string; editable: boolean; reason?: string };
-export type Snapshot = { revision: string; name: string; plainText?: string; nodes: BodyNode[]; limitations: string[] };
-export type EditOp =
+import type { Structure } from '../document-control/structure.ts';
+import type { ControlOp } from '../document-control/operations.ts';
+export type Snapshot = { revision: string; name: string; plainText?: string; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
+export type BodyOp =
  | { kind: 'create_document'; paragraphs: string[] }
  | { kind: 'insert_body_paragraphs'; after: string; paragraphs: string[] }
  | { kind: 'replace_body_text'; target: string; start: number; count: number; text: string }
  | { kind: 'delete_body_text'; target: string; start: number; count: number };
+export type EditOp = BodyOp | ControlOp;
 export type Generation = { message: string; operations: EditOp[]; sourceIds: string[] };
-export type Receipt = { runId: string; beforeRevision: string; afterRevision: string; before: string; after: string; operationCount: number };
+export type Receipt = { runId: string; beforeRevision: string; afterRevision: string; before: string; after: string; operationCount: number; beforeStructure?: Structure; afterStructure?: Structure };
 export type Source = { id: string; name: string; text: string; characters: number; sha256: string; limitation?: string };
 export type ModelConfig = { id: string; adapterId: 'openai-compatible' | 'hyperclova'; label: string; endpoint: string; modelId: string; maxOutputTokens?: number };
 export type RunStatus = 'preparing_context' | 'generating' | 'validating' | 'applying' | 'completed' | 'cancelled' | 'conflict' | 'failed_no_change' | 'failed_rolled_back' | 'failed_partial' | 'interrupted';

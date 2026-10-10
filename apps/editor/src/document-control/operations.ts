@@ -6,25 +6,49 @@ export type ControlOp =
   | { kind: 'create_table'; after: string; resultId: string; rows: string[][] }
   | { kind: 'set_table_cell'; target: string; row: number; column: number; originalText: string; text: string }
   | { kind: 'format_table_cells'; target: string; startRow: number; rowCount: number; startColumn: number; columnCount: number; properties: Record<string, any> }
+  | { kind: 'insert_table_row' | 'insert_table_column'; target: string; index: number; values: string[] }
+  | { kind: 'delete_table_row' | 'delete_table_column'; target: string; index: number }
   | { kind: 'set_page_setup'; section: number; properties: Record<string, any> };
-export const controlKinds = ['format_characters', 'format_paragraph', 'create_table', 'set_table_cell', 'format_table_cells', 'set_page_setup'];
+const tableAxisKinds = ['insert_table_row','insert_table_column','delete_table_row','delete_table_column'];
+export const controlKinds = ['format_characters', 'format_paragraph', 'create_table', 'set_table_cell', 'format_table_cells', 'set_page_setup',...tableAxisKinds];
 const fail = (m: string): never => { throw new Error(m); };
 const object = (v: any) => { if (!v || typeof v !== 'object' || Array.isArray(v)) fail('명령 객체가 필요합니다.'); return v; };
 const only = (v: any, fields: string[]) => { if (Object.keys(object(v)).some(k => !fields.includes(k))) fail('지원하지 않는 명령 속성입니다.'); };
 const integer = (v: any, min: number, max: number) => { if (!Number.isSafeInteger(v) || v < min || v > max) fail('대상 범위가 잘못되었습니다.'); return v as number; };
 const text = (v: any) => { if (typeof v !== 'string' || Array.from(v).length > 4000 || /[\u0000-\u001f\u007f]/u.test(v)) fail('셀은 제어문자 없이 4,000자 이내여야 합니다.'); return v as string; };
 const mm = (v: number) => Math.round(v * 7200 / 25.4);
-const charRules: Record<string, any> = { bold: 'boolean', italic: 'boolean', underline: 'boolean', strikethrough: 'boolean', fontSizePt: [1, 200], color: 'color' };
+const charRules: Record<string, any> = { bold: 'boolean', italic: 'boolean', underline: 'boolean', strikethrough: 'boolean', fontSizePt: [1, 200], color: 'color',fontFamily:'font',ratioPercent:[50,200],spacingPercent:[-50,50],superscript:'boolean',subscript:'boolean' };
 const paraRules: Record<string, any> = { alignment: ['left', 'right', 'center', 'justify', 'distribute'], lineSpacingPercent: [50, 500], marginLeftMm: [0, 100], marginRightMm: [0, 100], indentMm: [-100, 100], beforeMm: [0, 100], afterMm: [0, 100], keepWithNext: 'boolean', keepLines: 'boolean', pageBreakBefore: 'boolean' };
-const cellRules = { bold: 'boolean', fontSizePt: [1, 200], color: 'color', background: 'color', alignment: paraRules.alignment, verticalAlignment: ['top', 'center', 'bottom'] };
+const cellRules = { ...charRules, background: 'color', alignment: paraRules.alignment, verticalAlignment: ['top', 'center', 'bottom'] };
 const pageRules: Record<string, any> = { widthMm: [20, 1000], heightMm: [20, 1000], landscape: 'boolean', marginLeftMm: [0, 300], marginRightMm: [0, 300], marginTopMm: [0, 300], marginBottomMm: [0, 300], marginHeaderMm: [0, 100], marginFooterMm: [0, 100] };
 function properties(v: any, rules: Record<string, any>) {
   only(v, Object.keys(rules)); if (!Object.keys(v).length) fail('변경할 속성이 없습니다.');
   for (const [key, value] of Object.entries(v)) {
     const rule = rules[key];
-    if (rule === 'boolean' ? typeof value !== 'boolean' : rule === 'color' ? typeof value !== 'string' || !/^#[0-9a-f]{6}$/i.test(value) : typeof rule[0] === 'number' ? typeof value !== 'number' || !Number.isFinite(value) || value < rule[0] || value > rule[1] : !rule.includes(value)) fail('속성 값이 잘못되었습니다: ' + key);
+    if (rule === 'boolean' ? typeof value !== 'boolean' : rule === 'font' ? typeof value!=='string'||!value.trim()||value.length>100||/[\x00-\x1f\x7f]/.test(value) : rule === 'color' ? typeof value !== 'string' || !/^#[0-9a-f]{6}$/i.test(value) : typeof rule[0] === 'number' ? typeof value !== 'number' || !Number.isFinite(value) || value < rule[0] || value > rule[1] : !rule.includes(value)) fail('속성 값이 잘못되었습니다: ' + key);
+    if(['ratioPercent','spacingPercent'].includes(key)&&!Number.isInteger(value))fail('장평·자간은 정수 백분율로 입력해야 합니다.');
   }
+  if(v.superscript===true&&v.subscript===true)fail('위첨자와 아래첨자를 동시에 적용할 수 없습니다.');
   return v;
+}
+function tableAxisPlan(table:Table,op:any):Table {
+ const row=op.kind.endsWith('_row'),insert=op.kind.startsWith('insert_');
+ only(op,insert?['kind','target','index','values']:['kind','target','index']);
+ if(table.cells.length!==table.rows*table.columns||table.cells.some(c=>!c.editable||c.rowSpan!==1||c.columnSpan!==1))fail('행·열 편집은 병합·중첩·혼합 서식이 없는 단순 표만 지원합니다.');
+ const size=row?table.rows:table.columns,other=row?table.columns:table.rows;
+ integer(op.index,0,insert?size:size-1);
+ if(!insert&&size===1)fail('표의 마지막 행 또는 열은 삭제할 수 없습니다.');
+ if(insert&&(!Array.isArray(op.values)||op.values.length!==other))fail('삽입할 행·열의 셀 수가 현재 표와 다릅니다.');
+ if(insert)op.values.forEach(text);
+ const rows=table.rows+(row?(insert?1:-1):0),columns=table.columns+(!row?(insert?1:-1):0);
+ if(rows>50||columns>20||rows*columns>200)fail('행·열 편집 결과는 50행·20열·200셀 이내여야 합니다.');
+ const matrix=Array.from({length:table.rows},(_,r)=>Array.from({length:table.columns},(_,c)=>table.cells.find(v=>v.row===r&&v.column===c)));
+ if(matrix.some(r=>r.some(c=>!c)))fail('표의 셀 위치를 확인하지 못했습니다.');
+ const fresh=(value:string)=>({index:0,row:0,column:0,rowSpan:1,columnSpan:1,text:value,editable:true,properties:{}});
+ if(row)matrix.splice(op.index,insert?0:1,...(insert?[op.values.map(fresh)]:[]));
+ else matrix.forEach((r,i)=>r.splice(op.index,insert?0:1,...(insert?[fresh(op.values[i])]:[])));
+ const cells=matrix.flatMap((r,ri)=>r.map((c,ci)=>({...c!,index:ri*columns+ci,row:ri,column:ci})));
+ return {...table,rows,columns,cells};
 }
 export function pageProperties(current: any, props: any) {
   const next = { ...current };
@@ -34,14 +58,21 @@ export function pageProperties(current: any, props: any) {
   if (width - next.marginLeft - next.marginRight < mm(10) || height - next.marginTop - next.marginBottom < mm(10)) fail('여백이 용지의 본문 영역을 벗어납니다.');
   return next;
 }
-export function validateControlOperations(operations: any[], snapshot: Snapshot): ControlOp[] {
+export function validateControlOperations(operations: any[], snapshot: Snapshot): void {
   const structure = snapshot.structure; if (!structure) fail('이 문서는 구조 조회 후 편집해야 합니다.');
   const tables = new Map(structure!.tables.map(t => [t.id, structuredClone(t)]));
   const pages = new Map(structure!.sections.map(s => [s.index, s.page]));
   const created = new Set<string>(); let generated = 0;
-  const body = (id: any) => { const n = snapshot.nodes.find(n => n.id === id); if (!n?.editable) fail('편집 가능한 본문 문단 ID가 필요합니다.'); return n!; };
+  const nodes=structuredClone(snapshot.nodes);
+  const body = (id: any) => { const n = nodes.find(n => n.id === id); if (!n?.editable) fail('편집 가능한 본문 문단 ID가 필요합니다.'); return n!; };
   for (const op of operations) {
-    if (op.kind === 'format_characters' || op.kind === 'format_paragraph') {
+    if(op.kind==='insert_body_paragraphs')continue;
+    // Body commands are already validated by validateGeneration. Track their
+    // resulting text so later format commands are checked at execution time.
+    if(op.kind==='replace_body_text'||op.kind==='delete_body_text'){
+      const n=body(op.target),chars=Array.from(n.text);
+      n.text=chars.slice(0,op.start).join('')+(op.kind==='replace_body_text'?op.text:'')+chars.slice(op.start+op.count).join('');
+    } else if (op.kind === 'format_characters' || op.kind === 'format_paragraph') {
       only(op, ['kind', 'target', 'properties']); const n = body(op.target);
       if (op.kind === 'format_characters' && !n.text) fail('빈 문단에는 글자 서식을 적용할 수 없습니다.');
       properties(op.properties, op.kind === 'format_characters' ? charRules : paraRules);
@@ -57,6 +88,10 @@ export function validateControlOperations(operations: any[], snapshot: Snapshot)
       const cells: Table['cells'] = [];
       op.rows.forEach((row: any, r: number) => { if (!Array.isArray(row) || row.length !== columns) fail('표의 열 개수가 다릅니다.'); row.forEach((value: any, c: number) => { generated += text(value).length; cells.push({ index: r * columns + c, row: r, column: c, rowSpan: 1, columnSpan: 1, text: value, editable: true, properties: {} }); }); });
       created.add(op.resultId); tables.set('@' + op.resultId, { id: '@' + op.resultId, section: 0, paragraph: 0, control: 0, rows: op.rows.length, columns, cells });
+    } else if(tableAxisKinds.includes(op.kind)) {
+      const table=tables.get(op.target);if(!table)fail('현재 문서 또는 이번 요청에서 만든 표 ID가 필요합니다.');
+      tables.set(op.target,tableAxisPlan(table!,op));
+      if(op.kind.startsWith('insert_'))generated+=op.values.join('').length;
     } else if (op.kind === 'set_table_cell' || op.kind === 'format_table_cells') {
       const table = tables.get(op.target); if (!table) fail('현재 문서 또는 이번 요청에서 만든 표 ID가 필요합니다.');
       if (op.kind === 'set_table_cell') {
@@ -76,17 +111,47 @@ export function validateControlOperations(operations: any[], snapshot: Snapshot)
     } else fail('지원하지 않는 구조 편집 명령입니다.');
   }
   if (generated > 60000) fail('생성하는 표 텍스트는 60,000자 이내입니다.');
-  return operations;
 }
 const checked = (value: any) => { const result = parsed(value); if (result?.ok === false) fail('문서 엔진이 편집 명령을 거절했습니다.'); return result; };
 const selectedCells = (table: Table, op: any) => table.cells.filter(c => c.row >= op.startRow && c.row < op.startRow + op.rowCount && c.column >= op.startColumn && c.column < op.startColumn + op.columnCount);
-const charProperties = (props: any) => Object.fromEntries(Object.entries(props).filter(([k]) => k in charRules).map(([k, v]) => [k === 'fontSizePt' ? 'fontSize' : k === 'color' ? 'textColor' : k, k === 'fontSizePt' ? Math.round((v as number) * 100) : v]));
+function charProperties(doc:any,props:any) {
+ const result:any=Object.fromEntries(Object.entries(props).filter(([k])=>k in charRules&&!['fontFamily','ratioPercent','spacingPercent'].includes(k)).map(([k,v])=>[k==='fontSizePt'?'fontSize':k==='color'?'textColor':k,k==='fontSizePt'?Math.round((v as number)*100):v]));
+ if(props.fontFamily){result.fontIds=Array.from({length:7},(_,lang)=>doc.findOrCreateFontIdForLang(lang,props.fontFamily));if(result.fontIds.some((id:number)=>!Number.isInteger(id)||id<0||id>65535))fail('글꼴 이름을 문서에 등록하지 못했습니다.');}
+ if(props.ratioPercent!==undefined)result.ratios=Array(7).fill(props.ratioPercent);
+ if(props.spacingPercent!==undefined)result.spacings=Array(7).fill(props.spacingPercent);
+ if(props.superscript===true)result.subscript=false;if(props.subscript===true)result.superscript=false;
+ return result;
+}
+function replaceCellText(doc:any,base:number[],cell:number,value:string) {
+ const length=doc.getCellParagraphLength(...base,cell,0);
+ const shape=parsed(doc.getCellCharPropertiesAt(...base,cell,0,0)).charShapeId;
+ if(!Number.isInteger(shape))fail('원래 셀 글자 서식을 확인하지 못했습니다.');
+ if(length)checked(doc.deleteTextInCell(...base,cell,0,0,length));
+ if(value){checked(doc.insertTextInCell(...base,cell,0,0,value));checked(doc.setCharShapeIdInCell(...base,cell,0,0,doc.getCellParagraphLength(...base,cell,0),shape));}
+}
 export function executeControlOperation(wasm: any, snapshot: Snapshot, op: ControlOp, tables: Map<string, Table>): { section: number; after: number; count: number } | undefined {
   const doc = nativeDocument(wasm);
   if (op.kind === 'set_page_setup') { checked(doc.setPageDef(op.section, JSON.stringify(pageProperties(parsed(doc.getPageDef(op.section)), op.properties)))); return; }
+  if(tableAxisKinds.includes(op.kind)) {
+    const axis=op as Extract<ControlOp,{index:number}>,table=tables.get(axis.target)!;
+    const expected=tableAxisPlan(table,axis),row=axis.kind.endsWith('_row'),insert=axis.kind.startsWith('insert_');
+    const base=[table.section,table.paragraph,table.control],size=row?table.rows:table.columns;
+    const method=({insert_table_row:'insertTableRow',insert_table_column:'insertTableColumn',delete_table_row:'deleteTableRow',delete_table_column:'deleteTableColumn'} as any)[axis.kind];
+    if(insert)checked(doc[method](...base,Math.min(axis.index,size-1),axis.index===size));
+    else checked(doc[method](...base,axis.index));
+    const read=()=>readStructure(doc).tables.find(t=>t.section===table.section&&t.paragraph===table.paragraph&&t.control===table.control);
+    let current=read();if(!current)fail('변경한 표를 확인하지 못했습니다.');
+    if(insert)for(const cell of current!.cells.filter(c=>(row?c.row:c.column)===axis.index)) {
+      const value=(axis as any).values[row?cell.column:cell.row];
+      replaceCellText(doc,base,cell.index,value);
+    }
+    current=read();
+    if(!current||current.rows!==expected.rows||current.columns!==expected.columns||current.cells.length!==expected.cells.length||expected.cells.some(c=>current!.cells.find(v=>v.row===c.row&&v.column===c.column)?.text!==c.text))fail('표의 행·열 변경 결과가 명령과 다릅니다.');
+    tables.set(axis.target,current!);return;
+  }
   if (op.kind === 'format_characters' || op.kind === 'format_paragraph') {
     const n = snapshot.nodes.find(n => n.id === op.target)!;
-    if (op.kind === 'format_characters') checked(doc.applyCharFormat(n.section, n.paragraph, 0, doc.getParagraphLength(n.section, n.paragraph), JSON.stringify(charProperties(op.properties))));
+    if (op.kind === 'format_characters') checked(doc.applyCharFormat(n.section, n.paragraph, 0, doc.getParagraphLength(n.section, n.paragraph), JSON.stringify(charProperties(doc,op.properties))));
     else {
       const p: any = {}; for (const [k, v] of Object.entries(op.properties)) {
         const key = ({ lineSpacingPercent: 'lineSpacing', beforeMm: 'spacingBefore', afterMm: 'spacingAfter' } as any)[k] ?? (k.endsWith('Mm') ? k.slice(0, -2) : k);
@@ -117,11 +182,11 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
     const cell = table.cells.find(c => c.row === op.row && c.column === op.column)!;
     const length = doc.getCellParagraphLength(...base, cell.index, 0);
     if (doc.getTextInCell(...base, cell.index, 0, 0, length) !== op.originalText) fail('적용 직전 셀 원문이 달라졌습니다.');
-    checked(doc.replaceTextInCellDeferredPagination(...base, cell.index, 0, 0, length, op.text));
+    replaceCellText(doc,base,cell.index,op.text);
     if (doc.getTextInCell(...base, cell.index, 0, 0, doc.getCellParagraphLength(...base, cell.index, 0)) !== op.text) fail('셀 편집 결과가 다릅니다.');
     cell.text = op.text;
   } else for (const cell of selectedCells(table, op)) {
-    const p = op.properties, chars = charProperties(p), length = doc.getCellParagraphLength(...base, cell.index, 0);
+    const p = op.properties, chars = charProperties(doc,p), length = doc.getCellParagraphLength(...base, cell.index, 0);
     if (Object.keys(chars).length && length) checked(doc.applyCharFormatInCell(...base, cell.index, 0, 0, length, JSON.stringify(chars)));
     if (p.alignment) checked(doc.applyParaFormatInCell(...base, cell.index, 0, JSON.stringify({ alignment: p.alignment })));
     const cp: any = {};

@@ -1,0 +1,14 @@
+{
+  "checks": [
+    "Live editor applies one request containing table, cell style, title and page setup",
+    "Exported HWPX reopens and HWP counterpart is available for Hancom review",
+    "Invalid last command prevents all earlier changes",
+    "One request undo restores table structure, text, all formatting and paper settings",
+    "Native failure after first mutation restores the complete snapshot",
+    "Stale document revision is rejected",
+    "No page errors or external requests during document editing"
+  ],
+  "errors": [],
+  "external": [],
+  "note": "Engine reopen verified; Hancom Office visual review is pending."
+}

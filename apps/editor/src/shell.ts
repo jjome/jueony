@@ -8,6 +8,8 @@ import type {Reference} from './mvp/references.ts';
 import {LocalLLMPort} from './mvp/llm.ts';
 import {buildContext} from './mvp/context.ts';
 import {runOnce} from './mvp/run-once.ts';
+import {providerPresets} from './mvp/provider-presets.ts';
+import {TemporaryReferences} from './mvp/temporary-references.ts';
 
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 const store=new WorkspaceStore(),port=new LocalLLMPort();
@@ -21,13 +23,15 @@ async function refreshConnections(){
 }
 function fillConnection(config?:ModelConfig){
  editingId=config?.id;
- $<HTMLInputElement>('config-label').value=config?.label??'';$<HTMLInputElement>('config-endpoint').value=config?.endpoint??'';$<HTMLInputElement>('config-model').value=config?.modelId??'';$<HTMLInputElement>('config-key').value='';$<HTMLSelectElement>('config-adapter').value=config?.adapterId??'openai-compatible';$<HTMLInputElement>('config-tokens').value=String(config?.maxOutputTokens??4096);
+ $<HTMLInputElement>('config-label').value=config?.label??'';$<HTMLInputElement>('config-endpoint').value=config?.endpoint??'';$<HTMLInputElement>('config-model').value=config?.modelId??'';$<HTMLInputElement>('config-key').value='';$<HTMLSelectElement>('config-adapter').value=config?.adapterId??'openai-responses';$<HTMLInputElement>('config-tokens').value=String(config?.maxOutputTokens??(config?.adapterId==='hyperclova'?4096:8192));
  $<HTMLInputElement>('config-remember').checked=secureStorage&&(config?Boolean(connectionFlags.get(config.id)?.remember):true);$<HTMLInputElement>('config-remember').disabled=!secureStorage;
  $<HTMLButtonElement>('delete-connection').disabled=!config;
- adapterHint(false);$('config-status').textContent=connectionNotice||(config&&connectionFlags.get(config.id)?.hasKey?'등록된 키가 있습니다. 키를 비워 두면 유지하며, 새 키를 입력하면 교체합니다.':'새 연결을 등록하세요. 저장된 키 원문은 화면에 표시하지 않습니다.');
+ renderConnections();adapterHint(!config);$('config-status').textContent=connectionNotice||(config&&connectionFlags.get(config.id)?.hasKey?'등록된 키가 있습니다. 키를 비워 두면 유지하며, 새 키를 입력하면 교체합니다.':'새 연결을 등록하세요. 저장된 키 원문은 화면에 표시하지 않습니다.');
 }
+function renderConnections(){options($('saved-connections'),[{value:'',text:'＋ 새 연결 등록'},...state.models.map(m=>({value:m.id,text:`${m.label} · ${m.modelId} · ${connectionFlags.get(m.id)?.hasKey?'키 등록됨':'키 없음'}`}))],editingId);}
 type Tab={id:string;workspaceId:string;frame:HTMLIFrameElement;wrapper:HTMLElement;button:HTMLButtonElement;ready:Promise<any>;api:any;closed:boolean;handle?:FileSystemFileHandle;timer?:number;persistError?:boolean;persist:Promise<void>};
 const tabs:Tab[]=[];const loaded=new Set<string>();let selected:Reference[]=[];
+const temporary=new TemporaryReferences();
 const runLabels:Record<Run['status'],string>={preparing_context:'자료 읽는 중',generating:'모델 응답 대기',validating:'명령 검증 중',applying:'문서 적용 중',completed:'완료',cancelled:'취소됨',conflict:'문서 변경 충돌',failed_no_change:'실패 · 적용 없음',failed_rolled_back:'실패 · 변경 복원됨',failed_partial:'실패 · 부분 적용 확인 필요',interrupted:'이전 실행 중단됨'};
 const status=(text:string)=>{$('app-status').textContent=text;$('app-status').title=text;};
 const error=(e:unknown)=>status(e instanceof Error?e.message:String(e));
@@ -80,7 +84,18 @@ function renderMessages(){
  if(pending){const card=document.createElement('article');card.className='message assistant pending';card.id='agent-progress';card.setAttribute('role','status');card.textContent=(running!.run.model?.modelId??'AI')+' · '+runLabels[running!.run.status]+'…';target.append(card);}
  target.scrollTop=target.scrollHeight;
 }
-function renderReferences(){$('reference-summary').textContent=selected.length?'이번 요청 참고: '+selected.map(s=>s.path).join(', '):'참고 파일 없음 · 폴더 트리에서 체크하세요.';}
+function renderReferences(){
+ const target=$('reference-summary');target.replaceChildren();
+ const line=document.createElement('div');line.textContent=selected.length?'연결 자료: '+selected.map(s=>s.path).join(', '):'폴더에서 자료를 체크하거나 파일을 첨부하세요.';target.append(line);
+ const workspaceId=work().id,chatId=chat().id;
+ for(const item of temporary.list(workspaceId,chatId)){
+  const chip=button(item.file.name+' ×',()=>{temporary.remove(workspaceId,chatId,item.id);renderReferences();});
+  chip.className='attachment-chip';chip.title='임시 참고 첨부 제거: '+item.file.name;target.append(chip);
+ }
+}
+function attachFiles(files:File[],workspaceId=work().id,chatId=chat().id){
+ try{temporary.add(workspaceId,chatId,files);renderReferences();status('임시 참고 자료를 첨부했습니다. 이 채팅의 요청에 포함되며 앱을 새로고침하면 해제됩니다.');}catch(e){requestError(e);}
+}
 async function renderFolders(){
  const container=$('folder-tree');container.replaceChildren();const workspaceId=work().id;
  for(const folder of state.folders.filter(f=>f.workspaceId===workspaceId)){
@@ -176,7 +191,7 @@ async function send(){
   const references=await readReferences([...selected],state.folders,workspaceId,bytes=>original.api.readReference(bytes),controller.signal,async handle=>{
    for(const tab of tabs.filter(t=>t.workspaceId===workspaceId&&t.api?.fileHandle()))if(await handle.isSameEntry(tab.api.fileHandle())){const current:Snapshot=tab.api.snapshot();return {text:current.plainText??current.nodes.map(n=>n.text).join('\n'),revision:current.revision};}
    return undefined;
-  });
+  },{chatId,items:temporary.list(workspaceId,chatId)});
   run.sources=references.map(({text,...source})=>source);
   const context=buildContext(state,workspaceId,chatId,snapshot,references,request);
   const result=await runOnce({runId:run.id,context,model,port,editor:original.api,signal:controller.signal,
@@ -203,6 +218,13 @@ on('new-document',async()=>{if(cancelNavigation())await newTab();});
 on('open-document',async()=>{const picker=(window as any).showOpenFilePicker;if(picker){const [handle]=await picker({types:[{description:'한글 문서',accept:{'application/octet-stream':['.hwp','.hwpx']}}]});await openHandle(handle);}else{const file=document.createElement('input');file.type='file';file.accept='.hwp,.hwpx';file.onchange=async()=>{const f=file.files?.[0];if(f&&cancelNavigation()){try{const tab=await newTab();await tab.api.open(new Uint8Array(await f.arrayBuffer()),f.name);await persistTab(tab);}catch(e){error(e);}}};file.click();}});
 on('save-document',async()=>{if(running?.run.status==='applying')return;if(activeTab?.api){const tab=activeTab;const result=await tab.api.save();await persistTab(tab);status(result==='saved'?'파일에 저장했습니다.':'저장을 완료하지 않았습니다.');}});
 $('request-form').addEventListener('submit',e=>{e.preventDefault();void send().catch(requestError);});
+on('attach-reference',()=>{
+ const workspaceId=work().id,chatId=chat().id,input=document.createElement('input');input.type='file';input.accept='.hwp,.hwpx,.txt,.md';input.multiple=true;
+ input.onchange=()=>attachFiles(Array.from(input.files??[]),workspaceId,chatId);input.click();
+});
+$('chat-panel').addEventListener('dragover',e=>{if(e.dataTransfer?.types.includes('Files')){e.preventDefault();e.dataTransfer.dropEffect='copy';}});
+$('chat-panel').addEventListener('drop',e=>{if(e.dataTransfer?.types.includes('Files')){e.preventDefault();if(!e.dataTransfer.files.length){requestError('폴더는 왼쪽의 연결 버튼으로 등록해 주세요.');return;}attachFiles(Array.from(e.dataTransfer.files));}});
+$('request-input').addEventListener('paste',e=>{if(e.clipboardData?.files.length){e.preventDefault();attachFiles(Array.from(e.clipboardData.files));}});
 let requestComposing=false;
 $('request-input').addEventListener('compositionstart',()=>requestComposing=true);
 $('request-input').addEventListener('compositionend',()=>requestComposing=false);
@@ -215,35 +237,41 @@ $('provider-select').addEventListener('change',()=>{const value=$<HTMLSelectElem
 $('model-select').addEventListener('change',()=>{chat().modelId=$<HTMLSelectElement>('model-select').value;void persist().catch(error);});
 on('connection-settings',async()=>{await refreshConnections();const config=state.models.find(m=>m.id===$<HTMLSelectElement>('model-select').value);fillConnection(config);$<HTMLDialogElement>('model-dialog').showModal();});
 on('new-connection',()=>fillConnection());
+$('saved-connections').addEventListener('change',()=>fillConnection(state.models.find(m=>m.id===$<HTMLSelectElement>('saved-connections').value)));
 on('delete-connection',async()=>{if(running)throw new Error('진행 중 요청이 끝난 뒤 연결을 삭제해 주세요.');if(!editingId)return;const id=editingId;await port.removeConnection(id);state.models=state.models.filter(m=>m.id!==id);connectionFlags.delete(id);await persist();renderModels();fillConnection();$('config-status').textContent='선택한 연결과 저장된 키를 삭제했습니다.';});
 $('model-dialog').addEventListener('close',()=>{$<HTMLInputElement>('config-key').value='';});
-on('clear-credentials',async()=>{if(running)throw new Error('진행 중 요청이 끝난 뒤 키를 삭제해 주세요.');await port.clearCredentials();connectionFlags.clear();connectionNotice='';$<HTMLInputElement>('config-key').value='';adapterHint(false);$('config-status').textContent='실행 중인 키와 암호화 저장된 키를 모두 삭제했습니다. 모델 설정은 유지됩니다.';});
+on('clear-credentials',async()=>{if(running)throw new Error('진행 중 요청이 끝난 뒤 키를 삭제해 주세요.');await port.clearCredentials();connectionFlags.clear();connectionNotice='';$<HTMLInputElement>('config-key').value='';renderConnections();adapterHint(false);$('config-status').textContent='실행 중인 키와 암호화 저장된 키를 모두 삭제했습니다. 모델 설정은 유지됩니다.';});
 on('close-settings',()=>{$<HTMLInputElement>('config-key').value='';$<HTMLDialogElement>('model-dialog').close();});
 let settingsBusy=false;
 function adapterHint(reset:boolean){
- const native=$<HTMLSelectElement>('config-adapter').value==='hyperclova';
+ const adapter=$<HTMLSelectElement>('config-adapter').value as ModelConfig['adapterId'];
+ const native=adapter!=='openai-compatible',preset=providerPresets[adapter];
  $('config-token-field').hidden=!native;$<HTMLInputElement>('config-tokens').disabled=!native;
- $('adapter-hint').textContent=native?'일반 NAVER Cloud · HCX-005 / HCX-007 지원. 서비스 앱에서 승인된 모델을 선택하세요. Endpoint는 /v3/chat-completions까지 입력합니다. HCX-005는 함수 호출 방식으로 1,024~4,096 출력 토큰을 사용합니다.':'Chat Completions 호환 서버를 연결합니다. GPT 전용 Responses, Claude·Gemini 전용 adapter는 아직 구현하지 않았습니다.';
- $<HTMLInputElement>('config-key').required=native&&!connectionFlags.get(editingId??'')?.hasKey;
- $<HTMLInputElement>('config-key').placeholder=connectionFlags.get(editingId??'')?.hasKey?'비워 두면 기존 키 유지 · 새 키 입력 시 교체':native?'CLOVA Studio에서 발급한 API 키':'인증이 없는 로컬 서버는 비워 둘 수 있습니다.';
+ $('adapter-hint').textContent=preset.hint;
  if(reset){
   $<HTMLInputElement>('config-key').value='';
-  $<HTMLInputElement>('config-endpoint').value=native?'https://clovastudio.stream.ntruss.com/v3/chat-completions':'';
-  $<HTMLInputElement>('config-model').value=native?'HCX-005':'';
-  $<HTMLInputElement>('config-label').value=native?'NAVER Cloud 개발':'';
+  $<HTMLInputElement>('config-endpoint').value=preset.endpoint;
+  $<HTMLInputElement>('config-model').value=preset.model;
+  $<HTMLInputElement>('config-label').value=preset.name;
+  $<HTMLInputElement>('config-tokens').value=adapter==='hyperclova'?'4096':'8192';
  }
- const hcx005=native&&$<HTMLInputElement>('config-model').value==='HCX-005';
- $<HTMLInputElement>('config-tokens').min=hcx005?'1024':'128';$<HTMLInputElement>('config-tokens').max=hcx005?'4096':'8192';
+ const previous=state.models.find(m=>m.id===editingId);
+ const reusable=connectionFlags.get(editingId??'')?.hasKey&&previous?.adapterId===adapter&&previous.endpoint===$<HTMLInputElement>('config-endpoint').value.trim();
+ $<HTMLInputElement>('config-key').required=native&&!reusable;
+ $<HTMLInputElement>('config-key').placeholder=reusable?'비워 두면 기존 키 유지 · 새 키 입력 시 교체':preset.keyHint;
+ const hcx005=adapter==='hyperclova'&&$<HTMLInputElement>('config-model').value==='HCX-005';
+ $<HTMLInputElement>('config-tokens').min=hcx005?'1024':'128';$<HTMLInputElement>('config-tokens').max=hcx005?'4096':adapter==='hyperclova'?'8192':'32768';
 }
 $('config-adapter').addEventListener('change',()=>adapterHint(true));
 $('config-model').addEventListener('input',()=>adapterHint(false));
+$('config-endpoint').addEventListener('input',()=>adapterHint(false));
 $('model-dialog').addEventListener('cancel',event=>{if(settingsBusy)event.preventDefault();});
 async function configureModel(testOnly:boolean){
  const form=$<HTMLFormElement>('model-form');if(settingsBusy||!form.reportValidity())return;
  const endpoint=$<HTMLInputElement>('config-endpoint').value.trim(),modelId=$<HTMLInputElement>('config-model').value.trim();
  const adapterId=$<HTMLSelectElement>('config-adapter').value as ModelConfig['adapterId'];
  const existing=state.models.find(m=>m.id===editingId);
- const config:ModelConfig={id:existing?.id??uid(),adapterId,label:$<HTMLInputElement>('config-label').value.trim(),endpoint,modelId,...(adapterId==='hyperclova'?{maxOutputTokens:Number($<HTMLInputElement>('config-tokens').value)}:{})};
+ const config:ModelConfig={id:existing?.id??uid(),adapterId,label:$<HTMLInputElement>('config-label').value.trim(),endpoint,modelId,...(adapterId!=='openai-compatible'?{maxOutputTokens:Number($<HTMLInputElement>('config-tokens').value)}:{})};
  const keyValue=$<HTMLInputElement>('config-key').value;
  const key=keyValue||((editingId&&connectionFlags.get(editingId)?.hasKey)?undefined:'');
  const remember=$<HTMLInputElement>('config-remember').checked&&secureStorage;

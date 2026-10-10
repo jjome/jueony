@@ -46,7 +46,7 @@ try{
  await page.type('#request-input','새 문서를 작성해줘');await page.keyboard.press('Enter');await page.waitForSelector('#request-error:not([hidden])');assert.match(await page.$eval('#request-error',e=>e.textContent),/AI 연결/);assert.equal(calls.length,0);assert.equal((await snapshot()).nodes[0].text,'');await page.$eval('#request-input',e=>e.value='');pass('unconfigured Enter request shows an inline error without changing the document');
  const duplicate=await browser.newPage();await duplicate.goto(appUrl);await duplicate.waitForFunction(()=>document.getElementById('app-status').textContent.includes('다른 Jueony 창'));assert.equal(await duplicate.$eval('#app-shell',e=>e.inert),true);await duplicate.close();pass('second window cannot overwrite workspace storage');
  await page.click('#connection-settings');await page.waitForFunction(()=>document.getElementById('model-dialog').open);
- assert.deepEqual(await page.$$eval('#config-adapter option',els=>els.map(e=>e.value)),['openai-compatible','hyperclova']);
+ assert.deepEqual(await page.$$eval('#config-adapter option',els=>els.map(e=>e.value)),['openai-responses','anthropic','gemini','hyperclova','openai-compatible']);
  if(native){
   await page.select('#config-adapter','hyperclova');
   await page.$eval('#config-endpoint',e=>{e.value='http://127.0.0.1:4194/v3/chat-completions';});
@@ -59,8 +59,9 @@ try{
   await page.screenshot({path:resolve(evidence,'connection-settings.png'),fullPage:true});
   pass('native connection probe sends synthetic context and clears key');
  }else{
+  await page.select('#config-adapter','openai-compatible');
   assert.equal(await page.$eval('#config-token-field',e=>getComputedStyle(e).display),'none');
-  await page.type('#config-label','검증용 호환 서버');await page.type('#config-endpoint','http://127.0.0.1:4194/v1');await page.type('#config-model','fixture-model');
+  await page.$eval('#config-label',e=>e.value='검증용 호환 서버');await page.$eval('#config-endpoint',e=>e.value='http://127.0.0.1:4194/v1');await page.$eval('#config-model',e=>e.value='fixture-model');
  }
  await page.type('#config-key','test-only-secret');await page.click('#model-form button[type=submit]');
  await page.waitForFunction(()=>!document.getElementById('model-dialog').open);pass('provider and model configuration');

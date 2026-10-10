@@ -1,0 +1,54 @@
+{
+  "status": "PASS",
+  "scope": "Actual editor UI, external HTTP requests blocked; no independent Hancom comparison",
+  "runtime": "Edg/155.0.4283.45",
+  "results": [
+    {
+      "name": "mcst-bid-2026.hwp",
+      "pages": 15,
+      "tables": 11,
+      "edited": true,
+      "undo": true,
+      "id": "mcst-bid-2026",
+      "status": "PASS"
+    },
+    {
+      "name": "formatting.hwpx",
+      "pages": 1,
+      "tables": 1,
+      "edited": true,
+      "undo": true,
+      "id": "python-hwpx-0",
+      "status": "PASS"
+    },
+    {
+      "name": "notes.hwpx",
+      "pages": 1,
+      "tables": 1,
+      "edited": true,
+      "undo": true,
+      "id": "python-hwpx-1",
+      "status": "PASS"
+    },
+    {
+      "name": "equation.hwpx",
+      "pages": 1,
+      "tables": 0,
+      "edited": "not applicable",
+      "undo": "not applicable",
+      "id": "python-hwpx-2",
+      "status": "PASS"
+    },
+    {
+      "name": "form.hwpx",
+      "pages": 3,
+      "tables": 10,
+      "edited": true,
+      "undo": true,
+      "id": "python-hwpx-3",
+      "status": "PASS"
+    }
+  ],
+  "errors": [],
+  "externalRequests": []
+}

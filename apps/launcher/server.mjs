@@ -3,9 +3,8 @@ import { readFile, stat, realpath } from 'node:fs/promises';
 import { resolve, join, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
-import { createHyperCLOVA } from './providers/hyperclova.mjs';
+import { providerRegistry as registry } from './providers/registry.mjs';
 import { connectionTestInput, assertConnectionTest } from './providers/connection-test.mjs';
-import { createOpenAICompatible } from './providers/openai-compatible.mjs';
 import { createConnectionStore } from './connection-store.mjs';
 
 const here=resolve(fileURLToPath(new URL('.',import.meta.url)));
@@ -16,7 +15,6 @@ const origins=new Set([`http://127.0.0.1:${port}`,`http://localhost:${port}`]);
 const hosts=new Set([`127.0.0.1:${port}`,`localhost:${port}`]);
 const token=randomBytes(32).toString('hex');
 const configs=new Map();
-const registry=new Map([['openai-compatible',createOpenAICompatible],['hyperclova',createHyperCLOVA]]);
 const connectionStore=createConnectionStore();
 let storageWarning='',mutation=Promise.resolve();
 const serial=action=>{const result=mutation.then(action);mutation=result.catch(()=>{});return result;};
@@ -33,7 +31,7 @@ function connection(data,reuse=false){
  const config={id:c.id,adapterId:c.adapterId,label:c.label,endpoint:c.endpoint,modelId:c.modelId,...(c.maxOutputTokens!==undefined?{maxOutputTokens:c.maxOutputTokens}:{})};
  const previous=configs.get(config.id);let key=data.key;
  if(reuse&&key===undefined){
-  if(!previous||['adapterId','endpoint','modelId'].some(k=>previous.config[k]!==config[k]))throw Object.assign(new Error('주소·모델·API 방식을 변경할 때는 새 API 키를 입력해 주세요.'),{safeMessage:'주소·모델·API 방식을 변경할 때는 새 API 키를 입력해 주세요.'});
+  if(!previous||['adapterId','endpoint'].some(k=>previous.config[k]!==config[k]))throw Object.assign(new Error('주소·API 방식을 변경할 때는 새 API 키를 입력해 주세요.'),{safeMessage:'주소·API 방식을 변경할 때는 새 API 키를 입력해 주세요.'});
   key=previous.key;
  }
  return {adapter:registry.get(config.adapterId)(config,key),config,key,remember:data.remember===true};
@@ -51,10 +49,10 @@ const server=http.createServer({maxHeaderSize:16384,requestTimeout:15000,headers
  try{
   if(!hosts.has(req.headers.host)){reply(res,403,{error:'허용되지 않은 Host'});return;}
   const path=req.url?.split('?')[0]??'/';
-  if(path==='/api/health'){reply(res,200,{application:'jueony',apiVersion:1,connectionStorageVersion:1,documentControlVersion:1});return;}
+  if(path==='/api/health'){reply(res,200,{application:'jueony',apiVersion:1,connectionStorageVersion:1,documentControlVersion:1,providerCatalogVersion:1});return;}
   if(path.startsWith('/api/')){
    if(!caller(req)){reply(res,403,{error:'앱 화면에서만 요청할 수 있습니다.'});return;}
-   if(path==='/api/session'&&req.method==='GET'&&req.headers['x-jueony-bootstrap']==='1'){reply(res,200,{token,documentControlVersion:1});return;}
+   if(path==='/api/session'&&req.method==='GET'&&req.headers['x-jueony-bootstrap']==='1'){reply(res,200,{token,documentControlVersion:1,providerCatalogVersion:1});return;}
    if(req.method!=='POST'||!authorized(req)){reply(res,403,{error:'세션 인증이 필요합니다. 앱을 다시 열어 주세요.'});return;}
    const data=await body(req);
    if(path==='/api/connections'){reply(res,200,{connections:[...configs.values()].map(c=>({config:c.config,remember:c.remember,hasKey:Boolean(c.key)})),secureStorage:connectionStore.available,warning:storageWarning});return;}

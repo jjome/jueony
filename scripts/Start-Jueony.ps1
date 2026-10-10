@@ -36,7 +36,7 @@ if ($running -and $RestartServer) {
     Wait-Process -Id $ownerIds[0] -Timeout 10 -ErrorAction SilentlyContinue
     $running = $false
 }
-if ($running -and $health.documentControlVersion -ne 1) { throw '이전 AI 서버가 실행 중입니다. 문서를 저장하고 편집기 창을 닫은 뒤 Restart-Jueony.cmd를 실행하세요.' }
+if ($running -and ($health.documentControlVersion -ne 1 -or $health.providerCatalogVersion -ne 1)) { throw '이전 AI 서버가 실행 중입니다. 문서를 저장하고 편집기 창을 닫은 뒤 Restart-Jueony.cmd를 실행하세요.' }
 if (-not $running) {
     $occupied = Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue
     if ($occupied) { throw "$port 포트의 이전 편집기 서버 또는 다른 프로그램을 종료한 뒤 다시 실행해 주세요. 열린 문서는 먼저 저장하세요." }

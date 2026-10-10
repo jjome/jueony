@@ -1,6 +1,6 @@
 # Jueony 업무·채팅·문서 편집 MVP
 
-2026-10-09. 왼쪽 업무/채팅/폴더, 가운데 AI 대화, 오른쪽 실제 HWP/HWPX 편집기를 연결했다. 한글 2024 전체 기능·화면·호환성 100%를 구현한 제품은 아니다. 실제 기관 LLM과 한글 독립 검수는 대기 중이다.
+2026-10-11. 왼쪽 업무/채팅/폴더, 가운데 AI 대화, 오른쪽 실제 HWP/HWPX 편집기를 연결했다. 한글 2024 전체 기능·화면·호환성 100%를 구현한 제품은 아니다. 실제 기관 LLM과 한글 독립 검수는 대기 중이다.
 
 ## 실행
 
@@ -8,13 +8,13 @@
 
 업무와 채팅을 만들고 로컬 폴더를 연결한다. 원본을 복사하거나 이동하지 않으며 연결 해제도 원본을 삭제하지 않는다. 파일/폴더를 체크한 경우에만 요청 자료로 읽는다. HWP/HWPX와 UTF-8 TXT/MD를 지원한다. PDF/DOCX/XLSX/OCR은 미지원이다.
 
-AI 연결 설정에서 OpenAI 호환 Chat Completions 또는 HyperCLOVA X v3를 선택하고 endpoint, 연결 이름, 모델 ID, 키를 등록한다. 일반 NAVER Cloud 계정은 [HyperCLOVA 가이드](../../docs/14-hyperclova-x-api-guide.md)를 따른다. 합성 연결 테스트는 문서/자료 없이 API를 1회 호출한다. 2026-10-11 서비스 HCX-005의 실제 생성·수정·undo·저장 흐름을 검증했다. 초안 품질과 기관망 검증은 별도다.
+AI 연결 설정에서 GPT Responses, Claude Messages, Gemini GenerateContent, HyperCLOVA X v3 또는 OpenAI 호환 Chat Completions를 선택하고 endpoint, 연결 이름, 모델 ID, 키를 등록한다. 세 새 provider의 사용법과 실제 호출 미검증 범위는 [최신 연결 가이드](../../docs/20-native-providers-and-editing.md)를 읽는다. 일반 NAVER Cloud 계정은 [HyperCLOVA 가이드](../../docs/14-hyperclova-x-api-guide.md)를 따른다. 합성 연결 테스트는 문서/자료 없이 API를 1회 호출한다. 2026-10-11 서비스 HCX-005의 실제 생성·수정·undo·저장 흐름을 검증했다. 초안 품질과 기관망 검증은 별도다.
 
 키는 Windows 계정별 DPAPI 암호화 저장을 선택할 수 있다. 저장 시 재시작 후 복원한다. 미선택 시 서버 메모리에만 두며 창을 닫아도 서버가 실행 중이면 유지된다. AI 연결 설정에서 키 교체, 새 연결, 선택 연결 삭제, 모든 키 삭제를 제공한다. 일반 로그/채팅/IndexedDB에는 키를 기록하지 않는다. 실행 묶음에 connection-store.mjs와 credential-protect.ps1도 함께 유지한다.
 
 ## 편집과 저장
 
-새 초안, 여러 본문 위치의 삽입·교체·삭제, 글자/문단 서식, 새 표·단순 셀·셀 서식, 기존 구역의 용지·여백을 직접 적용한다. 본문과 구조 변경 비교/요청 undo를 제공한다. 한글 2024 단축키는 상단 단축키 버튼에서 확인한다. AI 문단 이동·개체·병합/중첩 표·자동 저장은 아직 미지원이다. [구현 범위와 검증](../../docs/17-editor-control-implementation.md)을 참고한다. 이전 서버가 실행 중이면 문서를 저장하고 창을 닫은 뒤 루트의 Restart-Jueony.cmd로 재시작한다.
+새 초안, 여러 본문 위치의 삽입·교체·삭제, 글자/문단 서식, 새 표·단순 셀·셀 서식·행/열 삽입과 삭제, 기존 구역의 용지·여백을 직접 적용한다. 본문과 구조 변경 비교/요청 undo를 제공한다. 한글 2024 단축키는 상단 단축키 버튼에서 확인한다. AI 문단 이동·개체·병합/중첩 표·자동 저장은 아직 미지원이다. [구현 범위와 검증](../../docs/17-editor-control-implementation.md)을 참고한다. 이전 서버가 실행 중이면 문서를 저장하고 창을 닫은 뒤 루트의 Restart-Jueony.cmd로 재시작한다.
 
 일반 Edge/Chrome은 File System Access API로 열고 저장한다. 원본 SHA-256 및 문서 revision을 검사하고 저장 중 입력을 잠근다. 외부 프로세스와의 디스크 교체 경쟁을 완전히 막는 파일 잠금은 아니다.
 
@@ -57,7 +57,7 @@ node scripts/verify-mvp.mjs
 
 JUEONY_TEST_URL로 대상 URL을 바꿀 수 있다. 이 값은 검증 스크립트용이다. 테스트 설정과 합성 자료는 격리된 프로필에만 저장한다.
 
-자동 검사: 앱/엔진 19, 서버 7, UI 통합 18. 네이티브 Windows 폴더 선택기는 OPFS 핸들로 대체해 검사했다. 한국어 IME, 실제 한글, 실제 기관 API, OS 전체 인터넷 차단 검수는 별도다. 엔진의 중간/렌더/rollback 실패 주입과 강제 종료 복구도 남았다.
+최신 자동 검사 수와 결과는 [증거 기록](../../docs/evidence/native-agent-2026-10-11/README.md)을 따른다. 네이티브 Windows 폴더 선택기는 OPFS 핸들로 대체해 검사했다. 한국어 IME, 실제 한글, 실제 기관 API, OS 전체 인터넷 차단 검수는 별도다. 엔진의 중간/렌더/rollback 실패 주입과 강제 종료 복구도 남았다.
 
 Rust 런처는 std로 빌드한다. HTTP/TLS 의존성과 Tauri 호스트 빌드는 이 PC의 Windows 애플리케이션 제어에 막혀 현재 경로는 PowerShell 시작 스크립트와 동봉한 Node 표준 서버를 사용한다. 정책을 변경하지 않았다. 설치 서비스나 자동 시작을 등록하지 않는다.
 
@@ -66,3 +66,5 @@ Rust 런처는 std로 빌드한다. HTTP/TLS 의존성과 Tauri 호스트 빌드
 소스 저장소에서는 docs/12-mvp-implementation.md, docs/mvp-acceptance-results.csv를 읽는다. 실행 묶음에서는 MVP-GUIDE.md를 읽는다. build-evidence.json과 bundle-evidence.json에 소스/런타임 해시를 기록한다.
 
 Jueony 자체 부분에는 LICENSE.txt의 개인·비업무용 조건이 적용된다. 제3자 원래 라이선스가 우선한다. rhwp MIT, 원본 부속 고지, fonts/licenses, Rust 표준 라이브러리 고지와 runtime/LICENSE.Node.txt를 보존한다. 한컴/Windows 상용 글꼴을 추출해 포함하지 않았다. 기관 배포용 전체 SBOM·고지는 후속 확정 사항이다.
+
+폴더 연결 없이 채팅의 참고 파일 버튼·드래그·파일 붙여넣기로 임시 자료를 지정할 수 있다. 첨부는 채팅별로 분리하며 새로고침 시 해제된다. 인터넷 공개 검사 문서는 소스 루트의 .tools/public-documents에만 보관하고 실행 묶음에 재배포하지 않는다. [검수 방법](../../docs/21-public-document-validation.md), [RAG·Agent 설계](../../docs/22-agent-retrieval-execution-design.md).

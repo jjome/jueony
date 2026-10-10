@@ -83,7 +83,9 @@ test('connection metadata hides secrets; key reuse cannot switch destinations; r
  assert.doesNotMatch(JSON.stringify(metadata),/first-fake-key|must-not-leak/);assert.equal(metadata.connections.find(c=>c.config.id===selected.id).hasKey,true);
  assert.equal((await post('configure',{config:{...selected,label:'Renamed'}})).status,200);
  await post('generate',{configId:selected.id,input});assert.equal(calls.at(-1).authorization,'Bearer first-fake-key');
- for(const change of [{endpoint:providerOrigin+'/other'},{modelId:'model-b'},{adapterId:'hyperclova'}]){
+ assert.equal((await post('configure',{config:{...selected,modelId:'model-b'}})).status,200);
+ await post('generate',{configId:selected.id,input});assert.equal(calls.at(-1).authorization,'Bearer first-fake-key');
+ for(const change of [{endpoint:providerOrigin+'/other'},{adapterId:'hyperclova'}]){
   assert.equal((await post('test-connection',{config:{...selected,...change}})).status,400);
   assert.equal((await post('configure',{config:{...selected,...change}})).status,400);
  }

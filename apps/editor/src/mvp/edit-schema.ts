@@ -27,8 +27,6 @@ export function validateGeneration(raw:unknown,snapshot:Snapshot,sourceIds:strin
  if(!Array.isArray(g.operations)||g.operations.length>30)fail('명령은 최대 30개입니다.');
  const touched=new Set<string>(),inserted=new Set<string>();let total=0;
  const grouped=groupConsecutiveInsertions(g.operations as unknown[]);
- const structural=grouped.filter(o=>controlKinds.includes(o.kind as string));
- if(structural.length)validateControlOperations(structural,snapshot);
  const operations:EditOp[]=grouped.map(value=>{
   const o=object(value);const kind=o.kind;
   if(controlKinds.includes(kind as string))return o as EditOp;
@@ -48,6 +46,7 @@ export function validateGeneration(raw:unknown,snapshot:Snapshot,sourceIds:strin
   return {kind,target:id,start:start as number,count:count as number,text};
  });
  if(total>60000)fail('한 번에 생성하는 본문은 60,000자 이내입니다.');
+ if(operations.some(o=>controlKinds.includes(o.kind)))validateControlOperations(operations,snapshot);
  return {message,operations,sourceIds:g.sourceIds as string[]};
 }
 export function assertRevision(expected:string,actual:string){if(expected!==actual){const e=new Error('요청 후 문서가 변경되었습니다. 최신 문서로 다시 요청해 주세요.');e.name='ConflictError';throw e;}}

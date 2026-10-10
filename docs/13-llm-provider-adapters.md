@@ -4,19 +4,19 @@
 사용자 선택: 일반 NAVER Cloud 개발 계정부터 연결한다. “germi”는 Google Gemini로 해석한다.
 이 문서는 구현된 기능과 다음 구현 작업을 구분한다. 계정별 모델 사용 가능 여부를 대신 보증하지 않는다.
 
-2026-10-11 후속 구현: 공통 편집 명령이 본문 4종에서 10종으로 확장됐다. HCX-005 함수 인수는 `message`, `sourceIds`, `operationsJson`이며 adapter가 문자열을 JSON 명령 배열로 파싱한 뒤 본문 원문을 대조한다. 앱에서 모든 명령의 대상·인자·revision을 다시 검증한다. 함수 인수의 복잡한 중첩 schema로 발생한 실제 40009를 해결한 고정 계약이며 자동 폴백이 아니다. [표·서식·쪽 설정 실호출 결과](17-editor-control-implementation.md)를 참고한다.
+2026-10-11 후속 구현: 공통 편집 명령이 본문 4종에서 14종으로 확장됐다. HCX-005 함수 인수는 `message`, `sourceIds`, `operationsJson`이며 adapter가 문자열을 JSON 명령 배열로 파싱한 뒤 본문 원문을 대조한다. 앱에서 모든 명령의 대상·인자·revision을 다시 검증한다. 함수 인수의 복잡한 중첩 schema로 발생한 실제 40009를 해결한 고정 계약이며 자동 폴백이 아니다. [표·서식·쪽 설정 실호출 결과](17-editor-control-implementation.md)를 참고한다.
 
 ## 1. 현재 상태와 목표
 
 | 제공자 / adapter ID | 연결 규격 | 이번 작업의 상태 |
 | --- | --- | --- |
-| GPT / `openai-responses` | OpenAI Responses | 전용 adapter 구현 명세 완료, 코드 미구현 |
-| Claude / `anthropic` | Anthropic Messages | 구현 명세 완료, 코드 미구현 |
-| Gemini / `gemini` | Gemini Generate Content | 구현 명세 완료, 코드 미구현 |
+| GPT / `openai-responses` | OpenAI Responses | 전용 adapter·설정·fixture/UI 구현 및 검증 완료. 실제 계정 호출은 키 등록 후 |
+| Claude / `anthropic` | Anthropic Messages | adapter·설정·fixture/UI 구현 및 검증 완료. 실제 계정 호출은 키 등록 후 |
+| Gemini / `gemini` | Gemini Generate Content | adapter·설정·fixture/UI 구현 및 검증 완료. 실제 계정 호출은 키 등록 후 |
 | HyperCLOVA X / `hyperclova` | CLOVA Studio v3: HCX-005 함수 호출 / HCX-007 Structured Outputs | 서비스 HCX-005 실호출 문서 흐름 통과. 초안 품질·기관망 검증은 별도 |
 | 기존 `openai-compatible` | Chat Completions 호환 | 유지. GPT 등의 호환 endpoint를 입력할 수 있으나 제공자별 실호출은 별도 검증 필요 |
 
-MVP는 모델을 한 번 호출하고 완성된 응답을 검증한 뒤 편집한다. 스트리밍 편집, 자동 재시도, 제공자 자동 전환, RAG, 자율 실행 loop는 추가하지 않는다. 네 제공자를 전부 구현한 상태처럼 UI에 표시하지 않는다.
+MVP는 모델을 한 번 호출하고 완성된 응답을 검증한 뒤 편집한다. 스트리밍 편집, 자동 재시도, 제공자 자동 전환, RAG, 자율 실행 loop는 추가하지 않는다. 네 제공자 전용 adapter와 기존 호환 adapter를 선택할 수 있다. 실제 키와 모델 권한이 있어야 호출 가능하다. RAG/loop는 별도 설계 단계다. [최신 사용법과 검증 범위](20-native-providers-and-editing.md)를 따른다.
 
 ## 2. 의존성 및 파일 경계
 
@@ -45,8 +45,8 @@ flowchart LR
 | 인증·동시 호출 수·adapter 등록 | `apps/launcher/server.mjs` |
 | 공통 편집 지시·출력 schema | `apps/launcher/providers/generation-contract.mjs` |
 | 합성 연결 검사 | `apps/launcher/providers/connection-test.mjs` |
-| 현재 adapter | `openai-compatible.mjs`, `hyperclova.mjs` |
-| 이후 추가 파일 | 같은 providers 폴더의 `openai-responses.mjs`, `anthropic.mjs`, `gemini.mjs` |
+| 기존 adapter | `openai-compatible.mjs`, `hyperclova.mjs` |
+| 이번에 추가한 파일 | `openai-responses.mjs`, `anthropic.mjs`, `gemini.mjs`, `native-common.mjs`, `registry.mjs` |
 
 SDK 응답, 인증 헤더, 제공자별 파라미터는 adapter 밖으로 전파하지 않는다. 향후 RAG는 Context에 검색 결과를 공급하고, loop는 실행 제어를 확장한다. 두 기능 모두 provider adapter의 책임이 아니다.
 
@@ -70,15 +70,15 @@ generate(input: LLMInput, config: ModelConfig, signal: AbortSignal): Promise<unk
 }
 ```
 
-공통 실행 가능 명령은 새 문서 생성, 본문 문단 뒤 삽입, 본문 범위 교체/삭제다. 표·서식·개체·쪽 설정·자동 저장 명령은 제공자와 관계없이 아직 없다.
+공통 명령은 새 문서·본문 삽입/교체/삭제, 글자/문단 서식, 표 생성/셀 교체/셀 서식, 행/열 삽입/삭제, 쪽 설정의 14종이다. 개체·병합/중첩 표·자동 저장은 아직 미지원이다.
 
 Port 반환값은 의도적으로 미검증 값이다. `validateGeneration`이 허용 필드, 실제 자료 ID, 편집 가능한 대상, Unicode 범위, 길이, 중복 대상, 명령 수를 검사한 후 실행한다. 서버의 JSON schema 제약은 편집기 검증을 대체하지 않는다. 원문과 문서 버전 검증도 유지한다.
 
-현재 `generationSchema()`는 CLOVA가 명시한 부분집합에 맞춘 출력 형식이다. 다음 adapter 구현 시 원본 명령 계약은 공유하되 제공자별 schema 투영 함수를 둔다. OpenAI/Claude의 strict 모드용 `additionalProperties:false`, 지원하지 않는 수치 제약 제거 등을 명시적으로 변환한다. schema 오류가 나면 느슨한 출력으로 몰래 재호출하지 않는다.
+현재 `generationSchema()`는 CLOVA가 명시한 부분집합에 맞춘 출력 형식이다. 원본 명령 계약을 공유하고 native-common.mjs에서 제공자별 schema 투영을 수행한다. OpenAI/Claude의 strict 모드용 `additionalProperties:false`, 지원하지 않는 수치 제약 제거 등을 명시적으로 변환한다. schema 오류가 나면 느슨한 출력으로 몰래 재호출하지 않는다.
 
 설정은 adapter ID / 연결 이름 / endpoint / 모델 ID / 선택적 출력 토큰 상한이다. 제공자 연결과 모델 선택을 분리한다. 키는 별도 인자로 전달한다. Windows DPAPI CurrentUser 암호화 저장을 선택할 수 있으며 미선택 시 서버 메모리에만 둔다. IndexedDB에는 비밀이 아닌 설정만 저장한다. 키 입력창도 등록·테스트 종료 후 비운다. 저장소 실패 시 평문 폴백은 없다. 연결 수정·개별 삭제·전체 키 삭제와 재시작 복원을 지원한다.
 
-현재 오류는 정제한 사용자 메시지로 UI에 전달된다. 신규 adapter 구현 시 인증, 한도, 연결/시간 초과, 취소, 미완성 응답, 거부, 잘못된 출력 유형을 공통 오류 계약으로 확장한다. 원격 오류 본문 전체, 키, 입력 문서는 로그에 넣지 않는다. 현재 HyperCLOVA 내부 오류 코드는 있으나 공통 UI 오류 코드/토큰 사용량 표시는 후속 작업이다.
+현재 오류는 정제한 사용자 메시지로 UI에 전달된다. 신규 adapter는 인증, 한도, 연결/시간 초과, 취소, 미완성 응답, 거부, 잘못된 출력을 내부 공통 오류 코드와 안전한 메시지로 변환한다. UI에는 메시지를 전달한다. 원격 오류 본문 전체, 키, 입력 문서는 로그에 넣지 않는다. 현재 HyperCLOVA 내부 오류 코드는 있으나 공통 UI 오류 코드/토큰 사용량 표시는 후속 작업이다.
 
 ## 4. GPT / OpenAI Responses 구현 작업
 
@@ -106,11 +106,11 @@ Port 반환값은 의도적으로 미검증 값이다. `validateGeneration`이 �
 
 ## 6. Gemini / Google 구현 작업
 
-- 계획 기준 API는 `POST https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`, `x-goog-api-key` 헤더다. 키를 URL 쿼리에 넣지 않는다.
+- 구현한 API는 `POST https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`, `x-goog-api-key` 헤더다. 키를 URL 쿼리에 넣지 않는다.
 - `systemInstruction`과 `contents[].parts[].text`로 변환한다.
 - 확인일의 REST 예시는 `generationConfig.responseFormat.text={mimeType:"application/json",schema:...}`다. 기존 예제의 `responseSchema` 등을 무조건 복사하지 않는다.
 - `candidates[].content.parts` 중 텍스트 결과, `finishReason`, `promptFeedback`의 차단 상태를 검사한다. thought/비텍스트/함수 호출을 편집 JSON으로 실행하지 않는다.
-- 문서 페이지가 Generate Content를 Legacy로 표기한다. 구현 착수 시 API 수명과 대상 모델 지원을 다시 확인하고, API 계열을 바꾸면 adapter 안에서만 반영한다.
+- 문서 페이지가 Generate Content를 Legacy로 표기한다. 후속 API 변경 시 수명과 대상 모델 지원을 다시 확인하고, API 계열을 바꾸면 adapter 안에서만 반영한다.
 
 근거: [Generate Content reference](https://ai.google.dev/api/generate-content), [구조화 출력 REST 예시](https://ai.google.dev/gemini-api/docs/generate-content/structured-output?hl=en).
 
@@ -141,9 +141,9 @@ Port 반환값은 의도적으로 미검증 값이다. `validateGeneration`이 �
 | L02 | HyperCLOVA native adapter·UI·합성 연결 테스트 | 구현 및 로컬 검증 완료 |
 | L03 | 일반 NAVER Cloud 실제 연결 | 완료: 승인 서비스 HCX-005 인증 및 지정 함수 호출 통과 |
 | L04 | 실제 모델의 본문 초안·교체·삽입·삭제·undo·저장 | 부분 완료: 합성 문서 생성·부분 삭제를 위한 전체 교체·삽입·undo·저장 통과. 자료 인용·초안 품질·독립 한글 검수는 대기 |
-| L05 | GPT Responses native adapter | 명세 완료 / 코드·실호출 미완료 |
-| L06 | Claude native adapter | 명세 완료 / 코드·실호출 미완료 |
-| L07 | Gemini native adapter | 명세 완료 / 코드·실호출 미완료 |
+| L05 | GPT Responses native adapter | 코드·fixture·UI 구현/검증 완료 / 실제 계정 키 미등록으로 실호출 미검증 |
+| L06 | Claude native adapter | 코드·fixture·UI 구현/검증 완료 / 실제 계정 키 미등록으로 실호출 미검증 |
+| L07 | Gemini native adapter | 코드·fixture·UI 구현/검증 완료 / 실제 계정 키 미등록으로 실호출 미검증 |
 | L08 | 공통 오류 코드·usage 및 모델 capability 정리 | 후속: 실제 사용 UI 필요에 맞춰 추가 |
 | L09 | 기관 endpoint 고정 정책·키 보관 정책 | 기관망 요건 확인 후 별도 구현 |
 

@@ -9,16 +9,17 @@
  <section id="folder-panel"><div class="panel-heading"><strong>연결한 폴더</strong><button id="add-folder">＋ 연결</button><button id="refresh-folders" title="새로고침">↻</button></div><div id="folder-tree"></div><p class="hint">원본 위치를 연결합니다. 참고 체크한 자료만 요청에 포함됩니다. 자동 분석하지 않습니다.</p></section></aside>
  <section id="chat-panel"><div class="panel-heading"><strong id="chat-title">채팅</strong><span class="badge">문서 편집 MVP</span></div><div class="model-line"><select id="provider-select" aria-label="LLM 제공자"></select><select id="model-select" aria-label="LLM 모델"></select></div>
  <div id="messages" aria-live="polite"></div><div id="reference-summary">참고 자료를 왼쪽에서 선택하세요.</div>
- <form id="request-form"><textarea id="request-input" aria-label="업무 요청" aria-describedby="request-key-hint" placeholder="자료를 참고해 초안을 작성하거나 현재 문서의 본문을 수정해 주세요." rows="4"></textarea><div id="request-key-hint">Enter로 전송 · Shift+Enter로 줄바꿈</div><p id="request-error" role="alert" hidden></p><div class="compose-actions"><span id="run-status" role="status">지원: 새 초안 · 여러 본문 삽입/교체/삭제</span><button id="cancel-run" type="button" disabled>중지</button><button id="send-request" type="submit">요청 보내기</button></div></form>
- <p class="capability-note">AI 지원: 본문 · 글자/문단 서식 · 새 표와 단순 셀 · 용지/여백. 개체·병합/중첩 표 편집은 아직 미지원입니다. 최근 대화 최대 20개와 현재 문서, 선택 자료만 사용합니다.</p></section>
+ <form id="request-form"><textarea id="request-input" aria-label="업무 요청" aria-describedby="request-key-hint" placeholder="자료를 참고해 초안을 작성하거나 현재 문서의 본문을 수정해 주세요." rows="4"></textarea><div id="request-key-hint">Enter로 전송 · Shift+Enter로 줄바꿈</div><div class="attachment-actions"><button id="attach-reference" type="button">＋ 참고 파일</button><span>HWP/HWPX/TXT/MD · 끌어 놓기/파일 붙여넣기<br/>임시 첨부는 새로고침 시 해제됩니다.</span></div><p id="request-error" role="alert" hidden></p><div class="compose-actions"><span id="run-status" role="status">지원: 새 초안 · 여러 본문 삽입/교체/삭제</span><button id="cancel-run" type="button" disabled>중지</button><button id="send-request" type="submit">요청 보내기</button></div></form>
+ <p class="capability-note">AI 지원: 본문 · 글꼴/글자/문단 서식 · 단순 표의 셀·행·열 · 용지/여백. 개체·병합/중첩 표 편집은 아직 미지원입니다. 최근 대화 최대 20개와 현재 문서, 선택 자료만 사용합니다.</p></section>
  <div id="agent-editor-split" role="separator" aria-label="AI 대화와 문서 너비 조절" aria-orientation="vertical" aria-controls="chat-panel editor-panel" tabindex="0" title="드래그 또는 좌우 방향키로 너비 조절 · 두 번 클릭 또는 Enter로 초기화"></div>
  <section id="editor-panel"><div class="panel-heading"><strong>작업 문서</strong><button id="open-document">열기</button><button id="new-document">＋ 새 문서</button><button id="save-document">저장</button></div><div id="documents" aria-label="편집 문서"></div><nav id="document-tabs" aria-label="문서 탭"><div id="document-tab-list" role="tablist"></div><span id="shell-status" role="status"></span></nav></section>
 </main>
 <dialog id="close-document"><form method="dialog"><h2>변경 내용을 저장할까요?</h2><p id="close-document-name"></p><p class="hint">저장하지 않고 닫으면 이 문서의 로컬 복구본도 제거됩니다.</p><div class="dialog-actions"><button value="save">저장하고 닫기</button><button value="discard">저장하지 않음</button><button value="cancel" autofocus>취소</button></div></form></dialog>
 <dialog id="model-dialog"><form id="model-form">
-<h2>AI 연결 설정</h2><button type="button" id="new-connection">＋ 새 연결</button>
-<p class="hint">현재 선택한 연결을 수정합니다. 연결 테스트는 문서·대화·자료 없이 합성 요청 1회를 전송하며 API 사용량이 발생할 수 있습니다. 키는 채팅에 저장하지 않습니다. 암호화 저장을 끄면 현재 서버 실행 중에만 유지됩니다.</p>
-<label>API 방식<select id="config-adapter"><option value="openai-compatible">OpenAI 호환 Chat Completions</option><option value="hyperclova">HyperCLOVA X · v3</option></select></label>
+<h2>AI 연결 설정</h2>
+<div class="connection-picker"><label>저장된 연결<select id="saved-connections" aria-label="관리할 AI 연결"></select></label><button type="button" id="new-connection">＋ 새 연결</button></div>
+<p class="hint">제공자별 연결을 여러 개 저장하고 채팅 위에서 선택할 수 있습니다. 연결 테스트는 문서·대화·자료 없이 합성 요청 1회를 전송하며 API 사용량이 발생할 수 있습니다.</p>
+<label>제공자 / API 방식<select id="config-adapter"><option value="openai-responses">GPT · OpenAI Responses</option><option value="anthropic">Claude · Anthropic Messages</option><option value="gemini">Gemini · Google AI Studio</option><option value="hyperclova">HyperCLOVA X · NAVER</option><option value="openai-compatible">OpenAI 호환 Chat Completions</option></select></label>
 <p id="adapter-hint" class="hint"></p>
 <label>연결 이름<input id="config-label" required placeholder="기관 AI"/></label>
 <label>Endpoint<input id="config-endpoint" type="url" required placeholder="https://서버주소/v1"/></label>
@@ -26,7 +27,7 @@
 <label id="config-token-field" hidden>최대 출력 토큰<input id="config-tokens" type="number" min="128" max="8192" step="1" value="4096"/></label>
 <label>API 키<input id="config-key" type="password" autocomplete="off" placeholder="인증이 없는 로컬 서버는 비워 둘 수 있습니다."/></label>
 <label class="remember-connection"><input id="config-remember" type="checkbox"/> 이 Windows 계정에 암호화 저장</label>
-<p class="hint">저장한 연결은 재실행 후 복원됩니다. 암호화 실패 시 평문으로 저장하지 않습니다. 주소·모델·API 방식을 바꿀 때는 키를 다시 입력하세요.</p>
+<p class="hint">키는 채팅에 저장하지 않습니다. 암호화 저장을 끄면 현재 서버 실행 중에만 유지됩니다. 저장 실패 시 평문으로 저장하지 않습니다. 같은 주소의 모델 변경은 기존 키를 사용하며, 주소·API 방식 변경은 키를 다시 입력해야 합니다.</p>
 <p id="config-status" role="status"></p>
 <div class="dialog-actions"><button type="button" id="delete-connection">선택 연결 삭제</button><button type="button" id="clear-credentials">모든 키 삭제</button><button type="button" id="close-settings">닫기</button><button type="button" id="test-connection">연결 테스트 (API 호출)</button><button type="submit">연결 저장</button></div>
 </form></dialog>

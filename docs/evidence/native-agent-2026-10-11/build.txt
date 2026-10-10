@@ -1,0 +1,30 @@
+vite v8.3.2 building client environment for production...
+transforming...
+✓ 301 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                  7.48 kB │ gzip:     3.13 kB
+dist/editor.html                                87.85 kB │ gzip:    11.56 kB
+dist/assets/canvaskit-SCAxUyCS.wasm          7,317.34 kB │ gzip: 2,989.78 kB
+dist/assets/rhwp_bg-BkVWMBaR.wasm           11,821.75 kB │ gzip: 4,461.90 kB
+dist/assets/index-PLZIZNr3.css                   7.63 kB │ gzip:     2.38 kB
+dist/assets/editor-DcYlQnqA.css                118.76 kB │ gzip:    20.76 kB
+dist/assets/edit-schema-C9A22XBD.js             21.29 kB │ gzip:     7.81 kB
+dist/assets/index-DlcyOiwG.js                   38.21 kB │ gzip:    13.72 kB
+dist/assets/canvaskit-renderer-DIJN0QCq.js     247.51 kB │ gzip:    74.72 kB
+dist/assets/editor-CwqKLtz_.js               2,150.79 kB │ gzip:   450.72 kB
+
+✓ built in 493ms
+{
+  "applicationId": "jueony-editor",
+  "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+  "enginePackage": "@rhwp/core@0.8.7",
+  "builtAt": "2026-10-10T21:19:00.772Z",
+  "engineWasmSha256": "54cf95014312e605c51b98eb9021247ea79ef2bbd0a7080e11c011d0246e3989",
+  "buildScriptSha256": "5ea08a9a0408e4cc2c79551253be29a2e3587bf615e2dbde4ca60c38b3d062a6",
+  "customSourceSha256": "77cf8628b88028144cb2a251fce0d65e8e24d919ae1545a2c4447603a45b22e3",
+  "applicationSourceCommit": "afd98dfdd1b0bbb025f3a6ef7e4b569effdd4a05",
+  "applicationSourceDirty": true,
+  "sourceBuild": false,
+  "note": "Rust 엔진은 공식 npm WASM 바이너리 사용. 이 빌드에서 Rust 엔진을 재컴파일하지 않음."
+}

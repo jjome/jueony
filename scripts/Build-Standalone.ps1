@@ -13,7 +13,7 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/dist') -Destination 
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/fixtures') -Destination $output -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/README.md') -Destination (Join-Path $output 'README.md') -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/12-mvp-implementation.md') -Destination (Join-Path $output 'MVP-GUIDE.md') -Force
-foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.md')) {
+foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.md', '15-ai-editor-control-plan.md', '16-hangul-shortcuts-plan.md', '17-editor-control-implementation.md', 'ai-editor-capability-matrix.csv')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
 $llmEvidence = Join-Path $output 'evidence'
@@ -46,6 +46,9 @@ foreach ($supportFile in @('connection-store.mjs', 'credential-protect.ps1')) {
 Copy-Item -LiteralPath (Join-Path $projectRoot 'scripts/Start-Jueony.ps1') -Destination (Join-Path $output 'Start-Jueony.ps1') -Force
 $startCmd = "@echo off" + [Environment]::NewLine + 'powershell.exe -NoProfile -File "%~dp0Start-Jueony.ps1"' + [Environment]::NewLine + 'if errorlevel 1 pause' + [Environment]::NewLine
 [IO.File]::WriteAllText((Join-Path $output 'Start-Jueony.cmd'), $startCmd, [Text.Encoding]::ASCII)
+$restartCmd = "@echo off" + [Environment]::NewLine + 'echo Save your documents and close Jueony windows before restarting.' + [Environment]::NewLine + 'powershell.exe -NoProfile -File "%~dp0Start-Jueony.ps1" -RestartServer' + [Environment]::NewLine + 'if errorlevel 1 pause' + [Environment]::NewLine
+[IO.File]::WriteAllText((Join-Path $output 'Restart-Jueony.cmd'), $restartCmd, [Text.Encoding]::ASCII)
+Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/editor-control-2026-10-11') -Destination $llmEvidence -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/launcher/providers') -Destination $output -Recurse -Force
 $nodeVersion = & (Join-Path $runtimePath 'node.exe') --version
 $providerHashes = [ordered]@{}

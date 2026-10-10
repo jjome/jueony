@@ -51,10 +51,10 @@ const server=http.createServer({maxHeaderSize:16384,requestTimeout:15000,headers
  try{
   if(!hosts.has(req.headers.host)){reply(res,403,{error:'허용되지 않은 Host'});return;}
   const path=req.url?.split('?')[0]??'/';
-  if(path==='/api/health'){reply(res,200,{application:'jueony',apiVersion:1,connectionStorageVersion:1});return;}
+  if(path==='/api/health'){reply(res,200,{application:'jueony',apiVersion:1,connectionStorageVersion:1,documentControlVersion:1});return;}
   if(path.startsWith('/api/')){
    if(!caller(req)){reply(res,403,{error:'앱 화면에서만 요청할 수 있습니다.'});return;}
-   if(path==='/api/session'&&req.method==='GET'&&req.headers['x-jueony-bootstrap']==='1'){reply(res,200,{token});return;}
+   if(path==='/api/session'&&req.method==='GET'&&req.headers['x-jueony-bootstrap']==='1'){reply(res,200,{token,documentControlVersion:1});return;}
    if(req.method!=='POST'||!authorized(req)){reply(res,403,{error:'세션 인증이 필요합니다. 앱을 다시 열어 주세요.'});return;}
    const data=await body(req);
    if(path==='/api/connections'){reply(res,200,{connections:[...configs.values()].map(c=>({config:c.config,remember:c.remember,hasKey:Boolean(c.key)})),secureStorage:connectionStore.available,warning:storageWarning});return;}

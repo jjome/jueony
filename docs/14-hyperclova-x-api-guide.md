@@ -45,7 +45,7 @@
 
 | 모델 | 요청·응답 방식 | 변경 검증 |
 | --- | --- | --- |
-| HCX-005 | maxTokens, tools, 지정 toolChoice; submit_document_edits 호출 1개만 허용 | 모델이 반환한 원문 전체와 snapshot을 정확히 대조한 뒤 앱이 Unicode 범위를 계산 |
+| HCX-005 | maxTokens, tools, 지정 toolChoice; submit_document_edits 호출 1개만 허용. 명령 배열은 operationsJson 문자열 | JSON 파싱 후 본문 원문 대조와 앱의 구조/속성/문서 버전 검사. [새 표·서식·용지 검증](17-editor-control-implementation.md) |
 | HCX-007 | maxCompletionTokens, thinking.effort:none, responseFormat schema | 기존 범위 명령과 출처·문서 버전 검사 |
 
 HCX-005 자유문 JSON의 구문 오류와 글자 수 오산을 실호출에서 확인하여 최종 구현에 함수 호출을 사용했다. HCX-007 전용 Structured Outputs 옵션을 HCX-005에 보내지 않는다. [HCX-005 v3](https://api.ncloud-docs.com/docs/clovastudio-chatcompletionsv3), [Function calling](https://api.ncloud-docs.com/docs/clovastudio-chatcompletionsv3-fc), [HCX-007 Structured Outputs](https://api.ncloud-docs.com/docs/clovastudio-chatcompletionsv3-so).

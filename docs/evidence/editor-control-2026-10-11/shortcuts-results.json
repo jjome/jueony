@@ -1,0 +1,15 @@
+{
+  "checks": [
+    "Alt+Shift+B applies bold to real selected document",
+    "Alt+Shift+C clears character styling instead of centering",
+    "Ctrl+M,R changes actual character color",
+    "shortcut edit participates in engine undo",
+    "Ctrl+Shift+C centers the actual paragraph",
+    "dialog input does not delete document text",
+    "Ctrl+N,T browser key input opens table creation (physical Windows key delivery still unverified)",
+    "Ctrl+Y deletes real line and undo restores text",
+    "Ctrl+PageUp/PageDown navigate to real document boundaries"
+  ],
+  "errors": [],
+  "limitation": "Headless Edge input is not a physical Windows IME or native accelerator validation."
+}

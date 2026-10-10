@@ -1,0 +1,148 @@
+TAP version 13
+# Subtest: server restart restores encrypted connections, replaces/deletes keys, and preserves corrupt store
+ok 1 - server restart restores encrypted connections, replaces/deletes keys, and preserves corrupt store
+  ---
+  duration_ms: 2390.7998
+  type: 'test'
+  ...
+# Subtest: Windows DPAPI encrypts, restores, replaces and deletes without plaintext fallback
+ok 2 - Windows DPAPI encrypts, restores, replaces and deletes without plaintext fallback
+  ---
+  duration_ms: 1253.2132
+  type: 'test'
+  ...
+# Subtest: native v3 URL/auth/schema/body preserve common contract
+ok 3 - native v3 URL/auth/schema/body preserve common contract
+  ---
+  duration_ms: 25.5388
+  type: 'test'
+  ...
+# Subtest: source schema excludes document IDs and empty references require an empty source list
+ok 4 - source schema excludes document IDs and empty references require an empty source list
+  ---
+  duration_ms: 0.3991
+  type: 'test'
+  ...
+# Subtest: HCX-005 uses maxTokens without HCX-007-only schema or reasoning fields
+ok 5 - HCX-005 uses maxTokens without HCX-007-only schema or reasoning fields
+  ---
+  duration_ms: 16.2402
+  type: 'test'
+  ...
+# Subtest: invalid models, keys, paths and unsafe endpoints fail before network
+ok 6 - invalid models, keys, paths and unsafe endpoints fail before network
+  ---
+  duration_ms: 0.3162
+  type: 'test'
+  ...
+# Subtest: whole-paragraph contract requires exact source text and computes Unicode offsets locally
+ok 7 - whole-paragraph contract requires exact source text and computes Unicode offsets locally
+  ---
+  duration_ms: 0.2111
+  type: 'test'
+  ...
+# Subtest: HCX-005 plan string preserves structured commands and rejects malformed or excessive payloads
+ok 8 - HCX-005 plan string preserves structured commands and rejects malformed or excessive payloads
+  ---
+  duration_ms: 0.3044
+  type: 'test'
+  ...
+# Subtest: explicit app prefix is preserved without guessing or falling back
+ok 9 - explicit app prefix is preserved without guessing or falling back
+  ---
+  duration_ms: 2.5402
+  type: 'test'
+  ...
+# Subtest: HTTP/application errors sanitized, no retries or redirects
+ok 10 - HTTP/application errors sanitized, no retries or redirects
+  ---
+  duration_ms: 5.36
+  type: 'test'
+  ...
+# Subtest: truncated, tool, malformed, refused and incomplete responses never yield edits
+ok 11 - truncated, tool, malformed, refused and incomplete responses never yield edits
+  ---
+  duration_ms: 10.5367
+  type: 'test'
+  ...
+# Subtest: abort cancels generation and leaves next request usable
+ok 12 - abort cancels generation and leaves next request usable
+  ---
+  duration_ms: 39.6317
+  type: 'test'
+  ...
+# Subtest: invalid or excessive input does not contact provider
+ok 13 - invalid or excessive input does not contact provider
+  ---
+  duration_ms: 6.0178
+  type: 'test'
+  ...
+# Subtest: connection probe rejects edits and source claims
+ok 14 - connection probe rejects edits and source claims
+  ---
+  duration_ms: 0.2301
+  type: 'test'
+  ...
+# Subtest: 세션 부트스트랩과 토큰/Origin/Host 경계를 강제한다
+ok 15 - 세션 부트스트랩과 토큰/Origin/Host 경계를 강제한다
+  ---
+  duration_ms: 148.4064
+  type: 'test'
+  ...
+# Subtest: 선택한 두 모델과 인증을 정확한 endpoint에 보내고 임의 응답 필드가 UI로 새지 않는다
+ok 16 - 선택한 두 모델과 인증을 정확한 endpoint에 보내고 임의 응답 필드가 UI로 새지 않는다
+  ---
+  duration_ms: 26.3839
+  type: 'test'
+  ...
+# Subtest: 외부 HTTP·사용자정보·쿼리 endpoint와 redirect 전송을 거부한다
+ok 17 - 외부 HTTP·사용자정보·쿼리 endpoint와 redirect 전송을 거부한다
+  ---
+  duration_ms: 8.8491
+  type: 'test'
+  ...
+# Subtest: 인증/잘못된 JSON 오류를 정제하고 자동 재시도와 키 로그를 남기지 않는다
+ok 18 - 인증/잘못된 JSON 오류를 정제하고 자동 재시도와 키 로그를 남기지 않는다
+  ---
+  duration_ms: 8.1387
+  type: 'test'
+  ...
+# Subtest: 취소된 HTTP 요청 후에도 다음 요청이 정상 처리된다
+ok 19 - 취소된 HTTP 요청 후에도 다음 요청이 정상 처리된다
+  ---
+  duration_ms: 119.5647
+  type: 'test'
+  ...
+# Subtest: 정적 자산은 로컬 CSP로 제공하고 경로 순회와 잘못된 JSON을 거부한다
+ok 20 - 정적 자산은 로컬 CSP로 제공하고 경로 순회와 잘못된 JSON을 거부한다
+  ---
+  duration_ms: 7.8759
+  type: 'test'
+  ...
+# Subtest: HyperCLOVA registry와 합성 연결 테스트는 사용자 문맥/키를 저장하지 않는다
+ok 21 - HyperCLOVA registry와 합성 연결 테스트는 사용자 문맥/키를 저장하지 않는다
+  ---
+  duration_ms: 8.8793
+  type: 'test'
+  ...
+# Subtest: 연결 키 삭제 후 기존 모델로 호출할 수 없다
+ok 22 - 연결 키 삭제 후 기존 모델로 호출할 수 없다
+  ---
+  duration_ms: 2.7744
+  type: 'test'
+  ...
+# Subtest: connection metadata hides secrets; key reuse cannot switch destinations; replacement and removal work
+ok 23 - connection metadata hides secrets; key reuse cannot switch destinations; replacement and removal work
+  ---
+  duration_ms: 19.1066
+  type: 'test'
+  ...
+1..23
+# tests 23
+# suites 0
+# pass 23
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2447.3086

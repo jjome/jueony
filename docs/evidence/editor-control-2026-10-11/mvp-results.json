@@ -1,0 +1,41 @@
+{
+  "results": [
+    "three panes and live editor ready",
+    "second window cannot overwrite workspace storage",
+    "provider and model configuration",
+    "two linked directory handles and tree",
+    "chat to real editor new document, selected reference and model passed",
+    "one request edits multiple positions without approval",
+    "request-level undo through engine history",
+    "actual HWP UI downloads and HWP/HWPX round trips for created/applied/reverted documents",
+    "cancelled late response does not edit",
+    "concurrent engine mutation rejects stale generation",
+    "request undo cannot erase a later edit",
+    "tree HWPX opens and selected live reference includes unsaved content",
+    "credential absent from persisted app state",
+    "independent chats",
+    "workspace isolation",
+    "manual keyboard input changes the same live document",
+    "restart restores workspace chats folders and documents",
+    "connection credentials can be cleared explicitly"
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "runtime": "Edg/155.0.4283.45",
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@rhwp/core@0.8.7",
+    "builtAt": "2026-10-10T17:12:39.042Z",
+    "engineWasmSha256": "54cf95014312e605c51b98eb9021247ea79ef2bbd0a7080e11c011d0246e3989",
+    "buildScriptSha256": "5ea08a9a0408e4cc2c79551253be29a2e3587bf615e2dbde4ca60c38b3d062a6",
+    "customSourceSha256": "a093f8dc97b8c2de3532433f2ad16e6693f5e09140192b0730877f3a8f100add",
+    "applicationSourceCommit": "971fb8e8fea702270461daccadfda4874b702d44",
+    "applicationSourceDirty": true,
+    "sourceBuild": false,
+    "note": "Rust 엔진은 공식 npm WASM 바이너리 사용. 이 빌드에서 Rust 엔진을 재컴파일하지 않음."
+  },
+  "adapter": "openai-compatible",
+  "provider": "local deterministic protocol fixture; NOT a live LLM",
+  "folderAccess": "OPFS directory handles; NOT native Windows picker"
+}

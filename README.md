@@ -1,6 +1,6 @@
 # Jueony — 공무원용 AI 문서 편집기
 
-폐쇄망 Windows PC에서 업무별 자료와 대화를 관리하고, 가운데 채팅의 요청으로 오른쪽 HWP/HWPX 문서를 AI와 함께 직접 편집하는 프로그램을 만든다. **현재는 업무·채팅과 실제 문서 편집을 연결한 본문 중심 MVP 개발판**이다. 소스 조사 이후 사용자의 후속 지시에 따라 로컬 실행·편집·저장 구현에 착수했다. 한글 2024 전체 기능·화면·파일 호환성 100%를 달성한 상태는 아니다.
+폐쇄망 Windows PC에서 업무별 자료와 대화를 관리하고, 가운데 채팅의 요청으로 오른쪽 HWP/HWPX 문서를 AI와 함께 직접 편집하는 프로그램을 만든다. **현재는 본문·표 기본 편집·서식·쪽 설정과 한글 단축키를 연결한 MVP 개발판**이다. 한글 2024 전체 기능·화면·파일 호환성 100%를 달성한 상태는 아니다. [최신 구현과 검증 결과](docs/17-editor-control-implementation.md)를 참고한다.
 
 ## 이용허락
 
@@ -22,12 +22,13 @@
 
 [HyperCLOVA X 연결 가이드](docs/14-hyperclova-x-api-guide.md), [최신 MVP 실행·지원 범위·검증 결과](docs/12-mvp-implementation.md), [개발·빌드 방법](apps/editor/README.md)을 먼저 읽는다. 복잡한 원본 문서는 사본으로 검수한다. 현재 빌드의 글꼴 대체와 미지원 개체 때문에 한글에서의 지면·개체 보존을 별도로 확인해야 한다.
 
-문서 엔진은 Rust/WASM, 화면·Agent는 TypeScript, 로컬 API는 동봉한 Node 서버다. **rhwp가 열린 문서 상태를 소유**한다. workspace·채팅·명시 자료·OpenAI 호환/HyperCLOVA X adapter·여러 본문 편집·요청 undo를 연결했다. 2026-10-11 일반 NAVER Cloud 서비스 HCX-005의 실제 생성·미저장 문맥 수정·비교·undo·저장을 확인했다. 키는 Windows DPAPI 암호화 저장을 선택할 수 있고 설정에서 교체·삭제한다. 기관망·초안 품질·실제 한글 독립 검수는 남아 있으며 AI 표·서식·개체·쪽 설정은 미지원이다.
+문서 엔진은 Rust/WASM, 화면·Agent는 TypeScript, 로컬 API는 동봉한 Node 서버다. **rhwp가 열린 문서 상태를 소유**한다. workspace·채팅·지정 자료·OpenAI 호환/HyperCLOVA X adapter·요청 undo를 연결했다. 2026-10-11 실제 HCX-005로 본문 편집과 4×3 일정표·제목/셀 서식·A4 가로/여백 변경을 확인했다. 키는 Windows DPAPI 암호화 저장을 선택하고 설정에서 교체·삭제한다. 개체·병합/중첩 표·고급 기능·외부 MCP와 한글 독립 검수는 남아 있다. 이전 서버가 떠 있으면 문서를 저장하고 창을 닫은 뒤 [Restart-Jueony.cmd](Restart-Jueony.cmd)를 실행한다.
 
 ## 프로젝트 문서
 
 | 문서 | 다루는 결정 |
 | --- | --- |
+| [단축키·AI 구조 편집 구현 결과](docs/17-editor-control-implementation.md) | 실제 지원 범위, 하이퍼클로바 실호출, 저장 검수 파일, 남은 작업 |
 | [한글 2024 단축키 구현과 검증](docs/16-hangul-shortcuts-plan.md) | 공식 매핑, 겹글쇠·IME·셀/개체 문맥, 포커스 격리, Windows 예약키 전달 |
 | [전체 편집 기능의 AI 제어 작업 계획](docs/15-ai-editor-control-plan.md) | 구현 전 명세: 표·서식·개체·쪽 설정부터 전체 기능의 공통 제어 API, Agent, MCP 연결과 [기능별 작업 목록](docs/ai-editor-capability-matrix.csv) |
 | [LLM 제공자 4종 구현 명세](docs/13-llm-provider-adapters.md) | GPT·Claude·Gemini·HyperCLOVA X의 계약, 구현 상태, 다음 작업 |
@@ -58,7 +59,7 @@
 
 ## 최신 MVP 검증 결과
 
-앱/엔진 **19개**, 로컬 API·암호화 저장 **22개**, headless Edge 통합 **18개(호환)/19개(HCX-007 fixture)**, 키 설정 UI **6개**를 통과했다. 별도로 실제 서비스 HCX-005의 합성 문서 흐름 **10개 검사**를 통과했다. 타입 검사·빌드도 수행했다. [실호출 결과와 품질 제한](docs/evidence/hyperclova-live-2026-10-11/README.md), [28개 수용 검사 상태](docs/mvp-acceptance-results.csv)를 참고한다.
+이번 확장: 앱/엔진 **29개**, 로컬 API·암호화 저장 **23개**, 기존 업무 Edge 통합 **18개**, 단축키 **9개**, 구조 편집 **7개**를 통과했다. 실제 HCX-005의 표·서식·용지 요청도 적용·비교·undo를 검사했다. [최신 증거와 한계](docs/17-editor-control-implementation.md)를 참고한다. 이전 HCX-007 fixture·키 설정 UI·실제 본문 검증 기록은 [기존 실호출 기록](docs/evidence/hyperclova-live-2026-10-11/README.md)에 남아 있다.
 
 ## 기본 편집기 단계의 이전 검증 결과
 

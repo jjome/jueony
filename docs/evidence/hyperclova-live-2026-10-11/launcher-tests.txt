@@ -1,0 +1,142 @@
+TAP version 13
+# Subtest: server restart restores encrypted connections, replaces/deletes keys, and preserves corrupt store
+ok 1 - server restart restores encrypted connections, replaces/deletes keys, and preserves corrupt store
+  ---
+  duration_ms: 2207.5887
+  type: 'test'
+  ...
+# Subtest: Windows DPAPI encrypts, restores, replaces and deletes without plaintext fallback
+ok 2 - Windows DPAPI encrypts, restores, replaces and deletes without plaintext fallback
+  ---
+  duration_ms: 1127.3678
+  type: 'test'
+  ...
+# Subtest: native v3 URL/auth/schema/body preserve common contract
+ok 3 - native v3 URL/auth/schema/body preserve common contract
+  ---
+  duration_ms: 22.5002
+  type: 'test'
+  ...
+# Subtest: source schema excludes document IDs and empty references require an empty source list
+ok 4 - source schema excludes document IDs and empty references require an empty source list
+  ---
+  duration_ms: 0.439
+  type: 'test'
+  ...
+# Subtest: HCX-005 uses maxTokens without HCX-007-only schema or reasoning fields
+ok 5 - HCX-005 uses maxTokens without HCX-007-only schema or reasoning fields
+  ---
+  duration_ms: 13.7273
+  type: 'test'
+  ...
+# Subtest: invalid models, keys, paths and unsafe endpoints fail before network
+ok 6 - invalid models, keys, paths and unsafe endpoints fail before network
+  ---
+  duration_ms: 0.3167
+  type: 'test'
+  ...
+# Subtest: whole-paragraph contract requires exact source text and computes Unicode offsets locally
+ok 7 - whole-paragraph contract requires exact source text and computes Unicode offsets locally
+  ---
+  duration_ms: 0.2
+  type: 'test'
+  ...
+# Subtest: explicit app prefix is preserved without guessing or falling back
+ok 8 - explicit app prefix is preserved without guessing or falling back
+  ---
+  duration_ms: 2.8906
+  type: 'test'
+  ...
+# Subtest: HTTP/application errors sanitized, no retries or redirects
+ok 9 - HTTP/application errors sanitized, no retries or redirects
+  ---
+  duration_ms: 4.6426
+  type: 'test'
+  ...
+# Subtest: truncated, tool, malformed, refused and incomplete responses never yield edits
+ok 10 - truncated, tool, malformed, refused and incomplete responses never yield edits
+  ---
+  duration_ms: 9.2126
+  type: 'test'
+  ...
+# Subtest: abort cancels generation and leaves next request usable
+ok 11 - abort cancels generation and leaves next request usable
+  ---
+  duration_ms: 45.5481
+  type: 'test'
+  ...
+# Subtest: invalid or excessive input does not contact provider
+ok 12 - invalid or excessive input does not contact provider
+  ---
+  duration_ms: 4.0706
+  type: 'test'
+  ...
+# Subtest: connection probe rejects edits and source claims
+ok 13 - connection probe rejects edits and source claims
+  ---
+  duration_ms: 0.2231
+  type: 'test'
+  ...
+# Subtest: 세션 부트스트랩과 토큰/Origin/Host 경계를 강제한다
+ok 14 - 세션 부트스트랩과 토큰/Origin/Host 경계를 강제한다
+  ---
+  duration_ms: 148.1518
+  type: 'test'
+  ...
+# Subtest: 선택한 두 모델과 인증을 정확한 endpoint에 보내고 임의 응답 필드가 UI로 새지 않는다
+ok 15 - 선택한 두 모델과 인증을 정확한 endpoint에 보내고 임의 응답 필드가 UI로 새지 않는다
+  ---
+  duration_ms: 18.2416
+  type: 'test'
+  ...
+# Subtest: 외부 HTTP·사용자정보·쿼리 endpoint와 redirect 전송을 거부한다
+ok 16 - 외부 HTTP·사용자정보·쿼리 endpoint와 redirect 전송을 거부한다
+  ---
+  duration_ms: 6.3923
+  type: 'test'
+  ...
+# Subtest: 인증/잘못된 JSON 오류를 정제하고 자동 재시도와 키 로그를 남기지 않는다
+ok 17 - 인증/잘못된 JSON 오류를 정제하고 자동 재시도와 키 로그를 남기지 않는다
+  ---
+  duration_ms: 6.0754
+  type: 'test'
+  ...
+# Subtest: 취소된 HTTP 요청 후에도 다음 요청이 정상 처리된다
+ok 18 - 취소된 HTTP 요청 후에도 다음 요청이 정상 처리된다
+  ---
+  duration_ms: 109.7031
+  type: 'test'
+  ...
+# Subtest: 정적 자산은 로컬 CSP로 제공하고 경로 순회와 잘못된 JSON을 거부한다
+ok 19 - 정적 자산은 로컬 CSP로 제공하고 경로 순회와 잘못된 JSON을 거부한다
+  ---
+  duration_ms: 3.7052
+  type: 'test'
+  ...
+# Subtest: HyperCLOVA registry와 합성 연결 테스트는 사용자 문맥/키를 저장하지 않는다
+ok 20 - HyperCLOVA registry와 합성 연결 테스트는 사용자 문맥/키를 저장하지 않는다
+  ---
+  duration_ms: 5.9159
+  type: 'test'
+  ...
+# Subtest: 연결 키 삭제 후 기존 모델로 호출할 수 없다
+ok 21 - 연결 키 삭제 후 기존 모델로 호출할 수 없다
+  ---
+  duration_ms: 2.0972
+  type: 'test'
+  ...
+# Subtest: connection metadata hides secrets; key reuse cannot switch destinations; replacement and removal work
+ok 22 - connection metadata hides secrets; key reuse cannot switch destinations; replacement and removal work
+  ---
+  duration_ms: 13.8263
+  type: 'test'
+  ...
+1..22
+# tests 22
+# suites 0
+# pass 22
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2263.5545

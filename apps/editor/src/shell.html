@@ -14,6 +14,20 @@
  <section id="editor-panel"><div class="panel-heading"><strong>작업 문서</strong><button id="open-document">열기</button><button id="new-document">＋ 새 문서</button><button id="save-document">저장</button></div><div id="documents" aria-label="편집 문서"></div><nav id="document-tabs" aria-label="문서 탭"><div id="document-tab-list" role="tablist"></div><span id="shell-status" role="status"></span></nav></section>
 </main>
 <dialog id="close-document"><form method="dialog"><h2>변경 내용을 저장할까요?</h2><p id="close-document-name"></p><p class="hint">저장하지 않고 닫으면 이 문서의 로컬 복구본도 제거됩니다.</p><div class="dialog-actions"><button value="save">저장하고 닫기</button><button value="discard">저장하지 않음</button><button value="cancel" autofocus>취소</button></div></form></dialog>
-<dialog id="model-dialog"><form id="model-form"><h2>AI 연결 설정</h2><p class="hint">구현된 API 방식만 선택할 수 있습니다. 연결 테스트는 짧은 합성 요청을 1회 전송하며 API 사용량이 발생할 수 있습니다. 문서·대화·자료는 보내지 않습니다. 키는 메모리에만 보관하며 채팅이나 설정 파일에 저장하지 않습니다. 앱 창을 닫아도 로컬 서버가 실행 중이면 유지됩니다. 아래 버튼으로 삭제할 수 있습니다.</p><label>API 방식<select id="config-adapter"><option value="openai-compatible">OpenAI 호환 Chat Completions</option><option value="hyperclova">HyperCLOVA X · v3 구조화 출력</option></select></label><p id="adapter-hint" class="hint"></p><label>연결 이름<input id="config-label" required placeholder="기관 AI"/></label><label>Endpoint<input id="config-endpoint" type="url" required placeholder="https://서버주소/v1"/></label><label>모델 ID<input id="config-model" required placeholder="서버에서 제공하는 실제 모델 ID"/></label><label id="config-token-field" hidden>최대 출력 토큰<input id="config-tokens" type="number" min="128" max="8192" step="1" value="4096"/></label><label>API 키<input id="config-key" type="password" autocomplete="off" placeholder="인증이 없는 로컬 서버는 비워 둘 수 있습니다."/></label><p id="config-status" role="status"></p><div class="dialog-actions"><button type="button" id="clear-credentials">연결 키 삭제</button><button type="button" id="close-settings">취소</button><button type="button" id="test-connection">연결 테스트 (API 호출)</button><button type="submit">연결 등록</button></div></form></dialog>
+<dialog id="model-dialog"><form id="model-form">
+<h2>AI 연결 설정</h2><button type="button" id="new-connection">＋ 새 연결</button>
+<p class="hint">현재 선택한 연결을 수정합니다. 연결 테스트는 문서·대화·자료 없이 합성 요청 1회를 전송하며 API 사용량이 발생할 수 있습니다. 키는 채팅에 저장하지 않습니다. 암호화 저장을 끄면 현재 서버 실행 중에만 유지됩니다.</p>
+<label>API 방식<select id="config-adapter"><option value="openai-compatible">OpenAI 호환 Chat Completions</option><option value="hyperclova">HyperCLOVA X · v3</option></select></label>
+<p id="adapter-hint" class="hint"></p>
+<label>연결 이름<input id="config-label" required placeholder="기관 AI"/></label>
+<label>Endpoint<input id="config-endpoint" type="url" required placeholder="https://서버주소/v1"/></label>
+<label>모델 ID<input id="config-model" required placeholder="승인된 실제 모델 ID"/></label>
+<label id="config-token-field" hidden>최대 출력 토큰<input id="config-tokens" type="number" min="128" max="8192" step="1" value="4096"/></label>
+<label>API 키<input id="config-key" type="password" autocomplete="off" placeholder="인증이 없는 로컬 서버는 비워 둘 수 있습니다."/></label>
+<label class="remember-connection"><input id="config-remember" type="checkbox"/> 이 Windows 계정에 암호화 저장</label>
+<p class="hint">저장한 연결은 재실행 후 복원됩니다. 암호화 실패 시 평문으로 저장하지 않습니다. 주소·모델·API 방식을 바꿀 때는 키를 다시 입력하세요.</p>
+<p id="config-status" role="status"></p>
+<div class="dialog-actions"><button type="button" id="delete-connection">선택 연결 삭제</button><button type="button" id="clear-credentials">모든 키 삭제</button><button type="button" id="close-settings">닫기</button><button type="button" id="test-connection">연결 테스트 (API 호출)</button><button type="submit">연결 저장</button></div>
+</form></dialog>
 <dialog id="change-dialog"><h2>AI 변경 내용</h2><div class="diff-columns"><section><h3>변경 전</h3><pre id="diff-before"></pre></section><section><h3>변경 후</h3><pre id="diff-after"></pre></section></div><form method="dialog"><button>닫기</button></form></dialog>
 <script type="module" src="/src/jueony/shell.ts"></script></body></html>

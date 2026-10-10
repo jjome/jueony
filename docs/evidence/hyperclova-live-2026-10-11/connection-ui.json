@@ -1,0 +1,13 @@
+{
+  "status": "PASS",
+  "results": [
+    "UI saves an encrypted key without exposing it",
+    "restart restores selected connection and leaves key input blank",
+    "blank key preserves existing credentials when editing the label",
+    "changing a target requires explicit key entry before sending",
+    "replacement key survives restart and is used by the provider",
+    "deleting a selected connection persists across restart"
+  ],
+  "provider": "local fixture; fake credentials only",
+  "runtime": "Edg/155.0.4283.45"
+}

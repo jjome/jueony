@@ -44,12 +44,13 @@ try{
  await page.waitForFunction(()=>[...document.querySelectorAll('.editor-frame')].some(f=>f.contentWindow?.jueonyEditor?.snapshot)&&document.getElementById('app-status').textContent.includes('준비 완료'),{timeout:60000});
  assert.equal((await snapshot()).nodes.length,1);pass('three panes and live editor ready');
  const duplicate=await browser.newPage();await duplicate.goto(appUrl);await duplicate.waitForFunction(()=>document.getElementById('app-status').textContent.includes('다른 Jueony 창'));assert.equal(await duplicate.$eval('#app-shell',e=>e.inert),true);await duplicate.close();pass('second window cannot overwrite workspace storage');
- await page.click('#connection-settings');
+ await page.click('#connection-settings');await page.waitForFunction(()=>document.getElementById('model-dialog').open);
  assert.deepEqual(await page.$$eval('#config-adapter option',els=>els.map(e=>e.value)),['openai-compatible','hyperclova']);
  if(native){
   await page.select('#config-adapter','hyperclova');
   await page.$eval('#config-endpoint',e=>{e.value='http://127.0.0.1:4194/v3/chat-completions';});
-  assert.equal(await page.$eval('#config-model',e=>e.value),'HCX-007');
+  assert.equal(await page.$eval('#config-model',e=>e.value),'HCX-005');
+  await page.$eval('#config-model',e=>{e.value='HCX-007';});
   await page.type('#config-key','test-only-secret');await page.click('#test-connection');
   await page.waitForFunction(()=>document.getElementById('config-status').textContent.includes('연결 테스트 성공'));
   assert.equal(await page.$eval('#config-key',e=>e.value),'');
@@ -100,7 +101,7 @@ try{
  assert.equal((await snapshot()).nodes[0].text,'참고 문서의 미저장 최신 내용');
  const inputFrame=await activeFrame();await inputFrame.focus('[aria-label="문서 편집 입력"]');await page.keyboard.type('X');await page.waitForFunction(()=>[...document.querySelectorAll('.editor-frame')].find(f=>!f.hidden).contentWindow.jueonyEditor.snapshot().nodes.some(n=>n.text.includes('X')));pass('manual keyboard input changes the same live document');
  assert.equal(await page.$$eval('#workspace-select option',els=>els.length),2);assert.equal(await page.$$('.folder-root').then(e=>e.length),2);pass('restart restores workspace chats folders and documents');
- await page.click('#connection-settings');await page.click('#clear-credentials');await page.waitForFunction(()=>document.getElementById('config-status').textContent.includes('모두 삭제'));await page.click('#close-settings');pass('connection credentials can be cleared explicitly');
+ await page.click('#connection-settings');await page.waitForFunction(()=>document.getElementById('model-dialog').open);await page.click('#clear-credentials');await page.waitForFunction(()=>document.getElementById('config-status').textContent.includes('모두 삭제'));await page.click('#close-settings');pass('connection credentials can be cleared explicitly');
  await writeFile(resolve(evidence,'result.json'),JSON.stringify({results,errors,externalRequests,runtime:await browser.version(),build:await page.evaluate(()=>fetch('/build-evidence.json').then(r=>r.json())),adapter:native?'hyperclova':'openai-compatible',provider:'local deterministic protocol fixture; NOT a live LLM',folderAccess:'OPFS directory handles; NOT native Windows picker'},null,2));
  assert.deepEqual(errors,[]);assert.deepEqual(externalRequests,[]);console.log(JSON.stringify({passed:results.length,errors}));
 }catch(error){await page.screenshot({path:resolve(evidence,'failure.png'),fullPage:true}).catch(()=>{});await writeFile(resolve(evidence,'failure.json'),JSON.stringify({error:String(error),errors,results,status:await page.$eval('#app-status',e=>e.textContent).catch(()=>''),frames:await page.$$eval('.editor-frame',els=>els.map(e=>({hidden:e.hidden,ready:!!e.contentWindow?.jueonyEditor,name:e.contentWindow?.jueonyEditor?.state().name})))},null,2));console.error(error);process.exitCode=1;}finally{await browser.close();provider.close();}

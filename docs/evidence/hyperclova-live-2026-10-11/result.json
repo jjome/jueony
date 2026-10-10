@@ -1,0 +1,192 @@
+{
+  "startedAt": "2026-10-10T16:10:17.629Z",
+  "provider": "NAVER Cloud live API",
+  "model": "HCX-005",
+  "endpoint": "https://clovastudio.stream.ntruss.com/v3/chat-completions",
+  "syntheticDataOnly": true,
+  "checks": [
+    "live authentication and validated connection JSON",
+    "live provider registered through settings",
+    "real model new-document command applied to live editor",
+    "01-created HWP UI save and HWP/HWPX engine reopen",
+    "real model uses unsaved state and edits multiple locations",
+    "02-applied HWP UI save and HWP/HWPX engine reopen",
+    "request diff matches actual document",
+    "request undo restores unsaved user content",
+    "03-reverted HWP UI save and HWP/HWPX engine reopen",
+    "API key absent from persisted workspace state"
+  ],
+  "calls": [
+    {
+      "stage": "connection",
+      "httpStatus": 200,
+      "statusCode": "20000",
+      "statusMessage": "OK",
+      "finishReason": "tool_calls",
+      "usage": {
+        "promptTokens": 606,
+        "completionTokens": 43,
+        "totalTokens": 649
+      },
+      "durationMs": 2374
+    },
+    {
+      "stage": "document",
+      "httpStatus": 200,
+      "request": "기능 검증용 가상 문서를 새로 작성해줘. 제목은 주민 교육 계획, 나머지 세 문단은 목적, 일정, 기대 효과로 구성해줘. 총 네 문단으로 작성하고 각 문단은 한 문장으로 짧게 써줘. 실제 기관이나 개인정보는 넣지 마.",
+      "response": {
+        "result": {
+          "message": "기능 검증용 가상 문서를 새로 작성합니다. 제목은 '주민 교육 계획'이며, 나머지 세 문단은 '목적', '일정', '기대 효과'로 구성됩니다. 각 문단은 한 문장으로 짧게 작성됩니다.",
+          "sourceIds": [],
+          "operations": [
+            {
+              "kind": "create_document",
+              "paragraphs": [
+                "주민 교육 계획",
+                "목적",
+                "일정",
+                "기대 효과"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "stage": "document",
+      "httpStatus": 200,
+      "request": "현재 첫 문단의 맨 앞 \"미저장 \" 부분만 삭제하고, 마지막 문단 뒤에 \"문의 안내: 담당 부서에 문의 바랍니다.\"라는 문단 하나를 추가해줘. 다른 내용은 유지해줘.",
+      "response": {
+        "result": {
+          "message": "첫 문단의 맨 앞 '미저장 ' 부분을 삭제하고, 마지막 문단 뒤에 '문의 안내: 담당 부서에 문의 바랍니다.'라는 문단을 추가합니다.",
+          "sourceIds": [],
+          "operations": [
+            {
+              "kind": "replace_body_text",
+              "target": "s0p0",
+              "start": 0,
+              "count": 12,
+              "text": "주민 교육 계획"
+            },
+            {
+              "kind": "insert_body_paragraphs",
+              "after": "s0p3",
+              "paragraphs": [
+                "문의 안내: 담당 부서에 문의 바랍니다."
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "가상 문서 1건의 smoke 검사이며 품질의 일반적 보장이 아님",
+    "HWPX는 UI로 저장한 HWP를 동일 엔진에서 변환",
+    "실제 한글 2024 재열기 미검사"
+  ],
+  "syntheticProviderOutputs": [
+    {
+      "syntheticOutput": {
+        "role": "assistant",
+        "content": "",
+        "toolCalls": [
+          {
+            "id": "call_TqtejBKLxVSKU5szNCpfOvVl",
+            "type": "function",
+            "function": {
+              "name": "submit_document_edits",
+              "arguments": {
+                "message": "기능 검증용 가상 문서를 새로 작성합니다. 제목은 '주민 교육 계획'이며, 나머지 세 문단은 '목적', '일정', '기대 효과'로 구성됩니다. 각 문단은 한 문장으로 짧게 작성됩니다.",
+                "sourceIds": [],
+                "operations": [
+                  {
+                    "kind": "create_document",
+                    "paragraphs": [
+                      "주민 교육 계획",
+                      "목적",
+                      "일정",
+                      "기대 효과"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "finishReason": "tool_calls"
+    },
+    {
+      "syntheticOutput": {
+        "role": "assistant",
+        "content": "",
+        "toolCalls": [
+          {
+            "id": "call_unwAO2zTu9gCnSHIe1Z4V8cm",
+            "type": "function",
+            "function": {
+              "name": "submit_document_edits",
+              "arguments": {
+                "message": "첫 문단의 맨 앞 '미저장 ' 부분을 삭제하고, 마지막 문단 뒤에 '문의 안내: 담당 부서에 문의 바랍니다.'라는 문단을 추가합니다.",
+                "sourceIds": [],
+                "operations": [
+                  {
+                    "kind": "replace_body_paragraph",
+                    "target": "s0p0",
+                    "originalText": "미저장 주민 교육 계획",
+                    "text": "주민 교육 계획"
+                  },
+                  {
+                    "kind": "insert_body_paragraphs",
+                    "after": "s0p3",
+                    "paragraphs": [
+                      "문의 안내: 담당 부서에 문의 바랍니다."
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "finishReason": "tool_calls"
+    }
+  ],
+  "created": [
+    "주민 교육 계획",
+    "목적",
+    "일정",
+    "기대 효과"
+  ],
+  "beforeEdit": [
+    "미저장 주민 교육 계획",
+    "목적",
+    "일정",
+    "기대 효과"
+  ],
+  "afterEdit": [
+    "주민 교육 계획",
+    "목적",
+    "일정",
+    "기대 효과",
+    "문의 안내: 담당 부서에 문의 바랍니다."
+  ],
+  "pageErrors": [],
+  "runtime": "Edg/155.0.4283.45",
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@rhwp/core@0.8.7",
+    "builtAt": "2026-10-10T16:01:58.999Z",
+    "engineWasmSha256": "54cf95014312e605c51b98eb9021247ea79ef2bbd0a7080e11c011d0246e3989",
+    "buildScriptSha256": "5e1ec254498dac3f78d57cbd6046b741720bc80944cd6de5ba7b9686af084c5e",
+    "customSourceSha256": "231189e5dc4d59482e84b176bc5afc9c0386bd287ae1cb67848857137d7408af",
+    "applicationSourceCommit": "4b87a6ed516829124db1c49418d1cc65568adfab",
+    "applicationSourceDirty": true,
+    "sourceBuild": false,
+    "note": "Rust 엔진은 공식 npm WASM 바이너리 사용. 이 빌드에서 Rust 엔진을 재컴파일하지 않음."
+  },
+  "status": "PASS",
+  "finishedAt": "2026-10-10T16:10:47.814Z"
+}

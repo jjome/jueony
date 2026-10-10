@@ -22,7 +22,7 @@ if (-not (Test-Path -LiteralPath (Join-Path $dist 'index.html'))) { throw 'scrip
 if (-not $nodePath) { throw 'Node.js 22 이상 또는 준비된 jueony-mvp 실행 묶음이 필요합니다.' }
 $port = 4173
 $running = $false
-try { $health = Invoke-RestMethod "http://127.0.0.1:$port/api/health" -TimeoutSec 2; $running = $health.application -eq 'jueony' -and $health.apiVersion -eq 1 } catch {}
+try { $health = Invoke-RestMethod "http://127.0.0.1:$port/api/health" -TimeoutSec 2; $running = $health.application -eq 'jueony' -and $health.apiVersion -eq 1 -and $health.connectionStorageVersion -eq 1 } catch {}
 if (-not $running) {
     $occupied = Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue
     if ($occupied) { throw '4173 포트의 이전 편집기 서버 또는 다른 프로그램을 종료한 뒤 다시 실행해 주세요. 열린 문서는 먼저 저장하세요.' }

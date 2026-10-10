@@ -19,7 +19,7 @@ before(async()=>{
   if(body.model==='slow')await new Promise(r=>setTimeout(r,1500));
   res.setHeader('Content-Type','application/json');res.end(JSON.stringify({choices:[{message:{content:JSON.stringify({message:body.model,sourceIds:[],operations:[]})}}]}));
  });await new Promise(r=>provider.listen(4196,'127.0.0.1',r));
- server=spawn(process.execPath,['server.mjs'],{cwd:resolve('apps/launcher'),env:{...process.env,JUEONY_PORT:'4195',JUEONY_DIST:resolve('apps/editor/dist')},stdio:['ignore','pipe','pipe'],windowsHide:true});
+ server=spawn(process.execPath,['server.mjs'],{cwd:resolve('apps/launcher'),env:{...process.env,JUEONY_PORT:'4195',JUEONY_DIST:resolve('apps/editor/dist'),JUEONY_CONNECTION_STORE:'memory'},stdio:['ignore','pipe','pipe'],windowsHide:true});
  server.stdout.on('data',b=>logs+=b);server.stderr.on('data',b=>logs+=b);
  for(let i=0;i<50;i++){try{const r=await fetch(origin+'/api/health');if(r.ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
  const r=await fetch(origin+'/api/session',{headers:{Origin:origin,'X-Jueony-Bootstrap':'1'}});assert.equal(r.status,200);token=(await r.json()).token;
@@ -76,3 +76,22 @@ test('HyperCLOVA registry와 합성 연결 테스트는 사용자 문맥/키를 
 });
 
 test('연결 키 삭제 후 기존 모델로 호출할 수 없다',async()=>{await config('model-a');assert.equal((await post('clear-credentials',{})).status,200);assert.equal((await post('generate',{configId:'model-a',input})).status,400);});
+test('connection metadata hides secrets; key reuse cannot switch destinations; replacement and removal work',async()=>{
+ const selected={id:'key-reuse',adapterId:'openai-compatible',label:'Fixture',endpoint:providerOrigin+'/v1',modelId:'model-a'};
+ assert.equal((await post('configure',{config:{...selected,secret:'must-not-leak'},key:'first-fake-key'})).status,200);
+ const metadata=await (await post('connections',{})).json();assert.equal(metadata.secureStorage,false);
+ assert.doesNotMatch(JSON.stringify(metadata),/first-fake-key|must-not-leak/);assert.equal(metadata.connections.find(c=>c.config.id===selected.id).hasKey,true);
+ assert.equal((await post('configure',{config:{...selected,label:'Renamed'}})).status,200);
+ await post('generate',{configId:selected.id,input});assert.equal(calls.at(-1).authorization,'Bearer first-fake-key');
+ for(const change of [{endpoint:providerOrigin+'/other'},{modelId:'model-b'},{adapterId:'hyperclova'}]){
+  assert.equal((await post('test-connection',{config:{...selected,...change}})).status,400);
+  assert.equal((await post('configure',{config:{...selected,...change}})).status,400);
+ }
+ assert.equal((await post('configure',{config:selected,key:'replacement-fake-key'})).status,200);
+ await post('generate',{configId:selected.id,input});assert.equal(calls.at(-1).authorization,'Bearer replacement-fake-key');
+ assert.equal((await post('configure',{config:selected,key:'other',remember:true})).status,400);
+ await post('generate',{configId:selected.id,input});assert.equal(calls.at(-1).authorization,'Bearer replacement-fake-key');
+ assert.equal((await post('remove-connection',{configId:selected.id})).status,200);
+ assert.equal((await post('generate',{configId:selected.id,input})).status,400);
+ assert.doesNotMatch(logs,/first-fake-key|replacement-fake-key/);
+});

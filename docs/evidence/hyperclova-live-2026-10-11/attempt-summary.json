@@ -1,0 +1,107 @@
+[
+  {
+    "startedAt": "2026-10-10T15:52:10.816Z",
+    "model": "HCX-007",
+    "status": "FAIL",
+    "callCount": 3,
+    "checks": [
+      "live authentication and complete edit JSON schema",
+      "live provider registered through settings",
+      "real model new-document command applied to live editor",
+      "01-created HWP UI save and HWP/HWPX engine reopen"
+    ],
+    "error": "Agent rejected or failed to apply response\n+ actual - expected\n\n+ '알 수 없는 출처입니다.'\n- 'AI 요청이 완료되었습니다.'\n"
+  },
+  {
+    "startedAt": "2026-10-10T15:54:49.321Z",
+    "model": "HCX-007",
+    "status": "FAIL",
+    "callCount": 1,
+    "checks": [],
+    "error": "CLOVA Studio API 키와 모델 접근 권한을 확인해 주세요."
+  },
+  {
+    "startedAt": "2026-10-10T16:02:06.598Z",
+    "model": "HCX-005",
+    "status": "FAIL",
+    "callCount": 1,
+    "checks": [],
+    "error": "모델이 편집 JSON을 반환하지 않았습니다. 자동 재시도하지 않았습니다."
+  },
+  {
+    "startedAt": "2026-10-10T16:02:56.583Z",
+    "model": "HCX-005",
+    "status": "FAIL",
+    "callCount": 1,
+    "checks": [],
+    "error": "모델이 편집 JSON을 반환하지 않았습니다. 자동 재시도하지 않았습니다."
+  },
+  {
+    "startedAt": "2026-10-10T16:04:02.246Z",
+    "model": "HCX-005",
+    "status": "FAIL",
+    "callCount": 1,
+    "checks": [
+      "live authentication and validated connection JSON"
+    ],
+    "error": "Waiting failed: 60000ms exceeded"
+  },
+  {
+    "startedAt": "2026-10-10T16:05:58.534Z",
+    "model": "HCX-005",
+    "status": "FAIL",
+    "callCount": 3,
+    "checks": [
+      "live authentication and validated connection JSON",
+      "live provider registered through settings",
+      "real model new-document command applied to live editor",
+      "01-created HWP UI save and HWP/HWPX engine reopen"
+    ],
+    "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   '민 교육 계획',\n-   '주민 교육 계획',\n    '목적: 주민들의 역량을 강화하고 삶의 질을 향상시키기 위해 교육을 실시합니다.',\n    '일정: 2023년 미정',\n    '기대 효과: 주민들의 참여와 만족도를 높일 수 있습니다.',\n    '문의 안내: 담당 부서에 문의 바랍니다.'\n  ]\n"
+  },
+  {
+    "startedAt": "2026-10-10T16:07:25.556Z",
+    "model": "HCX-005",
+    "status": "FAIL",
+    "callCount": 3,
+    "checks": [
+      "live authentication and validated connection JSON",
+      "live provider registered through settings",
+      "real model new-document command applied to live editor",
+      "01-created HWP UI save and HWP/HWPX engine reopen"
+    ],
+    "error": "Model request failed: 모델이 편집 JSON을 반환하지 않았습니다. 자동 재시도하지 않았습니다.\n\n400 !== 200\n"
+  },
+  {
+    "startedAt": "2026-10-10T16:08:24.453Z",
+    "model": "HCX-005",
+    "status": "FAIL",
+    "callCount": 3,
+    "checks": [
+      "live authentication and validated connection JSON",
+      "live provider registered through settings",
+      "real model new-document command applied to live editor",
+      "01-created HWP UI save and HWP/HWPX engine reopen"
+    ],
+    "error": "Model request failed: 모델이 편집 JSON을 반환하지 않았습니다. 자동 재시도하지 않았습니다.\n\n400 !== 200\n"
+  },
+  {
+    "startedAt": "2026-10-10T16:10:17.629Z",
+    "model": "HCX-005",
+    "status": "PASS",
+    "callCount": 3,
+    "checks": [
+      "live authentication and validated connection JSON",
+      "live provider registered through settings",
+      "real model new-document command applied to live editor",
+      "01-created HWP UI save and HWP/HWPX engine reopen",
+      "real model uses unsaved state and edits multiple locations",
+      "02-applied HWP UI save and HWP/HWPX engine reopen",
+      "request diff matches actual document",
+      "request undo restores unsaved user content",
+      "03-reverted HWP UI save and HWP/HWPX engine reopen",
+      "API key absent from persisted workspace state"
+    ],
+    "error": null
+  }
+]

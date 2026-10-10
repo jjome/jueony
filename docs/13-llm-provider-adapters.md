@@ -11,7 +11,7 @@
 | GPT / `openai-responses` | OpenAI Responses | 전용 adapter 구현 명세 완료, 코드 미구현 |
 | Claude / `anthropic` | Anthropic Messages | 구현 명세 완료, 코드 미구현 |
 | Gemini / `gemini` | Gemini Generate Content | 구현 명세 완료, 코드 미구현 |
-| HyperCLOVA X / `hyperclova` | CLOVA Studio v3 Structured Outputs | 전용 adapter·설정 UI·합성 연결 테스트 구현, 실제 계정 호출 대기 |
+| HyperCLOVA X / `hyperclova` | CLOVA Studio v3: HCX-005 함수 호출 / HCX-007 Structured Outputs | 서비스 HCX-005 실호출 문서 흐름 통과. 초안 품질·기관망 검증은 별도 |
 | 기존 `openai-compatible` | Chat Completions 호환 | 유지. GPT 등의 호환 endpoint를 입력할 수 있으나 제공자별 실호출은 별도 검증 필요 |
 
 MVP는 모델을 한 번 호출하고 완성된 응답을 검증한 뒤 편집한다. 스트리밍 편집, 자동 재시도, 제공자 자동 전환, RAG, 자율 실행 loop는 추가하지 않는다. 네 제공자를 전부 구현한 상태처럼 UI에 표시하지 않는다.
@@ -74,7 +74,7 @@ Port 반환값은 의도적으로 미검증 값이다. `validateGeneration`이 �
 
 현재 `generationSchema()`는 CLOVA가 명시한 부분집합에 맞춘 출력 형식이다. 다음 adapter 구현 시 원본 명령 계약은 공유하되 제공자별 schema 투영 함수를 둔다. OpenAI/Claude의 strict 모드용 `additionalProperties:false`, 지원하지 않는 수치 제약 제거 등을 명시적으로 변환한다. schema 오류가 나면 느슨한 출력으로 몰래 재호출하지 않는다.
 
-설정은 adapter ID / 연결 이름 / endpoint / 모델 ID / 선택적 출력 토큰 상한이다. 제공자 연결과 모델 선택을 분리한다. 키는 별도 인자로 전달하고 서버 프로세스 메모리에만 둔다. IndexedDB에는 비밀이 아닌 설정만 저장한다. 키 입력창도 등록·테스트 종료 후 비운다.
+설정은 adapter ID / 연결 이름 / endpoint / 모델 ID / 선택적 출력 토큰 상한이다. 제공자 연결과 모델 선택을 분리한다. 키는 별도 인자로 전달한다. Windows DPAPI CurrentUser 암호화 저장을 선택할 수 있으며 미선택 시 서버 메모리에만 둔다. IndexedDB에는 비밀이 아닌 설정만 저장한다. 키 입력창도 등록·테스트 종료 후 비운다. 저장소 실패 시 평문 폴백은 없다. 연결 수정·개별 삭제·전체 키 삭제와 재시작 복원을 지원한다.
 
 현재 오류는 정제한 사용자 메시지로 UI에 전달된다. 신규 adapter 구현 시 인증, 한도, 연결/시간 초과, 취소, 미완성 응답, 거부, 잘못된 출력 유형을 공통 오류 계약으로 확장한다. 원격 오류 본문 전체, 키, 입력 문서는 로그에 넣지 않는다. 현재 HyperCLOVA 내부 오류 코드는 있으나 공통 UI 오류 코드/토큰 사용량 표시는 후속 작업이다.
 
@@ -116,11 +116,13 @@ Port 반환값은 의도적으로 미검증 값이다. `validateGeneration`이 �
 
 ## 7. HyperCLOVA X 구현 결과
 
-일반용 기본 endpoint는 `https://clovastudio.stream.ntruss.com/v3/chat-completions`다. 모델 ID를 경로 끝에 추가하고 Bearer 인증으로 호출한다. 현 전용 adapter는 공식 구조화 출력 지원 범위에 맞춰 `HCX-007`만 받는다. `responseFormat` JSON schema와 `thinking.effort:none`을 사용한다. 출처: [API 공통 규격](https://api.ncloud-docs.com/docs/ai-naver-clovastudio-summary), [v3 구조화 출력](https://api.ncloud-docs.com/docs/clovastudio-chatcompletionsv3-so).
+일반용 기본 endpoint는 `https://clovastudio.stream.ntruss.com/v3/chat-completions`다. 모델 ID를 추가하고 Bearer 인증으로 호출한다. HCX-005는 지정 함수 `submit_document_edits`의 인수를 받아 원문 대조 후 내부 명령으로 변환한다. HCX-007은 `responseFormat` schema와 `thinking.effort:none`을 사용한다. [v3 함수 호출](https://api.ncloud-docs.com/docs/clovastudio-chatcompletionsv3-fc), [구조화 출력](https://api.ncloud-docs.com/docs/clovastudio-chatcompletionsv3-so).
+
+`paragraph-contract.mjs`가 HCX-005용 원문 전체 교체/비우기 계약과 범위 계산을 맡는다. 생성/삽입은 기존 계약을 유지한다. 원문 불일치·숫자 범위 명령·알 수 없는 명령은 거절하고, 기존 `validateGeneration`의 출처·명령·버전 검증도 그대로 수행한다. 함수 호출은 응답 전달 방식이며 RAG나 agent loop를 추가한 것이 아니다.
 
 이번 앱의 정책/구현:
 - 비스트리밍 1회 호출, 90초 제한, 응답 1 MB 제한.
-- 출력 토큰 기본 4096, UI 범위 128~8192. 이는 앱의 상한이다.
+- 출력 토큰 기본 4096. HCX-005는 함수 호출 규격에 따라 1024~4096, HCX-007은 앱 상한 128~8192.
 - HTTP와 응답 본문의 성공 상태를 둘 다 확인한다. 길이 제한 종료 등은 JSON 일부가 유효해 보여도 적용하지 않는다.
 - 입력 endpoint를 그대로 사용하며 일반용/공공용/호환 API 간 자동 전환을 하지 않는다. 명시된 testapp/serviceapp 접두 경로는 보존한다.
 - 서버의 `/api/test-connection`은 합성 문맥만 사용한다. 테스트 키/설정을 registry에 저장하지 않고 결과 텍스트도 기록하지 않는다.
@@ -135,14 +137,14 @@ Port 반환값은 의도적으로 미검증 값이다. `validateGeneration`이 �
 | --- | --- | --- |
 | L01 | 4개 제공자 명세·책임 경계 | 완료 |
 | L02 | HyperCLOVA native adapter·UI·합성 연결 테스트 | 구현 및 로컬 검증 완료 |
-| L03 | 일반 NAVER Cloud 실제 연결 | 대기: 사용자가 키 입력 후 연결 테스트 |
-| L04 | 실제 모델의 본문 초안·교체·삽입·삭제·undo·저장 | 대기: 품질/호환성 결과 기록 |
+| L03 | 일반 NAVER Cloud 실제 연결 | 완료: 승인 서비스 HCX-005 인증 및 지정 함수 호출 통과 |
+| L04 | 실제 모델의 본문 초안·교체·삽입·삭제·undo·저장 | 부분 완료: 합성 문서 생성·부분 삭제를 위한 전체 교체·삽입·undo·저장 통과. 자료 인용·초안 품질·독립 한글 검수는 대기 |
 | L05 | GPT Responses native adapter | 명세 완료 / 코드·실호출 미완료 |
 | L06 | Claude native adapter | 명세 완료 / 코드·실호출 미완료 |
 | L07 | Gemini native adapter | 명세 완료 / 코드·실호출 미완료 |
 | L08 | 공통 오류 코드·usage 및 모델 capability 정리 | 후속: 실제 사용 UI 필요에 맞춰 추가 |
 | L09 | 기관 endpoint 고정 정책·키 보관 정책 | 기관망 요건 확인 후 별도 구현 |
 
-공통 검사: 선택 모델/endpoint가 정확히 전달됨, key 비저장, redirect 거부, 다른 업무 문맥 배제, 취소와 늦은 응답 차단, 미지원 명령 무적용, 전체 batch 검증, 실제 문서 버전 충돌, 요청 undo. 모델에 보내는 지시문만으로 안전성을 판정하지 않는다.
+공통 검사: 선택 모델/endpoint 전달, key 평문 비저장, redirect 거부, 다른 업무 문맥 배제, 취소와 늦은 응답 차단, 미지원 명령 무적용, 전체 batch 검증, 문서 버전 충돌, 요청 undo. 모델 지시문만으로 안전성을 판정하지 않는다.
 
-로컬 fixture 검사는 wire 규격과 앱 동작을 검증한다. 실제 추론 품질, 계정 권한, 클라우드 schema 수용 여부, 네트워크 통신 및 과금 확인은 L03/L04에 남긴다.
+로컬 fixture와 [실제 API 검사](evidence/hyperclova-live-2026-10-11/README.md)를 구분한다. 실제 생성 초안은 항목명만 반환해 충분한 내용 작성 품질은 미달했다. 모델 기능 전체나 과금 청구 금액, 기관망을 검증한 것은 아니다.

@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "health": {
+    "application": "jueony",
+    "apiVersion": 1,
+    "connectionStorageVersion": 1
+  },
+  "restoredConnection": {
+    "config": {
+      "id": "naver-service",
+      "adapterId": "hyperclova",
+      "label": "NAVER 서비스 · HCX-005",
+      "endpoint": "https://clovastudio.stream.ntruss.com/v3/chat-completions",
+      "modelId": "HCX-005",
+      "maxOutputTokens": 4096
+    },
+    "remember": true,
+    "hasKey": true
+  },
+  "secureStorage": true,
+  "uiModel": "HCX-005",
+  "keyInputBlank": true,
+  "apiCallMade": false
+}

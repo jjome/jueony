@@ -8,9 +8,9 @@
 
 업무와 채팅을 만들고 로컬 폴더를 연결한다. 원본을 복사하거나 이동하지 않으며 연결 해제도 원본을 삭제하지 않는다. 파일/폴더를 체크한 경우에만 요청 자료로 읽는다. HWP/HWPX와 UTF-8 TXT/MD를 지원한다. PDF/DOCX/XLSX/OCR은 미지원이다.
 
-AI 연결 설정에서 OpenAI 호환 Chat Completions 또는 HyperCLOVA X v3를 선택하고 endpoint, 연결 이름, 모델 ID, 키를 등록한다. 일반 NAVER Cloud 개발 계정은 [HyperCLOVA 가이드](../../docs/14-hyperclova-x-api-guide.md)를 따른다. 합성 연결 테스트 버튼은 문서/자료 없이 API를 1회 호출한다. 설정 등록 후 실제 요청에서 인증/모델을 확인한다. 제공자와 모델 선택을 분리했고 등록한 연결만 표시한다. 실제 키가 제공되지 않아 자동 검증은 로컬 HTTP fixture로 수행했으며 이것을 실제 LLM 실행으로 보고하지 않는다.
+AI 연결 설정에서 OpenAI 호환 Chat Completions 또는 HyperCLOVA X v3를 선택하고 endpoint, 연결 이름, 모델 ID, 키를 등록한다. 일반 NAVER Cloud 계정은 [HyperCLOVA 가이드](../../docs/14-hyperclova-x-api-guide.md)를 따른다. 합성 연결 테스트는 문서/자료 없이 API를 1회 호출한다. 2026-10-11 서비스 HCX-005의 실제 생성·수정·undo·저장 흐름을 검증했다. 초안 품질과 기관망 검증은 별도다.
 
-키는 서버 메모리에만 보관한다. 창을 닫아도 서버는 실행 중일 수 있다. AI 연결 설정의 연결 키 삭제 버튼으로 제거할 수 있다. 서버 재시작 후에는 키를 다시 입력한다.
+키는 Windows 계정별 DPAPI 암호화 저장을 선택할 수 있다. 저장 시 재시작 후 복원한다. 미선택 시 서버 메모리에만 두며 창을 닫아도 서버가 실행 중이면 유지된다. AI 연결 설정에서 키 교체, 새 연결, 선택 연결 삭제, 모든 키 삭제를 제공한다. 일반 로그/채팅/IndexedDB에는 키를 기록하지 않는다. 실행 묶음에 connection-store.mjs와 credential-protect.ps1도 함께 유지한다.
 
 ## 편집과 저장
 

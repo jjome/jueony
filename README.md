@@ -22,7 +22,7 @@
 
 [HyperCLOVA X 연결 가이드](docs/14-hyperclova-x-api-guide.md), [최신 MVP 실행·지원 범위·검증 결과](docs/12-mvp-implementation.md), [개발·빌드 방법](apps/editor/README.md)을 먼저 읽는다. 복잡한 원본 문서는 사본으로 검수한다. 현재 빌드의 글꼴 대체와 미지원 개체 때문에 한글에서의 지면·개체 보존을 별도로 확인해야 한다.
 
-문서 엔진은 Rust/WASM, 화면·Agent는 TypeScript, 로컬 API는 동봉한 Node 서버다. 현재 실행 진입점은 PowerShell이며 별도 Rust 런처 소스도 유지한다. **rhwp가 열린 문서 상태를 소유**한다. workspace·채팅·명시 자료·OpenAI 호환/HyperCLOVA X adapter·여러 본문 위치 직접 편집·요청 undo를 연결했다. 실제 기관 LLM은 endpoint와 인증정보가 없어 검증 대기이며 AI 표·서식·개체·쪽 설정은 미지원이다. 키는 서버 메모리에만 보관하며 연결 설정에서 삭제한다. 실제 모델/한글 독립 검수까지 완료한 제품으로 보고하지 않는다.
+문서 엔진은 Rust/WASM, 화면·Agent는 TypeScript, 로컬 API는 동봉한 Node 서버다. **rhwp가 열린 문서 상태를 소유**한다. workspace·채팅·명시 자료·OpenAI 호환/HyperCLOVA X adapter·여러 본문 편집·요청 undo를 연결했다. 2026-10-11 일반 NAVER Cloud 서비스 HCX-005의 실제 생성·미저장 문맥 수정·비교·undo·저장을 확인했다. 키는 Windows DPAPI 암호화 저장을 선택할 수 있고 설정에서 교체·삭제한다. 기관망·초안 품질·실제 한글 독립 검수는 남아 있으며 AI 표·서식·개체·쪽 설정은 미지원이다.
 
 ## 프로젝트 문서
 
@@ -56,7 +56,7 @@
 
 ## 최신 MVP 검증 결과
 
-앱/엔진 **19개**, 로컬 API **7개**, headless Edge 통합 **18개**가 통과했다. 타입 검사·빌드도 수행했다. 모델은 실제 LLM과 구분한 로컬 HTTP fixture, 폴더는 OPFS 핸들로 검증했다. [세부 결과와 미검증 항목](docs/12-mvp-implementation.md), [28개 수용 검사 상태](docs/mvp-acceptance-results.csv)를 참고한다.
+앱/엔진 **19개**, 로컬 API·암호화 저장 **22개**, headless Edge 통합 **18개(호환)/19개(HCX-007 fixture)**, 키 설정 UI **6개**를 통과했다. 별도로 실제 서비스 HCX-005의 합성 문서 흐름 **10개 검사**를 통과했다. 타입 검사·빌드도 수행했다. [실호출 결과와 품질 제한](docs/evidence/hyperclova-live-2026-10-11/README.md), [28개 수용 검사 상태](docs/mvp-acceptance-results.csv)를 참고한다.
 
 ## 기본 편집기 단계의 이전 검증 결과
 

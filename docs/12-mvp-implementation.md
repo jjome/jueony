@@ -13,9 +13,9 @@
 5. 필요한 파일/폴더를 체크하고 가운데에서 요청한다. 지원하는 본문 명령은 검증 후 오른쪽 문서에 바로 반영된다.
 6. 결과의 변경 확인/요청 되돌리기 또는 오른쪽 편집기의 수동 편집·저장을 사용한다.
 
-API 설정에서 OpenAI 호환 **Chat Completions** 또는 **HyperCLOVA X v3 구조화 출력**을 고른다. OpenAI 호환 연결은 `https://기관서버/v1` 또는 전체 `.../chat/completions` 주소와 실제 모델 ID를 등록한다. 모델 목록 조회를 가정하지 않으며 등록한 모델만 선택지에 나온다. 여러 연결/모델을 등록할 수 있다. HTTPS를 사용하며 HTTP는 루프백 테스트 서버에만 허용한다. HyperCLOVA X 전용 연결은 [14번 가이드](14-hyperclova-x-api-guide.md)를 따른다. Azure 전용 인증과 Responses API는 미지원이다.
+API 설정에서 OpenAI 호환 **Chat Completions** 또는 **HyperCLOVA X v3**을 고른다. OpenAI 호환 연결은 `https://기관서버/v1` 또는 전체 `.../chat/completions` 주소와 실제 모델 ID를 등록한다. 모델 목록 조회를 가정하지 않으며 등록한 모델만 선택지에 나온다. 여러 연결/모델을 등록할 수 있다. HTTPS를 사용하며 HTTP는 루프백 테스트 서버에만 허용한다. HyperCLOVA X 전용 연결은 [14번 가이드](14-hyperclova-x-api-guide.md)를 따른다. Azure 전용 인증과 Responses API는 미지원이다.
 
-키는 로컬 서버의 메모리에만 있고 일반 설정·채팅·로그에 쓰지 않는다. **창을 닫아도 로컬 서버가 남아 있으면 키가 유지된다.** AI 연결 설정의 **연결 키 삭제**로 모두 제거할 수 있다. 서버를 다시 시작하면 키를 다시 입력한다. 프로필/연결 설정에는 endpoint와 모델 이름이 저장된다. 같은 프로필에서는 Jueony 업무 창 하나만 편집 가능하며 두 번째 창은 안내를 표시한다. 이는 저장소의 동시 쓰기 충돌을 막는다.
+키는 Windows DPAPI CurrentUser 암호화 저장을 선택할 수 있고 실패 시 평문으로 폴백하지 않는다. 미선택 시 서버 메모리에만 유지한다. 일반 설정·채팅·로그에는 키를 쓰지 않는다. **창을 닫아도 서버가 남아 있으면 메모리 키가 유지된다.** 설정에서 키 교체·선택 연결 삭제·모든 키 삭제를 제공한다. 프로필에는 endpoint와 모델 이름을 저장한다. 같은 프로필에서는 Jueony 업무 창 하나만 편집 가능하다.
 
 ## 실제 지원 범위
 
@@ -72,11 +72,11 @@ API 설정에서 OpenAI 호환 **Chat Completions** 또는 **HyperCLOVA X v3 구
 
 Rust HTTP/TLS 의존성의 빌드 프로그램이 이 PC의 Windows 애플리케이션 제어에 막혔다. 보안 설정을 완화하지 않고 동봉한 Node 표준 HTTP/fetch/TLS 서버와 기존 Rust/WASM 편집 엔진으로 구현했다. 최종 Rust 런처 exe도 실행 차단을 확인하여 현재 시작 경로는 PowerShell 스크립트를 사용한다. Node 배포 실행 파일과 이 스크립트 경로는 실제 실행했다. 서버용 외부 npm 패키지를 추가하지 않았다. Node 배포본의 전체 LICENSE와 원래 엔진/폰트 고지를 포함한다.
 
-서버는 127.0.0.1에만 바인딩하며 Host, Origin/fetch metadata, 부트스트랩 헤더, 난수 토큰을 검사한다. CSP의 connect-src는 self다. 모델 호출은 등록한 endpoint로만 보내고 redirect를 따르지 않는다. 기관 관리자의 endpoint allowlist, 인증서 배포, 브라우저 자체 통신 제어와 암호화 저장 정책은 아직 제품화하지 않았다.
+서버는 127.0.0.1에만 바인딩하며 Host, Origin/fetch metadata, 부트스트랩 헤더, 난수 토큰을 검사한다. CSP의 connect-src는 self다. 모델 호출은 등록한 endpoint로만 보내고 redirect를 따르지 않는다. 기관 관리자의 endpoint allowlist, 인증서 배포와 브라우저 자체 통신 제어는 아직 제품화하지 않았다. 개인 PC의 DPAPI 저장은 구현했으며 기관 키 보관 정책은 별도 검토한다.
 
 ## 2026-10-11 LLM 연결 확장
 
-HyperCLOVA X v3 구조화 출력 adapter와 문서/자료를 보내지 않는 합성 연결 테스트를 추가했다. 모델은 HCX-007, 실제 계정 권한과 출력 품질은 아직 검증하지 않았다. GPT Responses·Claude·Gemini 전용 adapter는 명세 단계다. 이번 추가 검증은 [LLM adapter 검사 기록](evidence/llm-adapters-2026-10-11/README.md)을 따른다.
+HyperCLOVA X v3는 HCX-005 지정 함수 호출과 HCX-007 구조화 출력을 지원한다. 승인된 서비스 모델은 HCX-005였으며 실제 생성·미저장 문서 수정·비교·undo·저장을 통과했다. 모델이 문단 원문을 반환하고 앱이 정확히 대조해 교체 범위를 계산한다. Windows 암호화 저장·복원·키 교체 UI를 추가했다. GPT Responses·Claude·Gemini 전용 adapter는 명세 단계다. [최신 실호출 검사](evidence/hyperclova-live-2026-10-11/README.md), [이전 fixture 기록](evidence/llm-adapters-2026-10-11/README.md).
 
 ## 자동 검증과 근거
 
@@ -89,7 +89,7 @@ HyperCLOVA X v3 구조화 출력 adapter와 문서/자료를 보내지 않는 �
 
 UI 검증의 모델 서버는 **결정적인 로컬 HTTP 테스트 fixture**다. 실제 추론 모델 호출이나 품질 검증이 아니다. 폴더 연결은 브라우저 OPFS 디렉터리 핸들로 API를 검사했으며 실제 Windows 폴더 선택 대화상자·권한 재승인을 조작한 검사가 아니다. 직접 키보드 입력은 Chromium 입력 경로 검사이며 한국어 IME 조합 검사가 아니다. 페이지에서 외부 자산 요청을 계측하지만 OS 네트워크를 실제로 차단하거나 Edge 자체 통신 전체를 감사한 것은 아니다.
 
-실제 기관 endpoint·모델·권한·키는 제공되지 않았으므로 M07/V14의 실제 LLM 관문은 **BLOCKED**다. 실제 한글 2024 검수도 **대기**다. 이전 사용자의 재열기 성공 보고를 새 저장물의 독립 판정으로 대신하지 않는다.
+2026-10-11 일반 NAVER Cloud 서비스 HCX-005의 실호출 흐름을 확인했다. V14는 실제 참고 자료 인용 검증이 남아 **PARTIAL**이다. 기관 endpoint 및 실제 한글 2024 검수는 대기다. 최종 생성 초안은 항목명만 있어 내용 품질 개선이 필요하다. 이전 사용자의 한글 재열기 성공을 새 저장물의 독립 판정으로 대신하지 않는다.
 
 ## 한글 검수용 문서
 

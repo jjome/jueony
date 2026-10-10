@@ -19,6 +19,7 @@ foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.m
 $llmEvidence = Join-Path $output 'evidence'
 New-Item -ItemType Directory -Force $llmEvidence | Out-Null
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/llm-adapters-2026-10-11') -Destination $llmEvidence -Recurse -Force
+Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/hyperclova-live-2026-10-11') -Destination $llmEvidence -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/mvp-acceptance-results.csv') -Destination $output -Force
 foreach ($notice in @('LICENSE.txt', 'THIRD_PARTY_NOTICES.md')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot $notice) -Destination (Join-Path $output $notice) -Force
@@ -39,6 +40,9 @@ if (-not (Test-Path -LiteralPath $targetNode) -or (Get-FileHash -LiteralPath $so
 }
 Copy-Item -LiteralPath (Join-Path $installedNode.FullName 'LICENSE') -Destination (Join-Path $runtimePath 'LICENSE.Node.txt') -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/launcher/server.mjs') -Destination $output -Force
+foreach ($supportFile in @('connection-store.mjs', 'credential-protect.ps1')) {
+    Copy-Item -LiteralPath (Join-Path $projectRoot ('apps/launcher/' + $supportFile)) -Destination $output -Force
+}
 Copy-Item -LiteralPath (Join-Path $projectRoot 'scripts/Start-Jueony.ps1') -Destination (Join-Path $output 'Start-Jueony.ps1') -Force
 $startCmd = "@echo off" + [Environment]::NewLine + 'powershell.exe -NoProfile -File "%~dp0Start-Jueony.ps1"' + [Environment]::NewLine + 'if errorlevel 1 pause' + [Environment]::NewLine
 [IO.File]::WriteAllText((Join-Path $output 'Start-Jueony.cmd'), $startCmd, [Text.Encoding]::ASCII)
@@ -52,6 +56,8 @@ $manifest = [ordered]@{
     nodeSha256 = (Get-FileHash -LiteralPath (Join-Path $runtimePath 'node.exe') -Algorithm SHA256).Hash
     launcherSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'JueonyEditor.exe') -Algorithm SHA256).Hash
     serverSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'server.mjs') -Algorithm SHA256).Hash
+    connectionStoreSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'connection-store.mjs') -Algorithm SHA256).Hash
+    credentialProtectSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'credential-protect.ps1') -Algorithm SHA256).Hash
     providerSha256 = $providerHashes
     adapterSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'providers/openai-compatible.mjs') -Algorithm SHA256).Hash
     frontend = Get-Content -LiteralPath (Join-Path $output 'dist/build-evidence.json') -Raw | ConvertFrom-Json

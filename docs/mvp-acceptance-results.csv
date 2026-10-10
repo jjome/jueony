@@ -12,7 +12,7 @@ id,status,date,scope,evidence
 "V11","PASS","2026-10-09","workspace/chat 소유권 및 다른 채팅 고유 문자열 제외 단위·UI 격리","docs/evidence/mvp-2026-10-09"
 "V12","PARTIAL","2026-10-09","가짜 source/target·임의 명령 거부 단위 통과; 실제 모델 prompt injection 평가 대기","docs/evidence/mvp-2026-10-09"
 "V13","PARTIAL","2026-10-09","UI 선택 모델 전달과 서버 두 모델 계약 통과; 실제 제공자 전환 미검증","docs/evidence/mvp-2026-10-09"
-"V14","BLOCKED","2026-10-09","기관 endpoint/model/credentials 미제공. 실제 LLM 대신 결정적 HTTP fixture만 검증","docs/evidence/mvp-2026-10-09"
+"V14","PARTIAL","2026-10-11","일반 NAVER Cloud 서비스 HCX-005로 생성·미저장 문맥 수정·undo·저장 통과. 실제 참고 자료 출처·초안 품질·기관 endpoint 검증은 남음","docs/evidence/hyperclova-live-2026-10-11"
 "V15","PARTIAL","2026-10-09","401/잘못된 JSON/redirect/취소 오류 검사; 실제 서버 timeout·모델 오류 종합 검사 대기","docs/evidence/mvp-2026-10-09"
 "V16","PASS","2026-10-09","키 포함 오류 정제·서버 로그 비노출·IndexedDB 키 없음·키 삭제 검사","docs/evidence/mvp-2026-10-09"
 "V17","PASS","2026-10-09","토큰/Origin/Host/비HTTPS·사용자정보·쿼리 endpoint/redirect 거부","docs/evidence/mvp-2026-10-09"

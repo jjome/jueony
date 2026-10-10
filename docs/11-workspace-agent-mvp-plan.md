@@ -214,7 +214,7 @@ API 키는 MVP에서 실행 세션 메모리에만 보관하는 방식을 우선
 | M04 | 동일 엔진의 전체 본문/Unicode snapshot 구현 및 미저장 내용 검사 |
 | M05 | 명시 자료 읽기·범위/출처·Context 구현 및 지원/거부 검사 |
 | M06 | Port·registry·인증된 호출 경계 구현; 로컬 HTTP 계약/보안 검사 통과 |
-| M07 | OpenAI 호환 adapter 구현; 실제 기관 LLM 호출 BLOCKED(설정/권한 미제공) |
+| M07 | OpenAI 호환·HyperCLOVA adapter 구현. 일반 서비스 HCX-005 실호출 통과; 기관망/품질은 후속 검증 |
 | M08 | 다중 위치 본문 변경·요청 undo 구현; 엔진 재파싱 통과, rollback 실패 주입 대기 |
 | M09 | 단일 생성·검증·직접 적용·취소/충돌 구현 및 통합 검사 |
 | M10 | 후속: AI 표·서식 미지원 표시. 기존 수동 편집은 유지 |
@@ -398,4 +398,4 @@ workspace/폴더/채팅/최근 문서를 재시작으로 복원한다. 접근 �
 
 ## 13. 2026-10-11 LLM 확장 작업
 
-사용자가 일반 NAVER Cloud 개발 계정을 선택했다. [13번 문서](13-llm-provider-adapters.md)의 L01~L09를 M07 후속 작업으로 추가한다. GPT Responses·Claude·Gemini·HyperCLOVA X의 native 계약을 명세했고, 우선 HyperCLOVA X adapter·설정 UI·합성 연결 검사를 구현했다. 실제 클라우드 호출 관문은 키 입력 후 별도로 통과해야 한다. 계정 설정과 검수 절차는 [14번 가이드](14-hyperclova-x-api-guide.md)를 따른다.
+사용자가 일반 NAVER Cloud 개발 계정을 선택했다. [13번 문서](13-llm-provider-adapters.md)의 L01~L09를 M07 후속 작업으로 추가한다. GPT Responses·Claude·Gemini·HyperCLOVA X의 native 계약을 명세했고 HyperCLOVA X를 우선 구현했다. 2026-10-11 승인 서비스 HCX-005로 실제 문서 생성·여러 위치 수정·undo·저장을 확인했으며 DPAPI 암호화 키 보관·교체·삭제를 구현했다. 자료 인용과 초안 품질, 기관망·한글 검수는 후속 관문으로 남긴다. [사용 가이드](14-hyperclova-x-api-guide.md), [실호출 기록](evidence/hyperclova-live-2026-10-11/README.md).

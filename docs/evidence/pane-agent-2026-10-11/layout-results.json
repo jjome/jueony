@@ -1,0 +1,60 @@
+{
+  "status": "PASS",
+  "checks": [
+    "Drag across the iframe resizes chat and document in opposite directions",
+    "Width persists across reload",
+    "Keyboard left/right and Shift fine/coarse adjustments",
+    "Window shrink fits both panes and widening restores preferred size",
+    "Sidebar folding preserves a usable document pane",
+    "Home and End respect minimum pane sizes",
+    "Enter and double click restore default widths",
+    "Escape cancels dragging and restores iframe interaction",
+    "Resizing does not change document content, paper settings or revision",
+    "No browser errors"
+  ],
+  "errors": [],
+  "initial": {
+    "sidebar": {
+      "width": 230,
+      "x": 0,
+      "right": 230
+    },
+    "chat-panel": {
+      "width": 340,
+      "x": 230,
+      "right": 570
+    },
+    "agent-editor-split": {
+      "width": 9,
+      "x": 570,
+      "right": 579
+    },
+    "editor-panel": {
+      "width": 1021,
+      "x": 579,
+      "right": 1600
+    }
+  },
+  "expanded": {
+    "sidebar": {
+      "width": 230,
+      "x": 0,
+      "right": 230
+    },
+    "chat-panel": {
+      "width": 600,
+      "x": 230,
+      "right": 830
+    },
+    "agent-editor-split": {
+      "width": 9,
+      "x": 830,
+      "right": 839
+    },
+    "editor-panel": {
+      "width": 761,
+      "x": 839,
+      "right": 1600
+    }
+  }
+}

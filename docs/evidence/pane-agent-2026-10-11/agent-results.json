@@ -1,0 +1,82 @@
+{
+  "syntheticOnly": true,
+  "origin": "http://127.0.0.1:4173",
+  "separateBrowserProfile": true,
+  "calls": 1,
+  "checks": [
+    "Real HCX-005 chat applied table, cell format, title and paper settings to live editor",
+    "Structure comparison and one-request undo restore original document"
+  ],
+  "hancomReview": "pending",
+  "model": "HCX-005",
+  "response": {
+    "result": {
+      "message": "제목 '업무 계획'을 16pt 굵게로 변경하고, 추진 일정 문단 뒤에 4행 3열 표를 생성합니다. 표의 첫 행은 굵게 하고 배경색 #eeeeee를 적용합니다. A4 가로 구역에서 좌우상하여백을 각 20mm로 변경합니다. 본문 문단의 텍스트는 그대로 유지하고 저장은 하지 않습니다.",
+      "sourceIds": [],
+      "operations": [
+        {
+          "kind": "format_characters",
+          "target": "s0p0",
+          "properties": {
+            "bold": true,
+            "fontSizePt": 16
+          }
+        },
+        {
+          "kind": "create_table",
+          "after": "s0p1",
+          "resultId": "schedule",
+          "rows": [
+            [
+              "단계",
+              "기간",
+              "담당"
+            ],
+            [
+              "준비",
+              "1월",
+              "총무"
+            ],
+            [
+              "실행",
+              "2월",
+              "사업"
+            ],
+            [
+              "점검",
+              "3월",
+              "감사"
+            ]
+          ]
+        },
+        {
+          "kind": "format_table_cells",
+          "target": "@schedule",
+          "startRow": 0,
+          "rowCount": 1,
+          "startColumn": 0,
+          "columnCount": 3,
+          "properties": {
+            "bold": true,
+            "background": "#eeeeee"
+          }
+        },
+        {
+          "kind": "set_page_setup",
+          "section": 0,
+          "properties": {
+            "widthMm": 210,
+            "heightMm": 297,
+            "landscape": true,
+            "marginLeftMm": 20,
+            "marginRightMm": 20,
+            "marginTopMm": 20,
+            "marginBottomMm": 20
+          }
+        }
+      ]
+    }
+  },
+  "appStatus": "AI 요청이 완료되었습니다.",
+  "status": "PASS"
+}

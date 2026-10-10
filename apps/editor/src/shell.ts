@@ -1,4 +1,5 @@
 import {describeStructure} from './document-control/describe.ts';
+import {installPaneResize} from './pane-layout.ts';
 import {WorkspaceStore} from './mvp/store.ts';
 import {addWorkspace,addChat,chatOf,uid,appendMessage} from './mvp/model.ts';
 import type {AppState,Receipt,Run,SavedDocument,ModelConfig,Snapshot} from './mvp/model.ts';
@@ -248,7 +249,7 @@ split.addEventListener('pointerup',()=>{dragging=false;void persist().catch(erro
 split.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();state.split=Math.max(20,Math.min(75,state.split+(e.key==='ArrowUp'?-3:3)));$('sidebar').style.setProperty('--chat-share',state.split+'%');split.setAttribute('aria-valuenow',String(state.split));void persist().catch(error);}});
 window.addEventListener('message',event=>{if(event.origin!==location.origin)return;const tab=tabs.find(t=>t.frame.contentWindow===event.source);if(!tab)return;if(event.data?.type==='jueony:status')refreshTab(tab);if(event.data?.type==='jueony:new-document'&&tab===activeTab&&cancelNavigation())void newTab().catch(error);if(event.data?.type==='jueony:close-document'&&tab===activeTab)void closeTab(tab).catch(error);});
 window.addEventListener('beforeunload',event=>{if(persistError||running||tabs.some(t=>t.persistError||t.api?.state().dirty)){event.preventDefault();event.returnValue='';}});
-async function start(){await store.open();state=await store.load();try{await refreshConnections();}catch{connectionNotice='AI 서버를 최신 실행기로 다시 시작해 주세요. 로컬 문서 편집은 사용할 수 있습니다.';}if(!state.workspaces.length)addWorkspace(state,'내 업무');if(!state.workspaces.some(w=>w.id===state.activeWorkspaceId))state.activeWorkspaceId=state.workspaces[0].id;render();await switchWorkspace(state.activeWorkspaceId);status('로컬 업무 준비 완료 · '+(connectionNotice||'AI 연결 설정에서 연결과 키를 변경할 수 있습니다.'));}
+async function start(){await store.open();state=await store.load();installPaneResize({root:$('app-shell'),sidebar:$('sidebar'),handle:$('agent-editor-split'),chat:$('chat-panel'),initialWidth:state.agentWidth,commit:width=>{state.agentWidth=width;void persist().catch(error);}});try{await refreshConnections();}catch{connectionNotice='AI 서버를 최신 실행기로 다시 시작해 주세요. 로컬 문서 편집은 사용할 수 있습니다.';}if(!state.workspaces.length)addWorkspace(state,'내 업무');if(!state.workspaces.some(w=>w.id===state.activeWorkspaceId))state.activeWorkspaceId=state.workspaces[0].id;render();await switchWorkspace(state.activeWorkspaceId);status('로컬 업무 준비 완료 · '+(connectionNotice||'AI 연결 설정에서 연결과 키를 변경할 수 있습니다.'));}
 // One writer per browser profile/origin prevents whole-state writes from
 // competing application windows from overwriting each other's workspaces.
 void navigator.locks.request('jueony-workspace-writer',{ifAvailable:true},async lock=>{

@@ -28,6 +28,8 @@
 
 | 문서 | 다루는 결정 |
 | --- | --- |
+| [한글 2024 단축키 구현과 검증](docs/16-hangul-shortcuts-plan.md) | 공식 매핑, 겹글쇠·IME·셀/개체 문맥, 포커스 격리, Windows 예약키 전달 |
+| [전체 편집 기능의 AI 제어 작업 계획](docs/15-ai-editor-control-plan.md) | 구현 전 명세: 표·서식·개체·쪽 설정부터 전체 기능의 공통 제어 API, Agent, MCP 연결과 [기능별 작업 목록](docs/ai-editor-capability-matrix.csv) |
 | [LLM 제공자 4종 구현 명세](docs/13-llm-provider-adapters.md) | GPT·Claude·Gemini·HyperCLOVA X의 계약, 구현 상태, 다음 작업 |
 | [HyperCLOVA X API 사용 가이드](docs/14-hyperclova-x-api-guide.md) | 일반 NAVER Cloud 계정, 키 발급, 합성 연결 검사, 편집 검수 |
 | [MVP 구현 결과와 사용법](docs/12-mvp-implementation.md) | 현재 실행 묶음, 지원 범위, 확장 위치, 검증 한계, 한글 검수용 문서 |

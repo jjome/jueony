@@ -60,15 +60,25 @@ await cp(join(app, 'src/shell.html'), join(root, 'index.html'));
 let main = await readFile(join(root, 'src/main.ts'), 'utf8');
 main = replaceOnce(main, 'confirmSaveBeforeReplacingDocument, fileCommands', 'confirmSaveBeforeReplacingDocument, saveCurrentDocument, fileCommands', 'host save import');
 main = replaceOnce(main, "return params.has('url');", "return params.has('url') || params.get('skipRecovery') === '1';", 'tab recovery');
-main = "import { installAgentBridge } from './jueony/mvp/editor-bridge';\nimport { installDesktopHost } from './jueony/desktop-host';\nimport { installHangulChrome } from './jueony/chrome-2024';\n" + main;
+main = "import { installHangulKeys } from './jueony/shortcuts/install';\nimport { installAgentBridge } from './jueony/mvp/editor-bridge';\nimport { installDesktopHost } from './jueony/desktop-host';\nimport { installHangulChrome } from './jueony/chrome-2024';\n" + main;
 main = replaceOnce(main, "const initPromise = initialize();", `const initPromise = initialize();
 installDesktopHost({ wasm, eventBus, documentState, ready: initPromise,
   save: () => saveCurrentDocument(commandServices),
   discard: async () => { await autosaveManager.discardCurrentDraft('tab-discard'); documentState.markClean('tab-discard'); },
 });
 installAgentBridge({ wasm, eventBus, documentState, ready: initPromise, automation, input: () => inputHandler, render: () => canvasView!.refreshDocumentAgentMutation(), load: (bytes, name, handle) => loadBytes(bytes, name, handle) });
-void initPromise.then(() => installHangulChrome({ wasm, eventBus, documentState, automation }));`, 'desktop host');
+void initPromise.then(() => { installHangulKeys({ automation, registry, input: () => inputHandler, eventBus }); installHangulChrome({ wasm, eventBus, documentState, automation }); });`, 'desktop host');
 await writeFile(join(root, 'src/main.ts'), main);
+let formatCommands = (await readFile(join(root, 'src/command/commands/format.ts'), 'utf8')).replace(/\r\n/g, '\n');
+formatCommands = replaceOnce(formatCommands, '      if (!savedSel) return;', '      // A caret-only character dialog applies pending typing properties.', 'caret character dialog');
+formatCommands = replaceOnce(formatCommands, '        ih.applyCharPropsToRange(savedSel.start, savedSel.end, mods);', '        if (savedSel) ih.applyCharPropsToRange(savedSel.start, savedSel.end, mods);\n        else services.eventBus.emit(\'format-char\', mods);', 'caret character format');
+await writeFile(join(root, 'src/command/commands/format.ts'), formatCommands);
+let tableCommands = await readFile(join(root, 'src/command/commands/table.ts'), 'utf8');
+tableCommands = replaceOnce(tableCommands, 'dialog.show(params?.anchorEl as HTMLElement | undefined);', 'if (params?.inputDialog) dialog.showInputDialog(); else dialog.show(params?.anchorEl as HTMLElement | undefined);', 'keyboard table dialog');
+await writeFile(join(root, 'src/command/commands/table.ts'), tableCommands);
+let tableCreate = await readFile(join(root, 'src/ui/table-create-dialog.ts'), 'utf8');
+tableCreate = replaceOnce(tableCreate, 'private showInputDialog(): void', 'showInputDialog(): void', 'table input dialog entry');
+await writeFile(join(root, 'src/ui/table-create-dialog.ts'), tableCreate);
 let documentTitle = await readFile(join(root, 'src/ui/document-title.ts'), 'utf8');
 documentTitle = documentTitle.replaceAll('rhwp-studio', 'Jueony 문서 편집기');
 await writeFile(join(root, 'src/ui/document-title.ts'), documentTitle);

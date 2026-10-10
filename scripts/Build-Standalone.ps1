@@ -13,6 +13,13 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/dist') -Destination 
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/fixtures') -Destination $output -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/README.md') -Destination (Join-Path $output 'README.md') -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/12-mvp-implementation.md') -Destination (Join-Path $output 'MVP-GUIDE.md') -Force
+foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.md')) {
+    Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
+}
+$llmEvidence = Join-Path $output 'evidence'
+New-Item -ItemType Directory -Force $llmEvidence | Out-Null
+Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/llm-adapters-2026-10-11') -Destination $llmEvidence -Recurse -Force
+Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/mvp-acceptance-results.csv') -Destination $output -Force
 foreach ($notice in @('LICENSE.txt', 'THIRD_PARTY_NOTICES.md')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot $notice) -Destination (Join-Path $output $notice) -Force
 }
@@ -37,12 +44,15 @@ $startCmd = "@echo off" + [Environment]::NewLine + 'powershell.exe -NoProfile -F
 [IO.File]::WriteAllText((Join-Path $output 'Start-Jueony.cmd'), $startCmd, [Text.Encoding]::ASCII)
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/launcher/providers') -Destination $output -Recurse -Force
 $nodeVersion = & (Join-Path $runtimePath 'node.exe') --version
+$providerHashes = [ordered]@{}
+Get-ChildItem -LiteralPath (Join-Path $output 'providers') -Filter '*.mjs' | Sort-Object Name | ForEach-Object { $providerHashes[$_.Name] = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash }
 $manifest = [ordered]@{
     createdAt = (Get-Date).ToUniversalTime().ToString('o')
     nodeVersion = $nodeVersion
     nodeSha256 = (Get-FileHash -LiteralPath (Join-Path $runtimePath 'node.exe') -Algorithm SHA256).Hash
     launcherSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'JueonyEditor.exe') -Algorithm SHA256).Hash
     serverSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'server.mjs') -Algorithm SHA256).Hash
+    providerSha256 = $providerHashes
     adapterSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'providers/openai-compatible.mjs') -Algorithm SHA256).Hash
     frontend = Get-Content -LiteralPath (Join-Path $output 'dist/build-evidence.json') -Raw | ConvertFrom-Json
 }

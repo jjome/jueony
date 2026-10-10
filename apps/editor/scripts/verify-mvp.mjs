@@ -6,13 +6,14 @@ import assert from 'node:assert/strict';
 import init,{HwpDocument} from '@rhwp/core';
 await init({module_or_path:await readFile('node_modules/@rhwp/core/rhwp_bg.wasm')});
 const appUrl=process.env.JUEONY_TEST_URL??'http://127.0.0.1:4193/';
-const evidence=resolve('evidence/mvp');await mkdir(evidence,{recursive:true});
+const native=process.env.JUEONY_TEST_ADAPTER==='hyperclova';
+const evidence=resolve(native?'evidence/mvp-hyperclova':'evidence/mvp');await mkdir(evidence,{recursive:true});
 const calls=[];
-const provider=http.createServer(async(req,res)=>{let body='';for await(const chunk of req)body+=chunk;const payload=JSON.parse(body);calls.push(payload);const input=JSON.parse(payload.messages[1].content);const nodes=input.document.nodes;
- const result=input.instruction.includes('읽기')?{message:'자료를 확인했습니다.',sourceIds:input.references.map(s=>s.id),operations:[]}:input.instruction.includes('초안')?{message:'검증 서버가 새 초안 명령을 반환했습니다.',sourceIds:input.references.map(s=>s.id),operations:[{kind:'create_document',paragraphs:['올해 업무 계획','추진 목적을 정리합니다.','일정을 검토합니다.']}]}
+const provider=http.createServer(async(req,res)=>{let body='';for await(const chunk of req)body+=chunk;const payload=JSON.parse(body);calls.push({...payload,_requestPath:req.url});const input=JSON.parse(payload.messages[1].content);const nodes=input.document.nodes;
+ const result=input.instruction.includes('연결 확인 요청')?{message:'연결 확인',sourceIds:[],operations:[]}:input.instruction.includes('읽기')?{message:'자료를 확인했습니다.',sourceIds:input.references.map(s=>s.id),operations:[]}:input.instruction.includes('초안')?{message:'검증 서버가 새 초안 명령을 반환했습니다.',sourceIds:input.references.map(s=>s.id),operations:[{kind:'create_document',paragraphs:['올해 업무 계획','추진 목적을 정리합니다.','일정을 검토합니다.']}]}
  :{message:'검증 서버가 여러 위치 변경 명령을 반환했습니다.',sourceIds:[],operations:[{kind:'replace_body_text',target:nodes[0].id,start:0,count:Array.from(nodes[0].text).length,text:'수정된 업무 계획'},{kind:'insert_body_paragraphs',after:nodes.at(-1).id,paragraphs:['추가 검토 사항']}]};
  if(input.instruction.includes('지연'))await new Promise(r=>setTimeout(r,2000));
- res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify({choices:[{message:{content:JSON.stringify(result)}}]}));});
+ res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify(native?{status:{code:'20000'},result:{finishReason:'stop',message:{role:'assistant',content:JSON.stringify(result)}}}:{choices:[{message:{content:JSON.stringify(result)}}]}));});
 await new Promise(r=>provider.listen(4194,'127.0.0.1',r));
 const browser=await puppeteer.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,args:['--no-first-run','--disable-background-networking'],defaultViewport:{width:1440,height:960}});
 const page=await browser.newPage();const errors=[],externalRequests=[];page.on('request',r=>{if(/^https?:/.test(r.url())&&new URL(r.url()).origin!==new URL(appUrl).origin)externalRequests.push(r.url());});page.on('pageerror',e=>{errors.push(e.stack??e.message);console.error('PAGE',e.stack)});page.on('dialog',d=>d.accept(d.type()==='prompt'?'검증 업무 B':undefined));
@@ -43,7 +44,23 @@ try{
  await page.waitForFunction(()=>[...document.querySelectorAll('.editor-frame')].some(f=>f.contentWindow?.jueonyEditor?.snapshot)&&document.getElementById('app-status').textContent.includes('준비 완료'),{timeout:60000});
  assert.equal((await snapshot()).nodes.length,1);pass('three panes and live editor ready');
  const duplicate=await browser.newPage();await duplicate.goto(appUrl);await duplicate.waitForFunction(()=>document.getElementById('app-status').textContent.includes('다른 Jueony 창'));assert.equal(await duplicate.$eval('#app-shell',e=>e.inert),true);await duplicate.close();pass('second window cannot overwrite workspace storage');
- await page.click('#connection-settings');await page.type('#config-label','검증용 호환 서버');await page.type('#config-endpoint','http://127.0.0.1:4194/v1');await page.type('#config-model','fixture-model');await page.type('#config-key','test-only-secret');await page.click('#model-form button[type=submit]');
+ await page.click('#connection-settings');
+ assert.deepEqual(await page.$$eval('#config-adapter option',els=>els.map(e=>e.value)),['openai-compatible','hyperclova']);
+ if(native){
+  await page.select('#config-adapter','hyperclova');
+  await page.$eval('#config-endpoint',e=>{e.value='http://127.0.0.1:4194/v3/chat-completions';});
+  assert.equal(await page.$eval('#config-model',e=>e.value),'HCX-007');
+  await page.type('#config-key','test-only-secret');await page.click('#test-connection');
+  await page.waitForFunction(()=>document.getElementById('config-status').textContent.includes('연결 테스트 성공'));
+  assert.equal(await page.$eval('#config-key',e=>e.value),'');
+  const probe=JSON.parse(calls.at(-1).messages[1].content);assert.deepEqual(probe.document.nodes,[]);assert.deepEqual(probe.references,[]);assert.deepEqual(probe.conversation,[]);
+  await page.screenshot({path:resolve(evidence,'connection-settings.png'),fullPage:true});
+  pass('native connection probe sends synthetic context and clears key');
+ }else{
+  assert.equal(await page.$eval('#config-token-field',e=>getComputedStyle(e).display),'none');
+  await page.type('#config-label','검증용 호환 서버');await page.type('#config-endpoint','http://127.0.0.1:4194/v1');await page.type('#config-model','fixture-model');
+ }
+ await page.type('#config-key','test-only-secret');await page.click('#model-form button[type=submit]');
  await page.waitForFunction(()=>!document.getElementById('model-dialog').open);pass('provider and model configuration');
  const fixture=[...await readFile('fixtures/three-paragraphs.hwpx')];
  await page.evaluate(async(bytes)=>{
@@ -57,7 +74,7 @@ try{
  await page.evaluate(()=>{const row=[...document.querySelectorAll('.folder-row')].find(r=>r.textContent.includes('참고.txt'));row.querySelector('input').click();});
  await send('지정한 자료를 참고해 올해 계획서 초안을 작성해줘');
  const first=await snapshot();assert.deepEqual(first.nodes.map(n=>n.text),['올해 업무 계획','추진 목적을 정리합니다.','일정을 검토합니다.']);
- assert.equal(calls[0].model,'fixture-model');assert.equal(JSON.parse(calls[0].messages[1].content).references.length,1);pass('chat to real editor new document, selected reference and model passed');
+ assert.equal(native?calls.at(-1)._requestPath:calls.at(-1).model,native?'/v3/chat-completions/HCX-007':'fixture-model');assert.equal(JSON.parse(calls.at(-1).messages[1].content).references.length,1);pass('chat to real editor new document, selected reference and model passed');
  await saveArtifact('01-created',first.nodes.map(n=>n.text));
  await send('앞뒤 항목을 수정해줘');
  const changed=await snapshot();assert.equal(changed.nodes[0].text,'수정된 업무 계획');assert.equal(changed.nodes.at(-1).text,'추가 검토 사항');pass('one request edits multiple positions without approval');
@@ -84,6 +101,6 @@ try{
  const inputFrame=await activeFrame();await inputFrame.focus('[aria-label="문서 편집 입력"]');await page.keyboard.type('X');await page.waitForFunction(()=>[...document.querySelectorAll('.editor-frame')].find(f=>!f.hidden).contentWindow.jueonyEditor.snapshot().nodes.some(n=>n.text.includes('X')));pass('manual keyboard input changes the same live document');
  assert.equal(await page.$$eval('#workspace-select option',els=>els.length),2);assert.equal(await page.$$('.folder-root').then(e=>e.length),2);pass('restart restores workspace chats folders and documents');
  await page.click('#connection-settings');await page.click('#clear-credentials');await page.waitForFunction(()=>document.getElementById('config-status').textContent.includes('모두 삭제'));await page.click('#close-settings');pass('connection credentials can be cleared explicitly');
- await writeFile(resolve(evidence,'result.json'),JSON.stringify({results,errors,externalRequests,runtime:await browser.version(),build:await page.evaluate(()=>fetch('/build-evidence.json').then(r=>r.json())),provider:'local deterministic protocol fixture; NOT a live LLM',folderAccess:'OPFS directory handles; NOT native Windows picker'},null,2));
+ await writeFile(resolve(evidence,'result.json'),JSON.stringify({results,errors,externalRequests,runtime:await browser.version(),build:await page.evaluate(()=>fetch('/build-evidence.json').then(r=>r.json())),adapter:native?'hyperclova':'openai-compatible',provider:'local deterministic protocol fixture; NOT a live LLM',folderAccess:'OPFS directory handles; NOT native Windows picker'},null,2));
  assert.deepEqual(errors,[]);assert.deepEqual(externalRequests,[]);console.log(JSON.stringify({passed:results.length,errors}));
 }catch(error){await page.screenshot({path:resolve(evidence,'failure.png'),fullPage:true}).catch(()=>{});await writeFile(resolve(evidence,'failure.json'),JSON.stringify({error:String(error),errors,results,status:await page.$eval('#app-status',e=>e.textContent).catch(()=>''),frames:await page.$$eval('.editor-frame',els=>els.map(e=>({hidden:e.hidden,ready:!!e.contentWindow?.jueonyEditor,name:e.contentWindow?.jueonyEditor?.state().name})))},null,2));console.error(error);process.exitCode=1;}finally{await browser.close();provider.close();}

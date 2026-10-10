@@ -24,7 +24,7 @@ async function persist(){try{await store.save(state);persistError=false;}catch(e
 function cancelNavigation(){if(closing||restoring){status('문서 준비 또는 닫기를 완료한 뒤 전환해 주세요.');return false;}if(running?.run.status==='applying'){status('문서 적용이 끝난 뒤 전환해 주세요.');return false;}running?.controller.abort();return true;}
 function options(select:HTMLSelectElement,items:{value:string;text:string}[],value?:string){select.replaceChildren(...items.map(item=>{const o=document.createElement('option');o.value=item.value;o.textContent=item.text;return o;}));if(value&&items.some(x=>x.value===value))select.value=value;}
 function renderModels(){
- const group=(m:ModelConfig)=>m.label+' | '+m.endpoint;
+ const group=(m:ModelConfig)=>m.label+' | '+m.adapterId+' | '+m.endpoint;
  const providers=[...new Set(state.models.map(group))];
  const selectedModel=state.models.find(m=>m.id===chat().modelId)??state.models[0];
  options($('provider-select'),providers.length?providers.map(value=>({value,text:value.split(' | ')[0]})):[{value:'',text:'AI 연결 필요'}],selectedModel?group(selectedModel):undefined);
@@ -142,7 +142,7 @@ async function send(){
  const input=$<HTMLTextAreaElement>('request-input');const request=input.value.trim();if(!request||running||restoring)return;
  const model=state.models.find(m=>m.id===$<HTMLSelectElement>('model-select').value);if(!model)throw new Error('먼저 AI 연결을 등록해 주세요.');
  const original=activeTab;if(!original?.api||original.workspaceId!==work().id)throw new Error('문서 준비를 기다려 주세요.');
- const workspaceId=work().id,chatId=chat().id,run:Run={id:uid(),workspaceId,chatId,documentId:original.id,status:'preparing_context',model:{adapterId:model.adapterId,label:model.label,endpoint:model.endpoint,modelId:model.modelId},sources:[],createdAt:Date.now()};
+ const workspaceId=work().id,chatId=chat().id,run:Run={id:uid(),workspaceId,chatId,documentId:original.id,status:'preparing_context',model:{adapterId:model.adapterId,label:model.label,endpoint:model.endpoint,modelId:model.modelId,maxOutputTokens:model.maxOutputTokens},sources:[],createdAt:Date.now()};
  const controller=new AbortController();running={controller,run};state.runs.push(run);appendMessage(state,workspaceId,chatId,{id:uid(),role:'user',text:request,runId:run.id});input.value='';renderMessages();updateRun();
  try{
   await persist();const snapshot:Snapshot=original.api.snapshot();
@@ -177,13 +177,43 @@ on('open-document',async()=>{const picker=(window as any).showOpenFilePicker;if(
 on('save-document',async()=>{if(running?.run.status==='applying')return;if(activeTab?.api){const tab=activeTab;const result=await tab.api.save();await persistTab(tab);status(result==='saved'?'파일에 저장했습니다.':'저장을 완료하지 않았습니다.');}});
 $('request-form').addEventListener('submit',e=>{e.preventDefault();void send().catch(error);});
 on('cancel-run',()=>running?.controller.abort());
-$('provider-select').addEventListener('change',()=>{const value=$<HTMLSelectElement>('provider-select').value;const m=state.models.find(m=>m.label+' | '+m.endpoint===value);chat().modelId=m?.id;renderModels();void persist().catch(error);});
+$('provider-select').addEventListener('change',()=>{const value=$<HTMLSelectElement>('provider-select').value;const m=state.models.find(m=>m.label+' | '+m.adapterId+' | '+m.endpoint===value);chat().modelId=m?.id;renderModels();void persist().catch(error);});
 $('model-select').addEventListener('change',()=>{chat().modelId=$<HTMLSelectElement>('model-select').value;void persist().catch(error);});
-on('connection-settings',()=>{const config=state.models.find(m=>m.id===$<HTMLSelectElement>('model-select').value);$<HTMLInputElement>('config-label').value=config?.label??'';$<HTMLInputElement>('config-endpoint').value=config?.endpoint??'';$<HTMLInputElement>('config-model').value=config?.modelId??'';$<HTMLInputElement>('config-key').value='';$('config-status').textContent='로컬 서버를 다시 시작했다면 같은 연결의 키를 다시 입력해 주세요.';$<HTMLDialogElement>('model-dialog').showModal();});
+on('connection-settings',()=>{const config=state.models.find(m=>m.id===$<HTMLSelectElement>('model-select').value);$<HTMLInputElement>('config-label').value=config?.label??'';$<HTMLInputElement>('config-endpoint').value=config?.endpoint??'';$<HTMLInputElement>('config-model').value=config?.modelId??'';$<HTMLInputElement>('config-key').value='';$<HTMLSelectElement>('config-adapter').value=config?.adapterId??'openai-compatible';$<HTMLInputElement>('config-tokens').value=String(config?.maxOutputTokens??4096);adapterHint(false);$('config-status').textContent='로컬 서버를 다시 시작했다면 같은 연결의 키를 다시 입력해 주세요.';$<HTMLDialogElement>('model-dialog').showModal();});
 $('model-dialog').addEventListener('close',()=>{$<HTMLInputElement>('config-key').value='';});
 on('clear-credentials',async()=>{if(running)throw new Error('진행 중 요청이 끝난 뒤 키를 삭제해 주세요.');await port.clearCredentials();$<HTMLInputElement>('config-key').value='';$('config-status').textContent='실행 중인 서버의 연결 키를 모두 삭제했습니다. 모델 설정은 유지됩니다.';});
 on('close-settings',()=>{$<HTMLInputElement>('config-key').value='';$<HTMLDialogElement>('model-dialog').close();});
-$('model-form').addEventListener('submit',e=>{e.preventDefault();void(async()=>{const endpoint=$<HTMLInputElement>('config-endpoint').value.trim(),modelId=$<HTMLInputElement>('config-model').value.trim();const existing=state.models.find(m=>m.endpoint===endpoint&&m.modelId===modelId);const config:ModelConfig={id:existing?.id??uid(),adapterId:'openai-compatible',label:$<HTMLInputElement>('config-label').value.trim(),endpoint,modelId};try{await port.configure(config,$<HTMLInputElement>('config-key').value);if(existing)Object.assign(existing,config);else state.models.push(config);chat().modelId=config.id;await persist();renderModels();$<HTMLDialogElement>('model-dialog').close();status('연결을 등록했습니다. 실제 요청 시 모델과 인증을 확인합니다.');}catch(e){$('config-status').textContent=e instanceof Error?e.message:String(e);}finally{$<HTMLInputElement>('config-key').value='';}})();});
+let settingsBusy=false;
+function adapterHint(reset:boolean){
+ const native=$<HTMLSelectElement>('config-adapter').value==='hyperclova';
+ $('config-token-field').hidden=!native;$<HTMLInputElement>('config-tokens').disabled=!native;
+ $('adapter-hint').textContent=native?'일반 NAVER Cloud · HCX-007 지원. Endpoint는 /v3/chat-completions까지 입력합니다. 실제 계정의 모델 권한은 연결 테스트로 확인합니다.':'Chat Completions 호환 서버를 연결합니다. GPT 전용 Responses, Claude·Gemini 전용 adapter는 아직 구현하지 않았습니다.';
+ $<HTMLInputElement>('config-key').required=native;
+ $<HTMLInputElement>('config-key').placeholder=native?'CLOVA Studio에서 발급한 API 키':'인증이 없는 로컬 서버는 비워 둘 수 있습니다.';
+ if(reset){
+  $<HTMLInputElement>('config-key').value='';
+  $<HTMLInputElement>('config-endpoint').value=native?'https://clovastudio.stream.ntruss.com/v3/chat-completions':'';
+  $<HTMLInputElement>('config-model').value=native?'HCX-007':'';
+  $<HTMLInputElement>('config-label').value=native?'NAVER Cloud 개발':'';
+ }
+}
+$('config-adapter').addEventListener('change',()=>adapterHint(true));
+$('model-dialog').addEventListener('cancel',event=>{if(settingsBusy)event.preventDefault();});
+async function configureModel(testOnly:boolean){
+ const form=$<HTMLFormElement>('model-form');if(settingsBusy||!form.reportValidity())return;
+ const endpoint=$<HTMLInputElement>('config-endpoint').value.trim(),modelId=$<HTMLInputElement>('config-model').value.trim();
+ const adapterId=$<HTMLSelectElement>('config-adapter').value as ModelConfig['adapterId'];
+ const existing=state.models.find(m=>m.adapterId===adapterId&&m.endpoint===endpoint&&m.modelId===modelId);
+ const config:ModelConfig={id:existing?.id??uid(),adapterId,label:$<HTMLInputElement>('config-label').value.trim(),endpoint,modelId,...(adapterId==='hyperclova'?{maxOutputTokens:Number($<HTMLInputElement>('config-tokens').value)}:{})};
+ settingsBusy=true;for(const control of form.querySelectorAll<HTMLInputElement|HTMLSelectElement|HTMLButtonElement>('input,select,button'))control.disabled=true;
+ try{
+  if(testOnly){$('config-status').textContent='합성 요청으로 연결 확인 중…';await port.testConnection(config,$<HTMLInputElement>('config-key').value);$('config-status').textContent='연결 테스트 성공 · 문서/대화/자료 전송 없음. 설정을 저장하려면 키를 다시 입력하고 연결 등록을 누르세요.';}
+  else{await port.configure(config,$<HTMLInputElement>('config-key').value);if(existing)Object.assign(existing,config);else state.models.push(config);chat().modelId=config.id;await persist();renderModels();$<HTMLDialogElement>('model-dialog').close();status('연결을 등록했습니다. 등록만으로는 실제 API 호출을 수행하지 않습니다.');}
+ }catch(e){$('config-status').textContent=e instanceof Error?e.message:String(e);}
+ finally{settingsBusy=false;$<HTMLInputElement>('config-key').value='';for(const control of form.querySelectorAll<HTMLInputElement|HTMLSelectElement|HTMLButtonElement>('input,select,button'))control.disabled=false;adapterHint(false);}
+}
+on('test-connection',()=>configureModel(true));
+$('model-form').addEventListener('submit',e=>{e.preventDefault();void configureModel(false).catch(error);});
 const split=$('sidebar-split');let dragging=false;
 split.addEventListener('pointerdown',e=>{dragging=true;split.setPointerCapture(e.pointerId);});
 split.addEventListener('pointermove',e=>{if(!dragging)return;const rect=$('sidebar').getBoundingClientRect();state.split=Math.max(20,Math.min(75,Math.round((e.clientY-rect.top)/rect.height*100)));$('sidebar').style.setProperty('--chat-share',state.split+'%');split.setAttribute('aria-valuenow',String(state.split));});

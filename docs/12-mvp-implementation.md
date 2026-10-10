@@ -13,7 +13,7 @@
 5. 필요한 파일/폴더를 체크하고 가운데에서 요청한다. 지원하는 본문 명령은 검증 후 오른쪽 문서에 바로 반영된다.
 6. 결과의 변경 확인/요청 되돌리기 또는 오른쪽 편집기의 수동 편집·저장을 사용한다.
 
-API 설정은 OpenAI 호환 **Chat Completions** 규격이다. `https://기관서버/v1` 또는 전체 `.../chat/completions` 주소와 실제 모델 ID를 등록한다. 모델 목록 조회를 가정하지 않으며 등록한 모델만 선택지에 나온다. 여러 연결/모델을 등록할 수 있다. HTTPS를 사용하며 HTTP는 루프백 테스트 서버에만 허용한다. 고유 규격 HyperCLOVA X, Azure 전용 인증, Responses API는 이번 adapter의 지원 대상이 아니다.
+API 설정에서 OpenAI 호환 **Chat Completions** 또는 **HyperCLOVA X v3 구조화 출력**을 고른다. OpenAI 호환 연결은 `https://기관서버/v1` 또는 전체 `.../chat/completions` 주소와 실제 모델 ID를 등록한다. 모델 목록 조회를 가정하지 않으며 등록한 모델만 선택지에 나온다. 여러 연결/모델을 등록할 수 있다. HTTPS를 사용하며 HTTP는 루프백 테스트 서버에만 허용한다. HyperCLOVA X 전용 연결은 [14번 가이드](14-hyperclova-x-api-guide.md)를 따른다. Azure 전용 인증과 Responses API는 미지원이다.
 
 키는 로컬 서버의 메모리에만 있고 일반 설정·채팅·로그에 쓰지 않는다. **창을 닫아도 로컬 서버가 남아 있으면 키가 유지된다.** AI 연결 설정의 **연결 키 삭제**로 모두 제거할 수 있다. 서버를 다시 시작하면 키를 다시 입력한다. 프로필/연결 설정에는 endpoint와 모델 이름이 저장된다. 같은 프로필에서는 Jueony 업무 창 하나만 편집 가능하며 두 번째 창은 안내를 표시한다. 이는 저장소의 동시 쓰기 충돌을 막는다.
 
@@ -65,14 +65,18 @@ API 설정은 OpenAI 호환 **Chat Completions** 규격이다. `https://기관�
 | 제공자 중립 Port·HTTP 전달 | `src/mvp/llm.ts` |
 | 엔진 읽기/적용/undo·명령 schema | `src/mvp/editor-bridge.ts`, `edit-schema.ts` |
 | 인증된 루프백 서버·provider registry | `apps/launcher/server.mjs` |
-| 요청/인증/응답/오류 변환 | `apps/launcher/providers/openai-compatible.mjs` |
+| 요청/인증/응답/오류 변환 | `apps/launcher/providers/openai-compatible.mjs`, `hyperclova.mjs` |
 | Windows 시작·번들 | `scripts/Start-Jueony.ps1`, `Build-Standalone.ps1`; 별도 Rust 런처 `apps/launcher/main.rs` |
 
-추가 adapter는 registry에 등록하고 공통 입력을 받아 `{message, sourceIds, operations}`를 반환한다. 제공자 wire format은 해당 파일 안에서만 다룬다. 현재 프런트 설정 UI는 OpenAI 호환 하나만 노출한다. 다른 인증 형태를 추가할 때 설정 항목과 지원 목록은 늘려야 하지만 Agent·업무 저장·편집기는 재작성하지 않는다.
+추가 adapter는 registry에 등록하고 공통 입력을 받아 `{message, sourceIds, operations}`를 반환한다. 제공자 wire format은 해당 파일 안에서만 다룬다. 2026-10-11 업데이트: 프런트 설정 UI는 OpenAI 호환과 HyperCLOVA X native v3를 노출한다. 네 제공자의 작업 구분은 [13번 구현 명세](13-llm-provider-adapters.md), 일반 NAVER Cloud 설정은 [14번 가이드](14-hyperclova-x-api-guide.md)를 따른다. 다른 인증 형태를 추가할 때 설정 항목과 지원 목록은 늘려야 하지만 Agent·업무 저장·편집기는 재작성하지 않는다.
 
 Rust HTTP/TLS 의존성의 빌드 프로그램이 이 PC의 Windows 애플리케이션 제어에 막혔다. 보안 설정을 완화하지 않고 동봉한 Node 표준 HTTP/fetch/TLS 서버와 기존 Rust/WASM 편집 엔진으로 구현했다. 최종 Rust 런처 exe도 실행 차단을 확인하여 현재 시작 경로는 PowerShell 스크립트를 사용한다. Node 배포 실행 파일과 이 스크립트 경로는 실제 실행했다. 서버용 외부 npm 패키지를 추가하지 않았다. Node 배포본의 전체 LICENSE와 원래 엔진/폰트 고지를 포함한다.
 
 서버는 127.0.0.1에만 바인딩하며 Host, Origin/fetch metadata, 부트스트랩 헤더, 난수 토큰을 검사한다. CSP의 connect-src는 self다. 모델 호출은 등록한 endpoint로만 보내고 redirect를 따르지 않는다. 기관 관리자의 endpoint allowlist, 인증서 배포, 브라우저 자체 통신 제어와 암호화 저장 정책은 아직 제품화하지 않았다.
+
+## 2026-10-11 LLM 연결 확장
+
+HyperCLOVA X v3 구조화 출력 adapter와 문서/자료를 보내지 않는 합성 연결 테스트를 추가했다. 모델은 HCX-007, 실제 계정 권한과 출력 품질은 아직 검증하지 않았다. GPT Responses·Claude·Gemini 전용 adapter는 명세 단계다. 이번 추가 검증은 [LLM adapter 검사 기록](evidence/llm-adapters-2026-10-11/README.md)을 따른다.
 
 ## 자동 검증과 근거
 
@@ -99,7 +103,7 @@ HWP는 UI의 저장·다운로드 확인 경로에서 얻은 파일이다. HWPX�
 
 ## 남은 우선 작업
 
-1. 실제 기관 endpoint와 모델로 새 초안→후속 변경→undo→저장을 검증한다. HyperCLOVA X 고유 규격이면 별도 adapter를 추가한다.
+1. 실제 기관 endpoint와 모델로 새 초안→후속 변경→undo→저장을 검증한다. HyperCLOVA X native adapter는 2026-10-11 추가했으며 일반 NAVER Cloud 키를 입력한 실제 호출은 대기 중이다.
 2. 실제 Windows 폴더 선택/권한 복원, 한글 2024의 합성 저장물·복잡한 양식, 한국어 IME 세부 사례를 검사한다.
 3. 렌더/중간 명령/rollback 실패 주입과 강제 종료·저장 공간 부족 복구를 보강한다.
 4. 엔진 지원을 확인하며 AI 표/서식 명령을 하나씩 추가한다. 기존 E00~E12의 전체 편집기 보강은 별도 미완료 목록으로 유지한다.

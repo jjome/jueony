@@ -20,14 +20,16 @@
 - 일반 Edge/Chrome에서는 파일 선택 대화상자로 열고 저장한다. 다운로드 모드에서는 파일 저장을 확인한 후 **저장 확인**을 눌러야 수정 상태가 해제된다.
 - 검수할 예제는 [기본 HWP](apps/editor/fixtures/three-paragraphs.hwp), [기본 HWPX](apps/editor/fixtures/three-paragraphs.hwpx), [표 HWP](apps/editor/fixtures/schedule-table.hwp), [표 HWPX](apps/editor/fixtures/schedule-table.hwpx)다.
 
-[최신 MVP 실행·지원 범위·검증 결과](docs/12-mvp-implementation.md), [개발·빌드 방법](apps/editor/README.md)을 먼저 읽는다. 복잡한 원본 문서는 사본으로 검수한다. 현재 빌드의 글꼴 대체와 미지원 개체 때문에 한글에서의 지면·개체 보존을 별도로 확인해야 한다.
+[HyperCLOVA X 연결 가이드](docs/14-hyperclova-x-api-guide.md), [최신 MVP 실행·지원 범위·검증 결과](docs/12-mvp-implementation.md), [개발·빌드 방법](apps/editor/README.md)을 먼저 읽는다. 복잡한 원본 문서는 사본으로 검수한다. 현재 빌드의 글꼴 대체와 미지원 개체 때문에 한글에서의 지면·개체 보존을 별도로 확인해야 한다.
 
-문서 엔진은 Rust/WASM, 화면·Agent는 TypeScript, 로컬 API는 동봉한 Node 서버다. 현재 실행 진입점은 PowerShell이며 별도 Rust 런처 소스도 유지한다. **rhwp가 열린 문서 상태를 소유**한다. workspace·채팅·명시 자료·OpenAI 호환 adapter·여러 본문 위치 직접 편집·요청 undo를 연결했다. 실제 기관 LLM은 endpoint와 인증정보가 없어 검증 대기이며 AI 표·서식·개체·쪽 설정은 미지원이다. 키는 서버 메모리에만 보관하며 연결 설정에서 삭제한다. 실제 모델/한글 독립 검수까지 완료한 제품으로 보고하지 않는다.
+문서 엔진은 Rust/WASM, 화면·Agent는 TypeScript, 로컬 API는 동봉한 Node 서버다. 현재 실행 진입점은 PowerShell이며 별도 Rust 런처 소스도 유지한다. **rhwp가 열린 문서 상태를 소유**한다. workspace·채팅·명시 자료·OpenAI 호환/HyperCLOVA X adapter·여러 본문 위치 직접 편집·요청 undo를 연결했다. 실제 기관 LLM은 endpoint와 인증정보가 없어 검증 대기이며 AI 표·서식·개체·쪽 설정은 미지원이다. 키는 서버 메모리에만 보관하며 연결 설정에서 삭제한다. 실제 모델/한글 독립 검수까지 완료한 제품으로 보고하지 않는다.
 
 ## 프로젝트 문서
 
 | 문서 | 다루는 결정 |
 | --- | --- |
+| [LLM 제공자 4종 구현 명세](docs/13-llm-provider-adapters.md) | GPT·Claude·Gemini·HyperCLOVA X의 계약, 구현 상태, 다음 작업 |
+| [HyperCLOVA X API 사용 가이드](docs/14-hyperclova-x-api-guide.md) | 일반 NAVER Cloud 계정, 키 발급, 합성 연결 검사, 편집 검수 |
 | [MVP 구현 결과와 사용법](docs/12-mvp-implementation.md) | 현재 실행 묶음, 지원 범위, 확장 위치, 검증 한계, 한글 검수용 문서 |
 | [Workspace·채팅·AI 직접 편집 MVP](docs/11-workspace-agent-mvp-plan.md) | 최신 방향: M00~M12 작업, Ports and Adapters, 직접 적용·undo, V01~V28 수용 검사 |
 | [기본 편집기 보강 작업 계획](docs/10-basic-editor-work-plan.md) | 구현 전 작업 지시서: 13개 작업, 완료 기준, 의존 관계, [54개 검사 목록](docs/basic-editor-checklist.csv) |

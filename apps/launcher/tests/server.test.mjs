@@ -10,6 +10,9 @@ before(async()=>{
  provider=http.createServer(async(req,res)=>{
   let bytes='';for await(const chunk of req)bytes+=chunk;
   const body=JSON.parse(bytes);calls.push({body,authorization:req.headers.authorization,url:req.url});
+  if(req.url.startsWith('/v3/chat-completions/')){
+   res.setHeader('Content-Type','application/json');res.end(JSON.stringify({status:{code:'20000'},result:{finishReason:'stop',message:{role:'assistant',content:JSON.stringify({message:'연결 확인',operations:[],sourceIds:[]})}}}));return;
+  }
   if(body.model==='unauthorized'){res.writeHead(401);res.end('private-key-in-error');return;}
   if(body.model==='redirect'){res.writeHead(307,{Location:providerOrigin+'/redirect-target'});res.end();return;}
   if(body.model==='bad-json'){res.end('not JSON');return;}
@@ -58,4 +61,18 @@ test('정적 자산은 로컬 CSP로 제공하고 경로 순회와 잘못된 JSO
  for(const path of ['/%2e%2e%5cLICENSE.txt','/C%3A/Windows/win.ini','/%00'])assert.equal((await fetch(origin+path)).status,404);
  const bad=await fetch(origin+'/api/configure',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json','X-Jueony-Token':token},body:'{'});assert.equal(bad.status,400);
 });
+test('HyperCLOVA registry와 합성 연결 테스트는 사용자 문맥/키를 저장하지 않는다',async()=>{
+ const native={id:'hyperclova-fixture',adapterId:'hyperclova',label:'NAVER fixture',endpoint:providerOrigin+'/v3/chat-completions',modelId:'HCX-007'};
+ const before=calls.length;
+ const probe=await post('test-connection',{config:native,key:'private-key-in-error',input:{privateDocument:'MUST NOT SEND'}});
+ assert.equal(probe.status,200);assert.deepEqual(await probe.json(),{connected:true,documentSent:false});
+ assert.equal(calls.length,before+1);const context=JSON.parse(calls.at(-1).body.messages[1].content);
+ assert.deepEqual(context.references,[]);assert.deepEqual(context.conversation,[]);assert.deepEqual(context.document.nodes,[]);
+ assert.doesNotMatch(JSON.stringify(context),/MUST NOT SEND/);
+ assert.equal((await post('generate',{configId:native.id,input})).status,400);
+ assert.equal((await post('configure',{config:native,key:'private-key-in-error'})).status,200);
+ assert.equal((await post('generate',{configId:native.id,input})).status,200);
+ assert.doesNotMatch(logs,/private-key-in-error/);
+});
+
 test('연결 키 삭제 후 기존 모델로 호출할 수 없다',async()=>{await config('model-a');assert.equal((await post('clear-credentials',{})).status,200);assert.equal((await post('generate',{configId:'model-a',input})).status,400);});

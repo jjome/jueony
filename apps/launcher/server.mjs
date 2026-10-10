@@ -3,6 +3,8 @@ import { readFile, stat, realpath } from 'node:fs/promises';
 import { resolve, join, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
+import { createHyperCLOVA } from './providers/hyperclova.mjs';
+import { connectionTestInput, assertConnectionTest } from './providers/connection-test.mjs';
 import { createOpenAICompatible } from './providers/openai-compatible.mjs';
 
 const here=resolve(fileURLToPath(new URL('.',import.meta.url)));
@@ -13,13 +15,18 @@ const origins=new Set([`http://127.0.0.1:${port}`,`http://localhost:${port}`]);
 const hosts=new Set([`127.0.0.1:${port}`,`localhost:${port}`]);
 const token=randomBytes(32).toString('hex');
 const configs=new Map();
-const registry=new Map([['openai-compatible',createOpenAICompatible]]);
+const registry=new Map([['openai-compatible',createOpenAICompatible],['hyperclova',createHyperCLOVA]]);
 const csp="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'";
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.wasm':'application/wasm','.woff2':'font/woff2','.woff':'font/woff','.ttf':'font/ttf','.otf':'font/otf','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.ico':'image/x-icon'};
 function reply(res,status,data,type='application/json'){res.writeHead(status,{'Content-Type':type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':csp,'Referrer-Policy':'no-referrer'});res.end(type==='application/json'?JSON.stringify(data):data);}
 function caller(req){const origin=req.headers.origin;if(origin)return origins.has(origin);return req.headers['sec-fetch-site']==='same-origin'&&['cors','same-origin'].includes(req.headers['sec-fetch-mode']);}
 function authorized(req){const supplied=req.headers['x-jueony-token'];return typeof supplied==='string'&&supplied.length===token.length&&timingSafeEqual(Buffer.from(supplied),Buffer.from(token));}
 async function body(req){if(req.headers['content-type']!=='application/json')throw new Error('JSON 요청이 필요합니다.');let size=0;const parts=[];for await(const chunk of req){size+=chunk.length;if(size>2_000_000)throw new Error('요청 크기 제한을 넘었습니다.');parts.push(chunk);}return JSON.parse(Buffer.concat(parts).toString('utf8'));}
+function connection(data){
+ const config=data.config;
+ if(!config||typeof config.id!=='string'||config.id.length>100||!registry.has(config.adapterId))throw new Error('지원하지 않는 제공자 설정입니다.');
+ return {adapter:registry.get(config.adapterId)(config,data.key),config:{...config}};
+}
 let active=0;
 const server=http.createServer({maxHeaderSize:16384,requestTimeout:15000,headersTimeout:10000},async(req,res)=>{
  try{
@@ -33,16 +40,14 @@ const server=http.createServer({maxHeaderSize:16384,requestTimeout:15000,headers
    const data=await body(req);
    if(path==='/api/clear-credentials'){configs.clear();reply(res,200,{cleared:true});return;}
    if(path==='/api/configure'){
-    const config=data.config;
-    if(!config||typeof config.id!=='string'||config.id.length>100||!registry.has(config.adapterId))throw new Error('지원하지 않는 제공자 설정입니다.');
-    const adapter=registry.get(config.adapterId)(config,data.key);
-    configs.set(config.id,{adapter,config:{...config}});reply(res,200,{configured:true});return;
+    const selected=connection(data);
+    configs.set(selected.config.id,selected);reply(res,200,{configured:true});return;
    }
-   if(path==='/api/generate'){
-    const selected=configs.get(data.configId);if(!selected)throw new Error('연결 설정에서 API 키를 입력해 주세요. 키는 실행 중에만 보관합니다.');
+   if(path==='/api/generate'||path==='/api/test-connection'){
+    const selected=path==='/api/test-connection'?connection(data):configs.get(data.configId);if(!selected)throw new Error('연결 설정에서 API 키를 입력해 주세요. 키는 실행 중에만 보관합니다.');
     if(active>=2){reply(res,429,{error:'다른 AI 요청이 진행 중입니다.'});return;}
     const abort=new AbortController();res.on('close',()=>abort.abort());active++;
-    try{const result=await selected.adapter.generate(data.input,abort.signal);if(!res.destroyed)reply(res,200,{result});}finally{active--;}
+    try{const testing=path==='/api/test-connection';const result=await selected.adapter.generate(testing?connectionTestInput():data.input,abort.signal);if(!res.destroyed)reply(res,200,testing?assertConnectionTest(result):{result});}finally{active--;}
     return;
    }
    reply(res,404,{error:'없는 API'});return;

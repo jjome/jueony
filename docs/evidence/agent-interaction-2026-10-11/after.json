@@ -1,0 +1,70 @@
+{
+  "origin": "http://127.0.0.1:4173",
+  "syntheticOnly": true,
+  "separateProfile": true,
+  "checks": [
+    "Shift+Enter inserts a newline without sending",
+    "Composition state, keyCode 229 and composing Enter do not send (synthetic IME events)",
+    "Enter sends one real HCX-005 request and creates a new document",
+    "Button sends a follow-up edit and preserves the date and place",
+    "Request undo restores the first generated document",
+    "Progress appears while working and clears on completion; no browser errors"
+  ],
+  "runs": [
+    {
+      "text": "새 문서에 회의 안내문을 작성해줘. 제목은 회의 안내, 일시는 2026년 10월 20일 오후 2시, 장소는 대회의실이야. 제목, 일시, 장소를 각각 별도 문단으로 작성해줘. 다른 내용은 추가하지 마.",
+      "input": "Enter",
+      "httpStatus": 200,
+      "result": {
+        "result": {
+          "message": "회의 안내문 작성: 제목, 일시, 장소를 각각 별도 문단으로 작성합니다.",
+          "sourceIds": [],
+          "operations": [
+            {
+              "kind": "create_document",
+              "paragraphs": [
+                "회의 안내",
+                "2026년 10월 20일 오후 2시",
+                "대회의실"
+              ]
+            }
+          ]
+        }
+      },
+      "status": "AI 요청이 완료되었습니다."
+    },
+    {
+      "text": "현재 문서의 제목 회의 안내를 업무 회의 안내로 바꾸고, 그 제목만 16pt 굵게 해줘. 일시와 장소는 그대로 유지해줘.",
+      "input": "button",
+      "httpStatus": 200,
+      "result": {
+        "result": {
+          "message": "제목 변경 및 서식 적용",
+          "sourceIds": [],
+          "operations": [
+            {
+              "kind": "replace_body_text",
+              "target": "s0p0",
+              "start": 0,
+              "count": 5,
+              "text": "업무 회의 안내"
+            },
+            {
+              "kind": "format_characters",
+              "target": "s0p0",
+              "properties": {
+                "bold": true,
+                "fontSizePt": 16
+              }
+            }
+          ]
+        }
+      },
+      "status": "AI 요청이 완료되었습니다."
+    }
+  ],
+  "errors": [],
+  "selectedModel": "HCX-005",
+  "status": "PASS",
+  "calls": 2
+}

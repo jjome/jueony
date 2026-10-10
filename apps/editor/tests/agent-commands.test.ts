@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import init,{HwpDocument} from '@rhwp/core';
 import {executeBodyOperations,validateGeneration,assertRevision} from '../src/mvp/edit-schema.ts';
+import {executeDocumentOperations} from '../src/document-control/execute.ts';
 import {initialState,addWorkspace,addChat,appendMessage,interruptRuns} from '../src/mvp/model.ts';
 import {buildContext} from '../src/mvp/context.ts';
 import type {Snapshot} from '../src/mvp/model.ts';
@@ -43,8 +44,46 @@ test('본문 전체 교체가 균일한 원래 글자·문단 서식을 보존�
 });
 test('명령 전체 사전 검사에서 알 수 없는 명령·범위·출처·중복 대상을 거부한다',()=>{
  const doc=HwpDocument.createEmpty();doc.createBlankDocument();try{const s=snapshot(doc);
- for(const operations of [[{kind:'shell',command:'anything'}],[{kind:'delete_body_text',target:'s0p0',start:0,count:1}],[{kind:'create_document',paragraphs:['a\nb']}],[{kind:'insert_body_paragraphs',after:'s0p0',paragraphs:['a']},{kind:'insert_body_paragraphs',after:'s0p0',paragraphs:['b']}]])assert.throws(()=>validateGeneration({message:'',sourceIds:[],operations},s,[]));
+ for(const operations of [[{kind:'shell',command:'anything'}],[{kind:'delete_body_text',target:'s0p0',start:0,count:1}],[{kind:'create_document',paragraphs:['a\nb']}],[{kind:'replace_body_text',target:'s0p0',start:0,count:0,text:'a'},{kind:'replace_body_text',target:'s0p0',start:0,count:0,text:'b'}]])assert.throws(()=>validateGeneration({message:'',sourceIds:[],operations},s,[]));
  assert.throws(()=>validateGeneration({message:'',sourceIds:['foreign'],operations:[]},s,[]));assert.throws(()=>assertRevision('old','new'));assert.deepEqual(text(doc),['']);
+ }finally{doc.free();}
+});
+
+test('실제 HCX-005 회귀: 같은 위치의 연속 삽입을 응답 순서대로 보존하고 재열기·undo한다',()=>{
+ const doc=HwpDocument.createEmpty();doc.createBlankDocument();
+ try{
+  const before=snapshot(doc),saved=doc.saveSnapshot();
+  const values=['회의 안내','2026년 10월 20일 오후 2시','대회의실'];
+  const raw={message:'회의 안내문 작성',sourceIds:[],operations:values.map(value=>({kind:'insert_body_paragraphs',after:'s0p0',paragraphs:[value]}))};
+  const original=JSON.stringify(raw),result=validateGeneration(raw,before,[]);assert.equal(JSON.stringify(raw),original);assert.equal(result.operations.length,1);
+  executeDocumentOperations(doc,before,result.operations);assert.deepEqual(text(doc),['',...values]);
+  for(const bytes of [doc.exportHwp(),doc.exportHwpx()]){const reopened=new HwpDocument(bytes);try{assert.deepEqual(text(reopened),['',...values]);}finally{reopened.free();}}
+  doc.restoreSnapshot(saved);assert.deepEqual(text(doc),['']);doc.discardSnapshot(saved);
+ }finally{doc.free();}
+});
+
+test('같은 문단의 본문 변경과 그 뒤 삽입은 두 순서 모두 대상을 보존한다',()=>{
+ for(const reverse of [false,true]){
+  const doc=HwpDocument.createEmpty();doc.createBlankDocument();doc.insertText(0,0,0,'원래 제목');
+  try{
+   const base=snapshot(doc),operations:any[]=[{kind:'replace_body_text',target:'s0p0',start:0,count:5,text:'회의 안내'},{kind:'insert_body_paragraphs',after:'s0p0',paragraphs:['일시','장소']}];
+   if(reverse)operations.reverse();executeDocumentOperations(doc,base,validateGeneration({message:'',sourceIds:[],operations},base,[]).operations);
+   assert.deepEqual(text(doc),['회의 안내','일시','장소']);
+  }finally{doc.free();}
+ }
+});
+
+test('삽입 묶음도 미지원 속성·문단 수 초과·비연속 중복은 거절한다',()=>{
+ const doc=HwpDocument.createEmpty();doc.createBlankDocument();doc.splitParagraph(0,0,0);
+ try{
+  const base=snapshot(doc),insert=(after:string,paragraphs:string[],extra={})=>({kind:'insert_body_paragraphs',after,paragraphs,...extra});
+  for(const operations of [
+   [insert('s0p0',['정상']),insert('s0p0',['거절'],{command:'bad'})],
+   [insert('s0p0',[]),insert('s0p0',['빈 명령 숨기기 금지'])],
+   [insert('s0p0',Array(100).fill('본문')),insert('s0p0',['101번째'])],
+   [insert('s0p0',['앞']),insert('s0p1',['다른 위치']),insert('s0p0',['모호한 재삽입'])],
+  ])assert.throws(()=>validateGeneration({message:'',sourceIds:[],operations},base,[]));
+  assert.deepEqual(text(doc),['','']);
  }finally{doc.free();}
 });
 test('업무·채팅 Context 격리와 중단 실행 복원',()=>{

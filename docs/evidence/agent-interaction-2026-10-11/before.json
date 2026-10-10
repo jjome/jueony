@@ -1,0 +1,43 @@
+{
+  "origin": "http://127.0.0.1:4173",
+  "syntheticOnly": true,
+  "separateProfile": true,
+  "checks": [],
+  "errors": [],
+  "selectedModel": "HCX-005",
+  "enterSent": false,
+  "enterAddedNewline": true,
+  "lastResponse": {
+    "result": {
+      "message": "회의 안내문 작성",
+      "sourceIds": [],
+      "operations": [
+        {
+          "kind": "insert_body_paragraphs",
+          "after": "s0p0",
+          "paragraphs": [
+            "회의 안내"
+          ]
+        },
+        {
+          "kind": "insert_body_paragraphs",
+          "after": "s0p0",
+          "paragraphs": [
+            "2026년 10월 20일 오후 2시"
+          ]
+        },
+        {
+          "kind": "insert_body_paragraphs",
+          "after": "s0p0",
+          "paragraphs": [
+            "대회의실"
+          ]
+        }
+      ]
+    }
+  },
+  "lastStatus": "같은 문단의 겹치는 명령은 한 명령으로 합쳐 주세요.",
+  "status": "FAIL",
+  "error": "Expected values to be strictly equal:\n+ actual - expected\n\n+ '같은 문단의 겹치는 명령은 한 명령으로 합쳐 주세요.'\n- 'AI 요청이 완료되었습니다.'\n",
+  "calls": 1
+}

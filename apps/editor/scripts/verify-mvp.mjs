@@ -43,6 +43,7 @@ try{
  await page.goto(appUrl+'?storage=download');
  await page.waitForFunction(()=>[...document.querySelectorAll('.editor-frame')].some(f=>f.contentWindow?.jueonyEditor?.snapshot)&&document.getElementById('app-status').textContent.includes('준비 완료'),{timeout:60000});
  assert.equal((await snapshot()).nodes.length,1);pass('three panes and live editor ready');
+ await page.type('#request-input','새 문서를 작성해줘');await page.keyboard.press('Enter');await page.waitForSelector('#request-error:not([hidden])');assert.match(await page.$eval('#request-error',e=>e.textContent),/AI 연결/);assert.equal(calls.length,0);assert.equal((await snapshot()).nodes[0].text,'');await page.$eval('#request-input',e=>e.value='');pass('unconfigured Enter request shows an inline error without changing the document');
  const duplicate=await browser.newPage();await duplicate.goto(appUrl);await duplicate.waitForFunction(()=>document.getElementById('app-status').textContent.includes('다른 Jueony 창'));assert.equal(await duplicate.$eval('#app-shell',e=>e.inert),true);await duplicate.close();pass('second window cannot overwrite workspace storage');
  await page.click('#connection-settings');await page.waitForFunction(()=>document.getElementById('model-dialog').open);
  assert.deepEqual(await page.$$eval('#config-adapter option',els=>els.map(e=>e.value)),['openai-compatible','hyperclova']);

@@ -31,6 +31,7 @@ const tabs:Tab[]=[];const loaded=new Set<string>();let selected:Reference[]=[];
 const runLabels:Record<Run['status'],string>={preparing_context:'자료 읽는 중',generating:'모델 응답 대기',validating:'명령 검증 중',applying:'문서 적용 중',completed:'완료',cancelled:'취소됨',conflict:'문서 변경 충돌',failed_no_change:'실패 · 적용 없음',failed_rolled_back:'실패 · 변경 복원됨',failed_partial:'실패 · 부분 적용 확인 필요',interrupted:'이전 실행 중단됨'};
 const status=(text:string)=>{$('app-status').textContent=text;$('app-status').title=text;};
 const error=(e:unknown)=>status(e instanceof Error?e.message:String(e));
+const requestError=(e:unknown)=>{error(e);$('request-error').textContent=e instanceof Error?e.message:String(e);$('request-error').hidden=false;};
 const work=()=>state.workspaces.find(w=>w.id===state.activeWorkspaceId)!;
 const chat=()=>chatOf(state,work().id,work().activeChatId);
 const button=(label:string,action:()=>unknown)=>{const b=document.createElement('button');b.textContent=label;b.type='button';b.onclick=()=>{try{void Promise.resolve(action()).catch(error);}catch(e){error(e);}};return b;};
@@ -74,6 +75,9 @@ function renderMessages(){
   }
   target.append(card);
  }
+ const pending=running?.run.chatId===chat().id&&running.run.workspaceId===work().id;
+ target.setAttribute('aria-busy',String(Boolean(pending)));
+ if(pending){const card=document.createElement('article');card.className='message assistant pending';card.id='agent-progress';card.setAttribute('role','status');card.textContent=(running!.run.model?.modelId??'AI')+' · '+runLabels[running!.run.status]+'…';target.append(card);}
  target.scrollTop=target.scrollHeight;
 }
 function renderReferences(){$('reference-summary').textContent=selected.length?'이번 요청 참고: '+selected.map(s=>s.path).join(', '):'참고 파일 없음 · 폴더 트리에서 체크하세요.';}
@@ -159,7 +163,10 @@ async function switchWorkspace(id:string){
 }
 function updateRun(){const busy=Boolean(running);$<HTMLButtonElement>('send-request').disabled=busy;$<HTMLButtonElement>('cancel-run').disabled=!busy||running?.run.status==='applying';$('run-status').textContent=running?runLabels[running.run.status]:'지원: 본문 · 서식 · 표 · 용지/여백';}
 async function send(){
- const input=$<HTMLTextAreaElement>('request-input');const request=input.value.trim();if(!request||running||restoring)return;
+ const input=$<HTMLTextAreaElement>('request-input');const request=input.value.trim();if(!request)return;
+ $('request-error').hidden=true;
+ if(running)throw new Error('현재 요청이 진행 중입니다. 완료를 기다리거나 중지한 뒤 전송해 주세요.');
+ if(restoring)throw new Error('문서를 준비하고 있습니다. 준비 완료 후 다시 전송해 주세요.');
  const model=state.models.find(m=>m.id===$<HTMLSelectElement>('model-select').value);if(!model)throw new Error('먼저 AI 연결을 등록해 주세요.');
  const original=activeTab;if(!original?.api||original.workspaceId!==work().id)throw new Error('문서 준비를 기다려 주세요.');
  const workspaceId=work().id,chatId=chat().id,run:Run={id:uid(),workspaceId,chatId,documentId:original.id,status:'preparing_context',model:{adapterId:model.adapterId,label:model.label,endpoint:model.endpoint,modelId:model.modelId,maxOutputTokens:model.maxOutputTokens},sources:[],createdAt:Date.now()};
@@ -175,14 +182,14 @@ async function send(){
   const result=await runOnce({runId:run.id,context,model,port,editor:original.api,signal:controller.signal,
    isCurrent:()=>work().id===workspaceId&&chat().id===chatId&&activeTab?.id===run.documentId,
    createDocument:async()=>{const tab=await newTab(workspaceId);run.documentId=tab.id;return tab.api;},
-   state:s=>{run.status=s;updateRun();void persist().catch(error);}});
+   state:s=>{run.status=s;updateRun();renderMessages();void persist().catch(error);}});
   run.status='completed';run.receipt=result.receipt;run.usedSourceIds=result.sourceIds;
   appendMessage(state,workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:result.message+'\n\n'+(result.receipt?result.receipt.operationCount+'개 명령을 실제 문서에 적용했습니다. 파일 저장은 별도로 실행하세요.':'문서에 적용한 변경은 없습니다.')});
   const tab=tabs.find(t=>t.id===run.documentId);
   try{if(tab)await persistTab(tab);status('AI 요청이 완료되었습니다.');}catch(e){persistError=true;run.error='문서 변경은 적용됐지만 로컬 복구본 저장에 실패했습니다. 문서를 파일로 저장해 주세요.';appendMessage(state,workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:run.error});status(run.error);}
  }catch(e){
   const name=e instanceof Error?e.name:'';run.status=controller.signal.aborted||name==='AbortError'?'cancelled':name==='ConflictError'?'conflict':name==='PartialApplyError'?'failed_partial':name==='RolledBackError'?'failed_rolled_back':'failed_no_change';run.error=run.status==='cancelled'?'요청을 취소했습니다. 이 요청의 변경을 적용하지 않았습니다.':e instanceof Error?e.message:'실행 오류';
-  appendMessage(state,workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:run.error});error(e);
+  appendMessage(state,workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:run.error});requestError(run.error);
  }finally{running=undefined;await persist().catch(error);renderMessages();updateRun();}
 }
 on('add-workspace',async()=>{if(!cancelNavigation())return;const name=prompt('새 업무 이름');if(!name?.trim())return;const w=addWorkspace(state,name);await switchWorkspace(w.id);});
@@ -195,7 +202,14 @@ on('toggle-sidebar',()=>$('app-shell').classList.toggle('sidebar-hidden'));
 on('new-document',async()=>{if(cancelNavigation())await newTab();});
 on('open-document',async()=>{const picker=(window as any).showOpenFilePicker;if(picker){const [handle]=await picker({types:[{description:'한글 문서',accept:{'application/octet-stream':['.hwp','.hwpx']}}]});await openHandle(handle);}else{const file=document.createElement('input');file.type='file';file.accept='.hwp,.hwpx';file.onchange=async()=>{const f=file.files?.[0];if(f&&cancelNavigation()){try{const tab=await newTab();await tab.api.open(new Uint8Array(await f.arrayBuffer()),f.name);await persistTab(tab);}catch(e){error(e);}}};file.click();}});
 on('save-document',async()=>{if(running?.run.status==='applying')return;if(activeTab?.api){const tab=activeTab;const result=await tab.api.save();await persistTab(tab);status(result==='saved'?'파일에 저장했습니다.':'저장을 완료하지 않았습니다.');}});
-$('request-form').addEventListener('submit',e=>{e.preventDefault();void send().catch(error);});
+$('request-form').addEventListener('submit',e=>{e.preventDefault();void send().catch(requestError);});
+let requestComposing=false;
+$('request-input').addEventListener('compositionstart',()=>requestComposing=true);
+$('request-input').addEventListener('compositionend',()=>requestComposing=false);
+$('request-input').addEventListener('keydown',e=>{
+ if(e.key!=='Enter'||e.shiftKey||e.isComposing||requestComposing||e.keyCode===229)return;
+ e.preventDefault();if(!e.repeat)$<HTMLFormElement>('request-form').requestSubmit();
+});
 on('cancel-run',()=>running?.controller.abort());
 $('provider-select').addEventListener('change',()=>{const value=$<HTMLSelectElement>('provider-select').value;const m=state.models.find(m=>m.label+' | '+m.adapterId+' | '+m.endpoint===value);chat().modelId=m?.id;renderModels();void persist().catch(error);});
 $('model-select').addEventListener('change',()=>{chat().modelId=$<HTMLSelectElement>('model-select').value;void persist().catch(error);});

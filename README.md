@@ -32,6 +32,7 @@
 
 | 문서 | 다루는 결정 |
 | --- | --- |
+| [이번 자율 구현 결과와 다음 실행](docs/23-autonomous-work-result.md) | 완료 항목·실제 검증·아침 사용 순서와 남은 범위 |
 | [제공자 3종·표 행열·서식·임시 첨부](docs/20-native-providers-and-editing.md) | GPT·Claude·Gemini 설정과 키 관리, 실제 구현 및 검증 한계 |
 | [공개 문서 호환성 검사](docs/21-public-document-validation.md) | 인터넷 표본 5개, 재열기 결과, 알려진 차이와 실제 한글 검수 파일 |
 | [RAG·Agent 실행 설계](docs/22-agent-retrieval-execution-design.md) | 로컬 검색·문맥·제한된 loop·MCP·평가 사례와 단계별 적용 계획 |

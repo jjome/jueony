@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "origin": "http://127.0.0.1:4173",
+  "syntheticOnly": true,
+  "separateProfile": true,
+  "selectedModel": "HCX-005",
+  "calls": 2,
+  "checks": [
+    "Shift+Enter inserts a newline without sending",
+    "Composition state, keyCode 229 and composing Enter do not send (synthetic IME events)",
+    "Enter sends one real HCX-005 request and creates a new document",
+    "Button sends a follow-up edit and preserves the date and place",
+    "Request undo restores the first generated document",
+    "Progress appears while working and clears on completion; no browser errors"
+  ],
+  "errors": [],
+  "sourceCommit": "9397032ba8a9a835bb672029f25097597778c88e",
+  "date": "2026-10-11"
+}

@@ -13,7 +13,7 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/dist') -Destination 
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/fixtures') -Destination $output -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/README.md') -Destination (Join-Path $output 'README.md') -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/12-mvp-implementation.md') -Destination (Join-Path $output 'MVP-GUIDE.md') -Force
-foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.md', '15-ai-editor-control-plan.md', '16-hangul-shortcuts-plan.md', '17-editor-control-implementation.md', '18-pane-resize-agent-check.md', '19-agent-interaction-fix.md', '20-native-providers-and-editing.md', '21-public-document-validation.md', '22-agent-retrieval-execution-design.md', 'agent-evaluation-cases.csv', 'ai-editor-capability-matrix.csv')) {
+foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.md', '15-ai-editor-control-plan.md', '16-hangul-shortcuts-plan.md', '17-editor-control-implementation.md', '18-pane-resize-agent-check.md', '19-agent-interaction-fix.md', '20-native-providers-and-editing.md', '21-public-document-validation.md', '22-agent-retrieval-execution-design.md', '23-autonomous-work-result.md', 'agent-evaluation-cases.csv', 'ai-editor-capability-matrix.csv')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
 $llmEvidence = Join-Path $output 'evidence'

@@ -15,8 +15,11 @@
 | 공개 문서 UI | 5개 열기 통과, 4개 셀 편집/undo 통과 | `public-browser.json` |
 | 공개 문서 엔진 무수정 저장 | 4 PASS_CONTENT / 1 REVIEW_REQUIRED | `public-roundtrip.json` |
 | TypeScript / production build | 통과 | `typecheck.txt`, `build.txt` |
+| 최종 실행 묶음 / 기존 HCX-005 실호출 | 실제 2회 호출·6 시나리오 통과 | `hcx-live.json`, `bundle.json` |
 
 native UI의 16번 모델 요청은 전부 로컬 fixture다. 세 제공자의 **실제 계정 호출은 키가 없어 미검증**이다. fixture는 인증 헤더·URL·모델 선택·응답 변환·거부·편집 연결을 확인하며 자연어 품질이나 해당 계정의 모델 권한을 입증하지 않는다. 일반 API가 실제 기관망에서 연결되는지도 별도다.
+
+최종 실행 묶음은 구현 커밋 `9397032`에서 tracked 변경 없이 빌드했다. 그 묶음의 실제 4173 서버와 기존 HCX-005 연결로 합성 회의 안내문 작성 → 제목 교체/16pt 굵게 → 요청 undo를 통과했다. 공개 다운로드 문서와 사용자 업무 자료는 실호출에 사용하지 않았다. 이 실호출은 새 표 행열·장평 등 모든 기능의 모델 해석 품질까지 확인한 것은 아니다.
 
 공개 표본의 출처/다운로드 실패/SHA-256은 `public-sources.json`에 있다. 엔진의 content-loss 0과 실제 텍스트 비교를 구분했다. note_example의 HWP 결과는 끝 빈 문단 한 개 증가로 별도 검수 판정이다. 원본·저장 파일·공개 자료 화면 캡처는 `.tools/public-documents`에만 있고 Git/배포 묶음에는 포함하지 않는다. [독립 한글 검수 절차](../../21-public-document-validation.md).
 

@@ -26,7 +26,7 @@ foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.m
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
 $llmEvidence = Join-Path $output 'evidence'
-foreach ($guide in @('30-layered-modular-refactor-plan.md','31-facade-contracts.md','32-modular-refactor-result.md','33-editor-parity-features-result.md','refactor-work-plan.csv','hangul-2024-gap-checklist.csv')) {
+foreach ($guide in @('30-layered-modular-refactor-plan.md','31-facade-contracts.md','32-modular-refactor-result.md','33-editor-parity-features-result.md','34-sections-tabs-result.md','refactor-work-plan.csv','hangul-2024-gap-checklist.csv')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
 New-Item -ItemType Directory -Force $llmEvidence | Out-Null
@@ -85,6 +85,15 @@ if (Test-Path -LiteralPath $featureDocuments) {
     Get-ChildItem -LiteralPath $featureDocuments -File |
         Where-Object { $_.Extension -in @('.hwp', '.hwpx') } | Copy-Item -Destination $reviewDocuments -Force
 }
+$sectionEvidence = Join-Path $projectRoot 'docs/evidence/sections-tabs-2026-10-12'
+if (Test-Path -LiteralPath $sectionEvidence) {
+    Copy-Item -LiteralPath $sectionEvidence -Destination $llmEvidence -Recurse -Force
+    $sectionDocuments = Join-Path $sectionEvidence 'documents'
+    if (Test-Path -LiteralPath $sectionDocuments) {
+        Get-ChildItem -LiteralPath $sectionDocuments -File |
+            Where-Object { $_.Extension -in @('.hwp', '.hwpx') } | Copy-Item -Destination $reviewDocuments -Force
+    }
+}
 $providerHashes = [ordered]@{}
 Get-ChildItem -LiteralPath (Join-Path $output 'providers') -Filter '*.mjs' | Sort-Object Name | ForEach-Object { $providerHashes[$_.Name] = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash }
 $moduleHashes = [ordered]@{}
@@ -105,5 +114,5 @@ $manifest = [ordered]@{
     adapterSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'providers/openai-compatible.mjs') -Algorithm SHA256).Hash
     frontend = Get-Content -LiteralPath (Join-Path $output 'dist/build-evidence.json') -Raw | ConvertFrom-Json
 }
-$manifest | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $output 'bundle-evidence.json') -Encoding utf8
+$manifest | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath (Join-Path $output 'bundle-evidence.json') -Encoding utf8
 Write-Output "실행 파일: $output\JueonyEditor.exe"

@@ -2,15 +2,16 @@ import puppeteer from 'puppeteer-core';
 import {spawn} from 'node:child_process';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {resolve,dirname} from 'node:path';
-import {fileURLToPath} from 'node:url';
+import {fileURLToPath,pathToFileURL} from 'node:url';
 import assert from 'node:assert/strict';
-import init,{HwpDocument} from '@rhwp/core';
 
 const app=resolve(dirname(fileURLToPath(import.meta.url)),'..'),repo=resolve(app,'../..');
+const enginePkg=process.env.JUEONY_ENGINE_PACKAGE?resolve(repo,process.env.JUEONY_ENGINE_PACKAGE):resolve(app,'node_modules/@rhwp/core');
+const {default:init,HwpDocument}=await import(pathToFileURL(resolve(enginePkg,'rhwp.js')).href);
 const port=4210,origin=`http://127.0.0.1:${port}`,out=resolve(app,process.env.JUEONY_TEST_OUTPUT??'evidence/parity-features');
 const dist=resolve(app,process.env.JUEONY_TEST_DIST??'evidence/dist-features');
 await mkdir(out,{recursive:true});
-await init({module_or_path:await readFile(resolve(app,'node_modules/@rhwp/core/rhwp_bg.wasm'))});
+await init({module_or_path:await readFile(resolve(enginePkg,'rhwp_bg.wasm'))});
 if(await fetch(origin+'/api/health').then(()=>true,()=>false))throw new Error(`Test port ${port} already occupied`);
 const server=spawn(process.execPath,['apps/launcher/server.mjs'],{cwd:repo,windowsHide:true,stdio:'ignore',env:{...process.env,JUEONY_PORT:String(port),JUEONY_DIST:dist,JUEONY_CONNECTION_STORE:'memory'}});
 const results=[],failures=[],pageErrors=[],external=[],browserDialogs=[],consoleErrors=[];
@@ -88,6 +89,42 @@ try{
   page=await browser.newPage();page.setDefaultTimeout(15000);page.on('pageerror',error=>pageErrors.push(String(error)));page.on('console',message=>{if(message.type()==='error')consoleErrors.push(message.text());});page.on('dialog',dialog=>{browserDialogs.push({type:dialog.type(),message:dialog.message()});void dialog.accept();});
   await page.setRequestInterception(true);page.on('request',request=>{if(!request.url().startsWith(origin)&&!request.url().startsWith('data:')&&!request.url().startsWith('blob:')){external.push(request.url());void request.abort();}else void request.continue();});
   await page.goto(origin);await ready();
+
+  if(process.env.JUEONY_ENGINE_PACKAGE) {
+    await scenario('Alt+Shift+Enter splits actual body sections; undo/redo and guarded file save',async()=>{
+      const frame=await openFixture(),before=await snapshot();
+      await frame.evaluate(()=>{const s=window.__parityServices,ih=s.getInputHandler();ih.cursor.moveTo({sectionIndex:0,paragraphIndex:1,charOffset:2});ih.updateCaret();ih.focus();s.eventBus.emit('command-state-changed');});
+      await chord('Alt','Shift','Enter');
+      await frame.waitForFunction(()=>window.jueonyEditor.snapshot().structure.sections.length===2);
+      const after=await snapshot();assert.equal(after.nodes.map(n=>n.text).join(''),before.nodes.map(n=>n.text).join(''));
+      assert.equal(await frame.evaluate(()=>window.__parityServices.getInputHandler().getPosition().sectionIndex),1);
+      await saveBytes('ui-section-split.hwpx');
+      await command('edit:undo');assert.deepEqual((await snapshot()).structure.sections,before.structure.sections);assert.deepEqual((await snapshot()).nodes.map(n=>n.text),before.nodes.map(n=>n.text));
+      await command('edit:redo');assert.equal((await snapshot()).structure.sections.length,2);
+    });
+    await scenario('paragraph dialog changes default tab spacing in pt; cancel/undo/reopen preserve state',async()=>{
+      const doc=HwpDocument.createEmpty();doc.createBlankDocument();doc.insertText(0,0,0,'A\tB\tC');doc.splitParagraph(0,0,5);doc.insertText(0,1,0,'D\tE\tF');doc.insertSectionBreak(0,1,0);doc.setSectionDef(0,JSON.stringify({defaultTabSpacing:8000}));doc.setSectionDef(1,JSON.stringify({defaultTabSpacing:12000}));
+      const bytes=[...doc.exportHwpx()];doc.free();const frame=await openBytes(bytes,'ui-default-tabs.hwpx');
+      await frame.evaluate(()=>{const s=window.__parityServices,ih=s.getInputHandler();ih.cursor.moveTo({sectionIndex:1,paragraphIndex:0,charOffset:0});ih.updateCaret();ih.focus();s.eventBus.emit('command-state-changed');});
+      await command('format:para-shape');
+      await frame.click('.modal-overlay .dialog-tabs .dialog-tab[data-tab="tabStops"]');
+      await frame.click('[data-jueony-default-tab-change]');await frame.waitForSelector('[data-jueony-default-tabs]');
+      assert.equal(await frame.$eval('[aria-label="기본 탭 간격(pt)"]',e=>e.value),'60.0');
+      await frame.$eval('[aria-label="기본 탭 간격(pt)"]',e=>{e.value='20';});
+      await frame.click('.modal-overlay:has([data-jueony-default-tabs]) .dialog-btn-primary');
+      await frame.waitForSelector('[data-jueony-default-tabs]',{hidden:true});
+      await page.keyboard.press('Escape');
+      assert.equal(await frame.evaluate(()=>window.__parityServices.wasm.getSectionDef(1).defaultTabSpacing),4000);
+      assert.equal(await frame.evaluate(()=>window.__parityServices.wasm.getSectionDef(0).defaultTabSpacing),8000);
+      await saveBytes('ui-default-tabs-20pt.hwpx');await command('edit:undo');
+      assert.equal(await frame.evaluate(()=>window.__parityServices.wasm.getSectionDef(1).defaultTabSpacing),12000);
+      await command('edit:redo');assert.equal(await frame.evaluate(()=>window.__parityServices.wasm.getSectionDef(1).defaultTabSpacing),4000);
+      const revision=(await snapshot()).revision;
+      await command('format:para-shape');await frame.click('.modal-overlay .dialog-tabs .dialog-tab[data-tab="tabStops"]');await frame.click('[data-jueony-default-tab-change]');
+      assert.equal(await frame.$eval('[aria-label="기본 탭 간격(pt)"]',e=>e.value),'20.0');
+      await page.keyboard.press('Escape');await page.keyboard.press('Escape');assert.equal((await snapshot()).revision,revision);
+    });
+  }
 
   await scenario('F6 opens styles; Alt+F6 focuses chat; modal F6 does not change document',async()=>{
     const frame=await openFixture(),before=await snapshot();await page.keyboard.press('F6');await frame.waitForSelector('.sd-body');

@@ -10,7 +10,9 @@
 
 ## 바로 실행
 
-최신 기능 검수본은 **[Start-Review.cmd](build/jueony-features-20261011/Start-Review.cmd)**로 실행한다(4193). F6 스타일, 캡션 위치·되돌리기, 머리말/꼬리말 창, 영구 쪽 감추기, 복구 설정과 AI 스타일·다단 명령을 보강했다. [지원 범위·검증·남은 차이](docs/33-editor-parity-features-result.md)를 확인한다.
+최신 구역·탭 검수본은 **[Start-Review.cmd](build/jueony-sections-tabs-20261012/Start-Review.cmd)**로 실행한다(4194). Alt+Shift+Enter로 실제 구역 분할, 구역별 기본 탭 간격, 저장·되돌리기를 보강했다. [지원 범위·검증·실제 한글 비교 제한](docs/34-sections-tabs-result.md)을 확인한다. 포트별 업무 저장소가 달라 기존 업무·연결이 자동으로 표시되지 않을 수 있다.
+
+이전 기능 검수본은 **[Start-Review.cmd](build/jueony-features-20261011/Start-Review.cmd)**로 실행한다(4193). F6 스타일, 캡션 위치·되돌리기, 머리말/꼬리말 창, 영구 쪽 감추기, 복구 설정과 AI 스타일·다단 명령을 보강했다. [지원 범위·검증·남은 차이](docs/33-editor-parity-features-result.md)를 확인한다.
 
 리팩터링 검수본은 **[Start-Review.cmd](build/jueony-refactor-20261011/Start-Review.cmd)**로 실행한다(4192). [모듈 구조·검사·남은 이관](docs/32-modular-refactor-result.md)을 참고한다. 기존 4173/4191 실행 묶음은 유지한다.
 

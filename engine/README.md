@@ -4,6 +4,8 @@ Jueony는 MIT 라이선스의 rhwp `0.8.7`, 커밋 `1a76570e833917d15817415a53c0
 
 현재 패치는 구역별 기본 탭 간격과 실제 본문 구역 분할을 구현한다. API `insertSectionBreak(sectionIdx, paraIdx, charOffset)`는 논리 글자 단위 좌표를 받고 `{ok, sectionIdx, paraIdx, charOffset, pageCount}`를 반환한다. 전체 문서 snapshot은 UI의 기존 명령 라우터가 소유한다. 개체/필드/범위 태그가 있는 분할 대상, 여러 문단에 걸친 필드, 구역 내부의 중복 구역 정의는 변경 전에 거부한다.
 
+`table-creation-consistency.patch`는 검증에서 발견한 신규 표의 메모리 IR/저장 기본값 차이를 수정한다. 기존 serializer와 보존 검사는 그대로 유지한다. 최종 검수 범위·결과와 실제 한글 비교 제한은 [34번 결과](../docs/34-sections-tabs-result.md)에 기록한다.
+
 ## 재현
 
 ```powershell

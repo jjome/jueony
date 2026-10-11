@@ -1,0 +1,375 @@
+{
+  "build": {
+    "wasmSha256": "9c18bface573cc16f15f87e8181ec6d6a3af0acd21d086bb81f22ac495eefced",
+    "jsSha256": "2c9dc1b9a05182ef5efb2456e4414e78c930821896c5f4537056ac7a33065184",
+    "buildMode": "wsl-review-no-opt",
+    "sourceId": "4a1574025b040d57",
+    "builtAt": "2026-10-11T16:33:06.6745934Z",
+    "optimized": false,
+    "patches": [
+      {
+        "name": "default-tabs.patch",
+        "sha256": "11ebc0a2967f8bea9d50d49970fd75b32af112472129c728a9bee4314f273f68"
+      },
+      {
+        "name": "section-split.patch",
+        "sha256": "03e88bf74a68e884eee1aa6fbb3c860c9fdef830701b1e14f0ff8821b30fcd31"
+      },
+      {
+        "name": "table-creation-consistency.patch",
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+      }
+    ],
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f"
+  },
+  "results": [
+    {
+      "name": "section boundaries: first/start/middle/end/last/empty, HWP+HWPX reopen and snapshot restore",
+      "data": {
+        "cases": 7
+      }
+    },
+    {
+      "name": "mixed Korean/emoji/tab text and character runs survive split and both saves",
+      "data": {
+        "sections": [
+          [
+            "앞 문단",
+            "가😀"
+          ],
+          [
+            "나\t다",
+            "마지막 문단"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "middle section split retains later section properties and distinct tab distances",
+      "data": {
+        "sections": [
+          [
+            "ONE"
+          ],
+          [
+            "T"
+          ],
+          [
+            "WO"
+          ],
+          [
+            "THREE"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "invalid offsets and control-bearing split target leave document unchanged",
+      "data": {
+        "table": {
+          "ok": true,
+          "paraIdx": 1,
+          "controlIdx": 0
+        },
+        "sections": [
+          [
+            "앞 문단",
+            "",
+            "",
+            "가😀나\t다",
+            "마지막 문단"
+          ]
+        ]
+      }
+    },
+    {
+      "name": "table and header survive moving to a new BodyText stream",
+      "data": {
+        "controls": [
+          {
+            "ctrlId": "secd",
+            "ctrlCh": 2,
+            "userDesc": "구역 정의",
+            "list": 0,
+            "para": 0,
+            "pos": 0,
+            "controlIndex": 0,
+            "props": {}
+          },
+          {
+            "ctrlId": "cold",
+            "ctrlCh": 2,
+            "userDesc": "단 정의",
+            "list": 0,
+            "para": 0,
+            "pos": 8,
+            "controlIndex": 1,
+            "props": {}
+          },
+          {
+            "ctrlId": "head",
+            "ctrlCh": 2,
+            "userDesc": "머리말",
+            "list": 0,
+            "para": 0,
+            "pos": 21,
+            "controlIndex": 2,
+            "props": {}
+          },
+          {
+            "ctrlId": "secd",
+            "ctrlCh": 2,
+            "userDesc": "구역 정의",
+            "list": 0,
+            "para": 2,
+            "pos": 0,
+            "controlIndex": 0,
+            "props": {}
+          },
+          {
+            "ctrlId": "cold",
+            "ctrlCh": 2,
+            "userDesc": "단 정의",
+            "list": 0,
+            "para": 2,
+            "pos": 8,
+            "controlIndex": 1,
+            "props": {}
+          },
+          {
+            "ctrlId": "tbl",
+            "ctrlCh": 11,
+            "userDesc": "표",
+            "list": 0,
+            "para": 3,
+            "pos": 0,
+            "controlIndex": 0,
+            "props": {
+              "Lock": 0,
+              "TreatAsChar": 0,
+              "AllowOverlap": 0,
+              "TextWrap": 1,
+              "Width": 41954,
+              "Height": 2564,
+              "HorzOffset": 0,
+              "VertOffset": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "new table properties match exported HWP and HWPX without a section split",
+      "data": {
+        "properties": {
+          "cellSpacing": 0,
+          "paddingLeft": 510,
+          "paddingRight": 510,
+          "paddingTop": 141,
+          "paddingBottom": 141,
+          "pageBreak": 0,
+          "repeatHeader": false,
+          "borderFillId": 3,
+          "borderLeft": {
+            "type": 1,
+            "width": 1,
+            "color": "#000000"
+          },
+          "borderRight": {
+            "type": 1,
+            "width": 1,
+            "color": "#000000"
+          },
+          "borderTop": {
+            "type": 1,
+            "width": 1,
+            "color": "#000000"
+          },
+          "borderBottom": {
+            "type": 1,
+            "width": 1,
+            "color": "#000000"
+          },
+          "fillType": "none",
+          "fillColor": "#ffffff",
+          "patternColor": "#000000",
+          "patternType": 0,
+          "diagonalLine": 1,
+          "diagonalSlash": 0,
+          "diagonalBackSlash": 0,
+          "diagonalWidth": 0,
+          "diagonalColor": "#000000",
+          "centerLine": "NONE",
+          "tableWidth": 41954,
+          "tableHeight": 2564,
+          "outerLeft": 283,
+          "outerRight": 283,
+          "outerTop": 283,
+          "outerBottom": 283,
+          "hasCaption": false,
+          "treatAsChar": false,
+          "textWrap": "TopAndBottom",
+          "vertRelTo": "Para",
+          "vertAlign": "Top",
+          "horzRelTo": "Para",
+          "horzAlign": "Left",
+          "vertOffset": 0,
+          "horzOffset": 0,
+          "restrictInPage": false,
+          "allowOverlap": false,
+          "keepWithAnchor": false
+        }
+      }
+    },
+    {
+      "name": "section default tab 20/40/60pt updates current layout and round-trips raw values",
+      "data": {
+        "observations": [
+          {
+            "pt": 20,
+            "raw": 4000,
+            "cursor": {
+              "pageIndex": 0,
+              "x": 140.1,
+              "y": 132.9,
+              "height": 13.3
+            }
+          },
+          {
+            "pt": 40,
+            "raw": 8000,
+            "cursor": {
+              "pageIndex": 0,
+              "x": 166.7,
+              "y": 132.9,
+              "height": 13.3
+            }
+          },
+          {
+            "pt": 60,
+            "raw": 12000,
+            "cursor": {
+              "pageIndex": 0,
+              "x": 193.4,
+              "y": 132.9,
+              "height": 13.3
+            }
+          }
+        ],
+        "note": "Cursor/SVG observations are diagnostics, not independent Hancom pixel parity."
+      }
+    },
+    {
+      "name": "distinct section tab layouts and explicit paragraph stops survive settings changes",
+      "data": {
+        "first": {
+          "pageIndex": 0,
+          "x": 140.1,
+          "y": 132.9,
+          "height": 13.3
+        },
+        "second": {
+          "pageIndex": 1,
+          "x": 193.4,
+          "y": 132.9,
+          "height": 13.3
+        },
+        "explicit": [
+          {
+            "position": 18000,
+            "type": 0,
+            "fill": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "default tab updates nested table cell and own header geometry without losing cell text",
+      "data": {
+        "observations": [
+          {
+            "raw": 4000,
+            "cell": {
+              "pageIndex": 0,
+              "x": 150.6,
+              "y": 159.9,
+              "height": 13.3,
+              "cellBounds": {
+                "x": 117.2,
+                "y": 157.4,
+                "w": 279.7,
+                "h": 17.1
+              },
+              "cellOverflowed": false
+            },
+            "header": {
+              "pageIndex": 0,
+              "x": 140.1,
+              "y": 76.2,
+              "height": 13.3
+            }
+          },
+          {
+            "raw": 12000,
+            "cell": {
+              "pageIndex": 0,
+              "x": 204,
+              "y": 159.9,
+              "height": 13.3,
+              "cellBounds": {
+                "x": 117.2,
+                "y": 157.4,
+                "w": 279.7,
+                "h": 17.1
+              },
+              "cellOverflowed": false
+            },
+            "header": {
+              "pageIndex": 0,
+              "x": 193.4,
+              "y": 76.2,
+              "height": 13.3
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "failures": [],
+  "documents": [
+    "boundary-0.hwp",
+    "boundary-0.hwpx",
+    "boundary-1.hwp",
+    "boundary-1.hwpx",
+    "boundary-2.hwp",
+    "boundary-2.hwpx",
+    "boundary-3.hwp",
+    "boundary-3.hwpx",
+    "boundary-4.hwp",
+    "boundary-4.hwpx",
+    "boundary-5.hwp",
+    "boundary-5.hwpx",
+    "boundary-6.hwp",
+    "boundary-6.hwpx",
+    "mixed-runs-tabs.hwp",
+    "mixed-runs-tabs.hwpx",
+    "four-sections.hwp",
+    "four-sections.hwpx",
+    "table-header-sections.hwp",
+    "table-header-sections.hwpx",
+    "new-table-properties.hwp",
+    "new-table-properties.hwpx",
+    "tabs-20pt.hwp",
+    "tabs-20pt.hwpx",
+    "tabs-40pt.hwp",
+    "tabs-40pt.hwpx",
+    "tabs-60pt.hwp",
+    "tabs-60pt.hwpx",
+    "scoped-and-explicit-tabs.hwp",
+    "scoped-and-explicit-tabs.hwpx",
+    "nested-cell-header-tabs.hwp",
+    "nested-cell-header-tabs.hwpx"
+  ],
+  "nativeHancom": "NOT_RUN",
+  "note": "Fresh WASM functional diagnostics and engine round-trips. No new rendering fixture/golden or Hancom equivalence assertion."
+}

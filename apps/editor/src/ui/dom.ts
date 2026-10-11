@@ -1,0 +1,3 @@
+export const element=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
+export function selectOptions(select:HTMLSelectElement,items:{value:string;text:string}[],value?:string){select.replaceChildren(...items.map(item=>{const o=document.createElement('option');o.value=item.value;o.textContent=item.text;return o;}));if(value&&items.some(x=>x.value===value))select.value=value;}
+export const bindClick=(error:(error:unknown)=>void)=>(id:string,action:()=>unknown)=>element(id).addEventListener('click',()=>{try{void Promise.resolve(action()).catch(error);}catch(e){error(e);}});

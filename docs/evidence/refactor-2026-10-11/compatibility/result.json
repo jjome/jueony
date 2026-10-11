@@ -1,0 +1,33 @@
+{
+  "results": [
+    "v1 workspace/chat/native folder handle/recovery/tab order restored despite malformed draft; interrupted run not replayed",
+    "workspace switch isolates chat/folders; legacy macro remains available",
+    "v1 resave/reload retains unknown fields and structured-cloned folder handles",
+    "offline native file-handle write, reopened saved content and request undo succeed"
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "persisted": {
+    "version": 1,
+    "extension": {
+      "preserve": "unknown additive data"
+    },
+    "folderKind": "directory",
+    "run": "interrupted"
+  },
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@rhwp/core@0.8.7",
+    "builtAt": "2026-10-11T11:44:56.328Z",
+    "engineWasmSha256": "54cf95014312e605c51b98eb9021247ea79ef2bbd0a7080e11c011d0246e3989",
+    "buildScriptSha256": "3c17f4629d3b3fe9a52e98bb0d04acab11822c55e384cbab681a56a0853430a8",
+    "studioPatchSha256": "d1b9167bfc1e4e7e522ed957472913c33ccdf15fdd8125e3e966a11d9aa1e1ea",
+    "customSourceSha256": "7900d48be52ae70af83ee7ad2e70c4342260c57a53bf19863f974bb97dd29cc2",
+    "applicationSourceCommit": "1386cd4e21defd60e405b7a59e3f46d8080d2010",
+    "applicationSourceDirty": true,
+    "sourceBuild": false,
+    "note": "Rust 엔진은 공식 npm WASM 바이너리 사용. 이 빌드에서 Rust 엔진을 재컴파일하지 않음."
+  },
+  "note": "Synthetic v1 storage and local OPFS file; no user profile or paid model calls"
+}

@@ -1,0 +1,10 @@
+export type { JsonValue, DocumentProperties, Cell, Table, Structure, BodyNode, Snapshot, BodyOp, ControlOp, EditOp, Receipt } from './types.ts';
+export { plainSnapshot } from './types.ts';
+export { validateEditOperations, assertRevision } from '../domain/edit-operations.ts';
+export type { EditProposal } from './types.ts';
+export { validateEditProposal } from '../domain/edit-proposal.ts';
+export type {DocumentQueryFacade, DocumentEditFacade, DocumentFacades} from './facades.ts';
+export {createDocumentFacades} from '../application/facades.ts';
+export type {DocumentEnginePort} from '../ports/engine.ts';
+export {describeStructure} from '../application/describe-structure.ts';
+export type {EditorCommand,EditorMenu,EditorMenuItem,DocumentInteractionFacade} from './interaction.ts';

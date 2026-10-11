@@ -1,7 +1,4 @@
-type Command={id:string;label:string;shortcutLabel?:string;enabled:boolean};
-type MenuItem={params?:Record<string,unknown>;commandId?:string;label:string;enabled:boolean;submenu?:MenuItem[]};
-type Menu={menuId:string;label:string;items:MenuItem[]};
-type Editor={prepareMenus?():Promise<void>;toolbarsVisible?():boolean;commands():Command[];menus():Menu[];executeCommand(id:string,params?:Record<string,unknown>):{ok:boolean;message?:string;reason?:string}};
+import type {DocumentInteractionFacade as Editor,EditorMenuItem as MenuItem} from './modules/document/public/index.ts';
 /** Host controls forward to the active editor dispatcher, preserving its gates and history. */
 export function installUnifiedChrome(options:{menus:HTMLElement;tools:HTMLElement;active:()=>Editor|undefined;execute:(id:string,params?:Record<string,unknown>)=>unknown;error:(error:unknown)=>void}){
  let identity:Editor|undefined;

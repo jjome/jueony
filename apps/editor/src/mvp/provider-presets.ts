@@ -1,4 +1,4 @@
-import type {ModelConfig} from './model.ts';
+import type {ModelConfig} from '../modules/connections/public/index.ts';
 
 export const providerPresets:Record<ModelConfig['adapterId'],{name:string;endpoint:string;model:string;hint:string;keyHint:string}>={
  'openai-responses':{name:'GPT · OpenAI',endpoint:'https://api.openai.com/v1',model:'',hint:'OpenAI Responses API로 연결합니다. 계정에서 사용 가능한 구조화 출력 지원 모델 ID를 입력하세요. Endpoint는 /v1까지 입력합니다.',keyHint:'OpenAI API 키'},

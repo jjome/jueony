@@ -26,6 +26,9 @@ foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.m
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
 $llmEvidence = Join-Path $output 'evidence'
+foreach ($guide in @('30-layered-modular-refactor-plan.md','31-facade-contracts.md','32-modular-refactor-result.md','refactor-work-plan.csv')) {
+    Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
+}
 New-Item -ItemType Directory -Force $llmEvidence | Out-Null
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/llm-adapters-2026-10-11') -Destination $llmEvidence -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/hyperclova-live-2026-10-11') -Destination $llmEvidence -Recurse -Force
@@ -64,6 +67,11 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/agent-interaction-
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/native-agent-2026-10-11') -Destination $llmEvidence -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/claude-live-fix-2026-10-11') -Destination $llmEvidence -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/launcher/providers') -Destination $output -Recurse -Force
+foreach ($moduleDirectory in @('services', 'contracts')) {
+    Copy-Item -LiteralPath (Join-Path $projectRoot ('apps/launcher/' + $moduleDirectory)) -Destination $output -Recurse -Force
+}
+# Package the canonical document wire contract; the source-only re-export is not deployable.
+Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/src/modules/document/public/wire-schema.mjs') -Destination (Join-Path $output 'contracts/document-wire-schema.mjs') -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/continuation-2026-10-11') -Destination $llmEvidence -Recurse -Force
 $reviewDocuments = Join-Path $output 'review-documents'
 New-Item -ItemType Directory -Force $reviewDocuments | Out-Null
@@ -74,6 +82,10 @@ foreach ($relative in @('behavior', 'state', 'agent/preflight')) {
 $nodeVersion = & (Join-Path $runtimePath 'node.exe') --version
 $providerHashes = [ordered]@{}
 Get-ChildItem -LiteralPath (Join-Path $output 'providers') -Filter '*.mjs' | Sort-Object Name | ForEach-Object { $providerHashes[$_.Name] = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash }
+$moduleHashes = [ordered]@{}
+foreach ($directory in @('services', 'contracts')) {
+    Get-ChildItem -LiteralPath (Join-Path $output $directory) -Filter '*.mjs' -Recurse | Sort-Object FullName | ForEach-Object { $moduleHashes[$directory + '/' + $_.Name] = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash }
+}
 $manifest = [ordered]@{
     createdAt = (Get-Date).ToUniversalTime().ToString('o')
     reviewPort = $ReviewPort
@@ -84,6 +96,7 @@ $manifest = [ordered]@{
     connectionStoreSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'connection-store.mjs') -Algorithm SHA256).Hash
     credentialProtectSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'credential-protect.ps1') -Algorithm SHA256).Hash
     providerSha256 = $providerHashes
+    moduleSha256 = $moduleHashes
     adapterSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'providers/openai-compatible.mjs') -Algorithm SHA256).Hash
     frontend = Get-Content -LiteralPath (Join-Path $output 'dist/build-evidence.json') -Raw | ConvertFrom-Json
 }

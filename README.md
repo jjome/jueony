@@ -1,6 +1,6 @@
 # Jueony — 공무원용 AI 문서 편집기
 
-폐쇄망 Windows PC에서 업무별 자료와 대화를 관리하고, 가운데 채팅의 요청으로 오른쪽 HWP/HWPX 문서를 AI와 함께 직접 편집하는 프로그램을 만든다. **현재는 본문·단순 표 행/열·서식·쪽 설정과 한글 단축키를 연결한 MVP 개발판**이다. 한글 2024 전체 기능·화면·파일 호환성 100%를 달성한 상태는 아니다. [최신 구현과 검증 결과](docs/28-continuation-implementation.md), [설치 한글 2024와의 비교·미구현 목록](docs/29-hangul-2024-comparison.md)을 참고한다.
+폐쇄망 Windows PC에서 업무별 자료와 대화를 관리하고, 가운데 채팅의 요청으로 오른쪽 HWP/HWPX 문서를 AI와 함께 직접 편집하는 프로그램을 만든다. **현재는 본문·단순 표 행/열·서식·쪽 설정과 한글 단축키를 연결한 MVP 개발판**이다. 한글 2024 전체 기능·화면·파일 호환성 100%를 달성한 상태는 아니다. [최신 구현과 검증 결과](docs/28-continuation-implementation.md), [설치 한글 2024와의 비교·미구현 목록](docs/29-hangul-2024-comparison.md)을 참고한다. 다음 신규 기능 병렬 구현에 앞서 [레이어·모듈 리팩터링 계획](docs/30-layered-modular-refactor-plan.md)과 [Facade 계약](docs/31-facade-contracts.md)의 핵심 모듈 첫 이관을 적용했다. [리팩터링 적용 결과와 남은 이관](docs/32-modular-refactor-result.md)을 확인한다.
 
 ## 이용허락
 
@@ -9,6 +9,8 @@
 제3자 오픈소스·글꼴 등에는 각각의 원래 라이선스가 우선한다. [제3자 고지](THIRD_PARTY_NOTICES.md)와 [적용 기록](docs/09-licensing.md)을 참고한다. 기관용 개발이라는 제품 목표가 기관의 무료 사용을 허가하는 것은 아니다. 기관 사용은 별도 계약 대상으로 둔다.
 
 ## 바로 실행
+
+리팩터링 검수본은 **[Start-Review.cmd](build/jueony-refactor-20261011/Start-Review.cmd)**로 실행한다(4192). [모듈 구조·검사·남은 이관](docs/32-modular-refactor-result.md)을 참고한다. 기존 4173/4191 실행 묶음은 유지한다.
 
 최신 자율 구현 검수본은 **[Start-Review.cmd](build/jueony-continuation-20261011/Start-Review.cmd)**로 실행한다(4191). 통합 메뉴, 문서 기본값·배율·스크롤 복원, 지정 자료 검색, 적용 전 후보 검토, 반복 작업/업무 초안을 추가했다. 기존 4173 앱과 저장소가 분리되므로 새 업무 화면이 보일 수 있다. [지원 범위·검사·남은 작업](docs/28-continuation-implementation.md)을 확인한다. 아래 기본 실행기는 이전 4173 묶음을 유지한다.
 

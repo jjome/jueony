@@ -1,25 +1,5 @@
-// Provider wire projection of DocumentControl's semantic validators.
-// No native engine calls or execution permissions belong in a provider adapter.
-export const controlKinds = ['format_characters', 'format_paragraph', 'create_table', 'set_table_cell', 'format_table_cells', 'set_page_setup', 'insert_table_row','insert_table_column','delete_table_row','delete_table_column'];
-const text = { type: 'string' }, number = { type: 'number' }, bool = { type: 'boolean' }, integer = { type: 'integer', minimum: 0 };
-const object = properties => ({ type: 'object', properties, required: Object.keys(properties) });
-const properties = values => ({ type: 'object', properties: values });
-const characters = {bold:bool,italic:bool,underline:bool,strikethrough:bool,fontSizePt:number,color:text,fontFamily:text,ratioPercent:integer,spacingPercent:{type:'integer'},superscript:bool,subscript:bool};
-const operation = (kind, fields) => object({ kind: { type: 'string', enum: [kind] }, ...fields });
-export function controlSchemas() {
- return [
-  operation('format_characters', { target: text, properties: properties(characters) }),
-  operation('format_paragraph', { target: text, properties: properties({ alignment: text, lineSpacingPercent: number, marginLeftMm: number, marginRightMm: number, indentMm: number, beforeMm: number, afterMm: number, keepWithNext: bool, keepLines: bool, pageBreakBefore: bool }) }),
-  operation('create_table', { after: text, resultId: text, rows: { type: 'array', items: { type: 'array', items: text } } }),
-  operation('set_table_cell', { target: text, row: integer, column: integer, originalText: text, text }),
-  operation('format_table_cells', { target: text, startRow: integer, rowCount: integer, startColumn: integer, columnCount: integer, properties: properties({ ...characters, background: text, alignment: text, verticalAlignment: text }) }),
-  operation('set_page_setup', { section: integer, properties: properties({ widthMm: number, heightMm: number, landscape: bool, marginLeftMm: number, marginRightMm: number, marginTopMm: number, marginBottomMm: number, marginHeaderMm: number, marginFooterMm: number }) }),
-  operation('insert_table_row',{target:text,index:integer,values:{type:'array',items:text}}),
-  operation('insert_table_column',{target:text,index:integer,values:{type:'array',items:text}}),
-  operation('delete_table_row',{target:text,index:integer}),
-  operation('delete_table_column',{target:text,index:integer}),
- ];
-}
+// Compatibility export: the Document module owns command wire shapes.
+export { controlKinds, controlSchemas } from '../contracts/document-wire-schema.mjs';
 export const CONTROL_SYSTEM = `
 Additional supported DocumentControl operations (only if document.structure exists):
 {"kind":"format_characters","target":"s0p0","properties":{"bold":true,"fontSizePt":16,"color":"#000000"}}: whole editable nonempty body paragraph. Also italic, underline, strikethrough booleans; fontFamily (font name), ratioPercent (integer 50-200), spacingPercent (integer -50..50), superscript/subscript booleans (mutually exclusive when true). Font bytes are not downloaded; missing installed fonts use rendering fallback. Change only requested properties; omitted properties remain unchanged. format_table_cells accepts these character properties too.

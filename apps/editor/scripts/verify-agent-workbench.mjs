@@ -4,7 +4,7 @@ import {mkdir,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import http from 'node:http';
 import assert from 'node:assert/strict';
-const out=resolve('evidence/agent-workbench'),origin='http://127.0.0.1:4206',calls=[];await mkdir(out,{recursive:true});
+const out=resolve(process.env.JUEONY_TEST_OUTPUT??'evidence/agent-workbench'),origin='http://127.0.0.1:4206',calls=[];await mkdir(out,{recursive:true});
 for(const port of [4206,4207])if(await fetch('http://127.0.0.1:'+port).then(()=>true,()=>false))throw new Error('Test port occupied: '+port);
 const provider=http.createServer(async(req,res)=>{let body='';for await(const chunk of req)body+=chunk;const payload=JSON.parse(body),input=JSON.parse(payload.messages[1].content);calls.push(input);const review=input.instruction.includes('[앱의 적용 전 재검토]');
  if(input.instruction.includes('지연')&&review)await new Promise(r=>setTimeout(r,2500));
@@ -12,7 +12,7 @@ const provider=http.createServer(async(req,res)=>{let body='';for await(const ch
  const result={message:'합성 모델의 편집 후보입니다.',sourceIds:input.references.map(s=>s.id),operations:[{kind:'replace_body_text',target:input.document.nodes[0].id,start:0,count:[...input.document.nodes[0].text].length,text}]};
  res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify({choices:[{message:{content:JSON.stringify(result)}}]}));});
 await new Promise(r=>provider.listen(4207,'127.0.0.1',r));
-const server=spawn(process.execPath,['apps/launcher/server.mjs'],{cwd:resolve('../..'),windowsHide:true,env:{...process.env,JUEONY_PORT:'4206',JUEONY_DIST:resolve('evidence/dist-continuation'),JUEONY_CONNECTION_STORE:'memory'},stdio:'ignore'});
+const server=spawn(process.execPath,['apps/launcher/server.mjs'],{cwd:resolve('../..'),windowsHide:true,env:{...process.env,JUEONY_PORT:'4206',JUEONY_DIST:resolve(process.env.JUEONY_TEST_DIST??'evidence/dist-continuation'),JUEONY_CONNECTION_STORE:'memory'},stdio:'ignore'});
 let browser,page;const results=[],errors=[];const pass=name=>{results.push(name);console.log('PASS',name);};
 const ready=()=>page.waitForFunction(()=>document.getElementById('app-status').textContent.includes('준비 완료'),{timeout:90000});
 const active=async()=>await (await page.$('.editor-frame:not([hidden])')).contentFrame();

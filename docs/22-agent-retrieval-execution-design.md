@@ -194,3 +194,9 @@ MCP 외부 노출은 기본 비활성, 로컬 명시 연결, 세션 인증, capa
 | A7 | 외부 MCP·기관 배포 | 열린 session bridge, 명시 연결과 권한, endpoint·보관·SBOM·배포 정책 검증 |
 
 새 기능이 실패하면 기존 single 모드와 직접 편집·저장을 유지한다. 사용자 동의 없는 폴더 자동 전송이나 새 외부 서비스를 기본값으로 추가하지 않는다. UI/Agent/Provider/편집 엔진을 다시 작성하지 않고 이 경계에서 작게 교체한다.
+
+## 후속 구현 계획과의 관계
+
+사용자 우선순위 갱신: 이 문서의 새 RAG/loop 구현보다 [한글 기능 동작 및 상태 저장](25-hangul-parity-and-state-plan.md)의 전수 대조와 기반 차이 수정을 먼저 진행한다. 현재 single Agent는 유지하며, 수동 편집·환경값·재실행·파일 보존을 검증한 명령 계층 위에서 확장한다.
+
+2026-10-11 추가 요구사항의 통합 순서는 [24번 작업 계획](24-next-development-plan.md)을 따른다. 공통 문서 명령을 UI·AI·매크로가 재사용하고, 키워드 검색과 출처를 먼저 구현한 뒤 journal·staging·bounded loop로 진행한다. 위 A3의 임베딩/hybrid/reranker 실험은 A4/A5 실행 제어의 필수 선행 조건이 아니다. 실제 검색 실패와 평가 이득을 확인한 후 선택한다. Claude 실호출은 [검증 완료](evidence/claude-live-fix-2026-10-11/README.md), GPT·Gemini 실계정 검증은 남아 있다.

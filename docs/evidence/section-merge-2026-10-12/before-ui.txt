@@ -1,0 +1,8 @@
+FAIL Delete joins section boundary, previous settings, undo/redo and hwp save TimeoutError: Waiting failed: 15000ms exceeded
+    at new WaitTask (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/common/WaitTask.js:46:34)
+    at IsolatedWorld.waitForFunction (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Realm.js:49:26)
+    at CdpFrame.waitForFunction (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:585:43)
+    at CdpFrame.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/util/decorators.js:101:27)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:103:52
+    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:66:7)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:95:85

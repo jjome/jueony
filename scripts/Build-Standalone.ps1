@@ -26,7 +26,7 @@ foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.m
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
 $llmEvidence = Join-Path $output 'evidence'
-foreach ($guide in @('30-layered-modular-refactor-plan.md','31-facade-contracts.md','32-modular-refactor-result.md','33-editor-parity-features-result.md','34-sections-tabs-result.md','refactor-work-plan.csv','hangul-2024-gap-checklist.csv')) {
+foreach ($guide in @('30-layered-modular-refactor-plan.md','31-facade-contracts.md','32-modular-refactor-result.md','33-editor-parity-features-result.md','34-sections-tabs-result.md','35-section-boundary-merge-result.md','refactor-work-plan.csv','hangul-2024-gap-checklist.csv')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
 New-Item -ItemType Directory -Force $llmEvidence | Out-Null
@@ -95,6 +95,15 @@ if (Test-Path -LiteralPath $sectionEvidence) {
     }
 }
 $providerHashes = [ordered]@{}
+$mergeEvidence = Join-Path $projectRoot 'docs/evidence/section-merge-2026-10-12'
+if (Test-Path -LiteralPath $mergeEvidence) {
+    Copy-Item -LiteralPath $mergeEvidence -Destination $llmEvidence -Recurse -Force
+    $mergeDocuments = Join-Path $mergeEvidence 'documents'
+    if (Test-Path -LiteralPath $mergeDocuments) {
+        Get-ChildItem -LiteralPath $mergeDocuments -File |
+            Where-Object { $_.Extension -in @('.hwp', '.hwpx') } | Copy-Item -Destination $reviewDocuments -Force
+    }
+}
 Get-ChildItem -LiteralPath (Join-Path $output 'providers') -Filter '*.mjs' | Sort-Object Name | ForEach-Object { $providerHashes[$_.Name] = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash }
 $moduleHashes = [ordered]@{}
 foreach ($directory in @('services', 'contracts')) {

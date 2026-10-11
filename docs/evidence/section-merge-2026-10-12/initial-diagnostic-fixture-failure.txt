@@ -1,0 +1,16 @@
+PASS empty/start/middle/end paragraph boundaries and exact snapshot undo
+PASS mixed Korean emoji tabs and character format runs retain order
+PASS three sections retain untouched later settings while left page/tab settings win
+PASS merge middle and last boundaries leaves unrelated section content unchanged
+FAIL invalid bounds and boundary controls/fields reject without partial mutation AssertionError [ERR_ASSERTION]: Missing expected exception: left-table must reject boundary 1
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-section-merge.mjs:186:16
+    at run (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-section-merge.mjs:60:28)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-section-merge.mjs:173:7 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: undefined,
+  operator: 'throws',
+  diff: 'simple'
+}
+PASS later table moves with contents and properties; snapshot restores its original section

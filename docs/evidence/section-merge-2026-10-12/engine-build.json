@@ -1,0 +1,23 @@
+{
+  "sourceId": "1fede95758e046e6",
+  "builtAt": "2026-10-11T16:53:11.4663466Z",
+  "patches": [
+    {
+      "name": "default-tabs.patch",
+      "sha256": "11ebc0a2967f8bea9d50d49970fd75b32af112472129c728a9bee4314f273f68"
+    },
+    {
+      "name": "section-split.patch",
+      "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+    },
+    {
+      "name": "table-creation-consistency.patch",
+      "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+    }
+  ],
+  "wasmSha256": "cb018ea7a0a198c464cfb6d250bd781d2fb609929c03729d244675d832d49aa9",
+  "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+  "optimized": false,
+  "buildMode": "wsl-review-no-opt",
+  "jsSha256": "67db5e7aa028ee10fa028257a5e35796e4042024b83268b1ea4b0edb68459dbc"
+}

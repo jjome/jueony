@@ -4,6 +4,8 @@
 
 ## 실행
 
+구역 경계 합치기 검수본은 `build/jueony-section-merge-20261012/Start-Review.cmd`(4195)다. Delete/Backspace 지원 경계와 저장·undo 및 실제 한글 비교 상태는 [35번 결과](../../docs/35-section-boundary-merge-result.md)를 따른다.
+
 최신 검수본은 `build/jueony-sections-tabs-20261012/Start-Review.cmd`(4194)다. 같은 묶음의 `Start-Jueony.cmd`도 4194를 쓴다. 구역 나누기(Alt+Shift+Enter)와 구역별 기본 탭 간격·저장·undo는 [34번 결과](../../docs/34-sections-tabs-result.md)를 따른다. 이전 실행 묶음은 유지하며 업무 저장소가 origin별로 구분된다. 통합 메뉴·문서별 보기/새 문서 기본값·지정 자료 검색·후보 검토·반복 작업은 [28번 구현 결과](../../docs/28-continuation-implementation.md)를 따른다.
 
 프로젝트 루트 또는 build/jueony-mvp의 Start-Jueony.cmd를 실행한다. 묶음의 dist, runtime, server.mjs, providers, LICENSE와 고지 파일을 함께 유지한다. Edge/Chrome이 필요하며 Node.js 22 런타임은 동봉했다. PowerShell 스크립트가 127.0.0.1:4173에서 동봉한 Node 서버를 시작하고 편집 창을 연다. 새 Rust exe는 컴파일했으나 이 PC의 OS 애플리케이션 제어에 실행이 차단되었다. 이전 정적 서버가 같은 포트를 점유 중이면 이전 창의 문서를 저장하고 서버를 종료한 뒤 실행한다.

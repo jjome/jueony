@@ -1,0 +1,7 @@
+PASS empty/start/middle/end paragraph boundaries and exact snapshot undo
+PASS mixed Korean emoji tabs and character format runs retain order
+PASS three sections retain untouched later settings while left page/tab settings win
+PASS merge middle and last boundaries leaves unrelated section content unchanged
+PASS invalid bounds and boundary controls/fields reject without partial mutation
+PASS left own header survives an eligible merge and both strict saves
+PASS later table moves with contents and properties; snapshot restores its original section

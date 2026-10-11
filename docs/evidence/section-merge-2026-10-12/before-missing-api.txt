@@ -1,0 +1,20 @@
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: fresh engine must export mergeSectionBoundary
++ actual - expected
+
++ 'undefined'
+- 'function'
+
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-section-merge.mjs:20:8 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 'undefined',
+  expected: 'function',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v22.22.2

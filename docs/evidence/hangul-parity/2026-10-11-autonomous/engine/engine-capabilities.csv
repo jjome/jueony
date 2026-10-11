@@ -1,0 +1,25 @@
+id,area,installed_engine_surface,jueony_ai_status,reuse_class,independent_reference,next_verification
+E01,문서 열기/내보내기,HwpDocument/exportHwpWithReport/exportHwpxWithReport,수동 저장 연결,REUSED,BLOCKED_REFERENCE,양방향 저장과 실제 한글 재열기/레이아웃
+E02,본문 삽입/교체/삭제,insertText/deleteText/splitParagraph,단순 본문 4종 연결,REUSED_WITH_GUARDS,BLOCKED_REFERENCE,혼합 서식/제어문자/여러 위치/undo
+E03,글자와 문단 속성,applyCharFormat/applyParaFormat,허용 속성 연결,REUSED_WITH_GUARDS,BLOCKED_REFERENCE,혼합 서식 보존 및 한글 출력
+E04,스타일,getStyleList/createStyle/applyStyle/deleteStyle,AI 미연결,ENGINE_AVAILABLE,BLOCKED_REFERENCE,상속/일괄 적용/저장/undo
+E05,표/셀 조회와 생성,getTableDimensions/getCellInfo/createTable,단순 표 연결,REUSED_WITH_GUARDS,BLOCKED_REFERENCE,병합/중첩 표 분리 검사
+E06,표 셀 편집/서식,deleteTextInCellByPath/insertTextInCellByPath/setCellProperties,단순 셀만 연결,REUSED_WITH_GUARDS,BLOCKED_REFERENCE,혼합 글자/여러 문단/중첩 경로
+E07,표 행/열,insertTableRow/insertTableColumn/deleteTableRow/deleteTableColumn,단순 표 연결,REUSED_WITH_GUARDS,BLOCKED_REFERENCE,병합 경계/새 표 별칭/연속 연산
+E08,셀 병합/분할,mergeTableCells/splitTableCell/splitTableCellInto,AI 미연결,ENGINE_AVAILABLE,BLOCKED_REFERENCE,내용 순서/서식/rowspan/undo/저장
+E09,표 나누기/합치기/전치,splitTable/mergeTableWithNext/transposeTableCellsInPlace,AI 미연결,ENGINE_AVAILABLE,BLOCKED_REFERENCE,좌표 재해석/개체 포함/쪽 넘김
+E10,표 배치/쪽 넘김,setTableProperties,AI 미연결,ENGINE_AVAILABLE,BLOCKED_REFERENCE,repeatHeader/pageBreak와 행 분할 출력
+E11,용지/여백/다단,setPageDef/setColumnDef/setPageBorderFill,용지 여백 일부 연결,PARTIAL_REUSE,BLOCKED_REFERENCE,구역/바탕쪽/다단/레이아웃
+E12,머리말/꼬리말,createHeaderFooter/getHeaderFooter/insertTextInHeaderFooter,AI 미연결,ENGINE_AVAILABLE,BLOCKED_REFERENCE,적용 범위/상속/선택/저장
+E13,각주/미주,insertFootnote/insertEndnote/insertTextInFootnote,AI 미연결,ENGINE_AVAILABLE,BLOCKED_REFERENCE,번호/구역/쪽 분할/인쇄
+E14,그림,insertPicture/setPictureProperties/assignPictureImage,AI 미연결,ENGINE_AVAILABLE,BLOCKED_REFERENCE,자산 hash/위치/감싸기/크기/undo
+E15,도형/글상자,createShapeControl/setShapeProperties/setTextBoxAt,AI 미연결,ENGINE_AVAILABLE,BLOCKED_REFERENCE,본문/셀 경로/텍스트/배치
+E16,개체 그룹/캡션/앞뒤,groupShapes/ungroupShape/attachCaptionAt/changeShapeZOrder,AI 미연결,ENGINE_AVAILABLE,BLOCKED_REFERENCE,anchor/순서/여러 개체 undo
+E17,수식,insertEquation/setEquationProperties/promoteOleEquation,AI 미연결,ENGINE_AVAILABLE,BLOCKED_REFERENCE,수식 script/미지원 OLE/글꼴/기준 PDF
+E18,차트,listCharts/getChartData/setChartData,AI 미연결,PARTIAL_ENGINE_AVAILABLE,BLOCKED_REFERENCE,신규 생성 가능 여부/데이터/저장/렌더
+E19,책갈피/필드,addBookmark/renameBookmark/setFieldValueByName,AI 미연결,ENGINE_AVAILABLE,BLOCKED_REFERENCE,필드 영역/누름틀/상호 참조
+E20,undo/snapshot,saveSnapshot/restoreSnapshot/discardSnapshot,최신 AI 요청 묶음 undo 연결,REUSED_WITH_GUARDS,BLOCKED_REFERENCE,자산/구조/redo/사용자 후속 편집
+E21,비지원 특수 개체,WithReport의 controlOmitted/rawPassthroughUnavailable 보고,AI 미연결,PRESERVATION_MUST_BE_MEASURED,BLOCKED_REFERENCE,코드별 보존/손실 표본 필요
+E22,문서 비교/변경 추적/서명,현 AI 공통 계약 및 설치 d.ts에서 완전 흐름 미확인,AI 미연결,REQUIRES_DISCOVERY,BLOCKED_REFERENCE,한글 기능별 API/파일 형식/외부 의존 실사
+E23,복구 원본 재연결,FileSystemFileHandle + 디스크 SHA256,이번 독립 모듈 구현,NEW_APP_ADAPTER,BLOCKED_REFERENCE,브라우저 재시작/권한/외부 변경 통합
+E24,복구 내용 손실 보고,exportHwpWithReport/exportHwpxWithReport,bridge 보강 필요,REUSE_REQUIRED,BLOCKED_REFERENCE,손실 발생 시 기존 복구본 보존

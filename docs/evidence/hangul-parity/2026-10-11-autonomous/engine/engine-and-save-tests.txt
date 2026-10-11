@@ -1,0 +1,226 @@
+TAP version 13
+# Subtest: Claude JSON 인자도 공통 대상·범위·출처·서식 검사를 통과해야 한다
+ok 1 - Claude JSON 인자도 공통 대상·범위·출처·서식 검사를 통과해야 한다
+  ---
+  duration_ms: 49.0663
+  type: 'test'
+  ...
+# Subtest: 실제 WASM에서 새 문단 초안을 만들고 두 형식으로 보존한다
+ok 2 - 실제 WASM에서 새 문단 초안을 만들고 두 형식으로 보존한다
+  ---
+  duration_ms: 40.0109
+  type: 'test'
+  ...
+# Subtest: 여러 위치 교체/삭제/삽입과 snapshot 되돌림이 앞뒤 문단을 보존한다
+ok 3 - 여러 위치 교체/삭제/삽입과 snapshot 되돌림이 앞뒤 문단을 보존한다
+  ---
+  duration_ms: 61.5664
+  type: 'test'
+  ...
+# Subtest: 이모지 앞뒤 Unicode 범위 교체와 빈 문단 삭제를 보존한다
+ok 4 - 이모지 앞뒤 Unicode 범위 교체와 빈 문단 삭제를 보존한다
+  ---
+  duration_ms: 1.1591
+  type: 'test'
+  ...
+# Subtest: 본문 전체 교체가 균일한 원래 글자·문단 서식을 보존한다
+ok 5 - 본문 전체 교체가 균일한 원래 글자·문단 서식을 보존한다
+  ---
+  duration_ms: 1.9113
+  type: 'test'
+  ...
+# Subtest: 명령 전체 사전 검사에서 알 수 없는 명령·범위·출처·중복 대상을 거부한다
+ok 6 - 명령 전체 사전 검사에서 알 수 없는 명령·범위·출처·중복 대상을 거부한다
+  ---
+  duration_ms: 0.7608
+  type: 'test'
+  ...
+# Subtest: 실제 HCX-005 회귀: 같은 위치의 연속 삽입을 응답 순서대로 보존하고 재열기·undo한다
+ok 7 - 실제 HCX-005 회귀: 같은 위치의 연속 삽입을 응답 순서대로 보존하고 재열기·undo한다
+  ---
+  duration_ms: 5.6274
+  type: 'test'
+  ...
+# Subtest: 같은 문단의 본문 변경과 그 뒤 삽입은 두 순서 모두 대상을 보존한다
+ok 8 - 같은 문단의 본문 변경과 그 뒤 삽입은 두 순서 모두 대상을 보존한다
+  ---
+  duration_ms: 2.3863
+  type: 'test'
+  ...
+# Subtest: 삽입 묶음도 미지원 속성·문단 수 초과·비연속 중복은 거절한다
+ok 9 - 삽입 묶음도 미지원 속성·문단 수 초과·비연속 중복은 거절한다
+  ---
+  duration_ms: 1.0298
+  type: 'test'
+  ...
+# Subtest: 업무·채팅 Context 격리와 중단 실행 복원
+ok 10 - 업무·채팅 Context 격리와 중단 실행 복원
+  ---
+  duration_ms: 1.4496
+  type: 'test'
+  ...
+# Subtest: 빈 본문 입력 뒤 같은 요청의 글자 서식은 새 내용을 기준으로 검사한다
+ok 11 - 빈 본문 입력 뒤 같은 요청의 글자 서식은 새 내용을 기준으로 검사한다
+  ---
+  duration_ms: 89.1331
+  type: 'test'
+  ...
+# Subtest: 실제 WASM: 4x3 일정표·표제 서식·쪽 설정·이동한 대상·두 형식 재열기
+ok 12 - 실제 WASM: 4x3 일정표·표제 서식·쪽 설정·이동한 대상·두 형식 재열기
+  ---
+  duration_ms: 29.9953
+  type: 'test'
+  ...
+# Subtest: 셀 원문 검증과 혼합 서식·범위·미지원 속성 거절
+ok 13 - 셀 원문 검증과 혼합 서식·범위·미지원 속성 거절
+  ---
+  duration_ms: 12.0091
+  type: 'test'
+  ...
+# Subtest: 본문 삽입과 표 생성 뒤에도 원래 대상 ID가 같은 문단을 가리킨다
+ok 14 - 본문 삽입과 표 생성 뒤에도 원래 대상 ID가 같은 문단을 가리킨다
+  ---
+  duration_ms: 12.6123
+  type: 'test'
+  ...
+# Subtest: 표 행·열 앞/중간/뒤 삽입·삭제와 후속 셀 편집을 두 형식 저장과 undo로 검증
+ok 15 - 표 행·열 앞/중간/뒤 삽입·삭제와 후속 셀 편집을 두 형식 저장과 undo로 검증
+  ---
+  duration_ms: 87.7394
+  type: 'test'
+  ...
+# Subtest: 요청 내 새 표 참조와 연속 행열 편집, 복잡한 셀과 마지막 행열 삭제 거절
+ok 16 - 요청 내 새 표 참조와 연속 행열 편집, 복잡한 셀과 마지막 행열 삭제 거절
+  ---
+  duration_ms: 9.6985
+  type: 'test'
+  ...
+# Subtest: 셀 긴 본문 교체·비우기·빈 셀 채우기는 글자/문단 서식을 보존한다
+ok 17 - 셀 긴 본문 교체·비우기·빈 셀 채우기는 글자/문단 서식을 보존한다
+  ---
+  duration_ms: 19.41
+  type: 'test'
+  ...
+# Subtest: 본문과 셀 글꼴·장평·자간·위아래첨자 설정을 두 형식으로 보존
+ok 18 - 본문과 셀 글꼴·장평·자간·위아래첨자 설정을 두 형식으로 보존
+  ---
+  duration_ms: 11.1912
+  type: 'test'
+  ...
+# Subtest: hwp: UI 저장물의 문단 경계와 텍스트, 두 형식으로 재저장한 본문을 보존한다
+ok 19 - hwp: UI 저장물의 문단 경계와 텍스트, 두 형식으로 재저장한 본문을 보존한다
+  ---
+  duration_ms: 79.1154
+  type: 'test'
+  ...
+# Subtest: hwpx: UI 저장물의 문단 경계와 텍스트, 두 형식으로 재저장한 본문을 보존한다
+ok 20 - hwpx: UI 저장물의 문단 경계와 텍스트, 두 형식으로 재저장한 본문을 보존한다
+  ---
+  duration_ms: 9.5645
+  type: 'test'
+  ...
+# Subtest: 저장하고 탭 닫기에서 생성한 HWP가 본문을 포함한다
+ok 21 - 저장하고 탭 닫기에서 생성한 HWP가 본문을 포함한다
+  ---
+  duration_ms: 1.4395
+  type: 'test'
+  ...
+# Subtest: hwp: UI에서 만든 3×3 표와 9개 셀 내용을 재저장 후에도 보존한다
+ok 22 - hwp: UI에서 만든 3×3 표와 9개 셀 내용을 재저장 후에도 보존한다
+  ---
+  duration_ms: 16.2611
+  type: 'test'
+  ...
+# Subtest: hwpx: UI에서 만든 3×3 표와 9개 셀 내용을 재저장 후에도 보존한다
+ok 23 - hwpx: UI에서 만든 3×3 표와 9개 셀 내용을 재저장 후에도 보존한다
+  ---
+  duration_ms: 7.6805
+  type: 'test'
+  ...
+# Subtest: 파일 handle과 마지막 디스크 fingerprint를 함께 캡처하고 복구 bytes를 쓰지 않는다
+ok 24 - 파일 handle과 마지막 디스크 fingerprint를 함께 캡처하고 복구 bytes를 쓰지 않는다
+  ---
+  duration_ms: 5.1993
+  type: 'test'
+  ...
+# Subtest: 네이티브 emulation handle의 함수는 캡처하지 않아 IndexedDB 전체 저장 실패를 막는다
+ok 25 - 네이티브 emulation handle의 함수는 캡처하지 않아 IndexedDB 전체 저장 실패를 막는다
+  ---
+  duration_ms: 0.4691
+  type: 'test'
+  ...
+# Subtest: 자동 복원은 권한 조회만 하고 prompt이면 파일도 읽지 않는다
+ok 26 - 자동 복원은 권한 조회만 하고 prompt이면 파일도 읽지 않는다
+  ---
+  duration_ms: 0.7507
+  type: 'test'
+  ...
+# Subtest: 명시적 재연결에서만 권한을 요청하고 원본을 검증한다
+ok 27 - 명시적 재연결에서만 권한을 요청하고 원본을 검증한다
+  ---
+  duration_ms: 0.556
+  type: 'test'
+  ...
+# Subtest: 권한 거부나 취소에서 파일을 읽거나 쓰지 않는다
+ok 28 - 권한 거부나 취소에서 파일을 읽거나 쓰지 않는다
+  ---
+  duration_ms: 0.4836
+  type: 'test'
+  ...
+# Subtest: 이전 디스크와 다른 dirty 복구 문서도 원본 기준으로 연결하고 저장할 수 있다
+ok 29 - 이전 디스크와 다른 dirty 복구 문서도 원본 기준으로 연결하고 저장할 수 있다
+  ---
+  duration_ms: 1.403
+  type: 'test'
+  ...
+# Subtest: 재시작 중 외부 수정이 있으면 권한이 있어도 연결하지 않고 기존 fingerprint를 유지한다
+ok 30 - 재시작 중 외부 수정이 있으면 권한이 있어도 연결하지 않고 기존 fingerprint를 유지한다
+  ---
+  duration_ms: 0.5595
+  type: 'test'
+  ...
+# Subtest: 연결 후 다시 외부 수정이 발생해도 기존 저장 가드가 덮어쓰기를 거부한다
+ok 31 - 연결 후 다시 외부 수정이 발생해도 기존 저장 가드가 덮어쓰기를 거부한다
+  ---
+  duration_ms: 1.1424
+  type: 'test'
+  ...
+# Subtest: 파일 이동·삭제 및 손상된 연결 메타데이터를 복구 문서 실패로 전파하지 않는다
+ok 32 - 파일 이동·삭제 및 손상된 연결 메타데이터를 복구 문서 실패로 전파하지 않는다
+  ---
+  duration_ms: 0.6932
+  type: 'test'
+  ...
+# Subtest: 다른 이름/형식으로 저장한 새 handle은 자기 디스크 기준을 사용한다
+ok 33 - 다른 이름/형식으로 저장한 새 handle은 자기 디스크 기준을 사용한다
+  ---
+  duration_ms: 0.9328
+  type: 'test'
+  ...
+# Subtest: 저장 대기 중 문서 교체나 수정이 발생하면 거절한다
+ok 34 - 저장 대기 중 문서 교체나 수정이 발생하면 거절한다
+  ---
+  duration_ms: 0.7853
+  type: 'test'
+  ...
+# Subtest: 외부 프로그램이 원본을 바꾸면 덮어쓰기를 시작하지 않는다
+ok 35 - 외부 프로그램이 원본을 바꾸면 덮어쓰기를 시작하지 않는다
+  ---
+  duration_ms: 4.1992
+  type: 'test'
+  ...
+# Subtest: 쓰기 실패와 저장 중 수정 시 close하지 않고 abort하며 입력 잠금을 복원한다
+ok 36 - 쓰기 실패와 저장 중 수정 시 close하지 않고 abort하며 입력 잠금을 복원한다
+  ---
+  duration_ms: 0.8016
+  type: 'test'
+  ...
+1..36
+# tests 36
+# suites 0
+# pass 36
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1100.5974

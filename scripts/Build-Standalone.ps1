@@ -1,19 +1,24 @@
-param([string]$OutputName = 'jueony-mvp')
+﻿param([string]$OutputName = 'jueony-mvp',[string]$FrontendProfile = '')
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $env:RUSTUP_HOME = Join-Path $projectRoot '.tools/rustup'
 $env:CARGO_HOME = Join-Path $projectRoot '.tools/cargo'
 $compiler = Join-Path $env:CARGO_HOME 'bin/rustc.exe'
 if ($OutputName -notmatch '^[a-zA-Z0-9_-]+$') { throw '잘못된 출력 폴더 이름' }
+if ($FrontendProfile -and $FrontendProfile -notmatch '^[a-z][a-z0-9-]{0,30}$') { throw '잘못된 프런트엔드 프로필' }
+$frontend = if ($FrontendProfile) { Join-Path $projectRoot ('apps/editor/evidence/dist-' + $FrontendProfile) } else { Join-Path $projectRoot 'apps/editor/dist' }
+if (-not (Test-Path -LiteralPath (Join-Path $frontend 'build-evidence.json'))) { throw '프런트엔드 빌드를 먼저 실행해 주세요.' }
 $output = Join-Path $projectRoot ('build/' + $OutputName)
 New-Item -ItemType Directory -Force $output | Out-Null
 & $compiler --edition 2021 -O (Join-Path $projectRoot 'apps/launcher/main.rs') -o (Join-Path $output 'JueonyEditor.exe')
 if ($LASTEXITCODE -ne 0) { throw 'Rust 런처 빌드 실패' }
-Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/dist') -Destination $output -Recurse -Force
+$frontendOutput = Join-Path $output 'dist'
+New-Item -ItemType Directory -Force $frontendOutput | Out-Null
+Get-ChildItem -LiteralPath $frontend -Force | Copy-Item -Destination $frontendOutput -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/fixtures') -Destination $output -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/README.md') -Destination (Join-Path $output 'README.md') -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/12-mvp-implementation.md') -Destination (Join-Path $output 'MVP-GUIDE.md') -Force
-foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.md', '15-ai-editor-control-plan.md', '16-hangul-shortcuts-plan.md', '17-editor-control-implementation.md', '18-pane-resize-agent-check.md', '19-agent-interaction-fix.md', '20-native-providers-and-editing.md', '21-public-document-validation.md', '22-agent-retrieval-execution-design.md', '23-autonomous-work-result.md', 'agent-evaluation-cases.csv', 'ai-editor-capability-matrix.csv')) {
+foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.md', '15-ai-editor-control-plan.md', '16-hangul-shortcuts-plan.md', '17-editor-control-implementation.md', '18-pane-resize-agent-check.md', '19-agent-interaction-fix.md', '20-native-providers-and-editing.md', '21-public-document-validation.md', '22-agent-retrieval-execution-design.md', '23-autonomous-work-result.md', '24-next-development-plan.md', '25-hangul-parity-and-state-plan.md', '26-parallel-execution-plan.md', '27-parity-foundation-result.md', 'hangul-2024-feature-audit.csv', 'editor-state-contract.csv', 'agent-evaluation-cases.csv', 'ai-editor-capability-matrix.csv')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
 $llmEvidence = Join-Path $output 'evidence'

@@ -1,3 +1,6 @@
+import {recoveryBytes} from './recovery-export.ts';
+import {captureFileConnection, restoreFileConnection} from '../file-connection.ts';
+import type {StoredFileConnection} from '../file-connection.ts';
 import { rememberFileSnapshot } from '../save-guard';
 import { collectTargetEvidence } from '../../document-agent/controller';
 import { assertRevision, validateGeneration } from './edit-schema.ts';
@@ -36,8 +39,18 @@ export function installAgentBridge(d:Deps){
  }
  Object.assign(api,{
   snapshot,
+  documentIdentity:()=>String(d.wasm.documentGeneration)+':'+d.wasm.fileName,
   async open(bytes:Uint8Array,name:string,handle:any=null,dirty=false){await d.ready;if(api.busy()||applying)throw new Error('문서 작업 중입니다.');await d.load(bytes,name,handle);if(handle)await rememberFileSnapshot(handle,bytes);if(dirty)d.documentState.markDirty('workspace-recovery');},
-  recovery(){if(applying||composing||api.busy())return null;d.input()?.flushDeferredPaginationIfNeeded('jueony-recovery');return {name:d.wasm.fileName,dirty:d.documentState.isDirty(),bytes:d.wasm.fileName.toLowerCase().endsWith('.hwpx')?d.wasm.exportHwpx():d.wasm.exportHwp()};},
+  async restoreFileConnection(connection:StoredFileConnection,requestPermission=false){
+   if(applying||composing||api.busy())throw new Error('문서 작업이 끝난 뒤 원본 파일에 연결해 주세요.');
+   const generation=d.wasm.documentGeneration,name=d.wasm.fileName;
+   if(connection?.handle?.name!==name)return {status:'unavailable',message:'현재 문서와 원본 파일 이름이 다릅니다. 복구 내용은 유지하며 다른 이름으로 저장해 주세요.'};
+   const result=await restoreFileConnection(connection,{requestPermission});
+   if(generation!==d.wasm.documentGeneration||name!==d.wasm.fileName)throw new Error('원본 연결을 확인하는 동안 다른 문서가 열렸습니다. 다시 연결해 주세요.');
+   if(result.status==='connected')d.wasm.currentFileHandle=result.handle;
+   return result;
+  },
+  recovery(){if(applying||composing||api.busy())return null;d.input()?.flushDeferredPaginationIfNeeded('jueony-recovery');return {name:d.wasm.fileName,dirty:d.documentState.isDirty(),fileConnection:captureFileConnection(d.wasm.currentFileHandle),bytes:recoveryBytes(d.wasm,d.wasm.fileName)};},
   async readReference(bytes:Uint8Array){await d.ready;const {HwpDocument}=d.wasm.getWasmModuleExports();const doc=new HwpDocument(bytes);try{return textOf(doc);}finally{doc.free();}},
   async apply(runId:string,base:Snapshot,generation:Generation):Promise<Receipt>{
    if(applied.has(runId))throw new Error('이미 적용한 요청입니다.');

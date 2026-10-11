@@ -1,0 +1,19 @@
+{
+  "passed": 8,
+  "checks": [
+    "F5 then F7 selects the full middle column, showing three cells without opening page setup",
+    "F5 then F8 selects the full middle row, showing three aligned cells",
+    "Column and row selection preserve dirty state, revision and serialized document bytes",
+    "Empty upstream equal-height/equal-width commands cannot report success and shortcuts show unsupported",
+    "F7 in body text still opens page setup and Escape cancels",
+    "Ctrl+F reports unsupported navigation; Ctrl+Q,F opens Find; dialog input cannot delete document lines",
+    "Ctrl+F1 reaches the existing toolbar command and toggles back",
+    "No page errors or external network requests"
+  ],
+  "errors": [],
+  "external": [],
+  "editorHtmlSha256": "3a98a260e34d7f4aa6f5e56c7b492310df884bd6420222d97923521022573082",
+  "port": 4199,
+  "dist": "C:\\Users\\jjome\\Documents\\work\\jueony\\apps\\editor\\evidence\\dist-parity",
+  "limitation": "Headless browser checks with test-only initial cursor positioning; physical Windows IME, native key delivery and Hancom editor comparison remain unverified."
+}

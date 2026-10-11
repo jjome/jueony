@@ -1,0 +1,682 @@
+TAP version 13
+# Subtest: Claude JSON 인자도 공통 대상·범위·출처·서식 검사를 통과해야 한다
+ok 1 - Claude JSON 인자도 공통 대상·범위·출처·서식 검사를 통과해야 한다
+  ---
+  duration_ms: 63.8927
+  type: 'test'
+  ...
+# Subtest: 실제 WASM에서 새 문단 초안을 만들고 두 형식으로 보존한다
+ok 2 - 실제 WASM에서 새 문단 초안을 만들고 두 형식으로 보존한다
+  ---
+  duration_ms: 39.928
+  type: 'test'
+  ...
+# Subtest: 여러 위치 교체/삭제/삽입과 snapshot 되돌림이 앞뒤 문단을 보존한다
+ok 3 - 여러 위치 교체/삭제/삽입과 snapshot 되돌림이 앞뒤 문단을 보존한다
+  ---
+  duration_ms: 59.3298
+  type: 'test'
+  ...
+# Subtest: 이모지 앞뒤 Unicode 범위 교체와 빈 문단 삭제를 보존한다
+ok 4 - 이모지 앞뒤 Unicode 범위 교체와 빈 문단 삭제를 보존한다
+  ---
+  duration_ms: 1.5783
+  type: 'test'
+  ...
+# Subtest: 본문 전체 교체가 균일한 원래 글자·문단 서식을 보존한다
+ok 5 - 본문 전체 교체가 균일한 원래 글자·문단 서식을 보존한다
+  ---
+  duration_ms: 2.6694
+  type: 'test'
+  ...
+# Subtest: 명령 전체 사전 검사에서 알 수 없는 명령·범위·출처·중복 대상을 거부한다
+ok 6 - 명령 전체 사전 검사에서 알 수 없는 명령·범위·출처·중복 대상을 거부한다
+  ---
+  duration_ms: 0.976
+  type: 'test'
+  ...
+# Subtest: 실제 HCX-005 회귀: 같은 위치의 연속 삽입을 응답 순서대로 보존하고 재열기·undo한다
+ok 7 - 실제 HCX-005 회귀: 같은 위치의 연속 삽입을 응답 순서대로 보존하고 재열기·undo한다
+  ---
+  duration_ms: 5.6099
+  type: 'test'
+  ...
+# Subtest: 같은 문단의 본문 변경과 그 뒤 삽입은 두 순서 모두 대상을 보존한다
+ok 8 - 같은 문단의 본문 변경과 그 뒤 삽입은 두 순서 모두 대상을 보존한다
+  ---
+  duration_ms: 2.31
+  type: 'test'
+  ...
+# Subtest: 삽입 묶음도 미지원 속성·문단 수 초과·비연속 중복은 거절한다
+ok 9 - 삽입 묶음도 미지원 속성·문단 수 초과·비연속 중복은 거절한다
+  ---
+  duration_ms: 0.9538
+  type: 'test'
+  ...
+# Subtest: 업무·채팅 Context 격리와 중단 실행 복원
+ok 10 - 업무·채팅 Context 격리와 중단 실행 복원
+  ---
+  duration_ms: 1.1561
+  type: 'test'
+  ...
+# Subtest: 단일 Agent는 한 번 호출하고 검증 후 실제 적용 결과를 반환한다
+ok 11 - 단일 Agent는 한 번 호출하고 검증 후 실제 적용 결과를 반환한다
+  ---
+  duration_ms: 4.0508
+  type: 'test'
+  ...
+# Subtest: 취소/업무 전환/늦은 응답/잘못된 명령은 적용·자동 재시도하지 않는다
+ok 12 - 취소/업무 전환/늦은 응답/잘못된 명령은 적용·자동 재시도하지 않는다
+  ---
+  duration_ms: 2.5226
+  type: 'test'
+  ...
+# Subtest: 지원하지 않는 작업의 설명만 있는 응답은 문서를 변경하지 않는다
+ok 13 - 지원하지 않는 작업의 설명만 있는 응답은 문서를 변경하지 않는다
+  ---
+  duration_ms: 0.2868
+  type: 'test'
+  ...
+# Subtest: 참고 자료 중복 제거·다른 업무 차단·최신 열린 내용 우선
+ok 14 - 참고 자료 중복 제거·다른 업무 차단·최신 열린 내용 우선
+  ---
+  duration_ms: 9.9194
+  type: 'test'
+  ...
+# Subtest: 참고 폴더 미지원 형식·깊이·취소는 조용한 누락 없이 실패한다
+ok 15 - 참고 폴더 미지원 형식·깊이·취소는 조용한 누락 없이 실패한다
+  ---
+  duration_ms: 1.0386
+  type: 'test'
+  ...
+# Subtest: 빈 본문 입력 뒤 같은 요청의 글자 서식은 새 내용을 기준으로 검사한다
+ok 16 - 빈 본문 입력 뒤 같은 요청의 글자 서식은 새 내용을 기준으로 검사한다
+  ---
+  duration_ms: 101.6972
+  type: 'test'
+  ...
+# Subtest: 실제 WASM: 4x3 일정표·표제 서식·쪽 설정·이동한 대상·두 형식 재열기
+ok 17 - 실제 WASM: 4x3 일정표·표제 서식·쪽 설정·이동한 대상·두 형식 재열기
+  ---
+  duration_ms: 33.8331
+  type: 'test'
+  ...
+# Subtest: 셀 원문 검증과 혼합 서식·범위·미지원 속성 거절
+ok 18 - 셀 원문 검증과 혼합 서식·범위·미지원 속성 거절
+  ---
+  duration_ms: 12.1803
+  type: 'test'
+  ...
+# Subtest: 본문 삽입과 표 생성 뒤에도 원래 대상 ID가 같은 문단을 가리킨다
+ok 19 - 본문 삽입과 표 생성 뒤에도 원래 대상 ID가 같은 문단을 가리킨다
+  ---
+  duration_ms: 13.5967
+  type: 'test'
+  ...
+# Subtest: 표 행·열 앞/중간/뒤 삽입·삭제와 후속 셀 편집을 두 형식 저장과 undo로 검증
+ok 20 - 표 행·열 앞/중간/뒤 삽입·삭제와 후속 셀 편집을 두 형식 저장과 undo로 검증
+  ---
+  duration_ms: 97.088
+  type: 'test'
+  ...
+# Subtest: 요청 내 새 표 참조와 연속 행열 편집, 복잡한 셀과 마지막 행열 삭제 거절
+ok 21 - 요청 내 새 표 참조와 연속 행열 편집, 복잡한 셀과 마지막 행열 삭제 거절
+  ---
+  duration_ms: 8.8027
+  type: 'test'
+  ...
+# Subtest: 셀 긴 본문 교체·비우기·빈 셀 채우기는 글자/문단 서식을 보존한다
+ok 22 - 셀 긴 본문 교체·비우기·빈 셀 채우기는 글자/문단 서식을 보존한다
+  ---
+  duration_ms: 18.4717
+  type: 'test'
+  ...
+# Subtest: 본문과 셀 글꼴·장평·자간·위아래첨자 설정을 두 형식으로 보존
+ok 23 - 본문과 셀 글꼴·장평·자간·위아래첨자 설정을 두 형식으로 보존
+  ---
+  duration_ms: 10.243
+  type: 'test'
+  ...
+# Subtest: restore uses saved tab order, includes orphan records and ignores removed IDs
+ok 24 - restore uses saved tab order, includes orphan records and ignores removed IDs
+  ---
+  duration_ms: 1.3173
+  type: 'test'
+  ...
+# Subtest: old profiles without tab order retain every record in the original order
+ok 25 - old profiles without tab order retain every record in the original order
+  ---
+  duration_ms: 0.1694
+  type: 'test'
+  ...
+# Subtest: hwp: UI 저장물의 문단 경계와 텍스트, 두 형식으로 재저장한 본문을 보존한다
+ok 26 - hwp: UI 저장물의 문단 경계와 텍스트, 두 형식으로 재저장한 본문을 보존한다
+  ---
+  duration_ms: 87.0148
+  type: 'test'
+  ...
+# Subtest: hwpx: UI 저장물의 문단 경계와 텍스트, 두 형식으로 재저장한 본문을 보존한다
+ok 27 - hwpx: UI 저장물의 문단 경계와 텍스트, 두 형식으로 재저장한 본문을 보존한다
+  ---
+  duration_ms: 10.0185
+  type: 'test'
+  ...
+# Subtest: 저장하고 탭 닫기에서 생성한 HWP가 본문을 포함한다
+ok 28 - 저장하고 탭 닫기에서 생성한 HWP가 본문을 포함한다
+  ---
+  duration_ms: 1.8277
+  type: 'test'
+  ...
+# Subtest: hwp: UI에서 만든 3×3 표와 9개 셀 내용을 재저장 후에도 보존한다
+ok 29 - hwp: UI에서 만든 3×3 표와 9개 셀 내용을 재저장 후에도 보존한다
+  ---
+  duration_ms: 18.1481
+  type: 'test'
+  ...
+# Subtest: hwpx: UI에서 만든 3×3 표와 9개 셀 내용을 재저장 후에도 보존한다
+ok 30 - hwpx: UI에서 만든 3×3 표와 9개 셀 내용을 재저장 후에도 보존한다
+  ---
+  duration_ms: 7.6499
+  type: 'test'
+  ...
+# Subtest: 파일 handle과 마지막 디스크 fingerprint를 함께 캡처하고 복구 bytes를 쓰지 않는다
+ok 31 - 파일 handle과 마지막 디스크 fingerprint를 함께 캡처하고 복구 bytes를 쓰지 않는다
+  ---
+  duration_ms: 10.9202
+  type: 'test'
+  ...
+# Subtest: 네이티브 emulation handle의 함수는 캡처하지 않아 IndexedDB 전체 저장 실패를 막는다
+ok 32 - 네이티브 emulation handle의 함수는 캡처하지 않아 IndexedDB 전체 저장 실패를 막는다
+  ---
+  duration_ms: 0.7473
+  type: 'test'
+  ...
+# Subtest: 자동 복원은 권한 조회만 하고 prompt이면 파일도 읽지 않는다
+ok 33 - 자동 복원은 권한 조회만 하고 prompt이면 파일도 읽지 않는다
+  ---
+  duration_ms: 1.1932
+  type: 'test'
+  ...
+# Subtest: 명시적 재연결에서만 권한을 요청하고 원본을 검증한다
+ok 34 - 명시적 재연결에서만 권한을 요청하고 원본을 검증한다
+  ---
+  duration_ms: 4.5636
+  type: 'test'
+  ...
+# Subtest: 권한 거부나 취소에서 파일을 읽거나 쓰지 않는다
+ok 35 - 권한 거부나 취소에서 파일을 읽거나 쓰지 않는다
+  ---
+  duration_ms: 0.57
+  type: 'test'
+  ...
+# Subtest: 이전 디스크와 다른 dirty 복구 문서도 원본 기준으로 연결하고 저장할 수 있다
+ok 36 - 이전 디스크와 다른 dirty 복구 문서도 원본 기준으로 연결하고 저장할 수 있다
+  ---
+  duration_ms: 7.0536
+  type: 'test'
+  ...
+# Subtest: 재시작 중 외부 수정이 있으면 권한이 있어도 연결하지 않고 기존 fingerprint를 유지한다
+ok 37 - 재시작 중 외부 수정이 있으면 권한이 있어도 연결하지 않고 기존 fingerprint를 유지한다
+  ---
+  duration_ms: 2.301
+  type: 'test'
+  ...
+# Subtest: 연결 후 다시 외부 수정이 발생해도 기존 저장 가드가 덮어쓰기를 거부한다
+ok 38 - 연결 후 다시 외부 수정이 발생해도 기존 저장 가드가 덮어쓰기를 거부한다
+  ---
+  duration_ms: 1.1922
+  type: 'test'
+  ...
+# Subtest: 파일 이동·삭제 및 손상된 연결 메타데이터를 복구 문서 실패로 전파하지 않는다
+ok 39 - 파일 이동·삭제 및 손상된 연결 메타데이터를 복구 문서 실패로 전파하지 않는다
+  ---
+  duration_ms: 0.9761
+  type: 'test'
+  ...
+# Subtest: 다른 이름/형식으로 저장한 새 handle은 자기 디스크 기준을 사용한다
+ok 40 - 다른 이름/형식으로 저장한 새 handle은 자기 디스크 기준을 사용한다
+  ---
+  duration_ms: 1.2804
+  type: 'test'
+  ...
+# Subtest: 한글의 원래 의미를 유지하며 이전 잘못된 매핑을 제거한다
+ok 41 - 한글의 원래 의미를 유지하며 이전 잘못된 매핑을 제거한다
+  ---
+  duration_ms: 1.2192
+  type: 'test'
+  ...
+# Subtest: 한영 상태의 물리 키와 modifier 조합을 구분한다
+ok 42 - 한영 상태의 물리 키와 modifier 조합을 구분한다
+  ---
+  duration_ms: 0.2605
+  type: 'test'
+  ...
+# Subtest: 연속키 색상과 표가 분리되고 modifier를 놓아도 두 번째 키가 동작한다
+ok 43 - 연속키 색상과 표가 분리되고 modifier를 놓아도 두 번째 키가 동작한다
+  ---
+  duration_ms: 0.4946
+  type: 'test'
+  ...
+# Subtest: 연속키 만료 취소 반복과 잘못된 후속 키가 문서를 바꾸지 않는다
+ok 44 - 연속키 만료 취소 반복과 잘못된 후속 키가 문서를 바꾸지 않는다
+  ---
+  duration_ms: 0.2946
+  type: 'test'
+  ...
+# Subtest: 셀 명령은 셀 문맥에서만 실행되고 같은 Ctrl+Enter는 본문 쪽 나누기가 된다
+ok 45 - 셀 명령은 셀 문맥에서만 실행되고 같은 Ctrl+Enter는 본문 쪽 나누기가 된다
+  ---
+  duration_ms: 0.8054
+  type: 'test'
+  ...
+# Subtest: 조합 입력은 도중에 가로채지 않고 동일 scope의 키는 하나의 명령만 갖는다
+ok 46 - 조합 입력은 도중에 가로채지 않고 동일 scope의 키는 하나의 명령만 갖는다
+  ---
+  duration_ms: 0.2984
+  type: 'test'
+  ...
+# Subtest: 셀 블록 F7/F8은 칸/줄 선택이며 본문 F7 편집 용지를 가로채지 않는다
+ok 47 - 셀 블록 F7/F8은 칸/줄 선택이며 본문 F7 편집 용지를 가로채지 않는다
+  ---
+  duration_ms: 0.2266
+  type: 'test'
+  ...
+# Subtest: Ctrl+F 탐색과 Ctrl+Q,F 찾기를 다른 명령으로 유지한다
+ok 48 - Ctrl+F 탐색과 Ctrl+Q,F 찾기를 다른 명령으로 유지한다
+  ---
+  duration_ms: 0.1383
+  type: 'test'
+  ...
+# Subtest: 기존 기본 도구 상자 Ctrl+F1 연결을 한글 매핑에서도 유지한다
+ok 49 - 기존 기본 도구 상자 Ctrl+F1 연결을 한글 매핑에서도 유지한다
+  ---
+  duration_ms: 0.3655
+  type: 'test'
+  ...
+# Subtest: 전체 칸/줄 선택은 방향과 문서·중첩 표 식별을 보존하고 원본 상태를 변경하지 않는다
+ok 50 - 전체 칸/줄 선택은 방향과 문서·중첩 표 식별을 보존하고 원본 상태를 변경하지 않는다
+  ---
+  duration_ms: 0.981
+  type: 'test'
+  ...
+# Subtest: 삭제·크기 변경으로 선택이 무효해졌으면 새 범위를 만들지 않는다
+ok 51 - 삭제·크기 변경으로 선택이 무효해졌으면 새 범위를 만들지 않는다
+  ---
+  duration_ms: 0.1899
+  type: 'test'
+  ...
+# Subtest: 셀 선택 실행은 중첩 표 크기를 읽고 선택만 갱신하며 문서 편집 API를 호출하지 않는다
+ok 52 - 셀 선택 실행은 중첩 표 크기를 읽고 선택만 갱신하며 문서 편집 API를 호출하지 않는다
+  ---
+  duration_ms: 0.3948
+  type: 'test'
+  ...
+# Subtest: 구버전 서버에는 새 문서 명령이나 인증 설정을 보내지 않는다
+ok 53 - 구버전 서버에는 새 문서 명령이나 인증 설정을 보내지 않는다
+  ---
+  duration_ms: 19.8394
+  type: 'test'
+  ...
+# Subtest: 문서 제어가 있어도 새 제공자를 지원하지 않는 서버에는 요청하지 않는다
+ok 54 - 문서 제어가 있어도 새 제공자를 지원하지 않는 서버에는 요청하지 않는다
+  ---
+  duration_ms: 0.3035
+  type: 'test'
+  ...
+# Subtest: stale iframe saves only changed fields and keeps another iframe preferences
+ok 55 - stale iframe saves only changed fields and keeps another iframe preferences
+  ---
+  duration_ms: 1.946
+  type: 'test'
+  ...
+# Subtest: field-level merge preserves different properties in the same section and latest same-field edit wins
+ok 56 - field-level merge preserves different properties in the same section and latest same-field edit wins
+  ---
+  duration_ms: 1.8583
+  type: 'test'
+  ...
+# Subtest: unknown stored sections are retained when a normalizer drops them
+ok 57 - unknown stored sections are retained when a normalizer drops them
+  ---
+  duration_ms: 0.2888
+  type: 'test'
+  ...
+# Subtest: legacy unversioned settings migrate on an actual write without replacing other fields
+ok 58 - legacy unversioned settings migrate on an actual write without replacing other fields
+  ---
+  duration_ms: 0.1891
+  type: 'test'
+  ...
+# Subtest: no-change save reloads latest value without writing stale data
+ok 59 - no-change save reloads latest value without writing stale data
+  ---
+  duration_ms: 0.2372
+  type: 'test'
+  ...
+# Subtest: arrays are edited atomically while unrelated remote settings survive
+ok 60 - arrays are edited atomically while unrelated remote settings survive
+  ---
+  duration_ms: 0.2726
+  type: 'test'
+  ...
+# Subtest: snapshot and committed results cannot mutate the internal baseline by reference
+ok 61 - snapshot and committed results cannot mutate the internal baseline by reference
+  ---
+  duration_ms: 0.1866
+  type: 'test'
+  ...
+# Subtest: read failure and quota failure preserve previous raw and baseline, then permit retry
+ok 62 - read failure and quota failure preserve previous raw and baseline, then permit retry
+  ---
+  duration_ms: 0.662
+  type: 'test'
+  ...
+# Subtest: corrupt persisted input is retained rather than silently reset: {broken
+ok 63 - corrupt persisted input is retained rather than silently reset: {broken
+  ---
+  duration_ms: 0.4393
+  type: 'test'
+  ...
+# Subtest: corrupt persisted input is retained rather than silently reset: null
+ok 64 - corrupt persisted input is retained rather than silently reset: null
+  ---
+  duration_ms: 0.4119
+  type: 'test'
+  ...
+# Subtest: corrupt persisted input is retained rather than silently reset: []
+ok 65 - corrupt persisted input is retained rather than silently reset: []
+  ---
+  duration_ms: 0.2221
+  type: 'test'
+  ...
+# Subtest: corrupt persisted input is retained rather than silently reset: 42
+ok 66 - corrupt persisted input is retained rather than silently reset: 42
+  ---
+  duration_ms: 0.0988
+  type: 'test'
+  ...
+# Subtest: unsupported version is preserved without writes: 2
+ok 67 - unsupported version is preserved without writes: 2
+  ---
+  duration_ms: 0.1436
+  type: 'test'
+  ...
+# Subtest: unsupported version is preserved without writes: 0
+ok 68 - unsupported version is preserved without writes: 0
+  ---
+  duration_ms: 0.0724
+  type: 'test'
+  ...
+# Subtest: unsupported version is preserved without writes: -1
+ok 69 - unsupported version is preserved without writes: -1
+  ---
+  duration_ms: 0.1635
+  type: 'test'
+  ...
+# Subtest: unsupported version is preserved without writes: 1.5
+ok 70 - unsupported version is preserved without writes: 1.5
+  ---
+  duration_ms: 0.1211
+  type: 'test'
+  ...
+# Subtest: unsupported version is preserved without writes: 1
+ok 71 - unsupported version is preserved without writes: 1
+  ---
+  duration_ms: 0.0755
+  type: 'test'
+  ...
+# Subtest: unsupported version is preserved without writes: null
+ok 72 - unsupported version is preserved without writes: null
+  ---
+  duration_ms: 0.0581
+  type: 'test'
+  ...
+# Subtest: settings reset in another tab is accepted on refresh without restoring deleted fields
+ok 73 - settings reset in another tab is accepted on refresh without restoring deleted fields
+  ---
+  duration_ms: 0.1762
+  type: 'test'
+  ...
+# Subtest: special object keys do not change Object.prototype
+ok 74 - special object keys do not change Object.prototype
+  ---
+  duration_ms: 0.167
+  type: 'test'
+  ...
+# Subtest: binding rolls back unsaved memory changes and reports a write failure once
+ok 75 - binding rolls back unsaved memory changes and reports a write failure once
+  ---
+  duration_ms: 0.3225
+  type: 'test'
+  ...
+# Subtest: binding listens only for its settings key, refreshes another iframe, and disposes listener
+ok 76 - binding listens only for its settings key, refreshes another iframe, and disposes listener
+  ---
+  duration_ms: 0.4311
+  type: 'test'
+  ...
+# Subtest: binding reports only missed remote fields after a local command commits stale state
+ok 77 - binding reports only missed remote fields after a local command commits stale state
+  ---
+  duration_ms: 0.3274
+  type: 'test'
+  ...
+# Subtest: two iframe bindings keep repeated same-turn sequential writes without delivering storage events
+ok 78 - two iframe bindings keep repeated same-turn sequential writes without delivering storage events
+  ---
+  duration_ms: 0.683
+  type: 'test'
+  ...
+# Subtest: deleted known field does not remove another writer unknown nested field
+ok 79 - deleted known field does not remove another writer unknown nested field
+  ---
+  duration_ms: 0.2407
+  type: 'test'
+  ...
+# Subtest: recovery chooses the actual document format and returns only a loss-free export
+ok 80 - recovery chooses the actual document format and returns only a loss-free export
+  ---
+  duration_ms: 1.2609
+  type: 'test'
+  ...
+# Subtest: loss, missing/mismatched reports and empty bytes never become a new recovery record
+ok 81 - loss, missing/mismatched reports and empty bytes never become a new recovery record
+  ---
+  duration_ms: 0.3179
+  type: 'test'
+  ...
+# Subtest: password-protected document never invokes an unencrypted recovery exporter
+ok 82 - password-protected document never invokes an unencrypted recovery exporter
+  ---
+  duration_ms: 0.3395
+  type: 'test'
+  ...
+# Subtest: legacy recovery metadata remains valid without optional connection fields
+ok 83 - legacy recovery metadata remains valid without optional connection fields
+  ---
+  duration_ms: 0.8408
+  type: 'test'
+  ...
+# Subtest: invalid recovery metadata cannot pollute the workspace tab list
+ok 84 - invalid recovery metadata cannot pollute the workspace tab list
+  ---
+  duration_ms: 0.3234
+  type: 'test'
+  ...
+# Subtest: 저장 대기 중 문서 교체나 수정이 발생하면 거절한다
+ok 85 - 저장 대기 중 문서 교체나 수정이 발생하면 거절한다
+  ---
+  duration_ms: 1.2161
+  type: 'test'
+  ...
+# Subtest: 외부 프로그램이 원본을 바꾸면 덮어쓰기를 시작하지 않는다
+ok 86 - 외부 프로그램이 원본을 바꾸면 덮어쓰기를 시작하지 않는다
+  ---
+  duration_ms: 4.6185
+  type: 'test'
+  ...
+# Subtest: 쓰기 실패와 저장 중 수정 시 close하지 않고 abort하며 입력 잠금을 복원한다
+ok 87 - 쓰기 실패와 저장 중 수정 시 close하지 않고 abort하며 입력 잠금을 복원한다
+  ---
+  duration_ms: 0.7489
+  type: 'test'
+  ...
+# Subtest: temporary attachments isolate chats/workspaces, deduplicate, remove and do not survive a new store
+ok 88 - temporary attachments isolate chats/workspaces, deduplicate, remove and do not survive a new store
+  ---
+  duration_ms: 2.3683
+  type: 'test'
+  ...
+# Subtest: attachment validation rejects the entire batch for invalid format, oversize or too many files
+ok 89 - attachment validation rejects the entire batch for invalid format, oversize or too many files
+  ---
+  duration_ms: 4.2157
+  type: 'test'
+  ...
+# Subtest: folderless HWP extraction, hash and explicit limits accompany the transmitted text
+ok 90 - folderless HWP extraction, hash and explicit limits accompany the transmitted text
+  ---
+  duration_ms: 5.168
+  type: 'test'
+  ...
+# Subtest: linked and temporary sources share count/text budgets; invalid encoding and cancellation fail before generation
+ok 91 - linked and temporary sources share count/text budgets; invalid encoding and cancellation fail before generation
+  ---
+  duration_ms: 2.4139
+  type: 'test'
+  ...
+# Subtest: legacy v1 and fresh empty states validate without adding optional new fields
+ok 92 - legacy v1 and fresh empty states validate without adding optional new fields
+  ---
+  duration_ms: 0.9232
+  type: 'test'
+  ...
+# Subtest: unknown additive fields and live file handles are preserved without invoking permissions
+ok 93 - unknown additive fields and live file handles are preserved without invoking permissions
+  ---
+  duration_ms: 0.1958
+  type: 'test'
+  ...
+# Subtest: missing active workspace and inactive/deleted model references retain shell fallback
+ok 94 - missing active workspace and inactive/deleted model references retain shell fallback
+  ---
+  duration_ms: 0.0763
+  type: 'test'
+  ...
+# Subtest: invalid root cannot become a new blank workspace: null
+ok 95 - invalid root cannot become a new blank workspace: null
+  ---
+  duration_ms: 0.7234
+  type: 'test'
+  ...
+# Subtest: invalid root cannot become a new blank workspace: false
+ok 96 - invalid root cannot become a new blank workspace: false
+  ---
+  duration_ms: 0.123
+  type: 'test'
+  ...
+# Subtest: invalid root cannot become a new blank workspace:
+ok 97 - invalid root cannot become a new blank workspace:
+  ---
+  duration_ms: 0.0431
+  type: 'test'
+  ...
+# Subtest: invalid root cannot become a new blank workspace: raw
+ok 98 - invalid root cannot become a new blank workspace: raw
+  ---
+  duration_ms: 0.0783
+  type: 'test'
+  ...
+# Subtest: invalid root cannot become a new blank workspace: 5
+ok 99 - invalid root cannot become a new blank workspace: 5
+  ---
+  duration_ms: 0.0423
+  type: 'test'
+  ...
+# Subtest: future and absent versions do not mutate the stored payload
+ok 100 - future and absent versions do not mutate the stored payload
+  ---
+  duration_ms: 0.3197
+  type: 'test'
+  ...
+# Subtest: each required collection is validated before any interrupted run is rewritten
+ok 101 - each required collection is validated before any interrupted run is rewritten
+  ---
+  duration_ms: 0.3201
+  type: 'test'
+  ...
+# Subtest: duplicate identity cannot shadow a workspace, chat, folder, model or run
+ok 102 - duplicate identity cannot shadow a workspace, chat, folder, model or run
+  ---
+  duration_ms: 0.1419
+  type: 'test'
+  ...
+# Subtest: workspace active chat must exist and belong to that workspace
+ok 103 - workspace active chat must exist and belong to that workspace
+  ---
+  duration_ms: 0.1274
+  type: 'test'
+  ...
+# Subtest: chats and folders cannot reference a missing workspace
+ok 104 - chats and folders cannot reference a missing workspace
+  ---
+  duration_ms: 0.1266
+  type: 'test'
+  ...
+# Subtest: revoked permission does not prevent restore but a non-directory handle is reported
+ok 105 - revoked permission does not prevent restore but a non-directory handle is reported
+  ---
+  duration_ms: 0.2351
+  type: 'test'
+  ...
+# Subtest: run and message histories cannot cross workspace or chat boundaries
+ok 106 - run and message histories cannot cross workspace or chat boundaries
+  ---
+  duration_ms: 0.131
+  type: 'test'
+  ...
+# Subtest: missing legacy run log is allowed while existing linked runs are scoped
+ok 107 - missing legacy run log is allowed while existing linked runs are scoped
+  ---
+  duration_ms: 0.0429
+  type: 'test'
+  ...
+# Subtest: malformed messages, source metadata and run status are rejected
+ok 108 - malformed messages, source metadata and run status are rejected
+  ---
+  duration_ms: 0.1795
+  type: 'test'
+  ...
+# Subtest: invalid connection tokens, layout numbers and duplicated document order are rejected
+ok 109 - invalid connection tokens, layout numbers and duplicated document order are rejected
+  ---
+  duration_ms: 0.1637
+  type: 'test'
+  ...
+# Subtest: valid interrupted run may be rewritten only after validation, once
+ok 110 - valid interrupted run may be rewritten only after validation, once
+  ---
+  duration_ms: 1.1813
+  type: 'test'
+  ...
+# Subtest: receipt summary validates without requiring optional old structural snapshots
+ok 111 - receipt summary validates without requiring optional old structural snapshots
+  ---
+  duration_ms: 0.1553
+  type: 'test'
+  ...
+# Subtest: structural receipt malformed arrays are blocked before diff UI reads them
+ok 112 - structural receipt malformed arrays are blocked before diff UI reads them
+  ---
+  duration_ms: 0.1497
+  type: 'test'
+  ...
+1..112
+# tests 112
+# suites 0
+# pass 112
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1156.5041

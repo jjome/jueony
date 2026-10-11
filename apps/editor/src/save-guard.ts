@@ -13,6 +13,19 @@ async function fingerprint(bytes: ArrayBuffer) {
 export async function rememberFileSnapshot(handle: object, bytes: Uint8Array) {
   fileSnapshots.set(handle, await fingerprint(new Uint8Array(bytes).buffer));
 }
+// A recovery draft contains the latest editor bytes, which can differ from the
+// last disk write. Persist this disk fingerprint alongside a cloneable handle.
+export function rememberedFileFingerprint(handle: object): string | undefined {
+  return fileSnapshots.get(handle);
+}
+
+export async function reconnectFileSnapshot(handle: Handle, expected: string): Promise<boolean> {
+  if (!/^[0-9a-f]{64}$/i.test(expected) || !handle.getFile) return false;
+  const actual = await fingerprint(await (await handle.getFile()).arrayBuffer());
+  if (actual !== expected.toLowerCase()) return false;
+  fileSnapshots.set(handle, actual);
+  return true;
+}
 async function assertFileUnchanged(handle: Handle) {
   const expected = fileSnapshots.get(handle);
   if (!expected || !handle.getFile) return;

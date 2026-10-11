@@ -1,0 +1,62 @@
+{
+  "runId": "2026-10-11-autonomous",
+  "baselineCommit": "e53e3e47546e81b9efad36d030627175c7108372",
+  "startedAt": "2026-10-11T16:09:31.6914108+09:00",
+  "project": "Jueony",
+  "editorEngine": "@rhwp/core@0.8.7",
+  "referenceSourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+  "operatingSystem": "Windows 11 Pro 10.0.26200",
+  "installedHancom": {
+    "comparisonStatus": "BLOCKED_REFERENCE",
+    "editorAvailable": false,
+    "product": "한컴오피스 2024 뷰어",
+    "version": "13.0.0.387"
+  },
+  "nativeUiAutomation": {
+    "available": false,
+    "reason": "Computer Use skill read; required node_repl tool is not exposed in this session."
+  },
+  "production": {
+    "preserve": true,
+    "origin": "http://127.0.0.1:4173",
+    "processId": 21736
+  },
+  "integration": {
+    "port": 4198,
+    "actualHancomParity": "NOT_RUN",
+    "credentials": "memory-only synthetic",
+    "browserProfile": "temporary isolated Edge",
+    "buildProfile": "parity"
+  },
+  "workers": {
+    "root": "baseline, shared files, integration, commit",
+    "C": "engine audit and file connections",
+    "B": "state audit and preferences",
+    "A": "behavior audit and shortcuts"
+  },
+  "limitations": [
+    "DPI, physical Korean IME and printer profile not measured; no native GUI comparison claimed",
+    "Working documentation changes predate this run and are preserved"
+  ],
+  "outcome": {
+    "gates": {
+      "G0": "PARTIAL_REFERENCE_UNAVAILABLE",
+      "G1": "INITIAL_AUDIT_NOT_EXHAUSTIVE",
+      "H03": "CONFIRMED_DEFECTS_FIXED",
+      "G2": "BLOCKED_REFERENCE"
+    },
+    "tests": {
+      "editorUnit": 112,
+      "launcherUnit": 43,
+      "stateBrowser": 14,
+      "shortcutBrowser": 8,
+      "mvpBrowser": 19
+    },
+    "reviewServer": {
+      "port": 4190,
+      "bundle": "build/jueony-parity-20261011",
+      "existingProductionProcessUnchanged": 21736
+    },
+    "newProviderRagLoopMacroImplementation": false
+  }
+}

@@ -1,8 +1,20 @@
+import { selectWholeCellBand } from './cell-band.ts';
 import { HangulKeyResolver, hangulBindings } from './keymap.ts';
 import { defaultShortcuts } from '../../command/shortcut-map';
 
 export function installHangulKeys({ automation, registry, input, eventBus }: { automation: any; registry: any; input: () => any; eventBus: any }) {
   const resolver = new HangulKeyResolver();
+  // These upstream entries have empty execute functions. Never advertise them as actions.
+  const unsupported = new Set(['table:cell-height-equal', 'table:cell-width-equal']);
+  for (const id of unsupported) {
+    const command = registry.get(id);
+    if (command) registry.register({ ...command, label: command.label + ' (미지원)', canExecute: () => false });
+    for (const item of document.querySelectorAll<HTMLElement>(`[data-cmd="${id}"]`)) {
+      item.title = '아직 지원하지 않는 기능입니다.';
+      item.setAttribute('aria-disabled', 'true');
+      item.querySelector('.md-label')?.append(' (미지원)');
+    }
+  }
   // Keep the engine fallback consistent as well (IME and submode handlers use it).
   defaultShortcuts.splice(0, defaultShortcuts.length, ...hangulBindings.filter(b => b.scope === 'document' && !b.keys.includes(',') && !b.command.startsWith('pending:') && !b.nativeClipboard).map(b => {
     const parts = b.keys.split('+'), key = parts.at(-1)!;
@@ -47,6 +59,13 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
     }
     ih.updateCaret(); ih.focus();
   }, true);
+  for (const [axis, label] of [['columns', '칸 전체 블록'], ['rows', '줄 전체 블록']] as const) {
+    registry.register({
+      id: 'ext:jueony-select-cell-' + axis, label,
+      canExecute: (c: any) => c.hasDocument && c.inCellSelectionMode && !c.isFormMode,
+      execute: () => { if (!selectWholeCellBand(input(), axis)) throw new Error('현재 표의 셀 블록을 다시 선택해 주세요.'); },
+    });
+  }
   registry.register({ id: 'ext:jueony-close', label: '문서 닫기', canExecute: () => window.parent !== window, execute: () => window.parent.postMessage({ type: 'jueony:close-document' }, location.origin) });
   const labels = new Map<string, string[]>();
   for (const b of hangulBindings) { if (!labels.has(b.command)) labels.set(b.command, []); labels.get(b.command)!.push(b.keys); }
@@ -84,19 +103,19 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
     if (result.hint) hint(result.hint);
     if (!result.binding) return;
     const b = result.binding;
-    if (!registry.has(b.command)) { hint(b.label + ': 아직 지원하지 않는 기능입니다.'); return; }
+    if (!registry.has(b.command) || unsupported.has(b.command)) { hint(b.command === 'pending:navigation-pane' ? '탐색 작업 창은 아직 지원하지 않습니다. 찾기는 Ctrl+Q, F를 사용하세요.' : b.label + ': 아직 지원하지 않는 기능입니다.'); return; }
     const outcome = automation.execute(b.command, b.params, { allowDialog: true });
     hint(outcome.ok ? '' : b.label + ': 현재 문맥에서 실행할 수 없습니다.');
   }, true);
   const api = (window as any).jueonyEditor;
-  api.shortcuts = () => hangulBindings.map(b => ({ ...b, registered: registry.has(b.command), enabled: automation.isEnabled(b.command) }));
+  api.shortcuts = () => hangulBindings.map(b => ({ ...b, registered: registry.has(b.command), supported: registry.has(b.command) && !unsupported.has(b.command), enabled: automation.isEnabled(b.command) }));
   const button = document.createElement('button'); button.textContent = '단축키'; button.type = 'button'; button.title = '한글 2024 단축키와 지원 상태';
   button.onclick = () => {
     const dialog = document.createElement('dialog'); dialog.style.cssText = 'max-width:780px;width:85%;max-height:80vh;border:1px solid #ccd5df;border-radius:8px;padding:20px';
     const title = document.createElement('h2'); title.textContent = '한글 2024 단축키';
     const text = document.createElement('p'); text.textContent = '문서에 포커스가 있을 때 사용합니다. Ctrl+N 등 일부 조합은 브라우저가 먼저 처리할 수 있습니다. 한글 IME와 네이티브 호스트 검수는 별도입니다.';
     const search = document.createElement('input'); search.placeholder = '기능 또는 단축키 검색'; search.setAttribute('aria-label', '단축키 검색');
-    const list = document.createElement('div'); const render = () => { list.replaceChildren(); for (const b of api.shortcuts().filter((v: any) => (v.keys + v.label).toLowerCase().includes(search.value.toLowerCase()))) { const row = document.createElement('p'); row.textContent = `${b.keys} — ${b.label} · ${b.scope === 'document' ? '문서' : b.scope === 'cells' ? '셀 블록' : b.scope === 'table' ? '표 안' : '개체 선택'} · ${b.registered ? '연결됨' : '미지원'}`; list.append(row); } };
+    const list = document.createElement('div'); const render = () => { list.replaceChildren(); for (const b of api.shortcuts().filter((v: any) => (v.keys + v.label).toLowerCase().includes(search.value.toLowerCase()))) { const row = document.createElement('p'); row.textContent = `${b.keys} — ${b.label} · ${b.scope === 'document' ? '문서' : b.scope === 'cells' ? '셀 블록' : b.scope === 'table' ? '표 안' : '개체 선택'} · ${b.supported ? '연결됨' : '미지원'}`; list.append(row); } };
     const close = document.createElement('button'); close.textContent = '닫기'; close.onclick = () => dialog.close();
     search.oninput = render; dialog.append(title, text, search, close, list); document.body.append(dialog); dialog.addEventListener('close', () => dialog.remove()); render(); dialog.showModal(); search.focus();
   };

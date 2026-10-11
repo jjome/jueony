@@ -1,0 +1,344 @@
+{
+  "run": "2026-10-11-autonomous",
+  "engineWasmSha256": "54cf95014312e605c51b98eb9021247ea79ef2bbd0a7080e11c011d0246e3989",
+  "scope": "Same-engine content/structure round trip; not an independent Hangul layout/render/compatibility verdict. Public source files and generated derivatives excluded from Git.",
+  "reports": [
+    {
+      "id": "mcst-bid-2026",
+      "source": "https://www.mcst.go.kr/site/s_notice/notice/bidView.jsp?pSeq=18649",
+      "sourceSha256": "c61a13b249183a675d38d5badfa3af610edcf99a403622440fc81b7f52b348f2",
+      "engine": "@rhwp/core@0.8.7",
+      "independentHancom": "BLOCKED_REFERENCE",
+      "exports": [
+        {
+          "format": "hwp",
+          "file": "generated/mcst-bid-2026-roundtrip.hwp",
+          "sha256": "f6e1e0dc78677c6e03d309a1e6da696f36e541c835718c105a9717d0d4bb6317",
+          "size": 126464,
+          "reopened": true,
+          "textEqual": true,
+          "bodyEqual": true,
+          "tableContentEqual": true,
+          "controlKindsEqual": true,
+          "pages": 15,
+          "paragraphs": 181,
+          "contentLoss": {
+            "schemaVersion": 1,
+            "outputFormat": "hwp",
+            "count": 0,
+            "losses": []
+          }
+        },
+        {
+          "format": "hwpx",
+          "file": "generated/mcst-bid-2026-roundtrip.hwpx",
+          "sha256": "cef8a3b80d6732be5f850c28923b27a09e2f0ff9df9a2835bc3b84c512266452",
+          "size": 53391,
+          "reopened": true,
+          "textEqual": true,
+          "bodyEqual": true,
+          "tableContentEqual": true,
+          "controlKindsEqual": true,
+          "pages": 15,
+          "paragraphs": 181,
+          "contentLoss": {
+            "schemaVersion": 1,
+            "outputFormat": "hwpx",
+            "count": 0,
+            "losses": []
+          }
+        }
+      ],
+      "editedExports": [],
+      "before": {
+        "pages": 15,
+        "paragraphs": 181,
+        "tables": 11,
+        "controlKinds": [
+          "secd",
+          "cold",
+          "pgnp",
+          "foot",
+          "pghd",
+          "tbl",
+          "head",
+          "gso",
+          "nwno"
+        ]
+      },
+      "cellEdit": "NOT_APPLICABLE: no wholly unmerged table with an editable simple cell",
+      "status": "PASS_CONTENT_ONLY"
+    },
+    {
+      "id": "python-hwpx-0",
+      "source": "https://github.com/airmang/python-hwpx/blob/839562b87f54923c1a0317c22b1f2d4863f3c658/examples/FormattingShowcase.hwpx",
+      "sourceSha256": "aa6d85118875bb07b47f2f8d766dcd049a22820636384ed12b1e0fdd208fc6fb",
+      "engine": "@rhwp/core@0.8.7",
+      "independentHancom": "BLOCKED_REFERENCE",
+      "exports": [
+        {
+          "format": "hwp",
+          "file": "generated/python-hwpx-0-roundtrip.hwp",
+          "sha256": "dd084fb71d6ec160108923a542ff17aafb128e38e47a261f49663570aa41e1ca",
+          "size": 18944,
+          "reopened": true,
+          "textEqual": true,
+          "bodyEqual": true,
+          "tableContentEqual": true,
+          "controlKindsEqual": true,
+          "pages": 1,
+          "paragraphs": 8,
+          "contentLoss": {
+            "schemaVersion": 1,
+            "outputFormat": "hwp",
+            "count": 0,
+            "losses": []
+          }
+        },
+        {
+          "format": "hwpx",
+          "file": "generated/python-hwpx-0-roundtrip.hwpx",
+          "sha256": "4a321999f91675168f2a8426143952aa3b2c43dc4a9015c668985fb35b3ef4db",
+          "size": 15772,
+          "reopened": true,
+          "textEqual": true,
+          "bodyEqual": true,
+          "tableContentEqual": true,
+          "controlKindsEqual": true,
+          "pages": 1,
+          "paragraphs": 8,
+          "contentLoss": {
+            "schemaVersion": 1,
+            "outputFormat": "hwpx",
+            "count": 0,
+            "losses": []
+          }
+        }
+      ],
+      "editedExports": [],
+      "before": {
+        "pages": 1,
+        "paragraphs": 8,
+        "tables": 1,
+        "controlKinds": [
+          "secd",
+          "cold",
+          "tbl"
+        ]
+      },
+      "cellEdit": "NOT_APPLICABLE: no wholly unmerged table with an editable simple cell",
+      "status": "PASS_CONTENT_ONLY"
+    },
+    {
+      "id": "python-hwpx-1",
+      "source": "https://github.com/airmang/python-hwpx/blob/839562b87f54923c1a0317c22b1f2d4863f3c658/examples/note_example.hwpx",
+      "sourceSha256": "e353969fefeebb041d51549f5019a0df23a99bab89b18f10bf937274418bfa21",
+      "engine": "@rhwp/core@0.8.7",
+      "independentHancom": "BLOCKED_REFERENCE",
+      "exports": [
+        {
+          "format": "hwp",
+          "file": "generated/python-hwpx-1-roundtrip.hwp",
+          "sha256": "dbcde3a8d6ee4a65841b79b23cdb8cb889b44278e3177a4683cb94b0e1e2e83f",
+          "size": 44032,
+          "reopened": true,
+          "textEqual": false,
+          "bodyEqual": false,
+          "tableContentEqual": true,
+          "controlKindsEqual": true,
+          "pages": 1,
+          "paragraphs": 3,
+          "contentLoss": {
+            "schemaVersion": 1,
+            "outputFormat": "hwp",
+            "count": 0,
+            "losses": []
+          }
+        },
+        {
+          "format": "hwpx",
+          "file": "generated/python-hwpx-1-roundtrip.hwpx",
+          "sha256": "482ef1a61c63f9a08505bde261068c6fa133379b08913781f3649697acd85237",
+          "size": 37152,
+          "reopened": true,
+          "textEqual": true,
+          "bodyEqual": true,
+          "tableContentEqual": true,
+          "controlKindsEqual": true,
+          "pages": 1,
+          "paragraphs": 2,
+          "contentLoss": {
+            "schemaVersion": 1,
+            "outputFormat": "hwpx",
+            "count": 0,
+            "losses": []
+          }
+        }
+      ],
+      "editedExports": [],
+      "before": {
+        "pages": 1,
+        "paragraphs": 2,
+        "tables": 1,
+        "controlKinds": [
+          "secd",
+          "cold",
+          "",
+          "gso",
+          "tbl"
+        ]
+      },
+      "cellEdit": "NOT_APPLICABLE: no wholly unmerged table with an editable simple cell",
+      "status": "REVIEW_REQUIRED"
+    },
+    {
+      "id": "python-hwpx-2",
+      "source": "https://github.com/airmang/python-hwpx/blob/839562b87f54923c1a0317c22b1f2d4863f3c658/tests/fixtures/equation_preview/equation_p0.hwpx",
+      "sourceSha256": "02a3a6defefb73df29081f1415e96cdf14dab20b6f20c2ab5dd881a601bdc757",
+      "engine": "@rhwp/core@0.8.7",
+      "independentHancom": "BLOCKED_REFERENCE",
+      "exports": [
+        {
+          "format": "hwp",
+          "file": "generated/python-hwpx-2-roundtrip.hwp",
+          "sha256": "cd2b2266c5fddbd82c2dcb2616049ccaa5db33cfba360ef8119c0aca0983287c",
+          "size": 11776,
+          "reopened": true,
+          "textEqual": true,
+          "bodyEqual": true,
+          "tableContentEqual": true,
+          "controlKindsEqual": true,
+          "pages": 1,
+          "paragraphs": 9,
+          "contentLoss": {
+            "schemaVersion": 1,
+            "outputFormat": "hwp",
+            "count": 0,
+            "losses": []
+          }
+        },
+        {
+          "format": "hwpx",
+          "file": "generated/python-hwpx-2-roundtrip.hwpx",
+          "sha256": "bb9f219c29b54262b24b64f512c716eedd10fa9732e557ba54cd27f6280c6ac0",
+          "size": 8091,
+          "reopened": true,
+          "textEqual": true,
+          "bodyEqual": true,
+          "tableContentEqual": true,
+          "controlKindsEqual": true,
+          "pages": 1,
+          "paragraphs": 9,
+          "contentLoss": {
+            "schemaVersion": 1,
+            "outputFormat": "hwpx",
+            "count": 0,
+            "losses": []
+          }
+        }
+      ],
+      "editedExports": [],
+      "before": {
+        "pages": 1,
+        "paragraphs": 9,
+        "tables": 0,
+        "controlKinds": [
+          "secd",
+          "cold",
+          "eqed"
+        ]
+      },
+      "cellEdit": "NOT_APPLICABLE: no wholly unmerged table with an editable simple cell",
+      "status": "PASS_CONTENT_ONLY"
+    },
+    {
+      "id": "python-hwpx-3",
+      "source": "https://github.com/airmang/python-hwpx/blob/839562b87f54923c1a0317c22b1f2d4863f3c658/tests/fixtures/exam/A_form.hwpx",
+      "sourceSha256": "c11c90b48eb8b709cdeb91f5a2c7ecae1b89d0d1390dfc1db32865b902d0dd0f",
+      "engine": "@rhwp/core@0.8.7",
+      "independentHancom": "BLOCKED_REFERENCE",
+      "exports": [
+        {
+          "format": "hwp",
+          "file": "generated/python-hwpx-3-roundtrip.hwp",
+          "sha256": "07c0612ab9f7452698e25ed246e4901ee0aa2b6629fcf1a2c672ad720af849ce",
+          "size": 405504,
+          "reopened": true,
+          "textEqual": true,
+          "bodyEqual": true,
+          "tableContentEqual": true,
+          "controlKindsEqual": true,
+          "pages": 3,
+          "paragraphs": 101,
+          "contentLoss": {
+            "schemaVersion": 1,
+            "outputFormat": "hwp",
+            "count": 0,
+            "losses": []
+          }
+        },
+        {
+          "format": "hwpx",
+          "file": "generated/python-hwpx-3-roundtrip.hwpx",
+          "sha256": "e3d92ac69f4ab730635005c0d8fdbb34b5df73b93d6c3ca09d412d01d1bb2935",
+          "size": 398246,
+          "reopened": true,
+          "textEqual": true,
+          "bodyEqual": true,
+          "tableContentEqual": true,
+          "controlKindsEqual": true,
+          "pages": 3,
+          "paragraphs": 101,
+          "contentLoss": {
+            "schemaVersion": 1,
+            "outputFormat": "hwpx",
+            "count": 0,
+            "losses": []
+          }
+        }
+      ],
+      "editedExports": [
+        {
+          "format": "hwp",
+          "file": "generated/python-hwpx-3-edited.hwp",
+          "sha256": "fe13a7d94767570114f5979a7c12b0905fa527eb93d7d969a0a0f2c5610692a5",
+          "selectedCellTextEqual": true,
+          "contentLoss": {
+            "schemaVersion": 1,
+            "outputFormat": "hwp",
+            "count": 0,
+            "losses": []
+          }
+        },
+        {
+          "format": "hwpx",
+          "file": "generated/python-hwpx-3-edited.hwpx",
+          "sha256": "eb075f4065f951460d373a823e5fbad663dbb223fdf904d4640a7beca895c247",
+          "selectedCellTextEqual": true,
+          "contentLoss": {
+            "schemaVersion": 1,
+            "outputFormat": "hwpx",
+            "count": 0,
+            "losses": []
+          }
+        }
+      ],
+      "before": {
+        "pages": 3,
+        "paragraphs": 101,
+        "tables": 10,
+        "controlKinds": [
+          "secd",
+          "cold",
+          "tbl",
+          "",
+          "head",
+          "foot",
+          "gso"
+        ]
+      },
+      "undoContentEqual": true,
+      "status": "PASS_CONTENT_ONLY"
+    }
+  ]
+}

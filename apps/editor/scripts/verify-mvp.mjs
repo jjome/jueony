@@ -7,7 +7,7 @@ import init,{HwpDocument} from '@rhwp/core';
 await init({module_or_path:await readFile('node_modules/@rhwp/core/rhwp_bg.wasm')});
 const appUrl=process.env.JUEONY_TEST_URL??'http://127.0.0.1:4193/';
 const native=process.env.JUEONY_TEST_ADAPTER==='hyperclova';
-const evidence=resolve(native?'evidence/mvp-hyperclova':'evidence/mvp');await mkdir(evidence,{recursive:true});
+const evidence=resolve(process.env.JUEONY_TEST_EVIDENCE??(native?'evidence/mvp-hyperclova':'evidence/mvp'));await mkdir(evidence,{recursive:true});
 const calls=[];
 const provider=http.createServer(async(req,res)=>{let body='';for await(const chunk of req)body+=chunk;const payload=JSON.parse(body);calls.push({...payload,_requestPath:req.url});const input=JSON.parse(payload.messages[1].content);const nodes=input.document.nodes;
  const result=input.instruction.includes('연결 확인 요청')?{message:'연결 확인',sourceIds:[],operations:[]}:input.instruction.includes('읽기')?{message:'자료를 확인했습니다.',sourceIds:input.references.map(s=>s.id),operations:[]}:input.instruction.includes('초안')?{message:'검증 서버가 새 초안 명령을 반환했습니다.',sourceIds:input.references.map(s=>s.id),operations:[{kind:'create_document',paragraphs:['올해 업무 계획','추진 목적을 정리합니다.','일정을 검토합니다.']}]}

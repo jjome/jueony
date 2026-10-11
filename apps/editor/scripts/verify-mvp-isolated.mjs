@@ -5,7 +5,7 @@ import { join } from 'node:path';
 const root = fileURLToPath(new URL('../../../', import.meta.url));
 const origin = 'http://127.0.0.1:4202';
 if (await fetch(origin + '/api/health').then(() => true, () => false)) throw new Error('Isolated port is in use');
-const server = spawn(process.execPath, ['apps/launcher/server.mjs'], { cwd: root, windowsHide: true, env: { ...process.env, JUEONY_PORT: '4202', JUEONY_DIST: join(root, 'apps/editor/dist'), JUEONY_CONNECTION_STORE: 'memory' }, stdio: 'ignore' });
+const server = spawn(process.execPath, ['apps/launcher/server.mjs'], { cwd: root, windowsHide: true, env: { ...process.env, JUEONY_PORT: '4202', JUEONY_DIST: process.env.JUEONY_TEST_DIST ?? join(root, 'apps/editor/dist'), JUEONY_CONNECTION_STORE: 'memory' }, stdio: 'ignore' });
 try {
  let ready = false;
  for (let i = 0; i < 100; i++) { if (server.exitCode !== null) throw new Error('Server failed'); if (await fetch(origin + '/api/health').then(r => r.ok, () => false)) { ready = true; break; } await new Promise(r => setTimeout(r, 100)); }

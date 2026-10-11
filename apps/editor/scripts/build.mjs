@@ -18,7 +18,10 @@ if (commit !== expectedCommit) throw new Error(`참조 커밋이 다릅니다: $
 const sourceChanges = execFileSync('git', ['-C', upstream, 'status', '--porcelain', '--untracked-files=all', '--',
   'rhwp-studio', 'assets/fonts', 'npm/hwpctrl-ocx', 'LICENSE', 'THIRD_PARTY_LICENSES.md'], { encoding: 'utf8' }).trim();
 if (sourceChanges) throw new Error('참조 소스에 변경이 있습니다. 기준 커밋과 같은 소스로 빌드해 주세요.');
-const root = join(app, '.build/studio');
+const profile = process.env.JUEONY_BUILD_PROFILE ?? '';
+if (profile && !/^[a-z][a-z0-9-]{0,30}$/.test(profile)) throw new Error('Invalid build profile');
+const root = join(app, '.build', profile ? `studio-${profile}` : 'studio');
+const outputDir = profile ? join(app, 'evidence', `dist-${profile}`) : join(app, 'dist');
 await mkdir(root, { recursive: true });
 await cp(join(upstream, 'rhwp-studio/src'), join(root, 'src'), { recursive: true });
 await cp(join(upstream, 'rhwp-studio/types'), join(root, 'types'), { recursive: true });
@@ -57,6 +60,22 @@ html = replaceOnce(html, '<div id="studio-root">', '<div id="studio-root">\n    
 html = replaceOnce(html, '</head>', '  <link rel="stylesheet" href="/src/jueony/editor.css" />\n</head>', 'css');
 await writeFile(join(root, 'editor.html'), html);
 await cp(join(app, 'src/shell.html'), join(root, 'index.html'));
+let settings = (await readFile(join(root, 'src/core/user-settings.ts'), 'utf8')).replace(/\r\n/g, '\n');
+settings = "import { bindPreferencesPersistence } from '../jueony/preferences/binding.ts';\n" + settings;
+settings = replaceOnce(settings, '  constructor() {\n    this.data = this.load();\n  }', `  private persistence: ReturnType<typeof bindPreferencesPersistence<AppSettings>>;
+  constructor() {
+    this.data = this.load();
+    this.persistence = bindPreferencesPersistence({
+      storage: { getItem: key => localStorage.getItem(key), setItem: (key, value) => localStorage.setItem(key, value) },
+      key: STORAGE_KEY, supportedVersion: 1, initial: this.data, load: () => this.load(),
+      replace: value => { this.data = value; }, events: window,
+      onChange: update => window.dispatchEvent(new CustomEvent('jueony:preferences-changed', { detail: update })),
+      onError: error => window.dispatchEvent(new CustomEvent('jueony:preferences-error', { detail: { message: error.message } })),
+    });
+  }
+  refreshFromStorage(): void { this.persistence.refresh(); }`, 'shared preferences');
+settings = replaceOnce(settings, '    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));', '    this.persistence.save(this.data);', 'merge settings save');
+await writeFile(join(root, 'src/core/user-settings.ts'), settings);
 let main = await readFile(join(root, 'src/main.ts'), 'utf8');
 main = replaceOnce(main, 'confirmSaveBeforeReplacingDocument, fileCommands', 'confirmSaveBeforeReplacingDocument, saveCurrentDocument, fileCommands', 'host save import');
 main = replaceOnce(main, "return params.has('url');", "return params.has('url') || params.get('skipRecovery') === '1';", 'tab recovery');
@@ -68,6 +87,40 @@ installDesktopHost({ wasm, eventBus, documentState, ready: initPromise,
 });
 installAgentBridge({ wasm, eventBus, documentState, ready: initPromise, automation, input: () => inputHandler, render: () => canvasView!.refreshDocumentAgentMutation(), load: (bytes, name, handle) => loadBytes(bytes, name, handle) });
 void initPromise.then(() => { installHangulKeys({ automation, registry, input: () => inputHandler, eventBus }); installHangulChrome({ wasm, eventBus, documentState, automation }); });`, 'desktop host');
+main = replaceOnce(main, 'import { initThemeSync, setThemeMode, getThemeMode, getEffectiveTheme }', 'import { applyTheme, syncThemeMenu, initThemeSync, setThemeMode, getThemeMode, getEffectiveTheme }', 'remote preference theme');
+main += `
+// Reuse the Studio settings owner; only reapply fields received from another tab.
+let jueonyPendingView = false;
+function jueonyApplyPreferences(paths: string[]) {
+  syncToolboxMenu(); applyTheme(); syncThemeMenu();
+  if(paths.some(path => path === 'font' || path.startsWith('font.'))) toolbar?.initFontDropdown(currentDocumentFonts);
+  if (wasm.pageCount > 0) {
+    applySavedTextMarkSettings();
+    if (paths.some(path => path === 'view' || /view\\.(pageArrangement|pageMovement|zoomFitMode)/.test(path))) jueonyPendingView = true;
+    const view = userSettings.getViewSettings();
+    const container = document.getElementById('scroll-container');
+    if (jueonyPendingView && container && container.clientWidth > 0) {
+      jueonyPendingView = false;
+      eventBus.emit('page-view-settings-changed', { arrangement: view.pageArrangement, pageMovement: view.pageMovement });
+      applySavedZoomFitMode(view.zoomFitMode);
+    }
+    eventBus.emit('document-view-changed');
+  }
+  eventBus.emit('autosave-settings-changed'); eventBus.emit('command-state-changed');
+}
+window.addEventListener('jueony:preferences-changed', ((event: CustomEvent) => {
+  const { changedPaths } = event.detail;
+  if (changedPaths.length) void initPromise.then(() => jueonyApplyPreferences(changedPaths));
+  if (window.parent !== window) window.parent.postMessage({type:'jueony:preferences-state',error:false},location.origin);
+}) as EventListener);
+window.addEventListener('jueony:preferences-error', ((event: CustomEvent) => {
+  void initPromise.then(() => jueonyApplyPreferences(['view']));
+  if (window.parent !== window) window.parent.postMessage({type:'jueony:preferences-state',error:true,message:event.detail.message},location.origin);
+  else { const target=document.getElementById('sb-message'); if(target) target.textContent=event.detail.message; }
+}) as EventListener);
+window.addEventListener('resize', () => { if(jueonyPendingView) void initPromise.then(() => jueonyApplyPreferences([])); });
+void initPromise.then(() => userSettings.refreshFromStorage());
+`;
 await writeFile(join(root, 'src/main.ts'), main);
 let formatCommands = (await readFile(join(root, 'src/command/commands/format.ts'), 'utf8')).replace(/\r\n/g, '\n');
 formatCommands = replaceOnce(formatCommands, '      if (!savedSel) return;', '      // A caret-only character dialog applies pending typing properties.', 'caret character dialog');
@@ -130,7 +183,7 @@ await build({
     '@wasm': join(app, 'node_modules/@rhwp/core'),
     '@rhwp/hwpctrl/studio-plugin': join(upstream, 'npm/hwpctrl-ocx/src/studio-plugin.mjs'),
   } },
-  build: { outDir: join(app, 'dist'), emptyOutDir: true, assetsInlineLimit: 0, chunkSizeWarningLimit: 3000,
+  build: { outDir: outputDir, emptyOutDir: true, assetsInlineLimit: 0, chunkSizeWarningLimit: 3000,
     rolldownOptions: { input: { index: join(root, 'index.html'), editor: join(root, 'editor.html') } },
   },
 });
@@ -154,5 +207,5 @@ const evidence = {
   applicationSourceDirty: Boolean(execFileSync('git', ['-C', app, 'status', '--porcelain', '--', '.'], { encoding: 'utf8' }).trim()),
   sourceBuild: false, note: 'Rust 엔진은 공식 npm WASM 바이너리 사용. 이 빌드에서 Rust 엔진을 재컴파일하지 않음.',
 };
-await writeFile(join(app, 'dist/build-evidence.json'), JSON.stringify(evidence, null, 2));
+await writeFile(join(outputDir, 'build-evidence.json'), JSON.stringify(evidence, null, 2));
 console.log(JSON.stringify(evidence, null, 2));

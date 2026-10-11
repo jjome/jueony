@@ -1,5 +1,6 @@
 export type BodyNode = { id: string; section: number; paragraph: number; text: string; editable: boolean; reason?: string };
 import type { Structure } from '../document-control/structure.ts';
+import type { StoredFileConnection } from '../file-connection.ts';
 import type { ControlOp } from '../document-control/operations.ts';
 export type Snapshot = { revision: string; name: string; plainText?: string; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
 export type BodyOp =
@@ -17,9 +18,9 @@ export type Run = { id: string; workspaceId: string; chatId: string; documentId:
 export type Message = { id: string; role: 'user' | 'assistant'; text: string; runId?: string };
 export type Chat = { id: string; workspaceId: string; title: string; messages: Message[]; modelId?: string };
 export type Folder = { id: string; workspaceId: string; name: string; handle: FileSystemDirectoryHandle };
-export type Workspace = { id: string; name: string; activeChatId: string; activeDocumentId?: string };
-export type SavedDocument = { id: string; workspaceId: string; name: string; bytes: Uint8Array; dirty: boolean; updatedAt: number };
-export type AppState = { version: 1; activeWorkspaceId: string; workspaces: Workspace[]; chats: Chat[]; folders: Folder[]; runs: Run[]; models: ModelConfig[]; split: number; agentWidth?: number };
+export type Workspace = { id: string; name: string; activeChatId: string; activeDocumentId?: string; documentOrder?: string[] };
+export type SavedDocument = { id: string; workspaceId: string; name: string; bytes: Uint8Array; dirty: boolean; updatedAt: number; fileConnection?: StoredFileConnection };
+export type AppState = { version: 1; activeWorkspaceId: string; workspaces: Workspace[]; chats: Chat[]; folders: Folder[]; runs: Run[]; models: ModelConfig[]; split: number; agentWidth?: number; sidebarHidden?: boolean };
 export const uid = () => crypto.randomUUID();
 export function initialState(): AppState { return { version:1,activeWorkspaceId:'',workspaces:[],chats:[],folders:[],runs:[],models:[],split:42 }; }
 export function workspaceOf(state: AppState, id: string) { const w=state.workspaces.find(w=>w.id===id); if(!w) throw new Error('업무를 찾을 수 없습니다.'); return w; }

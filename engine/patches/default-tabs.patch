@@ -1,0 +1,782 @@
+diff --git a/src/renderer/style_resolver.rs b/src/renderer/style_resolver.rs
+index 3ae3232..140d76a 100644
+--- a/src/renderer/style_resolver.rs
++++ b/src/renderer/style_resolver.rs
+@@ -436,6 +436,8 @@ pub struct ResolvedStyleSet {
+     pub char_styles: Vec<ResolvedCharStyle>,
+     /// 문단 스타일 목록 (para_shapes[id]에 대응)
+     pub para_styles: Vec<ResolvedParaStyle>,
++    /// SectionDef tabStop uses twice the effective HWPUNIT distance.
++    pub(crate) section_tab_widths: Vec<f64>,
+     /// 테두리/배경 스타일 목록 (border_fills[id]에 대응)
+     pub border_styles: Vec<ResolvedBorderStyle>,
+     /// 문단 번호 정의 목록 (numberings[id]에 대응)
+@@ -461,6 +463,35 @@ pub struct ResolvedStyleSet {
+         Option<std::sync::Arc<crate::renderer::shaping_context::HorizontalShapingContext>>,
+ }
+ 
++impl ResolvedStyleSet {
++    /// Keep one section-specific paragraph-style set shared by reflow, measurement and paint.
++    /// Explicit TabDef stops remain unchanged and retain priority in tab-stop resolution.
++    pub(crate) fn for_section(&self, section_index: usize) -> Self {
++        let mut styles = self.clone();
++        let width = self.section_tab_widths.get(section_index).copied()
++            .unwrap_or_else(|| self.para_styles.first().map(|p| p.default_tab_width).unwrap_or(0.0));
++        for para in &mut styles.para_styles {
++            para.default_tab_width = width;
++        }
++        styles
++    }
++
++    pub(crate) fn with_section_tab_spacing(&self, raw_spacing: u32, dpi: f64) -> Self {
++        let mut styles = self.clone();
++        let width = section_default_tab_width(raw_spacing, dpi);
++        for para in &mut styles.para_styles {
++            para.default_tab_width = width;
++        }
++        styles
++    }
++}
++
++/// A missing/zero SectionDef distance keeps the existing 40pt default. Avoid signed casts
++/// for parser-owned u32 values; this is a distance, not a signed paragraph margin.
++pub(crate) fn section_default_tab_width(raw_spacing: u32, dpi: f64) -> f64 {
++    f64::from(if raw_spacing == 0 { 8000 } else { raw_spacing }) * dpi / 14400.0
++}
++
+ /// DocInfo 참조 테이블을 해소된 스타일 목록으로 변환한다.
+ pub fn resolve_styles(doc_info: &DocInfo, dpi: f64) -> ResolvedStyleSet {
+     resolve_styles_with_variant(doc_info, dpi, false)
+@@ -472,6 +503,9 @@ pub fn resolve_styles(doc_info: &DocInfo, dpi: f64) -> ResolvedStyleSet {
+ pub(crate) fn resolve_styles_for_document(document: &Document, dpi: f64) -> ResolvedStyleSet {
+     let profile = document.layout_profile();
+     let mut styles = resolve_styles_with_variant(&document.doc_info, dpi, profile.hwp3_layout());
++    styles.section_tab_widths = document.sections.iter()
++        .map(|section| section_default_tab_width(section.section_def.default_tab_spacing, dpi))
++        .collect();
+     // [#7051] 계보 신호가 없는 저장본의 HFT ASCII 반각 판정은 로드 시 한 번 내려 출처에 둔다.
+     styles.hft_ascii_halfwidth |= document.provenance.hft_ascii_halfwidth_witnessed;
+     if profile.hwpx_stored_layout() {
+@@ -608,6 +642,7 @@ pub fn resolve_styles_with_variant(
+             .map(|style| style.char_shape_id as usize),
+         char_styles,
+         para_styles,
++        section_tab_widths: Vec::new(),
+         border_styles,
+         numberings,
+         bullets,
+@@ -1228,8 +1263,8 @@ fn resolve_single_para_style(
+         _ => hwpunit_to_px(ps.line_spacing, dpi) / 2.0,
+     };
+ 
+-    // 기본 탭 간격: HWP 기본값 80pt (8000 HWPUNIT)
+-    let default_tab_width = hwpunit_to_px(4000, dpi);
++    // DocInfo has no section owner. Section consumers override this 40pt fallback.
++    let default_tab_width = section_default_tab_width(0, dpi);
+ 
+     // 커스텀 탭 정지 해소: TabDef.tabs[] → px 변환
+     // TabItem.position은 ParaShape 여백과 동일하게 2배 스케일로 저장되므로
+diff --git a/src/document_core/mod.rs b/src/document_core/mod.rs
+index c7f2d2c..8ac44a4 100644
+--- a/src/document_core/mod.rs
++++ b/src/document_core/mod.rs
+@@ -473,6 +473,10 @@ impl DocumentCore {
+         )
+     }
+ 
++    pub(crate) fn resolve_render_styles_for_section(&self, section_idx: usize) -> ResolvedStyleSet {
++        self.resolve_render_styles().for_section(section_idx)
++    }
++
+     pub(crate) fn rebuild_resolved_styles(&mut self) {
+         self.styles = self.resolve_render_styles();
+         self.styles.supplemental_metrics = self
+diff --git a/src/document_core/commands/formatting.rs b/src/document_core/commands/formatting.rs
+index 95cce1d..beaef79 100644
+--- a/src/document_core/commands/formatting.rs
++++ b/src/document_core/commands/formatting.rs
+@@ -1056,7 +1056,7 @@ impl DocumentCore {
+         // 텍스트 폭/높이에 영향을 주는 글자 모양 변경 시 LineSeg 재계산.
+         // 장평/자간은 글꼴 크기처럼 줄나눔과 페이지네이션을 바꾼다.
+         if char_shape_mods_affect_text_flow(&mods) {
+-            let styles = self.resolve_render_styles();
++            let styles = self.resolve_render_styles_for_section(sec_idx);
+             let section = &self.document.sections[sec_idx];
+             let page_def = &section.section_def.page_def;
+             let column_def = DocumentCore::find_initial_column_def(&section.paragraphs);
+@@ -1123,7 +1123,7 @@ impl DocumentCore {
+             )));
+         }
+ 
+-        let styles = self.resolve_render_styles();
++        let styles = self.resolve_render_styles_for_section(sec_idx);
+         let available_box = {
+             let section = &self.document.sections[sec_idx];
+             let page_def = &section.section_def.page_def;
+@@ -1577,7 +1577,7 @@ impl DocumentCore {
+         // 사용하므로). 줄간격뿐 아니라 여백/들여쓰기/줄나눔 단위도 사용 가능 폭·토큰
+         // 경계를 바꾼다 — [#4324] para_shape_mods_affect_text_flow(:16 부근) 참고.
+         if para_shape_mods_affect_text_flow(&mods) {
+-            let styles = self.resolve_render_styles();
++            let styles = self.resolve_render_styles_for_section(sec_idx);
+             let section = &self.document.sections[sec_idx];
+             let page_def = &section.section_def.page_def;
+             let column_def = DocumentCore::find_initial_column_def(&section.paragraphs);
+@@ -1634,7 +1634,7 @@ impl DocumentCore {
+             )));
+         }
+ 
+-        let styles = self.resolve_render_styles();
++        let styles = self.resolve_render_styles_for_section(sec_idx);
+         let available_box = {
+             let section = &self.document.sections[sec_idx];
+             let page_def = &section.section_def.page_def;
+@@ -2004,7 +2004,7 @@ impl DocumentCore {
+             Some(para) => para.para_shape_id,
+             None => return,
+         };
+-        let styles = self.resolve_render_styles();
++        let styles = self.resolve_render_styles_for_section(sec_idx);
+         let paragraph_box =
+             body_paragraph_box_for_para_shape(self, sec_idx, para_shape_id, &styles);
+         if let Some(para) = self
+@@ -2035,7 +2035,7 @@ impl DocumentCore {
+     /// 분할 1줄 그대로인 꼬리말이 본문을 절반으로 좁힌 뒤에도 렌더에서 386.7px 로 본문
+     /// 오른쪽 끝(396.9px) 안에 들어온다 (samples/hwp3-sample19-hwp5.hwp).
+     pub(crate) fn reflow_body_paragraphs_in_section(&mut self, sec_idx: usize) {
+-        let styles = self.resolve_render_styles();
++        let styles = self.resolve_render_styles_for_section(sec_idx);
+         let dpi = self.dpi;
+         let wrap_width = self.body_wrap_width(sec_idx);
+         let Some(section) = self.document.sections.get_mut(sec_idx) else {
+diff --git a/src/document_core/commands/formatting_runs.rs b/src/document_core/commands/formatting_runs.rs
+index adfe1de..fa9489f 100644
+--- a/src/document_core/commands/formatting_runs.rs
++++ b/src/document_core/commands/formatting_runs.rs
+@@ -109,7 +109,7 @@ impl DocumentCore {
+         if start == end {
+             return Ok("{\"ok\":true}".into());
+         }
+-        let styles = self.resolve_render_styles();
++        let styles = self.resolve_render_styles_for_section(sec);
+         let section = &self.document.sections[sec];
+         let columns = Self::find_initial_column_def(&section.paragraphs);
+         let layout =
+diff --git a/src/document_core/commands/header_footer_ops.rs b/src/document_core/commands/header_footer_ops.rs
+index 5d5df58..ecfec78 100644
+--- a/src/document_core/commands/header_footer_ops.rs
++++ b/src/document_core/commands/header_footer_ops.rs
+@@ -1116,7 +1116,7 @@ impl DocumentCore {
+         // 있어(margin_left/right 가 0.0 으로 폴백) 여백을 무시한 폭으로 리플로우해버린다.
+         // formatting.rs 의 reflow_cell_paragraph(twin, text_editing.rs)와 동일하게
+         // doc_info 에서 매번 새로 resolve 한다.
+-        let styles = self.resolve_render_styles();
++        let styles = self.resolve_render_styles_for_section(section_idx);
+ 
+         // 문단 여백 적용
+         let para_shape_id =
+diff --git a/src/document_core/commands/text_editing.rs b/src/document_core/commands/text_editing.rs
+index 9f6f809..320c538 100644
+--- a/src/document_core/commands/text_editing.rs
++++ b/src/document_core/commands/text_editing.rs
+@@ -1704,6 +1704,7 @@ impl DocumentCore {
+ 
+     /// 지정된 문단의 line_segs를 컬럼 너비 기반으로 재계산한다.
+     pub(crate) fn reflow_paragraph(&mut self, section_idx: usize, para_idx: usize) {
++        let default_tab_styles = self.styles.for_section(section_idx);
+         let section = &self.document.sections[section_idx];
+         let page_def = &section.section_def.page_def;
+         // 해당 문단에 적용되는 ColumnDef를 찾음 (구역 내 다단↔단일단 전환 지원)
+@@ -1724,13 +1725,13 @@ impl DocumentCore {
+ 
+         // 문단 스타일 조회 — 여백은 `ParagraphBox::body_for_style` 가 해소한다.
+         let para = &section.paragraphs[para_idx];
+-        let para_style = self.styles.para_styles.get(para.para_shape_id as usize);
++        let para_style = default_tab_styles.para_styles.get(para.para_shape_id as usize);
+         // 본문: 열 상자를 그대로 넘긴다. 이 자리가 대화형 편집의 관문이고,
+         // 종전에 두 끝점을 버려 `column_start=0` 을 발행했던 지점이다.
+         reflow_line_segs(
+             &mut self.document.sections[section_idx].paragraphs[para_idx],
+             ParagraphBox::body_for_style(col_area.width, para_style, self.dpi),
+-            &self.styles,
++            &default_tab_styles,
+             self.dpi,
+         );
+     }
+@@ -2809,7 +2810,7 @@ impl DocumentCore {
+     ) {
+         use crate::renderer::hwpunit_to_px;
+ 
+-        let styles = self.resolve_render_styles();
++        let styles = self.resolve_render_styles_for_section(section_idx);
+         let cell_width_px = hwpunit_to_px(cell_width, self.dpi);
+         let pad_left_px = hwpunit_to_px(pad_left as i32, self.dpi);
+         let pad_right_px = hwpunit_to_px(pad_right as i32, self.dpi);
+@@ -3211,7 +3212,7 @@ impl DocumentCore {
+         else {
+             return;
+         };
+-        let styles = self.resolve_render_styles();
++        let styles = self.resolve_render_styles_for_section(section_idx);
+         let dpi = self.dpi;
+         let cell_width_px = hwpunit_to_px(cell_width, dpi);
+         let pad_left_px = hwpunit_to_px(pad_left as i32, dpi);
+@@ -3248,7 +3249,7 @@ impl DocumentCore {
+         start_para: usize,
+         ignore_reset_at: Option<usize>,
+     ) {
+-        let styles = self.resolve_render_styles();
++        let styles = self.resolve_render_styles_for_section(section_idx);
+         let dpi = self.dpi;
+         let is_hwp3_variant = self.document.layout_profile().hwp3_layout();
+         if let Ok(paras) = self.get_cell_paragraphs_mut_by_path(section_idx, parent_para_idx, path)
+diff --git a/src/document_core/commands/footnote_ops.rs b/src/document_core/commands/footnote_ops.rs
+index 90f802e..f5dea27 100644
+--- a/src/document_core/commands/footnote_ops.rs
++++ b/src/document_core/commands/footnote_ops.rs
+@@ -308,6 +308,7 @@ impl DocumentCore {
+         control_idx: usize,
+         fn_para_idx: usize,
+     ) {
++        let default_tab_styles = self.styles.for_section(section_idx);
+         use crate::renderer::hwpunit_to_px;
+ 
+         // 각주 영역 폭 = 페이지 텍스트 영역 폭
+@@ -329,7 +330,7 @@ impl DocumentCore {
+             Some(p) => p.para_shape_id,
+             None => return,
+         };
+-        let para_style = self.styles.para_styles.get(para_shape_id as usize);
++        let para_style = default_tab_styles.para_styles.get(para_shape_id as usize);
+         let margin_left = para_style.map(|s| s.margin_left).unwrap_or(0.0);
+         let margin_right = para_style.map(|s| s.margin_right).unwrap_or(0.0);
+         let final_width = (available_width - margin_left - margin_right).max(0.0);
+@@ -344,7 +345,7 @@ impl DocumentCore {
+                     reflow_line_segs(
+                         para,
+                         ParagraphBox::content_width_px(final_width, self.dpi),
+-                        &self.styles,
++                        &default_tab_styles,
+                         self.dpi,
+                     );
+                 }
+@@ -355,7 +356,7 @@ impl DocumentCore {
+                     reflow_line_segs(
+                         para,
+                         ParagraphBox::content_width_px(final_width, self.dpi),
+-                        &self.styles,
++                        &default_tab_styles,
+                         self.dpi,
+                     );
+                 }
+diff --git a/src/document_core/commands/document.rs b/src/document_core/commands/document.rs
+index cf2a293..4791147 100644
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -498,6 +498,8 @@ impl DocumentCore {
+         use crate::model::control::Control;
+ 
+         for section in &mut document.sections {
++            let section_styles = styles.with_section_tab_spacing(section.section_def.default_tab_spacing, dpi);
++            let styles = &section_styles;
+             // [#4898] 이 구역의 저장 lineseg 가 배치 권위를 갖는지 먼저 판정한다 —
+             // 권위가 있으면 0높이 lineseg(한컴이 접어 둔 숨은 블록)를 재조판하지 않는다.
+             let section_sized = Self::section_has_sized_lineseg(section);
+@@ -1203,6 +1205,154 @@ impl DocumentCore {
+         }
+     }
+ 
++    /// A changed section tab distance invalidates stored line ownership only where tabs occur.
++    /// Nested cell, text-box, caption, header/footer, note and master-page owners then use
++    /// their existing fresh-layout width paths with the same section-resolved style set.
++    pub(crate) fn invalidate_section_tab_layout(&mut self, section_idx: usize) {
++        let Some(section) = self.document.sections.get_mut(section_idx) else { return; };
++        let body_tab_paras: Vec<usize> = section.paragraphs.iter().enumerate()
++            .filter_map(|(idx, para)| para.text.contains('\t').then_some(idx)).collect();
++        for para in &mut section.paragraphs { Self::invalidate_tab_layout_in_paragraph(para); }
++        for master in &mut section.section_def.master_pages {
++            for para in &mut master.paragraphs { Self::invalidate_tab_layout_in_paragraph(para); }
++        }
++        for idx in &body_tab_paras { self.reflow_paragraph(section_idx, *idx); }
++        let styles = self.styles.for_section(section_idx);
++        let variant = self.document.layout_profile().hwp3_layout();
++        if let Some(start) = body_tab_paras.first() {
++            crate::renderer::composer::recalculate_section_vpos(
++                &mut self.document.sections[section_idx].paragraphs, *start, None, None, &styles, self.dpi, variant,
++            );
++        }
++    }
++
++    fn invalidate_tab_layout_in_paragraph(para: &mut Paragraph) {
++        for ctrl in &mut para.controls {
++            Self::invalidate_tab_layouts_in_control(ctrl);
++        }
++        if para.text.contains('\t') {
++            para.line_segs.clear();
++            para.stored_text_partition_dirty = true;
++        }
++    }
++
++    fn invalidate_tab_layouts_in_control(ctrl: &mut Control) {
++        match ctrl {
++            Control::Table(table) => {
++                for cell in &mut table.cells {
++                    for para in &mut cell.paragraphs {
++                        Self::invalidate_tab_layout_in_paragraph(para);
++                    }
++                }
++                if let Some(caption) = &mut table.caption {
++                    Self::invalidate_tab_layouts_in_caption(caption);
++                }
++            }
++            Control::Shape(shape) => Self::invalidate_tab_layouts_in_shape(shape),
++            Control::Picture(picture) => {
++                if let Some(caption) = &mut picture.caption {
++                    Self::invalidate_tab_layouts_in_caption(caption);
++                }
++            }
++            Control::Header(header) => {
++                for para in &mut header.paragraphs {
++                    Self::invalidate_tab_layout_in_paragraph(para);
++                }
++            }
++            Control::Footer(footer) => {
++                for para in &mut footer.paragraphs {
++                    Self::invalidate_tab_layout_in_paragraph(para);
++                }
++            }
++            Control::Footnote(footnote) => {
++                for para in &mut footnote.paragraphs {
++                    Self::invalidate_tab_layout_in_paragraph(para);
++                }
++            }
++            Control::Endnote(endnote) => {
++                for para in &mut endnote.paragraphs {
++                    Self::invalidate_tab_layout_in_paragraph(para);
++                }
++            }
++            Control::HiddenComment(comment) => {
++                for para in &mut comment.paragraphs {
++                    Self::invalidate_tab_layout_in_paragraph(para);
++                }
++            }
++            Control::Field(field) => {
++                for para in &mut field.memo_paragraphs {
++                    Self::invalidate_tab_layout_in_paragraph(para);
++                }
++            }
++            _ => {}
++        }
++    }
++
++    fn invalidate_tab_layouts_in_shape(shape: &mut ShapeObject) {
++        match shape {
++            ShapeObject::Line(line) => {
++                Self::invalidate_tab_layouts_in_drawing(&mut line.drawing)
++            }
++            ShapeObject::Rectangle(rect) => {
++                Self::invalidate_tab_layouts_in_drawing(&mut rect.drawing)
++            }
++            ShapeObject::Ellipse(ellipse) => {
++                Self::invalidate_tab_layouts_in_drawing(&mut ellipse.drawing)
++            }
++            ShapeObject::Arc(arc) => {
++                Self::invalidate_tab_layouts_in_drawing(&mut arc.drawing)
++            }
++            ShapeObject::Polygon(polygon) => {
++                Self::invalidate_tab_layouts_in_drawing(&mut polygon.drawing)
++            }
++            ShapeObject::Curve(curve) => {
++                Self::invalidate_tab_layouts_in_drawing(&mut curve.drawing)
++            }
++            ShapeObject::Group(group) => {
++                for child in &mut group.children {
++                    Self::invalidate_tab_layouts_in_shape(child);
++                }
++                if let Some(caption) = &mut group.caption {
++                    Self::invalidate_tab_layouts_in_caption(caption);
++                }
++            }
++            ShapeObject::Picture(picture) => {
++                if let Some(caption) = &mut picture.caption {
++                    Self::invalidate_tab_layouts_in_caption(caption);
++                }
++            }
++            ShapeObject::Chart(chart) => {
++                Self::invalidate_tab_layouts_in_drawing(&mut chart.drawing);
++                if let Some(caption) = &mut chart.caption {
++                    Self::invalidate_tab_layouts_in_caption(caption);
++                }
++            }
++            ShapeObject::Ole(ole) => {
++                Self::invalidate_tab_layouts_in_drawing(&mut ole.drawing);
++                if let Some(caption) = &mut ole.caption {
++                    Self::invalidate_tab_layouts_in_caption(caption);
++                }
++            }
++        }
++    }
++
++    fn invalidate_tab_layouts_in_drawing(drawing: &mut DrawingObjAttr) {
++        if let Some(text_box) = &mut drawing.text_box {
++            for para in &mut text_box.paragraphs {
++                Self::invalidate_tab_layout_in_paragraph(para);
++            }
++        }
++        if let Some(caption) = &mut drawing.caption {
++            Self::invalidate_tab_layouts_in_caption(caption);
++        }
++    }
++
++    fn invalidate_tab_layouts_in_caption(caption: &mut Caption) {
++        for para in &mut caption.paragraphs {
++            Self::invalidate_tab_layout_in_paragraph(para);
++        }
++    }
++
+     fn clear_missing_lineseg_placeholder_in_paragraph(para: &mut Paragraph) {
+         for ctrl in &mut para.controls {
+             Self::clear_missing_lineseg_placeholders_in_control(ctrl);
+@@ -1592,6 +1742,7 @@ impl DocumentCore {
+         let doc_hwp3_layout = self.document.layout_profile().hwp3_layout();
+ 
+         for section in &mut self.document.sections {
++            let styles = styles.with_section_tab_spacing(section.section_def.default_tab_spacing, dpi);
+             let page_def = &section.section_def.page_def;
+             let column_def = Self::find_initial_column_def(&section.paragraphs);
+             let layout = PageLayoutInfo::from_page_def(page_def, &column_def, dpi);
+diff --git a/src/document_core/queries/rendering.rs b/src/document_core/queries/rendering.rs
+index c435fd5..230895f 100644
+--- a/src/document_core/queries/rendering.rs
++++ b/src/document_core/queries/rendering.rs
+@@ -1078,7 +1078,8 @@ impl DocumentCore {
+             .document
+             .sections
+             .iter()
+-            .map(|section| compose_section_with_horizontal_shaping(section, &self.styles))
++            .enumerate()
++            .map(|(idx, section)| compose_section_with_horizontal_shaping(section, &self.styles.for_section(idx)))
+             .collect();
+     }
+ 
+@@ -3147,7 +3148,17 @@ impl DocumentCore {
+         section_idx: usize,
+         json: &str,
+     ) -> Result<String, HwpError> {
++        let before_spacing = self.document.sections.get(section_idx)
++            .map(|section| section.section_def.default_tab_spacing);
+         self.apply_section_def_json(section_idx, json)?;
++        let after_spacing = self.document.sections[section_idx].section_def.default_tab_spacing;
++        if before_spacing != Some(after_spacing) {
++            self.rebuild_resolved_styles();
++            self.invalidate_section_tab_layout(section_idx);
++            self.measured_sections.clear();
++            self.measured_tables.clear();
++            self.dirty_paragraphs.clear();
++        }
+         let page_count = self.recompose_and_paginate();
+         Ok(format!("{{\"ok\":true,\"pageCount\":{}}}", page_count))
+     }
+@@ -3155,9 +3166,19 @@ impl DocumentCore {
+     /// 모든 구역의 SectionDef를 일괄 변경하고 재페이지네이션 (네이티브 에러 타입)
+     pub fn set_section_def_all_native(&mut self, json: &str) -> Result<String, HwpError> {
+         let count = self.document.sections.len();
++        let before: Vec<u32> = self.document.sections.iter().map(|s| s.section_def.default_tab_spacing).collect();
+         for idx in 0..count {
+             self.apply_section_def_json(idx, json)?;
+         }
++        self.rebuild_resolved_styles();
++        for (idx, old) in before.iter().enumerate() {
++            if *old != self.document.sections[idx].section_def.default_tab_spacing {
++                self.invalidate_section_tab_layout(idx);
++            }
++        }
++        self.measured_sections.clear();
++        self.measured_tables.clear();
++        self.dirty_paragraphs.clear();
+         let page_count = self.recompose_and_paginate();
+         Ok(format!("{{\"ok\":true,\"pageCount\":{}}}", page_count))
+     }
+@@ -4213,10 +4234,11 @@ impl DocumentCore {
+ 
+     /// 구역을 재조판하고 dirty로 표시한다.
+     pub(crate) fn recompose_section(&mut self, section_idx: usize) {
++        let default_tab_styles = self.styles.for_section(section_idx);
+         self.invalidate_page_tree_cache();
+         self.composed[section_idx] = compose_section_with_horizontal_shaping(
+             &self.document.sections[section_idx],
+-            &self.styles,
++            &default_tab_styles,
+         );
+         self.mark_section_dirty(section_idx);
+         // 전체 문단 dirty (모두 재측정 필요)
+@@ -4277,19 +4299,21 @@ impl DocumentCore {
+ 
+     /// 단일 문단만 재조판한다.
+     pub(crate) fn recompose_paragraph(&mut self, section_idx: usize, para_idx: usize) {
++        let default_tab_styles = self.styles.for_section(section_idx);
+         self.invalidate_page_tree_cache();
+         let para = &self.document.sections[section_idx].paragraphs[para_idx];
+         self.composed[section_idx][para_idx] =
+-            compose_paragraph_with_horizontal_shaping(para, &self.styles);
++            compose_paragraph_with_horizontal_shaping(para, &default_tab_styles);
+         self.mark_section_dirty(section_idx);
+         self.mark_paragraph_dirty(section_idx, para_idx);
+     }
+ 
+     /// composed 벡터에 새 문단 항목을 삽입한다 (문단 분할/붙여넣기 후).
+     pub(crate) fn insert_composed_paragraph(&mut self, section_idx: usize, para_idx: usize) {
++        let default_tab_styles = self.styles.for_section(section_idx);
+         self.invalidate_page_tree_cache();
+         let para = &self.document.sections[section_idx].paragraphs[para_idx];
+-        let composed = compose_paragraph_with_horizontal_shaping(para, &self.styles);
++        let composed = compose_paragraph_with_horizontal_shaping(para, &default_tab_styles);
+         self.composed[section_idx].insert(para_idx, composed);
+         self.mark_section_dirty(section_idx);
+         // measured_sections: 인덱스 조정으로 기존 측정값 재사용 (전체 재측정 회피)
+@@ -4611,6 +4635,7 @@ impl DocumentCore {
+                 }
+             },
+         };
++        let default_tab_styles = self.styles.for_section(section_index);
+         let profile = self.effective_layout_profile();
+         let hwp3_origin_flow_spacing_before = uses_hwp3_origin_flow_spacing_before(&self.document);
+         let measurer = HeightMeasurer::new(self.dpi)
+@@ -4636,7 +4661,7 @@ impl DocumentCore {
+             measurer.measure_section_selective(
+                 paragraphs,
+                 composed,
+-                &self.styles,
++                &default_tab_styles,
+                 &self.measured_sections[section_index],
+                 self.dirty_paragraphs
+                     .get(section_index)
+@@ -4644,14 +4669,14 @@ impl DocumentCore {
+                 Some(column_width),
+             )
+         } else {
+-            measurer.measure_section(paragraphs, composed, &self.styles, Some(column_width))
++            measurer.measure_section(paragraphs, composed, &default_tab_styles, Some(column_width))
+         };
+         let typesetter = TypesetEngine::new(self.dpi)
+             .with_render_normalization(std::sync::Arc::clone(&self.render_normalization.overlay));
+         let Some(renderer_job) = typesetter.begin_resumable_table_pagination(
+             paragraphs,
+             composed,
+-            &self.styles,
++            &default_tab_styles,
+             &section.section_def.page_def,
+             &column_def,
+             section_index,
+@@ -5058,6 +5083,7 @@ impl DocumentCore {
+         let mut issue2424_typeset_elapsed = std::time::Duration::ZERO;
+         let mut issue2424_postprocess_elapsed = std::time::Duration::ZERO;
+         for (idx, section) in self.document.sections.iter().enumerate() {
++            let default_tab_styles = self.styles.for_section(idx);
+             if !self.dirty_sections[idx] {
+                 // dirty가 아닌 구역에서도 carry를 업데이트
+                 if let Some(pages) = self.pagination.get(idx) {
+@@ -5140,7 +5166,7 @@ impl DocumentCore {
+                 measurer.measure_section_selective(
+                     para_src,
+                     composed,
+-                    &self.styles,
++                    &default_tab_styles,
+                     &self.measured_sections[idx],
+                     dirty_paras,
+                     Some(col_w_sel),
+@@ -5157,7 +5183,7 @@ impl DocumentCore {
+                     .first()
+                     .map(|a| a.width)
+                     .unwrap_or(layout_pre.body_area.width);
+-                measurer.measure_section(para_src, composed, &self.styles, Some(col_w_pre))
++                measurer.measure_section(para_src, composed, &default_tab_styles, Some(col_w_pre))
+             };
+             if let Some(started) = issue2424_measure_started {
+                 issue2424_measure_elapsed += started.elapsed();
+@@ -5179,7 +5205,7 @@ impl DocumentCore {
+                     &section.section_def.page_def,
+                     &column_def,
+                     idx,
+-                    &self.styles.para_styles,
++                    &default_tab_styles.para_styles,
+                     crate::renderer::pagination::PaginationOpts {
+                         hide_empty_line: section.section_def.hide_empty_line,
+                         respect_vpos_reset: self.respect_vpos_reset,
+@@ -5256,7 +5282,7 @@ impl DocumentCore {
+                 typesetter.typeset_section_with_variant(
+                     para_src,
+                     composed,
+-                    &self.styles,
++                    &default_tab_styles,
+                     &section.section_def.page_def,
+                     &column_def,
+                     idx,
+@@ -5792,6 +5818,7 @@ impl DocumentCore {
+                 continue;
+             }
+             let section = &self.document.sections[idx];
++            let default_tab_styles = self.styles.for_section(idx);
+             let pd = &section.section_def.page_def;
+             let body_area = PageAreas::from_page_def(pd).body_area;
+             let body_h_hu = body_area.height();
+@@ -5839,7 +5866,7 @@ impl DocumentCore {
+                     if matches.binary_search(&i).is_ok() {
+                         let mut c = crate::renderer::composer::compose_paragraph_in_context(
+                             p,
+-                            &self.styles,
++                            &default_tab_styles,
+                         );
+                         // [#2004] composer 가 line_seg 부족(HWP5 빈-문단)으로 1줄로 붕괴하면
+                         // 그림 수만큼 줄을 합성(모두 char_start 동일)해 Stage2 stacked 게이트
+@@ -5869,7 +5896,7 @@ impl DocumentCore {
+                         c
+                     } else {
+                         base.and_then(|c| c.get(i)).cloned().unwrap_or_else(|| {
+-                            crate::renderer::composer::compose_paragraph_in_context(p, &self.styles)
++                            crate::renderer::composer::compose_paragraph_in_context(p, &default_tab_styles)
+                         })
+                     }
+                 })
+@@ -6273,11 +6300,12 @@ impl DocumentCore {
+     }
+ 
+     fn dump_section_typesetter(&self, sec_idx: usize) -> TypesetEngine {
++        let default_tab_styles = self.styles.for_section(sec_idx);
+         let typesetter = TypesetEngine::new(self.dpi)
+             .with_render_normalization(std::sync::Arc::clone(&self.render_normalization.overlay));
+         typesetter.apply_section_format_context(
+             self.section_render_paragraphs(sec_idx),
+-            &self.styles,
++            &default_tab_styles,
+             self.effective_layout_profile(),
+         );
+         typesetter
+@@ -6343,6 +6371,7 @@ impl DocumentCore {
+         paragraphs: &[Paragraph],
+         column_width_px: Option<f64>,
+     ) -> Option<crate::renderer::typeset::DumpFormattedParagraphHeight> {
++        let default_tab_styles = self.styles.for_section(sec_idx);
+         let para = paragraphs.get(para_index)?;
+         let composed = if para_index < body_len {
+             self.section_render_composed(sec_idx).get(para_index)
+@@ -6352,7 +6381,7 @@ impl DocumentCore {
+         Some(typesetter.dump_formatted_paragraph_height(
+             para,
+             composed,
+-            &self.styles,
++            &default_tab_styles,
+             column_width_px,
+             para_index >= body_len,
+         ))
+@@ -7052,6 +7081,7 @@ impl DocumentCore {
+         old_text_len: usize,
+         new_text_len: usize,
+     ) -> Option<FocusedPageTreePatch> {
++        let default_tab_styles = self.styles.for_section(section_idx);
+         // partial Canvas replay는 일반 화면 text만 대상으로 한다. 편집 표식/디버그
+         // overlay는 bbox 밖에 별도 glyph를 그릴 수 있으므로 기존 full repaint를 유지한다.
+         if self.show_paragraph_marks || self.show_control_codes || self.debug_overlay {
+@@ -7097,7 +7127,7 @@ impl DocumentCore {
+         }
+ 
+         let composed =
+-            crate::renderer::composer::compose_paragraph_in_context(paragraph, &self.styles);
++            crate::renderer::composer::compose_paragraph_in_context(paragraph, &default_tab_styles);
+         if composed.numbering_text.is_some()
+             || !composed.inline_controls.is_empty()
+             || !composed.tac_controls.is_empty()
+@@ -7112,8 +7142,7 @@ impl DocumentCore {
+         if line.char_start != line_start || line.has_line_break || line.runs.is_empty() {
+             return None;
+         }
+-        let alignment = self
+-            .styles
++        let alignment = default_tab_styles
+             .para_styles
+             .get(paragraph.para_shape_id as usize)
+             .map(|style| style.alignment)
+@@ -7186,11 +7215,10 @@ impl DocumentCore {
+         let mut x = template.run_x;
+         let mut prepared = Vec::with_capacity(line.runs.len());
+         for (run_index, run) in line.runs.iter().enumerate() {
+-            let char_style = self.styles.char_styles.get(run.char_style_id as usize)?;
++            let char_style = default_tab_styles.char_styles.get(run.char_style_id as usize)?;
+             let run_border_fill_id = char_style.border_fill_id;
+             let run_has_background = run_border_fill_id > 0
+-                && self
+-                    .styles
++                && default_tab_styles
+                     .border_styles
+                     .get((run_border_fill_id as usize).saturating_sub(1))
+                     .is_some_and(|border| border.fill_color.is_some());
+@@ -7203,7 +7231,7 @@ impl DocumentCore {
+                 return None;
+             }
+ 
+-            let mut style = run.text_style(&self.styles);
++            let mut style = run.text_style(&default_tab_styles);
+             if !focused_partial_repaint_style_is_safe(&style) {
+                 return None;
+             }
+@@ -7499,6 +7527,7 @@ impl DocumentCore {
+                 )
+             }));
+         let (base_page_content, paragraphs, composed) = self.find_page(page_num)?;
++        let default_tab_styles = self.styles.for_section(base_page_content.section_index);
+         let overridden_page_content =
+             if let Some((section_idx, is_header, apply_to)) = header_footer_override {
+                 let mut page_content = base_page_content.clone();
+@@ -7704,7 +7733,7 @@ impl DocumentCore {
+             combined_paragraphs = paragraphs.iter().chain(en_paras.iter()).cloned().collect();
+             let en_composed: Vec<_> = en_paras
+                 .iter()
+-                .map(|p| crate::renderer::composer::compose_paragraph_in_context(p, &self.styles))
++                .map(|p| crate::renderer::composer::compose_paragraph_in_context(p, &default_tab_styles))
+                 .collect();
+             combined_composed = composed
+                 .iter()
+@@ -7720,7 +7749,7 @@ impl DocumentCore {
+             header_paragraphs,
+             footer_paragraphs,
+             render_composed,
+-            &self.styles,
++            &default_tab_styles,
+             footnote_shape,
+             &self.document.bin_data_content,
+             active_mp,
+@@ -7736,7 +7765,7 @@ impl DocumentCore {
+                 Some(*ext_mp),
+                 &page_content.layout,
+                 composed,
+-                &self.styles,
++                &default_tab_styles,
+                 &self.document.bin_data_content,
+                 page_content.section_index,
+                 page_content.page_number,
+diff --git a/src/renderer/layout.rs b/src/renderer/layout.rs
+index 6ee65a4..ce81d6c 100644
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -6228,6 +6228,10 @@ impl LayoutEngine {
+         bin_data_content: &[BinDataContent],
+         page_border_fill: Option<&PageBorderFill>,
+     ) {
++        let source_section = page_content.active_header.as_ref()
++            .map(|reference| reference.source_section_index).unwrap_or(page_content.section_index);
++        let section_styles = styles.for_section(source_section);
++        let styles = &section_styles;
+         self.current_page_number.set(page_content.page_number);
+         let header_id = tree.next_id();
+         let mut header_node = RenderNode::new(
+@@ -6373,6 +6377,10 @@ impl LayoutEngine {
+         layout: &PageLayoutInfo,
+         bin_data_content: &[BinDataContent],
+     ) -> RenderNode {
++        let source_section = page_content.active_footer.as_ref()
++            .map(|reference| reference.source_section_index).unwrap_or(page_content.section_index);
++        let section_styles = styles.for_section(source_section);
++        let styles = &section_styles;
+         self.current_page_number.set(page_content.page_number);
+         let footer_id = tree.next_id();
+         let mut footer_node = RenderNode::new(

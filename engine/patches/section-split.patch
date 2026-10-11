@@ -1,0 +1,281 @@
+diff --git a/src/document_core/commands/mod.rs b/src/document_core/commands/mod.rs
+index 20a8020..e8bf252 100644
+--- a/src/document_core/commands/mod.rs
++++ b/src/document_core/commands/mod.rs
+@@ -21,6 +21,7 @@ pub(crate) mod picture_transform_journal;
+ pub mod page_extract;
+ mod table_ops;
+ mod text_editing;
++mod section_ops;
+ // [#5769] Stage 4 — 구역 raw 저널. SectionRawCapture 타입이 DocumentCore 필드로
+ // 쓰이므로 pub(crate).
+ pub(crate) mod section_raw_journal;
+diff --git a/src/wasm_api.rs b/src/wasm_api.rs
+index 2031085..a1b7dc0 100644
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -6113,6 +6113,19 @@ impl HwpDocument {
+             .map_err(|e| e.into())
+     }
+ 
++    /// Insert an actual body section boundary. Offsets use logical characters,
++    /// like splitParagraph, rather than HwpCtrl extended-control stream units.
++    #[wasm_bindgen(js_name = insertSectionBreak)]
++    pub fn insert_section_break_api(
++        &mut self,
++        section_idx: usize,
++        para_idx: usize,
++        char_offset: usize,
++    ) -> Result<String, JsValue> {
++        self.insert_section_break_native(section_idx, para_idx, char_offset)
++            .map_err(|error| error.into())
++    }
++
+     /// 개체를 한 걸음 옮긴다 — 웹한글컨트롤 `ShapeObjMove*`(걸음 56 HWPUNIT).
+     #[wasm_bindgen(js_name = moveControlAt)]
+     pub fn move_control_at_api(
+diff --git a/src/document_core/commands/section_ops.rs b/src/document_core/commands/section_ops.rs
+new file mode 100644
+index 0000000..e099056
+--- /dev/null
++++ b/src/document_core/commands/section_ops.rs
+@@ -0,0 +1,239 @@
++//! Actual body section splitting. The legacy HwpCtrl marker operation remains separate.
++//!
++//! Paragraph boundaries follow the recorded native BreakSection observations in
++//! mydocs/plans/archives/hwpctrl_ocx_full_compat.md section 4.45: a middle caret
++//! splits text, a start caret uses that paragraph, and an end caret uses the next.
++//! Independent Hancom save/print validation is required for layout parity.
++
++use crate::document_core::DocumentCore;
++use crate::error::HwpError;
++use crate::model::control::Control;
++use crate::model::document::{Section, SectionDef};
++use crate::model::page::ColumnDef;
++use crate::model::paragraph::{ColumnBreakType, Paragraph};
++
++fn invalid(reason: &str) -> HwpError {
++    HwpError::InvalidField(reason.to_string())
++}
++
++/// Publish SectionDef/ColumnDef and their stream slots at the same owner boundary.
++/// Control-data indices are shifted together; definitions already at the front
++/// are replaced, while following content and its relative control order survive.
++fn install_definitions(para: &mut Paragraph, definition: &SectionDef, columns: ColumnDef) {
++    let existing = para
++        .controls
++        .iter()
++        .take_while(|control| matches!(control, Control::SectionDef(_) | Control::ColumnDef(_)))
++        .count();
++    if existing > 0 {
++        para.controls.drain(..existing);
++        let removed = existing.min(para.ctrl_data_records.len());
++        para.ctrl_data_records.drain(..removed);
++    }
++    for range in &mut para.field_ranges {
++        range.control_idx = range.control_idx.saturating_sub(existing) + 2;
++    }
++    if existing > 2 {
++        para.release_leading_extended_control_slots(existing - 2);
++    } else {
++        for _ in existing..2 {
++            para.shift_for_control_slot_insert(0);
++        }
++        para.char_count = para.char_count.saturating_add(((2 - existing) * 8) as u32);
++    }
++    para.controls.insert(0, Control::ColumnDef(columns));
++    para.controls
++        .insert(0, Control::SectionDef(Box::new(definition.clone())));
++    para.ctrl_data_records.insert(0, None);
++    para.ctrl_data_records.insert(0, None);
++    para.control_mask |= 1 << 2;
++    para.has_para_text = true;
++    para.column_type = ColumnBreakType::Section;
++    para.raw_break_type = 0;
++    para.page_break_synthesized = false;
++    para.invalidate_layout_inputs();
++}
++
++impl DocumentCore {
++    /// Split a root body section at a paragraph logical character offset.
++    ///
++    /// It returns a section-local caret, not HwpCtrl stream units. Table cells,
++    /// HF/note lists and object selections have no representation in this API.
++    /// The selected paragraph must be plain text (leading definitions and HF
++    /// definitions are allowed); objects in other paragraphs move intact. A
++    /// cross-paragraph field is rejected before changing any document state.
++    /// The caller owns one snapshot history operation around this structural edit.
++    pub fn insert_section_break_native(
++        &mut self,
++        section_idx: usize,
++        para_idx: usize,
++        char_offset: usize,
++    ) -> Result<String, HwpError> {
++        let original = self
++            .document
++            .sections
++            .get(section_idx)
++            .ok_or_else(|| invalid("구역 인덱스가 범위를 벗어났습니다"))?;
++        let paragraph = original
++            .paragraphs
++            .get(para_idx)
++            .ok_or_else(|| invalid("본문 문단 인덱스가 범위를 벗어났습니다"))?;
++        if self.document.sections.len() >= u16::MAX as usize {
++            return Err(invalid("구역 개수 제한을 초과합니다"));
++        }
++        let length = paragraph.text.chars().count();
++        if char_offset > length {
++            return Err(invalid("본문 글자 위치가 범위를 벗어났습니다"));
++        }
++        if paragraph.char_offsets.len() != length {
++            return Err(invalid("문단의 문자 위치 정보가 완전하지 않습니다"));
++        }
++        if !paragraph.field_ranges.is_empty()
++            || !paragraph.range_tags.is_empty()
++            || paragraph.controls.iter().any(|control| {
++                !matches!(
++                    control,
++                    Control::SectionDef(_)
++                        | Control::ColumnDef(_)
++                        | Control::Header(_)
++                        | Control::Footer(_)
++                )
++            })
++        {
++            return Err(invalid(
++                "개체·필드·범위 태그가 있는 문단에서는 구역을 나눌 수 없습니다",
++            ));
++        }
++        // A field begun in one body paragraph and ended in another cannot cross
++        // two BodyText streams. Do not silently detach its original endpoint.
++        if original
++            .paragraphs
++            .iter()
++            .any(|para| !para.orphan_field_ends.is_empty())
++        {
++            return Err(invalid(
++                "여러 문단에 걸친 필드가 있는 구역은 먼저 필드 범위를 정리해야 합니다",
++            ));
++        }
++        if original.paragraphs.iter().enumerate().any(|(index, para)| {
++            index > 0
++                && para
++                    .controls
++                    .iter()
++                    .any(|control| matches!(control, Control::SectionDef(_)))
++        }) {
++            return Err(invalid(
++                "구역 내부에 별도 구역 정의가 있는 문서는 먼저 구조 정리가 필요합니다",
++            ));
++        }
++        // Split a staged copy. Every fallible validation is above this point;
++        // neither rejected positions nor unsupported controls touch raw streams,
++        // rendered caches, or the snapshot journal.
++        let mut left = original.clone();
++        let boundary;
++        let at_end = char_offset == length && length > 0;
++        if at_end {
++            boundary = para_idx + 1;
++            if boundary == left.paragraphs.len() {
++                left.paragraphs.push(Paragraph::new_empty_like(paragraph));
++            }
++        } else if char_offset == 0 && para_idx > 0 {
++            boundary = para_idx;
++        } else {
++            // The initial paragraph has nowhere before it to keep a nonempty
++            // Section0. Keep its definitions on a left empty paragraph instead
++            // of emitting an invalid section containing no paragraphs.
++            let original_tabs = left.paragraphs[para_idx].tab_extended.clone();
++            let mut tail = left.paragraphs[para_idx].split_at(char_offset);
++            let before_tabs = left.paragraphs[para_idx]
++                .text
++                .chars()
++                .filter(|ch| *ch == '\t')
++                .count();
++            left.paragraphs[para_idx].tab_extended =
++                original_tabs[..before_tabs.min(original_tabs.len())].to_vec();
++            tail.tab_extended = original_tabs[before_tabs.min(original_tabs.len())..].to_vec();
++            boundary = para_idx + 1;
++            left.paragraphs.insert(boundary, tail);
++        }
++        let target_occupied = left.paragraphs[boundary].column_type != ColumnBreakType::None
++            || matches!(
++                left.paragraphs[boundary].controls.first(),
++                Some(Control::SectionDef(_) | Control::ColumnDef(_))
++            );
++        let mut caret_para = 0usize;
++        if target_occupied {
++            let blank = Paragraph::new_empty_like(&left.paragraphs[boundary]);
++            left.paragraphs.insert(boundary, blank);
++            if !at_end && char_offset == 0 {
++                caret_para = 1;
++            }
++        }
++        let inherited_columns = Self::find_column_def_for_paragraph(&left.paragraphs, boundary);
++        let mut right = Section {
++            section_def: left.section_def.clone(),
++            paragraphs: left.paragraphs.split_off(boundary),
++            raw_stream: None,
++            raw_provenance: None,
++        };
++        // Explicit start numbers belong to the old section. A new section
++        // continues the page/object counters instead of restarting them.
++        right.section_def.page_num = 0;
++        right.section_def.page_num_type = 0;
++        right.section_def.flags &= !(3 << 20);
++        right.section_def.picture_num = 0;
++        right.section_def.table_num = 0;
++        right.section_def.equation_num = 0;
++        install_definitions(
++            &mut right.paragraphs[0],
++            &right.section_def,
++            inherited_columns,
++        );
++        left.raw_stream = None;
++        left.raw_provenance = None;
++        // Source HF controls stay on the original paragraphs. The renderer's
++        // existing odd/even carry logic supplies inheritance to the new section;
++        // duplicating controls would create a second independent definition.
++        self.document.sections[section_idx] = left;
++        self.document.sections.insert(section_idx + 1, right);
++        self.document.doc_properties.section_count = self.document.sections.len() as u16;
++        self.document.doc_properties.raw_data = None;
++        self.document.doc_info.raw_stream_dirty = true;
++        self.pending_pagination_job = None;
++        self.deferred_pagination_descriptor = None;
++        self.deferred_pagination_revision = self.deferred_pagination_revision.wrapping_add(1);
++        self.para_column_map.clear();
++        // Inserting a section shifts every later section index. Refresh the
++        // document-owned style aggregate before any reflow so section-specific
++        // tab widths cannot be read through the previous index map.
++        self.rebuild_resolved_styles();
++        // Reflow only the split/inserted boundary in the old section. The new
++        // stream starts from zero; its existing page/column reset boundaries
++        // remain semantic input rather than being flattened into one page.
++        let left_boundary = para_idx.min(self.document.sections[section_idx].paragraphs.len() - 1);
++        self.reflow_paragraph(section_idx, left_boundary);
++        self.reflow_body_paragraph(section_idx + 1, 0);
++        let hwp3_layout = self.document.layout_profile().hwp3_layout();
++        for affected in [section_idx, section_idx + 1] {
++            // This helper consumes paragraph before/after spacing and existing
++            // line metrics only; it does not resolve or measure tab stops.
++            crate::renderer::composer::recalculate_section_vpos(
++                &mut self.document.sections[affected].paragraphs,
++                if affected == section_idx {
++                    left_boundary
++                } else {
++                    0
++                },
++                None,
++                None,
++                &self.styles,
++                self.dpi,
++                hwp3_layout,
++            );
++        }
++        self.rebuild_derived_state();
++        Ok(serde_json::json!({"ok":true,"sectionIdx":section_idx + 1,
++            "paraIdx":caret_para,"charOffset":0,"pageCount":self.page_count()})
++        .to_string())
++    }
++}

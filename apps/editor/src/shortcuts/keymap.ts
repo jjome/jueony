@@ -58,6 +58,7 @@ export const hangulBindings: Binding[] = [
   binding('Ctrl+Backspace', 'table:delete-row', '줄 지우기', 'table'),
   binding('Ctrl+Enter', 'page:break', '쪽 나누기'), binding('Ctrl+J', 'page:break', '쪽 나누기'),
   binding('Ctrl+Shift+Enter', 'page:column-break', '단 나누기'), binding('Ctrl+Alt+Enter', 'page:col-settings', '단 설정'),
+  binding('Alt+Shift+Enter', 'page:section-break', '구역 나누기'),
   binding('Ctrl+F1', 'view:toolbox-basic', '기본 도구 상자 접기/펴기'),
   binding('F7', 'ext:jueony-select-cell-columns', '칸 전체 블록', 'cells'),
   binding('F8', 'ext:jueony-select-cell-rows', '줄 전체 블록', 'cells'),

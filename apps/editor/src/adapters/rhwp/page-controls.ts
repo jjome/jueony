@@ -28,6 +28,19 @@ export function writePageHide(doc:any,target:{sectionIndex:number;paragraphIndex
 }
 export function installPageControls(registry:any,input:()=>any){
   const body=(ctx:any)=>ctx.hasDocument&&ctx.isEditable&&!ctx.isFormMode&&!ctx.inTable&&!ctx.inCellSelectionMode&&!ctx.inPictureObjectSelection&&!ctx.inTableObjectSelection&&!input()?.cursor?.isInHeaderFooter?.()&&!input()?.cursor?.isInFootnote?.()&&!input()?.cursor?.isInTextBox?.();
+  registry.register({id:'page:section-break',label:'구역 나누기',shortcutLabel:'Alt+Shift+Enter',
+    canExecute:(ctx:any)=>body(ctx)&&!input()?.cursor?.hasSelection?.()&&typeof input()?.wasm?.borrowDocumentHandle?.()?.insertSectionBreak==='function',
+    execute(){
+      const ih=input();ih.flushDeferredPaginationIfNeeded('section-break');
+      const pos=ih.getPosition();
+      ih.executeOperation({kind:'snapshot',operationType:'jueonySectionBreak',operation:(wasm:any)=>{
+        const result=json(wasm.borrowDocumentHandle().insertSectionBreak(pos.sectionIndex,pos.paragraphIndex,pos.charOffset));
+        if(result?.ok!==true||!Number.isInteger(result.sectionIdx)||!Number.isInteger(result.paraIdx))throw new Error('구역 나누기가 적용되지 않았습니다.');
+        return {sectionIndex:result.sectionIdx,paragraphIndex:result.paraIdx,charOffset:result.charOffset??0};
+      },meta:{actionId:'page:section-break',domain:'page',refresh:'full',dirtyScope:'document'}});
+      ih.focus();
+    },
+  });
   const show=(id:string,title:string,build:(form:HTMLFormElement)=>()=>void)=>{
     if(document.querySelector('dialog[open],.modal-overlay'))return;
     const dialog=document.createElement('dialog');dialog.id=id;dialog.className='jueony-page-dialog';

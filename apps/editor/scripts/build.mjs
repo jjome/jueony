@@ -1,6 +1,7 @@
 import {applyStudioPatches} from './integration/studio-patches.mjs';
 import {applyManualFeaturePatches} from './integration/manual-feature-patches.mjs';
 import {applyRecoveryPatches} from './integration/recovery-patches.mjs';
+import {applyTabFeaturePatches} from './integration/tab-feature-patches.mjs';
 import {auditRepository} from '../../../scripts/check-module-boundaries.mjs';
 import { cp, mkdir, readFile, writeFile, readdir } from 'node:fs/promises';
 import { resolve, dirname, join } from 'node:path';
@@ -19,6 +20,18 @@ if (licenseText !== await readFile(join(app, 'LICENSE.txt'), 'utf8')) {
 }
 const upstream = resolve(app, '../../upstream/rhwp-source');
 const expectedCommit = '1a76570e833917d15817415a53c09ad61ab3203f';
+const sha256 = data => createHash('sha256').update(data).digest('hex');
+const engineRoot = process.env.JUEONY_ENGINE_PACKAGE ? resolve(projectRoot, process.env.JUEONY_ENGINE_PACKAGE) : join(app, 'node_modules/@rhwp/core');
+let engineEvidence;
+if (process.env.JUEONY_ENGINE_PACKAGE) {
+  engineEvidence = JSON.parse(await readFile(join(engineRoot, 'jueony-engine-build.json'), 'utf8'));
+  if (engineEvidence.baseCommit !== expectedCommit ||
+      engineEvidence.wasmSha256 !== sha256(await readFile(join(engineRoot, 'rhwp_bg.wasm'))) ||
+      engineEvidence.jsSha256 !== sha256(await readFile(join(engineRoot, 'rhwp.js')))) throw new Error('Local engine provenance mismatch');
+  for (const patch of engineEvidence.patches) {
+    if (!/^[a-z0-9-]+\.patch$/.test(patch.name) || patch.sha256 !== sha256(await readFile(join(projectRoot, 'engine/patches', patch.name)))) throw new Error('Local engine patches changed; rebuild WASM first');
+  }
+}
 const commit = execFileSync('git', ['-C', upstream, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 if (commit !== expectedCommit) throw new Error(`참조 커밋이 다릅니다: ${commit}`);
 const sourceChanges = execFileSync('git', ['-C', upstream, 'status', '--porcelain', '--untracked-files=all', '--',
@@ -32,7 +45,7 @@ await mkdir(root, { recursive: true });
 await cp(join(upstream, 'rhwp-studio/src'), join(root, 'src'), { recursive: true });
 await cp(join(upstream, 'rhwp-studio/types'), join(root, 'types'), { recursive: true });
 const tsconfig = JSON.parse(await readFile(join(upstream, 'rhwp-studio/tsconfig.json'), 'utf8'));
-tsconfig.compilerOptions.paths['@wasm/*'] = ['../../node_modules/@rhwp/core/*'];
+tsconfig.compilerOptions.paths['@wasm/*'] = [engineRoot.replaceAll('\\', '/') + '/*'];
 await writeFile(join(root, 'tsconfig.json'), JSON.stringify(tsconfig, null, 2));
 // Windows Git 체크아웃의 fonts 항목은 심볼릭 링크 대신 텍스트 파일일 수 있다.
 await mkdir(join(root, 'public'), { recursive: true });
@@ -56,20 +69,21 @@ for (const [name, file] of [['canvaskit-wasm', 'LICENSE'], ['@noble/hashes', 'LI
 await applyStudioPatches({root,upstream,app});
 await applyManualFeaturePatches({root});
 await applyRecoveryPatches({root});
+// These dialogs require the patched engine's section-aware tab layout.
+if (engineEvidence) await applyTabFeaturePatches({root});
 await build({
   configFile: false, root, base: './', publicDir: join(root, 'public'),
   define: { __APP_VERSION__: JSON.stringify('0.8.7'), __RHWP_DISABLE_EXTERNAL_WEBFONTS__: 'true', __RHWP_HWPCTRL__: 'false' },
   resolve: { alias: {
     '@': join(root, 'src'),
-    '@wasm/rhwp.js': join(app, 'node_modules/@rhwp/core/rhwp.js'),
-    '@wasm': join(app, 'node_modules/@rhwp/core'),
+    '@wasm/rhwp.js': join(engineRoot, 'rhwp.js'),
+    '@wasm': engineRoot,
     '@rhwp/hwpctrl/studio-plugin': join(upstream, 'npm/hwpctrl-ocx/src/studio-plugin.mjs'),
   } },
   build: { outDir: outputDir, emptyOutDir: true, assetsInlineLimit: 0, chunkSizeWarningLimit: 3000,
     rolldownOptions: { input: { index: join(root, 'index.html'), editor: join(root, 'editor.html') } },
   },
 });
-const sha256 = data => createHash('sha256').update(data).digest('hex');
 const customSource = [];
 async function collectSource(directory, prefix = '') {
  for (const entry of (await readdir(directory, { withFileTypes: true })).sort((a,b)=>a.name.localeCompare(b.name))) {
@@ -82,7 +96,8 @@ await collectSource(join(app, 'src'));
 const evidence = {
   applicationId: 'jueony-editor',
   sourceCommit: commit, enginePackage: '@rhwp/core@0.8.7', builtAt: new Date().toISOString(),
-  engineWasmSha256: sha256(await readFile(join(app, 'node_modules/@rhwp/core/rhwp_bg.wasm'))),
+  engineWasmSha256: sha256(await readFile(join(engineRoot, 'rhwp_bg.wasm'))),
+  engineBuild: engineEvidence ?? null,
   buildScriptSha256: sha256(await readFile(fileURLToPath(import.meta.url))),
   studioPatchSha256: sha256(await readFile(join(app,'scripts/integration/studio-patches.mjs'))),
   featurePatchSha256: sha256(await readFile(join(app,'scripts/integration/manual-feature-patches.mjs'))),
@@ -90,7 +105,7 @@ const evidence = {
   customSourceSha256: sha256(customSource.join('\n')),
   applicationSourceCommit: execFileSync('git', ['-C', app, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
   applicationSourceDirty: Boolean(execFileSync('git', ['-C', app, 'status', '--porcelain', '--', '.'], { encoding: 'utf8' }).trim()),
-  sourceBuild: false, note: 'Rust 엔진은 공식 npm WASM 바이너리 사용. 이 빌드에서 Rust 엔진을 재컴파일하지 않음.',
+  sourceBuild: Boolean(engineEvidence), note: engineEvidence ? '고정 rhwp 소스와 추적 패치를 직접 빌드한 검수용 WASM. 최적화 및 한컴 출력 비교 상태는 engineBuild와 검증 보고서 참조.' : 'Rust 엔진은 공식 npm WASM 바이너리 사용. 이 빌드에서 Rust 엔진을 재컴파일하지 않음.',
 };
 await writeFile(join(outputDir, 'build-evidence.json'), JSON.stringify(evidence, null, 2));
 console.log(JSON.stringify(evidence, null, 2));

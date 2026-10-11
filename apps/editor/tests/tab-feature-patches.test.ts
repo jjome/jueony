@@ -35,6 +35,8 @@ test('tab UI patch applies once to pinned Studio and rejects drift', async () =>
 test('default-tab dialog applies only tab distance, preserves distinct section settings and rejects stale/invalid input', async () => {
   const root = await fixture();
   const oldDocument = globalThis.document;
+  const oldWindow = globalThis.window;
+  globalThis.window = {} as any;
   class Element {
     children: any[] = []; dataset: Record<string, string> = {}; value = ''; textContent = ''; className = '';
     append(...children: any[]) { this.children.push(...children); }
@@ -74,5 +76,10 @@ test('default-tab dialog applies only tab distance, preserves distinct section s
     const noOp = new DefaultTabSpacingDialog(services, 0, () => {}); noOp.createBody();
     noOp.spacing.value = '20'; noOp.scope.value = 'current';
     assert.equal(noOp.onConfirm(), true); assert.equal(history, 1);
-  } finally { globalThis.document = oldDocument; await rm(root, { recursive: true, force: true }); }
+    let revision = 'document-a:1';
+    globalThis.window = { jueonyEditor: { revision: () => revision } } as any;
+    const changedDocument = new DefaultTabSpacingDialog(services, 0, () => {}); changedDocument.createBody();
+    revision = 'document-b:1'; changedDocument.spacing.value = '60';
+    assert.equal(changedDocument.onConfirm(), false); assert.equal(history, 1);
+  } finally { globalThis.document = oldDocument; globalThis.window = oldWindow; await rm(root, { recursive: true, force: true }); }
 });

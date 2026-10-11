@@ -51,6 +51,7 @@ export function installAgentBridge(d:Deps){
    for(const menu of model)visit(menu.items);
    const pageMenu=model.find((menu:any)=>menu.menuId==='page');
    if(pageMenu&&!pageMenu.items.some((item:any)=>item.commandId==='page:header-footer-dialog'))pageMenu.items.unshift({label:'머리말/꼬리말',commandId:'page:header-footer-dialog',enabled:d.automation.isEnabled('page:header-footer-dialog')});
+   if(pageMenu&&!pageMenu.items.some((item:any)=>item.commandId==='page:section-break'))pageMenu.items.push({label:'구역 나누기',commandId:'page:section-break',shortcut:'Alt+Shift+Enter',enabled:d.automation.isEnabled('page:section-break')});
    const fileMenu=model.find((menu:any)=>menu.menuId==='file');
    if(fileMenu&&!fileMenu.items.some((item:any)=>item.commandId==='file:document-info'))fileMenu.items.push({label:'문서 정보',commandId:'file:document-info',enabled:d.automation.isEnabled('file:document-info')});
    return model;

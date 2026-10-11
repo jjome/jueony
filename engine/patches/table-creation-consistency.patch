@@ -1,0 +1,36 @@
+diff --git a/src/document_core/commands/object_ops/table.rs b/src/document_core/commands/object_ops/table.rs
+index 3413ce7..64e468b 100644
+--- a/src/document_core/commands/object_ops/table.rs
++++ b/src/document_core/commands/object_ops/table.rs
+@@ -572,7 +572,9 @@ impl DocumentCore {
+         raw_ctrl_data[common_obj_offsets::INSTANCE_ID].copy_from_slice(&instance_id.to_le_bytes());
+ 
+         let mut table = Table {
+-            attr: 0x082A2210, // 한컴 기본값 (blank_h_saved.hwp)
++            // Keep the live IR equal to the existing raw serialization defaults. A
++            // different cached attr changes flowWithText after the first save.
++            attr: flags,
+             row_count,
+             col_count,
+             cell_spacing: 0,
+@@ -596,6 +598,7 @@ impl DocumentCore {
+             repeat_header: options.repeat_header.unwrap_or(false),
+             caption: None,
+             common: crate::model::shape::CommonObjAttr {
++                attr: flags,
+                 instance_id,
+                 treat_as_char: false,
+                 text_wrap: crate::model::shape::TextWrap::TopAndBottom,
+@@ -605,6 +608,12 @@ impl DocumentCore {
+                 horz_align: crate::model::shape::HorzAlign::Left,
+                 width: total_width,
+                 height: total_height,
++                margin: crate::model::Padding {
++                    left: outer_margin,
++                    right: outer_margin,
++                    top: outer_margin,
++                    bottom: outer_margin,
++                },
+                 ..Default::default()
+             },
+             outer_margin_left: 283,

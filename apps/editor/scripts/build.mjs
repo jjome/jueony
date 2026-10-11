@@ -31,6 +31,8 @@ if (process.env.JUEONY_ENGINE_PACKAGE) {
   for (const patch of engineEvidence.patches) {
     if (!/^[a-z0-9-]+\.patch$/.test(patch.name) || patch.sha256 !== sha256(await readFile(join(projectRoot, 'engine/patches', patch.name)))) throw new Error('Local engine patches changed; rebuild WASM first');
   }
+  const currentPatches=(await readdir(join(projectRoot,'engine/patches'))).filter(name=>name.endsWith('.patch')).sort();
+  if(JSON.stringify(currentPatches)!==JSON.stringify(engineEvidence.patches.map(p=>p.name).sort()))throw new Error('Local engine patch set changed; rebuild WASM first');
 }
 const commit = execFileSync('git', ['-C', upstream, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 if (commit !== expectedCommit) throw new Error(`참조 커밋이 다릅니다: ${commit}`);
@@ -95,13 +97,14 @@ async function collectSource(directory, prefix = '') {
 await collectSource(join(app, 'src'));
 const evidence = {
   applicationId: 'jueony-editor',
-  sourceCommit: commit, enginePackage: '@rhwp/core@0.8.7', builtAt: new Date().toISOString(),
+  sourceCommit: commit, enginePackage: engineEvidence ? '@jueony/rhwp-engine-review@0.8.7' : '@rhwp/core@0.8.7', builtAt: new Date().toISOString(),
   engineWasmSha256: sha256(await readFile(join(engineRoot, 'rhwp_bg.wasm'))),
   engineBuild: engineEvidence ?? null,
   buildScriptSha256: sha256(await readFile(fileURLToPath(import.meta.url))),
   studioPatchSha256: sha256(await readFile(join(app,'scripts/integration/studio-patches.mjs'))),
   featurePatchSha256: sha256(await readFile(join(app,'scripts/integration/manual-feature-patches.mjs'))),
   recoveryPatchSha256: sha256(await readFile(join(app,'scripts/integration/recovery-patches.mjs'))),
+  tabFeaturePatchSha256: sha256(await readFile(join(app,'scripts/integration/tab-feature-patches.mjs'))),
   customSourceSha256: sha256(customSource.join('\n')),
   applicationSourceCommit: execFileSync('git', ['-C', app, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
   applicationSourceDirty: Boolean(execFileSync('git', ['-C', app, 'status', '--porcelain', '--', '.'], { encoding: 'utf8' }).trim()),

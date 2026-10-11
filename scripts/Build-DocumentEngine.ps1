@@ -29,10 +29,15 @@ if (-not (Test-Path -LiteralPath $prepared)) {
     & python.exe -c 'import sys,tarfile; tarfile.open(sys.argv[1]).extractall(sys.argv[2],filter="data")' $archive $sourceRoot
     if ($LASTEXITCODE -ne 0) { throw 'Engine source extraction failed.' }
     foreach ($patch in $patches) {
-        & git -C $sourceRoot apply --check --whitespace=error-all $patch.FullName
+        # The copy lives inside Jueony's Git worktree. Applying from its nested cwd
+        # silently skips paths outside that cwd prefix. Anchor every path at repo root.
+        $patchDirectory = 'build/rhwp-engine/source-' + $sourceId
+        & git -C $projectRoot apply --directory=$patchDirectory --check --whitespace=error-all $patch.FullName
         if ($LASTEXITCODE -ne 0) { throw "Engine patch drift: $($patch.Name)" }
-        & git -C $sourceRoot apply --whitespace=error-all $patch.FullName
+        & git -C $projectRoot apply --directory=$patchDirectory --whitespace=error-all $patch.FullName
         if ($LASTEXITCODE -ne 0) { throw "Engine patch failed: $($patch.Name)" }
+        & git -C $projectRoot apply --directory=$patchDirectory --reverse --check $patch.FullName
+        if ($LASTEXITCODE -ne 0) { throw "Engine patch was not applied: $($patch.Name)" }
     }
     @{baseCommit=$baseCommit;patches=$patchEvidence;sourceId=$sourceId} | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $prepared -Encoding utf8NoBOM
 }
@@ -62,6 +67,7 @@ try {
 } finally { Pop-Location }
 }
 $pkg = Join-Path $sourceRoot 'pkg'
+if (-not (Select-String -LiteralPath (Join-Path $pkg 'rhwp.js') -SimpleMatch 'insertSectionBreak(' -Quiet)) { throw 'Compiled engine is missing the patched section-break API.' }
 Copy-Item -LiteralPath (Join-Path $sourceRoot 'LICENSE') -Destination (Join-Path $pkg 'LICENSE')
 '{"name":"@jueony/rhwp-engine-review","version":"0.8.7","type":"module","main":"rhwp.js","types":"rhwp.d.ts","license":"MIT"}' | Set-Content -LiteralPath (Join-Path $pkg 'package.json') -Encoding utf8NoBOM
 $manifest = @{baseCommit=$baseCommit;patches=$patchEvidence;sourceId=$sourceId;builtAt=[DateTime]::UtcNow.ToString('o');optimized=$false;buildMode=($Runtime.ToLowerInvariant()+'-review-no-opt');wasmSha256=(Get-FileHash -LiteralPath (Join-Path $pkg 'rhwp_bg.wasm') -Algorithm SHA256).Hash.ToLowerInvariant();jsSha256=(Get-FileHash -LiteralPath (Join-Path $pkg 'rhwp.js') -Algorithm SHA256).Hash.ToLowerInvariant()}

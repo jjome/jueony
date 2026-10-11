@@ -15,8 +15,10 @@ export class DefaultTabSpacingDialog extends ModalDialog {
   private scope!: HTMLSelectElement;
   private error!: HTMLParagraphElement;
   private before: number[];
+  private revision: string | undefined;
   constructor(private services: CommandServices, private sectionIdx: number, private applied: (raw: number) => void) {
     super('기본 탭 간격', 380);
+    this.revision = (window as any).jueonyEditor?.revision?.();
     this.before = Array.from({ length: services.wasm.getSectionCount() }, (_, idx) => services.wasm.getSectionDef(idx).defaultTabSpacing);
   }
   protected createBody(): HTMLElement {
@@ -51,6 +53,9 @@ export class DefaultTabSpacingDialog extends ModalDialog {
     }
     const ih = this.services.getInputHandler();
     if (!ih) { this.error.textContent = '문서 편집기가 준비되지 않았습니다.'; return false; }
+    if (this.revision !== (window as any).jueonyEditor?.revision?.()) {
+      this.error.textContent = '문서가 변경되었습니다. 대화상자를 다시 열어 주세요.'; return false;
+    }
     if (this.services.wasm.getSectionCount() !== this.before.length
       || this.before.some((value, idx) => this.services.wasm.getSectionDef(idx).defaultTabSpacing !== value)) {
       this.error.textContent = '구역 설정이 변경되었습니다. 대화상자를 다시 열어 주세요.'; return false;
@@ -104,7 +109,7 @@ export async function applyTabFeaturePatches({ root }) {
     source = "import { DefaultTabSpacingDialog } from '@/ui/default-tab-spacing-dialog';\n" + source;
     return replaceOnce(source, '      const dialog = new ParaShapeDialog(services.wasm, services.eventBus);', `      const dialog = new ParaShapeDialog(services.wasm, services.eventBus);
       dialog.onDefaultTabSpacingChange = (applied) => {
-        const defaultTabs = new DefaultTabSpacingDialog(services, curPos.section, applied);
+        const defaultTabs = new DefaultTabSpacingDialog(services, curPos.sectionIndex, applied);
         defaultTabs.afterClose = () => document.querySelector<HTMLElement>('[data-jueony-default-tab-change]')?.focus();
         defaultTabs.show();
       };`, 'format dialog wiring');

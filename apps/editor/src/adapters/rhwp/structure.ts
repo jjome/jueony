@@ -7,13 +7,14 @@ export function readStructure(wasm: any): Structure {
   const doc = nativeDocument(wasm), positions: { section: number; paragraph: number }[] = [];
   const sections: Structure['sections'] = [], paragraphs: Structure['paragraphs'] = [];
   for (let section = 0; section < doc.getSectionCount(); section++) {
-    sections.push({ index: section, page: parsed(doc.getPageDef(section)) });
+    sections.push({ index: section, page: parsed(doc.getPageDef(section)),columns:parsed(doc.getColumnDef(section)) });
     for (let paragraph = 0; paragraph < doc.getParagraphCount(section); paragraph++) {
       positions.push({ section, paragraph });
-      paragraphs.push({ id: `s${section}p${paragraph}`, characters: parsed(doc.getCharPropertiesAt(section, paragraph, 0)), paragraph: parsed(doc.getParaPropertiesAt(section, paragraph)) });
+      paragraphs.push({ id: `s${section}p${paragraph}`, characters: parsed(doc.getCharPropertiesAt(section, paragraph, 0)), paragraph: parsed(doc.getParaPropertiesAt(section, paragraph)),style:parsed(doc.getStyleAt(section,paragraph)),pageHide:parsed(doc.getPageHide(section,paragraph)) });
     }
   }
   const controls = parsed(doc.getControls()), lists = parsed(doc.getCursorModel()).lists;
+  paragraphs.forEach((p,index)=>{const at=positions[index];p.controls=controls.filter((c:any)=>c.list===0&&c.para===index).map((c:any)=>c.ctrlId);p.pageIndex=parsed(doc.getPageOfPosition(at.section,at.paragraph)).page;});
   const tables: Table[] = [], unsupportedControls: string[] = [];
   for (const control of controls) {
     if (['secd', 'cold'].includes(control.ctrlId)) continue;
@@ -36,5 +37,6 @@ export function readStructure(wasm: any): Structure {
     }
     tables.push({ id: `s${section}p${paragraph}t${ci}`, section, paragraph, control: ci, rows: dimensions.rowCount, columns: dimensions.colCount, cells });
   }
-  return { sections, tables, paragraphs, unsupportedControls: [...new Set(unsupportedControls)] };
+  const styles=parsed(doc.getStyleList()).map((style:any)=>({id:style.id,name:style.name,type:style.type}));
+  return { sections, tables, paragraphs,styles, unsupportedControls: [...new Set(unsupportedControls)] };
 }

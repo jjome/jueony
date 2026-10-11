@@ -21,6 +21,13 @@ function replaceCellText(doc:any,base:number[],cell:number,value:string) {
 }
 export function executeControlOperation(wasm: any, snapshot: Snapshot, op: ControlOp, tables: Map<string, Table>): { section: number; after: number; count: number } | undefined {
   const doc = nativeDocument(wasm);
+  if(op.kind==='apply_paragraph_style') {const n=snapshot.nodes.find(n=>n.id===op.target)!;checked(doc.applyStyle(n.section,n.paragraph,op.styleId));return;}
+  if(op.kind==='set_columns'){checked(doc.setColumnDef(op.section,op.count,0,1,mm(op.spacingMm)));return;}
+  if(op.kind==='set_page_hide'){
+    const n=snapshot.nodes.find(n=>n.id===op.target)!;
+    const flags={...parsed(doc.getPageHide(n.section,n.paragraph)),...op.properties};
+    checked(doc.setPageHide(n.section,n.paragraph,...['hideHeader','hideFooter','hideMasterPage','hideBorder','hideFill','hidePageNum'].map(key=>flags[key]===true)));return;
+  }
   if (op.kind === 'set_page_setup') { checked(doc.setPageDef(op.section, JSON.stringify(pageProperties(parsed(doc.getPageDef(op.section)), op.properties)))); return; }
   if(tableAxisKinds.includes(op.kind)) {
     const axis=op as Extract<ControlOp,{index:number}>,table=tables.get(axis.target)!;

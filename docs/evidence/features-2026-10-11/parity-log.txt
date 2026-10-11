@@ -1,0 +1,10 @@
+PASS F6 opens styles; Alt+F6 focuses chat; modal F6 does not change document
+PASS table cell block F7 selects column; P opens cell properties without typing text
+PASS document information reads live text/table counts without changing revision or dirty state
+PASS hwp: page hide cancel/apply/undo/redo and actual save/reopen
+PASS hwpx: page hide cancel/apply/undo/redo and actual save/reopen
+PASS header/footer dialog cancel, create, undo/redo, then existing content stays intact
+PASS manual table caption position/removal form single undo steps and survive saving
+PASS hwp: Agent style/columns/page-hide batch uses live snapshot, persists and undoes as one request
+PASS hwpx: Agent style/columns/page-hide batch uses live snapshot, persists and undoes as one request
+PASS recovery options off retain old checkpoint; idle 5 seconds saves dirty changes and restores after reload

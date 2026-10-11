@@ -1,4 +1,6 @@
 import {applyStudioPatches} from './integration/studio-patches.mjs';
+import {applyManualFeaturePatches} from './integration/manual-feature-patches.mjs';
+import {applyRecoveryPatches} from './integration/recovery-patches.mjs';
 import {auditRepository} from '../../../scripts/check-module-boundaries.mjs';
 import { cp, mkdir, readFile, writeFile, readdir } from 'node:fs/promises';
 import { resolve, dirname, join } from 'node:path';
@@ -52,6 +54,8 @@ for (const [name, file] of [['canvaskit-wasm', 'LICENSE'], ['@noble/hashes', 'LI
 }
 
 await applyStudioPatches({root,upstream,app});
+await applyManualFeaturePatches({root});
+await applyRecoveryPatches({root});
 await build({
   configFile: false, root, base: './', publicDir: join(root, 'public'),
   define: { __APP_VERSION__: JSON.stringify('0.8.7'), __RHWP_DISABLE_EXTERNAL_WEBFONTS__: 'true', __RHWP_HWPCTRL__: 'false' },
@@ -81,6 +85,8 @@ const evidence = {
   engineWasmSha256: sha256(await readFile(join(app, 'node_modules/@rhwp/core/rhwp_bg.wasm'))),
   buildScriptSha256: sha256(await readFile(fileURLToPath(import.meta.url))),
   studioPatchSha256: sha256(await readFile(join(app,'scripts/integration/studio-patches.mjs'))),
+  featurePatchSha256: sha256(await readFile(join(app,'scripts/integration/manual-feature-patches.mjs'))),
+  recoveryPatchSha256: sha256(await readFile(join(app,'scripts/integration/recovery-patches.mjs'))),
   customSourceSha256: sha256(customSource.join('\n')),
   applicationSourceCommit: execFileSync('git', ['-C', app, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
   applicationSourceDirty: Boolean(execFileSync('git', ['-C', app, 'status', '--porcelain', '--', '.'], { encoding: 'utf8' }).trim()),

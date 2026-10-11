@@ -1,6 +1,6 @@
 # Jueony — 공무원용 AI 문서 편집기
 
-폐쇄망 Windows PC에서 업무별 자료와 대화를 관리하고, 가운데 채팅의 요청으로 오른쪽 HWP/HWPX 문서를 AI와 함께 직접 편집하는 프로그램을 만든다. **현재는 본문·단순 표 행/열·서식·쪽 설정과 한글 단축키를 연결한 MVP 개발판**이다. 한글 2024 전체 기능·화면·파일 호환성 100%를 달성한 상태는 아니다. [최신 구현과 검증 결과](docs/28-continuation-implementation.md), [설치 한글 2024와의 비교·미구현 목록](docs/29-hangul-2024-comparison.md)을 참고한다. 다음 신규 기능 병렬 구현에 앞서 [레이어·모듈 리팩터링 계획](docs/30-layered-modular-refactor-plan.md)과 [Facade 계약](docs/31-facade-contracts.md)의 핵심 모듈 첫 이관을 적용했다. [리팩터링 적용 결과와 남은 이관](docs/32-modular-refactor-result.md)을 확인한다.
+폐쇄망 Windows PC에서 업무별 자료와 대화를 관리하고, 가운데 채팅의 요청으로 오른쪽 HWP/HWPX 문서를 AI와 함께 직접 편집하는 프로그램을 만든다. **현재는 본문·단순 표 행/열·서식·쪽 설정과 한글 단축키를 연결한 MVP 개발판**이다. 한글 2024 전체 기능·화면·파일 호환성 100%를 달성한 상태는 아니다. [최신 구현과 검증 결과](docs/33-editor-parity-features-result.md), [설치 한글 2024와의 비교·미구현 목록](docs/29-hangul-2024-comparison.md)을 참고한다. 다음 신규 기능 병렬 구현에 앞서 [레이어·모듈 리팩터링 계획](docs/30-layered-modular-refactor-plan.md)과 [Facade 계약](docs/31-facade-contracts.md)의 핵심 모듈 첫 이관을 적용했다. [리팩터링 적용 결과와 남은 이관](docs/32-modular-refactor-result.md)을 확인한다.
 
 ## 이용허락
 
@@ -10,9 +10,11 @@
 
 ## 바로 실행
 
+최신 기능 검수본은 **[Start-Review.cmd](build/jueony-features-20261011/Start-Review.cmd)**로 실행한다(4193). F6 스타일, 캡션 위치·되돌리기, 머리말/꼬리말 창, 영구 쪽 감추기, 복구 설정과 AI 스타일·다단 명령을 보강했다. [지원 범위·검증·남은 차이](docs/33-editor-parity-features-result.md)를 확인한다.
+
 리팩터링 검수본은 **[Start-Review.cmd](build/jueony-refactor-20261011/Start-Review.cmd)**로 실행한다(4192). [모듈 구조·검사·남은 이관](docs/32-modular-refactor-result.md)을 참고한다. 기존 4173/4191 실행 묶음은 유지한다.
 
-최신 자율 구현 검수본은 **[Start-Review.cmd](build/jueony-continuation-20261011/Start-Review.cmd)**로 실행한다(4191). 통합 메뉴, 문서 기본값·배율·스크롤 복원, 지정 자료 검색, 적용 전 후보 검토, 반복 작업/업무 초안을 추가했다. 기존 4173 앱과 저장소가 분리되므로 새 업무 화면이 보일 수 있다. [지원 범위·검사·남은 작업](docs/28-continuation-implementation.md)을 확인한다. 아래 기본 실행기는 이전 4173 묶음을 유지한다.
+이전 자율 구현 검수본은 **[Start-Review.cmd](build/jueony-continuation-20261011/Start-Review.cmd)**로 실행한다(4191). 통합 메뉴, 문서 기본값·배율·스크롤 복원, 지정 자료 검색, 적용 전 후보 검토, 반복 작업/업무 초안을 추가했다. 기존 4173 앱과 저장소가 분리되므로 새 업무 화면이 보일 수 있다. [지원 범위·검사·남은 작업](docs/28-continuation-implementation.md)을 확인한다. 아래 기본 실행기는 이전 4173 묶음을 유지한다.
 
 프로젝트명은 **Jueony**이며, 현재 로컬 루트는 `C:\Users\jjome\Documents\work\jueony`다. [이름 변경 기록](docs/08-project-name.md)을 참고한다.
 
@@ -36,6 +38,7 @@
 
 | 문서 | 다루는 결정 |
 | --- | --- |
+| [기본 편집·상태 보존 보강](docs/33-editor-parity-features-result.md) | 4193 검수본, 캡션·감추기·머리말·복구·17종 AI 명령과 저장 보존 검사 |
 | [통합 UI·상태·검색·검토·반복 작업](docs/28-continuation-implementation.md) | 새 검수본 실행, 실제 Claude 확인, 한글 검수용 파일과 미완료 범위 |
 | [이번 자율 구현 결과와 다음 실행](docs/23-autonomous-work-result.md) | 완료 항목·실제 검증·아침 사용 순서와 남은 범위 |
 | [제공자 3종·표 행열·서식·임시 첨부](docs/20-native-providers-and-editing.md) | GPT·Claude·Gemini 설정과 키 관리, 실제 구현 및 검증 한계 |

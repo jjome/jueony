@@ -1,5 +1,7 @@
 # Jueony 병렬 작업 순서와 통합 검증
 
+후속 구현: [기본 편집·상태 보존 보강 결과](33-editor-parity-features-result.md)에 4193 검수본과 최신 검증을 기록했다. 아래 본문은 당시 조사 기록이며, 최신 항목별 상태는 [차이 목록](hangul-2024-gap-checklist.csv)을 따른다.
+
 후속 계획: 신규 기능 병렬 구현을 확대하기 전에 [레이어·모듈 리팩터링](30-layered-modular-refactor-plan.md)의 R00~R15를 먼저 수행한다. [Facade 계약](31-facade-contracts.md)과 [리팩터링 작업표](refactor-work-plan.csv)를 현재 선행 작업으로 사용한다. 아래 단계별 기록과 기존 검증 결과는 보존한다.
 
 2026-10-11. **한글 2024의 기능·동작 점검과 상태 저장을 먼저 맞춘 뒤 Agent를 확장한다.** 이 우선순위를 유지하면서 독립된 조사와 수정은 병렬로 진행한다. [제품 요구사항](24-next-development-plan.md), [한글 및 상태 검수 기준](25-hangul-parity-and-state-plan.md)을 실행할 때의 순서는 이 문서를 따른다.

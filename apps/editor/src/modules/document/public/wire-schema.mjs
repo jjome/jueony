@@ -1,5 +1,5 @@
 // Canonical provider-neutral wire shape; semantic validation remains in this module's domain.
-export const controlKinds = ['format_characters', 'format_paragraph', 'create_table', 'set_table_cell', 'format_table_cells', 'set_page_setup', 'insert_table_row','insert_table_column','delete_table_row','delete_table_column'];
+export const controlKinds = ['format_characters', 'format_paragraph', 'create_table', 'set_table_cell', 'format_table_cells', 'set_page_setup', 'insert_table_row','insert_table_column','delete_table_row','delete_table_column','apply_paragraph_style','set_columns','set_page_hide'];
 const text = { type: 'string' }, number = { type: 'number' }, bool = { type: 'boolean' }, integer = { type: 'integer', minimum: 0 };
 const object = properties => ({ type: 'object', properties, required: Object.keys(properties) });
 const properties = values => ({ type: 'object', properties: values });
@@ -7,6 +7,9 @@ const characters = {bold:bool,italic:bool,underline:bool,strikethrough:bool,font
 const operation = (kind, fields) => object({ kind: { type: 'string', enum: [kind] }, ...fields });
 export function controlSchemas() {
  return [
+  operation('apply_paragraph_style',{target:text,styleId:integer}),
+  operation('set_columns',{section:integer,count:{type:'integer',minimum:1,maximum:6},spacingMm:number}),
+  operation('set_page_hide',{target:text,properties:properties({hideHeader:bool,hideFooter:bool,hideMasterPage:bool,hideBorder:bool,hideFill:bool,hidePageNum:bool})}),
   operation('format_characters', { target: text, properties: properties(characters) }),
   operation('format_paragraph', { target: text, properties: properties({ alignment: text, lineSpacingPercent: number, marginLeftMm: number, marginRightMm: number, indentMm: number, beforeMm: number, afterMm: number, keepWithNext: bool, keepLines: bool, pageBreakBefore: bool }) }),
   operation('create_table', { after: text, resultId: text, rows: { type: 'array', items: { type: 'array', items: text } } }),

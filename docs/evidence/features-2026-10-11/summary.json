@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-11T12:13:50.998Z",
+  "baseCommit": "e08edccb33e2e8593da941b75a05becf8eabdee0",
+  "customSourceSha256": "3f23ceb30ef5147759370ea4c4ab49a3bce3097922399fc31f4e2eb215480d2a",
+  "engineWasmSha256": "54cf95014312e605c51b98eb9021247ea79ef2bbd0a7080e11c011d0246e3989",
+  "checks": {
+    "parity": {
+      "passed": 10,
+      "failed": 0
+    },
+    "workbench": {
+      "passed": 9,
+      "failed": 0
+    },
+    "compatibility": {
+      "passed": 4,
+      "failed": 0
+    },
+    "editor": {
+      "passed": 250,
+      "failed": 0
+    },
+    "server": {
+      "passed": 47,
+      "failed": 0
+    }
+  },
+  "typecheck": "passed",
+  "moduleBoundaries": {
+    "passed": true,
+    "modules": 9,
+    "scannedFiles": 136,
+    "violations": 0,
+    "exceptions": 0
+  },
+  "documents": [
+    {
+      "file": "agent-style-columns-hide.hwp",
+      "bytes": 13312,
+      "sha256": "1def92a19c98a54fcf15dc9e9989a068705f8eff027a37b1a49d9206eea49231"
+    },
+    {
+      "file": "agent-style-columns-hide.hwpx",
+      "bytes": 7520,
+      "sha256": "81d6ce361add7a8433c169fde40c60ab4d277c85394ea9f70b37b38d3078bcdc"
+    },
+    {
+      "file": "header-created.hwpx",
+      "bytes": 7663,
+      "sha256": "338920a9d84654f2ed6d317eb94c4eab51684b6dd5901ed9bdce6834fdc8d71e"
+    },
+    {
+      "file": "header-preserved.hwpx",
+      "bytes": 7684,
+      "sha256": "e113b4146c496dfabd49e0f9a2f65134efc804deb1e37bf5b91bc778a075202e"
+    },
+    {
+      "file": "page-hide.hwp",
+      "bytes": 13312,
+      "sha256": "078f321d7049e5e1522b7799e0faed8ad619b4462fdca5a3165ffc5e0b1251b6"
+    },
+    {
+      "file": "page-hide.hwpx",
+      "bytes": 7590,
+      "sha256": "9efc5f0ac53d1c88803f22fe7c4b50e4e25a6aa985960bde1e3b074a53aa4079"
+    },
+    {
+      "file": "table-caption.hwpx",
+      "bytes": 8224,
+      "sha256": "171f6d7f0a370f06471f0aed43eea2c15cb12a03ce273682c5f7467ec4e888e2"
+    }
+  ],
+  "nativeComparison": {
+    "verified": [
+      "F6 opens Styles dialog"
+    ],
+    "notRun": [
+      "These files in native Hancom",
+      "Layout and print equivalence",
+      "Complete feature parity"
+    ],
+    "blocker": "Native window activation and refreshed accessibility target failed after the F6 observation."
+  },
+  "llm": "Synthetic commands and local deterministic provider only; no live paid model call in this run.",
+  "limitations": [
+    "188-entry checklist retained: 65 wired, 43 partial, 77 missing, 3 stubs; wired does not imply native behavior equivalence.",
+    "Native WASM is pinned npm @rhwp/core 0.8.7; Rust document engine not rebuilt.",
+    "Browser beforeunload duplicate-confirmation warnings remain recorded."
+  ]
+}

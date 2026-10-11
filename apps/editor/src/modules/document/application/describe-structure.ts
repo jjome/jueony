@@ -7,7 +7,8 @@ const paragraph = (p: DocumentProperties) => `${(typeof p.alignment==='string'?a
 export function describeStructure(s?: Structure) {
  if (!s) return '이전 기록에는 구조 정보가 없습니다.';
  const lines = s.sections.map(({ index, page: p }) => `구역 ${index + 1}: ${mm(p.width)}×${mm(p.height)}mm ${p.landscape ? '가로' : '세로'} · 여백 좌/우/위/아래 ${mm(p.marginLeft)}/${mm(p.marginRight)}/${mm(p.marginTop)}/${mm(p.marginBottom)}mm`);
- s.paragraphs.forEach((p, i) => lines.push(`본문 문단 ${i + 1}: ${character(p.characters)} · ${paragraph(p.paragraph)}`));
+ s.sections.forEach(s=>{if(s.columns)lines.push(`구역 ${s.index+1} 단 설정: ${JSON.stringify(s.columns)}`);});
+ s.paragraphs.forEach((p, i) => lines.push(`본문 문단 ${i + 1}: ${character(p.characters)} · ${paragraph(p.paragraph)}${p.style?' · 스타일 '+JSON.stringify(p.style):''}${p.pageHide?.exists?' · 감추기 '+JSON.stringify(p.pageHide):''}`));
  if (!s.tables.length) lines.push('표 없음');
  s.tables.forEach((t, i) => {
    lines.push(`표 ${i + 1}: ${t.rows}행 × ${t.columns}열`);

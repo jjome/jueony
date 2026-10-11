@@ -3,11 +3,16 @@ import { installNavigationPane } from '../editor-actions/navigation-pane.ts';
 import { selectWholeCellBand } from './cell-band.ts';
 import { HangulKeyResolver, hangulBindings } from './keymap.ts';
 import { defaultShortcuts } from '../../command/shortcut-map';
+import { getObjectProps, setObjectProps } from '../../engine/object-props';
+import { installCaptionCommands } from '../adapters/rhwp/manual-commands.ts';
 
 export function installHangulKeys({ automation, registry, input, eventBus }: { automation: any; registry: any; input: () => any; eventBus: any }) {
   const resolver = new HangulKeyResolver();
   installEqualCells(registry, input);
   installNavigationPane(registry, input, eventBus);
+  installCaptionCommands({ registry, input, getObjectProps, setObjectProps });
+  // The pinned Studio marked the entire caption submenu as a stub; child state is now registry-owned.
+  document.querySelector('[data-cmd="insert:caption-top"]')?.closest('.md-sub')?.classList.remove('disabled');
   const unsupported = new Set<string>();
   // Keep the engine fallback consistent as well (IME and submode handlers use it).
   defaultShortcuts.splice(0, defaultShortcuts.length, ...hangulBindings.filter(b => b.scope === 'document' && !b.keys.includes(',') && !b.command.startsWith('pending:') && !b.nativeClipboard).map(b => {

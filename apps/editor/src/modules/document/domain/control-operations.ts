@@ -56,8 +56,16 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
   const structure = snapshot.structure; if (!structure) fail('이 문서는 구조 조회 후 편집해야 합니다.');
   const tables = new Map(structure!.tables.map(t => [t.id, structuredClone(t)]));
   const pages = new Map(structure!.sections.map(s => [s.index, s.page]));
+  const columns = new Map(structure!.sections.filter(s=>s.columns?.sameWidth===true).map(s=>[s.index,{count:Number(s.columns!.columnCount),spacing:Number(s.columns!.spacing)}]));
+  const checkColumns=(section:number)=>{
+    const layout=columns.get(section);if(!layout||layout.count<=1)return;
+    const page=pages.get(section)!;
+    const width=Number(page.landscape?page.height:page.width)-Number(page.marginLeft)-Number(page.marginRight);
+    if(!Number.isFinite(width)||!Number.isFinite(layout.spacing)||(width-layout.spacing*(layout.count-1))/layout.count<mm(10))fail('각 단의 너비는 10mm 이상이어야 합니다.');
+  };
   const created = new Set<string>(); let generated = 0;
   const nodes=structuredClone(snapshot.nodes);
+  const hiddenPages=new Map(structure!.paragraphs.filter(p=>p.pageHide?.exists&&p.pageIndex!==undefined).map(p=>[p.pageIndex,p.id]));
   const body = (id: string) => { const n = nodes.find(n => n.id === id); if (!n?.editable) fail('편집 가능한 본문 문단 ID가 필요합니다.'); return n!; };
   for (const op of operations) {
     if(op.kind==='insert_body_paragraphs')continue;
@@ -70,9 +78,23 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
       only(op, ['kind', 'target', 'properties']); const n = body(op.target);
       if (op.kind === 'format_characters' && !n.text) fail('빈 문단에는 글자 서식을 적용할 수 없습니다.');
       properties(op.properties, op.kind === 'format_characters' ? charRules : paraRules);
+    } else if(op.kind==='apply_paragraph_style'){
+      only(op,['kind','target','styleId']);body(op.target);
+      if(!structure!.styles?.some(style=>style.id===op.styleId&&style.type===0))fail('현재 문서의 문단 스타일 ID가 필요합니다.');
+    } else if(op.kind==='set_columns'){
+      only(op,['kind','section','count','spacingMm']);integer(op.section,0,structure!.sections.length-1);integer(op.count,1,6);
+      if(typeof op.spacingMm!=='number'||!Number.isFinite(op.spacingMm)||op.spacingMm<0||op.spacingMm>100)fail('단 간격은 0~100mm여야 합니다.');
+      columns.set(op.section,{count:op.count,spacing:mm(op.spacingMm)});checkColumns(op.section);
+    } else if(op.kind==='set_page_hide'){
+      only(op,['kind','target','properties']);const n=nodes.find(n=>n.id===op.target);
+      if(!n||(!n.editable&&!structure!.paragraphs.find(p=>p.id===n.id)?.pageHide?.exists))fail('감추기를 적용할 본문 문단 ID가 필요합니다.');
+      const target=structure!.paragraphs.find(p=>p.id===n!.id);
+      if(target?.controls?.some(id=>!['secd','cold','pghd'].includes(id)))fail('다른 개체·필드가 있는 문단의 감추기는 아직 지원하지 않습니다.');
+      if(target?.pageIndex!==undefined){const existing=hiddenPages.get(target.pageIndex);if(existing&&existing!==op.target)fail('같은 쪽에 이미 감추기 대상이 있습니다. 기존 문단을 수정하세요.');hiddenPages.set(target.pageIndex,op.target);}
+      properties(op.properties,{hideHeader:'boolean',hideFooter:'boolean',hideMasterPage:'boolean',hideBorder:'boolean',hideFill:'boolean',hidePageNum:'boolean'});
     } else if (op.kind === 'set_page_setup') {
       only(op, ['kind', 'section', 'properties']); integer(op.section, 0, structure!.sections.length - 1);
-      properties(op.properties, pageRules); pages.set(op.section, pageProperties(pages.get(op.section), op.properties));
+      properties(op.properties, pageRules); pages.set(op.section, pageProperties(pages.get(op.section), op.properties));checkColumns(op.section);
     } else if (op.kind === 'create_table') {
       only(op, ['kind', 'after', 'resultId', 'rows']); body(op.after);
       if (typeof op.resultId !== 'string' || !/^[A-Za-z][\w-]{0,39}$/.test(op.resultId) || created.has(op.resultId)) fail('새 표의 resultId는 중복되지 않는 영문 ID여야 합니다.');

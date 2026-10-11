@@ -7,6 +7,7 @@ import { assertRevision } from '../../modules/document/public/index.ts';
 import { createDocumentFacades } from '../../modules/document/public/index.ts';
 import { executeDocumentOperations } from './execute.ts';
 import { readStructure } from './structure.ts';
+import {verifyPreservedExport} from './preservation.ts';
 import { plainSnapshot } from '../../modules/document/public/index.ts';
 import type { Snapshot, Receipt, EditProposal as Generation } from '../../modules/document/public/index.ts';
 type Deps={wasm:any;eventBus:any;documentState:any;ready:Promise<unknown>;load:(bytes:Uint8Array,name:string,handle:any)=>Promise<void>;input:()=>any;render:()=>Promise<void>;automation:any;refreshMenus:()=>Promise<void>;};
@@ -36,7 +37,7 @@ export function installAgentBridge(d:Deps){
   const plainText=textOf(d.wasm.borrowDocumentHandle());assertRevision(before,revision());
   if(plainText.length>120000)throw new Error('전체 문서 텍스트 한도 120,000자를 넘습니다.');
   const structure=readStructure(d.wasm);assertRevision(before,revision());
-  return {revision:before,name:d.wasm.fileName,nodes,plainText,structure,limitations:['본문·표의 텍스트와 서식·쪽 설정을 읽습니다. 그림 안 글자/OCR은 읽지 않습니다.','AI 편집: 단순 본문, 글꼴·글자·문단 서식, 새 표·단순 셀·셀 서식·행/열 추가와 삭제, 구역별 용지·여백. 병합/중첩 표, 개체·필드 편집은 아직 미지원입니다.']} as Snapshot;
+  return {revision:before,name:d.wasm.fileName,nodes,plainText,structure,limitations:['본문·표의 텍스트와 서식·쪽 설정을 읽습니다. 그림 안 글자/OCR은 읽지 않습니다.','AI 편집: 단순 본문, 글꼴·글자·문단 서식, 새 표·단순 셀·셀 서식·행/열 추가와 삭제, 구역별 용지·여백·다단, 기존 문단 스타일, 쪽 감추기. 병합/중첩 표, 개체·필드 편집은 아직 미지원입니다.']} as Snapshot;
  }
  const native = {
   snapshot,
@@ -47,7 +48,12 @@ export function installAgentBridge(d:Deps){
    const model=d.automation.getMenuModel();
    const ids=Array.from(document.querySelectorAll<HTMLElement>('#recent-docs-panel [data-cmd="file:open-recent"]')).map(el=>el.dataset.id);let recent=0;
    const visit=(nodes:any[])=>{for(const node of nodes){if(node.commandId==='file:open-recent'){const id=ids[recent++];node.params=id?{id}:undefined;node.enabled=node.enabled&&Boolean(id);}if(node.submenu)visit(node.submenu);}};
-   for(const menu of model)visit(menu.items);return model;
+   for(const menu of model)visit(menu.items);
+   const pageMenu=model.find((menu:any)=>menu.menuId==='page');
+   if(pageMenu&&!pageMenu.items.some((item:any)=>item.commandId==='page:header-footer-dialog'))pageMenu.items.unshift({label:'머리말/꼬리말',commandId:'page:header-footer-dialog',enabled:d.automation.isEnabled('page:header-footer-dialog')});
+   const fileMenu=model.find((menu:any)=>menu.menuId==='file');
+   if(fileMenu&&!fileMenu.items.some((item:any)=>item.commandId==='file:document-info'))fileMenu.items.push({label:'문서 정보',commandId:'file:document-info',enabled:d.automation.isEnabled('file:document-info')});
+   return model;
   },
   focusEditor:()=>d.input()?.focus(),
   executeCommand(id:string,params?:Record<string,unknown>){
@@ -82,8 +88,10 @@ export function installAgentBridge(d:Deps){
     const artifact=d.wasm.fileName.toLowerCase().endsWith('.hwpx')?copy.exportHwpxWithReport():copy.exportHwpWithReport();
     try{
      const loss=JSON.parse(artifact.contentLoss());if(loss.count!==0)throw new Error('편집 결과 저장 시 내용 손실이 보고되어 문서에 적용하지 않았습니다.');
-     const reopened=new HwpDocument(artifact.takeBytes());
-     try{if(textOf(copy)!==textOf(reopened)||JSON.stringify(readStructure(copy))!==JSON.stringify(readStructure(reopened)))throw new Error('편집 사본을 저장 후 다시 열었을 때 내용·구조가 달라져 적용하지 않았습니다.');}finally{reopened.free();}
+     const bytes=artifact.takeBytes();
+     verifyPreservedExport(copy,bytes,d.wasm.fileName.toLowerCase().endsWith('.hwpx')?'hwpx':'hwp',loss,bytes=>new HwpDocument(bytes));
+     // The preservation verifier compares resolved semantics, including text/runs/tables.
+     // Raw reader JSON differs for HWPX metadata control ordering and cached storage IDs.
     }
     finally{artifact.free();}
    }finally{copy.free();}

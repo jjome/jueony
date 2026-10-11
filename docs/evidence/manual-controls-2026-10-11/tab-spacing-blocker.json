@@ -1,0 +1,31 @@
+{
+  "feature": "B097: 문단 모양의 기본 탭 간격 변경",
+  "date": "2026-10-11",
+  "engine": "@rhwp/core 0.8.7",
+  "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+  "status": "BLOCKED_BY_RENDERER",
+  "observations": [
+    {
+      "path": "upstream/rhwp-source/src/renderer/style_resolver.rs",
+      "line": 1232,
+      "fact": "default_tab_width는 hwpunit_to_px(4000, dpi) 상수이며 SectionDef.default_tab_spacing을 소비하지 않는다. 전체 src 검색으로 해당 필드의 조회/저장 경로와 렌더링 소비 부재를 대조했다."
+    },
+    {
+      "path": "upstream/rhwp-source/src/document_core/hwpjson/body.rs",
+      "line": 280,
+      "fact": "tabStop은 저장 단위, tabStopVal은 저장값 / 2로 출력한다."
+    },
+    {
+      "path": "upstream/rhwp-source/rhwp-studio/src/ui/para-shape-dialog.ts",
+      "line": 690,
+      "fact": "기본 탭 간격은 저장값 / 200으로 pt를 표시한다. 변경 버튼은 비활성이다."
+    },
+    {
+      "path": "upstream/rhwp-source/rhwp-studio/src/ui/section-settings-dialog.ts",
+      "line": 223,
+      "fact": "구역 설정의 동일 필드는 저장값 / 100으로 pt를 표시하며 저장 시 pt * 100을 사용해 문단 모양의 표시와 불일치한다."
+    }
+  ],
+  "decision": "문단 모양의 변경 UI를 활성화하지 않는다. 엔진 렌더링/단위 계약을 수정하고 동일 표본의 한글 출력 및 HWP/HWPX 저장·재열기를 검증한 뒤 적용한다.",
+  "verification": "정적 코드 분석. 한글과의 기본 탭 간격 실측 및 엔진 수정은 미실행."
+}

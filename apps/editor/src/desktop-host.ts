@@ -11,7 +11,7 @@ export function installDesktopHost({ wasm, eventBus, documentState, ready, save,
     bridgeVersion: 1,
     ready, revision, save, discard,
     fileHandle: () => wasm.currentFileHandle,
-    busy: () => Boolean(document.getElementById('jueony-busy') || document.getElementById('jueony-download-confirm')) || document.documentElement.classList.contains('rhwp-busy'),
+    busy: () => Boolean(document.getElementById('jueony-busy') || document.getElementById('jueony-download-confirm') || document.querySelector('.jueony-page-dialog[open]')) || document.documentElement.classList.contains('rhwp-busy'),
     state: () => ({ name: wasm.fileName, pageCount: wasm.pageCount, dirty: documentState.isDirty(), revision: revision() }),
   };
   // 이름 변경 전에 열린 부모 탭도 새 문서의 dirty/save 상태를 읽을 수 있어야 한다.

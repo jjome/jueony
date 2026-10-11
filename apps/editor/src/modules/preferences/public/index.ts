@@ -8,3 +8,7 @@ export { validateDocumentView } from '../domain/document-view.ts';
 export { createPreferencesFacade, createPreferencesFacade as createPreferencesPersistence } from '../application/persistence.ts';
 export { createDocumentViewFacade, createDocumentViewFacade as createDocumentViewAdapter } from '../application/document-view.ts';
 export { DOCUMENT_DEFAULTS_KEY, readDocumentDefaults, saveDocumentDefaults, resetDocumentDefaults } from '../application/document-defaults.ts';
+export type { RecoverySettings } from '../domain/recovery-policy.ts';
+export { DEFAULT_RECOVERY_SETTINGS, normalizeRecoverySettings, recoveryIsEnabled, recoveryDeadline } from '../domain/recovery-policy.ts';
+export type { RecoveryDocumentState, RecoveryClock, RecoveryCoordinatorOptions } from '../application/recovery-coordinator.ts';
+export { createRecoveryCoordinator } from '../application/recovery-coordinator.ts';

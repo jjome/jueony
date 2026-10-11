@@ -3,7 +3,7 @@ export type JsonValue = string | number | boolean | null | JsonValue[] | { [key:
 export type DocumentProperties = { [key: string]: JsonValue | undefined };
 export type Cell = { index: number; row: number; column: number; rowSpan: number; columnSpan: number; text: string; editable: boolean; properties: DocumentProperties; characters?: DocumentProperties; paragraphProperties?: DocumentProperties };
 export type Table = { id: string; section: number; paragraph: number; control: number; rows: number; columns: number; cells: Cell[] };
-export type Structure = { sections: { index: number; page: DocumentProperties }[]; tables: Table[]; paragraphs: { id: string; characters: DocumentProperties; paragraph: DocumentProperties }[]; unsupportedControls: string[] };
+export type Structure = { sections: { index: number; page: DocumentProperties; columns?:DocumentProperties }[]; styles?:{id:number;name:string;type:JsonValue}[]; tables: Table[]; paragraphs: { id: string; characters: DocumentProperties; paragraph: DocumentProperties; style?:DocumentProperties;pageHide?:DocumentProperties;controls?:string[];pageIndex?:number }[]; unsupportedControls: string[] };
 export type BodyNode = { id: string; section: number; paragraph: number; text: string; editable: boolean; reason?: string };
 export type Snapshot = { revision: string; name: string; plainText?: string; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
 export type BodyOp =
@@ -12,6 +12,9 @@ export type BodyOp =
  | { kind: 'replace_body_text'; target: string; start: number; count: number; text: string }
  | { kind: 'delete_body_text'; target: string; start: number; count: number };
 export type ControlOp =
+  | { kind:'apply_paragraph_style';target:string;styleId:number }
+  | { kind:'set_columns';section:number;count:number;spacingMm:number }
+  | { kind:'set_page_hide';target:string;properties:Record<string,unknown> }
   | { kind: 'format_characters' | 'format_paragraph'; target: string; properties: Record<string, unknown> }
   | { kind: 'create_table'; after: string; resultId: string; rows: string[][] }
   | { kind: 'set_table_cell'; target: string; row: number; column: number; originalText: string; text: string }

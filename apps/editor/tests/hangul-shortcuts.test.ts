@@ -70,6 +70,35 @@ test('Ctrl+F 탐색과 Ctrl+Q,F 찾기를 다른 명령으로 유지한다', () 
 test('기존 기본 도구 상자 Ctrl+F1 연결을 한글 매핑에서도 유지한다', () => {
   assert.equal(new HangulKeyResolver().resolve(key('F1', { ctrlKey: true }), ctx).binding?.command, 'view:toolbox-basic');
 });
+
+test('F6 is style in both body and table; F6 never becomes an agent focus key', () => {
+  const r = new HangulKeyResolver();
+  for (const scope of [ctx, { ...ctx, table: true }, { ...ctx, table: true, cells: true }]) {
+    assert.equal(r.resolve(key('F6'), scope).binding?.command, 'format:style-dialog');
+  }
+  assert.equal(r.resolve(key('F6', { isComposing: true }), ctx).handled, false);
+});
+
+test('cell border/background keys choose individual or combined dialog and correct tab', () => {
+  const r = new HangulKeyResolver();
+  for (const [code, command, tab] of [['KeyL', 'table:border-each', 'border'], ['KeyC', 'table:border-each', 'background'], ['KeyB', 'table:border-one', 'border'], ['KeyF', 'table:border-one', 'background']]) {
+    assert.equal(r.resolve(key(code), ctx).handled, false);
+    const result = r.resolve(key(code), { ...ctx, table: true, cells: true });
+    assert.equal(result.binding?.command, command); assert.equal(result.binding?.params?.tab, tab);
+  }
+});
+
+test('Ctrl+N,F formula and Ctrl+N,C table caption retain table scope and header/footer is connected', () => {
+  const r = new HangulKeyResolver(), table = { ...ctx, table: true };
+  r.resolve(key('KeyN', { ctrlKey: true }), table);
+  assert.equal(r.resolve(key('KeyF'), table).binding?.command, 'table:formula');
+  r.resolve(key('KeyN', { ctrlKey: true }), table);
+  assert.equal(r.resolve(key('KeyC'), table).binding?.command, 'table:caption-toggle');
+  r.resolve(key('KeyN', { ctrlKey: true }), ctx);
+  assert.equal(r.resolve(key('KeyC'), ctx).binding?.command, 'insert:caption-toggle');
+  r.resolve(key('KeyN', { ctrlKey: true }), ctx);
+  assert.equal(r.resolve(key('KeyH'), ctx).binding?.command, 'page:header-footer-dialog');
+});
 test('전체 칸/줄 선택은 방향과 문서·중첩 표 식별을 보존하고 원본 상태를 변경하지 않는다', () => {
   const state = { sec: 2, ppi: 3, ci: 4, cellPath: [{ controlIndex: 1, cellIndex: 2 }], anchor: { row: 2, col: 3 }, focus: { row: 1, col: 1 }, phase: 1, reason: 'manual', excluded: ['1:2'] };
   const columns = wholeCellBand(state, { rowCount: 5, colCount: 6 }, 'columns')!;

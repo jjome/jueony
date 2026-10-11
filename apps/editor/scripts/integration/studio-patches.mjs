@@ -35,7 +35,7 @@ let main = await readFile(join(root, 'src/main.ts'), 'utf8');
 main = replaceOnce(main, 'confirmSaveBeforeReplacingDocument, fileCommands', 'confirmSaveBeforeReplacingDocument, saveCurrentDocument, fileCommands', 'host save import');
 main = replaceOnce(main, "return params.has('url');", "return params.has('url') || params.get('skipRecovery') === '1';", 'tab recovery');
 main = "import { installHangulKeys } from './jueony/shortcuts/install';\nimport { installAgentBridge } from './jueony/mvp/editor-bridge';\nimport { installDesktopHost } from './jueony/desktop-host';\nimport { installHangulChrome } from './jueony/chrome-2024';\n" + main;
-main = "import {readDocumentDefaults, applyNewDocumentDefaults} from './jueony/preferences/document-defaults.ts';\nimport {createDocumentViewAdapter} from './jueony/preferences/document-view.ts';\nlet jueonyDocumentView: ReturnType<typeof createDocumentViewAdapter> | undefined;\n" + main;
+main = "import {installDocumentInformation} from './jueony/adapters/rhwp/document-info.ts';\nimport {installPageControls} from './jueony/adapters/rhwp/page-controls.ts';\nimport {readDocumentDefaults, applyNewDocumentDefaults} from './jueony/preferences/document-defaults.ts';\nimport {createDocumentViewAdapter} from './jueony/preferences/document-view.ts';\nlet jueonyDocumentView: ReturnType<typeof createDocumentViewAdapter> | undefined;\n" + main;
 main = replaceOnce(main, 'const docInfo = wasm.createNewDocument();', `const defaults = new URLSearchParams(location.search).get('skipDefaults') === '1' ? undefined : readDocumentDefaults(localStorage);
       const docInfo = wasm.createNewDocument();
       if(defaults && applyNewDocumentDefaults(wasm.borrowDocumentHandle()!, defaults)) docInfo.fontsUsed.push(defaults.font.family);`, 'new document defaults');
@@ -47,7 +47,7 @@ installDesktopHost({ wasm, eventBus, documentState, ready: initPromise,
   discard: async () => { await autosaveManager.discardCurrentDraft('tab-discard'); documentState.markClean('tab-discard'); },
 });
 installAgentBridge({ wasm, eventBus, documentState, ready: initPromise, automation, refreshMenus: async () => { recentSubmenuExpanded = true; await renderRecentSubmenu(); }, input: () => inputHandler, render: () => canvasView!.refreshDocumentAgentMutation(), load: (bytes, name, handle) => loadBytes(bytes, name, handle) });
-void initPromise.then(() => { installHangulKeys({ automation, registry, input: () => inputHandler, eventBus }); installHangulChrome({ wasm, eventBus, documentState, automation }); });`, 'desktop host');
+void initPromise.then(() => { installHangulKeys({ automation, registry, input: () => inputHandler, eventBus }); installPageControls(registry, () => inputHandler); installDocumentInformation({registry, input: () => inputHandler}); installHangulChrome({ wasm, eventBus, documentState, automation }); });`, 'desktop host');
 main = replaceOnce(main, 'import { initThemeSync, setThemeMode, getThemeMode, getEffectiveTheme }', 'import { applyTheme, syncThemeMenu, initThemeSync, setThemeMode, getThemeMode, getEffectiveTheme }', 'remote preference theme');
 main += `
 // Reuse the Studio settings owner; only reapply fields received from another tab.
@@ -92,7 +92,7 @@ const jueonyRememberView = () => { if (!jueonyDocumentView!.isRestoring()) { jue
 document.getElementById('scroll-container')?.addEventListener('scroll', jueonyRememberView, {passive:true});
 eventBus.on('zoom-level-display', jueonyRememberView);
 eventBus.on('command-state-changed', () => { if (window.parent !== window) window.parent.postMessage({type:'jueony:command-state'},location.origin); });
-window.addEventListener('keydown', event => { if(event.key === 'F6' && !event.isComposing && window.parent !== window){event.preventDefault();event.stopImmediatePropagation();window.parent.postMessage({type:'jueony:focus-chat'},location.origin);} },true);
+window.addEventListener('keydown', event => { if(event.key === 'F6' && event.altKey && !event.ctrlKey && !event.shiftKey && !event.isComposing && !document.querySelector('dialog[open],.modal-overlay') && window.parent !== window){event.preventDefault();event.stopImmediatePropagation();window.parent.postMessage({type:'jueony:focus-chat'},location.origin);} },true);
 void initPromise.then(() => userSettings.refreshFromStorage());
 `;
 await writeFile(join(root, 'src/main.ts'), main);
@@ -113,6 +113,12 @@ await writeFile(join(root, 'src/ui/document-title.ts'), documentTitle);
 // 저장할 Blob에 문서 버전을 연결해 저장 중 발생한 새 편집을 clean 처리하지 않는다.
 let fileCommands = (await readFile(join(root, 'src/command/commands/file.ts'), 'utf8')).replace(/\r\n/g, '\n');
 fileCommands = "import { confirmDownload } from '../../jueony/download-save';\n" + fileCommands;
+fileCommands = "import { verifyPreservedExport } from '../../jueony/adapters/rhwp/preservation.ts';\n" + fileCommands;
+fileCommands = replaceOnce(fileCommands,'  return {\n    blob: new Blob([artifact.bytes as unknown as BlobPart], {',`  const {HwpDocument} = services.wasm.getWasmModuleExports() as typeof import('@wasm/rhwp.js');
+  if(format !== 'hml') verifyPreservedExport(services.wasm, artifact.bytes, format, artifact.contentLoss,
+    bytes => password === undefined ? new HwpDocument(bytes) : HwpDocument.openWithPassword(bytes,password));
+  return {
+    blob: new Blob([artifact.bytes as unknown as BlobPart], {`, 'explicit save preservation');
 fileCommands = replaceOnce(fileCommands,
   'blob: new Blob([artifact.bytes as unknown as BlobPart], {\n      type: SAVE_FORMAT_DETAILS[format].mimeType,\n    }),',
   `blob: Object.assign(new Blob([artifact.bytes as unknown as BlobPart], {

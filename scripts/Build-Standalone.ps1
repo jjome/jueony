@@ -26,7 +26,7 @@ foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.m
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
 $llmEvidence = Join-Path $output 'evidence'
-foreach ($guide in @('30-layered-modular-refactor-plan.md','31-facade-contracts.md','32-modular-refactor-result.md','33-editor-parity-features-result.md','34-sections-tabs-result.md','35-section-boundary-merge-result.md','refactor-work-plan.csv','hangul-2024-gap-checklist.csv')) {
+foreach ($guide in @('30-layered-modular-refactor-plan.md','31-facade-contracts.md','32-modular-refactor-result.md','33-editor-parity-features-result.md','34-sections-tabs-result.md','35-section-boundary-merge-result.md','36-native-section-comparison.md','refactor-work-plan.csv','hangul-2024-gap-checklist.csv')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
 New-Item -ItemType Directory -Force $llmEvidence | Out-Null
@@ -102,6 +102,18 @@ if (Test-Path -LiteralPath $mergeEvidence) {
     if (Test-Path -LiteralPath $mergeDocuments) {
         Get-ChildItem -LiteralPath $mergeDocuments -File |
             Where-Object { $_.Extension -in @('.hwp', '.hwpx') } | Copy-Item -Destination $reviewDocuments -Force
+    }
+}
+$nativeEvidence = Join-Path $projectRoot 'docs/evidence/native-section-merge-2026-10-12'
+if (Test-Path -LiteralPath $nativeEvidence) {
+    Copy-Item -LiteralPath $nativeEvidence -Destination $llmEvidence -Recurse -Force
+    # Corrected exports supersede earlier synthetic fixtures in the review bundle;
+    # historical evidence remains in its original source directory.
+    foreach ($directory in @($nativeEvidence, (Join-Path $nativeEvidence 'documents'))) {
+        if (Test-Path -LiteralPath $directory) {
+            Get-ChildItem -LiteralPath $directory -File |
+                Where-Object { $_.Extension -in @('.hwp', '.hwpx') } | Copy-Item -Destination $reviewDocuments -Force
+        }
     }
 }
 Get-ChildItem -LiteralPath (Join-Path $output 'providers') -Filter '*.mjs' | Sort-Object Name | ForEach-Object { $providerHashes[$_.Name] = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash }

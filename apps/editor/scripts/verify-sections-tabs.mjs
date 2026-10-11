@@ -3,6 +3,7 @@ import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {resolve,dirname,join} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import assert from 'node:assert/strict';
+import {hwpxSectionTabAttributes} from './integration/hwpx-tab-evidence.mjs';
 import {verifyPreservedExport} from '../src/adapters/rhwp/preservation.ts';
 const app=resolve(dirname(fileURLToPath(import.meta.url)),'..'),repo=resolve(app,'../..');
 if(!process.env.JUEONY_ENGINE_PACKAGE)throw new Error('JUEONY_ENGINE_PACKAGE must name the fresh engine pkg');
@@ -77,6 +78,22 @@ await run('section default tab 20/40/60pt updates current layout and round-trips
    const cursor=parse(d.getCursorRect(0,0,2));observations.push({pt,raw,cursor});await writeFile(join(out,'tabs-'+pt+'pt.svg'),d.renderPageSvg(0));await roundtrip(d,'tabs-'+pt+'pt');d.restoreSnapshot(before);assert.deepEqual(parse(d.getCursorRect(0,0,2)),beforeCursor);d.discardSnapshot(before);
   }
   return {observations,note:'Cursor/SVG observations are diagnostics, not independent Hancom pixel parity.'};
+ }finally{d.free();}
+});
+await run('serialized HWPX tabStop and native tabStopVal agree across sections and zero/default settings',async()=>{
+ const rawValues=[0,8000,4000,12000,16000],d=blank(rawValues.map((raw,i)=>`구역 ${i}: ${raw}\t탭`));
+ try{
+  for(let right=1;right<rawValues.length;right++)d.insertSectionBreak(right-1,1,0);
+  rawValues.forEach((raw,section)=>d.setSectionDef(section,JSON.stringify({defaultTabSpacing:raw})));
+  const artifact=d.exportHwpxWithReport();let observations;
+  try{observations=hwpxSectionTabAttributes(artifact.takeBytes());}finally{artifact.free();}
+  const expected=rawValues.map((raw,section)=>({section,tabStop:raw||8000,tabStopVal:(raw||8000)/2,tabStopUnit:'HWPUNIT'}));
+  assert.deepEqual(observations,expected,'both physical XML attributes must reflect every section, not only the engine parser field');
+  // The raw-zero export is an in-memory serialization diagnostic. Normalize its
+  // semantic default before writing files through the unchanged strict save gate.
+  d.setSectionDef(0,JSON.stringify({defaultTabSpacing:8000}));
+  await roundtrip(d,'serialized-tab-values-five-sections');
+  return {rawValues,observations,note:'Native tabStopVal is checked directly in ZIP XML; raw 0 retains the 40pt default.'};
  }finally{d.free();}
 });
 await run('distinct section tab layouts and explicit paragraph stops survive settings changes',async()=>{

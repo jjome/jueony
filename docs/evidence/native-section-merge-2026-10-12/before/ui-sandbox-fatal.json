@@ -1,0 +1,8 @@
+{
+  "error": "Error: The browser is already running for C:\\Users\\jjome\\AppData\\Local\\Packages\\sandbox.{1745b7fe-c5a4-4caf-8db2-95619eb86806}\\AC\\Temp\\puppeteer_dev_chrome_profile-SsG5Le. Use a different `userDataDir` or stop the running browser first.",
+  "stack": "Error: The browser is already running for C:\\Users\\jjome\\AppData\\Local\\Packages\\sandbox.{1745b7fe-c5a4-4caf-8db2-95619eb86806}\\AC\\Temp\\puppeteer_dev_chrome_profile-SsG5Le. Use a different `userDataDir` or stop the running browser first.\n    at ChromeLauncher.launch (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:223:23)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async ChromeLauncher.launch (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:39:16)\n    at async PuppeteerNode.launch (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/node/PuppeteerNode.js:124:16)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:88:11",
+  "results": [],
+  "failures": [],
+  "pageErrors": [],
+  "external": []
+}

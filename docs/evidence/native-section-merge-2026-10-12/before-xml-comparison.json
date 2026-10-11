@@ -1,0 +1,307 @@
+{
+  "verifiedAt": "2026-10-11T17:17:18.685Z",
+  "engineWasmSha256": "cb018ea7a0a198c464cfb6d250bd781d2fb609929c03729d244675d832d49aa9",
+  "results": [
+    "native ABCD split/Delete saved as one body paragraph",
+    "native hwp: merged text, left settings and untouched later section match Jueony",
+    "native hwpx: merged text, left settings and untouched later section match Jueony"
+  ],
+  "failures": [
+    {
+      "name": "serialized HWPX tabStopVal agrees with native Hancom, independently of rhwp parser",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    {\n      section: 0,\n      tabStop: 4000,\n      tabStopUnit: 'HWPUNIT',\n+     tabStopVal: 4000\n-     tabStopVal: 2000\n    },\n    {\n      section: 1,\n      tabStop: 16000,\n      tabStopUnit: 'HWPUNIT',\n+     tabStopVal: 4000\n-     tabStopVal: 8000\n    }\n  ]\n"
+    }
+  ],
+  "observations": [
+    {
+      "name": "native-abcd-delete.hwpx",
+      "sha256": "38f2483ff4f63695992d47a5dd67af58e30c366931ec1718acd021a50f06bff2",
+      "bytes": 12832,
+      "sections": [
+        {
+          "paragraphs": [
+            "ABCD"
+          ],
+          "page": {
+            "width": 59528,
+            "height": 84186,
+            "marginLeft": 8504,
+            "marginRight": 8504,
+            "marginTop": 5668,
+            "marginBottom": 4252,
+            "marginHeader": 4252,
+            "marginFooter": 4252,
+            "marginGutter": 0,
+            "landscape": false,
+            "binding": 0
+          },
+          "definition": {
+            "pageNum": 0,
+            "pageNumType": 0,
+            "pictureNum": 0,
+            "tableNum": 0,
+            "equationNum": 0,
+            "columnSpacing": 1134,
+            "defaultTabSpacing": 8000,
+            "hideHeader": false,
+            "hideFooter": false,
+            "hideMasterPage": false,
+            "hideBorder": false,
+            "hideFill": false,
+            "hideEmptyLine": false
+          },
+          "columns": {
+            "columnCount": 1,
+            "columnType": 0,
+            "sameWidth": true,
+            "spacing": 0
+          }
+        }
+      ],
+      "info": {
+        "version": "5.1.0.0",
+        "sectionCount": 1,
+        "pageCount": 1,
+        "encrypted": false,
+        "hwp3Variant": false,
+        "fallbackFont": "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
+        "fontsUsed": [
+          "함초롬돋움",
+          "함초롬바탕"
+        ],
+        "fontSubstitutions": []
+      }
+    },
+    {
+      "name": "native-three-settings-delete.hwp",
+      "sha256": "b0b3a33d2a0671919ad5dbd603382622f70968f4a9c4ebc69fa7b7408443818f",
+      "bytes": 13824,
+      "sections": [
+        {
+          "paragraphs": [
+            "ONETWO"
+          ],
+          "page": {
+            "width": 59528,
+            "height": 84186,
+            "marginLeft": 9504,
+            "marginRight": 8504,
+            "marginTop": 5668,
+            "marginBottom": 4252,
+            "marginHeader": 4252,
+            "marginFooter": 4252,
+            "marginGutter": 0,
+            "landscape": false,
+            "binding": 0
+          },
+          "definition": {
+            "pageNum": 3,
+            "pageNumType": 0,
+            "pictureNum": 0,
+            "tableNum": 0,
+            "equationNum": 0,
+            "columnSpacing": 1134,
+            "defaultTabSpacing": 4000,
+            "hideHeader": false,
+            "hideFooter": false,
+            "hideMasterPage": false,
+            "hideBorder": false,
+            "hideFill": false,
+            "hideEmptyLine": false
+          },
+          "columns": {
+            "columnCount": 2,
+            "columnType": 0,
+            "sameWidth": true,
+            "spacing": 1000
+          }
+        },
+        {
+          "paragraphs": [
+            "THREE",
+            "FOUR"
+          ],
+          "page": {
+            "width": 59528,
+            "height": 84186,
+            "marginLeft": 8504,
+            "marginRight": 8504,
+            "marginTop": 5668,
+            "marginBottom": 4252,
+            "marginHeader": 4252,
+            "marginFooter": 4252,
+            "marginGutter": 0,
+            "landscape": false,
+            "binding": 0
+          },
+          "definition": {
+            "pageNum": 17,
+            "pageNumType": 0,
+            "pictureNum": 0,
+            "tableNum": 0,
+            "equationNum": 0,
+            "columnSpacing": 1134,
+            "defaultTabSpacing": 16000,
+            "hideHeader": false,
+            "hideFooter": false,
+            "hideMasterPage": false,
+            "hideBorder": false,
+            "hideFill": false,
+            "hideEmptyLine": false
+          },
+          "columns": {
+            "columnCount": 1,
+            "columnType": 0,
+            "sameWidth": true,
+            "spacing": 0
+          }
+        }
+      ],
+      "info": {
+        "version": "5.1.1.0",
+        "sectionCount": 2,
+        "pageCount": 2,
+        "encrypted": false,
+        "hwp3Variant": false,
+        "fallbackFont": "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
+        "fontsUsed": [
+          "함초롬돋움",
+          "함초롬바탕"
+        ],
+        "fontSubstitutions": []
+      }
+    },
+    {
+      "name": "native-three-settings-delete.hwpx",
+      "sha256": "cef3313ea3874625238f893f794a4993fdfbe0c762a0084b14ca94261f7299eb",
+      "bytes": 14371,
+      "sections": [
+        {
+          "paragraphs": [
+            "ONETWO"
+          ],
+          "page": {
+            "width": 59528,
+            "height": 84186,
+            "marginLeft": 9504,
+            "marginRight": 8504,
+            "marginTop": 5668,
+            "marginBottom": 4252,
+            "marginHeader": 4252,
+            "marginFooter": 4252,
+            "marginGutter": 0,
+            "landscape": false,
+            "binding": 0
+          },
+          "definition": {
+            "pageNum": 3,
+            "pageNumType": 0,
+            "pictureNum": 0,
+            "tableNum": 0,
+            "equationNum": 0,
+            "columnSpacing": 1134,
+            "defaultTabSpacing": 4000,
+            "hideHeader": false,
+            "hideFooter": false,
+            "hideMasterPage": false,
+            "hideBorder": false,
+            "hideFill": false,
+            "hideEmptyLine": false
+          },
+          "columns": {
+            "columnCount": 2,
+            "columnType": 0,
+            "sameWidth": true,
+            "spacing": 1000
+          }
+        },
+        {
+          "paragraphs": [
+            "THREE",
+            "FOUR"
+          ],
+          "page": {
+            "width": 59528,
+            "height": 84186,
+            "marginLeft": 8504,
+            "marginRight": 8504,
+            "marginTop": 5668,
+            "marginBottom": 4252,
+            "marginHeader": 4252,
+            "marginFooter": 4252,
+            "marginGutter": 0,
+            "landscape": false,
+            "binding": 0
+          },
+          "definition": {
+            "pageNum": 17,
+            "pageNumType": 0,
+            "pictureNum": 0,
+            "tableNum": 0,
+            "equationNum": 0,
+            "columnSpacing": 1134,
+            "defaultTabSpacing": 16000,
+            "hideHeader": false,
+            "hideFooter": false,
+            "hideMasterPage": false,
+            "hideBorder": false,
+            "hideFill": false,
+            "hideEmptyLine": false
+          },
+          "columns": {
+            "columnCount": 1,
+            "columnType": 0,
+            "sameWidth": true,
+            "spacing": 0
+          }
+        }
+      ],
+      "info": {
+        "version": "5.1.0.0",
+        "sectionCount": 2,
+        "pageCount": 2,
+        "encrypted": false,
+        "hwp3Variant": false,
+        "fallbackFont": "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
+        "fontsUsed": [
+          "함초롬돋움",
+          "함초롬바탕"
+        ],
+        "fontSubstitutions": []
+      }
+    },
+    {
+      "serializedTabValues": {
+        "actual": [
+          {
+            "section": 0,
+            "tabStop": 4000,
+            "tabStopVal": 4000,
+            "tabStopUnit": "HWPUNIT"
+          },
+          {
+            "section": 1,
+            "tabStop": 16000,
+            "tabStopVal": 4000,
+            "tabStopUnit": "HWPUNIT"
+          }
+        ],
+        "expected": [
+          {
+            "section": 0,
+            "tabStop": 4000,
+            "tabStopVal": 2000,
+            "tabStopUnit": "HWPUNIT"
+          },
+          {
+            "section": 1,
+            "tabStop": 16000,
+            "tabStopVal": 8000,
+            "tabStopUnit": "HWPUNIT"
+          }
+        ]
+      }
+    }
+  ],
+  "scope": "Selected synthetic body cases. Not independent layout/rendering validation or full Hancom parity."
+}

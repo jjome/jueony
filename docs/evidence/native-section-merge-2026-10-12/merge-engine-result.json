@@ -1,0 +1,628 @@
+{
+  "build": {
+    "sourceId": "1c738b6a10f4956a",
+    "wasmSha256": "c1e254531219bb88f983dca0671aa6d4c10be79460c50de8e5fb60d8cca182da",
+    "builtAt": "2026-10-11T17:20:16.8370530Z",
+    "buildMode": "wsl-review-no-opt",
+    "optimized": false,
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "jsSha256": "67db5e7aa028ee10fa028257a5e35796e4042024b83268b1ea4b0edb68459dbc",
+    "patches": [
+      {
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af",
+        "name": "default-tabs.patch"
+      },
+      {
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8",
+        "name": "section-split.patch"
+      },
+      {
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad",
+        "name": "table-creation-consistency.patch"
+      }
+    ]
+  },
+  "results": [
+    {
+      "name": "empty/start/middle/end paragraph boundaries and exact snapshot undo",
+      "data": {
+        "cases": 7,
+        "observations": [
+          {
+            "charOffset": 0,
+            "ok": true,
+            "pageCount": 1,
+            "paraIdx": 0,
+            "sectionIdx": 0
+          },
+          {
+            "charOffset": 0,
+            "ok": true,
+            "pageCount": 1,
+            "paraIdx": 0,
+            "sectionIdx": 0
+          },
+          {
+            "charOffset": 1,
+            "ok": true,
+            "pageCount": 1,
+            "paraIdx": 0,
+            "sectionIdx": 0
+          },
+          {
+            "charOffset": 3,
+            "ok": true,
+            "pageCount": 1,
+            "paraIdx": 0,
+            "sectionIdx": 0
+          },
+          {
+            "charOffset": 3,
+            "ok": true,
+            "pageCount": 1,
+            "paraIdx": 0,
+            "sectionIdx": 0
+          },
+          {
+            "charOffset": 3,
+            "ok": true,
+            "pageCount": 1,
+            "paraIdx": 1,
+            "sectionIdx": 0
+          },
+          {
+            "charOffset": 3,
+            "ok": true,
+            "pageCount": 1,
+            "paraIdx": 0,
+            "sectionIdx": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "mixed Korean emoji tabs and character format runs retain order",
+      "data": {
+        "result": {
+          "charOffset": 2,
+          "ok": true,
+          "pageCount": 1,
+          "paraIdx": 1,
+          "sectionIdx": 0
+        },
+        "text": "가😀나\t다\t끝",
+        "flags": [
+          {
+            "bold": true,
+            "italic": false
+          },
+          {
+            "bold": true,
+            "italic": false
+          },
+          {
+            "bold": false,
+            "italic": false
+          },
+          {
+            "bold": false,
+            "italic": true
+          },
+          {
+            "bold": false,
+            "italic": true
+          },
+          {
+            "bold": false,
+            "italic": false
+          },
+          {
+            "bold": false,
+            "italic": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "three sections retain untouched later settings while left page/tab settings win",
+      "data": {
+        "result": {
+          "charOffset": 3,
+          "ok": true,
+          "pageCount": 2,
+          "paraIdx": 0,
+          "sectionIdx": 0
+        },
+        "leftDef": {
+          "pageNum": 3,
+          "pageNumType": 0,
+          "pictureNum": 0,
+          "tableNum": 0,
+          "equationNum": 0,
+          "columnSpacing": 1134,
+          "defaultTabSpacing": 4000,
+          "hideHeader": false,
+          "hideFooter": false,
+          "hideMasterPage": false,
+          "hideBorder": false,
+          "hideFill": false,
+          "hideEmptyLine": false
+        },
+        "laterDef": {
+          "pageNum": 17,
+          "pageNumType": 0,
+          "pictureNum": 0,
+          "tableNum": 0,
+          "equationNum": 0,
+          "columnSpacing": 1134,
+          "defaultTabSpacing": 16000,
+          "hideHeader": false,
+          "hideFooter": false,
+          "hideMasterPage": false,
+          "hideBorder": false,
+          "hideFill": false,
+          "hideEmptyLine": false
+        },
+        "leftPage": {
+          "width": 59528,
+          "height": 84186,
+          "marginLeft": 9504,
+          "marginRight": 8504,
+          "marginTop": 5668,
+          "marginBottom": 4252,
+          "marginHeader": 4252,
+          "marginFooter": 4252,
+          "marginGutter": 0,
+          "landscape": false,
+          "binding": 0
+        },
+        "laterPage": {
+          "width": 59528,
+          "height": 84186,
+          "marginLeft": 8504,
+          "marginRight": 8504,
+          "marginTop": 5668,
+          "marginBottom": 4252,
+          "marginHeader": 4252,
+          "marginFooter": 4252,
+          "marginGutter": 0,
+          "landscape": false,
+          "binding": 0
+        },
+        "leftColumns": {
+          "columnCount": 2,
+          "columnType": 0,
+          "sameWidth": true,
+          "spacing": 1000
+        }
+      }
+    },
+    {
+      "name": "merge middle and last boundaries leaves unrelated section content unchanged",
+      "data": {
+        "observations": [
+          {
+            "charOffset": 5,
+            "ok": true,
+            "pageCount": 2,
+            "paraIdx": 0,
+            "sectionIdx": 0
+          },
+          {
+            "charOffset": 6,
+            "ok": true,
+            "pageCount": 2,
+            "paraIdx": 0,
+            "sectionIdx": 1
+          }
+        ]
+      }
+    },
+    {
+      "name": "invalid bounds and boundary controls/fields reject without partial mutation",
+      "data": {
+        "observations": [
+          {
+            "kind": "bounds",
+            "rejected": [
+              0,
+              2,
+              99
+            ],
+            "boundaryPara": 0,
+            "boundaryControls": [
+              {
+                "ctrlId": "secd",
+                "ctrlCh": 2,
+                "userDesc": "구역 정의",
+                "list": 0,
+                "para": 1,
+                "pos": 0,
+                "controlIndex": 0,
+                "props": {}
+              },
+              {
+                "ctrlId": "cold",
+                "ctrlCh": 2,
+                "userDesc": "단 정의",
+                "list": 0,
+                "para": 1,
+                "pos": 8,
+                "controlIndex": 1,
+                "props": {}
+              }
+            ]
+          },
+          {
+            "kind": "left-table",
+            "rejected": [
+              1
+            ],
+            "boundaryPara": 1,
+            "boundaryControls": [
+              {
+                "ctrlId": "tbl",
+                "ctrlCh": 11,
+                "userDesc": "표",
+                "list": 0,
+                "para": 1,
+                "pos": 0,
+                "controlIndex": 0,
+                "props": {
+                  "Lock": 0,
+                  "TreatAsChar": 0,
+                  "AllowOverlap": 0,
+                  "TextWrap": 1,
+                  "Width": 41954,
+                  "Height": 2564,
+                  "HorzOffset": 0,
+                  "VertOffset": 0
+                }
+              }
+            ]
+          },
+          {
+            "kind": "right-table",
+            "rejected": [
+              1
+            ],
+            "boundaryPara": 0,
+            "boundaryControls": [
+              {
+                "ctrlId": "secd",
+                "ctrlCh": 2,
+                "userDesc": "구역 정의",
+                "list": 0,
+                "para": 1,
+                "pos": 0,
+                "controlIndex": 0,
+                "props": {}
+              },
+              {
+                "ctrlId": "cold",
+                "ctrlCh": 2,
+                "userDesc": "단 정의",
+                "list": 0,
+                "para": 1,
+                "pos": 8,
+                "controlIndex": 1,
+                "props": {}
+              },
+              {
+                "ctrlId": "tbl",
+                "ctrlCh": 11,
+                "userDesc": "표",
+                "list": 0,
+                "para": 1,
+                "pos": 17,
+                "controlIndex": 2,
+                "props": {
+                  "Lock": 0,
+                  "TreatAsChar": 1,
+                  "AllowOverlap": 0,
+                  "TextWrap": 0,
+                  "Width": 41954,
+                  "Height": 2564,
+                  "HorzOffset": 0,
+                  "VertOffset": 0
+                }
+              }
+            ]
+          },
+          {
+            "kind": "left-field",
+            "rejected": [
+              1
+            ],
+            "boundaryPara": 0,
+            "boundaryControls": [
+              {
+                "ctrlId": "secd",
+                "ctrlCh": 2,
+                "userDesc": "구역 정의",
+                "list": 0,
+                "para": 0,
+                "pos": 0,
+                "controlIndex": 0,
+                "props": {}
+              },
+              {
+                "ctrlId": "cold",
+                "ctrlCh": 2,
+                "userDesc": "단 정의",
+                "list": 0,
+                "para": 0,
+                "pos": 8,
+                "controlIndex": 1,
+                "props": {}
+              },
+              {
+                "ctrlId": "",
+                "ctrlCh": 0,
+                "userDesc": "",
+                "list": 0,
+                "para": 0,
+                "pos": 17,
+                "controlIndex": 2,
+                "props": {}
+              }
+            ]
+          },
+          {
+            "kind": "right-field",
+            "rejected": [
+              1
+            ],
+            "boundaryPara": 0,
+            "boundaryControls": [
+              {
+                "ctrlId": "secd",
+                "ctrlCh": 2,
+                "userDesc": "구역 정의",
+                "list": 0,
+                "para": 1,
+                "pos": 0,
+                "controlIndex": 0,
+                "props": {}
+              },
+              {
+                "ctrlId": "cold",
+                "ctrlCh": 2,
+                "userDesc": "단 정의",
+                "list": 0,
+                "para": 1,
+                "pos": 8,
+                "controlIndex": 1,
+                "props": {}
+              },
+              {
+                "ctrlId": "",
+                "ctrlCh": 0,
+                "userDesc": "",
+                "list": 0,
+                "para": 1,
+                "pos": 17,
+                "controlIndex": 2,
+                "props": {}
+              }
+            ]
+          },
+          {
+            "kind": "right-header",
+            "rejected": [
+              1
+            ],
+            "boundaryPara": 0,
+            "boundaryControls": [
+              {
+                "ctrlId": "secd",
+                "ctrlCh": 2,
+                "userDesc": "구역 정의",
+                "list": 0,
+                "para": 1,
+                "pos": 0,
+                "controlIndex": 0,
+                "props": {}
+              },
+              {
+                "ctrlId": "cold",
+                "ctrlCh": 2,
+                "userDesc": "단 정의",
+                "list": 0,
+                "para": 1,
+                "pos": 8,
+                "controlIndex": 1,
+                "props": {}
+              },
+              {
+                "ctrlId": "head",
+                "ctrlCh": 2,
+                "userDesc": "머리말",
+                "list": 0,
+                "para": 1,
+                "pos": 21,
+                "controlIndex": 2,
+                "props": {}
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "left own header survives an eligible merge and both strict saves",
+      "data": {
+        "result": {
+          "charOffset": 4,
+          "ok": true,
+          "pageCount": 1,
+          "paraIdx": 1,
+          "sectionIdx": 0
+        },
+        "header": {
+          "ok": true,
+          "exists": true,
+          "kind": "header",
+          "applyTo": 0,
+          "label": "양 쪽",
+          "paraIndex": 0,
+          "controlIndex": 2,
+          "paraCount": 1,
+          "text": "왼쪽 공통 머리말"
+        }
+      }
+    },
+    {
+      "name": "later table moves with contents and properties; snapshot restores its original section",
+      "data": {
+        "result": {
+          "charOffset": 4,
+          "ok": true,
+          "pageCount": 1,
+          "paraIdx": 0,
+          "sectionIdx": 0
+        },
+        "table": {
+          "ok": true,
+          "paraIdx": 2,
+          "controlIdx": 0
+        },
+        "properties": {
+          "cellSpacing": 0,
+          "paddingLeft": 510,
+          "paddingRight": 510,
+          "paddingTop": 141,
+          "paddingBottom": 141,
+          "pageBreak": 0,
+          "repeatHeader": false,
+          "borderFillId": 3,
+          "borderLeft": {
+            "type": 1,
+            "width": 1,
+            "color": "#000000"
+          },
+          "borderRight": {
+            "type": 1,
+            "width": 1,
+            "color": "#000000"
+          },
+          "borderTop": {
+            "type": 1,
+            "width": 1,
+            "color": "#000000"
+          },
+          "borderBottom": {
+            "type": 1,
+            "width": 1,
+            "color": "#000000"
+          },
+          "fillType": "none",
+          "fillColor": "#ffffff",
+          "patternColor": "#000000",
+          "patternType": 0,
+          "diagonalLine": 1,
+          "diagonalSlash": 0,
+          "diagonalBackSlash": 0,
+          "diagonalWidth": 0,
+          "diagonalColor": "#000000",
+          "centerLine": "NONE",
+          "tableWidth": 41954,
+          "tableHeight": 2564,
+          "outerLeft": 283,
+          "outerRight": 283,
+          "outerTop": 283,
+          "outerBottom": 283,
+          "hasCaption": false,
+          "treatAsChar": false,
+          "textWrap": "TopAndBottom",
+          "vertRelTo": "Para",
+          "vertAlign": "Top",
+          "horzRelTo": "Para",
+          "horzAlign": "Left",
+          "vertOffset": 0,
+          "horzOffset": 0,
+          "restrictInPage": false,
+          "allowOverlap": false,
+          "keepWithAnchor": false
+        },
+        "rightCursor": {
+          "pageIndex": 1,
+          "x": 204,
+          "y": 156.1,
+          "height": 13.3,
+          "cellBounds": {
+            "x": 117.2,
+            "y": 153.6,
+            "w": 279.7,
+            "h": 17.1
+          },
+          "cellOverflowed": false
+        },
+        "leftCursor": {
+          "pageIndex": 0,
+          "x": 150.6,
+          "y": 156.1,
+          "height": 13.3,
+          "cellBounds": {
+            "x": 117.2,
+            "y": 153.6,
+            "w": 279.7,
+            "h": 17.1
+          },
+          "cellOverflowed": false
+        }
+      }
+    }
+  ],
+  "failures": [],
+  "documents": [
+    "merge-before-boundary-0.hwp",
+    "merge-before-boundary-0.hwpx",
+    "merge-boundary-0.hwp",
+    "merge-boundary-0.hwpx",
+    "merge-before-boundary-1.hwp",
+    "merge-before-boundary-1.hwpx",
+    "merge-boundary-1.hwp",
+    "merge-boundary-1.hwpx",
+    "merge-before-boundary-2.hwp",
+    "merge-before-boundary-2.hwpx",
+    "merge-boundary-2.hwp",
+    "merge-boundary-2.hwpx",
+    "merge-before-boundary-3.hwp",
+    "merge-before-boundary-3.hwpx",
+    "merge-boundary-3.hwp",
+    "merge-boundary-3.hwpx",
+    "merge-before-boundary-4.hwp",
+    "merge-before-boundary-4.hwpx",
+    "merge-boundary-4.hwp",
+    "merge-boundary-4.hwpx",
+    "merge-before-boundary-5.hwp",
+    "merge-before-boundary-5.hwpx",
+    "merge-boundary-5.hwp",
+    "merge-boundary-5.hwpx",
+    "merge-before-boundary-6.hwp",
+    "merge-before-boundary-6.hwpx",
+    "merge-boundary-6.hwp",
+    "merge-boundary-6.hwpx",
+    "merge-korean-emoji-tabs-runs.hwp",
+    "merge-korean-emoji-tabs-runs.hwpx",
+    "merge-before-three-section-settings.hwp",
+    "merge-before-three-section-settings.hwpx",
+    "merge-three-section-settings.hwp",
+    "merge-three-section-settings.hwpx",
+    "merge-three-at-1.hwp",
+    "merge-three-at-1.hwpx",
+    "merge-three-at-2.hwp",
+    "merge-three-at-2.hwpx",
+    "merge-preserved-left-header.hwp",
+    "merge-preserved-left-header.hwpx",
+    "merge-preserved-later-table.hwp",
+    "merge-preserved-later-table.hwpx"
+  ],
+  "nativeHancom": "NOT_RUN",
+  "unverified": [
+    "RangeTag-only boundary rejection has no public creation API and is not synthesized by these diagnostics.",
+    "Right-section additional ColumnDef controls require a separate imported fixture."
+  ],
+  "note": "Fresh WASM functional diagnostics and strict engine round-trips. No new rendering fixture/golden or claim of native Hancom equivalence."
+}

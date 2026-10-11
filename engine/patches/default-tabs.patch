@@ -995,3 +995,47 @@ index 183873b..70d2965 100644
          page_number_char_style_id: None,
          hwp3_variant: false,
          hft_ascii_halfwidth: false,
+diff --git a/src/serializer/hwpx/section.rs b/src/serializer/hwpx/section.rs
+index 8829aec..d1e21ea 100644
+--- a/src/serializer/hwpx/section.rs
++++ b/src/serializer/hwpx/section.rs
+@@ -151,22 +151,26 @@ fn replace_secpr_scalars(xml: &str, sd: &SectionDef) -> String {
+         1,
+     );
+ 
+-    // 기본 탭 폭. HWPX 파서는 secPr 의 tabStop 속성을 default_tab_spacing 으로 읽는다
+-    // (parser/hwpx/section.rs). 치환하지 않으면 열었던 값과 무관하게 늘 템플릿 상수
+-    // 8000 으로 저장돼, 탭 정렬이 원본과 어긋난다.
+-    //
+-    // 다만 SectionDef 는 derive(Default) 라 파싱을 거치지 않은 문서(신규 작성 등)에서는
+-    // 0 이다. 0 을 그대로 내보내면 탭 폭이 0 이 되어 지금보다 나빠지므로, 값이 있을 때만
+-    // 치환하고 없으면 템플릿 기본값을 유지한다.
+-    let out = if sd.default_tab_spacing != 0 {
+-        out.replacen(
++    // tabStop stores twice the effective HWPUNIT distance, while Hancom reads
++    // tabStopVal with tabStopUnit="HWPUNIT". Keep both attributes consistent,
++    // matching native HWP-to-HWPX output and document_core/hwpjson/body.rs.
++    // An unset IR value retains the existing 40pt default: raw 8000, value 4000.
++    let tab_stop = if sd.default_tab_spacing == 0 {
++        8000
++    } else {
++        sd.default_tab_spacing
++    };
++    let out = out
++        .replacen(
+             r#"tabStop="8000""#,
+-            &format!(r#"tabStop="{}""#, sd.default_tab_spacing),
++            &format!(r#"tabStop="{}""#, tab_stop),
+             1,
+         )
+-    } else {
+-        out
+-    };
++        .replacen(
++            r#"tabStopVal="4000""#,
++            &format!(r#"tabStopVal="{}""#, tab_stop / 2),
++            1,
++        );
+ 
+     // 구역 그리드와 시작 번호. 템플릿 상수가 모두 0 이고 SectionDef 기본값도 0 이라
+     // 기본 문서의 출력은 그대로이며, 파싱된 문서에서만 실제 값이 살아난다.

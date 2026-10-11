@@ -1,0 +1,10 @@
+PASS section boundaries: first/start/middle/end/last/empty, HWP+HWPX reopen and snapshot restore
+PASS mixed Korean/emoji/tab text and character runs survive split and both saves
+PASS middle section split retains later section properties and distinct tab distances
+PASS invalid offsets and control-bearing split target leave document unchanged
+PASS table and header survive moving to a new BodyText stream
+PASS new table properties match exported HWP and HWPX without a section split
+PASS section default tab 20/40/60pt updates current layout and round-trips raw values
+PASS serialized HWPX tabStop and native tabStopVal agree across sections and zero/default settings
+PASS distinct section tab layouts and explicit paragraph stops survive settings changes
+PASS default tab updates nested table cell and own header geometry without losing cell text

@@ -4,6 +4,8 @@ Jueony는 MIT 라이선스의 rhwp `0.8.7`, 커밋 `1a76570e833917d15817415a53c0
 
 현재 패치는 구역별 기본 탭 간격과 실제 본문 구역 분할을 구현한다. API `insertSectionBreak(sectionIdx, paraIdx, charOffset)`는 논리 글자 단위 좌표를 받고 `{ok, sectionIdx, paraIdx, charOffset, pageCount}`를 반환한다. 전체 문서 snapshot은 UI의 기존 명령 라우터가 소유한다. 개체/필드/범위 태그가 있는 분할 대상, 여러 문단에 걸친 필드, 구역 내부의 중복 구역 정의는 변경 전에 거부한다.
 
+HWPX 저장은 `tabStop`과 `tabStopVal`을 함께 기록한다. 한글의 `HWPUNIT` 값은 raw 거리의 절반이며 0은 기본 `8000/4000`으로 저장한다. 같은 엔진의 왕복만으로는 남은 템플릿 `tabStopVal` 오류를 발견하지 못하므로 실제 ZIP XML 진단과 [한글 실측](../docs/36-native-section-comparison.md)을 함께 사용한다.
+
 `mergeSectionBoundary(rightSectionIdx)`는 뒤 구역의 시작 경계를 제거하고 경계 문단을 결합한다. 앞 구역의 설정을 유지하며 같은 결과 계약으로 이전 본문 끝의 논리 좌표를 반환한다. 경계의 개체/필드/범위 태그/차례 표시, 뒤 구역의 독립 머리말·꼬리말 및 추가 구역·단 정의는 변경 전에 거부한다. Delete/Backspace와 snapshot undo 연결 및 직접 한글 비교 제한은 [35번 결과](../docs/35-section-boundary-merge-result.md)를 따른다.
 
 `table-creation-consistency.patch`는 검증에서 발견한 신규 표의 메모리 IR/저장 기본값 차이를 수정한다. 기존 serializer와 보존 검사는 그대로 유지한다. 최종 검수 범위·결과와 실제 한글 비교 제한은 [34번 결과](../docs/34-sections-tabs-result.md)에 기록한다.

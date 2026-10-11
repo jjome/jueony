@@ -1,0 +1,60 @@
+vite v8.3.2 building client environment for production...
+transforming...
+[plugin rolldown:vite-resolve] Module "path" has been externalized for browser compatibility, imported by "C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/canvaskit-wasm/bin/canvaskit.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+[plugin rolldown:vite-resolve] Module "fs" has been externalized for browser compatibility, imported by "C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/canvaskit-wasm/bin/canvaskit.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+✓ 378 modules transformed.
+rendering chunks...
+computing gzip size...
+evidence/dist-native-tabs/index.html                                  9.96 kB │ gzip:     3.90 kB
+evidence/dist-native-tabs/editor.html                                87.85 kB │ gzip:    11.56 kB
+evidence/dist-native-tabs/assets/canvaskit-SCAxUyCS.wasm          7,317.34 kB │ gzip: 2,989.78 kB
+evidence/dist-native-tabs/assets/rhwp_bg-BqSnLWIu.wasm           13,779.37 kB │ gzip: 4,794.59 kB
+evidence/dist-native-tabs/assets/index-CxrOEMJt.css                  10.17 kB │ gzip:     2.95 kB
+evidence/dist-native-tabs/assets/editor-BNDiHHRN.css                120.38 kB │ gzip:    21.07 kB
+evidence/dist-native-tabs/assets/public-Dva8KOzf.js                  19.21 kB │ gzip:     7.23 kB
+evidence/dist-native-tabs/assets/index-DVN3bPP4.js                   81.46 kB │ gzip:    27.83 kB
+evidence/dist-native-tabs/assets/canvaskit-renderer-WYBhhJIp.js     247.51 kB │ gzip:    74.72 kB
+evidence/dist-native-tabs/assets/editor-DZ0gAtnY.js               2,215.74 kB │ gzip:   473.12 kB
+
+✓ built in 593ms
+{
+  "applicationId": "jueony-editor",
+  "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+  "enginePackage": "@jueony/rhwp-engine-review@0.8.7",
+  "builtAt": "2026-10-11T17:20:42.253Z",
+  "engineWasmSha256": "c1e254531219bb88f983dca0671aa6d4c10be79460c50de8e5fb60d8cca182da",
+  "engineBuild": {
+    "sourceId": "1c738b6a10f4956a",
+    "wasmSha256": "c1e254531219bb88f983dca0671aa6d4c10be79460c50de8e5fb60d8cca182da",
+    "builtAt": "2026-10-11T17:20:16.8370530Z",
+    "buildMode": "wsl-review-no-opt",
+    "optimized": false,
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "jsSha256": "67db5e7aa028ee10fa028257a5e35796e4042024b83268b1ea4b0edb68459dbc",
+    "patches": [
+      {
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af",
+        "name": "default-tabs.patch"
+      },
+      {
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8",
+        "name": "section-split.patch"
+      },
+      {
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad",
+        "name": "table-creation-consistency.patch"
+      }
+    ]
+  },
+  "buildScriptSha256": "a9a587b1a02624f7d6a0ff21e325e09c5b79d00c738c5d29b4c91878055951da",
+  "studioPatchSha256": "ade4ed9eef367dcc0c729afa6277cf1dfe5b0e100fa38b4e9f4f845d82563cf8",
+  "featurePatchSha256": "63dc26158bcac35fd343cf09286e46cf943527446669dd8754dcb7b372e08a27",
+  "recoveryPatchSha256": "12dfbb56ca02e1642bb495a44e18cf0823da84864386211eeb8811916552f864",
+  "tabFeaturePatchSha256": "da0d7d0b9a0c529af8a4a9733bf239a1c4f6afcd99b8803f1237f1c57a90ceec",
+  "sectionBoundaryPatchSha256": "e2a5cee3330b67015a3ac8cc738cafe36966950d7a12fc48e1d0a7ffc2392b13",
+  "customSourceSha256": "6abc38d0cb0be7532c300bc10b26c9e5c1302e2790ddadfd6e88a08f582dbafe",
+  "applicationSourceCommit": "8432586e199dabd71a6d7011536e9aef58fad74c",
+  "applicationSourceDirty": true,
+  "sourceBuild": true,
+  "note": "고정 rhwp 소스와 추적 패치를 직접 빌드한 검수용 WASM. 최적화 및 한컴 출력 비교 상태는 engineBuild와 검증 보고서 참조."
+}

@@ -2,6 +2,8 @@
 
 2026-10-12. [구역 분할·기본 탭 보강](34-sections-tabs-result.md)의 후속 작업이다. 구역을 나눈 본문 경계에서 Delete/Backspace가 아무 동작도 하지 않던 경로를 기존 명령·저장 계층에 연결한다.
 
+최신 후속: [한글 2024 실측과 HWPX 탭 저장 보정](36-native-section-comparison.md). 아래 4195 검수본 기록은 최초 구현 결과이며, 실제 한글 비교에서 추가로 발견한 탭 직렬화 결함은 4196 후속본에서 보정한다.
+
 ## 구현 계약
 
 - 앞 구역의 마지막 본문 문단 끝에서 **Delete**, 뒤 구역의 첫 본문 문단 시작에서 **Backspace**를 누르면 두 구역을 합친다. 경계의 두 문단 텍스트와 글자 서식을 이어 붙이고 커서는 기존 앞 문단의 끝에 놓는다.
@@ -20,7 +22,7 @@
 
 한컴의 [구역 나누기 도움말](https://help.hancom.com/hoffice130/ko-KR/Hwp/format/break/section_break.htm)과 [구역 설정 도움말](https://help.hancom.com/hoffice130/ko-KR/Hwp/format/section/section.htm)은 경계 앞뒤의 Delete/Backspace로 구역을 제거하고 앞 구역의 모양을 따르는 기준을 명시한다. 이 기준을 명령과 설정 상속의 근거로 사용한다.
 
-설치된 한글 2024 창을 재선택하여 실제 키 입력을 시도했으나 두 번 모두 `failed to activate captured window`로 실패했다. 읽기 결과에는 기존 빈 문서와 스타일 창이 남아 있다. 실제 한글에서 경계 문단의 결합 방식·커서·인쇄 결과를 확인하지 못했으므로 직접 동작 동등성 및 독립 출력 비교는 **NOT_RUN**이다. 문단 이어 붙이기는 현재 제품의 명시적 계약이고 한글 실측으로 확인한 사실이 아니다. 새 렌더링 golden은 등록하지 않는다.
+최초 시도에서는 스타일 창이 열린 상태에서 두 번 모두 `failed to activate captured window`로 실패하여 `hancom-comparison.json`에 **NOT_RUN**으로 기록했다. 사용자가 스타일 창을 닫은 후 실제 한글에서 Alt+Shift+Enter, Backspace/Delete, undo와 세 구역 설정 상속·HWP/HWPX 사본 저장을 수행했다. 경계 문단 이어 붙이기와 커서가 실제 한글과 일치함을 확인했다. 후속 비교와 탭 저장 결함·수정은 [36번 결과](36-native-section-comparison.md)를 따른다. 독립 조판/인쇄 비교는 남아 있고 새 렌더링 golden은 등록하지 않는다.
 
 ## 한글에서 확인할 절차
 
@@ -44,7 +46,7 @@
 | 최종 묶음·기존 v1 상태·업무 격리·파일 저장 | 4 시나리오 통과 | `compatibility-result.json` |
 | Rust/WASM·프런트엔드·TypeScript 빌드 | 통과; `cargo --locked`, WSL 검수용 release | `engine-build.json`, `build-evidence.json`, `verification.json` |
 | Facade 모듈 경계 | 9 모듈, 위반·예외 0 | `boundaries.json` |
-| 실제 한글 키 입력·독립 PDF 비교 | **NOT_RUN**, 창 활성화 오류 | `hancom-comparison.json` |
+| 최초 실제 한글 비교 시도 | **NOT_RUN**, 당시 스타일 창 활성화 오류; 후속 일부 직접 비교 수행 | `hancom-comparison.json`, [후속 기록](36-native-section-comparison.md) |
 
 [검증 기록](evidence/section-merge-2026-10-12/)에 성공 결과와 수정 전 실패를 함께 보존한다. 이전 WASM에는 merge API가 없었고 이전 UI에서는 실제 Delete 후 두 구역이 유지되어 제한 시간 안에 합쳐지지 않았다. 같은 새 UI 시나리오는 HWP/HWPX와 Delete/Backspace 조합 모두 통과했다. 구역·설정·dirty 및 원래 커서의 undo 복원을 검사한다. 일반 문단 합치기, 문서 시작/끝, 양식 모드·표 셀과 지원하지 않는 독립 머리말 경계는 대조군으로 확인했다.
 

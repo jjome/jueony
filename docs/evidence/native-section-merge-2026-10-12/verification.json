@@ -1,0 +1,102 @@
+{
+  "verifiedAt": "2026-10-11T17:26:59.972868+00:00",
+  "codeBaselineCommit": "8432586",
+  "engineBuild": {
+    "sourceId": "1c738b6a10f4956a",
+    "wasmSha256": "c1e254531219bb88f983dca0671aa6d4c10be79460c50de8e5fb60d8cca182da",
+    "builtAt": "2026-10-11T17:20:16.8370530Z",
+    "buildMode": "wsl-review-no-opt",
+    "optimized": false,
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "jsSha256": "67db5e7aa028ee10fa028257a5e35796e4042024b83268b1ea4b0edb68459dbc",
+    "patches": [
+      {
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af",
+        "name": "default-tabs.patch"
+      },
+      {
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8",
+        "name": "section-split.patch"
+      },
+      {
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad",
+        "name": "table-creation-consistency.patch"
+      }
+    ]
+  },
+  "checks": {
+    "sectionMerge": {
+      "status": "PASS",
+      "groups": 7,
+      "evidence": "merge-engine-result.json"
+    },
+    "sectionSplitTabs": {
+      "status": "PASS",
+      "groups": 10,
+      "evidence": "tabs-engine-result.json"
+    },
+    "nativeSavedComparison": {
+      "status": "PASS",
+      "groups": 4,
+      "evidence": "parsed-comparison.json"
+    },
+    "browserEditor": {
+      "status": "PASS",
+      "groups": 19,
+      "evidence": "ui/result.json",
+      "consoleDiagnostics": [
+        "Blocked attempt to show multiple 'beforeunload' confirmation panels for a single navigation.",
+        "Blocked attempt to show multiple 'beforeunload' confirmation panels for a single navigation."
+      ]
+    },
+    "agentWorkbench": {
+      "status": "PASS",
+      "groups": 9,
+      "evidence": "workbench/result.json"
+    },
+    "bundleCompatibility": {
+      "status": "PASS",
+      "groups": 4,
+      "evidence": "compatibility/result.json"
+    }
+  },
+  "frontendBuild": "PASS",
+  "typecheck": "PASS",
+  "moduleBoundaries": {
+    "status": "PASS",
+    "modules": 9,
+    "files": 137,
+    "violations": 0
+  },
+  "nativeHancom": {
+    "status": "PARTIAL_PASS",
+    "scope": "Synthetic body section split, Delete/Backspace merge, undo, HWP/HWPX reopen, selected settings and later table display",
+    "correctedDefaultTabDialogPt": 20.0,
+    "previousIncorrectDialogPt": 40.0,
+    "evidence": "ui-observations.json"
+  },
+  "paidProviderCalls": 0,
+  "documents": {
+    "generated": 89,
+    "nativeSaved": 3,
+    "reviewBundleTotalIncludingPriorFixtures": 110,
+    "manifest": "documents.json"
+  },
+  "bundle": {
+    "path": "build/jueony-native-tabs-20261012",
+    "port": 4196,
+    "wasmSha256Verified": true,
+    "currentDocumentHashesVerified": true
+  },
+  "limitations": [
+    "No full Hancom feature equivalence",
+    "No independent PDF, pixel, print-layout comparison",
+    "Complex field/object and independent header/footer section-boundary restrictions remain",
+    "Review WASM is not wasm-opt optimized",
+    "This review port has its own workspace storage"
+  ],
+  "preservedFailureEvidence": [
+    "before-xml-comparison.json",
+    "before/"
+  ]
+}

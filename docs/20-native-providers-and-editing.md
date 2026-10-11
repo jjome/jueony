@@ -42,7 +42,7 @@ OpenAI에는 `store:false`, `text.format`의 strict JSON schema를 사용한다.
 
 Claude에는 `anthropic-version:2023-06-01`, `x-api-key`, `output_config.format`을 쓴다. thinking 블록은 편집 결과에 합치지 않으며 거부·토큰 한도·tool_use 응답을 적용하지 않는다. [Messages](https://platform.claude.com/docs/en/api/messages/create), [Structured outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs).
 
-2026-10-11 Claude 연결 오류 수정: 기존 공통 서식 schema에는 선택 속성 44개가 있어 Claude의 요청당 선택 속성 24개 제한을 넘었다. `anthropic-schema.mjs`는 네 서식 명령의 `properties`를 `{name,value}` 배열로 전송하고, 응답에서 공통 속성 객체로 복원한다. 이 투영은 선택 속성 0개, union 5개로 문서화된 한도(24/16) 이내다. 미지정 서식은 유지하며 `false`/`0`은 명시적 변경으로 보존한다. 중복·알 수 없는 이름·잘못된 값 타입은 문서 적용 전에 거절한다. JSON 제약과 문서 revision/범위 검사는 계속 적용한다.
+2026-10-11 Claude 연결 오류 수정: 기존 공통 schema의 선택 속성은 44개였다. 이를 선택 속성 0개/union 5개로 줄인 첫 수정도 실제 Claude에서 `The compiled grammar is too large` 오류로 거절됐다. 문서화된 항목 수 이외에 내부 규칙 크기 제한이 있기 때문이다. 최종 `anthropic-schema.mjs`는 각 명령을 `{kind,arguments}`로 전송한다. `kind`는 지원 명령 14개의 enum이고 `arguments`는 나머지 명령 필드를 담은 JSON 문자열이다. 선택 속성과 union은 모두 0개다. 서버가 문자열을 객체로 복원한 뒤 기존 편집기의 대상·허용 필드·타입·범위·출처·revision 검사를 적용한다. 구조화 출력이 내부 인자의 의미까지 보장한다고 간주하지 않는다. 미지정 서식은 유지하고 false/0은 보존하며 알 수 없는 인자를 조용히 삭제하지 않는다. 잘못된 명령은 문서 변경 전에 거절한다.
 
 `provider-error.mjs`는 오류 JSON을 최대 64 KiB까지만 읽어 잔액/한도, schema, 모델, 인증, 호출 속도, 서버 장애를 구분한다. 원격 오류 원문·키·문서 텍스트를 화면이나 로그로 전달하지 않으며 검증한 요청 ID만 안내에 포함한다. 모든 HTTP 400을 모델 ID 문제처럼 안내하던 동작을 수정했다. 분류되지 않는 오류의 구체 원인은 추가 진단이 필요하다.
 
@@ -80,6 +80,6 @@ Gemini에는 `x-goog-api-key`와 확인일 REST 문서의 `generationConfig.resp
 
 ## 검증 상태
 
-[검사 기록](evidence/native-agent-2026-10-11/README.md)에 단위·브라우저·공개 문서 검사와 실호출 여부를 구분했다. 세 새 제공자는 **합성 HTTP fixture 검증 완료 / 실제 API 키를 사용한 호출 미검증**이다. 키가 등록되면 연결 테스트 후 초안→후속 편집→undo→저장을 계정별로 확인해야 한다. fixture가 모델의 편집 품질을 입증하지는 않는다.
+[초기 검사 기록](evidence/native-agent-2026-10-11/README.md)에 단위·브라우저·공개 문서 검사와 당시 실호출 여부를 구분했다. 이후 **Claude Sonnet 5.5는 실제 API 연결과 초안→본문·서식·표·쪽 설정 변경→undo→HWP 저장 및 HWP/HWPX 엔진 재열기에 성공**했다. [Claude 실호출 기록](evidence/claude-live-fix-2026-10-11/README.md)을 참고한다. GPT와 Gemini는 여전히 합성 HTTP fixture 검증이며 실제 키 호출은 미검증이다. 단일 합성 문서의 실호출 성공이 모든 문서·요청의 품질이나 실제 한글 호환성을 보장하지 않는다.
 
 계정 접근이 없는 제공자까지 성공했다고 표시하지 않는다. 자동 RAG·Agent loop·외부 MCP·한글 100% 호환성은 이번에 완료되지 않았다. 그 다음 작업은 [Agent 설계](22-agent-retrieval-execution-design.md)와 기존 기능 목록에 남겼다.

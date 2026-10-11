@@ -24,7 +24,8 @@ before(async()=>{
   if(mode==='slow')await new Promise(r=>setTimeout(r,250));
   if(mode==='oversize'){res.end('x'.repeat(1_000_001));return;}
   if(mode==='bad-wire'){res.end('fixture-secret');return;}
-  const text=mode==='bad-json'?'```json\n{}\n```':JSON.stringify(generation);
+  const output=id==='anthropic'?{...generation,operations:generation.operations.map(({kind,...args})=>({kind,arguments:JSON.stringify(args)}))}:generation;
+  const text=mode==='bad-json'?'```json\n{}\n```':JSON.stringify(output);
   let wire=response(id,text,mode);
   if(mode==='empty')wire={};
   if(mode==='blocked'&&id==='gemini')wire={promptFeedback:{blockReason:'SAFETY'}};

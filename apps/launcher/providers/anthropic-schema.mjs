@@ -1,42 +1,36 @@
-import {nativeSchema,parseGeneration,fail} from './native-common.mjs';
+import {generationSchema} from './generation-contract.mjs';
+import {parseGeneration,fail} from './native-common.mjs';
 
-// Claude caps optional fields across the entire schema at 24. Formatting alone
-// has 44. Send sparse typed entries, then restore the provider-neutral object.
-// Do not make every formatting field required: that could overwrite untouched styles.
+const kinds=generationSchema().properties.operations.items.anyOf.map(v=>v.properties.kind.enum[0]);
+
+// Even a schema below Claude's optional/union limits can exceed its compiled
+// grammar limit. Keep the wire envelope small and validate decoded arguments
+// with the application's existing document-aware command validators.
 export function anthropicSchema(referenceIds=[]) {
- const schema=nativeSchema(referenceIds);
- for(const operation of schema.properties.operations.items.anyOf) {
-  const fields=operation.properties.properties;
-  if(!fields)continue;
-  const groups=new Map();
-  for(const [name,definition] of Object.entries(fields.properties)) {
-   const names=groups.get(definition.type)??[];names.push(name);groups.set(definition.type,names);
-  }
-  operation.properties.properties={type:'array',description:'Only formatting properties explicitly requested. Omit unchanged properties. Each name must be unique.',items:{anyOf:[...groups].map(([type,names])=>({
-   type:'object',additionalProperties:false,required:['name','value'],
-   properties:{name:{type:'string',enum:names},value:{type}},
-  }))}};
- }
- return schema;
+ return {
+  type:'object',additionalProperties:false,required:['message','sourceIds','operations'],
+  properties:{
+   message:{type:'string'},
+   sourceIds:{type:'array',items:referenceIds.length?{type:'string',enum:[...new Set(referenceIds)]}:{type:'string'}},
+   operations:{type:'array',items:{
+    type:'object',additionalProperties:false,required:['kind','arguments'],
+    properties:{kind:{type:'string',enum:kinds},arguments:{type:'string',description:'JSON object containing the documented fields for this operation, excluding kind. Keep properties as a sparse object; omit unchanged fields.'}},
+   }},
+  },
+ };
 }
 
-export const ANTHROPIC_FORMAT_INSTRUCTION='\nClaude output encoding: in format_characters, format_paragraph, format_table_cells and set_page_setup, encode properties as an array of {name,value} entries, NOT an object. For example properties:[{"name":"bold","value":true},{"name":"fontSizePt","value":16}]. Include only requested changes; do not invent defaults or repeat names. All other operation fields remain as documented.';
+export const ANTHROPIC_FORMAT_INSTRUCTION='\nClaude wire encoding: each operations entry has exactly two fields: kind (the documented operation name) and arguments (a JSON-encoded STRING containing all other documented operation fields, excluding kind). For example '+JSON.stringify({kind:'format_characters',arguments:JSON.stringify({target:'s0p0',properties:{bold:true,fontSizePt:16}})})+'. Inside arguments keep properties as the documented sparse object; include only requested changes. create_document arguments contain paragraphs. Do not place operation fields outside arguments. The app parses arguments and validates targets, types, allowed fields, ranges, source IDs, and document revision before any edit. Unsupported operations must not be returned.';
 
 export function parseAnthropicGeneration(text) {
- const result=parseGeneration(text),variants=nativeSchema([]).properties.operations.items.anyOf;
- for(const op of result.operations) {
-  const fields=variants.find(v=>v.properties.kind.enum[0]===op?.kind)?.properties.properties?.properties;
-  if(!fields)continue;
-  if(!Array.isArray(op.properties)||!op.properties.length||op.properties.length>Object.keys(fields).length)fail('invalid_response','Claude 서식 변경 응답이 올바르지 않습니다. 문서를 변경하지 않았습니다.');
-  const properties={};
-  for(const entry of op.properties) {
-   const definition=entry&&typeof entry.name==='string'&&Object.hasOwn(fields,entry.name)?fields[entry.name]:undefined;
-   if(!definition||Object.keys(entry).length!==2||!Object.hasOwn(entry,'value')||Object.hasOwn(properties,entry.name))fail('invalid_response','Claude 서식 변경에 알 수 없거나 중복된 속성이 있습니다. 문서를 변경하지 않았습니다.');
-   const value=entry.value;
-   if(definition.type==='integer'?!Number.isInteger(value):typeof value!==definition.type||(definition.type==='number'&&!Number.isFinite(value)))fail('invalid_response','Claude 서식 값의 형식이 올바르지 않습니다. 문서를 변경하지 않았습니다.');
-   properties[entry.name]=value;
-  }
-  op.properties=properties;
- }
+ const result=parseGeneration(text);
+ if(result.operations.length>30)fail('invalid_response','Claude 편집 명령은 최대 30개입니다. 문서를 변경하지 않았습니다.');
+ result.operations=result.operations.map(op=>{
+  if(!op||typeof op!=='object'||Array.isArray(op)||Object.keys(op).length!==2||!kinds.includes(op.kind)||typeof op.arguments!=='string')fail('invalid_response','Claude 편집 명령 형식이 올바르지 않습니다. 문서를 변경하지 않았습니다.');
+  let args;try{args=JSON.parse(op.arguments);}catch{fail('invalid_response','Claude 편집 인자가 올바른 JSON이 아닙니다. 문서를 변경하지 않았습니다.');}
+  if(!args||typeof args!=='object'||Array.isArray(args)||Object.hasOwn(args,'kind'))fail('invalid_response','Claude 편집 인자는 명령 종류를 제외한 객체여야 합니다. 문서를 변경하지 않았습니다.');
+  // Preserve all fields for semantic rejection; never hide unknown fields or coerce values.
+  return {kind:op.kind,...args};
+ });
  return result;
 }

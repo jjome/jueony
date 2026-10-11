@@ -4,12 +4,33 @@ import {readFile} from 'node:fs/promises';
 import init,{HwpDocument} from '@rhwp/core';
 import {executeBodyOperations,validateGeneration,assertRevision} from '../src/mvp/edit-schema.ts';
 import {executeDocumentOperations} from '../src/document-control/execute.ts';
+import {readStructure} from '../src/document-control/structure.ts';
+import {parseAnthropicGeneration} from '../../launcher/providers/anthropic-schema.mjs';
 import {initialState,addWorkspace,addChat,appendMessage,interruptRuns} from '../src/mvp/model.ts';
 import {buildContext} from '../src/mvp/context.ts';
 import type {Snapshot} from '../src/mvp/model.ts';
 await init({module_or_path:await readFile(new URL('../node_modules/@rhwp/core/rhwp_bg.wasm',import.meta.url))});
 const snapshot=(doc:HwpDocument):Snapshot=>({revision:'g1:1',name:'test.hwp',limitations:[],nodes:Array.from({length:doc.getParagraphCount(0)},(_,p)=>({id:'s0p'+p,section:0,paragraph:p,text:doc.getTextRange(0,p,0,doc.getParagraphLength(0,p)),editable:true}))});
 const text=(doc:HwpDocument)=>snapshot(doc).nodes.map(n=>n.text);
+
+test('Claude JSON 인자도 공통 대상·범위·출처·서식 검사를 통과해야 한다',()=>{
+ const doc=HwpDocument.createEmpty();doc.createBlankDocument();doc.insertText(0,0,0,'검증 본문');
+ try{
+  const before={...snapshot(doc),structure:readStructure(doc)};
+  const decode=(kind:string,args:unknown,sourceIds:string[]=[])=>parseAnthropicGeneration(JSON.stringify({message:'검증',sourceIds,operations:[{kind,arguments:JSON.stringify(args)}]}));
+  assert.equal(validateGeneration(decode('format_characters',{target:'s0p0',properties:{bold:false}}),before,[]).operations.length,1);
+  const invalid=[
+   decode('format_characters',{target:'missing',properties:{bold:true}}),
+   decode('format_characters',{target:'s0p0',properties:{bold:'true'}}),
+   decode('format_characters',{target:'s0p0',properties:{bold:true,unknown:1}}),
+   decode('replace_body_text',{target:'s0p0',start:0,count:100,text:'덮어쓰기'}),
+   decode('replace_body_text',{target:'s0p0',start:0,count:1,text:'수정',unknown:1}),
+   decode('replace_body_text',{target:'s0p0',start:0,count:1,text:'수정'},['다른 업무 자료']),
+  ];
+  for(const generation of invalid)assert.throws(()=>validateGeneration(generation,before,[]));
+  assert.deepEqual({...snapshot(doc),structure:readStructure(doc)},before);
+ }finally{doc.free();}
+});
 test('실제 WASM에서 새 문단 초안을 만들고 두 형식으로 보존한다',()=>{
  const doc=HwpDocument.createEmpty();doc.createBlankDocument();
  try{executeBodyOperations(doc,snapshot(doc),[{kind:'create_document',paragraphs:['올해 계획','첫 번째 항목 😀','두 번째 항목']}]);

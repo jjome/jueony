@@ -1,4 +1,4 @@
-﻿param([string]$OutputName = 'jueony-mvp')
+param([string]$OutputName = 'jueony-mvp')
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $env:RUSTUP_HOME = Join-Path $projectRoot '.tools/rustup'
@@ -52,6 +52,7 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/editor-control-202
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/pane-agent-2026-10-11') -Destination $llmEvidence -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/agent-interaction-2026-10-11') -Destination $llmEvidence -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/native-agent-2026-10-11') -Destination $llmEvidence -Recurse -Force
+Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/claude-live-fix-2026-10-11') -Destination $llmEvidence -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/launcher/providers') -Destination $output -Recurse -Force
 $nodeVersion = & (Join-Path $runtimePath 'node.exe') --version
 $providerHashes = [ordered]@{}

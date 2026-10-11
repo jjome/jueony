@@ -18,34 +18,38 @@ function complexity(schema) {
  walk(schema);return {optional,unions};
 }
 const parse=operations=>parseAnthropicGeneration(JSON.stringify({message:'제안',sourceIds:[],operations}));
-test('Claude schema keeps every editing command within documented optional/union budgets',()=>{
- const schema=anthropicSchema(['ref1','ref2']),budget=complexity(schema);
- assert.ok(budget.optional<=24,JSON.stringify(budget));assert.ok(budget.unions<=16,JSON.stringify(budget));
- assert.deepEqual(schema.properties.operations.items.anyOf.map(v=>v.properties.kind.enum[0]),generationSchema().properties.operations.items.anyOf.map(v=>v.properties.kind.enum[0]));
+test('Claude wire schema has no union expansion and preserves all command names',()=>{
+ const schema=anthropicSchema(['ref1','ref2']);
+ assert.deepEqual(complexity(schema),{optional:0,unions:0});
+ assert.deepEqual(schema.properties.operations.items.properties.kind.enum,generationSchema().properties.operations.items.anyOf.map(v=>v.properties.kind.enum[0]));
  assert.deepEqual(schema.properties.sourceIds.items.enum,['ref1','ref2']);
 });
-test('Claude sparse formatting restores only requested properties, including false and zero',()=>{
+test('Claude JSON arguments preserve Korean text, sparse formatting, false, zero and every command field',()=>{
  const operations=[
+  {kind:'create_document',paragraphs:['제목','인용: "안녕하세요"']},
   {kind:'replace_body_text',target:'s0p0',start:0,count:2,text:'제목'},
-  {kind:'format_characters',target:'s0p0',properties:[{name:'bold',value:false},{name:'spacingPercent',value:0},{name:'fontFamily',value:'함초롬바탕'}]},
-  {kind:'format_paragraph',target:'s0p0',properties:[{name:'alignment',value:'center'},{name:'marginLeftMm',value:0}]},
-  {kind:'format_table_cells',target:'@t',startRow:0,rowCount:1,startColumn:0,columnCount:2,properties:[{name:'background',value:'#eeeeee'}]},
-  {kind:'set_page_setup',section:0,properties:[{name:'landscape',value:false},{name:'widthMm',value:210}]},
+  {kind:'format_characters',target:'s0p0',properties:{bold:false,spacingPercent:0,fontFamily:'함초롬바탕'}},
+  {kind:'format_paragraph',target:'s0p0',properties:{alignment:'center',marginLeftMm:0}},
+  {kind:'format_table_cells',target:'@t',startRow:0,rowCount:1,startColumn:0,columnCount:2,properties:{background:'#eeeeee'}},
+  {kind:'set_page_setup',section:0,properties:{landscape:false,widthMm:210}},
  ];
- const expected=structuredClone(operations);expected[1].properties={bold:false,spacingPercent:0,fontFamily:'함초롬바탕'};expected[2].properties={alignment:'center',marginLeftMm:0};expected[3].properties={background:'#eeeeee'};expected[4].properties={landscape:false,widthMm:210};
- assert.deepEqual(parse(operations).operations,expected);
- assert.deepEqual(parse([{kind:'create_document',paragraphs:['제목','본문']}]).operations,[{kind:'create_document',paragraphs:['제목','본문']}]);
+ assert.deepEqual(parse(operations.map(({kind,...args})=>({kind,arguments:JSON.stringify(args)}))).operations,operations);
 });
-test('Claude rejects ambiguous, unknown and invalid style entries before execution',()=>{
- for(const properties of [null,{},[],[{name:'bold',value:true},{name:'bold',value:false}],[{name:'__proto__',value:'x'}],[{name:'constructor',value:'x'}],[{name:'arbitrary',value:true}],[{name:'bold',value:'true'}],[{name:'bold',value:null}],[{name:'ratioPercent',value:100.5}],[{name:'bold',value:true,extra:'x'}]]) {
-  assert.throws(()=>parse([{kind:'format_characters',target:'s0p0',properties}]),e=>e.code==='invalid_response');
- }
+test('Claude rejects malformed envelopes and JSON arguments instead of applying partial commands',()=>{
+ const invalid=[null,[],{}, {kind:'shell',arguments:'{}'}, {kind:'create_document',arguments:{}}, {kind:'create_document',arguments:'not-json'}, {kind:'create_document',arguments:'null'}, {kind:'create_document',arguments:'[]'}, {kind:'create_document',arguments:'{"kind":"set_page_setup"}'}, {kind:'create_document',arguments:'{}',extra:true}];
+ for(const op of invalid)assert.throws(()=>parse([op]),e=>e.code==='invalid_response');
+ assert.throws(()=>parse(Array.from({length:31},()=>({kind:'create_document',arguments:'{}'}))),e=>e.code==='invalid_response');
+});
+test('Claude retains unknown arguments for editor validation instead of silently hiding them',()=>{
+ const args={target:'s0p0',properties:{bold:'not-boolean',unknown:123},extra:'invalid'};
+ assert.deepEqual(parse([{kind:'format_characters',arguments:JSON.stringify(args)}]).operations,[{kind:'format_characters',...args}]);
 });
 test('provider errors distinguish billing, schema, model, authentication and rate limits without echoing secrets',async()=>{
  const cases=[
   [400,'Your credit balance is too low to access the Anthropic API.','billing'],
   [400,'Your organization has reached its spend limit','billing'],
   [400,'Schema is too complex for compilation.','schema'],
+  [400,'The compiled grammar is too large, which would cause performance issues. Simplify your tool schemas or reduce the number of strict tools.','schema'],
   [400,'Too many optional parameters: 44.','schema'],
   [400,'output_config.format.schema: unsupported schema','schema'],
   [404,'model not found','model'],[401,'invalid key','auth'],[429,'too many requests','rate_limit'],[503,'unavailable','unavailable'],[400,'invalid input','provider'],

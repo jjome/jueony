@@ -1,0 +1,82 @@
+{
+  "syntheticOnly": true,
+  "separateBrowserProfile": true,
+  "calls": 2,
+  "checks": [
+    "Real Claude creates three paragraphs through the chat and editor",
+    "Real Claude changes body, character format, table and page setup in one request",
+    "Structure diff displays the applied table",
+    "User save flow writes HWP; engine exports HWPX",
+    "One-request undo restores original body, formatting, tables and page setup",
+    "HWP reopen preserves AI text, format, table and page setup in the editor",
+    "HWPX reopen preserves AI text, format, table and page setup in the editor"
+  ],
+  "hancomReview": "not tested",
+  "startedAt": "2026-10-11T06:27:18.993Z",
+  "model": "claude-sonnet-5-5",
+  "generations": [
+    {
+      "message": "요청하신 대로 세 개의 문단으로 구성된 새 문서를 만드는 작업을 제안합니다. 문단은 \"Claude 연결 검증\", \"기존 본문입니다.\", \"마지막 문단입니다.\" 순서이며, 다른 내용이나 서식은 추가하지 않습니다. 현재 문서는 변경하지 않고 새 문서로 생성됩니다.",
+      "sourceIds": [],
+      "operations": [
+        {
+          "kind": "create_document",
+          "paragraphs": [
+            "Claude 연결 검증",
+            "기존 본문입니다.",
+            "마지막 문단입니다."
+          ]
+        }
+      ]
+    },
+    {
+      "message": "다음 편집을 제안합니다. 첫 문단(s0p0)의 \"Claude 연결 검증\"을 \"Claude 연결 검증 완료\"로 바꾸고 해당 문단만 16pt 굵게 설정합니다. 마지막 문단(s0p2) 바로 뒤에 2행 2열 표를 만들어 [항목, 상태], [본문, 완료]로 채웁니다. 구역 0은 A4(210x297mm) 가로 방향으로 바꾸고 왼쪽 여백만 20mm로 지정합니다. 다른 본문과 서식은 변경하지 않으며, 저장은 하지 않습니다. 실제 적용 여부는 애플리케이션이 알려줍니다.",
+      "sourceIds": [],
+      "operations": [
+        {
+          "kind": "replace_body_text",
+          "target": "s0p0",
+          "start": 0,
+          "count": 12,
+          "text": "Claude 연결 검증 완료"
+        },
+        {
+          "kind": "format_characters",
+          "target": "s0p0",
+          "properties": {
+            "bold": true,
+            "fontSizePt": 16
+          }
+        },
+        {
+          "kind": "create_table",
+          "after": "s0p2",
+          "resultId": "verify",
+          "rows": [
+            [
+              "항목",
+              "상태"
+            ],
+            [
+              "본문",
+              "완료"
+            ]
+          ]
+        },
+        {
+          "kind": "set_page_setup",
+          "section": 0,
+          "properties": {
+            "widthMm": 210,
+            "heightMm": 297,
+            "landscape": true,
+            "marginLeftMm": 20
+          }
+        }
+      ]
+    }
+  ],
+  "status": "PASS",
+  "pageErrors": [],
+  "finishedAt": "2026-10-11T06:27:29.526Z"
+}

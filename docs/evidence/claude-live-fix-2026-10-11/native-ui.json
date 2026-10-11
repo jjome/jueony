@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "results": [
+    "openai-responses: UI registration, native request, probe, create, edit/format, undo, refusal",
+    "anthropic: UI registration, native request, probe, create, edit/format, undo, refusal",
+    "gemini: UI registration, native request, probe, create, edit/format, undo, refusal",
+    "picker/drop/paste attachments parse HWPX and remain isolated to their chat",
+    "all three keys are encrypted on disk",
+    "saved connection picker edits model using its original key",
+    "all providers and rotated key restore after server restart",
+    "temporary file attachments are released on reload",
+    "individual deletion preserves other provider connections across restart"
+  ],
+  "externalAPICalls": 0,
+  "fixtureCalls": 16,
+  "errors": [],
+  "runtime": "Edg/155.0.4283.45"
+}

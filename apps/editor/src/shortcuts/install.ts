@@ -1,20 +1,14 @@
+import { installEqualCells, equalCellHelp } from '../editor-actions/equal-cells.ts';
+import { installNavigationPane } from '../editor-actions/navigation-pane.ts';
 import { selectWholeCellBand } from './cell-band.ts';
 import { HangulKeyResolver, hangulBindings } from './keymap.ts';
 import { defaultShortcuts } from '../../command/shortcut-map';
 
 export function installHangulKeys({ automation, registry, input, eventBus }: { automation: any; registry: any; input: () => any; eventBus: any }) {
   const resolver = new HangulKeyResolver();
-  // These upstream entries have empty execute functions. Never advertise them as actions.
-  const unsupported = new Set(['table:cell-height-equal', 'table:cell-width-equal']);
-  for (const id of unsupported) {
-    const command = registry.get(id);
-    if (command) registry.register({ ...command, label: command.label + ' (미지원)', canExecute: () => false });
-    for (const item of document.querySelectorAll<HTMLElement>(`[data-cmd="${id}"]`)) {
-      item.title = '아직 지원하지 않는 기능입니다.';
-      item.setAttribute('aria-disabled', 'true');
-      item.querySelector('.md-label')?.append(' (미지원)');
-    }
-  }
+  installEqualCells(registry, input);
+  installNavigationPane(registry, input, eventBus);
+  const unsupported = new Set<string>();
   // Keep the engine fallback consistent as well (IME and submode handlers use it).
   defaultShortcuts.splice(0, defaultShortcuts.length, ...hangulBindings.filter(b => b.scope === 'document' && !b.keys.includes(',') && !b.command.startsWith('pending:') && !b.nativeClipboard).map(b => {
     const parts = b.keys.split('+'), key = parts.at(-1)!;
@@ -85,7 +79,7 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
   eventBus.on('document-swapped', reset);
   window.addEventListener('keydown', (event: KeyboardEvent) => {
     const ih = input(), target = event.target as HTMLElement | null;
-    if (document.querySelector('.modal-overlay, dialog[open]') || (target?.closest('input, textarea, select, [contenteditable=true], [role=textbox]') && target !== ih?.textarea)) { resolver.reset(); return; }
+    if (document.querySelector('.modal-overlay, dialog[open]') || target?.closest('#jueony-navigation-pane') || (target?.closest('input, textarea, select, [contenteditable=true], [role=textbox]') && target !== ih?.textarea)) { resolver.reset(); return; }
     const c = automation.getContext();
     if (event.isComposing || ih?.isComposing || event.keyCode === 229) {
       if (event.ctrlKey || event.altKey) {
@@ -103,9 +97,9 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
     if (result.hint) hint(result.hint);
     if (!result.binding) return;
     const b = result.binding;
-    if (!registry.has(b.command) || unsupported.has(b.command)) { hint(b.command === 'pending:navigation-pane' ? '탐색 작업 창은 아직 지원하지 않습니다. 찾기는 Ctrl+Q, F를 사용하세요.' : b.label + ': 아직 지원하지 않는 기능입니다.'); return; }
+    if (!registry.has(b.command) || unsupported.has(b.command)) { hint(b.label + ': 아직 지원하지 않는 기능입니다.'); return; }
     const outcome = automation.execute(b.command, b.params, { allowDialog: true });
-    hint(outcome.ok ? '' : b.label + ': 현재 문맥에서 실행할 수 없습니다.');
+    hint(outcome.ok ? '' : b.command === 'table:cell-height-equal' || b.command === 'table:cell-width-equal' ? equalCellHelp : b.label + ': 현재 문맥에서 실행할 수 없습니다.');
   }, true);
   const api = (window as any).jueonyEditor;
   api.shortcuts = () => hangulBindings.map(b => ({ ...b, registered: registry.has(b.command), supported: registry.has(b.command) && !unsupported.has(b.command), enabled: automation.isEnabled(b.command) }));
@@ -119,5 +113,6 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
     const close = document.createElement('button'); close.textContent = '닫기'; close.onclick = () => dialog.close();
     search.oninput = render; dialog.append(title, text, search, close, list); document.body.append(dialog); dialog.addEventListener('close', () => dialog.remove()); render(); dialog.showModal(); search.focus();
   };
+  registry.register({ id: 'ext:jueony-shortcut-help', label: '단축키 도움말', opensDialog: true, execute: () => button.click() });
   document.getElementById('jueony-title')?.append(button);
 }

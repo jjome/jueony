@@ -23,7 +23,7 @@ export const hangulBindings: Binding[] = [
   binding('Ctrl+T', 'ext:jueony-delete-word', '한 단어 지우기'),
   binding('Ctrl+A', 'edit:select-all', '모두 선택'), binding('Ctrl+E', 'edit:delete', '지우기'),
   binding('Alt+C', 'edit:format-copy', '모양 복사'),
-  binding('Ctrl+Q,F', 'edit:find', '찾기'), binding('Ctrl+F', 'pending:navigation-pane', '탐색 작업 창'),
+  binding('Ctrl+Q,F', 'edit:find', '찾기'), binding('Ctrl+F', 'ext:jueony-navigation-pane', '탐색 작업 창'),
   binding('Ctrl+F2', 'edit:find-replace', '찾아 바꾸기'), binding('Ctrl+Q,A', 'edit:find-replace', '찾아 바꾸기'),
   binding('Ctrl+H', 'edit:find-replace', '찾아 바꾸기'), binding('Ctrl+L', 'edit:find-again', '다시 찾기'),
   binding('Alt+G', 'edit:goto', '찾아가기'),

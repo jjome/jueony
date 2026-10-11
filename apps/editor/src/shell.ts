@@ -1,3 +1,9 @@
+import {installUnifiedChrome} from './unified-chrome.ts';
+import {captureTemplate,materializeTemplate,templateVariables,draftTemplate} from './macros/commands.ts';
+import type {CommandTemplate,CommandMacro} from './macros/commands.ts';
+import {readDocumentDefaults,saveDocumentDefaults,resetDocumentDefaults} from './preferences/document-defaults.ts';
+import {buildRetrievedContext} from './mvp/context.ts';
+import {runBounded} from './agent/run-bounded.ts';
 import {assertRecoveryRecord} from './mvp/recovery-record.ts';
 import {orderRecoveredDocuments} from './mvp/document-order.ts';
 import type {StoredFileConnection} from './file-connection.ts';
@@ -35,6 +41,7 @@ function renderConnections(){options($('saved-connections'),[{value:'',text:'＋
 type Tab={id:string;workspaceId:string;frame:HTMLIFrameElement;wrapper:HTMLElement;button:HTMLButtonElement;ready:Promise<any>;api:any;closed:boolean;initialized:boolean;restoreError?:string;pendingConnection?:StoredFileConnection;pendingIdentity?:string;handle?:FileSystemFileHandle;timer?:number;persistError?:boolean;preferenceError?:boolean;preferenceMessage?:string;pendingWrites?:number;persist:Promise<void>};
 const tabs:Tab[]=[];const loaded=new Set<string>();let recoveryWarning=false;let selected:Reference[]=[];
 const temporary=new TemporaryReferences();
+const phaseLabels:Record<string,string>={generating:'초안 생성',reviewing:'계획 검토',validated:'명령 확인',ready:'적용 준비',applying:'문서 적용',completed:'완료',stopped:'중단'};
 const runLabels:Record<Run['status'],string>={preparing_context:'자료 읽는 중',generating:'모델 응답 대기',validating:'명령 검증 중',applying:'문서 적용 중',completed:'완료',cancelled:'취소됨',conflict:'문서 변경 충돌',failed_no_change:'실패 · 적용 없음',failed_rolled_back:'실패 · 변경 복원됨',failed_partial:'실패 · 부분 적용 확인 필요',interrupted:'이전 실행 중단됨'};
 const status=(text:string)=>{$('app-status').textContent=text;$('app-status').title=text;};
 const error=(e:unknown)=>status(e instanceof Error?e.message:String(e));
@@ -42,6 +49,7 @@ const requestError=(e:unknown)=>{error(e);$('request-error').textContent=e insta
 const work=()=>state.workspaces.find(w=>w.id===state.activeWorkspaceId)!;
 const chat=()=>chatOf(state,work().id,work().activeChatId);
 const button=(label:string,action:()=>unknown)=>{const b=document.createElement('button');b.textContent=label;b.type='button';b.onclick=()=>{try{void Promise.resolve(action()).catch(error);}catch(e){error(e);}};return b;};
+const chrome=installUnifiedChrome({menus:$('unified-menus'),tools:$('unified-tools'),active:()=>activeTab?.initialized?activeTab.api:undefined,execute:(id,params)=>{if(running?.run.status==='applying')throw new Error('문서 적용 중입니다.');if(id==='file:open'){$('open-document').click();return;}const result=activeTab?.api.executeCommand(id,params);if(!result?.ok)throw new Error(result?.message??'현재 문서에서 실행할 수 없습니다.');},error});
 const on=(id:string,action:()=>unknown)=>$(id).addEventListener('click',()=>{try{void Promise.resolve(action()).catch(error);}catch(e){error(e);}});
 async function persist(){stateWrites++;try{await store.save(state);persistError=false;}catch(e){persistError=true;throw e;}finally{stateWrites--;}}
 function cancelNavigation(){if(closing||restoring){status('문서 준비 또는 닫기를 완료한 뒤 전환해 주세요.');return false;}if(running?.run.status==='applying'){status('문서 적용이 끝난 뒤 전환해 주세요.');return false;}running?.controller.abort();return true;}
@@ -56,7 +64,8 @@ function renderModels(){
 }
 function render(){
  options($('workspace-select'),state.workspaces.map(w=>({value:w.id,text:w.name})),work().id);
- $('app-shell').classList.toggle('sidebar-hidden',Boolean(state.sidebarHidden));
+ $('app-shell').classList.toggle('sidebar-hidden',Boolean(state.sidebarHidden));$('app-shell').classList.toggle('focus-mode',Boolean(state.focusMode));$('focus-mode').setAttribute('aria-pressed',String(Boolean(state.focusMode)));
+ $<HTMLInputElement>('retrieve-sources').checked=Boolean(state.retrieveSources);$<HTMLInputElement>('review-before-apply').checked=Boolean(state.reviewBeforeApply);
  $('chat-title').textContent=chat().title;
  $('chat-list').replaceChildren(...state.chats.filter(c=>c.workspaceId===work().id).map(c=>{const b=button(c.title,async()=>{if(!cancelNavigation())return;work().activeChatId=c.id;selected=[];render();await renderFolders();await persist();});b.className='chat-item'+(c.id===chat().id?' active':'');b.ondblclick=async()=>{const title=prompt('채팅 이름',c.title);if(title?.trim()){c.title=title.trim();render();await persist().catch(error);}};return b;}));
  renderModels();renderMessages();renderReferences();
@@ -74,18 +83,20 @@ function renderMessages(){
   if(run&&m.role==='assistant'){
    const meta=document.createElement('div');meta.className='run-meta';meta.textContent=runLabels[run.status]+(run.sources.length?' · 전달한 자료: '+run.sources.map(s=>s.name+' ('+s.characters+'자)').join(', '):' · 참고 파일 없음');card.append(meta);
    if(run.sources.length){const detail=document.createElement('details'),summary=document.createElement('summary');summary.textContent='자료 범위와 출처';detail.append(summary);for(const source of run.sources){const info=document.createElement('div');info.textContent=source.name+' · '+source.characters+'자 · '+(run.usedSourceIds?.includes(source.id)?'모델이 참조 표시':'모델에 전달')+'\n'+(source.limitation??'UTF-8 텍스트 전체');detail.append(info);}card.append(detail);}
+   if(run.retrieval){const detail=document.createElement('details'),summary=document.createElement('summary');summary.textContent='자료 검색: '+run.retrieval.matchedChunkCount+'개 구간 · '+run.retrieval.sentCharacters+'자 전달';detail.append(summary);for(const hit of run.retrieval.hits){const line=document.createElement('div');line.textContent=hit.name+' · 추출문 '+hit.startLine+'–'+hit.endLine+'행';detail.append(line);}for(const warning of run.retrieval.warnings){const p=document.createElement('p');p.textContent=warning;detail.append(p);}card.append(detail);}
+   if(run.events?.length){const note=document.createElement('div');note.className='run-meta';note.textContent='검토 기록: '+run.events.map(e=>(phaseLabels[e.phase]??e.phase)+' '+e.call+'/'+e.maxCalls).join(' → ');card.append(note);}
    if(run.receipt){const actions=document.createElement('div');actions.className='message-actions';actions.append(button('변경 확인',()=>{
     const receipt=run.receipt!;$('diff-before').textContent=receipt.before;$('diff-after').textContent=receipt.after;
     $('structure-diff').hidden=JSON.stringify(receipt.beforeStructure)===JSON.stringify(receipt.afterStructure);
     $('structure-diff-text').textContent='변경 전\n'+describeStructure(receipt.beforeStructure)+'\n\n변경 후\n'+describeStructure(receipt.afterStructure);
     ($('change-dialog') as HTMLDialogElement).showModal();
-   }),button('요청 되돌리기',async()=>{if(running)throw new Error('진행 중 요청을 먼저 중지해 주세요.');const tab=tabs.find(t=>t.id===run.documentId&&t.workspaceId===run.workspaceId);if(!tab)throw new Error('열린 문서에서만 되돌릴 수 있습니다. 재시작 후에는 보존된 문서를 직접 편집해 주세요.');selectTab(tab);await tab.api.undoRequest(run.receipt);await persistTab(tab);status('이 요청의 변경을 되돌렸습니다.');}));card.append(actions);}
+   }),button('요청 되돌리기',async()=>{if(running)throw new Error('진행 중 요청을 먼저 중지해 주세요.');const tab=tabs.find(t=>t.id===run.documentId&&t.workspaceId===run.workspaceId);if(!tab)throw new Error('열린 문서에서만 되돌릴 수 있습니다. 재시작 후에는 보존된 문서를 직접 편집해 주세요.');selectTab(tab);await tab.api.undoRequest(run.receipt);await persistTab(tab);status('이 요청의 변경을 되돌렸습니다.');}));if(run.macroTemplate)actions.append(button('반복 작업으로 저장',async()=>{const name=prompt('반복 작업 이름');if(!name?.trim())return;const macro:CommandMacro={id:uid(),workspaceId:run.workspaceId,name:name.trim(),createdAt:Date.now(),template:structuredClone(run.macroTemplate!)};state.macros??=[];state.macros.push(macro);await persist();status('이 업무의 반복 작업에 저장했습니다.');}));card.append(actions);}
   }
   target.append(card);
  }
  const pending=running?.run.chatId===chat().id&&running.run.workspaceId===work().id;
  target.setAttribute('aria-busy',String(Boolean(pending)));
- if(pending){const card=document.createElement('article');card.className='message assistant pending';card.id='agent-progress';card.setAttribute('role','status');card.textContent=(running!.run.model?.modelId??'AI')+' · '+runLabels[running!.run.status]+'…';target.append(card);}
+ if(pending){const card=document.createElement('article');card.className='message assistant pending';card.id='agent-progress';card.setAttribute('role','status');card.textContent=(running!.run.model?.modelId??'반복 작업')+' · '+runLabels[running!.run.status]+'…'+(running!.run.events?.length?' ('+running!.run.events.at(-1)!.call+'/3회)':'');target.append(card);}
  target.scrollTop=target.scrollHeight;
 }
 function renderReferences(){
@@ -130,20 +141,20 @@ function checkPendingConnection(tab:Tab){
 }
 function refreshTab(tab:Tab){
  if(tab.closed||!tab.api||!tab.initialized)return;checkPendingConnection(tab);const s=tab.api.state();tab.button.textContent=s.name;tab.button.classList.toggle('is-dirty',s.dirty);
- if(tab===activeTab){document.title=work().name+' · '+s.name+' — Jueony';$('shell-status').textContent=s.dirty?'수정됨':'저장됨';$('reconnect-document').hidden=!tab.pendingConnection||Boolean(tab.api.fileHandle());}
+ if(tab===activeTab){document.title=work().name+' · '+s.name+' — Jueony';$('active-document-name').textContent=s.name;$('editor-heading').textContent=s.name;chrome.refresh();$('shell-status').textContent=s.dirty?'수정됨':'저장됨';$('reconnect-document').hidden=!tab.pendingConnection||Boolean(tab.api.fileHandle());}
  clearTimeout(tab.timer);tab.timer=window.setTimeout(()=>void persistTab(tab).catch(error),1400);
 }
-function selectTab(tab:Tab){if(tab.workspaceId!==work().id||tab.closed)return;activeTab=tab;work().activeDocumentId=tab.id;for(const t of tabs){t.frame.hidden=t!==tab;t.wrapper.hidden=t.workspaceId!==work().id;t.wrapper.classList.toggle('is-active',t===tab);t.button.setAttribute('aria-selected',String(t===tab));}refreshTab(tab);tab.frame.contentWindow?.dispatchEvent(new Event('resize'));void persist().catch(error);}
-async function newTab(workspaceId=work().id,saved?:SavedDocument){
+function selectTab(tab:Tab){if(tab.workspaceId!==work().id||tab.closed)return;if(activeTab?.initialized&&activeTab!==tab){activeTab.api.suspendDocumentView();void persistTab(activeTab).catch(error);}activeTab=tab;work().activeDocumentId=tab.id;for(const t of tabs){t.frame.hidden=t!==tab;t.wrapper.hidden=t.workspaceId!==work().id;t.wrapper.classList.toggle('is-active',t===tab);t.button.setAttribute('aria-selected',String(t===tab));}refreshTab(tab);tab.frame.contentWindow?.dispatchEvent(new Event('resize'));void persist().catch(error);}
+async function newTab(workspaceId=work().id,saved?:SavedDocument,forExisting=false){
  if(saved)assertRecoveryRecord(saved,workspaceId);
  const frame=document.createElement('iframe');const wrapper=document.createElement('div');wrapper.className='document-tab-wrap';
  const tab:Tab={id:saved?.id??uid(),workspaceId,frame,wrapper,button:button('문서 준비 중…',()=>{if(cancelNavigation())selectTab(tab);}),closed:false,initialized:false,pendingConnection:saved?.fileConnection,api:null,ready:Promise.resolve(null),persist:Promise.resolve()};
  tab.button.className='document-tab';tab.button.setAttribute('role','tab');
  const close=button('×',()=>closeTab(tab));close.className='close-tab';close.setAttribute('aria-label','문서 닫기');wrapper.append(tab.button,close);
- frame.className='editor-frame';frame.title='한글 문서 편집기';const url=new URL('./editor.html',location.href);url.searchParams.set('child','1');url.searchParams.set('skipRecovery','1');if(new URLSearchParams(location.search).get('storage')==='download')url.searchParams.set('storage','download');frame.src=url.href;
+ frame.className='editor-frame';frame.title='한글 문서 편집기';const url=new URL('./editor.html',location.href);url.searchParams.set('child','1');url.searchParams.set('skipRecovery','1');if(saved||forExisting)url.searchParams.set('skipDefaults','1');if(new URLSearchParams(location.search).get('storage')==='download')url.searchParams.set('storage','download');frame.src=url.href;
  tabs.push(tab);const owner=state.workspaces.find(w=>w.id===workspaceId)!;if(!owner.documentOrder)owner.documentOrder=[];if(!owner.documentOrder.includes(tab.id))owner.documentOrder.push(tab.id);$('documents').append(frame);$('document-tab-list').append(wrapper);
  tab.ready=new Promise((resolve,reject)=>{const started=Date.now();const timer=setInterval(()=>{const api=(frame.contentWindow as any)?.jueonyEditor;if(api?.snapshot){clearInterval(timer);Promise.resolve(api.ready).then(async()=>{
- for(let i=0;i<300;i++){if(!api.busy()&&api.state().pageCount>0){tab.api=api;resolve(api);return;}await new Promise(r=>setTimeout(r,100));}
+ for(let i=0;i<300;i++){if((frame.contentWindow as any).__jueonyInitializationError)throw new Error((frame.contentWindow as any).__jueonyInitializationError);if(!api.busy()&&api.state().pageCount>0){tab.api=api;resolve(api);return;}await new Promise(r=>setTimeout(r,100));}
  throw new Error('문서 초기화가 완료되지 않았습니다.');
 }).catch(reject);}else if(tab.closed||Date.now()-started>45000){clearInterval(timer);reject(new Error('편집기 준비 실패. 문서 탭을 다시 열어 주세요.'));}},100);});
  if(workspaceId===work().id)selectTab(tab);else frame.hidden=true;
@@ -151,10 +162,11 @@ async function newTab(workspaceId=work().id,saved?:SavedDocument){
   const api=await tab.ready;
   if(saved){
    await api.open(saved.bytes,saved.name,null,saved.dirty);
+   if(await api.restoreDocumentView(saved.view)==='invalid')status('문서 보기 정보가 손상되어 기본 보기로 열었습니다. 문서 내용은 유지합니다.');
    if(saved.fileConnection){tab.pendingIdentity=api.documentIdentity();const result=await api.restoreFileConnection(saved.fileConnection);if(result.status==='connected')tab.pendingConnection=undefined;else status(result.message);}
    else status('최근 문서를 복원했습니다. 원본 연결이 없는 문서는 다른 이름으로 저장해 주세요.');
   }
-  tab.initialized=true;refreshTab(tab);return tab;
+  tab.initialized=true;frame.contentDocument!.documentElement.dataset.unifiedChrome='true';chrome.refresh(true);refreshTab(tab);return tab;
  }catch(e){
   tab.restoreError=e instanceof Error?e.message:String(e);tab.button.textContent=(saved?.name??'문서')+' · 복원 실패';
   status('문서를 복원하지 못했습니다. 기존 복구본은 보존합니다. '+tab.restoreError);throw e;
@@ -167,7 +179,7 @@ async function persistTab(tab:Tab):Promise<boolean>{
   checkPendingConnection(tab);
   const fileConnection=snapshot.fileConnection??(!tab.api.fileHandle()?tab.pendingConnection:undefined);
   if(tab.api.fileHandle())tab.pendingConnection=undefined;
-  const data:SavedDocument={id:tab.id,workspaceId:tab.workspaceId,updatedAt:Date.now(),...snapshot,fileConnection};
+  const data:SavedDocument={id:tab.id,workspaceId:tab.workspaceId,updatedAt:Date.now(),...snapshot,fileConnection,view:tab.api.captureDocumentView()};
   tab.pendingWrites=(tab.pendingWrites??0)+1;tab.persist=tab.persist.catch(()=>{}).then(()=>store.saveDocument(data));
   try{await tab.persist;tab.persistError=false;return true;}finally{tab.pendingWrites!--;}
  }catch(e){
@@ -183,7 +195,7 @@ async function openHandle(handle:FileSystemFileHandle){
  if(work().id!==workspaceId)return;
  for(const tab of tabs.filter(t=>t.workspaceId===workspaceId&&t.api?.fileHandle())){if(await handle.isSameEntry(tab.api.fileHandle())){selectTab(tab);return;}}
  const file=await handle.getFile();if(file.size>64*1024*1024)throw new Error('MVP 문서 열기는 64MB까지 지원합니다.');
- if(work().id!==workspaceId)return;const tab=await newTab(workspaceId);await tab.api.open(new Uint8Array(await file.arrayBuffer()),file.name,handle);tab.handle=handle;await persistTab(tab);status('문서를 열었습니다.');
+ if(work().id!==workspaceId)return;const tab=await newTab(workspaceId,undefined,true);await tab.api.open(new Uint8Array(await file.arrayBuffer()),file.name,handle);tab.handle=handle;await persistTab(tab);status('문서를 열었습니다.');
 }
 async function closeTab(tab:Tab){
  if(closing||!cancelNavigation()||!tab.api||tab.api.busy())return;if(!tab.initialized){status('복원 실패 문서의 기존 복구본을 보존합니다. 재실행 후 다시 확인해 주세요.');return;}closing=true;
@@ -198,7 +210,7 @@ async function closeTab(tab:Tab){
 }
 async function switchWorkspace(id:string){
  if(restoring||closing||!cancelNavigation()){render();return;}restoring=true;
- try{if(activeTab?.initialized&&!await persistTab(activeTab))throw new Error('문서 작업이 끝난 뒤 업무를 전환해 주세요.');state.activeWorkspaceId=id;selected=[];activeTab=undefined;render();
+ try{if(activeTab?.initialized)activeTab.api.suspendDocumentView();if(activeTab?.initialized&&!await persistTab(activeTab))throw new Error('문서 작업이 끝난 뒤 업무를 전환해 주세요.');state.activeWorkspaceId=id;selected=[];activeTab=undefined;render();
   const previousDocumentId=work().activeDocumentId;
   if(!loaded.has(id)){const documents=orderRecoveredDocuments(await store.documents(id),work().documentOrder);for(const saved of documents)if(!tabs.some(t=>t.id===saved.id)){try{await newTab(id,saved);}catch(e){recoveryWarning=true;error(e);}}loaded.add(id);}
   const tab=tabs.find(t=>t.workspaceId===id&&t.id===previousDocumentId)??tabs.find(t=>t.workspaceId===id)??await newTab(id);selectTab(tab);render();await renderFolders();await persist();
@@ -221,12 +233,17 @@ async function send(){
    return undefined;
   },{chatId,items:temporary.list(workspaceId,chatId)});
   run.sources=references.map(({text,...source})=>source);
-  const context=buildContext(state,workspaceId,chatId,snapshot,references,request);
-  const result=await runOnce({runId:run.id,context,model,port,editor:original.api,signal:controller.signal,
+  const retrieved=state.retrieveSources?await buildRetrievedContext(state,workspaceId,chatId,snapshot,references,request,controller.signal):undefined;
+  const context=retrieved?.context??buildContext(state,workspaceId,chatId,snapshot,references,request);
+  run.sources=context.references.map(({text,...source})=>source);run.retrieval=retrieved?.retrieval;run.events=[];
+  const execute=state.reviewBeforeApply?runBounded:runOnce;
+  const result=await execute({runId:run.id,context,model,port,editor:original.api,signal:controller.signal,
    isCurrent:()=>work().id===workspaceId&&chat().id===chatId&&activeTab?.id===run.documentId,
    createDocument:async()=>{const tab=await newTab(workspaceId);run.documentId=tab.id;return tab.api;},
+   onEvent:(event:any)=>{run.events!.push(event);if(run.events!.length>40)run.events!.shift();renderMessages();},
    state:s=>{run.status=s;updateRun();renderMessages();void persist().catch(error);}});
   run.status='completed';run.receipt=result.receipt;run.usedSourceIds=result.sourceIds;
+  if(result.receipt&&result.generation)try{run.macroTemplate=captureTemplate(result.generation,snapshot);}catch{/* Unsupported command groups are not offered as recordable macros. */}
   appendMessage(state,workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:result.message+'\n\n'+(result.receipt?result.receipt.operationCount+'개 명령을 실제 문서에 적용했습니다. 파일 저장은 별도로 실행하세요.':'문서에 적용한 변경은 없습니다.')});
   const tab=tabs.find(t=>t.id===run.documentId);
   try{if(tab)await persistTab(tab);status('AI 요청이 완료되었습니다.');}catch(e){persistError=true;run.error='문서 변경은 적용됐지만 로컬 복구본 저장에 실패했습니다. 문서를 파일로 저장해 주세요.';appendMessage(state,workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:run.error});status(run.error);}
@@ -235,6 +252,56 @@ async function send(){
   appendMessage(state,workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:run.error});requestError(run.error);
  }finally{running=undefined;await persist().catch(error);renderMessages();updateRun();}
 }
+on('focus-mode',async()=>{state.focusMode=!state.focusMode;render();activeTab?.frame.contentWindow?.dispatchEvent(new Event('resize'));await persist();});
+for(const [id,key] of [['retrieve-sources','retrieveSources'],['review-before-apply','reviewBeforeApply']] as const)$(id).addEventListener('change',()=>{state[key]=$<HTMLInputElement>(id).checked;void persist().catch(error);});
+let pendingMacro:{template:CommandTemplate;name:string;workspaceId:string;chatId:string;tabId?:string}|undefined;
+function showMacro(template:CommandTemplate,name:string){
+ if(running)throw new Error('진행 중인 요청이 끝난 뒤 실행해 주세요.');
+ pendingMacro={template:structuredClone(template),name,workspaceId:work().id,chatId:chat().id,tabId:activeTab?.id};
+ $('macro-parameters-title').textContent=name;$('macro-error').textContent='';$('macro-variables').replaceChildren();
+ for(const variable of templateVariables(template)){const label=document.createElement('label');label.textContent=variable;const input=document.createElement('input');input.dataset.variable=variable;input.required=true;input.maxLength=4000;input.placeholder=variable==='붙임'?'없으면 없음으로 입력':variable;label.append(input);$('macro-variables').append(label);}
+ $('macro-preview').textContent=template.operations.length+'개 편집 명령 · '+(template.operations[0].kind==='create_document'?'새 문서를 만듭니다.':'현재 문서에서 원문이 일치하는 문단에 적용합니다.')+'\n변경 후 채팅의 요청 되돌리기로 복원할 수 있습니다.';
+ $<HTMLDialogElement>('macro-dialog').close();$<HTMLDialogElement>('macro-parameters').showModal();
+}
+function renderMacros(){
+ const list=$('macro-list');list.replaceChildren();
+ for(const macro of (state.macros??[]).filter(m=>m.workspaceId===work().id)){
+  const row=document.createElement('div');row.className='macro-row';const name=document.createElement('strong');name.textContent=macro.name;row.append(name,button('실행',()=>showMacro(macro.template,macro.name)),button('이름',async()=>{const next=prompt('반복 작업 이름',macro.name);if(next?.trim()){macro.name=next.trim();await persist();renderMacros();}}),button('삭제',async()=>{state.macros=state.macros?.filter(m=>m.id!==macro.id);await persist();renderMacros();}));list.append(row);
+ }
+ if(!list.children.length)list.textContent='아직 저장한 반복 작업이 없습니다. 완료한 AI 변경에서 반복 작업으로 저장을 누르세요.';
+}
+on('macro-manager',()=>{renderMacros();$<HTMLDialogElement>('macro-dialog').showModal();});on('close-macros',()=>$<HTMLDialogElement>('macro-dialog').close());on('cancel-macro',()=>$<HTMLDialogElement>('macro-parameters').close());
+for(const [id,kind,label] of [['recipe-letter','official-letter','공문 초안'],['recipe-plan','plan','추진 계획'],['recipe-report','report','결과 보고']] as const)on(id,()=>showMacro(draftTemplate(kind),label));
+$('macro-parameters-form').addEventListener('submit',e=>{e.preventDefault();void executeMacro().catch(e=>{$('macro-error').textContent=e instanceof Error?e.message:String(e);});});
+async function executeMacro(){
+ const pending=pendingMacro;if(!pending||running||restoring||closing)throw new Error('현재 작업을 마친 뒤 다시 실행해 주세요.');
+ if(work().id!==pending.workspaceId||chat().id!==pending.chatId||activeTab?.id!==pending.tabId)throw new Error('업무나 문서가 바뀌었습니다. 반복 작업을 다시 선택해 주세요.');
+ let tab=activeTab;if(!tab?.initialized)throw new Error('문서를 준비하고 있습니다.');
+ const values:Record<string,string>=Object.create(null);for(const input of $('macro-variables').querySelectorAll<HTMLInputElement>('input'))values[input.dataset.variable!]=input.value;
+ let base:Snapshot=tab.api.snapshot();const generation=materializeTemplate(pending.template,base,values);
+ await tab.api.preflight(base,generation);
+ if(activeTab!==tab||work().id!==pending.workspaceId||chat().id!==pending.chatId)throw new Error('문서가 바뀌었습니다. 다시 실행해 주세요.');
+ const run:Run={id:uid(),workspaceId:work().id,chatId:chat().id,documentId:tab.id,status:'applying',sources:[],createdAt:Date.now()};running={controller:new AbortController(),run};state.runs.push(run);
+ appendMessage(state,run.workspaceId,run.chatId,{id:uid(),role:'user',text:'반복 작업: '+pending.name,runId:run.id});$<HTMLDialogElement>('macro-parameters').close();renderMessages();updateRun();
+ try{
+  if(generation.operations[0]?.kind==='create_document'){tab=await newTab(run.workspaceId);run.documentId=tab.id;base=tab.api.snapshot();}
+  run.receipt=await tab.api.apply(run.id,base,generation);run.status='completed';run.macroTemplate=pending.template;
+  appendMessage(state,run.workspaceId,run.chatId,{id:uid(),role:'assistant',text:pending.name+' · '+run.receipt!.operationCount+'개 명령을 적용했습니다. 파일 저장은 별도로 실행하세요.',runId:run.id});
+  await persistTab(tab);status('반복 작업을 실행했습니다.');
+ }catch(e){const name=e instanceof Error?e.name:'';run.status=name==='PartialApplyError'?'failed_partial':name==='RolledBackError'?'failed_rolled_back':run.receipt?'completed':'failed_no_change';run.error=e instanceof Error?e.message:String(e);appendMessage(state,run.workspaceId,run.chatId,{id:uid(),role:'assistant',text:run.error,runId:run.id});requestError(e);}
+ finally{running=undefined;await persist().catch(error);renderMessages();updateRun();}
+}
+const defaultLabels:Record<string,string>={widthMm:'용지 너비 (mm)',heightMm:'용지 높이 (mm)',marginLeftMm:'왼쪽 여백 (mm)',marginRightMm:'오른쪽 여백 (mm)',marginTopMm:'위쪽 여백 (mm)',marginBottomMm:'아래쪽 여백 (mm)',marginHeaderMm:'머리말 (mm)',marginFooterMm:'꼬리말 (mm)'};
+function fillDefaults(){
+ const settings=readDocumentDefaults(localStorage);$<HTMLInputElement>('defaults-enabled').checked=settings.enabled;$('defaults-fields').replaceChildren();$('defaults-error').textContent='';
+ for(const [key,label] of Object.entries(defaultLabels)){const l=document.createElement('label');l.textContent=label;const input=document.createElement('input');input.type='number';input.step='0.1';input.required=true;input.min='0';input.max='1000';input.dataset.defaultField=key;input.value=String((settings.page as any)[key]);l.append(input);$('defaults-fields').append(l);}
+ const direction=document.createElement('label');direction.textContent='용지 방향';const select=document.createElement('select');select.id='defaults-landscape';options(select,[{value:'false',text:'세로'},{value:'true',text:'가로'}],String(settings.page.landscape));direction.append(select);$('defaults-fields').append(direction);
+ for(const [key,label,value] of [['family','기본 글꼴',settings.font.family],['sizePt','기본 크기 (pt)',String(settings.font.sizePt)]]){const l=document.createElement('label');l.textContent=label;const input=document.createElement('input');input.dataset.defaultFont=key;input.value=value;input.required=true;if(key==='sizePt'){input.type='number';input.min='1';input.max='200';input.step='0.1';}l.append(input);$('defaults-fields').append(l);}
+}
+on('document-defaults',()=>{$<HTMLDialogElement>('defaults-dialog').showModal();try{fillDefaults();}catch(e){$('defaults-error').textContent=e instanceof Error?e.message:String(e);}});on('close-defaults',()=>$<HTMLDialogElement>('defaults-dialog').close());
+on('reset-defaults',()=>{resetDocumentDefaults(localStorage);fillDefaults();status('새 문서 기본값을 복원했습니다. 기존 문서는 유지됩니다.'+($('app-shell').inert?' 창을 새로고침하여 편집기를 다시 시작하세요.':''));});
+$('defaults-form').addEventListener('submit',e=>{e.preventDefault();try{const settings=readDocumentDefaults(localStorage);settings.enabled=$<HTMLInputElement>('defaults-enabled').checked;for(const input of $('defaults-fields').querySelectorAll<HTMLInputElement>('[data-default-field]'))(settings.page as any)[input.dataset.defaultField!]=Number(input.value);settings.page.landscape=$<HTMLSelectElement>('defaults-landscape').value==='true';for(const input of $('defaults-fields').querySelectorAll<HTMLInputElement>('[data-default-font]'))(settings.font as any)[input.dataset.defaultFont!]=input.dataset.defaultFont==='sizePt'?Number(input.value):input.value;saveDocumentDefaults(localStorage,settings);$<HTMLDialogElement>('defaults-dialog').close();status('새 문서 기본값을 저장했습니다. 다음 새 문서부터 적용합니다.');}catch(e){$('defaults-error').textContent=e instanceof Error?e.message:String(e);}});
+window.addEventListener('keydown',e=>{if(e.isComposing)return;if(e.key==='F6'){e.preventDefault();if(document.activeElement===activeTab?.frame)$('request-input').focus();else activeTab?.api?.focusEditor();}if(e.ctrlKey&&!e.altKey&&!e.shiftKey&&e.code==='KeyS'&&!document.querySelector('dialog[open]')){e.preventDefault();$('save-document').click();}});
 on('add-workspace',async()=>{if(!cancelNavigation())return;const name=prompt('새 업무 이름');if(!name?.trim())return;const w=addWorkspace(state,name);await switchWorkspace(w.id);});
 on('rename-workspace',async()=>{const name=prompt('업무 이름',work().name);if(name?.trim()){work().name=name.trim();render();await persist();}});
 $('workspace-select').addEventListener('change',()=>void switchWorkspace($<HTMLSelectElement>('workspace-select').value).catch(error));
@@ -243,7 +310,7 @@ on('add-folder',async()=>{const picker=(window as any).showDirectoryPicker;if(!p
 on('refresh-folders',renderFolders);
 on('toggle-sidebar',async()=>{state.sidebarHidden=!state.sidebarHidden;$('app-shell').classList.toggle('sidebar-hidden',state.sidebarHidden);await persist();});
 on('new-document',async()=>{if(cancelNavigation())await newTab();});
-on('open-document',async()=>{const picker=(window as any).showOpenFilePicker;if(picker){const [handle]=await picker({types:[{description:'한글 문서',accept:{'application/octet-stream':['.hwp','.hwpx']}}]});await openHandle(handle);}else{const file=document.createElement('input');file.type='file';file.accept='.hwp,.hwpx';file.onchange=async()=>{const f=file.files?.[0];if(f&&cancelNavigation()){try{const tab=await newTab();await tab.api.open(new Uint8Array(await f.arrayBuffer()),f.name);await persistTab(tab);}catch(e){error(e);}}};file.click();}});
+on('open-document',async()=>{const picker=(window as any).showOpenFilePicker;if(picker){const [handle]=await picker({types:[{description:'한글 문서',accept:{'application/octet-stream':['.hwp','.hwpx']}}]});await openHandle(handle);}else{const file=document.createElement('input');file.type='file';file.accept='.hwp,.hwpx';file.onchange=async()=>{const f=file.files?.[0];if(f&&cancelNavigation()){try{const tab=await newTab(work().id,undefined,true);await tab.api.open(new Uint8Array(await f.arrayBuffer()),f.name);await persistTab(tab);}catch(e){error(e);}}};file.click();}});
 on('save-document',async()=>{if(running?.run.status==='applying')return;if(activeTab?.api&&activeTab.initialized){const tab=activeTab;const result=await tab.api.save();await persistTab(tab);status(result==='saved'?'파일에 저장했습니다.':'저장을 완료하지 않았습니다.');}});
 on('reconnect-document',async()=>{
  const tab=activeTab;if(!tab?.initialized)return;checkPendingConnection(tab);if(!tab.pendingConnection){refreshTab(tab);return;}
@@ -323,13 +390,13 @@ split.addEventListener('pointerdown',e=>{dragging=true;split.setPointerCapture(e
 split.addEventListener('pointermove',e=>{if(!dragging)return;const rect=$('sidebar').getBoundingClientRect();state.split=Math.max(20,Math.min(75,Math.round((e.clientY-rect.top)/rect.height*100)));$('sidebar').style.setProperty('--chat-share',state.split+'%');split.setAttribute('aria-valuenow',String(state.split));});
 split.addEventListener('pointerup',()=>{dragging=false;void persist().catch(error);});
 split.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();state.split=Math.max(20,Math.min(75,state.split+(e.key==='ArrowUp'?-3:3)));$('sidebar').style.setProperty('--chat-share',state.split+'%');split.setAttribute('aria-valuenow',String(state.split));void persist().catch(error);}});
-window.addEventListener('message',event=>{if(event.origin!==location.origin)return;const tab=tabs.find(t=>t.frame.contentWindow===event.source);if(!tab)return;if(event.data?.type==='jueony:status')refreshTab(tab);if(event.data?.type==='jueony:preferences-state'){tab.preferenceError=Boolean(event.data.error);tab.preferenceMessage=tab.preferenceError?String(event.data.message):undefined;if(tab.preferenceError)status(tab.preferenceMessage!);}if(event.data?.type==='jueony:new-document'&&tab===activeTab&&cancelNavigation())void newTab().catch(error);if(event.data?.type==='jueony:close-document'&&tab===activeTab)void closeTab(tab).catch(error);});
+window.addEventListener('message',event=>{if(event.origin!==location.origin)return;const tab=tabs.find(t=>t.frame.contentWindow===event.source);if(!tab)return;if(event.data?.type==='jueony:status')refreshTab(tab);if(event.data?.type==='jueony:command-state'&&tab===activeTab)chrome.refresh();if(event.data?.type==='jueony:focus-chat'&&tab===activeTab){if(state.focusMode){state.focusMode=false;render();void persist().catch(error);}$('request-input').focus();}if(event.data?.type==='jueony:preferences-state'){tab.preferenceError=Boolean(event.data.error);tab.preferenceMessage=tab.preferenceError?String(event.data.message):undefined;if(tab.preferenceError)status(tab.preferenceMessage!);}if(event.data?.type==='jueony:new-document'&&tab===activeTab&&cancelNavigation())void newTab().catch(error);if(event.data?.type==='jueony:close-document'&&tab===activeTab)void closeTab(tab).catch(error);});
 window.addEventListener('beforeunload',event=>{if(persistError||stateWrites||closing||running||tabs.some(t=>t.persistError||t.pendingWrites||t.preferenceError||t.api?.state().dirty)){event.preventDefault();event.returnValue='';}});
 async function start(){await store.open();state=await store.load();installPaneResize({root:$('app-shell'),sidebar:$('sidebar'),handle:$('agent-editor-split'),chat:$('chat-panel'),initialWidth:state.agentWidth,commit:width=>{state.agentWidth=width;void persist().catch(error);}});try{await refreshConnections();}catch{connectionNotice='AI 서버를 최신 실행기로 다시 시작해 주세요. 로컬 문서 편집은 사용할 수 있습니다.';}if(!state.workspaces.length)addWorkspace(state,'내 업무');if(!state.workspaces.some(w=>w.id===state.activeWorkspaceId))state.activeWorkspaceId=state.workspaces[0].id;render();await switchWorkspace(state.activeWorkspaceId);status('로컬 업무 준비 완료 · '+(tabs.some(t=>t.preferenceError)?tabs.find(t=>t.preferenceError)!.preferenceMessage:recoveryWarning||tabs.some(t=>t.restoreError)?'일부 문서 복원 실패: 기존 복구본은 보존했습니다.':tabs.some(t=>t.pendingConnection)?'복구 문서의 원본 연결을 확인하세요.':connectionNotice||'AI 연결 설정에서 연결과 키를 변경할 수 있습니다.'));}
 // One writer per browser profile/origin prevents whole-state writes from
 // competing application windows from overwriting each other's workspaces.
 void navigator.locks.request('jueony-workspace-writer',{ifAvailable:true},async lock=>{
- if(!lock){$('app-shell').inert=true;$<HTMLButtonElement>('connection-settings').disabled=true;status('다른 Jueony 창이 열려 있습니다. 기존 창을 사용하거나 닫은 뒤 이 창을 새로고침해 주세요.');return;}
- try{await start();}catch(e){$('app-shell').inert=true;$<HTMLButtonElement>('connection-settings').disabled=true;error(e);return;}
+ if(!lock){$('app-title').inert=true;$('unified-menus').inert=true;$('unified-tools').inert=true;$('app-shell').inert=true;$<HTMLButtonElement>('connection-settings').disabled=true;status('다른 Jueony 창이 열려 있습니다. 기존 창을 사용하거나 닫은 뒤 이 창을 새로고침해 주세요.');return;}
+ try{await start();}catch(e){$('unified-menus').inert=true;$('unified-tools').inert=true;$('app-shell').inert=true;$<HTMLButtonElement>('connection-settings').disabled=true;error(e);return;}
  await new Promise<void>(()=>{});
 }).catch(error);

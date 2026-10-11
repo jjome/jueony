@@ -1,0 +1,24 @@
+{
+  "passed": 15,
+  "checks": [
+    "W on a full cell block equalizes all widths without changing heights, and marks the real document dirty",
+    "Single undo restores the complete original geometry",
+    "Injected failure after the first height change rolls back all cell sizes and leaves dirty/revision unchanged",
+    "Height-equal ribbon command shares the keyboard command and preserves the outer table height",
+    "Height equalization is one complete undo/redo step, including table-height surplus",
+    "Engine layout reports equal visible widths and heights for the edited fixture",
+    "Repeated equalization of already equal cells is a no-op without new revision",
+    "Partial selections refuse execution without silently modifying other cells",
+    "Both exported HWP and HWPX reopen in the actual editor with all equalized sizes preserved",
+    "Ctrl+F docks a pane and searches body plus cell text; clicking a hit selects the cell without mutating the document",
+    "Case sensitivity refreshes the actual native search results",
+    "Navigation search input does not route Ctrl+Y to delete a document line",
+    "Unsaved direct editing refreshes search results from the same open document",
+    "Changing the open document clears the previous query and results",
+    "Ctrl+Q,F still opens the separate floating Find dialog"
+  ],
+  "errors": [],
+  "external": [],
+  "editorHtmlSha256": "302f708048b273e3600182e7f3c76dff5ee19036f6f976b35ae7bd65baf1d6d8",
+  "limitation": "Headless engine/browser checks; no installed Hancom editor, so physical shortcut/IME and Hancom reopen comparison remain BLOCKED_REFERENCE."
+}

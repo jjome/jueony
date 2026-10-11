@@ -102,9 +102,9 @@ try {
     assert.equal(result.ok, false); assert.equal(result.reason, 'disabled');
     await press(key);
     const hint = await page.$eval('#jueony-key-hint', e => e.textContent);
-    assert.ok(hint.includes('아직 지원하지 않는'));
+    assert.ok(hint.includes('칸 전체'));
   }
-  checks.push('Empty upstream equal-height/equal-width commands cannot report success and shortcuts show unsupported');
+  checks.push('Equal-height/equal-width reject insufficient or partial cell bands with an actionable hint');
   await page.evaluate(() => {
     const ih = window.rhwpStudio.automation.options.dispatcher.services.getInputHandler();
     ih.cursor.exitCellSelectionMode(); ih.cursor.clearSelection(); ih.cursor.moveTo({ sectionIndex: 0, paragraphIndex: 0, charOffset: 0 }); ih.updateCaret(); ih.focus();
@@ -115,14 +115,15 @@ try {
   checks.push('F7 in body text still opens page setup and Escape cancels');
   await focus(); await press('Control+F');
   assert.equal(await page.$('.modal-overlay'), null);
-  assert.ok((await page.$eval('#jueony-key-hint', el => el.textContent)).includes('Ctrl+Q, F'));
+  await page.waitForSelector('#jueony-navigation-pane');
+  await page.click('[aria-label="탐색 작업 창 닫기"]'); await focus();
   await press('Control+Q'); await press('F'); await page.waitForSelector('.find-dialog');
   assert.ok((await page.$eval('.find-dialog', el => el.textContent)).includes('찾기'));
   const beforeDialogKey = await page.evaluate(() => window.jueonyEditor.revision());
   await page.$eval('.find-dialog input', el => { el.focus(); el.dispatchEvent(new KeyboardEvent('keydown', { key: 'y', code: 'KeyY', ctrlKey: true, bubbles: true, cancelable: true })); });
   assert.equal(await page.evaluate(() => window.jueonyEditor.revision()), beforeDialogKey);
   await page.click('.find-dialog .dialog-close'); await page.waitForFunction(() => !document.querySelector('.find-dialog'));
-  checks.push('Ctrl+F reports unsupported navigation; Ctrl+Q,F opens Find; dialog input cannot delete document lines');
+  checks.push('Ctrl+F opens the docked navigation pane; Ctrl+Q,F opens Find; dialog input cannot delete document lines');
   await focus();
   const toolbarBefore = await page.evaluate(() => document.documentElement.dataset.toolboxBasic);
   await press('Control+F1');

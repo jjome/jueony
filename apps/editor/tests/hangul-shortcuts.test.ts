@@ -62,7 +62,7 @@ test('셀 블록 F7/F8은 칸/줄 선택이며 본문 F7 편집 용지를 가로
 
 test('Ctrl+F 탐색과 Ctrl+Q,F 찾기를 다른 명령으로 유지한다', () => {
   const r = new HangulKeyResolver();
-  assert.equal(r.resolve(key('KeyF', { ctrlKey: true }), ctx).binding?.command, 'pending:navigation-pane');
+  assert.equal(r.resolve(key('KeyF', { ctrlKey: true }), ctx).binding?.command, 'ext:jueony-navigation-pane');
   r.resolve(key('KeyQ', { ctrlKey: true }), ctx);
   assert.equal(r.resolve(key('KeyF'), ctx).binding?.command, 'edit:find');
 });

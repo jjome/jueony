@@ -1,0 +1,238 @@
+{
+  "scope": "Synthetic lexical retrieval evidence only. Not actual government documents, a production-quality benchmark, model output quality or independent Hancom compatibility.",
+  "sourceCount": 6,
+  "indexedChunks": 90,
+  "sourceCharacters": 82668,
+  "cases": [
+    {
+      "id": "Q01",
+      "query": "2025년 주민교육 참여 인원",
+      "expectedSourceId": "edu2025",
+      "expectedText": "128명",
+      "pass": true,
+      "topSourceId": "edu2025",
+      "sentCharacters": 7875,
+      "selectedChunks": 8,
+      "totalSourceCharacters": 82668,
+      "sourceIds": [
+        "edu2025",
+        "edu2026",
+        "edu2025",
+        "edu2025",
+        "edu2026",
+        "edu2026",
+        "budget",
+        "budget"
+      ]
+    },
+    {
+      "id": "Q02",
+      "query": "2025년 주민교육 만족도 조사 회수",
+      "expectedSourceId": "edu2025",
+      "expectedText": "104건",
+      "pass": true,
+      "topSourceId": "edu2025",
+      "sentCharacters": 7875,
+      "selectedChunks": 8,
+      "totalSourceCharacters": 82668,
+      "sourceIds": [
+        "edu2025",
+        "edu2025",
+        "edu2025",
+        "edu2026",
+        "edu2026",
+        "edu2026",
+        "budget",
+        "budget"
+      ]
+    },
+    {
+      "id": "Q03",
+      "query": "2026년 주민교육 운영 횟수",
+      "expectedSourceId": "edu2026",
+      "expectedText": "8회",
+      "pass": true,
+      "topSourceId": "edu2026",
+      "sentCharacters": 7875,
+      "selectedChunks": 8,
+      "totalSourceCharacters": 82668,
+      "sourceIds": [
+        "edu2026",
+        "edu2025",
+        "edu2026",
+        "edu2026",
+        "edu2025",
+        "edu2025",
+        "budget",
+        "budget"
+      ]
+    },
+    {
+      "id": "Q04",
+      "query": "2026년 주민교육 접수 기간",
+      "expectedSourceId": "edu2026",
+      "expectedText": "3월 18일",
+      "pass": true,
+      "topSourceId": "edu2026",
+      "sentCharacters": 7881,
+      "selectedChunks": 8,
+      "totalSourceCharacters": 82668,
+      "sourceIds": [
+        "edu2026",
+        "edu2026",
+        "edu2026",
+        "edu2025",
+        "edu2025",
+        "edu2025",
+        "complaint",
+        "budget"
+      ]
+    },
+    {
+      "id": "Q05",
+      "query": "북부복지관 점검 일정",
+      "expectedSourceId": "safety",
+      "expectedText": "6월 15일",
+      "pass": true,
+      "topSourceId": "safety",
+      "sentCharacters": 2949,
+      "selectedChunks": 3,
+      "totalSourceCharacters": 82668,
+      "sourceIds": [
+        "safety",
+        "safety",
+        "safety"
+      ]
+    },
+    {
+      "id": "Q06",
+      "query": "남부체육관 점검 날짜",
+      "expectedSourceId": "safety",
+      "expectedText": "6월 22일",
+      "pass": true,
+      "topSourceId": "safety",
+      "sentCharacters": 2949,
+      "selectedChunks": 3,
+      "totalSourceCharacters": 82668,
+      "sourceIds": [
+        "safety",
+        "safety",
+        "safety"
+      ]
+    },
+    {
+      "id": "Q07",
+      "query": "교육사업 강사비 금액",
+      "expectedSourceId": "budget",
+      "expectedText": "1,200만원",
+      "pass": true,
+      "topSourceId": "budget",
+      "sentCharacters": 7875,
+      "selectedChunks": 8,
+      "totalSourceCharacters": 82668,
+      "sourceIds": [
+        "budget",
+        "budget",
+        "budget",
+        "edu2026",
+        "edu2025",
+        "edu2025",
+        "edu2025",
+        "edu2026"
+      ]
+    },
+    {
+      "id": "Q08",
+      "query": "교육사업 기자재 구입비",
+      "expectedSourceId": "budget",
+      "expectedText": "800만원",
+      "pass": true,
+      "topSourceId": "budget",
+      "sentCharacters": 7875,
+      "selectedChunks": 8,
+      "totalSourceCharacters": 82668,
+      "sourceIds": [
+        "budget",
+        "budget",
+        "budget",
+        "edu2026",
+        "edu2025",
+        "edu2025",
+        "edu2025",
+        "edu2026"
+      ]
+    },
+    {
+      "id": "Q09",
+      "query": "대외 공문 수신란 작성 기준",
+      "expectedSourceId": "letter",
+      "expectedText": "기관장의 직위",
+      "pass": true,
+      "topSourceId": "letter",
+      "sentCharacters": 2944,
+      "selectedChunks": 3,
+      "totalSourceCharacters": 82668,
+      "sourceIds": [
+        "letter",
+        "letter",
+        "letter"
+      ]
+    },
+    {
+      "id": "Q10",
+      "query": "공문 붙임 문서 수량 표기",
+      "expectedSourceId": "letter",
+      "expectedText": "각 1부",
+      "pass": true,
+      "topSourceId": "letter",
+      "sentCharacters": 2944,
+      "selectedChunks": 3,
+      "totalSourceCharacters": 82668,
+      "sourceIds": [
+        "letter",
+        "letter",
+        "letter"
+      ]
+    },
+    {
+      "id": "Q11",
+      "query": "생활불편 신고 처리 기간",
+      "expectedSourceId": "complaint",
+      "expectedText": "7일",
+      "pass": true,
+      "topSourceId": "complaint",
+      "sentCharacters": 3945,
+      "selectedChunks": 4,
+      "totalSourceCharacters": 82668,
+      "sourceIds": [
+        "complaint",
+        "complaint",
+        "complaint",
+        "edu2026"
+      ]
+    },
+    {
+      "id": "Q12",
+      "query": "생활불편 민원 처리 결과 통지 수단",
+      "expectedSourceId": "complaint",
+      "expectedText": "전자우편",
+      "pass": true,
+      "topSourceId": "complaint",
+      "sentCharacters": 5886,
+      "selectedChunks": 6,
+      "totalSourceCharacters": 82668,
+      "sourceIds": [
+        "complaint",
+        "complaint",
+        "complaint",
+        "edu2025",
+        "edu2025",
+        "edu2025"
+      ]
+    }
+  ],
+  "passed": 12,
+  "total": 12,
+  "noMatchReferences": 0,
+  "meanSentCharacters": 5739
+}

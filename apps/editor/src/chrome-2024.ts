@@ -12,6 +12,7 @@ const tabs: Record<string, Group[]> = {
     { label: '찾기', commands: ['edit:find', 'edit:find-replace', 'edit:goto'] },
   ],
   view: [
+    { label: '작업 창', commands: ['ext:jueony-navigation-pane'] },
     { label: '표시', commands: ['view:para-mark', 'view:ctrl-mark', 'view:toggle-grid'] },
     { label: '확대/축소', commands: ['view:zoom-dialog', 'view:zoom-fit-page', 'view:zoom-fit-width', 'view:zoom-100'] },
   ],

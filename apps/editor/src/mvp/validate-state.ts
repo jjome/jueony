@@ -1,3 +1,4 @@
+import {assertTemplate} from '../macros/commands.ts';
 import type { AppState } from './model.ts';
 
 type ObjectValue = Record<string, unknown>;
@@ -103,10 +104,12 @@ export function validateAppState(value: unknown): AppState {
   const split = number(state.split, 'state.split'); if (split > 100) fail('state.split');
   if (state.agentWidth !== undefined) number(state.agentWidth, 'state.agentWidth');
   if (state.sidebarHidden !== undefined && typeof state.sidebarHidden !== 'boolean') fail('state.sidebarHidden');
+  for(const key of ['focusMode','retrieveSources','reviewBeforeApply']) if(state[key]!==undefined&&typeof state[key]!=='boolean')fail('state.'+key);
   const belongs = (item: ObjectValue, field: string): string => {
     const id = text(item.workspaceId, field + '.workspaceId', true);
     if (!workspaces.has(id)) fail(field + '.workspaceId'); return id;
   };
+  if(state.macros!==undefined)for(const macro of records(state.macros,'macros').values()){belongs(macro,'macros');text(macro.name,'macros.name',true);number(macro.createdAt,'macros.createdAt');try{assertTemplate(macro.template);}catch{fail('macros.template');}}
   let index = 0;
   for (const workspace of workspaces.values()) {
     const field = 'workspaces[' + index++ + ']';
@@ -151,6 +154,17 @@ export function validateAppState(value: unknown): AppState {
       text(source.sha256, field + '.sources.sha256'); optionalText(source, 'limitation', field + '.sources');
     }
     if (run.usedSourceIds !== undefined) strings(run.usedSourceIds, field + '.usedSourceIds');
+    if(run.retrieval!==undefined){
+      const r=object(run.retrieval,field+'.retrieval');if(r.mode!=='lexical')fail(field+'.retrieval.mode');
+      for(const key of ['selectedSourceCount','indexedChunkCount','matchedChunkCount','sentCharacters','totalSourceCharacters'])integer(r[key],field+'.retrieval.'+key);
+      strings(r.warnings,field+'.retrieval.warnings');
+      for(const raw of list(r.hits,field+'.retrieval.hits')){const hit=object(raw,field+'.retrieval.hits');for(const key of ['id','sourceId','name','sourceSha256','contentSha256'])text(hit[key],field+'.retrieval.hits.'+key,true);for(const key of ['start','end','startLine','endLine'])integer(hit[key],field+'.retrieval.hits.'+key);number(hit.score,field+'.retrieval.hits.score');}
+    }
+    if(run.events!==undefined){
+      const events=list(run.events,field+'.events');if(events.length>40)fail(field+'.events');
+      for(const raw of events){const event=object(raw,field+'.events');if(!['generating','reviewing','validated','ready','applying','completed','stopped'].includes(text(event.phase,field+'.events.phase')))fail(field+'.events.phase');for(const key of ['call','maxCalls','elapsedMs'])number(event[key],field+'.events.'+key);}
+    }
+    if(run.macroTemplate!==undefined){try{assertTemplate(run.macroTemplate);}catch{fail(field+'.macroTemplate');}}
     if (run.receipt !== undefined) {
       const receipt = object(run.receipt, field + '.receipt');
       if (receipt.runId !== run.id) fail(field + '.receipt.runId');

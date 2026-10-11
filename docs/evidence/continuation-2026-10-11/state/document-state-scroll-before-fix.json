@@ -1,0 +1,181 @@
+{
+  "status": "FAIL",
+  "stage": "document-specific numeric zoom",
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 210\n",
+  "results": [
+    {
+      "name": "first unconfigured document retains existing engine defaults"
+    },
+    {
+      "name": "saving new-document settings does not mutate the existing document or revision"
+    },
+    {
+      "name": "new blank document uses stored landscape, margins and real engine font properties",
+      "detail": {
+        "page": {
+          "width": 59528,
+          "height": 84189,
+          "marginLeft": 6236,
+          "marginRight": 5102,
+          "marginTop": 5669,
+          "marginBottom": 4252,
+          "marginHeader": 4252,
+          "marginFooter": 4252,
+          "marginGutter": 0,
+          "landscape": true,
+          "binding": 0
+        },
+        "font": {
+          "fontFamily": "맑은 고딕",
+          "fontSize": 1300,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "underlineType": "None",
+          "underlineColor": "#000000",
+          "strikethrough": false,
+          "strikeColor": "#000000",
+          "textColor": "#000000",
+          "shadeColor": "#ffffff",
+          "shadowType": 0,
+          "shadowColor": "#b2b2b2",
+          "shadowOffsetX": 10,
+          "shadowOffsetY": 10,
+          "outlineType": 0,
+          "subscript": false,
+          "superscript": false,
+          "emboss": false,
+          "engrave": false,
+          "emphasisDot": 0,
+          "underlineShape": 0,
+          "strikeShape": 0,
+          "kerning": false,
+          "charShapeId": 7,
+          "fontFamilies": [
+            "맑은 고딕",
+            "맑은 고딕",
+            "맑은 고딕",
+            "맑은 고딕",
+            "맑은 고딕",
+            "맑은 고딕",
+            "맑은 고딕"
+          ],
+          "ratios": [
+            100,
+            100,
+            100,
+            100,
+            100,
+            100,
+            100
+          ],
+          "spacings": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "relativeSizes": [
+            100,
+            100,
+            100,
+            100,
+            100,
+            100,
+            100
+          ],
+          "charOffsets": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "borderFillId": 2,
+          "borderLeft": {
+            "type": 0,
+            "width": 0,
+            "color": "#000000"
+          },
+          "borderRight": {
+            "type": 0,
+            "width": 0,
+            "color": "#000000"
+          },
+          "borderTop": {
+            "type": 0,
+            "width": 0,
+            "color": "#000000"
+          },
+          "borderBottom": {
+            "type": 0,
+            "width": 0,
+            "color": "#000000"
+          },
+          "fillType": "none",
+          "fillColor": "#ffffff",
+          "patternColor": "#999999",
+          "patternType": -1
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@rhwp/core@0.8.7",
+    "builtAt": "2026-10-11T07:48:15.938Z",
+    "engineWasmSha256": "54cf95014312e605c51b98eb9021247ea79ef2bbd0a7080e11c011d0246e3989",
+    "buildScriptSha256": "616a64e79bf8055e0f95b184e9bed3f3ba53aeee6d0de9f371d0195700128ab2",
+    "customSourceSha256": "a36838e9af588ef07330151aa7ec7444be9c55ffb814f61c2795a4883a6b6a72",
+    "applicationSourceCommit": "06f5a396e98747def012ca68b51a76524784db1f",
+    "applicationSourceDirty": true,
+    "sourceBuild": false,
+    "note": "Rust 엔진은 공식 npm WASM 바이너리 사용. 이 빌드에서 Rust 엔진을 재컴파일하지 않음."
+  },
+  "profile": "C:\\Users\\jjome\\AppData\\Local\\Temp\\jueony-document-state-3DRIT8",
+  "statusMessage": "새 문서 기본값을 저장했습니다. 다음 새 문서부터 적용합니다.",
+  "frames": [
+    {
+      "hidden": false,
+      "url": "http://127.0.0.1:4205/editor.html?child=1&skipRecovery=1&storage=download",
+      "state": {
+        "name": "새 문서.hwp",
+        "pageCount": 1,
+        "dirty": false,
+        "revision": "1:0"
+      },
+      "view": {
+        "version": 1,
+        "zoom": 1.25,
+        "fitMode": "none",
+        "scrollX": 316,
+        "scrollY": 210
+      }
+    },
+    {
+      "hidden": true,
+      "url": "http://127.0.0.1:4205/editor.html?child=1&skipRecovery=1&storage=download",
+      "state": {
+        "name": "새 문서.hwp",
+        "pageCount": 1,
+        "dirty": false,
+        "revision": "1:0"
+      },
+      "view": {
+        "version": 1,
+        "zoom": 0.8,
+        "fitMode": "none",
+        "scrollX": 268,
+        "scrollY": 0
+      }
+    }
+  ]
+}

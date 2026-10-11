@@ -1,4 +1,4 @@
-﻿param([string]$OutputName = 'jueony-mvp',[string]$FrontendProfile = '')
+﻿param([string]$OutputName = 'jueony-mvp',[string]$FrontendProfile = '',[ValidateRange(1024,65535)][int]$ReviewPort = 4173)
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $env:RUSTUP_HOME = Join-Path $projectRoot '.tools/rustup'
@@ -10,15 +10,19 @@ $frontend = if ($FrontendProfile) { Join-Path $projectRoot ('apps/editor/evidenc
 if (-not (Test-Path -LiteralPath (Join-Path $frontend 'build-evidence.json'))) { throw '프런트엔드 빌드를 먼저 실행해 주세요.' }
 $output = Join-Path $projectRoot ('build/' + $OutputName)
 New-Item -ItemType Directory -Force $output | Out-Null
-& $compiler --edition 2021 -O (Join-Path $projectRoot 'apps/launcher/main.rs') -o (Join-Path $output 'JueonyEditor.exe')
-if ($LASTEXITCODE -ne 0) { throw 'Rust 런처 빌드 실패' }
+$previousLauncherAddress = $env:JUEONY_LAUNCHER_ADDRESS
+try {
+    $env:JUEONY_LAUNCHER_ADDRESS = "127.0.0.1:$ReviewPort"
+    & $compiler --edition 2021 -O (Join-Path $projectRoot 'apps/launcher/main.rs') -o (Join-Path $output 'JueonyEditor.exe')
+    if ($LASTEXITCODE -ne 0) { throw 'Rust 런처 빌드 실패' }
+} finally { $env:JUEONY_LAUNCHER_ADDRESS = $previousLauncherAddress }
 $frontendOutput = Join-Path $output 'dist'
 New-Item -ItemType Directory -Force $frontendOutput | Out-Null
 Get-ChildItem -LiteralPath $frontend -Force | Copy-Item -Destination $frontendOutput -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/fixtures') -Destination $output -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/README.md') -Destination (Join-Path $output 'README.md') -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/12-mvp-implementation.md') -Destination (Join-Path $output 'MVP-GUIDE.md') -Force
-foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.md', '15-ai-editor-control-plan.md', '16-hangul-shortcuts-plan.md', '17-editor-control-implementation.md', '18-pane-resize-agent-check.md', '19-agent-interaction-fix.md', '20-native-providers-and-editing.md', '21-public-document-validation.md', '22-agent-retrieval-execution-design.md', '23-autonomous-work-result.md', '24-next-development-plan.md', '25-hangul-parity-and-state-plan.md', '26-parallel-execution-plan.md', '27-parity-foundation-result.md', 'hangul-2024-feature-audit.csv', 'editor-state-contract.csv', 'agent-evaluation-cases.csv', 'ai-editor-capability-matrix.csv')) {
+foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.md', '15-ai-editor-control-plan.md', '16-hangul-shortcuts-plan.md', '17-editor-control-implementation.md', '18-pane-resize-agent-check.md', '19-agent-interaction-fix.md', '20-native-providers-and-editing.md', '21-public-document-validation.md', '22-agent-retrieval-execution-design.md', '23-autonomous-work-result.md', '24-next-development-plan.md', '25-hangul-parity-and-state-plan.md', '26-parallel-execution-plan.md', '27-parity-foundation-result.md', '28-continuation-implementation.md', 'hangul-2024-feature-audit.csv', 'editor-state-contract.csv', 'agent-evaluation-cases.csv', 'ai-editor-capability-matrix.csv')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
 $llmEvidence = Join-Path $output 'evidence'
@@ -49,9 +53,10 @@ foreach ($supportFile in @('connection-store.mjs', 'credential-protect.ps1')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot ('apps/launcher/' + $supportFile)) -Destination $output -Force
 }
 Copy-Item -LiteralPath (Join-Path $projectRoot 'scripts/Start-Jueony.ps1') -Destination (Join-Path $output 'Start-Jueony.ps1') -Force
-$startCmd = "@echo off" + [Environment]::NewLine + 'powershell.exe -NoProfile -File "%~dp0Start-Jueony.ps1"' + [Environment]::NewLine + 'if errorlevel 1 pause' + [Environment]::NewLine
+$startCmd = "@echo off" + [Environment]::NewLine + ('powershell.exe -NoProfile -File "%~dp0Start-Jueony.ps1" -Port ' + $ReviewPort) + [Environment]::NewLine + 'if errorlevel 1 pause' + [Environment]::NewLine
 [IO.File]::WriteAllText((Join-Path $output 'Start-Jueony.cmd'), $startCmd, [Text.Encoding]::ASCII)
-$restartCmd = "@echo off" + [Environment]::NewLine + 'echo Save your documents and close Jueony windows before restarting.' + [Environment]::NewLine + 'powershell.exe -NoProfile -File "%~dp0Start-Jueony.ps1" -RestartServer' + [Environment]::NewLine + 'if errorlevel 1 pause' + [Environment]::NewLine
+if ($ReviewPort -ne 4173) { [IO.File]::WriteAllText((Join-Path $output 'Start-Review.cmd'), $startCmd, [Text.Encoding]::ASCII) }
+$restartCmd = "@echo off" + [Environment]::NewLine + 'echo Save your documents and close Jueony windows before restarting.' + [Environment]::NewLine + ('powershell.exe -NoProfile -File "%~dp0Start-Jueony.ps1" -Port ' + $ReviewPort + ' -RestartServer') + [Environment]::NewLine + 'if errorlevel 1 pause' + [Environment]::NewLine
 [IO.File]::WriteAllText((Join-Path $output 'Restart-Jueony.cmd'), $restartCmd, [Text.Encoding]::ASCII)
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/editor-control-2026-10-11') -Destination $llmEvidence -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/pane-agent-2026-10-11') -Destination $llmEvidence -Recurse -Force
@@ -59,11 +64,19 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/agent-interaction-
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/native-agent-2026-10-11') -Destination $llmEvidence -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/claude-live-fix-2026-10-11') -Destination $llmEvidence -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/launcher/providers') -Destination $output -Recurse -Force
+Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/continuation-2026-10-11') -Destination $llmEvidence -Recurse -Force
+$reviewDocuments = Join-Path $output 'review-documents'
+New-Item -ItemType Directory -Force $reviewDocuments | Out-Null
+foreach ($relative in @('behavior', 'state', 'agent/preflight')) {
+    Get-ChildItem -LiteralPath (Join-Path $projectRoot ('docs/evidence/continuation-2026-10-11/' + $relative)) -File |
+        Where-Object { $_.Extension -in @('.hwp', '.hwpx') } | Copy-Item -Destination $reviewDocuments -Force
+}
 $nodeVersion = & (Join-Path $runtimePath 'node.exe') --version
 $providerHashes = [ordered]@{}
 Get-ChildItem -LiteralPath (Join-Path $output 'providers') -Filter '*.mjs' | Sort-Object Name | ForEach-Object { $providerHashes[$_.Name] = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash }
 $manifest = [ordered]@{
     createdAt = (Get-Date).ToUniversalTime().ToString('o')
+    reviewPort = $ReviewPort
     nodeVersion = $nodeVersion
     nodeSha256 = (Get-FileHash -LiteralPath (Join-Path $runtimePath 'node.exe') -Algorithm SHA256).Hash
     launcherSha256 = (Get-FileHash -LiteralPath (Join-Path $output 'JueonyEditor.exe') -Algorithm SHA256).Hash

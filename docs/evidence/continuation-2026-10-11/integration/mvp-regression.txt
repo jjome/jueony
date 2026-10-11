@@ -1,0 +1,20 @@
+PASS three panes and live editor ready
+PASS unconfigured Enter request shows an inline error without changing the document
+PASS second window cannot overwrite workspace storage
+PASS provider and model configuration
+PASS two linked directory handles and tree
+PASS chat to real editor new document, selected reference and model passed
+PASS one request edits multiple positions without approval
+PASS request-level undo through engine history
+PASS actual HWP UI downloads and HWP/HWPX round trips for created/applied/reverted documents
+PASS cancelled late response does not edit
+PASS concurrent engine mutation rejects stale generation
+PASS request undo cannot erase a later edit
+PASS tree HWPX opens and selected live reference includes unsaved content
+PASS credential absent from persisted app state
+PASS independent chats
+PASS workspace isolation
+PASS manual keyboard input changes the same live document
+PASS restart restores workspace chats folders and documents
+PASS connection credentials can be cleared explicitly
+{"passed":19,"errors":[]}

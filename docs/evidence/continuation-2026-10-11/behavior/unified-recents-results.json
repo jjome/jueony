@@ -1,0 +1,14 @@
+{
+  "passed": 4,
+  "checks": [
+    "Host file-open creates two distinct recent-store IDs with serialized OPFS handles for same-name files",
+    "Opening the unified File menu refreshes records and recent item A reopens its exact original text and handle",
+    "The other same-name recent item resolves its own ID and reads the changed live file, not a cached snapshot or item A",
+    "Missing recent ID returns an explicit failure without changing the current document"
+  ],
+  "errors": [],
+  "external": [],
+  "port": 4211,
+  "editorHtmlSha256": "68db029895e2d43358df75761a80f34fc36f175c9ca5c378a972f5ca4bb245a4",
+  "limitation": "Uses synthetic OPFS handles in a fresh headless Edge profile; native OS file-picker permissions are not exercised."
+}

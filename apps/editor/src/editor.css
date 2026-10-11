@@ -62,3 +62,24 @@
 .j-download-buttons { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
 .j-download-buttons button { padding: 7px 12px; border: 1px solid #bcc7d3; background: #f6f8fb; border-radius: 2px; cursor: pointer; }
 .j-download-buttons button[value="saved"] { background: #087fae; border-color: #087fae; color: white; }
+/* The host exposes unified menus only after its command bridge is ready. */
+:root[data-unified-chrome="true"] #jueony-title,
+:root[data-unified-chrome="true"] #menu-bar,
+:root[data-unified-chrome="true"] #jueony-ribbon,
+:root[data-unified-chrome="true"] .j-quick-access { display: none !important; }
+:root[data-navigation-pane="open"] #jueony-style-panel { display: none; }
+#jueony-navigation-pane { flex: 0 0 270px; width: 270px; max-width: 45%; min-width: 190px; min-height: 0; display: flex; flex-direction: column; border-left: 1px solid #d9dfe7; background: #fafbfc; color: #354550; font: 12px 'Malgun Gothic', sans-serif; }
+.j-search-form { display: flex; gap: 4px; padding: 0 10px; }
+.j-search-form input { width: 100%; min-width: 0; padding: 6px; border: 1px solid #bdcbd9; }
+.j-search-form button, .j-search-controls button { border: 1px solid #c6d2dd; padding: 4px 8px; background: white; color: #354550; cursor: pointer; }
+.j-search-option { display: flex; align-items: center; gap: 5px; padding: 8px; }
+.j-search-controls { display: flex; gap: 6px; padding: 0 10px; }
+.j-search-controls button:disabled { opacity: .45; cursor: default; }
+.j-search-status { margin: 8px 12px; min-height: 18px; }
+.j-search-results { flex: 1; min-height: 0; overflow: auto; padding: 0 8px; }
+.j-search-hit { display: block; width: 100%; border: 1px solid transparent; border-bottom-color: #e0e6ec; padding: 8px; background: transparent; text-align: left; color: #354550; cursor: pointer; }
+.j-search-hit span, .j-search-hit small { display: block; overflow-wrap: anywhere; line-height: 1.6; }
+.j-search-hit small { color: #657c91; }
+.j-search-hit:hover, .j-search-hit[aria-current="true"] { background: #e4f1fb; border-color: #b6d5eb; }
+.j-search-limit { padding: 8px 12px; margin: 0; border-top: 1px solid #d9dfe7; color: #6a7d90; font-size: 11px; line-height: 1.6; }
+.j-search-form button { flex: 0 0 auto; white-space: nowrap; }

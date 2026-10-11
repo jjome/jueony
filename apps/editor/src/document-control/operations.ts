@@ -190,7 +190,8 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
     if (Object.keys(chars).length && length) checked(doc.applyCharFormatInCell(...base, cell.index, 0, 0, length, JSON.stringify(chars)));
     if (p.alignment) checked(doc.applyParaFormatInCell(...base, cell.index, 0, JSON.stringify({ alignment: p.alignment })));
     const cp: any = {};
-    if (p.background) Object.assign(cp, { fillType: 'solid', fillColor: p.background });
+    // OWPML omits hatchStyle for plain fills; -1 is the engine's no-pattern value.
+    if (p.background) Object.assign(cp, { fillType: 'solid', fillColor: p.background, patternType: -1 });
     if (p.verticalAlignment) cp.verticalAlign = ['top', 'center', 'bottom'].indexOf(p.verticalAlignment);
     if (Object.keys(cp).length) checked(doc.setCellProperties(...base, cell.index, JSON.stringify(cp)));
   }

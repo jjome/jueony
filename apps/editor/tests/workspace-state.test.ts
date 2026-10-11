@@ -116,3 +116,8 @@ test('structural receipt malformed arrays are blocked before diff UI reads them'
   validateAppState(state);
   state.runs[0].receipt.beforeStructure.sections = null; rejected(state, /sections/);
 });
+test('corrupt optional retrieval and progress records are rejected before rendering',()=>{
+ const state=fixture();state.runs[0].retrieval={mode:'lexical',hits:null};rejected(state,/retrieval/);
+ delete state.runs[0].retrieval;state.runs[0].events={map:'not an array'};rejected(state,/events/);
+ state.runs[0].events=[{phase:'reviewing',call:2,maxCalls:3,elapsedMs:100}];assert.strictEqual(validateAppState(state),state);
+});

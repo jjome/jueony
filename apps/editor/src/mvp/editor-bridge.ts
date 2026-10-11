@@ -8,7 +8,7 @@ import { executeDocumentOperations } from '../document-control/execute.ts';
 import { readStructure } from '../document-control/structure.ts';
 import { plainSnapshot } from './model.ts';
 import type { Snapshot, Receipt, Generation } from './model.ts';
-type Deps={wasm:any;eventBus:any;documentState:any;ready:Promise<unknown>;load:(bytes:Uint8Array,name:string,handle:any)=>Promise<void>;input:()=>any;render:()=>Promise<void>;automation:any;};
+type Deps={wasm:any;eventBus:any;documentState:any;ready:Promise<unknown>;load:(bytes:Uint8Array,name:string,handle:any)=>Promise<void>;input:()=>any;render:()=>Promise<void>;automation:any;refreshMenus:()=>Promise<void>;};
 export function installAgentBridge(d:Deps){
  const api=(window as any).jueonyEditor;let applying=false,composing=false,damaged=false;
  const applied=new Map<string,Receipt>();
@@ -39,6 +39,55 @@ export function installAgentBridge(d:Deps){
  }
  Object.assign(api,{
   snapshot,
+  toolbarsVisible:()=>document.documentElement.dataset.toolboxBasic!=='hidden',
+  commands:()=>d.automation.listCommands(),
+  prepareMenus:()=>d.refreshMenus(),
+  menus:()=>{
+   const model=d.automation.getMenuModel();
+   const ids=Array.from(document.querySelectorAll<HTMLElement>('#recent-docs-panel [data-cmd="file:open-recent"]')).map(el=>el.dataset.id);let recent=0;
+   const visit=(nodes:any[])=>{for(const node of nodes){if(node.commandId==='file:open-recent'){const id=ids[recent++];node.params=id?{id}:undefined;node.enabled=node.enabled&&Boolean(id);}if(node.submenu)visit(node.submenu);}};
+   for(const menu of model)visit(menu.items);return model;
+  },
+  focusEditor:()=>d.input()?.focus(),
+  executeCommand(id:string,params?:Record<string,unknown>){
+   if(applying||damaged||api.busy()||composing)throw new Error('문서 작업 또는 한글 조합이 끝난 뒤 실행해 주세요.');
+   d.input()?.focus();
+   if(id==='file:open-recent'&&typeof params?.id!=='string')return {ok:false,message:'최근 문서 식별자가 없습니다. 파일 메뉴를 다시 열어 주세요.'};
+   return d.automation.execute(id,params,{allowDialog:true});
+  },
+  async preflight(base:Snapshot,generation:Generation){
+   if(applying||damaged||api.busy()||composing)throw new Error('문서 작업이 끝난 뒤 다시 요청해 주세요.');
+   assertRevision(base.revision,revision());
+   const validated=validateGeneration(generation,base,generation.sourceIds);
+   const {HwpDocument}=d.wasm.getWasmModuleExports();
+   const creating=validated.operations[0]?.kind==='create_document';
+   let copy=creating?HwpDocument.createEmpty():new HwpDocument(recoveryBytes(d.wasm,d.wasm.fileName));
+   try{
+    if(creating){
+     copy.createBlankDocument();
+     // Establish the same file-format defaults as a freshly opened document.
+     // HWPX normalizes unused background metadata on its first serialization.
+     const initial=d.wasm.fileName.toLowerCase().endsWith('.hwpx')?copy.exportHwpxWithReport():copy.exportHwpWithReport();
+     try{
+      if(JSON.parse(initial.contentLoss()).count!==0)throw new Error('새 문서 사전 검사 초기화 중 손실이 보고되었습니다.');
+      const initialized=new HwpDocument(initial.takeBytes());copy.free();copy=initialized;
+     }finally{initial.free();}
+    }
+    if(!creating){
+     const text:string[]=[];for(let s=0;s<copy.getSectionCount();s++)for(let p=0;p<copy.getParagraphCount(s);p++)text.push(copy.getTextRange(s,p,0,copy.getParagraphLength(s,p)));
+     if(text.join('\n')!==plainSnapshot(base))throw new Error('사전 검사용 사본이 원문과 다릅니다. 문서에 적용하지 않았습니다.');
+    }
+    executeDocumentOperations(copy,base,validated.operations);
+    const artifact=d.wasm.fileName.toLowerCase().endsWith('.hwpx')?copy.exportHwpxWithReport():copy.exportHwpWithReport();
+    try{
+     const loss=JSON.parse(artifact.contentLoss());if(loss.count!==0)throw new Error('편집 결과 저장 시 내용 손실이 보고되어 문서에 적용하지 않았습니다.');
+     const reopened=new HwpDocument(artifact.takeBytes());
+     try{if(textOf(copy)!==textOf(reopened)||JSON.stringify(readStructure(copy))!==JSON.stringify(readStructure(reopened)))throw new Error('편집 사본을 저장 후 다시 열었을 때 내용·구조가 달라져 적용하지 않았습니다.');}finally{reopened.free();}
+    }
+    finally{artifact.free();}
+   }finally{copy.free();}
+   assertRevision(base.revision,revision());
+  },
   documentIdentity:()=>String(d.wasm.documentGeneration)+':'+d.wasm.fileName,
   async open(bytes:Uint8Array,name:string,handle:any=null,dirty=false){await d.ready;if(api.busy()||applying)throw new Error('문서 작업 중입니다.');await d.load(bytes,name,handle);if(handle)await rememberFileSnapshot(handle,bytes);if(dirty)d.documentState.markDirty('workspace-recovery');},
   async restoreFileConnection(connection:StoredFileConnection,requestPermission=false){
@@ -58,6 +107,8 @@ export function installAgentBridge(d:Deps){
    assertRevision(base.revision,revision());
    const validated=validateGeneration(generation,base,generation.sourceIds);
    if(!validated.operations.length)throw new Error('적용할 명령이 없습니다.');
+   await api.preflight(base,validated);assertRevision(base.revision,revision());
+   if(applying||damaged||api.busy()||composing)throw new Error('검사 중 다른 문서 작업이 시작되어 적용하지 않았습니다.');
    const before=plainSnapshot(base),beforeBytes=d.wasm.exportHwp();let executed=false;
    applying=true;const root=document.getElementById('studio-root')!;const inert=root.inert;root.inert=true;
    const overlay=Object.assign(document.createElement('div'),{id:'jueony-busy',textContent:'AI 변경을 문서에 적용하고 있습니다…'});document.body.append(overlay);

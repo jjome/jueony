@@ -1,0 +1,183 @@
+{
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@rhwp/core@0.8.7",
+    "builtAt": "2026-10-11T07:51:43.586Z",
+    "engineWasmSha256": "54cf95014312e605c51b98eb9021247ea79ef2bbd0a7080e11c011d0246e3989",
+    "buildScriptSha256": "70105f7ac1c9984398ad5303e99cca06f93efb775ee95c82e884280194075fea",
+    "customSourceSha256": "1ec814c563d89a7970842de783447bf119a190ef688d6dc49bdf6d0d00aac613",
+    "applicationSourceCommit": "06f5a396e98747def012ca68b51a76524784db1f",
+    "applicationSourceDirty": true,
+    "sourceBuild": false,
+    "note": "Rust 엔진은 공식 npm WASM 바이너리 사용. 이 빌드에서 Rust 엔진을 재컴파일하지 않음."
+  },
+  "results": [
+    {
+      "id": "create-empty-document",
+      "format": "hwp",
+      "status": "PASS",
+      "apply": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "character-format",
+      "format": "hwp",
+      "status": "PASS",
+      "apply": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "paragraph-format",
+      "format": "hwp",
+      "status": "PASS",
+      "apply": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "table-cell-style",
+      "format": "hwp",
+      "status": "PASS",
+      "apply": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "table-axis-batch",
+      "format": "hwp",
+      "status": "PASS",
+      "apply": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "page-setup",
+      "format": "hwp",
+      "status": "PASS",
+      "apply": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "mixed-controls",
+      "format": "hwp",
+      "status": "PASS",
+      "apply": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "create-empty-document",
+      "format": "hwpx",
+      "status": "FAIL",
+      "error": "렌더링 오류: XML 쓰기 실패: 미등록 ID 참조 발견: charPrIDRef: [0]",
+      "errorName": "ThrownValue",
+      "unchanged": true,
+      "nativeStructureDiff": [],
+      "nativeTextEqual": true
+    },
+    {
+      "id": "character-format",
+      "format": "hwpx",
+      "status": "PASS",
+      "apply": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "paragraph-format",
+      "format": "hwpx",
+      "status": "PASS",
+      "apply": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "table-cell-style",
+      "format": "hwpx",
+      "status": "FAIL",
+      "error": "편집 사본을 저장 후 다시 열었을 때 내용·구조가 달라져 적용하지 않았습니다.",
+      "errorName": "Error",
+      "unchanged": true,
+      "nativeStructureDiff": [
+        {
+          "path": "/tables/0/cells/0/properties/patternType",
+          "before": 0,
+          "after": -1
+        },
+        {
+          "path": "/tables/0/cells/1/properties/patternType",
+          "before": 0,
+          "after": -1
+        }
+      ],
+      "nativeTextEqual": true
+    },
+    {
+      "id": "table-axis-batch",
+      "format": "hwpx",
+      "status": "PASS",
+      "apply": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "page-setup",
+      "format": "hwpx",
+      "status": "PASS",
+      "apply": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "mixed-controls",
+      "format": "hwpx",
+      "status": "FAIL",
+      "error": "편집 사본을 저장 후 다시 열었을 때 내용·구조가 달라져 적용하지 않았습니다.",
+      "errorName": "Error",
+      "unchanged": true,
+      "nativeStructureDiff": [
+        {
+          "path": "/tables/0/cells/0/properties/patternType",
+          "before": 0,
+          "after": -1
+        },
+        {
+          "path": "/tables/0/cells/1/properties/patternType",
+          "before": 0,
+          "after": -1
+        },
+        {
+          "path": "/tables/0/cells/2/properties/patternType",
+          "before": 0,
+          "after": -1
+        }
+      ],
+      "nativeTextEqual": true
+    },
+    {
+      "id": "public-notes-hwpx-preflight",
+      "format": "hwpx",
+      "status": "PASS",
+      "unchanged": true,
+      "sourceSha256": "e353969fefeebb041d51549f5019a0df23a99bab89b18f10bf937274418bfa21"
+    }
+  ],
+  "errors": [],
+  "external": [],
+  "note": "Actual installed editor bridge applies synthetic commands only; original public notes read-only. Hancom independent rendering remains pending."
+}

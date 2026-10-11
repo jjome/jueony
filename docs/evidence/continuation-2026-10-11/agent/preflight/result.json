@@ -1,0 +1,181 @@
+{
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@rhwp/core@0.8.7",
+    "builtAt": "2026-10-11T07:59:53.093Z",
+    "engineWasmSha256": "54cf95014312e605c51b98eb9021247ea79ef2bbd0a7080e11c011d0246e3989",
+    "buildScriptSha256": "1d8f9fc1cac4791894515c6a5e4eed4511799b692f526519ce058ca815c89455",
+    "customSourceSha256": "4de202d3a110c62842fc1958da340fa8fdc4261e10be604eb5bb080be2caa112",
+    "applicationSourceCommit": "06f5a396e98747def012ca68b51a76524784db1f",
+    "applicationSourceDirty": true,
+    "sourceBuild": false,
+    "note": "Rust 엔진은 공식 npm WASM 바이너리 사용. 이 빌드에서 Rust 엔진을 재컴파일하지 않음."
+  },
+  "results": [
+    {
+      "id": "create-empty-document",
+      "format": "hwp",
+      "status": "PASS",
+      "apply": true,
+      "savedStructureDiff": [],
+      "structurePreserved": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "character-format",
+      "format": "hwp",
+      "status": "PASS",
+      "apply": true,
+      "savedStructureDiff": [],
+      "structurePreserved": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "paragraph-format",
+      "format": "hwp",
+      "status": "PASS",
+      "apply": true,
+      "savedStructureDiff": [],
+      "structurePreserved": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "table-cell-style",
+      "format": "hwp",
+      "status": "PASS",
+      "apply": true,
+      "savedStructureDiff": [],
+      "structurePreserved": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "table-axis-batch",
+      "format": "hwp",
+      "status": "PASS",
+      "apply": true,
+      "savedStructureDiff": [],
+      "structurePreserved": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "page-setup",
+      "format": "hwp",
+      "status": "PASS",
+      "apply": true,
+      "savedStructureDiff": [],
+      "structurePreserved": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "mixed-controls",
+      "format": "hwp",
+      "status": "PASS",
+      "apply": true,
+      "savedStructureDiff": [],
+      "structurePreserved": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "create-empty-document",
+      "format": "hwpx",
+      "status": "PASS",
+      "apply": true,
+      "savedStructureDiff": [],
+      "structurePreserved": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "character-format",
+      "format": "hwpx",
+      "status": "PASS",
+      "apply": true,
+      "savedStructureDiff": [],
+      "structurePreserved": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "paragraph-format",
+      "format": "hwpx",
+      "status": "PASS",
+      "apply": true,
+      "savedStructureDiff": [],
+      "structurePreserved": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "table-cell-style",
+      "format": "hwpx",
+      "status": "PASS",
+      "apply": true,
+      "savedStructureDiff": [],
+      "structurePreserved": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "table-axis-batch",
+      "format": "hwpx",
+      "status": "PASS",
+      "apply": true,
+      "savedStructureDiff": [],
+      "structurePreserved": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "page-setup",
+      "format": "hwpx",
+      "status": "PASS",
+      "apply": true,
+      "savedStructureDiff": [],
+      "structurePreserved": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "mixed-controls",
+      "format": "hwpx",
+      "status": "PASS",
+      "apply": true,
+      "savedStructureDiff": [],
+      "structurePreserved": true,
+      "reopened": true,
+      "bodyPreserved": true,
+      "undo": true
+    },
+    {
+      "id": "public-notes-hwpx-preflight",
+      "format": "hwpx",
+      "status": "PASS",
+      "unchanged": true,
+      "sourceSha256": "e353969fefeebb041d51549f5019a0df23a99bab89b18f10bf937274418bfa21"
+    }
+  ],
+  "errors": [],
+  "external": [],
+  "note": "Actual installed editor bridge applies synthetic commands only; original public notes read-only. Hancom independent rendering remains pending."
+}

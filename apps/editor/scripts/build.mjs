@@ -80,12 +80,18 @@ let main = await readFile(join(root, 'src/main.ts'), 'utf8');
 main = replaceOnce(main, 'confirmSaveBeforeReplacingDocument, fileCommands', 'confirmSaveBeforeReplacingDocument, saveCurrentDocument, fileCommands', 'host save import');
 main = replaceOnce(main, "return params.has('url');", "return params.has('url') || params.get('skipRecovery') === '1';", 'tab recovery');
 main = "import { installHangulKeys } from './jueony/shortcuts/install';\nimport { installAgentBridge } from './jueony/mvp/editor-bridge';\nimport { installDesktopHost } from './jueony/desktop-host';\nimport { installHangulChrome } from './jueony/chrome-2024';\n" + main;
+main = "import {readDocumentDefaults, applyNewDocumentDefaults} from './jueony/preferences/document-defaults.ts';\nimport {createDocumentViewAdapter} from './jueony/preferences/document-view.ts';\nlet jueonyDocumentView: ReturnType<typeof createDocumentViewAdapter> | undefined;\n" + main;
+main = replaceOnce(main, 'const docInfo = wasm.createNewDocument();', `const defaults = new URLSearchParams(location.search).get('skipDefaults') === '1' ? undefined : readDocumentDefaults(localStorage);
+      const docInfo = wasm.createNewDocument();
+      if(defaults && applyNewDocumentDefaults(wasm.borrowDocumentHandle()!, defaults)) docInfo.fontsUsed.push(defaults.font.family);`, 'new document defaults');
+main = replaceOnce(main, "console.error('[main] 새 문서 생성 실패:', error);", "(window as any).__jueonyInitializationError = String(error); console.error('[main] 새 문서 생성 실패:', error);", 'new document error detail');
+main = replaceOnce(main, 'userSettings.setZoomFitMode(normalizeZoomFitMode(mode));', 'if (!jueonyDocumentView?.isRestoring()) userSettings.setZoomFitMode(normalizeZoomFitMode(mode));', 'document view restore does not change default fit');
 main = replaceOnce(main, "const initPromise = initialize();", `const initPromise = initialize();
 installDesktopHost({ wasm, eventBus, documentState, ready: initPromise,
   save: () => saveCurrentDocument(commandServices),
   discard: async () => { await autosaveManager.discardCurrentDraft('tab-discard'); documentState.markClean('tab-discard'); },
 });
-installAgentBridge({ wasm, eventBus, documentState, ready: initPromise, automation, input: () => inputHandler, render: () => canvasView!.refreshDocumentAgentMutation(), load: (bytes, name, handle) => loadBytes(bytes, name, handle) });
+installAgentBridge({ wasm, eventBus, documentState, ready: initPromise, automation, refreshMenus: async () => { recentSubmenuExpanded = true; await renderRecentSubmenu(); }, input: () => inputHandler, render: () => canvasView!.refreshDocumentAgentMutation(), load: (bytes, name, handle) => loadBytes(bytes, name, handle) });
 void initPromise.then(() => { installHangulKeys({ automation, registry, input: () => inputHandler, eventBus }); installHangulChrome({ wasm, eventBus, documentState, automation }); });`, 'desktop host');
 main = replaceOnce(main, 'import { initThemeSync, setThemeMode, getThemeMode, getEffectiveTheme }', 'import { applyTheme, syncThemeMenu, initThemeSync, setThemeMode, getThemeMode, getEffectiveTheme }', 'remote preference theme');
 main += `
@@ -96,13 +102,13 @@ function jueonyApplyPreferences(paths: string[]) {
   if(paths.some(path => path === 'font' || path.startsWith('font.'))) toolbar?.initFontDropdown(currentDocumentFonts);
   if (wasm.pageCount > 0) {
     applySavedTextMarkSettings();
-    if (paths.some(path => path === 'view' || /view\\.(pageArrangement|pageMovement|zoomFitMode)/.test(path))) jueonyPendingView = true;
+    if (paths.some(path => path === 'view' || /view\\.(pageArrangement|pageMovement)/.test(path))) jueonyPendingView = true;
     const view = userSettings.getViewSettings();
     const container = document.getElementById('scroll-container');
     if (jueonyPendingView && container && container.clientWidth > 0) {
       jueonyPendingView = false;
       eventBus.emit('page-view-settings-changed', { arrangement: view.pageArrangement, pageMovement: view.pageMovement });
-      applySavedZoomFitMode(view.zoomFitMode);
+      // Existing tabs own their zoom; the stored fit rule initializes new documents only.
     }
     eventBus.emit('document-view-changed');
   }
@@ -119,6 +125,19 @@ window.addEventListener('jueony:preferences-error', ((event: CustomEvent) => {
   else { const target=document.getElementById('sb-message'); if(target) target.textContent=event.detail.message; }
 }) as EventListener);
 window.addEventListener('resize', () => { if(jueonyPendingView) void initPromise.then(() => jueonyApplyPreferences([])); });
+jueonyDocumentView = createDocumentViewAdapter({
+  viewport: () => canvasView?.getViewportManager(), identity: () => String(wasm.documentGeneration),
+  visible: () => (document.getElementById('scroll-container')?.clientWidth ?? 0) > 0,
+  applyFit: mode => applySavedZoomFitMode(mode),
+  settle: () => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))),
+});
+Object.assign((window as any).jueonyEditor, {captureDocumentView: () => jueonyDocumentView!.capture(),suspendDocumentView: () => jueonyDocumentView!.suspend(),restoreDocumentView: (value: unknown) => jueonyDocumentView!.restore(value)});
+window.addEventListener('resize', () => { void jueonyDocumentView!.retry(); });
+const jueonyRememberView = () => { if (!jueonyDocumentView!.isRestoring()) { jueonyDocumentView!.capture(); if (window.parent !== window) window.parent.postMessage({type:'jueony:status'},location.origin); } };
+document.getElementById('scroll-container')?.addEventListener('scroll', jueonyRememberView, {passive:true});
+eventBus.on('zoom-level-display', jueonyRememberView);
+eventBus.on('command-state-changed', () => { if (window.parent !== window) window.parent.postMessage({type:'jueony:command-state'},location.origin); });
+window.addEventListener('keydown', event => { if(event.key === 'F6' && !event.isComposing && window.parent !== window){event.preventDefault();event.stopImmediatePropagation();window.parent.postMessage({type:'jueony:focus-chat'},location.origin);} },true);
 void initPromise.then(() => userSettings.refreshFromStorage());
 `;
 await writeFile(join(root, 'src/main.ts'), main);

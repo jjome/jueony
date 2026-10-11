@@ -9,3 +9,13 @@ export function buildContext(state:AppState,workspaceId:string,chatId:string,doc
  if(references.reduce((n,s)=>n+s.text.length,0)>120000)throw new Error('참고 자료 한도 120,000자를 넘습니다. 자료를 줄여 주세요.');
  return {request,document,references,history};
 }
+
+/** Opt-in retrieval; the default buildContext continues sending the full selected sources. */
+export async function buildRetrievedContext(state:AppState,workspaceId:string,chatId:string,document:Snapshot,references:Source[],request:string,signal?:AbortSignal){
+ const context=buildContext(state,workspaceId,chatId,document,references,request);
+ const {indexSelectedSources,searchSelectedSources}=await import('../retrieval/selected-sources.ts');
+ signal?.throwIfAborted();const scope={workspaceId,chatId};
+ const index=await indexSelectedSources(scope,references,signal);
+ const selected=searchSelectedSources(index,scope,request,signal);
+ return {context:{...context,references:selected.references},retrieval:selected.retrieval};
+}

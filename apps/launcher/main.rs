@@ -12,7 +12,15 @@ use std::{
     time::Duration,
 };
 
-const ADDRESS: &str = "127.0.0.1:4173";
+// Review bundles use their own origin without replacing an open user server.
+const ADDRESS: &str = match option_env!("JUEONY_LAUNCHER_ADDRESS") {
+    Some(address) => address,
+    None => "127.0.0.1:4173",
+};
+fn configured_port() -> &'static str { ADDRESS.rsplit(':').next().unwrap_or("4173") }
+fn valid_host(value: &str) -> bool {
+    value == ADDRESS || value == format!("localhost:{}", configured_port())
+}
 const CSP: &str = "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data: blob:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'self'";
 
 fn percent_decode(value: &str) -> Option<String> {
@@ -66,7 +74,7 @@ fn respond(mut stream: TcpStream, root: &Path) -> io::Result<()> {
     let method = words.next().unwrap_or("");
     let target = words.next().unwrap_or("");
     let valid_host = lines.any(|line| line.split_once(':').is_some_and(|(key, value)| {
-        key.eq_ignore_ascii_case("host") && matches!(value.trim(), "127.0.0.1:4173" | "localhost:4173")
+        key.eq_ignore_ascii_case("host") && valid_host(value.trim())
     }));
     let path = if valid_host && matches!(method, "GET" | "HEAD") { asset_path(root, target) } else { None };
     match path {
@@ -84,7 +92,7 @@ fn existing_editor() -> bool {
     let Ok(address) = ADDRESS.parse() else { return false; };
     let Ok(mut stream) = TcpStream::connect_timeout(&address, Duration::from_secs(1)) else { return false; };
     let _ = stream.set_read_timeout(Some(Duration::from_secs(2)));
-    if stream.write_all(b"GET /api/health HTTP/1.1\r\nHost: 127.0.0.1:4173\r\nConnection: close\r\n\r\n").is_err() { return false; }
+    if write!(stream, "GET /api/health HTTP/1.1\r\nHost: {ADDRESS}\r\nConnection: close\r\n\r\n").is_err() { return false; }
     let mut response = String::new();
     if stream.take(65536).read_to_string(&mut response).is_err() { return false; }
     response.contains("\"application\":\"jueony\"") && response.contains("\"apiVersion\":1")
@@ -101,7 +109,7 @@ fn open_editor() -> io::Result<()> {
         if let Some(base) = env::var_os(variable) {
             let browser = PathBuf::from(base).join(suffix);
             if browser.is_file() {
-                Command::new(browser).arg("--app=http://127.0.0.1:4173/").arg("--window-size=1440,960").spawn()?;
+                Command::new(browser).arg(format!("--app=http://{ADDRESS}/")).arg("--window-size=1440,960").spawn()?;
                 return Ok(());
             }
         }
@@ -121,7 +129,7 @@ fn run() -> io::Result<()> {
     if node.is_file() && server.is_file() {
         if !existing_editor() {
             let mut command = Command::new(&node);
-            command.arg(&server).current_dir(base).env("JUEONY_DIST", &root).env("JUEONY_PORT", "4173");
+            command.arg(&server).current_dir(base).env("JUEONY_DIST", &root).env("JUEONY_PORT", configured_port());
             #[cfg(windows)]
             command.creation_flags(0x08000000);
             command.spawn()?;
@@ -163,6 +171,16 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn compiled_bundle_origin_is_loopback_and_host_is_exact() {
+        let address: std::net::SocketAddr = ADDRESS.parse().unwrap();
+        assert_eq!(address.ip(), std::net::IpAddr::V4(std::net::Ipv4Addr::LOCALHOST));
+        assert!((1024..=65535).contains(&address.port()));
+        assert!(valid_host(ADDRESS));
+        assert!(valid_host(&format!("localhost:{}", configured_port())));
+        assert!(!valid_host("attacker.example"));
+        assert!(!valid_host("127.0.0.1:1"));
+    }
     #[test]
     fn rejects_traversal_encoded_separators_and_invalid_utf8() {
         let root = env::current_dir().unwrap();

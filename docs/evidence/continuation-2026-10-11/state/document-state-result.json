@@ -1,0 +1,212 @@
+{
+  "status": "PASS",
+  "results": [
+    {
+      "name": "first unconfigured document retains existing engine defaults"
+    },
+    {
+      "name": "saving new-document settings does not mutate the existing document or revision"
+    },
+    {
+      "name": "new blank document uses stored landscape, margins and real engine font properties",
+      "detail": {
+        "page": {
+          "width": 59528,
+          "height": 84189,
+          "marginLeft": 6236,
+          "marginRight": 5102,
+          "marginTop": 5669,
+          "marginBottom": 4252,
+          "marginHeader": 4252,
+          "marginFooter": 4252,
+          "marginGutter": 0,
+          "landscape": true,
+          "binding": 0
+        },
+        "font": {
+          "fontFamily": "맑은 고딕",
+          "fontSize": 1300,
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "underlineType": "None",
+          "underlineColor": "#000000",
+          "strikethrough": false,
+          "strikeColor": "#000000",
+          "textColor": "#000000",
+          "shadeColor": "#ffffff",
+          "shadowType": 0,
+          "shadowColor": "#b2b2b2",
+          "shadowOffsetX": 10,
+          "shadowOffsetY": 10,
+          "outlineType": 0,
+          "subscript": false,
+          "superscript": false,
+          "emboss": false,
+          "engrave": false,
+          "emphasisDot": 0,
+          "underlineShape": 0,
+          "strikeShape": 0,
+          "kerning": false,
+          "charShapeId": 7,
+          "fontFamilies": [
+            "맑은 고딕",
+            "맑은 고딕",
+            "맑은 고딕",
+            "맑은 고딕",
+            "맑은 고딕",
+            "맑은 고딕",
+            "맑은 고딕"
+          ],
+          "ratios": [
+            100,
+            100,
+            100,
+            100,
+            100,
+            100,
+            100
+          ],
+          "spacings": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "relativeSizes": [
+            100,
+            100,
+            100,
+            100,
+            100,
+            100,
+            100
+          ],
+          "charOffsets": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "borderFillId": 2,
+          "borderLeft": {
+            "type": 0,
+            "width": 0,
+            "color": "#000000"
+          },
+          "borderRight": {
+            "type": 0,
+            "width": 0,
+            "color": "#000000"
+          },
+          "borderTop": {
+            "type": 0,
+            "width": 0,
+            "color": "#000000"
+          },
+          "borderBottom": {
+            "type": 0,
+            "width": 0,
+            "color": "#000000"
+          },
+          "fillType": "none",
+          "fillColor": "#ffffff",
+          "patternColor": "#999999",
+          "patternType": -1
+        }
+      }
+    },
+    {
+      "name": "two same-name tabs keep independent numeric zoom and scroll checkpoints",
+      "detail": {
+        "first": {
+          "version": 1,
+          "zoom": 1.25,
+          "fitMode": "none",
+          "scrollX": 315,
+          "scrollY": 210
+        },
+        "second": {
+          "version": 1,
+          "zoom": 0.8,
+          "fitMode": "none",
+          "scrollX": 268,
+          "scrollY": 0
+        }
+      }
+    },
+    {
+      "name": "focus mode and prior sidebar visibility restore after reload"
+    },
+    {
+      "name": "reload restores document-specific numeric zoom and preserves old/new page and font data"
+    },
+    {
+      "name": "leaving focus mode restores panels; new-document settings remain editable after restart"
+    },
+    {
+      "name": "opening an existing HWPX skips custom blank-document defaults"
+    },
+    {
+      "name": "fit width recalculates after viewport change and reload without replacing numeric zoom in other documents",
+      "detail": {
+        "before": {
+          "version": 1,
+          "zoom": 0.9588005543656293,
+          "fitMode": "fitWidth",
+          "scrollX": 0,
+          "scrollY": 0
+        },
+        "after": {
+          "version": 1,
+          "zoom": 0.7068161773970013,
+          "fitMode": "fitWidth",
+          "scrollX": 0,
+          "scrollY": 0
+        }
+      }
+    },
+    {
+      "name": "explicit defaults reset affects only later new documents"
+    },
+    {
+      "name": "future-version defaults remain untouched and do not block recovered document contents"
+    },
+    {
+      "name": "corrupt-defaults dialog offers an explicit reset and the next document opens normally"
+    },
+    {
+      "name": "workspace switching and restarting preserve each workspace document zoom and actual scroll"
+    },
+    {
+      "name": "fresh profile with corrupt defaults reports the cause promptly and recovers after explicit reset and reload"
+    }
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@rhwp/core@0.8.7",
+    "builtAt": "2026-10-11T07:58:08.271Z",
+    "engineWasmSha256": "54cf95014312e605c51b98eb9021247ea79ef2bbd0a7080e11c011d0246e3989",
+    "buildScriptSha256": "1d8f9fc1cac4791894515c6a5e4eed4511799b692f526519ce058ca815c89455",
+    "customSourceSha256": "9add5c2cf31107e95559656acc9cc242935b3e8b41820be90dbb82cc03b6b70e",
+    "applicationSourceCommit": "06f5a396e98747def012ca68b51a76524784db1f",
+    "applicationSourceDirty": true,
+    "sourceBuild": false,
+    "note": "Rust 엔진은 공식 npm WASM 바이너리 사용. 이 빌드에서 Rust 엔진을 재컴파일하지 않음."
+  },
+  "profile": "C:\\Users\\jjome\\AppData\\Local\\Temp\\jueony-document-state-5uQ4CF",
+  "limits": [
+    "Isolated headless Edge with generated profile and port 4205; native Windows file picker and IME not tested",
+    "Document content/font properties inspected from real WASM state; actual installed-font rendering parity not asserted",
+    "Hancom 2024 independent comparison BLOCKED_REFERENCE"
+  ]
+}

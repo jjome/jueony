@@ -1,0 +1,28 @@
+{
+  "results": [
+    "unified menu and focus mode preserve active document at 1366x768",
+    "official letter template fills explicit fields in a new document without a model call",
+    "template command batch undoes through the same editor history",
+    "recorded AI commands replay without AI and resolve the original paragraph",
+    "ambiguous macro targets are rejected without changing the document",
+    "selected-source lexical retrieval supplies located chunks; 3 candidate calls cause one final document application",
+    "bounded review changes undo as one request",
+    "cancelling during review prevents late provider output from applying",
+    "macros and agent options survive restart"
+  ],
+  "errors": [],
+  "provider": "local deterministic fixture, not a paid live LLM",
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@rhwp/core@0.8.7",
+    "builtAt": "2026-10-11T07:59:53.093Z",
+    "engineWasmSha256": "54cf95014312e605c51b98eb9021247ea79ef2bbd0a7080e11c011d0246e3989",
+    "buildScriptSha256": "1d8f9fc1cac4791894515c6a5e4eed4511799b692f526519ce058ca815c89455",
+    "customSourceSha256": "4de202d3a110c62842fc1958da340fa8fdc4261e10be604eb5bb080be2caa112",
+    "applicationSourceCommit": "06f5a396e98747def012ca68b51a76524784db1f",
+    "applicationSourceDirty": true,
+    "sourceBuild": false,
+    "note": "Rust 엔진은 공식 npm WASM 바이너리 사용. 이 빌드에서 Rust 엔진을 재컴파일하지 않음."
+  }
+}

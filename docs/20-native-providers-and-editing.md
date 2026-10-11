@@ -42,6 +42,10 @@ OpenAI에는 `store:false`, `text.format`의 strict JSON schema를 사용한다.
 
 Claude에는 `anthropic-version:2023-06-01`, `x-api-key`, `output_config.format`을 쓴다. thinking 블록은 편집 결과에 합치지 않으며 거부·토큰 한도·tool_use 응답을 적용하지 않는다. [Messages](https://platform.claude.com/docs/en/api/messages/create), [Structured outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs).
 
+2026-10-11 Claude 연결 오류 수정: 기존 공통 서식 schema에는 선택 속성 44개가 있어 Claude의 요청당 선택 속성 24개 제한을 넘었다. `anthropic-schema.mjs`는 네 서식 명령의 `properties`를 `{name,value}` 배열로 전송하고, 응답에서 공통 속성 객체로 복원한다. 이 투영은 선택 속성 0개, union 5개로 문서화된 한도(24/16) 이내다. 미지정 서식은 유지하며 `false`/`0`은 명시적 변경으로 보존한다. 중복·알 수 없는 이름·잘못된 값 타입은 문서 적용 전에 거절한다. JSON 제약과 문서 revision/범위 검사는 계속 적용한다.
+
+`provider-error.mjs`는 오류 JSON을 최대 64 KiB까지만 읽어 잔액/한도, schema, 모델, 인증, 호출 속도, 서버 장애를 구분한다. 원격 오류 원문·키·문서 텍스트를 화면이나 로그로 전달하지 않으며 검증한 요청 ID만 안내에 포함한다. 모든 HTTP 400을 모델 ID 문제처럼 안내하던 동작을 수정했다. 분류되지 않는 오류의 구체 원인은 추가 진단이 필요하다.
+
 Gemini에는 `x-goog-api-key`와 확인일 REST 문서의 `generationConfig.responseFormat.text`를 쓴다. 키를 URL에 넣지 않는다. 차단·잘림·thought·함수 호출을 편집 JSON으로 취급하지 않는다. GenerateContent 문서는 Legacy로 표기되어 있어 API 계열 변경은 별도 adapter 검증 후 진행한다. [REST 구조화 출력](https://ai.google.dev/gemini-api/docs/generate-content/structured-output?hl=en), [API 참조](https://ai.google.dev/api/generate-content).
 
 새 adapter의 제한은 요청 90초, 응답 1 MB, 출력 토큰 기본 8192/설정 128~32768이다. 실제 모델 한도보다 높게 입력하면 제공자 오류가 될 수 있다. 응답이 잘리거나 구조화 출력 미지원이면 편집하지 않는다. redirect·자동 재시도·제공자 자동 전환은 없다. 키와 원격 오류 본문을 일반 로그에 남기지 않는다. 로컬 테스트 이외의 HTTP endpoint는 거절한다.

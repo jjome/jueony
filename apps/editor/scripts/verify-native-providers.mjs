@@ -34,6 +34,7 @@ try{
    {kind:'delete_table_row',target:'@verify',index:1},
    {kind:'delete_table_column',target:'@verify',index:1},
   ]:[{kind:'create_document',paragraphs:[id+' 제목','본문 검증']}]};
+  if(id==='anthropic')for(const op of generation.operations)if(op.properties)op.properties=Object.entries(op.properties).map(([name,value])=>({name,value}));
   const text=JSON.stringify(generation),refusal=data.instruction.includes('거부');
   const wire=id==='openai-responses'?{status:'completed',output:[{type:'message',role:'assistant',status:'completed',content:[refusal?{type:'refusal',refusal:'blocked'}:{type:'output_text',text}]}]}:id==='anthropic'?{type:'message',role:'assistant',stop_reason:refusal?'refusal':'end_turn',content:[{type:'text',text}]}:{candidates:[{finishReason:refusal?'SAFETY':'STOP',content:{role:'model',parts:[{text}]}}]};
   await new Promise(r=>setTimeout(r,120));res.end(JSON.stringify(wire));

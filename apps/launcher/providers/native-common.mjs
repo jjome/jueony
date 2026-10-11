@@ -1,4 +1,5 @@
 import {generationSchema} from './generation-contract.mjs';
+import {providerError} from './provider-error.mjs';
 
 export function fail(code, message) {
  throw Object.assign(new Error(message), {code, safeMessage:message});
@@ -62,9 +63,9 @@ export async function postJSON(endpoint, headers, body, signal, provider) {
  try{response=await fetch(endpoint,{method:'POST',redirect:'error',headers:{'Content-Type':'application/json',Accept:'application/json',...headers},body:JSON.stringify(body),signal:combined});}
  catch{fail(signal.aborted?'cancelled':'network',signal.aborted?'AI 요청을 취소했습니다.':`${provider} 연결/시간 제한 오류입니다. 주소·인증서·네트워크를 확인해 주세요.`);}
  if(!response.ok) {
-  await response.body?.cancel();
-  const status=response.status;
-  fail(status===401||status===403?'auth':status===429?'rate_limit':'provider',status===401||status===403?`${provider} API 키 또는 모델 접근 권한을 확인해 주세요.`:status===429?`${provider} 사용량·잔액·호출 한도를 확인해 주세요.`:`${provider} 오류 (HTTP ${status}). 모델 ID·endpoint·구조화 출력 지원 여부를 확인해 주세요.`);
+  const error=await providerError(response,provider);
+  if(signal.aborted)fail('cancelled','AI 요청을 취소했습니다.');
+  fail(error.code,error.safeMessage);
  }
  let wire;
  try {

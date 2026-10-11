@@ -145,6 +145,13 @@ try{
     const frame=await active();
     assert.equal(await frame.evaluate(()=>{const e=new Event('beforeunload',{cancelable:true});window.dispatchEvent(e);return e.defaultPrevented;}),false);
     assert.equal(await page.evaluate(()=>{const e=new Event('beforeunload',{cancelable:true});window.dispatchEvent(e);return e.defaultPrevented;}),true);
+    const originalIndex=await page.evaluate(()=>[...document.querySelectorAll('.document-tab')].findIndex(e=>e.getAttribute('aria-selected')==='true'));
+    await page.click('#new-document');
+    await page.waitForFunction(()=>document.querySelector('.document-tab[aria-selected=true]')?.textContent!=='문서 준비 중…');
+    const cleanFrame=await services();
+    assert.equal(await cleanFrame.evaluate(()=>window.jueonyEditor.state().dirty),false);
+    assert.equal(await page.evaluate(()=>{const e=new Event('beforeunload',{cancelable:true});window.dispatchEvent(e);return e.defaultPrevented;}),true,'inactive dirty document lost exit protection');
+    await page.click(`.document-tab-wrap:nth-child(${originalIndex+1}) .document-tab`);
     const standalone=await browser.newPage();try{
       await standalone.goto(origin+'/editor.html?skipRecovery=1&storage=download');await standalone.waitForFunction(()=>window.jueonyEditor?.snapshot&&!window.jueonyEditor.busy());
       await standalone.evaluate(async()=>{const api=window.jueonyEditor,b=api.snapshot();await api.apply(crypto.randomUUID(),b,{message:'',sourceIds:[],operations:[{kind:'replace_body_text',target:b.nodes[0].id,start:0,count:0,text:'Standalone dirty'}]});});

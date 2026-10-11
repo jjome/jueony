@@ -104,6 +104,16 @@ if (Test-Path -LiteralPath $mergeEvidence) {
             Where-Object { $_.Extension -in @('.hwp', '.hwpx') } | Copy-Item -Destination $reviewDocuments -Force
     }
 }
+Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/37-basic-editing-state-result.md') -Destination $output -Force
+$basicEvidence = Join-Path $projectRoot 'docs/evidence/basic-state-2026-10-12'
+if (Test-Path -LiteralPath $basicEvidence) {
+    Copy-Item -LiteralPath $basicEvidence -Destination $llmEvidence -Recurse -Force
+    $basicDocuments = Join-Path $basicEvidence 'browser-verified'
+    if (Test-Path -LiteralPath $basicDocuments) {
+        Get-ChildItem -LiteralPath $basicDocuments -File |
+            Where-Object { $_.Extension -in @('.hwp', '.hwpx') } | Copy-Item -Destination $reviewDocuments -Force
+    }
+}
 $nativeEvidence = Join-Path $projectRoot 'docs/evidence/native-section-merge-2026-10-12'
 if (Test-Path -LiteralPath $nativeEvidence) {
     Copy-Item -LiteralPath $nativeEvidence -Destination $llmEvidence -Recurse -Force

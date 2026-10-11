@@ -1,0 +1,48 @@
+{
+  "status": "BLOCKED_NATIVE_INPUT",
+  "reference": "Hancom Office Hangul 2024, Hwp.exe",
+  "syntheticDocument": "native-abcd-delete.hwpx",
+  "observed": {
+    "windowList": "Only the main document window returned; owned Style dialog absent",
+    "mainWindowId": 723778,
+    "mainWindowTitle": "native-abcd-delete.hwpx - 한글",
+    "dialog": "스타일, opened by F6",
+    "defaultStyleKeys": {
+      "Ctrl+1": "바탕글",
+      "Ctrl+2": "본문",
+      "Ctrl+3": "개요 1",
+      "Ctrl+4": "개요 2",
+      "Ctrl+5": "개요 3",
+      "Ctrl+6": "개요 4",
+      "Ctrl+7": "개요 5",
+      "Ctrl+8": "개요 6",
+      "Ctrl+9": "개요 7",
+      "Ctrl+0": "개요 8"
+    },
+    "accessibility": "Style window index 86; Close button index 89",
+    "screenshots": "Main document and bounded Style modal both visible in the captured state"
+  },
+  "attempts": [
+    {
+      "action": "Raise Style via accessibility, fresh capture retried",
+      "error": "element 86 has no cached secondary actions for Hwp.exe"
+    },
+    {
+      "action": "Click exposed Close index",
+      "error": "element 89 is not available in cached app state for Hwp.exe"
+    },
+    {
+      "action": "Escape after screenshot-enabled state capture",
+      "error": "failed to activate captured window"
+    },
+    {
+      "action": "Fresh list_windows/get_window/get_state, click modal screenshot close",
+      "error": "failed to activate captured window"
+    }
+  ],
+  "interpretation": "Likely main-window selection/owned-modal activation mismatch; OS root cause is not confirmed. Not a Jueony document-edit failure.",
+  "recovery": "Fresh app/window selection and one input retry failed. Native input stopped under Computer Use recovery instruction; implementation and isolated browser tests continued.",
+  "skill": "C:/Users/jjome/.codex/plugins/cache/openai-bundled/computer-use/26.1007.21434/skills/computer-use/SKILL.md",
+  "evidenceKind": "Recorded observation and exact tool-error transcription; no successful native Ctrl+digit or modal-close claim",
+  "userData": "Synthetic document only. No key or account data."
+}

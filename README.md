@@ -10,6 +10,8 @@
 
 ## 바로 실행
 
+최신 기본 편집·상태 저장 검수본은 **[Start-Review.cmd](build/jueony-basic-state-20261012/Start-Review.cmd)**로 실행한다(4197). 대화상자 키 처리·종료 보호·본문 커서 복원·Ctrl+1~0 기본 스타일을 보강했다. [검사 결과와 실제 한글 조작 도구의 남은 제한](docs/37-basic-editing-state-result.md)을 확인한다.
+
 최신 실제 한글 비교·탭 저장 보정 검수본은 **[Start-Review.cmd](build/jueony-native-tabs-20261012/Start-Review.cmd)**로 실행한다(4196). Delete/Backspace 구역 병합을 실제 한글 2024에서 확인하고 HWPX 기본 탭 저장 값을 수정했다. [확인 범위·결함·검증 결과](docs/36-native-section-comparison.md)를 참고한다.
 
 최신 경계 합치기 검수본은 **[Start-Review.cmd](build/jueony-section-merge-20261012/Start-Review.cmd)**로 실행한다(4195). 본문 구역 경계의 Delete/Backspace, 앞 구역 설정 유지와 undo/redo·저장을 연결했다. [지원 범위와 한글 직접 비교 제한](docs/35-section-boundary-merge-result.md)을 확인한다. 이전 묶음과 업무 저장소는 유지한다.

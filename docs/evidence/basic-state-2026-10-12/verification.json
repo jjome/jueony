@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-12",
+  "implementationCommit": "743a7e4",
+  "editorUnitTests": {
+    "passed": 261,
+    "failed": 0,
+    "skipped": 0
+  },
+  "browser": {
+    "passed": 23,
+    "failed": 0,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "externalRequests": 0,
+    "evidence": "browser-verified/result.json"
+  },
+  "packageCompatibility": {
+    "passed": 4,
+    "failed": 0,
+    "evidence": "compatibility/result.json"
+  },
+  "typecheck": "PASS",
+  "frontendBuild": "PASS",
+  "boundaries": {
+    "ok": true,
+    "modules": 9,
+    "files": 141,
+    "diagnostics": 0
+  },
+  "nativeComparison": {
+    "status": "BLOCKED_NATIVE_INPUT",
+    "observed": "Default style key labels in F6 dialog",
+    "newBehaviorComparison": "NOT_RUN",
+    "diagnosis": "native-dialog-diagnosis.json"
+  },
+  "engineWasmSha256": "c1e254531219bb88f983dca0671aa6d4c10be79460c50de8e5fb60d8cca182da",
+  "customSourceSha256": "2781b392bc90f0cfa205bd685c23381bb125b4073896d134d7c2f7f138037e1b",
+  "buildSourceCommit": "f2795455b971c4761c43049e8a49f88d47c14db9",
+  "buildSourceDirty": true,
+  "buildNote": "Built before implementation commit; exact custom source and patch hashes identify tested code. Commit 743a7e4 contains these implementation changes.",
+  "paidLLMCalls": 0,
+  "reviewPort": 4197,
+  "documents": 14,
+  "workbench": {
+    "passed": 9,
+    "failed": 0,
+    "consoleErrors": 0,
+    "externalRequests": 0,
+    "evidence": "workbench-verified/result.json"
+  },
+  "inactiveExit": {
+    "passed": 1,
+    "failed": 0,
+    "consoleErrors": 0,
+    "externalRequests": 0,
+    "evidence": "inactive-exit-verified/result.json"
+  }
+}

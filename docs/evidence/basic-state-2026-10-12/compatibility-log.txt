@@ -1,0 +1,4 @@
+PASS v1 workspace/chat/native folder handle/recovery/tab order restored despite malformed draft; interrupted run not replayed
+PASS workspace switch isolates chat/folders; legacy macro remains available
+PASS v1 resave/reload retains unknown fields and structured-cloned folder handles
+PASS offline native file-handle write, reopened saved content and request undo succeed

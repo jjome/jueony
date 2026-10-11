@@ -6,7 +6,8 @@ export type PageDefaults = {
 export type DocumentDefaults = { version: 1; enabled: boolean; page: PageDefaults; font: { family: string; sizePt: number } };
 
 export type DocumentFitMode = 'none' | 'fitWidth' | 'fitPage';
-export type DocumentViewState = { version: 1; zoom: number; fitMode: DocumentFitMode; scrollX: number; scrollY: number };
+export type BodyCaret = { section: number; paragraph: number; offset: number; paragraphLength: number; before: string; after: string };
+export type DocumentViewState = { version: 1; zoom: number; fitMode: DocumentFitMode; scrollX: number; scrollY: number; caret?: BodyCaret };
 
 export type PreferenceErrorCode = 'read' | 'write' | 'corrupt' | 'version';
 export class PreferenceStorageError extends Error {

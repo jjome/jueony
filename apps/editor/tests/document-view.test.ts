@@ -104,3 +104,11 @@ test('suspended previous document cannot restore into a replacement document', a
   assert.equal(await f.adapter.retry(), 'ignored'); assert.equal(f.calls.length, count);
   assert.equal(f.viewport.getScrollY(), 0);
 });
+
+test('optional caret is restored after layout, before scroll, and captured defensively', async () => {
+ const f=fixture(),caret={section:0,paragraph:0,offset:1,paragraphLength:2,before:'가',after:'나'};
+ let current=caret;
+ const adapter=createDocumentViewAdapter({viewport:()=>f.viewport,identity:()=> 'a',visible:()=>true,applyFit:()=>{},settle:async()=>{f.calls.push('settled');},captureCaret:()=>current,restoreCaret:value=>{f.calls.push('caret');current=value;return true;}});
+ await adapter.restore(saved({caret}));assert.deepEqual(f.calls,['zoom:1.5','settled','caret','x:42','y:640']);
+ const captured=adapter.capture()!;captured.caret!.offset=999;assert.equal(adapter.capture()!.caret!.offset,1);
+});

@@ -32,10 +32,12 @@ settings = replaceOnce(settings, '  constructor() {\n    this.data = this.load()
 settings = replaceOnce(settings, '    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));', '    this.persistence.save(this.data);', 'merge settings save');
 await writeFile(join(root, 'src/core/user-settings.ts'), settings);
 let main = await readFile(join(root, 'src/main.ts'), 'utf8');
+main = replaceOnce(main, 'documentState.installBeforeUnload(window);', 'if (window.parent === window) documentState.installBeforeUnload(window);', 'host owns embedded exit prompt');
 main = replaceOnce(main, 'confirmSaveBeforeReplacingDocument, fileCommands', 'confirmSaveBeforeReplacingDocument, saveCurrentDocument, fileCommands', 'host save import');
 main = replaceOnce(main, "return params.has('url');", "return params.has('url') || params.get('skipRecovery') === '1';", 'tab recovery');
 main = "import { installHangulKeys } from './jueony/shortcuts/install';\nimport { installAgentBridge } from './jueony/mvp/editor-bridge';\nimport { installDesktopHost } from './jueony/desktop-host';\nimport { installHangulChrome } from './jueony/chrome-2024';\n" + main;
 main = "import {installDocumentInformation} from './jueony/adapters/rhwp/document-info.ts';\nimport {installPageControls} from './jueony/adapters/rhwp/page-controls.ts';\nimport {readDocumentDefaults, applyNewDocumentDefaults} from './jueony/preferences/document-defaults.ts';\nimport {createDocumentViewAdapter} from './jueony/preferences/document-view.ts';\nlet jueonyDocumentView: ReturnType<typeof createDocumentViewAdapter> | undefined;\n" + main;
+main = "import {captureBodyCaret, restoreBodyCaret} from './jueony/adapters/rhwp/body-caret.ts';\nlet jueonyComposing = false;\ndocument.addEventListener('compositionstart',()=>{jueonyComposing=true;},true);\ndocument.addEventListener('compositionend',()=>{jueonyComposing=false;},true);\n" + main;
 main = replaceOnce(main, 'const docInfo = wasm.createNewDocument();', `const defaults = new URLSearchParams(location.search).get('skipDefaults') === '1' ? undefined : readDocumentDefaults(localStorage);
       const docInfo = wasm.createNewDocument();
       if(defaults && applyNewDocumentDefaults(wasm.borrowDocumentHandle()!, defaults)) docInfo.fontsUsed.push(defaults.font.family);`, 'new document defaults');
@@ -85,6 +87,8 @@ jueonyDocumentView = createDocumentViewAdapter({
   visible: () => (document.getElementById('scroll-container')?.clientWidth ?? 0) > 0,
   applyFit: mode => applySavedZoomFitMode(mode),
   settle: () => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))),
+  captureCaret: () => jueonyComposing ? undefined : captureBodyCaret(inputHandler?.getSessionCaretAccess()),
+  restoreCaret: caret => !jueonyComposing && restoreBodyCaret(inputHandler?.getSessionCaretAccess(), caret),
 });
 Object.assign((window as any).jueonyEditor, {captureDocumentView: () => jueonyDocumentView!.capture(),suspendDocumentView: () => jueonyDocumentView!.suspend(),restoreDocumentView: (value: unknown) => jueonyDocumentView!.restore(value)});
 window.addEventListener('resize', () => { void jueonyDocumentView!.retry(); });
@@ -96,6 +100,55 @@ window.addEventListener('keydown', event => { if(event.key === 'F6' && event.alt
 void initPromise.then(() => userSettings.refreshFromStorage());
 `;
 await writeFile(join(root, 'src/main.ts'), main);
+let modal = (await readFile(join(root, 'src/ui/dialog.ts'), 'utf8')).replace(/\r\n/g, '\n');
+modal = "import { handleModalKeyboard } from '../jueony/adapters/browser/modal-keyboard.ts';\n" + modal;
+const captureStart = modal.indexOf('    this.captureHandler = (e: KeyboardEvent) => {');
+const captureEnd = modal.indexOf("    document.addEventListener('keydown', this.captureHandler, true);", captureStart);
+if(captureStart < 0 || captureEnd < 0) throw new Error('소스 패치 기준 불일치: modal keyboard');
+modal = modal.slice(0,captureStart) + `    this.captureHandler = e => handleModalKeyboard(e, this.overlay, () => this.hide(), () => {
+      (this.dialog.querySelector('.dialog-btn-primary') as HTMLButtonElement | null)?.click();
+    });
+` + modal.slice(captureEnd);
+modal = replaceOnce(modal, "    this.dialog.className = 'dialog-wrap';", `    this.dialog.className = 'dialog-wrap';
+    this.dialog.setAttribute('role', 'dialog');
+    this.dialog.setAttribute('aria-modal', 'true');
+    this.dialog.setAttribute('aria-label', this.title);
+    this.overlay.tabIndex = -1;`, 'modal accessibility');
+modal = replaceOnce(modal, "    closeBtn.className = 'dialog-close';", "    closeBtn.className = 'dialog-close';\n    closeBtn.setAttribute('aria-label', '닫기');", 'modal close label');
+// Closing a nested dialog restores focus within its parent, not into the document.
+modal = replaceOnce(modal, '    this.afterClose?.();', `    const parent = document.querySelectorAll<HTMLElement>('.modal-overlay, dialog[open]');
+    parent.item(parent.length - 1)?.querySelector<HTMLElement>('input, button, select, textarea')?.focus();
+    this.afterClose?.();`, 'nested modal focus');
+await writeFile(join(root, 'src/ui/dialog.ts'), modal);
+for (const name of ['para-shape-dialog.ts','char-shape-dialog.ts']) {
+  let shape = (await readFile(join(root, 'src/ui', name), 'utf8')).replace(/\r\n/g, '\n');
+  shape = "import { handleModalKeyboard } from '../jueony/adapters/browser/modal-keyboard.ts';\n" + shape;
+  shape = replaceOnce(shape, `    this.overlay.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { e.stopPropagation(); this.hide(); }
+    });`, `    this.overlay.addEventListener('keydown', e => handleModalKeyboard(e, this.overlay, () => this.hide(), () => {
+      this.dialog.querySelector<HTMLButtonElement>('.dialog-btn-primary')?.click();
+    }));`, name + ' keyboard');
+  shape = replaceOnce(shape, '    document.body.appendChild(this.overlay);', `    document.body.appendChild(this.overlay);
+    this.dialog.setAttribute('role', 'dialog'); this.dialog.setAttribute('aria-modal', 'true');
+    this.dialog.setAttribute('aria-label', this.dialog.querySelector('.dialog-title')?.textContent?.replace('×','').trim() ?? '서식');
+    this.dialog.querySelector<HTMLButtonElement>('.dialog-btn-primary')?.focus();`, name + ' focus');
+  await writeFile(join(root, 'src/ui', name), shape);
+}
+let caretInput = (await readFile(join(root, 'src/engine/input-handler.ts'), 'utf8')).replace(/\r\n/g, '\n');
+caretInput = replaceOnce(caretInput, '  getCursorPosition(): DocumentPosition { return this.cursor.getPosition(); }', `  getCursorPosition(): DocumentPosition { return this.cursor.getPosition(); }
+
+  /** Session view restoration only; no document mutation or keyboard focus transfer. */
+  getSessionCaretAccess() {
+    return { cursor: this.cursor, wasm: this.wasm,
+      getCursorPosition: () => this.cursor.getPosition(),
+      restoreSessionCaret: (position: DocumentPosition) => {
+        this.cursor.moveTo(position);
+        this.cursor.resetPreferredX();
+        this.updateCaret();
+      },
+    };
+  }`, 'session caret input boundary');
+await writeFile(join(root, 'src/engine/input-handler.ts'), caretInput);
 let formatCommands = (await readFile(join(root, 'src/command/commands/format.ts'), 'utf8')).replace(/\r\n/g, '\n');
 formatCommands = replaceOnce(formatCommands, '      if (!savedSel) return;', '      // A caret-only character dialog applies pending typing properties.', 'caret character dialog');
 formatCommands = replaceOnce(formatCommands, '        ih.applyCharPropsToRange(savedSel.start, savedSel.end, mods);', '        if (savedSel) ih.applyCharPropsToRange(savedSel.start, savedSel.end, mods);\n        else services.eventBus.emit(\'format-char\', mods);', 'caret character format');

@@ -2,6 +2,7 @@
  * Sources: help.hancom.com/hoffice130/ko-KR/Hwp/{menu,view/toolbar}.
  * Do not assign a browser workaround to a different Hangul command's key.
  */
+import { defaultStyleNames } from './style-slots.ts';
 export type Scope = 'document' | 'table' | 'cells' | 'object';
 export type Binding = { keys: string; command: string; label: string; scope: Scope; params?: Record<string, unknown>; nativeClipboard?: boolean };
 const binding = (keys: string, command: string, label: string, scope: Scope = 'document', params?: Record<string, unknown>): Binding => ({ keys, command, label, scope, ...(params ? { params } : {}) });
@@ -29,6 +30,7 @@ export const hangulBindings: Binding[] = [
   binding('Alt+G', 'edit:goto', '찾아가기'),
   binding('Alt+L', 'format:char-shape', '글자 모양'), binding('Alt+T', 'format:para-shape', '문단 모양'),
   binding('F6', 'format:style-dialog', '스타일'), binding('F7', 'file:page-setup', '편집 용지'),
+  ...defaultStyleNames.map((name, slot) => binding(`Ctrl+${(slot + 1) % 10}`, 'ext:jueony-default-style', `${name} 기본 스타일`, 'document', { slot })),
   binding('Ctrl+B', 'format:bold', '진하게'), binding('Alt+Shift+B', 'format:bold', '진하게'),
   binding('Ctrl+I', 'format:italic', '기울임'), binding('Alt+Shift+I', 'format:italic', '기울임'),
   binding('Ctrl+U', 'format:underline', '밑줄'), binding('Alt+Shift+U', 'format:underline', '밑줄'),

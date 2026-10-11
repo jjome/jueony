@@ -2,6 +2,7 @@ import { installEqualCells, equalCellHelp } from '../editor-actions/equal-cells.
 import { installNavigationPane } from '../editor-actions/navigation-pane.ts';
 import { selectWholeCellBand } from './cell-band.ts';
 import { HangulKeyResolver, hangulBindings } from './keymap.ts';
+import { resolveDefaultStyle } from './style-slots.ts';
 import { defaultShortcuts } from '../../command/shortcut-map';
 import { getObjectProps, setObjectProps } from '../../engine/object-props';
 import { installCaptionCommands } from '../adapters/rhwp/manual-commands.ts';
@@ -27,6 +28,11 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
     id, label, canExecute: (c: any) => c.hasDocument && c.isEditable && !c.isFormMode && (!bodyOnly || (!c.inTable && !c.inCellSelectionMode && !c.inPictureObjectSelection && !c.inTableObjectSelection && !input()?.cursor?.isInHeaderFooter?.() && !input()?.cursor?.isInFootnote?.() && !input()?.cursor?.isInTextBox?.())), execute,
   });
   register('ext:jueony-normal', '보통 모양', () => eventBus.emit('format-char', { bold: false, italic: false, underline: false, strikethrough: false, outlineType: 0, shadowType: 0, emboss: false, engrave: false, superscript: false, subscript: false }));
+  register('ext:jueony-default-style', '기본 스타일 단축키', (_s, p) => {
+    const ih = input(), styleId = resolveDefaultStyle(ih.wasm.getStyleList(), p?.slot);
+    if (styleId === undefined) throw new Error('해당 기본 스타일을 찾을 수 없습니다. F6에서 문서의 스타일을 확인하세요.');
+    ih.applyStyle(styleId);
+  }, true);
   register('ext:jueony-color', '글자색', (_s, p) => { if (!/^#[\da-f]{6}$/i.test(p?.textColor ?? '')) throw new Error('글자색 형식 오류'); eventBus.emit('format-char', { textColor: p.textColor }); });
   for (const [id, label, mode] of [['ext:jueony-delete-line', '한 줄 지우기', 'line'], ['ext:jueony-delete-line-end', '줄 뒤 지우기', 'end'], ['ext:jueony-delete-word', '한 단어 지우기', 'word']]) {
     register(id, label, () => {

@@ -9,7 +9,7 @@ import {createRecoveryCoordinator,normalizeRecoverySettings} from './modules/pre
 import {readRecoverySettings,watchRecoverySettings,browserRecoveryClock} from './adapters/browser/recovery-settings.ts';
 
 import {assertRecoveryRecord,partitionRecoveryRecords} from './modules/document-files/public/index.ts';
-import {createSessionFacade,createSessionGuard} from './modules/session/public/index.ts';
+import {createSessionFacade,createSessionGuard,shouldProtectExit} from './modules/session/public/index.ts';
 import type {StoredFileConnection} from './file-connection.ts';
 import {describeStructure} from './modules/document/public/index.ts';
 import {installPaneResize} from './pane-layout.ts';
@@ -342,7 +342,13 @@ split.addEventListener('pointermove',e=>{if(!dragging)return;const rect=$('sideb
 split.addEventListener('pointerup',()=>{dragging=false;void persist().catch(error);});
 split.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();state.split=Math.max(20,Math.min(75,state.split+(e.key==='ArrowUp'?-3:3)));$('sidebar').style.setProperty('--chat-share',state.split+'%');split.setAttribute('aria-valuenow',String(state.split));void persist().catch(error);}});
 window.addEventListener('message',event=>{if(event.origin!==location.origin)return;const tab=tabs.find(t=>t.frame.contentWindow===event.source);if(!tab)return;if(event.data?.type==='jueony:status')refreshTab(tab);if(event.data?.type==='jueony:command-state'&&tab===activeTab)chrome.refresh();if(event.data?.type==='jueony:focus-chat'&&tab===activeTab){if(state.focusMode){state.focusMode=false;render();void persist().catch(error);}$('request-input').focus();}if(event.data?.type==='jueony:preferences-state'){recoverySettingsWatcher.refresh();tab.preferenceError=Boolean(event.data.error);tab.preferenceMessage=tab.preferenceError?String(event.data.message):undefined;if(tab.preferenceError)status(tab.preferenceMessage!);}if(event.data?.type==='jueony:new-document'&&tab===activeTab&&cancelNavigation())void newTab().catch(error);if(event.data?.type==='jueony:close-document'&&tab===activeTab)void closeTab(tab).catch(error);});
-window.addEventListener('beforeunload',event=>{if(persistError||stateWrites||closing||running||tabs.some(t=>t.persistError||t.pendingWrites||t.preferenceError||t.api?.state().dirty)){event.preventDefault();event.returnValue='';}});
+window.addEventListener('beforeunload',event=>{
+ // The host owns the single exit prompt, including inactive and other-workspace tabs.
+ // A failed editor read is protected rather than silently allowing a destructive exit.
+ let protect=true;
+ try{protect=shouldProtectExit({persistenceFailed:persistError,pendingWrites:stateWrites,closing,running:Boolean(running),documents:tabs.filter(t=>!t.closed).map(t=>({dirty:Boolean(t.api?.state().dirty),persistenceFailed:Boolean(t.persistError),preferenceFailed:Boolean(t.preferenceError),pendingWrites:t.pendingWrites??0}))});}catch{}
+ if(protect){event.preventDefault();event.returnValue='';}
+});
 async function start(){await store.open();state=await store.load();installPaneResize({root:$('app-shell'),sidebar:$('sidebar'),handle:$('agent-editor-split'),chat:$('chat-panel'),initialWidth:state.agentWidth,commit:width=>{state.agentWidth=width;void persist().catch(error);}});try{await connectionUI.refresh();}catch{connectionUI.notice='AI 서버를 최신 실행기로 다시 시작해 주세요. 로컬 문서 편집은 사용할 수 있습니다.';}if(!state.workspaces.length)workspace.addWorkspace('내 업무');if(!state.workspaces.some(w=>w.id===state.activeWorkspaceId))state.activeWorkspaceId=state.workspaces[0].id;render();await switchWorkspace(state.activeWorkspaceId);status('로컬 업무 준비 완료 · '+(tabs.some(t=>t.preferenceError)?tabs.find(t=>t.preferenceError)!.preferenceMessage:recoveryWarning||tabs.some(t=>t.restoreError)?'일부 문서 복원 실패: 기존 복구본은 보존했습니다.':tabs.some(t=>t.pendingConnection)?'복구 문서의 원본 연결을 확인하세요.':connectionUI.notice||'AI 연결 설정에서 연결과 키를 변경할 수 있습니다.'));}
 // One writer per browser profile/origin prevents whole-state writes from
 // competing application windows from overwriting each other's workspaces.

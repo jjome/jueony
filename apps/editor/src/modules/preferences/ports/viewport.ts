@@ -1,4 +1,4 @@
-import type { DocumentFitMode } from '../public/contracts.ts';
+import type { DocumentFitMode, BodyCaret } from '../public/contracts.ts';
 
 export interface DocumentViewport {
   getZoom(): number; getZoomFitMode(): DocumentFitMode; getScrollX(): number; getScrollY(): number;
@@ -14,4 +14,6 @@ export interface DocumentViewAdapterOptions {
   applyFit: (mode: Exclude<DocumentFitMode, 'none'>) => void;
   /** Resolve after layout has reflected the new zoom (for example two RAFs). */
   settle: () => Promise<void>;
+  captureCaret?: () => BodyCaret | undefined;
+  restoreCaret?: (caret: BodyCaret) => boolean;
 }

@@ -1,10 +1,10 @@
-export type { PageDefaults, DocumentDefaults, DocumentFitMode, DocumentViewState, PreferenceErrorCode, PreferencesRefresh, ViewRestoreResult } from './contracts.ts';
+export type { PageDefaults, DocumentDefaults, DocumentFitMode, DocumentViewState, BodyCaret, PreferenceErrorCode, PreferencesRefresh, ViewRestoreResult } from './contracts.ts';
 export { PreferenceStorageError } from './contracts.ts';
 export type { PreferenceStorage, PreferencesPersistenceOptions } from '../ports/storage.ts';
 export type { DocumentViewport, DocumentViewAdapterOptions } from '../ports/viewport.ts';
 export { preferenceChangedPaths } from '../domain/merge.ts';
 export { defaultDocumentDefaults, validateDocumentDefaults } from '../domain/document-defaults.ts';
-export { validateDocumentView } from '../domain/document-view.ts';
+export { validateDocumentView, validateBodyCaret } from '../domain/document-view.ts';
 export { createPreferencesFacade, createPreferencesFacade as createPreferencesPersistence } from '../application/persistence.ts';
 export { createDocumentViewFacade, createDocumentViewFacade as createDocumentViewAdapter } from '../application/document-view.ts';
 export { DOCUMENT_DEFAULTS_KEY, readDocumentDefaults, saveDocumentDefaults, resetDocumentDefaults } from '../application/document-defaults.ts';

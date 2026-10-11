@@ -1,11 +1,11 @@
 import type { DocumentViewState, ViewRestoreResult } from '../public/contracts.ts';
 import type { DocumentViewAdapterOptions } from '../ports/viewport.ts';
-import { validateDocumentView } from '../domain/document-view.ts';
+import { validateDocumentView, validateBodyCaret } from '../domain/document-view.ts';
 
 export function createDocumentViewFacade(options: DocumentViewAdapterOptions) {
   type Pending = { identity: string; view: DocumentViewState };
   let pending: Pending | undefined, last: Pending | undefined, applying = false;
-  const copy = (view: DocumentViewState): DocumentViewState => ({ ...view });
+  const copy = (view: DocumentViewState): DocumentViewState => ({ ...view, ...(view.caret ? { caret: { ...view.caret } } : {}) });
   function discardStale() {
     const identity = options.identity();
     if (pending?.identity !== identity) pending = undefined;
@@ -17,7 +17,7 @@ export function createDocumentViewFacade(options: DocumentViewAdapterOptions) {
     if (!options.visible()) return last ? copy(last.view) : undefined;
     const viewport = options.viewport();
     if (!viewport) return undefined;
-    const view = validateDocumentView({ version: 1, zoom: viewport.getZoom(), fitMode: viewport.getZoomFitMode(), scrollX: viewport.getScrollX(), scrollY: viewport.getScrollY() });
+    const view = validateDocumentView({ version: 1, zoom: viewport.getZoom(), fitMode: viewport.getZoomFitMode(), scrollX: viewport.getScrollX(), scrollY: viewport.getScrollY(), caret: options.captureCaret?.() });
     if (view) last = { identity: options.identity(), view };
     return view ? copy(view) : undefined;
   }
@@ -41,10 +41,12 @@ export function createDocumentViewFacade(options: DocumentViewAdapterOptions) {
       await options.settle();
       if (pending !== item || options.identity() !== item.identity) return 'ignored';
       if (!options.visible()) return 'deferred';
+      // Optional old bookmarks cannot bypass the editor adapter's live-text checks.
+      if (item.view.caret) options.restoreCaret?.({ ...item.view.caret });
       // The browser viewport clamps an offset to its actual current scroll range.
       viewport.setScrollLeft(item.view.scrollX); viewport.setScrollTop(item.view.scrollY);
       pending = undefined;
-      const current = validateDocumentView({ version: 1, zoom: viewport.getZoom(), fitMode: viewport.getZoomFitMode(), scrollX: viewport.getScrollX(), scrollY: viewport.getScrollY() });
+      const current = validateDocumentView({ version: 1, zoom: viewport.getZoom(), fitMode: viewport.getZoomFitMode(), scrollX: viewport.getScrollX(), scrollY: viewport.getScrollY(), caret: validateBodyCaret(options.captureCaret?.()) });
       last = { identity: item.identity, view: current ?? copy(item.view) };
       return 'applied';
     } finally { applying = false; }

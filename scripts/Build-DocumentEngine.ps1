@@ -68,6 +68,7 @@ try {
 }
 $pkg = Join-Path $sourceRoot 'pkg'
 if (-not (Select-String -LiteralPath (Join-Path $pkg 'rhwp.js') -SimpleMatch 'insertSectionBreak(' -Quiet)) { throw 'Compiled engine is missing the patched section-break API.' }
+if (-not (Select-String -LiteralPath (Join-Path $pkg 'rhwp.js') -SimpleMatch 'mergeSectionBoundary(' -Quiet)) { throw 'Compiled engine is missing the patched section-merge API.' }
 Copy-Item -LiteralPath (Join-Path $sourceRoot 'LICENSE') -Destination (Join-Path $pkg 'LICENSE')
 '{"name":"@jueony/rhwp-engine-review","version":"0.8.7","type":"module","main":"rhwp.js","types":"rhwp.d.ts","license":"MIT"}' | Set-Content -LiteralPath (Join-Path $pkg 'package.json') -Encoding utf8NoBOM
 $manifest = @{baseCommit=$baseCommit;patches=$patchEvidence;sourceId=$sourceId;builtAt=[DateTime]::UtcNow.ToString('o');optimized=$false;buildMode=($Runtime.ToLowerInvariant()+'-review-no-opt');wasmSha256=(Get-FileHash -LiteralPath (Join-Path $pkg 'rhwp_bg.wasm') -Algorithm SHA256).Hash.ToLowerInvariant();jsSha256=(Get-FileHash -LiteralPath (Join-Path $pkg 'rhwp.js') -Algorithm SHA256).Hash.ToLowerInvariant()}

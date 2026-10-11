@@ -11,10 +11,10 @@ index 20a8020..e8bf252 100644
  // 쓰이므로 pub(crate).
  pub(crate) mod section_raw_journal;
 diff --git a/src/wasm_api.rs b/src/wasm_api.rs
-index 2031085..a1b7dc0 100644
+index 2031085..6d9a960 100644
 --- a/src/wasm_api.rs
 +++ b/src/wasm_api.rs
-@@ -6113,6 +6113,19 @@ impl HwpDocument {
+@@ -6113,6 +6113,30 @@ impl HwpDocument {
              .map_err(|e| e.into())
      }
  
@@ -31,15 +31,25 @@ index 2031085..a1b7dc0 100644
 +            .map_err(|error| error.into())
 +    }
 +
++    /// Remove a body section boundary, keeping the preceding section settings.
++    /// The caller owns a single snapshot undo operation around this edit.
++    #[wasm_bindgen(js_name = mergeSectionBoundary)]
++    pub fn merge_section_boundary_api(
++        &mut self,
++        right_section_idx: usize,
++    ) -> Result<String, JsValue> {
++        self.merge_section_boundary_native(right_section_idx)
++            .map_err(|error| error.into())
++    }
++
      /// 개체를 한 걸음 옮긴다 — 웹한글컨트롤 `ShapeObjMove*`(걸음 56 HWPUNIT).
      #[wasm_bindgen(js_name = moveControlAt)]
      pub fn move_control_at_api(
 diff --git a/src/document_core/commands/section_ops.rs b/src/document_core/commands/section_ops.rs
 new file mode 100644
-index 0000000..e099056
 --- /dev/null
 +++ b/src/document_core/commands/section_ops.rs
-@@ -0,0 +1,239 @@
+@@ -0,0 +1,431 @@
 +//! Actual body section splitting. The legacy HwpCtrl marker operation remains separate.
 +//!
 +//! Paragraph boundaries follow the recorded native BreakSection observations in
@@ -97,6 +107,198 @@ index 0000000..e099056
 +}
 +
 +impl DocumentCore {
++    /// Remove a body section boundary and retain the preceding section settings.
++    /// Boundary paragraph text is concatenated; the caller owns snapshot undo.
++    /// Unsupported field/object/definition scopes are rejected before publishing.
++    pub fn merge_section_boundary_native(
++        &mut self,
++        right_section_idx: usize,
++    ) -> Result<String, HwpError> {
++        if right_section_idx == 0 || right_section_idx >= self.document.sections.len() {
++            return Err(invalid("삭제할 구역 경계가 범위를 벗어났습니다"));
++        }
++        let left_idx = right_section_idx - 1;
++        let original_left = &self.document.sections[left_idx];
++        let original_right = &self.document.sections[right_section_idx];
++        let left_para_idx = original_left
++            .paragraphs
++            .len()
++            .checked_sub(1)
++            .ok_or_else(|| invalid("이전 구역에 본문 문단이 없습니다"))?;
++        let left_boundary = &original_left.paragraphs[left_para_idx];
++        let right_boundary = original_right
++            .paragraphs
++            .first()
++            .ok_or_else(|| invalid("다음 구역에 본문 문단이 없습니다"))?;
++        for paragraph in [left_boundary, right_boundary] {
++            if paragraph.char_offsets.len() != paragraph.text.chars().count()
++                || paragraph
++                    .char_offsets
++                    .last()
++                    .is_some_and(|pos| *pos >= paragraph.char_count)
++                || !paragraph.field_ranges.is_empty()
++                || !paragraph.range_tags.is_empty()
++                || !paragraph.title_marks.is_empty()
++                || paragraph.tab_extended.len()
++                    > paragraph.text.chars().filter(|ch| *ch == '\t').count()
++            {
++                return Err(invalid(
++                    "경계 문단의 필드·범위·문자 위치 정보는 병합을 지원하지 않습니다",
++                ));
++            }
++        }
++        // merge_from can preserve leading left definitions and HF controls, but
++        // a right object or HF would acquire a new paragraph/section owner.
++        if left_boundary.controls.iter().any(|control| {
++            !matches!(
++                control,
++                Control::SectionDef(_)
++                    | Control::ColumnDef(_)
++                    | Control::Header(_)
++                    | Control::Footer(_)
++            )
++        }) || right_boundary
++            .controls
++            .iter()
++            .any(|control| !matches!(control, Control::SectionDef(_) | Control::ColumnDef(_)))
++        {
++            return Err(invalid(
++                "개체·필드·머리말·꼬리말이 있는 경계 문단은 병합을 지원하지 않습니다",
++            ));
++        }
++        if [original_left, original_right].iter().any(|section| {
++            section
++                .paragraphs
++                .iter()
++                .any(|para| !para.orphan_field_ends.is_empty())
++        }) {
++            return Err(invalid(
++                "여러 문단에 걸친 필드가 있는 구역은 먼저 필드 범위를 정리해야 합니다",
++            ));
++        }
++        // Deleting a boundary keeps the preceding page/column/HF settings. An
++        // independent right HF or a later definition would silently replace
++        // those settings after a move, so leave that case untouched for now.
++        if original_right
++            .paragraphs
++            .iter()
++            .enumerate()
++            .any(|(index, para)| {
++                para.controls.iter().any(|control| {
++                    matches!(control, Control::Header(_) | Control::Footer(_))
++                        || (index > 0
++                            && matches!(control, Control::SectionDef(_) | Control::ColumnDef(_)))
++                })
++            })
++        {
++            return Err(invalid(
++                "다음 구역에 독립 머리말·꼬리말 또는 추가 구역·단 정의가 있어 병합할 수 없습니다",
++            ));
++        }
++        let definitions = right_boundary.controls.len();
++        if definitions > 2
++            || right_boundary
++                .controls
++                .iter()
++                .filter(|c| matches!(c, Control::SectionDef(_)))
++                .count()
++                > 1
++            || right_boundary
++                .controls
++                .iter()
++                .filter(|c| matches!(c, Control::ColumnDef(_)))
++                .count()
++                > 1
++            || right_boundary
++                .char_offsets
++                .first()
++                .is_some_and(|pos| *pos != (definitions * 8) as u32)
++        {
++            return Err(invalid(
++                "다음 구역의 시작 정의 위치는 병합을 지원하지 않습니다",
++            ));
++        }
++        if u64::from(left_boundary.char_count) + u64::from(right_boundary.char_count)
++            > u64::from(u32::MAX)
++        {
++            return Err(invalid("병합 문단의 저장 문자 수 제한을 초과합니다"));
++        }
++        // Staged mutation: section contents, caches and raw provenance remain
++        // byte-for-byte unchanged if any preflight above fails.
++        let mut left = original_left.clone();
++        let mut right = original_right.clone();
++        let mut tail = right.paragraphs.remove(0);
++        tail.controls.clear();
++        tail.ctrl_data_records.clear();
++        if tail.text.is_empty() {
++            // The generic release helper has no first text offset to inspect.
++            let released = (definitions * 8) as u32;
++            tail.char_count = tail.char_count.saturating_sub(released);
++            for run in &mut tail.char_shapes {
++                run.start_pos = run.start_pos.saturating_sub(released);
++            }
++        } else {
++            tail.release_leading_extended_control_slots(definitions);
++        }
++        tail.column_type = ColumnBreakType::None;
++        tail.raw_break_type = 0;
++        tail.page_break_synthesized = false;
++        let merged = &mut left.paragraphs[left_para_idx];
++        let caret_offset = merged.text.chars().count();
++        let left_tab_count = merged.text.chars().filter(|ch| *ch == '\t').count();
++        let right_tab_count = tail.text.chars().filter(|ch| *ch == '\t').count();
++        // merge_from omits TAB extended data; reserve missing entries so a
++        // right tab never receives an earlier left tab's width/leader metadata.
++        merged
++            .tab_extended
++            .resize(left_tab_count, [0, 0, 0, 0, 0, 0, 9]);
++        tail.tab_extended
++            .resize(right_tab_count, [0, 0, 0, 0, 0, 0, 9]);
++        let right_tabs = tail.tab_extended.clone();
++        merged.merge_from(&tail);
++        merged.tab_extended.extend(right_tabs);
++        merged.invalidate_layout_inputs();
++        left.paragraphs.extend(right.paragraphs);
++        left.raw_stream = None;
++        left.raw_provenance = None;
++        self.document.sections[left_idx] = left;
++        self.document.sections.remove(right_section_idx);
++        self.document.doc_properties.section_count = self.document.sections.len() as u16;
++        self.document.doc_properties.raw_data = None;
++        self.document.doc_info.raw_stream_dirty = true;
++        self.pending_pagination_job = None;
++        self.deferred_pagination_descriptor = None;
++        self.deferred_pagination_revision = self.deferred_pagination_revision.wrapping_add(1);
++        self.para_column_map.clear();
++        self.rebuild_resolved_styles();
++        // Moved text now uses the preceding section's paper/column/tab values.
++        // Earlier paragraphs and every later section retain their content.
++        self.reflow_paragraph(left_idx, left_para_idx);
++        for index in left_para_idx + 1..self.document.sections[left_idx].paragraphs.len() {
++            self.document.sections[left_idx].paragraphs[index]
++                .line_segs
++                .clear();
++            self.reflow_paragraph(left_idx, index);
++        }
++        let hwp3_layout = self.document.layout_profile().hwp3_layout();
++        let moved_end = self.document.sections[left_idx].paragraphs.len();
++        crate::renderer::composer::recalculate_section_vpos(
++            &mut self.document.sections[left_idx].paragraphs,
++            left_para_idx,
++            Some(left_para_idx + 1..moved_end),
++            None,
++            &self.styles,
++            self.dpi,
++            hwp3_layout,
++        );
++        self.rebuild_derived_state();
++        Ok(
++            serde_json::json!({"ok":true,"sectionIdx":left_idx,"paraIdx":left_para_idx,
++            "charOffset":caret_offset,"pageCount":self.page_count()})
++            .to_string(),
++        )
++    }
++
 +    /// Split a root body section at a paragraph logical character offset.
 +    ///
 +    /// It returns a section-local caret, not HwpCtrl stream units. Table cells,

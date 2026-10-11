@@ -91,6 +91,60 @@ try{
   await page.goto(origin);await ready();
 
   if(process.env.JUEONY_ENGINE_PACKAGE) {
+    if(typeof HwpDocument.prototype.mergeSectionBoundary==='function'||process.env.JUEONY_EXPECT_SECTION_MERGE==='1') {
+      for(const extension of ['hwp','hwpx'])for(const key of ['Delete','Backspace'])await scenario(`${key} joins section boundary, previous settings, undo/redo and ${extension} save`,async()=>{
+        const doc=HwpDocument.createEmpty();doc.createBlankDocument();doc.insertText(0,0,0,'가😀나\t다');
+        doc.splitParagraph(0,0,5);doc.insertText(0,1,0,'보존 문단');doc.insertSectionBreak(0,0,2);
+        doc.setSectionDef(0,JSON.stringify({defaultTabSpacing:4000}));doc.setSectionDef(1,JSON.stringify({defaultTabSpacing:12000}));
+        const bytes=[...doc[extension==='hwp'?'exportHwp':'exportHwpx']()];doc.free();
+        const frame=await openBytes(bytes,`join-${key}.${extension}`),before=await snapshot();
+        const position=key==='Delete'?{sectionIndex:0,paragraphIndex:0,charOffset:2}:{sectionIndex:1,paragraphIndex:0,charOffset:0};
+        await frame.evaluate(pos=>{const s=window.__parityServices,ih=s.getInputHandler();ih.cursor.moveTo(pos);ih.updateCaret();ih.focus();s.eventBus.emit('command-state-changed');},position);
+        await page.keyboard.press(key);await frame.waitForFunction(()=>window.jueonyEditor.snapshot().structure.sections.length===1);
+        const after=await snapshot();assert.deepEqual(after.nodes.map(n=>n.text),['가😀나\t다','보존 문단']);
+        assert.equal(await frame.evaluate(()=>window.__parityServices.wasm.getSectionDef(0).defaultTabSpacing),4000);
+        assert.deepEqual(await frame.evaluate(()=>window.__parityServices.getInputHandler().getPosition()),{sectionIndex:0,paragraphIndex:0,charOffset:2});
+        assert.equal(await frame.evaluate(()=>window.jueonyEditor.state().dirty),true);
+        await command('edit:undo');assert.deepEqual((await snapshot()).structure,before.structure);
+        assert.deepEqual(await frame.evaluate(()=>window.__parityServices.getInputHandler().getPosition()),position);
+        await command('edit:redo');assert.deepEqual((await snapshot()).nodes.map(n=>n.text),after.nodes.map(n=>n.text));
+        const saved=await saveBytes(`ui-section-join-${key.toLowerCase()}.${extension}`),reopen=new HwpDocument(new Uint8Array(saved));
+        try{assert.equal(reopen.getSectionCount(),1);assert.equal(reopen.getParagraphCount(0),2);assert.equal(parse(reopen.getSectionDef(0)).defaultTabSpacing,4000);}finally{reopen.free();}
+      });
+      await scenario('ordinary body deletion and outer document edges retain existing key behavior',async()=>{
+        const frame=await openFixture(),before=await snapshot();await page.keyboard.press('Backspace');assert.equal((await snapshot()).revision,before.revision);
+        await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.cursor.moveTo({sectionIndex:0,paragraphIndex:0,charOffset:1});ih.updateCaret();ih.focus();});
+        await page.keyboard.press('Backspace');assert.equal((await snapshot()).nodes[0].text,[...before.nodes[0].text].slice(1).join(''));
+        await command('edit:undo');assert.deepEqual((await snapshot()).nodes.map(n=>n.text),before.nodes.map(n=>n.text));
+        await page.keyboard.press('Delete');assert.equal((await snapshot()).nodes[0].text,[...before.nodes[0].text].filter((_,i)=>i!==1).join(''));
+        await command('edit:undo');
+        await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler(),w=window.__parityServices.wasm;const p=w.getParagraphCount(0)-1;ih.cursor.moveTo({sectionIndex:0,paragraphIndex:p,charOffset:w.getParagraphLength(0,p)});ih.updateCaret();ih.focus();});
+        const last=await snapshot();await page.keyboard.press('Delete');assert.equal((await snapshot()).revision,last.revision);
+        for(const key of ['Backspace','Delete']) {
+          const pos=key==='Backspace'?{sectionIndex:0,paragraphIndex:1,charOffset:0}:{sectionIndex:0,paragraphIndex:0,charOffset:[...before.nodes[0].text].length};
+          await frame.evaluate(pos=>{const ih=window.__parityServices.getInputHandler();ih.cursor.moveTo(pos);ih.updateCaret();ih.focus();},pos);
+          await page.keyboard.press(key);assert.deepEqual((await snapshot()).nodes.map(n=>n.text),[before.nodes[0].text+before.nodes[1].text,...before.nodes.slice(2).map(n=>n.text)]);
+          await command('edit:undo');assert.deepEqual((await snapshot()).nodes.map(n=>n.text),before.nodes.map(n=>n.text));
+        }
+      });
+      await scenario('unsupported header-bearing right section refuses join without document or dirty mutation',async()=>{
+        const doc=HwpDocument.createEmpty();doc.createBlankDocument();doc.insertText(0,0,0,'LEFT RIGHT');doc.insertSectionBreak(0,0,4);doc.createHeaderFooter(1,true,0);doc.insertTextInHeaderFooter(1,true,0,0,0,'RIGHT HEADER');
+        const bytes=[...doc.exportHwpx()];doc.free();const frame=await openBytes(bytes,'unsupported-section-header.hwpx'),before=await snapshot();
+        await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.cursor.moveTo({sectionIndex:1,paragraphIndex:0,charOffset:0});ih.updateCaret();ih.focus();});
+        await page.keyboard.press('Backspace');assert.deepEqual((await snapshot()).structure,before.structure);assert.deepEqual((await snapshot()).nodes,before.nodes);
+        assert.equal(await frame.evaluate(()=>window.jueonyEditor.state().dirty),false);
+        assert.match(await frame.$eval('#sb-message',e=>e.textContent),/구역을 합치지 못했습니다/);
+      });
+      await scenario('form mode and first table cell cannot trigger a body section merge',async()=>{
+        const doc=HwpDocument.createEmpty();doc.createBlankDocument();doc.insertText(0,0,0,'LEFT RIGHT');doc.insertSectionBreak(0,0,4);
+        const table=parse(doc.createTable(1,0,0,2,2)),bytes=[...doc.exportHwpx()];doc.free();
+        const frame=await openBytes(bytes,'guarded-section-cell.hwpx'),before=await snapshot();
+        await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.cursor.moveTo({sectionIndex:1,paragraphIndex:0,charOffset:0});ih.setEditMode('form');ih.updateCaret();ih.focus();});
+        try{await page.keyboard.press('Backspace');assert.deepEqual((await snapshot()).structure,before.structure);assert.deepEqual((await snapshot()).nodes,before.nodes);}finally{await frame.evaluate(()=>window.__parityServices.getInputHandler().setEditMode('normal'));}
+        await frame.evaluate(table=>{const ih=window.__parityServices.getInputHandler();ih.cursor.moveTo({sectionIndex:1,parentParaIndex:table.paraIdx,paragraphIndex:0,charOffset:0,controlIndex:table.controlIdx,cellIndex:0,cellParaIndex:0});ih.updateCaret();ih.focus();},table);
+        await page.keyboard.press('Backspace');assert.deepEqual((await snapshot()).structure,before.structure);assert.deepEqual((await snapshot()).nodes,before.nodes);
+      });
+    }
     await scenario('Alt+Shift+Enter splits actual body sections; undo/redo and guarded file save',async()=>{
       const frame=await openFixture(),before=await snapshot();
       await frame.evaluate(()=>{const s=window.__parityServices,ih=s.getInputHandler();ih.cursor.moveTo({sectionIndex:0,paragraphIndex:1,charOffset:2});ih.updateCaret();ih.focus();s.eventBus.emit('command-state-changed');});

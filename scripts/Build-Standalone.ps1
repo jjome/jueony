@@ -28,6 +28,9 @@ foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.m
 $llmEvidence = Join-Path $output 'evidence'
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/42-document-insertion-result.md') -Destination $output -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/43-style-management-result.md') -Destination $output -Force
+if (Test-Path -LiteralPath (Join-Path $projectRoot 'docs/44-editor-stages-result.md')) {
+    Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/44-editor-stages-result.md') -Destination $output -Force
+}
 foreach ($guide in @('30-layered-modular-refactor-plan.md','31-facade-contracts.md','32-modular-refactor-result.md','33-editor-parity-features-result.md','34-sections-tabs-result.md','35-section-boundary-merge-result.md','36-native-section-comparison.md','37-basic-editing-state-result.md','38-paragraph-selection-state-result.md','39-native-dialog-investigation.md','40-basic-navigation-calendar-result.md','41-pre-agent-editor-progress.md','refactor-work-plan.csv','hangul-2024-gap-checklist.csv')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
@@ -154,6 +157,28 @@ if (Test-Path -LiteralPath $insertionEvidence) {
         New-Item -ItemType Directory -Force $engineReview | Out-Null
         Get-ChildItem -LiteralPath $engineInsertion -File |
             Where-Object { $_.Extension -in @('.hwp', '.hwpx') } | Copy-Item -Destination $engineReview -Force
+    }
+}
+# Include only synthetic final review documents. Public corpus derivatives remain local.
+$currentFrontend = Get-Content -LiteralPath (Join-Path $frontend 'build-evidence.json') -Raw | ConvertFrom-Json
+foreach ($evidenceName in @('pre-agent-2026-10-13','page-border-2026-10-13','session-expansion-2026-10-13','table-conversion-2026-10-13','selected-object-properties-2026-10-13','formatting-toolbar-2026-10-13')) {
+    $source = Join-Path $projectRoot ('docs/evidence/' + $evidenceName)
+    if (Test-Path -LiteralPath $source) {
+        Copy-Item -LiteralPath $source -Destination $llmEvidence -Recurse -Force
+        Get-ChildItem -LiteralPath $source -Directory |
+            Where-Object { $_.Name -match 'final|verified' } | ForEach-Object {
+                $reportPath = Join-Path $_.FullName 'result.json'
+                if (-not (Test-Path -LiteralPath $reportPath)) { return }
+                $report = Get-Content -LiteralPath $reportPath -Raw | ConvertFrom-Json
+                if (-not $report.results.Count -or $report.failures.Count -or $report.errors.Count -or $report.pageErrors.Count -or $report.consoleErrors.Count) { return }
+                $recordedEngine = if ($report.build) { $report.build.engineBuild } else { $report.engine }
+                if ($recordedEngine.wasmSha256 -ne $currentFrontend.engineWasmSha256) { return }
+                if ($report.build -and $report.build.customSourceSha256 -ne $currentFrontend.customSourceSha256) { return }
+                $target = Join-Path $reviewDocuments ('pre-agent/' + $evidenceName + '/' + $_.Name)
+                New-Item -ItemType Directory -Force $target | Out-Null
+                Get-ChildItem -LiteralPath $_.FullName -File |
+                    Where-Object { $_.Extension -in @('.hwp', '.hwpx') } | Copy-Item -Destination $target -Force
+            }
     }
 }
 $moduleHashes = [ordered]@{}

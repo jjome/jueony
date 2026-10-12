@@ -1,0 +1,57 @@
+{
+  "results": [
+    "hwp: nested cells/header/footer/footnote inherit style changes without replacing direct formatting",
+    "hwpx: nested cells/header/footer/footnote inherit style changes without replacing direct formatting",
+    "footnote query JSON escapes literal tab, quotes, backslash and Unicode",
+    "endnote query JSON escapes literal tab, quotes, backslash and Unicode"
+  ],
+  "failures": [],
+  "engine": {
+    "patches": [
+      {
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af",
+        "name": "default-tabs.patch"
+      },
+      {
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f",
+        "name": "document-insertion.patch"
+      },
+      {
+        "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562",
+        "name": "note-query-json.patch"
+      },
+      {
+        "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f",
+        "name": "page-border-entries.patch"
+      },
+      {
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8",
+        "name": "section-split.patch"
+      },
+      {
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6",
+        "name": "style-reference-deletion.patch"
+      },
+      {
+        "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce",
+        "name": "style-reference-order.patch"
+      },
+      {
+        "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af",
+        "name": "style-shape-stories.patch"
+      },
+      {
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad",
+        "name": "table-creation-consistency.patch"
+      }
+    ],
+    "builtAt": "2026-10-12T16:01:37.5209715Z",
+    "optimized": false,
+    "sourceId": "efd91535b7c53466",
+    "buildMode": "wsl-review-no-opt",
+    "wasmSha256": "cc6549fc78dd9633bb0ddad524a86c1578cf6ce2161885355d4fe395762a649e",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "jsSha256": "0d406b11eeb0ca7bfb1144ecd9b1508ee93042aae034878559f9b84ca19ebbc5"
+  },
+  "scope": "Synthetic native-WASM edits, independent serialized XML and snapshot restoration; not Hancom visual parity."
+}

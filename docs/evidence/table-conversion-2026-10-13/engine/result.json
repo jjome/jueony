@@ -1,0 +1,40 @@
+{
+  "results": [
+    "hwp: literal Unicode/empty-cell conversion, scratch preflight and two saved roundtrips",
+    "hwpx: literal Unicode/empty-cell conversion, scratch preflight and two saved roundtrips",
+    "native unsafe conversion refuses stale content, merged/protected cells and literal host tabs without mutations"
+  ],
+  "failures": [],
+  "engine": {
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "patches": [
+      {
+        "name": "default-tabs.patch",
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+      },
+      {
+        "name": "document-insertion.patch",
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+      },
+      {
+        "name": "section-split.patch",
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+      },
+      {
+        "name": "style-reference-deletion.patch",
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+      },
+      {
+        "name": "table-creation-consistency.patch",
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+      }
+    ],
+    "wasmSha256": "d2bf4112349bca4dfc01fb980880d2719855343a6fc9ad0c43df8142c3200648",
+    "optimized": false,
+    "jsSha256": "ae538304ba4cc00f780d10b4cfcba9c896b41c82b2bc973f4057c835aad5ba82",
+    "buildMode": "wsl-review-no-opt",
+    "sourceId": "b28a2812acfc172f",
+    "builtAt": "2026-10-12T15:05:05.7619599Z"
+  },
+  "note": "Native WASM synthetic conversion tests, including scratch export-preservation checks and saved HWP/HWPX reopen. No native Hancom or UI comparison."
+}

@@ -1,0 +1,69 @@
+{
+  "results": [
+    "hwp into hwp: Unicode/body/table/image assets and destination page persist",
+    "hwp into hwpx: Unicode/body/table/image assets and destination page persist",
+    "hwpx into hwp: Unicode/body/table/image assets and destination page persist",
+    "hwpx into hwpx: Unicode/body/table/image assets and destination page persist",
+    "empty destination retains its page settings",
+    "hwp: colliding style IDs and source font/paragraph values remap into a blank destination",
+    "hwpx: colliding style IDs and source font/paragraph values remap into a blank destination",
+    "multiple sections refuses before mutating the destination",
+    "header refuses before mutating the destination",
+    "invalid bytes refuses before mutating the destination",
+    "invalid position refuses before mutating the destination",
+    "too many characters refuses before mutating the destination"
+  ],
+  "failures": [],
+  "engine": {
+    "builtAt": "2026-10-12T16:16:24.9937548Z",
+    "jsSha256": "0d406b11eeb0ca7bfb1144ecd9b1508ee93042aae034878559f9b84ca19ebbc5",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "optimized": false,
+    "patches": [
+      {
+        "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c",
+        "name": "border-fill-identity.patch"
+      },
+      {
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af",
+        "name": "default-tabs.patch"
+      },
+      {
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f",
+        "name": "document-insertion.patch"
+      },
+      {
+        "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562",
+        "name": "note-query-json.patch"
+      },
+      {
+        "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f",
+        "name": "page-border-entries.patch"
+      },
+      {
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8",
+        "name": "section-split.patch"
+      },
+      {
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6",
+        "name": "style-reference-deletion.patch"
+      },
+      {
+        "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce",
+        "name": "style-reference-order.patch"
+      },
+      {
+        "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af",
+        "name": "style-shape-stories.patch"
+      },
+      {
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad",
+        "name": "table-creation-consistency.patch"
+      }
+    ],
+    "sourceId": "5d412578fff9c9a0",
+    "wasmSha256": "5dc02a24794defb8b5e05b0bcc22fc7bdba30f8ec73c7d05a259733399d2423e",
+    "buildMode": "wsl-review-no-opt"
+  },
+  "note": "Native WASM regression using synthetic local documents. Not a Hancom rendering equality test."
+}

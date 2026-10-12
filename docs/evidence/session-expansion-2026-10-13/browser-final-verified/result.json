@@ -1,0 +1,198 @@
+{
+  "results": [
+    "nested cell caret persists actual workspace restart and refuses changed nested content",
+    "nested cell backward range persists actual workspace restart and refuses changed nested content",
+    "nested F5 cell block persists actual restart with the correct table path and rejects changed outer evidence",
+    "embedded image object selection persists actual restart and rejects changed picture properties",
+    "header backwards selection persists target and body return across workspace restart",
+    "footer backwards selection persists target and body return across workspace restart",
+    "body footnote backwards selection persists exact note binding and rejects changed story"
+  ],
+  "failures": [
+    {
+      "name": "trusted Ctrl+Tab and Ctrl+Shift+Tab cycle document tabs, wrap and preserve each body cursor without editing",
+      "error": "TimeoutError: Waiting failed: 15000ms exceeded",
+      "stack": "TimeoutError: Waiting failed: 15000ms exceeded\n    at new WaitTask (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/common/WaitTask.js:46:34)\n    at IsolatedWorld.waitForFunction (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Realm.js:49:26)\n    at CdpFrame.waitForFunction (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:585:43)\n    at CdpFrame.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/util/decorators.js:101:27)\n    at CdpPage.waitForFunction (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Page.js:1537:37)\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-session-expansion.mjs:185:51\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-session-expansion.mjs:93:6)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-session-expansion.mjs:177:2",
+      "state": {
+        "view": {
+          "version": 1,
+          "zoom": 0.9839989920624921,
+          "fitMode": "none",
+          "scrollX": 210,
+          "scrollY": 0,
+          "caret": {
+            "section": 0,
+            "paragraph": 0,
+            "offset": 2,
+            "paragraphLength": 8,
+            "before": "첫째",
+            "after": " 문서 본문"
+          },
+          "cursor": {
+            "kind": "text",
+            "focus": {
+              "kind": "body",
+              "caret": {
+                "section": 0,
+                "paragraph": 0,
+                "offset": 2,
+                "paragraphLength": 8,
+                "before": "첫째",
+                "after": " 문서 본문"
+              }
+            },
+            "blockPhase": null
+          }
+        },
+        "dirty": false,
+        "revision": "3:0",
+        "digest": "59e77f4597e31a78bd711fa631510f120693304b5448b0dedaa926074dc6ed80",
+        "position": {
+          "sectionIndex": 0,
+          "paragraphIndex": 0,
+          "charOffset": 2
+        },
+        "picture": null,
+        "block": null,
+        "header": "none",
+        "note": false,
+        "noteRange": null,
+        "headerRange": null,
+        "range": null
+      }
+    },
+    {
+      "name": "trusted table Ctrl+Tab inserts a literal tab and table hanging/modal contexts keep the current document tab",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'구분' !== '\\t구분'\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'구분' !== '\\t구분'\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-session-expansion.mjs:204:108\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-session-expansion.mjs:93:6)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-session-expansion.mjs:199:2",
+      "state": {
+        "view": {
+          "version": 1,
+          "zoom": 0.9839989920624921,
+          "fitMode": "none",
+          "scrollX": 210,
+          "scrollY": 0,
+          "cursor": {
+            "kind": "text",
+            "focus": {
+              "kind": "cell",
+              "caret": {
+                "section": 0,
+                "paragraph": 0,
+                "offset": 0,
+                "paragraphLength": 2,
+                "before": "",
+                "after": "구분"
+              },
+              "parentParagraph": 1,
+              "control": 0,
+              "cell": 0,
+              "tableFingerprint": "938d7bdfb0759b0124c2c18ef7beff8f0262a3bb7f4c2f85dd8e188b413f5914"
+            },
+            "blockPhase": null
+          }
+        },
+        "dirty": false,
+        "revision": "4:0",
+        "digest": "1b623738fff9aa738dd2dbf07e67e3a8d57e92f2f9299b522c0d8b6e69dee0b2",
+        "position": {
+          "sectionIndex": 0,
+          "parentParaIndex": 1,
+          "paragraphIndex": 0,
+          "controlIndex": 0,
+          "cellIndex": 0,
+          "cellParaIndex": 0,
+          "charOffset": 0
+        },
+        "picture": null,
+        "block": null,
+        "header": "none",
+        "note": false,
+        "noteRange": null,
+        "headerRange": null,
+        "range": null
+      }
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "dialogs": [],
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@jueony/rhwp-engine-review@0.8.7",
+    "builtAt": "2026-10-12T16:23:20.746Z",
+    "engineWasmSha256": "5dc02a24794defb8b5e05b0bcc22fc7bdba30f8ec73c7d05a259733399d2423e",
+    "engineBuild": {
+      "builtAt": "2026-10-12T16:16:24.9937548Z",
+      "jsSha256": "0d406b11eeb0ca7bfb1144ecd9b1508ee93042aae034878559f9b84ca19ebbc5",
+      "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+      "optimized": false,
+      "patches": [
+        {
+          "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c",
+          "name": "border-fill-identity.patch"
+        },
+        {
+          "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af",
+          "name": "default-tabs.patch"
+        },
+        {
+          "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f",
+          "name": "document-insertion.patch"
+        },
+        {
+          "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562",
+          "name": "note-query-json.patch"
+        },
+        {
+          "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f",
+          "name": "page-border-entries.patch"
+        },
+        {
+          "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8",
+          "name": "section-split.patch"
+        },
+        {
+          "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6",
+          "name": "style-reference-deletion.patch"
+        },
+        {
+          "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce",
+          "name": "style-reference-order.patch"
+        },
+        {
+          "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af",
+          "name": "style-shape-stories.patch"
+        },
+        {
+          "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad",
+          "name": "table-creation-consistency.patch"
+        }
+      ],
+      "sourceId": "5d412578fff9c9a0",
+      "wasmSha256": "5dc02a24794defb8b5e05b0bcc22fc7bdba30f8ec73c7d05a259733399d2423e",
+      "buildMode": "wsl-review-no-opt"
+    },
+    "buildScriptSha256": "e81a3787838292845d671c749b23f015b7a46cd6bd87393dd7f9da2774b24084",
+    "studioPatchSha256": "288d92712a0d79ac2366309f2bbbf5e36e4280ca9845003b9d7756e969a35533",
+    "featurePatchSha256": "ca3ae9e1f5c7075d0113b6a38cb905317ec51db8e0cfdb55f1dfb0e9e1e986b7",
+    "recoveryPatchSha256": "12dfbb56ca02e1642bb495a44e18cf0823da84864386211eeb8811916552f864",
+    "tabFeaturePatchSha256": "da0d7d0b9a0c529af8a4a9733bf239a1c4f6afcd99b8803f1237f1c57a90ceec",
+    "sectionBoundaryPatchSha256": "e2a5cee3330b67015a3ac8cc738cafe36966950d7a12fc48e1d0a7ffc2392b13",
+    "documentInsertionPatchSha256": "2941b880fe250f779c95ce7bbd9d54384b10dda5f1596f7c0343d44e0297d4ff",
+    "styleManagementPatchSha256": "792ad2629ba0d657fe0bc504fa0f3c55075c6b2c69ea0cb570954dad294ed55c",
+    "styleFlowPatchSha256": "11010768f738466f36731a71b6d596ecae4ba60c74132fd3ea088e4816a98974",
+    "tableConversionPatchSha256": "3b6e27294cede2396cdc3d248d68148946c45493eb821fb37f52b3c4c69626b3",
+    "pageBorderPatchSha256": "d066c398b7318373c2b4ced800d4d770d2cb6b0cf9662c4b0ef15b4fee2e1416",
+    "selectedObjectPropertiesPatchSha256": "3ff0eab7f38eece3ce098c33759d0e2bdce12fb3f44c8da417c81a1e02799279",
+    "formattingToolbarPatchSha256": "8186585701db9a6a98b4af18e38b821e1da6314897cc9922dffdd8e8e818f7e9",
+    "customSourceSha256": "1d162f6ad3561a09286e171d1156992ebe1de891cbf005752fd63037f737fa11",
+    "applicationSourceCommit": "20ac5dc11ba1cfb7a598219c13f20f197ef0f599",
+    "applicationSourceDirty": true,
+    "sourceBuild": true,
+    "note": "고정 rhwp 소스와 추적 패치를 직접 빌드한 검수용 WASM. 최적화 및 한컴 출력 비교 상태는 engineBuild와 검증 보고서 참조."
+  },
+  "note": "Headless Edge isolated profile; actual workspace IndexedDB/OPFS restart. Synthetic fixtures, test-only automation extension. No native Hancom parity assertion."
+}

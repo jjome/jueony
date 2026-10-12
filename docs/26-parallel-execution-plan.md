@@ -1,5 +1,7 @@
 # Jueony 병렬 작업 순서와 통합 검증
 
+2026-10-13 편집기 후속 실행: 사용자의 요청에 따라 Computer Use의 직접 비교 대기를 분리하고, Agent 재구성 전 편집기 범위를 병렬로 보강한다. 상태 저장·표와 개체·쪽 설정과 통합 UI 담당은 독립 소스 및 검사 포트를 사용하고 공용 엔진·빌드·shell·최종 통합은 한 담당이 처리한다. [최신 단계별 결과](44-editor-stages-result.md)와 [기능 차이 목록](hangul-2024-gap-checklist.csv)을 따른다. 아래의 제품 전체 단계 5~6을 새 Agent 개발 완료로 해석하지 않는다.
+
 후속 구현: [기본 편집·상태 보존 보강 결과](33-editor-parity-features-result.md)에 4193 검수본과 최신 검증을 기록했다. 아래 본문은 당시 조사 기록이며, 최신 항목별 상태는 [차이 목록](hangul-2024-gap-checklist.csv)을 따른다.
 
 후속 계획: 신규 기능 병렬 구현을 확대하기 전에 [레이어·모듈 리팩터링](30-layered-modular-refactor-plan.md)의 R00~R15를 먼저 수행한다. [Facade 계약](31-facade-contracts.md)과 [리팩터링 작업표](refactor-work-plan.csv)를 현재 선행 작업으로 사용한다. 아래 단계별 기록과 기존 검증 결과는 보존한다.

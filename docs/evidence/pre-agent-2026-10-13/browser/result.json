@@ -1,0 +1,182 @@
+{
+  "results": [
+    "modal Tab/Shift-Tab, focused cancel Enter, Escape and nested Escape preserve document and editor focus",
+    "body caret survives actual workspace reload and tab switching without dirty or focus changes",
+    "embedded dirty editors delegate the exit prompt to the workspace host; standalone retains protection",
+    "Ctrl+1 through Ctrl+0 apply default paragraph styles and undo without changing text",
+    "hwp: paragraph shortcut aliases adjust per-paragraph values and undo/save without changing text",
+    "hwpx: paragraph shortcut aliases adjust per-paragraph values and undo/save without changing text",
+    "hwp: quick hanging indent aligns to live prefix, repeats without edit and undoes/saves",
+    "hwpx: quick hanging indent aligns to live prefix, repeats without edit and undoes/saves",
+    "hwp: flat-cell quick hanging indent retains Unicode and Shift+Tab cell navigation",
+    "hwpx: flat-cell quick hanging indent retains Unicode and Shift+Tab cell navigation",
+    "hwp: object T transposes whole table, preserves cell text/format and one-step undo/save",
+    "hwpx: object T transposes whole table, preserves cell text/format and one-step undo/save",
+    "table object selection survives restart without dirty and rejects changed table evidence",
+    "cursor history physical Equal keys go back/forward, branch on manual movement and do not dirty the document",
+    "hwp: calendar string shortcut, preview, cancel/conflict, single undo and guarded save",
+    "hwpx: calendar string shortcut, preview, cancel/conflict, single undo and guarded save",
+    "calendar format survives restart; cancel and corrupt/quota storage do not duplicate document insertion",
+    "cursor history skips changed text bookmarks and restores flat-cell scalar offsets",
+    "body selection preserves backward anchor and F3 phase after delayed persistence/reload; changed middle text refuses restore",
+    "paragraph repeated keys preserve no-op redo and refuse modal/form/IME edits",
+    "flat table cell Unicode caret and same-cell text selection survive reload and tab switching",
+    "F5 cell block stores phase/rectangle/exclusions and paragraph delta applies to all selected cells as one undo",
+    "merged flat table cell cursor survives checkpoint/reload and new input cancels a pending restore",
+    "immediate reload journals latest body/cell selection before the debounced IndexedDB write",
+    "Delete joins section boundary, previous settings, undo/redo and hwp save",
+    "Backspace joins section boundary, previous settings, undo/redo and hwp save",
+    "Delete joins section boundary, previous settings, undo/redo and hwpx save",
+    "Backspace joins section boundary, previous settings, undo/redo and hwpx save",
+    "ordinary body deletion and outer document edges retain existing key behavior",
+    "unsupported header-bearing right section refuses join without document or dirty mutation",
+    "form mode and first table cell cannot trigger a body section merge",
+    "Alt+Shift+Enter splits actual body sections; undo/redo and guarded file save",
+    "paragraph dialog changes default tab spacing in pt; cancel/undo/reopen preserve state",
+    "F6 opens styles; Alt+F6 focuses chat; modal F6 does not change document",
+    "table cell block F7 selects column; P opens cell properties without typing text",
+    "document information reads live text/table counts without changing revision or dirty state",
+    "hwp: page hide cancel/apply/undo/redo and actual save/reopen",
+    "hwpx: page hide cancel/apply/undo/redo and actual save/reopen",
+    "header/footer dialog cancel, create, undo/redo, then existing content stays intact",
+    "manual table caption position/removal form single undo steps and survive saving",
+    "hwp: Agent style/columns/page-hide batch uses live snapshot, persists and undoes as one request",
+    "hwpx: Agent style/columns/page-hide batch uses live snapshot, persists and undoes as one request",
+    "hwp into hwp: document insertion Ctrl+O, file preflight, one undo/redo and guarded save",
+    "hwp into hwpx: document insertion Ctrl+O, file preflight, one undo/redo and guarded save",
+    "hwpx into hwp: document insertion Ctrl+O, file preflight, one undo/redo and guarded save",
+    "hwpx into hwpx: document insertion Ctrl+O, file preflight, one undo/redo and guarded save",
+    "document insertion cancel, invalid file and revision conflict never change the live document",
+    "document insertion rejects source headers/multiple sections and disables cell/selection targets",
+    "document insertion is disabled for an actually password-opened document",
+    "style list arrow/Home/End navigation retains modal focus and document state",
+    "hwp: style clone retains definitions and one-step undo/save without changing body",
+    "hwpx: style clone retains definitions and one-step undo/save without changing body",
+    "hwp: style character type and deferred font shape commit cancel/undo/save correctly",
+    "hwpx: style character type and deferred font shape commit cancel/undo/save correctly",
+    "hwp: deleting styles remaps flat-cell references and retains text/format in one undo",
+    "hwpx: deleting styles remaps flat-cell references and retains text/format in one undo",
+    "hwp: style edit renames identity, propagates body and cell size, keeps overrides and no-op undo state",
+    "hwpx: style edit renames identity, propagates body and cell size, keeps overrides and no-op undo state",
+    "style editing rejects duplicate names and concurrent document changes without applying pending formats",
+    "recovery options off retain old checkpoint; idle 5 seconds saves dirty changes and restores after reload",
+    "hwp: selected character style preserves unselected runs and one undo/save roundtrip",
+    "hwpx: selected character style preserves unselected runs and one undo/save roundtrip",
+    "Enter at paragraph end follows next style and undo restores the original document",
+    "style manager moves definitions together with body references, blocks fallback and undo restores order"
+  ],
+  "failures": [
+    {
+      "name": "hwp: page border solid background dialog cancels, undoes and preserves guarded export",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'both' !== '0'\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'both' !== '0'\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:284:12\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:66:7)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:270:41",
+      "settings": "{\"theme\":{\"mode\":\"light\",\"skin\":\"default\",\"skinChosen\":true}}",
+      "browserDialogs": [],
+      "consoleErrors": []
+    },
+    {
+      "name": "hwpx: page border solid background dialog cancels, undoes and preserves guarded export",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n... Skipped lines\n\n  {\n    applyPage: 'all',\n    attr: 1,\n    basis: 'page',\n    borderBottom: {\n...\n    patternColor: '#000000',\n+   patternType: -1,\n-   patternType: 0,\n    spacingBottom: 1417,\n    spacingLeft: 1417,\n    spacingRight: 1417,\n    spacingTop: 1417\n  }\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n... Skipped lines\n\n  {\n    applyPage: 'all',\n    attr: 1,\n    basis: 'page',\n    borderBottom: {\n...\n    patternColor: '#000000',\n+   patternType: -1,\n-   patternType: 0,\n    spacingBottom: 1417,\n    spacingLeft: 1417,\n    spacingRight: 1417,\n    spacingTop: 1417\n  }\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:282:16\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:66:7)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:270:41",
+      "settings": "{\"theme\":{\"mode\":\"light\",\"skin\":\"default\",\"skinChosen\":true}}",
+      "browserDialogs": [],
+      "consoleErrors": []
+    }
+  ],
+  "pageErrors": [],
+  "browserDialogs": [
+    {
+      "type": "beforeunload",
+      "message": ""
+    },
+    {
+      "type": "confirm",
+      "message": "'삭제 대상' 스타일을 삭제하시겠습니까?\n이 스타일을 사용 중인 문단은 바탕글로 변경됩니다."
+    },
+    {
+      "type": "confirm",
+      "message": "'삭제 대상' 스타일을 삭제하시겠습니까?\n이 스타일을 사용 중인 문단은 바탕글로 변경됩니다."
+    },
+    {
+      "type": "beforeunload",
+      "message": ""
+    },
+    {
+      "type": "beforeunload",
+      "message": ""
+    }
+  ],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@jueony/rhwp-engine-review@0.8.7",
+    "builtAt": "2026-10-12T16:02:19.615Z",
+    "engineWasmSha256": "cc6549fc78dd9633bb0ddad524a86c1578cf6ce2161885355d4fe395762a649e",
+    "engineBuild": {
+      "patches": [
+        {
+          "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af",
+          "name": "default-tabs.patch"
+        },
+        {
+          "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f",
+          "name": "document-insertion.patch"
+        },
+        {
+          "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562",
+          "name": "note-query-json.patch"
+        },
+        {
+          "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f",
+          "name": "page-border-entries.patch"
+        },
+        {
+          "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8",
+          "name": "section-split.patch"
+        },
+        {
+          "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6",
+          "name": "style-reference-deletion.patch"
+        },
+        {
+          "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce",
+          "name": "style-reference-order.patch"
+        },
+        {
+          "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af",
+          "name": "style-shape-stories.patch"
+        },
+        {
+          "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad",
+          "name": "table-creation-consistency.patch"
+        }
+      ],
+      "builtAt": "2026-10-12T16:01:37.5209715Z",
+      "optimized": false,
+      "sourceId": "efd91535b7c53466",
+      "buildMode": "wsl-review-no-opt",
+      "wasmSha256": "cc6549fc78dd9633bb0ddad524a86c1578cf6ce2161885355d4fe395762a649e",
+      "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+      "jsSha256": "0d406b11eeb0ca7bfb1144ecd9b1508ee93042aae034878559f9b84ca19ebbc5"
+    },
+    "buildScriptSha256": "861d27315d48d59c8a84d7d942d18e8322659e367da45eaa06522fd5d3be366e",
+    "studioPatchSha256": "288d92712a0d79ac2366309f2bbbf5e36e4280ca9845003b9d7756e969a35533",
+    "featurePatchSha256": "ca3ae9e1f5c7075d0113b6a38cb905317ec51db8e0cfdb55f1dfb0e9e1e986b7",
+    "recoveryPatchSha256": "12dfbb56ca02e1642bb495a44e18cf0823da84864386211eeb8811916552f864",
+    "tabFeaturePatchSha256": "da0d7d0b9a0c529af8a4a9733bf239a1c4f6afcd99b8803f1237f1c57a90ceec",
+    "sectionBoundaryPatchSha256": "e2a5cee3330b67015a3ac8cc738cafe36966950d7a12fc48e1d0a7ffc2392b13",
+    "documentInsertionPatchSha256": "2941b880fe250f779c95ce7bbd9d54384b10dda5f1596f7c0343d44e0297d4ff",
+    "styleManagementPatchSha256": "792ad2629ba0d657fe0bc504fa0f3c55075c6b2c69ea0cb570954dad294ed55c",
+    "styleFlowPatchSha256": "11010768f738466f36731a71b6d596ecae4ba60c74132fd3ea088e4816a98974",
+    "tableConversionPatchSha256": "3b6e27294cede2396cdc3d248d68148946c45493eb821fb37f52b3c4c69626b3",
+    "pageBorderPatchSha256": "d066c398b7318373c2b4ced800d4d770d2cb6b0cf9662c4b0ef15b4fee2e1416",
+    "customSourceSha256": "fd3e65f898a7922bebc3c7781746399b7b288cf4426407421a981bf4b467c1c8",
+    "applicationSourceCommit": "20ac5dc11ba1cfb7a598219c13f20f197ef0f599",
+    "applicationSourceDirty": true,
+    "sourceBuild": true,
+    "note": "고정 rhwp 소스와 추적 패치를 직접 빌드한 검수용 WASM. 최적화 및 한컴 출력 비교 상태는 engineBuild와 검증 보고서 참조."
+  },
+  "note": "Isolated headless Edge profile, synthetic files/OPFS and memory model store. Manual command/UI tests use a test extension to position cursors and read engine values. No paid model or native Hancom comparison."
+}

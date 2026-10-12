@@ -1,6 +1,6 @@
 # Jueony — 공무원용 AI 문서 편집기
 
-폐쇄망 Windows PC에서 업무별 자료와 대화를 관리하고, 가운데 채팅의 요청으로 오른쪽 HWP/HWPX 문서를 AI와 함께 직접 편집하는 프로그램을 만든다. **현재는 본문·단순 표 행/열·서식·쪽 설정과 한글 단축키를 연결한 MVP 개발판**이다. 한글 2024 전체 기능·화면·파일 호환성 100%를 달성한 상태는 아니다. [최신 구현과 검증 결과](docs/33-editor-parity-features-result.md), [설치 한글 2024와의 비교·미구현 목록](docs/29-hangul-2024-comparison.md)을 참고한다. 다음 신규 기능 병렬 구현에 앞서 [레이어·모듈 리팩터링 계획](docs/30-layered-modular-refactor-plan.md)과 [Facade 계약](docs/31-facade-contracts.md)의 핵심 모듈 첫 이관을 적용했다. [리팩터링 적용 결과와 남은 이관](docs/32-modular-refactor-result.md)을 확인한다.
+폐쇄망 Windows PC에서 업무별 자료와 대화를 관리하고, 가운데 채팅의 요청으로 오른쪽 HWP/HWPX 문서를 AI와 함께 직접 편집하는 프로그램을 만든다. **현재는 본문·단순 표 행/열·서식·쪽 설정과 한글 단축키를 연결한 MVP 개발판**이다. 한글 2024 전체 기능·화면·파일 호환성 100%를 달성한 상태는 아니다. [최신 구현과 검증 결과](docs/44-editor-stages-result.md), [설치 한글 2024와의 비교·미구현 목록](docs/29-hangul-2024-comparison.md)을 참고한다. 다음 신규 기능 병렬 구현에 앞서 [레이어·모듈 리팩터링 계획](docs/30-layered-modular-refactor-plan.md)과 [Facade 계약](docs/31-facade-contracts.md)의 핵심 모듈 첫 이관을 적용했다. [리팩터링 적용 결과와 남은 이관](docs/32-modular-refactor-result.md)을 확인한다.
 
 ## 이용허락
 
@@ -9,6 +9,8 @@
 제3자 오픈소스·글꼴 등에는 각각의 원래 라이선스가 우선한다. [제3자 고지](THIRD_PARTY_NOTICES.md)와 [적용 기록](docs/09-licensing.md)을 참고한다. 기관용 개발이라는 제품 목표가 기관의 무료 사용을 허가하는 것은 아니다. 기관 사용은 별도 계약 대상으로 둔다.
 
 ## 바로 실행
+
+최신 통합 편집기 검수본은 **[Start-Review.cmd](build/jueony-pre-agent-20261013/Start-Review.cmd)**로 실행한다(4203). 스타일·중첩 선택 복원·표 변환·정수 자동 채우기·개체 속성 단축키·쪽 배경과 통합 서식 도구 모음을 보강했다. [이번 단계별 결과와 남은 제한](docs/44-editor-stages-result.md)을 확인한다. 기존 포트의 업무와 문서는 유지하며 실제 한글의 전체 지면 동등성은 아직 완료하지 않았다.
 
 최신 문단·선택 저장 검수본은 **[Start-Review.cmd](build/jueony-selection-state-20261012/Start-Review.cmd)**로 실행한다(4198). 문단 여백·첫 줄 키와 본문/표 셀 선택 저장, 종료 직전 위치 복원을 보강했다. [구현·검증·제한](docs/38-paragraph-selection-state-result.md), [한글 대화상자 도구 오류 조사](docs/39-native-dialog-investigation.md)를 확인한다.
 

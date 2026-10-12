@@ -1,14 +1,27 @@
 import assert from 'node:assert/strict';
-import {readFile,writeFile} from 'node:fs/promises';
+import {readFile,writeFile,readdir} from 'node:fs/promises';
 import {resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
 
 const repo=resolve(dirname(fileURLToPath(import.meta.url)),'../../..');
 const evidence=resolve(repo,'docs/evidence/pre-agent-2026-10-13');
 const dist=resolve(repo,process.env.JUEONY_TEST_DIST??'apps/editor/evidence/dist-pre-agent');
 const json=async path=>JSON.parse(await readFile(path,'utf8'));
 const build=await json(resolve(dist,'build-evidence.json'));
+const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
+const source=[];
+async function collect(directory,prefix=''){
+ for(const entry of (await readdir(directory,{withFileTypes:true})).sort((a,b)=>a.name.localeCompare(b.name))){
+  const name=prefix+entry.name;if(entry.isDirectory())await collect(resolve(directory,entry.name),name+'/');
+  else source.push(name,await readFile(resolve(directory,entry.name),'utf8'));
+ }
+}
+await collect(resolve(repo,'apps/editor/src'));
+assert.equal(build.customSourceSha256,digest(source.join('\n')),'current application sources changed after verification');
+assert.equal(build.buildScriptSha256,digest(await readFile(resolve(repo,'apps/editor/scripts/build.mjs'))),'current build script changed after verification');
+for(const patch of build.engineBuild.patches)assert.equal(patch.sha256,digest(await readFile(resolve(repo,'engine/patches',patch.name))),'current engine patch changed: '+patch.name);
 const suites=[
  ['parity','browser',66],['session','browser',9],['table','browser',6],
  ['object-properties','browser',16],['page-border','browser',13],['formatting','browser',10],['agent','browser',9],
@@ -38,7 +51,7 @@ const summary={verifiedAt:new Date().toISOString(),status:'PASS_SCOPED_AUTOMATED
  scope:'Implemented editor paths, isolated browser sessions and same-engine serialization. Not full Hancom parity.',
  nativeHancomComparison:'DEFERRED_BY_USER',fullHancomParity:'NOT_COMPLETE',agentReconstruction:'NOT_STARTED_THIS_RUN',
  engine:{baseCommit:build.sourceCommit,wasmSha256:build.engineWasmSha256,optimized:build.engineBuild.optimized,patches:build.engineBuild.patches},
- application:{customSourceSha256:build.customSourceSha256,buildScriptSha256:build.buildScriptSha256},
+ application:{customSourceSha256:build.customSourceSha256,buildScriptSha256:build.buildScriptSha256,reviewCommit:execFileSync('git',['-C',repo,'rev-parse','HEAD'],{encoding:'utf8'}).trim(),buildRecordedCommit:build.applicationSourceCommit,buildRecordedDirty:build.applicationSourceDirty},
  units:{passed:count('pass'),failed:0,skipped:0},moduleBoundaries:{ok:true,scannedFiles:boundaries.scannedFiles,moduleCount:boundaries.modules.length},
  browserCases:results.filter(row=>row.kind==='browser').reduce((sum,row)=>sum+row.passed,0),nativeCases:results.filter(row=>row.kind==='native').reduce((sum,row)=>sum+row.passed,0),results,
  publicCorpus:corpus.reports.map(report=>({id:report.id,contentStatus:report.status,exports:report.exports.map(row=>({format:row.format,guardStatus:row.guard?.status,issues:row.guard?.issues??[],unverified:row.guard?.unverified??[]}))})),

@@ -1,0 +1,22 @@
+{
+  "results": [
+    "page dialog cancel and unchanged confirmation do not mark document dirty",
+    "hwp: odd-page gradient all actual dialog → one snapshot undo/redo → save/reopen",
+    "hwp: odd-page gradient exceptFirst actual dialog → one snapshot undo/redo → save/reopen",
+    "hwp: odd-page gradient firstOnly actual dialog → one snapshot undo/redo → save/reopen",
+    "hwpx: odd-page gradient all actual dialog → one snapshot undo/redo → save/reopen",
+    "hwpx: odd-page gradient exceptFirst actual dialog → one snapshot undo/redo → save/reopen",
+    "hwpx: odd-page gradient firstOnly actual dialog → one snapshot undo/redo → save/reopen",
+    "multiple page-kind drafts commit atomically in a single undo",
+    "invalid gradient coordinates retain dialog and leave native document unchanged",
+    "unchanged and border-only edits preserve mixed first-page border/fill visibility",
+    "stale page dialog refuses to overwrite intervening document edit",
+    "unified menu keyboard and quick format dialog preserve real editor selection",
+    "actual unified popup remains inside narrow 200% DPI viewport"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Actual browser command/selection/history and real WASM save. Native Hancom comparison remains pending."
+}

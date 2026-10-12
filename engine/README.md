@@ -32,4 +32,12 @@ Cargo metadata와 build 모두 `--locked`로 실행한다. WSL 캐시는 Linux `
 
 `style-reference-deletion.patch`는 스타일 삭제 후 본문뿐 아니라 표/중첩 문단·개체/특수 story·바탕쪽의 스타일 참조를 함께 보정한다. 삭제된 연결은 0으로, 뒤 ID는 하나 낮춘다. 기존 문단의 직접 모양과 텍스트는 변경하지 않는다. 브라우저 편집/undo와 독립 중첩 XML 검사 결과 및 모양 전파 제한은 [43번 결과](../docs/43-style-management-result.md)에 기록한다.
 
+2026-10-13 후속 패치는 다음 계약을 추가한다. [통합 구현과 검증 범위](../docs/44-editor-stages-result.md)를 함께 확인한다.
+
+- `style-reference-order.patch`: `moveStyle(from, to)`로 정의와 모든 문단 트리의 참조·다음 스타일 번호를 함께 재배치한다. ID 0은 고정한다.
+- `style-shape-stories.patch`: 정의 변경 때 특수 문단 트리에도 모양을 전파하고 직접 서식은 유지한다. `styleShapeStoriesEnabled()`로 adapter가 지원 여부를 확인한다.
+- `page-border-entries.patch`: `getPageBorderFillEntry(section, kind)`와 `setPageBorderFillEntry(section, kind, json)`로 both/even/odd 설정, 첫 쪽 표시, 두 색 그러데이션을 처리한다. 공유 자원은 복사하며 구역 첫 쪽 표시와 홀짝 선택을 조판·렌더링에 반영한다. 머리말/꼬리말 포함 플래그의 저장 보존은 가능하지만 실제 배치 계산은 아직 지원하지 않는다.
+- `border-fill-identity.patch`: 배경색뿐 아니라 무늬·그러데이션·그림·투명도 전체를 비교하여 다른 채우기를 같은 자원으로 합치지 않는다.
+- `note-query-json.patch`: 각주/미주 텍스트 조회에서 탭·줄바꿈·제어문자를 JSON 규칙대로 이스케이프한다.
+
 rhwp 원문의 MIT 고지와 별도 third-party 고지를 유지한다. 변경한 엔진에도 같은 라이선스 조건이 적용된다. 개발 도구는 실행 묶음에 포함하지 않는다. 엔진 코드를 컴파일한 사실, 구조·저장 왕복, 한컴의 실제 저장·인쇄·시각 일치는 서로 다른 검증이다. 새 조판 golden을 독립 한컴 출력 없이 추가하거나 테스트 통과만으로 한글 2024와 같다고 판정하지 않는다. 최종 실행 결과는 프로젝트의 작업 결과 문서에 별도로 기록한다.

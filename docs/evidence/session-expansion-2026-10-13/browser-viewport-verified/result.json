@@ -1,0 +1,240 @@
+{
+  "results": [
+    "nested cell caret persists actual workspace restart and refuses changed nested content",
+    "nested cell backward range persists actual workspace restart and refuses changed nested content",
+    "nested F5 cell block persists actual restart with the correct table path and rejects changed outer evidence",
+    "embedded image object selection persists actual restart and rejects changed picture properties",
+    "header backwards selection persists target and body return across workspace restart"
+  ],
+  "failures": [
+    {
+      "name": "footer backwards selection persists target and body return across workspace restart",
+      "error": "AssertionError [ERR_ASSERTION]: footer: vertical viewport changed 293 -> 225",
+      "stack": "AssertionError [ERR_ASSERTION]: footer: vertical viewport changed 293 -> 225\n    at checkpointAndReload (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-session-expansion.mjs:76:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-session-expansion.mjs:158:3\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-session-expansion.mjs:93:6)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-session-expansion.mjs:150:37",
+      "state": {
+        "view": {
+          "version": 1,
+          "zoom": 0.9839989920624921,
+          "fitMode": "none",
+          "scrollX": 210,
+          "scrollY": 225,
+          "cursor": {
+            "kind": "header-footer",
+            "focus": {
+              "kind": "body",
+              "caret": {
+                "section": 0,
+                "paragraph": 0,
+                "offset": 2,
+                "paragraphLength": 5,
+                "before": "본문",
+                "after": " 확인"
+              }
+            },
+            "caret": {
+              "section": 0,
+              "paragraph": 0,
+              "offset": 1,
+              "paragraphLength": 5,
+              "before": "가",
+              "after": "😀나다라"
+            },
+            "anchor": {
+              "section": 0,
+              "paragraph": 0,
+              "offset": 4,
+              "paragraphLength": 5,
+              "before": "가😀나다",
+              "after": "라"
+            },
+            "storyFingerprint": "3c00b5818e2ddd604fe6f375b8fbbbe7d08bb34ee5c1af472d53c42783a561d4",
+            "isHeader": false,
+            "applyTo": 2
+          }
+        },
+        "dirty": false,
+        "revision": "2:0",
+        "digest": "411fe2054110c1280bb605c6361d9bb59e0fac653d879a60bf7e1c0e2e50241b",
+        "position": {
+          "sectionIndex": 0,
+          "paragraphIndex": 0,
+          "charOffset": 2
+        },
+        "picture": null,
+        "block": null,
+        "header": "footer",
+        "note": false,
+        "noteRange": null,
+        "headerRange": {
+          "start": {
+            "sectionIdx": 0,
+            "isHeader": false,
+            "applyTo": 2,
+            "paraIdx": 0,
+            "charOffset": 1
+          },
+          "end": {
+            "sectionIdx": 0,
+            "isHeader": false,
+            "applyTo": 2,
+            "paraIdx": 0,
+            "charOffset": 4
+          },
+          "previewPage": 0
+        },
+        "range": null
+      }
+    },
+    {
+      "name": "body footnote backwards selection persists exact note binding and rejects changed story",
+      "error": "AssertionError [ERR_ASSERTION]: footnote: vertical viewport changed 380 -> 312",
+      "stack": "AssertionError [ERR_ASSERTION]: footnote: vertical viewport changed 380 -> 312\n    at checkpointAndReload (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-session-expansion.mjs:76:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-session-expansion.mjs:168:133\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-session-expansion.mjs:93:6)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-session-expansion.mjs:161:2",
+      "state": {
+        "view": {
+          "version": 1,
+          "zoom": 0.9839989920624921,
+          "fitMode": "none",
+          "scrollX": 210,
+          "scrollY": 312,
+          "cursor": {
+            "kind": "footnote",
+            "focus": {
+              "kind": "body",
+              "caret": {
+                "section": 0,
+                "paragraph": 0,
+                "offset": 2,
+                "paragraphLength": 8,
+                "before": "본문",
+                "after": " 각주 확인"
+              }
+            },
+            "caret": {
+              "section": 0,
+              "paragraph": 0,
+              "offset": 3,
+              "paragraphLength": 7,
+              "before": "  가",
+              "after": "😀나다라"
+            },
+            "anchor": {
+              "section": 0,
+              "paragraph": 0,
+              "offset": 5,
+              "paragraphLength": 7,
+              "before": "  가😀나",
+              "after": "다라"
+            },
+            "storyFingerprint": "4a784d480ab5ac340623f37cfaab4b2e90d7b23d07c1c16c9a6c121feed342ab",
+            "parentParagraph": 0,
+            "control": 2,
+            "page": 0,
+            "index": 0,
+            "sourceType": "body"
+          }
+        },
+        "dirty": false,
+        "revision": "2:0",
+        "digest": "be06e46adc03492d956ee8aba91268f1178ceb27dd2ac1bd415d6c06223cc922",
+        "position": {
+          "sectionIndex": 0,
+          "paragraphIndex": 0,
+          "charOffset": 2
+        },
+        "picture": null,
+        "block": null,
+        "header": "none",
+        "note": true,
+        "noteRange": {
+          "anchor": {
+            "fnParaIdx": 0,
+            "charOffset": 5
+          },
+          "focus": {
+            "fnParaIdx": 0,
+            "charOffset": 3
+          },
+          "pageNum": 0,
+          "footnoteIndex": 0
+        },
+        "headerRange": null,
+        "range": null
+      }
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "dialogs": [],
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@jueony/rhwp-engine-review@0.8.7",
+    "builtAt": "2026-10-12T16:05:31.700Z",
+    "engineWasmSha256": "cc6549fc78dd9633bb0ddad524a86c1578cf6ce2161885355d4fe395762a649e",
+    "engineBuild": {
+      "patches": [
+        {
+          "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af",
+          "name": "default-tabs.patch"
+        },
+        {
+          "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f",
+          "name": "document-insertion.patch"
+        },
+        {
+          "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562",
+          "name": "note-query-json.patch"
+        },
+        {
+          "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f",
+          "name": "page-border-entries.patch"
+        },
+        {
+          "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8",
+          "name": "section-split.patch"
+        },
+        {
+          "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6",
+          "name": "style-reference-deletion.patch"
+        },
+        {
+          "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce",
+          "name": "style-reference-order.patch"
+        },
+        {
+          "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af",
+          "name": "style-shape-stories.patch"
+        },
+        {
+          "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad",
+          "name": "table-creation-consistency.patch"
+        }
+      ],
+      "builtAt": "2026-10-12T16:01:37.5209715Z",
+      "optimized": false,
+      "sourceId": "efd91535b7c53466",
+      "buildMode": "wsl-review-no-opt",
+      "wasmSha256": "cc6549fc78dd9633bb0ddad524a86c1578cf6ce2161885355d4fe395762a649e",
+      "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+      "jsSha256": "0d406b11eeb0ca7bfb1144ecd9b1508ee93042aae034878559f9b84ca19ebbc5"
+    },
+    "buildScriptSha256": "861d27315d48d59c8a84d7d942d18e8322659e367da45eaa06522fd5d3be366e",
+    "studioPatchSha256": "288d92712a0d79ac2366309f2bbbf5e36e4280ca9845003b9d7756e969a35533",
+    "featurePatchSha256": "ca3ae9e1f5c7075d0113b6a38cb905317ec51db8e0cfdb55f1dfb0e9e1e986b7",
+    "recoveryPatchSha256": "12dfbb56ca02e1642bb495a44e18cf0823da84864386211eeb8811916552f864",
+    "tabFeaturePatchSha256": "da0d7d0b9a0c529af8a4a9733bf239a1c4f6afcd99b8803f1237f1c57a90ceec",
+    "sectionBoundaryPatchSha256": "e2a5cee3330b67015a3ac8cc738cafe36966950d7a12fc48e1d0a7ffc2392b13",
+    "documentInsertionPatchSha256": "2941b880fe250f779c95ce7bbd9d54384b10dda5f1596f7c0343d44e0297d4ff",
+    "styleManagementPatchSha256": "792ad2629ba0d657fe0bc504fa0f3c55075c6b2c69ea0cb570954dad294ed55c",
+    "styleFlowPatchSha256": "11010768f738466f36731a71b6d596ecae4ba60c74132fd3ea088e4816a98974",
+    "tableConversionPatchSha256": "3b6e27294cede2396cdc3d248d68148946c45493eb821fb37f52b3c4c69626b3",
+    "pageBorderPatchSha256": "d066c398b7318373c2b4ced800d4d770d2cb6b0cf9662c4b0ef15b4fee2e1416",
+    "customSourceSha256": "7350a6817129acff8573880ecab58c3cdaae293e2859c5fd7439e0400061adce",
+    "applicationSourceCommit": "20ac5dc11ba1cfb7a598219c13f20f197ef0f599",
+    "applicationSourceDirty": true,
+    "sourceBuild": true,
+    "note": "고정 rhwp 소스와 추적 패치를 직접 빌드한 검수용 WASM. 최적화 및 한컴 출력 비교 상태는 engineBuild와 검증 보고서 참조."
+  },
+  "note": "Headless Edge isolated profile; actual workspace IndexedDB/OPFS restart. Synthetic fixtures, test-only automation extension. No native Hancom parity assertion."
+}

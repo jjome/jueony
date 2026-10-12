@@ -4,6 +4,8 @@
 
 ## 실행
 
+2026-10-13 최신 편집기 통합 검수본은 `build/jueony-pre-agent-20261013/Start-Review.cmd`(4203)다. 스타일·상태 복원·표 변환·셀 블록 A 자동 채우기·선택 개체 Ctrl+N,K·쪽 배경·통합 서식 도구 모음을 보강했다. [44번 결과](../../docs/44-editor-stages-result.md)에 최종 검사와 실제 한글 비교의 남은 범위를 기록한다. 아래 실행본은 이전 이력이며 기존 포트의 업무 저장소는 유지한다. 검수 파일은 새 묶음의 `review-documents/pre-agent/`에 있다.
+
 최신 한글 실측·HWPX 탭 저장 보정본은 `build/jueony-native-tabs-20261012/Start-Review.cmd`(4196)다. [36번 결과](../../docs/36-native-section-comparison.md)에 직접 비교 범위와 새 검증을 기록한다.
 
 구역 경계 합치기 검수본은 `build/jueony-section-merge-20261012/Start-Review.cmd`(4195)다. Delete/Backspace 지원 경계와 저장·undo 및 실제 한글 비교 상태는 [35번 결과](../../docs/35-section-boundary-merge-result.md)를 따른다.

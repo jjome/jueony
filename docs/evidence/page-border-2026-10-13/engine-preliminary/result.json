@@ -1,0 +1,139 @@
+{
+  "results": [
+    "hwp: both all two-color gradient + header/footer inclusion",
+    "hwp: both firstOnly two-color gradient + header/footer inclusion",
+    "hwp: even all two-color gradient + header/footer inclusion",
+    "hwp: even firstOnly two-color gradient + header/footer inclusion",
+    "hwp: odd all two-color gradient + header/footer inclusion",
+    "hwp: odd firstOnly two-color gradient + header/footer inclusion",
+    "hwpx: both all two-color gradient + header/footer inclusion",
+    "hwpx: both firstOnly two-color gradient + header/footer inclusion",
+    "hwpx: even all two-color gradient + header/footer inclusion",
+    "hwpx: even firstOnly two-color gradient + header/footer inclusion",
+    "hwpx: odd all two-color gradient + header/footer inclusion",
+    "hwpx: odd firstOnly two-color gradient + header/footer inclusion",
+    "three-page SVG selects page parity and all section scope",
+    "three-page SVG selects page parity and firstOnly section scope"
+  ],
+  "failures": [
+    {
+      "name": "hwp: both exceptFirst two-color gradient + header/footer inclusion",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'HIDE_ALL'\n- 'HIDE_FIRST'\n        ^\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'HIDE_ALL'\n- 'HIDE_FIRST'\n        ^\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-page-border-engine.mjs:32:10"
+    },
+    {
+      "name": "hwp: even exceptFirst two-color gradient + header/footer inclusion",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'HIDE_ALL'\n- 'HIDE_FIRST'\n        ^\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'HIDE_ALL'\n- 'HIDE_FIRST'\n        ^\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-page-border-engine.mjs:32:10"
+    },
+    {
+      "name": "hwp: odd exceptFirst two-color gradient + header/footer inclusion",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'HIDE_ALL'\n- 'HIDE_FIRST'\n        ^\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'HIDE_ALL'\n- 'HIDE_FIRST'\n        ^\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-page-border-engine.mjs:32:10"
+    },
+    {
+      "name": "hwpx: both exceptFirst two-color gradient + header/footer inclusion",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'HIDE_ALL'\n- 'HIDE_FIRST'\n        ^\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'HIDE_ALL'\n- 'HIDE_FIRST'\n        ^\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-page-border-engine.mjs:32:10"
+    },
+    {
+      "name": "hwpx: even exceptFirst two-color gradient + header/footer inclusion",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'HIDE_ALL'\n- 'HIDE_FIRST'\n        ^\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'HIDE_ALL'\n- 'HIDE_FIRST'\n        ^\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-page-border-engine.mjs:32:10"
+    },
+    {
+      "name": "hwpx: odd exceptFirst two-color gradient + header/footer inclusion",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'HIDE_ALL'\n- 'HIDE_FIRST'\n        ^\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'HIDE_ALL'\n- 'HIDE_FIRST'\n        ^\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-page-border-engine.mjs:32:10"
+    },
+    {
+      "name": "hwp: gradient type1 roundtrip preserves shared cell fill and other page entries",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'gradient' !== 'none'\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'gradient' !== 'none'\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-page-border-engine.mjs:43:145"
+    },
+    {
+      "name": "hwp: gradient type2 roundtrip preserves shared cell fill and other page entries",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'gradient' !== 'none'\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'gradient' !== 'none'\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-page-border-engine.mjs:43:145"
+    },
+    {
+      "name": "hwp: gradient type3 roundtrip preserves shared cell fill and other page entries",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'gradient' !== 'none'\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'gradient' !== 'none'\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-page-border-engine.mjs:43:145"
+    },
+    {
+      "name": "hwp: gradient type4 roundtrip preserves shared cell fill and other page entries",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'gradient' !== 'none'\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'gradient' !== 'none'\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-page-border-engine.mjs:43:145"
+    },
+    {
+      "name": "hwpx: gradient type1 roundtrip preserves shared cell fill and other page entries",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'gradient' !== 'none'\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'gradient' !== 'none'\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-page-border-engine.mjs:43:145"
+    },
+    {
+      "name": "hwpx: gradient type2 roundtrip preserves shared cell fill and other page entries",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'gradient' !== 'none'\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'gradient' !== 'none'\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-page-border-engine.mjs:43:145"
+    },
+    {
+      "name": "hwpx: gradient type3 roundtrip preserves shared cell fill and other page entries",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'gradient' !== 'none'\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'gradient' !== 'none'\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-page-border-engine.mjs:43:145"
+    },
+    {
+      "name": "hwpx: gradient type4 roundtrip preserves shared cell fill and other page entries",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'gradient' !== 'none'\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'gradient' !== 'none'\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-page-border-engine.mjs:43:145"
+    },
+    {
+      "name": "three-page SVG selects page parity and exceptFirst section scope",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\ntrue !== false\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\ntrue !== false\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-page-border-engine.mjs:59:10"
+    }
+  ],
+  "engine": {
+    "sourceId": "6136091cc40807f7",
+    "wasmSha256": "8600e3501142550928e4279cf4c0f5eacd03a9b1fa0b27699391fd0e657f1f7a",
+    "patches": [
+      {
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af",
+        "name": "default-tabs.patch"
+      },
+      {
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f",
+        "name": "document-insertion.patch"
+      },
+      {
+        "sha256": "cccb19a81a61d65dbdbde682ade3a374683e4ebfd54081bebb27ce9638f83d7c",
+        "name": "page-border-entries.patch"
+      },
+      {
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8",
+        "name": "section-split.patch"
+      },
+      {
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6",
+        "name": "style-reference-deletion.patch"
+      },
+      {
+        "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce",
+        "name": "style-reference-order.patch"
+      },
+      {
+        "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af",
+        "name": "style-shape-stories.patch"
+      },
+      {
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad",
+        "name": "table-creation-consistency.patch"
+      }
+    ],
+    "optimized": false,
+    "jsSha256": "0d406b11eeb0ca7bfb1144ecd9b1508ee93042aae034878559f9b84ca19ebbc5",
+    "buildMode": "wsl-review-no-opt",
+    "builtAt": "2026-10-12T15:51:10.8148240Z",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f"
+  },
+  "note": "Real WASM and independent saved XML; native Hancom visual comparison is pending."
+}

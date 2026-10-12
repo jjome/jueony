@@ -1,0 +1,352 @@
+{
+  "verifiedAt": "2026-10-12T16:44:34.409Z",
+  "status": "PASS_SCOPED_AUTOMATED_CHECKS",
+  "scope": "Implemented editor paths, isolated browser sessions and same-engine serialization. Not full Hancom parity.",
+  "nativeHancomComparison": "DEFERRED_BY_USER",
+  "fullHancomParity": "NOT_COMPLETE",
+  "agentReconstruction": "NOT_STARTED_THIS_RUN",
+  "engine": {
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "wasmSha256": "5dc02a24794defb8b5e05b0bcc22fc7bdba30f8ec73c7d05a259733399d2423e",
+    "optimized": false,
+    "patches": [
+      {
+        "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c",
+        "name": "border-fill-identity.patch"
+      },
+      {
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af",
+        "name": "default-tabs.patch"
+      },
+      {
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f",
+        "name": "document-insertion.patch"
+      },
+      {
+        "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562",
+        "name": "note-query-json.patch"
+      },
+      {
+        "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f",
+        "name": "page-border-entries.patch"
+      },
+      {
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8",
+        "name": "section-split.patch"
+      },
+      {
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6",
+        "name": "style-reference-deletion.patch"
+      },
+      {
+        "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce",
+        "name": "style-reference-order.patch"
+      },
+      {
+        "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af",
+        "name": "style-shape-stories.patch"
+      },
+      {
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad",
+        "name": "table-creation-consistency.patch"
+      }
+    ]
+  },
+  "application": {
+    "customSourceSha256": "2be8e99588d66101114b658b71d444e0a047e5dc24e78f2002485869165f433c",
+    "buildScriptSha256": "df4b996c242c320b0a6a9836759e760c9e8f9f9f641de2106e901aa7b69169be",
+    "reviewCommit": "c00a4f257d5841f5fd7063f873c47bf0859fe3c0",
+    "buildRecordedCommit": "20ac5dc11ba1cfb7a598219c13f20f197ef0f599",
+    "buildRecordedDirty": true
+  },
+  "units": {
+    "passed": 351,
+    "failed": 0,
+    "skipped": 0
+  },
+  "moduleBoundaries": {
+    "ok": true,
+    "scannedFiles": 178,
+    "moduleCount": 9
+  },
+  "browserCases": 133,
+  "nativeCases": 58,
+  "results": [
+    {
+      "name": "parity",
+      "kind": "browser",
+      "passed": 66,
+      "report": "checks/parity.json",
+      "sha256": "923867a335d6a98e30d26586ce3475dea2b706d80ff69dccbda428cc59ccd764"
+    },
+    {
+      "name": "session",
+      "kind": "browser",
+      "passed": 9,
+      "report": "checks/session.json",
+      "sha256": "1520594f94874ce52356928b216054c2c4bef3c85586d15096ca5ddb557736c6"
+    },
+    {
+      "name": "table",
+      "kind": "browser",
+      "passed": 6,
+      "report": "checks/table.json",
+      "sha256": "b8170c50ab43ebdbbf537407820f180b40473b31fa001f693dd2e9d059c1b403"
+    },
+    {
+      "name": "object-properties",
+      "kind": "browser",
+      "passed": 16,
+      "report": "checks/object-properties.json",
+      "sha256": "dc8d8db909826d94190bb6c5e9d8d8afe73a1ac5c0c4cbb512a9f14a7695995b"
+    },
+    {
+      "name": "page-border",
+      "kind": "browser",
+      "passed": 13,
+      "report": "checks/page-border.json",
+      "sha256": "939e097c11fb8437eb7a0118b61d4abdf6cc156c7056934fb14aae34ae26b548"
+    },
+    {
+      "name": "formatting",
+      "kind": "browser",
+      "passed": 10,
+      "report": "checks/formatting.json",
+      "sha256": "cd6c81549eaf19c9e6fea72d7ae98da19dff2f09e749e672c0cc7200232c705d"
+    },
+    {
+      "name": "agent",
+      "kind": "browser",
+      "passed": 9,
+      "report": "checks/agent.json",
+      "sha256": "fe8eadb140487994948a1e84952b50469081464f1305f69bcb8041f5b84a75a1"
+    },
+    {
+      "name": "page-border-engine",
+      "kind": "native",
+      "passed": 31,
+      "report": "checks/page-border-engine.json",
+      "sha256": "786d1c4195c580dbb58ae9d3a15dabf2205b9b87e857211f6eaff62607600fb3"
+    },
+    {
+      "name": "table-engine",
+      "kind": "native",
+      "passed": 5,
+      "report": "checks/table-engine.json",
+      "sha256": "2aca27e9fc9e48de72fcbdf0fdf267e83bf00e5a2d270147a7d8a8cc8376e08c"
+    },
+    {
+      "name": "style-order-engine",
+      "kind": "native",
+      "passed": 6,
+      "report": "checks/style-order-engine.json",
+      "sha256": "8817844c36dada67edb299abec83ef76f9a29d6e065267daf19c1571e298ca82"
+    },
+    {
+      "name": "style-stories-engine",
+      "kind": "native",
+      "passed": 4,
+      "report": "checks/style-stories-engine.json",
+      "sha256": "076ce0cd60d372e4a09e4ca47b3021b8d1d5853d2965c72c19a48757921d5abf"
+    },
+    {
+      "name": "document-insertion-engine",
+      "kind": "native",
+      "passed": 12,
+      "report": "checks/document-insertion-engine.json",
+      "sha256": "77643c07aa8be44cd8a1b056f27e9e8d671b7e42f881e23ca6bcd88c050cc0e8"
+    },
+    {
+      "name": "bundle-compatibility",
+      "kind": "browser",
+      "passed": 4,
+      "report": "checks/bundle-compatibility.json",
+      "sha256": "b21325cf00fcaa26fd7ceb268c86c37b5a5062ab609e0161e7d1608744083dc4"
+    }
+  ],
+  "publicCorpus": [
+    {
+      "id": "mcst-bid-2026",
+      "contentStatus": "PASS_CONTENT",
+      "exports": [
+        {
+          "format": "hwp",
+          "guardStatus": "checked",
+          "issues": [],
+          "unverified": [
+            "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+            "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+            "머리말·꼬리말·각주 내부의 개체와 모든 글자 run은 별도 한글 비교가 필요합니다.",
+            "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+          ]
+        },
+        {
+          "format": "hwpx",
+          "guardStatus": "blocked",
+          "issues": [
+            {
+              "code": "changed",
+              "path": "section/0/paragraph/7",
+              "message": "저장 전후 값이 다릅니다"
+            },
+            {
+              "code": "changed",
+              "path": "section/0/paragraph/11",
+              "message": "저장 전후 값이 다릅니다"
+            },
+            {
+              "code": "changed",
+              "path": "objects",
+              "message": "저장 전후 값이 다릅니다"
+            }
+          ],
+          "unverified": []
+        }
+      ]
+    },
+    {
+      "id": "python-hwpx-0",
+      "contentStatus": "PASS_CONTENT",
+      "exports": [
+        {
+          "format": "hwp",
+          "guardStatus": "blocked",
+          "issues": [
+            {
+              "code": "changed",
+              "path": "objects",
+              "message": "저장 전후 값이 다릅니다"
+            }
+          ],
+          "unverified": []
+        },
+        {
+          "format": "hwpx",
+          "guardStatus": "checked",
+          "issues": [],
+          "unverified": [
+            "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+            "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+            "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "python-hwpx-1",
+      "contentStatus": "REVIEW_REQUIRED",
+      "exports": [
+        {
+          "format": "hwp",
+          "guardStatus": "blocked",
+          "issues": [
+            {
+              "code": "changed",
+              "path": "section/0/paragraph-count",
+              "message": "저장 전후 값이 다릅니다"
+            },
+            {
+              "code": "changed",
+              "path": "text",
+              "message": "저장 전후 값이 다릅니다"
+            },
+            {
+              "code": "changed",
+              "path": "fields",
+              "message": "저장 전후 값이 다릅니다"
+            },
+            {
+              "code": "changed",
+              "path": "objects",
+              "message": "저장 전후 값이 다릅니다"
+            },
+            {
+              "code": "changed",
+              "path": "section/0/paragraph/2",
+              "message": "저장 전후 값이 다릅니다"
+            }
+          ],
+          "unverified": []
+        },
+        {
+          "format": "hwpx",
+          "guardStatus": "checked",
+          "issues": [],
+          "unverified": [
+            "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+            "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+            "종류를 노출하지 않는 컨트롤이 있습니다. 개수·위치는 비교하지만 내부 payload 보존은 검증하지 못합니다.",
+            "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "python-hwpx-2",
+      "contentStatus": "PASS_CONTENT",
+      "exports": [
+        {
+          "format": "hwp",
+          "guardStatus": "checked",
+          "issues": [],
+          "unverified": [
+            "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+            "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+            "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+          ]
+        },
+        {
+          "format": "hwpx",
+          "guardStatus": "checked",
+          "issues": [],
+          "unverified": [
+            "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+            "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+            "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "python-hwpx-3",
+      "contentStatus": "PASS_CONTENT",
+      "exports": [
+        {
+          "format": "hwp",
+          "guardStatus": "blocked",
+          "issues": [
+            {
+              "code": "changed",
+              "path": "controls",
+              "message": "저장 전후 값이 다릅니다"
+            },
+            {
+              "code": "changed",
+              "path": "objects",
+              "message": "저장 전후 값이 다릅니다"
+            }
+          ],
+          "unverified": []
+        },
+        {
+          "format": "hwpx",
+          "guardStatus": "checked",
+          "issues": [],
+          "unverified": [
+            "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+            "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+            "종류를 노출하지 않는 컨트롤이 있습니다. 개수·위치는 비교하지만 내부 payload 보존은 검증하지 못합니다.",
+            "머리말·꼬리말·각주 내부의 개체와 모든 글자 run은 별도 한글 비교가 필요합니다.",
+            "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Native Hancom layout and complete menu parity are pending.",
+    "Cross-format preservation failures remain blocked by the production save guard.",
+    "Public corpus derivatives are excluded from the review bundle.",
+    "Paid LLM calls were not used in these regressions."
+  ]
+}

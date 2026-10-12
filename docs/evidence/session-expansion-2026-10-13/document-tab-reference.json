@@ -1,0 +1,16 @@
+{
+  "checkedAt": "2026-10-13",
+  "referenceVersion": "Hancom Office 2024 / HOffice130",
+  "documentTabs": {
+    "source": "https://help.hancom.com/hoffice130/ko-KR/Hwp/file/new_tab.htm",
+    "next": "Ctrl+Tab",
+    "previous": "Ctrl+Shift+Tab"
+  },
+  "tableContext": {
+    "source": "https://help.hancom.com/hoffice130/ko-KR/Hwp/view/toolbar/shortcut(table).htm",
+    "literalTab": "Ctrl+Tab",
+    "quickHangingIndent": "Ctrl+Shift+Tab"
+  },
+  "implementationScope": "Trusted editor body key events only; preserve table, IME, dialog and other workspace contexts.",
+  "nativeHancomComparison": "Not performed in this run. Official documentation establishes the intended mapping; native event delivery remains a separate validation."
+}

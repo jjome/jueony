@@ -1,0 +1,47 @@
+{
+  "results": [
+    "unified chrome reuses one visible native formatting toolbar and exposes detached optional state",
+    "hwp: actual native font/size/bold/alignment controls preserve selection, undo individually and save/reopen",
+    "hwpx: actual native font/size/bold/alignment controls preserve selection, undo individually and save/reopen",
+    "native style dropdown uses the same current paragraph and reported state",
+    "font language selection modifies only the chosen native language slot",
+    "keyboard size arrow commits exactly once and invalid input mutates nothing",
+    "form/inactive input blocks font resource registration and size change",
+    "IME composition blocks toolbar commit and resumes after compositionend"
+  ],
+  "failures": [
+    {
+      "name": "stale focused formatting field cannot apply to an intervening tracked native edit",
+      "error": "AssertionError [ERR_ASSERTION]: test mutation must cross the tracked document boundary",
+      "stack": "AssertionError [ERR_ASSERTION]: test mutation must cross the tracked document boundary\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-formatting-toolbar.mjs:51:363\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-formatting-toolbar.mjs:29:39)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-formatting-toolbar.mjs:51:2",
+      "formatting": {
+        "visible": true,
+        "enabled": true,
+        "revision": "10:30",
+        "documentIdentity": "10:formatting.hwpx",
+        "selectionToken": "{\"position\":{\"sectionIndex\":0,\"paragraphIndex\":0,\"charOffset\":7},\"selection\":{\"anchor\":{\"sectionIndex\":0,\"paragraphIndex\":0,\"charOffset\":0},\"focus\":{\"sectionIndex\":0,\"paragraphIndex\":0,\"charOffset\":7}},\"story\":{\"header\":\"none\",\"hfSection\":0,\"hfApply\":0,\"hfPara\":0,\"hfOffset\":0,\"footnote\":0}}",
+        "styleId": 0,
+        "fontFamily": "함초롬바탕",
+        "sizePt": 16,
+        "language": 0,
+        "bold": false,
+        "italic": false,
+        "underline": false,
+        "alignment": "justify",
+        "fonts": [
+          "함초롬바탕",
+          "함초롬돋움",
+          "맑은 고딕",
+          "나눔고딕",
+          "바탕",
+          "돋움",
+          "궁서"
+        ]
+      }
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Reuses actual native style-bar; registered dispatcher routes, live selection/history and real WASM saved files. No AI/provider calls."
+}

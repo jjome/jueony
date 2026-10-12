@@ -1,0 +1,44 @@
+{
+  "results": [
+    "hwp: literal Unicode/empty-cell conversion, scratch preflight and two saved roundtrips",
+    "hwpx: literal Unicode/empty-cell conversion, scratch preflight and two saved roundtrips",
+    "native unsafe conversion refuses stale content, merged/protected cells and literal host tabs without mutations"
+  ],
+  "failures": [],
+  "engine": {
+    "builtAt": "2026-10-12T15:38:22.3354899Z",
+    "jsSha256": "9ff32fb4bcefe62e478eeb712798abbbb6c260e64c581a62daaa030f4e28e965",
+    "patches": [
+      {
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af",
+        "name": "default-tabs.patch"
+      },
+      {
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f",
+        "name": "document-insertion.patch"
+      },
+      {
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8",
+        "name": "section-split.patch"
+      },
+      {
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6",
+        "name": "style-reference-deletion.patch"
+      },
+      {
+        "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce",
+        "name": "style-reference-order.patch"
+      },
+      {
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad",
+        "name": "table-creation-consistency.patch"
+      }
+    ],
+    "optimized": false,
+    "wasmSha256": "67d32cb9c85502c8761c1471c550572c3a3863cc4b5f07374584d848dca67ef2",
+    "sourceId": "6cdcbd5724a8adb2",
+    "buildMode": "wsl-review-no-opt",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f"
+  },
+  "note": "Native WASM synthetic conversion tests, including scratch export-preservation checks and saved HWP/HWPX reopen. No native Hancom or UI comparison."
+}

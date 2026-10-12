@@ -1,0 +1,8 @@
+file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/build.mjs:41
+  if(JSON.stringify(currentPatches)!==JSON.stringify(engineEvidence.patches.map(p=>p.name).sort()))throw new Error('Local engine patch set changed; rebuild WASM first');
+                                                                                                         ^
+
+Error: Local engine patch set changed; rebuild WASM first
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/build.mjs:41:106
+
+Node.js v22.22.2

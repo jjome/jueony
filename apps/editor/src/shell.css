@@ -22,3 +22,17 @@ dialog .remember-connection{display:flex;align-items:center;gap:8px}dialog .reme
 @media(max-width:1000px){#app-title{flex-wrap:wrap;height:auto;min-height:39px;padding:5px}#app-status{max-width:20vw}#unified-menus{overflow:visible}#unified-menus summary{padding:6px 8px}}
 
 #unified-tools[hidden]{display:none}
+
+/* Menus stay inside the visible viewport at high DPI and in narrow windows. */
+#unified-menus{flex-wrap:wrap;flex-basis:auto;min-height:31px}
+.unified-menu>summary{white-space:nowrap}
+.unified-menu summary::-webkit-details-marker{display:none}
+.unified-menu summary:focus-visible{outline:2px solid #2589c5;outline-offset:-2px;background:#e7f1fa}
+.unified-menu-popup{position:fixed;z-index:1200;min-width:min(235px,calc(100vw - 16px));max-width:min(340px,calc(100vw - 16px));overscroll-behavior:contain;scrollbar-gutter:stable;overflow-wrap:anywhere}
+.unified-menu-popup button{white-space:normal}
+.unified-menu-popup summary[aria-disabled=true]{opacity:.45;cursor:default}
+.unified-menu-popup details>details{margin-left:12px}
+dialog{max-height:calc(100dvh - 24px);overflow:auto;overscroll-behavior:contain}
+dialog h2{overflow-wrap:anywhere}
+#unified-tools{min-height:36px}
+@media(max-width:720px){#app-title{gap:5px}#app-status{max-width:28vw}#unified-menus{padding:0 4px}.unified-menu>summary{padding:6px 8px}.defaults-grid,.diff-columns{grid-template-columns:1fr}dialog{padding:16px}.connection-picker{flex-wrap:wrap}.connection-picker label{flex-basis:100%}}

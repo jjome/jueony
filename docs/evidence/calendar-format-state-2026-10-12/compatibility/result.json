@@ -1,0 +1,60 @@
+{
+  "results": [
+    "v1 workspace/chat/native folder handle/recovery/tab order restored despite malformed draft; interrupted run not replayed",
+    "workspace switch isolates chat/folders; legacy macro remains available",
+    "v1 resave/reload retains unknown fields and structured-cloned folder handles",
+    "offline native file-handle write, reopened saved content and request undo succeed"
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "persisted": {
+    "version": 1,
+    "extension": {
+      "preserve": "unknown additive data"
+    },
+    "folderKind": "directory",
+    "run": "interrupted"
+  },
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@jueony/rhwp-engine-review@0.8.7",
+    "builtAt": "2026-10-12T12:52:02.896Z",
+    "engineWasmSha256": "c1e254531219bb88f983dca0671aa6d4c10be79460c50de8e5fb60d8cca182da",
+    "engineBuild": {
+      "sourceId": "1c738b6a10f4956a",
+      "wasmSha256": "c1e254531219bb88f983dca0671aa6d4c10be79460c50de8e5fb60d8cca182da",
+      "builtAt": "2026-10-11T17:20:16.8370530Z",
+      "buildMode": "wsl-review-no-opt",
+      "optimized": false,
+      "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+      "jsSha256": "67db5e7aa028ee10fa028257a5e35796e4042024b83268b1ea4b0edb68459dbc",
+      "patches": [
+        {
+          "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af",
+          "name": "default-tabs.patch"
+        },
+        {
+          "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8",
+          "name": "section-split.patch"
+        },
+        {
+          "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad",
+          "name": "table-creation-consistency.patch"
+        }
+      ]
+    },
+    "buildScriptSha256": "a9a587b1a02624f7d6a0ff21e325e09c5b79d00c738c5d29b4c91878055951da",
+    "studioPatchSha256": "676dc3269af09326fe0d44a1e70b8a93b8c68e8dca7b79426281b33a1a1a6f65",
+    "featurePatchSha256": "63dc26158bcac35fd343cf09286e46cf943527446669dd8754dcb7b372e08a27",
+    "recoveryPatchSha256": "12dfbb56ca02e1642bb495a44e18cf0823da84864386211eeb8811916552f864",
+    "tabFeaturePatchSha256": "da0d7d0b9a0c529af8a4a9733bf239a1c4f6afcd99b8803f1237f1c57a90ceec",
+    "sectionBoundaryPatchSha256": "e2a5cee3330b67015a3ac8cc738cafe36966950d7a12fc48e1d0a7ffc2392b13",
+    "customSourceSha256": "65dc635b303ca195814b6a28b9f53cb6d4033b40e3ac7cc97b1eb1314f346440",
+    "applicationSourceCommit": "18d28dfb73b4dbbf6dabfcf42b2faea704db3dcf",
+    "applicationSourceDirty": true,
+    "sourceBuild": true,
+    "note": "고정 rhwp 소스와 추적 패치를 직접 빌드한 검수용 WASM. 최적화 및 한컴 출력 비교 상태는 engineBuild와 검증 보고서 참조."
+  },
+  "note": "Synthetic v1 storage and local OPFS file; no user profile or paid model calls"
+}

@@ -239,6 +239,36 @@ try{
     assert.match(await frame.$eval('.modal-overlay [role=alert]',e=>e.textContent),/문서나 커서가 바뀌었습니다/);await page.keyboard.press('Escape');
   });
 
+  await scenario('calendar format survives restart; cancel and corrupt/quota storage do not duplicate document insertion',async()=>{
+    let frame=await openFixture();
+    await frame.evaluate(()=>localStorage.removeItem('jueony-calendar-format'));
+    await command('ext:jueony-calendar-stamp');await frame.select('[aria-label="날짜/시간 형식"]','date-iso');
+    await frame.click('.modal-overlay .dialog-btn-primary');
+    await page.reload({waitUntil:'networkidle0'});await ready();await focusBody();frame=await active();
+    await command('ext:jueony-calendar-stamp');
+    assert.equal(await frame.$eval('[aria-label="날짜/시간 형식"]',e=>e.value),'date-iso');
+    await frame.select('[aria-label="날짜/시간 형식"]','time');await page.keyboard.press('Escape');
+    assert.equal(await frame.evaluate(()=>JSON.parse(localStorage.getItem('jueony-calendar-format')).format),'date-iso');
+    await frame.evaluate(()=>localStorage.setItem('jueony-calendar-format','{"version":2,"format":"time"}'));
+    await command('ext:jueony-calendar-stamp');
+    assert.match(await frame.$eval('.modal-overlay [role=alert]',e=>e.textContent),/지원하지 않는 형식/);
+    const before=(await snapshot()).nodes[0].text,stamp=await frame.$eval('[aria-label="넣을 날짜/시간"]',e=>e.value);
+    await frame.click('.modal-overlay .dialog-btn-primary');await frame.waitForFunction(()=>!document.querySelector('.modal-overlay'));
+    assert.equal((await snapshot()).nodes[0].text,stamp+before);
+    assert.equal(await frame.evaluate(()=>localStorage.getItem('jueony-calendar-format')),'{"version":2,"format":"time"}');
+    assert.match(await frame.$eval('#rhwp-toast-container',e=>e.textContent),/날짜\/시간은 넣었습니다.*형식 저장 실패/);
+    await command('edit:undo');assert.equal((await snapshot()).nodes[0].text,before);
+    await frame.evaluate(()=>{localStorage.setItem('jueony-calendar-format','{"version":1,"format":"time"}');window.__calendarOriginalSet=Storage.prototype.setItem;Storage.prototype.setItem=function(key,value){if(key==='jueony-calendar-format')throw new DOMException('Quota','QuotaExceededError');return window.__calendarOriginalSet.call(this,key,value);};});
+    try{
+      await command('ext:jueony-calendar-stamp');await frame.select('[aria-label="날짜/시간 형식"]','date-time');
+      const value=await frame.$eval('[aria-label="넣을 날짜/시간"]',e=>e.value);
+      await frame.click('.modal-overlay .dialog-btn-primary');await frame.waitForFunction(()=>!document.querySelector('.modal-overlay'));
+      assert.equal((await snapshot()).nodes[0].text,value+before);
+      assert.equal(await frame.evaluate(()=>JSON.parse(localStorage.getItem('jueony-calendar-format')).format),'time');
+      await command('edit:undo');assert.equal((await snapshot()).nodes[0].text,before);
+    }finally{await frame.evaluate(()=>{Storage.prototype.setItem=window.__calendarOriginalSet;delete window.__calendarOriginalSet;localStorage.removeItem('jueony-calendar-format');});}
+  });
+
   await scenario('cursor history skips changed text bookmarks and restores flat-cell scalar offsets',async()=>{
     let frame=await openFixture();
     const move=async(paragraph)=>{await frame.evaluate(paragraph=>{const ih=window.__parityServices.getInputHandler();ih.cursor.moveTo({sectionIndex:0,paragraphIndex:paragraph,charOffset:1});ih.updateCaret();ih.focus();},paragraph);await delay(180);};

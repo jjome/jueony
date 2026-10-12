@@ -7,8 +7,10 @@ type Block = CellBlockBookmark & {sec:number;ppi:number;ci:number;cellPath?:Posi
 export type SessionCursorInput = {
   getCursorPosition():Position;
   restoreSessionSelection(focus:Position,anchor:Position|undefined,phase:number|null,block:Block|undefined):boolean;
+  restoreSessionTableObject?(ref:{sec:number;ppi:number;ci:number}):boolean;
   cursor:{hasSelection():boolean;getSelection():{anchor:Position;focus:Position}|null;blockSelectionPhase():number|null;captureCellSelection():Block|null;
-    isInHeaderFooter():boolean;isInFootnote():boolean;isInTextBox():boolean;isInTableObjectSelection():boolean;isInPictureObjectSelection():boolean};
+    isInHeaderFooter():boolean;isInFootnote():boolean;isInTextBox():boolean;isInTableObjectSelection():boolean;isInPictureObjectSelection():boolean;
+    getSelectedTableRef?():{sec:number;ppi:number;ci:number;cellPath?:unknown[]}|null};
   wasm:{requiresPasswordForSave?:boolean;getSectionCount():number;getParagraphCount(section:number):number;getParagraphLength(section:number,paragraph:number):number;getTextRange(section:number,paragraph:number,offset:number,count:number):string;
     getTableDimensions(section:number,parent:number,control:number):{rowCount:number;colCount:number;cellCount:number};
     getCellInfo(section:number,parent:number,control:number,cell:number):{row:number;col:number;rowSpan:number;colSpan:number};
@@ -93,6 +95,14 @@ function position(point:SessionPoint):Position{
   :{sectionIndex:c.section,paragraphIndex:c.paragraph,charOffset:c.offset,parentParaIndex:point.parentParagraph,controlIndex:point.control,cellIndex:point.cell,cellParaIndex:c.paragraph,cellPath:[{controlIndex:point.control,cellIndex:point.cell,cellParaIndex:c.paragraph}]};
 }
 export function captureSessionCursor(input:SessionCursorInput|undefined):SessionCursor|undefined{
+ if(input?.cursor.isInTableObjectSelection()&&input.restoreSessionTableObject&&!input.wasm.requiresPasswordForSave
+   &&!input.cursor.isInHeaderFooter()&&!input.cursor.isInFootnote()&&!input.cursor.isInTextBox()){
+  try{
+   const ref=input.cursor.getSelectedTableRef?.();if(!ref||ref.cellPath?.length)return;
+   const read=evidence(input),focus=read.point({sectionIndex:ref.sec,paragraphIndex:ref.ppi,charOffset:0}),table=read.table(ref.sec,ref.ppi,ref.ci);
+   return focus?.kind==='body'&&table?validateSessionCursor({kind:'table-object',focus,control:ref.ci,tableFingerprint:table.fingerprint}):undefined;
+  }catch{return;}
+ }
  if(!input||unsupported(input))return;
  try{
   const read=evidence(input),focus=read.point(input.getCursorPosition());if(!focus)return;
@@ -109,7 +119,16 @@ export function captureSessionCursor(input:SessionCursorInput|undefined):Session
  }catch{return;}
 }
 export function restoreSessionCursor(input:SessionCursorInput|undefined,value:unknown):boolean{
- const saved=validateSessionCursor(value);if(!input||!saved||unsupported(input))return false;
+ const saved=validateSessionCursor(value);if(!input||!saved)return false;
+ if(saved.kind==='table-object'){
+  if(!input.restoreSessionTableObject||input.wasm.requiresPasswordForSave||input.cursor.isInHeaderFooter()||input.cursor.isInFootnote()||input.cursor.isInTextBox()||input.cursor.isInPictureObjectSelection())return false;
+  try{
+   const read=evidence(input),focus=read.point(position(saved.focus)),table=read.table(saved.focus.caret.section,saved.focus.caret.paragraph,saved.control);
+   if(JSON.stringify(focus)!==JSON.stringify(saved.focus)||table?.fingerprint!==saved.tableFingerprint)return false;
+   return input.restoreSessionTableObject({sec:saved.focus.caret.section,ppi:saved.focus.caret.paragraph,ci:saved.control});
+  }catch{return false;}
+ }
+ if(unsupported(input))return false;
  try{
   const read=evidence(input),focus=read.point(position(saved.focus));
   if(JSON.stringify(focus)!==JSON.stringify(saved.focus))return false;

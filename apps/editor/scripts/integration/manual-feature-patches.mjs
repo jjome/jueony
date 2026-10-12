@@ -37,4 +37,16 @@ export async function applyManualFeaturePatches({ root }) {
   await edit('ui/cell-border-bg-dialog.ts', source => replaceOnce(source,
     '  show(): void {\n    super.show();',
     "  show(initialTab: 'border' | 'background' = 'border'): void {\n    super.show();\n    this.switchTab(initialTab === 'background' ? 1 : 0);", 'cell dialog tab'));
+  await edit('ui/page-border-dialog.ts', source => {
+    // Native solid fills use -1 for no hatch; the UI's no-pattern option is 0.
+    // HWPX reload returns -1, which previously left the select without a value.
+    source = replaceOnce(source,
+      '    this.bgPatternSelect.value = String(this.settings.patternType || 0);',
+      '    this.bgPatternSelect.value = String(this.settings.patternType === -1 ? 0 : (this.settings.patternType || 0));',
+      'page fill no-pattern display');
+    return replaceOnce(source,
+      '      patternType: parseInt(this.bgPatternSelect.value, 10),',
+      "      patternType: this.bgPatternSelect.value === '' ? this.settings.patternType :\n        (this.bgColorRadio.checked && this.bgPatternSelect.value === '0' ? -1 : parseInt(this.bgPatternSelect.value, 10)),",
+      'page fill no-pattern native value');
+  });
 }

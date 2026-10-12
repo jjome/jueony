@@ -8,6 +8,8 @@ import { getObjectProps, setObjectProps } from '../../engine/object-props';
 import { installCaptionCommands } from '../adapters/rhwp/manual-commands.ts';
 import { installNavigationHistory } from '../adapters/rhwp/navigation-history.ts';
 import { installCalendarStamp } from '../adapters/rhwp/calendar-stamp.ts';
+import { installHangingIndent } from '../adapters/rhwp/hanging-indent.ts';
+import { installTransposeTable } from '../adapters/rhwp/transpose-table.ts';
 
 export function installHangulKeys({ automation, registry, input, eventBus }: { automation: any; registry: any; input: () => any; eventBus: any }) {
   const resolver = new HangulKeyResolver();
@@ -16,11 +18,13 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
   installCaptionCommands({ registry, input, getObjectProps, setObjectProps });
   installNavigationHistory(registry, input, eventBus);
   installCalendarStamp(registry, input, eventBus);
+  installHangingIndent(registry, input);
+  installTransposeTable(registry, input, eventBus);
   // The pinned Studio marked the entire caption submenu as a stub; child state is now registry-owned.
   document.querySelector('[data-cmd="insert:caption-top"]')?.closest('.md-sub')?.classList.remove('disabled');
   const unsupported = new Set<string>();
   // Keep the engine fallback consistent as well (IME and submode handlers use it).
-  defaultShortcuts.splice(0, defaultShortcuts.length, ...hangulBindings.filter(b => b.scope === 'document' && !b.keys.includes(',') && !b.command.startsWith('pending:') && !b.nativeClipboard).map(b => {
+  defaultShortcuts.splice(0, defaultShortcuts.length, ...hangulBindings.filter(b => b.scope === 'document' && b.keys !== 'Shift+Tab' && !b.keys.includes(',') && !b.command.startsWith('pending:') && !b.nativeClipboard).map(b => {
     const parts = b.keys.split('+'), key = parts.at(-1)!;
     return [{ key: key.toLowerCase(), ...(/^[A-Z]$/.test(key) ? { code: 'Key' + key } : {}), ctrl: parts.includes('Ctrl'), alt: parts.includes('Alt'), shift: parts.includes('Shift') }, b.command] as typeof defaultShortcuts[number];
   }));
@@ -102,6 +106,8 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
     const ih = input(), target = event.target instanceof HTMLElement ? event.target : null;
     if (document.querySelector('.modal-overlay, dialog[open]') || target?.closest('#jueony-navigation-pane') || (target?.closest('input, textarea, select, [contenteditable=true], [role=textbox]') && target !== ih?.textarea)) { resolver.reset(); return; }
     const c = automation.getContext();
+    // In tables Shift+Tab belongs to cell navigation; hanging indent uses Ctrl+Shift+Tab.
+    if ((c.inTable || c.inCellSelectionMode) && event.key === 'Tab' && event.shiftKey && !event.ctrlKey && !event.altKey) { resolver.reset(); return; }
     if (event.isComposing || ih?.isComposing || event.keyCode === 229) {
       if (event.ctrlKey || event.altKey) {
         const candidate = resolver.resolve({ key: event.key, code: event.code, ctrlKey: event.ctrlKey, altKey: event.altKey, shiftKey: event.shiftKey, metaKey: event.metaKey, repeat: event.repeat, isComposing: false }, { table: c.inTable || c.inCellSelectionMode, cells: c.inCellSelectionMode, object: c.inPictureObjectSelection || c.inTableObjectSelection });

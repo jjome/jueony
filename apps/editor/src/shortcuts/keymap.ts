@@ -30,6 +30,8 @@ export const hangulBindings: Binding[] = [
   binding('Ctrl+H', 'edit:find-replace', '찾아 바꾸기'), binding('Ctrl+L', 'edit:find-again', '다시 찾기'),
   binding('Alt+G', 'edit:goto', '찾아가기'),
   binding('Alt+L', 'format:char-shape', '글자 모양'), binding('Alt+T', 'format:para-shape', '문단 모양'),
+  binding('Shift+Tab', 'ext:jueony-hanging-indent', '빠른 내어쓰기'),
+  binding('Ctrl+Shift+Tab', 'ext:jueony-hanging-indent', '빠른 내어쓰기', 'table'),
   binding('F6', 'format:style-dialog', '스타일'), binding('F7', 'file:page-setup', '편집 용지'),
   ...[
     ['Ctrl+Alt+F5', 'Ctrl+Shift+E', 'left-less', '왼쪽 여백 줄이기'],
@@ -90,6 +92,7 @@ export const hangulBindings: Binding[] = [
   binding('Ctrl+N,C', 'table:caption-toggle', '표 캡션 넣기', 'table'),
   binding('Ctrl+Shift+S', 'table:block-sum', '블록 합계', 'cells'), binding('Ctrl+Shift+A', 'table:block-avg', '블록 평균', 'cells'), binding('Ctrl+Shift+P', 'table:block-product', '블록 곱', 'cells'),
   binding('P', 'format:object-properties', '개체 속성', 'object'), binding('G', 'insert:group-shapes', '개체 묶기', 'object'), binding('U', 'insert:ungroup-shapes', '개체 풀기', 'object'),
+  binding('T', 'ext:jueony-transpose-table', '표 뒤집기', 'object'),
   binding('Shift+PageUp', 'insert:arrange-front', '맨 앞으로', 'object'), binding('Shift+PageDown', 'insert:arrange-back', '맨 뒤로', 'object'),
   // Reserve former upstream shortcuts that would run a DIFFERENT Hangul function.
   binding('Alt+Shift+H', 'pending:macro-record', '스크립트 매크로 정의'),

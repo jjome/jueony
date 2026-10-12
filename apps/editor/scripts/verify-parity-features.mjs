@@ -205,6 +205,85 @@ try{
     try{for(let p=0;p<2;p++)assert.equal(parse(reopen.getParaShapeSet(0,p)).LeftMargin,propsAfter[p].LeftMargin);}finally{reopen.free();}
   });
 
+  for(const extension of ['hwp','hwpx'])await scenario(`${extension}: quick hanging indent aligns to live prefix, repeats without edit and undoes/saves`,async()=>{
+    const doc=HwpDocument.createEmpty();doc.createBlankDocument();doc.insertText(0,0,0,'1. 가😀나 항목의 내용');doc.applyParaFormat(0,0,JSON.stringify({marginLeft:1001,indent:600}));
+    const bytes=[...doc[extension==='hwp'?'exportHwp':'exportHwpx']()];doc.free();const frame=await openBytes(bytes,`hanging-indent.${extension}`);
+    await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.cursor.moveTo({sectionIndex:0,paragraphIndex:0,charOffset:3});ih.updateCaret();ih.focus();});
+    const info=await frame.evaluate(()=>{const d=window.__parityServices.wasm.borrowDocumentHandle();return {before:JSON.parse(d.getParaShapeSet(0,0)),prefix:JSON.parse(d.getCursorRect(0,0,3)).x-JSON.parse(d.getCursorRect(0,0,0)).x};});
+    await chord('Shift','Tab');const shape=await frame.evaluate(()=>JSON.parse(window.__parityServices.wasm.borrowDocumentHandle().getParaShapeSet(0,0)));
+    assert.equal(shape.LeftMargin,info.before.LeftMargin+info.before.Indentation+Math.round(info.prefix*150));assert.equal(shape.Indentation,-Math.round(info.prefix*150));
+    const changed=await snapshot();await chord('Shift','Tab');assert.equal((await snapshot()).revision,changed.revision);
+    await command('edit:undo');assert.deepEqual(await frame.evaluate(()=>JSON.parse(window.__parityServices.wasm.borrowDocumentHandle().getParaShapeSet(0,0))),info.before);
+    await command('edit:redo');const saved=await saveBytes(`hanging-indent.${extension}`),reopened=new HwpDocument(new Uint8Array(saved));
+    try{assert.equal(parse(reopened.getParaShapeSet(0,0)).LeftMargin,shape.LeftMargin);assert.equal(parse(reopened.getParaShapeSet(0,0)).Indentation,shape.Indentation);}finally{reopened.free();}
+    await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.cursor.selectRange({sectionIndex:0,paragraphIndex:0,charOffset:0},{sectionIndex:0,paragraphIndex:0,charOffset:2});ih.updateCaret();});
+    assert.equal(await frame.evaluate(()=>window.rhwpStudio.automation.isEnabled('ext:jueony-hanging-indent')),false);
+  });
+
+  for(const extension of ['hwp','hwpx'])await scenario(`${extension}: flat-cell quick hanging indent retains Unicode and Shift+Tab cell navigation`,async()=>{
+    const doc=HwpDocument.createEmpty();doc.createBlankDocument();const table=parse(doc.createTable(0,0,0,2,2));
+    for(let c=0;c<2;c++)doc.insertTextInCell(0,table.paraIdx,table.controlIdx,c,0,0,'가😀나 셀');
+    const bytes=[...doc[extension==='hwp'?'exportHwp':'exportHwpx']()];doc.free();const frame=await openBytes(bytes,`cell-hanging.${extension}`);
+    const position=cell=>({sectionIndex:0,parentParaIndex:table.paraIdx,paragraphIndex:0,charOffset:2,controlIndex:table.controlIdx,cellIndex:cell,cellParaIndex:0,cellPath:[{controlIndex:table.controlIdx,cellIndex:cell,cellParaIndex:0}]});
+    await frame.evaluate(p=>{const ih=window.__parityServices.getInputHandler();ih.cursor.moveTo(p);ih.updateCaret();ih.focus();},position(0));
+    const before=(await snapshot()).revision;
+    await chord('Control','Shift','Tab');assert.notEqual((await snapshot()).revision,before);
+    const raw=()=>frame.evaluate(table=>{const d=window.__parityServices.wasm.borrowDocumentHandle(),l=JSON.parse(d.getCursorModel()).lists.find(l=>l.isCell&&l.hostListId===0&&l.hostPara===table.paraIdx&&l.controlIndex===table.controlIdx&&l.cellIndex===0);return JSON.parse(d.getParaShapeSet(l.listId,0));},table);
+    const changed=await raw();assert.ok(changed.LeftMargin>0);assert.equal(changed.LeftMargin,-changed.Indentation);
+    const saved=await saveBytes(`cell-hanging.${extension}`);await openBytes(saved,`cell-hanging-reopen.${extension}`);assert.deepEqual(await raw(),changed);
+    await frame.evaluate(p=>{const ih=window.__parityServices.getInputHandler();ih.cursor.moveTo(p);ih.updateCaret();ih.focus();},position(1));
+    const version=(await snapshot()).revision;await chord('Shift','Tab');assert.equal((await snapshot()).revision,version);
+    assert.equal(await frame.evaluate(()=>window.__parityServices.getInputHandler().getCursorPosition().cellIndex),0);
+  });
+
+  for(const extension of ['hwp','hwpx'])await scenario(`${extension}: object T transposes whole table, preserves cell text/format and one-step undo/save`,async()=>{
+    const doc=HwpDocument.createEmpty();doc.createBlankDocument();const table=parse(doc.createTable(0,0,0,2,3));
+    for(let c=0;c<6;c++)doc.insertTextInCell(0,table.paraIdx,table.controlIdx,c,0,0,`셀${c}😀`);
+    doc.applyCharFormatInCell(0,table.paraIdx,table.controlIdx,1,0,0,4,JSON.stringify({bold:true}));
+    const bytes=[...doc[extension==='hwp'?'exportHwp':'exportHwpx']()];doc.free();const frame=await openBytes(bytes,`transpose-table.${extension}`);
+    const select=()=>frame.evaluate(table=>{const ih=window.__parityServices.getInputHandler();ih.cursor.exitCellSelectionMode();ih.cursor.enterTableObjectSelectionDirect(0,table.paraIdx,table.controlIdx);ih.updateCaret();ih.focus();},table);
+    const cells=()=>snapshot().then(s=>s.structure.tables[0].cells.map(c=>({row:c.row,column:c.column,text:c.text,characters:c.characters})));
+    const original=await cells();await select();await page.keyboard.press('t');const after=await cells();
+    assert.equal((await snapshot()).structure.tables[0].rows,3);assert.equal((await snapshot()).structure.tables[0].columns,2);
+    for(const old of original)assert.deepEqual(after.find(c=>c.row===old.column&&c.column===old.row),{...old,row:old.column,column:old.row});
+    await command('edit:undo');assert.deepEqual(await cells(),original);await command('edit:redo');
+    const saved=await saveBytes(`transpose-table.${extension}`);await openBytes(saved,`transpose-reopen.${extension}`);assert.deepEqual(await cells(),after);
+    await frame.evaluate(table=>window.__parityServices.wasm.setCellProperties(0,table.paraIdx,table.controlIdx,0,{cellProtect:true}),table);
+    await select();assert.equal(await frame.evaluate(()=>window.rhwpStudio.automation.isEnabled('ext:jueony-transpose-table')),false);
+    const before=(await snapshot()).revision;await page.keyboard.press('t');assert.equal((await snapshot()).revision,before);
+  });
+
+  await scenario('table object selection survives restart without dirty and rejects changed table evidence',async()=>{
+    let frame=await openFixture('schedule-table.hwpx');await page.click('#save-document');await page.waitForFunction(()=>document.getElementById('app-status').textContent==='파일에 저장했습니다.');
+    await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.cursor.enterTableObjectSelectionDirect(0,1,0);ih.updateCaret();ih.focus();window.__parityServices.eventBus.emit('table-object-selection-changed',true);});
+    const saved=await frame.evaluate(()=>window.jueonyEditor.captureDocumentView());assert.equal(saved.cursor.kind,'table-object');
+    await delay(2000);const storedBefore=await page.evaluate(async()=>{const db=await new Promise(resolve=>{const r=indexedDB.open('jueony-workspaces',1);r.onsuccess=()=>resolve(r.result);});const docs=await new Promise(resolve=>{const r=db.transaction('documents').objectStore('documents').getAll();r.onsuccess=()=>resolve(r.result.map(d=>({name:d.name,view:d.view})));});db.close();return docs;});await page.reload();await ready();frame=await services();
+    const stateAfter=await frame.evaluate(()=>({selected:window.__parityServices.getInputHandler().cursor.isInTableObjectSelection(),view:window.jueonyEditor.captureDocumentView()}));
+    assert.equal(stateAfter.selected,true,JSON.stringify({saved,storedBefore,stateAfter}));
+    assert.equal(await frame.evaluate(()=>window.jueonyEditor.state().dirty),false);
+    assert.deepEqual((await frame.evaluate(()=>window.jueonyEditor.captureDocumentView())).cursor,saved.cursor);
+    await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.cursor.exitTableObjectSelection();ih.wasm.insertTextInCell(0,1,0,0,0,0,'변경');});
+    const restored=await frame.evaluate(view=>window.jueonyEditor.restoreDocumentView(view),saved);
+    await delay(200);assert.equal(await frame.evaluate(()=>window.__parityServices.getInputHandler().cursor.isInTableObjectSelection()),false);
+  });
+
+  for(const extension of ['hwp','hwpx'])await scenario(`${extension}: page border solid background dialog cancels, undoes and preserves guarded export`,async()=>{
+    const frame=await openFixture(),original=await frame.evaluate(()=>window.__parityServices.wasm.getPageBorderFill(0)),revision=(await snapshot()).revision;
+    await command('page:page-border');await page.keyboard.press('Escape');assert.equal((await snapshot()).revision,revision);
+    await command('page:page-border');await frame.click('.modal-overlay .dialog-tab[data-tab=background]');
+    await frame.click('input[name="page-border-bg"][value="solid"]');
+    await frame.$eval('.dialog-tab-panel[data-tab=background] input[type=color]',e=>{e.value='#ffeedd';e.dispatchEvent(new Event('input',{bubbles:true}));});
+    await frame.click('input[name="page-border-fill-area"][value="paper"]');await frame.click('.modal-overlay .dialog-btn-primary');
+    const after=await frame.evaluate(()=>window.__parityServices.wasm.getPageBorderFill(0));assert.equal(after.fillType,'solid');assert.equal(after.fillColor.toLowerCase(),'#ffeedd');assert.equal(after.fillArea,'paper');
+    await command('edit:undo');assert.deepEqual(await frame.evaluate(()=>window.__parityServices.wasm.getPageBorderFill(0)),original);await command('edit:redo');
+    // Explicit format selection in the test file ensures both serialization paths are checked.
+    const exported=await frame.evaluate(extension=>{const w=window.__parityServices.wasm;return [...(extension==='hwp'?w.exportHwp():w.exportHwpx())];},extension);
+    const file=await openBytes(exported,`page-border.${extension}`);const saved=await saveBytes(`page-border.${extension}`),doc=new HwpDocument(new Uint8Array(saved));
+    try{assert.deepEqual(parse(doc.getPageBorderFill(0)),after);}finally{doc.free();}
+    await command('page:page-border');await file.click('.modal-overlay .dialog-tab[data-tab=background]');
+    assert.equal(await file.$eval('.dialog-tab-panel[data-tab=background] select',e=>e.value),'0');await page.keyboard.press('Escape');
+  });
+
   await scenario('cursor history physical Equal keys go back/forward, branch on manual movement and do not dirty the document',async()=>{
     const frame=await openFixture(),revision=(await snapshot()).revision;
     const generation=await frame.evaluate(()=>{window.__historySwapCount=0;window.__parityServices.eventBus.on('document-swapped',()=>window.__historySwapCount++);return window.__parityServices.wasm.documentGeneration;});

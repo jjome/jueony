@@ -12,6 +12,10 @@ function point(value: any): SessionPoint | undefined {
 export function validateSessionCursor(value: any): SessionCursor | undefined {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return;
   const focus = point(value.focus); if (!focus) return;
+  if (value.kind === 'table-object') {
+    if (focus.kind !== 'body' || !integer(value.control) || !digest(value.tableFingerprint)) return;
+    return {kind:'table-object',focus,control:value.control,tableFingerprint:value.tableFingerprint};
+  }
   if (value.kind === 'text') {
     if (value.blockPhase !== null && (!integer(value.blockPhase) || value.blockPhase > 5)) return;
     if (value.anchor === undefined) return value.blockPhase === null ? {kind:'text',focus,blockPhase:null} : undefined;

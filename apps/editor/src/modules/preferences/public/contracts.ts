@@ -12,7 +12,8 @@ export type SessionPoint = { kind: 'body'; caret: BodyCaret } | {
 };
 export type CellBlockBookmark = { anchor: { row: number; col: number }; focus: { row: number; col: number }; phase: 1 | 2 | 3; reason: 'manual' | 'protected'; excluded: string[] };
 export type SessionCursor = { kind: 'text'; focus: SessionPoint; anchor?: SessionPoint; blockPhase: number | null; selectionFingerprint?: string }
-  | { kind: 'cells'; focus: Extract<SessionPoint, { kind: 'cell' }>; block: CellBlockBookmark };
+  | { kind: 'cells'; focus: Extract<SessionPoint, { kind: 'cell' }>; block: CellBlockBookmark }
+  | { kind: 'table-object'; focus: Extract<SessionPoint, { kind: 'body' }>; control: number; tableFingerprint: string };
 export type DocumentViewState = { version: 1; zoom: number; fitMode: DocumentFitMode; scrollX: number; scrollY: number; caret?: BodyCaret; cursor?: SessionCursor };
 
 export type PreferenceErrorCode = 'read' | 'write' | 'corrupt' | 'version';

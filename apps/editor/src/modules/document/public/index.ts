@@ -10,3 +10,4 @@ export {createDocumentFacades} from '../application/facades.ts';
 export type {DocumentEnginePort} from '../ports/engine.ts';
 export {describeStructure} from '../application/describe-structure.ts';
 export type {EditorCommand,EditorMenu,EditorMenuItem,DocumentInteractionFacade} from './interaction.ts';
+export { planHangingIndent } from '../domain/hanging-indent.ts';

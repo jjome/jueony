@@ -19,6 +19,19 @@ function fixture(){
  return {input,body,cells,cell,position:()=>position,calls:()=>calls,set:(p:any,a?:any,f3:number|null=null)=>{position=p;range=a?{anchor:a,focus:p}:null;phase=f3;block=null;},block:(b:any)=>{block=b;},blocked:(v:boolean)=>{blocked=v;},removed:()=>{removed=true;}};
 }
 
+test('table object bookmarks restore only the same bounded table and host paragraph',()=>{
+ const f=fixture();let restored:any;
+ f.input.cursor.isInTableObjectSelection=()=>true;
+ f.input.cursor.getSelectedTableRef=()=>({sec:0,ppi:1,ci:0});
+ f.input.restoreSessionTableObject=ref=>{restored=ref;return true;};
+ const saved=captureSessionCursor(f.input)!;assert.equal(saved.kind,'table-object');
+ assert.equal(restoreSessionCursor(f.input,saved),true);assert.deepEqual(restored,{sec:0,ppi:1,ci:0});
+ f.cells[0][0]='変更';assert.equal(restoreSessionCursor(f.input,saved),false);
+ assert.equal(validateSessionCursor({...saved,control:-1}),undefined);
+ assert.equal(validateSessionCursor({...saved,tableFingerprint:'bad'}),undefined);
+ f.input.cursor.getSelectedTableRef=()=>({sec:0,ppi:1,ci:0,cellPath:[{}]});assert.equal(captureSessionCursor(f.input),undefined);
+});
+
 test('backward body selection across sections retains anchor, focus, F3 phase and text guard',()=>{
  const f=fixture();f.set({sectionIndex:0,paragraphIndex:0,charOffset:1},{sectionIndex:1,paragraphIndex:0,charOffset:2},3);
  const saved=captureSessionCursor(f.input)!;assert.equal(saved.kind,'text');assert.equal(saved.kind==='text'&&saved.blockPhase,3);

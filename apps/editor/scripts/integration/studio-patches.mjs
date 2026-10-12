@@ -100,6 +100,7 @@ const jueonyRememberView = () => { if (!jueonyDocumentView!.isRestoring()) { jue
 document.getElementById('scroll-container')?.addEventListener('scroll', jueonyRememberView, {passive:true});
 eventBus.on('zoom-level-display', jueonyRememberView);
 eventBus.on('cursor-rect-updated', jueonyRememberView);
+eventBus.on('table-object-selection-changed', jueonyRememberView);
 eventBus.on('document-mutated', () => { jueonyCursorInteraction++; });
 eventBus.on('command-state-changed', () => { if (window.parent !== window) window.parent.postMessage({type:'jueony:command-state'},location.origin); });
 window.addEventListener('keydown', event => { if(event.key === 'F6' && event.altKey && !event.ctrlKey && !event.shiftKey && !event.isComposing && !document.querySelector('dialog[open],.modal-overlay') && window.parent !== window){event.preventDefault();event.stopImmediatePropagation();window.parent.postMessage({type:'jueony:focus-chat'},location.origin);} },true);
@@ -177,6 +178,13 @@ caretInput = replaceOnce(caretInput, '  getCursorPosition(): DocumentPosition { 
   getSessionCaretAccess() {
     return { cursor: this.cursor, wasm: this.wasm,
       getCursorPosition: () => this.cursor.getPosition(),
+      restoreSessionTableObject: (ref: {sec:number;ppi:number;ci:number}) => {
+        this.cursor.clearSelection(); this.cursor.exitCellSelectionMode();
+        this.cursor.moveTo({sectionIndex:ref.sec,paragraphIndex:ref.ppi,charOffset:0});
+        this.cursor.enterTableObjectSelectionDirect(ref.sec,ref.ppi,ref.ci);
+        this.updateCaret(); this.eventBus.emit('table-object-selection-changed',true);
+        return true;
+      },
       restoreSessionCaret: (position: DocumentPosition) => {
         this.cursor.moveTo(position);
         this.cursor.resetPreferredX();

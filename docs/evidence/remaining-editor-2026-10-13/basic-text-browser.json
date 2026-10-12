@@ -1,0 +1,97 @@
+{
+  "results": [
+    "hwp: mixed-format case expansion through real dialog, undo/redo and save",
+    "hwp: plaintext multiline paste replaces selected text and preserves suffix formatting",
+    "hwp: Unicode space/hyphen commands and trusted shortcut, undo and save",
+    "hwp: 2024-02-28 autofill preview, undo and native save",
+    "hwp: 😀 제001호 autofill preview, undo and native save",
+    "hwpx: mixed-format case expansion through real dialog, undo/redo and save",
+    "hwpx: plaintext multiline paste replaces selected text and preserves suffix formatting",
+    "hwpx: Unicode space/hyphen commands and trusted shortcut, undo and save",
+    "hwpx: 2024-02-28 autofill preview, undo and native save",
+    "hwpx: 😀 제001호 autofill preview, undo and native save",
+    "cancel, identical transformation and stale dialog leave no new mutation",
+    "failure after live replacement rolls back bytes and history without partial edit"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "externalRequests": [],
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@jueony/rhwp-engine-review@0.8.7",
+    "builtAt": "2026-10-12T23:54:10.344Z",
+    "engineWasmSha256": "5dc02a24794defb8b5e05b0bcc22fc7bdba30f8ec73c7d05a259733399d2423e",
+    "engineBuild": {
+      "builtAt": "2026-10-12T16:16:24.9937548Z",
+      "jsSha256": "0d406b11eeb0ca7bfb1144ecd9b1508ee93042aae034878559f9b84ca19ebbc5",
+      "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+      "optimized": false,
+      "patches": [
+        {
+          "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c",
+          "name": "border-fill-identity.patch"
+        },
+        {
+          "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af",
+          "name": "default-tabs.patch"
+        },
+        {
+          "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f",
+          "name": "document-insertion.patch"
+        },
+        {
+          "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562",
+          "name": "note-query-json.patch"
+        },
+        {
+          "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f",
+          "name": "page-border-entries.patch"
+        },
+        {
+          "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8",
+          "name": "section-split.patch"
+        },
+        {
+          "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6",
+          "name": "style-reference-deletion.patch"
+        },
+        {
+          "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce",
+          "name": "style-reference-order.patch"
+        },
+        {
+          "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af",
+          "name": "style-shape-stories.patch"
+        },
+        {
+          "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad",
+          "name": "table-creation-consistency.patch"
+        }
+      ],
+      "sourceId": "5d412578fff9c9a0",
+      "wasmSha256": "5dc02a24794defb8b5e05b0bcc22fc7bdba30f8ec73c7d05a259733399d2423e",
+      "buildMode": "wsl-review-no-opt"
+    },
+    "buildScriptSha256": "df4b996c242c320b0a6a9836759e760c9e8f9f9f641de2106e901aa7b69169be",
+    "studioPatchSha256": "288d92712a0d79ac2366309f2bbbf5e36e4280ca9845003b9d7756e969a35533",
+    "featurePatchSha256": "ca3ae9e1f5c7075d0113b6a38cb905317ec51db8e0cfdb55f1dfb0e9e1e986b7",
+    "recoveryPatchSha256": "12dfbb56ca02e1642bb495a44e18cf0823da84864386211eeb8811916552f864",
+    "tabFeaturePatchSha256": "da0d7d0b9a0c529af8a4a9733bf239a1c4f6afcd99b8803f1237f1c57a90ceec",
+    "sectionBoundaryPatchSha256": "e2a5cee3330b67015a3ac8cc738cafe36966950d7a12fc48e1d0a7ffc2392b13",
+    "documentInsertionPatchSha256": "2941b880fe250f779c95ce7bbd9d54384b10dda5f1596f7c0343d44e0297d4ff",
+    "styleManagementPatchSha256": "792ad2629ba0d657fe0bc504fa0f3c55075c6b2c69ea0cb570954dad294ed55c",
+    "styleFlowPatchSha256": "11010768f738466f36731a71b6d596ecae4ba60c74132fd3ea088e4816a98974",
+    "tableConversionPatchSha256": "f127cc7c4eeafbf7bb40415dbc598b5e6a68fd1b13dc7fc6b273bbb573b08109",
+    "pageBorderPatchSha256": "ec65f5b04c9c640bbe94147c04940098bef5ff495d171bfbce5b60df81ffc9f4",
+    "selectedObjectPropertiesPatchSha256": "3ff0eab7f38eece3ce098c33759d0e2bdce12fb3f44c8da417c81a1e02799279",
+    "formattingToolbarPatchSha256": "d75122ccc9459cf9fa46d065777231c5b83144393a1af93d20cffee8594c600f",
+    "documentTabCyclePatchSha256": "1c907daa1e91202f24c77827629ce66c9959cf12a6d1656d64f8942d106c79f8",
+    "customSourceSha256": "a5036cf9ef5ebfd5b93843dd08c689f5bd61792aace61618211a3c84d73c7086",
+    "applicationSourceCommit": "dd79d2f35d5816dd6929ee9d1ab8b0e45636abb5",
+    "applicationSourceDirty": true,
+    "sourceBuild": true,
+    "note": "고정 rhwp 소스와 추적 패치를 직접 빌드한 검수용 WASM. 최적화 및 한컴 출력 비교 상태는 engineBuild와 검증 보고서 참조."
+  },
+  "note": "Isolated Edge, real production commands/dialogs/history/save. Native engine reopen. No Hancom GUI comparison or paid LLM call."
+}

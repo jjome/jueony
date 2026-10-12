@@ -11,6 +11,7 @@ import { installCalendarStamp } from '../adapters/rhwp/calendar-stamp.ts';
 import { installHangingIndent } from '../adapters/rhwp/hanging-indent.ts';
 import { installTransposeTable } from '../adapters/rhwp/transpose-table.ts';
 import { installDocumentInsertion } from '../adapters/rhwp/document-insertion.ts';
+import { installBasicTextCommands } from '../adapters/rhwp/basic-text-commands.ts';
 
 export function installHangulKeys({ automation, registry, input, eventBus }: { automation: any; registry: any; input: () => any; eventBus: any }) {
   const resolver = new HangulKeyResolver();
@@ -22,13 +23,14 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
   installHangingIndent(registry, input);
   installTransposeTable(registry, input, eventBus);
   installDocumentInsertion(registry, input, eventBus);
+  installBasicTextCommands(registry, input, eventBus);
   // The pinned Studio marked the entire caption submenu as a stub; child state is now registry-owned.
   document.querySelector('[data-cmd="insert:caption-top"]')?.closest('.md-sub')?.classList.remove('disabled');
   const unsupported = new Set<string>();
   // Keep the engine fallback consistent as well (IME and submode handlers use it).
   defaultShortcuts.splice(0, defaultShortcuts.length, ...hangulBindings.filter(b => b.scope === 'document' && b.keys !== 'Shift+Tab' && !b.keys.includes(',') && !b.command.startsWith('pending:') && !b.nativeClipboard).map(b => {
     const parts = b.keys.split('+'), key = parts.at(-1)!;
-    return [{ key: key.toLowerCase(), ...(/^[A-Z]$/.test(key) ? { code: 'Key' + key } : {}), ctrl: parts.includes('Ctrl'), alt: parts.includes('Alt'), shift: parts.includes('Shift') }, b.command] as typeof defaultShortcuts[number];
+    return [{ key: key === 'Space' ? ' ' : key.toLowerCase(), ...(/^[A-Z]$/.test(key) ? { code: 'Key' + key } : {}), ctrl: parts.includes('Ctrl'), alt: parts.includes('Alt'), shift: parts.includes('Shift') }, b.command] as typeof defaultShortcuts[number];
   }));
   const notice = document.createElement('div'); notice.id = 'jueony-key-hint'; notice.setAttribute('role', 'status');
   Object.assign(notice.style, { position: 'fixed', bottom: '35px', left: '16px', zIndex: '5000', background: '#193452', color: 'white', padding: '8px 14px', borderRadius: '6px', pointerEvents: 'none', display: 'none' });

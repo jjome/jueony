@@ -7,7 +7,7 @@ export function installTableAutoFill(registry: any, input: () => any, eventBus: 
       && !ih.isComposing && !ih.wasm.requiresPasswordForSave && !c.isInHeaderFooter() && !c.isInFootnote() && !c.isInTextBox();
   };
   const read = () => readAutoFillPlan(input().wasm, input().cursor.captureCellSelection());
-  registry.register({ id: 'table:auto-fill-integers', label: '자동 채우기 (정수 수열)', opensDialog: true,
+  registry.register({ id: 'table:auto-fill-integers', label: '자동 채우기 (정수·날짜·번호)', opensDialog: true,
     canExecute: (context: any) => { if (!safe(context)) return false; try { read(); return true; } catch { return false; } },
     execute: () => {
       const api = (window as any).jueonyEditor, revision = api.revision(), plan = read();
@@ -22,5 +22,5 @@ export function installTableAutoFill(registry: any, input: () => any, eventBus: 
     },
   });
   const anchor = document.querySelector('.md-item[data-cmd="table:text-to-table"]');
-  if (anchor) { const item = document.createElement('div'); item.className = 'md-item'; item.dataset.cmd = 'table:auto-fill-integers'; const label = document.createElement('span'); label.className = 'md-label'; label.textContent = '자동 채우기 (정수 수열)'; item.append(label); anchor.after(item); }
+  if (anchor) { const item = document.createElement('div'); item.className = 'md-item'; item.dataset.cmd = 'table:auto-fill-integers'; const label = document.createElement('span'); label.className = 'md-label'; label.textContent = '자동 채우기 (정수·날짜·번호)'; item.append(label); anchor.after(item); }
 }

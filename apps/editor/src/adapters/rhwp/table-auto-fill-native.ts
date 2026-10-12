@@ -1,9 +1,9 @@
-import { planIntegerSeries } from '../../modules/document/public/table-auto-fill.ts';
+import { planTableSeries, type TableSeries } from '../../modules/document/public/table-auto-fill.ts';
 import { verifyPreservedExport } from './preservation.ts';
 type Point = { row: number; col: number };
 export type AutoFillBlock = { sec: number; ppi: number; ci: number; cellPath?: unknown[]; anchor: Point; focus: Point; excluded?: unknown[] };
 type SeriesCell = { index: number; row: number; column: number; text: string; charShape: number; paraShape: number; style: number };
-export type AutoFillPlan = { section: number; paragraph: number; control: number; block: AutoFillBlock; step: number; cells: SeriesCell[]; values: string[] };
+export type AutoFillPlan = { section: number; paragraph: number; control: number; block: AutoFillBlock; cells: SeriesCell[] } & TableSeries;
 const parsed = (v: any): any => typeof v === 'string' ? JSON.parse(v) : v;
 const native = (wasm: any) => wasm.borrowDocumentHandle?.() ?? wasm;
 const integer = (v: unknown): v is number => Number.isSafeInteger(v) && (v as number) >= 0;
@@ -36,7 +36,7 @@ export function readAutoFillPlan(value: any, block: AutoFillBlock): AutoFillPlan
   }
   cells.sort((a, b) => a.row - b.row || a.column - b.column);
   if (cells.length !== (r1 - r0 + 1) * (c1 - c0 + 1) || new Set(cells.map(c => `${c.row}:${c.column}`)).size !== cells.length) throw new Error('선택한 셀 범위가 유효하지 않습니다.');
-  const series = planIntegerSeries(cells[0]?.text ?? '', cells[1]?.text ?? '', cells.length);
+  const series = planTableSeries(cells[0]?.text ?? '', cells[1]?.text ?? '', cells.length);
   return { section, paragraph, control, block: structuredClone(block), cells, ...series };
 }
 
@@ -47,7 +47,7 @@ export function executeAutoFill(value: any, plan: AutoFillPlan): void {
   plan.cells.slice(2).forEach((cell, index) => {
     const text = plan.values[index + 2]; if (text === cell.text) return;
     const args = [plan.section, plan.paragraph, plan.control, cell.index, 0], count = doc.getCellParagraphLength(...args);
-    if (count) checked(doc.deleteTextInCell(...args, 0, count)); checked(doc.insertTextInCell(...args, 0, text)); checked(doc.setCharShapeIdInCell(...args, 0, text.length, cell.charShape));
+    if (count) checked(doc.deleteTextInCell(...args, 0, count)); checked(doc.insertTextInCell(...args, 0, text)); checked(doc.setCharShapeIdInCell(...args, 0, Array.from(text).length, cell.charShape));
     if (doc.getTextInCell(...args, 0, doc.getCellParagraphLength(...args)) !== text
       || parsed(doc.getCellParaPropertiesAt(...args)).paraShapeId !== cell.paraShape || parsed(doc.getCellStyleAt(...args)).id !== cell.style) throw new Error('자동 채우기 결과나 셀 서식이 다릅니다.');
   });

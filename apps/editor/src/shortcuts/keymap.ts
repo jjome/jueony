@@ -61,6 +61,9 @@ export const hangulBindings: Binding[] = [
   binding('Ctrl+Shift+Delete', 'format:toggle-bullet', '글머리표 적용/해제'),
   ...(['K', 'R', 'B', 'D', 'G', 'Y', 'C', 'W'] as const).map((key, i) => binding('Ctrl+M,' + key, 'ext:jueony-color', ['검정', '빨강', '파랑', '자주', '초록', '노랑', '청록', '흰색'][i] + ' 글자색', 'document', { textColor: ['#000000', '#ff0000', '#0000ff', '#ff00ff', '#00ff00', '#ffff00', '#00ffff', '#ffffff'][i] })),
   binding('Ctrl+F10', 'insert:symbols', '문자표'),
+  binding('Alt+Space', 'insert:fixed-space', '고정폭 빈 칸 (Unicode)'),
+  binding('Ctrl+Alt+Space', 'insert:nonbreaking-space', '묶음 빈 칸 (Unicode)'),
+  binding('Ctrl+Shift+-', 'insert:soft-hyphen', '무른 하이픈 (Unicode)'),
   binding('Ctrl+N,T', 'table:create', '표 만들기', 'document', { inputDialog: true }), binding('Ctrl+N,I', 'insert:image', '그림'),
   binding('Ctrl+N,B', 'insert:textbox', '글상자'), binding('Ctrl+N,M', 'insert:equation', '수식'),
   binding('Ctrl+N,N', 'insert:footnote', '각주'), binding('Ctrl+N,E', 'insert:endnote', '미주'),
@@ -103,7 +106,7 @@ export type Key = Pick<KeyboardEvent, 'key' | 'code' | 'ctrlKey' | 'altKey' | 's
 export type KeyContext = { table: boolean; cells: boolean; object: boolean };
 export function keyStroke(e: Key): string {
   const code = e.code ?? '';
-  const key = /^Key[A-Z]$/.test(code) ? code.slice(3) : /^Digit\d$/.test(code) ? code.slice(5) : ({ BracketLeft: '[', BracketRight: ']', Equal: '=', Minus: '-' } as Record<string, string>)[code] ?? (e.key.length === 1 ? e.key.toUpperCase() : e.key);
+  const key = /^Key[A-Z]$/.test(code) ? code.slice(3) : /^Digit\d$/.test(code) ? code.slice(5) : ({ BracketLeft: '[', BracketRight: ']', Equal: '=', Minus: '-', Space: 'Space' } as Record<string, string>)[code] ?? (e.key === ' ' ? 'Space' : e.key.length === 1 ? e.key.toUpperCase() : e.key);
   return [e.ctrlKey ? 'Ctrl' : '', e.altKey ? 'Alt' : '', e.shiftKey ? 'Shift' : '', key].filter(Boolean).join('+');
 }
 export class HangulKeyResolver {

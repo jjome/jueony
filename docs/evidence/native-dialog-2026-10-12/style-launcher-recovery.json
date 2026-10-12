@@ -1,0 +1,52 @@
+{
+  "status": "PASS_STYLE_LAUNCHER_RECOVERY",
+  "documentWindowId": 723778,
+  "directEscapeError": "Error: failed to activate captured window",
+  "verifiedCycles": [
+    {
+      "method": "supported API calls",
+      "beforeStylePresent": true,
+      "afterStylePresent": false,
+      "documentFocusReturned": true
+    },
+    {
+      "method": "scripts/hangul-style-recovery.mjs",
+      "beforeStylePresent": true,
+      "afterStylePresent": false,
+      "documentFocusReturned": true
+    },
+    {
+      "method": "scripts/hangul-style-recovery.mjs repeated",
+      "beforeStylePresent": true,
+      "afterStylePresent": false,
+      "documentFocusReturned": true
+    }
+  ],
+  "final": {
+    "windowId": 723778,
+    "styleDialogPresent": false,
+    "focused": "4 편집 (settable, string) ID: 185288740"
+  },
+  "remainingHwpWindowIds": [
+    723778
+  ],
+  "createdLaunchersClosed": [
+    4590220,
+    9703036,
+    13373068,
+    16977100
+  ],
+  "syntheticDocumentStatus": {
+    "characters": 0,
+    "sections": 1
+  },
+  "sourceSha256": "9a7458c86222adb7c0b8e0eb1f159865d45dbb2e15bd55216fd280ca8a11539b",
+  "execution": "The workspace module source was submitted as REPL code with only ESM export keywords removed; native APIs stayed unchanged. Local-file import failed with EPERM. No eval or custom protocol client was used.",
+  "observedAt": "2026-10-12T11:52:36Z",
+  "limitations": [
+    "Direct Escape/button activation in the owned modal still fails in the Computer Use bridge.",
+    "Launcher recovery opens an additional Hancom start window; only newly created, observed empty launchers were closed with the supported API.",
+    "Verified only for an untouched top-level Style dialog in the project synthetic document; nested style edits and other dialogs remain unverified.",
+    "No native helper source, binary, permissions, or protocol was changed."
+  ]
+}

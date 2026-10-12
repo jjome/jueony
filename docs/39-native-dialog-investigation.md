@@ -1,6 +1,6 @@
 # 한글 2024 모달 창 조작 오류 조사
 
-2026-10-12. Jueony 코드 결함과 Computer Use 환경 결함을 구분한다. 현재 문제는 해결 완료 상태가 아니다. [현재 재현 기록](evidence/selection-spacing-2026-10-12/native-dialog-recovery.json), [이전 기록](evidence/basic-state-2026-10-12/native-dialog-diagnosis.json)을 함께 제공한다.
+2026-10-12. Jueony 코드 결함과 Computer Use 환경 결함을 구분한다. **스타일 창 닫기와 원래 문서 복귀는 지원 API를 사용하는 런처 복구 경로로 검증됐다.** 직접 Esc/닫기 버튼을 보낼 때의 Computer Use 활성화 오류는 남아 있다. [복구 검증 기록](evidence/native-dialog-2026-10-12/style-launcher-recovery.json), [앞선 재현 기록](evidence/selection-spacing-2026-10-12/native-dialog-recovery.json), [이전 기록](evidence/basic-state-2026-10-12/native-dialog-diagnosis.json)을 함께 제공한다.
 
 ## 이번에 다시 확인한 사실
 
@@ -46,6 +46,25 @@ Windows에는 소유 창의 마지막 활성 팝업을 찾는 [GetLastActivePopu
 
 도구 수정의 최소 판정 기준은 (1) 반환된 픽셀이 한글/스타일 창과 일치하고, (2) F6로 연 스타일 창을 지원 API로 닫아 트리에서 사라짐을 확인하고, (3) 부모 편집 화면으로 복귀하는 것이다. 세 조건이 통과하기 전에는 `BLOCKED_TOOL_MODAL_ACTIVATION` 상태를 유지한다.
 
+## 적용한 복구 코드와 실제 검증
+
+2026-10-12 20:52 KST. [복구 스크립트](../scripts/hangul-style-recovery.mjs)를 추가했다. Computer Use 내부 바이너리를 수정한 패치가 아니라, 지원되는 `sky` API를 조합한 자동화 복구 코드다. 패키지의 manifest는 Proprietary이며 설치 패키지에는 활성화 구현을 수정할 JS/TS/Rust/C#/C/C++ 소스가 없었다. 외부 helper를 찾아 실행하거나 별도 프로토콜 클라이언트를 만들지 않았다.
+
+검증한 경로는 다음과 같다. 각 단계는 별도 REPL 셀에서 실행하고 관찰 결과를 읽은 뒤 다음 입력을 보낸다.
+
+1. `observeStyleRecovery(sky, documentTitle)`로 현재 앱 목록의 정확한 문서 제목을 선택한다. 반환된 Window만 사용하며, 스타일 창이 열린 상태를 확인한다.
+2. `dismissStyleViaLauncher(sky, observation)`가 해당 앱의 반환된 app ID로 `launch_app`을 한 번 호출하고 같은 문서를 다시 관찰한다. 스타일 창이 사라지지 않거나 접근성 정보가 없으면 성공으로 처리하지 않는다.
+3. 닫힌 상태를 확인한 다음 셀에서 `focusRecoveredDocument(sky, observation)`를 실행한다. 원래 문서를 활성화하고 캡처·포커스를 확인한다. 관찰 객체는 입력에 한 번만 사용할 수 있다.
+4. 런처 호출은 별도의 한글 시작 화면을 만든다. 호출 전 존재하지 않았던 반환 Window를 새로 관찰하여 **빈 Launcher 화면**임을 확인한 경우에만 별도 셀에서 `press_key(Alt_L+F4)`로 정리한다. 비동기 닫기 뒤 새 창 목록에서 제거됐는지 확인하며, 아직 목록에 남았다고 입력을 반복하지 않는다. 기존 문서 창이나 미확인 창에는 이 정리를 적용하지 않는다.
+
+실제 한글 2024의 합성 문서에서 열린 스타일 창 → 런처 호출 → 스타일 창 사라짐 → 원래 문서 편집 포커스 복귀를 **3회** 확인했다. 그중 2회는 저장한 스크립트의 함수로 검증했다. 마지막 상태는 스타일 창 없음, 문서 편집 영역 포커스, 0글자·1구역이며 한글 Window는 원래 문서 하나만 남았다. 생성된 시작 화면 4개도 관찰 후 정리했다. 문서 내용이나 스타일 값은 입력하지 않았다.
+
+직접 부모를 전면에 가져온 뒤 F6로 스타일 창을 열고 Esc를 보내는 경로는 여전히 `failed to activate captured window`가 재현됐다. 따라서 런처 복구 성공을 SDK의 모달 입력 결함 수정으로 설명하지 않는다. 열린 최상위 스타일 목록을 변경하지 않은 상태에서 닫는 경로만 검증했으며, 중첩 스타일 편집·다른 대화상자·저장되지 않은 스타일 변경의 취소 의미는 아직 검증하지 않았다.
+
+모듈의 로컬 파일 import는 이 Node REPL에서 `EPERM`으로 실패했다. 실제 검증은 파일 원문에서 ESM `export` 키워드만 제거하고 동일한 함수 선언을 REPL 코드로 전달하는 방식으로 했다. 문자열 eval, helper 직접 실행, Windows UIA/SendKeys/COM 우회는 사용하지 않았다. 셸에서는 JS 구문 검사만 실행한다. 이 파일은 Jueony 실행 파일에 넣는 기능이나 일반 PowerShell 실행 스크립트가 아니다.
+
+[공식 Computer Use 문서](https://learn.chatgpt.com/docs/computer-use)는 Windows에서 대상 앱이 활성 데스크톱에 표시된 상태로 실행하도록 설명한다. 복구 후 실제 대상 화면을 확인했으며, 다른 앱의 픽셀을 대상 화면으로 간주하지 않는다. Hancom 직접 연결 플러그인 검색 결과에는 대체 연결이 없었다.
+
 ## 비교 작업의 계속 진행 범위
 
-Jueony 자체 대화상자와 키·선택·파일 검사는 실제 Edge의 격리된 프로필에서 진행한다. HWP/HWPX 시험 파일과 원본 정수/독립 XML 결과를 준비해 실제 한글 재열기 검수가 가능하게 한다. 도구 수정 후 새 기능의 한글 키 조절량과 선택·커서 수명을 직접 입력·관찰하여 비교한다. 그 전까지 해당 네이티브 비교는 `BLOCKED_NATIVE_INPUT`으로 유지한다.
+Jueony 자체 대화상자와 키·선택·파일 검사는 실제 Edge의 격리된 프로필에서 진행한다. HWP/HWPX 시험 파일과 원본 정수/독립 XML 결과를 준비해 실제 한글 재열기 검수가 가능하게 한다. 스타일 목록은 위 복구 경로로 닫고 문서 입력을 계속할 수 있다. 다른 대화상자까지 복구됐다고 확대하지 않으며, 미검증 대화상자 입력이 필요한 비교 항목은 계속 `BLOCKED_NATIVE_INPUT`으로 유지한다.

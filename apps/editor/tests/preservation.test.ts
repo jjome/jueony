@@ -49,6 +49,21 @@ for(const format of ['hwp','hwpx'] as const)test(`${format}: actual WASM mixed c
  }finally{doc.free();}
 });
 
+test('HWP no-hatch code zero survives HWPX canonical minus-one without hiding real hatch changes',()=>{
+ const doc=blank();try{
+  doc.setPageBorderFill(0,JSON.stringify({fillType:'solid',fillColor:'#ddeeff',patternType:0,patternColor:'#000000'}));
+  assert.equal(check(doc,'hwpx').status,'checked');
+  doc.setPageBorderFill(0,JSON.stringify({fillType:'solid',fillColor:'#ccddff',patternType:1,patternColor:'#000000'}));
+  const before=capturePreservationEvidence(doc);
+  assert.equal((before.values['section/0/page-border'] as any).patternType,1);
+  doc.setPageBorderFill(0,JSON.stringify({fillType:'solid',fillColor:'#bbccee',patternType:2,patternColor:'#000000'}));
+  const after=capturePreservationEvidence(doc);assert.equal((after.values['section/0/page-border'] as any).patternType,2);
+  // Isolate hatch identity from the colors used to allocate distinct old-package fixtures.
+  (after.values['section/0/page-border'] as any).fillColor=(before.values['section/0/page-border'] as any).fillColor;
+  assert.equal(comparePreservationEvidence(before,after,'hwpx',clean('hwpx')).status,'blocked');
+ }finally{doc.free();}
+});
+
 test('body text equality cannot conceal a lost non-first character run',()=>{
  const doc=blank();let reopened:HwpDocument|undefined;try{
   doc.insertText(0,0,0,'보통 굵음');doc.applyCharFormat(0,0,3,5,JSON.stringify({bold:true}));

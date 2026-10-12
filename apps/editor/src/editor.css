@@ -68,6 +68,10 @@
 :root[data-unified-chrome="true"] #jueony-ribbon,
 :root[data-unified-chrome="true"] .j-quick-access { display: none !important; }
 :root[data-navigation-pane="open"] #jueony-style-panel { display: none; }
+/* A desktop split pane can be short/narrow without a mobile keyboard being open. */
+@media screen {
+  :root[data-unified-chrome="true"]:not([data-toolbox-format="hidden"]) #style-bar { display: grid !important; }
+}
 #jueony-navigation-pane { flex: 0 0 270px; width: 270px; max-width: 45%; min-width: 190px; min-height: 0; display: flex; flex-direction: column; border-left: 1px solid #d9dfe7; background: #fafbfc; color: #354550; font: 12px 'Malgun Gothic', sans-serif; }
 .j-search-form { display: flex; gap: 4px; padding: 0 10px; }
 .j-search-form input { width: 100%; min-width: 0; padding: 6px; border: 1px solid #bdcbd9; }

@@ -8,6 +8,7 @@ import { createDocumentFacades } from '../../modules/document/public/index.ts';
 import { executeDocumentOperations } from './execute.ts';
 import { readStructure } from './structure.ts';
 import {verifyPreservedExport} from './preservation.ts';
+import {readNativeFormattingState} from './formatting-toolbar.ts';
 import { plainSnapshot } from '../../modules/document/public/index.ts';
 import type { Snapshot, Receipt, EditProposal as Generation } from '../../modules/document/public/index.ts';
 type Deps={wasm:any;eventBus:any;documentState:any;ready:Promise<unknown>;load:(bytes:Uint8Array,name:string,handle:any)=>Promise<void>;input:()=>any;render:()=>Promise<void>;automation:any;refreshMenus:()=>Promise<void>;};
@@ -42,6 +43,7 @@ export function installAgentBridge(d:Deps){
  const native = {
   snapshot,
   toolbarsVisible:()=>document.documentElement.dataset.toolboxBasic!=='hidden',
+  formattingState:()=>readNativeFormattingState(d.wasm,d.input(),d.automation.getContext(),api),
   commands:()=>d.automation.listCommands(),
   prepareMenus:()=>d.refreshMenus(),
   menus:()=>{

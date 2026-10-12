@@ -1,7 +1,7 @@
 import {readFile,writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
 /** Generated Studio seams only; policies and native mutation are owned by adapters. */
-export async function applyStyleManagementPatches({root}) {
+export async function applyStyleManagementPatches({root,orderEnabled=false}) {
   const replace=(s,b,a,label)=>{if(s.split(b).length!==2)throw new Error('스타일 패치 기준 불일치: '+label);return s.replace(b,a);};
   const edit=async(file,transform)=>{const path=join(root,'src',file);await writeFile(path,transform((await readFile(path,'utf8')).replace(/\r\n/g,'\n')));};
   await edit('ui/style-edit-dialog.ts',s=>{
@@ -51,11 +51,27 @@ export async function applyStyleManagementPatches({root}) {
     return replace(s,'  override show(): void {\n    super.show();',"  override show(): void {\n    this.jueonyRevision=(window as any).jueonyEditor?.revision();\n    super.show();",'edit revision');
   });
   await edit('ui/style-dialog.ts',s=>{
-    s="import {assertStyleDialogCurrent,cloneStyleDefinition} from '../jueony/adapters/rhwp/style-management.ts';\n"+s;
+    s="import {assertStyleDialogCurrent,cloneStyleDefinition,moveStyleDefinition} from '../jueony/adapters/rhwp/style-management.ts';\n"+s;
     s=replace(s,'  private styles: StyleEntry[] = [];','  private styles: StyleEntry[] = [];\n  private jueonyRevision: string | undefined;\n  private jueonyError!: HTMLParagraphElement;','manager state');
     s=replace(s,"    this.styleList.className = 'sd-style-list';","    this.styleList.className = 'sd-style-list';\n    this.styleList.setAttribute('role','listbox');this.styleList.setAttribute('aria-label','스타일 목록');",'listbox');
     s=replace(s,'    iconBar.appendChild(btnDelete);',`    iconBar.appendChild(btnDelete);
     const clone=this.createIconBtn('⧉','선택한 스타일 복제',()=>this.jueonyClone());clone.dataset.jueonyCloneStyle='true';iconBar.appendChild(clone);`,'clone button');
+    if(orderEnabled){
+      s=replace(s,'    leftCol.appendChild(iconBar);',`    for(const [direction,label] of [[-1,'위로'],[1,'아래로']] as const){
+      const button=this.createIconBtn(direction===-1?'↑':'↓','스타일 '+label,()=>this.jueonyMove(direction));
+      button.dataset.jueonyMoveStyle=String(direction);iconBar.appendChild(button);
+    }
+    leftCol.appendChild(iconBar);`,'move buttons');
+      s=replace(s,'  private handleDelete(): void {',`  private jueonyMove(direction:-1|1): void {
+    try{
+      assertStyleDialogCurrent(this.jueonyRevision,this.wasm,this.services);
+      const ih=this.services!.getInputHandler()!;let created=this.selectedId;
+      ih.executeOperation({kind:'snapshot',operationType:'moveStyle',operation:wasm=>{created=moveStyleDefinition(wasm,created,direction);return ih.getPosition();}});
+      this.selectedId=created;this.refresh();
+    }catch(error){this.jueonyError.textContent=error instanceof Error?error.message:String(error);}
+  }
+  private handleDelete(): void {`,'move handler');
+    }
     s=replace(s,'    body.appendChild(this.infoPanel);',"    body.appendChild(this.infoPanel);\n    this.jueonyError=document.createElement('p');this.jueonyError.setAttribute('role','alert');leftCol.appendChild(this.jueonyError);",'manager error');
     s=replace(s,'      this.onAddRequest?.();','      this.jueonyRunChild(()=>this.onAddRequest?.());','add target guard');
     s=replace(s,'      this.onEditRequest?.(this.selectedId);','      this.jueonyRunChild(()=>this.onEditRequest?.(this.selectedId));','edit target guard');
@@ -85,4 +101,12 @@ export async function applyStyleManagementPatches({root}) {
   }`,'apply guard');
     return replace(s,'  override show(): void {\n    super.show();',"  override show(): void {\n    this.jueonyRevision=(window as any).jueonyEditor?.revision();\n    super.show();",'manager show revision');
   });
+  if(orderEnabled){
+    await edit('core/wasm-bridge.ts',s=>replace(s,'  createStyle(json: string): number {',`  moveStyle(from:number,to:number):boolean {
+    if(!this.doc)throw new Error('문서가 로드되지 않았습니다');
+    return (this.doc as any).moveStyle(from,to);
+  }
+  createStyle(json: string): number {`,'move bridge'));
+    await edit('core/mutation-method-registry.ts',s=>replace(s,"'updateStyle', 'updateStyleShapes', 'createStyle', 'deleteStyle', 'applyStyle',","'updateStyle', 'updateStyleShapes', 'moveStyle', 'createStyle', 'deleteStyle', 'applyStyle',",'move mutation registration'));
+  }
 }

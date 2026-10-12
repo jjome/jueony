@@ -23,13 +23,14 @@ import {createWorkbenchServices} from './composition/workbench.ts';
 
 
 import {installConnectionsPanel} from './ui/connections-panel.ts';
+import {installDocumentTabCycle} from './adapters/browser/document-tab-cycle.ts';
 import {TemporaryReferences} from './adapters/files/temporary-references.ts';
 
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 const {store,connections:port,modelGateway}=createWorkbenchServices();
 let state:AppState,activeTab:Tab|undefined,restoring=false,persistError=false,closing=false,stateWrites=0;
 let running:{controller:AbortController;run:Run}|undefined;
-type Tab={id:string;workspaceId:string;frame:HTMLIFrameElement;wrapper:HTMLElement;button:HTMLButtonElement;ready:Promise<DocumentFrameClient|null>;api:DocumentFrameClient|null;closed:boolean;initialized:boolean;restoreError?:string;pendingConnection?:StoredFileConnection;pendingIdentity?:string;handle?:FileSystemFileHandle;timer?:number;persistError?:boolean;preferenceError?:boolean;preferenceMessage?:string;pendingWrites?:number;persist:Promise<void>;recovery?:ReturnType<typeof createRecoveryCoordinator>;cachedDocument?:SavedDocument};
+type Tab={id:string;workspaceId:string;frame:HTMLIFrameElement;wrapper:HTMLElement;button:HTMLButtonElement;ready:Promise<DocumentFrameClient|null>;api:DocumentFrameClient|null;closed:boolean;initialized:boolean;restoreError?:string;pendingConnection?:StoredFileConnection;pendingIdentity?:string;handle?:FileSystemFileHandle;timer?:number;persistError?:boolean;preferenceError?:boolean;preferenceMessage?:string;pendingWrites?:number;persist:Promise<void>;recovery?:ReturnType<typeof createRecoveryCoordinator>;disposeTabCycle?:()=>void;cachedDocument?:SavedDocument};
 const tabs:Tab[]=[];const loaded=new Set<string>();let recoveryWarning=false;let selected:Reference[]=[];
 const viewJournal=createDocumentViewJournal({getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value)});
 const viewClocks=new Map<string,number>();let viewJournalError=false;
@@ -175,6 +176,9 @@ async function newTab(workspaceId=work().id,saved?:SavedDocument,forExisting=fal
  if(workspaceId===work().id)selectTab(tab);else frame.hidden=true;
  try {
   const api=(await tab.ready)!;
+  // Fix the final viewport before restoring scroll; hiding chrome afterward clamps bottom positions.
+  frame.contentDocument!.documentElement.dataset.unifiedChrome='true';
+  frame.contentWindow?.dispatchEvent(new Event('resize'));
   if(saved){
    await api.open(saved.bytes,saved.name,null,saved.dirty);
    let view=saved.view;
@@ -185,7 +189,11 @@ async function newTab(workspaceId=work().id,saved?:SavedDocument,forExisting=fal
   }
   tab.cachedDocument=saved;
   tab.recovery=createRecoveryCoordinator({settings:recoverySettings,clock:browserRecoveryClock(window),checkpoint:()=>persistTab(tab,'automatic'),onError:error});
-  tab.initialized=true;frame.contentDocument!.documentElement.dataset.unifiedChrome='true';chrome.refresh(true);refreshTab(tab);
+  tab.initialized=true;chrome.refresh(true);refreshTab(tab);
+  tab.disposeTabCycle=installDocumentTabCycle({source:frame.contentWindow!,sourceDocument:frame.contentDocument!,sourceId:tab.id,sourceWorkspaceId:tab.workspaceId,
+   tabs:()=>tabs.filter(t=>t.initialized).map(({id,workspaceId,closed})=>({id,workspaceId,closed})),activeId:()=>activeTab?.id,workspaceId:()=>work().id,
+   captureView:()=>api.captureDocumentView(),blocked:()=>tab.closed||closing||restoring||api.busy()||Boolean(document.querySelector('dialog[open]')),
+   activate:id=>{const target=tabs.find(t=>t.id===id);if(target&&cancelNavigation())selectTab(target);},focus:id=>tabs.find(t=>t.id===id)?.api?.focusEditor()});
   if(saved)tab.recovery.checkpointed({identity:api.documentIdentity(),...api.state()});
   else if(!forExisting)await persistTab(tab);
   return tab;
@@ -230,7 +238,7 @@ async function closeTab(tab:Tab){
   selectTab(tab);const dialog=$<HTMLDialogElement>('close-document');$('close-document-name').textContent=tab.api!.state().name;dialog.returnValue='cancel';const choice=new Promise<string>(resolve=>dialog.addEventListener('close',()=>resolve(dialog.returnValue),{once:true}));dialog.showModal();const action=await choice;
   if(action==='cancel'||!action)return;if(action==='save'){if(await tab.api!.save()!=='saved'||tab.api!.state().dirty)return;}else if(action==='discard')await tab.api!.discard();
  }
- clearTimeout(tab.timer);tab.closed=true;await tab.persist.catch(()=>{});try{await store.removeDocument(tab.id);}catch(e){tab.closed=false;refreshTab(tab);throw e;}tab.recovery?.dispose();tabs.splice(tabs.indexOf(tab),1);const nextId=session.closed(tab);tab.frame.remove();tab.wrapper.remove();
+ clearTimeout(tab.timer);tab.closed=true;await tab.persist.catch(()=>{});try{await store.removeDocument(tab.id);}catch(e){tab.closed=false;refreshTab(tab);throw e;}tab.recovery?.dispose();tab.disposeTabCycle?.();tabs.splice(tabs.indexOf(tab),1);const nextId=session.closed(tab);tab.frame.remove();tab.wrapper.remove();
  const next=tabs.find(t=>t.id===nextId);if(next)selectTab(next);else await newTab();
  }finally{closing=false;}
 }

@@ -281,7 +281,7 @@ try{
     const file=await openBytes(exported,`page-border.${extension}`);const saved=await saveBytes(`page-border.${extension}`),doc=new HwpDocument(new Uint8Array(saved));
     try{assert.deepEqual(parse(doc.getPageBorderFill(0)),after);}finally{doc.free();}
     await command('page:page-border');await file.click('.modal-overlay .dialog-tab[data-tab=background]');
-    assert.equal(await file.$eval('.dialog-tab-panel[data-tab=background] select',e=>e.value),'0');await page.keyboard.press('Escape');
+    assert.equal(await file.$eval('.dialog-tab-panel[data-tab=background] select:not([data-page-border-kind]):not([data-page-gradient])',e=>e.value),'0');await page.keyboard.press('Escape');
   });
 
   await scenario('cursor history physical Equal keys go back/forward, branch on manual movement and do not dirty the document',async()=>{
@@ -786,6 +786,39 @@ try{
     await page.reload();await ready();assert.equal((await snapshot()).nodes[0].text,'RECOVERY ENABLED AGAIN');
   });
 
+  for(const format of ['hwp','hwpx'])await scenario(`${format}: selected character style preserves unselected runs and one undo/save roundtrip`,async()=>{
+    const source=new HwpDocument(new Uint8Array(await fixture())),id=source.createStyle(JSON.stringify({name:'선택 강조',type:1}));
+    source.updateStyleShapes(id,JSON.stringify({bold:true,fontSize:1800}),'{}');
+    const data=[...source[format==='hwp'?'exportHwp':'exportHwpx']()];source.free();
+    const frame=await openBytes(data,'selected-style.'+format),before=await snapshot();
+    await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.cursor.selectRange({sectionIndex:0,paragraphIndex:0,charOffset:1},{sectionIndex:0,paragraphIndex:0,charOffset:4},null);ih.updateCaret();});
+    await command('format:apply-style',{styleId:id});
+    const check=await frame.evaluate(()=>{const w=window.__parityServices.wasm;return [w.getCharPropertiesAt(0,0,0),w.getCharPropertiesAt(0,0,2),w.getCharPropertiesAt(0,0,4),w.getStyleAt(0,0)];});
+    assert.equal(check[1].bold,true);assert.equal(check[1].fontSize,1800);assert.notEqual(check[0].fontSize,1800);assert.notEqual(check[2].fontSize,1800);assert.equal(check[3].id,0);
+    assert.deepEqual((await snapshot()).nodes.map(n=>n.text),before.nodes.map(n=>n.text));
+    await command('edit:undo');assert.deepEqual((await snapshot()).structure,before.structure);await command('edit:redo');
+    const bytes=await saveBytes('selected-style-saved.'+format),reopened=new HwpDocument(new Uint8Array(bytes));
+    try{assert.equal(parse(reopened.getCharPropertiesAt(0,0,2)).fontSize,1800);assert.notEqual(parse(reopened.getCharPropertiesAt(0,0,0)).fontSize,1800);}finally{reopened.free();}
+  });
+  await scenario('Enter at paragraph end follows next style and undo restores the original document',async()=>{
+    const source=new HwpDocument(new Uint8Array(await fixture())),next=source.createStyle(JSON.stringify({name:'다음 본문'})),title=source.createStyle(JSON.stringify({name:'제목 연결',nextStyleId:next}));
+    source.applyStyle(0,0,title);const data=[...source.exportHwpx()];source.free();
+    const frame=await openBytes(data,'next-style.hwpx'),before=await snapshot();
+    await frame.evaluate(()=>{const s=window.__parityServices,ih=s.getInputHandler();ih.cursor.moveTo({sectionIndex:0,paragraphIndex:0,charOffset:s.wasm.getParagraphLength(0,0)});ih.updateCaret();ih.focus();});
+    await page.keyboard.press('Enter');
+    assert.equal(await frame.evaluate(()=>window.__parityServices.wasm.getStyleAt(0,1).name),'다음 본문');
+    assert.equal((await snapshot()).nodes.length,before.nodes.length+1);await command('edit:undo');assert.deepEqual((await snapshot()).structure,before.structure);
+    await command('edit:redo');assert.equal(await frame.evaluate(()=>window.__parityServices.wasm.getStyleAt(0,1).name),'다음 본문');
+  });
+  await scenario('style manager moves definitions together with body references, blocks fallback and undo restores order',async()=>{
+    const source=new HwpDocument(new Uint8Array(await fixture())),a=source.createStyle(JSON.stringify({name:'순서 첫째'})),b=source.createStyle(JSON.stringify({name:'순서 둘째',nextStyleId:a}));
+    source.applyStyle(0,0,b);const data=[...source.exportHwpx()];source.free();const frame=await openBytes(data,'style-order.hwpx'),before=await snapshot();
+    await command('format:style-dialog');await frame.click('[data-jueony-move-style="-1"]');
+    assert.equal(await frame.evaluate(()=>window.__parityServices.wasm.getStyleAt(0,0).name),'순서 둘째');
+    assert.equal(await frame.evaluate(b=>window.__parityServices.wasm.getStyleList().find(s=>s.name==='순서 둘째').id,b),a);
+    await page.keyboard.press('Escape');await command('edit:undo');assert.deepEqual((await snapshot()).structure,before.structure);
+    await command('edit:redo');const saved=await saveBytes('style-order-saved.hwpx'),reopened=new HwpDocument(new Uint8Array(saved));try{assert.equal(parse(reopened.getStyleAt(0,0)).name,'순서 둘째');assert.equal(parse(reopened.getStyleList()).find(s=>s.name==='순서 둘째').id,a);}finally{reopened.free();}
+  });
   if(pageErrors.length)failures.push({name:'browser errors',errors:pageErrors});
   if(external.length)failures.push({name:'offline asset boundary',external});
   await page.screenshot({path:resolve(out,'features.png')});

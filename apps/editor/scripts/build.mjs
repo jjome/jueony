@@ -5,6 +5,12 @@ import {applyTabFeaturePatches} from './integration/tab-feature-patches.mjs';
 import {applySectionBoundaryPatches} from './integration/section-boundary-patches.mjs';
 import {applyDocumentInsertionPatches} from './integration/document-insertion-patches.mjs';
 import {applyStyleManagementPatches} from './integration/style-management-patches.mjs';
+import {applyStyleFlowPatches} from './integration/style-flow-patches.mjs';
+import {applyTableConversionPatches} from './integration/table-conversion-patches.mjs';
+import {applyPageBorderPatches} from './integration/page-border-patches.mjs';
+import {applySelectedObjectPropertiesPatches} from './integration/selected-object-properties-patches.mjs';
+import {applyFormattingToolbarPatches} from './integration/formatting-toolbar-patches.mjs';
+import {applyDocumentTabCyclePatches} from './integration/document-tab-cycle-patches.mjs';
 import {auditRepository} from '../../../scripts/check-module-boundaries.mjs';
 import { cp, mkdir, readFile, writeFile, readdir } from 'node:fs/promises';
 import { resolve, dirname, join } from 'node:path';
@@ -73,12 +79,18 @@ for (const [name, file] of [['canvaskit-wasm', 'LICENSE'], ['@noble/hashes', 'LI
 
 await applyStudioPatches({root,upstream,app});
 await applyManualFeaturePatches({root});
+await applyPageBorderPatches({root});
 await applyRecoveryPatches({root});
 // These dialogs require the patched engine's section-aware tab layout.
 if (engineEvidence) await applyTabFeaturePatches({root});
 if (engineEvidence) await applySectionBoundaryPatches({root});
 if (engineEvidence?.patches.some(p => p.name === 'document-insertion.patch')) await applyDocumentInsertionPatches({root});
-if (engineEvidence?.patches.some(p => p.name === 'style-reference-deletion.patch')) await applyStyleManagementPatches({root});
+if (engineEvidence?.patches.some(p => p.name === 'style-reference-deletion.patch')) await applyStyleManagementPatches({root,orderEnabled:engineEvidence.patches.some(p=>p.name==='style-reference-order.patch')});
+await applyStyleFlowPatches({root});
+await applyTableConversionPatches({root});
+await applySelectedObjectPropertiesPatches({root});
+await applyFormattingToolbarPatches({root});
+await applyDocumentTabCyclePatches({root});
 await build({
   configFile: false, root, base: './', publicDir: join(root, 'public'),
   define: { __APP_VERSION__: JSON.stringify('0.8.7'), __RHWP_DISABLE_EXTERNAL_WEBFONTS__: 'true', __RHWP_HWPCTRL__: 'false' },
@@ -114,6 +126,12 @@ const evidence = {
   sectionBoundaryPatchSha256: sha256(await readFile(join(app,'scripts/integration/section-boundary-patches.mjs'))),
   documentInsertionPatchSha256: sha256(await readFile(join(app,'scripts/integration/document-insertion-patches.mjs'))),
   styleManagementPatchSha256: sha256(await readFile(join(app,'scripts/integration/style-management-patches.mjs'))),
+  styleFlowPatchSha256: sha256(await readFile(join(app,'scripts/integration/style-flow-patches.mjs'))),
+  tableConversionPatchSha256: sha256(await readFile(join(app,'scripts/integration/table-conversion-patches.mjs'))),
+  pageBorderPatchSha256: sha256(await readFile(join(app,'scripts/integration/page-border-patches.mjs'))),
+  selectedObjectPropertiesPatchSha256: sha256(await readFile(join(app,'scripts/integration/selected-object-properties-patches.mjs'))),
+  formattingToolbarPatchSha256: sha256(await readFile(join(app,'scripts/integration/formatting-toolbar-patches.mjs'))),
+  documentTabCyclePatchSha256: sha256(await readFile(join(app,'scripts/integration/document-tab-cycle-patches.mjs'))),
   customSourceSha256: sha256(customSource.join('\n')),
   applicationSourceCommit: execFileSync('git', ['-C', app, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
   applicationSourceDirty: Boolean(execFileSync('git', ['-C', app, 'status', '--porcelain', '--', '.'], { encoding: 'utf8' }).trim()),

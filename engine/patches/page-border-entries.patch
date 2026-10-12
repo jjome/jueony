@@ -1,0 +1,177 @@
+--- a/src/document_core/queries/rendering.rs
++++ b/src/document_core/queries/rendering.rs
+@@ -2900,7 +2900,7 @@
+         let sec_idx = page_content.section_index;
+         let section_def = &self.document.sections[sec_idx].section_def;
+         let page_def = &section_def.page_def;
+-        let page_border_fill = &section_def.page_border_fill;
++        let page_border_fill = jueony_page_border_fill(section_def,page_content.page_number);
+         let ml = hwpunit_to_px(page_def.margin_left as i32, self.dpi);
+         let mr = hwpunit_to_px(page_def.margin_right as i32, self.dpi);
+         let mt = hwpunit_to_px(page_def.margin_top as i32, self.dpi);
+@@ -3197,6 +3197,10 @@
+ 
+     /// 구역의 쪽 테두리/배경 설정을 JSON으로 반환한다.
+     pub fn get_page_border_fill_native(&self, section_idx: usize) -> Result<String, HwpError> {
++        self.get_page_border_fill_entry_native(section_idx,"both")
++    }
++
++    pub fn get_page_border_fill_entry_native(&self, section_idx: usize, kind: &str) -> Result<String, HwpError> {
+         use crate::document_core::helpers::{
+             border_line_type_to_u8_val, color_ref_to_css, fill_json_values,
+         };
+@@ -3207,7 +3211,8 @@
+             .sections
+             .get(section_idx)
+             .ok_or_else(|| HwpError::RenderError(format!("구역 {} 범위 초과", section_idx)))?;
+-        let pbf = &section.section_def.page_border_fill;
++        let slot = match kind { "both" => None, "even" => Some(0), "odd" => Some(1), _ => return Err(HwpError::RenderError("Invalid page kind".into())) };
++        let pbf = slot.and_then(|index| section.section_def.extra_page_border_fills.get(index)).unwrap_or(&section.section_def.page_border_fill);
+         let basis = match pbf.ui_basis {
+             PageBorderUiBasis::Paper => "paper",
+             PageBorderUiBasis::Page => "page",
+@@ -3258,7 +3263,7 @@
+             }
+         }
+ 
+-        Ok(format!(
++        let raw = format!(
+             "{{\"attr\":{},\"basis\":\"{}\",\"spacingLeft\":{},\"spacingRight\":{},\"spacingTop\":{},\"spacingBottom\":{},\
+             \"borderFillId\":{},\"headerInside\":{},\"footerInside\":{},\"fillArea\":\"{}\",\
+             \"hideBorder\":{},\"hideFill\":{},{} }}",
+@@ -3275,7 +3280,81 @@
+             section.section_def.hide_border,
+             section.section_def.hide_fill,
+             border_json,
+-        ))
++        );
++        let mut value: serde_json::Value = serde_json::from_str(&raw).map_err(|error| HwpError::RenderError(error.to_string()))?;
++        value["kind"] = serde_json::json!(kind);
++        let sd = &section.section_def;
++        value["firstPageBorder"] = serde_json::json!(sd.first_page_border);
++        value["firstPageFill"] = serde_json::json!(sd.first_page_fill);
++        value["applyPage"] = serde_json::json!(if sd.first_page_border || sd.first_page_fill {"firstOnly"} else if sd.hide_border || sd.hide_fill {"exceptFirst"} else {"all"});
++        if let Some(fill) = pbf.border_fill_id.checked_sub(1).and_then(|id|self.document.doc_info.border_fills.get(id as usize)) {
++            if let Some(gradient) = &fill.fill.gradient {
++                value["fillType"] = serde_json::json!("gradient");
++                value["gradient"] = serde_json::json!({"type":gradient.gradient_type,"angle":gradient.angle,"centerX":gradient.center_x,"centerY":gradient.center_y,"blur":gradient.blur,"stepCenter":gradient.step_center,"colors":gradient.colors.iter().map(|color|color_ref_to_css(*color)).collect::<Vec<_>>(),"positions":gradient.positions});
++            } else if fill.fill.image.is_some() { value["fillType"] = serde_json::json!("image"); }
++        }
++        Ok(value.to_string())
++    }
++
++    pub fn set_page_border_fill_entry_native(&mut self, section_idx: usize, kind: &str, json: &str) -> Result<String, HwpError> {
++        use crate::model::style::{Fill, FillType, GradientFill};
++        let fail = |message: &str| HwpError::RenderError(message.into());
++        let slot = match kind { "both" => None, "even" => Some(0), "odd" => Some(1), _ => return Err(fail("Invalid page kind")) };
++        if section_idx >= self.document.sections.len() { return Err(fail("Invalid section")); }
++        if self.document.doc_info.border_fills.len()>=65534 {return Err(fail("Border fill resource limit"));}
++        let mut value: serde_json::Value = serde_json::from_str(json).map_err(|_|fail("Invalid page settings JSON"))?;
++        if !value.is_object() { return Err(fail("Invalid page settings")); }
++        let apply = value.get("applyPage").and_then(|v|v.as_str()).unwrap_or("all").to_owned();
++        if !["all","exceptFirst","firstOnly"].contains(&apply.as_str()) { return Err(fail("Invalid page application")); }
++        let fill_type=value.get("fillType").and_then(|v|v.as_str()).unwrap_or("none");
++        if !["none","solid","gradient"].contains(&fill_type) { return Err(fail("Image background editing is unsupported")); }
++        let gradient = if fill_type == "gradient" {
++            let g=value.get("gradient").ok_or_else(||fail("Missing gradient"))?;
++            let number=|key:&str,min:i64,max:i64|->Result<i16,HwpError>{let v=g.get(key).and_then(|v|v.as_i64()).ok_or_else(||fail("Invalid gradient value"))?;if v<min||v>max {return Err(fail("Gradient value out of range"));}Ok(v as i16)};
++            let colors=g.get("colors").and_then(|v|v.as_array()).ok_or_else(||fail("Invalid gradient colors"))?;
++            if colors.len()!=2 { return Err(fail("Only two-color gradients are supported")); }
++            let mut parsed=Vec::new();
++            for color in colors {
++                let text=color.as_str().ok_or_else(||fail("Invalid color"))?;
++                if text.len()!=7||!text.starts_with('#') {return Err(fail("Invalid color"));}
++                let rgb=u32::from_str_radix(&text[1..],16).map_err(|_|fail("Invalid color"))?;
++                parsed.push(((rgb>>16)&255)| (rgb&0x00ff00) | ((rgb&255)<<16));
++            }
++            if g.get("positions").and_then(|v|v.as_array()).is_some_and(|v|!v.is_empty()) {return Err(fail("Custom color stops are unsupported"));}
++            Some(GradientFill {gradient_type:number("type",1,4)?,angle:number("angle",0,360)?,center_x:number("centerX",0,100)?,center_y:number("centerY",0,100)?,blur:number("blur",0,100)?,step_center:number("stepCenter",0,100)? as u8,colors:parsed,positions:Vec::new()})
++        } else {None};
++        let original=self.document.sections[section_idx].section_def.page_border_fill.clone();
++        let selected=slot.and_then(|index|self.document.sections[section_idx].section_def.extra_page_border_fills.get(index)).cloned().unwrap_or_else(||original.clone());
++        value["borderFillId"]=serde_json::json!(selected.border_fill_id);
++        if gradient.is_some() {value["fillType"]=serde_json::json!("none");}
++        self.document.sections[section_idx].section_def.page_border_fill=selected;
++        self.set_page_border_fill_native(section_idx,&value.to_string())?;
++        let mut updated=self.document.sections[section_idx].section_def.page_border_fill.clone();
++        if let Some(gradient)=gradient {
++            let mut bf=self.document.doc_info.border_fills.get((updated.border_fill_id-1) as usize).cloned().ok_or_else(||fail("Missing fill"))?;
++            bf.raw_data=None;bf.fill=Fill {fill_type:FillType::Gradient,gradient:Some(gradient),..Default::default()};
++            self.document.doc_info.border_fills.push(bf);
++            updated.border_fill_id=self.document.doc_info.border_fills.len() as u16;
++            self.document.sections[section_idx].section_def.page_border_fill=updated.clone();
++            self.document.doc_info.raw_stream_dirty=true;
++        }
++        let section=&mut self.document.sections[section_idx];let sd=&mut section.section_def;
++        if let Some(slot)=slot {
++            sd.page_border_fill=original.clone();
++            while sd.extra_page_border_fills.len()<2 {sd.extra_page_border_fills.push(original.clone());}
++            sd.extra_page_border_fills[slot]=updated;
++        } else {for entry in &mut sd.extra_page_border_fills {*entry=updated.clone();}}
++        sd.first_page_border=value.get("firstPageBorder").and_then(|v|v.as_bool()).unwrap_or(apply=="firstOnly");
++        sd.first_page_fill=value.get("firstPageFill").and_then(|v|v.as_bool()).unwrap_or(apply=="firstOnly");
++        sd.hide_border=value.get("hideBorder").and_then(|v|v.as_bool()).unwrap_or(apply=="exceptFirst");
++        sd.hide_fill=value.get("hideFill").and_then(|v|v.as_bool()).unwrap_or(apply=="exceptFirst");
++        sd.flags=(sd.flags & !0x0318) | if sd.first_page_border {0x0100} else {0} | if sd.first_page_fill {0x0200} else {0} | if sd.hide_border {0x0008} else {0} | if sd.hide_fill {0x0010} else {0};
++        let updated_sd=sd.clone();
++        for para in &mut section.paragraphs {for control in &mut para.controls {if let Control::SectionDef(def)=control {**def=updated_sd.clone();}}}
++        section.raw_stream=None;
++        self.rebuild_resolved_styles();
++        let pages=self.recompose_and_paginate();
++        Ok(serde_json::json!({"ok":true,"pageCount":pages}).to_string())
+     }
+ 
+     /// 구역의 쪽 테두리/배경 설정을 JSON에서 업데이트하고 재조판한다.
+@@ -7603,7 +7682,7 @@
+             .document
+             .sections
+             .get(page_content.section_index)
+-            .map(|s| &s.section_def.page_border_fill);
++            .map(|s| jueony_page_border_fill(&s.section_def,page_content.page_number));
+         let outline_num_id = self
+             .document
+             .sections
+@@ -7767,8 +7846,18 @@
+             (&combined_paragraphs, &combined_composed)
+         };
+ 
++        // Section visibility excludes the section's first page; preserve any per-page hide control.
++        let section_hidden = &self.document.sections[page_content.section_index].section_def;
++        let mut first_content;
++        let render_content = if is_section_first_page && (section_hidden.hide_border || section_hidden.hide_fill) {
++            first_content = page_content.clone();
++            let hidden = first_content.page_hide.get_or_insert_with(Default::default);
++            hidden.hide_border |= section_hidden.hide_border;
++            hidden.hide_fill |= section_hidden.hide_fill;
++            &first_content
++        } else {page_content};
+         let mut tree = self.layout_engine.build_render_tree(
+-            page_content,
++            render_content,
+             render_paragraphs,
+             header_paragraphs,
+             footer_paragraphs,
+@@ -9830,3 +9919,9 @@
+         }
+     }
+ }
++
++// Query geometry and drawing use the same slot and displayed page number.
++fn jueony_page_border_fill(section:&crate::model::document::SectionDef,page_number:u32)->&crate::model::page::PageBorderFill {
++    let slot=if page_number==0 {None} else if page_number.is_multiple_of(2) {Some(0)} else {Some(1)};
++    slot.and_then(|index|section.extra_page_border_fills.get(index)).unwrap_or(&section.page_border_fill)
++}
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1230,6 +1230,11 @@
+         self.set_page_border_fill_native(section_idx as usize, json)
+             .map_err(|e| e.into())
+     }
++
++    #[wasm_bindgen(js_name = getPageBorderFillEntry)]
++    pub fn get_page_border_fill_entry(&self, section_idx:u32, kind:&str)->Result<String,JsValue>{self.core.get_page_border_fill_entry_native(section_idx as usize,kind).map_err(|error|error.into())}
++    #[wasm_bindgen(js_name = setPageBorderFillEntry)]
++    pub fn set_page_border_fill_entry(&mut self, section_idx:u32, kind:&str,json:&str)->Result<String,JsValue>{self.core.set_page_border_fill_entry_native(section_idx as usize,kind,json).map_err(|error|error.into())}
+ 
+     /// 현재 구역의 다단 설정을 JSON으로 반환한다.
+     #[wasm_bindgen(js_name = getColumnDef)]

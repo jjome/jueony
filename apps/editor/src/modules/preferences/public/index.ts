@@ -6,7 +6,7 @@ export type { DocumentViewport, DocumentViewAdapterOptions } from '../ports/view
 export { preferenceChangedPaths } from '../domain/merge.ts';
 export { defaultDocumentDefaults, validateDocumentDefaults } from '../domain/document-defaults.ts';
 export { validateDocumentView, validateBodyCaret } from '../domain/document-view.ts';
-export type {SessionCursor, SessionPoint, CellBlockBookmark} from './contracts.ts';
+export type {SessionCursor, SessionPoint, SessionCellPath, CellBlockBookmark, HeaderFooterBookmark, FootnoteBookmark} from './contracts.ts';
 export {validateSessionCursor} from '../domain/session-cursor.ts';
 export {createDocumentViewJournal,VIEW_JOURNAL_KEY} from '../application/view-journal.ts';
 export type {ViewJournalEntry} from '../application/view-journal.ts';

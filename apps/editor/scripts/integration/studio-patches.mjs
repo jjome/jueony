@@ -101,6 +101,9 @@ document.getElementById('scroll-container')?.addEventListener('scroll', jueonyRe
 eventBus.on('zoom-level-display', jueonyRememberView);
 eventBus.on('cursor-rect-updated', jueonyRememberView);
 eventBus.on('table-object-selection-changed', jueonyRememberView);
+eventBus.on('picture-object-selection-changed', jueonyRememberView);
+eventBus.on('headerFooterModeChanged', jueonyRememberView);
+eventBus.on('footnoteModeChanged', jueonyRememberView);
 eventBus.on('document-mutated', () => { jueonyCursorInteraction++; });
 eventBus.on('command-state-changed', () => { if (window.parent !== window) window.parent.postMessage({type:'jueony:command-state'},location.origin); });
 window.addEventListener('keydown', event => { if(event.key === 'F6' && event.altKey && !event.ctrlKey && !event.shiftKey && !event.isComposing && !document.querySelector('dialog[open],.modal-overlay') && window.parent !== window){event.preventDefault();event.stopImmediatePropagation();window.parent.postMessage({type:'jueony:focus-chat'},location.origin);} },true);
@@ -142,6 +145,11 @@ for (const name of ['para-shape-dialog.ts','char-shape-dialog.ts']) {
   await writeFile(join(root, 'src/ui', name), shape);
 }
 let caretInput = (await readFile(join(root, 'src/engine/input-handler.ts'), 'utf8')).replace(/\r\n/g, '\n');
+let scalarCursor=(await readFile(join(root,'src/engine/cursor.ts'),'utf8')).replace(/\r\n/g,'\n');
+scalarCursor=replaceOnce(scalarCursor,"this._fnCharOffset = (info.texts[this._fnInnerParaIdx] ?? '').length;","this._fnCharOffset = [...(info.texts[this._fnInnerParaIdx] ?? '')].length;",'note End scalar offset');
+scalarCursor=replaceOnce(scalarCursor,'const charCount = currentText.length;','const charCount = [...currentText].length;','note Right scalar offset');
+scalarCursor=replaceOnce(scalarCursor,'this._fnCharOffset = prevText.length;','this._fnCharOffset = [...prevText].length;','note previous scalar offset');
+await writeFile(join(root,'src/engine/cursor.ts'),scalarCursor);
 caretInput = "import { paragraphSpacingChange } from '../jueony/shortcuts/paragraph-spacing.ts';\nimport {createParagraphSpacingReader} from '../jueony/adapters/rhwp/paragraph-spacing.ts';\n" + caretInput;
 caretInput = replaceOnce(caretInput, '  getCursorPosition(): DocumentPosition { return this.cursor.getPosition(); }', `  getCursorPosition(): DocumentPosition { return this.cursor.getPosition(); }
 
@@ -178,6 +186,30 @@ caretInput = replaceOnce(caretInput, '  getCursorPosition(): DocumentPosition { 
   getSessionCaretAccess() {
     return { cursor: this.cursor, wasm: this.wasm,
       getCursorPosition: () => this.cursor.getPosition(),
+      restoreSessionHeaderFooter: (saved: import('../jueony/modules/preferences/public/index.ts').HeaderFooterBookmark) => {
+        this.cursor.exitHeaderFooterMode();this.cursor.exitFootnoteMode();this.cursor.clearSelection();this.cursor.exitCellSelectionMode();this.cursor.exitTableObjectSelection();this.cursor.exitPictureObjectSelection();
+        this.cursor.moveTo({sectionIndex:saved.focus.caret.section,paragraphIndex:saved.focus.caret.paragraph,charOffset:saved.focus.caret.offset});
+        this.cursor.enterHeaderFooterMode(saved.isHeader,saved.caret.section,saved.applyTo);
+        if(saved.anchor){
+          const point=(value:typeof saved.caret)=>({sectionIdx:value.section,isHeader:saved.isHeader,applyTo:saved.applyTo,paraIdx:value.paragraph,charOffset:value.offset});
+          if(!this.cursor.selectHeaderFooterRange(point(saved.anchor),point(saved.caret),this.cursor.hfPreviewPage))return false;
+        }else this.cursor.setHfCursorPosition(saved.caret.paragraph,saved.caret.offset);
+        this.updateCaret();this.eventBus.emit('headerFooterModeChanged',{mode:saved.isHeader?'header':'footer',sectionIdx:saved.caret.section,applyTo:saved.applyTo,previewPage:this.cursor.hfPreviewPage});this.eventBus.emit('command-state-changed');return true;
+      },
+      restoreSessionFootnote: (saved: import('../jueony/modules/preferences/public/index.ts').FootnoteBookmark) => {
+        this.cursor.exitHeaderFooterMode();this.cursor.exitFootnoteMode();this.cursor.clearSelection();this.cursor.exitCellSelectionMode();this.cursor.exitTableObjectSelection();this.cursor.exitPictureObjectSelection();
+        this.cursor.moveTo({sectionIndex:saved.focus.caret.section,paragraphIndex:saved.focus.caret.paragraph,charOffset:saved.focus.caret.offset});
+        this.cursor.enterFootnoteMode(saved.caret.section,saved.parentParagraph,saved.control,saved.index,saved.page);
+        if(saved.anchor){this.cursor.setFnCursorPosition(saved.anchor.paragraph,saved.anchor.offset);this.cursor.setFnAnchor();}
+        this.cursor.setFnCursorPosition(saved.caret.paragraph,saved.caret.offset);
+        this.updateCaret();this.eventBus.emit('footnoteModeChanged',true);this.eventBus.emit('command-state-changed');return true;
+      },
+      restoreSessionPictureObject: (ref: {sec:number;ppi:number;ci:number;type:'image'}) => {
+        this.cursor.clearSelection();this.cursor.exitCellSelectionMode();this.cursor.exitTableObjectSelection();
+        this.cursor.moveTo({sectionIndex:ref.sec,paragraphIndex:ref.ppi,charOffset:0});
+        this.cursor.enterPictureObjectSelectionDirect(ref.sec,ref.ppi,ref.ci,'image');
+        this.updateCaret();this.eventBus.emit('picture-object-selection-changed',true);this.eventBus.emit('command-state-changed');return true;
+      },
       restoreSessionTableObject: (ref: {sec:number;ppi:number;ci:number}) => {
         this.cursor.clearSelection(); this.cursor.exitCellSelectionMode();
         this.cursor.moveTo({sectionIndex:ref.sec,paragraphIndex:ref.ppi,charOffset:0});
@@ -193,6 +225,7 @@ caretInput = replaceOnce(caretInput, '  getCursorPosition(): DocumentPosition { 
       restoreSessionSelection: (focus: DocumentPosition, anchor: DocumentPosition | undefined, phase: number | null, block: import('./cursor').CellBlockSelectionState | undefined): boolean => {
         if (block && !this.cursor.restoreCellSelection(block)) return false;
         if (!block) this.cursor.exitCellSelectionMode();
+        this.cursor.clearSelection();
         if (anchor && anchor.parentParaIndex === undefined) {
           if (!this.cursor.selectRange(anchor, focus, phase)) return false;
         } else {

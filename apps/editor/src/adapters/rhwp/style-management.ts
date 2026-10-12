@@ -32,7 +32,9 @@ export function normalizeStyleCharMods(wasm: any, draft: Record<string, any>) {
 
 /** Current shape propagation is implemented for body and flat table cells only. */
 export function assertStyleShapeScope(wasm: any) {
-  const model = JSON.parse(wasm.borrowDocumentHandle().getCursorModel());
+  const doc=wasm.borrowDocumentHandle();
+  if(typeof doc.styleShapeStoriesEnabled==='function'&&doc.styleShapeStoriesEnabled())return;
+  const model = JSON.parse(doc.getCursorModel());
   if (model.lists.some((list: any) => !list.isCell || list.hostListId !== 0)) throw new Error('중첩 표·머리말·각주·글상자 등이 있는 문서의 스타일 모양 변경은 아직 지원하지 않습니다.');
 }
 
@@ -62,4 +64,11 @@ export function cloneStyleDefinition(wasm: any, id: number) {
   if (newId < 0 || newId > 255) throw new Error('스타일 복제에 실패했습니다.');
   if (source.type === 0 && source.nextStyleId === source.id && !wasm.updateStyle(newId,JSON.stringify({nextStyleId:newId}))) throw new Error('복제한 다음 스타일 연결에 실패했습니다.');
   return newId;
+}
+
+export function moveStyleDefinition(wasm:any,id:number,direction:-1|1):number {
+  const styles=wasm.getStyleList(),destination=id+direction;
+  if(!Number.isInteger(id)||id<1||!styles.some((s:any)=>s.id===id)||destination<1||destination>=styles.length)throw new Error('바탕글은 이동할 수 없으며 목록 끝을 넘길 수 없습니다.');
+  if(!wasm.moveStyle(id,destination))throw new Error('스타일 순서를 변경하지 못했습니다.');
+  return destination;
 }

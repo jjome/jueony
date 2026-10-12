@@ -1,0 +1,21 @@
+--- a/src/document_core/helpers.rs
++++ b/src/document_core/helpers.rs
+@@ -1582,15 +1582,9 @@
+             return false;
+         }
+     }
+-    // fill 비교 (fill_type + solid color)
+-    if a.fill.fill_type != b.fill.fill_type {
+-        return false;
+-    }
+-    match (&a.fill.solid, &b.fill.solid) {
+-        (Some(sa), Some(sb)) => sa.background_color == sb.background_color,
+-        (None, None) => true,
+-        _ => false,
+-    }
++    // A shared resource is identical only if every fill property matches.
++    // Color alone loses hatch type/color, gradient stops, images and opacity.
++    a.fill == b.fill
+ }
+ 
+ #[cfg(test)]

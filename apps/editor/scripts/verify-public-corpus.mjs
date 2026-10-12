@@ -1,14 +1,16 @@
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
-import {fileURLToPath} from 'node:url';
-import {join} from 'node:path';
-import init,{HwpDocument} from '@rhwp/core';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+import {join,resolve} from 'node:path';
 import {readStructure} from '../src/document-control/structure.ts';
 import {validateGeneration} from '../src/mvp/edit-schema.ts';
 import {executeDocumentOperations} from '../src/document-control/execute.ts';
-const root=fileURLToPath(new URL('../../../',import.meta.url)),directory=join(root,'.tools/public-documents'),out=join(directory,'results');
+import {verifyPreservedExport} from '../src/adapters/rhwp/preservation.ts';
+const root=fileURLToPath(new URL('../../../',import.meta.url)),directory=join(root,'.tools/public-documents'),out=resolve(root,process.env.JUEONY_TEST_OUTPUT??'.tools/public-documents/results');
+const pkg=resolve(root,process.env.JUEONY_ENGINE_PACKAGE??'apps/editor/node_modules/@rhwp/core');
+const {default:init,HwpDocument}=await import(pathToFileURL(join(pkg,'rhwp.js')).href);
 await mkdir(out,{recursive:true});
-await init({module_or_path:await readFile(new URL('../node_modules/@rhwp/core/rhwp_bg.wasm',import.meta.url))});
+await init({module_or_path:await readFile(join(pkg,'rhwp_bg.wasm'))});
 const hash=v=>createHash('sha256').update(typeof v==='string'?v:JSON.stringify(v)).digest('hex');
 const text=doc=>JSON.parse(doc.getTextFileUnicode());
 const body=doc=>Array.from({length:doc.getSectionCount()},(_,s)=>Array.from({length:doc.getParagraphCount(s)},(_,p)=>({id:`s${s}p${p}`,section:s,paragraph:p,text:doc.getTextRange(s,p,0,doc.getParagraphLength(s,p)),editable:false}))).flat();
@@ -25,8 +27,10 @@ for(const source of manifest.filter(s=>s.status==='downloaded')) {
   for(const format of ['hwp','hwpx']){
    let reopened,artifact;
    try{artifact=format==='hwp'?doc.exportHwpWithReport():doc.exportHwpxWithReport();const loss=JSON.parse(artifact.contentLoss()),exported=artifact.takeBytes();await writeFile(join(out,source.id+'-roundtrip.'+format),exported);reopened=new HwpDocument(exported);
-    const afterText=text(reopened),afterBody=body(reopened);
-    report.exports.push({format,size:exported.length,reopened:true,textEqual:hash(afterText)===report.textHash,bodyEqual:hash(afterBody.map(n=>n.text))===hash(beforeBody.map(n=>n.text)),bodyParagraphsBefore:beforeBody.length,bodyParagraphsAfter:afterBody.length,textDifference:afterText===beforeText?'none':afterText===beforeText+'\r\n'?'one extra terminal CRLF':'other',tableContentEqual:hash(tableContent(readStructure(reopened)))===report.tableContentHash,pages:reopened.pageCount(),contentLoss:loss});
+    const afterText=text(reopened),afterBody=body(reopened);let guard;
+    try{const validation=verifyPreservedExport(doc,exported,format,loss,bytes=>new HwpDocument(bytes));guard={status:validation.status,unverified:validation.unverified};}
+    catch(error){guard={status:'blocked',issues:error.report?.issues??[{message:String(error)}]};}
+    report.exports.push({format,size:exported.length,reopened:true,textEqual:hash(afterText)===report.textHash,bodyEqual:hash(afterBody.map(n=>n.text))===hash(beforeBody.map(n=>n.text)),bodyParagraphsBefore:beforeBody.length,bodyParagraphsAfter:afterBody.length,textDifference:afterText===beforeText?'none':afterText===beforeText+'\r\n'?'one extra terminal CRLF':'other',tableContentEqual:hash(tableContent(readStructure(reopened)))===report.tableContentHash,pages:reopened.pageCount(),contentLoss:loss,guard});
    }catch(e){report.exports.push({format,error:String(e)});}finally{reopened?.free();artifact?.free();}
   }
   // Edit a plain existing cell only if the production structural validator accepts it.
@@ -41,4 +45,5 @@ for(const source of manifest.filter(s=>s.status==='downloaded')) {
  }catch(error){report.status='FAIL';report.error=String(error);}finally{doc?.free();}
  reports.push(report);console.log(JSON.stringify({id:report.id,status:report.status,pages:report.pages,tables:report.tables,error:report.error}));
 }
-await writeFile(join(out,'report.json'),JSON.stringify({engine:'@rhwp/core 0.8.7',scope:'Content/structure round trip using same engine, not independent Hancom/layout validation',reports},null,2));
+await writeFile(join(out,'report.json'),JSON.stringify({engine:await readFile(join(pkg,'jueony-engine-build.json'),'utf8').then(JSON.parse,()=>({package:'@rhwp/core 0.8.7'})),scope:'Content/structure round trip using same engine, not independent Hancom/layout validation',reports},null,2));
+if(reports.some(report=>report.status==='FAIL'))process.exitCode=1;

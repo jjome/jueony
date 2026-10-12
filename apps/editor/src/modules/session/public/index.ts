@@ -1,4 +1,5 @@
 export {orderRecoveredDocuments} from '../domain/document-order.ts';
+export {documentTabCycleTarget} from '../domain/document-tab-cycle.ts';
 export {createSessionGuard} from '../application/navigation.ts';
 export {createSessionFacade} from '../application/facade.ts';
 export {shouldProtectExit} from '../domain/exit-protection.ts';

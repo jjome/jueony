@@ -46,6 +46,8 @@ function normalized(value:Json):Json {
  for(const key of Object.keys(value).sort()){
   if(['charShapeId','paraShapeId','borderFillId'].includes(key))continue;
   if(value.fillType==='none'&&['fillColor','patternColor','patternType'].includes(key))continue;
+  // Both native codes mean no hatch; HWPX omits hatchStyle unless pattern_type >= 1.
+  if(value.fillType==='solid'&&key==='patternType'&&typeof value[key]==='number'&&value[key]<=0){result[key]=-1;continue;}
   result[key]=normalized(value[key]);
  }
  return result;
@@ -65,6 +67,9 @@ export function capturePreservationEvidence(value:NativeDocument):PreservationEv
   const key=`section/${section}`;
   for(const [name,method] of [['page','getPageDef'],['definition','getSectionDef'],['columns','getColumnDef']] as const)capture(`${key}/${name}`,()=>read(doc,method,section));
   capture(`${key}/page-border`,()=>{const {attr:rawBits,...resolved}=record(read(doc,'getPageBorderFill',section));return resolved;});
+  if(typeof (doc as Record<string,unknown>).getPageBorderFillEntry==='function')capture(`${key}/page-border-entries`,()=>['both','even','odd'].map(kind=>{
+    const {attr:rawBits,...resolved}=record(read(doc,'getPageBorderFillEntry',section,kind));return resolved;
+  }));
   capture(`${key}/paragraph-count`,()=>integer(read(doc,'getParagraphCount',section)));
   const count=Number(values[`${key}/paragraph-count`]??0);
   for(let paragraph=0;paragraph<count;paragraph++){

@@ -1,0 +1,20 @@
+--- a/src/document_core/commands/footnote_ops.rs
++++ b/src/document_core/commands/footnote_ops.rs
+@@ -479,7 +479,7 @@
+                 let texts: Vec<String> = f
+                     .paragraphs
+                     .iter()
+-                    .map(|p| p.text.replace('\\', "\\\\").replace('"', "\\\""))
++                    .map(|p| crate::document_core::helpers::json_escape(&p.text))
+                     .collect();
+                 let total_len: usize = f.paragraphs.iter().map(|p| p.text.chars().count()).sum();
+                 Ok(format!(
+@@ -495,7 +495,7 @@
+                 let texts: Vec<String> = e
+                     .paragraphs
+                     .iter()
+-                    .map(|p| p.text.replace('\\', "\\\\").replace('"', "\\\""))
++                    .map(|p| crate::document_core::helpers::json_escape(&p.text))
+                     .collect();
+                 let total_len: usize = e.paragraphs.iter().map(|p| p.text.chars().count()).sum();
+                 Ok(format!(

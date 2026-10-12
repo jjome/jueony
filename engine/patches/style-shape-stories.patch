@@ -1,0 +1,66 @@
+--- a/src/document_core/commands/style_references.rs
++++ b/src/document_core/commands/style_references.rs
+@@ -3,17 +3,30 @@
+ use crate::model::control::Control;
+ use crate::model::paragraph::Paragraph;
+ use crate::model::shape::{DrawingObjAttr, ShapeObject};
++use crate::renderer::composer::restamp_indentation;
+ 
+-enum StyleRemap { Deleted(u8), Order([u8; 256]) }
++enum StyleRemap { Deleted(u8), Order([u8; 256]), Shapes {id:u8,kind:u8,old_char:u32,new_char:u32,old_para:u16,new_para:u16,old_indent:i32,new_indent:i32} }
+ fn remap(id: &mut u8, mapping: &StyleRemap) {
+     match mapping {
+         StyleRemap::Deleted(removed) => { if *id == *removed { *id = 0; } else if *id > *removed { *id -= 1; } },
+         StyleRemap::Order(ids) => { *id = ids[usize::from(*id)]; },
++        StyleRemap::Shapes {..} => {},
+     }
+ }
+ fn paragraphs(items: &mut [Paragraph], mapping: &StyleRemap) {
+     for paragraph in items {
+         remap(&mut paragraph.style_id, mapping);
++        if let StyleRemap::Shapes {id,kind,old_char,new_char,old_para,new_para,old_indent,new_indent}=mapping {
++            if paragraph.style_id==*id {
++                if *kind==0 && paragraph.para_shape_id==*old_para {
++                    paragraph.para_shape_id=*new_para;
++                    restamp_indentation(&mut paragraph.line_segs,*old_indent,*new_indent);
++                }
++                paragraph.replace_style_char_shape_preserving_overrides(*old_char,*new_char);
++                // The edit invalidates stored line inputs; each owner recomposes at its own width.
++                paragraph.invalidate_layout_inputs();
++            }
++        }
+         for control in &mut paragraph.controls {
+             match control {
+                 Control::Table(table) => {
+@@ -76,6 +89,11 @@
+         }
+     }
+ 
++    pub(crate) fn propagate_style_shape_references(&mut self,id:u8,kind:u8,old_char:u32,new_char:u32,old_para:u16,new_para:u16) {
++        let (old_indent,new_indent)=self.para_shape_indents(old_para,new_para);
++        self.remap_style_references(&StyleRemap::Shapes {id,kind,old_char,new_char,old_para,new_para,old_indent,new_indent});
++        for section in &mut self.document.sections {section.raw_stream=None;}
++    }
+     pub(crate) fn move_style_definition(&mut self, from: usize, to: usize) -> bool {
+         let count = self.document.doc_info.styles.len();
+         // ID zero is the document fallback and is never moved.
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -7380,6 +7380,9 @@
+     /// 스타일의 CharShape/ParaShape를 수정한다.
+     ///
+     /// charMods/paraMods는 기존 parse_char_shape_mods/parse_para_shape_mods와 동일한 JSON 형식
++    #[wasm_bindgen(js_name = styleShapeStoriesEnabled)]
++    pub fn style_shape_stories_enabled(&self)->bool {true}
++
+     #[wasm_bindgen(js_name = updateStyleShapes)]
+     pub fn update_style_shapes(
+         &mut self,
+@@ -7470,6 +7473,7 @@
+         // [#7490] 셀 문단은 저장 줄 기록을 두고 재조판하므로 bit 20 도 새 들여쓰기로 단다.
+         // 본문 문단은 `reflow_body_paragraph` 가 줄을 비우고 다시 짠다.
+         let (old_indent, new_indent) = self.core.para_shape_indents(old_psid, new_psid);
++        self.core.propagate_style_shape_references(sid,style_type,old_csid,new_csid,old_psid,new_psid);
+ 
+         for (sec_idx, para_idx) in body_targets {
+             if let Some(para) = self

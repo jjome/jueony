@@ -1,0 +1,148 @@
+--- a/src/document_core/commands/style_references.rs
++++ b/src/document_core/commands/style_references.rs
+@@ -4,68 +4,100 @@
+ use crate::model::paragraph::Paragraph;
+ use crate::model::shape::{DrawingObjAttr, ShapeObject};
+ 
+-fn remap(id: &mut u8, removed: u8) {
+-    if *id == removed { *id = 0; } else if *id > removed { *id -= 1; }
++enum StyleRemap { Deleted(u8), Order([u8; 256]) }
++fn remap(id: &mut u8, mapping: &StyleRemap) {
++    match mapping {
++        StyleRemap::Deleted(removed) => { if *id == *removed { *id = 0; } else if *id > *removed { *id -= 1; } },
++        StyleRemap::Order(ids) => { *id = ids[usize::from(*id)]; },
++    }
+ }
+-fn paragraphs(items: &mut [Paragraph], removed: u8) {
++fn paragraphs(items: &mut [Paragraph], mapping: &StyleRemap) {
+     for paragraph in items {
+-        remap(&mut paragraph.style_id, removed);
++        remap(&mut paragraph.style_id, mapping);
+         for control in &mut paragraph.controls {
+             match control {
+                 Control::Table(table) => {
+-                    for cell in &mut table.cells { paragraphs(&mut cell.paragraphs, removed); }
+-                    if let Some(caption) = &mut table.caption { paragraphs(&mut caption.paragraphs, removed); }
++                    for cell in &mut table.cells { paragraphs(&mut cell.paragraphs, mapping); }
++                    if let Some(caption) = &mut table.caption { paragraphs(&mut caption.paragraphs, mapping); }
+                 },
+                 Control::Picture(picture) => {
+-                    if let Some(caption) = &mut picture.caption { paragraphs(&mut caption.paragraphs, removed); }
++                    if let Some(caption) = &mut picture.caption { paragraphs(&mut caption.paragraphs, mapping); }
+                 },
+-                Control::Shape(object) => shape(object, removed),
+-                Control::Header(header) => paragraphs(&mut header.paragraphs, removed),
+-                Control::Footer(footer) => paragraphs(&mut footer.paragraphs, removed),
+-                Control::Footnote(note) => paragraphs(&mut note.paragraphs, removed),
+-                Control::Endnote(note) => paragraphs(&mut note.paragraphs, removed),
+-                Control::HiddenComment(comment) => paragraphs(&mut comment.paragraphs, removed),
+-                Control::Field(field) => paragraphs(&mut field.memo_paragraphs, removed),
++                Control::Shape(object) => shape(object, mapping),
++                Control::Header(header) => paragraphs(&mut header.paragraphs, mapping),
++                Control::Footer(footer) => paragraphs(&mut footer.paragraphs, mapping),
++                Control::Footnote(note) => paragraphs(&mut note.paragraphs, mapping),
++                Control::Endnote(note) => paragraphs(&mut note.paragraphs, mapping),
++                Control::HiddenComment(comment) => paragraphs(&mut comment.paragraphs, mapping),
++                Control::Field(field) => paragraphs(&mut field.memo_paragraphs, mapping),
+                 Control::SectionDef(section) => {
+-                    for master in &mut section.master_pages { paragraphs(&mut master.paragraphs, removed); }
++                    for master in &mut section.master_pages { paragraphs(&mut master.paragraphs, mapping); }
+                 },
+                 Control::Ruby(ruby) => {
+-                    if let Ok(mut id) = u8::try_from(ruby.style_id_ref) { remap(&mut id, removed); ruby.style_id_ref = u16::from(id); }
++                    if let Ok(mut id) = u8::try_from(ruby.style_id_ref) { remap(&mut id, mapping); ruby.style_id_ref = u16::from(id); }
+                 },
+                 _ => {},
+             }
+         }
+     }
+ }
+-fn drawing(object: &mut DrawingObjAttr, removed: u8) {
+-    if let Some(text) = &mut object.text_box { paragraphs(&mut text.paragraphs, removed); }
+-    if let Some(caption) = &mut object.caption { paragraphs(&mut caption.paragraphs, removed); }
++fn drawing(object: &mut DrawingObjAttr, mapping: &StyleRemap) {
++    if let Some(text) = &mut object.text_box { paragraphs(&mut text.paragraphs, mapping); }
++    if let Some(caption) = &mut object.caption { paragraphs(&mut caption.paragraphs, mapping); }
+ }
+-fn shape(object: &mut ShapeObject, removed: u8) {
++fn shape(object: &mut ShapeObject, mapping: &StyleRemap) {
+     match object {
+         ShapeObject::Picture(picture) => {
+-            if let Some(caption) = &mut picture.caption { paragraphs(&mut caption.paragraphs, removed); }
++            if let Some(caption) = &mut picture.caption { paragraphs(&mut caption.paragraphs, mapping); }
+         },
+         ShapeObject::Group(group) => {
+-            for child in &mut group.children { shape(child, removed); }
+-            if let Some(caption) = &mut group.caption { paragraphs(&mut caption.paragraphs, removed); }
++            for child in &mut group.children { shape(child, mapping); }
++            if let Some(caption) = &mut group.caption { paragraphs(&mut caption.paragraphs, mapping); }
+         },
+         ShapeObject::Chart(chart) => {
+-            drawing(&mut chart.drawing, removed);
+-            if let Some(caption) = &mut chart.caption { paragraphs(&mut caption.paragraphs, removed); }
++            drawing(&mut chart.drawing, mapping);
++            if let Some(caption) = &mut chart.caption { paragraphs(&mut caption.paragraphs, mapping); }
+         },
+         ShapeObject::Ole(ole) => {
+-            drawing(&mut ole.drawing, removed);
+-            if let Some(caption) = &mut ole.caption { paragraphs(&mut caption.paragraphs, removed); }
++            drawing(&mut ole.drawing, mapping);
++            if let Some(caption) = &mut ole.caption { paragraphs(&mut caption.paragraphs, mapping); }
+         },
+-        _ => { if let Some(object) = object.drawing_mut() { drawing(object, removed); } },
++        _ => { if let Some(object) = object.drawing_mut() { drawing(object, mapping); } },
+     }
+ }
+ impl DocumentCore {
+     pub(crate) fn remap_deleted_style_references(&mut self, removed: u8) {
++        self.remap_style_references(&StyleRemap::Deleted(removed));
++    }
++    fn remap_style_references(&mut self, mapping: &StyleRemap) {
+         for section in &mut self.document.sections {
+-            paragraphs(&mut section.paragraphs, removed);
+-            for master in &mut section.section_def.master_pages { paragraphs(&mut master.paragraphs, removed); }
++            paragraphs(&mut section.paragraphs, mapping);
++            for master in &mut section.section_def.master_pages { paragraphs(&mut master.paragraphs, mapping); }
+         }
+     }
++
++    pub(crate) fn move_style_definition(&mut self, from: usize, to: usize) -> bool {
++        let count = self.document.doc_info.styles.len();
++        // ID zero is the document fallback and is never moved.
++        if from == 0 || to == 0 || from >= count || to >= count || count > 256 { return false; }
++        if from == to { return true; }
++        let mut mapping = std::array::from_fn::<_, 256, _>(|i| i as u8);
++        mapping[from] = to as u8;
++        if from < to { for id in from + 1..=to { mapping[id] = (id - 1) as u8; } }
++        else { for id in to..from { mapping[id] = (id + 1) as u8; } }
++        let value = self.document.doc_info.styles.remove(from);
++        self.document.doc_info.styles.insert(to, value);
++        for style in &mut self.document.doc_info.styles {
++            style.next_style_id = mapping[usize::from(style.next_style_id)];
++            style.raw_data = None;
++        }
++        self.document.doc_info.raw_stream_dirty = true;
++        self.remap_style_references(&StyleRemap::Order(mapping));
++        let count = self.document.sections.len();
++        for index in 0..count {
++            self.document.sections[index].raw_stream = None;
++            self.rebuild_section(index);
++        }
++        true
++    }
+ }
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -7530,6 +7530,12 @@
+     ///
+     /// json: {"name":"...", "englishName":"...", "type":0, "nextStyleId":0}
+     /// 반환값: 새 스타일 ID (0-based)
++    /// Move a style definition and all references together; fallback ID zero stays fixed.
++    #[wasm_bindgen(js_name = moveStyle)]
++    pub fn move_style(&mut self, from: u32, to: u32) -> bool {
++        self.core.move_style_definition(from as usize, to as usize)
++    }
++
+     #[wasm_bindgen(js_name = createStyle)]
+     pub fn create_style(&mut self, json: &str) -> i32 {
+         use crate::document_core::helpers::{json_i32, json_str};

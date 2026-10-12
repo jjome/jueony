@@ -1,0 +1,4259 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-12T16:59:51.712Z",
+  "asOfDate": "2026-10-13",
+  "status": "PASS_CONTRACTS_WITH_QUALITY_GAPS",
+  "invocation": "node --experimental-strip-types scripts/verify-rag-corpus.mjs",
+  "enginePackage": "build/rhwp-engine/source-5d412578fff9c9a0/pkg",
+  "provenance": {
+    "wasmSha256": "5dc02a24794defb8b5e05b0bcc22fc7bdba30f8ec73c7d05a259733399d2423e",
+    "engineJsSha256": "0d406b11eeb0ca7bfb1144ecd9b1508ee93042aae034878559f9b84ca19ebbc5",
+    "manifestSha256": "45a29149ef3620674588e018868319df61caa4a9b202cb7922f3ecde01c94fb0",
+    "casesSha256": "2628da58dacb575977f5820dddf7ed090a06b1adb7a6bebb4894434098f85468",
+    "evaluationScriptSha256": "1378a5f17e9b2483d34345794c60c52d68aebfdcec9c3c15ef85b57ac9016dea"
+  },
+  "networkRequests": 0,
+  "llmCalls": 0,
+  "semanticDocumentCount": 16,
+  "physicalFileCount": 21,
+  "contractChecks": {
+    "passed": 69,
+    "failed": 0
+  },
+  "metrics": {
+    "queryCount": 22,
+    "answerableCount": 18,
+    "unanswerableCount": 4,
+    "sourceRecallAt1": 0.2777777777777778,
+    "sourceRecallAt3": 0.8333333333333334,
+    "sourceRecallAt8": 1,
+    "sourcePrecisionAt1": 0.2777777777777778,
+    "sourcePrecisionAt3": 0.27777777777777773,
+    "sourcePrecisionAt8": 0.16732804232804233,
+    "meanReciprocalRank": 0.5666666666666668,
+    "answerSpanMacroRecall": 1,
+    "unanswerableFalsePositiveQueries": 3,
+    "queriesWithQualityIssues": 16,
+    "meanExtractionMilliseconds": 7.90205,
+    "meanIndexMilliseconds": 0.2199772727272773,
+    "meanSearchMilliseconds": 0.3716590909090872,
+    "meanContextMilliseconds": 0.3547818181818162
+  },
+  "methodology": {
+    "ranking": "Unique source IDs in returned chunk order; canonical authority docs fixed before scoring. Precision denominator is min(k, returned unique source count); empty output is 0 in macro precision.",
+    "answerSpan": "Literal NFKC text after removing whitespace and comma separators, checked only inside returned canonical authority chunks; no generated answers.",
+    "extraction": "Actual local HwpDocument Unicode extraction for every physical HWP/HWPX; UTF-8 TXT/MD. Gateway file handles are deterministic contract doubles over real bytes, not OS permission verification.",
+    "timing": "Cold local run including repeated extraction per question; context timing includes a second index+search. Device-specific, not comparative performance claims."
+  },
+  "limitations": [
+    "Sources have no workspace owner/version/validity metadata. The gateway checks registered workspace roots; direct Source[] callers must enforce ownership. Index scope checks only prevent reusing a scoped index.",
+    "Shared docs are explicitly connected to each evaluated workspace; no automatic global access or persistent search index.",
+    "Version/current authority is ground truth, not implemented automatic date filtering; lexical search can return superseded or unrelated documents.",
+    "Missing answer does not trigger abstention or confidence threshold. Zero-hit unfamiliar vocabulary and overlapping unanswerable questions are measured separately.",
+    "Synthetic corpus quality is not public-document, Hancom rendering, semantic understanding, or real-world RAG accuracy validation.",
+    "Instructions remain reference data at context boundary; no real-model prompt-injection resistance or answer safety validation.",
+    "No embeddings, reranker, vector DB, OCR, provider calls, autonomous loop, output factuality evaluation, or production Agent reconstruction."
+  ],
+  "extraction": [
+    {
+      "documentId": "shared-office-rule-2026",
+      "path": "shared/shared-office-rule-2026.md",
+      "format": "md",
+      "byteLength": 667,
+      "characters": 333,
+      "utf8TextBytes": 667,
+      "sha256": "86f42473ec53cda5cdd5abee8a30944745bf9f17f0d4d88f7194bbe6f9ffa530",
+      "textSha256": "86f42473ec53cda5cdd5abee8a30944745bf9f17f0d4d88f7194bbe6f9ffa530",
+      "milliseconds": 0.20529999999999404,
+      "facts": [
+        {
+          "id": "shared-office-rule-2026.approvalFlow",
+          "text": "담당자 작성 → 행정지원팀 검토 → 부서장 승인 순서로 처리한다.",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "shared-record-rule-2025",
+      "path": "shared/shared-record-rule-2025.txt",
+      "format": "txt",
+      "byteLength": 583,
+      "characters": 312,
+      "utf8TextBytes": 583,
+      "sha256": "7744fd7606585855c59fc819b29fe323d6bedd7d27022fd238eac49f73a563df",
+      "textSha256": "7744fd7606585855c59fc819b29fe323d6bedd7d27022fd238eac49f73a563df",
+      "milliseconds": 0.10269999999999868,
+      "facts": [
+        {
+          "id": "shared-record-rule-2025.retentionYears",
+          "text": "보관 기간은 승인 완료일부터 3년이다.",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "shared-record-rule-2026",
+      "path": "shared/shared-record-rule-2026.md",
+      "format": "md",
+      "byteLength": 631,
+      "characters": 318,
+      "utf8TextBytes": 631,
+      "sha256": "dda2baccff97cab93451f765305b8ee4d14728032ad096d3051e918a5a80fe46",
+      "textSha256": "dda2baccff97cab93451f765305b8ee4d14728032ad096d3051e918a5a80fe46",
+      "milliseconds": 0.04980000000000473,
+      "facts": [
+        {
+          "id": "shared-record-rule-2026.retentionYears",
+          "text": "보관 기간은 승인 완료일부터 5년이다.",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "shared-expense-guide-2026",
+      "path": "shared/shared-expense-guide-2026.md",
+      "format": "md",
+      "byteLength": 617,
+      "characters": 322,
+      "utf8TextBytes": 617,
+      "sha256": "79bedd9f4e9043494e064766b475959da5eb44a70ff892fa5484d7e9dafad363",
+      "textSha256": "79bedd9f4e9043494e064766b475959da5eb44a70ff892fa5484d7e9dafad363",
+      "milliseconds": 0.08789999999999054,
+      "facts": [
+        {
+          "id": "shared-expense-guide-2026.trainingPerSessionLimitWon",
+          "text": "교육 1회 비용 상한은 3,000,000원이다.",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "service-plan-2026",
+      "path": "workspace-service/service-plan-2026.hwp",
+      "format": "hwp",
+      "byteLength": 19456,
+      "characters": 4615,
+      "utf8TextBytes": 10840,
+      "sha256": "649dca1058752f3378b70a7f9ac13961560ad95562469b2cdb1a85554d021214",
+      "textSha256": "60722fa0765ed3f72468c1245ee0f3508eac2b5511a8cc1e91ffaf473649d080",
+      "milliseconds": 41.63150000000002,
+      "facts": [
+        {
+          "id": "service-plan-2026.projectName",
+          "text": "사업명은 민원 문서 전환 사업이다. 총사업비는 48,000,000원이다.",
+          "located": true
+        },
+        {
+          "id": "service-plan-2026.trainingSessions",
+          "text": "교육은 총 6회 운영한다. 성과 목표는 민원 문서 처리시간 20% 단축이다.",
+          "located": true
+        },
+        {
+          "id": "service-plan-2026.processingTimeReductionPercent",
+          "text": "교육은 총 6회 운영한다. 성과 목표는 민원 문서 처리시간 20% 단축이다.",
+          "located": true
+        },
+        {
+          "id": "service-plan-2026.resultsReportDueDate",
+          "text": "결과보고서 제출 기한은 2026-12-24이며, 측정 기준은 시범운영 전후 동일한 민원 유형 100건이다.",
+          "located": true
+        },
+        {
+          "id": "service-plan-2026.performanceSampleCount",
+          "text": "결과보고서 제출 기한은 2026-12-24이며, 측정 기준은 시범운영 전후 동일한 민원 유형 100건이다.",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "service-plan-2026",
+      "path": "workspace-service/service-plan-2026.hwpx",
+      "format": "hwpx",
+      "byteLength": 12296,
+      "characters": 4615,
+      "utf8TextBytes": 10840,
+      "sha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+      "textSha256": "60722fa0765ed3f72468c1245ee0f3508eac2b5511a8cc1e91ffaf473649d080",
+      "milliseconds": 17.7183,
+      "facts": [
+        {
+          "id": "service-plan-2026.projectName",
+          "text": "사업명은 민원 문서 전환 사업이다. 총사업비는 48,000,000원이다.",
+          "located": true
+        },
+        {
+          "id": "service-plan-2026.trainingSessions",
+          "text": "교육은 총 6회 운영한다. 성과 목표는 민원 문서 처리시간 20% 단축이다.",
+          "located": true
+        },
+        {
+          "id": "service-plan-2026.processingTimeReductionPercent",
+          "text": "교육은 총 6회 운영한다. 성과 목표는 민원 문서 처리시간 20% 단축이다.",
+          "located": true
+        },
+        {
+          "id": "service-plan-2026.resultsReportDueDate",
+          "text": "결과보고서 제출 기한은 2026-12-24이며, 측정 기준은 시범운영 전후 동일한 민원 유형 100건이다.",
+          "located": true
+        },
+        {
+          "id": "service-plan-2026.performanceSampleCount",
+          "text": "결과보고서 제출 기한은 2026-12-24이며, 측정 기준은 시범운영 전후 동일한 민원 유형 100건이다.",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "service-budget-2026-v1",
+      "path": "workspace-service/service-budget-2026-v1.txt",
+      "format": "txt",
+      "byteLength": 702,
+      "characters": 399,
+      "utf8TextBytes": 702,
+      "sha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+      "textSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+      "milliseconds": 0.04169999999999163,
+      "facts": [
+        {
+          "id": "service-budget-2026-v1.totalBudgetWon",
+          "text": "총사업비는 36,000,000원이다. 교육비 12,000,000원, 장비비 18,000,000원, 홍보비 6,000,000원으로 구성한다.",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "service-budget-2026-v2",
+      "path": "workspace-service/service-budget-2026-v2.hwp",
+      "format": "hwp",
+      "byteLength": 14336,
+      "characters": 455,
+      "utf8TextBytes": 824,
+      "sha256": "4d70265b5c55758f46bd1870d149790f4218820e7bf9aacd577ff431542b022d",
+      "textSha256": "e2320d1766a9d51e09878b1cdc38b32a09ef01638a1e718d0b81b9e74c7a026f",
+      "milliseconds": 1.5728000000000009,
+      "facts": [
+        {
+          "id": "service-budget-2026-v2.trainingBudgetWon",
+          "text": "18,000,000원",
+          "located": true
+        },
+        {
+          "id": "service-budget-2026-v2.equipmentBudgetWon",
+          "text": "22,000,000원",
+          "located": true
+        },
+        {
+          "id": "service-budget-2026-v2.publicityBudgetWon",
+          "text": "8,000,000원",
+          "located": true
+        },
+        {
+          "id": "service-budget-2026-v2.totalBudgetWon",
+          "text": "48,000,000원",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "service-budget-2026-v2",
+      "path": "workspace-service/service-budget-2026-v2.hwpx",
+      "format": "hwpx",
+      "byteLength": 8736,
+      "characters": 455,
+      "utf8TextBytes": 824,
+      "sha256": "a03266b24af198877fce8170be9ca4d40632631b307549a52d08afc67f9d741c",
+      "textSha256": "e2320d1766a9d51e09878b1cdc38b32a09ef01638a1e718d0b81b9e74c7a026f",
+      "milliseconds": 1.5475999999999885,
+      "facts": [
+        {
+          "id": "service-budget-2026-v2.trainingBudgetWon",
+          "text": "18,000,000원",
+          "located": true
+        },
+        {
+          "id": "service-budget-2026-v2.equipmentBudgetWon",
+          "text": "22,000,000원",
+          "located": true
+        },
+        {
+          "id": "service-budget-2026-v2.publicityBudgetWon",
+          "text": "8,000,000원",
+          "located": true
+        },
+        {
+          "id": "service-budget-2026-v2.totalBudgetWon",
+          "text": "48,000,000원",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "service-schedule-2026",
+      "path": "workspace-service/service-schedule-2026.hwp",
+      "format": "hwp",
+      "byteLength": 14336,
+      "characters": 395,
+      "utf8TextBytes": 694,
+      "sha256": "11389316d309e77e89f2030148d32ab44e903674a9dd6391ea57ecf4be4acec5",
+      "textSha256": "6fccd6439468b26c8167d6e5bb77969d9bc712c6a32c4cbacaf36d486c762feb",
+      "milliseconds": 1.4619000000000142,
+      "facts": [
+        {
+          "id": "service-schedule-2026.startDate",
+          "text": "2026-11-02",
+          "located": true
+        },
+        {
+          "id": "service-schedule-2026.trainingDate",
+          "text": "2026-11-16",
+          "located": true
+        },
+        {
+          "id": "service-schedule-2026.pilotDate",
+          "text": "2026-11-30",
+          "located": true
+        },
+        {
+          "id": "service-schedule-2026.completionDate",
+          "text": "2026-12-18",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "service-schedule-2026",
+      "path": "workspace-service/service-schedule-2026.hwpx",
+      "format": "hwpx",
+      "byteLength": 8672,
+      "characters": 395,
+      "utf8TextBytes": 694,
+      "sha256": "b984aff5124026a9ee4cff5a035ec478437444bbd8891412c1d6f375f85b34e5",
+      "textSha256": "6fccd6439468b26c8167d6e5bb77969d9bc712c6a32c4cbacaf36d486c762feb",
+      "milliseconds": 1.3274999999999864,
+      "facts": [
+        {
+          "id": "service-schedule-2026.startDate",
+          "text": "2026-11-02",
+          "located": true
+        },
+        {
+          "id": "service-schedule-2026.trainingDate",
+          "text": "2026-11-16",
+          "located": true
+        },
+        {
+          "id": "service-schedule-2026.pilotDate",
+          "text": "2026-11-30",
+          "located": true
+        },
+        {
+          "id": "service-schedule-2026.completionDate",
+          "text": "2026-12-18",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "service-schedule-2026-v1",
+      "path": "workspace-service/service-schedule-2026-v1.md",
+      "format": "md",
+      "byteLength": 593,
+      "characters": 336,
+      "utf8TextBytes": 593,
+      "sha256": "f25b4caf0a1cccd22ab2e603e945223a0abcd9634a6f6b90d46794252e1b38b2",
+      "textSha256": "f25b4caf0a1cccd22ab2e603e945223a0abcd9634a6f6b90d46794252e1b38b2",
+      "milliseconds": 0.03450000000000841,
+      "facts": [
+        {
+          "id": "service-schedule-2026-v1.startDate",
+          "text": "구버전 착수일은 2026-09-01이며, 완료일은 2026-11-30이다.",
+          "located": true
+        },
+        {
+          "id": "service-schedule-2026-v1.completionDate",
+          "text": "구버전 착수일은 2026-09-01이며, 완료일은 2026-11-30이다.",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "service-risks-2026",
+      "path": "workspace-service/service-risks-2026.md",
+      "format": "md",
+      "byteLength": 740,
+      "characters": 366,
+      "utf8TextBytes": 740,
+      "sha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+      "textSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+      "milliseconds": 0.026299999999991996,
+      "facts": [
+        {
+          "id": "service-risks-2026.mainRisk",
+          "text": "주요 위험은 복잡한 표·개체의 문서 호환성이다. 대응은 원본 보관과 저장 후 재열기 검사이다.",
+          "located": true
+        },
+        {
+          "id": "service-risks-2026.mitigation",
+          "text": "주요 위험은 복잡한 표·개체의 문서 호환성이다. 대응은 원본 보관과 저장 후 재열기 검사이다.",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "service-roles-2026",
+      "path": "workspace-service/service-roles-2026.txt",
+      "format": "txt",
+      "byteLength": 621,
+      "characters": 318,
+      "utf8TextBytes": 621,
+      "sha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+      "textSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+      "milliseconds": 0.021600000000006503,
+      "facts": [
+        {
+          "id": "service-roles-2026.reviewRole",
+          "text": "작성은 업무 담당자, 검토는 행정지원팀, 승인은 부서장이 담당한다.",
+          "located": true
+        },
+        {
+          "id": "service-roles-2026.approvalRole",
+          "text": "작성은 업무 담당자, 검토는 행정지원팀, 승인은 부서장이 담당한다.",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "service-glossary-2026",
+      "path": "workspace-service/service-glossary-2026.md",
+      "format": "md",
+      "byteLength": 672,
+      "characters": 343,
+      "utf8TextBytes": 672,
+      "sha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+      "textSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+      "milliseconds": 0.025300000000015643,
+      "facts": [
+        {
+          "id": "service-glossary-2026.digitizationAlias",
+          "text": "이 사업에서 자료 디지털화는 문서 전환과 같은 뜻으로 사용한다.",
+          "located": true
+        },
+        {
+          "id": "service-glossary-2026.ocrMeaning",
+          "text": "OCR은 이미지에 보이는 문자를 읽는 기능이다. 현재 문서의 표 원문 읽기와 그림 안 문자 읽기는 구분한다.",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "other-plan-2026",
+      "path": "workspace-other/other-plan-2026.txt",
+      "format": "txt",
+      "byteLength": 644,
+      "characters": 329,
+      "utf8TextBytes": 644,
+      "sha256": "0f2116b2c6c06556b03fa6561f1606848b9cdb8e2c9308b479d713330cc10fa1",
+      "textSha256": "0f2116b2c6c06556b03fa6561f1606848b9cdb8e2c9308b479d713330cc10fa1",
+      "milliseconds": 0.023000000000024556,
+      "facts": [
+        {
+          "id": "other-plan-2026.projectName",
+          "text": "사업명은 재난 대응 문서 전환 사업이며, 총사업비는 72,000,000원이다.",
+          "located": true
+        },
+        {
+          "id": "other-plan-2026.totalBudgetWon",
+          "text": "사업명은 재난 대응 문서 전환 사업이며, 총사업비는 72,000,000원이다.",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "other-budget-2026",
+      "path": "workspace-other/other-budget-2026.hwp",
+      "format": "hwp",
+      "byteLength": 14336,
+      "characters": 385,
+      "utf8TextBytes": 698,
+      "sha256": "35c87b53b7c87629bf8f72934a985a7b31ad3c69b8754234220552c678f4a179",
+      "textSha256": "9d8b5c4070d4008aa7413761125066f4f277192b8abb1c7c5ee969ffe047b863",
+      "milliseconds": 1.4191999999999894,
+      "facts": [
+        {
+          "id": "other-budget-2026.consultingBudgetWon",
+          "text": "32,000,000원",
+          "located": true
+        },
+        {
+          "id": "other-budget-2026.exerciseBudgetWon",
+          "text": "24,000,000원",
+          "located": true
+        },
+        {
+          "id": "other-budget-2026.publicityBudgetWon",
+          "text": "16,000,000원",
+          "located": true
+        },
+        {
+          "id": "other-budget-2026.totalBudgetWon",
+          "text": "72,000,000원",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "other-budget-2026",
+      "path": "workspace-other/other-budget-2026.hwpx",
+      "format": "hwpx",
+      "byteLength": 8679,
+      "characters": 385,
+      "utf8TextBytes": 698,
+      "sha256": "f32187fa3716f7e70773a63b34f2b8bc2978f45b28270cf8f50bf33e8a895409",
+      "textSha256": "9d8b5c4070d4008aa7413761125066f4f277192b8abb1c7c5ee969ffe047b863",
+      "milliseconds": 1.4625000000000057,
+      "facts": [
+        {
+          "id": "other-budget-2026.consultingBudgetWon",
+          "text": "32,000,000원",
+          "located": true
+        },
+        {
+          "id": "other-budget-2026.exerciseBudgetWon",
+          "text": "24,000,000원",
+          "located": true
+        },
+        {
+          "id": "other-budget-2026.publicityBudgetWon",
+          "text": "16,000,000원",
+          "located": true
+        },
+        {
+          "id": "other-budget-2026.totalBudgetWon",
+          "text": "72,000,000원",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "other-meeting-2026",
+      "path": "workspace-other/other-meeting-2026.md",
+      "format": "md",
+      "byteLength": 664,
+      "characters": 347,
+      "utf8TextBytes": 664,
+      "sha256": "aa45ebf58acf3d5c4c82a62bea605bdbf560b25acc7380e4597ea97e633a64a5",
+      "textSha256": "aa45ebf58acf3d5c4c82a62bea605bdbf560b25acc7380e4597ea97e633a64a5",
+      "milliseconds": 0.03330000000002542,
+      "facts": [
+        {
+          "id": "other-meeting-2026.confirmedBudgetWon",
+          "text": "2026-10-13 회의에서 재난 대응 문서 전환 총사업비 72,000,000원을 확정하였다.",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "temporary-service-meeting-20261012",
+      "path": "temporary/temporary-service-meeting-20261012.hwp",
+      "format": "hwp",
+      "byteLength": 15360,
+      "characters": 674,
+      "utf8TextBytes": 1301,
+      "sha256": "b749862bbb2f58f307e23126cc7fdeed838342c316e0731d4afc7f1aadaf4d5d",
+      "textSha256": "287f6994ea9db36ee83cad4326e88b2d5092cd343d390380d4381a3e9c3913a6",
+      "milliseconds": 1.8548999999999864,
+      "facts": [
+        {
+          "id": "temporary-service-meeting-20261012.confirmedBudgetWon",
+          "text": "48,000,000원",
+          "located": true
+        },
+        {
+          "id": "temporary-service-meeting-20261012.confirmedStartDate",
+          "text": "2026-11-02",
+          "located": true
+        },
+        {
+          "id": "temporary-service-meeting-20261012.confirmedCompletionDate",
+          "text": "2026-12-18",
+          "located": true
+        }
+      ]
+    },
+    {
+      "documentId": "temporary-service-meeting-20261012",
+      "path": "temporary/temporary-service-meeting-20261012.hwpx",
+      "format": "hwpx",
+      "byteLength": 9055,
+      "characters": 674,
+      "utf8TextBytes": 1301,
+      "sha256": "a37b95ece1cf3557e537fc4b2c50c04bc282a0e35effe93c679055f1e02e5c70",
+      "textSha256": "287f6994ea9db36ee83cad4326e88b2d5092cd343d390380d4381a3e9c3913a6",
+      "milliseconds": 1.5952000000000055,
+      "facts": [
+        {
+          "id": "temporary-service-meeting-20261012.confirmedBudgetWon",
+          "text": "48,000,000원",
+          "located": true
+        },
+        {
+          "id": "temporary-service-meeting-20261012.confirmedStartDate",
+          "text": "2026-11-02",
+          "located": true
+        },
+        {
+          "id": "temporary-service-meeting-20261012.confirmedCompletionDate",
+          "text": "2026-12-18",
+          "located": true
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "extract:shared/shared-office-rule-2026.md",
+      "status": "pass",
+      "milliseconds": 0.06399999999999295
+    },
+    {
+      "id": "extract:shared/shared-record-rule-2025.txt",
+      "status": "pass",
+      "milliseconds": 0.09950000000000614
+    },
+    {
+      "id": "extract:shared/shared-record-rule-2026.md",
+      "status": "pass",
+      "milliseconds": 0.012600000000020373
+    },
+    {
+      "id": "extract:shared/shared-expense-guide-2026.md",
+      "status": "pass",
+      "milliseconds": 0.009399999999999409
+    },
+    {
+      "id": "extract:workspace-service/service-plan-2026.hwp",
+      "status": "pass",
+      "milliseconds": 0.0724999999999909
+    },
+    {
+      "id": "extract:workspace-service/service-plan-2026.hwpx",
+      "status": "pass",
+      "milliseconds": 0.07720000000000482
+    },
+    {
+      "id": "extract:workspace-service/service-budget-2026-v1.txt",
+      "status": "pass",
+      "milliseconds": 0.012100000000003774
+    },
+    {
+      "id": "extract:workspace-service/service-budget-2026-v2.hwp",
+      "status": "pass",
+      "milliseconds": 0.025100000000009004
+    },
+    {
+      "id": "extract:workspace-service/service-budget-2026-v2.hwpx",
+      "status": "pass",
+      "milliseconds": 0.020700000000005048
+    },
+    {
+      "id": "extract:workspace-service/service-schedule-2026.hwp",
+      "status": "pass",
+      "milliseconds": 0.023299999999977672
+    },
+    {
+      "id": "extract:workspace-service/service-schedule-2026.hwpx",
+      "status": "pass",
+      "milliseconds": 0.02029999999999177
+    },
+    {
+      "id": "extract:workspace-service/service-schedule-2026-v1.md",
+      "status": "pass",
+      "milliseconds": 0.008299999999991314
+    },
+    {
+      "id": "extract:workspace-service/service-risks-2026.md",
+      "status": "pass",
+      "milliseconds": 0.006699999999995043
+    },
+    {
+      "id": "extract:workspace-service/service-roles-2026.txt",
+      "status": "pass",
+      "milliseconds": 0.006100000000003547
+    },
+    {
+      "id": "extract:workspace-service/service-glossary-2026.md",
+      "status": "pass",
+      "milliseconds": 0.009399999999999409
+    },
+    {
+      "id": "extract:workspace-other/other-plan-2026.txt",
+      "status": "pass",
+      "milliseconds": 0.007699999999999818
+    },
+    {
+      "id": "extract:workspace-other/other-budget-2026.hwp",
+      "status": "pass",
+      "milliseconds": 0.021300000000024966
+    },
+    {
+      "id": "extract:workspace-other/other-budget-2026.hwpx",
+      "status": "pass",
+      "milliseconds": 0.019000000000005457
+    },
+    {
+      "id": "extract:workspace-other/other-meeting-2026.md",
+      "status": "pass",
+      "milliseconds": 0.006600000000020145
+    },
+    {
+      "id": "extract:temporary/temporary-service-meeting-20261012.hwp",
+      "status": "pass",
+      "milliseconds": 0.025000000000005684
+    },
+    {
+      "id": "extract:temporary/temporary-service-meeting-20261012.hwpx",
+      "status": "pass",
+      "milliseconds": 0.022199999999998
+    },
+    {
+      "id": "gateway:hwp-extraction:service-plan-2026",
+      "status": "pass",
+      "milliseconds": 6.965299999999985
+    },
+    {
+      "id": "gateway:hwp-extraction:service-budget-2026-v2",
+      "status": "pass",
+      "milliseconds": 1.6898999999999944
+    },
+    {
+      "id": "gateway:hwp-extraction:service-schedule-2026",
+      "status": "pass",
+      "milliseconds": 1.954999999999984
+    },
+    {
+      "id": "gateway:hwp-extraction:other-budget-2026",
+      "status": "pass",
+      "milliseconds": 1.7546000000000106
+    },
+    {
+      "id": "gateway:hwp-extraction:temporary-service-meeting-20261012",
+      "status": "pass",
+      "milliseconds": 2.7683999999999855
+    },
+    {
+      "id": "context-and-citations:current-budget",
+      "status": "pass",
+      "milliseconds": 0.7095999999999947
+    },
+    {
+      "id": "context-and-citations:old-budget",
+      "status": "pass",
+      "milliseconds": 1.5782000000000096
+    },
+    {
+      "id": "context-and-citations:current-equipment",
+      "status": "pass",
+      "milliseconds": 0.12139999999999418
+    },
+    {
+      "id": "context-and-citations:plan-training",
+      "status": "pass",
+      "milliseconds": 0.09099999999995134
+    },
+    {
+      "id": "context-and-citations:plan-performance",
+      "status": "pass",
+      "milliseconds": 0.10540000000003147
+    },
+    {
+      "id": "context-and-citations:late-appendix",
+      "status": "pass",
+      "milliseconds": 0.14670000000000982
+    },
+    {
+      "id": "context-and-citations:current-start",
+      "status": "pass",
+      "milliseconds": 0.088799999999992
+    },
+    {
+      "id": "context-and-citations:current-end",
+      "status": "pass",
+      "milliseconds": 0.09260000000000446
+    },
+    {
+      "id": "context-and-citations:old-end",
+      "status": "pass",
+      "milliseconds": 0.09649999999999181
+    },
+    {
+      "id": "context-and-citations:current-retention",
+      "status": "pass",
+      "milliseconds": 0.08310000000000173
+    },
+    {
+      "id": "context-and-citations:old-retention",
+      "status": "pass",
+      "milliseconds": 0.09539999999998372
+    },
+    {
+      "id": "context-and-citations:training-limit",
+      "status": "pass",
+      "milliseconds": 0.08190000000001874
+    },
+    {
+      "id": "context-and-citations:approval-flow",
+      "status": "pass",
+      "milliseconds": 0.0806999999999789
+    },
+    {
+      "id": "context-and-citations:compatibility-risk",
+      "status": "pass",
+      "milliseconds": 0.08220000000000027
+    },
+    {
+      "id": "context-and-citations:roles",
+      "status": "pass",
+      "milliseconds": 0.10590000000001965
+    },
+    {
+      "id": "context-and-citations:semantic-alias",
+      "status": "pass",
+      "milliseconds": 0.06479999999999109
+    },
+    {
+      "id": "context-and-citations:temporary-confirmation",
+      "status": "pass",
+      "milliseconds": 0.08569999999997435
+    },
+    {
+      "id": "context-and-citations:other-budget",
+      "status": "pass",
+      "milliseconds": 0.05369999999999209
+    },
+    {
+      "id": "context-and-citations:unknown-word",
+      "status": "pass",
+      "milliseconds": 0.021700000000009823
+    },
+    {
+      "id": "context-and-citations:unknown-overlap",
+      "status": "pass",
+      "milliseconds": 0.07450000000000045
+    },
+    {
+      "id": "context-and-citations:foreign-unselected",
+      "status": "pass",
+      "milliseconds": 0.07510000000002037
+    },
+    {
+      "id": "context-and-citations:unknown-key",
+      "status": "pass",
+      "milliseconds": 0.08109999999999218
+    },
+    {
+      "id": "gateway:foreign-workspace",
+      "status": "pass",
+      "milliseconds": 0.31630000000001246
+    },
+    {
+      "id": "gateway:registered-foreign-root",
+      "status": "pass",
+      "milliseconds": 0.03910000000001901
+    },
+    {
+      "id": "gateway:unregistered-root",
+      "status": "pass",
+      "milliseconds": 0.023000000000024556
+    },
+    {
+      "id": "gateway:permission-not-granted",
+      "status": "pass",
+      "milliseconds": 0.01839999999998554
+    },
+    {
+      "id": "gateway:empty-selection-does-not-enumerate",
+      "status": "pass",
+      "milliseconds": 0.016799999999989268
+    },
+    {
+      "id": "context:foreign-chat",
+      "status": "pass",
+      "milliseconds": 0.04419999999998936
+    },
+    {
+      "id": "index:foreign-workspace",
+      "status": "pass",
+      "milliseconds": 0.02719999999999345
+    },
+    {
+      "id": "index:foreign-chat",
+      "status": "pass",
+      "milliseconds": 0.01839999999998554
+    },
+    {
+      "id": "index:mixed-chunk-scope",
+      "status": "pass",
+      "milliseconds": 0.022600000000011278
+    },
+    {
+      "id": "index:cleared-selection",
+      "status": "pass",
+      "milliseconds": 0.052399999999977354
+    },
+    {
+      "id": "index:source-version-changes-chunk-ID",
+      "status": "pass",
+      "milliseconds": 0.0585999999999558
+    },
+    {
+      "id": "temporary:scope-and-explicit-use",
+      "status": "pass",
+      "milliseconds": 1.5848000000000297
+    },
+    {
+      "id": "context:reference-instructions-remain-data",
+      "status": "pass",
+      "milliseconds": 9.04159999999996
+    },
+    {
+      "id": "context:actual-manifest-instruction-bait-remains-data",
+      "status": "pass",
+      "milliseconds": 1.6048999999999864
+    },
+    {
+      "id": "gateway:live-unsaved-document",
+      "status": "pass",
+      "milliseconds": 0.13870000000002847
+    },
+    {
+      "id": "limits:21-sources",
+      "status": "pass",
+      "milliseconds": 0.1372000000000071
+    },
+    {
+      "id": "limits:120001-characters",
+      "status": "pass",
+      "milliseconds": 0.05389999999999873
+    },
+    {
+      "id": "limits:query-length",
+      "status": "pass",
+      "milliseconds": 0.036200000000008004
+    },
+    {
+      "id": "limits:duplicate-source",
+      "status": "pass",
+      "milliseconds": 0.0625
+    },
+    {
+      "id": "limits:invalid-hash",
+      "status": "pass",
+      "milliseconds": 0.04629999999997381
+    },
+    {
+      "id": "limits:abort",
+      "status": "pass",
+      "milliseconds": 0.21210000000002083
+    }
+  ],
+  "queries": [
+    {
+      "id": "current-budget",
+      "category": "version",
+      "query": "2026년 10월 현재 민원 문서 전환 사업의 확정 총예산은 얼마인가요?",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [
+        "service-budget-2026-v2"
+      ],
+      "rankedSourceIds": [
+        "service-plan-2026",
+        "service-budget-2026-v2",
+        "service-glossary-2026",
+        "service-schedule-2026",
+        "service-risks-2026",
+        "service-roles-2026",
+        "service-schedule-2026-v1"
+      ],
+      "expectedEvidence": [
+        {
+          "text": "48,000,000",
+          "found": true
+        }
+      ],
+      "recallAt1": 0,
+      "recallAt3": 1,
+      "recallAt8": 1,
+      "precisionAt1": 0,
+      "precisionAt3": 0.3333333333333333,
+      "precisionAt8": 0.14285714285714285,
+      "reciprocalRank": 0.5,
+      "evidenceRecall": 1,
+      "noHitExpected": false,
+      "falsePositiveHitCount": null,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 16,
+      "returnedChunkCount": 8,
+      "sentCharacters": 3927,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [
+        "expected authority is not the first unique source"
+      ],
+      "latency": {
+        "extractionMilliseconds": 9.403500000000008,
+        "indexingMilliseconds": 1.9428000000000054,
+        "searchMilliseconds": 1.7623999999999853,
+        "contextMilliseconds": 0.5964000000000169
+      },
+      "hits": [
+        {
+          "id": "chunk:a10a63c372646b4d2a924bb7d7111574641d086b46378327aac198cc3c2839ee",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "06404b43e29e56076e92767bf0e339bbec2c7cb6a4142c3d2e3524a83f334367",
+          "start": 0,
+          "end": 895,
+          "startLine": 1,
+          "endLine": 11,
+          "score": 7.239481159393048,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:b11fe8e09e05200735467d23751eba6976bbba87c6bc4d1bc0f61cd4b030b67d",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v2.hwpx",
+          "name": "workspace-service/service-budget-2026-v2.hwpx",
+          "sourceSha256": "a03266b24af198877fce8170be9ca4d40632631b307549a52d08afc67f9d741c",
+          "contentSha256": "e2320d1766a9d51e09878b1cdc38b32a09ef01638a1e718d0b81b9e74c7a026f",
+          "start": 0,
+          "end": 455,
+          "startLine": 1,
+          "endLine": 20,
+          "score": 3.4115757790619217,
+          "documentId": "service-budget-2026-v2"
+        },
+        {
+          "id": "chunk:c0390ec96b85296bd81d33911498ef024cf884a888303d61ce8e93afa32c6060",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-glossary-2026.md",
+          "name": "workspace-service/service-glossary-2026.md",
+          "sourceSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "contentSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "start": 0,
+          "end": 343,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 3.3942165027979305,
+          "documentId": "service-glossary-2026"
+        },
+        {
+          "id": "chunk:c52ce418fbeb274c99451d1f8dedafeb017fedb87fed8a69476e29a9f36d4db1",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-schedule-2026.hwpx",
+          "name": "workspace-service/service-schedule-2026.hwpx",
+          "sourceSha256": "b984aff5124026a9ee4cff5a035ec478437444bbd8891412c1d6f375f85b34e5",
+          "contentSha256": "6fccd6439468b26c8167d6e5bb77969d9bc712c6a32c4cbacaf36d486c762feb",
+          "start": 0,
+          "end": 395,
+          "startLine": 1,
+          "endLine": 19,
+          "score": 3.1454782116459197,
+          "documentId": "service-schedule-2026"
+        },
+        {
+          "id": "chunk:498d6ab1fef9b2392c0cebebeee3c485c324877ead5a3ae519f6bb5d904bd9f5",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "72bddfb9673cb497ef411e0eab6dde6f24780f3cae3dff021a73e23cd7106917",
+          "start": 3383,
+          "end": 4202,
+          "startLine": 21,
+          "endLine": 23,
+          "score": 2.816377670190846,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:0c20e4653e5a0473e1904fad661901bcf440bf957cbd24677f11598f42134c1b",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-risks-2026.md",
+          "name": "workspace-service/service-risks-2026.md",
+          "sourceSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "contentSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "start": 0,
+          "end": 366,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.4318004155770256,
+          "documentId": "service-risks-2026"
+        },
+        {
+          "id": "chunk:877dac48a30ef5782eb3db6941eeb39f47174152b1f61b7c6bed66b76012020f",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-roles-2026.txt",
+          "name": "workspace-service/service-roles-2026.txt",
+          "sourceSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "contentSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "start": 0,
+          "end": 318,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.4318004155770256,
+          "documentId": "service-roles-2026"
+        },
+        {
+          "id": "chunk:298ea9ac947293b769e0a57312e5ba951c041872bcf26ecea8d78874e198ec88",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-schedule-2026-v1.md",
+          "name": "workspace-service/service-schedule-2026-v1.md",
+          "sourceSha256": "f25b4caf0a1cccd22ab2e603e945223a0abcd9634a6f6b90d46794252e1b38b2",
+          "contentSha256": "f25b4caf0a1cccd22ab2e603e945223a0abcd9634a6f6b90d46794252e1b38b2",
+          "start": 0,
+          "end": 336,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.4318004155770256,
+          "documentId": "service-schedule-2026-v1"
+        }
+      ]
+    },
+    {
+      "id": "old-budget",
+      "category": "version",
+      "query": "2026년 9월까지 적용한 민원 문서 전환 사업 예산 초안의 총액을 알려 주세요.",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [
+        "service-budget-2026-v1"
+      ],
+      "rankedSourceIds": [
+        "service-plan-2026",
+        "service-schedule-2026",
+        "service-budget-2026-v2",
+        "service-budget-2026-v1",
+        "service-glossary-2026",
+        "shared-record-rule-2025",
+        "service-risks-2026",
+        "service-roles-2026"
+      ],
+      "expectedEvidence": [
+        {
+          "text": "36,000,000",
+          "found": true
+        }
+      ],
+      "recallAt1": 0,
+      "recallAt3": 0,
+      "recallAt8": 1,
+      "precisionAt1": 0,
+      "precisionAt3": 0,
+      "precisionAt8": 0.125,
+      "reciprocalRank": 0.25,
+      "evidenceRecall": 1,
+      "noHitExpected": false,
+      "falsePositiveHitCount": null,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 17,
+      "returnedChunkCount": 8,
+      "sentCharacters": 3483,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [
+        "expected authority is not the first unique source"
+      ],
+      "latency": {
+        "extractionMilliseconds": 8.747099999999989,
+        "indexingMilliseconds": 0.14110000000002287,
+        "searchMilliseconds": 0.3271000000000015,
+        "contextMilliseconds": 0.34730000000001837
+      },
+      "hits": [
+        {
+          "id": "chunk:a10a63c372646b4d2a924bb7d7111574641d086b46378327aac198cc3c2839ee",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "06404b43e29e56076e92767bf0e339bbec2c7cb6a4142c3d2e3524a83f334367",
+          "start": 0,
+          "end": 895,
+          "startLine": 1,
+          "endLine": 11,
+          "score": 5.438459164272691,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:c52ce418fbeb274c99451d1f8dedafeb017fedb87fed8a69476e29a9f36d4db1",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-schedule-2026.hwpx",
+          "name": "workspace-service/service-schedule-2026.hwpx",
+          "sourceSha256": "b984aff5124026a9ee4cff5a035ec478437444bbd8891412c1d6f375f85b34e5",
+          "contentSha256": "6fccd6439468b26c8167d6e5bb77969d9bc712c6a32c4cbacaf36d486c762feb",
+          "start": 0,
+          "end": 395,
+          "startLine": 1,
+          "endLine": 19,
+          "score": 4.190400882202649,
+          "documentId": "service-schedule-2026"
+        },
+        {
+          "id": "chunk:b11fe8e09e05200735467d23751eba6976bbba87c6bc4d1bc0f61cd4b030b67d",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v2.hwpx",
+          "name": "workspace-service/service-budget-2026-v2.hwpx",
+          "sourceSha256": "a03266b24af198877fce8170be9ca4d40632631b307549a52d08afc67f9d741c",
+          "contentSha256": "e2320d1766a9d51e09878b1cdc38b32a09ef01638a1e718d0b81b9e74c7a026f",
+          "start": 0,
+          "end": 455,
+          "startLine": 1,
+          "endLine": 20,
+          "score": 4.147066180015369,
+          "documentId": "service-budget-2026-v2"
+        },
+        {
+          "id": "chunk:710a1492bead599b1e9b02908ad832e980c0dc9e308301db5dfa3341f1597212",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v1.txt",
+          "name": "workspace-service/service-budget-2026-v1.txt",
+          "sourceSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "contentSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "start": 0,
+          "end": 399,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 4.08002831660598,
+          "documentId": "service-budget-2026-v1"
+        },
+        {
+          "id": "chunk:c0390ec96b85296bd81d33911498ef024cf884a888303d61ce8e93afa32c6060",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-glossary-2026.md",
+          "name": "workspace-service/service-glossary-2026.md",
+          "sourceSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "contentSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "start": 0,
+          "end": 343,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 3.7548144776540875,
+          "documentId": "service-glossary-2026"
+        },
+        {
+          "id": "chunk:9c9a28cdf4d997a41118aab39ce2c40be2cfd186c552a6a6511bb558a7224338",
+          "sourceId": "eval-root:workspace-service/shared/shared-record-rule-2025.txt",
+          "name": "shared/shared-record-rule-2025.txt",
+          "sourceSha256": "7744fd7606585855c59fc819b29fe323d6bedd7d27022fd238eac49f73a563df",
+          "contentSha256": "7744fd7606585855c59fc819b29fe323d6bedd7d27022fd238eac49f73a563df",
+          "start": 0,
+          "end": 312,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 3.3685892690601014,
+          "documentId": "shared-record-rule-2025"
+        },
+        {
+          "id": "chunk:0c20e4653e5a0473e1904fad661901bcf440bf957cbd24677f11598f42134c1b",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-risks-2026.md",
+          "name": "workspace-service/service-risks-2026.md",
+          "sourceSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "contentSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "start": 0,
+          "end": 366,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.7495404795259697,
+          "documentId": "service-risks-2026"
+        },
+        {
+          "id": "chunk:877dac48a30ef5782eb3db6941eeb39f47174152b1f61b7c6bed66b76012020f",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-roles-2026.txt",
+          "name": "workspace-service/service-roles-2026.txt",
+          "sourceSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "contentSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "start": 0,
+          "end": 318,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.7495404795259697,
+          "documentId": "service-roles-2026"
+        }
+      ]
+    },
+    {
+      "id": "current-equipment",
+      "category": "table",
+      "query": "민원 문서 전환 사업의 현재 예산에서 장비 항목의 금액은 얼마인가요?",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [
+        "service-budget-2026-v2"
+      ],
+      "rankedSourceIds": [
+        "service-plan-2026",
+        "service-budget-2026-v2",
+        "service-glossary-2026",
+        "service-budget-2026-v1",
+        "shared-expense-guide-2026",
+        "service-schedule-2026"
+      ],
+      "expectedEvidence": [
+        {
+          "text": "22,000,000",
+          "found": true
+        }
+      ],
+      "recallAt1": 0,
+      "recallAt3": 1,
+      "recallAt8": 1,
+      "precisionAt1": 0,
+      "precisionAt3": 0.3333333333333333,
+      "precisionAt8": 0.16666666666666666,
+      "reciprocalRank": 0.5,
+      "evidenceRecall": 1,
+      "noHitExpected": false,
+      "falsePositiveHitCount": null,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 17,
+      "returnedChunkCount": 8,
+      "sentCharacters": 4434,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [
+        "expected authority is not the first unique source"
+      ],
+      "latency": {
+        "extractionMilliseconds": 8.331000000000017,
+        "indexingMilliseconds": 0.14480000000003201,
+        "searchMilliseconds": 0.33070000000003574,
+        "contextMilliseconds": 0.40289999999998827
+      },
+      "hits": [
+        {
+          "id": "chunk:a10a63c372646b4d2a924bb7d7111574641d086b46378327aac198cc3c2839ee",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "06404b43e29e56076e92767bf0e339bbec2c7cb6a4142c3d2e3524a83f334367",
+          "start": 0,
+          "end": 895,
+          "startLine": 1,
+          "endLine": 11,
+          "score": 9.346780331298337,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:498d6ab1fef9b2392c0cebebeee3c485c324877ead5a3ae519f6bb5d904bd9f5",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "72bddfb9673cb497ef411e0eab6dde6f24780f3cae3dff021a73e23cd7106917",
+          "start": 3383,
+          "end": 4202,
+          "startLine": 21,
+          "endLine": 23,
+          "score": 6.356335613481937,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:b11fe8e09e05200735467d23751eba6976bbba87c6bc4d1bc0f61cd4b030b67d",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v2.hwpx",
+          "name": "workspace-service/service-budget-2026-v2.hwpx",
+          "sourceSha256": "a03266b24af198877fce8170be9ca4d40632631b307549a52d08afc67f9d741c",
+          "contentSha256": "e2320d1766a9d51e09878b1cdc38b32a09ef01638a1e718d0b81b9e74c7a026f",
+          "start": 0,
+          "end": 455,
+          "startLine": 1,
+          "endLine": 20,
+          "score": 5.557065717858387,
+          "documentId": "service-budget-2026-v2"
+        },
+        {
+          "id": "chunk:5493ee64a385efae712a2f84aed0f3607639258dbbd8cf67c5f6a4863df0aca4",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "a1c98907a19399097d42cfd119b8decf30defb7b655161cad69976aa5af326de",
+          "start": 895,
+          "end": 1701,
+          "startLine": 12,
+          "endLine": 14,
+          "score": 4.947340992473325,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:c0390ec96b85296bd81d33911498ef024cf884a888303d61ce8e93afa32c6060",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-glossary-2026.md",
+          "name": "workspace-service/service-glossary-2026.md",
+          "sourceSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "contentSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "start": 0,
+          "end": 343,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 3.630544769537933,
+          "documentId": "service-glossary-2026"
+        },
+        {
+          "id": "chunk:710a1492bead599b1e9b02908ad832e980c0dc9e308301db5dfa3341f1597212",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v1.txt",
+          "name": "workspace-service/service-budget-2026-v1.txt",
+          "sourceSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "contentSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "start": 0,
+          "end": 399,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 3.5802505521323162,
+          "documentId": "service-budget-2026-v1"
+        },
+        {
+          "id": "chunk:b71d2d5f2d522cecc805d33300153daffff4ea924fae212693f4b1a36af67251",
+          "sourceId": "eval-root:workspace-service/shared/shared-expense-guide-2026.md",
+          "name": "shared/shared-expense-guide-2026.md",
+          "sourceSha256": "79bedd9f4e9043494e064766b475959da5eb44a70ff892fa5484d7e9dafad363",
+          "contentSha256": "79bedd9f4e9043494e064766b475959da5eb44a70ff892fa5484d7e9dafad363",
+          "start": 0,
+          "end": 322,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 3.3095184777555158,
+          "documentId": "shared-expense-guide-2026"
+        },
+        {
+          "id": "chunk:c52ce418fbeb274c99451d1f8dedafeb017fedb87fed8a69476e29a9f36d4db1",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-schedule-2026.hwpx",
+          "name": "workspace-service/service-schedule-2026.hwpx",
+          "sourceSha256": "b984aff5124026a9ee4cff5a035ec478437444bbd8891412c1d6f375f85b34e5",
+          "contentSha256": "6fccd6439468b26c8167d6e5bb77969d9bc712c6a32c4cbacaf36d486c762feb",
+          "start": 0,
+          "end": 395,
+          "startLine": 1,
+          "endLine": 19,
+          "score": 3.1454782116459197,
+          "documentId": "service-schedule-2026"
+        }
+      ]
+    },
+    {
+      "id": "plan-training",
+      "category": "native",
+      "query": "올해 민원 문서 전환 사업에서 교육은 몇 회 실시하나요?",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [
+        "service-plan-2026"
+      ],
+      "rankedSourceIds": [
+        "service-plan-2026",
+        "service-glossary-2026",
+        "service-budget-2026-v1",
+        "service-budget-2026-v2",
+        "service-risks-2026",
+        "service-schedule-2026",
+        "service-roles-2026"
+      ],
+      "expectedEvidence": [
+        {
+          "text": "6회",
+          "found": true
+        }
+      ],
+      "recallAt1": 1,
+      "recallAt3": 1,
+      "recallAt8": 1,
+      "precisionAt1": 1,
+      "precisionAt3": 0.3333333333333333,
+      "precisionAt8": 0.14285714285714285,
+      "reciprocalRank": 1,
+      "evidenceRecall": 1,
+      "noHitExpected": false,
+      "falsePositiveHitCount": null,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 16,
+      "returnedChunkCount": 8,
+      "sentCharacters": 4007,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [],
+      "latency": {
+        "extractionMilliseconds": 8.497799999999984,
+        "indexingMilliseconds": 0.14109999999999445,
+        "searchMilliseconds": 0.26249999999998863,
+        "contextMilliseconds": 0.35199999999997544
+      },
+      "hits": [
+        {
+          "id": "chunk:a10a63c372646b4d2a924bb7d7111574641d086b46378327aac198cc3c2839ee",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "06404b43e29e56076e92767bf0e339bbec2c7cb6a4142c3d2e3524a83f334367",
+          "start": 0,
+          "end": 895,
+          "startLine": 1,
+          "endLine": 11,
+          "score": 6.1044380832251885,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:c0390ec96b85296bd81d33911498ef024cf884a888303d61ce8e93afa32c6060",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-glossary-2026.md",
+          "name": "workspace-service/service-glossary-2026.md",
+          "sourceSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "contentSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "start": 0,
+          "end": 343,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 4.833905732813015,
+          "documentId": "service-glossary-2026"
+        },
+        {
+          "id": "chunk:710a1492bead599b1e9b02908ad832e980c0dc9e308301db5dfa3341f1597212",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v1.txt",
+          "name": "workspace-service/service-budget-2026-v1.txt",
+          "sourceSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "contentSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "start": 0,
+          "end": 399,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.8945931333359893,
+          "documentId": "service-budget-2026-v1"
+        },
+        {
+          "id": "chunk:b11fe8e09e05200735467d23751eba6976bbba87c6bc4d1bc0f61cd4b030b67d",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v2.hwpx",
+          "name": "workspace-service/service-budget-2026-v2.hwpx",
+          "sourceSha256": "a03266b24af198877fce8170be9ca4d40632631b307549a52d08afc67f9d741c",
+          "contentSha256": "e2320d1766a9d51e09878b1cdc38b32a09ef01638a1e718d0b81b9e74c7a026f",
+          "start": 0,
+          "end": 455,
+          "startLine": 1,
+          "endLine": 20,
+          "score": 1.8945931333359893,
+          "documentId": "service-budget-2026-v2"
+        },
+        {
+          "id": "chunk:0c20e4653e5a0473e1904fad661901bcf440bf957cbd24677f11598f42134c1b",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-risks-2026.md",
+          "name": "workspace-service/service-risks-2026.md",
+          "sourceSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "contentSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "start": 0,
+          "end": 366,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.8732810617498399,
+          "documentId": "service-risks-2026"
+        },
+        {
+          "id": "chunk:c52ce418fbeb274c99451d1f8dedafeb017fedb87fed8a69476e29a9f36d4db1",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-schedule-2026.hwpx",
+          "name": "workspace-service/service-schedule-2026.hwpx",
+          "sourceSha256": "b984aff5124026a9ee4cff5a035ec478437444bbd8891412c1d6f375f85b34e5",
+          "contentSha256": "6fccd6439468b26c8167d6e5bb77969d9bc712c6a32c4cbacaf36d486c762feb",
+          "start": 0,
+          "end": 395,
+          "startLine": 1,
+          "endLine": 19,
+          "score": 1.779991148889563,
+          "documentId": "service-schedule-2026"
+        },
+        {
+          "id": "chunk:220a129f51f2567cff9407624abfb72de4dc0e2219ded6fefcd65c27d827c927",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "012a465a1cf5d44665c2dd802372f46be6b1a46487d86d4c524ea2c8e92f9447",
+          "start": 1701,
+          "end": 2537,
+          "startLine": 15,
+          "endLine": 17,
+          "score": 1.669210158035354,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:877dac48a30ef5782eb3db6941eeb39f47174152b1f61b7c6bed66b76012020f",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-roles-2026.txt",
+          "name": "workspace-service/service-roles-2026.txt",
+          "sourceSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "contentSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "start": 0,
+          "end": 318,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.6035206350617053,
+          "documentId": "service-roles-2026"
+        }
+      ]
+    },
+    {
+      "id": "plan-performance",
+      "category": "native",
+      "query": "민원 문서 전환 사업의 처리시간 단축 목표는 몇 퍼센트인가요?",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [
+        "service-plan-2026"
+      ],
+      "rankedSourceIds": [
+        "service-plan-2026",
+        "service-glossary-2026",
+        "service-budget-2026-v1",
+        "service-budget-2026-v2",
+        "service-risks-2026",
+        "service-roles-2026"
+      ],
+      "expectedEvidence": [
+        {
+          "text": "20%",
+          "found": true
+        }
+      ],
+      "recallAt1": 1,
+      "recallAt3": 1,
+      "recallAt8": 1,
+      "precisionAt1": 1,
+      "precisionAt3": 0.3333333333333333,
+      "precisionAt8": 0.16666666666666666,
+      "reciprocalRank": 1,
+      "evidenceRecall": 1,
+      "noHitExpected": false,
+      "falsePositiveHitCount": null,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 15,
+      "returnedChunkCount": 8,
+      "sentCharacters": 4008,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [],
+      "latency": {
+        "extractionMilliseconds": 8.204700000000003,
+        "indexingMilliseconds": 0.12860000000000582,
+        "searchMilliseconds": 0.25729999999998654,
+        "contextMilliseconds": 0.40919999999999845
+      },
+      "hits": [
+        {
+          "id": "chunk:a10a63c372646b4d2a924bb7d7111574641d086b46378327aac198cc3c2839ee",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "06404b43e29e56076e92767bf0e339bbec2c7cb6a4142c3d2e3524a83f334367",
+          "start": 0,
+          "end": 895,
+          "startLine": 1,
+          "endLine": 11,
+          "score": 13.221552145335693,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:f101a4b413c99914d719d87f56b995d7df9c76e7e363431394e1858fd6620de4",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "50f1c20e57685bcc7fd755fcb49fb16d7f96fc8ceca6184b1cdfc22386f1290f",
+          "start": 4202,
+          "end": 4615,
+          "startLine": 24,
+          "endLine": 35,
+          "score": 5.2148123852739285,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:498d6ab1fef9b2392c0cebebeee3c485c324877ead5a3ae519f6bb5d904bd9f5",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "72bddfb9673cb497ef411e0eab6dde6f24780f3cae3dff021a73e23cd7106917",
+          "start": 3383,
+          "end": 4202,
+          "startLine": 21,
+          "endLine": 23,
+          "score": 3.0370845273882376,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:c0390ec96b85296bd81d33911498ef024cf884a888303d61ce8e93afa32c6060",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-glossary-2026.md",
+          "name": "workspace-service/service-glossary-2026.md",
+          "sourceSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "contentSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "start": 0,
+          "end": 343,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.148461973984987,
+          "documentId": "service-glossary-2026"
+        },
+        {
+          "id": "chunk:710a1492bead599b1e9b02908ad832e980c0dc9e308301db5dfa3341f1597212",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v1.txt",
+          "name": "workspace-service/service-budget-2026-v1.txt",
+          "sourceSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "contentSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "start": 0,
+          "end": 399,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.7181226195081316,
+          "documentId": "service-budget-2026-v1"
+        },
+        {
+          "id": "chunk:b11fe8e09e05200735467d23751eba6976bbba87c6bc4d1bc0f61cd4b030b67d",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v2.hwpx",
+          "name": "workspace-service/service-budget-2026-v2.hwpx",
+          "sourceSha256": "a03266b24af198877fce8170be9ca4d40632631b307549a52d08afc67f9d741c",
+          "contentSha256": "e2320d1766a9d51e09878b1cdc38b32a09ef01638a1e718d0b81b9e74c7a026f",
+          "start": 0,
+          "end": 455,
+          "startLine": 1,
+          "endLine": 20,
+          "score": 1.7181226195081316,
+          "documentId": "service-budget-2026-v2"
+        },
+        {
+          "id": "chunk:0c20e4653e5a0473e1904fad661901bcf440bf957cbd24677f11598f42134c1b",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-risks-2026.md",
+          "name": "workspace-service/service-risks-2026.md",
+          "sourceSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "contentSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "start": 0,
+          "end": 366,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.6035206350617053,
+          "documentId": "service-risks-2026"
+        },
+        {
+          "id": "chunk:877dac48a30ef5782eb3db6941eeb39f47174152b1f61b7c6bed66b76012020f",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-roles-2026.txt",
+          "name": "workspace-service/service-roles-2026.txt",
+          "sourceSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "contentSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "start": 0,
+          "end": 318,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.6035206350617053,
+          "documentId": "service-roles-2026"
+        }
+      ]
+    },
+    {
+      "id": "late-appendix",
+      "category": "late-chunk",
+      "query": "사업 결과보고서 제출 기한과 성과 측정에 사용할 민원 표본 수를 알려 주세요.",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [
+        "service-plan-2026"
+      ],
+      "rankedSourceIds": [
+        "service-plan-2026",
+        "service-budget-2026-v2",
+        "service-budget-2026-v1",
+        "service-glossary-2026",
+        "service-risks-2026",
+        "service-roles-2026"
+      ],
+      "expectedEvidence": [
+        {
+          "text": "2026-12-24",
+          "found": true
+        },
+        {
+          "text": "100건",
+          "found": true
+        }
+      ],
+      "recallAt1": 1,
+      "recallAt3": 1,
+      "recallAt8": 1,
+      "precisionAt1": 1,
+      "precisionAt3": 0.3333333333333333,
+      "precisionAt8": 0.16666666666666666,
+      "reciprocalRank": 1,
+      "evidenceRecall": 1,
+      "noHitExpected": false,
+      "falsePositiveHitCount": null,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 17,
+      "returnedChunkCount": 8,
+      "sentCharacters": 4008,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [],
+      "latency": {
+        "extractionMilliseconds": 7.9576999999999884,
+        "indexingMilliseconds": 0.23879999999996926,
+        "searchMilliseconds": 0.4992000000000303,
+        "contextMilliseconds": 0.3339000000000283
+      },
+      "hits": [
+        {
+          "id": "chunk:a10a63c372646b4d2a924bb7d7111574641d086b46378327aac198cc3c2839ee",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "06404b43e29e56076e92767bf0e339bbec2c7cb6a4142c3d2e3524a83f334367",
+          "start": 0,
+          "end": 895,
+          "startLine": 1,
+          "endLine": 11,
+          "score": 9.467470185059993,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:498d6ab1fef9b2392c0cebebeee3c485c324877ead5a3ae519f6bb5d904bd9f5",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "72bddfb9673cb497ef411e0eab6dde6f24780f3cae3dff021a73e23cd7106917",
+          "start": 3383,
+          "end": 4202,
+          "startLine": 21,
+          "endLine": 23,
+          "score": 8.62478671434034,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:f101a4b413c99914d719d87f56b995d7df9c76e7e363431394e1858fd6620de4",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "50f1c20e57685bcc7fd755fcb49fb16d7f96fc8ceca6184b1cdfc22386f1290f",
+          "start": 4202,
+          "end": 4615,
+          "startLine": 24,
+          "endLine": 35,
+          "score": 8.59586587006356,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:b11fe8e09e05200735467d23751eba6976bbba87c6bc4d1bc0f61cd4b030b67d",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v2.hwpx",
+          "name": "workspace-service/service-budget-2026-v2.hwpx",
+          "sourceSha256": "a03266b24af198877fce8170be9ca4d40632631b307549a52d08afc67f9d741c",
+          "contentSha256": "e2320d1766a9d51e09878b1cdc38b32a09ef01638a1e718d0b81b9e74c7a026f",
+          "start": 0,
+          "end": 455,
+          "startLine": 1,
+          "endLine": 20,
+          "score": 1.9813533850258596,
+          "documentId": "service-budget-2026-v2"
+        },
+        {
+          "id": "chunk:710a1492bead599b1e9b02908ad832e980c0dc9e308301db5dfa3341f1597212",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v1.txt",
+          "name": "workspace-service/service-budget-2026-v1.txt",
+          "sourceSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "contentSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "start": 0,
+          "end": 399,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.8179571075124388,
+          "documentId": "service-budget-2026-v1"
+        },
+        {
+          "id": "chunk:c0390ec96b85296bd81d33911498ef024cf884a888303d61ce8e93afa32c6060",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-glossary-2026.md",
+          "name": "workspace-service/service-glossary-2026.md",
+          "sourceSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "contentSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "start": 0,
+          "end": 343,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.7435327798406708,
+          "documentId": "service-glossary-2026"
+        },
+        {
+          "id": "chunk:0c20e4653e5a0473e1904fad661901bcf440bf957cbd24677f11598f42134c1b",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-risks-2026.md",
+          "name": "workspace-service/service-risks-2026.md",
+          "sourceSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "contentSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "start": 0,
+          "end": 366,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.4214176991081642,
+          "documentId": "service-risks-2026"
+        },
+        {
+          "id": "chunk:877dac48a30ef5782eb3db6941eeb39f47174152b1f61b7c6bed66b76012020f",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-roles-2026.txt",
+          "name": "workspace-service/service-roles-2026.txt",
+          "sourceSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "contentSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "start": 0,
+          "end": 318,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.2449471852803065,
+          "documentId": "service-roles-2026"
+        }
+      ]
+    },
+    {
+      "id": "current-start",
+      "category": "version",
+      "query": "현재 확정된 민원 문서 전환 사업 착수일은 언제인가요?",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [
+        "service-schedule-2026"
+      ],
+      "rankedSourceIds": [
+        "service-schedule-2026-v1",
+        "service-plan-2026",
+        "service-budget-2026-v2",
+        "service-glossary-2026",
+        "service-schedule-2026",
+        "service-risks-2026",
+        "service-roles-2026",
+        "service-budget-2026-v1"
+      ],
+      "expectedEvidence": [
+        {
+          "text": "2026-11-02",
+          "found": true
+        }
+      ],
+      "recallAt1": 0,
+      "recallAt3": 0,
+      "recallAt8": 1,
+      "precisionAt1": 0,
+      "precisionAt3": 0,
+      "precisionAt8": 0.125,
+      "reciprocalRank": 0.2,
+      "evidenceRecall": 1,
+      "noHitExpected": false,
+      "falsePositiveHitCount": null,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 16,
+      "returnedChunkCount": 8,
+      "sentCharacters": 3507,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [
+        "expected authority is not the first unique source"
+      ],
+      "latency": {
+        "extractionMilliseconds": 7.900700000000029,
+        "indexingMilliseconds": 0.13939999999996644,
+        "searchMilliseconds": 0.24279999999998836,
+        "contextMilliseconds": 0.33740000000000236
+      },
+      "hits": [
+        {
+          "id": "chunk:298ea9ac947293b769e0a57312e5ba951c041872bcf26ecea8d78874e198ec88",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-schedule-2026-v1.md",
+          "name": "workspace-service/service-schedule-2026-v1.md",
+          "sourceSha256": "f25b4caf0a1cccd22ab2e603e945223a0abcd9634a6f6b90d46794252e1b38b2",
+          "contentSha256": "f25b4caf0a1cccd22ab2e603e945223a0abcd9634a6f6b90d46794252e1b38b2",
+          "start": 0,
+          "end": 336,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 6.049857589819419,
+          "documentId": "service-schedule-2026-v1"
+        },
+        {
+          "id": "chunk:a10a63c372646b4d2a924bb7d7111574641d086b46378327aac198cc3c2839ee",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "06404b43e29e56076e92767bf0e339bbec2c7cb6a4142c3d2e3524a83f334367",
+          "start": 0,
+          "end": 895,
+          "startLine": 1,
+          "endLine": 11,
+          "score": 5.464525053663026,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:b11fe8e09e05200735467d23751eba6976bbba87c6bc4d1bc0f61cd4b030b67d",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v2.hwpx",
+          "name": "workspace-service/service-budget-2026-v2.hwpx",
+          "sourceSha256": "a03266b24af198877fce8170be9ca4d40632631b307549a52d08afc67f9d741c",
+          "contentSha256": "e2320d1766a9d51e09878b1cdc38b32a09ef01638a1e718d0b81b9e74c7a026f",
+          "start": 0,
+          "end": 455,
+          "startLine": 1,
+          "endLine": 20,
+          "score": 4.062294087217332,
+          "documentId": "service-budget-2026-v2"
+        },
+        {
+          "id": "chunk:c0390ec96b85296bd81d33911498ef024cf884a888303d61ce8e93afa32c6060",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-glossary-2026.md",
+          "name": "workspace-service/service-glossary-2026.md",
+          "sourceSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "contentSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "start": 0,
+          "end": 343,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 4.006173909774764,
+          "documentId": "service-glossary-2026"
+        },
+        {
+          "id": "chunk:c52ce418fbeb274c99451d1f8dedafeb017fedb87fed8a69476e29a9f36d4db1",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-schedule-2026.hwpx",
+          "name": "workspace-service/service-schedule-2026.hwpx",
+          "sourceSha256": "b984aff5124026a9ee4cff5a035ec478437444bbd8891412c1d6f375f85b34e5",
+          "contentSha256": "6fccd6439468b26c8167d6e5bb77969d9bc712c6a32c4cbacaf36d486c762feb",
+          "start": 0,
+          "end": 395,
+          "startLine": 1,
+          "endLine": 19,
+          "score": 3.995213820758651,
+          "documentId": "service-schedule-2026"
+        },
+        {
+          "id": "chunk:0c20e4653e5a0473e1904fad661901bcf440bf957cbd24677f11598f42134c1b",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-risks-2026.md",
+          "name": "workspace-service/service-risks-2026.md",
+          "sourceSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "contentSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "start": 0,
+          "end": 366,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.775606368916305,
+          "documentId": "service-risks-2026"
+        },
+        {
+          "id": "chunk:877dac48a30ef5782eb3db6941eeb39f47174152b1f61b7c6bed66b76012020f",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-roles-2026.txt",
+          "name": "workspace-service/service-roles-2026.txt",
+          "sourceSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "contentSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "start": 0,
+          "end": 318,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.775606368916305,
+          "documentId": "service-roles-2026"
+        },
+        {
+          "id": "chunk:710a1492bead599b1e9b02908ad832e980c0dc9e308301db5dfa3341f1597212",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v1.txt",
+          "name": "workspace-service/service-budget-2026-v1.txt",
+          "sourceSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "contentSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "start": 0,
+          "end": 399,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.6349384950795436,
+          "documentId": "service-budget-2026-v1"
+        }
+      ]
+    },
+    {
+      "id": "current-end",
+      "category": "version",
+      "query": "민원 문서 전환 사업의 최신 완료 예정일을 알려 주세요.",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [
+        "service-schedule-2026"
+      ],
+      "rankedSourceIds": [
+        "service-plan-2026",
+        "service-risks-2026",
+        "service-schedule-2026-v1",
+        "service-schedule-2026",
+        "service-glossary-2026",
+        "service-budget-2026-v1"
+      ],
+      "expectedEvidence": [
+        {
+          "text": "2026-12-18",
+          "found": true
+        }
+      ],
+      "recallAt1": 0,
+      "recallAt3": 0,
+      "recallAt8": 1,
+      "precisionAt1": 0,
+      "precisionAt3": 0,
+      "precisionAt8": 0.16666666666666666,
+      "reciprocalRank": 0.25,
+      "evidenceRecall": 1,
+      "noHitExpected": false,
+      "falsePositiveHitCount": null,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 16,
+      "returnedChunkCount": 8,
+      "sentCharacters": 4399,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [
+        "expected authority is not the first unique source"
+      ],
+      "latency": {
+        "extractionMilliseconds": 9.564700000000016,
+        "indexingMilliseconds": 0.13580000000001746,
+        "searchMilliseconds": 0.21299999999996544,
+        "contextMilliseconds": 0.28160000000002583
+      },
+      "hits": [
+        {
+          "id": "chunk:a10a63c372646b4d2a924bb7d7111574641d086b46378327aac198cc3c2839ee",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "06404b43e29e56076e92767bf0e339bbec2c7cb6a4142c3d2e3524a83f334367",
+          "start": 0,
+          "end": 895,
+          "startLine": 1,
+          "endLine": 11,
+          "score": 8.276992170774045,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:498d6ab1fef9b2392c0cebebeee3c485c324877ead5a3ae519f6bb5d904bd9f5",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "72bddfb9673cb497ef411e0eab6dde6f24780f3cae3dff021a73e23cd7106917",
+          "start": 3383,
+          "end": 4202,
+          "startLine": 21,
+          "endLine": 23,
+          "score": 4.297806050952602,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:0c20e4653e5a0473e1904fad661901bcf440bf957cbd24677f11598f42134c1b",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-risks-2026.md",
+          "name": "workspace-service/service-risks-2026.md",
+          "sourceSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "contentSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "start": 0,
+          "end": 366,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.4858732042009937,
+          "documentId": "service-risks-2026"
+        },
+        {
+          "id": "chunk:298ea9ac947293b769e0a57312e5ba951c041872bcf26ecea8d78874e198ec88",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-schedule-2026-v1.md",
+          "name": "workspace-service/service-schedule-2026-v1.md",
+          "sourceSha256": "f25b4caf0a1cccd22ab2e603e945223a0abcd9634a6f6b90d46794252e1b38b2",
+          "contentSha256": "f25b4caf0a1cccd22ab2e603e945223a0abcd9634a6f6b90d46794252e1b38b2",
+          "start": 0,
+          "end": 336,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.4858732042009937,
+          "documentId": "service-schedule-2026-v1"
+        },
+        {
+          "id": "chunk:c52ce418fbeb274c99451d1f8dedafeb017fedb87fed8a69476e29a9f36d4db1",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-schedule-2026.hwpx",
+          "name": "workspace-service/service-schedule-2026.hwpx",
+          "sourceSha256": "b984aff5124026a9ee4cff5a035ec478437444bbd8891412c1d6f375f85b34e5",
+          "contentSha256": "6fccd6439468b26c8167d6e5bb77969d9bc712c6a32c4cbacaf36d486c762feb",
+          "start": 0,
+          "end": 395,
+          "startLine": 1,
+          "endLine": 19,
+          "score": 2.4858732042009937,
+          "documentId": "service-schedule-2026"
+        },
+        {
+          "id": "chunk:e11f5225b4e485b2fc3de4712be273e0a57d4683bce7d2b6543af006283415c8",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "2e55cd78d0b9b2ea49a777da1b15479a7f27a64499b1f4f169befcf255533312",
+          "start": 2537,
+          "end": 3383,
+          "startLine": 18,
+          "endLine": 20,
+          "score": 2.442651480314716,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:c0390ec96b85296bd81d33911498ef024cf884a888303d61ce8e93afa32c6060",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-glossary-2026.md",
+          "name": "workspace-service/service-glossary-2026.md",
+          "sourceSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "contentSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "start": 0,
+          "end": 343,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.148461973984987,
+          "documentId": "service-glossary-2026"
+        },
+        {
+          "id": "chunk:710a1492bead599b1e9b02908ad832e980c0dc9e308301db5dfa3341f1597212",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v1.txt",
+          "name": "workspace-service/service-budget-2026-v1.txt",
+          "sourceSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "contentSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "start": 0,
+          "end": 399,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.7181226195081316,
+          "documentId": "service-budget-2026-v1"
+        }
+      ]
+    },
+    {
+      "id": "old-end",
+      "category": "version",
+      "query": "수정 전 일정 초안에서 민원 문서 전환 사업의 완료 예정일은 언제였나요?",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [
+        "service-schedule-2026-v1"
+      ],
+      "rankedSourceIds": [
+        "service-plan-2026",
+        "service-schedule-2026-v1",
+        "service-schedule-2026",
+        "service-risks-2026",
+        "service-glossary-2026",
+        "service-budget-2026-v1"
+      ],
+      "expectedEvidence": [
+        {
+          "text": "2026-11-30",
+          "found": true
+        }
+      ],
+      "recallAt1": 0,
+      "recallAt3": 1,
+      "recallAt8": 1,
+      "precisionAt1": 0,
+      "precisionAt3": 0.3333333333333333,
+      "precisionAt8": 0.16666666666666666,
+      "reciprocalRank": 0.5,
+      "evidenceRecall": 1,
+      "noHitExpected": false,
+      "falsePositiveHitCount": null,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 17,
+      "returnedChunkCount": 8,
+      "sentCharacters": 4399,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [
+        "expected authority is not the first unique source"
+      ],
+      "latency": {
+        "extractionMilliseconds": 7.883800000000008,
+        "indexingMilliseconds": 0.1268000000000029,
+        "searchMilliseconds": 1.1899999999999977,
+        "contextMilliseconds": 0.9547000000000025
+      },
+      "hits": [
+        {
+          "id": "chunk:a10a63c372646b4d2a924bb7d7111574641d086b46378327aac198cc3c2839ee",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "06404b43e29e56076e92767bf0e339bbec2c7cb6a4142c3d2e3524a83f334367",
+          "start": 0,
+          "end": 895,
+          "startLine": 1,
+          "endLine": 11,
+          "score": 6.411201378877728,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:298ea9ac947293b769e0a57312e5ba951c041872bcf26ecea8d78874e198ec88",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-schedule-2026-v1.md",
+          "name": "workspace-service/service-schedule-2026-v1.md",
+          "sourceSha256": "f25b4caf0a1cccd22ab2e603e945223a0abcd9634a6f6b90d46794252e1b38b2",
+          "contentSha256": "f25b4caf0a1cccd22ab2e603e945223a0abcd9634a6f6b90d46794252e1b38b2",
+          "start": 0,
+          "end": 336,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 4.864660063191097,
+          "documentId": "service-schedule-2026-v1"
+        },
+        {
+          "id": "chunk:c52ce418fbeb274c99451d1f8dedafeb017fedb87fed8a69476e29a9f36d4db1",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-schedule-2026.hwpx",
+          "name": "workspace-service/service-schedule-2026.hwpx",
+          "sourceSha256": "b984aff5124026a9ee4cff5a035ec478437444bbd8891412c1d6f375f85b34e5",
+          "contentSha256": "6fccd6439468b26c8167d6e5bb77969d9bc712c6a32c4cbacaf36d486c762feb",
+          "start": 0,
+          "end": 395,
+          "startLine": 1,
+          "endLine": 19,
+          "score": 4.849155871601014,
+          "documentId": "service-schedule-2026"
+        },
+        {
+          "id": "chunk:498d6ab1fef9b2392c0cebebeee3c485c324877ead5a3ae519f6bb5d904bd9f5",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "72bddfb9673cb497ef411e0eab6dde6f24780f3cae3dff021a73e23cd7106917",
+          "start": 3383,
+          "end": 4202,
+          "startLine": 21,
+          "endLine": 23,
+          "score": 4.356073552924433,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:e11f5225b4e485b2fc3de4712be273e0a57d4683bce7d2b6543af006283415c8",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "2e55cd78d0b9b2ea49a777da1b15479a7f27a64499b1f4f169befcf255533312",
+          "start": 2537,
+          "end": 3383,
+          "startLine": 18,
+          "endLine": 20,
+          "score": 3.5908606540665935,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:0c20e4653e5a0473e1904fad661901bcf440bf957cbd24677f11598f42134c1b",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-risks-2026.md",
+          "name": "workspace-service/service-risks-2026.md",
+          "sourceSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "contentSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "start": 0,
+          "end": 366,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.4858732042009937,
+          "documentId": "service-risks-2026"
+        },
+        {
+          "id": "chunk:c0390ec96b85296bd81d33911498ef024cf884a888303d61ce8e93afa32c6060",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-glossary-2026.md",
+          "name": "workspace-service/service-glossary-2026.md",
+          "sourceSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "contentSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "start": 0,
+          "end": 343,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.3847902407249895,
+          "documentId": "service-glossary-2026"
+        },
+        {
+          "id": "chunk:710a1492bead599b1e9b02908ad832e980c0dc9e308301db5dfa3341f1597212",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v1.txt",
+          "name": "workspace-service/service-budget-2026-v1.txt",
+          "sourceSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "contentSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "start": 0,
+          "end": 399,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.7181226195081316,
+          "documentId": "service-budget-2026-v1"
+        }
+      ]
+    },
+    {
+      "id": "current-retention",
+      "category": "version",
+      "query": "2026년 시행되는 기록 보관 규정의 보관 기간은 몇 년인가요?",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [
+        "shared-record-rule-2026"
+      ],
+      "rankedSourceIds": [
+        "shared-record-rule-2025",
+        "shared-record-rule-2026",
+        "service-plan-2026",
+        "service-risks-2026",
+        "shared-office-rule-2026",
+        "shared-expense-guide-2026"
+      ],
+      "expectedEvidence": [
+        {
+          "text": "5년",
+          "found": true
+        }
+      ],
+      "recallAt1": 0,
+      "recallAt3": 1,
+      "recallAt8": 1,
+      "precisionAt1": 0,
+      "precisionAt3": 0.3333333333333333,
+      "precisionAt8": 0.16666666666666666,
+      "reciprocalRank": 0.5,
+      "evidenceRecall": 1,
+      "noHitExpected": false,
+      "falsePositiveHitCount": null,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 17,
+      "returnedChunkCount": 8,
+      "sentCharacters": 4122,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [
+        "expected authority is not the first unique source"
+      ],
+      "latency": {
+        "extractionMilliseconds": 8.25849999999997,
+        "indexingMilliseconds": 0.12069999999999936,
+        "searchMilliseconds": 0.20609999999999218,
+        "contextMilliseconds": 0.2839999999999918
+      },
+      "hits": [
+        {
+          "id": "chunk:9c9a28cdf4d997a41118aab39ce2c40be2cfd186c552a6a6511bb558a7224338",
+          "sourceId": "eval-root:workspace-service/shared/shared-record-rule-2025.txt",
+          "name": "shared/shared-record-rule-2025.txt",
+          "sourceSha256": "7744fd7606585855c59fc819b29fe323d6bedd7d27022fd238eac49f73a563df",
+          "contentSha256": "7744fd7606585855c59fc819b29fe323d6bedd7d27022fd238eac49f73a563df",
+          "start": 0,
+          "end": 312,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 6.813525435344031,
+          "documentId": "shared-record-rule-2025"
+        },
+        {
+          "id": "chunk:7328052813f3d9b1af2e7b968113b60f2922ce6debe68c97b1b0f8a389f60836",
+          "sourceId": "eval-root:workspace-service/shared/shared-record-rule-2026.md",
+          "name": "shared/shared-record-rule-2026.md",
+          "sourceSha256": "dda2baccff97cab93451f765305b8ee4d14728032ad096d3051e918a5a80fe46",
+          "contentSha256": "dda2baccff97cab93451f765305b8ee4d14728032ad096d3051e918a5a80fe46",
+          "start": 0,
+          "end": 318,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 5.720819451754635,
+          "documentId": "shared-record-rule-2026"
+        },
+        {
+          "id": "chunk:5493ee64a385efae712a2f84aed0f3607639258dbbd8cf67c5f6a4863df0aca4",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "a1c98907a19399097d42cfd119b8decf30defb7b655161cad69976aa5af326de",
+          "start": 895,
+          "end": 1701,
+          "startLine": 12,
+          "endLine": 14,
+          "score": 3.845211436799791,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:498d6ab1fef9b2392c0cebebeee3c485c324877ead5a3ae519f6bb5d904bd9f5",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "72bddfb9673cb497ef411e0eab6dde6f24780f3cae3dff021a73e23cd7106917",
+          "start": 3383,
+          "end": 4202,
+          "startLine": 21,
+          "endLine": 23,
+          "score": 3.154390890441478,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:e11f5225b4e485b2fc3de4712be273e0a57d4683bce7d2b6543af006283415c8",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "2e55cd78d0b9b2ea49a777da1b15479a7f27a64499b1f4f169befcf255533312",
+          "start": 2537,
+          "end": 3383,
+          "startLine": 18,
+          "endLine": 20,
+          "score": 2.614116178974473,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:0c20e4653e5a0473e1904fad661901bcf440bf957cbd24677f11598f42134c1b",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-risks-2026.md",
+          "name": "workspace-service/service-risks-2026.md",
+          "sourceSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "contentSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "start": 0,
+          "end": 366,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.1578907528179803,
+          "documentId": "service-risks-2026"
+        },
+        {
+          "id": "chunk:48cebe8be266c5799da7e8a052236936c2261bf71f9cc9cb473a78e70fd34885",
+          "sourceId": "eval-root:workspace-service/shared/shared-office-rule-2026.md",
+          "name": "shared/shared-office-rule-2026.md",
+          "sourceSha256": "86f42473ec53cda5cdd5abee8a30944745bf9f17f0d4d88f7194bbe6f9ffa530",
+          "contentSha256": "86f42473ec53cda5cdd5abee8a30944745bf9f17f0d4d88f7194bbe6f9ffa530",
+          "start": 0,
+          "end": 333,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 0.9201692253480056,
+          "documentId": "shared-office-rule-2026"
+        },
+        {
+          "id": "chunk:b71d2d5f2d522cecc805d33300153daffff4ea924fae212693f4b1a36af67251",
+          "sourceId": "eval-root:workspace-service/shared/shared-expense-guide-2026.md",
+          "name": "shared/shared-expense-guide-2026.md",
+          "sourceSha256": "79bedd9f4e9043494e064766b475959da5eb44a70ff892fa5484d7e9dafad363",
+          "contentSha256": "79bedd9f4e9043494e064766b475959da5eb44a70ff892fa5484d7e9dafad363",
+          "start": 0,
+          "end": 322,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 0.10010912867465473,
+          "documentId": "shared-expense-guide-2026"
+        }
+      ]
+    },
+    {
+      "id": "old-retention",
+      "category": "version",
+      "query": "2025년에 적용하던 이전 기록 보관 규정의 보관 기간을 알려 주세요.",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [
+        "shared-record-rule-2025"
+      ],
+      "rankedSourceIds": [
+        "shared-record-rule-2026",
+        "service-plan-2026",
+        "shared-record-rule-2025",
+        "service-risks-2026",
+        "shared-office-rule-2026",
+        "service-budget-2026-v2"
+      ],
+      "expectedEvidence": [
+        {
+          "text": "3년",
+          "found": true
+        }
+      ],
+      "recallAt1": 0,
+      "recallAt3": 1,
+      "recallAt8": 1,
+      "precisionAt1": 0,
+      "precisionAt3": 0.3333333333333333,
+      "precisionAt8": 0.16666666666666666,
+      "reciprocalRank": 0.3333333333333333,
+      "evidenceRecall": 1,
+      "noHitExpected": false,
+      "falsePositiveHitCount": null,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 17,
+      "returnedChunkCount": 8,
+      "sentCharacters": 4304,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [
+        "expected authority is not the first unique source"
+      ],
+      "latency": {
+        "extractionMilliseconds": 7.444199999999967,
+        "indexingMilliseconds": 0.14670000000000982,
+        "searchMilliseconds": 0.22889999999995325,
+        "contextMilliseconds": 0.3072999999999979
+      },
+      "hits": [
+        {
+          "id": "chunk:7328052813f3d9b1af2e7b968113b60f2922ce6debe68c97b1b0f8a389f60836",
+          "sourceId": "eval-root:workspace-service/shared/shared-record-rule-2026.md",
+          "name": "shared/shared-record-rule-2026.md",
+          "sourceSha256": "dda2baccff97cab93451f765305b8ee4d14728032ad096d3051e918a5a80fe46",
+          "contentSha256": "dda2baccff97cab93451f765305b8ee4d14728032ad096d3051e918a5a80fe46",
+          "start": 0,
+          "end": 318,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 6.347358511142289,
+          "documentId": "shared-record-rule-2026"
+        },
+        {
+          "id": "chunk:a10a63c372646b4d2a924bb7d7111574641d086b46378327aac198cc3c2839ee",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "06404b43e29e56076e92767bf0e339bbec2c7cb6a4142c3d2e3524a83f334367",
+          "start": 0,
+          "end": 895,
+          "startLine": 1,
+          "endLine": 11,
+          "score": 4.3828750596004085,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:5493ee64a385efae712a2f84aed0f3607639258dbbd8cf67c5f6a4863df0aca4",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "a1c98907a19399097d42cfd119b8decf30defb7b655161cad69976aa5af326de",
+          "start": 895,
+          "end": 1701,
+          "startLine": 12,
+          "endLine": 14,
+          "score": 4.224605844158216,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:498d6ab1fef9b2392c0cebebeee3c485c324877ead5a3ae519f6bb5d904bd9f5",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "72bddfb9673cb497ef411e0eab6dde6f24780f3cae3dff021a73e23cd7106917",
+          "start": 3383,
+          "end": 4202,
+          "startLine": 21,
+          "endLine": 23,
+          "score": 3.3922036031619522,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:9c9a28cdf4d997a41118aab39ce2c40be2cfd186c552a6a6511bb558a7224338",
+          "sourceId": "eval-root:workspace-service/shared/shared-record-rule-2025.txt",
+          "name": "shared/shared-record-rule-2025.txt",
+          "sourceSha256": "7744fd7606585855c59fc819b29fe323d6bedd7d27022fd238eac49f73a563df",
+          "contentSha256": "7744fd7606585855c59fc819b29fe323d6bedd7d27022fd238eac49f73a563df",
+          "start": 0,
+          "end": 312,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 3.2023955457234274,
+          "documentId": "shared-record-rule-2025"
+        },
+        {
+          "id": "chunk:0c20e4653e5a0473e1904fad661901bcf440bf957cbd24677f11598f42134c1b",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-risks-2026.md",
+          "name": "workspace-service/service-risks-2026.md",
+          "sourceSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "contentSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "start": 0,
+          "end": 366,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.2724927372644068,
+          "documentId": "service-risks-2026"
+        },
+        {
+          "id": "chunk:48cebe8be266c5799da7e8a052236936c2261bf71f9cc9cb473a78e70fd34885",
+          "sourceId": "eval-root:workspace-service/shared/shared-office-rule-2026.md",
+          "name": "shared/shared-office-rule-2026.md",
+          "sourceSha256": "86f42473ec53cda5cdd5abee8a30944745bf9f17f0d4d88f7194bbe6f9ffa530",
+          "contentSha256": "86f42473ec53cda5cdd5abee8a30944745bf9f17f0d4d88f7194bbe6f9ffa530",
+          "start": 0,
+          "end": 333,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.1018090732038208,
+          "documentId": "shared-office-rule-2026"
+        },
+        {
+          "id": "chunk:b11fe8e09e05200735467d23751eba6976bbba87c6bc4d1bc0f61cd4b030b67d",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v2.hwpx",
+          "name": "workspace-service/service-budget-2026-v2.hwpx",
+          "sourceSha256": "a03266b24af198877fce8170be9ca4d40632631b307549a52d08afc67f9d741c",
+          "contentSha256": "e2320d1766a9d51e09878b1cdc38b32a09ef01638a1e718d0b81b9e74c7a026f",
+          "start": 0,
+          "end": 455,
+          "startLine": 1,
+          "endLine": 20,
+          "score": 0.5407259491466695,
+          "documentId": "service-budget-2026-v2"
+        }
+      ]
+    },
+    {
+      "id": "training-limit",
+      "category": "shared",
+      "query": "공통 지출 지침에서 교육 1회당 지출 상한은 얼마인가요?",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [
+        "shared-expense-guide-2026"
+      ],
+      "rankedSourceIds": [
+        "shared-expense-guide-2026",
+        "service-plan-2026",
+        "shared-office-rule-2026",
+        "service-budget-2026-v1",
+        "service-budget-2026-v2",
+        "service-schedule-2026"
+      ],
+      "expectedEvidence": [
+        {
+          "text": "3,000,000",
+          "found": true
+        }
+      ],
+      "recallAt1": 1,
+      "recallAt3": 1,
+      "recallAt8": 1,
+      "precisionAt1": 1,
+      "precisionAt3": 0.3333333333333333,
+      "precisionAt8": 0.16666666666666666,
+      "reciprocalRank": 1,
+      "evidenceRecall": 1,
+      "noHitExpected": false,
+      "falsePositiveHitCount": null,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 11,
+      "returnedChunkCount": 8,
+      "sentCharacters": 4454,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [],
+      "latency": {
+        "extractionMilliseconds": 7.63900000000001,
+        "indexingMilliseconds": 0.12040000000001783,
+        "searchMilliseconds": 0.1922999999999888,
+        "contextMilliseconds": 0.2529999999999859
+      },
+      "hits": [
+        {
+          "id": "chunk:b71d2d5f2d522cecc805d33300153daffff4ea924fae212693f4b1a36af67251",
+          "sourceId": "eval-root:workspace-service/shared/shared-expense-guide-2026.md",
+          "name": "shared/shared-expense-guide-2026.md",
+          "sourceSha256": "79bedd9f4e9043494e064766b475959da5eb44a70ff892fa5484d7e9dafad363",
+          "contentSha256": "79bedd9f4e9043494e064766b475959da5eb44a70ff892fa5484d7e9dafad363",
+          "start": 0,
+          "end": 322,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 4.533026703408239,
+          "documentId": "shared-expense-guide-2026"
+        },
+        {
+          "id": "chunk:498d6ab1fef9b2392c0cebebeee3c485c324877ead5a3ae519f6bb5d904bd9f5",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "72bddfb9673cb497ef411e0eab6dde6f24780f3cae3dff021a73e23cd7106917",
+          "start": 3383,
+          "end": 4202,
+          "startLine": 21,
+          "endLine": 23,
+          "score": 3.0023048123472647,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:220a129f51f2567cff9407624abfb72de4dc0e2219ded6fefcd65c27d827c927",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "012a465a1cf5d44665c2dd802372f46be6b1a46487d86d4c524ea2c8e92f9447",
+          "start": 1701,
+          "end": 2537,
+          "startLine": 15,
+          "endLine": 17,
+          "score": 2.1392765789219066,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:48cebe8be266c5799da7e8a052236936c2261bf71f9cc9cb473a78e70fd34885",
+          "sourceId": "eval-root:workspace-service/shared/shared-office-rule-2026.md",
+          "name": "shared/shared-office-rule-2026.md",
+          "sourceSha256": "86f42473ec53cda5cdd5abee8a30944745bf9f17f0d4d88f7194bbe6f9ffa530",
+          "contentSha256": "86f42473ec53cda5cdd5abee8a30944745bf9f17f0d4d88f7194bbe6f9ffa530",
+          "start": 0,
+          "end": 333,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.5960303652081824,
+          "documentId": "shared-office-rule-2026"
+        },
+        {
+          "id": "chunk:a10a63c372646b4d2a924bb7d7111574641d086b46378327aac198cc3c2839ee",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "06404b43e29e56076e92767bf0e339bbec2c7cb6a4142c3d2e3524a83f334367",
+          "start": 0,
+          "end": 895,
+          "startLine": 1,
+          "endLine": 11,
+          "score": 1.3984957345007432,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:710a1492bead599b1e9b02908ad832e980c0dc9e308301db5dfa3341f1597212",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v1.txt",
+          "name": "workspace-service/service-budget-2026-v1.txt",
+          "sourceSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "contentSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "start": 0,
+          "end": 399,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 0.8823525691392884,
+          "documentId": "service-budget-2026-v1"
+        },
+        {
+          "id": "chunk:b11fe8e09e05200735467d23751eba6976bbba87c6bc4d1bc0f61cd4b030b67d",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v2.hwpx",
+          "name": "workspace-service/service-budget-2026-v2.hwpx",
+          "sourceSha256": "a03266b24af198877fce8170be9ca4d40632631b307549a52d08afc67f9d741c",
+          "contentSha256": "e2320d1766a9d51e09878b1cdc38b32a09ef01638a1e718d0b81b9e74c7a026f",
+          "start": 0,
+          "end": 455,
+          "startLine": 1,
+          "endLine": 20,
+          "score": 0.8823525691392884,
+          "documentId": "service-budget-2026-v2"
+        },
+        {
+          "id": "chunk:c52ce418fbeb274c99451d1f8dedafeb017fedb87fed8a69476e29a9f36d4db1",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-schedule-2026.hwpx",
+          "name": "workspace-service/service-schedule-2026.hwpx",
+          "sourceSha256": "b984aff5124026a9ee4cff5a035ec478437444bbd8891412c1d6f375f85b34e5",
+          "contentSha256": "6fccd6439468b26c8167d6e5bb77969d9bc712c6a32c4cbacaf36d486c762feb",
+          "start": 0,
+          "end": 395,
+          "startLine": 1,
+          "endLine": 19,
+          "score": 0.8823525691392884,
+          "documentId": "service-schedule-2026"
+        }
+      ]
+    },
+    {
+      "id": "approval-flow",
+      "category": "shared",
+      "query": "공통 사무 처리 규정의 작성, 검토, 승인 절차와 담당 역할을 알려 주세요.",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [
+        "shared-office-rule-2026"
+      ],
+      "rankedSourceIds": [
+        "service-plan-2026",
+        "shared-office-rule-2026",
+        "service-roles-2026",
+        "shared-record-rule-2025",
+        "shared-record-rule-2026",
+        "shared-expense-guide-2026"
+      ],
+      "expectedEvidence": [
+        {
+          "text": "행정지원팀",
+          "found": true
+        },
+        {
+          "text": "부서장",
+          "found": true
+        }
+      ],
+      "recallAt1": 0,
+      "recallAt3": 1,
+      "recallAt8": 1,
+      "precisionAt1": 0,
+      "precisionAt3": 0.3333333333333333,
+      "precisionAt8": 0.16666666666666666,
+      "reciprocalRank": 0.5,
+      "evidenceRecall": 1,
+      "noHitExpected": false,
+      "falsePositiveHitCount": null,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 17,
+      "returnedChunkCount": 8,
+      "sentCharacters": 3641,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [
+        "expected authority is not the first unique source"
+      ],
+      "latency": {
+        "extractionMilliseconds": 7.299000000000035,
+        "indexingMilliseconds": 0.14549999999997,
+        "searchMilliseconds": 0.23250000000001592,
+        "contextMilliseconds": 0.2785000000000082
+      },
+      "hits": [
+        {
+          "id": "chunk:5493ee64a385efae712a2f84aed0f3607639258dbbd8cf67c5f6a4863df0aca4",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "a1c98907a19399097d42cfd119b8decf30defb7b655161cad69976aa5af326de",
+          "start": 895,
+          "end": 1701,
+          "startLine": 12,
+          "endLine": 14,
+          "score": 8.386780116968051,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:48cebe8be266c5799da7e8a052236936c2261bf71f9cc9cb473a78e70fd34885",
+          "sourceId": "eval-root:workspace-service/shared/shared-office-rule-2026.md",
+          "name": "shared/shared-office-rule-2026.md",
+          "sourceSha256": "86f42473ec53cda5cdd5abee8a30944745bf9f17f0d4d88f7194bbe6f9ffa530",
+          "contentSha256": "86f42473ec53cda5cdd5abee8a30944745bf9f17f0d4d88f7194bbe6f9ffa530",
+          "start": 0,
+          "end": 333,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 7.692332216349312,
+          "documentId": "shared-office-rule-2026"
+        },
+        {
+          "id": "chunk:498d6ab1fef9b2392c0cebebeee3c485c324877ead5a3ae519f6bb5d904bd9f5",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "72bddfb9673cb497ef411e0eab6dde6f24780f3cae3dff021a73e23cd7106917",
+          "start": 3383,
+          "end": 4202,
+          "startLine": 21,
+          "endLine": 23,
+          "score": 7.570535761576733,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:f101a4b413c99914d719d87f56b995d7df9c76e7e363431394e1858fd6620de4",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "50f1c20e57685bcc7fd755fcb49fb16d7f96fc8ceca6184b1cdfc22386f1290f",
+          "start": 4202,
+          "end": 4615,
+          "startLine": 24,
+          "endLine": 35,
+          "score": 5.19203522738007,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:877dac48a30ef5782eb3db6941eeb39f47174152b1f61b7c6bed66b76012020f",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-roles-2026.txt",
+          "name": "workspace-service/service-roles-2026.txt",
+          "sourceSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "contentSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "start": 0,
+          "end": 318,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 4.788490105005677,
+          "documentId": "service-roles-2026"
+        },
+        {
+          "id": "chunk:9c9a28cdf4d997a41118aab39ce2c40be2cfd186c552a6a6511bb558a7224338",
+          "sourceId": "eval-root:workspace-service/shared/shared-record-rule-2025.txt",
+          "name": "shared/shared-record-rule-2025.txt",
+          "sourceSha256": "7744fd7606585855c59fc819b29fe323d6bedd7d27022fd238eac49f73a563df",
+          "contentSha256": "7744fd7606585855c59fc819b29fe323d6bedd7d27022fd238eac49f73a563df",
+          "start": 0,
+          "end": 312,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.3867968469756808,
+          "documentId": "shared-record-rule-2025"
+        },
+        {
+          "id": "chunk:7328052813f3d9b1af2e7b968113b60f2922ce6debe68c97b1b0f8a389f60836",
+          "sourceId": "eval-root:workspace-service/shared/shared-record-rule-2026.md",
+          "name": "shared/shared-record-rule-2026.md",
+          "sourceSha256": "dda2baccff97cab93451f765305b8ee4d14728032ad096d3051e918a5a80fe46",
+          "contentSha256": "dda2baccff97cab93451f765305b8ee4d14728032ad096d3051e918a5a80fe46",
+          "start": 0,
+          "end": 318,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.3867968469756808,
+          "documentId": "shared-record-rule-2026"
+        },
+        {
+          "id": "chunk:b71d2d5f2d522cecc805d33300153daffff4ea924fae212693f4b1a36af67251",
+          "sourceId": "eval-root:workspace-service/shared/shared-expense-guide-2026.md",
+          "name": "shared/shared-expense-guide-2026.md",
+          "sourceSha256": "79bedd9f4e9043494e064766b475959da5eb44a70ff892fa5484d7e9dafad363",
+          "contentSha256": "79bedd9f4e9043494e064766b475959da5eb44a70ff892fa5484d7e9dafad363",
+          "start": 0,
+          "end": 322,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 0.673119050906787,
+          "documentId": "shared-expense-guide-2026"
+        }
+      ]
+    },
+    {
+      "id": "compatibility-risk",
+      "category": "text",
+      "query": "민원 문서 전환 사업의 문서 호환성 위험에는 어떻게 대응하나요?",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [
+        "service-risks-2026"
+      ],
+      "rankedSourceIds": [
+        "service-plan-2026",
+        "service-risks-2026",
+        "service-glossary-2026",
+        "service-roles-2026",
+        "service-budget-2026-v1",
+        "service-budget-2026-v2"
+      ],
+      "expectedEvidence": [
+        {
+          "text": "원본",
+          "found": true
+        },
+        {
+          "text": "재열기",
+          "found": true
+        }
+      ],
+      "recallAt1": 0,
+      "recallAt3": 1,
+      "recallAt8": 1,
+      "precisionAt1": 0,
+      "precisionAt3": 0.3333333333333333,
+      "precisionAt8": 0.16666666666666666,
+      "reciprocalRank": 0.5,
+      "evidenceRecall": 1,
+      "noHitExpected": false,
+      "falsePositiveHitCount": null,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 17,
+      "returnedChunkCount": 8,
+      "sentCharacters": 4431,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [
+        "expected authority is not the first unique source"
+      ],
+      "latency": {
+        "extractionMilliseconds": 7.823499999999967,
+        "indexingMilliseconds": 0.11960000000004811,
+        "searchMilliseconds": 0.22560000000004266,
+        "contextMilliseconds": 0.2659999999999627
+      },
+      "hits": [
+        {
+          "id": "chunk:a10a63c372646b4d2a924bb7d7111574641d086b46378327aac198cc3c2839ee",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "06404b43e29e56076e92767bf0e339bbec2c7cb6a4142c3d2e3524a83f334367",
+          "start": 0,
+          "end": 895,
+          "startLine": 1,
+          "endLine": 11,
+          "score": 6.730407451919364,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:0c20e4653e5a0473e1904fad661901bcf440bf957cbd24677f11598f42134c1b",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-risks-2026.md",
+          "name": "workspace-service/service-risks-2026.md",
+          "sourceSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "contentSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "start": 0,
+          "end": 366,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 6.111193667666634,
+          "documentId": "service-risks-2026"
+        },
+        {
+          "id": "chunk:498d6ab1fef9b2392c0cebebeee3c485c324877ead5a3ae519f6bb5d904bd9f5",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "72bddfb9673cb497ef411e0eab6dde6f24780f3cae3dff021a73e23cd7106917",
+          "start": 3383,
+          "end": 4202,
+          "startLine": 21,
+          "endLine": 23,
+          "score": 3.192994260015214,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:220a129f51f2567cff9407624abfb72de4dc0e2219ded6fefcd65c27d827c927",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "012a465a1cf5d44665c2dd802372f46be6b1a46487d86d4c524ea2c8e92f9447",
+          "start": 1701,
+          "end": 2537,
+          "startLine": 15,
+          "endLine": 17,
+          "score": 2.9063797743396296,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:c0390ec96b85296bd81d33911498ef024cf884a888303d61ce8e93afa32c6060",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-glossary-2026.md",
+          "name": "workspace-service/service-glossary-2026.md",
+          "sourceSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "contentSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "start": 0,
+          "end": 343,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.148461973984987,
+          "documentId": "service-glossary-2026"
+        },
+        {
+          "id": "chunk:877dac48a30ef5782eb3db6941eeb39f47174152b1f61b7c6bed66b76012020f",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-roles-2026.txt",
+          "name": "workspace-service/service-roles-2026.txt",
+          "sourceSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "contentSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "start": 0,
+          "end": 318,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.8150769598903704,
+          "documentId": "service-roles-2026"
+        },
+        {
+          "id": "chunk:710a1492bead599b1e9b02908ad832e980c0dc9e308301db5dfa3341f1597212",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v1.txt",
+          "name": "workspace-service/service-budget-2026-v1.txt",
+          "sourceSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "contentSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "start": 0,
+          "end": 399,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.7181226195081316,
+          "documentId": "service-budget-2026-v1"
+        },
+        {
+          "id": "chunk:b11fe8e09e05200735467d23751eba6976bbba87c6bc4d1bc0f61cd4b030b67d",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v2.hwpx",
+          "name": "workspace-service/service-budget-2026-v2.hwpx",
+          "sourceSha256": "a03266b24af198877fce8170be9ca4d40632631b307549a52d08afc67f9d741c",
+          "contentSha256": "e2320d1766a9d51e09878b1cdc38b32a09ef01638a1e718d0b81b9e74c7a026f",
+          "start": 0,
+          "end": 455,
+          "startLine": 1,
+          "endLine": 20,
+          "score": 1.7181226195081316,
+          "documentId": "service-budget-2026-v2"
+        }
+      ]
+    },
+    {
+      "id": "roles",
+      "category": "text",
+      "query": "민원 문서 전환 사업의 검토와 승인은 어느 역할이 맡나요?",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [
+        "service-roles-2026"
+      ],
+      "rankedSourceIds": [
+        "service-plan-2026",
+        "service-roles-2026",
+        "service-risks-2026",
+        "service-glossary-2026",
+        "service-budget-2026-v1",
+        "service-budget-2026-v2"
+      ],
+      "expectedEvidence": [
+        {
+          "text": "행정지원팀",
+          "found": true
+        },
+        {
+          "text": "부서장",
+          "found": true
+        }
+      ],
+      "recallAt1": 0,
+      "recallAt3": 1,
+      "recallAt8": 1,
+      "precisionAt1": 0,
+      "precisionAt3": 0.3333333333333333,
+      "precisionAt8": 0.16666666666666666,
+      "reciprocalRank": 0.5,
+      "evidenceRecall": 1,
+      "noHitExpected": false,
+      "falsePositiveHitCount": null,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 17,
+      "returnedChunkCount": 8,
+      "sentCharacters": 4441,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [
+        "expected authority is not the first unique source"
+      ],
+      "latency": {
+        "extractionMilliseconds": 7.185000000000002,
+        "indexingMilliseconds": 0.12060000000002447,
+        "searchMilliseconds": 0.234800000000007,
+        "contextMilliseconds": 0.367999999999995
+      },
+      "hits": [
+        {
+          "id": "chunk:a10a63c372646b4d2a924bb7d7111574641d086b46378327aac198cc3c2839ee",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "06404b43e29e56076e92767bf0e339bbec2c7cb6a4142c3d2e3524a83f334367",
+          "start": 0,
+          "end": 895,
+          "startLine": 1,
+          "endLine": 11,
+          "score": 6.637431887751031,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:877dac48a30ef5782eb3db6941eeb39f47174152b1f61b7c6bed66b76012020f",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-roles-2026.txt",
+          "name": "workspace-service/service-roles-2026.txt",
+          "sourceSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "contentSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "start": 0,
+          "end": 318,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 4.78433818609328,
+          "documentId": "service-roles-2026"
+        },
+        {
+          "id": "chunk:0c20e4653e5a0473e1904fad661901bcf440bf957cbd24677f11598f42134c1b",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-risks-2026.md",
+          "name": "workspace-service/service-risks-2026.md",
+          "sourceSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "contentSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "start": 0,
+          "end": 366,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 3.1995510002698877,
+          "documentId": "service-risks-2026"
+        },
+        {
+          "id": "chunk:498d6ab1fef9b2392c0cebebeee3c485c324877ead5a3ae519f6bb5d904bd9f5",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "72bddfb9673cb497ef411e0eab6dde6f24780f3cae3dff021a73e23cd7106917",
+          "start": 3383,
+          "end": 4202,
+          "startLine": 21,
+          "endLine": 23,
+          "score": 2.987246804171977,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:c0390ec96b85296bd81d33911498ef024cf884a888303d61ce8e93afa32c6060",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-glossary-2026.md",
+          "name": "workspace-service/service-glossary-2026.md",
+          "sourceSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "contentSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "start": 0,
+          "end": 343,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.148461973984987,
+          "documentId": "service-glossary-2026"
+        },
+        {
+          "id": "chunk:e11f5225b4e485b2fc3de4712be273e0a57d4683bce7d2b6543af006283415c8",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "2e55cd78d0b9b2ea49a777da1b15479a7f27a64499b1f4f169befcf255533312",
+          "start": 2537,
+          "end": 3383,
+          "startLine": 18,
+          "endLine": 20,
+          "score": 1.927452070286114,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:710a1492bead599b1e9b02908ad832e980c0dc9e308301db5dfa3341f1597212",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v1.txt",
+          "name": "workspace-service/service-budget-2026-v1.txt",
+          "sourceSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "contentSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "start": 0,
+          "end": 399,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.7181226195081316,
+          "documentId": "service-budget-2026-v1"
+        },
+        {
+          "id": "chunk:b11fe8e09e05200735467d23751eba6976bbba87c6bc4d1bc0f61cd4b030b67d",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v2.hwpx",
+          "name": "workspace-service/service-budget-2026-v2.hwpx",
+          "sourceSha256": "a03266b24af198877fce8170be9ca4d40632631b307549a52d08afc67f9d741c",
+          "contentSha256": "e2320d1766a9d51e09878b1cdc38b32a09ef01638a1e718d0b81b9e74c7a026f",
+          "start": 0,
+          "end": 455,
+          "startLine": 1,
+          "endLine": 20,
+          "score": 1.7181226195081316,
+          "documentId": "service-budget-2026-v2"
+        }
+      ]
+    },
+    {
+      "id": "semantic-alias",
+      "category": "alias",
+      "query": "자료 디지털화는 이 업무에서 어떤 용어와 같은 뜻인가요?",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [
+        "service-glossary-2026"
+      ],
+      "rankedSourceIds": [
+        "service-glossary-2026",
+        "service-plan-2026",
+        "service-roles-2026"
+      ],
+      "expectedEvidence": [
+        {
+          "text": "문서 전환",
+          "found": true
+        }
+      ],
+      "recallAt1": 1,
+      "recallAt3": 1,
+      "recallAt8": 1,
+      "precisionAt1": 1,
+      "precisionAt3": 0.3333333333333333,
+      "precisionAt8": 0.3333333333333333,
+      "reciprocalRank": 1,
+      "evidenceRecall": 1,
+      "noHitExpected": false,
+      "falsePositiveHitCount": null,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 8,
+      "returnedChunkCount": 5,
+      "sentCharacters": 3221,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [],
+      "latency": {
+        "extractionMilliseconds": 7.784800000000018,
+        "indexingMilliseconds": 0.12140000000005102,
+        "searchMilliseconds": 0.21749999999997272,
+        "contextMilliseconds": 0.26890000000003056
+      },
+      "hits": [
+        {
+          "id": "chunk:c0390ec96b85296bd81d33911498ef024cf884a888303d61ce8e93afa32c6060",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-glossary-2026.md",
+          "name": "workspace-service/service-glossary-2026.md",
+          "sourceSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "contentSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "start": 0,
+          "end": 343,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 5.741405988867772,
+          "documentId": "service-glossary-2026"
+        },
+        {
+          "id": "chunk:498d6ab1fef9b2392c0cebebeee3c485c324877ead5a3ae519f6bb5d904bd9f5",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "72bddfb9673cb497ef411e0eab6dde6f24780f3cae3dff021a73e23cd7106917",
+          "start": 3383,
+          "end": 4202,
+          "startLine": 21,
+          "endLine": 23,
+          "score": 4.969174639408765,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:e11f5225b4e485b2fc3de4712be273e0a57d4683bce7d2b6543af006283415c8",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "2e55cd78d0b9b2ea49a777da1b15479a7f27a64499b1f4f169befcf255533312",
+          "start": 2537,
+          "end": 3383,
+          "startLine": 18,
+          "endLine": 20,
+          "score": 2.5362348160962234,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:a10a63c372646b4d2a924bb7d7111574641d086b46378327aac198cc3c2839ee",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "06404b43e29e56076e92767bf0e339bbec2c7cb6a4142c3d2e3524a83f334367",
+          "start": 0,
+          "end": 895,
+          "startLine": 1,
+          "endLine": 11,
+          "score": 1.6755946884675152,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:877dac48a30ef5782eb3db6941eeb39f47174152b1f61b7c6bed66b76012020f",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-roles-2026.txt",
+          "name": "workspace-service/service-roles-2026.txt",
+          "sourceSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "contentSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "start": 0,
+          "end": 318,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 0.2589769726161997,
+          "documentId": "service-roles-2026"
+        }
+      ]
+    },
+    {
+      "id": "temporary-confirmation",
+      "category": "temporary",
+      "query": "10월 12일 회의에서 확정한 사업 예산과 완료 일자를 알려 주세요.",
+      "workspaceId": "workspace-service",
+      "temporary": true,
+      "expectedDocs": [
+        "temporary-service-meeting-20261012"
+      ],
+      "rankedSourceIds": [
+        "service-plan-2026",
+        "shared-expense-guide-2026",
+        "temporary-service-meeting-20261012",
+        "service-schedule-2026",
+        "service-glossary-2026",
+        "shared-record-rule-2025"
+      ],
+      "expectedEvidence": [
+        {
+          "text": "48,000,000",
+          "found": true
+        },
+        {
+          "text": "2026-12-18",
+          "found": true
+        }
+      ],
+      "recallAt1": 0,
+      "recallAt3": 1,
+      "recallAt8": 1,
+      "precisionAt1": 0,
+      "precisionAt3": 0.3333333333333333,
+      "precisionAt8": 0.16666666666666666,
+      "reciprocalRank": 0.3333333333333333,
+      "evidenceRecall": 1,
+      "noHitExpected": false,
+      "falsePositiveHitCount": null,
+      "sourceCount": 13,
+      "sourceCharacters": 9186,
+      "indexedChunkCount": 18,
+      "candidateChunkCount": 18,
+      "returnedChunkCount": 8,
+      "sentCharacters": 4200,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [
+        "expected authority is not the first unique source"
+      ],
+      "latency": {
+        "extractionMilliseconds": 10.121999999999957,
+        "indexingMilliseconds": 0.18849999999997635,
+        "searchMilliseconds": 0.5423000000000116,
+        "contextMilliseconds": 0.4966000000000008
+      },
+      "hits": [
+        {
+          "id": "chunk:e11f5225b4e485b2fc3de4712be273e0a57d4683bce7d2b6543af006283415c8",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "2e55cd78d0b9b2ea49a777da1b15479a7f27a64499b1f4f169befcf255533312",
+          "start": 2537,
+          "end": 3383,
+          "startLine": 18,
+          "endLine": 20,
+          "score": 5.086413462635086,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:b71d2d5f2d522cecc805d33300153daffff4ea924fae212693f4b1a36af67251",
+          "sourceId": "eval-root:workspace-service/shared/shared-expense-guide-2026.md",
+          "name": "shared/shared-expense-guide-2026.md",
+          "sourceSha256": "79bedd9f4e9043494e064766b475959da5eb44a70ff892fa5484d7e9dafad363",
+          "contentSha256": "79bedd9f4e9043494e064766b475959da5eb44a70ff892fa5484d7e9dafad363",
+          "start": 0,
+          "end": 322,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 3.6176696297347806,
+          "documentId": "shared-expense-guide-2026"
+        },
+        {
+          "id": "chunk:f7c459e993eefba31a0b1c3572f4fff37925497ea6413610fd8d2fcecff9d749",
+          "sourceId": "attachment:ac9524e2-1c66-46df-a4f0-e25186dc6b25",
+          "name": "temporary-service-meeting-20261012.hwpx",
+          "sourceSha256": "a37b95ece1cf3557e537fc4b2c50c04bc282a0e35effe93c679055f1e02e5c70",
+          "contentSha256": "287f6994ea9db36ee83cad4326e88b2d5092cd343d390380d4381a3e9c3913a6",
+          "start": 0,
+          "end": 674,
+          "startLine": 1,
+          "endLine": 21,
+          "score": 3.411640758613478,
+          "documentId": "temporary-service-meeting-20261012"
+        },
+        {
+          "id": "chunk:f101a4b413c99914d719d87f56b995d7df9c76e7e363431394e1858fd6620de4",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "50f1c20e57685bcc7fd755fcb49fb16d7f96fc8ceca6184b1cdfc22386f1290f",
+          "start": 4202,
+          "end": 4615,
+          "startLine": 24,
+          "endLine": 35,
+          "score": 2.235352628537722,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:c52ce418fbeb274c99451d1f8dedafeb017fedb87fed8a69476e29a9f36d4db1",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-schedule-2026.hwpx",
+          "name": "workspace-service/service-schedule-2026.hwpx",
+          "sourceSha256": "b984aff5124026a9ee4cff5a035ec478437444bbd8891412c1d6f375f85b34e5",
+          "contentSha256": "6fccd6439468b26c8167d6e5bb77969d9bc712c6a32c4cbacaf36d486c762feb",
+          "start": 0,
+          "end": 395,
+          "startLine": 1,
+          "endLine": 19,
+          "score": 1.93908905760725,
+          "documentId": "service-schedule-2026"
+        },
+        {
+          "id": "chunk:a10a63c372646b4d2a924bb7d7111574641d086b46378327aac198cc3c2839ee",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "06404b43e29e56076e92767bf0e339bbec2c7cb6a4142c3d2e3524a83f334367",
+          "start": 0,
+          "end": 895,
+          "startLine": 1,
+          "endLine": 11,
+          "score": 1.8150703794137346,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:c0390ec96b85296bd81d33911498ef024cf884a888303d61ce8e93afa32c6060",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-glossary-2026.md",
+          "name": "workspace-service/service-glossary-2026.md",
+          "sourceSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "contentSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "start": 0,
+          "end": 343,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.5809080915773985,
+          "documentId": "service-glossary-2026"
+        },
+        {
+          "id": "chunk:9c9a28cdf4d997a41118aab39ce2c40be2cfd186c552a6a6511bb558a7224338",
+          "sourceId": "eval-root:workspace-service/shared/shared-record-rule-2025.txt",
+          "name": "shared/shared-record-rule-2025.txt",
+          "sourceSha256": "7744fd7606585855c59fc819b29fe323d6bedd7d27022fd238eac49f73a563df",
+          "contentSha256": "7744fd7606585855c59fc819b29fe323d6bedd7d27022fd238eac49f73a563df",
+          "start": 0,
+          "end": 312,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.5237923817819732,
+          "documentId": "shared-record-rule-2025"
+        }
+      ]
+    },
+    {
+      "id": "other-budget",
+      "category": "other-workspace",
+      "query": "재난 대응 문서 전환 사업의 확정 총예산은 얼마인가요?",
+      "workspaceId": "workspace-other",
+      "temporary": false,
+      "expectedDocs": [
+        "other-budget-2026"
+      ],
+      "rankedSourceIds": [
+        "other-plan-2026",
+        "other-meeting-2026",
+        "other-budget-2026",
+        "shared-expense-guide-2026",
+        "shared-office-rule-2026",
+        "shared-record-rule-2025",
+        "shared-record-rule-2026"
+      ],
+      "expectedEvidence": [
+        {
+          "text": "72,000,000",
+          "found": true
+        }
+      ],
+      "recallAt1": 0,
+      "recallAt3": 1,
+      "recallAt8": 1,
+      "precisionAt1": 0,
+      "precisionAt3": 0.3333333333333333,
+      "precisionAt8": 0.14285714285714285,
+      "reciprocalRank": 0.3333333333333333,
+      "evidenceRecall": 1,
+      "noHitExpected": false,
+      "falsePositiveHitCount": null,
+      "sourceCount": 7,
+      "sourceCharacters": 2346,
+      "indexedChunkCount": 7,
+      "candidateChunkCount": 7,
+      "returnedChunkCount": 7,
+      "sentCharacters": 2346,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [
+        "expected authority is not the first unique source"
+      ],
+      "latency": {
+        "extractionMilliseconds": 1.5120000000000005,
+        "indexingMilliseconds": 0.05680000000000973,
+        "searchMilliseconds": 0.09769999999997481,
+        "contextMilliseconds": 0.103999999999985
+      },
+      "hits": [
+        {
+          "id": "chunk:147cff5199c3b84357d84d2cb8cfde11fbd89265f80796aeebdde1c8afed4f6a",
+          "sourceId": "eval-root:workspace-other/workspace-other/other-plan-2026.txt",
+          "name": "workspace-other/other-plan-2026.txt",
+          "sourceSha256": "0f2116b2c6c06556b03fa6561f1606848b9cdb8e2c9308b479d713330cc10fa1",
+          "contentSha256": "0f2116b2c6c06556b03fa6561f1606848b9cdb8e2c9308b479d713330cc10fa1",
+          "start": 0,
+          "end": 329,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 6.947675702878596,
+          "documentId": "other-plan-2026"
+        },
+        {
+          "id": "chunk:b011fd5efe789ba1acb9f1b959f415a8d14476fab59949266058af30cc95480a",
+          "sourceId": "eval-root:workspace-other/workspace-other/other-meeting-2026.md",
+          "name": "workspace-other/other-meeting-2026.md",
+          "sourceSha256": "aa45ebf58acf3d5c4c82a62bea605bdbf560b25acc7380e4597ea97e633a64a5",
+          "contentSha256": "aa45ebf58acf3d5c4c82a62bea605bdbf560b25acc7380e4597ea97e633a64a5",
+          "start": 0,
+          "end": 347,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 6.183994155986471,
+          "documentId": "other-meeting-2026"
+        },
+        {
+          "id": "chunk:2094ac0dff099f687d69173fd78a01c574a675b37763ffd07e49165c438c551c",
+          "sourceId": "eval-root:workspace-other/workspace-other/other-budget-2026.hwpx",
+          "name": "workspace-other/other-budget-2026.hwpx",
+          "sourceSha256": "f32187fa3716f7e70773a63b34f2b8bc2978f45b28270cf8f50bf33e8a895409",
+          "contentSha256": "9d8b5c4070d4008aa7413761125066f4f277192b8abb1c7c5ee969ffe047b863",
+          "start": 0,
+          "end": 385,
+          "startLine": 1,
+          "endLine": 19,
+          "score": 3.4630165259427326,
+          "documentId": "other-budget-2026"
+        },
+        {
+          "id": "chunk:68c4369182569f52a8b357b76b2726e467f38074ee50633d0869e0551c917e05",
+          "sourceId": "eval-root:workspace-other/shared/shared-expense-guide-2026.md",
+          "name": "shared/shared-expense-guide-2026.md",
+          "sourceSha256": "79bedd9f4e9043494e064766b475959da5eb44a70ff892fa5484d7e9dafad363",
+          "contentSha256": "79bedd9f4e9043494e064766b475959da5eb44a70ff892fa5484d7e9dafad363",
+          "start": 0,
+          "end": 322,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 0.37876937668022126,
+          "documentId": "shared-expense-guide-2026"
+        },
+        {
+          "id": "chunk:e1d58006829ef44e451b9ebfc03af4d03ae15a67a57b368eaef52d9fff8b8932",
+          "sourceId": "eval-root:workspace-other/shared/shared-office-rule-2026.md",
+          "name": "shared/shared-office-rule-2026.md",
+          "sourceSha256": "86f42473ec53cda5cdd5abee8a30944745bf9f17f0d4d88f7194bbe6f9ffa530",
+          "contentSha256": "86f42473ec53cda5cdd5abee8a30944745bf9f17f0d4d88f7194bbe6f9ffa530",
+          "start": 0,
+          "end": 333,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 0.2113100913072466,
+          "documentId": "shared-office-rule-2026"
+        },
+        {
+          "id": "chunk:cc237ddacc9a6a50559069042a22f82ed2cb508a46818c6323e5863f1220e3a8",
+          "sourceId": "eval-root:workspace-other/shared/shared-record-rule-2025.txt",
+          "name": "shared/shared-record-rule-2025.txt",
+          "sourceSha256": "7744fd7606585855c59fc819b29fe323d6bedd7d27022fd238eac49f73a563df",
+          "contentSha256": "7744fd7606585855c59fc819b29fe323d6bedd7d27022fd238eac49f73a563df",
+          "start": 0,
+          "end": 312,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 0.2113100913072466,
+          "documentId": "shared-record-rule-2025"
+        },
+        {
+          "id": "chunk:7866a019072b7cdeaef8eae9dc5dc5845d84ea203e3ef93e506e9e2f74359e96",
+          "sourceId": "eval-root:workspace-other/shared/shared-record-rule-2026.md",
+          "name": "shared/shared-record-rule-2026.md",
+          "sourceSha256": "dda2baccff97cab93451f765305b8ee4d14728032ad096d3051e918a5a80fe46",
+          "contentSha256": "dda2baccff97cab93451f765305b8ee4d14728032ad096d3051e918a5a80fe46",
+          "start": 0,
+          "end": 318,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 0.2113100913072466,
+          "documentId": "shared-record-rule-2026"
+        }
+      ]
+    },
+    {
+      "id": "unknown-word",
+      "category": "unanswerable",
+      "query": "제노퀘이사 오로라관측 망원경의 초점거리는?",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [],
+      "rankedSourceIds": [],
+      "expectedEvidence": [],
+      "recallAt1": null,
+      "recallAt3": null,
+      "recallAt8": null,
+      "precisionAt1": null,
+      "precisionAt3": null,
+      "precisionAt8": null,
+      "reciprocalRank": null,
+      "evidenceRecall": null,
+      "noHitExpected": true,
+      "falsePositiveHitCount": 0,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 0,
+      "returnedChunkCount": 0,
+      "sentCharacters": 0,
+      "warnings": [
+        "선택한 자료에서 관련 구간을 찾지 못했습니다. 이번 요청에는 참고 자료 본문을 전달하지 않습니다. 검색어를 구체화하거나 전체 자료 전달 모드를 사용하세요."
+      ],
+      "qualityIssues": [],
+      "latency": {
+        "extractionMilliseconds": 7.380800000000022,
+        "indexingMilliseconds": 0.16639999999995325,
+        "searchMilliseconds": 0.1664000000000101,
+        "contextMilliseconds": 0.2604000000000042
+      },
+      "hits": []
+    },
+    {
+      "id": "unknown-overlap",
+      "category": "unanswerable-overlap",
+      "query": "민원 문서 전환 사업 담당자의 개인 휴대전화 번호와 주민등록번호를 알려 주세요.",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [],
+      "rankedSourceIds": [
+        "service-plan-2026",
+        "service-roles-2026",
+        "service-glossary-2026",
+        "service-budget-2026-v1",
+        "service-budget-2026-v2",
+        "service-risks-2026",
+        "service-schedule-2026-v1"
+      ],
+      "expectedEvidence": [],
+      "recallAt1": null,
+      "recallAt3": null,
+      "recallAt8": null,
+      "precisionAt1": 0,
+      "precisionAt3": 0,
+      "precisionAt8": 0,
+      "reciprocalRank": null,
+      "evidenceRecall": null,
+      "noHitExpected": true,
+      "falsePositiveHitCount": 8,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 17,
+      "returnedChunkCount": 8,
+      "sentCharacters": 3931,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [
+        "unanswerable question still returned lexical matches; no automatic abstention"
+      ],
+      "latency": {
+        "extractionMilliseconds": 8.073900000000037,
+        "indexingMilliseconds": 0.14690000000001646,
+        "searchMilliseconds": 0.22570000000001755,
+        "contextMilliseconds": 0.3044999999999618
+      },
+      "hits": [
+        {
+          "id": "chunk:a10a63c372646b4d2a924bb7d7111574641d086b46378327aac198cc3c2839ee",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "06404b43e29e56076e92767bf0e339bbec2c7cb6a4142c3d2e3524a83f334367",
+          "start": 0,
+          "end": 895,
+          "startLine": 1,
+          "endLine": 11,
+          "score": 5.511974200597852,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:498d6ab1fef9b2392c0cebebeee3c485c324877ead5a3ae519f6bb5d904bd9f5",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "72bddfb9673cb497ef411e0eab6dde6f24780f3cae3dff021a73e23cd7106917",
+          "start": 3383,
+          "end": 4202,
+          "startLine": 21,
+          "endLine": 23,
+          "score": 3.9580238627176803,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:877dac48a30ef5782eb3db6941eeb39f47174152b1f61b7c6bed66b76012020f",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-roles-2026.txt",
+          "name": "workspace-service/service-roles-2026.txt",
+          "sourceSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "contentSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "start": 0,
+          "end": 318,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 3.245490221965059,
+          "documentId": "service-roles-2026"
+        },
+        {
+          "id": "chunk:c0390ec96b85296bd81d33911498ef024cf884a888303d61ce8e93afa32c6060",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-glossary-2026.md",
+          "name": "workspace-service/service-glossary-2026.md",
+          "sourceSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "contentSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "start": 0,
+          "end": 343,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.875021365408248,
+          "documentId": "service-glossary-2026"
+        },
+        {
+          "id": "chunk:710a1492bead599b1e9b02908ad832e980c0dc9e308301db5dfa3341f1597212",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v1.txt",
+          "name": "workspace-service/service-budget-2026-v1.txt",
+          "sourceSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "contentSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "start": 0,
+          "end": 399,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.6349384950795436,
+          "documentId": "service-budget-2026-v1"
+        },
+        {
+          "id": "chunk:b11fe8e09e05200735467d23751eba6976bbba87c6bc4d1bc0f61cd4b030b67d",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v2.hwpx",
+          "name": "workspace-service/service-budget-2026-v2.hwpx",
+          "sourceSha256": "a03266b24af198877fce8170be9ca4d40632631b307549a52d08afc67f9d741c",
+          "contentSha256": "e2320d1766a9d51e09878b1cdc38b32a09ef01638a1e718d0b81b9e74c7a026f",
+          "start": 0,
+          "end": 455,
+          "startLine": 1,
+          "endLine": 20,
+          "score": 2.6349384950795436,
+          "documentId": "service-budget-2026-v2"
+        },
+        {
+          "id": "chunk:0c20e4653e5a0473e1904fad661901bcf440bf957cbd24677f11598f42134c1b",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-risks-2026.md",
+          "name": "workspace-service/service-risks-2026.md",
+          "sourceSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "contentSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "start": 0,
+          "end": 366,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.0619285728474113,
+          "documentId": "service-risks-2026"
+        },
+        {
+          "id": "chunk:298ea9ac947293b769e0a57312e5ba951c041872bcf26ecea8d78874e198ec88",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-schedule-2026-v1.md",
+          "name": "workspace-service/service-schedule-2026-v1.md",
+          "sourceSha256": "f25b4caf0a1cccd22ab2e603e945223a0abcd9634a6f6b90d46794252e1b38b2",
+          "contentSha256": "f25b4caf0a1cccd22ab2e603e945223a0abcd9634a6f6b90d46794252e1b38b2",
+          "start": 0,
+          "end": 336,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.0619285728474113,
+          "documentId": "service-schedule-2026-v1"
+        }
+      ]
+    },
+    {
+      "id": "foreign-unselected",
+      "category": "unanswerable-scope",
+      "query": "재난 대응 문서 전환 사업의 자문 예산은 얼마인가요?",
+      "workspaceId": "workspace-service",
+      "temporary": false,
+      "expectedDocs": [],
+      "rankedSourceIds": [
+        "service-plan-2026",
+        "service-budget-2026-v1",
+        "service-risks-2026",
+        "service-glossary-2026",
+        "service-budget-2026-v2",
+        "service-roles-2026",
+        "service-schedule-2026-v1"
+      ],
+      "expectedEvidence": [],
+      "recallAt1": null,
+      "recallAt3": null,
+      "recallAt8": null,
+      "precisionAt1": 0,
+      "precisionAt3": 0,
+      "precisionAt8": 0,
+      "reciprocalRank": null,
+      "evidenceRecall": null,
+      "noHitExpected": true,
+      "falsePositiveHitCount": 8,
+      "sourceCount": 12,
+      "sourceCharacters": 8512,
+      "indexedChunkCount": 17,
+      "candidateChunkCount": 15,
+      "returnedChunkCount": 8,
+      "sentCharacters": 3931,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [
+        "unanswerable question still returned lexical matches; no automatic abstention"
+      ],
+      "latency": {
+        "extractionMilliseconds": 7.87360000000001,
+        "indexingMilliseconds": 0.11760000000003856,
+        "searchMilliseconds": 0.2267999999999688,
+        "contextMilliseconds": 0.2838999999999601
+      },
+      "hits": [
+        {
+          "id": "chunk:a10a63c372646b4d2a924bb7d7111574641d086b46378327aac198cc3c2839ee",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "06404b43e29e56076e92767bf0e339bbec2c7cb6a4142c3d2e3524a83f334367",
+          "start": 0,
+          "end": 895,
+          "startLine": 1,
+          "endLine": 11,
+          "score": 8.425830677455622,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:710a1492bead599b1e9b02908ad832e980c0dc9e308301db5dfa3341f1597212",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v1.txt",
+          "name": "workspace-service/service-budget-2026-v1.txt",
+          "sourceSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "contentSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "start": 0,
+          "end": 399,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 3.7613984159639857,
+          "documentId": "service-budget-2026-v1"
+        },
+        {
+          "id": "chunk:0c20e4653e5a0473e1904fad661901bcf440bf957cbd24677f11598f42134c1b",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-risks-2026.md",
+          "name": "workspace-service/service-risks-2026.md",
+          "sourceSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "contentSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "start": 0,
+          "end": 366,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 2.64221572166814,
+          "documentId": "service-risks-2026"
+        },
+        {
+          "id": "chunk:498d6ab1fef9b2392c0cebebeee3c485c324877ead5a3ae519f6bb5d904bd9f5",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "72bddfb9673cb497ef411e0eab6dde6f24780f3cae3dff021a73e23cd7106917",
+          "start": 3383,
+          "end": 4202,
+          "startLine": 21,
+          "endLine": 23,
+          "score": 2.144440407142672,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:c0390ec96b85296bd81d33911498ef024cf884a888303d61ce8e93afa32c6060",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-glossary-2026.md",
+          "name": "workspace-service/service-glossary-2026.md",
+          "sourceSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "contentSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "start": 0,
+          "end": 343,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.59112669538324,
+          "documentId": "service-glossary-2026"
+        },
+        {
+          "id": "chunk:b11fe8e09e05200735467d23751eba6976bbba87c6bc4d1bc0f61cd4b030b67d",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v2.hwpx",
+          "name": "workspace-service/service-budget-2026-v2.hwpx",
+          "sourceSha256": "a03266b24af198877fce8170be9ca4d40632631b307549a52d08afc67f9d741c",
+          "contentSha256": "e2320d1766a9d51e09878b1cdc38b32a09ef01638a1e718d0b81b9e74c7a026f",
+          "start": 0,
+          "end": 455,
+          "startLine": 1,
+          "endLine": 20,
+          "score": 1.31228292387596,
+          "documentId": "service-budget-2026-v2"
+        },
+        {
+          "id": "chunk:877dac48a30ef5782eb3db6941eeb39f47174152b1f61b7c6bed66b76012020f",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-roles-2026.txt",
+          "name": "workspace-service/service-roles-2026.txt",
+          "sourceSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "contentSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "start": 0,
+          "end": 318,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.0461853564599577,
+          "documentId": "service-roles-2026"
+        },
+        {
+          "id": "chunk:298ea9ac947293b769e0a57312e5ba951c041872bcf26ecea8d78874e198ec88",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-schedule-2026-v1.md",
+          "name": "workspace-service/service-schedule-2026-v1.md",
+          "sourceSha256": "f25b4caf0a1cccd22ab2e603e945223a0abcd9634a6f6b90d46794252e1b38b2",
+          "contentSha256": "f25b4caf0a1cccd22ab2e603e945223a0abcd9634a6f6b90d46794252e1b38b2",
+          "start": 0,
+          "end": 336,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 1.0461853564599577,
+          "documentId": "service-schedule-2026-v1"
+        }
+      ]
+    },
+    {
+      "id": "unknown-key",
+      "category": "unanswerable-overlap",
+      "query": "첨부 회의록에서 사용하는 실제 서비스 API 키 값을 알려 주세요.",
+      "workspaceId": "workspace-service",
+      "temporary": true,
+      "expectedDocs": [],
+      "rankedSourceIds": [
+        "service-plan-2026",
+        "temporary-service-meeting-20261012",
+        "service-budget-2026-v2",
+        "shared-office-rule-2026",
+        "shared-record-rule-2026",
+        "service-glossary-2026"
+      ],
+      "expectedEvidence": [],
+      "recallAt1": null,
+      "recallAt3": null,
+      "recallAt8": null,
+      "precisionAt1": 0,
+      "precisionAt3": 0,
+      "precisionAt8": 0,
+      "reciprocalRank": null,
+      "evidenceRecall": null,
+      "noHitExpected": true,
+      "falsePositiveHitCount": 8,
+      "sourceCount": 13,
+      "sourceCharacters": 9186,
+      "indexedChunkCount": 18,
+      "candidateChunkCount": 18,
+      "returnedChunkCount": 8,
+      "sentCharacters": 4624,
+      "warnings": [
+        "문자열 기반 관련도 검색입니다. 전체 자료를 모델에 전달하지 않으며 숫자·사실의 정확성을 보증하지 않습니다."
+      ],
+      "qualityIssues": [
+        "unanswerable question still returned lexical matches; no automatic abstention"
+      ],
+      "latency": {
+        "extractionMilliseconds": 8.957799999999963,
+        "indexingMilliseconds": 0.1291999999999689,
+        "searchMilliseconds": 0.2948999999999842,
+        "contextMilliseconds": 0.3147000000000162
+      },
+      "hits": [
+        {
+          "id": "chunk:498d6ab1fef9b2392c0cebebeee3c485c324877ead5a3ae519f6bb5d904bd9f5",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "72bddfb9673cb497ef411e0eab6dde6f24780f3cae3dff021a73e23cd7106917",
+          "start": 3383,
+          "end": 4202,
+          "startLine": 21,
+          "endLine": 23,
+          "score": 9.89998358970579,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:e11f5225b4e485b2fc3de4712be273e0a57d4683bce7d2b6543af006283415c8",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "2e55cd78d0b9b2ea49a777da1b15479a7f27a64499b1f4f169befcf255533312",
+          "start": 2537,
+          "end": 3383,
+          "startLine": 18,
+          "endLine": 20,
+          "score": 7.261772927050176,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:220a129f51f2567cff9407624abfb72de4dc0e2219ded6fefcd65c27d827c927",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-plan-2026.hwpx",
+          "name": "workspace-service/service-plan-2026.hwpx",
+          "sourceSha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "contentSha256": "012a465a1cf5d44665c2dd802372f46be6b1a46487d86d4c524ea2c8e92f9447",
+          "start": 1701,
+          "end": 2537,
+          "startLine": 15,
+          "endLine": 17,
+          "score": 5.099150851006865,
+          "documentId": "service-plan-2026"
+        },
+        {
+          "id": "chunk:5463151f767ef5420e0c4b9b17a16b751541e438d80a89edcdb1fba72d875353",
+          "sourceId": "attachment:a95eaf5a-d977-4ad6-aed2-73bcc3062779",
+          "name": "temporary-service-meeting-20261012.hwpx",
+          "sourceSha256": "a37b95ece1cf3557e537fc4b2c50c04bc282a0e35effe93c679055f1e02e5c70",
+          "contentSha256": "287f6994ea9db36ee83cad4326e88b2d5092cd343d390380d4381a3e9c3913a6",
+          "start": 0,
+          "end": 674,
+          "startLine": 1,
+          "endLine": 21,
+          "score": 3.274528318573666,
+          "documentId": "temporary-service-meeting-20261012"
+        },
+        {
+          "id": "chunk:b11fe8e09e05200735467d23751eba6976bbba87c6bc4d1bc0f61cd4b030b67d",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-budget-2026-v2.hwpx",
+          "name": "workspace-service/service-budget-2026-v2.hwpx",
+          "sourceSha256": "a03266b24af198877fce8170be9ca4d40632631b307549a52d08afc67f9d741c",
+          "contentSha256": "e2320d1766a9d51e09878b1cdc38b32a09ef01638a1e718d0b81b9e74c7a026f",
+          "start": 0,
+          "end": 455,
+          "startLine": 1,
+          "endLine": 20,
+          "score": 1.1172497629397629,
+          "documentId": "service-budget-2026-v2"
+        },
+        {
+          "id": "chunk:48cebe8be266c5799da7e8a052236936c2261bf71f9cc9cb473a78e70fd34885",
+          "sourceId": "eval-root:workspace-service/shared/shared-office-rule-2026.md",
+          "name": "shared/shared-office-rule-2026.md",
+          "sourceSha256": "86f42473ec53cda5cdd5abee8a30944745bf9f17f0d4d88f7194bbe6f9ffa530",
+          "contentSha256": "86f42473ec53cda5cdd5abee8a30944745bf9f17f0d4d88f7194bbe6f9ffa530",
+          "start": 0,
+          "end": 333,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 0.9602290580591362,
+          "documentId": "shared-office-rule-2026"
+        },
+        {
+          "id": "chunk:7328052813f3d9b1af2e7b968113b60f2922ce6debe68c97b1b0f8a389f60836",
+          "sourceId": "eval-root:workspace-service/shared/shared-record-rule-2026.md",
+          "name": "shared/shared-record-rule-2026.md",
+          "sourceSha256": "dda2baccff97cab93451f765305b8ee4d14728032ad096d3051e918a5a80fe46",
+          "contentSha256": "dda2baccff97cab93451f765305b8ee4d14728032ad096d3051e918a5a80fe46",
+          "start": 0,
+          "end": 318,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 0.9602290580591362,
+          "documentId": "shared-record-rule-2026"
+        },
+        {
+          "id": "chunk:c0390ec96b85296bd81d33911498ef024cf884a888303d61ce8e93afa32c6060",
+          "sourceId": "eval-root:workspace-service/workspace-service/service-glossary-2026.md",
+          "name": "workspace-service/service-glossary-2026.md",
+          "sourceSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "contentSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "start": 0,
+          "end": 343,
+          "startLine": 1,
+          "endLine": 8,
+          "score": 0.9105633230466728,
+          "documentId": "service-glossary-2026"
+        }
+      ]
+    }
+  ]
+}

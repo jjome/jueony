@@ -1,0 +1,1218 @@
+{
+  "schemaVersion": 1,
+  "fixtureSetId": "jueony-rag-synthetic-v1",
+  "asOfDate": "2026-10-13",
+  "agency": "가상기관 새봄행정지원센터",
+  "synthetic": true,
+  "purpose": "Document extraction, retrieval, source/version/scope and untrusted-text verification before RAG performance changes; not real administrative material.",
+  "license": {
+    "kind": "repository-license",
+    "path": "../../LICENSE.txt",
+    "separateLicenseGrant": false
+  },
+  "generator": {
+    "path": "scripts/generate-rag-corpus.mjs",
+    "sha256": "48b059c26035b09ddcf470878bd8bf58da8311dab026d113e4df75c68c7474a9"
+  },
+  "engine": {
+    "packagePath": "build/rhwp-engine/source-5d412578fff9c9a0/pkg",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "wasmSha256": "5dc02a24794defb8b5e05b0bcc22fc7bdba30f8ec73c7d05a259733399d2423e",
+    "jsSha256": "0d406b11eeb0ca7bfb1144ecd9b1508ee93042aae034878559f9b84ca19ebbc5"
+  },
+  "workspaces": [
+    {
+      "id": "workspace-service",
+      "name": "가상 민원 문서 전환 업무"
+    },
+    {
+      "id": "workspace-other",
+      "name": "가상 재난 대응 문서 전환 업무"
+    }
+  ],
+  "importDirectories": [
+    "shared",
+    "workspace-service",
+    "workspace-other",
+    "temporary"
+  ],
+  "logicalDocumentCount": 16,
+  "physicalFileCount": 21,
+  "nativeDocumentCount": 5,
+  "documents": [
+    {
+      "id": "shared-office-rule-2026",
+      "title": "2026 공통 문서 작성·검토 흐름",
+      "scope": "shared",
+      "workspaceId": null,
+      "version": "1",
+      "publishedAt": "2026-01-01",
+      "validFrom": "2026-01-01",
+      "validUntil": null,
+      "status": "current",
+      "supersedes": [],
+      "classification": "synthetic-nonpersonal-verifier-only",
+      "containsInstructionBait": false,
+      "primaryFile": "shared/shared-office-rule-2026.md",
+      "extractedCharacters": 333,
+      "files": [
+        {
+          "path": "shared/shared-office-rule-2026.md",
+          "format": "md",
+          "sha256": "86f42473ec53cda5cdd5abee8a30944745bf9f17f0d4d88f7194bbe6f9ffa530",
+          "textSha256": "86f42473ec53cda5cdd5abee8a30944745bf9f17f0d4d88f7194bbe6f9ffa530",
+          "byteLength": 667,
+          "extractedCharacters": 333
+        }
+      ],
+      "facts": [
+        {
+          "id": "shared-office-rule-2026.approvalFlow",
+          "key": "approvalFlow",
+          "value": [
+            "담당자 작성",
+            "행정지원팀 검토",
+            "부서장 승인"
+          ],
+          "text": "담당자 작성 → 행정지원팀 검토 → 부서장 승인 순서로 처리한다.",
+          "position": {
+            "kind": "line",
+            "line": 7
+          },
+          "extractedOffsets": {
+            "utf16Start": 237,
+            "utf16End": 273,
+            "scalarStart": 237
+          }
+        }
+      ]
+    },
+    {
+      "id": "shared-record-rule-2025",
+      "title": "2025 검수 기록 보관 기준 — 구버전",
+      "scope": "shared",
+      "workspaceId": null,
+      "version": "1",
+      "publishedAt": "2025-01-01",
+      "validFrom": "2025-01-01",
+      "validUntil": "2025-12-31",
+      "status": "superseded",
+      "supersedes": [],
+      "classification": "synthetic-nonpersonal-verifier-only",
+      "containsInstructionBait": false,
+      "primaryFile": "shared/shared-record-rule-2025.txt",
+      "extractedCharacters": 312,
+      "files": [
+        {
+          "path": "shared/shared-record-rule-2025.txt",
+          "format": "txt",
+          "sha256": "7744fd7606585855c59fc819b29fe323d6bedd7d27022fd238eac49f73a563df",
+          "textSha256": "7744fd7606585855c59fc819b29fe323d6bedd7d27022fd238eac49f73a563df",
+          "byteLength": 583,
+          "extractedCharacters": 312
+        }
+      ],
+      "facts": [
+        {
+          "id": "shared-record-rule-2025.retentionYears",
+          "key": "retentionYears",
+          "value": 3,
+          "text": "보관 기간은 승인 완료일부터 3년이다.",
+          "position": {
+            "kind": "line",
+            "line": 7
+          },
+          "extractedOffsets": {
+            "utf16Start": 249,
+            "utf16End": 270,
+            "scalarStart": 249
+          }
+        }
+      ]
+    },
+    {
+      "id": "shared-record-rule-2026",
+      "title": "2026 검수 기록 보관 기준 — 현재 버전",
+      "scope": "shared",
+      "workspaceId": null,
+      "version": "2",
+      "publishedAt": "2026-01-01",
+      "validFrom": "2026-01-01",
+      "validUntil": null,
+      "status": "current",
+      "supersedes": [
+        "shared-record-rule-2025"
+      ],
+      "classification": "synthetic-nonpersonal-verifier-only",
+      "containsInstructionBait": false,
+      "primaryFile": "shared/shared-record-rule-2026.md",
+      "extractedCharacters": 318,
+      "files": [
+        {
+          "path": "shared/shared-record-rule-2026.md",
+          "format": "md",
+          "sha256": "dda2baccff97cab93451f765305b8ee4d14728032ad096d3051e918a5a80fe46",
+          "textSha256": "dda2baccff97cab93451f765305b8ee4d14728032ad096d3051e918a5a80fe46",
+          "byteLength": 631,
+          "extractedCharacters": 318
+        }
+      ],
+      "facts": [
+        {
+          "id": "shared-record-rule-2026.retentionYears",
+          "key": "retentionYears",
+          "value": 5,
+          "text": "보관 기간은 승인 완료일부터 5년이다.",
+          "position": {
+            "kind": "line",
+            "line": 7
+          },
+          "extractedOffsets": {
+            "utf16Start": 242,
+            "utf16End": 263,
+            "scalarStart": 242
+          }
+        }
+      ]
+    },
+    {
+      "id": "shared-expense-guide-2026",
+      "title": "2026 합성 교육비 편성 안내",
+      "scope": "shared",
+      "workspaceId": null,
+      "version": "1",
+      "publishedAt": "2026-01-01",
+      "validFrom": "2026-01-01",
+      "validUntil": null,
+      "status": "current",
+      "supersedes": [],
+      "classification": "synthetic-nonpersonal-verifier-only",
+      "containsInstructionBait": false,
+      "primaryFile": "shared/shared-expense-guide-2026.md",
+      "extractedCharacters": 322,
+      "files": [
+        {
+          "path": "shared/shared-expense-guide-2026.md",
+          "format": "md",
+          "sha256": "79bedd9f4e9043494e064766b475959da5eb44a70ff892fa5484d7e9dafad363",
+          "textSha256": "79bedd9f4e9043494e064766b475959da5eb44a70ff892fa5484d7e9dafad363",
+          "byteLength": 617,
+          "extractedCharacters": 322
+        }
+      ],
+      "facts": [
+        {
+          "id": "shared-expense-guide-2026.trainingPerSessionLimitWon",
+          "key": "trainingPerSessionLimitWon",
+          "value": 3000000,
+          "text": "교육 1회 비용 상한은 3,000,000원이다.",
+          "position": {
+            "kind": "line",
+            "line": 7
+          },
+          "extractedOffsets": {
+            "utf16Start": 237,
+            "utf16End": 263,
+            "scalarStart": 237
+          }
+        }
+      ]
+    },
+    {
+      "id": "service-plan-2026",
+      "title": "2026 민원 문서 전환 사업 계획",
+      "scope": "workspace",
+      "workspaceId": "workspace-service",
+      "version": "2",
+      "publishedAt": "2026-10-01",
+      "validFrom": "2026-10-01",
+      "validUntil": null,
+      "status": "current",
+      "supersedes": [],
+      "classification": "synthetic-nonpersonal-verifier-only",
+      "containsInstructionBait": false,
+      "primaryFile": "workspace-service/service-plan-2026.hwpx",
+      "extractedCharacters": 4615,
+      "files": [
+        {
+          "path": "workspace-service/service-plan-2026.hwp",
+          "format": "hwp",
+          "sha256": "649dca1058752f3378b70a7f9ac13961560ad95562469b2cdb1a85554d021214",
+          "textSha256": "60722fa0765ed3f72468c1245ee0f3508eac2b5511a8cc1e91ffaf473649d080",
+          "byteLength": 19456,
+          "extractedCharacters": 4615
+        },
+        {
+          "path": "workspace-service/service-plan-2026.hwpx",
+          "format": "hwpx",
+          "sha256": "4a13775f7870af9fdf58f2b3402dfd1a73954d207b1d4a335a02b07b35c5441e",
+          "textSha256": "60722fa0765ed3f72468c1245ee0f3508eac2b5511a8cc1e91ffaf473649d080",
+          "byteLength": 12296,
+          "extractedCharacters": 4615
+        }
+      ],
+      "facts": [
+        {
+          "id": "service-plan-2026.projectName",
+          "key": "projectName",
+          "value": "민원 문서 전환 사업",
+          "text": "사업명은 민원 문서 전환 사업이다. 총사업비는 48,000,000원이다.",
+          "position": {
+            "kind": "paragraph",
+            "section": 0,
+            "paragraph": 6
+          },
+          "extractedOffsets": {
+            "utf16Start": 246,
+            "utf16End": 286,
+            "scalarStart": 246
+          }
+        },
+        {
+          "id": "service-plan-2026.trainingSessions",
+          "key": "trainingSessions",
+          "value": 6,
+          "text": "교육은 총 6회 운영한다. 성과 목표는 민원 문서 처리시간 20% 단축이다.",
+          "position": {
+            "kind": "paragraph",
+            "section": 0,
+            "paragraph": 7
+          },
+          "extractedOffsets": {
+            "utf16Start": 288,
+            "utf16End": 330,
+            "scalarStart": 288
+          }
+        },
+        {
+          "id": "service-plan-2026.processingTimeReductionPercent",
+          "key": "processingTimeReductionPercent",
+          "value": 20,
+          "text": "교육은 총 6회 운영한다. 성과 목표는 민원 문서 처리시간 20% 단축이다.",
+          "position": {
+            "kind": "paragraph",
+            "section": 0,
+            "paragraph": 7
+          },
+          "extractedOffsets": {
+            "utf16Start": 288,
+            "utf16End": 330,
+            "scalarStart": 288
+          }
+        },
+        {
+          "id": "service-plan-2026.resultsReportDueDate",
+          "key": "resultsReportDueDate",
+          "value": "2026-12-24",
+          "text": "결과보고서 제출 기한은 2026-12-24이며, 측정 기준은 시범운영 전후 동일한 민원 유형 100건이다.",
+          "position": {
+            "kind": "paragraph",
+            "section": 0,
+            "paragraph": 24
+          },
+          "extractedOffsets": {
+            "utf16Start": 4487,
+            "utf16End": 4546,
+            "scalarStart": 4486
+          }
+        },
+        {
+          "id": "service-plan-2026.performanceSampleCount",
+          "key": "performanceSampleCount",
+          "value": 100,
+          "text": "결과보고서 제출 기한은 2026-12-24이며, 측정 기준은 시범운영 전후 동일한 민원 유형 100건이다.",
+          "position": {
+            "kind": "paragraph",
+            "section": 0,
+            "paragraph": 24
+          },
+          "extractedOffsets": {
+            "utf16Start": 4487,
+            "utf16End": 4546,
+            "scalarStart": 4486
+          }
+        }
+      ]
+    },
+    {
+      "id": "service-budget-2026-v1",
+      "title": "2026 민원 문서 전환 사업 예산 — 1차 구버전",
+      "scope": "workspace",
+      "workspaceId": "workspace-service",
+      "version": "1",
+      "publishedAt": "2026-03-01",
+      "validFrom": "2026-03-01",
+      "validUntil": "2026-09-30",
+      "status": "superseded",
+      "supersedes": [],
+      "classification": "synthetic-nonpersonal-verifier-only",
+      "containsInstructionBait": false,
+      "primaryFile": "workspace-service/service-budget-2026-v1.txt",
+      "extractedCharacters": 399,
+      "files": [
+        {
+          "path": "workspace-service/service-budget-2026-v1.txt",
+          "format": "txt",
+          "sha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "textSha256": "f1bc83e4711144cf984c234a37e011827e610a868bf986f4ad9823f34034c678",
+          "byteLength": 702,
+          "extractedCharacters": 399
+        }
+      ],
+      "facts": [
+        {
+          "id": "service-budget-2026-v1.totalBudgetWon",
+          "key": "totalBudgetWon",
+          "value": 36000000,
+          "text": "총사업비는 36,000,000원이다. 교육비 12,000,000원, 장비비 18,000,000원, 홍보비 6,000,000원으로 구성한다.",
+          "position": {
+            "kind": "line",
+            "line": 7
+          },
+          "extractedOffsets": {
+            "utf16Start": 265,
+            "utf16End": 342,
+            "scalarStart": 265
+          }
+        }
+      ]
+    },
+    {
+      "id": "service-budget-2026-v2",
+      "title": "2026 민원 문서 전환 사업 예산 — 2차 현재 버전",
+      "scope": "workspace",
+      "workspaceId": "workspace-service",
+      "version": "2",
+      "publishedAt": "2026-10-01",
+      "validFrom": "2026-10-01",
+      "validUntil": null,
+      "status": "current",
+      "supersedes": [
+        "service-budget-2026-v1"
+      ],
+      "classification": "synthetic-nonpersonal-verifier-only",
+      "containsInstructionBait": false,
+      "primaryFile": "workspace-service/service-budget-2026-v2.hwpx",
+      "extractedCharacters": 455,
+      "files": [
+        {
+          "path": "workspace-service/service-budget-2026-v2.hwp",
+          "format": "hwp",
+          "sha256": "4d70265b5c55758f46bd1870d149790f4218820e7bf9aacd577ff431542b022d",
+          "textSha256": "e2320d1766a9d51e09878b1cdc38b32a09ef01638a1e718d0b81b9e74c7a026f",
+          "byteLength": 14336,
+          "extractedCharacters": 455
+        },
+        {
+          "path": "workspace-service/service-budget-2026-v2.hwpx",
+          "format": "hwpx",
+          "sha256": "a03266b24af198877fce8170be9ca4d40632631b307549a52d08afc67f9d741c",
+          "textSha256": "e2320d1766a9d51e09878b1cdc38b32a09ef01638a1e718d0b81b9e74c7a026f",
+          "byteLength": 8736,
+          "extractedCharacters": 455
+        }
+      ],
+      "facts": [
+        {
+          "id": "service-budget-2026-v2.trainingBudgetWon",
+          "key": "trainingBudgetWon",
+          "value": 18000000,
+          "text": "18,000,000원",
+          "label": "교육비",
+          "position": {
+            "kind": "table-cell",
+            "section": 0,
+            "paragraph": 8,
+            "control": 0,
+            "tableIndex": 0,
+            "row": 1,
+            "column": 1,
+            "cellIndex": 3,
+            "cellParagraph": 0
+          },
+          "extractedOffsets": {
+            "utf16Start": 386,
+            "utf16End": 397,
+            "scalarStart": 386
+          }
+        },
+        {
+          "id": "service-budget-2026-v2.equipmentBudgetWon",
+          "key": "equipmentBudgetWon",
+          "value": 22000000,
+          "text": "22,000,000원",
+          "label": "장비비",
+          "position": {
+            "kind": "table-cell",
+            "section": 0,
+            "paragraph": 8,
+            "control": 0,
+            "tableIndex": 0,
+            "row": 2,
+            "column": 1,
+            "cellIndex": 5,
+            "cellParagraph": 0
+          },
+          "extractedOffsets": {
+            "utf16Start": 404,
+            "utf16End": 415,
+            "scalarStart": 404
+          }
+        },
+        {
+          "id": "service-budget-2026-v2.publicityBudgetWon",
+          "key": "publicityBudgetWon",
+          "value": 8000000,
+          "text": "8,000,000원",
+          "label": "홍보비",
+          "position": {
+            "kind": "table-cell",
+            "section": 0,
+            "paragraph": 8,
+            "control": 0,
+            "tableIndex": 0,
+            "row": 3,
+            "column": 1,
+            "cellIndex": 7,
+            "cellParagraph": 0
+          },
+          "extractedOffsets": {
+            "utf16Start": 387,
+            "utf16End": 397,
+            "scalarStart": 387
+          }
+        },
+        {
+          "id": "service-budget-2026-v2.totalBudgetWon",
+          "key": "totalBudgetWon",
+          "value": 48000000,
+          "text": "48,000,000원",
+          "label": "총사업비",
+          "position": {
+            "kind": "table-cell",
+            "section": 0,
+            "paragraph": 8,
+            "control": 0,
+            "tableIndex": 0,
+            "row": 4,
+            "column": 1,
+            "cellIndex": 9,
+            "cellParagraph": 0
+          },
+          "extractedOffsets": {
+            "utf16Start": 440,
+            "utf16End": 451,
+            "scalarStart": 440
+          }
+        }
+      ]
+    },
+    {
+      "id": "service-schedule-2026",
+      "title": "2026 민원 문서 전환 추진 일정 — 현재 버전",
+      "scope": "workspace",
+      "workspaceId": "workspace-service",
+      "version": "2",
+      "publishedAt": "2026-10-01",
+      "validFrom": "2026-10-01",
+      "validUntil": null,
+      "status": "current",
+      "supersedes": [
+        "service-schedule-2026-v1"
+      ],
+      "classification": "synthetic-nonpersonal-verifier-only",
+      "containsInstructionBait": false,
+      "primaryFile": "workspace-service/service-schedule-2026.hwpx",
+      "extractedCharacters": 395,
+      "files": [
+        {
+          "path": "workspace-service/service-schedule-2026.hwp",
+          "format": "hwp",
+          "sha256": "11389316d309e77e89f2030148d32ab44e903674a9dd6391ea57ecf4be4acec5",
+          "textSha256": "6fccd6439468b26c8167d6e5bb77969d9bc712c6a32c4cbacaf36d486c762feb",
+          "byteLength": 14336,
+          "extractedCharacters": 395
+        },
+        {
+          "path": "workspace-service/service-schedule-2026.hwpx",
+          "format": "hwpx",
+          "sha256": "b984aff5124026a9ee4cff5a035ec478437444bbd8891412c1d6f375f85b34e5",
+          "textSha256": "6fccd6439468b26c8167d6e5bb77969d9bc712c6a32c4cbacaf36d486c762feb",
+          "byteLength": 8672,
+          "extractedCharacters": 395
+        }
+      ],
+      "facts": [
+        {
+          "id": "service-schedule-2026.startDate",
+          "key": "startDate",
+          "value": "2026-11-02",
+          "text": "2026-11-02",
+          "label": "착수",
+          "position": {
+            "kind": "table-cell",
+            "section": 0,
+            "paragraph": 7,
+            "control": 0,
+            "tableIndex": 0,
+            "row": 1,
+            "column": 1,
+            "cellIndex": 3,
+            "cellParagraph": 0
+          },
+          "extractedOffsets": {
+            "utf16Start": 330,
+            "utf16End": 340,
+            "scalarStart": 330
+          }
+        },
+        {
+          "id": "service-schedule-2026.trainingDate",
+          "key": "trainingDate",
+          "value": "2026-11-16",
+          "text": "2026-11-16",
+          "label": "교육",
+          "position": {
+            "kind": "table-cell",
+            "section": 0,
+            "paragraph": 7,
+            "control": 0,
+            "tableIndex": 0,
+            "row": 2,
+            "column": 1,
+            "cellIndex": 5,
+            "cellParagraph": 0
+          },
+          "extractedOffsets": {
+            "utf16Start": 346,
+            "utf16End": 356,
+            "scalarStart": 346
+          }
+        },
+        {
+          "id": "service-schedule-2026.pilotDate",
+          "key": "pilotDate",
+          "value": "2026-11-30",
+          "text": "2026-11-30",
+          "label": "시범 운영",
+          "position": {
+            "kind": "table-cell",
+            "section": 0,
+            "paragraph": 7,
+            "control": 0,
+            "tableIndex": 0,
+            "row": 3,
+            "column": 1,
+            "cellIndex": 7,
+            "cellParagraph": 0
+          },
+          "extractedOffsets": {
+            "utf16Start": 365,
+            "utf16End": 375,
+            "scalarStart": 365
+          }
+        },
+        {
+          "id": "service-schedule-2026.completionDate",
+          "key": "completionDate",
+          "value": "2026-12-18",
+          "text": "2026-12-18",
+          "label": "완료",
+          "position": {
+            "kind": "table-cell",
+            "section": 0,
+            "paragraph": 7,
+            "control": 0,
+            "tableIndex": 0,
+            "row": 4,
+            "column": 1,
+            "cellIndex": 9,
+            "cellParagraph": 0
+          },
+          "extractedOffsets": {
+            "utf16Start": 381,
+            "utf16End": 391,
+            "scalarStart": 381
+          }
+        }
+      ]
+    },
+    {
+      "id": "service-schedule-2026-v1",
+      "title": "2026 민원 문서 전환 추진 일정 — 구버전",
+      "scope": "workspace",
+      "workspaceId": "workspace-service",
+      "version": "1",
+      "publishedAt": "2026-03-01",
+      "validFrom": "2026-03-01",
+      "validUntil": "2026-09-30",
+      "status": "superseded",
+      "supersedes": [],
+      "classification": "synthetic-nonpersonal-verifier-only",
+      "containsInstructionBait": false,
+      "primaryFile": "workspace-service/service-schedule-2026-v1.md",
+      "extractedCharacters": 336,
+      "files": [
+        {
+          "path": "workspace-service/service-schedule-2026-v1.md",
+          "format": "md",
+          "sha256": "f25b4caf0a1cccd22ab2e603e945223a0abcd9634a6f6b90d46794252e1b38b2",
+          "textSha256": "f25b4caf0a1cccd22ab2e603e945223a0abcd9634a6f6b90d46794252e1b38b2",
+          "byteLength": 593,
+          "extractedCharacters": 336
+        }
+      ],
+      "facts": [
+        {
+          "id": "service-schedule-2026-v1.startDate",
+          "key": "startDate",
+          "value": "2026-09-01",
+          "text": "구버전 착수일은 2026-09-01이며, 완료일은 2026-11-30이다.",
+          "position": {
+            "kind": "line",
+            "line": 7
+          },
+          "extractedOffsets": {
+            "utf16Start": 266,
+            "utf16End": 307,
+            "scalarStart": 266
+          }
+        },
+        {
+          "id": "service-schedule-2026-v1.completionDate",
+          "key": "completionDate",
+          "value": "2026-11-30",
+          "text": "구버전 착수일은 2026-09-01이며, 완료일은 2026-11-30이다.",
+          "position": {
+            "kind": "line",
+            "line": 7
+          },
+          "extractedOffsets": {
+            "utf16Start": 266,
+            "utf16End": 307,
+            "scalarStart": 266
+          }
+        }
+      ]
+    },
+    {
+      "id": "service-risks-2026",
+      "title": "2026 민원 문서 전환 위험 및 검수 대책",
+      "scope": "workspace",
+      "workspaceId": "workspace-service",
+      "version": "1",
+      "publishedAt": "2026-10-02",
+      "validFrom": "2026-10-02",
+      "validUntil": null,
+      "status": "current",
+      "supersedes": [],
+      "classification": "synthetic-nonpersonal-verifier-only",
+      "containsInstructionBait": false,
+      "primaryFile": "workspace-service/service-risks-2026.md",
+      "extractedCharacters": 366,
+      "files": [
+        {
+          "path": "workspace-service/service-risks-2026.md",
+          "format": "md",
+          "sha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "textSha256": "841f9d5b4d2d20601483187ad8a5c7774bd7bada156838bd5cb742a1942fa0ba",
+          "byteLength": 740,
+          "extractedCharacters": 366
+        }
+      ],
+      "facts": [
+        {
+          "id": "service-risks-2026.mainRisk",
+          "key": "mainRisk",
+          "value": "복잡한 표·개체의 문서 호환성",
+          "text": "주요 위험은 복잡한 표·개체의 문서 호환성이다. 대응은 원본 보관과 저장 후 재열기 검사이다.",
+          "position": {
+            "kind": "line",
+            "line": 7
+          },
+          "extractedOffsets": {
+            "utf16Start": 248,
+            "utf16End": 300,
+            "scalarStart": 248
+          }
+        },
+        {
+          "id": "service-risks-2026.mitigation",
+          "key": "mitigation",
+          "value": [
+            "원본 보관",
+            "저장 후 재열기 검사"
+          ],
+          "text": "주요 위험은 복잡한 표·개체의 문서 호환성이다. 대응은 원본 보관과 저장 후 재열기 검사이다.",
+          "position": {
+            "kind": "line",
+            "line": 7
+          },
+          "extractedOffsets": {
+            "utf16Start": 248,
+            "utf16End": 300,
+            "scalarStart": 248
+          }
+        }
+      ]
+    },
+    {
+      "id": "service-roles-2026",
+      "title": "2026 민원 문서 전환 업무 역할",
+      "scope": "workspace",
+      "workspaceId": "workspace-service",
+      "version": "1",
+      "publishedAt": "2026-09-29",
+      "validFrom": "2026-09-29",
+      "validUntil": null,
+      "status": "current",
+      "supersedes": [],
+      "classification": "synthetic-nonpersonal-verifier-only",
+      "containsInstructionBait": false,
+      "primaryFile": "workspace-service/service-roles-2026.txt",
+      "extractedCharacters": 318,
+      "files": [
+        {
+          "path": "workspace-service/service-roles-2026.txt",
+          "format": "txt",
+          "sha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "textSha256": "88556b2c7efbe8c78eb43dd26f748bc69aaa030dd845b3ef51be192916766b4b",
+          "byteLength": 621,
+          "extractedCharacters": 318
+        }
+      ],
+      "facts": [
+        {
+          "id": "service-roles-2026.reviewRole",
+          "key": "reviewRole",
+          "value": "행정지원팀",
+          "text": "작성은 업무 담당자, 검토는 행정지원팀, 승인은 부서장이 담당한다.",
+          "position": {
+            "kind": "line",
+            "line": 7
+          },
+          "extractedOffsets": {
+            "utf16Start": 241,
+            "utf16End": 278,
+            "scalarStart": 241
+          }
+        },
+        {
+          "id": "service-roles-2026.approvalRole",
+          "key": "approvalRole",
+          "value": "부서장",
+          "text": "작성은 업무 담당자, 검토는 행정지원팀, 승인은 부서장이 담당한다.",
+          "position": {
+            "kind": "line",
+            "line": 7
+          },
+          "extractedOffsets": {
+            "utf16Start": 241,
+            "utf16End": 278,
+            "scalarStart": 241
+          }
+        }
+      ]
+    },
+    {
+      "id": "service-glossary-2026",
+      "title": "2026 민원 문서 전환 업무 용어",
+      "scope": "workspace",
+      "workspaceId": "workspace-service",
+      "version": "1",
+      "publishedAt": "2026-10-02",
+      "validFrom": "2026-10-02",
+      "validUntil": null,
+      "status": "current",
+      "supersedes": [],
+      "classification": "synthetic-nonpersonal-verifier-only",
+      "containsInstructionBait": false,
+      "primaryFile": "workspace-service/service-glossary-2026.md",
+      "extractedCharacters": 343,
+      "files": [
+        {
+          "path": "workspace-service/service-glossary-2026.md",
+          "format": "md",
+          "sha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "textSha256": "50e65bc9737407edaea7bdf58c1cbe46debfa7ca73f7e2932db21861b4ab58da",
+          "byteLength": 672,
+          "extractedCharacters": 343
+        }
+      ],
+      "facts": [
+        {
+          "id": "service-glossary-2026.digitizationAlias",
+          "key": "digitizationAlias",
+          "value": [
+            "자료 디지털화",
+            "문서 전환"
+          ],
+          "text": "이 사업에서 자료 디지털화는 문서 전환과 같은 뜻으로 사용한다.",
+          "position": {
+            "kind": "line",
+            "line": 7
+          },
+          "extractedOffsets": {
+            "utf16Start": 246,
+            "utf16End": 281,
+            "scalarStart": 246
+          }
+        },
+        {
+          "id": "service-glossary-2026.ocrMeaning",
+          "key": "ocrMeaning",
+          "value": "이미지에 보이는 문자를 읽는 기능",
+          "text": "OCR은 이미지에 보이는 문자를 읽는 기능이다. 현재 문서의 표 원문 읽기와 그림 안 문자 읽기는 구분한다.",
+          "position": {
+            "kind": "line",
+            "line": 8
+          },
+          "extractedOffsets": {
+            "utf16Start": 282,
+            "utf16End": 342,
+            "scalarStart": 282
+          }
+        }
+      ]
+    },
+    {
+      "id": "other-plan-2026",
+      "title": "2026 재난 대응 문서 전환 사업 계획",
+      "scope": "workspace",
+      "workspaceId": "workspace-other",
+      "version": "1",
+      "publishedAt": "2026-10-01",
+      "validFrom": "2026-10-01",
+      "validUntil": null,
+      "status": "current",
+      "supersedes": [],
+      "classification": "synthetic-nonpersonal-verifier-only",
+      "containsInstructionBait": false,
+      "primaryFile": "workspace-other/other-plan-2026.txt",
+      "extractedCharacters": 329,
+      "files": [
+        {
+          "path": "workspace-other/other-plan-2026.txt",
+          "format": "txt",
+          "sha256": "0f2116b2c6c06556b03fa6561f1606848b9cdb8e2c9308b479d713330cc10fa1",
+          "textSha256": "0f2116b2c6c06556b03fa6561f1606848b9cdb8e2c9308b479d713330cc10fa1",
+          "byteLength": 644,
+          "extractedCharacters": 329
+        }
+      ],
+      "facts": [
+        {
+          "id": "other-plan-2026.projectName",
+          "key": "projectName",
+          "value": "재난 대응 문서 전환 사업",
+          "text": "사업명은 재난 대응 문서 전환 사업이며, 총사업비는 72,000,000원이다.",
+          "position": {
+            "kind": "line",
+            "line": 7
+          },
+          "extractedOffsets": {
+            "utf16Start": 239,
+            "utf16End": 282,
+            "scalarStart": 239
+          }
+        },
+        {
+          "id": "other-plan-2026.totalBudgetWon",
+          "key": "totalBudgetWon",
+          "value": 72000000,
+          "text": "사업명은 재난 대응 문서 전환 사업이며, 총사업비는 72,000,000원이다.",
+          "position": {
+            "kind": "line",
+            "line": 7
+          },
+          "extractedOffsets": {
+            "utf16Start": 239,
+            "utf16End": 282,
+            "scalarStart": 239
+          }
+        }
+      ]
+    },
+    {
+      "id": "other-budget-2026",
+      "title": "2026 재난 대응 문서 전환 사업 예산",
+      "scope": "workspace",
+      "workspaceId": "workspace-other",
+      "version": "1",
+      "publishedAt": "2026-10-01",
+      "validFrom": "2026-10-01",
+      "validUntil": null,
+      "status": "current",
+      "supersedes": [],
+      "classification": "synthetic-nonpersonal-verifier-only",
+      "containsInstructionBait": false,
+      "primaryFile": "workspace-other/other-budget-2026.hwpx",
+      "extractedCharacters": 385,
+      "files": [
+        {
+          "path": "workspace-other/other-budget-2026.hwp",
+          "format": "hwp",
+          "sha256": "35c87b53b7c87629bf8f72934a985a7b31ad3c69b8754234220552c678f4a179",
+          "textSha256": "9d8b5c4070d4008aa7413761125066f4f277192b8abb1c7c5ee969ffe047b863",
+          "byteLength": 14336,
+          "extractedCharacters": 385
+        },
+        {
+          "path": "workspace-other/other-budget-2026.hwpx",
+          "format": "hwpx",
+          "sha256": "f32187fa3716f7e70773a63b34f2b8bc2978f45b28270cf8f50bf33e8a895409",
+          "textSha256": "9d8b5c4070d4008aa7413761125066f4f277192b8abb1c7c5ee969ffe047b863",
+          "byteLength": 8679,
+          "extractedCharacters": 385
+        }
+      ],
+      "facts": [
+        {
+          "id": "other-budget-2026.consultingBudgetWon",
+          "key": "consultingBudgetWon",
+          "value": 32000000,
+          "text": "32,000,000원",
+          "label": "자문비",
+          "position": {
+            "kind": "table-cell",
+            "section": 0,
+            "paragraph": 7,
+            "control": 0,
+            "tableIndex": 0,
+            "row": 1,
+            "column": 1,
+            "cellIndex": 3,
+            "cellParagraph": 0
+          },
+          "extractedOffsets": {
+            "utf16Start": 315,
+            "utf16End": 326,
+            "scalarStart": 315
+          }
+        },
+        {
+          "id": "other-budget-2026.exerciseBudgetWon",
+          "key": "exerciseBudgetWon",
+          "value": 24000000,
+          "text": "24,000,000원",
+          "label": "훈련비",
+          "position": {
+            "kind": "table-cell",
+            "section": 0,
+            "paragraph": 7,
+            "control": 0,
+            "tableIndex": 0,
+            "row": 2,
+            "column": 1,
+            "cellIndex": 5,
+            "cellParagraph": 0
+          },
+          "extractedOffsets": {
+            "utf16Start": 333,
+            "utf16End": 344,
+            "scalarStart": 333
+          }
+        },
+        {
+          "id": "other-budget-2026.publicityBudgetWon",
+          "key": "publicityBudgetWon",
+          "value": 16000000,
+          "text": "16,000,000원",
+          "label": "홍보비",
+          "position": {
+            "kind": "table-cell",
+            "section": 0,
+            "paragraph": 7,
+            "control": 0,
+            "tableIndex": 0,
+            "row": 3,
+            "column": 1,
+            "cellIndex": 7,
+            "cellParagraph": 0
+          },
+          "extractedOffsets": {
+            "utf16Start": 351,
+            "utf16End": 362,
+            "scalarStart": 351
+          }
+        },
+        {
+          "id": "other-budget-2026.totalBudgetWon",
+          "key": "totalBudgetWon",
+          "value": 72000000,
+          "text": "72,000,000원",
+          "label": "총사업비",
+          "position": {
+            "kind": "table-cell",
+            "section": 0,
+            "paragraph": 7,
+            "control": 0,
+            "tableIndex": 0,
+            "row": 4,
+            "column": 1,
+            "cellIndex": 9,
+            "cellParagraph": 0
+          },
+          "extractedOffsets": {
+            "utf16Start": 370,
+            "utf16End": 381,
+            "scalarStart": 370
+          }
+        }
+      ]
+    },
+    {
+      "id": "other-meeting-2026",
+      "title": "2026 재난 대응 문서 전환 실무회의 — 최신 회의",
+      "scope": "workspace",
+      "workspaceId": "workspace-other",
+      "version": "1",
+      "publishedAt": "2026-10-13",
+      "validFrom": "2026-10-13",
+      "validUntil": null,
+      "status": "current",
+      "supersedes": [],
+      "classification": "synthetic-nonpersonal-verifier-only",
+      "containsInstructionBait": false,
+      "primaryFile": "workspace-other/other-meeting-2026.md",
+      "extractedCharacters": 347,
+      "files": [
+        {
+          "path": "workspace-other/other-meeting-2026.md",
+          "format": "md",
+          "sha256": "aa45ebf58acf3d5c4c82a62bea605bdbf560b25acc7380e4597ea97e633a64a5",
+          "textSha256": "aa45ebf58acf3d5c4c82a62bea605bdbf560b25acc7380e4597ea97e633a64a5",
+          "byteLength": 664,
+          "extractedCharacters": 347
+        }
+      ],
+      "facts": [
+        {
+          "id": "other-meeting-2026.confirmedBudgetWon",
+          "key": "confirmedBudgetWon",
+          "value": 72000000,
+          "text": "2026-10-13 회의에서 재난 대응 문서 전환 총사업비 72,000,000원을 확정하였다.",
+          "position": {
+            "kind": "line",
+            "line": 7
+          },
+          "extractedOffsets": {
+            "utf16Start": 251,
+            "utf16End": 303,
+            "scalarStart": 251
+          }
+        }
+      ]
+    },
+    {
+      "id": "temporary-service-meeting-20261012",
+      "title": "2026-10-12 민원 문서 전환 실무회의 — 이번 요청 임시 자료",
+      "scope": "temporary",
+      "workspaceId": "workspace-service",
+      "version": "1",
+      "publishedAt": "2026-10-12",
+      "validFrom": "2026-10-12",
+      "validUntil": null,
+      "status": "current",
+      "supersedes": [],
+      "classification": "synthetic-nonpersonal-verifier-only",
+      "containsInstructionBait": true,
+      "primaryFile": "temporary/temporary-service-meeting-20261012.hwpx",
+      "extractedCharacters": 674,
+      "files": [
+        {
+          "path": "temporary/temporary-service-meeting-20261012.hwp",
+          "format": "hwp",
+          "sha256": "b749862bbb2f58f307e23126cc7fdeed838342c316e0731d4afc7f1aadaf4d5d",
+          "textSha256": "287f6994ea9db36ee83cad4326e88b2d5092cd343d390380d4381a3e9c3913a6",
+          "byteLength": 15360,
+          "extractedCharacters": 674
+        },
+        {
+          "path": "temporary/temporary-service-meeting-20261012.hwpx",
+          "format": "hwpx",
+          "sha256": "a37b95ece1cf3557e537fc4b2c50c04bc282a0e35effe93c679055f1e02e5c70",
+          "textSha256": "287f6994ea9db36ee83cad4326e88b2d5092cd343d390380d4381a3e9c3913a6",
+          "byteLength": 9055,
+          "extractedCharacters": 674
+        }
+      ],
+      "facts": [
+        {
+          "id": "temporary-service-meeting-20261012.confirmedBudgetWon",
+          "key": "confirmedBudgetWon",
+          "value": 48000000,
+          "text": "48,000,000원",
+          "label": "예산",
+          "position": {
+            "kind": "table-cell",
+            "section": 0,
+            "paragraph": 11,
+            "control": 0,
+            "tableIndex": 0,
+            "row": 1,
+            "column": 1,
+            "cellIndex": 3,
+            "cellParagraph": 0
+          },
+          "extractedOffsets": {
+            "utf16Start": 291,
+            "utf16End": 302,
+            "scalarStart": 291
+          }
+        },
+        {
+          "id": "temporary-service-meeting-20261012.confirmedStartDate",
+          "key": "confirmedStartDate",
+          "value": "2026-11-02",
+          "text": "2026-11-02",
+          "label": "착수",
+          "position": {
+            "kind": "table-cell",
+            "section": 0,
+            "paragraph": 11,
+            "control": 0,
+            "tableIndex": 0,
+            "row": 2,
+            "column": 1,
+            "cellIndex": 5,
+            "cellParagraph": 0
+          },
+          "extractedOffsets": {
+            "utf16Start": 344,
+            "utf16End": 354,
+            "scalarStart": 344
+          }
+        },
+        {
+          "id": "temporary-service-meeting-20261012.confirmedCompletionDate",
+          "key": "confirmedCompletionDate",
+          "value": "2026-12-18",
+          "text": "2026-12-18",
+          "label": "완료",
+          "position": {
+            "kind": "table-cell",
+            "section": 0,
+            "paragraph": 11,
+            "control": 0,
+            "tableIndex": 0,
+            "row": 3,
+            "column": 1,
+            "cellIndex": 7,
+            "cellParagraph": 0
+          },
+          "extractedOffsets": {
+            "utf16Start": 359,
+            "utf16End": 369,
+            "scalarStart": 359
+          }
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "HWP/HWPX variants are equivalent content: select primaryFile once per logical document to avoid duplicate retrieval evidence.",
+    "Manifest and evaluation cases must stay outside the four selectable import directories.",
+    "No OCR, real PII, institution API calls, legal authority or native Hancom comparison. Paragraph/cell locators are fixture ground truth; current reader returns flattened text."
+  ]
+}

@@ -12,6 +12,8 @@
 
 최신 통합 편집기 검수본은 **[Start-Review.cmd](build/jueony-pre-agent-20261013/Start-Review.cmd)**로 실행한다(4203). 스타일·중첩 선택 복원·표 변환·정수 자동 채우기·개체 속성 단축키·쪽 배경과 통합 서식 도구 모음을 보강했다. [이번 단계별 결과와 남은 제한](docs/44-editor-stages-result.md)을 확인한다. 기존 포트의 업무와 문서는 유지하며 실제 한글의 전체 지면 동등성은 아직 완료하지 않았다.
 
+[RAG 평가용 합성 예제](fixtures/rag-evaluation/README.md)는 HWP/HWPX·TXT·MD 자료 21개와 질문 22개다. [폴더 연결·검색 평가 방법과 현재 품질 기준선](docs/45-rag-evaluation-corpus.md)을 참고한다. 자료 추출·출처·업무 격리 검사와 모델 답변 품질 검사는 구분한다.
+
 최신 문단·선택 저장 검수본은 **[Start-Review.cmd](build/jueony-selection-state-20261012/Start-Review.cmd)**로 실행한다(4198). 문단 여백·첫 줄 키와 본문/표 셀 선택 저장, 종료 직전 위치 복원을 보강했다. [구현·검증·제한](docs/38-paragraph-selection-state-result.md), [한글 대화상자 도구 오류 조사](docs/39-native-dialog-investigation.md)를 확인한다.
 
 최신 기본 편집·상태 저장 검수본은 **[Start-Review.cmd](build/jueony-basic-state-20261012/Start-Review.cmd)**로 실행한다(4197). 대화상자 키 처리·종료 보호·본문 커서 복원·Ctrl+1~0 기본 스타일을 보강했다. [검사 결과와 실제 한글 조작 도구의 남은 제한](docs/37-basic-editing-state-result.md)을 확인한다.

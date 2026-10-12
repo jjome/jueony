@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "asOfDate": "2026-10-13",
+  "purpose": "Synthetic local evaluation; questions and expectations are fixed independently of retrieval scores. No model calls or real institution records.",
+  "cases": [
+    {"id":"current-budget","query":"2026년 10월 현재 민원 문서 전환 사업의 확정 총예산은 얼마인가요?","expectedDocs":["service-budget-2026-v2"],"expectedEvidence":["48,000,000"],"category":"version"},
+    {"id":"old-budget","query":"2026년 9월까지 적용한 민원 문서 전환 사업 예산 초안의 총액을 알려 주세요.","expectedDocs":["service-budget-2026-v1"],"expectedEvidence":["36,000,000"],"category":"version"},
+    {"id":"current-equipment","query":"민원 문서 전환 사업의 현재 예산에서 장비 항목의 금액은 얼마인가요?","expectedDocs":["service-budget-2026-v2"],"expectedEvidence":["22,000,000"],"category":"table"},
+    {"id":"plan-training","query":"올해 민원 문서 전환 사업에서 교육은 몇 회 실시하나요?","expectedDocs":["service-plan-2026"],"expectedEvidence":["6회"],"category":"native"},
+    {"id":"plan-performance","query":"민원 문서 전환 사업의 처리시간 단축 목표는 몇 퍼센트인가요?","expectedDocs":["service-plan-2026"],"expectedEvidence":["20%"],"category":"native"},
+    {"id":"late-appendix","query":"사업 결과보고서 제출 기한과 성과 측정에 사용할 민원 표본 수를 알려 주세요.","expectedDocs":["service-plan-2026"],"expectedEvidence":["2026-12-24","100건"],"category":"late-chunk"},
+    {"id":"current-start","query":"현재 확정된 민원 문서 전환 사업 착수일은 언제인가요?","expectedDocs":["service-schedule-2026"],"expectedEvidence":["2026-11-02"],"category":"version"},
+    {"id":"current-end","query":"민원 문서 전환 사업의 최신 완료 예정일을 알려 주세요.","expectedDocs":["service-schedule-2026"],"expectedEvidence":["2026-12-18"],"category":"version"},
+    {"id":"old-end","query":"수정 전 일정 초안에서 민원 문서 전환 사업의 완료 예정일은 언제였나요?","expectedDocs":["service-schedule-2026-v1"],"expectedEvidence":["2026-11-30"],"category":"version"},
+    {"id":"current-retention","query":"2026년 시행되는 기록 보관 규정의 보관 기간은 몇 년인가요?","expectedDocs":["shared-record-rule-2026"],"expectedEvidence":["5년"],"category":"version"},
+    {"id":"old-retention","query":"2025년에 적용하던 이전 기록 보관 규정의 보관 기간을 알려 주세요.","expectedDocs":["shared-record-rule-2025"],"expectedEvidence":["3년"],"category":"version"},
+    {"id":"training-limit","query":"공통 지출 지침에서 교육 1회당 지출 상한은 얼마인가요?","expectedDocs":["shared-expense-guide-2026"],"expectedEvidence":["3,000,000"],"category":"shared"},
+    {"id":"approval-flow","query":"공통 사무 처리 규정의 작성, 검토, 승인 절차와 담당 역할을 알려 주세요.","expectedDocs":["shared-office-rule-2026"],"expectedEvidence":["행정지원팀","부서장"],"category":"shared"},
+    {"id":"compatibility-risk","query":"민원 문서 전환 사업의 문서 호환성 위험에는 어떻게 대응하나요?","expectedDocs":["service-risks-2026"],"expectedEvidence":["원본","재열기"],"category":"text"},
+    {"id":"roles","query":"민원 문서 전환 사업의 검토와 승인은 어느 역할이 맡나요?","expectedDocs":["service-roles-2026"],"expectedEvidence":["행정지원팀","부서장"],"category":"text"},
+    {"id":"semantic-alias","query":"자료 디지털화는 이 업무에서 어떤 용어와 같은 뜻인가요?","expectedDocs":["service-glossary-2026"],"expectedEvidence":["문서 전환"],"category":"alias"},
+    {"id":"temporary-confirmation","query":"10월 12일 회의에서 확정한 사업 예산과 완료 일자를 알려 주세요.","temporary":true,"expectedDocs":["temporary-service-meeting-20261012"],"expectedEvidence":["48,000,000","2026-12-18"],"category":"temporary"},
+    {"id":"other-budget","query":"재난 대응 문서 전환 사업의 확정 총예산은 얼마인가요?","workspace":"workspace-other","expectedDocs":["other-budget-2026"],"expectedEvidence":["72,000,000"],"category":"other-workspace"},
+    {"id":"unknown-word","query":"제노퀘이사 오로라관측 망원경의 초점거리는?","expectedDocs":[],"expectedEvidence":[],"category":"unanswerable"},
+    {"id":"unknown-overlap","query":"민원 문서 전환 사업 담당자의 개인 휴대전화 번호와 주민등록번호를 알려 주세요.","expectedDocs":[],"expectedEvidence":[],"category":"unanswerable-overlap"},
+    {"id":"foreign-unselected","query":"재난 대응 문서 전환 사업의 자문 예산은 얼마인가요?","expectedDocs":[],"expectedEvidence":[],"category":"unanswerable-scope"},
+    {"id":"unknown-key","query":"첨부 회의록에서 사용하는 실제 서비스 API 키 값을 알려 주세요.","temporary":true,"expectedDocs":[],"expectedEvidence":[],"category":"unanswerable-overlap"}
+  ]
+}

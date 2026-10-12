@@ -31,6 +31,9 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/43-style-management-result.
 if (Test-Path -LiteralPath (Join-Path $projectRoot 'docs/44-editor-stages-result.md')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/44-editor-stages-result.md') -Destination $output -Force
 }
+if (Test-Path -LiteralPath (Join-Path $projectRoot 'docs/45-rag-evaluation-corpus.md')) {
+    Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/45-rag-evaluation-corpus.md') -Destination $output -Force
+}
 foreach ($guide in @('30-layered-modular-refactor-plan.md','31-facade-contracts.md','32-modular-refactor-result.md','33-editor-parity-features-result.md','34-sections-tabs-result.md','35-section-boundary-merge-result.md','36-native-section-comparison.md','37-basic-editing-state-result.md','38-paragraph-selection-state-result.md','39-native-dialog-investigation.md','40-basic-navigation-calendar-result.md','41-pre-agent-editor-progress.md','refactor-work-plan.csv','hangul-2024-gap-checklist.csv')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
@@ -80,6 +83,16 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/src/modules/document
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/continuation-2026-10-11') -Destination $llmEvidence -Recurse -Force
 $reviewDocuments = Join-Path $output 'review-documents'
 New-Item -ItemType Directory -Force $reviewDocuments | Out-Null
+$ragCorpus = Join-Path $projectRoot 'fixtures/rag-evaluation'
+if (Test-Path -LiteralPath $ragCorpus) {
+    $referenceExamples = Join-Path $output 'reference-examples'
+    New-Item -ItemType Directory -Force $referenceExamples | Out-Null
+    Copy-Item -LiteralPath $ragCorpus -Destination $referenceExamples -Recurse -Force
+}
+foreach ($evidenceName in @('rag-corpus-2026-10-13','rag-evaluation-2026-10-13')) {
+    $source = Join-Path $projectRoot ('docs/evidence/' + $evidenceName)
+    if (Test-Path -LiteralPath $source) { Copy-Item -LiteralPath $source -Destination $llmEvidence -Recurse -Force }
+}
 foreach ($relative in @('behavior', 'state', 'agent/preflight')) {
     Get-ChildItem -LiteralPath (Join-Path $projectRoot ('docs/evidence/continuation-2026-10-11/' + $relative)) -File |
         Where-Object { $_.Extension -in @('.hwp', '.hwpx') } | Copy-Item -Destination $reviewDocuments -Force

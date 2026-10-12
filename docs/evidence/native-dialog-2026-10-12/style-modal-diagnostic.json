@@ -1,0 +1,158 @@
+{
+  "observedAt": "2026-10-12T11:38:38Z",
+  "status": "BLOCKED_TOOL_MODAL_ACTIVATION",
+  "nativeDialogClosed": false,
+  "scope": "Hancom Hangul 2024 Style dialog in project synthetic native-abcd-delete.hwpx",
+  "observations": {
+    "listWindowsHwpCount": 1,
+    "listAppsHwpWindowCountAfterKernelReset": 1,
+    "returnedWindowId": 723778,
+    "separateStyleWindowReturned": false,
+    "accessibilityStyleDialogPresent": true,
+    "accessibilityCloseButton": {
+      "index": 4,
+      "automationId": "PART_Close"
+    },
+    "screenshotMatchesTarget": false,
+    "screenshotObservation": "The returned pixels showed another foreground application, while accessibility described Hwp and its Style dialog. Unrelated pixels and titles were not persisted.",
+    "screenshotMetadata": [
+      {
+        "id": "screenshot-0",
+        "originX": 2756,
+        "originY": 196,
+        "width": 1200,
+        "height": 700,
+        "zIndex": 0
+      },
+      {
+        "id": "screenshot-1",
+        "originX": 2963,
+        "originY": 247,
+        "width": 787,
+        "height": 598,
+        "zIndex": 1
+      }
+    ],
+    "sdkInspection": "The exposed methods are native-bound; @oai/sky resolves through an injected facade, not a readable local module at workspace cwd.",
+    "finalStyleDialogPresent": true,
+    "finalFocusedElement": "10 목록 항목 (selectable) 바탕글"
+  },
+  "attempts": [
+    {
+      "method": "get_window_state(include_screenshot:false,include_text:true) → click(element_index:4)",
+      "result": "Error: failed to activate captured window"
+    },
+    {
+      "method": "js_reset → initialize → list_apps → get_window → text-only state → perform_secondary_action(element_index:1,action:Raise)",
+      "result": "Error: failed to activate captured window"
+    }
+  ],
+  "processDiagnostic": {
+    "script": "scripts/diagnose-native-process.ps1",
+    "exitCode": 0,
+    "processes": [
+      {
+        "process": "codex",
+        "id": 1616,
+        "session": 3,
+        "responding": true,
+        "integrity": "medium (0x2000)"
+      },
+      {
+        "process": "codex",
+        "id": 3992,
+        "session": 3,
+        "responding": true,
+        "integrity": "medium (0x2000)"
+      },
+      {
+        "process": "codex",
+        "id": 13360,
+        "session": 3,
+        "responding": true,
+        "integrity": "medium (0x2000)"
+      },
+      {
+        "process": "codex",
+        "id": 18092,
+        "session": 3,
+        "responding": true,
+        "integrity": "medium (0x2000)"
+      },
+      {
+        "process": "codex",
+        "id": 20272,
+        "session": 3,
+        "responding": true,
+        "integrity": "medium (0x2000)"
+      },
+      {
+        "process": "codex",
+        "id": 22224,
+        "session": 3,
+        "responding": true,
+        "integrity": "medium (0x2000)"
+      },
+      {
+        "process": "codex",
+        "id": 24000,
+        "session": 3,
+        "responding": true,
+        "integrity": "medium (0x2000)"
+      },
+      {
+        "process": "codex",
+        "id": 25444,
+        "session": 3,
+        "responding": true,
+        "integrity": "medium (0x2000)"
+      },
+      {
+        "process": "codex",
+        "id": 28048,
+        "session": 3,
+        "responding": true,
+        "integrity": "medium (0x2000)"
+      },
+      {
+        "process": "codex",
+        "id": 29648,
+        "session": 3,
+        "responding": true,
+        "integrity": "medium (0x2000)"
+      },
+      {
+        "process": "codex",
+        "id": 33640,
+        "session": 3,
+        "responding": true,
+        "integrity": "medium (0x2000)"
+      },
+      {
+        "process": "Hwp",
+        "id": 32172,
+        "session": 3,
+        "responding": true,
+        "integrity": "medium (0x2000)"
+      }
+    ],
+    "limitation": "Codex and Hwp process tokens were read. The underlying Computer Use helper token and native activation return trace were not exposed or inspected."
+  },
+  "conclusions": {
+    "confirmed": [
+      "Hwp responds and its process and all observed Codex processes run in session 3 at medium integrity (0x2000).",
+      "Both list APIs expose only the parent document, while accessibility exposes the Style dialog.",
+      "Text-only capture and a JavaScript kernel reset did not restore modal activation."
+    ],
+    "hypothesis": "The bridge targets the parent while the owned modal is open, or binds captured/accessible state to an unsuitable activation target. Exact internal cause is unconfirmed.",
+    "nextRequired": "Tool-provider correction or a supported API exposing the owned modal and accurate capture/input binding. No Jueony source change can repair the injected Computer Use bridge.",
+    "excludedActions": [
+      "No direct UIA/SendKeys/COM automation",
+      "No guessed HWND",
+      "No native helper launch or custom protocol client",
+      "No security or foreground-lock settings changes",
+      "No unrelated screenshots persisted",
+      "No user document content edits"
+    ]
+  }
+}

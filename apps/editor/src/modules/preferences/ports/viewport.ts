@@ -1,4 +1,4 @@
-import type { DocumentFitMode, BodyCaret } from '../public/contracts.ts';
+import type { DocumentFitMode, BodyCaret, SessionCursor } from '../public/contracts.ts';
 
 export interface DocumentViewport {
   getZoom(): number; getZoomFitMode(): DocumentFitMode; getScrollX(): number; getScrollY(): number;
@@ -16,4 +16,8 @@ export interface DocumentViewAdapterOptions {
   settle: () => Promise<void>;
   captureCaret?: () => BodyCaret | undefined;
   restoreCaret?: (caret: BodyCaret) => boolean;
+  captureCursor?: () => SessionCursor | undefined;
+  restoreCursor?: (cursor: SessionCursor) => boolean;
+  /** Changes when the user moves/types/selects while asynchronous layout settles. */
+  cursorInteraction?: () => number;
 }

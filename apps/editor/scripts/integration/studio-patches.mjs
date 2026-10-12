@@ -38,6 +38,7 @@ main = replaceOnce(main, "return params.has('url');", "return params.has('url') 
 main = "import { installHangulKeys } from './jueony/shortcuts/install';\nimport { installAgentBridge } from './jueony/mvp/editor-bridge';\nimport { installDesktopHost } from './jueony/desktop-host';\nimport { installHangulChrome } from './jueony/chrome-2024';\n" + main;
 main = "import {installDocumentInformation} from './jueony/adapters/rhwp/document-info.ts';\nimport {installPageControls} from './jueony/adapters/rhwp/page-controls.ts';\nimport {readDocumentDefaults, applyNewDocumentDefaults} from './jueony/preferences/document-defaults.ts';\nimport {createDocumentViewAdapter} from './jueony/preferences/document-view.ts';\nlet jueonyDocumentView: ReturnType<typeof createDocumentViewAdapter> | undefined;\n" + main;
 main = "import {captureBodyCaret, restoreBodyCaret} from './jueony/adapters/rhwp/body-caret.ts';\nlet jueonyComposing = false;\ndocument.addEventListener('compositionstart',()=>{jueonyComposing=true;},true);\ndocument.addEventListener('compositionend',()=>{jueonyComposing=false;},true);\n" + main;
+main = "import {captureSessionCursor, restoreSessionCursor} from './jueony/adapters/rhwp/session-cursor.ts';\nlet jueonyCursorInteraction = 0;\ndocument.addEventListener('keydown',()=>jueonyCursorInteraction++,true);\ndocument.addEventListener('pointerdown',()=>jueonyCursorInteraction++,true);\ndocument.addEventListener('pointermove',e=>{if(e.buttons)jueonyCursorInteraction++;},true);\ndocument.addEventListener('wheel',()=>jueonyCursorInteraction++,{capture:true,passive:true});\n" + main;
 main = replaceOnce(main, 'const docInfo = wasm.createNewDocument();', `const defaults = new URLSearchParams(location.search).get('skipDefaults') === '1' ? undefined : readDocumentDefaults(localStorage);
       const docInfo = wasm.createNewDocument();
       if(defaults && applyNewDocumentDefaults(wasm.borrowDocumentHandle()!, defaults)) docInfo.fontsUsed.push(defaults.font.family);`, 'new document defaults');
@@ -89,12 +90,17 @@ jueonyDocumentView = createDocumentViewAdapter({
   settle: () => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))),
   captureCaret: () => jueonyComposing ? undefined : captureBodyCaret(inputHandler?.getSessionCaretAccess()),
   restoreCaret: caret => !jueonyComposing && restoreBodyCaret(inputHandler?.getSessionCaretAccess(), caret),
+  captureCursor: () => jueonyComposing ? undefined : captureSessionCursor(inputHandler?.getSessionCaretAccess()),
+  restoreCursor: cursor => !jueonyComposing && restoreSessionCursor(inputHandler?.getSessionCaretAccess(), cursor),
+  cursorInteraction: () => jueonyCursorInteraction,
 });
 Object.assign((window as any).jueonyEditor, {captureDocumentView: () => jueonyDocumentView!.capture(),suspendDocumentView: () => jueonyDocumentView!.suspend(),restoreDocumentView: (value: unknown) => jueonyDocumentView!.restore(value)});
 window.addEventListener('resize', () => { void jueonyDocumentView!.retry(); });
 const jueonyRememberView = () => { if (!jueonyDocumentView!.isRestoring()) { jueonyDocumentView!.capture(); if (window.parent !== window) window.parent.postMessage({type:'jueony:status'},location.origin); } };
 document.getElementById('scroll-container')?.addEventListener('scroll', jueonyRememberView, {passive:true});
 eventBus.on('zoom-level-display', jueonyRememberView);
+eventBus.on('cursor-rect-updated', jueonyRememberView);
+eventBus.on('document-mutated', () => { jueonyCursorInteraction++; });
 eventBus.on('command-state-changed', () => { if (window.parent !== window) window.parent.postMessage({type:'jueony:command-state'},location.origin); });
 window.addEventListener('keydown', event => { if(event.key === 'F6' && event.altKey && !event.ctrlKey && !event.shiftKey && !event.isComposing && !document.querySelector('dialog[open],.modal-overlay') && window.parent !== window){event.preventDefault();event.stopImmediatePropagation();window.parent.postMessage({type:'jueony:focus-chat'},location.origin);} },true);
 void initPromise.then(() => userSettings.refreshFromStorage());
@@ -135,7 +141,37 @@ for (const name of ['para-shape-dialog.ts','char-shape-dialog.ts']) {
   await writeFile(join(root, 'src/ui', name), shape);
 }
 let caretInput = (await readFile(join(root, 'src/engine/input-handler.ts'), 'utf8')).replace(/\r\n/g, '\n');
+caretInput = "import { paragraphSpacingChange } from '../jueony/shortcuts/paragraph-spacing.ts';\nimport {createParagraphSpacingReader} from '../jueony/adapters/rhwp/paragraph-spacing.ts';\n" + caretInput;
 caretInput = replaceOnce(caretInput, '  getCursorPosition(): DocumentPosition { return this.cursor.getPosition(); }', `  getCursorPosition(): DocumentPosition { return this.cursor.getPosition(); }
+
+  /** Relative values per paragraph, preflighted then recorded as one atomic undo step. */
+  adjustParagraphSpacing(operation: unknown): boolean {
+    const block = this.getSelectedCellBlock();
+    const targets = block?.cellPath?.length === 1
+      ? this.getParaFormatTargetsForCellBlock({ ...block, cellPath: undefined })
+      : this.getParaFormatTargetsAtCursor();
+    if (!targets.length || targets.length > 5000) return false;
+    const read = createParagraphSpacingReader(this.wasm);
+    const changes = targets.map(target => ({ target, props: paragraphSpacingChange(read(target), operation) })).filter(change => Object.keys(change.props).length);
+    if (!changes.length) return true;
+    const position = this.cursor.getPosition(), cellSelection = this.cursor.captureCellSelection(), textSelection = this.cursor.getSelection();
+    this.executeOperation({ kind: 'snapshot', operationType: 'paragraphSpacing',
+      selectionBefore: cellSelection ? { mode: 'cellBlock', state: cellSelection }
+        : textSelection && textSelection.anchor.parentParaIndex === undefined
+          ? { start: textSelection.anchor, end: textSelection.focus, blockPhase: this.cursor.blockSelectionPhase() } : null,
+      operation: wasm => {
+        wasm.runInBatch(() => {
+          for (const { target, props } of changes) {
+            const json = JSON.stringify(props);
+            if (target.kind === 'body') wasm.applyParaFormat(target.sec, target.para, json);
+            else wasm.applyParaFormatInCell(target.sec, target.parentPara, target.controlIdx, target.cellIdx, target.cellParaIdx, json);
+          }
+        });
+        return position;
+      },
+    });
+    return true;
+  }
 
   /** Session view restoration only; no document mutation or keyboard focus transfer. */
   getSessionCaretAccess() {
@@ -145,6 +181,21 @@ caretInput = replaceOnce(caretInput, '  getCursorPosition(): DocumentPosition { 
         this.cursor.moveTo(position);
         this.cursor.resetPreferredX();
         this.updateCaret();
+      },
+      restoreSessionSelection: (focus: DocumentPosition, anchor: DocumentPosition | undefined, phase: number | null, block: import('./cursor').CellBlockSelectionState | undefined): boolean => {
+        if (block && !this.cursor.restoreCellSelection(block)) return false;
+        if (!block) this.cursor.exitCellSelectionMode();
+        if (anchor && anchor.parentParaIndex === undefined) {
+          if (!this.cursor.selectRange(anchor, focus, phase)) return false;
+        } else {
+          this.cursor.exitBlockSelectionMode();
+          if (anchor) { this.cursor.moveTo(anchor); this.cursor.setAnchor(); }
+          this.cursor.moveTo(focus);
+        }
+        this.cursor.resetPreferredX();
+        this.updateCaret();
+        this.eventBus.emit('command-state-changed');
+        return true;
       },
     };
   }`, 'session caret input boundary');

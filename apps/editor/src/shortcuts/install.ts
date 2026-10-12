@@ -28,6 +28,12 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
     id, label, canExecute: (c: any) => c.hasDocument && c.isEditable && !c.isFormMode && (!bodyOnly || (!c.inTable && !c.inCellSelectionMode && !c.inPictureObjectSelection && !c.inTableObjectSelection && !input()?.cursor?.isInHeaderFooter?.() && !input()?.cursor?.isInFootnote?.() && !input()?.cursor?.isInTextBox?.())), execute,
   });
   register('ext:jueony-normal', '보통 모양', () => eventBus.emit('format-char', { bold: false, italic: false, underline: false, strikethrough: false, outlineType: 0, shadowType: 0, emboss: false, engrave: false, superscript: false, subscript: false }));
+  registry.register({id:'ext:jueony-paragraph-spacing',label:'문단 여백·첫 줄 조절',
+    canExecute:(c:any)=>c.hasDocument&&c.isEditable&&!c.isFormMode&&!c.inPictureObjectSelection&&!c.inTableObjectSelection
+      &&!input()?.cursor?.isInHeaderFooter?.()&&!input()?.cursor?.isInFootnote?.()&&!input()?.cursor?.isInTextBox?.()
+      &&(input()?.getCursorPosition()?.cellPath?.length??0)<=1,
+    execute:(_s:any,p:any)=>{if(!input()?.adjustParagraphSpacing(p?.operation))throw new Error('현재 문맥에서 문단 여백을 조절할 수 없습니다.');},
+  });
   register('ext:jueony-default-style', '기본 스타일 단축키', (_s, p) => {
     const ih = input(), styleId = resolveDefaultStyle(ih.wasm.getStyleList(), p?.slot);
     if (styleId === undefined) throw new Error('해당 기본 스타일을 찾을 수 없습니다. F6에서 문서의 스타일을 확인하세요.');
@@ -89,7 +95,7 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
   document.addEventListener('focusin', () => resolver.reset(), true);
   eventBus.on('document-swapped', reset);
   window.addEventListener('keydown', (event: KeyboardEvent) => {
-    const ih = input(), target = event.target as HTMLElement | null;
+    const ih = input(), target = event.target instanceof HTMLElement ? event.target : null;
     if (document.querySelector('.modal-overlay, dialog[open]') || target?.closest('#jueony-navigation-pane') || (target?.closest('input, textarea, select, [contenteditable=true], [role=textbox]') && target !== ih?.textarea)) { resolver.reset(); return; }
     const c = automation.getContext();
     if (event.isComposing || ih?.isComposing || event.keyCode === 229) {

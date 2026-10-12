@@ -7,7 +7,13 @@ export type DocumentDefaults = { version: 1; enabled: boolean; page: PageDefault
 
 export type DocumentFitMode = 'none' | 'fitWidth' | 'fitPage';
 export type BodyCaret = { section: number; paragraph: number; offset: number; paragraphLength: number; before: string; after: string };
-export type DocumentViewState = { version: 1; zoom: number; fitMode: DocumentFitMode; scrollX: number; scrollY: number; caret?: BodyCaret };
+export type SessionPoint = { kind: 'body'; caret: BodyCaret } | {
+  kind: 'cell'; caret: BodyCaret; parentParagraph: number; control: number; cell: number; tableFingerprint: string;
+};
+export type CellBlockBookmark = { anchor: { row: number; col: number }; focus: { row: number; col: number }; phase: 1 | 2 | 3; reason: 'manual' | 'protected'; excluded: string[] };
+export type SessionCursor = { kind: 'text'; focus: SessionPoint; anchor?: SessionPoint; blockPhase: number | null; selectionFingerprint?: string }
+  | { kind: 'cells'; focus: Extract<SessionPoint, { kind: 'cell' }>; block: CellBlockBookmark };
+export type DocumentViewState = { version: 1; zoom: number; fitMode: DocumentFitMode; scrollX: number; scrollY: number; caret?: BodyCaret; cursor?: SessionCursor };
 
 export type PreferenceErrorCode = 'read' | 'write' | 'corrupt' | 'version';
 export class PreferenceStorageError extends Error {

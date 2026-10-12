@@ -179,6 +179,104 @@ try{
     assert.equal((await (await services()).evaluate(()=>window.__parityServices.wasm.getStyleAt(0,0))).name.replace(/\s/g,''),'개요7');
   });
 
+  for(const extension of ['hwp','hwpx'])await scenario(`${extension}: paragraph shortcut aliases adjust per-paragraph values and undo/save without changing text`,async()=>{
+    const doc=HwpDocument.createEmpty();doc.createBlankDocument();doc.insertText(0,0,0,'여백 가😀나');doc.splitParagraph(0,0,6);doc.insertText(0,1,0,'다른 여백 문단');
+    doc.applyParaFormat(0,0,JSON.stringify({marginLeft:2000,marginRight:4000,indent:1000}));doc.applyParaFormat(0,1,JSON.stringify({marginLeft:6000,marginRight:8000,indent:0}));
+    const bytes=[...doc[extension==='hwp'?'exportHwp':'exportHwpx']()];doc.free();const frame=await openBytes(bytes,`paragraph-keys.${extension}`),before=await snapshot();
+    for(const [keys,field,delta] of [
+      [['Control','Alt','F5'],'marginLeft',-1],[['Control','Shift','e'],'marginLeft',-1],[['Control','Alt','F6'],'marginLeft',1],[['Control','Shift','g'],'marginLeft',1],
+      [['Control','Alt','F7'],'marginRight',1],[['Control','Shift','d'],'marginRight',1],[['Control','Alt','F8'],'marginRight',-1],[['Control','Shift','f'],'marginRight',-1],
+      [['Control','F5'],'indent',-1],[['Control','Shift','o'],'indent',-1],[['Control','F6'],'indent',1],[['Control','Shift','i'],'indent',1],
+      [['Control','F7'],'both',-1],[['Control','F8'],'both',1],
+    ]){
+      await focusBody();const old=await frame.evaluate(()=>JSON.parse(window.__parityServices.wasm.borrowDocumentHandle().getParaShapeSet(0,0)));await chord(...keys);
+      const props=await frame.evaluate(()=>JSON.parse(window.__parityServices.wasm.borrowDocumentHandle().getParaShapeSet(0,0)));
+      for(const key of field==='both'?['LeftMargin','RightMargin']:[{marginLeft:'LeftMargin',marginRight:'RightMargin',indent:'Indentation'}[field]])assert.equal(props[key]-old[key],delta*200,`${keys.join('+')}: ${JSON.stringify({old,props})}`);
+      assert.deepEqual((await snapshot()).nodes.map(n=>n.text),before.nodes.map(n=>n.text));
+    }
+    const propsBefore=await frame.evaluate(()=>[0,1].map(p=>JSON.parse(window.__parityServices.wasm.borrowDocumentHandle().getParaShapeSet(0,p))));
+    await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.cursor.selectRange({sectionIndex:0,paragraphIndex:0,charOffset:1},{sectionIndex:0,paragraphIndex:1,charOffset:2});ih.updateCaret();ih.focus();});
+    await chord('Control','Shift','g');const propsAfter=await frame.evaluate(()=>[0,1].map(p=>JSON.parse(window.__parityServices.wasm.borrowDocumentHandle().getParaShapeSet(0,p))));
+    for(let p=0;p<2;p++)assert.equal(propsAfter[p].LeftMargin-propsBefore[p].LeftMargin,200);
+    assert.ok(await frame.evaluate(()=>window.__parityServices.getInputHandler().cursor.hasSelection()));
+    await command('edit:undo');assert.deepEqual(await frame.evaluate(()=>[0,1].map(p=>JSON.parse(window.__parityServices.wasm.borrowDocumentHandle().getParaShapeSet(0,p)))),propsBefore);
+    assert.ok(await frame.evaluate(()=>window.__parityServices.getInputHandler().cursor.hasSelection()));
+    await command('edit:redo');const saved=await saveBytes(`paragraph-spacing.${extension}`),reopen=new HwpDocument(new Uint8Array(saved));
+    try{for(let p=0;p<2;p++)assert.equal(parse(reopen.getParaShapeSet(0,p)).LeftMargin,propsAfter[p].LeftMargin);}finally{reopen.free();}
+  });
+
+  await scenario('body selection preserves backward anchor and F3 phase after delayed persistence/reload; changed middle text refuses restore',async()=>{
+    let frame=await openFixture(),before=await snapshot();await page.click('#save-document');await page.waitForFunction(()=>document.getElementById('app-status').textContent==='파일에 저장했습니다.');
+    await delay(1800); // Exceed the previous save timer: the cursor event must trigger its own view write.
+    const saved=await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.cursor.selectRange({sectionIndex:0,paragraphIndex:2,charOffset:2},{sectionIndex:0,paragraphIndex:0,charOffset:1},3);ih.updateCaret();ih.focus();return window.jueonyEditor.captureDocumentView();});
+    assert.equal(saved.cursor.kind,'text');assert.equal(saved.cursor.blockPhase,3);assert.equal(saved.cursor.anchor.caret.paragraph,2);
+    await delay(2000);await page.reload();await ready();frame=await services();
+    const actual=await frame.evaluate(()=>({view:window.jueonyEditor.captureDocumentView(),range:window.__parityServices.getInputHandler().cursor.getSelection(),phase:window.__parityServices.getInputHandler().cursor.blockSelectionPhase()}));
+    assert.deepEqual(actual.view.cursor,saved.cursor);assert.equal(actual.phase,3);assert.equal(actual.range.anchor.paragraphIndex,2);assert.equal(actual.range.focus.paragraphIndex,0);
+    assert.deepEqual((await snapshot()).nodes.map(n=>n.text),before.nodes.map(n=>n.text));assert.equal(await frame.evaluate(()=>window.jueonyEditor.state().dirty),false);
+    await page.$eval('#request-input',e=>e.focus());await frame.evaluate(v=>window.jueonyEditor.restoreDocumentView(v),saved);assert.equal(await page.evaluate(()=>document.activeElement.id),'request-input');
+    await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.cursor.exitBlockSelectionMode();ih.cursor.moveTo({sectionIndex:0,paragraphIndex:1,charOffset:0});ih.applyParaPropsAtCursor({alignment:'left'});});
+    await frame.evaluate(async saved=>{const s=window.__parityServices,ih=s.getInputHandler();const text=s.wasm.getTextRange(0,1,0,s.wasm.getParagraphLength(0,1));s.wasm.borrowDocumentHandle().deleteText(0,1,0,1);s.wasm.borrowDocumentHandle().insertText(0,1,0,text[0]==='X'?'Y':'X');ih.cursor.moveTo({sectionIndex:0,paragraphIndex:1,charOffset:0});ih.updateCaret();await window.jueonyEditor.restoreDocumentView(saved);},saved);
+    assert.equal(await frame.evaluate(()=>window.__parityServices.getInputHandler().cursor.hasSelection()),false);
+  });
+
+  await scenario('paragraph repeated keys preserve no-op redo and refuse modal/form/IME edits',async()=>{
+    const doc=HwpDocument.createEmpty();doc.createBlankDocument();doc.insertText(0,0,0,'반복 단축키');const bytes=[...doc.exportHwpx()];doc.free();const frame=await openBytes(bytes,'paragraph-guards.hwpx');
+    await page.keyboard.down('Control');await page.keyboard.down('Shift');for(let n=0;n<3;n++)await page.keyboard.down('g');await page.keyboard.up('g');await page.keyboard.up('Shift');await page.keyboard.up('Control');
+    assert.equal(await frame.evaluate(()=>JSON.parse(window.__parityServices.wasm.borrowDocumentHandle().getParaShapeSet(0,0)).LeftMargin),600);
+    for(let n=0;n<3;n++)await command('edit:undo');const revision=(await snapshot()).revision;
+    await focusBody();await chord('Control','Shift','e');assert.equal((await snapshot()).revision,revision);assert.equal(await frame.evaluate(()=>window.rhwpStudio.automation.isEnabled('edit:redo')),true);
+    await frame.evaluate(()=>window.__parityServices.getInputHandler().setEditMode('form'));
+    await chord('Control','F6');assert.equal((await snapshot()).revision,revision);await frame.evaluate(()=>window.__parityServices.getInputHandler().setEditMode('normal'));
+    await focusBody();await frame.evaluate(()=>window.dispatchEvent(new KeyboardEvent('keydown',{key:'g',code:'KeyG',ctrlKey:true,shiftKey:true,isComposing:true,bubbles:true,cancelable:true})));assert.equal((await snapshot()).revision,revision);
+    await chord('Alt','t');await frame.waitForSelector('.modal-overlay');await chord('Control','Shift','g');assert.equal((await snapshot()).revision,revision);await page.keyboard.press('Escape');
+  });
+
+  await scenario('flat table cell Unicode caret and same-cell text selection survive reload and tab switching',async()=>{
+    const doc=HwpDocument.createEmpty();doc.createBlankDocument();const table=parse(doc.createTable(0,0,0,2,2));doc.insertTextInCell(0,table.paraIdx,table.controlIdx,0,0,0,'가😀나 셀 문서');
+    const bytes=[...doc.exportHwpx()];doc.free();let frame=await openBytes(bytes,'cell-cursor.hwpx');await page.click('#save-document');await page.waitForFunction(()=>document.getElementById('app-status').textContent==='파일에 저장했습니다.');
+    await frame.evaluate(table=>{const ih=window.__parityServices.getInputHandler();ih.cursor.moveTo({sectionIndex:0,parentParaIndex:table.paraIdx,paragraphIndex:0,charOffset:2,controlIndex:table.controlIdx,cellIndex:0,cellParaIndex:0,cellPath:[{controlIndex:table.controlIdx,cellIndex:0,cellParaIndex:0}]});ih.updateCaret();ih.focus();},table);
+    const saved=await frame.evaluate(()=>window.jueonyEditor.captureDocumentView());assert.equal(saved.cursor.focus.kind,'cell');assert.equal(saved.cursor.focus.caret.before,'가😀');
+    await delay(2000);await page.reload();await ready();frame=await services();assert.deepEqual((await frame.evaluate(()=>window.jueonyEditor.captureDocumentView())).cursor,saved.cursor);
+    const selected=await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler(),p=ih.cursor.getPosition();ih.cursor.moveTo({...p,charOffset:1});ih.cursor.setAnchor();ih.cursor.moveTo({...p,charOffset:4});ih.updateCaret();return window.jueonyEditor.captureDocumentView();});
+    assert.equal(selected.cursor.anchor.kind,'cell');await delay(2000);await page.reload();await ready();frame=await services();assert.deepEqual((await frame.evaluate(()=>window.jueonyEditor.captureDocumentView())).cursor,selected.cursor);
+    const index=await page.evaluate(()=>[...document.querySelectorAll('.document-tab')].findIndex(e=>e.getAttribute('aria-selected')==='true'));
+    await page.click('#new-document');await page.waitForFunction(()=>document.querySelector('.document-tab[aria-selected=true]')?.textContent!=='문서 준비 중…');await page.click(`.document-tab-wrap:nth-child(${index+1}) .document-tab`);frame=await services();
+    assert.deepEqual((await frame.evaluate(()=>window.jueonyEditor.captureDocumentView())).cursor,selected.cursor);
+    assert.equal(await frame.evaluate(()=>window.jueonyEditor.state().dirty),false);
+  });
+
+  await scenario('F5 cell block stores phase/rectangle/exclusions and paragraph delta applies to all selected cells as one undo',async()=>{
+    let frame=await openFixture('schedule-table.hwpx');await page.click('#save-document');await page.waitForFunction(()=>document.getElementById('app-status').textContent==='파일에 저장했습니다.');
+    await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.cursor.moveTo({sectionIndex:0,parentParaIndex:1,paragraphIndex:0,charOffset:0,controlIndex:0,cellIndex:0,cellParaIndex:0,cellPath:[{controlIndex:0,cellIndex:0,cellParaIndex:0}]});ih.cursor.enterCellSelectionMode();ih.cursor.advanceCellSelectionPhase();ih.cursor.setCellSelectionFocus(1,1);ih.cursor.ctrlToggleCell(0,1);ih.updateCaret();ih.focus();});
+    const saved=await frame.evaluate(()=>window.jueonyEditor.captureDocumentView());assert.equal(saved.cursor.kind,'cells');assert.equal(saved.cursor.block.phase,2);
+    await delay(2000);await page.reload();await ready();frame=await services();assert.deepEqual((await frame.evaluate(()=>window.jueonyEditor.captureDocumentView())).cursor,saved.cursor);
+    const block=await frame.evaluate(()=>window.__parityServices.getInputHandler().cursor.captureCellSelection());assert.equal(block.phase,2);assert.deepEqual(block.focus,saved.cursor.block.focus);
+    assert.deepEqual(block.excluded,['0,1']);
+    const cellInfo=await frame.evaluate(()=>{const w=window.__parityServices.wasm;return Array.from({length:w.getTableDimensions(0,1,0).cellCount},(_,c)=>w.getCellInfo(0,1,0,c));});
+    const before=await frame.evaluate(()=>{const w=window.__parityServices.wasm,d=w.borrowDocumentHandle(),lists=JSON.parse(d.getCursorModel()).lists;return Array.from({length:w.getTableDimensions(0,1,0).cellCount},(_,c)=>JSON.parse(d.getParaShapeSet(lists.find(l=>l.isCell&&l.hostListId===0&&l.sectionIndex===0&&l.hostPara===1&&l.controlIndex===0&&l.cellIndex===c).listId,0)));});
+    await frame.evaluate(()=>window.__parityServices.getInputHandler().focus());await chord('Control','Shift','g');
+    const after=await frame.evaluate(()=>{const w=window.__parityServices.wasm,d=w.borrowDocumentHandle(),lists=JSON.parse(d.getCursorModel()).lists;return Array.from({length:w.getTableDimensions(0,1,0).cellCount},(_,c)=>JSON.parse(d.getParaShapeSet(lists.find(l=>l.isCell&&l.hostListId===0&&l.sectionIndex===0&&l.hostPara===1&&l.controlIndex===0&&l.cellIndex===c).listId,0)));});
+    for(let i=0;i<cellInfo.length;i++){
+      const inside=cellInfo[i].row>=Math.min(block.anchor.row,block.focus.row)&&cellInfo[i].row<=Math.max(block.anchor.row,block.focus.row)&&cellInfo[i].col>=Math.min(block.anchor.col,block.focus.col)&&cellInfo[i].col<=Math.max(block.anchor.col,block.focus.col)&&!block.excluded.includes(`${cellInfo[i].row},${cellInfo[i].col}`);
+      assert.equal(after[i].LeftMargin-before[i].LeftMargin,inside?200:0,`cell ${i} selection delta`);
+    }
+    await command('edit:undo');assert.deepEqual(await frame.evaluate(()=>{const w=window.__parityServices.wasm,d=w.borrowDocumentHandle(),lists=JSON.parse(d.getCursorModel()).lists;return Array.from({length:w.getTableDimensions(0,1,0).cellCount},(_,c)=>JSON.parse(d.getParaShapeSet(lists.find(l=>l.isCell&&l.hostListId===0&&l.sectionIndex===0&&l.hostPara===1&&l.controlIndex===0&&l.cellIndex===c).listId,0)));}),before);
+    assert.equal(await frame.evaluate(()=>window.__parityServices.getInputHandler().cursor.isInCellSelectionMode()),true);
+  });
+
+  await scenario('merged flat table cell cursor survives checkpoint/reload and new input cancels a pending restore',async()=>{
+    const doc=HwpDocument.createEmpty();doc.createBlankDocument();const table=parse(doc.createTable(0,0,0,2,2));doc.insertTextInCell(0,table.paraIdx,table.controlIdx,0,0,0,'병합😀셀');
+    doc.mergeTableCells(0,table.paraIdx,table.controlIdx,0,0,0,1);const bytes=[...doc.exportHwpx()];doc.free();let frame=await openBytes(bytes,'merged-cell-cursor.hwpx');
+    await page.click('#save-document');await page.waitForFunction(()=>document.getElementById('app-status').textContent==='파일에 저장했습니다.');
+    await frame.evaluate(table=>{const ih=window.__parityServices.getInputHandler();ih.cursor.moveTo({sectionIndex:0,parentParaIndex:table.paraIdx,paragraphIndex:0,charOffset:3,controlIndex:table.controlIdx,cellIndex:0,cellParaIndex:0});ih.updateCaret();},table);
+    const saved=await frame.evaluate(()=>window.jueonyEditor.captureDocumentView());assert.equal(saved.cursor.focus.kind,'cell');
+    await delay(2000);await page.reload();await ready();frame=await services();assert.deepEqual((await frame.evaluate(()=>window.jueonyEditor.captureDocumentView())).cursor,saved.cursor);
+    const result=await frame.evaluate(async saved=>{const ih=window.__parityServices.getInputHandler(),p=ih.cursor.getPosition();ih.cursor.moveTo({...p,charOffset:0});ih.updateCaret();const pending=window.jueonyEditor.restoreDocumentView(saved);document.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight',code:'ArrowRight',bubbles:true}));const status=await pending;return {status,offset:ih.cursor.getPosition().charOffset};},saved);
+    assert.deepEqual(result,{status:'ignored',offset:0});assert.equal(await frame.evaluate(()=>window.jueonyEditor.state().dirty),false);
+    await saveBytes('merged-cell-cursor.hwpx');
+  });
+
   if(process.env.JUEONY_ENGINE_PACKAGE) {
     if(typeof HwpDocument.prototype.mergeSectionBoundary==='function'||process.env.JUEONY_EXPECT_SECTION_MERGE==='1') {
       for(const extension of ['hwp','hwpx'])for(const key of ['Delete','Backspace'])await scenario(`${key} joins section boundary, previous settings, undo/redo and ${extension} save`,async()=>{

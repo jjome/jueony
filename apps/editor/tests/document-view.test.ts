@@ -112,3 +112,17 @@ test('optional caret is restored after layout, before scroll, and captured defen
  await adapter.restore(saved({caret}));assert.deepEqual(f.calls,['zoom:1.5','settled','caret','x:42','y:640']);
  const captured=adapter.capture()!;captured.caret!.offset=999;assert.equal(adapter.capture()!.caret!.offset,1);
 });
+
+test('new cursor bookmark overrides legacy caret and copies nested selection fields',async()=>{
+ const f=fixture(),caret={section:0,paragraph:0,offset:1,paragraphLength:2,before:'가',after:'나'},cursor={kind:'text' as const,focus:{kind:'body' as const,caret},blockPhase:null};
+ let current=cursor,legacy=0;
+ const adapter=createDocumentViewAdapter({viewport:()=>f.viewport,identity:()=> 'a',visible:()=>true,applyFit:()=>{},settle:async()=>{},captureCursor:()=>current,restoreCursor:value=>{if(value.kind==='text')current=value;return true;},restoreCaret:()=>{legacy++;return true;}});
+ await adapter.restore(saved({caret,cursor}));assert.equal(legacy,0);
+ adapter.capture()!.cursor!.focus.caret.offset=99;assert.equal(adapter.capture()!.cursor!.focus.caret.offset,1);
+});
+test('user input while layout settles cancels old cursor and scroll restoration',async()=>{
+ const f=fixture();let interaction=0,restored=0,release!:()=>void;
+ const adapter=createDocumentViewAdapter({viewport:()=>f.viewport,identity:()=> 'a',visible:()=>true,applyFit:()=>{},settle:()=>new Promise<void>(r=>{release=r;}),cursorInteraction:()=>interaction,restoreCaret:()=>{restored++;return true;}});
+ const task=adapter.restore(saved({caret:{section:0,paragraph:0,offset:0,paragraphLength:0,before:'',after:''}}));
+ interaction++;f.viewport.setScrollTop(9);release();assert.equal(await task,'ignored');assert.equal(restored,0);assert.equal(f.viewport.getScrollY(),9);assert.equal(adapter.hasPending(),false);
+});

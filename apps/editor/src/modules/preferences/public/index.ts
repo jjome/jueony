@@ -5,6 +5,8 @@ export type { DocumentViewport, DocumentViewAdapterOptions } from '../ports/view
 export { preferenceChangedPaths } from '../domain/merge.ts';
 export { defaultDocumentDefaults, validateDocumentDefaults } from '../domain/document-defaults.ts';
 export { validateDocumentView, validateBodyCaret } from '../domain/document-view.ts';
+export type {SessionCursor, SessionPoint, CellBlockBookmark} from './contracts.ts';
+export {validateSessionCursor} from '../domain/session-cursor.ts';
 export { createPreferencesFacade, createPreferencesFacade as createPreferencesPersistence } from '../application/persistence.ts';
 export { createDocumentViewFacade, createDocumentViewFacade as createDocumentViewAdapter } from '../application/document-view.ts';
 export { DOCUMENT_DEFAULTS_KEY, readDocumentDefaults, saveDocumentDefaults, resetDocumentDefaults } from '../application/document-defaults.ts';

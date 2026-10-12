@@ -4,7 +4,7 @@
  */
 import { defaultStyleNames } from './style-slots.ts';
 export type Scope = 'document' | 'table' | 'cells' | 'object';
-export type Binding = { keys: string; command: string; label: string; scope: Scope; params?: Record<string, unknown>; nativeClipboard?: boolean };
+export type Binding = { keys: string; command: string; label: string; scope: Scope; params?: Record<string, unknown>; nativeClipboard?: boolean; repeatable?: boolean };
 const binding = (keys: string, command: string, label: string, scope: Scope = 'document', params?: Record<string, unknown>): Binding => ({ keys, command, label, scope, ...(params ? { params } : {}) });
 export const hangulBindings: Binding[] = [
   ...[['Ctrl+C', 'edit:copy', '복사하기'], ['Ctrl+X', 'edit:cut', '오려 두기'], ['Ctrl+V', 'edit:paste', '붙이기'], ['Shift+Delete', 'edit:cut', '오려 두기'], ['Shift+Insert', 'edit:paste', '붙이기']].map(([keys, command, label]) => ({ ...binding(keys, command, label), nativeClipboard: true })),
@@ -30,6 +30,16 @@ export const hangulBindings: Binding[] = [
   binding('Alt+G', 'edit:goto', '찾아가기'),
   binding('Alt+L', 'format:char-shape', '글자 모양'), binding('Alt+T', 'format:para-shape', '문단 모양'),
   binding('F6', 'format:style-dialog', '스타일'), binding('F7', 'file:page-setup', '편집 용지'),
+  ...[
+    ['Ctrl+Alt+F5', 'Ctrl+Shift+E', 'left-less', '왼쪽 여백 줄이기'],
+    ['Ctrl+Alt+F6', 'Ctrl+Shift+G', 'left-more', '왼쪽 여백 늘이기'],
+    ['Ctrl+Alt+F7', 'Ctrl+Shift+D', 'right-more', '오른쪽 여백 늘이기'],
+    ['Ctrl+Alt+F8', 'Ctrl+Shift+F', 'right-less', '오른쪽 여백 줄이기'],
+    ['Ctrl+F5', 'Ctrl+Shift+O', 'indent-less', '첫 줄 내어쓰기'],
+    ['Ctrl+F6', 'Ctrl+Shift+I', 'indent-more', '첫 줄 들여쓰기'],
+    ['Ctrl+F7', '', 'both-less', '양쪽 여백 줄이기'],
+    ['Ctrl+F8', '', 'both-more', '양쪽 여백 늘이기'],
+  ].flatMap(([primary, alternate, operation, label]) => [primary, alternate].filter(Boolean).map(keys => ({...binding(keys, 'ext:jueony-paragraph-spacing', label, 'document', { operation }), repeatable: true}))),
   ...defaultStyleNames.map((name, slot) => binding(`Ctrl+${(slot + 1) % 10}`, 'ext:jueony-default-style', `${name} 기본 스타일`, 'document', { slot })),
   binding('Ctrl+B', 'format:bold', '진하게'), binding('Alt+Shift+B', 'format:bold', '진하게'),
   binding('Ctrl+I', 'format:italic', '기울임'), binding('Alt+Shift+I', 'format:italic', '기울임'),
@@ -110,7 +120,7 @@ export class HangulKeyResolver {
       return found ? { handled: true, binding: found } : { handled: true, hint: '이 연속키는 현재 지원하지 않습니다.' };
     }
     const found = this.find(stroke, ctx);
-    if (found) return e.repeat ? { handled: true } : { handled: true, binding: found };
+    if (found) return e.repeat && !found.repeatable ? { handled: true } : { handled: true, binding: found };
     if ((e.ctrlKey || e.altKey) && hangulBindings.some(b => b.keys === stroke)) return { handled: true, hint: '현재 선택 문맥에서 사용할 수 없는 단축키입니다.' };
     if (hangulBindings.some(b => b.keys.startsWith(stroke + ','))) {
       this.pending = { prefix: stroke, until: now + 3000 };

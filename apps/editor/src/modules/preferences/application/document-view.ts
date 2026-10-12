@@ -1,11 +1,12 @@
 import type { DocumentViewState, ViewRestoreResult } from '../public/contracts.ts';
 import type { DocumentViewAdapterOptions } from '../ports/viewport.ts';
 import { validateDocumentView, validateBodyCaret } from '../domain/document-view.ts';
+import {validateSessionCursor} from '../domain/session-cursor.ts';
 
 export function createDocumentViewFacade(options: DocumentViewAdapterOptions) {
   type Pending = { identity: string; view: DocumentViewState };
   let pending: Pending | undefined, last: Pending | undefined, applying = false;
-  const copy = (view: DocumentViewState): DocumentViewState => ({ ...view, ...(view.caret ? { caret: { ...view.caret } } : {}) });
+  const copy = (view: DocumentViewState): DocumentViewState => ({ ...view, ...(view.caret ? { caret: { ...view.caret } } : {}), ...(view.cursor ? {cursor:validateSessionCursor(view.cursor)!} : {}) });
   function discardStale() {
     const identity = options.identity();
     if (pending?.identity !== identity) pending = undefined;
@@ -17,7 +18,7 @@ export function createDocumentViewFacade(options: DocumentViewAdapterOptions) {
     if (!options.visible()) return last ? copy(last.view) : undefined;
     const viewport = options.viewport();
     if (!viewport) return undefined;
-    const view = validateDocumentView({ version: 1, zoom: viewport.getZoom(), fitMode: viewport.getZoomFitMode(), scrollX: viewport.getScrollX(), scrollY: viewport.getScrollY(), caret: options.captureCaret?.() });
+    const view = validateDocumentView({ version: 1, zoom: viewport.getZoom(), fitMode: viewport.getZoomFitMode(), scrollX: viewport.getScrollX(), scrollY: viewport.getScrollY(), caret: options.captureCaret?.(), cursor:options.captureCursor?.() });
     if (view) last = { identity: options.identity(), view };
     return view ? copy(view) : undefined;
   }
@@ -36,17 +37,23 @@ export function createDocumentViewFacade(options: DocumentViewAdapterOptions) {
     if (applying || !viewport || !options.visible()) return 'deferred';
     applying = true;
     try {
+      const interaction = options.cursorInteraction?.();
       if (item.view.fitMode === 'none') viewport.setZoom(item.view.zoom, { x: 0, y: 0 }, 'none');
       else options.applyFit(item.view.fitMode);
       await options.settle();
       if (pending !== item || options.identity() !== item.identity) return 'ignored';
       if (!options.visible()) return 'deferred';
+      if (interaction !== options.cursorInteraction?.()) {
+        // Input arriving during layout owns the new cursor/scroll state.
+        pending = undefined; last = undefined; capture(); return 'ignored';
+      }
       // Optional old bookmarks cannot bypass the editor adapter's live-text checks.
-      if (item.view.caret) options.restoreCaret?.({ ...item.view.caret });
+      if (item.view.cursor) options.restoreCursor?.(validateSessionCursor(item.view.cursor)!);
+      else if (item.view.caret) options.restoreCaret?.({ ...item.view.caret });
       // The browser viewport clamps an offset to its actual current scroll range.
       viewport.setScrollLeft(item.view.scrollX); viewport.setScrollTop(item.view.scrollY);
       pending = undefined;
-      const current = validateDocumentView({ version: 1, zoom: viewport.getZoom(), fitMode: viewport.getZoomFitMode(), scrollX: viewport.getScrollX(), scrollY: viewport.getScrollY(), caret: validateBodyCaret(options.captureCaret?.()) });
+      const current = validateDocumentView({ version: 1, zoom: viewport.getZoom(), fitMode: viewport.getZoomFitMode(), scrollX: viewport.getScrollX(), scrollY: viewport.getScrollY(), caret: validateBodyCaret(options.captureCaret?.()), cursor:options.captureCursor?.() });
       last = { identity: item.identity, view: current ?? copy(item.view) };
       return 'applied';
     } finally { applying = false; }

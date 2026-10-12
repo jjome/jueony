@@ -8,7 +8,7 @@ test('한글의 원래 의미를 유지하며 이전 잘못된 매핑을 제거�
   const r = new HangulKeyResolver();
   assert.equal(r.resolve(key('KeyY', { ctrlKey: true }), ctx).binding?.command, 'ext:jueony-delete-line');
   assert.equal(r.resolve(key('KeyC', { altKey: true, shiftKey: true }), ctx).binding?.command, 'ext:jueony-normal');
-  assert.equal(r.resolve(key('KeyO', { ctrlKey: true }), ctx).binding?.command, 'pending:insert-document');
+  assert.equal(r.resolve(key('KeyO', { ctrlKey: true }), ctx).binding?.command, 'ext:jueony-insert-document');
   assert.equal(r.resolve(key('KeyR', { ctrlKey: true, shiftKey: true }), ctx).binding?.command, 'format:align-right');
 });
 test('한영 상태의 물리 키와 modifier 조합을 구분한다', () => {

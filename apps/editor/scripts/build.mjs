@@ -3,6 +3,7 @@ import {applyManualFeaturePatches} from './integration/manual-feature-patches.mj
 import {applyRecoveryPatches} from './integration/recovery-patches.mjs';
 import {applyTabFeaturePatches} from './integration/tab-feature-patches.mjs';
 import {applySectionBoundaryPatches} from './integration/section-boundary-patches.mjs';
+import {applyDocumentInsertionPatches} from './integration/document-insertion-patches.mjs';
 import {auditRepository} from '../../../scripts/check-module-boundaries.mjs';
 import { cp, mkdir, readFile, writeFile, readdir } from 'node:fs/promises';
 import { resolve, dirname, join } from 'node:path';
@@ -75,6 +76,7 @@ await applyRecoveryPatches({root});
 // These dialogs require the patched engine's section-aware tab layout.
 if (engineEvidence) await applyTabFeaturePatches({root});
 if (engineEvidence) await applySectionBoundaryPatches({root});
+if (engineEvidence?.patches.some(p => p.name === 'document-insertion.patch')) await applyDocumentInsertionPatches({root});
 await build({
   configFile: false, root, base: './', publicDir: join(root, 'public'),
   define: { __APP_VERSION__: JSON.stringify('0.8.7'), __RHWP_DISABLE_EXTERNAL_WEBFONTS__: 'true', __RHWP_HWPCTRL__: 'false' },
@@ -108,6 +110,7 @@ const evidence = {
   recoveryPatchSha256: sha256(await readFile(join(app,'scripts/integration/recovery-patches.mjs'))),
   tabFeaturePatchSha256: sha256(await readFile(join(app,'scripts/integration/tab-feature-patches.mjs'))),
   sectionBoundaryPatchSha256: sha256(await readFile(join(app,'scripts/integration/section-boundary-patches.mjs'))),
+  documentInsertionPatchSha256: sha256(await readFile(join(app,'scripts/integration/document-insertion-patches.mjs'))),
   customSourceSha256: sha256(customSource.join('\n')),
   applicationSourceCommit: execFileSync('git', ['-C', app, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
   applicationSourceDirty: Boolean(execFileSync('git', ['-C', app, 'status', '--porcelain', '--', '.'], { encoding: 'utf8' }).trim()),

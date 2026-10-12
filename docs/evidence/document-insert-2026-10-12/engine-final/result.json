@@ -1,0 +1,60 @@
+{
+  "results": [
+    "empty destination retains its page settings",
+    "multiple sections refuses before mutating the destination",
+    "header refuses before mutating the destination",
+    "invalid bytes refuses before mutating the destination",
+    "invalid position refuses before mutating the destination",
+    "too many characters refuses before mutating the destination"
+  ],
+  "failures": [
+    {
+      "name": "hwp into hwp: Unicode/body/table/image assets and destination page persist",
+      "error": "TypeError: destination.getImageList is not a function",
+      "stack": "TypeError: destination.getImageList is not a function\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-insertion-engine.mjs:48:38\n    at async test (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-insertion-engine.mjs:21:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-insertion-engine.mjs:25:3"
+    },
+    {
+      "name": "hwp into hwpx: Unicode/body/table/image assets and destination page persist",
+      "error": "TypeError: destination.getImageList is not a function",
+      "stack": "TypeError: destination.getImageList is not a function\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-insertion-engine.mjs:48:38\n    at async test (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-insertion-engine.mjs:21:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-insertion-engine.mjs:25:3"
+    },
+    {
+      "name": "hwpx into hwp: Unicode/body/table/image assets and destination page persist",
+      "error": "TypeError: destination.getImageList is not a function",
+      "stack": "TypeError: destination.getImageList is not a function\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-insertion-engine.mjs:48:38\n    at async test (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-insertion-engine.mjs:21:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-insertion-engine.mjs:25:3"
+    },
+    {
+      "name": "hwpx into hwpx: Unicode/body/table/image assets and destination page persist",
+      "error": "TypeError: destination.getImageList is not a function",
+      "stack": "TypeError: destination.getImageList is not a function\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-insertion-engine.mjs:48:38\n    at async test (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-insertion-engine.mjs:21:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-insertion-engine.mjs:25:3"
+    }
+  ],
+  "engine": {
+    "optimized": false,
+    "buildMode": "wsl-review-no-opt",
+    "builtAt": "2026-10-12T14:11:03.9140776Z",
+    "patches": [
+      {
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af",
+        "name": "default-tabs.patch"
+      },
+      {
+        "sha256": "330da585582a690488a819353c72f840acddb77fe4780ca940a9991c420aa09a",
+        "name": "document-insertion.patch"
+      },
+      {
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8",
+        "name": "section-split.patch"
+      },
+      {
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad",
+        "name": "table-creation-consistency.patch"
+      }
+    ],
+    "jsSha256": "ae538304ba4cc00f780d10b4cfcba9c896b41c82b2bc973f4057c835aad5ba82",
+    "sourceId": "af94bb005f1a76a5",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "wasmSha256": "73068e1a0cc71e8eab8b4607435f563e81971a6c1ee37309893de9eba9c43216"
+  },
+  "note": "Native WASM regression using synthetic local documents. Not a Hancom rendering equality test."
+}

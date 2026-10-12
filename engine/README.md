@@ -12,6 +12,8 @@ HWPX 저장은 `tabStop`과 `tabStopVal`을 함께 기록한다. 한글의 `HWPU
 
 ## 재현
 
+`document-insertion.patch`는 `insertDocumentBytes(sectionIdx, paraIdx, charOffset, bytes)`를 추가한다. 단일 구역 원본의 본문·표·그림을 기존 외부 문서 이식 경로로 옮기며 대상 쪽 설정을 유지한다. 원본의 지원 컨트롤·참조·크기를 변경 전에 검증한다. HWPX 그림의 HWP 저장 종류 비트와 빈 대상 문단의 스타일 이식을 보완한다. 파일 선택·사본 검사·한 번 undo·실제 한글 재열기 결과와 제한은 [42번 결과](../docs/42-document-insertion-result.md)를 따른다. 실제 native API가 없는 기본 npm 엔진에서는 명령을 활성화하지 않는다.
+
 ```powershell
 ./scripts/Build-DocumentEngine.ps1 -Runtime Wsl
 $env:JUEONY_ENGINE_PACKAGE = '<출력된 pkg 경로>'

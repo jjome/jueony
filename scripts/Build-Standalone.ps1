@@ -26,6 +26,7 @@ foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.m
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
 $llmEvidence = Join-Path $output 'evidence'
+Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/42-document-insertion-result.md') -Destination $output -Force
 foreach ($guide in @('30-layered-modular-refactor-plan.md','31-facade-contracts.md','32-modular-refactor-result.md','33-editor-parity-features-result.md','34-sections-tabs-result.md','35-section-boundary-merge-result.md','36-native-section-comparison.md','37-basic-editing-state-result.md','38-paragraph-selection-state-result.md','39-native-dialog-investigation.md','40-basic-navigation-calendar-result.md','41-pre-agent-editor-progress.md','refactor-work-plan.csv','hangul-2024-gap-checklist.csv')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
@@ -138,6 +139,22 @@ if (Test-Path -LiteralPath $nativeEvidence) {
     }
 }
 Get-ChildItem -LiteralPath (Join-Path $output 'providers') -Filter '*.mjs' | Sort-Object Name | ForEach-Object { $providerHashes[$_.Name] = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash }
+$insertionEvidence = Join-Path $projectRoot 'docs/evidence/document-insert-2026-10-12'
+if (Test-Path -LiteralPath $insertionEvidence) {
+    Copy-Item -LiteralPath $insertionEvidence -Destination $llmEvidence -Recurse -Force
+    $insertionDocuments = Join-Path $insertionEvidence 'final-verified'
+    if (Test-Path -LiteralPath $insertionDocuments) {
+        Get-ChildItem -LiteralPath $insertionDocuments -File |
+            Where-Object { $_.Extension -in @('.hwp', '.hwpx') } | Copy-Item -Destination $reviewDocuments -Force
+    }
+    $engineInsertion = Join-Path $insertionEvidence 'engine-complete'
+    if (Test-Path -LiteralPath $engineInsertion) {
+        $engineReview = Join-Path $reviewDocuments 'engine-insertion'
+        New-Item -ItemType Directory -Force $engineReview | Out-Null
+        Get-ChildItem -LiteralPath $engineInsertion -File |
+            Where-Object { $_.Extension -in @('.hwp', '.hwpx') } | Copy-Item -Destination $engineReview -Force
+    }
+}
 $moduleHashes = [ordered]@{}
 foreach ($directory in @('services', 'contracts')) {
     Get-ChildItem -LiteralPath (Join-Path $output $directory) -Filter '*.mjs' -Recurse | Sort-Object FullName | ForEach-Object { $moduleHashes[$directory + '/' + $_.Name] = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash }

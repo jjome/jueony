@@ -10,6 +10,7 @@ import { installNavigationHistory } from '../adapters/rhwp/navigation-history.ts
 import { installCalendarStamp } from '../adapters/rhwp/calendar-stamp.ts';
 import { installHangingIndent } from '../adapters/rhwp/hanging-indent.ts';
 import { installTransposeTable } from '../adapters/rhwp/transpose-table.ts';
+import { installDocumentInsertion } from '../adapters/rhwp/document-insertion.ts';
 
 export function installHangulKeys({ automation, registry, input, eventBus }: { automation: any; registry: any; input: () => any; eventBus: any }) {
   const resolver = new HangulKeyResolver();
@@ -20,6 +21,7 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
   installCalendarStamp(registry, input, eventBus);
   installHangingIndent(registry, input);
   installTransposeTable(registry, input, eventBus);
+  installDocumentInsertion(registry, input, eventBus);
   // The pinned Studio marked the entire caption submenu as a stub; child state is now registry-owned.
   document.querySelector('[data-cmd="insert:caption-top"]')?.closest('.md-sub')?.classList.remove('disabled');
   const unsupported = new Set<string>();

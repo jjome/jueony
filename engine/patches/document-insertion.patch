@@ -1,0 +1,177 @@
+diff --git a/src/document_core/commands/mod.rs b/src/document_core/commands/mod.rs
+--- a/src/document_core/commands/mod.rs
++++ b/src/document_core/commands/mod.rs
+@@ -9,6 +9,7 @@
+ // [jb] 외부 문서(다른 서식표)를 커서에 끼워 넣기 — 한글 클립보드 문서모델 붙여넣기용
+ mod footnote_ops;
+ mod foreign_paste;
++mod document_insert;
+ mod formatting;
+ mod formatting_runs;
+ mod header_footer_ops;
+diff --git a/src/document_core/commands/foreign_paste.rs b/src/document_core/commands/foreign_paste.rs
+--- a/src/document_core/commands/foreign_paste.rs
++++ b/src/document_core/commands/foreign_paste.rs
+@@ -39,6 +39,14 @@
+         char_offset: usize,
+         foreign: Document,
+     ) -> Result<String, HwpError> {
++        self.paste_foreign_document_content_native(section_idx, para_idx, char_offset, foreign, true)
++    }
++
++    /// File insertion can preserve the destination page even when it is empty.
++    pub fn paste_foreign_document_content_native(
++        &mut self, section_idx: usize, para_idx: usize, char_offset: usize,
++        foreign: Document, inherit_empty_page: bool,
++    ) -> Result<String, HwpError> {
+         // 인덱스 검증 — `paste_internal_native` 와 같은 문구를 쓴다(스튜디오가 같은 처리).
+         if section_idx >= self.document.sections.len() {
+             return Err(HwpError::RenderError(format!(
+@@ -78,7 +86,7 @@
+         // 시작하고 쪽 경계가 줄줄이 밀렸다. 내용이 있는 문서에 붙일 때는 종전대로 대상 설정을
+         // 지킨다(남의 문서 서식을 붙여넣기가 바꾸면 안 된다).
+         // 🔴 빈 문서라도 첫 문단은 자기 구역 정의를 갖고 있으므로 그것은 "내용"으로 세지 않는다.
+-        let target_is_empty = self.document.sections.len() == 1
++        let target_is_empty = inherit_empty_page && self.document.sections.len() == 1
+             && self.document.sections[section_idx]
+                 .paragraphs
+                 .iter()
+@@ -142,14 +150,15 @@
+                     .iter()
+                     .all(|c| matches!(c, Control::SectionDef(_) | Control::ColumnDef(_)));
+             if target_para_is_blank && char_offset == 0 {
+-                let (shape_id, char_shapes) = {
++                let (shape_id, char_shapes, style_id) = {
+                     let first = &foreign_paras[0];
+-                    (first.para_shape_id, first.char_shapes.clone())
++                    (first.para_shape_id, first.char_shapes.clone(), first.style_id)
+                 };
+                 let (old_indent, new_indent) =
+                     self.para_shape_indents(target.para_shape_id, shape_id);
+                 let target = &mut self.document.sections[section_idx].paragraphs[para_idx];
+                 target.para_shape_id = shape_id;
++                if !inherit_empty_page { target.style_id = style_id; }
+                 // [#7490] 빈 문단의 옛 줄 기록(bit 20)을 붙여넣은 들여쓰기에 맞춘다.
+                 restamp_indentation(&mut target.line_segs, old_indent, new_indent);
+                 if !char_shapes.is_empty() {
+@@ -460,6 +469,11 @@
+                 ..Default::default()
+             });
+         record.raw_data = None;
++        // HWPX synthesizes BinData with attr=0 even for embedded pictures.
++        // HWP5 serializes attr directly; normalize its type bits after transplant.
++        record.attr = (record.attr & !3) | match record.data_type {
++            BinDataType::Link => 0, BinDataType::Embedding => 1, BinDataType::Storage => 2,
++        };
+         record.storage_id = self.next_storage_id;
+         self.next_storage_id = self.next_storage_id.saturating_add(1);
+ 
+diff --git a/src/wasm_api.rs b/src/wasm_api.rs
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -8736,6 +8736,16 @@
+     /// 한글은 Ctrl+C 시 클립보드 HTML 끝 주석에 문서 모델 전체를 싣는다. HTML 에는 없는
+     /// 글꼴 등록·문단모양·쪽 설정·셀 속성·그림 원본이 여기 있어, 이 경로라야 원본과 같은
+     /// 조판이 나온다. 실패하면 호출한 쪽이 종전 `pasteHtml` 로 되돌아가면 된다.
++    /// Insert supported HWP/HWPX content, preserving destination section settings.
++    /// The Studio caller owns preflight and one snapshot undo transaction.
++    #[wasm_bindgen(js_name = insertDocumentBytes)]
++    pub fn insert_document_bytes_api(
++        &mut self, section_idx: usize, para_idx: usize, char_offset: usize, data: &[u8],
++    ) -> Result<String, JsValue> {
++        self.insert_document_bytes_native(section_idx, para_idx, char_offset, data)
++            .map_err(|error| error.into())
++    }
++
+     #[wasm_bindgen(js_name = pasteHwpJson)]
+     pub fn paste_hwp_json(
+         &mut self,
+diff --git a/src/document_core/commands/document_insert.rs b/src/document_core/commands/document_insert.rs
+new file mode 100644
+--- /dev/null
++++ b/src/document_core/commands/document_insert.rs
+@@ -0,0 +1,84 @@
++//! Bounded file insertion: text, tables and pictures; no HTML downgrade.
++use crate::document_core::DocumentCore;
++use crate::error::HwpError;
++use crate::model::control::Control;
++use crate::model::document::Document;
++use crate::model::paragraph::Paragraph;
++
++fn refused(message: &str) -> HwpError { HwpError::RenderError(message.into()) }
++
++fn validate_paragraphs(
++    paragraphs: &[Paragraph], document: &Document, depth: usize,
++    count: &mut usize, characters: &mut usize, cells: &mut usize,
++) -> Result<(), HwpError> {
++    if depth > 8 { return Err(refused("삽입 원본의 중첩 깊이가 한도를 넘습니다")); }
++    for paragraph in paragraphs {
++        *count += 1; *characters += paragraph.text.chars().count();
++        if *count > 5000 || *characters > 100000 {
++            return Err(refused("삽입 원본은 5,000문단 / 10만 문자 이내여야 합니다"));
++        }
++        if !paragraph.field_ranges.is_empty() {
++            return Err(refused("필드가 있는 문서 삽입은 아직 지원하지 않습니다"));
++        }
++        if paragraph.para_shape_id as usize >= document.doc_info.para_shapes.len()
++            || paragraph.style_id as usize >= document.doc_info.styles.len()
++            || paragraph.char_shapes.iter().any(|run| run.char_shape_id as usize >= document.doc_info.char_shapes.len()) {
++            return Err(refused("삽입 원본의 서식 참조가 유효하지 않습니다"));
++        }
++        for control in &paragraph.controls {
++            match control {
++                Control::SectionDef(_) | Control::ColumnDef(_) if depth == 0 => {},
++                Control::Table(table) => {
++                    *cells += table.cells.len();
++                    if *cells > 1000 { return Err(refused("삽입 원본의 표는 총 1,000셀 이내여야 합니다")); }
++                    for cell in &table.cells {
++                        validate_paragraphs(&cell.paragraphs, document, depth + 1, count, characters, cells)?;
++                    }
++                    if let Some(caption) = &table.caption {
++                        validate_paragraphs(&caption.paragraphs, document, depth + 1, count, characters, cells)?;
++                    }
++                },
++                Control::Picture(picture) => {
++                    if let Some(caption) = &picture.caption {
++                        validate_paragraphs(&caption.paragraphs, document, depth + 1, count, characters, cells)?;
++                    }
++                },
++                _ => return Err(refused("현재 문서 삽입은 본문·표·그림만 지원합니다. 머리말/각주/필드/도형 등은 제외됩니다")),
++            }
++        }
++    }
++    Ok(())
++}
++
++impl DocumentCore {
++    /// Parse and validate before touching destination IDs/content.
++    pub fn insert_document_bytes_native(
++        &mut self, section_idx: usize, para_idx: usize, char_offset: usize, data: &[u8],
++    ) -> Result<String, HwpError> {
++        if data.is_empty() || data.len() > 32 * 1024 * 1024 {
++            return Err(refused("삽입 파일은 비어 있지 않은 32MiB 이하 HWP/HWPX여야 합니다"));
++        }
++        let section = self.document.sections.get(section_idx)
++            .ok_or_else(|| refused("대상 구역이 없습니다"))?;
++        let paragraph = section.paragraphs.get(para_idx)
++            .ok_or_else(|| refused("대상 문단이 없습니다"))?;
++        if char_offset > paragraph.text.chars().count() {
++            return Err(refused("대상 문자 위치가 문단 범위를 벗어났습니다"));
++        }
++        let source = DocumentCore::from_bytes(data)?.document;
++        if source.sections.len() != 1 {
++            return Err(refused("현재는 단일 구역 원본만 삽입할 수 있습니다"));
++        }
++        if source.sections[0].paragraphs.is_empty() {
++            return Err(refused("삽입 원본에 문단이 없습니다"));
++        }
++        if self.document.doc_info.styles.len() + source.doc_info.styles.len() > 256
++            || self.document.doc_info.para_shapes.len() + source.doc_info.para_shapes.len() > 65535 {
++            return Err(refused("서식 참조 개수 한도를 넘어서 삽입하지 않았습니다"));
++        }
++        validate_paragraphs(&source.sections[0].paragraphs, &source, 0, &mut 0, &mut 0, &mut 0)?;
++        let result = self.paste_foreign_document_content_native(section_idx, para_idx, char_offset, source, false)?;
++        self.document.doc_info.raw_stream_dirty = true;
++        Ok(result)
++    }
++}

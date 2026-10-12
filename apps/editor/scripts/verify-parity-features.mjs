@@ -635,6 +635,68 @@ try{
     assert.ok(rejection,'impossible geometry should be rejected');assert.equal((await snapshot()).revision,revision);
   });
 
+  if(typeof HwpDocument.prototype.insertDocumentBytes==='function') {
+    for(const sourceFormat of ['hwp','hwpx'])for(const extension of ['hwp','hwpx'])await scenario(`${sourceFormat} into ${extension}: document insertion Ctrl+O, file preflight, one undo/redo and guarded save`,async()=>{
+      const source=new HwpDocument(new Uint8Array(await fixture('schedule-table.hwpx')));
+      const sourcePath=resolve(out,`import-source-${sourceFormat}-to-${extension}.${sourceFormat}`),sourceBytes=source[sourceFormat==='hwp'?'exportHwp':'exportHwpx']();source.free();await writeFile(sourcePath,sourceBytes);
+      const destination=HwpDocument.createEmpty();destination.createBlankDocument();destination.insertText(0,0,0,'앞😀뒤');
+      const bytes=[...destination[extension==='hwp'?'exportHwp':'exportHwpx']()];destination.free();const frame=await openBytes(bytes,`insert-destination.${extension}`);
+      await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.cursor.moveTo({sectionIndex:0,paragraphIndex:0,charOffset:2});ih.updateCaret();ih.focus();});
+      const before=await snapshot(),pageBefore=before.structure.sections[0];
+      await chord('Control','o');await frame.waitForSelector('[data-jueony-document-insertion]');
+      await (await frame.$('input[aria-label="끼워 넣을 한글 문서"]')).uploadFile(sourcePath);
+      await frame.waitForFunction(()=>document.querySelector('[data-jueony-document-insertion] [role=status]')?.textContent.includes('사전 검사 통과'),{timeout:30000});
+      assert.equal((await snapshot()).revision,before.revision);assert.equal(await frame.evaluate(()=>window.jueonyEditor.state().dirty),false);
+      await frame.click('.modal-overlay .dialog-btn-primary');await frame.waitForFunction(()=>!document.querySelector('[data-jueony-document-insertion]'));
+      const after=await snapshot();assert.notEqual(after.revision,before.revision);assert.equal(after.nodes[0].text.startsWith('앞😀'),true);assert.ok(after.structure.tables.length>0);assert.deepEqual(after.structure.sections[0],pageBefore);
+      await command('edit:undo');assert.deepEqual((await snapshot()).nodes.map(n=>n.text),before.nodes.map(n=>n.text));assert.deepEqual((await snapshot()).structure,before.structure);
+      await command('edit:redo');assert.deepEqual((await snapshot()).structure,after.structure);
+      const saved=await saveBytes(`inserted-${sourceFormat}-to-${extension}.${extension}`);await openBytes(saved,`insert-reopen.${extension}`);assert.deepEqual((await snapshot()).structure,after.structure);
+      assert.deepEqual(new Uint8Array(await readFile(sourcePath)),sourceBytes);
+    });
+    await scenario('document insertion cancel, invalid file and revision conflict never change the live document',async()=>{
+      const sourcePath=resolve(out,'import-simple.hwpx');await writeFile(sourcePath,new Uint8Array(await fixture()));
+      const invalidPath=resolve(out,'invalid-import.hwpx');await writeFile(invalidPath,'invalid HWPX');
+      const frame=await openFixture(),before=await snapshot();
+      await command('ext:jueony-insert-document');await (await frame.$('input[aria-label="끼워 넣을 한글 문서"]')).uploadFile(invalidPath);
+      await frame.waitForFunction(()=>{const s=document.querySelector('[data-jueony-document-insertion] [role=status]')?.textContent;return s&&!s.includes('검사하고')&&!s.includes('로컬 파일');});
+      await frame.click('.modal-overlay .dialog-btn-primary');assert.equal((await snapshot()).revision,before.revision);
+      await (await frame.$('input[aria-label="끼워 넣을 한글 문서"]')).uploadFile(sourcePath);await frame.waitForFunction(()=>document.querySelector('[data-jueony-document-insertion] [role=status]')?.textContent.includes('사전 검사 통과'));
+      await page.keyboard.press('Escape');assert.equal((await snapshot()).revision,before.revision);
+      await command('ext:jueony-insert-document');await (await frame.$('input[aria-label="끼워 넣을 한글 문서"]')).uploadFile(sourcePath);await frame.waitForFunction(()=>document.querySelector('[data-jueony-document-insertion] [role=status]')?.textContent.includes('사전 검사 통과'));
+      await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.executeOperation({kind:'snapshot',operationType:'test-concurrent-edit',operation:wasm=>{wasm.insertText(0,0,0,'나중 변경');return ih.getCursorPosition();}});});
+      const changed=await snapshot();await frame.click('.modal-overlay .dialog-btn-primary');assert.equal((await snapshot()).revision,changed.revision);
+      assert.match(await frame.$eval('[data-jueony-document-insertion] [role=status]',e=>e.textContent),/문서나 커서가 바뀌/);await page.keyboard.press('Escape');
+    });
+    await scenario('document insertion rejects source headers/multiple sections and disables cell/selection targets',async()=>{
+      const frame=await openFixture(),before=await snapshot();
+      for(const kind of ['header','sections']){
+        const doc=HwpDocument.createEmpty();doc.createBlankDocument();doc.insertText(0,0,0,'삽입 금지');if(kind==='header')doc.createHeaderFooter(0,true,0);else doc.insertSectionBreak(0,0,1);
+        const path=resolve(out,`unsupported-${kind}.hwpx`);await writeFile(path,doc.exportHwpx());doc.free();await command('ext:jueony-insert-document');
+        await (await frame.$('input[aria-label="끼워 넣을 한글 문서"]')).uploadFile(path);
+        await frame.waitForFunction(()=>{const s=document.querySelector('[data-jueony-document-insertion] [role=status]')?.textContent;return s&&!s.includes('검사하고')&&!s.includes('로컬 파일');});
+        assert.doesNotMatch(await frame.$eval('[data-jueony-document-insertion] [role=status]',e=>e.textContent),/사전 검사 통과/);
+        await frame.click('.modal-overlay .dialog-btn-primary');assert.equal((await snapshot()).revision,before.revision);await page.keyboard.press('Escape');
+      }
+      await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.cursor.selectRange({sectionIndex:0,paragraphIndex:0,charOffset:0},{sectionIndex:0,paragraphIndex:0,charOffset:1});ih.updateCaret();});
+      assert.equal(await frame.evaluate(()=>window.rhwpStudio.automation.isEnabled('ext:jueony-insert-document')),false);
+      await openFixture('schedule-table.hwpx');await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.cursor.moveTo({sectionIndex:0,parentParaIndex:1,paragraphIndex:0,charOffset:0,controlIndex:0,cellIndex:0,cellParaIndex:0,cellPath:[{controlIndex:0,cellIndex:0,cellParaIndex:0}]});ih.updateCaret();});
+      assert.equal(await frame.evaluate(()=>window.rhwpStudio.automation.isEnabled('ext:jueony-insert-document')),false);
+    });
+    await scenario('document insertion is disabled for an actually password-opened document',async()=>{
+      const doc=HwpDocument.createEmpty();doc.createBlankDocument();doc.insertText(0,0,0,'암호 문서 원문');
+      const password='jueony-synthetic-only',bytes=[...doc.exportHwpWithPassword(password)];doc.free();const frame=await openFixture();
+      await frame.evaluate((bytes,password)=>{
+        const s=window.__parityServices;s.wasm.loadDocumentWithPassword(new Uint8Array(bytes),password,'encrypted-test.hwp');
+        const ih=s.getInputHandler();ih.cursor.clearSelection();ih.cursor.moveTo({sectionIndex:0,paragraphIndex:0,charOffset:0});ih.updateCaret();
+      },bytes,password);
+      const before=await snapshot();assert.equal(await frame.evaluate(()=>window.__parityServices.wasm.requiresPasswordForSave),true);
+      assert.equal(await frame.evaluate(()=>window.rhwpStudio.automation.isEnabled('ext:jueony-insert-document')),false);
+      const result=await frame.evaluate(()=>window.jueonyEditor.executeCommand('ext:jueony-insert-document'));assert.equal(result.ok,false);
+      assert.equal((await snapshot()).revision,before.revision);assert.equal(await frame.$('[data-jueony-document-insertion]'),null);
+    });
+  }
+
   await scenario('recovery options off retain old checkpoint; idle 5 seconds saves dirty changes and restores after reload',async()=>{
     await openFixture();await settings(true);await replaceFirst('RECOVERY BASELINE');await delay(6500);
     let records=await storedDocuments(),baseline=records.find(record=>firstText(record.bytes)==='RECOVERY BASELINE');assert.ok(baseline,'enabled recovery checkpoint missing');

@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-12",
+  "application": "Hancom Office Hangul 2024",
+  "method": "Computer Use @oai/sky, observed native Windows UI; synthetic local files only",
+  "observations": [
+    {"action": "Ctrl+O", "result": "문서 끼워 넣기 file chooser opens", "observedOptions": ["스타일의 글자 모양 유지", "스타일의 문단 모양 유지", "스타일 유지", "쪽 모양 유지", "파일 이름으로 책갈피 넣기"]},
+    {"action": "Escape from file chooser", "result": "chooser closes; original 24-character calendar fixture remains visible"},
+    {"action": "insert engine-assets/source-hwpx-to-hwpx.hwpx into calendar-string.hwpx", "result": "source body, bold/red character, italic table cell and picture visible alongside original body"},
+    {"action": "Ctrl+Z once after insertion", "result": "inserted body/table/picture removed together; original calendar line and 24-character count restored"},
+    {"action": "Alt+O and open engine-complete/inserted-hwpx-to-hwp.hwp", "result": "native document window opens without repair/error dialog; body, formatted Unicode glyphs, 2x2 table and picture rendering visible"},
+    {"action": "Alt+O and open engine-complete/inserted-hwp-to-hwpx.hwpx", "result": "native document window opens without repair/error dialog; body, formatted Unicode glyphs, 2x2 table and picture rendering visible"}
+  ],
+  "toolIssue": {
+    "error": "element 1973 is not available in cached app state for Hwp.exe",
+    "recovery": "fresh screenshot capture, coordinate click on file name field, literal file path, then Return; each action separately refreshed",
+    "scope": "file choosers only; earlier Style/Paragraph Shape activation issues have not been declared resolved"
+  },
+  "limitations": [
+    "No independent golden layout/PDF/print comparison, complete style-option comparison or native resave byte/semantic comparison.",
+    "Tiny red and blue pictures deliberately use overlapping anchors; visible picture appearance alone does not prove every asset. Distinct asset hashes are verified by the separate WASM regression.",
+    "Native Unicode glyph fallback depends on installed fonts. Opening a document does not prove all glyph metrics match Jueony.",
+    "Screenshots were inspected in original Computer Use results, not exported or decoded into this evidence directory."
+  ]
+}

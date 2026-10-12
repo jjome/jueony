@@ -15,7 +15,7 @@ export const hangulBindings: Binding[] = [
   binding('Alt+V', 'file:save-as', '다른 이름으로 저장하기'),
   binding('Alt+P', 'file:print', '인쇄'), binding('Ctrl+P', 'file:print', '인쇄'),
   binding('Ctrl+F4', 'ext:jueony-close', '문서 닫기'),
-  binding('Ctrl+O', 'pending:insert-document', '문서 끼워 넣기'),
+  binding('Ctrl+O', 'ext:jueony-insert-document', '문서 끼워 넣기'),
   binding('Ctrl+K,D', 'ext:jueony-calendar-stamp', '날짜/시간 문자열'),
   ...(['PageUp', 'PageDown', 'Home', 'End'] as const).map((key, i) => binding('Ctrl+' + key, 'ext:jueony-navigate', ['문서 처음', '문서 끝', '화면 첫 줄', '화면 끝줄'][i], 'document', { edge: ['document-start', 'document-end', 'screen-start', 'screen-end'][i] })),
   binding('Alt+Home', 'ext:jueony-navigate', '문단 처음', 'document', { edge: 'paragraph-start' }),

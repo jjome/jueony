@@ -9,7 +9,7 @@ export type SessionCursorInput = {
   restoreSessionSelection(focus:Position,anchor:Position|undefined,phase:number|null,block:Block|undefined):boolean;
   cursor:{hasSelection():boolean;getSelection():{anchor:Position;focus:Position}|null;blockSelectionPhase():number|null;captureCellSelection():Block|null;
     isInHeaderFooter():boolean;isInFootnote():boolean;isInTextBox():boolean;isInTableObjectSelection():boolean;isInPictureObjectSelection():boolean};
-  wasm:{getSectionCount():number;getParagraphCount(section:number):number;getParagraphLength(section:number,paragraph:number):number;getTextRange(section:number,paragraph:number,offset:number,count:number):string;
+  wasm:{requiresPasswordForSave?:boolean;getSectionCount():number;getParagraphCount(section:number):number;getParagraphLength(section:number,paragraph:number):number;getTextRange(section:number,paragraph:number,offset:number,count:number):string;
     getTableDimensions(section:number,parent:number,control:number):{rowCount:number;colCount:number;cellCount:number};
     getCellInfo(section:number,parent:number,control:number,cell:number):{row:number;col:number;rowSpan:number;colSpan:number};
     getCellParagraphCount(section:number,parent:number,control:number,cell:number):number;
@@ -18,7 +18,7 @@ export type SessionCursorInput = {
 };
 const integer=(v:unknown):v is number=>Number.isSafeInteger(v)&&(v as number)>=0&&(v as number)<=2147483647;
 const hash=(value:unknown)=>Array.from(sha256(new TextEncoder().encode(JSON.stringify(value))),v=>v.toString(16).padStart(2,'0')).join('');
-function unsupported(input:SessionCursorInput){const c=input.cursor;return c.isInHeaderFooter()||c.isInFootnote()||c.isInTextBox()||c.isInTableObjectSelection()||c.isInPictureObjectSelection();}
+function unsupported(input:SessionCursorInput){const c=input.cursor;return input.wasm.requiresPasswordForSave||c.isInHeaderFooter()||c.isInFootnote()||c.isInTextBox()||c.isInTableObjectSelection()||c.isInPictureObjectSelection();}
 function evidence(input:SessionCursorInput){
  const wasm=input.wasm,cache=new Map<string,{fingerprint:string;rows:number;columns:number}>();
  function bodyAddress(section:number,paragraph:number){return integer(section)&&integer(paragraph)&&section<wasm.getSectionCount()&&paragraph<wasm.getParagraphCount(section);}

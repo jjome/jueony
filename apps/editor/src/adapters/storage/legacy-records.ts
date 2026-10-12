@@ -17,7 +17,7 @@ export type {Message,Chat,Workspace} from '../../modules/workspace/public/index.
 export {workspaceOf,chatOf,appendMessage} from '../../modules/workspace/public/index.ts';
 export type Run = { id: string; workspaceId: string; chatId: string; documentId: string; status: RunStatus; model?: Omit<ModelConfig,'id'>; sources: Omit<Source,'text'>[]; receipt?: Receipt; macroTemplate?:CommandTemplate; retrieval?:RetrievalSummary; events?:AgentEvent[]; usedSourceIds?: string[]; error?: string; createdAt: number };
 export type Folder = { id: string; workspaceId: string; name: string; handle: FileSystemDirectoryHandle };
-export type SavedDocument = { id: string; workspaceId: string; name: string; bytes: Uint8Array; dirty: boolean; updatedAt: number; view?:DocumentViewState; fileConnection?: StoredFileConnection };
+export type SavedDocument = { id: string; workspaceId: string; name: string; bytes: Uint8Array; dirty: boolean; updatedAt: number; viewUpdatedAt?:number; view?:DocumentViewState; fileConnection?: StoredFileConnection };
 export type AppState = { version: 1; activeWorkspaceId: string; workspaces: Workspace[]; chats: Chat[]; folders: Folder[]; runs: Run[]; models: ModelConfig[]; split: number; agentWidth?: number; sidebarHidden?: boolean; focusMode?:boolean; retrieveSources?:boolean; reviewBeforeApply?:boolean; macros?:CommandMacro[] };
 
 export const uid=()=>crypto.randomUUID();

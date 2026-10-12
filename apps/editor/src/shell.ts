@@ -5,7 +5,7 @@ import {createAutomationFacade} from './modules/automation/public/index.ts';
 import type {CommandTemplate,CommandMacro} from './modules/automation/public/index.ts';
 import {installDocumentDefaultsPanel} from './ui/document-defaults-panel.ts';
 import {agent} from './composition/agent.ts';
-import {createRecoveryCoordinator,normalizeRecoverySettings} from './modules/preferences/public/index.ts';
+import {createRecoveryCoordinator,normalizeRecoverySettings,createDocumentViewJournal} from './modules/preferences/public/index.ts';
 import {readRecoverySettings,watchRecoverySettings,browserRecoveryClock} from './adapters/browser/recovery-settings.ts';
 
 import {assertRecoveryRecord,partitionRecoveryRecords} from './modules/document-files/public/index.ts';
@@ -31,6 +31,17 @@ let state:AppState,activeTab:Tab|undefined,restoring=false,persistError=false,cl
 let running:{controller:AbortController;run:Run}|undefined;
 type Tab={id:string;workspaceId:string;frame:HTMLIFrameElement;wrapper:HTMLElement;button:HTMLButtonElement;ready:Promise<DocumentFrameClient|null>;api:DocumentFrameClient|null;closed:boolean;initialized:boolean;restoreError?:string;pendingConnection?:StoredFileConnection;pendingIdentity?:string;handle?:FileSystemFileHandle;timer?:number;persistError?:boolean;preferenceError?:boolean;preferenceMessage?:string;pendingWrites?:number;persist:Promise<void>;recovery?:ReturnType<typeof createRecoveryCoordinator>;cachedDocument?:SavedDocument};
 const tabs:Tab[]=[];const loaded=new Set<string>();let recoveryWarning=false;let selected:Reference[]=[];
+const viewJournal=createDocumentViewJournal({getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value)});
+const viewClocks=new Map<string,number>();let viewJournalError=false;
+function viewStamp(tab:Tab){const stored=tab.cachedDocument?.viewUpdatedAt;const value=Math.max(Date.now(),viewClocks.get(tab.id)??0,Number.isSafeInteger(stored)?stored!:0)+1;viewClocks.set(tab.id,value);return value;}
+function checkpointExitView(){
+ try{
+  const eligible=tabs.filter(tab=>!tab.closed&&tab.initialized&&tab.cachedDocument&&tab.api);
+  const ordered=[...eligible.filter(tab=>tab!==activeTab),...eligible.filter(tab=>tab===activeTab)];
+  const entries=ordered.flatMap(tab=>{const view=tab.api!.captureDocumentView();return view?[{documentId:tab.id,workspaceId:tab.workspaceId,checkpointAt:tab.cachedDocument!.updatedAt,recordedAt:viewStamp(tab),view}]:[];});
+  if(entries.length){viewJournal.checkpoint(entries);viewJournalError=false;}
+ }catch(e){viewJournalError=true;error(e);}
+}
 const temporary=new TemporaryReferences();
 const automation=createAutomationFacade();
 const phaseLabels:Record<string,string>={generating:'초안 생성',reviewing:'계획 검토',validated:'명령 확인',ready:'적용 준비',applying:'문서 적용',completed:'완료',stopped:'중단'};
@@ -147,7 +158,7 @@ function refreshTab(tab:Tab){
 async function persistCachedView(tab:Tab){
  if(tab.closed||!tab.initialized||!tab.api||!tab.cachedDocument||tab.pendingWrites)return;
  const view=tab.api.captureDocumentView();if(JSON.stringify(view)===JSON.stringify(tab.cachedDocument.view))return;
- const data={...tab.cachedDocument,view};tab.pendingWrites=(tab.pendingWrites??0)+1;
+ const data={...tab.cachedDocument,view,viewUpdatedAt:viewStamp(tab)};tab.pendingWrites=(tab.pendingWrites??0)+1;
  tab.persist=tab.persist.catch(()=>{}).then(()=>store.saveDocument(data));
  try{await tab.persist;tab.cachedDocument=data;tab.persistError=false;}catch(e){tab.persistError=true;throw e;}finally{tab.pendingWrites!--;}
 }
@@ -166,7 +177,9 @@ async function newTab(workspaceId=work().id,saved?:SavedDocument,forExisting=fal
   const api=(await tab.ready)!;
   if(saved){
    await api.open(saved.bytes,saved.name,null,saved.dirty);
-   if(await api.restoreDocumentView(saved.view)==='invalid')status('문서 보기 정보가 손상되어 기본 보기로 열었습니다. 문서 내용은 유지합니다.');
+   let view=saved.view;
+   try{const journal=viewJournal.readRecord(saved.id,workspaceId,saved.updatedAt,Number.isSafeInteger(saved.viewUpdatedAt)?saved.viewUpdatedAt!:saved.updatedAt);if(journal){view=journal.view;viewClocks.set(tab.id,Math.max(viewClocks.get(tab.id)??0,journal.recordedAt));}}catch(e){viewJournalError=true;error(e);}
+   if(await api.restoreDocumentView(view)==='invalid')status('문서 보기 정보가 손상되어 기본 보기로 열었습니다. 문서 내용은 유지합니다.');
    if(saved.fileConnection){tab.pendingIdentity=api.documentIdentity();const result=await api.restoreFileConnection(saved.fileConnection);if(result.status==='connected')tab.pendingConnection=undefined;else status(result.message);}
    else status('최근 문서를 복원했습니다. 원본 연결이 없는 문서는 다른 이름으로 저장해 주세요.');
   }
@@ -190,11 +203,13 @@ async function persistTab(tab:Tab,reason:'explicit'|'automatic'='explicit'):Prom
   checkPendingConnection(tab);
   const fileConnection=snapshot.fileConnection??(!tab.api!.fileHandle()?tab.pendingConnection:undefined);
   if(tab.api!.fileHandle())tab.pendingConnection=undefined;
-  const data:SavedDocument={id:tab.id,workspaceId:tab.workspaceId,updatedAt:Date.now(),...snapshot,fileConnection,view:tab.api!.captureDocumentView()};
+  const data:SavedDocument={id:tab.id,workspaceId:tab.workspaceId,updatedAt:Date.now(),viewUpdatedAt:viewStamp(tab),...snapshot,fileConnection,view:tab.api!.captureDocumentView()};
   tab.pendingWrites=(tab.pendingWrites??0)+1;tab.persist=tab.persist.catch(()=>{}).then(()=>store.saveDocument(data));
   try{await tab.persist;tab.cachedDocument=data;tab.recovery?.checkpointed(captured);tab.persistError=false;return true;}finally{tab.pendingWrites!--;}
  }catch(e){
   if((e as any)?.code==='PASSWORD_RECOVERY_BLOCKED'){
+   tab.cachedDocument=undefined;viewClocks.delete(tab.id);
+   try{viewJournal.remove(tab.id,tab.workspaceId);}catch(journalError){viewJournalError=true;error(journalError);}
    tab.pendingWrites=(tab.pendingWrites??0)+1;tab.persist=tab.persist.catch(()=>{}).then(()=>store.removeDocument(tab.id));
    try{await tab.persist;tab.persistError=false;status((e as Error).message);return true;}catch(removeError){tab.persistError=true;throw removeError;}finally{tab.pendingWrites!--;}
   }
@@ -343,12 +358,14 @@ split.addEventListener('pointerup',()=>{dragging=false;void persist().catch(erro
 split.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();state.split=Math.max(20,Math.min(75,state.split+(e.key==='ArrowUp'?-3:3)));$('sidebar').style.setProperty('--chat-share',state.split+'%');split.setAttribute('aria-valuenow',String(state.split));void persist().catch(error);}});
 window.addEventListener('message',event=>{if(event.origin!==location.origin)return;const tab=tabs.find(t=>t.frame.contentWindow===event.source);if(!tab)return;if(event.data?.type==='jueony:status')refreshTab(tab);if(event.data?.type==='jueony:command-state'&&tab===activeTab)chrome.refresh();if(event.data?.type==='jueony:focus-chat'&&tab===activeTab){if(state.focusMode){state.focusMode=false;render();void persist().catch(error);}$('request-input').focus();}if(event.data?.type==='jueony:preferences-state'){recoverySettingsWatcher.refresh();tab.preferenceError=Boolean(event.data.error);tab.preferenceMessage=tab.preferenceError?String(event.data.message):undefined;if(tab.preferenceError)status(tab.preferenceMessage!);}if(event.data?.type==='jueony:new-document'&&tab===activeTab&&cancelNavigation())void newTab().catch(error);if(event.data?.type==='jueony:close-document'&&tab===activeTab)void closeTab(tab).catch(error);});
 window.addEventListener('beforeunload',event=>{
+ checkpointExitView();
  // The host owns the single exit prompt, including inactive and other-workspace tabs.
  // A failed editor read is protected rather than silently allowing a destructive exit.
  let protect=true;
- try{protect=shouldProtectExit({persistenceFailed:persistError,pendingWrites:stateWrites,closing,running:Boolean(running),documents:tabs.filter(t=>!t.closed).map(t=>({dirty:Boolean(t.api?.state().dirty),persistenceFailed:Boolean(t.persistError),preferenceFailed:Boolean(t.preferenceError),pendingWrites:t.pendingWrites??0}))});}catch{}
+ try{protect=shouldProtectExit({persistenceFailed:persistError||viewJournalError,pendingWrites:stateWrites,closing,running:Boolean(running),documents:tabs.filter(t=>!t.closed).map(t=>({dirty:Boolean(t.api?.state().dirty),persistenceFailed:Boolean(t.persistError),preferenceFailed:Boolean(t.preferenceError),pendingWrites:t.pendingWrites??0}))});}catch{}
  if(protect){event.preventDefault();event.returnValue='';}
 });
+window.addEventListener('pagehide',checkpointExitView);
 async function start(){await store.open();state=await store.load();installPaneResize({root:$('app-shell'),sidebar:$('sidebar'),handle:$('agent-editor-split'),chat:$('chat-panel'),initialWidth:state.agentWidth,commit:width=>{state.agentWidth=width;void persist().catch(error);}});try{await connectionUI.refresh();}catch{connectionUI.notice='AI 서버를 최신 실행기로 다시 시작해 주세요. 로컬 문서 편집은 사용할 수 있습니다.';}if(!state.workspaces.length)workspace.addWorkspace('내 업무');if(!state.workspaces.some(w=>w.id===state.activeWorkspaceId))state.activeWorkspaceId=state.workspaces[0].id;render();await switchWorkspace(state.activeWorkspaceId);status('로컬 업무 준비 완료 · '+(tabs.some(t=>t.preferenceError)?tabs.find(t=>t.preferenceError)!.preferenceMessage:recoveryWarning||tabs.some(t=>t.restoreError)?'일부 문서 복원 실패: 기존 복구본은 보존했습니다.':tabs.some(t=>t.pendingConnection)?'복구 문서의 원본 연결을 확인하세요.':connectionUI.notice||'AI 연결 설정에서 연결과 키를 변경할 수 있습니다.'));}
 // One writer per browser profile/origin prevents whole-state writes from
 // competing application windows from overwriting each other's workspaces.

@@ -5,11 +5,11 @@ type Position = { sectionIndex: number; paragraphIndex: number; charOffset: numb
 type CaretInput = {
   getCursorPosition(): Position; restoreSessionCaret(position: Position): void;
   cursor: { hasSelection(): boolean; isInHeaderFooter(): boolean; isInFootnote(): boolean; isInTextBox(): boolean; isInCellSelectionMode(): boolean; isInTableObjectSelection(): boolean; isInPictureObjectSelection(): boolean; moveTo(position: Position): void };
-  wasm: { getSectionCount(): number; getParagraphCount(section: number): number; getParagraphLength(section: number, paragraph: number): number; getTextRange(section: number, paragraph: number, offset: number, count: number): string };
+  wasm: { requiresPasswordForSave?: boolean; getSectionCount(): number; getParagraphCount(section: number): number; getParagraphLength(section: number, paragraph: number): number; getTextRange(section: number, paragraph: number, offset: number, count: number): string };
 };
 function isBody(input: CaretInput): boolean {
   const position = input.getCursorPosition(), cursor = input.cursor;
-  return position.parentParaIndex === undefined && !position.cellPath?.length && !cursor.hasSelection()
+  return !input.wasm.requiresPasswordForSave && position.parentParaIndex === undefined && !position.cellPath?.length && !cursor.hasSelection()
     && !cursor.isInHeaderFooter() && !cursor.isInFootnote() && !cursor.isInTextBox() && !cursor.isInCellSelectionMode()
     && !cursor.isInTableObjectSelection() && !cursor.isInPictureObjectSelection();
 }

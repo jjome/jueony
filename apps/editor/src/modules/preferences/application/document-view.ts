@@ -4,7 +4,7 @@ import { validateDocumentView, validateBodyCaret } from '../domain/document-view
 import {validateSessionCursor} from '../domain/session-cursor.ts';
 
 export function createDocumentViewFacade(options: DocumentViewAdapterOptions) {
-  type Pending = { identity: string; view: DocumentViewState };
+  type Pending = { identity: string; view: DocumentViewState; interaction?: number };
   let pending: Pending | undefined, last: Pending | undefined, applying = false;
   const copy = (view: DocumentViewState): DocumentViewState => ({ ...view, ...(view.caret ? { caret: { ...view.caret } } : {}), ...(view.cursor ? {cursor:validateSessionCursor(view.cursor)!} : {}) });
   function discardStale() {
@@ -14,6 +14,7 @@ export function createDocumentViewFacade(options: DocumentViewAdapterOptions) {
   }
   function capture(): DocumentViewState | undefined {
     discardStale();
+    if (pending && options.visible() && pending.interaction !== options.cursorInteraction?.()) { pending = undefined; last = undefined; }
     if (pending) return copy(pending.view);
     if (!options.visible()) return last ? copy(last.view) : undefined;
     const viewport = options.viewport();
@@ -27,7 +28,7 @@ export function createDocumentViewFacade(options: DocumentViewAdapterOptions) {
     const view = capture();
     // Keep an in-flight restore's item identity so a rapid hide/show does not
     // cancel the only scheduled settle/retry and leave a snapshot unapplied.
-    if (view && !pending) pending = { identity: options.identity(), view: copy(view) };
+    if (view && !pending) pending = { identity: options.identity(), view: copy(view), interaction: options.cursorInteraction?.() };
     return view ? copy(view) : undefined;
   }
   async function retry(): Promise<ViewRestoreResult> {
@@ -35,9 +36,10 @@ export function createDocumentViewFacade(options: DocumentViewAdapterOptions) {
     const item = pending, viewport = options.viewport();
     if (!item) return 'ignored';
     if (applying || !viewport || !options.visible()) return 'deferred';
+    if (item.interaction !== options.cursorInteraction?.()) { pending = undefined; last = undefined; capture(); return 'ignored'; }
     applying = true;
     try {
-      const interaction = options.cursorInteraction?.();
+      const interaction = item.interaction;
       if (item.view.fitMode === 'none') viewport.setZoom(item.view.zoom, { x: 0, y: 0 }, 'none');
       else options.applyFit(item.view.fitMode);
       await options.settle();
@@ -61,7 +63,7 @@ export function createDocumentViewFacade(options: DocumentViewAdapterOptions) {
   async function restore(value: unknown): Promise<ViewRestoreResult> {
     const view = validateDocumentView(value);
     if (!view) return value === undefined ? 'ignored' : 'invalid';
-    pending = { identity: options.identity(), view };
+    pending = { identity: options.identity(), view, interaction: options.cursorInteraction?.() };
     last = undefined;
     return retry();
   }

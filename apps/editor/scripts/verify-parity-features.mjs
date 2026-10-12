@@ -277,6 +277,16 @@ try{
     await saveBytes('merged-cell-cursor.hwpx');
   });
 
+  await scenario('immediate reload journals latest body/cell selection before the debounced IndexedDB write',async()=>{
+    let frame=await openFixture();await page.click('#save-document');await page.waitForFunction(()=>document.getElementById('app-status').textContent==='파일에 저장했습니다.');
+    const saved=await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.cursor.selectRange({sectionIndex:0,paragraphIndex:0,charOffset:1},{sectionIndex:0,paragraphIndex:2,charOffset:2},3);ih.updateCaret();return window.jueonyEditor.captureDocumentView();});
+    await page.reload();await ready();frame=await services();assert.deepEqual((await frame.evaluate(()=>window.jueonyEditor.captureDocumentView())).cursor,saved.cursor);
+    await openFixture('schedule-table.hwpx');frame=await services();await page.click('#save-document');await page.waitForFunction(()=>document.getElementById('app-status').textContent==='파일에 저장했습니다.');
+    const cell=await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.cursor.moveTo({sectionIndex:0,parentParaIndex:1,paragraphIndex:0,charOffset:1,controlIndex:0,cellIndex:1,cellParaIndex:0});ih.updateCaret();return window.jueonyEditor.captureDocumentView();});assert.equal(cell.cursor.focus.kind,'cell');
+    await page.reload();await ready();frame=await services();assert.deepEqual((await frame.evaluate(()=>window.jueonyEditor.captureDocumentView())).cursor,cell.cursor);
+    const journal=await page.evaluate(()=>JSON.parse(localStorage.getItem('jueony-document-view-journal-v1')));assert.equal(journal.version,1);assert.ok(journal.entries.every(e=>!('bytes' in e)));
+  });
+
   if(process.env.JUEONY_ENGINE_PACKAGE) {
     if(typeof HwpDocument.prototype.mergeSectionBoundary==='function'||process.env.JUEONY_EXPECT_SECTION_MERGE==='1') {
       for(const extension of ['hwp','hwpx'])for(const key of ['Delete','Backspace'])await scenario(`${key} joins section boundary, previous settings, undo/redo and ${extension} save`,async()=>{

@@ -59,3 +59,7 @@ test('oversized table or body selection refuses persistence instead of truncatin
  const f=fixture();f.set(f.cell());f.input.wasm.getTableDimensions=()=>({rowCount:513,colCount:1,cellCount:513});assert.equal(captureSessionCursor(f.input),undefined);
  const g=fixture();g.body[0][1]='x'.repeat(100001);g.set({sectionIndex:0,paragraphIndex:2,charOffset:1},{sectionIndex:0,paragraphIndex:0,charOffset:1});assert.equal(captureSessionCursor(g.input),undefined);
 });
+test('password-protected document context never enters cursor persistence',()=>{
+ const f=fixture(),saved=captureSessionCursor(f.input)!;f.input.wasm.requiresPasswordForSave=true;
+ assert.equal(captureSessionCursor(f.input),undefined);assert.equal(restoreSessionCursor(f.input,saved),false);assert.equal(f.calls(),0);
+});

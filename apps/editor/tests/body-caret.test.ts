@@ -29,6 +29,12 @@ test('malformed optional caret is discarded without losing old view settings',()
  const view={version:1,zoom:1,fitMode:'none',scrollX:0,scrollY:0};assert.deepEqual(validateDocumentView({...view,caret:{version:8}}),view);
 });
 
+test('legacy caret path also excludes password-protected document excerpts',()=>{
+ const f=fixture(),caret=captureBodyCaret(f.input)!;
+ Object.assign(f.input.wasm,{requiresPasswordForSave:true});
+ assert.equal(captureBodyCaret(f.input),undefined);assert.equal(restoreBodyCaret(f.input,caret),false);
+});
+
 test('transient cursor from the previous document cannot read outside newly loaded bytes',()=>{
  const f=fixture();let reads=0;
  f.input.wasm.getParagraphLength=()=>{reads++;return 1;};

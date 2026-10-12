@@ -126,3 +126,10 @@ test('user input while layout settles cancels old cursor and scroll restoration'
  const task=adapter.restore(saved({caret:{section:0,paragraph:0,offset:0,paragraphLength:0,before:'',after:''}}));
  interaction++;f.viewport.setScrollTop(9);release();assert.equal(await task,'ignored');assert.equal(restored,0);assert.equal(f.viewport.getScrollY(),9);assert.equal(adapter.hasPending(),false);
 });
+
+test('an exit capture during pending restoration records user position rather than the stale bookmark',async()=>{
+ const f=fixture();let interaction=0,release!:()=>void;
+ const adapter=createDocumentViewAdapter({viewport:()=>f.viewport,identity:()=> 'a',visible:()=>true,applyFit:()=>{},settle:()=>new Promise<void>(r=>{release=r;}),cursorInteraction:()=>interaction});
+ const task=adapter.restore(saved());interaction++;f.viewport.setScrollTop(7);
+ assert.equal(adapter.capture()!.scrollY,7);assert.equal(adapter.hasPending(),false);release();assert.equal(await task,'ignored');
+});

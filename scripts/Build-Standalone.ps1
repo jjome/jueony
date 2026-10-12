@@ -104,7 +104,18 @@ if (Test-Path -LiteralPath $mergeEvidence) {
             Where-Object { $_.Extension -in @('.hwp', '.hwpx') } | Copy-Item -Destination $reviewDocuments -Force
     }
 }
-Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/37-basic-editing-state-result.md') -Destination $output -Force
+foreach ($guide in @('37-basic-editing-state-result.md','38-paragraph-selection-state-result.md','39-native-dialog-investigation.md')) {
+    Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination $output -Force
+}
+$selectionEvidence = Join-Path $projectRoot 'docs/evidence/selection-spacing-2026-10-12'
+if (Test-Path -LiteralPath $selectionEvidence) {
+    Copy-Item -LiteralPath $selectionEvidence -Destination $llmEvidence -Recurse -Force
+    $selectionDocuments = Join-Path $selectionEvidence 'verified'
+    if (Test-Path -LiteralPath $selectionDocuments) {
+        Get-ChildItem -LiteralPath $selectionDocuments -File |
+            Where-Object { $_.Extension -in @('.hwp', '.hwpx') } | Copy-Item -Destination $reviewDocuments -Force
+    }
+}
 $basicEvidence = Join-Path $projectRoot 'docs/evidence/basic-state-2026-10-12'
 if (Test-Path -LiteralPath $basicEvidence) {
     Copy-Item -LiteralPath $basicEvidence -Destination $llmEvidence -Recurse -Force

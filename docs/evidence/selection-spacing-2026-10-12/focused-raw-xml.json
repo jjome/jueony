@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "file": "docs\\evidence\\selection-spacing-2026-10-12\\focused-raw\\paragraph-spacing.hwpx",
+  "checks": "Exact margin/indent values in HwpUnitChar case and legacy default; all body paragraphs retained",
+  "paragraphs": [
+    {
+      "paragraph": 0,
+      "paraShape": "29",
+      "case": {
+        "left": 1100,
+        "right": 2000,
+        "intent": 500
+      },
+      "default": {
+        "left": 2200,
+        "right": 4000,
+        "intent": 1000
+      }
+    },
+    {
+      "paragraph": 1,
+      "paraShape": "30",
+      "case": {
+        "left": 3100,
+        "right": 4000,
+        "intent": 0
+      },
+      "default": {
+        "left": 6200,
+        "right": 8000,
+        "intent": 0
+      }
+    }
+  ],
+  "nativeHancom": "NOT_RUN"
+}

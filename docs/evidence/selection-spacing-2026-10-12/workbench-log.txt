@@ -1,0 +1,9 @@
+PASS unified menu and focus mode preserve active document at 1366x768
+PASS official letter template fills explicit fields in a new document without a model call
+PASS template command batch undoes through the same editor history
+PASS recorded AI commands replay without AI and resolve the original paragraph
+PASS ambiguous macro targets are rejected without changing the document
+PASS selected-source lexical retrieval supplies located chunks; 3 candidate calls cause one final document application
+PASS bounded review changes undo as one request
+PASS cancelling during review prevents late provider output from applying
+PASS macros and agent options survive restart

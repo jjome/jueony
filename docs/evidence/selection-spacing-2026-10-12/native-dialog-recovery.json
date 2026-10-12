@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-11T23:46:27.286Z",
+  "status": "BLOCKED_NATIVE_INPUT",
+  "initial": "No modal present in fresh capture; opening F6 succeeded",
+  "returnedWindows": [
+    {
+      "app": "process:C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Bin\\Hwp.exe",
+      "id": 723778,
+      "title": "native-abcd-delete.hwpx [C:\\Users\\jjome\\Documents\\work\\jueony\\docs\\evidence\\native-section-merge-2026-10-12\\] - 한글"
+    }
+  ],
+  "modalFocus": "95 목록 항목 바탕글 in recovery capture",
+  "error": "Error: failed to activate captured window",
+  "recoveryError": "Error: failed to activate captured window",
+  "attempt": "Fresh list_windows/get_window/get_window_state then explicit activate_window; same failure. No fabricated modal handle or COM/SendKeys workaround.",
+  "next": "Tool needs to return a targetable owned modal Window or route activation/input through the active owned modal."
+}

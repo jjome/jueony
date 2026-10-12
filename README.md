@@ -10,6 +10,8 @@
 
 ## 바로 실행
 
+최신 문단·선택 저장 검수본은 **[Start-Review.cmd](build/jueony-selection-state-20261012/Start-Review.cmd)**로 실행한다(4198). 문단 여백·첫 줄 키와 본문/표 셀 선택 저장, 종료 직전 위치 복원을 보강했다. [구현·검증·제한](docs/38-paragraph-selection-state-result.md), [한글 대화상자 도구 오류 조사](docs/39-native-dialog-investigation.md)를 확인한다.
+
 최신 기본 편집·상태 저장 검수본은 **[Start-Review.cmd](build/jueony-basic-state-20261012/Start-Review.cmd)**로 실행한다(4197). 대화상자 키 처리·종료 보호·본문 커서 복원·Ctrl+1~0 기본 스타일을 보강했다. [검사 결과와 실제 한글 조작 도구의 남은 제한](docs/37-basic-editing-state-result.md)을 확인한다.
 
 최신 실제 한글 비교·탭 저장 보정 검수본은 **[Start-Review.cmd](build/jueony-native-tabs-20261012/Start-Review.cmd)**로 실행한다(4196). Delete/Backspace 구역 병합을 실제 한글 2024에서 확인하고 HWPX 기본 탭 저장 값을 수정했다. [확인 범위·결함·검증 결과](docs/36-native-section-comparison.md)를 참고한다.

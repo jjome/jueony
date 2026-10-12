@@ -1,0 +1,31 @@
+PASS modal Tab/Shift-Tab, focused cancel Enter, Escape and nested Escape preserve document and editor focus
+PASS body caret survives actual workspace reload and tab switching without dirty or focus changes
+PASS embedded dirty editors delegate the exit prompt to the workspace host; standalone retains protection
+PASS Ctrl+1 through Ctrl+0 apply default paragraph styles and undo without changing text
+PASS hwp: paragraph shortcut aliases adjust per-paragraph values and undo/save without changing text
+PASS hwpx: paragraph shortcut aliases adjust per-paragraph values and undo/save without changing text
+PASS body selection preserves backward anchor and F3 phase after delayed persistence/reload; changed middle text refuses restore
+PASS paragraph repeated keys preserve no-op redo and refuse modal/form/IME edits
+PASS flat table cell Unicode caret and same-cell text selection survive reload and tab switching
+PASS F5 cell block stores phase/rectangle/exclusions and paragraph delta applies to all selected cells as one undo
+PASS merged flat table cell cursor survives checkpoint/reload and new input cancels a pending restore
+PASS immediate reload journals latest body/cell selection before the debounced IndexedDB write
+PASS Delete joins section boundary, previous settings, undo/redo and hwp save
+PASS Backspace joins section boundary, previous settings, undo/redo and hwp save
+PASS Delete joins section boundary, previous settings, undo/redo and hwpx save
+PASS Backspace joins section boundary, previous settings, undo/redo and hwpx save
+PASS ordinary body deletion and outer document edges retain existing key behavior
+PASS unsupported header-bearing right section refuses join without document or dirty mutation
+PASS form mode and first table cell cannot trigger a body section merge
+PASS Alt+Shift+Enter splits actual body sections; undo/redo and guarded file save
+PASS paragraph dialog changes default tab spacing in pt; cancel/undo/reopen preserve state
+PASS F6 opens styles; Alt+F6 focuses chat; modal F6 does not change document
+PASS table cell block F7 selects column; P opens cell properties without typing text
+PASS document information reads live text/table counts without changing revision or dirty state
+PASS hwp: page hide cancel/apply/undo/redo and actual save/reopen
+PASS hwpx: page hide cancel/apply/undo/redo and actual save/reopen
+PASS header/footer dialog cancel, create, undo/redo, then existing content stays intact
+PASS manual table caption position/removal form single undo steps and survive saving
+PASS hwp: Agent style/columns/page-hide batch uses live snapshot, persists and undoes as one request
+PASS hwpx: Agent style/columns/page-hide batch uses live snapshot, persists and undoes as one request
+PASS recovery options off retain old checkpoint; idle 5 seconds saves dirty changes and restores after reload

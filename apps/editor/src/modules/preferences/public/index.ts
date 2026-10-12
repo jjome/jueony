@@ -1,5 +1,6 @@
 export type { PageDefaults, DocumentDefaults, DocumentFitMode, DocumentViewState, BodyCaret, PreferenceErrorCode, PreferencesRefresh, ViewRestoreResult } from './contracts.ts';
 export { PreferenceStorageError } from './contracts.ts';
+export { createNavigationHistory } from '../domain/navigation-history.ts';
 export type { PreferenceStorage, PreferencesPersistenceOptions } from '../ports/storage.ts';
 export type { DocumentViewport, DocumentViewAdapterOptions } from '../ports/viewport.ts';
 export { preferenceChangedPaths } from '../domain/merge.ts';

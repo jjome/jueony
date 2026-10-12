@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-12",
+  "application": "Hancom Office Hangul 2024",
+  "automation": "node_repl @oai/sky supported API; native UI",
+  "status": "PASS_OPEN_AND_VISIBLE_TEXT_ONLY",
+  "files": [
+    {"file": "verified/calendar-string.hwp", "visibleAndAccessibleText": "2026.10.12 21:25:27기준 본문", "characters": 24, "pages": 1, "sections": 1},
+    {"file": "verified/calendar-string.hwpx", "visibleAndAccessibleText": "2026.10.12 21:25:28기준 본문", "characters": 24, "pages": 1, "sections": 1}
+  ],
+  "warningObserved": false,
+  "documentsChangedInHancom": false,
+  "leftOpenForReview": true,
+  "limitations": "No date-code field, complex layout, native date dialog parity or printing comparison. Screenshots inspected inline; payloads were not saved again.",
+  "fileDialogRecovery": {
+    "setValueError": "Cannot set a value for an element that is not settable",
+    "coordinateClickAndLiteralPathInput": "PASS",
+    "focusMetadataDisagreedWithVisibleFileNameCaret": true
+  }
+}

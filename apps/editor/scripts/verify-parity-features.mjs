@@ -205,6 +205,56 @@ try{
     try{for(let p=0;p<2;p++)assert.equal(parse(reopen.getParaShapeSet(0,p)).LeftMargin,propsAfter[p].LeftMargin);}finally{reopen.free();}
   });
 
+  await scenario('cursor history physical Equal keys go back/forward, branch on manual movement and do not dirty the document',async()=>{
+    const frame=await openFixture(),revision=(await snapshot()).revision;
+    const generation=await frame.evaluate(()=>{window.__historySwapCount=0;window.__parityServices.eventBus.on('document-swapped',()=>window.__historySwapCount++);return window.__parityServices.wasm.documentGeneration;});
+    const move=async(paragraph,offset)=>{await frame.evaluate((paragraph,offset)=>{const ih=window.__parityServices.getInputHandler();ih.cursor.clearSelection();ih.cursor.moveTo({sectionIndex:0,paragraphIndex:paragraph,charOffset:offset});ih.updateCaret();ih.focus();},paragraph,offset);await delay(180);};
+    const point=()=>frame.evaluate(()=>window.__parityServices.getInputHandler().getCursorPosition());
+    await move(0,1);await move(1,1);await move(2,1);
+    await chord('Control','=');assert.equal((await point()).paragraphIndex,1);
+    await chord('Control','Shift','=');assert.equal((await point()).paragraphIndex,2);
+    await chord('Control','=');await move(0,2);
+    assert.equal(await frame.evaluate(()=>window.rhwpStudio.automation.isEnabled('ext:jueony-next-cursor')),false);
+    await chord('Control','=');assert.equal((await point()).paragraphIndex,1);
+    assert.equal((await snapshot()).revision,revision);assert.equal(await frame.evaluate(()=>window.jueonyEditor.state().dirty),false);
+    await openFixture();await delay(180);
+    const reopened=await (await active()).evaluate(()=>({enabled:window.rhwpStudio.automation.isEnabled('ext:jueony-previous-cursor'),generation:window.__parityServices.wasm.documentGeneration,swaps:window.__historySwapCount,position:window.__parityServices.getInputHandler().getCursorPosition(),view:window.jueonyEditor.captureDocumentView()}));
+    assert.equal(reopened.enabled,false,JSON.stringify({previousGeneration:generation,...reopened}));
+  });
+
+  for(const extension of ['hwp','hwpx'])await scenario(`${extension}: calendar string shortcut, preview, cancel/conflict, single undo and guarded save`,async()=>{
+    const doc=HwpDocument.createEmpty();doc.createBlankDocument();doc.insertText(0,0,0,'기준 본문');const bytes=[...(extension==='hwp'?doc.exportHwp():doc.exportHwpx())];doc.free();
+    const frame=await openBytes(bytes,`calendar-string.${extension}`),base=(await snapshot()).nodes[0].text,revision=(await snapshot()).revision;
+    await chord('Control','k');await page.keyboard.press('d');await frame.waitForSelector('[aria-label="날짜/시간 형식"]');
+    await page.keyboard.press('Escape');assert.equal((await snapshot()).revision,revision);assert.equal((await snapshot()).nodes[0].text,base);
+    await command('ext:jueony-calendar-stamp');await frame.select('[aria-label="날짜/시간 형식"]','date-time');
+    const stamp=await frame.$eval('[aria-label="넣을 날짜/시간"]',e=>e.value);assert.match(stamp,/^\d{4}\.\d{2}\.\d{2} \d{2}:\d{2}:\d{2}$/);
+    await frame.click('.modal-overlay .dialog-btn-primary');await frame.waitForFunction(()=>!document.querySelector('.modal-overlay'));
+    assert.equal((await snapshot()).nodes[0].text,stamp+base);await command('edit:undo');assert.equal((await snapshot()).nodes[0].text,base);await command('edit:redo');
+    const saved=await saveBytes(`calendar-string.${extension}`),reopened=new HwpDocument(new Uint8Array(saved));
+    try{assert.equal(reopened.getTextRange(0,0,0,reopened.getParagraphLength(0,0)),stamp+base);}finally{reopened.free();}
+    await focusBody();await command('ext:jueony-calendar-stamp');const beforeConflict=(await snapshot()).revision;
+    await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.cursor.moveTo({...ih.getCursorPosition(),charOffset:1});ih.updateCaret();});
+    await frame.click('.modal-overlay .dialog-btn-primary');assert.equal((await snapshot()).revision,beforeConflict);
+    assert.match(await frame.$eval('.modal-overlay [role=alert]',e=>e.textContent),/문서나 커서가 바뀌었습니다/);await page.keyboard.press('Escape');
+  });
+
+  await scenario('cursor history skips changed text bookmarks and restores flat-cell scalar offsets',async()=>{
+    let frame=await openFixture();
+    const move=async(paragraph)=>{await frame.evaluate(paragraph=>{const ih=window.__parityServices.getInputHandler();ih.cursor.moveTo({sectionIndex:0,paragraphIndex:paragraph,charOffset:1});ih.updateCaret();ih.focus();},paragraph);await delay(180);};
+    await move(0);await move(1);await move(2);
+    await frame.evaluate(()=>{const doc=window.__parityServices.wasm.borrowDocumentHandle();doc.deleteText(0,1,0,1);doc.insertText(0,1,0,'X');});
+    await command('ext:jueony-previous-cursor');assert.equal(await frame.evaluate(()=>window.__parityServices.getInputHandler().getCursorPosition().paragraphIndex),0);
+    const doc=HwpDocument.createEmpty();doc.createBlankDocument();const table=parse(doc.createTable(0,0,0,2,2));
+    for(let cell=0;cell<2;cell++)doc.insertTextInCell(0,table.paraIdx,table.controlIdx,cell,0,0,'가😀나 셀');
+    const bytes=[...doc.exportHwpx()];doc.free();frame=await openBytes(bytes,'cursor-history-cell.hwpx');
+    const cell=async(index,offset)=>{await frame.evaluate((table,index,offset)=>{const ih=window.__parityServices.getInputHandler();ih.cursor.moveTo({sectionIndex:0,parentParaIndex:table.paraIdx,paragraphIndex:0,charOffset:offset,controlIndex:table.controlIdx,cellIndex:index,cellParaIndex:0,cellPath:[{controlIndex:table.controlIdx,cellIndex:index,cellParaIndex:0}]});ih.updateCaret();ih.focus();},table,index,offset);await delay(180);};
+    await cell(0,2);await cell(1,3);await command('ext:jueony-previous-cursor');
+    let position=await frame.evaluate(()=>window.__parityServices.getInputHandler().getCursorPosition());assert.equal(position.cellIndex,0);assert.equal(position.charOffset,2);
+    await command('ext:jueony-next-cursor');position=await frame.evaluate(()=>window.__parityServices.getInputHandler().getCursorPosition());assert.equal(position.cellIndex,1);assert.equal(position.charOffset,3);
+    assert.equal(await frame.evaluate(()=>window.jueonyEditor.state().dirty),false);
+  });
+
   await scenario('body selection preserves backward anchor and F3 phase after delayed persistence/reload; changed middle text refuses restore',async()=>{
     let frame=await openFixture(),before=await snapshot();await page.click('#save-document');await page.waitForFunction(()=>document.getElementById('app-status').textContent==='파일에 저장했습니다.');
     await delay(1800); // Exceed the previous save timer: the cursor event must trigger its own view write.

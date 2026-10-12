@@ -6,12 +6,16 @@ import { resolveDefaultStyle } from './style-slots.ts';
 import { defaultShortcuts } from '../../command/shortcut-map';
 import { getObjectProps, setObjectProps } from '../../engine/object-props';
 import { installCaptionCommands } from '../adapters/rhwp/manual-commands.ts';
+import { installNavigationHistory } from '../adapters/rhwp/navigation-history.ts';
+import { installCalendarStamp } from '../adapters/rhwp/calendar-stamp.ts';
 
 export function installHangulKeys({ automation, registry, input, eventBus }: { automation: any; registry: any; input: () => any; eventBus: any }) {
   const resolver = new HangulKeyResolver();
   installEqualCells(registry, input);
   installNavigationPane(registry, input, eventBus);
   installCaptionCommands({ registry, input, getObjectProps, setObjectProps });
+  installNavigationHistory(registry, input, eventBus);
+  installCalendarStamp(registry, input, eventBus);
   // The pinned Studio marked the entire caption submenu as a stub; child state is now registry-owned.
   document.querySelector('[data-cmd="insert:caption-top"]')?.closest('.md-sub')?.classList.remove('disabled');
   const unsupported = new Set<string>();

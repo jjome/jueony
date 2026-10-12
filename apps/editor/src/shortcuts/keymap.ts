@@ -16,6 +16,7 @@ export const hangulBindings: Binding[] = [
   binding('Alt+P', 'file:print', '인쇄'), binding('Ctrl+P', 'file:print', '인쇄'),
   binding('Ctrl+F4', 'ext:jueony-close', '문서 닫기'),
   binding('Ctrl+O', 'pending:insert-document', '문서 끼워 넣기'),
+  binding('Ctrl+K,D', 'ext:jueony-calendar-stamp', '날짜/시간 문자열'),
   ...(['PageUp', 'PageDown', 'Home', 'End'] as const).map((key, i) => binding('Ctrl+' + key, 'ext:jueony-navigate', ['문서 처음', '문서 끝', '화면 첫 줄', '화면 끝줄'][i], 'document', { edge: ['document-start', 'document-end', 'screen-start', 'screen-end'][i] })),
   binding('Alt+Home', 'ext:jueony-navigate', '문단 처음', 'document', { edge: 'paragraph-start' }),
   binding('Alt+End', 'ext:jueony-navigate', '문단 끝', 'document', { edge: 'paragraph-end' }),
@@ -92,7 +93,7 @@ export const hangulBindings: Binding[] = [
   binding('Shift+PageUp', 'insert:arrange-front', '맨 앞으로', 'object'), binding('Shift+PageDown', 'insert:arrange-back', '맨 뒤로', 'object'),
   // Reserve former upstream shortcuts that would run a DIFFERENT Hangul function.
   binding('Alt+Shift+H', 'pending:macro-record', '스크립트 매크로 정의'),
-  binding('Ctrl+=', 'pending:previous-cursor', '이전 커서 위치'), binding('Ctrl+Shift+=', 'pending:next-cursor', '다음 커서 위치'),
+  binding('Ctrl+=', 'ext:jueony-previous-cursor', '이전 커서 위치'), binding('Ctrl+Shift+=', 'ext:jueony-next-cursor', '다음 커서 위치'),
   binding('Ctrl+-', 'pending:clear-char-style', '글자 스타일 해제'),
 ];
 export type Key = Pick<KeyboardEvent, 'key' | 'code' | 'ctrlKey' | 'altKey' | 'shiftKey' | 'metaKey' | 'repeat' | 'isComposing'>;

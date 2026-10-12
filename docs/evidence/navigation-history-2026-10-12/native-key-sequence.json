@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-12",
+  "fixture": "native-section-merge-2026-10-12/native-abcd-delete.hwpx",
+  "environment": "Hancom Office Hangul 2024; one empty body paragraph; Hamchorom Batang 10pt",
+  "eachStepSavedWith": "Ctrl+S",
+  "sequence": [
+    {"key": "Ctrl+F6", "file": "indent-more.hwpx", "notes": "First-line amount 1.0pt observed in native paragraph dialog; direct initial baseline not captured"},
+    {"key": "Ctrl+Shift+G", "file": "left-more.hwpx"},
+    {"key": "Ctrl+Shift+D", "file": "right-more.hwpx"},
+    {"key": "Ctrl+F8", "file": "both-f8.hwpx", "notes": "Observed decrease; differs from official shortcut table and current app mapping"},
+    {"key": "Ctrl+F7", "file": "both-f7.hwpx", "notes": "Observed increase; differs from official shortcut table and current app mapping"},
+    {"key": "Ctrl+Shift+E", "file": "left-less.hwpx"},
+    {"key": "Ctrl+Shift+F", "file": "right-less.hwpx"},
+    {"key": "Ctrl+F5", "file": "indent-zero.hwpx"},
+    {"key": "Ctrl+Shift+O", "file": "indent-negative.hwpx"},
+    {"key": "Ctrl+Shift+I", "file": "restored-zero.hwpx"}
+  ],
+  "fixtureRestoration": {
+    "nativeDocumentClosedBeforeRestore": true,
+    "sha256BeforeAndAfter": "38f2483ff4f63695992d47a5dd67af58e30c366931ec1718acd021a50f06bff2",
+    "originalDiskBytesRestored": true,
+    "backup": "native-files/original-before-test.hwpx"
+  },
+  "nativeModal": {
+    "paragraphDialogEscape": "failed to activate captured window",
+    "launcherResolvedParagraphDialog": false,
+    "manuallyClosedByUser": true,
+    "extraRecoveryLaunchersClosed": true,
+    "generalModalFixClaimed": false
+  }
+}

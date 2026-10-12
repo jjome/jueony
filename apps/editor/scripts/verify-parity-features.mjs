@@ -697,6 +697,83 @@ try{
     });
   }
 
+  await scenario('style list arrow/Home/End navigation retains modal focus and document state',async()=>{
+    const frame=await openFixture(),before=await snapshot();await command('format:style-dialog');await frame.focus('.sd-style-item');
+    await page.keyboard.press('ArrowDown');assert.equal(await frame.$$eval('.sd-style-item',items=>items.indexOf(document.activeElement)),1);
+    await page.keyboard.press('End');assert.equal(await frame.$$eval('.sd-style-item',items=>items.indexOf(document.activeElement)),await frame.$$eval('.sd-style-item',items=>items.length-1));
+    await page.keyboard.press('Home');assert.equal(await frame.$$eval('.sd-style-item',items=>items.indexOf(document.activeElement)),0);
+    assert.equal((await snapshot()).revision,before.revision);await page.keyboard.press('Escape');assert.equal((await snapshot()).revision,before.revision);
+  });
+  for(const extension of ['hwp','hwpx'])await scenario(`${extension}: style clone retains definitions and one-step undo/save without changing body`,async()=>{
+    const doc=HwpDocument.createEmpty();doc.createBlankDocument();doc.insertText(0,0,0,'스타일 원문');
+    const id=doc.createStyle(JSON.stringify({name:'복제 원본',englishName:'CloneSource',nextStyleId:0}));doc.updateStyle(id,JSON.stringify({nextStyleId:id}));doc.updateStyleShapes(id,JSON.stringify({bold:true,fontSize:1300}),'{}');doc.applyStyle(0,0,id);
+    const bytes=[...doc[extension==='hwp'?'exportHwp':'exportHwpx']()];doc.free();const frame=await openBytes(bytes,`style-clone.${extension}`),before=await snapshot();
+    const details=await frame.evaluate(id=>window.__parityServices.wasm.getStyleDetail(id),id);
+    await page.keyboard.press('F6');await frame.click('[data-jueony-clone-style]');
+    const clone=await frame.evaluate(()=>window.__parityServices.wasm.getStyleList().find(s=>s.name==='복제 원본 복사'));assert.ok(clone);assert.equal(clone.type,0);assert.equal(clone.nextStyleId,clone.id);assert.equal(clone.englishName,'');
+    assert.deepEqual(await frame.evaluate(id=>window.__parityServices.wasm.getStyleDetail(id),clone.id),details);
+    await page.keyboard.press('Escape');assert.deepEqual((await snapshot()).nodes.map(n=>n.text),before.nodes.map(n=>n.text));
+    await command('edit:undo');assert.equal(await frame.evaluate(()=>window.__parityServices.wasm.getStyleList().some(s=>s.name==='복제 원본 복사')),false);
+    await command('edit:redo');const saved=await saveBytes(`style-clone.${extension}`);const reopened=new HwpDocument(new Uint8Array(saved));try{const next=parse(reopened.getStyleList()).find(s=>s.name==='복제 원본 복사');assert.equal(next.nextStyleId,next.id);assert.equal(parse(reopened.getStyleDetail(next.id)).charProps.bold,true);}finally{reopened.free();}
+  });
+  for(const extension of ['hwp','hwpx'])await scenario(`${extension}: style character type and deferred font shape commit cancel/undo/save correctly`,async()=>{
+    const frame=await openFixture(),name=`style-create.${extension}`,bytes=await frame.evaluate(extension=>[...window.__parityServices.wasm.borrowDocumentHandle()[extension==='hwp'?'exportHwp':'exportHwpx']()],extension);await openBytes(bytes,name);
+    const before=await snapshot(),baseline=await frame.evaluate(()=>[...window.__parityServices.wasm.exportHwp()]);
+    await command('format:style-dialog');await frame.click('.sd-icon-btn');await frame.waitForSelector('.se-body');
+    await frame.click('.se-type-radios input[value="1"]');assert.equal(await frame.$eval('.se-shape-btn',b=>b.disabled),true);
+    await frame.$eval('[aria-label="스타일 이름"]',e=>{e.value='새 글자 스타일';});
+    await frame.click('.se-shape-btns button:nth-child(2)');
+    await frame.waitForSelector('.cs-dialog');
+    await frame.evaluate(()=>{const dialog=[...document.querySelectorAll('.modal-overlay')].at(-1),select=[...dialog.querySelectorAll('select')].find(s=>[...s.options].some(o=>o.value==='함초롬바탕'));const option=document.createElement('option');option.value='JueonySyntheticStyleFont';option.textContent=option.value;select.append(option);select.value=option.value;});
+    await frame.click('.cs-dialog .dialog-btn-primary');
+    assert.deepEqual(await frame.evaluate(()=>[...window.__parityServices.wasm.exportHwp()]),baseline);
+    await frame.click('.se-shape-btns button:nth-child(2)');
+    assert.equal(await frame.evaluate(()=>{const dialog=[...document.querySelectorAll('.modal-overlay')].at(-1);return [...dialog.querySelectorAll('select')].some(s=>s.value==='JueonySyntheticStyleFont');}),true);
+    await page.keyboard.press('Escape');await page.keyboard.press('Escape');assert.equal((await snapshot()).revision,before.revision);assert.deepEqual(await frame.evaluate(()=>[...window.__parityServices.wasm.exportHwp()]),baseline);
+    await frame.click('.sd-icon-btn');await frame.click('.se-type-radios input[value="1"]');await frame.$eval('[aria-label="스타일 이름"]',e=>e.value='확정 글자 스타일');
+    await frame.click('.se-shape-btns button:nth-child(2)');await frame.evaluate(()=>{const dialog=[...document.querySelectorAll('.modal-overlay')].at(-1),select=[...dialog.querySelectorAll('select')].find(s=>[...s.options].some(o=>o.value==='함초롬바탕'));const o=document.createElement('option');o.value='JueonySyntheticStyleFont';o.textContent=o.value;select.append(o);select.value=o.value;});await frame.click('.cs-dialog .dialog-btn-primary');
+    await frame.click('.se-body + .dialog-footer .dialog-btn-primary');await frame.waitForSelector('.se-body',{hidden:true});
+    const created=await frame.evaluate(()=>window.__parityServices.wasm.getStyleList().find(s=>s.name==='확정 글자 스타일'));assert.equal(created.type,1);
+    assert.equal((await frame.evaluate(id=>window.__parityServices.wasm.getStyleDetail(id),created.id)).charProps.fontFamily,'JueonySyntheticStyleFont');
+    await page.keyboard.press('Escape');await command('edit:undo');assert.deepEqual(await frame.evaluate(()=>[...window.__parityServices.wasm.exportHwp()]),baseline);
+    await command('edit:redo');const saved=await saveBytes(`style-character.${extension}`),reopened=new HwpDocument(new Uint8Array(saved));try{assert.equal(parse(reopened.getStyleList()).find(s=>s.name==='확정 글자 스타일').type,1);}finally{reopened.free();}
+  });
+  for(const extension of ['hwp','hwpx'])await scenario(`${extension}: deleting styles remaps flat-cell references and retains text/format in one undo`,async()=>{
+    const doc=new HwpDocument(new Uint8Array(await fixture('schedule-table.hwpx'))),deleted=doc.createStyle(JSON.stringify({name:'삭제 대상'})),kept=doc.createStyle(JSON.stringify({name:'남을 스타일'}));
+    doc.applyCellStyle(0,1,0,0,0,deleted);doc.applyCellStyle(0,1,0,1,0,kept);doc.applyStyle(0,0,kept);const bytes=[...doc[extension==='hwp'?'exportHwp':'exportHwpx']()];doc.free();const frame=await openBytes(bytes,`style-delete.${extension}`),before=await snapshot();
+    await command('format:style-dialog');await frame.$$eval('.sd-style-item',items=>items.find(e=>e.textContent.includes('삭제 대상')).click());await frame.click('.sd-icon-btn:nth-child(3)');
+    assert.equal((await frame.evaluate(()=>window.__parityServices.wasm.getCellStyleAt(0,1,0,0,0))).id,0);
+    assert.equal((await frame.evaluate(()=>window.__parityServices.wasm.getCellStyleAt(0,1,0,1,0))).name,'남을 스타일');
+    await page.keyboard.press('Escape');assert.deepEqual((await snapshot()).nodes.map(n=>n.text),before.nodes.map(n=>n.text));await command('edit:undo');assert.deepEqual((await snapshot()).structure,before.structure);
+    await command('edit:redo');const saved=await saveBytes(`style-deleted.${extension}`),reopened=new HwpDocument(new Uint8Array(saved));try{assert.equal(parse(reopened.getCellStyleAt(0,1,0,1,0)).name,'남을 스타일');assert.equal(parse(reopened.getCellStyleAt(0,1,0,0,0)).id,0);}finally{reopened.free();}
+  });
+  for(const extension of ['hwp','hwpx'])await scenario(`${extension}: style edit renames identity, propagates body and cell size, keeps overrides and no-op undo state`,async()=>{
+    const doc=new HwpDocument(new Uint8Array(await fixture('schedule-table.hwpx'))),id=doc.createStyle(JSON.stringify({name:'편집 원본',englishName:'EditOriginal'}));
+    doc.applyStyle(0,0,id);doc.applyCellStyle(0,1,0,0,0,id);doc.applyCharFormat(0,0,1,2,JSON.stringify({italic:true}));
+    const bytes=[...doc[extension==='hwp'?'exportHwp':'exportHwpx']()];doc.free();const frame=await openBytes(bytes,`style-edit.${extension}`),before=await snapshot();
+    await command('format:style-dialog');await frame.click('.sd-icon-btn:nth-child(2)');await frame.click('.se-body + .dialog-footer .dialog-btn-primary');
+    await page.keyboard.press('Escape');assert.equal((await snapshot()).revision,before.revision);
+    await command('format:style-dialog');await frame.click('.sd-icon-btn:nth-child(2)');await frame.$eval('[aria-label="스타일 이름"]',e=>e.value='편집 완료');
+    await frame.click('.se-shape-btns button:nth-child(2)');
+    await frame.$eval('.cs-dialog input[type=number]',e=>{e.value='16';e.dispatchEvent(new Event('input',{bubbles:true}));});await frame.click('.cs-dialog .dialog-btn-primary');
+    await frame.click('.se-body + .dialog-footer .dialog-btn-primary');await frame.waitForSelector('.se-body',{hidden:true});await page.keyboard.press('Escape');
+    assert.equal((await frame.evaluate(id=>window.__parityServices.wasm.getStyleList().find(s=>s.id===id),id)).name,'편집 완료');
+    assert.equal(await frame.evaluate(()=>window.__parityServices.wasm.getCharPropertiesAt(0,0,0).fontSize),1600);
+    assert.equal(await frame.evaluate(()=>window.__parityServices.wasm.getCharPropertiesAt(0,0,1).italic),true);
+    assert.equal(await frame.evaluate(()=>window.__parityServices.wasm.getCellCharPropertiesAt(0,1,0,0,0,0).fontSize),1600);
+    await command('edit:undo');assert.deepEqual((await snapshot()).structure,before.structure);await command('edit:redo');
+    const saved=await saveBytes(`style-edited.${extension}`),reopened=new HwpDocument(new Uint8Array(saved));try{assert.equal(parse(reopened.getStyleList()).find(s=>s.id===id).name,'편집 완료');assert.equal(parse(reopened.getCharPropertiesAt(0,0,0)).fontSize,1600);}finally{reopened.free();}
+  });
+  await scenario('style editing rejects duplicate names and concurrent document changes without applying pending formats',async()=>{
+    const frame=await openFixture();await command('format:style-dialog');await frame.click('.sd-icon-btn');
+    await frame.$eval('[aria-label="스타일 이름"]',e=>e.value='바탕글');const before=await snapshot();await frame.click('.se-body + .dialog-footer .dialog-btn-primary');assert.equal((await snapshot()).revision,before.revision);
+    assert.match(await frame.$eval('.se-body [role=alert]',e=>e.textContent),/같은 이름/);await frame.$eval('[aria-label="스타일 이름"]',e=>e.value='충돌 스타일');
+    await frame.evaluate(()=>{const ih=window.__parityServices.getInputHandler();ih.executeOperation({kind:'snapshot',operationType:'test-style-concurrent',operation:wasm=>{wasm.insertText(0,0,0,'후속');return ih.getPosition();}});});
+    const changed=await snapshot();await frame.click('.se-body + .dialog-footer .dialog-btn-primary');assert.equal((await snapshot()).revision,changed.revision);assert.match(await frame.$eval('.se-body [role=alert]',e=>e.textContent),/문서 상태가 바뀌/);
+    await page.keyboard.press('Escape');await frame.click('.sd-icon-btn');assert.equal(await frame.$('.se-body'),null);
+    assert.match(await frame.$eval('.sd-body [role=alert]',e=>e.textContent),/문서 상태가 바뀌/);await page.keyboard.press('Escape');
+  });
+
   await scenario('recovery options off retain old checkpoint; idle 5 seconds saves dirty changes and restores after reload',async()=>{
     await openFixture();await settings(true);await replaceFirst('RECOVERY BASELINE');await delay(6500);
     let records=await storedDocuments(),baseline=records.find(record=>firstText(record.bytes)==='RECOVERY BASELINE');assert.ok(baseline,'enabled recovery checkpoint missing');

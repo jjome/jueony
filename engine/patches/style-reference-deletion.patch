@@ -1,0 +1,115 @@
+diff --git a/src/document_core/commands/mod.rs b/src/document_core/commands/mod.rs
+--- a/src/document_core/commands/mod.rs
++++ b/src/document_core/commands/mod.rs
+@@ -24,3 +24,5 @@
+ // [#5769] Stage 4 — 구역 raw 저널. SectionRawCapture 타입이 DocumentCore 필드로
+ // 쓰이므로 pub(crate).
+ pub(crate) mod section_raw_journal;
++
++mod style_references;
+diff --git a/src/wasm_api.rs b/src/wasm_api.rs
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -7567,24 +7567,9 @@
+             return false;
+         }
+         let sid = style_id as u8;
+-        // 해당 스타일을 사용 중인 문단을 바탕글(0)로 변경
+-        for section in &mut self.core.document.sections {
+-            for para in &mut section.paragraphs {
+-                if para.style_id == sid {
+-                    para.style_id = 0;
+-                }
+-            }
+-        }
+-        // 스타일 삭제 (인덱스 기반이므로 뒤의 ID가 변경됨에 주의)
++        // Body, nested cells, captions, special stories and master pages share IDs.
++        self.core.remap_deleted_style_references(sid);
+         self.core.document.doc_info.styles.remove(style_id as usize);
+-        // 삭제된 ID보다 큰 style_id를 가진 문단들 보정
+-        for section in &mut self.core.document.sections {
+-            for para in &mut section.paragraphs {
+-                if para.style_id > sid {
+-                    para.style_id -= 1;
+-                }
+-            }
+-        }
+         // next_style_id 보정
+         for s in &mut self.core.document.doc_info.styles {
+             if s.next_style_id == sid {
+diff --git a/src/document_core/commands/style_references.rs b/src/document_core/commands/style_references.rs
+new file mode 100644
+--- /dev/null
++++ b/src/document_core/commands/style_references.rs
+@@ -0,0 +1,71 @@
++//! Update style references in every modeled paragraph when a style ID is removed.
++use crate::document_core::DocumentCore;
++use crate::model::control::Control;
++use crate::model::paragraph::Paragraph;
++use crate::model::shape::{DrawingObjAttr, ShapeObject};
++
++fn remap(id: &mut u8, removed: u8) {
++    if *id == removed { *id = 0; } else if *id > removed { *id -= 1; }
++}
++fn paragraphs(items: &mut [Paragraph], removed: u8) {
++    for paragraph in items {
++        remap(&mut paragraph.style_id, removed);
++        for control in &mut paragraph.controls {
++            match control {
++                Control::Table(table) => {
++                    for cell in &mut table.cells { paragraphs(&mut cell.paragraphs, removed); }
++                    if let Some(caption) = &mut table.caption { paragraphs(&mut caption.paragraphs, removed); }
++                },
++                Control::Picture(picture) => {
++                    if let Some(caption) = &mut picture.caption { paragraphs(&mut caption.paragraphs, removed); }
++                },
++                Control::Shape(object) => shape(object, removed),
++                Control::Header(header) => paragraphs(&mut header.paragraphs, removed),
++                Control::Footer(footer) => paragraphs(&mut footer.paragraphs, removed),
++                Control::Footnote(note) => paragraphs(&mut note.paragraphs, removed),
++                Control::Endnote(note) => paragraphs(&mut note.paragraphs, removed),
++                Control::HiddenComment(comment) => paragraphs(&mut comment.paragraphs, removed),
++                Control::Field(field) => paragraphs(&mut field.memo_paragraphs, removed),
++                Control::SectionDef(section) => {
++                    for master in &mut section.master_pages { paragraphs(&mut master.paragraphs, removed); }
++                },
++                Control::Ruby(ruby) => {
++                    if let Ok(mut id) = u8::try_from(ruby.style_id_ref) { remap(&mut id, removed); ruby.style_id_ref = u16::from(id); }
++                },
++                _ => {},
++            }
++        }
++    }
++}
++fn drawing(object: &mut DrawingObjAttr, removed: u8) {
++    if let Some(text) = &mut object.text_box { paragraphs(&mut text.paragraphs, removed); }
++    if let Some(caption) = &mut object.caption { paragraphs(&mut caption.paragraphs, removed); }
++}
++fn shape(object: &mut ShapeObject, removed: u8) {
++    match object {
++        ShapeObject::Picture(picture) => {
++            if let Some(caption) = &mut picture.caption { paragraphs(&mut caption.paragraphs, removed); }
++        },
++        ShapeObject::Group(group) => {
++            for child in &mut group.children { shape(child, removed); }
++            if let Some(caption) = &mut group.caption { paragraphs(&mut caption.paragraphs, removed); }
++        },
++        ShapeObject::Chart(chart) => {
++            drawing(&mut chart.drawing, removed);
++            if let Some(caption) = &mut chart.caption { paragraphs(&mut caption.paragraphs, removed); }
++        },
++        ShapeObject::Ole(ole) => {
++            drawing(&mut ole.drawing, removed);
++            if let Some(caption) = &mut ole.caption { paragraphs(&mut caption.paragraphs, removed); }
++        },
++        _ => { if let Some(object) = object.drawing_mut() { drawing(object, removed); } },
++    }
++}
++impl DocumentCore {
++    pub(crate) fn remap_deleted_style_references(&mut self, removed: u8) {
++        for section in &mut self.document.sections {
++            paragraphs(&mut section.paragraphs, removed);
++            for master in &mut section.section_def.master_pages { paragraphs(&mut master.paragraphs, removed); }
++        }
++    }
++}

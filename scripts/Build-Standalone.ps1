@@ -27,6 +27,7 @@ foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.m
 }
 $llmEvidence = Join-Path $output 'evidence'
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/42-document-insertion-result.md') -Destination $output -Force
+Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/43-style-management-result.md') -Destination $output -Force
 foreach ($guide in @('30-layered-modular-refactor-plan.md','31-facade-contracts.md','32-modular-refactor-result.md','33-editor-parity-features-result.md','34-sections-tabs-result.md','35-section-boundary-merge-result.md','36-native-section-comparison.md','37-basic-editing-state-result.md','38-paragraph-selection-state-result.md','39-native-dialog-investigation.md','40-basic-navigation-calendar-result.md','41-pre-agent-editor-progress.md','refactor-work-plan.csv','hangul-2024-gap-checklist.csv')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
@@ -156,6 +157,19 @@ if (Test-Path -LiteralPath $insertionEvidence) {
     }
 }
 $moduleHashes = [ordered]@{}
+$styleEvidence = Join-Path $projectRoot 'docs/evidence/style-management-2026-10-13'
+if (Test-Path -LiteralPath $styleEvidence) {
+    Copy-Item -LiteralPath $styleEvidence -Destination $llmEvidence -Recurse -Force
+    foreach ($directory in @('final-verified','engine-verified')) {
+        $source = Join-Path $styleEvidence $directory
+        if (Test-Path -LiteralPath $source) {
+            $target = Join-Path $reviewDocuments ('styles/' + $directory)
+            New-Item -ItemType Directory -Force $target | Out-Null
+            Get-ChildItem -LiteralPath $source -File |
+                Where-Object { $_.Extension -in @('.hwp', '.hwpx') } | Copy-Item -Destination $target -Force
+        }
+    }
+}
 foreach ($directory in @('services', 'contracts')) {
     Get-ChildItem -LiteralPath (Join-Path $output $directory) -Filter '*.mjs' -Recurse | Sort-Object FullName | ForEach-Object { $moduleHashes[$directory + '/' + $_.Name] = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash }
 }

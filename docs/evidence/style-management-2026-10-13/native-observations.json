@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-13",
+  "application": "Hancom Office Hangul 2024",
+  "fixture": "inserted-hwp-to-hwpx.hwpx from the prior document insertion evidence",
+  "observed": "F6 opened the Style dialog. Names, Ctrl+1..0 defaults, character/paragraph information and management buttons were visible.",
+  "attempts": [
+    {"action":"Escape","result":"failed to activate captured window"},
+    {"action":"refresh returned Window and screenshot, then retry Escape once","result":"failed to activate captured window"}
+  ],
+  "stoppedNativeInput": true,
+  "note": "No successful native style edit, cancel, undo, save or reopening of the newly edited style documents is claimed. Code/isolated browser/native WASM verification continued. Screenshots were inspected in original Computer Use outputs, not exported or decoded here."
+}

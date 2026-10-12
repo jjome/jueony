@@ -11,3 +11,5 @@ export type {DocumentEnginePort} from '../ports/engine.ts';
 export {describeStructure} from '../application/describe-structure.ts';
 export type {EditorCommand,EditorMenu,EditorMenuItem,DocumentInteractionFacade} from './interaction.ts';
 export { planHangingIndent } from '../domain/hanging-indent.ts';
+export { validateStyleDefinition } from '../domain/style-definition.ts';
+export type { StyleDefinition, NamedStyle } from '../domain/style-definition.ts';

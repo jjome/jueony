@@ -1,0 +1,63 @@
+{
+  "results": [
+    "hwp: style edit renames identity, propagates body and cell size, keeps overrides and no-op undo state",
+    "hwpx: style edit renames identity, propagates body and cell size, keeps overrides and no-op undo state"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "browserDialogs": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@jueony/rhwp-engine-review@0.8.7",
+    "builtAt": "2026-10-12T15:08:07.382Z",
+    "engineWasmSha256": "d2bf4112349bca4dfc01fb980880d2719855343a6fc9ad0c43df8142c3200648",
+    "engineBuild": {
+      "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+      "patches": [
+        {
+          "name": "default-tabs.patch",
+          "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+        },
+        {
+          "name": "document-insertion.patch",
+          "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+        },
+        {
+          "name": "section-split.patch",
+          "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+        },
+        {
+          "name": "style-reference-deletion.patch",
+          "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+        },
+        {
+          "name": "table-creation-consistency.patch",
+          "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+        }
+      ],
+      "wasmSha256": "d2bf4112349bca4dfc01fb980880d2719855343a6fc9ad0c43df8142c3200648",
+      "optimized": false,
+      "jsSha256": "ae538304ba4cc00f780d10b4cfcba9c896b41c82b2bc973f4057c835aad5ba82",
+      "buildMode": "wsl-review-no-opt",
+      "sourceId": "b28a2812acfc172f",
+      "builtAt": "2026-10-12T15:05:05.7619599Z"
+    },
+    "buildScriptSha256": "485566f35e3745974e1ad246cebddd65d7b7661f99ed37180a63b57175f66a02",
+    "studioPatchSha256": "9da3698ea59fc52426ac8fa7f6fcd4c2d389f989e7a10d7c23c1eb5cac7fcf1e",
+    "featurePatchSha256": "ca3ae9e1f5c7075d0113b6a38cb905317ec51db8e0cfdb55f1dfb0e9e1e986b7",
+    "recoveryPatchSha256": "12dfbb56ca02e1642bb495a44e18cf0823da84864386211eeb8811916552f864",
+    "tabFeaturePatchSha256": "da0d7d0b9a0c529af8a4a9733bf239a1c4f6afcd99b8803f1237f1c57a90ceec",
+    "sectionBoundaryPatchSha256": "e2a5cee3330b67015a3ac8cc738cafe36966950d7a12fc48e1d0a7ffc2392b13",
+    "documentInsertionPatchSha256": "2941b880fe250f779c95ce7bbd9d54384b10dda5f1596f7c0343d44e0297d4ff",
+    "styleManagementPatchSha256": "acd47de5c882e5ce4d0d4f9e6b54a122926d48ea38b7c3a048061ab4c890ce73",
+    "customSourceSha256": "0e973f25bcf34433b67e204cb2af9975742493deb1b6e1473da55991b3654be8",
+    "applicationSourceCommit": "8be8c57c50bfbac7db0ead0b2b853dc2cf3de753",
+    "applicationSourceDirty": true,
+    "sourceBuild": true,
+    "note": "고정 rhwp 소스와 추적 패치를 직접 빌드한 검수용 WASM. 최적화 및 한컴 출력 비교 상태는 engineBuild와 검증 보고서 참조."
+  },
+  "note": "Isolated headless Edge profile, synthetic files/OPFS and memory model store. Manual command/UI tests use a test extension to position cursors and read engine values. No paid model or native Hancom comparison."
+}

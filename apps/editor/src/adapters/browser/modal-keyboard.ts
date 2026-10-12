@@ -16,6 +16,16 @@ export function handleModalKeyboard(event: KeyboardEvent, overlay: HTMLElement, 
     return;
   }
   const target = event.target instanceof HTMLElement ? event.target : null;
+  const option = target?.closest<HTMLElement>('[role="option"]'), listbox = option?.closest<HTMLElement>('[role="listbox"]');
+  if (option && listbox && ['ArrowDown','ArrowUp','Home','End'].includes(event.key)) {
+    const options = [...listbox.querySelectorAll<HTMLElement>('[role="option"]')].filter(el => el.getAttribute('aria-disabled') !== 'true' && el.getClientRects().length > 0);
+    const index = options.indexOf(option);
+    const next = event.key === 'Home' ? 0 : event.key === 'End' ? options.length - 1 : Math.max(0, Math.min(options.length - 1, index + (event.key === 'ArrowDown' ? 1 : -1)));
+    event.preventDefault(); options[next]?.click();
+    // A selection change may rebuild option nodes. Recover focus from the live list.
+    [...listbox.querySelectorAll<HTMLElement>('[role="option"]')].filter(el => el.getAttribute('aria-disabled') !== 'true' && el.getClientRects().length > 0)[next]?.focus();
+    return;
+  }
   if (event.key === 'Enter' && target instanceof HTMLButtonElement) {
     // Consume before focus changes: the key must not become a document Enter
     // after closing the dialog or also activate its default confirm button.

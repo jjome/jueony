@@ -1,5 +1,5 @@
 // Canonical provider-neutral wire shape; semantic validation remains in this module's domain.
-export const controlKinds = ['format_characters', 'format_paragraph', 'create_table', 'set_table_cell', 'format_table_cells', 'set_page_setup', 'insert_table_row','insert_table_column','delete_table_row','delete_table_column','apply_paragraph_style','set_columns','set_page_hide','set_section_tabs','set_line_numbers','set_page_background','set_master_page_text','delete_master_page'];
+export const controlKinds = ['split_section','format_characters', 'format_paragraph', 'create_table', 'set_table_cell', 'format_table_cells', 'set_page_setup', 'insert_table_row','insert_table_column','delete_table_row','delete_table_column','apply_paragraph_style','set_columns','set_page_hide','set_section_tabs','set_line_numbers','set_page_background','set_master_page_text','delete_master_page'];
 const text = { type: 'string' }, number = { type: 'number' }, bool = { type: 'boolean' }, integer = { type: 'integer', minimum: 0 };
 const object = properties => ({ type: 'object', properties, required: Object.keys(properties) });
 const properties = values => ({ type: 'object', properties: values });
@@ -7,6 +7,7 @@ const characters = {bold:bool,italic:bool,underline:bool,strikethrough:bool,font
 const operation = (kind, fields) => object({ kind: { type: 'string', enum: [kind] }, ...fields });
 export function controlSchemas() {
  return [
+  operation('split_section',{target:text,offset:integer}),
   operation('set_master_page_text',{section:integer,pageKind:{type:'string',enum:['both','even','odd']},text,xMm:number,yMm:number,fontSizePt:number,color:text,bold:bool}),
   operation('delete_master_page',{section:integer,pageKind:{type:'string',enum:['both','even','odd']}}),
   operation('set_page_background',{section:integer,pageKind:{type:'string',enum:['both','even','odd']},fillType:{type:'string',enum:['none','solid']},color:text}),

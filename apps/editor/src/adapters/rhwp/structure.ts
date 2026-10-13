@@ -57,5 +57,5 @@ export function readStructure(wasm: any): Structure {
   }
   const styles=parsed(doc.getStyleList()).map((style:any)=>({id:style.id,name:style.name,type:style.type}));
   if(sections.reduce((total,s)=>total+(s.masterPages?.pages.reduce((n,p)=>n+Array.from(p.text).length,0)??0),0)>120000)throw new Error('바탕쪽 문맥은 전체 120,000자 이하입니다. 원본 바탕쪽은 유지됩니다.');
-  return { sections, tables, paragraphs,styles, unsupportedControls: [...new Set(unsupportedControls)] };
+  return { sectionSplitAvailable:typeof doc.insertSectionBreak==='function', sections, tables, paragraphs,styles, unsupportedControls: [...new Set(unsupportedControls)] };
 }

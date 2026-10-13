@@ -1,5 +1,6 @@
 import type { Snapshot, Table, ControlOp } from '../../modules/document/public/index.ts';
 import { nativeDocument, parsed, readStructure } from './structure.ts';
+import {executeAgentSectionSplit} from './agent-section-split.ts';
 import {executeAgentSectionOperation} from './agent-section-settings.ts';
 import {executeAgentPageBackground} from './agent-page-background.ts';
 import {executeAgentMasterPage} from './agent-master-pages.ts';
@@ -24,6 +25,7 @@ function replaceCellText(doc:any,base:number[],cell:number,value:string) {
 }
 export function executeControlOperation(wasm: any, snapshot: Snapshot, op: ControlOp, tables: Map<string, Table>): { section: number; after: number; count: number } | undefined {
   const doc = nativeDocument(wasm);
+  if(op.kind==='split_section'){executeAgentSectionSplit(doc,snapshot,op);return;}
   if(op.kind==='set_section_tabs'||op.kind==='set_line_numbers'){executeAgentSectionOperation(doc,snapshot.name,op);return;}
   if(op.kind==='set_page_background'){executeAgentPageBackground(doc,op);return;}
   if(op.kind==='set_master_page_text'||op.kind==='delete_master_page'){executeAgentMasterPage(doc,snapshot.name,op);return;}

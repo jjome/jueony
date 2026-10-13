@@ -1,3 +1,4 @@
+import {readDocumentFailure} from './modules/document/public/index.ts';
 import {connectDocumentFrame} from './adapters/iframe/document-client.ts';
 import type {DocumentFrameClient} from './adapters/iframe/document-client.ts';
 import {installUnifiedChrome} from './unified-chrome.ts';
@@ -48,11 +49,11 @@ const automation=createAutomationFacade();
 const phaseLabels:Record<string,string>={generating:'초안 생성',reviewing:'계획 검토',validated:'명령 확인',ready:'적용 준비',applying:'문서 적용',completed:'완료',stopped:'중단'};
 const runLabels:Record<Run['status'],string>={preparing_context:'자료 읽는 중',generating:'모델 응답 대기',validating:'명령 검증 중',applying:'문서 적용 중',completed:'완료',cancelled:'취소됨',conflict:'문서 변경 충돌',failed_no_change:'실패 · 적용 없음',failed_rolled_back:'실패 · 변경 복원됨',failed_partial:'실패 · 부분 적용 확인 필요',interrupted:'이전 실행 중단됨'};
 const status=(text:string)=>{$('app-status').textContent=text;$('app-status').title=text;};
-const error=(e:unknown)=>status(e instanceof Error?e.message:String(e));
+const error=(e:unknown)=>status(readDocumentFailure(e).message);
 let recoverySettings=normalizeRecoverySettings(undefined);
 try{recoverySettings=readRecoverySettings(localStorage);}catch(e){error(e);}
 const recoverySettingsWatcher=watchRecoverySettings({storage:localStorage,events:window,onChange:value=>{recoverySettings=value;for(const tab of tabs)tab.recovery?.updateSettings(value);},onError:error});
-const requestError=(e:unknown)=>{error(e);$('request-error').textContent=e instanceof Error?e.message:String(e);$('request-error').hidden=false;};
+const requestError=(e:unknown)=>{error(e);$('request-error').textContent=readDocumentFailure(e).message;$('request-error').hidden=false;};
 const work=()=>state.workspaces.find(w=>w.id===state.activeWorkspaceId)!;
 const workspace=createWorkspaceFacade({state:{current:()=>state},ids:{next:uid}});
 const chat=()=>workspace.chat(work().id,work().activeChatId);
@@ -281,7 +282,7 @@ async function send(){
   const tab=tabs.find(t=>t.id===run.documentId);
   try{if(tab)await persistTab(tab);status('AI 요청이 완료되었습니다.');}catch(e){persistError=true;run.error='문서 변경은 적용됐지만 로컬 복구본 저장에 실패했습니다. 문서를 파일로 저장해 주세요.';workspace.appendMessage(workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:run.error});status(run.error);}
  }catch(e){
-  const name=e instanceof Error?e.name:'';run.status=controller.signal.aborted||name==='AbortError'?'cancelled':name==='ConflictError'?'conflict':name==='PartialApplyError'?'failed_partial':name==='RolledBackError'?'failed_rolled_back':'failed_no_change';run.error=run.status==='cancelled'?'요청을 취소했습니다. 이 요청의 변경을 적용하지 않았습니다.':e instanceof Error?e.message:'실행 오류';
+  const failure=readDocumentFailure(e),name=failure.name;run.status=controller.signal.aborted||name==='AbortError'?'cancelled':name==='ConflictError'?'conflict':name==='PartialApplyError'?'failed_partial':name==='RolledBackError'?'failed_rolled_back':'failed_no_change';run.error=run.status==='cancelled'?'요청을 취소했습니다. 이 요청의 변경을 적용하지 않았습니다.':failure.message;
   workspace.appendMessage(workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:run.error});requestError(run.error);
  }finally{running=undefined;await persist().catch(error);renderMessages();updateRun();}
 }
@@ -314,7 +315,7 @@ function renderMacros(){
 }
 on('macro-manager',()=>{renderMacros();$<HTMLDialogElement>('macro-dialog').showModal();});on('close-macros',()=>$<HTMLDialogElement>('macro-dialog').close());on('cancel-macro',()=>$<HTMLDialogElement>('macro-parameters').close());
 for(const [id,kind,label] of [['recipe-letter','official-letter','공문 초안'],['recipe-plan','plan','추진 계획'],['recipe-report','report','결과 보고']] as const)on(id,()=>showMacro(automation.draft(kind),label));
-$('macro-parameters-form').addEventListener('submit',e=>{e.preventDefault();void executeMacro().catch(e=>{$('macro-error').textContent=e instanceof Error?e.message:String(e);});});
+$('macro-parameters-form').addEventListener('submit',e=>{e.preventDefault();void executeMacro().catch(e=>{$('macro-error').textContent=readDocumentFailure(e).message;});});
 async function executeMacro(){
  const pending=pendingMacro;if(!pending||running||restoring||closing)throw new Error('현재 작업을 마친 뒤 다시 실행해 주세요.');
  if(work().id!==pending.workspaceId||chat().id!==pending.chatId||activeTab?.id!==pending.tabId)throw new Error('업무나 문서가 바뀌었습니다. 반복 작업을 다시 선택해 주세요.');
@@ -334,7 +335,7 @@ async function executeMacro(){
   run.receipt=await automation.apply({runId:run.id,base,proposal:generation,editor:tab.api!,createDocument:async()=>{tab=await newTab(run.workspaceId);run.documentId=tab.id;return tab.api!;}});run.status='completed';run.macroTemplate=pending.template;
   workspace.appendMessage(run.workspaceId,run.chatId,{id:uid(),role:'assistant',text:pending.name+' · '+run.receipt!.operationCount+'개 명령을 적용했습니다. 파일 저장은 별도로 실행하세요.',runId:run.id});
   await persistTab(tab);status('반복 작업을 실행했습니다.');
- }catch(e){const name=e instanceof Error?e.name:'';run.status=name==='PartialApplyError'?'failed_partial':name==='RolledBackError'?'failed_rolled_back':run.receipt?'completed':'failed_no_change';run.error=e instanceof Error?e.message:String(e);workspace.appendMessage(run.workspaceId,run.chatId,{id:uid(),role:'assistant',text:run.error,runId:run.id});requestError(e);}
+ }catch(e){const failure=readDocumentFailure(e),name=failure.name;run.status=name==='PartialApplyError'?'failed_partial':name==='RolledBackError'?'failed_rolled_back':run.receipt?'completed':'failed_no_change';run.error=failure.message;workspace.appendMessage(run.workspaceId,run.chatId,{id:uid(),role:'assistant',text:run.error,runId:run.id});requestError(e);}
  finally{running=undefined;await persist().catch(error);renderMessages();updateRun();}
 }
 installDocumentDefaultsPanel({status,error});

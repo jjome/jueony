@@ -1,4 +1,5 @@
 export type { JsonValue, DocumentProperties, Cell, Table, Structure, BodyNode, Snapshot, BodyOp, ControlOp, EditOp, Receipt } from './types.ts';
+export type {AgentSectionSplitOp} from './types.ts';
 export type {AgentSectionOp,AgentLineNumbers,LineNumberRestart} from './types.ts';
 export type {AgentPageBackground,AgentPageBackgroundOp} from './types.ts';
 export type {AgentMasterPage,AgentMasterPages,AgentMasterPageOp} from './types.ts';
@@ -36,3 +37,6 @@ export {validatePageBodyPastePlan} from '../domain/page-body-paste-plan.ts';
 export type {PageBodyPastePlan} from '../domain/page-body-paste-plan.ts';
 export {validateEmptySectionRemovalPlan,sameEmptySectionRemovalRange} from '../domain/empty-section-removal.ts';
 export type {EmptySectionRemovalPlan} from '../domain/empty-section-removal.ts';
+
+export {readDocumentFailure} from './failure.ts';
+export type {DocumentFailure} from './failure.ts';

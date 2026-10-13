@@ -38,7 +38,7 @@ export function installAgentBridge(d:Deps){
   const plainText=textOf(d.wasm.borrowDocumentHandle());assertRevision(before,revision());
   if(plainText.length>120000)throw new Error('전체 문서 텍스트 한도 120,000자를 넘습니다.');
   const structure=readStructure(d.wasm);assertRevision(before,revision());
-  return {revision:before,name:d.wasm.fileName,nodes,plainText,structure,limitations:['본문·표의 텍스트와 서식·쪽 설정을 읽습니다. 그림 안 글자/OCR은 읽지 않습니다.','AI 편집: 단순 본문, 글꼴·글자·문단 서식, 새 표·단순 셀·셀 서식·행/열 추가와 삭제, 구역별 용지·여백·다단, 기존 문단 스타일, 쪽 감추기. 병합/중첩 표, 개체·필드 편집은 아직 미지원입니다.']} as Snapshot;
+  return {revision:before,name:d.wasm.fileName,nodes,plainText,structure,limitations:['본문·표의 텍스트와 서식·쪽 설정을 읽습니다. 그림 안 글자/OCR은 읽지 않습니다.','AI 편집: 단순 본문, 글꼴·글자·문단 서식, 새 표·단순 셀·셀 서식·행/열 추가와 삭제, 구역별 용지·여백·다단·기본 탭, HWPX 기본 본문 줄 번호, 기존 문단 스타일, 쪽 감추기. 줄 번호는 현재 구역의 editable과 파일 형식을 확인합니다. 병합/중첩 표, 개체·필드 편집은 아직 미지원입니다.']} as Snapshot;
  }
  const native = {
   snapshot,
@@ -121,7 +121,7 @@ export function installAgentBridge(d:Deps){
    if(!validated.operations.length)throw new Error('적용할 명령이 없습니다.');
    await api.preflight(base,validated);assertRevision(base.revision,revision());
    if(applying||damaged||api.busy()||composing)throw new Error('검사 중 다른 문서 작업이 시작되어 적용하지 않았습니다.');
-   const before=plainSnapshot(base),beforeBytes=d.wasm.exportHwp();let executed=false;
+   const before=plainSnapshot(base),beforeBytes=recoveryBytes(d.wasm,d.wasm.fileName);let executed=false;
    applying=true;const root=document.getElementById('studio-root')!;const inert=root.inert;root.inert=true;
    const overlay=Object.assign(document.createElement('div'),{id:'jueony-busy',textContent:'AI 변경을 문서에 적용하고 있습니다…'});document.body.append(overlay);
    try{
@@ -136,7 +136,7 @@ export function installAgentBridge(d:Deps){
    }catch(error){
     const e=error instanceof Error?error:new Error('문서 적용 실패');
     const body:string[]=[];try{for(let s=0;s<d.wasm.getSectionCount();s++)for(let p=0;p<d.wasm.getParagraphCount(s);p++)body.push(d.wasm.getTextRange(s,p,0,d.wasm.getParagraphLength(s,p)));}catch{}
-    let restored=false;try{const afterBytes=d.wasm.exportHwp();restored=body.join('\n')===before&&beforeBytes.length===afterBytes.length&&beforeBytes.every((b:number,i:number)=>b===afterBytes[i]);}catch{}
+    let restored=false;try{const afterBytes=recoveryBytes(d.wasm,d.wasm.fileName);restored=body.join('\n')===before&&beforeBytes.length===afterBytes.length&&beforeBytes.every((b:number,i:number)=>b===afterBytes[i]);}catch{}
     e.name=restored?(executed?'RolledBackError':'ApplyError'):'PartialApplyError';damaged=!restored;
     if(damaged)d.documentState.markDirty('jueony-partial');throw e;
    }finally{applying=false;root.inert=inert;overlay.remove();}

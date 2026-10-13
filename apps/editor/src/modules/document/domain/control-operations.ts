@@ -1,5 +1,6 @@
 import type { Snapshot, Table, ControlOp, EditOp, DocumentProperties } from '../public/types.ts';
 import {tableAxisKinds,controlKinds} from '../public/wire-schema.mjs';
+import {agentTabSpacingRaw,agentLineNumberSettings} from './agent-section-settings.ts';
 export {tableAxisKinds,controlKinds};
 const fail = (m: string): never => { throw new Error(m); };
 const object = (v: unknown): Record<string, unknown> => { if (!v || typeof v !== 'object' || Array.isArray(v)) return fail('명령 객체가 필요합니다.'); return v as Record<string, unknown>; };
@@ -57,6 +58,15 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
   const tables = new Map(structure!.tables.map(t => [t.id, structuredClone(t)]));
   const pages = new Map(structure!.sections.map(s => [s.index, s.page]));
   const columns = new Map(structure!.sections.filter(s=>s.columns?.sameWidth===true).map(s=>[s.index,{count:Number(s.columns!.columnCount),spacing:Number(s.columns!.spacing)}]));
+  // Single columns can carry sameWidth=false; the engine still supports their numbering.
+  const lineColumns = new Map(structure!.sections.map(s=>[s.index,s.columns?.columnCount]));
+  const lineNumbers = new Map(structure!.sections.map(s=>[s.index,s.lineNumbers]));
+  const tableSections = new Set(structure!.tables.map(t=>t.section));
+  const checkLineNumbers=(section:number)=>{
+    const lines=lineNumbers.get(section);if(!lines?.enabled)return;
+    if(lineColumns.get(section)!==1||tableSections.has(section))fail('줄 번호가 있는 구역은 한 단 일반 본문을 유지해야 합니다. 먼저 줄 번호를 끄세요.');
+    if(mm(lines.distanceMm)>=Number(pages.get(section)?.marginLeft))fail('줄 번호 간격은 왼쪽 용지 여백 안에 있어야 합니다.');
+  };
   const checkColumns=(section:number)=>{
     const layout=columns.get(section);if(!layout||layout.count<=1)return;
     const page=pages.get(section)!;
@@ -81,10 +91,19 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
     } else if(op.kind==='apply_paragraph_style'){
       only(op,['kind','target','styleId']);body(op.target);
       if(!structure!.styles?.some(style=>style.id===op.styleId&&style.type===0))fail('현재 문서의 문단 스타일 ID가 필요합니다.');
+    } else if(op.kind==='set_section_tabs'){
+      only(op,['kind','section','spacingPt']);integer(op.section,0,structure!.sections.length-1);agentTabSpacingRaw(op.spacingPt);
+      if(structure!.sections.find(s=>s.index===op.section)?.defaultTabSpacingPt===undefined)fail('기본 탭 설정을 조회한 구역이 필요합니다.');
+    } else if(op.kind==='set_line_numbers'){
+      only(op,['kind','section','enabled','restart','countBy','startNumber','distanceMm']);integer(op.section,0,structure!.sections.length-1);agentLineNumberSettings(op);
+      if(!/\.hwpx$/iu.test(snapshot.name))fail('AI 줄 번호 편집은 HWPX에서 지원합니다. 먼저 HWPX로 저장하세요.');
+      const current=structure!.sections.find(s=>s.index===op.section)?.lineNumbers;
+      if(!current||(!current.editable&&(current.enabled||op.enabled)))fail('이 구역의 줄 번호는 지원 범위 밖입니다. 원본 설정을 유지합니다.');
+      lineNumbers.set(op.section,{editable:current!.editable,enabled:op.enabled,restart:op.restart,countBy:op.countBy,startNumber:op.startNumber,distanceMm:op.distanceMm});checkLineNumbers(op.section);
     } else if(op.kind==='set_columns'){
       only(op,['kind','section','count','spacingMm']);integer(op.section,0,structure!.sections.length-1);integer(op.count,1,6);
       if(typeof op.spacingMm!=='number'||!Number.isFinite(op.spacingMm)||op.spacingMm<0||op.spacingMm>100)fail('단 간격은 0~100mm여야 합니다.');
-      columns.set(op.section,{count:op.count,spacing:mm(op.spacingMm)});checkColumns(op.section);
+      columns.set(op.section,{count:op.count,spacing:mm(op.spacingMm)});lineColumns.set(op.section,op.count);checkColumns(op.section);checkLineNumbers(op.section);
     } else if(op.kind==='set_page_hide'){
       only(op,['kind','target','properties']);const n=nodes.find(n=>n.id===op.target);
       if(!n||(!n.editable&&!structure!.paragraphs.find(p=>p.id===n.id)?.pageHide?.exists))fail('감추기를 적용할 본문 문단 ID가 필요합니다.');
@@ -94,9 +113,10 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
       properties(op.properties,{hideHeader:'boolean',hideFooter:'boolean',hideMasterPage:'boolean',hideBorder:'boolean',hideFill:'boolean',hidePageNum:'boolean'});
     } else if (op.kind === 'set_page_setup') {
       only(op, ['kind', 'section', 'properties']); integer(op.section, 0, structure!.sections.length - 1);
-      properties(op.properties, pageRules); pages.set(op.section, pageProperties(pages.get(op.section), op.properties));checkColumns(op.section);
+      properties(op.properties, pageRules); pages.set(op.section, pageProperties(pages.get(op.section), op.properties));checkColumns(op.section);checkLineNumbers(op.section);
     } else if (op.kind === 'create_table') {
       only(op, ['kind', 'after', 'resultId', 'rows']); body(op.after);
+      const section=body(op.after).section;tableSections.add(section);checkLineNumbers(section);
       if (typeof op.resultId !== 'string' || !/^[A-Za-z][\w-]{0,39}$/.test(op.resultId) || created.has(op.resultId)) fail('새 표의 resultId는 중복되지 않는 영문 ID여야 합니다.');
       if (!Array.isArray(op.rows)) fail('표 데이터가 필요합니다.'); integer(op.rows.length, 1, 50);
       if (!Array.isArray(op.rows[0])) fail('표의 열이 필요합니다.'); const columns = integer(op.rows[0].length, 1, 20);

@@ -1,5 +1,5 @@
 // Canonical provider-neutral wire shape; semantic validation remains in this module's domain.
-export const controlKinds = ['format_characters', 'format_paragraph', 'create_table', 'set_table_cell', 'format_table_cells', 'set_page_setup', 'insert_table_row','insert_table_column','delete_table_row','delete_table_column','apply_paragraph_style','set_columns','set_page_hide'];
+export const controlKinds = ['format_characters', 'format_paragraph', 'create_table', 'set_table_cell', 'format_table_cells', 'set_page_setup', 'insert_table_row','insert_table_column','delete_table_row','delete_table_column','apply_paragraph_style','set_columns','set_page_hide','set_section_tabs','set_line_numbers'];
 const text = { type: 'string' }, number = { type: 'number' }, bool = { type: 'boolean' }, integer = { type: 'integer', minimum: 0 };
 const object = properties => ({ type: 'object', properties, required: Object.keys(properties) });
 const properties = values => ({ type: 'object', properties: values });
@@ -7,6 +7,8 @@ const characters = {bold:bool,italic:bool,underline:bool,strikethrough:bool,font
 const operation = (kind, fields) => object({ kind: { type: 'string', enum: [kind] }, ...fields });
 export function controlSchemas() {
  return [
+  operation('set_section_tabs',{section:integer,spacingPt:{type:'number',minimum:0.1,maximum:9999}}),
+  operation('set_line_numbers',{section:integer,enabled:bool,restart:{type:'string',enum:['page','section','continuous']},countBy:{type:'integer',minimum:1,maximum:65535},startNumber:{type:'integer',minimum:1,maximum:65535},distanceMm:{type:'number',minimum:0,maximum:50}}),
   operation('apply_paragraph_style',{target:text,styleId:integer}),
   operation('set_columns',{section:integer,count:{type:'integer',minimum:1,maximum:6},spacingMm:number}),
   operation('set_page_hide',{target:text,properties:properties({hideHeader:bool,hideFooter:bool,hideMasterPage:bool,hideBorder:bool,hideFill:bool,hidePageNum:bool})}),

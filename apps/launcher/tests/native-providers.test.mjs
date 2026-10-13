@@ -24,7 +24,8 @@ before(async()=>{
   if(mode==='slow')await new Promise(r=>setTimeout(r,250));
   if(mode==='oversize'){res.end('x'.repeat(1_000_001));return;}
   if(mode==='bad-wire'){res.end('fixture-secret');return;}
-  const output=id==='anthropic'?{...generation,operations:generation.operations.map(({kind,...args})=>({kind,arguments:JSON.stringify(args)}))}:generation;
+  const planned=mode==='section-settings'?{message:'구역 설정',sourceIds:[],operations:[{kind:'set_section_tabs',section:0,spacingPt:24},{kind:'set_line_numbers',section:0,enabled:true,restart:'page',countBy:2,startNumber:10,distanceMm:4}]}:generation;
+  const output=id==='anthropic'?{...planned,operations:planned.operations.map(({kind,...args})=>({kind,arguments:JSON.stringify(args)}))}:planned;
   const text=mode==='bad-json'?'```json\n{}\n```':JSON.stringify(output);
   let wire=response(id,text,mode);
   if(mode==='empty')wire={};
@@ -37,6 +38,7 @@ const config=id=>({id,adapterId:id,modelId:'test-model',endpoint,maxOutputTokens
 const run=(id,mode,signal=new AbortController().signal)=>providerRegistry.get(id)(config(id),'fixture-secret').generate(input(mode),signal);
 
 for(const id of ids) {
+ test(id+' transports section tab and HWPX numbering commands through the provider-neutral schema',async()=>{const result=await run(id,'section-settings');assert.deepEqual(result.operations,[{kind:'set_section_tabs',section:0,spacingPt:24},{kind:'set_line_numbers',section:0,enabled:true,restart:'page',countBy:2,startNumber:10,distanceMm:4}]);const call=calls.at(-1);assert.ok(JSON.stringify(call.body).includes('set_section_tabs'));assert.ok(JSON.stringify(call.body).includes('set_line_numbers'));});
  test(id+' maps native authentication, schema, model and context',async()=>{
   assert.deepEqual(await run(id,'ok'),generation);
   const call=calls.at(-1);assert.equal(call.data.document.nodes[0].codePointLength,4);assert.deepEqual(call.data.references,input().references);

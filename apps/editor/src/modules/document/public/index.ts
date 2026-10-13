@@ -1,4 +1,5 @@
 export type { JsonValue, DocumentProperties, Cell, Table, Structure, BodyNode, Snapshot, BodyOp, ControlOp, EditOp, Receipt } from './types.ts';
+export type {AgentSectionOp,AgentLineNumbers,LineNumberRestart} from './types.ts';
 export { plainSnapshot } from './types.ts';
 export { calendarStampFormats, formatCalendarStamp } from '../domain/calendar-stamp.ts';
 export type { CalendarStamp, CalendarStampFormat } from '../domain/calendar-stamp.ts';

@@ -1,4 +1,5 @@
 import type { Cell, Table, Structure } from '../../modules/document/public/types.ts';
+import {readLineNumberSettings} from './line-numbers.ts';
 export type { Cell, Table, Structure } from '../../modules/document/public/types.ts';
 // All coordinates refer to the currently open WASM document, never its disk copy.
 export const parsed = (v: any): any => typeof v === 'string' ? JSON.parse(v) : v;
@@ -7,7 +8,17 @@ export function readStructure(wasm: any): Structure {
   const doc = nativeDocument(wasm), positions: { section: number; paragraph: number }[] = [];
   const sections: Structure['sections'] = [], paragraphs: Structure['paragraphs'] = [];
   for (let section = 0; section < doc.getSectionCount(); section++) {
-    sections.push({ index: section, page: parsed(doc.getPageDef(section)),columns:parsed(doc.getColumnDef(section)) });
+    const entry:Structure['sections'][number]={index:section,page:parsed(doc.getPageDef(section)),columns:parsed(doc.getColumnDef(section))};
+    if(typeof doc.getSectionDef==='function'){
+      const raw=parsed(doc.getSectionDef(section)).defaultTabSpacing;
+      if(!Number.isSafeInteger(raw)||raw<0)throw new Error('구역의 기본 탭 설정을 읽지 못했습니다.');
+      entry.defaultTabSpacingPt=(raw||8000)/200;
+    }
+    if(typeof doc.getLineNumberSettings==='function'){
+      const settings=readLineNumberSettings(doc,section);
+      entry.lineNumbers={enabled:settings.enabled,restart:([null,'page','section','continuous'] as const)[settings.restartType]??null,countBy:settings.countBy,startNumber:settings.startNumber,distanceMm:Math.round(settings.distance*25.4/7200*1000000)/1000000,editable:settings.editable};
+    }
+    sections.push(entry);
     for (let paragraph = 0; paragraph < doc.getParagraphCount(section); paragraph++) {
       positions.push({ section, paragraph });
       paragraphs.push({ id: `s${section}p${paragraph}`, characters: parsed(doc.getCharPropertiesAt(section, paragraph, 0)), paragraph: parsed(doc.getParaPropertiesAt(section, paragraph)),style:parsed(doc.getStyleAt(section,paragraph)),pageHide:parsed(doc.getPageHide(section,paragraph)) });

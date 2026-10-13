@@ -1,0 +1,68 @@
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -5743,12 +5743,18 @@
+                 let (base_x, base_y, base_w, base_h) = if paper_based {
+                     (0.0, 0.0, layout.page_width, layout.page_height)
+                 } else {
+-                    (
+-                        layout.body_area.x,
+-                        layout.body_area.y,
+-                        layout.body_area.width,
+-                        layout.body_area.height,
+-                    )
++                    // Inclusion applies only to body-based borders. Use the same
++                    // configured story bands as pagination, even for empty stories.
++                    let body_top = layout.body_area.y;
++                    let body_bottom = body_top + layout.body_area.height;
++                    let top = if pbf.attr & 2 != 0 {
++                        layout.header_area.y.clamp(0.0, body_top)
++                    } else { body_top };
++                    let bottom = if pbf.attr & 4 != 0 {
++                        (layout.footer_area.y + layout.footer_area.height)
++                            .clamp(body_bottom, layout.page_height)
++                    } else { body_bottom };
++                    (layout.body_area.x, top, layout.body_area.width, bottom - top)
+                 };
+ 
+                 let sp_l = hwpunit_to_px(pbf.spacing_left as i32, self.dpi);
+--- a/src/document_core/queries/rendering.rs
++++ b/src/document_core/queries/rendering.rs
+@@ -2932,8 +2932,15 @@
+         let pbf_right = hwpunit_to_px(page_border_fill.spacing_right as i32, self.dpi);
+         let pbf_top = hwpunit_to_px(page_border_fill.spacing_top as i32, self.dpi);
+         let pbf_bottom = hwpunit_to_px(page_border_fill.spacing_bottom as i32, self.dpi);
+-        let body_top = mt + mh;
+-        let body_bottom_margin = mb + mf;
++        let body_top = hwpunit_to_px(areas.body_area.top, self.dpi);
++        let body_bottom = hwpunit_to_px(areas.body_area.bottom, self.dpi);
++        let border_top = if page_border_fill.attr & 2 != 0 {
++            header_y.clamp(0.0, body_top)
++        } else { body_top };
++        let border_bottom = if page_border_fill.attr & 4 != 0 {
++            (footer_y + footer_height).clamp(body_bottom, page_content.layout.page_height)
++        } else { body_bottom };
++        let body_bottom_margin = page_content.layout.page_height - border_bottom;
+         let visual_outsets = if matches!(page_border_fill.basis, PageBorderBasis::BodyBased)
+             && page_border_fill.border_fill_id > 0
+         {
+@@ -2960,7 +2967,7 @@
+                 PageBorderBasis::BodyBased => (
+                     (ml - pbf_left - out_l).max(0.0),
+                     (mr - pbf_right - out_r).max(0.0),
+-                    (body_top - pbf_top - out_t).max(0.0),
++                    (border_top - pbf_top - out_t).max(0.0),
+                     (body_bottom_margin - pbf_bottom).max(0.0),
+                 ),
+             };
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1230,6 +1230,9 @@
+         self.set_page_border_fill_native(section_idx as usize, json)
+             .map_err(|e| e.into())
+     }
++
++    #[wasm_bindgen(js_name = pageBorderInclusionEnabled)]
++    pub fn page_border_inclusion_enabled(&self) -> bool { true }
+ 
+     #[wasm_bindgen(js_name = getPageBorderFillEntry)]
+     pub fn get_page_border_fill_entry(&self, section_idx:u32, kind:&str)->Result<String,JsValue>{self.core.get_page_border_fill_entry_native(section_idx as usize,kind).map_err(|error|error.into())}

@@ -3,8 +3,9 @@ import {readFile,mkdir,writeFile} from 'node:fs/promises';
 import {resolve,dirname} from 'node:path';
 import {pathToFileURL,fileURLToPath} from 'node:url';
 import {execFileSync} from 'node:child_process';
-import {readPageBorderSettings,writePageBorderSettings} from '../src/adapters/rhwp/page-border-settings.ts';
+import {readPageBorderSettings,writePageBorderSettings,planPageBorderEdits,executePageBorderEdits,executeNewSectionBorder} from '../src/adapters/rhwp/page-border-settings.ts';
 import {defaultPageGradient} from '../src/modules/document/public/index.ts';
+import {preflightDocumentEdit} from '../src/adapters/rhwp/edit-preflight.ts';
 const repo=resolve(dirname(fileURLToPath(import.meta.url)),'../../..');
 if(!process.env.JUEONY_ENGINE_PACKAGE)throw new Error('JUEONY_ENGINE_PACKAGE is required');
 const pkg=resolve(repo,process.env.JUEONY_ENGINE_PACKAGE),out=resolve(repo,process.env.JUEONY_TEST_OUTPUT??'docs/evidence/page-border-2026-10-13/engine');
@@ -76,4 +77,41 @@ for(const application of ['all','exceptFirst','firstOnly']){
   for(let i=0;i<3;i++)await writeFile(resolve(out,`parity-${application}-${i+1}.svg`),doc.renderPageSvg(i));results.push(name);console.log('PASS',name);
  }catch(error){failures.push({name,error:String(error),stack:error.stack});console.error('FAIL',name,error);}finally{doc?.free();}
 }
-await writeFile(resolve(out,'result.json'),JSON.stringify({results,failures,engine:JSON.parse(await readFile(resolve(pkg,'jueony-engine-build.json'),'utf8')),note:'Real WASM and independent saved XML; native Hancom visual comparison is pending.'},null,2));if(failures.length)process.exitCode=1;
+const borderY=(doc,color)=>{const line=doc.renderPageSvg(0).match(new RegExp(`<line\\b[^>]*stroke="${color}"[^>]*>`,'i'))?.[0];assert.ok(line,'Expected rendered page border');return Number(line.match(/y1="([^"]+)"/)[1]);};
+for(const format of ['hwp','hwpx']){
+ const newName=`${format}: new-section scope splits scalar body position and applies only the new section`;let newDoc;
+ try{
+  newDoc=HwpDocument.createEmpty();newDoc.createBlankDocument();newDoc.insertText(0,0,0,'앞😀뒤');const before=readPageBorderSettings(newDoc,0),drafts=new Map([['both',{...before,fillType:'solid',fillColor:'#cceeff',patternType:-1}]]),position={sectionIndex:0,paragraphIndex:0,charOffset:2};
+  preflightDocumentEdit({fileName:'new-scope.'+format,borrowDocumentHandle:()=>newDoc,getWasmModuleExports:()=>({HwpDocument})},scratch=>executeNewSectionBorder(scratch,position,drafts));const caret=executeNewSectionBorder(newDoc,position,drafts);assert.equal(caret.sectionIndex,1);assert.equal(newDoc.getSectionCount(),2);assert.equal(readPageBorderSettings(newDoc,0).fillType,before.fillType);assert.equal(readPageBorderSettings(newDoc,1).fillColor,'#cceeff');
+  assert.equal(newDoc.getTextRange(0,0,0,newDoc.getParagraphLength(0,0)),'앞😀');assert.equal(newDoc.getTextRange(1,0,0,newDoc.getParagraphLength(1,0)),'뒤');
+  const bytes=newDoc[format==='hwp'?'exportHwp':'exportHwpx']();await writeFile(resolve(out,`new-section-border.${format}`),bytes);const loaded=new HwpDocument(bytes);try{assert.equal(loaded.getSectionCount(),2);assert.equal(readPageBorderSettings(loaded,1).fillColor,'#cceeff');}finally{loaded.free();}results.push(newName);console.log('PASS',newName);
+ }catch(error){failures.push({name:newName,error:String(error),stack:error.stack});console.error('FAIL',newName,error);}finally{newDoc?.free();}
+ const name=`${format}: inclusion flags move real SVG borders by unequal story bands and survive guarded save`;let doc;
+ try{
+  doc=HwpDocument.createEmpty();doc.createBlankDocument();doc.insertText(0,0,0,'머리말·꼬리말 포함 검수');doc.setPageDef(0,JSON.stringify({marginTop:5000,marginHeader:3000,marginBottom:6000,marginFooter:2000}));
+  const base={...readPageBorderSettings(doc,0),basis:'page',spacingTop:0,spacingBottom:0,borderTop:{type:1,width:0,color:'#13579b'},borderBottom:{type:1,width:0,color:'#2468ac'}};
+  writePageBorderSettings(doc,0,'both',{...base,headerInside:false,footerInside:false});const top=borderY(doc,'#13579b'),bottom=borderY(doc,'#2468ac');
+  for(const headerInside of [false,true])for(const footerInside of [false,true]){
+   writePageBorderSettings(doc,0,'both',{...base,headerInside,footerInside});assert.ok(Math.abs(borderY(doc,'#13579b')-top+(headerInside?40:0))<0.01);assert.ok(Math.abs(borderY(doc,'#2468ac')-bottom-(footerInside?80:0))<0.01);
+   const info=parse(doc.getPageInfo(0));assert.ok(Math.abs(info.pageBorderTop-borderY(doc,'#13579b'))<0.1);assert.ok(Math.abs(info.height-info.pageBorderBottom-borderY(doc,'#2468ac'))<0.2);
+   preflightDocumentEdit({fileName:'inclusion.'+format,borrowDocumentHandle:()=>doc,getWasmModuleExports:()=>({HwpDocument})},()=>{});
+   const bytes=doc[format==='hwp'?'exportHwp':'exportHwpx']();await writeFile(resolve(out,`inclusion-${Number(headerInside)}${Number(footerInside)}.${format}`),bytes);const loaded=new HwpDocument(bytes);
+   try{assert.ok(Math.abs(borderY(loaded,'#13579b')-borderY(doc,'#13579b'))<0.01);assert.ok(Math.abs(borderY(loaded,'#2468ac')-borderY(doc,'#2468ac'))<0.01);}finally{loaded.free();}
+  }
+  results.push(name);console.log('PASS',name);
+ }catch(error){failures.push({name,error:String(error),stack:error.stack});console.error('FAIL',name,error);}finally{doc?.free();}
+ const scopeName=`${format}: whole-document scope copies current parity settings without changing section paper or text`;doc=undefined;
+ try{
+  doc=HwpDocument.createEmpty();doc.createBlankDocument();doc.insertText(0,0,0,'앞뒤');doc.insertSectionBreak(0,0,1);doc.setPageDef(1,JSON.stringify({marginLeft:5000}));
+  const originalText=doc.getTextFileUnicode(),papers=[0,1].map(s=>doc.getPageDef(s));
+  writePageBorderSettings(doc,0,'odd',{...readPageBorderSettings(doc,0,'odd'),fillType:'solid',fillColor:'#123456',patternType:-1});
+  writePageBorderSettings(doc,1,'both',{...readPageBorderSettings(doc,1),fillType:'solid',fillColor:'#abcdef',patternType:-1});
+  const drafts=new Map([['odd',{...readPageBorderSettings(doc,0,'odd'),headerInside:true,basis:'page'}]]),edits=planPageBorderEdits(doc,0,drafts,'document');
+  preflightDocumentEdit({fileName:'scope.'+format,borrowDocumentHandle:()=>doc,getWasmModuleExports:()=>({HwpDocument})},scratch=>executePageBorderEdits(scratch,planPageBorderEdits(scratch,0,drafts,'document')));executePageBorderEdits(doc,edits);
+  for(const section of [0,1]){assert.equal(readPageBorderSettings(doc,section,'odd').fillColor,'#123456');assert.equal(readPageBorderSettings(doc,section,'odd').headerInside,true);assert.equal(readPageBorderSettings(doc,section,'even').fillType,'none');assert.equal(doc.getPageDef(section),papers[section]);}assert.equal(doc.getTextFileUnicode(),originalText);
+  const bytes=doc[format==='hwp'?'exportHwp':'exportHwpx']();await writeFile(resolve(out,`all-section-border.${format}`),bytes);const loaded=new HwpDocument(bytes);try{assert.equal(loaded.getSectionCount(),2);assert.equal(readPageBorderSettings(loaded,1,'odd').headerInside,true);assert.equal(loaded.getTextFileUnicode(),originalText);}finally{loaded.free();}
+  results.push(scopeName);console.log('PASS',scopeName);
+ }catch(error){failures.push({name:scopeName,error:String(error),stack:error.stack});console.error('FAIL',scopeName,error);}finally{doc?.free();}
+}
+{const name='paper-based border ignores inactive inclusion flags; inclusion capability is explicit';let doc;try{doc=HwpDocument.createEmpty();doc.createBlankDocument();assert.equal(doc.pageBorderInclusionEnabled(),true);const base={...readPageBorderSettings(doc,0),basis:'paper',borderTop:{type:1,width:0,color:'#13579b'}};writePageBorderSettings(doc,0,'both',{...base,headerInside:false,footerInside:false});const before=borderY(doc,'#13579b');writePageBorderSettings(doc,0,'both',{...base,headerInside:true,footerInside:true});assert.equal(borderY(doc,'#13579b'),before);results.push(name);console.log('PASS',name);}catch(error){failures.push({name,error:String(error),stack:error.stack});console.error('FAIL',name,error);}finally{doc?.free();}}
+await writeFile(resolve(out,'result.json'),JSON.stringify({results,failures,engine:JSON.parse(await readFile(resolve(pkg,'jueony-engine-build.json'),'utf8')),note:'Real WASM, SVG geometry and independent saved XML; native Hancom visual comparison is pending.'},null,2));if(failures.length)process.exitCode=1;

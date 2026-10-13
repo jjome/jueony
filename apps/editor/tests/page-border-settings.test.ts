@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {defaultPageGradient,validatePageBorderSettings,samePageBorderSettings,pageSpacingFromInput} from '../src/modules/document/public/index.ts';
-import {readPageBorderSettings,writePageBorderSettings,collectPageBorderSettings} from '../src/adapters/rhwp/page-border-settings.ts';
+import {readPageBorderSettings,writePageBorderSettings,collectPageBorderSettings,planPageBorderEdits,executePageBorderEdits,supportsPageBorderInclusion} from '../src/adapters/rhwp/page-border-settings.ts';
 const settings=()=>({kind:'both' as const,applyPage:'all' as const,fillType:'solid',spacingLeft:1417,spacingRight:1417,spacingTop:1417,spacingBottom:1417,fillColor:'#ffffff',patternType:-1});
 test('validates two-color native gradients and rejects unsupported stop fidelity or invalid coordinates',()=>{
  const value={...settings(),fillType:'gradient',gradient:defaultPageGradient()};assert.deepEqual(validatePageBorderSettings(value),value);
@@ -43,4 +43,18 @@ test('dialog collection preserves untouched no-hatch raw values and mixed sectio
  const dialog={settings:current,jueonyKind:'both',jueonyApplicationChanged:false,radioValue:(name:string)=>name==='page-border-apply'?'firstOnly':'paper',basisPaper:{checked:true},spacingInputs:Object.fromEntries(['Left','Right','Top','Bottom'].map(side=>[side,{value:'5'}])),borderNoneCheck:{checked:true},borderEdits:{Left:border,Right:border,Top:border,Bottom:border},jueonyHeaderInside:{checked:false},jueonyFooterInside:{checked:false},bgColorRadio:{checked:true},bgNoneRadio:{checked:false},bgColorInput:{value:'#ffffff'},bgPatternColorInput:{value:'#000000'},bgPatternSelect:{value:'0'}};
  const next=collectPageBorderSettings(dialog);assert.equal(next.patternType,0);assert.equal(samePageBorderSettings(current,next),true);
  const newSolid=collectPageBorderSettings({...dialog,settings:{...current,fillType:'none'}});assert.equal(newSolid.patternType,-1,'new solid fill must explicitly encode no hatch for both formats');
+});
+
+test('whole-document border plan retains explicit parity after a both reset and refuses stale baselines',()=>{
+ const kinds=['both','even','odd'] as const;
+ const sections=[0,1].map(section=>new Map(kinds.map(kind=>[kind,{...settings(),kind,fillColor:section?'#333333':kind==='odd'?'#aa0000':'#ffffff'}])));
+ const wasm={getSectionCount:()=>2,getPageBorderFillEntry:(section:number,kind:any)=>JSON.stringify(sections[section].get(kind)),setPageBorderFillEntry:(section:number,kind:any,json:string)=>{const value=JSON.parse(json);if(kind==='both')for(const key of kinds)sections[section].set(key,{...value,kind:key});else sections[section].set(kind,value);return '{"ok":true}';}};
+ const odd={...readPageBorderSettings(wasm,0,'odd'),fillColor:'#00aa00'};
+ const edits=planPageBorderEdits(wasm,0,new Map([['odd',odd]]),'document');executePageBorderEdits(wasm,edits);
+ for(const s of sections){assert.equal(s.get('both')!.fillColor,'#ffffff');assert.equal(s.get('even')!.fillColor,'#ffffff');assert.equal(s.get('odd')!.fillColor,'#00aa00');}
+ assert.deepEqual(planPageBorderEdits(wasm,0,new Map([['odd',odd]]),'document'),[]);
+ const pending=planPageBorderEdits(wasm,0,new Map([['odd',{...odd,fillColor:'#123456'}]]),'document');
+ sections[1].set('odd',{...odd,fillColor:'#999999'});assert.throws(()=>executePageBorderEdits(wasm,pending),/바뀌었습니다/);assert.equal(sections[0].get('odd')!.fillColor,'#00aa00');
+ assert.throws(()=>planPageBorderEdits(wasm,0,new Map([['odd',{...odd,fillType:'image'}]]),'document'),/그림 배경/);
+ assert.equal(supportsPageBorderInclusion(undefined),false);assert.equal(supportsPageBorderInclusion({pageBorderInclusionEnabled:()=>true}),true);
 });

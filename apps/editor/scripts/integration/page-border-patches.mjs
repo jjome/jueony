@@ -3,7 +3,7 @@ import {join} from 'node:path';
 export async function applyPageBorderPatches({root}){
  const path=join(root,'src/ui/page-border-dialog.ts');let source=(await readFile(path,'utf8')).replace(/\r\n/g,'\n');
  const replace=(before,after,label)=>{if(source.split(before).length!==2)throw new Error('Page border seam drift: '+label);source=source.replace(before,after);};
- source="import {readPageBorderSettings,supportsPageBorderEntries,applyPageBorderDialog,createPageBorderKindControls,createPageGradientControls,populatePageBorderExtras} from '../jueony/adapters/rhwp/page-border-settings.ts';\n"+source;
+ source="import {readPageBorderSettings,supportsPageBorderEntries,applyPageBorderDialog,createPageBorderKindControls,createPageGradientControls,populatePageBorderExtras,createPageBorderScopeControls,populatePageBorderInclusion} from '../jueony/adapters/rhwp/page-border-settings.ts';\n"+source;
  replace('  private settings!: PageBorderFillSettings;',`  private settings!: PageBorderFillSettings;
   private jueonyRevision?: string;
   private jueonyKind: 'both' | 'odd' | 'even' = 'both';
@@ -14,7 +14,9 @@ export async function applyPageBorderPatches({root}){
   private jueonyGradientInputs: Record<string, HTMLInputElement | HTMLSelectElement> = {};
   private jueonyHeaderInside!: HTMLInputElement;
   private jueonyFooterInside!: HTMLInputElement;`,'draft fields');
+ replace('    body.append(tabBar, panelWrap);','    body.append(tabBar, panelWrap, createPageBorderScopeControls(this));','scope selector');
  replace('    this.settings = this.wasm.getPageBorderFill(this.sectionIdx);',`    this.jueonyRevision=(window as any).jueonyEditor?.revision();
+    (this as any).jueonyPosition=this.services?.getInputHandler()?.getCursorPosition();
     this.jueonyKind='both';this.jueonyDrafts.clear();this.jueonyApplicationChanged=false;
     this.settings = readPageBorderSettings(this.wasm, this.sectionIdx) as unknown as PageBorderFillSettings;`,'read native entries');
  const start=source.indexOf('  protected onConfirm(): boolean {'),end=source.indexOf('  private buildBorderTab(): HTMLElement {',start);
@@ -25,7 +27,7 @@ export async function applyPageBorderPatches({root}){
  if(gradientStart<0||gradientEnd<0)throw new Error('Page gradient seam drift');source=source.slice(0,gradientStart)+`    const gradRow = createPageGradientControls(this);
     const picture = this.checkbox('그림 배경 (새 그림 넣기 미지원)');picture.disabled = true;
 `+source.slice(gradientEnd);
- replace('    group.append(\n      basisRow,',"    this.jueonyHeaderInside=this.checkbox('머리말 포함 (배치 미지원)');\n    this.jueonyFooterInside=this.checkbox('꼬리말 포함 (배치 미지원)');\n    this.jueonyHeaderInside.disabled=true;this.jueonyFooterInside.disabled=true;\n    const inclusionNotice=document.createElement('p');inclusionNotice.textContent='머리말/꼬리말 포함 범위의 실제 배치는 아직 지원하지 않습니다. 기존 문서의 저장 값을 표시·보존합니다.';inclusionNotice.style.cssText='font-size:11px;margin:4px 0;color:var(--color-text);';\n    group.append(\n      basisRow,",'inclusion controls');
+ replace('    group.append(\n      basisRow,',"    this.jueonyHeaderInside=this.checkbox('머리말 포함');this.jueonyHeaderInside.setAttribute('aria-label','쪽 테두리 머리말 포함');\n    this.jueonyFooterInside=this.checkbox('꼬리말 포함');this.jueonyFooterInside.setAttribute('aria-label','쪽 테두리 꼬리말 포함');\n    this.jueonyHeaderInside.disabled=true;this.jueonyFooterInside.disabled=true;\n    for(const radio of [this.basisPaper,basisPage])radio.addEventListener('change',()=>populatePageBorderInclusion(this));\n    const inclusionNotice=document.createElement('p');inclusionNotice.dataset.pageInclusionNotice='true';inclusionNotice.style.cssText='font-size:11px;margin:4px 0;color:var(--color-text);';\n    group.append(\n      basisRow,",'inclusion controls');
  replace("      this.checkboxRow(this.disabledCheck(t('dialog.pageBorder.disabledCheck.label'))),\n      this.checkboxRow(this.disabledCheck(t('dialog.pageBorder.disabledCheck.label.x011117'))),","      this.checkboxRow(this.jueonyHeaderInside),\n      this.checkboxRow(this.jueonyFooterInside),\n      inclusionNotice,",'display existing inclusion');
  replace('    firstOnly.disabled = true;',"    firstOnly.disabled = !supportsPageBorderEntries(this.wasm);",'first page capability');
  replace("      ['3', '대각선'],\n      ['4', '격자'],","      ['3', '역대각선'],\n      ['4', '대각선'],\n      ['5', '십자'],\n      ['6', '대각 격자'],",'native hatch labels');

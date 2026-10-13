@@ -28,10 +28,12 @@ settings.xml 전체를 재직렬화하지 않는다. CaretPosition의 시작 태
 
 실제 Edge에서는 로컬 복구 기록 없는 파일 열기, 저장 직전 커서 우선, 편집 undo/redo, 빈 문단/첫 문단, 설정 보존, 외부 파일 변경 거절을 검사한다. 파일 충돌 경고는 테스트가 실제로 닫고 정확한 예상 오류 하나를 별도 기록한다. 다른 오류를 일괄 무시하지 않는다. 기존 사용자 창·문서·서버는 유지하고 합성 OPFS 파일과 별도 headless 프로필을 사용한다.
 
-최종 검증 수와 빌드 해시는 [검증 요약](evidence/hwpx-caret-2026-10-14/verification-summary.json)을 따른다. 기존 모든 쪽 편집 회귀, TypeScript, 모듈 경계, 실행 묶음 호환을 같은 엔진으로 확인한다. Agent 회귀는 유료 모델 대신 로컬 mock을 사용한다. 한글 2024에서의 실제 파일 열기·커서·지면 비교는 아직 실행하지 않았다.
+최종 단위 411개·브라우저 288개(실행 묶음 호환 4개 포함)·실제 엔진 245개가 통과했다. TypeScript와 9개 모듈·229개 소스 경계도 통과했다. 최종 검증 수와 빌드 해시는 [검증 요약](evidence/hwpx-caret-2026-10-14/verification-summary.json)을 따른다. 기존 모든 쪽 편집 회귀, TypeScript, 모듈 경계, 실행 묶음 호환을 같은 엔진으로 확인한다. Agent 회귀는 유료 모델 대신 로컬 mock을 사용한다. 한글 2024에서의 실제 파일 열기·커서·지면 비교는 아직 실행하지 않았다.
 
 ## 실행과 후속 과제
 
 새 검수본은 `build/jueony-hwpx-caret-20261014/Start-Review.cmd`, Rust 실행 파일은 같은 폴더의 `JueonyEditor.exe`, 주소는 `http://127.0.0.1:4240/`이다. 한글에서 열어볼 합성 문서는 `review-documents/hwpx-caret/caret-native`와 `caret-browser`에 준비한다. 이전 실행 창과 origin별 업무 저장소는 유지한다.
 
 다중 구역의 본문 목록, 표/글상자/머리말/각주 등 중첩 목록, 탭·필드·인라인 개체의 위치 대응, 복잡한 쪽 편집과 Agent 제어 확장이 남는다. 전체 문서화된 구현 범위는 완료되지 않았으며 자동 계속 작업을 유지한다. 고정 업스트림을 수정하지 않고 MIT/제삼자 고지를 유지한다.
+
+기능 커밋은 `01c427a`이며 최종 엔진은 `build/rhwp-engine/source-5940ba94eca23794/pkg`이다. WASM SHA-256은 `2c9be2d4945b747bf114d49c3012caf88d9e96bf22df6148b0f770bb88ebdfcf`, 앱 소스 SHA-256은 `a8eb730335f613d0db25d0ead8702eb4a76c3f83b8ad89a0270325db4668dba2`이다. 빌드는 직전 `98b477b`와 작업 중 소스를 기록하며 보고서는 실제 패치·앱·WASM 바이트 해시로 최종 구현을 대조한다. [실행 확인](evidence/hwpx-caret-2026-10-14/launch-check.json)은 제공 중인 메타데이터와 실제 WASM 바이트를 검사했다.

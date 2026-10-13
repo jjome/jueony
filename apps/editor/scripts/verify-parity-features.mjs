@@ -586,7 +586,10 @@ try{
 
   await scenario('header/footer dialog cancel, create, undo/redo, then existing content stays intact',async()=>{
     const frame=await openFixture();assert.equal((await header()).exists,false);
-    await command('page:header-footer-dialog');await frame.click('#jueony-header-footer button[type=button]');assert.equal((await header()).exists,false);
+    await command('page:header-footer-dialog');await frame.click('#jueony-header-footer button[type=button]');
+    // Native dialog.close() queues the close listener. Wait for its actual disposal before
+    // opening another dialog with the same ID, rather than selecting the old hidden button.
+    await frame.waitForFunction(()=>!document.getElementById('jueony-header-footer'));assert.equal((await header()).exists,false);
     await command('page:header-footer-dialog');await frame.click('#jueony-header-footer button[type=submit]');
     await frame.waitForSelector('#jueony-header-footer',{hidden:true});assert.equal((await header()).exists,true);
     // Undo directly inside the header, exercising the production history/mode transition.

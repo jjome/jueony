@@ -10,7 +10,9 @@
 
 ## 바로 실행
 
-최신 통합 편집기 검수본은 **[Start-Review.cmd](build/jueony-pre-agent-20261013/Start-Review.cmd)**로 실행한다(4203). 스타일·중첩 선택 복원·표 변환·정수 자동 채우기·개체 속성 단축키·쪽 배경과 통합 서식 도구 모음을 보강했다. [이번 단계별 결과와 남은 제한](docs/44-editor-stages-result.md)을 확인한다. 기존 포트의 업무와 문서는 유지하며 실제 한글의 전체 지면 동등성은 아직 완료하지 않았다.
+최신 쪽 편집 검수본은 **[Start-Review.cmd](build/jueony-page-copy-20261014/Start-Review.cmd)**로 실행한다(4230). 완전한 본문 문단의 쪽 복사·대상 쪽 뒤 붙이기·삭제, 기본 바탕쪽·줄 번호와 그림 배경/용지 설정을 연결했다. [실제 지원 범위·검증·남은 제한](docs/55-page-body-copy-and-paste.md)을 확인한다. 걸친 문단·표·개체의 쪽 복사/삭제와 다른 용지의 쪽 붙이기는 아직 지원하지 않는다. 기존 포트의 업무와 문서는 유지하며 한글 직접 비교는 마지막 일괄 검수로 남긴다.
+
+이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 
 [RAG 평가용 합성 예제](fixtures/rag-evaluation/README.md)는 HWP/HWPX·TXT·MD 자료 21개와 질문 22개다. [폴더 연결·검색 평가 방법과 현재 품질 기준선](docs/45-rag-evaluation-corpus.md)을 참고한다. 자료 추출·출처·업무 격리 검사와 모델 답변 품질 검사는 구분한다.
 
@@ -52,6 +54,7 @@
 
 | 문서 | 다루는 결정 |
 | --- | --- |
+| [쪽 본문 복사·붙이기](docs/55-page-body-copy-and-paste.md) | 4230 검수본, 내부 복사 버퍼·서식 자원 이식·한 번의 undo·저장과 미지원 범위 |
 | [기본 편집·상태 보존 보강](docs/33-editor-parity-features-result.md) | 4193 검수본, 캡션·감추기·머리말·복구·17종 AI 명령과 저장 보존 검사 |
 | [통합 UI·상태·검색·검토·반복 작업](docs/28-continuation-implementation.md) | 새 검수본 실행, 실제 Claude 확인, 한글 검수용 파일과 미완료 범위 |
 | [이번 자율 구현 결과와 다음 실행](docs/23-autonomous-work-result.md) | 완료 항목·실제 검증·아침 사용 순서와 남은 범위 |

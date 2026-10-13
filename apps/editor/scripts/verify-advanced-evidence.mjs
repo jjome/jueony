@@ -47,7 +47,7 @@ if(agentSectionsProfile)suites.push(['section-browser/result.json',10]);
 if(backgroundProfile)suites.push(['background-browser/result.json',9]);
 if(agentMastersProfile)suites.push(['agent-master-browser/result.json',11]);
 if(macroProfile)suites.push(['macro-browser/result.json',10]);
-if(splitProfile)suites.push(['split-browser/result.json',11]);
+if(splitProfile)suites.push(['split-browser/result.json',12]);
 if (process.argv.includes('--include-bundle')) suites.push(['bundle-compatibility/result.json', 4]);
 const reports = [];
 for (const [file, minimum] of suites) {

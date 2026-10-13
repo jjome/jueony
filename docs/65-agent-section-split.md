@@ -44,8 +44,11 @@ Document domain이 단독 실행·대상·글자 위치·구역 수·원본 구�
 
 ## 완료한 검증
 
-최종 단위 **466개**, provider/server **52개**, 실제 WASM **310개**, 브라우저 **335개**(동봉 실행 검사 전)가 통과했다. TypeScript와 9개 모듈·238개 소스 경계 검사도 통과했다. [검증 요약](evidence/agent-split-2026-10-14/verification-summary.json)은 실제 소스·빌드·패치·WASM 해시를 대조한다. 바탕쪽 취소/오류 표시 회귀에서는 Esc 종료와 검증 메시지 생성 완료를 기다리도록 검사 스크립트를 고쳤으며 초기 실패는 `build/agent-split-master-dialog-initial`에 보존했다.
+최종 단위 **466개**, provider/server **52개**, 실제 WASM **310개**, 브라우저 **340개**(동봉 실행 호환 4개 포함)가 통과했다. TypeScript와 9개 모듈·238개 소스 경계 검사도 통과했다. [검증 요약](evidence/agent-split-2026-10-14/verification-summary.json)은 실제 소스·빌드·패치·WASM 해시를 대조한다. 바탕쪽 취소/오류 표시 회귀에서는 Esc 종료와 검증 메시지 생성 완료를 기다리도록 검사 스크립트를 고쳤으며 초기 실패는 `build/agent-split-master-dialog-initial`에 보존했다.
 
 앱 소스 SHA-256은 `e42499c612402a249fe606472da9ef33db040a21dd173837fcc9571b9f413306`, WASM SHA-256은 기존 `2ff6d89629fa60b7e1ae5ecb55144a4ab8cbb8f192a49a8acd23a2244d3ab474`다. 기존 `build/rhwp-engine/source-8950f8c2bcb2c714/pkg`와 참조 저장소를 변경하지 않고 엔진을 재사용했다.
 
-이번 실행 묶음은 `build/jueony-agent-split-20261014/Start-Review.cmd`, 검수 포트는 **4252**다. Rust 실행기는 같은 폴더의 `JueonyEditor.exe`다. 합성 HWP/HWPX는 `review-documents/agent-split/split-native`와 `split-browser`에 포함한다. 동봉 실행 확인은 후속 결과에 기록한다.
+이번 실행 묶음은 `build/jueony-agent-split-20261014/Start-Review.cmd`, 검수 포트는 **4252**다. Rust 실행기는 같은 폴더의 `JueonyEditor.exe`다. 합성 HWP/HWPX는 `review-documents/agent-split/split-native`와 `split-browser`에 포함한다. 동봉 실행 호환 4개도 통과했다. [실행 확인](evidence/agent-split-2026-10-14/launch-check.json)은 4252의 실제 메타데이터·WASM 바이트·공통 명령/provider 계약 해시를 확인했다. Rust exe는 컴파일했으며 이번 실제 실행 검증은 스크립트·동봉 런타임 경로다. 구현 커밋은 `761a774`이며 빌드 당시 Git 기준/작업 중 여부와 실제 소스 해시를 함께 기록했다.
+
+
+전용 Edge 검사는 **12개**다. 빈 새 문서와 첫 문단 앞의 구역 나누기를 실제 채팅·저장·요청 undo로 추가 확인했다. 추가 경계 검사 전 증거도 `build/agent-split-before-empty-chat-check`에 보존했다. [구조 변경 화면](evidence/agent-split-2026-10-14/split-browser/agent-split.png)을 확인할 수 있다. 최종 검사 실패·skip·page error·외부 자산 요청은 0건이다.

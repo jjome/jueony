@@ -1,0 +1,322 @@
+TAP version 13
+# Subtest: Claude wire schema has no union expansion and preserves all command names
+ok 1 - Claude wire schema has no union expansion and preserves all command names
+  ---
+  duration_ms: 1.4798
+  type: 'test'
+  ...
+# Subtest: Claude JSON arguments preserve Korean text, sparse formatting, false, zero and every command field
+ok 2 - Claude JSON arguments preserve Korean text, sparse formatting, false, zero and every command field
+  ---
+  duration_ms: 0.4694
+  type: 'test'
+  ...
+# Subtest: Claude rejects malformed envelopes and JSON arguments instead of applying partial commands
+ok 3 - Claude rejects malformed envelopes and JSON arguments instead of applying partial commands
+  ---
+  duration_ms: 22.197
+  type: 'test'
+  ...
+# Subtest: Claude retains unknown arguments for editor validation instead of silently hiding them
+ok 4 - Claude retains unknown arguments for editor validation instead of silently hiding them
+  ---
+  duration_ms: 2.6895
+  type: 'test'
+  ...
+# Subtest: provider errors distinguish billing, schema, model, authentication and rate limits without echoing secrets
+ok 5 - provider errors distinguish billing, schema, model, authentication and rate limits without echoing secrets
+  ---
+  duration_ms: 120.6113
+  type: 'test'
+  ...
+# Subtest: provider errors bound malformed/oversized bodies and do not expose arbitrary headers
+ok 6 - provider errors bound malformed/oversized bodies and do not expose arbitrary headers
+  ---
+  duration_ms: 0.9742
+  type: 'test'
+  ...
+# Subtest: server restart restores encrypted connections, replaces/deletes keys, and preserves corrupt store
+ok 7 - server restart restores encrypted connections, replaces/deletes keys, and preserves corrupt store
+  ---
+  duration_ms: 7922.8866
+  type: 'test'
+  ...
+# Subtest: Windows DPAPI encrypts, restores, replaces and deletes without plaintext fallback
+ok 8 - Windows DPAPI encrypts, restores, replaces and deletes without plaintext fallback
+  ---
+  duration_ms: 5903.2039
+  type: 'test'
+  ...
+# Subtest: native v3 URL/auth/schema/body preserve common contract
+ok 9 - native v3 URL/auth/schema/body preserve common contract
+  ---
+  duration_ms: 96.2016
+  type: 'test'
+  ...
+# Subtest: HCX-005 transports Agent tab, HWPX numbering and guarded background and basic master commands without a provider-specific document contract
+ok 10 - HCX-005 transports Agent tab, HWPX numbering and guarded background and basic master commands without a provider-specific document contract
+  ---
+  duration_ms: 5.7681
+  type: 'test'
+  ...
+# Subtest: HCX-007 transports Agent tab, HWPX numbering and guarded background and basic master commands without a provider-specific document contract
+ok 11 - HCX-007 transports Agent tab, HWPX numbering and guarded background and basic master commands without a provider-specific document contract
+  ---
+  duration_ms: 3.6266
+  type: 'test'
+  ...
+# Subtest: source schema excludes document IDs and empty references require an empty source list
+ok 12 - source schema excludes document IDs and empty references require an empty source list
+  ---
+  duration_ms: 0.6157
+  type: 'test'
+  ...
+# Subtest: HCX-005 uses maxTokens without HCX-007-only schema or reasoning fields
+ok 13 - HCX-005 uses maxTokens without HCX-007-only schema or reasoning fields
+  ---
+  duration_ms: 60.3815
+  type: 'test'
+  ...
+# Subtest: invalid models, keys, paths and unsafe endpoints fail before network
+ok 14 - invalid models, keys, paths and unsafe endpoints fail before network
+  ---
+  duration_ms: 0.4984
+  type: 'test'
+  ...
+# Subtest: whole-paragraph contract requires exact source text and computes Unicode offsets locally
+ok 15 - whole-paragraph contract requires exact source text and computes Unicode offsets locally
+  ---
+  duration_ms: 0.3437
+  type: 'test'
+  ...
+# Subtest: HCX-005 plan string preserves structured commands and rejects malformed or excessive payloads
+ok 16 - HCX-005 plan string preserves structured commands and rejects malformed or excessive payloads
+  ---
+  duration_ms: 0.4449
+  type: 'test'
+  ...
+# Subtest: explicit app prefix is preserved without guessing or falling back
+ok 17 - explicit app prefix is preserved without guessing or falling back
+  ---
+  duration_ms: 3.4851
+  type: 'test'
+  ...
+# Subtest: HTTP/application errors sanitized, no retries or redirects
+ok 18 - HTTP/application errors sanitized, no retries or redirects
+  ---
+  duration_ms: 7.6477
+  type: 'test'
+  ...
+# Subtest: truncated, tool, malformed, refused and incomplete responses never yield edits
+ok 19 - truncated, tool, malformed, refused and incomplete responses never yield edits
+  ---
+  duration_ms: 40.7499
+  type: 'test'
+  ...
+# Subtest: abort cancels generation and leaves next request usable
+ok 20 - abort cancels generation and leaves next request usable
+  ---
+  duration_ms: 58.4823
+  type: 'test'
+  ...
+# Subtest: invalid or excessive input does not contact provider
+ok 21 - invalid or excessive input does not contact provider
+  ---
+  duration_ms: 18.9918
+  type: 'test'
+  ...
+# Subtest: connection probe rejects edits and source claims
+ok 22 - connection probe rejects edits and source claims
+  ---
+  duration_ms: 0.2923
+  type: 'test'
+  ...
+# Subtest: service keeps key reuse, metadata isolation, and probe context independent of HTTP
+ok 23 - service keeps key reuse, metadata isolation, and probe context independent of HTTP
+  ---
+  duration_ms: 76.5865
+  type: 'test'
+  ...
+# Subtest: serialized mutations preserve existing connections when encrypted save fails
+ok 24 - serialized mutations preserve existing connections when encrypted save fails
+  ---
+  duration_ms: 0.7708
+  type: 'test'
+  ...
+# Subtest: corrupt restoration blocks writes until explicit clear, without leaking partial records
+ok 25 - corrupt restoration blocks writes until explicit clear, without leaking partial records
+  ---
+  duration_ms: 0.4444
+  type: 'test'
+  ...
+# Subtest: active request budget releases on provider failure and cancellation is forwarded
+ok 26 - active request budget releases on provider failure and cancellation is forwarded
+  ---
+  duration_ms: 0.4264
+  type: 'test'
+  ...
+# Subtest: openai-responses transports section tab, HWPX numbering and guarded background and basic master commands through the provider-neutral schema
+ok 27 - openai-responses transports section tab, HWPX numbering and guarded background and basic master commands through the provider-neutral schema
+  ---
+  duration_ms: 69.7486
+  type: 'test'
+  ...
+# Subtest: openai-responses maps native authentication, schema, model and context
+ok 28 - openai-responses maps native authentication, schema, model and context
+  ---
+  duration_ms: 6.6054
+  type: 'test'
+  ...
+# Subtest: openai-responses rejects refusal, incomplete and unsupported output without retry
+ok 29 - openai-responses rejects refusal, incomplete and unsupported output without retry
+  ---
+  duration_ms: 68.9334
+  type: 'test'
+  ...
+# Subtest: openai-responses handles authentication, quota, redirects and cancellation safely
+ok 30 - openai-responses handles authentication, quota, redirects and cancellation safely
+  ---
+  duration_ms: 77.1238
+  type: 'test'
+  ...
+# Subtest: openai-responses validates connection before any network call
+ok 31 - openai-responses validates connection before any network call
+  ---
+  duration_ms: 0.5634
+  type: 'test'
+  ...
+# Subtest: anthropic transports section tab, HWPX numbering and guarded background and basic master commands through the provider-neutral schema
+ok 32 - anthropic transports section tab, HWPX numbering and guarded background and basic master commands through the provider-neutral schema
+  ---
+  duration_ms: 5.4215
+  type: 'test'
+  ...
+# Subtest: anthropic maps native authentication, schema, model and context
+ok 33 - anthropic maps native authentication, schema, model and context
+  ---
+  duration_ms: 3.9509
+  type: 'test'
+  ...
+# Subtest: anthropic rejects refusal, incomplete and unsupported output without retry
+ok 34 - anthropic rejects refusal, incomplete and unsupported output without retry
+  ---
+  duration_ms: 15.9482
+  type: 'test'
+  ...
+# Subtest: anthropic handles authentication, quota, redirects and cancellation safely
+ok 35 - anthropic handles authentication, quota, redirects and cancellation safely
+  ---
+  duration_ms: 51.2476
+  type: 'test'
+  ...
+# Subtest: anthropic validates connection before any network call
+ok 36 - anthropic validates connection before any network call
+  ---
+  duration_ms: 0.8249
+  type: 'test'
+  ...
+# Subtest: gemini transports section tab, HWPX numbering and guarded background and basic master commands through the provider-neutral schema
+ok 37 - gemini transports section tab, HWPX numbering and guarded background and basic master commands through the provider-neutral schema
+  ---
+  duration_ms: 4.9217
+  type: 'test'
+  ...
+# Subtest: gemini maps native authentication, schema, model and context
+ok 38 - gemini maps native authentication, schema, model and context
+  ---
+  duration_ms: 2.0416
+  type: 'test'
+  ...
+# Subtest: gemini rejects refusal, incomplete and unsupported output without retry
+ok 39 - gemini rejects refusal, incomplete and unsupported output without retry
+  ---
+  duration_ms: 17.731
+  type: 'test'
+  ...
+# Subtest: gemini handles authentication, quota, redirects and cancellation safely
+ok 40 - gemini handles authentication, quota, redirects and cancellation safely
+  ---
+  duration_ms: 49.5267
+  type: 'test'
+  ...
+# Subtest: gemini validates connection before any network call
+ok 41 - gemini validates connection before any network call
+  ---
+  duration_ms: 0.343
+  type: 'test'
+  ...
+# Subtest: strict projection makes optional format fields nullable; normalization preserves false/zero and unknown fields for semantic rejection
+ok 42 - strict projection makes optional format fields nullable; normalization preserves false/zero and unknown fields for semantic rejection
+  ---
+  duration_ms: 1.04
+  type: 'test'
+  ...
+# Subtest: Gemini rejects blocked prompts and models containing path components
+ok 43 - Gemini rejects blocked prompts and models containing path components
+  ---
+  duration_ms: 7.5883
+  type: 'test'
+  ...
+# Subtest: 세션 부트스트랩과 토큰/Origin/Host 경계를 강제한다
+ok 44 - 세션 부트스트랩과 토큰/Origin/Host 경계를 강제한다
+  ---
+  duration_ms: 695.7663
+  type: 'test'
+  ...
+# Subtest: 선택한 두 모델과 인증을 정확한 endpoint에 보내고 임의 응답 필드가 UI로 새지 않는다
+ok 45 - 선택한 두 모델과 인증을 정확한 endpoint에 보내고 임의 응답 필드가 UI로 새지 않는다
+  ---
+  duration_ms: 27.5032
+  type: 'test'
+  ...
+# Subtest: 외부 HTTP·사용자정보·쿼리 endpoint와 redirect 전송을 거부한다
+ok 46 - 외부 HTTP·사용자정보·쿼리 endpoint와 redirect 전송을 거부한다
+  ---
+  duration_ms: 8.4742
+  type: 'test'
+  ...
+# Subtest: 인증/잘못된 JSON 오류를 정제하고 자동 재시도와 키 로그를 남기지 않는다
+ok 47 - 인증/잘못된 JSON 오류를 정제하고 자동 재시도와 키 로그를 남기지 않는다
+  ---
+  duration_ms: 8.0335
+  type: 'test'
+  ...
+# Subtest: 취소된 HTTP 요청 후에도 다음 요청이 정상 처리된다
+ok 48 - 취소된 HTTP 요청 후에도 다음 요청이 정상 처리된다
+  ---
+  duration_ms: 120.5805
+  type: 'test'
+  ...
+# Subtest: 정적 자산은 로컬 CSP로 제공하고 경로 순회와 잘못된 JSON을 거부한다
+ok 49 - 정적 자산은 로컬 CSP로 제공하고 경로 순회와 잘못된 JSON을 거부한다
+  ---
+  duration_ms: 41.6563
+  type: 'test'
+  ...
+# Subtest: HyperCLOVA registry와 합성 연결 테스트는 사용자 문맥/키를 저장하지 않는다
+ok 50 - HyperCLOVA registry와 합성 연결 테스트는 사용자 문맥/키를 저장하지 않는다
+  ---
+  duration_ms: 10.2018
+  type: 'test'
+  ...
+# Subtest: 연결 키 삭제 후 기존 모델로 호출할 수 없다
+ok 51 - 연결 키 삭제 후 기존 모델로 호출할 수 없다
+  ---
+  duration_ms: 2.7887
+  type: 'test'
+  ...
+# Subtest: connection metadata hides secrets; key reuse cannot switch destinations; replacement and removal work
+ok 52 - connection metadata hides secrets; key reuse cannot switch destinations; replacement and removal work
+  ---
+  duration_ms: 21.3426
+  type: 'test'
+  ...
+1..52
+# tests 52
+# suites 0
+# pass 52
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8271.337

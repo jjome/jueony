@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-section-macros-20261014/Start-Review.cmd)**로 실행한다(4250). 기본 탭·줄 번호·단색 배경·텍스트 바탕쪽·용지/여백·단 설정을 반복 작업으로 저장하고, 실행마다 적용 구역을 직접 선택한다. 추가 AI 호출 없이 변수·원문·버전·현재 형식을 검증하여 적용하며 요청 undo/redo·실패 복원·안전 저장·업무별 재실행을 확인했다. [지원 범위·사용법·검증](docs/64-section-repeat-work.md)을 확인한다. 기존 [바탕쪽 Agent](docs/63-agent-master-page-tools.md), [단색 쪽 배경](docs/62-agent-page-background.md), [기본 탭·HWPX 줄 번호](docs/61-agent-section-tools.md)와 기존 편집 기능도 포함한다. 한글 전체 기능, 고급 바탕쪽·개체·기존 표의 반복 기록, 구역 생성/삭제의 Agent 도구와 실제 한글 비교는 남는다. 이전 실행 창과 문서는 유지한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-agent-split-20261014/Start-Review.cmd)**로 실행한다(4252). AI가 한 단 일반 본문의 Unicode 위치에서 구역을 나누고, 갱신된 문서의 새 구역 설정을 후속 요청으로 바꾼다. 나누기는 단독 명령이며 복잡한 원본과 묶음·반복 기록은 거절한다. 변경 비교·undo/redo·실패 복원·양 형식 저장·재실행을 검증했고, iframe 오류가 Agent 창에 잘못 표시되던 문제도 수정했다. [사용법·검증·남은 제한](docs/65-agent-section-split.md)을 확인한다. 기존 [구역 설정 반복 작업](docs/64-section-repeat-work.md), [바탕쪽 Agent](docs/63-agent-master-page-tools.md), [단색 배경](docs/62-agent-page-background.md)과 기존 편집 기능도 포함한다. 구역 삭제/합치기·고급 개체 도구와 전체 한글 동등성 검수는 남는다. 이전 실행 창과 문서는 유지한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

@@ -1,0 +1,58 @@
+{
+  "status": "PASS_SCOPED_AUTOMATED_CHECKS",
+  "verifiedAt": "2026-10-13T14:34:53.793Z",
+  "unitPassed": 386,
+  "browserPassed": 158,
+  "nativePassed": 55,
+  "moduleCount": 9,
+  "moduleFiles": 215,
+  "customSourceSha256": "70e11d30d08d126dd8ddecfadf7dc2a333d2e764a6af784d0225b1b7457848f7",
+  "buildScriptSha256": "8df671207273b6ae1e1c78b58e6c9e551299d4eb84619db8ca81c9be10b2a9f2",
+  "wasmSha256": "88de9ec4001f3c8969baf6383f6d8106914d1e34bd83bf875f3f9f1e59f4ac00",
+  "engineSourceId": "4c657cc3e144b90b",
+  "buildApplicationCommit": "14c1e7badbdc309e6b612f54146630224ddb7da3",
+  "buildApplicationDirty": true,
+  "reports": [
+    {
+      "file": "browser/result.json",
+      "passed": 24,
+      "sha256": "cfe82ff2100704f358c4488c28cf06f13fc5cf8296b2e0aa3690002da5812d60"
+    },
+    {
+      "file": "regression-parity/result.json",
+      "passed": 66,
+      "sha256": "8960447b2cd90ebff86ca3e09796e1713d8628ee8b3865fd8e73bedeb67c9797"
+    },
+    {
+      "file": "regression-session/result.json",
+      "passed": 9,
+      "sha256": "a87d7b4a00d2fec56682d6f0086e7c6c6660f6bf3db82e3679c15dd041b7f5e4"
+    },
+    {
+      "file": "basic-text/basic-text-browser.json",
+      "passed": 28,
+      "sha256": "a41569ba9ba3188c3366d9e5656ed11609f04a45a18b342e3d4b154056d29e2c"
+    },
+    {
+      "file": "regression-agent/result.json",
+      "passed": 9,
+      "sha256": "abd84f4b6f8869a18866331816a2b7101203588fce3b77288bae9fd4e6bc2724"
+    },
+    {
+      "file": "regression-table/result.json",
+      "passed": 18,
+      "sha256": "5d508fb808e3b636acee29d5e3b6786f9633460f0408426e48578280fe7381ce"
+    },
+    {
+      "file": "bundle-compatibility/result.json",
+      "passed": 4,
+      "sha256": "f09b898dc805ab973f58c951bb8ec1746547dc502968fadfbf1b0f433b5d7b18"
+    }
+  ],
+  "limitations": [
+    "Actual Hancom GUI/layout comparison is deferred.",
+    "No paid LLM request: Agent tests use a deterministic local adapter.",
+    "Full Hangul feature parity remains incomplete; no percentage of completion is inferred from these scoped tests.",
+    "Unsupported source properties may be blocked by the stricter cell preservation guard."
+  ]
+}

@@ -27,3 +27,5 @@ export {defaultLineNumberSettings,validateLineNumberSettings,sameLineNumberSetti
 export type {LineNumberSettings} from '../domain/line-number-settings.ts';
 export {validatePageBodyDeletionPlan,samePageBodyDeletionRange} from '../domain/page-body-deletion.ts';
 export type {PageBodyDeletionPlan} from '../domain/page-body-deletion.ts';
+export {validatePageBodyClipboard} from '../domain/page-body-clipboard.ts';
+export type {PageBodyClipboard} from '../domain/page-body-clipboard.ts';

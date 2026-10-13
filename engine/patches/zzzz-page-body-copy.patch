@@ -1,0 +1,117 @@
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -2349,7 +2349,7 @@
+         })
+     }
+ 
+-    fn hwpx_document_for_export<T>(
++    pub(crate) fn hwpx_document_for_export<T>(
+         &self,
+         serialize: impl FnOnce(
+             &crate::model::document::Document,
+--- /dev/null
++++ b/src/document_core/commands/page_body_copy.rs
+@@ -0,0 +1,77 @@
++//! App-local full-body-page clipboard. No diagnostic whole-page extraction.
++use crate::document_core::DocumentCore;
++use crate::error::HwpError;
++use crate::model::document::SectionDef;
++use crate::model::paragraph::ColumnBreakType;
++fn fail(s:&str)->HwpError{HwpError::RenderError(s.into())}
++fn no_outline(core:&DocumentCore,si:usize,first:usize,count:usize)->Result<(),HwpError>{
++    if core.document.sections[si].paragraphs[first..first+count].iter().any(|p|core.document.doc_info.para_shapes.get(p.para_shape_id as usize).is_some_and(|ps|ps.head_type==crate::model::style::HeadType::Outline)){return Err(fail("개요 번호 본문의 쪽 복사는 아직 지원하지 않습니다."));}Ok(())
++}
++fn settings(core:&DocumentCore,si:usize)->Result<serde_json::Value,HwpError>{
++    let sd:&SectionDef=&core.document.sections[si].section_def;
++    if !sd.master_pages.is_empty()||!sd.extra_child_records.is_empty()||sd.raw_ctrl_extra.iter().any(|b|*b!=0)||sd.line_numbers.enabled||sd.memo_shape_id!=0{return Err(fail("바탕쪽·줄 번호·개요·메모·미지원 구역 설정의 쪽 복사는 아직 지원하지 않습니다."));}
++    let mut v=serde_json::to_value(sd).map_err(|_|fail("쪽 설정을 확인하지 못했습니다."))?;
++    // Opaque storage padding and unused note defaults are not page geometry.
++    for k in ["raw_ctrl_extra","footnote_shape","endnote_shape","page_num","picture_num","table_num","equation_num","page_border_fill","extra_page_border_fills"]{v.as_object_mut().unwrap().remove(k);}
++    let mut borders=Vec::new();for kind in ["both","odd","even"]{
++        let mut border:serde_json::Value=serde_json::from_str(&core.get_page_border_fill_entry_native(si,kind)?).map_err(|_|fail("쪽 테두리/배경을 읽지 못했습니다."))?;
++        if border["fillType"]=="image"{return Err(fail("그림 배경 쪽의 복사는 아직 지원하지 않습니다."));}
++        let inactive=border["fillType"]=="none";if border["patternType"].as_i64().is_some_and(|p|p<=0){border["patternType"]=serde_json::json!(-1);}let fields=border.as_object_mut().unwrap();fields.remove("attr");fields.remove("borderFillId");if inactive{for key in ["fillColor","patternColor","patternType"]{fields.remove(key);}}borders.push(border);
++    }
++    v["borders"]=serde_json::json!(borders);
++    let columns=core.document.sections[si].paragraphs.iter().flat_map(|p|&p.controls).find_map(|c|if let crate::model::control::Control::ColumnDef(col)=c{Some(col)}else{None});
++    if let Some(c)=columns{if !c.same_width&&(!c.widths.is_empty()||!c.gaps.is_empty()){return Err(fail("사용자 단 너비의 쪽 복사는 아직 지원하지 않습니다."));}v["columns"]=serde_json::json!({"type":c.column_type,"direction":c.direction,"count":c.column_count,"spacing":c.spacing,"separatorType":c.separator_type,"separatorWidth":c.separator_width,"separatorColor":c.separator_color});}
++    Ok(v)
++}
++impl DocumentCore {
++    pub fn get_page_body_clipboard_settings_native(&self,section:usize)->Result<String,HwpError>{self.document.sections.get(section).ok_or_else(||fail("구역이 없습니다."))?;Ok(settings(self,section)?.to_string())}
++    pub fn copy_page_body_native(&self,page:u32,token:&str)->Result<Vec<u8>,HwpError>{
++        let p:serde_json::Value=serde_json::from_str(&self.get_page_body_deletion_plan_native(page)?).map_err(|_|fail("쪽 범위를 읽지 못했습니다."))?;
++        if p["supported"]!=true{return Err(fail(p["reason"].as_str().unwrap_or("미지원 쪽")));}
++        if p["token"].as_str()!=Some(token){return Err(fail("쪽 본문이 바뀌었습니다."));}
++        let si=p["section"].as_u64().unwrap() as usize;let first=p["firstParagraph"].as_u64().unwrap() as usize;let count=p["paragraphCount"].as_u64().unwrap() as usize;
++        no_outline(self,si,first,count)?;settings(self,si)?;
++        if self.document.provenance.hwp3_lineage{return Err(fail("HWP3 계보 문서의 쪽 복사는 아직 지원하지 않습니다."));}
++        let data=self.hwpx_document_for_export(|original|{
++            let mut d=original.clone();let mut s=d.sections[si].clone();s.paragraphs=s.paragraphs[first..first+count].to_vec();s.raw_stream=None;s.raw_provenance=None;
++            let columns=original.sections[si].paragraphs.iter().flat_map(|p|&p.controls).find_map(|c|if let crate::model::control::Control::ColumnDef(col)=c{Some(col.clone())}else{None}).unwrap_or_else(||crate::model::page::ColumnDef{column_count:1,..Default::default()});
++            super::section_ops::install_definitions(&mut s.paragraphs[0],&s.section_def,columns);
++            d.sections=vec![s];d.preview=None;d.extra_streams.clear();d.hwpx_aux_entries.retain(|(path,_)|path==crate::model::document::HWP5_ORIGIN_HWPX_MARKER_PATH);
++            d.doc_properties=Default::default();d.doc_properties.section_count=1;d.doc_info.raw_stream=None;d.doc_info.raw_provenance=None;d.doc_info.raw_stream_dirty=true;d.doc_info.extra_records.clear();d.doc_info.memo_properties_xml=None;d.doc_info.hwpx_head_tail=None;d.doc_info.print_method=None;d.doc_info.memo_shape_count=0;
++            super::bin_data_prune::prune_unreferenced_bin_data(&mut d);
++            crate::serializer::serialize_hwpx(&d)
++        })?;
++        if data.len()>32*1024*1024{return Err(fail("쪽 복사 자료는 32MiB 이하입니다."));}
++        let copied=Self::from_bytes(&data)?;let check:serde_json::Value=serde_json::from_str(&copied.get_page_body_deletion_plan_native(0)?).map_err(|_|fail("복사 사본을 확인하지 못했습니다."))?;
++        if copied.page_count()!=1||check["supported"]!=true||check["texts"]!=p["texts"]||check["paragraphCount"]!=p["paragraphCount"]{return Err(fail("복사 사본의 본문이나 쪽 배치가 달라져 복사하지 않았습니다."));}
++        Ok(data)
++    }
++    pub fn paste_page_body_native(&mut self,page:u32,token:&str,data:&[u8])->Result<String,HwpError>{
++        if data.is_empty()||data.len()>32*1024*1024{return Err(fail("쪽 복사 자료는 비어 있지 않은 32MiB 이하입니다."));}
++        let target:serde_json::Value=serde_json::from_str(&self.get_page_body_deletion_plan_native(page)?).map_err(|_|fail("대상 쪽을 읽지 못했습니다."))?;
++        if target["supported"]!=true{return Err(fail(target["reason"].as_str().unwrap_or("미지원 대상 쪽")));}
++        if target["token"].as_str()!=Some(token){return Err(fail("대상 쪽 본문이 바뀌었습니다."));}
++        let si=target["section"].as_u64().unwrap() as usize;let at=(target["firstParagraph"].as_u64().unwrap()+target["paragraphCount"].as_u64().unwrap()) as usize;
++        let source=Self::from_bytes(data)?;if source.document.sections.len()!=1||source.page_count()!=1{return Err(fail("한 구역·한 쪽 본문 사본만 붙일 수 있습니다."));}
++        let content:serde_json::Value=serde_json::from_str(&source.get_page_body_deletion_plan_native(0)?).map_err(|_|fail("복사 본문을 확인하지 못했습니다."))?;
++        if content["supported"]!=true{return Err(fail("복사한 쪽은 완전한 일반 본문 문단이어야 합니다."));}
++        if settings(&source,0)?!=settings(self,si)?{return Err(fail("용지·쪽 설정이 다릅니다. 다른 설정의 쪽 붙이기는 아직 지원하지 않습니다."));}
++        no_outline(&source,0,0,source.document.sections[0].paragraphs.len())?;
++        let original=self.document.clone();let events=self.event_log.len();let pages=self.page_count();
++        let attempt=(||{
++            self.insert_paragraph_native(si,at)?;
++            self.insert_document_bytes_native(si,at,0,data)?;
++            let count=content["paragraphCount"].as_u64().unwrap() as usize;
++            let paragraphs=&mut self.document.sections[si].paragraphs;
++            for pi in [at,at+count]{if let Some(p)=paragraphs.get_mut(pi){p.column_type=ColumnBreakType::Page;p.raw_break_type=0x04;p.page_break_synthesized=false;p.invalidate_layout_inputs();}}
++            self.document.sections[si].raw_stream=None;self.document.doc_properties.raw_data=None;
++            self.rebuild_resolved_styles();for pi in at..self.document.sections[si].paragraphs.len(){self.document.sections[si].paragraphs[pi].line_segs.clear();self.reflow_paragraph(si,pi);}
++            let hwp3=self.document.layout_profile().hwp3_layout();crate::renderer::composer::recalculate_section_vpos(&mut self.document.sections[si].paragraphs,at,None,None,&self.styles,self.dpi,hwp3);self.rebuild_derived_state();
++            let pasted:serde_json::Value=serde_json::from_str(&self.get_page_body_deletion_plan_native(page+1)?).map_err(|_|fail("붙인 쪽을 확인하지 못했습니다."))?;
++            if self.page_count()!=pages+1||pasted["supported"]!=true||pasted["firstParagraph"]!=at||pasted["texts"]!=content["texts"]||pasted["paragraphCount"]!=content["paragraphCount"]{return Err(fail("붙인 본문이나 쪽 배치가 달라져 원문을 복원했습니다."));}
++            Ok(serde_json::json!({"ok":true,"sectionIdx":si,"paraIdx":at,"charOffset":0,"pageCount":self.page_count()}).to_string())
++        })();
++        if attempt.is_err(){self.document=original;self.event_log.truncate(events);self.rebuild_resolved_styles();self.rebuild_derived_state();}
++        attempt
++    }
++}
+--- a/src/document_core/commands/mod.rs
++++ b/src/document_core/commands/mod.rs
+@@ -16,6 +16,7 @@
+ mod master_pages;
+ mod line_numbers;
+ mod page_body_delete;
++mod page_body_copy;
+ mod html_import;
+ mod object_ops;
+ pub(crate) mod paragraph_block;
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1211,6 +1211,13 @@
+     pub fn page_body_deletion_plan(&self,page:u32)->Result<String,JsValue>{self.get_page_body_deletion_plan_native(page).map_err(|e|e.into())}
+     #[wasm_bindgen(js_name = deletePageBody)]
+     pub fn delete_page_body(&mut self,page:u32,token:&str)->Result<String,JsValue>{self.delete_page_body_native(page,token).map_err(|e|e.into())}
++
++    #[wasm_bindgen(js_name = copyPageBody)]
++    pub fn copy_page_body(&self,page:u32,token:&str)->Result<Vec<u8>,JsValue>{self.copy_page_body_native(page,token).map_err(|e|e.into())}
++    #[wasm_bindgen(js_name = pastePageBody)]
++    pub fn paste_page_body(&mut self,page:u32,token:&str,data:&[u8])->Result<String,JsValue>{self.paste_page_body_native(page,token,data).map_err(|e|e.into())}
++    #[wasm_bindgen(js_name = getPageBodyClipboardSettings)]
++    pub fn page_body_clipboard_settings(&self,section:usize)->Result<String,JsValue>{self.get_page_body_clipboard_settings_native(section).map_err(|e|e.into())}
+ 
+     #[wasm_bindgen(js_name = getSectionDef)]
+     pub fn get_section_def(&self, section_idx: u32) -> Result<String, JsValue> {

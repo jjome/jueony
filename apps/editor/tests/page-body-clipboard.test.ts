@@ -1,0 +1,6 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import vm from 'node:vm';
+import {validatePageBodyClipboard} from '../src/modules/document/public/index.ts';
+test('page clipboard owns a snapshot independent of source and each consumer',()=>{const bytes=new Uint8Array([1,2]),texts=['본문 😀'],c=validatePageBodyClipboard({version:1,bytes,texts});bytes[0]=8;texts[0]='수정';assert.equal(c.bytes[0],1);assert.deepEqual(c.texts,['본문 😀']);const consumer=validatePageBodyClipboard(c);consumer.bytes[0]=7;assert.equal(c.bytes[0],1);});
+test('page clipboard permits cross-frame Uint8Array and rejects malformed/unbounded payloads',()=>{const foreign=vm.runInNewContext('({version:1,bytes:new Uint8Array([1]),texts:["문서"]})');assert.equal(validatePageBodyClipboard(foreign).bytes[0],1);for(const bytes of [[],new Uint8Array(),new Uint16Array([1]),new Uint8Array(32*1024*1024+1)])assert.throws(()=>validatePageBodyClipboard({version:1,bytes,texts:['x']}));for(const texts of [[],[null],['x'.repeat(100001)],Array(1001).fill('')])assert.throws(()=>validatePageBodyClipboard({version:1,bytes:new Uint8Array([1]),texts}));assert.throws(()=>validatePageBodyClipboard({version:2,bytes:new Uint8Array([1]),texts:['x']}));});

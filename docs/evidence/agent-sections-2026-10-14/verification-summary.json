@@ -1,0 +1,116 @@
+{
+  "status": "PASS_SCOPED_AUTOMATED_CHECKS",
+  "verifiedAt": "2026-10-13T22:02:46.455Z",
+  "providerPassed": 52,
+  "unitPassed": 420,
+  "browserPassed": 298,
+  "nativePassed": 256,
+  "moduleCount": 9,
+  "moduleFiles": 231,
+  "customSourceSha256": "ec1d35536b0b61bd75d79878cc11eb71161f82fec31eb404aeadfbac69bd406c",
+  "buildScriptSha256": "8df671207273b6ae1e1c78b58e6c9e551299d4eb84619db8ca81c9be10b2a9f2",
+  "wasmSha256": "2c9be2d4945b747bf114d49c3012caf88d9e96bf22df6148b0f770bb88ebdfcf",
+  "engineSourceId": "5940ba94eca23794",
+  "buildApplicationCommit": "17046fc8f2c1a782252cf7e6a92bbdabe92a97b1",
+  "buildApplicationDirty": true,
+  "reports": [
+    {
+      "file": "browser/result.json",
+      "passed": 24,
+      "sha256": "5c6c9a8cd269e9676e63fbcab35a9325f160f61a96aaf8069edb572e2a48d612"
+    },
+    {
+      "file": "regression-parity/result.json",
+      "passed": 66,
+      "sha256": "0949c1d54365e84b7ae731d79a60b10e838b32ec3b75067966a5145a1c932eac"
+    },
+    {
+      "file": "regression-session/result.json",
+      "passed": 9,
+      "sha256": "150156cc59a091d09a41d5a14d800eefcbe03085f4d945a96351c4d9fdeedd5d"
+    },
+    {
+      "file": "basic-text/basic-text-browser.json",
+      "passed": 28,
+      "sha256": "b903d998ea9d1921d1f7fef56d2288643def1878cf61baf2f9b2b4dd51e9a565"
+    },
+    {
+      "file": "regression-agent/result.json",
+      "passed": 9,
+      "sha256": "9745620b1c81920d29a3a2c59a112b12c30fe78ac179e67d8b358dbb8b3b6eca"
+    },
+    {
+      "file": "regression-table/result.json",
+      "passed": 18,
+      "sha256": "97c75d01f8fdcd53f5331d56b1cc156639cb4ff861c526769bd1e19ec166bc9b"
+    },
+    {
+      "file": "image-browser/result.json",
+      "passed": 26,
+      "sha256": "44e4f4e27b8eea69227c91dd09e013c148041c3e3c71466cf50fe34275f9759c"
+    },
+    {
+      "file": "master-browser/result.json",
+      "passed": 17,
+      "sha256": "53cbfd0ef353b6657df2123500111c30e92820b6e52a0a62968c72a38872cc6e"
+    },
+    {
+      "file": "line-browser/result.json",
+      "passed": 12,
+      "sha256": "f8194aaf2337b222186d742ca5e44410f7df897f5909543128265a6bf2f8243c"
+    },
+    {
+      "file": "delete-browser/result.json",
+      "passed": 11,
+      "sha256": "8255db9237c30c286e8703131961dd4311033e2d8ed04a697360ec643806aa5e"
+    },
+    {
+      "file": "copy-browser/result.json",
+      "passed": 11,
+      "sha256": "8c815dd17a27f27f29fd137540085668801ba3a33c583a22648f15c4297bd676"
+    },
+    {
+      "file": "paper-browser/result.json",
+      "passed": 9,
+      "sha256": "1c7bdccac665868118f8166dc1b9cad8b626fec1aa25436376bc41600a8aea2e"
+    },
+    {
+      "file": "style-browser/result.json",
+      "passed": 10,
+      "sha256": "65b158f122feb59e75a71e6fa72b924d705c85f5ee2bdd749d53e06b39aef1fb"
+    },
+    {
+      "file": "image-paste-browser/result.json",
+      "passed": 17,
+      "sha256": "5d822fada3c9db1ab8581aba98d19b5d21e4b7c41c93471c1845dc09a620fa17"
+    },
+    {
+      "file": "empty-browser/result.json",
+      "passed": 11,
+      "sha256": "a617d50756c9c68a1792ccac7bde051421207acad60f53c9b79e622960d8af2e"
+    },
+    {
+      "file": "caret-browser/result.json",
+      "passed": 6,
+      "sha256": "171b8bd2d04016c1f16cf5cd236405b0646b9d7d763249376e8091f0efeb8c03"
+    },
+    {
+      "file": "section-browser/result.json",
+      "passed": 10,
+      "sha256": "2bc6f34127f9cfc5f763cc768dfe385d142d51385de60ae7d8e7e68003cc97b1"
+    },
+    {
+      "file": "bundle-compatibility/result.json",
+      "passed": 4,
+      "sha256": "94863f73c670179b5c5314c548dee30596e373f270682796e4cd1c2ec2c6c810"
+    }
+  ],
+  "limitations": [
+    "Actual Hancom GUI/layout comparison is deferred.",
+    "No paid LLM request: Agent tests use a deterministic local adapter.",
+    "Full Hangul feature parity remains incomplete; no percentage of completion is inferred from these scoped tests.",
+    "Unsupported source properties may be blocked by the stricter cell preservation guard.",
+    "Agent tools support section default tabs and bounded HWPX line numbering; per-paragraph tabs, binary HWP numbering, external MCP and automatic save remain unsupported.",
+    "Native HWPX file caret supports bounded single-section plain body only; multiple sections, nested stories, tabs/fields/objects and native Hancom verification remain deferred."
+  ]
+}

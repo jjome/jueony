@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-hwpx-caret-20261014/Start-Review.cmd)**로 실행한다(4240). 단일 구역 일반 본문의 HWPX 파일에 저장 직전 커서를 기록하고 로컬 복구 기록 없이 다시 연다. 인쇄·외부 설정을 유지하며 잘못된 위치와 미지원 목록을 검사한다. 기존 쪽 본문 복사·붙이기·삭제, 기본 쪽 모양·그림 배경 이식, 빈 구역 삭제도 포함한다. [지원 범위·검증·남은 제한](docs/60-hwpx-body-caret.md)을 확인한다. 다중 구역·표/중첩 목록의 파일 캐럿과 실제 한글 비교는 남는다. 이전 실행 창과 문서는 유지한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-agent-sections-20261014/Start-Review.cmd)**로 실행한다(4242). Agent가 구역별 기본 탭과 HWPX 기본 본문 줄 번호를 현재 문서에 적용한다. 변경 비교·요청 undo/redo·안전 저장과 후속 수정, 실패 복원·오래된 응답 거절을 검증했다. [지원 범위·검증·남은 제한](docs/61-agent-section-tools.md)을 확인한다. 기존 쪽 편집과 [단일 구역 HWPX 파일 커서](docs/60-hwpx-body-caret.md)도 포함한다. 개체·복잡한 표·필드·구역 생성/삭제의 Agent 도구와 실제 한글 비교는 남는다. 이전 실행 창과 문서는 유지한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

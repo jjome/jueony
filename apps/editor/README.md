@@ -4,6 +4,8 @@
 
 ## 실행
 
+2026-10-14 최신 Agent 검수본은 `build/jueony-agent-sections-20261014/Start-Review.cmd`(4242)다. 기본 탭과 HWPX 기본 본문 줄 번호를 공통 Agent 명령으로 연결했다. [61번 구현·검증](../../docs/61-agent-section-tools.md)을 따른다. 실제 유료 모델 품질과 한글 2024 비교는 별도이며 아래 실행본은 이전 이력이다.
+
 2026-10-14 최신 검수본은 `build/jueony-hwpx-caret-20261014/Start-Review.cmd`(4240)다. 단일 구역 일반 본문 HWPX의 파일 커서 저장/복원과 설정 보존을 보강했다. [60번 지원 범위·검증](../../docs/60-hwpx-body-caret.md)을 따른다. 다중 구역·표/중첩 목록의 파일 커서와 실제 한글 검수는 남는다. 아래 실행 묶음은 이전 이력이다.
 
 2026-10-13 최신 편집기 통합 검수본은 `build/jueony-pre-agent-20261013/Start-Review.cmd`(4203)다. 스타일·상태 복원·표 변환·셀 블록 A 자동 채우기·선택 개체 Ctrl+N,K·쪽 배경·통합 서식 도구 모음을 보강했다. [44번 결과](../../docs/44-editor-stages-result.md)에 최종 검사와 실제 한글 비교의 남은 범위를 기록한다. 아래 실행본은 이전 이력이며 기존 포트의 업무 저장소는 유지한다. 검수 파일은 새 묶음의 `review-documents/pre-agent/`에 있다.

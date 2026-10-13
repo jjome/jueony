@@ -37,3 +37,5 @@ settings.xml 전체를 재직렬화하지 않는다. CaretPosition의 시작 태
 다중 구역의 본문 목록, 표/글상자/머리말/각주 등 중첩 목록, 탭·필드·인라인 개체의 위치 대응, 복잡한 쪽 편집과 Agent 제어 확장이 남는다. 전체 문서화된 구현 범위는 완료되지 않았으며 자동 계속 작업을 유지한다. 고정 업스트림을 수정하지 않고 MIT/제삼자 고지를 유지한다.
 
 기능 커밋은 `01c427a`이며 최종 엔진은 `build/rhwp-engine/source-5940ba94eca23794/pkg`이다. WASM SHA-256은 `2c9be2d4945b747bf114d49c3012caf88d9e96bf22df6148b0f770bb88ebdfcf`, 앱 소스 SHA-256은 `a8eb730335f613d0db25d0ead8702eb4a76c3f83b8ad89a0270325db4668dba2`이다. 빌드는 직전 `98b477b`와 작업 중 소스를 기록하며 보고서는 실제 패치·앱·WASM 바이트 해시로 최종 구현을 대조한다. [실행 확인](evidence/hwpx-caret-2026-10-14/launch-check.json)은 제공 중인 메타데이터와 실제 WASM 바이트를 검사했다.
+
+후속: [61번 Agent 구역 도구](61-agent-section-tools.md)는 기본 탭과 HWPX 기본 본문 줄 번호를 공통 Agent 명령에 연결한다. 이 문서의 파일 캐럿 지원 범위와 실제 한글 비교의 남은 제한은 유지한다.

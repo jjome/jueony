@@ -6,7 +6,7 @@
 
 `set_section_tabs`는 기존 구역 하나의 기본 탭 간격을 0.1~9999pt로 바꾼다. HWP/HWPX 모두 지원하며, 문단의 개별 탭 목록을 새로 만들거나 수정하지 않는다. 문서 전체에 적용하려면 조회한 각 구역에 명령을 보낸다. 기존 수동 편집의 실측 계약과 같은 `pt × 200` 모델 값을 사용한다. 원본의 0은 수동 편집과 동일하게 기본 40pt로 읽으며 같은 값의 요청은 setter를 호출하지 않는다.
 
-`set_line_numbers`는 HWPX의 가로쓰기·한 단·일반 본문 구역에 기본 줄 번호를 설정한다. 조회 결과 `lineNumbers.editable`과 파일 형식을 검사한다. 쪽마다/구역마다 새 번호 또는 이어서 매기기, 시작 번호와 표시 간격 1~65535, 본문과의 간격 0~50mm를 받는다. 간격은 왼쪽 용지 여백 안에 있어야 한다. 기본 번호 글꼴은 기존 엔진의 8pt이며 문단의 번호 억제 설정을 임의로 해제하지 않는다.
+`set_line_numbers`는 최대 100구역 문서의 HWPX 가로쓰기·한 단·일반 본문 구역에 기본 줄 번호를 설정한다. 조회 결과 `lineNumbers.editable`과 파일 형식을 검사한다. 쪽마다/구역마다 새 번호 또는 이어서 매기기, 시작 번호와 표시 간격 1~65535, 본문과의 간격 0~50mm를 받는다. 간격은 왼쪽 용지 여백 안에 있어야 한다. 기본 번호 글꼴은 기존 엔진의 8pt이며 문단의 번호 억제 설정을 임의로 해제하지 않는다.
 
 ```json
 {
@@ -44,8 +44,10 @@ Agent 실패 복원 비교는 현재 파일 형식의 `recoveryBytes`를 사용�
 
 CLOVA HCX-005의 tool 응답과 HCX-007의 JSON 응답도 provider fixture 검사에 포함한다. 키는 합성 문자열을 서버 메모리에만 등록하며 사용자 키 저장소를 읽거나 수정하지 않는다. 검증 기록에 키/인증 헤더를 남기지 않는다. RAG·적용 전 재검토·취소·기존 반복 작업은 기존 회귀로 별도 검사한다.
 
-최종 전체 수치와 실제 앱/패치/WASM 해시는 [검증 요약](evidence/agent-sections-2026-10-14/verification-summary.json)을 따른다. 초기 브라우저 스크립트의 변경 비교 대화상자 ID 오류는 실제 `change-dialog` 경로로 바로잡았다. 첫 탭 검사에서는 구역에서 상속한 문단의 defaultTabSpacing도 바뀌므로 이 값의 예상 변경과 나머지 명시 서식 보존을 구분했다.
+최종 단위 420개·제공자/서버 52개·브라우저 298개(실행 묶음 호환 4개 포함)·실제 엔진 256개가 통과했다. TypeScript와 9개 모듈·231개 소스 경계도 통과했다. 최종 전체 수치와 실제 앱/패치/WASM 해시는 [검증 요약](evidence/agent-sections-2026-10-14/verification-summary.json)을 따른다. 초기 브라우저 스크립트의 변경 비교 대화상자 ID 오류는 실제 `change-dialog` 경로로 바로잡았다. 첫 탭 검사에서는 구역에서 상속한 문단의 defaultTabSpacing도 바뀌므로 이 값의 예상 변경과 나머지 명시 서식 보존을 구분했다.
 
 새 실행 묶음은 `build/jueony-agent-sections-20261014/Start-Review.cmd`, 같은 폴더의 Rust 실행 파일은 `JueonyEditor.exe`, 주소는 `http://127.0.0.1:4242/`다. 합성 검수 문서는 `review-documents/agent-sections/section-native`와 `section-browser`에 포함한다. 이전 서버·실행 창·사용자 문서를 유지한다.
 
 기본 탭과 HWPX 줄 번호의 내부 Agent 도구 연결을 완료하는 범위다. 전체 쪽 편집, 개체·복잡한 표·필드, 구역 생성/삭제의 Agent 도구, 외부 MCP, 기관 배포와 한글 2024 직접 비교는 남는다. 전체 문서화된 범위는 완료되지 않았으므로 자동 계속 작업을 유지한다.
+
+기능 커밋은 `a5830c0`이며 엔진은 이전 검증과 같은 `build/rhwp-engine/source-5940ba94eca23794/pkg`를 사용한다. WASM SHA-256은 `2c9be2d4945b747bf114d49c3012caf88d9e96bf22df6148b0f770bb88ebdfcf`, 최종 앱 소스 SHA-256은 `ec1d35536b0b61bd75d79878cc11eb71161f82fec31eb404aeadfbac69bd406c`이다. 빌드는 직전 `17046fc`와 작업 중 소스를 기록하며 실제 소스 해시로 구현을 대조한다. [실행 확인](evidence/agent-sections-2026-10-14/launch-check.json)은 제공 중인 메타데이터·WASM 바이트와 동봉한 wire schema/provider 안내의 바이트 해시를 확인했다.

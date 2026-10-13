@@ -31,3 +31,5 @@ export {validatePageBodyClipboard} from '../domain/page-body-clipboard.ts';
 export type {PageBodyClipboard} from '../domain/page-body-clipboard.ts';
 export {validatePageBodyPastePlan} from '../domain/page-body-paste-plan.ts';
 export type {PageBodyPastePlan} from '../domain/page-body-paste-plan.ts';
+export {validateEmptySectionRemovalPlan,sameEmptySectionRemovalRange} from '../domain/empty-section-removal.ts';
+export type {EmptySectionRemovalPlan} from '../domain/empty-section-removal.ts';

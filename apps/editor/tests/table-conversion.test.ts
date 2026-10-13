@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseTableText, joinTableText, tableTextDelimiter } from '../src/modules/document/public/table-conversion.ts';
+import { parseTableText, joinTableText, tableTextDelimiter, sliceCharacterRuns } from '../src/modules/document/public/table-conversion.ts';
 import { readFile } from 'node:fs/promises';
 import init, { HwpDocument } from '../node_modules/@rhwp/core/rhwp.js';
 import { readTextTablePlan, readTableTextPlan, executeTableConversion } from '../src/adapters/rhwp/table-conversion-native.ts';
@@ -23,6 +23,44 @@ test('literal conversion rejects uneven, too large or ambiguous cells rather tha
   assert.throws(() => joinTableText([['가,나']], 'comma'), /다른 구분자/);
   assert.throws(() => joinTableText([['가\n나']], 'tab'), /다른 구분자/);
   assert.throws(() => tableTextDelimiter('pipe'), /구분자/);
+});
+
+test('character runs are sliced in scalar coordinates with complete nonoverlapping coverage', () => {
+  const runs = [{ startOffset: 0, endOffset: 2, charShapeId: 0 }, { startOffset: 2, endOffset: 5, charShapeId: 3 }];
+  assert.deepEqual(sliceCharacterRuns(runs, 1, 4), [{ startOffset: 0, endOffset: 1, charShapeId: 0 }, { startOffset: 1, endOffset: 3, charShapeId: 3 }]);
+  assert.deepEqual(sliceCharacterRuns(runs, 3, 3), []);
+  assert.throws(() => sliceCharacterRuns([runs[1]], 0, 5), /빠지거나/);
+  assert.throws(() => sliceCharacterRuns([runs[0], { ...runs[1], startOffset: 1 }], 0, 5), /겹칩니다/);
+  assert.throws(() => sliceCharacterRuns(runs, 0, 6), /모두/);
+});
+
+test('mixed Unicode character formatting survives text to table and table to text in both formats', async () => {
+  await init({ module_or_path: await readFile(new URL('../node_modules/@rhwp/core/rhwp_bg.wasm', import.meta.url)) });
+  for (const ext of ['Hwp', 'Hwpx']) {
+    const doc: any = HwpDocument.createEmpty(); doc.createBlankDocument(); let reopened: any;
+    try {
+      doc.insertText(0, 0, 0, '가😀나\t\t끝글');
+      doc.applyCharFormat(0, 0, 1, 3, JSON.stringify({ bold: true, textColor: '#ff0000' }));
+      doc.applyCharFormat(0, 0, 3, 5, JSON.stringify({ italic: true }));
+      doc.applyCharFormat(0, 0, 6, 7, JSON.stringify({ underline: 'Bottom' }));
+      const before = [0, 1, 2, 5, 6].map(offset => JSON.parse(doc.getCharPropertiesAt(0, 0, offset)));
+      const plan = readTextTablePlan(doc, { anchor: { sectionIndex: 0, paragraphIndex: 0, charOffset: 0 }, focus: { sectionIndex: 0, paragraphIndex: 0, charOffset: 7 } }, 'tab');
+      executeTableConversion(doc, plan);
+      const table = JSON.parse(doc.getControls()).find((c: any) => c.ctrlId === 'tbl'), ref = { sec: 0, ppi: table.para, ci: table.controlIndex };
+      assert.equal(JSON.parse(doc.getCellCharPropertiesAt(0, ref.ppi, ref.ci, 0, 0, 0)).bold, false);
+      assert.equal(JSON.parse(doc.getCellCharPropertiesAt(0, ref.ppi, ref.ci, 0, 0, 1)).bold, true);
+      assert.equal(JSON.parse(doc.getCellCharPropertiesAt(0, ref.ppi, ref.ci, 1, 0, 0)).italic, true);
+      const savedTable: any = new HwpDocument(doc['export' + ext]());
+      try { assert.equal(JSON.parse(savedTable.getCellCharPropertiesAt(0, ref.ppi, ref.ci, 0, 0, 2)).textColor, '#ff0000'); }
+      finally { savedTable.free(); }
+      const inverse = readTableTextPlan(doc, ref, 'tab'); executeTableConversion(doc, inverse);
+      assert.equal(doc.getTextRange(0, 0, 0, 7), '가😀나\t\t끝글');
+      [0, 1, 2, 5, 6].forEach((offset, index) => assert.deepEqual(JSON.parse(doc.getCharPropertiesAt(0, 0, offset)), before[index]));
+      reopened = new HwpDocument(doc['export' + ext]());
+      assert.equal(JSON.parse(reopened.getCharPropertiesAt(0, 0, 1)).bold, true);
+      assert.equal(JSON.parse(reopened.getCharPropertiesAt(0, 0, 5)).bold, false);
+    } finally { reopened?.free(); doc.free(); }
+  }
 });
 
 test('native body conversion preserves surrounding paragraphs, cells, Unicode and row styles; stale plan is refused', async () => {

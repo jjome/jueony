@@ -6,7 +6,7 @@ export async function applyTableConversionPatches({ root }) {
   let source = (await readFile(path, 'utf8')).replace(/\r\n/g, '\n');
   const anchor = '  installDocumentInsertion(registry, input, eventBus);';
   if (source.split(anchor).length !== 2) throw new Error('표 문자열 변환 패치 기준 불일치');
-  source = "import { installTableConversion } from '../adapters/rhwp/table-conversion.ts';\nimport { installTableAutoFill } from '../adapters/rhwp/table-auto-fill.ts';\n" + source.replace(anchor, anchor + '\n  installTableConversion(registry, input, eventBus);\n  installTableAutoFill(registry, input, eventBus);');
+  source = "import { installTableConversion } from '../adapters/rhwp/table-conversion.ts';\nimport { installTableAutoFill } from '../adapters/rhwp/table-auto-fill.ts';\nimport { installTablePresets } from '../adapters/rhwp/table-presets.ts';\nimport { installParagraphSort } from '../adapters/rhwp/paragraph-sort.ts';\n" + source.replace(anchor, anchor + '\n  installTableConversion(registry, input, eventBus);\n  installTableAutoFill(registry, input, eventBus);\n  installTablePresets(registry, input, eventBus);\n  installParagraphSort(registry, input, eventBus);');
   await writeFile(path, source);
   const keyPath = join(root, 'src/jueony/shortcuts/keymap.ts');
   const keySource = (await readFile(keyPath, 'utf8')).replace(/\r\n/g, '\n');

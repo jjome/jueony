@@ -131,7 +131,8 @@ export function capturePreservationEvidence(value:NativeDocument):PreservationEv
   const result:Json[]=[];
   for(const list of lists){
    if(!list.isCell){unverified.push('글상자·캡션 안의 모든 글자 서식은 검사 범위 밖입니다. 텍스트와 컨트롤 속성은 별도 비교합니다.');continue;}
-   const cell:{list:Json;paragraphs:Json[]}={list,paragraphs:[]};
+   const location=address(list,0),cellIndex=integer(list.cellIndex);
+   const cell:{list:Json;properties:Json;paragraphs:Json[]}={list,properties:read(doc,'getCellPropertiesByPath',location.section,location.paragraph,JSON.stringify(location.path),cellIndex),paragraphs:[]};
    for(let p=0;p<integer(list.paraCount);p++){
     budget(++paragraphs,LIMITS.paragraphs);const a=address(list,p),path=JSON.stringify(a.path);
     const length=integer(read(doc,'getCellParagraphLengthByPath',a.section,a.paragraph,path));

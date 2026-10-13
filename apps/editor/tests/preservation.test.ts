@@ -107,6 +107,18 @@ test('image asset byte changes are blocked independently of matching text and co
  }finally{doc.free();}
 });
 
+test('actual cell border, fill, padding and geometry changes are detected even with identical text and runs',()=>{
+ const doc=blank();try{
+  const t=JSON.parse(doc.createTable(0,0,0,2,2));doc.insertTextInCell(0,t.paraIdx,t.controlIdx,0,0,0,'원문 유지');
+  const before=capturePreservationEvidence(doc);
+  doc.setCellProperties(0,t.paraIdx,t.controlIdx,0,JSON.stringify({fillType:'solid',fillColor:'#ff0000',paddingLeft:500}));
+  const after=capturePreservationEvidence(doc);assert.equal(before.values.text,after.values.text);
+  const report=comparePreservationEvidence(before,after,'hwpx',clean('hwpx'));
+  assert.equal(report.status,'blocked');assert.ok(report.issues.some(i=>i.path==='cells'));
+  const cell=(after.values.cells as any[])[0];assert.equal(cell.properties.fillColor,'#ff0000');assert.equal(cell.properties.paddingLeft,500);
+ }finally{doc.free();}
+});
+
 test('malformed and nonzero serializer reports cannot be interpreted as no loss',()=>{
  const doc=blank();try{
   const evidence=capturePreservationEvidence(doc);

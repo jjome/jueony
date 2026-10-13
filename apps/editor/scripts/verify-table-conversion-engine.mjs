@@ -5,6 +5,9 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readTextTablePlan, readTableTextPlan, executeTableConversion, preflightTableConversion } from '../src/adapters/rhwp/table-conversion-native.ts';
 import { readAutoFillPlan, executeAutoFill, preflightAutoFill } from '../src/adapters/rhwp/table-auto-fill-native.ts';
+import { readTablePresetPlan, executeTablePreset, preflightTablePreset } from '../src/adapters/rhwp/table-presets-native.ts';
+import { readParagraphSortPlan, executeParagraphSort, preflightParagraphSort } from '../src/adapters/rhwp/paragraph-sort-native.ts';
+import { tablePresets } from '../src/modules/document/public/table-presets.ts';
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 if (!process.env.JUEONY_ENGINE_PACKAGE) throw new Error('Set JUEONY_ENGINE_PACKAGE to the verified engine package');
@@ -23,6 +26,7 @@ for (const ext of ['hwp', 'hwpx']) {
       for (let p = 0; p < values.length; p++) { if (p) d.splitParagraph(0, p - 1, d.getParagraphLength(0, p - 1)); d.insertText(0, p, 0, values[p]); }
       d.applyCharFormat(0, 1, 0, d.getParagraphLength(0, 1), JSON.stringify({ bold: true, textColor: '#ff0000' }));
       d.applyParaFormat(0, 2, JSON.stringify({ alignment: 'center', spacingBefore: 283 }));
+      d.applyCharFormat(0, 2, 1, 2, JSON.stringify({ italic: true, textColor: '#0000ff' }));
       const plan = readTextTablePlan(d, { anchor: { sectionIndex: 0, paragraphIndex: 1, charOffset: 0 }, focus: { sectionIndex: 0, paragraphIndex: 4, charOffset: 0 } }, 'tab');
       const bridge = { fileName: 'converted.' + ext, borrowDocumentHandle: () => d, getWasmModuleExports: () => ({ HwpDocument }) };
       const before = hash(d.exportHwpx()); preflightTableConversion(bridge, plan); assert.equal(hash(d.exportHwpx()), before, 'scratch probe must not dirty the live document');
@@ -41,6 +45,7 @@ for (const ext of ['hwp', 'hwpx']) {
       const returned = d[ext === 'hwp' ? 'exportHwp' : 'exportHwpx'](); await writeFile(resolve(out, `table-converted-to-text.${ext}`), returned);
       converted = new HwpDocument(returned); assert.deepEqual(body(converted), values);
       assert.equal(parse(converted.getControls()).some(c => c.ctrlId === 'tbl'), false);
+      assert.equal(parse(converted.getCharPropertiesAt(0, 2, 1)).italic, true); assert.equal(parse(converted.getCharPropertiesAt(0, 2, 0)).italic, false);
     } finally { converted?.free(); reopened?.free(); d.free(); }
   });
 }
@@ -75,5 +80,35 @@ for (const ext of ['hwp', 'hwpx']) await test(`${ext}: selected integer series p
     assert.throws(() => executeAutoFill(d, plan), /바뀌었습니다/);
   } finally { reopened?.free(); d.free(); }
 });
-await writeFile(resolve(out, 'result.json'), JSON.stringify({ results, failures, engine: JSON.parse(await readFile(resolve(pkg, 'jueony-engine-build.json'), 'utf8')), note: 'Native WASM synthetic conversion tests, including scratch export-preservation checks and saved HWP/HWPX reopen. No native Hancom or UI comparison.' }, null, 2));
+for (const ext of ['hwp', 'hwpx']) {
+  await test(`${ext}: table gallery on a fresh production document, four presets and mixed text preservation`, async () => {
+    const d = fresh();
+    try {
+      const t = parse(d.createTable(0, 0, 0, 3, 2)), target = { sec: 0, ppi: t.paraIdx, ci: t.controlIdx };
+      d.insertTextInCell(0, target.ppi, target.ci, 0, 0, 0, '내용😀'); d.applyCharFormatInCell(0, target.ppi, target.ci, 0, 0, 2, 3, JSON.stringify({ italic: true }));
+      d.setCellProperties(0, target.ppi, target.ci, 1, JSON.stringify({ diagonalSlash: 7, diagonalLine: 1 }));
+      const bridge = { fileName: 'gallery.' + ext, borrowDocumentHandle: () => d, getWasmModuleExports: () => ({ HwpDocument }) };
+      for (const preset of tablePresets) {
+        const plan = readTablePresetPlan(d, target, preset.id, true), before = hash(d.exportHwpx()); preflightTablePreset(bridge, plan); assert.equal(hash(d.exportHwpx()), before);
+        executeTablePreset(d, plan); const bytes = d[ext === 'hwp' ? 'exportHwp' : 'exportHwpx'](); await writeFile(resolve(out, `table-gallery-${preset.id}.${ext}`), bytes);
+        const reopened = new HwpDocument(bytes);
+        try { assert.equal(reopened.getTextInCell(0, target.ppi, target.ci, 0, 0, 0, 3), '내용😀'); assert.equal(parse(reopened.getCellCharPropertiesAt(0, target.ppi, target.ci, 0, 0, 2)).italic, true); assert.equal(parse(reopened.getCellProperties(0, target.ppi, target.ci, 1)).diagonalSlash, 7); }
+        finally { reopened.free(); }
+      }
+    } finally { d.free(); }
+  });
+  await test(`${ext}: exact numeric paragraph sort preserves mixed formatting and title/neighbor paragraphs`, async () => {
+    const d = fresh();
+    try {
+      const rows = ['앞', '이름\t점수', '가😀\t9007199254740993', '나\t9007199254740992', '다\t-0.2', '뒤']; rows.forEach((text, p) => { if (p) d.splitParagraph(0, p - 1, d.getParagraphLength(0, p - 1)); d.insertText(0, p, 0, text); });
+      d.applyCharFormat(0, 2, 1, 2, JSON.stringify({ bold: true, textColor: '#ff0000' }));
+      const selection = { anchor: { sectionIndex: 0, paragraphIndex: 1, charOffset: 0 }, focus: { sectionIndex: 0, paragraphIndex: 5, charOffset: 0 } }, options = { mode: 'number', descending: false, keepFirst: true, column: 2 };
+      const plan = readParagraphSortPlan(d, selection, options), before = hash(d.exportHwpx()); preflightParagraphSort({ fileName: 'sort.' + ext, borrowDocumentHandle: () => d, getWasmModuleExports: () => ({ HwpDocument }) }, plan); assert.equal(hash(d.exportHwpx()), before);
+      executeParagraphSort(d, plan); assert.deepEqual(body(d), [rows[0], rows[1], rows[4], rows[3], rows[2], rows[5]]);
+      const bytes = d[ext === 'hwp' ? 'exportHwp' : 'exportHwpx'](); await writeFile(resolve(out, `paragraph-sort.${ext}`), bytes); const reopened = new HwpDocument(bytes);
+      try { assert.equal(parse(reopened.getCharPropertiesAt(0, 4, 1)).bold, true); } finally { reopened.free(); }
+    } finally { d.free(); }
+  });
+}
+await writeFile(resolve(out, 'result.json'), JSON.stringify({ results, failures, engine: JSON.parse(await readFile(resolve(pkg, 'jueony-engine-build.json'), 'utf8')), note: 'Native WASM conversion, table gallery and paragraph sort tests, including scratch export-preservation checks and saved HWP/HWPX reopen. No native Hancom or UI comparison.' }, null, 2));
 if (failures.length) process.exitCode = 1;

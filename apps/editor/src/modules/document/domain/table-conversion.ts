@@ -2,6 +2,26 @@ export const tableTextSeparators = ['tab', 'comma', 'semicolon'] as const;
 export type TableTextSeparator = typeof tableTextSeparators[number];
 export const tableConversionLimits = { rows: 1000, columns: 100, cells: 1000, characters: 100000, cellCharacters: 4000 } as const;
 
+export type CharacterRun = { startOffset: number; endOffset: number; charShapeId: number };
+
+/** Scalar offsets match the engine (not UTF-16 offsets). Require complete coverage. */
+export function sliceCharacterRuns(runs: readonly CharacterRun[], start: number, end: number): CharacterRun[] {
+  if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start < 0 || end < start) throw new Error('글자 서식 범위가 올바르지 않습니다.');
+  const result: CharacterRun[] = []; let offset = start;
+  for (const run of runs) {
+    if (![run.startOffset, run.endOffset, run.charShapeId].every(v => Number.isSafeInteger(v) && v >= 0) || run.endOffset <= run.startOffset) throw new Error('원문 글자 서식이 올바르지 않습니다.');
+    const first = Math.max(start, run.startOffset), last = Math.min(end, run.endOffset);
+    if (last <= first) continue;
+    if (first !== offset) throw new Error('원문 글자 서식이 빠지거나 겹칩니다.');
+    const previous = result.at(-1);
+    if (previous?.charShapeId === run.charShapeId) previous.endOffset = last - start;
+    else result.push({ startOffset: first - start, endOffset: last - start, charShapeId: run.charShapeId });
+    offset = last;
+  }
+  if (offset !== end) throw new Error('원문 글자 서식을 모두 확인하지 못했습니다.');
+  return result;
+}
+
 export function tableTextDelimiter(value: unknown): string {
   if (value === 'tab') return '\t';
   if (value === 'comma') return ',';

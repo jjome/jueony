@@ -1,2 +1,2 @@
-export { tableTextSeparators, tableTextDelimiter, tableConversionLimits, parseTableText, joinTableText } from '../domain/table-conversion.ts';
-export type { TableTextSeparator } from '../domain/table-conversion.ts';
+export { tableTextSeparators, tableTextDelimiter, tableConversionLimits, parseTableText, joinTableText, sliceCharacterRuns } from '../domain/table-conversion.ts';
+export type { TableTextSeparator, CharacterRun } from '../domain/table-conversion.ts';

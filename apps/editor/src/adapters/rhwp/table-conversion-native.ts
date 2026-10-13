@@ -1,9 +1,9 @@
-import { parseTableText, joinTableText, tableTextDelimiter, tableConversionLimits } from '../../modules/document/public/table-conversion.ts';
-import type { TableTextSeparator } from '../../modules/document/public/table-conversion.ts';
+import { parseTableText, joinTableText, tableTextDelimiter, tableConversionLimits, sliceCharacterRuns } from '../../modules/document/public/table-conversion.ts';
+import type { TableTextSeparator, CharacterRun } from '../../modules/document/public/table-conversion.ts';
 import { verifyPreservedExport } from './preservation.ts';
 
 type Position = { sectionIndex: number; paragraphIndex: number; charOffset: number; parentParaIndex?: number; cellPath?: unknown[]; isTextBox?: boolean };
-type Format = { charShape: number; paraShape: number; style: number };
+type Format = { charShape: number; paraShape: number; style: number; runs: CharacterRun[] };
 export type TextTablePlan = { kind: 'text-to-table'; section: number; first: number; last: number; texts: string[]; rows: string[][]; formats: Format[]; separator: TableTextSeparator };
 export type TableTextPlan = { kind: 'table-to-text'; section: number; paragraph: number; control: number; rows: string[][]; texts: string[]; formats: Format[][]; separator: TableTextSeparator };
 export type TableConversionPlan = TextTablePlan | TableTextPlan;
@@ -22,7 +22,6 @@ function format(doc: any, section: number, paragraph: number, cell?: { control: 
   const count = cell ? doc.getCellParagraphLength(...args) : doc.getParagraphLength(...args);
   const runs = cell ? parsed(doc.getCharShapeRunsInCellByPath(section, paragraph, JSON.stringify([{ controlIndex: cell.control, cellIndex: cell.index, cellParaIndex: 0 }]), 0, count))
     : parsed(doc.getCharShapeRuns(section, paragraph, 0, count));
-  if (new Set(runs.map((run: any) => run.charShapeId)).size > 1) throw new Error('혼합 글자 서식 문단은 아직 변환할 수 없습니다.');
   const charShape = parsed(doc[cell ? 'getCellCharPropertiesAt' : 'getCharPropertiesAt'](...args, 0)).charShapeId;
   const paragraphProperties = parsed(doc[cell ? 'getCellParaPropertiesAt' : 'getParaPropertiesAt'](...args));
   // Automatic labels are not returned by getTextRange/getTextInCell. Moving
@@ -31,14 +30,14 @@ function format(doc: any, section: number, paragraph: number, cell?: { control: 
   const paraShape = paragraphProperties.paraShapeId;
   const style = parsed(doc[cell ? 'getCellStyleAt' : 'getStyleAt'](...args)).id;
   if (![charShape, paraShape, style].every(integer)) throw new Error('원문 글자·문단·스타일 서식을 확인하지 못했습니다.');
-  return { charShape, paraShape, style };
+  return { charShape, paraShape, style, runs: count ? sliceCharacterRuns(runs, 0, count) : [] };
 }
 function address(doc: any, section: number, paragraph: number) {
   if (!integer(section) || !integer(paragraph) || section >= doc.getSectionCount() || paragraph >= doc.getParagraphCount(section)) throw new Error('문서의 대상 위치가 유효하지 않습니다.');
 }
 
 /** Whole body paragraphs only; an end at the following paragraph's start excludes that paragraph. */
-export function readTextTablePlan(value: any, selection: { anchor: Position; focus: Position }, separator: TableTextSeparator): TextTablePlan {
+export function readBodyParagraphs(value: any, selection: { anchor: Position; focus: Position }): Omit<TextTablePlan, 'kind' | 'rows' | 'separator'> {
   const doc = native(value);
   if (!selection?.anchor || !selection.focus) throw new Error('변환할 본문 문단 전체를 먼저 선택하세요.');
   let { anchor: start, focus: end } = selection;
@@ -64,7 +63,12 @@ export function readTextTablePlan(value: any, selection: { anchor: Position; foc
     if (!integer(count) || (characters += count) > tableConversionLimits.characters) throw new Error('변환할 글자가 100,000자를 넘습니다.');
     texts.push(doc.getTextRange(section, paragraph, 0, count)); formats.push(format(doc, section, paragraph));
   }
-  return { kind: 'text-to-table', section, first, last, texts, rows: parseTableText(texts, separator), formats, separator };
+  return { section, first, last, texts, formats };
+}
+
+export function readTextTablePlan(value: any, selection: { anchor: Position; focus: Position }, separator: TableTextSeparator): TextTablePlan {
+  const body = readBodyParagraphs(value, selection);
+  return { ...body, kind: 'text-to-table', rows: parseTableText(body.texts, separator), separator };
 }
 
 /** Isolated, flat, unmerged, unprotected tables with one plain paragraph per cell. */
@@ -114,14 +118,23 @@ export function executeTableConversion(value: any, plan: TableConversionPlan): P
       || doc.getParagraphLength(plan.section, plan.first + 1) !== 0
       || rootControls(doc, plan.section, plan.first + 1).length) throw new Error('표 생성 후 새 빈 문단의 위치가 예상과 다릅니다.');
     checked(doc.deleteParagraph(plan.section, plan.first + 1));
-    plan.rows.forEach((row, r) => row.forEach((text, c) => {
+    plan.rows.forEach((row, r) => { let offset = 0; row.forEach((text, c) => {
       const args = [plan.section, result.paraIdx, result.controlIdx, r * row.length + c, 0], f = plan.formats[r];
       checked(doc.applyCellStyle(...args, f.style)); checked(doc.setCellParaShapeId(...args, f.paraShape));
       if (text) checked(doc.insertTextInCell(...args, 0, text));
-      checked(doc.setCharShapeIdInCell(...args, 0, length(text), f.charShape));
-    }));
+      const count = length(text), runs = sliceCharacterRuns(f.runs, offset, offset + count);
+      // Empty cells inherit the original separator/insertion position, not the first run.
+      const emptyShape = f.runs.find(run => run.startOffset <= offset && run.endOffset > offset)?.charShapeId ?? f.runs.at(-1)?.charShapeId ?? f.charShape;
+      if (count) checked(doc.setCharShapeRunsInCellByPath(plan.section, result.paraIdx, JSON.stringify([{ controlIndex: result.controlIdx, cellIndex: r * row.length + c, cellParaIndex: 0 }]), 0, count, JSON.stringify(runs)));
+      else checked(doc.setCharShapeIdInCell(...args, 0, 0, emptyShape));
+      offset += count + (c < row.length - 1 ? length(tableTextDelimiter(plan.separator)) : 0);
+    }); });
     const actual = readTableTextPlan(doc, { sec: plan.section, ppi: result.paraIdx, ci: result.controlIdx }, plan.separator);
     if (JSON.stringify(actual.rows) !== JSON.stringify(plan.rows)) throw new Error('생성한 표의 문자열이 원문과 다릅니다.');
+    plan.rows.forEach((row, r) => { let offset = 0; row.forEach((text, c) => {
+      if (length(text) && JSON.stringify(actual.formats[r][c].runs) !== JSON.stringify(sliceCharacterRuns(plan.formats[r].runs, offset, offset + length(text)))) throw new Error('표 변환 중 글자 서식이 바뀌었습니다.');
+      offset += length(text) + (c < row.length - 1 ? length(tableTextDelimiter(plan.separator)) : 0);
+    }); });
     return { sectionIndex: plan.section, paragraphIndex: plan.first, charOffset: 0 };
   }
   checked(doc.deleteTableControl(plan.section, plan.paragraph, plan.control));
@@ -135,9 +148,11 @@ export function executeTableConversion(value: any, plan: TableConversionPlan): P
     else checked(doc.setCharShapeId(plan.section, paragraph, 0, 0, plan.formats[r][0].charShape));
     let offset = 0;
     plan.rows[r].forEach((cell, c) => {
-      const count = length(cell) + (c < plan.rows[r].length - 1 ? length(delimiter) : 0);
-      if (count) checked(doc.setCharShapeId(plan.section, paragraph, offset, offset + count, plan.formats[r][c].charShape));
+      const count = length(cell), f = plan.formats[r][c];
+      if (count) checked(doc.setCharShapeRuns(plan.section, paragraph, offset, offset + count, JSON.stringify(f.runs.map(run => ({ ...run, startOffset: run.startOffset + offset, endOffset: run.endOffset + offset })))));
       offset += count;
+      // A new separator takes the preceding cell's final character/insertion style.
+      if (c < plan.rows[r].length - 1) { checked(doc.setCharShapeId(plan.section, paragraph, offset, offset + length(delimiter), f.runs.at(-1)?.charShapeId ?? f.charShape)); offset += length(delimiter); }
     });
     if (doc.getTextRange(plan.section, paragraph, 0, doc.getParagraphLength(plan.section, paragraph)) !== text) throw new Error('표를 문자열로 바꾼 결과가 원문과 다릅니다.');
   });

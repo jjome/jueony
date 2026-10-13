@@ -32,6 +32,7 @@ async function open(ext) {
   const text = ['앞 문단', '이름\t나이', '김😀\t30', '뒤 문단'];
   for (let p = 0; p < text.length; p++) { if (p) doc.splitParagraph(0, p - 1, doc.getParagraphLength(0, p - 1)); doc.insertText(0, p, 0, text[p]); }
   doc.applyCharFormat(0, 1, 0, doc.getParagraphLength(0, 1), JSON.stringify({ bold: true }));
+  doc.applyCharFormat(0, 2, 1, 2, JSON.stringify({ italic: true, textColor: '#0000ff' }));
   const bytes = [...doc[ext === 'hwp' ? 'exportHwp' : 'exportHwpx']()]; doc.free();
   const frame = await services(); await frame.evaluate(async (bytes, ext) => {
     const root = await navigator.storage.getDirectory(), handle = await root.getFileHandle(`conversion.${ext}`, { create: true }), writer = await handle.createWritable(); await writer.write(new Uint8Array(bytes)); await writer.close();
@@ -67,14 +68,14 @@ try {
     await execute('edit:undo'); assert.deepEqual((await snapshot()).nodes.map(n => n.text), text); assert.equal((await snapshot()).structure.tables.length, 0);
     await execute('edit:redo'); changed = await snapshot(); assert.equal(changed.structure.tables.length, 1);
     const saved = await save(`browser-text-to-table.${ext}`), native = new HwpDocument(new Uint8Array(saved));
-    try { assert.equal(JSON.parse(native.getTableDimensions(0, 1, changed.structure.tables[0].control)).cellCount, 4); assert.equal(native.getTextFileUnicode().includes('김😀'), true); }
+    try { assert.equal(JSON.parse(native.getTableDimensions(0, 1, changed.structure.tables[0].control)).cellCount, 4); assert.equal(native.getTextFileUnicode().includes('김😀'), true); assert.equal(JSON.parse(native.getCellCharPropertiesAt(0, 1, changed.structure.tables[0].control, 2, 0, 1)).italic, true); }
     finally { native.free(); }
     await frame.evaluate(() => { const s = window.__tableServices, t = window.jueonyEditor.snapshot().structure.tables[0], ih = s.getInputHandler(); ih.cursor.enterTableObjectSelectionDirect(t.section, t.paragraph, t.control); ih.updateCaret(); ih.focus(); s.eventBus.emit('table-object-selection-changed', true); s.eventBus.emit('command-state-changed'); });
     await execute('table:table-to-text'); await frame.waitForSelector('[data-jueony-table-conversion="table-to-text"]'); await confirm(frame);
     assert.deepEqual((await snapshot()).nodes.map(n => n.text), text); assert.equal((await snapshot()).structure.tables.length, 0);
     await execute('edit:undo'); assert.equal((await snapshot()).structure.tables.length, 1); await execute('edit:redo'); assert.deepEqual((await snapshot()).nodes.map(n => n.text), text);
     const returned = await save(`browser-table-to-text.${ext}`), reopened = new HwpDocument(new Uint8Array(returned));
-    try { assert.deepEqual(Array.from({ length: reopened.getParagraphCount(0) }, (_, p) => reopened.getTextRange(0, p, 0, reopened.getParagraphLength(0, p))), text); assert.equal(JSON.parse(reopened.getCharPropertiesAt(0, 1, 0)).bold, true); }
+    try { assert.deepEqual(Array.from({ length: reopened.getParagraphCount(0) }, (_, p) => reopened.getTextRange(0, p, 0, reopened.getParagraphLength(0, p))), text); assert.equal(JSON.parse(reopened.getCharPropertiesAt(0, 1, 0)).bold, true); assert.equal(JSON.parse(reopened.getCharPropertiesAt(0, 2, 1)).italic, true); }
     finally { reopened.free(); }
   });
   await scenario('cancel and concurrently changed document refuse conversion without applying old selected text', async () => {
@@ -119,6 +120,27 @@ try {
     try { assert.equal(reopened.getTextInCell(0, t.paraIdx, t.controlIdx, 6, 0, 0, 3), '005'); assert.equal(JSON.parse(reopened.getCellCharPropertiesAt(0, t.paraIdx, t.controlIdx, 6, 0, 0)).bold, true); }
     finally { reopened.free(); }
   });
+  for (const ext of ['hwp', 'hwpx']) {
+    await scenario(`${ext}: real table preset dialog, cancel, one undo/redo and guarded save of mixed text`, async () => {
+      const { frame } = await open(ext); await execute('table:text-to-table'); await confirm(frame);
+      await frame.evaluate(() => { const s = window.__tableServices, t = window.jueonyEditor.snapshot().structure.tables[0], ih = s.getInputHandler(); ih.cursor.enterTableObjectSelectionDirect(t.section, t.paragraph, t.control); ih.updateCaret(); ih.focus(); s.eventBus.emit('table-object-selection-changed', true); s.eventBus.emit('command-state-changed'); });
+      const before = await snapshot(); await execute('table:basic-presets'); await frame.waitForSelector('[data-jueony-table-presets]'); await page.keyboard.press('Escape'); assert.equal((await snapshot()).revision, before.revision);
+      await execute('table:basic-presets'); await frame.select('[aria-label="표 모양"]', 'blue'); await frame.click('.modal-overlay .dialog-btn-primary'); await frame.waitForSelector('[data-jueony-table-presets]', { hidden: true });
+      const after = await snapshot(); assert.deepEqual(after.structure.tables[0].cells.map(c => c.text), before.structure.tables[0].cells.map(c => c.text)); assert.equal(after.structure.tables[0].cells[0].properties.fillColor, '#dceaf7');
+      assert.equal(await frame.evaluate(() => window.__tableServices.getInputHandler().history.peekUndoTop().type), 'snapshot:jueonyTablePreset'); await execute('edit:undo'); assert.deepEqual((await snapshot()).structure, before.structure); await execute('edit:redo');
+      const bytes = await save('browser-gallery.' + ext), reopened = new HwpDocument(new Uint8Array(bytes)), table = after.structure.tables[0];
+      try { assert.equal(JSON.parse(reopened.getCellProperties(table.section, table.paragraph, table.control, 0)).fillColor, '#dceaf7'); assert.equal(JSON.parse(reopened.getCellCharPropertiesAt(table.section, table.paragraph, table.control, 2, 0, 1)).italic, true); } finally { reopened.free(); }
+    });
+    await scenario(`${ext}: real numeric paragraph sort dialog keeps title and format, undo/redo and save`, async () => {
+      const doc = HwpDocument.createEmpty(); doc.createBlankDocument(); const texts = ['앞', '이름\t점수', '가😀\t20', '나\t3', '다\t-2', '뒤']; texts.forEach((text, p) => { if (p) doc.splitParagraph(0, p - 1, doc.getParagraphLength(0, p - 1)); doc.insertText(0, p, 0, text); }); doc.applyCharFormat(0, 2, 1, 2, JSON.stringify({ bold: true, textColor: '#ff0000' }));
+      const bytes = [...doc[ext === 'hwp' ? 'exportHwp' : 'exportHwpx']()]; doc.free(); const frame = await services();
+      await frame.evaluate(async (bytes, ext) => { const root = await navigator.storage.getDirectory(), handle = await root.getFileHandle('sort.' + ext, { create: true }), writer = await handle.createWritable(); await writer.write(new Uint8Array(bytes)); await writer.close(); await window.jueonyEditor.open(new Uint8Array(bytes), 'sort.' + ext, handle, false); const s = window.__tableServices, ih = s.getInputHandler(); ih.cursor.selectRange({ sectionIndex: 0, paragraphIndex: 1, charOffset: 0 }, { sectionIndex: 0, paragraphIndex: 5, charOffset: 0 }); ih.updateCaret(); ih.focus(); s.eventBus.emit('command-state-changed'); }, bytes, ext);
+      const before = await snapshot(); await execute('edit:sort-paragraphs'); await frame.select('[aria-label="정렬 종류"]', 'number'); await frame.$eval('[aria-label="정렬 기준 탭 열"]', e => { e.value = '2'; e.dispatchEvent(new Event('change')); }); await frame.$$eval('[data-jueony-paragraph-sort] input[type=checkbox]', inputs => { inputs[1].checked = true; inputs[1].dispatchEvent(new Event('change')); }); await frame.click('.modal-overlay .dialog-btn-primary'); await frame.waitForSelector('[data-jueony-paragraph-sort]', { hidden: true });
+      const expected = [texts[0], texts[1], texts[4], texts[3], texts[2], texts[5]]; assert.deepEqual((await snapshot()).nodes.map(n => n.text), expected); assert.equal(await frame.evaluate(() => window.__tableServices.getInputHandler().history.peekUndoTop().type), 'snapshot:jueonyParagraphSort');
+      await execute('edit:undo'); assert.deepEqual((await snapshot()).nodes.map(n => n.text), before.nodes.map(n => n.text)); await execute('edit:redo'); assert.deepEqual((await snapshot()).nodes.map(n => n.text), expected);
+      const saved = await save('browser-sort.' + ext), reopened = new HwpDocument(new Uint8Array(saved)); try { assert.equal(JSON.parse(reopened.getCharPropertiesAt(0, 4, 1)).bold, true); assert.equal(JSON.parse(reopened.getCharPropertiesAt(0, 4, 1)).textColor, '#ff0000'); } finally { reopened.free(); }
+    });
+  }
   if (pageErrors.length) failures.push({ name: 'page errors', errors: pageErrors }); if (consoleErrors.length) failures.push({ name: 'console errors', errors: consoleErrors }); if (externalRequests.length) failures.push({ name: 'offline asset boundary', externalRequests });
   await page.screenshot({ path: resolve(out, 'conversion.png') });
   await writeFile(resolve(out, 'result.json'), JSON.stringify({ results, failures, pageErrors, consoleErrors, externalRequests, build: await page.evaluate(() => fetch('/build-evidence.json').then(r => r.json())), note: 'Isolated headless Edge profile. Synthetic test extension positions actual cursor/selection; production dialogs/commands/history/save used. No paid model or native Hancom comparison.' }, null, 2)); if (failures.length) process.exitCode = 1;

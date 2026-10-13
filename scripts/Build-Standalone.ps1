@@ -34,7 +34,7 @@ if (Test-Path -LiteralPath (Join-Path $projectRoot 'docs/44-editor-stages-result
 if (Test-Path -LiteralPath (Join-Path $projectRoot 'docs/45-rag-evaluation-corpus.md')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/45-rag-evaluation-corpus.md') -Destination $output -Force
 }
-foreach ($guide in @('46-hangul-implementation-status.md','47-remaining-editor-implementation.md','48-advanced-editor-continuation.md')) {
+foreach ($guide in @('46-hangul-implementation-status.md','47-remaining-editor-implementation.md','48-advanced-editor-continuation.md','49-page-border-inclusion-and-scope.md')) {
     if (Test-Path -LiteralPath (Join-Path $projectRoot ('docs/' + $guide))) { Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination $output -Force }
 }
 foreach ($guide in @('30-layered-modular-refactor-plan.md','31-facade-contracts.md','32-modular-refactor-result.md','33-editor-parity-features-result.md','34-sections-tabs-result.md','35-section-boundary-merge-result.md','36-native-section-comparison.md','37-basic-editing-state-result.md','38-paragraph-selection-state-result.md','39-native-dialog-investigation.md','40-basic-navigation-calendar-result.md','41-pre-agent-editor-progress.md','refactor-work-plan.csv','hangul-2024-gap-checklist.csv')) {
@@ -109,6 +109,20 @@ if ($FrontendProfile -eq 'advanced-editor') {
         }
     }
     if (Test-Path -LiteralPath (Join-Path $advancedEvidence 'verification-summary.json')) { Copy-Item -LiteralPath (Join-Path $advancedEvidence 'verification-summary.json') -Destination $advancedReview -Force }
+}
+if ($FrontendProfile -eq 'page-inclusion') {
+    $pageEvidence = Join-Path $projectRoot 'docs/evidence/page-inclusion-2026-10-13'
+    $pageReview = Join-Path $reviewDocuments 'page-inclusion'
+    New-Item -ItemType Directory -Force $pageReview | Out-Null
+    foreach ($category in @('native','browser')) {
+        $source = Join-Path $pageEvidence $category
+        if (Test-Path -LiteralPath $source) {
+            $target = Join-Path $pageReview $category
+            New-Item -ItemType Directory -Force $target | Out-Null
+            Get-ChildItem -LiteralPath $source -File | Where-Object { $_.Extension -in @('.hwp','.hwpx','.json','.svg') } | Copy-Item -Destination $target -Force
+        }
+    }
+    if (Test-Path -LiteralPath (Join-Path $pageEvidence 'verification-summary.json')) { Copy-Item -LiteralPath (Join-Path $pageEvidence 'verification-summary.json') -Destination $pageReview -Force }
 }
 if (Test-Path -LiteralPath $ragCorpus) {
     $referenceExamples = Join-Path $output 'reference-examples'

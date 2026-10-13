@@ -1,0 +1,106 @@
+{
+  "results": [
+    "nested cell caret persists actual workspace restart and refuses changed nested content",
+    "nested cell backward range persists actual workspace restart and refuses changed nested content",
+    "nested F5 cell block persists actual restart with the correct table path and rejects changed outer evidence",
+    "embedded image object selection persists actual restart and rejects changed picture properties",
+    "header backwards selection persists target and body return across workspace restart",
+    "footer backwards selection persists target and body return across workspace restart",
+    "body footnote backwards selection persists exact note binding and rejects changed story",
+    "trusted Ctrl+Tab and Ctrl+Shift+Tab cycle document tabs, wrap and preserve each body cursor without editing",
+    "trusted table Ctrl+Tab inserts a literal tab and table hanging/modal contexts keep the current document tab"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "dialogs": [],
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@jueony/rhwp-engine-review@0.8.7",
+    "builtAt": "2026-10-13T14:12:29.288Z",
+    "engineWasmSha256": "c3476c2e208e587e22c9e048a68a4c27e179524969bc2699c34f7ee2c96eeb3b",
+    "engineBuild": {
+      "wasmSha256": "c3476c2e208e587e22c9e048a68a4c27e179524969bc2699c34f7ee2c96eeb3b",
+      "jsSha256": "b34cdaee302658eca747f8dffdb2af9a439fc76a1835cb9ffd71e0cb4e85f952",
+      "buildMode": "wsl-review-no-opt",
+      "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+      "sourceId": "7faba1e743412dab",
+      "patches": [
+        {
+          "name": "border-fill-identity.patch",
+          "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c"
+        },
+        {
+          "name": "default-tabs.patch",
+          "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+        },
+        {
+          "name": "document-insertion.patch",
+          "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+        },
+        {
+          "name": "merged-table-transpose.patch",
+          "sha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768"
+        },
+        {
+          "name": "note-query-json.patch",
+          "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562"
+        },
+        {
+          "name": "page-border-entries.patch",
+          "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f"
+        },
+        {
+          "name": "page-border-inclusion.patch",
+          "sha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e"
+        },
+        {
+          "name": "section-split.patch",
+          "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+        },
+        {
+          "name": "style-reference-deletion.patch",
+          "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+        },
+        {
+          "name": "style-reference-order.patch",
+          "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce"
+        },
+        {
+          "name": "style-shape-stories.patch",
+          "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af"
+        },
+        {
+          "name": "table-creation-consistency.patch",
+          "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+        }
+      ],
+      "builtAt": "2026-10-13T14:00:50.9896993Z",
+      "optimized": false
+    },
+    "buildScriptSha256": "8df671207273b6ae1e1c78b58e6c9e551299d4eb84619db8ca81c9be10b2a9f2",
+    "studioPatchSha256": "288d92712a0d79ac2366309f2bbbf5e36e4280ca9845003b9d7756e969a35533",
+    "featurePatchSha256": "ca3ae9e1f5c7075d0113b6a38cb905317ec51db8e0cfdb55f1dfb0e9e1e986b7",
+    "recoveryPatchSha256": "12dfbb56ca02e1642bb495a44e18cf0823da84864386211eeb8811916552f864",
+    "tabFeaturePatchSha256": "da0d7d0b9a0c529af8a4a9733bf239a1c4f6afcd99b8803f1237f1c57a90ceec",
+    "sectionBoundaryPatchSha256": "e2a5cee3330b67015a3ac8cc738cafe36966950d7a12fc48e1d0a7ffc2392b13",
+    "documentInsertionPatchSha256": "2941b880fe250f779c95ce7bbd9d54384b10dda5f1596f7c0343d44e0297d4ff",
+    "styleManagementPatchSha256": "792ad2629ba0d657fe0bc504fa0f3c55075c6b2c69ea0cb570954dad294ed55c",
+    "styleFlowPatchSha256": "11010768f738466f36731a71b6d596ecae4ba60c74132fd3ea088e4816a98974",
+    "tableConversionPatchSha256": "77b1afbf52aa073f5617feacbf84781b5976fdfe549f25e10dc1116603333fe9",
+    "pageBorderPatchSha256": "58f0dcfc452ff03b0cd275222f7cdd3145a6b0d94de78aa2e422317678800021",
+    "selectedObjectPropertiesPatchSha256": "3ff0eab7f38eece3ce098c33759d0e2bdce12fb3f44c8da417c81a1e02799279",
+    "formattingToolbarPatchSha256": "d75122ccc9459cf9fa46d065777231c5b83144393a1af93d20cffee8594c600f",
+    "documentTabCyclePatchSha256": "1c907daa1e91202f24c77827629ce66c9959cf12a6d1656d64f8942d106c79f8",
+    "keyboardContextPatchSha256": "0f85ceeaa4c2998908068ad2ba0aadf3bcf137749c6d49765bb293938a4cdd1f",
+    "documentSwapStatePatchSha256": "d4ae8194a8ff2446cfd2483b53356226197c7610cae6bebea38da1af670fb212",
+    "customSourceSha256": "e19a289355bb2937e6764104d5fa27e08872e3c8ad53784dbbec89646a173e8b",
+    "applicationSourceCommit": "6b103088c2284d8ab5e45a2eec5b3d33ce3aed5b",
+    "applicationSourceDirty": true,
+    "sourceBuild": true,
+    "note": "고정 rhwp 소스와 추적 패치를 직접 빌드한 검수용 WASM. 최적화 및 한컴 출력 비교 상태는 engineBuild와 검증 보고서 참조."
+  },
+  "note": "Headless Edge isolated profile; actual workspace IndexedDB/OPFS restart. Synthetic fixtures, test-only automation extension. No native Hancom parity assertion."
+}

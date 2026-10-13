@@ -10,13 +10,14 @@ test('page dialog patch follows pinned native controls and keeps unsupported leg
  const root=await mkdtemp(join(tmpdir(),'jueony-page-border-')),repo=fileURLToPath(new URL('../../../',import.meta.url));
  try{
   await mkdir(join(root,'src/ui'),{recursive:true});await mkdir(join(root,'src/core'),{recursive:true});await mkdir(join(root,'src/command/commands'),{recursive:true});
-  for(const file of ['ui/page-border-dialog.ts','ui/cell-border-bg-dialog.ts','command/commands/insert.ts','command/commands/table.ts','core/mutation-method-registry.ts'])await copyFile(join(repo,'upstream/rhwp-source/rhwp-studio/src',file),join(root,'src',file));
+  for(const file of ['ui/page-border-dialog.ts','ui/page-setup-dialog.ts','ui/cell-border-bg-dialog.ts','command/commands/insert.ts','command/commands/table.ts','core/mutation-method-registry.ts'])await copyFile(join(repo,'upstream/rhwp-source/rhwp-studio/src',file),join(root,'src',file));
   await applyManualFeaturePatches({root});await applyPageBorderPatches({root});
   const source=await readFile(join(root,'src/ui/page-border-dialog.ts'),'utf8');
   assert.match(source,/applyPageBorderDialog\(this\)/);assert.match(source,/firstOnly.disabled = !supportsPageBorderEntries/);
   assert.match(source,/createPageGradientControls\(this\)/);assert.match(source,/this.jueonyHeaderInside=this.checkbox/);
   assert.doesNotMatch(source,/const next: PageBorderFillSettings/);
   assert.match(await readFile(join(root,'src/core/mutation-method-registry.ts'),'utf8'),/'setPageBorderFillEntry'/);
+  assert.match(source,/createPageImageControls/);assert.match(await readFile(join(root,'src/ui/page-setup-dialog.ts'),'utf8'),/applyPageSetupDialog\(this,pageBodyViolation\)/);
   await assert.rejects(()=>applyPageBorderPatches({root}),/seam drift/);
  }finally{await rm(root,{recursive:true,force:true});}
 });

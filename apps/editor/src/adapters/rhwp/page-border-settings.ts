@@ -1,6 +1,7 @@
 import {defaultPageGradient,validatePageBorderSettings,samePageBorderSettings,pageSpacingFromInput} from '../../modules/document/public/index.ts';
 import type {PageBorderKind,PageBorderSettings} from '../../modules/document/public/index.ts';
 import {preflightDocumentEdit} from './edit-preflight.ts';
+import {supportsPageBackgroundImage,resolvePageImageDrafts,collectPageImageSettings,populatePageImageControls} from './page-background-image.ts';
 
 const parse=(value:any)=>typeof value==='string'?JSON.parse(value):value;
 const documentHandle=(wasm:any)=>wasm.borrowDocumentHandle?.()??wasm.doc??wasm;
@@ -22,7 +23,7 @@ export function writePageBorderSettings(wasm:any,section:number,kind:PageBorderK
   next.firstPageBorder=next.firstPageFill=next.applyPage==='firstOnly';
  }
  // Existing images are preserved by ID when only border/position options change.
- if(next.fillType==='image')delete (next as any).fillType;
+ if(next.fillType==='image'&&!supportsPageBackgroundImage(wasm))delete (next as any).fillType;
  const result=supportsPageBorderEntries(wasm)?parse(doc.setPageBorderFillEntry(section,kind,JSON.stringify(next))):
   kind==='both'&&next.applyPage!=='firstOnly'&&next.fillType!=='gradient'?parse(wasm.setPageBorderFill(section,next)):null;
  if(result?.ok!==true)throw new Error('쪽 테두리/배경을 적용하지 못했습니다.');
@@ -39,7 +40,7 @@ export function collectPageBorderSettings(dialog:any):PageBorderSettings {
  const scopeChanged=dialog.jueonyApplicationChanged||applyPage!==(current.applyPage??'all');
  const pattern=dialog.bgPatternSelect.value,originalPattern=Math.max(0,Number(current.patternType));
  const gradientChecked=dialog.jueonyGradientRadio?.checked===true;
- const fillType=gradientChecked?'gradient':dialog.bgColorRadio.checked?'solid':dialog.bgNoneRadio.checked?'none':current.fillType;
+ const fillType=dialog.jueonyImageRadio?.checked?'image':gradientChecked?'gradient':dialog.bgColorRadio.checked?'solid':dialog.bgNoneRadio.checked?'none':current.fillType;
  const next:PageBorderSettings={...current,kind:dialog.jueonyKind,applyPage,basis:dialog.basisPaper.checked?'paper':'page',
   ...Object.fromEntries(['Left','Right','Top','Bottom'].flatMap(side=>[[`spacing${side}`,pageSpacingFromInput(Number(current[`spacing${side}`]),dialog.spacingInputs[side].value)],[`border${side}`,dialog.borderNoneCheck.checked?{type:0,width:0,color:'#000000'}:{...dialog.borderEdits[side]}]])),
   headerInside:supportsPageBorderInclusion(dialog.wasm)?dialog.jueonyHeaderInside.checked:current.headerInside,footerInside:supportsPageBorderInclusion(dialog.wasm)?dialog.jueonyFooterInside.checked:current.footerInside,
@@ -54,6 +55,7 @@ export function collectPageBorderSettings(dialog:any):PageBorderSettings {
   if(gradient.colors.length===2)gradient.colors=[inputs.start.value,inputs.end.value];
   next.gradient=gradient;
  }
+ if(fillType==='image')next.image=collectPageImageSettings(dialog);
  return validatePageBorderSettings(next);
 }
 export type PageBorderEditScope='current'|'document';
@@ -79,13 +81,14 @@ export function planPageBorderEdits(wasm:any,section:number,drafts:Map<PageBorde
  if(!supportsPageBorderEntries(wasm)&&scope==='document')throw new Error('이 엔진은 문서 전체 쪽 테두리 설정을 지원하지 않습니다.');
  const effective=new Map(kinds.map(kind=>[kind,readPageBorderSettings(wasm,section,kind)]));
  for(const kind of kinds){const draft=drafts.get(kind);if(!draft)continue;const value=validatePageBorderSettings({...draft,kind});
+  if(value.applyPage!==undefined&&value.applyPage!==effective.get(kind)?.applyPage){value.hideBorder=value.hideFill=value.applyPage==='exceptFirst';value.firstPageBorder=value.firstPageFill=value.applyPage==='firstOnly';}
   if(kind==='both'&&!samePageBorderSettings(effective.get(kind)!,value))for(const target of kinds)effective.set(target,{...structuredClone(value),kind:target});
   else effective.set(kind,value);
  }
  const edits:PageBorderEdit[]=[];
  for(const index of scope==='document'?Array.from({length:count},(_,i)=>i):[section]){
   const group=kinds.map(kind=>({section:index,kind,before:readPageBorderSettings(wasm,index,kind),after:structuredClone(effective.get(kind)!)}));
-  if(scope==='document'&&group.some(edit=>edit.after.fillType==='image'))throw new Error('그림 배경은 구역 간 복사를 아직 지원하지 않습니다. 현재 구역을 선택하세요.');
+  if(scope==='document'&&!supportsPageBackgroundImage(wasm)&&group.some(edit=>edit.after.fillType==='image'))throw new Error('그림 배경은 구역 간 복사를 아직 지원하지 않습니다. 현재 구역을 선택하세요.');
   const changed=group.filter(edit=>!samePageBorderSettings(edit.before,edit.after));
   if(changed.length)edits.push(...(changed.some(edit=>edit.kind==='both')?group:changed));
  }
@@ -99,15 +102,23 @@ export function executePageBorderEdits(wasm:any,edits:PageBorderEdit[]):void {
 }
 export function applyPageBorderDialog(dialog:any):boolean {
  try{
+  if(dialog.jueonyImageLoading)throw new Error('그림을 읽는 중입니다. 파일 읽기가 끝나면 적용하세요.');
   assertPageBorderDialogCurrent(dialog);const next=collectPageBorderSettings(dialog);
   const drafts=new Map<PageBorderKind,PageBorderSettings>(dialog.jueonyDrafts);drafts.set(dialog.jueonyKind,next);
   if(dialog.jueonyApplicationChanged)for(const [kind,draft]of drafts)drafts.set(kind,validatePageBorderSettings({...draft,applyPage:next.applyPage,hideBorder:next.hideBorder,hideFill:next.hideFill,firstPageBorder:next.firstPageBorder,firstPageFill:next.firstPageFill}));
   const scope=dialog.jueonyScope?.value??'current';
   const input=dialog.services.getInputHandler();
+  const resolved=(wasm:any)=>resolvePageImageDrafts(wasm,drafts,dialog.jueonyImageUploads??new Map());
   if(scope==='new-section'){
    const assertPosition=()=>{assertPageBorderDialogCurrent(dialog);if(!newSectionScopeAllowed(dialog)||JSON.stringify(input.getCursorPosition())!==JSON.stringify(dialog.jueonyPosition))throw new Error('본문 커서나 선택이 바뀌었습니다. 새 구역 적용 창을 다시 여세요.');};
-   assertPosition();preflightDocumentEdit(dialog.wasm,scratch=>executeNewSectionBorder(scratch,dialog.jueonyPosition,drafts));assertPosition();
-   input.executeOperation({kind:'snapshot',operationType:'pageBorderNewSection',operation:(wasm:any)=>executeNewSectionBorder(wasm,dialog.jueonyPosition,drafts)});return true;
+   assertPosition();preflightDocumentEdit(dialog.wasm,scratch=>executeNewSectionBorder(scratch,dialog.jueonyPosition,resolved(scratch)));assertPosition();
+   input.executeOperation({kind:'snapshot',operationType:'pageBorderNewSection',operation:(wasm:any)=>{assertPosition();return executeNewSectionBorder(wasm,dialog.jueonyPosition,resolved(wasm));}});return true;
+  }
+  const pending=[...drafts].some(([kind,draft])=>draft.fillType==='image'&&dialog.jueonyImageUploads?.has(kind));
+  if(pending){
+   const apply=(wasm:any)=>executePageBorderEdits(wasm,planPageBorderEdits(wasm,dialog.sectionIdx,resolved(wasm),scope));
+   preflightDocumentEdit(dialog.wasm,apply);assertPageBorderDialogCurrent(dialog);
+   input.executeOperation({kind:'snapshot',operationType:'pageBorder',operation:(wasm:any)=>{assertPageBorderDialogCurrent(dialog);apply(wasm);return input.getCursorPosition();}});return true;
   }
   const edits=planPageBorderEdits(dialog.wasm,dialog.sectionIdx,drafts,scope);
   if(!edits.length)return true;
@@ -162,4 +173,5 @@ export function populatePageBorderExtras(dialog:any):void {
  dialog.jueonyGradientInputs.start.value=gradient.colors[0]??'#ffffff';dialog.jueonyGradientInputs.end.value=gradient.colors.at(-1)??'#87b7ed';
  dialog.jueonyGradientRadio.checked=dialog.settings.fillType==='gradient';
  populatePageBorderInclusion(dialog);
+ populatePageImageControls(dialog);
 }

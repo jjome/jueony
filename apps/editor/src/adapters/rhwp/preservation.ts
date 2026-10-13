@@ -58,18 +58,26 @@ const bytesHash=(bytes:Uint8Array)=>Array.from(sha256(bytes),v=>v.toString(16).p
 export function capturePreservationEvidence(value:NativeDocument):PreservationEvidence {
  const doc=native(value),values:Record<string,Json>={},issues:PreservationIssue[]=[],unverified=[...UNVERIFIED];
  let paragraphs=0,runs=0,assetBytes=0;
+ const pageImageHashes=new Map<number,string>();
  const capture=(path:string,action:()=>Json)=>{try{values[path]=normalized(action());}catch{issues.push({code:'unreadable',path,message:'문서 속성을 읽지 못했습니다'});}};
  const budget=(count:number,limit:number)=>{if(count>limit)throw new Error('검사 크기 한도 초과');};
  const at: {section:number;paragraph:number}[]=[];
+ const pageBorder=(section:number,kind?:string):Json=>{
+  const {attr:rawBits,...resolved}=record(kind?read(doc,'getPageBorderFillEntry',section,kind):read(doc,'getPageBorderFill',section));
+  if(resolved.fillType==='image'&&resolved.image&&typeof (doc as Record<string,unknown>).getPageBackgroundImageBytes==='function'){
+   const image=record(resolved.image),id=integer(image.binDataId);let hash=pageImageHashes.get(id);
+   if(!hash){const bytes=invoke(doc,'getPageBackgroundImageBytes',section,kind??'both');if(!(bytes instanceof Uint8Array)||!bytes.length)throw new Error('배경 그림 bytes 없음');assetBytes+=bytes.byteLength;budget(assetBytes,LIMITS.assetBytes);budget(pageImageHashes.size+1,LIMITS.assets);hash=bytesHash(bytes);pageImageHashes.set(id,hash);}
+   const {binDataId:unused,...properties}=image;resolved.image={...properties,assetSha256:hash};
+  }
+  return resolved;
+ };
  capture('sections',()=>integer(read(doc,'getSectionCount')));
  const sectionCount=typeof values.sections==='number'?values.sections:0;
  for(let section=0;section<sectionCount;section++){
   const key=`section/${section}`;
   for(const [name,method] of [['page','getPageDef'],['definition','getSectionDef'],['columns','getColumnDef']] as const)capture(`${key}/${name}`,()=>read(doc,method,section));
-  capture(`${key}/page-border`,()=>{const {attr:rawBits,...resolved}=record(read(doc,'getPageBorderFill',section));return resolved;});
-  if(typeof (doc as Record<string,unknown>).getPageBorderFillEntry==='function')capture(`${key}/page-border-entries`,()=>['both','even','odd'].map(kind=>{
-    const {attr:rawBits,...resolved}=record(read(doc,'getPageBorderFillEntry',section,kind));return resolved;
-  }));
+  capture(`${key}/page-border`,()=>pageBorder(section));
+  if(typeof (doc as Record<string,unknown>).getPageBorderFillEntry==='function')capture(`${key}/page-border-entries`,()=>['both','even','odd'].map(kind=>pageBorder(section,kind)));
   capture(`${key}/paragraph-count`,()=>integer(read(doc,'getParagraphCount',section)));
   const count=Number(values[`${key}/paragraph-count`]??0);
   for(let paragraph=0;paragraph<count;paragraph++){

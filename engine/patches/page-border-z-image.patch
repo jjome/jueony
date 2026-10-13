@@ -1,0 +1,114 @@
+--- a/src/document_core/queries/rendering.rs
++++ b/src/document_core/queries/rendering.rs
+@@ -3298,13 +3298,48 @@
+             if let Some(gradient) = &fill.fill.gradient {
+                 value["fillType"] = serde_json::json!("gradient");
+                 value["gradient"] = serde_json::json!({"type":gradient.gradient_type,"angle":gradient.angle,"centerX":gradient.center_x,"centerY":gradient.center_y,"blur":gradient.blur,"stepCenter":gradient.step_center,"colors":gradient.colors.iter().map(|color|color_ref_to_css(*color)).collect::<Vec<_>>(),"positions":gradient.positions});
+-            } else if fill.fill.image.is_some() { value["fillType"] = serde_json::json!("image"); }
++            } else if let Some(image) = &fill.fill.image {
++                use crate::model::style::ImageFillMode;
++                let mode = match image.fill_mode {
++                    ImageFillMode::TileAll => "tile", ImageFillMode::FitToSize | ImageFillMode::Total => "fit",
++                    ImageFillMode::Center => "center", ImageFillMode::Zoom => "zoom",
++                    ImageFillMode::TileHorzTop => "TileHorzTop", ImageFillMode::TileHorzBottom => "TileHorzBottom",
++                    ImageFillMode::TileVertLeft => "TileVertLeft", ImageFillMode::TileVertRight => "TileVertRight",
++                    ImageFillMode::CenterTop => "CenterTop", ImageFillMode::CenterBottom => "CenterBottom",
++                    ImageFillMode::LeftCenter => "LeftCenter", ImageFillMode::LeftTop => "LeftTop", ImageFillMode::LeftBottom => "LeftBottom",
++                    ImageFillMode::RightCenter => "RightCenter", ImageFillMode::RightTop => "RightTop", ImageFillMode::RightBottom => "RightBottom",
++                    ImageFillMode::None => "None",
++                };
++                let (brightness,contrast)=image.display_brightness_contrast();
++                value["fillType"]=serde_json::json!("image");
++                value["image"]=serde_json::json!({"binDataId":image.bin_data_id,"mode":mode,"brightness":brightness,"contrast":contrast,"effect":image.effect});
++            }
+         }
+         Ok(value.to_string())
+     }
+ 
++    /// Embedded, bounded PNG/JPEG registration. Validate before allocating a resource.
++    pub fn register_page_background_image_native(&mut self,data:&[u8],extension:&str)->Result<String,HwpError>{
++        let fail=||HwpError::RenderError("배경 그림은 10MiB 이하 PNG/JPEG, 8192px 이하·1600만 픽셀 이하만 지원합니다.".into());
++        if data.is_empty()||data.len()>10*1024*1024||self.document.bin_data_content.len()>=65534||self.document.doc_info.bin_data_list.len()>=65534{return Err(fail());}
++        let (format,ext)=match extension.to_ascii_lowercase().as_str(){"png"=>(image::ImageFormat::Png,"png"),"jpg"|"jpeg"=>(image::ImageFormat::Jpeg,"jpg"),_=>return Err(fail())};
++        if image::guess_format(data).map_err(|_|fail())?!=format{return Err(fail());}
++        let (width,height)=image::ImageReader::with_format(std::io::Cursor::new(data),format).into_dimensions().map_err(|_|fail())?;
++        if width==0||height==0||width>8192||height>8192||width as u64*height as u64>16_000_000{return Err(fail());}
++        image::load_from_memory_with_format(data,format).map_err(|_|fail())?;
++        let id=self.register_embedded_bin_data(data,ext);
++        Ok(serde_json::json!({"ok":true,"binDataId":id,"width":width,"height":height}).to_string())
++    }
++
++    pub fn get_page_background_image_bytes_native(&self,section:usize,kind:&str)->Result<Vec<u8>,HwpError>{
++        let json=self.get_page_border_fill_entry_native(section,kind)?;
++        let value:serde_json::Value=serde_json::from_str(&json).map_err(|e|HwpError::RenderError(e.to_string()))?;
++        let id=value.get("image").and_then(|v|v.get("binDataId")).and_then(|v|v.as_u64()).ok_or_else(||HwpError::RenderError("Missing image".into()))? as u16;
++        crate::renderer::layout::find_bin_data_bytes(&self.document.bin_data_content,id).map(|bytes|bytes.to_vec()).ok_or_else(||HwpError::RenderError("Missing image bytes".into()))
++    }
++
+     pub fn set_page_border_fill_entry_native(&mut self, section_idx: usize, kind: &str, json: &str) -> Result<String, HwpError> {
+-        use crate::model::style::{Fill, FillType, GradientFill};
++        use crate::model::style::{Fill, FillType, GradientFill, ImageFill, ImageFillMode};
+         let fail = |message: &str| HwpError::RenderError(message.into());
+         let slot = match kind { "both" => None, "even" => Some(0), "odd" => Some(1), _ => return Err(fail("Invalid page kind")) };
+         if section_idx >= self.document.sections.len() { return Err(fail("Invalid section")); }
+@@ -3314,7 +3349,24 @@
+         let apply = value.get("applyPage").and_then(|v|v.as_str()).unwrap_or("all").to_owned();
+         if !["all","exceptFirst","firstOnly"].contains(&apply.as_str()) { return Err(fail("Invalid page application")); }
+         let fill_type=value.get("fillType").and_then(|v|v.as_str()).unwrap_or("none");
+-        if !["none","solid","gradient"].contains(&fill_type) { return Err(fail("Image background editing is unsupported")); }
++        if !["none","solid","gradient","image"].contains(&fill_type) { return Err(fail("Invalid background type")); }
++        let image = if fill_type == "image" {
++            let img=value.get("image").ok_or_else(||fail("Missing image settings"))?;
++            let number=|key:&str,min:i64,max:i64|->Result<i64,HwpError>{let v=img.get(key).and_then(|v|v.as_i64()).ok_or_else(||fail("Invalid image value"))?;if v<min||v>max{return Err(fail("Image value out of range"));}Ok(v)};
++            let id=number("binDataId",1,65535)? as u16;
++            if crate::renderer::layout::find_bin_data_bytes(&self.document.bin_data_content,id).is_none(){return Err(fail("Image resource not found"));}
++            let mode=match img.get("mode").and_then(|v|v.as_str()) {
++                Some("tile")=>ImageFillMode::TileAll,Some("fit")=>ImageFillMode::FitToSize,Some("center")=>ImageFillMode::Center,Some("zoom")=>ImageFillMode::Zoom,
++                Some("TileHorzTop")=>ImageFillMode::TileHorzTop,Some("TileHorzBottom")=>ImageFillMode::TileHorzBottom,
++                Some("TileVertLeft")=>ImageFillMode::TileVertLeft,Some("TileVertRight")=>ImageFillMode::TileVertRight,
++                Some("CenterTop")=>ImageFillMode::CenterTop,Some("CenterBottom")=>ImageFillMode::CenterBottom,
++                Some("LeftCenter")=>ImageFillMode::LeftCenter,Some("LeftTop")=>ImageFillMode::LeftTop,Some("LeftBottom")=>ImageFillMode::LeftBottom,
++                Some("RightCenter")=>ImageFillMode::RightCenter,Some("RightTop")=>ImageFillMode::RightTop,Some("RightBottom")=>ImageFillMode::RightBottom,
++                Some("None")=>ImageFillMode::None,_=>return Err(fail("Invalid image fill mode")),
++            };
++            // The model stores HWP5 binary byte order, opposite to display/HWPX.
++            Some(ImageFill {bin_data_id:id,fill_mode:mode,brightness:number("contrast",-100,100)? as i8,contrast:number("brightness",-100,100)? as i8,effect:number("effect",0,3)? as u8})
++        } else {None};
+         let gradient = if fill_type == "gradient" {
+             let g=value.get("gradient").ok_or_else(||fail("Missing gradient"))?;
+             let number=|key:&str,min:i64,max:i64|->Result<i16,HwpError>{let v=g.get(key).and_then(|v|v.as_i64()).ok_or_else(||fail("Invalid gradient value"))?;if v<min||v>max {return Err(fail("Gradient value out of range"));}Ok(v as i16)};
+@@ -3333,13 +3385,13 @@
+         let original=self.document.sections[section_idx].section_def.page_border_fill.clone();
+         let selected=slot.and_then(|index|self.document.sections[section_idx].section_def.extra_page_border_fills.get(index)).cloned().unwrap_or_else(||original.clone());
+         value["borderFillId"]=serde_json::json!(selected.border_fill_id);
+-        if gradient.is_some() {value["fillType"]=serde_json::json!("none");}
++        if gradient.is_some() || image.is_some() {value["fillType"]=serde_json::json!("none");}
+         self.document.sections[section_idx].section_def.page_border_fill=selected;
+         self.set_page_border_fill_native(section_idx,&value.to_string())?;
+         let mut updated=self.document.sections[section_idx].section_def.page_border_fill.clone();
+-        if let Some(gradient)=gradient {
++        if gradient.is_some() || image.is_some() {
+             let mut bf=self.document.doc_info.border_fills.get((updated.border_fill_id-1) as usize).cloned().ok_or_else(||fail("Missing fill"))?;
+-            bf.raw_data=None;bf.fill=Fill {fill_type:FillType::Gradient,gradient:Some(gradient),..Default::default()};
++            bf.raw_data=None;bf.fill=Fill {fill_type:if image.is_some(){FillType::Image}else{FillType::Gradient},gradient,image,..Default::default()};
+             self.document.doc_info.border_fills.push(bf);
+             updated.border_fill_id=self.document.doc_info.border_fills.len() as u16;
+             self.document.sections[section_idx].section_def.page_border_fill=updated.clone();
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1236,6 +1236,15 @@
+ 
+     #[wasm_bindgen(js_name = pageBorderFillAreaEnabled)]
+     pub fn page_border_fill_area_enabled(&self) -> bool { true }
++
++    #[wasm_bindgen(js_name = pageBackgroundImageEnabled)]
++    pub fn page_background_image_enabled(&self)->bool {true}
++
++    #[wasm_bindgen(js_name = registerPageBackgroundImage)]
++    pub fn register_page_background_image(&mut self,data:&[u8],extension:&str)->Result<String,JsValue>{self.core.register_page_background_image_native(data,extension).map_err(|e|e.into())}
++
++    #[wasm_bindgen(js_name = getPageBackgroundImageBytes)]
++    pub fn get_page_background_image_bytes(&self,section:u32,kind:&str)->Result<Vec<u8>,JsValue>{self.core.get_page_background_image_bytes_native(section as usize,kind).map_err(|e|e.into())}
+ 
+     #[wasm_bindgen(js_name = getPageBorderFillEntry)]
+     pub fn get_page_border_fill_entry(&self, section_idx:u32, kind:&str)->Result<String,JsValue>{self.core.get_page_border_fill_entry_native(section_idx as usize,kind).map_err(|error|error.into())}

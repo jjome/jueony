@@ -4,6 +4,7 @@ export async function applyPageBorderPatches({root}){
  const path=join(root,'src/ui/page-border-dialog.ts');let source=(await readFile(path,'utf8')).replace(/\r\n/g,'\n');
  const replace=(before,after,label)=>{if(source.split(before).length!==2)throw new Error('Page border seam drift: '+label);source=source.replace(before,after);};
  source="import {readPageBorderSettings,supportsPageBorderEntries,applyPageBorderDialog,createPageBorderKindControls,createPageGradientControls,populatePageBorderExtras,createPageBorderScopeControls,populatePageBorderInclusion} from '../jueony/adapters/rhwp/page-border-settings.ts';\n"+source;
+ source="import {createPageImageControls,resetPageImageDrafts} from '../jueony/adapters/rhwp/page-background-image.ts';\n"+source;
  replace('  private settings!: PageBorderFillSettings;',`  private settings!: PageBorderFillSettings;
   private jueonyRevision?: string;
   private jueonyKind: 'both' | 'odd' | 'even' = 'both';
@@ -17,7 +18,7 @@ export async function applyPageBorderPatches({root}){
  replace('    body.append(tabBar, panelWrap);','    body.append(tabBar, panelWrap, createPageBorderScopeControls(this));','scope selector');
  replace('    this.settings = this.wasm.getPageBorderFill(this.sectionIdx);',`    this.jueonyRevision=(window as any).jueonyEditor?.revision();
     (this as any).jueonyPosition=this.services?.getInputHandler()?.getCursorPosition();
-    this.jueonyKind='both';this.jueonyDrafts.clear();this.jueonyApplicationChanged=false;
+    this.jueonyKind='both';this.jueonyDrafts.clear();this.jueonyApplicationChanged=false;resetPageImageDrafts(this);
     this.settings = readPageBorderSettings(this.wasm, this.sectionIdx) as unknown as PageBorderFillSettings;`,'read native entries');
  const start=source.indexOf('  protected onConfirm(): boolean {'),end=source.indexOf('  private buildBorderTab(): HTMLElement {',start);
  if(start<0||end<0)throw new Error('Page border confirm seam drift');source=source.slice(0,start)+'  protected onConfirm(): boolean { return applyPageBorderDialog(this); }\n\n'+source.slice(end);
@@ -27,6 +28,10 @@ export async function applyPageBorderPatches({root}){
  if(gradientStart<0||gradientEnd<0)throw new Error('Page gradient seam drift');source=source.slice(0,gradientStart)+`    const gradRow = createPageGradientControls(this);
     const picture = this.checkbox('그림 배경 (새 그림 넣기 미지원)');picture.disabled = true;
 `+source.slice(gradientEnd);
+ const pictureStart=source.indexOf('    const pictureRow = this.row();'),pictureEnd=source.indexOf('    root.appendChild(fill);',pictureStart);
+ if(pictureStart<0||pictureEnd<0)throw new Error('Page image controls seam drift');
+ source=source.slice(0,pictureStart)+"    const pictureRow=createPageImageControls(this,()=>assertPageBorderDialogCurrent(this),error=>pageBorderError(this,error));\n    fill.append(this.radioRow(this.bgNoneRadio),colorRow,gradRow,pictureRow);\n"+source.slice(pictureEnd);
+ source=source.replace('populatePageBorderInclusion} from','populatePageBorderInclusion,assertPageBorderDialogCurrent,pageBorderError} from');
  replace('    group.append(\n      basisRow,',"    this.jueonyHeaderInside=this.checkbox('머리말 포함');this.jueonyHeaderInside.setAttribute('aria-label','쪽 테두리 머리말 포함');\n    this.jueonyFooterInside=this.checkbox('꼬리말 포함');this.jueonyFooterInside.setAttribute('aria-label','쪽 테두리 꼬리말 포함');\n    this.jueonyHeaderInside.disabled=true;this.jueonyFooterInside.disabled=true;\n    for(const radio of [this.basisPaper,basisPage])radio.addEventListener('change',()=>populatePageBorderInclusion(this));\n    const inclusionNotice=document.createElement('p');inclusionNotice.dataset.pageInclusionNotice='true';inclusionNotice.style.cssText='font-size:11px;margin:4px 0;color:var(--color-text);';\n    group.append(\n      basisRow,",'inclusion controls');
  replace("      this.checkboxRow(this.disabledCheck(t('dialog.pageBorder.disabledCheck.label'))),\n      this.checkboxRow(this.disabledCheck(t('dialog.pageBorder.disabledCheck.label.x011117'))),","      this.checkboxRow(this.jueonyHeaderInside),\n      this.checkboxRow(this.jueonyFooterInside),\n      inclusionNotice,",'display existing inclusion');
  replace('    firstOnly.disabled = true;',"    firstOnly.disabled = !supportsPageBorderEntries(this.wasm);",'first page capability');
@@ -38,5 +43,13 @@ export async function applyPageBorderPatches({root}){
  await writeFile(path,source);
  const registry=join(root,'src/core/mutation-method-registry.ts');let methods=(await readFile(registry,'utf8')).replace(/\r\n/g,'\n');
  if(methods.split("'setPageBorderFill',").length!==2)throw new Error('Page border mutation registry seam drift');
- methods=methods.replace("'setPageBorderFill',","'setPageBorderFill', 'setPageBorderFillEntry',");await writeFile(registry,methods);
+ methods=methods.replace("'setPageBorderFill',","'setPageBorderFill', 'setPageBorderFillEntry', 'registerPageBackgroundImage',");await writeFile(registry,methods);
+ const setupPath=join(root,'src/ui/page-setup-dialog.ts');let setup=(await readFile(setupPath,'utf8')).replace(/\r\n/g,'\n');
+ const editSetup=(before,after,label)=>{if(setup.split(before).length!==2)throw new Error('Page setup seam drift: '+label);setup=setup.replace(before,after);};
+ setup="import {applyPageSetupDialog,populatePageSetupScope} from '../jueony/adapters/rhwp/page-setup-settings.ts';\n"+setup;
+ editSetup('    this.pageDef = this.wasm.getPageDef(this.sectionIdx);',"    (this as any).jueonyRevision=(window as any).jueonyEditor?.revision();\n    (this as any).jueonyPosition=this.services?.getInputHandler()?.getCursorPosition();\n    (this as any).jueonyPaperChanged=false;\n    this.pageDef = this.wasm.getPageDef(this.sectionIdx);",'show baseline');
+ editSetup('    this.populateFields();','    this.populateFields();populatePageSetupScope(this);','scope population');
+ editSetup('  private onPaperChange(): void {','  private onPaperChange(): void {\n    (this as any).jueonyPaperChanged=true;','explicit preset');
+ const confirmStart=setup.indexOf('  protected onConfirm(): boolean {'),confirmEnd=setup.indexOf('  private populateFields(): void {',confirmStart);if(confirmStart<0||confirmEnd<0)throw new Error('Page setup confirm seam drift');
+ setup=setup.slice(0,confirmStart)+'  protected onConfirm(): boolean {return applyPageSetupDialog(this,pageBodyViolation);}\n\n'+setup.slice(confirmEnd);await writeFile(setupPath,setup);
 }

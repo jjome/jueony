@@ -17,3 +17,7 @@ export { validateStyleDefinition } from '../domain/style-definition.ts';
 export type { StyleDefinition, NamedStyle } from '../domain/style-definition.ts';
 export {defaultPageGradient,validatePageBorderSettings,samePageBorderSettings,pageSpacingFromInput} from '../domain/page-border-settings.ts';
 export type {PageBorderKind,PageBorderSettings,PageGradient} from '../domain/page-border-settings.ts';
+export {defaultPageImage,pageImageModes} from '../domain/page-border-settings.ts';
+export type {PageImageFill} from '../domain/page-border-settings.ts';
+export {pageSetupKeys,pageDimensionFromInput,validatePageSetup,samePageSetup} from '../domain/page-setup-settings.ts';
+export type {PageSetupSettings} from '../domain/page-setup-settings.ts';

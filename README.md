@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-agent-sections-20261014/Start-Review.cmd)**로 실행한다(4242). Agent가 구역별 기본 탭과 HWPX 기본 본문 줄 번호를 현재 문서에 적용한다. 변경 비교·요청 undo/redo·안전 저장과 후속 수정, 실패 복원·오래된 응답 거절을 검증했다. [지원 범위·검증·남은 제한](docs/61-agent-section-tools.md)을 확인한다. 기존 쪽 편집과 [단일 구역 HWPX 파일 커서](docs/60-hwpx-body-caret.md)도 포함한다. 개체·복잡한 표·필드·구역 생성/삭제의 Agent 도구와 실제 한글 비교는 남는다. 이전 실행 창과 문서는 유지한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-agent-background-20261014/Start-Review.cmd)**로 실행한다(4244). Agent가 현재 문서의 배경 없음·무늬 없는 단색을 바꾸거나 지울 수 있다. 홀짝 쪽의 테두리·배치·첫 쪽 표시 설정을 유지하고 그림·그러데이션·투명도 등 고급 원본은 읽기 전용으로 거절한다. 변경 비교·요청 undo/redo·안전 저장·재실행·실패 복원을 검증했다. [지원 범위·검증·남은 제한](docs/62-agent-page-background.md)을 확인한다. 기존 [기본 탭·HWPX 줄 번호 Agent 도구](docs/61-agent-section-tools.md)와 쪽 편집, [단일 구역 HWPX 파일 커서](docs/60-hwpx-body-caret.md)도 포함한다. 개체·복잡한 표·필드·구역 생성/삭제의 Agent 도구와 실제 한글 비교는 남는다. 이전 실행 창과 문서는 유지한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

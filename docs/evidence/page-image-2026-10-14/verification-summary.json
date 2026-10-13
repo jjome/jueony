@@ -1,0 +1,63 @@
+{
+  "status": "PASS_SCOPED_AUTOMATED_CHECKS",
+  "verifiedAt": "2026-10-13T15:40:33.719Z",
+  "unitPassed": 395,
+  "browserPassed": 184,
+  "nativePassed": 90,
+  "moduleCount": 9,
+  "moduleFiles": 218,
+  "customSourceSha256": "af52ae97a3080e3c78d006ba56ee63d91a08964eeaff08ebbe6482f8ef016a26",
+  "buildScriptSha256": "8df671207273b6ae1e1c78b58e6c9e551299d4eb84619db8ca81c9be10b2a9f2",
+  "wasmSha256": "9f053d11d6404b511d647549fc48e7495762e91edc968e2a066a2a2743fcbf6e",
+  "engineSourceId": "8c903c77a4e12086",
+  "buildApplicationCommit": "288b2193584aaa1f443abfea1c8117dde726d22e",
+  "buildApplicationDirty": true,
+  "reports": [
+    {
+      "file": "browser/result.json",
+      "passed": 24,
+      "sha256": "29cf82c652a3e4b46d5cf77c6093096eb0ee2277dcfa878a40dd2783dda35e62"
+    },
+    {
+      "file": "regression-parity/result.json",
+      "passed": 66,
+      "sha256": "63e41865ee4ad15ae55206afab3f503ed03ba6456e743d3d0d51c28e078eb029"
+    },
+    {
+      "file": "regression-session/result.json",
+      "passed": 9,
+      "sha256": "b8426fb431a7ab98bb408544ed0006b1a3e42fd79cb6213188f0cb36b9d99b19"
+    },
+    {
+      "file": "basic-text/basic-text-browser.json",
+      "passed": 28,
+      "sha256": "1d59f76fdcb855ba381ab5f9bfeaa0b0f5a2990ff5c4f8cb487e7bf3875d3ce3"
+    },
+    {
+      "file": "regression-agent/result.json",
+      "passed": 9,
+      "sha256": "eacf533e223770134293b01eabd6c92376ba7dcf85b114a2bc7a01d5c430f7fc"
+    },
+    {
+      "file": "regression-table/result.json",
+      "passed": 18,
+      "sha256": "9e03cebd0a715acbaaa1bdb1d9de7a58b9a0dc465488a7e9c153ea78dd608aaa"
+    },
+    {
+      "file": "image-browser/result.json",
+      "passed": 26,
+      "sha256": "39f9d50bc0f9ef89ebcb4a36f48760f59fb4056920e4398469adbeb839fcb21d"
+    },
+    {
+      "file": "bundle-compatibility/result.json",
+      "passed": 4,
+      "sha256": "301a377324ca72be14b1ce1c1f5239dd3b4b858cdbb20e4907d953eebc4a6121"
+    }
+  ],
+  "limitations": [
+    "Actual Hancom GUI/layout comparison is deferred.",
+    "No paid LLM request: Agent tests use a deterministic local adapter.",
+    "Full Hangul feature parity remains incomplete; no percentage of completion is inferred from these scoped tests.",
+    "Unsupported source properties may be blocked by the stricter cell preservation guard."
+  ]
+}

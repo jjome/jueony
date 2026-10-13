@@ -1,0 +1,106 @@
+--- a/src/document_core/commands/page_body_copy.rs
++++ b/src/document_core/commands/page_body_copy.rs
+@@ -7,6 +7,23 @@
+ fn no_outline(core:&DocumentCore,si:usize,first:usize,count:usize)->Result<(),HwpError>{
+     if core.document.sections[si].paragraphs[first..first+count].iter().any(|p|core.document.doc_info.para_shapes.get(p.para_shape_id as usize).is_some_and(|ps|ps.head_type==crate::model::style::HeadType::Outline)){return Err(fail("개요 번호 본문의 쪽 복사는 아직 지원하지 않습니다."));}Ok(())
+ }
++/// Read only embedded, decodable assets. Resource IDs from another document are not identities.
++fn page_image_payload(core:&DocumentCore,section:usize,kind:&str)->Result<(Vec<u8>,String),HwpError>{
++    let value:serde_json::Value=serde_json::from_str(&core.get_page_border_fill_entry_native(section,kind)?).map_err(|_|fail("그림 배경 설정 오류"))?;
++    let image=&value["image"];
++    if !["fit","tile","center"].iter().any(|mode|image["mode"]==*mode)||!image["brightness"].as_i64().is_some_and(|v|(-100..=100).contains(&v))||!image["contrast"].as_i64().is_some_and(|v|(-100..=100).contains(&v))||!image["effect"].as_i64().is_some_and(|v|(0..=2).contains(&v)){return Err(fail("그림 배경 쪽 복사는 크기 맞춤·바둑판식·가운데와 기본 색/회색조/흑백 효과만 지원합니다."));}
++    let id=image["binDataId"].as_u64().filter(|id|(1..=65535).contains(id)).ok_or_else(||fail("그림 자산 번호 오류"))? as u16;
++    let content=crate::renderer::layout::find_bin_data(&core.document.bin_data_content,id).ok_or_else(||fail("그림 자산이 없습니다."))?;
++    let bytes=content.data.load_limited(10*1024*1024).filter(|bytes|!bytes.is_empty()).ok_or_else(||fail("그림 배경은 10MiB 이하입니다."))?;
++    let format=image::guess_format(&bytes).map_err(|_|fail("PNG/JPEG 그림 배경만 복사할 수 있습니다."))?;
++    let extension=match (format,content.extension.to_ascii_lowercase().as_str()){
++        (image::ImageFormat::Png,"png")=>"png",(image::ImageFormat::Jpeg,"jpg"|"jpeg")=>"jpg",_=>return Err(fail("그림 형식과 자산 확장자가 일치하지 않습니다."))
++    };
++    let (width,height)=image::ImageReader::with_format(std::io::Cursor::new(&bytes),format).into_dimensions().map_err(|_|fail("배경 그림 크기를 읽지 못했습니다."))?;
++    if width==0||height==0||width>8192||height>8192||width as u64*height as u64>16_000_000{return Err(fail("배경 그림은 8192px 이하·1600만 픽셀 이하입니다."));}
++    image::load_from_memory_with_format(&bytes,format).map_err(|_|fail("배경 그림을 디코딩하지 못했습니다."))?;
++    Ok((bytes,extension.into()))
++}
+ fn settings(core:&DocumentCore,si:usize)->Result<serde_json::Value,HwpError>{
+     let sd:&SectionDef=&core.document.sections[si].section_def;
+     if !sd.master_pages.is_empty()||!sd.extra_child_records.is_empty()||sd.raw_ctrl_extra.iter().any(|b|*b!=0)||sd.line_numbers.enabled||sd.memo_shape_id!=0{return Err(fail("바탕쪽·줄 번호·개요·메모·미지원 구역 설정의 쪽 복사는 아직 지원하지 않습니다."));}
+@@ -15,8 +32,12 @@
+     for k in ["raw_ctrl_extra","footnote_shape","endnote_shape","page_num","picture_num","table_num","equation_num","page_border_fill","extra_page_border_fills"]{v.as_object_mut().unwrap().remove(k);}
+     let mut borders=Vec::new();for kind in ["both","odd","even"]{
+         let mut border:serde_json::Value=serde_json::from_str(&core.get_page_border_fill_entry_native(si,kind)?).map_err(|_|fail("쪽 테두리/배경을 읽지 못했습니다."))?;
+-        if border["fillType"]=="image"{return Err(fail("그림 배경 쪽의 복사는 아직 지원하지 않습니다."));}
+-        let inactive=border["fillType"]=="none";if border["patternType"].as_i64().is_some_and(|p|p<=0){border["patternType"]=serde_json::json!(-1);}let fields=border.as_object_mut().unwrap();fields.remove("attr");fields.remove("borderFillId");if inactive{for key in ["fillColor","patternColor","patternType"]{fields.remove(key);}}borders.push(border);
++        if border["fillType"]=="image"{
++            let (bytes,_)=page_image_payload(core,si,kind)?;
++            let image=border["image"].as_object_mut().ok_or_else(||fail("그림 배경 설정 오류"))?;
++            image.remove("binDataId");image.insert("assetDigest".into(),serde_json::json!(blake3::hash(&bytes).to_hex().to_string()));
++        }
++        let inactive=border["fillType"]=="none"||border["fillType"]=="image";if border["patternType"].as_i64().is_some_and(|p|p<=0){border["patternType"]=serde_json::json!(-1);}let fields=border.as_object_mut().unwrap();fields.remove("attr");fields.remove("borderFillId");if inactive{for key in ["fillColor","patternColor","patternType"]{fields.remove(key);}}borders.push(border);
+     }
+     v["borders"]=serde_json::json!(borders);
+     let columns=core.document.sections[si].paragraphs.iter().flat_map(|p|&p.controls).find_map(|c|if let crate::model::control::Control::ColumnDef(col)=c{Some(col)}else{None});
+@@ -26,11 +47,11 @@
+ fn opaque_border_properties(core:&DocumentCore,section:usize)->serde_json::Value{
+     let sd=&core.document.sections[section].section_def;
+     serde_json::json!(std::iter::once(&sd.page_border_fill).chain([sd.extra_page_border_fills.get(1).unwrap_or(&sd.page_border_fill),sd.extra_page_border_fills.first().unwrap_or(&sd.page_border_fill)]).map(|pbf|{
+-        pbf.border_fill_id.checked_sub(1).and_then(|id|core.document.doc_info.border_fills.get(id as usize)).map(|bf|serde_json::json!({"attr":bf.attr,"threeD":bf.three_d,"diagonal":if bf.attr&0x00fc==0{serde_json::Value::Null}else{serde_json::json!(bf.diagonal)},"centerLine":bf.center_line,"alpha":bf.fill.alpha,"mixed":bf.fill.solid.is_some()&&bf.fill.gradient.is_some(),"image":bf.fill.image.is_some()})).unwrap_or_else(||serde_json::json!({"attr":0,"threeD":false,"diagonal":null,"centerLine":crate::model::style::CenterLine::None,"alpha":0,"mixed":false,"image":false}))
++        pbf.border_fill_id.checked_sub(1).and_then(|id|core.document.doc_info.border_fills.get(id as usize)).map(|bf|serde_json::json!({"attr":bf.attr,"threeD":bf.three_d,"diagonal":if bf.attr&0x00fc==0{serde_json::Value::Null}else{serde_json::json!(bf.diagonal)},"centerLine":bf.center_line,"alpha":bf.fill.alpha,"mixed":([bf.fill.solid.is_some(),bf.fill.gradient.is_some(),bf.fill.image.is_some()].iter().filter(|present|**present).count()>1),"image":bf.fill.image.is_some()})).unwrap_or_else(||serde_json::json!({"attr":0,"threeD":false,"diagonal":null,"centerLine":crate::model::style::CenterLine::None,"alpha":0,"mixed":false,"image":false}))
+     }).collect::<Vec<_>>())
+ }
+ fn bounded_style_rows(core:&DocumentCore,section:usize,rows:&serde_json::Value)->Result<(),HwpError>{
+-    let fail_style=||fail("다른 쪽 스타일 붙이기는 양쪽이 같은 기본 테두리·무늬 없는 단색·두 색 그러데이션만 지원합니다. 홀짝 차이·개별 색상 위치·그림 배경은 제외합니다.");
++    let fail_style=||fail("다른 쪽 스타일 붙이기는 양쪽이 같은 기본 테두리·무늬 없는 단색·두 색 그러데이션·기본 PNG/JPEG 그림 배경만 지원합니다. 홀짝 차이·개별 색상 위치·고급 효과는 제외합니다.");
+     let rows=rows.as_array().filter(|r|r.len()==3).ok_or_else(fail_style)?;
+     let mut first=rows[0].clone();first.as_object_mut().ok_or_else(fail_style)?.remove("kind");
+     for row in rows{
+@@ -38,14 +59,14 @@
+         if row["applyPage"]!="all"||row["firstPageBorder"]!=false||row["firstPageFill"]!=false||row["hideBorder"]!=false||row["hideFill"]!=false{return Err(fail_style());}
+         for key in ["spacingLeft","spacingRight","spacingTop","spacingBottom"]{if !row[key].as_i64().is_some_and(|v|(0..=7087).contains(&v)){return Err(fail_style());}}
+         for side in ["borderLeft","borderRight","borderTop","borderBottom"]{if !row[side]["type"].as_i64().is_some_and(|v|(0..=16).contains(&v))||!row[side]["width"].as_i64().is_some_and(|v|(0..=15).contains(&v)){return Err(fail_style());}}
+-        match row["fillType"].as_str(){Some("none")=>{},Some("solid")=>{if !row["patternType"].as_i64().is_some_and(|v|v<=0){return Err(fail_style());}},Some("gradient")=>{
++        match row["fillType"].as_str(){Some("none")=>{},Some("image")=>{page_image_payload(core,section,row["kind"].as_str().unwrap_or("both"))?;},Some("solid")=>{if !row["patternType"].as_i64().is_some_and(|v|v<=0){return Err(fail_style());}},Some("gradient")=>{
+             let g=&row["gradient"];if g["colors"].as_array().map_or(true,|c|c.len()!=2)||g["positions"].as_array().map_or(true,|p|!p.is_empty())||!g["type"].as_i64().is_some_and(|v|(1..=4).contains(&v))||!g["angle"].as_i64().is_some_and(|v|(0..=360).contains(&v)){return Err(fail_style());}
+             for key in ["centerX","centerY","blur","stepCenter"]{if !g[key].as_i64().is_some_and(|v|(0..=100).contains(&v)){return Err(fail_style());}}
+         },_=>return Err(fail_style())}
+     }
+     let sd=&core.document.sections[section].section_def;
+     for pbf in std::iter::once(&sd.page_border_fill).chain(sd.extra_page_border_fills.iter()){
+-        if pbf.border_fill_id.checked_sub(1).and_then(|id|core.document.doc_info.border_fills.get(id as usize)).is_some_and(|bf|bf.fill.image.is_some()||bf.attr!=0||bf.three_d||bf.center_line!=crate::model::style::CenterLine::None||bf.fill.alpha!=0||bf.fill.gradient.is_some()&&bf.fill.solid.is_some()){return Err(fail_style());}
++        if pbf.border_fill_id.checked_sub(1).and_then(|id|core.document.doc_info.border_fills.get(id as usize)).is_some_and(|bf|bf.attr!=0||bf.three_d||bf.center_line!=crate::model::style::CenterLine::None||bf.fill.alpha!=0||[bf.fill.solid.is_some(),bf.fill.gradient.is_some(),bf.fill.image.is_some()].iter().filter(|present|**present).count()>1){return Err(fail_style());}
+     }
+     Ok(())
+ }
+@@ -77,7 +98,9 @@
+         let target:serde_json::Value=serde_json::from_str(&self.get_page_body_deletion_plan_native(page)?).map_err(|_|fail("대상 쪽을 읽지 못했습니다."))?;
+         if target["supported"]!=true{return Err(fail(target["reason"].as_str().unwrap_or("미지원 대상 쪽")));}
+         let si=target["section"].as_u64().unwrap() as usize;let at=(target["firstParagraph"].as_u64().unwrap()+target["paragraphCount"].as_u64().unwrap()) as usize;
+-        let source=Self::from_bytes(data)?;if source.document.sections.len()!=1||source.page_count()!=1{return Err(fail("한 구역·한 쪽 본문 사본만 붙일 수 있습니다."));}
++        let source=Self::from_bytes(data)?;
++        if self.document.bin_data_content.len()+source.document.bin_data_content.len()>65534||self.document.doc_info.bin_data_list.len()+source.document.doc_info.bin_data_list.len()>65534{return Err(fail("그림/내장 자산 참조 개수 한도를 넘습니다."));}
++        if source.document.sections.len()!=1||source.page_count()!=1{return Err(fail("한 구역·한 쪽 본문 사본만 붙일 수 있습니다."));}
+         let content:serde_json::Value=serde_json::from_str(&source.get_page_body_deletion_plan_native(0)?).map_err(|_|fail("복사 본문을 확인하지 못했습니다."))?;
+         if content["supported"]!=true{return Err(fail("복사한 쪽은 완전한 일반 본문 문단이어야 합니다."));}
+         no_outline(&source,0,0,source.document.sections[0].paragraphs.len())?;
+@@ -136,7 +159,21 @@
+                 if plan["styleChanged"]==true{
+                     let borders=settings(&source,0)?["borders"].as_array().unwrap().clone();
+                     // "both" resets parity slots. Uniform source rows need one actual setter.
+-                    self.set_page_border_fill_entry_native(result_section,"both",&borders[0].to_string())?;
++                    let mut values:serde_json::Value=serde_json::from_str(&source.get_page_border_fill_entry_native(0,"both")?).map_err(|_|fail("원본 쪽 모양 오류"))?;
++                    if values["fillType"]=="image"{
++                        let (bytes,extension)=page_image_payload(&source,0,"both")?;
++                        // Foreign resource import already embeds the asset. Reuse by bytes, not source ID.
++                        let existing=self.document.bin_data_content.iter().enumerate().find_map(|(i,content)|{
++                            if !["png","jpg","jpeg"].contains(&content.extension.to_ascii_lowercase().as_str()){return None;}
++                            content.data.load_limited(10*1024*1024).filter(|candidate|candidate==&bytes).and_then(|_|u16::try_from(i+1).ok())
++                        });
++                        let id=if let Some(id)=existing{id}else{
++                            let registered:serde_json::Value=serde_json::from_str(&self.register_page_background_image_native(&bytes,&extension)?).map_err(|_|fail("그림 등록 오류"))?;
++                            registered["binDataId"].as_u64().ok_or_else(||fail("그림 등록 번호 오류"))? as u16
++                        };
++                        values["image"]["binDataId"]=serde_json::json!(id);
++                    }
++                    self.set_page_border_fill_entry_native(result_section,"both",&values.to_string())?;
+                     if settings(self,result_section)?["borders"]!=serde_json::json!(borders){return Err(fail("옮긴 쪽 테두리/배경이 원본과 달라 원문을 복원했습니다."));}
+                 }
+             }else{

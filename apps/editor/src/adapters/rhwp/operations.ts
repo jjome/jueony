@@ -1,6 +1,7 @@
 import type { Snapshot, Table, ControlOp } from '../../modules/document/public/index.ts';
 import { nativeDocument, parsed, readStructure } from './structure.ts';
 import {executeAgentSectionOperation} from './agent-section-settings.ts';
+import {executeAgentPageBackground} from './agent-page-background.ts';
 import { tableAxisKinds, controlKinds, charRules, tableAxisPlan, pageProperties, selectedCells, mm } from '../../modules/document/public/engine-integration.ts';
 export { controlKinds };
 const fail = (message: string): never => { throw new Error(message); };
@@ -23,6 +24,7 @@ function replaceCellText(doc:any,base:number[],cell:number,value:string) {
 export function executeControlOperation(wasm: any, snapshot: Snapshot, op: ControlOp, tables: Map<string, Table>): { section: number; after: number; count: number } | undefined {
   const doc = nativeDocument(wasm);
   if(op.kind==='set_section_tabs'||op.kind==='set_line_numbers'){executeAgentSectionOperation(doc,snapshot.name,op);return;}
+  if(op.kind==='set_page_background'){executeAgentPageBackground(doc,op);return;}
   if(op.kind==='apply_paragraph_style') {const n=snapshot.nodes.find(n=>n.id===op.target)!;checked(doc.applyStyle(n.section,n.paragraph,op.styleId));return;}
   if(op.kind==='set_columns'){checked(doc.setColumnDef(op.section,op.count,0,1,mm(op.spacingMm)));return;}
   if(op.kind==='set_page_hide'){

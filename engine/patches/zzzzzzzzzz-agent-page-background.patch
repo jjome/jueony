@@ -1,0 +1,93 @@
+--- a/src/document_core/commands/agent_page_background.rs
++++ b/src/document_core/commands/agent_page_background.rs
+@@ -0,0 +1,66 @@
++//! Agent-only background edits. Preserve every non-fill field and parity slot.
++use crate::document_core::DocumentCore;
++use crate::error::HwpError;
++use crate::model::{control::Control,style::{BorderFill,CenterLine,Fill,FillType,SolidFill}};
++fn fail(s:&str)->HwpError{HwpError::RenderError(s.into())}
++fn slot(kind:&str)->Result<Option<usize>,HwpError>{match kind{"both"=>Ok(None),"even"=>Ok(Some(0)),"odd"=>Ok(Some(1)),_=>Err(fail("Invalid page background kind"))}}
++impl DocumentCore {
++    fn agent_background_rows(&self,section:usize,kind:&str)->Result<Vec<(Option<usize>,BorderFill)>,HwpError>{
++        let sd=&self.document.sections.get(section).ok_or_else(||fail("Invalid section"))?.section_def;
++        let requested=slot(kind)?;
++        if sd.extra_page_border_fills.len()>2{return Err(fail("추가 쪽 배경 항목은 읽기 전용입니다."));}
++        let slots=if requested.is_none(){std::iter::once(None).chain((0..sd.extra_page_border_fills.len()).map(Some)).collect()}else{vec![requested]};
++        slots.into_iter().map(|index|{
++            let pbf=index.and_then(|i|sd.extra_page_border_fills.get(i)).unwrap_or(&sd.page_border_fill);
++            let bf=if pbf.border_fill_id==0{BorderFill::default()}else{self.document.doc_info.border_fills.get(pbf.border_fill_id as usize-1).cloned().ok_or_else(||fail("쪽 배경 자산 참조가 잘못되었습니다."))?};
++            // Generic JSON getters omit alpha, mixed fills and some original effects.
++            // Refuse these in the actual IR before touching resource lists or sections.
++            if self.document.provenance.hwp3_lineage||bf.attr!=0||bf.three_d||bf.center_line!=CenterLine::None||bf.fill.alpha!=0||bf.fill.gradient.is_some()||bf.fill.image.is_some()||bf.fill.solid.is_some_and(|s|s.pattern_type>0)||!matches!((&bf.fill.fill_type,bf.fill.solid), (FillType::None,None)|(FillType::Solid,Some(_))){return Err(fail("AI 쪽 배경은 배경 없음·무늬 없는 단색 원본만 지원합니다. 그림·그러데이션·투명도·혼합/고급 효과는 유지합니다."));}
++            Ok((index,bf))
++        }).collect()
++    }
++    fn agent_background_token(&self,section:usize,kind:&str)->Result<String,HwpError>{
++        let rows=self.agent_background_rows(section,kind)?;
++        let value=serde_json::json!({"section":self.document.sections[section].section_def,"rows":rows,"kind":kind});
++        Ok(blake3::hash(value.to_string().as_bytes()).to_hex().to_string())
++    }
++    pub fn get_agent_page_background_native(&self,section:usize,kind:&str)->Result<String,HwpError>{
++        slot(kind)?;
++        let value:serde_json::Value=serde_json::from_str(&self.get_page_border_fill_entry_native(section,kind)?).map_err(|_|fail("Invalid background settings"))?;
++        let supported=self.agent_background_token(section,kind);
++        Ok(serde_json::json!({"kind":kind,"fillType":value["fillType"],"color":if value["fillType"]=="solid"{value["fillColor"].clone()}else{serde_json::Value::Null},"applyPage":value["applyPage"],"editable":supported.is_ok(),"reason":supported.as_ref().err().map(ToString::to_string),"token":supported.ok()}).to_string())
++    }
++    pub fn set_agent_page_background_native(&mut self,section:usize,kind:&str,json:&str)->Result<String,HwpError>{
++        let v:serde_json::Value=serde_json::from_str(json).map_err(|_|fail("Invalid background command"))?;
++        if !v.as_object().is_some_and(|o|o.len()==3&&o.keys().all(|k|["fillType","color","token"].contains(&k.as_str()))){return Err(fail("Invalid background command fields"));}
++        let color=v["color"].as_str().filter(|s|s.len()==7&&s.starts_with('#')&&s.as_bytes()[1..].iter().all(u8::is_ascii_hexdigit)).ok_or_else(||fail("배경 색은 #RRGGBB입니다."))?;
++        let rgb=u32::from_str_radix(&color[1..],16).map_err(|_|fail("Invalid color"))?;
++        let bgr=((rgb>>16)&255)|(rgb&0x00ff00)|((rgb&255)<<16);
++        let fill_type=v["fillType"].as_str().filter(|s|["none","solid"].contains(s)).ok_or_else(||fail("AI 배경은 없음·단색만 지원합니다."))?;
++        let token=self.agent_background_token(section,kind)?;
++        if v["token"].as_str()!=Some(token.as_str()){return Err(fail("쪽 배경 설정이 바뀌었습니다."));}
++        let rows=self.agent_background_rows(section,kind)?;
++        let mut changed=Vec::new();
++        for (index,mut bf) in rows{
++            if fill_type=="none"&&bf.fill.fill_type==FillType::None||fill_type=="solid"&&bf.fill.solid.is_some_and(|s|s.background_color&0xffffff==bgr){continue;}
++            bf.raw_data=None;
++            bf.fill=if fill_type=="none"{Fill::default()}else{Fill{fill_type:FillType::Solid,solid:Some(SolidFill{background_color:bgr,pattern_color:bf.fill.solid.map_or(0,|s|s.pattern_color),pattern_type:bf.fill.solid.map_or(-1,|s|s.pattern_type)}),..Default::default()}};
++            changed.push((index,bf));
++        }
++        if self.document.doc_info.border_fills.len()+changed.len()>65534{return Err(fail("쪽 배경 자산 개수 한도를 넘습니다."));}
++        if changed.is_empty(){return self.get_agent_page_background_native(section,kind);}
++        // All input/source checks finished. New resources are copies, never mutations
++        // of shared cell/paragraph border fills. Both changes each existing slot.
++        let original=self.document.sections[section].section_def.page_border_fill.clone();
++        for (index,bf) in changed{
++            self.document.doc_info.border_fills.push(bf);let id=self.document.doc_info.border_fills.len() as u16;
++            let sd=&mut self.document.sections[section].section_def;
++            if let Some(index)=index{while sd.extra_page_border_fills.len()<=index{sd.extra_page_border_fills.push(original.clone());}sd.extra_page_border_fills[index].border_fill_id=id;}else{sd.page_border_fill.border_fill_id=id;}
++        }
++        self.document.doc_info.raw_stream_dirty=true;
++        let s=&mut self.document.sections[section];let sd=s.section_def.clone();
++        for p in &mut s.paragraphs{for c in &mut p.controls{if let Control::SectionDef(def)=c{**def=sd.clone();}}}
++        s.raw_stream=None;self.mark_section_dirty(section);self.rebuild_resolved_styles();self.paginate_if_needed();
++        self.get_agent_page_background_native(section,kind)
++    }
++}
+--- a/src/document_core/commands/mod.rs
++++ b/src/document_core/commands/mod.rs
+@@ -15,6 +15,7 @@
+ mod header_footer_ops;
+ mod master_pages;
+ mod line_numbers;
++mod agent_page_background;
+ mod page_body_delete;
+ mod page_body_copy;
+ mod html_import;
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1199,6 +1199,11 @@
+ 
+     #[wasm_bindgen(js_name = setMasterPageText)]
+     pub fn set_master_page_text(&mut self,section:u32,kind:&str,json:&str)->Result<String,JsValue>{self.core.set_master_page_text_native(section as usize,kind,json).map_err(|e|e.into())}
++
++    #[wasm_bindgen(js_name = getAgentPageBackground)]
++    pub fn get_agent_page_background(&self,section:usize,kind:&str)->Result<String,JsValue>{self.core.get_agent_page_background_native(section,kind).map_err(|e|e.into())}
++    #[wasm_bindgen(js_name = setAgentPageBackground)]
++    pub fn set_agent_page_background(&mut self,section:usize,kind:&str,json:&str)->Result<String,JsValue>{self.core.set_agent_page_background_native(section,kind,json).map_err(|e|e.into())}
+ 
+     #[wasm_bindgen(js_name = getLineNumberSettings)]
+     pub fn get_line_number_settings(&self,section:usize)->Result<String,JsValue>{self.get_line_number_settings_native(section).map_err(|e|e.into())}

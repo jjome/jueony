@@ -91,6 +91,11 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
     } else if(op.kind==='apply_paragraph_style'){
       only(op,['kind','target','styleId']);body(op.target);
       if(!structure!.styles?.some(style=>style.id===op.styleId&&style.type===0))fail('현재 문서의 문단 스타일 ID가 필요합니다.');
+    } else if(op.kind==='set_page_background'){
+      only(op,['kind','section','pageKind','fillType','color']);integer(op.section,0,structure!.sections.length-1);
+      if(!['both','even','odd'].includes(op.pageKind)||!['none','solid'].includes(op.fillType)||typeof op.color!=='string'||!/^#[0-9a-f]{6}$/i.test(op.color))fail('쪽 배경은 양쪽·홀수·짝수 쪽의 없음·단색(#RRGGBB)만 지원합니다.');
+      const settings=structure!.sections.find(s=>s.index===op.section)?.pageBackgrounds;
+      if(!settings?.find(s=>s.kind===op.pageKind)?.editable)fail('이 구역의 원본 쪽 배경은 읽기 전용이거나 조회되지 않았습니다.');
     } else if(op.kind==='set_section_tabs'){
       only(op,['kind','section','spacingPt']);integer(op.section,0,structure!.sections.length-1);agentTabSpacingRaw(op.spacingPt);
       if(structure!.sections.find(s=>s.index===op.section)?.defaultTabSpacingPt===undefined)fail('기본 탭 설정을 조회한 구역이 필요합니다.');

@@ -38,7 +38,7 @@ export function installAgentBridge(d:Deps){
   const plainText=textOf(d.wasm.borrowDocumentHandle());assertRevision(before,revision());
   if(plainText.length>120000)throw new Error('전체 문서 텍스트 한도 120,000자를 넘습니다.');
   const structure=readStructure(d.wasm);assertRevision(before,revision());
-  return {revision:before,name:d.wasm.fileName,nodes,plainText,structure,limitations:['본문·표의 텍스트와 서식·쪽 설정을 읽습니다. 그림 안 글자/OCR은 읽지 않습니다.','AI 편집: 단순 본문, 글꼴·글자·문단 서식, 새 표·단순 셀·셀 서식·행/열 추가와 삭제, 구역별 용지·여백·다단·기본 탭, HWPX 기본 본문 줄 번호, 기존 문단 스타일, 쪽 감추기. 줄 번호는 현재 구역의 editable과 파일 형식을 확인합니다. 병합/중첩 표, 개체·필드 편집은 아직 미지원입니다.']} as Snapshot;
+  return {revision:before,name:d.wasm.fileName,nodes,plainText,structure,limitations:['본문·표의 텍스트와 서식·쪽 설정을 읽습니다. 그림 안 글자/OCR은 읽지 않습니다.','AI 편집: 단순 본문, 글꼴·글자·문단 서식, 새 표·단순 셀·셀 서식·행/열 추가와 삭제, 구역별 용지·여백·다단·기본 탭, HWPX 기본 본문 줄 번호·기본 단색 쪽 배경, 기존 문단 스타일, 쪽 감추기. 줄 번호는 현재 구역의 editable과 파일 형식을 확인합니다. 병합/중첩 표, 개체·필드 편집은 아직 미지원입니다.']} as Snapshot;
  }
  const native = {
   snapshot,

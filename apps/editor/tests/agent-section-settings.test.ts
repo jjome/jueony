@@ -6,9 +6,9 @@ import {generationSchema} from '../src/modules/document/public/wire-schema.mjs';
 import {executeAgentSectionOperation} from '../src/adapters/rhwp/agent-section-settings.ts';
 const base=():Snapshot=>({revision:'r1',name:'review.hwpx',limitations:[],nodes:[{id:'s0p0',section:0,paragraph:0,text:'본문',editable:true}],structure:{sections:[{index:0,page:{width:59528,height:84188,marginLeft:8504,marginRight:8504,marginTop:5668,marginBottom:4252,landscape:false},columns:{sameWidth:true,columnCount:1,spacing:0},defaultTabSpacingPt:40,lineNumbers:{enabled:false,restart:'page',countBy:1,startNumber:1,distanceMm:5,editable:true}}],paragraphs:[],tables:[],unsupportedControls:[]}});
 const numbering=()=>({kind:'set_line_numbers' as const,section:0,enabled:true,restart:'page' as const,countBy:1,startNumber:1,distanceMm:5});
-test('section tool wire uses explicit physical units and restart names across 19 supported commands',()=>{
+test('section tool wire uses explicit physical units and restart names across 20 supported commands',()=>{
  const options=generationSchema().properties.operations.items.anyOf;
- assert.equal(options.length,19);
+ assert.equal(options.length,20);
  const line=options.find(v=>v.properties.kind.enum[0]==='set_line_numbers')!;
  assert.deepEqual(line.properties.restart.enum,['page','section','continuous']);assert.ok(line.required.includes('distanceMm'));assert.ok(!('distance' in line.properties));
  const before=base(),operations=[{kind:'set_section_tabs',section:0,spacingPt:24},numbering()];assert.deepEqual(validateEditOperations(operations,before),operations);

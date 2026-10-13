@@ -19,6 +19,11 @@ export function readStructure(wasm: any): Structure {
       entry.lineNumbers={enabled:settings.enabled,restart:([null,'page','section','continuous'] as const)[settings.restartType]??null,countBy:settings.countBy,startNumber:settings.startNumber,distanceMm:Math.round(settings.distance*25.4/7200*1000000)/1000000,editable:settings.editable};
     }
     sections.push(entry);
+    if(typeof doc.getAgentPageBackground==='function')entry.pageBackgrounds=['both','even','odd'].map(kind=>{
+      const setting=parsed(doc.getAgentPageBackground(section,kind));
+      const visibility=parsed(doc.getPageBorderFillEntry(section,kind));
+      return {kind:setting.kind,fillType:setting.fillType,color:setting.color,applyPage:setting.applyPage,hideFill:visibility.hideFill,firstPageFill:visibility.firstPageFill,editable:setting.editable,...(setting.reason?{reason:setting.reason}:{})};
+    });
     for (let paragraph = 0; paragraph < doc.getParagraphCount(section); paragraph++) {
       positions.push({ section, paragraph });
       paragraphs.push({ id: `s${section}p${paragraph}`, characters: parsed(doc.getCharPropertiesAt(section, paragraph, 0)), paragraph: parsed(doc.getParaPropertiesAt(section, paragraph)),style:parsed(doc.getStyleAt(section,paragraph)),pageHide:parsed(doc.getPageHide(section,paragraph)) });

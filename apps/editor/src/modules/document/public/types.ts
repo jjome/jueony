@@ -5,8 +5,10 @@ export type Cell = { index: number; row: number; column: number; rowSpan: number
 export type Table = { id: string; section: number; paragraph: number; control: number; rows: number; columns: number; cells: Cell[] };
 export type LineNumberRestart = 'page' | 'section' | 'continuous';
 export type AgentLineNumbers = {enabled:boolean;restart:LineNumberRestart|null;countBy:number;startNumber:number;distanceMm:number;editable:boolean};
+export type AgentPageBackground = {kind:'both'|'even'|'odd';fillType:string;color:string|null;applyPage:string;hideFill?:boolean;firstPageFill?:boolean;editable:boolean;reason?:string};
+export type AgentPageBackgroundOp = {kind:'set_page_background';section:number;pageKind:'both'|'even'|'odd';fillType:'none'|'solid';color:string};
 export type AgentSectionOp = {kind:'set_section_tabs';section:number;spacingPt:number} | {kind:'set_line_numbers';section:number;enabled:boolean;restart:LineNumberRestart;countBy:number;startNumber:number;distanceMm:number};
-export type Structure = { sections: { index: number; page: DocumentProperties; columns?:DocumentProperties;defaultTabSpacingPt?:number;lineNumbers?:AgentLineNumbers }[]; styles?:{id:number;name:string;type:JsonValue}[]; tables: Table[]; paragraphs: { id: string; characters: DocumentProperties; paragraph: DocumentProperties; style?:DocumentProperties;pageHide?:DocumentProperties;controls?:string[];pageIndex?:number }[]; unsupportedControls: string[] };
+export type Structure = { sections: { index: number; page: DocumentProperties; columns?:DocumentProperties;defaultTabSpacingPt?:number;lineNumbers?:AgentLineNumbers;pageBackgrounds?:AgentPageBackground[] }[]; styles?:{id:number;name:string;type:JsonValue}[]; tables: Table[]; paragraphs: { id: string; characters: DocumentProperties; paragraph: DocumentProperties; style?:DocumentProperties;pageHide?:DocumentProperties;controls?:string[];pageIndex?:number }[]; unsupportedControls: string[] };
 export type BodyNode = { id: string; section: number; paragraph: number; text: string; editable: boolean; reason?: string };
 export type Snapshot = { revision: string; name: string; plainText?: string; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
 export type BodyOp =
@@ -16,6 +18,7 @@ export type BodyOp =
  | { kind: 'delete_body_text'; target: string; start: number; count: number };
 export type ControlOp =
   | AgentSectionOp
+  | AgentPageBackgroundOp
   | { kind:'apply_paragraph_style';target:string;styleId:number }
   | { kind:'set_columns';section:number;count:number;spacingMm:number }
   | { kind:'set_page_hide';target:string;properties:Record<string,unknown> }

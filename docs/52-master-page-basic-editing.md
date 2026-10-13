@@ -37,7 +37,7 @@ HWPX는 기본 양쪽·홀수·짝수 조합을 저장한다. HWP는 현재 파�
 
 바탕쪽 전용 엔진 17개와 실제 Edge 화면 17개 검사가 통과했다. 저장·재열기 후 종류·텍스트·서식·좌표, 실제 SVG 글자 위치와 홀짝 표시, 표 바탕쪽 변경 거절과 균일 기울임 유지를 합성 HWP/HWPX로 확인한다. 직접 한글에서 만든 golden과의 동일성 검사는 아니다.
 
-전체 회귀 결과는 [검증 요약](evidence/master-page-2026-10-14/verification-summary.json)에 기록한다. 단위 검사 398개, 9개 모듈의 220개 소스 경계와 TypeScript 검사를 수행한다. Agent 회귀는 로컬 mock이며 유료 모델 호출은 실행하지 않는다.
+전체 회귀는 단위 398개, 브라우저 201개, 엔진 107개가 통과했다. [검증 요약](evidence/master-page-2026-10-14/verification-summary.json)에 실제 소스·통합 패치·WASM 해시를 대조한 결과를 기록한다. 9개 모듈의 220개 소스 경계와 TypeScript 검사도 통과했다. Agent 회귀는 로컬 mock이며 유료 모델 호출은 실행하지 않는다.
 
 최신 실행 묶음은 `build/jueony-master-page-20261014/Start-Review.cmd`, 주소는 `http://127.0.0.1:4226/`다. 이전 4225 묶음은 유지한다. `review-documents/master-page/master-native`와 `master-browser`의 저장 파일을 실제 한글에서 확인할 수 있다.
 

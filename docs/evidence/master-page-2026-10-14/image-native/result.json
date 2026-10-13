@@ -1,0 +1,112 @@
+{
+  "results": [
+    "hwp: PNG fit/paper tone/effect and embedded bytes survive guarded roundtrip",
+    "hwp: PNG fit/page tone/effect and embedded bytes survive guarded roundtrip",
+    "hwp: PNG fit/border tone/effect and embedded bytes survive guarded roundtrip",
+    "hwp: PNG tile/paper tone/effect and embedded bytes survive guarded roundtrip",
+    "hwp: PNG tile/page tone/effect and embedded bytes survive guarded roundtrip",
+    "hwp: PNG tile/border tone/effect and embedded bytes survive guarded roundtrip",
+    "hwp: PNG center/paper tone/effect and embedded bytes survive guarded roundtrip",
+    "hwp: PNG center/page tone/effect and embedded bytes survive guarded roundtrip",
+    "hwp: PNG center/border tone/effect and embedded bytes survive guarded roundtrip",
+    "hwp: unsupported zoom/paper is refused before touching live document",
+    "hwp: unsupported zoom/page is refused before touching live document",
+    "hwp: unsupported zoom/border is refused before touching live document",
+    "hwpx: PNG fit/paper tone/effect and embedded bytes survive guarded roundtrip",
+    "hwpx: PNG fit/page tone/effect and embedded bytes survive guarded roundtrip",
+    "hwpx: PNG fit/border tone/effect and embedded bytes survive guarded roundtrip",
+    "hwpx: PNG tile/paper tone/effect and embedded bytes survive guarded roundtrip",
+    "hwpx: PNG tile/page tone/effect and embedded bytes survive guarded roundtrip",
+    "hwpx: PNG tile/border tone/effect and embedded bytes survive guarded roundtrip",
+    "hwpx: PNG center/paper tone/effect and embedded bytes survive guarded roundtrip",
+    "hwpx: PNG center/page tone/effect and embedded bytes survive guarded roundtrip",
+    "hwpx: PNG center/border tone/effect and embedded bytes survive guarded roundtrip",
+    "hwpx: PNG zoom/paper tone/effect and embedded bytes survive guarded roundtrip",
+    "hwpx: PNG zoom/page tone/effect and embedded bytes survive guarded roundtrip",
+    "hwpx: PNG zoom/border tone/effect and embedded bytes survive guarded roundtrip",
+    "hwp: JPEG watermark and whole-document copy preserve one shared embedded image and distinct paper",
+    "hwpx: JPEG watermark and whole-document copy preserve one shared embedded image and distinct paper",
+    "hwp: new section image and hidden first-page image survive guarded save without touching previous section",
+    "hwpx: new section image and hidden first-page image survive guarded save without touching previous section",
+    "invalid image payload, extension, missing reference and out-of-range effects are rejected before mutation",
+    "hwp: current paper settings preserve section content, embedded backgrounds and exact raw dimensions",
+    "hwp: all paper settings preserve section content, embedded backgrounds and exact raw dimensions",
+    "hwp: new-section paper settings preserve section content, embedded backgrounds and exact raw dimensions",
+    "hwpx: current paper settings preserve section content, embedded backgrounds and exact raw dimensions",
+    "hwpx: all paper settings preserve section content, embedded backgrounds and exact raw dimensions",
+    "hwpx: new-section paper settings preserve section content, embedded backgrounds and exact raw dimensions"
+  ],
+  "failures": [],
+  "engine": {
+    "buildMode": "wsl-review-no-opt",
+    "sourceId": "b5764245b2c033bb",
+    "builtAt": "2026-10-13T16:33:28.0007610Z",
+    "jsSha256": "b5482a43085d8bf3ed5013194f52565b5f4792fb92014aa9ae626c4ac310588e",
+    "optimized": false,
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "wasmSha256": "32ceb479eaab8960a4fe505daced5e6c020b2a92c2afb136446a20a39f611acb",
+    "patches": [
+      {
+        "name": "border-fill-identity.patch",
+        "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c"
+      },
+      {
+        "name": "default-tabs.patch",
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+      },
+      {
+        "name": "document-insertion.patch",
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+      },
+      {
+        "name": "master-page-editing.patch",
+        "sha256": "b04c7d682e105e3f37f72a18c1b4bb01cbf085424e3219f3919fd8c891dc26c2"
+      },
+      {
+        "name": "merged-table-transpose.patch",
+        "sha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768"
+      },
+      {
+        "name": "note-query-json.patch",
+        "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562"
+      },
+      {
+        "name": "page-border-entries.patch",
+        "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f"
+      },
+      {
+        "name": "page-border-inclusion.patch",
+        "sha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e"
+      },
+      {
+        "name": "page-border-region.patch",
+        "sha256": "ea98aed9ad8568699b802c5f46e4964fe524ba7634bc978d71fe10f44e1d7412"
+      },
+      {
+        "name": "page-border-z-image.patch",
+        "sha256": "97ccd3c9eac24c42b0844fc65e5804b232d3bef9929a6fd5de329cdd007b173b"
+      },
+      {
+        "name": "section-split.patch",
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+      },
+      {
+        "name": "style-reference-deletion.patch",
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+      },
+      {
+        "name": "style-reference-order.patch",
+        "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce"
+      },
+      {
+        "name": "style-shape-stories.patch",
+        "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af"
+      },
+      {
+        "name": "table-creation-consistency.patch",
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+      }
+    ]
+  },
+  "note": "Synthetic owned PNG/JPEG; exact embedded bytes and guarded save; Hancom GUI comparison deferred."
+}

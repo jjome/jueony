@@ -287,13 +287,22 @@ async function send(){
 }
 on('focus-mode',async()=>{state.focusMode=!state.focusMode;render();activeTab?.frame.contentWindow?.dispatchEvent(new Event('resize'));await persist();});
 for(const [id,key] of [['retrieve-sources','retrieveSources'],['review-before-apply','reviewBeforeApply']] as const)$(id).addEventListener('change',()=>{state[key]=$<HTMLInputElement>(id).checked;void persist().catch(error);});
-let pendingMacro:{template:CommandTemplate;name:string;workspaceId:string;chatId:string;tabId?:string}|undefined;
+let pendingMacro:{template:CommandTemplate;name:string;workspaceId:string;chatId:string;tabId?:string;revision:string}|undefined;
 function showMacro(template:CommandTemplate,name:string){
  if(running)throw new Error('진행 중인 요청이 끝난 뒤 실행해 주세요.');
- pendingMacro={template:structuredClone(template),name,workspaceId:work().id,chatId:chat().id,tabId:activeTab?.id};
- $('macro-parameters-title').textContent=name;$('macro-error').textContent='';$('macro-variables').replaceChildren();
+ if(!activeTab?.initialized||!activeTab.api)throw new Error('문서 준비가 끝난 뒤 실행해 주세요.');
+ const base=activeTab.api.snapshot(),sections=automation.sections(template);
+ pendingMacro={template:structuredClone(template),name,workspaceId:work().id,chatId:chat().id,tabId:activeTab.id,revision:base.revision};
+ $('macro-parameters-title').textContent=name;$('macro-error').textContent='';$('macro-variables').replaceChildren();$('macro-sections').replaceChildren();
+ for(const original of sections){
+  const label=document.createElement('label');label.textContent=`기록한 ${original+1}구역 → 대상 구역`;
+  const select=document.createElement('select');select.required=true;select.dataset.section=String(original);select.setAttribute('aria-label',label.textContent);
+  const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='적용할 구역을 직접 선택해 주세요';select.append(placeholder);
+  for(const section of base.structure?.sections??[]){const option=document.createElement('option');option.value=String(section.index);option.textContent=`${section.index+1}구역 · ${base.nodes.filter(n=>n.section===section.index).length}개 본문 문단`;select.append(option);}
+  label.append(select);$('macro-sections').append(label);
+ }
  for(const variable of automation.variables(template)){const label=document.createElement('label');label.textContent=variable;const input=document.createElement('input');input.dataset.variable=variable;input.required=true;input.maxLength=4000;input.placeholder=variable==='붙임'?'없으면 없음으로 입력':variable;label.append(input);$('macro-variables').append(label);}
- $('macro-preview').textContent=template.operations.length+'개 편집 명령 · '+(template.operations[0].kind==='create_document'?'새 문서를 만듭니다.':'현재 문서에서 원문이 일치하는 문단에 적용합니다.')+'\n변경 후 채팅의 요청 되돌리기로 복원할 수 있습니다.';
+ $('macro-preview').textContent=automation.describe(template)+'\n\n'+(template.operations[0].kind==='create_document'?'새 문서를 만듭니다.':sections.length?'선택한 구역에 적용하며 본문은 해당 구역에서 원문을 대조합니다.':'현재 문서에서 원문이 일치하는 문단에 적용합니다.')+'\n문서가 바뀌면 설정창을 다시 열어 주세요. 변경 후 요청 되돌리기로 복원할 수 있습니다. 파일 저장은 별도로 실행하세요.';
  $<HTMLDialogElement>('macro-dialog').close();$<HTMLDialogElement>('macro-parameters').showModal();
 }
 function renderMacros(){
@@ -311,9 +320,14 @@ async function executeMacro(){
  if(work().id!==pending.workspaceId||chat().id!==pending.chatId||activeTab?.id!==pending.tabId)throw new Error('업무나 문서가 바뀌었습니다. 반복 작업을 다시 선택해 주세요.');
  let tab=activeTab;if(!tab?.initialized)throw new Error('문서를 준비하고 있습니다.');
  const values:Record<string,string>=Object.create(null);for(const input of $('macro-variables').querySelectorAll<HTMLInputElement>('input'))values[input.dataset.variable!]=input.value;
- let base:Snapshot=tab.api!.snapshot();const generation=automation.prepare(pending.template,base,values);
+ const sectionTargets:Record<string,number>=Object.create(null);
+ for(const select of $('macro-sections').querySelectorAll<HTMLSelectElement>('select')){if(select.value==='')throw new Error('기록한 각 구역의 대상 구역을 직접 선택해 주세요.');sectionTargets[select.dataset.section!]=Number(select.value);}
+ let base:Snapshot=tab.api!.snapshot();
+ if(base.revision!==pending.revision)throw new Error('반복 작업 설정 중 문서가 바뀌었습니다. 취소 후 작업을 다시 열어 주세요.');
+ const generation=automation.prepare(pending.template,base,values,sectionTargets);
  await tab.api!.preflight(base,generation);
  if(activeTab!==tab||work().id!==pending.workspaceId||chat().id!==pending.chatId)throw new Error('문서가 바뀌었습니다. 다시 실행해 주세요.');
+ $('request-error').hidden=true;
  const run:Run={id:uid(),workspaceId:work().id,chatId:chat().id,documentId:tab.id,status:'applying',sources:[],createdAt:Date.now()};running={controller:new AbortController(),run};state.runs.push(run);
  workspace.appendMessage(run.workspaceId,run.chatId,{id:uid(),role:'user',text:'반복 작업: '+pending.name,runId:run.id});$<HTMLDialogElement>('macro-parameters').close();renderMessages();updateRun();
  try{

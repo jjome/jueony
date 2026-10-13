@@ -8,7 +8,7 @@ export class TablePresetsDialog extends ModalDialog {
   constructor(private preview: (id: TablePresetId, titleRow: boolean) => number, private apply: (id: TablePresetId, titleRow: boolean) => void) { super('기본 표 모양', 520); }
   protected createBody(): HTMLElement {
     const body = document.createElement('div'); body.dataset.jueonyTablePresets = 'true';
-    const help = document.createElement('p'); help.textContent = '선택한 본문 표 전체에 테두리·단색 배경을 적용합니다. 글자·문단 서식·내용·크기는 유지합니다. 직접 만든 기본 모양이며 한글의 원본 표 갤러리가 아닙니다. 세로 병합·보호 셀과 중첩 표는 지원하지 않습니다.';
+    const help = document.createElement('p'); help.textContent = '표 개체 선택은 전체 표, 셀 블록 선택은 해당 직사각형에 적용합니다. 셀 블록의 바깥 경계선은 주변 셀을 바꾸지 않도록 기존 선을 유지하고 내부 선·단색 배경을 바꿉니다. 제목행과 줄무늬는 선택 영역의 첫 행부터 계산하며 병합 셀은 시작 행의 색을 사용합니다. 글자·문단 서식·내용·크기와 선택 밖 셀은 유지합니다. 자체 기본 모양이며 한글 원본 갤러리가 아닙니다. 병합 셀을 일부만 포함하거나 보호 셀·제외 셀·중첩 대상이 있으면 적용하지 않습니다.';
     this.choice = document.createElement('select'); this.choice.setAttribute('aria-label', '표 모양');
     for (const preset of tablePresets) { const option = document.createElement('option'); option.value = preset.id; option.textContent = preset.name; this.choice.append(option); }
     this.titleRow = document.createElement('input'); this.titleRow.type = 'checkbox'; this.titleRow.checked = true;

@@ -20,6 +20,23 @@ const results = [], failures = [], fresh = () => { const d = HwpDocument.createE
 const body = d => Array.from({ length: d.getParagraphCount(0) }, (_, p) => d.getTextRange(0, p, 0, d.getParagraphLength(0, p)));
 async function test(name, run) { try { await run(); results.push(name); console.log('PASS', name); } catch (error) { failures.push({ name, error: String(error), stack: error.stack }); console.error('FAIL', name, error); } }
 for (const ext of ['hwp', 'hwpx']) {
+  await test(`${ext}: rectangular preset preserves protected unselected vertical merge and selection boundary lines`, async () => {
+    const d = fresh();
+    try {
+      const t = parse(d.createTable(0, 0, 0, 3, 3)), ref = { sec: 0, ppi: t.paraIdx, ci: t.controlIdx };
+      for (let i = 0; i < 9; i++) d.insertTextInCell(0, ref.ppi, ref.ci, i, 0, 0, `원문${i}😀`);
+      d.mergeTableCells(0, ref.ppi, ref.ci, 0, 0, 2, 0); d.setCellProperties(0, ref.ppi, ref.ci, 0, JSON.stringify({ cellProtect: true }));
+      const target = { ...ref, block: { anchor: { row: 2, col: 2 }, focus: { row: 1, col: 1 } } }, plan = readTablePresetPlan(d, target, 'blue', true), original = plan.unselected.map(c => c.properties);
+      const before = hash(d.exportHwpx()); preflightTablePreset({ fileName: 'block.' + ext, borrowDocumentHandle: () => d, getWasmModuleExports: () => ({ HwpDocument }) }, plan); assert.equal(hash(d.exportHwpx()), before); executeTablePreset(d, plan);
+      const bytes = d[ext === 'hwp' ? 'exportHwp' : 'exportHwpx'](); await writeFile(resolve(out, `cell-block-preset.${ext}`), bytes); const reopened = new HwpDocument(bytes);
+      try {
+        const loaded = readTablePresetPlan(reopened, target, 'blue', true);
+        const clean = p => Object.fromEntries(Object.entries(p).filter(([key]) => key !== 'borderFillId'));
+        assert.deepEqual(loaded.unselected.map(c => clean(c.properties)), original.map(clean));
+        assert.deepEqual(loaded.cells.map(c => c.properties.fillColor), ['#dceaf7', '#dceaf7', '#f1f6fb', '#f1f6fb']);
+      } finally { reopened.free(); }
+    } finally { d.free(); }
+  });
   for (const [unit, seeds] of [['months', ['2026-01-31', '2026-02-28']], ['years', ['2024-02-29', '2025-02-28']]]) await test(`${ext}: explicit ${unit} series scratch/save/reopen preserves anchored dates and target formatting`, async () => {
     const d = fresh();
     try {

@@ -44,7 +44,7 @@ test('all table presets preserve Unicode mixed formats and geometry through scra
   }
 });
 
-test('protected cells, vertical merges and stale table properties are refused before mutation', async () => {
+test('protected cells and stale table properties are refused; whole merged cells keep their first row color', async () => {
   await init({ module_or_path: await readFile(new URL('../node_modules/@rhwp/core/rhwp_bg.wasm', import.meta.url)) });
   const doc: any = HwpDocument.createEmpty(); doc.createBlankDocument();
   try {
@@ -55,6 +55,28 @@ test('protected cells, vertical merges and stale table properties are refused be
     doc.setCellProperties(0, target.ppi, target.ci, 0, JSON.stringify({ cellProtect: true }));
     assert.throws(() => readTablePresetPlan(doc, target, 'blue', true), /보호/);
     doc.setCellProperties(0, target.ppi, target.ci, 0, JSON.stringify({ cellProtect: false })); doc.mergeTableCells(0, target.ppi, target.ci, 0, 0, 1, 0);
-    assert.throws(() => readTablePresetPlan(doc, target, 'blue', true), /여러 행/);
+    const merged = readTablePresetPlan(doc, target, 'blue', true); executeTablePreset(doc, merged);
+    assert.equal(JSON.parse(doc.getCellInfo(0, target.ppi, target.ci, 0)).rowSpan, 2);
+    assert.equal(JSON.parse(doc.getCellProperties(0, target.ppi, target.ci, 0)).fillColor, '#dceaf7');
+  } finally { doc.free(); }
+});
+
+test('a reversed rectangular cell block changes only selected cells and refuses partial merged footprints', async () => {
+  await init({ module_or_path: await readFile(new URL('../node_modules/@rhwp/core/rhwp_bg.wasm', import.meta.url)) });
+  const doc: any = HwpDocument.createEmpty(); doc.createBlankDocument();
+  try {
+    const t = JSON.parse(doc.createTable(0, 0, 0, 2, 3)), target = { sec: 0, ppi: t.paraIdx, ci: t.controlIdx };
+    doc.setCellProperties(0, target.ppi, target.ci, 0, JSON.stringify({ cellProtect: true }));
+    const block = { anchor: { row: 1, col: 2 }, focus: { row: 1, col: 1 } }, plan = readTablePresetPlan(doc, { ...target, block }, 'blue', true);
+    assert.deepEqual(plan.cells.map(c => c.index), [4, 5]);
+    const before = Array.from({ length: 6 }, (_, i) => JSON.parse(doc.getCellProperties(0, target.ppi, target.ci, i)));
+    executeTablePreset(doc, plan);
+    for (let i = 0; i < 4; i++) assert.deepEqual(JSON.parse(doc.getCellProperties(0, target.ppi, target.ci, i)), before[i]);
+    for (let i = 4; i < 6; i++) assert.equal(JSON.parse(doc.getCellProperties(0, target.ppi, target.ci, i)).fillColor, '#dceaf7');
+    doc.mergeTableCells(0, target.ppi, target.ci, 1, 1, 1, 2);
+    assert.throws(() => readTablePresetPlan(doc, { ...target, block: { anchor: { row: 1, col: 2 }, focus: { row: 1, col: 2 } } }, 'blue', true), /병합 셀 전체/);
+    const whole = readTablePresetPlan(doc, { ...target, block }, 'clear', false); executeTablePreset(doc, whole);
+    assert.equal(whole.cells.length, 1); assert.equal(JSON.parse(doc.getCellProperties(0, target.ppi, target.ci, whole.cells[0].index)).fillType, 'none');
+    assert.throws(() => readTablePresetPlan(doc, { ...target, block: { ...block, excluded: [0] } }, 'blue', true), /직사각형/);
   } finally { doc.free(); }
 });

@@ -14,9 +14,9 @@ for (const patch of build.engineBuild.patches) assert.equal(patch.sha256, hash(a
 assert.ok(build.engineBuild.patches.some(p => p.name === 'merged-table-transpose.patch'));
 assert.deepEqual((await readdir(resolve(repo, 'engine/patches'))).filter(f => f.endsWith('.patch')).sort(), build.engineBuild.patches.map(p => p.name).sort());
 const unitPath = resolve(directory, 'unit.txt'), unit = (await readFile(unitPath, 'utf8')).replace(/[ \t]+$/gmu, ''); await writeFile(unitPath, unit);
-const count = label => Number(unit.match(new RegExp('^# ' + label + ' (\\d+)$', 'm'))?.[1]); assert.ok(count('tests') >= 383); assert.equal(count('pass'), count('tests')); for (const key of ['fail', 'skipped', 'cancelled', 'todo']) assert.equal(count(key), 0);
+const count = label => Number(unit.match(new RegExp('^# ' + label + ' (\\d+)$', 'm'))?.[1]); assert.ok(count('tests') >= 384); assert.equal(count('pass'), count('tests')); for (const key of ['fail', 'skipped', 'cancelled', 'todo']) assert.equal(count(key), 0);
 const boundaries = await json(resolve(directory, 'boundaries.json')); assert.equal(boundaries.ok, true); assert.deepEqual(boundaries.diagnostics, []);
-const suites = [['browser/result.json', 16], ['regression-parity/result.json', 66], ['regression-session/result.json', 9], ['basic-text/basic-text-browser.json', 28], ['regression-agent/result.json', 9]];
+const suites = [['browser/result.json', 18], ['regression-parity/result.json', 66], ['regression-session/result.json', 9], ['basic-text/basic-text-browser.json', 28], ['regression-agent/result.json', 9]];
 if (process.argv.includes('--include-bundle')) suites.push(['bundle-compatibility/result.json', 4]);
 const reports = [];
 for (const [file, minimum] of suites) {
@@ -25,7 +25,7 @@ for (const [file, minimum] of suites) {
   for (const key of ['customSourceSha256', 'buildScriptSha256', 'engineWasmSha256', 'tableConversionPatchSha256']) assert.equal(report.build[key], build[key], file + ': stale ' + key);
   reports.push({ file, passed: report.results.length, sha256: hash(await readFile(resolve(directory, file))) });
 }
-const native = await json(resolve(directory, 'native/result.json')); assert.ok(native.results.length >= 15); assert.deepEqual(native.failures, []); assert.equal(native.engine.wasmSha256, build.engineWasmSha256);
+const native = await json(resolve(directory, 'native/result.json')); assert.ok(native.results.length >= 17); assert.deepEqual(native.failures, []); assert.equal(native.engine.wasmSha256, build.engineWasmSha256);
 const summary = { status: 'PASS_SCOPED_AUTOMATED_CHECKS', verifiedAt: new Date().toISOString(), unitPassed: count('pass'), browserPassed: reports.reduce((n, r) => n + r.passed, 0), nativePassed: native.results.length, moduleCount: boundaries.moduleCount, moduleFiles: boundaries.scannedFiles,
   customSourceSha256: build.customSourceSha256, buildScriptSha256: build.buildScriptSha256, wasmSha256: build.engineWasmSha256, engineSourceId: build.engineBuild.sourceId, buildApplicationCommit: build.applicationSourceCommit, buildApplicationDirty: build.applicationSourceDirty, reports,
   limitations: ['Actual Hancom GUI/layout comparison is deferred.', 'No paid LLM request: Agent tests use a deterministic local adapter.', 'Full Hangul feature parity remains incomplete; no percentage of completion is inferred from these scoped tests.', 'Unsupported source properties may be blocked by the stricter cell preservation guard.'] };

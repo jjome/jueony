@@ -1,47 +1,47 @@
 {
   "status": "PASS_SCOPED_AUTOMATED_CHECKS",
-  "verifiedAt": "2026-10-13T01:24:49.414Z",
-  "unitPassed": 383,
-  "browserPassed": 132,
-  "nativePassed": 15,
+  "verifiedAt": "2026-10-13T01:33:01.076Z",
+  "unitPassed": 384,
+  "browserPassed": 134,
+  "nativePassed": 17,
   "moduleCount": 9,
   "moduleFiles": 215,
-  "customSourceSha256": "afd4f794509af0fa3c45417c745437120c004f50270115ccbd567c7793baf352",
+  "customSourceSha256": "648ed05d313f62e5e5456bfd2627a6f6eba91fad273314b77cdd6c749581d436",
   "buildScriptSha256": "8df671207273b6ae1e1c78b58e6c9e551299d4eb84619db8ca81c9be10b2a9f2",
   "wasmSha256": "d096a44dc95f3ed0a26a50e1ac05db8a525cf860fa59913a4f4ce511ad63283d",
   "engineSourceId": "1b04490267c6bf57",
-  "buildApplicationCommit": "d5fa8ae01471c63fe5ab8167320fe53f99ae6e3e",
+  "buildApplicationCommit": "5f7181180cec9d4716ffbacba45b87716015c932",
   "buildApplicationDirty": true,
   "reports": [
     {
       "file": "browser/result.json",
-      "passed": 16,
-      "sha256": "9fda158a7be98c2364a986492a0727815282e086c5e7a0d1dd3cb886bb47d96c"
+      "passed": 18,
+      "sha256": "b8ab6d20e0cb74968fe452003a3c062bd18ef32896f05ebcc37888b3e004cfbb"
     },
     {
       "file": "regression-parity/result.json",
       "passed": 66,
-      "sha256": "64fc6226db0a6406c03cf944e4bd2829e74ea3fdb12e84b1b97033c56c69ba42"
+      "sha256": "03d9804de4eda2bd16246bbe201373e3f3cfa4a0940d0a3fde09d9dcfba6d188"
     },
     {
       "file": "regression-session/result.json",
       "passed": 9,
-      "sha256": "388fb17eef488eade5b4b49f681fc269cd5906cf560592a43e38b1ffd869d398"
+      "sha256": "9cda54688c3209a96de6dafaf672a81b88042e1a358bfac0390feecd33c97644"
     },
     {
       "file": "basic-text/basic-text-browser.json",
       "passed": 28,
-      "sha256": "8a1c45b909f4e87b104dce3a3baa4b8f24cac38a6dba954d46ae4320115143ad"
+      "sha256": "38dec6b7134eb47b20c09c9f9b4c42c1b23d14bbce34f8333b9033694afdefee"
     },
     {
       "file": "regression-agent/result.json",
       "passed": 9,
-      "sha256": "14d7f4ff1623c2ad0b16b2fd160aaedd727f4c6c8c2a863683e4a6d780f5b832"
+      "sha256": "6cf9a80a5c89d238f61e8fe952642369cacf826c6d43026bd20ec4327f250928"
     },
     {
       "file": "bundle-compatibility/result.json",
       "passed": 4,
-      "sha256": "fdf909ea24c92a91b93d1da2063cd5ba3bcf7099726f05d5053b13a4f0a80775"
+      "sha256": "885ab7088d00db07ca176ae3f62c47660caa9f9f0eb2c018905d140f0af5442c"
     }
   ],
   "limitations": [

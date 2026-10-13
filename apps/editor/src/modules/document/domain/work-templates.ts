@@ -1,0 +1,15 @@
+export type WorkTemplateId = 'official-letter' | 'work-plan' | 'meeting-result' | 'work-report';
+export type WorkTemplate = { id: WorkTemplateId; name: string; description: string; paragraphs: { text: string; style: 'title' | 'heading' | 'body' }[]; table?: string[][] };
+export const workTemplates: readonly WorkTemplate[] = [
+  { id: 'official-letter', name: '공문 초안', description: '수신·제목·본문·붙임이 있는 작성용 초안', paragraphs: [
+    { text: '[기관명]', style: 'title' }, { text: '수신  [수신 기관 또는 부서]', style: 'body' }, { text: '(경유)  [경유 부서]', style: 'body' }, { text: '제목  [공문 제목]', style: 'heading' },
+    { text: '1. 관련: [관련 문서 번호와 날짜]', style: 'body' }, { text: '2. [요청 또는 안내할 내용을 작성하세요.]', style: 'body' }, { text: '  가. [주요 내용]', style: 'body' }, { text: '  나. [협조 사항 및 기한]', style: 'body' }, { text: '붙임  [붙임 문서명] 1부.  끝.', style: 'body' }, { text: '[발신 기관장 또는 결재권자]', style: 'heading' } ] },
+  { id: 'work-plan', name: '업무 추진 계획', description: '목적·개요·추진 내용·일정 표·기대 효과', paragraphs: [
+    { text: '[업무명] 추진 계획', style: 'title' }, { text: '1. 추진 목적', style: 'heading' }, { text: '[업무 필요성과 달성 목표를 작성하세요.]', style: 'body' }, { text: '2. 추진 개요', style: 'heading' }, { text: '기간: [시작일] ~ [종료일] / 대상: [대상] / 담당: [부서 및 담당자]', style: 'body' },
+    { text: '3. 세부 추진 내용', style: 'heading' }, { text: '[추진 방법과 주요 과제를 작성하세요.]', style: 'body' }, { text: '4. 기대 효과 및 협조 사항', style: 'heading' }, { text: '[기대 효과와 관계 부서 협조 사항을 작성하세요.]', style: 'body' }, { text: '5. 추진 일정', style: 'heading' }, { text: '', style: 'body' } ], table: [['단계', '주요 내용', '일정', '담당'], ['준비', '[준비 사항]', '[일정]', '[담당]'], ['실행', '[추진 사항]', '[일정]', '[담당]'], ['점검', '[점검 및 결과 정리]', '[일정]', '[담당]']] },
+  { id: 'meeting-result', name: '회의 결과', description: '개요·논의 내용·결정 사항·후속 조치 표', paragraphs: [
+    { text: '[회의명] 회의 결과', style: 'title' }, { text: '1. 회의 개요', style: 'heading' }, { text: '일시: [날짜 및 시간] / 장소: [장소] / 참석: [참석자]', style: 'body' }, { text: '2. 주요 논의 내용', style: 'heading' }, { text: '[안건별 주요 발언과 검토 내용을 작성하세요.]', style: 'body' }, { text: '3. 결정 사항', style: 'heading' }, { text: '[확정된 사항과 보류 사항을 구분해 작성하세요.]', style: 'body' }, { text: '4. 후속 조치', style: 'heading' }, { text: '', style: 'body' } ], table: [['조치 사항', '담당', '기한'], ['[후속 업무]', '[담당자]', '[기한]'], ['[추가 업무]', '[담당자]', '[기한]']] },
+  { id: 'work-report', name: '업무 보고서', description: '보고 요지·현황·문제점·검토 의견·향후 계획', paragraphs: [
+    { text: '[업무명] 보고', style: 'title' }, { text: '보고일: [날짜] / 작성: [부서 및 담당자]', style: 'body' }, { text: '1. 보고 요지', style: 'heading' }, { text: '[핵심 내용과 필요한 결정을 간단히 작성하세요.]', style: 'body' }, { text: '2. 추진 현황', style: 'heading' }, { text: '[확인된 사실과 진행 상황을 작성하세요.]', style: 'body' }, { text: '3. 문제점 및 검토 의견', style: 'heading' }, { text: '[문제점, 원인, 대안과 근거를 작성하세요.]', style: 'body' }, { text: '4. 향후 계획', style: 'heading' }, { text: '[추진 일정과 담당 부서를 작성하세요.]', style: 'body' } ] },
+];
+export function readWorkTemplate(id: unknown): WorkTemplate { const value = workTemplates.find(template => template.id === id); if (!value) throw new Error('지원하는 업무 양식을 선택하세요.'); return structuredClone(value); }

@@ -11,6 +11,8 @@ import {applyPageBorderPatches} from './integration/page-border-patches.mjs';
 import {applySelectedObjectPropertiesPatches} from './integration/selected-object-properties-patches.mjs';
 import {applyFormattingToolbarPatches} from './integration/formatting-toolbar-patches.mjs';
 import {applyDocumentTabCyclePatches} from './integration/document-tab-cycle-patches.mjs';
+import {applyKeyboardContextPatches} from './integration/keyboard-context-patches.mjs';
+import {applyDocumentSwapStatePatches} from './integration/document-swap-state-patches.mjs';
 import {auditRepository} from '../../../scripts/check-module-boundaries.mjs';
 import { cp, mkdir, readFile, writeFile, readdir } from 'node:fs/promises';
 import { resolve, dirname, join } from 'node:path';
@@ -91,6 +93,8 @@ await applyTableConversionPatches({root});
 await applySelectedObjectPropertiesPatches({root});
 await applyFormattingToolbarPatches({root});
 await applyDocumentTabCyclePatches({root});
+await applyKeyboardContextPatches({root});
+await applyDocumentSwapStatePatches({root});
 await build({
   configFile: false, root, base: './', publicDir: join(root, 'public'),
   define: { __APP_VERSION__: JSON.stringify('0.8.7'), __RHWP_DISABLE_EXTERNAL_WEBFONTS__: 'true', __RHWP_HWPCTRL__: 'false' },
@@ -132,6 +136,8 @@ const evidence = {
   selectedObjectPropertiesPatchSha256: sha256(await readFile(join(app,'scripts/integration/selected-object-properties-patches.mjs'))),
   formattingToolbarPatchSha256: sha256(await readFile(join(app,'scripts/integration/formatting-toolbar-patches.mjs'))),
   documentTabCyclePatchSha256: sha256(await readFile(join(app,'scripts/integration/document-tab-cycle-patches.mjs'))),
+  keyboardContextPatchSha256: sha256(await readFile(join(app,'scripts/integration/keyboard-context-patches.mjs'))),
+  documentSwapStatePatchSha256: sha256(await readFile(join(app,'scripts/integration/document-swap-state-patches.mjs'))),
   customSourceSha256: sha256(customSource.join('\n')),
   applicationSourceCommit: execFileSync('git', ['-C', app, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
   applicationSourceDirty: Boolean(execFileSync('git', ['-C', app, 'status', '--porcelain', '--', '.'], { encoding: 'utf8' }).trim()),

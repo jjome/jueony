@@ -87,3 +87,4 @@
 .j-search-hit:hover, .j-search-hit[aria-current="true"] { background: #e4f1fb; border-color: #b6d5eb; }
 .j-search-limit { padding: 8px 12px; margin: 0; border-top: 1px solid #d9dfe7; color: #6a7d90; font-size: 11px; line-height: 1.6; }
 .j-search-form button { flex: 0 0 auto; white-space: nowrap; }
+.context-menu [role="menuitem"]:focus-visible { outline: 2px solid #1f73be; outline-offset: -2px; background: #e7f0fa; }

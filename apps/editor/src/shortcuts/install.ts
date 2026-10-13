@@ -12,6 +12,10 @@ import { installHangingIndent } from '../adapters/rhwp/hanging-indent.ts';
 import { installTransposeTable } from '../adapters/rhwp/transpose-table.ts';
 import { installDocumentInsertion } from '../adapters/rhwp/document-insertion.ts';
 import { installBasicTextCommands } from '../adapters/rhwp/basic-text-commands.ts';
+import { installSettingsBackup } from '../adapters/browser/settings-backup-dialog.ts';
+import { installStylePackage } from '../adapters/rhwp/style-package.ts';
+import { installWorkTemplates } from '../adapters/rhwp/work-templates.ts';
+import { installSnippets } from '../adapters/rhwp/snippets.ts';
 
 export function installHangulKeys({ automation, registry, input, eventBus }: { automation: any; registry: any; input: () => any; eventBus: any }) {
   const resolver = new HangulKeyResolver();
@@ -24,6 +28,11 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
   installTransposeTable(registry, input, eventBus);
   installDocumentInsertion(registry, input, eventBus);
   installBasicTextCommands(registry, input, eventBus);
+  installSettingsBackup(registry);
+  installStylePackage(registry, input, eventBus);
+  installWorkTemplates(registry, input, eventBus);
+  installSnippets(registry, input, eventBus);
+  registry.register({ id: 'ext:jueony-context-menu', label: '빠른 메뉴', canExecute: (context: any) => context.hasDocument && !input()?.isComposing, execute: () => { if (!input()?.showKeyboardContextMenu?.()) throw new Error('현재 문맥의 빠른 메뉴를 열 수 없습니다.'); } });
   // The pinned Studio marked the entire caption submenu as a stub; child state is now registry-owned.
   document.querySelector('[data-cmd="insert:caption-top"]')?.closest('.md-sub')?.classList.remove('disabled');
   const unsupported = new Set<string>();
@@ -108,7 +117,7 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
   eventBus.on('document-swapped', reset);
   window.addEventListener('keydown', (event: KeyboardEvent) => {
     const ih = input(), target = event.target instanceof HTMLElement ? event.target : null;
-    if (document.querySelector('.modal-overlay, dialog[open]') || target?.closest('#jueony-navigation-pane') || (target?.closest('input, textarea, select, [contenteditable=true], [role=textbox]') && target !== ih?.textarea)) { resolver.reset(); return; }
+    if (document.querySelector('.modal-overlay, dialog[open], .context-menu') || target?.closest('#jueony-navigation-pane') || (target?.closest('input, textarea, select, [contenteditable=true], [role=textbox]') && target !== ih?.textarea)) { resolver.reset(); return; }
     const c = automation.getContext();
     // In tables Shift+Tab belongs to cell navigation; hanging indent uses Ctrl+Shift+Tab.
     if ((c.inTable || c.inCellSelectionMode) && event.key === 'Tab' && event.shiftKey && !event.ctrlKey && !event.altKey) { resolver.reset(); return; }

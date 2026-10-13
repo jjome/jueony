@@ -34,6 +34,9 @@ if (Test-Path -LiteralPath (Join-Path $projectRoot 'docs/44-editor-stages-result
 if (Test-Path -LiteralPath (Join-Path $projectRoot 'docs/45-rag-evaluation-corpus.md')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/45-rag-evaluation-corpus.md') -Destination $output -Force
 }
+foreach ($guide in @('46-hangul-implementation-status.md','47-remaining-editor-implementation.md')) {
+    if (Test-Path -LiteralPath (Join-Path $projectRoot ('docs/' + $guide))) { Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination $output -Force }
+}
 foreach ($guide in @('30-layered-modular-refactor-plan.md','31-facade-contracts.md','32-modular-refactor-result.md','33-editor-parity-features-result.md','34-sections-tabs-result.md','35-section-boundary-merge-result.md','36-native-section-comparison.md','37-basic-editing-state-result.md','38-paragraph-selection-state-result.md','39-native-dialog-investigation.md','40-basic-navigation-calendar-result.md','41-pre-agent-editor-progress.md','refactor-work-plan.csv','hangul-2024-gap-checklist.csv')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
@@ -83,6 +86,15 @@ Copy-Item -LiteralPath (Join-Path $projectRoot 'apps/editor/src/modules/document
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/evidence/continuation-2026-10-11') -Destination $llmEvidence -Recurse -Force
 $reviewDocuments = Join-Path $output 'review-documents'
 New-Item -ItemType Directory -Force $reviewDocuments | Out-Null
+if ($FrontendProfile -eq 'remaining-editor') {
+    $editorEvidence = Join-Path $projectRoot 'docs/evidence/remaining-editor-2026-10-13'
+    $editorReview = Join-Path $reviewDocuments 'remaining-editor'
+    New-Item -ItemType Directory -Force $editorReview | Out-Null
+    Get-ChildItem -LiteralPath $editorEvidence -File | Where-Object { $_.Extension -in @('.hwp','.hwpx') } | Copy-Item -Destination $editorReview -Force
+    foreach ($record in @('basic-text-browser.json','verification-summary.json')) {
+        if (Test-Path -LiteralPath (Join-Path $editorEvidence $record)) { Copy-Item -LiteralPath (Join-Path $editorEvidence $record) -Destination $editorReview -Force }
+    }
+}
 $ragCorpus = Join-Path $projectRoot 'fixtures/rag-evaluation'
 if (Test-Path -LiteralPath $ragCorpus) {
     $referenceExamples = Join-Path $output 'reference-examples'

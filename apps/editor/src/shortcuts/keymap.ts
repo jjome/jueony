@@ -61,6 +61,7 @@ export const hangulBindings: Binding[] = [
   binding('Ctrl+Shift+Delete', 'format:toggle-bullet', '글머리표 적용/해제'),
   ...(['K', 'R', 'B', 'D', 'G', 'Y', 'C', 'W'] as const).map((key, i) => binding('Ctrl+M,' + key, 'ext:jueony-color', ['검정', '빨강', '파랑', '자주', '초록', '노랑', '청록', '흰색'][i] + ' 글자색', 'document', { textColor: ['#000000', '#ff0000', '#0000ff', '#ff00ff', '#00ff00', '#ffff00', '#00ffff', '#ffffff'][i] })),
   binding('Ctrl+F10', 'insert:symbols', '문자표'),
+  binding('Shift+F10', 'ext:jueony-context-menu', '빠른 메뉴'),
   binding('Alt+Space', 'insert:fixed-space', '고정폭 빈 칸 (Unicode)'),
   binding('Ctrl+Alt+Space', 'insert:nonbreaking-space', '묶음 빈 칸 (Unicode)'),
   binding('Ctrl+Shift+-', 'insert:soft-hyphen', '무른 하이픈 (Unicode)'),

@@ -1,0 +1,50 @@
+{
+  "status": "PASS_SCOPED_AUTOMATED_CHECKS",
+  "verifiedAt": "2026-10-13T00:19:00.332Z",
+  "unitPassed": 373,
+  "browserPassed": 122,
+  "moduleCount": 9,
+  "moduleFiles": 204,
+  "customSourceSha256": "3dfceeab9ad2d13f5d73b9f640c4a78426ceabdcde78ff85211035959cb51f33",
+  "buildScriptSha256": "8df671207273b6ae1e1c78b58e6c9e551299d4eb84619db8ca81c9be10b2a9f2",
+  "wasmSha256": "5dc02a24794defb8b5e05b0bcc22fc7bdba30f8ec73c7d05a259733399d2423e",
+  "buildApplicationCommit": "39dcf35f8f49f98c1639cb8b6244e9a57acbf77c",
+  "buildApplicationDirty": true,
+  "results": [
+    {
+      "report": "basic-text-browser.json",
+      "passed": 28,
+      "sha256": "99175f8c824d4fc6b80a876408460a5b47a98f36b14ea2c5854a13a94d3859ac"
+    },
+    {
+      "report": "regression-parity/result.json",
+      "passed": 66,
+      "sha256": "303917493e64e16fa53bf3344539e07ea42cb2f76a4a6e6e36f853d51c1e3011"
+    },
+    {
+      "report": "regression-session/result.json",
+      "passed": 9,
+      "sha256": "876caf2414d37f9e90360c3da1c876a8728d154114d01ac5ca12c0bbad983a9b"
+    },
+    {
+      "report": "regression-table/result.json",
+      "passed": 6,
+      "sha256": "e336743de324cff4c9d7f7bb00cc315d4e6402639302d6aa8ba2b393d2dacc0b"
+    },
+    {
+      "report": "regression-agent/result.json",
+      "passed": 9,
+      "sha256": "c3950679f33c11d55f45ada4984f97599fb4b0ba205478902ab7571e2a756b6c"
+    },
+    {
+      "report": "bundle-compatibility/result.json",
+      "passed": 4,
+      "sha256": "5f8582a48a4259fbc7bf57a64915404921becd3182c8522037e35c6afe5fa98f"
+    }
+  ],
+  "limitations": [
+    "Actual Hancom GUI/shortcut/layout comparison deferred by the user.",
+    "No paid LLM request; Agent regression uses a local deterministic model.",
+    "Full Hangul feature parity and four existing public cross-format preservation failures remain incomplete."
+  ]
+}

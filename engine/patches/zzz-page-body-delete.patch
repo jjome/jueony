@@ -1,0 +1,84 @@
+--- a/src/document_core/commands/section_ops.rs
++++ b/src/document_core/commands/section_ops.rs
+@@ -19,7 +19,7 @@
+ /// Publish SectionDef/ColumnDef and their stream slots at the same owner boundary.
+ /// Control-data indices are shifted together; definitions already at the front
+ /// are replaced, while following content and its relative control order survive.
+-fn install_definitions(para: &mut Paragraph, definition: &SectionDef, columns: ColumnDef) {
++pub(crate) fn install_definitions(para: &mut Paragraph, definition: &SectionDef, columns: ColumnDef) {
+     let existing = para
+         .controls
+         .iter()
+--- /dev/null
++++ b/src/document_core/commands/page_body_delete.rs
+@@ -0,0 +1,46 @@
++//! Bounded deletion of full body paragraphs on one physical page.
++//! A spanning paragraph is rejected; the diagnostic page extractor is not reused.
++use crate::document_core::DocumentCore;
++use crate::error::HwpError;
++use crate::model::{control::Control,paragraph::Paragraph};
++use crate::renderer::pagination::PageItem;
++fn fail(s:&str)->HwpError{HwpError::RenderError(s.into())}
++fn simple(p:&Paragraph)->bool{
++    p.field_ranges.is_empty()&&p.orphan_field_ends.is_empty()&&p.range_tags.is_empty()&&p.title_marks.is_empty()&&p.controls.iter().all(|c|matches!(c,Control::SectionDef(_)|Control::ColumnDef(_)))
++}
++impl DocumentCore {
++    pub fn get_page_body_deletion_plan_native(&self,page_num:u32)->Result<String,HwpError>{
++        let mut global=0;let mut found=None;
++        'outer:for (si,pages) in self.pagination.iter().enumerate(){for page in &pages.pages{if global==page_num{found=Some((si,page));break 'outer;}global+=1;}}
++        let (si,page)=found.ok_or_else(||fail("쪽 번호가 범위를 벗어났습니다."))?;let section=&self.document.sections[si];
++        let unsupported=|reason:&str|Ok(serde_json::json!({"ok":true,"supported":false,"page":page_num,"reason":reason}).to_string());
++        if section.section_def.text_direction!=0||section.section_def.hide_empty_line||page.column_contents.len()!=1||!section.paragraphs.iter().all(simple){return unsupported("가로쓰기·한 단·일반 본문 구역만 지원합니다. 표·개체·필드·숨긴 빈 줄은 제외합니다.");}
++        if section.paragraphs.iter().any(|p|p.controls.iter().any(|c|matches!(c,Control::ColumnDef(col) if col.column_count!=1))){return unsupported("다단 구역은 지원하지 않습니다.");}
++        let mut indices=Vec::new();
++        for column in &page.column_contents{for item in &column.items{match item{PageItem::FullParagraph{para_index} if *para_index<section.paragraphs.len()=>indices.push(*para_index),_=>return unsupported("쪽에 걸친 문단·표·개체는 아직 지울 수 없습니다.")}}}
++        indices.sort_unstable();indices.dedup();if indices.is_empty()||indices.len()>1000||indices.windows(2).any(|w|w[1]!=w[0]+1){return unsupported("이 쪽의 연속 본문 범위를 확인할 수 없습니다.");}
++        for other in &self.pagination[si].pages{if std::ptr::eq(other,page){continue;}if other.column_contents.iter().flat_map(|c|&c.items).any(|item|indices.contains(&item.para_index())){return unsupported("여러 쪽에 걸친 문단은 아직 지울 수 없습니다.");}}
++        let texts=indices.iter().map(|i|section.paragraphs[*i].text.clone()).collect::<Vec<_>>();if texts.iter().map(|t|t.chars().count()).sum::<usize>()>100000{return unsupported("한 번에 지울 본문은 10만 문자 이하입니다.");}
++        let digest=crate::model::raw_provenance::section_model_digest(section);let token=digest.iter().map(|b|format!("{:02x}",b)).collect::<String>();
++        Ok(serde_json::json!({"ok":true,"supported":true,"page":page_num,"section":si,"firstParagraph":indices[0],"paragraphCount":indices.len(),"texts":texts,"token":token,"retainsEmptySection":indices.len()==section.paragraphs.len(),"pagesBefore":self.page_count(),"willChange":indices.len()!=section.paragraphs.len()||indices.len()>1||texts.iter().any(|t|!t.is_empty())}).to_string())
++    }
++    pub fn delete_page_body_native(&mut self,page:u32,expected:&str)->Result<String,HwpError>{
++        let plan:serde_json::Value=serde_json::from_str(&self.get_page_body_deletion_plan_native(page)?).map_err(|_|fail("쪽 범위를 읽지 못했습니다."))?;
++        if plan["supported"]!=true{return Err(fail(plan["reason"].as_str().unwrap_or("미지원 쪽")));}
++        if plan["token"].as_str()!=Some(expected){return Err(fail("본문이 바뀌었습니다. 쪽 지우기 창을 다시 여세요."));}
++        let si=plan["section"].as_u64().unwrap() as usize;let first=plan["firstParagraph"].as_u64().unwrap() as usize;let count=plan["paragraphCount"].as_u64().unwrap() as usize;
++        if plan["willChange"]==false{return Ok(serde_json::json!({"ok":true,"sectionIdx":si,"paraIdx":first,"charOffset":0,"changed":false,"pageCount":self.page_count()}).to_string());}
++        let definition=self.document.sections[si].section_def.clone();
++        let columns=self.document.sections[si].paragraphs.iter().flat_map(|p|&p.controls).find_map(|c|if let Control::ColumnDef(col)=c{Some(col.clone())}else{None}).unwrap_or_default();
++        let keep=plan["retainsEmptySection"]==true;
++        for pi in (first..first+count).rev(){if keep&&pi==0{continue;}self.delete_paragraph_native(si,pi)?;}
++        if keep{let length=self.document.sections[si].paragraphs[0].text.chars().count();if length>0{self.delete_text_native(si,0,0,length)?;}}
++        if first==0{super::section_ops::install_definitions(&mut self.document.sections[si].paragraphs[0],&definition,columns);}
++        self.document.sections[si].raw_stream=None;self.document.doc_properties.raw_data=None;
++        self.rebuild_resolved_styles();let start=first.min(self.document.sections[si].paragraphs.len()-1);
++        for pi in start..self.document.sections[si].paragraphs.len(){self.document.sections[si].paragraphs[pi].line_segs.clear();self.reflow_paragraph(si,pi);}
++        let hwp3=self.document.layout_profile().hwp3_layout();crate::renderer::composer::recalculate_section_vpos(&mut self.document.sections[si].paragraphs,start,None,None,&self.styles,self.dpi,hwp3);
++        self.rebuild_derived_state();
++        Ok(serde_json::json!({"ok":true,"sectionIdx":si,"paraIdx":start,"charOffset":0,"retainedEmptySection":keep,"pageCount":self.page_count()}).to_string())
++    }
++}
+--- a/src/document_core/commands/mod.rs
++++ b/src/document_core/commands/mod.rs
+@@ -15,6 +15,7 @@
+ mod header_footer_ops;
+ mod master_pages;
+ mod line_numbers;
++mod page_body_delete;
+ mod html_import;
+ mod object_ops;
+ pub(crate) mod paragraph_block;
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1206,6 +1206,11 @@
+     pub fn set_line_number_settings(&mut self,section:usize,json:&str)->Result<String,JsValue>{self.set_line_number_settings_native(section,json).map_err(|e|e.into())}
+     #[wasm_bindgen(js_name = getPageLineNumbers)]
+     pub fn get_page_line_numbers(&self,page:u32)->Result<String,JsValue>{self.get_page_line_numbers_native(page).map_err(|e|e.into())}
++
++    #[wasm_bindgen(js_name = getPageBodyDeletionPlan)]
++    pub fn page_body_deletion_plan(&self,page:u32)->Result<String,JsValue>{self.get_page_body_deletion_plan_native(page).map_err(|e|e.into())}
++    #[wasm_bindgen(js_name = deletePageBody)]
++    pub fn delete_page_body(&mut self,page:u32,token:&str)->Result<String,JsValue>{self.delete_page_body_native(page,token).map_err(|e|e.into())}
+ 
+     #[wasm_bindgen(js_name = getSectionDef)]
+     pub fn get_section_def(&self, section_idx: u32) -> Result<String, JsValue> {

@@ -25,3 +25,5 @@ export {defaultMasterPageText,validateMasterPageText,sameMasterPageText} from '.
 export type {MasterPageKind,MasterPageText} from '../domain/master-page-settings.ts';
 export {defaultLineNumberSettings,validateLineNumberSettings,sameLineNumberSettings} from '../domain/line-number-settings.ts';
 export type {LineNumberSettings} from '../domain/line-number-settings.ts';
+export {validatePageBodyDeletionPlan,samePageBodyDeletionRange} from '../domain/page-body-deletion.ts';
+export type {PageBodyDeletionPlan} from '../domain/page-body-deletion.ts';

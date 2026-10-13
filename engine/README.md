@@ -45,5 +45,6 @@ Cargo metadata와 build 모두 `--locked`로 실행한다. WSL 캐시는 Linux `
 - `page-border-z-image.patch`: 임베드 PNG/JPEG 등록과 쪽 배경 참조·배치·효과·화면 기준 밝기/대비 편집을 추가한다. 전용 byte reader로 감춰진 배경도 저장 전후 검사한다. 기존 자원 등록 규칙을 재사용하고 새 자원의 실제 디코딩과 크기를 변경 전에 검증한다. HWP의 비율 유지 배경 맞춤은 저장 왕복이 달라 UI에서 비활성화한다. [51번 구현](../docs/51-picture-background-and-paper-scope.md)에 적용 범위와 제한을 기록한다.
 - `master-page-editing.patch`: 기본 텍스트 바탕쪽의 조회·생성·수정·삭제와 양쪽/홀짝 조판을 제공한다. 균일 기존 서식은 유지하고 복잡한 바탕쪽은 거절한다. HWP는 보존 가능한 종류 조합만 허용한다. 검수 엔진 `source-b5764245b2c033bb/pkg`, 적용 범위와 제한은 [52번 결과](../docs/52-master-page-basic-editing.md)를 따른다.
 - `zz-line-number-settings.patch`: HWPX 구역 줄 번호와 문단 제외 값의 IR·파싱·저장 보존, 기본 가로/한 단 본문 번호 렌더링을 추가한다. HWP 바이너리 매핑은 추측하지 않으며 유실되는 내보내기는 앱 보존 검사에서 거절한다. 검수 엔진 `source-c1cfb65fcfbbea50/pkg`, 제한과 결과는 [53번 구현](../docs/53-basic-line-numbers.md)에 기록한다.
+- `zzz-page-body-delete.patch`: 실제 페이지네이션의 완전한 본문 문단 범위만 지우고 첫 문단의 구역/단 정의를 재연결한다. 걸친 문단과 복합 구역은 변경 전에 거절하며 마지막 구역 문단은 비워 유지한다. 검수 엔진 `source-a9cbdd94c8aad084/pkg`, 결과와 제한은 [54번 구현](../docs/54-complete-body-page-deletion.md)을 따른다.
 
 rhwp 원문의 MIT 고지와 별도 third-party 고지를 유지한다. 변경한 엔진에도 같은 라이선스 조건이 적용된다. 개발 도구는 실행 묶음에 포함하지 않는다. 엔진 코드를 컴파일한 사실, 구조·저장 왕복, 한컴의 실제 저장·인쇄·시각 일치는 서로 다른 검증이다. 새 조판 golden을 독립 한컴 출력 없이 추가하거나 테스트 통과만으로 한글 2024와 같다고 판정하지 않는다. 최종 실행 결과는 프로젝트의 작업 결과 문서에 별도로 기록한다.

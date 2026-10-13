@@ -1,0 +1,73 @@
+{
+  "status": "PASS_SCOPED_AUTOMATED_CHECKS",
+  "verifiedAt": "2026-10-13T17:24:16.545Z",
+  "unitPassed": 400,
+  "browserPassed": 213,
+  "nativePassed": 122,
+  "moduleCount": 9,
+  "moduleFiles": 222,
+  "customSourceSha256": "cb7fcf8e6ee76157c216f36d7b74e996047b985955068f0d7abe3df23477de64",
+  "buildScriptSha256": "8df671207273b6ae1e1c78b58e6c9e551299d4eb84619db8ca81c9be10b2a9f2",
+  "wasmSha256": "b5572627cc916a7b7963e2c2a777cde90593fad2d3a8097ab805228931da886e",
+  "engineSourceId": "c1cfb65fcfbbea50",
+  "buildApplicationCommit": "752bd45e675d9b2c619420544857e5cfee16ba9d",
+  "buildApplicationDirty": true,
+  "reports": [
+    {
+      "file": "browser/result.json",
+      "passed": 24,
+      "sha256": "f439175a440178ef974bf6b6be87eeb676b7d96a6599f51990ca4e939c456d5a"
+    },
+    {
+      "file": "regression-parity/result.json",
+      "passed": 66,
+      "sha256": "ed2d4c189826faef9cc7d44289ad8a26c2e70088d2c65edda281c7e8e6d8a87a"
+    },
+    {
+      "file": "regression-session/result.json",
+      "passed": 9,
+      "sha256": "bac3ea56cbd24bdb45ed9c83d6f661a69bfbe5825a265928627a1f9cde539d3d"
+    },
+    {
+      "file": "basic-text/basic-text-browser.json",
+      "passed": 28,
+      "sha256": "bd63c31e38a290227dc16e5aa0210ded0d6bbac110479674bad0dd9b7d625bcd"
+    },
+    {
+      "file": "regression-agent/result.json",
+      "passed": 9,
+      "sha256": "143d50e3f0316f2b6bd3205c01b14b790fdbdf0a6718c8b138b77fce0f52d673"
+    },
+    {
+      "file": "regression-table/result.json",
+      "passed": 18,
+      "sha256": "249229d4d4cf4d311b4010efd201415994fc1dff4d13f013b8825d871c260c2a"
+    },
+    {
+      "file": "image-browser/result.json",
+      "passed": 26,
+      "sha256": "e2fe78d4242d6458ad7c065e5fa0a1f75fd43b4710961c5496baf217c21aad94"
+    },
+    {
+      "file": "master-browser/result.json",
+      "passed": 17,
+      "sha256": "a6f5d72be6c39fed151aea9c75ca716debb64b5e878761f7c93372e4a5b99835"
+    },
+    {
+      "file": "line-browser/result.json",
+      "passed": 12,
+      "sha256": "5468279755fc16b4f3f79761c573153d6c4a240928d5ebed3e10fcb512000c0d"
+    },
+    {
+      "file": "bundle-compatibility/result.json",
+      "passed": 4,
+      "sha256": "dda2bb9afe48bed62b4f4e04610c80d706b9928f22561259748c080c894f8a2a"
+    }
+  ],
+  "limitations": [
+    "Actual Hancom GUI/layout comparison is deferred.",
+    "No paid LLM request: Agent tests use a deterministic local adapter.",
+    "Full Hangul feature parity remains incomplete; no percentage of completion is inferred from these scoped tests.",
+    "Unsupported source properties may be blocked by the stricter cell preservation guard."
+  ]
+}

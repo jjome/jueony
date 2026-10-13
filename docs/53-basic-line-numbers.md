@@ -39,7 +39,7 @@ HWP 바이너리의 줄 번호 필드 배치를 확인하지 못했으므로 추
 
 줄 번호 전용 엔진 검사 15개와 실제 Edge 검사 12개가 통과했다. 독립 XML 검사로 원본 옵션·제외 스타일·미지원 방식 보존을 확인했고, 자동 줄바꿈·쪽/구역 재시작·이어 매기기·숨기기·본문 후속 편집·undo/redo·오래된 대화상자·부분 실패를 검사했다. 한컴에서 만든 지면 golden과 비교한 결과는 아니다.
 
-전체 회귀는 [최종 검증 요약](evidence/line-numbers-2026-10-14/verification-summary.json)에 기록한다. 소스·통합 패치·WASM이 각 보고서와 일치해야 통과하며, TypeScript와 9개 모듈/222개 소스의 경계도 검사한다. 기존 Agent 검사는 로컬 mock으로 수행하고 API 키나 유료 요청을 사용하지 않는다.
+전체 회귀는 단위 400개, 브라우저 213개, 엔진 122개가 통과했다. [최종 검증 요약](evidence/line-numbers-2026-10-14/verification-summary.json)에서 소스·통합 패치·WASM이 각 보고서와 일치함을 확인했다. TypeScript와 9개 모듈/222개 소스의 경계 검사도 통과했다. 기존 Agent 검사는 로컬 mock으로 수행하고 API 키나 유료 요청을 사용하지 않는다.
 
 실행 묶음은 `build/jueony-line-numbers-20261014/Start-Review.cmd`, 주소는 `http://127.0.0.1:4227/`다. 이전 4226 창과 문서는 종료하지 않는다. 검수 파일은 `review-documents/line-numbers/line-native`와 `line-browser`에 포함한다.
 

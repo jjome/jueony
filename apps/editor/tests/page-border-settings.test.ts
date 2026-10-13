@@ -1,8 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {defaultPageGradient,validatePageBorderSettings,samePageBorderSettings,pageSpacingFromInput} from '../src/modules/document/public/index.ts';
-import {readPageBorderSettings,writePageBorderSettings,collectPageBorderSettings,planPageBorderEdits,executePageBorderEdits,supportsPageBorderInclusion} from '../src/adapters/rhwp/page-border-settings.ts';
+import {readPageBorderSettings,writePageBorderSettings,collectPageBorderSettings,planPageBorderEdits,executePageBorderEdits,supportsPageBorderInclusion,supportsPageBorderFillArea} from '../src/adapters/rhwp/page-border-settings.ts';
 const settings=()=>({kind:'both' as const,applyPage:'all' as const,fillType:'solid',spacingLeft:1417,spacingRight:1417,spacingTop:1417,spacingBottom:1417,fillColor:'#ffffff',patternType:-1});
+
+test('border-region filling requires engine capability while existing stored values remain preservable',()=>{
+ let writes=0;const wasm={getPageBorderFillEntry:()=>JSON.stringify({...settings(),fillArea:'paper'}),setPageBorderFillEntry:()=>{writes++;return '{"ok":true}';}};
+ assert.equal(supportsPageBorderFillArea(undefined),false);assert.equal(supportsPageBorderFillArea(wasm),false);
+ assert.throws(()=>writePageBorderSettings(wasm,0,'both',{...settings(),fillArea:'border'}),/배경 배치/);assert.equal(writes,0);
+ const capable={...wasm,pageBorderFillAreaEnabled:()=>true};assert.equal(supportsPageBorderFillArea(capable),true);writePageBorderSettings(capable,0,'both',{...settings(),fillArea:'border'});assert.equal(writes,1);
+ const existing={...wasm,getPageBorderFillEntry:()=>JSON.stringify({...settings(),fillArea:'border'})};writePageBorderSettings(existing,0,'both',{...settings(),fillArea:'border',fillColor:'#123456'});assert.equal(writes,2);
+});
 test('validates two-color native gradients and rejects unsupported stop fidelity or invalid coordinates',()=>{
  const value={...settings(),fillType:'gradient',gradient:defaultPageGradient()};assert.deepEqual(validatePageBorderSettings(value),value);
  for(const gradient of [{...value.gradient,colors:['#fff','#000000']},{...value.gradient,colors:['#ffffff','#123456','#000000']},{...value.gradient,angle:361},{...value.gradient,centerX:-1},{...value.gradient,positions:[0,100]}])assert.throws(()=>validatePageBorderSettings({...value,gradient}));

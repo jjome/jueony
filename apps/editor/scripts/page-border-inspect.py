@@ -13,7 +13,7 @@ for element in section.iter():
     if local(element) == 'pageBorderFill':
         entries.append({'type': element.attrib.get('type'), 'id': element.attrib.get('borderFillIDRef'),
                         'headerInside': element.attrib.get('headerInside'), 'footerInside': element.attrib.get('footerInside'),
-                        'textBorder': element.attrib.get('textBorder')})
+                        'textBorder': element.attrib.get('textBorder'), 'fillArea': element.attrib.get('fillArea')})
     if local(element) == 'visibility':
         visibility = element.attrib
 fills = []

@@ -1,0 +1,161 @@
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -5644,6 +5644,20 @@
+                 layout.body_area.width,
+                 layout.body_area.height,
+             ),
++            2 => page_border_fill
++                .and_then(|pbf| pbf.border_fill_id.checked_sub(1)
++                    .and_then(|index| styles.border_styles.get(index as usize))
++                    .map(|style| self.page_border_bounds(layout, pbf, &style.borders)))
++                .map(|bounds| {
++                    // Border spacing may place outlines outside the sheet. A fill
++                    // is clipped to the sheet and never leaks onto adjacent pages.
++                    let left = bounds.x.clamp(0.0, layout.page_width);
++                    let top = bounds.y.clamp(0.0, layout.page_height);
++                    let right = (bounds.x + bounds.width).clamp(left, layout.page_width);
++                    let bottom = (bounds.y + bounds.height).clamp(top, layout.page_height);
++                    BoundingBox::new(left, top, right - left, bottom - top)
++                })
++                .unwrap_or_else(|| BoundingBox::new(0.0, 0.0, 0.0, 0.0)),
+             _ => BoundingBox::new(0.0, 0.0, layout.page_width, layout.page_height),
+         };
+ 
+@@ -5696,6 +5710,66 @@
+         }
+         // 쪽 테두리 경로도 같은 아래쪽 여백 기준선을 소비한다.
+         Some(self.footer_page_number_y(layout, &layout.footer_area, font_size))
++    }
++
++    fn page_border_bounds(
++        &self,
++        layout: &PageLayoutInfo,
++        pbf: &PageBorderFill,
++        borders: &[BorderLine; 4],
++    ) -> BoundingBox {
++        let paper_based = matches!(pbf.basis, PageBorderBasis::PaperBased);
++        let (base_x, base_y, base_w, base_h) = if paper_based {
++            (0.0, 0.0, layout.page_width, layout.page_height)
++        } else {
++            // Inclusion applies only to body-based borders. Use the same
++            // configured story bands as pagination, even for empty stories.
++            let body_top = layout.body_area.y;
++            let body_bottom = body_top + layout.body_area.height;
++            let top = if pbf.attr & 2 != 0 {
++                layout.header_area.y.clamp(0.0, body_top)
++            } else { body_top };
++            let bottom = if pbf.attr & 4 != 0 {
++                (layout.footer_area.y + layout.footer_area.height)
++                    .clamp(body_bottom, layout.page_height)
++            } else { body_bottom };
++            (layout.body_area.x, top, layout.body_area.width, bottom - top)
++        };
++
++        let sp_l = hwpunit_to_px(pbf.spacing_left as i32, self.dpi);
++        let sp_r = hwpunit_to_px(pbf.spacing_right as i32, self.dpi);
++        let sp_t = hwpunit_to_px(pbf.spacing_top as i32, self.dpi);
++        let sp_b = hwpunit_to_px(pbf.spacing_bottom as i32, self.dpi);
++        let (out_l, out_r, out_t, out_b) = if paper_based {
++            (0.0, 0.0, 0.0, 0.0)
++        } else {
++            (
++                body_page_border_outset(&borders[0]),
++                body_page_border_outset(&borders[1]),
++                body_page_border_outset(&borders[2]),
++                0.0,
++            )
++        };
++        // 종이 기준: 종이 가장자리에서 안쪽(+)으로 spacing
++        // 쪽 기준: 본문 영역에서 바깥쪽(-)으로 spacing + 선 묶음 폭만큼 확장
++        // 단 하단은 footer/쪽번호 영역과 맞닿으므로 한컴처럼 spacing까지만
++        // 반영한다. 상단/좌우 outset은 Stage 29 로고 정합을 유지한다.
++        let (bx, by, bw, bh) = if paper_based {
++            (
++                base_x + sp_l,
++                base_y + sp_t,
++                base_w - sp_l - sp_r,
++                base_h - sp_t - sp_b,
++            )
++        } else {
++            (
++                base_x - sp_l - out_l,
++                base_y - sp_t - out_t,
++                base_w + sp_l + sp_r + out_l + out_r,
++                base_h + sp_t + sp_b + out_t + out_b,
++            )
++        };
++        BoundingBox::new(bx, by, bw.max(0.0), bh.max(0.0))
+     }
+ 
+     fn build_page_borders(
+@@ -5740,56 +5814,8 @@
+                     );
+                 }
+                 let borders = &bs.borders;
+-                let (base_x, base_y, base_w, base_h) = if paper_based {
+-                    (0.0, 0.0, layout.page_width, layout.page_height)
+-                } else {
+-                    // Inclusion applies only to body-based borders. Use the same
+-                    // configured story bands as pagination, even for empty stories.
+-                    let body_top = layout.body_area.y;
+-                    let body_bottom = body_top + layout.body_area.height;
+-                    let top = if pbf.attr & 2 != 0 {
+-                        layout.header_area.y.clamp(0.0, body_top)
+-                    } else { body_top };
+-                    let bottom = if pbf.attr & 4 != 0 {
+-                        (layout.footer_area.y + layout.footer_area.height)
+-                            .clamp(body_bottom, layout.page_height)
+-                    } else { body_bottom };
+-                    (layout.body_area.x, top, layout.body_area.width, bottom - top)
+-                };
+-
+-                let sp_l = hwpunit_to_px(pbf.spacing_left as i32, self.dpi);
+-                let sp_r = hwpunit_to_px(pbf.spacing_right as i32, self.dpi);
+-                let sp_t = hwpunit_to_px(pbf.spacing_top as i32, self.dpi);
+-                let sp_b = hwpunit_to_px(pbf.spacing_bottom as i32, self.dpi);
+-                let (out_l, out_r, out_t, out_b) = if paper_based {
+-                    (0.0, 0.0, 0.0, 0.0)
+-                } else {
+-                    (
+-                        body_page_border_outset(&borders[0]),
+-                        body_page_border_outset(&borders[1]),
+-                        body_page_border_outset(&borders[2]),
+-                        0.0,
+-                    )
+-                };
+-                // 종이 기준: 종이 가장자리에서 안쪽(+)으로 spacing
+-                // 쪽 기준: 본문 영역에서 바깥쪽(-)으로 spacing + 선 묶음 폭만큼 확장
+-                // 단 하단은 footer/쪽번호 영역과 맞닿으므로 한컴처럼 spacing까지만
+-                // 반영한다. 상단/좌우 outset은 Stage 29 로고 정합을 유지한다.
+-                let (bx, by, bw, bh) = if paper_based {
+-                    (
+-                        base_x + sp_l,
+-                        base_y + sp_t,
+-                        base_w - sp_l - sp_r,
+-                        base_h - sp_t - sp_b,
+-                    )
+-                } else {
+-                    (
+-                        base_x - sp_l - out_l,
+-                        base_y - sp_t - out_t,
+-                        base_w + sp_l + sp_r + out_l + out_r,
+-                        base_h + sp_t + sp_b + out_t + out_b,
+-                    )
+-                };
++                let bounds = self.page_border_bounds(layout, pbf, borders);
++                let (bx, by, bw, bh) = (bounds.x, bounds.y, bounds.width, bounds.height);
+ 
+                 let top_nodes =
+                     create_border_line_nodes(tree.frame_mut(), &borders[2], bx, by, bx + bw, by);
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1233,6 +1233,9 @@
+ 
+     #[wasm_bindgen(js_name = pageBorderInclusionEnabled)]
+     pub fn page_border_inclusion_enabled(&self) -> bool { true }
++
++    #[wasm_bindgen(js_name = pageBorderFillAreaEnabled)]
++    pub fn page_border_fill_area_enabled(&self) -> bool { true }
+ 
+     #[wasm_bindgen(js_name = getPageBorderFillEntry)]
+     pub fn get_page_border_fill_entry(&self, section_idx:u32, kind:&str)->Result<String,JsValue>{self.core.get_page_border_fill_entry_native(section_idx as usize,kind).map_err(|error|error.into())}

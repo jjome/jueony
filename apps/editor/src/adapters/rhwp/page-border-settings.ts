@@ -6,6 +6,7 @@ const parse=(value:any)=>typeof value==='string'?JSON.parse(value):value;
 const documentHandle=(wasm:any)=>wasm.borrowDocumentHandle?.()??wasm.doc??wasm;
 export function supportsPageBorderEntries(wasm:any):boolean {const doc=documentHandle(wasm);return typeof doc?.getPageBorderFillEntry==='function'&&typeof doc?.setPageBorderFillEntry==='function';}
 export function supportsPageBorderInclusion(wasm:any):boolean {if(!wasm)return false;const doc=documentHandle(wasm);return typeof doc?.pageBorderInclusionEnabled==='function'&&doc.pageBorderInclusionEnabled()===true;}
+export function supportsPageBorderFillArea(wasm:any):boolean {if(!wasm)return false;const doc=documentHandle(wasm);return typeof doc?.pageBorderFillAreaEnabled==='function'&&doc.pageBorderFillAreaEnabled()===true;}
 export function readPageBorderSettings(wasm:any,section:number,kind:PageBorderKind='both'):PageBorderSettings {
  const doc=documentHandle(wasm);
  if(supportsPageBorderEntries(wasm))return parse(doc.getPageBorderFillEntry(section,kind));
@@ -15,6 +16,7 @@ export function readPageBorderSettings(wasm:any,section:number,kind:PageBorderKi
 export function writePageBorderSettings(wasm:any,section:number,kind:PageBorderKind,value:PageBorderSettings):void {
  const next=validatePageBorderSettings({...value,kind}),doc=documentHandle(wasm);
  const current=readPageBorderSettings(wasm,section,kind);
+ if(next.fillArea==='border'&&current.fillArea!=='border'&&!supportsPageBorderFillArea(wasm))throw new Error('이 문서 엔진은 테두리 영역의 배경 배치를 지원하지 않습니다.');
  if(next.applyPage!==undefined&&next.applyPage!==current.applyPage){
   next.hideBorder=next.hideFill=next.applyPage==='exceptFirst';
   next.firstPageBorder=next.firstPageFill=next.applyPage==='firstOnly';
@@ -151,6 +153,7 @@ export function createPageGradientControls(dialog:any):HTMLElement {
  return root;
 }
 export function populatePageBorderExtras(dialog:any):void {
+ for(const input of dialog.dialog.querySelectorAll('input[name="page-border-fill-area"][value="border"]')){input.disabled=!supportsPageBorderFillArea(dialog.wasm);input.title=input.disabled?'이 엔진은 저장된 값을 보존하지만 테두리 배경 배치를 지원하지 않습니다.':'실제 쪽 테두리 안쪽을 채웁니다.';}
  for(const select of dialog.dialog.querySelectorAll('[data-page-border-kind]'))select.value=dialog.jueonyKind;
  dialog.jueonyHeaderInside.checked=dialog.settings.headerInside;dialog.jueonyFooterInside.checked=dialog.settings.footerInside;
  for(const input of dialog.dialog.querySelectorAll('input[name="page-border-apply"]'))input.checked=input.value===(dialog.jueonyApplicationChanged?dialog.jueonyApplication:dialog.settings.applyPage??'all');

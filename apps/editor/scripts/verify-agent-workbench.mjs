@@ -19,7 +19,8 @@ const active=async()=>await (await page.$('.editor-frame:not([hidden])')).conten
 const snapshot=async()=>await (await active()).evaluate(()=>window.jueonyEditor.snapshot());
 const clickLast=async(text)=>{for(const b of (await page.$$('.message-actions button')).reverse())if(await b.evaluate((e,text)=>e.textContent===text,text)){await b.click();return;}throw new Error('button missing '+text);};
 const waitIdle=()=>page.waitForFunction(()=>!document.getElementById('send-request').disabled,{timeout:60000});
-const send=async(text)=>{await page.type('#request-input',text);await page.click('#send-request');await page.waitForFunction(()=>document.getElementById('send-request').disabled);await waitIdle();};
+// Observe before the click so a fast fixture completion cannot hide the busy transition.
+const send=async(text)=>{await page.type('#request-input',text);await page.evaluate(()=>{window.__agentSendStarted=false;window.__agentSendObserver=new MutationObserver(()=>{if(document.getElementById('send-request').disabled)window.__agentSendStarted=true;});window.__agentSendObserver.observe(document.getElementById('send-request'),{attributes:true,attributeFilter:['disabled']});});try{await page.click('#send-request');await page.waitForFunction(()=>window.__agentSendStarted);await waitIdle();}finally{await page.evaluate(()=>window.__agentSendObserver?.disconnect());}};
 const undo=async()=>{await clickLast('요청 되돌리기');await page.waitForFunction(()=>document.getElementById('app-status').textContent.includes('되돌렸습니다'));};
 try{
  for(let i=0;i<100;i++){if(await fetch(origin+'/api/health').then(r=>r.ok,()=>false))break;await new Promise(r=>setTimeout(r,100));}

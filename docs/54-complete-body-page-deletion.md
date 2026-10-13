@@ -34,7 +34,9 @@ Native token은 구역 모델의 변경 검사이며 앱의 전체 문서 revisi
 
 HWPX의 비활성 채우기 기본값 차이는 기존 보존 계약과 같이 실제 표시 속성과 구분한다. 실문서 적용 전후 글자 속성은 그대로 비교하고, 저장 재열기에서는 활성 서식과 표시 값들을 검사한다. 한글 지면 golden과의 동일성 검사는 아니다.
 
-전체 자동 회귀와 소스·통합 패치·WASM 해시 대조는 [검증 요약](evidence/page-delete-2026-10-14/verification-summary.json)에 기록한다. TypeScript, 단위 검사와 모듈 경계도 검사하며 Agent는 로컬 mock을 사용한다.
+전체 자동 회귀는 단위 402개, 브라우저 224개, 엔진 135개가 통과했다. 소스·통합 패치·WASM 해시 대조는 [검증 요약](evidence/page-delete-2026-10-14/verification-summary.json)에 기록한다. TypeScript와 9개 모듈/224개 소스 경계도 통과했으며 Agent는 로컬 mock을 사용한다.
+
+Agent 회귀의 첫 동시 실행에서는 실제 요청이 완료된 뒤 검사 코드가 작업 시작 상태를 기다려 시간 초과했다. 단독 재실행의 실제 동작을 확인하고, 클릭 전에 disabled 상태 변화를 관찰하도록 검사 경합을 수정하여 최종 9개 사례가 통과했다. 제품의 응답·보호 조건이나 테스트 시간 제한을 느슨하게 하지 않았다.
 
 최신 묶음은 `build/jueony-page-delete-20261014/Start-Review.cmd`, 주소는 `http://127.0.0.1:4228/`다. 이전 창은 종료하지 않는다. 한글에서 나중에 열어볼 합성 저장 파일은 `review-documents/page-delete/delete-native`와 `delete-browser`에 포함한다.
 

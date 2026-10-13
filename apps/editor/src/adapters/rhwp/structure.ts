@@ -1,5 +1,6 @@
 import type { Cell, Table, Structure } from '../../modules/document/public/types.ts';
 import {readLineNumberSettings} from './line-numbers.ts';
+import {readAgentMasterPages} from './agent-master-pages.ts';
 export type { Cell, Table, Structure } from '../../modules/document/public/types.ts';
 // All coordinates refer to the currently open WASM document, never its disk copy.
 export const parsed = (v: any): any => typeof v === 'string' ? JSON.parse(v) : v;
@@ -19,6 +20,7 @@ export function readStructure(wasm: any): Structure {
       entry.lineNumbers={enabled:settings.enabled,restart:([null,'page','section','continuous'] as const)[settings.restartType]??null,countBy:settings.countBy,startNumber:settings.startNumber,distanceMm:Math.round(settings.distance*25.4/7200*1000000)/1000000,editable:settings.editable};
     }
     sections.push(entry);
+    if(typeof doc.getMasterPages==='function'&&typeof doc.setMasterPageText==='function')entry.masterPages=readAgentMasterPages(doc,section);
     if(typeof doc.getAgentPageBackground==='function')entry.pageBackgrounds=['both','even','odd'].map(kind=>{
       const setting=parsed(doc.getAgentPageBackground(section,kind));
       const visibility=parsed(doc.getPageBorderFillEntry(section,kind));
@@ -54,5 +56,6 @@ export function readStructure(wasm: any): Structure {
     tables.push({ id: `s${section}p${paragraph}t${ci}`, section, paragraph, control: ci, rows: dimensions.rowCount, columns: dimensions.colCount, cells });
   }
   const styles=parsed(doc.getStyleList()).map((style:any)=>({id:style.id,name:style.name,type:style.type}));
+  if(sections.reduce((total,s)=>total+(s.masterPages?.pages.reduce((n,p)=>n+Array.from(p.text).length,0)??0),0)>120000)throw new Error('바탕쪽 문맥은 전체 120,000자 이하입니다. 원본 바탕쪽은 유지됩니다.');
   return { sections, tables, paragraphs,styles, unsupportedControls: [...new Set(unsupportedControls)] };
 }

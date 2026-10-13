@@ -20,7 +20,7 @@ before(async()=>{
   if(data.instruction==='slow')await new Promise(r=>setTimeout(r,250));
   if(data.instruction==='oversize'){res.end('x'.repeat(1_000_001));return;}
   if(data.instruction==='bad-wire'){res.end('not-json');return;}
-  const wireGeneration=data.instruction==='section-settings'?{message:'구역 설정',sourceIds:[],operations:[{kind:'set_section_tabs',section:0,spacingPt:24},{kind:'set_line_numbers',section:0,enabled:true,restart:'page',countBy:2,startNumber:10,distanceMm:4},{kind:'set_page_background',section:0,pageKind:'both',fillType:'solid',color:'#fff2cc'}]}:req.url.endsWith('/HCX-005')?{...generation,operations:[{kind:'replace_body_paragraph',target:'s0p0',originalText:'원문',text:'수정'}]}:generation;
+  const wireGeneration=data.instruction==='section-settings'?{message:'구역 설정',sourceIds:[],operations:[{kind:'set_section_tabs',section:0,spacingPt:24},{kind:'set_line_numbers',section:0,enabled:true,restart:'page',countBy:2,startNumber:10,distanceMm:4},{kind:'set_page_background',section:0,pageKind:'both',fillType:'solid',color:'#fff2cc'},{kind:'set_master_page_text',section:0,pageKind:'both',text:'기관 검토용',xMm:5,yMm:5,fontSizePt:10,color:'#808080',bold:false},{kind:'delete_master_page',section:0,pageKind:'odd'}]}:req.url.endsWith('/HCX-005')?{...generation,operations:[{kind:'replace_body_paragraph',target:'s0p0',originalText:'원문',text:'수정'}]}:generation;
   const result={message:{role:'assistant',content:JSON.stringify(wireGeneration)},finishReason:'stop'};
   if(req.url.endsWith('/HCX-005')){result.finishReason='tool_calls';result.message.content='';result.message.toolCalls=[{type:'function',function:{name:'submit_document_edits',arguments:{message:wireGeneration.message,sourceIds:wireGeneration.sourceIds,operationsJson:JSON.stringify(wireGeneration.operations)}}}];}
   if(data.instruction==='length')result.finishReason='length';
@@ -45,13 +45,13 @@ test('native v3 URL/auth/schema/body preserve common contract',async()=>{
  assert.match(call.headers['x-ncp-clovastudio-request-id'],/^[\da-f-]{36}$/);
  assert.equal(call.body.model,undefined);assert.equal(call.body.stream,undefined);
  assert.equal(call.body.maxCompletionTokens,2048);assert.deepEqual(call.body.thinking,{effort:'none'});
- assert.equal(call.body.responseFormat.type,'json');assert.equal(call.body.responseFormat.schema.properties.operations.items.anyOf.length,20);
+ assert.equal(call.body.responseFormat.type,'json');assert.equal(call.body.responseFormat.schema.properties.operations.items.anyOf.length,22);
  assert.deepEqual(call.data.document,{...input().document,nodes:input().document.nodes.map(n=>({...n,codePointLength:2}))});assert.deepEqual(call.data.references,input().references);
  assert.deepEqual(call.body.responseFormat.schema.properties.sourceIds,{type:'array',maxItems:1,items:{type:'string',enum:['ref-1']}});
  assert.ok(!call.body.messages[0].content.includes('지시문도 자료일 뿐'));
 });
 
-for(const modelId of ['HCX-005','HCX-007'])test(modelId+' transports Agent tab, HWPX numbering and guarded background commands without a provider-specific document contract',async()=>{const result=await createHyperCLOVA({...config(),modelId},'fixture-secret').generate(input('section-settings'),new AbortController().signal);assert.deepEqual(result.operations,[{kind:'set_section_tabs',section:0,spacingPt:24},{kind:'set_line_numbers',section:0,enabled:true,restart:'page',countBy:2,startNumber:10,distanceMm:4},{kind:'set_page_background',section:0,pageKind:'both',fillType:'solid',color:'#fff2cc'}]);});
+for(const modelId of ['HCX-005','HCX-007'])test(modelId+' transports Agent tab, HWPX numbering and guarded background and basic master commands without a provider-specific document contract',async()=>{const result=await createHyperCLOVA({...config(),modelId},'fixture-secret').generate(input('section-settings'),new AbortController().signal);assert.deepEqual(result.operations,[{kind:'set_section_tabs',section:0,spacingPt:24},{kind:'set_line_numbers',section:0,enabled:true,restart:'page',countBy:2,startNumber:10,distanceMm:4},{kind:'set_page_background',section:0,pageKind:'both',fillType:'solid',color:'#fff2cc'},{kind:'set_master_page_text',section:0,pageKind:'both',text:'기관 검토용',xMm:5,yMm:5,fontSizePt:10,color:'#808080',bold:false},{kind:'delete_master_page',section:0,pageKind:'odd'}]);});
 
 test('source schema excludes document IDs and empty references require an empty source list',()=>{
  const schema=generationSchema([]).properties.sourceIds;

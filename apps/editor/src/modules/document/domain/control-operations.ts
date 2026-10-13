@@ -1,6 +1,7 @@
 import type { Snapshot, Table, ControlOp, EditOp, DocumentProperties } from '../public/types.ts';
 import {tableAxisKinds,controlKinds} from '../public/wire-schema.mjs';
 import {agentTabSpacingRaw,agentLineNumberSettings} from './agent-section-settings.ts';
+import {agentMasterPagePayload,assertAgentMasterKinds} from './agent-master-pages.ts';
 export {tableAxisKinds,controlKinds};
 const fail = (m: string): never => { throw new Error(m); };
 const object = (v: unknown): Record<string, unknown> => { if (!v || typeof v !== 'object' || Array.isArray(v)) return fail('명령 객체가 필요합니다.'); return v as Record<string, unknown>; };
@@ -61,6 +62,11 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
   // Single columns can carry sameWidth=false; the engine still supports their numbering.
   const lineColumns = new Map(structure!.sections.map(s=>[s.index,s.columns?.columnCount]));
   const lineNumbers = new Map(structure!.sections.map(s=>[s.index,s.lineNumbers]));
+  const masters = new Map(structure!.sections.map(s=>[s.index,s.masterPages?structuredClone(s.masterPages):undefined]));
+  const changedMasters = new Map<number,Set<string>>();
+  const checkMasterStarts=(section:number)=>{
+    for(const page of masters.get(section)?.pages??[])if(changedMasters.get(section)?.has(page.kind))agentMasterPagePayload({kind:'set_master_page_text',section,pageKind:page.kind,text:page.text,xMm:page.xMm,yMm:page.yMm,fontSizePt:page.fontSizePt,color:page.color,bold:page.bold},pages.get(section));
+  };
   const tableSections = new Set(structure!.tables.map(t=>t.section));
   const checkLineNumbers=(section:number)=>{
     const lines=lineNumbers.get(section);if(!lines?.enabled)return;
@@ -91,6 +97,17 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
     } else if(op.kind==='apply_paragraph_style'){
       only(op,['kind','target','styleId']);body(op.target);
       if(!structure!.styles?.some(style=>style.id===op.styleId&&style.type===0))fail('현재 문서의 문단 스타일 ID가 필요합니다.');
+    } else if(op.kind==='set_master_page_text'||op.kind==='delete_master_page'){
+      only(op,op.kind==='delete_master_page'?['kind','section','pageKind']:['kind','section','pageKind','text','xMm','yMm','fontSizePt','color','bold']);integer(op.section,0,structure!.sections.length-1);
+      if(!['both','even','odd'].includes(op.pageKind))fail('바탕쪽 종류는 양쪽·홀수·짝수입니다.');
+      const current=masters.get(op.section);if(!current?.editable)fail('원본 바탕쪽이 읽기 전용이거나 조회되지 않았습니다.');
+      const existing=current!.pages.find(p=>p.kind===op.pageKind),rest=current!.pages.filter(p=>p.kind!==op.pageKind);
+      if(op.kind==='set_master_page_text'){
+        agentMasterPagePayload(op,pages.get(op.section));
+        rest.push({...existing,kind:op.pageKind,text:op.text,textTruncated:false,xMm:op.xMm,yMm:op.yMm,fontSizePt:op.fontSizePt,color:op.color.toLowerCase(),bold:op.bold,italic:existing?.italic??false,underline:existing?.underline??null,editable:true,paragraphCount:op.text.split('\n').length,controlCount:0});
+      }
+      assertAgentMasterKinds(snapshot.name,rest.map(p=>p.kind));current!.pages=rest;
+      const changed=changedMasters.get(op.section)??new Set();changed.add(op.pageKind);changedMasters.set(op.section,changed);checkMasterStarts(op.section);
     } else if(op.kind==='set_page_background'){
       only(op,['kind','section','pageKind','fillType','color']);integer(op.section,0,structure!.sections.length-1);
       if(!['both','even','odd'].includes(op.pageKind)||!['none','solid'].includes(op.fillType)||typeof op.color!=='string'||!/^#[0-9a-f]{6}$/i.test(op.color))fail('쪽 배경은 양쪽·홀수·짝수 쪽의 없음·단색(#RRGGBB)만 지원합니다.');
@@ -118,7 +135,7 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
       properties(op.properties,{hideHeader:'boolean',hideFooter:'boolean',hideMasterPage:'boolean',hideBorder:'boolean',hideFill:'boolean',hidePageNum:'boolean'});
     } else if (op.kind === 'set_page_setup') {
       only(op, ['kind', 'section', 'properties']); integer(op.section, 0, structure!.sections.length - 1);
-      properties(op.properties, pageRules); pages.set(op.section, pageProperties(pages.get(op.section), op.properties));checkColumns(op.section);checkLineNumbers(op.section);
+      properties(op.properties, pageRules); pages.set(op.section, pageProperties(pages.get(op.section), op.properties));checkColumns(op.section);checkLineNumbers(op.section);checkMasterStarts(op.section);
     } else if (op.kind === 'create_table') {
       only(op, ['kind', 'after', 'resultId', 'rows']); body(op.after);
       const section=body(op.after).section;tableSections.add(section);checkLineNumbers(section);

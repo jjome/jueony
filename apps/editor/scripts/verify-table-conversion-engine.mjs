@@ -8,6 +8,7 @@ import { readAutoFillPlan, executeAutoFill, preflightAutoFill } from '../src/ada
 import { readTablePresetPlan, executeTablePreset, preflightTablePreset } from '../src/adapters/rhwp/table-presets-native.ts';
 import { readParagraphSortPlan, executeParagraphSort, preflightParagraphSort } from '../src/adapters/rhwp/paragraph-sort-native.ts';
 import { tablePresets } from '../src/modules/document/public/table-presets.ts';
+import { readTransposePlan, executeTranspose, preflightTranspose } from '../src/adapters/rhwp/transpose-table.ts';
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 if (!process.env.JUEONY_ENGINE_PACKAGE) throw new Error('Set JUEONY_ENGINE_PACKAGE to the verified engine package');
@@ -19,6 +20,34 @@ const results = [], failures = [], fresh = () => { const d = HwpDocument.createE
 const body = d => Array.from({ length: d.getParagraphCount(0) }, (_, p) => d.getTextRange(0, p, 0, d.getParagraphLength(0, p)));
 async function test(name, run) { try { await run(); results.push(name); console.log('PASS', name); } catch (error) { failures.push({ name, error: String(error), stack: error.stack }); console.error('FAIL', name, error); } }
 for (const ext of ['hwp', 'hwpx']) {
+  for (const [unit, seeds] of [['months', ['2026-01-31', '2026-02-28']], ['years', ['2024-02-29', '2025-02-28']]]) await test(`${ext}: explicit ${unit} series scratch/save/reopen preserves anchored dates and target formatting`, async () => {
+    const d = fresh();
+    try {
+      const t = parse(d.createTable(0, 0, 0, 1, 4)); [...seeds, '기존', '기존'].forEach((text, cell) => d.insertTextInCell(0, t.paraIdx, t.controlIdx, cell, 0, 0, text)); d.applyCharFormatInCell(0, t.paraIdx, t.controlIdx, 2, 0, 0, 2, JSON.stringify({ bold: true }));
+      const block = { sec: 0, ppi: t.paraIdx, ci: t.controlIdx, anchor: { row: 0, col: 0 }, focus: { row: 0, col: 3 } }, plan = readAutoFillPlan(d, block, unit), before = hash(d.exportHwpx());
+      preflightAutoFill({ fileName: 'date.' + ext, borrowDocumentHandle: () => d, getWasmModuleExports: () => ({ HwpDocument }) }, plan); assert.equal(hash(d.exportHwpx()), before); executeAutoFill(d, plan);
+      const bytes = d[ext === 'hwp' ? 'exportHwp' : 'exportHwpx'](); await writeFile(resolve(out, `${unit}-auto-fill.${ext}`), bytes); const reopened = new HwpDocument(bytes);
+      try { for (let cell = 0; cell < 4; cell++) assert.equal(reopened.getTextInCell(0, t.paraIdx, t.controlIdx, cell, 0, 0, 10), plan.values[cell]); assert.equal(parse(reopened.getCellCharPropertiesAt(0, t.paraIdx, t.controlIdx, 2, 0, 0)).bold, true); } finally { reopened.free(); }
+    } finally { d.free(); }
+  });
+  await test(`${ext}: merged whole-table transpose retains cell spans, multiple paragraphs and mixed formats`, async () => {
+    const d = fresh();
+    try {
+      const t = parse(d.createTable(0, 0, 0, 3, 3)), target = { sec: 0, ppi: t.paraIdx, ci: t.controlIdx };
+      for (let i = 0; i < 9; i++) { d.insertTextInCell(0, target.ppi, target.ci, i, 0, 0, `셀${i}😀`); d.applyCharFormatInCell(0, target.ppi, target.ci, i, 0, 2, 3, JSON.stringify({ bold: true })); }
+      assert.equal(parse(d.mergeTableCells(0, target.ppi, target.ci, 0, 0, 0, 1)).ok, true); assert.equal(parse(d.mergeTableCells(0, target.ppi, target.ci, 1, 2, 2, 2)).ok, true);
+      d.setCellProperties(0, target.ppi, target.ci, 0, JSON.stringify({ fillType: 'solid', fillColor: '#ddffaa', paddingLeft: 350 }));
+      const bridge = { fileName: 'merged.' + ext, borrowDocumentHandle: () => d, getWasmModuleExports: () => ({ HwpDocument }) }, plan = readTransposePlan(d, target), before = hash(d.exportHwpx());
+      assert.ok(plan.cells.some(c => c.info.colSpan === 2)); assert.ok(plan.cells.some(c => c.info.rowSpan === 2));
+      preflightTranspose(bridge, plan); assert.equal(hash(d.exportHwpx()), before); executeTranspose(d, plan);
+      const after = readTransposePlan(d, target); assert.equal(after.cells.length, plan.cells.length);
+      const bytes = d[ext === 'hwp' ? 'exportHwp' : 'exportHwpx'](); await writeFile(resolve(out, `merged-table-transpose.${ext}`), bytes); const reopened = new HwpDocument(bytes);
+      try { const loaded = readTransposePlan(reopened, target); assert.deepEqual(loaded.cells.map(c => [c.info, c.paragraphs.map(p => p.text)]), after.cells.map(c => [c.info, c.paragraphs.map(p => p.text)])); assert.equal(loaded.cells.find(c => c.info.rowSpan === 2).props.fillColor, '#ddffaa'); }
+      finally { reopened.free(); }
+      executeTranspose(d, readTransposePlan(d, target)); assert.deepEqual(readTransposePlan(d, target).cells.map(c => [c.info, c.paragraphs.map(p => p.text)]), plan.cells.map(c => [c.info, c.paragraphs.map(p => p.text)]));
+      d.setCellProperties(0, target.ppi, target.ci, 0, JSON.stringify({ cellProtect: true })); assert.throws(() => readTransposePlan(d, target), /보호/);
+    } finally { d.free(); }
+  });
   await test(`${ext}: literal Unicode/empty-cell conversion, scratch preflight and two saved roundtrips`, async () => {
     const d = fresh(); let reopened, converted;
     try {

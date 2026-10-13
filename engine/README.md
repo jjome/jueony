@@ -39,5 +39,6 @@ Cargo metadata와 build 모두 `--locked`로 실행한다. WSL 캐시는 Linux `
 - `page-border-entries.patch`: `getPageBorderFillEntry(section, kind)`와 `setPageBorderFillEntry(section, kind, json)`로 both/even/odd 설정, 첫 쪽 표시, 두 색 그러데이션을 처리한다. 공유 자원은 복사하며 구역 첫 쪽 표시와 홀짝 선택을 조판·렌더링에 반영한다. 머리말/꼬리말 포함 플래그의 저장 보존은 가능하지만 실제 배치 계산은 아직 지원하지 않는다.
 - `border-fill-identity.patch`: 배경색뿐 아니라 무늬·그러데이션·그림·투명도 전체를 비교하여 다른 채우기를 같은 자원으로 합치지 않는다.
 - `note-query-json.patch`: 각주/미주 텍스트 조회에서 탭·줄바꿈·제어문자를 JSON 규칙대로 이스케이프한다.
+- `merged-table-transpose.patch`: 기존 `transposeTableCellsInPlace`를 병합 표로 확장한다. 전체 격자의 겹침·누락·span·보호·반복 제목행을 변경 전에 검사한다. 셀의 모든 문단/직접 서식과 영역 배경을 함께 옮기며 row_sizes와 격자를 재구축한다. 전체 너비 안에서 새 열 너비를 분배하므로 원래 지면과 동일한 크기 정책은 별도 검증 대상이다. 선택 블록의 행/열 바꿈 복사 기능에는 이 확장을 적용하지 않는다. 최신 검수 엔진은 `source-1b04490267c6bf57/pkg`이며 결과와 제한은 [48번 연속 구현](../docs/48-advanced-editor-continuation.md)을 따른다.
 
 rhwp 원문의 MIT 고지와 별도 third-party 고지를 유지한다. 변경한 엔진에도 같은 라이선스 조건이 적용된다. 개발 도구는 실행 묶음에 포함하지 않는다. 엔진 코드를 컴파일한 사실, 구조·저장 왕복, 한컴의 실제 저장·인쇄·시각 일치는 서로 다른 검증이다. 새 조판 golden을 독립 한컴 출력 없이 추가하거나 테스트 통과만으로 한글 2024와 같다고 판정하지 않는다. 최종 실행 결과는 프로젝트의 작업 결과 문서에 별도로 기록한다.

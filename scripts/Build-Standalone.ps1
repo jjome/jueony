@@ -34,7 +34,7 @@ if (Test-Path -LiteralPath (Join-Path $projectRoot 'docs/44-editor-stages-result
 if (Test-Path -LiteralPath (Join-Path $projectRoot 'docs/45-rag-evaluation-corpus.md')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/45-rag-evaluation-corpus.md') -Destination $output -Force
 }
-foreach ($guide in @('46-hangul-implementation-status.md','47-remaining-editor-implementation.md')) {
+foreach ($guide in @('46-hangul-implementation-status.md','47-remaining-editor-implementation.md','48-advanced-editor-continuation.md')) {
     if (Test-Path -LiteralPath (Join-Path $projectRoot ('docs/' + $guide))) { Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination $output -Force }
 }
 foreach ($guide in @('30-layered-modular-refactor-plan.md','31-facade-contracts.md','32-modular-refactor-result.md','33-editor-parity-features-result.md','34-sections-tabs-result.md','35-section-boundary-merge-result.md','36-native-section-comparison.md','37-basic-editing-state-result.md','38-paragraph-selection-state-result.md','39-native-dialog-investigation.md','40-basic-navigation-calendar-result.md','41-pre-agent-editor-progress.md','refactor-work-plan.csv','hangul-2024-gap-checklist.csv')) {
@@ -96,6 +96,20 @@ if ($FrontendProfile -eq 'remaining-editor') {
     }
 }
 $ragCorpus = Join-Path $projectRoot 'fixtures/rag-evaluation'
+if ($FrontendProfile -eq 'advanced-editor') {
+    $advancedEvidence = Join-Path $projectRoot 'docs/evidence/advanced-editor-2026-10-13'
+    $advancedReview = Join-Path $reviewDocuments 'advanced-editor'
+    New-Item -ItemType Directory -Force $advancedReview | Out-Null
+    foreach ($category in @('native','browser')) {
+        $categorySource = Join-Path $advancedEvidence $category
+        if (Test-Path -LiteralPath $categorySource) {
+            $categoryTarget = Join-Path $advancedReview $category
+            New-Item -ItemType Directory -Force $categoryTarget | Out-Null
+            Get-ChildItem -LiteralPath $categorySource -File | Where-Object { $_.Extension -in @('.hwp','.hwpx','.json') } | Copy-Item -Destination $categoryTarget -Force
+        }
+    }
+    if (Test-Path -LiteralPath (Join-Path $advancedEvidence 'verification-summary.json')) { Copy-Item -LiteralPath (Join-Path $advancedEvidence 'verification-summary.json') -Destination $advancedReview -Force }
+}
 if (Test-Path -LiteralPath $ragCorpus) {
     $referenceExamples = Join-Path $output 'reference-examples'
     New-Item -ItemType Directory -Force $referenceExamples | Out-Null

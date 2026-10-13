@@ -13,6 +13,7 @@ export function installParagraphSort(registry: any, input: () => any, eventBus: 
       }).show();
     },
   });
-  const anchor = document.querySelector('.md-item[data-cmd="edit:transform-text"]');
+  // Paste exists before optional basic-text commands are installed.
+  const anchor = document.querySelector('.md-item[data-cmd="edit:paste"]');
   if (anchor) { const item = document.createElement('div'); item.className = 'md-item'; item.dataset.cmd = 'edit:sort-paragraphs'; const label = document.createElement('span'); label.className = 'md-label'; label.textContent = '본문 문단 정렬'; item.append(label); anchor.after(item); }
 }

@@ -1,0 +1,76 @@
+{
+  "results": [
+    "hwp: explicit months series scratch/save/reopen preserves anchored dates and target formatting",
+    "hwp: explicit years series scratch/save/reopen preserves anchored dates and target formatting",
+    "hwp: merged whole-table transpose retains cell spans, multiple paragraphs and mixed formats",
+    "hwp: literal Unicode/empty-cell conversion, scratch preflight and two saved roundtrips",
+    "hwpx: explicit months series scratch/save/reopen preserves anchored dates and target formatting",
+    "hwpx: explicit years series scratch/save/reopen preserves anchored dates and target formatting",
+    "hwpx: merged whole-table transpose retains cell spans, multiple paragraphs and mixed formats",
+    "hwpx: literal Unicode/empty-cell conversion, scratch preflight and two saved roundtrips",
+    "native unsafe conversion refuses stale content, merged/protected cells and literal host tabs without mutations",
+    "hwp: selected integer series preserves target style/geometry and unrelated cells through scratch/save/reopen",
+    "hwpx: selected integer series preserves target style/geometry and unrelated cells through scratch/save/reopen",
+    "hwp: table gallery on a fresh production document, four presets and mixed text preservation",
+    "hwp: exact numeric paragraph sort preserves mixed formatting and title/neighbor paragraphs",
+    "hwpx: table gallery on a fresh production document, four presets and mixed text preservation",
+    "hwpx: exact numeric paragraph sort preserves mixed formatting and title/neighbor paragraphs"
+  ],
+  "failures": [],
+  "engine": {
+    "sourceId": "1b04490267c6bf57",
+    "patches": [
+      {
+        "name": "border-fill-identity.patch",
+        "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c"
+      },
+      {
+        "name": "default-tabs.patch",
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+      },
+      {
+        "name": "document-insertion.patch",
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+      },
+      {
+        "name": "merged-table-transpose.patch",
+        "sha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768"
+      },
+      {
+        "name": "note-query-json.patch",
+        "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562"
+      },
+      {
+        "name": "page-border-entries.patch",
+        "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f"
+      },
+      {
+        "name": "section-split.patch",
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+      },
+      {
+        "name": "style-reference-deletion.patch",
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+      },
+      {
+        "name": "style-reference-order.patch",
+        "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce"
+      },
+      {
+        "name": "style-shape-stories.patch",
+        "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af"
+      },
+      {
+        "name": "table-creation-consistency.patch",
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+      }
+    ],
+    "builtAt": "2026-10-13T01:17:54.7006524Z",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "buildMode": "wsl-review-no-opt",
+    "jsSha256": "0d406b11eeb0ca7bfb1144ecd9b1508ee93042aae034878559f9b84ca19ebbc5",
+    "wasmSha256": "d096a44dc95f3ed0a26a50e1ac05db8a525cf860fa59913a4f4ce511ad63283d",
+    "optimized": false
+  },
+  "note": "Native WASM conversion, table gallery and paragraph sort tests, including scratch export-preservation checks and saved HWP/HWPX reopen. No native Hancom or UI comparison."
+}

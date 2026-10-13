@@ -1,0 +1,84 @@
+--- a/src/model/table.rs
++++ b/src/model/table.rs
+@@ -1049,6 +1049,70 @@
+         Ok(changed)
+     }
+ 
++    /// Transpose a complete rectangular table, including merged cell footprints.
++    /// Validate everything before mutation. Cell contents, flags and border/fill
++    /// references travel with the cell; borders are not geometrically rotated.
++    pub fn transpose_table_in_place(&mut self) -> Result<Vec<(usize, usize)>, String> {
++        let rows = self.row_count as usize;
++        let cols = self.col_count as usize;
++        let size = rows.checked_mul(cols).ok_or("표 크기가 너무 큽니다")?;
++        if rows == 0 || cols == 0 || size > MAX_TABLE_GRID_CELLS || self.cells.is_empty() {
++            return Err("표 범위가 유효하지 않습니다".to_string());
++        }
++        if self.repeat_header || self.cells.iter().any(Cell::cell_protect) {
++            return Err("반복 제목행 또는 보호 셀이 있는 표는 뒤집을 수 없습니다".to_string());
++        }
++        let mut occupied = vec![false; size];
++        for cell in &self.cells {
++            let r = cell.row as usize;
++            let c = cell.col as usize;
++            let rs = cell.row_span as usize;
++            let cs = cell.col_span as usize;
++            if rs == 0 || cs == 0 || r + rs > rows || c + cs > cols {
++                return Err("병합 셀 범위가 올바르지 않습니다".to_string());
++            }
++            for row in r..r + rs {
++                for col in c..c + cs {
++                    let index = row * cols + col;
++                    if occupied[index] { return Err("셀 범위가 겹칩니다".to_string()); }
++                    occupied[index] = true;
++                }
++            }
++        }
++        if occupied.iter().any(|value| !value) {
++            return Err("표에 빈 셀 영역이 있습니다".to_string());
++        }
++        for zone in &self.zones {
++            if zone.start_row > zone.end_row || zone.start_col > zone.end_col
++                || zone.end_row as usize >= rows || zone.end_col as usize >= cols {
++                return Err("표 배경 영역이 올바르지 않습니다".to_string());
++            }
++        }
++        let total_width: HwpUnit = self.get_column_widths().iter().sum();
++        let widths = distribute_hwp_units(total_width.max(1800), self.row_count);
++        let row_height = self.get_row_heights().into_iter().max().unwrap_or(400).max(400);
++        let mut cells = self.cells.clone();
++        for cell in &mut cells {
++            std::mem::swap(&mut cell.row, &mut cell.col);
++            std::mem::swap(&mut cell.row_span, &mut cell.col_span);
++            cell.width = widths[cell.col as usize..(cell.col + cell.col_span) as usize].iter().sum();
++            cell.height = row_height.checked_mul(cell.row_span as HwpUnit)
++                .ok_or("셀 높이가 너무 큽니다")?;
++            if cell.paragraphs.is_empty() { cell.paragraphs.push(Paragraph::new_empty()); }
++        }
++        cells.sort_by_key(|cell| (cell.row, cell.col));
++        for zone in &mut self.zones {
++            std::mem::swap(&mut zone.start_row, &mut zone.start_col);
++            std::mem::swap(&mut zone.end_row, &mut zone.end_col);
++        }
++        std::mem::swap(&mut self.row_count, &mut self.col_count);
++        self.cells = cells;
++        self.rebuild_row_sizes();
++        self.update_ctrl_dimensions();
++        self.rebuild_grid();
++        Ok(self.cells.iter().enumerate().map(|(index, cell)| (index, cell.paragraphs.len())).collect())
++    }
++
+     /// 병합 없는 전체 표를 제자리에서 전치한다.
+     pub fn transpose_unmerged_table_in_place(&mut self) -> Result<Vec<(usize, usize)>, String> {
+         if self.row_count == 0 || self.col_count == 0 {
+--- a/src/document_core/commands/table_ops.rs
++++ b/src/document_core/commands/table_ops.rs
+@@ -895,7 +895,7 @@
+             let source_rows = table.row_count;
+             let source_cols = table.col_count;
+             let changed_cells = table
+-                .transpose_unmerged_table_in_place()
++                .transpose_table_in_place()
+                 .map_err(HwpError::RenderError)?;
+             (source_rows, source_cols, changed_cells)
+         };

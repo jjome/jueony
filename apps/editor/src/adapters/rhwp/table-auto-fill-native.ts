@@ -1,15 +1,15 @@
-import { planTableSeries, type TableSeries } from '../../modules/document/public/table-auto-fill.ts';
+import { planTableSeries, type TableSeries, type DateFillUnit } from '../../modules/document/public/table-auto-fill.ts';
 import { verifyPreservedExport } from './preservation.ts';
 type Point = { row: number; col: number };
 export type AutoFillBlock = { sec: number; ppi: number; ci: number; cellPath?: unknown[]; anchor: Point; focus: Point; excluded?: unknown[] };
 type SeriesCell = { index: number; row: number; column: number; text: string; charShape: number; paraShape: number; style: number };
-export type AutoFillPlan = { section: number; paragraph: number; control: number; block: AutoFillBlock; cells: SeriesCell[] } & TableSeries;
+export type AutoFillPlan = { section: number; paragraph: number; control: number; block: AutoFillBlock; cells: SeriesCell[]; dateUnit: DateFillUnit } & TableSeries;
 const parsed = (v: any): any => typeof v === 'string' ? JSON.parse(v) : v;
 const native = (wasm: any) => wasm.borrowDocumentHandle?.() ?? wasm;
 const integer = (v: unknown): v is number => Number.isSafeInteger(v) && (v as number) >= 0;
 const checked = (v: any) => { if (!parsed(v)?.ok) throw new Error('문서 엔진이 자동 채우기를 거절했습니다.'); };
 
-export function readAutoFillPlan(value: any, block: AutoFillBlock): AutoFillPlan {
+export function readAutoFillPlan(value: any, block: AutoFillBlock, dateUnit: DateFillUnit = 'days'): AutoFillPlan {
   const doc = native(value);
   if (!block || (block.cellPath?.length ?? 0) > 1 || block.excluded?.length) throw new Error('본문 표의 연속된 한 행 또는 한 열만 선택하세요.');
   const { sec: section, ppi: paragraph, ci: control } = block;
@@ -36,13 +36,13 @@ export function readAutoFillPlan(value: any, block: AutoFillBlock): AutoFillPlan
   }
   cells.sort((a, b) => a.row - b.row || a.column - b.column);
   if (cells.length !== (r1 - r0 + 1) * (c1 - c0 + 1) || new Set(cells.map(c => `${c.row}:${c.column}`)).size !== cells.length) throw new Error('선택한 셀 범위가 유효하지 않습니다.');
-  const series = planTableSeries(cells[0]?.text ?? '', cells[1]?.text ?? '', cells.length);
-  return { section, paragraph, control, block: structuredClone(block), cells, ...series };
+  const series = planTableSeries(cells[0]?.text ?? '', cells[1]?.text ?? '', cells.length, dateUnit);
+  return { section, paragraph, control, block: structuredClone(block), cells, ...series, dateUnit };
 }
 
 /** Must run inside the caller's snapshot router, which owns rollback and one undo. */
 export function executeAutoFill(value: any, plan: AutoFillPlan): void {
-  const doc = native(value), current = readAutoFillPlan(doc, plan.block);
+  const doc = native(value), current = readAutoFillPlan(doc, plan.block, plan.dateUnit);
   if (JSON.stringify(current) !== JSON.stringify(plan)) throw new Error('셀 원문·서식 또는 표 범위가 바뀌었습니다. 자동 채우기를 다시 여세요.');
   plan.cells.slice(2).forEach((cell, index) => {
     const text = plan.values[index + 2]; if (text === cell.text) return;
@@ -61,6 +61,6 @@ export function preflightAutoFill(wasm: any, plan: AutoFillPlan): void {
     finally { artifact.free(); }
   };
   let scratch: any;
-  try { scratch = open(save(native(wasm))); const scratchPlan = readAutoFillPlan(scratch, plan.block); if (JSON.stringify(scratchPlan.cells.map(c => c.text)) !== JSON.stringify(plan.cells.map(c => c.text))) throw new Error('사전 검사 사본의 셀이 원문과 다릅니다.'); executeAutoFill(scratch, scratchPlan); save(scratch); }
+  try { scratch = open(save(native(wasm))); const scratchPlan = readAutoFillPlan(scratch, plan.block, plan.dateUnit); if (JSON.stringify(scratchPlan.cells.map(c => c.text)) !== JSON.stringify(plan.cells.map(c => c.text))) throw new Error('사전 검사 사본의 셀이 원문과 다릅니다.'); executeAutoFill(scratch, scratchPlan); save(scratch); }
   finally { scratch?.free(); }
 }

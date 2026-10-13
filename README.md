@@ -1,6 +1,6 @@
 # Jueony — 공무원용 AI 문서 편집기
 
-폐쇄망 Windows PC에서 업무별 자료와 대화를 관리하고, 가운데 채팅의 요청으로 오른쪽 HWP/HWPX 문서를 AI와 함께 직접 편집하는 프로그램을 만든다. **현재는 본문·단순 표 행/열·서식·쪽 설정과 한글 단축키를 연결한 MVP 개발판**이다. 한글 2024 전체 기능·화면·파일 호환성 100%를 달성한 상태는 아니다. [통합 기반 구현 결과](docs/44-editor-stages-result.md), [쪽 편집 후속 구현·검증](docs/58-embedded-page-image-paste.md), [설치 한글 2024와의 비교·미구현 목록](docs/29-hangul-2024-comparison.md)을 참고한다. 다음 신규 기능 병렬 구현에 앞서 [레이어·모듈 리팩터링 계획](docs/30-layered-modular-refactor-plan.md)과 [Facade 계약](docs/31-facade-contracts.md)의 핵심 모듈 첫 이관을 적용했다. [리팩터링 적용 결과와 남은 이관](docs/32-modular-refactor-result.md)을 확인한다.
+폐쇄망 Windows PC에서 업무별 자료와 대화를 관리하고, 가운데 채팅의 요청으로 오른쪽 HWP/HWPX 문서를 AI와 함께 직접 편집하는 프로그램을 만든다. **현재는 본문·단순 표 행/열·서식·쪽 설정과 한글 단축키를 연결한 MVP 개발판**이다. 한글 2024 전체 기능·화면·파일 호환성 100%를 달성한 상태는 아니다. [통합 기반 구현 결과](docs/44-editor-stages-result.md), [쪽 편집 후속 구현·검증](docs/59-empty-body-section-removal.md), [설치 한글 2024와의 비교·미구현 목록](docs/29-hangul-2024-comparison.md)을 참고한다. 다음 신규 기능 병렬 구현에 앞서 [레이어·모듈 리팩터링 계획](docs/30-layered-modular-refactor-plan.md)과 [Facade 계약](docs/31-facade-contracts.md)의 핵심 모듈 첫 이관을 적용했다. [리팩터링 적용 결과와 남은 이관](docs/32-modular-refactor-result.md)을 확인한다.
 
 ## 이용허락
 
@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 쪽 편집 검수본은 **[Start-Review.cmd](build/jueony-page-image-paste-20261014/Start-Review.cmd)**로 실행한다(4236). 완전한 본문 문단의 쪽 복사·붙이기·삭제, 다른 기본 용지·테두리·단색·두 색 그러데이션과 PNG/JPEG 그림 배경의 구역 이식, 뒤 본문 설정 복원을 연결했다. [실제 지원 범위·검증·남은 제한](docs/58-embedded-page-image-paste.md)을 확인한다. 그림은 크기 맞춤·바둑판식·가운데 배치부터 지원한다. 걸친 문단·표·본문 그림 개체·고급 쪽 스타일·OS 클립보드는 남는다. 이전 실행 창과 문서를 유지하며 한글 직접 비교는 마지막 일괄 검수로 남긴다.
+최신 쪽 편집 검수본은 **[Start-Review.cmd](build/jueony-empty-section-20261014/Start-Review.cmd)**로 실행한다(4238). 기존 쪽 본문 복사·붙이기·삭제와 기본 쪽 모양·그림 배경 이식에 빈 본문 구역의 명시적 삭제를 추가했다. 남은 구역의 설정을 유지하고 한 번에 되돌리며 문서·로컬 커서 상태를 재실행 후 복원한다. [지원 범위·검증·남은 제한](docs/59-empty-body-section-removal.md)을 확인한다. HWPX 파일 자체의 캐럿 읽기/쓰기는 로컬 상태 복원과 별도로 미지원이다. 복잡한 문서와 실제 한글 비교는 남는다. 이전 실행 창과 문서는 유지한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 
@@ -57,6 +57,7 @@
 | [다른 용지의 쪽 붙이기](docs/56-different-paper-page-paste.md) | 4232 검수본, 새 구역과 뒤 본문 용지 복원·문단 서식·단일 undo·저장과 제한 |
 | [기본 쪽 모양 이식](docs/57-basic-page-style-paste.md) | 4234 검수본, 테두리·단색·두 색 그러데이션의 새 구역 이식과 뒤 본문 복원·거절 검사 |
 | [그림 배경의 쪽 복사·붙이기](docs/58-embedded-page-image-paste.md) | 4236 검수본, 내장 PNG/JPEG 자산 이식·자산 번호 충돌 방지·뒤 배경 복원·저장/거절 검사 |
+| [빈 본문 구역 삭제](docs/59-empty-body-section-removal.md) | 4238 검수본, 구역 분리 설정 보존·커서 이동·undo/redo·저장과 HWPX 캐럿 제한 |
 | [쪽 본문 복사·붙이기](docs/55-page-body-copy-and-paste.md) | 4230 검수본, 내부 복사 버퍼·서식 자원 이식·한 번의 undo·저장과 미지원 범위 |
 | [기본 편집·상태 보존 보강](docs/33-editor-parity-features-result.md) | 4193 검수본, 캡션·감추기·머리말·복구·17종 AI 명령과 저장 보존 검사 |
 | [통합 UI·상태·검색·검토·반복 작업](docs/28-continuation-implementation.md) | 새 검수본 실행, 실제 Claude 확인, 한글 검수용 파일과 미완료 범위 |

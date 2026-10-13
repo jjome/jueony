@@ -52,8 +52,11 @@ HWPX에서 기록한 줄 번호는 HWP 대상에서 전체 요청을 거절한�
 
 ## 완료한 자동 검증과 검수본
 
-단위 **452개**, provider/server **52개**, 실제 WASM **298개**, 브라우저 **324개**(동봉 실행 검사 전)가 최종 빌드로 통과했다. 전용 브라우저 10개와 WASM 9개를 포함하며 TypeScript와 9개 모듈·235개 소스의 경계 검사도 통과했다. 새 업무 전환 검수에서는 문서 로딩 완료 전에 다시 전환한 동작을 바로잡아 실제 새 문서 연결 완료를 기다렸다. 사용자 문서와 기존 서버를 종료하지 않았다.
+단위 **452개**, provider/server **52개**, 실제 WASM **298개**, 브라우저 **328개**(동봉 실행 호환 4개 포함)가 최종 빌드로 통과했다. 전용 브라우저 10개와 WASM 9개를 포함하며 TypeScript와 9개 모듈·235개 소스의 경계 검사도 통과했다. 새 업무 전환 검수에서는 문서 로딩 완료 전에 다시 전환한 동작을 바로잡아 실제 새 문서 연결 완료를 기다렸다. 사용자 문서와 기존 서버를 종료하지 않았다.
 
 [증거 요약](evidence/section-macros-2026-10-14/verification-summary.json)에 실제 소스·빌드·패치·WASM 해시를 대조한다. 실제 한글과 유료 모델 비교는 수행하지 않았다. 앱 소스 SHA-256은 `418f1ed2ffa4686db2d820d192f0917e192762fc91c697afae1c4f63964f8736`, WASM은 기존 `2ff6d89629fa60b7e1ae5ecb55144a4ab8cbb8f192a49a8acd23a2244d3ab474`다. 참조 저장소를 고치지 않고 기존 엔진을 재사용했다.
 
-이번 실행 묶음은 `build/jueony-section-macros-20261014/Start-Review.cmd`, 검수 포트는 **4250**이다. 같은 폴더의 `JueonyEditor.exe`와 스크립트를 포함한다. `review-documents/section-macros/macro-native`와 `macro-browser`의 합성 HWP/HWPX를 한글에서 확인할 수 있다. 실행 묶음 검사는 다음 단계에서 기록한다.
+이번 실행 묶음은 `build/jueony-section-macros-20261014/Start-Review.cmd`, 검수 포트는 **4250**이다. 같은 폴더의 `JueonyEditor.exe`와 스크립트를 포함한다. `review-documents/section-macros/macro-native`와 `macro-browser`의 합성 HWP/HWPX를 한글에서 확인할 수 있다. 동봉 실행 호환 4개도 통과했다. [실행 확인](evidence/section-macros-2026-10-14/launch-check.json)은 4250의 실제 메타데이터·WASM 바이트·공통 명령/provider 계약 해시를 확인했다. Rust exe는 컴파일했으며 이번 실제 실행 검증은 스크립트·동봉 런타임 경로다. 구현 커밋은 `f3b77ef`이며 빌드 당시 기준 커밋과 작업 중 여부를 기록하고 실제 소스 해시로 일치 여부를 검증한다.
+
+
+[화면 증거](evidence/section-macros-2026-10-14/macro-browser/section-repeat.png)는 재실행과 업무 전환 후 복원된 반복 작업 설정창이다. 자동 검증의 실패·skip·page error·외부 자산 요청은 0건이다.

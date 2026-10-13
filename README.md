@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-agent-masters-20261014-v2/Start-Review.cmd)**로 실행한다(4248). Agent가 현재 문서의 기본 텍스트 바탕쪽을 추가·수정·삭제한다. 양쪽·홀수·짝수 저장 정의와 앞 구역 상속을 구분하고 첫 쪽 감추기 설정을 유지한다. 복잡한 원본과 HWP 미보존 조합은 거절하며, 변경 비교·요청 undo/redo·안전 저장·재실행·실패 복원을 검증했다. [지원 범위·검증·남은 제한](docs/63-agent-master-page-tools.md)을 확인한다. 기존 [단색 쪽 배경](docs/62-agent-page-background.md), [기본 탭·HWPX 줄 번호](docs/61-agent-section-tools.md)와 쪽 편집·파일 커서도 포함한다. 바탕쪽 개체·복잡한 표·필드·구역 생성/삭제의 Agent 도구와 실제 한글 비교는 남는다. 이전 실행 창과 문서는 유지한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-section-macros-20261014/Start-Review.cmd)**로 실행한다(4250). 기본 탭·줄 번호·단색 배경·텍스트 바탕쪽·용지/여백·단 설정을 반복 작업으로 저장하고, 실행마다 적용 구역을 직접 선택한다. 추가 AI 호출 없이 변수·원문·버전·현재 형식을 검증하여 적용하며 요청 undo/redo·실패 복원·안전 저장·업무별 재실행을 확인했다. [지원 범위·사용법·검증](docs/64-section-repeat-work.md)을 확인한다. 기존 [바탕쪽 Agent](docs/63-agent-master-page-tools.md), [단색 쪽 배경](docs/62-agent-page-background.md), [기본 탭·HWPX 줄 번호](docs/61-agent-section-tools.md)와 기존 편집 기능도 포함한다. 한글 전체 기능, 고급 바탕쪽·개체·기존 표의 반복 기록, 구역 생성/삭제의 Agent 도구와 실제 한글 비교는 남는다. 이전 실행 창과 문서는 유지한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

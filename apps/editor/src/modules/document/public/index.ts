@@ -29,3 +29,5 @@ export {validatePageBodyDeletionPlan,samePageBodyDeletionRange} from '../domain/
 export type {PageBodyDeletionPlan} from '../domain/page-body-deletion.ts';
 export {validatePageBodyClipboard} from '../domain/page-body-clipboard.ts';
 export type {PageBodyClipboard} from '../domain/page-body-clipboard.ts';
+export {validatePageBodyPastePlan} from '../domain/page-body-paste-plan.ts';
+export type {PageBodyPastePlan} from '../domain/page-body-paste-plan.ts';

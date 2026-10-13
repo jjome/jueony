@@ -81,7 +81,10 @@ export function capturePreservationEvidence(value:NativeDocument):PreservationEv
   if(typeof (doc as Record<string,unknown>).getMasterPages==='function')capture(`${key}/master-pages`,()=>{
    const state=record(read(doc,'getMasterPages',section));return array(state.pages!).map(item=>{const {index:unused,editable:gate,...properties}=record(item);return properties;});
   });
-  capture(`${key}/paragraph-count`,()=>integer(read(doc,'getParagraphCount',section)));
+    if(typeof (doc as Record<string,unknown>).getLineNumberSettings==='function')capture(`${key}/line-numbers`,()=>{
+     const {editable:gate,formatSupport:format,ok:status,...settings}=record(read(doc,'getLineNumberSettings',section));return settings;
+    });
+    capture(`${key}/paragraph-count`,()=>integer(read(doc,'getParagraphCount',section)));
   const count=Number(values[`${key}/paragraph-count`]??0);
   for(let paragraph=0;paragraph<count;paragraph++){
    const pkey=`${key}/paragraph/${paragraph}`;at.push({section,paragraph});

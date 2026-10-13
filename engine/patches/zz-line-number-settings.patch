@@ -1,0 +1,253 @@
+--- a/src/model/document.rs
++++ b/src/model/document.rs
+@@ -290,9 +290,20 @@
+     pub raw_provenance: Option<crate::model::raw_provenance::SectionSeal>,
+ }
+ 
++/// HWPX line numbering. Binary HWP mapping is deliberately not invented.
++#[derive(Debug, Clone, Default, PartialEq, Eq, serde::Serialize)]
++pub struct LineNumberSettings {
++    pub enabled: bool,
++    pub restart_type: u32,
++    pub count_by: u32,
++    pub distance: i32,
++    pub start_number: u32,
++}
++
+ /// 구역 정의 (HWPTAG_CTRL_HEADER - 'secd')
+ #[derive(Debug, Clone, Default, serde::Serialize)]
+ pub struct SectionDef {
++    pub line_numbers: LineNumberSettings,
+     /// 속성 비트 플래그
+     pub flags: u32,
+     /// 단 간격
+--- a/src/parser/hwpx/section.rs
++++ b/src/parser/hwpx/section.rs
+@@ -1215,6 +1215,7 @@
+                     }
+                     b"startNum" => parse_start_num(e, sec_def),
+                     b"visibility" => parse_visibility(e, sec_def),
++                    b"lineNumberShape" => parse_line_numbers(e, sec_def),
+                     b"pageBorderFill" => {
+                         let (pbf, apply_type) = parse_page_border_fill(e, reader)?;
+                         push_page_border_fill(
+@@ -1247,6 +1248,7 @@
+                     }
+                     b"startNum" => parse_start_num(e, sec_def),
+                     b"visibility" => parse_visibility(e, sec_def),
++                    b"lineNumberShape" => parse_line_numbers(e, sec_def),
+                     b"pageBorderFill" => {
+                         let (pbf, apply_type) = parse_page_border_fill_empty(e);
+                         push_page_border_fill(
+@@ -1749,9 +1751,20 @@
+ }
+ 
+ /// <hp:visibility> 요소 파싱
++fn parse_line_numbers(e: &quick_xml::events::BytesStart, sd: &mut SectionDef) {
++    for attr in e.attributes().flatten() {match attr.key.as_ref().as_bytes() {
++        b"restartType" => sd.line_numbers.restart_type=parse_u32(&attr),
++        b"countBy" => sd.line_numbers.count_by=parse_u32(&attr),
++        b"distance" => sd.line_numbers.distance=parse_i32(&attr),
++        b"startNumber" => sd.line_numbers.start_number=parse_u32(&attr),
++        _=>{}
++    }}
++}
++
+ fn parse_visibility(e: &quick_xml::events::BytesStart, sec_def: &mut SectionDef) {
+     for attr in e.attributes().flatten() {
+         match attr.key.as_ref().as_bytes() {
++            b"showLineNumber" => sec_def.line_numbers.enabled=parse_bool(&attr),
+             b"hideFirstHeader" => {
+                 sec_def.hide_header = attr_str(&attr) == "1";
+                 if sec_def.hide_header {
+--- a/src/serializer/hwpx/section.rs
++++ b/src/serializer/hwpx/section.rs
+@@ -98,19 +98,23 @@
+         }
+     };
+     format!(
+-        r#"<hp:visibility hideFirstHeader="{}" hideFirstFooter="{}" hideFirstMasterPage="{}" border="{}" fill="{}" hideFirstPageNum="0" hideFirstEmptyLine="{}" showLineNumber="0"/>"#,
++        r#"<hp:visibility hideFirstHeader="{}" hideFirstFooter="{}" hideFirstMasterPage="{}" border="{}" fill="{}" hideFirstPageNum="0" hideFirstEmptyLine="{}" showLineNumber="{}"/>"#,
+         b(sd.hide_header),
+         b(sd.hide_footer),
+         b(sd.hide_master_page),
+         bf(sd.hide_border, sd.first_page_border),
+         bf(sd.hide_fill, sd.first_page_fill),
+         b(sd.hide_empty_line),
++        b(sd.line_numbers.enabled),
+     )
+ }
+ 
+ /// 템플릿의 visibility 고정 문자열을 IR 기반 값으로 1회 치환.
+ fn replace_visibility(xml: &str, sd: &SectionDef) -> String {
+-    xml.replacen(TEMPLATE_VISIBILITY, &render_visibility(sd), 1)
++    xml.replacen(TEMPLATE_VISIBILITY, &render_visibility(sd), 1).replacen(
++        r#"<hp:lineNumberShape restartType="0" countBy="0" distance="0" startNumber="0"/>"#,
++        &format!(r#"<hp:lineNumberShape restartType="{}" countBy="{}" distance="{}" startNumber="{}"/>"#,
++            sd.line_numbers.restart_type,sd.line_numbers.count_by,sd.line_numbers.distance,sd.line_numbers.start_number),1)
+ }
+ 
+ /// [#1987] 템플릿 secPr 의 하드코딩 스칼라(spaceColumns, outlineShapeIDRef, memoShapeIDRef 등)를
+--- a/src/parser/doc_info.rs
++++ b/src/parser/doc_info.rs
+@@ -796,6 +796,7 @@
+     let para_level = (((attr1 >> 25) & 0x07) as u8).max(outline_level_tail.min(9) as u8);
+ 
+     Ok(ParaShape {
++        suppress_line_numbers: false,
+         raw_data: None,
+         attr1,
+         margin_left,
+--- a/src/model/style.rs
++++ b/src/model/style.rs
+@@ -319,6 +319,8 @@
+ /// 문단 모양 (HWPTAG_PARA_SHAPE)
+ #[derive(Debug, Clone, Default, serde::Serialize)]
+ pub struct ParaShape {
++    /// HWPX paragraph line-number suppression; binary mapping is not inferred.
++    pub suppress_line_numbers: bool,
+     /// 원본 레코드 바이트 (라운드트립 보존용)
+     pub raw_data: Option<Vec<u8>>,
+     /// 속성1 비트 플래그
+@@ -399,7 +401,8 @@
+ /// ParaShape 비교: raw_data 필드 제외 (라운드트립용 원본 바이트는 논리적 동일성과 무관)
+ impl PartialEq for ParaShape {
+     fn eq(&self, other: &Self) -> bool {
+-        self.attr1 == other.attr1
++        self.suppress_line_numbers == other.suppress_line_numbers
++            && self.attr1 == other.attr1
+             && self.margin_left == other.margin_left
+             && self.margin_right == other.margin_right
+             && self.indent == other.indent
+--- a/src/parser/hwpx/header.rs
++++ b/src/parser/hwpx/header.rs
+@@ -922,6 +922,7 @@
+                     ps.attr1 &= !(1 << 22);
+                 }
+             }
++            b"suppressLineNumbers" => ps.suppress_line_numbers=parse_bool(&attr),
+             b"snapToGrid" => {
+                 if parse_bool(&attr) {
+                     ps.attr1 |= 1 << 8;
+--- a/src/serializer/hwpx/header.rs
++++ b/src/serializer/hwpx/header.rs
+@@ -1020,7 +1020,7 @@
+             ("condense", &condense),
+             ("fontLineHeight", &font_line_height),
+             ("snapToGrid", &snap_to_grid),
+-            ("suppressLineNumbers", "0"),
++            ("suppressLineNumbers", if ps.suppress_line_numbers {"1"} else {"0"}),
+             ("checked", "0"),
+         ],
+     )?;
+--- /dev/null
++++ b/src/document_core/commands/line_numbers.rs
+@@ -0,0 +1,72 @@
++use crate::document_core::DocumentCore;
++use crate::error::HwpError;
++use crate::model::{control::Control,document::LineNumberSettings};
++use crate::renderer::render_tree::{PageRenderTree,RenderNode,RenderNodeType,TextRunNode,BoundingBox,FieldMarkerType};
++
++fn fail(s:&str)->HwpError{HwpError::RenderError(s.into())}
++fn valid(n:&LineNumberSettings)->bool{(1..=3).contains(&n.restart_type)&&(1..=65535).contains(&n.count_by)&&(1..=65535).contains(&n.start_number)&&(0..=14173).contains(&n.distance)}
++
++impl DocumentCore {
++    pub(crate) fn line_number_section_supported(&self,section:usize)->bool {
++        let Some(s)=self.document.sections.get(section) else{return false;};
++        if s.section_def.text_direction!=0||s.section_def.hide_empty_line{return false;}
++        s.paragraphs.iter().all(|p|!self.document.doc_info.para_shapes.get(p.para_shape_id as usize).is_some_and(|ps|ps.suppress_line_numbers)&&p.controls.iter().all(|c|match c {
++            Control::SectionDef(_)|Control::Header(_)|Control::Footer(_)|Control::PageNumCtrl(_)|Control::PageHide(_)|Control::NewNumber(_)=>true,
++            Control::ColumnDef(col)=>col.column_count==1,
++            _=>false
++        }))
++    }
++    pub fn get_line_number_settings_native(&self,section:usize)->Result<String,HwpError>{
++        let s=self.document.sections.get(section).ok_or_else(||fail("Invalid section"))?;let n=&s.section_def.line_numbers;
++        Ok(serde_json::json!({"ok":true,"enabled":n.enabled,"restartType":n.restart_type,"countBy":n.count_by,"distance":n.distance,"startNumber":n.start_number,"editable":self.line_number_section_supported(section)&&(!n.enabled||valid(n)),"formatSupport":"hwpx","suppressedStyles":self.document.doc_info.para_shapes.iter().enumerate().filter_map(|(i,ps)|if ps.suppress_line_numbers{Some(i)}else{None}).collect::<Vec<_>>()}).to_string())
++    }
++    pub fn set_line_number_settings_native(&mut self,section:usize,json:&str)->Result<String,HwpError>{
++        let v:serde_json::Value=serde_json::from_str(json).map_err(|_|fail("Invalid line number JSON"))?;
++        let n=LineNumberSettings{enabled:v.get("enabled").and_then(|v|v.as_bool()).ok_or_else(||fail("Invalid enabled"))?,restart_type:v.get("restartType").and_then(|v|v.as_u64()).filter(|v|*v<=u32::MAX as u64).ok_or_else(||fail("Invalid restart"))? as u32,count_by:v.get("countBy").and_then(|v|v.as_u64()).filter(|v|*v<=u32::MAX as u64).ok_or_else(||fail("Invalid count"))? as u32,distance:v.get("distance").and_then(|v|v.as_i64()).filter(|v|*v>=i32::MIN as i64&&*v<=i32::MAX as i64).ok_or_else(||fail("Invalid distance"))? as i32,start_number:v.get("startNumber").and_then(|v|v.as_u64()).filter(|v|*v<=u32::MAX as u64).ok_or_else(||fail("Invalid start"))? as u32};
++        if !valid(&n){return Err(fail("줄 번호 값 범위를 확인하세요."));}
++        let s=self.document.sections.get(section).ok_or_else(||fail("Invalid section"))?;
++        if n.enabled&&(!self.line_number_section_supported(section)||n.distance as u32>=s.section_def.page_def.margin_left){return Err(fail("기본 줄 번호는 가로쓰기·한 단·일반 본문과 왼쪽 여백 안의 간격만 지원합니다."));}
++        if n==s.section_def.line_numbers{return self.get_line_number_settings_native(section);}
++        let s=&mut self.document.sections[section];s.section_def.line_numbers=n;
++        for p in &mut s.paragraphs{for c in &mut p.controls{if let Control::SectionDef(sd)=c{sd.line_numbers=s.section_def.line_numbers.clone();}}}
++        s.raw_stream=None;self.mark_section_dirty(section);self.paginate_if_needed();self.get_line_number_settings_native(section)
++    }
++    fn prior_page_line_count(&self,section:usize,page:&crate::renderer::pagination::PageContent)->u64{
++        use crate::renderer::pagination::PageItem;
++        page.column_contents.iter().flat_map(|c|&c.items).map(|item|match item{
++            PageItem::FullParagraph{para_index}=>self.composed.get(section).and_then(|c|c.get(*para_index)).map(|c|c.lines.len() as u64).unwrap_or(0),
++            PageItem::PartialParagraph{start_line,end_line,..}=>end_line.saturating_sub(*start_line) as u64,
++            _=>0
++        }).sum()
++    }
++    pub(crate) fn line_number_markers(&self,tree:&PageRenderTree,page_num:u32)->Vec<(u64,f64,f64)> {
++        fn lines(node:&RenderNode,body:bool,out:&mut Vec<(f64,f64)>){
++            match &node.node_type{
++                RenderNodeType::Header|RenderNodeType::Footer|RenderNodeType::MasterPage|RenderNodeType::FootnoteArea|RenderNodeType::Table(_)|RenderNodeType::TextBox|RenderNodeType::Group(_)=>return,
++                RenderNodeType::TextLine(l) if body&&l.caption_owner.is_none()=>{out.push((node.bbox.x,node.bbox.y+l.baseline));return;},
++                _=>{}
++            }
++            let body=body||matches!(node.node_type,RenderNodeType::Body{..});for c in &node.children{lines(c,body,out);}
++        }
++        let mut next=0u64;let mut previous=None;let mut current=None;let mut index=0;
++        'pages:for (section,result) in self.pagination.iter().enumerate(){for page in &result.pages{
++            let n=&self.document.sections[section].section_def.line_numbers;
++            if n.enabled&&valid(n)&&self.line_number_section_supported(section){
++                if previous.is_none()||n.restart_type==1||n.restart_type==2&&previous!=Some(section){next=n.start_number as u64;}
++                previous=Some(section);
++                if index==page_num{current=Some(n);break 'pages;}
++                next=next.saturating_add(self.prior_page_line_count(section,page));
++            }else if index==page_num{break 'pages;}
++            index+=1;
++        }}
++        let Some(n)=current else{return Vec::new();};let mut body=Vec::new();lines(&tree.root,false,&mut body);
++        body.into_iter().enumerate().filter_map(|(i,(x,y))|{let value=next+i as u64;if value%n.count_by as u64==0{Some((value,x-n.distance as f64*self.dpi/7200.0,y))}else{None}}).collect()
++    }
++    pub(crate) fn append_line_numbers(&self,tree:&mut PageRenderTree,page_num:u32){
++        for (value,right,baseline) in self.line_number_markers(tree,page_num){
++            let style=crate::renderer::TextStyle{font_family:"함초롬바탕".into(),font_size:self.dpi*8.0/72.0,..Default::default()};let text=value.to_string();let width=crate::renderer::layout::compute_char_positions(&text,&style).last().copied().unwrap_or(0.0);
++            let bbox=BoundingBox::new(right-width,baseline-style.font_size,width,style.font_size);let node=RenderNode::new(tree.next_id(),RenderNodeType::TextRun(TextRunNode{text,baseline:style.font_size,style,char_shape_id:None,para_shape_id:None,section_index:None,para_index:None,char_start:None,cell_context:None,is_para_end:false,is_line_break_end:false,rotation:0.0,is_vertical:false,char_overlap:None,border_fill_id:0,field_marker:FieldMarkerType::None,layout_positions:None,display_text:None}),bbox);tree.root.children.push(node);
++        }
++    }
++    pub fn get_page_line_numbers_native(&self,page:u32)->Result<String,HwpError>{let tree=self.build_page_tree(page)?;Ok(serde_json::json!({"ok":true,"markers":self.line_number_markers(&tree,page).iter().map(|(n,x,y)|serde_json::json!({"number":n,"right":x,"baseline":y})).collect::<Vec<_>>()}).to_string())}
++}
+--- a/src/document_core/commands/mod.rs
++++ b/src/document_core/commands/mod.rs
+@@ -14,6 +14,7 @@
+ mod formatting_runs;
+ mod header_footer_ops;
+ mod master_pages;
++mod line_numbers;
+ mod html_import;
+ mod object_ops;
+ pub(crate) mod paragraph_block;
+--- a/src/document_core/queries/rendering.rs
++++ b/src/document_core/queries/rendering.rs
+@@ -7946,6 +7946,7 @@
+         // Task #1154: 동일 bin_data_id Pic 컨트롤이 수직으로 인접 겹쳐 그려질 때
+         // 두 그림의 미세한 세로 스케일 차이로 인한 잔상(이중 라인) 제거.
+         // build 직후 1회만 적용 — 모든 렌더러(SVG/Canvas/Skia/HTML/Layer) 공통.
++        self.append_line_numbers(&mut tree, page_num);
+         tree.clip_overlapping_same_bin_images();
+         Ok(tree)
+     }
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1199,6 +1199,13 @@
+ 
+     #[wasm_bindgen(js_name = setMasterPageText)]
+     pub fn set_master_page_text(&mut self,section:u32,kind:&str,json:&str)->Result<String,JsValue>{self.core.set_master_page_text_native(section as usize,kind,json).map_err(|e|e.into())}
++
++    #[wasm_bindgen(js_name = getLineNumberSettings)]
++    pub fn get_line_number_settings(&self,section:usize)->Result<String,JsValue>{self.get_line_number_settings_native(section).map_err(|e|e.into())}
++    #[wasm_bindgen(js_name = setLineNumberSettings)]
++    pub fn set_line_number_settings(&mut self,section:usize,json:&str)->Result<String,JsValue>{self.set_line_number_settings_native(section,json).map_err(|e|e.into())}
++    #[wasm_bindgen(js_name = getPageLineNumbers)]
++    pub fn get_page_line_numbers(&self,page:u32)->Result<String,JsValue>{self.get_page_line_numbers_native(page).map_err(|e|e.into())}
+ 
+     #[wasm_bindgen(js_name = getSectionDef)]
+     pub fn get_section_def(&self, section_idx: u32) -> Result<String, JsValue> {

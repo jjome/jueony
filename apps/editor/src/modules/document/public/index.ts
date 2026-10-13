@@ -23,3 +23,5 @@ export {pageSetupKeys,pageDimensionFromInput,validatePageSetup,samePageSetup} fr
 export type {PageSetupSettings} from '../domain/page-setup-settings.ts';
 export {defaultMasterPageText,validateMasterPageText,sameMasterPageText} from '../domain/master-page-settings.ts';
 export type {MasterPageKind,MasterPageText} from '../domain/master-page-settings.ts';
+export {defaultLineNumberSettings,validateLineNumberSettings,sameLineNumberSettings} from '../domain/line-number-settings.ts';
+export type {LineNumberSettings} from '../domain/line-number-settings.ts';

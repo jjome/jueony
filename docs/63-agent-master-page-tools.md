@@ -38,4 +38,8 @@ HWPX는 기본 세 종류 조합을 지원한다. HWP는 기존 엔진에서 저
 
 초기 native 합성 HWPX의 첫 직렬화에서 미사용 채움 기본값이 바뀌어 전체 DTO 비교가 실패했다. 실제 편집기와 동일하게 해당 형식으로 저장한 표본을 먼저 열어 기준을 잡고 최종 검사를 다시 실행했다. 생산 코드의 저장 보존 조건이나 비교 필드를 삭제하지 않았다. 초기 실패 기록은 `build/agent-masters-native-initial-20261014`에 보존했다.
 
-전체 브라우저 회귀·동봉 실행 검증을 마친 뒤 최종 요약과 실행 경로를 기록한다. 바탕쪽 전용 캔버스·개체/필드/복잡한 서식, 상속 차단과 고급 배치, 새 명령의 반복 작업 기록, 외부 MCP, 구역 Agent 생성·삭제와 전체 한글 동등성 검수는 남는다. 전체 문서화된 구현 범위는 완료되지 않았으므로 자동 계속 작업을 유지한다.
+최종 단위 440개·provider/server 52개·브라우저 318개(동봉 실행 호환 4개 포함)·실제 엔진 289개가 통과했다. [검증 요약](evidence/agent-masters-2026-10-14/verification-summary.json)은 모든 보고서의 최종 앱·빌드·패치·WASM 해시를 대조했다. 첫 쪽 감추기 조회 보강 뒤 같은 최종 소스로 전용 검사와 기존 회귀를 다시 실행했다. 바탕쪽 전용 캔버스·개체/필드/복잡한 서식, 상속 차단과 고급 배치, 새 명령의 반복 작업 기록, 외부 MCP, 구역 Agent 생성·삭제와 전체 한글 동등성 검수는 남는다. 전체 문서화된 구현 범위는 완료되지 않았으므로 자동 계속 작업을 유지한다.
+
+최종 실행 묶음은 `build/jueony-agent-masters-20261014-v2/Start-Review.cmd`, 주소는 `http://127.0.0.1:4248/`, Rust 실행 파일은 같은 폴더의 `JueonyEditor.exe`다. 첫 4246 실행본과 다른 기존 서버·사용자 문서를 유지한다. `review-documents/agent-masters/agent-master-native`와 `agent-master-browser`의 합성 HWP/HWPX를 실제 한글에서 열어 볼 수 있다. [화면 증거](evidence/agent-masters-2026-10-14/agent-master-browser/agent-master.png)에서 저장·재실행 후 바탕쪽과 본문을 별도로 확인했다.
+
+구현 커밋은 `9b2fec6`, 첫 쪽 감추기 보강은 `4c1ae15`다. 엔진은 이전 배경 검수와 같은 `build/rhwp-engine/source-8950f8c2bcb2c714/pkg`, WASM SHA-256은 `2ff6d89629fa60b7e1ae5ecb55144a4ab8cbb8f192a49a8acd23a2244d3ab474`, 앱 소스 SHA-256은 `2083ce4dbd7215c85256b10c58c83b03464018db781d489b829d759abf23fa28`이다. 빌드는 `9b2fec6`과 이후 작업 중 소스를 기록하며 실제 소스 해시로 최종 구현을 대조한다. [실행 확인](evidence/agent-masters-2026-10-14/launch-check.json)은 4248의 실제 WASM 바이트·메타데이터 및 동봉 공통 계약/provider 안내 해시를 확인했다. Rust exe는 컴파일했으며 이번 실행 검증은 스크립트·동봉 런타임 경로다.

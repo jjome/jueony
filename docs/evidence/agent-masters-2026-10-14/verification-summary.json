@@ -1,0 +1,128 @@
+{
+  "status": "PASS_SCOPED_AUTOMATED_CHECKS",
+  "verifiedAt": "2026-10-13T23:01:57.562Z",
+  "providerPassed": 52,
+  "unitPassed": 440,
+  "browserPassed": 318,
+  "nativePassed": 289,
+  "moduleCount": 9,
+  "moduleFiles": 234,
+  "customSourceSha256": "2083ce4dbd7215c85256b10c58c83b03464018db781d489b829d759abf23fa28",
+  "buildScriptSha256": "8df671207273b6ae1e1c78b58e6c9e551299d4eb84619db8ca81c9be10b2a9f2",
+  "wasmSha256": "2ff6d89629fa60b7e1ae5ecb55144a4ab8cbb8f192a49a8acd23a2244d3ab474",
+  "engineSourceId": "8950f8c2bcb2c714",
+  "buildApplicationCommit": "9b2fec6e7fd6c4613d1268346f0378c4e67f316f",
+  "buildApplicationDirty": true,
+  "reports": [
+    {
+      "file": "browser/result.json",
+      "passed": 24,
+      "sha256": "81bdc14f07d783e8266a1f158c844274386f625e5e4633807461a7268876b7e7"
+    },
+    {
+      "file": "regression-parity/result.json",
+      "passed": 66,
+      "sha256": "374a6a778037ea94b38b8beaa9489d61f857c3b2b98fe3b5ba772aca392119be"
+    },
+    {
+      "file": "regression-session/result.json",
+      "passed": 9,
+      "sha256": "1b73691a6e5a234197dea8505c0ac1ea2d0b4856c04c7f6fe2fb12969808c586"
+    },
+    {
+      "file": "basic-text/basic-text-browser.json",
+      "passed": 28,
+      "sha256": "9dc4f5efac3e97c6610a0f2f57f2f559e2ef046f87a9a5d7b05a9f9632bf81ae"
+    },
+    {
+      "file": "regression-agent/result.json",
+      "passed": 9,
+      "sha256": "579b70556e868f7d9fba4d1d52cd8c91c63038088185c38e996792ce0cb123ab"
+    },
+    {
+      "file": "regression-table/result.json",
+      "passed": 18,
+      "sha256": "f5302cc13a4785afbf993ffedff1ba5b1addb80626bd232c4907a98893ef2f7a"
+    },
+    {
+      "file": "image-browser/result.json",
+      "passed": 26,
+      "sha256": "7d6760ca0ae67624a8ad0809bf239dcc204406b5a6dee6507eec51ff6a71c14c"
+    },
+    {
+      "file": "master-browser/result.json",
+      "passed": 17,
+      "sha256": "09d986946f43d0d9ae852654251fbf74d95b7eeab1fbdb2749884f8ba39b66f0"
+    },
+    {
+      "file": "line-browser/result.json",
+      "passed": 12,
+      "sha256": "61a558a526f275c2c8ec34f9ed2300cce2b2643d7bf1285a1f230c1c0999f9fb"
+    },
+    {
+      "file": "delete-browser/result.json",
+      "passed": 11,
+      "sha256": "1f349d4d2949c18db320c4d30baa3be5ad51427b7310a6b85b3b38bb963c06bb"
+    },
+    {
+      "file": "copy-browser/result.json",
+      "passed": 11,
+      "sha256": "2c19c1686c2a76467da5570ed0df5fe764dba46d26840180a8309b4c023c1124"
+    },
+    {
+      "file": "paper-browser/result.json",
+      "passed": 9,
+      "sha256": "ef698150fc138377cba33bc221213a4dc0ab570b1efe887d0bae47a85c81df7f"
+    },
+    {
+      "file": "style-browser/result.json",
+      "passed": 10,
+      "sha256": "e2da59cc432a6ff0e1b4e2f0d9df330640891adead867f1c55e4c2ec41e14e71"
+    },
+    {
+      "file": "image-paste-browser/result.json",
+      "passed": 17,
+      "sha256": "cffd3373a09ea2ebefa9327e4c30278a8420052d34135154dcdc9a9fdc0764c0"
+    },
+    {
+      "file": "empty-browser/result.json",
+      "passed": 11,
+      "sha256": "a5b5f5433f46c4f08067fbd5ef7b47ba6262f77f9441846ae6e04c42c2862814"
+    },
+    {
+      "file": "caret-browser/result.json",
+      "passed": 6,
+      "sha256": "2abf13cd095c25ed390226594b5131e052148be8999b80139d1e853ab102d9fa"
+    },
+    {
+      "file": "section-browser/result.json",
+      "passed": 10,
+      "sha256": "b2d13704f570441b1641ccb732017948a4dd244091b6e0923182fd35cf5097c9"
+    },
+    {
+      "file": "background-browser/result.json",
+      "passed": 9,
+      "sha256": "03742ca768bf724dfc45d35ae39cce42c35544c4f16092f722ff1ce885b7b5a4"
+    },
+    {
+      "file": "agent-master-browser/result.json",
+      "passed": 11,
+      "sha256": "77ddcf8a32a19119507ea5231ba37671cc6f67e129ec22b4396d474149910693"
+    },
+    {
+      "file": "bundle-compatibility/result.json",
+      "passed": 4,
+      "sha256": "fadddb33293b46cf5285b2668db876e0415501b02e1981473d91cffeebdbac18"
+    }
+  ],
+  "limitations": [
+    "Actual Hancom GUI/layout comparison is deferred.",
+    "No paid LLM request: Agent tests use a deterministic local adapter.",
+    "Full Hangul feature parity remains incomplete; no percentage of completion is inferred from these scoped tests.",
+    "Unsupported source properties may be blocked by the stricter cell preservation guard.",
+    "Agent masters support stored basic uniform text only, not pictures/tables/fields/extensions. HWP sparse parity combinations and long originals are refused; deleting a stored master does not suppress earlier inheritance.",
+    "Agent background commands support none/plain solid originals only. Image, gradient, hatch, alpha, mixed/advanced effects are read-only; parity geometry and original visibility are preserved.",
+    "Agent tools support section default tabs and bounded HWPX line numbering; per-paragraph tabs, binary HWP numbering, external MCP and automatic save remain unsupported.",
+    "Native HWPX file caret supports bounded single-section plain body only; multiple sections, nested stories, tabs/fields/objects and native Hancom verification remain deferred."
+  ]
+}

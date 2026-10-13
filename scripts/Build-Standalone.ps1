@@ -34,7 +34,7 @@ if (Test-Path -LiteralPath (Join-Path $projectRoot 'docs/44-editor-stages-result
 if (Test-Path -LiteralPath (Join-Path $projectRoot 'docs/45-rag-evaluation-corpus.md')) {
     Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/45-rag-evaluation-corpus.md') -Destination $output -Force
 }
-foreach ($guide in @('46-hangul-implementation-status.md','47-remaining-editor-implementation.md','48-advanced-editor-continuation.md','49-page-border-inclusion-and-scope.md','50-page-background-region.md','51-picture-background-and-paper-scope.md','52-master-page-basic-editing.md','53-basic-line-numbers.md','54-complete-body-page-deletion.md','55-page-body-copy-and-paste.md','56-different-paper-page-paste.md','57-basic-page-style-paste.md')) {
+foreach ($guide in @('46-hangul-implementation-status.md','47-remaining-editor-implementation.md','48-advanced-editor-continuation.md','49-page-border-inclusion-and-scope.md','50-page-background-region.md','51-picture-background-and-paper-scope.md','52-master-page-basic-editing.md','53-basic-line-numbers.md','54-complete-body-page-deletion.md','55-page-body-copy-and-paste.md','56-different-paper-page-paste.md','57-basic-page-style-paste.md','58-embedded-page-image-paste.md')) {
     if (Test-Path -LiteralPath (Join-Path $projectRoot ('docs/' + $guide))) { Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination $output -Force }
 }
 foreach ($guide in @('30-layered-modular-refactor-plan.md','31-facade-contracts.md','32-modular-refactor-result.md','33-editor-parity-features-result.md','34-sections-tabs-result.md','35-section-boundary-merge-result.md','36-native-section-comparison.md','37-basic-editing-state-result.md','38-paragraph-selection-state-result.md','39-native-dialog-investigation.md','40-basic-navigation-calendar-result.md','41-pre-agent-editor-progress.md','refactor-work-plan.csv','hangul-2024-gap-checklist.csv')) {
@@ -110,12 +110,12 @@ if ($FrontendProfile -eq 'advanced-editor') {
     }
     if (Test-Path -LiteralPath (Join-Path $advancedEvidence 'verification-summary.json')) { Copy-Item -LiteralPath (Join-Path $advancedEvidence 'verification-summary.json') -Destination $advancedReview -Force }
 }
-if ($FrontendProfile -in @('page-inclusion','page-region','page-image','master-page','line-numbers','page-delete','page-copy','page-paper','page-style')) {
-    $pageDate = if ($FrontendProfile -in @('page-image','master-page','line-numbers','page-delete','page-copy','page-paper','page-style')) { '2026-10-14' } else { '2026-10-13' }
+if ($FrontendProfile -in @('page-inclusion','page-region','page-image','master-page','line-numbers','page-delete','page-copy','page-paper','page-style','page-image-paste')) {
+    $pageDate = if ($FrontendProfile -in @('page-image','master-page','line-numbers','page-delete','page-copy','page-paper','page-style','page-image-paste')) { '2026-10-14' } else { '2026-10-13' }
     $pageEvidence = Join-Path $projectRoot ('docs/evidence/' + $FrontendProfile + '-' + $pageDate)
     $pageReview = Join-Path $reviewDocuments $FrontendProfile
     New-Item -ItemType Directory -Force $pageReview | Out-Null
-    foreach ($category in @('native','browser','image-native','image-browser','master-native','master-browser','line-native','line-browser','delete-native','delete-browser','copy-native','copy-browser','paper-native','paper-browser','style-native','style-browser')) {
+    foreach ($category in @('native','browser','image-native','image-browser','master-native','master-browser','line-native','line-browser','delete-native','delete-browser','copy-native','copy-browser','paper-native','paper-browser','style-native','style-browser','image-paste-native','image-paste-browser')) {
         $source = Join-Path $pageEvidence $category
         if (Test-Path -LiteralPath $source) {
             $target = Join-Path $pageReview $category

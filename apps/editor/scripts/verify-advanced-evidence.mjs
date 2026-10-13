@@ -29,7 +29,7 @@ if(masterProfile)assert.ok(build.engineBuild.patches.some(p=>p.name==='master-pa
 if(imageProfile)assert.ok(build.engineBuild.patches.some(p=>p.name==='page-border-z-image.patch'));
 assert.deepEqual((await readdir(resolve(repo, 'engine/patches'))).filter(f => f.endsWith('.patch')).sort(), build.engineBuild.patches.map(p => p.name).sort());
 const unitPath = resolve(directory, 'unit.txt'), unit = (await readFile(unitPath, 'utf8')).replace(/[ \t]+$/gmu, ''); await writeFile(unitPath, unit);
-const count = label => Number(unit.match(new RegExp('^# ' + label + ' (\\d+)$', 'm'))?.[1]); assert.ok(count('tests') >= (agentMastersProfile?439:backgroundProfile?429:agentSectionsProfile?420:emptyProfile?411:imagePasteProfile?408:styleProfile?407:paperProfile?406:copyProfile?404:deleteProfile?402:lineProfile?400:masterProfile?398:imageProfile?395:regionProfile?386:pageProfile?385:384)); assert.equal(count('pass'), count('tests')); for (const key of ['fail', 'skipped', 'cancelled', 'todo']) assert.equal(count(key), 0);
+const count = label => Number(unit.match(new RegExp('^# ' + label + ' (\\d+)$', 'm'))?.[1]); assert.ok(count('tests') >= (agentMastersProfile?440:backgroundProfile?429:agentSectionsProfile?420:emptyProfile?411:imagePasteProfile?408:styleProfile?407:paperProfile?406:copyProfile?404:deleteProfile?402:lineProfile?400:masterProfile?398:imageProfile?395:regionProfile?386:pageProfile?385:384)); assert.equal(count('pass'), count('tests')); for (const key of ['fail', 'skipped', 'cancelled', 'todo']) assert.equal(count(key), 0);
 const boundaries = await json(resolve(directory, 'boundaries.json')); assert.equal(boundaries.ok, true); assert.deepEqual(boundaries.diagnostics, []);
 const suites = [['browser/result.json', regionProfile?24:pageProfile?20:18], ['regression-parity/result.json', 66], ['regression-session/result.json', 9], ['basic-text/basic-text-browser.json', 28], ['regression-agent/result.json', 9]];
 if(pageProfile)suites.push(['regression-table/result.json',18]);
@@ -45,7 +45,7 @@ if(emptyProfile)suites.push(['empty-browser/result.json',11]);
 if(caretProfile)suites.push(['caret-browser/result.json',6]);
 if(agentSectionsProfile)suites.push(['section-browser/result.json',10]);
 if(backgroundProfile)suites.push(['background-browser/result.json',9]);
-if(agentMastersProfile)suites.push(['agent-master-browser/result.json',10]);
+if(agentMastersProfile)suites.push(['agent-master-browser/result.json',11]);
 if (process.argv.includes('--include-bundle')) suites.push(['bundle-compatibility/result.json', 4]);
 const reports = [];
 for (const [file, minimum] of suites) {
@@ -67,7 +67,7 @@ if(imagePasteProfile){const images=await json(resolve(directory,'image-paste-nat
 if(emptyProfile){const empty=await json(resolve(directory,'empty-native/result.json'));assert.ok(empty.results.length>=14);assert.deepEqual(empty.failures,[]);assert.equal(empty.engine.wasmSha256,build.engineWasmSha256);nativePassed+=empty.results.length;}
 if(caretProfile){const caret=await json(resolve(directory,'caret-native/result.json'));assert.ok(caret.results.length>=16);assert.deepEqual(caret.failures,[]);assert.equal(caret.engine.wasmSha256,build.engineWasmSha256);nativePassed+=caret.results.length;}
 if(backgroundProfile){const background=await json(resolve(directory,'background-native/result.json'));assert.ok(background.results.length>=16);assert.deepEqual(background.failures,[]);assert.equal(background.engine.wasmSha256,build.engineWasmSha256);nativePassed+=background.results.length;}
-if(agentMastersProfile){const master=await json(resolve(directory,'agent-master-native/result.json'));assert.ok(master.results.length>=15);assert.deepEqual(master.failures,[]);assert.equal(master.engine.wasmSha256,build.engineWasmSha256);nativePassed+=master.results.length;}
+if(agentMastersProfile){const master=await json(resolve(directory,'agent-master-native/result.json'));assert.ok(master.results.length>=17);assert.deepEqual(master.failures,[]);assert.equal(master.engine.wasmSha256,build.engineWasmSha256);nativePassed+=master.results.length;}
 let providerPassed;
 if(agentSectionsProfile){const section=await json(resolve(directory,'section-native/result.json'));assert.ok(section.results.length>=11);assert.deepEqual(section.failures,[]);assert.equal(section.engine.wasmSha256,build.engineWasmSha256);nativePassed+=section.results.length;const provider=(await readFile(resolve(directory,'provider-tests.txt'),'utf8')).replace(/[ \t]+$/gmu,'');await writeFile(resolve(directory,'provider-tests.txt'),provider);const total=Number(provider.match(/^# tests (\d+)$/m)?.[1]);assert.ok(total>=52);assert.match(provider,new RegExp('^# pass '+total+'$','m'));for(const key of ['fail','skipped','cancelled','todo'])assert.match(provider,new RegExp('^# '+key+' 0$','m'));providerPassed=total;}
 const summary = { status: 'PASS_SCOPED_AUTOMATED_CHECKS', verifiedAt: new Date().toISOString(), providerPassed, unitPassed: count('pass'), browserPassed: reports.reduce((n, r) => n + r.passed, 0), nativePassed, moduleCount: boundaries.moduleCount, moduleFiles: boundaries.scannedFiles,

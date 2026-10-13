@@ -13,7 +13,8 @@ export function readAgentMasterPages(wasm:any,section:number):AgentMasterPages {
   return {kind:p.kind,text:chars.slice(0,4000).join(''),textTruncated,xMm:mm(p.x),yMm:mm(p.y),fontSizePt:p.fontSize/100,color:p.color,bold:p.bold,italic:p.italic,underline:p.underline??null,editable:native.editable&&p.editable&&bounded&&!textTruncated,paragraphCount:p.paragraphCount,controlCount:p.controlCount};
  });
  const editable=native.editable&&bounded&&pages.every((p:any)=>p.editable);
- return {editable,pages,...(editable?{}:{reason:'표·그림·필드·혼합/확장·중복 또는 긴 원본 바탕쪽은 읽기 전용입니다. 긴 텍스트는 4,000자 미리보기입니다.'})};
+ const doc=handle(wasm),definition=typeof doc.getSectionDef==='function'?parsed(doc.getSectionDef(section)):null;
+ return {editable,pages,...(typeof definition?.hideMasterPage==='boolean'?{hiddenOnFirstPage:definition.hideMasterPage}:{}),...(editable?{}:{reason:'표·그림·필드·혼합/확장·중복 또는 긴 원본 바탕쪽은 읽기 전용입니다. 긴 텍스트는 4,000자 미리보기입니다.'})};
 }
 export function executeAgentMasterPage(wasm:any,name:string,op:AgentMasterPageOp):void {
  const doc=handle(wasm),current=readAgentMasterPages(doc,op.section);

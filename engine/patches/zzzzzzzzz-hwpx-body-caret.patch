@@ -1,0 +1,143 @@
+--- a/src/parser/hwpx/mod.rs
++++ b/src/parser/hwpx/mod.rs
+@@ -14,6 +14,7 @@
+ mod contract_streams;
+ mod crypto;
+ pub mod header;
++pub(crate) mod caret;
+ pub mod reader;
+ pub mod section;
+ pub mod utils;
+@@ -715,6 +716,7 @@
+     {
+         crate::model::hyperlink_format::decode(&mut doc, &bytes);
+     }
++    caret::restore(&mut doc);
+     Ok(doc)
+ }
+ 
+--- a/src/serializer/hwpx/mod.rs
++++ b/src/serializer/hwpx/mod.rs
+@@ -119,11 +119,12 @@
+ 
+     // 6. settings.xml — 원본 보존 우선.
+     //    하드코딩 상수는 PrintInfo(확대/인쇄 설정) 등을 빠뜨린다.
+-    z.write_deflated(
+-        "settings.xml",
+-        doc.hwpx_aux_entry("settings.xml")
+-            .unwrap_or_else(|| SETTINGS_XML.as_bytes()),
+-    )?;
++    // Only the validated ordinary-body caret is updated. PrintInfo, comments,
++    // namespaces and all bytes outside the caret opening tag remain untouched.
++    let settings = doc.hwpx_aux_entry("settings.xml")
++        .unwrap_or_else(|| SETTINGS_XML.as_bytes());
++    let settings = crate::parser::hwpx::caret::updated_settings(doc, settings);
++    z.write_deflated("settings.xml", &settings)?;
+ 
+     // 6-1. [#3557] Scripts/* — IR 밖 패키지 스크립트 원본 통과. 파서가 aux 로
+     //      보존한 것을 그대로 되쓴다(content.hpf 참조는 write_content_hpf 의
+--- a/src/parser/hwpx/caret.rs
++++ b/src/parser/hwpx/caret.rs
+@@ -0,0 +1,102 @@
++//! Bounded HWPX save-time body caret; not a nested-list ID resolver.
++//!
++//! Hancom samples repeat p@id (0/2147483648) while CaretPosition.paraIDRef
++//! identifies an ordinal in list 0. Never resolve the caret by XML p@id, nor
++//! equate a section number with a list ID. Multiple sections remain deferred.
++use crate::model::{control::Control, document::Document, paragraph::Paragraph};
++use quick_xml::{events::{BytesStart, Event}, name::ResolveResult, reader::NsReader, Writer};
++
++struct Caret { para: usize, pos: u32, start: usize, end: usize, tag: BytesStart<'static>, empty: bool }
++fn app_namespace(ns: ResolveResult<'_>) -> bool {
++    matches!(ns, ResolveResult::Bound(n) if n.as_ref()=="http://www.hancom.co.kr/hwpml/2011/app" || n.as_ref()=="http://www.owpml.org/owpml/2023/app")
++}
++fn read(bytes: &[u8]) -> Option<Caret> {
++    // The parser already bounds aux entries; keep an independent small cap too.
++    if bytes.len()>1024*1024 { return None; }
++    let mut r=NsReader::from_reader(bytes);
++    let mut depth=0usize; let mut root=false; let mut found=None;
++    loop {
++        let start=r.buffer_position() as usize;
++        match r.read_event().ok()? {
++            Event::Start(e)|Event::Empty(e) => {
++                let empty=bytes.get(r.buffer_position() as usize-2)==Some(&b'/');
++                let (ns,local)=r.resolver().resolve_element(e.name());
++                if depth==0 {
++                    if root||local.as_ref()!="HWPApplicationSetting"||!app_namespace(ns) { return None; }
++                    root=true;
++                } else if depth==1 && local.as_ref()=="CaretPosition" && app_namespace(ns) {
++                    if found.is_some(){return None;}
++                    let mut list=None;let mut para=None;let mut pos=None;
++                    for attr in e.attributes(){let a=attr.ok()?;match a.key.as_ref(){
++                        "listIDRef"=>list=Some(a.value.parse::<u32>().ok()?),
++                        "paraIDRef"=>para=Some(a.value.parse::<u32>().ok()?),
++                        "pos"=>pos=Some(a.value.parse::<u32>().ok()?),_=>{}
++                    }}
++                    if list!=Some(0){return None;}
++                    found=Some(Caret{para:para? as usize,pos:pos?,start,end:r.buffer_position() as usize,tag:e.into_owned(),empty});
++                }
++                if !empty{depth+=1;}
++            }
++            Event::End(_)=>{depth=depth.checked_sub(1)?;}
++            Event::DocType(_)=>return None,
++            Event::Eof=>return if root&&depth==0{found}else{None},
++            _=>{}
++        }
++    }
++}
++fn supported(doc:&Document)->bool{
++    if doc.sections.len()!=1||doc.provenance.hwp3_lineage{return false;}
++    let s=&doc.sections[0];
++    if s.paragraphs.is_empty()||s.paragraphs.len()>5000||!s.section_def.master_pages.is_empty(){return false;}
++    let mut count=0;
++    for (i,p) in s.paragraphs.iter().enumerate(){
++        count+=p.text.chars().count();
++        if count>100000||!p.field_ranges.is_empty()||!p.orphan_field_ends.is_empty()||!p.title_marks.is_empty()||!p.range_tags.is_empty()||!p.tab_extended.is_empty()||p.text.chars().any(char::is_control){return false;}
++        if p.controls.iter().any(|c|i!=0||!matches!(c,Control::SectionDef(_)|Control::ColumnDef(_))){return false;}
++        if p.controls.iter().filter(|c|matches!(c,Control::SectionDef(_))).count()>1||p.controls.iter().filter(|c|matches!(c,Control::ColumnDef(_))).count()>1{return false;}
++        if p.char_offsets.len()!=p.text.chars().count(){return false;}
++    }
++    true
++}
++fn offset(p:&Paragraph,index:usize)->Option<u32>{
++    if index>p.text.chars().count(){return None;}
++    if let Some(&v)=p.char_offsets.get(index){return Some(v);}
++    if let Some(&v)=p.char_offsets.last(){return Some(v+p.text.chars().last()?.len_utf16() as u32);}
++    Some(p.controls.len() as u32*8)
++}
++fn index(p:&Paragraph,pos:u32)->Option<usize>{
++    // Reject a surrogate midpoint, control slot, or oversized position instead
++    // of clamping an invalid file location into a seemingly valid saved caret.
++    p.char_offsets.iter().position(|&v|v==pos).or_else(||{let end=p.char_offsets.len();(offset(p,end)==Some(pos)).then_some(end)})
++}
++pub(crate) fn restore(doc:&mut Document){
++    if !supported(doc){return;}
++    let Some(c)=doc.hwpx_aux_entry("settings.xml").and_then(read) else{return;};
++    let Some(p)=doc.sections[0].paragraphs.get(c.para) else{return;};
++    if index(p,c.pos).is_none(){return;}
++    doc.doc_properties.caret_list_id=0;
++    doc.doc_properties.caret_para_id=c.para as u32;
++    doc.doc_properties.caret_char_pos=c.pos;
++}
++pub(crate) fn updated_settings(doc:&Document,original:&[u8])->Vec<u8>{
++    let unchanged=||original.to_vec();
++    if !supported(doc)||doc.doc_properties.caret_list_id!=0{return unchanged();}
++    let para=doc.doc_properties.caret_para_id as usize;
++    let Some(p)=doc.sections[0].paragraphs.get(para) else{return unchanged();};
++    let Some(i)=index(p,doc.doc_properties.caret_char_pos) else{return unchanged();};
++    let Some(c)=read(original) else{return unchanged();};
++    // The ordinary-body serializer always emits secPr plus the initial colPr
++    // in paragraph zero. These two structural controls occupy 16 HWP units.
++    let pos=p.text.chars().take(i).map(|x|x.len_utf16() as u32).sum::<u32>()+if para==0{16}else{0};
++    let mut tag=BytesStart::new(c.tag.name().as_ref().to_owned());
++    let para_text=para.to_string();let pos_text=pos.to_string();
++    for attr in c.tag.attributes(){let Ok(a)=attr else{return unchanged();};match a.key.as_ref(){
++        "listIDRef"=>tag.push_attribute(("listIDRef","0")),
++        "paraIDRef"=>tag.push_attribute(("paraIDRef",para_text.as_str())),
++        "pos"=>tag.push_attribute(("pos",pos_text.as_str())),_=>tag.push_attribute(a),
++    }}
++    let mut writer=Writer::new(Vec::new());
++    let event=if c.empty{Event::Empty(tag)}else{Event::Start(tag)};
++    if writer.write_event(event).is_err(){return unchanged();}
++    let mut bytes=original[..c.start].to_vec();bytes.extend(writer.into_inner());bytes.extend_from_slice(&original[c.end..]);bytes
++}

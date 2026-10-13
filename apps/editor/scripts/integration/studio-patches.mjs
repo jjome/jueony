@@ -13,6 +13,7 @@ html = html.replaceAll('rhwp-studio 문서 편집기', 'Jueony 문서 편집기'
 html = html.replace('data-i18n="ui.studioHeader.srLabel"', '');
 html = replaceOnce(html, '<div id="studio-root">', '<div id="studio-root">\n    <div id="jueony-title"><strong>Jueony 문서 편집기</strong><span>한글 2024 호환성 개발판</span></div>', 'titlebar');
 html = replaceOnce(html, '</head>', '  <link rel="stylesheet" href="/src/jueony/editor.css" />\n</head>', 'css');
+html = replaceOnce(html, '          <div class="md-item disabled" data-cmd="page:page-border"', '          <div class="md-item" data-cmd="page:master-page"><span class="md-icon"></span><span class="md-label">바탕쪽 (기본 텍스트)</span></div>\n          <div class="md-item disabled" data-cmd="page:page-border"', 'master page menu');
 await writeFile(join(root, 'editor.html'), html);
 await cp(join(app, 'src/shell.html'), join(root, 'index.html'));
 let settings = (await readFile(join(root, 'src/core/user-settings.ts'), 'utf8')).replace(/\r\n/g, '\n');

@@ -21,3 +21,5 @@ export {defaultPageImage,pageImageModes} from '../domain/page-border-settings.ts
 export type {PageImageFill} from '../domain/page-border-settings.ts';
 export {pageSetupKeys,pageDimensionFromInput,validatePageSetup,samePageSetup} from '../domain/page-setup-settings.ts';
 export type {PageSetupSettings} from '../domain/page-setup-settings.ts';
+export {defaultMasterPageText,validateMasterPageText,sameMasterPageText} from '../domain/master-page-settings.ts';
+export type {MasterPageKind,MasterPageText} from '../domain/master-page-settings.ts';

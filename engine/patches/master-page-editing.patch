@@ -1,0 +1,133 @@
+--- /dev/null
++++ b/src/document_core/commands/master_pages.rs
+@@ -0,0 +1,94 @@
++use crate::document_core::DocumentCore;
++use crate::error::HwpError;
++use crate::model::{control::Control,header_footer::{MasterPage,HeaderFooterApply},paragraph::{Paragraph,CharShapeRef},style::{Alignment,CharShapeMods,ParaShapeMods}};
++
++fn fail(message:&str)->HwpError {HwpError::RenderError(message.into())}
++fn kind(value:&str)->Result<HeaderFooterApply,HwpError>{match value{"both"=>Ok(HeaderFooterApply::Both),"odd"=>Ok(HeaderFooterApply::Odd),"even"=>Ok(HeaderFooterApply::Even),_=>Err(fail("Invalid master-page kind"))}}
++fn label(value:HeaderFooterApply)->&'static str {match value{HeaderFooterApply::Both=>"both",HeaderFooterApply::Odd=>"odd",HeaderFooterApply::Even=>"even"}}
++
++impl DocumentCore {
++    fn master_plain(&self,mp:&MasterPage)->bool {
++        if mp.is_extension||mp.overlap||mp.replace_base||mp.page_front||mp.ext_flags!=0||mp.text_direction!=0||mp.text_ref!=0||mp.num_ref!=0||mp.paragraphs.len()>100{return false;}
++        let mut cs_id=None;
++        for (i,p) in mp.paragraphs.iter().enumerate(){
++            if !p.controls.is_empty()||!p.range_tags.is_empty()||!p.field_ranges.is_empty()||!p.orphan_field_ends.is_empty()||!p.title_marks.is_empty()||!p.markpen_marks.is_empty()||p.style_id!=0||p.char_shapes.len()>1||p.text.chars().any(|c|c.is_control()){return false;}
++            let id=p.char_shapes.first().map(|r|r.char_shape_id).unwrap_or(0);
++            if cs_id.is_some_and(|old|old!=id){return false;}cs_id=Some(id);
++            let Some(ps)=self.document.doc_info.para_shapes.get(p.para_shape_id as usize) else{return false;};
++            if ps.alignment!=Alignment::Left||ps.margin_left<0||ps.margin_left%2!=0||ps.spacing_before<0||ps.spacing_before%2!=0||ps.margin_right!=0||ps.indent!=0||ps.spacing_after!=0||i>0&&ps.spacing_before!=0{return false;}
++            if let Some(first)=mp.paragraphs.first().and_then(|p|self.document.doc_info.para_shapes.get(p.para_shape_id as usize)){let mut expected=first.clone();let mut actual=ps.clone();expected.spacing_before=0;actual.spacing_before=0;if expected!=actual{return false;}}
++        }
++        true
++    }
++
++    pub fn get_master_pages_native(&self,section:usize)->Result<String,HwpError>{
++        let sec=self.document.sections.get(section).ok_or_else(||fail("Invalid section"))?;
++        let pages=&sec.section_def.master_pages;
++        let editable=pages.iter().all(|mp|self.master_plain(mp));
++        let rows=pages.iter().enumerate().map(|(index,mp)|{
++            let p=mp.paragraphs.first();let ps=p.and_then(|p|self.document.doc_info.para_shapes.get(p.para_shape_id as usize));
++            let cs=p.and_then(|p|self.document.doc_info.char_shapes.get(p.char_shapes.first().map(|r|r.char_shape_id).unwrap_or(0) as usize));
++            let color=cs.map(|cs|crate::document_core::helpers::color_ref_to_css(cs.text_color)).unwrap_or("#000000".into());
++            serde_json::json!({"index":index,"kind":label(mp.apply_to),"editable":editable&&self.master_plain(mp),"isExtension":mp.is_extension,"pageFront":mp.page_front,"textDirection":mp.text_direction,"textWidth":mp.text_width,"textHeight":mp.text_height,"text":mp.paragraphs.iter().map(|p|p.text.as_str()).collect::<Vec<_>>().join("\n"),"x":ps.map(|p|p.margin_left/2).unwrap_or(0),"y":ps.map(|p|p.spacing_before/2).unwrap_or(0),"fontSize":cs.map(|c|c.base_size).unwrap_or(1000),"color":color,"bold":cs.is_some_and(|c|c.bold),"italic":cs.is_some_and(|c|c.italic),"underline":cs.map(|c|format!("{:?}",c.underline_type)),"paragraphCount":mp.paragraphs.len(),"controlCount":mp.paragraphs.iter().map(|p|p.controls.len()).sum::<usize>()})
++        }).collect::<Vec<_>>();
++        Ok(serde_json::json!({"ok":true,"editable":editable,"pages":rows}).to_string())
++    }
++
++    pub fn set_master_page_text_native(&mut self,section:usize,page_kind:&str,json:&str)->Result<String,HwpError>{
++        let apply_to=kind(page_kind)?;
++        let sec=self.document.sections.get(section).ok_or_else(||fail("Invalid section"))?;
++        if !sec.section_def.master_pages.iter().all(|mp|self.master_plain(mp)){return Err(fail("복잡한 바탕쪽은 이 기본 편집 경로로 변경하지 않습니다."));}
++        let value:serde_json::Value=serde_json::from_str(json).map_err(|_|fail("Invalid master-page JSON"))?;
++        let deleting=value.get("delete").and_then(|v|v.as_bool()).unwrap_or(false);
++        let mut replacement=None;
++        if !deleting {
++            let text=value.get("text").and_then(|v|v.as_str()).ok_or_else(||fail("Missing master text"))?;
++            if text.chars().count()>4000||text.split('\n').count()>100||text.chars().any(|c|c.is_control()&&c!='\n'){return Err(fail("바탕쪽은 4000자·100문단 이하 텍스트를 지원합니다. 탭/제어문자는 제외합니다."));}
++            let integer=|key:&str,min:i64,max:i64|->Result<i32,HwpError>{let v=value.get(key).and_then(|v|v.as_i64()).ok_or_else(||fail("Invalid master value"))?;if v<min||v>max{return Err(fail("Master value out of range"));}Ok(v as i32)};
++            let pd=&sec.section_def.page_def;let width=if pd.landscape{pd.height}else{pd.width};let height=if pd.landscape{pd.width}else{pd.height};
++            let x=integer("x",0,(width-1) as i64)?;let y=integer("y",0,(height-1) as i64)?;let size=integer("fontSize",100,7200)?;
++            let color=value.get("color").and_then(|v|v.as_str()).ok_or_else(||fail("Invalid color"))?;
++            if color.len()!=7||!color.starts_with('#'){return Err(fail("Invalid color"));}let rgb=u32::from_str_radix(&color[1..],16).map_err(|_|fail("Invalid color"))?;
++            let bold=value.get("bold").and_then(|v|v.as_bool()).ok_or_else(||fail("Invalid bold"))?;
++            if self.document.doc_info.char_shapes.len()>60000||self.document.doc_info.para_shapes.len()>60000{return Err(fail("Master style resource limit"));}
++            let owner=sec.section_def.master_pages.iter().find(|mp|mp.apply_to==apply_to).and_then(|mp|mp.paragraphs.first());
++            let source_cs=owner.and_then(|p|p.char_shapes.first()).map(|r|r.char_shape_id as usize).unwrap_or(0);
++            let source_ps=owner.map(|p|p.para_shape_id as usize).unwrap_or(0);
++            let mut cs=self.document.doc_info.char_shapes.get(source_cs).cloned().ok_or_else(||fail("Missing document character style"))?;
++            cs=CharShapeMods{base_size:Some(size),text_color:Some(((rgb>>16)&255)|(rgb&0xff00)|((rgb&255)<<16)),bold:Some(bold),..Default::default()}.apply_to(&cs);cs.raw_data=None;
++            let cs_id=self.document.doc_info.char_shapes.len() as u32;
++            let mut styles=Vec::new();let mut paragraphs=Vec::new();
++            for (i,line) in text.split('\n').enumerate(){
++                let mut ps=self.document.doc_info.para_shapes.get(source_ps).cloned().ok_or_else(||fail("Missing paragraph style"))?;
++                ps=ParaShapeMods{alignment:Some(Alignment::Left),margin_left:Some(x*2),margin_right:Some(0),indent:Some(0),spacing_before:Some(if i==0{y*2}else{0}),spacing_after:Some(0),..Default::default()}.apply_to(&ps);ps.raw_data=None;
++                let ps_id=(self.document.doc_info.para_shapes.len()+styles.len()) as u16;styles.push(ps);
++                let mut offset=0;let offsets=line.chars().map(|c|{let old=offset;offset+=c.len_utf16() as u32;old}).collect();
++                paragraphs.push(Paragraph{text:line.into(),char_count:offset+1,char_offsets:offsets,char_shapes:vec![CharShapeRef{start_pos:0,char_shape_id:cs_id}],para_shape_id:ps_id,has_para_text:true,..Default::default()});
++            }
++            self.document.doc_info.char_shapes.push(cs);self.document.doc_info.para_shapes.extend(styles);
++            replacement=Some(MasterPage{apply_to,paragraphs,text_width:width,text_height:height,..Default::default()});
++        }
++        let sec=&mut self.document.sections[section];
++        // Remove only complete top-level master list subtrees. Other unknown section
++        // records retain their original bytes and order. Complex masters were refused.
++        let mut skip_level=None;
++        sec.section_def.extra_child_records.retain(|raw|{
++            if let Some(level)=skip_level {if raw.level>level{return false;}skip_level=None;}
++            if raw.tag_id==crate::parser::tags::HWPTAG_LIST_HEADER&&raw.data.len()>=18 {
++                let w=u32::from_le_bytes(raw.data[8..12].try_into().unwrap());let h=u32::from_le_bytes(raw.data[12..16].try_into().unwrap());
++                if w>0||h>0 {skip_level=Some(raw.level);return false;}
++            }true
++        });
++        sec.section_def.master_pages.retain(|mp|mp.apply_to!=apply_to);
++        if let Some(mp)=replacement{sec.section_def.master_pages.push(mp);}
++        sec.section_def.master_pages.sort_by_key(|mp|match mp.apply_to{HeaderFooterApply::Both=>0,HeaderFooterApply::Odd=>1,HeaderFooterApply::Even=>2});
++        // A single odd HWP master has a known native flag; arbitrary sparse parity
++        // combinations still go through the saved-copy preservation guard.
++        sec.section_def.flags &= !0xe000_0000;
++        if sec.section_def.master_pages.len()==1&&sec.section_def.master_pages[0].apply_to==HeaderFooterApply::Odd{sec.section_def.flags|=0x8000_0000;}
++        for mp in &mut sec.section_def.master_pages{mp.raw_list_header.clear();}
++        let sd=sec.section_def.clone();for p in &mut sec.paragraphs{for c in &mut p.controls{if let Control::SectionDef(def)=c{**def=sd.clone();}}}sec.raw_stream=None;
++        self.document.doc_info.raw_stream=None;self.document.doc_info.raw_stream_dirty=true;self.rebuild_resolved_styles();self.measured_sections.clear();self.measured_tables.clear();self.dirty_paragraphs.clear();
++        self.mark_section_dirty(section);self.paginate_if_needed();let pages=self.page_count();Ok(serde_json::json!({"ok":true,"pageCount":pages}).to_string())
++    }
++}
+--- a/src/document_core/commands/mod.rs
++++ b/src/document_core/commands/mod.rs
+@@ -13,6 +13,7 @@
+ mod formatting;
+ mod formatting_runs;
+ mod header_footer_ops;
++mod master_pages;
+ mod html_import;
+ mod object_ops;
+ pub(crate) mod paragraph_block;
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1194,6 +1194,12 @@
+     }
+ 
+     /// 구역 정의(SectionDef)를 JSON으로 반환한다.
++    #[wasm_bindgen(js_name = getMasterPages)]
++    pub fn get_master_pages(&self,section:u32)->Result<String,JsValue>{self.core.get_master_pages_native(section as usize).map_err(|e|e.into())}
++
++    #[wasm_bindgen(js_name = setMasterPageText)]
++    pub fn set_master_page_text(&mut self,section:u32,kind:&str,json:&str)->Result<String,JsValue>{self.core.set_master_page_text_native(section as usize,kind,json).map_err(|e|e.into())}
++
+     #[wasm_bindgen(js_name = getSectionDef)]
+     pub fn get_section_def(&self, section_idx: u32) -> Result<String, JsValue> {
+         self.get_section_def_native(section_idx as usize)
+--- a/src/document_core/queries/rendering.rs
++++ b/src/document_core/queries/rendering.rs
+@@ -878,7 +878,7 @@
+         .filter(|(_, m)| !m.is_extension)
+         .map(|(i, _)| i)
+         .collect();
+-    let single_base_mp = if base_mp_indices.len() == 1 {
++    let single_base_mp = if base_mp_indices.len() == 1 && mps[base_mp_indices[0]].apply_to == HeaderFooterApply::Both {
+         base_mp_indices.first().copied()
+     } else {
+         None

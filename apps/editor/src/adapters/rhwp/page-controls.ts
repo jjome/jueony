@@ -1,4 +1,5 @@
 /** Durable page commands. Every mutation uses Studio's snapshot/dirty/history owner. */
+import {installMasterPageControls} from './master-pages.ts';
 export const hideFields = [
   ['hideHeader','머리말'],['hideFooter','꼬리말'],['hideMasterPage','바탕쪽'],
   ['hideBorder','쪽 테두리'],['hideFill','쪽 배경'],['hidePageNum','쪽 번호'],
@@ -27,6 +28,7 @@ export function writePageHide(doc:any,target:{sectionIndex:number;paragraphIndex
   if(result?.ok!==true)throw new Error('쪽 감추기를 적용하지 못했습니다.');
 }
 export function installPageControls(registry:any,input:()=>any){
+  installMasterPageControls(registry,input);
   const body=(ctx:any)=>ctx.hasDocument&&ctx.isEditable&&!ctx.isFormMode&&!ctx.inTable&&!ctx.inCellSelectionMode&&!ctx.inPictureObjectSelection&&!ctx.inTableObjectSelection&&!input()?.cursor?.isInHeaderFooter?.()&&!input()?.cursor?.isInFootnote?.()&&!input()?.cursor?.isInTextBox?.();
   registry.register({id:'page:section-break',label:'구역 나누기',shortcutLabel:'Alt+Shift+Enter',
     canExecute:(ctx:any)=>body(ctx)&&!input()?.cursor?.hasSelection?.()&&typeof input()?.wasm?.borrowDocumentHandle?.()?.insertSectionBreak==='function',

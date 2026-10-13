@@ -78,6 +78,9 @@ export function capturePreservationEvidence(value:NativeDocument):PreservationEv
   for(const [name,method] of [['page','getPageDef'],['definition','getSectionDef'],['columns','getColumnDef']] as const)capture(`${key}/${name}`,()=>read(doc,method,section));
   capture(`${key}/page-border`,()=>pageBorder(section));
   if(typeof (doc as Record<string,unknown>).getPageBorderFillEntry==='function')capture(`${key}/page-border-entries`,()=>['both','even','odd'].map(kind=>pageBorder(section,kind)));
+  if(typeof (doc as Record<string,unknown>).getMasterPages==='function')capture(`${key}/master-pages`,()=>{
+   const state=record(read(doc,'getMasterPages',section));return array(state.pages!).map(item=>{const {index:unused,editable:gate,...properties}=record(item);return properties;});
+  });
   capture(`${key}/paragraph-count`,()=>integer(read(doc,'getParagraphCount',section)));
   const count=Number(values[`${key}/paragraph-count`]??0);
   for(let paragraph=0;paragraph<count;paragraph++){

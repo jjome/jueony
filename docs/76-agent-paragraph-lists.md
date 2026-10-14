@@ -24,3 +24,13 @@ Domain은 대상·카탈로그·인자·수준·원본 가능성과 no-op을 검
 단위 577·provider/server 52·이번 실제 엔진 23·이번 실제 Edge 14 통과. 네 제공자는 로컬 합성 응답이며 유료 API를 호출하지 않았다. 번호·글머리표와 서식 보존, 요청 undo/redo, 두 번째 실문서 적용 실패 복원, 예상 밖 자원/restart 변조 탐지, 동시 편집 충돌, 수동 입력, 저장 재열기와 업무 복원을 확인했다. 최종 누적 검사와 실행 묶음은 아래에 추가한다.
 
 새 보존 조회로 기존 엔진의 명시적 `NewStart(99)`가 HWP와 HWPX 내보내기에서 모두 사라지는 것을 발견했다. 직렬화기 손실 보고서는 count 0이었으므로, 독립적인 문단별 저장 상태 비교가 이를 차단하는지 검사했다. 현재는 이런 메모리 상태의 저장/preflight를 거절하고 열린 원본을 유지한다. 이미 잘못 내보낸 파일에서 사라진 원본 값을 복구한다고 주장하지 않는다. 이 결함 수정과 번호 다시 시작 공개 명령은 다음 별도 과제다.
+
+## 최종 검수본
+
+76번 최종 검사: 단위 577·provider/server 52·브라우저 493·실제 엔진 512 통과. 구현 `a3ed89b`와 4276 검수본의 앱 소스/WASM/공통 계약 해시를 대조했다. 저장된 번호/문자 글머리표 정의 적용·번호 7수준·수준 변경·해제·다른 문단 묶음 1회 undo/redo·두 번째 실문서 적용 실패 전체 복원·공유 자원/저장 restart 변조 탐지·동시 편집 충돌·양 형식 저장 재열기·수동 입력과 업무 복원을 확인했다. 한글 비교용 전용 HWP/HWPX 42개를 준비했다. 명시적 번호 다시 시작의 기존 직렬화 손실은 독립 저장 상태 검사로 차단하며 열린 원본을 유지한다. 새 모양 생성·번호 다시 시작·개요·실제 한글 직접 비교·유료 모델 품질·전체 동등성은 미완료다.
+
+실행: `build/jueony-agent-lists-20261014/Start-Review.cmd` 또는 `http://127.0.0.1:4276/`. 이전 검수 서버와 사용자 문서는 유지한다. 검수 파일은 같은 묶음의 `review-documents/agent-lists/agent-lists-native` 및 `agent-lists-browser`에 있다. `number-level-*`·`number-multiple`·`number-clear`·`bullet-existing`/`bullet`·`bullet-clear`·`switch-definition-kind`·`manual-numbered`를 실제 한글에서 확인한다. `bullet-opaque-*`와 `readonly-*`는 거절 대상 합성 원본이며 동등성 통과 자료가 아니다. [42개 파일 해시 목록](evidence/agent-lists-2026-10-14/list-documents.json)을 따른다.
+
+엔진 `source-77bef0dca9b38382/pkg`(WSL review/no opt), 앱 소스 SHA-256 `c43cba8377f620abca48836812a875adde8499af335ed9a8aecce69218905b9e`, WASM SHA-256 `4695ae3b3ded7e63be03ba61d8f1b0e1ca050f7e8325da0183646a208f724c4a`. 커밋 전 빌드의 applicationCommit 01b4727/dirty=true와 구현 a3ed89b는 앱 소스 해시 일치로 연결한다. 9개 모듈·256개 소스의 경계 및 TypeScript 검사 통과. [누적 결과](evidence/agent-lists-2026-10-14/verification-summary.json), [실행 대조](evidence/agent-lists-2026-10-14/launch-check.json), [기존 엔진 제한 진단](evidence/agent-lists-2026-10-14/source-baseline-notes.json)을 보관한다. 최종 증거 60개 분류의 1,206개 JSON/HWP/HWPX/SVG 파일을 검수 묶음에 복사하고 바이트를 대조했다.
+
+전체 문서화 범위는 미완료이며 자동화를 유지한다. 검사 수를 전체 한글 기능의 구현률로 환산하지 않는다.

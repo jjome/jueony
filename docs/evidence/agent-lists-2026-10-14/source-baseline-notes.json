@@ -1,0 +1,71 @@
+{
+  "storedStyleQuery": {
+    "existingMethod": "getStyleDetail",
+    "behavior": "May substitute actual body paragraph numbering for a stored style with no numbering.",
+    "preservationMethod": "getStoredStyleDetail",
+    "result": "Stored definition remains unchanged by body list application."
+  },
+  "restartExport": [
+    {
+      "format": "hwp",
+      "sourceStoredRestarts": [
+        [
+          null,
+          {
+            "NewStart": 99
+          },
+          null
+        ]
+      ],
+      "reopenedStoredRestarts": [
+        [
+          null,
+          null,
+          null
+        ]
+      ],
+      "serializerReport": {
+        "schemaVersion": 1,
+        "outputFormat": "hwp",
+        "count": 0,
+        "losses": []
+      },
+      "preflight": "BLOCKED_LIVE_STATE_PRESERVED"
+    },
+    {
+      "format": "hwpx",
+      "sourceStoredRestarts": [
+        [
+          null,
+          {
+            "NewStart": 99
+          },
+          null
+        ]
+      ],
+      "reopenedStoredRestarts": [
+        [
+          null,
+          null,
+          null
+        ]
+      ],
+      "serializerReport": {
+        "schemaVersion": 1,
+        "outputFormat": "hwpx",
+        "count": 0,
+        "losses": []
+      },
+      "preflight": "BLOCKED_LIVE_STATE_PRESERVED"
+    }
+  ],
+  "unusedBulletDiagnostic": {
+    "source": "fresh createBlankDocument plus ensureDefaultBullet without any paragraph reference",
+    "hwp": "New unused resource may be omitted by retained DocInfo raw stream; merely calling this API is not evidence of a persisted definition.",
+    "hwpx": "Observed resource persisted.",
+    "fixture": "Browser test applies the definition to another paragraph before opening the file, then tests applying that actual existing stored definition to the target.",
+    "scope": "New definition creation is NOT an Agent command in this bundle."
+  },
+  "nativeHancomComparison": "NOT_RUN",
+  "paidModels": "NOT_RUN"
+}

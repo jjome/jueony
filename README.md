@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-agent-para-box-20261014/Start-Review.cmd)**로 실행한다(4274). AI가 일반 본문 문단의 네 방향 기본 테두리·단색 배경·간격·연결/여백 무시를 부분 변경한다. 공유 서식과 요청 밖 원본을 보존하며 다른 문단끼리 묶음 적용·한 번에 되돌리기를 지원한다. [사용법·검증·제한](docs/75-agent-paragraph-decoration.md)을 확인한다. 고급 효과·복잡한 원본·반복 기록·전체 한글 동등성은 남는다. 기존 실행 창과 사용자 문서는 유지한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-agent-lists-20261014/Start-Review.cmd)**로 실행한다(4276). AI가 현재 문서에 저장된 문단 번호·문자 글머리표 정의를 적용하고 번호 수준을 바꾸거나 해제한다. 다른 문단끼리 묶음 적용과 한 번에 되돌리기를 지원한다. [사용법·검증·제한](docs/76-agent-paragraph-lists.md)을 확인한다. 새 모양·번호 다시 시작·개요와 전체 한글 동등성은 남는다. 기존 실행 창과 사용자 문서는 유지한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

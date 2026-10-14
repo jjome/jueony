@@ -4,12 +4,14 @@ import {nativeDocument,parsed} from './structure.ts';
 import {capturePreservationEvidence} from './preservation.ts';
 const canonical=(v:any):any=>Array.isArray(v)?v.map(canonical):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,canonical(v[k])])):v;
 const same=(a:any,b:any)=>JSON.stringify(canonical(a))===JSON.stringify(canonical(b));
-export function readAgentParagraphLists(wasm:any,nodes:BodyNode[]):Pick<Snapshot,'paragraphListSources'|'listCatalog'>{
+export function readAgentParagraphLists(wasm:any,nodes:BodyNode[]):Pick<Snapshot,'paragraphListSources'|'listCatalog'|'basicBulletSources'>{
  const d=nativeDocument(wasm);if(typeof d.getAgentParagraphList!=='function'||typeof d.setAgentParagraphList!=='function'||typeof d.getAgentListDefinitions!=='function')return {};
  try{const numberings=parsed(d.getNumberingList()),bullets=parsed(d.getBulletList());
   if(!Array.isArray(numberings)||!Array.isArray(bullets)||numberings.length>200||bullets.length>200||numberings.some((n,i)=>n.id!==i+1||!Array.isArray(n.levelFormats)||n.levelFormats.length!==7||n.levelFormats.some((f:any)=>typeof f!=='string'||f.length>500))||bullets.some((b,i)=>b.id!==i+1||typeof b.char!=='string'||b.char.length>4))return {};
   const definitions=parsed(d.getAgentListDefinitions());const textBullets=bullets.filter((b:any)=>{const raw=definitions.bullets?.[b.id-1];return raw?.image_bullet===0&&Array.isArray(raw.image_data)&&raw.image_data.every((n:any)=>n===0)&&raw.check_bullet_char===String.fromCharCode(0);});
-  return {listCatalog:{numberings,bullets:textBullets} as AgentListCatalog,paragraphListSources:Object.fromEntries(nodes.map(n=>{try{const raw=parsed(d.getAgentParagraphList(n.section,n.paragraph)),editable=n.editable&&raw.editable===true;return [n.id,{editable,...(!editable?{reason:n.reason??(typeof raw.reason==='string'?raw.reason.slice(0,500):'현재 번호 원본은 읽기 전용입니다.')}:{})}];}catch{return [n.id,{editable:false,reason:'원본 번호 속성을 확인하지 못했습니다.'}];}}))};
+  const paragraphListSources=Object.fromEntries(nodes.map(n=>{try{const raw=parsed(d.getAgentParagraphList(n.section,n.paragraph)),editable=n.editable&&raw.editable===true;return [n.id,{editable,...(!editable?{reason:n.reason??(typeof raw.reason==='string'?raw.reason.slice(0,500):'현재 번호 원본은 읽기 전용입니다.')}:{})}];}catch{return [n.id,{editable:false,reason:'원본 번호 속성을 확인하지 못했습니다.'}];}}));
+  const basicBulletSources=typeof d.setAgentBasicBullet==='function'?Object.fromEntries(Object.entries(paragraphListSources).map(([id,cap])=>[id,definitions.bullets.length>=200?{editable:false,reason:'글머리표 정의 한도 200개를 확인하세요.'}:cap])):undefined;
+  return {listCatalog:{numberings,bullets:textBullets} as AgentListCatalog,paragraphListSources,...(basicBulletSources?{basicBulletSources}:{})};
  }catch{return {};}
 }
 const list=(p:any)=>({headType:p.headType,numberingId:p.numberingId,paraLevel:p.paraLevel});

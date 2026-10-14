@@ -1,0 +1,17 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {validateEditOperations} from '../src/modules/document/public/index.ts';
+import {validateAgentBasicBullet,basicBulletCharacters} from '../src/modules/document/public/engine-integration.ts';
+import {generationSchema} from '../src/modules/document/public/wire-schema.mjs';
+import {captureTemplate} from '../src/modules/automation/public/index.ts';
+const op={kind:'set_basic_bullet' as const,target:'s0p0',character:'●'};
+const base=():any=>({revision:'r',name:'new.hwpx',limitations:[],nodes:[{id:'s0p0',section:0,paragraph:0,text:'본문 😀',editable:true}],basicBulletSources:{s0p0:{editable:true}},listCatalog:{numberings:[],bullets:[]},structure:{sections:[],paragraphs:[{id:'s0p0',characters:{},paragraph:{headType:'None',numberingId:0,paraLevel:0}}],tables:[],unsupportedControls:[]}});
+test('basic bullet wire has a bounded glyph enum and no native IDs/tokens',()=>{const all=generationSchema().properties.operations.items.anyOf;assert.equal(all.length,37);const shape=all.find(s=>s.properties.kind.enum[0]===op.kind)!;assert.deepEqual(shape.required,['kind','target','character']);assert.deepEqual(shape.properties.character.enum,basicBulletCharacters);});
+test('all eight static characters validate without mutating a document snapshot',()=>{for(const character of basicBulletCharacters){const s=base(),before=structuredClone(s);assert.equal(validateAgentBasicBullet({...op,character},s),character);assert.deepEqual(s,before);}});
+test('arbitrary, interactive and multiple glyphs cannot be substituted',()=>{for(const character of ['☑','☐','1.','●●','','a','\n',null,1])assert.throws(()=>validateEditOperations([{...op,character}],base()));});
+test('unknown force/path/resource/font fields reject before execution',()=>{for(const key of ['token','force','path','definitionId','color','fontFamily'])assert.throws(()=>validateEditOperations([{...op,[key]:1}],base()),/속성/);});
+test('missing capability is not inferred from an editable body node',()=>{const s=base();delete s.basicBulletSources;assert.throws(()=>validateEditOperations([op],s));});
+test('readonly source or actual body refusal cannot be overridden',()=>{for(const mode of ['source','node','target']){const s=base();if(mode==='source')s.basicBulletSources.s0p0={editable:false,reason:'글머리표 정의 한도'};if(mode==='node')s.nodes[0].editable=false;assert.throws(()=>validateEditOperations([{...op,...(mode==='target'?{target:'s9p9'}:{})}],s));}});
+test('current displayed same glyph is a no-op preserving custom stored marker settings',()=>{const s=base();s.structure.paragraphs[0].paragraph={headType:'Bullet',numberingId:7,paraLevel:0};s.listCatalog.bullets=[{id:7,char:'●',rawCode:9679}];assert.throws(()=>validateEditOperations([op],s),/변경/);});
+test('different glyph may replace a simple marker without modifying its old resource',()=>{const s=base();s.structure.paragraphs[0].paragraph={headType:'Bullet',numberingId:7,paraLevel:0};s.listCatalog.bullets=[{id:7,char:'○',rawCode:9675}];const before=structuredClone(s);assert.deepEqual(validateEditOperations([op],s),[op]);assert.deepEqual(s,before);});
+test('creation is isolated even from another new bullet command',()=>{for(const other of [op,{kind:'format_paragraph',target:'s0p0',properties:{alignment:'center'}}])assert.throws(()=>validateEditOperations([op,other],base()),/단독/);});
+test('definition creation does not become a reusable script or repeat operation',()=>{assert.throws(()=>captureTemplate('새 글머리표',[op],base()));});

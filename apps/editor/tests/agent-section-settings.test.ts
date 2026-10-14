@@ -8,7 +8,7 @@ const base=():Snapshot=>({revision:'r1',name:'review.hwpx',limitations:[],nodes:
 const numbering=()=>({kind:'set_line_numbers' as const,section:0,enabled:true,restart:'page' as const,countBy:1,startNumber:1,distanceMm:5});
 test('section tool wire uses explicit physical units and restart names across 24 supported commands',()=>{
  const options=generationSchema().properties.operations.items.anyOf;
- assert.equal(options.length,36);
+ assert.equal(options.length,37);
  const line=options.find(v=>v.properties.kind.enum[0]==='set_line_numbers')!;
  assert.deepEqual(line.properties.restart.enum,['page','section','continuous']);assert.ok(line.required.includes('distanceMm'));assert.ok(!('distance' in line.properties));
  const before=base(),operations=[{kind:'set_section_tabs',section:0,spacingPt:24},numbering()];assert.deepEqual(validateEditOperations(operations,before),operations);

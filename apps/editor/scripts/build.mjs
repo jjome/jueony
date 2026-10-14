@@ -1,3 +1,4 @@
+import {patchExportMetadataLoss} from './integration/export-metadata-loss-patches.mjs';
 import {applyStudioPatches} from './integration/studio-patches.mjs';
 import {applyManualFeaturePatches} from './integration/manual-feature-patches.mjs';
 import {applyRecoveryPatches} from './integration/recovery-patches.mjs';
@@ -80,6 +81,7 @@ for (const [name, file] of [['canvaskit-wasm', 'LICENSE'], ['@noble/hashes', 'LI
 }
 
 await applyStudioPatches({root,upstream,app});
+await writeFile(join(root,'src/core/export-content-loss.ts'),patchExportMetadataLoss(await readFile(join(root,'src/core/export-content-loss.ts'),'utf8')));
 await applyManualFeaturePatches({root});
 await applyPageBorderPatches({root});
 await applyRecoveryPatches({root});
@@ -138,6 +140,7 @@ const evidence = {
   documentTabCyclePatchSha256: sha256(await readFile(join(app,'scripts/integration/document-tab-cycle-patches.mjs'))),
   keyboardContextPatchSha256: sha256(await readFile(join(app,'scripts/integration/keyboard-context-patches.mjs'))),
   documentSwapStatePatchSha256: sha256(await readFile(join(app,'scripts/integration/document-swap-state-patches.mjs'))),
+  exportMetadataLossPatchSha256: sha256(await readFile(join(app,'scripts/integration/export-metadata-loss-patches.mjs'))),
   customSourceSha256: sha256(customSource.join('\n')),
   applicationSourceCommit: execFileSync('git', ['-C', app, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
   applicationSourceDirty: Boolean(execFileSync('git', ['-C', app, 'status', '--porcelain', '--', '.'], { encoding: 'utf8' }).trim()),

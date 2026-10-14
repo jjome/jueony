@@ -1,0 +1,210 @@
+--- /dev/null
++++ b/src/document_core/commands/agent_basic_bullet.rs
+@@ -0,0 +1,27 @@
++//! A fixed default character bullet, applied through a private source token.
++use crate::document_core::DocumentCore;
++use crate::error::HwpError;
++use crate::model::style::Bullet;
++fn fail(s:&str)->HwpError{HwpError::RenderError(s.into())}
++impl DocumentCore{
++    pub fn set_agent_basic_bullet_native(&mut self,s:usize,p:usize,json:&str)->Result<String,HwpError>{
++        let v:serde_json::Value=serde_json::from_str(json).map_err(|_|fail("Invalid basic bullet command"))?;
++        if !v.as_object().is_some_and(|o|o.len()==2&&o.keys().all(|k|["token","character"].contains(&k.as_str()))){return Err(fail("Invalid basic bullet fields"));}
++        let source:serde_json::Value=serde_json::from_str(&self.get_agent_paragraph_list_native(s,p)).map_err(|_|fail("Invalid paragraph list source"))?;
++        if source["editable"]!=true||v["token"].as_str()!=source["token"].as_str(){return Err(fail("본문 원문·서식·번호 정의가 바뀌었거나 읽기 전용입니다."));}
++        let character=v["character"].as_str().filter(|c|["●","○","■","□","◆","◇","▶","▷"].contains(c)).ok_or_else(||fail("지원하는 기본 문자 글머리표를 선택하세요."))?.chars().next().unwrap();
++        let info=&self.document.doc_info;if info.bullets.len()>=200||info.char_shapes.is_empty(){return Err(fail("글머리표 정의 한도 또는 글자 모양 원본을 확인하세요."));}
++        let ps=&info.para_shapes[self.document.sections[s].paragraphs[p].para_shape_id as usize];
++        if ps.head_type==crate::model::style::HeadType::Bullet&&info.bullets.get(ps.numbering_id as usize-1).is_some_and(|b|b.bullet_char==character){return Err(fail("글머리표의 변경 내용이 없습니다."));}
++        let before=self.document.clone();let events=self.event_log.len();let id=before.doc_info.bullets.len()+1;
++        let bullet=Bullet{bullet_char:character,attr:1<<3,text_distance:50,..Default::default()};
++        let result=(||{self.document.doc_info.bullets.push(bullet.clone());self.document.doc_info.raw_stream_dirty=true;
++            self.apply_para_format_native(s,p,&serde_json::json!({"headType":"Bullet","numberingId":id,"paraLevel":0}).to_string())?;
++            let mut expected=serde_json::to_value(&before.doc_info.bullets).map_err(|_|fail("Invalid source bullets"))?;expected.as_array_mut().unwrap().push(serde_json::to_value(&bullet).unwrap());
++            if serde_json::to_value(&self.document.doc_info.bullets).unwrap()!=expected||serde_json::to_value(&self.document.doc_info.numberings).unwrap()!=serde_json::to_value(&before.doc_info.numberings).unwrap(){return Err(fail("공유 번호 정의가 계획과 다릅니다."));}
++            let now=&self.document.doc_info.para_shapes[self.document.sections[s].paragraphs[p].para_shape_id as usize];
++            if now.head_type!=crate::model::style::HeadType::Bullet||now.numbering_id as usize!=id||now.para_level!=0{return Err(fail("기본 글머리표 적용 결과가 다릅니다."));}
++            Ok(serde_json::json!({"editable":true,"definitionId":id,"created":true}).to_string())})();
++        if result.is_err(){self.document=before;self.event_log.truncate(events);self.rebuild_derived_state();}result
++    }
++}
+--- a/src/document_core/commands/mod.rs
++++ b/src/document_core/commands/mod.rs
+@@ -18,6 +18,7 @@
+ mod agent_header_footer;
+ mod agent_paragraph_tabs;
+ mod agent_paragraph_lists;
++mod agent_basic_bullet;
+ mod agent_paragraph_decoration;
+ mod agent_page_background;
+ mod page_body_delete;
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1204,6 +1204,9 @@
+     pub fn get_agent_page_background(&self,section:usize,kind:&str)->Result<String,JsValue>{self.core.get_agent_page_background_native(section,kind).map_err(|e|e.into())}
+     #[wasm_bindgen(js_name = setAgentPageBackground)]
+     pub fn set_agent_page_background(&mut self,section:usize,kind:&str,json:&str)->Result<String,JsValue>{self.core.set_agent_page_background_native(section,kind,json).map_err(|e|e.into())}
++
++    #[wasm_bindgen(js_name = setAgentBasicBullet)]
++    pub fn set_agent_basic_bullet(&mut self,s:usize,p:usize,json:&str)->Result<String,JsValue>{self.core.set_agent_basic_bullet_native(s,p,json).map_err(|e|e.into())}
+ 
+     #[wasm_bindgen(js_name = getStoredStyleDetail)]
+     pub fn get_stored_style_detail(&self,id:usize)->String{match self.core.document.doc_info.styles.get(id){Some(s)=>format!("{{\"charProps\":{},\"paraProps\":{}}}",self.core.build_char_properties_json_by_id(s.char_shape_id),self.core.build_para_properties_json(s.para_shape_id,0)),None=>"{}".into()}}
+@@ -7811,6 +7814,7 @@
+             ..Default::default()
+         }; // a,b,c
+         self.core.document.doc_info.numberings.push(n);
++        self.core.document.doc_info.raw_stream_dirty = true;
+         1
+     }
+ 
+@@ -7873,6 +7877,7 @@
+         n.start_number = json_i32(json, "startNumber").unwrap_or(1) as u16;
+         n.level_start_numbers = [n.start_number as u32; 7];
+         self.core.document.doc_info.numberings.push(n);
++        self.core.document.doc_info.raw_stream_dirty = true;
+         self.core.document.doc_info.numberings.len() as u16
+     }
+ 
+@@ -7899,6 +7904,7 @@
+             ..Default::default()
+         };
+         self.core.document.doc_info.bullets.push(b);
++        self.core.document.doc_info.raw_stream_dirty = true;
+         self.core.document.doc_info.bullets.len() as u16
+     }
+ 
+--- /dev/null
++++ b/src/serializer/paragraph_metadata_loss.rs
+@@ -0,0 +1,57 @@
++//! Unsupported paragraph restart overrides must never produce a zero-loss report.
++use crate::model::{document::Document,paragraph::Paragraph,control::Control,shape::ShapeObject};
++use super::content_loss::{ContentLoss,ContentLossCode,ContentLossReason,ContentLossSubject,ContentLossReport};
++enum Node<'a>{Paragraph(&'a Paragraph,String),Shape(&'a ShapeObject,String)}
++fn paragraphs<'a>(stack:&mut Vec<Node<'a>>,items:&'a [Paragraph],path:&str){for(i,p)in items.iter().enumerate().rev(){stack.push(Node::Paragraph(p,format!("{path}/paragraph/{i}")));}}
++fn caption<'a>(stack:&mut Vec<Node<'a>>,value:Option<&'a crate::model::shape::Caption>,path:&str){if let Some(c)=value{paragraphs(stack,&c.paragraphs,&format!("{path}/caption"));}}
++fn drawing<'a>(stack:&mut Vec<Node<'a>>,value:&'a crate::model::shape::DrawingObjAttr,path:&str){caption(stack,value.caption.as_ref(),path);if let Some(t)=&value.text_box{paragraphs(stack,&t.paragraphs,&format!("{path}/textbox"));}}
++pub(super) fn record(doc:&Document,report:&mut ContentLossReport){
++    let mut stack=Vec::new();
++    for(i,s)in doc.sections.iter().enumerate().rev(){paragraphs(&mut stack,&s.paragraphs,&format!("section/{i}/body"));for(j,m)in s.section_def.master_pages.iter().enumerate().rev(){paragraphs(&mut stack,&m.paragraphs,&format!("section/{i}/master/{j}"));}}
++    while let Some(node)=stack.pop(){match node{
++        Node::Paragraph(p,path)=>{
++            if p.numbering_restart.is_some(){report.record(ContentLoss{code:ContentLossCode::MetadataReduced,subject:ContentLossSubject::ParagraphProperties,path:format!("{path}/numberingRestart"),reason:ContentLossReason::SerializerNotImplemented,resource_id:None});}
++            for(i,c)in p.controls.iter().enumerate().rev(){let key=format!("{path}/control/{i}");match c{
++                Control::Table(t)=>{caption(&mut stack,t.caption.as_ref(),&key);for(j,c)in t.cells.iter().enumerate().rev(){paragraphs(&mut stack,&c.paragraphs,&format!("{key}/cell/{j}"));}},
++                Control::Shape(s)=>stack.push(Node::Shape(s,key)),
++                Control::Picture(p)=>caption(&mut stack,p.caption.as_ref(),&key),
++                Control::Header(h)=>paragraphs(&mut stack,&h.paragraphs,&format!("{key}/header")),
++                Control::Footer(h)=>paragraphs(&mut stack,&h.paragraphs,&format!("{key}/footer")),
++                Control::Footnote(n)=>paragraphs(&mut stack,&n.paragraphs,&format!("{key}/footnote")),
++                Control::Endnote(n)=>paragraphs(&mut stack,&n.paragraphs,&format!("{key}/endnote")),
++                Control::HiddenComment(c)=>paragraphs(&mut stack,&c.paragraphs,&format!("{key}/comment")),
++                Control::Field(f)=>paragraphs(&mut stack,&f.memo_paragraphs,&format!("{key}/memo")),
++                Control::SectionDef(d)=>for(j,m)in d.master_pages.iter().enumerate().rev(){paragraphs(&mut stack,&m.paragraphs,&format!("{key}/master/{j}"));},_=>{}
++            }}
++        },
++        Node::Shape(s,path)=>match s{
++            ShapeObject::Group(g)=>{caption(&mut stack,g.caption.as_ref(),&path);for(i,s)in g.children.iter().enumerate().rev(){stack.push(Node::Shape(s,format!("{path}/shape/{i}")));}},
++            ShapeObject::Picture(p)=>caption(&mut stack,p.caption.as_ref(),&path),
++            ShapeObject::Chart(c)=>{caption(&mut stack,c.caption.as_ref(),&path);drawing(&mut stack,&c.drawing,&path);},
++            ShapeObject::Ole(o)=>{caption(&mut stack,o.caption.as_ref(),&path);drawing(&mut stack,&o.drawing,&path);},
++            _=>if let Some(d)=s.drawing(){drawing(&mut stack,d,&path);}
++        }
++    }}
++}
++
++#[cfg(test)]
++mod tests{
++    use super::*;
++    use crate::model::{document::Section,paragraph::NumberingRestart,header_footer::{Header,MasterPage},table::{Table,Cell}};
++    use crate::serializer::content_loss::SerializedFormat;
++    fn marked(n:u32)->Paragraph{Paragraph{numbering_restart:Some(NumberingRestart::NewStart(n)),..Default::default()}}
++    #[test]fn restart_loss_locations_cover_body_nested_cell_header_and_master(){
++        let mut root=marked(3);let cell=Cell{paragraphs:vec![marked(4)],..Default::default()};
++        root.controls.push(Control::Table(Box::new(Table{cells:vec![cell],..Default::default()})));
++        root.controls.push(Control::Header(Box::new(Header{paragraphs:vec![Paragraph{numbering_restart:Some(NumberingRestart::ContinuePrevious),..Default::default()}],..Default::default()})));
++        let mut section=Section{paragraphs:vec![root],..Default::default()};section.section_def.master_pages.push(MasterPage{paragraphs:vec![marked(9)],..Default::default()});
++        let mut doc=Document::default();doc.sections.push(section);
++        for format in [SerializedFormat::Hwp,SerializedFormat::Hwpx]{let mut report=ContentLossReport::new(format);record(&doc,&mut report);let mut paths=report.losses().iter().map(|l|l.path.as_str()).collect::<Vec<_>>();paths.sort();
++            assert_eq!(paths,vec!["section/0/body/paragraph/0/control/0/cell/0/paragraph/0/numberingRestart","section/0/body/paragraph/0/control/1/header/paragraph/0/numberingRestart","section/0/body/paragraph/0/numberingRestart","section/0/master/0/paragraph/0/numberingRestart"]);
++            assert!(report.losses().iter().all(|l|l.code==ContentLossCode::MetadataReduced&&l.subject==ContentLossSubject::ParagraphProperties&&l.reason==ContentLossReason::SerializerNotImplemented&&l.resource_id.is_none()));
++        }
++        assert_eq!(doc.sections[0].paragraphs[0].numbering_restart,Some(NumberingRestart::NewStart(3)));
++    }
++    #[test]fn ordinary_paragraphs_have_no_false_loss(){let mut doc=Document::default();doc.sections.push(Section{paragraphs:vec![Paragraph::default()],..Default::default()});let mut report=ContentLossReport::new(SerializedFormat::Hwp);record(&doc,&mut report);assert!(report.is_empty());}
++    #[test]fn nested_tree_walk_does_not_use_the_rust_call_stack(){let mut p=marked(1);for _ in 0..100{p=Paragraph{controls:vec![Control::Table(Box::new(Table{cells:vec![Cell{paragraphs:vec![p],..Default::default()}],..Default::default()}))],..Default::default()};}let mut doc=Document::default();doc.sections.push(Section{paragraphs:vec![p],..Default::default()});let mut report=ContentLossReport::new(SerializedFormat::Hwpx);record(&doc,&mut report);assert_eq!(report.len(),1);}
++}
+--- a/src/serializer/mod.rs
++++ b/src/serializer/mod.rs
+@@ -11,6 +11,7 @@
+ pub mod control;
+ pub mod doc_info;
+ mod form_identity;
++mod paragraph_metadata_loss;
+ pub mod header;
+ pub mod hml;
+ pub mod hwpx;
+--- a/src/serializer/content_loss.rs
++++ b/src/serializer/content_loss.rs
+@@ -46,6 +46,7 @@
+     BinaryData,
+     Control,
+     FieldParameters,
++    ParagraphProperties,
+ }
+ 
+ /// 손실이 필요해진 원인.
+@@ -60,6 +61,7 @@
+     RawPassthroughUnavailable,
+     /// 대상 형식에 대응 표현이 없다. 후속 컨트롤/메타데이터 생산자용이다.
+     UnsupportedByOutputFormat,
++    SerializerNotImplemented,
+ }
+ 
+ impl fmt::Display for ContentLossReason {
+@@ -75,6 +77,7 @@
+                 f.write_str("안전하게 통과시킬 원본 저장 바이트가 없음")
+             }
+             Self::UnsupportedByOutputFormat => f.write_str("출력 형식에 대응 표현이 없음"),
++            Self::SerializerNotImplemented => f.write_str("현재 직렬화기의 저장 경로가 구현되지 않음"),
+         }
+     }
+ }
+--- a/src/serializer/cfb_writer.rs
++++ b/src/serializer/cfb_writer.rs
+@@ -217,6 +217,7 @@
+ 
+     // 6. CFB 컨테이너 조립
+     let mut content_loss = ContentLossReport::new(SerializedFormat::Hwp);
++    super::paragraph_metadata_loss::record(doc,&mut content_loss);
+     let mut extra_streams = doc.extra_streams.clone();
+     extra_streams.retain(|(path, _)| path != crate::model::hyperlink_format::HWP_STREAM);
+     if let Some(bytes) = crate::model::hyperlink_format::encode(doc) {
+--- a/src/serializer/hwpx/mod.rs
++++ b/src/serializer/hwpx/mod.rs
+@@ -57,6 +57,7 @@
+ 
+     // 1-pass: ID 풀 구성
+     let mut ctx = SerializeContext::collect_from_document(doc);
++    super::paragraph_metadata_loss::record(doc,&mut ctx.content_loss);
+ 
+     let mut z = HwpxZipWriter::new();
+ 
+--- a/src/serializer/doc_info/tests.rs
++++ b/src/serializer/doc_info/tests.rs
+@@ -290,6 +290,7 @@
+         break_latin_word: None,
+         hwpx_plain_para_margin: false,
+         hwpx_plain_para_margin_physical: false,
++        suppress_line_numbers: false,
+     };
+ 
+     let data = serialize_para_shape(&ps);
+@@ -680,6 +681,7 @@
+         break_latin_word: None,
+         hwpx_plain_para_margin: false,
+         hwpx_plain_para_margin_physical: false,
++        suppress_line_numbers: false,
+     });
+     doc_info.styles.push(Style {
+         raw_data: None,

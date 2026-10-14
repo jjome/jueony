@@ -1,0 +1,30 @@
+{
+  "baselineDate": "2026-10-15",
+  "rows": 417,
+  "taskRows": 196,
+  "kinds": {
+    "ROLLUP": 188,
+    "STATE_ROLLUP": 33,
+    "TASK": 196
+  },
+  "implementation": {
+    "DONE": 141,
+    "PARTIAL": 28,
+    "MISSING": 22,
+    "AUDIT": 5
+  },
+  "verification": {
+    "DONE": 35,
+    "PARTIAL": 117,
+    "NOT_RUN": 44
+  },
+  "agent": {
+    "NA": 84,
+    "CONNECTED": 81,
+    "PARTIAL": 6,
+    "NOT_CONNECTED": 25
+  },
+  "completedTaskRows": 35,
+  "productCompletionPercent": null,
+  "note": "상위 항목·세부 작업은 중복 집계하지 않는다. 한글 전체 기능/동등성의 진행률이 아니다."
+}

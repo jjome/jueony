@@ -1,0 +1,280 @@
+{
+  "baselineDate": "2026-10-15",
+  "implementationCommit": "ab0ca4cc43353c2c34cd2d58b71506e6f3dd854e",
+  "sourceFiles": [
+    {
+      "path": "docs/hangul-2024-gap-checklist.csv",
+      "sha256": "b7191504f542b1d21edadb333fa4467be7088c1872371ed73721099ca1a8e283"
+    },
+    {
+      "path": "docs/editor-state-contract.csv",
+      "sha256": "941f59070d8b6da9232be00a970087e5e8c6b0f49582eea034f2f8b235d096c0"
+    },
+    {
+      "path": "docs/refactor-work-plan.csv",
+      "sha256": "5cf1724020c0cc9c10be3d5c84ea8f087f3170e868e773698f04bc732a890b8c"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/wire-schema.mjs",
+      "sha256": "69f6f77223924543af9df6aab91d27dfd172358b29137d0c3d5012501c76bf14"
+    },
+    {
+      "path": "docs/96-agent-table-merge.md",
+      "sha256": "8eda0337c4a27504adcdd9567d455edbfec44f5f5cd5ffbc20cd31d5a54e737d"
+    },
+    {
+      "path": "docs/evidence/table-merge-2026-10-15/verification-summary.json",
+      "sha256": "507bfee97b8854f36cfb381d41f96d22e0af694187b7b9e8168c46354454f4c4"
+    }
+  ],
+  "agentCommandKinds": [
+    "create_document",
+    "insert_body_paragraphs",
+    "replace_body_text",
+    "delete_body_text",
+    "merge_table_cells",
+    "set_table_header",
+    "set_table_pagination",
+    "set_next_paragraph_style",
+    "rename_paragraph_style",
+    "create_paragraph_style",
+    "set_paragraph_outline",
+    "set_basic_numbering",
+    "clone_paragraph_numbering",
+    "set_basic_bullet",
+    "set_paragraph_list",
+    "format_paragraph_decoration",
+    "set_paragraph_tabs",
+    "add_bookmark",
+    "rename_bookmark",
+    "delete_bookmark",
+    "create_header_footer",
+    "delete_header_footer",
+    "format_header_footer_paragraph",
+    "format_header_footer",
+    "set_header_footer_text",
+    "merge_sections",
+    "remove_empty_section",
+    "split_section",
+    "format_characters",
+    "format_paragraph",
+    "create_table",
+    "set_table_cell",
+    "format_table_cells",
+    "set_page_setup",
+    "insert_table_row",
+    "insert_table_column",
+    "delete_table_row",
+    "delete_table_column",
+    "apply_paragraph_style",
+    "set_columns",
+    "set_page_hide",
+    "set_section_tabs",
+    "set_line_numbers",
+    "set_page_background",
+    "set_master_page_text",
+    "delete_master_page"
+  ],
+  "checklistRows": 417,
+  "mcpIncluded": false,
+  "editorImplementationChanged": false,
+  "newEditorFeatureTestsRun": false,
+  "latestRecordedValidation": {
+    "status": "PASS_SCOPED_WITH_REMAINING_EDITOR_LIMITS",
+    "checkedAt": "2026-10-14T16:13:49.159Z",
+    "unitPassed": 725,
+    "providerPassed": 52,
+    "wasmPassed": 201,
+    "browserPassed": 187,
+    "moduleCount": 9,
+    "moduleFiles": 288,
+    "reports": [
+      {
+        "category": "merge-native",
+        "kind": "native",
+        "passed": 9
+      },
+      {
+        "category": "native",
+        "kind": "native",
+        "passed": 14
+      },
+      {
+        "category": "table-multi-header-native",
+        "kind": "native",
+        "passed": 16
+      },
+      {
+        "category": "agent-table-header-native",
+        "kind": "native",
+        "passed": 15
+      },
+      {
+        "category": "agent-table-pagination-native",
+        "kind": "native",
+        "passed": 15
+      },
+      {
+        "category": "table-protection-native",
+        "kind": "native",
+        "passed": 14
+      },
+      {
+        "category": "table-conversion-native",
+        "kind": "native",
+        "passed": 17
+      },
+      {
+        "category": "styles-native",
+        "kind": "native",
+        "passed": 6
+      },
+      {
+        "category": "style-stories-native",
+        "kind": "native",
+        "passed": 4
+      },
+      {
+        "category": "agent-style-next-native",
+        "kind": "native",
+        "passed": 14
+      },
+      {
+        "category": "agent-native",
+        "kind": "native",
+        "passed": 13
+      },
+      {
+        "category": "memo-native",
+        "kind": "native",
+        "passed": 5
+      },
+      {
+        "category": "following-native",
+        "kind": "native",
+        "passed": 6
+      },
+      {
+        "category": "outer-native",
+        "kind": "native",
+        "passed": 4
+      },
+      {
+        "category": "width-native",
+        "kind": "native",
+        "passed": 12
+      },
+      {
+        "category": "equal-native",
+        "kind": "native",
+        "passed": 12
+      },
+      {
+        "category": "owner-native",
+        "kind": "native",
+        "passed": 6
+      },
+      {
+        "category": "host-native",
+        "kind": "native",
+        "passed": 10
+      },
+      {
+        "category": "default-native",
+        "kind": "native",
+        "passed": 9
+      },
+      {
+        "category": "merge-browser",
+        "kind": "browser",
+        "passed": 12
+      },
+      {
+        "category": "browser",
+        "kind": "browser",
+        "passed": 14
+      },
+      {
+        "category": "table-multi-header-browser",
+        "kind": "browser",
+        "passed": 20
+      },
+      {
+        "category": "agent-table-header-browser",
+        "kind": "browser",
+        "passed": 18
+      },
+      {
+        "category": "agent-table-pagination-browser",
+        "kind": "browser",
+        "passed": 13
+      },
+      {
+        "category": "table-protection-browser",
+        "kind": "browser",
+        "passed": 14
+      },
+      {
+        "category": "table-conversion-browser",
+        "kind": "browser",
+        "passed": 18
+      },
+      {
+        "category": "selected-object-browser",
+        "kind": "browser",
+        "passed": 16
+      },
+      {
+        "category": "agent-style-next-browser",
+        "kind": "browser",
+        "passed": 14
+      },
+      {
+        "category": "agent-browser",
+        "kind": "browser",
+        "passed": 15
+      },
+      {
+        "category": "width-browser",
+        "kind": "browser",
+        "passed": 18
+      },
+      {
+        "category": "equal-browser",
+        "kind": "browser",
+        "passed": 15
+      }
+    ],
+    "engineSourceId": "424262393ae01deb",
+    "wasmSha256": "d63becfd91d3094f6df4a88ed0aaf50996b3a4d82cb69bd5ae5742a99f266169",
+    "customSourceSha256": "595e13ff9e4e1fc52334342eb60a6f8a5ce38ebdfde071773f64e2fbaec9d2d5",
+    "applicationSourceCommit": "b6e072245087a93ebd708f3d3fa8aa98bcbd368d",
+    "applicationSourceDirty": true,
+    "fixed": [
+      "A 46th neutral command merges a queried rectangle of a plain single-page HWPX table through the existing native engine.",
+      "Exact planned cell/list topology, paragraph/run semantics, every body/cell text, resources and neighboring table properties are verified.",
+      "Apply/undo/redo, primary-cell cursor, strict post-render failure rollback, unsaved restore and actual UI save/reopen are checked."
+    ],
+    "unresolved": [
+      "HWP overlap-enabled following-table roundtrip and four public cross-format preservation blocks remain gated; prior evidence in save-table-controls-2026-10-14.",
+      "Split/merged-source/nested/fragmented table Agent control and remaining documented editor scope."
+    ],
+    "limits": [
+      "Same-engine/Canvas tests; independent Hancom 2024, paid model credentials and Native Rust unit suite NOT_RUN.",
+      "Related current table/style/object regressions, not all historical editor tests. Four provider protocols are synthetic.",
+      "Single-page plain HWPX rectangle merge only. Different selected cell attributes and existing complex/merged sources refuse. Remainder of editor scope incomplete.",
+      "Automation remains active because full documented scope is incomplete."
+    ]
+  },
+  "publicReferences": [
+    "https://help.hancom.com/hoffice130/ko-KR/Hwp/menu/file.htm",
+    "https://help.hancom.com/hoffice130/ko-KR/Hwp/menu/table.htm",
+    "https://help.hancom.com/hoffice130/ko-KR/Hwp/menu/view.htm"
+  ],
+  "limitations": [
+    "Statuses reconciled conservatively from existing scoped code/contracts and historical evidence; not a new full native Hancom audit.",
+    "B/WIRED was not promoted to full implementation DONE. Menu and dialog coverage remains expandable.",
+    "The 196 task rows overlap parent scopes and may include distinct manual, Agent, preservation and live-provider checks; no product percent.",
+    "MCP is excluded by user correction; this tracks internal Agent connection only."
+  ]
+}

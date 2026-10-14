@@ -8,6 +8,10 @@
 
 제3자 오픈소스·글꼴 등에는 각각의 원래 라이선스가 우선한다. [제3자 고지](THIRD_PARTY_NOTICES.md)와 [적용 기록](docs/09-licensing.md)을 참고한다. 기관용 개발이라는 제품 목표가 기관의 무료 사용을 허가하는 것은 아니다. 기관 사용은 별도 계약 대상으로 둔다.
 
+## 전체 작업 관리
+
+앞으로는 [전체 작업 체크리스트](docs/jueony-work-checklist.md)의 **구현·검증·Agent 연결**을 각각 갱신한다. [검색 화면](docs/jueony-work-checklist.html)에서 남은 항목을 필터링하고 [CSV](docs/jueony-work-checklist.csv)를 원본으로 관리한다. 417개 항목은 한글 상위 기능 188개·상태 범위 33개·세부 실행 작업 196개이며, 중복 범위와 부분 검증을 전체 완성률로 계산하지 않는다. [완료 규칙과 다음 순서](docs/97-master-work-checklist.md)를 따른다. MCP 등록은 이번 완료 기준에서 제외한다.
+
 ## 바로 실행
 
 최신 검수본은 **[Start-Review.cmd](build/jueony-table-merge-20261015/Start-Review.cmd)**로 실행한다(4318). HWPX 한 쪽 본문 평면 표의 AI 사각형 셀 병합을 추가했다. 내용·문단/글자 서식·다른 표 보존, 요청 원복과 저장 재열기를 검사한다. [지원 범위·검증·제한](docs/96-agent-table-merge.md)을 따른다. [행 높이](docs/95-agent-row-heights.md)와 기존 저장 수정도 포함한다. 병합 원본의 Agent 분할·복합 표·일부 HWP/형식 변환·최종 한글 비교는 남아 있다.

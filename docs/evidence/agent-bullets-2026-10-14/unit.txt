@@ -1,0 +1,3560 @@
+TAP version 13
+# Subtest: basic bullet wire has a bounded glyph enum and no native IDs/tokens
+ok 1 - basic bullet wire has a bounded glyph enum and no native IDs/tokens
+  ---
+  duration_ms: 2.0762
+  type: 'test'
+  ...
+# Subtest: all eight static characters validate without mutating a document snapshot
+ok 2 - all eight static characters validate without mutating a document snapshot
+  ---
+  duration_ms: 0.7951
+  type: 'test'
+  ...
+# Subtest: arbitrary, interactive and multiple glyphs cannot be substituted
+ok 3 - arbitrary, interactive and multiple glyphs cannot be substituted
+  ---
+  duration_ms: 2.0373
+  type: 'test'
+  ...
+# Subtest: unknown force/path/resource/font fields reject before execution
+ok 4 - unknown force/path/resource/font fields reject before execution
+  ---
+  duration_ms: 0.5621
+  type: 'test'
+  ...
+# Subtest: missing capability is not inferred from an editable body node
+ok 5 - missing capability is not inferred from an editable body node
+  ---
+  duration_ms: 0.1694
+  type: 'test'
+  ...
+# Subtest: readonly source or actual body refusal cannot be overridden
+ok 6 - readonly source or actual body refusal cannot be overridden
+  ---
+  duration_ms: 0.255
+  type: 'test'
+  ...
+# Subtest: current displayed same glyph is a no-op preserving custom stored marker settings
+ok 7 - current displayed same glyph is a no-op preserving custom stored marker settings
+  ---
+  duration_ms: 0.2092
+  type: 'test'
+  ...
+# Subtest: different glyph may replace a simple marker without modifying its old resource
+ok 8 - different glyph may replace a simple marker without modifying its old resource
+  ---
+  duration_ms: 0.2533
+  type: 'test'
+  ...
+# Subtest: creation is isolated even from another new bullet command
+ok 9 - creation is isolated even from another new bullet command
+  ---
+  duration_ms: 0.3872
+  type: 'test'
+  ...
+# Subtest: definition creation does not become a reusable script or repeat operation
+ok 10 - definition creation does not become a reusable script or repeat operation
+  ---
+  duration_ms: 0.5701
+  type: 'test'
+  ...
+# Subtest: three bookmark wire contracts use public names and Unicode offsets without paths/native indices
+ok 11 - three bookmark wire contracts use public names and Unicode offsets without paths/native indices
+  ---
+  duration_ms: 2.9908
+  type: 'test'
+  ...
+# Subtest: adding a detached Unicode point validates without changing source
+ok 12 - adding a detached Unicode point validates without changing source
+  ---
+  duration_ms: 0.9852
+  type: 'test'
+  ...
+# Subtest: bookmark names reject blanks, oversized names, controls and malformed Unicode
+ok 13 - bookmark names reject blanks, oversized names, controls and malformed Unicode
+  ---
+  duration_ms: 0.4152
+  type: 'test'
+  ...
+# Subtest: new bookmark offsets are bounded integers in editable current body only
+ok 14 - new bookmark offsets are bounded integers in editable current body only
+  ---
+  duration_ms: 0.3049
+  type: 'test'
+  ...
+# Subtest: duplicate names and 200 item creation cap refuse before mutation
+ok 15 - duplicate names and 200 item creation cap refuse before mutation
+  ---
+  duration_ms: 0.3306
+  type: 'test'
+  ...
+# Subtest: rename and delete use one freshly queried unique name even when body is protected
+ok 16 - rename and delete use one freshly queried unique name even when body is protected
+  ---
+  duration_ms: 0.6238
+  type: 'test'
+  ...
+# Subtest: rename refuses no-op, duplicate destination and invalid new name
+ok 17 - rename refuses no-op, duplicate destination and invalid new name
+  ---
+  duration_ms: 0.2823
+  type: 'test'
+  ...
+# Subtest: unknown/complex/readonly bookmark location is never treated as editable
+ok 18 - unknown/complex/readonly bookmark location is never treated as editable
+  ---
+  duration_ms: 0.2067
+  type: 'test'
+  ...
+# Subtest: bookmark operations remain isolated and cannot be repeat templates
+ok 19 - bookmark operations remain isolated and cannot be repeat templates
+  ---
+  duration_ms: 0.8314
+  type: 'test'
+  ...
+# Subtest: comparison includes bookmark names, locations and explicit unknown list reason
+ok 20 - comparison includes bookmark names, locations and explicit unknown list reason
+  ---
+  duration_ms: 0.8045
+  type: 'test'
+  ...
+# Subtest: bounded 최종 계획만 실제 WASM에 적용하고 기존 표/양방향 저장/요청 snapshot undo를 보존한다
+ok 21 - bounded 최종 계획만 실제 WASM에 적용하고 기존 표/양방향 저장/요청 snapshot undo를 보존한다
+  ---
+  duration_ms: 199.2299
+  type: 'test'
+  ...
+# Subtest: 동일 명령계획이면 두 번에 종료하고 최종 계획만 한번 검증/적용한다
+ok 22 - 동일 명령계획이면 두 번에 종료하고 최종 계획만 한번 검증/적용한다
+  ---
+  duration_ms: 3.1357
+  type: 'test'
+  ...
+# Subtest: 계획이 계속 바뀌어도 최대 세 번 호출하고 마지막 결과만 적용한다
+ok 23 - 계획이 계속 바뀌어도 최대 세 번 호출하고 마지막 결과만 적용한다
+  ---
+  duration_ms: 0.7986
+  type: 'test'
+  ...
+# Subtest: 검토 중 취소·문서 변경·업무 전환은 늦은 결과를 적용하지 않는다
+ok 24 - 검토 중 취소·문서 변경·업무 전환은 늦은 결과를 적용하지 않는다
+  ---
+  duration_ms: 1.1454
+  type: 'test'
+  ...
+# Subtest: 검토 응답에 잘못된 명령/출처가 있으면 첫 유효 계획도 적용하지 않는다
+ok 25 - 검토 응답에 잘못된 명령/출처가 있으면 첫 유효 계획도 적용하지 않는다
+  ---
+  duration_ms: 0.7675
+  type: 'test'
+  ...
+# Subtest: 시간 제한은 취소를 무시하는 제공자를 기다리지 않으며 문서를 변경하지 않는다
+ok 26 - 시간 제한은 취소를 무시하는 제공자를 기다리지 않으며 문서를 변경하지 않는다
+  ---
+  duration_ms: 44.0676
+  type: 'test'
+  ...
+# Subtest: 입력 예산은 호출 전에 누적 확인하고 초과 시 자동 적용/재시도하지 않는다
+ok 27 - 입력 예산은 호출 전에 누적 확인하고 초과 시 자동 적용/재시도하지 않는다
+  ---
+  duration_ms: 0.8425
+  type: 'test'
+  ...
+# Subtest: 실제 엔진 preflight 실패 또는 preflight 중 문서 변경이면 적용하지 않는다
+ok 28 - 실제 엔진 preflight 실패 또는 preflight 중 문서 변경이면 적용하지 않는다
+  ---
+  duration_ms: 0.8625
+  type: 'test'
+  ...
+# Subtest: 읽기 응답은 receipt 없이 반환하고 새 문서도 최종 단계에서 한번만 생성한다
+ok 29 - 읽기 응답은 receipt 없이 반환하고 새 문서도 최종 단계에서 한번만 생성한다
+  ---
+  duration_ms: 0.4716
+  type: 'test'
+  ...
+# Subtest: 단일 실행은 계속 한번만 호출하며 매크로 기록용 validated generation을 반환한다
+ok 30 - 단일 실행은 계속 한번만 호출하며 매크로 기록용 validated generation을 반환한다
+  ---
+  duration_ms: 0.3346
+  type: 'test'
+  ...
+# Subtest: 초기 충돌, 무효 호출 한도, 과도한 검토 요청은 문서 변경 전에 거절한다
+ok 31 - 초기 충돌, 무효 호출 한도, 과도한 검토 요청은 문서 변경 전에 거절한다
+  ---
+  duration_ms: 1.4694
+  type: 'test'
+  ...
+# Subtest: 검증용 read-only preflight도 취소를 무시해 대기하면 시간 예산으로 중단한다
+ok 32 - 검증용 read-only preflight도 취소를 무시해 대기하면 시간 예산으로 중단한다
+  ---
+  duration_ms: 23.5021
+  type: 'test'
+  ...
+# Subtest: Claude JSON 인자도 공통 대상·범위·출처·서식 검사를 통과해야 한다
+ok 33 - Claude JSON 인자도 공통 대상·범위·출처·서식 검사를 통과해야 한다
+  ---
+  duration_ms: 91.1354
+  type: 'test'
+  ...
+# Subtest: 실제 WASM에서 새 문단 초안을 만들고 두 형식으로 보존한다
+ok 34 - 실제 WASM에서 새 문단 초안을 만들고 두 형식으로 보존한다
+  ---
+  duration_ms: 87.1262
+  type: 'test'
+  ...
+# Subtest: 여러 위치 교체/삭제/삽입과 snapshot 되돌림이 앞뒤 문단을 보존한다
+ok 35 - 여러 위치 교체/삭제/삽입과 snapshot 되돌림이 앞뒤 문단을 보존한다
+  ---
+  duration_ms: 94.2124
+  type: 'test'
+  ...
+# Subtest: 이모지 앞뒤 Unicode 범위 교체와 빈 문단 삭제를 보존한다
+ok 36 - 이모지 앞뒤 Unicode 범위 교체와 빈 문단 삭제를 보존한다
+  ---
+  duration_ms: 1.3804
+  type: 'test'
+  ...
+# Subtest: 본문 전체 교체가 균일한 원래 글자·문단 서식을 보존한다
+ok 37 - 본문 전체 교체가 균일한 원래 글자·문단 서식을 보존한다
+  ---
+  duration_ms: 2.2834
+  type: 'test'
+  ...
+# Subtest: 명령 전체 사전 검사에서 알 수 없는 명령·범위·출처·중복 대상을 거부한다
+ok 38 - 명령 전체 사전 검사에서 알 수 없는 명령·범위·출처·중복 대상을 거부한다
+  ---
+  duration_ms: 0.8044
+  type: 'test'
+  ...
+# Subtest: 실제 HCX-005 회귀: 같은 위치의 연속 삽입을 응답 순서대로 보존하고 재열기·undo한다
+ok 39 - 실제 HCX-005 회귀: 같은 위치의 연속 삽입을 응답 순서대로 보존하고 재열기·undo한다
+  ---
+  duration_ms: 6.1132
+  type: 'test'
+  ...
+# Subtest: 같은 문단의 본문 변경과 그 뒤 삽입은 두 순서 모두 대상을 보존한다
+ok 40 - 같은 문단의 본문 변경과 그 뒤 삽입은 두 순서 모두 대상을 보존한다
+  ---
+  duration_ms: 2.5917
+  type: 'test'
+  ...
+# Subtest: 삽입 묶음도 미지원 속성·문단 수 초과·비연속 중복은 거절한다
+ok 41 - 삽입 묶음도 미지원 속성·문단 수 초과·비연속 중복은 거절한다
+  ---
+  duration_ms: 1.1259
+  type: 'test'
+  ...
+# Subtest: 업무·채팅 Context 격리와 중단 실행 복원
+ok 42 - 업무·채팅 Context 격리와 중단 실행 복원
+  ---
+  duration_ms: 1.2941
+  type: 'test'
+  ...
+# Subtest: empty-section wire has only the current section index; no native token or file path
+ok 43 - empty-section wire has only the current section index; no native token or file path
+  ---
+  duration_ms: 4.2506
+  type: 'test'
+  ...
+# Subtest: native unsupported reason and absent or forged supported values refuse original changes
+ok 44 - native unsupported reason and absent or forged supported values refuse original changes
+  ---
+  duration_ms: 0.549
+  type: 'test'
+  ...
+# Subtest: sole section, more than 100 sections and missing targets cannot be removed
+ok 45 - sole section, more than 100 sections and missing targets cannot be removed
+  ---
+  duration_ms: 0.487
+  type: 'test'
+  ...
+# Subtest: whitespace, hidden text, added paragraphs and a protected empty body are not equivalent to empty
+ok 46 - whitespace, hidden text, added paragraphs and a protected empty body are not equivalent to empty
+  ---
+  duration_ms: 0.9273
+  type: 'test'
+  ...
+# Subtest: removal is isolated from text changes, repeated removals and follow-up settings
+ok 47 - removal is isolated from text changes, repeated removals and follow-up settings
+  ---
+  duration_ms: 0.4805
+  type: 'test'
+  ...
+# Subtest: invalid indices and force/token/arbitrary fields cannot enter the native plan
+ok 48 - invalid indices and force/token/arbitrary fields cannot enter the native plan
+  ---
+  duration_ms: 0.3788
+  type: 'test'
+  ...
+# Subtest: document context exposes eligibility and reason while the actual private plan is stripped
+ok 49 - document context exposes eligibility and reason while the actual private plan is stripped
+  ---
+  duration_ms: 1.0036
+  type: 'test'
+  ...
+# Subtest: unsupported and malformed native queries stay explicit and never enable a guessed removal
+ok 50 - unsupported and malformed native queries stay explicit and never enable a guessed removal
+  ---
+  duration_ms: 0.3429
+  type: 'test'
+  ...
+# Subtest: removal cannot be saved as a repeat action that could later bind to a different section
+ok 51 - removal cannot be saved as a repeat action that could later bind to a different section
+  ---
+  duration_ms: 0.5202
+  type: 'test'
+  ...
+# Subtest: validation remains immutable and does not infer removal from protected neighboring body text
+ok 52 - validation remains immutable and does not infer removal from protected neighboring body text
+  ---
+  duration_ms: 0.4856
+  type: 'test'
+  ...
+# Subtest: 단일 Agent는 한 번 호출하고 검증 후 실제 적용 결과를 반환한다
+ok 53 - 단일 Agent는 한 번 호출하고 검증 후 실제 적용 결과를 반환한다
+  ---
+  duration_ms: 2.8843
+  type: 'test'
+  ...
+# Subtest: 취소/업무 전환/늦은 응답/잘못된 명령은 적용·자동 재시도하지 않는다
+ok 54 - 취소/업무 전환/늦은 응답/잘못된 명령은 적용·자동 재시도하지 않는다
+  ---
+  duration_ms: 0.7585
+  type: 'test'
+  ...
+# Subtest: 지원하지 않는 작업의 설명만 있는 응답은 문서를 변경하지 않는다
+ok 55 - 지원하지 않는 작업의 설명만 있는 응답은 문서를 변경하지 않는다
+  ---
+  duration_ms: 0.2621
+  type: 'test'
+  ...
+# Subtest: 참고 자료 중복 제거·다른 업무 차단·최신 열린 내용 우선
+ok 56 - 참고 자료 중복 제거·다른 업무 차단·최신 열린 내용 우선
+  ---
+  duration_ms: 9.6707
+  type: 'test'
+  ...
+# Subtest: 참고 폴더 미지원 형식·깊이·취소는 조용한 누락 없이 실패한다
+ok 57 - 참고 폴더 미지원 형식·깊이·취소는 조용한 누락 없이 실패한다
+  ---
+  duration_ms: 1.1229
+  type: 'test'
+  ...
+# Subtest: creation wire addresses a missing stored definition with text and no source token/path/force
+ok 58 - creation wire addresses a missing stored definition with text and no source token/path/force
+  ---
+  duration_ms: 5.3842
+  type: 'test'
+  ...
+# Subtest: creation validation is detached and requires current existence=false plus queried eligibility
+ok 59 - creation validation is detached and requires current existence=false plus queried eligibility
+  ---
+  duration_ms: 0.7484
+  type: 'test'
+  ...
+# Subtest: only current explicit section/story/parity addresses are accepted
+ok 60 - only current explicit section/story/parity addresses are accepted
+  ---
+  duration_ms: 0.2577
+  type: 'test'
+  ...
+# Subtest: empty text intentionally creates a blank stored override instead of absence
+ok 61 - empty text intentionally creates a blank stored override instead of absence
+  ---
+  duration_ms: 0.169
+  type: 'test'
+  ...
+# Subtest: Unicode codepoint length accepts emoji and caps 4000 characters
+ok 62 - Unicode codepoint length accepts emoji and caps 4000 characters
+  ---
+  duration_ms: 0.454
+  type: 'test'
+  ...
+# Subtest: newline/tab/control/separators and malformed surrogate text are refused
+ok 63 - newline/tab/control/separators and malformed surrogate text are refused
+  ---
+  duration_ms: 0.3424
+  type: 'test'
+  ...
+# Subtest: creation is isolated from another creation or format operation
+ok 64 - creation is isolated from another creation or format operation
+  ---
+  duration_ms: 0.3029
+  type: 'test'
+  ...
+# Subtest: repeat templates cannot retain a missing-definition creation target
+ok 65 - repeat templates cannot retain a missing-definition creation target
+  ---
+  duration_ms: 0.3728
+  type: 'test'
+  ...
+# Subtest: comparison advertises queried creation eligibility without inventing an existing definition
+ok 66 - comparison advertises queried creation eligibility without inventing an existing definition
+  ---
+  duration_ms: 0.7323
+  type: 'test'
+  ...
+# Subtest: unknown missing definition metadata and unreadable complex documents are not assumed creatable
+ok 67 - unknown missing definition metadata and unreadable complex documents are not assumed creatable
+  ---
+  duration_ms: 0.4247
+  type: 'test'
+  ...
+# Subtest: delete wire is explicit about one stored definition and has no path/native token/force
+ok 68 - delete wire is explicit about one stored definition and has no path/native token/force
+  ---
+  duration_ms: 3.5451
+  type: 'test'
+  ...
+# Subtest: delete validates detached current stored source without mutating it
+ok 69 - delete validates detached current stored source without mutating it
+  ---
+  duration_ms: 0.5015
+  type: 'test'
+  ...
+# Subtest: missing, unknown, readonly and unqueried eligibility are refused
+ok 70 - missing, unknown, readonly and unqueried eligibility are refused
+  ---
+  duration_ms: 0.4575
+  type: 'test'
+  ...
+# Subtest: exact original text remains required even when deleting all text/control
+ok 71 - exact original text remains required even when deleting all text/control
+  ---
+  duration_ms: 0.4495
+  type: 'test'
+  ...
+# Subtest: empty existing definition can be deleted; absence is never synthesized as success
+ok 72 - empty existing definition can be deleted; absence is never synthesized as success
+  ---
+  duration_ms: 0.3409
+  type: 'test'
+  ...
+# Subtest: current section/story/parity are bounded and explicit
+ok 73 - current section/story/parity are bounded and explicit
+  ---
+  duration_ms: 0.2499
+  type: 'test'
+  ...
+# Subtest: delete cannot be batched with another deletion or text rewrite
+ok 74 - delete cannot be batched with another deletion or text rewrite
+  ---
+  duration_ms: 0.3052
+  type: 'test'
+  ...
+# Subtest: repeat templates never store a destructive header/footer target
+ok 75 - repeat templates never store a destructive header/footer target
+  ---
+  duration_ms: 0.4297
+  type: 'test'
+  ...
+# Subtest: comparison distinguishes stored deletion eligibility and absence
+ok 76 - comparison distinguishes stored deletion eligibility and absence
+  ---
+  duration_ms: 0.6942
+  type: 'test'
+  ...
+# Subtest: complex document eligibility is mandatory even if source text is simple
+ok 77 - complex document eligibility is mandatory even if source text is simple
+  ---
+  duration_ms: 0.3868
+  type: 'test'
+  ...
+# Subtest: header/footer contract is provider-neutral and requires exact original text, with no native token or force
+ok 78 - header/footer contract is provider-neutral and requires exact original text, with no native token or force
+  ---
+  duration_ms: 3.4637
+  type: 'test'
+  ...
+# Subtest: missing, unqueried, readonly, truncated, duplicate/multiparagraph sources never become body edits
+ok 79 - missing, unqueried, readonly, truncated, duplicate/multiparagraph sources never become body edits
+  ---
+  duration_ms: 0.4292
+  type: 'test'
+  ...
+# Subtest: section, story and parity addresses must identify an existing current stored definition
+ok 80 - section, story and parity addresses must identify an existing current stored definition
+  ---
+  duration_ms: 0.3622
+  type: 'test'
+  ...
+# Subtest: original text must match exactly, including whitespace and Unicode, with no implicit no-op
+ok 81 - original text must match exactly, including whitespace and Unicode, with no implicit no-op
+  ---
+  duration_ms: 0.2524
+  type: 'test'
+  ...
+# Subtest: replacement is a single line of at most 4000 Unicode points, including empty override
+ok 82 - replacement is a single line of at most 4000 Unicode points, including empty override
+  ---
+  duration_ms: 0.5736
+  type: 'test'
+  ...
+# Subtest: current release isolates header/footer changes and refuses stale repeat recording
+ok 83 - current release isolates header/footer changes and refuses stale repeat recording
+  ---
+  duration_ms: 0.4445
+  type: 'test'
+  ...
+# Subtest: native private token is stripped from all six parity/story DTOs and first-page hiding is explicit
+ok 84 - native private token is stripped from all six parity/story DTOs and first-page hiding is explicit
+  ---
+  duration_ms: 1.1155
+  type: 'test'
+  ...
+# Subtest: missing native capabilities are unavailable; malformed responses remain unknown and readonly
+ok 85 - missing native capabilities are unavailable; malformed responses remain unknown and readonly
+  ---
+  duration_ms: 0.8431
+  type: 'test'
+  ...
+# Subtest: native adapter rechecks current original and ignores model-private token fields
+ok 86 - native adapter rechecks current original and ignores model-private token fields
+  ---
+  duration_ms: 0.6717
+  type: 'test'
+  ...
+# Subtest: lying setter cannot claim success or silently change other parity/story definitions
+ok 87 - lying setter cannot claim success or silently change other parity/story definitions
+  ---
+  duration_ms: 1.6379
+  type: 'test'
+  ...
+# Subtest: human comparison labels stored header kind, parity, text and hiding without transport JSON
+ok 88 - human comparison labels stored header kind, parity, text and hiding without transport JSON
+  ---
+  duration_ms: 0.2706
+  type: 'test'
+  ...
+# Subtest: human comparison clearly distinguishes missing from unknown and bounds long text preview
+ok 89 - human comparison clearly distinguishes missing from unknown and bounds long text preview
+  ---
+  duration_ms: 0.3777
+  type: 'test'
+  ...
+# Subtest: format wire has a bounded property object and no native token or script fields
+ok 90 - format wire has a bounded property object and no native token or script fields
+  ---
+  duration_ms: 5.6419
+  type: 'test'
+  ...
+# Subtest: format validation preserves immutable source and accepts false flags and normalized physical sizes
+ok 91 - format validation preserves immutable source and accepts false flags and normalized physical sizes
+  ---
+  duration_ms: 0.5643
+  type: 'test'
+  ...
+# Subtest: missing, unknown, readonly, truncated, mixed/complex or multiple sources are refused
+ok 92 - missing, unknown, readonly, truncated, mixed/complex or multiple sources are refused
+  ---
+  duration_ms: 0.3386
+  type: 'test'
+  ...
+# Subtest: empty definitions cannot receive an insertion-style command in this release
+ok 93 - empty definitions cannot receive an insertion-style command in this release
+  ---
+  duration_ms: 0.3901
+  type: 'test'
+  ...
+# Subtest: exact current source and valid stored section/story/parity remain required
+ok 94 - exact current source and valid stored section/story/parity remain required
+  ---
+  duration_ms: 0.6085
+  type: 'test'
+  ...
+# Subtest: only five typed properties are accepted; arbitrary font family, paragraph and native units are excluded
+ok 95 - only five typed properties are accepted; arbitrary font family, paragraph and native units are excluded
+  ---
+  duration_ms: 0.4846
+  type: 'test'
+  ...
+# Subtest: font size and color boundaries are finite and explicit
+ok 96 - font size and color boundaries are finite and explicit
+  ---
+  duration_ms: 1.5295
+  type: 'test'
+  ...
+# Subtest: format is isolated so it cannot use a stale original text or font reference in a batch
+ok 97 - format is isolated so it cannot use a stale original text or font reference in a batch
+  ---
+  duration_ms: 0.2186
+  type: 'test'
+  ...
+# Subtest: header format cannot be captured as a repeat action with stored section identifiers
+ok 98 - header format cannot be captured as a repeat action with stored section identifiers
+  ---
+  duration_ms: 0.5482
+  type: 'test'
+  ...
+# Subtest: human comparison includes actual font points/color and current flags
+ok 99 - human comparison includes actual font points/color and current flags
+  ---
+  duration_ms: 0.7982
+  type: 'test'
+  ...
+# Subtest: paragraph wire has two explicit properties and no native controls
+ok 100 - paragraph wire has two explicit properties and no native controls
+  ---
+  duration_ms: 3.6026
+  type: 'test'
+  ...
+# Subtest: paragraph validation is detached, accepts only requested alignment or spacing
+ok 101 - paragraph validation is detached, accepts only requested alignment or spacing
+  ---
+  duration_ms: 0.5534
+  type: 'test'
+  ...
+# Subtest: paragraph formatting requires queried current editable single plain source
+ok 102 - paragraph formatting requires queried current editable single plain source
+  ---
+  duration_ms: 0.4157
+  type: 'test'
+  ...
+# Subtest: missing, wrong section/story/parity or stale original is refused
+ok 103 - missing, wrong section/story/parity or stale original is refused
+  ---
+  duration_ms: 0.2249
+  type: 'test'
+  ...
+# Subtest: only five actual alignment modes and integer 50..500 percent are supported
+ok 104 - only five actual alignment modes and integer 50..500 percent are supported
+  ---
+  duration_ms: 0.9742
+  type: 'test'
+  ...
+# Subtest: native units, margins, tabs, numbering, character properties and other paragraph options remain refused
+ok 105 - native units, margins, tabs, numbering, character properties and other paragraph options remain refused
+  ---
+  duration_ms: 0.4421
+  type: 'test'
+  ...
+# Subtest: paragraph command is isolated and not recorded with stored identifiers
+ok 106 - paragraph command is isolated and not recorded with stored identifiers
+  ---
+  duration_ms: 0.5482
+  type: 'test'
+  ...
+# Subtest: empty stored plain paragraph accepts paragraph settings without creating a definition
+ok 107 - empty stored plain paragraph accepts paragraph settings without creating a definition
+  ---
+  duration_ms: 0.1395
+  type: 'test'
+  ...
+# Subtest: alignment can retain fixed spacing mode and explicit percentage can replace it
+ok 108 - alignment can retain fixed spacing mode and explicit percentage can replace it
+  ---
+  duration_ms: 0.3087
+  type: 'test'
+  ...
+# Subtest: comparison distinguishes alignment and percent from a retained fixed spacing mode
+ok 109 - comparison distinguishes alignment and percent from a retained fixed spacing mode
+  ---
+  duration_ms: 0.8102
+  type: 'test'
+  ...
+# Subtest: master wire has explicit physical units and separate bounded create/update and delete commands
+ok 110 - master wire has explicit physical units and separate bounded create/update and delete commands
+  ---
+  duration_ms: 2.1013
+  type: 'test'
+  ...
+# Subtest: master validation keeps snapshots detached while tracking valid updates, parity and deletes
+ok 111 - master validation keeps snapshots detached while tracking valid updates, parity and deletes
+  ---
+  duration_ms: 2.0155
+  type: 'test'
+  ...
+# Subtest: binary HWP sparse parity prefixes are refused and canonical ordering/deletion is supported
+ok 112 - binary HWP sparse parity prefixes are refused and canonical ordering/deletion is supported
+  ---
+  duration_ms: 1.2283
+  type: 'test'
+  ...
+# Subtest: missing or read-only master capability blocks clearing and replacement
+ok 113 - missing or read-only master capability blocks clearing and replacement
+  ---
+  duration_ms: 0.3834
+  type: 'test'
+  ...
+# Subtest: master text accepts multiline Unicode but refuses tabs, controls, huge text and excessive lines
+ok 114 - master text accepts multiline Unicode but refuses tabs, controls, huge text and excessive lines
+  ---
+  duration_ms: 1.7288
+  type: 'test'
+  ...
+# Subtest: master geometry, required fields, font/color and arbitrary engine fields are validated
+ok 115 - master geometry, required fields, font/color and arbitrary engine fields are validated
+  ---
+  duration_ms: 0.9513
+  type: 'test'
+  ...
+# Subtest: oriented paper and later paper changes cannot invalidate a newly edited master start
+ok 116 - oriented paper and later paper changes cannot invalidate a newly edited master start
+  ---
+  duration_ms: 0.8536
+  type: 'test'
+  ...
+# Subtest: native master query shows an explicitly read-only bounded preview for long or duplicate originals
+ok 117 - native master query shows an explicitly read-only bounded preview for long or duplicate originals
+  ---
+  duration_ms: 0.5703
+  type: 'test'
+  ...
+# Subtest: adapter rechecks complex source and does not pass delete to native setter
+ok 118 - adapter rechecks complex source and does not pass delete to native setter
+  ---
+  duration_ms: 0.3961
+  type: 'test'
+  ...
+# Subtest: stored master-only comparison includes text, physical position and inherited-scope warning
+ok 119 - stored master-only comparison includes text, physical position and inherited-scope warning
+  ---
+  duration_ms: 0.9068
+  type: 'test'
+  ...
+# Subtest: first-page hiding is queried independently of stored definitions and editability
+ok 120 - first-page hiding is queried independently of stored definitions and editability
+  ---
+  duration_ms: 0.2466
+  type: 'test'
+  ...
+# Subtest: background wire has explicit scope, simple fill and required color across provider schemas
+ok 121 - background wire has explicit scope, simple fill and required color across provider schemas
+  ---
+  duration_ms: 1.9283
+  type: 'test'
+  ...
+# Subtest: valid HWP and HWPX background batches keep input snapshots detached and unchanged
+ok 122 - valid HWP and HWPX background batches keep input snapshots detached and unchanged
+  ---
+  duration_ms: 1.5426
+  type: 'test'
+  ...
+# Subtest: unknown native engine capability remains unavailable instead of silently succeeding
+ok 123 - unknown native engine capability remains unavailable instead of silently succeeding
+  ---
+  duration_ms: 0.5015
+  type: 'test'
+  ...
+# Subtest: read-only source blocks clearing as well as color changes before executing any command
+ok 124 - read-only source blocks clearing as well as color changes before executing any command
+  ---
+  duration_ms: 0.2803
+  type: 'test'
+  ...
+# Subtest: background validates section, scope, type, mandatory hex color and unknown fields
+ok 125 - background validates section, scope, type, mandatory hex color and unknown fields
+  ---
+  duration_ms: 0.6032
+  type: 'test'
+  ...
+# Subtest: parity-specific permission is independent from a blocked both source
+ok 126 - parity-specific permission is independent from a blocked both source
+  ---
+  duration_ms: 0.1272
+  type: 'test'
+  ...
+# Subtest: adapter rejects a newly unsupported source without calling native setter
+ok 127 - adapter rejects a newly unsupported source without calling native setter
+  ---
+  duration_ms: 0.2783
+  type: 'test'
+  ...
+# Subtest: native source token stays inside adapter and every both result is verified
+ok 128 - native source token stays inside adapter and every both result is verified
+  ---
+  duration_ms: 1.0114
+  type: 'test'
+  ...
+# Subtest: background-only diff includes parity, original visibility and read-only reason
+ok 129 - background-only diff includes parity, original visibility and read-only reason
+  ---
+  duration_ms: 0.7199
+  type: 'test'
+  ...
+# Subtest: decoration wire adds one neutral command and refuses private IDs/tokens
+ok 130 - decoration wire adds one neutral command and refuses private IDs/tokens
+  ---
+  duration_ms: 3.4884
+  type: 'test'
+  ...
+# Subtest: all sixteen representable border widths map exactly and leave source unchanged
+ok 131 - all sixteen representable border widths map exactly and leave source unchanged
+  ---
+  duration_ms: 1.9528
+  type: 'test'
+  ...
+# Subtest: partial side or flag updates contain only the requested native fields
+ok 132 - partial side or flag updates contain only the requested native fields
+  ---
+  duration_ms: 0.2224
+  type: 'test'
+  ...
+# Subtest: paired none/solid background uses RGB and clear has explicit canonical color
+ok 133 - paired none/solid background uses RGB and clear has explicit canonical color
+  ---
+  duration_ms: 0.3804
+  type: 'test'
+  ...
+# Subtest: none border is canonical and unknown styles/widths/fields never downgrade silently
+ok 134 - none border is canonical and unknown styles/widths/fields never downgrade silently
+  ---
+  duration_ms: 0.3026
+  type: 'test'
+  ...
+# Subtest: spacing is bounded, maps left/right/top/bottom and retains unrequested sides
+ok 135 - spacing is bounded, maps left/right/top/bottom and retains unrequested sides
+  ---
+  duration_ms: 0.3031
+  type: 'test'
+  ...
+# Subtest: distinct target decoration batches share one request; duplicate/mixed commands refuse
+ok 136 - distinct target decoration batches share one request; duplicate/mixed commands refuse
+  ---
+  duration_ms: 0.3319
+  type: 'test'
+  ...
+# Subtest: missing/readonly native source or body and unknown properties fail before changing anything
+ok 137 - missing/readonly native source or body and unknown properties fail before changing anything
+  ---
+  duration_ms: 0.4663
+  type: 'test'
+  ...
+# Subtest: no-op and repeat capture refuse without inventing text replacements
+ok 138 - no-op and repeat capture refuse without inventing text replacements
+  ---
+  duration_ms: 0.8182
+  type: 'test'
+  ...
+# Subtest: comparison shows paragraph borders/background/spacing/flags separately from page fill
+ok 139 - comparison shows paragraph borders/background/spacing/flags separately from page fill
+  ---
+  duration_ms: 0.9946
+  type: 'test'
+  ...
+# Subtest: list wire has explicit kind/definition/level and rejects native or restart fields
+ok 140 - list wire has explicit kind/definition/level and rejects native or restart fields
+  ---
+  duration_ms: 3.331
+  type: 'test'
+  ...
+# Subtest: stored numbering levels zero through six map without changing input
+ok 141 - stored numbering levels zero through six map without changing input
+  ---
+  duration_ms: 0.7946
+  type: 'test'
+  ...
+# Subtest: only actually queried definition IDs can be selected
+ok 142 - only actually queried definition IDs can be selected
+  ---
+  duration_ms: 0.5016
+  type: 'test'
+  ...
+# Subtest: bullets require an existing bullet and level zero; no guessed glyphs
+ok 143 - bullets require an existing bullet and level zero; no guessed glyphs
+  ---
+  duration_ms: 0.2285
+  type: 'test'
+  ...
+# Subtest: clear is explicit and preserves the catalog; noop clear is rejected
+ok 144 - clear is explicit and preserves the catalog; noop clear is rejected
+  ---
+  duration_ms: 0.353
+  type: 'test'
+  ...
+# Subtest: readonly/missing/unknown sources never become editable by a request field
+ok 145 - readonly/missing/unknown sources never become editable by a request field
+  ---
+  duration_ms: 0.1987
+  type: 'test'
+  ...
+# Subtest: list-only distinct targets batch while duplicate/mixed commands refuse
+ok 146 - list-only distinct targets batch while duplicate/mixed commands refuse
+  ---
+  duration_ms: 0.376
+  type: 'test'
+  ...
+# Subtest: invalid kinds and noninteger/out of range levels refuse before mutation
+ok 147 - invalid kinds and noninteger/out of range levels refuse before mutation
+  ---
+  duration_ms: 0.2573
+  type: 'test'
+  ...
+# Subtest: comparison includes list kind, stored definition and one-based displayed level
+ok 148 - comparison includes list kind, stored definition and one-based displayed level
+  ---
+  duration_ms: 0.8006
+  type: 'test'
+  ...
+# Subtest: list changes are not recorded as unsafe repeat actions
+ok 149 - list changes are not recorded as unsafe repeat actions
+  ---
+  duration_ms: 0.6531
+  type: 'test'
+  ...
+# Subtest: tab wire is provider-neutral and rejects private source tokens/native IDs
+ok 150 - tab wire is provider-neutral and rejects private source tokens/native IDs
+  ---
+  duration_ms: 3.3981
+  type: 'test'
+  ...
+# Subtest: four tab alignments and four leaders map into bounded native integers without mutating context
+ok 151 - four tab alignments and four leaders map into bounded native integers without mutating context
+  ---
+  duration_ms: 1.5306
+  type: 'test'
+  ...
+# Subtest: up to 30 distinct body paragraph tab commands share a request while duplicates and mixed work refuse
+ok 152 - up to 30 distinct body paragraph tab commands share a request while duplicates and mixed work refuse
+  ---
+  duration_ms: 0.3757
+  type: 'test'
+  ...
+# Subtest: 32 stops and explicit clearing preserve section default tabs as separate responsibility
+ok 153 - 32 stops and explicit clearing preserve section default tabs as separate responsibility
+  ---
+  duration_ms: 0.4047
+  type: 'test'
+  ...
+# Subtest: positions are finite, strictly increasing after HWP-unit rounding and inside actual body width
+ok 154 - positions are finite, strictly increasing after HWP-unit rounding and inside actual body width
+  ---
+  duration_ms: 0.5286
+  type: 'test'
+  ...
+# Subtest: landscape and paragraph margins restrict the same document body width without changing paper
+ok 155 - landscape and paragraph margins restrict the same document body width without changing paper
+  ---
+  duration_ms: 0.3308
+  type: 'test'
+  ...
+# Subtest: unknown source and protected or missing body paragraphs are never assumed editable
+ok 156 - unknown source and protected or missing body paragraphs are never assumed editable
+  ---
+  duration_ms: 0.415
+  type: 'test'
+  ...
+# Subtest: unknown stop fields/alignment/leader and nonboolean automatic flags refuse
+ok 157 - unknown stop fields/alignment/leader and nonboolean automatic flags refuse
+  ---
+  duration_ms: 0.3371
+  type: 'test'
+  ...
+# Subtest: no-op and repeat recording are refused with no invented text edits
+ok 158 - no-op and repeat recording are refused with no invented text edits
+  ---
+  duration_ms: 0.8884
+  type: 'test'
+  ...
+# Subtest: comparison describes tab millimeters, alignment and leaders separately from body text
+ok 159 - comparison describes tab millimeters, alignment and leaders separately from body text
+  ---
+  duration_ms: 0.9608
+  type: 'test'
+  ...
+# Subtest: hwp: 단색 셀 배경은 무늬 없음 -1로 저장하여 재열기 전후 전체 구조가 일치한다
+ok 160 - hwp: 단색 셀 배경은 무늬 없음 -1로 저장하여 재열기 전후 전체 구조가 일치한다
+  ---
+  duration_ms: 138.3564
+  type: 'test'
+  ...
+# Subtest: hwpx: 단색 셀 배경은 무늬 없음 -1로 저장하여 재열기 전후 전체 구조가 일치한다
+ok 161 - hwpx: 단색 셀 배경은 무늬 없음 -1로 저장하여 재열기 전후 전체 구조가 일치한다
+  ---
+  duration_ms: 36.7825
+  type: 'test'
+  ...
+# Subtest: merge wire uses only current right section, not force, token, path or native handles
+ok 162 - merge wire uses only current right section, not force, token, path or native handles
+  ---
+  duration_ms: 10.7858
+  type: 'test'
+  ...
+# Subtest: first/sole/nonexistent/fractional/string/oversize section addresses are refused
+ok 163 - first/sole/nonexistent/fractional/string/oversize section addresses are refused
+  ---
+  duration_ms: 0.746
+  type: 'test'
+  ...
+# Subtest: capability is strict and missing native implementation is refused
+ok 164 - capability is strict and missing native implementation is refused
+  ---
+  duration_ms: 0.4004
+  type: 'test'
+  ...
+# Subtest: merge is isolated and cannot reuse shifted section/body addresses in a batch
+ok 165 - merge is isolated and cannot reuse shifted section/body addresses in a batch
+  ---
+  duration_ms: 0.3565
+  type: 'test'
+  ...
+# Subtest: both affected source sections require queried plain body and no advanced owners
+ok 166 - both affected source sections require queried plain body and no advanced owners
+  ---
+  duration_ms: 0.9057
+  type: 'test'
+  ...
+# Subtest: hidden/unknown/unqueried controls are refused while untouched later sections are preserved
+ok 167 - hidden/unknown/unqueried controls are refused while untouched later sections are preserved
+  ---
+  duration_ms: 0.4969
+  type: 'test'
+  ...
+# Subtest: joined paragraph limit uses Unicode code points and allows genuinely empty boundaries
+ok 168 - joined paragraph limit uses Unicode code points and allows genuinely empty boundaries
+  ---
+  duration_ms: 0.6687
+  type: 'test'
+  ...
+# Subtest: merge context explains preceding-settings inheritance and cannot record stale repeat addresses
+ok 169 - merge context explains preceding-settings inheritance and cannot record stale repeat addresses
+  ---
+  duration_ms: 0.8819
+  type: 'test'
+  ...
+# Subtest: adapter rechecks all body text and section count before touching native source
+ok 170 - adapter rechecks all body text and section count before touching native source
+  ---
+  duration_ms: 0.4456
+  type: 'test'
+  ...
+# Subtest: section tool wire uses explicit physical units and restart names across 24 supported commands
+ok 171 - section tool wire uses explicit physical units and restart names across 24 supported commands
+  ---
+  duration_ms: 3.1004
+  type: 'test'
+  ...
+# Subtest: default tabs reject invalid units, absent capability, unknown fields and section indices without changing input
+ok 172 - default tabs reject invalid units, absent capability, unknown fields and section indices without changing input
+  ---
+  duration_ms: 0.9322
+  type: 'test'
+  ...
+# Subtest: line numbering requires queried editable HWPX and refuses disabling unsupported original numbering
+ok 173 - line numbering requires queried editable HWPX and refuses disabling unsupported original numbering
+  ---
+  duration_ms: 0.6536
+  type: 'test'
+  ...
+# Subtest: line numbering rejects missing, fractional, oversized and arbitrary execution fields
+ok 174 - line numbering rejects missing, fractional, oversized and arbitrary execution fields
+  ---
+  duration_ms: 1.0459
+  type: 'test'
+  ...
+# Subtest: batch validation tracks enabled lines against later or earlier columns, tables and page margins
+ok 175 - batch validation tracks enabled lines against later or earlier columns, tables and page margins
+  ---
+  duration_ms: 1.4624
+  type: 'test'
+  ...
+# Subtest: explicit line disable permits subsequent section column changes while preserving request order
+ok 176 - explicit line disable permits subsequent section column changes while preserving request order
+  ---
+  duration_ms: 0.3003
+  type: 'test'
+  ...
+# Subtest: structure review includes default tabs and numbering so property-only requests have an observable diff
+ok 177 - structure review includes default tabs and numbering so property-only requests have an observable diff
+  ---
+  duration_ms: 2.3584
+  type: 'test'
+  ...
+# Subtest: native tab adapter detects a lying setter and preserves legacy default-zero no-op
+ok 178 - native tab adapter detects a lying setter and preserves legacy default-zero no-op
+  ---
+  duration_ms: 0.4795
+  type: 'test'
+  ...
+# Subtest: known single-column numbering does not depend on the multi-column equal-width flag
+ok 179 - known single-column numbering does not depend on the multi-column equal-width flag
+  ---
+  duration_ms: 0.3966
+  type: 'test'
+  ...
+# Subtest: split wire is provider-neutral and uses an explicit zero-based Unicode offset
+ok 180 - split wire is provider-neutral and uses an explicit zero-based Unicode offset
+  ---
+  duration_ms: 3.1552
+  type: 'test'
+  ...
+# Subtest: split rejects missing and nonboolean capabilities, unavailable and protected body targets
+ok 181 - split rejects missing and nonboolean capabilities, unavailable and protected body targets
+  ---
+  duration_ms: 1.0261
+  type: 'test'
+  ...
+# Subtest: Unicode offset accepts boundaries but rejects UTF16 end, fractions, strings and script fields
+ok 182 - Unicode offset accepts boundaries but rejects UTF16 end, fractions, strings and script fields
+  ---
+  duration_ms: 1.0433
+  type: 'test'
+  ...
+# Subtest: structural splitting is isolated and cannot reinterpret IDs in the same batch
+ok 183 - structural splitting is isolated and cannot reinterpret IDs in the same batch
+  ---
+  duration_ms: 0.5267
+  type: 'test'
+  ...
+# Subtest: source sections containing tables, enabled numbering, multiple columns or any protected body are refused
+ok 184 - source sections containing tables, enabled numbering, multiple columns or any protected body are refused
+  ---
+  duration_ms: 0.3982
+  type: 'test'
+  ...
+# Subtest: page-hide and unknown/unqueried controls are refused while later sections stay outside source restrictions
+ok 185 - page-hide and unknown/unqueried controls are refused while later sections stay outside source restrictions
+  ---
+  duration_ms: 0.6907
+  type: 'test'
+  ...
+# Subtest: 100-section limit and unavailable structure are rejected without changing snapshot
+ok 186 - 100-section limit and unavailable structure are rejected without changing snapshot
+  ---
+  duration_ms: 0.3046
+  type: 'test'
+  ...
+# Subtest: split requests cannot be saved as a repeat template with stale section/body IDs
+ok 187 - split requests cannot be saved as a repeat template with stale section/body IDs
+  ---
+  duration_ms: 0.3337
+  type: 'test'
+  ...
+# Subtest: native split wrapper rechecks original content and required native capability before mutation
+ok 188 - native split wrapper rechecks original content and required native capability before mutation
+  ---
+  duration_ms: 0.5242
+  type: 'test'
+  ...
+# Subtest: native split wrapper rejects lying results even when a setter says success
+ok 189 - native split wrapper rejects lying results even when a setter says success
+  ---
+  duration_ms: 0.5104
+  type: 'test'
+  ...
+# Subtest: new-document macro applies only through newly created editor with its own revision
+ok 190 - new-document macro applies only through newly created editor with its own revision
+  ---
+  duration_ms: 1.7418
+  type: 'test'
+  ...
+# Subtest: failed macro application is surfaced once without automatic retry or a false receipt
+ok 191 - failed macro application is surfaced once without automatic retry or a false receipt
+  ---
+  duration_ms: 0.4269
+  type: 'test'
+  ...
+# Subtest: body caret uses scalar offsets and restores emoji/tab context without editing
+ok 192 - body caret uses scalar offsets and restores emoji/tab context without editing
+  ---
+  duration_ms: 1.5597
+  type: 'test'
+  ...
+# Subtest: changed length, changed same-length text and out-of-range target never move a caret
+ok 193 - changed length, changed same-length text and out-of-range target never move a caret
+  ---
+  duration_ms: 0.2473
+  type: 'test'
+  ...
+# Subtest: selection or unsupported nested mode cannot be captured or overwritten
+ok 194 - selection or unsupported nested mode cannot be captured or overwritten
+  ---
+  duration_ms: 0.1699
+  type: 'test'
+  ...
+# Subtest: malformed optional caret is discarded without losing old view settings
+ok 195 - malformed optional caret is discarded without losing old view settings
+  ---
+  duration_ms: 0.5023
+  type: 'test'
+  ...
+# Subtest: legacy caret path also excludes password-protected document excerpts
+ok 196 - legacy caret path also excludes password-protected document excerpts
+  ---
+  duration_ms: 0.1381
+  type: 'test'
+  ...
+# Subtest: transient cursor from the previous document cannot read outside newly loaded bytes
+ok 197 - transient cursor from the previous document cannot read outside newly loaded bytes
+  ---
+  duration_ms: 0.1377
+  type: 'test'
+  ...
+# Subtest: fresh user defaults and reopened preference preserve unknown additions
+ok 198 - fresh user defaults and reopened preference preserve unknown additions
+  ---
+  duration_ms: 1.4189
+  type: 'test'
+  ...
+# Subtest: corrupt, unknown and newer settings cannot be overwritten on confirmation
+ok 199 - corrupt, unknown and newer settings cannot be overwritten on confirmation
+  ---
+  duration_ms: 0.4845
+  type: 'test'
+  ...
+# Subtest: read and quota failures are explicit and retain previous preference
+ok 200 - read and quota failures are explicit and retain previous preference
+  ---
+  duration_ms: 0.4917
+  type: 'test'
+  ...
+# Subtest: calendar stamps preserve local components with explicit civil document formats
+ok 201 - calendar stamps preserve local components with explicit civil document formats
+  ---
+  duration_ms: 3.2815
+  type: 'test'
+  ...
+# Subtest: Gregorian boundaries and invalid clock or format values cannot produce misleading dates
+ok 202 - Gregorian boundaries and invalid clock or format values cannot produce misleading dates
+  ---
+  duration_ms: 0.4185
+  type: 'test'
+  ...
+# Subtest: connection facade and model port share one HTTP adapter without leaking credentials into generation
+ok 203 - connection facade and model port share one HTTP adapter without leaking credentials into generation
+  ---
+  duration_ms: 27.0568
+  type: 'test'
+  ...
+# Subtest: unsupported session contracts never receive connection credentials
+ok 204 - unsupported session contracts never receive connection credentials
+  ---
+  duration_ms: 0.6314
+  type: 'test'
+  ...
+# Subtest: keyboard context menu handles empty state, boundary wrapping and first/last navigation
+ok 205 - keyboard context menu handles empty state, boundary wrapping and first/last navigation
+  ---
+  duration_ms: 0.6986
+  type: 'test'
+  ...
+# Subtest: iframe adapter rejects incompatible version and incomplete capability surface
+ok 206 - iframe adapter rejects incompatible version and incomplete capability surface
+  ---
+  duration_ms: 0.8533
+  type: 'test'
+  ...
+# Subtest: 빈 본문 입력 뒤 같은 요청의 글자 서식은 새 내용을 기준으로 검사한다
+ok 207 - 빈 본문 입력 뒤 같은 요청의 글자 서식은 새 내용을 기준으로 검사한다
+  ---
+  duration_ms: 152.2584
+  type: 'test'
+  ...
+# Subtest: 실제 WASM: 4x3 일정표·표제 서식·쪽 설정·이동한 대상·두 형식 재열기
+ok 208 - 실제 WASM: 4x3 일정표·표제 서식·쪽 설정·이동한 대상·두 형식 재열기
+  ---
+  duration_ms: 48.0715
+  type: 'test'
+  ...
+# Subtest: 셀 원문 검증과 혼합 서식·범위·미지원 속성 거절
+ok 209 - 셀 원문 검증과 혼합 서식·범위·미지원 속성 거절
+  ---
+  duration_ms: 62.9804
+  type: 'test'
+  ...
+# Subtest: 본문 삽입과 표 생성 뒤에도 원래 대상 ID가 같은 문단을 가리킨다
+ok 210 - 본문 삽입과 표 생성 뒤에도 원래 대상 ID가 같은 문단을 가리킨다
+  ---
+  duration_ms: 14.4859
+  type: 'test'
+  ...
+# Subtest: 표 행·열 앞/중간/뒤 삽입·삭제와 후속 셀 편집을 두 형식 저장과 undo로 검증
+ok 211 - 표 행·열 앞/중간/뒤 삽입·삭제와 후속 셀 편집을 두 형식 저장과 undo로 검증
+  ---
+  duration_ms: 156.6322
+  type: 'test'
+  ...
+# Subtest: 요청 내 새 표 참조와 연속 행열 편집, 복잡한 셀과 마지막 행열 삭제 거절
+ok 212 - 요청 내 새 표 참조와 연속 행열 편집, 복잡한 셀과 마지막 행열 삭제 거절
+  ---
+  duration_ms: 14.1112
+  type: 'test'
+  ...
+# Subtest: 셀 긴 본문 교체·비우기·빈 셀 채우기는 글자/문단 서식을 보존한다
+ok 213 - 셀 긴 본문 교체·비우기·빈 셀 채우기는 글자/문단 서식을 보존한다
+  ---
+  duration_ms: 24.9433
+  type: 'test'
+  ...
+# Subtest: 본문과 셀 글꼴·장평·자간·위아래첨자 설정을 두 형식으로 보존
+ok 214 - 본문과 셀 글꼴·장평·자간·위아래첨자 설정을 두 형식으로 보존
+  ---
+  duration_ms: 12.6835
+  type: 'test'
+  ...
+# Subtest: missing setting preserves pinned blank document defaults without an implicit write
+ok 215 - missing setting preserves pinned blank document defaults without an implicit write
+  ---
+  duration_ms: 125.1241
+  type: 'test'
+  ...
+# Subtest: user defaults survive another store reader, preserve unknown fields and explicit reset
+ok 216 - user defaults survive another store reader, preserve unknown fields and explicit reset
+  ---
+  duration_ms: 0.4955
+  type: 'test'
+  ...
+# Subtest: invalid margins, font and versions cannot overwrite persisted preferences
+ok 217 - invalid margins, font and versions cannot overwrite persisted preferences
+  ---
+  duration_ms: 0.6631
+  type: 'test'
+  ...
+# Subtest: write failure keeps previous default and explicit reset failure is reported
+ok 218 - write failure keeps previous default and explicit reset failure is reported
+  ---
+  duration_ms: 0.3758
+  type: 'test'
+  ...
+# Subtest: orientation validation uses physical rotated page dimensions
+ok 219 - orientation validation uses physical rotated page dimensions
+  ---
+  duration_ms: 0.1851
+  type: 'test'
+  ...
+# Subtest: defaults are applied to new document only; changing settings leaves an existing document unchanged
+ok 220 - defaults are applied to new document only; changing settings leaves an existing document unchanged
+  ---
+  duration_ms: 14.5472
+  type: 'test'
+  ...
+# Subtest: hwp: blank document default page, normal style and later typing survive serialization
+ok 221 - hwp: blank document default page, normal style and later typing survive serialization
+  ---
+  duration_ms: 16.6267
+  type: 'test'
+  ...
+# Subtest: hwpx: blank document default page, normal style and later typing survive serialization
+ok 222 - hwpx: blank document default page, normal style and later typing survive serialization
+  ---
+  duration_ms: 40.7513
+  type: 'test'
+  ...
+# Subtest: prepare new-defaults HWP/HWPX fixtures for independent Hancom reopening
+ok 223 - prepare new-defaults HWP/HWPX fixtures for independent Hancom reopening
+  ---
+  duration_ms: 1699.1984
+  type: 'test'
+  ...
+# Subtest: Document facade rejects an invalid batch before any native operation
+ok 224 - Document facade rejects an invalid batch before any native operation
+  ---
+  duration_ms: 2.3668
+  type: 'test'
+  ...
+# Subtest: Document facade passes valid detached contracts and receipts through the engine port
+ok 225 - Document facade passes valid detached contracts and receipts through the engine port
+  ---
+  duration_ms: 0.546
+  type: 'test'
+  ...
+# Subtest: remote editor Error keeps rollback name and message across the iframe constructor boundary
+ok 226 - remote editor Error keeps rollback name and message across the iframe constructor boundary
+  ---
+  duration_ms: 1.6302
+  type: 'test'
+  ...
+# Subtest: partial, conflict and normal same-realm failures retain their actual classification
+ok 227 - partial, conflict and normal same-realm failures retain their actual classification
+  ---
+  duration_ms: 0.1943
+  type: 'test'
+  ...
+# Subtest: plain response objects and arbitrary values cannot become successful rollback classifications
+ok 228 - plain response objects and arbitrary values cannot become successful rollback classifications
+  ---
+  duration_ms: 0.1743
+  type: 'test'
+  ...
+# Subtest: throwing error properties are contained and never replace the original failure with another throw
+ok 229 - throwing error properties are contained and never replace the original failure with another throw
+  ---
+  duration_ms: 0.1074
+  type: 'test'
+  ...
+# Subtest: DocumentFiles writer needs no DOM and detects disk changes before commit
+ok 230 - DocumentFiles writer needs no DOM and detects disk changes before commit
+  ---
+  duration_ms: 1.7934
+  type: 'test'
+  ...
+# Subtest: DocumentFiles writer aborts revision conflict and releases its lock for a subsequent save
+ok 231 - DocumentFiles writer aborts revision conflict and releases its lock for a subsequent save
+  ---
+  duration_ms: 0.3445
+  type: 'test'
+  ...
+# Subtest: DocumentFiles serializes concurrent writes and does not abort after an acknowledged close
+ok 232 - DocumentFiles serializes concurrent writes and does not abort after an acknowledged close
+  ---
+  duration_ms: 0.3801
+  type: 'test'
+  ...
+# Subtest: document statistics count Unicode scalars and disclose extracted-text scope, not UTF-16 or control tokens
+ok 233 - document statistics count Unicode scalars and disclose extracted-text scope, not UTF-16 or control tokens
+  ---
+  duration_ms: 1.7938
+  type: 'test'
+  ...
+# Subtest: document information stays available for a readonly document and requires an actual loaded document
+ok 234 - document information stays available for a readonly document and requires an actual loaded document
+  ---
+  duration_ms: 0.2399
+  type: 'test'
+  ...
+# Subtest: pinned WASM reader includes current unsaved body and table text without changing the document
+ok 235 - pinned WASM reader includes current unsaved body and table text without changing the document
+  ---
+  duration_ms: 247.0057
+  type: 'test'
+  ...
+# Subtest: restore uses saved tab order, includes orphan records and ignores removed IDs
+ok 236 - restore uses saved tab order, includes orphan records and ignores removed IDs
+  ---
+  duration_ms: 1.3477
+  type: 'test'
+  ...
+# Subtest: old profiles without tab order retain every record in the original order
+ok 237 - old profiles without tab order retain every record in the original order
+  ---
+  duration_ms: 0.1368
+  type: 'test'
+  ...
+# Subtest: hwp: UI 저장물의 문단 경계와 텍스트, 두 형식으로 재저장한 본문을 보존한다
+ok 238 - hwp: UI 저장물의 문단 경계와 텍스트, 두 형식으로 재저장한 본문을 보존한다
+  ---
+  duration_ms: 173.7562
+  type: 'test'
+  ...
+# Subtest: hwpx: UI 저장물의 문단 경계와 텍스트, 두 형식으로 재저장한 본문을 보존한다
+ok 239 - hwpx: UI 저장물의 문단 경계와 텍스트, 두 형식으로 재저장한 본문을 보존한다
+  ---
+  duration_ms: 14.0289
+  type: 'test'
+  ...
+# Subtest: 저장하고 탭 닫기에서 생성한 HWP가 본문을 포함한다
+ok 240 - 저장하고 탭 닫기에서 생성한 HWP가 본문을 포함한다
+  ---
+  duration_ms: 30.141
+  type: 'test'
+  ...
+# Subtest: hwp: UI에서 만든 3×3 표와 9개 셀 내용을 재저장 후에도 보존한다
+ok 241 - hwp: UI에서 만든 3×3 표와 9개 셀 내용을 재저장 후에도 보존한다
+  ---
+  duration_ms: 63.965
+  type: 'test'
+  ...
+# Subtest: hwpx: UI에서 만든 3×3 표와 9개 셀 내용을 재저장 후에도 보존한다
+ok 242 - hwpx: UI에서 만든 3×3 표와 9개 셀 내용을 재저장 후에도 보존한다
+  ---
+  duration_ms: 16.4292
+  type: 'test'
+  ...
+# Subtest: document tab cycle respects displayed order, wraps both directions and excludes other workspaces/closed tabs
+ok 243 - document tab cycle respects displayed order, wraps both directions and excludes other workspaces/closed tabs
+  ---
+  duration_ms: 4.7065
+  type: 'test'
+  ...
+# Subtest: only trusted Ctrl+Tab/Shift+Ctrl+Tab without IME or extra modifiers are document cycle keys
+ok 244 - only trusted Ctrl+Tab/Shift+Ctrl+Tab without IME or extra modifiers are document cycle keys
+  ---
+  duration_ms: 0.2354
+  type: 'test'
+  ...
+# Subtest: trusted body shortcut activates/focuses only its chosen sameworkspace tab and disposes its listener
+ok 245 - trusted body shortcut activates/focuses only its chosen sameworkspace tab and disposes its listener
+  ---
+  duration_ms: 0.9823
+  type: 'test'
+  ...
+# Subtest: table, object, special-area, missing bookmark, modal, host input, stale source and IME keys never navigate or steal focus
+ok 246 - table, object, special-area, missing bookmark, modal, host input, stale source and IME keys never navigate or steal focus
+  ---
+  duration_ms: 1.1215
+  type: 'test'
+  ...
+# Subtest: failed or superseded activation cannot focus a stale target
+ok 247 - failed or superseded activation cannot focus a stale target
+  ---
+  duration_ms: 0.2109
+  type: 'test'
+  ...
+# Subtest: generated table Ctrl+Tab mapping keeps literal insertion separate from hanging indent and rejects double patching
+ok 248 - generated table Ctrl+Tab mapping keeps literal insertion separate from hanging indent and rejects double patching
+  ---
+  duration_ms: 74.4924
+  type: 'test'
+  ...
+# Subtest: view validator accepts only supported finite state without mutating input
+ok 249 - view validator accepts only supported finite state without mutating input
+  ---
+  duration_ms: 1.8438
+  type: 'test'
+  ...
+# Subtest: numeric zoom is applied before layout settles and scroll restoration follows it
+ok 250 - numeric zoom is applied before layout settles and scroll restoration follows it
+  ---
+  duration_ms: 0.7614
+  type: 'test'
+  ...
+# Subtest: fit mode recomputes using current viewport rather than reusing obsolete numeric zoom
+ok 251 - fit mode recomputes using current viewport rather than reusing obsolete numeric zoom
+  ---
+  duration_ms: 0.2699
+  type: 'test'
+  ...
+# Subtest: hidden iframe retains pending view and applies it when made visible
+ok 252 - hidden iframe retains pending view and applies it when made visible
+  ---
+  duration_ms: 0.1824
+  type: 'test'
+  ...
+# Subtest: hiding a tab preserves its last captured scroll offset
+ok 253 - hiding a tab preserves its last captured scroll offset
+  ---
+  duration_ms: 0.1984
+  type: 'test'
+  ...
+# Subtest: different adapters do not mix documents and captures are defensive copies
+ok 254 - different adapters do not mix documents and captures are defensive copies
+  ---
+  duration_ms: 0.2485
+  type: 'test'
+  ...
+# Subtest: a document swap during layout cancels stale scroll restoration
+ok 255 - a document swap during layout cancels stale scroll restoration
+  ---
+  duration_ms: 0.1597
+  type: 'test'
+  ...
+# Subtest: restoration deferred by hiding during layout completes on next visible retry
+ok 256 - restoration deferred by hiding during layout completes on next visible retry
+  ---
+  duration_ms: 0.5703
+  type: 'test'
+  ...
+# Subtest: invalid optional view does not throw or change document viewport
+ok 257 - invalid optional view does not throw or change document viewport
+  ---
+  duration_ms: 0.3508
+  type: 'test'
+  ...
+# Subtest: current scroll range clamps obsolete offset after page count or window size changes
+ok 258 - current scroll range clamps obsolete offset after page count or window size changes
+  ---
+  duration_ms: 0.4987
+  type: 'test'
+  ...
+# Subtest: explicit clear drops only view cache, not file contents or engine state
+ok 259 - explicit clear drops only view cache, not file contents or engine state
+  ---
+  duration_ms: 0.1985
+  type: 'test'
+  ...
+# Subtest: renderer failure ends restore guard and keeps snapshot available for explicit retry
+ok 260 - renderer failure ends restore guard and keeps snapshot available for explicit retry
+  ---
+  duration_ms: 0.4837
+  type: 'test'
+  ...
+# Subtest: suspend restores actual viewport offsets after hiding collapses iframe scroll
+ok 261 - suspend restores actual viewport offsets after hiding collapses iframe scroll
+  ---
+  duration_ms: 0.2171
+  type: 'test'
+  ...
+# Subtest: rapid hide and show during a restore retains the original settle task
+ok 262 - rapid hide and show during a restore retains the original settle task
+  ---
+  duration_ms: 0.131
+  type: 'test'
+  ...
+# Subtest: suspended previous document cannot restore into a replacement document
+ok 263 - suspended previous document cannot restore into a replacement document
+  ---
+  duration_ms: 0.0941
+  type: 'test'
+  ...
+# Subtest: optional caret is restored after layout, before scroll, and captured defensively
+ok 264 - optional caret is restored after layout, before scroll, and captured defensively
+  ---
+  duration_ms: 0.2652
+  type: 'test'
+  ...
+# Subtest: new cursor bookmark overrides legacy caret and copies nested selection fields
+ok 265 - new cursor bookmark overrides legacy caret and copies nested selection fields
+  ---
+  duration_ms: 0.3124
+  type: 'test'
+  ...
+# Subtest: user input while layout settles cancels old cursor and scroll restoration
+ok 266 - user input while layout settles cancels old cursor and scroll restoration
+  ---
+  duration_ms: 0.1772
+  type: 'test'
+  ...
+# Subtest: an exit capture during pending restoration records user position rather than the stale bookmark
+ok 267 - an exit capture during pending restoration records user position rather than the stale bookmark
+  ---
+  duration_ms: 0.1568
+  type: 'test'
+  ...
+# Subtest: equal widths preserve selected sum including integer remainder and never change an unselected column
+ok 268 - equal widths preserve selected sum including integer remainder and never change an unselected column
+  ---
+  duration_ms: 1.023
+  type: 'test'
+  ...
+# Subtest: equal heights preserve table size and reversed cell selection
+ok 269 - equal heights preserve table size and reversed cell selection
+  ---
+  duration_ms: 0.7881
+  type: 'test'
+  ...
+# Subtest: refuse partial, merged, discontinuous, stale or protected geometry before mutation
+ok 270 - refuse partial, merged, discontinuous, stale or protected geometry before mutation
+  ---
+  duration_ms: 0.492
+  type: 'test'
+  ...
+# Subtest: nested search location and path are preserved without sharing mutable arrays
+ok 271 - nested search location and path are preserved without sharing mutable arrays
+  ---
+  duration_ms: 0.2838
+  type: 'test'
+  ...
+# Subtest: result navigation wraps and excerpts use open nested-cell text
+ok 272 - result navigation wraps and excerpts use open nested-cell text
+  ---
+  duration_ms: 0.2872
+  type: 'test'
+  ...
+# Subtest: equal heights distribute control-height surplus instead of leaving the last visible row tall
+ok 273 - equal heights distribute control-height surplus instead of leaving the last visible row tall
+  ---
+  duration_ms: 0.3424
+  type: 'test'
+  ...
+# Subtest: empty section plan distinguishes following section start from preceding paragraph end
+ok 274 - empty section plan distinguishes following section start from preceding paragraph end
+  ---
+  duration_ms: 1.0525
+  type: 'test'
+  ...
+# Subtest: empty section plan rejects sole section, impossible caret, missing supported result and bad tokens
+ok 275 - empty section plan rejects sole section, impossible caret, missing supported result and bad tokens
+  ---
+  duration_ms: 0.602
+  type: 'test'
+  ...
+# Subtest: saved-copy range comparison ignores storage token but refuses changed section/page/caret projection
+ok 276 - saved-copy range comparison ignores storage token but refuses changed section/page/caret projection
+  ---
+  duration_ms: 0.209
+  type: 'test'
+  ...
+# Subtest: clean persisted workspace exits while any unsaved or failed tab protects the whole host
+ok 277 - clean persisted workspace exits while any unsaved or failed tab protects the whole host
+  ---
+  duration_ms: 0.8839
+  type: 'test'
+  ...
+# (node:26356) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: new paragraph metadata loss is explicitly accepted and labels its real location
+ok 278 - new paragraph metadata loss is explicitly accepted and labels its real location
+  ---
+  duration_ms: 5.4363
+  type: 'test'
+  ...
+# Subtest: new known enum entries do not admit arbitrary subjects/reasons or bad counts
+ok 279 - new known enum entries do not admit arbitrary subjects/reasons or bad counts
+  ---
+  duration_ms: 0.9202
+  type: 'test'
+  ...
+# Subtest: older binary loss records remain valid and unknown wire versions still fail
+ok 280 - older binary loss records remain valid and unknown wire versions still fail
+  ---
+  duration_ms: 0.2454
+  type: 'test'
+  ...
+# Subtest: pinned integration drift refuses to silently skip new validation
+ok 281 - pinned integration drift refuses to silently skip new validation
+  ---
+  duration_ms: 0.3127
+  type: 'test'
+  ...
+# Subtest: 파일 handle과 마지막 디스크 fingerprint를 함께 캡처하고 복구 bytes를 쓰지 않는다
+ok 282 - 파일 handle과 마지막 디스크 fingerprint를 함께 캡처하고 복구 bytes를 쓰지 않는다
+  ---
+  duration_ms: 18.4126
+  type: 'test'
+  ...
+# Subtest: 네이티브 emulation handle의 함수는 캡처하지 않아 IndexedDB 전체 저장 실패를 막는다
+ok 283 - 네이티브 emulation handle의 함수는 캡처하지 않아 IndexedDB 전체 저장 실패를 막는다
+  ---
+  duration_ms: 3.9036
+  type: 'test'
+  ...
+# Subtest: 자동 복원은 권한 조회만 하고 prompt이면 파일도 읽지 않는다
+ok 284 - 자동 복원은 권한 조회만 하고 prompt이면 파일도 읽지 않는다
+  ---
+  duration_ms: 1.2536
+  type: 'test'
+  ...
+# Subtest: 명시적 재연결에서만 권한을 요청하고 원본을 검증한다
+ok 285 - 명시적 재연결에서만 권한을 요청하고 원본을 검증한다
+  ---
+  duration_ms: 2.0672
+  type: 'test'
+  ...
+# Subtest: 권한 거부나 취소에서 파일을 읽거나 쓰지 않는다
+ok 286 - 권한 거부나 취소에서 파일을 읽거나 쓰지 않는다
+  ---
+  duration_ms: 0.9409
+  type: 'test'
+  ...
+# Subtest: 이전 디스크와 다른 dirty 복구 문서도 원본 기준으로 연결하고 저장할 수 있다
+ok 287 - 이전 디스크와 다른 dirty 복구 문서도 원본 기준으로 연결하고 저장할 수 있다
+  ---
+  duration_ms: 5.0243
+  type: 'test'
+  ...
+# Subtest: 재시작 중 외부 수정이 있으면 권한이 있어도 연결하지 않고 기존 fingerprint를 유지한다
+ok 288 - 재시작 중 외부 수정이 있으면 권한이 있어도 연결하지 않고 기존 fingerprint를 유지한다
+  ---
+  duration_ms: 1.8776
+  type: 'test'
+  ...
+# Subtest: 연결 후 다시 외부 수정이 발생해도 기존 저장 가드가 덮어쓰기를 거부한다
+ok 289 - 연결 후 다시 외부 수정이 발생해도 기존 저장 가드가 덮어쓰기를 거부한다
+  ---
+  duration_ms: 1.3536
+  type: 'test'
+  ...
+# Subtest: 파일 이동·삭제 및 손상된 연결 메타데이터를 복구 문서 실패로 전파하지 않는다
+ok 290 - 파일 이동·삭제 및 손상된 연결 메타데이터를 복구 문서 실패로 전파하지 않는다
+  ---
+  duration_ms: 1.1758
+  type: 'test'
+  ...
+# Subtest: 다른 이름/형식으로 저장한 새 handle은 자기 디스크 기준을 사용한다
+ok 291 - 다른 이름/형식으로 저장한 새 handle은 자기 디스크 기준을 사용한다
+  ---
+  duration_ms: 3.3806
+  type: 'test'
+  ...
+# Subtest: pinned visible formatting toolbar routes fonts and sizes through registered dispatcher commands
+ok 292 - pinned visible formatting toolbar routes fonts and sizes through registered dispatcher commands
+  ---
+  duration_ms: 166.8427
+  type: 'test'
+  ...
+# Subtest: toolbar size uses pt and exact 1/100pt native units instead of prefix parsing/clamping
+ok 293 - toolbar size uses pt and exact 1/100pt native units instead of prefix parsing/clamping
+  ---
+  duration_ms: 1.1098
+  type: 'test'
+  ...
+# Subtest: toolbar rejects invalid or out-of-range font size before any native mutation
+ok 294 - toolbar rejects invalid or out-of-range font size before any native mutation
+  ---
+  duration_ms: 0.2393
+  type: 'test'
+  ...
+# Subtest: font names retain Korean/Latin names and reject control characters or reserved set markers
+ok 295 - font names retain Korean/Latin names and reject control characters or reserved set markers
+  ---
+  duration_ms: 0.2532
+  type: 'test'
+  ...
+# Subtest: language category is all or one of the seven explicit native slots
+ok 296 - language category is all or one of the seven explicit native slots
+  ---
+  duration_ms: 0.2437
+  type: 'test'
+  ...
+# Subtest: stale document version rejects font registration before any native resource or text mutation
+ok 297 - stale document version rejects font registration before any native resource or text mutation
+  ---
+  duration_ms: 0.7028
+  type: 'test'
+  ...
+# Subtest: hanging indent preserves first-line origin and repeating does not create an edit
+ok 298 - hanging indent preserves first-line origin and repeating does not create an edit
+  ---
+  duration_ms: 1.8347
+  type: 'test'
+  ...
+# Subtest: native integer fractions are preserved and invalid geometry is rejected
+ok 299 - native integer fractions are preserved and invalid geometry is rejected
+  ---
+  duration_ms: 0.3737
+  type: 'test'
+  ...
+# Subtest: 한글의 원래 의미를 유지하며 이전 잘못된 매핑을 제거한다
+ok 300 - 한글의 원래 의미를 유지하며 이전 잘못된 매핑을 제거한다
+  ---
+  duration_ms: 1.2869
+  type: 'test'
+  ...
+# Subtest: 한영 상태의 물리 키와 modifier 조합을 구분한다
+ok 301 - 한영 상태의 물리 키와 modifier 조합을 구분한다
+  ---
+  duration_ms: 0.2589
+  type: 'test'
+  ...
+# Subtest: 연속키 색상과 표가 분리되고 modifier를 놓아도 두 번째 키가 동작한다
+ok 302 - 연속키 색상과 표가 분리되고 modifier를 놓아도 두 번째 키가 동작한다
+  ---
+  duration_ms: 1.1954
+  type: 'test'
+  ...
+# Subtest: 연속키 만료 취소 반복과 잘못된 후속 키가 문서를 바꾸지 않는다
+ok 303 - 연속키 만료 취소 반복과 잘못된 후속 키가 문서를 바꾸지 않는다
+  ---
+  duration_ms: 16.465
+  type: 'test'
+  ...
+# Subtest: 셀 명령은 셀 문맥에서만 실행되고 같은 Ctrl+Enter는 본문 쪽 나누기가 된다
+ok 304 - 셀 명령은 셀 문맥에서만 실행되고 같은 Ctrl+Enter는 본문 쪽 나누기가 된다
+  ---
+  duration_ms: 0.5052
+  type: 'test'
+  ...
+# Subtest: 조합 입력은 도중에 가로채지 않고 동일 scope의 키는 하나의 명령만 갖는다
+ok 305 - 조합 입력은 도중에 가로채지 않고 동일 scope의 키는 하나의 명령만 갖는다
+  ---
+  duration_ms: 0.2324
+  type: 'test'
+  ...
+# Subtest: 셀 블록 F7/F8은 칸/줄 선택이며 본문 F7 편집 용지를 가로채지 않는다
+ok 306 - 셀 블록 F7/F8은 칸/줄 선택이며 본문 F7 편집 용지를 가로채지 않는다
+  ---
+  duration_ms: 0.2306
+  type: 'test'
+  ...
+# Subtest: Ctrl+F 탐색과 Ctrl+Q,F 찾기를 다른 명령으로 유지한다
+ok 307 - Ctrl+F 탐색과 Ctrl+Q,F 찾기를 다른 명령으로 유지한다
+  ---
+  duration_ms: 0.1185
+  type: 'test'
+  ...
+# Subtest: 기존 기본 도구 상자 Ctrl+F1 연결을 한글 매핑에서도 유지한다
+ok 308 - 기존 기본 도구 상자 Ctrl+F1 연결을 한글 매핑에서도 유지한다
+  ---
+  duration_ms: 0.2702
+  type: 'test'
+  ...
+# Subtest: F6 is style in both body and table; F6 never becomes an agent focus key
+ok 309 - F6 is style in both body and table; F6 never becomes an agent focus key
+  ---
+  duration_ms: 0.3688
+  type: 'test'
+  ...
+# Subtest: cell border/background keys choose individual or combined dialog and correct tab
+ok 310 - cell border/background keys choose individual or combined dialog and correct tab
+  ---
+  duration_ms: 0.2341
+  type: 'test'
+  ...
+# Subtest: Ctrl+N,F formula and Ctrl+N,C table caption retain table scope and header/footer is connected
+ok 311 - Ctrl+N,F formula and Ctrl+N,C table caption retain table scope and header/footer is connected
+  ---
+  duration_ms: 0.1594
+  type: 'test'
+  ...
+# Subtest: 전체 칸/줄 선택은 방향과 문서·중첩 표 식별을 보존하고 원본 상태를 변경하지 않는다
+ok 312 - 전체 칸/줄 선택은 방향과 문서·중첩 표 식별을 보존하고 원본 상태를 변경하지 않는다
+  ---
+  duration_ms: 0.7255
+  type: 'test'
+  ...
+# Subtest: 삭제·크기 변경으로 선택이 무효해졌으면 새 범위를 만들지 않는다
+ok 313 - 삭제·크기 변경으로 선택이 무효해졌으면 새 범위를 만들지 않는다
+  ---
+  duration_ms: 0.1064
+  type: 'test'
+  ...
+# Subtest: 셀 선택 실행은 중첩 표 크기를 읽고 선택만 갱신하며 문서 편집 API를 호출하지 않는다
+ok 314 - 셀 선택 실행은 중첩 표 크기를 읽고 선택만 갱신하며 문서 편집 API를 호출하지 않는다
+  ---
+  duration_ms: 0.3583
+  type: 'test'
+  ...
+# Subtest: line number settings validate integer restart/start/interval/distance and strip extra input
+ok 315 - line number settings validate integer restart/start/interval/distance and strip extra input
+  ---
+  duration_ms: 1.3538
+  type: 'test'
+  ...
+# Subtest: line number plans isolate scopes, reject unsupported sections and validate every baseline before writing
+ok 316 - line number plans isolate scopes, reject unsupported sections and validate every baseline before writing
+  ---
+  duration_ms: 0.8273
+  type: 'test'
+  ...
+# Subtest: 구버전 서버에는 새 문서 명령이나 인증 설정을 보내지 않는다
+ok 317 - 구버전 서버에는 새 문서 명령이나 인증 설정을 보내지 않는다
+  ---
+  duration_ms: 48.9452
+  type: 'test'
+  ...
+# Subtest: 문서 제어가 있어도 새 제공자를 지원하지 않는 서버에는 요청하지 않는다
+ok 318 - 문서 제어가 있어도 새 제공자를 지원하지 않는 서버에는 요청하지 않는다
+  ---
+  duration_ms: 0.453
+  type: 'test'
+  ...
+# Subtest: recorded edit resolves original text after paragraphs move and validates variables
+ok 319 - recorded edit resolves original text after paragraphs move and validates variables
+  ---
+  duration_ms: 2.9139
+  type: 'test'
+  ...
+# Subtest: replay rejects ambiguous, deleted, protected and forged anchors
+ok 320 - replay rejects ambiguous, deleted, protected and forged anchors
+  ---
+  duration_ms: 0.7756
+  type: 'test'
+  ...
+# Subtest: template variables cannot inject commands or invalid control characters
+ok 321 - template variables cannot inject commands or invalid control characters
+  ---
+  duration_ms: 0.4758
+  type: 'test'
+  ...
+# Subtest: draft templates are explicit editable placeholders and do not make up facts
+ok 322 - draft templates are explicit editable placeholders and do not make up facts
+  ---
+  duration_ms: 0.2882
+  type: 'test'
+  ...
+# Subtest: two original anchors must never collapse into a single current paragraph
+ok 323 - two original anchors must never collapse into a single current paragraph
+  ---
+  duration_ms: 0.1716
+  type: 'test'
+  ...
+# Subtest: caption positions preserve existing spacing/width and use native enum types for each object kind
+ok 324 - caption positions preserve existing spacing/width and use native enum types for each object kind
+  ---
+  duration_ms: 1.2456
+  type: 'test'
+  ...
+# Subtest: caption snapshot is routed exactly once, a rejected operation never calls native mutation
+ok 325 - caption snapshot is routed exactly once, a rejected operation never calls native mutation
+  ---
+  duration_ms: 0.5317
+  type: 'test'
+  ...
+# Subtest: caption registry enables supported body objects and excludes readonly/multiple/nested/HF targets
+ok 326 - caption registry enables supported body objects and excludes readonly/multiple/nested/HF targets
+  ---
+  duration_ms: 0.4469
+  type: 'test'
+  ...
+# Subtest: caption command removal creates a single snapshot and native failure is surfaced
+ok 327 - caption command removal creates a single snapshot and native failure is surfaced
+  ---
+  duration_ms: 0.2912
+  type: 'test'
+  ...
+# Subtest: manual feature patches match pinned Studio; caption mutation uses history and cell background can open directly
+ok 328 - manual feature patches match pinned Studio; caption mutation uses history and cell background can open directly
+  ---
+  duration_ms: 206.9827
+  type: 'test'
+  ...
+# Subtest: master text validates scalar text, line limit, paper coordinates and hundred-point styles
+ok 329 - master text validates scalar text, line limit, paper coordinates and hundred-point styles
+  ---
+  duration_ms: 1.2277
+  type: 'test'
+  ...
+# Subtest: from-current scope isolates earlier sections and existing other parity; no-op and delete use exact baselines
+ok 330 - from-current scope isolates earlier sections and existing other parity; no-op and delete use exact baselines
+  ---
+  duration_ms: 1.9435
+  type: 'test'
+  ...
+# Subtest: complex master siblings and unsupported engines are refused before any write
+ok 331 - complex master siblings and unsupported engines are refused before any write
+  ---
+  duration_ms: 1.2742
+  type: 'test'
+  ...
+# Subtest: public type contracts are allowed and type-only cycles are rejected
+ok 332 - public type contracts are allowed and type-only cycles are rejected
+  ---
+  duration_ms: 20.0827
+  type: 'test'
+  ...
+# Subtest: static, type-expression, and dynamic private imports cannot bypass facade boundary
+ok 333 - static, type-expression, and dynamic private imports cannot bypass facade boundary
+  ---
+  duration_ms: 23.3985
+  type: 'test'
+  ...
+# Subtest: native access, public any and missing module references fail while data named document is valid
+ok 334 - native access, public any and missing module references fail while data named document is valid
+  ---
+  duration_ms: 3.6321
+  type: 'test'
+  ...
+# Subtest: legacy exceptions are exact, documented, consumed, and cannot authorize core imports
+ok 335 - legacy exceptions are exact, documented, consumed, and cannot authorize core imports
+  ---
+  duration_ms: 1.6691
+  type: 'test'
+  ...
+# Subtest: domain cannot import its application orchestration
+ok 336 - domain cannot import its application orchestration
+  ---
+  duration_ms: 0.7544
+  type: 'test'
+  ...
+# Subtest: repository module contracts satisfy the same rules as negative fixtures
+ok 337 - repository module contracts satisfy the same rules as negative fixtures
+  ---
+  duration_ms: 1511.5717
+  type: 'test'
+  ...
+# Subtest: back/forward leaves the current point and duplicate observations preserve forward history
+ok 338 - back/forward leaves the current point and duplicate observations preserve forward history
+  ---
+  duration_ms: 0.9525
+  type: 'test'
+  ...
+# Subtest: a manual move after back discards the former forward branch
+ok 339 - a manual move after back discards the former forward branch
+  ---
+  duration_ms: 0.1929
+  type: 'test'
+  ...
+# Subtest: invalid candidates can be removed in both directions without losing the current point
+ok 340 - invalid candidates can be removed in both directions without losing the current point
+  ---
+  duration_ms: 0.6835
+  type: 'test'
+  ...
+# Subtest: bounded history and document clear do not retain previous document positions
+ok 341 - bounded history and document clear do not retain previous document positions
+  ---
+  duration_ms: 0.3434
+  type: 'test'
+  ...
+# Subtest: physical Equal maps the two native cursor history keys even when shifted key is plus
+ok 342 - physical Equal maps the two native cursor history keys even when shifted key is plus
+  ---
+  duration_ms: 0.5568
+  type: 'test'
+  ...
+# Subtest: hwp: agent style/columns/hide batch saves, reopens, restores snapshot
+ok 343 - hwp: agent style/columns/hide batch saves, reopens, restores snapshot
+  ---
+  duration_ms: 188.2156
+  type: 'test'
+  ...
+# Subtest: hwpx: agent style/columns/hide batch saves, reopens, restores snapshot
+ok 344 - hwpx: agent style/columns/hide batch saves, reopens, restores snapshot
+  ---
+  duration_ms: 43.2561
+  type: 'test'
+  ...
+# Subtest: agent rejects unknown/character styles, impossible columns and nonboolean flags before mutation
+ok 345 - agent rejects unknown/character styles, impossible columns and nonboolean flags before mutation
+  ---
+  duration_ms: 1.6793
+  type: 'test'
+  ...
+# Subtest: page setup cannot invalidate columns earlier in a batch or already in the document
+ok 346 - page setup cannot invalidate columns earlier in a batch or already in the document
+  ---
+  duration_ms: 2.4835
+  type: 'test'
+  ...
+# Subtest: image settings validate display brightness/contrast, resource IDs and fill/effect modes
+ok 347 - image settings validate display brightness/contrast, resource IDs and fill/effect modes
+  ---
+  duration_ms: 1.8948
+  type: 'test'
+  ...
+# Subtest: image mode, tone, effect and asset reference are part of semantic no-op comparison
+ok 348 - image mode, tone, effect and asset reference are part of semantic no-op comparison
+  ---
+  duration_ms: 0.5299
+  type: 'test'
+  ...
+# Subtest: pending bytes register only in a capable transaction and materialize each shared upload once
+ok 349 - pending bytes register only in a capable transaction and materialize each shared upload once
+  ---
+  duration_ms: 0.6091
+  type: 'test'
+  ...
+# Subtest: inactive uploads allocate no asset and failed registration is propagated
+ok 350 - inactive uploads allocate no asset and failed registration is propagated
+  ---
+  duration_ms: 1.9983
+  type: 'test'
+  ...
+# Subtest: collecting new images requires a picked file and does not treat blank tone as zero
+ok 351 - collecting new images requires a picked file and does not treat blank tone as zero
+  ---
+  duration_ms: 2.0085
+  type: 'test'
+  ...
+# Subtest: page clipboard owns a snapshot independent of source and each consumer
+ok 352 - page clipboard owns a snapshot independent of source and each consumer
+  ---
+  duration_ms: 1.4531
+  type: 'test'
+  ...
+# Subtest: page clipboard permits cross-frame Uint8Array and rejects malformed/unbounded payloads
+ok 353 - page clipboard permits cross-frame Uint8Array and rejects malformed/unbounded payloads
+  ---
+  duration_ms: 1.4409
+  type: 'test'
+  ...
+# Subtest: page body deletion validates complete bounded ranges and preserves refusal reasons
+ok 354 - page body deletion validates complete bounded ranges and preserves refusal reasons
+  ---
+  duration_ms: 3.1692
+  type: 'test'
+  ...
+# Subtest: page body deletion refuses stale source tokens before any mutation
+ok 355 - page body deletion refuses stale source tokens before any mutation
+  ---
+  duration_ms: 1.8784
+  type: 'test'
+  ...
+# Subtest: paper paste contract distinguishes new section and restored following section from same-paper insertion
+ok 356 - paper paste contract distinguishes new section and restored following section from same-paper insertion
+  ---
+  duration_ms: 1.0573
+  type: 'test'
+  ...
+# Subtest: paper paste rejects stale token, impossible section count/anchor and invalid paper
+ok 357 - paper paste rejects stale token, impossible section count/anchor and invalid paper
+  ---
+  duration_ms: 0.4196
+  type: 'test'
+  ...
+# Subtest: style-only changes require a new section and bounded visible background types
+ok 358 - style-only changes require a new section and bounded visible background types
+  ---
+  duration_ms: 0.2415
+  type: 'test'
+  ...
+# Subtest: embedded page image plan uses the same bounded section contract without exposing resource IDs
+ok 359 - embedded page image plan uses the same bounded section contract without exposing resource IDs
+  ---
+  duration_ms: 0.7076
+  type: 'test'
+  ...
+# Subtest: page dialog patch follows pinned native controls and keeps unsupported legacy capabilities gated
+ok 360 - page dialog patch follows pinned native controls and keeps unsupported legacy capabilities gated
+  ---
+  duration_ms: 103.5432
+  type: 'test'
+  ...
+# Subtest: border-region filling requires engine capability while existing stored values remain preservable
+ok 361 - border-region filling requires engine capability while existing stored values remain preservable
+  ---
+  duration_ms: 1.4486
+  type: 'test'
+  ...
+# Subtest: validates two-color native gradients and rejects unsupported stop fidelity or invalid coordinates
+ok 362 - validates two-color native gradients and rejects unsupported stop fidelity or invalid coordinates
+  ---
+  duration_ms: 1.1406
+  type: 'test'
+  ...
+# Subtest: unmodified spacing retains sub-display-unit raw HWP values; invalid mm is rejected
+ok 363 - unmodified spacing retains sub-display-unit raw HWP values; invalid mm is rejected
+  ---
+  duration_ms: 0.2544
+  type: 'test'
+  ...
+# Subtest: semantic no-op ignores native reference allocation and unrelated attr bits
+ok 364 - semantic no-op ignores native reference allocation and unrelated attr bits
+  ---
+  duration_ms: 0.5636
+  type: 'test'
+  ...
+# Subtest: adapter reads native entry and routes parity settings through new capability
+ok 365 - adapter reads native entry and routes parity settings through new capability
+  ---
+  duration_ms: 0.3545
+  type: 'test'
+  ...
+# Subtest: legacy engine exposes all/except-first only and refuses unsupported commands
+ok 366 - legacy engine exposes all/except-first only and refuses unsupported commands
+  ---
+  duration_ms: 0.2852
+  type: 'test'
+  ...
+# Subtest: explicit application changes reset all scope flags while unchanged mixed visibility is preserved
+ok 367 - explicit application changes reset all scope flags while unchanged mixed visibility is preserved
+  ---
+  duration_ms: 0.4592
+  type: 'test'
+  ...
+# Subtest: dialog collection preserves untouched no-hatch raw values and mixed section flags
+ok 368 - dialog collection preserves untouched no-hatch raw values and mixed section flags
+  ---
+  duration_ms: 0.7041
+  type: 'test'
+  ...
+# Subtest: whole-document border plan retains explicit parity after a both reset and refuses stale baselines
+ok 369 - whole-document border plan retains explicit parity after a both reset and refuses stale baselines
+  ---
+  duration_ms: 2.2102
+  type: 'test'
+  ...
+# Subtest: page-hide preserves all six independent flags and rejects unreadable data
+ok 370 - page-hide preserves all six independent flags and rejects unreadable data
+  ---
+  duration_ms: 1.6922
+  type: 'test'
+  ...
+# Subtest: page-hide reuses an existing flag control on same page without creating contradictory controls
+ok 371 - page-hide reuses an existing flag control on same page without creating contradictory controls
+  ---
+  duration_ms: 0.4051
+  type: 'test'
+  ...
+# Subtest: unchanged one-decimal mm retains exact original dimensions; blank/invalid inputs fail
+ok 372 - unchanged one-decimal mm retains exact original dimensions; blank/invalid inputs fail
+  ---
+  duration_ms: 1.3031
+  type: 'test'
+  ...
+# Subtest: page setup collection preserves unmodified raw fields and applies exact preset dimensions
+ok 373 - page setup collection preserves unmodified raw fields and applies exact preset dimensions
+  ---
+  duration_ms: 0.7621
+  type: 'test'
+  ...
+# Subtest: whole-document setup plans only changed sections and checks all baselines before writing
+ok 374 - whole-document setup plans only changed sections and checks all baselines before writing
+  ---
+  duration_ms: 1.9709
+  type: 'test'
+  ...
+# Subtest: page setup rejects invalid orientation, dimensions and binding before planning
+ok 375 - page setup rejects invalid orientation, dimensions and binding before planning
+  ---
+  duration_ms: 0.3546
+  type: 'test'
+  ...
+# Subtest: paragraph sorting uses exact signed decimal keys, stable ties, title exemption and explicit tab columns
+ok 376 - paragraph sorting uses exact signed decimal keys, stable ties, title exemption and explicit tab columns
+  ---
+  duration_ms: 13.1231
+  type: 'test'
+  ...
+# Subtest: native sorting moves mixed runs, paragraph formats and styles together without changing surrounding text
+ok 377 - native sorting moves mixed runs, paragraph formats and styles together without changing surrounding text
+  ---
+  duration_ms: 395.413
+  type: 'test'
+  ...
+# Subtest: stale source formatting and partial selections are refused before sorting
+ok 378 - stale source formatting and partial selections are refused before sorting
+  ---
+  duration_ms: 1489.8432
+  type: 'test'
+  ...
+# Subtest: exact raw spacing resolves root section offsets and cell lists without rounded display data
+ok 379 - exact raw spacing resolves root section offsets and cell lists without rounded display data
+  ---
+  duration_ms: 1.7854
+  type: 'test'
+  ...
+# Subtest: absent native shape values never fall back to approximate px values
+ok 380 - absent native shape values never fall back to approximate px values
+  ---
+  duration_ms: 0.2103
+  type: 'test'
+  ...
+# Subtest: relative paragraph values use native 2x HWPUNIT without flattening existing differences
+ok 381 - relative paragraph values use native 2x HWPUNIT without flattening existing differences
+  ---
+  duration_ms: 1.4534
+  type: 'test'
+  ...
+# Subtest: official paragraph key aliases and repeat events resolve the same relative command
+ok 382 - official paragraph key aliases and repeat events resolve the same relative command
+  ---
+  duration_ms: 0.8035
+  type: 'test'
+  ...
+# Subtest: stale iframe saves only changed fields and keeps another iframe preferences
+ok 383 - stale iframe saves only changed fields and keeps another iframe preferences
+  ---
+  duration_ms: 2.0373
+  type: 'test'
+  ...
+# Subtest: field-level merge preserves different properties in the same section and latest same-field edit wins
+ok 384 - field-level merge preserves different properties in the same section and latest same-field edit wins
+  ---
+  duration_ms: 0.8327
+  type: 'test'
+  ...
+# Subtest: unknown stored sections are retained when a normalizer drops them
+ok 385 - unknown stored sections are retained when a normalizer drops them
+  ---
+  duration_ms: 0.3485
+  type: 'test'
+  ...
+# Subtest: legacy unversioned settings migrate on an actual write without replacing other fields
+ok 386 - legacy unversioned settings migrate on an actual write without replacing other fields
+  ---
+  duration_ms: 0.4103
+  type: 'test'
+  ...
+# Subtest: no-change save reloads latest value without writing stale data
+ok 387 - no-change save reloads latest value without writing stale data
+  ---
+  duration_ms: 0.249
+  type: 'test'
+  ...
+# Subtest: arrays are edited atomically while unrelated remote settings survive
+ok 388 - arrays are edited atomically while unrelated remote settings survive
+  ---
+  duration_ms: 0.2625
+  type: 'test'
+  ...
+# Subtest: snapshot and committed results cannot mutate the internal baseline by reference
+ok 389 - snapshot and committed results cannot mutate the internal baseline by reference
+  ---
+  duration_ms: 0.1459
+  type: 'test'
+  ...
+# Subtest: read failure and quota failure preserve previous raw and baseline, then permit retry
+ok 390 - read failure and quota failure preserve previous raw and baseline, then permit retry
+  ---
+  duration_ms: 0.5258
+  type: 'test'
+  ...
+# Subtest: corrupt persisted input is retained rather than silently reset: {broken
+ok 391 - corrupt persisted input is retained rather than silently reset: {broken
+  ---
+  duration_ms: 0.3601
+  type: 'test'
+  ...
+# Subtest: corrupt persisted input is retained rather than silently reset: null
+ok 392 - corrupt persisted input is retained rather than silently reset: null
+  ---
+  duration_ms: 0.4108
+  type: 'test'
+  ...
+# Subtest: corrupt persisted input is retained rather than silently reset: []
+ok 393 - corrupt persisted input is retained rather than silently reset: []
+  ---
+  duration_ms: 0.1479
+  type: 'test'
+  ...
+# Subtest: corrupt persisted input is retained rather than silently reset: 42
+ok 394 - corrupt persisted input is retained rather than silently reset: 42
+  ---
+  duration_ms: 0.0712
+  type: 'test'
+  ...
+# Subtest: unsupported version is preserved without writes: 2
+ok 395 - unsupported version is preserved without writes: 2
+  ---
+  duration_ms: 0.1712
+  type: 'test'
+  ...
+# Subtest: unsupported version is preserved without writes: 0
+ok 396 - unsupported version is preserved without writes: 0
+  ---
+  duration_ms: 0.0644
+  type: 'test'
+  ...
+# Subtest: unsupported version is preserved without writes: -1
+ok 397 - unsupported version is preserved without writes: -1
+  ---
+  duration_ms: 0.1327
+  type: 'test'
+  ...
+# Subtest: unsupported version is preserved without writes: 1.5
+ok 398 - unsupported version is preserved without writes: 1.5
+  ---
+  duration_ms: 0.0811
+  type: 'test'
+  ...
+# Subtest: unsupported version is preserved without writes: 1
+ok 399 - unsupported version is preserved without writes: 1
+  ---
+  duration_ms: 0.1196
+  type: 'test'
+  ...
+# Subtest: unsupported version is preserved without writes: null
+ok 400 - unsupported version is preserved without writes: null
+  ---
+  duration_ms: 0.1145
+  type: 'test'
+  ...
+# Subtest: settings reset in another tab is accepted on refresh without restoring deleted fields
+ok 401 - settings reset in another tab is accepted on refresh without restoring deleted fields
+  ---
+  duration_ms: 0.2138
+  type: 'test'
+  ...
+# Subtest: special object keys do not change Object.prototype
+ok 402 - special object keys do not change Object.prototype
+  ---
+  duration_ms: 0.192
+  type: 'test'
+  ...
+# Subtest: binding rolls back unsaved memory changes and reports a write failure once
+ok 403 - binding rolls back unsaved memory changes and reports a write failure once
+  ---
+  duration_ms: 0.3698
+  type: 'test'
+  ...
+# Subtest: binding listens only for its settings key, refreshes another iframe, and disposes listener
+ok 404 - binding listens only for its settings key, refreshes another iframe, and disposes listener
+  ---
+  duration_ms: 0.4179
+  type: 'test'
+  ...
+# Subtest: binding reports only missed remote fields after a local command commits stale state
+ok 405 - binding reports only missed remote fields after a local command commits stale state
+  ---
+  duration_ms: 0.4207
+  type: 'test'
+  ...
+# Subtest: two iframe bindings keep repeated same-turn sequential writes without delivering storage events
+ok 406 - two iframe bindings keep repeated same-turn sequential writes without delivering storage events
+  ---
+  duration_ms: 0.3107
+  type: 'test'
+  ...
+# Subtest: deleted known field does not remove another writer unknown nested field
+ok 407 - deleted known field does not remove another writer unknown nested field
+  ---
+  duration_ms: 0.2185
+  type: 'test'
+  ...
+# Subtest: hwp: actual WASM mixed character runs survive export/reopen
+ok 408 - hwp: actual WASM mixed character runs survive export/reopen
+  ---
+  duration_ms: 218.8093
+  type: 'test'
+  ...
+# Subtest: hwpx: actual WASM mixed character runs survive export/reopen
+ok 409 - hwpx: actual WASM mixed character runs survive export/reopen
+  ---
+  duration_ms: 36.1364
+  type: 'test'
+  ...
+# Subtest: HWP no-hatch code zero survives HWPX canonical minus-one without hiding real hatch changes
+ok 410 - HWP no-hatch code zero survives HWPX canonical minus-one without hiding real hatch changes
+  ---
+  duration_ms: 19.1417
+  type: 'test'
+  ...
+# Subtest: body text equality cannot conceal a lost non-first character run
+ok 411 - body text equality cannot conceal a lost non-first character run
+  ---
+  duration_ms: 9.24
+  type: 'test'
+  ...
+# Subtest: an omitted unidentified control is blocked even when serializer reports zero losses
+ok 412 - an omitted unidentified control is blocked even when serializer reports zero losses
+  ---
+  duration_ms: 16.613
+  type: 'test'
+  ...
+# Subtest: actual WASM Unknown-control HWPX omission is blocked despite a zero-loss native report
+ok 413 - actual WASM Unknown-control HWPX omission is blocked despite a zero-loss native report
+  ---
+  duration_ms: 11.4257
+  type: 'test'
+  ...
+# Subtest: image asset byte changes are blocked independently of matching text and counts
+ok 414 - image asset byte changes are blocked independently of matching text and counts
+  ---
+  duration_ms: 10.0734
+  type: 'test'
+  ...
+# Subtest: actual cell border, fill, padding and geometry changes are detected even with identical text and runs
+ok 415 - actual cell border, fill, padding and geometry changes are detected even with identical text and runs
+  ---
+  duration_ms: 52.6348
+  type: 'test'
+  ...
+# Subtest: malformed and nonzero serializer reports cannot be interpreted as no loss
+ok 416 - malformed and nonzero serializer reports cannot be interpreted as no loss
+  ---
+  duration_ms: 31.996
+  type: 'test'
+  ...
+# Subtest: reopened handle is freed after failed comparison and source document is untouched
+ok 417 - reopened handle is freed after failed comparison and source document is untouched
+  ---
+  duration_ms: 7.2793
+  type: 'test'
+  ...
+# Subtest: hwp: actual native image payload is checked without emitting image bytes
+ok 418 - hwp: actual native image payload is checked without emitting image bytes
+  ---
+  duration_ms: 13.8759
+  type: 'test'
+  ...
+# Subtest: hwpx: actual native image payload is checked without emitting image bytes
+ok 419 - hwpx: actual native image payload is checked without emitting image bytes
+  ---
+  duration_ms: 25.3862
+  type: 'test'
+  ...
+# Subtest: hwp: durable page hide and caption properties preserve their values
+ok 420 - hwp: durable page hide and caption properties preserve their values
+  ---
+  duration_ms: 14.0778
+  type: 'test'
+  ...
+# Subtest: hwpx: durable page hide and caption properties preserve their values
+ok 421 - hwpx: durable page hide and caption properties preserve their values
+  ---
+  duration_ms: 12.1156
+  type: 'test'
+  ...
+# Subtest: a changed durable hide flag is detected even when the control still exists
+ok 422 - a changed durable hide flag is detected even when the control still exists
+  ---
+  duration_ms: 17.9594
+  type: 'test'
+  ...
+# Subtest: hwp: fixture table including all cell character runs is checked
+ok 423 - hwp: fixture table including all cell character runs is checked
+  ---
+  duration_ms: 1539.7176
+  type: 'test'
+  ...
+# Subtest: hwpx: fixture table including all cell character runs is checked
+ok 424 - hwpx: fixture table including all cell character runs is checked
+  ---
+  duration_ms: 16.5221
+  type: 'test'
+  ...
+# Subtest: HWPX table caption right-middle/remove/undo compares resolved wrap rather than stale raw attr bits
+ok 425 - HWPX table caption right-middle/remove/undo compares resolved wrap rather than stale raw attr bits
+  ---
+  duration_ms: 38.3604
+  type: 'test'
+  ...
+# Subtest: hwp: header text is read beyond the root control list
+ok 426 - hwp: header text is read beyond the root control list
+  ---
+  duration_ms: 7.5092
+  type: 'test'
+  ...
+# Subtest: hwpx: header text is read beyond the root control list
+ok 427 - hwpx: header text is read beyond the root control list
+  ---
+  duration_ms: 6.8992
+  type: 'test'
+  ...
+# Subtest: recovery chooses the actual document format and returns only a loss-free export
+ok 428 - recovery chooses the actual document format and returns only a loss-free export
+  ---
+  duration_ms: 1.176
+  type: 'test'
+  ...
+# Subtest: loss, missing/mismatched reports and empty bytes never become a new recovery record
+ok 429 - loss, missing/mismatched reports and empty bytes never become a new recovery record
+  ---
+  duration_ms: 0.3173
+  type: 'test'
+  ...
+# Subtest: native recovery adapter really reopens exported content before returning bytes
+ok 430 - native recovery adapter really reopens exported content before returning bytes
+  ---
+  duration_ms: 225.0911
+  type: 'test'
+  ...
+# Subtest: password-protected document never invokes an unencrypted recovery exporter
+ok 431 - password-protected document never invokes an unencrypted recovery exporter
+  ---
+  duration_ms: 0.2228
+  type: 'test'
+  ...
+# Subtest: one malformed draft is isolated while valid drafts and original records remain intact
+ok 432 - one malformed draft is isolated while valid drafts and original records remain intact
+  ---
+  duration_ms: 1.233
+  type: 'test'
+  ...
+# Subtest: legacy recovery metadata remains valid without optional connection fields
+ok 433 - legacy recovery metadata remains valid without optional connection fields
+  ---
+  duration_ms: 0.8133
+  type: 'test'
+  ...
+# Subtest: invalid recovery metadata cannot pollute the workspace tab list
+ok 434 - invalid recovery metadata cannot pollute the workspace tab list
+  ---
+  duration_ms: 0.3073
+  type: 'test'
+  ...
+# Subtest: recovery settings retain Studio defaults, bounds and legacy numeric strings
+ok 435 - recovery settings retain Studio defaults, bounds and legacy numeric strings
+  ---
+  duration_ms: 1.3909
+  type: 'test'
+  ...
+# Subtest: unchanged status and selection do not delay recovery or serialize again
+ok 436 - unchanged status and selection do not delay recovery or serialize again
+  ---
+  duration_ms: 0.6214
+  type: 'test'
+  ...
+# Subtest: typing postpones idle checkpoint but periodic checkpoint is not starved
+ok 437 - typing postpones idle checkpoint but periodic checkpoint is not starved
+  ---
+  duration_ms: 0.422
+  type: 'test'
+  ...
+# Subtest: both toggles disable scheduling and boundary flush without deleting older checkpoints
+ok 438 - both toggles disable scheduling and boundary flush without deleting older checkpoints
+  ---
+  duration_ms: 0.2148
+  type: 'test'
+  ...
+# Subtest: one remaining toggle still creates recovery snapshots at its own interval
+ok 439 - one remaining toggle still creates recovery snapshots at its own interval
+  ---
+  duration_ms: 0.2466
+  type: 'test'
+  ...
+# Subtest: clean document and explicit checkpoint cancel pending dirty snapshot
+ok 440 - clean document and explicit checkpoint cancel pending dirty snapshot
+  ---
+  duration_ms: 0.1558
+  type: 'test'
+  ...
+# Subtest: document replacement and dispose cancel old timers
+ok 441 - document replacement and dispose cancel old timers
+  ---
+  duration_ms: 0.1236
+  type: 'test'
+  ...
+# Subtest: busy checkpoint retries without tight loop; disabling cancels retry
+ok 442 - busy checkpoint retries without tight loop; disabling cancels retry
+  ---
+  duration_ms: 0.1449
+  type: 'test'
+  ...
+# Subtest: failed checkpoint reports once and does not repeatedly serialize unchanged content
+ok 443 - failed checkpoint reports once and does not repeatedly serialize unchanged content
+  ---
+  duration_ms: 1.2746
+  type: 'test'
+  ...
+# Subtest: mutation during awaited write keeps a subsequent checkpoint pending
+ok 444 - mutation during awaited write keeps a subsequent checkpoint pending
+  ---
+  duration_ms: 0.6022
+  type: 'test'
+  ...
+# Subtest: settings reader leaves unrelated data alone, accepts legacy version and rejects corrupt/future records
+ok 445 - settings reader leaves unrelated data alone, accepts legacy version and rejects corrupt/future records
+  ---
+  duration_ms: 0.7294
+  type: 'test'
+  ...
+# Subtest: settings watcher responds to iframe storage event and preserves last known settings on failure
+ok 446 - settings watcher responds to iframe storage event and preserves last known settings on failure
+  ---
+  duration_ms: 0.3473
+  type: 'test'
+  ...
+# Subtest: 구간은 원문 UTF-16 위치와 줄번호를 보존하고 surrogate/CRLF를 나누지 않는다
+ok 447 - 구간은 원문 UTF-16 위치와 줄번호를 보존하고 surrogate/CRLF를 나누지 않는다
+  ---
+  duration_ms: 32.527
+  type: 'test'
+  ...
+# Subtest: 자료 순서에 상관없이 구간 ID가 같고 파일/추출문/업무 변경은 ID를 바꾼다
+ok 448 - 자료 순서에 상관없이 구간 ID가 같고 파일/추출문/업무 변경은 ID를 바꾼다
+  ---
+  duration_ms: 2.8565
+  type: 'test'
+  ...
+# Subtest: 검색 전후에 업무/채팅 범위를 검사하고 다른 scope chunk를 거부한다
+ok 449 - 검색 전후에 업무/채팅 범위를 검사하고 다른 scope chunk를 거부한다
+  ---
+  duration_ms: 1.3874
+  type: 'test'
+  ...
+# Subtest: 명시 자료에서 요청과 관련된 한국어 구간만 선택하고 원본과 구간 hash를 구분한다
+ok 450 - 명시 자료에서 요청과 관련된 한국어 구간만 선택하고 원본과 구간 hash를 구분한다
+  ---
+  duration_ms: 2.6792
+  type: 'test'
+  ...
+# Subtest: 검색 결과는 최대 8개/8000자/원본별3개이며 예산 때문에 무관한 내용을 채우지 않는다
+ok 451 - 검색 결과는 최대 8개/8000자/원본별3개이며 예산 때문에 무관한 내용을 채우지 않는다
+  ---
+  duration_ms: 5.3997
+  type: 'test'
+  ...
+# Subtest: 색인과 검색은 취소·중복 자료·잘못된 버전·탐색 예산을 거부한다
+ok 452 - 색인과 검색은 취소·중복 자료·잘못된 버전·탐색 예산을 거부한다
+  ---
+  duration_ms: 1.9961
+  type: 'test'
+  ...
+# Subtest: 선택을 해제하거나 원문이 바뀌면 다음 요청의 색인에 이전 구간이 남지 않는다
+ok 453 - 선택을 해제하거나 원문이 바뀌면 다음 요청의 색인에 이전 구간이 남지 않는다
+  ---
+  duration_ms: 0.9865
+  type: 'test'
+  ...
+# Subtest: 선택형 Context는 기본 single 문맥을 유지하고 현재 채팅만 사용한다
+ok 454 - 선택형 Context는 기본 single 문맥을 유지하고 현재 채팅만 사용한다
+  ---
+  duration_ms: 1.3637
+  type: 'test'
+  ...
+# Subtest: 저장 대기 중 문서 교체나 수정이 발생하면 거절한다
+ok 455 - 저장 대기 중 문서 교체나 수정이 발생하면 거절한다
+  ---
+  duration_ms: 0.9472
+  type: 'test'
+  ...
+# Subtest: 외부 프로그램이 원본을 바꾸면 덮어쓰기를 시작하지 않는다
+ok 456 - 외부 프로그램이 원본을 바꾸면 덮어쓰기를 시작하지 않는다
+  ---
+  duration_ms: 27.8144
+  type: 'test'
+  ...
+# Subtest: 쓰기 실패와 저장 중 수정 시 close하지 않고 abort하며 입력 잠금을 복원한다
+ok 457 - 쓰기 실패와 저장 중 수정 시 close하지 않고 abort하며 입력 잠금을 복원한다
+  ---
+  duration_ms: 1.5045
+  type: 'test'
+  ...
+# Subtest: section macros record V2 and require explicit mapping even when recorded index still exists
+ok 458 - section macros record V2 and require explicit mapping even when recorded index still exists
+  ---
+  duration_ms: 22.0212
+  type: 'test'
+  ...
+# Subtest: mapping refuses nonexisting, fractional, inherited and unknown section targets
+ok 459 - mapping refuses nonexisting, fractional, inherited and unknown section targets
+  ---
+  duration_ms: 0.5175
+  type: 'test'
+  ...
+# Subtest: distinct recorded sections cannot collapse into a single destination
+ok 460 - distinct recorded sections cannot collapse into a single destination
+  ---
+  duration_ms: 1.7621
+  type: 'test'
+  ...
+# Subtest: mixed section and body templates match original text only within selected destination
+ok 461 - mixed section and body templates match original text only within selected destination
+  ---
+  duration_ms: 3.0875
+  type: 'test'
+  ...
+# Subtest: body anchor sections are included when a different section receives page commands
+ok 462 - body anchor sections are included when a different section receives page commands
+  ---
+  duration_ms: 0.6237
+  type: 'test'
+  ...
+# Subtest: legacy V1 retains unique global original-text resolution and refuses added maps
+ok 463 - legacy V1 retains unique global original-text resolution and refuses added maps
+  ---
+  duration_ms: 0.5517
+  type: 'test'
+  ...
+# Subtest: master variables are literal, nonrecursive and revalidated after substitution
+ok 464 - master variables are literal, nonrecursive and revalidated after substitution
+  ---
+  duration_ms: 1.5689
+  type: 'test'
+  ...
+# Subtest: replay rechecks destination format, queried capability and ordered geometry before execution
+ok 465 - replay rechecks destination format, queried capability and ordered geometry before execution
+  ---
+  duration_ms: 1.0426
+  type: 'test'
+  ...
+# Subtest: template sections and input snapshots stay immutable during capture, selection and replay
+ok 466 - template sections and input snapshots stay immutable during capture, selection and replay
+  ---
+  duration_ms: 0.8843
+  type: 'test'
+  ...
+# Subtest: persisted templates cannot conceal section references or smuggle unsupported commands
+ok 467 - persisted templates cannot conceal section references or smuggle unsupported commands
+  ---
+  duration_ms: 0.6406
+  type: 'test'
+  ...
+# Subtest: readable preview identifies page scope, units, restart mode and bounded master text
+ok 468 - readable preview identifies page scope, units, restart mode and bounded master text
+  ---
+  duration_ms: 0.9858
+  type: 'test'
+  ...
+# Subtest: automation forwards the prepared section batch once and does not turn editor failures into success
+ok 469 - automation forwards the prepared section batch once and does not turn editor failures into success
+  ---
+  duration_ms: 0.573
+  type: 'test'
+  ...
+# Subtest: canonical table object address is sufficient; no unrelated cursor cell is required
+ok 470 - canonical table object address is sufficient; no unrelated cursor cell is required
+  ---
+  duration_ms: 2.5111
+  type: 'test'
+  ...
+# Subtest: picture, shape, line, group and equation route to existing dialog kinds and preserve full cell/HF/note identity
+ok 471 - picture, shape, line, group and equation route to existing dialog kinds and preserve full cell/HF/note identity
+  ---
+  duration_ms: 0.6804
+  type: 'test'
+  ...
+# Subtest: read-only/form/IME/encrypted/multiple/unsupported/ambiguous objects are unavailable and give explicit reasons
+ok 472 - read-only/form/IME/encrypted/multiple/unsupported/ambiguous objects are unavailable and give explicit reasons
+  ---
+  duration_ms: 0.6576
+  type: 'test'
+  ...
+# Subtest: dialog confirmation checks state before legacy mutation and keeps the dialog open on stale state
+ok 473 - dialog confirmation checks state before legacy mutation and keeps the dialog open on stale state
+  ---
+  duration_ms: 0.269
+  type: 'test'
+  ...
+# Subtest: table object bookmarks restore only the same bounded table and host paragraph
+ok 474 - table object bookmarks restore only the same bounded table and host paragraph
+  ---
+  duration_ms: 5.2731
+  type: 'test'
+  ...
+# Subtest: backward body selection across sections retains anchor, focus, F3 phase and text guard
+ok 475 - backward body selection across sections retains anchor, focus, F3 phase and text guard
+  ---
+  duration_ms: 0.7639
+  type: 'test'
+  ...
+# Subtest: cell caret and same-cell multi-paragraph text selection restore Unicode offsets
+ok 476 - cell caret and same-cell multi-paragraph text selection restore Unicode offsets
+  ---
+  duration_ms: 1.1743
+  type: 'test'
+  ...
+# Subtest: merged-cell F5 rectangle, phase and excluded cells require current table evidence
+ok 477 - merged-cell F5 rectangle, phase and excluded cells require current table evidence
+  ---
+  duration_ms: 1.0199
+  type: 'test'
+  ...
+# Subtest: unsupported or transient state is skipped without reading outside engine bounds
+ok 478 - unsupported or transient state is skipped without reading outside engine bounds
+  ---
+  duration_ms: 0.6156
+  type: 'test'
+  ...
+# Subtest: malformed optional cursor does not discard legacy view; validators make defensive copies
+ok 479 - malformed optional cursor does not discard legacy view; validators make defensive copies
+  ---
+  duration_ms: 0.2986
+  type: 'test'
+  ...
+# Subtest: oversized table or body selection refuses persistence instead of truncating its integrity guard
+ok 480 - oversized table or body selection refuses persistence instead of truncating its integrity guard
+  ---
+  duration_ms: 0.8275
+  type: 'test'
+  ...
+# Subtest: password-protected document context never enters cursor persistence
+ok 481 - password-protected document context never enters cursor persistence
+  ---
+  duration_ms: 0.2363
+  type: 'test'
+  ...
+# Subtest: nested cell caret and backward text range preserve the complete path and Unicode offsets
+ok 482 - nested cell caret and backward text range preserve the complete path and Unicode offsets
+  ---
+  duration_ms: 2.6211
+  type: 'test'
+  ...
+# Subtest: nested bookmarks reject changed ancestors, removed controls and malformed path contracts
+ok 483 - nested bookmarks reject changed ancestors, removed controls and malformed path contracts
+  ---
+  duration_ms: 2.1239
+  type: 'test'
+  ...
+# Subtest: nested F5 block restores the owning table path and rejects out-of-bounds rectangles
+ok 484 - nested F5 block restores the owning table path and rejects out-of-bounds rectangles
+  ---
+  duration_ms: 1.3086
+  type: 'test'
+  ...
+# Subtest: top-level embedded image selection persists a hash only and guards bytes, properties and host text
+ok 485 - top-level embedded image selection persists a hash only and guards bytes, properties and host text
+  ---
+  duration_ms: 0.7493
+  type: 'test'
+  ...
+# Subtest: multi, nested, linked/missing and non-picture objects refuse persistence without a fake successful restore
+ok 486 - multi, nested, linked/missing and non-picture objects refuse persistence without a fake successful restore
+  ---
+  duration_ms: 0.2957
+  type: 'test'
+  ...
+# Subtest: pinned WASM embedded-image bookmark survives HWP and HWPX reopen without modifying bytes
+ok 487 - pinned WASM embedded-image bookmark survives HWP and HWPX reopen without modifying bytes
+  ---
+  duration_ms: 240.0622
+  type: 'test'
+  ...
+# Subtest: header/footer caret and backwards text selection retain target and body return point
+ok 488 - header/footer caret and backwards text selection retain target and body return point
+  ---
+  duration_ms: 1.0455
+  type: 'test'
+  ...
+# Subtest: note range restores exact source only and refuses changed page ownership, note text or source type
+ok 489 - note range restores exact source only and refuses changed page ownership, note text or source type
+  ---
+  duration_ms: 1.6984
+  type: 'test'
+  ...
+# Subtest: special story bounds, malformed selections and protected files refuse persistence
+ok 490 - special story bounds, malformed selections and protected files refuse persistence
+  ---
+  duration_ms: 4.3511
+  type: 'test'
+  ...
+# Subtest: pinned WASM header and footer targets survive both save formats and remain unchanged by restoration
+ok 491 - pinned WASM header and footer targets survive both save formats and remain unchanged by restoration
+  ---
+  duration_ms: 108.5325
+  type: 'test'
+  ...
+# Subtest: pinned WASM body footnote keeps its control binding and Unicode caret after HWP/HWPX reopen
+ok 492 - pinned WASM body footnote keeps its control binding and Unicode caret after HWP/HWPX reopen
+  ---
+  duration_ms: 12.5477
+  type: 'test'
+  ...
+# Subtest: session registration owns order while selection rejects another workspace or missing tab
+ok 493 - session registration owns order while selection rejects another workspace or missing tab
+  ---
+  duration_ms: 1.6176
+  type: 'test'
+  ...
+# Subtest: closed selected tab chooses the first surviving document and last-tab close requests a blank
+ok 494 - closed selected tab chooses the first surviving document and last-tab close requests a blank
+  ---
+  duration_ms: 0.3075
+  type: 'test'
+  ...
+# Subtest: an unsuccessful close keeps tab order and active selection intact
+ok 495 - an unsuccessful close keeps tab order and active selection intact
+  ---
+  duration_ms: 0.3558
+  type: 'test'
+  ...
+# Subtest: closing a background-workspace record never selects it into the current workspace
+ok 496 - closing a background-workspace record never selects it into the current workspace
+  ---
+  duration_ms: 0.1155
+  type: 'test'
+  ...
+# Subtest: restore preserves saved order and orphan recovery records without mutating the input
+ok 497 - restore preserves saved order and orphan recovery records without mutating the input
+  ---
+  duration_ms: 0.5878
+  type: 'test'
+  ...
+# Subtest: workspace return chooses its prior live tab and falls back from a closed or foreign selection
+ok 498 - workspace return chooses its prior live tab and falls back from a closed or foreign selection
+  ---
+  duration_ms: 0.2638
+  type: 'test'
+  ...
+# Subtest: an explicit absent persisted selection falls back to the first tab after restore opened others
+ok 499 - an explicit absent persisted selection falls back to the first tab after restore opened others
+  ---
+  duration_ms: 0.1903
+  type: 'test'
+  ...
+# Subtest: selection eligibility does not alter the saved selection before a viewport is suspended
+ok 500 - selection eligibility does not alter the saved selection before a viewport is suspended
+  ---
+  duration_ms: 0.1148
+  type: 'test'
+  ...
+# Subtest: duplicate registration fails before changing order or resolving ambiguous IDs
+ok 501 - duplicate registration fails before changing order or resolving ambiguous IDs
+  ---
+  duration_ms: 0.3615
+  type: 'test'
+  ...
+# Subtest: navigation guard blocks applying, close and restore before cancelling generation
+ok 502 - navigation guard blocks applying, close and restore before cancelling generation
+  ---
+  duration_ms: 0.4343
+  type: 'test'
+  ...
+# Subtest: environment export is an explicit detached projection with no credential or content fields
+ok 503 - environment export is an explicit detached projection with no credential or content fields
+  ---
+  duration_ms: 2.0371
+  type: 'test'
+  ...
+# Subtest: backup rejects bad version, broken types, large data, malformed JSON and excessive values
+ok 504 - backup rejects bad version, broken types, large data, malformed JSON and excessive values
+  ---
+  duration_ms: 0.5111
+  type: 'test'
+  ...
+# Subtest: import preserves local unknown fields, validates input first and refuses concurrently changed settings
+ok 505 - import preserves local unknown fields, validates input first and refuses concurrently changed settings
+  ---
+  duration_ms: 0.9377
+  type: 'test'
+  ...
+# Subtest: second write failure restores first write, including initially absent settings
+ok 506 - second write failure restores first write, including initially absent settings
+  ---
+  duration_ms: 0.5905
+  type: 'test'
+  ...
+# Subtest: corrupt existing settings are never overwritten by import
+ok 507 - corrupt existing settings are never overwritten by import
+  ---
+  duration_ms: 0.2659
+  type: 'test'
+  ...
+# Subtest: shared snippets persist and support rename/delete without overwriting another window
+ok 508 - shared snippets persist and support rename/delete without overwriting another window
+  ---
+  duration_ms: 2.2225
+  type: 'test'
+  ...
+# Subtest: corrupt/versioned libraries, bad names and oversized content do not overwrite storage
+ok 509 - corrupt/versioned libraries, bad names and oversized content do not overwrite storage
+  ---
+  duration_ms: 0.3932
+  type: 'test'
+  ...
+# Subtest: quota failure leaves saved snippets intact
+ok 510 - quota failure leaves saved snippets intact
+  ---
+  duration_ms: 0.2306
+  type: 'test'
+  ...
+# Subtest: style contracts reject duplicate, malformed and overflowing definitions before mutations
+ok 511 - style contracts reject duplicate, malformed and overflowing definitions before mutations
+  ---
+  duration_ms: 1.9224
+  type: 'test'
+  ...
+# Subtest: renaming a style preserves its identity and rejects names owned by other styles
+ok 512 - renaming a style preserves its identity and rejects names owned by other styles
+  ---
+  duration_ms: 0.166
+  type: 'test'
+  ...
+# Subtest: draft preview preserves the original and converts paragraph raw values back to display units
+ok 513 - draft preview preserves the original and converts paragraph raw values back to display units
+  ---
+  duration_ms: 0.2777
+  type: 'test'
+  ...
+# Subtest: character style applies only selected text across paragraphs, preserving outside text and paragraph style
+ok 514 - character style applies only selected text across paragraphs, preserving outside text and paragraph style
+  ---
+  duration_ms: 1.8547
+  type: 'test'
+  ...
+# Subtest: invalid end is checked before any mutation, and different cells are rejected
+ok 515 - invalid end is checked before any mutation, and different cells are rejected
+  ---
+  duration_ms: 0.4421
+  type: 'test'
+  ...
+# Subtest: same nested cell range resolves paths per selected paragraph
+ok 516 - same nested cell range resolves paths per selected paragraph
+  ---
+  duration_ms: 0.5457
+  type: 'test'
+  ...
+# Subtest: next style follows only end-of-paragraph valid edges, without confusing character styles
+ok 517 - next style follows only end-of-paragraph valid edges, without confusing character styles
+  ---
+  duration_ms: 0.2648
+  type: 'test'
+  ...
+# Subtest: portable style import preserves language fonts, mixed definitions, next-style cycles and existing document across native formats
+ok 518 - portable style import preserves language fonts, mixed definitions, next-style cycles and existing document across native formats
+  ---
+  duration_ms: 214.1696
+  type: 'test'
+  ...
+# Subtest: advanced styles are refused explicitly and malformed portable shapes never mutate document
+ok 519 - advanced styles are refused explicitly and malformed portable shapes never mutate document
+  ---
+  duration_ms: 157.8186
+  type: 'test'
+  ...
+# Subtest: Ctrl+1 through Ctrl+0 resolve default styles by name, not accidental document IDs
+ok 520 - Ctrl+1 through Ctrl+0 resolve default styles by name, not accidental document IDs
+  ---
+  duration_ms: 1.2299
+  type: 'test'
+  ...
+# Subtest: missing, ambiguous or malformed style targets never select an unrelated style
+ok 521 - missing, ambiguous or malformed style targets never select an unrelated style
+  ---
+  duration_ms: 0.1729
+  type: 'test'
+  ...
+# Subtest: tab UI patch applies once to pinned Studio and rejects drift
+ok 522 - tab UI patch applies once to pinned Studio and rejects drift
+  ---
+  duration_ms: 63.7686
+  type: 'test'
+  ...
+# (node:8312) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: default-tab dialog applies only tab distance, preserves distinct section settings and rejects stale/invalid input
+ok 523 - default-tab dialog applies only tab distance, preserves distinct section settings and rejects stale/invalid input
+  ---
+  duration_ms: 227.7647
+  type: 'test'
+  ...
+# Subtest: generated Hangul A binding invokes integer autofill only with cell-block selection
+ok 524 - generated Hangul A binding invokes integer autofill only with cell-block selection
+  ---
+  duration_ms: 181.6953
+  type: 'test'
+  ...
+# Subtest: integer series derives explicit step, keeps seeds and consistent zero padding
+ok 525 - integer series derives explicit step, keeps seeds and consistent zero padding
+  ---
+  duration_ms: 1.4745
+  type: 'test'
+  ...
+# Subtest: series rejects inferred dates/formulas/prefixes, invalid count, padding and overflowing output
+ok 526 - series rejects inferred dates/formulas/prefixes, invalid count, padding and overflowing output
+  ---
+  duration_ms: 0.3965
+  type: 'test'
+  ...
+# Subtest: native selected row auto fill preserves seeds, target formats, geometry, other rows and saved documents
+ok 527 - native selected row auto fill preserves seeds, target formats, geometry, other rows and saved documents
+  ---
+  duration_ms: 281.9922
+  type: 'test'
+  ...
+# Subtest: literal table text preserves whitespace, empty and trailing cells and Unicode
+ok 528 - literal table text preserves whitespace, empty and trailing cells and Unicode
+  ---
+  duration_ms: 1.6296
+  type: 'test'
+  ...
+# Subtest: literal conversion rejects uneven, too large or ambiguous cells rather than drop content
+ok 529 - literal conversion rejects uneven, too large or ambiguous cells rather than drop content
+  ---
+  duration_ms: 0.6687
+  type: 'test'
+  ...
+# Subtest: character runs are sliced in scalar coordinates with complete nonoverlapping coverage
+ok 530 - character runs are sliced in scalar coordinates with complete nonoverlapping coverage
+  ---
+  duration_ms: 0.3879
+  type: 'test'
+  ...
+# Subtest: mixed Unicode character formatting survives text to table and table to text in both formats
+ok 531 - mixed Unicode character formatting survives text to table and table to text in both formats
+  ---
+  duration_ms: 295.6545
+  type: 'test'
+  ...
+# Subtest: native body conversion preserves surrounding paragraphs, cells, Unicode and row styles; stale plan is refused
+ok 532 - native body conversion preserves surrounding paragraphs, cells, Unicode and row styles; stale plan is refused
+  ---
+  duration_ms: 1263.9131
+  type: 'test'
+  ...
+# Subtest: native preflight rejects partial selection, controls, merged and protected cells without mutation
+ok 533 - native preflight rejects partial selection, controls, merged and protected cells without mutation
+  ---
+  duration_ms: 8.3958
+  type: 'test'
+  ...
+# Subtest: native text conversion refuses forced page boundaries and multi-column sources before mutation
+ok 534 - native text conversion refuses forced page boundaries and multi-column sources before mutation
+  ---
+  duration_ms: 7.4569
+  type: 'test'
+  ...
+# Subtest: native conversion retains each row paragraph style and each cell single-format run
+ok 535 - native conversion retains each row paragraph style and each cell single-format run
+  ---
+  duration_ms: 12.8853
+  type: 'test'
+  ...
+# Subtest: table preset definitions change only borders and fills with explicit header and stripe choices
+ok 536 - table preset definitions change only borders and fills with explicit header and stripe choices
+  ---
+  duration_ms: 1.0191
+  type: 'test'
+  ...
+# Subtest: all table presets preserve Unicode mixed formats and geometry through scratch and two formats
+ok 537 - all table presets preserve Unicode mixed formats and geometry through scratch and two formats
+  ---
+  duration_ms: 758.1733
+  type: 'test'
+  ...
+# Subtest: protected cells and stale table properties are refused; whole merged cells keep their first row color
+ok 538 - protected cells and stale table properties are refused; whole merged cells keep their first row color
+  ---
+  duration_ms: 998.5217
+  type: 'test'
+  ...
+# Subtest: a reversed rectangular cell block changes only selected cells and refuses partial merged footprints
+ok 539 - a reversed rectangular cell block changes only selected cells and refuses partial merged footprints
+  ---
+  duration_ms: 5.3625
+  type: 'test'
+  ...
+# Subtest: date fill crosses leap days, year boundaries, decreases and uses UTC days
+ok 540 - date fill crosses leap days, year boundaries, decreases and uses UTC days
+  ---
+  duration_ms: 2.203
+  type: 'test'
+  ...
+# Subtest: numbered labels keep literal Unicode prefix/suffix, zero padding and seed text
+ok 541 - numbered labels keep literal Unicode prefix/suffix, zero padding and seed text
+  ---
+  duration_ms: 0.5738
+  type: 'test'
+  ...
+# Subtest: explicit month/year fill uses the first day anchor without end-of-month or leap-year drift
+ok 542 - explicit month/year fill uses the first day anchor without end-of-month or leap-year drift
+  ---
+  duration_ms: 0.7371
+  type: 'test'
+  ...
+# Subtest: bad dates, mixed patterns, formulas and ambiguous multiple numbers fail before editing
+ok 543 - bad dates, mixed patterns, formulas and ambiguous multiple numbers fail before editing
+  ---
+  duration_ms: 0.3602
+  type: 'test'
+  ...
+# Subtest: dates and supplementary-Unicode labels roundtrip through native HWP/HWPX with target formatting
+ok 544 - dates and supplementary-Unicode labels roundtrip through native HWP/HWPX with target formatting
+  ---
+  duration_ms: 317.8402
+  type: 'test'
+  ...
+# Subtest: temporary attachments isolate chats/workspaces, deduplicate, remove and do not survive a new store
+ok 545 - temporary attachments isolate chats/workspaces, deduplicate, remove and do not survive a new store
+  ---
+  duration_ms: 11.2445
+  type: 'test'
+  ...
+# Subtest: attachment validation rejects the entire batch for invalid format, oversize or too many files
+ok 546 - attachment validation rejects the entire batch for invalid format, oversize or too many files
+  ---
+  duration_ms: 5.6969
+  type: 'test'
+  ...
+# Subtest: folderless HWP extraction, hash and explicit limits accompany the transmitted text
+ok 547 - folderless HWP extraction, hash and explicit limits accompany the transmitted text
+  ---
+  duration_ms: 28.5312
+  type: 'test'
+  ...
+# Subtest: linked and temporary sources share count/text budgets; invalid encoding and cancellation fail before generation
+ok 548 - linked and temporary sources share count/text budgets; invalid encoding and cancellation fail before generation
+  ---
+  duration_ms: 4.2479
+  type: 'test'
+  ...
+# Subtest: Unicode case expansion and printable ASCII width conversion leave Hangul and emoji intact
+ok 549 - Unicode case expansion and printable ASCII width conversion leave Hangul and emoji intact
+  ---
+  duration_ms: 0.8377
+  type: 'test'
+  ...
+# Subtest: native body selection expansion preserves mixed character formatting and text outside selection in both formats
+ok 550 - native body selection expansion preserves mixed character formatting and text outside selection in both formats
+  ---
+  duration_ms: 237.6181
+  type: 'test'
+  ...
+# Subtest: native same-cell case conversion keeps table geometry and neighbours
+ok 551 - native same-cell case conversion keeps table geometry and neighbours
+  ---
+  duration_ms: 124.0628
+  type: 'test'
+  ...
+# Subtest: native plain multiline replacement keeps suffix formatting, blank lines and Unicode through HWP/HWPX
+ok 552 - native plain multiline replacement keeps suffix formatting, blank lines and Unicode through HWP/HWPX
+  ---
+  duration_ms: 32.9377
+  type: 'test'
+  ...
+# Subtest: special Unicode spaces and soft hyphen remain exact characters after both native exports
+ok 553 - special Unicode spaces and soft hyphen remain exact characters after both native exports
+  ---
+  duration_ms: 51.2738
+  type: 'test'
+  ...
+# Subtest: menu arrows skip unavailable items and wrap in both directions
+ok 554 - menu arrows skip unavailable items and wrap in both directions
+  ---
+  duration_ms: 0.8699
+  type: 'test'
+  ...
+# Subtest: menu Home/End select boundaries without visiting disabled items
+ok 555 - menu Home/End select boundaries without visiting disabled items
+  ---
+  duration_ms: 0.1087
+  type: 'test'
+  ...
+# Subtest: menu navigation tolerates a removed or disabled focused entry
+ok 556 - menu navigation tolerates a removed or disabled focused entry
+  ---
+  duration_ms: 0.0985
+  type: 'test'
+  ...
+# Subtest: menu-specific gates cannot be overridden by a generally enabled command
+ok 557 - menu-specific gates cannot be overridden by a generally enabled command
+  ---
+  duration_ms: 0.0979
+  type: 'test'
+  ...
+# Subtest: exit fallback is synchronous, scoped to exact document checkpoint and defensive on read
+ok 558 - exit fallback is synchronous, scoped to exact document checkpoint and defensive on read
+  ---
+  duration_ms: 5.2742
+  type: 'test'
+  ...
+# Subtest: newer IndexedDB view wins over stale exit record; latest exit supersedes queued older view
+ok 559 - newer IndexedDB view wins over stale exit record; latest exit supersedes queued older view
+  ---
+  duration_ms: 0.269
+  type: 'test'
+  ...
+# Subtest: other workspaces and unloaded documents remain; journal bounds entries without document bytes
+ok 560 - other workspaces and unloaded documents remain; journal bounds entries without document bytes
+  ---
+  duration_ms: 0.7558
+  type: 'test'
+  ...
+# Subtest: corrupt and future journal data is preserved rather than overwritten
+ok 561 - corrupt and future journal data is preserved rather than overwritten
+  ---
+  duration_ms: 0.5029
+  type: 'test'
+  ...
+# Subtest: quota and blocked read failures are reported with preference errors
+ok 562 - quota and blocked read failures are reported with preference errors
+  ---
+  duration_ms: 0.225
+  type: 'test'
+  ...
+# Subtest: every original work template saves and reopens with styled titles and expected table cells
+ok 563 - every original work template saves and reopens with styled titles and expected table cells
+  ---
+  duration_ms: 274.9141
+  type: 'test'
+  ...
+# Subtest: template catalog returns detached definitions and rejects unknown templates
+ok 564 - template catalog returns detached definitions and rejects unknown templates
+  ---
+  duration_ms: 0.3719
+  type: 'test'
+  ...
+# Subtest: workspace facade creates independent chats and scopes message writes without browser dependencies
+ok 565 - workspace facade creates independent chats and scopes message writes without browser dependencies
+  ---
+  duration_ms: 1.8076
+  type: 'test'
+  ...
+# Subtest: facade resolves the current owner state after restore instead of retaining a stale aggregate
+ok 566 - facade resolves the current owner state after restore instead of retaining a stale aggregate
+  ---
+  duration_ms: 0.1816
+  type: 'test'
+  ...
+# Subtest: workspace slice mutations retain unrelated owner data and recovery does not duplicate messages
+ok 567 - workspace slice mutations retain unrelated owner data and recovery does not duplicate messages
+  ---
+  duration_ms: 0.26
+  type: 'test'
+  ...
+# Subtest: serialized physical-store writer does not overlap state and document commits
+ok 568 - serialized physical-store writer does not overlap state and document commits
+  ---
+  duration_ms: 0.2241
+  type: 'test'
+  ...
+# Subtest: failed commit is observable and later persistence can still complete
+ok 569 - failed commit is observable and later persistence can still complete
+  ---
+  duration_ms: 0.2804
+  type: 'test'
+  ...
+# Subtest: legacy v1 and fresh empty states validate without adding optional new fields
+ok 570 - legacy v1 and fresh empty states validate without adding optional new fields
+  ---
+  duration_ms: 1.5993
+  type: 'test'
+  ...
+# Subtest: unknown additive fields and live file handles are preserved without invoking permissions
+ok 571 - unknown additive fields and live file handles are preserved without invoking permissions
+  ---
+  duration_ms: 0.2983
+  type: 'test'
+  ...
+# Subtest: missing active workspace and inactive/deleted model references retain shell fallback
+ok 572 - missing active workspace and inactive/deleted model references retain shell fallback
+  ---
+  duration_ms: 0.1261
+  type: 'test'
+  ...
+# Subtest: invalid root cannot become a new blank workspace: null
+ok 573 - invalid root cannot become a new blank workspace: null
+  ---
+  duration_ms: 0.5193
+  type: 'test'
+  ...
+# Subtest: invalid root cannot become a new blank workspace: false
+ok 574 - invalid root cannot become a new blank workspace: false
+  ---
+  duration_ms: 0.1976
+  type: 'test'
+  ...
+# Subtest: invalid root cannot become a new blank workspace:
+ok 575 - invalid root cannot become a new blank workspace:
+  ---
+  duration_ms: 0.0762
+  type: 'test'
+  ...
+# Subtest: invalid root cannot become a new blank workspace: raw
+ok 576 - invalid root cannot become a new blank workspace: raw
+  ---
+  duration_ms: 0.1282
+  type: 'test'
+  ...
+# Subtest: invalid root cannot become a new blank workspace: 5
+ok 577 - invalid root cannot become a new blank workspace: 5
+  ---
+  duration_ms: 0.0811
+  type: 'test'
+  ...
+# Subtest: future and absent versions do not mutate the stored payload
+ok 578 - future and absent versions do not mutate the stored payload
+  ---
+  duration_ms: 0.5415
+  type: 'test'
+  ...
+# Subtest: each required collection is validated before any interrupted run is rewritten
+ok 579 - each required collection is validated before any interrupted run is rewritten
+  ---
+  duration_ms: 0.504
+  type: 'test'
+  ...
+# Subtest: duplicate identity cannot shadow a workspace, chat, folder, model or run
+ok 580 - duplicate identity cannot shadow a workspace, chat, folder, model or run
+  ---
+  duration_ms: 0.2533
+  type: 'test'
+  ...
+# Subtest: workspace active chat must exist and belong to that workspace
+ok 581 - workspace active chat must exist and belong to that workspace
+  ---
+  duration_ms: 0.1459
+  type: 'test'
+  ...
+# Subtest: chats and folders cannot reference a missing workspace
+ok 582 - chats and folders cannot reference a missing workspace
+  ---
+  duration_ms: 0.1483
+  type: 'test'
+  ...
+# Subtest: revoked permission does not prevent restore but a non-directory handle is reported
+ok 583 - revoked permission does not prevent restore but a non-directory handle is reported
+  ---
+  duration_ms: 0.4048
+  type: 'test'
+  ...
+# Subtest: run and message histories cannot cross workspace or chat boundaries
+ok 584 - run and message histories cannot cross workspace or chat boundaries
+  ---
+  duration_ms: 0.2329
+  type: 'test'
+  ...
+# Subtest: missing legacy run log is allowed while existing linked runs are scoped
+ok 585 - missing legacy run log is allowed while existing linked runs are scoped
+  ---
+  duration_ms: 0.0768
+  type: 'test'
+  ...
+# Subtest: malformed messages, source metadata and run status are rejected
+ok 586 - malformed messages, source metadata and run status are rejected
+  ---
+  duration_ms: 0.3039
+  type: 'test'
+  ...
+# Subtest: invalid connection tokens, layout numbers and duplicated document order are rejected
+ok 587 - invalid connection tokens, layout numbers and duplicated document order are rejected
+  ---
+  duration_ms: 0.3121
+  type: 'test'
+  ...
+# Subtest: valid interrupted run may be rewritten only after validation, once
+ok 588 - valid interrupted run may be rewritten only after validation, once
+  ---
+  duration_ms: 1.6331
+  type: 'test'
+  ...
+# Subtest: receipt summary validates without requiring optional old structural snapshots
+ok 589 - receipt summary validates without requiring optional old structural snapshots
+  ---
+  duration_ms: 0.2395
+  type: 'test'
+  ...
+# Subtest: structural receipt malformed arrays are blocked before diff UI reads them
+ok 590 - structural receipt malformed arrays are blocked before diff UI reads them
+  ---
+  duration_ms: 0.2357
+  type: 'test'
+  ...
+# Subtest: corrupt optional retrieval and progress records are rejected before rendering
+ok 591 - corrupt optional retrieval and progress records are rejected before rendering
+  ---
+  duration_ms: 0.2157
+  type: 'test'
+  ...
+1..591
+# tests 591
+# suites 0
+# pass 591
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4896.8464

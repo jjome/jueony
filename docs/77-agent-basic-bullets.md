@@ -33,3 +33,13 @@ Studio의 엄격한 보고서 DTO에 위 두 enum만 명시적으로 추가한�
 단위 591·provider/server 52·신규 실제 WASM 26·신규 실제 Edge 15 통과. 별도 Rust 3개 통과(다른 library tests 3,883개는 필터로 미실행). 네 브라우저 adapter는 OpenAI Responses·Anthropic·Gemini·OpenAI compatible의 로컬 합성 응답이며 실제 유료 API를 호출하지 않는다. Rust 검사 컴파일에 필요한 고정 fixture 11개는 빌드 사본에만 보충하며 실행 묶음에 포함하지 않는다. 이전 추가 필드에 맞춰 두 ParaShape 테스트 초기화에 기본 suppress_line_numbers=false를 넣었으며 기존 assertion은 유지한다.
 
 최종 누적 결과·실행 위치·파일 목록은 아래에 추가한다. 전체 문서화 범위는 미완료이며 자동화를 유지한다.
+
+## 최종 검수본
+
+77번 최종 검사: 단위 591·provider/server 52·브라우저 508·실제 WASM 538·별도 Rust 3 통과. 구현 `75c54bc`와 4278 검수본의 앱 소스/WASM/명령 계약 해시를 대조했다. 정의가 없는 문서의 기본 문자 글머리표 8종 생성/적용·서로 다른 문단의 독립 정의·공유 자원 보존·1회 undo/redo·실문서 실패 복원·예상 밖 자원/run 변조 탐지·동시 편집 충돌·양 형식 저장 재열기·수동 입력·업무 복원을 확인했다. 새 빈 HWP의 미사용 번호/글머리표 자원 저장 누락을 수정했다. 명시적 restart는 아직 저장되지 않지만 손실 보고 누락을 수정하고 실제 파일/복구 저장을 차단하여 원문과 디스크를 유지한다. 실제 한글 비교·유료 모델 품질·전체 동등성은 미완료다.
+
+실행: `build/jueony-agent-bullets-20261014/Start-Review.cmd` 또는 `http://127.0.0.1:4278/`. 이전 검수 서버와 사용자 문서는 유지한다. 30개 전용 합성 HWP/HWPX를 같은 묶음의 `review-documents/agent-bullets/agent-bullets-native` 및 `agent-bullets-browser`에 준비했다. `created-*`는 문자 8종, `unused-definitions.*`는 새 빈 문서의 미사용 정의 저장, `independent-existing.hwpx`/`multiple-definitions.*`는 기존 정의 보존, `all-eight.hwpx`/`manual-created.hwpx`는 후속 요청·수동 입력의 결과다. 실제 한글 재열기는 아직 하지 않았다. [파일별 해시 목록](evidence/agent-bullets-2026-10-14/basic-bullet-documents.json)을 따른다.
+
+엔진 `source-d7b6d44ddb2bf9fb/pkg`(WSL review/no opt), 앱 소스 SHA-256 `b9c3f256f2006510f58c83599bf6c928b3543b0fb7d9cdb89358dad953e3ca46`, WASM SHA-256 `bacfc5fbcbe5457cc03facc118d158b9c017bff7f561a238d408d3ca4eb18b96`. 커밋 전 applicationCommit 9fc19db/dirty=true와 구현 75c54bc는 실제 앱 소스 및 추적 패치 해시로 연결한다. 9개 모듈·258개 소스의 경계와 TypeScript 검사 통과. 62개 분류의 1246개 JSON/HWP/HWPX/SVG 파일을 검수 묶음에 복사해 바이트를 대조했다. [누적 결과](evidence/agent-bullets-2026-10-14/verification-summary.json), [실행 대조](evidence/agent-bullets-2026-10-14/launch-check.json), [저장 결함·지원 범위](evidence/agent-bullets-2026-10-14/source-baseline-notes.json), [Rust 범위](evidence/agent-bullets-2026-10-14/native-rust-tests.json)를 보관한다.
+
+브라우저의 의도한 저장 차단 2건은 expectedSaveErrors로 구분한다. 예상 밖 page/console 오류와 외부 자산 요청은 0건이다. 번호 다시 시작의 실제 형식 연결·사용자 지정 번호/마커 모양·개요·그림/체크 글머리표와 최종 한글 직접 검수는 다음 항목이며 자동화를 유지한다. 검사 수로 전체 구현률을 계산하지 않는다.

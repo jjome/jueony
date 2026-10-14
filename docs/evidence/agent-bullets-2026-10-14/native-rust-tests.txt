@@ -1,0 +1,9 @@
+    Finished `release-test` profile [optimized] target(s) in 5.62s
+     Running unittests src/lib.rs (/tmp/jueony-rhwp-engine/target/pr-review/release-test/deps/rhwp-5545605cf1af5cd9)
+
+running 3 tests
+test serializer::paragraph_metadata_loss::tests::ordinary_paragraphs_have_no_false_loss ... ok
+test serializer::paragraph_metadata_loss::tests::restart_loss_locations_cover_body_nested_cell_header_and_master ... ok
+test serializer::paragraph_metadata_loss::tests::nested_tree_walk_does_not_use_the_rust_call_stack ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 3883 filtered out; finished in 0.00s

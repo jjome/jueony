@@ -1,0 +1,48 @@
+{
+  "newBasicBullet": {
+    "wireKind": "set_basic_bullet",
+    "glyphs": [
+      "●",
+      "○",
+      "■",
+      "□",
+      "◆",
+      "◇",
+      "▶",
+      "▷"
+    ],
+    "markerDefaults": {
+      "attr": 8,
+      "widthAdjust": 0,
+      "textDistance": 50,
+      "charShapeId": 0
+    },
+    "maxDefinitions": 200,
+    "isolated": true,
+    "checkboxSupport": false
+  },
+  "resourcePersistence": {
+    "fixedApis": [
+      "ensureDefaultBullet",
+      "ensureDefaultNumbering",
+      "createNumbering"
+    ],
+    "fix": "Mark DocInfo raw stream dirty only when a definition is actually added.",
+    "verified": "Fresh unused bullet/custom numbering retained by both actual serializers and reopens."
+  },
+  "restartMetadata": {
+    "serialized": false,
+    "reported": true,
+    "code": "metadataReduced",
+    "subject": "paragraphProperties",
+    "reason": "serializerNotImplemented",
+    "strictFileAndRecoverySave": "BLOCKED_LIVE_AND_DISK_PRESERVED",
+    "nativeRustScope": "body/nested cell/header/master exact paths, no false loss, stack at depth 100"
+  },
+  "browserExpectedErrors": {
+    "count": 2,
+    "reason": "Intentional HWP/HWPX file-save failures due to known restart metadata loss; not unexpected console errors."
+  },
+  "nativeHancomComparison": "NOT_RUN",
+  "paidModels": "NOT_RUN"
+}

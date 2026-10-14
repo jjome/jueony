@@ -1,7 +1,7 @@
-import type {Snapshot,AgentHeaderFooterDeleteOp,Structure} from '../../modules/document/public/index.ts';
+import type {Snapshot,AgentHeaderFooterDeleteOp} from '../../modules/document/public/index.ts';
 import {validateAgentHeaderFooterDelete} from '../../modules/document/public/engine-integration.ts';
 import {readStructure,nativeDocument,parsed} from './structure.ts';
-import {capturePreservationEvidence} from './preservation.ts';
+import {captureHeaderFooterBody,stableHeaderFooterStructure} from './agent-header-footer-structure.ts';
 type RootControl={list:number;para:number;controlIndex:number;ctrlId:string};
 const parity={both:0,even:1,odd:2};
 /** Delete one stored definition, preserving body content and all other stored settings. */
@@ -16,16 +16,16 @@ export function executeAgentHeaderFooterDelete(wasm:any,base:Snapshot,op:AgentHe
  const flat=positions.findIndex(([s,p])=>s===op.section&&p===target.paraIndex),controls:RootControl[]=parsed(doc.getControls());
  if(flat<0||!Number.isSafeInteger(target.controlIndex)||!controls.some(c=>c.list===0&&c.para===flat&&c.controlIndex===target.controlIndex&&c.ctrlId===(header?'head':'foot')))throw new Error('삭제 대상 머리말/꼬리말의 본문 위치를 확인하지 못했습니다.');
  const text=()=>positions.map(([s,p])=>doc.getTextRange(s,p,0,doc.getParagraphLength(s,p)));
- const bodyEvidence=()=>{const evidence=capturePreservationEvidence(doc);if(evidence.issues.length)throw new Error('삭제 전후 본문 보존 속성을 모두 확인하지 못했습니다.');return Object.fromEntries(Object.entries(evidence.values).filter(([key])=>/^section\/\d+\/paragraph\/\d+$/u.test(key)));};
+ const bodyEvidence=()=>captureHeaderFooterBody(doc);
  const originalBody=bodyEvidence(),originalText=text(),expected=structuredClone(before);
  const entry=expected.sections.find(s=>s.index===op.section)!.headerFooters!.find(h=>h.story===op.story&&h.pageKind===op.pageKind)!;
  // A missing stored definition can reveal a prior section's inheritance. No blank override is created.
- Object.assign(entry,{exists:false,editable:false,deletable:false,text:'',textTruncated:false,paragraphCount:0});delete entry.characters;delete entry.paragraph;delete entry.reason;
+ Object.assign(entry,{exists:false,editable:false,deletable:false,creatable:typeof doc.createHeaderFooter==='function',text:'',textTruncated:false,paragraphCount:0});delete entry.characters;delete entry.paragraph;delete entry.reason;
  const list=expected.paragraphs[flat].controls!,i=list.findIndex((_,i)=>controls.filter(c=>c.list===0&&c.para===flat)[i]?.controlIndex===target.controlIndex);
  if(i<0)throw new Error('본문 제어 목록이 삭제 대상과 다릅니다.');list.splice(i,1);
  expected.unsupportedControls=[...new Set(controls.filter(c=>!(c.list===0&&c.para===flat&&c.controlIndex===target.controlIndex)&&!['secd','cold'].includes(c.ctrlId)).map(c=>c.ctrlId))] as string[];
  const result=parsed(doc.deleteHeaderFooter(op.section,header,apply));if(result?.ok!==true)throw new Error('머리말/꼬리말 정의를 삭제하지 못했습니다.');
  const after=readStructure(doc);
- const stable=(value:Structure)=>({...value,sections:value.sections.map(s=>{const {emptySectionRemoval,...rest}=s;return {...rest,...(s.lineNumbers?{lineNumbers:{...s.lineNumbers,editable:undefined}}:{}),headerFooters:s.headerFooters?.map(h=>{if(s.index!==op.section||h.story!==op.story||h.pageKind!==op.pageKind)return h;const {reason,...definition}=h;return definition;})};}),paragraphs:value.paragraphs.map(p=>{const {pageIndex,...rest}=p;return rest;})});
+ const stable=(value:typeof before)=>stableHeaderFooterStructure(value,op);
  if(JSON.stringify(bodyEvidence())!==JSON.stringify(originalBody)||JSON.stringify(text())!==JSON.stringify(originalText)||JSON.stringify(stable(after))!==JSON.stringify(stable(expected)))throw new Error('머리말/꼬리말 삭제 뒤 본문·다른 정의·설정이 계획과 다릅니다.');
 }

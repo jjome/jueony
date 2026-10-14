@@ -14,7 +14,7 @@ export function describeStructure(s?: Structure) {
   lines.push(`구역 ${s.index+1} 저장된 머리말/꼬리말 (상속되어 보이는 내용과 구분):`);
   for(const h of s.headerFooters){
    const label=`${{both:'양쪽',odd:'홀수 쪽',even:'짝수 쪽'}[h.pageKind]} ${h.story==='header'?'머리말':'꼬리말'}`;
-   if(h.exists===false){lines.push(`  ${label}: 저장된 정의 없음`);continue;}
+   if(h.exists===false){lines.push(`  ${label}: 저장된 정의 없음${h.creatable?' · 새 정의 생성 가능':''}`);continue;}
    if(h.exists===null){lines.push(`  ${label}: 조회하지 못함 · 원본 유지`);continue;}
    const chars=Array.from(h.text),preview=JSON.stringify(chars.slice(0,240).join(''));
    if(h.paragraph)lines.push(`  ${label} 문단: ${alignments[h.paragraph.alignment]??h.paragraph.alignment} 정렬 · 줄 간격 ${h.paragraph.lineSpacing}${h.paragraph.lineSpacingType==='Percent'?'%':' ('+h.paragraph.lineSpacingType+')'}`);

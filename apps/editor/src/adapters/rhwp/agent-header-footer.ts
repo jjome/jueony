@@ -7,8 +7,8 @@ const parity={both:0,even:1,odd:2};
 export function readAgentHeaderFooters(wasm:any,section:number):AgentHeaderFooter[]|undefined {
  const doc=native(wasm);if(typeof doc.getAgentHeaderFooter!=='function'||typeof doc.setAgentHeaderFooterText!=='function')return;
  const definition=parsed(doc.getSectionDef(section));
- let deletionSafe=false;
- try{const controls=parsed(doc.getControls());deletionSafe=typeof doc.deleteHeaderFooter==='function'&&Array.isArray(controls)&&controls.every(c=>c.list===0&&['secd','cold','head','foot'].includes(c.ctrlId));}catch{/* Unknown root/nested controls remain read-only for deletion. */}
+ let plainRoot=false;
+ try{const controls=parsed(doc.getControls());plainRoot=Array.isArray(controls)&&controls.every(c=>c.list===0&&['secd','cold','head','foot'].includes(c.ctrlId));}catch{/* Unknown root/nested controls remain read-only for deletion. */}
  return (['header','footer'] as const).flatMap(story=>(['both','odd','even'] as const).map(pageKind=>{
   try{const r=parsed(doc.getAgentHeaderFooter(section,story==='header',parity[pageKind]));
    if(typeof r.exists!=='boolean'||typeof r.editable!=='boolean'||typeof r.text!=='string'||!Number.isSafeInteger(r.paragraphCount)||r.paragraphCount<0||typeof r.textTruncated!=='boolean'||Array.from(r.text).length>4000||r.editable&&(!r.exists||r.paragraphCount!==1||r.textTruncated||typeof r.token!=='string'||!/^[a-f0-9]{64}$/u.test(r.token)))throw new Error('잘못된 머리말/꼬리말 응답');
@@ -25,8 +25,8 @@ export function readAgentHeaderFooters(wasm:any,section:number):AgentHeaderFoote
     paragraph={alignment:p.alignment,lineSpacing:p.lineSpacing,lineSpacingType:p.lineSpacingType};
    }
    const hidden=definition[story==='header'?'hideHeader':'hideFooter'];
-   return {story,pageKind,exists:r.exists,editable:r.editable,deletable:r.editable&&deletionSafe,text:r.text,textTruncated:r.textTruncated,paragraphCount:r.paragraphCount,...(characters?{characters}:{}),...(paragraph?{paragraph}:{}),...(typeof hidden==='boolean'?{hiddenOnFirstPage:hidden}:{}),...(!r.editable?{reason:typeof r.reason==='string'?r.reason.slice(0,1000):'원본 머리말/꼬리말은 읽기 전용입니다.'}:{})};
-  }catch{return {story,pageKind,exists:null,editable:false,deletable:false,text:'',textTruncated:false,paragraphCount:0,reason:'머리말/꼬리말의 안전한 편집 가능성을 확인하지 못했습니다. 원본은 유지합니다.'};}
+   return {story,pageKind,exists:r.exists,editable:r.editable,deletable:r.editable&&plainRoot&&typeof doc.deleteHeaderFooter==='function',creatable:!r.exists&&r.paragraphCount===0&&r.text===''&&plainRoot&&typeof doc.createHeaderFooter==='function',text:r.text,textTruncated:r.textTruncated,paragraphCount:r.paragraphCount,...(characters?{characters}:{}),...(paragraph?{paragraph}:{}),...(typeof hidden==='boolean'?{hiddenOnFirstPage:hidden}:{}),...(!r.editable?{reason:typeof r.reason==='string'?r.reason.slice(0,1000):'원본 머리말/꼬리말은 읽기 전용입니다.'}:{})};
+  }catch{return {story,pageKind,exists:null,editable:false,deletable:false,creatable:false,text:'',textTruncated:false,paragraphCount:0,reason:'머리말/꼬리말의 안전한 편집 가능성을 확인하지 못했습니다. 원본은 유지합니다.'};}
  }));
 }
 export function executeAgentHeaderFooter(wasm:any,base:Snapshot,op:AgentHeaderFooterOp):void {

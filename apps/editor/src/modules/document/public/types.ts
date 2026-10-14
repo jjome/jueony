@@ -13,12 +13,13 @@ export type AgentMasterPageOp = {kind:'set_master_page_text';section:number;page
 export type AgentSectionOp = {kind:'set_section_tabs';section:number;spacingPt:number} | {kind:'set_line_numbers';section:number;enabled:boolean;restart:LineNumberRestart;countBy:number;startNumber:number;distanceMm:number};
 export type AgentEmptySectionEligibility = {supported:boolean;reason?:string};
 export type AgentEmptySectionOp = {kind:'remove_empty_section';section:number};
+export type AgentHeaderFooterCreateOp = {kind:'create_header_footer';section:number;story:'header'|'footer';pageKind:'both'|'odd'|'even';text:string};
 export type AgentHeaderFooterDeleteOp = {kind:'delete_header_footer';section:number;story:'header'|'footer';pageKind:'both'|'odd'|'even';originalText:string};
 export type AgentHeaderFooterCharacters = {bold:boolean;italic:boolean;underline:boolean;fontSizePt:number;color:string};
 export type AgentHeaderFooterParagraph = {alignment:string;lineSpacing:number;lineSpacingType:string};
 export type AgentHeaderFooterParagraphOp = {kind:'format_header_footer_paragraph';section:number;story:'header'|'footer';pageKind:'both'|'odd'|'even';originalText:string;properties:{alignment?:'left'|'right'|'center'|'justify'|'distribute';lineSpacingPercent?:number}};
 export type AgentHeaderFooterFormatOp = {kind:'format_header_footer';section:number;story:'header'|'footer';pageKind:'both'|'odd'|'even';originalText:string;properties:Partial<AgentHeaderFooterCharacters>};
-export type AgentHeaderFooter = {story:'header'|'footer';pageKind:'both'|'odd'|'even';exists:boolean|null;editable:boolean;deletable?:boolean;paragraphCount:number;text:string;textTruncated:boolean;hiddenOnFirstPage?:boolean;characters?:AgentHeaderFooterCharacters;paragraph?:AgentHeaderFooterParagraph;reason?:string};
+export type AgentHeaderFooter = {story:'header'|'footer';pageKind:'both'|'odd'|'even';exists:boolean|null;editable:boolean;deletable?:boolean;creatable?:boolean;paragraphCount:number;text:string;textTruncated:boolean;hiddenOnFirstPage?:boolean;characters?:AgentHeaderFooterCharacters;paragraph?:AgentHeaderFooterParagraph;reason?:string};
 export type AgentHeaderFooterOp = {kind:'set_header_footer_text';section:number;story:'header'|'footer';pageKind:'both'|'odd'|'even';originalText:string;text:string};
 export type AgentSectionMergeOp = {kind:'merge_sections';rightSection:number};
 export type AgentSectionSplitOp = {kind:'split_section';target:string;offset:number};
@@ -31,6 +32,7 @@ export type BodyOp =
  | { kind: 'replace_body_text'; target: string; start: number; count: number; text: string }
  | { kind: 'delete_body_text'; target: string; start: number; count: number };
 export type ControlOp =
+  | AgentHeaderFooterCreateOp
   | AgentHeaderFooterDeleteOp
   | AgentHeaderFooterParagraphOp
   | AgentHeaderFooterFormatOp

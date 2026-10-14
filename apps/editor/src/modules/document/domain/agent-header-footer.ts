@@ -1,4 +1,4 @@
-import type {AgentHeaderFooterOp,AgentHeaderFooterFormatOp,AgentHeaderFooterParagraphOp,AgentHeaderFooterDeleteOp,Snapshot} from '../public/types.ts';
+import type {AgentHeaderFooterOp,AgentHeaderFooterFormatOp,AgentHeaderFooterParagraphOp,AgentHeaderFooterDeleteOp,AgentHeaderFooterCreateOp,Snapshot} from '../public/types.ts';
 function sourceFor(op:AgentHeaderFooterOp|AgentHeaderFooterFormatOp|AgentHeaderFooterParagraphOp|AgentHeaderFooterDeleteOp,snapshot:Snapshot) {
  const s=snapshot.structure?.sections.find(s=>s.index===op.section);
  if(!Number.isSafeInteger(op.section)||op.section<0||!s||!['header','footer'].includes(op.story)||!['both','odd','even'].includes(op.pageKind))throw new Error('현재 구역·머리말/꼬리말·양쪽/홀짝 종류를 지정하세요.');
@@ -39,4 +39,12 @@ export function validateAgentHeaderFooterParagraph(op:AgentHeaderFooterParagraph
 export function validateAgentHeaderFooterDelete(op:AgentHeaderFooterDeleteOp,snapshot:Snapshot):void {
  const source=sourceFor(op,snapshot);
  if(source.deletable!==true)throw new Error('머리말/꼬리말 정의 삭제는 일반 본문과 단순 머리말/꼬리말만 있는 문서에서 지원합니다. 원본은 유지합니다.');
+}
+
+export function validateAgentHeaderFooterCreate(op:AgentHeaderFooterCreateOp,snapshot:Snapshot):void {
+ const section=snapshot.structure?.sections.find(s=>s.index===op.section);
+ if(!Number.isSafeInteger(op.section)||op.section<0||!section||!['header','footer'].includes(op.story)||!['both','odd','even'].includes(op.pageKind))throw new Error('생성할 현재 구역·머리말/꼬리말·양쪽/홀짝을 지정하세요.');
+ const source=section.headerFooters?.find(h=>h.story===op.story&&h.pageKind===op.pageKind);
+ if(source?.exists!==false||source.creatable!==true||source.paragraphCount!==0||source.text!==''||source.textTruncated)throw new Error('조회된 생성 가능 위치에 저장 정의가 없어야 합니다. 일반 본문과 단순 머리말/꼬리말만 있는 문서에서 새로 만듭니다.');
+ if(typeof op.text!=='string'||Array.from(op.text).length>4000||/[\u0000-\u001f\u007f-\u009f\u2028\u2029\ud800-\udfff]/u.test(op.text))throw new Error('새 머리말/꼬리말은 올바른 Unicode 한 문단 4,000자 이하이며 줄바꿈·탭·제어문자를 넣지 마세요.');
 }

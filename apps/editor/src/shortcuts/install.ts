@@ -9,6 +9,7 @@ import { installCaptionCommands } from '../adapters/rhwp/manual-commands.ts';
 import { installNavigationHistory } from '../adapters/rhwp/navigation-history.ts';
 import { installCalendarStamp } from '../adapters/rhwp/calendar-stamp.ts';
 import { installHangingIndent } from '../adapters/rhwp/hanging-indent.ts';
+import {installTableHeader} from '../adapters/rhwp/table-header.ts';
 import { installTransposeTable } from '../adapters/rhwp/transpose-table.ts';
 import { installDocumentInsertion } from '../adapters/rhwp/document-insertion.ts';
 import { installBasicTextCommands } from '../adapters/rhwp/basic-text-commands.ts';
@@ -26,6 +27,7 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
   installCalendarStamp(registry, input, eventBus);
   installHangingIndent(registry, input);
   installTransposeTable(registry, input, eventBus);
+  installTableHeader(registry,input,eventBus);
   installDocumentInsertion(registry, input, eventBus);
   installBasicTextCommands(registry, input, eventBus);
   installSettingsBackup(registry);

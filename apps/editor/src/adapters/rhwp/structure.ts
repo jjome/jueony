@@ -62,7 +62,8 @@ export function readStructure(wasm: any): Structure {
       cells.push({ index: i, row: info.row, column: info.col, rowSpan: info.rowSpan, columnSpan: info.colSpan, text: texts.join('\n'), editable: Boolean(simple), properties: parsed(doc.getCellProperties(section, paragraph, ci, i)), characters: parsed(doc.getCellCharPropertiesAt(section, paragraph, ci, i, 0, 0)), paragraphProperties: parsed(doc.getCellParaPropertiesAt(section, paragraph, ci, i, 0)) });
     }
     const tableProps=parsed(doc.getTableProperties(section,paragraph,ci)),mode=(['none','cell','row'] as const)[tableProps.pageBreak];
-    tables.push({ ...(mode!==undefined?{pagination:{mode,repeatHeader:tableProps.repeatHeader}}:{}), id: `s${section}p${paragraph}t${ci}`, section, paragraph, control: ci, rows: dimensions.rowCount, columns: dimensions.colCount, cells });
+    const headerRows=cells.every(c=>c.properties.isHeader===false)?0:cells.every(c=>c.properties.isHeader===(c.row===0))?1:null;
+    tables.push({headerRows, ...(mode!==undefined?{pagination:{mode,repeatHeader:tableProps.repeatHeader}}:{}), id: `s${section}p${paragraph}t${ci}`, section, paragraph, control: ci, rows: dimensions.rowCount, columns: dimensions.colCount, cells });
   }
   const styleLinks=parsed(doc.getStyleList()).map((style:any)=>({id:style.id,nextStyleId:style.nextStyleId}));
   const styles=parsed(doc.getStyleList()).map((style:any)=>({id:style.id,name:style.name,type:style.type}));

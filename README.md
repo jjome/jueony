@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-agent-table-pagination-20261014/Start-Review.cmd)**로 실행한다(4296). AI가 본문 단순 표의 쪽 나눔 정책을 셀/행/나누지 않기로 변경한다. 셀 내용·서식·배치를 유지하며 비교·undo/redo·HWP/HWPX 저장 재열기를 지원한다. [사용법·검증·제한](docs/84-agent-table-pagination.md)을 확인한다. 제목 행 반복 설정·복잡한 표와 전체 한글 동등성은 남는다. 이전 스타일 생성/이름 변경/다음 연결과 기존 기능도 포함한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-agent-table-header-20261014/Start-Review.cmd)**로 실행한다(4298). 표 메뉴의 ‘첫 제목 행·반복’과 AI 명령으로 첫 행 전체 지정/해제·반복·쪽 나눔을 한 번에 설정한다. 실제 다음 쪽의 제목 반복·취소/선택 유지·undo/redo·HWP/HWPX 재열기를 검증했다. [사용법·검증·제한](docs/85-table-title-row-repeat.md)을 확인한다. 여러 제목 행·복잡한 표·한글 직접 비교는 남는다. 기존 기능도 포함한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

@@ -30,7 +30,7 @@ export function describeStructure(s?: Structure) {
  if(s.styles)lines.push('문서 스타일 목록 ('+s.styles.length+'개): '+s.styles.map(v=>{const link=s.styleLinks?.find(l=>l.id===v.id),next=s.styles?.find(n=>n.id===link?.nextStyleId);return v.name+' ('+(v.type===0?'문단':'글자')+')'+(v.type===0&&link?' · Enter 후 '+(next?.name??'없는 다음 스타일'): '');}).join('\n'));
  if (!s.tables.length) lines.push('표 없음');
  s.tables.forEach((t, i) => {
-   if(t.pagination)lines.push(`표 ${i+1} 쪽 나눔: ${{none:'나누지 않기',cell:'셀 안에서 나눔',row:'행 사이에서 나눔'}[t.pagination.mode]} · 제목 행 반복 ${t.pagination.repeatHeader?'켜짐':'꺼짐'} (반복 설정 변경은 미지원)`);
+   if(t.pagination)lines.push(`표 ${i+1} 쪽 나눔: ${{none:'나누지 않기',cell:'셀 안에서 나눔',row:'행 사이에서 나눔'}[t.pagination.mode]} · 제목 행 반복 ${t.pagination.repeatHeader?'켜짐':'꺼짐'} · 제목 행 ${t.headerRows===null?'복합 원본':t.headerRows===1?'첫 행 전체':'없음'}`);
    lines.push(`표 ${i + 1}: ${t.rows}행 × ${t.columns}열`);
    for (const c of t.cells) lines.push(`  ${c.row + 1}행 ${c.column + 1}열: ${c.text} · 배경 ${c.properties.fillType === 'none' ? '없음' : c.properties.fillColor}${c.characters ? ' · ' + character(c.characters) : ''}${c.paragraphProperties ? ' · ' + paragraph(c.paragraphProperties) : ''}`);
  });

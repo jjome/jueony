@@ -1,3 +1,4 @@
+import {validateAgentTableHeader} from './agent-table-header.ts';
 import {validateAgentTablePagination} from './agent-table-pagination.ts';
 import {validateAgentNextParagraphStyle} from './agent-style-next.ts';
 import {agentRenameParagraphStyleName} from './agent-style-rename.ts';
@@ -108,6 +109,7 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
   const tabs=operations.filter(op=>op.kind==='set_paragraph_tabs');
   if(tabs.length&&(tabs.length!==operations.length||new Set(tabs.map(op=>(op as {target:string}).target)).size!==tabs.length))fail('문단 탭은 서로 다른 문단의 탭 명령만 한 요청으로 묶어 실행하세요.');
   for (const op of operations) {
+    if(op.kind==='set_table_header'){only(op,['kind','target','headerRows','repeatHeader','paginationMode']);if(operations.length!==1)fail('표 제목 행은 단독 명령으로 실행하세요.');validateAgentTableHeader(op,snapshot);continue;}
     if(op.kind==='set_table_pagination'){only(op,['kind','target','mode']);if(operations.length!==1)fail('표 쪽 나눔은 단독 명령으로 실행하세요.');validateAgentTablePagination(op,snapshot);continue;}
     if(op.kind==='set_next_paragraph_style'){only(op,['kind','styleId','nextStyleId']);if(operations.length!==1)fail('다음 문단 스타일 설정은 단독 명령으로 실행하세요.');validateAgentNextParagraphStyle(op,snapshot);continue;}
     if(op.kind==='rename_paragraph_style'){only(op,['kind','styleId','name']);if(operations.length!==1)fail('문단 스타일 이름 변경은 단독 명령으로 실행하세요.');agentRenameParagraphStyleName(op,snapshot);continue;}

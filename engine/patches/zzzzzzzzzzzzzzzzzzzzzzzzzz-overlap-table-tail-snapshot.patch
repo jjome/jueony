@@ -1,0 +1,122 @@
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -1983,12 +1983,14 @@
+         // [#7114] 어댑터 없는 경로도 같은 저장 프레임을 낸다 — 두 진입점이 다른 조판을
+         // 저장하면 «저장본을 다시 열면 배치가 달라진다» 가 경로마다 갈린다.
+         // 재래핑된 표가 없으면 복제 없이 live IR 을 그대로 쓴다.
+-        if self.render_normalization.text_reflowed_tables.is_empty() {
++        if self.render_normalization.text_reflowed_tables.is_empty()
++            && !self.effective_layout_profile().session_edited() {
+             return crate::serializer::serialize_document(&self.document)
+                 .map_err(|e| HwpError::RenderError(e.to_string()));
+         }
+         let mut snapshot = self.document.clone();
+         self.writeback_reflowed_table_frames(&mut snapshot);
++        self.writeback_edited_overlap_table_tail(&mut snapshot);
+         crate::serializer::serialize_document(&snapshot)
+             .map_err(|e| HwpError::RenderError(e.to_string()))
+     }
+@@ -2193,11 +2195,103 @@
+         }
+     }
+ 
++    /// Persist the resolved origin of an edited, overlapping whole-table tail.
++    /// This changes only the disposable HWP snapshot. Untouched source overlap,
++    /// negative/absolute offsets, text hosts, split tables and multi-page/column
++    /// frames retain their source contracts; allow_overlap is never overridden.
++    fn writeback_edited_overlap_table_tail(&self, snapshot: &mut Document) {
++        use crate::model::control::Control;
++        use crate::renderer::pagination::PageItem;
++        use crate::renderer::float_placement::{object_only_saved_table_anchor, ParagraphFloatFlow};
++        use crate::renderer::render_tree::{RenderNode, RenderNodeType};
++        fn blank_origins(node: &RenderNode, si: usize, origins: &mut std::collections::BTreeMap<usize, Vec<f64>>) {
++            if let RenderNodeType::TextRun(run) = &node.node_type {
++                if run.text.is_empty() && run.section_index == Some(si)
++                    && run.cell_context.is_none() && run.char_start == Some(0) {
++                    if let Some(pi) = run.para_index { origins.entry(pi).or_default().push(node.bbox.y); }
++                }
++            }
++            for child in &node.children { blank_origins(child, si, origins); }
++        }
++        let profile = self.effective_layout_profile();
++        if !profile.native_hwp5_layout() || !profile.session_edited()
++            || !self.dpi.is_finite() || self.dpi <= 0.0 { return; }
++        for (si, section) in self.document.sections.iter().enumerate() {
++            let Some(pagination) = self.pagination.get(si) else { continue; };
++            let [page] = pagination.pages.as_slice() else { continue; };
++            let [column] = page.column_contents.as_slice() else { continue; };
++            if column.zone_layout.is_some() || column.zone_y_offset != 0.0
++                || column.start_height != 0.0 || column.endnote_flow { continue; }
++            let Some(PageItem::FullParagraph { para_index: first }) = column.items.first() else { continue; };
++            if section.paragraphs.get(*first).and_then(|p| p.line_segs.first())
++                .map(|line| line.vertical_pos) != Some(0) { continue; }
++            let page_number: u32 = self.pagination.iter().take(si).map(|p| p.pages.len() as u32).sum();
++            let Ok(tree) = self.build_page_tree(page_number) else { continue; };
++            let mut blank_lines = std::collections::BTreeMap::new();
++            blank_origins(&tree.root, si, &mut blank_lines);
++            for (pi, para) in section.paragraphs.iter().enumerate().skip(1) {
++                let [Control::Table(table)] = para.controls.as_slice() else { continue; };
++                if !table.common.allow_overlap || table.page_break != crate::model::table::TablePageBreak::None
++                    || !object_only_saved_table_anchor(para, table)
++                    || para.stored_text_partition_is_dirty() || para.cell_format_vpos_dirty
++                    || table.common.vert_align != crate::model::shape::VertAlign::Top
++                    || crate::renderer::float_placement::signed_hwpunit(table.common.vertical_offset) < 0 { continue; }
++                // A tail consisting exclusively of whole table hosts has no
++                // later text/source line frame whose original gap we could erase.
++                if section.paragraphs[pi..].iter().any(|host| {
++                    !(host.text.is_empty() && host.controls.is_empty())
++                        && !matches!(host.controls.as_slice(), [Control::Table(t)]
++                            if t.page_break == crate::model::table::TablePageBreak::None
++                                && object_only_saved_table_anchor(host, t))
++                }) { continue; }
++                let previous = &section.paragraphs[pi - 1];
++                let [Control::Table(prior)] = previous.controls.as_slice() else { continue; };
++                if prior.page_break != crate::model::table::TablePageBreak::None
++                    || !object_only_saved_table_anchor(previous, prior) { continue; }
++                if !column.items.iter().any(|item| matches!(item, PageItem::Table { para_index, control_index }
++                    if *para_index == pi - 1 && *control_index == 0))
++                    || !column.items.iter().any(|item| matches!(item, PageItem::Table { para_index, control_index }
++                    if *para_index == pi && *control_index == 0)) { continue; }
++                let Some(placement) = column.paragraph_float_placements.get(&(pi, 0)) else { continue; };
++                if placement.flow != ParagraphFloatFlow::Exclusion || placement.stored_host_origin.is_some()
++                    || !placement.anchor_y.is_finite() || placement.anchor_y < 0.0 { continue; }
++                let origin = (placement.anchor_y * 7200.0 / self.dpi).round();
++                if origin > i32::MAX as f64 { continue; }
++                let [line] = para.line_segs.as_slice() else { continue; };
++                // A positive saved gap is not evidence of a stale backwards anchor.
++                if origin <= line.vertical_pos as f64
++                    || line.tag & crate::model::paragraph::LineSeg::TAG_IMPLEMENTATION_PROPERTY != 0 { continue; }
++                // Root empty successors must retain their actual rendered line
++                // origins too. Otherwise stale lines fall inside the saved table
++                // and disappear as wrap-around blanks after reopening.
++                // Consume the same precise tree used by the public layout query;
++                // do not infer line advances from fallback measurement or clamp.
++                let mut blanks = Vec::new();
++                let mut invalid = false;
++                for (bi, blank) in section.paragraphs.iter().enumerate().skip(pi + 1) {
++                    if !blank.text.is_empty() || !blank.controls.is_empty() { continue; }
++                    let ([line], Some(positions)) = (blank.line_segs.as_slice(), blank_lines.get(&bi)) else { invalid = true; break; };
++                    let [y] = positions.as_slice() else { invalid = true; break; };
++                    let value = ((y - page.layout.body_area.y) * 7200.0 / self.dpi).round();
++                    if !value.is_finite() || value < line.vertical_pos as f64 || value > i32::MAX as f64
++                        || line.tag & crate::model::paragraph::LineSeg::TAG_IMPLEMENTATION_PROPERTY != 0 {
++                        invalid = true; break;
++                    }
++                    blanks.push((bi, value as i32));
++                }
++                if invalid { continue; }
++                snapshot.sections[si].paragraphs[pi].line_segs[0].vertical_pos = origin as i32;
++                for (bi, value) in blanks { snapshot.sections[si].paragraphs[bi].line_segs[0].vertical_pos = value; }
++            }
++        }
++    }
++
+     pub fn prepare_hwp_export_snapshot(&self) -> HwpExportSnapshot {
+         use crate::document_core::converters::hwpx_to_hwp::convert_if_hwpx_source;
+ 
+         let mut snapshot = self.document.clone();
+         self.writeback_reflowed_table_frames(&mut snapshot);
++        self.writeback_edited_overlap_table_tail(&mut snapshot);
+         let _report = convert_if_hwpx_source(&mut snapshot, self.source_format);
+         super::header_footer_ops::lower_header_footer_field_markers(
+             &mut snapshot,

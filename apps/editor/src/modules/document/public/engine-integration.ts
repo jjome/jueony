@@ -40,3 +40,5 @@ export {cellPaddingPlan} from '../domain/cell-padding.ts';
 export {tableMergePlan} from '../domain/table-merge.ts';
 
 export {tableSplitPlan} from '../domain/table-split.ts';
+
+export {tableStructurePlan} from '../domain/table-structure.ts';

@@ -6,7 +6,7 @@ import {generationSchema} from '../src/modules/document/public/wire-schema.mjs';
 import {captureTemplate} from '../src/modules/automation/public/index.ts';
 const op={kind:'rename_paragraph_style' as const,styleId:1,name:'올해 업무'};
 const base=():any=>({revision:'r',name:'fixture.hwpx',nodes:[],limitations:[],structure:{sections:[],paragraphs:[],tables:[],unsupportedControls:[],styles:[{id:0,name:'바탕글',type:0},{id:1,name:'지난 업무',type:0},{id:2,name:'글자',type:1}]},styleRenameSources:{'1':{editable:true,fingerprint:'a'.repeat(64)}}});
-test('rename wire has only stored nondefault style ID and bounded name',()=>{const all=generationSchema().properties.operations.items.anyOf;assert.equal(all.length,47);assert.deepEqual(all.find(x=>x.properties.kind.enum[0]===op.kind)!.required,['kind','styleId','name']);});
+test('rename wire has only stored nondefault style ID and bounded name',()=>{const all=generationSchema().properties.operations.items.anyOf;assert.equal(all.length,49);assert.deepEqual(all.find(x=>x.properties.kind.enum[0]===op.kind)!.required,['kind','styleId','name']);});
 test('rename definition does not need an editable body or mutate input',()=>{const s=base(),old=structuredClone(s);assert.deepEqual(validateEditOperations([op],s),[op]);assert.deepEqual(s,old);});
 test('rename name is NFC and same normalized name is a no-op',()=>{const s=base();assert.equal(agentRenameParagraphStyleName({...op,name:'e\u0301'},s),'é');s.structure.styles[1].name='é';assert.throws(()=>validateEditOperations([{...op,name:'e\u0301'}],s),/현재/);});
 test('duplicate name of paragraph or character style refuses',()=>{for(const name of ['바탕글','글자'])assert.throws(()=>validateEditOperations([{...op,name}],base()),/이미/);});

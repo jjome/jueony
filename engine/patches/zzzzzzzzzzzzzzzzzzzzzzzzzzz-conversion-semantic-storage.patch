@@ -1,0 +1,219 @@
+--- a/src/document_core/commands/table_ops.rs
++++ b/src/document_core/commands/table_ops.rs
+@@ -2764,8 +2764,10 @@
+         // HwpUnit은 u32 저장형이지만 위치 오프셋의 JSON 계약은 부호 있는 값이다.
+         let vert_offset = common.vertical_offset as i32;
+         let horz_offset = common.horizontal_offset as i32;
+-        let restrict_in_page = (table.attr >> 13) & 0x01 != 0;
+-        let allow_overlap = (table.attr >> 14) & 0x01 != 0;
++        // table.attr is only a TAC compatibility mirror for HWPX.
++        // The resolved common values are authoritative in both formats.
++        let restrict_in_page = common.flow_with_text;
++        let allow_overlap = common.allow_overlap;
+         let keep_with_anchor = common.prevent_page_break != 0;
+ 
+         Ok(format!(
+--- a/src/document_core/queries/hwpctrl_sets.rs
++++ b/src/document_core/queries/hwpctrl_sets.rs
+@@ -812,7 +812,17 @@
+                         }
+                     }
+                     let common = match ctrl {
+-                        Control::Table(t) => Some(&mut t.common),
++                        Control::Table(t) => {
++                            // Synthesized tables have no provenance seal and may
++                            // reuse their raw CTRL_HEADER. Keep its known lock bit
++                            // in sync without changing any other stored bytes.
++                            if t.raw_ctrl_data.len() >= 4 {
++                                let mut attr = u32::from_le_bytes(t.raw_ctrl_data[..4].try_into().unwrap());
++                                if locked { attr |= 1 << 30; } else { attr &= !(1 << 30); }
++                                t.raw_ctrl_data[..4].copy_from_slice(&attr.to_le_bytes());
++                            }
++                            Some(&mut t.common)
++                        }
+                         Control::Shape(s) => Some(s.common_mut()),
+                         Control::Picture(p) => Some(&mut p.common),
+                         _ => None,
+--- a/src/parser/body_text/memo_tail.rs
++++ b/src/parser/body_text/memo_tail.rs
+@@ -43,33 +43,57 @@
+         if lists.insert(index, paragraphs).is_some() { return Ok(false); }
+     }
+     // Resolve first. No partial mutation when a duplicate or orphan is found.
++    fn resolve(paragraphs: &[Paragraph], lists: &BTreeMap<u32, Vec<Paragraph>>,
++        targets: &mut BTreeMap<u32, ()>) -> bool {
++        for para in paragraphs {
++            for ctrl in &para.controls {
++                match ctrl {
++                    Control::Field(field) => {
++                        let memo = field.field_type == FieldType::Memo
++                            || (field.ctrl_id == tags::FIELD_UNKNOWN
++                                && field.properties & 0x8000 != 0
++                                && field.command.starts_with("MEMO/"));
++                        if memo && lists.contains_key(&field.memo_index)
++                            && (!field.memo_paragraphs.is_empty()
++                                || targets.insert(field.memo_index, ()).is_some()) { return false; }
++                    }
++                    Control::Table(table) => {
++                        for cell in &table.cells {
++                            if !resolve(&cell.paragraphs, lists, targets) { return false; }
++                        }
++                    }
++                    _ => {}
++                }
++            }
++        }
++        true
++    }
+     let mut targets = BTreeMap::new();
+-    for (pi, para) in body.iter().enumerate() {
+-        for (ci, ctrl) in para.controls.iter().enumerate() {
+-            if let Control::Field(field) = ctrl {
+-                let memo = field.field_type == FieldType::Memo
+-                    || (field.ctrl_id == tags::FIELD_UNKNOWN
+-                        && field.properties & 0x8000 != 0
+-                        && field.command.starts_with("MEMO/"));
+-                if memo && lists.contains_key(&field.memo_index) {
+-                    if !field.memo_paragraphs.is_empty()
+-                        || targets.insert(field.memo_index, (pi,ci)).is_some()
+-                    { return Ok(false); }
++    if !resolve(body, &lists, &mut targets) || targets.len() != lists.len() { return Ok(false); }
++    fn assign(paragraphs: &mut [Paragraph], lists: &mut BTreeMap<u32, Vec<Paragraph>>) {
++        for para in paragraphs {
++            for ctrl in &mut para.controls {
++                match ctrl {
++                    Control::Field(field) => {
++                        let memo = field.field_type == FieldType::Memo
++                            || (field.ctrl_id == tags::FIELD_UNKNOWN
++                                && field.properties & 0x8000 != 0
++                                && field.command.starts_with("MEMO/"));
++                        if memo { if let Some(paragraphs) = lists.remove(&field.memo_index) {
++                            field.memo_paragraphs = paragraphs;
++                            field.field_type = FieldType::Memo;
++                            field.ctrl_id = tags::FIELD_MEMO;
++                            field.properties &= !0x8000;
++                        } }
++                    }
++                    Control::Table(table) => {
++                        for cell in &mut table.cells { assign(&mut cell.paragraphs, lists); }
++                    }
++                    _ => {}
+                 }
+             }
+         }
+     }
+-    if targets.len() != lists.len() { return Ok(false); }
+-    for (index, paragraphs) in lists {
+-        let (pi, ci) = targets[&index];
+-        if let Control::Field(field) = &mut body[pi].controls[ci] {
+-            field.memo_paragraphs = paragraphs;
+-            // The serializer lowers Memo to %unk + marker bit. Restore the
+-            // semantic identity only with this resolved, owned memo body.
+-            field.field_type = FieldType::Memo;
+-            field.ctrl_id = tags::FIELD_MEMO;
+-            field.properties &= !0x8000;
+-        }
+-    }
++    assign(body, &mut lists);
+     Ok(true)
+ }
+--- a/src/parser/hwpx/header.rs
++++ b/src/parser/hwpx/header.rs
+@@ -1102,7 +1102,12 @@
+                         // [#1986] 값 3종(BREAK_WORD/KEEP_WORD/HYPHENATION) — 원문 보존.
+                         // 미보존 시 직렬화가 KEEP_WORD 로 고정해 꼬리말·표셀 재계산
+                         // 줄나눔이 바뀌고 레이아웃(페이지 수)이 갈린다.
+-                        ps.break_latin_word = Some(attr_str(&attr));
++                        let token = attr_str(&attr);
++                        let unit = match token.as_str() {
++                            "HYPHENATION" => 1, "BREAK_WORD" => 2, _ => 0,
++                        };
++                        ps.attr1 = (ps.attr1 & !(0x03 << 5)) | (unit << 5);
++                        ps.break_latin_word = Some(token);
+                     }
+                     b"breakNonLatinWord" => {
+                         // HWP5 ParaShape attr1 bit 7: non-Latin line-break unit.
+--- a/src/parser/hwpx/section.rs
++++ b/src/parser/hwpx/section.rs
+@@ -2621,6 +2621,9 @@
+     }
+     if common.size_protect {
+         attr |= 1 << 20;
++    }
++    if common.locked {
++        attr |= 1 << 30;
+     }
+     if common.hwp5_gen_shape_attr_bit26 {
+         attr |= 1 << 26;
+--- a/src/serializer/body_text.rs
++++ b/src/serializer/body_text.rs
+@@ -169,17 +169,23 @@
+ 
+ fn collect_memo_lists(section: &Section) -> Vec<(u32, Vec<Paragraph>)> {
+     let mut memo_lists = Vec::new();
+-    for para in &section.paragraphs {
+-        for ctrl in &para.controls {
+-            if let Control::Field(field) = ctrl {
+-                if field.field_type == crate::model::control::FieldType::Memo
+-                    && !field.memo_paragraphs.is_empty()
+-                {
+-                    memo_lists.push((field.memo_index, field.memo_paragraphs.clone()));
++    fn collect(paragraphs: &[Paragraph], memo_lists: &mut Vec<(u32, Vec<Paragraph>)>) {
++        for para in paragraphs {
++            for ctrl in &para.controls {
++                match ctrl {
++                    Control::Field(field) if field.field_type == crate::model::control::FieldType::Memo
++                        && !field.memo_paragraphs.is_empty() => {
++                        memo_lists.push((field.memo_index, field.memo_paragraphs.clone()));
++                    }
++                    Control::Table(table) => {
++                        for cell in &table.cells { collect(&cell.paragraphs, memo_lists); }
++                    }
++                    _ => {}
+                 }
+             }
+         }
+     }
++    collect(&section.paragraphs, &mut memo_lists);
+     memo_lists
+ }
+ 
+--- a/src/serializer/control.rs
++++ b/src/serializer/control.rs
+@@ -2194,7 +2194,7 @@
+ /// [#5592] `pack_common_attr_bits` 가 의미 필드에서 재구성하는 비트 전체.
+ ///
+ /// 이 마스크 안은 IR enum/bool 필드가 정본이고, 밖(예: bit 1·27·31, 캡션 bit 29 —
+-/// 방출 직전 `apply_caption_attr_bit` 가 강제, 잠금 bit 30 — pack 미방출이라 raw 보존)
++/// 방출 직전 `apply_caption_attr_bit` 가 강제)
+ /// 은 파스 시점 raw 를 보존한다.
+ const COMMON_ATTR_SEMANTIC_MASK: u32 = 0x01            // treat_as_char
+     | (1 << 2)                                          // affect_line_spacing
+@@ -2210,7 +2210,8 @@
+     | (0x07 << 21)                                      // text_wrap
+     | (0x03 << 24)                                      // text_flow
+     | (1 << 26)                                         // hwp5_gen_shape_attr_bit26
+-    | (1 << 28); // hwp5_gen_shape_attr_bit28
++    | (1 << 28)                                         // hwp5_gen_shape_attr_bit28
++    | (1 << 30); // locked
+ 
+ fn serialize_common_obj_attr(common: &CommonObjAttr) -> Vec<u8> {
+     let mut w = ByteWriter::new();
+@@ -2296,6 +2297,7 @@
+ /// - bit 20: size protect when VertRelTo is Para
+ /// - bit 26: HWPX GenShape storage high bit 후보
+ /// - bit 28: HWPX GenShape numbering category high bit 후보
++/// - bit 30: locked
+ pub(crate) fn pack_common_attr_bits(common: &CommonObjAttr) -> u32 {
+     let mut a: u32 = 0;
+     if common.treat_as_char {
+@@ -2327,6 +2329,9 @@
+     }
+     if common.hwp5_gen_shape_attr_bit28 {
+         a |= 1 << 28;
++    }
++    if common.locked {
++        a |= 1 << 30;
+     }
+     a
+ }

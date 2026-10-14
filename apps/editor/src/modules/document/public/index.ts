@@ -1,3 +1,4 @@
+export type {AgentTableStructureOp,AgentTableStructureSource} from './types.ts';
 export type {AgentTableSplitOp,AgentTableSplitSource} from './types.ts';
 export type {AgentTableMergeOp,AgentTableMergeSource} from './types.ts';
 export type { JsonValue, DocumentProperties, Cell, Table, Structure, BodyNode, Snapshot, BodyOp, ControlOp, EditOp, Receipt } from './types.ts';

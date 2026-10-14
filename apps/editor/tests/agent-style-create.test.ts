@@ -5,7 +5,7 @@ import {generationSchema} from '../src/modules/document/public/wire-schema.mjs';
 import {captureTemplate} from '../src/modules/automation/public/index.ts';
 const op={kind:'create_paragraph_style' as const,sourceStyleId:0,name:'업무 본문'};
 const base=():any=>({revision:'r',name:'new.hwp',nodes:[],limitations:[],styleCreationSources:{'0':{editable:true,fingerprint:'a'.repeat(64)}},structure:{sections:[],paragraphs:[],tables:[],unsupportedControls:[],styles:[{id:0,name:'바탕글',type:0},{id:1,name:'문자',type:1}]}});
-test('style creation wire has name and queried source only',()=>{const all=generationSchema().properties.operations.items.anyOf;assert.equal(all.length,47);assert.deepEqual(all.find(x=>x.properties.kind.enum[0]===op.kind)!.required,['kind','sourceStyleId','name']);});
+test('style creation wire has name and queried source only',()=>{const all=generationSchema().properties.operations.items.anyOf;assert.equal(all.length,49);assert.deepEqual(all.find(x=>x.properties.kind.enum[0]===op.kind)!.required,['kind','sourceStyleId','name']);});
 test('a named definition needs no editable body and does not alter snapshot',()=>{const s=base(),old=structuredClone(s);assert.deepEqual(validateEditOperations([op],s),[op]);assert.deepEqual(s,old);});
 test('names are normalized to NFC and duplicate normalization is rejected',()=>{const s=base();assert.equal(agentCreateParagraphStyleName({...op,name:'e\u0301'},s),'é');s.structure.styles[0].name='é';assert.throws(()=>validateEditOperations([{...op,name:'e\u0301'}],s));});
 test('whitespace, controls, empty and excessive names refuse',()=>{for(const name of ['', ' ', ' 앞', '뒤 ', '줄\n바꿈','c\u0000','x\u2028y','a'.repeat(81),null,1])assert.throws(()=>validateEditOperations([{...op,name}],base()));});

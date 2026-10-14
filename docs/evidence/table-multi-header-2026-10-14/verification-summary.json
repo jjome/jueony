@@ -1,0 +1,107 @@
+{
+  "status": "PASS_SCOPED_AUTOMATED_CHECKS",
+  "checkedAt": "2026-10-14T11:44:49.734Z",
+  "unitPassed": 686,
+  "providerPassed": 52,
+  "wasmPassed": 101,
+  "browserPassed": 117,
+  "moduleCount": 9,
+  "moduleFiles": 279,
+  "reports": [
+    {
+      "category": "table-multi-header-native",
+      "kind": "native",
+      "passed": 16
+    },
+    {
+      "category": "table-multi-header-browser",
+      "kind": "browser",
+      "passed": 20
+    },
+    {
+      "category": "agent-table-header-native",
+      "kind": "native",
+      "passed": 15
+    },
+    {
+      "category": "agent-table-header-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "table-protection-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "table-protection-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "agent-table-pagination-native",
+      "kind": "native",
+      "passed": 15
+    },
+    {
+      "category": "agent-table-pagination-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "table-conversion-native",
+      "kind": "native",
+      "passed": 17
+    },
+    {
+      "category": "table-conversion-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "selected-object-browser",
+      "kind": "browser",
+      "passed": 16
+    },
+    {
+      "category": "styles-native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "style-stories-native",
+      "kind": "native",
+      "passed": 4
+    },
+    {
+      "category": "agent-style-next-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "agent-style-next-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "bundle-compatibility",
+      "kind": "bundle",
+      "passed": 4
+    }
+  ],
+  "customSourceSha256": "970783ce3715c16dfc68d3dbe9ec405e1839f749d3326cf4f775b6b22f99e7c7",
+  "wasmSha256": "ba74ed4ab9e819166e41152036cbd01286fa69f3cac3eeb5a08b4c0b4cad723b",
+  "engineSourceId": "570603c60a53c953",
+  "applicationSourceCommit": "18111a58142552e5746f9f317b724b80aee7ff7a",
+  "applicationSourceDirty": true,
+  "scope": "Current full unit/provider suites and related actual WASM/Edge scenarios: contiguous complete leading multi-row table titles, first-row regression, protected cells, pagination, conversion, selected-object routing, styles and next-style. Not a cumulative full-editor sweep.",
+  "limitations": [
+    "Only complete contiguous leading rows in root simple tables of at most 200 cells. Partial/scattered flags, protected/merged/nested/mixed/caption/inline/overlap/field sources remain unsupported.",
+    "repeatHeader requires at least one title row, a separate body row and row pagination. All rows may be title-only with repetition disabled. No aliases/mixed requests/macro/autosave.",
+    "Actual SVG two/three-row fixtures verify title counts and logical body content with HWP/HWPX reopen. Not an independent Hancom layout reference; oversized or incomplete title blocks refuse from actual per-fragment geometry. Complex pagination and full output parity are unverified.",
+    "Known prior row-policy partial body-cell continuation remains. This increment changes header flags and UI/contracts, not engine pagination/layout.",
+    "App AI protected-table policy is not Native ACL, OS permissions or full Hancom form-mode equivalence. No AI unprotect command.",
+    "Native Hancom and paid model calls NOT_RUN; four synthetic provider protocols used. Native Rust unit suite/engine compile NOT_RUN; unchanged 570603 engine reused and actual WASM scenarios rerun.",
+    "Full documented implementation scope incomplete; automation remains active."
+  ]
+}

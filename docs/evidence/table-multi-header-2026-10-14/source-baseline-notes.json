@@ -1,0 +1,24 @@
+{
+  "implementationCommit": "ed0725ea37a038feeecf2de77d5e78a0c24405fc",
+  "applicationSourceCommit": "18111a58142552e5746f9f317b724b80aee7ff7a",
+  "applicationSourceDirty": true,
+  "customSourceSha256": "970783ce3715c16dfc68d3dbe9ec405e1839f749d3326cf4f775b6b22f99e7c7",
+  "engineSourceId": "570603c60a53c953",
+  "wasmSha256": "ba74ed4ab9e819166e41152036cbd01286fa69f3cac3eeb5a08b4c0b4cad723b",
+  "upstreamReference": "1a76570e833917d15817415a53c09ad61ab3203f",
+  "engineChanged": false,
+  "finalBundle": "build/jueony-table-multi-header-20261014 @4302",
+  "notes": [
+    "Additive headerRows integer extension of existing set_table_header, still 45 command kinds. Current table bounds, repeat requires body rows and row policy, all-title-only permitted with repeat off.",
+    "Only complete contiguous leading title blocks from root simple <=200-cell tables; partial/scattered/merged/protected/nested/mixed/caption/inline/overlap/field originals still protected.",
+    "Same manual dialog and Agent domain/adapter, current source/selection/version check, exact expected preservation, one request/snapshot/undo, dirty/caret/history rollback.",
+    "New multi-row repeat uses actual Native pageCount/getPageControlLayout/getPageInfo on preflight and real execution. Every target fragment must contain complete title cells plus visible body, valid title rectangles inside physical page. Incomplete/oversized/unreadable evidence refuses. No clipping/clamping or layout engine workaround.",
+    "Actual two/three-row SVGs contain every title once per page; 54 BODY labels and second/third lines once overall. Non-title HEAD labels once overall. Repeat-off leaves titles at original start. These are same-engine synthetic observations, not independent Hancom parity.",
+    "80-row/60-title counterexamples refuse in both formats before real mutation; missing/failing layout, absent/incomplete fragments, hidden body and out-of-page title rectangles tested. These sources are marked as refused inputs, not successful edits.",
+    "Unsaved recovery test explicitly accepts beforeunload confirmation; preserves recovered title count/settings/comparison. An initial harness dismissal blocked reload; test corrected without disabling product unload protection.",
+    "Known prior row-policy partial body-cell continuation remains; pagination/renderer unchanged. Complex/tall layout and full Hancom output parity pending.",
+    "Existing immutable 570603 engine reused, no new engine compile or Native Rust unit suite. Actual WASM tests rerun.",
+    "Current full unit/provider suites and listed table/next-style/style regressions only; not historical cumulative editor sweep. Four synthetic provider protocols, no paid model calls. Native Hancom comparison NOT_RUN.",
+    "Full documented implementation incomplete; automation remains active."
+  ]
+}

@@ -151,6 +151,20 @@ export function installHangulChrome({ wasm, eventBus, documentState, automation 
   const styleSelect = document.getElementById('style-name') as HTMLSelectElement;
   let styleSignature = '';
   function syncStyles() {
+    // Definitions can change through Agent snapshots, imports and undo/redo without a reload.
+    try {
+      const stored = wasm.getStyleList();
+      const names = stored.map(style => `${style.id}:${style.name}`).join('|');
+      const current = [...styleSelect.options].map(option => `${option.value}:${option.textContent}`).join('|');
+      if (names !== current) {
+        const selected = styleSelect.value;
+        styleSelect.replaceChildren(...stored.map(style => {
+          const option = document.createElement('option');
+          option.value = String(style.id); option.textContent = style.name; return option;
+        }));
+        if (stored.some(style => String(style.id) === selected)) styleSelect.value = selected;
+      }
+    } catch { /* No active document yet; keep the existing dropdown until load. */ }
     const signature = [...styleSelect.options].map(option => `${option.value}:${option.textContent}`).join('|');
     if (signature !== styleSignature) {
       styleSignature = signature; styleList.replaceChildren();
@@ -170,7 +184,11 @@ export function installHangulChrome({ wasm, eventBus, documentState, automation 
   try { initiallyOpen = localStorage.getItem('jueony-style-panel') !== 'false'; } catch { /* 기본 보기 */ }
   setPanel(initiallyOpen);
   new MutationObserver(syncStyles).observe(styleSelect, { childList: true });
-  eventBus.on('cursor-style-changed', syncStyles);
+  eventBus.on('cursor-style-changed', (info) => {
+    syncStyles();
+    styleSelect.value = String((info as { id: number }).id);
+    syncStyles();
+  });
 
   const documentBar = document.createElement('div'); documentBar.id = 'jueony-document-tabs';
   const current = document.createElement('span'); current.className = 'j-document-tab';

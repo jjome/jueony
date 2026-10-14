@@ -1,0 +1,17 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {validateEditOperations,describeStructure} from '../src/modules/document/public/index.ts';
+import {agentCreateParagraphStyleName} from '../src/modules/document/public/engine-integration.ts';
+import {generationSchema} from '../src/modules/document/public/wire-schema.mjs';
+import {captureTemplate} from '../src/modules/automation/public/index.ts';
+const op={kind:'create_paragraph_style' as const,sourceStyleId:0,name:'업무 본문'};
+const base=():any=>({revision:'r',name:'new.hwp',nodes:[],limitations:[],styleCreationSources:{'0':{editable:true,fingerprint:'a'.repeat(64)}},structure:{sections:[],paragraphs:[],tables:[],unsupportedControls:[],styles:[{id:0,name:'바탕글',type:0},{id:1,name:'문자',type:1}]}});
+test('style creation wire has name and queried source only',()=>{const all=generationSchema().properties.operations.items.anyOf;assert.equal(all.length,41);assert.deepEqual(all.find(x=>x.properties.kind.enum[0]===op.kind)!.required,['kind','sourceStyleId','name']);});
+test('a named definition needs no editable body and does not alter snapshot',()=>{const s=base(),old=structuredClone(s);assert.deepEqual(validateEditOperations([op],s),[op]);assert.deepEqual(s,old);});
+test('names are normalized to NFC and duplicate normalization is rejected',()=>{const s=base();assert.equal(agentCreateParagraphStyleName({...op,name:'e\u0301'},s),'é');s.structure.styles[0].name='é';assert.throws(()=>validateEditOperations([{...op,name:'e\u0301'}],s));});
+test('whitespace, controls, empty and excessive names refuse',()=>{for(const name of ['', ' ', ' 앞', '뒤 ', '줄\n바꿈','c\u0000','x\u2028y','a'.repeat(81),null,1])assert.throws(()=>validateEditOperations([{...op,name}],base()));});
+test('character style, missing source and bad source IDs refuse',()=>{for(const sourceStyleId of [1,2,-1,1.5,NaN,'0',null])assert.throws(()=>validateEditOperations([{...op,sourceStyleId}],base()));});
+test('source capability and fingerprint are required',()=>{for(const mode of ['missing','readonly','fingerprint']){const s=base();if(mode==='missing')delete s.styleCreationSources;if(mode==='readonly')s.styleCreationSources[0].editable=false;if(mode==='fingerprint')delete s.styleCreationSources[0].fingerprint;assert.throws(()=>validateEditOperations([op],s));}});
+test('256 stored definitions are a hard cap including character styles',()=>{const s=base();s.structure.styles=Array.from({length:256},(_,id)=>({id,name:'항목'+id,type:0}));assert.throws(()=>validateEditOperations([op],s));});
+test('resource IDs, native token, next-style, target and force injection refuse',()=>{for(const key of ['paraShapeId','charShapeId','token','nextStyleId','target','force','fontSize'])assert.throws(()=>validateEditOperations([{...op,[key]:0}],base()));});
+test('creation is isolated and is not a repeated macro',()=>{assert.throws(()=>validateEditOperations([op,op],base()));assert.throws(()=>captureTemplate('스타일',[op],base()));});
+test('comparison visibly includes definition names when the body does not change',()=>{const s=base();assert.match(describeStructure(s.structure),/문서 스타일 목록.*바탕글/);});

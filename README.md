@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-agent-outline-20261014-v2/Start-Review.cmd)**로 실행한다(4286). AI가 문서에 저장된 구역 개요 모양을 사용해 일반 본문 7수준을 지정·변경·해제하고 다른 문단의 개요 명령을 한 요청으로 되돌린다. 본문 서식과 공유 번호 정의는 유지한다. [사용법·검증·제한](docs/80-agent-paragraph-outline.md)을 확인한다. [기본 숫자 번호 생성](docs/79-agent-basic-numbering.md)·[정규 번호 모양 복제](docs/78-agent-numbering-clone.md)·[글머리표 생성](docs/77-agent-basic-bullets.md)도 포함한다. 개요 모양 변경·목차·문단 restart 저장·한글 직접 비교·전체 동등성은 남는다. 기존 실행 창과 사용자 문서는 유지한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-agent-style-create-20261014/Start-Review.cmd)**로 실행한다(4288). AI가 저장된 문단 스타일의 글자·문단 모양을 참조하는 새 스타일을 만들고 후속 요청에서 본문에 적용한다. 변경 비교·요청 undo/redo·저장 재열기를 지원한다. [사용법·검증·제한](docs/81-agent-paragraph-style-create.md)을 확인한다. [구역 개요 수준](docs/80-agent-paragraph-outline.md)과 이전 기본 번호/글머리표도 포함한다. 스타일 정의 수정·삭제·상속, 개요 모양/목차, 명시적 문단 restart 저장과 한글 직접 비교·전체 동등성은 남는다. 이전 실행 창과 사용자 문서는 유지한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

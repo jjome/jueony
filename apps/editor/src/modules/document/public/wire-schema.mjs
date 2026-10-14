@@ -7,7 +7,7 @@ const characters = {bold:bool,italic:bool,underline:bool,strikethrough:bool,font
 const operation = (kind, fields) => object({ kind: { type: 'string', enum: [kind] }, ...fields });
 export function controlSchemas() {
  return [
-  operation('set_table_header',{target:text,headerRows:{type:'integer',minimum:0,maximum:1},repeatHeader:bool,paginationMode:{type:'string',enum:['none','cell','row']}}),
+  operation('set_table_header',{target:text,headerRows:{type:'integer',minimum:0,maximum:200},repeatHeader:bool,paginationMode:{type:'string',enum:['none','cell','row']}}),
   operation('set_table_pagination',{target:text,mode:{type:'string',enum:['none','cell','row']}}),
   operation('set_next_paragraph_style',{styleId:{type:'integer',minimum:1,maximum:255},nextStyleId:{type:'integer',minimum:0,maximum:255}}),
   operation('rename_paragraph_style',{styleId:{type:'integer',minimum:1,maximum:255},name:{type:'string',minLength:1,maxLength:80}}),

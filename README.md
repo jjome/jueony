@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-table-protection-20261014/Start-Review.cmd)**로 실행한다(4300). 보호 셀의 AI 내용·서식·행/열 편집 우회를 차단하고, 비보호 이웃의 편집과 배경색 변경은 보호 셀의 내용/경계선을 유지한다. 실제 Native 보호 재검사·실패 원복·undo/redo·HWP/HWPX 재열기를 검증했다. [수정 전 재현·정책·검증·제한](docs/86-ai-table-protection.md)을 확인한다. 첫 제목 행 반복과 기존 기능도 포함하며 복잡한 표·한글 직접 비교는 남는다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-table-multi-header-20261014/Start-Review.cmd)**로 실행한다(4302). 맨 위의 연속 제목 행 수 지정·반복/해제를 수동 창과 Agent 공통 명령으로 지원한다. 2/3행 반복의 실제 조각·본문 보존, 너무 큰 제목 블록 거절·undo/redo·HWP/HWPX 재열기·미저장 업무 복원을 검증한다. [지원 범위·검증·제한](docs/87-table-multiple-title-rows.md)을 확인한다. 기존 보호 셀 검사도 유지하며 복잡한 표·한글 직접 비교는 남는다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

@@ -32,3 +32,5 @@ export {validateAgentNextParagraphStyle} from '../domain/agent-style-next.ts';
 export {validateAgentTablePagination} from '../domain/agent-table-pagination.ts';
 
 export {validateAgentTableHeader} from '../domain/agent-table-header.ts';
+
+export {cellPaddingPlan} from '../domain/cell-padding.ts';

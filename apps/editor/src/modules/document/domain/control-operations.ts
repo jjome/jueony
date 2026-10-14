@@ -1,3 +1,4 @@
+import {cellPaddingPlan} from './cell-padding.ts';
 import {validateAgentTableHeader} from './agent-table-header.ts';
 import {validateAgentTablePagination} from './agent-table-pagination.ts';
 import {validateAgentNextParagraphStyle} from './agent-style-next.ts';
@@ -29,7 +30,7 @@ export const mm = (v: number) => Math.round(v * 7200 / 25.4);
 type PropertyRule = 'boolean' | 'font' | 'color' | [number, number] | string[];
 export const charRules: Record<string, PropertyRule> = { bold: 'boolean', italic: 'boolean', underline: 'boolean', strikethrough: 'boolean', fontSizePt: [1, 200], color: 'color',fontFamily:'font',ratioPercent:[50,200],spacingPercent:[-50,50],superscript:'boolean',subscript:'boolean' };
 const paraRules: Record<string, PropertyRule> = { alignment: ['left', 'right', 'center', 'justify', 'distribute'], lineSpacingPercent: [50, 500], marginLeftMm: [0, 100], marginRightMm: [0, 100], indentMm: [-100, 100], beforeMm: [0, 100], afterMm: [0, 100], keepWithNext: 'boolean', keepLines: 'boolean', pageBreakBefore: 'boolean' };
-const cellRules: Record<string, PropertyRule> = { ...charRules, background: 'color', alignment: paraRules.alignment, verticalAlignment: ['top', 'center', 'bottom'] };
+const cellRules: Record<string, PropertyRule> = { ...charRules, background: 'color', alignment: paraRules.alignment, verticalAlignment: ['top', 'center', 'bottom'],paddingMode:['custom','table'],paddingLeftMm:[0,100],paddingRightMm:[0,100],paddingTopMm:[0,100],paddingBottomMm:[0,100] };
 const pageRules: Record<string, PropertyRule> = { widthMm: [20, 1000], heightMm: [20, 1000], landscape: 'boolean', marginLeftMm: [0, 300], marginRightMm: [0, 300], marginTopMm: [0, 300], marginBottomMm: [0, 300], marginHeaderMm: [0, 100], marginFooterMm: [0, 100] };
 function properties(value: unknown, rules: Record<string, PropertyRule>) {
   const v = object(value);
@@ -210,6 +211,7 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
         only(op, ['kind', 'target', 'startRow', 'rowCount', 'startColumn', 'columnCount', 'properties']);
         integer(op.startRow, 0, table!.rows - 1); integer(op.rowCount, 1, table!.rows - op.startRow); integer(op.startColumn, 0, table!.columns - 1); integer(op.columnCount, 1, table!.columns - op.startColumn);
         properties(op.properties, cellRules);
+        if(Object.keys(op.properties).some(k=>k.startsWith('padding'))){if(operations.length!==1)fail('셀 안 여백은 단독 요청으로 실행하세요.');cellPaddingPlan(op,snapshot);}
         const cells = selectedCells(table!, op);if(cells.some(c=>c.properties.cellProtect===true))fail('보호 셀은 AI로 서식을 수정하지 않습니다.');
         if (cells.length !== op.rowCount * op.columnCount || cells.some(c => !c.editable || c.properties.cellProtect===true || c.rowSpan !== 1 || c.columnSpan !== 1)) fail('병합 셀 또는 복잡한 셀 서식은 아직 지원하지 않습니다.');
         if (Object.keys(op.properties).some(k => k in charRules) && cells.some(c => !c.text)) fail('빈 셀의 글자 서식은 텍스트 입력 후 적용하세요.');

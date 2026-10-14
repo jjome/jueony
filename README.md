@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-table-multi-header-20261014/Start-Review.cmd)**로 실행한다(4302). 맨 위의 연속 제목 행 수 지정·반복/해제를 수동 창과 Agent 공통 명령으로 지원한다. 2/3행 반복의 실제 조각·본문 보존, 너무 큰 제목 블록 거절·undo/redo·HWP/HWPX 재열기·미저장 업무 복원을 검증한다. [지원 범위·검증·제한](docs/87-table-multiple-title-rows.md)을 확인한다. 기존 보호 셀 검사도 유지하며 복잡한 표·한글 직접 비교는 남는다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-cell-padding-20261014/Start-Review.cmd)**로 실행한다(4304). HWPX 셀 안 여백 네 방향 지정·표 기본값 복귀를 Agent에 연결하고 기존 수동 창에서도 값을 확인한다. 실제 편집/저장 사본 배치·undo/redo·저장 재열기·미저장 복원을 검증한다. HWP는 확인된 글줄 배치 차이로 이 AI 기능을 거절하며 성공으로 표시하지 않는다. [지원 범위·검증·HWP 제한](docs/88-agent-cell-inner-padding.md)을 확인한다. 여러 제목 행과 기존 보호 검사도 유지한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

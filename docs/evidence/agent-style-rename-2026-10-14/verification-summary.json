@@ -1,0 +1,123 @@
+{
+  "status": "PASS_SCOPED_AUTOMATED_CHECKS",
+  "checkedAt": "2026-10-14T09:25:44.267Z",
+  "unitPassed": 641,
+  "providerPassed": 52,
+  "wasmPassed": 196,
+  "browserPassed": 100,
+  "moduleCount": 9,
+  "moduleFiles": 269,
+  "reports": [
+    {
+      "category": "agent-style-rename-native",
+      "kind": "native",
+      "passed": 19
+    },
+    {
+      "category": "agent-style-rename-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "styles-native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "style-stories-native",
+      "kind": "native",
+      "passed": 4
+    },
+    {
+      "category": "agent-style-create-native",
+      "kind": "native",
+      "passed": 13
+    },
+    {
+      "category": "agent-style-create-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "agent-outline-native",
+      "kind": "native",
+      "passed": 23
+    },
+    {
+      "category": "agent-basic-numbering-native",
+      "kind": "native",
+      "passed": 25
+    },
+    {
+      "category": "agent-numbering-native",
+      "kind": "native",
+      "passed": 17
+    },
+    {
+      "category": "agent-bullets-native",
+      "kind": "native",
+      "passed": 26
+    },
+    {
+      "category": "agent-lists-native",
+      "kind": "native",
+      "passed": 23
+    },
+    {
+      "category": "agent-para-tabs-native",
+      "kind": "native",
+      "passed": 20
+    },
+    {
+      "category": "agent-para-box-native",
+      "kind": "native",
+      "passed": 20
+    },
+    {
+      "category": "agent-outline-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "agent-basic-numbering-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "agent-numbering-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "agent-bullets-browser",
+      "kind": "browser",
+      "passed": 15
+    },
+    {
+      "category": "agent-lists-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "bundle-compatibility",
+      "kind": "bundle",
+      "passed": 4
+    }
+  ],
+  "customSourceSha256": "6fe56d98a31b48d00326ed27a6ba3b9d512c8888dcc4c2e4efc22325089c6058",
+  "wasmSha256": "ba74ed4ab9e819166e41152036cbd01286fa69f3cac3eeb5a08b4c0b4cad723b",
+  "engineSourceId": "570603c60a53c953",
+  "applicationSourceCommit": "503d41532bfd115aada99c885786ecaac780ca90",
+  "applicationSourceDirty": true,
+  "scope": "Current build: full unit/provider suites, new style-rename/independent metadata-loss scenarios, style creation/reorder/delete/story and related outline/list/bullet/tab/decoration regressions only. This is NOT the cumulative 77-profile full editor sweep.",
+  "limitations": [
+    "Rename one nondefault paragraph style name only; no English/next/shape/type/language/lock edits. Field documents, character/locked/noncanonical raw HWP definitions protected.",
+    "Append one paragraph-style definition referencing exact stored source char/para shapes; self next style, empty English name, Korean language and unlocked. Separate apply; no custom shapes, inheritance, rename/delete or macro.",
+    "Ordinary body stored section outline levels 0..6/relevel/clear; distinct-target outline-only batch, one request undo. No definition creation/change or builtin fallback; divergent direct references remain protected.",
+    "Extended/noncanonical raw resource cloning remains protected; new default resources can be added without reducing original blank HWP definitions.",
+    "Explicit stored paragraph restart remains unserialized and strict save/recovery remains blocked on truthful content loss.",
+    "No arbitrary new numbering format, section outline shape changes, outline TOC, image/check list, macro or automatic save.",
+    "Native Hancom comparison and paid LLM calls NOT_RUN. Native Rust unit tests NOT_RUN; fresh 570603 engine compiled with read-only style metadata getter and actual WASM scenarios rerun.",
+    "Full documented implementation scope incomplete; no percentage inferred."
+  ]
+}

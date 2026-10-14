@@ -1,0 +1,20 @@
+{
+  "implementationCommit": "30f34f78b6431baf7e9a4727d8bb2e942e15395f",
+  "applicationSourceCommit": "503d41532bfd115aada99c885786ecaac780ca90",
+  "applicationSourceDirty": true,
+  "customSourceSha256": "6fe56d98a31b48d00326ed27a6ba3b9d512c8888dcc4c2e4efc22325089c6058",
+  "engineSourceId": "570603c60a53c953",
+  "wasmSha256": "ba74ed4ab9e819166e41152036cbd01286fa69f3cac3eeb5a08b4c0b4cad723b",
+  "upstreamReference": "1a76570e833917d15817415a53c09ad61ab3203f",
+  "engineChanged": true,
+  "patch": "zzzzzzzzzzzzzzzzzzz-agent-style-metadata.patch",
+  "finalBundle": "build/jueony-agent-style-rename-20261014 @4292",
+  "notes": [
+    "Fresh immutable engine copy compiled in WSL; previous c1700 engine and review servers retained.",
+    "Read-only Native metadata API compares raw HWP style bytes with canonical serializer reconstruction. No unsupported opaque bytes discarded for AI rename.",
+    "Stored language and lock joined common preservation comparisons; actual XML-only metadata drift and HWP lock-loss detected despite identical legacy getters.",
+    "Only one localized paragraph style name changes. ID/English/next/type/shape resources/language/lock preserved. Default/character/locked/raw-extended/field documents protected.",
+    "New style creation explicitly uses Korean/unlocked metadata instead of cloning source metadata.",
+    "Expected unrelated restart-loss save rejections remain blocked. Native Rust unit tests and native Hancom/paid model calls NOT_RUN. Full editor scope incomplete; automation remains active."
+  ]
+}

@@ -29,3 +29,15 @@
 검수본은 `build/jueony-agent-style-rename-20261014/Start-Review.cmd`, 주소 `http://127.0.0.1:4292/`다. 이전 4290/4288 등 실행 묶음과 사용자 파일은 유지한다. 자체 합성 HWP/HWPX 검수 파일과 원본·제한·해시를 함께 제공한다. `raw-tail-fixture.hwp`는 이름 변경 성공 파일이 아니라 확장 원본을 보호하는지 확인하는 입력이다. language/lock fixture는 보존 검사의 독립 반례로도 사용한다. fixture Python 도우미는 자체 제작 소형 CFB/ZIP에만 사용하며 제품 파일 저장기가 아니다.
 
 최종 검사 수·커밋·파일 해시는 아래에 기록한다. 전체 문서화된 구현 범위는 아직 미완료다.
+
+## 최종 결과
+
+구현 `30f34f7` 커밋·푸시 완료. 전체 단위 641·provider/server 52·관련 실제 WASM 196·브라우저 100(묶음 호환 4 포함) 통과. 신규 WASM 19·신규 Edge 13과 이전 생성/개요/번호/목록/글머리표·탭/테두리·스타일 이동/삭제·특수 영역의 관련 회귀 범위다. 이전 전체 편집기 누적 검사를 이번에 모두 실행한 수치가 아니다. TypeScript와 9개 모듈·269개 소스 경계도 통과했다. 예상 밖 page/console 오류·외부 자산 요청은 0건이며 관련 글머리표의 의도한 손실 저장 차단 2건은 따로 기록한다. Native Rust unit tests는 미실행이고, 새 WASM은 WSL에서 직접 컴파일해 실행했다. [검사별 결과](evidence/agent-style-rename-2026-10-14/verification-summary.json)를 따른다.
+
+한국어·따옴표/역슬래시/이모지·NFC 이름, 256개 정의, 본문/셀의 ID 유지, 동일 이름/중복/기본/글자/잠금/확장 원본/필드 문서 거절, stale 이름/모양/목록·지연 모델 충돌, 잘못된 성공과 요청 밖 영어 이름/다음 연결/본문/글꼴/자원 변경, live 실패 전체 복원·커서·수동 UI·직접 입력·undo/redo·파일 재열기·업무 복원을 확인했다. 네 제공자는 실제 adapter의 합성 프로토콜 검사이며 실제 유료 모델 호출·품질 검수가 아니다.
+
+독립적으로 langID/lockForm만 바꾼 HWPX를 만들어 기존 스타일 목록과 저장 모양 getter는 같은데 새 저장 보존 검사가 styles 차이를 차단함을 확인했다. HWPX 잠금 정의를 HWP로 변환한 실제 사본에서는 lockForm이 true→false이며 다른 legacy 스타일 값은 같고 새 styles 보존 증거가 거절함을 확인했다. 보호된 HWP 꼬리 UINT16을 0x1234로 바꾼 실제 CFB 입력은 이름 변경을 거절하고 다시 저장해도 rawCanonical=false를 유지한다. 손실을 숨기거나 보호 기준을 완화하지 않았다.
+
+앱 소스 SHA-256 `6fe56d98a31b48d00326ed27a6ba3b9d512c8888dcc4c2e4efc22325089c6058`, 엔진 `570603c60a53c953`, WASM SHA-256 `ba74ed4ab9e819166e41152036cbd01286fa69f3cac3eeb5a08b4c0b4cad723b`. 빌드의 503d415/dirty=true는 구현 30f34f7의 실제 소스/추적 패치 해시로 연결한다. 4292 검수 서버의 실제 앱/WASM과 공통 wire/provider 계약도 대조했다. [실행 대조](evidence/agent-style-rename-2026-10-14/launch-check.json), [원본·제한](evidence/agent-style-rename-2026-10-14/source-baseline-notes.json)를 따른다.
+
+한글 확인용 합성 문서는 성공 편집 결과 17개와 보호/독립 반례 입력 10개를 구분해 제공한다. renamed-*·manual-renamed-style은 이름 변경 결과, created-explicit-metadata는 생성 메타데이터 확인 결과다. language/lock/raw-tail의 source/fixture는 입력 또는 손실 반례이며 이름 변경 성공으로 표시하지 않는다. [역할·파일 해시·한글 확인 순서](evidence/agent-style-rename-2026-10-14/style-rename-documents.json)를 확인한다. 실제 한글 직접 비교·유료 모델 품질·스타일 모양/다음 연결 수정·삭제·상속·문단 restart 저장과 전체 동등성은 남아 있으며 자동화를 유지한다.

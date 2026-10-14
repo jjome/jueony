@@ -37,3 +37,13 @@ HWP 진단 파일은 별도의 diagnostic-hwp 폴더에 보관하며 성공 편�
 실제 HWPX 안 여백/표 기본값 복귀·비활성 값 유지·다른 셀/테두리/저장 크기 보존·빈 셀·실제 글자 시작점/행 높이 관계·저장 재열기·undo/redo·수동 창 값·업무 복원을 검사한다. 누락/범위/혼합 요청·너비 초과·보호 원본·HWP·변장한 HWP·두 번째 셀 실패·다른 속성/배치 오염·지연 충돌을 검사한다. 같은 엔진의 사본 검사이며 독립 한글 조판 동등성은 아직 미검증이다.
 
 표 크기/균등 분배·테두리·병합/분할·복잡한 표, HWP 안 여백 배치 수정과 남은 고급 기능은 미완료다. 전체 구현 범위가 실제 완료될 때까지 자동화를 유지한다.
+
+## 최종 결과
+
+구현 `ba3241d` 커밋·푸시 완료. 전체 단위 695·provider/server 52·관련 실제 WASM 114·브라우저 130(묶음 호환 4 포함) 통과. 신규 안 여백 검사는 WASM 13·Edge 13이며 지원 성공뿐 아니라 HWP/원본/범위 거절·실패 복원·알려진 Native 진단 사례를 포함한다. 기존 여러/첫 제목 행·보호 셀·쪽 나눔·표 변환/꾸미기/채우기/뒤집기·선택 개체·스타일·다음 스타일 Enter 관련 회귀다. 과거 전체 편집기 누적 검사를 모두 실행한 수치는 아니다. TypeScript와 9개 모듈·281개 소스 경계도 통과했고 예상 밖 page/console 오류·외부 자산 요청은 0건이다. [검사별 결과](evidence/cell-padding-2026-10-14/verification-summary.json)를 따른다.
+
+HWPX 네 방향 지정/상속 복귀·비활성 값 유지·너비/누락/혼합/no-op·보호 원본 거절, 다른 셀/표·테두리·저장 크기 보존, 빈 셀·실제 글자 시작/행 높이·저장 사본 배치, 요청 undo/redo·수동 셀 탭 표시·취소·두 번째 셀/다른 속성/배치 오염 복원·지연 충돌·미저장 업무 복원을 확인했다. 설정/비교/미지원 안내 화면을 육안 확인했다. HWP와 변장 HWP의 배치 차이를 숨기지 않고 명령을 거절한다.
+
+[성공 HWPX 출력 11개·미지원 HWP 입력 2개·Native 배치 진단 HWP 5개 및 한글 확인 순서](evidence/cell-padding-2026-10-14/cell-padding-documents.json)를 분리했다. diagnostic-hwp의 파일은 성공 출력으로 집계하지 않는다. [Native 관찰](evidence/cell-padding-2026-10-14/cell-padding-native/diagnostic-hwp/observation.json)의 편집/재열기 y 차이는 여전히 미해결이다. 자동 변환이나 원본 덮어쓰기를 하지 않는다.
+
+앱 소스 SHA-256 `4a4061e258c94bd21537278ec4178b3eca305094c69a57d76a82380415f3cca0`, 기존 엔진 `570603c60a53c953`, WASM SHA-256 `ba74ed4ab9e819166e41152036cbd01286fa69f3cac3eeb5a08b4c0b4cad723b`. 빌드의 07c4e51/dirty=true를 구현 커밋의 실제 소스·패치 해시와 대조했다. [4304 실제 실행 대조](evidence/cell-padding-2026-10-14/launch-check.json), [원본·제한](evidence/cell-padding-2026-10-14/source-baseline-notes.json)를 따른다. 유료 모델·실제 한글 비교와 Native Rust unit tests/새 엔진 빌드는 미실행이며 전체 범위는 아직 미완료다.

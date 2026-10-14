@@ -1,0 +1,24 @@
+{
+  "implementationCommit": "ba3241d218e8ce8ab066fee0138879e0cd88332a",
+  "applicationSourceCommit": "07c4e51e649fcedddcbb4edf25272fa63983ba3d",
+  "applicationSourceDirty": true,
+  "customSourceSha256": "4a4061e258c94bd21537278ec4178b3eca305094c69a57d76a82380415f3cca0",
+  "engineSourceId": "570603c60a53c953",
+  "wasmSha256": "ba74ed4ab9e819166e41152036cbd01286fa69f3cac3eeb5a08b4c0b4cad723b",
+  "upstreamReference": "1a76570e833917d15817415a53c09ad61ab3203f",
+  "engineChanged": false,
+  "finalBundle": "build/jueony-cell-padding-20261014 @4304",
+  "notes": [
+    "HWPX-only additive extension of existing format_table_cells, still 45 kinds. Custom requires all four sides, table mode disables individual application without clearing stored values.",
+    "Domain and native adapter responsibilities separate; queried eligibility/fingerprint/defaults, known protection flags, current real table and exact whole-document preservation rechecked. Existing non-padding cell-format behavior retained.",
+    "Padding-only one request, no aliases/mixed styles/batches/macro/autosave. Simple root <=200 cells with protected/mixed/merged/nested/fields/vertical text/complex placement excluded. Left+right must leave positive content width.",
+    "Additional actual page/table/cell/text-run geometry comparison versus saved/reopened HWPX, response rounding tolerance 0.2px. Missing or changed evidence refuses; no clipping/clamping or hidden success.",
+    "Raw Native HWP setters preserve logical padding but a self-authored specimen shows live y162.5 vs reopened y166.3. Cause in stored-line/reflow/writer paths remains to be traced; no engine fix or Hancom parity claimed.",
+    "HWP source is explicitly readonly for this AI feature. Renamed HWP also refuses via actual live/reopened layout check and restores whole request. Raw Native HWP diagnostic outputs are segregated from 11 successful HWPX outputs and 2 unchanged unsupported inputs.",
+    "Manual existing cell-properties dialog displays the same values and cancel does not change bytes/history; no manual HWP protection or all manual-save behavior fix claimed.",
+    "Native cell/text/geometry relations, empty cells, rollback of second-cell/unrequested metadata/layout changes, delayed user-edit conflict and unsaved beforeunload-confirmed recovery tested.",
+    "Full unit/provider suites and listed table/title/protection/pagination/conversion/style/next-style regressions only, not historical cumulative editor sweep.",
+    "Four actual provider adapters with synthetic protocols, Native Hancom and paid calls NOT_RUN. Existing unchanged 570603 engine reused; no new engine compile/Native Rust unit suite.",
+    "Full documented scope incomplete; automation remains active."
+  ]
+}

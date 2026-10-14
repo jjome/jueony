@@ -1,0 +1,161 @@
+{
+  "counts": {
+    "unsupported-format-source-input": 2,
+    "successful-hwpx-edit-output": 11,
+    "unresolved-native-layout-diagnostic": 5
+  },
+  "documents": [
+    {
+      "path": "cell-padding-native/diagnostic-hwp/native-padding-layout.hwp",
+      "role": "unresolved-native-layout-diagnostic",
+      "bytes": 13312,
+      "sha256": "bed8e9a7b46a74c2f7b6375155cc978f04c18091a3eb854a8e1aa6f14b2c4c70",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "cell-padding-native/diagnostic-hwp/padding-custom.hwp",
+      "role": "unresolved-native-layout-diagnostic",
+      "bytes": 13312,
+      "sha256": "57e322143ac744979871e7915a064809ed2690e6effb8b423123c9be020a4bc2",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "cell-padding-native/diagnostic-hwp/padding-layout.hwp",
+      "role": "unresolved-native-layout-diagnostic",
+      "bytes": 13312,
+      "sha256": "9cf2d25bf6c1964d8f96e6dd8c2168c07e80439ee39f403e88fbdd3000ccc490",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "cell-padding-native/diagnostic-hwp/padding-table.hwp",
+      "role": "unresolved-native-layout-diagnostic",
+      "bytes": 13312,
+      "sha256": "57c71eab9aa6c9434c10265893c470acd5d753f3b21a94dde1e4d47beaf215f7",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "cell-padding-native/diagnostic-hwp/padding-zero-inherited.hwp",
+      "role": "unresolved-native-layout-diagnostic",
+      "bytes": 13312,
+      "sha256": "ff51e3e056c3f71a66a538a0b90cadea4fa4fc82444c019e90b65b63ccec5b42",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "cell-padding-native/padding-custom.hwpx",
+      "role": "successful-hwpx-edit-output",
+      "bytes": 8234,
+      "sha256": "a30d23da20e9b1ab716b0864fbc11457c904a5fd9ac546bb39467c95288407c8",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "cell-padding-native/padding-empty.hwpx",
+      "role": "successful-hwpx-edit-output",
+      "bytes": 8123,
+      "sha256": "61bedac5e54e1369133304c635aad80edf77c71640fa1d964486f9119fbc4883",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "cell-padding-native/padding-later-section.hwpx",
+      "role": "successful-hwpx-edit-output",
+      "bytes": 9459,
+      "sha256": "13ea513db047a123f4d471115f1512df4377e7bf9b07c80233cb571485156d19",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "cell-padding-native/padding-layout.hwpx",
+      "role": "successful-hwpx-edit-output",
+      "bytes": 8130,
+      "sha256": "0f4cb9c3d666b80ed1daed38c88c22d6f5574347a0d9e505798f29df8cf42fab",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "cell-padding-native/padding-renamed-hwp-source.hwp",
+      "role": "unsupported-format-source-input",
+      "bytes": 13312,
+      "sha256": "81ab816952932ecf7121bed3d7baae6c30fda178723f95b586448079debc9c62",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "cell-padding-native/padding-table.hwpx",
+      "role": "successful-hwpx-edit-output",
+      "bytes": 8220,
+      "sha256": "507ed56594a2066e83ce20520130345c9c4f51cb0b5f21b4c8ed94e89cf322f5",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "cell-padding-native/padding-unsupported-source.hwp",
+      "role": "unsupported-format-source-input",
+      "bytes": 13312,
+      "sha256": "81ab816952932ecf7121bed3d7baae6c30fda178723f95b586448079debc9c62",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "cell-padding-native/padding-zero-inherited.hwpx",
+      "role": "successful-hwpx-edit-output",
+      "bytes": 8122,
+      "sha256": "a2974f82b541ff6bb9222def47089dcadab202efa103ec3f1c9b6661e18da50b",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "cell-padding-browser/padding-anthropic.hwpx",
+      "role": "successful-hwpx-edit-output",
+      "bytes": 8234,
+      "sha256": "a30d23da20e9b1ab716b0864fbc11457c904a5fd9ac546bb39467c95288407c8",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "cell-padding-browser/padding-gemini.hwpx",
+      "role": "successful-hwpx-edit-output",
+      "bytes": 8234,
+      "sha256": "a30d23da20e9b1ab716b0864fbc11457c904a5fd9ac546bb39467c95288407c8",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "cell-padding-browser/padding-openai-compatible.hwpx",
+      "role": "successful-hwpx-edit-output",
+      "bytes": 8234,
+      "sha256": "a30d23da20e9b1ab716b0864fbc11457c904a5fd9ac546bb39467c95288407c8",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "cell-padding-browser/padding-openai-responses.hwpx",
+      "role": "successful-hwpx-edit-output",
+      "bytes": 8234,
+      "sha256": "a30d23da20e9b1ab716b0864fbc11457c904a5fd9ac546bb39467c95288407c8",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "cell-padding-browser/padding-table-default.hwpx",
+      "role": "successful-hwpx-edit-output",
+      "bytes": 8111,
+      "sha256": "42a6d69a6e760b9dfa7d189cbab12ae41fadec681b8d0cac35bd73389d99ce29",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    }
+  ],
+  "manualChecks": [
+    "Only successful-hwpx-edit-output files demonstrate supported AI editing. padding-custom and provider files set 2/3/1/4mm, table/default files inherit without erasing stored individual values.",
+    "Open copies in Hancom 2024: inspect individual padding checkbox/4 values, table default values, text/font/paragraph/borders and stored width/height. Layout row heights may change from inner padding.",
+    "padding-layout sets 10/3/6/8mm; compare to SVG text origin/row size. padding-zero-inherited uses zero table defaults while stored individual values remain inactive. padding-empty has no character formatting added.",
+    "Unsupported HWP source inputs are unchanged after refusal. diagnostic-hwp contains raw Native outputs from the unresolved live-versus-saved y discrepancy, NOT successful AI outputs or a fix. observation.json records actual live/reopened runs.",
+    "Open diagnostic HWP as a COPY in Hancom and record independent layout; do not infer Native/Hancom parity from the same-engine discrepancy.",
+    "Save a COPY in Hancom and reopen in Jueony; record logical/padding/inheritance/layout differences without overwriting evidence. Paid model quality NOT_RUN."
+  ]
+}

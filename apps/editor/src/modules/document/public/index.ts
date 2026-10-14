@@ -1,4 +1,5 @@
 export type { JsonValue, DocumentProperties, Cell, Table, Structure, BodyNode, Snapshot, BodyOp, ControlOp, EditOp, Receipt } from './types.ts';
+export type {AgentEmptySectionOp,AgentEmptySectionEligibility} from './types.ts';
 export type {AgentSectionSplitOp} from './types.ts';
 export type {AgentSectionOp,AgentLineNumbers,LineNumberRestart} from './types.ts';
 export type {AgentPageBackground,AgentPageBackgroundOp} from './types.ts';

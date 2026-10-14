@@ -1,4 +1,5 @@
 import type { Cell, Table, Structure } from '../../modules/document/public/types.ts';
+import {readAgentEmptySectionEligibility} from './agent-empty-section.ts';
 import {readLineNumberSettings} from './line-numbers.ts';
 import {readAgentMasterPages} from './agent-master-pages.ts';
 export type { Cell, Table, Structure } from '../../modules/document/public/types.ts';
@@ -19,6 +20,7 @@ export function readStructure(wasm: any): Structure {
       const settings=readLineNumberSettings(doc,section);
       entry.lineNumbers={enabled:settings.enabled,restart:([null,'page','section','continuous'] as const)[settings.restartType]??null,countBy:settings.countBy,startNumber:settings.startNumber,distanceMm:Math.round(settings.distance*25.4/7200*1000000)/1000000,editable:settings.editable};
     }
+    const removal=readAgentEmptySectionEligibility(doc,section);if(removal)entry.emptySectionRemoval=removal;
     sections.push(entry);
     if(typeof doc.getMasterPages==='function'&&typeof doc.setMasterPageText==='function')entry.masterPages=readAgentMasterPages(doc,section);
     if(typeof doc.getAgentPageBackground==='function')entry.pageBackgrounds=['both','even','odd'].map(kind=>{

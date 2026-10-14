@@ -4,3 +4,5 @@ export {agentTabSpacingRaw,agentLineNumberSettings} from '../domain/agent-sectio
 export {agentMasterPagePayload,assertAgentMasterKinds} from '../domain/agent-master-pages.ts';
 
 export {validateAgentSectionSplit} from '../domain/agent-section-split.ts';
+
+export {validateAgentEmptySection} from '../domain/agent-empty-section.ts';

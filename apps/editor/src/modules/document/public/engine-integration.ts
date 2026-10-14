@@ -6,3 +6,5 @@ export {agentMasterPagePayload,assertAgentMasterKinds} from '../domain/agent-mas
 export {validateAgentSectionSplit} from '../domain/agent-section-split.ts';
 
 export {validateAgentEmptySection} from '../domain/agent-empty-section.ts';
+
+export {validateAgentSectionMerge} from '../domain/agent-section-merge.ts';

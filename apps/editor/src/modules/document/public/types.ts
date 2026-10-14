@@ -13,8 +13,9 @@ export type AgentMasterPageOp = {kind:'set_master_page_text';section:number;page
 export type AgentSectionOp = {kind:'set_section_tabs';section:number;spacingPt:number} | {kind:'set_line_numbers';section:number;enabled:boolean;restart:LineNumberRestart;countBy:number;startNumber:number;distanceMm:number};
 export type AgentEmptySectionEligibility = {supported:boolean;reason?:string};
 export type AgentEmptySectionOp = {kind:'remove_empty_section';section:number};
+export type AgentSectionMergeOp = {kind:'merge_sections';rightSection:number};
 export type AgentSectionSplitOp = {kind:'split_section';target:string;offset:number};
-export type Structure = { sectionSplitAvailable?:boolean; sections: { index: number; page: DocumentProperties; emptySectionRemoval?:AgentEmptySectionEligibility; columns?:DocumentProperties;defaultTabSpacingPt?:number;lineNumbers?:AgentLineNumbers;pageBackgrounds?:AgentPageBackground[];masterPages?:AgentMasterPages }[]; styles?:{id:number;name:string;type:JsonValue}[]; tables: Table[]; paragraphs: { id: string; characters: DocumentProperties; paragraph: DocumentProperties; style?:DocumentProperties;pageHide?:DocumentProperties;controls?:string[];pageIndex?:number }[]; unsupportedControls: string[] };
+export type Structure = { sectionMergeAvailable?:boolean; sectionSplitAvailable?:boolean; sections: { index: number; page: DocumentProperties; emptySectionRemoval?:AgentEmptySectionEligibility; columns?:DocumentProperties;defaultTabSpacingPt?:number;lineNumbers?:AgentLineNumbers;pageBackgrounds?:AgentPageBackground[];masterPages?:AgentMasterPages }[]; styles?:{id:number;name:string;type:JsonValue}[]; tables: Table[]; paragraphs: { id: string; characters: DocumentProperties; paragraph: DocumentProperties; style?:DocumentProperties;pageHide?:DocumentProperties;controls?:string[];pageIndex?:number }[]; unsupportedControls: string[] };
 export type BodyNode = { id: string; section: number; paragraph: number; text: string; editable: boolean; reason?: string };
 export type Snapshot = { revision: string; name: string; plainText?: string; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
 export type BodyOp =
@@ -24,6 +25,7 @@ export type BodyOp =
  | { kind: 'delete_body_text'; target: string; start: number; count: number };
 export type ControlOp =
   | AgentEmptySectionOp
+  | AgentSectionMergeOp
   | AgentSectionSplitOp
   | AgentSectionOp
   | AgentPageBackgroundOp

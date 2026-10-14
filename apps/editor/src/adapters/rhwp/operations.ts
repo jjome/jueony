@@ -25,6 +25,7 @@ function replaceCellText(doc:any,base:number[],cell:number,value:string) {
 }
 export function executeControlOperation(wasm: any, snapshot: Snapshot, op: ControlOp, tables: Map<string, Table>): { section: number; after: number; count: number } | undefined {
   const doc = nativeDocument(wasm);
+  if(op.kind==='merge_sections')throw new Error('구역 합치기는 단독 구조 명령으로 실행하세요.');
   if(op.kind==='remove_empty_section')throw new Error('빈 구역 삭제는 단독 구조 명령으로 실행하세요.');
   if(op.kind==='split_section'){executeAgentSectionSplit(doc,snapshot,op);return;}
   if(op.kind==='set_section_tabs'||op.kind==='set_line_numbers'){executeAgentSectionOperation(doc,snapshot.name,op);return;}

@@ -1,3 +1,4 @@
+import {executeAgentParagraphDecoration} from './agent-paragraph-decoration.ts';
 import {executeAgentParagraphTabs} from './agent-paragraph-tabs.ts';
 import type { Snapshot, Table, ControlOp } from '../../modules/document/public/index.ts';
 import { nativeDocument, parsed, readStructure } from './structure.ts';
@@ -30,6 +31,7 @@ function replaceCellText(doc:any,base:number[],cell:number,value:string) {
 }
 export function executeControlOperation(wasm: any, snapshot: Snapshot, op: ControlOp, tables: Map<string, Table>): { section: number; after: number; count: number } | undefined {
   const doc = nativeDocument(wasm);
+  if(op.kind==='format_paragraph_decoration'){executeAgentParagraphDecoration(doc,snapshot,op);return;}
   if(op.kind==='set_paragraph_tabs'){executeAgentParagraphTabs(doc,snapshot,op);return;}
   if(op.kind==='add_bookmark'||op.kind==='rename_bookmark'||op.kind==='delete_bookmark'){executeAgentBookmark(doc,snapshot,op);return;}
   if(op.kind==='create_header_footer'){executeAgentHeaderFooterCreate(doc,snapshot,op);return;}

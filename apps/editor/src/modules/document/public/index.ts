@@ -46,3 +46,5 @@ export {readDocumentFailure} from './failure.ts';
 export type {DocumentFailure} from './failure.ts';
 
 export type {AgentParagraphTabStop,AgentParagraphTabsOp,AgentParagraphTabSource} from './types.ts';
+
+export type {AgentParagraphDecorationOp,AgentParagraphDecorationSource} from './types.ts';

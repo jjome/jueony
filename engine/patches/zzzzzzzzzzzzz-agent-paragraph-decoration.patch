@@ -1,0 +1,70 @@
+--- /dev/null
++++ b/src/document_core/commands/agent_paragraph_decoration.rs
+@@ -0,0 +1,43 @@
++//! Basic paragraph borders/solid fill. Preserve shared resources and private source evidence.
++use crate::document_core::DocumentCore;
++use crate::error::HwpError;
++use crate::model::style::{BorderFill,BorderLineType,CenterLine,FillType};
++fn fail(s:&str)->HwpError{HwpError::RenderError(s.into())}
++fn color(v:&serde_json::Value)->bool{v.as_str().is_some_and(|s|s.len()==7&&s.starts_with('#')&&s.as_bytes()[1..].iter().all(u8::is_ascii_hexdigit))}
++impl DocumentCore{
++    fn agent_decoration_source(&self,section:usize,paragraph:usize)->Result<(u16,BorderFill,String),HwpError>{
++        let body:serde_json::Value=serde_json::from_str(&self.get_agent_paragraph_tabs_native(section,paragraph)?).map_err(|_|fail("Invalid body source"))?;
++        if body["editable"]!=true{return Err(fail(body["reason"].as_str().unwrap_or("일반 본문 원본을 확인하지 못했습니다.")));}
++        let p=&self.document.sections[section].paragraphs[paragraph];let ps=self.document.doc_info.para_shapes.get(p.para_shape_id as usize).ok_or_else(||fail("Invalid paragraph shape"))?;
++        let id=ps.border_fill_id;if id==0{return Err(fail("저장된 문단 테두리/배경 정의를 확인하지 못했습니다."));}
++        let bf=self.document.doc_info.border_fills.get(id as usize-1).cloned().ok_or_else(||fail("Invalid border/fill reference"))?;
++        if self.document.doc_info.border_fills.len()>=65534||bf.attr!=0||bf.three_d||bf.center_line!=CenterLine::None||bf.fill.alpha!=0||bf.fill.gradient.is_some()||bf.fill.image.is_some()||bf.fill.solid.is_some_and(|s|s.pattern_type>0||(s.background_color>0xffffff&&s.background_color!=0xffffffff)||s.pattern_color>0xffffff)||!matches!((&bf.fill.fill_type,bf.fill.solid),(FillType::None,None)|(FillType::Solid,Some(_))|(FillType::None,Some(crate::model::style::SolidFill{background_color:0xffffffff,..})))||bf.borders.iter().any(|b|!matches!(b.line_type,BorderLineType::None|BorderLineType::Solid)||b.width>15||b.color>0xffffff||b.line_type==BorderLineType::None&&(b.width!=0||b.color!=0)){return Err(fail("문단 테두리/배경은 기본 없음·실선·무늬 없는 단색 원본만 지원합니다. 고급 효과는 유지합니다."));}
++        if let Some(raw)=&bf.raw_data{let canonical=crate::serializer::doc_info::serialize_border_fill(&bf);let legacy=bf.fill.fill_type==FillType::None&&canonical.len()==raw.len()+4&&canonical[..raw.len()]==raw[..]&&canonical[raw.len()..]==[0,0,0,0];if raw!=&canonical&&!legacy{return Err(fail("해석되지 않은 원본 문단 테두리/배경 추가 데이터는 변경하지 않습니다."));}}
++        Ok((id,bf,body["token"].as_str().ok_or_else(||fail("Missing body source token"))?.to_string()))
++    }
++    fn agent_decoration_token(&self,section:usize,paragraph:usize)->Result<String,HwpError>{
++        let(id,bf,body)=self.agent_decoration_source(section,paragraph)?;let value=serde_json::json!({"id":id,"borderFill":bf,"body":body});Ok(blake3::hash(value.to_string().as_bytes()).to_hex().to_string())
++    }
++    pub fn get_agent_paragraph_decoration_native(&self,section:usize,paragraph:usize)->Result<String,HwpError>{
++        let token=self.agent_decoration_token(section,paragraph);Ok(serde_json::json!({"editable":token.is_ok(),"reason":token.as_ref().err().map(ToString::to_string),"token":token.ok()}).to_string())
++    }
++    pub fn set_agent_paragraph_decoration_native(&mut self,section:usize,paragraph:usize,json:&str)->Result<String,HwpError>{
++        let v:serde_json::Value=serde_json::from_str(json).map_err(|_|fail("Invalid paragraph decoration command"))?;
++        if !v.as_object().is_some_and(|o|o.len()==2&&o.keys().all(|k|["token","properties"].contains(&k.as_str()))){return Err(fail("Invalid decoration command fields"));}
++        let token=self.agent_decoration_token(section,paragraph)?;if v["token"].as_str()!=Some(token.as_str()){return Err(fail("문단 원문·서식·테두리/배경이 바뀌었습니다."));}
++        let props=v["properties"].as_object().filter(|o|!o.is_empty()).ok_or_else(||fail("Empty decoration properties"))?;
++        for(key,val)in props{match key.as_str(){
++            "borderLeft"|"borderRight"|"borderTop"|"borderBottom"=>{let valid=val.as_object().is_some_and(|o|o.len()==3&&o.keys().all(|k|["type","width","color"].contains(&k.as_str())));if !valid||!val["type"].as_u64().is_some_and(|n|n<=1)||!val["width"].as_u64().is_some_and(|n|n<=15)||!color(&val["color"])||val["type"]==0&&(val["width"]!=0||val["color"].as_str()!=Some("#000000")){return Err(fail("Invalid basic border"));}}
++            "fillType"=>{if !val.as_str().is_some_and(|s|["none","solid"].contains(&s)){return Err(fail("Only none/solid fill is supported"));}}
++            "fillColor"=>{if !color(val){return Err(fail("Invalid fill color"));}}
++            "borderSpacing"=>{if !val.as_array().is_some_and(|a|a.len()==4&&a.iter().all(|n|n.as_i64().is_some_and(|n|(0..=5669).contains(&n)))){return Err(fail("Invalid border spacing"));}}
++            "borderConnect"|"borderIgnoreMargin"=>{if !val.is_boolean(){return Err(fail("Invalid border flag"));}}
++            _=>return Err(fail("Unsupported decoration property")),
++        }}
++        if props.contains_key("fillType")!=props.contains_key("fillColor"){return Err(fail("Fill type/color must be specified together"));}
++        let(id,before_bf,_)=self.agent_decoration_source(section,paragraph)?;let mut payload=v["properties"].clone();payload["borderFillId"]=serde_json::json!(id);
++        if props.contains_key("fillType"){let old:serde_json::Value=serde_json::from_str(&self.get_para_properties_at_native(section,paragraph)?).map_err(|_|fail("Invalid fill source"))?;payload["patternType"]=serde_json::json!(-1);payload["patternColor"]=if old["fillType"]=="solid"{old["patternColor"].clone()}else{serde_json::json!("#000000")};}
++        let original=self.document.clone();let events=self.event_log.len();let result=(||{self.apply_para_format_native(section,paragraph,&payload.to_string())?;let answer=self.get_agent_paragraph_decoration_native(section,paragraph)?;let after:serde_json::Value=serde_json::from_str(&answer).map_err(|_|fail("Invalid resulting decoration"))?;if after["editable"]!=true{return Err(fail("문단 테두리/배경 결과의 지원 속성을 확인하지 못했습니다."));}let(_,after_bf,_)=self.agent_decoration_source(section,paragraph)?;let mut expected=serde_json::to_value(&before_bf).unwrap();let mut actual=serde_json::to_value(&after_bf).unwrap();expected.as_object_mut().unwrap().remove("raw_data");actual.as_object_mut().unwrap().remove("raw_data");for(i,key)in ["borderLeft","borderRight","borderTop","borderBottom"].iter().enumerate(){if props.contains_key(*key){expected["borders"][i]=actual["borders"][i].clone();}}if props.contains_key("fillType"){expected["fill"]=actual["fill"].clone();}if expected!=actual{return Err(fail("요청하지 않은 문단 테두리/배경 원본 속성이 달라 복원합니다."));}Ok(answer)})();
++        if result.is_err(){self.document=original;self.event_log.truncate(events);self.rebuild_derived_state();}result
++    }
++}
+--- a/src/document_core/commands/mod.rs
++++ b/src/document_core/commands/mod.rs
+@@ -17,6 +17,7 @@
+ mod line_numbers;
+ mod agent_header_footer;
+ mod agent_paragraph_tabs;
++mod agent_paragraph_decoration;
+ mod agent_page_background;
+ mod page_body_delete;
+ mod page_body_copy;
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1204,6 +1204,11 @@
+     pub fn get_agent_page_background(&self,section:usize,kind:&str)->Result<String,JsValue>{self.core.get_agent_page_background_native(section,kind).map_err(|e|e.into())}
+     #[wasm_bindgen(js_name = setAgentPageBackground)]
+     pub fn set_agent_page_background(&mut self,section:usize,kind:&str,json:&str)->Result<String,JsValue>{self.core.set_agent_page_background_native(section,kind,json).map_err(|e|e.into())}
++
++    #[wasm_bindgen(js_name = getAgentParagraphDecoration)]
++    pub fn get_agent_paragraph_decoration(&self,section:usize,paragraph:usize)->Result<String,JsValue>{self.core.get_agent_paragraph_decoration_native(section,paragraph).map_err(|e|e.into())}
++    #[wasm_bindgen(js_name = setAgentParagraphDecoration)]
++    pub fn set_agent_paragraph_decoration(&mut self,section:usize,paragraph:usize,json:&str)->Result<String,JsValue>{self.core.set_agent_paragraph_decoration_native(section,paragraph,json).map_err(|e|e.into())}
+ 
+     #[wasm_bindgen(js_name = getAgentParagraphTabs)]
+     pub fn get_agent_paragraph_tabs(&self,section:usize,paragraph:usize)->Result<String,JsValue>{self.core.get_agent_paragraph_tabs_native(section,paragraph).map_err(|e|e.into())}

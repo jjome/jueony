@@ -14,3 +14,5 @@ export {validateAgentHeaderFooter,validateAgentHeaderFooterFormat,validateAgentH
 export {validateAgentBookmark,validBookmarkName} from '../domain/agent-bookmarks.ts';
 
 export {agentParagraphTabsPayload} from '../domain/agent-paragraph-tabs.ts';
+
+export {agentParagraphDecorationPayload,paragraphBorderWidthsMm} from '../domain/agent-paragraph-decoration.ts';

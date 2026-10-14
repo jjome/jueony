@@ -1,3 +1,4 @@
+import {tableSplitPlan} from './table-split.ts';
 import {tableMergePlan} from './table-merge.ts';
 import {rowHeightPlan} from './row-heights.ts';
 import {equalColumnsPlan,explicitColumnWidthPlan} from './equal-columns.ts';
@@ -114,6 +115,7 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
   const tabs=operations.filter(op=>op.kind==='set_paragraph_tabs');
   if(tabs.length&&(tabs.length!==operations.length||new Set(tabs.map(op=>(op as {target:string}).target)).size!==tabs.length))fail('문단 탭은 서로 다른 문단의 탭 명령만 한 요청으로 묶어 실행하세요.');
   for (const op of operations) {
+    if(op.kind==='split_table_cell'){only(op,['kind','target','row','column']);if(operations.length!==1)fail('셀 기본 분할은 단독 요청으로 실행하세요.');tableSplitPlan(op,snapshot);continue;}
     if(op.kind==='merge_table_cells'){only(op,['kind','target','startRow','startColumn','rowCount','columnCount']);if(operations.length!==1)fail('셀 병합은 단독 요청으로 실행하세요.');tableMergePlan(op,snapshot);continue;}
     if(op.kind==='set_table_header'){only(op,['kind','target','headerRows','repeatHeader','paginationMode']);if(operations.length!==1)fail('표 제목 행은 단독 명령으로 실행하세요.');validateAgentTableHeader(op,snapshot);continue;}
     if(op.kind==='set_table_pagination'){only(op,['kind','target','mode']);if(operations.length!==1)fail('표 쪽 나눔은 단독 명령으로 실행하세요.');validateAgentTablePagination(op,snapshot);continue;}

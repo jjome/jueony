@@ -1,3 +1,4 @@
+import {topologySemantics as semantic,rootBodyTexts as body,tableTextTree as texts} from './table-topology-evidence.ts';
 import type {Snapshot,Table,AgentTableMergeOp,AgentTableMergeSource} from '../../modules/document/public/index.ts';
 import {tableMergePlan} from '../../modules/document/public/engine-integration.ts';
 import {nativeDocument,parsed,readStructure} from './structure.ts';
@@ -7,7 +8,6 @@ import {assertNativeTableWritable} from './table-write-guard.ts';
 import {tableLayoutEvidence,sameTableLayout} from './table-layout-evidence.ts';
 const canonical=(v:any):any=>Array.isArray(v)?v.map(canonical):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,canonical(v[k])])):v;
 const same=(a:any,b:any)=>JSON.stringify(canonical(a))===JSON.stringify(canonical(b));
-const body=(d:any)=>Array.from({length:d.getSectionCount()},(_,s)=>Array.from({length:d.getParagraphCount(s)},(_,p)=>d.getTextRange(s,p,0,d.getParagraphLength(s,p))));
 export function readTableMergeSources(wasm:any,tables:Table[],name:string):Record<string,AgentTableMergeSource>|undefined {
  const d=nativeDocument(wasm),sources=readEqualColumnSources(d,tables,name);if(!sources)return;
  let simple=false;try{simple=parsed(d.getFieldList()).length===0&&parsed(d.getBookmarks()).length===0&&parsed(d.getControls()).every((c:any)=>c.list===0&&['tbl','secd','cold'].includes(c.ctrlId))&&parsed(d.getCursorModel()).lists.every((l:any)=>l.isCell&&l.hostListId===0);}catch{}
@@ -25,7 +25,6 @@ export function assertTableMergeResult(wasm:any,base:Snapshot,op:AgentTableMerge
 /** List IDs are ephemeral slots. All addresses, topology and paragraph/run semantics remain exact.
  * The linear text export changes order when cells become paragraphs; all body and cell text is
  * instead compared by the explicitly planned tree. This is command-local, not a save-guard change. */
-function semantic(values:any){const {text:linearText,...rest}=structuredClone(values);rest.cells=rest.cells.map((c:any)=>{const {listId:slot,...list}=c.list;return {...c,list};});return rest;}
 export function executeTableMerge(wasm:any,base:Snapshot,op:AgentTableMergeOp):{sectionIndex:number;parentParaIndex:number;paragraphIndex:number;charOffset:number;controlIndex:number;cellIndex:number;cellParaIndex:number;cellPath:any[]} {
  const d=nativeDocument(wasm),plan=tableMergePlan(op,base),t=plan.table,structure=readStructure(d),source=readTableMergeSources(d,structure.tables,base.name)?.[op.target];
  if(!same(structure.tables.find(v=>v.id===t.id),t)||source?.editable!==true||!same(source,base.tableMergeSources?.[t.id]))throw new Error('표 내용·서식·배치가 바뀌었습니다. 최신 문서로 다시 요청하세요.');assertNativeTableWritable(d,t);
@@ -35,7 +34,6 @@ export function executeTableMerge(wasm:any,base:Snapshot,op:AgentTableMergeOp):{
  const remaining=originals.filter((c:any)=>!removed.has(c.list.cellIndex));remaining.forEach((c:any,index:number)=>{const primary=selected.has(c.list.cellIndex);Object.assign(c.list,{cellIndex:index,cellCount:remaining.length});if(primary){Object.assign(c.list,{rowSpan:op.rowCount,colSpan:op.columnCount,paraCount:first.paragraphs.length});Object.assign(c.properties,{width:plan.width,height:plan.height});}});
  const raw=semantic(before.values).cells,at=raw.findIndex(isTarget);expected.cells=[...raw.slice(0,at),...remaining,...raw.slice(at+originals.length)];
  if(parsed(d.mergeTableCells(t.section,t.paragraph,t.control,op.startRow,op.startColumn,op.startRow+op.rowCount-1,op.startColumn+op.columnCount-1))?.ok!==true)throw new Error('표 셀 병합에 실패했습니다.');
- const texts=(tables:Table[])=>tables.map(t=>({id:t.id,section:t.section,paragraph:t.paragraph,control:t.control,cells:t.cells.map(c=>({index:c.index,row:c.row,column:c.column,text:c.text}))}));
  const expectedText=texts(structure.tables.map(table=>table.id===t.id?{...table,cells:resultCells(base,op)}:table));
  const after=capturePreservationEvidence(d);if(after.issues.length||!same(semantic(after.values),expected)||!same(body(d),beforeBody)||!same(texts(readStructure(d).tables),expectedText))throw new Error('병합 뒤 문단 서식·글자 run·이웃 셀·자원 보존이 계획과 다릅니다.');
  assertTableMergeResult(d,base,op);const cell=resultCells(base,op).find(c=>c.row===op.startRow&&c.column===op.startColumn)!;

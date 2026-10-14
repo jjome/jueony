@@ -1,0 +1,39 @@
+import {sha256} from '@noble/hashes/sha2.js';
+import type {Snapshot,Table,AgentTableSplitOp,AgentTableSplitSource} from '../../modules/document/public/index.ts';
+import {tableSplitPlan} from '../../modules/document/public/engine-integration.ts';
+import {nativeDocument,parsed,readStructure} from './structure.ts';
+import {capturePreservationEvidence} from './preservation.ts';
+import {assertNativeTableWritable} from './table-write-guard.ts';
+import {tableLayoutEvidence,sameTableLayout} from './table-layout-evidence.ts';
+import {topologySemantics,rootBodyTexts,tableTextTree} from './table-topology-evidence.ts';
+const canonical=(v:any):any=>Array.isArray(v)?v.map(canonical):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,canonical(v[k])])):v;
+const same=(a:any,b:any)=>JSON.stringify(canonical(a))===JSON.stringify(canonical(b));
+const hash=(v:any)=>Array.from(sha256(new TextEncoder().encode(JSON.stringify(canonical(v)))),n=>n.toString(16).padStart(2,'0')).join('');
+export function readTableSplitSources(wasm:any,tables:Table[],name:string):Record<string,AgentTableSplitSource>|undefined {
+ const d=nativeDocument(wasm);if(typeof d.splitTableCell!=='function')return;
+ return Object.fromEntries(tables.map(t=>{try{
+  const p=parsed(d.getTableProperties(t.section,t.paragraph,t.control)),cols=parsed(d.getColumnDef(t.section)),controls=parsed(d.getControls()),lists=parsed(d.getCursorModel()).lists;
+  const merged=t.cells.filter(c=>c.rowSpan*c.columnSpan>1),flat=t.paragraph+Array.from({length:t.section},(_,s)=>d.getParagraphCount(s)).reduce((a:number,b:number)=>a+b,0),control=controls.find((c:any)=>c.ctrlId==='tbl'&&c.list===0&&c.para===flat&&c.controlIndex===t.control);
+  if(!/\.hwpx$/iu.test(name)||merged.length!==1||t.rows*t.columns>200||controls.some((c:any)=>c.list!==0||!['secd','cold','tbl'].includes(c.ctrlId))||lists.some((l:any)=>!l.isCell||l.hostListId!==0)||parsed(d.getFieldList()).length||parsed(d.getBookmarks()).length||control?.props?.Lock!==0||cols.columnCount!==1||p.hasCaption||p.treatAsChar||p.allowOverlap||p.repeatHeader||p.cellSpacing!==0||p.textWrap!=='TopAndBottom'||p.vertRelTo!=='Para'||p.vertAlign!=='Top'||!['Para','Column'].includes(p.horzRelTo)||p.horzAlign!=='Left')throw new Error('unsupported');
+  const primary=merged[0];assertNativeTableWritable(d,t);
+  for(const c of t.cells){if(c.properties.textDirection!==0||c!==primary&&!c.editable)throw new Error('unsupported');const count=d.getCellParagraphCount(t.section,t.paragraph,t.control,c.index);if(count<1||count>50)throw new Error('unsupported');for(let para=0;para<count;para++){const length=d.getCellParagraphLength(t.section,t.paragraph,t.control,c.index,para),path=JSON.stringify([{controlIndex:t.control,cellIndex:c.index,cellParaIndex:para}]),runs=parsed(d.getCharShapeRunsInCellByPath(t.section,t.paragraph,path,0,length));if(length>4000||new Set(runs.map((r:any)=>r.charShapeId)).size>1)throw new Error('unsupported');}}
+  const frames=Array.from({length:d.pageCount()},(_,page)=>parsed(d.getPageControlLayout(page)).controls.filter((c:any)=>c.type==='table'&&c.secIdx===t.section&&c.paraIdx===t.paragraph&&c.controlIdx===t.control)).flat();if(frames.length!==1||frames[0].cells?.length!==t.cells.length)throw new Error('unsupported');
+  const infer=(n:number,row:boolean)=>Array.from({length:n},(_,i)=>{const witnesses=t.cells.filter(c=>row?c.row===i&&c.rowSpan===1:c.column===i&&c.columnSpan===1),values=new Set(witnesses.map(c=>Number(c.properties[row?'height':'width'])));if(values.size!==1)throw new Error('missing grid witness');const value=[...values][0];if(!Number.isSafeInteger(value)||value<200)throw new Error('unsupported');return value;});
+  const widths=infer(t.columns,false),heights=infer(t.rows,true),e=capturePreservationEvidence(d);if(e.issues.length)throw new Error('unsupported');const source={editable:true,fingerprint:hash({table:t,properties:p,columns:cols,page:parsed(d.getPageDef(t.section)),preservation:e.values}),widths,heights};
+  tableSplitPlan({kind:'split_table_cell',target:t.id,row:primary.row,column:primary.column},{name,structure:{tables:[t]},tableSplitSources:{[t.id]:source}} as Snapshot);return [t.id,source];
+ }catch{return [t.id,{editable:false,reason:'AI 기본 분할은 한 쪽 HWPX 평면 표의 병합 주 셀 하나와 주변의 일치하는 원본 격자 폭/높이가 필요합니다. 필드·책갈피·보호·복합 배치·중첩·전체 병합의 불명확한 폭/높이는 제외합니다.'}];}}));
+}
+export function assertTableSplitResult(wasm:any,base:Snapshot,op:AgentTableSplitOp):void {
+ const d=nativeDocument(wasm),plan=tableSplitPlan(op,base),actual=readStructure(d).tables.find(t=>t.id===op.target);
+ if(!actual||actual.rows!==plan.table.rows||actual.columns!==plan.table.columns||actual.cells.length!==plan.cells.length||actual.cells.some((c,i)=>!same({index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,text:c.text,properties:c.properties,characters:c.characters},{index:plan.cells[i].index,row:plan.cells[i].row,column:plan.cells[i].column,rowSpan:plan.cells[i].rowSpan,columnSpan:plan.cells[i].columnSpan,text:plan.cells[i].text,properties:plan.cells[i].properties,characters:plan.cells[i].characters})))throw new Error('기본 분할 결과의 위치·내용·크기·새 셀 속성이 계획과 다릅니다.');
+ let reopened:any;try{reopened=new d.constructor(d.exportHwpx());if(!sameTableLayout(tableLayoutEvidence(d,actual),tableLayoutEvidence(reopened,actual)))throw new Error('기본 분할 후 저장 재열기의 셀/글줄 배치가 다릅니다.');}finally{reopened?.free();}
+}
+export function executeTableSplit(wasm:any,base:Snapshot,op:AgentTableSplitOp){
+ const d=nativeDocument(wasm),plan=tableSplitPlan(op,base),t=plan.table,structure=readStructure(d),cap=readTableSplitSources(d,structure.tables,base.name)?.[t.id];if(!same(structure.tables.find(v=>v.id===t.id),t)||cap?.editable!==true||!same(cap,base.tableSplitSources?.[t.id]))throw new Error('분할 원본 내용·서식·격자가 바뀌었습니다. 최신 문서로 다시 요청하세요.');assertNativeTableWritable(d,t);
+ const evidence=capturePreservationEvidence(d);if(evidence.issues.length)throw new Error('분할 전 보존 정보를 확인하지 못했습니다.');const expected=topologySemantics(evidence.values),beforeBody=rootBodyTexts(d),isTarget=(c:any)=>c.list.hostListId===0&&c.list.sectionIndex===t.section&&c.list.hostPara===t.paragraph&&c.list.controlIndex===t.control,originals=expected.cells.filter(isTarget),primary=originals.find((c:any)=>c.list.cellIndex===plan.primary.index);
+ if(!primary||originals.length!==t.cells.length)throw new Error('분할할 주 셀 보존 정보가 없습니다.');
+ const replacements=plan.cells.map(c=>{const original=originals.find((v:any)=>v.list.row===c.row&&v.list.col===c.column),cell=structuredClone(original??primary);Object.assign(cell.list,{cellIndex:c.index,cellCount:plan.cells.length,row:c.row,col:c.column,rowSpan:1,colSpan:1});cell.properties={...cell.properties,width:c.properties.width,height:c.properties.height};if(!original){cell.list.paraCount=1;cell.paragraphs=[{paragraph:structuredClone(primary.paragraphs[0].paragraph),runs:[]}];}return cell;});
+ const at=expected.cells.findIndex(isTarget);expected.cells.splice(at,originals.length,...replacements);const expectedText=tableTextTree(structure.tables.map(v=>v.id===t.id?{...v,cells:plan.cells}:v));
+ if(parsed(d.splitTableCell(t.section,t.paragraph,t.control,op.row,op.column))?.ok!==true)throw new Error('병합 셀 기본 분할에 실패했습니다.');const after=capturePreservationEvidence(d);if(after.issues.length||!same(topologySemantics(after.values),expected)||!same(rootBodyTexts(d),beforeBody)||!same(tableTextTree(readStructure(d).tables),expectedText))throw new Error('기본 분할 뒤 문단/글자 서식·다른 셀·자원이 계획과 다릅니다.');
+ assertTableSplitResult(d,base,op);const cell=plan.cells.find(c=>c.row===op.row&&c.column===op.column)!;return {sectionIndex:t.section,parentParaIndex:t.paragraph,paragraphIndex:0,charOffset:0,controlIndex:t.control,cellIndex:cell.index,cellParaIndex:0,cellPath:[{controlIndex:t.control,cellIndex:cell.index,cellParaIndex:0}]};
+}

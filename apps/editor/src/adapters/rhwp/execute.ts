@@ -1,3 +1,4 @@
+import {executeTableSplit} from './table-split.ts';
 import {executeTableMerge} from './table-merge.ts';
 import {executeAgentSectionMerge} from './agent-section-merge.ts';
 import {executeAgentEmptySection} from './agent-empty-section.ts';
@@ -14,6 +15,7 @@ export function executeDocumentOperations(wasm: any, base: Snapshot, operations:
   if(operations.length===1&&operations[0].kind==='remove_empty_section')return executeAgentEmptySection(doc,snapshot,operations[0]);
   if(operations.length===1&&operations[0].kind==='merge_sections')return executeAgentSectionMerge(doc,snapshot,operations[0]);
   if(operations.length===1&&operations[0].kind==='merge_table_cells')return executeTableMerge(doc,snapshot,operations[0]);
+  if(operations.length===1&&operations[0].kind==='split_table_cell')return executeTableSplit(doc,snapshot,operations[0]);
   const tables = new Map((snapshot.structure?.tables ?? []).map(t => [t.id, t]));
   for (const op of operations) {
     let insertion: { section: number; after: number; count: number } | undefined;

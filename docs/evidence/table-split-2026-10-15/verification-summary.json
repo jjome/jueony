@@ -1,0 +1,197 @@
+{
+  "status": "PASS_SCOPED_WITH_REMAINING_EDITOR_LIMITS",
+  "checkedAt": "2026-10-14T17:08:43.862Z",
+  "unitPassed": 733,
+  "providerPassed": 52,
+  "wasmPassed": 210,
+  "browserPassed": 199,
+  "moduleCount": 9,
+  "moduleFiles": 291,
+  "reports": [
+    {
+      "category": "split-native",
+      "kind": "native",
+      "passed": 9
+    },
+    {
+      "category": "merge-native",
+      "kind": "native",
+      "passed": 9
+    },
+    {
+      "category": "native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "table-multi-header-native",
+      "kind": "native",
+      "passed": 16
+    },
+    {
+      "category": "agent-table-header-native",
+      "kind": "native",
+      "passed": 15
+    },
+    {
+      "category": "agent-table-pagination-native",
+      "kind": "native",
+      "passed": 15
+    },
+    {
+      "category": "table-protection-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "table-conversion-native",
+      "kind": "native",
+      "passed": 17
+    },
+    {
+      "category": "styles-native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "style-stories-native",
+      "kind": "native",
+      "passed": 4
+    },
+    {
+      "category": "agent-style-next-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "agent-native",
+      "kind": "native",
+      "passed": 13
+    },
+    {
+      "category": "memo-native",
+      "kind": "native",
+      "passed": 5
+    },
+    {
+      "category": "following-native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "outer-native",
+      "kind": "native",
+      "passed": 4
+    },
+    {
+      "category": "width-native",
+      "kind": "native",
+      "passed": 12
+    },
+    {
+      "category": "equal-native",
+      "kind": "native",
+      "passed": 12
+    },
+    {
+      "category": "owner-native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "host-native",
+      "kind": "native",
+      "passed": 10
+    },
+    {
+      "category": "default-native",
+      "kind": "native",
+      "passed": 9
+    },
+    {
+      "category": "split-browser",
+      "kind": "browser",
+      "passed": 12
+    },
+    {
+      "category": "merge-browser",
+      "kind": "browser",
+      "passed": 12
+    },
+    {
+      "category": "browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "table-multi-header-browser",
+      "kind": "browser",
+      "passed": 20
+    },
+    {
+      "category": "agent-table-header-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "agent-table-pagination-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "table-protection-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "table-conversion-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "selected-object-browser",
+      "kind": "browser",
+      "passed": 16
+    },
+    {
+      "category": "agent-style-next-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "agent-browser",
+      "kind": "browser",
+      "passed": 15
+    },
+    {
+      "category": "width-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "equal-browser",
+      "kind": "browser",
+      "passed": 15
+    }
+  ],
+  "engineSourceId": "424262393ae01deb",
+  "wasmSha256": "d63becfd91d3094f6df4a88ed0aaf50996b3a4d82cb69bd5ae5742a99f266169",
+  "customSourceSha256": "8438312775f69ead311ceffabd2640ddec82d80ac4e7f5721475036ade40cd60",
+  "applicationSourceCommit": "7a6c13b09b3ed5ee1cb0a26b4297323fcbfd5bb2",
+  "applicationSourceDirty": true,
+  "fixed": [
+    "A 47th neutral command splits one queried merged cell into its witnessed unequal grid through the existing native engine.",
+    "Exact planned cell/list topology, primary paragraph/run retention, empty new cells, every body/cell text, resources and neighboring tables are verified.",
+    "Apply/undo/redo, primary-cell cursor, strict post-render failure rollback, unsaved restore and actual UI save/reopen are checked."
+  ],
+  "unresolved": [
+    "HWP overlap-enabled following-table roundtrip and four public cross-format preservation blocks remain gated; prior evidence in save-table-controls-2026-10-14.",
+    "Arbitrary division, additional merged cells, nested/fragmented tables and remaining documented editor scope."
+  ],
+  "limits": [
+    "Same-engine/Canvas tests; independent Hancom 2024, paid model credentials and Native Rust unit suite NOT_RUN.",
+    "Related current table/style/object regressions, not all historical editor tests. Four provider protocols are synthetic.",
+    "Single-page HWPX witnessed basic split only. One merged cell, simple other cells, known widths/heights; all text retained in primary. Complex or ambiguous grids refuse. Remainder of editor scope incomplete.",
+    "Automation remains active because full documented scope is incomplete."
+  ]
+}

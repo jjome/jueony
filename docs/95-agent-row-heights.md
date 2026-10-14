@@ -50,3 +50,5 @@ HWPX의 한 쪽에 전부 배치된 본문 단순 표에서 모든 열에 걸친
 B162는 PARTIAL로 유지한다. 이번에 검사한 범위를 한글의 모든 표 기능이나 전체 제품 진행률로 환산하지 않는다. 문서화된 전체 범위가 남아 있으므로 자동화는 유지한다.
 
 최종 관련 검사: 단위 719개·provider/server 52개·실제 WASM 192개·Edge 175개 통과. TypeScript와 9개 모듈/286개 소스 경계를 확인했다. 예상 밖 page/console 오류·외부 요청은 0건이다. 엔진 `424262393ae01deb`와 WASM SHA-256 `d63becfd91d3094f6df4a88ed0aaf50996b3a4d82cb69bd5ae5742a99f266169`를 재사용했고, 앱 소스 SHA-256은 `bac8c5e88173da6173702dafe307473f6a62c304378dcc0faa53e015c5140587`이다. 관련 회귀 검사 집계이며 전체 한글 기능 검수율은 아니다.
+
+구현 `dd68da0` 커밋·푸시 완료. [Git/빌드 소스 대조](evidence/row-heights-2026-10-15/source-baseline-notes.json), [문서별 역할·한글 검수 순서](evidence/row-heights-2026-10-15/documents.json)를 보존했다.

@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-row-heights-20261015/Start-Review.cmd)**로 실행한다(4316). HWPX 단순 표의 AI 행 높이 균등 분배·mm 지정을 추가하고 재렌더 실패 복구를 보강했다. [지원 범위·검증·제한](docs/95-agent-row-heights.md)을 따른다. [기존 저장 수정](docs/93-storage-table-and-memo-ownership.md), [열 너비·바깥 여백](docs/94-table-width-and-outer-margins.md)도 포함한다. HWP 겹침 허용 표·일부 형식 변환·병합/중첩 Agent 제어와 한글 전수 비교는 남아 있다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-table-merge-20261015/Start-Review.cmd)**로 실행한다(4318). HWPX 한 쪽 본문 평면 표의 AI 사각형 셀 병합을 추가했다. 내용·문단/글자 서식·다른 표 보존, 요청 원복과 저장 재열기를 검사한다. [지원 범위·검증·제한](docs/96-agent-table-merge.md)을 따른다. [행 높이](docs/95-agent-row-heights.md)와 기존 저장 수정도 포함한다. 병합 원본의 Agent 분할·복합 표·일부 HWP/형식 변환·최종 한글 비교는 남아 있다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

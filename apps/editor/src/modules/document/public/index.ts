@@ -1,3 +1,4 @@
+export type {AgentTableMergeOp,AgentTableMergeSource} from './types.ts';
 export type { JsonValue, DocumentProperties, Cell, Table, Structure, BodyNode, Snapshot, BodyOp, ControlOp, EditOp, Receipt } from './types.ts';
 export type {AgentEmptySectionOp,AgentEmptySectionEligibility} from './types.ts';
 export type {AgentTableHeaderOp, AgentTableHeaderSource, AgentTablePaginationOp, AgentTablePaginationSource, TablePaginationMode, AgentNextParagraphStyleOp, AgentRenameParagraphStyleOp, AgentCreateParagraphStyleOp,AgentParagraphOutlineOp,AgentParagraphOutlineSource,AgentBasicNumberingOp,AgentNumberingCloneOp,AgentNumberingDefinitionSource,AgentBasicBulletOp,AgentParagraphListOp,AgentListCatalog} from "./types.ts";

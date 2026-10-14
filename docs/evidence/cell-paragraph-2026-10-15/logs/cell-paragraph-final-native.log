@@ -1,0 +1,31 @@
+PASS public caps expose only paragraph indexes/texts and coordinates, no private Native IDs
+PASS second: real merged paragraph edit, other state, strict save reopen and undo
+PASS first: real merged paragraph edit, other state, strict save reopen and undo
+PASS clear: real merged paragraph edit, other state, strict save reopen and undo
+PASS wrapping: real merged paragraph edit, other state, strict save reopen and undo
+PASS hwp: unsupported or stale request leaves bytes unchanged
+PASS mixed: unsupported or stale request leaves bytes unchanged
+PASS protect: unsupported or stale request leaves bytes unchanged
+PASS locked: unsupported or stale request leaves bytes unchanged
+PASS field: unsupported or stale request leaves bytes unchanged
+PASS bookmark: unsupported or stale request leaves bytes unchanged
+PASS stale-neighbor: unsupported or stale request leaves bytes unchanged
+PASS stale-format: unsupported or stale request leaves bytes unchanged
+PASS absorbed-coordinate: unsupported or stale request leaves bytes unchanged
+PASS batch: unsupported or stale request leaves bytes unchanged
+PASS no-op: unsupported or stale request leaves bytes unchanged
+PASS alias: unsupported or stale request leaves bytes unchanged
+PASS invalid-paragraph: unsupported or stale request leaves bytes unchanged
+PASS control-text: unsupported or stale request leaves bytes unchanged
+PASS zone: unsupported or stale request leaves bytes unchanged
+PASS unread-zone: unsupported or stale request leaves bytes unchanged
+PASS delete-noop: faulty native apply rolls back exact bytes
+PASS insert-throw: faulty native apply rolls back exact bytes
+PASS shape-false: faulty native apply rolls back exact bytes
+PASS other-table-corruption: faulty native apply rolls back exact bytes
+PASS unused-font-resource: faulty native apply rolls back exact bytes
+PASS empty merged paragraph reinsertion preserves its stored character and paragraph style
+PASS application revision conflict rejects even when Native IR is unchanged
+PASS too-long text that fragments the table refuses after exact rollback
+PASS private proof requires this successful request and rejects restored or new failed request state
+PASS post-render observation cannot swap an existing raw character binding while resolved appearance matches

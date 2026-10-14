@@ -1,7 +1,7 @@
 *.sh text eol=lf
 # Unified diff context uses a single space for empty source lines. The build
 # additionally runs git apply --whitespace=error-all on the patched Rust.
-engine/patches/*.patch text eol=lf whitespace=-blank-at-eol
+engine/patches/*.patch text eol=lf whitespace=-blank-at-eol,-blank-at-eof
 # Fixture byte hashes must survive Windows checkout without newline conversion.
 fixtures/rag-evaluation/** -text
 scripts/generate-rag-corpus.mjs text eol=lf

@@ -1,3 +1,5 @@
+import {captureTextBoxCursor,restoreTextBoxCursor} from './session-textbox.ts';
+import type {TextBoxBookmark} from '../../modules/preferences/public/index.ts';
 import {sha256} from '@noble/hashes/sha2.js';
 import {validateBodyCaret, validateSessionCursor} from '../../modules/preferences/public/index.ts';
 import type {BodyCaret, SessionCursor, SessionPoint, CellBlockBookmark,HeaderFooterBookmark,FootnoteBookmark} from '../../modules/preferences/public/index.ts';
@@ -11,6 +13,7 @@ export type SessionCursorInput = {
   restoreSessionPictureObject?(ref:{sec:number;ppi:number;ci:number;type:'image'}):boolean;
   restoreSessionHeaderFooter?(saved:HeaderFooterBookmark):boolean;
   restoreSessionFootnote?(saved:FootnoteBookmark):boolean;
+  restoreSessionTextBox?(saved:TextBoxBookmark):boolean;
   cursor:{hasSelection():boolean;getSelection():{anchor:Position;focus:Position}|null;blockSelectionPhase():number|null;captureCellSelection():Block|null;
     isInHeaderFooter():boolean;isInFootnote():boolean;isInTextBox():boolean;isInTableObjectSelection():boolean;isInPictureObjectSelection():boolean;
     getSelectedTableRef?():{sec:number;ppi:number;ci:number;cellPath?:unknown[]}|null;
@@ -20,7 +23,7 @@ export type SessionCursorInput = {
     getHeaderFooterSelectionOrdered?():{start:{sectionIdx:number;isHeader:boolean;applyTo:number;paraIdx:number;charOffset:number};end:{sectionIdx:number;isHeader:boolean;applyTo:number;paraIdx:number;charOffset:number}}|null;
     readonly fnSectionIdx?:number;readonly fnParaIdx?:number;readonly fnControlIdx?:number;readonly fnInnerParaIdx?:number;readonly fnCharOffset?:number;readonly fnPageNum?:number;readonly fnFootnoteIndex?:number;
     getFootnoteSelection?():{anchor:{fnParaIdx:number;charOffset:number};focus:{fnParaIdx:number;charOffset:number};pageNum:number;footnoteIndex:number}|null};
-  wasm:{requiresPasswordForSave?:boolean;getSectionCount():number;getParagraphCount(section:number):number;getParagraphLength(section:number,paragraph:number):number;getTextRange(section:number,paragraph:number,offset:number,count:number):string;
+  wasm:{borrowDocumentHandle?():any;requiresPasswordForSave?:boolean;getSectionCount():number;getParagraphCount(section:number):number;getParagraphLength(section:number,paragraph:number):number;getTextRange(section:number,paragraph:number,offset:number,count:number):string;
     getTableDimensions(section:number,parent:number,control:number):{rowCount:number;colCount:number;cellCount:number};
     getCellInfo(section:number,parent:number,control:number,cell:number):{row:number;col:number;rowSpan:number;colSpan:number};
     getCellParagraphCount(section:number,parent:number,control:number,cell:number):number;
@@ -172,6 +175,7 @@ function position(point:SessionPoint):Position{
   :{sectionIndex:c.section,paragraphIndex:c.paragraph,charOffset:c.offset,parentParaIndex:point.parentParagraph,controlIndex:point.control,cellIndex:point.cell,cellParaIndex:c.paragraph,cellPath:point.cellPath?.map(entry=>({...entry}))??[{controlIndex:point.control,cellIndex:point.cell,cellParaIndex:c.paragraph}]};
 }
 export function captureSessionCursor(input:SessionCursorInput|undefined):SessionCursor|undefined{
+ if(input?.cursor.isInTextBox())return captureTextBoxCursor(input);
  if(input&&!input.wasm.requiresPasswordForSave&&!input.cursor.isInTextBox()&&!input.cursor.isInTableObjectSelection()&&!input.cursor.isInPictureObjectSelection()
    &&(input.cursor.isInHeaderFooter()||input.cursor.isInFootnote())){
   try{
@@ -240,6 +244,7 @@ export function captureSessionCursor(input:SessionCursorInput|undefined):Session
 }
 export function restoreSessionCursor(input:SessionCursorInput|undefined,value:unknown):boolean{
  const saved=validateSessionCursor(value);if(!input||!saved)return false;
+ if(saved.kind==='textbox')return restoreTextBoxCursor(input,saved);
  if(saved.kind==='header-footer'||saved.kind==='footnote'){
   if(input.wasm.requiresPasswordForSave||input.cursor.isInTextBox()||input.cursor.isInTableObjectSelection()||input.cursor.isInPictureObjectSelection())return false;
   try{

@@ -1,0 +1,70 @@
+{
+  "paidModels": "NOT_RUN",
+  "suites": [
+    {
+      "suite": "native",
+      "failed": 0,
+      "resultSha256": "1dfbf94ac7b95e83ac0c89e420cfd17ea44bce204748e6ed42d1e6d092b73128",
+      "passed": 31
+    },
+    {
+      "suite": "textbox-storage",
+      "failed": 0,
+      "resultSha256": "fd350d7fa486510021d6efef432350b7a2030576dab2081829e14ef5cf570606",
+      "passed": 14
+    },
+    {
+      "suite": "zip-safety",
+      "failed": 0,
+      "resultSha256": "e74177542844a578132ef9fdb77364bed92553070a5c1d75929e36946a0c73f0",
+      "passed": 24
+    },
+    {
+      "suite": "browser",
+      "failed": 0,
+      "resultSha256": "26329bc187ca0943d1be6bba50ca2655364e4f8124e2bc66bd2c075a2afa68fc",
+      "passed": 12
+    }
+  ],
+  "sourceFreezeAtUtc": "2026-10-14T18:18:05.3356413Z",
+  "sourceFiles": [
+    {
+      "sha256": "c5c15d5318fd58c6f13610b979bab712020968f123c0c1a5be21e9ffb5d20531",
+      "path": "apps/editor/src/modules/document/domain/cell-paragraph.ts"
+    },
+    {
+      "sha256": "3a7af2e0946402bb8ac65441e2f590dd9cb094210611d7f2a3fef809c3b023b7",
+      "path": "apps/editor/src/adapters/rhwp/cell-paragraph.ts"
+    },
+    {
+      "sha256": "d97193d94158bf418b83c4a50443a5c8d666420999588a86caf5b6e876e4b125",
+      "path": "apps/editor/tests/cell-paragraph.test.ts"
+    },
+    {
+      "sha256": "e2d4c58cb81642278dcdeb2730096a6b1bc8e801bc7f8e75e18f33d6d5e4d467",
+      "path": "apps/editor/scripts/verify-cell-paragraph-engine.mjs"
+    },
+    {
+      "sha256": "240e0056d5ae485ae7b3912c39274171d6666a58ffab736d5fb6fa77ef8085f3",
+      "path": "apps/editor/scripts/verify-cell-paragraph.mjs"
+    },
+    {
+      "sha256": "d2ddf205083c34f3bb86c73312fa1430bb6bad2fd6b3d80542c95a2bac780687",
+      "path": "apps/editor/scripts/verify-textbox-alignment-engine.mjs"
+    },
+    {
+      "sha256": "3a84f0652adf2f94ec6d2188d1a4f78f45c9e93355e7c32f584190d19197f8da",
+      "path": "apps/editor/scripts/verify-format-conversion.mjs"
+    },
+    {
+      "sha256": "b9d8791a5e9b7b5e6b5d1bd794f3a7ebe9012c7bc8403c49333217cfef434122",
+      "path": "engine/patches/zzzzzzzzzzzzzzzzzzzzzzzzzzzz-textbox-alignment-storage.patch"
+    }
+  ],
+  "typecheckDiagnostics": 0,
+  "hancom2024": "NOT_RUN",
+  "scope": "N004 plain merged cell paragraph; synthetic provider protocols; same-engine strict preservation and layout. Full merged-table editing NOT_COMPLETE.",
+  "unitPassed": 8,
+  "engineWasmSha256": "6e7e8ca9971063ae08ba5336fdd7ef5f73a66a055a82e0600adf4c21a52ded3d",
+  "engineSourceId": "31c6854ba64af4b5"
+}

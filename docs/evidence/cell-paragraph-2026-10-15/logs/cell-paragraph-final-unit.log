@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: cell paragraph is an explicit neutral single-paragraph contract
+ok 1 - cell paragraph is an explicit neutral single-paragraph contract
+  ---
+  duration_ms: 1.9188
+  type: 'test'
+  ...
+# Subtest: exact merged anchor and paragraph content returns a pure plan
+ok 2 - exact merged anchor and paragraph content returns a pure plan
+  ---
+  duration_ms: 1.329
+  type: 'test'
+  ...
+# Subtest: existing set_table_cell does not gain merged or multiparagraph support
+ok 3 - existing set_table_cell does not gain merged or multiparagraph support
+  ---
+  duration_ms: 0.2955
+  type: 'test'
+  ...
+# Subtest: empty replacement is an empty paragraph, while a no-op refuses
+ok 4 - empty replacement is an empty paragraph, while a no-op refuses
+  ---
+  duration_ms: 0.1314
+  type: 'test'
+  ...
+# Subtest: unknown paragraph fields and malformed numeric/text args refuse
+ok 5 - unknown paragraph fields and malformed numeric/text args refuse
+  ---
+  duration_ms: 0.3191
+  type: 'test'
+  ...
+# Subtest: unmerged and absorbed coordinates, aliases and incorrect original text refuse
+ok 6 - unmerged and absorbed coordinates, aliases and incorrect original text refuse
+  ---
+  duration_ms: 0.1343
+  type: 'test'
+  ...
+# Subtest: HWP, unread/forged caps and protection refuse
+ok 7 - HWP, unread/forged caps and protection refuse
+  ---
+  duration_ms: 0.1905
+  type: 'test'
+  ...
+# Subtest: single-operation and macro restrictions remain explicit
+ok 8 - single-operation and macro restrictions remain explicit
+  ---
+  duration_ms: 0.309
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 133.8347

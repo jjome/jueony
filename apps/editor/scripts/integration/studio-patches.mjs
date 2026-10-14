@@ -191,6 +191,12 @@ caretInput = replaceOnce(caretInput, '  getCursorPosition(): DocumentPosition { 
   getSessionCaretAccess() {
     return { cursor: this.cursor, wasm: this.wasm,
       getCursorPosition: () => this.cursor.getPosition(),
+      restoreSessionTextBox: (saved: import('../jueony/modules/preferences/public/index.ts').TextBoxBookmark): boolean => {
+        this.cursor.exitHeaderFooterMode();this.cursor.exitFootnoteMode();this.cursor.clearSelection();this.cursor.exitCellSelectionMode();this.cursor.exitBlockSelectionMode();this.cursor.exitTableObjectSelection();this.cursor.exitPictureObjectSelection();
+        const point=(caret:typeof saved.caret):DocumentPosition=>({sectionIndex:caret.section,paragraphIndex:caret.paragraph,charOffset:caret.offset,parentParaIndex:saved.focus.caret.paragraph,controlIndex:saved.control,cellIndex:0,cellParaIndex:caret.paragraph,cellPath:[{controlIndex:saved.control,cellIndex:0,cellParaIndex:caret.paragraph}],isTextBox:true});
+        if(saved.anchor){this.cursor.moveTo(point(saved.anchor));this.cursor.setAnchor();}
+        this.cursor.moveTo(point(saved.caret));this.cursor.resetPreferredX();this.updateCaret();this.eventBus.emit('command-state-changed');return true;
+      },
       restoreSessionHeaderFooter: (saved: import('../jueony/modules/preferences/public/index.ts').HeaderFooterBookmark) => {
         this.cursor.exitHeaderFooterMode();this.cursor.exitFootnoteMode();this.cursor.clearSelection();this.cursor.exitCellSelectionMode();this.cursor.exitTableObjectSelection();this.cursor.exitPictureObjectSelection();
         this.cursor.moveTo({sectionIndex:saved.focus.caret.section,paragraphIndex:saved.focus.caret.paragraph,charOffset:saved.focus.caret.offset});

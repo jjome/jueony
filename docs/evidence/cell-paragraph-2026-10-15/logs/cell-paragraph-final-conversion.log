@@ -1,0 +1,24 @@
+PASS mcst-bid-2026 -> hwp: unchanged strict export evidence and live state
+PASS mcst-bid-2026 -> hwpx: unchanged strict export evidence and live state
+PASS python-hwpx-0 -> hwp: unchanged strict export evidence and live state
+PASS python-hwpx-0 -> hwpx: unchanged strict export evidence and live state
+PASS python-hwpx-1 -> hwp: unchanged strict export evidence and live state
+PASS python-hwpx-1 -> hwpx: unchanged strict export evidence and live state
+PASS python-hwpx-2 -> hwp: unchanged strict export evidence and live state
+PASS python-hwpx-2 -> hwpx: unchanged strict export evidence and live state
+PASS python-hwpx-3 -> hwp: unchanged strict export evidence and live state
+PASS python-hwpx-3 -> hwpx: unchanged strict export evidence and live state
+PASS self-authored Latin KEEP_WORD: effective unit and strict evidence both formats
+PASS self-authored Latin HYPHENATION: effective unit and strict evidence both formats
+PASS self-authored Latin BREAK_WORD: effective unit and strict evidence both formats
+PASS self-authored root plus cell memos: owned lists keep field identity and text
+PASS duplicate root and cell memo index: ambiguous carrier is retained and strict save blocked
+PASS self-authored orphan-index: whole ownership resolution refuses partial attachment
+PASS self-authored empty-carrier: whole ownership resolution refuses partial attachment
+PASS self-authored flow=false overlap=false: getter is resolved common state
+PASS self-authored flow=false overlap=true: getter is resolved common state
+PASS self-authored flow=true overlap=false: getter is resolved common state
+PASS self-authored flow=true overlap=true: getter is resolved common state
+PASS self-authored locked and unlocked table: lock survives HWP then HWPX
+PASS reopened table lock changes preserve both raw-cache and sealed source paths
+PASS preservation still rejects real flow, overlap and lock corruption

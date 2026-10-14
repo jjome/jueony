@@ -24,3 +24,6 @@ export type { BackupStorage } from '../application/settings-backup.ts';
 export type { Snippet, SnippetLibrary } from '../domain/snippets.ts';
 export { validateSnippetLibrary } from '../domain/snippets.ts';
 export { readSnippetLibrary, updateSnippetLibrary, SNIPPETS_KEY } from '../application/snippets.ts';
+
+export type {TextBoxBookmark} from './contracts.ts';
+export {validateTextBoxBookmark} from '../domain/textbox-bookmark.ts';

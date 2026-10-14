@@ -1,3 +1,4 @@
+export type {AgentCellParagraphOp,AgentCellParagraphSource,AgentTableSubdivisionOp,AgentTableSubdivisionSource} from './types.ts';
 export type {AgentTableStructureOp,AgentTableStructureSource} from './types.ts';
 export type {AgentTableSplitOp,AgentTableSplitSource} from './types.ts';
 export type {AgentTableMergeOp,AgentTableMergeSource} from './types.ts';

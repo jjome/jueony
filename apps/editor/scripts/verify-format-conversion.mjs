@@ -53,13 +53,13 @@ await scenario('duplicate root and cell memo index: ambiguous carrier is retaine
  const d=new HwpDocument(await readFile(join(out,'nested-memo-duplicate.hwpx')));try{const {bytes,loss}=exportArtifact(d,'hwp'),r=new HwpDocument(bytes);try{assert.equal(r.getParagraphCount(0),d.getParagraphCount(0)+1);assert.throws(()=>verifyPreservedExport(d,bytes,'hwp',loss,b=>new HwpDocument(b)),/보존 검사/);}finally{r.free();}}finally{d.free();}
 });
 for(const mode of ['orphan-index','empty-carrier'])await scenario(`self-authored ${mode}: whole ownership resolution refuses partial attachment`,async()=>{
- const d=new HwpDocument(await readFile(join(out,'nested-memo-unique.hwpx')));try{let changed=false,pending=false;
-  const bytes=conversionRecordFixture(d.exportHwp(),({tag,level,data})=>{
+ const d=new HwpDocument(await readFile(join(out,'nested-memo-unique.hwpx')));try{let changed=false,pending=false;const original=exportArtifact(d,'hwp');
+  const bytes=conversionRecordFixture(original.bytes,({tag,level,data})=>{
    if(changed)return false;
    if(tag===93&&level===1){if(mode==='orphan-index'){assert.equal(data.length,4);data.writeUInt32LE(99,0);changed=true;return true;}pending=true;}
    if(mode==='empty-carrier'&&pending&&tag===72&&level===1){data.writeUInt32LE(0,0);changed=true;return true;}
    return false;
-  });assert.equal(changed,true);const r=new HwpDocument(bytes);try{assert.equal(r.getParagraphCount(0),d.getParagraphCount(0)+1);assert.equal(JSON.parse(r.getFieldList()).filter(v=>v.fieldType==='memo').length,0);assert.throws(()=>verifyPreservedExport(d,bytes,'hwp',{},b=>new HwpDocument(b)),/보존 검사/);}finally{r.free();}
+  });assert.equal(changed,true);const r=new HwpDocument(bytes);try{assert.equal(r.getParagraphCount(0),d.getParagraphCount(0)+1);assert.equal(JSON.parse(r.getFieldList()).filter(v=>v.fieldType==='memo').length,0);assert.throws(()=>verifyPreservedExport(d,bytes,'hwp',original.loss,b=>new HwpDocument(b)),error=>error.report?.issues.some(i=>i.code==='changed')&&!error.report.issues.some(i=>i.path==='serializer-report'));}finally{r.free();}
  }finally{d.free();}
 });
 
@@ -78,7 +78,7 @@ await scenario('reopened table lock changes preserve both raw-cache and sealed s
  try{for(const sourceFormat of ['hwp','hwpx']){const source=sourceFormat==='hwp'?blank.exportHwp():blank.exportHwpx(),d=new HwpDocument(source);try{for(const locked of [true,false]){const {ctrl}=queryTable(d);d.setControlLock(ctrl.para,ctrl.controlIndex,locked);for(const format of ['hwp','hwpx']){const {bytes,loss}=exportArtifact(d,format);assert.equal(verifyPreservedExport(d,bytes,format,loss,b=>new HwpDocument(b)).status,'checked');const r=new HwpDocument(bytes);try{assert.equal(Number(queryTable(r).ctrl.props.Lock),Number(locked));}finally{r.free();}}}}finally{d.free();}}}finally{blank.free();}
 });
 await scenario('preservation still rejects real flow, overlap and lock corruption',()=>{
- const d=HwpDocument.createEmpty();d.createBlankDocument();try{d.createTable(0,0,0,2,2);const baseline=d.exportHwpx();for(const name of ['restrictInPage','allowOverlap','Lock']){const changed=new HwpDocument(baseline);try{const {ctrl}=queryTable(changed);if(name==='Lock')changed.setControlLock(ctrl.para,ctrl.controlIndex,true);else changed.setTableProperties(0,ctrl.para,ctrl.controlIndex,JSON.stringify({[name]:!queryTable(d).properties[name]}));assert.throws(()=>verifyPreservedExport(d,changed.exportHwpx(),'hwpx',{},b=>new HwpDocument(b)),/보존 검사/);}finally{changed.free();}}}finally{d.free();}
+ const d=HwpDocument.createEmpty();d.createBlankDocument();try{d.createTable(0,0,0,2,2);const baseline=d.exportHwpx();for(const name of ['restrictInPage','allowOverlap','Lock']){const changed=new HwpDocument(baseline);try{const {ctrl}=queryTable(changed);if(name==='Lock')changed.setControlLock(ctrl.para,ctrl.controlIndex,true);else changed.setTableProperties(0,ctrl.para,ctrl.controlIndex,JSON.stringify({[name]:!queryTable(d).properties[name]}));const corrupted=exportArtifact(changed,'hwpx');assert.throws(()=>verifyPreservedExport(d,corrupted.bytes,'hwpx',corrupted.loss,b=>new HwpDocument(b)),error=>error.report?.issues.some(i=>i.code==='changed')&&!error.report.issues.some(i=>i.path==='serializer-report'));}finally{changed.free();}}}finally{d.free();}
 });
 await writeFile(join(out,'result.json'),JSON.stringify({results,failures,publicReports,engine:JSON.parse(await readFile(join(pkg,'jueony-engine-build.json'),'utf8')),note:'Native WASM and repeated same-engine export; Hancom comparison NOT_RUN. Public source and converted bytes remain ignored and are not distribution inputs.'},null,2));
 if(failures.length)process.exitCode=1;

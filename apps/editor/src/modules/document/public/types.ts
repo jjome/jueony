@@ -1,3 +1,7 @@
+export type AgentCellParagraphOp={kind:"replace_cell_paragraph";target:string;row:number;column:number;paragraph:number;originalText:string;text:string};
+export type AgentCellParagraphSource={editable:boolean;fingerprint?:string;cells?:Array<{index:number;row:number;column:number;rowSpan:number;columnSpan:number;paragraphs:Array<{index:number;text:string}>}>;reason?:string};
+export type AgentTableSubdivisionOp={kind:"split_table_cell_into";target:string;row:number;column:number;rows:number;columns:number};
+export type AgentTableSubdivisionSource={editable:boolean;fingerprint?:string;cells?:Array<{row:number;column:number;minimumWidth:number;minimumHeight:number}>;frame?:{page:number;x:number;y:number;w:number;h:number;cells:Array<{index:number;row:number;column:number;x:number;y:number;w:number;h:number}>};reason?:string};
 /** Detached JSON data. No engine handles cross this boundary. */
 export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 export type DocumentProperties = { [key: string]: JsonValue | undefined };
@@ -10,7 +14,7 @@ export type AgentTableHeaderOp={kind:'set_table_header';target:string;headerRows
 export type AgentTableHeaderSource=AgentTablePaginationSource&{headerRows?:number;repeatHeader?:boolean};
 export type AgentTablePaginationOp={kind:'set_table_pagination';target:string;mode:TablePaginationMode};
 export type AgentTablePaginationSource={editable:boolean;mode?:TablePaginationMode;fingerprint?:string;reason?:string};
-export type Table = { editable?:boolean; reason?:string; id: string; section: number; paragraph: number; control: number; headerRows?:number|null; pagination?:{mode:TablePaginationMode;repeatHeader:boolean}; rows: number; columns: number; cells: Cell[] };
+export type Table = { cellZoneCount?:number; editable?:boolean; reason?:string; id: string; section: number; paragraph: number; control: number; headerRows?:number|null; pagination?:{mode:TablePaginationMode;repeatHeader:boolean}; rows: number; columns: number; cells: Cell[] };
 export type LineNumberRestart = 'page' | 'section' | 'continuous';
 export type AgentLineNumbers = {enabled:boolean;restart:LineNumberRestart|null;countBy:number;startNumber:number;distanceMm:number;editable:boolean};
 export type AgentPageBackground = {kind:'both'|'even'|'odd';fillType:string;color:string|null;applyPage:string;hideFill?:boolean;firstPageFill?:boolean;editable:boolean;reason?:string};
@@ -58,13 +62,15 @@ export type AgentTableStructureOp={kind:"split_table";target:string;atRow:number
 export type AgentTableStructureSource={editable:boolean;fingerprint?:string;splitRows?:number[];nextTarget?:string;reason?:string};
 export type AgentTableSplitOp={kind:"split_table_cell";target:string;row:number;column:number};
 export type AgentTableSplitSource={editable:boolean;fingerprint?:string;widths?:number[];heights?:number[];reason?:string};
-export type Snapshot = { tableStructureSources?:Record<string,AgentTableStructureSource>; tableSplitSources?:Record<string,AgentTableSplitSource>; tableMergeSources?:Record<string,AgentTableMergeSource>; rowHeightSources?:Record<string,AgentRowHeightSource>; equalColumnSources?:Record<string,AgentEqualColumnSource>; cellPaddingSources?:Record<string,AgentCellPaddingSource>; tableHeaderSources?:Record<string,AgentTableHeaderSource>; tablePaginationSources?:Record<string,AgentTablePaginationSource>; revision: string; name: string; plainText?: string; styleNextSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string;currentNextStyleId:number}>; styleNextTargets?:Record<string,{fingerprint:string}>; styleRenameSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; styleCreationSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; paragraphOutlineSources?:Record<string,AgentParagraphOutlineSource>; numberingDefinitionSources?:AgentNumberingDefinitionSource[]; paragraphTabSources?:Record<string,AgentParagraphTabSource>; basicNumberingSources?:Record<string,AgentParagraphTabSource>; basicBulletSources?:Record<string,AgentParagraphTabSource>; paragraphListSources?:Record<string,AgentParagraphTabSource>; listCatalog?:AgentListCatalog; paragraphDecorationSources?:Record<string,AgentParagraphDecorationSource>; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
+export type Snapshot = { cellParagraphSources?:Record<string,AgentCellParagraphSource>; tableSubdivisionSources?:Record<string,AgentTableSubdivisionSource>; tableStructureSources?:Record<string,AgentTableStructureSource>; tableSplitSources?:Record<string,AgentTableSplitSource>; tableMergeSources?:Record<string,AgentTableMergeSource>; rowHeightSources?:Record<string,AgentRowHeightSource>; equalColumnSources?:Record<string,AgentEqualColumnSource>; cellPaddingSources?:Record<string,AgentCellPaddingSource>; tableHeaderSources?:Record<string,AgentTableHeaderSource>; tablePaginationSources?:Record<string,AgentTablePaginationSource>; revision: string; name: string; plainText?: string; styleNextSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string;currentNextStyleId:number}>; styleNextTargets?:Record<string,{fingerprint:string}>; styleRenameSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; styleCreationSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; paragraphOutlineSources?:Record<string,AgentParagraphOutlineSource>; numberingDefinitionSources?:AgentNumberingDefinitionSource[]; paragraphTabSources?:Record<string,AgentParagraphTabSource>; basicNumberingSources?:Record<string,AgentParagraphTabSource>; basicBulletSources?:Record<string,AgentParagraphTabSource>; paragraphListSources?:Record<string,AgentParagraphTabSource>; listCatalog?:AgentListCatalog; paragraphDecorationSources?:Record<string,AgentParagraphDecorationSource>; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
 export type BodyOp =
  | { kind: 'create_document'; paragraphs: string[] }
  | { kind: 'insert_body_paragraphs'; after: string; paragraphs: string[] }
  | { kind: 'replace_body_text'; target: string; start: number; count: number; text: string }
  | { kind: 'delete_body_text'; target: string; start: number; count: number };
 export type ControlOp =
+  | AgentCellParagraphOp
+  | AgentTableSubdivisionOp
   | AgentTableStructureOp
   | AgentTableSplitOp
   | AgentTableMergeOp

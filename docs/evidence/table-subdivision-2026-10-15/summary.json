@@ -1,0 +1,37 @@
+{
+  "feature": "N005 split_table_cell_into",
+  "implementation": "bounded HWPX plain unmerged source cell subdivision",
+  "unit": {
+    "pass": 7,
+    "fail": 0
+  },
+  "native": {
+    "pass": 14,
+    "fail": 0
+  },
+  "browser": {
+    "pass": 13,
+    "fail": 0,
+    "pageErrors": [],
+    "consoleErrors": [],
+    "externalRequests": []
+  },
+  "engine": {
+    "source": "source-31c6854ba64af4b5",
+    "wasmSha256": "6e7e8ca9971063ae08ba5336fdd7ef5f73a66a055a82e0600adf4c21a52ded3d",
+    "cellZoneGetterPatchSha256": "9dc3ffd29ada303898ab21268fb72e23b1b56bcf7c589a11687716848e80bb70"
+  },
+  "notRun": [
+    "Native Hancom 2024 comparison",
+    "paid model calls"
+  ],
+  "limits": [
+    "HWP source readonly",
+    "merged source cells readonly",
+    "cell zones or unavailable cell zone observation readonly",
+    "paragraph/cell mixed styles or fields/bookmarks readonly",
+    "multi-page, nested or complex-layout tables readonly",
+    "expansion beyond original footprint refuses and rolls back",
+    "new surrounding spans generally close next subdivision capability"
+  ]
+}

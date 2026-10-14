@@ -1,3 +1,4 @@
+import {assertNativeTableNoCellZones} from './table-write-guard.ts';
 import {executeRowHeights} from './row-heights.ts';
 import {executeEqualColumns} from './equal-columns.ts';
 import {executeCellPadding} from './cell-padding.ts';
@@ -83,6 +84,7 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
   if(tableAxisKinds.includes(op.kind)) {
     const axis=op as Extract<ControlOp,{index:number}>,table=tables.get(axis.target)!;
     assertNativeTableWritable(doc,table);
+    assertNativeTableNoCellZones(doc,table);
     const expected=tableAxisPlan(table,axis),row=axis.kind.endsWith('_row'),insert=axis.kind.startsWith('insert_');
     const base=[table.section,table.paragraph,table.control],size=row?table.rows:table.columns;
     const method=({insert_table_row:'insertTableRow',insert_table_column:'insertTableColumn',delete_table_row:'deleteTableRow',delete_table_column:'deleteTableColumn'} as any)[axis.kind];

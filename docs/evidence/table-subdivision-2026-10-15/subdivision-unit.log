@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: subdivision has a separate wire kind and plain positive integer DTO
+ok 1 - subdivision has a separate wire kind and plain positive integer DTO
+  ---
+  duration_ms: 2.144
+  type: 'test'
+  ...
+# Subtest: unmerged cell becomes N by M, preserves total unequal dimensions and first-cell content
+ok 2 - unmerged cell becomes N by M, preserves total unequal dimensions and first-cell content
+  ---
+  duration_ms: 0.5232
+  type: 'test'
+  ...
+# Subtest: neighbors shift exact addresses and span added grid positions without changing properties/text/styles
+ok 3 - neighbors shift exact addresses and span added grid positions without changing properties/text/styles
+  ---
+  duration_ms: 0.3272
+  type: 'test'
+  ...
+# Subtest: whole one-cell source and one-axis subdivision are explicit supported plans
+ok 4 - whole one-cell source and one-axis subdivision are explicit supported plans
+  ---
+  duration_ms: 0.2017
+  type: 'test'
+  ...
+# Subtest: invalid coordinates, no-op, fractional/bool/string counts, unknown keys and aliases reject
+ok 5 - invalid coordinates, no-op, fractional/bool/string counts, unknown keys and aliases reject
+  ---
+  duration_ms: 0.7285
+  type: 'test'
+  ...
+# Subtest: grid budget and source per-cell padding minimum reject before planning mutation
+ok 6 - grid budget and source per-cell padding minimum reject before planning mutation
+  ---
+  duration_ms: 0.3212
+  type: 'test'
+  ...
+# Subtest: HWP, readonly/missing cap or frame, protection/header/merged/ragged source cannot be substituted
+ok 7 - HWP, readonly/missing cap or frame, protection/header/merged/ragged source cannot be substituted
+  ---
+  duration_ms: 0.3851
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 156.4383

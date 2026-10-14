@@ -14,11 +14,12 @@ export type SessionPoint = { kind: 'body'; caret: BodyCaret } | {
 export type CellBlockBookmark = { anchor: { row: number; col: number }; focus: { row: number; col: number }; phase: 1 | 2 | 3; reason: 'manual' | 'protected'; excluded: string[] };
 export type HeaderFooterBookmark = {kind:'header-footer';focus:Extract<SessionPoint,{kind:'body'}>;caret:BodyCaret;anchor?:BodyCaret;isHeader:boolean;applyTo:number;storyFingerprint:string};
 export type FootnoteBookmark = {kind:'footnote';focus:Extract<SessionPoint,{kind:'body'}>;caret:BodyCaret;anchor?:BodyCaret;parentParagraph:number;control:number;page:number;index:number;sourceType:string;storyFingerprint:string};
+export type TextBoxBookmark = {kind:"textbox";focus:Extract<SessionPoint,{kind:"body"}>;control:number;caret:BodyCaret;anchor?:BodyCaret;storyFingerprint:string};
 export type SessionCursor = { kind: 'text'; focus: SessionPoint; anchor?: SessionPoint; blockPhase: number | null; selectionFingerprint?: string }
   | { kind: 'cells'; focus: Extract<SessionPoint, { kind: 'cell' }>; block: CellBlockBookmark }
   | { kind: 'table-object'; focus: Extract<SessionPoint, { kind: 'body' }>; control: number; tableFingerprint: string }
   | { kind: 'picture-object'; focus: Extract<SessionPoint, { kind: 'body' }>; control: number; pictureFingerprint: string }
-  | HeaderFooterBookmark | FootnoteBookmark;
+  | HeaderFooterBookmark | FootnoteBookmark | TextBoxBookmark;
 export type DocumentViewState = { version: 1; zoom: number; fitMode: DocumentFitMode; scrollX: number; scrollY: number; caret?: BodyCaret; cursor?: SessionCursor };
 
 export type PreferenceErrorCode = 'read' | 'write' | 'corrupt' | 'version';

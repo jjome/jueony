@@ -1,3 +1,5 @@
+import {cellParagraphPlan} from './cell-paragraph.ts';
+import {tableSubdivisionPlan} from './table-subdivision.ts';
 import {tableStructurePlan} from './table-structure.ts';
 import {tableSplitPlan} from './table-split.ts';
 import {tableMergePlan} from './table-merge.ts';
@@ -50,6 +52,7 @@ function properties(value: unknown, rules: Record<string, PropertyRule>) {
 }
 type AxisOperation = Extract<ControlOp, {index:number}>;
 export function tableAxisPlan(table:Table,op:AxisOperation):Table {
+ if(table.cellZoneCount!==undefined&&table.cellZoneCount!==0)fail('셀 합성 영역이 있는 표는 AI로 행·열을 변경하지 않습니다.');
  if(table.editable===false)fail('보호 표는 AI로 행·열을 편집하지 않습니다.');if(table.cells.some(c=>c.properties.cellProtect===true))fail('보호 셀이 있는 표는 AI로 행·열을 편집하지 않습니다.');
  const values = 'values' in op ? op.values : [];
  const row=op.kind.endsWith('_row'),insert=op.kind.startsWith('insert_');
@@ -116,6 +119,8 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
   const tabs=operations.filter(op=>op.kind==='set_paragraph_tabs');
   if(tabs.length&&(tabs.length!==operations.length||new Set(tabs.map(op=>(op as {target:string}).target)).size!==tabs.length))fail('문단 탭은 서로 다른 문단의 탭 명령만 한 요청으로 묶어 실행하세요.');
   for (const op of operations) {
+    if(op.kind==='replace_cell_paragraph'){only(op,['kind','target','row','column','paragraph','originalText','text']);if(operations.length!==1)fail('셀 문단 교체는 단독 요청으로 실행하세요.');cellParagraphPlan(op,snapshot);continue;}
+    if(op.kind==='split_table_cell_into'){only(op,['kind','target','row','column','rows','columns']);if(operations.length!==1)fail('임의 셀 분할은 단독 요청으로 실행하세요.');tableSubdivisionPlan(op,snapshot);continue;}
     if(op.kind==='split_table'||op.kind==='attach_table'){only(op,op.kind==='split_table'?['kind','target','atRow']:['kind','target','nextTarget']);if(operations.length!==1)fail('표 나누기·붙이기는 단독 요청으로 실행하세요.');tableStructurePlan(op,snapshot);continue;}
     if(op.kind==='split_table_cell'){only(op,['kind','target','row','column']);if(operations.length!==1)fail('셀 기본 분할은 단독 요청으로 실행하세요.');tableSplitPlan(op,snapshot);continue;}
     if(op.kind==='merge_table_cells'){only(op,['kind','target','startRow','startColumn','rowCount','columnCount']);if(operations.length!==1)fail('셀 병합은 단독 요청으로 실행하세요.');tableMergePlan(op,snapshot);continue;}

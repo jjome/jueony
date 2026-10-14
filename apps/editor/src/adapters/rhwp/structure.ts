@@ -65,7 +65,7 @@ export function readStructure(wasm: any): Structure {
     const tableProps=parsed(doc.getTableProperties(section,paragraph,ci)),mode=(['none','cell','row'] as const)[tableProps.pageBreak];
     let leading=0;while(leading<dimensions.rowCount&&cells.some(c=>c.row===leading)&&cells.filter(c=>c.row===leading).every(c=>c.properties.isHeader===true))leading++;
     const headerRows=cells.every(c=>c.properties.isHeader===(c.row<leading))?leading:null;
-    tables.push({editable:control.props?.Lock===0,...(control.props?.Lock!==0?{reason:'보호 표 또는 보호 상태를 확인할 수 없는 표입니다.'}:{}),headerRows, ...(mode!==undefined?{pagination:{mode,repeatHeader:tableProps.repeatHeader}}:{}), id: `s${section}p${paragraph}t${ci}`, section, paragraph, control: ci, rows: dimensions.rowCount, columns: dimensions.colCount, cells });
+    tables.push({...(Number.isSafeInteger(tableProps.cellZoneCount)&&tableProps.cellZoneCount>=0?{cellZoneCount:tableProps.cellZoneCount}:{}),editable:control.props?.Lock===0,...(control.props?.Lock!==0?{reason:'보호 표 또는 보호 상태를 확인할 수 없는 표입니다.'}:{}),headerRows, ...(mode!==undefined?{pagination:{mode,repeatHeader:tableProps.repeatHeader}}:{}), id: `s${section}p${paragraph}t${ci}`, section, paragraph, control: ci, rows: dimensions.rowCount, columns: dimensions.colCount, cells });
   }
   const styleLinks=parsed(doc.getStyleList()).map((style:any)=>({id:style.id,nextStyleId:style.nextStyleId}));
   const styles=parsed(doc.getStyleList()).map((style:any)=>({id:style.id,name:style.name,type:style.type}));

@@ -10,11 +10,11 @@
 
 ## 전체 작업 관리
 
-앞으로는 [전체 작업 체크리스트](docs/jueony-work-checklist.md)의 **구현·검증·Agent 연결**을 각각 갱신한다. [검색 화면](docs/jueony-work-checklist.html)에서 남은 항목을 필터링하고 [CSV](docs/jueony-work-checklist.csv)를 원본으로 관리한다. 421개 항목은 한글 상위 기능 188개·상태 범위 33개·세부 실행 작업 200개이며, 중복 범위와 부분 검증을 전체 완성률로 계산하지 않는다. [완료 규칙과 다음 순서](docs/97-master-work-checklist.md)를 따른다. MCP 등록은 이번 완료 기준에서 제외한다.
+앞으로는 [전체 작업 체크리스트](docs/jueony-work-checklist.md)의 **구현·검증·Agent 연결**을 각각 갱신한다. [검색 화면](docs/jueony-work-checklist.html)에서 남은 항목을 필터링하고 [CSV](docs/jueony-work-checklist.csv)를 원본으로 관리한다. 425개 항목은 한글 상위 기능 188개·상태 범위 33개·세부 실행 작업 204개이며, 중복 범위와 부분 검증을 전체 완성률로 계산하지 않는다. [완료 규칙과 다음 순서](docs/97-master-work-checklist.md)를 따른다. MCP 등록은 이번 완료 기준에서 제외한다.
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-table-structure-20261015/Start-Review.cmd)**로 실행한다(4322). AI 표 나누기·호환 다음 표 붙이기를 추가했다. [지원 범위·검증](docs/99-agent-table-structure.md)을 따른다. [형식 변환 4건과 좁은 HWP 겹침 표 저장 수정](docs/100-storage-conversion-and-overlap.md), 기존 기본 셀 분할·병합·행 높이도 포함한다. 복합 원본·임의 분할·HWP 저장 배치 두 반례·최종 한글 비교는 남아 있다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-parallel-editor-20261015/Start-Review.cmd)**로 실행한다(4324). 병합 주 셀의 한 문단 편집, 지정 행·열 셀 분할과 글상자 커서·선택·미저장 복원을 병렬로 추가했다. Agent 계약은 51종이다. [통합 결과와 제한](docs/104-parallel-editor-integration.md)을 따른다. 글상자 HWP 세로 정렬 저장과 표 영역 서식 관측 보호도 포함한다. 복합 병합·중첩·전체 개체·고급 편집과 최종 한글 비교는 남아 있다. 이전 4322 검수본은 유지한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

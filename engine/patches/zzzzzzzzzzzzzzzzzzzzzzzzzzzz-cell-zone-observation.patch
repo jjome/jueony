@@ -1,0 +1,20 @@
+--- a/src/document_core/commands/table_ops.rs
++++ b/src/document_core/commands/table_ops.rs
+@@ -2771,7 +2771,7 @@
+         let keep_with_anchor = common.prevent_page_break != 0;
+ 
+         Ok(format!(
+-            "{{\"cellSpacing\":{},\"paddingLeft\":{},\"paddingRight\":{},\"paddingTop\":{},\"paddingBottom\":{},\"pageBreak\":{},\"repeatHeader\":{},{},\"tableWidth\":{},\"tableHeight\":{},\"outerLeft\":{},\"outerRight\":{},\"outerTop\":{},\"outerBottom\":{}{},\"treatAsChar\":{},\"textWrap\":\"{}\",\"vertRelTo\":\"{}\",\"vertAlign\":\"{}\",\"horzRelTo\":\"{}\",\"horzAlign\":\"{}\",\"vertOffset\":{},\"horzOffset\":{},\"restrictInPage\":{},\"allowOverlap\":{},\"keepWithAnchor\":{}}}",
++            "{{\"cellSpacing\":{},\"paddingLeft\":{},\"paddingRight\":{},\"paddingTop\":{},\"paddingBottom\":{},\"pageBreak\":{},\"repeatHeader\":{},{},\"tableWidth\":{},\"tableHeight\":{},\"outerLeft\":{},\"outerRight\":{},\"outerTop\":{},\"outerBottom\":{}{},\"treatAsChar\":{},\"textWrap\":\"{}\",\"vertRelTo\":\"{}\",\"vertAlign\":\"{}\",\"horzRelTo\":\"{}\",\"horzAlign\":\"{}\",\"vertOffset\":{},\"horzOffset\":{},\"restrictInPage\":{},\"allowOverlap\":{},\"keepWithAnchor\":{},\"cellZoneCount\":{}}}",
+             table.cell_spacing,
+             table.padding.left, table.padding.right, table.padding.top, table.padding.bottom,
+             pb, table.repeat_header,
+@@ -2782,7 +2782,7 @@
+             treat_as_char,
+             text_wrap, vert_rel_to, vert_align, horz_rel_to, horz_align,
+             vert_offset, horz_offset,
+-            restrict_in_page, allow_overlap, keep_with_anchor,
++            restrict_in_page, allow_overlap, keep_with_anchor, table.zones.len(),
+         ))
+     }
+ 

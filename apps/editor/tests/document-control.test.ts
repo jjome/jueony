@@ -1,12 +1,21 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import init, { HwpDocument } from '@rhwp/core';
+import type { HwpDocument as NativeDocument } from '@rhwp/core';
+import { resolve } from 'node:path';
+import { pathToFileURL, fileURLToPath } from 'node:url';
+const enginePackage = process.env.JUEONY_ENGINE_PACKAGE ? resolve(process.env.JUEONY_ENGINE_PACKAGE) : fileURLToPath(new URL('../node_modules/@rhwp/core/', import.meta.url));
+const { default: init, HwpDocument } = await import(pathToFileURL(resolve(enginePackage, 'rhwp.js')).href);
+type HwpDocument = NativeDocument;
 import { readStructure } from '../src/document-control/structure.ts';
 import { executeDocumentOperations } from '../src/document-control/execute.ts';
 import { executeBodyOperations, validateGeneration } from '../src/mvp/edit-schema.ts';
 import type { Snapshot } from '../src/mvp/model.ts';
-await init({ module_or_path: await readFile(new URL('../node_modules/@rhwp/core/rhwp_bg.wasm', import.meta.url)) });
+await init({ module_or_path: await readFile(resolve(enginePackage, 'rhwp_bg.wasm')) });
+const probe = HwpDocument.createEmpty(); probe.createBlankDocument(); probe.createTable(0, 0, 0, 1, 1);
+const hasCellZoneObservation = JSON.parse(probe.getTableProperties(0, 0, readStructure(probe).tables[0].control)).cellZoneCount === 0; probe.free();
+// Topology must refuse unknown region ownership. The upstream npm engine lacks
+// this observation; run the patched engine via JUEONY_ENGINE_PACKAGE for these cases.
 const snapshot = (doc: HwpDocument): Snapshot => ({ revision: 'v1', name: 'test.hwpx', limitations: [], structure: readStructure(doc), nodes: Array.from({ length: doc.getSectionCount() }, (_, s) => Array.from({ length: doc.getParagraphCount(s) }, (_, p) => ({ id: `s${s}p${p}`, section: s, paragraph: p, text: doc.getTextRange(s, p, 0, doc.getParagraphLength(s, p)), editable: true }))).flat() });
 const fixture = () => { const doc = HwpDocument.createEmpty(); doc.createBlankDocument(); executeBodyOperations(doc, snapshot(doc), [{ kind: 'create_document', paragraphs: ['업무 계획', '추진 일정', '후속 조치'] }]); return doc; };
 const rows = [['단계', '기간', '담당'], ['준비', '1월', '총무'], ['실행', '2월', '사업'], ['점검', '3월', '감사']];
@@ -76,7 +85,7 @@ test('본문 삽입과 표 생성 뒤에도 원래 대상 ID가 같은 문단을
   } finally { doc.free(); }
 });
 
-test('표 행·열 앞/중간/뒤 삽입·삭제와 후속 셀 편집을 두 형식 저장과 undo로 검증',()=>{
+test('표 행·열 앞/중간/뒤 삽입·삭제와 후속 셀 편집을 두 형식 저장과 undo로 검증',{skip: !hasCellZoneObservation},()=>{
  for(const axis of ['row','column'])for(const index of [0,1,2]){
   const doc=fixture();try{
    let base=snapshot(doc);executeDocumentOperations(doc,base,validateGeneration({message:'',sourceIds:[],operations:[{kind:'create_table',after:'s0p0',resultId:'t',rows:[['A','B'],['C','D']]}]},base,[]).operations);
@@ -94,7 +103,7 @@ test('표 행·열 앞/중간/뒤 삽입·삭제와 후속 셀 편집을 두 형
  }
 });
 
-test('요청 내 새 표 참조와 연속 행열 편집, 복잡한 셀과 마지막 행열 삭제 거절',()=>{
+test('요청 내 새 표 참조와 연속 행열 편집, 복잡한 셀과 마지막 행열 삭제 거절',{skip: !hasCellZoneObservation},()=>{
  const doc=fixture();try{
   const base=snapshot(doc),ops=[{kind:'create_table',after:'s0p0',resultId:'t',rows:[['A','B'],['C','D']]},{kind:'insert_table_row',target:'@t',index:2,values:['E','F']},{kind:'insert_table_column',target:'@t',index:0,values:['1','2','3']},{kind:'delete_table_row',target:'@t',index:0},{kind:'delete_table_column',target:'@t',index:2},{kind:'set_table_cell',target:'@t',row:0,column:1,originalText:'C',text:'변경'}];
   executeDocumentOperations(doc,base,validateGeneration({message:'',sourceIds:[],operations:ops},base,[]).operations);

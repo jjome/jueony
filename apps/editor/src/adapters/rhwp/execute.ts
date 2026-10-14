@@ -1,3 +1,5 @@
+import {executeCellParagraph} from './cell-paragraph.ts';
+import {executeTableSubdivision} from './table-subdivision.ts';
 import {executeTableStructure} from './table-structure.ts';
 import {executeTableSplit} from './table-split.ts';
 import {executeTableMerge} from './table-merge.ts';
@@ -17,6 +19,8 @@ export function executeDocumentOperations(wasm: any, base: Snapshot, operations:
   if(operations.length===1&&operations[0].kind==='merge_sections')return executeAgentSectionMerge(doc,snapshot,operations[0]);
   if(operations.length===1&&operations[0].kind==='merge_table_cells')return executeTableMerge(doc,snapshot,operations[0]);
   if(operations.length===1&&(operations[0].kind==='split_table'||operations[0].kind==='attach_table'))return executeTableStructure(doc,snapshot,operations[0]);
+  if(operations.length===1&&operations[0].kind==='replace_cell_paragraph')return executeCellParagraph(doc,snapshot,operations[0]);
+  if(operations.length===1&&operations[0].kind==='split_table_cell_into')return executeTableSubdivision(doc,snapshot,operations[0]);
   if(operations.length===1&&operations[0].kind==='split_table_cell')return executeTableSplit(doc,snapshot,operations[0]);
   const tables = new Map((snapshot.structure?.tables ?? []).map(t => [t.id, t]));
   for (const op of operations) {

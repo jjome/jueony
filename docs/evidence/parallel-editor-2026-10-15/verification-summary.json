@@ -1,0 +1,255 @@
+{
+  "status": "PASS_SCOPED_WITH_REMAINING_EDITOR_LIMITS",
+  "checkedAt": "2026-10-14T18:23:22.273Z",
+  "unitPassed": 772,
+  "providerPassed": 52,
+  "wasmPassed": 330,
+  "browserPassed": 246,
+  "moduleCount": 9,
+  "moduleFiles": 299,
+  "reports": [
+    {
+      "category": "split-native",
+      "kind": "native",
+      "passed": 9
+    },
+    {
+      "category": "merge-native",
+      "kind": "native",
+      "passed": 9
+    },
+    {
+      "category": "native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "table-multi-header-native",
+      "kind": "native",
+      "passed": 16
+    },
+    {
+      "category": "agent-table-header-native",
+      "kind": "native",
+      "passed": 15
+    },
+    {
+      "category": "agent-table-pagination-native",
+      "kind": "native",
+      "passed": 15
+    },
+    {
+      "category": "table-protection-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "table-conversion-native",
+      "kind": "native",
+      "passed": 17
+    },
+    {
+      "category": "styles-native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "style-stories-native",
+      "kind": "native",
+      "passed": 4
+    },
+    {
+      "category": "agent-style-next-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "agent-native",
+      "kind": "native",
+      "passed": 13
+    },
+    {
+      "category": "memo-native",
+      "kind": "native",
+      "passed": 5
+    },
+    {
+      "category": "following-native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "outer-native",
+      "kind": "native",
+      "passed": 4
+    },
+    {
+      "category": "width-native",
+      "kind": "native",
+      "passed": 12
+    },
+    {
+      "category": "equal-native",
+      "kind": "native",
+      "passed": 12
+    },
+    {
+      "category": "owner-native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "host-native",
+      "kind": "native",
+      "passed": 10
+    },
+    {
+      "category": "default-native",
+      "kind": "native",
+      "passed": 9
+    },
+    {
+      "category": "split-browser",
+      "kind": "browser",
+      "passed": 12
+    },
+    {
+      "category": "merge-browser",
+      "kind": "browser",
+      "passed": 12
+    },
+    {
+      "category": "browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "table-multi-header-browser",
+      "kind": "browser",
+      "passed": 20
+    },
+    {
+      "category": "agent-table-header-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "agent-table-pagination-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "table-protection-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "table-conversion-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "selected-object-browser",
+      "kind": "browser",
+      "passed": 16
+    },
+    {
+      "category": "agent-style-next-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "agent-browser",
+      "kind": "browser",
+      "passed": 15
+    },
+    {
+      "category": "width-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "equal-browser",
+      "kind": "browser",
+      "passed": 15
+    },
+    {
+      "category": "structure-native",
+      "kind": "native",
+      "passed": 11
+    },
+    {
+      "category": "structure-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "cell-paragraph-native",
+      "kind": "native",
+      "passed": 31
+    },
+    {
+      "category": "cell-paragraph-browser",
+      "kind": "browser",
+      "passed": 12
+    },
+    {
+      "category": "subdivision-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "subdivision-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "textbox-native",
+      "kind": "native",
+      "passed": 8
+    },
+    {
+      "category": "textbox-browser",
+      "kind": "browser",
+      "passed": 8
+    },
+    {
+      "category": "textbox-storage-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "format-conversion-native",
+      "kind": "native",
+      "passed": 24
+    },
+    {
+      "category": "overlap-native",
+      "kind": "native",
+      "passed": 18
+    }
+  ],
+  "engineSourceId": "31c6854ba64af4b5",
+  "wasmSha256": "6e7e8ca9971063ae08ba5336fdd7ef5f73a66a055a82e0600adf4c21a52ded3d",
+  "customSourceSha256": "94bc5c54a87f571a74cfbf27bb43a716b3e600a06c84f710cd63fcf23adc2347",
+  "applicationSourceCommit": "6d701dbb656493b1dfbab7e5af5f43bda5bee5ac",
+  "applicationSourceDirty": true,
+  "commandKinds": 51,
+  "fixed": [
+    "Parallel merged-primary paragraph replacement and plain source arbitrary row/column subdivision are connected to the existing opened document, neutral Agent contract, validation, comparison, cursor, request undo/redo, strict post-render and save/reopen.",
+    "Rectangle textbox caret/forward/reverse selection, tab/workspace restart and actual unsaved keyboard recovery are supported only for fully queried plain sources.",
+    "Read-only Native cell-zone ownership gates table topology; missing/ambiguous/zoned observations refuse. HWP textbox known semantic alignment synchronizes list bits while reserved raw3 remains protected.",
+    "Current related table/style/storage/browser scenarios are re-executed on the identical engine31 and application source."
+  ],
+  "unresolved": [
+    "The four recorded public conversion blocks are fixed. HWP overlapping tails with later visible text or positive saved gaps remain unresolved.",
+    "Broad N004/N005/N014 remain partial: complex merged/nested/protected/field/caption/zoned/multi-page editing and all shape/story state are not complete.",
+    "Next candidate investigation found span-crossing Native row insertion/deletion height mismatch and existing header/note story fingerprint format-observation gaps; isolated candidate work is not included in this reviewed build."
+  ],
+  "limits": [
+    "Scenario executions are not unique features or a full Hancom completion percentage. All listed reports match this build; unrelated historical suites are not counted.",
+    "Independent Hancom2024 comparison, actual paid model calls and Native Rust unit suite NOT_RUN. Four provider protocols are synthetic.",
+    "Public corpus originals/conversions remain ignored locally; only metadata and authored feature fixtures are packaged.",
+    "Production source was frozen during concurrent verification. Independent next-candidate experiments do not modify this engine patch set."
+  ]
+}

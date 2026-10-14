@@ -1,0 +1,80 @@
+--- a/src/document_core/commands/object_ops/shape.rs
++++ b/src/document_core/commands/object_ops/shape.rs
+@@ -273,8 +273,8 @@
+                 crate::model::table::VerticalAlign::Bottom => "Bottom",
+             };
+             format!(
+-                ",\"tbMarginLeft\":{},\"tbMarginRight\":{},\"tbMarginTop\":{},\"tbMarginBottom\":{},\"tbVerticalAlign\":\"{}\"",
+-                tb.margin_left, tb.margin_right, tb.margin_top, tb.margin_bottom, va
++                ",\"tbMarginLeft\":{},\"tbMarginRight\":{},\"tbMarginTop\":{},\"tbMarginBottom\":{},\"tbVerticalAlign\":\"{}\",\"tbVerticalAlignKnown\":{}",
++                tb.margin_left, tb.margin_right, tb.margin_top, tb.margin_bottom, va, (tb.list_attr >> 5) & 0x03 != 3
+             )
+         } else {
+             String::new()
+@@ -582,6 +582,14 @@
+                         "Bottom" => crate::model::table::VerticalAlign::Bottom,
+                         _ => tb.vertical_align,
+                     };
++                    if matches!(v.as_str(), "Top" | "Center" | "Bottom") {
++                        let code = match tb.vertical_align {
++                            crate::model::table::VerticalAlign::Top => 0,
++                            crate::model::table::VerticalAlign::Center => 1,
++                            crate::model::table::VerticalAlign::Bottom => 2,
++                        };
++                        tb.list_attr = (tb.list_attr & !(0x03 << 5)) | (code << 5);
++                    }
+                 }
+             }
+         }
+@@ -663,8 +671,8 @@
+                 crate::model::table::VerticalAlign::Bottom => "Bottom",
+             };
+             format!(
+-                ",\"tbMarginLeft\":{},\"tbMarginRight\":{},\"tbMarginTop\":{},\"tbMarginBottom\":{},\"tbVerticalAlign\":\"{}\"",
+-                tb.margin_left, tb.margin_right, tb.margin_top, tb.margin_bottom, va
++                ",\"tbMarginLeft\":{},\"tbMarginRight\":{},\"tbMarginTop\":{},\"tbMarginBottom\":{},\"tbVerticalAlign\":\"{}\",\"tbVerticalAlignKnown\":{}",
++                tb.margin_left, tb.margin_right, tb.margin_top, tb.margin_bottom, va, (tb.list_attr >> 5) & 0x03 != 3
+             )
+         } else {
+             String::new()
+@@ -936,6 +944,14 @@
+                         "Bottom" => crate::model::table::VerticalAlign::Bottom,
+                         _ => tb.vertical_align,
+                     };
++                    if matches!(v.as_str(), "Top" | "Center" | "Bottom") {
++                        let code = match tb.vertical_align {
++                            crate::model::table::VerticalAlign::Top => 0,
++                            crate::model::table::VerticalAlign::Center => 1,
++                            crate::model::table::VerticalAlign::Bottom => 2,
++                        };
++                        tb.list_attr = (tb.list_attr & !(0x03 << 5)) | (code << 5);
++                    }
+                 }
+             }
+         }
+--- a/src/serializer/control.rs
++++ b/src/serializer/control.rs
+@@ -2152,7 +2152,22 @@
+         let mut w = ByteWriter::new();
+         // para_count: 스펙은 INT16이지만 실제 HWP 파일에서는 UINT32로 저장됨
+         w.write_u32(text_box.paragraphs.len() as u32).unwrap();
+-        w.write_u32(text_box.list_attr).unwrap();
++        // LIST_HEADER bits 5-6 are the textbox's resolved vertical alignment.
++        // New boxes may carry a cached Center list_attr but a Top semantic
++        // value. Preserve all unrelated/unknown bits, as the cell writer does.
++        let alignment = match text_box.vertical_align {
++            crate::model::table::VerticalAlign::Top => 0,
++            crate::model::table::VerticalAlign::Center => 1,
++            crate::model::table::VerticalAlign::Bottom => 2,
++        };
++        // Code 3 is reserved: parser exposes only a Top fallback, not proof
++        // of source intent. Preserve it until an explicit supported setter.
++        let list_attr = if (text_box.list_attr >> 5) & 0x03 == 3 {
++            text_box.list_attr
++        } else {
++            (text_box.list_attr & !(0x03 << 5)) | (alignment << 5)
++        };
++        w.write_u32(list_attr).unwrap();
+         // 여백 + 최대 폭 (글상자 고유 데이터)
+         w.write_i16(text_box.margin_left).unwrap();
+         w.write_i16(text_box.margin_right).unwrap();

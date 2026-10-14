@@ -1,6 +1,11 @@
 import type {Table} from '../../modules/document/public/index.ts';
 import {capturePreservationEvidence} from './preservation.ts';
 import {nativeDocument,parsed} from './structure.ts';
+/** Topology changes cannot preserve unexposed cell-zone coordinates. */
+export function assertNativeTableNoCellZones(wasm:any,table:Table):void {
+ const d=nativeDocument(wasm),p=parsed(d.getTableProperties(table.section,table.paragraph,table.control));
+ if(p?.cellZoneCount!==0)throw new Error('하나의 셀처럼 설정된 영역이 있거나 그 상태를 확인할 수 없는 표는 AI로 구조를 변경하지 않습니다.');
+}
 /** Recheck Native flags, independent of detached/legacy/model-visible editable values. */
 export function assertNativeTableWritable(wasm:any,table:Table,cells?:number[]):void {
  const d=nativeDocument(wasm),flat=table.paragraph+Array.from({length:table.section},(_,i)=>d.getParagraphCount(i)).reduce((a:number,b:number)=>a+b,0);

@@ -1,0 +1,17 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {validateEditOperations,describeStructure} from '../src/modules/document/public/index.ts';
+import {generationSchema} from '../src/modules/document/public/wire-schema.mjs';
+import {captureTemplate} from '../src/modules/automation/public/index.ts';
+const op={kind:'delete_header_footer' as const,section:0,story:'header' as const,pageKind:'both' as const,originalText:'기관 😀'};
+const base=():any=>({revision:'r',name:'delete.hwpx',limitations:[],nodes:[],structure:{sections:[{index:0,page:{},headerFooters:[{story:'header',pageKind:'both',exists:true,editable:true,deletable:true,text:'기관 😀',textTruncated:false,paragraphCount:1}]}],paragraphs:[],tables:[],unsupportedControls:[]}});
+test('delete wire is explicit about one stored definition and has no path/native token/force',()=>{const all=generationSchema().properties.operations.items.anyOf;assert.equal(all.length,29);const shape=all.find(s=>s.properties.kind.enum[0]===op.kind)!;assert.deepEqual(shape.required,['kind','section','story','pageKind','originalText']);for(const field of ['token','path','force','text','properties'])assert.throws(()=>validateEditOperations([{...op,[field]:'x'}],base()),/속성/);});
+test('delete validates detached current stored source without mutating it',()=>{const s=base(),before=structuredClone(s);assert.deepEqual(validateEditOperations([op],s),[op]);assert.deepEqual(s,before);});
+test('missing, unknown, readonly and unqueried eligibility are refused',()=>{for(const patch of [{exists:false},{exists:null},{editable:false},{deletable:false},{deletable:undefined},{textTruncated:true},{paragraphCount:2}]){const s=base();Object.assign(s.structure.sections[0].headerFooters[0],patch);assert.throws(()=>validateEditOperations([op],s));}});
+test('exact original text remains required even when deleting all text/control',()=>{for(const originalText of ['오래된',undefined,1])assert.throws(()=>validateEditOperations([{...op,originalText}],base()),/원문/);});
+test('empty existing definition can be deleted; absence is never synthesized as success',()=>{const s=base();s.structure.sections[0].headerFooters[0].text='';assert.equal(validateEditOperations([{...op,originalText:''}],s).length,1);s.structure.sections[0].headerFooters[0].exists=false;assert.throws(()=>validateEditOperations([{...op,originalText:''}],s));});
+test('current section/story/parity are bounded and explicit',()=>{for(const patch of [{section:-1},{section:1},{section:0.5},{story:'body'},{pageKind:'all'}])assert.throws(()=>validateEditOperations([{...op,...patch}],base()));});
+test('delete cannot be batched with another deletion or text rewrite',()=>{for(const other of [op,{kind:'set_header_footer_text',section:0,story:'header',pageKind:'both',originalText:op.originalText,text:''}])assert.throws(()=>validateEditOperations([op,other],base()),/단독/);});
+test('repeat templates never store a destructive header/footer target',()=>{assert.throws(()=>captureTemplate({message:'삭제',sourceIds:[],operations:[op]},base()),/아직 기록/);});
+test('comparison distinguishes stored deletion eligibility and absence',()=>{const s=base();assert.match(describeStructure(s.structure),/저장 정의 삭제 가능/);s.structure.sections[0].headerFooters[0].exists=false;assert.match(describeStructure(s.structure),/양쪽 머리말: 저장된 정의 없음/);});
+test('complex document eligibility is mandatory even if source text is simple',()=>{const s=base();s.structure.sections[0].headerFooters[0].deletable=false;assert.throws(()=>validateEditOperations([op],s),/일반 본문/);});

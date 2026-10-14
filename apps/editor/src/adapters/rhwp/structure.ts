@@ -35,6 +35,9 @@ export function readStructure(wasm: any): Structure {
       paragraphs.push({ id: `s${section}p${paragraph}`, characters: parsed(doc.getCharPropertiesAt(section, paragraph, 0)), paragraph: parsed(doc.getParaPropertiesAt(section, paragraph)),style:parsed(doc.getStyleAt(section,paragraph)),pageHide:parsed(doc.getPageHide(section,paragraph)) });
     }
   }
+  // Deletion is restricted to documents whose every stored header/footer is natively plain.
+  const allPlainHeaders=sections.every(s=>s.headerFooters?.every(h=>h.exists===false||h.exists===true&&h.editable===true)===true);
+  if(!allPlainHeaders)for(const section of sections)for(const header of section.headerFooters??[])header.deletable=false;
   const controls = parsed(doc.getControls()), lists = parsed(doc.getCursorModel()).lists;
   paragraphs.forEach((p,index)=>{const at=positions[index];p.controls=controls.filter((c:any)=>c.list===0&&c.para===index).map((c:any)=>c.ctrlId);p.pageIndex=parsed(doc.getPageOfPosition(at.section,at.paragraph)).page;});
   const tables: Table[] = [], unsupportedControls: string[] = [];

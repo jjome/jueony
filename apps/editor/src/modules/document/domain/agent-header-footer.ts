@@ -1,5 +1,5 @@
-import type {AgentHeaderFooterOp,AgentHeaderFooterFormatOp,AgentHeaderFooterParagraphOp,Snapshot} from '../public/types.ts';
-function sourceFor(op:AgentHeaderFooterOp|AgentHeaderFooterFormatOp|AgentHeaderFooterParagraphOp,snapshot:Snapshot) {
+import type {AgentHeaderFooterOp,AgentHeaderFooterFormatOp,AgentHeaderFooterParagraphOp,AgentHeaderFooterDeleteOp,Snapshot} from '../public/types.ts';
+function sourceFor(op:AgentHeaderFooterOp|AgentHeaderFooterFormatOp|AgentHeaderFooterParagraphOp|AgentHeaderFooterDeleteOp,snapshot:Snapshot) {
  const s=snapshot.structure?.sections.find(s=>s.index===op.section);
  if(!Number.isSafeInteger(op.section)||op.section<0||!s||!['header','footer'].includes(op.story)||!['both','odd','even'].includes(op.pageKind))throw new Error('현재 구역·머리말/꼬리말·양쪽/홀짝 종류를 지정하세요.');
  const source=s.headerFooters?.find(h=>h.story===op.story&&h.pageKind===op.pageKind);
@@ -34,4 +34,9 @@ export function validateAgentHeaderFooterParagraph(op:AgentHeaderFooterParagraph
   else if(key==='lineSpacingPercent'){if(typeof value!=='number'||!Number.isInteger(value)||value<50||value>500)throw new Error('줄 간격은 50~500의 정수 백분율입니다.');}
   else throw new Error('머리말/꼬리말 문단 서식은 정렬과 백분율 줄 간격만 지원합니다.');
  }
+}
+
+export function validateAgentHeaderFooterDelete(op:AgentHeaderFooterDeleteOp,snapshot:Snapshot):void {
+ const source=sourceFor(op,snapshot);
+ if(source.deletable!==true)throw new Error('머리말/꼬리말 정의 삭제는 일반 본문과 단순 머리말/꼬리말만 있는 문서에서 지원합니다. 원본은 유지합니다.');
 }

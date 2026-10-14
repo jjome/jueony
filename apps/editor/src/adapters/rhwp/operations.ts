@@ -1,5 +1,6 @@
 import type { Snapshot, Table, ControlOp } from '../../modules/document/public/index.ts';
 import { nativeDocument, parsed, readStructure } from './structure.ts';
+import {executeAgentHeaderFooterDelete} from './agent-header-footer-delete.ts';
 import {executeAgentHeaderFooter,executeAgentHeaderFooterFormat,executeAgentHeaderFooterParagraph} from './agent-header-footer.ts';
 import {executeAgentSectionSplit} from './agent-section-split.ts';
 import {executeAgentSectionOperation} from './agent-section-settings.ts';
@@ -26,6 +27,7 @@ function replaceCellText(doc:any,base:number[],cell:number,value:string) {
 }
 export function executeControlOperation(wasm: any, snapshot: Snapshot, op: ControlOp, tables: Map<string, Table>): { section: number; after: number; count: number } | undefined {
   const doc = nativeDocument(wasm);
+  if(op.kind==='delete_header_footer'){executeAgentHeaderFooterDelete(doc,snapshot,op);return;}
   if(op.kind==='format_header_footer_paragraph'){executeAgentHeaderFooterParagraph(doc,snapshot,op);return;}
   if(op.kind==='format_header_footer'){executeAgentHeaderFooterFormat(doc,snapshot,op);return;}
   if(op.kind==='set_header_footer_text'){executeAgentHeaderFooter(doc,snapshot,op);return;}

@@ -1,0 +1,102 @@
+{
+  "successfulOutputs": 9,
+  "protectedInputs": 2,
+  "documents": [
+    {
+      "path": "table-protection-native/new-alias-table.hwpx",
+      "role": "successful-edit-output",
+      "bytes": 7995,
+      "sha256": "713300abd579a06a5d90096ad20180740f734cbe06ce67f718001d26aa5ff5ae",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "table-protection-native/protected-source.hwp",
+      "role": "protected-source-input",
+      "bytes": 13312,
+      "sha256": "ba091463c27c463033c2326b4855f17aaea331ea2b4f2885f4853f2f231251bf",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "table-protection-native/protected-source.hwpx",
+      "role": "protected-source-input",
+      "bytes": 8104,
+      "sha256": "6f6e173442c6d1d2dfd24c321af90398b6b0b6808b5c6996fd001aa7c52928a6",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "table-protection-native/unprotected-neighbour.hwp",
+      "role": "successful-edit-output",
+      "bytes": 13312,
+      "sha256": "12750b3f84e763fa1c296a7520f5a8d804adc59ba33ce9c78827f86fadce5a67",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "table-protection-native/unprotected-neighbour.hwpx",
+      "role": "successful-edit-output",
+      "bytes": 8143,
+      "sha256": "8e869650c4b9873f618e63f1db759b150fda659b673da152e6e0c2dfbb00b0b3",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "table-protection-browser/neighbour-anthropic.hwpx",
+      "role": "successful-edit-output",
+      "bytes": 8110,
+      "sha256": "57e65fb90da948021dad99256359b40fb865bbfb02617c9dbbf089abed4aa260",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "table-protection-browser/neighbour-format.hwp",
+      "role": "successful-edit-output",
+      "bytes": 13312,
+      "sha256": "73540ae53e2ce845ec01f1a6d028206f56912192acf82b82492e12cd156866dd",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "table-protection-browser/neighbour-format.hwpx",
+      "role": "successful-edit-output",
+      "bytes": 8137,
+      "sha256": "7f2cc896622df9b939163833d9056528ccf33504d324e9341f6fbd9c6a4c19c1",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "table-protection-browser/neighbour-gemini.hwpx",
+      "role": "successful-edit-output",
+      "bytes": 8110,
+      "sha256": "57e65fb90da948021dad99256359b40fb865bbfb02617c9dbbf089abed4aa260",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "table-protection-browser/neighbour-openai-compatible.hwpx",
+      "role": "successful-edit-output",
+      "bytes": 8110,
+      "sha256": "57e65fb90da948021dad99256359b40fb865bbfb02617c9dbbf089abed4aa260",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    },
+    {
+      "path": "table-protection-browser/neighbour-openai-responses.hwpx",
+      "role": "successful-edit-output",
+      "bytes": 8110,
+      "sha256": "57e65fb90da948021dad99256359b40fb865bbfb02617c9dbbf089abed4aa260",
+      "origin": "self-authored synthetic fixture",
+      "nativeHancom2024": "NOT_RUN"
+    }
+  ],
+  "policy": "App AI write guard; not Native ACL, OS permissions or all Hancom form-mode equivalence.",
+  "manualChecks": [
+    "Open protected-source.hwp and .hwpx as COPIES in Hancom 2024; inspect first-cell protection and original text. These are protected inputs, not successful AI edits.",
+    "Open unprotected-neighbour and neighbour-format outputs; protected first-cell text, borders and formatting should remain unchanged, while only the unprotected neighbour changes.",
+    "Open new-alias-table.hwpx to inspect fresh table creation and subsequent row/column/text/format operations.",
+    "Inspect protection-rejected.png and protection-comparison.png for refusal and readonly descriptions. Provider outputs use synthetic protocols; no paid model quality claim.",
+    "Save a COPY in Hancom and reopen in Jueony; record content/flag/border/layout differences without overwriting source evidence."
+  ]
+}

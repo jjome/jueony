@@ -1,0 +1,22 @@
+{
+  "implementationCommit": "226b88cea0f726ae5133fff19d5375cf728dafc5",
+  "applicationSourceCommit": "07297890cf813fcfb52e756a7f92e97b2f0dc98d",
+  "applicationSourceDirty": true,
+  "customSourceSha256": "5ac83f323fb0fc00277e765d6ce423a1abcf659ce4d620001c77a2d15f4fb81c",
+  "engineSourceId": "570603c60a53c953",
+  "wasmSha256": "ba74ed4ab9e819166e41152036cbd01286fa69f3cac3eeb5a08b4c0b4cad723b",
+  "upstreamReference": "1a76570e833917d15817415a53c09ad61ab3203f",
+  "engineChanged": false,
+  "finalBundle": "build/jueony-table-protection-20261014 @4300",
+  "notes": [
+    "Before-fix evidence at 0729789: protected HWP/HWPX cell accepted actual AI text write because editable=true ignored Native cellProtect.",
+    "Current built application metadata predates implementation commit and is dirty=true; exact current source, build script, patches and WASM hashes are independently checked by evidence verifier.",
+    "App AI policy only. Manual protection UI remains separate; no AI unprotect command or all-form-mode/Native-ACL parity claim.",
+    "Domain guards plus independent actual Native Lock and cellProtect checks. Axes scan all actual Native cells even when model/snapshot omits protected cells. Missing flags, reader errors and invalid ranges fail closed.",
+    "Protected neighbour content, normalized format/border and flags compared after nonstructural writes. Background-only update previously changed adjacent protected border width 1 to 0; passing original border/diagonal properties fixes this counterexample.",
+    "Fault-injected Native Lock/unreadable flags do not demonstrate generation of a real locked file. Live failures and unexpected protected-neighbour drift restore full request snapshot. Delayed AI cannot overwrite a user protection edit.",
+    "Existing immutable 570603 engine reused unchanged. Actual WASM suites rerun; no new engine compile or Native Rust unit suite in this increment.",
+    "Full unit/provider suites plus listed related regressions only; not cumulative historical full-editor sweep. Two intentional bullet loss-save refusals remain expected and separate.",
+    "Four provider adapters use synthetic protocol servers. Native Hancom comparison and paid model calls NOT_RUN. Full documented implementation incomplete; automation remains active."
+  ]
+}

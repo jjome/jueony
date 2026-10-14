@@ -1,0 +1,20 @@
+{
+  "implementationCommit": "056ed9ce26caaf6c1285a39d1004c14d1e77bd3e",
+  "applicationSourceCommit": "87f2615c01a85ae10fbb397eb16de2a771537932",
+  "applicationSourceDirty": true,
+  "customSourceSha256": "33b8f6579f21ddadbbb85216b8d1e8d6063a9c83751545eae2a34e1f7e344ec0",
+  "engineSourceId": "570603c60a53c953",
+  "wasmSha256": "ba74ed4ab9e819166e41152036cbd01286fa69f3cac3eeb5a08b4c0b4cad723b",
+  "upstreamReference": "1a76570e833917d15817415a53c09ad61ab3203f",
+  "engineChanged": false,
+  "finalBundle": "build/jueony-agent-table-header-20261014 @4298",
+  "notes": [
+    "Existing immutable 570603 engine reused unchanged; no engine compile or Native Rust unit tests in this increment. Actual WASM tests rerun.",
+    "Atomic first-row title flags, repeatHeader and explicit pageBreak policy. One command/undo, no alias/mixed batch/macro/autosave. Existing cells/text/format/geometry/placement/other tables/resources remain.",
+    "Only none/whole-first-row originals supported. Partial/multiple/scattered title rows and complex/protected/merged/nested/mixed/caption/inline/overlap/field originals and >200 cells protected.",
+    "Manual dialog shares Agent domain and adapter; current revision/selection rechecked, preflight/save verified, table object and body cell-block selection retained. Cancel/no-op/stale dialog and live second-cell failure tested.",
+    "24-row/48-cell SVGs show exactly one of each first-row label on every continued page; repeat off leaves labels only on first page. All 46 body item labels and second/third lines occur once across rendered pages; stored text is unchanged.",
+    "Known renderer observation: row policy continues a partial body cell below the repeated title. Existing can_intra_split path retained; exact row-boundary/Hancom layout parity pending and documented.",
+    "Actual Edge uses four synthetic provider protocols, not paid LLM. Native Hancom/paid models NOT_RUN. Full editor scope incomplete; automation remains active."
+  ]
+}

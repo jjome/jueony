@@ -1,0 +1,172 @@
+{
+  "status": "PASS_SCOPED_AUTOMATED_CHECKS",
+  "checkedAt": "2026-10-14T10:51:06.566Z",
+  "unitPassed": 672,
+  "providerPassed": 52,
+  "wasmPassed": 257,
+  "browserPassed": 179,
+  "moduleCount": 9,
+  "moduleFiles": 278,
+  "reports": [
+    {
+      "category": "agent-table-header-native",
+      "kind": "native",
+      "passed": 15
+    },
+    {
+      "category": "agent-table-header-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "agent-table-pagination-native",
+      "kind": "native",
+      "passed": 15
+    },
+    {
+      "category": "agent-table-pagination-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "table-conversion-native",
+      "kind": "native",
+      "passed": 17
+    },
+    {
+      "category": "table-conversion-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "selected-object-browser",
+      "kind": "browser",
+      "passed": 16
+    },
+    {
+      "category": "agent-style-next-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "agent-style-next-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "agent-style-rename-native",
+      "kind": "native",
+      "passed": 19
+    },
+    {
+      "category": "agent-style-rename-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "styles-native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "style-stories-native",
+      "kind": "native",
+      "passed": 4
+    },
+    {
+      "category": "agent-style-create-native",
+      "kind": "native",
+      "passed": 13
+    },
+    {
+      "category": "agent-style-create-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "agent-outline-native",
+      "kind": "native",
+      "passed": 23
+    },
+    {
+      "category": "agent-basic-numbering-native",
+      "kind": "native",
+      "passed": 25
+    },
+    {
+      "category": "agent-numbering-native",
+      "kind": "native",
+      "passed": 17
+    },
+    {
+      "category": "agent-bullets-native",
+      "kind": "native",
+      "passed": 26
+    },
+    {
+      "category": "agent-lists-native",
+      "kind": "native",
+      "passed": 23
+    },
+    {
+      "category": "agent-para-tabs-native",
+      "kind": "native",
+      "passed": 20
+    },
+    {
+      "category": "agent-para-box-native",
+      "kind": "native",
+      "passed": 20
+    },
+    {
+      "category": "agent-outline-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "agent-basic-numbering-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "agent-numbering-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "agent-bullets-browser",
+      "kind": "browser",
+      "passed": 15
+    },
+    {
+      "category": "agent-lists-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "bundle-compatibility",
+      "kind": "bundle",
+      "passed": 4
+    }
+  ],
+  "customSourceSha256": "33b8f6579f21ddadbbb85216b8d1e8d6063a9c83751545eae2a34e1f7e344ec0",
+  "wasmSha256": "ba74ed4ab9e819166e41152036cbd01286fa69f3cac3eeb5a08b4c0b4cad723b",
+  "engineSourceId": "570603c60a53c953",
+  "applicationSourceCommit": "87f2615c01a85ae10fbb397eb16de2a771537932",
+  "applicationSourceDirty": true,
+  "scope": "Current build: full unit/provider suites, new atomic first title row/repetition and manual dialog/selection scenarios with actual continuation SVG label counts, table pagination/conversion/presets/fill/transpose, selected-object dispatch, next-style Enter, style rename/creation/reorder/delete/story and related outline/list/bullet/tab/decoration regressions only. This is NOT the cumulative 77-profile full editor sweep.",
+  "limitations": [
+    "Known retained renderer observation: a long row-policy fixture continues a partial body cell below the repeated title on the next page. Text/title counts preserved; exact row-boundary/Hancom layout comparison remains pending.",
+    "Only first-row whole-cell title assignment/clear plus repeatHeader and explicit pagination policy in one transaction. Repeat requires first row, row policy and at least one body row. Partial/multiple/scattered title rows and complex tables protected. Manual dialog shares same domain/adapter with Agent; no macro/autosave. Native Hancom parity NOT_RUN.",
+    "Existing root simple table pageBreak policy only: none/cell/row (0/1/2). Cell content/format/geometry, table placement and repeatHeader preserved. Protected/merged/nested/mixed/caption/inline/overlap/field documents and >200 cells unsupported. Pagination command does not edit title-row flags; separate set_table_header supports first row only. No exact Hancom layout guarantee, macro or autosave.",
+    "Set one paragraph style next link only; future Enter at ordinary body paragraph end follows it, middle split retains source. Default source, character/locked/noncanonical raw endpoints and field documents protected. No macro/autosave.",
+    "Rename one nondefault paragraph style name only; no English/shape/type/language/lock edits through rename. Field documents, character/locked/noncanonical raw HWP definitions protected.",
+    "Append one paragraph-style definition referencing exact stored source char/para shapes; self next style, empty English name, Korean language and unlocked. Separate apply; no custom shapes, inheritance, delete or macro.",
+    "Ordinary body stored section outline levels 0..6/relevel/clear; distinct-target outline-only batch, one request undo. No definition creation/change or builtin fallback; divergent direct references remain protected.",
+    "Extended/noncanonical raw resource cloning remains protected; new default resources can be added without reducing original blank HWP definitions.",
+    "Explicit stored paragraph restart remains unserialized and strict save/recovery remains blocked on truthful content loss.",
+    "No arbitrary new numbering format, section outline shape changes, outline TOC, image/check list, macro or automatic save.",
+    "Native Hancom comparison and paid LLM calls NOT_RUN. Native Rust unit tests NOT_RUN; existing 570603 engine reused unchanged with read-only style metadata getter and actual WASM scenarios rerun.",
+    "Full documented implementation scope incomplete; no percentage inferred."
+  ]
+}

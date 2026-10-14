@@ -120,7 +120,7 @@ if ($FrontendProfile -in @('page-inclusion','page-region','page-image','master-p
         if (Test-Path -LiteralPath $source) {
             $target = Join-Path $pageReview $category
             New-Item -ItemType Directory -Force $target | Out-Null
-            Get-ChildItem -LiteralPath $source -File | Where-Object { $_.Extension -in @('.hwp','.hwpx','.json','.svg') } | Copy-Item -Destination $target -Force
+            Get-ChildItem -LiteralPath $source -File | Where-Object { $_.Extension -in @('.hwp','.hwpx','.json','.svg') -or ($FrontendProfile -eq 'agent-table-header' -and $_.Extension -eq '.png' -and $_.Name -notlike 'failure*') } | Copy-Item -Destination $target -Force
         }
     }
     if (Test-Path -LiteralPath (Join-Path $pageEvidence 'verification-summary.json')) { Copy-Item -LiteralPath (Join-Path $pageEvidence 'verification-summary.json') -Destination $pageReview -Force }

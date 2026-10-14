@@ -1,0 +1,11 @@
+{
+  "implementationCommit": "8834003",
+  "basis": "Preserve a queried canonical stored seven-level numbering resource; validate raw binary/XML regeneration before clearing raw caches on the NEW clone only. Do not reduce opaque source shapes.",
+  "nativeFixtures": "Synthetic canonical definitions assembled via HWPX, then saved/reloaded as each format. Original blank HWP extended raw definitions and noncanonical XML are explicitly negative cases.",
+  "semantics": "New independent numbering ID; selected level start changes, other heads/formats/start levels and original resources preserved. This is not Paragraph.numbering_restart.",
+  "scope": "Current scoped regression subset; not the cumulative previous full sweep.",
+  "visualCheck": "Actual Edge screenshot shows 13. with manual added body text; Hancom/layout comparison NOT_RUN.",
+  "nativeRustUnitTests": "NOT_RUN on this engine build; WASM compile and actual engine scenarios run.",
+  "nativeHancomComparison": "NOT_RUN",
+  "paidLLMCalls": "NOT_RUN"
+}

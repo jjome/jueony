@@ -1,0 +1,68 @@
+[
+  {
+    "format": "hwp",
+    "sourceStoredRestarts": [
+      [
+        null,
+        {
+          "NewStart": 99
+        },
+        null
+      ]
+    ],
+    "reopenedStoredRestarts": [
+      [
+        null,
+        null,
+        null
+      ]
+    ],
+    "serializerReport": {
+      "schemaVersion": 1,
+      "outputFormat": "hwp",
+      "count": 1,
+      "losses": [
+        {
+          "code": "metadataReduced",
+          "subject": "paragraphProperties",
+          "path": "section/0/body/paragraph/1/numberingRestart",
+          "reason": "serializerNotImplemented"
+        }
+      ]
+    },
+    "preflight": "BLOCKED_LIVE_STATE_PRESERVED"
+  },
+  {
+    "format": "hwpx",
+    "sourceStoredRestarts": [
+      [
+        null,
+        {
+          "NewStart": 99
+        },
+        null
+      ]
+    ],
+    "reopenedStoredRestarts": [
+      [
+        null,
+        null,
+        null
+      ]
+    ],
+    "serializerReport": {
+      "schemaVersion": 1,
+      "outputFormat": "hwpx",
+      "count": 1,
+      "losses": [
+        {
+          "code": "metadataReduced",
+          "subject": "paragraphProperties",
+          "path": "section/0/body/paragraph/1/numberingRestart",
+          "reason": "serializerNotImplemented"
+        }
+      ]
+    },
+    "preflight": "BLOCKED_LIVE_STATE_PRESERVED"
+  }
+]

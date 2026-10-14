@@ -31,3 +31,11 @@ Adapter는 현재 본문/번호/카탈로그를 다시 읽고 원본 비공개 �
 실행 묶음은 `build/jueony-agent-numbering-20261014/Start-Review.cmd`, 주소는 `http://127.0.0.1:4280/`으로 준비한다. 이전 검수 서버와 사용자 문서는 유지한다. 새 합성 검수 파일은 `review-documents/agent-numbering/agent-numbering-native` 및 `agent-numbering-browser`에 포함한다.
 
 다음은 확장 원본을 보존하는 번호 정의 복제, 실제 한컴 표현에 근거한 문단 restart 저장, 사용자 지정 모양·개요와 최종 한글 직접 검수다. 전체 범위는 미완료이며 자동화를 유지한다.
+
+## 최종 검수본
+
+구현 `8834003`을 커밋·푸시했다. 전체 단위 601·provider/server 52·관련 실제 WASM 106·브라우저 46(검수 묶음 호환 4 포함) 통과. 신규 번호 검사 17/13과 기존 번호·글머리표·문단 탭·테두리의 관련 회귀를 같은 최종 엔진/앱에서 검사했다. 이 수치는 77번의 전체 편집기 누적 검사 538/508을 이번에 모두 재실행했다는 뜻이 아니다. [검사별 범위](evidence/agent-numbering-2026-10-14/verification-summary.json)를 따른다. TypeScript와 9개 모듈·260개 소스 경계 검사 통과, 예상 밖 page/console 오류와 외부 자산 요청 0. 기존 글머리표 저장 차단 2건은 별도 expectedSaveErrors다. 별도 Native Rust unit tests는 이번 빌드에서 실행하지 않았다.
+
+새 검수본 4280의 실제 served 소스/WASM·공통 명령/provider 계약과 묶음 호환을 대조했다. 앱 소스 SHA-256 `9175892703576f4748107f252e1c46ba7ee6082820bd6bd8666e97a507cce0a5`, 엔진 `3a5a68936f7c43e7`, WASM SHA-256 `52884acc0ec4e779f34febe0ba2ccf9a4c64bc781c49be402e67b490a4912713`. 빌드의 Git 메타데이터는 3b654e4/dirty=true이며 구현 8834003의 실제 앱 소스와 추적 패치 해시로 연결한다. [실행 대조](evidence/agent-numbering-2026-10-14/launch-check.json), [원본/합성 범위](evidence/agent-numbering-2026-10-14/source-baseline-notes.json)를 보관한다.
+
+새 검수 HWP/HWPX 17개를 실행 묶음의 review-documents/agent-numbering에 포함했다. `cloned-level-*`는 수준 0/1/6, `continued-sequence.*`는 시작 23과 후속 24, `retained-custom-shape.*`는 기존 사용자 형식의 유지, `created-*`는 네 합성 provider, `manual-created.hwpx`는 사용자 직접 입력 결과다. [파일 해시 목록](evidence/agent-numbering-2026-10-14/numbering-documents.json)으로 식별한다. 실제 한글 직접 재열기·유료 모델 품질·확장 번호와 문단 restart 및 전체 기능 구현은 미완료다. 자동화를 유지한다.

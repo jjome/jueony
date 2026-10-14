@@ -1,0 +1,71 @@
+{
+  "status": "PASS_SCOPED_AUTOMATED_CHECKS",
+  "checkedAt": "2026-10-14T07:09:16.313Z",
+  "unitPassed": 601,
+  "providerPassed": 52,
+  "wasmPassed": 106,
+  "browserPassed": 46,
+  "moduleCount": 9,
+  "moduleFiles": 260,
+  "reports": [
+    {
+      "category": "agent-numbering-native",
+      "kind": "native",
+      "passed": 17
+    },
+    {
+      "category": "agent-bullets-native",
+      "kind": "native",
+      "passed": 26
+    },
+    {
+      "category": "agent-lists-native",
+      "kind": "native",
+      "passed": 23
+    },
+    {
+      "category": "agent-para-tabs-native",
+      "kind": "native",
+      "passed": 20
+    },
+    {
+      "category": "agent-para-box-native",
+      "kind": "native",
+      "passed": 20
+    },
+    {
+      "category": "agent-numbering-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "agent-bullets-browser",
+      "kind": "browser",
+      "passed": 15
+    },
+    {
+      "category": "agent-lists-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "bundle-compatibility",
+      "kind": "bundle",
+      "passed": 4
+    }
+  ],
+  "customSourceSha256": "9175892703576f4748107f252e1c46ba7ee6082820bd6bd8666e97a507cce0a5",
+  "wasmSha256": "52884acc0ec4e779f34febe0ba2ccf9a4c64bc781c49be402e67b490a4912713",
+  "engineSourceId": "3a5a68936f7c43e7",
+  "applicationSourceCommit": "3b654e4a1959d5d0dbfb69739409c2038ab808c5",
+  "applicationSourceDirty": true,
+  "scope": "Current build: full unit/provider suites, new numbering scenarios and related list/bullet/tab/decoration regressions only. This is NOT the cumulative 77-profile full editor sweep.",
+  "limitations": [
+    "Canonical existing seven-level numbering definitions only; exactly one command and one request undo; at most 200 stored definitions.",
+    "Extended/noncanonical HWP/HWPX raw resources (including original blank HWP definitions) remain protected.",
+    "Explicit stored paragraph restart remains unserialized and strict save/recovery remains blocked on truthful content loss.",
+    "No new arbitrary numbering format, outline, image/check list, macro or automatic save.",
+    "Native Hancom comparison and paid LLM calls NOT_RUN. Native Rust unit tests NOT_RUN on this build (WASM engine scenarios and compilation performed).",
+    "Full documented implementation scope incomplete; no percentage inferred."
+  ]
+}

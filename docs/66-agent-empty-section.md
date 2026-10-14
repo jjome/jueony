@@ -41,8 +41,11 @@ Domain은 단독 명령·현재 구역·원문·삭제 가능성을 검사한다
 
 ## 완료한 자동 검증
 
-최종 단위 **476개**, provider/server **52개**, 실제 WASM **325개**, 브라우저 **348개**(동봉 실행 검사 전)가 같은 빌드로 통과했다. TypeScript와 9개 모듈·240개 소스 경계 검사도 통과했다. [검증 요약](evidence/agent-empty-2026-10-14/verification-summary.json)은 최종 소스·빌드·패치·WASM 해시를 대조한다. 미지원 원본을 허용하도록 기존 검사나 Native 판정을 바꾸지 않았다.
+최종 단위 **476개**, provider/server **52개**, 실제 WASM **325개**, 브라우저 **352개**(동봉 실행 호환 4개 포함)가 같은 빌드로 통과했다. TypeScript와 9개 모듈·240개 소스 경계 검사도 통과했다. [검증 요약](evidence/agent-empty-2026-10-14/verification-summary.json)은 최종 소스·빌드·패치·WASM 해시를 대조한다. 미지원 원본을 허용하도록 기존 검사나 Native 판정을 바꾸지 않았다.
 
 앱 소스 SHA-256은 `bde892c06a9955be78b8f0c0d2ae262e0c5a594217098d2aa4b4d9dbc7d526b2`이며 WASM SHA-256은 기존 `2ff6d89629fa60b7e1ae5ecb55144a4ab8cbb8f192a49a8acd23a2244d3ab474`다. 기존 `build/rhwp-engine/source-8950f8c2bcb2c714/pkg`를 재사용했고 참조 저장소·엔진 패치를 변경하지 않았다.
 
-이번 검수본은 `build/jueony-agent-empty-20261014/Start-Review.cmd`, 포트 **4254**다. 같은 폴더의 `JueonyEditor.exe`와 실행 스크립트를 포함한다. 합성 HWP/HWPX는 `review-documents/agent-empty/agent-empty-native`와 `agent-empty-browser`에서 실제 한글로 열 수 있다. 동봉 실행 확인은 후속 결과에 기록한다.
+이번 검수본은 `build/jueony-agent-empty-20261014/Start-Review.cmd`, 포트 **4254**다. 같은 폴더의 `JueonyEditor.exe`와 실행 스크립트를 포함한다. 합성 HWP/HWPX는 `review-documents/agent-empty/agent-empty-native`와 `agent-empty-browser`에서 실제 한글로 열 수 있다. 동봉 실행 호환 4개도 통과했다. [실행 확인](evidence/agent-empty-2026-10-14/launch-check.json)은 4254의 실제 메타데이터·WASM 바이트·공통 명령/provider 계약 해시를 확인했다. Rust exe는 컴파일했으며 실제 실행 검증은 스크립트·동봉 런타임 경로다. 구현 커밋은 `da57f55`이며 빌드 당시 Git 기준/작업 중 여부와 실제 소스 해시를 함께 기록했다.
+
+
+[변경 비교 화면](evidence/agent-empty-2026-10-14/agent-empty-browser/agent-empty.png)에서 삭제 전후 구역 설정과 본문을 확인한다. 최종 검사 실패·skip·page error·외부 자산 요청은 0건이다. 한글 직접 비교·유료 모델 품질 및 전체 잔여 구현 완료를 의미하지 않는다.

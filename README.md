@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-agent-split-20261014/Start-Review.cmd)**로 실행한다(4252). AI가 한 단 일반 본문의 Unicode 위치에서 구역을 나누고, 갱신된 문서의 새 구역 설정을 후속 요청으로 바꾼다. 나누기는 단독 명령이며 복잡한 원본과 묶음·반복 기록은 거절한다. 변경 비교·undo/redo·실패 복원·양 형식 저장·재실행을 검증했고, iframe 오류가 Agent 창에 잘못 표시되던 문제도 수정했다. [사용법·검증·남은 제한](docs/65-agent-section-split.md)을 확인한다. 기존 [구역 설정 반복 작업](docs/64-section-repeat-work.md), [바탕쪽 Agent](docs/63-agent-master-page-tools.md), [단색 배경](docs/62-agent-page-background.md)과 기존 편집 기능도 포함한다. 구역 삭제/합치기·고급 개체 도구와 전체 한글 동등성 검수는 남는다. 이전 실행 창과 문서는 유지한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-agent-empty-20261014/Start-Review.cmd)**로 실행한다(4254). AI가 기존 엔진에서 삭제 가능하다고 확인한 빈 본문 구역을 단독 요청으로 삭제한다. 남은 본문·용지·배경을 보존하며 삭제 후 커서·변경 비교·undo/redo·실패 복원·양 형식 저장·로컬 재실행을 검증했다. 해당 구역의 배경·용지 설정도 함께 삭제되므로 시각적으로 완전히 빈 쪽이라는 뜻은 아니다. [사용법·검증·남은 제한](docs/66-agent-empty-section.md)을 확인한다. 기존 [구역 나누기](docs/65-agent-section-split.md), [구역 설정 반복 작업](docs/64-section-repeat-work.md)과 기존 편집 기능도 포함한다. 본문 있는 구역 삭제/합치기·고급 개체 도구와 전체 한글 동등성 검수는 남는다. 이전 실행 창과 문서는 유지한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

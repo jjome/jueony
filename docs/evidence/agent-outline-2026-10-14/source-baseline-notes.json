@@ -1,0 +1,13 @@
+{
+  "implementationCommit": "c68b150",
+  "scope": "Ordinary body outline levels 0..6/relevel/clear using an existing stored section numbering definition. Distinct-target outline-only batch, one request undo; no shared resource or section reference changes.",
+  "referencePreservation": "Existing getSectionDef omits outline reference. Added independent getAgentOutlineDefinition(section), included in all per-section save/reopen preservation evidence even when the first paragraph is not editable.",
+  "independentFailureProof": "An actual HWPX copy changes only outlineShapeIDRef 1 -> 0; legacy getSectionDef remains equal, while the new preservation evidence blocks the changed reference. Original live document bytes remain unchanged.",
+  "negativeSources": "No stored section definition, divergent paragraph outline reference, explicit restart, mixed text formatting, real tabs, fields, bookmarks and invalid inputs remain protected.",
+  "formatMeaning": "Uses the document stored definition, not a newly synthesized hierarchical pattern or TOC. Does not auto-change body font/margins/style.",
+  "scopeCounts": "Full unit/provider suites; scoped list/bullet/tab/decoration and new outline actual engine/browser regressions. Not a full editor cumulative sweep.",
+  "visualCheck": "Actual Edge screenshot shows the stored second-level marker 가. and manual added body text. Hancom layout comparison NOT_RUN.",
+  "nativeRustUnitTests": "NOT_RUN on this build; actual WASM compile/tests performed.",
+  "paidModelCalls": "NOT_RUN; four deterministic local provider protocols only.",
+  "priorCandidate": "4284 initial candidate is preserved; the final reference-preservation build is a separate v2 bundle on 4286."
+}

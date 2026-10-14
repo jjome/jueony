@@ -27,3 +27,13 @@ Rust는 원본 토큰과 자원·구역 참조를 대조하고 문서/이벤트 
 검수본은 `build/jueony-agent-outline-20261014-v2/Start-Review.cmd`, 주소는 `http://127.0.0.1:4286/`로 준비한다. 이전 실행 창·서버·사용자 문서는 유지한다. 한글에서 열 합성 HWP/HWPX는 review-documents/agent-outline에 포함한다. 네 제공자는 로컬 합성 프로토콜 검사이며 실제 유료 모델 호출이 아니다. 실제 한글 직접 비교는 마지막 일괄 단계로 유지한다. 전체 범위는 미완료다. 최종 검사 수와 해시는 아래에 추가한다.
 
 개요 연결 검수 중 기존 getSectionDef 조회에서 개요 정의 참조가 빠져 있음을 확인했다. 별도 읽기 getAgentOutlineDefinition을 추가하여 모든 구역의 저장 전후 참조를 비교한다. 복잡한 첫 문단 때문에 일반 본문 편집 자격이 없더라도 참조 조회는 가능하다. 재열기 사본의 outlineShapeIDRef만 바뀐 실제 HWPX를 만들어 기존 구역 조회는 같아도 새 보존 증거가 저장을 차단하는지 검사한다. 첫 4284 후보는 보존하고 최종 수정본은 4286 별도 묶음으로 준비한다.
+
+## 최종 결과
+
+구현 `c68b150` 커밋·푸시 완료. 전체 단위 621·provider/server 52·관련 실제 WASM 154·브라우저 74(묶음 호환 4 포함) 통과. 신규 WASM 23·신규 Edge 14와 기존 기본 번호 생성/복제/목록/글머리표·문단 탭/테두리의 관련 회귀 범위다. 과거 전체 편집기 누적 검사를 이번에 전부 재실행한 수치가 아니다. TypeScript와 9개 모듈·264개 소스 경계 통과. 예상 밖 page/console 오류·외부 자산 요청 0건이며 이전 의도한 손실 저장 차단 2건은 expectedSaveErrors로 별도 기록한다. 별도 Native Rust unit tests는 이번 빌드에서 미실행이다. [검사별 결과](evidence/agent-outline-2026-10-14/verification-summary.json)를 따른다.
+
+양 형식의 모든 7수준·수준 변경·해제·서로 다른 문단 1회 undo/redo·두 번째 실문서 적용 실패 전체 복원·다른 run/공유 자원 변조 탐지·동시 편집 충돌·직접 입력·저장/재열기·업무 복원을 확인했다. 저장된 구역 정의가 없을 때의 거절과 실제 HWPX 사본의 개요 참조만 달라진 손실 차단을 별도로 검사했다. 원본과 기존 디스크 파일을 보호하며 손실 저장을 허용하지 않는다.
+
+최종 앱 소스 SHA-256 `761cf55747bcbd71954d8c9ec0bab7d481d72bfc2079f14497aed495b8341031`, 엔진 `c1700d31d7fa3af7`, WASM SHA-256 `3b5028ea80f754b6564aa17c1fdb5b14322ce61dd8456ab94cdfc9178c0d9515`. 빌드 메타데이터 ac10d8c/dirty=true는 구현 c68b150의 실제 소스/추적 패치 해시로 연결한다. 4286 v2 검수 서버의 served 소스/WASM·공통 명령/provider 계약을 대조했다. [실행 대조](evidence/agent-outline-2026-10-14/launch-check.json), [원본·지원 범위](evidence/agent-outline-2026-10-14/source-baseline-notes.json)를 보관한다.
+
+한글 검수용 새 합성 HWP/HWPX 28개를 포함했다. `outline-level-*.*`는 양 형식 7수준, `outline-batch.*`는 여러 수준, `outline-cleared.*`는 해제, `applied-<adapter>.hwpx`는 네 합성 제공자, `manual-outline.hwpx`/`cleared-manual.hwpx`는 직접 입력·해제 결과다. `missing-outline-reference.hwpx`는 정의가 없는 적용 거절을 확인하는 입력이며 성공 적용 파일이 아니다. [파일 해시](evidence/agent-outline-2026-10-14/outline-documents.json)를 따른다. 실제 한글 직접 비교·유료 모델 품질·구역 개요 모양 변경/목차·명시적 문단 restart 저장·전체 동등성은 미완료이며 자동화를 유지한다.

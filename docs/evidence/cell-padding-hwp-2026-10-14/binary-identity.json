@@ -1,0 +1,19 @@
+{
+  "beforeNormalizationSource": "8fa799aa758c7bd0",
+  "finalSource": "7a2fb1cfb7db3b64",
+  "files": [
+    {
+      "file": "rhwp_bg.wasm",
+      "sha256": "16ce4091a0121e47dbcabb9bc4b0caaf5edea6530ff7fe0a8b60e3ffe0203c07",
+      "identical": true
+    },
+    {
+      "file": "rhwp.js",
+      "sha256": "e176d229d2362d2c9ab9eb544e891fb95a5ef8b8b4cffe347eedc090d5ee42ca",
+      "identical": true
+    }
+  ],
+  "committedPatchSha256": "f90714f601227bba000d63be77e5ac9f3985d192e613990984544b2f70b0f603",
+  "patchWorkingBytesEqualGitBlob": true,
+  "note": "Final LF-input rebuild produces identical runtime JS/WASM. Related regression runs against 8fa remain evidence for these exact bytes; core Native/Edge cases rerun with 7a. No additional feature changes."
+}

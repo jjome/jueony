@@ -8,7 +8,7 @@
 
 생산자는 `float_placement.rs::from_empty_reflow_host`다. `typeset/table/host_spacing.rs`의 before/after는 바깥 여백을 포함하며, `typeset/table/block/entry.rs`가 이 계획의 occupied_bottom으로 실제 fit을 판정하고 같은 paragraph_float_placements를 발행한다. `prepare.rs`는 첫 조각에서 shared formatted box를 보존한다. `layout.rs`의 table_y_start와 layout_table 호출은 확정된 같은 table_top을 사용하여 위쪽 바깥 여백을 다시 더하지 않는다. 유효한 저장 원점과 편집 후 현재 흐름 원점의 차이를 여백 소유 규칙의 차이로 바꾸지 않는다.
 
-새 엔진은 `source-8fa799aa758c7bd0/pkg`이며 고정 MIT 참조 소스는 수정하지 않았다. 이전 570603 엔진과 실행 창은 유지한다. 이번 변경은 Native 배치 경로 수정이며 Agent 명령 종류는 45개 그대로다.
+새 엔진은 `source-7a2fb1cfb7db3b64/pkg`이며 고정 MIT 참조 소스는 수정하지 않았다. 이전 570603 엔진과 실행 창은 유지한다. 이번 변경은 Native 배치 경로 수정이며 Agent 명령 종류는 45개 그대로다.
 
 ## 실제로 통과한 범위
 
@@ -36,3 +36,5 @@
 검수본: `build/jueony-cell-padding-hwp-20261014/Start-Review.cmd`, `http://127.0.0.1:4306/`. [파일 목록과 한글 확인 순서](evidence/cell-padding-hwp-2026-10-14/documents.json)를 따른다. 사용자 원본을 덮어쓰지 않으며 기존 4304/4302 등은 종료하지 않는다.
 
 WSL release WASM을 실제로 새 빌드했다. 네 provider는 합성 프로토콜이며 유료 호출·한글 2024 직접 조작/독립 출력 비교·Native Rust unit suite는 미실행이다. 전체 표 서식·병합/복잡한 표·모든 한글 동등성은 미완료이며 자동화는 유지한다.
+
+구현 `4eab9c7` 푸시 완료. 최종 LF 패치 입력과 Git blob이 바이트까지 같으며 새 빌드 JS/WASM은 앞서 회귀 검사를 수행한 바이너리와 동일하다. [바이너리/패치 대조](evidence/cell-padding-hwp-2026-10-14/binary-identity.json)를 보존했고 핵심 Native/Edge를 최종 입력에서 다시 실행했다. WASM SHA-256 `16ce4091a0121e47dbcabb9bc4b0caaf5edea6530ff7fe0a8b60e3ffe0203c07`, 앱 소스 SHA-256 `e81f3d5b737f80f79026c48a1be9b818eb3a9eaa4cef3d90446fadc86cf46512`. [실제 4306 서버 대조](evidence/cell-padding-hwp-2026-10-14/launch-check.json)를 확인했다.

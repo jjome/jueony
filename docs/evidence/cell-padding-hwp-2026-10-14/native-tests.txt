@@ -1,0 +1,12 @@
+PASS hwp: short custom and inherited padding preserve whole document geometry across save/reopen and snapshot
+PASS hwp: long custom and inherited padding preserve whole document geometry across save/reopen and snapshot
+PASS hwp: bottom custom and inherited padding preserve whole document geometry across save/reopen and snapshot
+PASS hwp: empty custom and inherited padding preserve whole document geometry across save/reopen and snapshot
+PASS hwpx: short custom and inherited padding preserve whole document geometry across save/reopen and snapshot
+PASS hwpx: long custom and inherited padding preserve whole document geometry across save/reopen and snapshot
+PASS hwpx: bottom custom and inherited padding preserve whole document geometry across save/reopen and snapshot
+PASS hwpx: empty custom and inherited padding preserve whole document geometry across save/reopen and snapshot
+PASS hwp: vertical-only custom changes and zero defaults use the same effective frame
+PASS hwpx: vertical-only custom changes and zero defaults use the same effective frame
+UNRESOLVED_NATIVE_DIAGNOSTIC multiple-tables layout[0].controls[1].y: 242 != 178.7
+UNRESOLVED_NATIVE_DIAGNOSTIC zero-defaults layout[0].controls[0].h: 67.5 != 61.6

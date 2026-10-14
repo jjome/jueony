@@ -1,0 +1,18 @@
+{
+  "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+  "priorEngine": "570603c60a53c953",
+  "newEngine": "7a2fb1cfb7db3b64",
+  "scope": "Empty whole-table formatted host origin with preserved document values. Not all HWP serialization/geometry.",
+  "hancomComparison": "NOT_RUN",
+  "paidModelTest": "NOT_RUN",
+  "nativeRustUnitSuite": "NOT_RUN",
+  "freshWasmBuild": "WSL_RELEASE_BINDGEN_WEB_NO_WASM_OPT",
+  "unresolved": [
+    "multiple-table following stored anchor",
+    "styled zero-default cell row height"
+  ],
+  "implementationCommit": "4eab9c7",
+  "wasmSha256": "16ce4091a0121e47dbcabb9bc4b0caaf5edea6530ff7fe0a8b60e3ffe0203c07",
+  "customSourceSha256": "e81f3d5b737f80f79026c48a1be9b818eb3a9eaa4cef3d90446fadc86cf46512",
+  "patchCommittedBytesMatchCanonicalBuild": true
+}

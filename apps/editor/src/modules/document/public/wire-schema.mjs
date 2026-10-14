@@ -1,5 +1,5 @@
 // Canonical provider-neutral wire shape; semantic validation remains in this module's domain.
-export const controlKinds = ['clone_paragraph_numbering','set_basic_bullet','set_paragraph_list','format_paragraph_decoration','set_paragraph_tabs','add_bookmark','rename_bookmark','delete_bookmark','create_header_footer','delete_header_footer','format_header_footer_paragraph','format_header_footer','set_header_footer_text','merge_sections','remove_empty_section','split_section','format_characters', 'format_paragraph', 'create_table', 'set_table_cell', 'format_table_cells', 'set_page_setup', 'insert_table_row','insert_table_column','delete_table_row','delete_table_column','apply_paragraph_style','set_columns','set_page_hide','set_section_tabs','set_line_numbers','set_page_background','set_master_page_text','delete_master_page'];
+export const controlKinds = ['set_basic_numbering','clone_paragraph_numbering','set_basic_bullet','set_paragraph_list','format_paragraph_decoration','set_paragraph_tabs','add_bookmark','rename_bookmark','delete_bookmark','create_header_footer','delete_header_footer','format_header_footer_paragraph','format_header_footer','set_header_footer_text','merge_sections','remove_empty_section','split_section','format_characters', 'format_paragraph', 'create_table', 'set_table_cell', 'format_table_cells', 'set_page_setup', 'insert_table_row','insert_table_column','delete_table_row','delete_table_column','apply_paragraph_style','set_columns','set_page_hide','set_section_tabs','set_line_numbers','set_page_background','set_master_page_text','delete_master_page'];
 const text = { type: 'string' }, number = { type: 'number' }, bool = { type: 'boolean' }, integer = { type: 'integer', minimum: 0 };
 const object = properties => ({ type: 'object', properties, required: Object.keys(properties) });
 const properties = values => ({ type: 'object', properties: values });
@@ -7,6 +7,7 @@ const characters = {bold:bool,italic:bool,underline:bool,strikethrough:bool,font
 const operation = (kind, fields) => object({ kind: { type: 'string', enum: [kind] }, ...fields });
 export function controlSchemas() {
  return [
+  operation('set_basic_numbering',{target:text,pattern:{type:'string',enum:['decimal','parenthesized','closing_parenthesis']},level:{type:'integer',minimum:0,maximum:6},startNumber:{type:'integer',minimum:1,maximum:65535}}),
   operation('clone_paragraph_numbering',{target:text,sourceDefinitionId:{type:'integer',minimum:1,maximum:200},level:{type:'integer',minimum:0,maximum:6},startNumber:{type:'integer',minimum:1,maximum:65535}}),
   operation('set_basic_bullet',{target:text,character:{type:'string',enum:['●','○','■','□','◆','◇','▶','▷']}}),
   operation('set_paragraph_list',{target:text,listKind:{type:'string',enum:['none','number','bullet']},definitionId:integer,level:{type:'integer',minimum:0,maximum:6}}),

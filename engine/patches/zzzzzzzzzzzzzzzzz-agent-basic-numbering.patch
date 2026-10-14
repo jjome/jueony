@@ -1,0 +1,53 @@
+--- /dev/null
++++ b/src/document_core/commands/agent_basic_numbering.rs
+@@ -0,0 +1,28 @@
++//! Create a fixed basic decimal numbering definition without reducing an existing raw resource.
++use crate::document_core::DocumentCore;
++use crate::error::HwpError;
++use crate::model::style::{HeadType,Numbering,NumberingHead};
++fn fail(s:&str)->HwpError{HwpError::RenderError(s.into())}
++impl DocumentCore{
++    pub fn set_agent_basic_numbering_native(&mut self,s:usize,p:usize,json:&str)->Result<String,HwpError>{
++        let v:serde_json::Value=serde_json::from_str(json).map_err(|_|fail("Invalid basic numbering command"))?;
++        if !v.as_object().is_some_and(|o|o.len()==4&&o.keys().all(|k|["token","pattern","level","startNumber"].contains(&k.as_str()))){return Err(fail("Invalid basic numbering fields"));}
++        let state:serde_json::Value=serde_json::from_str(&self.get_agent_paragraph_list_native(s,p)).map_err(|_|fail("Invalid list source"))?;
++        if state["editable"]!=true||v["token"].as_str()!=state["token"].as_str(){return Err(fail("본문 원문·서식·번호 정의가 바뀌었거나 읽기 전용입니다."));}
++        let pattern=v["pattern"].as_str().filter(|x|["decimal","parenthesized","closing_parenthesis"].contains(x)).ok_or_else(||fail("기본 숫자 번호 3종을 선택하세요."))?;
++        let level=v["level"].as_u64().filter(|x|*x<=6).ok_or_else(||fail("Invalid numbering level"))? as usize;
++        let start=v["startNumber"].as_u64().filter(|x|*x>0&&*x<=65535).ok_or_else(||fail("Invalid start number"))? as u32;
++        if self.document.doc_info.numberings.len()>=200||self.document.doc_info.char_shapes.is_empty(){return Err(fail("번호 정의 한도 또는 글자 모양 원본을 확인하세요."));}
++        let formats=std::array::from_fn(|i|match pattern{"parenthesized"=>format!("(^{})",i+1),"closing_parenthesis"=>format!("^{})",i+1),_=>format!("^{}.",i+1)});
++        let mut n=Numbering{heads:[NumberingHead{attr:8,width_adjust:0,text_distance:50,char_shape_id:0,number_format:0};7],level_formats:formats,start_number:1,level_start_numbers:[1;7],..Default::default()};
++        n.level_start_numbers[level]=start;if level==0{n.start_number=start as u16;}
++        let before=self.document.clone();let events=self.event_log.len();let id=before.doc_info.numberings.len()+1;
++        let result=(||{self.document.doc_info.numberings.push(n.clone());self.document.doc_info.raw_stream_dirty=true;
++            self.apply_para_format_native(s,p,&serde_json::json!({"headType":"Number","numberingId":id,"paraLevel":level}).to_string())?;
++            let mut expected=serde_json::to_value(&before.doc_info.numberings).unwrap();expected.as_array_mut().unwrap().push(serde_json::to_value(&n).unwrap());
++            let ps=&self.document.doc_info.para_shapes[self.document.sections[s].paragraphs[p].para_shape_id as usize];
++            if serde_json::to_value(&self.document.doc_info.numberings).unwrap()!=expected||serde_json::to_value(&self.document.doc_info.bullets).unwrap()!=serde_json::to_value(&before.doc_info.bullets).unwrap()||ps.head_type!=HeadType::Number||ps.numbering_id as usize!=id||ps.para_level as usize!=level{return Err(fail("새 기본 번호 정의 또는 문단 적용 결과가 계획과 다릅니다."));}
++            Ok(serde_json::json!({"editable":true,"definitionId":id,"created":true}).to_string())})();
++        if result.is_err(){self.document=before;self.event_log.truncate(events);self.rebuild_derived_state();}result
++    }
++}
+--- a/src/document_core/commands/mod.rs
++++ b/src/document_core/commands/mod.rs
+@@ -20,6 +20,7 @@
+ mod agent_paragraph_lists;
+ mod agent_basic_bullet;
+ mod agent_numbering_clone;
++mod agent_basic_numbering;
+ mod agent_paragraph_decoration;
+ mod agent_page_background;
+ mod page_body_delete;
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1204,6 +1204,9 @@
+     pub fn get_agent_page_background(&self,section:usize,kind:&str)->Result<String,JsValue>{self.core.get_agent_page_background_native(section,kind).map_err(|e|e.into())}
+     #[wasm_bindgen(js_name = setAgentPageBackground)]
+     pub fn set_agent_page_background(&mut self,section:usize,kind:&str,json:&str)->Result<String,JsValue>{self.core.set_agent_page_background_native(section,kind,json).map_err(|e|e.into())}
++
++    #[wasm_bindgen(js_name = setAgentBasicNumbering)]
++    pub fn set_agent_basic_numbering(&mut self,s:usize,p:usize,json:&str)->Result<String,JsValue>{self.core.set_agent_basic_numbering_native(s,p,json).map_err(|e|e.into())}
+ 
+     #[wasm_bindgen(js_name = getAgentNumberingDefinitions)]
+     pub fn get_agent_numbering_definitions(&self)->String{self.core.get_agent_numbering_definitions_native()}

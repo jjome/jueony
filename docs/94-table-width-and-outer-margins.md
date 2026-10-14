@@ -50,3 +50,5 @@ UI/Agent → 중립 wire/문서 도메인 계획 → 공개 facade → rhwp adap
 일반 HWP의 Agent 크기·안 여백 제한, 높이/병합/중첩 미지원은 유지한다. 전체 범위가 미완료이므로 기존 자동화를 유지한다.
 
 최종 검사: 단위 710·provider/server 52·관련 실제 WASM 178·Edge 161 통과. 새 바깥 여백 4개는 이전 엔진 4실패→수정 후 4통과, 너비 Native 12개/실제 통합 Edge 18개를 포함한다. TypeScript와 9개 모듈/284개 소스 경계, 예상 밖 page/console 오류·외부 요청 0건을 확인했다. 최종 엔진 `424262393ae01deb`, WASM SHA-256 `d63becfd91d3094f6df4a88ed0aaf50996b3a4d82cb69bd5ae5742a99f266169`, 앱 소스 SHA-256 `b1c4f1c87608c1f4c8addc07db57f5fb6ffcde22c205b431d5d11bd41a530b49`. 실제 4314 실행 서버의 자산·중립 wire/provider 계약을 확인했다. 공개 코퍼스 10출력 중 보존 검사 6건 통과/4건 차단을 유지한다. [검사 집계](evidence/save-table-controls-2026-10-14/verification-summary.json), [실제 실행 대조](evidence/save-table-controls-2026-10-14/launch-check.json)를 따른다.
+
+구현 `c0cd596` 커밋·푸시 완료. [Git/빌드 소스 대조](evidence/save-table-controls-2026-10-14/source-baseline-notes.json), [문서별 역할·한글 검수 순서](evidence/save-table-controls-2026-10-14/documents.json)를 보존했다.

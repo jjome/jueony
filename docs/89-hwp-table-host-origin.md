@@ -38,3 +38,5 @@
 WSL release WASM을 실제로 새 빌드했다. 네 provider는 합성 프로토콜이며 유료 호출·한글 2024 직접 조작/독립 출력 비교·Native Rust unit suite는 미실행이다. 전체 표 서식·병합/복잡한 표·모든 한글 동등성은 미완료이며 자동화는 유지한다.
 
 구현 `4eab9c7` 푸시 완료. 최종 LF 패치 입력과 Git blob이 바이트까지 같으며 새 빌드 JS/WASM은 앞서 회귀 검사를 수행한 바이너리와 동일하다. [바이너리/패치 대조](evidence/cell-padding-hwp-2026-10-14/binary-identity.json)를 보존했고 핵심 Native/Edge를 최종 입력에서 다시 실행했다. WASM SHA-256 `16ce4091a0121e47dbcabb9bc4b0caaf5edea6530ff7fe0a8b60e3ffe0203c07`, 앱 소스 SHA-256 `e81f3d5b737f80f79026c48a1be9b818eb3a9eaa4cef3d90446fadc86cf46512`. [실제 4306 서버 대조](evidence/cell-padding-hwp-2026-10-14/launch-check.json)를 확인했다.
+
+후속: [90번](90-table-default-padding-reflow.md)은 표 기본 여백 변경의 저장 줄 갱신과 유효 기하 변경 후 초기 행 배분 캐시의 무효화를 추가했다. 위 0 기본 여백 진단은 새 엔진에서 일치한다. 과거 실패 증거는 보존하며 여러 표의 후속 앵커 문제와 정상 HWP Agent 안 여백 제한은 남는다.

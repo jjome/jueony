@@ -1,0 +1,95 @@
+--- a/src/document_core/commands/table_ops.rs
++++ b/src/document_core/commands/table_ops.rs
+@@ -1323,7 +1323,7 @@
+         // 대상 셀의 적용 직전 id — 아래 borrow 블록이 정상 완료되면 채워진다.
+         let mut target_bf_before = 0u16;
+ 
+-        let (needs_reflow, reflow_para_count) = {
++        let (needs_reflow, reflow_para_count, geometry_changed) = {
+             let mut needs_reflow = false;
+             let mut size_changed = false;
+             let mut width_changed = false;
+@@ -1347,6 +1347,8 @@
+             })?;
+             target_bf_before = cell.border_fill_id;
+ 
++            let padding = cell.effective_padding(&table.padding);
++            let before_geometry = (cell.width, cell.height, padding.left, padding.right, padding.top, padding.bottom);
+             if let Some(v) = top_u32("width") {
+                 needs_reflow |= cell.width != v;
+                 width_changed = cell.width != v;
+@@ -1416,9 +1418,15 @@
+                     );
+                 }
+             }
+-            (needs_reflow, table.cells[cell_idx].paragraphs.len())
+-        };
+-
++            let cell = &table.cells[cell_idx];
++            let padding = cell.effective_padding(&table.padding);
++            let geometry_changed = before_geometry != (cell.width, cell.height, padding.left, padding.right, padding.top, padding.bottom);
++            (needs_reflow, cell.paragraphs.len(), geometry_changed)
++        };
++
++        if geometry_changed {
++            self.invalidate_table_geometry_measurement(section_idx, parent_para_idx, control_idx);
++        }
+         if needs_reflow {
+             let para_count = reflow_para_count;
+             for cell_para_idx in 0..para_count {
+@@ -2798,6 +2806,13 @@
+             .unwrap_or((0, 0, 0));
+ 
+         let table = self.get_table_mut(section_idx, parent_para_idx, control_idx)?;
++        // Stored rows describe the effective content width, not dormant cell
++        // margins. Changing table defaults must republish rows for inheriting
++        // cells before measuring/painting and serializing the edited table.
++        let old_inner_widths: Vec<(i64, i16, i16)> = table.cells.iter().map(|cell| {
++            let padding = cell.effective_padding(&table.padding);
++            (i64::from(cell.width) - i64::from(padding.left) - i64::from(padding.right), padding.top, padding.bottom)
++        }).collect();
+ 
+         if let Some(v) = json_i16(json, "cellSpacing") {
+             table.cell_spacing = v;
+@@ -3093,6 +3108,23 @@
+                 caption_changed = true;
+             }
+         }
++        let reflow_cells: Vec<(usize, usize)> = table.cells.iter().enumerate().filter_map(|(idx, cell)| {
++            let padding = cell.effective_padding(&table.padding);
++            let inner = i64::from(cell.width) - i64::from(padding.left) - i64::from(padding.right);
++            (old_inner_widths.get(idx).map(|old| old.0) != Some(inner))
++                .then_some((idx, cell.paragraphs.len()))
++        }).collect();
++        let geometry_changed = table.cells.iter().enumerate().any(|(idx, cell)| {
++            let padding = cell.effective_padding(&table.padding);
++            old_inner_widths.get(idx).copied() != Some((
++                i64::from(cell.width) - i64::from(padding.left) - i64::from(padding.right),
++                padding.top, padding.bottom))
++        });
++        if geometry_changed {
++            self.invalidate_table_geometry_measurement(section_idx, parent_para_idx, control_idx);
++        }
++        self.reflow_table_cell_paragraphs(section_idx, parent_para_idx, control_idx, &reflow_cells);
++
+         // BorderFill 변경 — 표 테두리/배경/대각선 변경 시 모든 셀에도 동일 적용
+         // (HWP 렌더링은 cell.border_fill_id를 사용, table.border_fill_id는 페이지 분할용)
+         let has_border_fill_change = json.contains("\"borderLeft\"")
+@@ -4559,3 +4591,17 @@
+         }
+     }
+ }
++
++impl DocumentCore {
++    /// The loaded row allocation is a text-edit floor, not a constraint after
++    /// explicitly changing the table/cell content box. Retain model row sizes;
++    /// discard only this table's previous derived measurement before remeasure.
++    fn invalidate_table_geometry_measurement(&mut self, section: usize, paragraph: usize, control: usize) {
++        if let Some(cached) = self.measured_sections.get_mut(section) {
++            cached.tables.retain(|table| table.para_index != paragraph || table.control_index != control);
++        }
++        if let Some(cached) = self.measured_tables.get_mut(section) {
++            cached.retain(|table| table.para_index != paragraph || table.control_index != control);
++        }
++    }
++}

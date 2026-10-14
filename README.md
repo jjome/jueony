@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-cell-padding-hwp-20261014/Start-Review.cmd)**로 실행한다(4306). HWP의 단순 표 시작 위치가 편집 후 저장 재열기에서 달라지는 문제를 새 Native 엔진에서 수정했다. HWPX 셀 안 여백은 기존대로 동작하며, 여러 표/0 기본 여백의 HWP 배치 문제는 남아 HWP의 해당 AI 기능 제한을 유지한다. [수정 범위·검증·남은 진단](docs/89-hwp-table-host-origin.md)을 확인한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-table-default-padding-20261014/Start-Review.cmd)**로 실행한다(4308). 표 기본 안 여백 변경 시 상속 셀의 줄바꿈을 갱신하고, 여백·크기 변경 뒤 이전 행 배분 캐시를 재사용하던 문제를 수정했다. 수동 속성 창의 취소·undo/redo·HWP/HWPX 저장 재열기를 검증했다. HWP의 후속 표 앵커 문제는 남아 해당 AI 안 여백 제한을 유지한다. [수정 범위·검증·남은 진단](docs/90-table-default-padding-reflow.md)을 확인한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

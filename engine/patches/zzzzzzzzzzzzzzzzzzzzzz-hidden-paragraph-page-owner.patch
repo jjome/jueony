@@ -1,0 +1,98 @@
+--- a/src/document_core/commands/text_editing.rs
++++ b/src/document_core/commands/text_editing.rs
+@@ -5441,6 +5441,45 @@
+                         }
+                     }
+                 }
++                // Hidden empty bridge/tail paragraphs intentionally consume no PageItem.
++                // The dump-page ownership contract already attaches them to the last
++                // page of the preceding actual body item (including a split table).
++                // Reuse that logical ownership for queries without inventing a paint
++                // item, changing pagination, or forgiving an ordinary missing paragraph.
++                if result.is_empty()
++                    && pr.hidden_empty_paras.contains(&para_idx)
++                    && self
++                        .section_render_paragraphs(section_idx)
++                        .get(para_idx)
++                        .is_some_and(|p| {
++                            p.controls.is_empty()
++                                && p.text.chars().all(|c| c.is_whitespace() || c.is_control())
++                        })
++                {
++                    let mut owner: Option<(usize, usize)> = None;
++                    for (local_page, page) in pr.pages.iter().enumerate() {
++                        for col in &page.column_contents {
++                            for item in &col.items {
++                                let pi = match item {
++                                    crate::renderer::pagination::PageItem::FullParagraph { para_index }
++                                    | crate::renderer::pagination::PageItem::PartialParagraph { para_index, .. }
++                                    | crate::renderer::pagination::PageItem::Table { para_index, .. }
++                                    | crate::renderer::pagination::PageItem::PartialTable { para_index, .. }
++                                    | crate::renderer::pagination::PageItem::Shape { para_index, .. } => Some(*para_index),
++                                    _ => None,
++                                };
++                                if let Some(pi) = pi.filter(|pi| *pi < para_idx) {
++                                    if owner.is_none_or(|(previous, _)| pi >= previous) {
++                                        owner = Some((pi, local_page));
++                                    }
++                                }
++                            }
++                        }
++                    }
++                    if let Some((_, local_page)) = owner {
++                        result.push(global_offset + local_page as u32);
++                    }
++                }
+                 return if result.is_empty() {
+                     Err(HwpError::RenderError(format!(
+                         "문단 (sec={}, para={})이 페이지에 없습니다",
+--- a/src/renderer/typeset/state/finalize.rs
++++ b/src/renderer/typeset/state/finalize.rs
+@@ -23,12 +23,12 @@
+ pub(super) fn discard_terminal_blank_only_page(
+     pages: &mut Vec<PageContent>,
+     paragraphs: &[Paragraph],
+-) {
++) -> Vec<usize> {
+     if pages.len() <= 1 {
+-        return;
++        return Vec::new();
+     }
+     let Some(last_page) = pages.last() else {
+-        return;
++        return Vec::new();
+     };
+     let mut has_item = false;
+     let blank_only = last_page.column_contents.iter().all(|column| {
+@@ -68,8 +68,18 @@
+         })
+     });
+     if has_item && blank_only {
+-        pages.pop();
++        // Preserve the logical ownership of exactly the paragraphs absorbed by
++        // this existing finalization decision. They no longer have paint items.
++        return pages.pop().into_iter()
++            .flat_map(|page| page.column_contents)
++            .flat_map(|column| column.items)
++            .filter_map(|item| match item {
++                PageItem::FullParagraph { para_index } => Some(para_index),
++                _ => None,
++            })
++            .collect();
+     }
++    Vec::new()
+ }
+ /// 페이지 번호 + 머리말/꼬리말 최종 할당 (기존 Paginator::finalize_pages와 동일)
+ pub(in crate::renderer::typeset) fn finalize_pages(
+--- a/src/renderer/typeset/state/commands.rs
++++ b/src/renderer/typeset/state/commands.rs
+@@ -10,7 +10,8 @@
+         &mut self,
+         paragraphs: &[Paragraph],
+     ) {
+-        super::finalize::discard_terminal_blank_only_page(&mut self.data.pages, paragraphs);
++        let absorbed = super::finalize::discard_terminal_blank_only_page(&mut self.data.pages, paragraphs);
++        self.data.hidden_empty_paras.extend(absorbed);
+     }
+     pub(in crate::renderer::typeset) fn finalize_pages(
+         &mut self,

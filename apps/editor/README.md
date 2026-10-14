@@ -2,7 +2,9 @@
 
 2026-10-11. 왼쪽 업무/채팅/폴더, 가운데 AI 대화, 오른쪽 실제 HWP/HWPX 편집기를 연결했다. 한글 2024 전체 기능·화면·호환성 100%를 구현한 제품은 아니다. 실제 기관 LLM과 한글 독립 검수는 대기 중이다.
 
-최신 표 균등 분배 검수본(2026-10-14): `build/jueony-equal-columns-20261014/Start-Review.cmd` (4310). HWPX 본문 단순 표의 전체 행에 걸친 열 너비 같게를 Agent에 연결했다. 긴 표의 화면 페이지 매핑 오류는 원복하며 미해결로 남는다. [91번 지원·실행·검증](../../docs/91-agent-equal-column-widths.md)을 따른다. 아래 실행본은 이전 이력이다.
+최신 긴 표 검수본(2026-10-14): `build/jueony-paragraph-page-owner-20261014/Start-Review.cmd` (4312). 끝 빈 문단의 페이지 소유를 보존해 긴 표의 Agent 결과 조회·저장 재열기를 수정했다. [92번 결과·제한](../../docs/92-terminal-paragraph-page-owner.md)을 따른다. HWP 크기·행 높이와 전체 한글 직접 비교는 남는다. 아래는 이전 이력이다.
+
+직전 표 균등 분배 검수본(2026-10-14): `build/jueony-equal-columns-20261014/Start-Review.cmd` (4310). HWPX 본문 단순 표의 전체 행에 걸친 열 너비 같게를 Agent에 연결했다. 긴 표의 화면 페이지 매핑 오류는 원복하며 미해결로 남는다. [91번 지원·실행·검증](../../docs/91-agent-equal-column-widths.md)을 따른다. 아래 실행본은 이전 이력이다.
 
 ## 실행
 

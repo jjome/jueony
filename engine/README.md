@@ -56,3 +56,5 @@ rhwp 원문의 MIT 고지와 별도 third-party 고지를 유지한다. 변경�
 `zzzzzzzzzzzzzzzzzzzz-whole-table-edited-host.patch`는 비분할 빈 표 host에서 현재 흐름 원점과 저장 원점의 formatted outer box 소유를 통일한다. 셀 여백/서식/저장 줄 정보를 지우지 않으며 whole fit·first fragment·paint가 같은 계획을 쓴다. 단순 HWP/HWPX 왕복 10개와 기존 표 회귀를 확인했다. 여러 HWP 표와 0 기본 여백+다른 글자 크기 진단은 미해결이고 HWP Agent 안 여백 제한을 유지한다. [89번](../docs/89-hwp-table-host-origin.md)을 따른다.
 
 `zzzzzzzzzzzzzzzzzzzzz-table-default-padding-reflow.patch`는 표 기본 여백의 유효 수평 내용 폭 변화에 대해 상속 셀의 저장 줄을 공통 reflow 경로로 갱신한다. 표·셀의 유효 내용 상자/크기가 바뀌면 그 표의 파생 측정만 무효화하여 텍스트 편집용 초기 행 배분 하한을 다른 기하에 재사용하지 않는다. 모델의 선언 크기와 다른 표의 측정·기존 텍스트 편집 규칙은 유지한다. 0 기본 여백+다른 글자 크기의 HWP 진단과 수동 HWP/HWPX 저장 재열기를 확인했다. 여러 표 후속 앵커는 미완료다. [90번](../docs/90-table-default-padding-reflow.md)을 따른다.
+
+`zzzzzzzzzzzzzzzzzzzzzz-hidden-paragraph-page-owner.patch`는 기존 빈 끝 쪽 제거 규칙을 바꾸지 않고 실제 흡수한 문단 ID를 숨김 집합에 보존한다. 문단→쪽 조회는 그 정보와 앞선 실제 PageItem의 끝 쪽 소유를 사용하며, 일반 누락/비어 있지 않은 문단의 오류는 유지한다. 기존 문서 덤프의 숨김 소유 규칙과 일치한다. 이전/이후 전체 쪽 geometry 불변과 긴 표 Native/Canvas 요청·저장 재열기는 [92번](../docs/92-terminal-paragraph-page-owner.md)을 따른다. 엔진 `source-d46ea37c6fc63c03/pkg`이며 HWP Agent 크기 제한과 독립 한글 검수는 유지한다.

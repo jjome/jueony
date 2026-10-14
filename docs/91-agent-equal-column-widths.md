@@ -35,3 +35,5 @@ HWP AI 크기 편집, 행 높이 균등 분배, 직접 너비/높이 지정, 병
 최종 자동 검사 수치·소스 해시·실제 실행 묶음 대조는 같은 증거 폴더의 `verification-summary.json`을 따른다. 기존 전체 편집기의 역사적 누적 사례를 모두 재실행한 수치로 표시하지 않는다.
 
 최종 검사: 단위 703·provider/server 52·관련 실제 WASM 135·Edge 138 통과. 신규 균등 분배는 Native 12·Edge 12이며 긴 표의 화면 실패/원복 사례를 성공 편집으로 분류하지 않는다. TypeScript 및 9개 모듈/284개 소스 경계 통과, 예상 밖 page/console 오류·외부 자산 요청 0건이다. 구현 `9c7997a` 커밋·푸시 완료. 앱 소스 SHA-256 `dc797c9a9f9ce227d219cb8ac5393a4fe04389c6d251d1f275c7d5db8ee44716`, 기존 WASM `0f71ca3992a728ea93b5f88907d07555dbefce533cbd8e8ab192e7ba4cb37179`를 실제 4310 서버와 대조했다. [검사 결과](evidence/equal-columns-2026-10-14/verification-summary.json), [문서별 역할과 한글 검수 순서](evidence/equal-columns-2026-10-14/documents.json), [소스 기준](evidence/equal-columns-2026-10-14/source-baseline-notes.json)을 보존한다.
+
+후속 92번에서 긴 표의 끝 빈 문단이 쪽 제거 시 소유 정보를 잃던 경로를 수정했다. 이 문서의 긴 표 미해결 상태는 91번 당시의 기록이며 최신 검수는 [92번](92-terminal-paragraph-page-owner.md)을 따른다. HWP·행 높이·직접 크기·복합 표와 전체 한글 비교는 계속 남는다.

@@ -1,0 +1,81 @@
+--- /dev/null
++++ b/src/document_core/commands/agent_paragraph_tabs.rs
+@@ -0,0 +1,54 @@
++//! Strict, bounded body paragraph tab definitions for Agent commands.
++use crate::document_core::DocumentCore;
++use crate::error::HwpError;
++use crate::model::{control::Control,style::TabDef};
++fn fail(s:&str)->HwpError{HwpError::RenderError(s.into())}
++fn supported(td:&TabDef)->bool{
++    if td.attr&!3!=0||td.tabs.len()>32||td.tabs.iter().any(|t|t.position==0||t.position>283465||t.tab_type>3||t.fill_type>3)||td.tabs.windows(2).any(|p|p[0].position>=p[1].position){return false;}
++    if let Some(raw)=&td.raw_data{
++        if raw.len()!=8+8*td.tabs.len(){return false;}
++        let u32_at=|i|u32::from_le_bytes(raw[i..i+4].try_into().unwrap());
++        if u32_at(0)&!3!=0||u32_at(4) as usize!=td.tabs.len()||(u32_at(0)&1!=0)!=td.auto_tab_left||(u32_at(0)&2!=0)!=td.auto_tab_right{return false;}
++        for(i,t)in td.tabs.iter().enumerate(){let n=8+i*8;if u32_at(n)!=t.position||raw[n+4]!=t.tab_type||raw[n+5]!=t.fill_type||raw[n+6..n+8]!=[0,0]{return false;}}
++    }
++    true
++}
++impl DocumentCore{
++    fn agent_tabs_source(&self,section:usize,paragraph:usize)->Result<&TabDef,HwpError>{
++        let p=self.document.sections.get(section).and_then(|s|s.paragraphs.get(paragraph)).ok_or_else(||fail("Invalid body paragraph"))?;
++        if self.document.provenance.hwp3_lineage||p.text.chars().count()>4000||p.text.chars().any(char::is_control)||p.controls.iter().any(|c|!matches!(c,Control::SectionDef(_)|Control::ColumnDef(_)))||p.ctrl_data_records.iter().any(Option::is_some)||!p.range_tags.is_empty()||!p.field_ranges.is_empty()||!p.orphan_field_ends.is_empty()||!p.title_marks.is_empty()||!p.markpen_marks.is_empty()||!p.tab_extended.is_empty(){return Err(fail("탭 설정은 제어·필드·표식 없는 일반 본문만 지원합니다."));}
++        let cs=p.char_shapes.first().map(|r|r.char_shape_id).unwrap_or(0);
++        if p.char_shapes.iter().any(|r|r.char_shape_id!=cs)||self.document.doc_info.char_shapes.get(cs as usize).is_none(){return Err(fail("혼합 또는 잘못된 글자 서식 문단은 읽기 전용입니다."));}
++        let ps=self.document.doc_info.para_shapes.get(p.para_shape_id as usize).ok_or_else(||fail("Invalid paragraph shape"))?;
++        let td=self.document.doc_info.tab_defs.get(ps.tab_def_id as usize).ok_or_else(||fail("Invalid tab definition"))?;
++        if !supported(td){return Err(fail("고급 채움·중복/정렬되지 않은 위치·추가 원본 탭 속성은 변경하지 않습니다."));}
++        Ok(td)
++    }
++    fn agent_tabs_token(&self,section:usize,paragraph:usize)->Result<String,HwpError>{
++        let td=self.agent_tabs_source(section,paragraph)?;let p=&self.document.sections[section].paragraphs[paragraph];
++        let v=serde_json::json!({"body":p,"paragraph":self.document.doc_info.para_shapes[p.para_shape_id as usize],"tabs":td,"characters":p.char_shapes.iter().map(|r|&self.document.doc_info.char_shapes[r.char_shape_id as usize]).collect::<Vec<_>>()});
++        Ok(blake3::hash(v.to_string().as_bytes()).to_hex().to_string())
++    }
++    pub fn get_agent_paragraph_tabs_native(&self,section:usize,paragraph:usize)->Result<String,HwpError>{
++        let source=self.agent_tabs_source(section,paragraph);let token=self.agent_tabs_token(section,paragraph);
++        Ok(match source{Ok(td)=>serde_json::json!({"editable":true,"stops":td.tabs.iter().map(|t|serde_json::json!({"position":t.position,"type":t.tab_type,"fill":t.fill_type})).collect::<Vec<_>>(),"autoLeft":td.auto_tab_left,"autoRight":td.auto_tab_right,"token":token.ok()}),Err(e)=>serde_json::json!({"editable":false,"reason":e.to_string()})}.to_string())
++    }
++    pub fn set_agent_paragraph_tabs_native(&mut self,section:usize,paragraph:usize,json:&str)->Result<String,HwpError>{
++        let v:serde_json::Value=serde_json::from_str(json).map_err(|_|fail("Invalid tab command"))?;
++        if !v.as_object().is_some_and(|o|o.len()==4&&o.keys().all(|k|["token","tabStops","tabAutoLeft","tabAutoRight"].contains(&k.as_str()))){return Err(fail("Invalid tab command fields"));}
++        let token=self.agent_tabs_token(section,paragraph)?;if v["token"].as_str()!=Some(token.as_str()){return Err(fail("문단 원문·서식·탭 설정이 바뀌었습니다."));}
++        let left=v["tabAutoLeft"].as_bool().ok_or_else(||fail("Invalid automatic tab"))?;let right=v["tabAutoRight"].as_bool().ok_or_else(||fail("Invalid automatic tab"))?;
++        let values=v["tabStops"].as_array().filter(|a|a.len()<=32).ok_or_else(||fail("Tab stop count exceeds 32"))?;
++        let mut stops=Vec::new();let mut previous=0;
++        for item in values{if !item.as_object().is_some_and(|o|o.len()==3&&o.keys().all(|k|["position","type","fill"].contains(&k.as_str()))){return Err(fail("Invalid tab stop fields"));}
++            let pos=item["position"].as_u64().filter(|n|*n>previous&&*n<=283465).ok_or_else(||fail("Invalid tab position"))?;
++            let kind=item["type"].as_u64().filter(|n|*n<=3).ok_or_else(||fail("Invalid tab alignment"))?;let fill=item["fill"].as_u64().filter(|n|*n<=3).ok_or_else(||fail("Invalid tab leader"))?;
++            previous=pos;stops.push(serde_json::json!({"position":pos,"type":kind,"fill":fill}));
++        }
++        let wanted=serde_json::json!({"tabStops":stops,"tabAutoLeft":left,"tabAutoRight":right});
++        let original=self.document.clone();let events=self.event_log.len();
++        let result=(||{self.apply_para_format_native(section,paragraph,&wanted.to_string())?;let answer=self.get_agent_paragraph_tabs_native(section,paragraph)?;let after:serde_json::Value=serde_json::from_str(&answer).map_err(|_|fail("Invalid resulting tabs"))?;
++            if after["editable"]!=true||after["stops"]!=wanted["tabStops"]||after["autoLeft"]!=left||after["autoRight"]!=right{return Err(fail("탭 설정 적용 결과가 요청과 다릅니다."));}Ok(answer)})();
++        if result.is_err(){self.document=original;self.event_log.truncate(events);self.rebuild_derived_state();}result
++    }
++}
+--- a/src/document_core/commands/mod.rs
++++ b/src/document_core/commands/mod.rs
+@@ -16,6 +16,7 @@
+ mod master_pages;
+ mod line_numbers;
+ mod agent_header_footer;
++mod agent_paragraph_tabs;
+ mod agent_page_background;
+ mod page_body_delete;
+ mod page_body_copy;
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1204,6 +1204,11 @@
+     pub fn get_agent_page_background(&self,section:usize,kind:&str)->Result<String,JsValue>{self.core.get_agent_page_background_native(section,kind).map_err(|e|e.into())}
+     #[wasm_bindgen(js_name = setAgentPageBackground)]
+     pub fn set_agent_page_background(&mut self,section:usize,kind:&str,json:&str)->Result<String,JsValue>{self.core.set_agent_page_background_native(section,kind,json).map_err(|e|e.into())}
++
++    #[wasm_bindgen(js_name = getAgentParagraphTabs)]
++    pub fn get_agent_paragraph_tabs(&self,section:usize,paragraph:usize)->Result<String,JsValue>{self.core.get_agent_paragraph_tabs_native(section,paragraph).map_err(|e|e.into())}
++    #[wasm_bindgen(js_name = setAgentParagraphTabs)]
++    pub fn set_agent_paragraph_tabs(&mut self,section:usize,paragraph:usize,json:&str)->Result<String,JsValue>{self.core.set_agent_paragraph_tabs_native(section,paragraph,json).map_err(|e|e.into())}
+ 
+     #[wasm_bindgen(js_name = getAgentHeaderFooter)]
+     pub fn get_agent_header_footer(&self,section:usize,header:bool,apply:u8)->Result<String,JsValue>{self.core.get_agent_header_footer_native(section,header,apply).map_err(|e|e.into())}

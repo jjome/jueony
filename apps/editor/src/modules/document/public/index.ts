@@ -44,3 +44,5 @@ export type {EmptySectionRemovalPlan} from '../domain/empty-section-removal.ts';
 
 export {readDocumentFailure} from './failure.ts';
 export type {DocumentFailure} from './failure.ts';
+
+export type {AgentParagraphTabStop,AgentParagraphTabsOp,AgentParagraphTabSource} from './types.ts';

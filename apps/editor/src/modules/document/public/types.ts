@@ -26,15 +26,19 @@ export type AgentHeaderFooter = {story:'header'|'footer';pageKind:'both'|'odd'|'
 export type AgentHeaderFooterOp = {kind:'set_header_footer_text';section:number;story:'header'|'footer';pageKind:'both'|'odd'|'even';originalText:string;text:string};
 export type AgentSectionMergeOp = {kind:'merge_sections';rightSection:number};
 export type AgentSectionSplitOp = {kind:'split_section';target:string;offset:number};
+export type AgentParagraphTabStop={positionMm:number;alignment:'left'|'right'|'center'|'decimal';leader:'none'|'solid'|'dash'|'dot'};
+export type AgentParagraphTabsOp={kind:'set_paragraph_tabs';target:string;stops:AgentParagraphTabStop[];autoLeft:boolean;autoRight:boolean};
+export type AgentParagraphTabSource={editable:boolean;reason?:string};
 export type Structure = { bookmarks?:AgentBookmarks; sectionMergeAvailable?:boolean; sectionSplitAvailable?:boolean; sections: { index: number; page: DocumentProperties; emptySectionRemoval?:AgentEmptySectionEligibility; headerFooters?:AgentHeaderFooter[]; columns?:DocumentProperties;defaultTabSpacingPt?:number;lineNumbers?:AgentLineNumbers;pageBackgrounds?:AgentPageBackground[];masterPages?:AgentMasterPages }[]; styles?:{id:number;name:string;type:JsonValue}[]; tables: Table[]; paragraphs: { id: string; characters: DocumentProperties; paragraph: DocumentProperties; style?:DocumentProperties;pageHide?:DocumentProperties;controls?:string[];pageIndex?:number }[]; unsupportedControls: string[] };
 export type BodyNode = { id: string; section: number; paragraph: number; text: string; editable: boolean; reason?: string };
-export type Snapshot = { revision: string; name: string; plainText?: string; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
+export type Snapshot = { revision: string; name: string; plainText?: string; paragraphTabSources?:Record<string,AgentParagraphTabSource>; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
 export type BodyOp =
  | { kind: 'create_document'; paragraphs: string[] }
  | { kind: 'insert_body_paragraphs'; after: string; paragraphs: string[] }
  | { kind: 'replace_body_text'; target: string; start: number; count: number; text: string }
  | { kind: 'delete_body_text'; target: string; start: number; count: number };
 export type ControlOp =
+  | AgentParagraphTabsOp
   | AgentBookmarkOp
   | AgentHeaderFooterCreateOp
   | AgentHeaderFooterDeleteOp

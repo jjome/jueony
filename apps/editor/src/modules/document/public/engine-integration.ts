@@ -12,3 +12,5 @@ export {validateAgentSectionMerge} from '../domain/agent-section-merge.ts';
 export {validateAgentHeaderFooter,validateAgentHeaderFooterFormat,validateAgentHeaderFooterParagraph,validateAgentHeaderFooterDelete,validateAgentHeaderFooterCreate} from '../domain/agent-header-footer.ts';
 
 export {validateAgentBookmark,validBookmarkName} from '../domain/agent-bookmarks.ts';
+
+export {agentParagraphTabsPayload} from '../domain/agent-paragraph-tabs.ts';

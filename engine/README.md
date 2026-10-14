@@ -48,3 +48,5 @@ Cargo metadata와 build 모두 `--locked`로 실행한다. WSL 캐시는 Linux `
 - `zzz-page-body-delete.patch`: 실제 페이지네이션의 완전한 본문 문단 범위만 지우고 첫 문단의 구역/단 정의를 재연결한다. 걸친 문단과 복합 구역은 변경 전에 거절하며 마지막 구역 문단은 비워 유지한다. 검수 엔진 `source-a9cbdd94c8aad084/pkg`, 결과와 제한은 [54번 구현](../docs/54-complete-body-page-deletion.md)을 따른다.
 
 rhwp 원문의 MIT 고지와 별도 third-party 고지를 유지한다. 변경한 엔진에도 같은 라이선스 조건이 적용된다. 개발 도구는 실행 묶음에 포함하지 않는다. 엔진 코드를 컴파일한 사실, 구조·저장 왕복, 한컴의 실제 저장·인쇄·시각 일치는 서로 다른 검증이다. 새 조판 golden을 독립 한컴 출력 없이 추가하거나 테스트 통과만으로 한글 2024와 같다고 판정하지 않는다. 최종 실행 결과는 프로젝트의 작업 결과 문서에 별도로 기록한다.
+
+`zzzzzzzzzzzz-agent-paragraph-tabs.patch`는 일반 본문 문단의 기본 사용자 탭에 private 원본 토큰·attr/예약 바이트/추가 데이터·위치/정렬/채움 검사를 추가한다. 현재 API는 `getAgentParagraphTabs`/`setAgentParagraphTabs`이며 지원 여부만 모델에 전달한다. 표/필드/실제 탭/혼합·고급 원본은 유지한다. 기존 빈 CTRL_DATA 슬롯과 실제 payload를 구분한다. 검증 결과와 제한은 [74번 문서](../docs/74-agent-paragraph-tabs.md)를 따른다.

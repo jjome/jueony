@@ -31,6 +31,7 @@ export type AgentParagraphTabsOp={kind:'set_paragraph_tabs';target:string;stops:
 export type AgentParagraphDecorationOp={kind:'format_paragraph_decoration';target:string;properties:Record<string,unknown>};
 export type AgentParagraphDecorationSource=AgentParagraphTabSource;
 export type AgentParagraphTabSource={editable:boolean;reason?:string};
+export type AgentNextParagraphStyleOp={kind:"set_next_paragraph_style";styleId:number;nextStyleId:number};
 export type AgentRenameParagraphStyleOp={kind:"rename_paragraph_style";styleId:number;name:string};
 export type AgentCreateParagraphStyleOp={kind:"create_paragraph_style";sourceStyleId:number;name:string};
 export type AgentParagraphOutlineOp={kind:"set_paragraph_outline";target:string;enabled:boolean;level:number};
@@ -41,15 +42,16 @@ export type AgentNumberingDefinitionSource={id:number;editable:boolean;startNumb
 export type AgentBasicBulletOp={kind:"set_basic_bullet";target:string;character:string};
 export type AgentParagraphListOp={kind:"set_paragraph_list";target:string;listKind:"none"|"number"|"bullet";definitionId:number;level:number};
 export type AgentListCatalog={numberings:{id:number;levelFormats:string[];startNumber:number}[];bullets:{id:number;char:string;rawCode:number}[]};
-export type Structure = { bookmarks?:AgentBookmarks; sectionMergeAvailable?:boolean; sectionSplitAvailable?:boolean; sections: { index: number; page: DocumentProperties; emptySectionRemoval?:AgentEmptySectionEligibility; headerFooters?:AgentHeaderFooter[]; columns?:DocumentProperties;defaultTabSpacingPt?:number;lineNumbers?:AgentLineNumbers;pageBackgrounds?:AgentPageBackground[];masterPages?:AgentMasterPages }[]; styles?:{id:number;name:string;type:JsonValue}[]; tables: Table[]; paragraphs: { id: string; characters: DocumentProperties; paragraph: DocumentProperties; style?:DocumentProperties;pageHide?:DocumentProperties;controls?:string[];pageIndex?:number }[]; unsupportedControls: string[] };
+export type Structure = { bookmarks?:AgentBookmarks; sectionMergeAvailable?:boolean; sectionSplitAvailable?:boolean; sections: { index: number; page: DocumentProperties; emptySectionRemoval?:AgentEmptySectionEligibility; headerFooters?:AgentHeaderFooter[]; columns?:DocumentProperties;defaultTabSpacingPt?:number;lineNumbers?:AgentLineNumbers;pageBackgrounds?:AgentPageBackground[];masterPages?:AgentMasterPages }[]; styleLinks?:{id:number;nextStyleId:number}[]; styles?:{id:number;name:string;type:JsonValue}[]; tables: Table[]; paragraphs: { id: string; characters: DocumentProperties; paragraph: DocumentProperties; style?:DocumentProperties;pageHide?:DocumentProperties;controls?:string[];pageIndex?:number }[]; unsupportedControls: string[] };
 export type BodyNode = { id: string; section: number; paragraph: number; text: string; editable: boolean; reason?: string };
-export type Snapshot = { revision: string; name: string; plainText?: string; styleRenameSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; styleCreationSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; paragraphOutlineSources?:Record<string,AgentParagraphOutlineSource>; numberingDefinitionSources?:AgentNumberingDefinitionSource[]; paragraphTabSources?:Record<string,AgentParagraphTabSource>; basicNumberingSources?:Record<string,AgentParagraphTabSource>; basicBulletSources?:Record<string,AgentParagraphTabSource>; paragraphListSources?:Record<string,AgentParagraphTabSource>; listCatalog?:AgentListCatalog; paragraphDecorationSources?:Record<string,AgentParagraphDecorationSource>; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
+export type Snapshot = { revision: string; name: string; plainText?: string; styleNextSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string;currentNextStyleId:number}>; styleNextTargets?:Record<string,{fingerprint:string}>; styleRenameSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; styleCreationSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; paragraphOutlineSources?:Record<string,AgentParagraphOutlineSource>; numberingDefinitionSources?:AgentNumberingDefinitionSource[]; paragraphTabSources?:Record<string,AgentParagraphTabSource>; basicNumberingSources?:Record<string,AgentParagraphTabSource>; basicBulletSources?:Record<string,AgentParagraphTabSource>; paragraphListSources?:Record<string,AgentParagraphTabSource>; listCatalog?:AgentListCatalog; paragraphDecorationSources?:Record<string,AgentParagraphDecorationSource>; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
 export type BodyOp =
  | { kind: 'create_document'; paragraphs: string[] }
  | { kind: 'insert_body_paragraphs'; after: string; paragraphs: string[] }
  | { kind: 'replace_body_text'; target: string; start: number; count: number; text: string }
  | { kind: 'delete_body_text'; target: string; start: number; count: number };
 export type ControlOp =
+  | AgentNextParagraphStyleOp
   | AgentRenameParagraphStyleOp
   | AgentCreateParagraphStyleOp
   | AgentParagraphOutlineOp

@@ -27,7 +27,7 @@ export function describeStructure(s?: Structure) {
  s.paragraphs.forEach((p,i)=>{const v=p.paragraph;if(v.fillType!==undefined)lines.push(`본문 문단 ${i+1} 테두리/배경: ${['borderLeft','borderRight','borderTop','borderBottom'].map(k=>k+':'+JSON.stringify(v[k])).join(' · ')} · 배경 ${v.fillType==='none'?'없음':v.fillColor} · 좌/우/위/아래 간격 ${Array.isArray(v.borderSpacing)?v.borderSpacing.map(mm).join('/'):''}mm · 연결 ${v.borderConnect} · 여백 무시 ${v.borderIgnoreMargin}`);});
  s.paragraphs.forEach((p,i)=>lines.push(`본문 문단 ${i+1} 번호: ${p.paragraph.headType} · 정의 ${p.paragraph.numberingId} · 수준 ${Number(p.paragraph.paraLevel??0)+1}`));
  if(s.bookmarks){lines.push(`AI 책갈피: ${s.bookmarks.editable?'일반 본문 점 책갈피 편집 가능':s.bookmarks.reason??'읽기 전용'}`);for(const b of s.bookmarks.items)lines.push(`책갈피 ${JSON.stringify(b.name)}: ${b.target??'위치 지원 범위 밖'}${b.offset!==null?' · Unicode 글자 위치 '+b.offset:''} · ${b.editable?'이름 변경/삭제 가능':'읽기 전용'}`);if(s.bookmarks.editable&&!s.bookmarks.items.length)lines.push('책갈피 없음');}
- if(s.styles)lines.push('문서 스타일 목록 ('+s.styles.length+'개): '+s.styles.map(v=>v.name+' ('+(v.type===0?'문단':'글자')+')').join('\n'));
+ if(s.styles)lines.push('문서 스타일 목록 ('+s.styles.length+'개): '+s.styles.map(v=>{const link=s.styleLinks?.find(l=>l.id===v.id),next=s.styles?.find(n=>n.id===link?.nextStyleId);return v.name+' ('+(v.type===0?'문단':'글자')+')'+(v.type===0&&link?' · Enter 후 '+(next?.name??'없는 다음 스타일'): '');}).join('\n'));
  if (!s.tables.length) lines.push('표 없음');
  s.tables.forEach((t, i) => {
    lines.push(`표 ${i + 1}: ${t.rows}행 × ${t.columns}열`);

@@ -26,3 +26,5 @@ export {validateAgentNumberingClone} from '../domain/agent-numbering-clone.ts';
 export {validateAgentBasicBullet,basicBulletCharacters} from '../domain/agent-basic-bullet.ts';
 
 export {agentRenameParagraphStyleName} from '../domain/agent-style-rename.ts';
+
+export {validateAgentNextParagraphStyle} from '../domain/agent-style-next.ts';

@@ -1,16 +1,12 @@
-import {sha256} from '@noble/hashes/sha2.js';
+import {readAgentStyleState} from './agent-style-source.ts';
 import type {Snapshot,AgentRenameParagraphStyleOp} from '../../modules/document/public/index.ts';
 import {agentRenameParagraphStyleName} from '../../modules/document/public/engine-integration.ts';
 import {nativeDocument,parsed} from './structure.ts';
-import {capturePreservationEvidence,readStoredStyleMetadata} from './preservation.ts';
+import {capturePreservationEvidence} from './preservation.ts';
 const canonical=(v:any):any=>Array.isArray(v)?v.map(canonical):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,canonical(v[k])])):v;
 const same=(a:any,b:any)=>JSON.stringify(canonical(a))===JSON.stringify(canonical(b));
-const fingerprint=(v:any)=>Array.from(sha256(new TextEncoder().encode(JSON.stringify(canonical(v)))),n=>n.toString(16).padStart(2,'0')).join('');
 export function readAgentStyleRenameSources(wasm:any):Pick<Snapshot,'styleRenameSources'>{
- const d=nativeDocument(wasm);if(typeof d.updateStyle!=='function'||typeof d.getStoredStyleDetail!=='function'||typeof d.getAgentStyleMetadata!=='function'||typeof d.getFieldList!=='function')return {};
- try{const fields=parsed(d.getFieldList()),fieldFree=Array.isArray(fields)&&fields.length===0;const styles=parsed(d.getStyleList());if(!Array.isArray(styles)||styles.length>256||styles.some((v,i)=>v.id!==i))return {};
- return {styleRenameSources:Object.fromEntries(styles.map(v=>{const detail=parsed(d.getStoredStyleDetail(v.id)),native=parsed(d.getAgentStyleMetadata(v.id)),metadata=readStoredStyleMetadata(d,v.id),editable=fieldFree&&v.id>0&&v.type===0&&native.rawCanonical===true&&metadata?.lockForm===false&&detail?.charProps&&detail?.paraProps;
- return [String(v.id),{editable:Boolean(editable),...(editable?{fingerprint:fingerprint({style:v,details:detail,metadata})}:{reason:'필드가 있는 문서와 바탕글·글자·양식 잠금·비정규 바이너리 스타일은 AI 이름 변경에서 보호합니다.'})}];}))};}catch{return {};}
+ const state=readAgentStyleState(wasm);return state?{styleRenameSources:state.sources}:{};
 }
 export function executeAgentRenameParagraphStyle(wasm:any,base:Snapshot,op:AgentRenameParagraphStyleOp){
  const name=agentRenameParagraphStyleName(op,base),d=nativeDocument(wasm),styles=parsed(d.getStyleList()),current=readAgentStyleRenameSources(d).styleRenameSources?.[String(op.styleId)];

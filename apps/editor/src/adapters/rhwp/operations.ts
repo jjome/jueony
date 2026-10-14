@@ -1,3 +1,4 @@
+import {executeAgentNextParagraphStyle} from './agent-style-next.ts';
 import {executeAgentRenameParagraphStyle} from './agent-style-rename.ts';
 import {executeAgentCreateParagraphStyle} from './agent-style-create.ts';
 import {executeAgentParagraphOutline} from './agent-paragraph-outline.ts';
@@ -38,6 +39,7 @@ function replaceCellText(doc:any,base:number[],cell:number,value:string) {
 }
 export function executeControlOperation(wasm: any, snapshot: Snapshot, op: ControlOp, tables: Map<string, Table>): { section: number; after: number; count: number } | undefined {
   const doc = nativeDocument(wasm);
+  if(op.kind==='set_next_paragraph_style'){executeAgentNextParagraphStyle(doc,snapshot,op);return;}
   if(op.kind==='rename_paragraph_style'){executeAgentRenameParagraphStyle(doc,snapshot,op);return;}
   if(op.kind==='create_paragraph_style'){executeAgentCreateParagraphStyle(doc,snapshot,op);return;}
   if(op.kind==='set_paragraph_outline'){executeAgentParagraphOutline(doc,snapshot,op);return;}

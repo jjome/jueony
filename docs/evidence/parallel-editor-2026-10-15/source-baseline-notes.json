@@ -1,0 +1,18 @@
+{
+  "implementationCommit": "75c24b75610dcca665edc046755a79f00c176bff",
+  "sourceCommitRecordedAtBuild": "6d701dbb656493b1dfbab7e5af5f43bda5bee5ac",
+  "sourceDirtyRecordedAtBuild": true,
+  "exactRawApplicationSourceSha256": "94bc5c54a87f571a74cfbf27bb43a716b3e600a06c84f710cd63fcf23adc2347",
+  "engineSourceId": "31c6854ba64af4b5",
+  "wasmSha256": "6e7e8ca9971063ae08ba5336fdd7ef5f73a66a055a82e0600adf4c21a52ded3d",
+  "gitSourceEquivalence": "All current editor sources equal committed implementation after LF normalization; raw compiled patches equal engine metadata and normalized patch content equals Git. No new source/engine changes after reviewed build.",
+  "patchNormalization": [
+    {
+      "name": "zzzzzzzzzzzzzzzzzzz-agent-style-metadata.patch",
+      "compiledWorkingSha256": "53c6a573df6e8f1d0af4f388dad4e624a700006ad38f7a1de820eabc1d6d44cb",
+      "committedSha256": "24a6f824744c56eddbd6a089897b7383a86d63006b491299684c20586632b035",
+      "reason": "Historical local CRLF patch, Git eol=lf; exact normalized patch content matches. Compiled raw input remains immutable."
+    }
+  ],
+  "note": "The reviewed build was compiled from exact pending source before commit. This provenance binds it to the completed implementation commit; historical build metadata is preserved, not rewritten."
+}

@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-agent-para-tabs-20261014/Start-Review.cmd)**로 실행한다(4272). AI가 일반 본문 문단별 사용자 탭·양 끝 자동 탭을 설정하고, 서로 다른 문단의 탭을 한 요청/undo로 적용한다. Native 원본 토큰·알 수 없는 탭 속성·전체 문서 보존을 검사한다. [사용법·검증·제한](docs/74-agent-paragraph-tabs.md)을 확인한다. 기본 4정렬/4채움·32개 이하만 지원하며 실제 탭 문자/필드/개체/혼합 원본 AI 편집·고급 채움·반복 기록·전체 한글 동등성은 남는다. 기존 실행 창과 사용자 문서는 유지한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-agent-para-box-20261014/Start-Review.cmd)**로 실행한다(4274). AI가 일반 본문 문단의 네 방향 기본 테두리·단색 배경·간격·연결/여백 무시를 부분 변경한다. 공유 서식과 요청 밖 원본을 보존하며 다른 문단끼리 묶음 적용·한 번에 되돌리기를 지원한다. [사용법·검증·제한](docs/75-agent-paragraph-decoration.md)을 확인한다. 고급 효과·복잡한 원본·반복 기록·전체 한글 동등성은 남는다. 기존 실행 창과 사용자 문서는 유지한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

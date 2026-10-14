@@ -1,0 +1,15 @@
+{
+  "referenceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+  "fixture": "upstream/rhwp-source/saved/blank2010.hwp",
+  "fixtureSha256": "43f472751fafefb8c66b0f831660ebed51e443a46bebe44c75bba918154ce4c9",
+  "readMethod": "Read-only standard-library CFB FAT/MiniFAT reader, raw-deflate DocInfo, record tag 20/BORDER_FILL index 2",
+  "recordBytes": 53,
+  "recordSha256": "b3647a162973d802ac7ab20a690303db815fc505b9c36e8f9a90e686a31bdf2d",
+  "attributes": 0,
+  "storedInactiveDiagonalType": 1,
+  "backgroundColorRefHex": "ffffffff",
+  "patternColorRefHex": "00999999",
+  "patternType": -1,
+  "meaning": "Stored inactive SOLID diagonal and known COLORREF NONE marker are preserved, not treated as active effects or RGB. HWPX empty winBrush may retain SolidFill while FillType is None. Existing native model/color and serializer/hwpx/header explain this representation.",
+  "nativeHancomComparison": "NOT_RUN"
+}

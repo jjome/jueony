@@ -1,0 +1,3700 @@
+{
+  "ok": true,
+  "scannedFiles": 274,
+  "moduleCount": 9,
+  "modules": [
+    "agent",
+    "automation",
+    "connections",
+    "document",
+    "document-files",
+    "preferences",
+    "references",
+    "session",
+    "workspace"
+  ],
+  "dependencies": [
+    {
+      "from": "apps/editor/src/adapters/browser/calendar-format-preference.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/calendar-format-preference.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/calendar-format-preference.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/calendar-format-preference.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/calendar-stamp-dialog.ts",
+      "to": "apps/editor/ui/dialog",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/calendar-stamp-dialog.ts",
+      "to": "apps/editor/ui/toast",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/calendar-stamp-dialog.ts",
+      "to": "apps/editor/src/adapters/browser/calendar-format-preference.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/calendar-stamp-dialog.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/calendar-stamp-dialog.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/content-hash.ts",
+      "to": "apps/editor/src/modules/references/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/document-insertion-dialog.ts",
+      "to": "apps/editor/ui/dialog",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/document-tab-cycle.ts",
+      "to": "apps/editor/src/modules/session/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/document-tab-cycle.ts",
+      "to": "apps/editor/src/modules/session/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/document-tab-cycle.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/paragraph-sort-dialog.ts",
+      "to": "apps/editor/ui/dialog",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/paragraph-sort-dialog.ts",
+      "to": "apps/editor/src/modules/document/public/paragraph-sort.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/plain-text-dialog.ts",
+      "to": "apps/editor/ui/dialog",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/preferences-binding.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/preferences-binding.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/recovery-settings.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/recovery-settings.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/settings-backup-dialog.ts",
+      "to": "apps/editor/ui/dialog",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/settings-backup-dialog.ts",
+      "to": "apps/editor/core/user-settings",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/settings-backup-dialog.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/snippet-dialog.ts",
+      "to": "apps/editor/ui/dialog",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/snippet-dialog.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/style-package-dialog.ts",
+      "to": "apps/editor/ui/dialog",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/style-package-dialog.ts",
+      "to": "apps/editor/src/modules/document/public/style-package.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/style-package-dialog.ts",
+      "to": "apps/editor/src/adapters/rhwp/style-package-native.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/table-auto-fill-dialog.ts",
+      "to": "apps/editor/ui/dialog",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/table-auto-fill-dialog.ts",
+      "to": "apps/editor/src/modules/document/public/table-auto-fill.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/table-conversion-dialog.ts",
+      "to": "apps/editor/ui/dialog",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/table-conversion-dialog.ts",
+      "to": "apps/editor/src/modules/document/public/table-conversion.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/table-conversion-dialog.ts",
+      "to": "apps/editor/src/modules/document/public/table-conversion.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/table-presets-dialog.ts",
+      "to": "apps/editor/ui/dialog",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/table-presets-dialog.ts",
+      "to": "apps/editor/src/modules/document/public/table-presets.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/text-transform-dialog.ts",
+      "to": "apps/editor/ui/dialog",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/text-transform-dialog.ts",
+      "to": "apps/editor/src/modules/document/public/text-transform.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/work-template-dialog.ts",
+      "to": "apps/editor/ui/dialog",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/browser/work-template-dialog.ts",
+      "to": "apps/editor/src/modules/document/public/work-templates.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/files/download-save.ts",
+      "to": "apps/editor/src/modules/document-files/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/files/file-connection.ts",
+      "to": "apps/editor/src/adapters/files/fingerprints.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/files/recovery-export.ts",
+      "to": "apps/editor/src/modules/document-files/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/files/recovery-export.ts",
+      "to": "apps/editor/src/modules/document-files/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/files/recovery-export.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/files/recovery-export.ts",
+      "to": "apps/editor/src/modules/document-files/public/index.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/adapters/files/references.ts",
+      "to": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/files/references.ts",
+      "to": "apps/editor/src/modules/references/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/files/references.ts",
+      "to": "apps/editor/src/adapters/files/temporary-references.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/files/save-runtime.ts",
+      "to": "apps/editor/src/modules/document-files/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/files/save-runtime.ts",
+      "to": "apps/editor/src/adapters/files/fingerprints.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/files/save-runtime.ts",
+      "to": "apps/editor/src/adapters/files/fingerprints.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/files/save-runtime.ts",
+      "to": "apps/editor/src/adapters/files/fingerprints.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/adapters/files/save-runtime.ts",
+      "to": "apps/editor/src/modules/document-files/public/index.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/adapters/http/local-model-gateway.ts",
+      "to": "apps/editor/src/modules/connections/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/iframe/document-client.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/iframe/document-client.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/iframe/document-client.ts",
+      "to": "apps/editor/src/adapters/files/file-connection.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-basic-bullet.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-basic-bullet.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-basic-bullet.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-paragraph-list.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-basic-bullet.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-basic-bullet.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-basic-numbering.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-basic-numbering.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-basic-numbering.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-paragraph-list.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-basic-numbering.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-basic-numbering.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-bookmarks.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-bookmarks.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-bookmarks.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-bookmarks.ts",
+      "to": "apps/editor/src/adapters/rhwp/body-preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-empty-section.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-empty-section.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-empty-section.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-empty-section.ts",
+      "to": "apps/editor/src/adapters/rhwp/empty-section-removal.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-empty-section.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-header-footer-create.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-header-footer-create.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-header-footer-create.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-header-footer-create.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-header-footer-structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-header-footer-delete.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-header-footer-delete.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-header-footer-delete.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-header-footer-delete.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-header-footer-structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-header-footer-structure.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-header-footer-structure.ts",
+      "to": "apps/editor/src/adapters/rhwp/body-preservation.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-header-footer.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-header-footer.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-master-pages.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-master-pages.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-master-pages.ts",
+      "to": "apps/editor/src/adapters/rhwp/master-pages.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-numbering-clone.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-numbering-clone.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-numbering-clone.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-paragraph-list.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-numbering-clone.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-numbering-clone.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-page-background.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-page-background.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-paragraph-decoration.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-paragraph-decoration.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-paragraph-decoration.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-paragraph-decoration.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-paragraph-list.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-paragraph-list.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-paragraph-list.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-paragraph-list.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-paragraph-outline.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-paragraph-outline.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-paragraph-outline.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-paragraph-list.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-paragraph-outline.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-paragraph-outline.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-paragraph-tabs.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-paragraph-tabs.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-paragraph-tabs.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-paragraph-tabs.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-section-merge.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-section-merge.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-section-merge.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-section-settings.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-section-settings.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-section-settings.ts",
+      "to": "apps/editor/src/adapters/rhwp/line-numbers.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-section-settings.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-section-split.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-section-split.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-section-split.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-style-create.ts",
+      "to": "@noble/hashes/sha2.js",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-style-create.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-style-create.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-style-create.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-style-create.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-style-next.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-style-next.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-style-next.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-style-next.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-style-next.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-style-source.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-style-rename.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-style-source.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-style-rename.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-style-rename.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-style-rename.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-style-rename.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-style-source.ts",
+      "to": "@noble/hashes/sha2.js",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-style-source.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-style-source.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-table-pagination.ts",
+      "to": "@noble/hashes/sha2.js",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-table-pagination.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-table-pagination.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-table-pagination.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/agent-table-pagination.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/basic-text-commands.ts",
+      "to": "apps/editor/src/adapters/browser/text-transform-dialog.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/basic-text-commands.ts",
+      "to": "apps/editor/src/adapters/browser/plain-text-dialog.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/basic-text-commands.ts",
+      "to": "apps/editor/src/adapters/rhwp/text-transform-native.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/basic-text-commands.ts",
+      "to": "apps/editor/src/adapters/rhwp/plain-text-native.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/basic-text-commands.ts",
+      "to": "apps/editor/src/modules/document/public/text-transform.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/body-caret.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/body-caret.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/body-operations.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/body-operations.ts",
+      "to": "apps/editor/src/modules/document/public/wire-schema.mjs",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/body-preservation.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/calendar-stamp.ts",
+      "to": "apps/editor/engine/command",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/calendar-stamp.ts",
+      "to": "apps/editor/src/adapters/browser/calendar-stamp-dialog.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/document-defaults.ts",
+      "to": "apps/editor/src/modules/preferences/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/document-defaults.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/document-insertion.ts",
+      "to": "apps/editor/src/adapters/browser/document-insertion-dialog.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/document-insertion.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/edit-preflight.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-table-pagination.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-style-next.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-style-rename.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-style-create.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-paragraph-outline.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-paragraph-list.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-paragraph-decoration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-paragraph-tabs.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/adapters/files/recovery-export.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/adapters/files/file-connection.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/adapters/files/file-connection.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/adapters/files/save-runtime.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/document-agent/controller",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/adapters/rhwp/execute.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/adapters/rhwp/formatting-toolbar.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/empty-section-removal.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/empty-section-removal.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/empty-section-removal.ts",
+      "to": "apps/editor/src/adapters/rhwp/edit-preflight.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/execute.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-section-merge.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/execute.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-empty-section.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/execute.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/execute.ts",
+      "to": "apps/editor/src/adapters/rhwp/body-operations.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/execute.ts",
+      "to": "apps/editor/src/adapters/rhwp/operations.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/execute.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/execute.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/formatting-toolbar.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/formatting-toolbar.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/hanging-indent.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/hanging-indent.ts",
+      "to": "apps/editor/src/adapters/rhwp/paragraph-spacing.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/line-numbers.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/line-numbers.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/line-numbers.ts",
+      "to": "apps/editor/src/adapters/rhwp/edit-preflight.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/master-pages.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/master-pages.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/master-pages.ts",
+      "to": "apps/editor/src/adapters/rhwp/edit-preflight.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/navigation-history.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/navigation-history.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/navigation-history.ts",
+      "to": "apps/editor/src/adapters/rhwp/session-cursor.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-table-pagination.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-style-next.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-style-rename.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-style-create.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-paragraph-outline.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-basic-numbering.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-numbering-clone.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-basic-bullet.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-paragraph-list.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-paragraph-decoration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-paragraph-tabs.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-bookmarks.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-header-footer-create.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-header-footer-delete.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-header-footer.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-section-split.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-section-settings.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-page-background.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-master-pages.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/operations.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-background-image.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-background-image.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-body-clipboard.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-body-clipboard.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-body-clipboard.ts",
+      "to": "apps/editor/src/adapters/rhwp/page-body-deletion.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-body-clipboard.ts",
+      "to": "apps/editor/src/adapters/rhwp/edit-preflight.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-body-deletion.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-body-deletion.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-body-deletion.ts",
+      "to": "apps/editor/src/adapters/rhwp/edit-preflight.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-border-settings.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-border-settings.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-border-settings.ts",
+      "to": "apps/editor/src/adapters/rhwp/edit-preflight.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-border-settings.ts",
+      "to": "apps/editor/src/adapters/rhwp/page-background-image.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-controls.ts",
+      "to": "apps/editor/src/adapters/rhwp/master-pages.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-controls.ts",
+      "to": "apps/editor/src/adapters/rhwp/line-numbers.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-controls.ts",
+      "to": "apps/editor/src/adapters/rhwp/page-body-deletion.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-controls.ts",
+      "to": "apps/editor/src/adapters/rhwp/page-body-clipboard.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-controls.ts",
+      "to": "apps/editor/src/adapters/rhwp/empty-section-removal.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-setup-settings.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-setup-settings.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/page-setup-settings.ts",
+      "to": "apps/editor/src/adapters/rhwp/edit-preflight.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/paragraph-sort-native.ts",
+      "to": "apps/editor/src/modules/document/public/paragraph-sort.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/paragraph-sort-native.ts",
+      "to": "apps/editor/src/adapters/rhwp/table-conversion-native.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/paragraph-sort-native.ts",
+      "to": "apps/editor/src/adapters/rhwp/edit-preflight.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/paragraph-sort.ts",
+      "to": "apps/editor/src/adapters/browser/paragraph-sort-dialog.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/paragraph-sort.ts",
+      "to": "apps/editor/src/adapters/rhwp/paragraph-sort-native.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/plain-text-native.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "to": "@noble/hashes/sha2.js",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/session-cursor.ts",
+      "to": "@noble/hashes/sha2.js",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/session-cursor.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/session-cursor.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/snippets.ts",
+      "to": "apps/editor/src/adapters/browser/snippet-dialog.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/snippets.ts",
+      "to": "apps/editor/src/adapters/rhwp/plain-text-native.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/structure.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/structure.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-bookmarks.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/structure.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-header-footer.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/structure.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-empty-section.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/structure.ts",
+      "to": "apps/editor/src/adapters/rhwp/line-numbers.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/structure.ts",
+      "to": "apps/editor/src/adapters/rhwp/agent-master-pages.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/structure.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/style-management.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/style-management.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/style-package-native.ts",
+      "to": "apps/editor/src/modules/document/public/style-package.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/style-package-native.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/style-package.ts",
+      "to": "apps/editor/src/adapters/browser/style-package-dialog.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/style-package.ts",
+      "to": "apps/editor/src/modules/document/public/style-package.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/style-package.ts",
+      "to": "apps/editor/src/adapters/rhwp/style-package-native.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/table-auto-fill-native.ts",
+      "to": "apps/editor/src/modules/document/public/table-auto-fill.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/table-auto-fill-native.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/table-auto-fill.ts",
+      "to": "apps/editor/src/adapters/browser/table-auto-fill-dialog.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/table-auto-fill.ts",
+      "to": "apps/editor/src/adapters/rhwp/table-auto-fill-native.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/table-auto-fill.ts",
+      "to": "apps/editor/src/modules/document/public/table-auto-fill.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/table-conversion-native.ts",
+      "to": "apps/editor/src/modules/document/public/table-conversion.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/table-conversion-native.ts",
+      "to": "apps/editor/src/modules/document/public/table-conversion.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/table-conversion-native.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/table-conversion.ts",
+      "to": "apps/editor/src/adapters/browser/table-conversion-dialog.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/table-conversion.ts",
+      "to": "apps/editor/src/adapters/rhwp/table-conversion-native.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/table-conversion.ts",
+      "to": "apps/editor/src/adapters/rhwp/table-conversion-native.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/table-conversion.ts",
+      "to": "apps/editor/src/modules/document/public/table-conversion.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/table-presets-native.ts",
+      "to": "apps/editor/src/modules/document/public/table-presets.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/table-presets-native.ts",
+      "to": "apps/editor/src/adapters/rhwp/edit-preflight.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/table-presets.ts",
+      "to": "apps/editor/src/adapters/browser/table-presets-dialog.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/table-presets.ts",
+      "to": "apps/editor/src/adapters/rhwp/table-presets-native.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/text-transform-native.ts",
+      "to": "apps/editor/src/modules/document/public/text-transform.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/text-transform-native.ts",
+      "to": "apps/editor/src/adapters/rhwp/style-flow.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/text-transform-native.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/transpose-table.ts",
+      "to": "apps/editor/src/adapters/rhwp/edit-preflight.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/work-templates-native.ts",
+      "to": "apps/editor/src/modules/document/public/work-templates.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/work-templates-native.ts",
+      "to": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/work-templates.ts",
+      "to": "apps/editor/src/adapters/browser/work-template-dialog.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/rhwp/work-templates.ts",
+      "to": "apps/editor/src/adapters/rhwp/work-templates-native.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/indexeddb-workspace.ts",
+      "to": "apps/editor/src/adapters/storage/legacy-state-validator.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/indexeddb-workspace.ts",
+      "to": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/indexeddb-workspace.ts",
+      "to": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/indexeddb-workspace.ts",
+      "to": "apps/editor/src/adapters/storage/serialized-writer.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "to": "apps/editor/src/modules/references/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "to": "apps/editor/src/modules/agent/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "to": "apps/editor/src/modules/automation/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "to": "apps/editor/src/modules/connections/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "to": "apps/editor/src/modules/workspace/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "to": "apps/editor/src/adapters/files/file-connection.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "to": "apps/editor/src/modules/workspace/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "to": "apps/editor/src/modules/agent/public/index.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "to": "apps/editor/src/modules/references/public/index.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "to": "apps/editor/src/modules/connections/public/index.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "to": "apps/editor/src/modules/workspace/public/index.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "to": "apps/editor/src/modules/workspace/public/index.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/legacy-state-validator.ts",
+      "to": "apps/editor/src/macros/commands.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/adapters/storage/legacy-state-validator.ts",
+      "to": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/agent/run-bounded.ts",
+      "to": "apps/editor/src/modules/agent/public/index.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/agent/run-bounded.ts",
+      "to": "apps/editor/src/modules/agent/public/index.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/chrome-2024.ts",
+      "to": "apps/editor/automation/host",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/chrome-2024.ts",
+      "to": "apps/editor/core/wasm-bridge",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/chrome-2024.ts",
+      "to": "apps/editor/core/event-bus",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/chrome-2024.ts",
+      "to": "apps/editor/core/document-dirty-state",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/chrome-2024.ts",
+      "to": "apps/editor/src/icons.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/composition/agent.ts",
+      "to": "apps/editor/src/modules/agent/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/composition/agent.ts",
+      "to": "apps/editor/src/composition/references.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/composition/references.ts",
+      "to": "apps/editor/src/modules/references/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/composition/references.ts",
+      "to": "apps/editor/src/adapters/browser/content-hash.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/composition/workbench.ts",
+      "to": "apps/editor/src/adapters/storage/indexeddb-workspace.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/composition/workbench.ts",
+      "to": "apps/editor/src/adapters/http/local-model-gateway.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/composition/workbench.ts",
+      "to": "apps/editor/src/modules/connections/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/document-control/describe.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/document-control/execute.ts",
+      "to": "apps/editor/src/adapters/rhwp/execute.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/document-control/operations.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/document-control/operations.ts",
+      "to": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/document-control/operations.ts",
+      "to": "apps/editor/src/adapters/rhwp/operations.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/document-control/structure.ts",
+      "to": "apps/editor/src/adapters/rhwp/structure.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/document-control/structure.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/download-save.ts",
+      "to": "apps/editor/src/adapters/files/download-save.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/editor-actions/equal-cells.ts",
+      "to": "apps/editor/src/shortcuts/cell-band.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/editor-actions/navigation-pane.ts",
+      "to": "apps/editor/src/editor-actions/search-model.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/editor-actions/navigation-pane.ts",
+      "to": "apps/editor/src/editor-actions/search-model.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/file-connection.ts",
+      "to": "apps/editor/src/adapters/files/file-connection.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/file-connection.ts",
+      "to": "apps/editor/src/adapters/files/file-connection.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/macros/commands.ts",
+      "to": "apps/editor/src/modules/automation/public/index.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/macros/commands.ts",
+      "to": "apps/editor/src/modules/automation/public/index.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/context.ts",
+      "to": "apps/editor/src/modules/workspace/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/context.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/context.ts",
+      "to": "apps/editor/src/modules/references/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/context.ts",
+      "to": "apps/editor/src/modules/workspace/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/context.ts",
+      "to": "apps/editor/src/modules/connections/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/facade.ts",
+      "to": "apps/editor/src/modules/agent/application/run-once.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/facade.ts",
+      "to": "apps/editor/src/modules/agent/application/run-bounded.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/facade.ts",
+      "to": "apps/editor/src/modules/agent/application/run-bounded.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/facade.ts",
+      "to": "apps/editor/src/modules/agent/application/context.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/facade.ts",
+      "to": "apps/editor/src/modules/references/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/run-bounded.ts",
+      "to": "apps/editor/src/modules/agent/application/run-once.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/run-bounded.ts",
+      "to": "apps/editor/src/modules/agent/application/run-once.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/run-bounded.ts",
+      "to": "apps/editor/src/modules/agent/domain/generation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/run-bounded.ts",
+      "to": "apps/editor/src/modules/agent/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/run-bounded.ts",
+      "to": "apps/editor/src/modules/connections/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/run-bounded.ts",
+      "to": "apps/editor/src/modules/agent/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/run-once.ts",
+      "to": "apps/editor/src/modules/agent/domain/generation.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/run-once.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/run-once.ts",
+      "to": "apps/editor/src/modules/connections/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/run-once.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/application/run-once.ts",
+      "to": "apps/editor/src/modules/agent/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/domain/generation.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/public/contracts.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/public/index.ts",
+      "to": "apps/editor/src/modules/agent/public/contracts.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/public/index.ts",
+      "to": "apps/editor/src/modules/agent/application/run-once.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/public/index.ts",
+      "to": "apps/editor/src/modules/agent/application/run-bounded.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/public/index.ts",
+      "to": "apps/editor/src/modules/agent/domain/generation.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/public/index.ts",
+      "to": "apps/editor/src/modules/agent/application/run-once.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/public/index.ts",
+      "to": "apps/editor/src/modules/agent/application/run-once.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/public/index.ts",
+      "to": "apps/editor/src/modules/agent/application/run-bounded.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/public/index.ts",
+      "to": "apps/editor/src/modules/agent/application/context.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/public/index.ts",
+      "to": "apps/editor/src/modules/agent/application/facade.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/agent/public/index.ts",
+      "to": "apps/editor/src/modules/agent/application/facade.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/automation/application/describe-template.ts",
+      "to": "apps/editor/src/modules/automation/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/automation/application/describe-template.ts",
+      "to": "apps/editor/src/modules/automation/domain/commands.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/automation/application/facade.ts",
+      "to": "apps/editor/src/modules/automation/domain/commands.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/automation/application/facade.ts",
+      "to": "apps/editor/src/modules/automation/application/describe-template.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/automation/application/facade.ts",
+      "to": "apps/editor/src/modules/automation/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/automation/application/facade.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/automation/domain/commands.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/automation/domain/commands.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/automation/domain/commands.ts",
+      "to": "apps/editor/src/modules/automation/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/automation/public/contracts.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/automation/public/index.ts",
+      "to": "apps/editor/src/modules/automation/public/contracts.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/automation/public/index.ts",
+      "to": "apps/editor/src/modules/automation/domain/commands.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/automation/public/index.ts",
+      "to": "apps/editor/src/modules/automation/application/facade.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/automation/public/index.ts",
+      "to": "apps/editor/src/modules/automation/application/facade.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/connections/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/connections/public/index.ts",
+      "to": "apps/editor/src/modules/references/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/connections/public/index.ts",
+      "to": "apps/editor/src/modules/workspace/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/application/describe-structure.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/application/facades.ts",
+      "to": "apps/editor/src/modules/document/ports/engine.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/application/facades.ts",
+      "to": "apps/editor/src/modules/document/public/facades.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/application/facades.ts",
+      "to": "apps/editor/src/modules/document/domain/edit-proposal.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-basic-bullet.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-basic-numbering.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-bookmarks.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-empty-section.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-header-footer.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-master-pages.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-master-pages.ts",
+      "to": "apps/editor/src/modules/document/domain/master-page-settings.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-numbering-clone.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-paragraph-decoration.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-paragraph-list.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-paragraph-outline.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-paragraph-tabs.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-section-merge.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-section-settings.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-section-settings.ts",
+      "to": "apps/editor/src/modules/document/domain/line-number-settings.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-section-split.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-style-create.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-style-name.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-style-create.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-style-next.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-style-rename.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-style-rename.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-style-name.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/agent-table-pagination.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-table-pagination.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-style-next.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-style-rename.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-style-create.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-paragraph-outline.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-basic-numbering.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-numbering-clone.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-basic-bullet.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-paragraph-list.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-paragraph-decoration.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-paragraph-tabs.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-bookmarks.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-header-footer.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-section-merge.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-empty-section.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-section-split.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/public/wire-schema.mjs",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-section-settings.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-master-pages.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/edit-operations.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/edit-operations.ts",
+      "to": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/edit-proposal.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/edit-proposal.ts",
+      "to": "apps/editor/src/modules/document/domain/edit-operations.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/page-body-paste-plan.ts",
+      "to": "apps/editor/src/modules/document/domain/page-setup-settings.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/page-body-paste-plan.ts",
+      "to": "apps/editor/src/modules/document/domain/page-setup-settings.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/page-body-paste-plan.ts",
+      "to": "apps/editor/src/modules/document/domain/page-body-deletion.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/domain/table-series.ts",
+      "to": "apps/editor/src/modules/document/domain/table-auto-fill.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document/ports/engine.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-section-settings.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-master-pages.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-section-split.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-empty-section.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-section-merge.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-header-footer.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-bookmarks.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-paragraph-tabs.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-paragraph-decoration.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-paragraph-list.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-style-create.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-paragraph-outline.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-basic-numbering.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-numbering-clone.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-basic-bullet.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-style-rename.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-style-next.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "to": "apps/editor/src/modules/document/domain/agent-table-pagination.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/facades.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/calendar-stamp.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/calendar-stamp.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/edit-operations.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/edit-proposal.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/facades.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/application/facades.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/ports/engine.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/application/describe-structure.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/interaction.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/interaction.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/formatting-toolbar.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/hanging-indent.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/style-definition.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/style-definition.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/page-border-settings.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/page-border-settings.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/page-border-settings.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/page-border-settings.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/page-setup-settings.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/page-setup-settings.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/master-page-settings.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/master-page-settings.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/line-number-settings.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/line-number-settings.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/page-body-deletion.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/page-body-deletion.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/page-body-clipboard.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/page-body-clipboard.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/page-body-paste-plan.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/page-body-paste-plan.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/empty-section-removal.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/domain/empty-section-removal.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/failure.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/failure.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/index.ts",
+      "to": "apps/editor/src/modules/document/public/types.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/paragraph-sort.ts",
+      "to": "apps/editor/src/modules/document/domain/paragraph-sort.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/paragraph-sort.ts",
+      "to": "apps/editor/src/modules/document/domain/paragraph-sort.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/style-package.ts",
+      "to": "apps/editor/src/modules/document/domain/style-package.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/style-package.ts",
+      "to": "apps/editor/src/modules/document/domain/style-package.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/table-auto-fill.ts",
+      "to": "apps/editor/src/modules/document/domain/table-auto-fill.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/table-auto-fill.ts",
+      "to": "apps/editor/src/modules/document/domain/table-auto-fill.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/table-auto-fill.ts",
+      "to": "apps/editor/src/modules/document/domain/table-series.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/table-auto-fill.ts",
+      "to": "apps/editor/src/modules/document/domain/table-series.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/table-conversion.ts",
+      "to": "apps/editor/src/modules/document/domain/table-conversion.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/table-conversion.ts",
+      "to": "apps/editor/src/modules/document/domain/table-conversion.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/table-presets.ts",
+      "to": "apps/editor/src/modules/document/domain/table-presets.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/table-presets.ts",
+      "to": "apps/editor/src/modules/document/domain/table-presets.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/text-transform.ts",
+      "to": "apps/editor/src/modules/document/domain/text-transform.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/text-transform.ts",
+      "to": "apps/editor/src/modules/document/domain/text-transform.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/work-templates.ts",
+      "to": "apps/editor/src/modules/document/domain/work-templates.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document/public/work-templates.ts",
+      "to": "apps/editor/src/modules/document/domain/work-templates.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document-files/application/export-recovery.ts",
+      "to": "apps/editor/src/modules/document-files/ports/recovery-export.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document-files/application/export-recovery.ts",
+      "to": "apps/editor/src/modules/document-files/domain/recovery-export.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document-files/application/write-snapshot.ts",
+      "to": "apps/editor/src/modules/document-files/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document-files/application/write-snapshot.ts",
+      "to": "apps/editor/src/modules/document-files/ports/snapshot-write.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document-files/application/write-snapshot.ts",
+      "to": "apps/editor/src/modules/document-files/domain/save-revision.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/document-files/domain/recovery-export.ts",
+      "to": "apps/editor/src/modules/document-files/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document-files/domain/recovery-record.ts",
+      "to": "apps/editor/src/modules/document-files/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document-files/ports/recovery-export.ts",
+      "to": "apps/editor/src/modules/document-files/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/document-files/public/index.ts",
+      "to": "apps/editor/src/modules/document-files/public/contracts.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document-files/public/index.ts",
+      "to": "apps/editor/src/modules/document-files/domain/save-revision.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document-files/public/index.ts",
+      "to": "apps/editor/src/modules/document-files/domain/recovery-export.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document-files/public/index.ts",
+      "to": "apps/editor/src/modules/document-files/domain/recovery-record.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document-files/public/index.ts",
+      "to": "apps/editor/src/modules/document-files/application/write-snapshot.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document-files/public/index.ts",
+      "to": "apps/editor/src/modules/document-files/application/export-recovery.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/document-files/public/index.ts",
+      "to": "apps/editor/src/modules/document-files/ports/snapshot-write.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/document-files/public/index.ts",
+      "to": "apps/editor/src/modules/document-files/ports/recovery-export.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/document-defaults.ts",
+      "to": "apps/editor/src/modules/preferences/ports/storage.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/document-defaults.ts",
+      "to": "apps/editor/src/modules/preferences/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/document-defaults.ts",
+      "to": "apps/editor/src/modules/preferences/domain/document-defaults.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/document-view.ts",
+      "to": "apps/editor/src/modules/preferences/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/document-view.ts",
+      "to": "apps/editor/src/modules/preferences/ports/viewport.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/document-view.ts",
+      "to": "apps/editor/src/modules/preferences/domain/document-view.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/document-view.ts",
+      "to": "apps/editor/src/modules/preferences/domain/session-cursor.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/persistence.ts",
+      "to": "apps/editor/src/modules/preferences/public/contracts.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/persistence.ts",
+      "to": "apps/editor/src/modules/preferences/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/persistence.ts",
+      "to": "apps/editor/src/modules/preferences/ports/storage.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/persistence.ts",
+      "to": "apps/editor/src/modules/preferences/domain/merge.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/persistence.ts",
+      "to": "apps/editor/src/modules/preferences/domain/merge.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/recovery-coordinator.ts",
+      "to": "apps/editor/src/modules/preferences/domain/recovery-policy.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/recovery-coordinator.ts",
+      "to": "apps/editor/src/modules/preferences/domain/recovery-policy.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/settings-backup.ts",
+      "to": "apps/editor/src/modules/preferences/domain/settings-backup.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/settings-backup.ts",
+      "to": "apps/editor/src/modules/preferences/domain/document-defaults.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/settings-backup.ts",
+      "to": "apps/editor/src/modules/preferences/ports/storage.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/settings-backup.ts",
+      "to": "apps/editor/src/modules/preferences/application/document-defaults.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/snippets.ts",
+      "to": "apps/editor/src/modules/preferences/domain/snippets.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/snippets.ts",
+      "to": "apps/editor/src/modules/preferences/ports/storage.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/view-journal.ts",
+      "to": "apps/editor/src/modules/preferences/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/view-journal.ts",
+      "to": "apps/editor/src/modules/preferences/public/contracts.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/view-journal.ts",
+      "to": "apps/editor/src/modules/preferences/ports/storage.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/application/view-journal.ts",
+      "to": "apps/editor/src/modules/preferences/domain/document-view.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/domain/body-caret.ts",
+      "to": "apps/editor/src/modules/preferences/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/domain/document-defaults.ts",
+      "to": "apps/editor/src/modules/preferences/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/domain/document-view.ts",
+      "to": "apps/editor/src/modules/preferences/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/domain/document-view.ts",
+      "to": "apps/editor/src/modules/preferences/domain/body-caret.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/domain/document-view.ts",
+      "to": "apps/editor/src/modules/preferences/domain/session-cursor.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/domain/document-view.ts",
+      "to": "apps/editor/src/modules/preferences/domain/body-caret.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/domain/session-cursor.ts",
+      "to": "apps/editor/src/modules/preferences/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/domain/session-cursor.ts",
+      "to": "apps/editor/src/modules/preferences/domain/body-caret.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/domain/settings-backup.ts",
+      "to": "apps/editor/src/modules/preferences/domain/document-defaults.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/domain/settings-backup.ts",
+      "to": "apps/editor/src/modules/preferences/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/ports/viewport.ts",
+      "to": "apps/editor/src/modules/preferences/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/public/contracts.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/public/contracts.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/domain/navigation-history.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/ports/storage.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/ports/viewport.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/domain/merge.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/domain/document-defaults.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/domain/document-view.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/public/contracts.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/domain/session-cursor.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/application/view-journal.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/application/view-journal.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/application/persistence.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/application/document-view.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/application/document-defaults.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/domain/recovery-policy.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/domain/recovery-policy.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/application/recovery-coordinator.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/application/recovery-coordinator.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/domain/settings-backup.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/domain/settings-backup.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/application/settings-backup.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/application/settings-backup.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/domain/snippets.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/domain/snippets.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/preferences/public/index.ts",
+      "to": "apps/editor/src/modules/preferences/application/snippets.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/references/application/facade.ts",
+      "to": "apps/editor/src/modules/references/application/selected-sources.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/references/application/facade.ts",
+      "to": "apps/editor/src/modules/references/ports/content-hash.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/references/application/facade.ts",
+      "to": "apps/editor/src/modules/references/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/references/application/selected-sources.ts",
+      "to": "apps/editor/src/modules/references/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/references/public/index.ts",
+      "to": "apps/editor/src/modules/references/public/contracts.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/references/public/index.ts",
+      "to": "apps/editor/src/modules/references/application/facade.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/references/public/index.ts",
+      "to": "apps/editor/src/modules/references/application/facade.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/references/public/index.ts",
+      "to": "apps/editor/src/modules/references/ports/content-hash.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/session/application/facade.ts",
+      "to": "apps/editor/src/modules/session/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/session/application/facade.ts",
+      "to": "apps/editor/src/modules/session/ports/lifecycle.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/session/application/facade.ts",
+      "to": "apps/editor/src/modules/session/domain/tabs.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/session/domain/document-tab-cycle.ts",
+      "to": "apps/editor/src/modules/session/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/session/domain/tabs.ts",
+      "to": "apps/editor/src/modules/session/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/session/domain/tabs.ts",
+      "to": "apps/editor/src/modules/session/domain/document-order.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/session/ports/lifecycle.ts",
+      "to": "apps/editor/src/modules/session/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/session/public/index.ts",
+      "to": "apps/editor/src/modules/session/domain/document-order.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/session/public/index.ts",
+      "to": "apps/editor/src/modules/session/domain/document-tab-cycle.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/session/public/index.ts",
+      "to": "apps/editor/src/modules/session/application/navigation.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/session/public/index.ts",
+      "to": "apps/editor/src/modules/session/application/facade.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/session/public/index.ts",
+      "to": "apps/editor/src/modules/session/domain/exit-protection.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/session/public/index.ts",
+      "to": "apps/editor/src/modules/session/domain/exit-protection.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/session/public/index.ts",
+      "to": "apps/editor/src/modules/session/public/contracts.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/session/public/index.ts",
+      "to": "apps/editor/src/modules/session/ports/lifecycle.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/workspace/application/facade.ts",
+      "to": "apps/editor/src/modules/workspace/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/workspace/application/facade.ts",
+      "to": "apps/editor/src/modules/workspace/ports/state.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/workspace/application/facade.ts",
+      "to": "apps/editor/src/modules/workspace/domain/workspace.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/modules/workspace/domain/workspace.ts",
+      "to": "apps/editor/src/modules/workspace/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/workspace/ports/state.ts",
+      "to": "apps/editor/src/modules/workspace/public/contracts.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/modules/workspace/public/index.ts",
+      "to": "apps/editor/src/modules/workspace/public/contracts.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/workspace/public/index.ts",
+      "to": "apps/editor/src/modules/workspace/ports/state.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/modules/workspace/public/index.ts",
+      "to": "apps/editor/src/modules/workspace/application/facade.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/modules/workspace/public/index.ts",
+      "to": "apps/editor/src/modules/workspace/domain/workspace.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/mvp/context.ts",
+      "to": "apps/editor/src/composition/agent.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/mvp/document-order.ts",
+      "to": "apps/editor/src/modules/session/public/index.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/mvp/edit-schema.ts",
+      "to": "apps/editor/src/modules/agent/public/index.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/mvp/edit-schema.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/mvp/edit-schema.ts",
+      "to": "apps/editor/src/adapters/rhwp/body-operations.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/mvp/editor-bridge.ts",
+      "to": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/mvp/llm.ts",
+      "to": "apps/editor/src/modules/connections/public/index.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/mvp/llm.ts",
+      "to": "apps/editor/src/adapters/http/local-model-gateway.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/mvp/model.ts",
+      "to": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "kind": "export-all"
+    },
+    {
+      "from": "apps/editor/src/mvp/provider-presets.ts",
+      "to": "apps/editor/src/modules/connections/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/mvp/recovery-export.ts",
+      "to": "apps/editor/src/adapters/files/recovery-export.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/mvp/recovery-record.ts",
+      "to": "apps/editor/src/modules/document-files/public/index.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/mvp/references.ts",
+      "to": "apps/editor/src/adapters/files/references.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/mvp/references.ts",
+      "to": "apps/editor/src/adapters/files/references.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/mvp/run-once.ts",
+      "to": "apps/editor/src/modules/agent/public/index.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/mvp/run-once.ts",
+      "to": "apps/editor/src/modules/agent/public/index.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/mvp/store.ts",
+      "to": "apps/editor/src/adapters/storage/indexeddb-workspace.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/mvp/temporary-references.ts",
+      "to": "apps/editor/src/adapters/files/temporary-references.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/mvp/temporary-references.ts",
+      "to": "apps/editor/src/adapters/files/temporary-references.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/mvp/validate-state.ts",
+      "to": "apps/editor/src/adapters/storage/legacy-state-validator.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/preferences/binding.ts",
+      "to": "apps/editor/src/adapters/browser/preferences-binding.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/preferences/binding.ts",
+      "to": "apps/editor/src/adapters/browser/preferences-binding.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/preferences/document-defaults.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/preferences/document-defaults.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/preferences/document-defaults.ts",
+      "to": "apps/editor/src/adapters/rhwp/document-defaults.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/preferences/document-defaults.ts",
+      "to": "apps/editor/src/adapters/rhwp/document-defaults.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/preferences/document-view.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/preferences/document-view.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/preferences/persistence.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/preferences/persistence.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/retrieval/selected-sources.ts",
+      "to": "apps/editor/src/modules/references/public/index.ts",
+      "kind": "type-export"
+    },
+    {
+      "from": "apps/editor/src/retrieval/selected-sources.ts",
+      "to": "apps/editor/src/composition/references.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/save-guard.ts",
+      "to": "apps/editor/src/adapters/files/save-runtime.ts",
+      "kind": "export"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/adapters/iframe/document-client.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/adapters/iframe/document-client.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/unified-chrome.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/modules/automation/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/modules/automation/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/ui/document-defaults-panel.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/composition/agent.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/adapters/browser/recovery-settings.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/modules/document-files/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/modules/session/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/file-connection.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/pane-layout.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/mvp/model.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/modules/workspace/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/mvp/model.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/adapters/files/references.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/mvp/references.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/composition/workbench.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/ui/connections-panel.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/adapters/browser/document-tab-cycle.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shell.ts",
+      "to": "apps/editor/src/adapters/files/temporary-references.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/install.ts",
+      "to": "apps/editor/src/editor-actions/equal-cells.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/install.ts",
+      "to": "apps/editor/src/editor-actions/navigation-pane.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/install.ts",
+      "to": "apps/editor/src/shortcuts/cell-band.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/install.ts",
+      "to": "apps/editor/src/shortcuts/keymap.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/install.ts",
+      "to": "apps/editor/src/shortcuts/style-slots.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/install.ts",
+      "to": "apps/editor/command/shortcut-map",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/install.ts",
+      "to": "apps/editor/engine/object-props",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/install.ts",
+      "to": "apps/editor/src/adapters/rhwp/manual-commands.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/install.ts",
+      "to": "apps/editor/src/adapters/rhwp/navigation-history.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/install.ts",
+      "to": "apps/editor/src/adapters/rhwp/calendar-stamp.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/install.ts",
+      "to": "apps/editor/src/adapters/rhwp/hanging-indent.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/install.ts",
+      "to": "apps/editor/src/adapters/rhwp/transpose-table.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/install.ts",
+      "to": "apps/editor/src/adapters/rhwp/document-insertion.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/install.ts",
+      "to": "apps/editor/src/adapters/rhwp/basic-text-commands.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/install.ts",
+      "to": "apps/editor/src/adapters/browser/settings-backup-dialog.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/install.ts",
+      "to": "apps/editor/src/adapters/rhwp/style-package.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/install.ts",
+      "to": "apps/editor/src/adapters/rhwp/work-templates.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/install.ts",
+      "to": "apps/editor/src/adapters/rhwp/snippets.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/shortcuts/keymap.ts",
+      "to": "apps/editor/src/shortcuts/style-slots.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/ui/connections-panel.ts",
+      "to": "apps/editor/src/modules/connections/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/ui/connections-panel.ts",
+      "to": "apps/editor/src/modules/workspace/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/ui/connections-panel.ts",
+      "to": "apps/editor/src/mvp/provider-presets.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/ui/connections-panel.ts",
+      "to": "apps/editor/src/ui/dom.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/ui/document-defaults-panel.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/ui/document-defaults-panel.ts",
+      "to": "apps/editor/src/modules/preferences/public/index.ts",
+      "kind": "type"
+    },
+    {
+      "from": "apps/editor/src/ui/document-defaults-panel.ts",
+      "to": "apps/editor/src/ui/dom.ts",
+      "kind": "import"
+    },
+    {
+      "from": "apps/editor/src/unified-chrome.ts",
+      "to": "apps/editor/src/modules/document/public/index.ts",
+      "kind": "type"
+    }
+  ],
+  "diagnostics": [],
+  "allowedLegacyImports": 0
+}

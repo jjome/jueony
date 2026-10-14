@@ -1,0 +1,21 @@
+{
+  "implementationCommit": "7317a445999600005b7b31d7a18f7d09534bd89a",
+  "applicationSourceCommit": "b3954cea9105b98bec5877ae168f947fdcb5b0a3",
+  "applicationSourceDirty": true,
+  "customSourceSha256": "4c031e8ce0d16e073a71bbd431bb4c3c52574c8a690647ca092ded34fd14654d",
+  "engineSourceId": "570603c60a53c953",
+  "wasmSha256": "ba74ed4ab9e819166e41152036cbd01286fa69f3cac3eeb5a08b4c0b4cad723b",
+  "upstreamReference": "1a76570e833917d15817415a53c09ad61ab3203f",
+  "engineChanged": false,
+  "finalBundle": "build/jueony-agent-table-pagination-20261014 @4296",
+  "notes": [
+    "Existing immutable 570603 engine reused unchanged; no engine compile or Native Rust unit tests in this increment. Actual WASM tests rerun.",
+    "Only existing root simple table pageBreak policy changes (0/1/2). Existing cells, text, formatting, geometry, placement, repeatHeader and header-cell flags remain.",
+    "One command/request, no alias/mixed batch/macro/autosave. Field/protected/merged/nested/mixed/caption/inline/overlap and >200-cell sources protected.",
+    "Fingerprint resolves TextWrap from the same common text_wrap used by serializer and preservation, instead of stale cached control bits. Real placement changes still rejected.",
+    "Failed placement-injection experiment used outerLeft on an HWPX fixture without raw control bytes; it did not change the model. Replaced with actual vertOffset mutation and all rollback scenarios passed. No protection weakened.",
+    "24-row/48-cell row-break fixture rendered multiple pages and reopened in HWP/HWPX. Same-engine evidence only; not independent Hancom layout parity.",
+    "Existing header flags preserved, not title-row configuration/repetition implementation.",
+    "Actual Edge uses four synthetic provider protocols, not paid LLM. Native Hancom/paid models NOT_RUN. Full editor scope incomplete; automation remains active."
+  ]
+}

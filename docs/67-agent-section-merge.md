@@ -19,3 +19,27 @@
 단위는 계약·capability·인덱스·금지 인자·단독 실행·양쪽 원본·Unicode 한도·반복 거절·오래된 원문을 검사한다. 실제 WASM은 HWP/HWPX 두 경계·서식·탭·서로 다른 설정·빈 경계·그림·커서·snapshot undo·저장 재열기·미지원·거짓 성공·split 후 merge를 검사한다. 실제 Edge는 네 provider의 로컬 합성 응답으로 모델 선택·비교·undo/redo·저장·파일 커서·후속 요청·거절·실제 변경 후 실패 복원·지연 충돌·그림·재실행을 검사한다. 결과는 검증 완료 후 갱신한다.
 
 복잡한 경계/상속·바탕쪽·개체·필드·다단·줄 번호·혼합 원본, 여러 경계 일괄 합치기, 본문 있는 구역 전체 삭제와 반복 기록은 남는다. 유료 모델 품질·실제 한글 조판·전체 동등성은 미검증이며 자동 계속 작업을 유지한다.
+
+
+## 완료한 자동 검증과 실행
+
+단위 **485개**, provider/server **52개**, 실제 WASM **337개**, 브라우저 **364개**(동봉 런타임 실행 호환 4개 포함)가 같은 빌드에서 통과했다. TypeScript와 9개 모듈·242개 소스의 Facade 경계 검사도 통과했다. 실패·skip·page error·외부 자산 요청은 0건이다. [검증 요약](evidence/agent-merge-2026-10-14/verification-summary.json)은 소스·빌드·엔진 패치·WASM 해시를 대조한다. 미지원 원본의 기존 보호를 완화하지 않았다.
+
+전용 단위 9개·실제 WASM 12개·Edge 12개는 위에 설명한 합치기·앞 설정 상속·양 형식 저장·글자 서식·탭·빈 경계·그림·커서·요청 undo/redo·정확한 실패 복원·사용자 변경 충돌·업무 재실행을 확인했다. GPT·Claude·Gemini·OpenAI 호환 연결은 실제 adapter에 로컬 합성 응답을 전달했으며 유료 모델을 호출하지 않았다.
+
+앱 소스 SHA-256은 `e0a7d547f7e8722403ffcff526d8345d004925602b91c8a6d6efe47468aa81d7`이며 WASM은 기존 `2ff6d89629fa60b7e1ae5ecb55144a4ab8cbb8f192a49a8acd23a2244d3ab474`다. 엔진 소스 `8950f8c2bcb2c714`를 재사용했고 참조 저장소를 변경하지 않았다. 구현 커밋 **`5c51287`**이며 빌드 시 Git 기준·작업 중 표시와 실제 소스 해시를 함께 기록했다.
+
+실행은 `build/jueony-agent-merge-20261014/Start-Review.cmd`, 포트 **4256**다. 같은 폴더에 `JueonyEditor.exe`가 있다. Rust exe는 컴파일했고 실제 실행 검증은 스크립트·동봉 Node 경로다. [실행 확인](evidence/agent-merge-2026-10-14/launch-check.json)은 해당 서버의 메타데이터·실제 WASM 바이트·공통 wire/provider 계약 해시를 대조했다. 이전 창과 서버는 유지하며 새 포트는 별도 로컬 업무 저장소를 사용한다.
+
+[변경 비교 화면](evidence/agent-merge-2026-10-14/agent-merge-browser/agent-merge.png)에서 본문 결합과 구역 설정 변경을 확인한다. 같은 엔진 저장 재열기는 실제 한글 조판·인쇄 동등성 확인과 다르다. 전체 문서화된 구현 범위는 미완료이며 자동 계속 작업은 유지한다.
+
+## 실제 한글 일괄 검수 준비
+
+이번 합성 HWP/HWPX **21개**와 파일별 SHA-256을 [문서 목록](evidence/agent-merge-2026-10-14/merge-documents.json)에 기록했다. 실행 묶음의 `review-documents/agent-merge/agent-merge-native`와 `agent-merge-browser`에도 포함한다. Native 폴더의 `before-merge-1-*`, `before-merge-2-*`는 각각 병합 전 원본이며 `merge-1-*`, `merge-2-*`는 결과다.
+
+1. 원본의 사본을 한글에서 열고 앞/뒤 본문·구역 수·용지/배경/탭·경계 글자 서식을 기록한다.
+2. 원본의 첫 경계 또는 마지막 경계를 Delete/Backspace로 합쳐 앞 설정 유지·두 문단 결합·후속 문단·커서 위치를 비교한다.
+3. 한글에서 별도 이름으로 저장하고 Jueony 결과와 양쪽에서 재열어 확인한다. 동일 글꼴과 용지로 PDF/인쇄 배치도 비교한다.
+4. `merge-images-*`, `merge-blank-*`, `split-then-merge`와 브라우저 저장 결과에서 배경·빈 경계·나누기 후 합치기·저장 커서를 확인한다.
+
+아직 실제 한글에서 이 새 Agent 묶음을 직접 비교하지 않았다. 과거 수동 경계 비교와 이번 자동 Agent 검증을 구분한다. 사용자 원본은 검수 중 덮어쓰지 않는다.

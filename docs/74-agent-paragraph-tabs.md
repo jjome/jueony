@@ -16,4 +16,14 @@ Document Domain이 지원 범위·단위·위치·묶음을 검사한다. Snapsh
 
 ## 검사
 
-단위·실제 WASM·격리된 Edge에서 양 형식, 네 제공자 합성 응답, 여러 문단 묶음·실패 복원·서식만 바뀐 동시 변경·저장/재실행을 검사한다. 실제 한글 2024 직접 비교와 유료 모델 호출은 미실행이다. 전체 잔여 범위는 완료되지 않았으며 자동화는 유지한다. 확정 검사와 실행 위치는 검증 후 기록한다.
+단위·실제 WASM·격리된 Edge에서 양 형식, 네 제공자 합성 응답, 여러 문단 묶음·실패 복원·서식만 바뀐 동시 변경·저장/재실행을 검사한다. 실제 한글 2024 직접 비교와 유료 모델 호출은 미실행이다. 전체 잔여 범위는 완료되지 않았으며 자동화는 유지한다. 확정 검사와 실행 위치는 아래와 같다.
+
+## 확정 검사와 실행
+
+74번 최종 검사: 단위 557·provider/server 52·브라우저 464·실제 엔진 469 통과. 구현 `c677662`와 4272 검수본의 실제 앱 소스/WASM/공통 계약 해시를 대조했다. 문단별 사용자 탭 4정렬/4채움·자동 탭·32개 제한·여러 문단 묶음 1회 undo/redo·두 번째 적용 중 전체 복원·다른 본문 run/설정 보존·탭만 바뀐 동시 변경 충돌·양 형식 저장/재열기·직접 Tab 입력·업무 복원을 확인했다. 한글 비교용 전용 HWP/HWPX 29개를 준비했다. 실제 한글 직접 비교·유료 모델 품질·전체 한글 동등성은 미완료다.
+
+실행: `build/jueony-agent-para-tabs-20261014/Start-Review.cmd` 또는 `http://127.0.0.1:4272/`. 이전 4270/4268 등 실행본과 사용자 문서는 유지한다. 네 제공자는 로컬 합성 응답으로 검사했으며 유료 호출은 하지 않았다.
+
+검수 파일은 `build/jueony-agent-para-tabs-20261014/review-documents/agent-para-tabs/agent-para-tabs-native`와 `agent-para-tabs-browser`에 있다. `alignment-*`와 `leader-*`의 문단 모양 탭 설정, `cleared.*`의 명시 탭 지우기와 기본 간격 유지, `batch-*`의 서로 다른 문단 설정, `manual-tab-after-ai.hwpx`의 실제 Tab 입력/채움 렌더를 한글에서 확인한다. 비교는 아직 미실행이다. 파일별 해시는 [검수 목록](evidence/agent-para-tabs-2026-10-14/paragraph-tab-documents.json)을 따른다.
+
+엔진: `source-8022002b6df8268e/pkg`(WSL review/no opt). 앱 소스 SHA-256 `f806c80ae69369227cdd3264b91ec32cae18ad388c403af4b7382057ba63f04e`, WASM SHA-256 `01191f3f5eb60f65cc38b66ac200d48bc05d3d54f433b66b746215e54bfe17ca`. [누적 결과](evidence/agent-para-tabs-2026-10-14/verification-summary.json), [실행 대조](evidence/agent-para-tabs-2026-10-14/launch-check.json)을 보관한다. 커밋 전 빌드를 같은 소스 해시로 검사했으므로 buildApplicationCommit 8431f5e/dirty=true 메타데이터와 구현 c677662를 구분한다. 모듈 9개·소스 252개의 경계 검사도 통과했다. 전체 문서화 범위는 미완료이며 자동화는 유지한다.

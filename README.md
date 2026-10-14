@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-agent-bookmarks-20261014/Start-Review.cmd)**로 실행한다(4270). AI가 일반 본문 점 책갈피를 추가·이름 변경·삭제하며 현재 이름/Unicode 위치와 본문·서식을 검증한다. 요청 되돌리기·다시 실행·실패 복원·동시 변경 충돌·저장·재실행을 검사했다. [사용법·검증·제한](docs/73-agent-body-bookmarks.md)을 확인한다. 표·필드·개체/HF 문서의 책갈피, 범위/링크·반복 기록과 전체 한글 동등성은 남는다. 기존 4268 등 실행 창과 사용자 문서는 유지한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-agent-para-tabs-20261014/Start-Review.cmd)**로 실행한다(4272). AI가 일반 본문 문단별 사용자 탭·양 끝 자동 탭을 설정하고, 서로 다른 문단의 탭을 한 요청/undo로 적용한다. Native 원본 토큰·알 수 없는 탭 속성·전체 문서 보존을 검사한다. [사용법·검증·제한](docs/74-agent-paragraph-tabs.md)을 확인한다. 기본 4정렬/4채움·32개 이하만 지원하며 실제 탭 문자/필드/개체/혼합 원본 AI 편집·고급 채움·반복 기록·전체 한글 동등성은 남는다. 기존 실행 창과 사용자 문서는 유지한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

@@ -101,6 +101,18 @@ export function capturePreservationEvidence(value:NativeDocument):PreservationEv
   }
   // Header/footer getters do not appear recursively in getControls. Read their text separately.
   for(const header of [true,false])for(const applyTo of [0,1,2])capture(`${key}/${header?'header':'footer'}/${applyTo}`,()=>read(doc,'getHeaderFooter',section,header,applyTo));
+  if(typeof (doc as Record<string,unknown>).getAgentHeaderFooter==='function'){
+   for(const header of [true,false])for(const applyTo of [0,1,2])capture(`${key}/${header?'header':'footer'}/${applyTo}/format`,()=>{
+    const state=record(read(doc,'getHeaderFooter',section,header,applyTo));if(state.exists!==true)return [];
+    const count=integer(state.paraCount);budget(count,1024);
+    return Array.from({length:count},(_,p)=>{
+     budget(++paragraphs,LIMITS.paragraphs);budget(++runs,LIMITS.runs);
+     return {paragraph:read(doc,'getParaPropertiesInHf',section,header,applyTo,p),firstCharacters:read(doc,'getCharPropertiesInHeaderFooter',section,header,applyTo,p,0)};
+    });
+   });
+   const note='머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.';
+   if(!unverified.includes(note))unverified.push(note);
+  }
  }
  capture('text',()=>read(doc,'getTextFileUnicode'));
  capture('fields',()=>read(doc,'getFieldList'));

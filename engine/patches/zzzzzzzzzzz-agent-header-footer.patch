@@ -1,0 +1,90 @@
+--- /dev/null
++++ b/src/document_core/commands/agent_header_footer.rs
+@@ -0,0 +1,63 @@
++//! Bounded Agent access to a stored plain header/footer definition; tokens remain private.
++use crate::document_core::{DocumentCore,header_footer_apply_to_u8};
++use crate::error::HwpError;
++use crate::model::{control::Control,paragraph::Paragraph};
++fn fail(s:&str)->HwpError{HwpError::RenderError(s.into())}
++fn meta(p:&Paragraph)->serde_json::Value{
++    let mut v=serde_json::to_value(p).unwrap();
++    for k in ["text","char_count","char_offsets","char_shapes","line_segs","hwpx_axis_shift","layout_only_fill_lines","has_para_text"]{v.as_object_mut().unwrap().remove(k);}
++    v
++}
++impl DocumentCore{
++    fn agent_hf_source(&self,section:usize,header:bool,apply:u8)->Result<(usize,usize,&Paragraph),HwpError>{
++        if apply>2{return Err(fail("Invalid header/footer parity"));}
++        let sec=self.document.sections.get(section).ok_or_else(||fail("Invalid section"))?;
++        let mut found=Vec::new();
++        for (pi,p) in sec.paragraphs.iter().enumerate(){for (ci,c) in p.controls.iter().enumerate(){
++            let data=match c{Control::Header(h) if header=>Some((h.apply_to,&h.paragraphs,h.raw_attr,&h.raw_ctrl_extra,h.list_attr,h.text_ref,h.num_ref)),Control::Footer(f) if !header=>Some((f.apply_to,&f.paragraphs,f.raw_attr,&f.raw_ctrl_extra,f.list_attr,f.text_ref,f.num_ref)),_=>None};
++            if let Some((kind,paras,attr,extra,list,text_ref,num_ref))=data{if header_footer_apply_to_u8(kind)==apply{found.push((pi,ci,paras,attr,extra,list,text_ref,num_ref));}}
++        }}
++        if found.len()!=1{return Err(fail("저장된 머리말/꼬리말 하나만 편집합니다. 없음·중복 정의는 변경하지 않습니다."));}
++        let (pi,ci,paras,attr,extra,list,text_ref,num_ref)=found[0];
++        // A four-byte HF extra is the standard instance ID (also materialized by HWPX).
++        // PARA_HEADER may add a zero change-tracking suffix after its instance ID.
++        // Preserve these exact bytes; nonzero tracking and unknown tails remain readonly.
++        if self.document.provenance.hwp3_lineage||paras.len()!=1||attr&!3!=0||![0,4].contains(&extra.len())||list!=0||text_ref!=0||num_ref!=0{return Err(fail("여러 문단·추가 속성의 머리말/꼬리말은 읽기 전용입니다."));}
++        let p=&paras[0];
++        if p.text.chars().count()>4000||p.text.chars().any(char::is_control)||!p.controls.is_empty()||!p.ctrl_data_records.is_empty()||!p.range_tags.is_empty()||!p.field_ranges.is_empty()||!p.orphan_field_ends.is_empty()||!p.title_marks.is_empty()||!p.markpen_marks.is_empty()||!p.tab_extended.is_empty()||![0,10,12].contains(&p.raw_header_extra.len())||(p.raw_header_extra.len()==12&&p.raw_header_extra[10..].iter().any(|b|*b!=0))||p.numbering_restart.is_some()||p.char_offsets.len()!=p.text.chars().count(){return Err(fail("필드·개체·탭·표식·긴 원본 머리말/꼬리말은 읽기 전용입니다."));}
++        let cs=p.char_shapes.first().map(|r|r.char_shape_id).unwrap_or(0);
++        if p.char_shapes.iter().any(|r|r.char_shape_id!=cs)||self.document.doc_info.char_shapes.get(cs as usize).is_none()||self.document.doc_info.para_shapes.get(p.para_shape_id as usize).is_none(){return Err(fail("혼합 글자 서식 또는 잘못된 서식 참조는 변경하지 않습니다."));}
++        Ok((pi,ci,p))
++    }
++    fn agent_hf_token(&self,section:usize,header:bool,apply:u8)->Result<String,HwpError>{
++        let(pi,ci,p)=self.agent_hf_source(section,header,apply)?;
++        let cs=p.char_shapes.first().map(|r|r.char_shape_id).unwrap_or(0);
++        let v=serde_json::json!({"control":self.document.sections[section].paragraphs[pi].controls[ci],"char":self.document.doc_info.char_shapes[cs as usize],"para":self.document.doc_info.para_shapes[p.para_shape_id as usize]});
++        Ok(blake3::hash(v.to_string().as_bytes()).to_hex().to_string())
++    }
++    pub fn get_agent_header_footer_native(&self,section:usize,header:bool,apply:u8)->Result<String,HwpError>{
++        if apply>2{return Err(fail("Invalid header/footer parity"));}
++        let value:serde_json::Value=serde_json::from_str(&self.get_header_footer_native(section,header,apply)?).map_err(|_|fail("Invalid header/footer response"))?;
++        let raw=value["text"].as_str().unwrap_or("");let token=self.agent_hf_token(section,header,apply);
++        Ok(serde_json::json!({"exists":value["exists"],"paragraphCount":value["paraCount"].as_u64().unwrap_or(0),"text":raw.chars().take(4000).collect::<String>(),"textTruncated":raw.chars().count()>4000,"editable":token.is_ok(),"reason":token.as_ref().err().map(ToString::to_string),"token":token.ok()}).to_string())
++    }
++    pub fn set_agent_header_footer_text_native(&mut self,section:usize,header:bool,apply:u8,json:&str)->Result<String,HwpError>{
++        let v:serde_json::Value=serde_json::from_str(json).map_err(|_|fail("Invalid header/footer command"))?;
++        if !v.as_object().is_some_and(|o|o.len()==2&&o.keys().all(|k|["text","token"].contains(&k.as_str()))){return Err(fail("Invalid header/footer fields"));}
++        let text=v["text"].as_str().filter(|s|s.chars().count()<=4000&&!s.chars().any(char::is_control)).ok_or_else(||fail("머리말/꼬리말은 제어문자 없는 한 문단 4,000자 이하입니다."))?;
++        let token=self.agent_hf_token(section,header,apply)?;
++        if v["token"].as_str()!=Some(token.as_str()){return Err(fail("머리말/꼬리말 원문이나 서식이 바뀌었습니다."));}
++        let (_,_,p)=self.agent_hf_source(section,header,apply)?;
++        if p.text==text{return self.get_agent_header_footer_native(section,header,apply);}
++        let length=p.text.chars().count();let before=meta(p);let cs=p.char_shapes.first().map(|r|r.char_shape_id).unwrap_or(0);
++        let original=self.document.clone();let events=self.event_log.len();
++        let result=(||{
++            self.replace_range_in_header_footer_native(section,header,apply,0,0,0,length,text)?;
++            let(_,_,after)=self.agent_hf_source(section,header,apply)?;
++            if after.text!=text||meta(after)!=before||after.char_shapes.iter().any(|r|r.char_shape_id!=cs){return Err(fail("머리말/꼬리말 변경 후 서식·문단 정보가 달라 원문을 복원합니다."));}
++            self.get_agent_header_footer_native(section,header,apply)
++        })();
++        if result.is_err(){self.document=original;self.event_log.truncate(events);self.rebuild_derived_state();}
++        result
++    }
++}
+--- a/src/document_core/commands/mod.rs
++++ b/src/document_core/commands/mod.rs
+@@ -15,6 +15,7 @@
+ mod header_footer_ops;
+ mod master_pages;
+ mod line_numbers;
++mod agent_header_footer;
+ mod agent_page_background;
+ mod page_body_delete;
+ mod page_body_copy;
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1200,6 +1200,11 @@
+     #[wasm_bindgen(js_name = getAgentPageBackground)]
+     pub fn get_agent_page_background(&self,section:usize,kind:&str)->Result<String,JsValue>{self.core.get_agent_page_background_native(section,kind).map_err(|e|e.into())}
+     #[wasm_bindgen(js_name = setAgentPageBackground)]
+     pub fn set_agent_page_background(&mut self,section:usize,kind:&str,json:&str)->Result<String,JsValue>{self.core.set_agent_page_background_native(section,kind,json).map_err(|e|e.into())}
++
++    #[wasm_bindgen(js_name = getAgentHeaderFooter)]
++    pub fn get_agent_header_footer(&self,section:usize,header:bool,apply:u8)->Result<String,JsValue>{self.core.get_agent_header_footer_native(section,header,apply).map_err(|e|e.into())}
++    #[wasm_bindgen(js_name = setAgentHeaderFooterText)]
++    pub fn set_agent_header_footer_text(&mut self,section:usize,header:bool,apply:u8,json:&str)->Result<String,JsValue>{self.core.set_agent_header_footer_text_native(section,header,apply,json).map_err(|e|e.into())}
+ 
+     #[wasm_bindgen(js_name = getLineNumberSettings)]

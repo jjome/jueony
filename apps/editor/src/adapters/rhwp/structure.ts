@@ -1,4 +1,5 @@
 import type { Cell, Table, Structure } from '../../modules/document/public/types.ts';
+import {readAgentHeaderFooters} from './agent-header-footer.ts';
 import {readAgentEmptySectionEligibility} from './agent-empty-section.ts';
 import {readLineNumberSettings} from './line-numbers.ts';
 import {readAgentMasterPages} from './agent-master-pages.ts';
@@ -21,6 +22,7 @@ export function readStructure(wasm: any): Structure {
       entry.lineNumbers={enabled:settings.enabled,restart:([null,'page','section','continuous'] as const)[settings.restartType]??null,countBy:settings.countBy,startNumber:settings.startNumber,distanceMm:Math.round(settings.distance*25.4/7200*1000000)/1000000,editable:settings.editable};
     }
     const removal=readAgentEmptySectionEligibility(doc,section);if(removal)entry.emptySectionRemoval=removal;
+    const headerFooters=readAgentHeaderFooters(doc,section);if(headerFooters)entry.headerFooters=headerFooters;
     sections.push(entry);
     if(typeof doc.getMasterPages==='function'&&typeof doc.setMasterPageText==='function')entry.masterPages=readAgentMasterPages(doc,section);
     if(typeof doc.getAgentPageBackground==='function')entry.pageBackgrounds=['both','even','odd'].map(kind=>{
@@ -59,5 +61,6 @@ export function readStructure(wasm: any): Structure {
   }
   const styles=parsed(doc.getStyleList()).map((style:any)=>({id:style.id,name:style.name,type:style.type}));
   if(sections.reduce((total,s)=>total+(s.masterPages?.pages.reduce((n,p)=>n+Array.from(p.text).length,0)??0),0)>120000)throw new Error('바탕쪽 문맥은 전체 120,000자 이하입니다. 원본 바탕쪽은 유지됩니다.');
+  if(sections.reduce((total,s)=>total+(s.headerFooters?.reduce((n,h)=>n+Array.from(h.text).length,0)??0),0)>120000)throw new Error('머리말/꼬리말 문맥은 전체 120,000자 이하입니다.');
   return { sectionMergeAvailable:typeof doc.mergeSectionBoundary==='function', sectionSplitAvailable:typeof doc.insertSectionBreak==='function', sections, tables, paragraphs,styles, unsupportedControls: [...new Set(unsupportedControls)] };
 }

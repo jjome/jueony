@@ -1,3 +1,4 @@
+import {validateAgentHeaderFooter} from './agent-header-footer.ts';
 import {validateAgentSectionMerge} from './agent-section-merge.ts';
 import {validateAgentEmptySection} from './agent-empty-section.ts';
 import {validateAgentSectionSplit} from './agent-section-split.ts';
@@ -87,6 +88,7 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
   const hiddenPages=new Map(structure!.paragraphs.filter(p=>p.pageHide?.exists&&p.pageIndex!==undefined).map(p=>[p.pageIndex,p.id]));
   const body = (id: string) => { const n = nodes.find(n => n.id === id); if (!n?.editable) fail('편집 가능한 본문 문단 ID가 필요합니다.'); return n!; };
   for (const op of operations) {
+    if(op.kind==='set_header_footer_text'){only(op,['kind','section','story','pageKind','originalText','text']);if(operations.length!==1)fail('머리말/꼬리말 수정은 현재 단독 명령으로 실행하세요.');validateAgentHeaderFooter(op,snapshot);continue;}
     if(op.kind==='merge_sections'){only(op,['kind','rightSection']);if(operations.length!==1)fail('구역 합치기는 단독 명령으로 실행하세요. 남은 구역 편집은 후속 요청에서 지정합니다.');validateAgentSectionMerge(op,snapshot);continue;}
     if(op.kind==='remove_empty_section'){only(op,['kind','section']);if(operations.length!==1)fail('빈 구역 삭제는 단독 명령으로 실행하세요. 남은 구역의 편집은 후속 요청에서 지정합니다.');validateAgentEmptySection(op,snapshot);continue;}
     if(op.kind==='split_section'){only(op,['kind','target','offset']);if(operations.length!==1)fail('구역 나누기는 단독 명령으로 실행하세요. 새 구역 설정은 후속 요청에서 지정합니다.');validateAgentSectionSplit(op,snapshot);continue;}

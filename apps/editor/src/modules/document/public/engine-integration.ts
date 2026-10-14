@@ -19,4 +19,5 @@ export {agentParagraphDecorationPayload,paragraphBorderWidthsMm} from '../domain
 
 export {agentParagraphListPayload} from '../domain/agent-paragraph-list.ts';
 
+export {validateAgentNumberingClone} from '../domain/agent-numbering-clone.ts';
 export {validateAgentBasicBullet,basicBulletCharacters} from '../domain/agent-basic-bullet.ts';

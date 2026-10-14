@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-agent-bullets-20261014/Start-Review.cmd)**로 실행한다(4278). AI가 글머리표가 없는 문서에도 기본 문자 8종을 생성·적용하고 요청 단위로 되돌린다. 기존 공유 정의와 본문 서식을 유지한다. [사용법·검증·제한](docs/77-agent-basic-bullets.md)을 확인한다. 번호 다시 시작의 저장은 아직 미구현이며 누락을 정확히 보고하고 저장을 차단한다. 사용자 지정 모양·개요·전체 한글 동등성은 남는다. 기존 실행 창과 사용자 문서는 유지한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-agent-numbering-20261014/Start-Review.cmd)**로 실행한다(4280). AI가 현재 직렬화기로 보존 가능한 기존 기본 번호 모양을 복제하고 새 독립 목록의 시작 값을 지정한다. 기존 정의·다른 문단과 본문 서식을 유지하며 후속 요청으로 목록을 이어갈 수 있다. [사용법·검증·제한](docs/78-agent-numbering-clone.md)을 확인한다. 확장 원본과 명시적 문단 restart 저장은 미지원이며 손실 저장 차단을 유지한다. [이전 기본 글머리표 8종 생성](docs/77-agent-basic-bullets.md)도 포함한다. 한글 2024 직접 비교·전체 동등성은 미완료다. 기존 실행 창과 사용자 문서는 유지한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

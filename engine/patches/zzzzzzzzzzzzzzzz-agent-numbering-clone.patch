@@ -1,0 +1,91 @@
+--- /dev/null
++++ b/src/document_core/commands/agent_numbering_clone.rs
+@@ -0,0 +1,36 @@
++//! Copy a canonical stored seven-level numbering resource; never mutate shared definitions.
++use crate::document_core::DocumentCore;
++use crate::error::HwpError;
++use crate::model::style::{HeadType,Numbering};
++fn fail(s:&str)->HwpError{HwpError::RenderError(s.into())}
++impl DocumentCore{
++    fn agent_cloneable_numbering(&self,id:usize)->Result<&Numbering,HwpError>{
++        let n=self.document.doc_info.numberings.get(id.checked_sub(1).ok_or_else(||fail("Invalid numbering ID"))?).ok_or_else(||fail("Invalid numbering ID"))?;
++        if self.document.doc_info.numberings.len()>=200{return Err(fail("번호 정의 한도 200개를 확인하세요."));}
++        if n.level_formats.iter().any(|f|f.chars().count()>500)||n.heads.iter().any(|h|h.char_shape_id!=u32::MAX&&h.char_shape_id as usize>=self.document.doc_info.char_shapes.len()){return Err(fail("번호 형식 또는 글자 모양 참조를 확인하지 못했습니다."));}
++        if !crate::serializer::doc_info::agent_numbering_raw_supported(n)||!crate::serializer::hwpx::header::agent_numbering_raw_supported(n){return Err(fail("확장 번호 원본은 기본 7수준 정의로 축소하지 않습니다."));}
++        Ok(n)
++    }
++    pub fn get_agent_numbering_definitions_native(&self)->String{
++        serde_json::Value::Array(self.document.doc_info.numberings.iter().enumerate().map(|(i,n)|match self.agent_cloneable_numbering(i+1){Ok(_)=>serde_json::json!({"id":i+1,"editable":true,"startNumbers":n.level_start_numbers}),Err(e)=>serde_json::json!({"id":i+1,"editable":false,"reason":e.to_string()})}).collect()).to_string()
++    }
++    pub fn clone_agent_numbering_native(&mut self,s:usize,p:usize,json:&str)->Result<String,HwpError>{
++        let v:serde_json::Value=serde_json::from_str(json).map_err(|_|fail("Invalid numbering command"))?;
++        if !v.as_object().is_some_and(|o|o.len()==5&&o.keys().all(|k|["token","sourceDefinitionId","level","startNumber","target"].contains(&k.as_str())))||v["target"]!=format!("s{s}p{p}"){return Err(fail("Invalid numbering command fields"));}
++        let state:serde_json::Value=serde_json::from_str(&self.get_agent_paragraph_list_native(s,p)).map_err(|_|fail("Invalid list source"))?;
++        if state["editable"]!=true||v["token"].as_str()!=state["token"].as_str(){return Err(fail("본문 원문·서식·번호 정의가 바뀌었거나 읽기 전용입니다."));}
++        let id=v["sourceDefinitionId"].as_u64().filter(|x|*x>0&&*x<=200).ok_or_else(||fail("Invalid numbering definition"))? as usize;
++        let level=v["level"].as_u64().filter(|x|*x<=6).ok_or_else(||fail("Invalid numbering level"))? as usize;
++        let start=v["startNumber"].as_u64().filter(|x|*x>0&&*x<=65535).ok_or_else(||fail("Invalid start number"))? as u32;
++        let mut n=self.agent_cloneable_numbering(id)?.clone();if n.level_formats[level].is_empty(){return Err(fail("빈 번호 형식 수준은 적용할 수 없습니다."));}
++        n.raw_data=None;n.raw_para_heads=None;n.level_start_numbers[level]=start;if level==0{n.start_number=start as u16;}
++        let before=self.document.clone();let events=self.event_log.len();let new_id=before.doc_info.numberings.len()+1;
++        let result=(||{self.document.doc_info.numberings.push(n.clone());self.document.doc_info.raw_stream_dirty=true;
++            self.apply_para_format_native(s,p,&serde_json::json!({"headType":"Number","numberingId":new_id,"paraLevel":level}).to_string())?;
++            let mut expected=serde_json::to_value(&before.doc_info.numberings).unwrap();expected.as_array_mut().unwrap().push(serde_json::to_value(&n).unwrap());
++            let ps=&self.document.doc_info.para_shapes[self.document.sections[s].paragraphs[p].para_shape_id as usize];
++            if serde_json::to_value(&self.document.doc_info.numberings).unwrap()!=expected||serde_json::to_value(&self.document.doc_info.bullets).unwrap()!=serde_json::to_value(&before.doc_info.bullets).unwrap()||ps.head_type!=HeadType::Number||ps.numbering_id as usize!=new_id||ps.para_level as usize!=level{return Err(fail("복제 번호 정의 또는 문단 적용 결과가 계획과 다릅니다."));}
++            Ok(serde_json::json!({"editable":true,"definitionId":new_id,"created":true}).to_string())})();
++        if result.is_err(){self.document=before;self.event_log.truncate(events);self.rebuild_derived_state();}result
++    }
++}
+--- a/src/document_core/commands/mod.rs
++++ b/src/document_core/commands/mod.rs
+@@ -19,6 +19,7 @@
+ mod agent_paragraph_tabs;
+ mod agent_paragraph_lists;
+ mod agent_basic_bullet;
++mod agent_numbering_clone;
+ mod agent_paragraph_decoration;
+ mod agent_page_background;
+ mod page_body_delete;
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1204,6 +1204,11 @@
+     pub fn get_agent_page_background(&self,section:usize,kind:&str)->Result<String,JsValue>{self.core.get_agent_page_background_native(section,kind).map_err(|e|e.into())}
+     #[wasm_bindgen(js_name = setAgentPageBackground)]
+     pub fn set_agent_page_background(&mut self,section:usize,kind:&str,json:&str)->Result<String,JsValue>{self.core.set_agent_page_background_native(section,kind,json).map_err(|e|e.into())}
++
++    #[wasm_bindgen(js_name = getAgentNumberingDefinitions)]
++    pub fn get_agent_numbering_definitions(&self)->String{self.core.get_agent_numbering_definitions_native()}
++    #[wasm_bindgen(js_name = cloneAgentNumbering)]
++    pub fn clone_agent_numbering(&mut self,s:usize,p:usize,json:&str)->Result<String,JsValue>{self.core.clone_agent_numbering_native(s,p,json).map_err(|e|e.into())}
+ 
+     #[wasm_bindgen(js_name = setAgentBasicBullet)]
+     pub fn set_agent_basic_bullet(&mut self,s:usize,p:usize,json:&str)->Result<String,JsValue>{self.core.set_agent_basic_bullet_native(s,p,json).map_err(|e|e.into())}
+--- a/src/serializer/doc_info.rs
++++ b/src/serializer/doc_info.rs
+@@ -666,6 +666,8 @@
+     w.into_bytes()
+ }
+ 
++pub(crate) fn agent_numbering_raw_supported(n:&Numbering)->bool{n.raw_data.as_ref().is_none_or(|raw|*raw==serialize_numbering(n))}
++
+ fn serialize_numbering(numbering: &Numbering) -> Vec<u8> {
+     let mut w = ByteWriter::new();
+ 
+--- a/src/serializer/hwpx/header.rs
++++ b/src/serializer/hwpx/header.rs
+@@ -805,6 +805,14 @@
+     Ok(())
+ }
+ 
++pub(crate) fn agent_numbering_raw_supported(n:&Numbering)->bool{
++    let Some(raw)=&n.raw_para_heads else{return true;};
++    let mut plain=n.clone();plain.raw_para_heads=None;
++    let mut w=Writer::new(Vec::new());if write_numbering(&mut w,0,&plain).is_err(){return false;}
++    let Ok(xml)=String::from_utf8(w.into_inner()) else{return false;};
++    xml.split_once('>').and_then(|(_,s)|s.strip_suffix("</hh:numbering>")).is_some_and(|inner|inner==raw)
++}
++
+ fn write_numbering<W: Write>(
+     w: &mut Writer<W>,
+     id: u16,

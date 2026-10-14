@@ -1,3 +1,4 @@
+import {executeAgentNumberingClone} from './agent-numbering-clone.ts';
 import {executeAgentBasicBullet} from './agent-basic-bullet.ts';
 import {executeAgentParagraphList} from './agent-paragraph-list.ts';
 import {executeAgentParagraphDecoration} from './agent-paragraph-decoration.ts';
@@ -33,6 +34,7 @@ function replaceCellText(doc:any,base:number[],cell:number,value:string) {
 }
 export function executeControlOperation(wasm: any, snapshot: Snapshot, op: ControlOp, tables: Map<string, Table>): { section: number; after: number; count: number } | undefined {
   const doc = nativeDocument(wasm);
+  if(op.kind==='clone_paragraph_numbering'){executeAgentNumberingClone(doc,snapshot,op);return;}
   if(op.kind==='set_basic_bullet'){executeAgentBasicBullet(doc,snapshot,op);return;}
   if(op.kind==='set_paragraph_list'){executeAgentParagraphList(doc,snapshot,op);return;}
   if(op.kind==='format_paragraph_decoration'){executeAgentParagraphDecoration(doc,snapshot,op);return;}

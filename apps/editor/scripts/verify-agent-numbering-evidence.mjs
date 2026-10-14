@@ -1,0 +1,26 @@
+import assert from 'node:assert/strict';
+import {readFile,readdir,writeFile} from 'node:fs/promises';
+import {resolve,dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {createHash} from 'node:crypto';
+const repo=resolve(dirname(fileURLToPath(import.meta.url)),'../../..'),dir=resolve(repo,'docs/evidence/agent-numbering-2026-10-14'),dist=resolve(repo,'apps/editor/evidence/dist-agent-numbering');
+const hash=b=>createHash('sha256').update(b).digest('hex'),json=async p=>JSON.parse(await readFile(p,'utf8')),build=await json(resolve(dist,'build-evidence.json'));
+const sources=[];async function collect(path,prefix=''){for(const entry of(await readdir(path,{withFileTypes:true})).sort((a,b)=>a.name.localeCompare(b.name))){const name=prefix+entry.name;if(entry.isDirectory())await collect(resolve(path,entry.name),name+'/');else sources.push(name,await readFile(resolve(path,entry.name),'utf8'));}}
+await collect(resolve(repo,'apps/editor/src'));assert.equal(hash(sources.join('\n')),build.customSourceSha256);
+assert.equal(hash(await readFile(resolve(repo,'apps/editor/scripts/build.mjs'))),build.buildScriptSha256);
+assert.equal(hash(await readFile(resolve(repo,'apps/editor/scripts/integration/export-metadata-loss-patches.mjs'))),build.exportMetadataLossPatchSha256);
+for(const p of build.engineBuild.patches)assert.equal(hash(await readFile(resolve(repo,'engine/patches',p.name))),p.sha256);
+assert.ok(build.engineBuild.patches.some(p=>p.name==='zzzzzzzzzzzzzzzz-agent-numbering-clone.patch'));
+const assets=await readdir(resolve(dist,'assets')),wasm=assets.find(n=>/^rhwp_bg-.*\.wasm$/.test(n));assert.ok(wasm);assert.equal(hash(await readFile(resolve(dist,'assets',wasm))),build.engineWasmSha256);
+const totals={unitPassed:0,providerPassed:0,wasmPassed:0,browserPassed:0};
+for(const [file,key,min]of [['unit-tests.txt','unitPassed',601],['provider-tests.txt','providerPassed',52]]){const log=await readFile(resolve(dir,file),'utf8'),count=Number(log.match(/^# tests (\d+)$/mu)?.[1]);assert.ok(count>=min);assert.match(log,new RegExp('^# pass '+count+'$','mu'));for(const field of ['fail','cancelled','skipped','todo'])assert.match(log,new RegExp('^# '+field+' 0$','mu'));totals[key]=count;}
+assert.equal((await readFile(resolve(dir,'typescript.txt'),'utf8')).trim(),'');const boundary=await json(resolve(dir,'boundaries.json'));assert.equal(boundary.ok,true);assert.deepEqual(boundary.diagnostics,[]);
+const reports=[];
+for(const [category,kind,min]of [['agent-numbering-native','native',17],['agent-bullets-native','native',26],['agent-lists-native','native',23],['agent-para-tabs-native','native',20],['agent-para-box-native','native',20],['agent-numbering-browser','browser',13],['agent-bullets-browser','browser',15],['agent-lists-browser','browser',14],['bundle-compatibility','bundle',4]]){
+ const data=await json(resolve(dir,category,'result.json'));assert.ok(data.results.length>=min,category);for(const field of ['failures','errors','pageErrors','consoleErrors','externalRequests','external'])if(data[field])assert.deepEqual(data[field],[],category+' '+field);
+ if(category==='agent-bullets-browser')assert.equal(data.expectedSaveErrors.length,2);else assert.equal(data.expectedSaveErrors?.length??0,0);
+ if(kind==='native')assert.equal(data.engine.wasmSha256,build.engineWasmSha256);else if(kind==='browser'){assert.equal(data.build.customSourceSha256,build.customSourceSha256);assert.equal(data.build.engineWasmSha256,build.engineWasmSha256);}else{const bundled=await json(resolve(repo,'build/jueony-agent-numbering-20261014/dist/build-evidence.json'));assert.deepEqual(bundled,build);}
+ totals[kind==='native'?'wasmPassed':'browserPassed']+=data.results.length;reports.push({category,kind,passed:data.results.length});
+}
+const summary={status:'PASS_SCOPED_AUTOMATED_CHECKS',checkedAt:new Date().toISOString(),...totals,moduleCount:boundary.moduleCount,moduleFiles:boundary.scannedFiles,reports,customSourceSha256:build.customSourceSha256,wasmSha256:build.engineWasmSha256,engineSourceId:build.engineBuild.sourceId,applicationSourceCommit:build.applicationSourceCommit,applicationSourceDirty:build.applicationSourceDirty,scope:'Current build: full unit/provider suites, new numbering scenarios and related list/bullet/tab/decoration regressions only. This is NOT the cumulative 77-profile full editor sweep.',limitations:['Canonical existing seven-level numbering definitions only; exactly one command and one request undo; at most 200 stored definitions.','Extended/noncanonical HWP/HWPX raw resources (including original blank HWP definitions) remain protected.','Explicit stored paragraph restart remains unserialized and strict save/recovery remains blocked on truthful content loss.','No new arbitrary numbering format, outline, image/check list, macro or automatic save.','Native Hancom comparison and paid LLM calls NOT_RUN. Native Rust unit tests NOT_RUN on this build (WASM engine scenarios and compilation performed).','Full documented implementation scope incomplete; no percentage inferred.']};
+await writeFile(resolve(dir,'verification-summary.json'),JSON.stringify(summary,null,2));console.log(JSON.stringify(summary,null,2));

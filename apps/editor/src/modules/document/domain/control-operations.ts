@@ -1,3 +1,4 @@
+import {validateAgentNumberingClone} from './agent-numbering-clone.ts';
 import {validateAgentBasicBullet} from './agent-basic-bullet.ts';
 import {agentParagraphListPayload} from './agent-paragraph-list.ts';
 import {agentParagraphDecorationPayload} from './agent-paragraph-decoration.ts';
@@ -99,6 +100,7 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
   const tabs=operations.filter(op=>op.kind==='set_paragraph_tabs');
   if(tabs.length&&(tabs.length!==operations.length||new Set(tabs.map(op=>(op as {target:string}).target)).size!==tabs.length))fail('문단 탭은 서로 다른 문단의 탭 명령만 한 요청으로 묶어 실행하세요.');
   for (const op of operations) {
+    if(op.kind==='clone_paragraph_numbering'){only(op,['kind','target','sourceDefinitionId','level','startNumber']);if(operations.length!==1)fail('번호 정의 복제와 적용은 단독 명령으로 실행하세요.');validateAgentNumberingClone(op,snapshot);continue;}
     if(op.kind==='set_basic_bullet'){only(op,['kind','target','character']);if(operations.length!==1)fail('새 기본 글머리표 정의 생성과 적용은 단독 명령으로 실행하세요.');validateAgentBasicBullet(op,snapshot);continue;}
     if(op.kind==='set_paragraph_list'){only(op,['kind','target','listKind','definitionId','level']);agentParagraphListPayload(op,snapshot);continue;}
     if(op.kind==='format_paragraph_decoration'){only(op,['kind','target','properties']);agentParagraphDecorationPayload(op,snapshot);continue;}

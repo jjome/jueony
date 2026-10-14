@@ -1,3 +1,4 @@
+import {validateAgentBookmark} from './agent-bookmarks.ts';
 import {validateAgentHeaderFooter,validateAgentHeaderFooterFormat,validateAgentHeaderFooterParagraph,validateAgentHeaderFooterDelete,validateAgentHeaderFooterCreate} from './agent-header-footer.ts';
 import {validateAgentSectionMerge} from './agent-section-merge.ts';
 import {validateAgentEmptySection} from './agent-empty-section.ts';
@@ -88,6 +89,7 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
   const hiddenPages=new Map(structure!.paragraphs.filter(p=>p.pageHide?.exists&&p.pageIndex!==undefined).map(p=>[p.pageIndex,p.id]));
   const body = (id: string) => { const n = nodes.find(n => n.id === id); if (!n?.editable) fail('편집 가능한 본문 문단 ID가 필요합니다.'); return n!; };
   for (const op of operations) {
+    if(op.kind==='add_bookmark'||op.kind==='rename_bookmark'||op.kind==='delete_bookmark'){only(op,op.kind==='add_bookmark'?['kind','target','offset','name']:op.kind==='rename_bookmark'?['kind','name','newName']:['kind','name']);if(operations.length!==1)fail('책갈피 편집은 단독 명령으로 실행하세요.');validateAgentBookmark(op,snapshot);continue;}
     if(op.kind==='create_header_footer'){only(op,['kind','section','story','pageKind','text']);if(operations.length!==1)fail('머리말/꼬리말 정의 생성은 단독 명령으로 실행하세요.');validateAgentHeaderFooterCreate(op,snapshot);continue;}
     if(op.kind==='delete_header_footer'){only(op,['kind','section','story','pageKind','originalText']);if(operations.length!==1)fail('머리말/꼬리말 정의 삭제는 단독 명령으로 실행하세요.');validateAgentHeaderFooterDelete(op,snapshot);continue;}
     if(op.kind==='format_header_footer_paragraph'){only(op,['kind','section','story','pageKind','originalText','properties']);if(operations.length!==1)fail('머리말/꼬리말 문단 서식은 현재 단독 명령으로 실행하세요.');validateAgentHeaderFooterParagraph(op,snapshot);continue;}

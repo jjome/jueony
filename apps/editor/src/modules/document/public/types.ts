@@ -13,6 +13,9 @@ export type AgentMasterPageOp = {kind:'set_master_page_text';section:number;page
 export type AgentSectionOp = {kind:'set_section_tabs';section:number;spacingPt:number} | {kind:'set_line_numbers';section:number;enabled:boolean;restart:LineNumberRestart;countBy:number;startNumber:number;distanceMm:number};
 export type AgentEmptySectionEligibility = {supported:boolean;reason?:string};
 export type AgentEmptySectionOp = {kind:'remove_empty_section';section:number};
+export type AgentBookmark = {name:string;target:string|null;offset:number|null;editable:boolean};
+export type AgentBookmarks = {editable:boolean;items:AgentBookmark[];reason?:string};
+export type AgentBookmarkOp = {kind:'add_bookmark';target:string;offset:number;name:string}|{kind:'rename_bookmark';name:string;newName:string}|{kind:'delete_bookmark';name:string};
 export type AgentHeaderFooterCreateOp = {kind:'create_header_footer';section:number;story:'header'|'footer';pageKind:'both'|'odd'|'even';text:string};
 export type AgentHeaderFooterDeleteOp = {kind:'delete_header_footer';section:number;story:'header'|'footer';pageKind:'both'|'odd'|'even';originalText:string};
 export type AgentHeaderFooterCharacters = {bold:boolean;italic:boolean;underline:boolean;fontSizePt:number;color:string};
@@ -23,7 +26,7 @@ export type AgentHeaderFooter = {story:'header'|'footer';pageKind:'both'|'odd'|'
 export type AgentHeaderFooterOp = {kind:'set_header_footer_text';section:number;story:'header'|'footer';pageKind:'both'|'odd'|'even';originalText:string;text:string};
 export type AgentSectionMergeOp = {kind:'merge_sections';rightSection:number};
 export type AgentSectionSplitOp = {kind:'split_section';target:string;offset:number};
-export type Structure = { sectionMergeAvailable?:boolean; sectionSplitAvailable?:boolean; sections: { index: number; page: DocumentProperties; emptySectionRemoval?:AgentEmptySectionEligibility; headerFooters?:AgentHeaderFooter[]; columns?:DocumentProperties;defaultTabSpacingPt?:number;lineNumbers?:AgentLineNumbers;pageBackgrounds?:AgentPageBackground[];masterPages?:AgentMasterPages }[]; styles?:{id:number;name:string;type:JsonValue}[]; tables: Table[]; paragraphs: { id: string; characters: DocumentProperties; paragraph: DocumentProperties; style?:DocumentProperties;pageHide?:DocumentProperties;controls?:string[];pageIndex?:number }[]; unsupportedControls: string[] };
+export type Structure = { bookmarks?:AgentBookmarks; sectionMergeAvailable?:boolean; sectionSplitAvailable?:boolean; sections: { index: number; page: DocumentProperties; emptySectionRemoval?:AgentEmptySectionEligibility; headerFooters?:AgentHeaderFooter[]; columns?:DocumentProperties;defaultTabSpacingPt?:number;lineNumbers?:AgentLineNumbers;pageBackgrounds?:AgentPageBackground[];masterPages?:AgentMasterPages }[]; styles?:{id:number;name:string;type:JsonValue}[]; tables: Table[]; paragraphs: { id: string; characters: DocumentProperties; paragraph: DocumentProperties; style?:DocumentProperties;pageHide?:DocumentProperties;controls?:string[];pageIndex?:number }[]; unsupportedControls: string[] };
 export type BodyNode = { id: string; section: number; paragraph: number; text: string; editable: boolean; reason?: string };
 export type Snapshot = { revision: string; name: string; plainText?: string; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
 export type BodyOp =
@@ -32,6 +35,7 @@ export type BodyOp =
  | { kind: 'replace_body_text'; target: string; start: number; count: number; text: string }
  | { kind: 'delete_body_text'; target: string; start: number; count: number };
 export type ControlOp =
+  | AgentBookmarkOp
   | AgentHeaderFooterCreateOp
   | AgentHeaderFooterDeleteOp
   | AgentHeaderFooterParagraphOp

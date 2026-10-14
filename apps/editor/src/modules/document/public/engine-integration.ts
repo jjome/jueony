@@ -10,3 +10,5 @@ export {validateAgentEmptySection} from '../domain/agent-empty-section.ts';
 export {validateAgentSectionMerge} from '../domain/agent-section-merge.ts';
 
 export {validateAgentHeaderFooter,validateAgentHeaderFooterFormat,validateAgentHeaderFooterParagraph,validateAgentHeaderFooterDelete,validateAgentHeaderFooterCreate} from '../domain/agent-header-footer.ts';
+
+export {validateAgentBookmark,validBookmarkName} from '../domain/agent-bookmarks.ts';

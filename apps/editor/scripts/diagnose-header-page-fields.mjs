@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {resolve,dirname} from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+import {verifyPreservedExport} from '../src/adapters/rhwp/preservation.ts';
+const repo=resolve(dirname(fileURLToPath(import.meta.url)),'../../..'),pkg=resolve(repo,process.env.JUEONY_ENGINE_PACKAGE),out=resolve(repo,'docs/evidence/agent-bookmarks-2026-10-14');await mkdir(out,{recursive:true});
+const {default:init,HwpDocument}=await import(pathToFileURL(resolve(pkg,'rhwp.js')).href);await init({module_or_path:await readFile(resolve(pkg,'rhwp_bg.wasm'))});
+const results=[];
+for(const format of ['hwp','hwpx']){const d=HwpDocument.createEmpty();d.createBlankDocument();d.createHeaderFooter(0,false,0);d.insertTextInHeaderFooter(0,false,0,0,0,'제  / 쪽');d.insertFieldInHf(0,false,0,0,5,2);d.insertFieldInHf(0,false,0,0,2,1);const before=JSON.parse(d.getHeaderFooter(0,false,0)).text,artifact=d[format==='hwp'?'exportHwpWithReport':'exportHwpxWithReport']();try{const bytes=artifact.takeBytes(),copy=new HwpDocument(bytes);let report;try{const after=JSON.parse(copy.getHeaderFooter(0,false,0)).text;try{verifyPreservedExport(d,bytes,format,artifact.contentLoss(),b=>new HwpDocument(b));assert.fail('Dynamic fields must remain blocked until semantic preservation is proven');}catch(error){if(error.code==='ERR_ASSERTION')throw error;report=error.report;assert.equal(report?.status,'blocked');assert.ok(report.issues.some(i=>i.path==='section/0/footer/0'));}results.push({format,beforeText:before,reopenedText:after,report});}finally{copy.free();}}finally{artifact.free();d.free();}}
+await writeFile(resolve(out,'header-page-fields-diagnostic.json'),JSON.stringify({status:'EXPECTED_BLOCK',results,nativeHancomComparison:'NOT_RUN',note:'Native export lowers in-memory field markers into AutoNumber controls/placeholders. No production command or guard relaxation; semantic field/location/format verification remains required.'},null,2));console.log('PASS dynamic header page fields remain blocked in HWP and HWPX');

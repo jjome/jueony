@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-save-table-controls-20261015/Start-Review.cmd)**로 실행한다(4314). HWP 후속 표와 메모 보관용 문단의 저장 소유, 표 바깥 여백의 화면/저장 불일치를 수정하고 HWPX AI 열 너비 mm 지정을 추가했다. [저장 수정](docs/93-storage-table-and-memo-ownership.md), [표 크기 계약·검증·제한](docs/94-table-width-and-outer-margins.md)을 따른다. HWP 겹침 허용 표와 일부 형식 변환은 여전히 제한되며, 높이·병합/중첩 Agent 제어와 한글 전수 비교는 남아 있다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-row-heights-20261015/Start-Review.cmd)**로 실행한다(4316). HWPX 단순 표의 AI 행 높이 균등 분배·mm 지정을 추가하고 재렌더 실패 복구를 보강했다. [지원 범위·검증·제한](docs/95-agent-row-heights.md)을 따른다. [기존 저장 수정](docs/93-storage-table-and-memo-ownership.md), [열 너비·바깥 여백](docs/94-table-width-and-outer-margins.md)도 포함한다. HWP 겹침 허용 표·일부 형식 변환·병합/중첩 Agent 제어와 한글 전수 비교는 남아 있다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

@@ -34,4 +34,5 @@ export {validateAgentTablePagination} from '../domain/agent-table-pagination.ts'
 export {validateAgentTableHeader} from '../domain/agent-table-header.ts';
 
 export {equalColumnsPlan,explicitColumnWidthPlan} from '../domain/equal-columns.ts';
+export {rowHeightPlan} from '../domain/row-heights.ts';
 export {cellPaddingPlan} from '../domain/cell-padding.ts';

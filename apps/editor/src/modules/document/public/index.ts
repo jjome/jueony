@@ -50,4 +50,4 @@ export type {AgentParagraphTabStop,AgentParagraphTabsOp,AgentParagraphTabSource}
 
 export type {AgentParagraphDecorationOp,AgentParagraphDecorationSource} from './types.ts';
 
-export type {AgentCellPaddingSource,AgentEqualColumnSource} from './types.ts';
+export type {AgentCellPaddingSource,AgentEqualColumnSource,AgentRowHeightSource} from './types.ts';

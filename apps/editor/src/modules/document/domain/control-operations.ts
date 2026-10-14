@@ -1,3 +1,4 @@
+import {rowHeightPlan} from './row-heights.ts';
 import {equalColumnsPlan,explicitColumnWidthPlan} from './equal-columns.ts';
 import {cellPaddingPlan} from './cell-padding.ts';
 import {validateAgentTableHeader} from './agent-table-header.ts';
@@ -31,7 +32,7 @@ export const mm = (v: number) => Math.round(v * 7200 / 25.4);
 type PropertyRule = 'boolean' | 'font' | 'color' | [number, number] | string[];
 export const charRules: Record<string, PropertyRule> = { bold: 'boolean', italic: 'boolean', underline: 'boolean', strikethrough: 'boolean', fontSizePt: [1, 200], color: 'color',fontFamily:'font',ratioPercent:[50,200],spacingPercent:[-50,50],superscript:'boolean',subscript:'boolean' };
 const paraRules: Record<string, PropertyRule> = { alignment: ['left', 'right', 'center', 'justify', 'distribute'], lineSpacingPercent: [50, 500], marginLeftMm: [0, 100], marginRightMm: [0, 100], indentMm: [-100, 100], beforeMm: [0, 100], afterMm: [0, 100], keepWithNext: 'boolean', keepLines: 'boolean', pageBreakBefore: 'boolean' };
-const cellRules: Record<string, PropertyRule> = { ...charRules, background: 'color', alignment: paraRules.alignment, verticalAlignment: ['top', 'center', 'bottom'],equalizeColumns:'boolean',columnWidthMm:[1,500],paddingMode:['custom','table'],paddingLeftMm:[0,100],paddingRightMm:[0,100],paddingTopMm:[0,100],paddingBottomMm:[0,100] };
+const cellRules: Record<string, PropertyRule> = { ...charRules, background: 'color', alignment: paraRules.alignment, verticalAlignment: ['top', 'center', 'bottom'],equalizeColumns:'boolean',columnWidthMm:[1,500],equalizeRows:'boolean',rowHeightMm:[1,300],paddingMode:['custom','table'],paddingLeftMm:[0,100],paddingRightMm:[0,100],paddingTopMm:[0,100],paddingBottomMm:[0,100] };
 const pageRules: Record<string, PropertyRule> = { widthMm: [20, 1000], heightMm: [20, 1000], landscape: 'boolean', marginLeftMm: [0, 300], marginRightMm: [0, 300], marginTopMm: [0, 300], marginBottomMm: [0, 300], marginHeaderMm: [0, 100], marginFooterMm: [0, 100] };
 function properties(value: unknown, rules: Record<string, PropertyRule>) {
   const v = object(value);
@@ -212,6 +213,7 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
         only(op, ['kind', 'target', 'startRow', 'rowCount', 'startColumn', 'columnCount', 'properties']);
         integer(op.startRow, 0, table!.rows - 1); integer(op.rowCount, 1, table!.rows - op.startRow); integer(op.startColumn, 0, table!.columns - 1); integer(op.columnCount, 1, table!.columns - op.startColumn);
         properties(op.properties, cellRules);
+        if(Object.hasOwn(op.properties,'equalizeRows')||Object.hasOwn(op.properties,'rowHeightMm')){if(operations.length!==1)fail('행 높이는 단독 요청으로 실행하세요.');rowHeightPlan(op,snapshot);}
         if(Object.hasOwn(op.properties,'columnWidthMm')){if(operations.length!==1)fail('열 너비 직접 지정은 단독 요청으로 실행하세요.');explicitColumnWidthPlan(op,snapshot);}
         if(Object.hasOwn(op.properties,'equalizeColumns')){if(operations.length!==1)fail('열 너비 균등 분배는 단독 요청으로 실행하세요.');equalColumnsPlan(op,snapshot);}
         if(Object.keys(op.properties).some(k=>k.startsWith('padding'))){if(operations.length!==1)fail('셀 안 여백은 단독 요청으로 실행하세요.');cellPaddingPlan(op,snapshot);}

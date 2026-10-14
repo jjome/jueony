@@ -1,0 +1,177 @@
+{
+  "status": "PASS_SCOPED_WITH_REMAINING_EDITOR_LIMITS",
+  "checkedAt": "2026-10-14T15:51:04.260Z",
+  "unitPassed": 719,
+  "providerPassed": 52,
+  "wasmPassed": 192,
+  "browserPassed": 175,
+  "moduleCount": 9,
+  "moduleFiles": 286,
+  "reports": [
+    {
+      "category": "native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "table-multi-header-native",
+      "kind": "native",
+      "passed": 16
+    },
+    {
+      "category": "agent-table-header-native",
+      "kind": "native",
+      "passed": 15
+    },
+    {
+      "category": "agent-table-pagination-native",
+      "kind": "native",
+      "passed": 15
+    },
+    {
+      "category": "table-protection-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "table-conversion-native",
+      "kind": "native",
+      "passed": 17
+    },
+    {
+      "category": "styles-native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "style-stories-native",
+      "kind": "native",
+      "passed": 4
+    },
+    {
+      "category": "agent-style-next-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "agent-native",
+      "kind": "native",
+      "passed": 13
+    },
+    {
+      "category": "memo-native",
+      "kind": "native",
+      "passed": 5
+    },
+    {
+      "category": "following-native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "outer-native",
+      "kind": "native",
+      "passed": 4
+    },
+    {
+      "category": "width-native",
+      "kind": "native",
+      "passed": 12
+    },
+    {
+      "category": "equal-native",
+      "kind": "native",
+      "passed": 12
+    },
+    {
+      "category": "owner-native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "host-native",
+      "kind": "native",
+      "passed": 10
+    },
+    {
+      "category": "default-native",
+      "kind": "native",
+      "passed": 9
+    },
+    {
+      "category": "browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "table-multi-header-browser",
+      "kind": "browser",
+      "passed": 20
+    },
+    {
+      "category": "agent-table-header-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "agent-table-pagination-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "table-protection-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "table-conversion-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "selected-object-browser",
+      "kind": "browser",
+      "passed": 16
+    },
+    {
+      "category": "agent-style-next-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "agent-browser",
+      "kind": "browser",
+      "passed": 15
+    },
+    {
+      "category": "width-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "equal-browser",
+      "kind": "browser",
+      "passed": 15
+    }
+  ],
+  "engineSourceId": "424262393ae01deb",
+  "wasmSha256": "d63becfd91d3094f6df4a88ed0aaf50996b3a4d82cb69bd5ae5742a99f266169",
+  "customSourceSha256": "bac8c5e88173da6173702dafe307473f6a62c304378dcc0faa53e015c5140587",
+  "applicationSourceCommit": "9bfad367e011bbca9ba3fe6e06243ddbd636659c",
+  "applicationSourceDirty": true,
+  "fixed": [
+    "Complete-row stored height equalization preserves exact integer total/remainder; explicit mm targets each selected row.",
+    "Native source/semantic preservation, actual rendered cell height and saved table/text layout are verified without loosening tolerance.",
+    "Mutation validation executes only on the first strict render; rollback renders the restored document without demanding proposed heights."
+  ],
+  "unresolved": [
+    "HWP overlap-enabled following-table roundtrip and four public cross-format preservation blocks remain gated; prior evidence in save-table-controls-2026-10-14.",
+    "Merged/nested/fragmented table Agent control and remaining documented editor scope."
+  ],
+  "limits": [
+    "Same-engine/Canvas tests; independent Hancom 2024, paid model credentials and Native Rust unit suite NOT_RUN.",
+    "Related current table/style/object regressions, not all historical editor tests. Four provider protocols are synthetic.",
+    "Single-page simple HWPX rows only; unsupported requests and altered-DPI export preservation are refused, not counted as supported edits.",
+    "Automation remains active because full documented scope is incomplete."
+  ]
+}

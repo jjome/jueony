@@ -1,0 +1,103 @@
+--- a/src/parser/body_text.rs
++++ b/src/parser/body_text.rs
+@@ -20,6 +20,7 @@
+ use super::tags;
+ 
+ mod drawing_text_structure;
++mod memo_tail;
+ 
+ use crate::model::control::{Control, UnknownControl};
+ use crate::model::document::{RawRecord, Section, SectionDef};
+@@ -103,7 +104,13 @@
+                 }
+             }
+ 
+-            section.paragraphs.push(paragraph);
++            // A final root that owns only MEMO_LIST records is a storage
++            // carrier, not a body paragraph. Consume it only after every list
++            // has a unique matching Memo field and all children were parsed.
++            if idx != records.len()
++                || !memo_tail::attach(&mut section.paragraphs, &paragraph, para_records)? {
++                section.paragraphs.push(paragraph);
++            }
+         } else {
+             idx += 1;
+         }
+--- /dev/null
++++ b/src/parser/body_text/memo_tail.rs
+@@ -0,0 +1,75 @@
++//! Ownership of the HWP5 section-tail MEMO_LIST container.
++//! Unknown/ambiguous tails remain untouched; never discard an ordinary blank.
++use super::{parse_paragraph, BodyTextError, Paragraph, Record, tags};
++use crate::model::control::{Control, FieldType};
++use std::collections::BTreeMap;
++
++pub(super) fn attach(body: &mut [Paragraph], carrier: &Paragraph, records: &[Record])
++    -> Result<bool, BodyTextError>
++{
++    if records.first().is_none_or(|r| r.level != 0)
++        || !carrier.text.is_empty() || !carrier.controls.is_empty()
++        || carrier.has_para_text || !carrier.char_count_msb
++        || !records.iter().any(|r| r.level == 1 && r.tag_id == tags::HWPTAG_MEMO_LIST)
++    { return Ok(false); }
++    let mut lists = BTreeMap::new();
++    let mut at = 1;
++    while at < records.len() {
++        let r = &records[at];
++        if r.level == 1 && matches!(r.tag_id,
++            tags::HWPTAG_PARA_CHAR_SHAPE | tags::HWPTAG_PARA_LINE_SEG)
++        { at += 1; continue; }
++        if r.level != 1 || r.tag_id != tags::HWPTAG_MEMO_LIST || r.data.len() != 4
++        { return Ok(false); }
++        let index = u32::from_le_bytes(r.data[..4].try_into().unwrap());
++        at += 1;
++        let Some(header) = records.get(at) else { return Ok(false); };
++        if header.level != 1 || header.tag_id != tags::HWPTAG_LIST_HEADER
++            || header.data.len() != 16 || header.data[4..].iter().any(|b| *b != 0)
++        { return Ok(false); }
++        let count = u32::from_le_bytes(header.data[..4].try_into().unwrap()) as usize;
++        if count == 0 || count > records.len() { return Ok(false); }
++        at += 1;
++        let mut paragraphs = Vec::new();
++        for _ in 0..count {
++            let Some(first) = records.get(at) else { return Ok(false); };
++            if first.tag_id != tags::HWPTAG_PARA_HEADER || first.level != 1
++            { return Ok(false); }
++            let start = at;
++            at += 1;
++            while at < records.len() && records[at].level > 1 { at += 1; }
++            paragraphs.push(parse_paragraph(&records[start..at])?);
++        }
++        if lists.insert(index, paragraphs).is_some() { return Ok(false); }
++    }
++    // Resolve first. No partial mutation when a duplicate or orphan is found.
++    let mut targets = BTreeMap::new();
++    for (pi, para) in body.iter().enumerate() {
++        for (ci, ctrl) in para.controls.iter().enumerate() {
++            if let Control::Field(field) = ctrl {
++                let memo = field.field_type == FieldType::Memo
++                    || (field.ctrl_id == tags::FIELD_UNKNOWN
++                        && field.properties & 0x8000 != 0
++                        && field.command.starts_with("MEMO/"));
++                if memo && lists.contains_key(&field.memo_index) {
++                    if !field.memo_paragraphs.is_empty()
++                        || targets.insert(field.memo_index, (pi,ci)).is_some()
++                    { return Ok(false); }
++                }
++            }
++        }
++    }
++    if targets.len() != lists.len() { return Ok(false); }
++    for (index, paragraphs) in lists {
++        let (pi, ci) = targets[&index];
++        if let Control::Field(field) = &mut body[pi].controls[ci] {
++            field.memo_paragraphs = paragraphs;
++            // The serializer lowers Memo to %unk + marker bit. Restore the
++            // semantic identity only with this resolved, owned memo body.
++            field.field_type = FieldType::Memo;
++            field.ctrl_id = tags::FIELD_MEMO;
++            field.properties &= !0x8000;
++        }
++    }
++    Ok(true)
++}

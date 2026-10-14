@@ -1,0 +1,34 @@
+--- a/src/renderer/typeset/table/block/entry.rs
++++ b/src/renderer/typeset/table/block/entry.rs
+@@ -1574,7 +1574,30 @@
+                     previous = Some((line.vertical_pos, line.column_start, host_index));
+                 }
+             }
+-            Some(st.vpos_col_anchor + hwpunit_to_px(para.line_segs.first()?.vertical_pos, self.dpi))
++            let origin = st.vpos_col_anchor
++                + hwpunit_to_px(para.line_segs.first()?.vertical_pos, self.dpi);
++            // A monotone ladder does not prove ownership when an immediately
++            // preceding whole object-only table consumed more than its empty
++            // anchor line. A non-overlapping successor cannot reuse an anchor
++            // inside that actually emitted table's occupied flow band. Keep
++            // positive saved gaps, overlapping objects, split tables and text
++            // hosts on their existing contracts; do not infer missing frames.
++            if !table.common.allow_overlap && origin + 0.5 < st.current_height {
++                if let Some(previous_index) = para_idx.checked_sub(1) {
++                    if st.current_items.iter().any(|item| matches!(item,
++                        PageItem::Table { para_index, control_index }
++                            if *para_index == previous_index
++                            && paragraphs_all.get(*para_index)
++                                .and_then(|host| host.controls.get(*control_index)
++                                    .map(|control| (host, control)))
++                                .is_some_and(|(host, control)| matches!(control,
++                                    Control::Table(previous_table)
++                                        if previous_table.page_break == crate::model::table::TablePageBreak::None
++                                        && crate::renderer::float_placement::object_only_saved_table_anchor(host, previous_table)))))
++                    { return None; }
++                }
++            }
++            Some(origin)
+         })
+         .flatten();
+         // 글줄은 구성 결과와 저장 줄이 같을 때만 이 원점을 소비한다.

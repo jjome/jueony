@@ -1,0 +1,67 @@
+--- /dev/null
++++ b/src/document_core/commands/agent_paragraph_outline.rs
+@@ -0,0 +1,38 @@
++//! Apply a stored section outline definition without changing shared resources.
++use crate::document_core::DocumentCore;
++use crate::error::HwpError;
++use crate::model::style::HeadType;
++fn fail(s:&str)->HwpError{HwpError::RenderError(s.into())}
++impl DocumentCore{
++    fn agent_outline_token(&self,s:usize,p:usize)->Result<(String,u16),HwpError>{
++        let tabs:serde_json::Value=serde_json::from_str(&self.get_agent_paragraph_tabs_native(s,p)?).map_err(|_|fail("Invalid body source"))?;
++        if tabs["editable"]!=true{return Err(fail("개요 설정은 일반 본문과 기본 탭 원본만 지원합니다."));}
++        let section=&self.document.sections[s];let body=&section.paragraphs[p];let ps=&self.document.doc_info.para_shapes[body.para_shape_id as usize];
++        if body.numbering_restart.is_some()||ps.para_level>6{return Err(fail("명시적 번호 다시 시작·확장 수준은 읽기 전용입니다."));}
++        let id=section.section_def.outline_numbering_id;
++        let n=self.document.doc_info.numberings.get(id.checked_sub(1).ok_or_else(||fail("저장된 구역 개요 번호 정의가 없습니다."))? as usize).ok_or_else(||fail("구역 개요 번호 참조가 올바르지 않습니다."))?;
++        if n.level_formats.iter().any(|f|f.chars().count()>500)||n.heads.iter().any(|h|h.char_shape_id!=u32::MAX&&h.char_shape_id as usize>=self.document.doc_info.char_shapes.len()){return Err(fail("개요 번호 형식과 글자 모양 참조를 확인하세요."));}
++        if ps.head_type==HeadType::Outline{if ps.numbering_id!=0&&ps.numbering_id!=id{return Err(fail("구역과 다른 개요 번호 원본은 읽기 전용입니다."));}}
++        else{let list:serde_json::Value=serde_json::from_str(&self.get_agent_paragraph_list_native(s,p)).map_err(|_|fail("Invalid list source"))?;if list["editable"]!=true{return Err(fail("현재 목록 원본은 개요로 바꿀 수 없습니다."));}}
++        let value=serde_json::json!({"body":tabs,"outlineDefinitionId":id,"numberings":self.document.doc_info.numberings,"bullets":self.document.doc_info.bullets});
++        Ok((blake3::hash(value.to_string().as_bytes()).to_hex().to_string(),id))
++    }
++    pub fn get_agent_paragraph_outline_native(&self,s:usize,p:usize)->String{
++        match self.agent_outline_token(s,p){Ok((token,id))=>serde_json::json!({"editable":true,"token":token,"definitionId":id,"levelFormats":self.document.doc_info.numberings[id as usize-1].level_formats}),Err(e)=>serde_json::json!({"editable":false,"reason":e.to_string()})}.to_string()
++    }
++    pub fn set_agent_paragraph_outline_native(&mut self,s:usize,p:usize,json:&str)->Result<String,HwpError>{
++        let v:serde_json::Value=serde_json::from_str(json).map_err(|_|fail("Invalid outline command"))?;
++        if !v.as_object().is_some_and(|o|o.len()==3&&o.keys().all(|k|["token","enabled","level"].contains(&k.as_str()))){return Err(fail("Invalid outline fields"));}
++        let (token,id)=self.agent_outline_token(s,p)?;if v["token"].as_str()!=Some(token.as_str()){return Err(fail("문단 원문·서식·개요 번호 정의가 바뀌었습니다."));}
++        let enabled=v["enabled"].as_bool().ok_or_else(||fail("Invalid outline mode"))?;let level=v["level"].as_u64().filter(|n|*n<=6).ok_or_else(||fail("Invalid outline level"))? as u8;
++        let ps=&self.document.doc_info.para_shapes[self.document.sections[s].paragraphs[p].para_shape_id as usize];
++        if !enabled&&(level!=0||ps.head_type!=HeadType::Outline)||enabled&&self.document.doc_info.numberings[id as usize-1].level_formats[level as usize].is_empty(){return Err(fail("개요 해제는 현재 개요 문단에서 수준 0으로 요청하고 빈 번호 형식은 적용하지 않습니다."));}
++        if enabled&&ps.head_type==HeadType::Outline&&ps.numbering_id==0&&ps.para_level==level{return Err(fail("개요 수준의 변경 내용이 없습니다."));}
++        let before=self.document.clone();let events=self.event_log.len();let head=if enabled{"Outline"}else{"None"};
++        let result=(||{self.apply_para_format_native(s,p,&serde_json::json!({"headType":head,"numberingId":0,"paraLevel":level}).to_string())?;
++            let ps=&self.document.doc_info.para_shapes[self.document.sections[s].paragraphs[p].para_shape_id as usize];
++            if format!("{:?}",ps.head_type)!=head||ps.numbering_id!=0||ps.para_level!=level||serde_json::to_value(&before.doc_info.numberings).unwrap()!=serde_json::to_value(&self.document.doc_info.numberings).unwrap()||serde_json::to_value(&before.doc_info.bullets).unwrap()!=serde_json::to_value(&self.document.doc_info.bullets).unwrap()||self.document.sections[s].section_def.outline_numbering_id!=id{return Err(fail("개요 적용 뒤 문단 또는 공유 번호 정의가 계획과 다릅니다."));}
++            Ok(self.get_agent_paragraph_outline_native(s,p))})();
++        if result.is_err(){self.document=before;self.event_log.truncate(events);self.rebuild_derived_state();}result
++    }
++}
+--- a/src/document_core/commands/mod.rs
++++ b/src/document_core/commands/mod.rs
+@@ -21,6 +21,7 @@
+ mod agent_basic_bullet;
+ mod agent_numbering_clone;
+ mod agent_basic_numbering;
++mod agent_paragraph_outline;
+ mod agent_paragraph_decoration;
+ mod agent_page_background;
+ mod page_body_delete;
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1204,6 +1204,13 @@
+     pub fn get_agent_page_background(&self,section:usize,kind:&str)->Result<String,JsValue>{self.core.get_agent_page_background_native(section,kind).map_err(|e|e.into())}
+     #[wasm_bindgen(js_name = setAgentPageBackground)]
+     pub fn set_agent_page_background(&mut self,section:usize,kind:&str,json:&str)->Result<String,JsValue>{self.core.set_agent_page_background_native(section,kind,json).map_err(|e|e.into())}
++
++    #[wasm_bindgen(js_name = getAgentOutlineDefinition)]
++    pub fn get_agent_outline_definition(&self,s:usize)->Result<String,JsValue>{self.core.document.sections.get(s).map(|section|serde_json::json!({"definitionId":section.section_def.outline_numbering_id}).to_string()).ok_or_else(||JsValue::from_str("Invalid section"))}
++    #[wasm_bindgen(js_name = getAgentParagraphOutline)]
++    pub fn get_agent_paragraph_outline(&self,s:usize,p:usize)->String{self.core.get_agent_paragraph_outline_native(s,p)}
++    #[wasm_bindgen(js_name = setAgentParagraphOutline)]
++    pub fn set_agent_paragraph_outline(&mut self,s:usize,p:usize,json:&str)->Result<String,JsValue>{self.core.set_agent_paragraph_outline_native(s,p,json).map_err(|e|e.into())}
+ 
+     #[wasm_bindgen(js_name = setAgentBasicNumbering)]
+     pub fn set_agent_basic_numbering(&mut self,s:usize,p:usize,json:&str)->Result<String,JsValue>{self.core.set_agent_basic_numbering_native(s,p,json).map_err(|e|e.into())}

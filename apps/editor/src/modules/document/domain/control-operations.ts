@@ -1,3 +1,4 @@
+import {agentParagraphOutlinePayload} from './agent-paragraph-outline.ts';
 import {validateAgentBasicNumbering} from './agent-basic-numbering.ts';
 import {validateAgentNumberingClone} from './agent-numbering-clone.ts';
 import {validateAgentBasicBullet} from './agent-basic-bullet.ts';
@@ -94,6 +95,8 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
   const nodes=structuredClone(snapshot.nodes);
   const hiddenPages=new Map(structure!.paragraphs.filter(p=>p.pageHide?.exists&&p.pageIndex!==undefined).map(p=>[p.pageIndex,p.id]));
   const body = (id: string) => { const n = nodes.find(n => n.id === id); if (!n?.editable) fail('편집 가능한 본문 문단 ID가 필요합니다.'); return n!; };
+  const outlines=operations.filter(op=>op.kind==='set_paragraph_outline');
+  if(outlines.length&&(outlines.length!==operations.length||new Set(outlines.map(op=>(op as {target:string}).target)).size!==outlines.length))fail('개요는 서로 다른 문단의 개요 전용 명령만 묶어 실행하세요.');
   const lists=operations.filter(op=>op.kind==='set_paragraph_list');
   if(lists.length&&(lists.length!==operations.length||new Set(lists.map(op=>(op as {target:string}).target)).size!==lists.length))fail('문단 번호는 서로 다른 문단의 전용 명령만 묶어 실행하세요.');
   const decoration=operations.filter(op=>op.kind==='format_paragraph_decoration');
@@ -101,6 +104,7 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
   const tabs=operations.filter(op=>op.kind==='set_paragraph_tabs');
   if(tabs.length&&(tabs.length!==operations.length||new Set(tabs.map(op=>(op as {target:string}).target)).size!==tabs.length))fail('문단 탭은 서로 다른 문단의 탭 명령만 한 요청으로 묶어 실행하세요.');
   for (const op of operations) {
+    if(op.kind==='set_paragraph_outline'){only(op,['kind','target','enabled','level']);agentParagraphOutlinePayload(op,snapshot);continue;}
     if(op.kind==='set_basic_numbering'){only(op,['kind','target','pattern','level','startNumber']);if(operations.length!==1)fail('새 기본 번호 생성과 적용은 단독 명령으로 실행하세요.');validateAgentBasicNumbering(op,snapshot);continue;}
     if(op.kind==='clone_paragraph_numbering'){only(op,['kind','target','sourceDefinitionId','level','startNumber']);if(operations.length!==1)fail('번호 정의 복제와 적용은 단독 명령으로 실행하세요.');validateAgentNumberingClone(op,snapshot);continue;}
     if(op.kind==='set_basic_bullet'){only(op,['kind','target','character']);if(operations.length!==1)fail('새 기본 글머리표 정의 생성과 적용은 단독 명령으로 실행하세요.');validateAgentBasicBullet(op,snapshot);continue;}

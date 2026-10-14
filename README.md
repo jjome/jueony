@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-agent-basic-numbering-20261014/Start-Review.cmd)**로 실행한다(4282). AI가 새 기본 숫자 번호 3종(1. / (1) / 1))·7수준·시작 값을 지정하고 목록을 이어간다. 기존 원본 정의는 그대로 유지한다. 복제 가능한 모양이 없는 빈 HWP에서도 실제 생성·저장 경로를 연결한다. [사용법·검증·제한](docs/79-agent-basic-numbering.md)을 확인한다. [기존 정규 번호 모양 복제](docs/78-agent-numbering-clone.md)와 [기본 글머리표 8종](docs/77-agent-basic-bullets.md)도 포함한다. 기존 확장 모양 복제·문단 restart 저장·한글 직접 비교·전체 동등성은 남는다. 기존 실행 창과 사용자 문서는 유지한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-agent-outline-20261014-v2/Start-Review.cmd)**로 실행한다(4286). AI가 문서에 저장된 구역 개요 모양을 사용해 일반 본문 7수준을 지정·변경·해제하고 다른 문단의 개요 명령을 한 요청으로 되돌린다. 본문 서식과 공유 번호 정의는 유지한다. [사용법·검증·제한](docs/80-agent-paragraph-outline.md)을 확인한다. [기본 숫자 번호 생성](docs/79-agent-basic-numbering.md)·[정규 번호 모양 복제](docs/78-agent-numbering-clone.md)·[글머리표 생성](docs/77-agent-basic-bullets.md)도 포함한다. 개요 모양 변경·목차·문단 restart 저장·한글 직접 비교·전체 동등성은 남는다. 기존 실행 창과 사용자 문서는 유지한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

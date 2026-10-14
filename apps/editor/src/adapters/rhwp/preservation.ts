@@ -78,6 +78,7 @@ export function capturePreservationEvidence(value:NativeDocument):PreservationEv
  for(let section=0;section<sectionCount;section++){
   const key=`section/${section}`;
   for(const [name,method] of [['page','getPageDef'],['definition','getSectionDef'],['columns','getColumnDef']] as const)capture(`${key}/${name}`,()=>read(doc,method,section));
+  if(typeof (doc as Record<string,unknown>).getAgentOutlineDefinition==='function')capture(`${key}/outline-definition`,()=>({definitionId:integer(record(read(doc,'getAgentOutlineDefinition',section)).definitionId)}));
   capture(`${key}/page-border`,()=>pageBorder(section));
   if(typeof (doc as Record<string,unknown>).getPageBorderFillEntry==='function')capture(`${key}/page-border-entries`,()=>['both','even','odd'].map(kind=>pageBorder(section,kind)));
   if(typeof (doc as Record<string,unknown>).getMasterPages==='function')capture(`${key}/master-pages`,()=>{

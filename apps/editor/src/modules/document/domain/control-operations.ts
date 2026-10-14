@@ -1,3 +1,4 @@
+import {agentRenameParagraphStyleName} from './agent-style-rename.ts';
 import {agentCreateParagraphStyleName} from './agent-style-create.ts';
 import {agentParagraphOutlinePayload} from './agent-paragraph-outline.ts';
 import {validateAgentBasicNumbering} from './agent-basic-numbering.ts';
@@ -105,6 +106,7 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
   const tabs=operations.filter(op=>op.kind==='set_paragraph_tabs');
   if(tabs.length&&(tabs.length!==operations.length||new Set(tabs.map(op=>(op as {target:string}).target)).size!==tabs.length))fail('문단 탭은 서로 다른 문단의 탭 명령만 한 요청으로 묶어 실행하세요.');
   for (const op of operations) {
+    if(op.kind==='rename_paragraph_style'){only(op,['kind','styleId','name']);if(operations.length!==1)fail('문단 스타일 이름 변경은 단독 명령으로 실행하세요.');agentRenameParagraphStyleName(op,snapshot);continue;}
     if(op.kind==='create_paragraph_style'){only(op,['kind','sourceStyleId','name']);if(operations.length!==1)fail('새 문단 스타일 생성은 단독 명령으로 실행하세요.');agentCreateParagraphStyleName(op,snapshot);continue;}
     if(op.kind==='set_paragraph_outline'){only(op,['kind','target','enabled','level']);agentParagraphOutlinePayload(op,snapshot);continue;}
     if(op.kind==='set_basic_numbering'){only(op,['kind','target','pattern','level','startNumber']);if(operations.length!==1)fail('새 기본 번호 생성과 적용은 단독 명령으로 실행하세요.');validateAgentBasicNumbering(op,snapshot);continue;}

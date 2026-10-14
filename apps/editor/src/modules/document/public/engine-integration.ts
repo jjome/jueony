@@ -24,3 +24,5 @@ export {agentParagraphOutlinePayload} from '../domain/agent-paragraph-outline.ts
 export {validateAgentBasicNumbering,basicNumberingFormats,basicNumberingPatterns} from '../domain/agent-basic-numbering.ts';
 export {validateAgentNumberingClone} from '../domain/agent-numbering-clone.ts';
 export {validateAgentBasicBullet,basicBulletCharacters} from '../domain/agent-basic-bullet.ts';
+
+export {agentRenameParagraphStyleName} from '../domain/agent-style-rename.ts';

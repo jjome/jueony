@@ -145,7 +145,7 @@ export function capturePreservationEvidence(value:NativeDocument):PreservationEv
   return [...metadata,...content];
  });
  capture('styles',()=>array(read(doc,'getStyleList')).map(item=>{
-  const style=record(item),id=integer(style.id);return {...style,details:read(doc,typeof (doc as Record<string,unknown>).getStoredStyleDetail==='function'?'getStoredStyleDetail':'getStyleDetail',id)};
+  const style=record(item),id=integer(style.id),metadata=readStoredStyleMetadata(doc,id);return {...style,...(metadata?{metadata}:{}),details:read(doc,typeof (doc as Record<string,unknown>).getStoredStyleDetail==='function'?'getStoredStyleDetail':'getStyleDetail',id)};
  }));
  capture('cells',()=>{
   const lists=array(record(read(doc,'getCursorModel')).lists).map(record),byId=new Map(lists.map(l=>[integer(l.listId),l]));
@@ -219,4 +219,12 @@ export function verifyPreservedExport(source:NativeDocument,bytes:Uint8Array,for
  const report=comparePreservationEvidence(before,after,format,contentLoss);
  if(report.status==='blocked')throw new PreservationError(report);
  return report;
+}
+
+/** Semantic metadata, separate from physical raw-record reconstruction eligibility. */
+export function readStoredStyleMetadata(doc:any,id:number):{langId:number;lockForm:boolean}|undefined {
+ if(typeof doc.getAgentStyleMetadata!=='function')return undefined;
+ const state=record(read(doc,'getAgentStyleMetadata',id));
+ if(typeof state.langId!=='number'||!Number.isInteger(state.langId)||state.langId< -32768||state.langId>32767||typeof state.lockForm!=='boolean')throw new Error('저장 스타일 언어·잠금 정보를 확인하지 못했습니다.');
+ return {langId:state.langId,lockForm:state.lockForm};
 }

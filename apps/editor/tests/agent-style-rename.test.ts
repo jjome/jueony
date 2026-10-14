@@ -1,0 +1,18 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {validateEditOperations} from '../src/modules/document/public/index.ts';
+import {agentRenameParagraphStyleName} from '../src/modules/document/public/engine-integration.ts';
+import {generationSchema} from '../src/modules/document/public/wire-schema.mjs';
+import {captureTemplate} from '../src/modules/automation/public/index.ts';
+const op={kind:'rename_paragraph_style' as const,styleId:1,name:'올해 업무'};
+const base=():any=>({revision:'r',name:'fixture.hwpx',nodes:[],limitations:[],structure:{sections:[],paragraphs:[],tables:[],unsupportedControls:[],styles:[{id:0,name:'바탕글',type:0},{id:1,name:'지난 업무',type:0},{id:2,name:'글자',type:1}]},styleRenameSources:{'1':{editable:true,fingerprint:'a'.repeat(64)}}});
+test('rename wire has only stored nondefault style ID and bounded name',()=>{const all=generationSchema().properties.operations.items.anyOf;assert.equal(all.length,42);assert.deepEqual(all.find(x=>x.properties.kind.enum[0]===op.kind)!.required,['kind','styleId','name']);});
+test('rename definition does not need an editable body or mutate input',()=>{const s=base(),old=structuredClone(s);assert.deepEqual(validateEditOperations([op],s),[op]);assert.deepEqual(s,old);});
+test('rename name is NFC and same normalized name is a no-op',()=>{const s=base();assert.equal(agentRenameParagraphStyleName({...op,name:'e\u0301'},s),'é');s.structure.styles[1].name='é';assert.throws(()=>validateEditOperations([{...op,name:'e\u0301'}],s),/현재/);});
+test('duplicate name of paragraph or character style refuses',()=>{for(const name of ['바탕글','글자'])assert.throws(()=>validateEditOperations([{...op,name}],base()),/이미/);});
+test('default, character, missing and noninteger IDs refuse',()=>{for(const styleId of [0,2,3,256,-1,1.2,NaN,'1',null])assert.throws(()=>validateEditOperations([{...op,styleId}],base()));});
+test('missing, protected and invalid fingerprint refuse',()=>{for(const mode of ['missing','protected','fingerprint']){const s=base();if(mode==='missing')delete s.styleRenameSources;if(mode==='protected')s.styleRenameSources[1].editable=false;if(mode==='fingerprint')s.styleRenameSources[1].fingerprint='bad';assert.throws(()=>validateEditOperations([op],s));}});
+test('all 256 stored definitions can still rename',()=>{const s=base();s.structure.styles=Array.from({length:256},(_,id)=>({id,name:'항목'+id,type:0}));assert.deepEqual(validateEditOperations([op],s),[op]);s.structure.styles.push({id:256,name:'초과',type:0});assert.throws(()=>validateEditOperations([op],s));});
+test('invalid name, trim, control and excessive UTF-16 length refuse',()=>{for(const name of ['', ' 앞','뒤 ','c\u0000','줄\u2029분리','x\u0085','😀'.repeat(41),null,1])assert.throws(()=>validateEditOperations([{...op,name}],base()));});
+test('metadata, raw authority and shape injection refuse',()=>{for(const key of ['englishName','langId','lockForm','nextStyleId','type','paraShapeId','charShapeId','token','force','fingerprint'])assert.throws(()=>validateEditOperations([{...op,[key]:0}],base()));});
+test('rename is a single command, not a repeated macro',()=>{assert.throws(()=>validateEditOperations([op,op],base()));assert.throws(()=>captureTemplate('스타일',[op],base()));});

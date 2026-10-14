@@ -1,0 +1,22 @@
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -7359,6 +7359,19 @@
+             cell_para_idx,
+         )
+         .map_err(|e| e.into())
++    }
++
++    /// Read stored metadata and refuse lossy raw-record reconstruction in Agent rename.
++    #[wasm_bindgen(js_name = getAgentStyleMetadata)]
++    pub fn get_agent_style_metadata(&self, id: u32) -> String {
++        match self.core.document.doc_info.styles.get(id as usize) {
++            Some(style) => serde_json::json!({
++                "langId": style.lang_id,
++                "lockForm": style.lock_form,
++                "rawCanonical": style.raw_data.as_ref().map(|raw| *raw == crate::serializer::doc_info::serialize_style(style)).unwrap_or(true)
++            }).to_string(),
++            None => serde_json::json!({"ok": false}).to_string(),
++        }
+     }
+ 
+     /// 문서에 정의된 스타일 목록을 조회한다.

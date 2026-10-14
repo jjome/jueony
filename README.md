@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-agent-style-create-20261014-v2/Start-Review.cmd)**로 실행한다(4290). AI가 저장된 문단 스타일의 글자·문단 모양을 참조하는 새 스타일을 만들고 후속 요청에서 본문에 적용한다. 변경 비교·요청 undo/redo·저장 재열기를 지원한다. [사용법·검증·제한](docs/81-agent-paragraph-style-create.md)을 확인한다. [구역 개요 수준](docs/80-agent-paragraph-outline.md)과 이전 기본 번호/글머리표도 포함한다. 스타일 정의 수정·삭제·상속, 개요 모양/목차, 명시적 문단 restart 저장과 한글 직접 비교·전체 동등성은 남는다. 이전 실행 창과 사용자 문서는 유지한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-agent-style-rename-20261014/Start-Review.cmd)**로 실행한다(4292). AI가 저장 문단 스타일의 이름만 변경하고 본문·셀의 스타일 ID와 서식을 유지한다. 수동 스타일 UI·변경 비교·요청 undo/redo·저장 재열기를 지원한다. [사용법·검증·제한](docs/82-agent-paragraph-style-rename.md)을 확인한다. 이전 [새 스타일 생성](docs/81-agent-paragraph-style-create.md)과 개요/번호 기능도 포함한다. 바탕글·글자/잠금/확장 원본·필드 문서는 이름 변경에서 보호한다. 스타일 모양 수정·삭제·상속, 문단 restart 저장·한글 직접 비교·전체 동등성은 남는다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

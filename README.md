@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-agent-header-format-20261014/Start-Review.cmd)**로 실행한다(4262). AI가 기존 단순 머리말·꼬리말의 텍스트와 기본 글자 서식을 수정한다. 굵게·기울임·밑줄·1~200pt 크기·RGB 색을 전체 한 문단에 적용하고 텍스트·문단·홀짝·감추기·본문을 보존한다. [사용법·검증·제한](docs/69-agent-header-font-format.md)을 확인한다. 생성/삭제·글꼴 종류/문단 모양·필드·개체·혼합/여러 문단은 남는다. 기존 실행 창과 사용자 문서는 유지한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-agent-header-paragraph-20261014/Start-Review.cmd)**로 실행한다(4264). AI가 기존 단순 머리말·꼬리말의 텍스트·기본 글자 서식·정렬·백분율 줄 간격을 수정한다. 정렬만 바꾸면 기존 줄 간격 방식과 값을 유지한다. [사용법·검증·제한](docs/70-agent-header-paragraph.md)을 확인한다. 원문·미요청 서식·다른 정의·감추기·본문을 보존하며 요청 undo/redo·실패 복원·저장·재실행을 검사했다. 생성/삭제·복잡한 원본·고급 문단 옵션과 전체 한글 동등성은 남는다. 기존 실행 창과 사용자 문서는 유지한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

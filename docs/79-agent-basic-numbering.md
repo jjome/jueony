@@ -23,3 +23,13 @@ Domain은 고정 패턴·수준·시작 값·단독 명령을 검사한다. Adap
 ## 검수본
 
 `build/jueony-agent-basic-numbering-20261014/Start-Review.cmd` 또는 `http://127.0.0.1:4282/`로 준비한다. 이전 실행 창·서버·사용자 문서를 유지한다. 한글에서 열 검수 파일은 묶음의 review-documents/agent-basic-numbering에 포함한다. 실제 한글 2024 직접 비교와 유료 모델 호출은 수행하지 않으며 전체 구현은 미완료다. 최종 검사 범위·수치·소스 해시는 아래에 추가한다.
+
+## 최종 결과
+
+구현 `d35531b` 커밋·푸시 완료. 전체 단위 611·provider/server 52·관련 실제 WASM 131·브라우저 60(묶음 호환 4 포함) 통과. 신규 WASM 25·신규 Edge 14와 기존 번호 복제/목록/기본 글머리표·문단 탭/테두리의 관련 회귀 범위다. 직전 전체 편집기 누적 538/508을 이번에 모두 재실행한 것으로 계산하지 않는다. TypeScript와 9개 모듈·262개 소스의 경계 검사 통과. 예상 밖 page/console 오류와 외부 자산 요청 0건이며, 이전 글머리표의 의도한 손실 저장 차단 2건은 expectedSaveErrors로 구분한다. 별도 Native Rust unit tests는 이번 빌드에서 미실행이다. [검사별 결과](evidence/agent-basic-numbering-2026-10-14/verification-summary.json)를 따른다.
+
+직접 빈 HWP 원본에서 확장 정의를 유지하고 새 기본 번호 3종을 생성/적용/저장했다. 양 형식의 수준 0/3/6, 새 목록 23/24 이어짐·공유 원본 유지·요청 undo/redo·실문서 실패 복원·위조 반환/토큰·동시 편집·수동 입력·업무 복원을 확인했다. 단위 검사에서는 전체 0~6수준과 입력 범위 경계를 검사한다. 유료 모델 성능이나 실제 한글 지면 동등성은 판정하지 않았다.
+
+앱 소스 SHA-256 `7544d9cb69d10bd20cf3d8189e10629a5ab1f92d37a008292dae14813556ca0a`, 엔진 `bb2a4db1f6f1988f`, WASM SHA-256 `c5e0296d2c9e0b493bdeb01b338bc5596dae2b6da039ed6eb4e0b0a8a175f497`. 빌드 메타데이터 7c4b7c2/dirty=true는 구현 d35531b의 실제 소스/추적 패치 해시로 연결한다. 4282 검수 서버의 served 메타데이터·WASM 바이트·포함 명령/provider 계약을 대조했다. [실행 대조](evidence/agent-basic-numbering-2026-10-14/launch-check.json)와 [원본·지원 범위](evidence/agent-basic-numbering-2026-10-14/source-baseline-notes.json)를 보관한다.
+
+한글에서 열 새 합성 HWP/HWPX 30개를 review-documents/agent-basic-numbering에 포함했다. `created-<pattern>-<level>.*`는 3종×3수준×2형식, `continued-sequence.*`는 새 목록 이어짐, `created-<adapter>.hwpx`는 네 합성 제공자, `default-<pattern>.hwp`는 직접 HWP 기본 패턴, `manual-created.hwpx`는 사용자 추가 편집 결과다. [파일별 해시](evidence/agent-basic-numbering-2026-10-14/basic-numbering-documents.json)를 따른다. 기존 확장 모양 복제·임의 번호 모양·문단별 restart 저장·개요와 최종 한글 직접 비교는 남는다. 전체 구현이 완료되지 않아 자동화를 유지한다.

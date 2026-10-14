@@ -1,0 +1,10 @@
+{
+  "implementationCommit": "d35531b",
+  "sourceRule": "New default definitions only; no original raw resource is cloned, reduced or rewritten. Existing canonical clone command and opaque-source rejection stay unchanged.",
+  "nativeFixtures": "Direct original blank HWP and generated HWPX body, no HWPX normalization step for new HWP creation tests. Check three patterns at levels 0/3/6 in both formats; unit tests cover all 0..6 levels and input limits.",
+  "semantics": "Independent new numbering ID; default char shape 0, autoIndent attr8, width0, textDistance50, numeric format0; all seven formats use chosen punctuation. Selected level start changes; other starts1; global start follows selected start only at level0. No Paragraph.numbering_restart.",
+  "scope": "Full unit/provider suites and scoped related engine/browser regressions only, not a full editor sweep.",
+  "visualCheck": "Actual Edge screenshot confirms 13. marker and added manual body text on shared active document. Native Hancom comparison NOT_RUN.",
+  "nativeRustUnitTests": "NOT_RUN on this build; WASM compiled and actual engine cases executed.",
+  "paidModelCalls": "NOT_RUN; four local synthetic provider protocols only."
+}

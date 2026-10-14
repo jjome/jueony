@@ -33,3 +33,5 @@
 최종 한글 검수에는 `review-documents/table-split/split-browser`의 실제 UI 저장 문서 복사본을 사용한다. 내용이 첫 셀에 유지되는지, 빈 새 셀·불균등 너비/높이·문단 서식·다른 표·구역 위치를 확인하고 복사본을 한글에서 저장·재열기한다.
 
 전체 완료 목록은 [관리 CSV](jueony-work-checklist.csv)에 유지한다. 기본 분할만 완료 체크하며 임의 분할·중첩·고급 표와 최종 한글 검증은 완료 처리하지 않는다.
+
+구현 `eb2c010` 커밋·푸시 완료. [Git/빌드 소스 대조](evidence/table-split-2026-10-15/source-baseline-notes.json), [문서별 역할·한글 검수 순서](evidence/table-split-2026-10-15/documents.json)를 보존했다.

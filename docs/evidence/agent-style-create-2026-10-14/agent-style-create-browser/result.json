@@ -1,0 +1,2579 @@
+{
+  "results": [
+    "openai-responses: create stored-shape paragraph style via chat, compare, undo/redo, save/reopen",
+    "anthropic: create stored-shape paragraph style via chat, compare, undo/redo, save/reopen",
+    "gemini: create stored-shape paragraph style via chat, compare, undo/redo, save/reopen",
+    "openai-compatible: create stored-shape paragraph style via chat, compare, undo/redo, save/reopen",
+    "hwp: create then independently apply queried new style and request undo/save",
+    "hwpx: create then independently apply queried new style and request undo/save",
+    "invalid/duplicate names, source, unknown args and batching preserve body/catalog/history",
+    "metadata-only creation retains the live body caret",
+    "failure after native creation restores style definitions/body/caret/history/dirty",
+    "lying ID, wrong reference and unrequested font/resource/body changes refuse and restore",
+    "delayed model cannot overwrite a newer live style catalog",
+    "manual typing after applying new style uses the same live document and safe saves",
+    "host reload restores new style definition and persisted structure comparison"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "providerCalls": [
+    {
+      "adapterId": "openai-responses",
+      "model": "openai-responses-fixture",
+      "instruction": "새 업무 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "anthropic",
+      "model": "anthropic-fixture",
+      "instruction": "새 업무 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "gemini",
+      "model": "gemini-fixture",
+      "instruction": "새 업무 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "새 업무 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "새 업무 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "6412ef16049f7b25ca1a9fa37618112e96f843088c440b6b1ac3fba2b3bed07e"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "28b80d495b6431744e1c3646aa7617a6eb4795395e33d6200632d7d9e6f1fe26"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "2e55fbe93f5a6ff81ede7ed11e2bfe39b53ff6737234b7aec637354b4c642da7"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "72b5447270e53c27f6659dbd75122b5e890dedcc47610a9dc1590739ecd4f647"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "65681ac16c5bb4b4508e986ba96c44d566b1a4ca796b7a5da011b8093ad92f08"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "507f91e09654b936ac12e71b2248c2dddb2a702fabcf1826d2dbe0a5df2d115a"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "56d1640edda4d309a5628de131777ec78f659b839c0e34e1e8db51dd42588e0a"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "783c81a9a8fbe0f0f242c242c8cc6b6b950e2e7dc80870aa29f3fad7fe352b46"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "bff4aa4b88bea8611a0e034d712492361f0c6698f9388c57e5a496473b354018"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "319427e4ce91f28b4fbaa5a2059e666388e317610445ac182c3a640e5a8140de"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "9b32e2fe22d2a917aa1bf513544444fc657062e1b30e338a4326b1aa05f88f3a"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "1bb7d5ea70527e8b38d842ccb80a4cda6fdda3f957829e044037fa26e24b2cf9"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "6802245f1407f990c650893295873951748cb2ea5130c46ea3cbf9853e7c9752"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5ac83c3ee179c4fa357898a72bf91f9ceb3324bf6af012c8be568b9c73264674"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "2063660be59e5e80e7c3edf01be1e5d74a8b5bf920a2ad266cf22750bd130a11"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "ef908086476cb32967f7ded3fb1f459950e3d59dcbc14fc1479ce6b65f844a07"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "8f20406149b533a1e87bca1cd8a7fe652c32ed31eebb095646ca1f0512875a7a"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "7652c43acb1e1ed5b44a3832953b358883ae86bdbd4ec9bc7c516d78dc815edf"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ff0d6117a07d301f152f53c080bc6424b85202f3766f93530df1e7678f07290c"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "fb33fdf4a569b97d91548748e4fc928ad409cabe06b06e60c3e8c4d10fc8362c"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "dcd734cca2329ab2555a296305037c9881d1f4ae26868af0ae6513895ff4c8e3"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "스타일 적용",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "6412ef16049f7b25ca1a9fa37618112e96f843088c440b6b1ac3fba2b3bed07e"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "28b80d495b6431744e1c3646aa7617a6eb4795395e33d6200632d7d9e6f1fe26"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "2e55fbe93f5a6ff81ede7ed11e2bfe39b53ff6737234b7aec637354b4c642da7"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "72b5447270e53c27f6659dbd75122b5e890dedcc47610a9dc1590739ecd4f647"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "65681ac16c5bb4b4508e986ba96c44d566b1a4ca796b7a5da011b8093ad92f08"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "507f91e09654b936ac12e71b2248c2dddb2a702fabcf1826d2dbe0a5df2d115a"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "56d1640edda4d309a5628de131777ec78f659b839c0e34e1e8db51dd42588e0a"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "783c81a9a8fbe0f0f242c242c8cc6b6b950e2e7dc80870aa29f3fad7fe352b46"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "bff4aa4b88bea8611a0e034d712492361f0c6698f9388c57e5a496473b354018"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "319427e4ce91f28b4fbaa5a2059e666388e317610445ac182c3a640e5a8140de"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "9b32e2fe22d2a917aa1bf513544444fc657062e1b30e338a4326b1aa05f88f3a"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "1bb7d5ea70527e8b38d842ccb80a4cda6fdda3f957829e044037fa26e24b2cf9"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "6802245f1407f990c650893295873951748cb2ea5130c46ea3cbf9853e7c9752"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5ac83c3ee179c4fa357898a72bf91f9ceb3324bf6af012c8be568b9c73264674"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "2063660be59e5e80e7c3edf01be1e5d74a8b5bf920a2ad266cf22750bd130a11"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "ef908086476cb32967f7ded3fb1f459950e3d59dcbc14fc1479ce6b65f844a07"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "8f20406149b533a1e87bca1cd8a7fe652c32ed31eebb095646ca1f0512875a7a"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "7652c43acb1e1ed5b44a3832953b358883ae86bdbd4ec9bc7c516d78dc815edf"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ff0d6117a07d301f152f53c080bc6424b85202f3766f93530df1e7678f07290c"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "fb33fdf4a569b97d91548748e4fc928ad409cabe06b06e60c3e8c4d10fc8362c"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "dcd734cca2329ab2555a296305037c9881d1f4ae26868af0ae6513895ff4c8e3"
+        },
+        "22": {
+          "editable": true,
+          "fingerprint": "9f23335c0a46fe0126393774ade07e306fed706379cb4b5f7a93071217e0182e"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "새 업무 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "스타일 적용",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        },
+        "22": {
+          "editable": true,
+          "fingerprint": "f501a9ee8b626dbb8a609be7afe1725df642f2d807050f8ddcbe5223adca7908"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "중복 새 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "이름 오류 새 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "없는 원본 새 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "미지원 새 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "묶음 새 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "혼합 명령 새 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "새 업무 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "새 업무 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "새 업무 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "새 업무 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "새 업무 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "새 업무 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "새 업무 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "지연 새 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "새 업무 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "스타일 적용",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        },
+        "22": {
+          "editable": true,
+          "fingerprint": "f501a9ee8b626dbb8a609be7afe1725df642f2d807050f8ddcbe5223adca7908"
+        }
+      }
+    },
+    {
+      "adapterId": "openai-compatible",
+      "model": "openai-compatible-fixture",
+      "instruction": "새 업무 스타일",
+      "styleCreationSources": {
+        "0": {
+          "editable": true,
+          "fingerprint": "95bebea7fdf4a4b3f0ef4cd0e1c5fad0518a0d0c6b045647af8b4e636c9fc064"
+        },
+        "1": {
+          "editable": true,
+          "fingerprint": "158ea602d45b750f51dfdf7db14462b5c4e9168418571ef38d564f2cb3dc4368"
+        },
+        "2": {
+          "editable": true,
+          "fingerprint": "d72f80722ff0e04a377679eb5442380c9785fb57e8feadd98904757980e55ee2"
+        },
+        "3": {
+          "editable": true,
+          "fingerprint": "35b6b889134b6729390724de71cd657e8f402c6672f0fb7e373a894212fa88cf"
+        },
+        "4": {
+          "editable": true,
+          "fingerprint": "55756e24e4ad870f876eec03d9d5e35c236f9df0ffc3ed48c88729d6a00533d1"
+        },
+        "5": {
+          "editable": true,
+          "fingerprint": "83109ba236c3241e42ca23a4c67ae3af29881209ba68b74c374055186db7fe6d"
+        },
+        "6": {
+          "editable": true,
+          "fingerprint": "7595b25040d7756785228e8ddb689844904e3a721e0947a9a0d35d9cb65c130b"
+        },
+        "7": {
+          "editable": true,
+          "fingerprint": "d9c622c1a38db0d6a3f96e1695463dea46b348771d3cabc62fc0c100d11d9967"
+        },
+        "8": {
+          "editable": true,
+          "fingerprint": "ba214a467731a50409183afbf98f1d72160bad81f7772096c20e9c61a229489b"
+        },
+        "9": {
+          "editable": true,
+          "fingerprint": "a28219e4fdc6dfe5112ea4f029eeed86d666a15d4189ae911fce342e333c5a1c"
+        },
+        "10": {
+          "editable": true,
+          "fingerprint": "fbc0d11bff85aa1fe84202693b4e46a24eaf769429073cfaf19f7ce1704f1dd3"
+        },
+        "11": {
+          "editable": true,
+          "fingerprint": "5b9ebab6e3d70977c396a60d45f48dbec988cf7589883060df3a72b7d17b9391"
+        },
+        "12": {
+          "editable": false,
+          "reason": "저장 문단 스타일·유효한 모양·256개 미만의 정의가 필요합니다."
+        },
+        "13": {
+          "editable": true,
+          "fingerprint": "23e5d77f0491f929868d6d7e95f2c037d135bd8cede441c62f19deab7d10958a"
+        },
+        "14": {
+          "editable": true,
+          "fingerprint": "5e81f16475fa191f9f57bfb948ff7d32a14555d927b019eed99d1b261e5a4596"
+        },
+        "15": {
+          "editable": true,
+          "fingerprint": "8959b0d281a03260d810963ab8d5c559fc472d60b34b55372a030a2e46d15bbf"
+        },
+        "16": {
+          "editable": true,
+          "fingerprint": "0ea28cece73182f0210d6b6dfaa9fea02bc4eaac8aecf5326f3af80c15c936f0"
+        },
+        "17": {
+          "editable": true,
+          "fingerprint": "a556be368bae2c48cae3af70f13b36c5d5bc57e078eb5a18b5592901e32fc39d"
+        },
+        "18": {
+          "editable": true,
+          "fingerprint": "85b4d16e0aa7f96432234803d53c937f15998fe0cfeab920d60d36b119a1571e"
+        },
+        "19": {
+          "editable": true,
+          "fingerprint": "ca7b0e0cad8afb52b37f9b5e6a3933f7fc7d3fc985023f933af91e724cbc90e6"
+        },
+        "20": {
+          "editable": true,
+          "fingerprint": "83de6d547482ab3754c258d8a38da19536564b6988458eea4f9bc5bd589be53d"
+        },
+        "21": {
+          "editable": true,
+          "fingerprint": "09b58c240cc5ad49f0df59c33afce8d3c5101f72d004d36bc5ac72a7be95f89a"
+        }
+      }
+    }
+  ],
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@jueony/rhwp-engine-review@0.8.7",
+    "builtAt": "2026-10-14T08:46:46.119Z",
+    "engineWasmSha256": "3b5028ea80f754b6564aa17c1fdb5b14322ce61dd8456ab94cdfc9178c0d9515",
+    "engineBuild": {
+      "optimized": false,
+      "wasmSha256": "3b5028ea80f754b6564aa17c1fdb5b14322ce61dd8456ab94cdfc9178c0d9515",
+      "sourceId": "c1700d31d7fa3af7",
+      "patches": [
+        {
+          "name": "border-fill-identity.patch",
+          "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c"
+        },
+        {
+          "name": "default-tabs.patch",
+          "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+        },
+        {
+          "name": "document-insertion.patch",
+          "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+        },
+        {
+          "name": "master-page-editing.patch",
+          "sha256": "b04c7d682e105e3f37f72a18c1b4bb01cbf085424e3219f3919fd8c891dc26c2"
+        },
+        {
+          "name": "merged-table-transpose.patch",
+          "sha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768"
+        },
+        {
+          "name": "note-query-json.patch",
+          "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562"
+        },
+        {
+          "name": "page-border-entries.patch",
+          "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f"
+        },
+        {
+          "name": "page-border-inclusion.patch",
+          "sha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e"
+        },
+        {
+          "name": "page-border-region.patch",
+          "sha256": "ea98aed9ad8568699b802c5f46e4964fe524ba7634bc978d71fe10f44e1d7412"
+        },
+        {
+          "name": "page-border-z-image.patch",
+          "sha256": "97ccd3c9eac24c42b0844fc65e5804b232d3bef9929a6fd5de329cdd007b173b"
+        },
+        {
+          "name": "section-split.patch",
+          "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+        },
+        {
+          "name": "style-reference-deletion.patch",
+          "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+        },
+        {
+          "name": "style-reference-order.patch",
+          "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce"
+        },
+        {
+          "name": "style-shape-stories.patch",
+          "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af"
+        },
+        {
+          "name": "table-creation-consistency.patch",
+          "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+        },
+        {
+          "name": "zz-line-number-settings.patch",
+          "sha256": "4cb8ce4a8d49864f53c3ff95fdfc8ef3e0342b09f86cd525dfb9aa102e2dee72"
+        },
+        {
+          "name": "zzz-page-body-delete.patch",
+          "sha256": "54bf1697627ec92c4379fb8ca314f9bf9d99c2207bf9e90859d35c7324be2e83"
+        },
+        {
+          "name": "zzzz-page-body-copy.patch",
+          "sha256": "45f3331d992f3799dad1f076bfd6d237d8c989541ea510d888e4afb5407749db"
+        },
+        {
+          "name": "zzzzz-page-body-paper-paste.patch",
+          "sha256": "4df977f851378597848aa60581957c123e6565ebf04f9412052dbfdabb2c43a0"
+        },
+        {
+          "name": "zzzzzz-page-body-style-paste.patch",
+          "sha256": "168c4c158bc0db3e71230903eae0b1ae71092a1a139f2ad5747712f95127bd75"
+        },
+        {
+          "name": "zzzzzzz-page-body-image-paste.patch",
+          "sha256": "ac08a167a376bae3e1e890f8109f2f9552ce952abe7882712f813183597ce57a"
+        },
+        {
+          "name": "zzzzzzzz-empty-section-remove.patch",
+          "sha256": "d49d3acc5bc0b3049415e17233a7f7a7249792f6500d475ce6cd39d3ad14d590"
+        },
+        {
+          "name": "zzzzzzzzz-hwpx-body-caret.patch",
+          "sha256": "c073ab44d5460f92915ea6493a791d2cbf24bb60ad66eca5033be0fc9835ac56"
+        },
+        {
+          "name": "zzzzzzzzzz-agent-page-background.patch",
+          "sha256": "74104eca6a40a3a7f06ad6d20ed8f44f816f0c153a2be40fdf584b61fc9ba907"
+        },
+        {
+          "name": "zzzzzzzzzzz-agent-header-footer.patch",
+          "sha256": "415fa55bc5fe0c4f49a7dce025723067022d7bdef076a9fb48b7f456c30cb91a"
+        },
+        {
+          "name": "zzzzzzzzzzzz-agent-paragraph-tabs.patch",
+          "sha256": "d15949747520d51020433aca32539f79c5a8cc0dfdad9de95db221dae651b311"
+        },
+        {
+          "name": "zzzzzzzzzzzzz-agent-paragraph-decoration.patch",
+          "sha256": "2adf2bba46d11a6ca97ce838da1d329c627c8532812674b7329aaef3cdb544fb"
+        },
+        {
+          "name": "zzzzzzzzzzzzzz-agent-paragraph-lists.patch",
+          "sha256": "06e1af9e90e0c54da772a533f9c2ac5279db059c37fb3612c189e0d7e1c7692d"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzz-agent-basic-bullets.patch",
+          "sha256": "03138686d9faa51fcf335f1b6299a294248031d36ca079da5346e52d0b531a35"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzz-agent-numbering-clone.patch",
+          "sha256": "a79207f328ca0521515344c018554ccc20092142dabaa5ba413ff162408fa567"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzz-agent-basic-numbering.patch",
+          "sha256": "66ac344e90a16b3e447e97bd6a593edbc7b9e024313cc40f81f2611838f3b102"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzz-agent-paragraph-outline.patch",
+          "sha256": "dfe19d3083f6a4222440ce558b5451f2568cf57b211bcc19babb508c1db2022e"
+        }
+      ],
+      "builtAt": "2026-10-14T08:11:09.3928812Z",
+      "jsSha256": "2f1dc525d03aa0c9e6a7fde755f8a183cb3d3d036a20ea18b0e0ebb310414a72",
+      "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+      "buildMode": "wsl-review-no-opt"
+    },
+    "buildScriptSha256": "e530c77487d231e37582d377e7dddebf8a52dbb00bc267bcad607971c25c19e4",
+    "studioPatchSha256": "d0a413372bd0327c50c68297ba6ef0e7d1f07e24e7545dcfb20f834b0661d7d3",
+    "featurePatchSha256": "ca3ae9e1f5c7075d0113b6a38cb905317ec51db8e0cfdb55f1dfb0e9e1e986b7",
+    "recoveryPatchSha256": "12dfbb56ca02e1642bb495a44e18cf0823da84864386211eeb8811916552f864",
+    "tabFeaturePatchSha256": "da0d7d0b9a0c529af8a4a9733bf239a1c4f6afcd99b8803f1237f1c57a90ceec",
+    "sectionBoundaryPatchSha256": "e2a5cee3330b67015a3ac8cc738cafe36966950d7a12fc48e1d0a7ffc2392b13",
+    "documentInsertionPatchSha256": "2941b880fe250f779c95ce7bbd9d54384b10dda5f1596f7c0343d44e0297d4ff",
+    "styleManagementPatchSha256": "792ad2629ba0d657fe0bc504fa0f3c55075c6b2c69ea0cb570954dad294ed55c",
+    "styleFlowPatchSha256": "11010768f738466f36731a71b6d596ecae4ba60c74132fd3ea088e4816a98974",
+    "tableConversionPatchSha256": "77b1afbf52aa073f5617feacbf84781b5976fdfe549f25e10dc1116603333fe9",
+    "pageBorderPatchSha256": "70bf19d6d91304856bd7e4c75d3e6fdf43403eea9d9e06e90b2321f8117d20bb",
+    "selectedObjectPropertiesPatchSha256": "3ff0eab7f38eece3ce098c33759d0e2bdce12fb3f44c8da417c81a1e02799279",
+    "formattingToolbarPatchSha256": "d75122ccc9459cf9fa46d065777231c5b83144393a1af93d20cffee8594c600f",
+    "documentTabCyclePatchSha256": "1c907daa1e91202f24c77827629ce66c9959cf12a6d1656d64f8942d106c79f8",
+    "keyboardContextPatchSha256": "0f85ceeaa4c2998908068ad2ba0aadf3bcf137749c6d49765bb293938a4cdd1f",
+    "documentSwapStatePatchSha256": "d4ae8194a8ff2446cfd2483b53356226197c7610cae6bebea38da1af670fb212",
+    "exportMetadataLossPatchSha256": "b7a30c5f36f960f9860ae19fc6b427040f253b019c30b0362efb269613e38fc2",
+    "customSourceSha256": "37648a7eb21af64b355d6a6cf027fe95d39f3c1111f24eee52a0b2606be5ffa5",
+    "applicationSourceCommit": "adacbebd7aa33071ec4befec66d76dbb0d9b9fbe",
+    "applicationSourceDirty": true,
+    "sourceBuild": true,
+    "note": "고정 rhwp 소스와 추적 패치를 직접 빌드한 검수용 WASM. 최적화 및 한컴 출력 비교 상태는 engineBuild와 검증 보고서 참조."
+  },
+  "note": "Actual Edge/four synthetic provider protocols. Stored-shape paragraph style creation and separate existing apply, request undo/rollback/conflict/caret/manual typing/save/reload. Native Hancom and paid models NOT_RUN."
+}

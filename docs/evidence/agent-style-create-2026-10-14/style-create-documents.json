@@ -1,0 +1,123 @@
+{
+  "scope": "New paragraph-style creation/apply saved output only; related regressions separate.",
+  "documents": [
+    {
+      "path": "agent-style-create-native/applied-new-style.hwp",
+      "bytes": 12800,
+      "sha256": "c72302591f2a5bd0e6cbd1c27b05fe43b4fd14e88e45c624639f9ec34aeac344",
+      "origin": "self-authored synthetic fixture",
+      "hancom2024": "NOT_RUN"
+    },
+    {
+      "path": "agent-style-create-native/applied-new-style.hwpx",
+      "bytes": 7445,
+      "sha256": "17267505ca4839c50631ec8b6651c9a6525ae87f217627468e7dac0df9d99d0d",
+      "origin": "self-authored synthetic fixture",
+      "hancom2024": "NOT_RUN"
+    },
+    {
+      "path": "agent-style-create-native/created-22-14.hwp",
+      "bytes": 12800,
+      "sha256": "e186a0bcd9aa764f05e5e609765e663a238db8a64d92bb643fe6c12678905c48",
+      "origin": "self-authored synthetic fixture",
+      "hancom2024": "NOT_RUN"
+    },
+    {
+      "path": "agent-style-create-native/created-22-14.hwpx",
+      "bytes": 7467,
+      "sha256": "cd62536049bef956ea0e13b601e4820032360f5df187b52407147a43592765a9",
+      "origin": "self-authored synthetic fixture",
+      "hancom2024": "NOT_RUN"
+    },
+    {
+      "path": "agent-style-create-native/created-22-2.hwp",
+      "bytes": 12800,
+      "sha256": "7fae049a2c976cc30ca4dd27ba88580d158000e7482d3269427f8def1d5b7803",
+      "origin": "self-authored synthetic fixture",
+      "hancom2024": "NOT_RUN"
+    },
+    {
+      "path": "agent-style-create-native/created-22-2.hwpx",
+      "bytes": 7428,
+      "sha256": "a93871915832e319790a69df8685502d70b934cc8c138b083de17ad2983c7107",
+      "origin": "self-authored synthetic fixture",
+      "hancom2024": "NOT_RUN"
+    },
+    {
+      "path": "agent-style-create-native/created-22-5.hwp",
+      "bytes": 12800,
+      "sha256": "8605e38e7e6a4636dc0b6f726abce486980f49c77c04d3b3db984be8f73be651",
+      "origin": "self-authored synthetic fixture",
+      "hancom2024": "NOT_RUN"
+    },
+    {
+      "path": "agent-style-create-native/created-22-5.hwpx",
+      "bytes": 7433,
+      "sha256": "d76acaef522f9bd8d12507dac6e17027089a7986a7a9067ae47f11dfc70374c3",
+      "origin": "self-authored synthetic fixture",
+      "hancom2024": "NOT_RUN"
+    },
+    {
+      "path": "agent-style-create-native/stored-style-not-effective-body.hwpx",
+      "bytes": 7478,
+      "sha256": "e08f1b44a91213a1c4b51ed3f14a9e83314f0571236fc10b23a5b5dcc4066e45",
+      "origin": "self-authored synthetic fixture",
+      "hancom2024": "NOT_RUN"
+    },
+    {
+      "path": "agent-style-create-browser/applied-new-style.hwp",
+      "bytes": 12800,
+      "sha256": "79a3f5e0a792c45e69d752b48160fb4ef290e674df0054e4822d8c5bbc499325",
+      "origin": "self-authored synthetic fixture",
+      "hancom2024": "NOT_RUN"
+    },
+    {
+      "path": "agent-style-create-browser/applied-new-style.hwpx",
+      "bytes": 7438,
+      "sha256": "9b80dfbe3120ab9616e3b59731120f2678322282bf77a64b398fd8ae7ca8eefa",
+      "origin": "self-authored synthetic fixture",
+      "hancom2024": "NOT_RUN"
+    },
+    {
+      "path": "agent-style-create-browser/created-anthropic.hwpx",
+      "bytes": 7431,
+      "sha256": "c9d8eb6cf7162138242b23903dc0f9f64cef5a6ebe29d5214d4f8c7940ba0b96",
+      "origin": "self-authored synthetic fixture",
+      "hancom2024": "NOT_RUN"
+    },
+    {
+      "path": "agent-style-create-browser/created-gemini.hwpx",
+      "bytes": 7431,
+      "sha256": "c9d8eb6cf7162138242b23903dc0f9f64cef5a6ebe29d5214d4f8c7940ba0b96",
+      "origin": "self-authored synthetic fixture",
+      "hancom2024": "NOT_RUN"
+    },
+    {
+      "path": "agent-style-create-browser/created-openai-compatible.hwpx",
+      "bytes": 7431,
+      "sha256": "c9d8eb6cf7162138242b23903dc0f9f64cef5a6ebe29d5214d4f8c7940ba0b96",
+      "origin": "self-authored synthetic fixture",
+      "hancom2024": "NOT_RUN"
+    },
+    {
+      "path": "agent-style-create-browser/created-openai-responses.hwpx",
+      "bytes": 7431,
+      "sha256": "c9d8eb6cf7162138242b23903dc0f9f64cef5a6ebe29d5214d4f8c7940ba0b96",
+      "origin": "self-authored synthetic fixture",
+      "hancom2024": "NOT_RUN"
+    },
+    {
+      "path": "agent-style-create-browser/manual-new-style.hwpx",
+      "bytes": 7451,
+      "sha256": "8fbf5cf1cdeec32a7b9feeeb9443d203e9144ab23ff9b83b2386b1f683d305ac",
+      "origin": "self-authored synthetic fixture",
+      "hancom2024": "NOT_RUN"
+    }
+  ],
+  "manualChecks": [
+    "Open in native Hancom 2024 and compare original text and formatting.",
+    "Check new paragraph style name and self next style in style dialog.",
+    "Check applied-new-style files select the new style on first body paragraph.",
+    "Save in Hancom and reopen in Jueony; record schema and visual differences separately."
+  ]
+}

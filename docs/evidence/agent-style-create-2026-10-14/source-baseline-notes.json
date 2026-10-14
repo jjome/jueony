@@ -1,0 +1,20 @@
+{
+  "implementationCommit": "adacbebd7aa33071ec4befec66d76dbb0d9b9fbe",
+  "manualUiFixCommit": "357a1e6",
+  "applicationSourceCommit": "adacbebd7aa33071ec4befec66d76dbb0d9b9fbe",
+  "applicationSourceDirty": true,
+  "customSourceSha256": "37648a7eb21af64b355d6a6cf027fe95d39f3c1111f24eee52a0b2606be5ffa5",
+  "engineSourceId": "c1700d31d7fa3af7",
+  "wasmSha256": "3b5028ea80f754b6564aa17c1fdb5b14322ce61dd8456ab94cdfc9178c0d9515",
+  "upstreamReference": "1a76570e833917d15817415a53c09ad61ab3203f",
+  "engineChanged": false,
+  "candidatePreserved": "build/jueony-agent-style-create-20261014 @4288",
+  "finalBundle": "build/jueony-agent-style-create-20261014-v2 @4290",
+  "notes": [
+    "Existing immutable c1700 engine reused. New TypeScript domain and adapter reuse getStoredStyleDetail/createStyle.",
+    "New style references exact existing stored char/para resources, self next ID, empty English name, language Korean and unlocked. No inherited or independent custom shape clone.",
+    "Manual dropdown and style panel synchronize on creation, undo/redo and caret events; native current caret style determines selection.",
+    "Expected loss-save rejections in related bullet regression are intentional and remain blocked.",
+    "No native Hancom GUI/layout comparison or paid-model invocation performed. Full documented scope incomplete; automation remains active."
+  ]
+}

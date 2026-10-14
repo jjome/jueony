@@ -1,3 +1,4 @@
+import {assertNativeTableWritable,protectedTableEvidence,assertProtectedTableUnchanged} from './table-write-guard.ts';
 import {executeAgentTableHeader} from './agent-table-header.ts';
 import {executeAgentTablePagination} from './agent-table-pagination.ts';
 import {executeAgentNextParagraphStyle} from './agent-style-next.ts';
@@ -75,6 +76,7 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
   if (op.kind === 'set_page_setup') { checked(doc.setPageDef(op.section, JSON.stringify(pageProperties(parsed(doc.getPageDef(op.section)), op.properties)))); return; }
   if(tableAxisKinds.includes(op.kind)) {
     const axis=op as Extract<ControlOp,{index:number}>,table=tables.get(axis.target)!;
+    assertNativeTableWritable(doc,table);
     const expected=tableAxisPlan(table,axis),row=axis.kind.endsWith('_row'),insert=axis.kind.startsWith('insert_');
     const base=[table.section,table.paragraph,table.control],size=row?table.rows:table.columns;
     const method=({insert_table_row:'insertTableRow',insert_table_column:'insertTableColumn',delete_table_row:'deleteTableRow',delete_table_column:'deleteTableColumn'} as any)[axis.kind];
@@ -121,19 +123,22 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
   const base = [table.section, table.paragraph, table.control];
   if (op.kind === 'set_table_cell') {
     const cell = table.cells.find(c => c.row === op.row && c.column === op.column)!;
+    assertNativeTableWritable(doc,table,[cell.index]);
     const length = doc.getCellParagraphLength(...base, cell.index, 0);
     if (doc.getTextInCell(...base, cell.index, 0, 0, length) !== op.originalText) fail('적용 직전 셀 원문이 달라졌습니다.');
+    const protectedBefore=protectedTableEvidence(doc,table);
     replaceCellText(doc,base,cell.index,op.text);
+    assertProtectedTableUnchanged(doc,table,protectedBefore);
     if (doc.getTextInCell(...base, cell.index, 0, 0, doc.getCellParagraphLength(...base, cell.index, 0)) !== op.text) fail('셀 편집 결과가 다릅니다.');
     cell.text = op.text;
-  } else for (const cell of selectedCells(table, op)) {
+  } else {assertNativeTableWritable(doc,table,selectedCells(table,op).map(c=>c.index));const protectedBefore=protectedTableEvidence(doc,table);for (const cell of selectedCells(table, op)) {
     const p = op.properties, chars = charProperties(doc,p), length = doc.getCellParagraphLength(...base, cell.index, 0);
     if (Object.keys(chars).length && length) checked(doc.applyCharFormatInCell(...base, cell.index, 0, 0, length, JSON.stringify(chars)));
     if (p.alignment) checked(doc.applyParaFormatInCell(...base, cell.index, 0, JSON.stringify({ alignment: p.alignment })));
     const cp: any = {};
     // OWPML omits hatchStyle for plain fills; -1 is the engine's no-pattern value.
-    if (p.background) Object.assign(cp, { fillType: 'solid', fillColor: p.background, patternType: -1 });
+    if (p.background) {const original=parsed(doc.getCellProperties(...base,cell.index));Object.assign(cp,Object.fromEntries(['borderLeft','borderRight','borderTop','borderBottom','patternColor','diagonalLine','diagonalSlash','diagonalBackSlash','diagonalWidth','diagonalColor','centerLine'].map(key=>[key,original[key]])),{ fillType: 'solid', fillColor: p.background, patternType: -1 });}
     if (p.verticalAlignment) cp.verticalAlign = ['top', 'center', 'bottom'].indexOf(p.verticalAlignment as string);
     if (Object.keys(cp).length) checked(doc.setCellProperties(...base, cell.index, JSON.stringify(cp)));
-  }
+  }assertProtectedTableUnchanged(doc,table,protectedBefore);}
 }

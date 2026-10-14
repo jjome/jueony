@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-agent-table-header-20261014/Start-Review.cmd)**로 실행한다(4298). 표 메뉴의 ‘첫 제목 행·반복’과 AI 명령으로 첫 행 전체 지정/해제·반복·쪽 나눔을 한 번에 설정한다. 실제 다음 쪽의 제목 반복·취소/선택 유지·undo/redo·HWP/HWPX 재열기를 검증했다. [사용법·검증·제한](docs/85-table-title-row-repeat.md)을 확인한다. 여러 제목 행·복잡한 표·한글 직접 비교는 남는다. 기존 기능도 포함한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-table-protection-20261014/Start-Review.cmd)**로 실행한다(4300). 보호 셀의 AI 내용·서식·행/열 편집 우회를 차단하고, 비보호 이웃의 편집과 배경색 변경은 보호 셀의 내용/경계선을 유지한다. 실제 Native 보호 재검사·실패 원복·undo/redo·HWP/HWPX 재열기를 검증했다. [수정 전 재현·정책·검증·제한](docs/86-ai-table-protection.md)을 확인한다. 첫 제목 행 반복과 기존 기능도 포함하며 복잡한 표·한글 직접 비교는 남는다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

@@ -1,13 +1,13 @@
 /** Detached JSON data. No engine handles cross this boundary. */
 export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 export type DocumentProperties = { [key: string]: JsonValue | undefined };
-export type Cell = { index: number; row: number; column: number; rowSpan: number; columnSpan: number; text: string; editable: boolean; properties: DocumentProperties; characters?: DocumentProperties; paragraphProperties?: DocumentProperties };
+export type Cell = { index: number; row: number; column: number; rowSpan: number; columnSpan: number; text: string; editable: boolean; reason?:string; properties: DocumentProperties; characters?: DocumentProperties; paragraphProperties?: DocumentProperties };
 export type TablePaginationMode='none'|'cell'|'row';
 export type AgentTableHeaderOp={kind:'set_table_header';target:string;headerRows:0|1;repeatHeader:boolean;paginationMode:TablePaginationMode};
 export type AgentTableHeaderSource=AgentTablePaginationSource&{headerRows?:0|1;repeatHeader?:boolean};
 export type AgentTablePaginationOp={kind:'set_table_pagination';target:string;mode:TablePaginationMode};
 export type AgentTablePaginationSource={editable:boolean;mode?:TablePaginationMode;fingerprint?:string;reason?:string};
-export type Table = { id: string; section: number; paragraph: number; control: number; headerRows?:0|1|null; pagination?:{mode:TablePaginationMode;repeatHeader:boolean}; rows: number; columns: number; cells: Cell[] };
+export type Table = { editable?:boolean; reason?:string; id: string; section: number; paragraph: number; control: number; headerRows?:0|1|null; pagination?:{mode:TablePaginationMode;repeatHeader:boolean}; rows: number; columns: number; cells: Cell[] };
 export type LineNumberRestart = 'page' | 'section' | 'continuous';
 export type AgentLineNumbers = {enabled:boolean;restart:LineNumberRestart|null;countBy:number;startNumber:number;distanceMm:number;editable:boolean};
 export type AgentPageBackground = {kind:'both'|'even'|'odd';fillType:string;color:string|null;applyPage:string;hideFill?:boolean;firstPageFill?:boolean;editable:boolean;reason?:string};

@@ -44,10 +44,11 @@ function properties(value: unknown, rules: Record<string, PropertyRule>) {
 }
 type AxisOperation = Extract<ControlOp, {index:number}>;
 export function tableAxisPlan(table:Table,op:AxisOperation):Table {
+ if(table.editable===false)fail('보호 표는 AI로 행·열을 편집하지 않습니다.');if(table.cells.some(c=>c.properties.cellProtect===true))fail('보호 셀이 있는 표는 AI로 행·열을 편집하지 않습니다.');
  const values = 'values' in op ? op.values : [];
  const row=op.kind.endsWith('_row'),insert=op.kind.startsWith('insert_');
  only(op,insert?['kind','target','index','values']:['kind','target','index']);
- if(table.cells.length!==table.rows*table.columns||table.cells.some(c=>!c.editable||c.rowSpan!==1||c.columnSpan!==1))fail('행·열 편집은 병합·중첩·혼합 서식이 없는 단순 표만 지원합니다.');
+ if(table.cells.length!==table.rows*table.columns||table.cells.some(c=>!c.editable||c.properties.cellProtect===true||c.rowSpan!==1||c.columnSpan!==1))fail('행·열 편집은 병합·중첩·혼합 서식이 없는 단순 표만 지원합니다.');
  const size=row?table.rows:table.columns,other=row?table.columns:table.rows;
  integer(op.index,0,insert?size:size-1);
  if(!insert&&size===1)fail('표의 마지막 행 또는 열은 삭제할 수 없습니다.');
@@ -197,19 +198,20 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
       tables.set(op.target,tableAxisPlan(table!,op));
       if('values' in op)generated+=op.values.join('').length;
     } else if (op.kind === 'set_table_cell' || op.kind === 'format_table_cells') {
-      const table = tables.get(op.target); if (!table) fail('현재 문서 또는 이번 요청에서 만든 표 ID가 필요합니다.');
+      const table = tables.get(op.target); if (!table) fail('현재 문서 또는 이번 요청에서 만든 표 ID가 필요합니다.');if(table!.editable===false)fail('보호 표는 AI로 편집하지 않습니다.');
       if (op.kind === 'set_table_cell') {
         only(op, ['kind', 'target', 'row', 'column', 'originalText', 'text']);
         integer(op.row, 0, table!.rows - 1); integer(op.column, 0, table!.columns - 1);
         const cell = table!.cells.find(c => c.row === op.row && c.column === op.column);
-        if (!cell?.editable || cell.rowSpan !== 1 || cell.columnSpan !== 1 || cell.text !== op.originalText) fail('셀 원문이 다르거나 복잡한 셀입니다.');
+        if(cell?.properties.cellProtect===true)fail('보호 셀은 AI로 내용을 수정하지 않습니다.');
+        if (!cell?.editable || cell.properties.cellProtect===true || cell.rowSpan !== 1 || cell.columnSpan !== 1 || cell.text !== op.originalText) fail('셀 원문이 다르거나 복잡한 셀입니다.');
         generated += text(op.text).length; cell!.text = op.text;
       } else {
         only(op, ['kind', 'target', 'startRow', 'rowCount', 'startColumn', 'columnCount', 'properties']);
         integer(op.startRow, 0, table!.rows - 1); integer(op.rowCount, 1, table!.rows - op.startRow); integer(op.startColumn, 0, table!.columns - 1); integer(op.columnCount, 1, table!.columns - op.startColumn);
         properties(op.properties, cellRules);
-        const cells = selectedCells(table!, op);
-        if (cells.length !== op.rowCount * op.columnCount || cells.some(c => !c.editable || c.rowSpan !== 1 || c.columnSpan !== 1)) fail('병합 셀 또는 복잡한 셀 서식은 아직 지원하지 않습니다.');
+        const cells = selectedCells(table!, op);if(cells.some(c=>c.properties.cellProtect===true))fail('보호 셀은 AI로 서식을 수정하지 않습니다.');
+        if (cells.length !== op.rowCount * op.columnCount || cells.some(c => !c.editable || c.properties.cellProtect===true || c.rowSpan !== 1 || c.columnSpan !== 1)) fail('병합 셀 또는 복잡한 셀 서식은 아직 지원하지 않습니다.');
         if (Object.keys(op.properties).some(k => k in charRules) && cells.some(c => !c.text)) fail('빈 셀의 글자 서식은 텍스트 입력 후 적용하세요.');
       }
     } else fail('지원하지 않는 구조 편집 명령입니다.');

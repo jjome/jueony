@@ -59,11 +59,12 @@ export function readStructure(wasm: any): Structure {
       const list = lists.find((l: any) => l.isCell && l.sectionIndex === section && l.hostPara === paragraph && l.controlIndex === ci && l.cellIndex === i && l.hostListId === 0);
       const runs = count === 1 ? parsed(doc.getCharShapeRunsInCellByPath(section, paragraph, JSON.stringify([{ controlIndex: ci, cellIndex: i, cellParaIndex: 0 }]), 0, doc.getCellParagraphLength(section, paragraph, ci, i, 0))) : [];
       const simple = count === 1 && new Set(runs.map((r: any) => r.charShapeId)).size <= 1 && Array.from(texts[0]).length <= 4000 && list && !controls.some((c: any) => c.list === list.listId);
-      cells.push({ index: i, row: info.row, column: info.col, rowSpan: info.rowSpan, columnSpan: info.colSpan, text: texts.join('\n'), editable: Boolean(simple), properties: parsed(doc.getCellProperties(section, paragraph, ci, i)), characters: parsed(doc.getCellCharPropertiesAt(section, paragraph, ci, i, 0, 0)), paragraphProperties: parsed(doc.getCellParaPropertiesAt(section, paragraph, ci, i, 0)) });
+      const properties=parsed(doc.getCellProperties(section,paragraph,ci,i));
+      cells.push({ index: i, row: info.row, column: info.col, rowSpan: info.rowSpan, columnSpan: info.colSpan, text: texts.join('\n'), editable: Boolean(simple)&&properties.cellProtect===false&&control.props?.Lock===0, ...(properties.cellProtect!==false?{reason:'보호 셀 또는 보호 상태를 확인할 수 없는 셀입니다.'}:control.props?.Lock!==0?{reason:'보호 표 또는 보호 상태를 확인할 수 없는 표입니다.'}:{}), properties, characters: parsed(doc.getCellCharPropertiesAt(section, paragraph, ci, i, 0, 0)), paragraphProperties: parsed(doc.getCellParaPropertiesAt(section, paragraph, ci, i, 0)) });
     }
     const tableProps=parsed(doc.getTableProperties(section,paragraph,ci)),mode=(['none','cell','row'] as const)[tableProps.pageBreak];
     const headerRows=cells.every(c=>c.properties.isHeader===false)?0:cells.every(c=>c.properties.isHeader===(c.row===0))?1:null;
-    tables.push({headerRows, ...(mode!==undefined?{pagination:{mode,repeatHeader:tableProps.repeatHeader}}:{}), id: `s${section}p${paragraph}t${ci}`, section, paragraph, control: ci, rows: dimensions.rowCount, columns: dimensions.colCount, cells });
+    tables.push({editable:control.props?.Lock===0,...(control.props?.Lock!==0?{reason:'보호 표 또는 보호 상태를 확인할 수 없는 표입니다.'}:{}),headerRows, ...(mode!==undefined?{pagination:{mode,repeatHeader:tableProps.repeatHeader}}:{}), id: `s${section}p${paragraph}t${ci}`, section, paragraph, control: ci, rows: dimensions.rowCount, columns: dimensions.colCount, cells });
   }
   const styleLinks=parsed(doc.getStyleList()).map((style:any)=>({id:style.id,nextStyleId:style.nextStyleId}));
   const styles=parsed(doc.getStyleList()).map((style:any)=>({id:style.id,name:style.name,type:style.type}));

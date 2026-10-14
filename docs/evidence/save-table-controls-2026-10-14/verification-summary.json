@@ -1,0 +1,178 @@
+{
+  "status": "PASS_SCOPED_WITH_REMAINING_EDITOR_LIMITS",
+  "checkedAt": "2026-10-14T15:16:07.908Z",
+  "unitPassed": 710,
+  "providerPassed": 52,
+  "wasmPassed": 178,
+  "browserPassed": 161,
+  "moduleCount": 9,
+  "moduleFiles": 284,
+  "reports": [
+    {
+      "category": "table-multi-header-native",
+      "kind": "native",
+      "passed": 16
+    },
+    {
+      "category": "agent-table-header-native",
+      "kind": "native",
+      "passed": 15
+    },
+    {
+      "category": "agent-table-pagination-native",
+      "kind": "native",
+      "passed": 15
+    },
+    {
+      "category": "table-protection-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "table-conversion-native",
+      "kind": "native",
+      "passed": 17
+    },
+    {
+      "category": "styles-native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "style-stories-native",
+      "kind": "native",
+      "passed": 4
+    },
+    {
+      "category": "agent-style-next-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "agent-native",
+      "kind": "native",
+      "passed": 13
+    },
+    {
+      "category": "memo-native",
+      "kind": "native",
+      "passed": 5
+    },
+    {
+      "category": "following-native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "outer-native",
+      "kind": "native",
+      "passed": 4
+    },
+    {
+      "category": "width-native",
+      "kind": "native",
+      "passed": 12
+    },
+    {
+      "category": "equal-native",
+      "kind": "native",
+      "passed": 12
+    },
+    {
+      "category": "owner-native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "host-native",
+      "kind": "native",
+      "passed": 10
+    },
+    {
+      "category": "default-native",
+      "kind": "native",
+      "passed": 9
+    },
+    {
+      "category": "table-multi-header-browser",
+      "kind": "browser",
+      "passed": 20
+    },
+    {
+      "category": "agent-table-header-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "agent-table-pagination-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "table-protection-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "table-conversion-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "selected-object-browser",
+      "kind": "browser",
+      "passed": 16
+    },
+    {
+      "category": "agent-style-next-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "agent-browser",
+      "kind": "browser",
+      "passed": 15
+    },
+    {
+      "category": "width-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "equal-browser",
+      "kind": "browser",
+      "passed": 15
+    }
+  ],
+  "engineSourceId": "424262393ae01deb",
+  "wasmSha256": "d63becfd91d3094f6df4a88ed0aaf50996b3a4d82cb69bd5ae5742a99f266169",
+  "customSourceSha256": "b1c4f1c87608c1f4c8addc07db57f5fb6ffcde22c205b431d5d11bd41a530b49",
+  "applicationSourceCommit": "612d21bbcf1503978507fda53f7e481e5c75b16a",
+  "applicationSourceDirty": true,
+  "publicCorpus": {
+    "originals": 5,
+    "exports": 10,
+    "checked": 6,
+    "blocked": 4,
+    "note": "Original hashes checked; public inputs/outputs not redistributed; no model calls."
+  },
+  "outerMarginBefore": {
+    "passed": 0,
+    "failed": 4
+  },
+  "fixed": [
+    "Non-overlapping whole following-table saved anchors no longer reuse a proven occupied flow band.",
+    "Owned MEMO_LIST carriers attach to unique Memo fields; genuine empty body paragraphs survive.",
+    "Four table outer margins update semantic, common-object and optional raw cache ownership together.",
+    "Explicit complete-column width in mm executes through the same neutral contract and native command; only selected widths/common total may change."
+  ],
+  "unresolved": [
+    "HWP overlap-enabled following-table roundtrip and four public cross-format preservation blocks; normal HWP Agent geometry remains readonly.",
+    "Row heights, merged/nested table Agent control and remaining documented editor scope."
+  ],
+  "limits": [
+    "Same-engine/Canvas tests; independent Hancom 2024, paid model credentials and Native Rust unit suite NOT_RUN.",
+    "Related current table/style/object regressions, not all historical editor tests; before failures excluded from PASS counts.",
+    "Automation remains active because full documented scope is incomplete."
+  ]
+}

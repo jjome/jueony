@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-table-default-padding-20261014/Start-Review.cmd)**로 실행한다(4308). 표 기본 안 여백 변경 시 상속 셀의 줄바꿈을 갱신하고, 여백·크기 변경 뒤 이전 행 배분 캐시를 재사용하던 문제를 수정했다. 수동 속성 창의 취소·undo/redo·HWP/HWPX 저장 재열기를 검증했다. HWP의 후속 표 앵커 문제는 남아 해당 AI 안 여백 제한을 유지한다. [수정 범위·검증·남은 진단](docs/90-table-default-padding-reflow.md)을 확인한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-save-table-controls-20261015/Start-Review.cmd)**로 실행한다(4314). HWP 후속 표와 메모 보관용 문단의 저장 소유, 표 바깥 여백의 화면/저장 불일치를 수정하고 HWPX AI 열 너비 mm 지정을 추가했다. [저장 수정](docs/93-storage-table-and-memo-ownership.md), [표 크기 계약·검증·제한](docs/94-table-width-and-outer-margins.md)을 따른다. HWP 겹침 허용 표와 일부 형식 변환은 여전히 제한되며, 높이·병합/중첩 Agent 제어와 한글 전수 비교는 남아 있다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

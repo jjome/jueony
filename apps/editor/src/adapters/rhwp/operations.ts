@@ -44,7 +44,7 @@ function replaceCellText(doc:any,base:number[],cell:number,value:string) {
 }
 export function executeControlOperation(wasm: any, snapshot: Snapshot, op: ControlOp, tables: Map<string, Table>): { section: number; after: number; count: number } | undefined {
   const doc = nativeDocument(wasm);
-  if(op.kind==='format_table_cells'&&Object.hasOwn(op.properties,'equalizeColumns')){executeEqualColumns(doc,snapshot,op);return;}
+  if(op.kind==='format_table_cells'&&(Object.hasOwn(op.properties,'equalizeColumns')||Object.hasOwn(op.properties,'columnWidthMm'))){executeEqualColumns(doc,snapshot,op);return;}
   if(op.kind==='format_table_cells'&&Object.keys(op.properties).some(k=>k.startsWith('padding'))){executeCellPadding(doc,snapshot,op);return;}
   if(op.kind==='set_table_header'){executeAgentTableHeader(doc,snapshot,op);return;}
   if(op.kind==='set_table_pagination'){executeAgentTablePagination(doc,snapshot,op);return;}

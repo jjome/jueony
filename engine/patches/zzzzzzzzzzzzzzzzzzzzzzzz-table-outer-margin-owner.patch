@@ -1,0 +1,57 @@
+--- a/src/document_core/commands/table_ops.rs
++++ b/src/document_core/commands/table_ops.rs
+@@ -2998,28 +2998,32 @@
+             );
+         }
+ 
+-        // 바깥 여백 (CommonObjAttr margin ranges, parse_common_obj_attr 정합)
+-        if table.raw_ctrl_data.len() >= common_obj_offsets::MARGIN_BOTTOM.end {
+-            if let Some(v) = json_i16(json, "outerLeft") {
+-                table.raw_ctrl_data[common_obj_offsets::MARGIN_LEFT]
+-                    .copy_from_slice(&v.to_le_bytes());
+-                table.common.margin.left = v;
+-            }
+-            if let Some(v) = json_i16(json, "outerRight") {
+-                table.raw_ctrl_data[common_obj_offsets::MARGIN_RIGHT]
+-                    .copy_from_slice(&v.to_le_bytes());
+-                table.common.margin.right = v;
+-            }
+-            if let Some(v) = json_i16(json, "outerTop") {
+-                table.raw_ctrl_data[common_obj_offsets::MARGIN_TOP]
+-                    .copy_from_slice(&v.to_le_bytes());
+-                table.common.margin.top = v;
+-            }
+-            if let Some(v) = json_i16(json, "outerBottom") {
+-                table.raw_ctrl_data[common_obj_offsets::MARGIN_BOTTOM]
+-                    .copy_from_slice(&v.to_le_bytes());
+-                table.common.margin.bottom = v;
+-            }
++        // Both semantic copies are consumed: placement/HWPX read the table
++        // margins, while HWP common-object lowering reads common.margin. Raw
++        // CTRL bytes are an optional cache, not permission to edit the model.
++        if let Some(v) = json_i16(json, "outerLeft") {
++            table.outer_margin_left = v;
++            table.common.margin.left = v;
++            patch_raw_ctrl_field(&mut table.raw_ctrl_data,
++                common_obj_offsets::MARGIN_LEFT, &v.to_le_bytes());
++        }
++        if let Some(v) = json_i16(json, "outerRight") {
++            table.outer_margin_right = v;
++            table.common.margin.right = v;
++            patch_raw_ctrl_field(&mut table.raw_ctrl_data,
++                common_obj_offsets::MARGIN_RIGHT, &v.to_le_bytes());
++        }
++        if let Some(v) = json_i16(json, "outerTop") {
++            table.outer_margin_top = v;
++            table.common.margin.top = v;
++            patch_raw_ctrl_field(&mut table.raw_ctrl_data,
++                common_obj_offsets::MARGIN_TOP, &v.to_le_bytes());
++        }
++        if let Some(v) = json_i16(json, "outerBottom") {
++            table.outer_margin_bottom = v;
++            table.common.margin.bottom = v;
++            patch_raw_ctrl_field(&mut table.raw_ctrl_data,
++                common_obj_offsets::MARGIN_BOTTOM, &v.to_le_bytes());
+         }
+ 
+         // 캡션 생성/수정

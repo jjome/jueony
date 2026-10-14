@@ -1,0 +1,131 @@
+{
+  "status": "PASS_SCOPED_CHECKS_WITH_UNRESOLVED_HWP_DIAGNOSTICS",
+  "checkedAt": "2026-10-14T13:21:02.873Z",
+  "unitPassed": 695,
+  "providerPassed": 52,
+  "wasmPassed": 133,
+  "browserPassed": 128,
+  "moduleCount": 9,
+  "moduleFiles": 281,
+  "reports": [
+    {
+      "category": "native",
+      "kind": "native",
+      "passed": 9
+    },
+    {
+      "category": "host-native",
+      "kind": "native",
+      "passed": 10
+    },
+    {
+      "category": "agent-native",
+      "kind": "native",
+      "passed": 13
+    },
+    {
+      "category": "agent-browser",
+      "kind": "browser",
+      "passed": 15
+    },
+    {
+      "category": "table-multi-header-native",
+      "kind": "native",
+      "passed": 16
+    },
+    {
+      "category": "table-multi-header-browser",
+      "kind": "browser",
+      "passed": 20
+    },
+    {
+      "category": "agent-table-header-native",
+      "kind": "native",
+      "passed": 15
+    },
+    {
+      "category": "agent-table-header-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "table-protection-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "table-protection-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "agent-table-pagination-native",
+      "kind": "native",
+      "passed": 15
+    },
+    {
+      "category": "agent-table-pagination-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "table-conversion-native",
+      "kind": "native",
+      "passed": 17
+    },
+    {
+      "category": "table-conversion-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "selected-object-browser",
+      "kind": "browser",
+      "passed": 16
+    },
+    {
+      "category": "styles-native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "style-stories-native",
+      "kind": "native",
+      "passed": 4
+    },
+    {
+      "category": "agent-style-next-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "agent-style-next-browser",
+      "kind": "browser",
+      "passed": 14
+    }
+  ],
+  "unresolved": [
+    {
+      "mode": "multiple-tables",
+      "status": "UNRESOLVED_NATIVE_DIAGNOSTIC",
+      "discrepancy": "layout[0].controls[1].y: 242 != 178.7"
+    }
+  ],
+  "resolvedDiagnostics": [
+    {
+      "mode": "zero-defaults",
+      "status": "MATCHED_NATIVE_DIAGNOSTIC"
+    }
+  ],
+  "engineSourceId": "3cb8152e4498fbbb",
+  "wasmSha256": "0f71ca3992a728ea93b5f88907d07555dbefce533cbd8e8ab192e7ba4cb37179",
+  "customSourceSha256": "e81f3d5b737f80f79026c48a1be9b818eb3a9eaa4cef3d90446fadc86cf46512",
+  "applicationSourceCommit": "a9ffb18eed73117088be70ac9dba977a774bea95",
+  "applicationSourceDirty": true,
+  "limits": [
+    "Effective table-default content widths now republish inherited stored rows; explicit cell/table geometry invalidates only that table derived row-allocation floor. Styled zero-default HWP diagnostic is fixed, including prior saved failing input. Multiple-table following anchor still differs; normal HWP Agent padding remains readonly.",
+    "Actual geometry/preservation gates retained; renamed input with injected geometry refuses. Native HWP diagnosis files are not successful Agent outputs.",
+    "Same-engine roundtrip only; independent Hancom 2024 comparison, paid models and Native Rust unit suite NOT_RUN. Fresh WSL release WASM built.",
+    "Current unit/provider suites and related table/style/selected-object regressions; not all historical editor tests. Full documented scope incomplete."
+  ]
+}

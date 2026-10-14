@@ -32,3 +32,5 @@ Native 검사는 실제 HWP/HWPX 저장 줄 폭, 좁힘/넓힘에 따른 줄 수
 독립 한글 2024 비교와 유료 모델 호출, Native Rust unit suite는 이번 범위에 포함하지 않는다. 네 provider는 합성 프로토콜로 검사한다. 전체 표·개체·고급 편집·한글 동등성과 후속 앵커 오류는 미완료이며 자동화를 유지한다.
 
 최종 자동 검사: 단위 695·provider/server 52·관련 실제 WASM 133·Edge 128 통과. 신규 기본 여백 Native 9개, 기존 단순 host Native 10개, 안 여백 Native 13/Edge 15개와 표 제목 행·보호·쪽 나눔·변환·선택 개체·스타일 회귀다. 미해결 후속 표 앵커 진단은 통과 수에 포함하지 않는다. 예상 밖 page/console 오류·외부 자산 요청은 0건이며 TypeScript와 9개 모듈/281개 소스 경계도 통과했다. [검사별 결과](evidence/table-default-padding-2026-10-14/verification-summary.json), [이전 엔진 기준선](evidence/table-default-padding-2026-10-14/before-engine.json)을 따른다. 전체 편집기 누적 검사를 모두 재실행한 수치는 아니다.
+
+구현 `0ebdc52` 커밋·푸시 완료. 엔진 `3cb8152e4498fbbb`, WASM SHA-256 `0f71ca3992a728ea93b5f88907d07555dbefce533cbd8e8ab192e7ba4cb37179`, 앱 소스 SHA-256 `e81f3d5b737f80f79026c48a1be9b818eb3a9eaa4cef3d90446fadc86cf46512`. [실제 4308 서버 대조](evidence/table-default-padding-2026-10-14/launch-check.json), [Git 패치 바이트/원본·제한](evidence/table-default-padding-2026-10-14/source-baseline-notes.json), [검수 파일 분류와 한글 확인 순서](evidence/table-default-padding-2026-10-14/documents.json)를 보존했다. 사용자 원본과 기존 실행 창은 유지한다.

@@ -1,0 +1,27 @@
+{
+  "implementationCommit": "0ebdc52",
+  "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+  "engineSourceId": "3cb8152e4498fbbb",
+  "wasmSha256": "0f71ca3992a728ea93b5f88907d07555dbefce533cbd8e8ab192e7ba4cb37179",
+  "customSourceSha256": "e81f3d5b737f80f79026c48a1be9b818eb3a9eaa4cef3d90446fadc86cf46512",
+  "committedPatchSha256": "903260c4c371a2a1d4b0afa72f8f0e1f191db936bd6e055a974a0a4295badf0e",
+  "patchWorkingBytesEqualGitBlob": true,
+  "build": "WSL_RELEASE_BINDGEN_WEB_NO_WASM_OPT",
+  "scope": "Effective inherited widths and per-table geometry measurement invalidation; no relaxed persistence or protected-source gates.",
+  "nativeHancomComparison": "NOT_RUN",
+  "paidModelTest": "NOT_RUN",
+  "nativeRustUnitSuite": "NOT_RUN",
+  "unresolved": [
+    {
+      "mode": "multiple-tables",
+      "status": "UNRESOLVED_NATIVE_DIAGNOSTIC",
+      "discrepancy": "layout[0].controls[1].y: 242 != 178.7"
+    }
+  ],
+  "resolvedDiagnostics": [
+    {
+      "mode": "zero-defaults",
+      "status": "MATCHED_NATIVE_DIAGNOSTIC"
+    }
+  ]
+}

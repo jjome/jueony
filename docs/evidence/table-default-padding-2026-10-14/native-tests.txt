@@ -1,0 +1,9 @@
+PASS hwp: table horizontal defaults publish current inherited widths and leave custom cells untouched
+PASS hwpx: table horizontal defaults publish current inherited widths and leave custom cells untouched
+PASS hwp: zero defaults with font-size neighbor then custom/inherited cell padding stays stable
+PASS hwpx: zero defaults with font-size neighbor then custom/inherited cell padding stays stable
+PASS hwp: narrower and wider table defaults rewrap inherited text without losing or changing custom cell rows
+PASS hwpx: narrower and wider table defaults rewrap inherited text without losing or changing custom cell rows
+PASS hwp: top/bottom-only defaults do not republish unrelated horizontal line records
+PASS hwpx: top/bottom-only defaults do not republish unrelated horizontal line records
+PASS previously recorded HWP zero-default diagnostic also stays stable after an ordinary cell margin edit

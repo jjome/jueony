@@ -47,3 +47,5 @@ HWP, 기존 병합·중첩·보호·혼합 run/복합 셀, 셀 간 속성이 다
 4. 최종 한글 2024 비교를 일괄 수행한다. 전체 범위는 미완료이며 자동화를 유지한다.
 
 최종 관련 검사: 단위 725개·provider/server 52개·실제 WASM 201개·Edge 187개 통과. TypeScript와 9개 모듈/288개 소스 경계를 확인했다. 예상 밖 page/console 오류·외부 요청은 0건이다. 엔진 `424262393ae01deb`, WASM SHA-256 `d63becfd91d3094f6df4a88ed0aaf50996b3a4d82cb69bd5ae5742a99f266169`를 재사용하며 앱 소스 SHA-256은 `595e13ff9e4e1fc52334342eb60a6f8a5ce38ebdfde071773f64e2fbaec9d2d5`이다. 관련 회귀 검사 집계이며 한글 전체 검증률은 아니다.
+
+구현 `6647366` 커밋·푸시 완료. [Git/빌드 소스 대조](evidence/table-merge-2026-10-15/source-baseline-notes.json), [문서별 역할·한글 검수 순서](evidence/table-merge-2026-10-15/documents.json)를 보존했다.

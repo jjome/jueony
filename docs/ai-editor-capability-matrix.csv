@@ -1,4 +1,4 @@
-feature_id,group,capability,current_evidence,task,stage,acceptance,expansion_status,internal_ai,mcp,undo_check,hwp_roundtrip,hwpx_roundtrip,hancom_check
+﻿feature_id,group,capability,current_evidence,task,stage,acceptance,expansion_status,internal_ai,mcp,undo_check,hwp_roundtrip,hwpx_roundtrip,hancom_check
 F001,기능 실사,한글 메뉴와 Jueony command 및 engine 기능 대조,메뉴와 command 및 HwpCtrl stub가 혼재,C00,기반,A01,미착수,해당없음,해당없음,해당없음,해당없음,해당없음,목록 대조 대기
 F002,조회,미저장 문서 전체 구조와 속성 조회,structure.ts에서 구역과 본문 속성 및 표와 셀 조회,C01,기반,A02,부분 구현,본문 및 단순 표와 쪽 속성,미연결,해당없음,단순 표본 조회 통과,단순 표본 조회 통과,대조 대기
 F003,조회,노드별 읽기와 긴 문서 나눠 읽기,현재 본문 추출 상한과 제한 안내 존재,C01,기반,A03,미착수,확장 미연결,미연결,해당없음,조회 검사 대기,조회 검사 대기,대조 대기
@@ -28,7 +28,7 @@ F026,표,표와 셀 구조 조회 및 생성 삭제 이동,구조 조회와 crea
 F027,표,여러 셀 채우기 비우기와 셀 내부 본문,긴 셀 교체 비우기 재입력과 글자 모양 복원,C06,첫 완주와 확장,A15,부분 구현,한 셀 한 문단의 단순 표 4000자; 보호/확인 불가 셀과 표 거절; 비보호 이웃 허용,미연결,빈 셀 및 긴 셀 복원 통과,공개 표본 편집 파일 준비,공개 표본 편집 파일 준비,대기
 F028,표,행과 열 삽입 삭제 및 재배치,insert_table_row insert_table_column delete_table_row delete_table_column,C06,확장,A15,부분 구현,단순 표 삽입 삭제 지원; 보호 셀이 있으면 거절; 재배치 미지원,미연결,연속 명령과 새 표 alias 복원 통과,셀 행렬 재열기 통과,셀 행렬 재열기 통과,대기
 F029,표,셀 병합 분할 및 내용 보존,mergeTableCells 및 splitTableCell 계열 후보,C06,확장,A15 A16,미착수,미지원,미연결,대기,대기,대기,대기
-F030,표,폭 높이 균등 분배와 셀 여백,HWPX format_table_cells 셀 안 여백 custom/table 모드; 크기/균등 분배는 후속,C06 C16,확장,A16 A32,부분 구현,HWPX 단순 표 안 여백 네 방향과 표 기본값 복귀; 기본 여백 재조판/행 배분 캐시 수정; 후속 표 앵커 차이로 HWP 제한 유지; 크기 균등 분배 미지원,외부 MCP 미연결,요청 undo와 실패 복원 검사,안 여백/상속 재열기 검사,업무 복원 검사,88/89/90번 범위; 최종 한글 비교 대기
+F030,표,폭 높이 균등 분배와 셀 여백,HWPX format_table_cells 안 여백 custom/table 및 전체 행에 걸친 열 너비 균등 분배,C06 C16,확장,A16 A32,부분 구현,HWPX 단순 표 안 여백 네 방향과 표 기본값 복귀; 기본 여백 재조판/행 배분 캐시 수정; 후속 표 앵커 차이로 HWP 제한 유지; HWPX 열 너비 같게 단독 요청 지원; 직접 크기/행 높이 미지원; 긴 표 Canvas 페이지 매핑 실패는 원복,외부 MCP 미연결,요청 undo와 실패 복원 검사,안 여백/상속 재열기 검사,업무 복원 검사,88/89/90/91번 범위; 최종 한글 비교 대기
 F031,표,셀 테두리 배경 정렬과 범위 글자 서식,format_table_cells에 글꼴 장평 자간 첨자 추가,C06,첫 완주와 확장,A15,부분 구현,테두리와 병합 셀 제외; 보호 셀 거절 및 비보호 이웃 배경의 기존 경계 보존,미연결,셀 서식 복원 통과,서식 재열기 통과,서식 재열기 통과,대기
 F032,표,표 배치 쪽 넘김과 제목 행 반복,set_table_pagination 및 set_table_header와 수동 제목 행 수·반복 창,C06,확장,A16,부분 구현,200셀 이하 단순 표 맨 위 연속 전체 제목 행 수·반복·명시 쪽 나눔 지원; 부분/흩어진 제목 및 복잡한 표 보호; 여러 행 반복은 실제 조각 배치 검사,외부 MCP 미연결; 내부 2종 명령과 수동 창 공통 실행,요청/수동 undo·redo와 세번째 셀 실패 복원 통과,제목/반복 on·off·clear 재열기와 이어지는 쪽 렌더 통과,제목/반복 저장·업무 복원·수동 선택 유지 통과,최종 한글 일괄 검수 대기; 87번 문서
 F033,표,중첩 표와 병합 셀 경로 및 표 나누기 합치기,ByPath 및 mergeTableWithNext 후보와 나누기 실사 필요,C06,확장,A16,미착수,미지원,미연결,대기,대기,대기,대기

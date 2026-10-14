@@ -1,3 +1,4 @@
+import {tableLayoutEvidence,sameTableLayout} from './table-layout-evidence.ts';
 import type {ControlOp,Snapshot,Table,AgentCellPaddingSource} from '../../modules/document/public/index.ts';
 import {cellPaddingPlan} from '../../modules/document/public/engine-integration.ts';
 import {readAgentTablePaginationSources} from './agent-table-pagination.ts';
@@ -16,25 +17,6 @@ export function readCellPaddingSources(wasm:any,tables:Table[],documentName:stri
   return [t.id,{editable:true,fingerprint:source.fingerprint,defaultsMm:{left:p.paddingLeft*25.4/7200,right:p.paddingRight*25.4/7200,top:p.paddingTop*25.4/7200,bottom:p.paddingBottom*25.4/7200}}];
  }catch{return [t.id,{editable:false,reason:'셀 안 여백은 기본 여백을 읽을 수 있고 보호·병합·중첩·혼합 서식·필드·세로 글씨·복합 배치가 없는 본문 단순 표(200셀 이하)만 지원합니다.'}];}}));
 }
-function layoutEvidence(d:any,t:Table):unknown[] {
- const result:unknown[]=[];const count=d.pageCount();if(!Number.isSafeInteger(count)||count<1)throw new Error('셀 안 여백의 실제 배치를 확인하지 못했습니다.');
- for(let page=0;page<count;page++){
-  const controls=parsed(d.getPageControlLayout(page)).controls,runs=parsed(d.getPageTextLayout(page)).runs;
-  if(!Array.isArray(controls)||!Array.isArray(runs))throw new Error('셀 안 여백의 실제 셀/글줄 배치를 읽지 못했습니다.');
-  for(const c of controls.filter((c:any)=>c.type==='table'&&c.secIdx===t.section&&c.paraIdx===t.paragraph&&c.controlIdx===t.control)){
-   if(!Array.isArray(c.cells)||[c,...c.cells].some((v:any)=>!['x','y','w','h'].every(k=>Number.isFinite(v[k]))||v.w<=0||v.h<=0))throw new Error('셀 안 여백의 실제 사각형 배치를 읽지 못했습니다.');
-   result.push({page,x:c.x,y:c.y,w:c.w,h:c.h,cells:c.cells.map((v:any)=>({index:v.cellIdx,row:v.row,column:v.col,x:v.x,y:v.y,w:v.w,h:v.h}))});
-  }
-  for(const r of runs.filter((r:any)=>r.secIdx===t.section&&r.parentParaIdx===t.paragraph&&r.controlIdx===t.control)){if(!['x','y','w','h'].every(k=>Number.isFinite(r[k]))||r.h<=0||r.w<0)throw new Error('셀 안 여백의 실제 글줄 배치를 읽지 못했습니다.');result.push({page,cell:r.cellIdx,paragraph:r.cellParaIdx,start:r.charStart,text:r.text,x:r.x,y:r.y,w:r.w,h:r.h});}
- }
- if(!result.length)throw new Error('셀 안 여백 대상의 실제 배치가 없습니다.');return result;
-}
-function sameLayout(a:any,b:any):boolean {
- if(typeof a==='number'&&typeof b==='number')return Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-b)<=0.2;
- if(Array.isArray(a)||Array.isArray(b))return Array.isArray(a)&&Array.isArray(b)&&a.length===b.length&&a.every((v,i)=>sameLayout(v,b[i]));
- if(a&&b&&typeof a==='object'&&typeof b==='object')return Object.keys(a).length===Object.keys(b).length&&Object.keys(a).every(k=>Object.hasOwn(b,k)&&sameLayout(a[k],b[k]));
- return a===b;
-}
 /** Only requested cell padding and inheritance flags may change. */
 export function executeCellPadding(wasm:any,base:Snapshot,op:Extract<ControlOp,{kind:'format_table_cells'}>):void {
  const plan=cellPaddingPlan(op,base),d=nativeDocument(wasm),structure=readStructure(d),table=structure.tables.find(t=>t.id===op.target),cap=readCellPaddingSources(d,structure.tables,base.name)?.[op.target],source=base.cellPaddingSources?.[op.target];
@@ -46,5 +28,5 @@ export function executeCellPadding(wasm:any,base:Snapshot,op:Extract<ControlOp,{
   if(Object.entries(plan.patch).some(([k,v])=>cell.properties[k]!==v)&&parsed(d.setCellProperties(table.section,table.paragraph,table.control,cell.index,JSON.stringify(plan.patch)))?.ok!==true)throw new Error('셀 안 여백 변경에 실패했습니다.');
  }
  const after=capturePreservationEvidence(d);if(after.issues.length||!same(after.values,expected))throw new Error('셀 안 여백 변경 뒤 내용·서식·테두리·크기·다른 셀·자원이 계획과 다릅니다.');
- let reopened:any;try{const live=layoutEvidence(d,table);reopened=new d.constructor(d.exportHwpx());if(!sameLayout(live,layoutEvidence(reopened,table)))throw new Error('셀 안 여백 변경 후 저장 재열기의 실제 셀/글줄 배치가 다릅니다. 적용하지 않습니다.');}finally{reopened?.free();}
+ let reopened:any;try{const live=tableLayoutEvidence(d,table);reopened=new d.constructor(d.exportHwpx());if(!sameTableLayout(live,tableLayoutEvidence(reopened,table)))throw new Error('셀 안 여백 변경 후 저장 재열기의 실제 셀/글줄 배치가 다릅니다. 적용하지 않습니다.');}finally{reopened?.free();}
 }

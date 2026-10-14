@@ -1,0 +1,25 @@
+--- a/src/renderer/float_placement.rs
++++ b/src/renderer/float_placement.rs
+@@ -2326,7 +2326,12 @@
+         // 폭0 자체는 현재 흐름과 저장/paint 원점이 같다는 증거가 아니다.
+         let stored_origin = stored_origin.filter(|_| saved_whole_empty_table_anchor(para, table));
+         let origin = stored_origin.unwrap_or(origin);
+-        if !(empty_table_host_uses_formatted_box(para, table) || stored_origin.is_some())
++        // A cell geometry edit invalidates the section's saved-flow origin, but
++        // does not create a text line in an object-only whole-table host. Use
++        // the current flow origin and the same formatted outer box; reopening
++        // restores the saved origin, not a different margin ownership rule.
++        if !(empty_table_host_uses_formatted_box(para, table)
++            || saved_whole_empty_table_anchor(para, table))
+             || ![origin, table_height, before, after]
+                 .iter()
+                 .all(|value| value.is_finite())
+@@ -3224,7 +3229,7 @@
+     empty_table_host_uses_formatted_box(para, table)
+         || (saved_whole_empty_table_anchor(para, table)
+             && placement.is_some_and(|plan| {
+-                plan.flow == ParagraphFloatFlow::Exclusion && plan.stored_host_origin.is_some()
++                plan.flow == ParagraphFloatFlow::Exclusion
+             }))
+ }
+ 

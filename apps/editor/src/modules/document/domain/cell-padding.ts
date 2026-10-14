@@ -4,7 +4,7 @@ const sides=['Left','Right','Top','Bottom'] as const;
 const raw=(mm:number)=>Math.round(mm*7200/25.4);
 /** Complete custom values avoid accidentally activating dormant inherited-side values. */
 export function cellPaddingPlan(op:Operation,s:Snapshot):{table:Table;cells:Cell[];patch:Record<string,number|boolean>} {
- if(!/\.hwpx$/iu.test(s.name))throw new Error('AI 셀 안 여백은 현재 HWPX 원본만 지원합니다. HWP는 편집 화면과 저장 재열기의 글줄 배치 차이를 먼저 수정해야 합니다.');
+ if(!/\.hwpx$/iu.test(s.name))throw new Error('AI 셀 안 여백은 현재 HWPX 원본만 지원합니다. HWP는 후속 표·행 높이의 저장 재열기 배치를 먼저 수정해야 합니다.');
  const table=s.structure?.tables.find(t=>t.id===op.target),source=s.cellPaddingSources?.[op.target],p=op.properties;
  if(!table||!/^s\d+p\d+t\d+$/u.test(op.target)||source?.editable!==true||!/^[a-f0-9]{64}$/u.test(source.fingerprint??''))throw new Error('조회된 안 여백 편집 가능 본문 단순 표가 필요합니다.');
  if(!['custom','table'].includes(p.paddingMode as string)||Object.keys(p).some(k=>!['paddingMode',...sides.map(v=>'padding'+v+'Mm')].includes(k)))throw new Error('셀 안 여백은 custom/table 모드로 다른 서식과 분리해 요청하세요.');

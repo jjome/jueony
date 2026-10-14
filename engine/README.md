@@ -52,3 +52,5 @@ rhwp 원문의 MIT 고지와 별도 third-party 고지를 유지한다. 변경�
 `zzzzzzzzzzzz-agent-paragraph-tabs.patch`는 일반 본문 문단의 기본 사용자 탭에 private 원본 토큰·attr/예약 바이트/추가 데이터·위치/정렬/채움 검사를 추가한다. 현재 API는 `getAgentParagraphTabs`/`setAgentParagraphTabs`이며 지원 여부만 모델에 전달한다. 표/필드/실제 탭/혼합·고급 원본은 유지한다. 기존 빈 CTRL_DATA 슬롯과 실제 payload를 구분한다. 검증 결과와 제한은 [74번 문서](../docs/74-agent-paragraph-tabs.md)를 따른다.
 
 `zzzzzzzzzzzzz-agent-paragraph-decoration.patch`는 기본 본문 문단의 네 방향 실선/없음·단색 배경·간격/연결 속성을 Native 원본 토큰으로 검사한다. 알려진 비활성 대각선 선모양과 색 없음/빈 winBrush는 복제·유지하며 요청 밖 BF 필드를 대조한다. 공유 자원을 원위치에서 수정하지 않고 고급 효과/알 수 없는 원본을 거절한다. 결과와 제한은 [75번 문서](../docs/75-agent-paragraph-decoration.md)를 따른다.
+
+`zzzzzzzzzzzzzzzzzzzz-whole-table-edited-host.patch`는 비분할 빈 표 host에서 현재 흐름 원점과 저장 원점의 formatted outer box 소유를 통일한다. 셀 여백/서식/저장 줄 정보를 지우지 않으며 whole fit·first fragment·paint가 같은 계획을 쓴다. 단순 HWP/HWPX 왕복 10개와 기존 표 회귀를 확인했다. 여러 HWP 표와 0 기본 여백+다른 글자 크기 진단은 미해결이고 HWP Agent 안 여백 제한을 유지한다. [89번](../docs/89-hwp-table-host-origin.md)을 따른다.

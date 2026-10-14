@@ -47,3 +47,5 @@ HWPX 네 방향 지정/상속 복귀·비활성 값 유지·너비/누락/혼합
 [성공 HWPX 출력 11개·미지원 HWP 입력 2개·Native 배치 진단 HWP 5개 및 한글 확인 순서](evidence/cell-padding-2026-10-14/cell-padding-documents.json)를 분리했다. diagnostic-hwp의 파일은 성공 출력으로 집계하지 않는다. [Native 관찰](evidence/cell-padding-2026-10-14/cell-padding-native/diagnostic-hwp/observation.json)의 편집/재열기 y 차이는 여전히 미해결이다. 자동 변환이나 원본 덮어쓰기를 하지 않는다.
 
 앱 소스 SHA-256 `4a4061e258c94bd21537278ec4178b3eca305094c69a57d76a82380415f3cca0`, 기존 엔진 `570603c60a53c953`, WASM SHA-256 `ba74ed4ab9e819166e41152036cbd01286fa69f3cac3eeb5a08b4c0b4cad723b`. 빌드의 07c4e51/dirty=true를 구현 커밋의 실제 소스·패치 해시와 대조했다. [4304 실제 실행 대조](evidence/cell-padding-2026-10-14/launch-check.json), [원본·제한](evidence/cell-padding-2026-10-14/source-baseline-notes.json)를 따른다. 유료 모델·실제 한글 비교와 Native Rust unit tests/새 엔진 빌드는 미실행이며 전체 범위는 아직 미완료다.
+
+후속 정정: 89번 새 엔진은 위 단순 Native 3.8px 차이의 표 원점을 수정했다. 여러 표/0 기본 여백+다른 글자 크기에서는 새 오류가 남아 정상 HWP 제한을 유지한다. 과거 570603 실패 증거는 그대로 보존하며 최신 상태는 [89번](89-hwp-table-host-origin.md)을 따른다. 파일 이름 변경 자체의 거절을 보장하는 것이 아니라 실제 보존·배치 검사로 판정한다.

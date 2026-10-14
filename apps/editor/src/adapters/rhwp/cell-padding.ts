@@ -8,7 +8,7 @@ const sides=['Left','Right','Top','Bottom'] as const;
 const canonical=(v:any):any=>Array.isArray(v)?v.map(canonical):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,canonical(v[k])])):v;
 const same=(a:any,b:any)=>JSON.stringify(canonical(a))===JSON.stringify(canonical(b));
 export function readCellPaddingSources(wasm:any,tables:Table[],documentName:string):Record<string,AgentCellPaddingSource>|undefined {
- if(!/\.hwpx$/iu.test(documentName))return Object.fromEntries(tables.map(t=>[t.id,{editable:false,reason:'AI 셀 안 여백은 HWPX 원본만 지원합니다. HWP의 편집 후 저장 재열기 글줄 배치 차이는 미해결입니다.'}]));
+ if(!/\.hwpx$/iu.test(documentName))return Object.fromEntries(tables.map(t=>[t.id,{editable:false,reason:'AI 셀 안 여백은 HWPX 원본만 지원합니다. HWP의 후속 표·행 높이 저장 재열기 차이는 추가 수정이 필요합니다.'}]));
  const d=nativeDocument(wasm),sources=readAgentTablePaginationSources(d,tables);if(!sources||typeof d.setCellProperties!=='function')return;
  return Object.fromEntries(tables.map(t=>{try{const source=sources[t.id],p=parsed(d.getTableProperties(t.section,t.paragraph,t.control));
   const valid=(v:any)=>sides.every(side=>Number.isSafeInteger(v['padding'+side])&&v['padding'+side]>=0&&v['padding'+side]<=32767);

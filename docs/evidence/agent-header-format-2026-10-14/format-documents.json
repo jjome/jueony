@@ -1,0 +1,182 @@
+{
+  "scope": "existing stored plain header/footer basic character formatting",
+  "count": 35,
+  "nativeHancomComparison": "NOT_RUN",
+  "files": [
+    {
+      "path": "agent-header-format-browser/flags-and-followup.hwpx",
+      "bytes": 9216,
+      "sha256": "a364757efe036c9cf09e628acbea70977a1b561ce852c6053d37056ff825ad38"
+    },
+    {
+      "path": "agent-header-format-browser/footer-odd.hwp",
+      "bytes": 13312,
+      "sha256": "58c9e8fc30d6f229577f46e86260ff4739c7711e8afcd441f6410815c5c72fbe"
+    },
+    {
+      "path": "agent-header-format-browser/header-even.hwp",
+      "bytes": 13824,
+      "sha256": "9882f9996dae0f97b81b0340f6afd05ffb4d1f05460e7cef06ea53b038ba78cf"
+    },
+    {
+      "path": "agent-header-format-browser/header-format-anthropic.hwpx",
+      "bytes": 9166,
+      "sha256": "35251840ed19c7230db21d591d7b5cefeee2b63e5bed51b95c0bb377cc378691"
+    },
+    {
+      "path": "agent-header-format-browser/header-format-gemini.hwpx",
+      "bytes": 9166,
+      "sha256": "35251840ed19c7230db21d591d7b5cefeee2b63e5bed51b95c0bb377cc378691"
+    },
+    {
+      "path": "agent-header-format-browser/header-format-openai-compatible.hwpx",
+      "bytes": 9166,
+      "sha256": "35251840ed19c7230db21d591d7b5cefeee2b63e5bed51b95c0bb377cc378691"
+    },
+    {
+      "path": "agent-header-format-browser/header-format-openai-responses.hwpx",
+      "bytes": 9166,
+      "sha256": "35251840ed19c7230db21d591d7b5cefeee2b63e5bed51b95c0bb377cc378691"
+    },
+    {
+      "path": "agent-header-format-browser/hidden-second-section.hwpx",
+      "bytes": 9168,
+      "sha256": "ac3b76311124c5e56a2a7b537b66c3916027d5b43492ff1b3b41b759c994bcdc"
+    },
+    {
+      "path": "agent-header-format-browser/rendered-font.hwpx",
+      "bytes": 7593,
+      "sha256": "e63b25c5d5a9c4b5f664e2b59b2ba67ad4af6e7519686a8b489b3a6ee74c981c"
+    },
+    {
+      "path": "agent-header-format-native/before-footer-both.hwp",
+      "bytes": 13312,
+      "sha256": "b98164846a2051e558d94f95239563a731fafd44f48af37215fb1d5382661484"
+    },
+    {
+      "path": "agent-header-format-native/before-footer-both.hwpx",
+      "bytes": 9118,
+      "sha256": "fe1011e07a0dcea230a11359829b016a9b9c25598c61ab13c4be88378d555450"
+    },
+    {
+      "path": "agent-header-format-native/before-footer-even.hwp",
+      "bytes": 13312,
+      "sha256": "b98164846a2051e558d94f95239563a731fafd44f48af37215fb1d5382661484"
+    },
+    {
+      "path": "agent-header-format-native/before-footer-even.hwpx",
+      "bytes": 9118,
+      "sha256": "fe1011e07a0dcea230a11359829b016a9b9c25598c61ab13c4be88378d555450"
+    },
+    {
+      "path": "agent-header-format-native/before-footer-odd.hwp",
+      "bytes": 13312,
+      "sha256": "b98164846a2051e558d94f95239563a731fafd44f48af37215fb1d5382661484"
+    },
+    {
+      "path": "agent-header-format-native/before-footer-odd.hwpx",
+      "bytes": 9118,
+      "sha256": "fe1011e07a0dcea230a11359829b016a9b9c25598c61ab13c4be88378d555450"
+    },
+    {
+      "path": "agent-header-format-native/before-header-both.hwp",
+      "bytes": 13312,
+      "sha256": "b98164846a2051e558d94f95239563a731fafd44f48af37215fb1d5382661484"
+    },
+    {
+      "path": "agent-header-format-native/before-header-both.hwpx",
+      "bytes": 9118,
+      "sha256": "fe1011e07a0dcea230a11359829b016a9b9c25598c61ab13c4be88378d555450"
+    },
+    {
+      "path": "agent-header-format-native/before-header-even.hwp",
+      "bytes": 13312,
+      "sha256": "b98164846a2051e558d94f95239563a731fafd44f48af37215fb1d5382661484"
+    },
+    {
+      "path": "agent-header-format-native/before-header-even.hwpx",
+      "bytes": 9118,
+      "sha256": "fe1011e07a0dcea230a11359829b016a9b9c25598c61ab13c4be88378d555450"
+    },
+    {
+      "path": "agent-header-format-native/before-header-odd.hwp",
+      "bytes": 13312,
+      "sha256": "b98164846a2051e558d94f95239563a731fafd44f48af37215fb1d5382661484"
+    },
+    {
+      "path": "agent-header-format-native/before-header-odd.hwpx",
+      "bytes": 9118,
+      "sha256": "fe1011e07a0dcea230a11359829b016a9b9c25598c61ab13c4be88378d555450"
+    },
+    {
+      "path": "agent-header-format-native/false-flags-followup.hwpx",
+      "bytes": 9205,
+      "sha256": "134f98485350a7dc9dba3d354919325a342626b96e3da38210403512a3901436"
+    },
+    {
+      "path": "agent-header-format-native/formatted-footer-both.hwp",
+      "bytes": 13312,
+      "sha256": "c2179ef35eb8792fbe185a2fb1d72e7dfa1cc878eafa46e4d43e163c93411eaa"
+    },
+    {
+      "path": "agent-header-format-native/formatted-footer-both.hwpx",
+      "bytes": 9169,
+      "sha256": "f35933dff35741444233217e7fd75320bbdede4c2ef899550fe8f4952f18ab04"
+    },
+    {
+      "path": "agent-header-format-native/formatted-footer-even.hwp",
+      "bytes": 13824,
+      "sha256": "b4b0eb52b935624bf85e35da8d9d2f29d7b5543fbc8141973b531c1010e6eed5"
+    },
+    {
+      "path": "agent-header-format-native/formatted-footer-even.hwpx",
+      "bytes": 9167,
+      "sha256": "02a74782da4ac08f317ce98c8e6de7c579afbe554ea28ba95ca81de50f22d49e"
+    },
+    {
+      "path": "agent-header-format-native/formatted-footer-odd.hwp",
+      "bytes": 13312,
+      "sha256": "a9462df83c7e4208eb315475be54960ea280f37155c33d806df1b7630d6b003d"
+    },
+    {
+      "path": "agent-header-format-native/formatted-footer-odd.hwpx",
+      "bytes": 9167,
+      "sha256": "9a36f856ca3e3a5245823468ca78cc308273cc0ccf7366bbc3ef9383ff9f5fd5"
+    },
+    {
+      "path": "agent-header-format-native/formatted-header-both.hwp",
+      "bytes": 13824,
+      "sha256": "7f7302c375a622e9d6f81199541c0a19c136631ccdc96382c9da4f645fc26a11"
+    },
+    {
+      "path": "agent-header-format-native/formatted-header-both.hwpx",
+      "bytes": 9168,
+      "sha256": "914993b13e3a980944bc33dc58b141dd69fe132ebb31509a9354b7eb4938716c"
+    },
+    {
+      "path": "agent-header-format-native/formatted-header-even.hwp",
+      "bytes": 13824,
+      "sha256": "3e81df38528c05870166067401d273b91dde9728daaedf31ff83f4851dc373d1"
+    },
+    {
+      "path": "agent-header-format-native/formatted-header-even.hwpx",
+      "bytes": 9167,
+      "sha256": "4043705ff04c5daa68642a8758ef66949cb0271c3f56521bb33f53f6c96a9472"
+    },
+    {
+      "path": "agent-header-format-native/formatted-header-odd.hwp",
+      "bytes": 13312,
+      "sha256": "97ee5c99da4d1d3ccdec7b97fd5af0947619a8ae82b113fe3ca0e18faacc421d"
+    },
+    {
+      "path": "agent-header-format-native/formatted-header-odd.hwpx",
+      "bytes": 9167,
+      "sha256": "fa887b711c67779f8ad5d06c184eba9fb5b444cdfd34750c9a2a1a4b5572a1d7"
+    },
+    {
+      "path": "agent-header-format-native/retained-font-effects.hwpx",
+      "bytes": 9211,
+      "sha256": "4f58864e4c45de436316c9e379dc91081a1370d31c9e00b1c4c4217d15dfa2d1"
+    }
+  ]
+}

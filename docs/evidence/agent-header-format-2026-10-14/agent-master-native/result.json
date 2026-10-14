@@ -1,0 +1,134 @@
+{
+  "results": [
+    "hwp both: basic Agent master draws on intended parity, preserves body/page styles, saves and restores snapshot or rejects sparse HWP",
+    "hwp odd: basic Agent master draws on intended parity, preserves body/page styles, saves and restores snapshot or rejects sparse HWP",
+    "hwp even: basic Agent master draws on intended parity, preserves body/page styles, saves and restores snapshot or rejects sparse HWP",
+    "hwpx both: basic Agent master draws on intended parity, preserves body/page styles, saves and restores snapshot or rejects sparse HWP",
+    "hwpx odd: basic Agent master draws on intended parity, preserves body/page styles, saves and restores snapshot or rejects sparse HWP",
+    "hwpx even: basic Agent master draws on intended parity, preserves body/page styles, saves and restores snapshot or rejects sparse HWP",
+    "hwp: ordered parity batch, subsequent replacement and reverse deletions preserve override semantics and saved reopen",
+    "hwpx: ordered parity batch, subsequent replacement and reverse deletions preserve override semantics and saved reopen",
+    "hwp: section-specific master edits leave earlier stored masters, papers and their inheritance intact",
+    "hwpx: section-specific master edits leave earlier stored masters, papers and their inheritance intact",
+    "imported table master retains source style or is explicitly read-only before a whole Agent batch",
+    "imported italic master retains source style or is explicitly read-only before a whole Agent batch",
+    "imported long master retains source style or is explicitly read-only before a whole Agent batch",
+    "invalid native-independent values and later paper shrink refuse all earlier Agent changes",
+    "unchanged stored master and missing master deletion do not allocate native style resources",
+    "hwp: first-page master hiding stays visible in Agent context and survives edit, render and save",
+    "hwpx: first-page master hiding stays visible in Agent context and survives edit, render and save"
+  ],
+  "failures": [],
+  "engine": {
+    "wasmSha256": "eb1a657c9ea42f72c31b0dfb99c827ead31c9a6e5d2c1d4307720eb8c2354516",
+    "builtAt": "2026-10-14T01:17:39.2825756Z",
+    "optimized": false,
+    "jsSha256": "14bfefc4791c5e16ca8b17b0d28d845a745df1234413a5ae498c6453db9c2e0e",
+    "patches": [
+      {
+        "name": "border-fill-identity.patch",
+        "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c"
+      },
+      {
+        "name": "default-tabs.patch",
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+      },
+      {
+        "name": "document-insertion.patch",
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+      },
+      {
+        "name": "master-page-editing.patch",
+        "sha256": "b04c7d682e105e3f37f72a18c1b4bb01cbf085424e3219f3919fd8c891dc26c2"
+      },
+      {
+        "name": "merged-table-transpose.patch",
+        "sha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768"
+      },
+      {
+        "name": "note-query-json.patch",
+        "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562"
+      },
+      {
+        "name": "page-border-entries.patch",
+        "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f"
+      },
+      {
+        "name": "page-border-inclusion.patch",
+        "sha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e"
+      },
+      {
+        "name": "page-border-region.patch",
+        "sha256": "ea98aed9ad8568699b802c5f46e4964fe524ba7634bc978d71fe10f44e1d7412"
+      },
+      {
+        "name": "page-border-z-image.patch",
+        "sha256": "97ccd3c9eac24c42b0844fc65e5804b232d3bef9929a6fd5de329cdd007b173b"
+      },
+      {
+        "name": "section-split.patch",
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+      },
+      {
+        "name": "style-reference-deletion.patch",
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+      },
+      {
+        "name": "style-reference-order.patch",
+        "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce"
+      },
+      {
+        "name": "style-shape-stories.patch",
+        "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af"
+      },
+      {
+        "name": "table-creation-consistency.patch",
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+      },
+      {
+        "name": "zz-line-number-settings.patch",
+        "sha256": "4cb8ce4a8d49864f53c3ff95fdfc8ef3e0342b09f86cd525dfb9aa102e2dee72"
+      },
+      {
+        "name": "zzz-page-body-delete.patch",
+        "sha256": "54bf1697627ec92c4379fb8ca314f9bf9d99c2207bf9e90859d35c7324be2e83"
+      },
+      {
+        "name": "zzzz-page-body-copy.patch",
+        "sha256": "45f3331d992f3799dad1f076bfd6d237d8c989541ea510d888e4afb5407749db"
+      },
+      {
+        "name": "zzzzz-page-body-paper-paste.patch",
+        "sha256": "4df977f851378597848aa60581957c123e6565ebf04f9412052dbfdabb2c43a0"
+      },
+      {
+        "name": "zzzzzz-page-body-style-paste.patch",
+        "sha256": "168c4c158bc0db3e71230903eae0b1ae71092a1a139f2ad5747712f95127bd75"
+      },
+      {
+        "name": "zzzzzzz-page-body-image-paste.patch",
+        "sha256": "ac08a167a376bae3e1e890f8109f2f9552ce952abe7882712f813183597ce57a"
+      },
+      {
+        "name": "zzzzzzzz-empty-section-remove.patch",
+        "sha256": "d49d3acc5bc0b3049415e17233a7f7a7249792f6500d475ce6cd39d3ad14d590"
+      },
+      {
+        "name": "zzzzzzzzz-hwpx-body-caret.patch",
+        "sha256": "c073ab44d5460f92915ea6493a791d2cbf24bb60ad66eca5033be0fc9835ac56"
+      },
+      {
+        "name": "zzzzzzzzzz-agent-page-background.patch",
+        "sha256": "74104eca6a40a3a7f06ad6d20ed8f44f816f0c153a2be40fdf584b61fc9ba907"
+      },
+      {
+        "name": "zzzzzzzzzzz-agent-header-footer.patch",
+        "sha256": "415fa55bc5fe0c4f49a7dce025723067022d7bdef076a9fb48b7f456c30cb91a"
+      }
+    ],
+    "buildMode": "wsl-review-no-opt",
+    "sourceId": "b975635f0614152d",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f"
+  },
+  "note": "Existing guarded native master engine connected to Agent; stored basic text only. HWP sparse combos and complex/long originals refused. Real engine, SVG, snapshot undo and saved reopen; native Hancom deferred."
+}

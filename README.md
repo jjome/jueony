@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-agent-header-20261014b/Start-Review.cmd)**로 실행한다(4260). AI가 현재 구역에 저장된 기존 단순 머리말·꼬리말의 텍스트를 수정한다. 홀짝·첫 쪽 감추기·글자/문단 모양·본문과 다른 정의를 보존하고 비교·요청 undo/redo·실패 복원·저장 재열기·업무 재실행을 검증한다. [사용법·검증·제한](docs/68-agent-header-footer.md)을 확인한다. 기존 구역 나누기·합치기·빈 구역 삭제·설정 반복도 포함한다. 머리말 생성/삭제·여러 문단·필드·개체·혼합 서식과 전체 한글 동등성 검수는 남는다. 기존 실행 창과 사용자 문서는 유지한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-agent-header-format-20261014/Start-Review.cmd)**로 실행한다(4262). AI가 기존 단순 머리말·꼬리말의 텍스트와 기본 글자 서식을 수정한다. 굵게·기울임·밑줄·1~200pt 크기·RGB 색을 전체 한 문단에 적용하고 텍스트·문단·홀짝·감추기·본문을 보존한다. [사용법·검증·제한](docs/69-agent-header-font-format.md)을 확인한다. 생성/삭제·글꼴 종류/문단 모양·필드·개체·혼합/여러 문단은 남는다. 기존 실행 창과 사용자 문서는 유지한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

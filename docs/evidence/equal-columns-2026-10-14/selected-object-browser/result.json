@@ -1,0 +1,206 @@
+{
+  "results": [
+    "hwp: selected table Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save",
+    "hwp: selected image Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save",
+    "hwp: selected shape Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save",
+    "hwp: selected line Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save",
+    "hwp: selected textbox Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save",
+    "hwp: selected group Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save",
+    "hwp: selected equation Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save",
+    "hwpx: selected table Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save",
+    "hwpx: selected image Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save",
+    "hwpx: selected shape Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save",
+    "hwpx: selected line Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save",
+    "hwpx: selected textbox Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save",
+    "hwpx: selected group Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save",
+    "hwpx: selected equation Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save",
+    "stale table dialog refuses confirm after another document mutation",
+    "stale image dialog refuses confirm after another document mutation"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@jueony/rhwp-engine-review@0.8.7",
+    "builtAt": "2026-10-14T13:47:06.934Z",
+    "engineWasmSha256": "0f71ca3992a728ea93b5f88907d07555dbefce533cbd8e8ab192e7ba4cb37179",
+    "engineBuild": {
+      "patches": [
+        {
+          "name": "border-fill-identity.patch",
+          "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c"
+        },
+        {
+          "name": "default-tabs.patch",
+          "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+        },
+        {
+          "name": "document-insertion.patch",
+          "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+        },
+        {
+          "name": "master-page-editing.patch",
+          "sha256": "b04c7d682e105e3f37f72a18c1b4bb01cbf085424e3219f3919fd8c891dc26c2"
+        },
+        {
+          "name": "merged-table-transpose.patch",
+          "sha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768"
+        },
+        {
+          "name": "note-query-json.patch",
+          "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562"
+        },
+        {
+          "name": "page-border-entries.patch",
+          "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f"
+        },
+        {
+          "name": "page-border-inclusion.patch",
+          "sha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e"
+        },
+        {
+          "name": "page-border-region.patch",
+          "sha256": "ea98aed9ad8568699b802c5f46e4964fe524ba7634bc978d71fe10f44e1d7412"
+        },
+        {
+          "name": "page-border-z-image.patch",
+          "sha256": "97ccd3c9eac24c42b0844fc65e5804b232d3bef9929a6fd5de329cdd007b173b"
+        },
+        {
+          "name": "section-split.patch",
+          "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+        },
+        {
+          "name": "style-reference-deletion.patch",
+          "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+        },
+        {
+          "name": "style-reference-order.patch",
+          "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce"
+        },
+        {
+          "name": "style-shape-stories.patch",
+          "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af"
+        },
+        {
+          "name": "table-creation-consistency.patch",
+          "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+        },
+        {
+          "name": "zz-line-number-settings.patch",
+          "sha256": "4cb8ce4a8d49864f53c3ff95fdfc8ef3e0342b09f86cd525dfb9aa102e2dee72"
+        },
+        {
+          "name": "zzz-page-body-delete.patch",
+          "sha256": "54bf1697627ec92c4379fb8ca314f9bf9d99c2207bf9e90859d35c7324be2e83"
+        },
+        {
+          "name": "zzzz-page-body-copy.patch",
+          "sha256": "45f3331d992f3799dad1f076bfd6d237d8c989541ea510d888e4afb5407749db"
+        },
+        {
+          "name": "zzzzz-page-body-paper-paste.patch",
+          "sha256": "4df977f851378597848aa60581957c123e6565ebf04f9412052dbfdabb2c43a0"
+        },
+        {
+          "name": "zzzzzz-page-body-style-paste.patch",
+          "sha256": "168c4c158bc0db3e71230903eae0b1ae71092a1a139f2ad5747712f95127bd75"
+        },
+        {
+          "name": "zzzzzzz-page-body-image-paste.patch",
+          "sha256": "ac08a167a376bae3e1e890f8109f2f9552ce952abe7882712f813183597ce57a"
+        },
+        {
+          "name": "zzzzzzzz-empty-section-remove.patch",
+          "sha256": "d49d3acc5bc0b3049415e17233a7f7a7249792f6500d475ce6cd39d3ad14d590"
+        },
+        {
+          "name": "zzzzzzzzz-hwpx-body-caret.patch",
+          "sha256": "c073ab44d5460f92915ea6493a791d2cbf24bb60ad66eca5033be0fc9835ac56"
+        },
+        {
+          "name": "zzzzzzzzzz-agent-page-background.patch",
+          "sha256": "74104eca6a40a3a7f06ad6d20ed8f44f816f0c153a2be40fdf584b61fc9ba907"
+        },
+        {
+          "name": "zzzzzzzzzzz-agent-header-footer.patch",
+          "sha256": "415fa55bc5fe0c4f49a7dce025723067022d7bdef076a9fb48b7f456c30cb91a"
+        },
+        {
+          "name": "zzzzzzzzzzzz-agent-paragraph-tabs.patch",
+          "sha256": "d15949747520d51020433aca32539f79c5a8cc0dfdad9de95db221dae651b311"
+        },
+        {
+          "name": "zzzzzzzzzzzzz-agent-paragraph-decoration.patch",
+          "sha256": "2adf2bba46d11a6ca97ce838da1d329c627c8532812674b7329aaef3cdb544fb"
+        },
+        {
+          "name": "zzzzzzzzzzzzzz-agent-paragraph-lists.patch",
+          "sha256": "06e1af9e90e0c54da772a533f9c2ac5279db059c37fb3612c189e0d7e1c7692d"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzz-agent-basic-bullets.patch",
+          "sha256": "03138686d9faa51fcf335f1b6299a294248031d36ca079da5346e52d0b531a35"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzz-agent-numbering-clone.patch",
+          "sha256": "a79207f328ca0521515344c018554ccc20092142dabaa5ba413ff162408fa567"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzz-agent-basic-numbering.patch",
+          "sha256": "66ac344e90a16b3e447e97bd6a593edbc7b9e024313cc40f81f2611838f3b102"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzz-agent-paragraph-outline.patch",
+          "sha256": "dfe19d3083f6a4222440ce558b5451f2568cf57b211bcc19babb508c1db2022e"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzz-agent-style-metadata.patch",
+          "sha256": "53c6a573df6e8f1d0af4f388dad4e624a700006ad38f7a1de820eabc1d6d44cb"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzz-whole-table-edited-host.patch",
+          "sha256": "f90714f601227bba000d63be77e5ac9f3985d192e613990984544b2f70b0f603"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzz-table-default-padding-reflow.patch",
+          "sha256": "903260c4c371a2a1d4b0afa72f8f0e1f191db936bd6e055a974a0a4295badf0e"
+        }
+      ],
+      "jsSha256": "e176d229d2362d2c9ab9eb544e891fb95a5ef8b8b4cffe347eedc090d5ee42ca",
+      "builtAt": "2026-10-14T13:11:23.2805184Z",
+      "wasmSha256": "0f71ca3992a728ea93b5f88907d07555dbefce533cbd8e8ab192e7ba4cb37179",
+      "sourceId": "3cb8152e4498fbbb",
+      "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+      "buildMode": "wsl-review-no-opt",
+      "optimized": false
+    },
+    "buildScriptSha256": "e530c77487d231e37582d377e7dddebf8a52dbb00bc267bcad607971c25c19e4",
+    "studioPatchSha256": "d0a413372bd0327c50c68297ba6ef0e7d1f07e24e7545dcfb20f834b0661d7d3",
+    "featurePatchSha256": "ca3ae9e1f5c7075d0113b6a38cb905317ec51db8e0cfdb55f1dfb0e9e1e986b7",
+    "recoveryPatchSha256": "12dfbb56ca02e1642bb495a44e18cf0823da84864386211eeb8811916552f864",
+    "tabFeaturePatchSha256": "da0d7d0b9a0c529af8a4a9733bf239a1c4f6afcd99b8803f1237f1c57a90ceec",
+    "sectionBoundaryPatchSha256": "e2a5cee3330b67015a3ac8cc738cafe36966950d7a12fc48e1d0a7ffc2392b13",
+    "documentInsertionPatchSha256": "2941b880fe250f779c95ce7bbd9d54384b10dda5f1596f7c0343d44e0297d4ff",
+    "styleManagementPatchSha256": "792ad2629ba0d657fe0bc504fa0f3c55075c6b2c69ea0cb570954dad294ed55c",
+    "styleFlowPatchSha256": "11010768f738466f36731a71b6d596ecae4ba60c74132fd3ea088e4816a98974",
+    "tableConversionPatchSha256": "77b1afbf52aa073f5617feacbf84781b5976fdfe549f25e10dc1116603333fe9",
+    "pageBorderPatchSha256": "70bf19d6d91304856bd7e4c75d3e6fdf43403eea9d9e06e90b2321f8117d20bb",
+    "selectedObjectPropertiesPatchSha256": "3ff0eab7f38eece3ce098c33759d0e2bdce12fb3f44c8da417c81a1e02799279",
+    "formattingToolbarPatchSha256": "d75122ccc9459cf9fa46d065777231c5b83144393a1af93d20cffee8594c600f",
+    "documentTabCyclePatchSha256": "1c907daa1e91202f24c77827629ce66c9959cf12a6d1656d64f8942d106c79f8",
+    "keyboardContextPatchSha256": "0f85ceeaa4c2998908068ad2ba0aadf3bcf137749c6d49765bb293938a4cdd1f",
+    "documentSwapStatePatchSha256": "d4ae8194a8ff2446cfd2483b53356226197c7610cae6bebea38da1af670fb212",
+    "exportMetadataLossPatchSha256": "b7a30c5f36f960f9860ae19fc6b427040f253b019c30b0362efb269613e38fc2",
+    "customSourceSha256": "dc797c9a9f9ce227d219cb8ac5393a4fe04389c6d251d1f275c7d5db8ee44716",
+    "applicationSourceCommit": "8a52edae5f9a82c8ba550ab170cc7e89249dbdd8",
+    "applicationSourceDirty": true,
+    "sourceBuild": true,
+    "note": "고정 rhwp 소스와 추적 패치를 직접 빌드한 검수용 WASM. 최적화 및 한컴 출력 비교 상태는 engineBuild와 검증 보고서 참조."
+  },
+  "reference": "https://help.hancom.com/hoffice130/ko-KR/Hwp/edit/modification.htm",
+  "limitation": "Selected-object dispatch only. Hancom cursor-backward search across arbitrary controls is not implemented; unsupported dialog tabs retain their existing engine/UI limitations. No native Hancom comparison."
+}

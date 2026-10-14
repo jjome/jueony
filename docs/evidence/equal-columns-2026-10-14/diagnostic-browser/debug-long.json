@@ -1,0 +1,26 @@
+{
+  "status": "failed",
+  "error": "PartialApplyError: 렌더링 오류: 문단 (sec=0, para=2)이 페이지에 없습니다",
+  "stack": "PartialApplyError: 렌더링 오류: 문단 (sec=0, para=2)이 페이지에 없습니다\n    at Object.apply (http://127.0.0.1:4361/assets/editor-C5VmxoE6.js:90:150)\n    at async pptr:;CdpFrame.%3Canonymous%3E%20(file%3A%2F%2F%2FC%3A%2FUsers%2Fjjome%2FDocuments%2Fwork%2Fjueony%2Fapps%2Feditor%2Fnode_modules%2Fpuppeteer-core%2Flib%2Fpuppeteer%2Futil%2Fdecorators.js%3A101%3A27):1:1346",
+  "name": "PartialApplyError",
+  "records": [
+    {
+      "at": "resize-before",
+      "metrics": false
+    },
+    {
+      "at": "resize-after",
+      "value": "{\"ok\":true}",
+      "metrics": false
+    },
+    {
+      "at": "getPageOfPosition-error",
+      "value": "렌더링 오류: 문단 (sec=0, para=2)이 페이지에 없습니다",
+      "callArgs": [
+        0,
+        2
+      ],
+      "stack": "Error\n    at d.<computed> [as getPageOfPosition] (pptr:;CdpFrame.%3Canonymous%3E%20(file%3A%2F%2F%2FC%3A%2FUsers%2Fjjome%2FDocuments%2Fwork%2Fjueony%2Fapps%2Feditor%2Fnode_modules%2Fpuppeteer-core%2Flib%2Fpuppeteer%2Futil%2Fdecorators.js%3A101%3A27):1:791)\n    at http://127.0.0.1:4361/assets/editor-C5VmxoE6.js:79:58340\n    at Array.forEach (<anonymous>)\n    at ru (http://127.0.0.1:4361/assets/editor-C5VmxoE6.js:79:58233)\n    at Object.apply (http://127.0.0.1:4361/assets/editor-C5VmxoE6.js:90:47)\n    at async pptr:;CdpFrame.%3Canonymous%3E%20(file%3A%2F%2F%2FC%3A%2FUsers%2Fjjome%2FDocuments%2Fwork%2Fjueony%2Fapps%2Feditor%2Fnode_modules%2Fpuppeteer-core%2Flib%2Fpuppeteer%2Futil%2Fdecorators.js%3A101%3A27):1:1346"
+    }
+  ]
+}

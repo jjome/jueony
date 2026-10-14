@@ -1,0 +1,127 @@
+{
+  "status": "PASS_SCOPED_WITH_UNRESOLVED_LAYOUT_LIMITS",
+  "checkedAt": "2026-10-14T13:51:10.750Z",
+  "unitPassed": 703,
+  "providerPassed": 52,
+  "wasmPassed": 135,
+  "browserPassed": 138,
+  "moduleCount": 9,
+  "moduleFiles": 284,
+  "reports": [
+    {
+      "category": "native",
+      "kind": "native",
+      "passed": 12
+    },
+    {
+      "category": "default-native",
+      "kind": "native",
+      "passed": 9
+    },
+    {
+      "category": "agent-native",
+      "kind": "native",
+      "passed": 13
+    },
+    {
+      "category": "browser",
+      "kind": "browser",
+      "passed": 12
+    },
+    {
+      "category": "agent-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "table-multi-header-native",
+      "kind": "native",
+      "passed": 16
+    },
+    {
+      "category": "table-multi-header-browser",
+      "kind": "browser",
+      "passed": 20
+    },
+    {
+      "category": "agent-table-header-native",
+      "kind": "native",
+      "passed": 15
+    },
+    {
+      "category": "agent-table-header-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "table-protection-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "table-protection-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "agent-table-pagination-native",
+      "kind": "native",
+      "passed": 15
+    },
+    {
+      "category": "agent-table-pagination-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "table-conversion-native",
+      "kind": "native",
+      "passed": 17
+    },
+    {
+      "category": "table-conversion-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "selected-object-browser",
+      "kind": "browser",
+      "passed": 16
+    },
+    {
+      "category": "styles-native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "style-stories-native",
+      "kind": "native",
+      "passed": 4
+    },
+    {
+      "category": "agent-style-next-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "agent-style-next-browser",
+      "kind": "browser",
+      "passed": 14
+    }
+  ],
+  "engineSourceId": "3cb8152e4498fbbb",
+  "wasmSha256": "0f71ca3992a728ea93b5f88907d07555dbefce533cbd8e8ab192e7ba4cb37179",
+  "customSourceSha256": "dc797c9a9f9ce227d219cb8ac5393a4fe04389c6d251d1f275c7d5db8ee44716",
+  "applicationSourceCommit": "8a52edae5f9a82c8ba550ab170cc7e89249dbdd8",
+  "applicationSourceDirty": true,
+  "unresolved": [
+    "Long table with narrowed first column can lose trailing body paragraph page mapping after Canvas rendering. Rejected, full state restored, next request succeeds. Pure Native roundtrip does not demonstrate UI compatibility.",
+    "Existing multiple-table HWP following-anchor discrepancy remains; normal HWP Agent padding/equal widths stay readonly."
+  ],
+  "limits": [
+    "HWPX simple full-column bands only; exact selected integer total/remainder. No direct dimensions, equal row heights, merged/nested/complex/protected tables, macro/autosave integration.",
+    "Actual Native source/protection, exact preservation and saved cell/text geometry checks retained. Receipt structure validation now occurs inside strict render transaction before history commit.",
+    "Same-engine roundtrip only; independent Hancom 2024, paid model calls and Native Rust unit suite NOT_RUN. Existing patched WSL release WASM reused, no engine patch added.",
+    "Current unit/provider and related table/style/selected-object regressions, not all historical editor tests. Full documented scope incomplete; automation remains active."
+  ]
+}

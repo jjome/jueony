@@ -1,0 +1,12 @@
+PASS openai-responses: actual chat equalizes columns, comparison/undo/redo and safe save preserve remaining state
+PASS anthropic: actual chat equalizes columns, comparison/undo/redo and safe save preserve remaining state
+PASS gemini: actual chat equalizes columns, comparison/undo/redo and safe save preserve remaining state
+PASS openai-compatible: actual chat equalizes columns, comparison/undo/redo and safe save preserve remaining state
+PASS long-table post-render page-map failure rolls back before commit and next request still works
+PASS partial complete column band keeps first column and active cell cursor while distributing exact remainder
+PASS already equal/partial row/mixed/batch/alias/unknown inputs visibly fail without document writes
+PASS HWP/protected/merged/mixed source advertises readonly and visibly refuses
+PASS injected live resize failure or neighbor/text/layout corruption fully rolls back dirty/history/cursor
+PASS delayed provider cannot overwrite newer cell content
+PASS unsaved workspace restores equal widths/capability/comparison after confirmed restart
+PASS actual UI save/reopen preserves table and text layout with document-owned metrics initialized

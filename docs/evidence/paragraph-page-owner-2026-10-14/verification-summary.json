@@ -1,0 +1,150 @@
+{
+  "status": "PASS_SCOPED_WITH_REMAINING_EDITOR_LIMITS",
+  "checkedAt": "2026-10-14T14:25:19.030Z",
+  "unitPassed": 703,
+  "providerPassed": 52,
+  "wasmPassed": 141,
+  "browserPassed": 142,
+  "moduleCount": 9,
+  "moduleFiles": 284,
+  "reports": [
+    {
+      "category": "native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "equal-native",
+      "kind": "native",
+      "passed": 12
+    },
+    {
+      "category": "default-native",
+      "kind": "native",
+      "passed": 9
+    },
+    {
+      "category": "agent-native",
+      "kind": "native",
+      "passed": 13
+    },
+    {
+      "category": "browser",
+      "kind": "browser",
+      "passed": 15
+    },
+    {
+      "category": "geometry-browser",
+      "kind": "browser",
+      "passed": 1
+    },
+    {
+      "category": "agent-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "table-multi-header-native",
+      "kind": "native",
+      "passed": 16
+    },
+    {
+      "category": "table-multi-header-browser",
+      "kind": "browser",
+      "passed": 20
+    },
+    {
+      "category": "agent-table-header-native",
+      "kind": "native",
+      "passed": 15
+    },
+    {
+      "category": "agent-table-header-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "table-protection-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "table-protection-browser",
+      "kind": "browser",
+      "passed": 14
+    },
+    {
+      "category": "agent-table-pagination-native",
+      "kind": "native",
+      "passed": 15
+    },
+    {
+      "category": "agent-table-pagination-browser",
+      "kind": "browser",
+      "passed": 13
+    },
+    {
+      "category": "table-conversion-native",
+      "kind": "native",
+      "passed": 17
+    },
+    {
+      "category": "table-conversion-browser",
+      "kind": "browser",
+      "passed": 18
+    },
+    {
+      "category": "selected-object-browser",
+      "kind": "browser",
+      "passed": 16
+    },
+    {
+      "category": "styles-native",
+      "kind": "native",
+      "passed": 6
+    },
+    {
+      "category": "style-stories-native",
+      "kind": "native",
+      "passed": 4
+    },
+    {
+      "category": "agent-style-next-native",
+      "kind": "native",
+      "passed": 14
+    },
+    {
+      "category": "agent-style-next-browser",
+      "kind": "browser",
+      "passed": 14
+    }
+  ],
+  "engineSourceId": "d46ea37c6fc63c03",
+  "wasmSha256": "c2575912834d7917be9564e9004e594db2572867f1d9d0b91ddfc24d973ef7e6",
+  "customSourceSha256": "dc797c9a9f9ce227d219cb8ac5393a4fe04389c6d251d1f275c7d5db8ee44716",
+  "applicationSourceCommit": "ced2d251d3599d005777ddb91ff6b638d34e4d47",
+  "applicationSourceDirty": true,
+  "baseline": {
+    "native": {
+      "passed": 2,
+      "failed": 4
+    },
+    "browser": {
+      "passed": 0,
+      "failed": 1
+    }
+  },
+  "fixed": [
+    "Terminal blank-only page finalization now records exactly the absorbed logical paragraph IDs in hidden_empty_paras. Known hidden empty paragraph queries use preceding actual item last-page ownership.",
+    "Same previous/new initialized Canvas all-page control/text geometry is exactly identical. Actual long-table Agent application, undo/redo and UI save/reopen succeeds; ordinary injected page-query errors still roll back before receipt commit."
+  ],
+  "unresolved": [
+    "Existing multiple-table HWP following-anchor discrepancy remains. HWP Agent padding/equal-width gates stay readonly.",
+    "Equal row heights, explicit dimensions, complex/protected/merged/nested table Agent editing and full documented editor scope remain incomplete."
+  ],
+  "limits": [
+    "Same-engine roundtrip and Canvas tests only; independent Hancom 2024, paid models and Native Rust unit suite NOT_RUN. New tracked patch built as WSL release WASM without wasm-opt.",
+    "Current unit/provider and related table/style/selected-object regressions, not all historical editor tests. Earlier failed attempts and before baselines are excluded from PASS counts and review success files.",
+    "Full documented scope incomplete; automation remains active."
+  ]
+}

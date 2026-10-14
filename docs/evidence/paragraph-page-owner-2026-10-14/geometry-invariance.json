@@ -1,0 +1,14 @@
+{
+  "status": "IDENTICAL_ALL_PAGE_CONTROL_AND_TEXT_GEOMETRY",
+  "pageCount": 2,
+  "beforeMapping": {
+    "status": "unmapped",
+    "error": "렌더링 오류: 문단 (sec=0, para=2)이 페이지에 없습니다"
+  },
+  "afterMapping": {
+    "status": "mapped",
+    "ok": true,
+    "page": 1
+  },
+  "note": "Same actual initialized Canvas document, Native width mutation and normal render event. Query fix changes ownership only; no page/coordinate/paint policy change."
+}

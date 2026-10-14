@@ -30,3 +30,5 @@
 91번 긴 표의 페이지 조회 실패는 이번 범위에서 해결했다. HWP 여러 표의 후속 앵커 배치 차이, 행 높이 균등 분배·직접 크기 지정, 병합/복합 표, 모든 수동 기능의 Agent 제어와 한글 전체 동등성은 남는다. 정상 HWP의 Agent 안 여백·너비 제한은 유지한다. 독립 한글 비교·유료 모델 호출·Native Rust unit suite는 실행하지 않는다. 전체 문서화된 구현은 미완료이므로 자동화를 유지한다.
 
 최종 검사 수치·원본/성공/이전 실패 파일 분류·실제 실행 묶음의 소스 해시는 같은 증거 폴더의 `verification-summary.json`, `documents.json`, `source-baseline-notes.json`을 따른다. 과거 전체 편집기 검사를 모두 재실행한 수치로 표시하지 않는다.
+
+최종 검사: 단위 703·provider/server 52·관련 실제 WASM 141·Edge 142 통과. 신규 소유 검사는 Native 6개(이전 4실패/2통과), 실제 균등 분배/소유 Edge 15개와 별도 Canvas 배치 불변 1개를 포함한다. TypeScript·9개 모듈/284개 소스 경계 및 예상 밖 page/console 오류·외부 요청 0건을 확인했다. 구현 `62f6ca5` 커밋·푸시 완료. 새 WASM SHA-256 `c2575912834d7917be9564e9004e594db2572867f1d9d0b91ddfc24d973ef7e6`, 앱 소스 SHA-256 `dc797c9a9f9ce227d219cb8ac5393a4fe04389c6d251d1f275c7d5db8ee44716`. 실제 4312 서버의 자산·중립 wire/provider 계약을 대조하고 한글 검수 문서의 파일 해시 목록을 보존했다. [검사 집계](evidence/paragraph-page-owner-2026-10-14/verification-summary.json), [배치 불변 증거](evidence/paragraph-page-owner-2026-10-14/geometry-invariance.json), [문서별 역할](evidence/paragraph-page-owner-2026-10-14/documents.json)을 따른다.

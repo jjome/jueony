@@ -1,0 +1,1792 @@
+{
+  "implementationCommit": "0003af4f9b7591e7665dd8ff03534b5033c98753",
+  "buildSourceCommit": "1bb02f053727082f6d510cbf87d5a492a0a206cd",
+  "buildSourceDirty": true,
+  "engineSourceId": "58f40208d1f280ed",
+  "wasmSha256": "57b223d37857726cf28bf68008c2c872b6eeadb82f5e9637c03df9d9c32371c4",
+  "customSourceSha256": "99c302ba7c0d674557e51a89590966e0a5f8f4c2a2042a2f848c9d802864f080",
+  "enginePatches": [
+    {
+      "name": "border-fill-identity.patch",
+      "workingSha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c",
+      "committedSha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "default-tabs.patch",
+      "workingSha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af",
+      "committedSha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "document-insertion.patch",
+      "workingSha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f",
+      "committedSha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "master-page-editing.patch",
+      "workingSha256": "b04c7d682e105e3f37f72a18c1b4bb01cbf085424e3219f3919fd8c891dc26c2",
+      "committedSha256": "b04c7d682e105e3f37f72a18c1b4bb01cbf085424e3219f3919fd8c891dc26c2",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "merged-table-transpose.patch",
+      "workingSha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768",
+      "committedSha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "note-query-json.patch",
+      "workingSha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562",
+      "committedSha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "page-border-entries.patch",
+      "workingSha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f",
+      "committedSha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "page-border-inclusion.patch",
+      "workingSha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e",
+      "committedSha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "page-border-region.patch",
+      "workingSha256": "ea98aed9ad8568699b802c5f46e4964fe524ba7634bc978d71fe10f44e1d7412",
+      "committedSha256": "ea98aed9ad8568699b802c5f46e4964fe524ba7634bc978d71fe10f44e1d7412",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "page-border-z-image.patch",
+      "workingSha256": "97ccd3c9eac24c42b0844fc65e5804b232d3bef9929a6fd5de329cdd007b173b",
+      "committedSha256": "97ccd3c9eac24c42b0844fc65e5804b232d3bef9929a6fd5de329cdd007b173b",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "section-split.patch",
+      "workingSha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8",
+      "committedSha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "style-reference-deletion.patch",
+      "workingSha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6",
+      "committedSha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "style-reference-order.patch",
+      "workingSha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce",
+      "committedSha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "style-shape-stories.patch",
+      "workingSha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af",
+      "committedSha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "table-creation-consistency.patch",
+      "workingSha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad",
+      "committedSha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zz-line-number-settings.patch",
+      "workingSha256": "4cb8ce4a8d49864f53c3ff95fdfc8ef3e0342b09f86cd525dfb9aa102e2dee72",
+      "committedSha256": "4cb8ce4a8d49864f53c3ff95fdfc8ef3e0342b09f86cd525dfb9aa102e2dee72",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzz-page-body-delete.patch",
+      "workingSha256": "54bf1697627ec92c4379fb8ca314f9bf9d99c2207bf9e90859d35c7324be2e83",
+      "committedSha256": "54bf1697627ec92c4379fb8ca314f9bf9d99c2207bf9e90859d35c7324be2e83",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzz-page-body-copy.patch",
+      "workingSha256": "45f3331d992f3799dad1f076bfd6d237d8c989541ea510d888e4afb5407749db",
+      "committedSha256": "45f3331d992f3799dad1f076bfd6d237d8c989541ea510d888e4afb5407749db",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzz-page-body-paper-paste.patch",
+      "workingSha256": "4df977f851378597848aa60581957c123e6565ebf04f9412052dbfdabb2c43a0",
+      "committedSha256": "4df977f851378597848aa60581957c123e6565ebf04f9412052dbfdabb2c43a0",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzz-page-body-style-paste.patch",
+      "workingSha256": "168c4c158bc0db3e71230903eae0b1ae71092a1a139f2ad5747712f95127bd75",
+      "committedSha256": "168c4c158bc0db3e71230903eae0b1ae71092a1a139f2ad5747712f95127bd75",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzz-page-body-image-paste.patch",
+      "workingSha256": "ac08a167a376bae3e1e890f8109f2f9552ce952abe7882712f813183597ce57a",
+      "committedSha256": "ac08a167a376bae3e1e890f8109f2f9552ce952abe7882712f813183597ce57a",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzz-empty-section-remove.patch",
+      "workingSha256": "d49d3acc5bc0b3049415e17233a7f7a7249792f6500d475ce6cd39d3ad14d590",
+      "committedSha256": "d49d3acc5bc0b3049415e17233a7f7a7249792f6500d475ce6cd39d3ad14d590",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzz-hwpx-body-caret.patch",
+      "workingSha256": "c073ab44d5460f92915ea6493a791d2cbf24bb60ad66eca5033be0fc9835ac56",
+      "committedSha256": "c073ab44d5460f92915ea6493a791d2cbf24bb60ad66eca5033be0fc9835ac56",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzzz-agent-page-background.patch",
+      "workingSha256": "74104eca6a40a3a7f06ad6d20ed8f44f816f0c153a2be40fdf584b61fc9ba907",
+      "committedSha256": "74104eca6a40a3a7f06ad6d20ed8f44f816f0c153a2be40fdf584b61fc9ba907",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzzzz-agent-header-footer.patch",
+      "workingSha256": "415fa55bc5fe0c4f49a7dce025723067022d7bdef076a9fb48b7f456c30cb91a",
+      "committedSha256": "415fa55bc5fe0c4f49a7dce025723067022d7bdef076a9fb48b7f456c30cb91a",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzzzzz-agent-paragraph-tabs.patch",
+      "workingSha256": "d15949747520d51020433aca32539f79c5a8cc0dfdad9de95db221dae651b311",
+      "committedSha256": "d15949747520d51020433aca32539f79c5a8cc0dfdad9de95db221dae651b311",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzzzzzz-agent-paragraph-decoration.patch",
+      "workingSha256": "2adf2bba46d11a6ca97ce838da1d329c627c8532812674b7329aaef3cdb544fb",
+      "committedSha256": "2adf2bba46d11a6ca97ce838da1d329c627c8532812674b7329aaef3cdb544fb",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzzzzzzz-agent-paragraph-lists.patch",
+      "workingSha256": "06e1af9e90e0c54da772a533f9c2ac5279db059c37fb3612c189e0d7e1c7692d",
+      "committedSha256": "06e1af9e90e0c54da772a533f9c2ac5279db059c37fb3612c189e0d7e1c7692d",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzzzzzzzz-agent-basic-bullets.patch",
+      "workingSha256": "03138686d9faa51fcf335f1b6299a294248031d36ca079da5346e52d0b531a35",
+      "committedSha256": "03138686d9faa51fcf335f1b6299a294248031d36ca079da5346e52d0b531a35",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzzzzzzzzz-agent-numbering-clone.patch",
+      "workingSha256": "a79207f328ca0521515344c018554ccc20092142dabaa5ba413ff162408fa567",
+      "committedSha256": "a79207f328ca0521515344c018554ccc20092142dabaa5ba413ff162408fa567",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzzzzzzzzzz-agent-basic-numbering.patch",
+      "workingSha256": "66ac344e90a16b3e447e97bd6a593edbc7b9e024313cc40f81f2611838f3b102",
+      "committedSha256": "66ac344e90a16b3e447e97bd6a593edbc7b9e024313cc40f81f2611838f3b102",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzzzzzzzzzzz-agent-paragraph-outline.patch",
+      "workingSha256": "dfe19d3083f6a4222440ce558b5451f2568cf57b211bcc19babb508c1db2022e",
+      "committedSha256": "dfe19d3083f6a4222440ce558b5451f2568cf57b211bcc19babb508c1db2022e",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzzzzzzzzzzzz-agent-style-metadata.patch",
+      "workingSha256": "53c6a573df6e8f1d0af4f388dad4e624a700006ad38f7a1de820eabc1d6d44cb",
+      "committedSha256": "24a6f824744c56eddbd6a089897b7383a86d63006b491299684c20586632b035",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzzzzzzzzzzzzz-whole-table-edited-host.patch",
+      "workingSha256": "f90714f601227bba000d63be77e5ac9f3985d192e613990984544b2f70b0f603",
+      "committedSha256": "f90714f601227bba000d63be77e5ac9f3985d192e613990984544b2f70b0f603",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzzzzzzzzzzzzzz-table-default-padding-reflow.patch",
+      "workingSha256": "903260c4c371a2a1d4b0afa72f8f0e1f191db936bd6e055a974a0a4295badf0e",
+      "committedSha256": "903260c4c371a2a1d4b0afa72f8f0e1f191db936bd6e055a974a0a4295badf0e",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzzzzzzzzzzzzzzz-hidden-paragraph-page-owner.patch",
+      "workingSha256": "13df5f1c5493ef4560866f3806be6a3bd2c748e50a1fc531dac686994e310b6b",
+      "committedSha256": "13df5f1c5493ef4560866f3806be6a3bd2c748e50a1fc531dac686994e310b6b",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzzzzzzzzzzzzzzzz-following-table-flow-owner.patch",
+      "workingSha256": "251cb5ee2d06a1a78732d7c01839bf4bf596a5376ce5af8637b50d8c0633f897",
+      "committedSha256": "251cb5ee2d06a1a78732d7c01839bf4bf596a5376ce5af8637b50d8c0633f897",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzzzzzzzzzzzzzzzz-memo-tail-owner.patch",
+      "workingSha256": "5f4eafa802c6dd9dde96a1def6e187ef1be5b3f7e9a99cf8d4569458d0d0bca0",
+      "committedSha256": "5f4eafa802c6dd9dde96a1def6e187ef1be5b3f7e9a99cf8d4569458d0d0bca0",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzzzzzzzzzzzzzzzzz-table-outer-margin-owner.patch",
+      "workingSha256": "6132e26aa3a5b14f506f425d79930882a5c48092eac8e96bc4c8735cc8d42db3",
+      "committedSha256": "6132e26aa3a5b14f506f425d79930882a5c48092eac8e96bc4c8735cc8d42db3",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-table-tail-snapshot.patch",
+      "workingSha256": "11a853d99a9278fd94e2c573d384f3826c53b00a433bcb6b9fa04fb24e344f0e",
+      "committedSha256": "11a853d99a9278fd94e2c573d384f3826c53b00a433bcb6b9fa04fb24e344f0e",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzz-conversion-semantic-storage.patch",
+      "workingSha256": "65f3e6e87bb1030f2e565cfd96d36b85dc4065de8fb3615a2db24a9d4121a092",
+      "committedSha256": "65f3e6e87bb1030f2e565cfd96d36b85dc4065de8fb3615a2db24a9d4121a092",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    }
+  ],
+  "applicationFiles": [
+    {
+      "path": "apps/editor/src/adapters/browser/calendar-format-preference.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/calendar-stamp-dialog.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/content-hash.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/context-menu-keyboard.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/document-insertion-dialog.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/document-tab-cycle.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/modal-keyboard.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/paragraph-sort-dialog.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/plain-text-dialog.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/preferences-binding.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/recovery-settings.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/settings-backup-dialog.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/snippet-dialog.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/style-package-dialog.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/table-auto-fill-dialog.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/table-conversion-dialog.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/table-header-dialog.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/table-presets-dialog.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/text-transform-dialog.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/work-template-dialog.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/files/download-save.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/files/file-connection.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/files/fingerprints.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/files/recovery-export.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/files/references.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/files/save-runtime.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/files/temporary-references.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/http/local-model-gateway.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/iframe/document-client.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-basic-bullet.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-basic-numbering.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-bookmarks.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-empty-section.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-header-footer-create.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-header-footer-delete.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-header-footer-structure.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-header-footer.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-master-pages.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-numbering-clone.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-page-background.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-paragraph-decoration.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-paragraph-list.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-paragraph-outline.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-paragraph-tabs.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-section-merge.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-section-settings.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-section-split.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-style-create.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-style-next.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-style-rename.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-style-source.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-table-header.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-table-pagination.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/basic-text-commands.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/body-caret.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/body-operations.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/body-preservation.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/calendar-stamp.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/cell-padding.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-defaults.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-info.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-insertion.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/edit-preflight.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/empty-section-removal.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/equal-columns.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/execute.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/formatting-toolbar.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/hanging-indent.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/line-numbers.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/manual-commands.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/master-pages.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/navigation-history.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/operations.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/page-background-image.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/page-body-clipboard.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/page-body-deletion.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/page-border-settings.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/page-controls.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/page-setup-settings.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/paragraph-sort-native.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/paragraph-sort.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/paragraph-spacing.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/plain-text-native.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/row-heights.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/section-boundary.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/selected-object-properties.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/session-cursor.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/snippets.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/structure.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/style-flow.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/style-management.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/style-package-native.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/style-package.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-auto-fill-native.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-auto-fill.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-conversion-native.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-conversion.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-header.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-layout-evidence.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-merge.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-presets-native.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-presets.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-split.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-structure.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-topology-evidence.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-write-guard.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/text-transform-native.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/transpose-table.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/work-templates-native.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/work-templates.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/storage/indexeddb-workspace.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/storage/legacy-state-validator.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/adapters/storage/serialized-writer.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/agent/run-bounded.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/boot.js",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/chrome-2024.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/composition/agent.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/composition/references.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/composition/workbench.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/desktop-host.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/document-control/describe.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/document-control/execute.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/document-control/operations.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/document-control/structure.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/download-save.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/editor-actions/equal-cells.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/editor-actions/navigation-pane.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/editor-actions/search-model.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/editor.css",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/file-connection.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/icons.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/macros/commands.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/agent/application/context.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/agent/application/facade.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/agent/application/run-bounded.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/agent/application/run-once.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/agent/domain/generation.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/agent/public/contracts.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/agent/public/index.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/automation/application/describe-template.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/automation/application/facade.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/automation/domain/commands.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/automation/public/contracts.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/automation/public/index.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/connections/public/index.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/application/describe-structure.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/application/facades.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-basic-bullet.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-basic-numbering.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-bookmarks.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-empty-section.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-header-footer.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-master-pages.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-numbering-clone.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-paragraph-decoration.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-paragraph-list.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-paragraph-outline.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-paragraph-tabs.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-section-merge.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-section-settings.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-section-split.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-style-create.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-style-name.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-style-next.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-style-rename.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-table-header.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-table-pagination.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/calendar-stamp.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/cell-padding.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/edit-operations.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/edit-proposal.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/empty-section-removal.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/equal-columns.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/formatting-toolbar.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/hanging-indent.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/line-number-settings.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/master-page-settings.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/page-body-clipboard.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/page-body-deletion.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/page-body-paste-plan.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/page-border-settings.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/page-setup-settings.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/paragraph-sort.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/row-heights.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/style-definition.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/style-package.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/table-auto-fill.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/table-conversion.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/table-merge.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/table-presets.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/table-series.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/table-split.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/table-structure.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/text-transform.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/work-templates.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/ports/engine.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/facades.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/failure.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/index.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/interaction.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/paragraph-sort.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/style-package.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/table-auto-fill.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/table-conversion.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/table-presets.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/text-transform.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/types.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/wire-schema.d.mts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/wire-schema.mjs",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/work-templates.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/application/export-recovery.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/application/write-snapshot.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/domain/recovery-export.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/domain/recovery-record.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/domain/save-revision.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/ports/recovery-export.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/ports/snapshot-write.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/public/contracts.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/public/index.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/application/document-defaults.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/application/document-view.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/application/persistence.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/application/recovery-coordinator.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/application/settings-backup.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/application/snippets.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/application/view-journal.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/body-caret.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/document-defaults.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/document-view.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/merge.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/navigation-history.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/recovery-policy.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/session-cursor.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/settings-backup.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/snippets.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/ports/storage.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/ports/viewport.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/public/contracts.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/public/index.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/references/application/facade.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/references/application/selected-sources.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/references/ports/content-hash.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/references/public/contracts.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/references/public/index.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/session/application/facade.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/session/application/navigation.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/session/domain/document-order.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/session/domain/document-tab-cycle.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/session/domain/exit-protection.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/session/domain/tabs.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/session/ports/lifecycle.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/session/public/contracts.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/session/public/index.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/workspace/application/facade.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/workspace/domain/workspace.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/workspace/ports/state.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/workspace/public/contracts.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/modules/workspace/public/index.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/mvp/context.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/mvp/document-order.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/mvp/edit-schema.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/mvp/editor-bridge.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/mvp/llm.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/mvp/model.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/mvp/provider-presets.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/mvp/recovery-export.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/mvp/recovery-record.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/mvp/references.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/mvp/run-once.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/mvp/store.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/mvp/temporary-references.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/mvp/validate-state.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/pane-layout.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/preferences/binding.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/preferences/document-defaults.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/preferences/document-view.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/preferences/persistence.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/retrieval/selected-sources.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/save-guard.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/shell.css",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/shell.html",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/shell.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/shortcuts/cell-band.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/shortcuts/install.ts",
+      "byteEqual": false,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/shortcuts/keymap.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/shortcuts/paragraph-spacing.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/shortcuts/style-slots.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/ui/connections-panel.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/ui/document-defaults-panel.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/ui/dom.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    },
+    {
+      "path": "apps/editor/src/unified-chrome.ts",
+      "byteEqual": true,
+      "normalizedLFEqual": true
+    }
+  ],
+  "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+  "nativeHancomComparison": "NOT_RUN",
+  "paidModelTest": "NOT_RUN",
+  "nativeRustUnitSuite": "NOT_RUN",
+  "unresolved": [
+    "The four recorded public conversion preservation blocks are fixed in engine58; edited HWP overlap-table tails are fixed only in a narrow scope. See separate storage evidence and unchanged unsupported layout counterexamples.",
+    "HWP overlap tails with later visible text or positive saved gaps remain unresolved; arbitrary divisions, complex sources and remaining editor scope incomplete."
+  ],
+  "notes": [
+    "Engine patch working raw SHA matches compiled metadata; Git/source normalized LF content verified. Existing style metadata patch working CRLF differs from Git LF only in line endings.",
+    "Unit/provider logs trim trailing whitespace only for Git hygiene; raw ignored build logs retained.",
+    "Actual 4322 launcher metadata/assets and provider-neutral contracts checked; previous launchers and user documents were not replaced."
+  ]
+}

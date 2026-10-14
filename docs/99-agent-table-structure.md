@@ -36,3 +36,5 @@
 검수본의 `review-documents/table-structure/structure-browser`에 실제 UI로 저장한 문서와 재열기 화면을 포함한다. 최종 한글 검수는 복사본에서 행 경계·불균등 폭/높이·서식·빈 사이 문단·커서·다른 구역을 확인한다. 관련 과거 기능의 새 회귀 결과와 출력 지문은 보존하며 중복된 과거 문서/화면은 로컬 ignored build에 유지한다.
 
 [저장 수정과 남은 두 반례](100-storage-conversion-and-overlap.md), [전체 체크리스트](jueony-work-checklist.md)를 따른다. 병합 후 개별 문단 편집·임의 N×M 분할·글상자 상태 복원은 다음 병렬 후보이며, 이 실행본에서 지원한다고 표시하지 않는다.
+
+구현 `0003af4` 커밋·푸시 완료. [Git/빌드 소스 대조](evidence/table-structure-2026-10-15/source-baseline-notes.json), [문서별 역할·한글 검수 순서](evidence/table-structure-2026-10-15/documents.json)를 보존했다.

@@ -71,6 +71,8 @@ export function capturePreservationEvidence(value:NativeDocument):PreservationEv
   }
   return resolved;
  };
+ let storedRestarts:Json[]|undefined;
+ if(typeof (doc as Record<string,unknown>).getAgentListDefinitions==='function')capture('list-definitions',()=>{const {storedRestarts:state,...definitions}=record(read(doc,'getAgentListDefinitions'));storedRestarts=array(state);return definitions;});
  capture('sections',()=>integer(read(doc,'getSectionCount')));
  const sectionCount=typeof values.sections==='number'?values.sections:0;
  for(let section=0;section<sectionCount;section++){
@@ -93,7 +95,7 @@ export function capturePreservationEvidence(value:NativeDocument):PreservationEv
     const length=integer(read(doc,'getParagraphLength',section,paragraph));
     const segments=array(read(doc,'getCharShapeRuns',section,paragraph,0,length));
     runs+=segments.length;budget(runs,LIMITS.runs);
-    return {text:String(invoke(doc,'getTextRange',section,paragraph,0,length)),paragraph:read(doc,'getParaPropertiesAt',section,paragraph),pageHide:read(doc,'getPageHide',section,paragraph),style:read(doc,'getStyleAt',section,paragraph),runs:segments.map(item=>{
+    return {...(storedRestarts?{storedNumberingRestart:array(storedRestarts[section])[paragraph]??null}:{}),text:String(invoke(doc,'getTextRange',section,paragraph,0,length)),paragraph:read(doc,'getParaPropertiesAt',section,paragraph),pageHide:read(doc,'getPageHide',section,paragraph),style:read(doc,'getStyleAt',section,paragraph),runs:segments.map(item=>{
      const run=record(item),start=integer(run.startOffset),end=integer(run.endOffset);
      return {start,end,properties:read(doc,'getCharPropertiesAt',section,paragraph,start)};
     }),...(length===0?{emptyProperties:read(doc,'getCharPropertiesAt',section,paragraph,0)}:{})};
@@ -142,7 +144,7 @@ export function capturePreservationEvidence(value:NativeDocument):PreservationEv
   return [...metadata,...content];
  });
  capture('styles',()=>array(read(doc,'getStyleList')).map(item=>{
-  const style=record(item),id=integer(style.id);return {...style,details:read(doc,'getStyleDetail',id)};
+  const style=record(item),id=integer(style.id);return {...style,details:read(doc,typeof (doc as Record<string,unknown>).getStoredStyleDetail==='function'?'getStoredStyleDetail':'getStyleDetail',id)};
  }));
  capture('cells',()=>{
   const lists=array(record(read(doc,'getCursorModel')).lists).map(record),byId=new Map(lists.map(l=>[integer(l.listId),l]));

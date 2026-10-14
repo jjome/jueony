@@ -1,0 +1,75 @@
+--- /dev/null
++++ b/src/document_core/commands/agent_paragraph_lists.rs
+@@ -0,0 +1,44 @@
++//! Existing stored paragraph list definitions; no resource creation or restart changes.
++use crate::document_core::DocumentCore;
++use crate::error::HwpError;
++use crate::model::style::HeadType;
++fn fail(s:&str)->HwpError{HwpError::RenderError(s.into())}
++impl DocumentCore{
++    pub fn get_agent_list_definitions_native(&self)->String{
++        let info=&self.document.doc_info;
++        let mut v=serde_json::json!({"numberings":info.numberings,"bullets":info.bullets,"storedRestarts":self.document.sections.iter().map(|s|s.paragraphs.iter().map(|p|p.numbering_restart).collect::<Vec<_>>()).collect::<Vec<_>>()});
++        for key in ["numberings","bullets"]{for entry in v[key].as_array_mut().unwrap(){let o=entry.as_object_mut().unwrap();o.remove("raw_data");o.remove("raw_para_heads");o.remove("raw_para_head");}}
++        v.to_string()
++    }
++    fn agent_basic_bullet(&self,id:u16)->bool{id>0&&self.document.doc_info.bullets.get(id as usize-1).is_some_and(|b|b.image_bullet==0&&b.image_data==[0;4]&&b.check_bullet_char==char::from(0))}
++    fn agent_list_token(&self,s:usize,p:usize)->Result<String,HwpError>{
++        let source:serde_json::Value=serde_json::from_str(&self.get_agent_paragraph_tabs_native(s,p)?).map_err(|_|fail("Invalid body source"))?;
++        if source["editable"]!=true{return Err(fail("문단 번호는 일반 본문과 기본 탭 원본만 지원합니다."));}
++        let body=&self.document.sections[s].paragraphs[p];let ps=&self.document.doc_info.para_shapes[body.para_shape_id as usize];
++        if ps.head_type==HeadType::Outline||ps.para_level>6||body.numbering_restart.is_some(){return Err(fail("개요·확장 수준·명시적 번호 다시 시작은 읽기 전용입니다."));}
++        if ps.head_type==HeadType::Number&&(ps.numbering_id==0||ps.numbering_id as usize>self.document.doc_info.numberings.len())||ps.head_type==HeadType::Bullet&&(ps.numbering_id==0||ps.numbering_id as usize>self.document.doc_info.bullets.len()){return Err(fail("Invalid source list reference"));}
++        if ps.head_type==HeadType::Bullet&&(ps.para_level!=0||!self.agent_basic_bullet(ps.numbering_id)){return Err(fail("그림/체크 글머리표 원본은 읽기 전용입니다."));}
++        let value=serde_json::json!({"source":source,"numberings":self.document.doc_info.numberings,"bullets":self.document.doc_info.bullets});
++        Ok(blake3::hash(value.to_string().as_bytes()).to_hex().to_string())
++    }
++    pub fn get_agent_paragraph_list_native(&self,s:usize,p:usize)->String{
++        match self.agent_list_token(s,p){Ok(token)=>serde_json::json!({"editable":true,"token":token}),Err(e)=>serde_json::json!({"editable":false,"reason":e.to_string()})}.to_string()
++    }
++    pub fn set_agent_paragraph_list_native(&mut self,s:usize,p:usize,json:&str)->Result<String,HwpError>{
++        let v:serde_json::Value=serde_json::from_str(json).map_err(|_|fail("Invalid list command"))?;
++        if !v.as_object().is_some_and(|o|o.len()==4&&o.keys().all(|k|["token","headType","numberingId","paraLevel"].contains(&k.as_str()))){return Err(fail("Invalid list command fields"));}
++        if v["token"].as_str()!=Some(self.agent_list_token(s,p)?.as_str()){return Err(fail("문단 원문·서식·번호 정의가 바뀌었습니다."));}
++        let head=v["headType"].as_str().ok_or_else(||fail("Invalid list kind"))?;
++        let id=v["numberingId"].as_u64().filter(|n|*n<=65535).ok_or_else(||fail("Invalid list definition"))?;
++        let level=v["paraLevel"].as_u64().filter(|n|*n<=6).ok_or_else(||fail("Invalid list level"))?;
++        match head{"None" if id==0&&level==0=>{},"Number" if id>0&&(id as usize)<=self.document.doc_info.numberings.len()=>{},"Bullet" if id>0&&(id as usize)<=self.document.doc_info.bullets.len()&&level==0&&self.agent_basic_bullet(id as u16)=>{},_=>return Err(fail("현재 저장된 번호/글머리표 정의와 지원 수준만 선택하세요."))}
++        let valid_char=|id:u32|id==u32::MAX||(id as usize)<self.document.doc_info.char_shapes.len();
++        if head=="Number"&&self.document.doc_info.numberings[id as usize-1].heads.iter().any(|h|!valid_char(h.char_shape_id))||head=="Bullet"&&!valid_char(self.document.doc_info.bullets[id as usize-1].char_shape_id){return Err(fail("번호 정의의 글자 모양 참조를 확인하지 못했습니다."));}
++        let before=self.document.clone();let events=self.event_log.len();let resources=serde_json::json!({"numberings":before.doc_info.numberings,"bullets":before.doc_info.bullets});
++        let result=(||{self.apply_para_format_native(s,p,&serde_json::json!({"headType":head,"numberingId":id,"paraLevel":level}).to_string())?;
++            let ps=&self.document.doc_info.para_shapes[self.document.sections[s].paragraphs[p].para_shape_id as usize];
++            if format!("{:?}",ps.head_type)!=head||u64::from(ps.numbering_id)!=id||u64::from(ps.para_level)!=level||resources!=serde_json::json!({"numberings":self.document.doc_info.numberings,"bullets":self.document.doc_info.bullets}){return Err(fail("문단 번호 결과 또는 공유 정의가 계획과 다릅니다."));}
++            Ok(self.get_agent_paragraph_list_native(s,p))})();
++        if result.is_err(){self.document=before;self.event_log.truncate(events);self.rebuild_derived_state();}result
++    }
++}
+--- a/src/document_core/commands/mod.rs
++++ b/src/document_core/commands/mod.rs
+@@ -17,6 +17,7 @@
+ mod line_numbers;
+ mod agent_header_footer;
+ mod agent_paragraph_tabs;
++mod agent_paragraph_lists;
+ mod agent_paragraph_decoration;
+ mod agent_page_background;
+ mod page_body_delete;
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1204,6 +1204,15 @@
+     pub fn get_agent_page_background(&self,section:usize,kind:&str)->Result<String,JsValue>{self.core.get_agent_page_background_native(section,kind).map_err(|e|e.into())}
+     #[wasm_bindgen(js_name = setAgentPageBackground)]
+     pub fn set_agent_page_background(&mut self,section:usize,kind:&str,json:&str)->Result<String,JsValue>{self.core.set_agent_page_background_native(section,kind,json).map_err(|e|e.into())}
++
++    #[wasm_bindgen(js_name = getStoredStyleDetail)]
++    pub fn get_stored_style_detail(&self,id:usize)->String{match self.core.document.doc_info.styles.get(id){Some(s)=>format!("{{\"charProps\":{},\"paraProps\":{}}}",self.core.build_char_properties_json_by_id(s.char_shape_id),self.core.build_para_properties_json(s.para_shape_id,0)),None=>"{}".into()}}
++    #[wasm_bindgen(js_name = getAgentListDefinitions)]
++    pub fn get_agent_list_definitions(&self)->String{self.core.get_agent_list_definitions_native()}
++    #[wasm_bindgen(js_name = getAgentParagraphList)]
++    pub fn get_agent_paragraph_list(&self,s:usize,p:usize)->String{self.core.get_agent_paragraph_list_native(s,p)}
++    #[wasm_bindgen(js_name = setAgentParagraphList)]
++    pub fn set_agent_paragraph_list(&mut self,s:usize,p:usize,json:&str)->Result<String,JsValue>{self.core.set_agent_paragraph_list_native(s,p,json).map_err(|e|e.into())}
+ 
+     #[wasm_bindgen(js_name = getAgentParagraphDecoration)]
+     pub fn get_agent_paragraph_decoration(&self,section:usize,paragraph:usize)->Result<String,JsValue>{self.core.get_agent_paragraph_decoration_native(section,paragraph).map_err(|e|e.into())}

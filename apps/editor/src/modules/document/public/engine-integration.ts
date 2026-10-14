@@ -16,3 +16,5 @@ export {validateAgentBookmark,validBookmarkName} from '../domain/agent-bookmarks
 export {agentParagraphTabsPayload} from '../domain/agent-paragraph-tabs.ts';
 
 export {agentParagraphDecorationPayload,paragraphBorderWidthsMm} from '../domain/agent-paragraph-decoration.ts';
+
+export {agentParagraphListPayload} from '../domain/agent-paragraph-list.ts';

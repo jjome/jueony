@@ -1,3 +1,4 @@
+import {agentParagraphListPayload} from './agent-paragraph-list.ts';
 import {agentParagraphDecorationPayload} from './agent-paragraph-decoration.ts';
 import {agentParagraphTabsPayload} from './agent-paragraph-tabs.ts';
 import {validateAgentBookmark} from './agent-bookmarks.ts';
@@ -90,11 +91,14 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
   const nodes=structuredClone(snapshot.nodes);
   const hiddenPages=new Map(structure!.paragraphs.filter(p=>p.pageHide?.exists&&p.pageIndex!==undefined).map(p=>[p.pageIndex,p.id]));
   const body = (id: string) => { const n = nodes.find(n => n.id === id); if (!n?.editable) fail('편집 가능한 본문 문단 ID가 필요합니다.'); return n!; };
+  const lists=operations.filter(op=>op.kind==='set_paragraph_list');
+  if(lists.length&&(lists.length!==operations.length||new Set(lists.map(op=>(op as {target:string}).target)).size!==lists.length))fail('문단 번호는 서로 다른 문단의 전용 명령만 묶어 실행하세요.');
   const decoration=operations.filter(op=>op.kind==='format_paragraph_decoration');
   if(decoration.length&&(decoration.length!==operations.length||new Set(decoration.map(op=>(op as {target:string}).target)).size!==decoration.length))fail('문단 테두리/배경은 서로 다른 문단의 전용 명령만 묶어 실행하세요.');
   const tabs=operations.filter(op=>op.kind==='set_paragraph_tabs');
   if(tabs.length&&(tabs.length!==operations.length||new Set(tabs.map(op=>(op as {target:string}).target)).size!==tabs.length))fail('문단 탭은 서로 다른 문단의 탭 명령만 한 요청으로 묶어 실행하세요.');
   for (const op of operations) {
+    if(op.kind==='set_paragraph_list'){only(op,['kind','target','listKind','definitionId','level']);agentParagraphListPayload(op,snapshot);continue;}
     if(op.kind==='format_paragraph_decoration'){only(op,['kind','target','properties']);agentParagraphDecorationPayload(op,snapshot);continue;}
     if(op.kind==='set_paragraph_tabs'){only(op,['kind','target','stops','autoLeft','autoRight']);agentParagraphTabsPayload(op,snapshot);continue;}
     if(op.kind==='add_bookmark'||op.kind==='rename_bookmark'||op.kind==='delete_bookmark'){only(op,op.kind==='add_bookmark'?['kind','target','offset','name']:op.kind==='rename_bookmark'?['kind','name','newName']:['kind','name']);if(operations.length!==1)fail('책갈피 편집은 단독 명령으로 실행하세요.');validateAgentBookmark(op,snapshot);continue;}

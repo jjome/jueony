@@ -1,0 +1,21 @@
+{
+  "implementationCommit": "13ac952caec09b33f200fdb40801a30cebbbb5dd",
+  "applicationSourceCommit": "7bd08575419d40d5de349491714d41f04582a002",
+  "applicationSourceDirty": true,
+  "customSourceSha256": "b2e3e669ddd8a06e9294854e9c887baf4b7ef59fe8feae6eef4d4b178ca55f36",
+  "engineSourceId": "570603c60a53c953",
+  "wasmSha256": "ba74ed4ab9e819166e41152036cbd01286fa69f3cac3eeb5a08b4c0b4cad723b",
+  "upstreamReference": "1a76570e833917d15817415a53c09ad61ab3203f",
+  "engineChanged": false,
+  "reusedMetadataPatch": "zzzzzzzzzzzzzzzzzzz-agent-style-metadata.patch",
+  "finalBundle": "build/jueony-agent-style-next-20261014 @4294",
+  "notes": [
+    "Existing immutable 570603 engine reused unchanged; no Rust compile or Native Rust unit tests in this increment. Actual WASM scenarios rerun.",
+    "Shared style metadata eligibility extracted without weakening rename protections. Source and destination fingerprints include stored shapes, all style metadata and next-style edges.",
+    "Only one source nextStyleId changes; existing body, style IDs/formatting, names, English names, language, lock and resources preserved.",
+    "Ordinary body End+Enter switches to existing target shape; middle Enter keeps source; emoji heading, default/self/cycles and subsequent typed text exercised in actual Edge.",
+    "Default source, character/locked/noncanonical raw source or destination and field documents protected; default destination allowed. One command, one request undo, no macro/autosave.",
+    "Structure.styleLinks and persisted comparison show next-style names without changing existing styles triples.",
+    "Expected unrelated restart-loss save rejections remain blocked. Native Hancom/paid model calls NOT_RUN. Full editor scope incomplete; automation remains active."
+  ]
+}

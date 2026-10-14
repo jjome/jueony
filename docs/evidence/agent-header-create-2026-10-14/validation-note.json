@@ -1,0 +1,9 @@
+{
+  "initialParityFailureCases": 4,
+  "cause": "Creation eligibility is derived and becomes false after table insertion; previous test compared it as a stored page property.",
+  "resolution": "Retain every stored page/header setting check, exclude only creatable from stored-settings comparison and explicitly assert true before and false after insertion. Product guards unchanged.",
+  "finalParityPassed": 66,
+  "finalParityFailures": 0,
+  "initialDiagnostic": "initial-parity-result.json",
+  "initialLog": "initial-parity.log"
+}

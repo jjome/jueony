@@ -1,0 +1,232 @@
+{
+  "scope": "guarded missing stored header/footer definition creation and later editing/deletion",
+  "count": 45,
+  "nativeHancomComparison": "NOT_RUN",
+  "files": [
+    {
+      "path": "agent-header-create-browser/created-anthropic.hwpx",
+      "bytes": 9147,
+      "sha256": "89f34659cb36ee095a0c3d097bd5d8d7affb8ab4e128659ef830ab4832a2020e"
+    },
+    {
+      "path": "agent-header-create-browser/created-gemini.hwpx",
+      "bytes": 9147,
+      "sha256": "89f34659cb36ee095a0c3d097bd5d8d7affb8ab4e128659ef830ab4832a2020e"
+    },
+    {
+      "path": "agent-header-create-browser/created-openai-compatible.hwpx",
+      "bytes": 9147,
+      "sha256": "89f34659cb36ee095a0c3d097bd5d8d7affb8ab4e128659ef830ab4832a2020e"
+    },
+    {
+      "path": "agent-header-create-browser/created-openai-responses.hwpx",
+      "bytes": 9147,
+      "sha256": "89f34659cb36ee095a0c3d097bd5d8d7affb8ab4e128659ef830ab4832a2020e"
+    },
+    {
+      "path": "agent-header-create-browser/cycle-deleted.hwpx",
+      "bytes": 7471,
+      "sha256": "7b9972452239f5139268a618d2579a17d3519adf482336280cb22761fa2b51c2"
+    },
+    {
+      "path": "agent-header-create-browser/empty-stored-override.hwpx",
+      "bytes": 9124,
+      "sha256": "7858d90983294b37fac0417d0b41cc488a2b8ef58d12c57320dac556c7aaea1a"
+    },
+    {
+      "path": "agent-header-create-browser/footer-odd.hwp",
+      "bytes": 13312,
+      "sha256": "f124b9bfe9983df29e52f13d1c8c0196fec272be214daf71f270f12d81f3b348"
+    },
+    {
+      "path": "agent-header-create-browser/formatted-followup.hwpx",
+      "bytes": 7647,
+      "sha256": "952b27fa418bdd599b395412e551d008240a96193928c3fc0358d5664292f35e"
+    },
+    {
+      "path": "agent-header-create-browser/header-even.hwp",
+      "bytes": 13312,
+      "sha256": "c10df6f0078ca3f48039e17632a52e8c4a7ebdb6d86bcf2b70a2baf0372de093"
+    },
+    {
+      "path": "agent-header-create-browser/inherited-override.hwpx",
+      "bytes": 9031,
+      "sha256": "0371cdece5083668a356544e9c4f7d39c4c8c11e4b125c068a083fc0cd56a714"
+    },
+    {
+      "path": "agent-header-create-browser/rendered-creation.hwpx",
+      "bytes": 7560,
+      "sha256": "611b50f608d335ff365268a0d16e39e70e4b7a123d465e5bbb35ea483224ddd2"
+    },
+    {
+      "path": "agent-header-create-native/all-definitions-created-hwp.hwp",
+      "bytes": 13312,
+      "sha256": "d2d38fe987a3c8712e6f0a98a3638d0e98fb7f1bc4f0afadc0cf2b2d2d35177c"
+    },
+    {
+      "path": "agent-header-create-native/all-definitions-created-hwpx.hwpx",
+      "bytes": 9167,
+      "sha256": "3fbc71467c0b9860a8ef0523b88deeab45356541585b797e7a077bbddfe388af"
+    },
+    {
+      "path": "agent-header-create-native/before-footer-both.hwp",
+      "bytes": 13312,
+      "sha256": "df453989044f6cc5e93d4b159eec42141dd550254e0f4cda3e8844a05ac63287"
+    },
+    {
+      "path": "agent-header-create-native/before-footer-both.hwpx",
+      "bytes": 9103,
+      "sha256": "d0791974b0b70484a86f0656a9be8aee7a4db027aab23ce4ea19155f75c20442"
+    },
+    {
+      "path": "agent-header-create-native/before-footer-even.hwp",
+      "bytes": 13312,
+      "sha256": "6f6ffb4555824a673de33502055d34749196b39d65fbc786ba909277bcf83cf9"
+    },
+    {
+      "path": "agent-header-create-native/before-footer-even.hwpx",
+      "bytes": 9103,
+      "sha256": "89d08d16696a84d3572e0ffaf870edc0e64469d98a40f0f0a0b5d4782595828a"
+    },
+    {
+      "path": "agent-header-create-native/before-footer-odd.hwp",
+      "bytes": 13312,
+      "sha256": "e9d81100e29fc253135d706c3a24ad177c04505c02381bb832a4514f328a6a9b"
+    },
+    {
+      "path": "agent-header-create-native/before-footer-odd.hwpx",
+      "bytes": 9103,
+      "sha256": "6d1787571e8fc05f1d22ca0fdaef987dd6ce5cc81716ac0e828987b33de60f1a"
+    },
+    {
+      "path": "agent-header-create-native/before-header-both.hwp",
+      "bytes": 13312,
+      "sha256": "fa3f1e83709f3d5824ff58a9329c90fd58087f34f19f1a4f536b2bc14995ba10"
+    },
+    {
+      "path": "agent-header-create-native/before-header-both.hwpx",
+      "bytes": 9111,
+      "sha256": "8dc1ab81f9621e9a1a9881adc3e1d6bc35b0066674724b979e19f4803e16bfdd"
+    },
+    {
+      "path": "agent-header-create-native/before-header-even.hwp",
+      "bytes": 13312,
+      "sha256": "957330f2c85862b45898d8c6a1a51d90d60178fc983950c6219af4b143a92949"
+    },
+    {
+      "path": "agent-header-create-native/before-header-even.hwpx",
+      "bytes": 9103,
+      "sha256": "ab9c87be00fcf20988afd4eda4f426a1124d82a690f525359c51cc06cb0f2eb1"
+    },
+    {
+      "path": "agent-header-create-native/before-header-odd.hwp",
+      "bytes": 13312,
+      "sha256": "cc0cfe072d7c7eab8d3b91f444b48a444ee037dfc1c4f5776d48062be2de55e7"
+    },
+    {
+      "path": "agent-header-create-native/before-header-odd.hwpx",
+      "bytes": 9103,
+      "sha256": "585fa55ad909827ef6c8cdb16c14ba45b859ada89022aa6d76a1abab630d2704"
+    },
+    {
+      "path": "agent-header-create-native/created-footer-both.hwp",
+      "bytes": 13312,
+      "sha256": "0b9f490c3fd55f8f7f797b6e53ea9dd1a9dd914173170abb02f9ced41e424562"
+    },
+    {
+      "path": "agent-header-create-native/created-footer-both.hwpx",
+      "bytes": 9138,
+      "sha256": "81d855ad270338b0c0a9e29720bd61c5fb27d9346df95593a40a1dcbbf7086c0"
+    },
+    {
+      "path": "agent-header-create-native/created-footer-even.hwp",
+      "bytes": 13312,
+      "sha256": "425f896a422ee147a4687d7389ae1b65ddcdd7db4636ffdcc412e9a2e28e7060"
+    },
+    {
+      "path": "agent-header-create-native/created-footer-even.hwpx",
+      "bytes": 9137,
+      "sha256": "91a83a6a059df71d01e16bef69088f253ac1b0ad387e0dc3ae5df24708c5f2fd"
+    },
+    {
+      "path": "agent-header-create-native/created-footer-odd.hwp",
+      "bytes": 13312,
+      "sha256": "751482f645cef2ed49179a89b836fee657632214a7228364711f0b3d46b32b27"
+    },
+    {
+      "path": "agent-header-create-native/created-footer-odd.hwpx",
+      "bytes": 9137,
+      "sha256": "e5462614871de689d06b7468246da670870e64eed09baa0be2379015235c93a3"
+    },
+    {
+      "path": "agent-header-create-native/created-header-both.hwp",
+      "bytes": 13824,
+      "sha256": "8f77046adf17427563390b5c96227eadf3f16a655300b47acdce037b4c034600"
+    },
+    {
+      "path": "agent-header-create-native/created-header-both.hwpx",
+      "bytes": 9149,
+      "sha256": "c5ade87eddc9dbdbac0f70bcb50aa04b9050e52eb7915270aa4b24787267cd0b"
+    },
+    {
+      "path": "agent-header-create-native/created-header-even.hwp",
+      "bytes": 13312,
+      "sha256": "05ce2f4c5ff914efd488883d5c11e3245571993ebdcd6056103c3fce06ef7008"
+    },
+    {
+      "path": "agent-header-create-native/created-header-even.hwpx",
+      "bytes": 9141,
+      "sha256": "9999835c63f4ebfac4b99c94eff85e23c7045b1bb834067648e959ba8c21ff8c"
+    },
+    {
+      "path": "agent-header-create-native/created-header-odd.hwp",
+      "bytes": 13824,
+      "sha256": "edc4724fa81bc50c577e74ec6d67fe863f41ef00d7647ccc9b573168fef78784"
+    },
+    {
+      "path": "agent-header-create-native/created-header-odd.hwpx",
+      "bytes": 9141,
+      "sha256": "98cc2cc503ca03592686efbf57c7ac509958b2eaad070b5f04ba8acc13bda5bc"
+    },
+    {
+      "path": "agent-header-create-native/default-shapes.hwpx",
+      "bytes": 7601,
+      "sha256": "75b0664dc180834ae0816989e78d72180bf3e2d8d27a79b4a33b5b9afa1fba1f"
+    },
+    {
+      "path": "agent-header-create-native/empty-stored-override.hwpx",
+      "bytes": 7522,
+      "sha256": "5fd5f0d1ca292bab1c27982524b7d486ff2f60803b57506b322f145fedd4c4bf"
+    },
+    {
+      "path": "agent-header-create-native/formatted-followup-hwp.hwp",
+      "bytes": 13312,
+      "sha256": "5747ee9bfa64706394f1cedf3ddb21a06b920d267f6efa50aeb895f30b5e06ee"
+    },
+    {
+      "path": "agent-header-create-native/formatted-followup-hwpx.hwpx",
+      "bytes": 7647,
+      "sha256": "952b27fa418bdd599b395412e551d008240a96193928c3fc0358d5664292f35e"
+    },
+    {
+      "path": "agent-header-create-native/inherited-override-hwp.hwp",
+      "bytes": 13312,
+      "sha256": "578d26aca697b6bbca1c404e5c0eea67a7acf25ace4b47117ec99d841c981bab"
+    },
+    {
+      "path": "agent-header-create-native/inherited-override-hwpx.hwpx",
+      "bytes": 9019,
+      "sha256": "cfb17c53215c68e06b25fcd7b6eddfd5c425e9507345ee3104bdb78d4101b5ad"
+    },
+    {
+      "path": "agent-header-create-native/mixed-body-retained-hwp.hwp",
+      "bytes": 13312,
+      "sha256": "d0f6f1484fe021ff77a49d1cadcd36dc685145f6262fbf51809fb2e289ecc9af"
+    },
+    {
+      "path": "agent-header-create-native/mixed-body-retained-hwpx.hwpx",
+      "bytes": 7600,
+      "sha256": "09bbae7f93309344f011107648c089e5f9419e25d9fc8e9e8add48582161a0a4"
+    }
+  ]
+}

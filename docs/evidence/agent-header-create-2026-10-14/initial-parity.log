@@ -1,0 +1,362 @@
+PASS modal Tab/Shift-Tab, focused cancel Enter, Escape and nested Escape preserve document and editor focus
+PASS body caret survives actual workspace reload and tab switching without dirty or focus changes
+PASS embedded dirty editors delegate the exit prompt to the workspace host; standalone retains protection
+PASS Ctrl+1 through Ctrl+0 apply default paragraph styles and undo without changing text
+PASS hwp: paragraph shortcut aliases adjust per-paragraph values and undo/save without changing text
+PASS hwpx: paragraph shortcut aliases adjust per-paragraph values and undo/save without changing text
+PASS hwp: quick hanging indent aligns to live prefix, repeats without edit and undoes/saves
+PASS hwpx: quick hanging indent aligns to live prefix, repeats without edit and undoes/saves
+PASS hwp: flat-cell quick hanging indent retains Unicode and Shift+Tab cell navigation
+PASS hwpx: flat-cell quick hanging indent retains Unicode and Shift+Tab cell navigation
+PASS hwp: object T transposes whole table, preserves cell text/format and one-step undo/save
+PASS hwpx: object T transposes whole table, preserves cell text/format and one-step undo/save
+PASS table object selection survives restart without dirty and rejects changed table evidence
+PASS hwp: page border solid background dialog cancels, undoes and preserves guarded export
+PASS hwpx: page border solid background dialog cancels, undoes and preserves guarded export
+PASS cursor history physical Equal keys go back/forward, branch on manual movement and do not dirty the document
+PASS hwp: calendar string shortcut, preview, cancel/conflict, single undo and guarded save
+PASS hwpx: calendar string shortcut, preview, cancel/conflict, single undo and guarded save
+PASS calendar format survives restart; cancel and corrupt/quota storage do not duplicate document insertion
+PASS cursor history skips changed text bookmarks and restores flat-cell scalar offsets
+PASS body selection preserves backward anchor and F3 phase after delayed persistence/reload; changed middle text refuses restore
+PASS paragraph repeated keys preserve no-op redo and refuse modal/form/IME edits
+PASS flat table cell Unicode caret and same-cell text selection survive reload and tab switching
+PASS F5 cell block stores phase/rectangle/exclusions and paragraph delta applies to all selected cells as one undo
+PASS merged flat table cell cursor survives checkpoint/reload and new input cancels a pending restore
+PASS immediate reload journals latest body/cell selection before the debounced IndexedDB write
+PASS Delete joins section boundary, previous settings, undo/redo and hwp save
+PASS Backspace joins section boundary, previous settings, undo/redo and hwp save
+PASS Delete joins section boundary, previous settings, undo/redo and hwpx save
+PASS Backspace joins section boundary, previous settings, undo/redo and hwpx save
+PASS ordinary body deletion and outer document edges retain existing key behavior
+PASS unsupported header-bearing right section refuses join without document or dirty mutation
+PASS form mode and first table cell cannot trigger a body section merge
+PASS Alt+Shift+Enter splits actual body sections; undo/redo and guarded file save
+PASS paragraph dialog changes default tab spacing in pt; cancel/undo/reopen preserve state
+PASS F6 opens styles; Alt+F6 focuses chat; modal F6 does not change document
+PASS table cell block F7 selects column; P opens cell properties without typing text
+PASS document information reads live text/table counts without changing revision or dirty state
+PASS hwp: page hide cancel/apply/undo/redo and actual save/reopen
+PASS hwpx: page hide cancel/apply/undo/redo and actual save/reopen
+PASS header/footer dialog cancel, create, undo/redo, then existing content stays intact
+PASS manual table caption position/removal form single undo steps and survive saving
+PASS hwp: Agent style/columns/page-hide batch uses live snapshot, persists and undoes as one request
+PASS hwpx: Agent style/columns/page-hide batch uses live snapshot, persists and undoes as one request
+FAIL hwp into hwp: document insertion Ctrl+O, file preflight, one undo/redo and guarded save AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+... Skipped lines
+
+  {
+    columns: {
+      columnCount: 1,
+      columnType: 0,
+      sameWidth: true,
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'both',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'odd',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'even',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'both',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'odd',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'even',
+
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:658:14
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:66:7)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:642:84 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [Object],
+  expected: [Object],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+FAIL hwp into hwpx: document insertion Ctrl+O, file preflight, one undo/redo and guarded save AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+... Skipped lines
+
+  {
+    columns: {
+      columnCount: 1,
+      columnType: 0,
+      sameWidth: true,
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'both',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'odd',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'even',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'both',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'odd',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'even',
+
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:658:14
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:66:7)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:642:84 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [Object],
+  expected: [Object],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+FAIL hwpx into hwp: document insertion Ctrl+O, file preflight, one undo/redo and guarded save AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+... Skipped lines
+
+  {
+    columns: {
+      columnCount: 1,
+      columnType: 0,
+      sameWidth: true,
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'both',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'odd',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'even',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'both',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'odd',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'even',
+
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:658:14
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:66:7)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:642:84 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [Object],
+  expected: [Object],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+FAIL hwpx into hwpx: document insertion Ctrl+O, file preflight, one undo/redo and guarded save AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+... Skipped lines
+
+  {
+    columns: {
+      columnCount: 1,
+      columnType: 0,
+      sameWidth: true,
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'both',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'odd',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'even',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'both',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'odd',
+...
+      {
++       creatable: false,
+-       creatable: true,
+        deletable: false,
+        editable: false,
+        exists: false,
+        hiddenOnFirstPage: false,
+        pageKind: 'even',
+
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:658:14
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:66:7)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-parity-features.mjs:642:84 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [Object],
+  expected: [Object],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+PASS document insertion cancel, invalid file and revision conflict never change the live document
+PASS document insertion rejects source headers/multiple sections and disables cell/selection targets
+PASS document insertion is disabled for an actually password-opened document
+PASS style list arrow/Home/End navigation retains modal focus and document state
+PASS hwp: style clone retains definitions and one-step undo/save without changing body
+PASS hwpx: style clone retains definitions and one-step undo/save without changing body
+PASS hwp: style character type and deferred font shape commit cancel/undo/save correctly
+PASS hwpx: style character type and deferred font shape commit cancel/undo/save correctly
+PASS hwp: deleting styles remaps flat-cell references and retains text/format in one undo
+PASS hwpx: deleting styles remaps flat-cell references and retains text/format in one undo
+PASS hwp: style edit renames identity, propagates body and cell size, keeps overrides and no-op undo state
+PASS hwpx: style edit renames identity, propagates body and cell size, keeps overrides and no-op undo state
+PASS style editing rejects duplicate names and concurrent document changes without applying pending formats
+PASS recovery options off retain old checkpoint; idle 5 seconds saves dirty changes and restores after reload
+PASS hwp: selected character style preserves unselected runs and one undo/save roundtrip
+PASS hwpx: selected character style preserves unselected runs and one undo/save roundtrip
+PASS Enter at paragraph end follows next style and undo restores the original document
+PASS style manager moves definitions together with body references, blocks fallback and undo restores order

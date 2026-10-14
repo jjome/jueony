@@ -1,0 +1,182 @@
+{
+  "status": "PASS_SCOPED_AUTOMATED_CHECKS",
+  "verifiedAt": "2026-10-14T03:50:57.584Z",
+  "providerPassed": 52,
+  "unitPassed": 537,
+  "browserPassed": 434,
+  "nativePassed": 431,
+  "moduleCount": 9,
+  "moduleFiles": 247,
+  "customSourceSha256": "5d32844dbf2c39b331bf65be7b36e739b8562ac4600ba3cd778d2177a2cdd913",
+  "buildScriptSha256": "8df671207273b6ae1e1c78b58e6c9e551299d4eb84619db8ca81c9be10b2a9f2",
+  "wasmSha256": "eb1a657c9ea42f72c31b0dfb99c827ead31c9a6e5d2c1d4307720eb8c2354516",
+  "engineSourceId": "b975635f0614152d",
+  "buildApplicationCommit": "fa626b6d06b18d1910a5fd45c3e6422f404a22f7",
+  "buildApplicationDirty": true,
+  "reports": [
+    {
+      "file": "browser/result.json",
+      "passed": 24,
+      "sha256": "db5b39495b9f793e374e357a446ce9dfefb936b2383de76c4ea9d6d756fb6aff"
+    },
+    {
+      "file": "regression-parity/result.json",
+      "passed": 66,
+      "sha256": "7c251ab4106715b053e43893141acb1b159d4fa58da5709488fc8ed5ab0d208c"
+    },
+    {
+      "file": "regression-session/result.json",
+      "passed": 9,
+      "sha256": "44f57b5abf2e451f3183316db23382b80f9dcc604bd006aa9b669f6b11757df7"
+    },
+    {
+      "file": "basic-text/basic-text-browser.json",
+      "passed": 28,
+      "sha256": "0f80ef74b031c5c343b4ef79c14da4f77f82b9d99326a6927031f40ae31b23b9"
+    },
+    {
+      "file": "regression-agent/result.json",
+      "passed": 9,
+      "sha256": "823a7f48994b592c4680bd51e459d0cfc829e975903bdad3814d900dcd6c4f2b"
+    },
+    {
+      "file": "regression-table/result.json",
+      "passed": 18,
+      "sha256": "75cb731bc6f5d94925c507c29c09b5af7ddd15ae5b5b378fc5b60885e162f202"
+    },
+    {
+      "file": "image-browser/result.json",
+      "passed": 26,
+      "sha256": "84ddebe67faa244af18e1da53e66308f7b06f652755a6ac55b409ffd68b55375"
+    },
+    {
+      "file": "master-browser/result.json",
+      "passed": 17,
+      "sha256": "c6b611ee90ab84abc253d2ce9d53b82ad6d251fd4c0dac5576ddae36a5cd1637"
+    },
+    {
+      "file": "line-browser/result.json",
+      "passed": 12,
+      "sha256": "57db5ba3f86fe8dc2b7153db1dfe600582d9b9b6e4ba36b7e9e8976d614c1e0f"
+    },
+    {
+      "file": "delete-browser/result.json",
+      "passed": 11,
+      "sha256": "5d6527af627ca492baa4b413f0ac0dd528412c6daecc2db358d8da7430121c6f"
+    },
+    {
+      "file": "copy-browser/result.json",
+      "passed": 11,
+      "sha256": "1a8a71fb07294f4579e735da0d9cbf33e8f7563705ab39a47c63ec08b2c44119"
+    },
+    {
+      "file": "paper-browser/result.json",
+      "passed": 9,
+      "sha256": "8306a5f07910184c33e7425b2855b1e337228e8abb7ca74490421222ab6ee5f0"
+    },
+    {
+      "file": "style-browser/result.json",
+      "passed": 10,
+      "sha256": "e58c2046527d8f4a34995f3dd3ba7b97258cac4f39403feab0ba21ef072cf54f"
+    },
+    {
+      "file": "image-paste-browser/result.json",
+      "passed": 17,
+      "sha256": "5c324428ef97a1ed6aea25b2d2fb0fa25ba30271b120318e6099f7706d2c8bf9"
+    },
+    {
+      "file": "empty-browser/result.json",
+      "passed": 11,
+      "sha256": "b295ebd3ba8772aa46e33015f86fa0eab39cc940cb081c802cb5b8987fe412c4"
+    },
+    {
+      "file": "caret-browser/result.json",
+      "passed": 6,
+      "sha256": "83fb3ab501870be5ee5cca3c4f8a02ede8c5a31c65ac8b1433e3f3e14e9a2a2d"
+    },
+    {
+      "file": "section-browser/result.json",
+      "passed": 10,
+      "sha256": "1140ae7b268b0c53db825ddfe9b5c2e5317be5f35140a56dded3568f4e068b80"
+    },
+    {
+      "file": "background-browser/result.json",
+      "passed": 9,
+      "sha256": "e782770230a93d79b35087e5a261e20a5c74a02e574d92a655517b43483ec539"
+    },
+    {
+      "file": "agent-master-browser/result.json",
+      "passed": 11,
+      "sha256": "85b0d67f836059fee961afede0ac05a6ee2e7fe23398c31b1fe9034bd0a7c1cd"
+    },
+    {
+      "file": "macro-browser/result.json",
+      "passed": 10,
+      "sha256": "f4b171b506fbfd8ecbe54a5de15c4e92239a81ade807f857790c14297a2eaba6"
+    },
+    {
+      "file": "split-browser/result.json",
+      "passed": 12,
+      "sha256": "d5a8e7eb5082f87fc1ddc421f9d4aab8ae957577ee972209e82370532446f462"
+    },
+    {
+      "file": "agent-header-create-browser/result.json",
+      "passed": 15,
+      "sha256": "82662da9a7c2e2de4f3e4fe7679b8b23ba0db86ce2ff79894b325ba8d4e65c85"
+    },
+    {
+      "file": "agent-header-delete-browser/result.json",
+      "passed": 15,
+      "sha256": "c7d7942dafb0bfaec04cd0460b8ef34e79374d8a55cf06085d30fdd86b1c7846"
+    },
+    {
+      "file": "agent-header-paragraph-browser/result.json",
+      "passed": 14,
+      "sha256": "206e08e9691ecaef7ce4462405041a3cf6dc56dc47a3a47480eff1547f3e50c7"
+    },
+    {
+      "file": "agent-header-format-browser/result.json",
+      "passed": 13,
+      "sha256": "52b124a223e11581c99ca0dcae53625e2450abc73cb551737eefee4dd738783e"
+    },
+    {
+      "file": "agent-header-browser/result.json",
+      "passed": 13,
+      "sha256": "9ce236b253d1c3773551c5fc639b979836f53b5f0632f955fd910ef318442ed4"
+    },
+    {
+      "file": "agent-merge-browser/result.json",
+      "passed": 12,
+      "sha256": "926a14d7c138c6dbd34f9d774d660ab07658efd993f6849bece0ede8a9e3a98a"
+    },
+    {
+      "file": "agent-empty-browser/result.json",
+      "passed": 12,
+      "sha256": "8192cf1b28311f0bf53c5a918af83e3a851a56213415844929b1dfe293c3c7d5"
+    },
+    {
+      "file": "bundle-compatibility/result.json",
+      "passed": 4,
+      "sha256": "db1c8eb8c4a0cbd2cf41d7ac0359f26547559ffdbcd6121a2f442ce946cc58c4"
+    }
+  ],
+  "limitations": [
+    "Actual Hancom GUI/layout comparison is deferred.",
+    "No paid LLM request: Agent tests use a deterministic local adapter.",
+    "Full Hangul feature parity remains incomplete; no percentage of completion is inferred from these scoped tests.",
+    "Unsupported source properties may be blocked by the stricter cell preservation guard.",
+    "Creation creates one missing stored plain header/footer with up to 4000 Unicode characters and current default shape zero. Empty text creates a blank override; inherited content may be overridden but hiding/other parity definitions remain. Complex documents, initial custom font/paragraph settings, batch/repeat/automatic save are unsupported.",
+    "Deletion removes one existing native-guarded plain stored header/footer only in plain body documents with root section/column/header/footer controls. Tables/objects/fields/other controls, unknown/complex/mixed/multiple sources, creation, batch and repeat are unsupported. Deletion can reveal inherited content and is not global hiding.",
+    "Stored plain header/footer paragraph command supports five alignments and integer 50..500 Percent spacing only. Alignment alone retains current mode. Margins/indent/tabs/borders/numbering, complex sources, creation/deletion, batching and repeat remain unsupported.",
+    "Existing plain nonempty stored header/footer whole-paragraph font formatting supports bold/italic/underline/1..200pt/RGB only. Original native source/token and current-format save protections remain; this character command excludes family/spacing/paragraph changes, mixed/empty/multiple sources and batching/repeat. A separate scoped paragraph command may be available.",
+    "The header/footer text command replaces an existing native-guarded single plain paragraph only. Dynamic fields, objects, multiple/mixed/long definitions, inheritance overrides, creation and repeat recording are unsupported here; a separately guarded delete command may be available. Private tokens never reach the model.",
+    "Agent merging is isolated on two plain single-column editable sources only; masters/numbering/tables/objects/fields/page-hide/mixed originals and 4000+ joined paragraph are refused. Right settings follow preceding settings; no arbitrary nonempty section deletion or repeat recording.",
+    "Empty body section removal is a standalone command only for a native-supported whole plain document; sole/nonempty/whitespace/complex originals are refused. Removing a section removes its paper/background too; no arbitrary merge outside its separate guarded command, private model token, repeat recording or automatic save.",
+    "Agent splitting is a standalone source-section command for one-column editable plain body only; table/field/page-hide/numbered/mixed sources, structural batching and repeat recording are refused. Source inheritance follows the guarded native splitter.",
+    "Section repeats require explicit current destinations and revalidate source capabilities; existing table/object/style ID and script recording remain unsupported.",
+    "Agent masters support stored basic uniform text only, not pictures/tables/fields/extensions. HWP sparse parity combinations and long originals are refused; deleting a stored master does not suppress earlier inheritance.",
+    "Agent background commands support none/plain solid originals only. Image, gradient, hatch, alpha, mixed/advanced effects are read-only; parity geometry and original visibility are preserved.",
+    "Agent tools support section default tabs and bounded HWPX line numbering; per-paragraph tabs, binary HWP numbering, external MCP and automatic save remain unsupported.",
+    "Native HWPX file caret supports bounded single-section plain body only; multiple sections, nested stories, tabs/fields/objects and native Hancom verification remain deferred."
+  ]
+}

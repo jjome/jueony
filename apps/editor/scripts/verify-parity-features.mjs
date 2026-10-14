@@ -652,10 +652,11 @@ try{
       assert.equal((await snapshot()).revision,before.revision);assert.equal(await frame.evaluate(()=>window.jueonyEditor.state().dirty),false);
       await frame.click('.modal-overlay .dialog-btn-primary');await frame.waitForFunction(()=>!document.querySelector('[data-jueony-document-insertion]'));
       const after=await snapshot();assert.notEqual(after.revision,before.revision);assert.equal(after.nodes[0].text.startsWith('앞😀'),true);assert.ok(after.structure.tables.length>0);
-      // Numbering editability is a derived capability: adding a table changes it,
+      // Numbering editability and header creation eligibility are derived capabilities: adding a table changes them,
       // while every stored page/tab/numbering property must stay unchanged.
-      const settingsOnly=entry=>{const result=structuredClone(entry);if(result.lineNumbers)delete result.lineNumbers.editable;return result;};
+      const settingsOnly=entry=>{const result=structuredClone(entry);if(result.lineNumbers)delete result.lineNumbers.editable;for(const header of result.headerFooters??[])delete header.creatable;return result;};
       assert.deepEqual(settingsOnly(after.structure.sections[0]),settingsOnly(pageBefore));
+      if(pageBefore.headerFooters?.some(h=>h.creatable!==undefined)){assert.ok(pageBefore.headerFooters.every(h=>h.creatable===true));assert.ok(after.structure.sections[0].headerFooters.every(h=>h.creatable===false));}
       if(after.structure.sections[0].lineNumbers){assert.equal(pageBefore.lineNumbers.editable,true);assert.equal(after.structure.sections[0].lineNumbers.editable,false);}
       await command('edit:undo');assert.deepEqual((await snapshot()).nodes.map(n=>n.text),before.nodes.map(n=>n.text));assert.deepEqual((await snapshot()).structure,before.structure);
       await command('edit:redo');assert.deepEqual((await snapshot()).structure,after.structure);

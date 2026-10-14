@@ -10,7 +10,7 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-agent-header-delete-20261014/Start-Review.cmd)**로 실행한다(4266). AI가 기존 단순 머리말·꼬리말의 텍스트·기본 글자 서식·정렬·줄 간격을 바꾸고, 일반 문서에서 저장 정의 하나를 삭제한다. 삭제는 텍스트 비우기·상속 차단과 다르며 앞 구역/다른 홀짝 정의가 보일 수 있다. [사용법·검증·제한](docs/71-agent-header-deletion.md)을 확인한다. 전체 본문 run·다른 정의·설정을 보존하고 undo/redo·실패 복원·저장·재실행을 검사했다. 새 정의 생성·복잡한 문서의 삭제·전체 한글 동등성은 남는다. 기존 실행 창과 사용자 문서는 유지한다.
+최신 검수본은 **[Start-Review.cmd](build/jueony-agent-header-create-20261014/Start-Review.cmd)**로 실행한다(4268). AI가 일반 문서의 단순 머리말·꼬리말 정의를 만들고 텍스트·기본 글자 서식·정렬·줄 간격 수정과 삭제를 후속 요청으로 수행한다. 없는 위치만 생성하며 빈 문자열은 실제 빈 덮어쓰기 정의를 만든다. [사용법·검증·제한](docs/72-agent-header-creation.md)을 확인한다. 전체 본문 run·다른 정의·설정을 보존하고 undo/redo·실패 복원·동시 생성 충돌·저장·재실행을 검사했다. 복잡한 문서·최초 맞춤 서식·전체 한글 동등성은 남는다. 기존 실행 창과 사용자 문서는 유지한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

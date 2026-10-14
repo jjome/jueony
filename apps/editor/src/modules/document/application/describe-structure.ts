@@ -17,6 +17,7 @@ export function describeStructure(s?: Structure) {
    if(h.exists===false){lines.push(`  ${label}: 저장된 정의 없음`);continue;}
    if(h.exists===null){lines.push(`  ${label}: 조회하지 못함 · 원본 유지`);continue;}
    const chars=Array.from(h.text),preview=JSON.stringify(chars.slice(0,240).join(''));
+   if(h.paragraph)lines.push(`  ${label} 문단: ${alignments[h.paragraph.alignment]??h.paragraph.alignment} 정렬 · 줄 간격 ${h.paragraph.lineSpacing}${h.paragraph.lineSpacingType==='Percent'?'%':' ('+h.paragraph.lineSpacingType+')'}`);
    if(h.characters)lines.push(`  ${label} 글자: ${h.characters.fontSizePt}pt · ${h.characters.color}${h.characters.bold?' · 굵게':''}${h.characters.italic?' · 기울임':''}${h.characters.underline?' · 밑줄':''}`);
    lines.push(`  ${label}: ${preview}${chars.length>240||h.textTruncated?' … (미리보기)':''} · ${h.editable?'텍스트 수정 가능':'읽기 전용'}${h.hiddenOnFirstPage?' · 첫 쪽 감춤':''}${h.paragraphCount!==1?' · '+h.paragraphCount+'문단':''}`);
   }

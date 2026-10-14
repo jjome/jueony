@@ -14,8 +14,10 @@ export type AgentSectionOp = {kind:'set_section_tabs';section:number;spacingPt:n
 export type AgentEmptySectionEligibility = {supported:boolean;reason?:string};
 export type AgentEmptySectionOp = {kind:'remove_empty_section';section:number};
 export type AgentHeaderFooterCharacters = {bold:boolean;italic:boolean;underline:boolean;fontSizePt:number;color:string};
+export type AgentHeaderFooterParagraph = {alignment:string;lineSpacing:number;lineSpacingType:string};
+export type AgentHeaderFooterParagraphOp = {kind:'format_header_footer_paragraph';section:number;story:'header'|'footer';pageKind:'both'|'odd'|'even';originalText:string;properties:{alignment?:'left'|'right'|'center'|'justify'|'distribute';lineSpacingPercent?:number}};
 export type AgentHeaderFooterFormatOp = {kind:'format_header_footer';section:number;story:'header'|'footer';pageKind:'both'|'odd'|'even';originalText:string;properties:Partial<AgentHeaderFooterCharacters>};
-export type AgentHeaderFooter = {story:'header'|'footer';pageKind:'both'|'odd'|'even';exists:boolean|null;editable:boolean;paragraphCount:number;text:string;textTruncated:boolean;hiddenOnFirstPage?:boolean;characters?:AgentHeaderFooterCharacters;reason?:string};
+export type AgentHeaderFooter = {story:'header'|'footer';pageKind:'both'|'odd'|'even';exists:boolean|null;editable:boolean;paragraphCount:number;text:string;textTruncated:boolean;hiddenOnFirstPage?:boolean;characters?:AgentHeaderFooterCharacters;paragraph?:AgentHeaderFooterParagraph;reason?:string};
 export type AgentHeaderFooterOp = {kind:'set_header_footer_text';section:number;story:'header'|'footer';pageKind:'both'|'odd'|'even';originalText:string;text:string};
 export type AgentSectionMergeOp = {kind:'merge_sections';rightSection:number};
 export type AgentSectionSplitOp = {kind:'split_section';target:string;offset:number};
@@ -28,6 +30,7 @@ export type BodyOp =
  | { kind: 'replace_body_text'; target: string; start: number; count: number; text: string }
  | { kind: 'delete_body_text'; target: string; start: number; count: number };
 export type ControlOp =
+  | AgentHeaderFooterParagraphOp
   | AgentHeaderFooterFormatOp
   | AgentHeaderFooterOp
   | AgentEmptySectionOp

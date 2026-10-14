@@ -1,6 +1,6 @@
 export type { JsonValue, DocumentProperties, Cell, Table, Structure, BodyNode, Snapshot, BodyOp, ControlOp, EditOp, Receipt } from './types.ts';
 export type {AgentEmptySectionOp,AgentEmptySectionEligibility} from './types.ts';
-export type {AgentHeaderFooter,AgentHeaderFooterOp,AgentHeaderFooterCharacters,AgentHeaderFooterFormatOp} from './types.ts';
+export type {AgentHeaderFooter,AgentHeaderFooterOp,AgentHeaderFooterCharacters,AgentHeaderFooterFormatOp,AgentHeaderFooterParagraph,AgentHeaderFooterParagraphOp} from './types.ts';
 export type {AgentSectionMergeOp} from './types.ts';
 export type {AgentSectionSplitOp} from './types.ts';
 export type {AgentSectionOp,AgentLineNumbers,LineNumberRestart} from './types.ts';

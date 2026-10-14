@@ -28,3 +28,5 @@ export {validateAgentBasicBullet,basicBulletCharacters} from '../domain/agent-ba
 export {agentRenameParagraphStyleName} from '../domain/agent-style-rename.ts';
 
 export {validateAgentNextParagraphStyle} from '../domain/agent-style-next.ts';
+
+export {validateAgentTablePagination} from '../domain/agent-table-pagination.ts';

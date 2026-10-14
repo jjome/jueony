@@ -1,3 +1,4 @@
+import {readAgentTablePaginationSources} from './agent-table-pagination.ts';
 import {readAgentStyleNextSources} from './agent-style-next.ts';
 import {readAgentStyleRenameSources} from './agent-style-rename.ts';
 import {readAgentStyleCreationSources} from './agent-style-create.ts';
@@ -47,7 +48,7 @@ export function installAgentBridge(d:Deps){
   const structure=readStructure(d.wasm);assertRevision(before,revision());
   const paragraphTabSources=readAgentParagraphTabSources(d.wasm,nodes),paragraphDecorationSources=readAgentParagraphDecorationSources(d.wasm,nodes);assertRevision(before,revision());
   const lists=readAgentParagraphLists(d.wasm,nodes),outlines=readAgentParagraphOutlineSources(d.wasm,nodes,lists.listCatalog);assertRevision(before,revision());
-  return {revision:before,name:d.wasm.fileName,nodes,plainText,structure,...lists,...outlines,...readAgentStyleCreationSources(d.wasm),...readAgentStyleRenameSources(d.wasm),...readAgentStyleNextSources(d.wasm),...(paragraphTabSources?{paragraphTabSources}:{}),...(paragraphDecorationSources?{paragraphDecorationSources}:{}),limitations:['본문·표의 텍스트와 서식·쪽 설정을 읽습니다. 그림 안 글자/OCR은 읽지 않습니다.','AI 편집: 단순 본문, 글꼴·글자·문단 서식, 새 표·단순 셀·셀 서식·행/열 추가와 삭제, 일반 본문 구역 나누기·합치기·검증된 빈 본문 구역 삭제·기존 단순 머리말/꼬리말 텍스트·기본 글자 서식·정렬/백분율 줄 간격 수정·일반 문서의 새 정의 생성/기존 정의 삭제(각 단독 요청), 일반 본문 점 책갈피 추가·이름 변경·삭제(단독 요청), 저장 문단 스타일의 모양을 공유하는 새 이름 정의 생성(단독 요청, 본문 적용은 후속 요청)·기존 문단 스타일 이름/다음 문단 스타일 변경(필드 문서·바탕글/글자/잠금/비정규 원본 제외, 단독 요청), 저장된 구역 개요 모양의 본문 수준 지정·해제(다른 문단 전용 묶음), 새 기본 숫자 번호 3종·7수준·시작 값 생성(단독 요청), 조회된 기본 번호 모양 복제·지정 수준 시작 값·새 목록 적용(단독 요청, 원본 모양 보존 가능 시), 기본 문자 글머리표 8종 새 정의 생성·적용(단독 요청), 현재 문서에 저장된 문단 번호·글머리표 정의 적용/번호 7수준/해제(전용 묶음), 일반 본문 문단 기본 테두리/단색 배경·간격·연결/여백 무시, 일반 본문 문단별 사용자 탭 32개·양 끝 자동 탭(다른 문단 탭끼리 최대 30명령), 구역별 용지·여백·다단·기본 탭, HWPX 기본 본문 줄 번호·기본 단색 쪽 배경·기본 텍스트 바탕쪽, 기존 문단 스타일, 쪽 감추기. 줄 번호는 현재 구역의 editable과 파일 형식을 확인합니다. 병합/중첩 표, 개체·필드 편집은 아직 미지원입니다.']} as Snapshot;
+  return {revision:before,name:d.wasm.fileName,nodes,plainText,structure,tablePaginationSources:readAgentTablePaginationSources(d.wasm,structure.tables),...lists,...outlines,...readAgentStyleCreationSources(d.wasm),...readAgentStyleRenameSources(d.wasm),...readAgentStyleNextSources(d.wasm),...(paragraphTabSources?{paragraphTabSources}:{}),...(paragraphDecorationSources?{paragraphDecorationSources}:{}),limitations:['본문·표의 텍스트와 서식·쪽 설정을 읽습니다. 그림 안 글자/OCR은 읽지 않습니다.','AI 편집: 본문 단순 표 쪽 나눔 none/cell/row(단독 요청, 제목 행 반복 설정은 별도 미지원), 단순 본문, 글꼴·글자·문단 서식, 새 표·단순 셀·셀 서식·행/열 추가와 삭제, 일반 본문 구역 나누기·합치기·검증된 빈 본문 구역 삭제·기존 단순 머리말/꼬리말 텍스트·기본 글자 서식·정렬/백분율 줄 간격 수정·일반 문서의 새 정의 생성/기존 정의 삭제(각 단독 요청), 일반 본문 점 책갈피 추가·이름 변경·삭제(단독 요청), 저장 문단 스타일의 모양을 공유하는 새 이름 정의 생성(단독 요청, 본문 적용은 후속 요청)·기존 문단 스타일 이름/다음 문단 스타일 변경(필드 문서·바탕글/글자/잠금/비정규 원본 제외, 단독 요청), 저장된 구역 개요 모양의 본문 수준 지정·해제(다른 문단 전용 묶음), 새 기본 숫자 번호 3종·7수준·시작 값 생성(단독 요청), 조회된 기본 번호 모양 복제·지정 수준 시작 값·새 목록 적용(단독 요청, 원본 모양 보존 가능 시), 기본 문자 글머리표 8종 새 정의 생성·적용(단독 요청), 현재 문서에 저장된 문단 번호·글머리표 정의 적용/번호 7수준/해제(전용 묶음), 일반 본문 문단 기본 테두리/단색 배경·간격·연결/여백 무시, 일반 본문 문단별 사용자 탭 32개·양 끝 자동 탭(다른 문단 탭끼리 최대 30명령), 구역별 용지·여백·다단·기본 탭, HWPX 기본 본문 줄 번호·기본 단색 쪽 배경·기본 텍스트 바탕쪽, 기존 문단 스타일, 쪽 감추기. 줄 번호는 현재 구역의 editable과 파일 형식을 확인합니다. 병합/중첩 표, 개체·필드 편집은 아직 미지원입니다.']} as Snapshot;
  }
  const native = {
   snapshot,
@@ -136,7 +137,7 @@ export function installAgentBridge(d:Deps){
    try{
     const input=d.input();if(!input)throw new Error('편집기가 준비되지 않았습니다.');
     await input.executeDocumentAgentOperation({kind:'snapshot',operationType:'jueony:'+runId,operation:(wasm:any)=>{
-     assertRevision(base.revision,revision());executed=true;return executeDocumentOperations(wasm,base,validated.operations)??(validated.operations.length===1&&['create_paragraph_style','rename_paragraph_style','set_next_paragraph_style'].includes(validated.operations[0].kind)?input.getCursorPosition():{sectionIndex:0,paragraphIndex:0,charOffset:0});
+     assertRevision(base.revision,revision());executed=true;return executeDocumentOperations(wasm,base,validated.operations)??(validated.operations.length===1&&['create_paragraph_style','rename_paragraph_style','set_next_paragraph_style','set_table_pagination'].includes(validated.operations[0].kind)?input.getCursorPosition():{sectionIndex:0,paragraphIndex:0,charOffset:0});
     }},d.render);
     const afterRevision=revision();applying=false;
     // snapshot requires the busy gate to be removed; read the body directly while still gated.

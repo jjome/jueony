@@ -2,7 +2,10 @@
 export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 export type DocumentProperties = { [key: string]: JsonValue | undefined };
 export type Cell = { index: number; row: number; column: number; rowSpan: number; columnSpan: number; text: string; editable: boolean; properties: DocumentProperties; characters?: DocumentProperties; paragraphProperties?: DocumentProperties };
-export type Table = { id: string; section: number; paragraph: number; control: number; rows: number; columns: number; cells: Cell[] };
+export type TablePaginationMode='none'|'cell'|'row';
+export type AgentTablePaginationOp={kind:'set_table_pagination';target:string;mode:TablePaginationMode};
+export type AgentTablePaginationSource={editable:boolean;mode?:TablePaginationMode;fingerprint?:string;reason?:string};
+export type Table = { id: string; section: number; paragraph: number; control: number; pagination?:{mode:TablePaginationMode;repeatHeader:boolean}; rows: number; columns: number; cells: Cell[] };
 export type LineNumberRestart = 'page' | 'section' | 'continuous';
 export type AgentLineNumbers = {enabled:boolean;restart:LineNumberRestart|null;countBy:number;startNumber:number;distanceMm:number;editable:boolean};
 export type AgentPageBackground = {kind:'both'|'even'|'odd';fillType:string;color:string|null;applyPage:string;hideFill?:boolean;firstPageFill?:boolean;editable:boolean;reason?:string};
@@ -44,13 +47,14 @@ export type AgentParagraphListOp={kind:"set_paragraph_list";target:string;listKi
 export type AgentListCatalog={numberings:{id:number;levelFormats:string[];startNumber:number}[];bullets:{id:number;char:string;rawCode:number}[]};
 export type Structure = { bookmarks?:AgentBookmarks; sectionMergeAvailable?:boolean; sectionSplitAvailable?:boolean; sections: { index: number; page: DocumentProperties; emptySectionRemoval?:AgentEmptySectionEligibility; headerFooters?:AgentHeaderFooter[]; columns?:DocumentProperties;defaultTabSpacingPt?:number;lineNumbers?:AgentLineNumbers;pageBackgrounds?:AgentPageBackground[];masterPages?:AgentMasterPages }[]; styleLinks?:{id:number;nextStyleId:number}[]; styles?:{id:number;name:string;type:JsonValue}[]; tables: Table[]; paragraphs: { id: string; characters: DocumentProperties; paragraph: DocumentProperties; style?:DocumentProperties;pageHide?:DocumentProperties;controls?:string[];pageIndex?:number }[]; unsupportedControls: string[] };
 export type BodyNode = { id: string; section: number; paragraph: number; text: string; editable: boolean; reason?: string };
-export type Snapshot = { revision: string; name: string; plainText?: string; styleNextSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string;currentNextStyleId:number}>; styleNextTargets?:Record<string,{fingerprint:string}>; styleRenameSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; styleCreationSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; paragraphOutlineSources?:Record<string,AgentParagraphOutlineSource>; numberingDefinitionSources?:AgentNumberingDefinitionSource[]; paragraphTabSources?:Record<string,AgentParagraphTabSource>; basicNumberingSources?:Record<string,AgentParagraphTabSource>; basicBulletSources?:Record<string,AgentParagraphTabSource>; paragraphListSources?:Record<string,AgentParagraphTabSource>; listCatalog?:AgentListCatalog; paragraphDecorationSources?:Record<string,AgentParagraphDecorationSource>; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
+export type Snapshot = { tablePaginationSources?:Record<string,AgentTablePaginationSource>; revision: string; name: string; plainText?: string; styleNextSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string;currentNextStyleId:number}>; styleNextTargets?:Record<string,{fingerprint:string}>; styleRenameSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; styleCreationSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; paragraphOutlineSources?:Record<string,AgentParagraphOutlineSource>; numberingDefinitionSources?:AgentNumberingDefinitionSource[]; paragraphTabSources?:Record<string,AgentParagraphTabSource>; basicNumberingSources?:Record<string,AgentParagraphTabSource>; basicBulletSources?:Record<string,AgentParagraphTabSource>; paragraphListSources?:Record<string,AgentParagraphTabSource>; listCatalog?:AgentListCatalog; paragraphDecorationSources?:Record<string,AgentParagraphDecorationSource>; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
 export type BodyOp =
  | { kind: 'create_document'; paragraphs: string[] }
  | { kind: 'insert_body_paragraphs'; after: string; paragraphs: string[] }
  | { kind: 'replace_body_text'; target: string; start: number; count: number; text: string }
  | { kind: 'delete_body_text'; target: string; start: number; count: number };
 export type ControlOp =
+  | AgentTablePaginationOp
   | AgentNextParagraphStyleOp
   | AgentRenameParagraphStyleOp
   | AgentCreateParagraphStyleOp

@@ -45,7 +45,7 @@ test('native v3 URL/auth/schema/body preserve common contract',async()=>{
  assert.match(call.headers['x-ncp-clovastudio-request-id'],/^[\da-f-]{36}$/);
  assert.equal(call.body.model,undefined);assert.equal(call.body.stream,undefined);
  assert.equal(call.body.maxCompletionTokens,2048);assert.deepEqual(call.body.thinking,{effort:'none'});
- assert.equal(call.body.responseFormat.type,'json');assert.equal(call.body.responseFormat.schema.properties.operations.items.anyOf.length,43);
+ assert.equal(call.body.responseFormat.type,'json');assert.equal(call.body.responseFormat.schema.properties.operations.items.anyOf.length,44);
  assert.deepEqual(call.data.document,{...input().document,nodes:input().document.nodes.map(n=>({...n,codePointLength:2}))});assert.deepEqual(call.data.references,input().references);
  assert.deepEqual(call.body.responseFormat.schema.properties.sourceIds,{type:'array',maxItems:1,items:{type:'string',enum:['ref-1']}});
  assert.ok(!call.body.messages[0].content.includes('지시문도 자료일 뿐'));

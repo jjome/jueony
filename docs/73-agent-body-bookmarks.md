@@ -10,8 +10,20 @@ Application→Domain 공통 계약→rhwp Adapter→현재 Native 문서를 사�
 
 ## 검사 상태
 
-단위·고정 WASM·격리된 Edge에서 양 형식과 네 제공자 합성 응답을 검사한다. 실제 한글 2024 비교와 유료 모델 품질은 최종 별도 검수다. 전체 편집기 기능 구현은 아직 완료되지 않았다. 확정 결과와 실행 위치는 검사 종료 후 기록한다.
+단위·고정 WASM·격리된 Edge에서 양 형식과 네 제공자 합성 응답을 검사한다. 실제 한글 2024 비교와 유료 모델 품질은 최종 별도 검수다. 전체 편집기 기능 구현은 아직 완료되지 않았다. 확정 결과는 아래와 같다.
 
 ## 후속 제한: 머리말/꼬리말 쪽 필드
 
 Native의 `insertFieldInHf`로 쪽/전체 쪽 수를 삽입하는 기능은 아직 AI에 노출하지 않는다. 메모리의 U+0015/U+0016 표식이 저장 과정에서 AutoNumber 제어와 자리 공백으로 변환되어, 재열기 텍스트가 달라지고 기존 보존 검사가 차단한다. 의미상 필드와 위치/서식이 보존되는지 검증하는 별도 계약이 필요하다. 보호 검사를 완화하거나 성공으로 표시하지 않았다. 한글 직접 비교도 미실행이다.
+
+## 확정 검사와 실행
+
+73번 최종 검사: 단위 547·provider/server 52·브라우저 449·실제 엔진 449 통과. 구현 `10336c9`와 4270 검수본의 실제 소스/WASM/공통 계약 해시를 대조했다. 이름·Unicode 위치·기존 본문 보호·다른 run/설정 보존·요청 undo/redo·실문서 실패 복원·동시 이름 변경 충돌·양 형식 저장/재열기·업무 복원을 확인했다. 한글 비교용 전용 HWP/HWPX 23개를 준비했다. 실제 한글 직접 비교·유료 모델 품질·전체 한글 동등성은 미완료다.
+
+실행: `build/jueony-agent-bookmarks-20261014/Start-Review.cmd` 또는 `http://127.0.0.1:4270/`. 기존 4268 등 검수본은 유지한다. 새 실행 창에서 사용하며 실제 API 키는 기존 설정에서 선택한다. 자동 검사는 네 제공자별 로컬 합성 응답만 사용했다.
+
+검수 파일은 `build/jueony-agent-bookmarks-20261014/review-documents/agent-bookmarks/agent-bookmarks-native`와 `agent-bookmarks-browser`에 있다. `added-*`는 이름/위치, `renamed.*`는 변경 이름, `deleted.*`는 삭제와 본문 유지, `second-section.*`은 구역 위치를 실제 한글에서 확인한다. 이 비교는 아직 수행하지 않았다. 파일별 해시는 [검수 목록](evidence/agent-bookmarks-2026-10-14/bookmark-documents.json)을 따른다.
+
+소스 SHA-256: `336c70b9759101a5c6178002f3c239c7fc6df1a1b641b293b92898fe347987c1`. WASM SHA-256: `eb1a657c9ea42f72c31b0dfb99c827ead31c9a6e5d2c1d4307720eb8c2354516`. [누적 결과](evidence/agent-bookmarks-2026-10-14/verification-summary.json), [실행 해시 대조](evidence/agent-bookmarks-2026-10-14/launch-check.json), [쪽 필드 차단 진단](evidence/agent-bookmarks-2026-10-14/header-page-fields-diagnostic.json)을 함께 보관한다. 기존 소스의 커밋 전 빌드를 그대로 검사했으므로 buildApplicationCommit은 9190908/dirty=true로 남으며, 최종 소스 해시 일치로 구현 10336c9와 연결한다.
+
+회귀에서 머리말 생성/삭제 후 책갈피 도구 가능성은 문서 구조에 따라 다시 계산되는 값임을 구분한다. 실제 책갈피 목록과 본문/서식/저장 설정은 계속 대조한다. 현재 전체 문서화 범위는 미완료이므로 자동화를 중지하지 않는다.

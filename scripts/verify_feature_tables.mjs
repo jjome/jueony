@@ -9,7 +9,7 @@ const require=createRequire(resolve(process.cwd(),'apps/editor/package.json'));
 if(!process.env.JUEONY_MARKED_PACKAGE)throw new Error('Set JUEONY_MARKED_PACKAGE to the installed marked ESM entry file. No download is performed.');
 const {marked}=await import(pathToFileURL(resolve(process.env.JUEONY_MARKED_PACKAGE)).href);
 const {default:puppeteer}=await import(pathToFileURL(require.resolve('puppeteer-core')).href);
-const root=process.cwd(), out=resolve(root,'build/feature-doc-preview'), evidence=resolve(root,'docs/evidence/feature-docs-2026-10-16');
+const root=process.cwd(), out=resolve(process.env.JUEONY_FEATURE_PREVIEW_OUTPUT??resolve(root,'build/feature-doc-preview')), evidence=resolve(process.env.JUEONY_FEATURE_EVIDENCE_OUTPUT??resolve(root,'docs/evidence/feature-docs-2026-10-16'));
 await mkdir(out,{recursive:true});await mkdir(evidence,{recursive:true});
 const index=JSON.parse(await readFile('docs/features/index.json','utf8'));
 const files=['docs/jueony-progress.md',...index.groups.map(g=>'docs/features/'+g.file)];

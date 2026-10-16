@@ -2,9 +2,25 @@
 
 2026-10-17 **진행 중 초안**. [108번 기록](108-file-preservation-completion.md) 이후 실제 한글 2024와 Windows 실행본을 검사하면서 발견한 결함, 수정 범위와 남은 검수를 추적한다. 파일·저장 기능 전체의 완료 선언이 아니며, 이 문서 작성으로 CSV·기능별 집계·완료율을 변경하지 않는다.
 
-정식 엔진 `5921bb9f9dcd86fa`에서 겹침 표 흐름 관련 Native 72개와 실제 Edge 14개는 통과했다. 한글이 다시 저장한 여러 줄 본문의 줄 나눔·자폭과 선언 높이 차이는 남아 있다. 실제 Windows 실행본은 초기 종료 실패를 수정한 뒤 최신 `JueonyNativePickerReview.exe`에서 HWPX 열기·Ctrl+S·종료 취소·승인 후 실제 창 소멸·재실행 복구·명시적 다른 이름 저장과 원본 보존까지 통과했다. native HWP 직접 검수와 한글 지면 동등성은 별도이며, 이 결과들을 섞어 완료율로 계산하지 않는다.
+정식 `5921bb9f9dcd86fa`의 겹침 표 흐름 Native 72개·실제 Edge 14개 이후, 정식 **`9418a6df42a4ba6f`(53패치)**에서 현재 재조판·탭 저장 회귀와 독립 한글 통제 문서 검수를 마쳤다. 다만 옛 저장 캐시와 한글의 선언 높이 차이, 새로 분리한 **HWP→HWPX 변환 지면 손상 6경로**가 남아 있다. 실제 Windows 51패치 실행본은 HWPX의 열기·저장·종료 취소/승인·실제 창 소멸·재실행 복구·명시적 Save As와 원본 보존을 통과했고, native HWP도 열기·Ctrl+S·독립 재열기·실제 한글 재열기를 확인했다. 전체 종료·복구 흐름은 HWPX에서 검수한 것이며, 새 53패치 실행본의 Windows 검수나 전체 한글 지면 동등성으로 확대하지 않는다.
 
 아래 `build/` 링크는 로컬 진단·검수 근거다. 최종 마감 시 보존할 결과와 사본을 정리하고 링크를 확정한다. 기존 실패 결과와 immutable 엔진·실행본은 덮어쓰지 않는다.
+
+## 이번 실제 검사에서 추가로 발견한 결함
+
+**아래 실패가 남아 있으므로 파일·저장·복구·형식 보존 파트를 전체 완료로 표시하지 않는다.** 자체 왕복 통과와 실제 한글 호환성은 별도 판정한다. 원본, 실패 사본과 이전 엔진은 보존한다.
+
+| 항목 | 실제 확인 결과 | 현재 조치 |
+| --- | --- | --- |
+| HWP↔HWPX 표 흐름 | 53패치의 변환 실패 6경로를 새 37번 후속 패치로 수정. 순수 HWPX·제외 조건은 기존 바이트까지 대조 | 정식 56패치 `3a01e912b92dc8af` 빌드 완료. HWP/HWPX 출력에 같은 배치 보호를 적용한 Native 18개·실제 Edge 3개 통과. 변조 저장물은 파일창/쓰기 0회로 차단 |
+| 기본 탭 20/40/60pt | 실제 한글에서 세 구역을 확인하니 40pt 구역만 `ABC`가 붙음. 기본 탭 값은 맞지만 폭 미정 탭과 기존 LINE_SEG가 함께 남음 | 정확한 미정 탭 문단의 HWPX 줄 캐시만 생략하는 40번 후속 패치. 정식 56의 12경로 및 Rust 4개 통과. 생산 HWPX 출력도 실제 한글에서 세 구역 정상 분리·재저장 확인, 전체 지면 차이 0. 별도 HWP 출력에는 같은 결함이 남아 바이너리 저장 경로 보강 중. 미사용 스타일 6개 파서 차이는 별도 실패로 보존 |
+| 공개 문서 4개 | 모두 실제 한글에서 열고 별도 Save As 완료. python-hwpx-0만 원본/변환 대 한글의 공개 의미·배치 모두 동일 | [8개 비교 결과](../build/hancom-final-file-review-20261017/public-comparison-final53/batch-summary.json). python1은 표 전체 약 21.3px 이동, python3은 줄·자원 참조 차이, MCST는 복잡 지면 차이와 한글 16쪽/엔진 15쪽 관측을 별도 유지 |
+| 새 HWP 글상자 | 53패치 Top HWPX의 위·가운데·아래 정렬은 실제 한글에서 표시·재저장됨. **같은 엔진이 새로 만든 Top HWP는 한글에서 ‘파일이 손상되었습니다’ 오류** | [실제 오류 화면](../build/hancom-owned-file-review-20261017/textbox-Top-hwp-corrupt.png). 정상 HWPX를 한글이 직접 HWP로 저장한 독립 기준 사본을 확보해 바이너리 구조 결함을 조사 중. 기존 엔진 반복 저장 통과를 외부 열기 성공으로 취급하지 않음 |
+| 혼합 서식 변환 | 긴 본문의 14pt 굵은 글자 줄에서 HWP→HWPX 왕복 후 폭이 증가. 글자 자체 폭과 줄 끝 공백의 양쪽 정렬 분배를 분리 | 별도 최소 후보를 검증 중. 글꼴·공백 문자열·지면 허용치를 바꾸어 통과시키지 않음 |
+
+공개 문서의 실제 한글 비교 8건은 같은 네 원본의 두 비교이므로 고유 문서 8개가 아니다. 한글의 자원 재인덱싱은 원시 ID 차이로 남기고, 참조 자원의 실제 서식과 위치 결함을 별도로 조사한다. 공개 문서 본문·파생 파일은 Git에 추가하지 않는다.
+
+정식 56의 HWPX 미정 탭·형식별 저장 보호 검수는 [보존한 검수 묶음](evidence/file-completion-2026-10-17/engine56/manifest.json), [실제 Edge 보호](evidence/file-completion-2026-10-17/engine56/format-guard-edge.json), [한글 탭 독립 읽기](evidence/file-completion-2026-10-17/engine56/hancom-tab-readback.json)에 보존한다. 실제 엔진을 지정한 단위 검사 **839/839, 건너뜀 0**, 원본/한글 사본 변환 16/16을 확인했다. 새 글상자 손상·공개 문서의 외부 비교 실패를 이 통과 수로 상쇄하지 않는다. 53패치의 글자폭·탭 폭 수정과 독립 통제 자료는 `8771dd9`, 56패치 저장 보강은 `71a0ab3`에 커밋했다.
 
 ## 108번 이후 확인한 사실
 
@@ -14,6 +30,7 @@
 | c370 겹침 파일 직접 비교 | multiline / caption-multiline / positive-caption-gap 원본과 실제 한글 재저장본 | **3 PASS / 6 FAIL**. PASS 3개는 한글 저장본을 Jueony에서 다시 저장한 자체 왕복이다. 원본 대 한글의 의미·전체 지면 비교 6개는 실패 | [실패 결과](../build/hancom-file-preservation-20261017/overlap-roundtrip/result.json), [독립 CFB 기록](../build/hancom-file-preservation-20261017/overlap-roundtrip/raw-records.json) |
 | 정식 5921 수정 검수 | 현재 문서·직접 소유·허용 원시 변화·전체 배치·undo·실제 저장 재열기 | **Native 72/72, Edge 14/14 PASS**. 시나리오 수이며 고유 기능 수나 한글 전체 호환률이 아님 | [통합 요약](../build/n001-formal-5921/summary.json) |
 | 수정 후보의 기존 한글 자료 재분석 | 실제 한글 재저장본과 수정 엔진의 공개 배치 비교 | positive-caption 전체 배치 차이 0. multiline / caption은 표·본문 Y 차이가 해소됐지만 줄 partition·폭·charX 차이는 유지. 선언 높이 차이도 삭제하지 않음 | [후보 비교](../build/n001-completion-final/hancom-existing/result.json), [정식과 후보 동등성](../build/n001-formal-5921/formal-provenance.json) |
+| 정식 53패치 typography·탭 | Native 재조판 12/12·탭 6/6·독립 Hancom 통제 11/11, 실제 Edge Canvas 탭 6/6·통제 11/11 | 현재 재조판 158 경계와 반복 저장·전체 지면·실제 paint 통과. 아래의 옛 원본 비교 및 별도 변환 실패를 삭제하지 않음 | [정식 53 요약·지문](evidence/typeset-controls-2026-10-17/formal-summary.json), [자체 통제 원본·golden](evidence/typeset-controls-2026-10-17/manifest.json) |
 | 이전 Windows Final.exe | c370 독립 검수 실행본의 Open·Ctrl+S·저장 사본 한글 열기·dirty 종료 | 열기/저장/한글 열기와 Esc 취소 관찰. **승인 뒤 창 종료 실패**는 아래 최신 실행본에서 수정·재검수. 옛 실패 근거 유지 | [이전 실행본 지문](../build/native-file-gui-20261017/native-exit-final-result.json), [실제 GUI 근거](#native-gui) |
 | 최신 Windows PickerReview.exe | 5921 실제 native HWPX 열기·Ctrl+S·종료 취소/승인·창 소멸·재실행 복구·명시적 Save As·원본 보존 | **검수한 HWPX 경로 PASS**. 실제 창 목록, 복구 화면 및 원본/복구 파일의 독립 ZIP·XML·SHA 검증. HWP·전체 ACL·한글 조판 동일성으로 확대하지 않음 | [실제 GUI 최종 보고서](../build/native-file-gui-20261017/actual-picker/actual-validation.json), [최신 실행본 지문](../build/native-file-gui-20261017/native-picker-result.json) |
 
@@ -45,9 +62,30 @@
 
 `commonHeight`는 자동 크기 0, 명시 크기와 크기 보호를 포함하는 저장 선언이다. 측정 bbox 높이와 다르다는 이유로 전부 정규화하면 사용자의 크기 의도를 잃는다. [독립 조사](../build/n001-common-height-contract/conclusion.json)는 자동 0, 작은 보호 높이, 큰 명시 높이, 큰 보호 높이 네 대조와 commonHeight만 바꾼 여섯 실험을 보존한다. 이번 패치는 모든 표의 선언 높이를 실측값으로 덮어쓰지 않았다. 의미 보존 검사에서 `tableHeight`를 제거하지도 않았다.
 
-여러 줄 본문에는 별도의 줄 나눔 차이가 남는다. 기록된 예에서 본문 offset 106의 줄은 기존 54자에서 한글 52자로 바뀌고 다음 줄 시작은 160에서 158로 달라졌다. 수정 후보의 기존 한글 자료 비교에서는 multiline 492개, caption-multiline 186개의 공개 배치 필드 차이가 남았고 positive-caption은 0개였다. 이 수치는 서로 다른 배치 필드의 차이 수이며 실패 기능 수가 아니다.
+c370이 만든 옛 합성 원본과 실제 한글 재저장본의 직접 비교는 정식 53에서도 **4 PASS / 5 FAIL**이다. 세 의미 비교에는 `commonHeight` 3846→5181HU 차이가 남고, multiline·caption의 전체 공개 배치 비교에는 각각 501·186개 필드 차이가 남는다. 이 숫자는 실패 기능 수가 아니다. 옛 원본의 저장 LINE_SEG는 160 경계를 보존하며 실제 한글 저장본은 158이므로, 원시 캐시를 강제로 버리지 않은 로드 결과와 현재 문단의 재조판 결과를 구분한다. [정식 53의 기존 원본 비교](../build/file-completion-final-typeset/hancom-existing-pairs/result.json)와 옛 c370의 3 PASS / 6 FAIL을 각각 보존했다.
 
-글꼴 이름이 같거나 Canvas 측정 결과가 있다는 것만으로 한글 조판을 입증하지 않는다. [글꼴·줄 나눔 조사](../build/hancom-font-metrics-20261017/conclusion.json)와 독립 한글 텍스트 golden을 기준으로 추적한다. HCR advance 반올림으로 158 경계를 재현하는 후속 후보를 검토 중이지만, HWPX run 폭 회귀가 남아 정식 5921 완료 결과에 합산하지 않는다. 최종 합본의 전체 글줄·폭·자폭·쪽 수·HWP/HWPX 저장을 다시 검사해야 한다.
+### 정식 53의 현재 재조판·탭 검수
+
+실제 한글 2024에서 따로 저장한 11개 통제 문단으로 regular HCR Batang의 Hangul advance를 확인했다. 9pt 873→872, 9.5pt 921→920, 10pt 970→972, 20pt 1940→1940HU의 nearest-4HU 범위를 적용하며, 일반 공백은 기존 500HU를 유지한다. 다른 글꼴·bold/italic·위/아래첨자·명시 장평/자간·HFT 특수 서식은 이 규칙으로 재해석하지 않는다. 글꼴 이름·원시 DocInfo·문단 폭·검사 허용치를 맞추기 위해 바꾸지 않았다. 이 실측 범위를 전체 타이포그래피 호환성으로 일반화하지 않는다.
+
+첫 문단의 SectionDef/ColumnDef-only 구조에서는 편집과 import가 같은 물리 Frame을 사용하도록 좁혔다. 이어 HWP/HWPX의 저장 폭 미정 탭 자리표를 폭 0으로 읽던 정확 폭 생산 경로를 기존 모델 술어와 일치시켰다. 이전 52 엔진에서 혼합 서식의 실제 Canvas x가 최대 53.3334px, Hangul/tab은 최대 240.5867px 이동했던 반례도 새 저장물에서는 원래 위치가 유지된다. 조회 `run.w`를 덮어쓰거나 `charX`만 비교하는 방식으로 통과시키지 않았다.
+
+| 정식 53 검사 | 결과 | 실제 판정 범위 |
+| --- | --- | --- |
+| 현재 재조판 Native | 12/12 PASS | 기존 실제 한글 multiline/caption의 전체 문단 158 partition·가역 편집·엄격 HWP 저장, ASCII·숫자·하이픈·탭·한글 단어/글자·Unicode HWP/HWPX 회귀 |
+| 탭 저장 Native | 6/6 PASS | 기본 ASCII/Hangul·사용자 Left stop·들여쓰기·실제 혼합 bold run·끝 탭, 두 형식 각 2회 저장 재열기·전체 의미/자원·live 불변 |
+| 독립 Hancom 통제 Native | 11/11 PASS | 2개 실제 한글 저장본의 11문단, 전체 partition과 HWP/HWPX 전체 배치·보존 |
+| 실제 Edge Canvas | 탭 6/6·통제 11/11 PASS | 전체 공개 지면과 실제 fillText의 text/font/좌표, 저장 재열기 후 기존 최대 0.2 유지. page/console/external 오류 각각 0 |
+
+정식 WASM SHA-256은 `dadd0e384765cb8d7b8d623111447c4c4b275977ff131c83a47318cb567364e4`, JS는 `fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8`다. [검수기·결과·53패치 지문](evidence/typeset-controls-2026-10-17/formal-summary.json)에 private 후보와 구분해 기록했다. 이전 51/52 엔진과 실패 결과는 그대로다.
+
+[통제 자료](evidence/typeset-controls-2026-10-17/README.md)는 자체 생성 원본과 실제 한글 Save As 4개 HWP(84,480bytes)이며 공개·사용자 문서의 복사본이 아니다. CFB 스트림 명세로 BinData/font 스트림이 없음을 확인했고 글꼴 프로그램 추출·설치·재배포를 하지 않았다. 내장 글꼴 subset 가능성이 있는 측정용 PDF는 Git 자료에 포함하지 않는다.
+
+### 추가로 드러난 HWP→HWPX 변환 결함
+
+원본/한글 사본 × 저장 캐시/가역 편집 후 재조판 × HWP/HWPX를 각각 분리한 16경로 검사에서는 정식 **51·52·53이 모두 10 PASS / 6 FAIL**이다. 같은 형식 HWP 8경로는 통과했지만, 원본의 HWPX 변환 4경로는 뒤 표가 234→242px로 8px 이동하고, 편집한 한글 사본의 HWPX 변환 2경로는 본문이 한 줄 약 21.3px 밀린다. 줄 partition과 의미가 같다는 이유로 이 지면 손상을 허용하지 않는다. 35z/36z가 새로 만든 회귀와 기존 미완료 변환 경로를 구분한다.
+
+현재 `verifyPreservedExport`의 의미 검사는 이 6경로를 통과하며, 별도 겹침 배치 가드가 HWP 출력에만 적용되어 HWPX 손상을 놓친다. [정식 53 상세 결과](../build/file-completion-final-typeset/conversion-formal53/result.json), [51 기준](../build/file-completion-final-typeset/conversion-baseline51/result.json), [52 기준](../build/file-completion-final-typeset/conversion-baseline52/result.json)에 모두 실패로 남겼다. Engine 흐름·변환 및 필요 가드 보강은 후속 수정 대상이다. `commonHeight`를 실측값으로 정규화하거나 전체 배치 비교를 느슨하게 하여 닫지 않는다.
 
 ## 정식 실행본을 확인한 방법
 
@@ -126,7 +164,7 @@ native picker 중복 호출은 부모·동일 출처 iframe이 공유하는 한 
 | N002 공개 형식 변환 4차이 | 기록된 공개 5문서 10변환, 필드·메모·common 배치·잠금 의미 보존 | 감사에 기록된 `mcst-bid→HWPX`, `python-hwpx-0/1/3→HWP` 사본에서 표 안 메모·필드 내용과 수·개체·쪽/인쇄를 확인. 한글 재저장본을 엔진으로 읽어 의미를 대조. 공개 파생 파일은 Git/배포에 임의 추가하지 않음 |
 | G092 글상자 세로 정렬 | Top/Center/Bottom 저장·raw 예약3 보존, 명시 setter와 변환 거절 | [글상자 사본](../build/jueony-file-preservation-20261017/review-documents/file-preservation/textbox-storage-native/)의 HWP/HWPX 6개에서 한글 정렬 표시와 실제 글 위치·서식·이모지를 확인. 재저장 후 `known`/값을 비교. 예약 raw3를 알려진 정렬 성공으로 취급하지 않음 |
 | G096 단일 가시 본문 | Unicode·위첨자·동일 문단번호의 셀 소유 분리와 실제 UI 왕복 | [가시 본문 사본](../build/jueony-file-preservation-20261017/review-documents/file-preservation/overlap-visible-native/)의 plain/Unicode/superscript를 한글에서 열고 표 뒤 원문·위첨자·셀/본문 소유·지면·인쇄를 확인. 새 저장본의 한글 재저장과 Jueony 왕복을 대조 |
-| G105 여러 줄·캡션 | 실제 한글 실패 확인 후 5921 표/본문 Y 보강. 기존 전체 비교의 줄 나눔 차이는 남음 | 새 multiline·캡션 방향 사본을 한글에서 재저장. 표·캡션·모든 본문 글줄 시작·폭·charX·쪽 수·인쇄를 대조. 기존 6 FAIL과 선언 높이 차이를 해결한 근거 없이 완료로 올리지 않음 |
+| G105 여러 줄·캡션 | 정식 53에서 현재 재조판 158·Native 12/12·독립 통제/Canvas 통과. 옛 원본 캐시/의미 직접 비교 및 HWPX 변환은 별도 실패 유지 | 새 multiline·캡션 사본의 한글 재저장·인쇄 검수와 HWP→HWPX 변환 6경로를 마감. 선언 높이·원시 캐시 차이와 현재 재조판 성공을 구분하고, 전체 지면 실패가 남은 상태에서 완료로 올리지 않음 |
 | G106 양수 원점 | bare cache를 의미 간격으로 가정한 검사를 정정하고, 원시 vpos 무변경·234 실측·명시 offset/여백 보존 검증 | bare LINE_SEG 양수값, 실제 개체 offset, 문단 여백을 별도 사본으로 비교. 새 엔진 출력의 한글 재저장·캡션·쪽/인쇄를 확인. 캐시 값 보존과 사용자가 지정한 물리 간격 보존을 구분하여 최종 계약을 정정 |
 
 감사 시 참조한 일부 옛 문서 경로는 파일이 없었다. G069의 옛 파일명을 그대로 성공 근거로 복사하지 말고 [이번 탭 원본](../build/hancom-file-preservation-20261017/tabs-20-40-60.hwpx)과 [설정 기대값](../build/hancom-file-preservation-20261017/tabs-expected.json)을 사용한다. 모든 직접 검수는 원본을 보존하고 별도 사본에 수행한다.
@@ -134,7 +172,7 @@ native picker 중복 호출은 부모·동일 출처 iframe이 공유하는 한 
 ## 다음 마감 순서와 판정
 
 1. native HWPX 종료 결함 수정과 실제 Open·수정·Ctrl+S·Esc·승인 후 창 소멸·재실행 복구·Save As·원본 보존, native HWP Open·Ctrl+S·실제 한글 2024 재열기를 최신 PickerReview에서 확인했다. 최종 엔진/프런트엔드가 변경되면 같은 실제 경로를 다시 검수한다. IPC를 대체한 Edge 경계 검사 통과만으로 실제 창 종료를 판정하지 않는다.
-2. 독립 한글 텍스트 golden으로 줄 나눔·advance 수정 후보와 HWPX run 폭 회귀를 해결한다. 후보의 158 경계 한 곳만 맞춘 것을 문서 전체 적합성으로 표시하지 않는다.
+2. 독립 한글 통제 자료로 정식 53의 현재 줄 나눔·advance·탭 폭 저장 결함은 위 범위에서 검수했다. 다음은 새로 분리한 HWP→HWPX 지면 손상 6경로와 선언 높이·옛 저장 캐시의 외부 한글 비교를 각각 해결·검수한다. 158 경계 한 곳이나 본문 문자열 일치만으로 문서 전체 적합성을 표시하지 않는다.
 3. 새 정식 엔진·프런트엔드·native 실행본의 지문을 고정한 뒤 Native/Edge/Windows 회귀를 같은 합본에서 수행한다. private·이전 엔진·실패 실행의 수치를 섞지 않는다.
 4. 위 10개 작업별로 한글 화면·속성·재저장 파일 SHA·독립 원시/XML·인쇄 근거를 남긴다. 자체 왕복, 실제 한글 외부 재저장 변화, 원시 바이트 변화 범위와 OS 파일 계약을 각각 판정한다.
 5. 남은 실패·미실행 범위를 명시한 뒤에만 108번의 현재 안내, 기능 문서와 CSV를 갱신한다. 보호 검사·실패 원본·기존 복구본을 유지한다.

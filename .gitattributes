@@ -10,3 +10,7 @@ scripts/verify-rag-corpus.mjs text eol=lf
 docs/evidence/state-storage-2026-10-16/** -text whitespace=cr-at-eol
 # Node TAP includes an empty-string fixture in the subtest name (trailing space).
 docs/evidence/state-storage-2026-10-16/unit-tests.txt whitespace=cr-at-eol,-blank-at-eol
+
+# Keep raw recovery-integrity evidence identical to the verified artifacts.
+docs/evidence/recovery-integrity-2026-10-16/** -text whitespace=cr-at-eol
+docs/evidence/recovery-integrity-2026-10-16/unit-tests.txt whitespace=cr-at-eol,-blank-at-eol

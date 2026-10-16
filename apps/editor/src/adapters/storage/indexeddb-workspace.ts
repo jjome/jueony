@@ -2,6 +2,7 @@ import { validateAppState } from './legacy-state-validator.ts';
 import { initialState, interruptRuns } from './legacy-records.ts';
 import type { AppState, SavedDocument } from './legacy-records.ts';
 import { createSerializedWriter } from './serialized-writer.ts';
+import { sealRecoveryRecord } from './recovery-integrity.ts';
 
 // The legacy physical envelope remains v1. Domain modules never write separate
 // stale copies of its slices; all aggregate/document transactions share this queue.
@@ -43,7 +44,7 @@ export class WorkspaceStore {
     await this.request('state', 'readwrite', store => store.put(snapshot, 'current'));
   }
   async saveDocument(document: SavedDocument): Promise<void> {
-    const snapshot = structuredClone(document);
+    const snapshot = sealRecoveryRecord(document);
     await this.request('documents', 'readwrite', store => store.put(snapshot));
   }
   async documents(workspaceId: string): Promise<SavedDocument[]> {

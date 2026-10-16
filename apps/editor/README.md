@@ -1,8 +1,10 @@
 # Jueony 업무·채팅·문서 편집 MVP
 
+2026-10-16 후속 복구 검수본: `build/jueony-recovery-integrity-20261016/Start-Review.cmd` (4327). [106번 결과](../../docs/106-recovery-integrity.md): 복구본 내용/업무 지문 검증과 손상 기록 격리, 실제 별도 Edge 강제 종료·재실행 복원을 확인했다. 현재 프로필은 `recovery-integrity`, TypeScript 대상은 `.build/studio-recovery-integrity/tsconfig.json`이다. 아래 4326 결과는 직전 저장 보강 이력이다.
+
 2026-10-16 저장·복구 검수본은 `build/jueony-storage-20261016/Start-Review.cmd`(4326)다. [105번 저장·복구 결과](../../docs/105-file-storage-preservation.md)를 따른다. 실제 파일 readback, 다른 형식 저장 뒤 재저장, 속성창의 원본 정밀도 유지와 알려진 HWP 겹침 배치 손상의 저장 차단을 보강했다. 이전 4324와 사용자 문서·서버는 유지한다. 한글 직접 비교와 실제 Windows 파일 권한 검수는 별도다.
 
-현재 검수 프로필은 `storage-ready`이며 TypeScript 대상은 `.build/studio-storage-ready/tsconfig.json`이다. 단위 검사는 빌드한 패치 엔진의 절대 pkg 경로를 `JUEONY_ENGINE_PACKAGE`에 지정해 실행한다. 최신 실제 엔진 관측이 필요한 검사를 원본 npm 패키지 결과로 대체하지 않는다.
+직전 검수 프로필은 `storage-ready`이며 TypeScript 대상은 `.build/studio-storage-ready/tsconfig.json`이다. 단위 검사는 빌드한 패치 엔진의 절대 pkg 경로를 `JUEONY_ENGINE_PACKAGE`에 지정해 실행한다. 최신 실제 엔진 관측이 필요한 검사를 원본 npm 패키지 결과로 대체하지 않는다.
 
 2026-10-15 병렬 구현 검수본은 `build/jueony-parallel-editor-20261015/Start-Review.cmd`(4324)다. [104번 통합 결과](../../docs/104-parallel-editor-integration.md)가 최신 지원 범위·검사·제한의 기준이며 아래 실행본은 이전 이력이다. Agent 51종 계약에 병합 주 셀 문단 교체와 비병합 셀의 지정 행·열 분할을 추가했고, 지원하는 Rectangle 글상자의 커서·선택·미저장 복원을 연결했다.
 

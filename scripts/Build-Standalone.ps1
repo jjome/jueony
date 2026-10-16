@@ -238,7 +238,17 @@ foreach ($evidenceName in @('pre-agent-2026-10-13','page-border-2026-10-13','ses
     }
 }
 # Include current generated feature documents and only this bundle's synthetic evidence.
+if (Test-Path -LiteralPath (Join-Path $projectRoot 'docs/106-recovery-integrity.md')) {
+    Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/106-recovery-integrity.md') -Destination $output -Force
+}
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/features') -Destination $output -Recurse -Force
+$integrityEvidence = Join-Path $projectRoot 'docs/evidence/recovery-integrity-2026-10-16'
+if (Test-Path -LiteralPath $integrityEvidence) {
+    Copy-Item -LiteralPath $integrityEvidence -Destination $llmEvidence -Recurse -Force
+    $integrityReview = Join-Path $reviewDocuments 'recovery-integrity'
+    New-Item -ItemType Directory -Force $integrityReview | Out-Null
+    Get-ChildItem -LiteralPath $integrityEvidence -File | Where-Object { $_.Extension -in @('.hwp','.hwpx') } | Copy-Item -Destination $integrityReview -Force
+}
 $currentStorageEvidence = Join-Path $projectRoot 'docs/evidence/state-storage-2026-10-16'
 if (Test-Path -LiteralPath $currentStorageEvidence) {
     Copy-Item -LiteralPath $currentStorageEvidence -Destination $llmEvidence -Recurse -Force

@@ -4,7 +4,7 @@
 
 기준일: 2026-10-15. 원본은 [CSV](jueony-work-checklist.csv), 사용 규칙은 [97번 문서](97-master-work-checklist.md), 검색 화면은 [HTML](jueony-work-checklist.html)이다.
 
-총 433행: 실행 작업 212행과 상위 범위 항목 221행. 범위가 겹치므로 전체 완성률로 나누지 않는다.
+총 434행: 실행 작업 213행과 상위 범위 항목 221행. 범위가 겹치므로 전체 완성률로 나누지 않는다.
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증은 자동 검사와 한글 직접 비교를 구분한다. 각 완료 표시는 해당 행의 제한된 완료조건에만 적용한다.
 
@@ -512,6 +512,7 @@
 | G097 P0 | **알려진 HWP 겹침 배치 손상의 원본 쓰기 차단**<br>출처가 확인된 Native HWP5 인접 겹침 표만 전체 공개 표/텍스트 배치를 원문 그대로 비교한다. 불일치·미관측·한도 초과는 쓰기 전 거절, 열린 문서/원본/이전 복구본 보존. metrics 성공·실패 finally 복원. | ☑ 완료 | ☑ 완료<br>자동:PASS / 한글:NA | — 해당 없음 | 모든 HWP·다른 형식 변환의 일반 조판 동일성을 보장하지 않는다. 미지원 원본 자체의 렌더·저장 수정은 N001에 남긴다.<br>[105-file-storage-preservation.md](../docs/105-file-storage-preservation.md) · [verification-summary.json](../docs/evidence/state-storage-2026-10-16/verification-summary.json) |
 | G098 P1 | **병합 행 경계 추가·삭제 시 검증된 셀 높이 동기화**<br>Native/수동 UI의 이미 알려진 행 높이 합이 검증된 병합 span을 교차하는 추가·삭제에 한해 높이를 동기화. 양 형식·독립 기대값·undo/redo/저장/재열기 검증. 불명 높이는 추측하지 않는다. | ☑ 완료 | ◐ 부분<br>자동:PASS / 한글:NOT_RUN | — 해당 없음 | 한글 직접 비교와 N007 병합 행열 Agent 전체 지원은 별도이며 보호를 유지한다.<br>[105-file-storage-preservation.md](../docs/105-file-storage-preservation.md) · [verification-summary.json](../docs/evidence/state-storage-2026-10-16/verification-summary.json) |
 | G100 P1 | **새 각주의 고정 스타일 인덱스 참조 오류 수정**<br>새 각주만 고유한 named Footnote/각주 문단 스타일과 유효 참조를 확인한다. 스타일 순서 이동·재열기, 없음/rename/중복/type/범위 초과/깨진 참조의 삽입 전 bytes 불변을 검증. 기존 원본은 정규화하지 않는다. | ☑ 완료 | ◐ 부분<br>자동:PASS / 한글:NOT_RUN | — 해당 없음 | 한글 직접 비교. 고유한 표준 각주 스타일을 찾을 수 없는 원본은 삽입 거절로 명시한다.<br>[105-file-storage-preservation.md](../docs/105-file-storage-preservation.md) · [verification-summary.json](../docs/evidence/state-storage-2026-10-16/verification-summary.json) |
+| G101 P0 | **복구본 내용·업무 지문 검증과 강제 종료 복원**<br>새 IDB 복구본의 문서/workspace/이름/dirty/시각/문서 바이트를 SHA-256으로 묶고 복원 전에 검증한다. 손상·미지원 지문은 격리하며 원본 기록을 유지한다. 실제 별도 Edge 프로세스 강제 종료 후 HWP/HWPX 미저장 복원·UI 저장을 검증한다. | ☑ 완료 | ☑ 완료<br>자동:PASS / 한글:NA | — 해당 없음 | 지문 없는 과거 기록은 기존 구조 검사로 읽으며 다음 정상 쓰기에서 지문 추가. checksum은 서명/공격 방지가 아니며 Windows 전체/전원 장애·ACL·한글 비교는 별도.<br>[106-recovery-integrity.md](../docs/106-recovery-integrity.md) · [verification-summary.json](../docs/evidence/recovery-integrity-2026-10-16/verification-summary.json) |
 
 ## 모델·Agent — 실행 작업
 

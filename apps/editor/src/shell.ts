@@ -10,6 +10,7 @@ import {createRecoveryCoordinator,normalizeRecoverySettings,createDocumentViewJo
 import {readRecoverySettings,watchRecoverySettings,browserRecoveryClock} from './adapters/browser/recovery-settings.ts';
 
 import {assertRecoveryRecord,partitionRecoveryRecords} from './modules/document-files/public/index.ts';
+import {recoveryIntegrity} from './adapters/storage/recovery-integrity.ts';
 import {createSessionFacade,createSessionGuard,shouldProtectExit} from './modules/session/public/index.ts';
 import type {StoredFileConnection} from './file-connection.ts';
 import {describeStructure} from './modules/document/public/index.ts';
@@ -166,7 +167,7 @@ async function persistCachedView(tab:Tab){
 }
 function selectTab(tab:Tab){if(!session.canSelect(tab.id))return;if(activeTab?.initialized&&activeTab!==tab){activeTab.api!.suspendDocumentView();void persistTab(activeTab).catch(error);}if(!session.select(tab.id))return;activeTab=tab;for(const t of tabs){t.frame.hidden=t!==tab;t.wrapper.hidden=t.workspaceId!==work().id;t.wrapper.classList.toggle('is-active',t===tab);t.button.setAttribute('aria-selected',String(t===tab));}refreshTab(tab);tab.frame.contentWindow?.dispatchEvent(new Event('resize'));void persist().catch(error);}
 async function newTab(workspaceId=work().id,saved?:SavedDocument,forExisting=false){
- if(saved)assertRecoveryRecord(saved,workspaceId);
+ if(saved)assertRecoveryRecord(saved,workspaceId,recoveryIntegrity);
  const frame=document.createElement('iframe');const wrapper=document.createElement('div');wrapper.className='document-tab-wrap';
  const tab:Tab={id:saved?.id??uid(),workspaceId,frame,wrapper,button:button('문서 준비 중…',()=>{if(cancelNavigation())selectTab(tab);}),closed:false,initialized:false,pendingConnection:saved?.fileConnection,api:null,ready:Promise.resolve(null),persist:Promise.resolve()};
  tab.button.className='document-tab';tab.button.setAttribute('role','tab');
@@ -247,7 +248,7 @@ async function switchWorkspace(id:string){
  if(restoring||closing||!cancelNavigation()){render();return;}restoring=true;
  try{if(activeTab?.initialized)activeTab.api!.suspendDocumentView();if(activeTab?.initialized&&!await persistTab(activeTab))throw new Error('문서 작업이 끝난 뒤 업무를 전환해 주세요.');state.activeWorkspaceId=id;selected=[];activeTab=undefined;render();
   const previousDocumentId=work().activeDocumentId;
-  if(!loaded.has(id)){const recovery=partitionRecoveryRecords(await store.documents(id),id);for(const issue of recovery.errors){recoveryWarning=true;error(issue);}const documents=session.restore(id,recovery.valid);for(const saved of documents)if(!tabs.some(t=>t.id===saved.id)){try{await newTab(id,saved);}catch(e){recoveryWarning=true;error(e);}}loaded.add(id);}
+  if(!loaded.has(id)){const recovery=partitionRecoveryRecords(await store.documents(id),id,recoveryIntegrity);for(const issue of recovery.errors){recoveryWarning=true;error(issue);}const documents=session.restore(id,recovery.valid);for(const saved of documents)if(!tabs.some(t=>t.id===saved.id)){try{await newTab(id,saved);}catch(e){recoveryWarning=true;error(e);}}loaded.add(id);}
   const tab=tabs.find(t=>t.id===session.preferred(id,previousDocumentId))??await newTab(id);selectTab(tab);render();await renderFolders();await persist();
  }finally{restoring=false;}
 }

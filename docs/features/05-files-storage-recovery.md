@@ -6,13 +6,13 @@
 
 ## 진행 요약
 
-실행 작업 **17개**, 상위 범위 **10개**. CSV의 기록을 기능별로 표시한 문서다.
+실행 작업 **18개**, 상위 범위 **10개**. CSV의 기록을 기능별로 표시한 문서다.
 
 | 구분 | 실행 작업 | 상위 범위 |
 | --- | --- | --- |
-| 구현 | 완료 16/17 · 부분 1 | 완료 0/10 · 부분 9 · 미구현 1 |
-| 검증 | 완료 9/17 · 부분 8 | 완료 0/10 · 부분 3 · 미검증 7 |
-| Agent 연결 | 연결 6/6 · 부분 0 · 해당 없음 11 | 연결 0/10 · 부분 1 · 미연결 9 |
+| 구현 | 완료 17/18 · 부분 1 | 완료 0/10 · 부분 9 · 미구현 1 |
+| 검증 | 완료 10/18 · 부분 8 | 완료 0/10 · 부분 3 · 미검증 7 |
+| Agent 연결 | 연결 6/6 · 부분 0 · 해당 없음 12 | 연결 0/10 · 부분 1 · 미연결 9 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
@@ -59,6 +59,7 @@
 | --- | --- | --- | --- | --- |
 | [B010](<05-files-storage-recovery.md#b010>) · 범위 | 저장 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [G093](<05-files-storage-recovery.md#g093>) · 작업 | 실제 저장 파일 readback 후 성공 확인 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+| [G101](<05-files-storage-recovery.md#g101>) · 작업 | 복구본 내용·업무 지문 검증과 강제 종료 복원 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 
 <a id="work-3"></a>
 
@@ -484,6 +485,20 @@
 - UI 명령: `file:save`
 - 근거: [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>)
 - 원래 기록: `SCOPED_IMPLEMENTED;ENGINE_BROWSER_VERIFIED_2026_10_16`
+
+</details>
+
+<details id="g101">
+<summary>G101 · 복구본 내용·업무 지문 검증과 강제 종료 복원</summary>
+
+- 종류: 실행 작업 · 우선순위: P0.
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: 새 IDB 복구본의 문서/workspace/이름/dirty/시각/문서 바이트를 SHA-256으로 묶고 복원 전에 검증한다. 손상·미지원 지문은 격리하며 원본 기록을 유지한다. 실제 별도 Edge 프로세스 강제 종료 후 HWP/HWPX 미저장 복원·UI 저장을 검증한다.
+- 다음 작업: 지문 없는 과거 기록은 기존 구조 검사로 읽으며 다음 정상 쓰기에서 지문 추가. checksum은 서명/공격 방지가 아니며 Windows 전체/전원 장애·ACL·한글 비교는 별도.
+- 상위 항목: [B010](<05-files-storage-recovery.md#b010>) 저장
+- 근거: [106-recovery-integrity.md](<../106-recovery-integrity.md>) · [verification-summary.json](<../evidence/recovery-integrity-2026-10-16/verification-summary.json>)
+- 원래 기록: `SCOPED_IMPLEMENTED;ACTUAL_EDGE_CRASH_RECOVERY_VERIFIED_2026_10_16`
 
 </details>
 

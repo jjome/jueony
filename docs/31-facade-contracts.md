@@ -36,6 +36,8 @@ Facade는 코드 의존 경계이며 그 자체로 프로세스 보안 경계를
 
 `confirmPersisted`는 Files workflow에만 주입하는 제한된 수명 인터페이스다. 일반 UI/Agent/MCP에는 노출하지 않는다. `upsert`의 credential 입력은 설정 전용 채널에서 잠시 처리하고 즉시 신뢰된 로컬 서버/비밀 저장 adapter로 넘긴다. 공개 연결 상태, 오류, 이벤트, 채팅, 일반 로그, IndexedDB에는 키를 담지 않는다.
 
+복구 기록 검증에는 `RecoveryIntegrityPort.verify(record)`를 주입한다. Core는 선택적 지문의 버전·알고리즘·형식과 검증 결과만 판단하고, 저장 adapter가 SHA-256 계산과 호출 시점 사본을 담당한다. 지문 있는 기록은 검증 port 없이 복원할 수 없다. 손상 기록은 개별 격리하며 삭제·재서명하지 않는다. 지문 없는 기존 v1 기록은 호환성을 유지한다. [106번 범위·실제 강제 종료 검사](106-recovery-integrity.md)를 따른다.
+
 ## 3 계약의 기본 형태
 
 ```ts

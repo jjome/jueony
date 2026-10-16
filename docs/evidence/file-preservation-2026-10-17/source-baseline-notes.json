@@ -1,0 +1,92 @@
+{
+  "implementationCommit": "d57f09aedb0b2283ffdcb8779c949339b0d19a78",
+  "sourceCommitRecordedAtBuild": "a51b2258712d10d317400ee1120af04e08f837b7",
+  "sourceDirtyRecordedAtBuild": true,
+  "exactRawApplicationSourceSha256": "b1736454cb5cbf054f60b73de65df60453e2112e87d1a2bfc0fc2aeb87790cd0",
+  "engineSourceId": "c3706ce8cab54953",
+  "wasmSha256": "0f192f1394068a6543518487b10f0ce4ea611f6b9754ca317c1c0888bd467cef",
+  "nativeWindowsStorageSourceSha256": "dd9d79e2786507f6d4fdf8c4e191e015070129ce7ff50e9b667508e93ef4e081",
+  "gitSourceEquivalence": "All current editor source, integration files and native storage source equal the implementation commit after LF normalization; raw source hash and every recorded integration input hash exactly match the compiled metadata.",
+  "compiledSourceCheck": {
+    "status": "PASS",
+    "sourceFiles": 309,
+    "customSourceSha256": "b1736454cb5cbf054f60b73de65df60453e2112e87d1a2bfc0fc2aeb87790cd0",
+    "buildScriptSha256": "e530c77487d231e37582d377e7dddebf8a52dbb00bc267bcad607971c25c19e4",
+    "integrationSources": [
+      {
+        "file": "scripts/integration/studio-patches.mjs",
+        "sha256": "5c368ab28da36b0b0cc60d8e4ec708c289349678d7d710570d427e6837649203"
+      },
+      {
+        "file": "scripts/integration/manual-feature-patches.mjs",
+        "sha256": "3affc0c1cfa7e39cf43acc4e4335504b44b403e214b5ef0fd366a40765ff9980"
+      },
+      {
+        "file": "scripts/integration/recovery-patches.mjs",
+        "sha256": "12dfbb56ca02e1642bb495a44e18cf0823da84864386211eeb8811916552f864"
+      },
+      {
+        "file": "scripts/integration/tab-feature-patches.mjs",
+        "sha256": "da0d7d0b9a0c529af8a4a9733bf239a1c4f6afcd99b8803f1237f1c57a90ceec"
+      },
+      {
+        "file": "scripts/integration/section-boundary-patches.mjs",
+        "sha256": "e2a5cee3330b67015a3ac8cc738cafe36966950d7a12fc48e1d0a7ffc2392b13"
+      },
+      {
+        "file": "scripts/integration/document-insertion-patches.mjs",
+        "sha256": "2941b880fe250f779c95ce7bbd9d54384b10dda5f1596f7c0343d44e0297d4ff"
+      },
+      {
+        "file": "scripts/integration/style-management-patches.mjs",
+        "sha256": "792ad2629ba0d657fe0bc504fa0f3c55075c6b2c69ea0cb570954dad294ed55c"
+      },
+      {
+        "file": "scripts/integration/style-flow-patches.mjs",
+        "sha256": "11010768f738466f36731a71b6d596ecae4ba60c74132fd3ea088e4816a98974"
+      },
+      {
+        "file": "scripts/integration/table-conversion-patches.mjs",
+        "sha256": "77b1afbf52aa073f5617feacbf84781b5976fdfe549f25e10dc1116603333fe9"
+      },
+      {
+        "file": "scripts/integration/page-border-patches.mjs",
+        "sha256": "70bf19d6d91304856bd7e4c75d3e6fdf43403eea9d9e06e90b2321f8117d20bb"
+      },
+      {
+        "file": "scripts/integration/selected-object-properties-patches.mjs",
+        "sha256": "3ff0eab7f38eece3ce098c33759d0e2bdce12fb3f44c8da417c81a1e02799279"
+      },
+      {
+        "file": "scripts/integration/formatting-toolbar-patches.mjs",
+        "sha256": "d75122ccc9459cf9fa46d065777231c5b83144393a1af93d20cffee8594c600f"
+      },
+      {
+        "file": "scripts/integration/document-tab-cycle-patches.mjs",
+        "sha256": "1c907daa1e91202f24c77827629ce66c9959cf12a6d1656d64f8942d106c79f8"
+      },
+      {
+        "file": "scripts/integration/keyboard-context-patches.mjs",
+        "sha256": "0f85ceeaa4c2998908068ad2ba0aadf3bcf137749c6d49765bb293938a4cdd1f"
+      },
+      {
+        "file": "scripts/integration/document-swap-state-patches.mjs",
+        "sha256": "d4ae8194a8ff2446cfd2483b53356226197c7610cae6bebea38da1af670fb212"
+      },
+      {
+        "file": "scripts/integration/export-metadata-loss-patches.mjs",
+        "sha256": "b7a30c5f36f960f9860ae19fc6b427040f253b019c30b0362efb269613e38fc2"
+      }
+    ],
+    "enginePatchCount": 49
+  },
+  "patchNormalization": [
+    {
+      "name": "zzzzzzzzzzzzzzzzzzz-agent-style-metadata.patch",
+      "compiledWorkingSha256": "53c6a573df6e8f1d0af4f388dad4e624a700006ad38f7a1de820eabc1d6d44cb",
+      "committedSha256": "24a6f824744c56eddbd6a089897b7383a86d63006b491299684c20586632b035",
+      "reason": "Historical local CRLF patch, Git eol=lf; normalized content matches, raw compiled input remains immutable."
+    }
+  ],
+  "note": "Build compiled before commit from exact tested source. This record binds it to implementation commit without rewriting historical build metadata."
+}

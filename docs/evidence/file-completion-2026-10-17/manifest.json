@@ -1,0 +1,107 @@
+{
+  "scope": "Intermediate engine51 validation and independent Hancom baseline; not final native GUI or typography completion.",
+  "files": [
+    {
+      "path": "engine51/formal22.json",
+      "source": "build/n001-formal-5921/formal22/result.json",
+      "bytes": 105695,
+      "sha256": "5f5f99aad41c1d1a38f901b7f46037526ad74edce9999cad8cbf8e1df527ac36"
+    },
+    {
+      "path": "engine51/body-final.json",
+      "source": "build/n001-formal-5921/body-final/result.json",
+      "bytes": 47235,
+      "sha256": "94e5e3d0464dd20361f76b58c30c47608d0747ac3eb2725bae95f9a958d050c4"
+    },
+    {
+      "path": "engine51/positive-final.json",
+      "source": "build/n001-formal-5921/positive-final/result.json",
+      "bytes": 21165,
+      "sha256": "52b0a9f9042645dde435b1dc69f422e2e81a0159e80de3c01eb3d7023c9f12d5"
+    },
+    {
+      "path": "engine51/guard-final.json",
+      "source": "build/n001-formal-5921/guard-final/result.json",
+      "bytes": 19658,
+      "sha256": "5ac932db6665072cb3b30cdd0544a2f1b0fd4e5a8f020e2c65b31fc447907b33"
+    },
+    {
+      "path": "engine51/visible-final.json",
+      "source": "build/n001-formal-5921/visible-final/result.json",
+      "bytes": 24863,
+      "sha256": "47f198eaf6e33b440d1f898e4a63bea36b6f6daa794f72bdc9322ddea00fdd25"
+    },
+    {
+      "path": "engine51/browser-final.json",
+      "source": "build/n001-formal-5921/browser-final/result.json",
+      "bytes": 31795,
+      "sha256": "c8e7b34adf876f5560a7673bc035da1cccf299d7c4f179218b5aec3314601933"
+    },
+    {
+      "path": "engine51/summary.json",
+      "source": "build/n001-formal-5921/summary.json",
+      "bytes": 3291,
+      "sha256": "a763b69c23187ad3c63acdfe1d3f6f18fd5529dc28f1c9321bb7a39fb5b92d17"
+    },
+    {
+      "path": "engine51/formal-provenance.json",
+      "source": "build/n001-formal-5921/formal-provenance.json",
+      "bytes": 2899,
+      "sha256": "5660221851c46771cfd805d28783f08d421c361de834c9d0ef3121fe4af83e3d"
+    },
+    {
+      "path": "hancom/overlap-body-native-multiline.hwp",
+      "source": "build/hancom-file-preservation-20261017/overlap-body-native-multiline.hwp",
+      "bytes": 14848,
+      "sha256": "7efc35816157338223ac3a7e2a0df61a572e56a55affbf47f3010f845e6ab524"
+    },
+    {
+      "path": "hancom/overlap-body-native-caption-multiline.hwp",
+      "source": "build/hancom-file-preservation-20261017/overlap-body-native-caption-multiline.hwp",
+      "bytes": 13312,
+      "sha256": "8fa62ef0ff3711ff814773d8d361dffd947d34fa62cbc3b2cdfd12afc304ee61"
+    },
+    {
+      "path": "hancom/overlap-positive-native-caption-source-gap-10500.hwp",
+      "source": "build/hancom-file-preservation-20261017/overlap-positive-native-caption-source-gap-10500.hwp",
+      "bytes": 13312,
+      "sha256": "c65cd03a5e0c2893cc39983fe7825db38c324d7d8ff36d38afc2e9389f2e6e4c"
+    },
+    {
+      "path": "hancom/hancom-multiline-roundtrip.hwp",
+      "source": "build/hancom-file-preservation-20261017/hancom-multiline-roundtrip.hwp",
+      "bytes": 29184,
+      "sha256": "e8efe1eefcdf5146e4ae5e875c79bf45e8c9648ba94c51edd7acc55c285875e1"
+    },
+    {
+      "path": "hancom/hancom-caption-multiline-roundtrip.hwp",
+      "source": "build/hancom-file-preservation-20261017/hancom-caption-multiline-roundtrip.hwp",
+      "bytes": 22016,
+      "sha256": "1184d0381c650386152a2d789b747f0b4be25473e9f6768d6371aa38fedb920e"
+    },
+    {
+      "path": "hancom/hancom-positive-roundtrip.hwp",
+      "source": "build/hancom-file-preservation-20261017/hancom-positive-roundtrip.hwp",
+      "bytes": 16896,
+      "sha256": "09f356b978431d94dc23c88394b17b1dbf332d85038267e8552ad9a778d5f18d"
+    },
+    {
+      "path": "hancom/baseline-failures.json",
+      "source": "build/hancom-file-preservation-20261017/overlap-roundtrip/result.json",
+      "bytes": 1792887,
+      "sha256": "6a40713dcd8940658da39e73a35b1ca2e33fbe921daf98a9cde52b31cbf25f8e"
+    },
+    {
+      "path": "hancom/raw-records.json",
+      "source": "build/hancom-file-preservation-20261017/overlap-roundtrip/raw-records.json",
+      "bytes": 38417,
+      "sha256": "b39bcefff430d8cfe1ac5ea09cba69daf8af3102cb68b1408eb244256e34b1e6"
+    },
+    {
+      "path": "prior-verification-audit.json",
+      "source": "build/file-completion-verification-audit.json",
+      "bytes": 33324,
+      "sha256": "98dccb8db95178cb563f88fd7db0e909e41425679a48e478c297795c2b848b87"
+    }
+  ]
+}

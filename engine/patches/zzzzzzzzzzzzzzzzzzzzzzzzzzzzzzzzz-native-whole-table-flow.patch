@@ -1,0 +1,193 @@
+--- a/src/renderer/typeset/table/block/entry.rs
++++ b/src/renderer/typeset/table/block/entry.rs
+@@ -1542,7 +1542,32 @@
+                     PageItem::Table { para_index, control_index }
+                         if *para_index == previous_index && *control_index == 0))
+             });
++        // An empty host LINE_SEG is a cache, not an independent inter-frame gap.
++        // Use current flow only for an emitted adjacent native whole-table stack;
++        // actual paragraph margins and vertical offsets stay in the placement.
++        let semantic_whole_stack = st.col_count == 1 && st.profile.native_hwp5_layout()
++            && !st.current_items.iter().any(|item| matches!(item, PageItem::PartialTable { .. } | PageItem::Shape { .. }))
++            && matches!(st.current_items.first(), Some(PageItem::FullParagraph { para_index })
++                if paragraphs_all.get(*para_index).and_then(|host| host.line_segs.first())
++                    .is_some_and(|line| line.vertical_pos == 0
++                        && line.tag & crate::model::paragraph::LineSeg::TAG_IMPLEMENTATION_PROPERTY == 0))
++            && table.page_break == crate::model::table::TablePageBreak::None
++            && crate::renderer::float_placement::object_only_saved_table_anchor(para, table)
++            && table.common.vert_rel_to == crate::model::shape::VertRelTo::Para
++            && table.common.vert_align == crate::model::shape::VertAlign::Top
++            && signed_hwpunit(table.common.vertical_offset) >= 0
++            && para_idx.checked_sub(1).is_some_and(|previous_index| {
++                paragraphs_all.get(previous_index).is_some_and(|host| matches!(host.controls.as_slice(),
++                    [Control::Table(previous)] if previous.page_break == crate::model::table::TablePageBreak::None
++                        && crate::renderer::float_placement::object_only_saved_table_anchor(host, previous)
++                        && previous.common.vert_rel_to == crate::model::shape::VertRelTo::Para
++                        && previous.common.vert_align == crate::model::shape::VertAlign::Top
++                        && signed_hwpunit(previous.common.vertical_offset) >= 0))
++                && matches!(st.current_items.last(), Some(PageItem::Table { para_index, control_index })
++                        if *para_index == previous_index && *control_index == 0)
++            });
+         let source_host_origin = (st.col_count == 1
++            && !semantic_whole_stack
+             && (st.profile.hwpx_stored_layout() || st.profile.hwp5_stored_pagination_layout())
+             && !st.vpos_ladder_dirty
+             && (!st.profile.session_edited() || edited_positive_overlap))
+--- a/src/renderer/typeset/controls/flow_table.rs
++++ b/src/renderer/typeset/controls/flow_table.rs
+@@ -71,7 +71,7 @@
+     } = input;
+     let mut break_after_current_table = false;
+     let is_column_top = st.flow_table_column_top();
+-    let ft = engine.format_table(
++    let mut ft = engine.format_table(
+         para,
+         para_idx,
+         ctrl_idx,
+@@ -82,6 +82,69 @@
+         next_para,
+         is_column_top,
+     );
++
++    // Only native single-column adjacent whole-table frames own this empty
++    // anchor spacing. Keep all actual style margins and offset contracts in ft.
++    let starts_semantic_stack = st.col_count == 1 && st.profile.native_hwp5_layout()
++            && !st.current_items.iter().any(|item| matches!(item, super::super::PageItem::PartialTable { .. } | super::super::PageItem::Shape { .. }))
++            && matches!(st.current_items.first(), Some(super::super::PageItem::FullParagraph { para_index })
++                if paragraphs_all.get(*para_index).and_then(|host| host.line_segs.first())
++                    .is_some_and(|line| line.vertical_pos == 0
++                        && line.tag & crate::model::paragraph::LineSeg::TAG_IMPLEMENTATION_PROPERTY == 0))
++        && table.page_break == crate::model::table::TablePageBreak::None
++        && crate::renderer::float_placement::object_only_saved_table_anchor(para, table)
++        && table.common.vert_rel_to == crate::model::shape::VertRelTo::Para
++        && table.common.vert_align == crate::model::shape::VertAlign::Top
++        && signed_hwpunit(table.common.vertical_offset) >= 0
++        && next_para.is_some_and(|next| matches!(next.controls.as_slice(),
++            [crate::model::control::Control::Table(following)]
++                if following.page_break == crate::model::table::TablePageBreak::None
++                    && crate::renderer::float_placement::object_only_saved_table_anchor(next, following)
++                    && following.common.vert_rel_to == crate::model::shape::VertRelTo::Para
++                    && following.common.vert_align == crate::model::shape::VertAlign::Top
++                    && signed_hwpunit(following.common.vertical_offset) >= 0));
++    if starts_semantic_stack {
++        let single_cell_placeholder = table.row_count == 1 && table.col_count == 1
++            && table.cells.len() == 1 && table.cells[0].paragraphs.iter()
++                .all(|p| p.controls.is_empty() && p.line_segs.len() <= 1);
++        let cached_spacing = if single_cell_placeholder { 0.0 } else {
++            para.line_segs.last().filter(|seg| seg.line_spacing > 0)
++                .map(|seg| hwpunit_to_px(seg.line_spacing, engine.dpi)).unwrap_or(0.0)
++        };
++        ft.host_spacing.after -= cached_spacing;
++        ft.host_spacing.after_for_fit -= cached_spacing;
++    }
++
++    // Only the already-emitted adjacent native whole-table stack owns this
++    // continuation. The old empty-anchor advance encoded in LINE_SEG is not
++    // an additional blank line after the second physical frame (Hancom 2024).
++    let semantic_stack = st.col_count == 1 && st.profile.native_hwp5_layout()
++            && !st.current_items.iter().any(|item| matches!(item, super::super::PageItem::PartialTable { .. } | super::super::PageItem::Shape { .. }))
++            && matches!(st.current_items.first(), Some(super::super::PageItem::FullParagraph { para_index })
++                if paragraphs_all.get(*para_index).and_then(|host| host.line_segs.first())
++                    .is_some_and(|line| line.vertical_pos == 0
++                        && line.tag & crate::model::paragraph::LineSeg::TAG_IMPLEMENTATION_PROPERTY == 0))
++        && table.page_break == crate::model::table::TablePageBreak::None
++        && crate::renderer::float_placement::object_only_saved_table_anchor(para, table)
++        && table.common.vert_rel_to == crate::model::shape::VertRelTo::Para
++        && table.common.vert_align == crate::model::shape::VertAlign::Top
++        && signed_hwpunit(table.common.vertical_offset) >= 0
++        && para_idx.checked_sub(1).is_some_and(|previous_index| {
++            paragraphs_all.get(previous_index).is_some_and(|host| matches!(host.controls.as_slice(),
++                [crate::model::control::Control::Table(previous)] if previous.page_break == crate::model::table::TablePageBreak::None
++                    && crate::renderer::float_placement::object_only_saved_table_anchor(host, previous)
++                    && previous.common.vert_rel_to == crate::model::shape::VertRelTo::Para
++                    && previous.common.vert_align == crate::model::shape::VertAlign::Top
++                    && signed_hwpunit(previous.common.vertical_offset) >= 0))
++            && matches!(st.current_items.last(), Some(super::super::PageItem::Table { para_index, control_index })
++                if *para_index == previous_index && *control_index == 0)
++        });
++    if semantic_stack {
++        let cached_host_advance = crate::renderer::float_placement::stored_empty_anchor_band_host_line_advance_hu(
++            true, para, ctrl_idx, next_para).map(|hu| hwpunit_to_px(hu, engine.dpi)).unwrap_or(0.0);
++        ft.host_spacing.after -= cached_host_advance;
++        ft.host_spacing.after_for_fit -= cached_host_advance;
++    }
+ 
+     let issue2439_para_start_height =
+         st.prepare_flow_table_anchor(natural_top_lead(table, &ft, engine.dpi), para_start_height);
+--- a/src/renderer/float_placement.rs
++++ b/src/renderer/float_placement.rs
+@@ -4971,3 +4971,32 @@
+         && next.column_start >= host_start
+         && next.column_start + next.segment_width <= host_end
+ }
++
++/// The exact emitted native single-column stack, not bare source vpos, owns
++/// the following ordinary paragraph's flow start. No partial/absolute/unknown
++/// frame may use this contract, and the real first-column source row is required.
++pub(crate) fn native_whole_stack_owns_successor(
++    native: bool, single_column: bool,
++    items: &[crate::renderer::pagination::PageItem],
++    para_index: usize, paragraphs: &[Paragraph],
++) -> bool {
++    use crate::renderer::pagination::PageItem;
++    if !native || !single_column || items.len() < 3
++        || !paragraphs.get(para_index).is_some_and(|p| p.controls.is_empty())
++        || !matches!(items.first(), Some(PageItem::FullParagraph { para_index })
++            if paragraphs.get(*para_index).and_then(|p| p.line_segs.first())
++                .is_some_and(|l| l.vertical_pos == 0 && l.tag & 0x8000_0000 == 0))
++        || items.iter().any(|i| matches!(i, PageItem::PartialTable { .. } | PageItem::Shape { .. })) {
++        return false;
++    }
++    items[items.len()-2..].iter().enumerate().all(|(index, item)| {
++        let PageItem::Table { para_index: owner, control_index: 0 } = item else { return false; };
++        if owner.checked_add(2-index) != Some(para_index) { return false; }
++        let Some(host) = paragraphs.get(*owner) else { return false; };
++        let [crate::model::control::Control::Table(table)] = host.controls.as_slice() else { return false; };
++        table.page_break == TablePageBreak::None && object_only_saved_table_anchor(host, table)
++            && table.common.vert_rel_to == VertRelTo::Para
++            && table.common.vert_align == crate::model::shape::VertAlign::Top
++            && signed_hwpunit(table.common.vertical_offset) >= 0
++    })
++}
+--- a/src/renderer/typeset/section/vpos.rs
++++ b/src/renderer/typeset/section/vpos.rs
+@@ -86,7 +86,16 @@
+             session_edited: self.profile.get().session_edited(),
+             curr_item_is_table_fragment: false,
+         };
+-        let mut y = hc.vpos_adjust(st.current_height, para_idx, paragraphs, styles);
++        let semantic_successor = crate::renderer::float_placement::native_whole_stack_owns_successor(
++            st.profile.native_hwp5_layout(), st.col_count == 1, &st.current_items, para_idx, paragraphs);
++        let mut y = if semantic_successor {
++            if let Some(line) = paragraphs[para_idx].line_segs.first() {
++                hc.vpos_page_base = Some(line.vertical_pos
++                    - crate::renderer::px_to_hwpunit(st.current_height - st.vpos_col_anchor, self.dpi));
++                hc.vpos_lazy_base = None;
++            }
++            st.current_height
++        } else { hc.vpos_adjust(st.current_height, para_idx, paragraphs, styles) };
+         // 재조판된 저장 문단이 행을 줄였으면 후속 저장 사다리의 절대 vpos는
+         // 옛 행 수를 담고 있다. 동일 쪽에서 회수한 높이를 뺀 뒤 흐름 뒤로만 스냅한다.
+         if st.profile.hwpx_stored_layout()
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -8293,7 +8293,18 @@
+                 // [#7351] 표 조각은 host 문단의 앞 간격을 그리지 않으므로
+                 // 스냅의 `sb_N` 사전 차감에서 뺀다.
+                 hcursor.curr_item_is_table_fragment = matches!(item, PageItem::PartialTable { .. });
+-                y_offset = hcursor.vpos_adjust(y_offset, item_para, paragraphs, styles);
++                let semantic_successor = crate::renderer::float_placement::native_whole_stack_owns_successor(
++                    self.profile.get().native_hwp5_layout(), page_content.column_contents.len() == 1,
++                    &col_content.items[..item_ordinal], item_para, paragraphs);
++                if semantic_successor {
++                    if let Some(line) = paragraphs[item_para].line_segs.first() {
++                        hcursor.vpos_page_base = Some(line.vertical_pos
++                            - crate::renderer::px_to_hwpunit(y_offset - hcursor.col_anchor_y, self.dpi));
++                        hcursor.vpos_lazy_base = None;
++                    }
++                } else {
++                    y_offset = hcursor.vpos_adjust(y_offset, item_para, paragraphs, styles);
++                }
+                 hcursor.curr_item_is_table_fragment = false;
+             } // !shape_jumped
+               // [#5699 H1] 밴드-바닥 활성 단(사다리-미계상 표를 이 단에서 교정): 저장

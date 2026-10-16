@@ -1,0 +1,53 @@
+{
+  "formalSourceId": "5921bb9f9dcd86fa",
+  "privateSourceId": "private-1355cdec000ca4a3",
+  "wasmSha256": "ddebc39f88c774996f25fba2457b00c9770e3a4f951bade9bcbe8c948d763e11",
+  "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+  "metadataPatchCount": 51,
+  "allRecordedPatchFileHashesMatch": true,
+  "sourceFiles": [
+    {
+      "file": "src/document_core/commands/document.rs",
+      "privateRawSha256": "634f76c8889145b9e5cf41a30c78f52ad67a52b45f34837d380986417bd42cf8",
+      "formalRawSha256": "c5c87f0abfc77850017e29661732faf866d915db8b7c469607cf1ea7aba2b8ed",
+      "normalizedSha256": "634f76c8889145b9e5cf41a30c78f52ad67a52b45f34837d380986417bd42cf8",
+      "normalizedBytesEqual": true
+    },
+    {
+      "file": "src/renderer/typeset/table/block/entry.rs",
+      "privateRawSha256": "78264c2c1baccc44d1e143424c50170bf74760861ceef47b49b22e8eb2c74132",
+      "formalRawSha256": "e266bde3f4cd20f890207787e17d47d3c2a8cf22fde5450825abd2976768b39c",
+      "normalizedSha256": "78264c2c1baccc44d1e143424c50170bf74760861ceef47b49b22e8eb2c74132",
+      "normalizedBytesEqual": true
+    },
+    {
+      "file": "src/renderer/typeset/controls/flow_table.rs",
+      "privateRawSha256": "78f1110d7121a3a6fdfe2f57470437c74594c35233450a337c0b4497e931b0b8",
+      "formalRawSha256": "a0727a138591d60ff80b7f29dbd946b3ba528669f358756f76a03a48fc66d54b",
+      "normalizedSha256": "78f1110d7121a3a6fdfe2f57470437c74594c35233450a337c0b4497e931b0b8",
+      "normalizedBytesEqual": true
+    },
+    {
+      "file": "src/renderer/float_placement.rs",
+      "privateRawSha256": "63229b27a874ba8a20ff79686caed1ca7e5341c072ba58ec06fb73d3d100d9c6",
+      "formalRawSha256": "c0685df383413e0232b6717960e49dc383363fd2e3cd186ddadb380aba7c2317",
+      "normalizedSha256": "63229b27a874ba8a20ff79686caed1ca7e5341c072ba58ec06fb73d3d100d9c6",
+      "normalizedBytesEqual": true
+    },
+    {
+      "file": "src/renderer/typeset/section/vpos.rs",
+      "privateRawSha256": "87ccbbc577e1164a9d3137db74bdc00efb20d037bd0f5ca530e2e5c7b9aec5dd",
+      "formalRawSha256": "f71c60e6a20463cd82a22588a9f8e0a9f8e9a059778dbacae7084e78e957efff",
+      "normalizedSha256": "87ccbbc577e1164a9d3137db74bdc00efb20d037bd0f5ca530e2e5c7b9aec5dd",
+      "normalizedBytesEqual": true
+    },
+    {
+      "file": "src/renderer/layout.rs",
+      "privateRawSha256": "d2a367ea73c8b2d18d2fe35afce9393d907a022f30f0d57817e4b49c81e8ed3f",
+      "formalRawSha256": "9f63ba161ba8254823618e1a7a98ce02ec1a91daafcaaff512977b5fe694a7c7",
+      "normalizedSha256": "d2a367ea73c8b2d18d2fe35afce9393d907a022f30f0d57817e4b49c81e8ed3f",
+      "normalizedBytesEqual": true
+    }
+  ],
+  "note": "Private sources use LF; formal preparation uses CRLF. Both raw SHA retained; source comparison only normalizes those line terminators. Actual compiled WASM and JS hashes are byte-identical."
+}

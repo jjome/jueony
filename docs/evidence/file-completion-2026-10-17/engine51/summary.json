@@ -1,0 +1,82 @@
+{
+  "engine": "5921bb9f9dcd86fa",
+  "nativeScenarios": 72,
+  "browserScenarios": 14,
+  "results": [
+    {
+      "scope": "formal22",
+      "result": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\n001-formal-5921\\formal22\\result.json",
+      "results": 22,
+      "failures": 0,
+      "verifier": "verify-overlap-native-flow-engine.mjs",
+      "verifierSha256": "1fd45417cede6a8b67396e862a7922bed14d17d6a6c7c7b25db15c5e3e0caec5",
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "scope": "body-final",
+      "result": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\n001-formal-5921\\body-final\\result.json",
+      "results": 16,
+      "failures": 0,
+      "verifier": "verify-overlap-body-lines-engine.mjs",
+      "verifierSha256": "8a2f42929a584430bba81d752cb93da5f38dffd1d8bf7865f0c674713e7ca1f0",
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "scope": "positive-final",
+      "result": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\n001-formal-5921\\positive-final\\result.json",
+      "results": 11,
+      "failures": 0,
+      "verifier": "verify-overlap-positive-gap-engine.mjs",
+      "verifierSha256": "cc2ed865a0e1e1bd4d01d713b0f7fdbda085c7789326f1a735570e56b2263911",
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "scope": "guard-final",
+      "result": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\n001-formal-5921\\guard-final\\result.json",
+      "results": 9,
+      "failures": 0,
+      "verifier": "verify-overlap-save-layout-engine.mjs",
+      "verifierSha256": "934ad8adcae9809c40597a1bd24b1115bb7d41db51ff032d6e4fbc4a97b7b58b",
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "scope": "visible-final",
+      "result": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\n001-formal-5921\\visible-final\\result.json",
+      "results": 14,
+      "failures": 0,
+      "verifier": "verify-overlap-visible-tail-engine.mjs",
+      "verifierSha256": "806fc26a4fa0a272189855f3a5afb4c55c5e8b3e35a9d1d50b72fc3a13074a96",
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "scope": "browser-final",
+      "result": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\n001-formal-5921\\browser-final\\result.json",
+      "results": 14,
+      "failures": 0,
+      "verifier": "verify-overlap-visible-tail.mjs",
+      "verifierSha256": "461a31ad019fb299ef1bf0811e9563359138027790c01bdc71a1056d4ed9ecf4",
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "externalRequests": 0
+    }
+  ],
+  "provenance": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\n001-formal-5921\\formal-provenance.json",
+  "priorContractFailures": [
+    "body-before",
+    "positive-before",
+    "guard-before",
+    "visible-before",
+    "browser-before-expectations"
+  ],
+  "scopeNote": "Scenario counts overlap in feature coverage; they are not unique feature counts or a global completeness percentage. Fixed234 oracle follows independent actual Hancom SaveAs; full Hancom typography/declaredHeight differences remain separately reported, not counted as passes."
+}

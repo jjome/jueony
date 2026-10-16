@@ -1,0 +1,148 @@
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -2204,6 +2204,24 @@
+         use crate::renderer::pagination::PageItem;
+         use crate::renderer::float_placement::{object_only_saved_table_anchor, ParagraphFloatFlow};
+         use crate::renderer::render_tree::{RenderNode, RenderNodeType};
++        // These controls own no block/frame. Preserve their complete raw
++        // payloads and accept only exact root text/field-range ownership below.
++        fn readonly_tail_markers(para: &crate::model::paragraph::Paragraph) -> bool {
++            if para.controls.iter().all(|c| matches!(c, Control::Bookmark(_))) { return true; }
++            let ([Control::Field(field)], [range]) = (para.controls.as_slice(), para.field_ranges.as_slice()) else { return false; };
++            field.field_type == crate::model::control::FieldType::ClickHere
++                && field.memo_paragraphs.is_empty() && para.orphan_field_ends.is_empty()
++                && !para.text.is_empty() && range.control_idx == 0 && range.inner_slot_count == 0
++                && range.start_char_idx <= range.end_char_idx && range.end_char_idx <= para.text.chars().count()
++        }
++        fn readonly_field_presentation(para: &crate::model::paragraph::Paragraph, run: &crate::renderer::render_tree::TextRunNode) -> bool {
++            if !readonly_tail_markers(para) || run.char_shape_id.is_some()
++                || run.field_marker != crate::renderer::render_tree::FieldMarkerType::None { return false; }
++            let ([Control::Field(field)], [range]) = (para.controls.as_slice(), para.field_ranges.as_slice()) else { return false; };
++            range.start_char_idx == range.end_char_idx
++                && ((run.text.is_empty() && run.char_start == Some(range.start_char_idx))
++                    || (run.char_start.is_none() && field.guide_text() == Some(run.text.as_str())))
++        }
+         fn blank_origins(node: &RenderNode, si: usize, origins: &mut std::collections::BTreeMap<usize, Vec<f64>>) {
+             match &node.node_type {
+                 RenderNodeType::Page(_) | RenderNodeType::Body { .. } => {
+@@ -2214,7 +2232,7 @@
+                         let RenderNodeType::TextLine(line) = &child.node_type else { continue; };
+                         let Some(pi) = line.para_index else { continue; };
+                         if line.section_index != Some(si) || line.caption_owner.is_some()
+-                            || line.line_index != Some(0) || child.children.len() != 1 { continue; }
++                            || child.children.len() != 1 { continue; }
+                         let RenderNodeType::TextRun(run) = &child.children[0].node_type else { continue; };
+                         if run.text.is_empty() && run.section_index == Some(si)
+                             && run.para_index == Some(pi) && run.cell_context.is_none()
+@@ -2228,24 +2246,30 @@
+         }
+         // Only direct body-column lines own root source paragraphs. Never scan
+         // a table, caption, header or another nested story as a root line.
+-        fn visible_origins(node: &RenderNode, si: usize, origins: &mut std::collections::BTreeMap<usize, Vec<(f64, u32, i32, usize, String)>>) {
++        fn visible_origins(node: &RenderNode, si: usize, paragraphs: &[crate::model::paragraph::Paragraph], origins: &mut std::collections::BTreeMap<usize, Vec<(f64, Option<u32>, Option<i32>, usize, String)>>) {
+             match &node.node_type {
+                 RenderNodeType::Page(_) | RenderNodeType::Body { .. } => {
+-                    for child in &node.children { visible_origins(child, si, origins); }
++                    for child in &node.children { visible_origins(child, si, paragraphs, origins); }
+                 }
+                 RenderNodeType::Column(_) => {
+                     for child in &node.children {
+                         let RenderNodeType::TextLine(line) = &child.node_type else { continue; };
+-                        let (Some(pi), Some(index), Some(vpos)) = (line.para_index, line.line_index, line.vpos) else { continue; };
++                        let Some(pi) = line.para_index else { continue; };
++                        let (index, vpos) = (line.line_index, line.vpos);
+                         if line.section_index != Some(si) || line.caption_owner.is_some() { continue; }
+                         let mut text = String::new();
+-                        let Some(start) = child.children.first().and_then(|run| match &run.node_type {
+-                            RenderNodeType::TextRun(run) => run.char_start, _ => None,
++                        let Some(start) = child.children.iter().find_map(|run| match &run.node_type {
++                            RenderNodeType::TextRun(run) if run.char_shape_id.is_some() => run.char_start,
++                            _ => None,
+                         }) else { continue; };
+                         let mut offset = start;
+                         let mut valid = !child.children.is_empty();
+                         for run_node in &child.children {
+                             let RenderNodeType::TextRun(run) = &run_node.node_type else { valid = false; break; };
++                            if run.section_index == Some(si) && run.para_index == Some(pi)
++                                && run.cell_context.is_none() && !run.is_vertical && run.rotation == 0.0
++                                && run.char_overlap.is_none() && paragraphs.get(pi)
++                                    .is_some_and(|para| readonly_field_presentation(para, run)) { continue; }
+                             if run.section_index != Some(si) || run.para_index != Some(pi)
+                                 || run.cell_context.is_some() || run.char_start != Some(offset)
+                                 || run.is_vertical || run.rotation != 0.0 || run.char_overlap.is_some() {
+@@ -2279,7 +2303,7 @@
+             let mut blank_lines = std::collections::BTreeMap::new();
+             blank_origins(&tree.root, si, &mut blank_lines);
+             let mut visible_lines = std::collections::BTreeMap::new();
+-            visible_origins(&tree.root, si, &mut visible_lines);
++            visible_origins(&tree.root, si, &section.paragraphs, &mut visible_lines);
+             for (pi, para) in section.paragraphs.iter().enumerate().skip(1) {
+                 let [Control::Table(table)] = para.controls.as_slice() else { continue; };
+                 if !table.common.allow_overlap || table.page_break != crate::model::table::TablePageBreak::None
+@@ -2290,7 +2314,7 @@
+                 // A tail consisting exclusively of whole table hosts has no
+                 // later text/source line frame whose original gap we could erase.
+                 if section.paragraphs[pi..].iter().any(|host| {
+-                    !host.controls.is_empty()
++                    !readonly_tail_markers(host)
+                         && !matches!(host.controls.as_slice(), [Control::Table(t)]
+                             if t.page_break == crate::model::table::TablePageBreak::None
+                                 && object_only_saved_table_anchor(host, t))
+@@ -2320,37 +2344,45 @@
+                 let mut blanks = Vec::new();
+                 let mut invalid = false;
+                 for (bi, blank) in section.paragraphs.iter().enumerate().skip(pi + 1) {
+-                    if !blank.controls.is_empty() { continue; }
+-                    if blank.line_segs.is_empty() || blank.stored_text_partition_is_dirty()
+-                        || blank.cell_format_vpos_dirty || blank.text.chars().any(|ch| ch.is_control()) {
++                    if !readonly_tail_markers(blank) { continue; }
++                    if blank.cell_format_vpos_dirty || blank.text.chars().any(|ch| ch.is_control()) {
+                         invalid = true; break;
+                     }
++                    // A current reflow partition (or absent source rows) owns
++                    // natural flow, not page-relative source origins. Prove its
++                    // complete emitted root text, but never manufacture stored rows.
++                    let flow_owned = blank.line_segs.is_empty() || blank.stored_text_partition_is_dirty()
++                        || blank.line_segs.iter().all(|line| line.tag
++                            & crate::model::paragraph::LineSeg::TAG_IMPLEMENTATION_PROPERTY != 0);
+                     if !blank.text.is_empty() {
+                         let Some(positions) = visible_lines.get(&bi) else { invalid = true; break; };
+-                        if positions.len() != blank.line_segs.len() { invalid = true; break; }
++                        if !flow_owned && positions.len() != blank.line_segs.len() { invalid = true; break; }
+                         let mut text = String::new();
+                         let mut next = 0;
+                         for (li, (y, index, vpos, start, content)) in positions.iter().enumerate() {
+-                            let line = &blank.line_segs[li];
+-                            let source_start = blank.char_offsets.partition_point(|&offset| offset < blank.line_seg_text_start(li));
+-                            let value = ((y - page.layout.body_area.y) * 7200.0 / self.dpi).round();
+-                            if *index as usize != li || *vpos != line.vertical_pos || *start != next
+-                                || source_start != *start || content.is_empty()
+-                                || !value.is_finite() || value < line.vertical_pos as f64 || value > i32::MAX as f64
+-                                || line.tag & crate::model::paragraph::LineSeg::TAG_IMPLEMENTATION_PROPERTY != 0 {
++                            if index.is_some_and(|index| index as usize != li) || *start != next || content.is_empty() {
+                                 invalid = true; break;
+                             }
+                             next += content.chars().count();
+                             text.push_str(content);
++                            if flow_owned { continue; }
++                            let line = &blank.line_segs[li];
++                            let source_start = blank.char_offsets.partition_point(|&offset| offset < blank.line_seg_text_start(li));
++                            let value = ((y - page.layout.body_area.y) * 7200.0 / self.dpi).round();
++                            if *index != Some(li as u32) || *vpos != Some(line.vertical_pos) || source_start != *start
++                                || !value.is_finite() || value < line.vertical_pos as f64 || value > i32::MAX as f64 {
++                                invalid = true; break;
++                            }
+                             blanks.push((bi, li, value as i32));
+                         }
+                         if text != blank.text { invalid = true; }
+                         if invalid { break; }
+                         continue;
+                     }
+-                    let [line] = blank.line_segs.as_slice() else { invalid = true; break; };
+                     let Some(positions) = blank_lines.get(&bi) else { invalid = true; break; };
+                     let [y] = positions.as_slice() else { invalid = true; break; };
++                    if flow_owned { continue; }
++                    let [line] = blank.line_segs.as_slice() else { invalid = true; break; };
+                     let y = *y;
+                     let value = ((y - page.layout.body_area.y) * 7200.0 / self.dpi).round();
+                     if !value.is_finite() || value < line.vertical_pos as f64 || value > i32::MAX as f64

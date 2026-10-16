@@ -1,0 +1,595 @@
+{
+  "headAtAudit": "584a6b34014c6d3e62c83d24346b7b3fb513bf73",
+  "date": "2026-10-17",
+  "scope": "canonical file feature TASK verification PARTIAL 10 only; upper ROLLUP and duplicate subtask counts are not completion percentage",
+  "sourceHashes": {
+    "docs/features/05-files-storage-recovery.md": "0f4598254af94436dfe07e4e5ba92640a445d2398f3ec0397ca12648e1c41884",
+    "docs/jueony-work-checklist.csv": "e437f908fcf84401a4c35ff9ad9c0080fe14db210dbbb40e0f8695c9bfe9a63f",
+    "docs/108-file-preservation-completion.md": "aeca9f00055c766ce67ac421b833ad0d30e6fa0279c6c7a5522ae19aa5f14561"
+  },
+  "summary": {
+    "partialTasks": 10,
+    "autoPassHancomPending": 9,
+    "implementationAndAutoPartial": 1,
+    "noWholeFeatureCompletionClaim": true
+  },
+  "items": [
+    {
+      "id": "G069",
+      "task": "HWPX 기본 탭 저장 값 보정",
+      "canonical": {
+        "implementation": "DONE",
+        "verification": "PARTIAL",
+        "auto_check": "PASS",
+        "hancom_check": "NOT_RUN",
+        "scope": "기록된 기본 탭/구역 합치기 한글 비교 표본",
+        "next_action": "정의한 범위 회귀 유지; 한글 비교 대기"
+      },
+      "reviewedEvidence": [
+        "docs/36-native-section-comparison.md",
+        "docs/evidence/native-section-merge-2026-10-12/parsed-comparison.json"
+      ],
+      "automaticCoverage": "기본 탭 raw 값과 HWPX secPr tabStop/tabStopVal 관계. docs36에는 이전 엔진의 한글 20.0pt 실측과 한글 저장본 XML 비교가 있다. 최종 합본의 같은 기능 전체 한글 검수와 구분한다.",
+      "remainingAutomaticOrImplementation": "최종 회귀 범주 default-native는 표 기본 안 여백이며 기본 탭 검사가 아니다. 최신 기본 탭은 sections/Agent sections 쪽 검사와 독립 secPr XML 근거를 추적해야 한다. 기존 검사를 다시 실행해 성공 수에 가산하지 않는다.",
+      "hancomDirectRemaining": [
+        "native-three-settings-delete.hwpx 사본을 열어 두 구역·본문 ONETWO/THREE, FOUR를 확인한다.",
+        "구역 설정에서 첫 구역 기본 탭 20.0pt와 시작 쪽 번호 3을 확인하고, 다음 구역 값과 문서의 저장값을 대조한다.",
+        "대화상자는 취소로 닫고 다른 이름 HWP/HWPX 저장 후 재열기, 탭 문자 뒤 커서 위치·쪽 수·인쇄 미리 보기를 기록한다."
+      ],
+      "fixtures": [
+        {
+          "path": "docs/evidence/native-section-merge-2026-10-12/documents/native-three-settings-delete.hwpx",
+          "exists": false,
+          "sha256": null
+        }
+      ],
+      "priorHancom": "실행됨(2026-10-12, 제한된 합성 구역 사례); 최종 c370 전체 직접 비교는 대기"
+    },
+    {
+      "id": "G071",
+      "task": "겹침 금지 HWP 후속 표의 저장 앵커 소유",
+      "canonical": {
+        "implementation": "DONE",
+        "verification": "PARTIAL",
+        "auto_check": "PASS",
+        "hancom_check": "NOT_RUN",
+        "scope": "실제 앞 표 occupied flow 증거에 한정; 겹침 허용 제외",
+        "next_action": "정의한 범위 회귀 유지; 한글 비교 대기"
+      },
+      "reviewedEvidence": [
+        "docs/93-storage-table-and-memo-ownership.md",
+        "docs/evidence/file-preservation-2026-10-17/following-native/result.json"
+      ],
+      "automaticCoverage": "겹침 금지 후속 표 실제 occupied flow 소유, 두/세 표·긴 표 HWP/HWPX 6 Native, snapshot/반복 저장/전체 control-text 비교.",
+      "remainingAutomaticOrImplementation": "등록된 좁은 범위의 미수행 자동 경로는 찾지 못했다. 실제 한글 좌표·인쇄 검수가 남는다.",
+      "hancomDirectRemaining": [
+        "hwp-two/hwp-three/hwp-long 및 대응 HWPX 사본을 열어 표 사이와 후속 본문 위치를 확인한다.",
+        "각 표의 쪽/행/열·셀 텍스트·쪽 수를 기록하고 인쇄 미리 보기에서 겹침 또는 소실을 확인한다.",
+        "다른 이름 저장 후 재열기하고 Jueony Native 배치 수치와 한글 화면 근거를 분리해 기록한다."
+      ],
+      "fixtures": [
+        {
+          "path": "build/file-preservation-regression-output/following-native/hwp-two.hwp",
+          "exists": true,
+          "sha256": "61a963aec182053abb22ed82c4b2304490b8c104d45eaee868741e729edb5bb8"
+        },
+        {
+          "path": "build/file-preservation-regression-output/following-native/hwp-three.hwp",
+          "exists": true,
+          "sha256": "d107327375be096063fbf553827ee812a07a8fb520de47278c6a9bb6ea551466"
+        },
+        {
+          "path": "build/file-preservation-regression-output/following-native/hwp-long.hwp",
+          "exists": true,
+          "sha256": "203af6e4797c4ce600245497dd2c32d8e1a5d0a7136dd3e38ebc4d07acb71ce7"
+        },
+        {
+          "path": "build/file-preservation-regression-output/following-native/hwpx-two.hwpx",
+          "exists": true,
+          "sha256": "fae284a5c93249b946c262a26337f94cb7e5feecb72a99ff4ee4ee00de2638e5"
+        }
+      ],
+      "priorHancom": "최종 fixture의 직접 한글 비교 미실행 또는 진행 중; 부모 작업의 새 UI 근거를 후속 반영"
+    },
+    {
+      "id": "G073",
+      "task": "표 바깥 여백의 HWP/HWPX 모델·저장 일치",
+      "canonical": {
+        "implementation": "DONE",
+        "verification": "PARTIAL",
+        "auto_check": "PASS",
+        "hancom_check": "NOT_RUN",
+        "scope": "네 방향 semantic/common/raw cache·취소·undo·재열기",
+        "next_action": "정의한 범위 회귀 유지; 한글 비교 대기"
+      },
+      "reviewedEvidence": [
+        "docs/94-table-width-and-outer-margins.md",
+        "docs/evidence/file-preservation-2026-10-17/outer-native/result.json"
+      ],
+      "automaticCoverage": "표 바깥 여백 의미/common/raw cache, 취소·적용·undo/redo·두 형식 재열기. 최종 outer-native 4건.",
+      "remainingAutomaticOrImplementation": "등록된 네 방향 값/캐시 유무 자동 경로는 검증됨. 한글 표 속성 표시값과 실제 지면이 남는다.",
+      "hancomDirectRemaining": [
+        "hwp-fresh/hwp-loaded 및 hwpx-fresh/hwpx-loaded 사본을 각각 연다.",
+        "표/셀 속성의 바깥 여백 네 방향 값을 해당 Native result/layout JSON과 대조한다.",
+        "속성 확인은 취소하고 별도 사본 재저장 후 재열어 표 위치·인쇄 미리 보기를 비교한다."
+      ],
+      "fixtures": [
+        {
+          "path": "build/file-preservation-regression-output/outer-native/hwp-fresh.hwp",
+          "exists": true,
+          "sha256": "156a114b410d6b332fa92d54e89900234977548b8337c3b25d22b087f9c34f59"
+        },
+        {
+          "path": "build/file-preservation-regression-output/outer-native/hwp-loaded.hwp",
+          "exists": true,
+          "sha256": "928c5797c7dc1c21c70367e66f0237592513af86bc256b0145b03689902177c2"
+        },
+        {
+          "path": "build/file-preservation-regression-output/outer-native/hwpx-fresh.hwpx",
+          "exists": true,
+          "sha256": "3d4f13c1cf6f7aea60c264bcae26eafffeab91ca5ee2a6513eac3c83121b03e1"
+        },
+        {
+          "path": "build/file-preservation-regression-output/outer-native/hwpx-loaded.hwpx",
+          "exists": true,
+          "sha256": "3d4f13c1cf6f7aea60c264bcae26eafffeab91ca5ee2a6513eac3c83121b03e1"
+        }
+      ],
+      "priorHancom": "최종 fixture의 직접 한글 비교 미실행 또는 진행 중; 부모 작업의 새 UI 근거를 후속 반영"
+    },
+    {
+      "id": "G090",
+      "task": "HWP 단순 겹침 표 tail의 저장 snapshot 원점 기록",
+      "canonical": {
+        "implementation": "DONE",
+        "verification": "PARTIAL",
+        "auto_check": "PASS",
+        "hancom_check": "NOT_RUN",
+        "scope": "한 쪽·한 단·통째 object-only 표 tail 및 고유 단일 줄 빈 후속 본문; live불변/snapshot/반복저장/배치보존",
+        "next_action": "최종 실제 UI 저장·재열기·반복 저장 검증 완료, 한글 직접 지면 비교는 대기. N001의 복잡 원본 전체 범위는 부분 유지."
+      },
+      "reviewedEvidence": [
+        "docs/100-storage-conversion-and-overlap.md",
+        "docs/evidence/file-preservation-2026-10-17/overlap-native/result.json"
+      ],
+      "automaticCoverage": "한 쪽·한 단 object-only 겹침 표 tail과 빈 끝 본문의 고유 원점, Native18+최종 UI 저장 왕복 범위.",
+      "remainingAutomaticOrImplementation": "현재 지원 범위 자동 공백은 미발견. 복잡 원본은 N001로 남기며 완료에 합치지 않는다.",
+      "hancomDirectRemaining": [
+        "hwp-two/hwp-three/hwp-long/양수offset의 자체 사본을 열고 마지막 표와 끝 빈 문단이 같은 쪽에 남는지 확인한다.",
+        "문서 끝 커서와 인쇄 미리 보기에서 추가 쪽·빈 줄·표 겹침을 확인한다.",
+        "한글에서 사본 재저장 후 Jueony 재열기 배치 수치를 다시 기록한다."
+      ],
+      "fixtures": [
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/overlap-native/hwp-two.hwp",
+          "exists": true,
+          "sha256": "24a67d97f6d0a05fda6530afcba781d5114b19c76d30726d2637ffd1f3b25eb6"
+        },
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/overlap-native/hwp-three.hwp",
+          "exists": true,
+          "sha256": "fb0867b58eedbd5f34c502f4f159d2c747715bf95faba9731ce24661ea4c5226"
+        },
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/overlap-native/hwp-long.hwp",
+          "exists": true,
+          "sha256": "afac22c9e279e66dbb1b398563b155b7d70077d93cadcea5389eb44da33a2c79"
+        },
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/overlap-native/hwp-offset.hwp",
+          "exists": true,
+          "sha256": "f713bd43cd80a577c28ec5988fdfc40b438ef2347eeba04feec6293357215dda"
+        }
+      ],
+      "priorHancom": "최종 fixture의 직접 한글 비교 미실행 또는 진행 중; 부모 작업의 새 UI 근거를 후속 반영"
+    },
+    {
+      "id": "N001",
+      "task": "HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존",
+      "canonical": {
+        "implementation": "PARTIAL",
+        "verification": "PARTIAL",
+        "auto_check": "PARTIAL",
+        "hancom_check": "NOT_RUN",
+        "scope": "한쪽/한단의 정확한 원시 호스트와 줄 소유를 확인한 단일·여러 줄 본문, 캡션, 양수 저장 간격은 저장·재열기·반복 저장·실제 UI 검증 완료(G090/G096/G097/G105/G106). 혼합 글자 크기로 줄 구성이 달라지는 원본·다단·복합/불명확 원점은 지원 범위 밖이므로 전체 항목은 부분 유지.",
+        "next_action": "혼합 크기 줄 구성·다단·복합/불명확 원점의 재현 원본과 보존 기준을 먼저 확정. 지원 범위의 한글 직접 지면 비교는 마지막 일괄 검수로 진행; 여러 줄·캡션·양수 간격의 수정 완료 항목은 반복 구현하지 않음."
+      },
+      "reviewedEvidence": [
+        "docs/evidence/file-preservation-2026-10-17/overlap-body-native/result.json",
+        "docs/evidence/file-preservation-2026-10-17/overlap-positive-native/result.json",
+        "docs/evidence/file-preservation-2026-10-17/overlap-guard-native/result.json"
+      ],
+      "automaticCoverage": "단순 tail·가시 본문·여러 줄·캡션·양수 간격 지원은 하위 G090/G096/G105/G106에 분리되어 검증됨.",
+      "remainingAutomaticOrImplementation": "혼합 크기로 줄 partition이 바뀌는 원본, 다단, 중복/불명확 원점, 필드·책갈피 등은 구현 지원 밖이며 거절 검증만 있다. 이것은 한글 검사만 기다리는 DONE 항목이 아니다. 실제 구현/지원계약 결정이 필요하다.",
+      "hancomDirectRemaining": [
+        "현재 지원 사본만 한글 직접 검수하며 지원하지 않는 반례를 성공 fixture와 혼합하지 않는다.",
+        "미지원 원본은 원문/소유/한글 기대 지면부터 확정한다. 원본 미쓰기·dirty/undo 유지의 실패 검사를 유지한다.",
+        "지원 계약을 늘린 경우에만 별도 원시 변화 범위·전체 의미·재열기·실제 UI를 검증한다."
+      ],
+      "fixtures": [],
+      "priorHancom": "최종 fixture의 직접 한글 비교 미실행 또는 진행 중; 부모 작업의 새 UI 근거를 후속 반영",
+      "newIndependentHancomResult": "FAIL: original versus independently Hancom-resaved table/body origins differ above 0.2; see newHancomOverlapComparison. Runtime unchanged."
+    },
+    {
+      "id": "N002",
+      "task": "공개 형식 변환의 필드 보존 차이 4건",
+      "canonical": {
+        "implementation": "DONE",
+        "verification": "PARTIAL",
+        "auto_check": "PASS",
+        "hancom_check": "NOT_RUN",
+        "scope": "기록된 공개5문서10변환의4개 차이; common배치조회·영어단위·Lock·표셀메모 소유; 보존검사 유지",
+        "next_action": "한글 직접 재열기·지면 검수; 더 넓은 원본/특수 story 지원은 별도"
+      },
+      "reviewedEvidence": [
+        "docs/100-storage-conversion-and-overlap.md",
+        "docs/evidence/file-preservation-2026-10-17/format-conversion-native/result.json"
+      ],
+      "automaticCoverage": "공개 5문서 10변환 및 자체 원본/반례 포함 Native24 PASS. 필드·메모·common 배치·잠금 의미 보존.",
+      "remainingAutomaticOrImplementation": "같은 4개 차이의 자동 검증은 이미 완료. 모든 외부 원본/특수 story 보장은 없으며 별도 요구 없이 범위를 무한 확대하지 않는다.",
+      "hancomDirectRemaining": [
+        "ignored 로컬 공개 원본의 manifest SHA와 변환 전후 파일을 짝지어 mcst-bid→HWPX, python-hwpx-0/1/3→HWP 네 경로부터 확인한다.",
+        "본문뿐 아니라 표 안 메모·필드·개체 수와 해당 내용, 쪽 수·인쇄 미리 보기를 확인한다.",
+        "한글 재저장 사본을 엔진으로 읽고 원본과 필드/메모 의미를 다시 대조한다. 공개 파생 바이너리는 git/배포에 복사하지 않는다."
+      ],
+      "fixtures": [
+        {
+          "path": "build/file-preservation-regression-output/format-conversion-native/nested-memo-reopened.hwpx",
+          "exists": true,
+          "sha256": "9acdb58c1f5450a68d3b86ee4d1d67bea52825b08b29ae69a67c571f07179994"
+        },
+        {
+          "path": "build/file-preservation-regression-output/format-conversion-native/latin-KEEP_WORD.hwpx",
+          "exists": true,
+          "sha256": "b6fbc23b6f30795543a88ad2c7e629cdbc5bc8d06b4659acf0f80052eb25d7c3"
+        }
+      ],
+      "priorHancom": "최종 fixture의 직접 한글 비교 미실행 또는 진행 중; 부모 작업의 새 UI 근거를 후속 반영"
+    },
+    {
+      "id": "G092",
+      "task": "HWP 글상자 알려진 세로 정렬과 raw list 비트 동기화",
+      "canonical": {
+        "implementation": "DONE",
+        "verification": "PARTIAL",
+        "auto_check": "PASS",
+        "hancom_check": "NOT_RUN",
+        "scope": "알려진 Top/Center/Bottom만 동기화; 예약 raw3/기타 비트 보존·관측 known=false·명시 setter·미표현 HWPX 변환 거절",
+        "next_action": "자체 예제로 최종 한글 2024 비교; 복합 원본은 별도 작업."
+      },
+      "reviewedEvidence": [
+        "docs/103-textbox-state-and-storage.md",
+        "docs/evidence/file-preservation-2026-10-17/textbox-storage-native/result.json"
+      ],
+      "automaticCoverage": "글상자 세로 Top/Center/Bottom 및 raw reserved3 보존·명시 setter·변환 거절 Native14, 커서/선택 관련 Browser8은 별도.",
+      "remainingAutomaticOrImplementation": "같은 엔진 직렬화 왕복은 완료. 실제 한글의 위/가운데/아래 배치와 raw3를 지원값으로 오해하지 않는 직접 검수가 남는다.",
+      "hancomDirectRemaining": [
+        "Top/Center/Bottom HWP와 HWPX 6개 사본을 열어 실제 글상자 위/가운데/아래 위치를 확인한다.",
+        "개체 속성의 정렬 표시와 실제 내부 문단/이모지/굵게 구간을 기록한다.",
+        "사본 재저장 후 Jueony 재열기 tbVerticalAlign과 known 상태를 비교한다. 예약 raw3 반례를 일반 성공 검수 파일로 취급하지 않는다."
+      ],
+      "fixtures": [
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/textbox-storage-native/Top.hwp",
+          "exists": true,
+          "sha256": "8c84b02140b0a2a2ebf27982329098afd30c8334a0ba13741dc41c59b11b8fb5"
+        },
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/textbox-storage-native/Center.hwp",
+          "exists": true,
+          "sha256": "f05c0b819f92998eb5493c9acd371b5071d62f5eab82b5796c0e54b1b40501bc"
+        },
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/textbox-storage-native/Bottom.hwp",
+          "exists": true,
+          "sha256": "01429a5b8e4d4d5a7be8245f2be824dd7168bc7f4ec110c6e81c15a994cdb9d6"
+        },
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/textbox-storage-native/Top.hwpx",
+          "exists": true,
+          "sha256": "18856929441dc2f8ebf2acc1c527c73c4aa8b837a2617d30f962497f6d7d7c75"
+        },
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/textbox-storage-native/Center.hwpx",
+          "exists": true,
+          "sha256": "3e2913934f2f5536b70b50dbbcfe227139889af5985ea44f988572da8781bc06"
+        },
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/textbox-storage-native/Bottom.hwpx",
+          "exists": true,
+          "sha256": "becb65872792fb932eb075caf40aa629a19b0f37d4a74d1c730f7ac1b9624705"
+        }
+      ],
+      "priorHancom": "최종 fixture의 직접 한글 비교 미실행 또는 진행 중; 부모 작업의 새 UI 근거를 후속 반영"
+    },
+    {
+      "id": "G096",
+      "task": "HWP 겹침 표 뒤 단일 본문 글줄의 저장 원점 보존",
+      "canonical": {
+        "implementation": "DONE",
+        "verification": "PARTIAL",
+        "auto_check": "PASS",
+        "hancom_check": "NOT_RUN",
+        "scope": "Native HWP5 한 쪽·한 단 인접 겹침 표의 고유한 단일 본문 줄: 원문/서식/전체 공개 기하·Unicode·위첨자·동일 번호 표 셀 소유 구분, undo/redo·안전 저장·UI 재열기를 검증한다.",
+        "next_action": "최종 실제 UI 저장·재열기·반복 저장 검증 완료, 한글 직접 지면 비교는 대기. N001의 복잡 원본 전체 범위는 부분 유지."
+      },
+      "reviewedEvidence": [
+        "docs/evidence/file-preservation-2026-10-17/overlap-visible-native/result.json",
+        "docs/evidence/file-preservation-2026-10-17/overlap-visible-browser/result.json"
+      ],
+      "automaticCoverage": "단일 가시 본문 plain/Unicode/superscript/표셀 동일 문단번호, 수정·undo/redo·저장·UI재열기 및 반복 저장.",
+      "remainingAutomaticOrImplementation": "최종 지원 경로 자동 검증은 완료. 한글 실제 위첨자/Unicode 본문과 후속 표 위치 대조가 남는다.",
+      "hancomDirectRemaining": [
+        "plain/unicode/superscript/cell-address 사본을 열어 앞 표 수정 후 뒤 표와 본문이 소실/겹침 없이 유지되는지 확인한다.",
+        "본문/표셀의 동일 문단번호가 섞이지 않는지 확인하고 인쇄 미리 보기를 저장한다.",
+        "다른 이름 저장 후 재열기한 본문·표·쪽 수를 기록한다."
+      ],
+      "fixtures": [
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/overlap-visible-native/plain.hwp",
+          "exists": true,
+          "sha256": "1df570f1608dc33b46361708eb60ff71ac23c6ef28b874ae21ce7516f98606b5"
+        },
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/overlap-visible-native/unicode.hwp",
+          "exists": true,
+          "sha256": "3c0254b0e4d7cf31817bdb6d81e600c118dad8fbecb530cac9c66e482ae6e8a4"
+        },
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/overlap-visible-native/superscript.hwp",
+          "exists": true,
+          "sha256": "ec41d09df70ba0376fdf1df36100bd00ec6d20b5c8c7ade911ad2a144a03d4e4"
+        },
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/overlap-visible-native/cell-address.hwp",
+          "exists": true,
+          "sha256": "4bc16afa7b48df342dcce83a85ac28ef066a232550c804b2e85adae8cba9d37a"
+        }
+      ],
+      "priorHancom": "최종 fixture의 직접 한글 비교 미실행 또는 진행 중; 부모 작업의 새 UI 근거를 후속 반영"
+    },
+    {
+      "id": "G105",
+      "task": "겹침 표 후속 여러 줄 본문·캡션 원점 보존",
+      "canonical": {
+        "implementation": "DONE",
+        "verification": "PARTIAL",
+        "auto_check": "PASS",
+        "hancom_check": "NOT_RUN",
+        "scope": "한쪽/한단·정확한 원시 호스트의 Native HWP5에서 직접 본문 줄의 index/vpos/Unicode·UTF16 시작/연속 원문 전체를 일대일 확인해 snapshot 줄 위치만 보정. 캡션 story 소유 분리, raw payload 차이·전체 배치·반복 저장·undo/재적용·실제 UI 저장/재열기 검증.",
+        "next_action": "한글 직접 지면 비교는 대기. 혼합 크기로 원시 줄 partition이 달라진 경우·필드·책갈피·다단·중복 주소는 기존 보호 유지."
+      },
+      "reviewedEvidence": [
+        "docs/evidence/file-preservation-2026-10-17/overlap-body-native/result.json",
+        "docs/evidence/file-preservation-2026-10-17/overlap-visible-browser/result.json"
+      ],
+      "automaticCoverage": "후속 여러 줄 및 캡션 위치/방향 변형 Native16, 원시 LINE_SEG vpos만의 변화 범위와 실제 UI 저장·재열기.",
+      "remainingAutomaticOrImplementation": "지원된 단일 열/고유 직접 root 줄 범위 자동 완료. 한글 직접 지면/인쇄 비교가 남는다.",
+      "hancomDirectRemaining": [
+        "multiline, caption-multiline, caption-left/right/top 사본을 열어 줄바꿈·후속 표·캡션의 소유 위치를 확인한다.",
+        "줄마다 첫 글자/끝 글자와 표/캡션의 상대 위치, 쪽 수를 기록한다.",
+        "사본 재저장 후 Native line/text layout과 비교하고 Canvas 수치를 한글 픽셀이라고 주장하지 않는다."
+      ],
+      "fixtures": [
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/overlap-body-native/multiline.hwp",
+          "exists": true,
+          "sha256": "7efc35816157338223ac3a7e2a0df61a572e56a55affbf47f3010f845e6ab524"
+        },
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/overlap-body-native/caption-multiline.hwp",
+          "exists": true,
+          "sha256": "8fa62ef0ff3711ff814773d8d361dffd947d34fa62cbc3b2cdfd12afc304ee61"
+        },
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/overlap-body-native/caption-left.hwp",
+          "exists": true,
+          "sha256": "3e1ab17e325edb25524d911ebe6a1e349d51092a760ed6f45d74cb3139024128"
+        },
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/overlap-body-native/caption-right.hwp",
+          "exists": true,
+          "sha256": "953194d42ecd80c42f096711fae232798e33efaacd65418ddba365d179632fb0"
+        },
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/overlap-body-native/caption-top.hwp",
+          "exists": true,
+          "sha256": "f073692a552b131044a87e71783de2d24f0afea7bcf160eaddb0fdb453ae00cd"
+        }
+      ],
+      "priorHancom": "최종 fixture의 직접 한글 비교 미실행 또는 진행 중; 부모 작업의 새 UI 근거를 후속 반영",
+      "newIndependentHancomResult": "FAIL: original versus independently Hancom-resaved table/body origins differ above 0.2; see newHancomOverlapComparison. Runtime unchanged."
+    },
+    {
+      "id": "G106",
+      "task": "앞 표 편집 후 양수 저장 원점 간격 보존",
+      "canonical": {
+        "implementation": "DONE",
+        "verification": "PARTIAL",
+        "auto_check": "PASS",
+        "hancom_check": "NOT_RUN",
+        "scope": "현재 흐름보다 앞서 소비되지 않은 원본 양수 간격을, 같은 쪽/단의 인접 통째 표·확인된 호스트·저장 column ladder로 제한해 유지. 원본 좌표를 낮추거나 clamp하지 않음. 원본 기대 위치·캡션 포함 11개 Native와 실제 UI 저장 재열기 검증.",
+        "next_action": "한글 직접 비교는 대기. 음수/절대 배치·비겹침·구역 원점 불명확 원본은 기존 경로 유지."
+      },
+      "reviewedEvidence": [
+        "docs/evidence/file-preservation-2026-10-17/overlap-positive-native/result.json",
+        "docs/evidence/file-preservation-2026-10-17/overlap-visible-browser/result.json"
+      ],
+      "automaticCoverage": "저장 양수 간격을 앞서 소비하지 않는 한 쪽·한 단·인접 통째 표 원점 ladder, Native11+UI 반복 저장.",
+      "remainingAutomaticOrImplementation": "지원 원점 ladder 자동 완료. 음수/절대/겹침·흐름 불명확은 지원 밖. 한글 실제 간격 대조가 남는다.",
+      "hancomDirectRemaining": [
+        "plain-source-gap-9000/10500/15000 및 caption-source-gap-10500 사본을 연다.",
+        "표 사이 간격·앞 표 변경 후 후속 표 위치·캡션·쪽 수를 기록한다.",
+        "다른 이름 저장/재열기와 인쇄 미리 보기를 대조하고 값 clamp나 허용오차 확대로 통과시키지 않는다."
+      ],
+      "fixtures": [
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/overlap-positive-native/plain-source-gap-9000.hwp",
+          "exists": true,
+          "sha256": "25e75b97d8506193b88e3be80b019a9cf2d2dc53d8b70dc8bb8c3882883ffe06"
+        },
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/overlap-positive-native/plain-source-gap-10500.hwp",
+          "exists": true,
+          "sha256": "2e392a4bc998bae58579edf0e5ba96531edfb5f843a5bbdc48cb11cc8a3f748a"
+        },
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/overlap-positive-native/plain-source-gap-15000.hwp",
+          "exists": true,
+          "sha256": "395d6a3e225cdec9aa99dff53d40c802a8c1c1b88baae3a9937efc71c18e3104"
+        },
+        {
+          "path": "build/jueony-file-preservation-20261017/review-documents/file-preservation/overlap-positive-native/caption-source-gap-10500.hwp",
+          "exists": true,
+          "sha256": "c65cd03a5e0c2893cc39983fe7825db38c324d7d8ff36d38afc2e9389f2e6e4c"
+        }
+      ],
+      "priorHancom": "최종 fixture의 직접 한글 비교 미실행 또는 진행 중; 부모 작업의 새 UI 근거를 후속 반영",
+      "newIndependentHancomResult": "FAIL: original versus independently Hancom-resaved table/body origins differ above 0.2; see newHancomOverlapComparison. Runtime unchanged."
+    }
+  ],
+  "newCrossPathVerification": {
+    "script": "apps/editor/scripts/verify-converted-download-recovery.mjs",
+    "scriptSha256": "5eb3b8e5c465f1e4f20716e308bb873b2a54e1b7fdadb5332f82cd55f897f8a9",
+    "result": "build/file-completion-cross-path-v2/result.json",
+    "resultSha256": "ffb8e6a0bcc674b095fb0eb5bf15cc8f5099d8c9af26cd31be3fd62aa5e751fb",
+    "passed": 3,
+    "failures": 0,
+    "scope": "two previously uncombined conversion-download → dirty automatic checkpoint → actual owned Browser.crash/restart → same target-format download paths; plus errors/external zero assertion",
+    "counting": "new coverage only; do not add old 338 executions or repeated preliminary runs",
+    "errors": {
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "externalRequests": 0
+    }
+  },
+  "newHancomReadback": {
+    "script": "apps/editor/scripts/verify-hancom-file-roundtrip.mjs",
+    "result": "build/hancom-file-preservation-20261017/engine-roundtrip/result.json",
+    "passed": 4,
+    "scope": "two simple one-page plain-body fixtures; independently saved by parent Hancom UI; no general table/textbox/tab layout parity claim"
+  },
+  "docs108Assessment": {
+    "currentEvidenceConsistent": true,
+    "staleWorkflow": [
+      "한글 직접 검수를 마지막에 미룬다는 문장은 현재 부모가 실제 검수 중이므로 실행 단계에 맞게 갱신 필요.",
+      "기존10 PARTIAL 중 G069는 과거 docs36의 직접20pt 확인이 있어 전혀 미검수로만 설명하면 부정확.",
+      "review-documents의following/outer/default 디렉터리는 비어 있어 해당 검수는 실제 ignored regression output의 자체 fixture를 사용해야 함. default-native는 표 기본 안 여백이며 기본 탭 검사와 다름.",
+      "本 감사 도중 새 Hancom 실제 비교에서 G105/G106 수치 불일치가 발견됨. 현재는 단순 직접 검수 대기보다 실제 결함 조사/수정 상태로 설명해야 함."
+    ],
+    "stillIncomplete": [
+      "N001의지원 밖 복잡 배치는 구현 부분이므로한글검수만으로전체완료할수없음.",
+      "전체XML UI/개인정보편집/새창과새탭/모든OS장애는실제로범위밖이며부분상위항목상태와일치."
+    ],
+    "doNotRepeat": [
+      "공개4변환 결함 재구현",
+      "G105/G106 지원된 여러 줄/캡션/양수 간격 재구현",
+      "동일검사합산으로완료율산출"
+    ]
+  },
+  "manualProcedure": {
+    "launch": "build/jueony-file-preservation-20261017/Start-Review.cmd (4328), existing servers preserved",
+    "safety": "새 임시 폴더에 사본만 저장하고 사용자 원본/열린 창은 변경하지 않는다.",
+    "record": [
+      "fixtureSHA, 문서형식, 쪽수, 본문/표/필드/메모 위치와 수치",
+      "한글 대화상자 값과 취소 여부, 인쇄 미리 보기 스크린샷",
+      "한글 다른 이름 저장의 새 경로/SHA, Jueony strict 재열기·재저장 결과"
+    ],
+    "closure": "각행의지원범위에필요한직접근거확보후에만canonicalHancom/verification상태변경. 열림만으로픽셀/전체호환성을주장하지않는다."
+  },
+  "newHancomOverlapComparison": {
+    "result": "build/hancom-file-preservation-20261017/overlap-roundtrip/result.json",
+    "resultSha256": "6a40713dcd8940658da39e73a35b1ca2e33fbe921daf98a9cde52b31cbf25f8e",
+    "passed": 3,
+    "failures": 6,
+    "scope": "three independently Hancom UI-saved overlap fixtures, numeric Native portable layout and raw HWP root records; current same-engine save success does not establish Hancom equivalence",
+    "geometry": [
+      {
+        "mode": "multiline",
+        "changes": 523,
+        "tableBefore": [
+          {
+            "paraIdx": 1,
+            "y": 157.4,
+            "h": 69.1
+          },
+          {
+            "paraIdx": 2,
+            "y": 242,
+            "h": 34.2
+          }
+        ],
+        "tableAfter": [
+          {
+            "paraIdx": 1,
+            "y": 157.4,
+            "h": 69.1
+          },
+          {
+            "paraIdx": 2,
+            "y": 234,
+            "h": 34.2
+          }
+        ]
+      },
+      {
+        "mode": "caption-multiline",
+        "changes": 210,
+        "tableBefore": [
+          {
+            "paraIdx": 1,
+            "y": 157.4,
+            "h": 69.1
+          },
+          {
+            "paraIdx": 2,
+            "y": 242,
+            "h": 34.2
+          }
+        ],
+        "tableAfter": [
+          {
+            "paraIdx": 1,
+            "y": 157.4,
+            "h": 69.1
+          },
+          {
+            "paraIdx": 2,
+            "y": 234,
+            "h": 34.2
+          }
+        ]
+      },
+      {
+        "mode": "positive-caption-gap",
+        "changes": 18,
+        "tableBefore": [
+          {
+            "paraIdx": 1,
+            "y": 157.4,
+            "h": 69.1
+          },
+          {
+            "paraIdx": 2,
+            "y": 276,
+            "h": 34.2
+          }
+        ],
+        "tableAfter": [
+          {
+            "paraIdx": 1,
+            "y": 157.4,
+            "h": 69.1
+          },
+          {
+            "paraIdx": 2,
+            "y": 234,
+            "h": 34.2
+          }
+        ]
+      }
+    ],
+    "rawEvidence": "build/hancom-file-preservation-20261017/overlap-roundtrip/raw-records.json",
+    "conclusion": "G105/G106 current Hancom comparison FAIL, not merely NOT_RUN. N001 cannot close; root owns implementation coordination. No tolerance or preservation guard relaxation."
+  }
+}

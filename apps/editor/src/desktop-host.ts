@@ -1,5 +1,5 @@
-type Invoke = <T>(command: string, args?: Record<string, unknown>) => Promise<T>;
-type HandleInfo = { token: string; name: string };
+import {installNativeFilePickers,installNativeExitProtection} from './adapters/desktop/native-host.ts';
+
 type Host = { wasm: any; eventBus: any; documentState: any; ready: Promise<unknown>; save: () => Promise<string>; discard: () => Promise<void> };
 
 export function installDesktopHost({ wasm, eventBus, documentState, ready, save, discard }: Host) {
@@ -29,9 +29,8 @@ export function installDesktopHost({ wasm, eventBus, documentState, ready, save,
     new MutationObserver(notify).observe(document.querySelector('title')!, { childList: true });
     void ready.then(notify);
   }
-  const tauri = (window as any).__TAURI__ ?? (child ? (window.parent as any).__TAURI__ : undefined);
-  const invoke: Invoke | undefined = tauri?.core?.invoke;
-  if (!invoke) {
+  const tauri = installNativeFilePickers(window);
+  if (!tauri) {
     // 자동 검증/내장 브라우저에서는 명시적으로 다운로드 모드를 고를 수 있다.
     // 일반 Chrome/Edge 창은 지원되는 File System Access API를 그대로 사용한다.
     if (new URLSearchParams(location.search).get('storage') === 'download') {
@@ -40,54 +39,13 @@ export function installDesktopHost({ wasm, eventBus, documentState, ready, save,
     }
     return;
   }
-  const handles = new Map<string, any>();
-  const makeHandle = (info: HandleInfo) => {
-    if (handles.has(info.token)) return handles.get(info.token);
-    const handle = {
-      kind: 'file', name: info.name,
-      queryPermission: async () => 'granted', requestPermission: async () => 'granted',
-      isSameEntry: async (other: any) => other === handle,
-      getFile: async () => {
-        const bytes = await invoke<number[]>('read_document', { token: info.token });
-        return new File([new Uint8Array(bytes)], info.name);
-      },
-      createWritable: async () => {
-        let pending: Blob | null = null;
-        return {
-          write: async (blob: Blob) => { pending = blob; },
-          close: async () => {
-            if (!pending) throw new Error('저장할 내용이 없습니다.');
-            const bytes = Array.from(new Uint8Array(await pending.arrayBuffer()));
-            await invoke('write_document', { token: info.token, bytes });
-          },
-          abort: async () => { pending = null; },
-        };
-      },
-    };
-    handles.set(info.token, handle);
-    return handle;
-  };
-  (window as any).showOpenFilePicker = async () => {
-    const info = await invoke<HandleInfo | null>('pick_document');
-    if (!info) throw new DOMException('취소됨', 'AbortError');
-    return [makeHandle(info)];
-  };
-  (window as any).showSaveFilePicker = async (options: any) => {
-    const info = await invoke<HandleInfo | null>('pick_save_document', { suggestedName: options?.suggestedName ?? '문서.hwpx' });
-    if (!info) throw new DOMException('취소됨', 'AbortError');
-    return makeHandle(info);
-  };
   if (child) return; // 앱 종료 확인은 전체 문서를 아는 부모 창에서 수행한다.
-  let closeApproved = false;
-  const appWindow = tauri.window.getCurrentWindow();
-  void appWindow.onCloseRequested(async (event: any) => {
-    if (document.getElementById('jueony-busy') || (!closeApproved && documentState.isDirty())) {
-      event.preventDefault();
-      if (document.getElementById('jueony-busy')) return;
-      if (confirm('저장하지 않은 변경 내용이 있습니다. 변경 내용을 버리고 종료할까요?')) {
-        closeApproved = true;
-        await appWindow.close();
-      }
-    }
+  const protection=installNativeExitProtection(tauri,{
+    snapshot:()=>({stamp:revision(),blocked:Boolean(document.getElementById('jueony-busy')||document.querySelector('dialog[open],.modal-overlay')),needsConfirmation:documentState.isDirty()}),
+    confirm:async()=>confirm('저장하지 않은 변경이 있습니다. 원본 파일에 저장한 뒤 종료할까요? 취소하면 문서를 계속 편집합니다.'),
+    checkpoint:async()=>{if(documentState.isDirty()&&(await save()!=='saved'||documentState.isDirty()))throw new Error('파일을 저장하지 못해 종료하지 않았습니다.');},
+    freeze:()=>()=>{},
+    error:value=>alert(value instanceof Error?value.message:String(value)),
   });
+  void protection.ready.catch(value=>alert('종료 보호를 설치하지 못했습니다. '+String(value)));
 }

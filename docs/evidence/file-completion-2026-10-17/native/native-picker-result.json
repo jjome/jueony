@@ -1,0 +1,99 @@
+{
+  "createdAt": "2026-10-16T17:23:58.396529+00:00",
+  "supersedes": "native-exit-final-result.json",
+  "binary": {
+    "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-file-gui-20261017\\JueonyNativePickerReview.exe",
+    "sha256": "1df4138d53d3458bac2b8292fe61c30a036ef663465b500d004a464c8187beab",
+    "bytes": 52087296
+  },
+  "config": {
+    "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-file-gui-20261017\\tauri-native-picker.conf.json",
+    "sha256": "1556e6179c902101dd90952069f9bee6f962dfa8b77e8fa3c2036cf8d5d94812",
+    "frontendDist": "../evidence/dist-native-picker-final",
+    "url": "index.html",
+    "identifier": "local.jueony.nativepicker20261017"
+  },
+  "build": {
+    "status": "PASS",
+    "profile": "debug",
+    "offline": true,
+    "locked": true,
+    "log": "native-picker-build.log",
+    "typecheck": "PASS: typecheck-picker.log",
+    "compiledCapability": {
+      "main-editor": {
+        "identifier": "main-editor",
+        "description": "",
+        "local": true,
+        "windows": [
+          "main"
+        ],
+        "permissions": [
+          "core:default",
+          "core:window:allow-close",
+          "core:window:allow-destroy"
+        ]
+      }
+    }
+  },
+  "frontend": {
+    "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\apps\\editor\\evidence\\dist-native-picker-final",
+    "buildEvidenceSha256": "c2ca52fc584cee0a64891fac15456254e188523ff172c94f9369ad28be6a9010",
+    "customSourceSha256": "16c8bbfa702d111c6fbdf5075c749a23425ca171253a32bdfe63c385b8ec989a",
+    "engineSourceId": "5921bb9f9dcd86fa",
+    "wasmSha256": "ddebc39f88c774996f25fba2457b00c9770e3a4f951bade9bcbe8c948d763e11",
+    "patches": 51
+  },
+  "sourceFiles": {
+    "apps/editor/src/adapters/desktop/native-host.ts": "93ea53e31565a40b2d5ef015dc47eb16a14ad7a2bf7bf93aa0deb596f8d0f30f",
+    "apps/editor/src/desktop-host.ts": "da10596aea5bc8082aa27797bf0f733261a956b8e4d848bb23bb3a8228a932ad",
+    "apps/editor/src/shell.ts": "ea47b11a87e4a7fc2d96544f02feb0b503ac88648d4dfd918308593aee0d83a0",
+    "apps/editor/src-tauri/src/main.rs": "59516483ff5aded075c3b4a499fd843f6862ee05417ea27cf9e83c1345476476",
+    "apps/editor/src-tauri/capabilities/main.json": "de9d8cc1bf67d5f18d27b0f62cce1f0a0970a748add67e664c2ec41001aa5da6",
+    "apps/editor/tests/native-host.test.ts": "6565387c3e06c5f0566423261725292750e23ad195d59bfc4d42c84511cc24bf",
+    "apps/editor/scripts/verify-native-shell.mjs": "e706da7cf776cd05d3bf8665ad62771c4541c6efc5c8a669c1f496ffa14212a8"
+  },
+  "verification": {
+    "unit": {
+      "passed": 17,
+      "failed": 0,
+      "log": "unit-native-host-picker.log"
+    },
+    "edge": {
+      "passed": 11,
+      "failed": 0,
+      "result": "browser-native-picker-final/result.json",
+      "scope": "Real Edge/WASM/IDB/shell/iframe/confirmation UI; native IPC, OS dialog and OS destroy are controlled fakes."
+    },
+    "actualNativeGUI": "PASS for tested HWP/HWPX native basic paths, HWPX close/restart/Save As lifecycle and basic saved HWP reopen in actual Hancom 2024. See actual-picker/actual-validation.json.",
+    "ordinaryBrowserCloseRegression": {
+      "passed": 4,
+      "failed": 0,
+      "result": "browser-close-picker/result.json"
+    },
+    "actualNativeGUIReport": "actual-picker/actual-validation.json"
+  },
+  "fixes": [
+    "One open/save selection in flight per native window, shared between parent and same-origin iframe JS realms. Concurrent requests reject immediately with InvalidStateError; no queue. Cancel/error releases guard.",
+    "Both Rust picker commands set main WebviewWindow as dialog parent. No IPC command or argument changes.",
+    "All CloseRequested events are synchronously vetoed. After explicit consent and latest recovery checkpoint/readback, destroy() is called inside the guarded try/catch. Recursive close() and wrapper destruction outside catch are removed.",
+    "main-only local capability includes core:window:allow-destroy required by Tauri API. Permission failure revokes approval and resumes editing.",
+    "Native handles still cannot structured clone or silently grant authority after restart."
+  ],
+  "previousRuntimeFailures": [
+    {
+      "binary": "JueonyNativeStorageReview.exe",
+      "reason": "Absolute Windows frontendDist became file URL directory listing; root actual UI observed failure."
+    },
+    {
+      "binary": "JueonyNativeExitReviewFinal.exe",
+      "reason": "Root actual UI Open+CtrlS and exit-cancel passed, but accepted exit remained open/inert. Tauri outer onCloseRequested called destroy outside guarded catch without required allow-destroy capability."
+    }
+  ],
+  "preservedBinaries": [
+    "JueonyNativeStorageReview.exe",
+    "JueonyNativeExitReview.exe",
+    "JueonyNativeExitReviewFinal.exe"
+  ],
+  "frozenOriginalC370Frontend": true
+}

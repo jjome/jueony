@@ -12,7 +12,7 @@
 | [AI 연결·Agent 실행](<docs/features/02-agent-and-models.md>) | 14/20 · 부분 2 | 9/20 · 부분 3 | 13/19 | 구현 [N024](<docs/features/02-agent-and-models.md#n024>) 브라우저 인증 링크 기반 계정 연결 |
 | [참고 자료·검색·RAG](<docs/features/03-references-and-rag.md>) | 5/10 · 부분 2 | 4/10 · 부분 1 | 1/6 | 구현 [N033](<docs/features/03-references-and-rag.md#n033>) 검색 순위·구본 우선 문제와 무답 판별 |
 | [반복 작업·공무원 업무 양식](<docs/features/04-macros-and-business.md>)<br>상위 완료 0/5 | 3/6 · 부분 1 | 3/6 | 3/6 | 구현 [N038](<docs/features/04-macros-and-business.md#n038>) 반복 작업의 표·개체 명령 확장 |
-| [파일·저장·복구·형식 보존](<docs/features/05-files-storage-recovery.md>)<br>상위 완료 0/10 | 22/23 · 부분 1 | 13/23 · 부분 10 | 6/6 | 구현 [N001](<docs/features/05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존 |
+| [파일·저장·복구·형식 보존](<docs/features/05-files-storage-recovery.md>)<br>상위 완료 0/10 | 23/24 · 부분 1 | 14/24 · 부분 10 | 6/6 | 구현 [N001](<docs/features/05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존 |
 | [본문 편집·입력·선택·찾기](<docs/features/06-editing-and-selection.md>)<br>상위 완료 0/20 | 7/7 | 0/7 · 부분 7 | 4/4 | 검증 [A001](<docs/features/06-editing-and-selection.md#a001>) 새 본문 문서 작성 |
 | [글자·문단·스타일·번호](<docs/features/07-formatting-and-styles.md>)<br>상위 완료 0/18 | 19/23 · 부분 2 | 0/23 · 부분 19 | 13/16 | 구현 [N011](<docs/features/07-formatting-and-styles.md#n011>) 스타일 가져오기·내보내기 |
 | [표·셀·크기·계산](<docs/features/08-tables.md>)<br>상위 완료 0/24 | 32/38 · 부분 2 | 3/38 · 부분 31 | 26/33 · 부분 3 | 구현 [N004](<docs/features/08-tables.md#n004>) 기존 병합 원본의 후속 Agent 셀 편집 |
@@ -24,13 +24,13 @@
 | [보안·개인정보·검토·메모](<docs/features/14-security-and-review.md>)<br>상위 완료 0/11 | 상위 0/11 · 부분 3 | 상위 0/11 | 상위 0/11 | 상세 작업 분해 필요 |
 | [출력·변환·교정·외부 도구](<docs/features/15-output-and-tools.md>)<br>상위 완료 0/23 | 상위 0/23 · 부분 3 | 상위 0/23 | 상위 0/23 | 상세 작업 분해 필요 |
 | [모듈·실행 기반·배포·최종 검수](<docs/features/16-architecture-and-validation.md>) | 7/25 · 부분 16 | 7/25 · 부분 13 | 해당 없음 | 구현 [N041](<docs/features/16-architecture-and-validation.md#n041>) 독립 한글에서 복합 코퍼스 일괄 검수 |
-| **전체 실행 작업** | **166/218** | **43/218** | **88/117** | 세 축 완료 **43개** |
+| **전체 실행 작업** | **167/219** | **44/219** | **88/117** | 세 축 완료 **44개** |
 
 숫자는 **완료·연결 / 해당 세부 실행 작업 수**다. ‘상위’는 상세 작업이 아직 없는 영역의 상위 범위 집계다. 다른 행의 세부 작업 수와 합산하지 않는다. 전체 기능 완성률이 아니며, 한글 직접 비교와 미검증 변경은 완료에 포함하지 않는다.
 
 <!-- jueony-progress:end -->
 
-**최근 갱신(2026-10-17):** [파일 저장·복구·형식 보존 결과](docs/108-file-preservation-completion.md) — 구현 22/23, 검증 완료 13/23, 대상 Agent 연결 6/6. Windows 저장 보호·다운로드·폐기 실패 복구를 검증했으며, 복잡 겹침 배치와 한글 직접 비교는 남아 있습니다.
+**최근 갱신(2026-10-17):** [파일 보존 후속 검수](docs/109-file-preservation-hancom-followup.md) — 실제 Windows HWPX 열기·저장·종료 취소·복구 보관 후 종료·재실행 복원·새 파일 저장을 확인했습니다. 중복 선택창과 종료 결함을 수정했고, 실제 한글 글줄·탭 폭과 남은 직접 비교는 검사 중입니다. 아래 집계는 검증 근거가 확정된 행만 반영합니다.
 
 폐쇄망 Windows PC에서 업무별 자료와 대화를 관리하고, 가운데 채팅의 요청으로 오른쪽 HWP/HWPX 문서를 AI와 함께 직접 편집하는 프로그램을 만든다. **현재는 본문·단순 표 행/열·서식·쪽 설정과 한글 단축키를 연결한 MVP 개발판**이다. 한글 2024 전체 기능·화면·파일 호환성 100%를 달성한 상태는 아니다. [통합 기반 구현 결과](docs/44-editor-stages-result.md), [쪽 편집 후속 구현·검증](docs/59-empty-body-section-removal.md), [설치 한글 2024와의 비교·미구현 목록](docs/29-hangul-2024-comparison.md)을 참고한다. 다음 신규 기능 병렬 구현에 앞서 [레이어·모듈 리팩터링 계획](docs/30-layered-modular-refactor-plan.md)과 [Facade 계약](docs/31-facade-contracts.md)의 핵심 모듈 첫 이관을 적용했다. [리팩터링 적용 결과와 남은 이관](docs/32-modular-refactor-result.md)을 확인한다.
 

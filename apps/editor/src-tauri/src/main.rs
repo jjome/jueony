@@ -27,7 +27,8 @@ fn register(app: &tauri::AppHandle, path: PathBuf) -> Result<HandleInfo, String>
 #[tauri::command]
 async fn pick_document(app: tauri::AppHandle) -> Result<Option<HandleInfo>, String> {
     tauri::async_runtime::spawn_blocking(move || {
-        let selected = app.dialog().file().add_filter("한글 문서", &["hwp", "hwpx"]).blocking_pick_file();
+        let owner = app.get_webview_window("main").ok_or("문서 창을 찾을 수 없습니다.")?;
+        let selected = app.dialog().file().set_parent(&owner).add_filter("한글 문서", &["hwp", "hwpx"]).blocking_pick_file();
         selected.map(|p| p.into_path().map_err(|e| e.to_string()).and_then(|p| register(&app, p))).transpose()
     }).await.map_err(|e| e.to_string())?
 }
@@ -37,7 +38,8 @@ async fn pick_save_document(app: tauri::AppHandle, suggested_name: String) -> Re
     tauri::async_runtime::spawn_blocking(move || {
         let extension = if suggested_name.to_lowercase().ends_with(".hwp") { "hwp" } else { "hwpx" };
         let name = PathBuf::from(&suggested_name).file_name().unwrap_or_default().to_string_lossy().into_owned();
-        let selected = app.dialog().file().set_file_name(name).add_filter("한글 문서", &[extension]).blocking_save_file();
+        let owner = app.get_webview_window("main").ok_or("문서 창을 찾을 수 없습니다.")?;
+        let selected = app.dialog().file().set_parent(&owner).set_file_name(name).add_filter("한글 문서", &[extension]).blocking_save_file();
         selected.map(|p| p.into_path().map_err(|e| e.to_string()).and_then(|p| register(&app, p))).transpose()
     }).await.map_err(|e| e.to_string())?
 }

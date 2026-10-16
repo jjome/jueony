@@ -1,3 +1,4 @@
+import {installNativeFilePickers,installNativeExitProtection} from './adapters/desktop/native-host.ts';
 import {readDocumentFailure} from './modules/document/public/index.ts';
 import {connectDocumentFrame} from './adapters/iframe/document-client.ts';
 import type {DocumentFrameClient} from './adapters/iframe/document-client.ts';
@@ -32,6 +33,8 @@ const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(
 const {store,connections:port,modelGateway}=createWorkbenchServices();
 let state:AppState,activeTab:Tab|undefined,restoring=false,persistError=false,closing=false,stateWrites=0;
 let running:{controller:AbortController;run:Run}|undefined;
+const nativeHost=installNativeFilePickers(window);
+let nativeExitPending=false,nativeExit:ReturnType<typeof installNativeExitProtection>|undefined;
 type Tab={id:string;workspaceId:string;frame:HTMLIFrameElement;wrapper:HTMLElement;button:HTMLButtonElement;ready:Promise<DocumentFrameClient|null>;api:DocumentFrameClient|null;closed:boolean;initialized:boolean;restoreError?:string;pendingConnection?:StoredFileConnection;pendingIdentity?:string;handle?:FileSystemFileHandle;timer?:number;persistError?:boolean;preferenceError?:boolean;preferenceMessage?:string;pendingWrites?:number;persist:Promise<void>;recovery?:ReturnType<typeof createRecoveryCoordinator>;disposeTabCycle?:()=>void;cachedDocument?:SavedDocument};
 const tabs:Tab[]=[];const loaded=new Set<string>();let recoveryWarning=false;let selected:Reference[]=[];
 const viewJournal=createDocumentViewJournal({getItem:key=>localStorage.getItem(key),setItem:(key,value)=>localStorage.setItem(key,value)});
@@ -159,7 +162,7 @@ function refreshTab(tab:Tab){
  clearTimeout(tab.timer);tab.timer=window.setTimeout(()=>void persistCachedView(tab).catch(error),1400);
 }
 async function persistCachedView(tab:Tab){
- if(tab.closed||!tab.initialized||!tab.api||!tab.cachedDocument||tab.pendingWrites)return;
+ if(nativeExitPending||tab.closed||!tab.initialized||!tab.api||!tab.cachedDocument||tab.pendingWrites)return;
  const view=tab.api.captureDocumentView();if(JSON.stringify(view)===JSON.stringify(tab.cachedDocument.view))return;
  const data={...tab.cachedDocument,view,viewUpdatedAt:viewStamp(tab)};tab.pendingWrites=(tab.pendingWrites??0)+1;
  tab.persist=tab.persist.catch(()=>{}).then(()=>store.saveDocument(data));
@@ -204,10 +207,10 @@ async function newTab(workspaceId=work().id,saved?:SavedDocument,forExisting=fal
   status('문서를 복원하지 못했습니다. 기존 복구본은 보존합니다. '+tab.restoreError);throw e;
  }
 }
-async function persistTab(tab:Tab,reason:'explicit'|'automatic'='explicit'):Promise<boolean>{
- if(tab.closed||!tab.api||!tab.initialized)return false;clearTimeout(tab.timer);
+async function persistTab(tab:Tab,reason:'explicit'|'automatic'|'native-exit'='explicit'):Promise<boolean>{
+ if((nativeExitPending&&reason!=='native-exit')||tab.closed||!tab.api||!tab.initialized)return false;clearTimeout(tab.timer);
  const captured={identity:tab.api.documentIdentity(),...tab.api.state()};
- if(captured.dirty&&tab.recovery&&!tab.recovery.enabled()){await persistCachedView(tab);return true;}
+ if(reason!=='native-exit'&&captured.dirty&&tab.recovery&&!tab.recovery.enabled()){await persistCachedView(tab);return true;}
  try{
   const snapshot=tab.api!.recovery();if(!snapshot){if(reason==='explicit')tab.timer=window.setTimeout(()=>void persistTab(tab).catch(error),1500);return false;}
   checkPendingConnection(tab);
@@ -218,6 +221,7 @@ async function persistTab(tab:Tab,reason:'explicit'|'automatic'='explicit'):Prom
   try{await tab.persist;tab.cachedDocument=data;tab.recovery?.checkpointed(captured);tab.persistError=false;return true;}finally{tab.pendingWrites!--;}
  }catch(e){
   if((e as any)?.code==='PASSWORD_RECOVERY_BLOCKED'){
+   if(reason==='native-exit')throw e;
    tab.cachedDocument=undefined;viewClocks.delete(tab.id);
    try{viewJournal.remove(tab.id,tab.workspaceId);}catch(journalError){viewJournalError=true;error(journalError);}
    tab.pendingWrites=(tab.pendingWrites??0)+1;tab.persist=tab.persist.catch(()=>{}).then(()=>store.removeDocument(tab.id));
@@ -343,7 +347,7 @@ async function executeMacro(){
  finally{running=undefined;await persist().catch(error);renderMessages();updateRun();}
 }
 installDocumentDefaultsPanel({status,error});
-window.addEventListener('keydown',e=>{if(e.isComposing||document.querySelector('dialog[open]'))return;if(e.key==='F6'&&e.altKey&&!e.ctrlKey&&!e.shiftKey){e.preventDefault();if(document.activeElement===activeTab?.frame)$('request-input').focus();else activeTab?.api?.focusEditor();}if(e.ctrlKey&&!e.altKey&&!e.shiftKey&&e.code==='KeyS'){e.preventDefault();$('save-document').click();}});
+window.addEventListener('keydown',e=>{if(nativeExitPending){if(!document.getElementById('native-exit-confirm')?.contains(e.target as Node)){e.preventDefault();e.stopImmediatePropagation();}return;}if(e.isComposing||document.querySelector('dialog[open]'))return;if(e.key==='F6'&&e.altKey&&!e.ctrlKey&&!e.shiftKey){e.preventDefault();if(document.activeElement===activeTab?.frame)$('request-input').focus();else activeTab?.api?.focusEditor();}if(e.ctrlKey&&!e.altKey&&!e.shiftKey&&e.code==='KeyS'){e.preventDefault();$('save-document').click();}});
 on('add-workspace',async()=>{if(!cancelNavigation())return;const name=prompt('새 업무 이름');if(!name?.trim())return;const w=workspace.addWorkspace(name);await switchWorkspace(w.id);});
 on('rename-workspace',async()=>{const name=prompt('업무 이름',work().name);if(name?.trim()){work().name=name.trim();render();await persist();}});
 $('workspace-select').addEventListener('change',()=>void switchWorkspace($<HTMLSelectElement>('workspace-select').value).catch(error));
@@ -384,7 +388,47 @@ split.addEventListener('pointermove',e=>{if(!dragging)return;const rect=$('sideb
 split.addEventListener('pointerup',()=>{dragging=false;void persist().catch(error);});
 split.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();state.split=Math.max(20,Math.min(75,state.split+(e.key==='ArrowUp'?-3:3)));$('sidebar').style.setProperty('--chat-share',state.split+'%');split.setAttribute('aria-valuenow',String(state.split));void persist().catch(error);}});
 window.addEventListener('message',event=>{if(event.origin!==location.origin)return;const tab=tabs.find(t=>t.frame.contentWindow===event.source);if(!tab)return;if(event.data?.type==='jueony:status')refreshTab(tab);if(event.data?.type==='jueony:command-state'&&tab===activeTab)chrome.refresh();if(event.data?.type==='jueony:focus-chat'&&tab===activeTab){if(state.focusMode){state.focusMode=false;render();void persist().catch(error);}$('request-input').focus();}if(event.data?.type==='jueony:preferences-state'){recoverySettingsWatcher.refresh();tab.preferenceError=Boolean(event.data.error);tab.preferenceMessage=tab.preferenceError?String(event.data.message):undefined;if(tab.preferenceError)status(tab.preferenceMessage!);}if(event.data?.type==='jueony:new-document'&&tab===activeTab&&cancelNavigation())void newTab().catch(error);if(event.data?.type==='jueony:close-document'&&tab===activeTab)void closeTab(tab).catch(error);});
+function nativeExitSnapshot(){
+ const documents=tabs.filter(tab=>!tab.closed);
+ return {stamp:JSON.stringify({workspace:state?.activeWorkspaceId,documents:documents.map(tab=>({id:tab.id,workspaceId:tab.workspaceId,revision:tab.api?.revision(),dirty:tab.api?.state().dirty}))}),
+  blocked:!state||restoring||stateWrites>0||(closing&&!nativeExitPending)||Boolean(running)||documents.some(tab=>!tab.initialized||!tab.api||tab.api.busy()||(tab.pendingWrites??0)>0)||Boolean(document.querySelector('dialog[open]')),
+  needsConfirmation:documents.some(tab=>Boolean(tab.api?.state().dirty))};
+}
+function confirmNativeRecoveryExit():Promise<boolean>{
+ return new Promise(resolve=>{
+  const dialog=document.createElement('dialog');dialog.id='native-exit-confirm';dialog.className='jueony-page-dialog';
+  const title=document.createElement('h2');title.textContent='복구본을 보관하고 종료';
+  const message=document.createElement('p');message.textContent='원본 HWP/HWPX 파일에 저장하는 것이 아닙니다. 저장하지 않은 모든 문서의 최신 내용을 이 Windows 계정의 로컬 복구 저장소에 보관한 뒤 종료합니다. 자동복구를 꺼 둔 문서도 이번 종료에 한해서 복구본을 저장합니다. 원본 파일 저장을 원하거나 이 보관에 동의하지 않으면 취소하세요.';
+  const cancel=document.createElement('button');cancel.type='button';cancel.textContent='취소';cancel.onclick=()=>dialog.close('cancel');
+  const accept=document.createElement('button');accept.type='button';accept.textContent='복구본을 저장하고 종료';accept.onclick=()=>dialog.close('checkpoint');
+  dialog.append(title,message,cancel,accept);document.body.append(dialog);dialog.addEventListener('close',()=>{const accepted=dialog.returnValue==='checkpoint';dialog.remove();resolve(accepted);},{once:true});dialog.showModal();cancel.focus();
+ });
+}
+async function commitNativeExitRecovery(){
+ const documents=tabs.filter(tab=>!tab.closed);
+ for(const tab of documents){await tab.persist.catch(()=>{});if(tab.preferenceError)throw new Error(tab.preferenceMessage??'문서 환경 설정 저장을 확인해 주세요.');if(!await persistTab(tab,'native-exit'))throw new Error('문서 복구본을 준비하지 못해 종료하지 않았습니다.');}
+ // Read back committed records, including inactive and other-workspace documents.
+ for(const workspaceId of new Set(documents.map(tab=>tab.workspaceId))){
+  const saved=await store.documents(workspaceId);
+  for(const tab of documents.filter(tab=>tab.workspaceId===workspaceId)){
+   const record=saved.find(value=>value.id===tab.id),expected=tab.cachedDocument;
+   assertRecoveryRecord(record,workspaceId,recoveryIntegrity);
+   if(!record.integrity)throw new Error('복구본 저장 확인용 무결성 정보가 없어 종료하지 않았습니다.');
+   if(!expected||!record||record.name!==expected.name||record.dirty!==expected.dirty||record.updatedAt!==expected.updatedAt||record.bytes.length!==expected.bytes.length||record.bytes.some((byte,index)=>byte!==expected.bytes[index]))throw new Error('복구본 저장 후 확인에 실패해 종료하지 않았습니다.');
+  }
+ }
+ await persist();checkpointExitView();if(viewJournalError)throw new Error('문서 보기 상태를 보관하지 못해 종료하지 않았습니다.');
+}
+if(nativeHost){
+ nativeExit=installNativeExitProtection(nativeHost,{
+  snapshot:nativeExitSnapshot,confirm:confirmNativeRecoveryExit,checkpoint:commitNativeExitRecovery,
+  freeze:()=>{const previousClosing=closing;nativeExitPending=true;closing=true;for(const tab of tabs){clearTimeout(tab.timer);tab.recovery?.updateSettings({...recoverySettings,recoveryEnabled:false,idleSaveEnabled:false});}const elements=Array.from(document.body.children).filter((element):element is HTMLElement=>element instanceof HTMLElement);const previous=elements.map(element=>element.inert);elements.forEach(element=>element.inert=true);return()=>{elements.forEach((element,index)=>element.inert=previous[index]);nativeExitPending=false;closing=previousClosing;for(const tab of tabs){tab.recovery?.updateSettings(recoverySettings);refreshTab(tab);}};},
+  error:value=>status('종료하지 않았습니다. '+(value instanceof Error?value.message:String(value))),
+ });
+ void nativeExit.ready.catch(value=>status('네이티브 종료 보호를 설치하지 못했습니다. 문서를 파일에 저장한 뒤 종료해 주세요. '+String(value)));
+}
 window.addEventListener('beforeunload',event=>{
+ if(nativeExit?.isApproved())return;
  checkpointExitView();
  // The host owns the single exit prompt, including inactive and other-workspace tabs.
  // A failed editor read is protected rather than silently allowing a destructive exit.

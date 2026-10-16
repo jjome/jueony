@@ -30,3 +30,46 @@ test('DocumentFiles serializes concurrent writes and does not abort after an ack
  release();await assert.rejects(first,/문서가 바뀌/);
  assert.deepEqual(f.calls,['open','write','close']);assert.equal(f.disk(),'new');assert.equal(f.remembered(),'new');assert.equal(f.locks(),0);
 });
+
+test('acknowledged but truncated file never advances its fingerprint or becomes a successful save',async()=>{
+ const f=fixture(),open=f.sink.open;
+ f.sink.open=async()=>{const transaction=await open();return {...transaction,async close(){await transaction.close();f.setDisk('truncated');}};};
+ await assert.rejects(f.writer.write(f.sink,{expectedRevision:'1:1',bytes:bytes('new')}),/일치하지/);
+ assert.deepEqual(f.calls,['open','write','close']);assert.equal(f.disk(),'truncated');assert.equal(f.remembered(),'old');assert.equal(f.locks(),0);
+ await assert.rejects(f.writer.write(f.sink,{expectedRevision:'1:1',bytes:bytes('retry')}),/원본 파일/);
+ assert.deepEqual(f.calls,['open','write','close']);
+});
+
+test('committed file read failure keeps the previous baseline without aborting an acknowledged close',async()=>{
+ const f=fixture();let reads=0;
+ f.sink.readBytes=async()=>{if(++reads===3)throw new Error('readback unavailable');return bytes(f.disk());};
+ await assert.rejects(f.writer.write(f.sink,{expectedRevision:'1:1',bytes:bytes('new')}),/readback unavailable/);
+ assert.deepEqual(f.calls,['open','write','close']);assert.equal(f.disk(),'new');assert.equal(f.remembered(),'old');assert.equal(f.locks(),0);
+});
+
+test('open, write and precommit close failures preserve disk/baseline and release the lock even when abort fails',async()=>{
+ for(const stage of ['open','write','close']){
+  const f=fixture(),open=f.sink.open;
+  f.sink.open=async()=>{
+   if(stage==='open')throw new Error('failed-open');
+   const transaction=await open();return {...transaction,
+    async write(data){if(stage==='write')throw new Error('failed-write');await transaction.write(data);},
+    async close(){throw new Error('failed-close');},
+    async abort(){f.calls.push('abort-failed');throw new Error('abort must not replace original failure');},
+   };
+  };
+  await assert.rejects(f.writer.write(f.sink,{expectedRevision:'1:1',bytes:bytes('new')}),new RegExp('failed-'+stage));
+  assert.equal(f.disk(),'old');assert.equal(f.remembered(),'old');assert.equal(f.locks(),0);
+  assert.equal(f.calls.filter(c=>c==='abort-failed').length,stage==='open'?0:1);
+  f.sink.open=open;await f.writer.write(f.sink,{expectedRevision:'1:1',bytes:bytes('new')});
+  assert.equal(f.disk(),'new');assert.equal(f.remembered(),'new');assert.equal(f.locks(),0);
+ }
+});
+
+test('close failure after committing bytes never reports success or silently accepts the new baseline',async()=>{
+ const f=fixture(),open=f.sink.open;
+ f.sink.open=async()=>{const transaction=await open();return {...transaction,async close(){await transaction.close();throw new Error('close receipt unavailable');}};};
+ await assert.rejects(f.writer.write(f.sink,{expectedRevision:'1:1',bytes:bytes('new')}),/close receipt unavailable/);
+ assert.equal(f.disk(),'new');assert.equal(f.remembered(),'old');assert.equal(f.locks(),0);
+ await assert.rejects(f.writer.write(f.sink,{expectedRevision:'1:1',bytes:bytes('retry')}),/원본 파일/);
+});

@@ -27,6 +27,12 @@ export function createSnapshotWriter(deps: SnapshotWriteDependencies) {
    assertSaveRevision(expected,deps.revision());
    await assertFileUnchanged(sink);
    await writable.close();closed=true;
+   // Acknowledged close is irreversible. Read the committed bytes before
+   // advancing the disk baseline or allowing the UI to mark the document saved.
+   if(savedHash && sink.readBytes){
+    const actualHash=await deps.fingerprint(await sink.readBytes());
+    if(actualHash!==savedHash)throw new Error('저장한 파일의 내용이 문서 사본과 일치하지 않습니다. 편집 내용은 열린 문서에 남아 있습니다. 다른 이름으로 저장해 주세요.');
+   }
    if(savedHash)sink.rememberFingerprint(savedHash);
    assertSaveRevision(expected,deps.revision());
   }catch(error){if(!closed)await writable?.abort?.().catch(()=>undefined);throw error;}

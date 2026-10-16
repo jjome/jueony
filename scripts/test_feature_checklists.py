@@ -71,6 +71,43 @@ class FeatureChecklistTests(unittest.TestCase):
             expected = collections.Counter(r[field] for r in self.rows if r["kind"] == "TASK")
             self.assertEqual(combined, expected)
 
+    def test_mismatched_header_delimiter_and_body_columns_are_rejected(self):
+        for content in ["| A | B |\n| --- | --- | --- |\n| 1 | 2 |",
+                        "| A | B |\n| --- | --- |\n| 1 | 2 | 3 |"]:
+            with self.assertRaises(AssertionError):
+                features.validate_markdown_tables(content)
+        valid = "| A | B |\n| --- | ---: |\n| escaped \\| pipe | 2 |"
+        self.assertEqual(features.validate_markdown_tables(valid), [{"columns": 2, "rows": 1}])
+
+    def test_each_feature_has_its_own_overview_table(self):
+        content = self.outputs[checklist.DOCS / "jueony-progress.md"]
+        tables = features.validate_markdown_tables(content)
+        self.assertEqual(len(tables), 1 + len(self.groups))
+        self.assertEqual([t["columns"] for t in tables], [4] + [3] * len(self.groups))
+        for group in self.groups:
+            section = content.split(f'<a id="feature-{group["key"]}"></a>', 1)[1].split('<a id="feature-', 1)[0]
+            self.assertEqual(len(features.validate_markdown_tables(section)), 1)
+
+    def test_small_work_tables_keep_parent_children_and_all_rows_once(self):
+        seen = []
+        for group in self.groups:
+            items = self.grouped[group["key"]]
+            tables = features.work_tables(items)
+            ids = [r["id"] for t in tables for r in t["rows"]]
+            self.assertCountEqual(ids, [r["id"] for r in items])
+            self.assertTrue(all(0 < len(t["rows"]) <= 8 for t in tables))
+            path = checklist.DOCS / "features" / group["file"]
+            content = self.outputs[path]
+            actual = re.findall(r'^\| \[([A-Z]\d+)\]', content, re.M)
+            self.assertCountEqual(actual, ids)
+            seen.extend(actual)
+            parsed = features.validate_markdown_tables(content)
+            self.assertEqual(parsed[0]["columns"], 3)
+            self.assertTrue(all(t["columns"] == 5 and t["rows"] <= 8 for t in parsed[1:]))
+        self.assertCountEqual(seen, [r["id"] for r in self.rows])
+        table_family = next(t for t in features.work_tables(self.grouped["tables"]) if any(r["id"] == "B161" for r in t["rows"]))
+        self.assertTrue({"B161", "N004", "A050"}.issubset({r["id"] for r in table_family["rows"]}))
+
     def test_all_generated_local_links_and_item_fragments_resolve(self):
         for source, content in self.outputs.items():
             if source.suffix != ".md":

@@ -100,6 +100,64 @@ def next_axis(row):
     return "Agent 연결" if row["agent"] not in {"CONNECTED", "NA"} else "검증"
 
 
+def work_tables(items, limit=8):
+    """Keep related parent/child work together; show every row once in small tables."""
+    by_id = {row["id"]: row for row in items}
+    families = collections.OrderedDict()
+    for row in items:
+        ancestor = row
+        seen = set()
+        while ancestor["parent"] in by_id:
+            assert ancestor["id"] not in seen, "작업표 부모 순환"
+            seen.add(ancestor["id"])
+            ancestor = by_id[ancestor["parent"]]
+        families.setdefault(ancestor["id"], []).append(row)
+    buckets = collections.OrderedDict()
+    for root_id, family in families.items():
+        root = by_id[root_id]
+        if len(family) > 1:
+            key, title = root_id, root["task"]
+        else:
+            kind = "상위 기능 점검" if root["kind"] != "TASK" else "독립 실행 작업"
+            key, title = (kind, root["area"]), f"{root['area']} · {kind}"
+        buckets.setdefault(key, {"title": title, "rows": []})["rows"].extend(family)
+    result = []
+    for bucket in buckets.values():
+        for start in range(0, len(bucket["rows"]), limit):
+            suffix = f" ({start // limit + 1})" if len(bucket["rows"]) > limit else ""
+            result.append({"title": bucket["title"] + suffix, "rows": bucket["rows"][start:start + limit]})
+    return result
+
+
+def validate_markdown_tables(content):
+    """Reject mismatched columns instead of silently losing GFM table rendering."""
+    tables = []
+    block = []
+
+    def cells(line):
+        return re.split(r"(?<!\\)\|", line.strip()[1:-1])
+
+    def finish():
+        if not block:
+            return
+        assert len(block) >= 2, "표 구분선 없음"
+        width = len(cells(block[0]))
+        delimiter = cells(block[1])
+        assert len(delimiter) == width, "표 제목/구분선 열 수 불일치"
+        assert all(re.fullmatch(r"\s*:?-{3,}:?\s*", cell) for cell in delimiter), "잘못된 표 구분선"
+        assert all(len(cells(line)) == width for line in block[2:]), "표 본문 열 수 불일치"
+        tables.append({"columns": width, "rows": len(block) - 2})
+        block.clear()
+
+    for line in content.splitlines():
+        if line.startswith("|") and line.endswith("|"):
+            block.append(line)
+        else:
+            finish()
+    finish()
+    return tables
+
+
 def feature_outputs(rows, root, labels, kind_names, complete, counts):
     docs = root / "docs"
     config = json.loads((docs / "checklist-features.json").read_text(encoding="utf-8"))
@@ -132,35 +190,35 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
             f"세 축과 필요한 한글 검증을 모두 충족한 실행 작업: **{counts['completedTaskRows']}개**.", "",
             "완료 표시는 각 항목의 제한된 범위에 적용한다. 자동 검사 통과와 한글 2024 직접 비교는 구분한다. "
             "이 수치는 한글 전체 완성률이 아니다. 한글 2024 직접 비교는 마지막 일괄 검수로 진행한다.", "",
-            "## 기능별 문서", "",
-            "숫자는 `완료 또는 연결 / 해당 실행 작업`이다. Agent 분모는 해당 없음 항목을 제외한다. "
-            "기능명 아래의 상위 완료는 필요한 검증까지 끝난 상위 범위의 수다. "
-            "예를 들어 개체의 세부 구현 1/1은 선택 개체 속성 키 하나의 범위이며, 개체 전체 구현률이 아니다.", "",
-            "| 기능 문서·상위 완료 | 실행 작업 / 상위 범위 | 세부 구현 | 세부 검증 | 세부 Agent 연결 |",
-            "| --- | --- | --- | --- | --- | --- |"]
+            "## 기능 선택", "",
+            "아래에서 기능을 선택한다. 각 기능의 요약표와 상세 문서는 따로 제공한다.", ""]
+    for group in groups:
+        text.append(f"- [{group['title']}](<#feature-{group['key']}>) · " +
+                    local_link("상세 작업표", paths[group["key"]], overview))
+    text += ["", "## 기능별 요약표", "",
+             "실행 작업과 상위 범위는 별도 집계한다. Agent 분모에서는 해당 없음을 제외한다. "
+             "예를 들어 개체의 세부 구현 1/1은 선택 개체 속성 키 하나이며, 개체 전체 완성을 뜻하지 않는다.", ""]
     for group in groups:
         items = grouped[group["key"]]
         tasks = [r for r in items if r["kind"] == "TASK"]
         rollups = [r for r in items if r["kind"] != "TASK"]
-        upper = f"<br>상위 완료 {sum(complete(r) for r in rollups)}/{len(rollups)}" if rollups else ""
-        text.append(f"| {local_link(group['title'], paths[group['key']], overview)}{upper} | "
-                    f"{len(tasks)} / {len(items) - len(tasks)} | "
-                    f"{counter_text(tasks, 'implementation', 'DONE', 'PARTIAL')} | "
-                    f"{counter_text(tasks, 'verification', 'DONE', 'PARTIAL')} | "
-                    f"{counter_text(tasks, 'agent', 'CONNECTED', 'PARTIAL')} |")
-    text += ["", "## 다음 우선 작업", "",
-             "각 영역의 명시적인 후속 작업을 먼저 표시한다. 연결을 누르면 해당 항목의 범위·실제 상태·근거로 이동한다.", ""]
-    for group in groups:
-        pending = priority_tasks(grouped[group["key"]], complete)[:1]
+        text += [f'<a id="feature-{group["key"]}"></a>', "",
+                 f"### {group['title']}", "",
+                 local_link("항목별 작업표 열기 →", paths[group["key"]], overview), "",
+                 "| 구분 | 실행 작업 | 상위 범위 |", "| --- | --- | --- |"]
+        for field, label, done in [("implementation", "구현", "DONE"),
+                                   ("verification", "검증", "DONE"), ("agent", "Agent 연결", "CONNECTED")]:
+            text.append(f"| {label} | {counter_text(tasks, field, done, 'PARTIAL', True)} | "
+                        f"{counter_text(rollups, field, done, 'PARTIAL', True) if rollups else '— 상위 범위 없음'} |")
+        text += ["", f"실행 작업 {len(tasks)}개 · 상위 범위 {len(rollups)}개. "
+                 f"세 축 완료: 실행 작업 {sum(complete(r) for r in tasks)}개 · 상위 범위 {sum(complete(r) for r in rollups)}개.", ""]
+        pending = priority_tasks(items, complete)[:1]
         if pending:
-            text.append(f"- **{group['title']}**: " + " · ".join(f"{next_axis(r)} — " + task_link(r, overview) + " " + escaped(r["task"]) for r in pending))
-        elif not any(r["kind"] == "TASK" for r in grouped[group["key"]]):
-            text.append(f"- **{group['title']}**: 상위 기능의 상세 실행 작업과 완료조건을 추가한다.")
-    text += ["", "## 통합 검증 중인 변경", "",
-             "아래는 현재 작업 중인 후속 묶음이다. 최종 검증과 기록 갱신 전에는 위 완료 수치에 추가하지 않는다.", ""]
-    for group in groups:
+            text += ["**다음 작업:** " + " · ".join(f"{next_axis(r)} — " + task_link(r, overview) + " " + escaped(r["task"]) for r in pending), ""]
+        elif not tasks:
+            text += ["**다음 작업:** 상위 기능의 상세 실행 작업과 완료조건을 추가한다.", ""]
         if group.get("working"):
-            text.append(f"- {local_link(group['title'], paths[group['key']], overview)}: {group['working']}")
+            text += ["**통합 검증 중:** " + group["working"], ""]
     text += ["", "## 기록을 갱신하는 방법", "",
              "1. 해당 기능 문서에서 항목 ID와 완료조건을 확인한다.",
              "2. CSV의 구현·검증·Agent 연결과 자동/한글 검증, 근거·다음 작업을 수정한다.",
@@ -191,19 +249,17 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
                  group["description"], "", "## 진행 요약", "",
                  f"실행 작업 **{len(tasks)}개**, 상위 범위 **{len(items) - len(tasks)}개**. "
                  "CSV의 기록을 기능별로 표시한 문서다.", "",
-                 "| 축 | 실행 작업 상태 |", "| --- | --- |",
-                 f"| 구현 | {counter_text(tasks, 'implementation', 'DONE', 'PARTIAL', True)} |",
-                 f"| 검증 | {counter_text(tasks, 'verification', 'DONE', 'PARTIAL', True)} |",
-                 f"| Agent 연결 | {counter_text(tasks, 'agent', 'CONNECTED', 'PARTIAL', True)} |", "",
+                 "| 구분 | 실행 작업 | 상위 범위 |", "| --- | --- | --- |"]
+        for field, label, done in [("implementation", "구현", "DONE"),
+                                   ("verification", "검증", "DONE"), ("agent", "Agent 연결", "CONNECTED")]:
+            lines.append(f"| {label} | {counter_text(tasks, field, done, 'PARTIAL', True)} | "
+                         f"{counter_text(rollups, field, done, 'PARTIAL', True) if rollups else '— 상위 범위 없음'} |")
+        lines += ["",
                  "☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. "
                  "검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.", ""]
         if rollups:
             lines += [f"상위 범위는 세 축 완료 **{sum(complete(r) for r in rollups)}/{len(rollups)}개**다. "
-                      "세부 작업 완료 수와 분리해서 읽는다.", "",
-                      "| 축 | 상위 범위 상태 |", "| --- | --- |",
-                      f"| 구현 | {counter_text(rollups, 'implementation', 'DONE', 'PARTIAL', True)} |",
-                      f"| 검증 | {counter_text(rollups, 'verification', 'DONE', 'PARTIAL', True)} |",
-                      f"| Agent 연결 | {counter_text(rollups, 'agent', 'CONNECTED', 'PARTIAL', True)} |", ""]
+                      "세부 작업 완료 수와 분리해서 읽는다.", ""]
         if not tasks:
             lines += ["이 영역은 상위 기능의 점검 기록만 있다. 상세 실행 작업을 추가하고 완료조건을 확정해야 한다.", ""]
         if group.get("working"):
@@ -214,19 +270,19 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
             for row in pending:
                 lines.append(f"- **{next_axis(row)}** {task_link(row, path)} **{escaped(row['task'])}** — {escaped(row['next_action'])}")
             lines.append("")
-        for title, subset in [
-            ("남은 실행 작업", [r for r in tasks if not complete(r)]),
-            ("세 축 완료 작업", [r for r in tasks if complete(r)]),
-            ("상위 기능·상태 범위", [r for r in items if r["kind"] != "TASK"]),
-        ]:
-            if not subset:
-                continue
-            lines += [f"## {title} ({len(subset)})", "",
-                      "항목 ID를 누르면 아래의 완료조건·근거를 펼쳐 확인할 수 있다.", "",
+        tables = work_tables(items)
+        lines += ["## 기능별 작업표", "",
+                  "관련된 상위 기능과 실행 작업을 함께 묶었다. 각 표는 최대 8개 항목이며, 완료된 항목도 같은 표에 유지한다. "
+                  "ID를 누르면 아래의 완료조건·근거로 이동한다. **범위** 행은 상위 점검, **작업** 행은 실행 작업으로 중복 집계하지 않는다.", ""]
+        lines += [f"- [{table['title']}](<#work-{number}>)" for number, table in enumerate(tables, 1)]
+        lines.append("")
+        for number, table in enumerate(tables, 1):
+            lines += [f'<a id="work-{number}"></a>', "", f"### {table['title']}", "",
                       "| ID | 항목 | 구현 | 검증 | Agent 연결 |",
                       "| --- | --- | --- | --- | --- |"]
-            for row in subset:
-                lines.append(f"| {task_link(row, path)} {row['priority']} | {escaped(row['task'])} | "
+            for row in table["rows"]:
+                kind = "작업" if row["kind"] == "TASK" else "범위"
+                lines.append(f"| {task_link(row, path)} · {kind} | {escaped(row['task'])} | "
                              f"{labels[row['implementation']]} | {labels[row['verification']]} | {labels[row['agent']]} |")
             lines.append("")
         lines += ["## 항목별 완료조건·근거", "", "각 항목은 펼쳐서 읽는다. 상태와 근거는 CSV에서 관리한다.", ""]
@@ -267,4 +323,7 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
             "verification": dict(collections.Counter(r["verification"] for r in tasks)),
             "agent": dict(collections.Counter(r["agent"] for r in tasks))})
     outputs[docs / "features" / "index.json"] = json.dumps(index, ensure_ascii=False, indent=2) + "\n"
+    for path, content in outputs.items():
+        if path.suffix == ".md":
+            validate_markdown_tables(content)
     return outputs

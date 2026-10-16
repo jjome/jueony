@@ -8,11 +8,11 @@
 
 실행 작업 **25개**, 상위 범위 **0개**. CSV의 기록을 기능별로 표시한 문서다.
 
-| 축 | 실행 작업 상태 |
-| --- | --- |
-| 구현 | 완료 7/25 · 부분 16 · 미구현 2 |
-| 검증 | 완료 7/25 · 부분 13 · 미검증 5 |
-| Agent 연결 | 해당 없음 25 |
+| 구분 | 실행 작업 | 상위 범위 |
+| --- | --- | --- |
+| 구현 | 완료 7/25 · 부분 16 · 미구현 2 | — 상위 범위 없음 |
+| 검증 | 완료 7/25 · 부분 13 · 미검증 5 | — 상위 범위 없음 |
+| Agent 연결 | 해당 없음 25 | — 상위 범위 없음 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
@@ -22,44 +22,67 @@
 - **구현** [N042](<16-architecture-and-validation.md#n042>) **한글·Jueony 인쇄/PDF 조판 비교** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
 - **구현** [N043](<16-architecture-and-validation.md#n043>) **실제 Windows 파일 picker·권한·외부 수정** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
 
-## 남은 실행 작업 (18)
+## 기능별 작업표
 
-항목 ID를 누르면 아래의 완료조건·근거를 펼쳐 확인할 수 있다.
+관련된 상위 기능과 실행 작업을 함께 묶었다. 각 표는 최대 8개 항목이며, 완료된 항목도 같은 표에 유지한다. ID를 누르면 아래의 완료조건·근거로 이동한다. **범위** 행은 상위 점검, **작업** 행은 실행 작업으로 중복 집계하지 않는다.
 
-| ID | 항목 | 구현 | 검증 | Agent 연결 |
-| --- | --- | --- | --- | --- |
-| [R01](<16-architecture-and-validation.md#r01>) P1 | 모듈별 공개 계약과 상태 소유권 고정 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [R03](<16-architecture-and-validation.md#r03>) P1 | Composition Root와 호환 진입점 준비 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [R04](<16-architecture-and-validation.md#r04>) P1 | Document facade와 rhwp adapter 분리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [R05](<16-architecture-and-validation.md#r05>) P1 | 파일 저장과 복구 유스케이스 분리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [R06](<16-architecture-and-validation.md#r06>) P1 | 업무와 채팅 모델 및 저장 Port 분리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [R07](<16-architecture-and-validation.md#r07>) P1 | 자료와 검색 경계 분리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [R08](<16-architecture-and-validation.md#r08>) P1 | 환경과 보기 상태 모듈 분리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [R10](<16-architecture-and-validation.md#r10>) P1 | Agent 실행과 context 조립 분리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [R11](<16-architecture-and-validation.md#r11>) P1 | 매크로와 업무 템플릿 경계 분리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [R12](<16-architecture-and-validation.md#r12>) P1 | Session과 UI controller로 shell 해체 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [R13](<16-architecture-and-validation.md#r13>) P1 | iframe와 빌드 패치 의존을 adapter로 격리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [R14](<16-architecture-and-validation.md#r14>) P1 | 기존 상태와 자격증명 호환 최종 검수 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [R15](<16-architecture-and-validation.md#r15>) P1 | 통합 회귀와 모듈별 변경 영향 검증 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [N041](<16-architecture-and-validation.md#n041>) P1 | 독립 한글에서 복합 코퍼스 일괄 검수 | ☐ 미구현 | ☐ 미검증 | — 해당 없음 |
-| [N042](<16-architecture-and-validation.md#n042>) P1 | 한글·Jueony 인쇄/PDF 조판 비교 | ☐ 미구현 | ☐ 미검증 | — 해당 없음 |
-| [N043](<16-architecture-and-validation.md#n043>) P1 | 실제 Windows 파일 picker·권한·외부 수정 | ◐ 부분 | ☐ 미검증 | — 해당 없음 |
-| [N044](<16-architecture-and-validation.md#n044>) P1 | 비정상 종료·저장 실패·복구 통합 | ◐ 부분 | ☐ 미검증 | — 해당 없음 |
-| [N045](<16-architecture-and-validation.md#n045>) P1 | 기관 배포용 완전 오프라인 자산/허용 서버 정책 | ◐ 부분 | ☐ 미검증 | — 해당 없음 |
+- [기반·모듈 · 독립 실행 작업 (1)](<#work-1>)
+- [기반·모듈 · 독립 실행 작업 (2)](<#work-2>)
+- [기반·모듈 · 독립 실행 작업 (3)](<#work-3>)
+- [저장·호환성 · 독립 실행 작업](<#work-4>)
 
-## 세 축 완료 작업 (7)
+<a id="work-1"></a>
 
-항목 ID를 누르면 아래의 완료조건·근거를 펼쳐 확인할 수 있다.
+### 기반·모듈 · 독립 실행 작업 (1)
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [R00](<16-architecture-and-validation.md#r00>) P1 | 현재 동작과 데이터 기준 고정 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
-| [R02](<16-architecture-and-validation.md#r02>) P1 | 모듈 경계와 계약 검사 기반 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
-| [R09](<16-architecture-and-validation.md#r09>) P1 | 모델 연결과 제공자 adapter 경계 분리 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
-| [G001](<16-architecture-and-validation.md#g001>) P1 | rhwp 고정 소스·Rust/WASM 검수 빌드 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
-| [G002](<16-architecture-and-validation.md#g002>) P1 | 제3자 고지와 실행 묶음 고지 포함 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
-| [G003](<16-architecture-and-validation.md#g003>) P1 | Windows 독립 검수 실행기·포트 분리 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
-| [G004](<16-architecture-and-validation.md#g004>) P1 | 앱/엔진 소스와 검수 자산 해시 대조 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+| [R00](<16-architecture-and-validation.md#r00>) · 작업 | 현재 동작과 데이터 기준 고정 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+| [R01](<16-architecture-and-validation.md#r01>) · 작업 | 모듈별 공개 계약과 상태 소유권 고정 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [R02](<16-architecture-and-validation.md#r02>) · 작업 | 모듈 경계와 계약 검사 기반 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+| [R03](<16-architecture-and-validation.md#r03>) · 작업 | Composition Root와 호환 진입점 준비 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [R04](<16-architecture-and-validation.md#r04>) · 작업 | Document facade와 rhwp adapter 분리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [R05](<16-architecture-and-validation.md#r05>) · 작업 | 파일 저장과 복구 유스케이스 분리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [R06](<16-architecture-and-validation.md#r06>) · 작업 | 업무와 채팅 모델 및 저장 Port 분리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [R07](<16-architecture-and-validation.md#r07>) · 작업 | 자료와 검색 경계 분리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+
+<a id="work-2"></a>
+
+### 기반·모듈 · 독립 실행 작업 (2)
+
+| ID | 항목 | 구현 | 검증 | Agent 연결 |
+| --- | --- | --- | --- | --- |
+| [R08](<16-architecture-and-validation.md#r08>) · 작업 | 환경과 보기 상태 모듈 분리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [R09](<16-architecture-and-validation.md#r09>) · 작업 | 모델 연결과 제공자 adapter 경계 분리 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+| [R10](<16-architecture-and-validation.md#r10>) · 작업 | Agent 실행과 context 조립 분리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [R11](<16-architecture-and-validation.md#r11>) · 작업 | 매크로와 업무 템플릿 경계 분리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [R12](<16-architecture-and-validation.md#r12>) · 작업 | Session과 UI controller로 shell 해체 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [R13](<16-architecture-and-validation.md#r13>) · 작업 | iframe와 빌드 패치 의존을 adapter로 격리 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [R14](<16-architecture-and-validation.md#r14>) · 작업 | 기존 상태와 자격증명 호환 최종 검수 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [R15](<16-architecture-and-validation.md#r15>) · 작업 | 통합 회귀와 모듈별 변경 영향 검증 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+
+<a id="work-3"></a>
+
+### 기반·모듈 · 독립 실행 작업 (3)
+
+| ID | 항목 | 구현 | 검증 | Agent 연결 |
+| --- | --- | --- | --- | --- |
+| [G001](<16-architecture-and-validation.md#g001>) · 작업 | rhwp 고정 소스·Rust/WASM 검수 빌드 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+| [G002](<16-architecture-and-validation.md#g002>) · 작업 | 제3자 고지와 실행 묶음 고지 포함 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+| [G003](<16-architecture-and-validation.md#g003>) · 작업 | Windows 독립 검수 실행기·포트 분리 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+| [G004](<16-architecture-and-validation.md#g004>) · 작업 | 앱/엔진 소스와 검수 자산 해시 대조 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+
+<a id="work-4"></a>
+
+### 저장·호환성 · 독립 실행 작업
+
+| ID | 항목 | 구현 | 검증 | Agent 연결 |
+| --- | --- | --- | --- | --- |
+| [N041](<16-architecture-and-validation.md#n041>) · 작업 | 독립 한글에서 복합 코퍼스 일괄 검수 | ☐ 미구현 | ☐ 미검증 | — 해당 없음 |
+| [N042](<16-architecture-and-validation.md#n042>) · 작업 | 한글·Jueony 인쇄/PDF 조판 비교 | ☐ 미구현 | ☐ 미검증 | — 해당 없음 |
+| [N043](<16-architecture-and-validation.md#n043>) · 작업 | 실제 Windows 파일 picker·권한·외부 수정 | ◐ 부분 | ☐ 미검증 | — 해당 없음 |
+| [N044](<16-architecture-and-validation.md#n044>) · 작업 | 비정상 종료·저장 실패·복구 통합 | ◐ 부분 | ☐ 미검증 | — 해당 없음 |
+| [N045](<16-architecture-and-validation.md#n045>) · 작업 | 기관 배포용 완전 오프라인 자산/허용 서버 정책 | ◐ 부분 | ☐ 미검증 | — 해당 없음 |
 
 ## 항목별 완료조건·근거
 

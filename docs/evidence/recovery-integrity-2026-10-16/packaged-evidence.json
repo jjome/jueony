@@ -1,0 +1,67 @@
+{
+  "implementationCommit": "9709290ae89f67afbb1edbd4bd98ad35a039b2d6",
+  "bundle": "build/jueony-recovery-integrity-20261016",
+  "count": 12,
+  "files": [
+    {
+      "path": "boundaries.json",
+      "sha256": "276ef6a7b1871d91c1bcc57ca08caf64888073e3372e33794264ef5cca1710ad"
+    },
+    {
+      "path": "integrity-browser/result.json",
+      "sha256": "c4f9a9cae9296c792af6578d737acc32a31d278b4f2fbe6628bd31634b470bab"
+    },
+    {
+      "path": "launcher-check.json",
+      "sha256": "f322a5d0dd2aa57455d78e6d433e48e7f893b760714581bdc76e466bb2f06926"
+    },
+    {
+      "path": "README.md",
+      "sha256": "19f69856ee04d109c6b4877984e1b3720396385295e9079c725a5d007323f7ef"
+    },
+    {
+      "path": "recovered-saved-hwp.hwp",
+      "sha256": "a4c5e029bac8954c5c7e87673f1bdbb08250e9e78bd6025b6c4341147f10f87f"
+    },
+    {
+      "path": "recovered-saved-hwpx.hwpx",
+      "sha256": "230c9d78ab9633700aada9400e848857f9c79a47025e4a86bc084078a57f1c0d"
+    },
+    {
+      "path": "save-browser/result.json",
+      "sha256": "66adc3a2dd54b72c773467d6c5eed2aeed2707ee1239cfa5e985775ef0441f9c"
+    },
+    {
+      "path": "source-baseline-notes.json",
+      "sha256": "163f35e5233b02ca9928c257697fdd052b7d4a80a761920cc1d38c16aeecb8e0"
+    },
+    {
+      "path": "story-browser/result.json",
+      "sha256": "8acddacc170c3dd6efade898cfc9d4803ddda36ec4d469c3072ce1a5d3766e58"
+    },
+    {
+      "path": "typescript.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "unit-tests.txt",
+      "sha256": "2ef165ee78bba51b80fc3fe9fcd44d1f903c951b2a02cde4ff6c9659202d3cbb"
+    },
+    {
+      "path": "verification-summary.json",
+      "sha256": "8be7e6d8cb5d7c500d43bcd3e97b8c1b02d31f59221eabe1d10504fac3a859e1"
+    }
+  ],
+  "reviewDocumentCount": 2,
+  "reviewDocuments": [
+    {
+      "path": "recovered-saved-hwp.hwp",
+      "sha256": "a4c5e029bac8954c5c7e87673f1bdbb08250e9e78bd6025b6c4341147f10f87f"
+    },
+    {
+      "path": "recovered-saved-hwpx.hwpx",
+      "sha256": "230c9d78ab9633700aada9400e848857f9c79a47025e4a86bc084078a57f1c0d"
+    }
+  ],
+  "excluded": "Own persistent Edge profile, intentionally damaged drafts and mutable server logs are not packaged. This manifest does not hash itself."
+}

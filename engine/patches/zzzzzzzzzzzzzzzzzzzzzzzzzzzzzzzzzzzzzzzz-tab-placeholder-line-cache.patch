@@ -1,0 +1,121 @@
+--- a/src/serializer/hwpx/section.rs
++++ b/src/serializer/hwpx/section.rs
+@@ -893,7 +893,18 @@
+         .max(serialized_axis_end)
+         .saturating_add(injected_prefix_units)
+         .saturating_sub(hwp5_only_units);
+-    let axis_line_segs = if para.stored_text_partition_is_dirty() {
++    // A zero-width placeholder is not a resolved advance. Hancom trusts a
++    // retained LINE_SEG cache and can consequently render A\tB\tC collapsed
++    // even though the section's default tab interval is correct. Ask the
++    // consumer to compose this paragraph, as for other invalid layout caches.
++    // Only tabs actually present in text participate; saved nonzero widths and
++    // unknown/leader-bearing zero-width records keep their original cache.
++    let unresolved_tab_width = para.text.chars().filter(|&c| c == '\t').enumerate().any(
++        |(index, _)| para.tab_extended.get(index).map_or(true, |ext| {
++            crate::model::paragraph::tab_ext_is_placeholder(ext)
++        }),
++    );
++    let axis_line_segs = if para.stored_text_partition_is_dirty() || unresolved_tab_width {
+         // The retained rows are an edit-reflow template, not a partition of
+         // the current text. Omit the cache and let the consumer recompute it.
+         &source_line_segs[..0]
+@@ -5392,6 +5403,98 @@
+ 
+     use crate::model::paragraph::LineSeg;
+ 
++    fn g069_tab_cache_fixture(text: &str, tabs: Vec<[u16; 7]>) -> Paragraph {
++        Paragraph {
++            text: text.to_string(),
++            tab_extended: tabs,
++            line_segs: vec![LineSeg {
++                text_start: 0,
++                vertical_pos: 1600,
++                line_height: 1000,
++                text_height: 1000,
++                baseline_distance: 850,
++                line_spacing: 600,
++                column_start: 0,
++                segment_width: 42520,
++                tag: 393216,
++            }],
++            ..Default::default()
++        }
++    }
++
++    fn g069_render_tab_cache_fixture(para: Paragraph) -> String {
++        let (doc, section) = make_doc_with_paragraph(para);
++        let mut ctx = SerializeContext::collect_from_document(&doc);
++        String::from_utf8(write_section(&section, &doc, 0, &mut ctx).unwrap()).unwrap()
++    }
++
++    #[test]
++    fn g069_placeholder_and_implicit_tabs_omit_only_unresolved_cache() {
++        use crate::model::paragraph::TAB_EXT_PLACEHOLDER;
++        for tabs in [vec![], vec![TAB_EXT_PLACEHOLDER; 2], vec![[0, 0, 0x0100, 0, 0, 0, 9]; 2]] {
++            let para = g069_tab_cache_fixture("A\tB\tC", tabs);
++            let cached_before = para.line_segs.clone();
++            let xml = g069_render_tab_cache_fixture(para.clone());
++            assert!(!xml.contains("<hp:linesegarray"));
++            assert_eq!(xml.matches(r#"<hp:tab width="0" leader="0" type="1"/>"#).count(), 2);
++            assert_eq!(para.line_segs, cached_before, "serialization must not mutate live cache");
++            let reparsed = crate::parser::hwpx::section::parse_hwpx_section(&xml).unwrap();
++            assert_eq!(reparsed.paragraphs[0].text, "A\tB\tC");
++        }
++    }
++
++    #[test]
++    fn g069_resolved_and_unknown_zero_tab_records_keep_cache() {
++        for ext in [[3000, 0, 0x0100, 0, 0, 0, 9], [0, 0, 0x0500, 0, 0, 0, 9], [0, 0, 0x0101, 0, 0, 0, 9], [0, 0, 0x0100, 1, 0, 0, 9]] {
++            assert!(!crate::model::paragraph::tab_ext_is_placeholder(&ext));
++            let xml = g069_render_tab_cache_fixture(g069_tab_cache_fixture("A\tB", vec![ext]));
++            assert!(xml.contains("<hp:linesegarray>"));
++            assert!(xml.contains(r#"vertpos="1600""#));
++        }
++        // Unused tab metadata must not invalidate a paragraph without tabs.
++        let xml = g069_render_tab_cache_fixture(g069_tab_cache_fixture("AB", vec![crate::model::paragraph::TAB_EXT_PLACEHOLDER]));
++        assert!(xml.contains("<hp:linesegarray>"));
++    }
++
++    #[test]
++    fn g069_mixed_tabs_keep_saved_width_and_ordinal() {
++        let xml = g069_render_tab_cache_fixture(g069_tab_cache_fixture("A\tB\tC", vec![crate::model::paragraph::TAB_EXT_PLACEHOLDER, [3000, 0, 0x0100, 0, 0, 0, 9]]));
++        assert!(!xml.contains("<hp:linesegarray"));
++        assert!(xml.contains(r#"<hp:tab width="0" leader="0" type="1"/>"#));
++        assert!(xml.contains(r#"<hp:tab width="3000" leader="0" type="1"/>"#));
++        let reparsed = crate::parser::hwpx::section::parse_hwpx_section(&xml).unwrap();
++        assert!(crate::model::paragraph::tab_ext_is_placeholder(&reparsed.paragraphs[0].tab_extended[0]));
++        assert_eq!(reparsed.paragraphs[0].tab_extended[1][0], 3000);
++    }
++
++    #[test]
++    fn g069_three_section_intervals_survive_repeated_serialization() {
++        let mut doc = Document::default();
++        for spacing in [2000, 4000, 6000] {
++            let mut section = Section::default();
++            section.section_def.default_tab_spacing = spacing;
++            section.paragraphs.push(g069_tab_cache_fixture("A\tB\tC", vec![]));
++            doc.sections.push(section);
++        }
++        for (index, spacing) in [2000, 4000, 6000].iter().enumerate() {
++            let section = &doc.sections[index];
++            let mut ctx = SerializeContext::collect_from_document(&doc);
++            let xml = String::from_utf8(write_section(section, &doc, index, &mut ctx).unwrap()).unwrap();
++            assert!(!xml.contains("<hp:linesegarray"));
++            let reparsed = crate::parser::hwpx::section::parse_hwpx_section(&xml).unwrap();
++            assert_eq!(reparsed.section_def.default_tab_spacing, *spacing);
++            assert_eq!(reparsed.paragraphs[0].text, "A\tB\tC");
++            let mut next_doc = Document::default();
++            next_doc.sections.push(reparsed.clone());
++            let mut next_ctx = SerializeContext::collect_from_document(&next_doc);
++            let next_xml = String::from_utf8(write_section(&reparsed, &next_doc, 0, &mut next_ctx).unwrap()).unwrap();
++            assert!(!next_xml.contains("<hp:linesegarray"));
++            let second = crate::parser::hwpx::section::parse_hwpx_section(&next_xml).unwrap();
++            assert_eq!(second.section_def.default_tab_spacing, *spacing);
++            assert_eq!(second.paragraphs[0].text, "A\tB\tC");
++        }
++    }
++
+     #[test]
+     fn task177_lineseg_reflects_ir_values() {
+         // IR에 담긴 lineseg 값이 XML 속성에 그대로 반영되는지 확인.

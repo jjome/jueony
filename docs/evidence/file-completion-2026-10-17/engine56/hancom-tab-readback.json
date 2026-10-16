@@ -1,0 +1,108 @@
+{
+  "productionCandidateSourceId": "3a01e912b92dc8af",
+  "inputUnchanged": true,
+  "actualSavedSha256": "de0f37838d68a26b7184586921b55a3d6d4a498c7b3ba3c597ab5f0e4e31844a",
+  "rawSections": [
+    {
+      "section": "Contents/section0.xml",
+      "tabStop": "4000",
+      "tabStopVal": "2000",
+      "tabStopUnit": "HWPUNIT",
+      "tabs": [
+        {
+          "width": "1292",
+          "leader": "0",
+          "type": "1"
+        },
+        {
+          "width": "1396",
+          "leader": "0",
+          "type": "1"
+        }
+      ]
+    },
+    {
+      "section": "Contents/section1.xml",
+      "tabStop": "8000",
+      "tabStopVal": "4000",
+      "tabStopUnit": "HWPUNIT",
+      "tabs": [
+        {
+          "width": "3292",
+          "leader": "0",
+          "type": "1"
+        },
+        {
+          "width": "3396",
+          "leader": "0",
+          "type": "1"
+        }
+      ]
+    },
+    {
+      "section": "Contents/section2.xml",
+      "tabStop": "12000",
+      "tabStopVal": "6000",
+      "tabStopUnit": "HWPUNIT",
+      "tabs": [
+        {
+          "width": "5292",
+          "leader": "0",
+          "type": "1"
+        },
+        {
+          "width": "5396",
+          "leader": "0",
+          "type": "1"
+        }
+      ]
+    }
+  ],
+  "semanticCount": 6,
+  "semanticDifferences": [
+    {
+      "path": "$[\"styles\"][9][\"details\"][\"paraProps\"][\"headType\"]",
+      "before": "Outline",
+      "after": "None",
+      "kind": "value"
+    },
+    {
+      "path": "$[\"styles\"][9][\"details\"][\"paraProps\"][\"paraLevel\"]",
+      "before": 7,
+      "after": 0,
+      "delta": -7
+    },
+    {
+      "path": "$[\"styles\"][10][\"details\"][\"paraProps\"][\"headType\"]",
+      "before": "Outline",
+      "after": "None",
+      "kind": "value"
+    },
+    {
+      "path": "$[\"styles\"][10][\"details\"][\"paraProps\"][\"paraLevel\"]",
+      "before": 8,
+      "after": 0,
+      "delta": -8
+    },
+    {
+      "path": "$[\"styles\"][11][\"details\"][\"paraProps\"][\"headType\"]",
+      "before": "Outline",
+      "after": "None",
+      "kind": "value"
+    },
+    {
+      "path": "$[\"styles\"][11][\"details\"][\"paraProps\"][\"paraLevel\"]",
+      "before": 9,
+      "after": 0,
+      "delta": -9
+    }
+  ],
+  "geometryCount": 0,
+  "pages": {
+    "before": 3,
+    "after": 3,
+    "equal": true
+  },
+  "status": "DIFFERENT_OR_UNREADABLE",
+  "scope": "Root actual Hancom20/40/60pt3sectionvisualPASS. Independent ZIPinterval/tabadvancePASS. Whole semantic contract stillDIFFERENT unless six list definition default discrepancies are resolved; no normalization."
+}

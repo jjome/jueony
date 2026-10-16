@@ -2,7 +2,7 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {assertOverlapSaveLayout,OverlapSaveLayoutError} from '../src/adapters/rhwp/overlap-save-layout.ts';
 function reader(){const d:any={active:false,freed:0,changes:[]};Object.assign(d,{getSourceFormat:()=>'hwp',getDocumentInfo:()=>({version:'5.1.0.0',hwp3Variant:false}),getControls:()=>[{ctrlId:'tbl',list:0,para:0,controlIndex:0},{ctrlId:'tbl',list:0,para:1,controlIndex:0}],getSectionCount:()=>1,getParagraphCount:()=>2,getTableProperties:()=>({allowOverlap:true}),pageCount:()=>1,canvasMetricsActive:()=>d.active,selectCanvasMetrics:(v:boolean)=>{d.changes.push(v);d.active=v;},free:()=>d.freed++,getPageControlLayout:()=>({controls:[{type:'table',secIdx:0,paraIdx:1,controlIdx:0,x:0,y:30,w:50,h:20,cells:[{cellIdx:0,row:0,col:0,x:0,y:30,w:50,h:20}]}]}),getPageTextLayout:()=>({runs:[{text:'same',x:0,y:35,w:20,h:10,charX:[0,5,10,15,20],charShapeId:0}]})});return d;}
 const bytes=new Uint8Array([1]);
-test('unknown reader, other input/output formats and HWP3 are outside this narrow rule',()=>{assert.equal(assertOverlapSaveLayout({},bytes,'hwp',()=>{throw Error();}).status,'not-applicable');for(const mode of ['hwpx-source','hml-source','hwp3','hwpx-output']){const d=reader();if(mode==='hwpx-source')d.getSourceFormat=()=>'hwpx';if(mode==='hml-source')d.getSourceFormat=()=>'hml';if(mode==='hwp3')d.getDocumentInfo=()=>({version:'3.0.0.0',hwp3Variant:true});d.getControls=()=>{throw Error('must not query');};assert.equal(assertOverlapSaveLayout(d,bytes,mode==='hwpx-output'?'hwpx':'hwp',()=>{throw Error();}).status,'not-applicable');}});
+test('unknown reader, other input/output formats and HWP3 are outside this narrow rule',()=>{assert.equal(assertOverlapSaveLayout({},bytes,'hwp',()=>{throw Error();}).status,'not-applicable');for(const mode of ['hwpx-source','hml-source','hwp3','hml-output']){const d=reader();if(mode==='hwpx-source')d.getSourceFormat=()=>'hwpx';if(mode==='hml-source')d.getSourceFormat=()=>'hml';if(mode==='hwp3')d.getDocumentInfo=()=>({version:'3.0.0.0',hwp3Variant:true});d.getControls=()=>{throw Error('must not query');};assert.equal(assertOverlapSaveLayout(d,bytes,mode==='hml-output'?'hml':'hwp',()=>{throw Error();}).status,'not-applicable');}});
 test('empty, one-table, nonadjacent and nonoverlap readers need no geometry getters',()=>{for(const mode of ['empty','single','separate','nonoverlap']){const d=reader();if(mode==='empty')d.getControls=()=>[];if(mode==='single')d.getControls=()=>[{ctrlId:'tbl',list:0,para:0,controlIndex:0}];if(mode==='separate')d.getControls=()=>[{ctrlId:'tbl',list:0,para:0,controlIndex:0},{ctrlId:'tbl',list:0,para:3,controlIndex:0}];if(mode==='nonoverlap')d.getTableProperties=()=>({allowOverlap:false});delete d.getPageTextLayout;assert.equal(assertOverlapSaveLayout(d,bytes,'hwp',()=>{throw Error();}).status,'not-applicable');}});
 test('adjacent flattened roots across section boundary are not a following-table pair',()=>{const d=reader();d.getSectionCount=()=>2;d.getParagraphCount=()=>1;delete d.getTableProperties;assert.equal(assertOverlapSaveLayout(d,bytes,'hwp',()=>{throw Error();}).status,'not-applicable');});
 test('known raw geometry matches without dropping storage IDs or other returned fields',()=>{const d=reader(),r=reader();assert.deepEqual(assertOverlapSaveLayout({borrowDocumentHandle:()=>d},bytes,'hwp',()=>r),{status:'checked',targets:1,pages:1});assert.equal(r.freed,1);assert.equal(d.active,false);assert.deepEqual(d.changes,[]);});
@@ -14,3 +14,29 @@ test('Canvas temporarily selects portable metrics and is restored on success',()
 test('Canvas is restored and reopened handle freed after changed/unreadable geometry',()=>{for(const mode of ['changed','get-throw','reopen-throw']){const d=reader(),r=reader();d.active=true;if(mode==='changed'){const get=r.getPageControlLayout;r.getPageControlLayout=()=>{const p=get();p.controls[0].y=256;return p;};}if(mode==='get-throw')r.getPageTextLayout=()=>{throw Error('injected');};assert.throws(()=>assertOverlapSaveLayout(d,bytes,'hwp',()=>{if(mode==='reopen-throw')throw Error('injected');return r;}),OverlapSaveLayoutError);assert.equal(d.active,true);assert.deepEqual(d.changes,[false,true]);assert.equal(r.freed,mode==='reopen-throw'?0:1);}});
 test('portable selection failure still restores the original active environment',()=>{const d=reader();d.active=true;d.selectCanvasMetrics=(v:boolean)=>{d.active=v;if(!v)throw Error('injected');};assert.throws(()=>assertOverlapSaveLayout(d,bytes,'hwp',()=>reader()),OverlapSaveLayoutError);assert.equal(d.active,true);});
 test('unobservable metric mode for a known target is rejected without assuming portable',()=>{const d=reader();delete d.canvasMetricsActive;assert.throws(()=>assertOverlapSaveLayout(d,bytes,'hwp',()=>reader()),OverlapSaveLayoutError);});
+
+
+test('native HWP5 and exact HWP5-origin HWPX both guard HWP and HWPX outputs',()=>{
+ for(const source of ['hwp','hwpx'])for(const output of ['hwp','hwpx']){
+  const d=reader(),r=reader();d.getSourceFormat=()=>source;
+  if(source==='hwpx')d.getDocumentInfo=()=>({version:'0.0.0.0',hwp3Variant:false,hwp5OriginHwpx:true});
+  assert.equal(assertOverlapSaveLayout(d,bytes,output,()=>r).status,'checked');assert.equal(r.freed,1);
+ }
+});
+test('HWPX provenance must be an exact boolean from the engine; HWP3 and native unknown version stay excluded',()=>{
+ for(const marker of [undefined,false,1,'true',null]){
+  const d=reader();d.getSourceFormat=()=>'hwpx';d.getDocumentInfo=()=>({version:'5.1.0.0',hwp3Variant:false,hwp5OriginHwpx:marker});d.getControls=()=>{throw Error('no geometry for unproven HWPX');};
+  assert.equal(assertOverlapSaveLayout(d,bytes,'hwpx',()=>{throw Error('not opened');}).status,'not-applicable');
+ }
+ for(const source of ['hwp','hwpx']){
+  const d=reader();d.getSourceFormat=()=>source;d.getDocumentInfo=()=>({version:'3.0.0.0',hwp3Variant:true,hwp5OriginHwpx:true});assert.equal(assertOverlapSaveLayout(d,bytes,'hwpx',()=>reader()).status,'not-applicable');
+ }
+ const d=reader();d.getDocumentInfo=()=>({version:'0.0.0.0',hwp3Variant:false,hwp5OriginHwpx:true});assert.equal(assertOverlapSaveLayout(d,bytes,'hwpx',()=>reader()).status,'not-applicable');
+});
+test('HWP to HWPX and marked HWPX exports reject full-layout corruption at unchanged 0.2 tolerance and restore Canvas',()=>{
+ for(const source of ['hwp','hwpx'])for(const output of ['hwp','hwpx']){
+  const d=reader(),r=reader();d.active=true;d.getSourceFormat=()=>source;if(source==='hwpx')d.getDocumentInfo=()=>({hwp3Variant:false,hwp5OriginHwpx:true});
+  const get=r.getPageTextLayout;r.getPageTextLayout=()=>{const p=get();p.runs[0].charX[2]+=0.201;return p;};let writes=0;
+  assert.throws(()=>{assertOverlapSaveLayout(d,bytes,output,()=>r);writes++;},(e:any)=>e instanceof OverlapSaveLayoutError&&e.code==='changed');assert.equal(writes,0);assert.equal(r.freed,1);assert.equal(d.active,true);assert.deepEqual(d.changes,[false,true]);
+ }
+});

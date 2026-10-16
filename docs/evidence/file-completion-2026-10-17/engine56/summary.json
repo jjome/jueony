@@ -1,0 +1,98 @@
+{
+  "sourceId": "3a01e912b92dc8af",
+  "patchCount": 56,
+  "wasmSha256": "1f8ec5265a09af4747ee604003f2a2de7af282ebd32791773d6f29f26d89493a",
+  "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+  "distEngineHashMatches": true,
+  "ownedPatchMatches": [
+    {
+      "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-origin-hwpx-query.patch",
+      "sha256": "e419b33ca35e25c63b2ec40ba99cec33a7dee2690d3035e070cca2c9efa23581"
+    },
+    {
+      "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-line-cache.patch",
+      "sha256": "2629f5073faed3d9b4f121cb71116143879085396b3ef3421e26a6c4adff64a0"
+    }
+  ],
+  "tabs": {
+    "path": "build/tab-cache-final56/result.json",
+    "pass": 12,
+    "fail": 0
+  },
+  "guard": {
+    "path": "build/overlap-format-engine-final56-fixture-corrected/result.json",
+    "pass": 18,
+    "fail": 0
+  },
+  "browser": {
+    "path": "build/overlap-format-browser-final56-local-edge/result.json",
+    "pass": 3,
+    "fail": 0
+  },
+  "publicStrict": {
+    "path": "build/public-strict-final56/manifest.json",
+    "pass": 4,
+    "fail": 0
+  },
+  "limits": [
+    "Actual Hancom HWP binary tab review remains root-owned and pending.",
+    "Actual Hancom tab body/interval geometry passes, but six style differences prevent full semantic equality.",
+    "Public Hancom final53 comparisons still2/8PASS and6FAIL; final56 publicstrict4/4 is same-engine conversion only.",
+    "Root actual HWP textbox damage is a separate defect; not fixed by query/cache changes."
+  ],
+  "rust": {
+    "path": "build/tab-cache-final56/rust-g069-private-complete.log",
+    "pass": 4,
+    "fail": 0,
+    "ignored": 0,
+    "privateSourceManifest": "build/tab-cache-final56/private-test-source-manifest.json",
+    "sourceHashMatches": 1059,
+    "scope": "Full formal56 code with exact existing upstream assets/licenses. No dummy/synthetic replacement for missing fixtures, no system fonts. Four g069 tests ran;3891 unrelated library tests filtered by explicit name."
+  },
+  "unit": {
+    "path": "build/native-subagent-unit-final56.log",
+    "pass": 36,
+    "fail": 0,
+    "skipped": 0
+  },
+  "actualHancomTab": {
+    "path": "build/tab-cache-final56/actual-hancom-readback.json",
+    "bodyVisualThreeIntervals": "PASS,rootUI",
+    "rawIntervalsAndPositiveTabAdvances": "PASS",
+    "inputUnchanged": true,
+    "fullGeometryDifferences": 0,
+    "fullSemanticDifferences": 6,
+    "fullContractStatus": "DIFFERENT_OR_UNREADABLE",
+    "semanticDifferenceScope": "Unused style[9..11] Outline/paraLevel7..9 becomesNone/0. Not waived."
+  },
+  "artifacts": [
+    {
+      "path": "build/tab-cache-final56/result.json",
+      "sha256": "7e7d36a96cff8050a8dfb347f97e8d9f399023b993355149670bb9cb85101f2c"
+    },
+    {
+      "path": "build/overlap-format-engine-final56-fixture-corrected/result.json",
+      "sha256": "6ccbffb7c9517853530ea04f0fe0c620039dbf11f6ba501ba350b8d2ae8c4c1b"
+    },
+    {
+      "path": "build/overlap-format-browser-final56-local-edge/result.json",
+      "sha256": "6290bba44eeb71b7ec1f3291ab091a963ce870f29533bfe079b3171943125bb8"
+    },
+    {
+      "path": "build/public-strict-final56/manifest.json",
+      "sha256": "3f5ab47996c8b83dfac8759e734d622ccdf9d760239487e40196862d6300cee7"
+    },
+    {
+      "path": "build/tab-cache-final56/rust-g069-private-complete.log",
+      "sha256": "56fce651d307ea3c4c569ed959d5dc54f4f22cfa05b970c70cc769db60ab7269"
+    },
+    {
+      "path": "build/native-subagent-unit-final56.log",
+      "sha256": "ce842bf8d9648d275363c8dcc26162103814f0aebc0e67a26f59387e6635c43a"
+    },
+    {
+      "path": "build/tab-cache-final56/actual-hancom-readback.json",
+      "sha256": "3781bc3717a43fe38079da91363a8759bd33f3212fd945bdb9ff2dc15d2105df"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/tab-cache-final56/private-test-source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 16s
+     Running unittests src/lib.rs (/tmp/jueony-rhwp-engine/target/pr-review/debug/deps/rhwp-ce73103f82fd2fcb)
+
+running 4 tests
+test serializer::hwpx::section::tests::g069_resolved_and_unknown_zero_tab_records_keep_cache ... ok
+test serializer::hwpx::section::tests::g069_mixed_tabs_keep_saved_width_and_ordinal ... ok
+test serializer::hwpx::section::tests::g069_placeholder_and_implicit_tabs_omit_only_unresolved_cache ... ok
+test serializer::hwpx::section::tests::g069_three_section_intervals_survive_repeated_serialization ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 3891 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/tmp/jueony-rhwp-engine/target/pr-review/debug/deps/rhwp_contracts-1f7aab6206aba949)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 15 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/tmp/jueony-rhwp-engine/target/pr-review/debug/deps/rhwp_ooxml_chart-2a437da09e382cce)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 165 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (/tmp/jueony-rhwp-engine/target/pr-review/debug/deps/rhwp_password_crypto-88dfeafa062a37fc)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+

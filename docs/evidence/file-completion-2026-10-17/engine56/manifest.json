@@ -1,0 +1,67 @@
+{
+  "scope": "Formal56 supported cross-format flow and HWPX placeholder cache validation. NOT whole file-module completion. ActualHWP tab collapse, textbox corruption and public Hancom layout differences remain tracked separately.",
+  "files": [
+    {
+      "source": "build/native-subagent-final56-summary.json",
+      "path": "summary.json",
+      "sha256": "7c95b061ad479cf8082aeaf191b64e3c6527463f9a8a5ac1ce354b5871d11cac",
+      "bytes": 3838
+    },
+    {
+      "source": "build/tab-cache-final56/result.json",
+      "path": "tab-cache-result.json",
+      "sha256": "7e7d36a96cff8050a8dfb347f97e8d9f399023b993355149670bb9cb85101f2c",
+      "bytes": 35325
+    },
+    {
+      "source": "build/overlap-format-engine-final56-fixture-corrected/result.json",
+      "path": "format-guard-native.json",
+      "sha256": "6ccbffb7c9517853530ea04f0fe0c620039dbf11f6ba501ba350b8d2ae8c4c1b",
+      "bytes": 30333
+    },
+    {
+      "source": "build/overlap-format-browser-final56-local-edge/result.json",
+      "path": "format-guard-edge.json",
+      "sha256": "6290bba44eeb71b7ec1f3291ab091a963ce870f29533bfe079b3171943125bb8",
+      "bytes": 60427
+    },
+    {
+      "source": "build/conversion-final56/result.json",
+      "path": "original-hancom-conversion.json",
+      "sha256": "15eb14e70ca14f868e4bfc5709994eaf076ae7c43f8e76b3a15c054f5002ba46",
+      "bytes": 68967
+    },
+    {
+      "source": "build/tab-cache-final56/actual-hancom-readback.json",
+      "path": "hancom-tab-readback.json",
+      "sha256": "3781bc3717a43fe38079da91363a8759bd33f3212fd945bdb9ff2dc15d2105df",
+      "bytes": 2689
+    },
+    {
+      "source": "build/tab-cache-final56/rust-g069-private-complete.log",
+      "path": "rust-g069.log",
+      "sha256": "56fce651d307ea3c4c569ed959d5dc54f4f22cfa05b970c70cc769db60ab7269",
+      "bytes": 1557
+    },
+    {
+      "source": "build/feature-doc-evidence-20261017-file/table-rendering.json",
+      "path": "feature-tables.json",
+      "sha256": "b889da9be51165006eeb49e7e790a000c3622985655e0f477cb00b6b9c15bf50",
+      "bytes": 21489
+    }
+  ],
+  "unit": {
+    "testCount": 839,
+    "passCount": 839,
+    "skipCount": 0,
+    "failCount": 0,
+    "log": "build/file-completion-engine56-unit-with-engine.log",
+    "sha256": "02f4b3783df5c7a1645e6a6a392a36064645752ade97d55419a16dc67c8f2d3c"
+  },
+  "limits": [
+    "HWP placeholder cache still collapses in actual Hancom until later binary writer fix.",
+    "New native HWP textbox still corrupt until later new-shape flag fix.",
+    "Mixed bold long-line conversion has a separate known failure.",
+    "Actual public Hancom8 comparisons2pass6fail; same-engine4strict pass does not establish external layout equivalence."
+  ]
+}

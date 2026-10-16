@@ -13,8 +13,11 @@ function targets(d:Native):Target[]{
  // Unknown provenance is not evidence that this narrowly scoped rule applies.
  // In particular it must not block unrelated minimal preservation-test readers.
  if(typeof d?.getSourceFormat!=='function'||typeof d?.getDocumentInfo!=='function')return [];
- let info:any;try{if(d.getSourceFormat()!=='hwp')return [];info=json(d.getDocumentInfo());}catch{return [];}
- if(info?.hwp3Variant!==false||typeof info.version!=='string'||!info.version.startsWith('5.'))return [];
+ let info:any,format:any;try{format=d.getSourceFormat();info=json(d.getDocumentInfo());}catch{return [];}
+ if(info?.hwp3Variant!==false)return [];
+ if(format==='hwp'){
+  if(typeof info.version!=='string'||!info.version.startsWith('5.'))return [];
+ }else if(format!=='hwpx'||info.hwp5OriginHwpx!==true)return [];
  if(typeof d.getControls!=='function')return [];
  let controls:any;try{controls=json(d.getControls());}catch{return [];}
  if(!Array.isArray(controls))return [];
@@ -66,12 +69,12 @@ function same(a:any,b:any):boolean {
  if(a&&b&&typeof a==='object')return Object.keys(a).length===Object.keys(b).length&&Object.keys(a).every(k=>Object.hasOwn(b,k)&&same(a[k],b[k]));
  return a===b;
 }
-/** A fail-closed check for the known native-HWP adjacent overlapping-table
- * source only. It compares raw public control/text layout without projecting,
+/** A fail-closed check for known native-HWP5 or explicitly marked HWP5-origin
+ * HWPX adjacent overlapping tables. It compares raw public layout without projecting,
  * rounding, rebasing, substituting or normalizing any returned geometry.
  * It does not claim general document-format or Hancom layout equivalence. */
 export function assertOverlapSaveLayout(source:Native,bytes:Uint8Array,format:string,reopen:(bytes:Uint8Array)=>Native):OverlapSaveLayoutReport {
- if(format!=='hwp')return {status:'not-applicable',targets:0};
+ if(format!=='hwp'&&format!=='hwpx')return {status:'not-applicable',targets:0};
  const d=native(source),expected=targets(d);if(!expected.length)return {status:'not-applicable',targets:0};
  let restore=false,r:Native;
  try{

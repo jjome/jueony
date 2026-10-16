@@ -1,0 +1,125 @@
+diff --git a/src/renderer/layout/text_measurement.rs b/src/renderer/layout/text_measurement.rs
+--- a/src/renderer/layout/text_measurement.rs
++++ b/src/renderer/layout/text_measurement.rs
+@@ -991,6 +991,82 @@
+     hwp as f64 / 75.0
+ }
+ 
++/// Hancom 2024's regular HCR Batang Hangul advance is rounded to four HWPUNITs.
++/// Independent text-only controls distinguish nearest rounding from ceiling:
++/// 9pt 873 -> 872, 9.5pt 921 -> 920, 10pt 970 -> 972, 20pt 1940 -> 1940.
++/// This is a glyph-program rule, not a wider line-fit tolerance or a change to
++/// the document's font/spacing properties. Unmeasured faces and explicit width,
++/// tracking, script or weight transforms keep their existing measurement.
++fn regular_hcr_hangul_advance(
++    family: &str,
++    ch: char,
++    style: &TextStyle,
++    ratio: f64,
++    letter_spacing: f64,
++    advance: f64,
++) -> Option<f64> {
++    let family = family.split(',').next().unwrap_or(family).trim();
++    if !matches!(family, "함초롬바탕" | "HCR Batang")
++        || !matches!(ch, '\u{AC00}'..='\u{D7A3}')
++        || style.bold
++        || style.italic
++        || style.superscript
++        || style.subscript
++        || style.hft_hangul_face
++        || style.hft_fullwidth_dot
++        || ratio != 1.0
++        || letter_spacing != 0.0
++        || !advance.is_finite()
++        || advance < 0.0
++    {
++        return None;
++    }
++    Some(((advance * 75.0).round() / 4.0).round() * 4.0 / 75.0)
++}
++
++#[cfg(test)]
++mod jueony_hcr_advance_tests {
++    use super::*;
++
++    #[test]
++    fn regular_hcr_hangul_has_nearest_four_unit_advance() {
++        let style = TextStyle::default();
++        for (input, expected) in [(873, 872), (921, 920), (970, 972), (1940, 1940)] {
++            let width = regular_hcr_hangul_advance(
++                "함초롬바탕", '가', &style, 1.0, 0.0, input as f64 / 75.0,
++            ).unwrap();
++            assert!((width * 75.0 - expected as f64).abs() < 1e-8);
++        }
++    }
++
++    #[test]
++    fn regular_hcr_advance_does_not_reinterpret_other_measurements() {
++        let style = TextStyle::default();
++        for (family, ch, ratio, spacing) in [
++            ("함초롬돋움", '가', 1.0, 0.0),
++            ("함초롬바탕", 'A', 1.0, 0.0),
++            ("함초롬바탕", '0', 1.0, 0.0),
++            ("함초롬바탕", ' ', 1.0, 0.0),
++            ("함초롬바탕", '\t', 1.0, 0.0),
++            ("함초롬바탕", '😀', 1.0, 0.0),
++            ("함초롬바탕", '가', 0.95, 0.0),
++            ("함초롬바탕", '가', 1.0, -0.5),
++        ] {
++            assert!(regular_hcr_hangul_advance(family, ch, &style, ratio, spacing, 970.0 / 75.0).is_none());
++        }
++        for style in [
++            TextStyle { bold: true, ..Default::default() },
++            TextStyle { italic: true, ..Default::default() },
++            TextStyle { superscript: true, ..Default::default() },
++            TextStyle { subscript: true, ..Default::default() },
++            TextStyle { hft_hangul_face: true, ..Default::default() },
++            TextStyle { hft_fullwidth_dot: true, ..Default::default() },
++        ] {
++            assert!(regular_hcr_hangul_advance("함초롬바탕", '가', &style, 1.0, 0.0, 970.0 / 75.0).is_none());
++        }
++    }
++}
++
+ /// [#7390] `KoPubDotum` 기본 라틴 문자(U+0020~U+007E) 전진폭, 1000em 기준.
+ ///
+ /// KOPUS 배포본 `ttfs/kopub/KoPubDotum-{Light,Medium,Bold}.ttf` 의 `cmap`+`hmtx` 직독.
+@@ -1480,6 +1556,20 @@
+             latin.map_or(style.font_metric_trusted, |l| l.font_metric_trusted),
+             latin.is_none() && style.hft_hangul_face,
+         );
++        if embedded.width_source == "embeddedMetric" {
++            if let Some(advance) = embedded.width_px.and_then(|advance| {
++                regular_hcr_hangul_advance(
++                    metric_family,
++                    c,
++                    style,
++                    ratio,
++                    letter_spacing,
++                    advance,
++                )
++            }) {
++                embedded.width_px = Some(advance);
++            }
++        }
+         // 행의 공통 측정 규칙으로 폭을 고르며 원문의 useFontSpace 속성을 바꾸지 않는다.
+         // 일반 공백과 NBSP는 메트릭 조회 출처를 보존하고 명시한 글꼴 공백이 우선한다.
+         if style.layout_half_space
+diff --git a/src/renderer/composer/line_breaking.rs b/src/renderer/composer/line_breaking.rs
+--- a/src/renderer/composer/line_breaking.rs
++++ b/src/renderer/composer/line_breaking.rs
+@@ -4570,7 +4570,13 @@
+     let frame_eligible = !split_stale_cell_reflow
+         && preserve_prefix_for_edit.is_none()
+         && !para.text.is_empty()
+-        && para.controls.is_empty()
++        // Section/column definitions have no inline width. Their geometry is
++        // already resolved by paragraph_box, exactly as on NO_LS import.
++        // Sending only these markers to the old tolerant scalar path made a
++        // fresh first paragraph change its partition when reopened as HWPX.
++        // Objects, fields and other marker classes keep their existing owners.
++        && para.controls.iter().all(|control| matches!(control,
++            Control::SectionDef(_) | Control::ColumnDef(_)))
+         && preserved_prefix.is_empty();
+     if frame_eligible {
+         // 편집 프레임과 렌더 프레임이 이제 같은 상자에서 나온다 — 종전엔 이쪽만

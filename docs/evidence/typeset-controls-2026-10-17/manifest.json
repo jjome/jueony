@@ -1,0 +1,329 @@
+{
+  "scope": "11 self-authored text-only paragraph controls in two source/Hancom-saved pairs. No public/user document content, no font program extraction or redistributed font binaries. All CFB stream names/sizes checked; no BinData/font streams. PDF is deliberately not included because it can embed font subsets.",
+  "suggestedRepositoryDestination": "docs/evidence/typeset-controls-2026-10-17",
+  "files": [
+    {
+      "name": "typeset-control-source.hwp",
+      "sha256": "e2a3291102738ba3897981127b81205362605911ec40e83c7f9f7b361e15fbc8",
+      "bytes": 15360,
+      "origin": "Jueony self-authored source",
+      "cfbStreams": [
+        {
+          "name": "FileHeader",
+          "bytes": 256
+        },
+        {
+          "name": "DocInfo",
+          "bytes": 1775
+        },
+        {
+          "name": "Section0",
+          "bytes": 580
+        },
+        {
+          "name": "PrvImage",
+          "bytes": 5126
+        },
+        {
+          "name": "PrvText",
+          "bytes": 2000
+        },
+        {
+          "name": "DefaultJScript",
+          "bytes": 16
+        },
+        {
+          "name": "JScriptVersion",
+          "bytes": 13
+        },
+        {
+          "name": "_LinkDoc",
+          "bytes": 524
+        },
+        {
+          "name": "\u0005HwpSummaryInformation",
+          "bytes": 457
+        }
+      ],
+      "path": "control/typeset-control-source.hwp"
+    },
+    {
+      "name": "typeset-control-hancom.hwp",
+      "sha256": "35f932ce4390922210edd8c1adadeb99cdbe1280b1a6e23d672a3df44654deaa",
+      "bytes": 37376,
+      "origin": "Independent actual Hancom2024 UI SaveAs of the paired self-authored source",
+      "cfbStreams": [
+        {
+          "name": "FileHeader",
+          "bytes": 256
+        },
+        {
+          "name": "\u0005HwpSummaryInformation",
+          "bytes": 457
+        },
+        {
+          "name": "DocInfo",
+          "bytes": 1580
+        },
+        {
+          "name": "PrvImage",
+          "bytes": 26324
+        },
+        {
+          "name": "PrvText",
+          "bytes": 2044
+        },
+        {
+          "name": "JScriptVersion",
+          "bytes": 13
+        },
+        {
+          "name": "DefaultJScript",
+          "bytes": 16
+        },
+        {
+          "name": "_LinkDoc",
+          "bytes": 524
+        },
+        {
+          "name": "Section0",
+          "bytes": 643
+        }
+      ],
+      "path": "control/typeset-control-hancom.hwp"
+    },
+    {
+      "name": "typeset-quantum-source.hwp",
+      "sha256": "0b3a0953e116fac1bdf12a53640be52c5120befc57afa76c5e7883160be1b78d",
+      "bytes": 13824,
+      "origin": "Jueony self-authored source",
+      "cfbStreams": [
+        {
+          "name": "FileHeader",
+          "bytes": 256
+        },
+        {
+          "name": "DocInfo",
+          "bytes": 1774
+        },
+        {
+          "name": "Section0",
+          "bytes": 328
+        },
+        {
+          "name": "PrvImage",
+          "bytes": 5126
+        },
+        {
+          "name": "PrvText",
+          "bytes": 692
+        },
+        {
+          "name": "DefaultJScript",
+          "bytes": 16
+        },
+        {
+          "name": "JScriptVersion",
+          "bytes": 13
+        },
+        {
+          "name": "_LinkDoc",
+          "bytes": 524
+        },
+        {
+          "name": "\u0005HwpSummaryInformation",
+          "bytes": 457
+        }
+      ],
+      "path": "quantum/typeset-quantum-source.hwp"
+    },
+    {
+      "name": "typeset-quantum-hancom.hwp",
+      "sha256": "101b1cefc30ba31d18c9665ad3d0a751a1f400b4dc7f7b4fb828a4027c3a694b",
+      "bytes": 17920,
+      "origin": "Independent actual Hancom2024 UI SaveAs of the paired self-authored source",
+      "cfbStreams": [
+        {
+          "name": "FileHeader",
+          "bytes": 256
+        },
+        {
+          "name": "\u0005HwpSummaryInformation",
+          "bytes": 457
+        },
+        {
+          "name": "DocInfo",
+          "bytes": 1588
+        },
+        {
+          "name": "PrvImage",
+          "bytes": 8699
+        },
+        {
+          "name": "PrvText",
+          "bytes": 692
+        },
+        {
+          "name": "JScriptVersion",
+          "bytes": 13
+        },
+        {
+          "name": "DefaultJScript",
+          "bytes": 16
+        },
+        {
+          "name": "_LinkDoc",
+          "bytes": 524
+        },
+        {
+          "name": "Section0",
+          "bytes": 337
+        }
+      ],
+      "path": "quantum/typeset-quantum-hancom.hwp"
+    }
+  ],
+  "groups": [
+    {
+      "group": "control",
+      "sourceFile": "typeset-control-source.hwp",
+      "hancomFile": "typeset-control-hancom.hwp",
+      "cases": [
+        {
+          "id": "hangul-width38800",
+          "paragraph": 0,
+          "text": "가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가",
+          "width": 38800,
+          "fontSize": 1000,
+          "koreanBreakUnit": 1,
+          "englishBreakUnit": 0,
+          "alignment": "left"
+        },
+        {
+          "id": "hangul-width39100",
+          "paragraph": 1,
+          "text": "가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가",
+          "width": 39100,
+          "fontSize": 1000,
+          "koreanBreakUnit": 1,
+          "englishBreakUnit": 0,
+          "alignment": "left"
+        },
+        {
+          "id": "spaced-width38800",
+          "paragraph": 2,
+          "text": "가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 가 ",
+          "width": 38800,
+          "fontSize": 1000,
+          "koreanBreakUnit": 1,
+          "englishBreakUnit": 0,
+          "alignment": "left"
+        },
+        {
+          "id": "original-character-justify",
+          "paragraph": 3,
+          "text": "긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 ",
+          "width": 42520,
+          "fontSize": 1000,
+          "koreanBreakUnit": 1,
+          "englishBreakUnit": 0,
+          "alignment": "justify"
+        },
+        {
+          "id": "original-word-justify",
+          "paragraph": 4,
+          "text": "긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 ",
+          "width": 42520,
+          "fontSize": 1000,
+          "koreanBreakUnit": 0,
+          "englishBreakUnit": 0,
+          "alignment": "justify"
+        },
+        {
+          "id": "ascii-digit-character",
+          "paragraph": 5,
+          "text": "012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789",
+          "width": 38800,
+          "fontSize": 1000,
+          "koreanBreakUnit": 1,
+          "englishBreakUnit": 2,
+          "alignment": "left"
+        },
+        {
+          "id": "tabs-mixed",
+          "paragraph": 6,
+          "text": "가\t나\t123 ABC 가나다 가\t나\t123 ABC 가나다 가\t나\t123 ABC 가나다 가\t나\t123 ABC 가나다 가\t나\t123 ABC 가나다 가\t나\t123 ABC 가나다 가\t나\t123 ABC 가나다 가\t나\t123 ABC 가나다 ",
+          "width": 38800,
+          "fontSize": 1000,
+          "koreanBreakUnit": 1,
+          "englishBreakUnit": 0,
+          "alignment": "left"
+        },
+        {
+          "id": "hangul-20pt-width38800",
+          "paragraph": 7,
+          "text": "가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가",
+          "width": 38800,
+          "fontSize": 2000,
+          "koreanBreakUnit": 1,
+          "englishBreakUnit": 0,
+          "alignment": "left"
+        }
+      ]
+    },
+    {
+      "group": "quantum",
+      "sourceFile": "typeset-quantum-source.hwp",
+      "hancomFile": "typeset-quantum-hancom.hwp",
+      "cases": [
+        {
+          "id": "hangul-9pt-width34920",
+          "paragraph": 0,
+          "text": "가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가",
+          "width": 34920,
+          "fontSize": 900,
+          "koreanBreakUnit": 1,
+          "englishBreakUnit": 0,
+          "alignment": "left"
+        },
+        {
+          "id": "hangul-9_5pt-width36880",
+          "paragraph": 1,
+          "text": "가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가",
+          "width": 36880,
+          "fontSize": 950,
+          "koreanBreakUnit": 1,
+          "englishBreakUnit": 0,
+          "alignment": "left"
+        },
+        {
+          "id": "hangul-12pt-width40000",
+          "paragraph": 2,
+          "text": "가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가",
+          "width": 40000,
+          "fontSize": 1200,
+          "koreanBreakUnit": 1,
+          "englishBreakUnit": 0,
+          "alignment": "left"
+        }
+      ]
+    }
+  ],
+  "localPdfMeasurementOnly": {
+    "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\typeset-control-20261017\\typeset-control-hancom.pdf",
+    "sha256": "2a3d454f739726cc6a8b0dd16df8153efd4bfa047e724f26b749743f0f7ca537",
+    "notCopied": true
+  },
+  "formalVerification": {
+    "sourceId": "9418a6df42a4ba6f",
+    "wasmSha256": "dadd0e384765cb8d7b8d623111447c4c4b275977ff131c83a47318cb567364e4",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "patchCount": 53,
+    "manifest": {
+      "path": "build/rhwp-engine/source-9418a6df42a4ba6f/pkg/jueony-engine-build.json",
+      "sha256": "0ef22735dfcad6404a9c4d879d80b184a2af14afceb2fe5d914b69be02ada2c9",
+      "bytes": 8856
+    }
+  },
+  "validationSummary": "formal-summary.json"
+}

@@ -1,0 +1,200 @@
+{
+  "createdAt": "2026-10-16T18:08:45.161262+00:00",
+  "scope": "Official53 typography/tab bounded verification; not complete file-format or Hancom compatibility. Independent conversion and old-cache comparison failures are retained.",
+  "engine": {
+    "sourceId": "9418a6df42a4ba6f",
+    "wasmSha256": "dadd0e384765cb8d7b8d623111447c4c4b275977ff131c83a47318cb567364e4",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "patchCount": 53,
+    "manifest": {
+      "path": "build/rhwp-engine/source-9418a6df42a4ba6f/pkg/jueony-engine-build.json",
+      "sha256": "0ef22735dfcad6404a9c4d879d80b184a2af14afceb2fe5d914b69be02ada2c9",
+      "bytes": 8856
+    }
+  },
+  "profiles": {
+    "typography-native": {
+      "path": "build/file-completion-final-typeset/typography-native/result.json",
+      "sha256": "fb91502e1bdb23992b56727b9900e2717b086e81e2570f54fd045f84d8629e3f",
+      "bytes": 15388,
+      "passed": 12,
+      "failed": 0,
+      "failureIds": [],
+      "verifierSha256": "049a72c3195eef37e9111d5bf5bcf7b6c334e1277c930232b5119624d6d3ff8a",
+      "errors": {}
+    },
+    "tabs-native": {
+      "path": "build/file-completion-final-typeset/tabs-native/result.json",
+      "sha256": "75c1fbaf50b5ebdfb614e8a4c039efe6c50595cf90c8fecf09fae099e267416c",
+      "bytes": 19241,
+      "passed": 6,
+      "failed": 0,
+      "failureIds": [],
+      "verifierSha256": "7c11d289e65192a2457a5768c034d1f97afef23adcfcc11ce468418d4e9aaf3b",
+      "errors": {}
+    },
+    "controls-native": {
+      "path": "build/file-completion-final-typeset/controls-native/result.json",
+      "sha256": "91f50add9492263da6a0ddeb20a6f88d3e3f01d97e292b186bb6aceae204f143",
+      "bytes": 16928,
+      "passed": 11,
+      "failed": 0,
+      "failureIds": [],
+      "verifierSha256": "dd511bd126bbefaa06def3b46e26aaef6f04c0251ab7a3727be3b38ff7a18426",
+      "errors": {}
+    },
+    "tabs-canvas": {
+      "path": "build/file-completion-final-typeset/tabs-canvas/result.json",
+      "sha256": "061db2f94007e6d91446ebad3463eb20f90fe5c0ce868e1d9c3e3a1fcc6c9e6f",
+      "bytes": 14218,
+      "passed": 6,
+      "failed": 0,
+      "failureIds": [],
+      "verifierSha256": "eca7b0a81d0972c374c9af8623dcdfd369c02be4b6a956734066031f292e00e2",
+      "errors": {
+        "pageErrors": [],
+        "consoleErrors": [],
+        "externalRequests": []
+      }
+    },
+    "controls-canvas": {
+      "path": "build/file-completion-final-typeset/controls-canvas/result.json",
+      "sha256": "e2387f8f142a51c9a2030b658118276a2f53d28530c2285eb1c9d54680cf8938",
+      "bytes": 18519,
+      "passed": 11,
+      "failed": 0,
+      "failureIds": [],
+      "verifierSha256": "cd51c00384a86a9544b0de5d6dcfb6866ccfae708cbda666d7dbcecb9066a16c",
+      "errors": {
+        "pageErrors": [],
+        "consoleErrors": [],
+        "externalRequests": []
+      }
+    },
+    "hancom-existing-pairs": {
+      "path": "build/file-completion-final-typeset/hancom-existing-pairs/result.json",
+      "sha256": "98017a2902e10c6144a32573a8e529ef73ea62cb20cee1491280fd7420f7b21b",
+      "bytes": 1782593,
+      "passed": 4,
+      "failed": 5,
+      "failureIds": [
+        "multiline: exact body/page count and semantic preservation from independently Hancom-saved fixture",
+        "multiline: full public control/text layout within unchanged 0.2 maximum",
+        "caption-multiline: exact body/page count and semantic preservation from independently Hancom-saved fixture",
+        "caption-multiline: full public control/text layout within unchanged 0.2 maximum",
+        "positive-caption-gap: exact body/page count and semantic preservation from independently Hancom-saved fixture"
+      ],
+      "verifierSha256": "001d7d0168fd45a4b93f9ea159bc62f8a50bc77bee2d2d4f5b14e671cc433203",
+      "errors": {}
+    },
+    "conversion-formal53": {
+      "path": "build/file-completion-final-typeset/conversion-formal53/result.json",
+      "sha256": "26f8c27f1d1822cfc2b8863330f7fc048e02143fa96ca74ea02619ac56407c7c",
+      "bytes": 88297,
+      "passed": 10,
+      "failed": 6,
+      "failureIds": [
+        "multiline-original-cached-hwpx",
+        "multiline-original-reflow-hwpx",
+        "multiline-hancom-reflow-hwpx",
+        "caption-original-cached-hwpx",
+        "caption-original-reflow-hwpx",
+        "caption-hancom-reflow-hwpx"
+      ],
+      "verifierSha256": "9397d68a5d621252e5ebdab0b1e01c83d93b147bb3d7fc44f8a9246441b4880e",
+      "errors": {}
+    }
+  },
+  "baselineConversion": {
+    "baseline51": {
+      "path": "build/file-completion-final-typeset/conversion-baseline51/result.json",
+      "sha256": "3d8007044a1d9c6e39968fcdb70690dbacb3e771fba2b68c420556a330e9bda3",
+      "bytes": 87613,
+      "sourceId": "5921bb9f9dcd86fa",
+      "wasmSha256": "ddebc39f88c774996f25fba2457b00c9770e3a4f951bade9bcbe8c948d763e11",
+      "passed": 10,
+      "failed": 6,
+      "failureIds": [
+        "multiline-original-cached-hwpx",
+        "multiline-original-reflow-hwpx",
+        "multiline-hancom-reflow-hwpx",
+        "caption-original-cached-hwpx",
+        "caption-original-reflow-hwpx",
+        "caption-hancom-reflow-hwpx"
+      ]
+    },
+    "baseline52": {
+      "path": "build/file-completion-final-typeset/conversion-baseline52/result.json",
+      "sha256": "c68b6d8c85a7815c5262ce1fedb8095028b4e65d9b983aed4345bc9006eab427",
+      "bytes": 88111,
+      "sourceId": "399c17a318912a5d",
+      "wasmSha256": "c5aa5b71d3b09eb643eb16c6978650e07599bc7d3a80568749291d966e5ed3e1",
+      "passed": 10,
+      "failed": 6,
+      "failureIds": [
+        "multiline-original-cached-hwpx",
+        "multiline-original-reflow-hwpx",
+        "multiline-hancom-reflow-hwpx",
+        "caption-original-cached-hwpx",
+        "caption-original-reflow-hwpx",
+        "caption-hancom-reflow-hwpx"
+      ]
+    }
+  },
+  "patches": [
+    {
+      "path": "engine/patches/zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-typeset-advance-grid.patch",
+      "sha256": "4b55713647b5567ec88b39853b8a28efe4811bd08025ccf9c1f20c4554732638",
+      "bytes": 5579
+    },
+    {
+      "path": "engine/patches/zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-width.patch",
+      "sha256": "1cc54a1f9c37f31d034f66f8b0fbc4dedd3bffff7fb7094b824ebb88ae187183",
+      "bytes": 3615
+    }
+  ],
+  "verifiers": [
+    {
+      "path": "apps/editor/scripts/verify-typeset-reflow-engine.mjs",
+      "sha256": "049a72c3195eef37e9111d5bf5bcf7b6c334e1277c930232b5119624d6d3ff8a",
+      "bytes": 5883
+    },
+    {
+      "path": "apps/editor/scripts/verify-tab-placeholder-engine.mjs",
+      "sha256": "7c11d289e65192a2457a5768c034d1f97afef23adcfcc11ce468418d4e9aaf3b",
+      "bytes": 4381
+    },
+    {
+      "path": "apps/editor/scripts/verify-typeset-controls-engine.mjs",
+      "sha256": "dd511bd126bbefaa06def3b46e26aaef6f04c0251ab7a3727be3b38ff7a18426",
+      "bytes": 3683
+    },
+    {
+      "path": "apps/editor/scripts/verify-tab-placeholder-canvas.mjs",
+      "sha256": "eca7b0a81d0972c374c9af8623dcdfd369c02be4b6a956734066031f292e00e2",
+      "bytes": 7473
+    },
+    {
+      "path": "apps/editor/scripts/verify-typeset-canvas.mjs",
+      "sha256": "cd51c00384a86a9544b0de5d6dcfb6866ccfae708cbda666d7dbcecb9066a16c",
+      "bytes": 6354
+    },
+    {
+      "path": "apps/editor/scripts/verify-hancom-overlap-roundtrip.mjs",
+      "sha256": "001d7d0168fd45a4b93f9ea159bc62f8a50bc77bee2d2d4f5b14e671cc433203",
+      "bytes": 5499
+    },
+    {
+      "path": "apps/editor/scripts/verify-original-overlap-conversion.mjs",
+      "sha256": "9397d68a5d621252e5ebdab0b1e01c83d93b147bb3d7fc44f8a9246441b4880e",
+      "bytes": 4764
+    }
+  ],
+  "conclusions": [
+    "Official53 typography12, tabs6, independent control11, actual Canvas6/11 all pass with full model/resource preservation and unchanged complete raw geometry/paint maximum0.2.",
+    "Old independent original-to-Hancom pair comparison remains4PASS/5FAIL:3 commonHeight semantic changes3846→5181 and2 cached original geometry comparisons501/186 fields. Original old160 caches are not silently discarded; current reversible reflow matches Hancom158.",
+    "New independent original/Hancom cached/reflow HWP/HWPX matrix has10PASS/6FAIL on all official51/52/53 engines. Same-format HWP8cases pass. Four original-to-HWPX cases move following table+8px; two edited Hancom-to-HWPX cases move body+21.3px despite stable text partition and model semantics. This is an older unclosed conversion defect, not a35z/36z regression.",
+    "assertOverlapSaveLayout currently applies only to HWP output. The6 HWPX geometry failures currently pass the semantic preservation layer; engine/guard follow-up is owned by the parent and overlap worker. Do not declare file-format preservation complete.",
+    "Golden text controls are self-authored, actual Hancom UI SaveAs, with CFB directory manifest and no font/BinData streams; no font program extraction/install/redistribution. PDF is local-measurement-only and not copied."
+  ]
+}

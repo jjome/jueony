@@ -14,7 +14,7 @@ test('manual feature patches match pinned Studio; caption mutation uses history 
   try {
     await mkdir(join(root, 'src/command/commands'), { recursive: true });
     await mkdir(join(root, 'src/ui'), { recursive: true });
-    for (const file of ['command/commands/insert.ts', 'command/commands/table.ts', 'ui/cell-border-bg-dialog.ts', 'ui/page-border-dialog.ts']) {
+    for (const file of ['command/commands/insert.ts', 'command/commands/table.ts', 'ui/cell-border-bg-dialog.ts', 'ui/table-cell-props-dialog.ts', 'ui/page-border-dialog.ts']) {
       await copyFile(join(pinnedSource, file), join(root, 'src', file));
     }
     const before = await readFile(join(root, 'src/command/commands/insert.ts'), 'utf8');

@@ -1,0 +1,37 @@
+--- a/src/document_core/commands/object_ops/note.rs
++++ b/src/document_core/commands/object_ops/note.rs
+@@ -432,8 +432,24 @@
+             })
+         };
+ 
++        // Style indices vary with imported/custom DocInfo; never assume index 11.
++        // This only chooses metadata for the newly inserted paragraph. Existing notes
++        // and explicitly inherited character/paragraph formatting are left unchanged.
++        let matches: Vec<_> = self.document.doc_info.styles.iter().enumerate()
++            .filter(|(_, style)| style.style_type == 0 &&
++                (style.local_name == "각주" || style.english_name.eq_ignore_ascii_case("Footnote")))
++            .collect();
++        if matches.len() != 1 || matches[0].0 > u8::MAX as usize {
++            return Err(HwpError::RenderError("새 각주에 사용할 고유한 문단 스타일을 확인할 수 없습니다".into()));
++        }
++        let (footnote_style_id, named_style) = matches[0];
++        if self.document.doc_info.para_shapes.get(named_style.para_shape_id as usize).is_none() ||
++            self.document.doc_info.char_shapes.get(named_style.char_shape_id as usize).is_none() {
++            return Err(HwpError::RenderError("새 각주 스타일의 서식 참조가 올바르지 않습니다".into()));
++        }
++
+         // [Task #1058 reopen Round 5] 신규 각주 inner paragraph 한컴 contract 정합:
+-        //   - style_id = 11 (각주 style, 한컴 DocInfo 기본 각주 style ID)
++        //   - style_id is the verified named Footnote paragraph style in this document
+         //   - para_shape_id = 0 (각주 default ParaShape)
+         //   - controls = [AutoNumber] (각주 번호 inline 컨트롤, char index 0 위치)
+         //   - text = "  " (placeholder space ×2, AutoNumber 가 두 space 사이 8 cu 차지)
+@@ -460,7 +476,7 @@
+             control_mask: 1u32 << 0x12, // bit 18 (AutoNumber)
+             char_offsets: vec![0, 8],   // AutoNumber 가 두 space 사이 8 cu 차지
+             para_shape_id: 0,
+-            style_id: 11, // 각주 style
++            style_id: footnote_style_id as u8,
+             char_shapes: vec![CharShapeRef {
+                 start_pos: 0,
+                 char_shape_id: default_char_shape_id,

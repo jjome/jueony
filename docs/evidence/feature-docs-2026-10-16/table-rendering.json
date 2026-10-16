@@ -5,7 +5,7 @@
   "priorOverviewRecognizedTables": 1,
   "overviewRecognizedTables": 18,
   "documents": 17,
-  "rowIdsPreserved": 425,
+  "rowIdsPreserved": 433,
   "smallWorkTableLimit": 8,
   "viewportWidths": [
     620,
@@ -14,7 +14,7 @@
   "results": [
     {
       "file": "docs/jueony-progress.md",
-      "sha256": "cf0eaa726f1cb1804ce251a382d944fcf4d1cd73be1d465c7bfc8ac973188745",
+      "sha256": "a8a95029c6ef9dddfa9fcbfe7a3fbc08c74e10c257aa73fae7d70237a21d52ff",
       "tableCount": 18,
       "headerColumns": [
         5,
@@ -314,10 +314,11 @@
     },
     {
       "file": "docs/features/05-files-storage-recovery.md",
-      "sha256": "bba9295bea8d426a18f846d515d63a59b4869ab1b77397208e379983b4295722",
-      "tableCount": 7,
+      "sha256": "94c4b6b5dc2ffb1d59e6501ef3452a37b6c9dda8ed92bbc4e72d7fea0aa2efff",
+      "tableCount": 8,
       "headerColumns": [
         3,
+        5,
         5,
         5,
         5,
@@ -329,9 +330,10 @@
         3,
         8,
         2,
+        2,
         8,
         1,
-        2,
+        4,
         2
       ],
       "browserTables": [
@@ -352,6 +354,11 @@
         },
         {
           "columns": 5,
+          "rows": 2,
+          "consistent": true
+        },
+        {
+          "columns": 5,
           "rows": 8,
           "consistent": true
         },
@@ -362,7 +369,7 @@
         },
         {
           "columns": 5,
-          "rows": 2,
+          "rows": 4,
           "consistent": true
         },
         {
@@ -550,7 +557,7 @@
     },
     {
       "file": "docs/features/08-tables.md",
-      "sha256": "cd01d731b5833b39bda4ad25c8913e9326b700e83e1b74587b926c51b01a2ecb",
+      "sha256": "8b57e22d764021a100bff4a17f8e53c9b15571e7f297b93ca17f4f0223c2a022",
       "tableCount": 16,
       "headerColumns": [
         3,
@@ -575,11 +582,11 @@
         2,
         2,
         2,
-        6,
+        7,
         8,
         3,
         2,
-        4,
+        5,
         3,
         5,
         4,
@@ -611,7 +618,7 @@
         },
         {
           "columns": 5,
-          "rows": 6,
+          "rows": 7,
           "consistent": true
         },
         {
@@ -631,7 +638,7 @@
         },
         {
           "columns": 5,
-          "rows": 4,
+          "rows": 5,
           "consistent": true
         },
         {
@@ -775,7 +782,7 @@
     },
     {
       "file": "docs/features/10-headers-notes-fields.md",
-      "sha256": "3508315bed0ddc0047f6f5cba1c995c20c345e1f4b97cf45c6002ef5e7991695",
+      "sha256": "d41d9224bd7a8f8346c2c298d48362769aea5a149b806541baba79a5494fb069",
       "tableCount": 5,
       "headerColumns": [
         3,
@@ -787,7 +794,7 @@
       "bodyRows": [
         3,
         8,
-        1,
+        2,
         4,
         6
       ],
@@ -804,7 +811,7 @@
         },
         {
           "columns": 5,
-          "rows": 1,
+          "rows": 2,
           "consistent": true
         },
         {
@@ -955,7 +962,7 @@
     },
     {
       "file": "docs/features/13-state-and-preferences.md",
-      "sha256": "a6085abc79c26988a1d76aa585b73c1bbd9ff1f2f0fb204a65b29e02ae1ee78c",
+      "sha256": "bd5f5aa1388fbde50a6b6dcbfaafd14434b189e7f584d8b0ee5816842361d0e7",
       "tableCount": 9,
       "headerColumns": [
         3,
@@ -974,7 +981,7 @@
         8,
         8,
         7,
-        5,
+        6,
         2,
         8,
         4
@@ -1007,7 +1014,7 @@
         },
         {
           "columns": 5,
-          "rows": 5,
+          "rows": 6,
           "consistent": true
         },
         {

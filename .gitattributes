@@ -6,3 +6,7 @@ engine/patches/*.patch text eol=lf whitespace=-blank-at-eol,-blank-at-eof
 fixtures/rag-evaluation/** -text
 scripts/generate-rag-corpus.mjs text eol=lf
 scripts/verify-rag-corpus.mjs text eol=lf
+# Preserve storage validation artifacts byte-for-byte, including raw runner output.
+docs/evidence/state-storage-2026-10-16/** -text whitespace=cr-at-eol
+# Node TAP includes an empty-string fixture in the subtest name (trailing space).
+docs/evidence/state-storage-2026-10-16/unit-tests.txt whitespace=cr-at-eol,-blank-at-eol

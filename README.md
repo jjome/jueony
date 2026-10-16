@@ -12,19 +12,19 @@
 | [AI 연결·Agent 실행](<docs/features/02-agent-and-models.md>) | 14/20 · 부분 2 | 9/20 · 부분 3 | 13/19 | 구현 [N024](<docs/features/02-agent-and-models.md#n024>) 브라우저 인증 링크 기반 계정 연결 |
 | [참고 자료·검색·RAG](<docs/features/03-references-and-rag.md>) | 5/10 · 부분 2 | 4/10 · 부분 1 | 1/6 | 구현 [N033](<docs/features/03-references-and-rag.md#n033>) 검색 순위·구본 우선 문제와 무답 판별 |
 | [반복 작업·공무원 업무 양식](<docs/features/04-macros-and-business.md>)<br>상위 완료 0/5 | 3/6 · 부분 1 | 3/6 | 3/6 | 구현 [N038](<docs/features/04-macros-and-business.md#n038>) 반복 작업의 표·개체 명령 확장 |
-| [파일·저장·복구·형식 보존](<docs/features/05-files-storage-recovery.md>)<br>상위 완료 0/10 | 12/13 · 부분 1 | 6/13 · 부분 7 | 6/6 | **통합 검증 중** · 구현 [N001](<docs/features/05-files-storage-recovery.md#n001>) HWP 겹침 허용 후속 표의 화면/재열기 위치 |
+| [파일·저장·복구·형식 보존](<docs/features/05-files-storage-recovery.md>)<br>상위 완료 0/10 | 16/17 · 부분 1 | 9/17 · 부분 8 | 6/6 | 구현 [N001](<docs/features/05-files-storage-recovery.md#n001>) HWP 겹침 허용 후속 표의 화면/재열기 위치 |
 | [본문 편집·입력·선택·찾기](<docs/features/06-editing-and-selection.md>)<br>상위 완료 0/20 | 7/7 | 0/7 · 부분 7 | 4/4 | 검증 [A001](<docs/features/06-editing-and-selection.md#a001>) 새 본문 문서 작성 |
 | [글자·문단·스타일·번호](<docs/features/07-formatting-and-styles.md>)<br>상위 완료 0/18 | 19/23 · 부분 2 | 0/23 · 부분 19 | 13/16 | 구현 [N011](<docs/features/07-formatting-and-styles.md#n011>) 스타일 가져오기·내보내기 |
-| [표·셀·크기·계산](<docs/features/08-tables.md>)<br>상위 완료 0/24 | 30/36 · 부분 2 | 2/36 · 부분 30 | 26/33 · 부분 3 | **통합 검증 중** · 구현 [N004](<docs/features/08-tables.md#n004>) 기존 병합 원본의 후속 Agent 셀 편집 |
+| [표·셀·크기·계산](<docs/features/08-tables.md>)<br>상위 완료 0/24 | 32/38 · 부분 2 | 3/38 · 부분 31 | 26/33 · 부분 3 | 구현 [N004](<docs/features/08-tables.md#n004>) 기존 병합 원본의 후속 Agent 셀 편집 |
 | [쪽·구역·용지·배경](<docs/features/09-pages-and-sections.md>)<br>상위 완료 0/18 | 23/23 | 0/23 · 부분 23 | 12/17 · 부분 5 | Agent 연결 [G053](<docs/features/09-pages-and-sections.md#g053>) 수동 쪽 테두리의 적용 범위/포함 정책 |
-| [머리말·각주·필드·책갈피](<docs/features/10-headers-notes-fields.md>)<br>상위 완료 0/11 | 8/8 | 0/8 · 부분 8 | 8/8 | 검증 [A018](<docs/features/10-headers-notes-fields.md#a018>) 본문 점 책갈피 추가 |
+| [머리말·각주·필드·책갈피](<docs/features/10-headers-notes-fields.md>)<br>상위 완료 0/11 | 9/9 | 0/9 · 부분 9 | 8/8 | 검증 [A018](<docs/features/10-headers-notes-fields.md#a018>) 본문 점 책갈피 추가 |
 | [그림·도형·글상자·수식·개체](<docs/features/11-objects.md>)<br>상위 완료 0/18 | 1/1 | 0/1 · 부분 1 | 해당 없음 | 검증 [G022](<docs/features/11-objects.md#g022>) 선택 개체 속성 키 경로 |
 | [화면·메뉴·작업 창·단축키](<docs/features/12-ui-and-shortcuts.md>)<br>상위 완료 0/30 | 7/11 · 부분 3 | 4/11 · 부분 3 | 1/1 | 구현 [N019](<docs/features/12-ui-and-shortcuts.md#n019>) 한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교 |
-| [상태 저장·환경·선택 복원](<docs/features/13-state-and-preferences.md>)<br>상위 완료 0/33 | 12/17 · 부분 1 | 0/17 · 부분 13 | 1/1 | **통합 검증 중** · 구현 [N014](<docs/features/13-state-and-preferences.md#n014>) 글상자 내부 커서·선택 복원 |
+| [상태 저장·환경·선택 복원](<docs/features/13-state-and-preferences.md>)<br>상위 완료 0/33 | 13/18 · 부분 1 | 0/18 · 부분 14 | 1/1 | 구현 [N014](<docs/features/13-state-and-preferences.md#n014>) 글상자 내부 커서·선택 복원 |
 | [보안·개인정보·검토·메모](<docs/features/14-security-and-review.md>)<br>상위 완료 0/11 | 상위 0/11 · 부분 3 | 상위 0/11 | 상위 0/11 | 상세 작업 분해 필요 |
 | [출력·변환·교정·외부 도구](<docs/features/15-output-and-tools.md>)<br>상위 완료 0/23 | 상위 0/23 · 부분 3 | 상위 0/23 | 상위 0/23 | 상세 작업 분해 필요 |
 | [모듈·실행 기반·배포·최종 검수](<docs/features/16-architecture-and-validation.md>) | 7/25 · 부분 16 | 7/25 · 부분 13 | 해당 없음 | 구현 [N041](<docs/features/16-architecture-and-validation.md#n041>) 독립 한글에서 복합 코퍼스 일괄 검수 |
-| **전체 실행 작업** | **152/204** | **35/204** | **88/117** | 세 축 완료 **35개** |
+| **전체 실행 작업** | **160/212** | **39/212** | **88/117** | 세 축 완료 **39개** |
 
 숫자는 **완료·연결 / 해당 세부 실행 작업 수**다. ‘상위’는 상세 작업이 아직 없는 영역의 상위 범위 집계다. 다른 행의 세부 작업 수와 합산하지 않는다. 전체 기능 완성률이 아니며, 한글 직접 비교와 미검증 변경은 완료에 포함하지 않는다.
 
@@ -46,7 +46,9 @@
 
 ## 바로 실행
 
-최신 검수본은 **[Start-Review.cmd](build/jueony-parallel-editor-20261015/Start-Review.cmd)**로 실행한다(4324). 병합 주 셀의 한 문단 편집, 지정 행·열 셀 분할과 글상자 커서·선택·미저장 복원을 병렬로 추가했다. Agent 계약은 51종이다. [통합 결과와 제한](docs/104-parallel-editor-integration.md)을 따른다. 글상자 HWP 세로 정렬 저장과 표 영역 서식 관측 보호도 포함한다. 복합 병합·중첩·전체 개체·고급 편집과 최종 한글 비교는 남아 있다. 이전 4322 검수본은 유지한다.
+최신 저장·복구 검수본은 **[Start-Review.cmd](build/jueony-storage-20261016/Start-Review.cmd)**로 실행한다(4326). 실제 저장 파일 재읽기, 다른 형식 저장 뒤 재저장, 속성값 정밀도 유지와 알려진 겹침 배치 손상의 원본 쓰기 차단을 보강했다. [지원 범위·검증·남은 제한](docs/105-file-storage-preservation.md)을 따른다. 한글 직접 비교와 실제 Windows 파일 권한 검수는 남아 있다.
+
+이전 병렬 검수본은 **[Start-Review.cmd](build/jueony-parallel-editor-20261015/Start-Review.cmd)**로 실행한다(4324). 병합 주 셀의 한 문단 편집, 지정 행·열 셀 분할과 글상자 커서·선택·미저장 복원을 병렬로 추가했다. Agent 계약은 51종이다. [통합 결과와 제한](docs/104-parallel-editor-integration.md)을 따른다. 글상자 HWP 세로 정렬 저장과 표 영역 서식 관측 보호도 포함한다. 복합 병합·중첩·전체 개체·고급 편집과 최종 한글 비교는 남아 있다. 이전 4322 검수본은 유지한다.
 
 이전 단계별 통합 검수본은 [4203 실행 묶음](build/jueony-pre-agent-20261013/Start-Review.cmd)과 [구현 결과](docs/44-editor-stages-result.md)를 참고한다.
 

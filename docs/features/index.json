@@ -1,7 +1,7 @@
 {
   "organizedDate": "2026-10-16",
-  "rowCount": 425,
-  "taskCount": 204,
+  "rowCount": 433,
+  "taskCount": 212,
   "groups": [
     {
       "key": "workspaces",
@@ -163,21 +163,25 @@
         "G090",
         "N001",
         "N002",
-        "G092"
+        "G092",
+        "G093",
+        "G094",
+        "G096",
+        "G097"
       ],
-      "taskCount": 13,
+      "taskCount": 17,
       "rollupCount": 10,
       "implementation": {
-        "DONE": 12,
+        "DONE": 16,
         "PARTIAL": 1
       },
       "verification": {
-        "DONE": 6,
-        "PARTIAL": 7
+        "DONE": 9,
+        "PARTIAL": 8
       },
       "agent": {
         "CONNECTED": 6,
-        "NA": 7
+        "NA": 11
       }
     },
     {
@@ -354,24 +358,26 @@
         "N009",
         "N010",
         "A050",
-        "A051"
+        "A051",
+        "G095",
+        "G098"
       ],
-      "taskCount": 36,
+      "taskCount": 38,
       "rollupCount": 24,
       "implementation": {
-        "DONE": 30,
+        "DONE": 32,
         "PARTIAL": 2,
         "MISSING": 3,
         "AUDIT": 1
       },
       "verification": {
-        "PARTIAL": 30,
-        "DONE": 2,
+        "PARTIAL": 31,
+        "DONE": 3,
         "NOT_RUN": 4
       },
       "agent": {
         "CONNECTED": 26,
-        "NA": 3,
+        "NA": 5,
         "PARTIAL": 3,
         "NOT_CONNECTED": 4
       }
@@ -460,18 +466,20 @@
         "A022",
         "A023",
         "A024",
-        "A025"
+        "A025",
+        "G100"
       ],
-      "taskCount": 8,
+      "taskCount": 9,
       "rollupCount": 11,
       "implementation": {
-        "DONE": 8
+        "DONE": 9
       },
       "verification": {
-        "PARTIAL": 8
+        "PARTIAL": 9
       },
       "agent": {
-        "CONNECTED": 8
+        "CONNECTED": 8,
+        "NA": 1
       }
     },
     {
@@ -629,22 +637,23 @@
         "N016",
         "N017",
         "N018",
-        "G091"
+        "G091",
+        "G099"
       ],
-      "taskCount": 17,
+      "taskCount": 18,
       "rollupCount": 33,
       "implementation": {
-        "DONE": 12,
+        "DONE": 13,
         "PARTIAL": 1,
         "MISSING": 1,
         "AUDIT": 3
       },
       "verification": {
-        "PARTIAL": 13,
+        "PARTIAL": 14,
         "NOT_RUN": 4
       },
       "agent": {
-        "NA": 16,
+        "NA": 17,
         "CONNECTED": 1
       }
     },

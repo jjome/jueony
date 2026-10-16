@@ -1,0 +1,65 @@
+--- a/src/model/table.rs
++++ b/src/model/table.rs
+@@ -1399,6 +1399,26 @@
+             .stretched_row_heights()
+             .and_then(|heights| heights.get(row_idx as usize).copied());
+         let original_height = self.common.height;
++        // Only witnessed, explicit row heights are sufficient to resize a merged
++        // source cell. Automatic (zero) or completely merged rows are ambiguous.
++        // Precompute every update before shifting cells so overflow cannot leave
++        // a partially changed grid.
++        let source_row_heights = self.get_raw_row_heights();
++        let mut merged_height_updates = vec![None; self.cells.len()];
++        for (index, cell) in self.cells.iter().enumerate() {
++            let end = checked_table_span_end(cell.row, cell.row_span, "행")?;
++            if cell.row < target_row && end > target_row {
++                let known = source_row_heights.get(cell.row as usize..end as usize);
++                if let Some(heights) = known.filter(|v| !v.is_empty() && v.iter().all(|h| *h > 0)) {
++                    let sum: u64 = heights.iter().map(|h| u64::from(*h)).sum();
++                    if u64::from(cell.height) == sum {
++                        let added = source_row_heights.get(row_idx as usize).copied().unwrap_or(0);
++                        merged_height_updates[index] = Some(cell.height.checked_add(added)
++                            .ok_or_else(|| "병합 셀 높이 범위 초과".to_string())?);
++                    }
++                }
++            }
++        }
+         let col_widths = self.get_column_widths();
+ 
+         // 셀 height용
+@@ -1415,7 +1435,8 @@
+ 
+         // [#4264] row+row_span/col+col_span 은 파일에서 그대로 온 u16 이라
+         // saturating_add 없이 더하면 오버플로 패닉한다(rebuild_grid()와 동일 원인).
+-        for cell in &mut self.cells {
++        for (index, cell) in self.cells.iter_mut().enumerate() {
++            if let Some(height) = merged_height_updates[index] { cell.height = height; }
+             // 병합 셀이 삽입 지점을 걸치는 경우: row_span 확장
+             if cell.row < target_row
+                 && checked_table_span_end(cell.row, cell.row_span, "행")? > target_row
+@@ -1635,6 +1656,25 @@
+             .stretched_row_heights()
+             .and_then(|heights| heights.get(row_idx as usize).copied());
+         let original_height = self.common.height;
++        let source_row_heights = self.get_raw_row_heights();
++        let deleted_height = source_row_heights.get(row_idx as usize).copied().unwrap_or(0);
++        let mut merged_height_updates = vec![None; self.cells.len()];
++        for (index, cell) in self.cells.iter().enumerate() {
++            let end = checked_table_span_end(cell.row, cell.row_span, "행")?;
++            if cell.row_span > 1 && cell.row <= row_idx && end > row_idx {
++                let known = source_row_heights.get(cell.row as usize..end as usize);
++                if let Some(heights) = known.filter(|v| !v.is_empty() && v.iter().all(|h| *h > 0)) {
++                    let sum: u64 = heights.iter().map(|h| u64::from(*h)).sum();
++                    if u64::from(cell.height) == sum {
++                        merged_height_updates[index] = Some(cell.height.checked_sub(deleted_height)
++                            .ok_or_else(|| "병합 셀 높이 범위 오류".to_string())?);
++                    }
++                }
++            }
++        }
++        for (index, cell) in self.cells.iter_mut().enumerate() {
++            if let Some(height) = merged_height_updates[index] { cell.height = height; }
++        }
+ 
+         // 삭제 행을 걸치는 병합 셀: row_span 축소
+         // [#4264] row/row_span은 파일에서 그대로 온 u16이라 saturating_add 없이

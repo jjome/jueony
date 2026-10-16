@@ -6,13 +6,13 @@
 
 ## 진행 요약
 
-실행 작업 **8개**, 상위 범위 **11개**. CSV의 기록을 기능별로 표시한 문서다.
+실행 작업 **9개**, 상위 범위 **11개**. CSV의 기록을 기능별로 표시한 문서다.
 
 | 구분 | 실행 작업 | 상위 범위 |
 | --- | --- | --- |
-| 구현 | 완료 8/8 · 부분 0 | 완료 0/11 · 부분 8 · 미구현 3 |
-| 검증 | 완료 0/8 · 부분 8 | 완료 0/11 · 부분 2 · 미검증 9 |
-| Agent 연결 | 연결 8/8 · 부분 0 | 연결 0/11 · 부분 2 · 미연결 9 |
+| 구현 | 완료 9/9 · 부분 0 | 완료 0/11 · 부분 8 · 미구현 3 |
+| 검증 | 완료 0/9 · 부분 9 | 완료 0/11 · 부분 2 · 미검증 9 |
+| Agent 연결 | 연결 8/8 · 부분 0 · 해당 없음 1 | 연결 0/11 · 부분 2 · 미연결 9 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
@@ -28,33 +28,34 @@
 
 관련된 상위 기능과 실행 작업을 함께 묶었다. 각 표는 최대 8개 항목이며, 완료된 항목도 같은 표에 유지한다. ID를 누르면 아래의 완료조건·근거로 이동한다. **범위** 행은 상위 점검, **작업** 행은 실행 작업으로 중복 집계하지 않는다.
 
-- [입력 · 상위 기능 점검 (1)](<#work-1>)
-- [입력 · 상위 기능 점검 (2)](<#work-2>)
+- [입력 · 상위 기능 점검](<#work-1>)
+- [각주](<#work-2>)
 - [책갈피](<#work-3>)
 - [머리말·꼬리말](<#work-4>)
 
 <a id="work-1"></a>
 
-### 입력 · 상위 기능 점검 (1)
+### 입력 · 상위 기능 점검
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B077](<10-headers-notes-fields.md#b077>) · 범위 | 필드 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B078](<10-headers-notes-fields.md#b078>) · 범위 | 양식 개체 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B085](<10-headers-notes-fields.md#b085>) · 범위 | 각주 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B086](<10-headers-notes-fields.md#b086>) · 범위 | 미주 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B087](<10-headers-notes-fields.md#b087>) · 범위 | 각주·미주 모양 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B088](<10-headers-notes-fields.md#b088>) · 범위 | 날짜·시간·파일명 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B089](<10-headers-notes-fields.md#b089>) · 범위 | 덧말 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B093](<10-headers-notes-fields.md#b093>) · 범위 | 상호 참조 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B095](<10-headers-notes-fields.md#b095>) · 범위 | 하이퍼링크 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 
 <a id="work-2"></a>
 
-### 입력 · 상위 기능 점검 (2)
+### 각주
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B095](<10-headers-notes-fields.md#b095>) · 범위 | 하이퍼링크 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B085](<10-headers-notes-fields.md#b085>) · 범위 | 각주 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [G100](<10-headers-notes-fields.md#g100>) · 작업 | 새 각주의 고정 스타일 인덱스 참조 오류 수정 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-3"></a>
 
@@ -120,7 +121,7 @@
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
 - 다음 작업: 내용·번호·쪽 위치 보존
 - UI 명령: `insert:footnote`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>)
 - 원래 기록: `WIRED;NOT_RUN`
 
 </details>
@@ -352,6 +353,21 @@
 - Agent 명령: `set_header_footer_text`
 - 근거: [68-agent-header-footer.md](<../68-agent-header-footer.md>) · [wire-schema.mjs](<../../apps/editor/src/modules/document/public/wire-schema.mjs>)
 - 원래 기록: `CURRENT_46_KIND_CONTRACT`
+
+</details>
+
+<details id="g100">
+<summary>G100 · 새 각주의 고정 스타일 인덱스 참조 오류 수정</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 새 각주만 고유한 named Footnote/각주 문단 스타일과 유효 참조를 확인한다. 스타일 순서 이동·재열기, 없음/rename/중복/type/범위 초과/깨진 참조의 삽입 전 bytes 불변을 검증. 기존 원본은 정규화하지 않는다.
+- 다음 작업: 한글 직접 비교. 고유한 표준 각주 스타일을 찾을 수 없는 원본은 삽입 거절로 명시한다.
+- 상위 항목: [B085](<10-headers-notes-fields.md#b085>) 각주
+- UI 명령: `insert:footnote`
+- 근거: [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>)
+- 원래 기록: `SCOPED_IMPLEMENTED;ENGINE_BROWSER_VERIFIED_2026_10_16`
 
 </details>
 

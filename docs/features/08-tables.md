@@ -6,19 +6,17 @@
 
 ## 진행 요약
 
-실행 작업 **36개**, 상위 범위 **24개**. CSV의 기록을 기능별로 표시한 문서다.
+실행 작업 **38개**, 상위 범위 **24개**. CSV의 기록을 기능별로 표시한 문서다.
 
 | 구분 | 실행 작업 | 상위 범위 |
 | --- | --- | --- |
-| 구현 | 완료 30/36 · 부분 2 · 미구현 3 · 재점검 1 | 완료 0/24 · 부분 23 · 미구현 1 |
-| 검증 | 완료 2/36 · 부분 30 · 미검증 4 | 완료 0/24 · 부분 13 · 미검증 11 |
-| Agent 연결 | 연결 26/33 · 부분 3 · 미연결 4 · 해당 없음 3 | 연결 0/24 · 부분 9 · 미연결 15 |
+| 구현 | 완료 32/38 · 부분 2 · 미구현 3 · 재점검 1 | 완료 0/24 · 부분 23 · 미구현 1 |
+| 검증 | 완료 3/38 · 부분 31 · 미검증 4 | 완료 0/24 · 부분 13 · 미검증 11 |
+| Agent 연결 | 연결 26/33 · 부분 3 · 미연결 4 · 해당 없음 5 | 연결 0/24 · 부분 9 · 미연결 15 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
 상위 범위는 세 축 완료 **0/24개**다. 세부 작업 완료 수와 분리해서 읽는다.
-
-**현재 통합 중:** 병합 표 행 높이의 Native 수정과 속성 대화상자의 변경 값 보존을 검증 중이다. 병합 행열 Agent 전체 연결은 완료로 표시하지 않는다.
 
 ## 먼저 할 일
 
@@ -85,6 +83,7 @@
 | [A032](<08-tables.md#a032>) · 작업 | 단순 셀 원문 검사·교체 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [A033](<08-tables.md#a033>) · 작업 | 단순 셀 서식·안 여백·열 너비·행 높이 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [N006](<08-tables.md#n006>) · 작업 | 중첩 표 Agent 조회·경로·편집 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [G095](<08-tables.md#g095>) · 작업 | 속성창 변경값만 적용해 원본 정밀도 유지 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 
 <a id="work-5"></a>
 
@@ -130,6 +129,7 @@
 | [A035](<08-tables.md#a035>) · 작업 | 단순 표 행 추가 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [A036](<08-tables.md#a036>) · 작업 | 단순 표 열 추가 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [N007](<08-tables.md#n007>) · 작업 | 병합 포함 행/열 추가·삭제 Agent | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [G098](<08-tables.md#g098>) · 작업 | 병합 행 경계 추가·삭제 시 검증된 셀 높이 동기화 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-9"></a>
 
@@ -279,7 +279,7 @@
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
 - 다음 작업: 2026-10-15: 표 바깥 여백의 HWP/HWPX 모델·저장 불일치 수정, 실제 속성 창 취소·적용·undo/redo·안전 저장·UI 재열기 검증. 모든 속성 조합과 한글 직접 동등성 검수는 남음.
 - UI 명령: `table:cell-props`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [verification-summary.json](<../evidence/save-table-controls-2026-10-14/verification-summary.json>) · [94-table-width-and-outer-margins.md](<../94-table-width-and-outer-margins.md>)
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [verification-summary.json](<../evidence/save-table-controls-2026-10-14/verification-summary.json>) · [94-table-width-and-outer-margins.md](<../94-table-width-and-outer-margins.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>)
 - 원래 기록: `WIRED;BROWSER_TESTED_NATIVE_PENDING`
 
 </details>
@@ -986,7 +986,7 @@
 - 완료 범위: span 교차·주 셀 제거·neighbor 영향·실패 원복
 - 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
 - 상위 항목: [B158](<08-tables.md#b158>) 행·열 추가
-- 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>)
+- 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>)
 - 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
 
 </details>
@@ -1063,6 +1063,36 @@
 - Agent 명령: `split_table_cell_into`
 - 근거: [102-agent-cell-subdivision.md](<../102-agent-cell-subdivision.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>)
 - 원래 기록: `CURRENT_51_KIND_CONTRACT`
+
+</details>
+
+<details id="g095">
+<summary>G095 · 속성창 변경값만 적용해 원본 정밀도 유지</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: 표/셀 속성의 표시된 초기값과 사용자가 바꾼 값을 비교한다. 확인만 한 경우 bytes/revision/history/dirty 불변; 셀 여백만 바꾸면 원래 141HU 표 기본값을 보존한다.
+- 다음 작업: 다른 대화상자의 모든 수치·서식 조합은 별도 점검.
+- 상위 항목: [B153](<08-tables.md#b153>) 셀 속성
+- UI 명령: `table:cell-props`
+- 근거: [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>)
+- 원래 기록: `SCOPED_IMPLEMENTED;ENGINE_BROWSER_VERIFIED_2026_10_16`
+
+</details>
+
+<details id="g098">
+<summary>G098 · 병합 행 경계 추가·삭제 시 검증된 셀 높이 동기화</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: Native/수동 UI의 이미 알려진 행 높이 합이 검증된 병합 span을 교차하는 추가·삭제에 한해 높이를 동기화. 양 형식·독립 기대값·undo/redo/저장/재열기 검증. 불명 높이는 추측하지 않는다.
+- 다음 작업: 한글 직접 비교와 N007 병합 행열 Agent 전체 지원은 별도이며 보호를 유지한다.
+- 상위 항목: [B158](<08-tables.md#b158>) 행·열 추가
+- UI 명령: `table:insert-row-above;table:insert-row-below;table:delete-row`
+- 근거: [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>)
+- 원래 기록: `SCOPED_IMPLEMENTED;ENGINE_BROWSER_VERIFIED_2026_10_16`
 
 </details>
 

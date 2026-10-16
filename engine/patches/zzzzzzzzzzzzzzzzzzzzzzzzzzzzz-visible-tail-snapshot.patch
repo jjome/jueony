@@ -1,0 +1,97 @@
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -2213,6 +2213,39 @@
+             }
+             for child in &node.children { blank_origins(child, si, origins); }
+         }
++        // Only direct body-column lines own root source paragraphs. Never scan
++        // a table, caption, header or another nested story as a root line.
++        fn visible_origins(node: &RenderNode, si: usize, origins: &mut std::collections::BTreeMap<usize, Vec<(f64, u32, i32, String)>>) {
++            match &node.node_type {
++                RenderNodeType::Page(_) | RenderNodeType::Body { .. } => {
++                    for child in &node.children { visible_origins(child, si, origins); }
++                }
++                RenderNodeType::Column(_) => {
++                    for child in &node.children {
++                        let RenderNodeType::TextLine(line) = &child.node_type else { continue; };
++                        let (Some(pi), Some(index), Some(vpos)) = (line.para_index, line.line_index, line.vpos) else { continue; };
++                        if line.section_index != Some(si) || line.caption_owner.is_some() { continue; }
++                        let mut text = String::new();
++                        let mut offset = 0;
++                        let mut valid = !child.children.is_empty();
++                        for run_node in &child.children {
++                            let RenderNodeType::TextRun(run) = &run_node.node_type else { valid = false; break; };
++                            if run.section_index != Some(si) || run.para_index != Some(pi)
++                                || run.cell_context.is_some() || run.char_start != Some(offset)
++                                || run.is_vertical || run.rotation != 0.0 || run.char_overlap.is_some() {
++                                valid = false; break;
++                            }
++                            offset += run.text.chars().count();
++                            text.push_str(&run.text);
++                        }
++                        if valid && !text.is_empty() {
++                            origins.entry(pi).or_default().push((child.bbox.y, index, vpos, text));
++                        }
++                    }
++                }
++                _ => {}
++            }
++        }
+         let profile = self.effective_layout_profile();
+         if !profile.native_hwp5_layout() || !profile.session_edited()
+             || !self.dpi.is_finite() || self.dpi <= 0.0 { return; }
+@@ -2229,6 +2262,8 @@
+             let Ok(tree) = self.build_page_tree(page_number) else { continue; };
+             let mut blank_lines = std::collections::BTreeMap::new();
+             blank_origins(&tree.root, si, &mut blank_lines);
++            let mut visible_lines = std::collections::BTreeMap::new();
++            visible_origins(&tree.root, si, &mut visible_lines);
+             for (pi, para) in section.paragraphs.iter().enumerate().skip(1) {
+                 let [Control::Table(table)] = para.controls.as_slice() else { continue; };
+                 if !table.common.allow_overlap || table.page_break != crate::model::table::TablePageBreak::None
+@@ -2239,11 +2274,16 @@
+                 // A tail consisting exclusively of whole table hosts has no
+                 // later text/source line frame whose original gap we could erase.
+                 if section.paragraphs[pi..].iter().any(|host| {
+-                    !(host.text.is_empty() && host.controls.is_empty())
++                    !host.controls.is_empty()
+                         && !matches!(host.controls.as_slice(), [Control::Table(t)]
+                             if t.page_break == crate::model::table::TablePageBreak::None
+                                 && object_only_saved_table_anchor(host, t))
+                 }) { continue; }
++                let visible_tail = section.paragraphs[pi + 1..].iter()
++                    .any(|host| host.controls.is_empty() && !host.text.is_empty());
++                if visible_tail && section.paragraphs[pi - 1..].iter().any(|host|
++                    host.controls.iter().any(|control| matches!(control,
++                        Control::Table(t) if t.caption.is_some()))) { continue; }
+                 let previous = &section.paragraphs[pi - 1];
+                 let [Control::Table(prior)] = previous.controls.as_slice() else { continue; };
+                 if prior.page_break != crate::model::table::TablePageBreak::None
+@@ -2269,9 +2309,24 @@
+                 let mut blanks = Vec::new();
+                 let mut invalid = false;
+                 for (bi, blank) in section.paragraphs.iter().enumerate().skip(pi + 1) {
+-                    if !blank.text.is_empty() || !blank.controls.is_empty() { continue; }
+-                    let ([line], Some(positions)) = (blank.line_segs.as_slice(), blank_lines.get(&bi)) else { invalid = true; break; };
+-                    let [y] = positions.as_slice() else { invalid = true; break; };
++                    if !blank.controls.is_empty() { continue; }
++                    let [line] = blank.line_segs.as_slice() else { invalid = true; break; };
++                    if blank.stored_text_partition_is_dirty() || blank.cell_format_vpos_dirty {
++                        invalid = true; break;
++                    }
++                    let y = if blank.text.is_empty() {
++                        let Some(positions) = blank_lines.get(&bi) else { invalid = true; break; };
++                        let [y] = positions.as_slice() else { invalid = true; break; };
++                        *y
++                    } else {
++                        let Some(positions) = visible_lines.get(&bi) else { invalid = true; break; };
++                        let [(y, index, vpos, text)] = positions.as_slice() else { invalid = true; break; };
++                        if *index != 0 || *vpos != line.vertical_pos || *text != blank.text
++                            || line.text_start != 0 || blank.text.chars().any(|ch| ch.is_control()) {
++                            invalid = true; break;
++                        }
++                        *y
++                    };
+                     let value = ((y - page.layout.body_area.y) * 7200.0 / self.dpi).round();
+                     if !value.is_finite() || value < line.vertical_pos as f64 || value > i32::MAX as f64
+                         || line.tag & crate::model::paragraph::LineSeg::TAG_IMPLEMENTATION_PROPERTY != 0 {

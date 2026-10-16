@@ -1,5 +1,13 @@
 # Jueony 업무·채팅·문서 편집 MVP
 
+2026-10-16 저장·복구 검수본은 `build/jueony-storage-20261016/Start-Review.cmd`(4326)다. [105번 저장·복구 결과](../../docs/105-file-storage-preservation.md)를 따른다. 실제 파일 readback, 다른 형식 저장 뒤 재저장, 속성창의 원본 정밀도 유지와 알려진 HWP 겹침 배치 손상의 저장 차단을 보강했다. 이전 4324와 사용자 문서·서버는 유지한다. 한글 직접 비교와 실제 Windows 파일 권한 검수는 별도다.
+
+현재 검수 프로필은 `storage-ready`이며 TypeScript 대상은 `.build/studio-storage-ready/tsconfig.json`이다. 단위 검사는 빌드한 패치 엔진의 절대 pkg 경로를 `JUEONY_ENGINE_PACKAGE`에 지정해 실행한다. 최신 실제 엔진 관측이 필요한 검사를 원본 npm 패키지 결과로 대체하지 않는다.
+
+2026-10-15 병렬 구현 검수본은 `build/jueony-parallel-editor-20261015/Start-Review.cmd`(4324)다. [104번 통합 결과](../../docs/104-parallel-editor-integration.md)가 최신 지원 범위·검사·제한의 기준이며 아래 실행본은 이전 이력이다. Agent 51종 계약에 병합 주 셀 문단 교체와 비병합 셀의 지정 행·열 분할을 추가했고, 지원하는 Rectangle 글상자의 커서·선택·미저장 복원을 연결했다.
+
+단위 검사에는 `JUEONY_ENGINE_PACKAGE`로 `scripts/Build-DocumentEngine.ps1`이 출력한 **절대 pkg 경로**를 지정한다. 최신 표 구조 보호에는 `cellZoneCount` 관측이 필요하다. 원본 npm 엔진에는 이 관측이 없으므로 이를 사용하는 긍정 검사 두 개는 건너뛴다. 104번의 단위 772개 결과는 패치 엔진에서 건너뜀 없이 실행한 결과다. TypeScript 검사 대상도 검수 프로필의 `.build/studio-parallel-editor/tsconfig.json`으로 맞춘다.
+
 2026-10-11. 왼쪽 업무/채팅/폴더, 가운데 AI 대화, 오른쪽 실제 HWP/HWPX 편집기를 연결했다. 한글 2024 전체 기능·화면·호환성 100%를 구현한 제품은 아니다. 실제 기관 LLM과 한글 독립 검수는 대기 중이다.
 
 최신 긴 표 검수본(2026-10-14): `build/jueony-paragraph-page-owner-20261014/Start-Review.cmd` (4312). 끝 빈 문단의 페이지 소유를 보존해 긴 표의 Agent 결과 조회·저장 재열기를 수정했다. [92번 결과·제한](../../docs/92-terminal-paragraph-page-owner.md)을 따른다. HWP 크기·행 높이와 전체 한글 직접 비교는 남는다. 아래는 이전 이력이다.

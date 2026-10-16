@@ -6,23 +6,21 @@
 
 ## 진행 요약
 
-실행 작업 **17개**, 상위 범위 **33개**. CSV의 기록을 기능별로 표시한 문서다.
+실행 작업 **18개**, 상위 범위 **33개**. CSV의 기록을 기능별로 표시한 문서다.
 
 | 구분 | 실행 작업 | 상위 범위 |
 | --- | --- | --- |
-| 구현 | 완료 12/17 · 부분 1 · 미구현 1 · 재점검 3 | 완료 4/33 · 부분 3 · 재점검 26 |
-| 검증 | 완료 0/17 · 부분 13 · 미검증 4 | 완료 0/33 · 부분 33 |
-| Agent 연결 | 연결 1/1 · 부분 0 · 해당 없음 16 | 해당 없음 33 |
+| 구현 | 완료 13/18 · 부분 1 · 미구현 1 · 재점검 3 | 완료 4/33 · 부분 3 · 재점검 26 |
+| 검증 | 완료 0/18 · 부분 14 · 미검증 4 | 완료 0/33 · 부분 33 |
+| Agent 연결 | 연결 1/1 · 부분 0 · 해당 없음 17 | 해당 없음 33 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
 상위 범위는 세 축 완료 **0/33개**다. 세부 작업 완료 수와 분리해서 읽는다.
 
-**현재 통합 중:** 머리말·각주 story의 서식·소유·문맥 지문을 강화하는 후속 코드를 통합 검증 중이다. 기존 완료 기록과 새 미검증 변경을 구분한다.
-
 ## 먼저 할 일
 
-- **구현** [N014](<13-state-and-preferences.md#n014>) **글상자 내부 커서·선택 복원** — 평면 Rectangle story만 복원; 그룹·회전·중첩·캡션·표 내부와 기타 개체는 남음; 최종 한글 비교는 별도.
+- **구현** [N014](<13-state-and-preferences.md#n014>) **글상자 내부 커서·선택 복원** — Rectangle 글상자와 일반 H/F·root body 각주의 커서/선택·재시작 복원 검증. 미주 UI locator·필드/중첩/불명 graph 및 전체 상태·한글 동등성은 남음.
 - **구현** [N015](<13-state-and-preferences.md#n015>) **다중 개체·그룹 선택 복원** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
 - **재점검** [N016](<13-state-and-preferences.md#n016>) **미주·나머지 특수 영역 선택 복원** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
 
@@ -109,6 +107,7 @@
 | [N015](<13-state-and-preferences.md#n015>) · 작업 | 다중 개체·그룹 선택 복원 | ☐ 미구현 | ☐ 미검증 | — 해당 없음 |
 | [N016](<13-state-and-preferences.md#n016>) · 작업 | 미주·나머지 특수 영역 선택 복원 | ? 재점검 | ☐ 미검증 | — 해당 없음 |
 | [G091](<13-state-and-preferences.md#g091>) · 작업 | Rectangle 글상자 커서·선택·미저장 재시작 복원 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
+| [G099](<13-state-and-preferences.md#g099>) · 작업 | 머리말·본문 각주의 소유·서식 지문과 재시작 복원 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-6"></a>
 
@@ -728,9 +727,9 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
 - 완료 범위: 문단 경로·문맥 hash·원본 확인·포커스
-- 다음 작업: 평면 Rectangle story만 복원; 그룹·회전·중첩·캡션·표 내부와 기타 개체는 남음; 최종 한글 비교는 별도.
+- 다음 작업: Rectangle 글상자와 일반 H/F·root body 각주의 커서/선택·재시작 복원 검증. 미주 UI locator·필드/중첩/불명 graph 및 전체 상태·한글 동등성은 남음.
 - 상위 항목: [S018](<13-state-and-preferences.md#s018>) 본문/표/개체 선택과 모드
-- 근거: [103-textbox-state-and-storage.md](<../103-textbox-state-and-storage.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>)
+- 근거: [103-textbox-state-and-storage.md](<../103-textbox-state-and-storage.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>)
 - 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
 
 </details>
@@ -802,6 +801,20 @@
 - 상위 항목: [N014](<13-state-and-preferences.md#n014>) 글상자 내부 커서·선택 복원
 - 근거: [103-textbox-state-and-storage.md](<../103-textbox-state-and-storage.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>)
 - 원래 기록: `SCOPED_PARALLEL_EDITOR_STATE_STORAGE`
+
+</details>
+
+<details id="g099">
+<summary>G099 · 머리말·본문 각주의 소유·서식 지문과 재시작 복원</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 일반 H/F 및 root body 각주의 Unicode/다문단/혼합 서식 커서·역방향 선택·실제 재시작·포커스·bytes/dirty/geometry 불변. 논리 문맥과 실제 owner ID는 검증하고 재생성 문단 ID는 typed provenance로 분리한다.
+- 다음 작업: 한글 직접 비교. 미주 UI locator·표/개체/필드/불명 payload·예약 비트·활성 목록은 readonly. N014 전체 상태는 부분 유지.
+- 상위 항목: [N014](<13-state-and-preferences.md#n014>) 글상자 내부 커서·선택 복원
+- 근거: [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>)
+- 원래 기록: `SCOPED_IMPLEMENTED;ENGINE_BROWSER_VERIFIED_2026_10_16`
 
 </details>
 

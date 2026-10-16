@@ -145,6 +145,8 @@ FileAccessPort는 backend의 실제 보장을 반환한다. 브라우저 writabl
 
 복구 checkpoint는 원본 저장 완료가 아니며 dirty를 해제하지 않는다. 암호 문서의 평문 복구 금지, 손실 보고 시 기존 복구본 유지, 실제 사용자 저장 확인을 유지한다. `contentLoss.count=0`만으로 전체 무손실이라는 새 보장을 만들지 않는다.
 
+읽을 수 있는 파일 연결은 close 뒤 실제 commit 바이트를 다시 읽어 사본 지문과 일치한 다음 저장 성공을 알린다. close 이후 실패는 이미 디스크가 바뀌었을 수 있으므로 열린 문서는 dirty로 유지하고 원본 불변을 단정하지 않는다. 성공한 SaveAs의 출력 형식은 파일 연결 adapter가 관리하며 문서 엔진의 원본 형식을 바꾸지 않는다. 명시적으로 새 문서를 연 뒤에는 이전 연결의 출력 형식을 재사용하지 않는다. [저장·복구 보강 계약과 검증 범위](105-file-storage-preservation.md)를 따른다.
+
 ## 6 자료와 Agent 계약
 
 `ReferenceFacade.resolveContext`는 읽을 자료를 명시적으로 선택한 `workspaceId/chatId/sourceRefs`와 예산을 받는다. 결과는 실제 전달한 내용·출처·hash·추출 제한·잘림/누락 정보를 포함한 SourceBundle이다. 폴더 등록은 자동 분석 완료가 아니다. 자료 선택과 검색 범위를 provider adapter가 결정하지 않는다.

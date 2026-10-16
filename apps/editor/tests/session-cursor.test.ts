@@ -1,3 +1,7 @@
+import {resolve} from 'node:path';
+import {pathToFileURL} from 'node:url';
+async function patchedSessionEngine(){const pkg=process.env.JUEONY_ENGINE_PACKAGE?resolve(process.env.JUEONY_ENGINE_PACKAGE):new URL('../node_modules/@rhwp/core/',import.meta.url);const {readFile}=await import('node:fs/promises');const path=typeof pkg==='string'?pathToFileURL(pkg+'/rhwp.js'):new URL('rhwp.js',pkg);const engine=await import(path.href);await engine.default({module_or_path:await readFile(typeof pkg==='string'?pkg+'/rhwp_bg.wasm':new URL('rhwp_bg.wasm',pkg))});return engine;}
+function storyObservation(request:any,texts:string[],parent:number,control:number){return {version:1,complete:true,identityKnown:true,identity:{mode:'semantic',instance:null},kind:request.kind,section:request.section,parent,control,applyTo:request.applyTo??null,owner:{fixture:true},context:[{paragraph:parent,text:'host',paragraphProperties:{},controlKinds:[],host:{}}],paragraphs:texts.map(text=>({text,paragraph:{},metadata:{},style:{},controls:[],characters:text?[{start:0,end:[...text].length,properties:{bold:false}}]:[],emptyCharacters:text?null:{bold:false},endCharacters:{bold:false}}))};}
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {captureSessionCursor,restoreSessionCursor} from '../src/adapters/rhwp/session-cursor.ts';
@@ -193,6 +197,8 @@ function headerFixture(){
  Object.assign(f.input.cursor,{headerFooterMode:'header',hfSectionIdx:0,hfApplyTo:2,hfParaIdx:0,hfCharOffset:2,
   isInHeaderFooter:()=>true,hasSelection:()=>Boolean(range),getHeaderFooterSelectionOrdered:()=>range});
  f.input.wasm.getHeaderFooter=()=>JSON.stringify({ok:true,exists:true,kind:'header',applyTo:2,paraIndex:0,controlIndex:3,paraCount:texts.length,text:texts.join('\n')});
+ f.input.wasm.getSessionStoryEvidence=(request:string)=>JSON.stringify(storyObservation(JSON.parse(request),texts,0,3));
+ f.input.wasm.getCursorRectInHeaderFooter=()=>JSON.stringify({pageIndex:0,x:20,y:30,height:12});
  f.input.wasm.getHeaderFooterParaInfo=(_s,_h,_a,p)=>JSON.stringify({ok:true,paraCount:texts.length,charCount:[...texts[p]].length,text:texts[p]});
  f.input.restoreSessionHeaderFooter=saved=>{restored=saved;return true;};
  return {...f,texts,range:(value:any)=>{range=value;},restored:()=>restored};
@@ -210,11 +216,13 @@ test('header/footer caret and backwards text selection retain target and body re
 });
 
 function noteFixture(){
- const f=fixture(),texts=['  각😀주','다음 문단'];let restored:any,range:any=null,location:any={ok:true,sectionIdx:0,paraIdx:1,controlIdx:1,sourceType:'footnote'};
+ const f=fixture(),texts=['  각😀주','다음 문단'];let restored:any,range:any=null,location:any={ok:true,sectionIdx:0,paraIdx:1,controlIdx:1,sourceType:'body'};
  Object.assign(f.input.cursor,{fnSectionIdx:0,fnParaIdx:1,fnControlIdx:1,fnInnerParaIdx:0,fnCharOffset:4,fnPageNum:0,fnFootnoteIndex:0,
   isInFootnote:()=>true,hasSelection:()=>Boolean(range),getFootnoteSelection:()=>range});
  f.input.wasm.getFootnoteInfo=()=>({ok:true,paraCount:texts.length,totalTextLen:texts.reduce((s,t)=>s+[...t].length,0),number:1,texts:[...texts]});
  f.input.wasm.getPageFootnoteInfo=()=>location;
+ f.input.wasm.getSessionStoryEvidence=(request:string)=>JSON.stringify(storyObservation(JSON.parse(request),texts,1,1));
+ f.input.wasm.getCursorRectInFootnote=()=>JSON.stringify({pageIndex:0,x:20,y:80,height:12});
  f.input.restoreSessionFootnote=saved=>{restored=saved;return true;};
  return {...f,texts,range:(value:any)=>{range=value;},location:(value:any)=>{location=value;},restored:()=>restored};
 }
@@ -224,9 +232,9 @@ test('note range restores exact source only and refuses changed page ownership, 
  f.range({anchor:{fnParaIdx:1,charOffset:3},focus:{fnParaIdx:0,charOffset:4},pageNum:0,footnoteIndex:0});
  const saved=captureSessionCursor(f.input)!;assert.equal(saved?.kind,'footnote');assert.equal(restoreSessionCursor(f.input,saved),true);
  if(saved.kind==='footnote')assert.equal(f.restored().anchor.paragraph,1);
- f.location({ok:true,sectionIdx:0,paraIdx:1,controlIdx:2,sourceType:'footnote'});assert.equal(restoreSessionCursor(f.input,saved),false);
+ f.location({ok:true,sectionIdx:0,paraIdx:1,controlIdx:2,sourceType:'body'});assert.equal(restoreSessionCursor(f.input,saved),false);
  f.location({ok:true,sectionIdx:0,paraIdx:1,controlIdx:1,sourceType:'endnote'});assert.equal(restoreSessionCursor(f.input,saved),false);
- f.location({ok:true,sectionIdx:0,paraIdx:1,controlIdx:1,sourceType:'footnote'});f.texts[1]='변경됨';assert.equal(restoreSessionCursor(f.input,saved),false);
+ f.location({ok:true,sectionIdx:0,paraIdx:1,controlIdx:1,sourceType:'body'});f.texts[1]='변경됨';assert.equal(restoreSessionCursor(f.input,saved),false);
  for(const override of [{page:-1},{index:-1},{sourceType:'<bad>'},{control:-1}])assert.equal(validateSessionCursor({...saved,...override}),undefined);
  assert.equal(f.calls(),0);
 });
@@ -237,9 +245,8 @@ test('special story bounds, malformed selections and protected files refuse pers
  f.range(null);const saved=captureSessionCursor(f.input)!;f.input.wasm.requiresPasswordForSave=true;assert.equal(captureSessionCursor(f.input),undefined);assert.equal(restoreSessionCursor(f.input,saved),false);
 });
 
-test('pinned WASM header and footer targets survive both save formats and remain unchanged by restoration',async()=>{
- const {readFile}=await import('node:fs/promises'),{default:init,HwpDocument}=await import('../node_modules/@rhwp/core/rhwp.js');
- await init({module_or_path:await readFile(new URL('../node_modules/@rhwp/core/rhwp_bg.wasm',import.meta.url))});
+test('patched WASM header and footer targets survive both save formats and remain unchanged by restoration',{skip:!process.env.JUEONY_ENGINE_PACKAGE},async()=>{
+ const {HwpDocument}=await patchedSessionEngine();
  for(const isHeader of [true,false]){
   const doc=HwpDocument.createEmpty();
   try{
@@ -253,9 +260,8 @@ test('pinned WASM header and footer targets survive both save formats and remain
  }
 });
 
-test('pinned WASM body footnote keeps its control binding and Unicode caret after HWP/HWPX reopen',async()=>{
- const {readFile}=await import('node:fs/promises'),{default:init,HwpDocument}=await import('../node_modules/@rhwp/core/rhwp.js');
- await init({module_or_path:await readFile(new URL('../node_modules/@rhwp/core/rhwp_bg.wasm',import.meta.url))});
+test('patched WASM body footnote keeps its control binding and Unicode caret after HWP/HWPX reopen',{skip:!process.env.JUEONY_ENGINE_PACKAGE},async()=>{
+ const {HwpDocument}=await patchedSessionEngine();
  const doc=HwpDocument.createEmpty();
  try{
   doc.createBlankDocument();doc.insertText(0,0,0,'본문');const ref=JSON.parse(doc.insertFootnote(0,0,1));assert.equal(ref.ok,true);

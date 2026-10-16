@@ -1,0 +1,1625 @@
+{
+  "results": [
+    "hwpx vertical insertRow2: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx vertical insertColumn2: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx vertical deleteRow1: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx vertical deleteRow2: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx vertical deleteColumn1: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx vertical deleteColumn2: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx vertical insertRow3: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx vertical insertColumn3: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx horizontal insertRow2: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx horizontal insertColumn2: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx horizontal deleteRow1: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx horizontal deleteRow2: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx horizontal deleteColumn1: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx horizontal deleteColumn2: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx horizontal insertRow3: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx horizontal insertColumn3: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx rectangle insertRow2: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx rectangle insertColumn2: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx rectangle deleteRow1: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx rectangle deleteRow2: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx rectangle deleteColumn1: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx rectangle deleteColumn2: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx rectangle insertRow3: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx rectangle insertColumn3: independent stored height, grid, save/reopen, undo/redo",
+    "hwp vertical insertRow2: independent stored height, grid, save/reopen, undo/redo",
+    "hwp vertical insertColumn2: independent stored height, grid, save/reopen, undo/redo",
+    "hwp vertical deleteRow1: independent stored height, grid, save/reopen, undo/redo",
+    "hwp vertical deleteRow2: independent stored height, grid, save/reopen, undo/redo",
+    "hwp vertical deleteColumn1: independent stored height, grid, save/reopen, undo/redo",
+    "hwp vertical deleteColumn2: independent stored height, grid, save/reopen, undo/redo",
+    "hwp vertical insertRow3: independent stored height, grid, save/reopen, undo/redo",
+    "hwp vertical insertColumn3: independent stored height, grid, save/reopen, undo/redo",
+    "hwp horizontal insertRow2: independent stored height, grid, save/reopen, undo/redo",
+    "hwp horizontal insertColumn2: independent stored height, grid, save/reopen, undo/redo",
+    "hwp horizontal deleteRow1: independent stored height, grid, save/reopen, undo/redo",
+    "hwp horizontal deleteRow2: independent stored height, grid, save/reopen, undo/redo",
+    "hwp horizontal deleteColumn1: independent stored height, grid, save/reopen, undo/redo",
+    "hwp horizontal deleteColumn2: independent stored height, grid, save/reopen, undo/redo",
+    "hwp horizontal insertRow3: independent stored height, grid, save/reopen, undo/redo",
+    "hwp horizontal insertColumn3: independent stored height, grid, save/reopen, undo/redo",
+    "hwp rectangle insertRow2: independent stored height, grid, save/reopen, undo/redo",
+    "hwp rectangle insertColumn2: independent stored height, grid, save/reopen, undo/redo",
+    "hwp rectangle deleteRow1: independent stored height, grid, save/reopen, undo/redo",
+    "hwp rectangle deleteRow2: independent stored height, grid, save/reopen, undo/redo",
+    "hwp rectangle deleteColumn1: independent stored height, grid, save/reopen, undo/redo",
+    "hwp rectangle deleteColumn2: independent stored height, grid, save/reopen, undo/redo",
+    "hwp rectangle insertRow3: independent stored height, grid, save/reopen, undo/redo",
+    "hwp rectangle insertColumn3: independent stored height, grid, save/reopen, undo/redo",
+    "hwpx vertical insertRowBelow1: chosen above-row height added",
+    "hwpx rectangle insertRowBelow1: chosen above-row height added",
+    "hwp vertical insertRowBelow1: chosen above-row height added",
+    "hwp rectangle insertRowBelow1: chosen above-row height added",
+    "zero insertRow: ambiguous source merged height preserved",
+    "zero deleteRow: ambiguous source merged height preserved",
+    "inconsistent insertRow: ambiguous source merged height preserved",
+    "inconsistent deleteRow: ambiguous source merged height preserved",
+    "all-merged insertRow: ambiguous source merged height preserved",
+    "all-merged deleteRow: ambiguous source merged height preserved",
+    "protected insertRow: Native source flag/character preservation is separate from Agent permission",
+    "protected deleteRow: Native source flag/character preservation is separate from Agent permission",
+    "format insertRow: Native source flag/character preservation is separate from Agent permission",
+    "format deleteRow: Native source flag/character preservation is separate from Agent permission",
+    "Native invalid row/column positions fail before write",
+    "Agent merged/protected/zone axes remain unsupported and never mutate"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "scope": {
+    "nativeShapes": 52,
+    "sourceAmbiguity": 6,
+    "nativeFlagAndFormattingPreservation": 4,
+    "invalidNative": 1,
+    "agentRefusal": 1
+  },
+  "observations": [
+    {
+      "format": "hwpx",
+      "shape": "vertical",
+      "op": "insertRow",
+      "index": 2,
+      "expectedHeight": 20000,
+      "actualHeight": 20000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 5,
+        "columns": 4,
+        "cells": 18,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 33000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "e075f1b1e6e7c3cdaa4479fc6ad37dd617b3421c718c03216250a5fe0ca2ffbe"
+    },
+    {
+      "format": "hwpx",
+      "shape": "vertical",
+      "op": "insertColumn",
+      "index": 2,
+      "expectedHeight": 13000,
+      "actualHeight": 13000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 5,
+        "cells": 19,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 46000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "dd348afb97c3a27b5953446971b1e3aded8f0994132859d98806352dd1140231"
+    },
+    {
+      "format": "hwpx",
+      "shape": "vertical",
+      "op": "deleteRow",
+      "index": 1,
+      "expectedHeight": 7000,
+      "actualHeight": 7000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 3,
+        "columns": 4,
+        "cells": 12,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 20000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "abcc13d8d04498a8f73bf8e0bff668ada89c9d93ecc54b4111dcdfdbc497a371"
+    },
+    {
+      "format": "hwpx",
+      "shape": "vertical",
+      "op": "deleteRow",
+      "index": 2,
+      "expectedHeight": 6000,
+      "actualHeight": 6000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 3,
+        "columns": 4,
+        "cells": 12,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 19000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "7f3209d687c90a2963105993f7a0f3cb91158aae718eb343ea4e0207870a8ff6"
+    },
+    {
+      "format": "hwpx",
+      "shape": "vertical",
+      "op": "deleteColumn",
+      "index": 1,
+      "expectedHeight": 13000,
+      "actualHeight": null,
+      "removedPrimary": true,
+      "grid": {
+        "rows": 4,
+        "columns": 3,
+        "cells": 12,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 28000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "7be7681e9d7566299c57bdda7ecf44d5c314130b908a1195ef841a2c800b3d21"
+    },
+    {
+      "format": "hwpx",
+      "shape": "vertical",
+      "op": "deleteColumn",
+      "index": 2,
+      "expectedHeight": 13000,
+      "actualHeight": 13000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 3,
+        "cells": 11,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 26000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "05ff47cb2b4045f1b5bf16b9fc15d7184e1a3992a50f5646204ed06a91abd1f3"
+    },
+    {
+      "format": "hwpx",
+      "shape": "vertical",
+      "op": "insertRow",
+      "index": 3,
+      "expectedHeight": 13000,
+      "actualHeight": 13000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 5,
+        "columns": 4,
+        "cells": 19,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 34000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "478c6206a758692e2179cf99e2c5f3ed8526274f270d577d0d79557746b9cf6e"
+    },
+    {
+      "format": "hwpx",
+      "shape": "vertical",
+      "op": "insertColumn",
+      "index": 3,
+      "expectedHeight": 13000,
+      "actualHeight": 13000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 5,
+        "cells": 19,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 48000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "9769f8fe1e41c2736ed6dfce387e31b35758e787a0b254d7ce18d4f240293621"
+    },
+    {
+      "format": "hwpx",
+      "shape": "horizontal",
+      "op": "insertRow",
+      "index": 2,
+      "expectedHeight": 6000,
+      "actualHeight": 6000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 5,
+        "columns": 4,
+        "cells": 19,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 33000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "43a6f7f2a76a8d9e55e61723e7c79ac8ef6876752fdf99d4d758b4b14d115c1b"
+    },
+    {
+      "format": "hwpx",
+      "shape": "horizontal",
+      "op": "insertColumn",
+      "index": 2,
+      "expectedHeight": 6000,
+      "actualHeight": 6000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 5,
+        "cells": 18,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 46000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "665dfcfa90ca46204009e54bc5d80d83547bb02b6e113d75d12e389b76c150ab"
+    },
+    {
+      "format": "hwpx",
+      "shape": "horizontal",
+      "op": "deleteRow",
+      "index": 1,
+      "expectedHeight": 6000,
+      "actualHeight": null,
+      "removedPrimary": true,
+      "grid": {
+        "rows": 3,
+        "columns": 4,
+        "cells": 12,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 20000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "b2d8fec13ae29359e64c89654bc612659ac34636b61c2e724c84cec846407e3b"
+    },
+    {
+      "format": "hwpx",
+      "shape": "horizontal",
+      "op": "deleteRow",
+      "index": 2,
+      "expectedHeight": 6000,
+      "actualHeight": 6000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 3,
+        "columns": 4,
+        "cells": 11,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 19000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "6e9d40104d2dc7ee8458052bc4f42e21da4f0d543e2bc9637eb0c02e8cc523c2"
+    },
+    {
+      "format": "hwpx",
+      "shape": "horizontal",
+      "op": "deleteColumn",
+      "index": 1,
+      "expectedHeight": 6000,
+      "actualHeight": 6000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 3,
+        "cells": 12,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 28000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "a59dce11b955af6e72e9ec9ab7ebef65ed8f731434f70ddccb125340572198f2"
+    },
+    {
+      "format": "hwpx",
+      "shape": "horizontal",
+      "op": "deleteColumn",
+      "index": 2,
+      "expectedHeight": 6000,
+      "actualHeight": 6000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 3,
+        "cells": 12,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 26000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "4aaecd82068bb6ca0a1cc94b7deee26e751638c6adc3075a8a31249b2f8e3f61"
+    },
+    {
+      "format": "hwpx",
+      "shape": "horizontal",
+      "op": "insertRow",
+      "index": 3,
+      "expectedHeight": 6000,
+      "actualHeight": 6000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 5,
+        "columns": 4,
+        "cells": 19,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 34000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "32bca7617601b86aa59f39ab763dde538b9a1ecde5846eae09bc902eddbf5e55"
+    },
+    {
+      "format": "hwpx",
+      "shape": "horizontal",
+      "op": "insertColumn",
+      "index": 3,
+      "expectedHeight": 6000,
+      "actualHeight": 6000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 5,
+        "cells": 19,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 48000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "527570d2fab50a30b2b50d0ddf9d406dd0c296260975ad5424b0c7b55918c956"
+    },
+    {
+      "format": "hwpx",
+      "shape": "rectangle",
+      "op": "insertRow",
+      "index": 2,
+      "expectedHeight": 20000,
+      "actualHeight": 20000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 5,
+        "columns": 4,
+        "cells": 15,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 33000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "0c9bb11307928c7e38d8c53595d7c48d83cc0a417858dcd47d40ca9236d41e90"
+    },
+    {
+      "format": "hwpx",
+      "shape": "rectangle",
+      "op": "insertColumn",
+      "index": 2,
+      "expectedHeight": 13000,
+      "actualHeight": 13000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 5,
+        "cells": 15,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 46000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "9b3941dc289fb946b615d8fea409ebc5fbc7b9ab279743925f8bfdb24f7f66ed"
+    },
+    {
+      "format": "hwpx",
+      "shape": "rectangle",
+      "op": "deleteRow",
+      "index": 1,
+      "expectedHeight": 7000,
+      "actualHeight": 7000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 3,
+        "columns": 4,
+        "cells": 11,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 20000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "b8f159e133015d98d09c0753235c816229253df5893e73644b4379220e90ec0d"
+    },
+    {
+      "format": "hwpx",
+      "shape": "rectangle",
+      "op": "deleteRow",
+      "index": 2,
+      "expectedHeight": 6000,
+      "actualHeight": 6000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 3,
+        "columns": 4,
+        "cells": 11,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 19000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "1af94f0c7258eb41b5889e76093b992ecad04b6ef51cc15617d7ae844de3e62b"
+    },
+    {
+      "format": "hwpx",
+      "shape": "rectangle",
+      "op": "deleteColumn",
+      "index": 1,
+      "expectedHeight": 13000,
+      "actualHeight": 13000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 3,
+        "cells": 11,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 28000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "8e58608c125581c9b86c2016186b2037f3ad868dd59244fd2d22c83783c0cd07"
+    },
+    {
+      "format": "hwpx",
+      "shape": "rectangle",
+      "op": "deleteColumn",
+      "index": 2,
+      "expectedHeight": 13000,
+      "actualHeight": 13000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 3,
+        "cells": 11,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 26000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "b6f072c6dac31428000cd241c51eb9e31b846675548eca404eb9d01417e58cc6"
+    },
+    {
+      "format": "hwpx",
+      "shape": "rectangle",
+      "op": "insertRow",
+      "index": 3,
+      "expectedHeight": 13000,
+      "actualHeight": 13000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 5,
+        "columns": 4,
+        "cells": 17,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 34000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "89ce8013b3d2981a1621b06c686c8f73c4f3f2ac49c27ffa63d9b110ea7f9863"
+    },
+    {
+      "format": "hwpx",
+      "shape": "rectangle",
+      "op": "insertColumn",
+      "index": 3,
+      "expectedHeight": 13000,
+      "actualHeight": 13000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 5,
+        "cells": 17,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 48000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "a10935c894811d81fc8a5eebf89898137c06feadde69b755dd3bf1c034701046"
+    },
+    {
+      "format": "hwp",
+      "shape": "vertical",
+      "op": "insertRow",
+      "index": 2,
+      "expectedHeight": 20000,
+      "actualHeight": 20000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 5,
+        "columns": 4,
+        "cells": 18,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 33000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "ff9341cc0b9b2ca8e0493d09e93d9196e50fbaff69a89d5601b31535edbb02f8"
+    },
+    {
+      "format": "hwp",
+      "shape": "vertical",
+      "op": "insertColumn",
+      "index": 2,
+      "expectedHeight": 13000,
+      "actualHeight": 13000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 5,
+        "cells": 19,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 46000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "dbba1b16f2d2b271b16e1dae8a1f2abc73ccb83763c7f356185e85b1a563bce2"
+    },
+    {
+      "format": "hwp",
+      "shape": "vertical",
+      "op": "deleteRow",
+      "index": 1,
+      "expectedHeight": 7000,
+      "actualHeight": 7000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 3,
+        "columns": 4,
+        "cells": 12,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 20000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "4a5c80be291540b74a95c5b68358fca92b773598cf99e6f20ec68f2c18028d08"
+    },
+    {
+      "format": "hwp",
+      "shape": "vertical",
+      "op": "deleteRow",
+      "index": 2,
+      "expectedHeight": 6000,
+      "actualHeight": 6000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 3,
+        "columns": 4,
+        "cells": 12,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 19000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "171f560059f3739ec5c11ad24222274e977dcef8d25a18a2022fbd47b8e5732d"
+    },
+    {
+      "format": "hwp",
+      "shape": "vertical",
+      "op": "deleteColumn",
+      "index": 1,
+      "expectedHeight": 13000,
+      "actualHeight": null,
+      "removedPrimary": true,
+      "grid": {
+        "rows": 4,
+        "columns": 3,
+        "cells": 12,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 28000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "564d0643b6545f418d456b93561f497d29b37a0c786d9119b8ec6da4e8567470"
+    },
+    {
+      "format": "hwp",
+      "shape": "vertical",
+      "op": "deleteColumn",
+      "index": 2,
+      "expectedHeight": 13000,
+      "actualHeight": 13000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 3,
+        "cells": 11,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 26000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "23b91fc87b14226746cecc502119bf90dc47ebb5123bece2ebf424c429616650"
+    },
+    {
+      "format": "hwp",
+      "shape": "vertical",
+      "op": "insertRow",
+      "index": 3,
+      "expectedHeight": 13000,
+      "actualHeight": 13000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 5,
+        "columns": 4,
+        "cells": 19,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 34000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "d7672d3eb15615d346460acd96bc4c47c1aa17a745cb1ac2b4efb1eedc18e923"
+    },
+    {
+      "format": "hwp",
+      "shape": "vertical",
+      "op": "insertColumn",
+      "index": 3,
+      "expectedHeight": 13000,
+      "actualHeight": 13000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 5,
+        "cells": 19,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 48000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "b1108cf08d501fd65cb0aeeb40d5714caf7d294bd5417fd27450658e0a1ec818"
+    },
+    {
+      "format": "hwp",
+      "shape": "horizontal",
+      "op": "insertRow",
+      "index": 2,
+      "expectedHeight": 6000,
+      "actualHeight": 6000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 5,
+        "columns": 4,
+        "cells": 19,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 33000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "c2f8f22823c515f2fce9d811099a66f3fd87f185c2bf86640ab872e57e0a8bf4"
+    },
+    {
+      "format": "hwp",
+      "shape": "horizontal",
+      "op": "insertColumn",
+      "index": 2,
+      "expectedHeight": 6000,
+      "actualHeight": 6000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 5,
+        "cells": 18,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 46000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "28dd95e62b6c771970369eb84704c1b4ed18851de6e7c91e1c0d4f1df3a058c1"
+    },
+    {
+      "format": "hwp",
+      "shape": "horizontal",
+      "op": "deleteRow",
+      "index": 1,
+      "expectedHeight": 6000,
+      "actualHeight": null,
+      "removedPrimary": true,
+      "grid": {
+        "rows": 3,
+        "columns": 4,
+        "cells": 12,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 20000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "8e5d1edc100d7db73dbad1fc4af8297e73f0a199a222099dabf668b87f9b0e9b"
+    },
+    {
+      "format": "hwp",
+      "shape": "horizontal",
+      "op": "deleteRow",
+      "index": 2,
+      "expectedHeight": 6000,
+      "actualHeight": 6000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 3,
+        "columns": 4,
+        "cells": 11,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 19000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "340a3e6c32bc813100ffbfef0fd7d2dc029f31a0f5e56e89cc29bbb7ad7b4b91"
+    },
+    {
+      "format": "hwp",
+      "shape": "horizontal",
+      "op": "deleteColumn",
+      "index": 1,
+      "expectedHeight": 6000,
+      "actualHeight": 6000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 3,
+        "cells": 12,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 28000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "801ff591b7f6eb76e9582c3c379e35a6cc73010317db14c86a25d6af2f1f2bb8"
+    },
+    {
+      "format": "hwp",
+      "shape": "horizontal",
+      "op": "deleteColumn",
+      "index": 2,
+      "expectedHeight": 6000,
+      "actualHeight": 6000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 3,
+        "cells": 12,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 26000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "50b293bad677a3fc466dd27005835a8085a61d5d89c4f181d46da0ce8c7d1e74"
+    },
+    {
+      "format": "hwp",
+      "shape": "horizontal",
+      "op": "insertRow",
+      "index": 3,
+      "expectedHeight": 6000,
+      "actualHeight": 6000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 5,
+        "columns": 4,
+        "cells": 19,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 34000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "7b7f42c61a8e681a081bf160ddb594fee7eb071949b8cc6613dca0ec6f0da7f9"
+    },
+    {
+      "format": "hwp",
+      "shape": "horizontal",
+      "op": "insertColumn",
+      "index": 3,
+      "expectedHeight": 6000,
+      "actualHeight": 6000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 5,
+        "cells": 19,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 48000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "0eedf5fbbca25cfc908a8f6b097a57e9828a1877a86e96ae0d94c190c1ec7f15"
+    },
+    {
+      "format": "hwp",
+      "shape": "rectangle",
+      "op": "insertRow",
+      "index": 2,
+      "expectedHeight": 20000,
+      "actualHeight": 20000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 5,
+        "columns": 4,
+        "cells": 15,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 33000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "f6c620e9a2200c3578d0eaeecb478e18ebe27861d0ffca347851967acd443085"
+    },
+    {
+      "format": "hwp",
+      "shape": "rectangle",
+      "op": "insertColumn",
+      "index": 2,
+      "expectedHeight": 13000,
+      "actualHeight": 13000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 5,
+        "cells": 15,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 46000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "b3a8eba295fa12ad0c96c99e41167b0707fd1ff9bdd3414e52cec58cc3c9d76b"
+    },
+    {
+      "format": "hwp",
+      "shape": "rectangle",
+      "op": "deleteRow",
+      "index": 1,
+      "expectedHeight": 7000,
+      "actualHeight": 7000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 3,
+        "columns": 4,
+        "cells": 11,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 20000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "4f9632f0fdf1e56ba2c0c38ccc371d9ab366f763651a61f441dd0dd59a817254"
+    },
+    {
+      "format": "hwp",
+      "shape": "rectangle",
+      "op": "deleteRow",
+      "index": 2,
+      "expectedHeight": 6000,
+      "actualHeight": 6000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 3,
+        "columns": 4,
+        "cells": 11,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 19000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "a5a03d7e0a5adb6890b78992883c16c4b806f93afb16cffa02ec5e0879aa786c"
+    },
+    {
+      "format": "hwp",
+      "shape": "rectangle",
+      "op": "deleteColumn",
+      "index": 1,
+      "expectedHeight": 13000,
+      "actualHeight": 13000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 3,
+        "cells": 11,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 28000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "b8c7a19ed327edba01732f81bb8dc1906aca5aade81262a7fe708a04373f0390"
+    },
+    {
+      "format": "hwp",
+      "shape": "rectangle",
+      "op": "deleteColumn",
+      "index": 2,
+      "expectedHeight": 13000,
+      "actualHeight": 13000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 3,
+        "cells": 11,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 26000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "5df8908d09adcb0a812797a8dfd5565809aff8814c485a6f24f7f929b9f5955e"
+    },
+    {
+      "format": "hwp",
+      "shape": "rectangle",
+      "op": "insertRow",
+      "index": 3,
+      "expectedHeight": 13000,
+      "actualHeight": 13000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 5,
+        "columns": 4,
+        "cells": 17,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 36000,
+        "height": 34000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "f4adf13fe5aae03e5fe403e18b41704af6418fac9ed08577eb13c6709dfb3b47"
+    },
+    {
+      "format": "hwp",
+      "shape": "rectangle",
+      "op": "insertColumn",
+      "index": 3,
+      "expectedHeight": 13000,
+      "actualHeight": 13000,
+      "removedPrimary": false,
+      "grid": {
+        "rows": 4,
+        "columns": 5,
+        "cells": 17,
+        "coverage": "PASS"
+      },
+      "tableBefore": {
+        "width": 36000,
+        "height": 26000
+      },
+      "tableAfter": {
+        "width": 48000,
+        "height": 26000
+      },
+      "preservation": "PASS",
+      "layoutReopen": "PASS",
+      "undo": "PASS",
+      "redo": "PASS",
+      "fileSha256": "2523a31ed6dfc98c443e750246fd01f9f9b02d5ab138f61d77bed15771f0e3ac"
+    }
+  ],
+  "engine": {
+    "optimized": false,
+    "patches": [
+      {
+        "name": "border-fill-identity.patch",
+        "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c"
+      },
+      {
+        "name": "default-tabs.patch",
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+      },
+      {
+        "name": "document-insertion.patch",
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+      },
+      {
+        "name": "master-page-editing.patch",
+        "sha256": "b04c7d682e105e3f37f72a18c1b4bb01cbf085424e3219f3919fd8c891dc26c2"
+      },
+      {
+        "name": "merged-table-transpose.patch",
+        "sha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768"
+      },
+      {
+        "name": "note-query-json.patch",
+        "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562"
+      },
+      {
+        "name": "page-border-entries.patch",
+        "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f"
+      },
+      {
+        "name": "page-border-inclusion.patch",
+        "sha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e"
+      },
+      {
+        "name": "page-border-region.patch",
+        "sha256": "ea98aed9ad8568699b802c5f46e4964fe524ba7634bc978d71fe10f44e1d7412"
+      },
+      {
+        "name": "page-border-z-image.patch",
+        "sha256": "97ccd3c9eac24c42b0844fc65e5804b232d3bef9929a6fd5de329cdd007b173b"
+      },
+      {
+        "name": "section-split.patch",
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+      },
+      {
+        "name": "style-reference-deletion.patch",
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+      },
+      {
+        "name": "style-reference-order.patch",
+        "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce"
+      },
+      {
+        "name": "style-shape-stories.patch",
+        "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af"
+      },
+      {
+        "name": "table-creation-consistency.patch",
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+      },
+      {
+        "name": "zz-line-number-settings.patch",
+        "sha256": "4cb8ce4a8d49864f53c3ff95fdfc8ef3e0342b09f86cd525dfb9aa102e2dee72"
+      },
+      {
+        "name": "zzz-page-body-delete.patch",
+        "sha256": "54bf1697627ec92c4379fb8ca314f9bf9d99c2207bf9e90859d35c7324be2e83"
+      },
+      {
+        "name": "zzzz-page-body-copy.patch",
+        "sha256": "45f3331d992f3799dad1f076bfd6d237d8c989541ea510d888e4afb5407749db"
+      },
+      {
+        "name": "zzzzz-page-body-paper-paste.patch",
+        "sha256": "4df977f851378597848aa60581957c123e6565ebf04f9412052dbfdabb2c43a0"
+      },
+      {
+        "name": "zzzzzz-page-body-style-paste.patch",
+        "sha256": "168c4c158bc0db3e71230903eae0b1ae71092a1a139f2ad5747712f95127bd75"
+      },
+      {
+        "name": "zzzzzzz-page-body-image-paste.patch",
+        "sha256": "ac08a167a376bae3e1e890f8109f2f9552ce952abe7882712f813183597ce57a"
+      },
+      {
+        "name": "zzzzzzzz-empty-section-remove.patch",
+        "sha256": "d49d3acc5bc0b3049415e17233a7f7a7249792f6500d475ce6cd39d3ad14d590"
+      },
+      {
+        "name": "zzzzzzzzz-hwpx-body-caret.patch",
+        "sha256": "c073ab44d5460f92915ea6493a791d2cbf24bb60ad66eca5033be0fc9835ac56"
+      },
+      {
+        "name": "zzzzzzzzzz-agent-page-background.patch",
+        "sha256": "74104eca6a40a3a7f06ad6d20ed8f44f816f0c153a2be40fdf584b61fc9ba907"
+      },
+      {
+        "name": "zzzzzzzzzzz-agent-header-footer.patch",
+        "sha256": "415fa55bc5fe0c4f49a7dce025723067022d7bdef076a9fb48b7f456c30cb91a"
+      },
+      {
+        "name": "zzzzzzzzzzzz-agent-paragraph-tabs.patch",
+        "sha256": "d15949747520d51020433aca32539f79c5a8cc0dfdad9de95db221dae651b311"
+      },
+      {
+        "name": "zzzzzzzzzzzzz-agent-paragraph-decoration.patch",
+        "sha256": "2adf2bba46d11a6ca97ce838da1d329c627c8532812674b7329aaef3cdb544fb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzz-agent-paragraph-lists.patch",
+        "sha256": "06e1af9e90e0c54da772a533f9c2ac5279db059c37fb3612c189e0d7e1c7692d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzz-agent-basic-bullets.patch",
+        "sha256": "03138686d9faa51fcf335f1b6299a294248031d36ca079da5346e52d0b531a35"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzz-agent-numbering-clone.patch",
+        "sha256": "a79207f328ca0521515344c018554ccc20092142dabaa5ba413ff162408fa567"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzz-agent-basic-numbering.patch",
+        "sha256": "66ac344e90a16b3e447e97bd6a593edbc7b9e024313cc40f81f2611838f3b102"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzz-agent-paragraph-outline.patch",
+        "sha256": "dfe19d3083f6a4222440ce558b5451f2568cf57b211bcc19babb508c1db2022e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzz-agent-style-metadata.patch",
+        "sha256": "53c6a573df6e8f1d0af4f388dad4e624a700006ad38f7a1de820eabc1d6d44cb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzz-whole-table-edited-host.patch",
+        "sha256": "f90714f601227bba000d63be77e5ac9f3985d192e613990984544b2f70b0f603"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzz-table-default-padding-reflow.patch",
+        "sha256": "903260c4c371a2a1d4b0afa72f8f0e1f191db936bd6e055a974a0a4295badf0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzz-hidden-paragraph-page-owner.patch",
+        "sha256": "13df5f1c5493ef4560866f3806be6a3bd2c748e50a1fc531dac686994e310b6b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-following-table-flow-owner.patch",
+        "sha256": "251cb5ee2d06a1a78732d7c01839bf4bf596a5376ce5af8637b50d8c0633f897"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-memo-tail-owner.patch",
+        "sha256": "5f4eafa802c6dd9dde96a1def6e187ef1be5b3f7e9a99cf8d4569458d0d0bca0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzz-table-outer-margin-owner.patch",
+        "sha256": "6132e26aa3a5b14f506f425d79930882a5c48092eac8e96bc4c8735cc8d42db3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-table-tail-snapshot.patch",
+        "sha256": "11a853d99a9278fd94e2c573d384f3826c53b00a433bcb6b9fa04fb24e344f0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzz-conversion-semantic-storage.patch",
+        "sha256": "65f3e6e87bb1030f2e565cfd96d36b85dc4065de8fb3615a2db24a9d4121a092"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-zone-observation.patch",
+        "sha256": "9dc3ffd29ada303898ab21268fb72e23b1b56bcf7c589a11687716848e80bb70"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-textbox-alignment-storage.patch",
+        "sha256": "b9d8791a5e9b7b5e6b5d1bd794f3a7ebe9012c7bc8403c49333217cfef434122"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-footnote-style-identity.patch",
+        "sha256": "867d4ac34306a4edfb4360b2d9d51d5bb5bc43dedf5abd6919cedeba427894e6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-merged-row-height.patch",
+        "sha256": "6364cba702decf8160fea341932f5b0df6481c51fe135c2d77b6cae1c52192a3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-session-story-evidence.patch",
+        "sha256": "4f59265ba0740ad570a7dcbdd964a06a1d99075052713e70d9c1b755b83caab8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-visible-tail-snapshot.patch",
+        "sha256": "10dbdd14e2603200bec9ebcf34417c224d4f77624fc83ddf76a3c0cb28e8931e"
+      }
+    ],
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "builtAt": "2026-10-16T14:20:54.1949285Z",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "wasmSha256": "15c3227b32bd836cc2601eae1577a17c52183ecdfa7d7026d42aa3759b6709e9",
+    "buildMode": "wsl-review-no-opt",
+    "sourceId": "06b338995d5e1d80"
+  },
+  "note": "Primitive merged-row height synchronization only. Source0/unknown heights preserved. Merged-axis Agent is NOT_CONNECTED; protected primitive fixture verifies flags, never authorizes Agent. Native Hancom NOT_RUN."
+}

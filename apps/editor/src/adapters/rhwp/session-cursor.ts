@@ -1,3 +1,4 @@
+import {readSessionHeaderFooterStory,readSessionFootnoteStory} from './session-story.ts';
 import {captureTextBoxCursor,restoreTextBoxCursor} from './session-textbox.ts';
 import type {TextBoxBookmark} from '../../modules/preferences/public/index.ts';
 import {sha256} from '@noble/hashes/sha2.js';
@@ -139,30 +140,12 @@ function evidence(input:SessionCursorInput){
   const serialized=JSON.stringify(props);if(!serialized||serialized.length>16384||!props||typeof props!=='object'||Array.isArray(props))return;
   return hash([props,mime,Array.from(sha256(bytes),value=>value.toString(16).padStart(2,'0')).join('')]);
  }
- function storyCaret(section:number,texts:string[],paragraph:number,offset:number){
-  if(!integer(paragraph)||!integer(offset)||paragraph>=texts.length)return;
-  const characters=[...texts[paragraph]];if(offset>characters.length)return;
-  return bookmark(section,paragraph,offset,characters.length,(start,count)=>characters.slice(start,start+count).join(''));
- }
  function headerFooter(section:number,isHeader:boolean,applyTo:number){
-  if(!integer(section)||section>=wasm.getSectionCount()||![0,1,2].includes(applyTo)||!wasm.getHeaderFooter||!wasm.getHeaderFooterParaInfo)return;
-  const definition=JSON.parse(wasm.getHeaderFooter(section,isHeader,applyTo));
-  if(!definition.ok||!definition.exists||definition.applyTo!==applyTo||!integer(definition.paraCount)||definition.paraCount<1||definition.paraCount>1024)return;
-  const texts:string[]=[];let characters=0;
-  for(let p=0;p<definition.paraCount;p++){
-   const info=JSON.parse(wasm.getHeaderFooterParaInfo(section,isHeader,applyTo,p));
-   if(!info.ok||info.paraCount!==definition.paraCount||typeof info.text!=='string'||info.charCount!==[...info.text].length||(characters+=info.charCount)>100000)return;
-   texts.push(info.text);
-  }
-  return {fingerprint:hash([definition,texts]),caret:(p:number,o:number)=>storyCaret(section,texts,p,o)};
+  return readSessionHeaderFooterStory(input,section,isHeader,applyTo);
  }
  function footnote(section:number,parent:number,control:number,page:number,index:number){
-  if(!bodyAddress(section,parent)||!integer(control)||!integer(page)||!integer(index)||!wasm.getFootnoteInfo||!wasm.getPageFootnoteInfo)return;
-  const location=wasm.getPageFootnoteInfo(page,index),info=wasm.getFootnoteInfo(section,parent,control);
-  if(!location?.ok||location.sectionIdx!==section||location.paraIdx!==parent||location.controlIdx!==control||!info.ok||!Array.isArray(info.texts)
-    ||!integer(info.paraCount)||info.paraCount<1||info.paraCount>1024||info.texts.length!==info.paraCount||!info.texts.every(text=>typeof text==='string')
-    ||info.texts.reduce((sum,text)=>sum+[...text].length,0)>100000)return;
-  return {sourceType:location.sourceType,fingerprint:hash([location.sourceType,info]),caret:(p:number,o:number)=>storyCaret(section,info.texts,p,o)};
+  if(!bodyAddress(section,parent))return;
+  return readSessionFootnoteStory(input,section,parent,control,page,index);
  }
  return {point,table,cellTable,selection,picture,headerFooter,footnote};
 }

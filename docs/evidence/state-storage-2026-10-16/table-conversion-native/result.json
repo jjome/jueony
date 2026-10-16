@@ -1,0 +1,222 @@
+{
+  "results": [
+    "hwp: rectangular preset preserves protected unselected vertical merge and selection boundary lines",
+    "hwp: explicit months series scratch/save/reopen preserves anchored dates and target formatting",
+    "hwp: explicit years series scratch/save/reopen preserves anchored dates and target formatting",
+    "hwp: merged whole-table transpose retains cell spans, multiple paragraphs and mixed formats",
+    "hwp: literal Unicode/empty-cell conversion, scratch preflight and two saved roundtrips",
+    "hwpx: rectangular preset preserves protected unselected vertical merge and selection boundary lines",
+    "hwpx: explicit months series scratch/save/reopen preserves anchored dates and target formatting",
+    "hwpx: explicit years series scratch/save/reopen preserves anchored dates and target formatting",
+    "hwpx: merged whole-table transpose retains cell spans, multiple paragraphs and mixed formats",
+    "hwpx: literal Unicode/empty-cell conversion, scratch preflight and two saved roundtrips",
+    "native unsafe conversion refuses stale content, merged/protected cells and literal host tabs without mutations",
+    "hwp: selected integer series preserves target style/geometry and unrelated cells through scratch/save/reopen",
+    "hwpx: selected integer series preserves target style/geometry and unrelated cells through scratch/save/reopen",
+    "hwp: table gallery on a fresh production document, four presets and mixed text preservation",
+    "hwp: exact numeric paragraph sort preserves mixed formatting and title/neighbor paragraphs",
+    "hwpx: table gallery on a fresh production document, four presets and mixed text preservation",
+    "hwpx: exact numeric paragraph sort preserves mixed formatting and title/neighbor paragraphs"
+  ],
+  "failures": [],
+  "engine": {
+    "optimized": false,
+    "patches": [
+      {
+        "name": "border-fill-identity.patch",
+        "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c"
+      },
+      {
+        "name": "default-tabs.patch",
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+      },
+      {
+        "name": "document-insertion.patch",
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+      },
+      {
+        "name": "master-page-editing.patch",
+        "sha256": "b04c7d682e105e3f37f72a18c1b4bb01cbf085424e3219f3919fd8c891dc26c2"
+      },
+      {
+        "name": "merged-table-transpose.patch",
+        "sha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768"
+      },
+      {
+        "name": "note-query-json.patch",
+        "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562"
+      },
+      {
+        "name": "page-border-entries.patch",
+        "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f"
+      },
+      {
+        "name": "page-border-inclusion.patch",
+        "sha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e"
+      },
+      {
+        "name": "page-border-region.patch",
+        "sha256": "ea98aed9ad8568699b802c5f46e4964fe524ba7634bc978d71fe10f44e1d7412"
+      },
+      {
+        "name": "page-border-z-image.patch",
+        "sha256": "97ccd3c9eac24c42b0844fc65e5804b232d3bef9929a6fd5de329cdd007b173b"
+      },
+      {
+        "name": "section-split.patch",
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+      },
+      {
+        "name": "style-reference-deletion.patch",
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+      },
+      {
+        "name": "style-reference-order.patch",
+        "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce"
+      },
+      {
+        "name": "style-shape-stories.patch",
+        "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af"
+      },
+      {
+        "name": "table-creation-consistency.patch",
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+      },
+      {
+        "name": "zz-line-number-settings.patch",
+        "sha256": "4cb8ce4a8d49864f53c3ff95fdfc8ef3e0342b09f86cd525dfb9aa102e2dee72"
+      },
+      {
+        "name": "zzz-page-body-delete.patch",
+        "sha256": "54bf1697627ec92c4379fb8ca314f9bf9d99c2207bf9e90859d35c7324be2e83"
+      },
+      {
+        "name": "zzzz-page-body-copy.patch",
+        "sha256": "45f3331d992f3799dad1f076bfd6d237d8c989541ea510d888e4afb5407749db"
+      },
+      {
+        "name": "zzzzz-page-body-paper-paste.patch",
+        "sha256": "4df977f851378597848aa60581957c123e6565ebf04f9412052dbfdabb2c43a0"
+      },
+      {
+        "name": "zzzzzz-page-body-style-paste.patch",
+        "sha256": "168c4c158bc0db3e71230903eae0b1ae71092a1a139f2ad5747712f95127bd75"
+      },
+      {
+        "name": "zzzzzzz-page-body-image-paste.patch",
+        "sha256": "ac08a167a376bae3e1e890f8109f2f9552ce952abe7882712f813183597ce57a"
+      },
+      {
+        "name": "zzzzzzzz-empty-section-remove.patch",
+        "sha256": "d49d3acc5bc0b3049415e17233a7f7a7249792f6500d475ce6cd39d3ad14d590"
+      },
+      {
+        "name": "zzzzzzzzz-hwpx-body-caret.patch",
+        "sha256": "c073ab44d5460f92915ea6493a791d2cbf24bb60ad66eca5033be0fc9835ac56"
+      },
+      {
+        "name": "zzzzzzzzzz-agent-page-background.patch",
+        "sha256": "74104eca6a40a3a7f06ad6d20ed8f44f816f0c153a2be40fdf584b61fc9ba907"
+      },
+      {
+        "name": "zzzzzzzzzzz-agent-header-footer.patch",
+        "sha256": "415fa55bc5fe0c4f49a7dce025723067022d7bdef076a9fb48b7f456c30cb91a"
+      },
+      {
+        "name": "zzzzzzzzzzzz-agent-paragraph-tabs.patch",
+        "sha256": "d15949747520d51020433aca32539f79c5a8cc0dfdad9de95db221dae651b311"
+      },
+      {
+        "name": "zzzzzzzzzzzzz-agent-paragraph-decoration.patch",
+        "sha256": "2adf2bba46d11a6ca97ce838da1d329c627c8532812674b7329aaef3cdb544fb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzz-agent-paragraph-lists.patch",
+        "sha256": "06e1af9e90e0c54da772a533f9c2ac5279db059c37fb3612c189e0d7e1c7692d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzz-agent-basic-bullets.patch",
+        "sha256": "03138686d9faa51fcf335f1b6299a294248031d36ca079da5346e52d0b531a35"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzz-agent-numbering-clone.patch",
+        "sha256": "a79207f328ca0521515344c018554ccc20092142dabaa5ba413ff162408fa567"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzz-agent-basic-numbering.patch",
+        "sha256": "66ac344e90a16b3e447e97bd6a593edbc7b9e024313cc40f81f2611838f3b102"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzz-agent-paragraph-outline.patch",
+        "sha256": "dfe19d3083f6a4222440ce558b5451f2568cf57b211bcc19babb508c1db2022e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzz-agent-style-metadata.patch",
+        "sha256": "53c6a573df6e8f1d0af4f388dad4e624a700006ad38f7a1de820eabc1d6d44cb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzz-whole-table-edited-host.patch",
+        "sha256": "f90714f601227bba000d63be77e5ac9f3985d192e613990984544b2f70b0f603"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzz-table-default-padding-reflow.patch",
+        "sha256": "903260c4c371a2a1d4b0afa72f8f0e1f191db936bd6e055a974a0a4295badf0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzz-hidden-paragraph-page-owner.patch",
+        "sha256": "13df5f1c5493ef4560866f3806be6a3bd2c748e50a1fc531dac686994e310b6b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-following-table-flow-owner.patch",
+        "sha256": "251cb5ee2d06a1a78732d7c01839bf4bf596a5376ce5af8637b50d8c0633f897"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-memo-tail-owner.patch",
+        "sha256": "5f4eafa802c6dd9dde96a1def6e187ef1be5b3f7e9a99cf8d4569458d0d0bca0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzz-table-outer-margin-owner.patch",
+        "sha256": "6132e26aa3a5b14f506f425d79930882a5c48092eac8e96bc4c8735cc8d42db3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-table-tail-snapshot.patch",
+        "sha256": "11a853d99a9278fd94e2c573d384f3826c53b00a433bcb6b9fa04fb24e344f0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzz-conversion-semantic-storage.patch",
+        "sha256": "65f3e6e87bb1030f2e565cfd96d36b85dc4065de8fb3615a2db24a9d4121a092"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-zone-observation.patch",
+        "sha256": "9dc3ffd29ada303898ab21268fb72e23b1b56bcf7c589a11687716848e80bb70"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-textbox-alignment-storage.patch",
+        "sha256": "b9d8791a5e9b7b5e6b5d1bd794f3a7ebe9012c7bc8403c49333217cfef434122"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-footnote-style-identity.patch",
+        "sha256": "867d4ac34306a4edfb4360b2d9d51d5bb5bc43dedf5abd6919cedeba427894e6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-merged-row-height.patch",
+        "sha256": "6364cba702decf8160fea341932f5b0df6481c51fe135c2d77b6cae1c52192a3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-session-story-evidence.patch",
+        "sha256": "4f59265ba0740ad570a7dcbdd964a06a1d99075052713e70d9c1b755b83caab8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-visible-tail-snapshot.patch",
+        "sha256": "10dbdd14e2603200bec9ebcf34417c224d4f77624fc83ddf76a3c0cb28e8931e"
+      }
+    ],
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "builtAt": "2026-10-16T14:20:54.1949285Z",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "wasmSha256": "15c3227b32bd836cc2601eae1577a17c52183ecdfa7d7026d42aa3759b6709e9",
+    "buildMode": "wsl-review-no-opt",
+    "sourceId": "06b338995d5e1d80"
+  },
+  "note": "Native WASM conversion, table gallery and paragraph sort tests, including scratch export-preservation checks and saved HWP/HWPX reopen. No native Hancom or UI comparison."
+}

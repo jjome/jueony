@@ -1,4 +1,5 @@
 import {sha256} from '@noble/hashes/sha2.js';
+import {assertOverlapSaveLayout,OverlapSaveLayoutError} from './overlap-save-layout.ts';
 
 /** Read-only export evidence. This is an engine round-trip check, not a Hancom layout check. */
 type Json = null | boolean | number | string | Json[] | {[key:string]:Json};
@@ -218,6 +219,13 @@ export function verifyPreservedExport(source:NativeDocument,bytes:Uint8Array,for
  finally{reopened?.free();}
  const report=comparePreservationEvidence(before,after,format,contentLoss);
  if(report.status==='blocked')throw new PreservationError(report);
+ try{
+  const layout=assertOverlapSaveLayout(source,bytes,format,open);
+  if(layout.status==='checked')report.checked.push('native-hwp-overlapping-table-layout');
+ }catch(error){
+  const issue:PreservationIssue={code:error instanceof OverlapSaveLayoutError?error.code:'unreadable',path:'native-hwp-overlapping-table-layout',message:error instanceof Error?error.message:'저장 후 겹침 표 배치를 확인하지 못했습니다'};
+  throw new PreservationError({...report,status:'blocked',issues:[...report.issues,issue]});
+ }
  return report;
 }
 

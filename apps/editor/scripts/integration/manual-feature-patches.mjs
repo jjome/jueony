@@ -34,6 +34,21 @@ export async function applyManualFeaturePatches({ root }) {
     }
     return source;
   });
+  await edit('ui/table-cell-props-dialog.ts', source => {
+    source = "import { changedDialogProperties } from '../jueony/adapters/rhwp/dialog-property-delta';\n" + source;
+    source = replaceOnce(source, '  private cellProps!: CellProperties;', '  private cellProps!: CellProperties;\n  private initialForm!: { newCellProps: Record<string, unknown>; newTableProps: Record<string, unknown> };', 'table property displayed baseline');
+    source = replaceOnce(source, '    this.populateFields();', '    this.populateFields();\n    this.initialForm = structuredClone(this.collectPropertyForm(true));', 'capture displayed native precision');
+    const start = source.indexOf('  protected onConfirm(): void {');
+    const apply = source.indexOf('    const applyProps = () => {', start);
+    if (start < 0 || apply < 0) throw new Error('표/셀 속성 수집 경계 불일치');
+    let collect = source.slice(start, apply).replace('  protected onConfirm(): void {', '  private collectPropertyForm(includeInactive = false): { newCellProps: Record<string, unknown>; newTableProps: Record<string, unknown> } {');
+    collect = replaceOnce(collect, '    const { sec, ppi, ci } = this.tableCtx;\n', '', 'pure table form collection');
+    collect = replaceOnce(collect, 'if (this.cellApplySizeCheck.checked)', 'if (this.cellApplySizeCheck.checked || includeInactive)', 'remember inactive dimension display');
+    collect = replaceOnce(collect, 'if (this.cellPaddingCheck.checked)', 'if (this.cellPaddingCheck.checked || includeInactive)', 'remember inactive padding display');
+    source = source.slice(0, start) + collect + '    return { newCellProps, newTableProps };\n  }\n\n  protected onConfirm(): void {\n    const { sec, ppi, ci } = this.tableCtx;\n    const form = this.collectPropertyForm();\n    const newCellProps = changedDialogProperties(this.initialForm.newCellProps, form.newCellProps, this.cellProps as unknown as Record<string, unknown>);\n    const newTableProps = changedDialogProperties(this.initialForm.newTableProps, form.newTableProps, this.tableProps as unknown as Record<string, unknown>);\n    if (!Object.keys(newCellProps).length && !Object.keys(newTableProps).length) return;\n' + source.slice(apply);
+    source = replaceOnce(source, '      this.wasm.setCellProperties(sec, ppi, ci, this.cellIdx, newCellProps as Partial<CellProperties>);', '      if (Object.keys(newCellProps).length) this.wasm.setCellProperties(sec, ppi, ci, this.cellIdx, newCellProps as Partial<CellProperties>);', 'skip unchanged cell setter');
+    return replaceOnce(source, '      this.wasm.setTableProperties(sec, ppi, ci, newTableProps as Partial<TableProperties>);', '      if (Object.keys(newTableProps).length) this.wasm.setTableProperties(sec, ppi, ci, newTableProps as Partial<TableProperties>);', 'skip unchanged table setter');
+  });
   await edit('ui/cell-border-bg-dialog.ts', source => replaceOnce(source,
     '  show(): void {\n    super.show();',
     "  show(initialTab: 'border' | 'background' = 'border'): void {\n    super.show();\n    this.switchTab(initialTab === 'background' ? 1 : 0);", 'cell dialog tab'));

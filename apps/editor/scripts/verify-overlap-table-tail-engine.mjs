@@ -14,7 +14,7 @@ import {lineOriginFixture} from './verify-overlap-fixture.mjs';
 const baseline=process.env.JUEONY_OVERLAP_BASELINE?JSON.parse(await readFile(resolve(process.env.JUEONY_OVERLAP_BASELINE),'utf8')):null;
 const observations=[];
 for(const format of ['hwp','hwpx'])for(const mode of ['two','three','long','offset','negative','absolute','trailing-text','page-break','positive-gap'])await scenario(`${format} ${mode}: resolved overlap tail and guarded source contracts`,async()=>{
- const supported=['two','three','long','offset'].includes(mode);
+ const supported=['two','three','long','offset','positive-gap'].includes(mode);
  const d=HwpDocument.createEmpty();d.createBlankDocument();d.insertText(0,0,0,'앞 본문');d.splitParagraph(0,0,4);
  for(let p=1;p<=(mode==='three'?3:2);p++){
   if(p>1)d.splitParagraph(0,p-1,d.getParagraphLength(0,p-1));
@@ -31,7 +31,7 @@ for(const format of ['hwp','hwpx'])for(const mode of ['two','three','long','offs
   try{same(unmodified,layout(untouched));assert.deepEqual(capturePreservationEvidence(x).values,capturePreservationEvidence(untouched).values);}finally{untouched.free();}
   const token=x.saveSnapshot();
   for(const i of [0,1]){assert.equal(json(x.setCellProperties(0,1,0,i,'{"paddingLeft":567,"paddingRight":850,"paddingTop":283,"paddingBottom":1134,"applyInnerMargin":true}')).ok,true);const properties=json(x.getCellProperties(0,1,0,i));assert.equal(properties.paddingBottom,1134);assert.equal(properties.applyInnerMargin,true);}
-  const live=layout(x),values=capturePreservationEvidence(x).values,bytes=x[exporter]();same(layout(x),live);assert.deepEqual(capturePreservationEvidence(x).values,values,'export cannot mutate live model');const again=new HwpDocument(bytes);
+  const live=layout(x),values=capturePreservationEvidence(x).values,bytes=x[exporter]();if(format==='hwp'&&mode==='positive-gap')same(live[0].controls.find(c=>c.type==='table'&&c.paraIdx===2),unmodified[0].controls.find(c=>c.type==='table'&&c.paraIdx===2),'original forward source gap');same(layout(x),live);assert.deepEqual(capturePreservationEvidence(x).values,values,'export cannot mutate live model');const again=new HwpDocument(bytes);
   try{
    const reopened=layout(again);const observation={format,mode,supported,live,reopened,values};observations.push(observation);
    if(supported&&baseline){same(live,reopened);assert.deepEqual(values,capturePreservationEvidence(again).values);const twice=new HwpDocument(again[exporter]());try{same(reopened,layout(twice));assert.deepEqual(capturePreservationEvidence(twice).values,values);}finally{twice.free();}}

@@ -14,3 +14,7 @@ docs/evidence/state-storage-2026-10-16/unit-tests.txt whitespace=cr-at-eol,-blan
 # Keep raw recovery-integrity evidence identical to the verified artifacts.
 docs/evidence/recovery-integrity-2026-10-16/** -text whitespace=cr-at-eol
 docs/evidence/recovery-integrity-2026-10-16/unit-tests.txt whitespace=cr-at-eol,-blank-at-eol
+
+# Preserve final file-storage test logs and byte hashes across checkout.
+docs/evidence/file-preservation-2026-10-17/** -text whitespace=cr-at-eol
+docs/evidence/file-preservation-2026-10-17/unit-tests.txt whitespace=cr-at-eol,-blank-at-eol

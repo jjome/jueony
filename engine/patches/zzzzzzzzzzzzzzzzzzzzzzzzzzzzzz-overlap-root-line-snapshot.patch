@@ -1,0 +1,137 @@
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -2205,17 +2205,30 @@
+         use crate::renderer::float_placement::{object_only_saved_table_anchor, ParagraphFloatFlow};
+         use crate::renderer::render_tree::{RenderNode, RenderNodeType};
+         fn blank_origins(node: &RenderNode, si: usize, origins: &mut std::collections::BTreeMap<usize, Vec<f64>>) {
+-            if let RenderNodeType::TextRun(run) = &node.node_type {
+-                if run.text.is_empty() && run.section_index == Some(si)
+-                    && run.cell_context.is_none() && run.char_start == Some(0) {
+-                    if let Some(pi) = run.para_index { origins.entry(pi).or_default().push(node.bbox.y); }
+-                }
+-            }
+-            for child in &node.children { blank_origins(child, si, origins); }
++            match &node.node_type {
++                RenderNodeType::Page(_) | RenderNodeType::Body { .. } => {
++                    for child in &node.children { blank_origins(child, si, origins); }
++                }
++                RenderNodeType::Column(_) => {
++                    for child in &node.children {
++                        let RenderNodeType::TextLine(line) = &child.node_type else { continue; };
++                        let Some(pi) = line.para_index else { continue; };
++                        if line.section_index != Some(si) || line.caption_owner.is_some()
++                            || line.line_index != Some(0) || child.children.len() != 1 { continue; }
++                        let RenderNodeType::TextRun(run) = &child.children[0].node_type else { continue; };
++                        if run.text.is_empty() && run.section_index == Some(si)
++                            && run.para_index == Some(pi) && run.cell_context.is_none()
++                            && run.char_start == Some(0) && !run.is_vertical && run.rotation == 0.0 {
++                            origins.entry(pi).or_default().push(child.bbox.y);
++                        }
++                    }
++                }
++                _ => {}
++            }
+         }
+         // Only direct body-column lines own root source paragraphs. Never scan
+         // a table, caption, header or another nested story as a root line.
+-        fn visible_origins(node: &RenderNode, si: usize, origins: &mut std::collections::BTreeMap<usize, Vec<(f64, u32, i32, String)>>) {
++        fn visible_origins(node: &RenderNode, si: usize, origins: &mut std::collections::BTreeMap<usize, Vec<(f64, u32, i32, usize, String)>>) {
+             match &node.node_type {
+                 RenderNodeType::Page(_) | RenderNodeType::Body { .. } => {
+                     for child in &node.children { visible_origins(child, si, origins); }
+@@ -2226,7 +2239,10 @@
+                         let (Some(pi), Some(index), Some(vpos)) = (line.para_index, line.line_index, line.vpos) else { continue; };
+                         if line.section_index != Some(si) || line.caption_owner.is_some() { continue; }
+                         let mut text = String::new();
+-                        let mut offset = 0;
++                        let Some(start) = child.children.first().and_then(|run| match &run.node_type {
++                            RenderNodeType::TextRun(run) => run.char_start, _ => None,
++                        }) else { continue; };
++                        let mut offset = start;
+                         let mut valid = !child.children.is_empty();
+                         for run_node in &child.children {
+                             let RenderNodeType::TextRun(run) = &run_node.node_type else { valid = false; break; };
+@@ -2239,7 +2255,7 @@
+                             text.push_str(&run.text);
+                         }
+                         if valid && !text.is_empty() {
+-                            origins.entry(pi).or_default().push((child.bbox.y, index, vpos, text));
++                            origins.entry(pi).or_default().push((child.bbox.y, index, vpos, start, text));
+                         }
+                     }
+                 }
+@@ -2279,11 +2295,6 @@
+                             if t.page_break == crate::model::table::TablePageBreak::None
+                                 && object_only_saved_table_anchor(host, t))
+                 }) { continue; }
+-                let visible_tail = section.paragraphs[pi + 1..].iter()
+-                    .any(|host| host.controls.is_empty() && !host.text.is_empty());
+-                if visible_tail && section.paragraphs[pi - 1..].iter().any(|host|
+-                    host.controls.iter().any(|control| matches!(control,
+-                        Control::Table(t) if t.caption.is_some()))) { continue; }
+                 let previous = &section.paragraphs[pi - 1];
+                 let [Control::Table(prior)] = previous.controls.as_slice() else { continue; };
+                 if prior.page_break != crate::model::table::TablePageBreak::None
+@@ -2310,33 +2321,47 @@
+                 let mut invalid = false;
+                 for (bi, blank) in section.paragraphs.iter().enumerate().skip(pi + 1) {
+                     if !blank.controls.is_empty() { continue; }
+-                    let [line] = blank.line_segs.as_slice() else { invalid = true; break; };
+-                    if blank.stored_text_partition_is_dirty() || blank.cell_format_vpos_dirty {
++                    if blank.line_segs.is_empty() || blank.stored_text_partition_is_dirty()
++                        || blank.cell_format_vpos_dirty || blank.text.chars().any(|ch| ch.is_control()) {
+                         invalid = true; break;
+                     }
+-                    let y = if blank.text.is_empty() {
+-                        let Some(positions) = blank_lines.get(&bi) else { invalid = true; break; };
+-                        let [y] = positions.as_slice() else { invalid = true; break; };
+-                        *y
+-                    } else {
++                    if !blank.text.is_empty() {
+                         let Some(positions) = visible_lines.get(&bi) else { invalid = true; break; };
+-                        let [(y, index, vpos, text)] = positions.as_slice() else { invalid = true; break; };
+-                        if *index != 0 || *vpos != line.vertical_pos || *text != blank.text
+-                            || line.text_start != 0 || blank.text.chars().any(|ch| ch.is_control()) {
+-                            invalid = true; break;
++                        if positions.len() != blank.line_segs.len() { invalid = true; break; }
++                        let mut text = String::new();
++                        let mut next = 0;
++                        for (li, (y, index, vpos, start, content)) in positions.iter().enumerate() {
++                            let line = &blank.line_segs[li];
++                            let source_start = blank.char_offsets.partition_point(|&offset| offset < blank.line_seg_text_start(li));
++                            let value = ((y - page.layout.body_area.y) * 7200.0 / self.dpi).round();
++                            if *index as usize != li || *vpos != line.vertical_pos || *start != next
++                                || source_start != *start || content.is_empty()
++                                || !value.is_finite() || value < line.vertical_pos as f64 || value > i32::MAX as f64
++                                || line.tag & crate::model::paragraph::LineSeg::TAG_IMPLEMENTATION_PROPERTY != 0 {
++                                invalid = true; break;
++                            }
++                            next += content.chars().count();
++                            text.push_str(content);
++                            blanks.push((bi, li, value as i32));
+                         }
+-                        *y
+-                    };
++                        if text != blank.text { invalid = true; }
++                        if invalid { break; }
++                        continue;
++                    }
++                    let [line] = blank.line_segs.as_slice() else { invalid = true; break; };
++                    let Some(positions) = blank_lines.get(&bi) else { invalid = true; break; };
++                    let [y] = positions.as_slice() else { invalid = true; break; };
++                    let y = *y;
+                     let value = ((y - page.layout.body_area.y) * 7200.0 / self.dpi).round();
+                     if !value.is_finite() || value < line.vertical_pos as f64 || value > i32::MAX as f64
+                         || line.tag & crate::model::paragraph::LineSeg::TAG_IMPLEMENTATION_PROPERTY != 0 {
+                         invalid = true; break;
+                     }
+-                    blanks.push((bi, value as i32));
++                    blanks.push((bi, 0, value as i32));
+                 }
+                 if invalid { continue; }
+                 snapshot.sections[si].paragraphs[pi].line_segs[0].vertical_pos = origin as i32;
+-                for (bi, value) in blanks { snapshot.sections[si].paragraphs[bi].line_segs[0].vertical_pos = value; }
++                for (bi, li, value) in blanks { snapshot.sections[si].paragraphs[bi].line_segs[li].vertical_pos = value; }
+             }
+         }
+     }

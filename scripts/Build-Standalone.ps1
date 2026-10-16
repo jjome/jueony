@@ -238,8 +238,10 @@ foreach ($evidenceName in @('pre-agent-2026-10-13','page-border-2026-10-13','ses
     }
 }
 # Include current generated feature documents and only this bundle's synthetic evidence.
-if (Test-Path -LiteralPath (Join-Path $projectRoot 'docs/106-recovery-integrity.md')) {
-    Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/106-recovery-integrity.md') -Destination $output -Force
+foreach ($guide in @('106-recovery-integrity.md','107-native-file-storage.md','108-file-preservation-completion.md')) {
+    if (Test-Path -LiteralPath (Join-Path $projectRoot ('docs/' + $guide))) {
+        Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination $output -Force
+    }
 }
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/features') -Destination $output -Recurse -Force
 $integrityEvidence = Join-Path $projectRoot 'docs/evidence/recovery-integrity-2026-10-16'
@@ -250,6 +252,16 @@ if (Test-Path -LiteralPath $integrityEvidence) {
     Get-ChildItem -LiteralPath $integrityEvidence -File | Where-Object { $_.Extension -in @('.hwp','.hwpx') } | Copy-Item -Destination $integrityReview -Force
 }
 $currentStorageEvidence = Join-Path $projectRoot 'docs/evidence/state-storage-2026-10-16'
+$finalStorageEvidence = Join-Path $projectRoot 'docs/evidence/file-preservation-2026-10-17'
+if (Test-Path -LiteralPath $finalStorageEvidence) {
+    Copy-Item -LiteralPath $finalStorageEvidence -Destination $llmEvidence -Recurse -Force
+    Get-ChildItem -LiteralPath $finalStorageEvidence -Directory | ForEach-Object {
+        $target = Join-Path $reviewDocuments ('file-preservation/' + $_.Name)
+        New-Item -ItemType Directory -Force $target | Out-Null
+        Get-ChildItem -LiteralPath $_.FullName -File |
+            Where-Object { $_.Extension -in @('.hwp','.hwpx') } | Copy-Item -Destination $target -Force
+    }
+}
 if (Test-Path -LiteralPath $currentStorageEvidence) {
     Copy-Item -LiteralPath $currentStorageEvidence -Destination $llmEvidence -Recurse -Force
     $storageReview = Join-Path $reviewDocuments 'storage'

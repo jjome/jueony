@@ -40,6 +40,8 @@ Facade는 코드 의존 경계이며 그 자체로 프로세스 보안 경계를
 
 ## 3 계약의 기본 형태
 
+파일 연결의 이름·출력 형식은 저장 성공 또는 다운로드의 최종 사용자 확인 뒤에만 갱신한다. 다운로드 승인은 writable 원본 handle을 가지지 않으며 옛 원본 연결을 분리한다. 문서 generation이 바뀌면 그 다운로드 형식 연결은 무효다. 임베드 문서 폐기는 workspace 복구본 삭제가 commit이고, 삭제 실패 전에는 열린 문서의 dirty/undo를 바꾸지 않는다. Native 파일 읽기는 저장 기준 지문을 갱신하지 않는다. [108번 실제 경계 검사](108-file-preservation-completion.md)를 따른다.
+
 ```ts
 // 개념 예시. Brand/DTO의 전체 선언은 R01 산출물에 둔다.
 type DocumentBinding = Readonly<{

@@ -5,7 +5,7 @@
   "priorOverviewRecognizedTables": 1,
   "overviewRecognizedTables": 18,
   "documents": 17,
-  "rowIdsPreserved": 434,
+  "rowIdsPreserved": 439,
   "smallWorkTableLimit": 8,
   "viewportWidths": [
     620,
@@ -14,7 +14,7 @@
   "results": [
     {
       "file": "docs/jueony-progress.md",
-      "sha256": "a26ee0049fb2a7be31e61a4f5e50fd20b79fefb838bc218adb5e7e74fc56c072",
+      "sha256": "8ba9da6d2a67e6447e16aef47b0f91ba23a9b8b3a2e0040d985910226bc22b59",
       "tableCount": 18,
       "headerColumns": [
         5,
@@ -314,10 +314,11 @@
     },
     {
       "file": "docs/features/05-files-storage-recovery.md",
-      "sha256": "42d3150e69ec20c60b0e2cf7f36b6ce9bb44bb11f2fc60ccc49db381b1a14684",
-      "tableCount": 8,
+      "sha256": "0f4598254af94436dfe07e4e5ba92640a445d2398f3ec0397ca12648e1c41884",
+      "tableCount": 9,
       "headerColumns": [
         3,
+        5,
         5,
         5,
         5,
@@ -328,12 +329,13 @@
       ],
       "bodyRows": [
         3,
-        8,
+        7,
+        4,
         3,
         2,
         8,
         1,
-        4,
+        6,
         2
       ],
       "browserTables": [
@@ -344,7 +346,12 @@
         },
         {
           "columns": 5,
-          "rows": 8,
+          "rows": 7,
+          "consistent": true
+        },
+        {
+          "columns": 5,
+          "rows": 4,
           "consistent": true
         },
         {
@@ -369,7 +376,7 @@
         },
         {
           "columns": 5,
-          "rows": 4,
+          "rows": 6,
           "consistent": true
         },
         {

@@ -1,6 +1,8 @@
 # Jueony 업무·채팅·문서 편집 MVP
 
-2026-10-16 후속 복구 검수본: `build/jueony-recovery-integrity-20261016/Start-Review.cmd` (4327). [106번 결과](../../docs/106-recovery-integrity.md): 복구본 내용/업무 지문 검증과 손상 기록 격리, 실제 별도 Edge 강제 종료·재실행 복원을 확인했다. 현재 프로필은 `recovery-integrity`, TypeScript 대상은 `.build/studio-recovery-integrity/tsconfig.json`이다. 아래 4326 결과는 직전 저장 보강 이력이다.
+2026-10-17 최신 파일 검수본: `build/jueony-file-preservation-20261017/Start-Review.cmd` (4328). [108번 결과](../../docs/108-file-preservation-completion.md): 다운로드·닫기·Windows 파일 저장과 HWP 겹침 여러 줄/캡션/양수 간격 보존. 현재 프로필은 `file-preservation`, TypeScript 대상은 `.build/studio-file-preservation/tsconfig.json`이다. 아래 4327 이하 결과는 이전 이력이다.
+
+2026-10-16 후속 복구 검수본: `build/jueony-recovery-integrity-20261016/Start-Review.cmd` (4327). [106번 결과](../../docs/106-recovery-integrity.md): 복구본 내용/업무 지문 검증과 손상 기록 격리, 실제 별도 Edge 강제 종료·재실행 복원을 확인했다. 직전 프로필은 `recovery-integrity`, TypeScript 대상은 `.build/studio-recovery-integrity/tsconfig.json`이다. 아래 4326 결과는 직전 저장 보강 이력이다.
 
 2026-10-16 저장·복구 검수본은 `build/jueony-storage-20261016/Start-Review.cmd`(4326)다. [105번 저장·복구 결과](../../docs/105-file-storage-preservation.md)를 따른다. 실제 파일 readback, 다른 형식 저장 뒤 재저장, 속성창의 원본 정밀도 유지와 알려진 HWP 겹침 배치 손상의 저장 차단을 보강했다. 이전 4324와 사용자 문서·서버는 유지한다. 한글 직접 비교와 실제 Windows 파일 권한 검수는 별도다.
 

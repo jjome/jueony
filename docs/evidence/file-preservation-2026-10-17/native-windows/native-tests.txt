@@ -1,0 +1,23 @@
+
+running 10 tests
+test storage::tests::competing_creation_and_invalid_input_do_not_overwrite ... ok
+test storage::tests::read_cannot_adopt_a_competing_new_file ... ok
+test storage::tests::oversized_and_non_file_sources_are_rejected_before_reading ... ok
+test storage::tests::removed_existing_file_is_not_silently_recreated ... ok
+test storage::tests::windows_exclusive_share_lock_refuses_read_and_write_without_temp_leaks ... ok
+test storage::tests::reading_an_external_edit_does_not_adopt_it_as_the_write_baseline ... ok
+test storage::tests::save_and_external_change_guard ... ok
+test storage::tests::windows_replace_denial_preserves_original_and_removes_staging_file ... ok
+test storage::tests::windows_read_only_target_stays_unchanged_and_retry_after_unlock_succeeds ... ok
+test fixtures::real_engine_documents_keep_exact_bytes_across_native_create_replace_and_conflict ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s
+     Running unittests lib.rs (build\native-storage-target\debug\deps\jueony_native_storage_tests-c6c09c80e7f0f61d.exe)
+   Doc-tests jueony_native_storage_tests

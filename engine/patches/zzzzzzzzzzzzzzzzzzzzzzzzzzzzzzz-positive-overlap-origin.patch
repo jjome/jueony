@@ -1,0 +1,44 @@
+--- a/src/renderer/typeset/table/block/entry.rs
++++ b/src/renderer/typeset/table/block/entry.rs
+@@ -1521,10 +1521,31 @@
+         };
+         // 같은 저장 단의 첫 줄 원점은 글줄과 표가 함께 소비한다.
+         // 단을 여는 완전한 TAC 표도 저장 프레임이며, 재조판/분할 원점과 섞지 않는다.
++        // An edit to an earlier table must not discard a still-unconsumed
++        // positive source gap of this untouched adjacent whole-table anchor.
++        // This permits only a forward origin proven by the complete stored
++        // column ladder below; it never lowers/clamps a source coordinate.
++        let edited_positive_overlap = st.profile.native_hwp5_layout()
++            && st.profile.session_edited() && table.common.allow_overlap
++            && table.page_break == crate::model::table::TablePageBreak::None
++            && table.common.vert_rel_to == crate::model::shape::VertRelTo::Para
++            && table.common.vert_align == crate::model::shape::VertAlign::Top
++            && signed_hwpunit(table.common.vertical_offset) >= 0
++            && !para.cell_format_vpos_dirty
++            && crate::renderer::float_placement::object_only_saved_table_anchor(para, table)
++            && para_idx.checked_sub(1).is_some_and(|previous_index| {
++                paragraphs_all.get(previous_index).is_some_and(|host| {
++                    matches!(host.controls.as_slice(), [Control::Table(previous)]
++                        if previous.page_break == crate::model::table::TablePageBreak::None
++                            && crate::renderer::float_placement::object_only_saved_table_anchor(host, previous))
++                }) && st.current_items.iter().any(|item| matches!(item,
++                    PageItem::Table { para_index, control_index }
++                        if *para_index == previous_index && *control_index == 0))
++            });
+         let source_host_origin = (st.col_count == 1
+             && (st.profile.hwpx_stored_layout() || st.profile.hwp5_stored_pagination_layout())
+             && !st.vpos_ladder_dirty
+-            && !st.profile.session_edited())
++            && (!st.profile.session_edited() || edited_positive_overlap))
+         .then(|| {
+             let first = match st.current_items.first()? {
+                 PageItem::FullParagraph { para_index } => *para_index,
+@@ -1576,6 +1597,8 @@
+             }
+             let origin = st.vpos_col_anchor
+                 + hwpunit_to_px(para.line_segs.first()?.vertical_pos, self.dpi);
++            if st.profile.session_edited() && (!edited_positive_overlap
++                || !origin.is_finite() || origin <= st.current_height) { return None; }
+             // A monotone ladder does not prove ownership when an immediately
+             // preceding whole object-only table consumed more than its empty
+             // anchor line. A non-overlapping successor cannot reuse an anchor

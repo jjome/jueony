@@ -10,6 +10,8 @@ Tauri `DocumentFile.read`는 파일을 읽을 때마다 내부 저장 기준 지
 
 Tauri 명령 계층의 전체 컴파일 검사 중 기본 Windows 아이콘 누락도 발견했다. 외부 이미지·폰트가 없는 자체 문서/J 기하학적 아이콘과 재현 가능한 생성기를 추가했다. 실행 묶음에 쓰는 브라우저 편집 화면의 기능 변경은 아니다.
 
+[최종 같은 엔진의 실제 Windows 검사](evidence/file-preservation-2026-10-17/native-windows/result.json)와 [Tauri 컴파일 기록](evidence/file-preservation-2026-10-17/tauri-check.txt)을 따른다.
+
 ## 실제 검증
 
 Tauri를 흉내 낸 저장 코드가 아니라 `src-tauri/src/storage.rs` 자체를 경로로 포함하는 작은 테스트 crate를 사용한다. 격리된 Windows 임시 파일과 실제 OS 공유 모드·읽기 전용 속성으로 다음 10개 검사를 수행한다.

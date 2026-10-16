@@ -273,10 +273,11 @@ await writeFile(join(root, 'src/ui/document-title.ts'), documentTitle);
 let fileCommands = (await readFile(join(root, 'src/command/commands/file.ts'), 'utf8')).replace(/\r\n/g, '\n');
 fileCommands = "import { confirmDownload } from '../../jueony/download-save';\n" + fileCommands;
 fileCommands = "import { verifyPreservedExport } from '../../jueony/adapters/rhwp/preservation.ts';\n" + fileCommands;
+fileCommands = "import { acknowledgeDownloadedFile, readDownloadedFormat } from '../../jueony/adapters/files/download-connection.ts';\n" + fileCommands;
 fileCommands = "import { rememberSavedFormat, readSavedFormat } from '../../jueony/adapters/files/saved-format.ts';\n" + fileCommands;
 fileCommands = replaceOnce(fileCommands,
   'async function chooseSaveAsFormat(services: CommandServices): Promise<SaveFormat | null> {',
-  'async function chooseSaveAsFormat(services: CommandServices): Promise<SaveFormat | null> {\n  const savedFormat = readSavedFormat(services.wasm.currentFileHandle);\n  if (savedFormat) return savedFormat;', 'save-as default follows acknowledged output format');
+  'async function chooseSaveAsFormat(services: CommandServices): Promise<SaveFormat | null> {\n  const savedFormat = readSavedFormat(services.wasm.currentFileHandle) ?? readDownloadedFormat(services.wasm);\n  if (savedFormat) return savedFormat;', 'save-as default follows acknowledged output format');
 fileCommands = replaceOnce(fileCommands,
   "  if (sourceFormat === 'hml') markConvertedHmlSaveHandle(result.handle);",
   "  rememberSavedFormat(result.handle, saveFormat);\n  if (sourceFormat === 'hml') markConvertedHmlSaveHandle(result.handle);", 'acknowledged save connection format');
@@ -303,6 +304,20 @@ fileCommands = replaceOnce(fileCommands,
   "if (!downloadName) return 'cancelled';\n    persistDownloadWithContentLoss(",
   "if (!downloadName) return 'cancelled';\n    if (!await confirmDownload(payload.blob, downloadName)) return 'cancelled';\n    persistDownloadWithContentLoss(", 'confirm save download');
 fileCommands = fileCommands.replaceAll('() => downloadBlob(payload.blob, downloadName)', '() => {}');
+// Download metadata is committed only after the final user acknowledgement.
+fileCommands = replaceOnce(fileCommands,
+  '  services.wasm.fileName = downloadName;\n  if (target.forceSaveAs) services.wasm.currentFileHandle = null;\n  return downloadName;',
+  '  return downloadName;', 'download confirmation cancellation preserves connection');
+fileCommands = replaceOnce(fileCommands,
+  '        services.wasm.fileName = downloadName;',
+  '        acknowledgeDownloadedFile(services.wasm, downloadName, format);', 'acknowledged SaveAs download detaches original connection');
+fileCommands = replaceOnce(fileCommands,
+  "        services.wasm.requiresPasswordForSave = password !== null;\n        services.documentState.markClean('save');",
+  "        acknowledgeDownloadedFile(services.wasm, downloadName, target.format);\n        services.refreshDocumentStatus();\n        services.wasm.requiresPasswordForSave = password !== null;\n        services.documentState.markClean('save');", 'acknowledged current download name and format');
+fileCommands = replaceOnce(fileCommands,
+  '      services.wasm.currentFileHandle,\n    );',
+  '      services.wasm.currentFileHandle,\n      readDownloadedFormat(services.wasm),\n    );', 'current download output format');
+
 fileCommands = replaceOnce(fileCommands,
   "services.eventBus.emit('create-new-document');",
   `if (new URLSearchParams(location.search).get('child') === '1' && window.parent !== window) {
@@ -315,7 +330,10 @@ let saveTarget = (await readFile(join(root, 'src/command/save-target.ts'), 'utf8
 saveTarget = "import { readSavedFormat } from '../jueony/adapters/files/saved-format.ts';\n" + saveTarget;
 saveTarget = replaceOnce(saveTarget,
   "  const hasConvertedHmlTarget = sourceFormat === 'hml'",
-  "  const savedFormat = readSavedFormat(currentHandle);\n  if (savedFormat) return { format: savedFormat, forceSaveAs: false, suggestedName: fileNameForFormat(fileName, savedFormat) };\n  const hasConvertedHmlTarget = sourceFormat === 'hml'", 'verified output format for repeat saves');
+  "  const savedFormat = acknowledgedFormat ?? readSavedFormat(currentHandle);\n  if (savedFormat) return { format: savedFormat, forceSaveAs: false, suggestedName: fileNameForFormat(fileName, savedFormat) };\n  const hasConvertedHmlTarget = sourceFormat === 'hml'", 'verified output format for repeat saves');
+saveTarget = replaceOnce(saveTarget,
+  '  currentHandle?: NamedSaveHandle | null,\n): SaveTarget {',
+  '  currentHandle?: NamedSaveHandle | null,\n  acknowledgedFormat?: SaveFormat,\n): SaveTarget {', 'download format argument');
 await writeFile(join(root, 'src/command/save-target.ts'), saveTarget);
 let fileSystem = (await readFile(join(root, 'src/command/file-system-access.ts'), 'utf8')).replace(/\r\n/g, '\n');
 fileSystem = "import { writeSnapshot, rememberFileSnapshot } from '../jueony/save-guard';\n" + fileSystem;

@@ -238,8 +238,11 @@ async function closeTab(tab:Tab){
  try {
  if(tab.api!.state().dirty){
   selectTab(tab);const dialog=$<HTMLDialogElement>('close-document');$('close-document-name').textContent=tab.api!.state().name;dialog.returnValue='cancel';const choice=new Promise<string>(resolve=>dialog.addEventListener('close',()=>resolve(dialog.returnValue),{once:true}));dialog.showModal();const action=await choice;
-  if(action==='cancel'||!action)return;if(action==='save'){if(await tab.api!.save()!=='saved'||tab.api!.state().dirty)return;}else if(action==='discard')await tab.api!.discard();
+  if(action==='cancel'||!action)return;if(action==='save'){if(await tab.api!.save()!=='saved'||tab.api!.state().dirty)return;}else if(action!=='discard')return;
  }
+ // Embedded frames have no private autosave owner. Deleting the workspace draft
+ // is the discard commit: until that succeeds, keep the live dirty/undo state so
+ // a failed IDB delete cannot turn unsaved work into an apparently saved tab.
  clearTimeout(tab.timer);tab.closed=true;await tab.persist.catch(()=>{});try{await store.removeDocument(tab.id);}catch(e){tab.closed=false;refreshTab(tab);throw e;}tab.recovery?.dispose();tab.disposeTabCycle?.();tabs.splice(tabs.indexOf(tab),1);const nextId=session.closed(tab);tab.frame.remove();tab.wrapper.remove();
  const next=tabs.find(t=>t.id===nextId);if(next)selectTab(next);else await newTab();
  }finally{closing=false;}

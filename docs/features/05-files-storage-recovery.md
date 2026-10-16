@@ -4,15 +4,17 @@
 
 열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.
 
+**2026-10-17 갱신:** Windows 저장 보호·다운로드 승인/형식·폐기 실패 복구를 구현하고 검증했다. 지원하는 겹침 배치도 자동·브라우저 검증을 마쳤으며 한글 직접 비교는 대기한다. [이번 수정·검증 결과와 남은 범위](../108-file-preservation-completion.md)를 먼저 확인한다.
+
 ## 진행 요약
 
-실행 작업 **18개**, 상위 범위 **10개**. CSV의 기록을 기능별로 표시한 문서다.
+실행 작업 **23개**, 상위 범위 **10개**. CSV의 기록을 기능별로 표시한 문서다.
 
 | 구분 | 실행 작업 | 상위 범위 |
 | --- | --- | --- |
-| 구현 | 완료 17/18 · 부분 1 | 완료 0/10 · 부분 9 · 미구현 1 |
-| 검증 | 완료 10/18 · 부분 8 | 완료 0/10 · 부분 3 · 미검증 7 |
-| Agent 연결 | 연결 6/6 · 부분 0 · 해당 없음 12 | 연결 0/10 · 부분 1 · 미연결 9 |
+| 구현 | 완료 22/23 · 부분 1 | 완료 0/10 · 부분 9 · 미구현 1 |
+| 검증 | 완료 13/23 · 부분 10 | 완료 0/10 · 부분 4 · 미검증 6 |
+| Agent 연결 | 연결 6/6 · 부분 0 · 해당 없음 17 | 연결 0/10 · 부분 1 · 미연결 9 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
@@ -20,9 +22,9 @@
 
 ## 먼저 할 일
 
-- **구현** [N001](<05-files-storage-recovery.md#n001>) **HWP 겹침 허용 후속 표의 화면/재열기 위치** — 단일 본문 줄 후속 원점 보존과 알려진 배치 손상의 원본 쓰기 차단 완료. 여러 줄/caption/양수 저장 gap 등 원본의 실제 배치 지원과 한글 직접 비교는 남음.
+- **구현** [N001](<05-files-storage-recovery.md#n001>) **HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존** — 혼합 크기 줄 구성·다단·복합/불명확 원점의 재현 원본과 보존 기준을 먼저 확정. 지원 범위의 한글 직접 지면 비교는 마지막 일괄 검수로 진행; 여러 줄·캡션·양수 간격의 수정 완료 항목은 반복 구현하지 않음.
 - **검증** [N002](<05-files-storage-recovery.md#n002>) **공개 형식 변환의 필드 보존 차이 4건** — 한글 직접 재열기·지면 검수; 더 넓은 원본/특수 story 지원은 별도
-- **검증** [G090](<05-files-storage-recovery.md#g090>) **HWP 단순 겹침 표 tail의 저장 snapshot 원점 기록** — 지원된 좁은 원본의 직접 브라우저·한글 검증; N001 전체는부분유지
+- **검증** [G090](<05-files-storage-recovery.md#g090>) **HWP 단순 겹침 표 tail의 저장 snapshot 원점 기록** — 최종 실제 UI 저장·재열기·반복 저장 검증 완료, 한글 직접 지면 비교는 대기. N001의 복잡 원본 전체 범위는 부분 유지.
 
 ## 기능별 작업표
 
@@ -31,10 +33,11 @@
 - [파일 · 상위 기능 점검](<#work-1>)
 - [저장](<#work-2>)
 - [다른 이름 저장](<#work-3>)
-- [저장·호환성 · 독립 실행 작업 (1)](<#work-4>)
-- [저장·호환성 · 독립 실행 작업 (2)](<#work-5>)
-- [HWP 겹침 허용 후속 표의 화면/재열기 위치](<#work-6>)
-- [공개 형식 변환의 필드 보존 차이 4건](<#work-7>)
+- [문서 닫기](<#work-4>)
+- [저장·호환성 · 독립 실행 작업 (1)](<#work-5>)
+- [저장·호환성 · 독립 실행 작업 (2)](<#work-6>)
+- [HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존](<#work-7>)
+- [공개 형식 변환의 필드 보존 차이 4건](<#work-8>)
 
 <a id="work-1"></a>
 
@@ -48,7 +51,6 @@
 | [B006](<05-files-storage-recovery.md#b006>) · 범위 | 최근 문서 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B009](<05-files-storage-recovery.md#b009>) · 범위 | XML 탭·서식·문서 입출력 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B014](<05-files-storage-recovery.md#b014>) · 범위 | 문서 정보 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [B021](<05-files-storage-recovery.md#b021>) · 범위 | 문서 닫기 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B022](<05-files-storage-recovery.md#b022>) · 범위 | 프로그램 종료 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 
 <a id="work-2"></a>
@@ -60,6 +62,7 @@
 | [B010](<05-files-storage-recovery.md#b010>) · 범위 | 저장 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [G093](<05-files-storage-recovery.md#g093>) · 작업 | 실제 저장 파일 readback 후 성공 확인 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 | [G101](<05-files-storage-recovery.md#g101>) · 작업 | 복구본 내용·업무 지문 검증과 강제 종료 복원 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+| [G102](<05-files-storage-recovery.md#g102>) · 작업 | Windows Rust 저장 기준·실제 바이트·잠금 보호 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 
 <a id="work-3"></a>
 
@@ -69,8 +72,18 @@
 | --- | --- | --- | --- | --- |
 | [B011](<05-files-storage-recovery.md#b011>) · 범위 | 다른 이름 저장 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [G094](<05-files-storage-recovery.md#g094>) · 작업 | 다른 형식 저장 뒤 출력 형식 유지·취소·재저장 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+| [G103](<05-files-storage-recovery.md#g103>) · 작업 | 다운로드 최종 승인·출력 형식·원본 연결 수명 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 
 <a id="work-4"></a>
+
+### 문서 닫기
+
+| ID | 항목 | 구현 | 검증 | Agent 연결 |
+| --- | --- | --- | --- | --- |
+| [B021](<05-files-storage-recovery.md#b021>) · 범위 | 문서 닫기 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
+| [G104](<05-files-storage-recovery.md#g104>) · 작업 | 복구본 폐기 실패 시 열린 문서 상태 보존 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+
+<a id="work-5"></a>
 
 ### 저장·호환성 · 독립 실행 작업 (1)
 
@@ -85,7 +98,7 @@
 | [G071](<05-files-storage-recovery.md#g071>) · 작업 | 겹침 금지 HWP 후속 표의 저장 앵커 소유 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G072](<05-files-storage-recovery.md#g072>) · 작업 | HWP 메모 carrier의 본문 소유 분리 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 
-<a id="work-5"></a>
+<a id="work-6"></a>
 
 ### 저장·호환성 · 독립 실행 작업 (2)
 
@@ -93,18 +106,20 @@
 | --- | --- | --- | --- | --- |
 | [G073](<05-files-storage-recovery.md#g073>) · 작업 | 표 바깥 여백의 HWP/HWPX 모델·저장 일치 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
-<a id="work-6"></a>
+<a id="work-7"></a>
 
-### HWP 겹침 허용 후속 표의 화면/재열기 위치
+### HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [G090](<05-files-storage-recovery.md#g090>) · 작업 | HWP 단순 겹침 표 tail의 저장 snapshot 원점 기록 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
-| [N001](<05-files-storage-recovery.md#n001>) · 작업 | HWP 겹침 허용 후속 표의 화면/재열기 위치 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [N001](<05-files-storage-recovery.md#n001>) · 작업 | HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 | [G096](<05-files-storage-recovery.md#g096>) · 작업 | HWP 겹침 표 뒤 단일 본문 글줄의 저장 원점 보존 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G097](<05-files-storage-recovery.md#g097>) · 작업 | 알려진 HWP 겹침 배치 손상의 원본 쓰기 차단 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+| [G105](<05-files-storage-recovery.md#g105>) · 작업 | 겹침 표 후속 여러 줄 본문·캡션 원점 보존 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
+| [G106](<05-files-storage-recovery.md#g106>) · 작업 | 앞 표 편집 후 양수 저장 원점 간격 보존 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
-<a id="work-7"></a>
+<a id="work-8"></a>
 
 ### 공개 형식 변환의 필드 보존 차이 4건
 
@@ -193,9 +208,9 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 실제 OPFS 저장/다른 이름 저장/재저장/실패·취소/재읽기·복구 실패는 검증. Windows picker/ACL·공유 잠금과 모든 형식·한글 직접 검수는 남음.
+- 다음 작업: 최종 저장/다운로드/다른 형식 재저장/취소·실패/복구 및 실제 Windows 읽기 전용·공유 잠금 검증. 실제 picker GUI·전체 ACL·전원/디스크 장애·한글 직접 검수는 남음.
 - UI 명령: `file:save`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>)
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>)
 - 원래 기록: `WIRED;NOT_RUN`
 
 </details>
@@ -207,9 +222,9 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 실제 OPFS 저장/다른 이름 저장/재저장/실패·취소/재읽기·복구 실패는 검증. Windows picker/ACL·공유 잠금과 모든 형식·한글 직접 검수는 남음.
+- 다음 작업: 최종 저장/다운로드/다른 형식 재저장/취소·실패/복구 및 실제 Windows 읽기 전용·공유 잠금 검증. 실제 picker GUI·전체 ACL·전원/디스크 장애·한글 직접 검수는 남음.
 - UI 명령: `file:save-as`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>)
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>)
 - 원래 기록: `WIRED;NOT_RUN`
 
 </details>
@@ -232,12 +247,12 @@
 <summary>B021 · 문서 닫기</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: dirty·취소·마지막 탭은 상태 검수
+- 다음 작업: 닫기 취소·복구본 삭제 실패의 dirty/undo/원본 보존·후속 회복·마지막 탭 폐기는 실제 Edge 검증. 전체 메뉴/한글 종료 동등성은 남음.
 - UI 명령: `ext:jueony-close`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>)
 - 원래 기록: `WIRED;NOT_RUN`
 
 </details>
@@ -379,24 +394,24 @@
 - 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한 쪽·한 단·통째 object-only 표 tail 및 고유 단일 줄 빈 후속 본문; live불변/snapshot/반복저장/배치보존
-- 다음 작업: 지원된 좁은 원본의 직접 브라우저·한글 검증; N001 전체는부분유지
-- 상위 항목: [N001](<05-files-storage-recovery.md#n001>) HWP 겹침 허용 후속 표의 화면/재열기 위치
-- 근거: [100-storage-conversion-and-overlap.md](<../100-storage-conversion-and-overlap.md>) · [verification-summary.json](<../evidence/overlap-table-tail-2026-10-15/verification-summary.json>)
+- 다음 작업: 최종 실제 UI 저장·재열기·반복 저장 검증 완료, 한글 직접 지면 비교는 대기. N001의 복잡 원본 전체 범위는 부분 유지.
+- 상위 항목: [N001](<05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존
+- 근거: [100-storage-conversion-and-overlap.md](<../100-storage-conversion-and-overlap.md>) · [verification-summary.json](<../evidence/overlap-table-tail-2026-10-15/verification-summary.json>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>)
 - 원래 기록: `SCOPED_STORAGE_TAIL_WRITEBACK`
 
 </details>
 
 <details id="n001">
-<summary>N001 · HWP 겹침 허용 후속 표의 화면/재열기 위치</summary>
+<summary>N001 · HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존</summary>
 
 - 종류: 실행 작업 · 우선순위: P0.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
-- 완료 범위: 한 쪽·한 단의 편집된HWP 통째 표 tail/고유 단일 줄 빈 후속 본문만 수정; 뒤 가시본문·양수 저장gap 불일치2개 유지
-- 다음 작업: 단일 본문 줄 후속 원점 보존과 알려진 배치 손상의 원본 쓰기 차단 완료. 여러 줄/caption/양수 저장 gap 등 원본의 실제 배치 지원과 한글 직접 비교는 남음.
+- 완료 범위: 한쪽/한단의 정확한 원시 호스트와 줄 소유를 확인한 단일·여러 줄 본문, 캡션, 양수 저장 간격은 저장·재열기·반복 저장·실제 UI 검증 완료(G090/G096/G097/G105/G106). 혼합 글자 크기로 줄 구성이 달라지는 원본·다단·복합/불명확 원점은 지원 범위 밖이므로 전체 항목은 부분 유지.
+- 다음 작업: 혼합 크기 줄 구성·다단·복합/불명확 원점의 재현 원본과 보존 기준을 먼저 확정. 지원 범위의 한글 직접 지면 비교는 마지막 일괄 검수로 진행; 여러 줄·캡션·양수 간격의 수정 완료 항목은 반복 구현하지 않음.
 - 상위 항목: [B153](<08-tables.md#b153>) 셀 속성
-- 근거: [100-storage-conversion-and-overlap.md](<../100-storage-conversion-and-overlap.md>) · [verification-summary.json](<../evidence/overlap-table-tail-2026-10-15/verification-summary.json>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [100-storage-conversion-and-overlap.md](<../100-storage-conversion-and-overlap.md>) · [verification-summary.json](<../evidence/overlap-table-tail-2026-10-15/verification-summary.json>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;MULTILINE_CAPTION_POSITIVE_SCOPED_FIXED_2026_10_17`
 
 </details>
 
@@ -465,10 +480,10 @@
 - 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: Native HWP5 한 쪽·한 단 인접 겹침 표의 고유한 단일 본문 줄: 원문/서식/전체 공개 기하·Unicode·위첨자·동일 번호 표 셀 소유 구분, undo/redo·안전 저장·UI 재열기를 검증한다.
-- 다음 작업: 한글 직접 비교. 여러 줄·caption·양수 간격 등 미지원은 G097에서 저장 차단하며 배치 지원을 완료한 것이 아니다.
-- 상위 항목: [N001](<05-files-storage-recovery.md#n001>) HWP 겹침 허용 후속 표의 화면/재열기 위치
+- 다음 작업: 최종 실제 UI 저장·재열기·반복 저장 검증 완료, 한글 직접 지면 비교는 대기. N001의 복잡 원본 전체 범위는 부분 유지.
+- 상위 항목: [N001](<05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존
 - UI 명령: `table:cell-props`
-- 근거: [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>)
+- 근거: [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>)
 - 원래 기록: `SCOPED_IMPLEMENTED;ENGINE_BROWSER_VERIFIED_2026_10_16`
 
 </details>
@@ -480,10 +495,10 @@
 - 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
 - 완료 범위: 출처가 확인된 Native HWP5 인접 겹침 표만 전체 공개 표/텍스트 배치를 원문 그대로 비교한다. 불일치·미관측·한도 초과는 쓰기 전 거절, 열린 문서/원본/이전 복구본 보존. metrics 성공·실패 finally 복원.
-- 다음 작업: 모든 HWP·다른 형식 변환의 일반 조판 동일성을 보장하지 않는다. 미지원 원본 자체의 렌더·저장 수정은 N001에 남긴다.
-- 상위 항목: [N001](<05-files-storage-recovery.md#n001>) HWP 겹침 허용 후속 표의 화면/재열기 위치
+- 다음 작업: 이전 multiline/caption/positive-gap 반례는 제한된 소유 조건에서 수정. 혼합 크기 partition·중복 주소의 저장 거절·원본/dirty/undo 보존과 기존 0.2 배치 gate 유지 검증.
+- 상위 항목: [N001](<05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존
 - UI 명령: `file:save`
-- 근거: [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>)
+- 근거: [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>)
 - 원래 기록: `SCOPED_IMPLEMENTED;ENGINE_BROWSER_VERIFIED_2026_10_16`
 
 </details>
@@ -499,6 +514,76 @@
 - 상위 항목: [B010](<05-files-storage-recovery.md#b010>) 저장
 - 근거: [106-recovery-integrity.md](<../106-recovery-integrity.md>) · [verification-summary.json](<../evidence/recovery-integrity-2026-10-16/verification-summary.json>)
 - 원래 기록: `SCOPED_IMPLEMENTED;ACTUAL_EDGE_CRASH_RECOVERY_VERIFIED_2026_10_16`
+
+</details>
+
+<details id="g102">
+<summary>G102 · Windows Rust 저장 기준·실제 바이트·잠금 보호</summary>
+
+- 종류: 실행 작업 · 우선순위: P0.
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: 파일 읽기가 외부 수정/선점 파일을 새 기준으로 채택하지 않고, 교체 후 실제 바이트 검증 뒤에만 기준 갱신. 실제 Windows 읽기 전용·독점/교체 잠금·실제 엔진 두 형식 신규/교체·실패 복구 10개 및 Tauri 전체 컴파일 검사.
+- 다음 작업: Windows picker GUI·전체 ACL·디스크/전원 장애는 별도. 외부 쓰기를 원자적 CAS로 직렬화하는 보장은 없음.
+- 상위 항목: [B010](<05-files-storage-recovery.md#b010>) 저장
+- 근거: [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>)
+- 원래 기록: `SCOPED_IMPLEMENTED;FINAL_ENGINE_BROWSER_VERIFIED_2026_10_17`
+
+</details>
+
+<details id="g103">
+<summary>G103 · 다운로드 최종 승인·출력 형식·원본 연결 수명</summary>
+
+- 종류: 실행 작업 · 우선순위: P0.
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: 최종 확인 취소/dispatch 오류에서는 이름·dirty·undo·원본 handle 유지. 다운로드 승인 후만 옛 원본 연결/형식 기억 해제하고 generation/이름에 출력 형식을 연결. HWP/HWPX 4조합 실제 다운로드·재저장·복구 바이트 재열기 검증.
+- 다음 작업: 브라우저는 실제 디스크 commit을 보증하지 않으므로 사용자 저장 확인 유지. 전체 파일 대화상자와 한글 직접 비교는 상위 범위에서 별도.
+- 상위 항목: [B011](<05-files-storage-recovery.md#b011>) 다른 이름 저장
+- 근거: [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>)
+- 원래 기록: `SCOPED_IMPLEMENTED;FINAL_ENGINE_BROWSER_VERIFIED_2026_10_17`
+
+</details>
+
+<details id="g104">
+<summary>G104 · 복구본 폐기 실패 시 열린 문서 상태 보존</summary>
+
+- 종류: 실행 작업 · 우선순위: P0.
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: workspace 복구본 삭제를 폐기 commit으로 사용. 삭제 동기 오류/transaction abort에서 dirty·탭·undo·문서 바이트·기존 checkpoint·원본을 보존하고, 후속 편집·undo/redo·저장·재폐기로 회복. 실제 Edge 4개 검사.
+- 다음 작업: 한글 전체 문서 닫기 메뉴/종료 수명과 OS 강제 종료는 별도 상위 검수.
+- 상위 항목: [B021](<05-files-storage-recovery.md#b021>) 문서 닫기
+- 근거: [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>)
+- 원래 기록: `SCOPED_IMPLEMENTED;FINAL_ENGINE_BROWSER_VERIFIED_2026_10_17`
+
+</details>
+
+<details id="g105">
+<summary>G105 · 겹침 표 후속 여러 줄 본문·캡션 원점 보존</summary>
+
+- 종류: 실행 작업 · 우선순위: P0.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한쪽/한단·정확한 원시 호스트의 Native HWP5에서 직접 본문 줄의 index/vpos/Unicode·UTF16 시작/연속 원문 전체를 일대일 확인해 snapshot 줄 위치만 보정. 캡션 story 소유 분리, raw payload 차이·전체 배치·반복 저장·undo/재적용·실제 UI 저장/재열기 검증.
+- 다음 작업: 한글 직접 지면 비교는 대기. 혼합 크기로 원시 줄 partition이 달라진 경우·필드·책갈피·다단·중복 주소는 기존 보호 유지.
+- 상위 항목: [N001](<05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존
+- 근거: [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>)
+- 원래 기록: `SCOPED_IMPLEMENTED;FINAL_ENGINE_BROWSER_VERIFIED_2026_10_17`
+
+</details>
+
+<details id="g106">
+<summary>G106 · 앞 표 편집 후 양수 저장 원점 간격 보존</summary>
+
+- 종류: 실행 작업 · 우선순위: P0.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 현재 흐름보다 앞서 소비되지 않은 원본 양수 간격을, 같은 쪽/단의 인접 통째 표·확인된 호스트·저장 column ladder로 제한해 유지. 원본 좌표를 낮추거나 clamp하지 않음. 원본 기대 위치·캡션 포함 11개 Native와 실제 UI 저장 재열기 검증.
+- 다음 작업: 한글 직접 비교는 대기. 음수/절대 배치·비겹침·구역 원점 불명확 원본은 기존 경로 유지.
+- 상위 항목: [N001](<05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존
+- 근거: [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>)
+- 원래 기록: `SCOPED_IMPLEMENTED;FINAL_ENGINE_BROWSER_VERIFIED_2026_10_17`
 
 </details>
 

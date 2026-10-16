@@ -1,0 +1,31 @@
+{
+  "results": [
+    "hwp: rectangular preset preserves protected unselected vertical merge and selection boundary lines",
+    "hwp: explicit months series scratch/save/reopen preserves anchored dates and target formatting",
+    "hwp: explicit years series scratch/save/reopen preserves anchored dates and target formatting",
+    "hwp: merged whole-table transpose retains cell spans, multiple paragraphs and mixed formats",
+    "hwp: literal Unicode/empty-cell conversion, scratch preflight and two saved roundtrips",
+    "hwpx: rectangular preset preserves protected unselected vertical merge and selection boundary lines",
+    "hwpx: explicit months series scratch/save/reopen preserves anchored dates and target formatting",
+    "hwpx: explicit years series scratch/save/reopen preserves anchored dates and target formatting",
+    "hwpx: merged whole-table transpose retains cell spans, multiple paragraphs and mixed formats",
+    "hwpx: literal Unicode/empty-cell conversion, scratch preflight and two saved roundtrips",
+    "native unsafe conversion refuses stale content, merged/protected cells and literal host tabs without mutations",
+    "hwp: selected integer series preserves target style/geometry and unrelated cells through scratch/save/reopen",
+    "hwpx: selected integer series preserves target style/geometry and unrelated cells through scratch/save/reopen",
+    "hwp: table gallery on a fresh production document, four presets and mixed text preservation",
+    "hwp: exact numeric paragraph sort preserves mixed formatting and title/neighbor paragraphs",
+    "hwpx: table gallery on a fresh production document, four presets and mixed text preservation",
+    "hwpx: exact numeric paragraph sort preserves mixed formatting and title/neighbor paragraphs"
+  ],
+  "failures": [],
+  "note": "Native WASM conversion, table gallery and paragraph sort tests, including scratch export-preservation checks and saved HWP/HWPX reopen. No native Hancom or UI comparison.",
+  "originalResultSha256": "6f2e820c872ecabb20f4d4de372c9cd93edbc9dd74aec23255828f0414d98768",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

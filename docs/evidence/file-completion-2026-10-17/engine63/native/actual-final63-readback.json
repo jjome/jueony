@@ -1,0 +1,284 @@
+{
+  "createdAt": "2026-10-16T19:36:22.070Z",
+  "engineSourceId": "8deeb52a09ba2b75",
+  "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "hwp-tab",
+      "status": "PASS",
+      "producer": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-subagent-final63\\hwp-tab\\hwpx-to-hwp-1.hwp",
+      "producerSha256": "5f287793cf3ba9f56a9c3546ec3bc9b586c92777482cf12615e4a29e51e7cbd6",
+      "actual": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-subagent-final63\\hwp-tab\\hwpx-to-hwp-1-hancom.hwp",
+      "actualSha256": "9a66bd15702642abec8af3e1af839c12e62466ecc9329b21028db741283cee41",
+      "producerUnchanged": true,
+      "semanticDifferences": 0,
+      "fullGeometryDifferences": 0,
+      "geometryTolerance": 0.2,
+      "pages": {
+        "before": 3,
+        "after": 3,
+        "equal": true
+      },
+      "comparison": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-subagent-final63\\actual-final63-hwp-tab\\result.json",
+      "comparisonSha256": "824e4def68aca8007a485fa82e66e072121fe1c27370986d21b73b5e9267be3a",
+      "raw": [
+        {
+          "name": "Section0",
+          "compressedSha256": "504e047f94ca285f3c1e786b33f99de78ab5b4ab50ffd9bb5237b96fcdfe71a6",
+          "uncompressedSha256": "368ef685e1bc385297837357f14dd0bc4cd143387bb3d58d9c8e2af9ecdb6e06",
+          "paragraphs": [
+            {
+              "index": 0,
+              "headerLineCount": 1,
+              "lineCount": 1,
+              "tabs": []
+            },
+            {
+              "index": 1,
+              "headerLineCount": 1,
+              "lineCount": 1,
+              "tabs": [
+                {
+                  "width": 1292,
+                  "words": [
+                    1292,
+                    0,
+                    256,
+                    0,
+                    0,
+                    0,
+                    9
+                  ],
+                  "placeholder": false
+                },
+                {
+                  "width": 1396,
+                  "words": [
+                    1396,
+                    0,
+                    256,
+                    0,
+                    0,
+                    0,
+                    9
+                  ],
+                  "placeholder": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Section1",
+          "compressedSha256": "099a711895bd88f5e4db9d6d646d857363a2a83966f559169e123672011d9014",
+          "uncompressedSha256": "fa3386b19f8df5be827a18eab2dc37682ed6a62ff42dda359fa06961331156b4",
+          "paragraphs": [
+            {
+              "index": 0,
+              "headerLineCount": 1,
+              "lineCount": 1,
+              "tabs": []
+            },
+            {
+              "index": 1,
+              "headerLineCount": 1,
+              "lineCount": 1,
+              "tabs": [
+                {
+                  "width": 3292,
+                  "words": [
+                    3292,
+                    0,
+                    256,
+                    0,
+                    0,
+                    0,
+                    9
+                  ],
+                  "placeholder": false
+                },
+                {
+                  "width": 3396,
+                  "words": [
+                    3396,
+                    0,
+                    256,
+                    0,
+                    0,
+                    0,
+                    9
+                  ],
+                  "placeholder": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Section2",
+          "compressedSha256": "b9246bebb7effa85d799069b50a3f5965679e9280b7596f82735057e42fe3e3e",
+          "uncompressedSha256": "22c27286f8c6aa15cf1f20ccfbeb606be830ebf8a6308ef73c5d7e1297299bd0",
+          "paragraphs": [
+            {
+              "index": 0,
+              "headerLineCount": 1,
+              "lineCount": 1,
+              "tabs": []
+            },
+            {
+              "index": 1,
+              "headerLineCount": 1,
+              "lineCount": 1,
+              "tabs": [
+                {
+                  "width": 5292,
+                  "words": [
+                    5292,
+                    0,
+                    256,
+                    0,
+                    0,
+                    0,
+                    9
+                  ],
+                  "placeholder": false
+                },
+                {
+                  "width": 5396,
+                  "words": [
+                    5396,
+                    0,
+                    256,
+                    0,
+                    0,
+                    0,
+                    9
+                  ],
+                  "placeholder": false
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sectionDefinitions": [
+        {
+          "pageNum": 0,
+          "pageNumType": 0,
+          "pictureNum": 0,
+          "tableNum": 0,
+          "equationNum": 0,
+          "columnSpacing": 1134,
+          "defaultTabSpacing": 4000,
+          "hideHeader": false,
+          "hideFooter": false,
+          "hideMasterPage": false,
+          "hideBorder": false,
+          "hideFill": false,
+          "hideEmptyLine": false
+        },
+        {
+          "pageNum": 0,
+          "pageNumType": 0,
+          "pictureNum": 0,
+          "tableNum": 0,
+          "equationNum": 0,
+          "columnSpacing": 1134,
+          "defaultTabSpacing": 8000,
+          "hideHeader": false,
+          "hideFooter": false,
+          "hideMasterPage": false,
+          "hideBorder": false,
+          "hideFill": false,
+          "hideEmptyLine": false
+        },
+        {
+          "pageNum": 0,
+          "pageNumType": 0,
+          "pictureNum": 0,
+          "tableNum": 0,
+          "equationNum": 0,
+          "columnSpacing": 1134,
+          "defaultTabSpacing": 12000,
+          "hideHeader": false,
+          "hideFooter": false,
+          "hideMasterPage": false,
+          "hideBorder": false,
+          "hideFill": false,
+          "hideEmptyLine": false
+        }
+      ],
+      "note": "Raw stored defaultTabSpacing remains 4000/8000/12000. Effective 20/40/60pt behavior was separately observed in actual Hancom by root; no stored-unit normalization was applied.",
+      "rootScreenshots": [
+        {
+          "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-subagent-final63\\hwp-tab\\hancom-section1.png",
+          "sha256": "2d51b2bfa4d15f46735416ca190412c333cf89b8161f0acf3dc75108b7d39fd8",
+          "bytes": 81763
+        },
+        {
+          "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-subagent-final63\\hwp-tab\\hancom-section2.png",
+          "sha256": "7248d8a4401458e128b1dfec3469ce34a786ad02bfe2d888060c4d6a00510870",
+          "bytes": 82744
+        },
+        {
+          "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-subagent-final63\\hwp-tab\\hancom-section3.png",
+          "sha256": "08785dd265c885a36bc2c1a73ce4463da4536ec9cf010f65a3b3a70fa8ba9d4f",
+          "bytes": 83106
+        },
+        {
+          "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-subagent-final63\\hwp-tab\\hancom-saved.png",
+          "sha256": "7f59d1c3b5e3035434343a6a0ac41e531ceda7f1eb9e9fb3777465f6701feb8b",
+          "bytes": 83392
+        }
+      ]
+    },
+    {
+      "name": "shadow",
+      "status": "PASS",
+      "producer": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-subagent-final63\\shadow\\textbox-Top-1.hwpx",
+      "producerSha256": "892fe2784398038ae4d8308a6b5aceabcda72f4b8267576076575fbb48de6e27",
+      "actual": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-subagent-final63\\shadow\\textbox-Top-1-hancom.hwpx",
+      "actualSha256": "6f0c46a548488905aae8b0f91475dbf4f185473f3b796439198a139b6a09ca8b",
+      "producerUnchanged": true,
+      "semanticDifferences": 0,
+      "fullGeometryDifferences": 0,
+      "geometryTolerance": 0.2,
+      "pages": {
+        "before": 1,
+        "after": 1,
+        "equal": true
+      },
+      "comparison": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-subagent-final63\\actual-final63-shadow\\result.json",
+      "comparisonSha256": "46ea2ecc5677365b0ec93d83e69c776ee61f3475d1948d02e650bb15e2547a97",
+      "rawShadows": [
+        {
+          "section": "Contents/section0.xml",
+          "shape": "rect",
+          "shadows": [
+            {
+              "type": "NONE",
+              "color": "#000000",
+              "offsetX": "0",
+              "offsetY": "0",
+              "alpha": "0"
+            }
+          ]
+        }
+      ],
+      "rootScreenshots": [
+        {
+          "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-subagent-final63\\shadow\\hancom-open.png",
+          "sha256": "4751375e740df22aca3b7486bef3a23efd7662ed242a1df3d6b65626934d4429",
+          "bytes": 82731
+        },
+        {
+          "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-subagent-final63\\shadow\\hancom-saved.png",
+          "sha256": "cf2e49673ae71bc6d82356b08d3fb6ce7d6679b947c9654f8acecc4a4b398ae1",
+          "bytes": 83173
+        }
+      ]
+    }
+  ],
+  "scope": "Final63 producer outputs actually opened and saved separately by root in Hancom2024; full published semantic and every control/text layout field compared through final63 engine, raw binary tab records and XML shadows independently inspected. This is scoped to these owned regression documents, not all HWP/HWPX compatibility or print equivalence."
+}

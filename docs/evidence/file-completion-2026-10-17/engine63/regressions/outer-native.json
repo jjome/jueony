@@ -1,0 +1,18 @@
+{
+  "results": [
+    "hwp fresh: four outer margins, live geometry, repeated export, snapshot and preserved cells",
+    "hwp loaded: four outer margins, live geometry, repeated export, snapshot and preserved cells",
+    "hwpx fresh: four outer margins, live geometry, repeated export, snapshot and preserved cells",
+    "hwpx loaded: four outer margins, live geometry, repeated export, snapshot and preserved cells"
+  ],
+  "failures": [],
+  "note": "Native same-engine invariants, four stored margins and real table/text geometry. Hancom NOT_RUN.",
+  "originalResultSha256": "82279f3b59b2bd0d8d4498fd666d22a9c864be7176d4e5f01267da90eda0fb96",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

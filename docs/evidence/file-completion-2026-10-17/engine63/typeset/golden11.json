@@ -1,0 +1,26 @@
+{
+  "results": [
+    "hangul-width38800",
+    "hangul-width39100",
+    "spaced-width38800",
+    "original-character-justify",
+    "original-word-justify",
+    "ascii-digit-character",
+    "tabs-mixed",
+    "hangul-20pt-width38800",
+    "hangul-9pt-width34920",
+    "hangul-9_5pt-width36880",
+    "hangul-12pt-width40000"
+  ],
+  "failures": [],
+  "scope": "Independent Hancom UI save controls; whole public layout0.2, model preservation and live state invariance are unchanged requirements. No font byte extraction or fitted widths.",
+  "verifierSha256": "dd511bd126bbefaa06def3b46e26aaef6f04c0251ab7a3727be3b38ff7a18426",
+  "originalResultSha256": "2cdfead6106e55119d679d15872f47960826f3573959c5a23cc200a49340a5e7",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

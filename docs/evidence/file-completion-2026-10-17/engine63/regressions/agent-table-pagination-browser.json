@@ -1,0 +1,28 @@
+{
+  "results": [
+    "openai-responses: chat changes policy, comparison/one request undo/redo and real file save work",
+    "anthropic: chat changes policy, comparison/one request undo/redo and real file save work",
+    "gemini: chat changes policy, comparison/one request undo/redo and real file save work",
+    "openai-compatible: chat changes policy, comparison/one request undo/redo and real file save work",
+    "hwp: cell/row/none follow-up settings keep both tables/cells and survive file-handle reopen",
+    "hwpx: cell/row/none follow-up settings keep both tables/cells and survive file-handle reopen",
+    "no-op/unsupported policy/target/injected header and command mixing leave bytes/history unchanged",
+    "protected/merged/inline/caption/mixed/field documents visibly refuse unchanged",
+    "live first mutation then throw restores policy/cells/dirty/history/caret",
+    "false/no-op/wrong policy and unexpected repeated header/placement/cell/style/resource changes roll back",
+    "delayed model cannot overwrite newer table policy or cell text",
+    "body caret and direct typing remain usable after table metadata edit",
+    "saved workspace reload restores policy/capability and named comparison"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Actual Edge/four synthetic provider protocols. Stored table pagination modes, preservation, no-op/protected rejection, rollback/conflicts, caret/typing, save/reload. Native Hancom layout/paid models NOT_RUN.",
+  "originalResultSha256": "eebdcc1480c4af984b15963e653d1762a8a0461e01de001ab00d2b441707bca6",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "build": {
+    "engineWasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "builtAt": "2026-10-16T19:25:51.482Z"
+  }
+}

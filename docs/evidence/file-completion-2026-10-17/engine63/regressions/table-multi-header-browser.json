@@ -1,0 +1,35 @@
+{
+  "results": [
+    "openai-responses: chat applies two leading title rows, comparison/undo/redo and saved flags remain exact",
+    "anthropic: chat applies two leading title rows, comparison/undo/redo and saved flags remain exact",
+    "gemini: chat applies two leading title rows, comparison/undo/redo and saved flags remain exact",
+    "openai-compatible: chat applies two leading title rows, comparison/undo/redo and saved flags remain exact",
+    "hwp: follow-up shrink/extend/off/all-title/clear retains cells/other table and reopens",
+    "hwpx: follow-up shrink/extend/off/all-title/clear retains cells/other table and reopens",
+    "hwp: manual count reads existing two-row block, retains table selection and supports undo/redo",
+    "hwpx: manual count reads existing two-row block, retains table selection and supports undo/redo",
+    "manual invalid counts and repeat with no body row preserve bytes/history; disable title clears whole block",
+    "manual title count change from body cell block preserves selected cells and cancellation changes nothing",
+    "partial second-row/gap/protected title sources reject rather than reduce original flags",
+    "third title-cell live failure restores all flags/history/dirty/caret",
+    "delayed AI and stale manual dialog cannot overwrite newer multi-row title state",
+    "hwp: 2-row rendered titles repeat exactly once on continuation, all body labels remain and off affects only repeat",
+    "hwp: 3-row rendered titles repeat exactly once on continuation, all body labels remain and off affects only repeat",
+    "hwpx: 2-row rendered titles repeat exactly once on continuation, all body labels remain and off affects only repeat",
+    "hwpx: 3-row rendered titles repeat exactly once on continuation, all body labels remain and off affects only repeat",
+    "unsaved workspace recovery restores multi-title block, repeat setting and comparison history after reload",
+    "hwp: oversized title block visibly refuses in manual dialog and preserves actual bytes/history",
+    "hwpx: oversized title block visibly refuses in manual dialog and preserves actual bytes/history"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Actual Edge/four synthetic provider protocols. Contiguous leading multi-row title/repeat/policy. Four actual adapters with synthetic protocols, manual count/selection/cancel/stale/invalid values, two/three-row continuation labels/body counts, rollback/conflicts/save/reload. Native Hancom/paid models NOT_RUN.",
+  "originalResultSha256": "2152d17ba83bc33717632817e2c5d13d4786fd0c5ba3a607818e7217dec69bc0",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "build": {
+    "engineWasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "builtAt": "2026-10-16T19:25:51.482Z"
+  }
+}

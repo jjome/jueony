@@ -12,8 +12,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | --- | --- | --- |
-| 구현 | 완료 22/24 · 부분 2 | 완료 0/10 · 부분 9 · 미구현 1 |
-| 검증 | 완료 14/24 · 부분 10 | 완료 0/10 · 부분 6 · 미검증 4 |
+| 구현 | 완료 23/24 · 부분 1 | 완료 0/10 · 부분 9 · 미구현 1 |
+| 검증 | 완료 16/24 · 부분 8 | 완료 0/10 · 부분 6 · 미검증 4 |
 | Agent 연결 | 연결 6/6 · 부분 0 · 해당 없음 18 | 연결 0/10 · 부분 1 · 미연결 9 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -22,9 +22,9 @@
 
 ## 먼저 할 일
 
-- **구현** [N001](<05-files-storage-recovery.md#n001>) **HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존** — 최종 56패치 통합 회귀와 실제 한글 재저장 검수를 진행. 글줄·탭 폭 변경과 원점 보호 대조를 분리하고 선언 높이를 임의 정규화하지 않는다.
-- **구현** [G092](<05-files-storage-recovery.md#g092>) **HWP 글상자 알려진 세로 정렬과 raw list 비트 동기화** — 실제 한글에서 새 Top HWP 열기 손상 오류 재현. 정상 HWPX→한글 HWP 기준과 바이너리 차이를 수정하고 세 정렬·두 형식 직접 재검수.
-- **검증** [N002](<05-files-storage-recovery.md#n002>) **공개 형식 변환의 필드 보존 차이 4건** — 공개 네 문서 실제 한글 열기·SaveAs 완료. python0 전체 동등, python1 표 위치·python3 줄/참조·MCST 지면/쪽 수 차이는 수정·원인 분리 후 재검수.
+- **구현** [N001](<05-files-storage-recovery.md#n001>) **HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존** — 정식63 이후 표 높이/원점 후속 통합 회귀와 실제 한글 재저장 검수를 진행. 글줄·탭 폭 변경과 원점 보호 대조를 분리하고 선언 높이를 임의 정규화하지 않는다.
+- **검증** [N002](<05-files-storage-recovery.md#n002>) **공개 형식 변환의 필드 보존 차이 4건** — 정식63에서 python1 표 좌표142차이 해소. 실제 한글 raw ID 재인덱싱40과 python3 줄/참조·MCST 복잡 지면/쪽 수 차이는 별도 원인 분리·수정 검수. 원래 네 필드 보존 수정은 통과.
+- **검증** [G090](<05-files-storage-recovery.md#g090>) **HWP 단순 겹침 표 tail의 저장 snapshot 원점 기록** — 최종 실제 UI 저장·재열기·반복 저장 검증 완료, 한글 직접 지면 비교는 대기. N001의 복잡 원본 전체 범위는 부분 유지.
 
 ## 기능별 작업표
 
@@ -102,7 +102,7 @@
 | [G066](<05-files-storage-recovery.md#g066>) · 작업 | 오래된 문서 버전 결과의 덮어쓰기 거절 | ☑ 완료 | ☑ 완료 | ☑ 연결 |
 | [G067](<05-files-storage-recovery.md#g067>) · 작업 | 부분 Native 변경·재렌더 실패의 요청 원복 | ☑ 완료 | ☑ 완료 | ☑ 연결 |
 | [G068](<05-files-storage-recovery.md#g068>) · 작업 | 복구 렌더와 새 변경 검증의 분리 | ☑ 완료 | ☑ 완료 | ☑ 연결 |
-| [G069](<05-files-storage-recovery.md#g069>) · 작업 | HWPX 기본 탭 저장 값 보정 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
+| [G069](<05-files-storage-recovery.md#g069>) · 작업 | HWPX 기본 탭 저장 값 보정 | ☑ 완료 | ☑ 완료 | ☑ 연결 |
 | [G070](<05-files-storage-recovery.md#g070>) · 작업 | 숨김 끝 문단의 실제 페이지 소유 | ☑ 완료 | ☑ 완료 | ☑ 연결 |
 | [G071](<05-files-storage-recovery.md#g071>) · 작업 | 겹침 금지 HWP 후속 표의 저장 앵커 소유 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G072](<05-files-storage-recovery.md#g072>) · 작업 | HWP 메모 carrier의 본문 소유 분리 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
@@ -135,7 +135,7 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [N002](<05-files-storage-recovery.md#n002>) · 작업 | 공개 형식 변환의 필드 보존 차이 4건 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
-| [G092](<05-files-storage-recovery.md#g092>) · 작업 | HWP 글상자 알려진 세로 정렬과 raw list 비트 동기화 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [G092](<05-files-storage-recovery.md#g092>) · 작업 | HWP 글상자 알려진 세로 정렬과 raw list 비트 동기화 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 
 ## 항목별 완료조건·근거
 
@@ -335,12 +335,12 @@
 <summary>G069 · HWPX 기본 탭 저장 값 보정</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
-- 검증 구분: 자동 **PASS** / 한글 **PARTIAL**.
-- 완료 범위: 기록된 기본 탭/구역 합치기 및 20/40/60pt 구역. 폭 미정 탭과 유효 LINE_SEG가 함께 남는 HWPX 저장 결함도 포함.
-- 다음 작업: 정식 56의 미정 탭 캐시 수정 12경로 통과. 실제 한글 최소 A/B 40pt 정상화 확인; 생산 출력 3구역·HWP/HWPX 직접 재저장 검사 마감.
-- 근거: [36-native-section-comparison.md](<../36-native-section-comparison.md>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>)
-- 원래 기록: `SCOPED_FIX56_PASS;HANCOM_PRODUCTION_RETEST_IN_PROGRESS_2026_10_17`
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **DONE**.
+- 완료 범위: 기록된 기본 탭/구역 합치기 및 20/40/60pt 구역. 폭 미정 탭과 유효 LINE_SEG가 함께 남는 HWPX 저장 결함도 포함. HWP 바이너리 모델 저장의 미정 탭 캐시도 포함; 기존 무편집 raw BodyText 보존.
+- 다음 작업: 기록된 기본 탭·구역 합치기 및 20/40/60pt 저장 검수 마감. 정식63의 HWP/HWPX 반복 저장·실제 한글 재저장 의미/지면0차이. 무편집 legacy raw 원본은 보존하며 복잡 사용자 탭은 별도 항목으로 관리.
+- 근거: [36-native-section-comparison.md](<../36-native-section-comparison.md>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [manifest.json](<../evidence/file-completion-2026-10-17/engine63/manifest.json>)
+- 원래 기록: `SCOPED_DONE;FORMAL63_AND_ACTUAL_HANCOM_HWP_HWPX_PASS_2026_10_17`
 
 </details>
 
@@ -417,7 +417,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 확인한 단일 단 HWP 겹침 표·직접 본문 줄·혼합 서식·읽기 전용 책갈피/필드 표시의 흐름·저장 소유를 보강했다. bare LINE_SEG 캐시와 실제 여백/offset을 구분한다. 다단·복합/불명확 원점의 지원 확대는 완료로 표시하지 않는다.
-- 다음 작업: 최종 56패치 통합 회귀와 실제 한글 재저장 검수를 진행. 글줄·탭 폭 변경과 원점 보호 대조를 분리하고 선언 높이를 임의 정규화하지 않는다.
+- 다음 작업: 정식63 이후 표 높이/원점 후속 통합 회귀와 실제 한글 재저장 검수를 진행. 글줄·탭 폭 변경과 원점 보호 대조를 분리하고 선언 높이를 임의 정규화하지 않는다.
 - 상위 항목: [B153](<08-tables.md#b153>) 셀 속성
 - 근거: [100-storage-conversion-and-overlap.md](<../100-storage-conversion-and-overlap.md>) · [verification-summary.json](<../evidence/overlap-table-tail-2026-10-15/verification-summary.json>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [summary.json](<../evidence/file-completion-2026-10-17/engine51/summary.json>)
 - 원래 기록: `PARTIAL;INDEPENDENT_HANCOM_FAILURES_FOUND_AND_FOLLOWUP_2026_10_17`
@@ -431,7 +431,7 @@
 - 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **PARTIAL**.
 - 완료 범위: 기록된 공개5문서10변환의4개 차이; common배치조회·영어단위·Lock·표셀메모 소유; 보존검사 유지
-- 다음 작업: 공개 네 문서 실제 한글 열기·SaveAs 완료. python0 전체 동등, python1 표 위치·python3 줄/참조·MCST 지면/쪽 수 차이는 수정·원인 분리 후 재검수.
+- 다음 작업: 정식63에서 python1 표 좌표142차이 해소. 실제 한글 raw ID 재인덱싱40과 python3 줄/참조·MCST 복잡 지면/쪽 수 차이는 별도 원인 분리·수정 검수. 원래 네 필드 보존 수정은 통과.
 - 상위 항목: [B077](<10-headers-notes-fields.md#b077>) 필드
 - 근거: [100-storage-conversion-and-overlap.md](<../100-storage-conversion-and-overlap.md>) · [summary.json](<../evidence/format-conversion-2026-10-15/summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>)
 - 원래 기록: `EXPLICIT_SCOPED_FIX;INDEPENDENT_HANCOM_GEOMETRY_FAILURES_FOUND_2026_10_17`
@@ -442,13 +442,13 @@
 <summary>G092 · HWP 글상자 알려진 세로 정렬과 raw list 비트 동기화</summary>
 
 - 종류: 실행 작업 · 우선순위: P0.
-- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PARTIAL** / 한글 **PARTIAL**.
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **DONE**.
 - 완료 범위: 알려진 Top/Center/Bottom만 동기화; 예약 raw3/기타 비트 보존·관측 known=false·명시 setter·미표현 HWPX 변환 거절
-- 다음 작업: 실제 한글에서 새 Top HWP 열기 손상 오류 재현. 정상 HWPX→한글 HWP 기준과 바이너리 차이를 수정하고 세 정렬·두 형식 직접 재검수.
+- 다음 작업: 알려진 세 정렬의 두 형식 저장 검수 마감. 새 HWP 글상자 플래그 손상과 HWPX NONE 그림자 누락 수정. 실제 한글 HWP 세 사본 의미·배치0, 공식63 생성 원본과 SHA 동일. 예약 비트/미표현 정렬 보호 유지.
 - 상위 항목: [N002](<05-files-storage-recovery.md#n002>) 공개 형식 변환의 필드 보존 차이 4건
-- 근거: [103-textbox-state-and-storage.md](<../103-textbox-state-and-storage.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>)
-- 원래 기록: `INDEPENDENT_HANCOM_HWP_OPEN_FAILURE_FOUND_2026_10_17`
+- 근거: [103-textbox-state-and-storage.md](<../103-textbox-state-and-storage.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [manifest.json](<../evidence/file-completion-2026-10-17/textbox42-heading43/manifest.json>) · [manifest.json](<../evidence/file-completion-2026-10-17/engine63/manifest.json>)
+- 원래 기록: `SCOPED_DONE;NEW_TEXTBOX_STORAGE_FIXED;ACTUAL_HANCOM_AND_FORMAL63_PASS_2026_10_17`
 
 </details>
 
@@ -575,7 +575,7 @@
 - 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PARTIAL** / 한글 **PARTIAL**.
 - 완료 범위: 한쪽/한단·정확한 원시 호스트의 Native HWP5에서 직접 본문 줄의 index/vpos/Unicode·UTF16 시작/연속 원문 전체를 일대일 확인해 snapshot 줄 위치만 보정. 캡션 story 소유 분리, raw payload 차이·전체 배치·반복 저장·undo/재적용·실제 UI 저장/재열기 검증.
-- 다음 작업: 실제 한글에서 확인한 줄 분할·글자폭과 표 흐름 차이를 수정. 최종 56패치 회귀 및 새 파일의 실제 한글 재저장 비교 진행; 선언 높이 변화는 별도 관측으로 보존.
+- 다음 작업: 실제 한글에서 확인한 줄 분할·글자폭과 표 흐름 차이를 수정. 정식63 이후 표 높이/원점 후속 회귀 및 새 파일의 실제 한글 재저장 비교 진행; 선언 높이 변화는 별도 관측으로 보존.
 - 상위 항목: [N001](<05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존
 - 근거: [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [baseline-failures.json](<../evidence/file-completion-2026-10-17/hancom/baseline-failures.json>)
 - 원래 기록: `SCOPED_IMPLEMENTED;INDEPENDENT_HANCOM_FAILURES_FOUND;FINAL_INTEGRATION_IN_PROGRESS_2026_10_17`
@@ -589,7 +589,7 @@
 - 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PARTIAL** / 한글 **PARTIAL**.
 - 완료 범위: 실제 한글 재저장본에 따라 빈 표 host LINE_SEG의 양수 캐시를 사용자 간격으로 취급한 이전 기대를 정정. 확인한 Native 한 단 인접 통째 표의 현재 흐름을 사용하고 실제 문단 여백·명시 offset과 원시 바이트를 보존한다.
-- 다음 작업: 최종 56패치의 긍정·제외 대조와 실제 한글 재저장 검수를 마친다. 양수 cache 값 자체와 사용자 간격 의도를 혼동하지 않는다.
+- 다음 작업: 정식63 이후 표 높이/원점 후속의 긍정·제외 대조와 실제 한글 재저장 검수를 마친다. 양수 cache 값 자체와 사용자 간격 의도를 혼동하지 않는다.
 - 상위 항목: [N001](<05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존
 - 근거: [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [baseline-failures.json](<../evidence/file-completion-2026-10-17/hancom/baseline-failures.json>)
 - 원래 기록: `SCOPED_IMPLEMENTED;INDEPENDENT_HANCOM_FAILURES_FOUND;FINAL_INTEGRATION_IN_PROGRESS_2026_10_17`

@@ -1,0 +1,97 @@
+--- a/src/serializer/hwpx/shape.rs
++++ b/src/serializer/hwpx/shape.rs
+@@ -1069,20 +1069,14 @@
+ }
+ 
+ /// `<hp:shadow>` — `parse_shape_shadow_attr` 의 역매핑.
+-/// 전 필드 0 이면 원본에 shadow 부재로 간주하여 미방출.
++/// Explicit model values, including NONE/black/zero, must survive external saves.
+ /// alpha 는 정수 방출 (파서의 `>1.0` 경로와 정합 — 0/1 경계값만 비가역).
+ pub(crate) fn write_shadow<W: Write>(
+     w: &mut Writer<W>,
+     d: &DrawingObjAttr,
+ ) -> Result<(), SerializeError> {
+-    if d.shadow_type == 0
+-        && d.shadow_color == 0
+-        && d.shadow_offset_x == 0
+-        && d.shadow_offset_y == 0
+-        && d.shadow_alpha == 0
+-    {
+-        return Ok(());
+-    }
++    // Omitting all-zero NONE does not preserve black: Hancom 2024 supplies
++    // its own inactive default (#B2B2B2). Preserve the explicit model tuple.
+     let ty = match d.shadow_type {
+         1 => "LEFT_TOP",
+         2 => "RIGHT_TOP",
+@@ -1731,6 +1725,41 @@
+         );
+     }
+ 
++    fn g046_shadow_xml(drawing: &DrawingObjAttr) -> String {
++        let mut writer: Writer<Vec<u8>> = Writer::new(Vec::new());
++        write_shadow(&mut writer, drawing).unwrap();
++        String::from_utf8(writer.into_inner()).unwrap()
++    }
++
++    #[test]
++    fn g046_all_zero_none_shadow_remains_explicit_black() {
++        assert_eq!(g046_shadow_xml(&DrawingObjAttr::default()), r##"<hp:shadow type="NONE" color="#000000" offsetX="0" offsetY="0" alpha="0"/>"##);
++    }
++
++    #[test]
++    fn g046_nonzero_shadow_mapping_and_payload_are_unchanged() {
++        for (kind, name) in [(0, "NONE"), (1, "LEFT_TOP"), (2, "RIGHT_TOP"), (3, "LEFT_BOTTOM"), (4, "RIGHT_BOTTOM"), (5, "CENTER")] {
++            let drawing = DrawingObjAttr { shadow_type: kind, shadow_color: 0x00332211, shadow_offset_x: 123, shadow_offset_y: -456, shadow_alpha: 73, ..Default::default() };
++            assert_eq!(g046_shadow_xml(&drawing), format!(r##"<hp:shadow type="{}" color="#112233" offsetX="123" offsetY="-456" alpha="73"/>"##, name));
++        }
++    }
++
++    #[test]
++    fn g046_rect_textbox_and_line_only_differ_by_explicit_shadow_tuple() {
++        let zero = r##"<hp:shadow type="NONE" color="#000000" offsetX="0" offsetY="0" alpha="0"/>"##;
++        let gray = r##"<hp:shadow type="NONE" color="#B2B2B2" offsetX="0" offsetY="0" alpha="0"/>"##;
++        let mut paragraph = Paragraph::default(); paragraph.text = "그림자 없는 본문".to_string();
++        for mut rect in [RectangleShape::default(), rect_with_text_paragraph(paragraph)] {
++            let a = serialize_rect(&rect); assert_eq!(a.matches(zero).count(), 1);
++            rect.drawing.shadow_color = 0x00B2B2B2;
++            let b = serialize_rect(&rect); assert_eq!(b.matches(gray).count(), 1);
++            assert_eq!(a.replace(zero, ""), b.replace(gray, ""), "body/geometry/other attributes unchanged");
++        }
++        let mut line = LineShape::default(); let a = serialize_line(&line);
++        line.drawing.shadow_color = 0x00B2B2B2; let b = serialize_line(&line);
++        assert_eq!(a.matches(zero).count(), 1); assert_eq!(a.replace(zero, ""), b.replace(gray, ""));
++    }
++
+     #[test]
+     fn task1379_rect_line_fill_shadow_attrs() {
+         // lineShape/fillBrush/shadow 속성 역매핑.
+--- a/src/serializer/hwpx/section.rs
++++ b/src/serializer/hwpx/section.rs
+@@ -4205,6 +4205,26 @@
+     /// [Issue #1944] legacy 공용 도형 경로(polygon/ellipse/arc/curve)가 도형 내
+     /// 글상자(drawText) 문단을 방출해야 한다 — 종전 누락으로 도형 안 텍스트 소실.
+     #[test]
++    fn g046_common_shape_zero_none_preserves_body_and_other_geometry() {
++        use crate::model::shape::{CommonObjAttr, DrawingObjAttr, TextBox};
++        let zero = r##"<hp:shadow type="NONE" color="#000000" offsetX="0" offsetY="0" alpha="0"/>"##;
++        let gray = r##"<hp:shadow type="NONE" color="#B2B2B2" offsetX="0" offsetY="0" alpha="0"/>"##;
++        let mut paragraph = Paragraph::default(); paragraph.text = "공통 도형 본문".to_string();
++        let drawing = DrawingObjAttr { text_box: Some(TextBox { paragraphs: vec![paragraph], ..Default::default() }), ..Default::default() };
++        for tag in ["ellipse", "arc", "polygon", "curve"] {
++            let mut ctx = SerializeContext::default();
++            let a = render_common_shape_xml(tag, &CommonObjAttr::default(), &None, Some(&drawing), &[], "", "", &mut ctx);
++            let mut colored = drawing.clone(); colored.shadow_color = 0x00B2B2B2;
++            let mut b_ctx = SerializeContext::default();
++            let b = render_common_shape_xml(tag, &CommonObjAttr::default(), &None, Some(&colored), &[], "", "", &mut b_ctx);
++            assert_eq!(a.matches(zero).count(), 1); assert!(a.contains("공통 도형 본문"));
++            assert_eq!(a.replace(zero, ""), b.replace(gray, ""), "only shadow tuple changes for {}", tag);
++            let no_drawing = render_common_shape_xml(tag, &CommonObjAttr::default(), &None, None, &[], "", "", &mut ctx);
++            assert!(!no_drawing.contains("<hp:shadow"), "no drawing model must not fabricate shadow data");
++        }
++    }
++
++    #[test]
+     fn common_shape_emits_draw_text_for_legacy_shapes() {
+         use crate::model::shape::{CommonObjAttr, DrawingObjAttr, TextBox};
+ 

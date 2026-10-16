@@ -1,0 +1,23 @@
+{
+  "results": [
+    "hwp: table horizontal defaults publish current inherited widths and leave custom cells untouched",
+    "hwpx: table horizontal defaults publish current inherited widths and leave custom cells untouched",
+    "hwp: zero defaults with font-size neighbor then custom/inherited cell padding stays stable",
+    "hwpx: zero defaults with font-size neighbor then custom/inherited cell padding stays stable",
+    "hwp: narrower and wider table defaults rewrap inherited text without losing or changing custom cell rows",
+    "hwpx: narrower and wider table defaults rewrap inherited text without losing or changing custom cell rows",
+    "hwp: top/bottom-only defaults do not republish unrelated horizontal line records",
+    "hwpx: top/bottom-only defaults do not republish unrelated horizontal line records",
+    "previously recorded HWP zero-default diagnostic also stays stable after an ordinary cell margin edit"
+  ],
+  "failures": [],
+  "note": "Actual HWP/HWPX table-default mutation, stored lineseg width provenance, literal text/custom padding preservation, snapshot undo/reapply and all-page save/reopen. Same-engine consistency; not independent Hancom parity. Normal HWP Agent padding gate stays closed.",
+  "originalResultSha256": "7471318b28404bd0f563704d4b489be29fe7f82078bc26b33e9ef769dea6a4d4",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

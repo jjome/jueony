@@ -1,0 +1,29 @@
+{
+  "results": [
+    "openai-responses: chat sets a next-style edge, comparison/undo/redo/save preserve current paragraphs",
+    "anthropic: chat sets a next-style edge, comparison/undo/redo/save preserve current paragraphs",
+    "gemini: chat sets a next-style edge, comparison/undo/redo/save preserve current paragraphs",
+    "openai-compatible: chat sets a next-style edge, comparison/undo/redo/save preserve current paragraphs",
+    "hwp: actual Enter at end switches style/format; mid-paragraph Enter keeps heading; undo/redo/save work",
+    "hwpx: actual Enter at end switches style/format; mid-paragraph Enter keeps heading; undo/redo/save work",
+    "default destination, self continuation and two-step cycle follow real keyboard Enter",
+    "invalid/no-op/character/default source, batching, locked/raw endpoints and fields refuse unchanged",
+    "metadata-only next edge retains the current heading caret and manual style selection",
+    "failure after live native update restores edge, body, cursor, history and dirty",
+    "false/no-op/wrong edge, unexpected name/English/fonts/body/resources and destination edits refuse and restore",
+    "delayed model cannot overwrite a newer source edge or renamed destination",
+    "typing after actual Enter uses the body style formatting and saved style ID",
+    "host reload restores stored edge and persisted future-Enter comparison"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Actual Edge/four synthetic provider protocols. Next-style metadata, actual keyboard Enter at end/middle/default/self/cycles, target formatting and subsequent typing, undo/redo/rollback/conflicts/save/reload. Native Hancom and paid models NOT_RUN.",
+  "originalResultSha256": "878d2644192e2d8b95a56b3e224577afc41832c14826fb57b5c857ad8dc71343",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "build": {
+    "engineWasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "builtAt": "2026-10-16T19:25:51.482Z"
+  }
+}

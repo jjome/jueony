@@ -1,0 +1,126 @@
+--- a/src/serializer/body_text.rs
++++ b/src/serializer/body_text.rs
+@@ -384,7 +384,17 @@
+     //
+     // 범위 판정도 축을 올린 값으로 한다 — `actual_char_count` 는 이 파일에 실제로 실린
+     // 글자 수라 언제나 HWP5 축이다.
+-    let line_segs_in_range = if para.stored_text_partition_is_dirty() {
++    // Hancom treats retained LINE_SEG rows as a resolved layout. Pairing them
++    // with unresolved inline-tab placeholders can collapse the tab advances.
++    // Only regenerated paragraphs reach this writer: the section's unchanged
++    // sealed raw-stream path above stays byte-preserving. Keep real/unknown
++    // zero-width records, and derive PARA_HEADER's line count from this slice.
++    let unresolved_tab_width = para.text.chars().filter(|&c| c == '\t').enumerate().any(
++        |(index, _)| para.tab_extended.get(index).map_or(true, |ext| {
++            crate::model::paragraph::tab_ext_is_placeholder(ext)
++        }),
++    );
++    let line_segs_in_range = if para.stored_text_partition_is_dirty() || unresolved_tab_width {
+         // Text/style mutation retained the old rows only as an edit-reflow
+         // template. They are not a serializable partition of the new text.
+         &source_line_segs[..0]
+@@ -1946,6 +1956,104 @@
+         assert_eq!(parsed.paragraphs[0].char_shapes[1].char_shape_id, 3);
+     }
+ 
++    fn g069_hwp_tab_fixture(text: &str, tabs: Vec<[u16; 7]>) -> Section {
++        Section {
++            paragraphs: vec![Paragraph {
++                text: text.to_string(),
++                tab_extended: tabs,
++                line_segs: vec![LineSeg {
++                    text_start: 0, vertical_pos: 1600, line_height: 1000,
++                    text_height: 1000, baseline_distance: 850, line_spacing: 600,
++                    column_start: 0, segment_width: 42520, tag: 393216,
++                }],
++                ..Default::default()
++            }],
++            ..Default::default()
++        }
++    }
++
++    fn g069_hwp_header_count(bytes: &[u8]) -> u16 {
++        let records = Record::read_all(bytes).unwrap();
++        let header = records.iter().find(|r| r.tag_id == tags::HWPTAG_PARA_HEADER && r.level == 0).unwrap();
++        u16::from_le_bytes(header.data[16..18].try_into().unwrap())
++    }
++
++    #[test]
++    fn g069_hwp_unresolved_tabs_omit_line_record_and_header_count_together() {
++        for tabs in [vec![], vec![crate::model::paragraph::TAB_EXT_PLACEHOLDER; 2], vec![[0, 0, 0x0100, 0, 0, 0, 9]; 2]] {
++            let section = g069_hwp_tab_fixture("A\tB\tC", tabs);
++            let old_rows = section.paragraphs[0].line_segs.clone();
++            let bytes = serialize_section(&section);
++            assert_eq!(g069_hwp_header_count(&bytes), 0);
++            assert!(!Record::read_all(&bytes).unwrap().iter().any(|r| r.tag_id == tags::HWPTAG_PARA_LINE_SEG));
++            let parsed = parse_body_text_section(&bytes).unwrap();
++            assert_eq!(parsed.paragraphs[0].text, "A\tB\tC");
++            assert!(parsed.paragraphs[0].line_segs.is_empty());
++            assert_eq!(section.paragraphs[0].line_segs, old_rows, "export does not mutate live model");
++        }
++    }
++
++    #[test]
++    fn g069_hwp_resolved_unknown_zero_and_unused_tabs_preserve_rows() {
++        for ext in [[3000, 0, 0x0100, 0, 0, 0, 9], [0, 0, 0x0500, 0, 0, 0, 9], [0, 0, 0x0101, 0, 0, 0, 9], [0, 0, 0x0100, 1, 0, 0, 9]] {
++            let section = g069_hwp_tab_fixture("A\tB", vec![ext]);
++            let bytes = serialize_section(&section);
++            assert_eq!(g069_hwp_header_count(&bytes), 1);
++            let parsed = parse_body_text_section(&bytes).unwrap();
++            assert_eq!(parsed.paragraphs[0].line_segs.len(), 1);
++            assert_eq!(parsed.paragraphs[0].tab_extended[0], ext);
++        }
++        let bytes = serialize_section(&g069_hwp_tab_fixture("AB", vec![crate::model::paragraph::TAB_EXT_PLACEHOLDER]));
++        assert_eq!(g069_hwp_header_count(&bytes), 1);
++    }
++
++    #[test]
++    fn g069_hwp_sealed_unchanged_raw_is_preserved_but_text_edit_rebuilds() {
++        let mut section = g069_hwp_tab_fixture("A\tB\tC", vec![crate::model::paragraph::TAB_EXT_PLACEHOLDER; 2]);
++        let bytes = serialize_section(&section);
++        let mut records = Record::read_all(&bytes).unwrap();
++        let header = records.iter_mut().find(|r| r.tag_id == tags::HWPTAG_PARA_HEADER && r.level == 0).unwrap();
++        header.data[16..18].copy_from_slice(&1u16.to_le_bytes());
++        let at = records.iter().position(|r| r.tag_id == tags::HWPTAG_PARA_CHAR_SHAPE).unwrap() + 1;
++        let data = serialize_para_line_seg(&section.paragraphs[0].line_segs);
++        records.insert(at, Record { tag_id: tags::HWPTAG_PARA_LINE_SEG, level: 1, size: data.len() as u32, data });
++        let legacy = write_records(&records);
++        section.raw_stream = Some(legacy.clone());
++        section.seal_raw_provenance();
++        assert!(section.raw_provenance_permits_reuse());
++        assert_eq!(serialize_section(&section), legacy, "do not rewrite unchanged native authority");
++        section.paragraphs[0].insert_text_at(0, "X");
++        assert!(!section.raw_provenance_permits_reuse());
++        let edited = serialize_section(&section);
++        assert_eq!(g069_hwp_header_count(&edited), 0);
++        let reparsed = parse_body_text_section(&edited).unwrap();
++        assert_eq!(reparsed.paragraphs[0].text, "XA\tB\tC");
++        assert!(reparsed.paragraphs[0].line_segs.is_empty());
++    }
++
++    #[test]
++    fn g069_hwp_three_section_intervals_and_tab_ordinals_survive_twice() {
++        for spacing in [2000, 4000, 6000] {
++            let mut section = g069_hwp_tab_fixture("A\tB\tC", vec![crate::model::paragraph::TAB_EXT_PLACEHOLDER, [3000, 0, 0x0100, 0, 0, 0, 9]]);
++            section.section_def.default_tab_spacing = spacing;
++            section.section_def.page_def.width = 59528;
++            section.section_def.page_def.height = 84186;
++            for _ in 0..2 {
++                let bytes = serialize_section(&section);
++                assert_eq!(g069_hwp_header_count(&bytes), 0);
++                let parsed = parse_body_text_section(&bytes).unwrap();
++                assert_eq!(parsed.section_def.default_tab_spacing, spacing);
++                assert_eq!(parsed.paragraphs[0].text, "A\tB\tC");
++                assert!(crate::model::paragraph::tab_ext_is_placeholder(&parsed.paragraphs[0].tab_extended[0]));
++                assert_eq!(parsed.paragraphs[0].tab_extended[1][0], 3000);
++                section = parsed;
++                // Explicit regenerated model path; unchanged native raw reuse remains separate.
++                section.raw_stream = None;
++                section.raw_provenance = None;
++            }
++        }
++    }
++
+     /// PARA_LINE_SEG 라운드트립
+     #[test]
+     fn test_roundtrip_line_segs() {

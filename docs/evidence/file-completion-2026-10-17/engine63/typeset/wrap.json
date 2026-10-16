@@ -1,0 +1,23 @@
+{
+  "results": [
+    "regular-justify",
+    "mixed-bold",
+    "mixed-italic",
+    "unicode-numeric",
+    "left-trailing",
+    "right-trailing",
+    "ascii-justify",
+    "multiple-spaces"
+  ],
+  "failures": [],
+  "scope": "Self-authored complete paragraph content, mixed styles, width0.2 unchanged, every raw published layout field, exact global meaning/resources, repeated HWP/HWPX round trips, and live document invariance. No synthetic LINESEG is serialized merely to force equivalent geometry.",
+  "verifierSha256": "43c834b0eb1842b76b1bb4c5af58add1dd9b85cf351adbaaee3acb9867c0f954",
+  "originalResultSha256": "351d207c5379106e1b510286c88a0e69f957be6f52605d742b408101e38549ea",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

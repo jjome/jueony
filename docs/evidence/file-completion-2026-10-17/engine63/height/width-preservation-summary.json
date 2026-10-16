@@ -1,0 +1,48 @@
+{
+  "scope": "Width-only setter must preserve unrequested declared height in model and raw CTRL_HEADER. This is separate from the Hancom content-size rewrite after padding/font changes.",
+  "patch": "C:\\Users\\jjome\\Documents\\work\\jueony\\engine\\patches\\zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-width-declared-height-preservation.patch",
+  "patchSHA256": "5d4bb9a8907fe988741163510618d410b778cb24bfc45b51392780fc1ccc7fd8",
+  "base": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-3a01e912b92dc8af",
+  "privateSource": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\table-height-contract-candidate\\source",
+  "sourceChanges": [
+    {
+      "path": "src/document_core/commands/object_ops/shape.rs",
+      "baseSha256": "6fbcba62c1247afdcdb6f61a52536aaeeef6d338d2f477d6de202c8e0c0414ef",
+      "candidateSha256": "37255674f86cedd70ab97fb0df861f66b349fa87c74e921689feb02f46439772"
+    },
+    {
+      "path": "src/document_core/commands/table_ops.rs",
+      "baseSha256": "68523455f2de2f87dd3e2d7d8af35f79feccb51c95bd968a06b8abbdbc94efec",
+      "candidateSha256": "a7713041dd484352d556022581d4f156e491c733fa1ef176a2deb2c6a7275544"
+    },
+    {
+      "path": "src/parser/hwpx/header.rs",
+      "baseSha256": "bcafbfa475af16e6a5dce2a189d6eac9ce092a305777df748642d87b54fa3c2a",
+      "candidateSha256": "e33168fbfddd62a4bf077e01a093ef04799f7a57034f761177944526f1ad9943"
+    }
+  ],
+  "includedPriorPatches": "42 and43 plus45 only; production56 remains unchanged.",
+  "rust": {
+    "passed": 12,
+    "failed": 0,
+    "ignored": 0,
+    "filtered": 0,
+    "log": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\table-height-contract-candidate\\native12.log",
+    "harness": "C:\\Users\\jjome\\Documents\\work\\jueony\\apps\\editor\\scripts\\lib\\table-height-width-native.rs",
+    "harnessSHA256": "70a8adb5b1666678b14e51a34ab03c8964040b9699e8b2aad8ce2be403a2ce95"
+  },
+  "baselineJS": {
+    "passed": 2,
+    "failed": 10,
+    "result": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\table-height-contract-candidate\\baseline56\\result.json"
+  },
+  "formalWasmValidation": {
+    "passed": 12,
+    "failed": 0,
+    "result": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\table-height-contract-candidate\\formal63\\result.json",
+    "engineSource": "8deeb52a09ba2b75",
+    "wasmSHA256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "contract": "All public control/text layout fields tolerance0.2, exact full semantic evidence, HWP/HWPX output, rawheight, snapshot undo; no projection."
+  },
+  "remainingHeightSemantic": "Actual Hancom5 controlled cases now establish common-only unprotected0/9000 ->5181, protected1400/9000 ->1981, real cell3000 rows stay9000. See build/table-height-contract-20261017/contract-revision-and-command-design.json; explicit aggregate sync command47 is under private validation. This does not change the exact raw-preservation scope of45."
+}

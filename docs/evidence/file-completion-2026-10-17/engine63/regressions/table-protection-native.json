@@ -1,0 +1,28 @@
+{
+  "results": [
+    "hwp: Native protected cell is readonly in context and text/all format/axis writes reject unchanged",
+    "hwp: forged/old editable flags cannot bypass independent live Native protection checks",
+    "hwp: neighbour text/format writes succeed and undo/reopen retain protected cell text/flag",
+    "hwp: unchanged protected input roundtrip persists protection and refusal",
+    "hwpx: Native protected cell is readonly in context and text/all format/axis writes reject unchanged",
+    "hwpx: forged/old editable flags cannot bypass independent live Native protection checks",
+    "hwpx: neighbour text/format writes succeed and undo/reopen retain protected cell text/flag",
+    "hwpx: unchanged protected input roundtrip persists protection and refusal",
+    "readonly or unreadable Native table/cell protection flags fail closed despite forged context",
+    "forged Native cell index and empty range cannot call a writer",
+    "second-operation protection change inside snapshot rejects and full snapshot restoration retains original bytes",
+    "new table aliases and follow-up row/column/text/format commands remain writable",
+    "unselected protected neighbour text/format/protection drift fails the whole snapshot transaction",
+    "axis guard scans every actual Native cell even when a forged context omits protected cells"
+  ],
+  "failures": [],
+  "note": "Protection policy for AI table text/format/axes. Context/domain guards plus independent live Native rechecks; unprotected neighbour allowed. Before-fix 0729789 permitted actual protected writes. Reader fault injection separately identified; no native Hancom parity/paid LLM.",
+  "originalResultSha256": "132c603eb5a71f6dcac07e944c8701e0a72609ac7f5f907d5d7a091d38df13a6",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

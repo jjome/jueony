@@ -1,0 +1,28 @@
+{
+  "results": [
+    "Top -> hwp: real textbox meaning, runs and repeated save",
+    "Top -> hwpx: real textbox meaning, runs and repeated save",
+    "Center -> hwp: real textbox meaning, runs and repeated save",
+    "Center -> hwpx: real textbox meaning, runs and repeated save",
+    "Bottom -> hwp: real textbox meaning, runs and repeated save",
+    "Bottom -> hwpx: real textbox meaning, runs and repeated save",
+    "new textbox default is Top before and after HWP with no explicit setter",
+    "existing HWP textbox preserves unrelated list_attr bits while semantic alignment changes",
+    "reserved raw alignment 3 stays unknown and unchanged across repeat HWP save",
+    "reserved raw3 explicit Top setter updates only supported alignment bits",
+    "reserved raw3 explicit Center setter updates only supported alignment bits",
+    "reserved raw3 explicit Bottom setter updates only supported alignment bits",
+    "unsupported alignment setter never normalizes reserved raw3",
+    "real textbox alignment corruption remains blocked by unchanged preservation guard"
+  ],
+  "failures": [],
+  "scope": "Native textbox alignment storage; same-engine resolved story/run properties. No session fingerprint tolerance relaxation; Hancom NOT_RUN.",
+  "originalResultSha256": "6c0f526b6f596839d851ff2e18578d9094d689a5aa442ee97eea7b891738375b",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

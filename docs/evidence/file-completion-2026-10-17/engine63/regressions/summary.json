@@ -1,0 +1,359 @@
+{
+  "suites": [
+    {
+      "category": "split-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 9,
+      "failures": 0,
+      "sourceResultSha256": "5b9ee109c3c38264d0f5760c572eee338b739cda58c5071ec8a1a27a3bd9fd7b"
+    },
+    {
+      "category": "merge-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 9,
+      "failures": 0,
+      "sourceResultSha256": "1ae7c9b7fbd357cafc577dccd9107f005f9236dd1ad82c2222260383e81baec4"
+    },
+    {
+      "category": "native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 14,
+      "failures": 0,
+      "sourceResultSha256": "16b39219f870b5c5408f82628513c58f65282c53d58e1078ffbdd52b7fd6ef92"
+    },
+    {
+      "category": "table-multi-header-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 16,
+      "failures": 0,
+      "sourceResultSha256": "8413adbb41728470e9209c4dfe590a3b946690b31d25c7c4cdaff4873f395e7a"
+    },
+    {
+      "category": "agent-table-header-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 15,
+      "failures": 0,
+      "sourceResultSha256": "ae4dd2a17ac91e693ef9a01bedd5a06082d3870a14f4c7282b9c14f700eda789"
+    },
+    {
+      "category": "agent-table-pagination-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 15,
+      "failures": 0,
+      "sourceResultSha256": "3617be8d7bf036aae2f0d02cd8f7e1d97d545bd88f3000696e9f2989c88e79de"
+    },
+    {
+      "category": "table-protection-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 14,
+      "failures": 0,
+      "sourceResultSha256": "132c603eb5a71f6dcac07e944c8701e0a72609ac7f5f907d5d7a091d38df13a6"
+    },
+    {
+      "category": "table-conversion-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 17,
+      "failures": 0,
+      "sourceResultSha256": "6f2e820c872ecabb20f4d4de372c9cd93edbc9dd74aec23255828f0414d98768"
+    },
+    {
+      "category": "styles-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 6,
+      "failures": 0,
+      "sourceResultSha256": "c067c896df1482ac69b4306db8ce7c00bd7c15d526f6ed6a8736d3fe9e9492d1"
+    },
+    {
+      "category": "style-stories-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 4,
+      "failures": 0,
+      "sourceResultSha256": "2ba9a74d334df8b04d8cbcd9fd576ad474f4263f98ec7cf60a0793675aae13ac"
+    },
+    {
+      "category": "agent-style-next-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 14,
+      "failures": 0,
+      "sourceResultSha256": "3be006274fc68de0854c4c5aec0d05d926587d50a63817db34bf9189ae1f8cb0"
+    },
+    {
+      "category": "agent-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 13,
+      "failures": 0,
+      "sourceResultSha256": "2dbf913cdf4b9280610d5c059a6ef4b6003783ad58c28407f4fcc7d158f2d394"
+    },
+    {
+      "category": "memo-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 5,
+      "failures": 0,
+      "sourceResultSha256": "e4a8b9b990f37304b584102e1703a2bbbb52866fc5e1168f8cb7d21ed21748fd"
+    },
+    {
+      "category": "following-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 6,
+      "failures": 0,
+      "sourceResultSha256": "aeeacc0c6067f1a198b77cd941a6ef37e97273194d1004e30dea530f01f40b59"
+    },
+    {
+      "category": "outer-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 4,
+      "failures": 0,
+      "sourceResultSha256": "82279f3b59b2bd0d8d4498fd666d22a9c864be7176d4e5f01267da90eda0fb96"
+    },
+    {
+      "category": "width-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 12,
+      "failures": 0,
+      "sourceResultSha256": "41cf13b45bc3378a83e031ba6780b1891e551c3caa51051f6ce7e06ef3e6968c"
+    },
+    {
+      "category": "equal-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 12,
+      "failures": 0,
+      "sourceResultSha256": "10270871606bf01df95656523122cc4e09d3b18c933918bb020ddf7c71cba1b7"
+    },
+    {
+      "category": "owner-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 6,
+      "failures": 0,
+      "sourceResultSha256": "d83edd544688351b7811875e9477504e772083d6f765c923ff49ebecbe4cc13e"
+    },
+    {
+      "category": "host-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 10,
+      "failures": 0,
+      "sourceResultSha256": "a28dd45fd6db0ae0f9fc6d833ce6c4637fb9a14d47a083dd483b0a3a7e3109cd"
+    },
+    {
+      "category": "default-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 9,
+      "failures": 0,
+      "sourceResultSha256": "7471318b28404bd0f563704d4b489be29fe7f82078bc26b33e9ef769dea6a4d4"
+    },
+    {
+      "category": "split-browser",
+      "kind": "browser",
+      "exitCode": 0,
+      "results": 12,
+      "failures": 0,
+      "sourceResultSha256": "171dc9781c1d7237dc0798f5fa1f1cbc134eecf37ed5756475ee3e2fa4324999"
+    },
+    {
+      "category": "merge-browser",
+      "kind": "browser",
+      "exitCode": 0,
+      "results": 12,
+      "failures": 0,
+      "sourceResultSha256": "e613acba906a1b49a4f114ec60787205ec0f8bf3f6f62a802a6de700feea5af5"
+    },
+    {
+      "category": "browser",
+      "kind": "browser",
+      "exitCode": 0,
+      "results": 14,
+      "failures": 0,
+      "sourceResultSha256": "a0b1f847f45490948ae6bb7a72007b3d71ff7be6c227a35ec0b6f3423dd81584"
+    },
+    {
+      "category": "table-multi-header-browser",
+      "kind": "browser",
+      "exitCode": 0,
+      "results": 20,
+      "failures": 0,
+      "sourceResultSha256": "2152d17ba83bc33717632817e2c5d13d4786fd0c5ba3a607818e7217dec69bc0"
+    },
+    {
+      "category": "agent-table-header-browser",
+      "kind": "browser",
+      "exitCode": 0,
+      "results": 18,
+      "failures": 0,
+      "sourceResultSha256": "6aa9d5516cba424ec8ebd44bc0478166292f9968352cf441bdfd14e1fbc484f7"
+    },
+    {
+      "category": "agent-table-pagination-browser",
+      "kind": "browser",
+      "exitCode": 0,
+      "results": 13,
+      "failures": 0,
+      "sourceResultSha256": "eebdcc1480c4af984b15963e653d1762a8a0461e01de001ab00d2b441707bca6"
+    },
+    {
+      "category": "table-protection-browser",
+      "kind": "browser",
+      "exitCode": 0,
+      "results": 14,
+      "failures": 0,
+      "sourceResultSha256": "10105276271ca01809d56f3c34d758c0c5dbea7d1c5978667bcfa41e7f10fecb"
+    },
+    {
+      "category": "table-conversion-browser",
+      "kind": "browser",
+      "exitCode": 0,
+      "results": 18,
+      "failures": 0,
+      "sourceResultSha256": "1d5ad0fccf76ec78acfc2ac8f9ff1fe9e3932c7dfca0a94fd9a6f600e34e6edd"
+    },
+    {
+      "category": "selected-object-browser",
+      "kind": "browser",
+      "exitCode": 0,
+      "results": 16,
+      "failures": 0,
+      "sourceResultSha256": "09485df67afe53479d0c2ea680c256568ced2fc74f7ead180c8579f3dc3d1b69"
+    },
+    {
+      "category": "agent-style-next-browser",
+      "kind": "browser",
+      "exitCode": 0,
+      "results": 14,
+      "failures": 0,
+      "sourceResultSha256": "878d2644192e2d8b95a56b3e224577afc41832c14826fb57b5c857ad8dc71343"
+    },
+    {
+      "category": "agent-browser",
+      "kind": "browser",
+      "exitCode": 0,
+      "results": 15,
+      "failures": 0,
+      "sourceResultSha256": "3107e3dead93aef2258bea6a43e455f54b231665f64b9560e5ecf50c0923fa31"
+    },
+    {
+      "category": "width-browser",
+      "kind": "browser",
+      "exitCode": 0,
+      "results": 18,
+      "failures": 0,
+      "sourceResultSha256": "cc50708ff9b010ec9fddff39aac3a99e1e4c841d60a448ff27916796da14272d"
+    },
+    {
+      "category": "equal-browser",
+      "kind": "browser",
+      "exitCode": 0,
+      "results": 15,
+      "failures": 0,
+      "sourceResultSha256": "2fc2ff3e3afad3bfc3251a15b639c97017f34a19b6008df512670d4e71ca8391"
+    },
+    {
+      "category": "structure-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 11,
+      "failures": 0,
+      "sourceResultSha256": "62860cac9a08118d82de266cab92e76439b2716246f14618f4707ec81a56719d"
+    },
+    {
+      "category": "structure-browser",
+      "kind": "browser",
+      "exitCode": 0,
+      "results": 14,
+      "failures": 0,
+      "sourceResultSha256": "d82c126800f6c4a2913601d167d2a4d49ac936f784cb1a45b23ffdd822cf7cc8"
+    },
+    {
+      "category": "cell-paragraph-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 31,
+      "failures": 0,
+      "sourceResultSha256": "026f0987a1fea651c588580d894cd64947706523ab0503b085a39e69a14139c0"
+    },
+    {
+      "category": "cell-paragraph-browser",
+      "kind": "browser",
+      "exitCode": 0,
+      "results": 12,
+      "failures": 0,
+      "sourceResultSha256": "3dea4ce679be135d73937bf8770b5c86fd224a0f7cdc378062b4974ec7ac3e59"
+    },
+    {
+      "category": "subdivision-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 14,
+      "failures": 0,
+      "sourceResultSha256": "686b4fc7f7e94b75c1cef75452579196937b24d75cb66460edb163a237fa3431"
+    },
+    {
+      "category": "subdivision-browser",
+      "kind": "browser",
+      "exitCode": 0,
+      "results": 13,
+      "failures": 0,
+      "sourceResultSha256": "587dbb81a597fadb675452f6df98c3bef3f385619b4d8e3b0875fa70321238bd"
+    },
+    {
+      "category": "textbox-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 8,
+      "failures": 0,
+      "sourceResultSha256": "efc406a6aecdfa080110f556726f4a49720fd7457ec8bc8b9005525a2be61b2d"
+    },
+    {
+      "category": "textbox-browser",
+      "kind": "browser",
+      "exitCode": 0,
+      "results": 8,
+      "failures": 0,
+      "sourceResultSha256": "a822b192baea530135056cd9b955ad35e3bfb99fdc658fc8210a528b75087da7"
+    },
+    {
+      "category": "textbox-storage-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 14,
+      "failures": 0,
+      "sourceResultSha256": "6c0f526b6f596839d851ff2e18578d9094d689a5aa442ee97eea7b891738375b"
+    },
+    {
+      "category": "format-conversion-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 24,
+      "failures": 0,
+      "sourceResultSha256": "cfe5175251c8f6429589e707dde96ef01235f2a897ce365680a384a75c73d63c"
+    },
+    {
+      "category": "overlap-native",
+      "kind": "native",
+      "exitCode": 0,
+      "results": 18,
+      "failures": 0,
+      "sourceResultSha256": "f823e1fe17486831a35e0d5a9bc9bafec2f0ca42a51fd65ebf6bcf06021067ea"
+    }
+  ],
+  "suiteCount": 44,
+  "failures": 0,
+  "scope": "44 distinct runner suites; result counts are not a percent of full Hancom feature compatibility."
+}

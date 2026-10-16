@@ -1,0 +1,20 @@
+{
+  "results": [
+    "hwp: absorbed terminal empty paragraph belongs to actual last table fragment, query is read-only and snapshot restores",
+    "hwpx: absorbed terminal empty paragraph belongs to actual last table fragment, query is read-only and snapshot restores",
+    "content-length sweep preserves all body paragraph page mappings and ordinary invalid addresses reject",
+    "later section uses global page offset and references actual table fragment owner",
+    "text tail has its own actual text layout; empty ownership is never used to hide visible contents",
+    "explicit page break keeps its real blank page rather than borrowing preceding table ownership"
+  ],
+  "failures": [],
+  "note": "Actual Native WASM ownership of terminal empty paragraphs. Queries do not mutate page geometry/model; invalid addresses and visible body stay distinct. HWP fixtures are Native diagnostics, not AI support. Native Hancom/paid models NOT_RUN.",
+  "originalResultSha256": "d83edd544688351b7811875e9477504e772083d6f765c923ff49ebecbe4cc13e",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "results": [
+    "hwp: two leading rows repeat, shrink, extend, title-only/all and clear with exact preservation and snapshot undo/reopen",
+    "hwpx: two leading rows repeat, shrink, extend, title-only/all and clear with exact preservation and snapshot undo/reopen",
+    "hwp: pre-existing complete two-row block stays editable and can change without reducing other attributes",
+    "hwpx: pre-existing complete two-row block stays editable and can change without reducing other attributes",
+    "partial second row/gap/scattered/unknown title flags remain readonly, not silently normalized",
+    "multi-row protected/mixed/merged sources and invalid whole-table repeat refuse before changes",
+    "third title-cell failure and unexpected later flag restore the full request snapshot",
+    "newer header count or protected second row invalidates detached request capability",
+    "hwp: 2 leading rows render every title exactly once on every page, body labels once overall, repeat off and reopen retain data",
+    "hwp: 3 leading rows render every title exactly once on every page, body labels once overall, repeat off and reopen retain data",
+    "hwpx: 2 leading rows render every title exactly once on every page, body labels once overall, repeat off and reopen retain data",
+    "hwpx: 3 leading rows render every title exactly once on every page, body labels once overall, repeat off and reopen retain data",
+    "multi-row later-section table uses flattened identity without changing earlier content",
+    "hwp: oversized 60-row repeated title block refuses on actual fragment layout, preflight preserves original",
+    "hwpx: oversized 60-row repeated title block refuses on actual fragment layout, preflight preserves original",
+    "missing/unreadable/incomplete actual fragment evidence refuses and snapshot restores flags"
+  ],
+  "failures": [],
+  "note": "Complete contiguous leading title rows only. Exact flag/policy preservation, two/three-row continuation labels/body contents, oversized title-block actual-fragment refusal, HWP/HWPX save/reopen and rollback. Existing engine unchanged. Native Hancom and paid models NOT_RUN; no full layout parity claim.",
+  "originalResultSha256": "8413adbb41728470e9209c4dfe590a3b946690b31d25c7c4cdaff4873f395e7a",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "results": [
+    "HWPX whole: exact selected widths, total/remainder, unrelated state and snapshot/reopen",
+    "HWPX band: exact selected widths, total/remainder, unrelated state and snapshot/reopen",
+    "HWPX long: exact selected widths, total/remainder, unrelated state and snapshot/reopen",
+    "HWPX multiple: exact selected widths, total/remainder, unrelated state and snapshot/reopen",
+    "long narrow column widens and row reflow remains stable on save/reopen",
+    "invalid/no-op/partial bands/mixed/aliases/batch/overflow inputs never write",
+    "protected/merged/mixed/field/vertical/inline/inconsistent table sources stay readonly",
+    "stale text/defaults/width/Native protection rejects detached source without writes",
+    "false/no-op/throwing resize or changed text/border/height/padding/unselected width rejects and snapshot restores",
+    "missing layout or injected live cell/text geometry rejects and restores",
+    "empty cells and later section identity preserve actual geometry and safe save",
+    "HWP source remains readonly even with forged eligibility"
+  ],
+  "failures": [],
+  "note": "Actual WASM; HWPX full-column bands equal width, exact sum and preservation plus saved layout. Native Hancom/paid models NOT_RUN.",
+  "originalResultSha256": "10270871606bf01df95656523122cc4e09d3b18c933918bb020ddf7c71cba1b7",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "results": [
+    "hwpx: actual session caret and forward/backward selection restore without bytes/dirty/focus changes",
+    "hwp: actual session caret and forward/backward selection restore without bytes/dirty/focus changes",
+    "textbox selection persists through actual workspace reload and document-tab switching",
+    "real keyboard edits in unsaved textbox retain bytes, dirty flag and Unicode caret after restart",
+    "equal-length text, paragraph/character style and box identity edits refuse old selection",
+    "wrong paths and fingerprints leave safe body cursor unchanged; unknown saved kind never activates another object",
+    "caption/group/rotation/field/locked/unknown-protection stories never persist as plain textbox",
+    "user input during asynchronous view settle retains its new body caret and cancels stale restore"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Actual Session facade, workspace restart/tab switching, cursor/selection/geometry/focus and failure checks. Simple root Rectangle textbox state only. Hancom comparison NOT_RUN.",
+  "originalResultSha256": "a822b192baea530135056cd9b955ad35e3bfb99fdc658fc8210a528b75087da7",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "build": {
+    "engineWasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "builtAt": "2026-10-16T19:25:51.482Z"
+  }
+}

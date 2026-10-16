@@ -1,0 +1,19 @@
+{
+  "results": [
+    "one: memo body ownership, actual blank body, repeat saves and live immutability",
+    "two: memo body ownership, actual blank body, repeat saves and live immutability",
+    "duplicate memo indices do not consume the ambiguous carrier",
+    "ordinary blank document and genuine terminal blank paragraphs remain",
+    "HWP to HWPX memo XML independently preserves all paragraphs and Unicode"
+  ],
+  "failures": [],
+  "note": "Self-authored sources; native Hancom comparison NOT_RUN. Ambiguous carriers remain unsupported.",
+  "originalResultSha256": "e4a8b9b990f37304b584102e1703a2bbbb52866fc5e1168f8cb7d21ed21748fd",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

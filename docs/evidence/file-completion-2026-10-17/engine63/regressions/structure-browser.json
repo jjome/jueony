@@ -1,0 +1,29 @@
+{
+  "results": [
+    "openai-responses: actual chat split/attach, compare, undo/redo, safe save and UI reopen",
+    "anthropic: actual chat split/attach, compare, undo/redo, safe save and UI reopen",
+    "gemini: actual chat split/attach, compare, undo/redo, safe save and UI reopen",
+    "openai-compatible: actual chat split/attach, compare, undo/redo, safe save and UI reopen",
+    "second interior boundary and explicit next target retain row/column widths and cursor",
+    "first/last boundary, alias, missing table, arbitrary next target and batch never write",
+    "HWP, protection, merged grid, mixed original, field, bookmark and caption remain readonly",
+    "attach rejects nonblank gap, unequal next columns, caption and foreign next target",
+    "live split false/no-op/throw or equal-length body/cell contamination restores bytes/history/dirty/cursor",
+    "live attach throw or unrelated equal-length body contamination restores both tables",
+    "post-render split geometry failure restores snapshot and next request succeeds",
+    "late model response cannot overwrite newer user cell edit",
+    "unsaved split restores after workspace restart then attaches and undoes",
+    "later section split/attach mapping, following table and actual UI save/reopen"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Actual Edge with four synthetic provider protocols. Guarded HWPX root table split/attach with explicit root/cell/control movement. Hancom/paid models NOT_RUN.",
+  "originalResultSha256": "d82c126800f6c4a2913601d167d2a4d49ac936f784cb1a45b23ffdd822cf7cc8",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "build": {
+    "engineWasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "builtAt": "2026-10-16T19:25:51.482Z"
+  }
+}

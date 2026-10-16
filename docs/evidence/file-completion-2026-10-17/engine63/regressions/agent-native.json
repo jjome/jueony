@@ -1,0 +1,27 @@
+{
+  "results": [
+    "hwpx: custom rectangular padding and table-default reset preserve exact other state, snapshot undo/redo and reopen",
+    "hwpx: latent individual sides never activate accidentally; zero table defaults restored without clearing stored custom padding",
+    "hwpx: actual text origin shifts inside padding and rendered row grows while stored dimensions and text remain",
+    "invalid incomplete/mixed/noop/overflow/alias/batch/raw-injection requests refuse without writes",
+    "protected anywhere/merged/mixed/field/vertical/inline/negative or unknown padding sources stay readonly",
+    "changed table defaults/individual padding/cell text/width or Native protection invalidates detached source",
+    "second-cell failure, noop/false setter and unexpected text/border/defaults/neighbor/geometry/protection mutation reject and restore",
+    "later-section table identity applies padding only to requested root table",
+    "HWP source padding remains readonly while expanded layout cases are unresolved",
+    "renamed HWP with injected live geometry cannot bypass actual saved layout check, snapshot restores whole request",
+    "missing/changed actual text/cell layout rejects and restores padding",
+    "empty cells accept padding-only transaction without character formatting",
+    "Native simple HWP host-origin diagnostic matches saved geometry after engine fix"
+  ],
+  "failures": [],
+  "note": "HWPX-only existing format_table_cells padding-only transaction. Complete custom four sides or table default; latent stored values retained. Exact preservation plus actual live-versus-reopened cell/text layout, empty cells and rollback. Native blank whole-table host uses shared formatted outer box after edits; old diagnostic evidence retained separately. Native Hancom/paid models NOT_RUN; fresh patched engine.",
+  "originalResultSha256": "2dbf913cdf4b9280610d5c059a6ef4b6003783ad58c28407f4fcc7d158f2d394",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

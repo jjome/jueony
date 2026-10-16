@@ -1,0 +1,141 @@
+{
+  "createdAt": "2026-10-16T19:29:04.221570+00:00",
+  "engineSourceId": "8deeb52a09ba2b75",
+  "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+  "groups": [
+    {
+      "name": "hwp-tab",
+      "kind": "repeated-save-results",
+      "pass": 8,
+      "fail": 0,
+      "path": "build\\native-subagent-final63\\hwp-tab\\result.json",
+      "sha256": "db6f8b48f79bd6a6c2c35351d3c1751d6d6c2867b3e0a928d8e233e71ed1fcba"
+    },
+    {
+      "name": "hwpx-tab",
+      "kind": "repeated-save-results",
+      "pass": 12,
+      "fail": 0,
+      "path": "build\\native-subagent-final63\\hwpx-tab\\result.json",
+      "sha256": "a03bfe0b5a1146ca06bdd4934d81ca2d2724ce617b4670db6f5039452c9feb76"
+    },
+    {
+      "name": "shadow",
+      "kind": "repeated-save-results",
+      "pass": 34,
+      "fail": 0,
+      "path": "build\\native-subagent-final63\\shadow\\result.json",
+      "sha256": "d18e340316c2c4e75b523cf50a669e71e8ba1c360681a430814c31f3b9261129"
+    },
+    {
+      "name": "guard-engine",
+      "kind": "checks",
+      "pass": 18,
+      "fail": 0,
+      "path": "build\\native-subagent-final63\\guard-engine\\result.json",
+      "sha256": "75b78d9c3152ef6667600ca062c738f965611de3d970bdac32c0266b57c99424"
+    },
+    {
+      "name": "guard-browser",
+      "kind": "checks",
+      "pass": 3,
+      "fail": 0,
+      "path": "build\\native-subagent-final63\\guard-browser\\result.json",
+      "sha256": "83d3191c4318d4a0acb05c93a5949cbeb3763f7dcc4633979fb1e9e55285d2df"
+    },
+    {
+      "name": "converted-download-recovery",
+      "kind": "checks",
+      "pass": 3,
+      "fail": 0,
+      "path": "build\\native-subagent-final63\\converted-download-recovery\\result.json",
+      "sha256": "7a4bfcd5fdb309d29d06aa6813ce6a95e6691138248353d67b89feebc2e18735"
+    },
+    {
+      "name": "public-strict",
+      "kind": "same-engine-conversions",
+      "pass": 4,
+      "fail": 0,
+      "path": "build\\native-subagent-final63\\public-strict\\manifest.json",
+      "sha256": "9f9a161442aa367619d2364bc7eb05fbe91dff3701296e98a576345030c37e45"
+    }
+  ],
+  "actualHancomReadbacks": [
+    {
+      "name": "actual-tab-hwpx",
+      "semanticDifferences": 0,
+      "geometryDifferences": 0,
+      "pages": {
+        "before": 3,
+        "after": 3,
+        "equal": true
+      },
+      "path": "build\\native-subagent-final63\\actual-tab-hwpx\\result.json",
+      "sha256": "aae705aeeb82cf67f0eb33cc380adda31c40e847941eebd17928d48c670cb875",
+      "scope": "Previously independently Hancom-saved artifacts; root visual evidence is separate. Not yet final63 producer-output Hancom review."
+    },
+    {
+      "name": "actual-explicit-shadow-control",
+      "semanticDifferences": 0,
+      "geometryDifferences": 0,
+      "pages": {
+        "before": 1,
+        "after": 1,
+        "equal": true
+      },
+      "path": "build\\native-subagent-final63\\actual-explicit-shadow-control\\result.json",
+      "sha256": "8b172b08a798c56a6d987656c2604b85dd2097e8a4ff4452aa5aad7e6d4d123b",
+      "scope": "Previously independently Hancom-saved artifacts; root visual evidence is separate. Not yet final63 producer-output Hancom review."
+    }
+  ],
+  "nativeRust": {
+    "g069HwpHwpx": {
+      "pass": 8,
+      "ignored": 0,
+      "log": "build/hwp-tab-cache-candidate44/rust-g069-fresh.log",
+      "scope": "Exact serializer40+44 private source; zero-test cached attempt rejected, then actual8names verified."
+    },
+    "g046Shadow": {
+      "pass": 4,
+      "ignored": 0,
+      "log": "build/none-shadow-candidate46/rust-g046.log",
+      "scope": "Exact serializer46 private source; inventory4 names required before execution."
+    }
+  },
+  "remaining": [
+    "Unchanged sealed native BodyText raw is intentionally preserved; imported legacy invalid tab caches are not silently rewritten.",
+    "Cross-app public8 comparisons remain2PASS/6FAIL:MCST20878 raw layoutdifferences and actualUI16pages vsengine15;python1rawcharShapeId40 only;python3semantic2/layout731. No normalization or tolerance changes.",
+    "Browser OPFS/download tests do not claim OS native picker/Tauri or power-loss durability. Existing actual native lifecycle proof used earlier51 build and is separately documented."
+  ],
+  "safety": "No production parser/guard/geometry tolerance weakened; full0.2 geometry and exact semantic readers retained. No public originals/derivatives/logs containing their body text should be committed/distributed.",
+  "updatedAt": "2026-10-16T19:36:22.076Z",
+  "actualFinal63ProducerReadback": {
+    "status": "PASS",
+    "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-subagent-final63\\actual-final63-readback.json",
+    "sha256": "4a6fcc59390090f477dbb0d9d54e82f7a46f14e31a403f565dcb06ab2d8b815d",
+    "checks": [
+      {
+        "name": "hwp-tab",
+        "semanticDifferences": 0,
+        "geometryDifferences": 0,
+        "pages": {
+          "before": 3,
+          "after": 3,
+          "equal": true
+        },
+        "actualSha256": "9a66bd15702642abec8af3e1af839c12e62466ecc9329b21028db741283cee41"
+      },
+      {
+        "name": "shadow",
+        "semanticDifferences": 0,
+        "geometryDifferences": 0,
+        "pages": {
+          "before": 1,
+          "after": 1,
+          "equal": true
+        },
+        "actualSha256": "6f0c46a548488905aae8b0f91475dbf4f185473f3b796439198a139b6a09ca8b"
+      }
+    ]
+  }
+}

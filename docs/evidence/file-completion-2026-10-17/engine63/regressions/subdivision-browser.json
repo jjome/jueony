@@ -1,0 +1,28 @@
+{
+  "results": [
+    "openai-responses: chat subdivision, compare, cursor, undo/redo, save/UI reopen",
+    "anthropic: chat subdivision, compare, cursor, undo/redo, save/UI reopen",
+    "gemini: chat subdivision, compare, cursor, undo/redo, save/UI reopen",
+    "openai-compatible: chat subdivision, compare, cursor, undo/redo, save/UI reopen",
+    "\uac00\ub85c \ubd84\ud560: one-axis unequal geometry save/reopen",
+    "\uc138\ub85c \ubd84\ud560: one-axis unequal geometry save/reopen",
+    "alias/missing/overflow/no-op/extra args/batch refuse without writes",
+    "HWP/protection/merged/mixed/field/zones/unknown getter readonly",
+    "live Native throw/text/width fault restores bytes/history/cursor/dirty",
+    "post-render geometry fault rolls back and next request succeeds",
+    "late response preserves newer user edit",
+    "unsaved restart restores result and merged neighbors close further subdivision",
+    "later-section mapping saves/reopens in UI"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Actual Edge with four synthetic provider protocols; narrow HWPX plain source N-by-M subdivision. Hancom and paid providers NOT_RUN.",
+  "originalResultSha256": "587dbb81a597fadb675452f6df98c3bef3f385619b4d8e3b0875fa70321238bd",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "build": {
+    "engineWasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "builtAt": "2026-10-16T19:25:51.482Z"
+  }
+}

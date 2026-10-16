@@ -1,0 +1,32 @@
+{
+  "results": [
+    "hwp two: resolved overlap tail and guarded source contracts",
+    "hwp three: resolved overlap tail and guarded source contracts",
+    "hwp long: resolved overlap tail and guarded source contracts",
+    "hwp offset: resolved overlap tail and guarded source contracts",
+    "hwp negative: resolved overlap tail and guarded source contracts",
+    "hwp absolute: resolved overlap tail and guarded source contracts",
+    "hwp trailing-text: resolved overlap tail and guarded source contracts",
+    "hwp page-break: resolved overlap tail and guarded source contracts",
+    "hwp positive-gap: resolved overlap tail and guarded source contracts",
+    "hwpx two: resolved overlap tail and guarded source contracts",
+    "hwpx three: resolved overlap tail and guarded source contracts",
+    "hwpx long: resolved overlap tail and guarded source contracts",
+    "hwpx offset: resolved overlap tail and guarded source contracts",
+    "hwpx negative: resolved overlap tail and guarded source contracts",
+    "hwpx absolute: resolved overlap tail and guarded source contracts",
+    "hwpx trailing-text: resolved overlap tail and guarded source contracts",
+    "hwpx page-break: resolved overlap tail and guarded source contracts",
+    "hwpx positive-gap: resolved overlap tail and guarded source contracts"
+  ],
+  "failures": [],
+  "note": "Positive bare-cache234 oracle is independently observed by Hancom2024; old unchanged-live-y expectation and failure are preserved separately. All geometry fields,0.2 guard and excluded negative/absolute/page-break baseline controls remain mandatory. Native same-engine invariants; restricted edited native-HWP whole-table tail snapshot. NOT Hancom comparison. No HWP AI gate relaxation; excluded cases may retain known mismatch.",
+  "originalResultSha256": "f823e1fe17486831a35e0d5a9bc9bafec2f0ca42a51fd65ebf6bcf06021067ea",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

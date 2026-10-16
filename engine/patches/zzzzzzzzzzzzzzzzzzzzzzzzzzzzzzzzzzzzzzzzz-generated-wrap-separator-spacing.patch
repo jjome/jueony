@@ -1,0 +1,99 @@
+--- a/src/renderer/layout/paragraph_layout.rs
++++ b/src/renderer/layout/paragraph_layout.rs
+@@ -4684,6 +4684,10 @@
+     ) -> f64 {
+         let mut y = y_start;
+         let end = end_line.min(composed.lines.len());
++        // Ownership is paragraph-wide and read-only; prove it once, not once per row.
++        let generated_uncached_plain_body = !physical_frame_rows && cell_ctx.is_none()
++            && matches!(col_node.node_type, RenderNodeType::Column(_))
++            && para.is_some_and(|p| generated_uncached_plain_rows(p, composed));
+         // [#4968 R4D-1] 한 문단의 모든 최종 emitted run이 같은 registry
+         // generation과 per-face parse cache를 소비한다.
+         let mut kerning_layout_session = self.exact_font_layout_session();
+@@ -6227,11 +6231,14 @@
+             let needs_distribute = alignment == Alignment::Distribute;
+ 
+             let has_tabs = comp_line.runs.iter().any(|r| r.text.contains('\t'));
+-            let renders_synthetic_wrap_trailing_space = !physical_frame_rows
+-                && !is_last_line_of_para
+-                && para
++            // HWPX intentionally omits synthetic LINE_SEG caches. Its freshly
++            // composed plain body rows still paint the preserved wrap separator,
++            // exactly as the same generated HWP5 rows do. Fit that same slot;
++            // do not invent stored rows or alter the glyph/space metric.
++            let renders_synthetic_wrap_trailing_space = !is_last_line_of_para
++                && (generated_uncached_plain_body || (!physical_frame_rows && para
+                     .and_then(|p| p.line_segs.get(line_idx))
+-                    .is_some_and(|seg| seg.tag & LineSeg::TAG_IMPLEMENTATION_PROPERTY != 0)
++                    .is_some_and(|seg| seg.tag & LineSeg::TAG_IMPLEMENTATION_PROPERTY != 0)))
+                 && comp_line
+                     .runs
+                     .iter()
+@@ -11263,3 +11270,66 @@
+         assert_eq!(map_pua_bullet_char('\u{F00CF}'), '\u{F00CF}');
+     }
+ }
++
++/// A complete generated single-lane body partition, with no stored-row, inline,
++/// field, forced-break, table-cell or exclusion-lane ownership to reinterpret.
++fn generated_uncached_plain_rows(para: &Paragraph, composed: &ComposedParagraph) -> bool {
++    if !para.line_segs.is_empty() || !para.controls.is_empty()
++        || !para.field_ranges.is_empty() || !para.orphan_field_ends.is_empty()
++        || !para.range_tags.is_empty() || !para.title_marks.is_empty()
++        || !para.markpen_marks.is_empty()
++        || para.text.contains(['\t', '\n', '\r']) || composed.lines.len() < 2
++        || !composed.inline_controls.is_empty() || !composed.tac_controls.is_empty()
++        || !composed.footnote_positions.is_empty() || composed.numbering_text.is_some()
++    { return false; }
++    let width = composed.lines[0].segment_width;
++    let mut next_start = 0;
++    let mut text = String::new();
++    for line in &composed.lines {
++        if width <= 0 || line.segment_width != width || line.column_start != 0
++            || line.has_line_break || line.char_start != next_start
++            || line.runs.iter().any(|run| run.inserted_control_text
++                || run.footnote_marker.is_some() || run.char_overlap.is_some())
++        { return false; }
++        for run in &line.runs { text.push_str(&run.text); next_start += run.text.chars().count(); }
++    }
++    text == para.text
++}
++
++#[cfg(test)]
++mod jueony_generated_trailing_space_tests {
++    use super::*;
++    use crate::renderer::composer::ComposedTextRun;
++    fn fixture() -> (Paragraph, ComposedParagraph) {
++        let p = Paragraph { text: "A B C D ".into(), ..Paragraph::default() };
++        let line = |text: &str, start| ComposedLine {
++            runs: vec![ComposedTextRun {text: text.into(), ..ComposedTextRun::default()}],
++            line_height: 1000, baseline_distance: 850, segment_width: 2000,
++            column_start: 0, line_spacing: 600, has_line_break: false, char_start: start,
++        };
++        let c = ComposedParagraph {lines: vec![line("A B ",0),line("C D ",4)],
++            para_style_id: 0, inline_controls: vec![], numbering_text: None,
++            tac_controls: vec![], footnote_positions: vec![], tab_extended: vec![], horizontal_shaping: None};
++        (p,c)
++    }
++    #[test]
++    fn uncached_body_has_complete_unambiguous_generated_partition() {
++        let (p,c) = fixture(); assert!(generated_uncached_plain_rows(&p,&c));
++        let changes: Vec<fn(&mut ComposedParagraph)> = vec![
++            |c| c.lines[1].column_start = 1,
++            |c| c.lines[1].segment_width -= 1,
++            |c| c.lines[1].char_start = 3,
++            |c| c.lines[1].has_line_break = true,
++            |c| c.lines[1].runs[0].inserted_control_text = true,
++            |c| c.lines[1].runs[0].footnote_marker = Some(1),
++            |c| c.lines[1].runs[0].text.push('X'),
++            |c| c.lines.pop().map(|_| ()).unwrap(),
++        ];
++        for (i, change) in changes.into_iter().enumerate() {
++            let mut cc = c.clone(); change(&mut cc);
++            assert!(!generated_uncached_plain_rows(&p,&cc), "negative {i}");
++        }
++        let mut stored = p.clone(); stored.line_segs.push(LineSeg::default());
++        assert!(!generated_uncached_plain_rows(&stored,&c));
++    }
++}

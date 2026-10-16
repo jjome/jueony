@@ -1,0 +1,36 @@
+--- a/src/document_core/commands/table_ops.rs
++++ b/src/document_core/commands/table_ops.rs
+@@ -1327,8 +1327,10 @@
+             let mut needs_reflow = false;
+             let mut size_changed = false;
+             let mut width_changed = false;
++            let mut height_changed = false;
+             let table = self.get_table_mut(section_idx, parent_para_idx, control_idx)?;
+             let original_width = table.common.width;
++            let original_height = table.common.height;
+             let direct_border_fill_id = if has_border_fill_change {
+                 None
+             } else {
+@@ -1356,7 +1358,8 @@
+                 cell.width = v;
+             }
+             if let Some(v) = top_u32("height") {
+-                size_changed |= cell.height != v;
++                height_changed = cell.height != v;
++                size_changed |= height_changed;
+                 cell.height = v;
+             }
+             if let Some(v) = top_i16("paddingLeft") {
+@@ -1407,6 +1410,12 @@
+             }
+             if size_changed {
+                 table.update_ctrl_dimensions();
++                if !height_changed {
++                    // A width-only edit can reflow content, but it does not
++                    // request replacing an explicit/automatic stored height by
++                    // the row declarations. Keep both model and raw height.
++                    table.sync_ctrl_height(original_height);
++                }
+                 if !width_changed {
+                     // 행마다 칸 경계가 다르면 열별 최댓값 합은 실제 표 너비보다 크다.
+                     // 높이만 바꿀 때 선언 너비와 HWP 원본 헤더는 그대로 둔다.

@@ -1,0 +1,29 @@
+{
+  "results": [
+    "openai-responses: protected context is readonly; real chat write refuses, unprotected neighbour still edits/saves/undoes",
+    "anthropic: protected context is readonly; real chat write refuses, unprotected neighbour still edits/saves/undoes",
+    "gemini: protected context is readonly; real chat write refuses, unprotected neighbour still edits/saves/undoes",
+    "openai-compatible: protected context is readonly; real chat write refuses, unprotected neighbour still edits/saves/undoes",
+    "hwp: protected text/format/range/all axes/mixed batch visibly refuse with bytes/history unchanged",
+    "hwpx: protected text/format/range/all axes/mixed batch visibly refuse with bytes/history unchanged",
+    "hwp: neighbour background/bold keeps protected shared edge/content/format/flag through undo and file reopen",
+    "hwpx: neighbour background/bold keeps protected shared edge/content/format/flag through undo and file reopen",
+    "forged old editable flags cannot bypass live Native protection or overwrite its current flag",
+    "Native cell protection reader unavailable fails closed and leaves current file unchanged",
+    "unexpected protected neighbour text/format/unprotect drift rolls back whole live edit",
+    "new protection introduced during a live batch restores all earlier text and flags",
+    "delayed provider cannot overwrite normal user snapshot protection change",
+    "saved workspace reload restores readonly flags and neighbour edit history/comparison"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Actual Edge/four synthetic provider protocols. Protected writes visibly refuse, Native flags rechecked independently, protected neighbour semantics preserved including borders, rollback/conflicts/save/reload. Same-engine evidence; native Hancom/paid models NOT_RUN.",
+  "originalResultSha256": "10105276271ca01809d56f3c34d758c0c5dbea7d1c5978667bcfa41e7f10fecb",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "build": {
+    "engineWasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "builtAt": "2026-10-16T19:25:51.482Z"
+  }
+}

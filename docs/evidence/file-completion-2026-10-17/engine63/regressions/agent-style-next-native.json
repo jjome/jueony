@@ -1,0 +1,28 @@
+{
+  "results": [
+    "hwp: set one next-style edge preserving all current paragraphs/shapes/metadata, snapshot undo and reopen",
+    "hwp: existing split command follows the target only at paragraph end and preserves target formatting",
+    "hwp: default destination, self continuation and two-step cycles are legitimate paragraph edges",
+    "hwpx: set one next-style edge preserving all current paragraphs/shapes/metadata, snapshot undo and reopen",
+    "hwpx: existing split command follows the target only at paragraph end and preserves target formatting",
+    "hwpx: default destination, self continuation and two-step cycles are legitimate paragraph edges",
+    "a full 256-style catalog still permits one edge update",
+    "default/character/missing IDs, no-op, injected fields and batching refuse unchanged",
+    "stale source or destination shapes/names/edges refuse without overwriting current state",
+    "false/no-op/wrong edge, unexpected names/fonts/body/resources refuse and restore snapshot",
+    "locked/opaque source and destination definitions and field documents are protected",
+    "foreign source and target language remain unchanged",
+    "forged current-edge metadata cannot manufacture a no-op undo entry",
+    "unavailable Native metadata disables capability and cannot be bypassed by an old snapshot"
+  ],
+  "failures": [],
+  "note": "Set one next-paragraph-style edge only; existing paragraphs, resources and metadata unchanged. Shared source/target fingerprints, default target/self/cycles, actual split helper and save/reopen. Native Hancom/paid models NOT_RUN.",
+  "originalResultSha256": "3be006274fc68de0854c4c5aec0d05d926587d50a63817db34bf9189ae1f8cb0",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

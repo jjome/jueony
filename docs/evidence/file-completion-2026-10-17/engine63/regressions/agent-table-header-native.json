@@ -1,0 +1,29 @@
+{
+  "results": [
+    "hwp: repeat changes exactly title flags/repeat/policy; cells/format/other table and snapshot undo/reopen remain",
+    "hwp: title-only changes exactly title flags/repeat/policy; cells/format/other table and snapshot undo/reopen remain",
+    "hwp: clear changes exactly title flags/repeat/policy; cells/format/other table and snapshot undo/reopen remain",
+    "hwpx: repeat changes exactly title flags/repeat/policy; cells/format/other table and snapshot undo/reopen remain",
+    "hwpx: title-only changes exactly title flags/repeat/policy; cells/format/other table and snapshot undo/reopen remain",
+    "hwpx: clear changes exactly title flags/repeat/policy; cells/format/other table and snapshot undo/reopen remain",
+    "invalid combinations/no-op/targets/injection/batches refuse without changing bytes",
+    "partial first row/partial second row/scattered original title flags remain protected",
+    "merged/protected/inline/caption/mixed/field sources and missing cell writer are protected",
+    "changed first title flags/cell content/format/table policy invalidate old source",
+    "second cell failure, false/no-op and extra flag/content/format/placement/style/resource changes reject and restore",
+    "forged current header capability cannot make an empty undo change",
+    "later section flattened table identity changes title flags in the intended section only",
+    "hwp: real multi-page render repeats first-row labels on continuation, disabling repeat removes them",
+    "hwpx: real multi-page render repeats first-row labels on continuation, disabling repeat removes them"
+  ],
+  "failures": [],
+  "note": "Atomic first-row title flags/repeat/pageBreak. Actual SVG continuation label counts versus repeat off, no duplicated stored data, HWP/HWPX reopen, protection/rollback. Native Hancom/paid LLM NOT_RUN.",
+  "originalResultSha256": "ae4dd2a17ac91e693ef9a01bedd5a06082d3870a14f4c7282b9c14f700eda789",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

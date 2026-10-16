@@ -1,0 +1,800 @@
+{
+  "engineSourceId": "8deeb52a09ba2b75",
+  "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+  "scope": "Frozen official63 evidence preceding candidate47. Selected compact results and exact complete-original report hashes; own synthetic artifact allowlist only. Group counts overlap in feature coverage and must not be summed into implementation completeness.",
+  "counts": {
+    "typesetNative": 72,
+    "typesetCanvas": 8,
+    "rootRegressionSuites": 44,
+    "rootUnitTests": 839,
+    "widthPreservation": 12,
+    "actualFinal63HancomProducerReadbacks": 2,
+    "generatedTextboxStorageContract": 6,
+    "headingNamespaceStyleContract": 12,
+    "actualHancomTextboxInputsByteIdenticalToReviewedCandidate": 3
+  },
+  "fixtureAllowlist": [
+    "fixtures/hwp-tab-producer.hwp",
+    "fixtures/hwp-tab-actual.hwp",
+    "fixtures/shadow-producer.hwpx",
+    "fixtures/shadow-actual.hwpx"
+  ],
+  "entries": [
+    {
+      "path": "engine-build.json",
+      "sha256": "bbe0a281a6aef3cc5944e3cb932e1c37a37ebc4f8a9c01f94e660d0803dfac43",
+      "bytes": 10800,
+      "exactCopiedSources": [
+        "build\\rhwp-engine\\source-8deeb52a09ba2b75\\pkg\\jueony-engine-build.json"
+      ]
+    },
+    {
+      "path": "fixtures/hwp-tab-actual.hwp",
+      "sha256": "9a66bd15702642abec8af3e1af839c12e62466ecc9329b21028db741283cee41",
+      "bytes": 13824
+    },
+    {
+      "path": "fixtures/hwp-tab-producer.hwp",
+      "sha256": "5f287793cf3ba9f56a9c3546ec3bc9b586c92777482cf12615e4a29e51e7cbd6",
+      "bytes": 7168
+    },
+    {
+      "path": "fixtures/provenance.json",
+      "sha256": "7126801144f8a157d057eace501dc6c2fe3dd4270dcfc980e0e1481215cc0f92",
+      "bytes": 3037
+    },
+    {
+      "path": "fixtures/shadow-actual.hwpx",
+      "sha256": "6f0c46a548488905aae8b0f91475dbf4f185473f3b796439198a139b6a09ca8b",
+      "bytes": 15260
+    },
+    {
+      "path": "fixtures/shadow-producer.hwpx",
+      "sha256": "892fe2784398038ae4d8308a6b5aceabcda72f4b8267576076575fbb48de6e27",
+      "bytes": 8158
+    },
+    {
+      "path": "height/contract-revision-and-command-design.json",
+      "sha256": "55f9ced455b30f5f1b97d13e820bce75cbad95dc9228469e5082d8a2c303ad35",
+      "bytes": 7046,
+      "exactCopiedSources": [
+        "build\\table-height-contract-20261017\\contract-revision-and-command-design.json"
+      ]
+    },
+    {
+      "path": "height/independent-integer-row-oracle-final.json",
+      "sha256": "0a1e589f99a2b86cab7b3a0c0abb0259db98827e239da2ba0adb93ef201106f7",
+      "bytes": 6167,
+      "exactCopiedSources": [
+        "build\\table-height-contract-20261017\\independent-integer-row-oracle-final.json"
+      ]
+    },
+    {
+      "path": "height/width-preservation-summary.json",
+      "sha256": "0d9d56ec7f4722d14e303d93bfe289805ca8f71b86bfd85050f1cb7d6d8b9eca",
+      "bytes": 2941,
+      "exactCopiedSources": [
+        "build\\table-height-contract-candidate\\summary.json"
+      ]
+    },
+    {
+      "path": "height/width12.json",
+      "sha256": "95cfb2467c0b8bda35e982db141dece51b086d7d5a7638f1d813f5a957c22a24",
+      "bytes": 2162,
+      "originalResultSha256": "8852270b4693ca36a73ddbc467f633f8a6319d46eb35bcc727f567f6fe071144",
+      "originalSources": [
+        "build\\table-height-contract-candidate\\formal63\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "limitations.json",
+      "sha256": "5cd2ff09b7747945795e5c94a2366c8d207749ee54355d534d10714c9b8cac17",
+      "bytes": 1332
+    },
+    {
+      "path": "native/actual-explicit-shadow-control.json",
+      "sha256": "95f76f7aa26457894366a86e6aee5fbb90505f847dcaf0d6ae4193bbb3fb64c2",
+      "bytes": 3214
+    },
+    {
+      "path": "native/actual-final63-hwp-tab.json",
+      "sha256": "d20bd081c1a2d1869ae8419801ee77683d9fbcee8f0e4a21efb54bc05ae2e99b",
+      "bytes": 2929
+    },
+    {
+      "path": "native/actual-final63-readback.json",
+      "sha256": "4a6fcc59390090f477dbb0d9d54e82f7a46f14e31a403f565dcb06ab2d8b815d",
+      "bytes": 9619,
+      "exactCopiedSources": [
+        "build\\native-subagent-final63\\actual-final63-readback.json"
+      ]
+    },
+    {
+      "path": "native/actual-final63-shadow.json",
+      "sha256": "3d5714e3cec819a80a5d84734a6eedb272c42cfc83bcaa352212396dffd9cfad",
+      "bytes": 3194
+    },
+    {
+      "path": "native/actual-tab-hwpx.json",
+      "sha256": "d6ef8a052977626c5eab58647db550ab2d33b8218ef70aada79f5fe91dc493dc",
+      "bytes": 2897
+    },
+    {
+      "path": "native/converted-download-recovery.json",
+      "sha256": "576d831051c6d96bde1f3d04ff124acc69b943697a4e92cd2cc0694504c2d633",
+      "bytes": 1428,
+      "originalResultSha256": "7a4bfcd5fdb309d29d06aa6813ce6a95e6691138248353d67b89feebc2e18735",
+      "originalSources": [
+        "build\\native-subagent-final63\\converted-download-recovery\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "native/guard-browser.json",
+      "sha256": "ea13063dbb930ac16d8b3d6e0622f4ac1368856022bb250ffd7e6d23849a285e",
+      "bytes": 1803,
+      "originalResultSha256": "83d3191c4318d4a0acb05c93a5949cbeb3763f7dcc4633979fb1e9e55285d2df",
+      "originalSources": [
+        "build\\native-subagent-final63\\guard-browser\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "native/guard-engine.json",
+      "sha256": "f4c171c9163749ccc103a59388cd5678a3d447f14e63d15952bd057655b878f5",
+      "bytes": 2982,
+      "originalResultSha256": "75b78d9c3152ef6667600ca062c738f965611de3d970bdac32c0266b57c99424",
+      "originalSources": [
+        "build\\native-subagent-final63\\guard-engine\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "native/hwp-tab.json",
+      "sha256": "314fa3d0e44ebf1659527194d3552d2269861a4c304ffa3b75431f5bf9dba550",
+      "bytes": 30208,
+      "originalResultSha256": "db6f8b48f79bd6a6c2c35351d3c1751d6d6c2867b3e0a928d8e233e71ed1fcba",
+      "originalSources": [
+        "build\\native-subagent-final63\\hwp-tab\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "native/hwpx-tab.json",
+      "sha256": "b71f0cbde08696fa191fef3c30a16bf13dd52f2ab6654c7f98a70b7ec54ef7eb",
+      "bytes": 27145,
+      "originalResultSha256": "a03bfe0b5a1146ca06bdd4934d81ca2d2724ce617b4670db6f5039452c9feb76",
+      "originalSources": [
+        "build\\native-subagent-final63\\hwpx-tab\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "native/shadow.json",
+      "sha256": "74c8803b523ee952b32840c611549ddeda193cccf2019e05551d080288a0008a",
+      "bytes": 27698,
+      "originalResultSha256": "d18e340316c2c4e75b523cf50a669e71e8ba1c360681a430814c31f3b9261129",
+      "originalSources": [
+        "build\\native-subagent-final63\\shadow\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "native/summary.json",
+      "sha256": "f0b242551dd19e09113ec577d49ce576545dc82b4e78301448269441a3031090",
+      "bytes": 5363,
+      "exactCopiedSources": [
+        "build\\native-subagent-final63\\summary.json"
+      ]
+    },
+    {
+      "path": "public-cross-hancom-summary.json",
+      "sha256": "c55bb743943164a6bcd295923d789e3a42a4409c7e00da7f393527d590cbf463",
+      "bytes": 3767,
+      "exactCopiedSources": [
+        "build\\native-subagent-final63\\public-cross-hancom\\summary.json"
+      ]
+    },
+    {
+      "path": "public-strict-summary.json",
+      "sha256": "798a7efd8dd18bffbe0ab5b1acd33dc5e6d5593dded0c63c887835a1ccfc3857",
+      "bytes": 1929,
+      "originalResultSha256": "9f9a161442aa367619d2364bc7eb05fbe91dff3701296e98a576345030c37e45",
+      "originalSources": [
+        "build\\native-subagent-final63\\public-strict\\manifest.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/agent-browser.json",
+      "sha256": "d26930f6c751306e5b63495d5ef6be6434772989ff6054934f6fadf054699e28",
+      "bytes": 2293,
+      "originalResultSha256": "3107e3dead93aef2258bea6a43e455f54b231665f64b9560e5ecf50c0923fa31",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\agent-browser\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/agent-native.json",
+      "sha256": "2ec843af0c79ce133e713bd1d114375f76a27fd22ceedfd0cb9ea4782ef33bc4",
+      "bytes": 2388,
+      "originalResultSha256": "2dbf913cdf4b9280610d5c059a6ef4b6003783ad58c28407f4fcc7d158f2d394",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\agent-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/agent-style-next-browser.json",
+      "sha256": "6d55d951918adf20a394962e81b6b13a14a1a9894789ea2b10f551bc65d62cc8",
+      "bytes": 2176,
+      "originalResultSha256": "878d2644192e2d8b95a56b3e224577afc41832c14826fb57b5c857ad8dc71343",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\agent-style-next-browser\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/agent-style-next-native.json",
+      "sha256": "3bd46159e755b4f6613d11a165cc49394679c2f4a1a3bb3611d59123463582f0",
+      "bytes": 2147,
+      "originalResultSha256": "3be006274fc68de0854c4c5aec0d05d926587d50a63817db34bf9189ae1f8cb0",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\agent-style-next-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/agent-table-header-browser.json",
+      "sha256": "060dbda141ada64271b9a7efa5a4987848f8782f2912072a0463acfe1f49b4ec",
+      "bytes": 2625,
+      "originalResultSha256": "6aa9d5516cba424ec8ebd44bc0478166292f9968352cf441bdfd14e1fbc484f7",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\agent-table-header-browser\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/agent-table-header-native.json",
+      "sha256": "d1f18f52cd81563ae30689a38f6d5c886c3c5f960305e3a700f5851d15cbabfe",
+      "bytes": 2401,
+      "originalResultSha256": "ae4dd2a17ac91e693ef9a01bedd5a06082d3870a14f4c7282b9c14f700eda789",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\agent-table-header-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/agent-table-pagination-browser.json",
+      "sha256": "3e92aa8056bb0c084536d4487f813de20037923eb78711d3c2e124dc69de2725",
+      "bytes": 1963,
+      "originalResultSha256": "eebdcc1480c4af984b15963e653d1762a8a0461e01de001ab00d2b441707bca6",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\agent-table-pagination-browser\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/agent-table-pagination-native.json",
+      "sha256": "325811ac8caf51c7dcc931482689aa5086714a646bf71772c1bbbf8b02c9a624",
+      "bytes": 2199,
+      "originalResultSha256": "3617be8d7bf036aae2f0d02cd8f7e1d97d545bd88f3000696e9f2989c88e79de",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\agent-table-pagination-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/browser.json",
+      "sha256": "1f3529eb13368037e35d8fa68a288d0eba81deace4dfbcd0acaed824f00b7cf1",
+      "bytes": 1967,
+      "originalResultSha256": "a0b1f847f45490948ae6bb7a72007b3d71ff7be6c227a35ec0b6f3423dd81584",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\browser\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/cell-paragraph-browser.json",
+      "sha256": "5305eb05d12260c567f766abdcab6040c00f6c49e976e004e6f67491cf53315a",
+      "bytes": 1840,
+      "originalResultSha256": "3dea4ce679be135d73937bf8770b5c86fd224a0f7cdc378062b4974ec7ac3e59",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\cell-paragraph-browser\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/cell-paragraph-native.json",
+      "sha256": "50a6174b52f376d740c08084a9497aa4c4046dfedd94fcf8e4d802429cc4281d",
+      "bytes": 3110,
+      "originalResultSha256": "026f0987a1fea651c588580d894cd64947706523ab0503b085a39e69a14139c0",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\cell-paragraph-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/default-native.json",
+      "sha256": "3c16fc11a68ff537a4dc7d4a28a1a4553149f714c876731358175ab789f3e254",
+      "bytes": 1779,
+      "originalResultSha256": "7471318b28404bd0f563704d4b489be29fe7f82078bc26b33e9ef769dea6a4d4",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\default-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/equal-browser.json",
+      "sha256": "3e9cbb74dc491e5cfdc934eeabc1ae7dfac0814212e217656d8c916f8a859786",
+      "bytes": 2314,
+      "originalResultSha256": "2fc2ff3e3afad3bfc3251a15b639c97017f34a19b6008df512670d4e71ca8391",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\equal-browser\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/equal-native.json",
+      "sha256": "c70825f2700506bb955941f9e4c9ef0feea746fcae9fb0d19c8a8f3af9c3e7ef",
+      "bytes": 1806,
+      "originalResultSha256": "10270871606bf01df95656523122cc4e09d3b18c933918bb020ddf7c71cba1b7",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\equal-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/following-native.json",
+      "sha256": "0fb75c512d271b867ac62b5375eebc30ca547799f090b05e4a8c0fea61318699",
+      "bytes": 1257,
+      "originalResultSha256": "aeeacc0c6067f1a198b77cd941a6ef37e97273194d1004e30dea530f01f40b59",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\following-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/format-conversion-native.json",
+      "sha256": "baead5fdb4649ba43937c94b939f9fc32dba911f476a73ff42a5d5551d974c58",
+      "bytes": 2709,
+      "originalResultSha256": "cfe5175251c8f6429589e707dde96ef01235f2a897ce365680a384a75c73d63c",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\format-conversion-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/host-native.json",
+      "sha256": "11e4975f091c7d67ec4992bd18ba9b1c5f4f21d3010d4515bb6d33ac1e6fd484",
+      "bytes": 1846,
+      "originalResultSha256": "a28dd45fd6db0ae0f9fc6d833ce6c4637fb9a14d47a083dd483b0a3a7e3109cd",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\host-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/memo-native.json",
+      "sha256": "354b269735c2c43b6b42dddebbbb698e5b9fd4edf2fdfd57070be2046be2cf89",
+      "bytes": 1088,
+      "originalResultSha256": "e4a8b9b990f37304b584102e1703a2bbbb52866fc5e1168f8cb7d21ed21748fd",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\memo-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/merge-browser.json",
+      "sha256": "2d40cf98a119b0146a4a0350021242ec7ffc1f86aa1969712e7ace1d5486b835",
+      "bytes": 1720,
+      "originalResultSha256": "e613acba906a1b49a4f114ec60787205ec0f8bf3f6f62a802a6de700feea5af5",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\merge-browser\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/merge-native.json",
+      "sha256": "5f1f44fd030ac6add6d8c73990c0a7e72c8cc936b7803e4bfe36a68405cecbe2",
+      "bytes": 1421,
+      "originalResultSha256": "1ae7c9b7fbd357cafc577dccd9107f005f9236dd1ad82c2222260383e81baec4",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\merge-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/native.json",
+      "sha256": "c61f29e9ded11ed8195c53aa45dfe288e2293418269f2388683b1a163972db59",
+      "bytes": 2064,
+      "originalResultSha256": "16b39219f870b5c5408f82628513c58f65282c53d58e1078ffbdd52b7fd6ef92",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/outer-native.json",
+      "sha256": "66b42ded2afc21183eb291a0d819894a1947800c9e89e2b01f8cd5dd03059dc3",
+      "bytes": 1092,
+      "originalResultSha256": "82279f3b59b2bd0d8d4498fd666d22a9c864be7176d4e5f01267da90eda0fb96",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\outer-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/overlap-native.json",
+      "sha256": "c91ff4527fd454ba57a56df0c2c105e8f1c82780bf5f53fe8cdf4b054c3bff1f",
+      "bytes": 2337,
+      "originalResultSha256": "f823e1fe17486831a35e0d5a9bc9bafec2f0ca42a51fd65ebf6bcf06021067ea",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\overlap-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/owner-native.json",
+      "sha256": "86adfa752d9f910a86be1a1096a0932bb47e092e7fd77987cb276e44f95c7f60",
+      "bytes": 1492,
+      "originalResultSha256": "d83edd544688351b7811875e9477504e772083d6f765c923ff49ebecbe4cc13e",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\owner-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/selected-object-browser.json",
+      "sha256": "de170b0c032ad29b0d7aa948a22e9e65d67cbf3a14c743da50a547435bfc1361",
+      "bytes": 2261,
+      "originalResultSha256": "09485df67afe53479d0c2ea680c256568ced2fc74f7ead180c8579f3dc3d1b69",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\selected-object-browser\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/split-browser.json",
+      "sha256": "51d5e645831673d8be3aee8214ae45bd47f1099dbbbfd3ecfd23c3197adcd7bc",
+      "bytes": 1756,
+      "originalResultSha256": "171dc9781c1d7237dc0798f5fa1f1cbc134eecf37ed5756475ee3e2fa4324999",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\split-browser\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/split-native.json",
+      "sha256": "050270c0f54003b86019a0dfe29fa7be18aed1db1dc7aeecfae4140f9ae05c17",
+      "bytes": 1690,
+      "originalResultSha256": "5b9ee109c3c38264d0f5760c572eee338b739cda58c5071ec8a1a27a3bd9fd7b",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\split-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/structure-browser.json",
+      "sha256": "a9e7b567bd6c3e8abc247ba57762919cd01eff6f5c8c1e3f799596970191c113",
+      "bytes": 1971,
+      "originalResultSha256": "d82c126800f6c4a2913601d167d2a4d49ac936f784cb1a45b23ffdd822cf7cc8",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\structure-browser\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/structure-native.json",
+      "sha256": "3f96cc3002baf57273f444dd5bf0933fe1b19339d99d4b2fb5a396f9769351c2",
+      "bytes": 1858,
+      "originalResultSha256": "62860cac9a08118d82de266cab92e76439b2716246f14618f4707ec81a56719d",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\structure-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/style-stories-native.json",
+      "sha256": "9ce9862f4eb6e2f70b0a55c0161b8a7b993b21aa04fc73b348196cac43b94e0e",
+      "bytes": 1072,
+      "originalResultSha256": "2ba9a74d334df8b04d8cbcd9fd576ad474f4263f98ec7cf60a0793675aae13ac",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\style-stories-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/styles-native.json",
+      "sha256": "412193c65a2a2d8daa75fed68981236e343995544d7596d2538d2072d77f0e9b",
+      "bytes": 1256,
+      "originalResultSha256": "c067c896df1482ac69b4306db8ce7c00bd7c15d526f6ed6a8736d3fe9e9492d1",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\styles-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/subdivision-browser.json",
+      "sha256": "36bdfd5d8e198034cbd3c6478fff3c5ceda45e2c8de78d8ea49601fe2a733d45",
+      "bytes": 1636,
+      "originalResultSha256": "587dbb81a597fadb675452f6df98c3bef3f385619b4d8e3b0875fa70321238bd",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\subdivision-browser\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/subdivision-native.json",
+      "sha256": "9a1f9cdb3006cde37c5af5d45316612f5cb1b6a4af6047863cd4d75db207ef08",
+      "bytes": 2052,
+      "originalResultSha256": "686b4fc7f7e94b75c1cef75452579196937b24d75cb66460edb163a237fa3431",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\subdivision-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/summary.json",
+      "sha256": "bb1b19ba5d586b8c7c5bb9681a3087e31aaeda44e9bf2838563ad16bb27668f6",
+      "bytes": 10856
+    },
+    {
+      "path": "regressions/table-conversion-browser.json",
+      "sha256": "59c3ecd7ca9cdca44b7f316b92479a7e5e5a6618651bc224718a955e742e15c5",
+      "bytes": 2550,
+      "originalResultSha256": "1d5ad0fccf76ec78acfc2ac8f9ff1fe9e3932c7dfca0a94fd9a6f600e34e6edd",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\table-conversion-browser\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/table-conversion-native.json",
+      "sha256": "a0d4b7c108e72d1c2116af62fb193bace0db44b5452c10a85c5d61db560af03c",
+      "bytes": 2535,
+      "originalResultSha256": "6f2e820c872ecabb20f4d4de372c9cd93edbc9dd74aec23255828f0414d98768",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\table-conversion-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/table-multi-header-browser.json",
+      "sha256": "f3d5c7e40030d978fadac57e6c0acc74ae3ddfb1fa8c8c985a9b90f3df786a12",
+      "bytes": 2990,
+      "originalResultSha256": "2152d17ba83bc33717632817e2c5d13d4786fd0c5ba3a607818e7217dec69bc0",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\table-multi-header-browser\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/table-multi-header-native.json",
+      "sha256": "ef78b496f98173d18ad1795111727d3d00551ecbd1e6116e12212573a193149a",
+      "bytes": 2733,
+      "originalResultSha256": "8413adbb41728470e9209c4dfe590a3b946690b31d25c7c4cdaff4873f395e7a",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\table-multi-header-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/table-protection-browser.json",
+      "sha256": "11a0316e7469a2da10bc363549cfde022cffeb5d00d1d2925582bc88b61989bb",
+      "bytes": 2310,
+      "originalResultSha256": "10105276271ca01809d56f3c34d758c0c5dbea7d1c5978667bcfa41e7f10fecb",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\table-protection-browser\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/table-protection-native.json",
+      "sha256": "78b12b3caa5025b45400e13a1d930472722c592adb5dd00ddec1c5d68cfbd813",
+      "bytes": 2215,
+      "originalResultSha256": "132c603eb5a71f6dcac07e944c8701e0a72609ac7f5f907d5d7a091d38df13a6",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\table-protection-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/textbox-browser.json",
+      "sha256": "758808a40e50eac61759760b1efcf13286250ad4a5274674a050e72752e1e7c7",
+      "bytes": 1556,
+      "originalResultSha256": "a822b192baea530135056cd9b955ad35e3bfb99fdc658fc8210a528b75087da7",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\textbox-browser\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/textbox-native.json",
+      "sha256": "3e95563240b1f98e9bbcd8e25612a530ab2cf8b751fb457aee59905238f34f8f",
+      "bytes": 1578,
+      "originalResultSha256": "efc406a6aecdfa080110f556726f4a49720fd7457ec8bc8b9005525a2be61b2d",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\textbox-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/textbox-storage-native.json",
+      "sha256": "579b74d8ae93fe1fcc8034f37450a74b12f58acdc678cda5f370b71a8d387196",
+      "bytes": 1800,
+      "originalResultSha256": "6c0f526b6f596839d851ff2e18578d9094d689a5aa442ee97eea7b891738375b",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\textbox-storage-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/width-browser.json",
+      "sha256": "161bfe4fa302f807c3c6084b1e858a3464c3c111e5ac2ab96e84f011001eb473",
+      "bytes": 2593,
+      "originalResultSha256": "cc50708ff9b010ec9fddff39aac3a99e1e4c841d60a448ff27916796da14272d",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\width-browser\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "regressions/width-native.json",
+      "sha256": "9a2e7320b5ddd1aef0b7df20a1495cfc82dd23cecbd7d87439facead99430170",
+      "bytes": 1734,
+      "originalResultSha256": "41cf13b45bc3378a83e031ba6780b1891e551c3caa51051f6ce7e06ef3e6968c",
+      "originalSources": [
+        "build\\file-completion-formal63-regressions\\width-native\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "typeset/boundaries.json",
+      "sha256": "009e6117da2696f99b75f3c978df791785149bf588c3a2775873cae43d659a50",
+      "bytes": 1393,
+      "originalResultSha256": "5449d4f9bb31ebfabd5a494fcba2cc5e4e892bf62809b24afb3df21ac839cc0c",
+      "originalSources": [
+        "build\\file-completion-formal63-typeset\\boundaries\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "typeset/canvas8.json",
+      "sha256": "9aa9629cfafb2c5abf83499610b67c6d801f4cdb9386a442df55afadb3792319",
+      "bytes": 1163,
+      "originalResultSha256": "49d13ca035470696e732915b05adde848df1337640d780a3f52723cc9796619a",
+      "originalSources": [
+        "build\\file-completion-formal63-typeset\\canvas8\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "typeset/golden11.json",
+      "sha256": "85522c7ea0bd5b2d66f3d4bf7ab04b314c3c23da1fbc985ef1ddde05f7381578",
+      "bytes": 1173,
+      "originalResultSha256": "2cdfead6106e55119d679d15872f47960826f3573959c5a23cc200a49340a5e7",
+      "originalSources": [
+        "build\\file-completion-formal63-typeset\\golden11\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "typeset/matrix27.json",
+      "sha256": "a33019737c7fcf953654ff28ea11c9b61fefc59e00fae9002add82ca81a76360",
+      "bytes": 4272,
+      "originalResultSha256": "6c5a82808530291d24a8b1a0d7abc421eb04375592a51d581bde83bb8ace18fb",
+      "originalSources": [
+        "build\\file-completion-formal63-typeset\\matrix27\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "typeset/prefix.json",
+      "sha256": "a2887d544f6dfa9101e262110461e222e028c36f94b9727122eca3e64d8a5c22",
+      "bytes": 913,
+      "originalResultSha256": "5d9fdd83eb225c85af89a8d586beae4fa0b4156078c74593961b09c47b85e4ee",
+      "originalSources": [
+        "build\\file-completion-formal63-typeset\\prefix\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "typeset/reflow12.json",
+      "sha256": "7316bf567a6be25da11507e8d49f8b12be1f6abeeb2b5146289c2deb19cdf698",
+      "bytes": 2094,
+      "originalResultSha256": "875247f6857eaa7f061d78bb4d685b06b30f7cbac6dc3ac2847c1c622aba8b2a",
+      "originalSources": [
+        "build\\file-completion-formal63-typeset\\reflow12\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "typeset/summary.json",
+      "sha256": "66bcc220b25d6d961230ba067fac88b67ce976e99cfe3a09176e1996173137f9",
+      "bytes": 3671,
+      "exactCopiedSources": [
+        "build\\file-completion-formal63-typeset\\summary.json"
+      ]
+    },
+    {
+      "path": "typeset/tabs6.json",
+      "sha256": "ecbac7b64e812b327f65bdb5376ef2beea15252ca90286d84dafb6c8ab3b5f92",
+      "bytes": 1032,
+      "originalResultSha256": "5865c1adcf6011939a56e72946ea05091537373cdfd756981a7d75099c641b94",
+      "originalSources": [
+        "build\\file-completion-formal63-typeset\\tabs6\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "typeset/wrap.json",
+      "sha256": "43daf576f35142fce84fb0353622d7312c35a9f3cbb9184a407bf76f429a66db",
+      "bytes": 1135,
+      "originalResultSha256": "351d207c5379106e1b510286c88a0e69f957be6f52605d742b408101e38549ea",
+      "originalSources": [
+        "build\\file-completion-formal63-typeset\\wrap\\result.json"
+      ],
+      "scope": "Compact derived record; original complete ignored report retained under SHA256"
+    },
+    {
+      "path": "unit-statistics.json",
+      "sha256": "42382877dc4931522bcb9a48c5cf8650d754bcadb6c48fc3ed05ab7ba73ab354",
+      "bytes": 102
+    },
+    {
+      "path": "unit839.tap.log",
+      "sha256": "baf6a53062f472733ae40c985ccfaf1fc412451d88d4265432c946f87697ae85",
+      "bytes": 197514,
+      "exactCopiedSources": [
+        "build\\file-completion-engine63-unit.log"
+      ]
+    },
+    {
+      "path": "native/textbox-contract-final63.json",
+      "sha256": "b4b6e6c66c57db4871dd08ffc1a5abc2a3d3c02c92ce2b97692ee2a61fc280bf",
+      "bytes": 1811,
+      "originalResultSha256": "212b03cee7172349a490d34b2f4ddb614165820db27153ec50d1b2c4ab46787e",
+      "originalSources": [
+        "build\\textbox-contract-final63\\result.json"
+      ],
+      "scope": "Additional final63 contract check; distinct from existing14 alignment regressions and not a new actual Hancom GUI execution."
+    },
+    {
+      "path": "native/heading-case-final63.json",
+      "sha256": "40ab0b4c94d1e6d0ce198022a3377c39a4518d9b8f14f3ee116ef7f5166c3163",
+      "bytes": 1783,
+      "originalResultSha256": "bd153f18aebbc5fe457e055c98cbb64e5a84c93fd6d5fc6d5eb3adb1b3a19330",
+      "originalSources": [
+        "build\\heading-case-final63\\result.json"
+      ],
+      "scope": "Additional final63 contract check; distinct from existing14 alignment regressions and not a new actual Hancom GUI execution."
+    },
+    {
+      "path": "native/actual-hancom-file-equivalence.json",
+      "sha256": "672106e5f67f30e56b1c0224cbdcceb702c77aa7ef45df99ae10f4e0a900bc4f",
+      "bytes": 749,
+      "scope": "Byte-identical final63-to-previously-actual-Hancom-reviewed own fixture linkage; no repeat actual UI run claimed.",
+      "exactCopiedSources": [
+        "build\\textbox-contract-final63\\actual-hancom-file-equivalence.json"
+      ]
+    },
+    {
+      "path": "native/actual-hancom-file-equivalence-scope.json",
+      "sha256": "bfbfcec68e8e9be5b793b9e5018153a026343163c8c3305d8b66465f1f1a2282",
+      "bytes": 1905,
+      "scope": "Byte-identical final63-to-previously-actual-Hancom-reviewed own fixture linkage; no repeat actual UI run claimed."
+    },
+    {
+      "path": "feature-tables.json",
+      "sha256": "2f63278fd70755c3508f8823106387939d377b8b0302c1e0db3347a7a7c3871b",
+      "bytes": 21489,
+      "exactCopiedSources": [
+        "build\\feature-doc-evidence-final63\\table-rendering.json"
+      ],
+      "scope": "Root actual GFM feature-document table rendering audit, separate from document engine/layout compatibility tests."
+    }
+  ]
+}

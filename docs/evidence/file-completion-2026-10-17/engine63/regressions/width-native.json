@@ -1,0 +1,26 @@
+{
+  "results": [
+    "explicit column one: actual width, untouched cells, snapshot and saved layout",
+    "explicit column band: actual width, untouched cells, snapshot and saved layout",
+    "explicit column whole: actual width, untouched cells, snapshot and saved layout",
+    "explicit column long: actual width, untouched cells, snapshot and saved layout",
+    "explicit column multiple: actual width, untouched cells, snapshot and saved layout",
+    "explicit column later: actual width, untouched cells, snapshot and saved layout",
+    "single-column table width applies and saves with no hidden neighbor changes",
+    "narrow/widen reflows long text and retains exact requested stored widths",
+    "out of body/partial bands/invalid/mixed/batch/HWP/no-op never write",
+    "protected, merged, mixed, fields, vertical, inline and ragged sources refuse",
+    "position and outer margins reduce the width budget; absolute/centered placements refuse",
+    "stale dimensions/defaults, injected mutation and geometry failures roll back"
+  ],
+  "failures": [],
+  "note": "Actual WASM explicit complete-column width; strict preservation/layout guard; Hancom and paid model NOT_RUN.",
+  "originalResultSha256": "41cf13b45bc3378a83e031ba6780b1891e551c3caa51051f6ce7e06ef3e6968c",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

@@ -1,0 +1,272 @@
+{
+  "scope": "Five controlled single-line3x2 authored inputs independently saved by actual Hancom UI. Exact integer HWPX row/cell/margin inspection; not a general renderer or production normalization.",
+  "results": [
+    {
+      "name": "auto-zero",
+      "before": {
+        "file": "auto-zero.hwpx",
+        "sha256": "5c66ed86531ca0b8b0c118fd7cfd6212ab05fbc68ce9106783de70f99aac5fa0",
+        "commonHeight": 0,
+        "protect": false,
+        "realCellHeights": [
+          282,
+          282,
+          282,
+          282,
+          282,
+          282
+        ],
+        "rowContentMinima": [
+          2417,
+          1482,
+          1282
+        ],
+        "rowPaddingMinima": [
+          1417,
+          282,
+          282
+        ],
+        "expectedFrameFromSeparatedContract": 5181
+      },
+      "actualHancomSaved": {
+        "file": "auto-zero-hancom.hwpx",
+        "sha256": "b387723ef5aeda17532d48fe3d7a2adff7c524c1ab92f85f18ea5d0948048e69",
+        "commonHeight": 5181,
+        "protect": false,
+        "realCellHeights": [
+          282,
+          282,
+          282,
+          282,
+          282,
+          282
+        ],
+        "rowContentMinima": [
+          2417,
+          1482,
+          1282
+        ],
+        "rowPaddingMinima": [
+          1417,
+          282,
+          282
+        ],
+        "expectedFrameFromSeparatedContract": 5181
+      }
+    },
+    {
+      "name": "large",
+      "before": {
+        "file": "large.hwpx",
+        "sha256": "2c30919a69b1b129ce04e7998c79d12da81a6ead03b12e1da348e05fa6d8884c",
+        "commonHeight": 9000,
+        "protect": false,
+        "realCellHeights": [
+          282,
+          282,
+          282,
+          282,
+          282,
+          282
+        ],
+        "rowContentMinima": [
+          2417,
+          1482,
+          1282
+        ],
+        "rowPaddingMinima": [
+          1417,
+          282,
+          282
+        ],
+        "expectedFrameFromSeparatedContract": 5181
+      },
+      "actualHancomSaved": {
+        "file": "large-hancom.hwpx",
+        "sha256": "af263da81fa216968d73f1d08f57449f947be3f57dc2a312b1a633f7d2228ee7",
+        "commonHeight": 5181,
+        "protect": false,
+        "realCellHeights": [
+          282,
+          282,
+          282,
+          282,
+          282,
+          282
+        ],
+        "rowContentMinima": [
+          2417,
+          1482,
+          1282
+        ],
+        "rowPaddingMinima": [
+          1417,
+          282,
+          282
+        ],
+        "expectedFrameFromSeparatedContract": 5181
+      }
+    },
+    {
+      "name": "small-protected",
+      "before": {
+        "file": "small-protected.hwpx",
+        "sha256": "c950c77e08d7e5b07aaf63491f4ba01acb1bc924d4d69af5734b62427099eacb",
+        "commonHeight": 1400,
+        "protect": true,
+        "realCellHeights": [
+          282,
+          282,
+          282,
+          282,
+          282,
+          282
+        ],
+        "rowContentMinima": [
+          2417,
+          1482,
+          1282
+        ],
+        "rowPaddingMinima": [
+          1417,
+          282,
+          282
+        ],
+        "expectedFrameFromSeparatedContract": 1981
+      },
+      "actualHancomSaved": {
+        "file": "small-protected-hancom.hwpx",
+        "sha256": "f5e3a5967a653a81b2befce64adb5e90d947b0b2e3503bcb22cadf5372aeb891",
+        "commonHeight": 1981,
+        "protect": true,
+        "realCellHeights": [
+          282,
+          282,
+          282,
+          282,
+          282,
+          282
+        ],
+        "rowContentMinima": [
+          2417,
+          1482,
+          1282
+        ],
+        "rowPaddingMinima": [
+          1417,
+          282,
+          282
+        ],
+        "expectedFrameFromSeparatedContract": 1981
+      }
+    },
+    {
+      "name": "large-protected",
+      "before": {
+        "file": "large-protected.hwpx",
+        "sha256": "d1d94e3b9f1100e4e8548d0a9da0a6284a32d30b7968fd9d0ac5759568305edf",
+        "commonHeight": 9000,
+        "protect": true,
+        "realCellHeights": [
+          282,
+          282,
+          282,
+          282,
+          282,
+          282
+        ],
+        "rowContentMinima": [
+          2417,
+          1482,
+          1282
+        ],
+        "rowPaddingMinima": [
+          1417,
+          282,
+          282
+        ],
+        "expectedFrameFromSeparatedContract": 1981
+      },
+      "actualHancomSaved": {
+        "file": "large-protected-hancom.hwpx",
+        "sha256": "4ff1aecb5bb28f8b0c09484d2943c1cc2b1c5cbf4dcaf3fb36fa5b8189f629bc",
+        "commonHeight": 1981,
+        "protect": true,
+        "realCellHeights": [
+          282,
+          282,
+          282,
+          282,
+          282,
+          282
+        ],
+        "rowContentMinima": [
+          2417,
+          1482,
+          1282
+        ],
+        "rowPaddingMinima": [
+          1417,
+          282,
+          282
+        ],
+        "expectedFrameFromSeparatedContract": 1981
+      }
+    },
+    {
+      "name": "explicit-rows-9000",
+      "before": {
+        "file": "explicit-rows-9000.hwpx",
+        "sha256": "8a2773333958eae0265f98b9162576cc9fdd7df6ceac61f202bc6d3d5af65cd6",
+        "commonHeight": 9000,
+        "protect": false,
+        "realCellHeights": [
+          3000,
+          3000,
+          3000,
+          3000,
+          3000,
+          3000
+        ],
+        "rowContentMinima": [
+          3000,
+          3000,
+          3000
+        ],
+        "rowPaddingMinima": [
+          3000,
+          3000,
+          3000
+        ],
+        "expectedFrameFromSeparatedContract": 9000
+      },
+      "actualHancomSaved": {
+        "file": "explicit-rows-9000-hancom.hwpx",
+        "sha256": "ba064ef2bf5757eafef12dabee916f26862505b4df183a03055ab9b09fd80ded",
+        "commonHeight": 9000,
+        "protect": false,
+        "realCellHeights": [
+          3000,
+          3000,
+          3000,
+          3000,
+          3000,
+          3000
+        ],
+        "rowContentMinima": [
+          3000,
+          3000,
+          3000
+        ],
+        "rowPaddingMinima": [
+          3000,
+          3000,
+          3000
+        ],
+        "expectedFrameFromSeparatedContract": 9000
+      }
+    }
+  ],
+  "passed": 5,
+  "failed": 0
+}

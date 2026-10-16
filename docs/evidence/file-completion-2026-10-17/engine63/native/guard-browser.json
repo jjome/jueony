@@ -1,0 +1,31 @@
+{
+  "results": [
+    "actual HWP Save As HWPX and marked HWPX follow-up save keep guarded full layout",
+    "actual provenance-corrupted HWPX export is rejected before picker or OPFS writer and keeps dirty/history/Canvas/source/target unchanged",
+    "no unexpected page/console errors or external assets"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Actual isolated Edge, actual manual cell properties UI, Save As command pipeline, OPFS files/writer counts and guarded source/target state. Picker returns own OPFS handle; no native OS dialog or Hancom UI claim. Export fault removes only owned HWP5-origin ZIP member; production geometry/0.2 guard remains unchanged.",
+  "verifierSha256": "16b1e31ef1aa0a32ad3a84251a219e1a38f97b2a397be22cfab5d177742c5375",
+  "originalResultSha256": "83d3191c4318d4a0acb05c93a5949cbeb3763f7dcc4633979fb1e9e55285d2df",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  },
+  "baselineEngine": {
+    "sourceId": "31c6854ba64af4b5",
+    "wasmSha256": "6e7e8ca9971063ae08ba5336fdd7ef5f73a66a055a82e0600adf4c21a52ded3d",
+    "jsSha256": "e176d229d2362d2c9ab9eb544e891fb95a5ef8b8b4cffe347eedc090d5ee42ca",
+    "builtAt": "2026-10-14T18:02:30.0272826Z"
+  },
+  "build": {
+    "engineWasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "builtAt": "2026-10-16T19:25:51.482Z"
+  }
+}

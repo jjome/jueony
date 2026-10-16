@@ -1,0 +1,30 @@
+{
+  "results": [
+    "Top: actual native creation stores Hancom-readable bit24; full HWP/HWPX roundtrip and undo",
+    "Center: actual native creation stores Hancom-readable bit24; full HWP/HWPX roundtrip and undo",
+    "Bottom: actual native creation stores Hancom-readable bit24; full HWP/HWPX roundtrip and undo",
+    "original parsed legacy and unknown storage flags remain byte-exact through an alignment edit",
+    "non-textbox rectangle keeps its pre-existing creation flags",
+    "independent actual Hancom reference and single-field repaired reference both carry bit24"
+  ],
+  "failures": [],
+  "verifierSha256": "27a32811bbac1efccbf043bc7002f7723b6dc7a70fe739bd97bc3930085191c0",
+  "scope": {
+    "generatedThreeAlignments": 3,
+    "loadedRawFlagsPreserved": 1,
+    "unrelatedCreationUnchanged": 1,
+    "independentHancomBinaryOracle": 1
+  },
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Bit24 oracle is based on an actual Hancom-created HWP and the parent agent own single-field mutation open/SaveAs control. Automated Native/WASM tests do not count as a new actual Hancom UI run. The common-string writer, old parsed raw flags and non-textbox/group defaults are untouched.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8"
+  },
+  "originalResultSha256": "212b03cee7172349a490d34b2f4ddb614165820db27153ec50d1b2c4ab46787e",
+  "observationsOmitted": "Complete observation records remain ignored under original SHA256.",
+  "distinction": "Additional final63 contract check; distinct from existing14 alignment regressions and not a new actual Hancom GUI execution."
+}

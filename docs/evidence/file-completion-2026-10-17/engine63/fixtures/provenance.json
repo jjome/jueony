@@ -1,0 +1,91 @@
+{
+  "provenance": "Own HwpDocument.createEmpty authored A-tab-B-tab-C three sections and own generated textbox. Producer worker confirmed no public/user body and no font program embedding. Actual copies are root Hancom2024 SaveAs from these exact producers. Font names are references only; no fonts/PDF/runtime packages included.",
+  "fixtures": [
+    {
+      "fixture": "fixtures/hwp-tab-producer.hwp",
+      "source": "build\\native-subagent-final63\\hwp-tab\\hwpx-to-hwp-1.hwp",
+      "sha256": "5f287793cf3ba9f56a9c3546ec3bc9b586c92777482cf12615e4a29e51e7cbd6",
+      "archiveEntries": [
+        "Root Entry",
+        "FileHeader",
+        "DocInfo",
+        "BodyText",
+        "Section0",
+        "Section1",
+        "Section2",
+        "PrvText",
+        "PrvImage",
+        "Scripts",
+        "DefaultJScript",
+        "HwpSummaryInformation",
+        "DocOptions",
+        "_LinkDoc",
+        "JScriptVersion",
+        "RhwpHwpxOrigin"
+      ],
+      "noFontOrBinaryResourceEntry": true
+    },
+    {
+      "fixture": "fixtures/hwp-tab-actual.hwp",
+      "source": "build\\native-subagent-final63\\hwp-tab\\hwpx-to-hwp-1-hancom.hwp",
+      "sha256": "9a66bd15702642abec8af3e1af839c12e62466ecc9329b21028db741283cee41",
+      "archiveEntries": [
+        "Root Entry",
+        "FileHeader",
+        "\u0005HwpSummaryInformation",
+        "DocInfo",
+        "BodyText",
+        "PrvImage",
+        "PrvText",
+        "DocOptions",
+        "Scripts",
+        "JScriptVersion",
+        "DefaultJScript",
+        "_LinkDoc",
+        "Section0",
+        "Section1",
+        "Section2"
+      ],
+      "noFontOrBinaryResourceEntry": true
+    },
+    {
+      "fixture": "fixtures/shadow-producer.hwpx",
+      "source": "build\\native-subagent-final63\\shadow\\textbox-Top-1.hwpx",
+      "sha256": "892fe2784398038ae4d8308a6b5aceabcda72f4b8267576076575fbb48de6e27",
+      "archiveEntries": [
+        "mimetype",
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "Preview/PrvText.txt",
+        "Preview/PrvImage.png",
+        "settings.xml",
+        "META-INF/container.rdf",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml",
+        "META-INF/rhwp-hwp5-origin"
+      ],
+      "noFontOrBinaryResourceEntry": true
+    },
+    {
+      "fixture": "fixtures/shadow-actual.hwpx",
+      "source": "build\\native-subagent-final63\\shadow\\textbox-Top-1-hancom.hwpx",
+      "sha256": "6f0c46a548488905aae8b0f91475dbf4f185473f3b796439198a139b6a09ca8b",
+      "archiveEntries": [
+        "mimetype",
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "Preview/PrvText.txt",
+        "settings.xml",
+        "Preview/PrvImage.png",
+        "META-INF/container.rdf",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ],
+      "noFontOrBinaryResourceEntry": true
+    }
+  ]
+}

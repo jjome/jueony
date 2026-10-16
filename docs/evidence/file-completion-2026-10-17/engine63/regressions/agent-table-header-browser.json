@@ -1,0 +1,33 @@
+{
+  "results": [
+    "openai-responses: chat applies first-row flags/repeat/row policy atomically, comparison/undo/redo/save preserve contents",
+    "anthropic: chat applies first-row flags/repeat/row policy atomically, comparison/undo/redo/save preserve contents",
+    "gemini: chat applies first-row flags/repeat/row policy atomically, comparison/undo/redo/save preserve contents",
+    "openai-compatible: chat applies first-row flags/repeat/row policy atomically, comparison/undo/redo/save preserve contents",
+    "hwp: title-only/repeat/off/clear follow-up transactions retain both tables/format and saved flags",
+    "hwpx: title-only/repeat/off/clear follow-up transactions retain both tables/format and saved flags",
+    "invalid/no-op/unsupported rows/target/injection/batches refuse unchanged",
+    "partial-first/partial-second/scattered title rows and protected cell/merged/field sources visibly refuse unchanged",
+    "second title cell failure restores first applied flag/policy/dirty/history/caret",
+    "false/no-op/extra header flag/text/format/placement/style/resource mutation rolls back",
+    "delayed model cannot overwrite newer header flags or table-cell text",
+    "body caret and direct typing remain usable after header edit",
+    "saved workspace restores title flags/capability and named repeat comparison",
+    "hwp: manual first-title-row dialog updates all first-row cells/repeat/policy in one undo and saved file",
+    "hwpx: manual first-title-row dialog updates all first-row cells/repeat/policy in one undo and saved file",
+    "manual cancel/no-op/stale dialog preserves existing changes and table selection",
+    "manual cell block selection remains and first row changes even when body cells were selected",
+    "browser/WASM rendered continuation repeats both title labels and turning repeat off removes them"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Actual Edge/four synthetic provider protocols. Atomic first-row title/repeat/policy, manual dialog/selection/cancel/stale/noop, continuation SVG label counts, rollback/conflicts/typing/save/reload. Native Hancom/paid models NOT_RUN.",
+  "originalResultSha256": "6aa9d5516cba424ec8ebd44bc0478166292f9968352cf441bdfd14e1fbc484f7",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "build": {
+    "engineWasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "builtAt": "2026-10-16T19:25:51.482Z"
+  }
+}

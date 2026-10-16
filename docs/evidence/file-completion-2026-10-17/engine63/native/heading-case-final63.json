@@ -1,0 +1,34 @@
+{
+  "results": [
+    "exact2016 level7",
+    "exact2016 level8",
+    "exact2016 level9",
+    "nonempty heading element",
+    "unknown namespace selects explicit fallback",
+    "URI prefix alone is unsupported",
+    "wrong attribute key is unsupported",
+    "unknown case does not hide supported case",
+    "first supported case owns heading",
+    "actual Hancom Top preserves complete style table and repeat HWPX export",
+    "actual Hancom Center preserves complete style table and repeat HWPX export",
+    "actual Hancom Bottom preserves complete style table and repeat HWPX export"
+  ],
+  "failures": [],
+  "verifierSha256": "32e7e58a02e1a6549d7ea24adde0715a55b08e764e5f7d98f28686eeae149bd3",
+  "scope": {
+    "namespaceSelection": 9,
+    "actualHancomCompleteStyleTables": 3
+  },
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Tests parse supported2016paragraph heading cases and explicit unknown-namespace fallbacks; all existing margin/style properties remain mandatory. Full document semantic comparison is a separate root-owned check; shadow NONE latent color0\u2192B2B2B2 remains independently unresolved and is not removed from that comparison.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8"
+  },
+  "originalResultSha256": "bd153f18aebbc5fe457e055c98cbb64e5a84c93fd6d5fc6d5eb3adb1b3a19330",
+  "observationsOmitted": "Complete observation records remain ignored under original SHA256.",
+  "distinction": "Additional final63 contract check; distinct from existing14 alignment regressions and not a new actual Hancom GUI execution."
+}

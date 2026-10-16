@@ -1,0 +1,38 @@
+{
+  "results": [
+    "mcst-bid-2026 -> hwp: unchanged strict export evidence and live state",
+    "mcst-bid-2026 -> hwpx: unchanged strict export evidence and live state",
+    "python-hwpx-0 -> hwp: unchanged strict export evidence and live state",
+    "python-hwpx-0 -> hwpx: unchanged strict export evidence and live state",
+    "python-hwpx-1 -> hwp: unchanged strict export evidence and live state",
+    "python-hwpx-1 -> hwpx: unchanged strict export evidence and live state",
+    "python-hwpx-2 -> hwp: unchanged strict export evidence and live state",
+    "python-hwpx-2 -> hwpx: unchanged strict export evidence and live state",
+    "python-hwpx-3 -> hwp: unchanged strict export evidence and live state",
+    "python-hwpx-3 -> hwpx: unchanged strict export evidence and live state",
+    "self-authored Latin KEEP_WORD: effective unit and strict evidence both formats",
+    "self-authored Latin HYPHENATION: effective unit and strict evidence both formats",
+    "self-authored Latin BREAK_WORD: effective unit and strict evidence both formats",
+    "self-authored root plus cell memos: owned lists keep field identity and text",
+    "duplicate root and cell memo index: ambiguous carrier is retained and strict save blocked",
+    "self-authored orphan-index: whole ownership resolution refuses partial attachment",
+    "self-authored empty-carrier: whole ownership resolution refuses partial attachment",
+    "self-authored flow=false overlap=false: getter is resolved common state",
+    "self-authored flow=false overlap=true: getter is resolved common state",
+    "self-authored flow=true overlap=false: getter is resolved common state",
+    "self-authored flow=true overlap=true: getter is resolved common state",
+    "self-authored locked and unlocked table: lock survives HWP then HWPX",
+    "reopened table lock changes preserve both raw-cache and sealed source paths",
+    "preservation still rejects real flow, overlap and lock corruption"
+  ],
+  "failures": [],
+  "note": "Native WASM and repeated same-engine export; Hancom comparison NOT_RUN. Public source and converted bytes remain ignored and are not distribution inputs.",
+  "originalResultSha256": "cfe5175251c8f6429589e707dde96ef01235f2a897ce365680a384a75c73d63c",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

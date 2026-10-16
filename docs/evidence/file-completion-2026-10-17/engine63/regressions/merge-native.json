@@ -1,0 +1,23 @@
+{
+  "results": [
+    "merge horizontal preserves paragraphs, attributes, saved layout and other table",
+    "merge vertical preserves paragraphs, attributes, saved layout and other table",
+    "merge rectangle preserves paragraphs, attributes, saved layout and other table",
+    "merge whole preserves paragraphs, attributes, saved layout and other table",
+    "empty secondary adds no paragraph; empty primary remains",
+    "distinct cell paragraph and character formats survive as merged paragraphs",
+    "invalid rectangle, alias, no-op, batch and unequal cell attributes refuse without writes",
+    "HWP, protected, merged, mixed, bookmarked and field-bearing sources never write",
+    "stale source, false/no-op and neighbor corruption cannot commit"
+  ],
+  "failures": [],
+  "note": "Actual WASM rectangle merge; strict existing guards. Hancom/paid models NOT_RUN.",
+  "originalResultSha256": "1ae7c9b7fbd357cafc577dccd9107f005f9236dd1ad82c2222260383e81baec4",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

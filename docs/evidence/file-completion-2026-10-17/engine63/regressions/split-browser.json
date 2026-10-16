@@ -1,0 +1,27 @@
+{
+  "results": [
+    "openai-responses: actual chat basic split, compare, undo/redo, safe save and UI reopen",
+    "anthropic: actual chat basic split, compare, undo/redo, safe save and UI reopen",
+    "gemini: actual chat basic split, compare, undo/redo, safe save and UI reopen",
+    "openai-compatible: actual chat basic split, compare, undo/redo, safe save and UI reopen",
+    "offset rectangle split keeps primary paragraphs and cursor, new cells empty",
+    "unmerged target, alias, missing table, overflow, arbitrary split and batch never write",
+    "HWP, protection, second merge, mixed original, field and missing grid witness remain readonly",
+    "live split then throw or equal-length other-table contamination restores bytes/history/dirty/cursor",
+    "post-render split geometry failure restores snapshot and next request succeeds",
+    "late model response cannot overwrite newer unmerged user cell edit",
+    "unsaved split restores after workspace restart and another split is no-op refusal",
+    "later section split mapping and actual UI save/reopen"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Actual Edge with four synthetic provider protocols. Witnessed-grid HWPX basic split only, original text stays primary. Hancom/paid models NOT_RUN.",
+  "originalResultSha256": "171dc9781c1d7237dc0798f5fa1f1cbc134eecf37ed5756475ee3e2fa4324999",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "build": {
+    "engineWasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "builtAt": "2026-10-16T19:25:51.482Z"
+  }
+}

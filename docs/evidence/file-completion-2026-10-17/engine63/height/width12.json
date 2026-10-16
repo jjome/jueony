@@ -1,0 +1,37 @@
+{
+  "results": [
+    "auto-zero hwp: width-only preserves declared/raw height, strict export and undo",
+    "auto-zero hwpx: width-only preserves declared/raw height, strict export and undo",
+    "small-protected hwp: width-only preserves declared/raw height, strict export and undo",
+    "small-protected hwpx: width-only preserves declared/raw height, strict export and undo",
+    "large hwp: width-only preserves declared/raw height, strict export and undo",
+    "large hwpx: width-only preserves declared/raw height, strict export and undo",
+    "large-protected hwp: width-only preserves declared/raw height, strict export and undo",
+    "large-protected hwpx: width-only preserves declared/raw height, strict export and undo",
+    "unchanged height argument is not a height edit",
+    "explicit height edit still recalculates row declarations",
+    "explicit edit of both axes still changes both dimensions",
+    "new table width edit preserves its original computed height"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "This checks unrequested declared-height loss during width-only edits. It does not normalize stale content-derived height after padding edits or claim the separate actual Hancom 3846->5181 difference is resolved. No preserved field or geometry tolerance is removed.",
+  "scope": {
+    "widthOnlyFormatHeightCases": 8,
+    "noOpHeightArgument": 1,
+    "heightEditPositive": 1,
+    "bothAxesPositive": 1,
+    "newCreation": 1
+  },
+  "verifierSha256": "ff61d0456402310b6724d52e0ab176b10d2cefe18923b6b14b4efed35bb2927f",
+  "originalResultSha256": "8852270b4693ca36a73ddbc467f633f8a6319d46eb35bcc727f567f6fe071144",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

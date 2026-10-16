@@ -1,0 +1,30 @@
+{
+  "results": [
+    "openai-responses: chat sets HWPX padding, comparison/undo/redo/save preserve remaining cells and table",
+    "anthropic: chat sets HWPX padding, comparison/undo/redo/save preserve remaining cells and table",
+    "gemini: chat sets HWPX padding, comparison/undo/redo/save preserve remaining cells and table",
+    "openai-compatible: chat sets HWPX padding, comparison/undo/redo/save preserve remaining cells and table",
+    "table-default reset retains dormant values, native manual cell properties display same custom values and cancel is unchanged",
+    "no-op/incomplete/mixed/width overflow/alias/batch/raw fields visibly refuse unchanged",
+    "protected anywhere, merged, mixed and field original remain readonly for padding",
+    "HWP remains visibly readonly and never changes the document",
+    "renamed HWP with injected geometry cannot bypass actual layout guard",
+    "second-cell live failure restores padding/dirty/history/caret",
+    "unrequested neighboring padding/table-default mutation or differing layout causes full rollback",
+    "delayed provider cannot overwrite newer ordinary cell text",
+    "unsaved workspace restores custom padding, capability and comparison after confirmed restart",
+    "hwp: manual table default padding cancel/apply/undo/redo/save uses inherited cells and preserves custom cell",
+    "hwpx: manual table default padding cancel/apply/undo/redo/save uses inherited cells and preserves custom cell"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Actual Edge/four synthetic provider protocols. HWPX-only padding custom/table defaults. Four synthetic provider protocols, exact state/geometry preservation, HWP refusal and injected geometry rejection, rollback/conflicts/undo/save/unsaved recovery. Native Hancom/paid models NOT_RUN.",
+  "originalResultSha256": "3107e3dead93aef2258bea6a43e455f54b231665f64b9560e5ecf50c0923fa31",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "build": {
+    "engineWasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "builtAt": "2026-10-16T19:25:51.482Z"
+  }
+}

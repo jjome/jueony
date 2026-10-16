@@ -1,0 +1,25 @@
+{
+  "results": [
+    "split two interior boundaries preserves unequal row heights, all text and character styles",
+    "attach freshly split tables restores exact document preservation and root addresses",
+    "later-section root, following tables and flattened control addresses remain correct",
+    "HWP, protected cell/table, merged cells, captions, headers and mixed styles refuse",
+    "out-of-range/no-op/alias/extra arguments and unqueried next target refuse",
+    "attach rejects content between tables, unequal column widths and changed table properties",
+    "stale paragraph format and next-table text cannot overwrite user edits",
+    "native false, no-op, throw, equal-length body/cell and unrelated property corruption fail and restore",
+    "unknown protection flags, native reader failure and missing native writer never imply editable",
+    "empty cell character defaults and custom host paragraph properties survive split and attach",
+    "split and attach HWP output passes strict preservation and same-engine layout reopen"
+  ],
+  "failures": [],
+  "note": "Actual WASM splitTable / mergeTableWithNext guarded adapters, explicit root/cell/control transformation, saved HWPX plus HWP cross-format strict preservation and same-engine layout reopen. Browser UI/paid models/Hancom NOT_RUN.",
+  "originalResultSha256": "62860cac9a08118d82de266cab92e76439b2716246f14618f4707ec81a56719d",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

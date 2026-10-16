@@ -1,0 +1,152 @@
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -179,6 +179,63 @@
+ pub(crate) const ENDNOTE_BETWEEN_NOTES_BASE_FLOW_HU: i32 = 1984;
+ const SINGLE_ROW_DECLARED_TRUST_MAX_RATIO: f64 = 1.5;
+ 
++/// A non-flow paper ellipse and a TAC table can share a duplicated outer-band
++/// carrier in generated HWPX/HWP. Hancom removes the font-only prefix row when
++/// re-saving it. Accept only its exact two-control/two-row ownership proof;
++/// neither source LINE_SEG values nor declared table dimensions are rewritten.
++fn duplicated_nonflow_prefix_band_origin(
++    para: &Paragraph,
++    control_index: usize,
++    table: &crate::model::table::Table,
++) -> Option<i32> {
++    use crate::model::paragraph::{ColumnBreakType, LineSeg};
++    let [Control::Shape(shape), Control::Table(owned)] = para.controls.as_slice() else {
++        return None;
++    };
++    let ShapeObject::Ellipse(ellipse) = shape.as_ref() else { return None; };
++    let decoration = &ellipse.common;
++    if control_index != 1 || !std::ptr::eq(owned.as_ref(), table)
++        || para.stored_text_partition_dirty
++        || !matches!(para.column_type, ColumnBreakType::None)
++        || !para.range_tags.is_empty() || !para.markpen_marks.is_empty()
++        || decoration.treat_as_char || decoration.flow_with_text
++        || decoration.affect_line_spacing
++        || !matches!(decoration.text_wrap, TextWrap::InFrontOfText)
++        || !matches!(decoration.vert_rel_to, VertRelTo::Paper)
++        || !matches!(decoration.horz_rel_to, HorzRelTo::Paper)
++        || !table.common.treat_as_char || !table.common.flow_with_text
++        || table.common.allow_overlap
++        || table.caption.is_some() || !matches!(table.page_break, TablePageBreak::RowBreak)
++        || !matches!(table.common.text_wrap, TextWrap::TopAndBottom)
++        || !matches!(table.common.vert_rel_to, VertRelTo::Para)
++        || !matches!(table.common.vert_align, VertAlign::Top)
++        || !matches!(table.common.horz_rel_to, HorzRelTo::Para)
++        || table.common.vertical_offset != 0 || table.common.horizontal_offset != 0
++        || table.outer_margin_top < 0 || table.outer_margin_bottom < 0
++        || para.empty_control_stream_position(0)? != 0
++        || para.empty_control_stream_position(1)? != 8
++    { return None; }
++    let [prefix, carrier] = para.line_segs.as_slice() else { return None; };
++    let band = i64::from(table.common.height) + i64::from(table.outer_margin_top)
++        + i64::from(table.outer_margin_bottom);
++    if band <= 0 || prefix.tag != carrier.tag
++        || prefix.tag & LineSeg::TAG_IMPLEMENTATION_PROPERTY != 0
++        || para.line_seg_text_start(0) != 0 || para.line_seg_text_start(1) != 8
++        || prefix.vertical_pos < 0 || prefix.text_height <= 0
++        || prefix.line_spacing < 0 || prefix.line_spacing != carrier.line_spacing
++        || prefix.column_start != 0 || carrier.column_start != 0
++        || prefix.segment_width <= 0 || prefix.segment_width != carrier.segment_width
++        || i64::from(prefix.line_height) != band || i64::from(carrier.line_height) != band
++        || i64::from(carrier.text_height) != band
++        || i64::from(prefix.text_height) * 2 >= band
++        || prefix.baseline_distance < 0 || prefix.baseline_distance > prefix.text_height
++        || carrier.baseline_distance < 0 || i64::from(carrier.baseline_distance) > band
++        || i64::from(carrier.vertical_pos) - i64::from(prefix.vertical_pos)
++            != i64::from(prefix.text_height) + i64::from(prefix.line_spacing)
++    { return None; }
++    Some(prefix.vertical_pos)
++}
++
+ /// 빈 host의 full-band TAC 표가 두 번째 저장 줄을 온전히 점유했을 때 표의 실제
+ /// 상단을 복원한다. 한컴은 그 줄의 `text_height`를 `표 높이 + 위·아래 outMargin`으로
+ /// 기록하고, 잉크를 `vertical_pos + outMargin.top`에 둔다.
+@@ -220,7 +277,9 @@
+             && i64::from(previous.text_height) * 2 < band_height_hu)
+             .then_some(current.vertical_pos)
+     });
+-    let vpos = candidates.next()?;
++    let candidate_vpos = candidates.next()?;
++    let vpos = duplicated_nonflow_prefix_band_origin(para, control_index, table)
++        .unwrap_or(candidate_vpos);
+     // 한 표는 하나의 full-band 저장 줄만 소유한다.
+     if candidates.next().is_some() {
+         return None;
+@@ -16911,3 +16970,74 @@
+     }
+     width
+ }
++
++#[cfg(test)]
++mod jueony_duplicated_nonflow_prefix_band_tests {
++    use super::*;
++    use crate::model::paragraph::LineSeg;
++    use crate::model::shape::EllipseShape;
++    fn fixture() -> Paragraph {
++        let mut p = Paragraph { char_count: 17, ..Paragraph::default() };
++        let mut ellipse = EllipseShape::default();
++        ellipse.common.text_wrap = TextWrap::InFrontOfText;
++        ellipse.common.allow_overlap = true;
++        let mut table = crate::model::table::Table::default();
++        table.common.treat_as_char = true;
++        table.common.flow_with_text = true;
++        table.common.text_wrap = TextWrap::TopAndBottom;
++        table.common.vert_rel_to = VertRelTo::Para;
++        table.common.horz_rel_to = HorzRelTo::Para;
++        table.common.height = 64199;
++        table.page_break = TablePageBreak::RowBreak;
++        table.outer_margin_top = 283;
++        table.outer_margin_bottom = 283;
++        p.controls = vec![Control::Shape(Box::new(ShapeObject::Ellipse(ellipse))), Control::Table(Box::new(table))];
++        p.line_segs = vec![
++            LineSeg { text_start: 0, vertical_pos: 2720, line_height: 64765,
++                text_height: 1000, baseline_distance: 850, line_spacing: 600,
++                column_start: 0, segment_width: 48188, tag: 393216 },
++            LineSeg { text_start: 8, vertical_pos: 4320, line_height: 64765,
++                text_height: 64765, baseline_distance: 55050, line_spacing: 600,
++                column_start: 0, segment_width: 48188, tag: 393216 },
++        ]; p
++    }
++    fn probe(p: &Paragraph) -> Option<i32> {
++        let Control::Table(t) = &p.controls[1] else { return None; };
++        duplicated_nonflow_prefix_band_origin(p, 1, t)
++    }
++    #[test]
++    fn exact_prefix_uses_first_band_without_mutation() {
++        let p = fixture();
++        let before = serde_json::to_value(&p).unwrap();
++        assert_eq!(probe(&p), Some(2720));
++        assert_eq!(serde_json::to_value(&p).unwrap(), before);
++        let Control::Table(t) = &p.controls[1] else { panic!(); };
++        let area = LayoutRect { x: 0.0, y: 94.5, width: 650.0, height: 1000.0 };
++        let top = stored_empty_full_band_tac_table_top(&p, 1, t, &area, 96.0).unwrap();
++        assert!((top - (94.5 + 3003.0 / 75.0)).abs() < 1e-9);
++    }
++    #[test]
++    fn ambiguous_or_real_prefix_lines_keep_original_owner() {
++        let changes: Vec<fn(&mut Paragraph)> = vec![
++            |p| p.text = "visible".into(),
++            |p| if let Control::Table(t) = &mut p.controls[1] { t.page_break = TablePageBreak::CellBreak; },
++            |p| if let Control::Table(t) = &mut p.controls[1] { t.caption = Some(Caption::default()); },
++            |p| p.char_count += 1,
++            |p| p.line_segs[0].line_height = 1000,
++            |p| p.line_segs[1].vertical_pos += 1,
++            |p| p.line_segs[1].text_start = 0,
++            |p| p.line_segs[0].tag |= LineSeg::TAG_IMPLEMENTATION_PROPERTY,
++            |p| p.line_segs[0].column_start = 1,
++            |p| p.line_segs[1].segment_width -= 1,
++            |p| p.line_segs.push(p.line_segs[1].clone()),
++            |p| p.stored_text_partition_dirty = true,
++            |p| if let Control::Shape(s) = &mut p.controls[0] { if let ShapeObject::Ellipse(e) = s.as_mut() { e.common.affect_line_spacing = true; } },
++            |p| if let Control::Shape(s) = &mut p.controls[0] { if let ShapeObject::Ellipse(e) = s.as_mut() { e.common.vert_rel_to = VertRelTo::Para; } },
++            |p| if let Control::Table(t) = &mut p.controls[1] { t.common.vertical_offset = 1; },
++        ];
++        for (i, change) in changes.into_iter().enumerate() {
++            let mut p = fixture(); change(&mut p);
++            assert_eq!(probe(&p), None, "negative {i}");
++        }
++    }
++}

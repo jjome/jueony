@@ -1,0 +1,29 @@
+{
+  "results": [
+    "hwp: cell changes only one table pagination policy and snapshot undo/reopen preserve cells/format",
+    "hwp: row changes only one table pagination policy and snapshot undo/reopen preserve cells/format",
+    "hwp: none changes only one table pagination policy and snapshot undo/reopen preserve cells/format",
+    "hwpx: cell changes only one table pagination policy and snapshot undo/reopen preserve cells/format",
+    "hwpx: row changes only one table pagination policy and snapshot undo/reopen preserve cells/format",
+    "hwpx: none changes only one table pagination policy and snapshot undo/reopen preserve cells/format",
+    "existing repeated-header and header-cell flags remain unchanged",
+    "same/unsupported policy, unknown targets, injection and batches refuse unchanged",
+    "source geometry/text/format/policy mutation invalidates previously queried capability",
+    "false/noop/wrong policy and unexpected header/width/text/style/resource changes refuse and restore",
+    "merged/protected/inline/caption/overlap/field/mixed-format and oversized tables are protected",
+    "missing writer disables capability and rejects old snapshots",
+    "resolved TextWrap tolerates stale cached control bits but rejects a real placement change",
+    "flattened table identity in a later section changes the intended object only",
+    "multi-page row policy renders all stored table cells and survives both saved formats"
+  ],
+  "failures": [],
+  "note": "Stored table page-break policy only. Existing header flags/placement/cells/style/resources remain. Same-engine save/reopen, NOT native Hancom layout or paid LLM.",
+  "originalResultSha256": "3617be8d7bf036aae2f0d02cd8f7e1d97d545bd88f3000696e9f2989c88e79de",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "results": [
+    "row height whole: exact stored and rendered heights, preservation, snapshot and safe reopen",
+    "row height band: exact stored and rendered heights, preservation, snapshot and safe reopen",
+    "row height direct: exact stored and rendered heights, preservation, snapshot and safe reopen",
+    "row height multiple: exact stored and rendered heights, preservation, snapshot and safe reopen",
+    "row height empty: exact stored and rendered heights, preservation, snapshot and safe reopen",
+    "row height later: exact stored and rendered heights, preservation, snapshot and safe reopen",
+    "row height single-column: exact stored and rendered heights, preservation, snapshot and safe reopen",
+    "long content gets a large explicit height; requests below content minimum reject without writes",
+    "existing export guard refuses altered-DPI style evidence before height mutation",
+    "one-row table supports explicit height and rejects equalization",
+    "height can grow and shrink repeatedly when content fits",
+    "invalid/no-op/partial columns/mixed/batch/alias/overflow/HWP commands refuse without writes",
+    "protected/merged/mixed/field/vertical/inline/ragged/spaced/multicolumn sources stay readonly",
+    "stale source, false/no-op/throwing setters, unwanted neighbor changes or differing actual geometry rollback"
+  ],
+  "failures": [],
+  "note": "Actual WASM row height equal/direct; exact actual heights and saved layout required. Hancom and paid models NOT_RUN.",
+  "originalResultSha256": "16b39219f870b5c5408f82628513c58f65282c53d58e1078ffbdd52b7fd6ef92",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

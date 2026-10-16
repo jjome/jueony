@@ -1,0 +1,30 @@
+{
+  "results": [
+    "openai-responses: actual chat equalizes columns, comparison/undo/redo and safe save preserve remaining state",
+    "anthropic: actual chat equalizes columns, comparison/undo/redo and safe save preserve remaining state",
+    "gemini: actual chat equalizes columns, comparison/undo/redo and safe save preserve remaining state",
+    "openai-compatible: actual chat equalizes columns, comparison/undo/redo and safe save preserve remaining state",
+    "long-table post-render ownership: reject/rollback baseline or valid pages and save/reopen after fix",
+    "partial complete column band keeps first column and active cell cursor while distributing exact remainder",
+    "already equal/partial row/mixed/batch/alias/unknown inputs visibly fail without document writes",
+    "HWP/protected/merged/mixed source advertises readonly and visibly refuses",
+    "injected live resize failure or neighbor/text/layout corruption fully rolls back dirty/history/cursor",
+    "delayed provider cannot overwrite newer cell content",
+    "unsaved workspace restores equal widths/capability/comparison after confirmed restart",
+    "actual UI save/reopen preserves table and text layout with document-owned metrics initialized",
+    "hidden owner: later-section long table uses global page offset, body mapping is read-only and invalid addresses still fail",
+    "hidden owner: ordinary text tail retains own line and actual keyboard insertion after long table saves/reopens",
+    "hidden owner: injected ordinary missing-page error still rolls back before receipt commit"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Actual Edge/four synthetic provider protocols; HWPX complete column bands, exact preservation, failure rollback/conflicts/undo/save/workspace recovery/UI reopen. Native Hancom/paid models NOT_RUN.",
+  "originalResultSha256": "2fc2ff3e3afad3bfc3251a15b639c97017f34a19b6008df512670d4e71ca8391",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "build": {
+    "engineWasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "builtAt": "2026-10-16T19:25:51.482Z"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "results": [
+    "openai-responses: actual merged paragraph chat, compare, one undo/redo, safe save and UI reopen",
+    "anthropic: actual merged paragraph chat, compare, one undo/redo, safe save and UI reopen",
+    "gemini: actual merged paragraph chat, compare, one undo/redo, safe save and UI reopen",
+    "openai-compatible: actual merged paragraph chat, compare, one undo/redo, safe save and UI reopen",
+    "invalid original/coordinate, alias, missing target, overflow, no-op and batch never write",
+    "HWP, protection, lock, mixed characters, field and bookmark remain readonly",
+    "actual live fault restores bytes/history/dirty/cursor without an extra undo entry",
+    "actual strict post-render geometry fault rolls back, then next request works",
+    "late model response cannot overwrite a newer user cell edit",
+    "empty paragraph, reinsertion and unsupported growth keep request-sized undo and safe save",
+    "unsaved merged paragraph state survives workspace restart without redistributing text",
+    "no unexpected console/page errors or external assets"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Four synthetic protocol adapters, actual document/undo/save/reopen. Paid calls and Hancom NOT_RUN.",
+  "originalResultSha256": "3dea4ce679be135d73937bf8770b5c86fd224a0f7cdc378062b4974ec7ac3e59",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

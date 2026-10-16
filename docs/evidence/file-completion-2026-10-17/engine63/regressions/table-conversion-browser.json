@@ -1,0 +1,33 @@
+{
+  "results": [
+    "hwp: actual selection \u2192 conversion dialog \u2192 table; undo/redo, native save/reopen and inverse conversion",
+    "hwpx: actual selection \u2192 conversion dialog \u2192 table; undo/redo, native save/reopen and inverse conversion",
+    "cancel and concurrently changed document refuse conversion without applying old selected text",
+    "native failure after source deletion restores content and leaves no partial table or undo receipt",
+    "hwp: integer autofill previews overwrite, preserves formats/other cells, one undo and repeat no-op",
+    "hwpx: integer autofill previews overwrite, preserves formats/other cells, one undo and repeat no-op",
+    "hwp: real selected-cell preset dialog preserves outer cells and merged block, undo/save",
+    "hwp: explicit monthly/yearly auto fill previews anchored dates and uses one undo/save",
+    "hwp: object T transposes merged table with mixed/multiple paragraphs; one undo and save/reopen",
+    "hwp: real table preset dialog, cancel, one undo/redo and guarded save of mixed text",
+    "hwp: real numeric paragraph sort dialog keeps title and format, undo/redo and save",
+    "hwpx: real selected-cell preset dialog preserves outer cells and merged block, undo/save",
+    "hwpx: explicit monthly/yearly auto fill previews anchored dates and uses one undo/save",
+    "hwpx: object T transposes merged table with mixed/multiple paragraphs; one undo and save/reopen",
+    "hwpx: real table preset dialog, cancel, one undo/redo and guarded save of mixed text",
+    "hwpx: real numeric paragraph sort dialog keeps title and format, undo/redo and save",
+    "table preset failure after first cell restores every property and leaves history unchanged",
+    "paragraph sort failure after text replacement restores every run and leaves history unchanged"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Isolated headless Edge profile. Synthetic test extension positions actual cursor/selection; production dialogs/commands/history/save used. No paid model or native Hancom comparison.",
+  "originalResultSha256": "1d5ad0fccf76ec78acfc2ac8f9ff1fe9e3932c7dfca0a94fd9a6f600e34e6edd",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "build": {
+    "engineWasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "builtAt": "2026-10-16T19:25:51.482Z"
+  }
+}

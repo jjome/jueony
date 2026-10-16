@@ -1,0 +1,20 @@
+{
+  "results": [
+    "hwp two: following tables whole-page geometry, preservation, snapshot and repeated save",
+    "hwp three: following tables whole-page geometry, preservation, snapshot and repeated save",
+    "hwp long: following tables whole-page geometry, preservation, snapshot and repeated save",
+    "hwpx two: following tables whole-page geometry, preservation, snapshot and repeated save",
+    "hwpx three: following tables whole-page geometry, preservation, snapshot and repeated save",
+    "hwpx long: following tables whole-page geometry, preservation, snapshot and repeated save"
+  ],
+  "failures": [],
+  "note": "Native same-engine invariants, NOT Hancom comparison. No HWP AI gate relaxation.",
+  "originalResultSha256": "aeeacc0c6067f1a198b77cd941a6ef37e97273194d1004e30dea530f01f40b59",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

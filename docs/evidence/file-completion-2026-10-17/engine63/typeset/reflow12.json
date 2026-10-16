@@ -1,0 +1,27 @@
+{
+  "results": [
+    "hancom-multiline-roundtrip.hwp: actual reversible edit matches independently Hancom-produced entire text partition",
+    "hancom-multiline-roundtrip.hwp: actual edited live state survives strict HWP save/reopen",
+    "hancom-caption-multiline-roundtrip.hwp: actual reversible edit matches independently Hancom-produced entire text partition",
+    "hancom-caption-multiline-roundtrip.hwp: actual edited live state survives strict HWP save/reopen",
+    "ascii-word: text/Unicode boundary, break contract and strict HWP/HWPX reopens",
+    "ascii-char: text/Unicode boundary, break contract and strict HWP/HWPX reopens",
+    "digits: text/Unicode boundary, break contract and strict HWP/HWPX reopens",
+    "hyphen: text/Unicode boundary, break contract and strict HWP/HWPX reopens",
+    "tabs: text/Unicode boundary, break contract and strict HWP/HWPX reopens",
+    "hangul-word: text/Unicode boundary, break contract and strict HWP/HWPX reopens",
+    "hangul-char: text/Unicode boundary, break contract and strict HWP/HWPX reopens",
+    "unicode: text/Unicode boundary, break contract and strict HWP/HWPX reopens"
+  ],
+  "failures": [],
+  "scope": "Targets known160vs158 independent Hancom partition defect; baseline is expected to fail the two conformance assertions. Existing preservation guards and complete raw public geometry0.2 remain unchanged. Regression invariants are not claims of complete Hancom typographic conformance.",
+  "verifierSha256": "049a72c3195eef37e9111d5bf5bcf7b6c334e1277c930232b5119624d6d3ff8a",
+  "originalResultSha256": "875247f6857eaa7f061d78bb4d685b06b30f7cbac6dc3ac2847c1c622aba8b2a",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

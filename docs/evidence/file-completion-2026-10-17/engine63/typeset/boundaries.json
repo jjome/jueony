@@ -1,0 +1,23 @@
+{
+  "results": [
+    "header",
+    "footer"
+  ],
+  "failures": [],
+  "scope": "Negative parity against immutable production baseline for genuinely uncached multiline Header/Footer stories. Complete raw published control/text geometry0.2, all semantic values, exact HWP/HWPX serializer bytes and each output baseline-vs-target rendering remain unchanged. This does not claim the baseline story layout matches native Hancom or that baseline own cross-format layout is lossless.",
+  "verifierSha256": "6c527d37d2b08b8aa385094b0f9472c1c1fe07984b76601a55e4120075dfbb66",
+  "originalResultSha256": "5449d4f9bb31ebfabd5a494fcba2cc5e4e892bf62809b24afb3df21ac839cc0c",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  },
+  "baselineEngine": {
+    "sourceId": "3a01e912b92dc8af",
+    "wasmSha256": "1f8ec5265a09af4747ee604003f2a2de7af282ebd32791773d6f29f26d89493a",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T18:32:22.0344438Z"
+  }
+}

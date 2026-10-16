@@ -1,0 +1,56 @@
+{
+  "results": [
+    "plain: native HWP to marker HWPX full geometry, repeated saves, reverse conversion and undo",
+    "multiline: native HWP to marker HWPX full geometry, repeated saves, reverse conversion and undo",
+    "caption-multiline: native HWP to marker HWPX full geometry, repeated saves, reverse conversion and undo",
+    "positive: native HWP to marker HWPX full geometry, repeated saves, reverse conversion and undo",
+    "positive-caption: native HWP to marker HWPX full geometry, repeated saves, reverse conversion and undo",
+    "mixed: native HWP to marker HWPX full geometry, repeated saves, reverse conversion and undo",
+    "mixed-long: native HWP to marker HWPX full geometry, repeated saves, reverse conversion and undo",
+    "bookmark: native HWP to marker HWPX full geometry, repeated saves, reverse conversion and undo",
+    "field: native HWP to marker HWPX full geometry, repeated saves, reverse conversion and undo",
+    "offset: native HWP to marker HWPX full geometry, repeated saves, reverse conversion and undo",
+    "margin: native HWP to marker HWPX full geometry, repeated saves, reverse conversion and undo",
+    "marker HWPX column2: full excluded geometry, source bytes and semantic ownership remain baseline",
+    "marker HWPX column3: full excluded geometry, source bytes and semantic ownership remain baseline",
+    "marker HWPX absolute: full excluded geometry, source bytes and semantic ownership remain baseline",
+    "marker HWPX negative: full excluded geometry, source bytes and semantic ownership remain baseline",
+    "marker HWPX rowbreak: full excluded geometry, source bytes and semantic ownership remain baseline",
+    "marker HWPX tac: full excluded geometry, source bytes and semantic ownership remain baseline",
+    "marker HWPX first-line-origin: full excluded geometry, source bytes and semantic ownership remain baseline",
+    "marker HWPX earlier-picture: full excluded geometry, source bytes and semantic ownership remain baseline",
+    "pure HWPX column2: full excluded geometry, source bytes and semantic ownership remain baseline",
+    "pure HWPX column3: full excluded geometry, source bytes and semantic ownership remain baseline",
+    "pure HWPX absolute: full excluded geometry, source bytes and semantic ownership remain baseline",
+    "pure HWPX negative: full excluded geometry, source bytes and semantic ownership remain baseline",
+    "pure HWPX rowbreak: full excluded geometry, source bytes and semantic ownership remain baseline",
+    "pure HWPX tac: full excluded geometry, source bytes and semantic ownership remain baseline",
+    "pure HWPX first-line-origin: full excluded geometry, source bytes and semantic ownership remain baseline",
+    "pure HWPX earlier-picture: full excluded geometry, source bytes and semantic ownership remain baseline"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "note": "Every public control/cell/run geometry field retains strict0.2. Native HWP provenance may survive as an explicit HWPX marker; pure HWPX never opts into that source contract. Declared common height and semantic resources remain exact. No Hancom UI comparison is claimed.",
+  "scope": {
+    "crossFormatWholeStackWithUndo": 11,
+    "unchangedMarkerExclusions": 8,
+    "unchangedPureHwpx": 8
+  },
+  "verifierSha256": "18422a5aeed7ba0d6b194a25b648cf1d63b4c7ab82b79910b2ae7480d219aa20",
+  "originalResultSha256": "6c5a82808530291d24a8b1a0d7abc421eb04375592a51d581bde83bb8ace18fb",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  },
+  "baselineEngine": {
+    "sourceId": "3a01e912b92dc8af",
+    "wasmSha256": "1f8ec5265a09af4747ee604003f2a2de7af282ebd32791773d6f29f26d89493a",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T18:32:22.0344438Z"
+  }
+}

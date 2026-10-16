@@ -1,0 +1,88 @@
+{
+  "enginePackage": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-8deeb52a09ba2b75\\pkg",
+  "sourceId": "8deeb52a09ba2b75",
+  "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+  "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+  "patchCount": 63,
+  "nativePassed": 72,
+  "canvasPassed": 8,
+  "failures": 0,
+  "results": [
+    {
+      "name": "wrap",
+      "passed": 8,
+      "failures": 0,
+      "result": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\file-completion-formal63-typeset\\wrap\\result.json",
+      "sha256": "351d207c5379106e1b510286c88a0e69f957be6f52605d742b408101e38549ea"
+    },
+    {
+      "name": "prefix",
+      "passed": 6,
+      "failures": 0,
+      "result": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\file-completion-formal63-typeset\\prefix\\result.json",
+      "sha256": "5d9fdd83eb225c85af89a8d586beae4fa0b4156078c74593961b09c47b85e4ee",
+      "externalComparisons": [
+        {
+          "before": "source-python-hwpx-1.hwpx",
+          "after": "python-hwpx-1-hwp.hwp",
+          "geometryDiffCount": 0,
+          "semanticDiffCount": 0,
+          "status": "SAME_WITHIN_PUBLISHED_CONTRACT"
+        },
+        {
+          "before": "python-hwpx-1-hwp.hwp",
+          "after": "python-hwpx-1-hwp-hancom.hwp",
+          "geometryDiffCount": 40,
+          "semanticDiffCount": 0,
+          "status": "DIFFERENT_WITH_ALL_RAW_FIELDS_RETAINED"
+        }
+      ]
+    },
+    {
+      "name": "boundaries",
+      "passed": 2,
+      "failures": 0,
+      "result": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\file-completion-formal63-typeset\\boundaries\\result.json",
+      "sha256": "5449d4f9bb31ebfabd5a494fcba2cc5e4e892bf62809b24afb3df21ac839cc0c"
+    },
+    {
+      "name": "matrix27",
+      "passed": 27,
+      "failures": 0,
+      "result": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\file-completion-formal63-typeset\\matrix27\\result.json",
+      "sha256": "6c5a82808530291d24a8b1a0d7abc421eb04375592a51d581bde83bb8ace18fb"
+    },
+    {
+      "name": "golden11",
+      "passed": 11,
+      "failures": 0,
+      "result": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\file-completion-formal63-typeset\\golden11\\result.json",
+      "sha256": "2cdfead6106e55119d679d15872f47960826f3573959c5a23cc200a49340a5e7"
+    },
+    {
+      "name": "tabs6",
+      "passed": 6,
+      "failures": 0,
+      "result": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\file-completion-formal63-typeset\\tabs6\\result.json",
+      "sha256": "5865c1adcf6011939a56e72946ea05091537373cdfd756981a7d75099c641b94"
+    },
+    {
+      "name": "reflow12",
+      "passed": 12,
+      "failures": 0,
+      "result": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\file-completion-formal63-typeset\\reflow12\\result.json",
+      "sha256": "875247f6857eaa7f061d78bb4d685b06b30f7cbac6dc3ac2847c1c622aba8b2a"
+    },
+    {
+      "name": "canvas8",
+      "passed": 8,
+      "failures": 0,
+      "result": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\file-completion-formal63-typeset\\canvas8\\result.json",
+      "sha256": "49d13ca035470696e732915b05adde848df1337640d780a3f52723cc9796619a",
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "externalRequests": 0
+    }
+  ],
+  "scope": "All complete public raw layout fields0.2 and strict meaning/resources/own repeated export guards remain intact. External Hancom native-ID reindex differences retained and not declared full contract equality. No production source or verifier modifications for this rerun."
+}

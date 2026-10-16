@@ -1,0 +1,18 @@
+{
+  "results": [
+    "hwp: nested cells/header/footer/footnote inherit style changes without replacing direct formatting",
+    "hwpx: nested cells/header/footer/footnote inherit style changes without replacing direct formatting",
+    "footnote query JSON escapes literal tab, quotes, backslash and Unicode",
+    "endnote query JSON escapes literal tab, quotes, backslash and Unicode"
+  ],
+  "failures": [],
+  "scope": "Synthetic native-WASM edits, independent serialized XML and snapshot restoration; not Hancom visual parity.",
+  "originalResultSha256": "2ba9a74d334df8b04d8cbcd9fd576ad474f4263f98ec7cf60a0793675aae13ac",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

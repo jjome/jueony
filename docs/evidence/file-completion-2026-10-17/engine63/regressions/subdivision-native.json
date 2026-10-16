@@ -1,0 +1,28 @@
+{
+  "results": [
+    "vertical-center: exact model/spans/format, first-cell content, save/reopen and snapshot redo",
+    "horizontal-wide: exact model/spans/format, first-cell content, save/reopen and snapshot redo",
+    "rectangle-center: exact model/spans/format, first-cell content, save/reopen and snapshot redo",
+    "unequal-bottom: exact model/spans/format, first-cell content, save/reopen and snapshot redo",
+    "empty-narrow: exact model/spans/format, first-cell content, save/reopen and snapshot redo",
+    "whole-single-cell: exact model/spans/format, first-cell content, save/reopen and snapshot redo",
+    "later-section: exact model/spans/format, first-cell content, save/reopen and snapshot redo",
+    "content minimum grows outer table: reject and restore exact bytes",
+    "invalid args, alias, no-op, overflow and missing cell refuse without writes",
+    "protection, header, field, bookmark, mixed, merged, HWP and inconsistent dimensions close capability",
+    "stale body/target style/grid versions cannot overwrite newer edits",
+    "false/no-op/throw/neighbor corruption reject inside outer snapshot rollback",
+    "same-effect cell zone remains observable and closes every table topology path",
+    "unknown Native cell zone count is readonly without changing the document"
+  ],
+  "failures": [],
+  "note": "Actual WASM N-by-M unmerged source subdivision. Fields/zones/protection/complex layout are rejected. Same-engine invariants; Native Hancom, paid providers NOT_RUN.",
+  "originalResultSha256": "686b4fc7f7e94b75c1cef75452579196937b24d75cb66460edb163a237fa3431",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

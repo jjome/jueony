@@ -1,0 +1,21 @@
+{
+  "results": [
+    "ascii-default",
+    "hangul-default",
+    "left-custom",
+    "indented-default",
+    "mixed-char-runs",
+    "trailing-tab"
+  ],
+  "failures": [],
+  "scope": "Actual Native/WASM, complete public layout within original0.2, whole semantic/resource preservation, repeated HWP/HWPX exports/reopens, and live invariance. No ignored coordinate fields or adjusted run-width oracle.",
+  "verifierSha256": "7c11d289e65192a2457a5768c034d1f97afef23adcfcc11ce468418d4e9aaf3b",
+  "originalResultSha256": "5865c1adcf6011939a56e72946ea05091537373cdfd756981a7d75099c641b94",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  }
+}

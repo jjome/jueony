@@ -1,0 +1,41 @@
+{
+  "results": [
+    "query exposes exact false for ordinary HWPX and HWP, true only for HWP5-origin HWPX",
+    "plain hwp -> hwp: full-layout guard and semantic export keep live state unchanged",
+    "plain hwp -> hwpx: full-layout guard and semantic export keep live state unchanged",
+    "plain hwpx -> hwp: full-layout guard and semantic export keep live state unchanged",
+    "plain hwpx -> hwpx: full-layout guard and semantic export keep live state unchanged",
+    "multiline hwp -> hwp: full-layout guard and semantic export keep live state unchanged",
+    "multiline hwp -> hwpx: full-layout guard and semantic export keep live state unchanged",
+    "multiline hwpx -> hwp: full-layout guard and semantic export keep live state unchanged",
+    "multiline hwpx -> hwpx: full-layout guard and semantic export keep live state unchanged",
+    "caption hwp -> hwp: full-layout guard and semantic export keep live state unchanged",
+    "caption hwp -> hwpx: full-layout guard and semantic export keep live state unchanged",
+    "caption hwpx -> hwp: full-layout guard and semantic export keep live state unchanged",
+    "caption hwpx -> hwpx: full-layout guard and semantic export keep live state unchanged",
+    "mixed hwp -> hwp: full-layout guard and semantic export keep live state unchanged",
+    "mixed hwp -> hwpx: full-layout guard and semantic export keep live state unchanged",
+    "mixed hwpx -> hwp: full-layout guard and semantic export keep live state unchanged",
+    "mixed hwpx -> hwpx: full-layout guard and semantic export keep live state unchanged",
+    "real HWP to HWPX provenance-corrupted bytes fail only layout and open no writer"
+  ],
+  "failures": [],
+  "note": "Real WASM, owned synthetic documents. Full geometry/0.2 and semantic reader unchanged. Native writer counter is complemented by real Edge OPFS open-zero verifier. No Hancom UI claim.",
+  "verifierSha256": "649cb9ce69e15b21046f39bc2c2842a7b17ba54e0126e1aba486433444eaa7fb",
+  "guardSha256": "81292a0acd43934682abea16fa510b6fdedbd820d9f1822bac511de3919d1495",
+  "fixtureSha256": "78e464a22bdb7041e104620f6020fd7dc2a0a45c23605fec2e0f284fbc475224",
+  "originalResultSha256": "75b78d9c3152ef6667600ca062c738f965611de3d970bdac32c0266b57c99424",
+  "observationsOmitted": "Full snapshots, resource/body content and execution observations remain ignored. Original complete result is identified by SHA256.",
+  "engine": {
+    "sourceId": "8deeb52a09ba2b75",
+    "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+    "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8",
+    "builtAt": "2026-10-16T19:25:03.6775985Z"
+  },
+  "baselineEngine": {
+    "sourceId": "31c6854ba64af4b5",
+    "wasmSha256": "6e7e8ca9971063ae08ba5336fdd7ef5f73a66a055a82e0600adf4c21a52ded3d",
+    "jsSha256": "e176d229d2362d2c9ab9eb544e891fb95a5ef8b8b4cffe347eedc090d5ee42ca",
+    "builtAt": "2026-10-14T18:02:30.0272826Z"
+  }
+}

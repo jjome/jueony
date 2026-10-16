@@ -1,0 +1,149 @@
+{
+  "status": "IGNORED_ENGINE_COMMAND_CANDIDATE_NATIVE14_BUILD_IN_PROGRESS; production63 unchanged",
+  "supersedesHypothesis": "Earlier build/n001-common-height-contract/conclusion.json treated every common.height as an independent explicit minimum. Actual Hancom unprotected controls now falsify that broad assumption; original evidence remains immutable.",
+  "observedOracles": [
+    {
+      "input": "large.hwpx",
+      "hancom": "large-hancom.hwpx",
+      "protect": false,
+      "commonBefore": 9000,
+      "commonAfter": 5181,
+      "cellHeightsBefore": [
+        282,
+        282,
+        282,
+        282,
+        282,
+        282
+      ],
+      "cellHeightsAfter": [
+        282,
+        282,
+        282,
+        282,
+        282,
+        282
+      ]
+    },
+    {
+      "input": "auto-zero.hwpx",
+      "hancom": "auto-zero-hancom.hwpx",
+      "protect": false,
+      "commonBefore": 0,
+      "commonAfter": 5181,
+      "cellHeightsBefore": [
+        282,
+        282,
+        282,
+        282,
+        282,
+        282
+      ],
+      "cellHeightsAfter": [
+        282,
+        282,
+        282,
+        282,
+        282,
+        282
+      ]
+    },
+    {
+      "input": "explicit-rows-9000.hwpx",
+      "hancom": "explicit-rows-9000-hancom.hwpx",
+      "protect": false,
+      "commonBefore": 9000,
+      "commonAfter": 9000,
+      "cellHeightsBefore": [
+        3000,
+        3000,
+        3000,
+        3000,
+        3000,
+        3000
+      ],
+      "cellHeightsAfter": [
+        3000,
+        3000,
+        3000,
+        3000,
+        3000,
+        3000
+      ]
+    }
+  ],
+  "protectedObservation": {
+    "sources": [
+      "small-protected.hwpx",
+      "large-protected.hwpx"
+    ],
+    "hancom": [
+      "small-protected-hancom.hwpx",
+      "large-protected-hancom.hwpx"
+    ],
+    "commonBefore": [
+      1400,
+      9000
+    ],
+    "commonAfter": [
+      1981,
+      1981
+    ],
+    "protectAfter": 1,
+    "cellHeightsRemain": [
+      282,
+      282,
+      282,
+      282,
+      282,
+      282
+    ],
+    "activeRowPaddingSums": [
+      1417,
+      282,
+      282
+    ],
+    "paddingFloorSum": 1981,
+    "meaning": "Both protected inputs collapse/expand to the same row/padding floor, clip text, and preserve protect1. Therefore the intermediate hypothesis that protected common itself is an independent explicit frame is also falsified. Cell minima and protect-dependent content growth define the aggregate result for this controlled family.",
+    "sourceRawEvidence": "protected-small-raw.json"
+  },
+  "separateSourceValues": {
+    "cellHeight": "User row/cell minimum, retained byte-for-byte. Actual6cells3000 produce3rows9000.",
+    "unprotectedCommonHeight": "Observed aggregate result cache for this flat authored family; common-only9000 does not create a user row minimum in Hancom.",
+    "protectedCommonHeight": "Observed aggregate result cache of the protected/clipped table frame: common-only1400 and9000 both ->1981 while cellHeight282 remains. Preserve protection and cell minima; never substitute full content5181."
+  },
+  "actualEngineDefect": "Existing unprotected measurement/layout may expand rows from stale large commonHeight (large source vs Hancom copy: semantic2 and fullgeometry54, tolerance0.2 unchanged). Creation estimates1000+padding per row; font/padding reflow leaves aggregate height stale.",
+  "proposedBoundary": {
+    "planner": "Inside engine, clone only the addressed supported table. Set clone.common.height=0 for content/declared-cell measurement, retain every real cell height, padding, style and stored-line value. Use same HeightMeasurer/profile/ResolvedStyleSet/DPI; derive integer HWPUNIT from rows+inter-row spacing, excluding caption.",
+    "mutation": "Explicit engine command/preflight transaction validates address/source revision/current common value and supported topology, then sync_ctrl_height in live IR and raw CTRL_HEADER together. Return before/after height and measured rows. Record this as a real document change.",
+    "firstSupportedScope": "Candidate first version: one-page unprotected/noAdjust=false, Absolute height criterion, object-only ordinary block owner, complete1x1 rectangular cell grid, normal horizontal paragraphs with no controls/form/protected-cell fields. Caption/lock/protect/merged/nested/partial/unknown inputs reject atomically. This intentionally does not implement the separate protected clipping renderer.",
+    "save": "Application Save facade invokes this explicit preflight before capturing preservation evidence. Export remains immutable. All fields, fullgeometry0.2 and source ownership guards stay enabled; validation compares against the genuinely updated live state. Stale UI/AI requests cannot be applied after revision changes.",
+    "undo": "Group cache synchronization into the same edit/request/save-preflight transaction, using actual snapshots. Do not rely on arbitrary setTableProperties rollback or re-read disk.",
+    "laterEdits": "Measure with aggregate cache excluded each time so padding removal can shrink content-grown rows. Preserve true cell3000 minima so explicitly sized9000 table never collapses to5181.",
+    "forbidden": "No getter/comparator normalization, dropped Height fields, export-copy-only rewrites, synthetic success, or tolerance changes."
+  },
+  "requiredIndependentChecks": [
+    "Measured clone produces5181 for unprotected common0/3846/9000 using existing exact cell contents; emits9000 for actual cell3000 rows.",
+    "Protected1400/9000 remain explicit frame and unchanged by synchronization; unsupported input fails atomically.",
+    "Input raw/semantic graph unchanged by planning. Applying plan changes only addressed common.height/raw4bytes plus documented revision/measurement state.",
+    "Padding/font grow/shrink, explicit cell-height edit, width-only edit, whole-document geometry, rollback, repeated HWP/HWPX export/reopen and actual Hancom SaveAs.",
+    "Full source/bytes SHA lineage and formal package proof. Existing APIs cannot silently start returning normalized heights."
+  ],
+  "currentProduction45": "Only prevents width-only setter from overwriting unrelated commonHeight with the raw row declaration sum846. It does not implement content-frame synchronization and does not resolve3846->5181; its original exact raw-preservation evidence remains valid and separate.",
+  "actualEngineLargeComparison": {
+    "engine": "private56+42+43",
+    "semanticDifferences": 2,
+    "fullGeometryDifferences": 54,
+    "numericTolerance": 0.2,
+    "path": "compare-large-private43/result.json"
+  },
+  "candidate": {
+    "path": "build/table-height-sync-candidate/table-content-height-command.patch",
+    "bindings": [
+      "getTableContentHeightPlan(section,para,control)",
+      "applyTableContentHeightPlan(section,para,control,expectedBefore,expectedAfter)"
+    ],
+    "event": "TableContentHeightSynchronized(section,para,ctrl,beforeHeight,afterHeight)",
+    "production": "not promoted; Native14 compilation in progress; whole geometry/stale/undo/save browser follow-up pending"
+  }
+}

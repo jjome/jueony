@@ -44,7 +44,7 @@ async fn pick_save_document(app: tauri::AppHandle, suggested_name: String) -> Re
 
 #[tauri::command]
 fn read_document(documents: State<Documents>, token: String) -> Result<Vec<u8>, String> {
-    documents.0.lock().map_err(|e| e.to_string())?.get_mut(&token)
+    documents.0.lock().map_err(|e| e.to_string())?.get(&token)
         .ok_or("허용되지 않은 파일입니다.")?.read().map_err(|e| e.to_string())
 }
 

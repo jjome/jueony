@@ -1,0 +1,15 @@
+[package]
+name = "jueony-native-storage-tests"
+version = "0.0.0"
+edition = "2021"
+publish = false
+license-file = "../LICENSE.txt"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+sha2 = "=0.10.9"
+tempfile = "=3.27.0"
+
+[workspace]

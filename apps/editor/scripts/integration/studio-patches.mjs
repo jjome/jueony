@@ -37,6 +37,9 @@ settings = replaceOnce(settings, '  constructor() {\n    this.data = this.load()
 settings = replaceOnce(settings, '    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));', '    this.persistence.save(this.data);', 'merge settings save');
 await writeFile(join(root, 'src/core/user-settings.ts'), settings);
 let main = await readFile(join(root, 'src/main.ts'), 'utf8');
+main = "import { rememberSavedFormat } from './jueony/adapters/files/saved-format.ts';\n" + main;
+main = replaceOnce(main, '    const docInfo = await loadDocumentForOpen(data, fileName);',
+  '    const docInfo = await loadDocumentForOpen(data, fileName);\n    rememberSavedFormat(fileHandle, undefined);', 'freshly opened file replaces saved connection format');
 main = replaceOnce(main, 'documentState.installBeforeUnload(window);', 'if (window.parent === window) documentState.installBeforeUnload(window);', 'host owns embedded exit prompt');
 main = replaceOnce(main, 'confirmSaveBeforeReplacingDocument, fileCommands', 'confirmSaveBeforeReplacingDocument, saveCurrentDocument, fileCommands', 'host save import');
 main = replaceOnce(main, "return params.has('url');", "return params.has('url') || params.get('skipRecovery') === '1';", 'tab recovery');
@@ -270,6 +273,13 @@ await writeFile(join(root, 'src/ui/document-title.ts'), documentTitle);
 let fileCommands = (await readFile(join(root, 'src/command/commands/file.ts'), 'utf8')).replace(/\r\n/g, '\n');
 fileCommands = "import { confirmDownload } from '../../jueony/download-save';\n" + fileCommands;
 fileCommands = "import { verifyPreservedExport } from '../../jueony/adapters/rhwp/preservation.ts';\n" + fileCommands;
+fileCommands = "import { rememberSavedFormat, readSavedFormat } from '../../jueony/adapters/files/saved-format.ts';\n" + fileCommands;
+fileCommands = replaceOnce(fileCommands,
+  'async function chooseSaveAsFormat(services: CommandServices): Promise<SaveFormat | null> {',
+  'async function chooseSaveAsFormat(services: CommandServices): Promise<SaveFormat | null> {\n  const savedFormat = readSavedFormat(services.wasm.currentFileHandle);\n  if (savedFormat) return savedFormat;', 'save-as default follows acknowledged output format');
+fileCommands = replaceOnce(fileCommands,
+  "  if (sourceFormat === 'hml') markConvertedHmlSaveHandle(result.handle);",
+  "  rememberSavedFormat(result.handle, saveFormat);\n  if (sourceFormat === 'hml') markConvertedHmlSaveHandle(result.handle);", 'acknowledged save connection format');
 fileCommands = replaceOnce(fileCommands,'  return {\n    blob: new Blob([artifact.bytes as unknown as BlobPart], {',`  const {HwpDocument} = services.wasm.getWasmModuleExports() as typeof import('@wasm/rhwp.js');
   if(format !== 'hml') verifyPreservedExport(services.wasm, artifact.bytes, format, artifact.contentLoss,
     bytes => password === undefined ? new HwpDocument(bytes) : HwpDocument.openWithPassword(bytes,password));
@@ -301,6 +311,12 @@ fileCommands = replaceOnce(fileCommands,
         window.parent.postMessage({ type: 'joouni:new-document' }, location.origin);
       } else services.eventBus.emit('create-new-document');`, 'new document tab');
 await writeFile(join(root, 'src/command/commands/file.ts'), fileCommands);
+let saveTarget = (await readFile(join(root, 'src/command/save-target.ts'), 'utf8')).replace(/\r\n/g, '\n');
+saveTarget = "import { readSavedFormat } from '../jueony/adapters/files/saved-format.ts';\n" + saveTarget;
+saveTarget = replaceOnce(saveTarget,
+  "  const hasConvertedHmlTarget = sourceFormat === 'hml'",
+  "  const savedFormat = readSavedFormat(currentHandle);\n  if (savedFormat) return { format: savedFormat, forceSaveAs: false, suggestedName: fileNameForFormat(fileName, savedFormat) };\n  const hasConvertedHmlTarget = sourceFormat === 'hml'", 'verified output format for repeat saves');
+await writeFile(join(root, 'src/command/save-target.ts'), saveTarget);
 let fileSystem = (await readFile(join(root, 'src/command/file-system-access.ts'), 'utf8')).replace(/\r\n/g, '\n');
 fileSystem = "import { writeSnapshot, rememberFileSnapshot } from '../jueony/save-guard';\n" + fileSystem;
 fileSystem = replaceOnce(fileSystem,

@@ -1,5 +1,7 @@
 # Jueony 전체 작업 체크리스트
 
+먼저 [기능별 종합 진행 현황](jueony-progress.md)에서 영역을 선택한다. 각 기능의 상세 문서로 연결된다.
+
 기준일: 2026-10-15. 원본은 [CSV](jueony-work-checklist.csv), 사용 규칙은 [97번 문서](97-master-work-checklist.md), 검색 화면은 [HTML](jueony-work-checklist.html)이다.
 
 총 425행: 실행 작업 204행과 상위 범위 항목 221행. 범위가 겹치므로 전체 완성률로 나누지 않는다.

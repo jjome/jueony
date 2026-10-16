@@ -4,6 +4,8 @@
 
 ## 어디에서 보는가
 
+- **[기능별 종합 진행 현황](jueony-progress.md)**: 처음 여는 문서다. 영역별 진행 수치와 다음 우선 작업을 보고 16개 상세 기능 문서로 이동한다.
+- [기능 분류 원본](checklist-features.json): 기능별 배치와 관련 문서 연결을 관리한다. 상태·완료조건·근거의 원본은 아래 CSV다.
 - [전체 표](jueony-work-checklist.md): 모든 행과 세 축, 완료조건, 근거를 읽는다.
 - [검색 화면](jueony-work-checklist.html): 작업명·ID·영역으로 찾고 남은 구현·검증·Agent 연결을 각각 필터링한다. 읽기 전용 화면이다.
 - [관리 원본 CSV](jueony-work-checklist.csv): 실제 상태를 수정한다. Excel에서 사용할 수 있는 UTF-8 BOM 파일이다.

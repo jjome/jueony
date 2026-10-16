@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "organizedDate": "2026-10-16",
+  "groups": [
+    {
+      "key": "workspaces",
+      "file": "01-workspaces.md",
+      "title": "업무·채팅·폴더 관리",
+      "description": "업무별 workspace, 독립 채팅, 로컬 폴더 연결과 원본 유지.",
+      "ids": "G005-G008",
+      "related": ["references", "agent", "session"]
+    },
+    {
+      "key": "agent",
+      "file": "02-agent-and-models.md",
+      "title": "AI 연결·Agent 실행",
+      "description": "제공자·모델·인증, 현재 문서 문맥, 진행·취소, 변경 확인과 Agent loop.",
+      "ids": "G074-G083 G086 N024-N032",
+      "related": ["references", "macros", "architecture"]
+    },
+    {
+      "key": "references",
+      "file": "03-references-and-rag.md",
+      "title": "참고 자료·검색·RAG",
+      "description": "즉시 첨부, 자료 격리, 추출·색인·검색·근거와 검색 품질 평가.",
+      "ids": "G009-G011 G084-G085 N033-N037",
+      "related": ["workspaces", "agent", "macros"]
+    },
+    {
+      "key": "macros",
+      "file": "04-macros-and-business.md",
+      "title": "반복 작업·공무원 업무 양식",
+      "description": "문서마당·상용구·기관 양식, 반복 명령, 매크로 기록·재생과 메일 머지.",
+      "ids": "B003-B004 B081 B141-B142 G087-G089 N038-N040",
+      "related": ["agent", "references", "editing"]
+    },
+    {
+      "key": "files",
+      "file": "05-files-storage-recovery.md",
+      "title": "파일·저장·복구·형식 보존",
+      "description": "열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.",
+      "ids": "B001-B002 B005-B006 B009-B011 B014 B021-B022 G065-G073 G090 G092 N001-N002",
+      "working": "HWP 후속 본문 표 저장 보정과 관련 실제 브라우저 검사를 통합 중이다. 현재 CSV 완료 상태에는 추가 반영하지 않았다.",
+      "related": ["session", "tables", "architecture"]
+    },
+    {
+      "key": "editing",
+      "file": "06-editing-and-selection.md",
+      "title": "본문 편집·입력·선택·찾기",
+      "description": "본문 작성·삽입·교체·삭제, IME, 클립보드, 선택·탐색·찾기와 특수 문자.",
+      "ids": "B023-B037 B039-B040 B090 B170 B182 A001-A002 G019 G023-G024",
+      "related": ["formatting", "session", "ui"]
+    },
+    {
+      "key": "formatting",
+      "file": "07-formatting-and-styles.md",
+      "title": "글자·문단·스타일·번호",
+      "description": "글자·문단 모양, 스타일, 목록·개요·탭과 관련 빠른키 및 Agent 명령.",
+      "ids": "B080 B096-B110 B183-B184 G020-G021 G036-G039 N011-N013 N022",
+      "related": ["editing", "pages", "ui"]
+    },
+    {
+      "key": "tables",
+      "file": "08-tables.md",
+      "title": "표·셀·크기·계산",
+      "description": "표 생성·변환·제목 반복·여백·크기·병합·분할·행열·중첩과 계산.",
+      "ids": "B067-B069 B084 B153-B169 B171-B173 G040-G052 N003-N010",
+      "working": "병합 표 행 높이의 Native 수정과 속성 대화상자의 변경 값 보존을 검증 중이다. 병합 행열 Agent 전체 연결은 완료로 표시하지 않는다.",
+      "related": ["files", "stories", "objects"]
+    },
+    {
+      "key": "pages",
+      "file": "09-pages-and-sections.md",
+      "title": "쪽·구역·용지·배경",
+      "description": "용지·여백·다단·구역, 쪽 나누기·복사·삭제, 바탕쪽과 배경.",
+      "ids": "B111-B114 B116-B127 B185-B186 G053-G064",
+      "related": ["stories", "files", "formatting"]
+    },
+    {
+      "key": "stories",
+      "file": "10-headers-notes-fields.md",
+      "title": "머리말·각주·필드·책갈피",
+      "description": "머리말·꼬리말, 각주·미주, 필드·날짜·상호 참조·책갈피·링크.",
+      "ids": "B077-B078 B085-B089 B093-B095 B115",
+      "related": ["session", "pages", "files"]
+    },
+    {
+      "key": "objects",
+      "file": "11-objects.md",
+      "title": "그림·도형·글상자·수식·개체",
+      "description": "개체 생성·편집·캡션·배치·그룹, 차트·수식·OLE와 관련 단축키.",
+      "ids": "B038 B064-B066 B070-B076 B079 B082 B174-B178 G022",
+      "related": ["tables", "stories", "session"]
+    },
+    {
+      "key": "ui",
+      "file": "12-ui-and-shortcuts.md",
+      "title": "화면·메뉴·작업 창·단축키",
+      "description": "한글 UI 통합, 보기·배율·패널·문서 탭, 리본·문맥 메뉴와 키 문맥.",
+      "ids": "B041-B063 B148 B150-B152 B179-B181 G012-G018 N019-N021 N023",
+      "related": ["session", "editing", "formatting"]
+    },
+    {
+      "key": "session",
+      "file": "13-state-and-preferences.md",
+      "title": "상태 저장·환경·선택 복원",
+      "description": "문서·환경·세션의 저장 수명, 커서·선택·스크롤·탭·복구와 재시작.",
+      "ids": "S001-S033 G025-G035 G091 N014-N018",
+      "working": "머리말·각주 story의 서식·소유·문맥 지문을 강화하는 후속 코드를 통합 검증 중이다. 기존 완료 기록과 새 미검증 변경을 구분한다.",
+      "related": ["files", "ui", "stories"]
+    },
+    {
+      "key": "security",
+      "file": "14-security-and-review.md",
+      "title": "보안·개인정보·검토·메모",
+      "description": "암호·배포용·개인정보, 변경 추적·이력·문서 비교·메모의 전체 범위.",
+      "ids": "B092 B128-B136 B146",
+      "related": ["files", "agent", "architecture"]
+    },
+    {
+      "key": "tools",
+      "file": "15-output-and-tools.md",
+      "title": "출력·변환·교정·외부 도구",
+      "description": "인쇄·PDF·접근성 변환·외부 연동, 사전·교정·차례·색인·문서 도구.",
+      "ids": "B007-B008 B012-B013 B015-B020 B083 B091 B137-B140 B143-B145 B147 B149 B187-B188",
+      "related": ["files", "macros", "architecture"]
+    },
+    {
+      "key": "architecture",
+      "file": "16-architecture-and-validation.md",
+      "title": "모듈·실행 기반·배포·최종 검수",
+      "description": "레이어·facade·계약·엔진·고지·실행 묶음과 최종 한글·OS·오프라인 검수.",
+      "ids": "R00-R15 G001-G004 N041-N045",
+      "related": ["files", "agent", "session"]
+    }
+  ]
+}

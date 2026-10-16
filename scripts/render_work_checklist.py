@@ -61,6 +61,7 @@ def stats(rows):
 
 def markdown(rows, counts):
     text = ["# Jueony 전체 작업 체크리스트", "",
+            "먼저 [기능별 종합 진행 현황](jueony-progress.md)에서 영역을 선택한다. 각 기능의 상세 문서로 연결된다.", "",
             "기준일: 2026-10-15. 원본은 [CSV](jueony-work-checklist.csv), 사용 규칙은 "
             "[97번 문서](97-master-work-checklist.md), 검색 화면은 [HTML](jueony-work-checklist.html)이다.", "",
             f"총 {counts['rows']}행: 실행 작업 {counts['taskRows']}행과 상위 범위 항목 "
@@ -96,7 +97,7 @@ input,select{font:inherit;padding:8px;border:1px solid #a9bacb;border-radius:5px
 table{border-collapse:collapse;width:100%;margin-top:16px}td,th{padding:10px;text-align:left;border-bottom:1px solid #dde5ee;vertical-align:top}
 th{background:#edf3f8}td:nth-child(1){white-space:nowrap}small{color:#53697b}.done{background:#eef8ef}a{color:#12649e}
 details p{margin:4px 0}.status{min-width:115px}#count{margin-left:8px;font-weight:600}</style>
-<header><h1>Jueony 구현 · 검증 · Agent 연결</h1><p>2026-10-15 기준. CSV가 원본이며 이 화면은 검색용입니다.
+<header><h1>Jueony 구현 · 검증 · Agent 연결</h1><p><a href="jueony-progress.md">기능별 종합 진행 현황</a> · 2026-10-15 기준. CSV가 원본이며 이 화면은 검색용입니다.
 상위 메뉴 연결을 완료로 계산하지 않습니다. 자동 검사 통과와 한글 직접 비교는 별개입니다.
 <a href="97-master-work-checklist.md">사용 규칙</a> · <a href="jueony-work-checklist.csv">CSV</a></p>
 <input id="query" aria-label="검색" placeholder="작업명·ID·명령·남은 제한 검색">
@@ -129,6 +130,8 @@ def main():
     outputs = {DOCS / "jueony-work-checklist.md": markdown(rows, counts),
                DOCS / "jueony-work-checklist.html": page(rows, counts),
                DOCS / "evidence/master-checklist-2026-10-15/counts.json": json.dumps(counts, ensure_ascii=False, indent=2) + "\n"}
+    from feature_checklists import feature_outputs
+    outputs.update(feature_outputs(rows, ROOT, LABELS, KINDS, complete, counts))
     for path, content in outputs.items():
         if args.check:
             assert path.read_text(encoding="utf-8") == content, "CSV와 표시 파일 불일치: " + str(path)

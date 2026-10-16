@@ -1,5 +1,9 @@
 # Jueony — 공무원용 AI 문서 편집기
 
+## [전체 진행 현황 · 기능별 작업 문서 바로가기](docs/jueony-progress.md)
+
+**16개 기능별 문서의 구현 · 검증 · Agent 연결 상태와 다음 작업을 한눈에 확인합니다.**
+
 폐쇄망 Windows PC에서 업무별 자료와 대화를 관리하고, 가운데 채팅의 요청으로 오른쪽 HWP/HWPX 문서를 AI와 함께 직접 편집하는 프로그램을 만든다. **현재는 본문·단순 표 행/열·서식·쪽 설정과 한글 단축키를 연결한 MVP 개발판**이다. 한글 2024 전체 기능·화면·파일 호환성 100%를 달성한 상태는 아니다. [통합 기반 구현 결과](docs/44-editor-stages-result.md), [쪽 편집 후속 구현·검증](docs/59-empty-body-section-removal.md), [설치 한글 2024와의 비교·미구현 목록](docs/29-hangul-2024-comparison.md)을 참고한다. 다음 신규 기능 병렬 구현에 앞서 [레이어·모듈 리팩터링 계획](docs/30-layered-modular-refactor-plan.md)과 [Facade 계약](docs/31-facade-contracts.md)의 핵심 모듈 첫 이관을 적용했다. [리팩터링 적용 결과와 남은 이관](docs/32-modular-refactor-result.md)을 확인한다.
 
 ## 이용허락
@@ -9,6 +13,8 @@
 제3자 오픈소스·글꼴 등에는 각각의 원래 라이선스가 우선한다. [제3자 고지](THIRD_PARTY_NOTICES.md)와 [적용 기록](docs/09-licensing.md)을 참고한다. 기관용 개발이라는 제품 목표가 기관의 무료 사용을 허가하는 것은 아니다. 기관 사용은 별도 계약 대상으로 둔다.
 
 ## 전체 작업 관리
+
+먼저 **[기능별 종합 진행 현황](docs/jueony-progress.md)**을 연다. 16개 기능별 문서에서 구현·검증·Agent 연결, 남은 작업과 근거를 확인할 수 있다. 표·서식·쪽 등의 Agent 명령도 해당 기능 문서에 함께 정리했다.
 
 앞으로는 [전체 작업 체크리스트](docs/jueony-work-checklist.md)의 **구현·검증·Agent 연결**을 각각 갱신한다. [검색 화면](docs/jueony-work-checklist.html)에서 남은 항목을 필터링하고 [CSV](docs/jueony-work-checklist.csv)를 원본으로 관리한다. 425개 항목은 한글 상위 기능 188개·상태 범위 33개·세부 실행 작업 204개이며, 중복 범위와 부분 검증을 전체 완성률로 계산하지 않는다. [완료 규칙과 다음 순서](docs/97-master-work-checklist.md)를 따른다. MCP 등록은 이번 완료 기준에서 제외한다.
 

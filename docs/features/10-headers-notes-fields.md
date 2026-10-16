@@ -1,0 +1,347 @@
+# 머리말·각주·필드·책갈피
+
+[← 종합 진행 현황](<../jueony-progress.md>) · [전체 검색](<../jueony-work-checklist.html>) · [완료 규칙](<../97-master-work-checklist.md>)
+
+머리말·꼬리말, 각주·미주, 필드·날짜·상호 참조·책갈피·링크.
+
+## 진행 요약
+
+실행 작업 **8개**, 상위 범위 **11개**. CSV의 기록을 기능별로 표시한 문서다.
+
+| 축 | 실행 작업 상태 |
+| --- | --- |
+| 구현 | 완료 8/8 · 부분 0 |
+| 검증 | 완료 0/8 · 부분 8 |
+| Agent 연결 | 연결 8/8 · 부분 0 |
+
+☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
+
+상위 범위는 세 축 완료 **0/11개**다. 세부 작업 완료 수와 분리해서 읽는다.
+
+| 축 | 상위 범위 상태 |
+| --- | --- |
+| 구현 | 완료 0/11 · 부분 8 · 미구현 3 |
+| 검증 | 완료 0/11 · 부분 2 · 미검증 9 |
+| Agent 연결 | 연결 0/11 · 부분 2 · 미연결 9 |
+
+## 먼저 할 일
+
+- **검증** [A018](<10-headers-notes-fields.md#a018>) **본문 점 책갈피 추가** — 지원 범위별 한글 비교와 실제 모델 품질 확인; 원본 확장은 별도 작업.
+- **검증** [A019](<10-headers-notes-fields.md#a019>) **본문 책갈피 이름 변경** — 지원 범위별 한글 비교와 실제 모델 품질 확인; 원본 확장은 별도 작업.
+- **검증** [A020](<10-headers-notes-fields.md#a020>) **본문 책갈피 삭제** — 지원 범위별 한글 비교와 실제 모델 품질 확인; 원본 확장은 별도 작업.
+
+## 남은 실행 작업 (8)
+
+항목 ID를 누르면 아래의 완료조건·근거를 펼쳐 확인할 수 있다.
+
+| ID | 항목 | 구현 | 검증 | Agent 연결 |
+| --- | --- | --- | --- | --- |
+| [A018](<10-headers-notes-fields.md#a018>) P1 | 본문 점 책갈피 추가 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
+| [A019](<10-headers-notes-fields.md#a019>) P1 | 본문 책갈피 이름 변경 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
+| [A020](<10-headers-notes-fields.md#a020>) P1 | 본문 책갈피 삭제 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
+| [A021](<10-headers-notes-fields.md#a021>) P1 | 단순 머리말/꼬리말 정의 생성 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
+| [A022](<10-headers-notes-fields.md#a022>) P1 | 단순 머리말/꼬리말 삭제 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
+| [A023](<10-headers-notes-fields.md#a023>) P1 | 머리말/꼬리말 문단 서식 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
+| [A024](<10-headers-notes-fields.md#a024>) P1 | 머리말/꼬리말 글자 서식 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
+| [A025](<10-headers-notes-fields.md#a025>) P1 | 머리말/꼬리말 내용 변경 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
+
+## 상위 기능·상태 범위 (11)
+
+항목 ID를 누르면 아래의 완료조건·근거를 펼쳐 확인할 수 있다.
+
+| ID | 항목 | 구현 | 검증 | Agent 연결 |
+| --- | --- | --- | --- | --- |
+| [B077](<10-headers-notes-fields.md#b077>) P2 | 필드 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B078](<10-headers-notes-fields.md#b078>) P2 | 양식 개체 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B085](<10-headers-notes-fields.md#b085>) P2 | 각주 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B086](<10-headers-notes-fields.md#b086>) P2 | 미주 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B087](<10-headers-notes-fields.md#b087>) P1 | 각주·미주 모양 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B088](<10-headers-notes-fields.md#b088>) P2 | 날짜·시간·파일명 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
+| [B089](<10-headers-notes-fields.md#b089>) P2 | 덧말 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B093](<10-headers-notes-fields.md#b093>) P2 | 상호 참조 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B094](<10-headers-notes-fields.md#b094>) P2 | 책갈피 | ◐ 부분 | ☐ 미검증 | ◐ 부분 |
+| [B095](<10-headers-notes-fields.md#b095>) P2 | 하이퍼링크 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B115](<10-headers-notes-fields.md#b115>) P1 | 머리말·꼬리말 | ◐ 부분 | ◐ 부분 | ◐ 부분 |
+
+## 항목별 완료조건·근거
+
+각 항목은 펼쳐서 읽는다. 상태와 근거는 CSV에서 관리한다.
+
+<details id="b077">
+<summary>B077 · 필드</summary>
+
+- 종류: 한글 상위 기능 · 우선순위: P2.
+- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
+- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
+- 다음 작업: 누름틀·양식 종류별 보존 검수
+- UI 명령: `insert:field`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
+- 원래 기록: `WIRED;NOT_RUN`
+
+</details>
+
+<details id="b078">
+<summary>B078 · 양식 개체</summary>
+
+- 종류: 한글 상위 기능 · 우선순위: P2.
+- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
+- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
+- 다음 작업: 양식 개체 신규 생성/속성 UI 없음. 기존 Form 읽기·값 설정 API 존재와 구분.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
+- 원래 기록: `MISSING;NOT_RUN`
+
+</details>
+
+<details id="b085">
+<summary>B085 · 각주</summary>
+
+- 종류: 한글 상위 기능 · 우선순위: P2.
+- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
+- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
+- 다음 작업: 내용·번호·쪽 위치 보존
+- UI 명령: `insert:footnote`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
+- 원래 기록: `WIRED;NOT_RUN`
+
+</details>
+
+<details id="b086">
+<summary>B086 · 미주</summary>
+
+- 종류: 한글 상위 기능 · 우선순위: P2.
+- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
+- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
+- 다음 작업: 각주 변환 및 저장 별도
+- UI 명령: `insert:endnote`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
+- 원래 기록: `WIRED;NOT_RUN`
+
+</details>
+
+<details id="b087">
+<summary>B087 · 각주·미주 모양</summary>
+
+- 종류: 한글 상위 기능 · 우선순위: P1.
+- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
+- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
+- 다음 작업: 각주·미주 입력/일부 모양 있음. 미주 내용 번호 작은 크기 옵션 비활성.
+- UI 명령: `insert:endnote-shape`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
+- 원래 기록: `PARTIAL;NOT_RUN`
+
+</details>
+
+<details id="b088">
+<summary>B088 · 날짜·시간·파일명</summary>
+
+- 종류: 한글 상위 기능 · 우선순위: P2.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
+- 다음 작업: 일반 날짜 문자열 5형식·마지막 성공 형식 재실행 복원·취소·충돌·undo·저장·실제 한글 재열기 통과. 자동 갱신 코드·사용자 형식·표/특수 영역 미지원. 형식 복원 정책의 실제 한글 비교 남음.
+- UI 명령: `ext:jueony-calendar-stamp; page:insert-field-filename`
+- 근거: [result.json](<../evidence/navigation-history-2026-10-12/verified/result.json>) · [native-calendar-reopen.json](<../evidence/navigation-history-2026-10-12/native-calendar-reopen.json>) · [result.json](<../evidence/calendar-format-state-2026-10-12/verified/result.json>)
+- 원래 기록: `PARTIAL;CALENDAR_STRING_NATIVE_REOPEN_PASS_ONLY`
+
+</details>
+
+<details id="b089">
+<summary>B089 · 덧말</summary>
+
+- 종류: 한글 상위 기능 · 우선순위: P2.
+- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
+- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
+- 다음 작업: 발음/루비 표현 보존 별도
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
+- 원래 기록: `MISSING;NOT_RUN`
+
+</details>
+
+<details id="b093">
+<summary>B093 · 상호 참조</summary>
+
+- 종류: 한글 상위 기능 · 우선순위: P2.
+- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
+- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
+- 다음 작업: 필드 업데이트 포함 구현 필요
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
+- 원래 기록: `MISSING;NOT_RUN`
+
+</details>
+
+<details id="b094">
+<summary>B094 · 책갈피</summary>
+
+- 종류: 한글 상위 기능 · 우선순위: P2.
+- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ◐ 부분.
+- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
+- 다음 작업: 이름·위치·숫자 바로키 별도
+- UI 명령: `insert:bookmark`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
+- 원래 기록: `WIRED;NOT_RUN`
+
+</details>
+
+<details id="b095">
+<summary>B095 · 하이퍼링크</summary>
+
+- 종류: 한글 상위 기능 · 우선순위: P2.
+- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
+- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
+- 다음 작업: 외부 URL 정책과 내부 이동 검사
+- UI 명령: `insert:hyperlink`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
+- 원래 기록: `WIRED;NOT_RUN`
+
+</details>
+
+<details id="b115">
+<summary>B115 · 머리말·꼬리말</summary>
+
+- 종류: 한글 상위 기능 · 우선순위: P1.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
+- 다음 작업: 통합 창과 양쪽·홀수·짝수 생성·기존 내용 보존·undo 구현. 한글 대화상자 전체와 외관 비교는 남음.
+- UI 명령: `page:header-footer-dialog`
+- 근거: [parity-result.json](<../evidence/features-2026-10-11/parity-result.json>) · [editor-tests.txt](<../evidence/features-2026-10-11/editor-tests.txt>)
+- 원래 기록: `PARTIAL;BROWSER_TESTED_NATIVE_PENDING`
+
+</details>
+
+<details id="a018">
+<summary>A018 · 본문 점 책갈피 추가</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 현재 계약이 허용하는 조회·대상·파일형식·보호·크기·묶음 제한 안의 내부 Agent 연결. 모든 원본/한글 기능을 지원한다는 의미 아님.
+- 다음 작업: 지원 범위별 한글 비교와 실제 모델 품질 확인; 원본 확장은 별도 작업.
+- 상위 항목: [B094](<10-headers-notes-fields.md#b094>) 책갈피
+- Agent 명령: `add_bookmark`
+- 근거: [73-agent-body-bookmarks.md](<../73-agent-body-bookmarks.md>) · [wire-schema.mjs](<../../apps/editor/src/modules/document/public/wire-schema.mjs>)
+- 원래 기록: `CURRENT_46_KIND_CONTRACT`
+
+</details>
+
+<details id="a019">
+<summary>A019 · 본문 책갈피 이름 변경</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 현재 계약이 허용하는 조회·대상·파일형식·보호·크기·묶음 제한 안의 내부 Agent 연결. 모든 원본/한글 기능을 지원한다는 의미 아님.
+- 다음 작업: 지원 범위별 한글 비교와 실제 모델 품질 확인; 원본 확장은 별도 작업.
+- 상위 항목: [B094](<10-headers-notes-fields.md#b094>) 책갈피
+- Agent 명령: `rename_bookmark`
+- 근거: [73-agent-body-bookmarks.md](<../73-agent-body-bookmarks.md>) · [wire-schema.mjs](<../../apps/editor/src/modules/document/public/wire-schema.mjs>)
+- 원래 기록: `CURRENT_46_KIND_CONTRACT`
+
+</details>
+
+<details id="a020">
+<summary>A020 · 본문 책갈피 삭제</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 현재 계약이 허용하는 조회·대상·파일형식·보호·크기·묶음 제한 안의 내부 Agent 연결. 모든 원본/한글 기능을 지원한다는 의미 아님.
+- 다음 작업: 지원 범위별 한글 비교와 실제 모델 품질 확인; 원본 확장은 별도 작업.
+- 상위 항목: [B094](<10-headers-notes-fields.md#b094>) 책갈피
+- Agent 명령: `delete_bookmark`
+- 근거: [73-agent-body-bookmarks.md](<../73-agent-body-bookmarks.md>) · [wire-schema.mjs](<../../apps/editor/src/modules/document/public/wire-schema.mjs>)
+- 원래 기록: `CURRENT_46_KIND_CONTRACT`
+
+</details>
+
+<details id="a021">
+<summary>A021 · 단순 머리말/꼬리말 정의 생성</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 현재 계약이 허용하는 조회·대상·파일형식·보호·크기·묶음 제한 안의 내부 Agent 연결. 모든 원본/한글 기능을 지원한다는 의미 아님.
+- 다음 작업: 지원 범위별 한글 비교와 실제 모델 품질 확인; 원본 확장은 별도 작업.
+- 상위 항목: [B115](<10-headers-notes-fields.md#b115>) 머리말·꼬리말
+- Agent 명령: `create_header_footer`
+- 근거: [72-agent-header-creation.md](<../72-agent-header-creation.md>) · [wire-schema.mjs](<../../apps/editor/src/modules/document/public/wire-schema.mjs>)
+- 원래 기록: `CURRENT_46_KIND_CONTRACT`
+
+</details>
+
+<details id="a022">
+<summary>A022 · 단순 머리말/꼬리말 삭제</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 현재 계약이 허용하는 조회·대상·파일형식·보호·크기·묶음 제한 안의 내부 Agent 연결. 모든 원본/한글 기능을 지원한다는 의미 아님.
+- 다음 작업: 지원 범위별 한글 비교와 실제 모델 품질 확인; 원본 확장은 별도 작업.
+- 상위 항목: [B115](<10-headers-notes-fields.md#b115>) 머리말·꼬리말
+- Agent 명령: `delete_header_footer`
+- 근거: [71-agent-header-deletion.md](<../71-agent-header-deletion.md>) · [wire-schema.mjs](<../../apps/editor/src/modules/document/public/wire-schema.mjs>)
+- 원래 기록: `CURRENT_46_KIND_CONTRACT`
+
+</details>
+
+<details id="a023">
+<summary>A023 · 머리말/꼬리말 문단 서식</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 현재 계약이 허용하는 조회·대상·파일형식·보호·크기·묶음 제한 안의 내부 Agent 연결. 모든 원본/한글 기능을 지원한다는 의미 아님.
+- 다음 작업: 지원 범위별 한글 비교와 실제 모델 품질 확인; 원본 확장은 별도 작업.
+- 상위 항목: [B115](<10-headers-notes-fields.md#b115>) 머리말·꼬리말
+- Agent 명령: `format_header_footer_paragraph`
+- 근거: [70-agent-header-paragraph.md](<../70-agent-header-paragraph.md>) · [wire-schema.mjs](<../../apps/editor/src/modules/document/public/wire-schema.mjs>)
+- 원래 기록: `CURRENT_46_KIND_CONTRACT`
+
+</details>
+
+<details id="a024">
+<summary>A024 · 머리말/꼬리말 글자 서식</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 현재 계약이 허용하는 조회·대상·파일형식·보호·크기·묶음 제한 안의 내부 Agent 연결. 모든 원본/한글 기능을 지원한다는 의미 아님.
+- 다음 작업: 지원 범위별 한글 비교와 실제 모델 품질 확인; 원본 확장은 별도 작업.
+- 상위 항목: [B115](<10-headers-notes-fields.md#b115>) 머리말·꼬리말
+- Agent 명령: `format_header_footer`
+- 근거: [69-agent-header-font-format.md](<../69-agent-header-font-format.md>) · [wire-schema.mjs](<../../apps/editor/src/modules/document/public/wire-schema.mjs>)
+- 원래 기록: `CURRENT_46_KIND_CONTRACT`
+
+</details>
+
+<details id="a025">
+<summary>A025 · 머리말/꼬리말 내용 변경</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 현재 계약이 허용하는 조회·대상·파일형식·보호·크기·묶음 제한 안의 내부 Agent 연결. 모든 원본/한글 기능을 지원한다는 의미 아님.
+- 다음 작업: 지원 범위별 한글 비교와 실제 모델 품질 확인; 원본 확장은 별도 작업.
+- 상위 항목: [B115](<10-headers-notes-fields.md#b115>) 머리말·꼬리말
+- Agent 명령: `set_header_footer_text`
+- 근거: [68-agent-header-footer.md](<../68-agent-header-footer.md>) · [wire-schema.mjs](<../../apps/editor/src/modules/document/public/wire-schema.mjs>)
+- 원래 기록: `CURRENT_46_KIND_CONTRACT`
+
+</details>
+
+## 함께 보는 기능
+
+- [상태 저장·환경·선택 복원](<13-state-and-preferences.md>)
+- [쪽·구역·용지·배경](<09-pages-and-sections.md>)
+- [파일·저장·복구·형식 보존](<05-files-storage-recovery.md>)
+
+이 파일은 자동 생성한다. 상태는 [CSV](<../jueony-work-checklist.csv>)에서, 기능 배치는 [분류 원본](<../checklist-features.json>)에서 수정한다.

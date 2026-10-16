@@ -82,11 +82,23 @@ class FeatureChecklistTests(unittest.TestCase):
     def test_each_feature_has_its_own_overview_table(self):
         content = self.outputs[checklist.DOCS / "jueony-progress.md"]
         tables = features.validate_markdown_tables(content)
-        self.assertEqual(len(tables), 1 + len(self.groups))
-        self.assertEqual([t["columns"] for t in tables], [4] + [3] * len(self.groups))
+        self.assertEqual(len(tables), 2 + len(self.groups))
+        self.assertEqual([t["columns"] for t in tables], [5, 4] + [3] * len(self.groups))
         for group in self.groups:
             section = content.split(f'<a id="feature-{group["key"]}"></a>', 1)[1].split('<a id="feature-', 1)[0]
             self.assertEqual(len(features.validate_markdown_tables(section)), 1)
+
+    def test_dashboard_is_first_and_readme_generated_block_stays_in_sync(self):
+        overview = self.outputs[checklist.DOCS / "jueony-progress.md"]
+        readme = self.outputs[checklist.ROOT / "README.md"]
+        block = readme.split("<!-- jueony-progress:start -->")[1].split("<!-- jueony-progress:end -->")[0]
+        self.assertTrue(overview.splitlines()[2].startswith("| 기능 |"))
+        self.assertEqual(features.validate_markdown_tables(block), [{"columns": 5, "rows": len(self.groups) + 1}])
+        for group in self.groups:
+            self.assertIn(f"[{group['title']}]", block)
+            self.assertIn(f"[{group['title']}]", overview.split("문서 구성일:")[0])
+        self.assertEqual(readme.split("<!-- jueony-progress:end -->")[1],
+                         (checklist.ROOT / "README.md").read_text(encoding="utf-8").split("<!-- jueony-progress:end -->")[1])
 
     def test_small_work_tables_keep_parent_children_and_all_rows_once(self):
         seen = []
@@ -112,6 +124,8 @@ class FeatureChecklistTests(unittest.TestCase):
         for source, content in self.outputs.items():
             if source.suffix != ".md":
                 continue
+            if source == checklist.ROOT / "README.md":
+                content = content.split("<!-- jueony-progress:start -->")[1].split("<!-- jueony-progress:end -->")[0]
             for angle, ordinary in re.findall(r'\[[^\]]+\]\((?:<([^>]+)>|([^\s)]+))\)', content):
                 href = unquote(angle or ordinary)
                 path, _, anchor = href.partition("#")

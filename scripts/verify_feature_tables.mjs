@@ -18,7 +18,7 @@ assert.equal(marked.lexer(old).filter(t=>t.type==='table').length,1,'Prior malfo
 const results=[];
 for(const file of files){
  const md=await readFile(file,'utf8'), tables=marked.lexer(md).filter(t=>t.type==='table');
- const expected=file.endsWith('jueony-progress.md')?17:undefined;
+ const expected=file.endsWith('jueony-progress.md')?index.groups.length+2:undefined;
  if(expected)assert.equal(tables.length,expected);else{
   const rowIds=tables.flatMap(t=>t.rows).flatMap(r=>r.slice(0,1)).flatMap(c=>[...c.text.matchAll(/\[([A-Z]\d+)\]/g)].map(m=>m[1]));
   const group=index.groups.find(g=>file.endsWith(g.file));assert.deepEqual([...rowIds].sort(),[...group.ids].sort());
@@ -32,9 +32,10 @@ const browser=await puppeteer.launch({executablePath:process.env.JUEONY_TEST_BRO
 const page=await browser.newPage();
 try{
  for(const result of results){await page.goto(pathToFileURL(result.preview).href);const counts=await page.evaluate(()=>[...document.querySelectorAll('table')].map(t=>({columns:t.querySelectorAll('thead th').length,rows:t.querySelectorAll('tbody tr').length,consistent:[...t.querySelectorAll('tbody tr')].every(r=>r.cells.length===t.querySelectorAll('thead th').length)})));assert.deepEqual(counts.map(c=>c.columns),result.headerColumns);assert.ok(counts.every(c=>c.consistent));result.browserTables=counts;delete result.preview;}
+ await page.goto(pathToFileURL(resolve(out,'jueony-progress.html')).href);await page.screenshot({path:resolve(evidence,'overview-dashboard.png'),fullPage:false});
  await page.goto(pathToFileURL(resolve(out,'jueony-progress.html')).href+'#feature-tables');await page.screenshot({path:resolve(evidence,'overview-table.png')});
  await page.goto(pathToFileURL(resolve(out,'08-tables.html')).href+'#work-10');await page.screenshot({path:resolve(evidence,'table-functions.png')});
  for(const width of [620,1100]){await page.setViewport({width,height:850});const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth);assert.equal(overflow,false,'Table preview overflow at '+width);}
 }finally{await browser.close();}
-await writeFile(resolve(evidence,'table-rendering.json'),JSON.stringify({sourceCommitBefore:'c09d579',parser:'bundled marked GFM',browser:'headless Microsoft Edge',priorOverviewRecognizedTables:1,overviewRecognizedTables:17,documents:results.length,rowIdsPreserved:index.rowCount,smallWorkTableLimit:8,viewportWidths:[620,1100],results},null,2));
+await writeFile(resolve(evidence,'table-rendering.json'),JSON.stringify({sourceCommitBefore:'c09d579',parser:'bundled marked GFM',browser:'headless Microsoft Edge',priorOverviewRecognizedTables:1,overviewRecognizedTables:index.groups.length+2,documents:results.length,rowIdsPreserved:index.rowCount,smallWorkTableLimit:8,viewportWidths:[620,1100],results},null,2));
 console.log(JSON.stringify({documents:results.length,tables:results.reduce((n,r)=>n+r.tableCount,0),rowIds:index.rowCount,passed:true}));

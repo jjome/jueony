@@ -172,7 +172,37 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
         href = Path(os.path.relpath(target, current.parent)).as_posix() + "#" + row["id"].lower()
         return f"[{row['id']}](<{href}>)"
 
-    text = ["# Jueony 기능별 진행 현황", "",
+    def dashboard(current):
+        lines = ["| 기능 | 구현 완료 | 검증 완료 | Agent 연결 | 현재 상황 · 다음 작업 |",
+                 "| --- | --- | --- | --- | --- |"]
+        for group in groups:
+            items = grouped[group["key"]]
+            tasks = [r for r in items if r["kind"] == "TASK"]
+            scope = tasks or items
+            def value(field, done):
+                states = collections.Counter(r[field] for r in scope)
+                total = len(scope) - states["NA"]
+                if not total:
+                    return "해당 없음"
+                return ("상위 " if not tasks else "") + f"{states[done]}/{total}" + (f" · 부분 {states['PARTIAL']}" if states["PARTIAL"] else "")
+            pending = priority_tasks(items, complete)[:1]
+            next_work = (f"{next_axis(pending[0])} " + task_link(pending[0], current) + " " + escaped(pending[0]["task"])) if pending else "상세 작업 분해 필요" if not tasks else "기록된 작업 완료"
+            if group.get("working"):
+                next_work = "**통합 검증 중** · " + next_work
+            rollups = [r for r in items if r["kind"] != "TASK"]
+            upper = f"<br>상위 완료 {sum(complete(r) for r in rollups)}/{len(rollups)}" if rollups else ""
+            lines.append(f"| {local_link(group['title'], paths[group['key']], current)}{upper} | "
+                         f"{value('implementation', 'DONE')} | {value('verification', 'DONE')} | "
+                         f"{value('agent', 'CONNECTED')} | {next_work} |")
+        lines += [f"| **전체 실행 작업** | **{counts['implementation'].get('DONE', 0)}/{counts['taskRows']}** | "
+                  f"**{counts['verification'].get('DONE', 0)}/{counts['taskRows']}** | "
+                  f"**{counts['agent'].get('CONNECTED', 0)}/{counts['taskRows'] - counts['agent'].get('NA', 0)}** | "
+                  f"세 축 완료 **{counts['completedTaskRows']}개** |", "",
+                  "숫자는 **완료·연결 / 해당 세부 실행 작업 수**다. ‘상위’는 상세 작업이 아직 없는 영역의 상위 범위 집계다. "
+                  "다른 행의 세부 작업 수와 합산하지 않는다. 전체 기능 완성률이 아니며, 한글 직접 비교와 미검증 변경은 완료에 포함하지 않는다.", ""]
+        return lines
+
+    text = ["# Jueony 기능별 진행 현황", ""] + dashboard(overview) + [
             f"문서 구성일: {config['organizedDate']}. 진행 상태는 검수한 [CSV](jueony-work-checklist.csv)의 기록을 사용한다. "
             "상태를 바꿀 때 CSV를 수정하고 문서를 다시 생성한다.", "",
             "## 현재 집계", "",
@@ -228,6 +258,13 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
              "[완료 규칙](97-master-work-checklist.md) · [전체 검색](jueony-work-checklist.html) · "
              "[전체 원문](jueony-work-checklist.md) · [기능 분류 원본](checklist-features.json)", ""]
     outputs[overview] = "\n".join(text)
+    readme = root / "README.md"
+    start, end = "<!-- jueony-progress:start -->", "<!-- jueony-progress:end -->"
+    readme_text = readme.read_text(encoding="utf-8")
+    assert readme_text.count(start) == readme_text.count(end) == 1, "README 진행표 경계 확인 필요"
+    before, remaining = readme_text.split(start)
+    _, after = remaining.split(end)
+    outputs[readme] = before + start + "\n\n" + "\n".join(dashboard(readme)) + "\n" + end + after
     directory_index = docs / "features" / "README.md"
     directory_lines = ["# 기능별 작업 문서", "",
                        local_link("종합 진행 현황", overview, directory_index) +

@@ -1,0 +1,70 @@
+--- a/src/parser/hwpx/header.rs
++++ b/src/parser/hwpx/header.rs
+@@ -1281,6 +1281,9 @@
+     let mut in_hwpunitchar_case = false;
+     let mut in_default = false;
+     let mut found_case = false;
++    let mut in_paragraph_case = false;
++    let mut case_heading = None;
++    let mut default_heading = None;
+     // default 값을 임시 저장 (case가 없을 때 폴백)
+     let mut def_margin_left: Option<i32> = None;
+     let mut def_margin_right: Option<i32> = None;
+@@ -1312,9 +1315,19 @@
+                         if is_hwpunitchar {
+                             in_hwpunitchar_case = true;
+                         }
++                        in_paragraph_case = ce.attributes().flatten().any(|attr|
++                            local_name(attr.key.as_ref().as_bytes()) == b"required-namespace"
++                                && attr_str(&attr) == "http://www.hancom.co.kr/hwpml/2016/paragraph");
+                     }
+                     b"default" => {
+                         in_default = true;
++                    }
++                    b"heading" if in_paragraph_case || in_default => {
++                        let mut heading = ParaShape::default();
++                        parse_para_shape_child(ce, &mut heading);
++                        let value = (heading.head_type, heading.numbering_id, heading.para_level);
++                        if in_paragraph_case && case_heading.is_none() { case_heading = Some(value); }
++                        else if in_default && default_heading.is_none() { default_heading = Some(value); }
+                     }
+                     _ => {}
+                 }
+@@ -1322,6 +1335,16 @@
+             Ok(Event::Empty(ref ce)) => {
+                 let cname = ce.name();
+                 let local = local_name(cname.as_ref());
++                // Hancom 2024 keeps extended outline levels in a supported
++                // paragraph-2016 case, with NONE/0 only as legacy fallback.
++                // Choose that heading independently of the margin-unit switch.
++                if local == b"heading" && (in_paragraph_case || in_default) {
++                    let mut heading = ParaShape::default();
++                    parse_para_shape_child(ce, &mut heading);
++                    let value = (heading.head_type, heading.numbering_id, heading.para_level);
++                    if in_paragraph_case && case_heading.is_none() { case_heading = Some(value); }
++                    else if in_default && default_heading.is_none() { default_heading = Some(value); }
++                }
+                 if in_hwpunitchar_case || in_default {
+                     match local {
+                         b"margin" | b"intent" | b"left" | b"right" | b"prev" | b"next" => {
+@@ -1438,6 +1461,7 @@
+                 match local {
+                     b"case" => {
+                         in_hwpunitchar_case = false;
++                        in_paragraph_case = false;
+                     }
+                     b"default" => {
+                         in_default = false;
+@@ -1451,6 +1475,12 @@
+             _ => {}
+         }
+         buf.clear();
++    }
++
++    if let Some((head_type, numbering_id, para_level)) = case_heading.or(default_heading) {
++        ps.head_type = head_type;
++        ps.numbering_id = numbering_id;
++        ps.para_level = para_level;
+     }
+ 
+     // HwpUnitChar case가 없으면 default 값 적용

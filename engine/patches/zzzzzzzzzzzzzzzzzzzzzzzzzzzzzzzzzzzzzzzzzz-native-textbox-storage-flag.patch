@@ -1,0 +1,15 @@
+--- a/src/document_core/commands/object_ops/shape.rs
++++ b/src/document_core/commands/object_ops/shape.rs
+@@ -1322,7 +1322,11 @@
+                 current_width: width,
+                 current_height: height,
+                 local_file_version: 1,
+-                flip: 0x00080000, // 한컴 기본값
++                // Hancom's native text-box storage discriminator is bit24.
++                // Bit19 is rotate-image, not the text-box discriminator; using
++                // it alone makes freshly generated HWP text boxes unreadable.
++                // Existing parsed shapes and non-textbox/group flags stay intact.
++                flip: if has_textbox { 0x0100_0000 } else { 0x0008_0000 },
+                 rotation_center: crate::model::Point {
+                     x: (width / 2) as i32,
+                     y: (height / 2) as i32,

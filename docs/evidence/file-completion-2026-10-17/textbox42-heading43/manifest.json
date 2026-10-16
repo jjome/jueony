@@ -1,0 +1,131 @@
+{
+  "scope": "42/43 private candidate, final combined engine pending",
+  "nativeTests": 6,
+  "wasmTests": 32,
+  "actualHancomNewHwpAlignments": 3,
+  "actualSemanticDifferences": [
+    0,
+    0,
+    0
+  ],
+  "actualGeometryDifferences": [
+    0,
+    0,
+    0
+  ],
+  "geometryTolerance": 0.2,
+  "ownDocuments": true,
+  "containsFonts": false,
+  "limits": [
+    "Final merged engine and native exe still require separate validation.",
+    "No claim of full Hancom compatibility.",
+    "HWPX NONE shadow omission is a separate unresolved serializer defect."
+  ],
+  "files": [
+    {
+      "name": "alignment-fourteen.json",
+      "bytes": 11318,
+      "sha256": "fb9f1d12b444aca80f96b8a6bb5812aa9cb656149232ff249dd87b2e6c90e4bf"
+    },
+    {
+      "name": "baseline56-storage-failure.json",
+      "bytes": 13408,
+      "sha256": "6c037f00d57568b3866308f17d1c34ae4ca7ea6b93b964f05d333947f67d89e7"
+    },
+    {
+      "name": "Bottom-hancom-comparison.json",
+      "bytes": 12536,
+      "sha256": "df401d3bff88cac511e82b256de1d73923f093f0a513ec507b492747ea6d745a"
+    },
+    {
+      "name": "Bottom-hancom.hwp",
+      "bytes": 14848,
+      "sha256": "002c595a97cd8f7794f39974a58a4fe2005ffc9a0223eb08539419151fff2877"
+    },
+    {
+      "name": "Bottom-hwp-hancom-open.png",
+      "bytes": 80448,
+      "sha256": "623aea98cb1c1bf46ea49558aa9f45ceaa1f4750e8946471f2ede40bfa670baf"
+    },
+    {
+      "name": "Bottom-hwp-hancom-saved.png",
+      "bytes": 81287,
+      "sha256": "6043dbdb56587912d0060f2dbf9ba9fc2e463de0683f966d88465e739159138e"
+    },
+    {
+      "name": "Bottom.hwp",
+      "bytes": 13312,
+      "sha256": "fec3cc5a7a2d12e47732c2c332052cd9a19b3d33d5508c91efee0a7567f3cedd"
+    },
+    {
+      "name": "candidate-summary.json",
+      "bytes": 13337,
+      "sha256": "0f1ed287ae3ad279f87c42dfb643c08cad6d0cc265eacccdd5d462c6e2c4eddf"
+    },
+    {
+      "name": "Center-hancom-comparison.json",
+      "bytes": 12536,
+      "sha256": "6d239795b17b5a5ed3a6fce0d7d2754badb14897e1d9e8cef94ac0747d2aaca8"
+    },
+    {
+      "name": "Center-hancom.hwp",
+      "bytes": 14848,
+      "sha256": "2adb9cd218e97596c98c875f6eed2fcbf41cdf52fe5a27f6b689fe80ee0b4461"
+    },
+    {
+      "name": "Center-hwp-hancom-open.png",
+      "bytes": 80466,
+      "sha256": "ebc10c699453743200d5be5c6511efd7a687e592e39426f73d1bebdd96dc60df"
+    },
+    {
+      "name": "Center-hwp-hancom-saved.png",
+      "bytes": 81037,
+      "sha256": "3c7c2aab5ec674baa3a1d0612e4ddb5c437f598dc53e230695c881bdd906dc6d"
+    },
+    {
+      "name": "Center.hwp",
+      "bytes": 13312,
+      "sha256": "d20854d4dbd5f0d6b4354b612a42aee072b99fd819387932e2116299423668ac"
+    },
+    {
+      "name": "heading-twelve.json",
+      "bytes": 13414,
+      "sha256": "7397854e6b9204574420c30d2cd4099e56b4167d9fdaf81233d33b97203849f9"
+    },
+    {
+      "name": "rust-six.log",
+      "bytes": 833,
+      "sha256": "093a475c2706290beb3d0645aaf8d7189a6e0203f42cc110e102c812b4a0d9c9"
+    },
+    {
+      "name": "storage-six.json",
+      "bytes": 12786,
+      "sha256": "f41a7ed96c50eceb9ff2b0b628de3c7ebc4a07bd8a82592fcdab055415471194"
+    },
+    {
+      "name": "Top-hancom-comparison.json",
+      "bytes": 12530,
+      "sha256": "581707323b4dc4da740911c316cdf22e33dc72b23bc7a43908438fbd829888d8"
+    },
+    {
+      "name": "Top-hancom.hwp",
+      "bytes": 14848,
+      "sha256": "ee2d257e40805da3a5cf5d14c1a19a33e64dbffd9f1e3b03e7420fdc412e264b"
+    },
+    {
+      "name": "Top-hwp-hancom-open.png",
+      "bytes": 79724,
+      "sha256": "6afd579c4e411d19c501ed9128ad97649c159a9e8861256c3fdf40e9c313f7e8"
+    },
+    {
+      "name": "Top-hwp-hancom-saved.png",
+      "bytes": 80422,
+      "sha256": "4273b8c84e10abf7e1068578a91f11a767d7098246875b3c8f252fc302272611"
+    },
+    {
+      "name": "Top.hwp",
+      "bytes": 13312,
+      "sha256": "ba4c86ca6ff4f670ca599f2c364ba12ead7660f831fd6808e207648125d27bc7"
+    }
+  ]
+}

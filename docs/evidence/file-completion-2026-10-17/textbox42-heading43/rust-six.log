@@ -1,0 +1,14 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/textbox-contract-native/source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 51.28s
+     Running tests/jueony_textbox_storage.rs (/tmp/jueony-rhwp-engine/target/pr-review/debug/deps/jueony_textbox_storage-cd87d8c32c1f508d)
+
+running 6 tests
+test unrelated_rectangle_creation_keeps_its_existing_storage_contract ... ok
+test actual_hancom_heading_case_preserves_all_three_extended_style_levels ... ok
+test new_textbox_top_hancom_storage_and_roundtrip ... ok
+test new_textbox_bottom_hancom_storage_and_roundtrip ... ok
+test new_textbox_center_hancom_storage_and_roundtrip ... ok
+test existing_loaded_shape_unknown_flags_are_not_normalized ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+

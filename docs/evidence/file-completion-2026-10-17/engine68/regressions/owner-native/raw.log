@@ -1,0 +1,6 @@
+PASS hwp: absorbed terminal empty paragraph belongs to actual last table fragment, query is read-only and snapshot restores
+PASS hwpx: absorbed terminal empty paragraph belongs to actual last table fragment, query is read-only and snapshot restores
+PASS content-length sweep preserves all body paragraph page mappings and ordinary invalid addresses reject
+PASS later section uses global page offset and references actual table fragment owner
+PASS text tail has its own actual text layout; empty ownership is never used to hide visible contents
+PASS explicit page break keeps its real blank page rather than borrowing preceding table ownership

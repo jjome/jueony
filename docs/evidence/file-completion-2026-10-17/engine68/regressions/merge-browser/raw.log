@@ -1,0 +1,12 @@
+PASS openai-responses: actual chat merge, compare, undo/redo, safe save and UI reopen
+PASS anthropic: actual chat merge, compare, undo/redo, safe save and UI reopen
+PASS gemini: actual chat merge, compare, undo/redo, safe save and UI reopen
+PASS openai-compatible: actual chat merge, compare, undo/redo, safe save and UI reopen
+PASS offset rectangle preserves independent paragraph formats, source order and primary cell cursor
+PASS invalid single cell, alias, missing target, overflow, unsupported split and batch never write
+PASS HWP, protection, existing merge, mixed original, field and unequal cell properties remain readonly
+PASS live merge then throw or neighbor contamination restores exact bytes/history/dirty/cursor
+PASS post-render geometry failure restores snapshot and next merge succeeds
+PASS late model response cannot overwrite newer user cell edit
+PASS unsaved merged document restores after workspace restart and stays readonly for another merge
+PASS later section merge mapping and actual UI save/reopen

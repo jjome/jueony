@@ -1,0 +1,69 @@
+{
+  "createdAt": "2026-10-17T01:48:44.689Z",
+  "status": "NATIVE_VERIFIED_COMBINED_WASM_PENDING",
+  "formalBaseSourceId": "f146979ecedec189",
+  "productionModified": false,
+  "privateWasmBuilt": false,
+  "cargoReleased": true,
+  "patch": {
+    "path": "owned-live-table-outer-origin-candidate.patch",
+    "sha256": "a17f4769b34b72a9e303c29b5f3ef4b9252adf3f41e770ad848818f73ae7a200"
+  },
+  "changedRust": [
+    {
+      "path": "src/renderer/layout.rs",
+      "old": "836ba60ec3a055ae0aa6b46c8e2ca3d713339725b9f7e9ca51cc9efedceea50e",
+      "new": "93591d9ff7d1aec95331004037f9adb6c0e8f8f999af02f8059337f79ce9b3c2"
+    },
+    {
+      "path": "src/document_core/commands/document.rs",
+      "old": "6c0af5a0bca1c8e6755db1fe35e851bde6844d119d83f0670177d58b8d2bceed",
+      "new": "62f4f3e23347cbce034f1802f7062b3796820319347dcaf2f526f089a1a024a6"
+    }
+  ],
+  "tests": [
+    {
+      "path": "native-live-fixed.log",
+      "sha256": "523cbc6849e72e66107f9ab58826dd6795a974b8e50fb5a11194916390aad98c",
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "path": "native-original10-regression.log",
+      "sha256": "0f65ab5e027eccd0f25f18080783b0dc369515abf9c4be5fa3ba11ec98e65f50",
+      "passed": 10,
+      "failed": 0,
+      "ignored": 0
+    }
+  ],
+  "livePaths": [
+    "HWP fresh",
+    "HWP loaded",
+    "HWPX fresh",
+    "HWPX loaded"
+  ],
+  "geometryContract": "Every published control and text layout field, unchanged0.2px numeric tolerance. Original regression script and original31 remain unchanged.",
+  "causes": [
+    {
+      "path": "fresh HWP/HWPX",
+      "cause": "Owned constructor raw TABLE6 was rejected although explicit semantic pageBreak None and repeat false serialize to canonical raw0.",
+      "fix": "Accept exact raw6 only without a sealed control source cache and with all four common/table margin copies equal. Existing pageBreak/repeat/protection and unknown/noAdjust checks remain."
+    },
+    {
+      "path": "loaded HWP edited session",
+      "cause": "Existing recomputed Exclusion plan has stored_host_origin None, although anchor/top/complete occupied band exactly match the known host row.",
+      "fix": "Only the actual native_hwp5_layout && session_edited renderer call permits missing stored host. Exact anchor/top/occupied proof, numeric arithmetic threshold0.000001px, X/successor constraints remain. Immutable marker-HWPX export call explicitly passes false."
+    }
+  ],
+  "priorFailureEvidence": {
+    "path": "native-live-trace-runtime.log",
+    "sha256": "4020c9c9eaac8c115a039039e84f81348b584786c6485675ba05d1c95fc6a816"
+  },
+  "requiredAfterRootCombinedBuild": [
+    "Unchanged verify-table-outer-hancom.mjs31",
+    "Unchanged verify-table-outer-margin-engine.mjs4 including snapshot/repeat save",
+    "Unchanged verify-column-width.mjs browser save-preflight regression"
+  ],
+  "applyCheck": "apply-check66.json"
+}

@@ -1,0 +1,14 @@
+PASS auto-zero hwpx: actual SaveAs sync5181, one undo, repeat Save and exact source preservation
+PASS large hwpx: actual SaveAs sync5181, one undo, repeat Save and exact source preservation
+PASS auto-zero hwp: actual SaveAs sync5181, one undo, repeat Save and exact source preservation
+PASS large hwp: actual SaveAs sync5181, one undo, repeat Save and exact source preservation
+PASS explicit-rows-9000: actual SaveAs keeps noop/protection unchanged
+PASS small-protected: actual SaveAs keeps noop/protection unchanged
+PASS large-protected: actual SaveAs keeps noop/protection unchanged
+PASS actual current-file Save enters same preflight and writes checked5181
+PASS SaveAs dialog Esc cancels before preflight, picker or write
+PASS OS picker AbortError writes nothing and keeps synchronized edit undoable/dirty
+PASS apply-then-throw fault rolls back entire live transaction before picker/writer
+PASS reader: actual SaveAs fails closed before picker/write and restores exact live state
+PASS geometry: actual SaveAs fails closed before picker/write and restores exact live state
+PASS no unexpected console/page errors or external assets

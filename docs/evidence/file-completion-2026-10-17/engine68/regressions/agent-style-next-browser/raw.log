@@ -1,0 +1,14 @@
+PASS openai-responses: chat sets a next-style edge, comparison/undo/redo/save preserve current paragraphs
+PASS anthropic: chat sets a next-style edge, comparison/undo/redo/save preserve current paragraphs
+PASS gemini: chat sets a next-style edge, comparison/undo/redo/save preserve current paragraphs
+PASS openai-compatible: chat sets a next-style edge, comparison/undo/redo/save preserve current paragraphs
+PASS hwp: actual Enter at end switches style/format; mid-paragraph Enter keeps heading; undo/redo/save work
+PASS hwpx: actual Enter at end switches style/format; mid-paragraph Enter keeps heading; undo/redo/save work
+PASS default destination, self continuation and two-step cycle follow real keyboard Enter
+PASS invalid/no-op/character/default source, batching, locked/raw endpoints and fields refuse unchanged
+PASS metadata-only next edge retains the current heading caret and manual style selection
+PASS failure after live native update restores edge, body, cursor, history and dirty
+PASS false/no-op/wrong edge, unexpected name/English/fonts/body/resources and destination edits refuse and restore
+PASS delayed model cannot overwrite a newer source edge or renamed destination
+PASS typing after actual Enter uses the body style formatting and saved style ID
+PASS host reload restores stored edge and persisted future-Enter comparison

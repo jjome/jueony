@@ -1,0 +1,23 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/document-metadata-candidate/source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 05s
+     Running tests/jueony_document_metadata.rs (/tmp/jueony-rhwp-engine/target/pr-review/debug/deps/jueony_document_metadata-866d5ff7fbc1c6d9)
+
+running 15 tests
+test metadata_event_records_field_names_without_values ... ok
+test metadata_snapshots_restore_before_and_after ... ok
+test metadata_noop_has_no_dirty_event ... ok
+test metadata_stale_token_is_atomic ... ok
+test metadata_unknown_ole_properties_header_and_padding_stay_exact ... ok
+test metadata_rejects_invalid_input_without_mutation ... ok
+test metadata_untouched_native_summary_converts_to_hwpx ... ok
+test metadata_empty_values_clear_both_storages ... ok
+test metadata_xml_entities_and_cdata_are_actual_values ... ok
+test metadata_xml_selfclosing_fields_preserve_attributes ... ok
+test metadata_unknown_xml_attrs_and_entries_stay_verbatim ... ok
+test metadata_xml_readonly_getter_does_not_rewrite_any_storage ... ok
+test metadata_xml_duplicate_alias_and_wrong_namespace_are_readonly ... ok
+test metadata_corrupt_ole_section_is_readonly_and_unchanged ... ok
+test metadata_unicode_roundtrips_both_formats_twice ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
+

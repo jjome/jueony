@@ -1,0 +1,20 @@
+PASS openai-responses: chat subdivision, compare, cursor, undo/redo, save/UI reopen
+PASS anthropic: chat subdivision, compare, cursor, undo/redo, save/UI reopen
+PASS gemini: chat subdivision, compare, cursor, undo/redo, save/UI reopen
+PASS openai-compatible: chat subdivision, compare, cursor, undo/redo, save/UI reopen
+PASS 가로 분할: one-axis unequal geometry save/reopen
+PASS 세로 분할: one-axis unequal geometry save/reopen
+PASS alias/missing/overflow/no-op/extra args/batch refuse without writes
+readonly fixture hwp
+readonly fixture protect
+readonly fixture merged
+readonly fixture mixed
+readonly fixture field
+readonly fixture zone
+readonly fixture missing
+PASS HWP/protection/merged/mixed/field/zones/unknown getter readonly
+PASS live Native throw/text/width fault restores bytes/history/cursor/dirty
+PASS post-render geometry fault rolls back and next request succeeds
+PASS late response preserves newer user edit
+PASS unsaved restart restores result and merged neighbors close further subdivision
+PASS later-section mapping saves/reopens in UI

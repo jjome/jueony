@@ -1,0 +1,9 @@
+PASS hwp: real five-field edit, complete semantics/geometry and two-format double save/reopen
+PASS hwpx: real five-field edit, complete semantics/geometry and two-format double save/reopen
+PASS actual snapshot restores summary and original raw document bytes for undo/redo
+PASS no-op has no event, bytes, metadata fingerprint or history mutation
+PASS actual stale CAS and invalid strings reject atomically without leaking values in events
+PASS 4096 UTF16-unit boundary supports emoji and rejects excess before mutation
+PASS hwp: generic save guard detects actual altered metadata bytes although contentLoss is zero
+PASS hwpx: generic save guard detects actual altered metadata bytes although contentLoss is zero
+PASS both format conversions retain unedited known five-field values

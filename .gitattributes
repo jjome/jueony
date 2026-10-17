@@ -34,3 +34,20 @@ docs/evidence/file-completion-2026-10-17/engine63/unit839.tap.log whitespace=cr-
 docs/evidence/file-completion-2026-10-17/engine65/application/unit851.log whitespace=cr-at-eol,-blank-at-eol
 docs/evidence/file-completion-2026-10-17/engine65/application/unit852.log whitespace=cr-at-eol,-blank-at-eol
 docs/evidence/file-completion-2026-10-17/engine65/application/native-recents-windows-rust18.log whitespace=cr-at-eol,-blank-at-eof
+
+# Verified raw outputs and archived diff context retain their original bytes.
+apps/editor/scripts/verify-document-metadata-engine.mjs whitespace=-blank-at-eof
+docs/evidence/file-completion-2026-10-17/engine66/formal/unit859.log whitespace=cr-at-eol,-blank-at-eol
+docs/evidence/file-completion-2026-10-17/engine66/logs/native10.log whitespace=cr-at-eol,-blank-at-eof
+docs/evidence/file-completion-2026-10-17/engine66/regression-failure-followup/native-followup/native-live-fixed.log whitespace=cr-at-eol,-blank-at-eof
+docs/evidence/file-completion-2026-10-17/engine66/regression-failure-followup/native-followup/native-original10-regression.log whitespace=cr-at-eol,-blank-at-eof
+docs/evidence/file-completion-2026-10-17/engine66/regression-failure-followup/native-followup/owned-live-table-outer-origin-candidate.patch whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+docs/evidence/file-completion-2026-10-17/engine66/regression-failure-followup/source-proof/production-followup-eof-trimmed.patch whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+docs/evidence/file-completion-2026-10-17/engine66/reproduction/outer-placeholder-origin-candidate.patch whitespace=cr-at-eol,-blank-at-eol
+docs/evidence/file-completion-2026-10-17/engine68/lifecycle/final-unit870.log whitespace=cr-at-eol,-blank-at-eol
+docs/evidence/file-completion-2026-10-17/engine68/lifecycle/unit870.log whitespace=cr-at-eol,-blank-at-eol
+docs/evidence/file-completion-2026-10-17/engine68/metadata/actual-hancom/hwp-summary.txt whitespace=cr-at-eol,-blank-at-eol
+docs/evidence/file-completion-2026-10-17/engine68/metadata/native/native15-formal66.log whitespace=cr-at-eol,-blank-at-eof
+docs/evidence/file-completion-2026-10-17/engine68/metadata/reproduction/verify-document-metadata-engine.mjs whitespace=cr-at-eol,-blank-at-eof
+docs/evidence/file-completion-2026-10-17/engine68/regressions/host-native/raw.log whitespace=cr-at-eol,-blank-at-eol
+docs/evidence/file-completion-2026-10-17/engine68/unit868.log whitespace=cr-at-eol,-blank-at-eol

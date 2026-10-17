@@ -1,0 +1,32 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/outer-native-candidate48/source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 45.67s
+     Running unittests src/lib.rs (/tmp/jueony-rhwp-engine/target/pr-review/debug/deps/rhwp-ce73103f82fd2fcb)
+renderer::layout::jueony_unresolved_single_table_origin_tests::g048_actual_owned_source_and_hancom_pairs_take_distinct_contracts: test
+renderer::layout::jueony_unresolved_single_table_origin_tests::g048_all_side_channels_and_noadjust_are_rejected_in_every_owner: test
+renderer::layout::jueony_unresolved_single_table_origin_tests::g048_cells_protection_field_nested_and_merge_are_excluded: test
+renderer::layout::jueony_unresolved_single_table_origin_tests::g048_converted_hwp_preserves_the_same_runtime_contract: test
+renderer::layout::jueony_unresolved_single_table_origin_tests::g048_exact_unresolved_native_and_marked_origin_is_read_only: test
+renderer::layout::jueony_unresolved_single_table_origin_tests::g048_hancom_resolved_band_and_other_geometry_stay_on_old_path: test
+renderer::layout::jueony_unresolved_single_table_origin_tests::g048_host_text_dirty_stored_or_extra_control_are_excluded: test
+renderer::layout::jueony_unresolved_single_table_origin_tests::g048_offsets_lock_caption_and_symmetric_margins_are_excluded: test
+renderer::layout::jueony_unresolved_single_table_origin_tests::g048_prefix_and_following_template_witness_must_be_exact: test
+renderer::layout::jueony_unresolved_single_table_origin_tests::g048_runtime_real_core_matches_hancom_origin: test
+
+10 tests, 0 benchmarks
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.65s
+     Running unittests src/lib.rs (/tmp/jueony-rhwp-engine/target/pr-review/debug/deps/rhwp-ce73103f82fd2fcb)
+
+running 10 tests
+test renderer::layout::jueony_unresolved_single_table_origin_tests::g048_cells_protection_field_nested_and_merge_are_excluded ... ok
+test renderer::layout::jueony_unresolved_single_table_origin_tests::g048_all_side_channels_and_noadjust_are_rejected_in_every_owner ... ok
+test renderer::layout::jueony_unresolved_single_table_origin_tests::g048_host_text_dirty_stored_or_extra_control_are_excluded ... ok
+test renderer::layout::jueony_unresolved_single_table_origin_tests::g048_hancom_resolved_band_and_other_geometry_stay_on_old_path ... ok
+test renderer::layout::jueony_unresolved_single_table_origin_tests::g048_offsets_lock_caption_and_symmetric_margins_are_excluded ... ok
+test renderer::layout::jueony_unresolved_single_table_origin_tests::g048_exact_unresolved_native_and_marked_origin_is_read_only ... ok
+test renderer::layout::jueony_unresolved_single_table_origin_tests::g048_prefix_and_following_template_witness_must_be_exact ... ok
+test renderer::layout::jueony_unresolved_single_table_origin_tests::g048_actual_owned_source_and_hancom_pairs_take_distinct_contracts ... ok
+test renderer::layout::jueony_unresolved_single_table_origin_tests::g048_converted_hwp_preserves_the_same_runtime_contract ... ok
+test renderer::layout::jueony_unresolved_single_table_origin_tests::g048_runtime_real_core_matches_hancom_origin ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 3906 filtered out; finished in 0.04s
+

@@ -1,0 +1,37 @@
+{
+  "formal": "source-cda65172283c6657",
+  "metadataOwnedFiles": [
+    {
+      "path": "src/document_core/document_metadata.rs",
+      "candidateSha256": "e28f9cf2de3f4dccc81f4917dbdc71284a32d65505804a5b40a376610965b473",
+      "formalSha256": "44dfb4f062393872d8bccfa7db15f67d11d21b672ed5d1308e1d95c3a52c36bc",
+      "textSame": true
+    },
+    {
+      "path": "src/document_core/mod.rs",
+      "candidateSha256": "e4addb1d5674940429b68fed71304a7baec7a0ef389ce8e490f95a5527f2a1e5",
+      "formalSha256": "e4addb1d5674940429b68fed71304a7baec7a0ef389ce8e490f95a5527f2a1e5",
+      "textSame": true
+    },
+    {
+      "path": "src/model/event.rs",
+      "candidateSha256": "dc1106c2050a2dc4c71818fd003d7bb08974948989a799f9df6084b81dd6c248",
+      "formalSha256": "dc1106c2050a2dc4c71818fd003d7bb08974948989a799f9df6084b81dd6c248",
+      "textSame": true
+    },
+    {
+      "path": "src/wasm_api.rs",
+      "candidateSha256": "43e07aef97c3913f6d99c827f8bbcc460a0b320d0b373a80eb373506f803c145",
+      "formalSha256": "43e07aef97c3913f6d99c827f8bbcc460a0b320d0b373a80eb373506f803c145",
+      "textSame": true
+    },
+    {
+      "path": "src/serializer/hwpx/mod.rs",
+      "candidateSha256": "c8004cde7f046b675d5038af8287586380b2624d19cb9d9194ec923288123b3f",
+      "formalSha256": "c8004cde7f046b675d5038af8287586380b2624d19cb9d9194ec923288123b3f",
+      "textSame": true
+    }
+  ],
+  "documentExportHookBothPresent": true,
+  "note": "document.rs additionally includes the independent G073 live fix in formal68; it is not falsely asserted byte-identical."
+}

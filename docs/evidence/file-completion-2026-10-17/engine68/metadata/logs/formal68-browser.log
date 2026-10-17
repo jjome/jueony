@@ -1,0 +1,10 @@
+PASS hwp: actual menu edits five summary fields, single undo/redo and original-handle OPFS save/reopen
+PASS hwp: actual modal Escape and unchanged Apply preserve exact bytes, dirty state and history
+PASS hwpx: actual menu edits five summary fields, single undo/redo and original-handle OPFS save/reopen
+PASS hwpx: actual modal Escape and unchanged Apply preserve exact bytes, dirty state and history
+PASS raw-owner CAS rejects a Native metadata change made while the real dialog is open
+PASS Native apply-then-throw rolls back real metadata transaction without adding history or changing disk
+PASS read-only metadata remains visible but cannot be applied through the actual UI
+PASS hwp: actual Save blocks metadata-loss artifact with zero contentLoss, leaves OPFS original/dirty state and allows retry
+PASS hwpx: actual Save blocks metadata-loss artifact with zero contentLoss, leaves OPFS original/dirty state and allows retry
+PASS no unexpected page/console errors or external data requests

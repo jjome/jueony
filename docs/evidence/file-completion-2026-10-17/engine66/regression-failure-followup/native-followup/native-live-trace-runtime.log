@@ -1,0 +1,31 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/outer-live-candidate66/source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 16s
+     Running unittests src/lib.rs (/tmp/jueony-rhwp-engine/target/pr-review/debug/deps/rhwp-ce73103f82fd2fcb)
+renderer::layout::jueony_live_outer_contract_tests::g050_live_outer_four_command_paths_match_saved_reopen: test
+
+1 test, 0 benchmarks
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.37s
+     Running unittests src/lib.rs (/tmp/jueony-rhwp-engine/target/pr-review/debug/deps/rhwp-ce73103f82fd2fcb)
+
+running 1 test
+test renderer::layout::jueony_live_outer_contract_tests::g050_live_outer_four_command_paths_match_saved_reopen ... FAILED
+
+failures:
+
+---- renderer::layout::jueony_live_outer_contract_tests::g050_live_outer_four_command_paths_match_saved_reopen stdout ----
+G050 hwp loaded=false profile=LayoutCompatibilityProfile { hwp3_layout: false, hwp3_native_layout: false, hwp3_password_layout: false, hwpx_stored_layout: false, hwpx_container: false, hwp5_origin_hwpx: false, native_hwp5_layout: true, hangul2024_layout: false, session_edited: false } helper=None measured=51.28 plan={(1, 0): ParagraphFloatPlacement { flow: Exclusion, anchor_y: 21.333333333333332, stored_host_origin: Some(21.333333333333332), stored_successor_line_origin: None, table_left: None, table_top: 36.45333333333333, occupied_bottom: 106.62666666666667 }}
+G050 hwp loaded=true profile=LayoutCompatibilityProfile { hwp3_layout: false, hwp3_native_layout: false, hwp3_password_layout: false, hwpx_stored_layout: false, hwpx_container: false, hwp5_origin_hwpx: false, native_hwp5_layout: true, hangul2024_layout: false, session_edited: true } helper=Some(1600) measured=51.28 plan={(1, 0): ParagraphFloatPlacement { flow: Exclusion, anchor_y: 21.333333333333336, stored_host_origin: None, stored_successor_line_origin: None, table_left: None, table_top: 36.45333333333333, occupied_bottom: 106.62666666666667 }}
+G050 hwpx loaded=false profile=LayoutCompatibilityProfile { hwp3_layout: false, hwp3_native_layout: false, hwp3_password_layout: false, hwpx_stored_layout: false, hwpx_container: false, hwp5_origin_hwpx: false, native_hwp5_layout: true, hangul2024_layout: false, session_edited: false } helper=None measured=51.28 plan={(1, 0): ParagraphFloatPlacement { flow: Exclusion, anchor_y: 21.333333333333332, stored_host_origin: Some(21.333333333333332), stored_successor_line_origin: None, table_left: None, table_top: 36.45333333333333, occupied_bottom: 106.62666666666667 }}
+G050 hwpx loaded=true profile=LayoutCompatibilityProfile { hwp3_layout: false, hwp3_native_layout: false, hwp3_password_layout: false, hwpx_stored_layout: false, hwpx_container: true, hwp5_origin_hwpx: true, native_hwp5_layout: false, hangul2024_layout: false, session_edited: false } helper=Some(1600) measured=51.28 plan={(1, 0): ParagraphFloatPlacement { flow: Exclusion, anchor_y: 21.333333333333332, stored_host_origin: Some(21.333333333333332), stored_successor_line_origin: None, table_left: None, table_top: 36.45333333333333, occupied_bottom: 106.62666666666667 }}
+
+thread 'renderer::layout::jueony_live_outer_contract_tests::g050_live_outer_four_command_paths_match_saved_reopen' (45986) panicked at src/renderer/layout.rs:17330:9:
+hwp-fresh: live=168.7, reopened=153.6; hwp-loaded: live=168.7, reopened=153.6; hwpx-fresh: live=168.7, reopened=153.6
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    renderer::layout::jueony_live_outer_contract_tests::g050_live_outer_four_command_paths_match_saved_reopen
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3916 filtered out; finished in 0.11s
+
+error: test failed, to rerun pass `-p rhwp --lib`

@@ -1,0 +1,62 @@
+{
+  "status": "PREPARED_NOT_BUILT",
+  "frontend": "C:\\Users\\jjome\\Documents\\work\\jueony\\apps\\editor\\evidence\\dist-file-lifecycle-verified68",
+  "engineSourceId": "cda65172283c6657",
+  "wasmSha256": "4a9acaf931b91b967f93b777cf5b987c7e73d23cff0f0a9a9c719b5e244938e9",
+  "nativeExe": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-file-final68-20261017\\JueonyNativeFinal68Review.exe",
+  "config": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-file-final68-20261017\\tauri-final68-review.conf.json",
+  "project": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-file-final68-20261017\\project",
+  "source": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-file-final68-20261017\\project\\src-tauri",
+  "cargoTargetCache": "C:\\Users\\jjome\\Documents\\work\\jueony\\apps\\editor\\src-tauri\\target",
+  "node": "C:/Users/jjome/AppData/Local/Volta/tools/image/node/22.22.2/node.exe",
+  "arguments": [
+    "C:\\Users\\jjome\\Documents\\work\\jueony\\apps\\editor\\node_modules\\@tauri-apps\\cli\\tauri.js",
+    "build",
+    "--debug",
+    "--no-bundle",
+    "--ci",
+    "--config",
+    "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-file-final68-20261017\\tauri-final68-review.conf.json",
+    "--",
+    "--offline",
+    "--locked",
+    "--bin",
+    "jueony-native-final68-review"
+  ],
+  "cwd": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-file-final68-20261017\\project",
+  "gui": "NOT_LAUNCHED",
+  "nativeGuiValidation": "NOT_RUN",
+  "scope": "Desktop file lifecycle review; no API backend included; distinct identifier, no old review data migration",
+  "oldExesPreserved": [
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\apps\\editor\\src-tauri\\target\\debug\\jueony-editor.exe",
+      "bytes": 52097024,
+      "sha256": "bf450d1707ebde192848516b8f29a96aa0ec362163173bfadc4c582b42c9db96"
+    },
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-file-gui-20261017\\JueonyNativeExitReview.exe",
+      "bytes": 52080640,
+      "sha256": "8c63b08d815adf96428e9dc136c238daaec15130dccfc3890997f56d1d233ee5"
+    },
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-file-gui-20261017\\JueonyNativeExitReviewFinal.exe",
+      "bytes": 52081152,
+      "sha256": "1c04c5268313c83b3efc3d65bcc30abbda869b64147f5a9c0536034fb39b85fb"
+    },
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-file-gui-20261017\\JueonyNativePickerReview.exe",
+      "bytes": 52087296,
+      "sha256": "1df4138d53d3458bac2b8292fe61c30a036ef663465b500d004a464c8187beab"
+    },
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-file-gui-20261017\\JueonyNativeStorageReview.exe",
+      "bytes": 13940224,
+      "sha256": "3eb99a104fd018496ede35b999046cbb52591dafd8d5424a385ed88690e9751f"
+    },
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-final65-review-20261017\\JueonyNativeFinal65Review.exe",
+      "bytes": 52097024,
+      "sha256": "bf450d1707ebde192848516b8f29a96aa0ec362163173bfadc4c582b42c9db96"
+    }
+  ]
+}

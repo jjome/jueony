@@ -112,9 +112,10 @@ export function nativeRecentHandle(surface:Window,info:NativeHandleInfo):FileSys
 }
 
 export type NativeExitSnapshot = { stamp: string; blocked: boolean; needsConfirmation: boolean };
+export type NativeExitConfirmation = boolean | {beforeStamp:string;approvedSnapshot:NativeExitSnapshot;rollback?:()=>Promise<void>};
 export type NativeExitHooks = {
   snapshot(): NativeExitSnapshot;
-  confirm(): Promise<boolean>;
+  confirm(): Promise<NativeExitConfirmation>;
   checkpoint(): Promise<void>;
   freeze(): () => void;
   close(): Promise<void>;
@@ -137,21 +138,30 @@ export function createNativeExitCoordinator(hooks: NativeExitHooks) {
     } catch { approved = undefined; }
     approved = undefined;
     if (pending) return;
-    let resume: (() => void) | undefined, keepFrozen = false;
+    let resume: (() => void) | undefined, keepFrozen = false, rollback:(()=>Promise<void>)|undefined;
     pending = true;
     try {
       const before = hooks.snapshot();
       if (before.blocked) throw new Error('문서 작업과 대화상자를 마친 뒤 종료해 주세요.');
       resume = hooks.freeze();
-      if (before.needsConfirmation && !await hooks.confirm()) return;
+      let expected=before;
+      if(before.needsConfirmation){
+        const consent=await hooks.confirm();if(!consent)return;
+        if(typeof consent==='object'){
+          rollback=consent.rollback;
+          if(consent.beforeStamp!==before.stamp||consent.approvedSnapshot.blocked)throw Error('종료 선택의 문서 버전이 일치하지 않습니다.');
+          expected=consent.approvedSnapshot;
+        }
+      }
       await hooks.checkpoint();
       const after = hooks.snapshot();
-      if (after.blocked || before.stamp !== after.stamp) throw new Error('종료 준비 중 문서가 바뀌었습니다. 최신 내용을 확인한 뒤 다시 종료해 주세요.');
+      if (after.blocked || expected.stamp !== after.stamp) throw new Error('종료 준비 중 문서가 바뀌었습니다. 최신 내용을 확인한 뒤 다시 종료해 주세요.');
       approved = after.stamp;
       await hooks.close();
       keepFrozen = true;
     } catch (error) {
       approved = undefined;
+      if(rollback)try{await rollback();}catch(restoreError){hooks.error(new Error('종료하지 않았으며 복구본 원복도 확인하지 못했습니다. 열린 문서를 파일에 저장하세요. '+String(restoreError)));return;}
       hooks.error(error);
     } finally {
       pending = false;

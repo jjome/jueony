@@ -1,0 +1,28 @@
+{
+  "results": [
+    {
+      "name": "body-raw-byte-change",
+      "rejected": true,
+      "error": "non-summary stream changed: BodyText/Section0",
+      "inputSha256": "1adf478be2592faf68893dcc2c49206f6a0c7154a127bef58c9be09829ffab28",
+      "afterSha256": "083fc797c1f78565242824313d5e590c4bd2edfce65f84a909603203ae0ac0d7"
+    },
+    {
+      "name": "unknown-summary-PID9-byte-change",
+      "rejected": true,
+      "error": "summary bytes differ from the exact independent five-field rewrite",
+      "inputSha256": "1adf478be2592faf68893dcc2c49206f6a0c7154a127bef58c9be09829ffab28",
+      "afterSha256": "83285cbff4f69ff7964ff8645304c46798582ca23b93cfc3f1cc44f4968f5ef2"
+    },
+    {
+      "name": "wrong-independent-source-author",
+      "rejected": true,
+      "error": "summary bytes differ from the exact independent five-field rewrite",
+      "inputSha256": "1adf478be2592faf68893dcc2c49206f6a0c7154a127bef58c9be09829ffab28",
+      "afterSha256": "9e9fb9c82e11299499ae7be1f60b3f181aba9172566c3911ea51426b3c462e4b"
+    }
+  ],
+  "failures": [],
+  "helperSha256": "92931cef313dc87bdba7047df192911a6f2b7d25e931e7497ade32b5e53ccedf",
+  "scope": "Mutations occur only in new byte copies of owned test artifacts. Original formal/baseline artifacts remain unchanged. Three independent negative controls: other logical stream byte, opaque PID9 payload byte, and incorrect source-known-field oracle."
+}

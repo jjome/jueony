@@ -1,0 +1,352 @@
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -345,6 +345,129 @@
+ 
+     let stored_y = hwpunit_to_px(following.vertical_pos, dpi);
+     (stored_y <= col_area.height + 60.0).then_some(col_area.y + stored_y)
++}
++
++/// A single empty host with an unresolved zero-width text-line template must not
++/// turn its outer top into a second paint inset. Its final empty paragraph row
++/// still advances by one template line, not by the table's outer box. This is
++/// deliberately not a general stored-anchor interpretation or a cache rewrite.
++fn unresolved_single_table_placeholder_origin_hu(
++    native_profile: bool,
++    column_count: usize,
++    paragraphs: &[Paragraph],
++    index: usize,
++    table: &crate::model::table::Table,
++    measured_height: Option<f64>,
++    dpi: f64,
++) -> Option<i32> {
++    use crate::model::paragraph::ColumnBreakType;
++    let para = paragraphs.get(index)?;
++    let prev = paragraphs.get(index.checked_sub(1)?)?;
++    let next = paragraphs.get(index.checked_add(1)?)?;
++    let plain_metadata = |p: &Paragraph| p.field_ranges.is_empty()
++        && p.orphan_field_ends.is_empty() && p.range_tags.is_empty()
++        && p.title_marks.is_empty() && p.markpen_marks.is_empty()
++        && p.ctrl_data_records.iter().all(Option::is_none)
++        && p.tab_extended.is_empty() && p.numbering_restart.is_none()
++        && p.layout_only_fill_lines == 0 && !p.stored_text_partition_is_dirty()
++        && !p.cell_format_vpos_dirty;
++    if !native_profile || column_count != 1 || !para.text.is_empty()
++        || !plain_metadata(para) || !plain_metadata(prev) || !plain_metadata(next)
++        || !matches!(para.column_type, ColumnBreakType::None)
++        || !matches!(next.column_type, ColumnBreakType::None)
++        || !matches!(para.controls.as_slice(), [Control::Table(_)])
++        || !prev.controls.iter().all(|c| matches!(c, Control::SectionDef(_) | Control::ColumnDef(_)))
++        || !next.controls.is_empty() || !para_has_visible_text(prev) || !next.text.is_empty()
++        || index.checked_add(2) != Some(paragraphs.len())
++        || paragraphs.iter().flat_map(|p| &p.controls).filter(|c| matches!(c, Control::Table(_))).take(2).count() != 1
++        || !is_para_topbottom_float(&table.common)
++        || !matches!(table.common.vert_align, VertAlign::Top)
++        || !matches!(table.common.horz_rel_to, HorzRelTo::Para)
++        || !matches!(table.common.horz_align, HorzAlign::Left)
++        || table.common.vertical_offset != 0 || table.common.horizontal_offset != 0
++        || table.common.locked || table.common.size_protect || table.caption.is_some()
++        || table.common.attr & (1 << 30) != 0 || table.attr & (1 << 30) != 0
++        // Known TABLE bit26 materializes nonzero HWPX inMargin. No other
++        // record flags (including noAdjust0x08) belong to this plain scope.
++        || table.raw_table_record_attr & !0x0400_0000 != 0
++        || !matches!(table.common.height_criterion, crate::model::shape::SizeCriterion::Absolute)
++        || !matches!(table.common.width_criterion, crate::model::shape::SizeCriterion::Absolute)
++        || table.common.width == 0 || table.common.width > i32::MAX as u32
++        || table.page_break != TablePageBreak::None || table.repeat_header || !table.zones.is_empty()
++        || table.cell_spacing != 0
++        || table.outer_margin_top <= 0 || table.outer_margin_left < 0
++        || table.outer_margin_right < 0 || table.outer_margin_bottom < 0
++        || (table.outer_margin_top == table.outer_margin_bottom
++            && table.outer_margin_top == table.outer_margin_left
++            && table.outer_margin_top == table.outer_margin_right)
++        || table.row_count == 0 || table.col_count == 0
++        || table.cells.len() != usize::from(table.row_count) * usize::from(table.col_count)
++        || table.cells.iter().enumerate().any(|(i, c)|
++            usize::from(c.row) != i / usize::from(table.col_count)
++            || usize::from(c.col) != i % usize::from(table.col_count)
++            || c.paragraphs.len() != 1 || c.cell_protect() || c.field_name.is_some()
++            || c.row_span != 1 || c.col_span != 1 || c.width == 0 || c.height == 0
++            || c.width > i32::MAX as u32 || c.height > i32::MAX as u32
++            || c.text_direction != 0 || c.line_wrap != 0
++            || c.paragraphs.iter().any(|p| !p.controls.is_empty() || !plain_metadata(p)))
++        || table.common.height == 0 || table.common.height > i32::MAX as u32
++        || !measured_height.is_some_and(|h| (h - hwpunit_to_px(table.common.height as i32, dpi)).abs() <= 0.2)
++    { return None; }
++    let [before] = prev.line_segs.as_slice() else { return None; };
++    let [host] = para.line_segs.as_slice() else { return None; };
++    let [following] = next.line_segs.as_slice() else { return None; };
++    let template = |line: &crate::model::paragraph::LineSeg| {
++        line.tag == 0x0006_0000 && line.line_height > 0 && line.text_height == line.line_height
++            && line.baseline_distance > 0 && line.baseline_distance <= line.text_height
++            && line.line_spacing >= 0 && line.column_start == 0
++    };
++    if !template(before) || !template(host) || !template(following)
++        || host.segment_width != 0 || before.segment_width <= 0
++        || following.segment_width != before.segment_width
++        || host.vertical_pos <= 0 || before.vertical_pos < 0
++        || host.line_height != before.line_height || host.line_height != following.line_height
++        || host.line_spacing != before.line_spacing || host.line_spacing != following.line_spacing
++        || host.text_height != before.text_height || host.text_height != following.text_height
++        || host.baseline_distance != before.baseline_distance || host.baseline_distance != following.baseline_distance
++        || i64::from(host.vertical_pos) - i64::from(before.vertical_pos)
++            != i64::from(before.line_height) + i64::from(before.line_spacing)
++        || i64::from(following.vertical_pos) - i64::from(host.vertical_pos)
++            != i64::from(host.line_height) + i64::from(host.line_spacing)
++        || i64::from(table.common.height) + i64::from(table.outer_margin_top)
++            + i64::from(table.outer_margin_bottom)
++            <= i64::from(host.line_height) + i64::from(host.line_spacing)
++    { return None; }
++    Some(host.vertical_pos)
++}
++
++/// The unresolved template is meaningful only when the existing flow plan
++/// already reserves its complete outer band. Share this exact paint proof with
++/// marker-HWPX lowering; do not reinterpret general HWPX-derived binaries.
++pub(crate) fn unresolved_single_table_placeholder_paint_origin_hu(
++    native_profile: bool,
++    column_count: usize,
++    paragraphs: &[Paragraph],
++    index: usize,
++    table: &crate::model::table::Table,
++    measured_height: Option<f64>,
++    dpi: f64,
++    placement: Option<&crate::renderer::float_placement::ParagraphFloatPlacement>,
++) -> Option<i32> {
++    let origin = unresolved_single_table_placeholder_origin_hu(
++        native_profile, column_count, paragraphs, index, table, measured_height, dpi)?;
++    let p = placement?;
++    let host = hwpunit_to_px(origin, dpi);
++    let equal = |a: f64, b: f64| (a - b).abs() <= 0.000_001;
++    (matches!(p.flow, crate::renderer::float_placement::ParagraphFloatFlow::Exclusion)
++        && p.table_left.is_none()
++        && p.stored_successor_line_origin.is_none()
++        && p.stored_host_origin.is_some_and(|v| equal(v, host))
++        && equal(p.anchor_y, host)
++        && equal(p.table_top, host + hwpunit_to_px(table.outer_margin_top as i32, dpi))
++        && equal(p.occupied_bottom, p.table_top
++            + hwpunit_to_px(table.common.height as i32, dpi)
++            + hwpunit_to_px(table.outer_margin_bottom as i32, dpi)))
++        .then_some(origin)
+ }
+ 
+ /// 저장 outer-box paint origin 보정의 layout 단계 안전문이다.
+@@ -11533,6 +11656,12 @@
+             };
+             let mt = fitted_visible_mt.as_ref().or(raw_mt);
+             let declared_height = hwpunit_to_px(signed_hwpunit(t.common.height), self.dpi);
++            let unresolved_placeholder_origin = unresolved_single_table_placeholder_paint_origin_hu(
++                self.profile.get().hwp5_stored_pagination_layout(),
++                *zone_column_count, paragraphs, para_index, t,
++                mt.map(|measured| measured.total_height), self.dpi,
++                ctx.paragraph_float_placements.get(&(para_index, control_index)),
++            ).map(|hu| col_area.y + hwpunit_to_px(hu, self.dpi));
+             // 확정 표 원점은 위여백을 이미 소비했다. 같은 계획이 없는 저장 표만
+             // 기존 출력 보정을 적용하며, 아래 흐름 끝에서도 그 보정만 되돌린다.
+             let physical_outer_box_paint_inset = !ctx
+@@ -12564,7 +12693,7 @@
+                             .map(|p| {
+                                 (
+                                     p.table_left.map(|left| col_area.x + left),
+-                                    col_area.y + p.table_top,
++                                    unresolved_placeholder_origin.unwrap_or(col_area.y + p.table_top),
+                                 )
+                             }),
+                         Self::standalone_table_char_border_fill(Some(para), t, styles),
+@@ -12629,7 +12758,7 @@
+                         page_content.section_index,
+                         para_index,
+                         marker_x,
+-                        table_y_start + column_top_outer_box_inset_y,
++                        unresolved_placeholder_origin.unwrap_or(table_y_start + column_top_outer_box_inset_y),
+                         self.dpi,
+                     );
+                 }
+@@ -17041,3 +17170,132 @@
+         }
+     }
+ }
++
++#[cfg(test)]
++mod jueony_unresolved_single_table_origin_tests {
++    use super::*;
++    use crate::model::paragraph::LineSeg;
++    use crate::model::table::{Cell, Table};
++    fn fixture() -> Vec<Paragraph> {
++        let line = |y, width| LineSeg { text_start: 0, vertical_pos: y,
++            line_height: 1000, text_height: 1000, baseline_distance: 850,
++            line_spacing: 600, column_start: 0, segment_width: width, tag: 0x60000 };
++        let mut t=Table::default();
++        t.common.treat_as_char=false; t.common.text_wrap=TextWrap::TopAndBottom;
++        t.common.vert_rel_to=VertRelTo::Para; t.common.vert_align=VertAlign::Top;
++        t.common.horz_rel_to=HorzRelTo::Para; t.common.horz_align=HorzAlign::Left;
++        t.common.width=41954; t.common.height=3846;
++        t.outer_margin_left=567; t.outer_margin_right=850;
++        t.outer_margin_top=1134; t.outer_margin_bottom=1417;
++        t.row_count=3;t.col_count=2;
++        t.cells=(0..6).map(|i| Cell {row:i/2,col:i%2,row_span:1,col_span:1,
++            width:20977,height:1282,paragraphs:vec![Paragraph {text:"cell".into(),..Paragraph::default()}],..Cell::default()}).collect();
++        vec![Paragraph {text:"before".into(),line_segs:vec![line(0,42520)],..Paragraph::default()},
++            Paragraph {controls:vec![Control::Table(Box::new(t))],line_segs:vec![line(1600,0)],..Paragraph::default()},
++            Paragraph {line_segs:vec![line(3200,42520)],..Paragraph::default()}]
++    }
++    fn probe(p:&[Paragraph],native:bool,columns:usize,measured:f64)->Option<i32>{
++        let Control::Table(t)=&p[1].controls[0] else{panic!()};
++        unresolved_single_table_placeholder_origin_hu(native,columns,p,1,t,Some(measured),96.0)
++    }
++    fn edit_table(p:&mut [Paragraph],f:impl FnOnce(&mut Table)){
++        let Control::Table(t)=&mut p[1].controls[0] else{panic!()}; f(t);
++    }
++    #[test]fn g048_runtime_real_core_matches_hancom_origin(){
++        let root=std::env::var("JUEONY_OUTER_FIXTURES").expect("absolute own fixtures");
++        for name in ["outer-hwp.hwp","outer-hwp-hancom.hwp","outer-hwpx.hwpx","outer-hwpx-hancom.hwpx"] {
++            let bytes=std::fs::read(std::path::Path::new(&root).join(name)).unwrap();
++            let mut core=crate::document_core::DocumentCore::from_bytes(&bytes).unwrap();core.paginate();
++            let layout:serde_json::Value=serde_json::from_str(&core.get_page_control_layout_native(0).unwrap()).unwrap();
++            let y=layout["controls"][0]["y"].as_f64().unwrap();
++            assert!((y-153.6).abs()<=0.2,"{name}: actual runtime y={y}");
++        }
++    }
++    #[test]fn g048_converted_hwp_preserves_the_same_runtime_contract(){
++        let root=std::env::var("JUEONY_OUTER_FIXTURES").unwrap();
++        let bytes=std::fs::read(std::path::Path::new(&root).join("outer-hwpx.hwpx")).unwrap();
++        let mut live=crate::document_core::DocumentCore::from_bytes(&bytes).unwrap();live.paginate();
++        let saved=live.export_hwp_with_adapter_snapshot().unwrap();
++        let document=crate::parser::parse_hwp(&saved).unwrap();
++        assert!(document.layout_profile().hwp5_stored_pagination_layout());
++        assert!(!document.extra_streams.iter().any(|(p,_)|p==crate::model::document::HWPX_ORIGIN_STREAM_PATH));
++        let mut core=crate::document_core::DocumentCore::from_bytes(&saved).unwrap();core.paginate();
++        let layout:serde_json::Value=serde_json::from_str(&core.get_page_control_layout_native(0).unwrap()).unwrap();
++        let y=layout["controls"][0]["y"].as_f64().unwrap();assert!((y-153.6).abs()<=0.2,"converted actual runtime y={y}");
++        let text:serde_json::Value=serde_json::from_str(&core.get_page_text_layout_native(0).unwrap()).unwrap();
++        assert!((text["runs"][13]["y"].as_f64().unwrap()-153.6).abs()<=0.2);
++    }
++    #[test]fn g048_actual_owned_source_and_hancom_pairs_take_distinct_contracts(){
++        let root=std::env::var("JUEONY_OUTER_FIXTURES").expect("absolute own fixture root required");
++        for (name, expected) in [("outer-hwp.hwp",Some(1600)),("outer-hwp-hancom.hwp",None),
++            ("outer-hwpx.hwpx",Some(1600)),("outer-hwpx-hancom.hwpx",None)] {
++            let bytes=std::fs::read(std::path::Path::new(&root).join(name)).unwrap();
++            let document=if name.ends_with(".hwpx") {crate::parser::hwpx::parse_hwpx(&bytes).unwrap()}
++                else {crate::parser::parse_hwp(&bytes).unwrap()};
++            let p=&document.sections[0].paragraphs;
++            assert_eq!(probe(p,true,1,51.28),expected,"{name}");
++        }
++    }
++    #[test]fn g048_exact_unresolved_native_and_marked_origin_is_read_only(){
++        let p=fixture();let before=serde_json::to_string(&p).unwrap();
++        assert_eq!(probe(&p,true,1,51.28),Some(1600));
++        assert_eq!(serde_json::to_string(&p).unwrap(),before);
++        let mut marked=fixture();edit_table(&mut marked,|t|t.raw_table_record_attr=0x0400_0000);
++        assert_eq!(probe(&marked,true,1,51.28),Some(1600));
++    }
++    #[test]fn g048_hancom_resolved_band_and_other_geometry_stay_on_old_path(){
++        let mut p=fixture();p[2].line_segs[0].vertical_pos=7997;
++        assert_eq!(probe(&p,true,1,51.28),None);
++        p[2].line_segs[0].vertical_pos=3201;assert_eq!(probe(&p,true,1,51.28),None);
++        let p=fixture();assert_eq!(probe(&p,false,1,51.28),None);assert_eq!(probe(&p,true,2,51.28),None);
++        assert_eq!(probe(&p,true,1,51.5),None);
++    }
++    #[test]fn g048_offsets_lock_caption_and_symmetric_margins_are_excluded(){
++        for which in 0..7 {let mut p=fixture();edit_table(&mut p,|t|match which{
++            0=>t.common.vertical_offset=1,1=>t.common.horizontal_offset=1,
++            2=>t.common.locked=true,3=>t.common.size_protect=true,
++            4=>t.caption=Some(crate::model::shape::Caption::default()),
++            5=>{t.outer_margin_left=283;t.outer_margin_right=283;t.outer_margin_top=283;t.outer_margin_bottom=283;},
++            _=>t.page_break=TablePageBreak::RowBreak});assert_eq!(probe(&p,true,1,51.28),None);}
++    }
++    #[test]fn g048_cells_protection_field_nested_and_merge_are_excluded(){
++        for which in 0..6 {let mut p=fixture();edit_table(&mut p,|t|match which{
++            0=>t.cells[0].set_cell_protect(true),1=>t.cells[0].field_name=Some("field".into()),
++            2=>t.cells[0].row_span=2,3=>t.cells[0].paragraphs.push(Paragraph::default()),
++            4=>t.cells[0].paragraphs[0].controls.push(Control::Table(Box::default())),
++            _=>t.cells[0].col=1});assert_eq!(probe(&p,true,1,51.28),None);}
++    }
++    #[test]fn g048_host_text_dirty_stored_or_extra_control_are_excluded(){
++        for which in 0..5 {let mut p=fixture();match which{
++            0=>p[1].text="visible".into(),1=>p[1].stored_text_partition_dirty=true,
++            2=>p[1].line_segs[0].segment_width=1,
++            3=>p[1].line_segs[0].tag|=LineSeg::TAG_IMPLEMENTATION_PROPERTY,
++            _=>p[1].controls.push(Control::Table(Box::default()))};assert_eq!(probe(&p,true,1,51.28),None);}
++    }
++    #[test]fn g048_all_side_channels_and_noadjust_are_rejected_in_every_owner(){
++        use crate::model::paragraph::{FieldRange,OrphanFieldEnd,RangeTag,TitleMark,MarkpenMark};
++        fn side(p:&mut Paragraph,i:usize){match i{
++            0=>p.field_ranges.push(FieldRange::default()),1=>p.orphan_field_ends.push(OrphanFieldEnd::default()),
++            2=>p.range_tags.push(RangeTag::default()),3=>p.title_marks.push(TitleMark::default()),
++            4=>p.markpen_marks.push(MarkpenMark::default()),5=>p.ctrl_data_records.push(Some(vec![])),
++            6=>p.tab_extended.push([0;7]),_=>p.layout_only_fill_lines=1}}
++        for owner in 0..4 {for i in 0..8 {let mut p=fixture();
++            if owner<3 {side(&mut p[owner],i);}else {edit_table(&mut p,|t|side(&mut t.cells[0].paragraphs[0],i));}
++            assert_eq!(probe(&p,true,1,51.28),None,"owner={owner}, channel={i}");
++        }}
++        for which in 0..10 {let mut p=fixture();edit_table(&mut p,|t|match which{
++            0=>t.raw_table_record_attr|=0x08,1=>t.common.attr|=1<<30,2=>t.attr|=1<<30,
++            3=>t.common.height_criterion=crate::model::shape::SizeCriterion::Page,
++            4=>t.common.width=u32::MAX,5=>t.common.height=u32::MAX,
++            6=>t.cells[0].text_direction=1,7=>t.cells[0].line_wrap=1,
++            8=>t.raw_table_record_attr|=0x0800_0000,
++            _=>t.common.width_criterion=crate::model::shape::SizeCriterion::Column});
++            assert_eq!(probe(&p,true,1,51.28),None,"unsafe attr={which}");}
++    }
++    #[test]fn g048_prefix_and_following_template_witness_must_be_exact(){
++        for which in 0..6 {let mut p=fixture();match which{
++            0=>p[0].text.clear(),1=>p[2].text="visible".into(),2=>p[2].stored_text_partition_dirty=true,
++            3=>p[2].line_segs[0].line_spacing+=1,4=>p[0].line_segs[0].baseline_distance+=1,
++            _=>p[2].controls.push(Control::Table(Box::default()))};assert_eq!(probe(&p,true,1,51.28),None);}
++    }
++}
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -2448,6 +2448,43 @@
+         })
+     }
+ 
++    /// Preserve the native source contract only for the exact single-table
++    /// unresolved template whose current paint and flow proof already agrees.
++    /// Pure HWPX, original extra streams, unsafe metadata and edited layouts
++    /// retain their existing lowering/provenance behavior.
++    fn can_restore_native_single_table_placeholder_hwp_lineage(&self) -> bool {
++        use crate::model::control::Control;
++        use crate::model::document::{HWP5_ORIGIN_HWPX_MARKER_PATH,
++            HWP5_ORIGIN_HWPX_PARAGRAPH_AXIS, HWPX_ORIGIN_STREAM_PATH};
++        use crate::renderer::pagination::PageItem;
++        if !matches!(self.source_format, crate::parser::FileFormat::Hwpx)
++            || self.document.provenance.hwp3_lineage
++            || self.effective_layout_profile().session_edited()
++            || self.document.hwpx_aux_entry(HWP5_ORIGIN_HWPX_MARKER_PATH)
++                != Some(HWP5_ORIGIN_HWPX_PARAGRAPH_AXIS)
++            || self.document.extra_streams.iter().any(|(p,_)|p==HWPX_ORIGIN_STREAM_PATH) {
++            return false;
++        }
++        let ([section],[pagination],[measurements]) = (self.document.sections.as_slice(),
++            self.pagination.as_slice(),self.measured_tables.as_slice()) else { return false; };
++        let [page]=pagination.pages.as_slice() else { return false; };
++        let [column]=page.column_contents.as_slice() else { return false; };
++        if column.zone_layout.is_some() || column.zone_y_offset!=0.0
++            || column.start_height!=0.0 || column.endnote_flow
++            || !matches!(column.items.as_slice(),[PageItem::FullParagraph{para_index:0},
++                PageItem::Table{para_index:1,control_index:0},PageItem::FullParagraph{para_index:2}]) {
++            return false;
++        }
++        let Some(host)=section.paragraphs.get(1) else { return false; };
++        let [Control::Table(table)]=host.controls.as_slice() else { return false; };
++        let [measured]=measurements.as_slice() else { return false; };
++        if measured.para_index!=1 || measured.control_index!=0 { return false; }
++        crate::renderer::layout::unresolved_single_table_placeholder_paint_origin_hu(
++            self.effective_layout_profile().hwp5_stored_pagination_layout(),1,
++            &section.paragraphs,1,table,Some(measured.total_height),self.dpi,
++            column.paragraph_float_placements.get(&(1,0))).is_some()
++    }
++
+     pub fn prepare_hwp_export_snapshot(&self) -> HwpExportSnapshot {
+         use crate::document_core::converters::hwpx_to_hwp::convert_if_hwpx_source;
+ 
+@@ -2455,7 +2492,8 @@
+         self.writeback_reflowed_table_frames(&mut snapshot);
+         self.writeback_edited_overlap_table_tail(&mut snapshot);
+         let _report = convert_if_hwpx_source(&mut snapshot, self.source_format);
+-        if self.can_restore_native_whole_stack_hwp_lineage() {
++        if self.can_restore_native_whole_stack_hwp_lineage()
++            || self.can_restore_native_single_table_placeholder_hwp_lineage() {
+             // Only remove the marker just generated by pure-HWPX lowering;
+             // original extra streams and every model/source payload stay intact.
+             snapshot.extra_streams.retain(|(p, _)|

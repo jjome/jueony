@@ -1,0 +1,40 @@
+import assert from 'node:assert/strict';import{readFile,writeFile,mkdir}from'node:fs/promises';import{resolve,join}from'node:path';
+import{loadReviewEngine,hash,snapshot,compareSnapshots,writeJSON}from'./lib/hancom-review.mjs';
+import{verifyPreservedExport}from'../src/adapters/rhwp/preservation.ts';
+import{hwpTabCacheEvidence}from'./integration/hwp-tab-evidence.mjs';
+for(const key of ['JUEONY_OUTER_FIXTURES','JUEONY_ENGINE_PACKAGE','JUEONY_TEST_OUTPUT','JUEONY_BASELINE_ENGINE_PACKAGE'])assert.ok(process.env[key],key+' is required');
+const root=resolve(process.env.JUEONY_OUTER_FIXTURES),pkg=resolve(process.env.JUEONY_ENGINE_PACKAGE),out=resolve(process.env.JUEONY_TEST_OUTPUT);await mkdir(out,{recursive:true});const candidate=await loadReviewEngine(pkg),baseline=await loadReviewEngine(resolve(process.env.JUEONY_BASELINE_ENGINE_PACKAGE)),results=[],failures=[],observations=[];
+async function scenario(name,run){try{await run();results.push(name);console.log('PASS',name);}catch(e){failures.push({name,error:String(e),stack:e.stack,...(e.comparison?{comparison:e.comparison}:{})});console.error('FAIL',name,String(e.message).slice(0,220));}}
+const oraclePath=process.env.JUEONY_METADATA_ORACLE;const oracle=oraclePath?JSON.parse(await readFile(resolve(oraclePath),'utf8')):undefined;const metadataFor=async(name,bytes)=>{if(typeof candidate.HwpDocument.prototype.getDocumentMetadata!=='function')return undefined;assert.ok(oracle,'independent raw summary oracle required');const e=oracle.files.find(e=>e.name===name);assert.ok(e&&!e.error,'raw summary oracle entry missing');assert.equal(e.sha256,hash(bytes),'independent metadata oracle is bound to exact input');return e.values;};
+function equal(a,b,sourceMetadata){const sa=snapshot(a),sb=snapshot(b);if(sourceMetadata){assert.equal(typeof b.getDocumentMetadata,'undefined','only historical baseline lacks new summary API');assert.equal(Object.hasOwn(sb.semantic.values,'summary-metadata'),false);assert.deepEqual(sa.semantic.values['summary-metadata'],sourceMetadata);sb.semantic.values['summary-metadata']=sourceMetadata;}const c=compareSnapshots(sa,sb);if(c.status!=='SAME_WITHIN_PUBLISHED_CONTRACT'){const error=Error('Full comparison mismatch: semantic='+c.semantic.count+', geometry='+c.geometry.count);error.comparison=c;throw error;}assert.equal(c.semantic.count,0);assert.equal(c.geometry.count,0);assert.equal(c.pages.equal,true);assert.deepEqual(c.semantic.readIssues,{before:[],after:[]});return c;}
+for(const format of['hwp','hwpx'])await scenario(format+' actual Hancom full comparison with explicitly reported raw summary difference',async()=>{
+ const an='outer-'+format+'.'+format,bn='outer-'+format+'-hancom.'+format,ab=await readFile(join(root,an)),bb=await readFile(join(root,bn)),a=new candidate.HwpDocument(ab),b=new candidate.HwpDocument(bb);
+ try{const sa=snapshot(a),sb=snapshot(b),av=await metadataFor(an,ab),bv=await metadataFor(bn,bb),c=compareSnapshots(sa,sb);
+  if(av){assert.deepEqual(sa.semantic.values['summary-metadata'],av);assert.deepEqual(sb.semantic.values['summary-metadata'],bv);}
+  const expected=av&&format==='hwpx'?[{path:'$["summary-metadata"]["title"]',before:'',after:'앞 본문',kind:'value'}]:[];
+  assert.deepEqual(c.semantic.differences,expected,'all actual differences must equal the independently read raw title difference; no projection');assert.equal(c.geometry.count,0);assert.equal(c.pages.equal,true);assert.deepEqual(c.semantic.readIssues,{before:[],after:[]});
+  observations.push({name:'actual-pair',format,semantic:c.semantic.count,geometry:c.geometry.count,pages:c.pages,comparison:c,tableY:JSON.parse(a.getPageControlLayout(0)).controls[0].y,note:expected.length?'Hancom filled the empty OPF title with the actual leading text. The one title difference is retained in this report; this pair is NOT semantically identical. Table geometry and every other published field agree.':'All published semantic and geometry fields agree.'});
+ }finally{a.free();b.free();}
+});
+for(const name of ['outer-hwp.hwp','outer-hwp-hancom.hwp','outer-hwpx.hwpx','outer-hwpx-hancom.hwpx'])for(const format of['hwp','hwpx'])await scenario(name+' repeat strict '+format+' and untouched active/raw preservation',async()=>{
+ const bytes=await readFile(join(root,name)),live=new candidate.HwpDocument(bytes),before=live.exportHwp(),events=live.getEventLog();let current=live,owns=false;
+ try{for(let round=1;round<=2;round++){const artifact=current[format==='hwp'?'exportHwpWithReport':'exportHwpxWithReport']();try{const output=artifact.takeBytes(),strict=verifyPreservedExport(current,output,format,artifact.contentLoss(),b=>new candidate.HwpDocument(b));assert.equal(strict.status,'checked');const reopened=new candidate.HwpDocument(output);try{equal(live,reopened);const path=join(out,name+'-'+format+'-'+round+'.'+format);await writeFile(path,output,{flag:'wx'});observations.push({name,format,round,sha256:hash(output),semantic:0,geometry:0});}catch(e){reopened.free();throw e;}if(owns)current.free();current=reopened;owns=true;}finally{artifact.free();}}
+ assert.deepEqual(live.exportHwp(),before);assert.equal(live.getEventLog(),events);
+ if(name.endsWith('.hwp')){
+  const recordBytes=values=>values.map(({compressedSha256,...records})=>records);
+  const actualRaw=hwpTabCacheEvidence(live.exportHwp());assert.deepEqual(recordBytes(actualRaw),recordBytes(hwpTabCacheEvidence(bytes)),'entire decompressed native BodyText record bytes stay exact; container DEFLATE coding need not match Hancom');
+  const old=new baseline.HwpDocument(bytes);try{assert.deepEqual(actualRaw,hwpTabCacheEvidence(old.exportHwp()),'candidate raw/compression policy is exactly the unchanged official63 policy');}finally{old.free();}
+ }
+ }finally{if(owns)current.free();live.free();}
+});
+for(const [label,alter] of [
+ ['protected-cell',d=>d.setCellProperties(0,1,0,0,'{"cellProtect":true}')],
+ ['field-cell',d=>d.setCellProperties(0,1,0,0,'{"fieldName":"source"}')],
+ ['object-lock',d=>d.setControlLock(1,0,true)],
+ ['row-break',d=>d.setTableProperties(0,1,0,'{"pageBreak":2}')],
+])for(const input of ['outer-hwp.hwp','outer-hwpx.hwpx'])await scenario('unsafe scope unchanged '+label+' '+input,async()=>{
+ const bytes=await readFile(join(root,input)),a=new candidate.HwpDocument(bytes),b=new baseline.HwpDocument(bytes);
+ try{const sourceMetadata=await metadataFor(input,bytes);alter(a);alter(b);equal(a,b,sourceMetadata);const savedA=a.exportHwp(),savedB=b.exportHwp();assert.deepEqual(savedA,savedB,'unsafe scope export bytes stay exactly official63');const reopenedA=new candidate.HwpDocument(savedA),reopenedB=new baseline.HwpDocument(savedB);try{equal(reopenedA,reopenedB,sourceMetadata);}finally{reopenedA.free();reopenedB.free();}}finally{a.free();b.free();}
+});
+const manifest=JSON.parse(await readFile(join(root,'manifest.json'),'utf8'));for(const item of manifest.files.filter(x=>!x.name.startsWith('outer-')))await scenario('formal63 unchanged negative '+item.name,async()=>{const bytes=await readFile(join(root,item.name)),a=new candidate.HwpDocument(bytes),b=new baseline.HwpDocument(bytes);try{equal(a,b,await metadataFor(item.name,bytes));}finally{a.free();b.free();}});
+await writeJSON(join(out,'result.json'),{createdAt:new Date().toISOString(),results,failures,observations,candidate:candidate.metadata,baseline:baseline.metadata,verifierSha256:hash(await readFile(new URL(import.meta.url))),scope:'Formal engine single-table placeholder-origin contract. A historical baseline lacking the new summary API is enriched with independent raw source summary values, bound to exact input SHA; existing fields and geometry are never removed or projected. Actual source/Hancom pairs are owned synthetic fixtures. All semantics and every published control/text geometry field compare with unchanged0.2. No source fields, raw stream bytes or guard were normalized. No fresh Hancom GUI verification is claimed.'});if(failures.length)process.exitCode=1;

@@ -1,0 +1,14 @@
+PASS row height whole: exact stored and rendered heights, preservation, snapshot and safe reopen
+PASS row height band: exact stored and rendered heights, preservation, snapshot and safe reopen
+PASS row height direct: exact stored and rendered heights, preservation, snapshot and safe reopen
+PASS row height multiple: exact stored and rendered heights, preservation, snapshot and safe reopen
+PASS row height empty: exact stored and rendered heights, preservation, snapshot and safe reopen
+PASS row height later: exact stored and rendered heights, preservation, snapshot and safe reopen
+PASS row height single-column: exact stored and rendered heights, preservation, snapshot and safe reopen
+PASS long content gets a large explicit height; requests below content minimum reject without writes
+PASS existing export guard refuses altered-DPI style evidence before height mutation
+PASS one-row table supports explicit height and rejects equalization
+PASS height can grow and shrink repeatedly when content fits
+PASS invalid/no-op/partial columns/mixed/batch/alias/overflow/HWP commands refuse without writes
+PASS protected/merged/mixed/field/vertical/inline/ragged/spaced/multicolumn sources stay readonly
+PASS stale source, false/no-op/throwing setters, unwanted neighbor changes or differing actual geometry rollback

@@ -1,0 +1,16 @@
+PASS hwp: selected table Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save
+PASS hwp: selected image Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save
+PASS hwp: selected shape Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save
+PASS hwp: selected line Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save
+PASS hwp: selected textbox Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save
+PASS hwp: selected group Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save
+PASS hwp: selected equation Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save
+PASS hwpx: selected table Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save
+PASS hwpx: selected image Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save
+PASS hwpx: selected shape Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save
+PASS hwpx: selected line Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save
+PASS hwpx: selected textbox Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save
+PASS hwpx: selected group Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save
+PASS hwpx: selected equation Ctrl+N,K opens native dialog, cancel preserves content and P applies/undo/redo/save
+PASS stale table dialog refuses confirm after another document mutation
+PASS stale image dialog refuses confirm after another document mutation

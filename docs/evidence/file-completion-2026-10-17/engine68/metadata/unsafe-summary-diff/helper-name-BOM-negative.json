@@ -1,0 +1,10 @@
+{
+  "name": "directory-summary-name-BOM-alias",
+  "historicalReaderWouldAccept": true,
+  "currentReaderRejected": true,
+  "error": "Expected values to be strictly equal:",
+  "sourceSha256": "9e9fb9c82e11299499ae7be1f60b3f181aba9172566c3911ea51426b3c462e4b",
+  "mutatedSha256": "8e2c2397a19b2699c5d38602b08377914ecfabfe846c10969758cc470a8df6d8",
+  "helperSha256": "92931cef313dc87bdba7047df192911a6f2b7d25e931e7497ade32b5e53ccedf",
+  "scope": "Only an owned copied CFB directory-name entry is mutated. Its leading U+FEFF is name content, not an encoding BOM to discard. Production engine and app are unchanged."
+}

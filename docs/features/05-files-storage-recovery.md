@@ -4,7 +4,7 @@
 
 열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.
 
-**2026-10-17 현재:** 2026-10-17 정식65 후속: 저장 Undo·표 속성 높이 갱신 회귀 수정 중이며 G071은 실제 한글 양형식 재저장 사본의 전체 의미·공개 배치 차이0으로 마감했다. 최근 문서 재연결·문서 정보 편집을 병렬 구현 중이다. 상위10개와 N001·나머지 직접 검증은 아직 미완료다. 상세 완료·실패를 109번 기록에서 구분한다. [완료·실패·잔여](../109-file-preservation-hancom-followup.md).
+**2026-10-17 현재:** 저장 Undo·표 속성 높이 회귀를 수정하고 정식68에서 기존44회귀를 통과했다. G071·G073은 제한된 실제 한글 사본·지면 검수까지 마감했다. 최근 문서 재연결과 문서 요약5필드를 구현·검수했고 닫기·종료의 네 가지 선택과 다문서 원자 복구도 구현·검수했다. 최신 실제 Windows 흐름은 아직 미검수다. 상위10개 전체·N001 등 남은 검수는 미완료이며 세부 완료 수로 대신하지 않는다. [실제 완료·실패·잔여](../109-file-preservation-hancom-followup.md).
 
 ## 진행 요약
 
@@ -13,7 +13,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | --- | --- | --- |
 | 구현 | 완료 23/24 · 부분 1 | 완료 0/10 · 부분 9 · 미구현 1 |
-| 검증 | 완료 17/24 · 부분 7 | 완료 0/10 · 부분 7 · 미검증 3 |
+| 검증 | 완료 18/24 · 부분 6 | 완료 0/10 · 부분 7 · 미검증 3 |
 | Agent 연결 | 연결 6/6 · 부분 0 · 해당 없음 18 | 연결 0/10 · 부분 1 · 미연결 9 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -113,7 +113,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [G073](<05-files-storage-recovery.md#g073>) · 작업 | 표 바깥 여백의 HWP/HWPX 모델·저장 일치 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
+| [G073](<05-files-storage-recovery.md#g073>) · 작업 | 표 바깥 여백의 HWP/HWPX 모델·저장 일치 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 
 <a id="work-8"></a>
 
@@ -245,10 +245,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 미저장 내용의 읽기 전용 통계 구현. 개인 정보·이력 편집과 한글 통계 동등성은 남음.
+- 다음 작업: 정식68에서 제목·주제·작성자·키워드·설명5필드 원자 편집과 한 번 Undo/Redo, 두 형식 저장 재열기 구현. Native15/API9/실제 Edge10 통과, 실제 한글 HWP5필드 표시만 확인. 작성·수정일/이력·한글 통계 동일성·HWPX 한글 재저장·Agent 연결은 남음.
 - UI 명령: `file:document-info`
-- 근거: [parity-result.json](<../evidence/features-2026-10-11/parity-result.json>) · [editor-tests.txt](<../evidence/features-2026-10-11/editor-tests.txt>)
-- 원래 기록: `PARTIAL;BROWSER_TESTED_NATIVE_PENDING`
+- 근거: [parity-result.json](<../evidence/features-2026-10-11/parity-result.json>) · [editor-tests.txt](<../evidence/features-2026-10-11/editor-tests.txt>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [README.md](<../evidence/file-completion-2026-10-17/engine68/metadata/README.md>)
+- 원래 기록: `PARTIAL;FIVE_FIELD_METADATA_EDIT_AND_ROUNDTRIP_VERIFIED_FULL_INFORMATION_PARITY_PENDING_2026_10_17`
 
 </details>
 
@@ -259,10 +259,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 닫기 취소·복구본 삭제 실패의 dirty/undo/원본 보존·후속 회복·마지막 탭 폐기는 실제 Edge 검증. 전체 메뉴/한글 종료 동등성은 남음.
+- 다음 작업: 통합 파일 메뉴 닫기를 기존 탭 저장/폐기/취소와 연결. 실제 Edge 종료/닫기10사례 및 취소·저장 실패의 열린 상태 보존 검수. 최신 실제 Windows·한글 전체 수명 비교와 Agent 연결은 남음.
 - UI 명령: `ext:jueony-close`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>)
-- 원래 기록: `WIRED;NOT_RUN`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [completion.json](<../evidence/file-completion-2026-10-17/engine68/lifecycle/completion.json>)
+- 원래 기록: `PARTIAL;HOST_MENU_CLOSE_AND_EXIT_LIFECYCLE_VERIFIED_NATIVE_HANCOM_AGENT_PENDING_2026_10_17`
 
 </details>
 
@@ -273,9 +273,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 기본 네이티브 종료·미저장 복구의 실제 창 검수 완료(G107). 전체 한글 종료 메뉴·다른 모든 작업 상태와 동일한 동작인지는 상위 비교로 유지.
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>)
-- 원래 기록: `PARTIAL;NOT_RUN`
+- 다음 작업: OS X와 파일 메뉴 끝에 같은 coordinator 연결. 모두 파일 저장/저장 안 함/복구본 보관/취소, stable 문서 instance·API·출력 이름, 다문서·다른 업무 checkpoint 원자 변경/실패 CAS 보상 구현. 실제 Edge+합성 Native IPC10·unit29 통과. 새 흐름 실제 Windows/Hancom·Agent 연결은 남음.
+- UI 명령: `file:exit`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [completion.json](<../evidence/file-completion-2026-10-17/engine68/lifecycle/completion.json>)
+- 원래 기록: `PARTIAL;ATOMIC_SAVE_DISCARD_RECOVERY_CANCEL_IMPLEMENTED_DIRECT_NATIVE_AND_AGENT_PENDING_2026_10_17`
 
 </details>
 
@@ -387,12 +388,12 @@
 <summary>G073 · 표 바깥 여백의 HWP/HWPX 모델·저장 일치</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PARTIAL** / 한글 **PARTIAL**.
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **DONE**.
 - 완료 범위: 네 방향 semantic/common/raw cache·취소·undo·재열기
-- 다음 작업: 정식63의 HWP/HWPX 각각 실제 한글 재저장에서 의미0/배치20차이 발견. 단일 표 뒤 LINE_SEG Y의 양방향 A/B로 원점 분기 원인을 분리했으며 좁은 후속 수정과 실제 재열기 검수 진행.
-- 근거: [94-table-width-and-outer-margins.md](<../94-table-width-and-outer-margins.md>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>)
-- 원래 기록: `SCOPED_IMPLEMENTED;ACTUAL_HANCOM_OUTER_ORIGIN_FAILURE_2026_10_17`
+- 다음 작업: 정식68에서 마감: 실제 한글 양형식 사본의 표·전체 공개 지면 차이0, 실제 fresh/loaded4경로·Undo·보존 재열기 통과. 제목1개 자동부여 차이는 raw oracle로 별도 보고하고 지우지 않음. 보호 음성·본문 및 unknown bytes 보존 유지.
+- 근거: [94-table-width-and-outer-margins.md](<../94-table-width-and-outer-margins.md>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [contract31-bom-preserving.json](<../evidence/file-completion-2026-10-17/engine68/outer/contract31-bom-preserving.json>) · [result.json](<../evidence/file-completion-2026-10-17/engine68/regressions/outer-native/result.json>) · [README.md](<../evidence/file-completion-2026-10-17/engine68/metadata/README.md>)
+- 원래 기록: `DONE;FORMAL68_OUTER_ORIGIN_LIVE_SAVE_AND_HANCOM_PAIRS_VERIFIED_2026_10_17`
 
 </details>
 

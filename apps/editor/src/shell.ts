@@ -1,5 +1,8 @@
 import {installNativeFilePickers,installNativeExitProtection,nativeFileToken,nativeRecentHandle} from './adapters/desktop/native-host.ts';
 import {createNativeRecents} from './adapters/desktop/native-recents.ts';
+import {createDocumentLifecycle,assertExitSavedTransition} from './adapters/desktop/document-lifecycle.ts';
+import {withExitSaveFrame} from './adapters/desktop/exit-save-frame.ts';
+import type {NativeExitConfirmation} from './adapters/desktop/native-host.ts';
 import {readDocumentFailure} from './modules/document/public/index.ts';
 import {connectDocumentFrame} from './adapters/iframe/document-client.ts';
 import type {DocumentFrameClient} from './adapters/iframe/document-client.ts';
@@ -65,7 +68,8 @@ const chat=()=>workspace.chat(work().id,work().activeChatId);
 const session=createSessionFacade({state:{activeWorkspaceId:()=>state.activeWorkspaceId,workspaces:()=>state.workspaces,tabs:()=>tabs.map(({id,workspaceId,closed})=>({id,workspaceId,closed}))},lifecycle:{setOrder:(id,order)=>{workspace.workspace(id).documentOrder=order;},setActiveDocument:(id,documentId)=>{workspace.workspace(id).activeDocumentId=documentId;}}});
 const button=(label:string,action:()=>unknown)=>{const b=document.createElement('button');b.textContent=label;b.type='button';b.onclick=()=>{try{void Promise.resolve(action()).catch(error);}catch(e){error(e);}};return b;};
 const nativeRecents=nativeHost?createNativeRecents({invoke:nativeHost.core.invoke.bind(nativeHost.core),workspace:()=>state?.activeWorkspaceId??'',canNavigate:()=>!closing&&!restoring&&!nativeExitPending&&cancelNavigation(),handle:info=>nativeRecentHandle(window,info),token:nativeFileToken,open:openHandle,confirm:message=>window.confirm(message),notice:status,changed:()=>chrome.refresh()}):undefined;
-const chrome=installUnifiedChrome({menus:$('unified-menus'),tools:$('unified-tools'),active:()=>{const api=activeTab?.initialized?activeTab.api??undefined:undefined;return api?nativeRecents?.wrap(api)??api:undefined;},execute:(id,params)=>{if(running?.run.status==='applying')throw new Error('문서 적용 중입니다.');if(nativeRecents&&(id==='file:open-native-recent'||id==='file:clear-native-recent'))return nativeRecents.execute(id,params);if(id==='file:open'){$('open-document').click();return;}const result=activeTab?.api!.executeCommand(id,params);if(!result?.ok)throw new Error(result?.message??'현재 문서에서 실행할 수 없습니다.');},error});
+const lifecycle=createDocumentLifecycle({canClose:()=>Boolean(activeTab?.initialized&&activeTab.api&&!activeTab.api.busy()&&!closing&&!restoring&&!nativeExitPending&&!running&&!document.querySelector('dialog[open]')),canExit:()=>Boolean(nativeExit&&!nativeExitSnapshot().blocked),close:async()=>{if(activeTab)await closeTab(activeTab);},exit:async()=>{if(!nativeExit)throw Error('프로그램 종료 보호를 확인할 수 없습니다.');await nativeExit.request({preventDefault(){}});}});
+const chrome=installUnifiedChrome({menus:$('unified-menus'),tools:$('unified-tools'),active:()=>{const api=activeTab?.initialized?activeTab.api??undefined:undefined;return api?lifecycle.wrap(nativeRecents?.wrap(api)??api):undefined;},execute:(id,params)=>{if(running?.run.status==='applying')throw new Error('문서 적용 중입니다.');if(id==='ext:jueony-close'||id==='file:exit')return lifecycle.execute(id);if(nativeRecents&&(id==='file:open-native-recent'||id==='file:clear-native-recent'))return nativeRecents.execute(id,params);if(id==='file:open'){$('open-document').click();return;}const result=activeTab?.api!.executeCommand(id,params);if(!result?.ok)throw new Error(result?.message??'현재 문서에서 실행할 수 없습니다.');},error});
 const on=(id:string,action:()=>unknown)=>$(id).addEventListener('click',()=>{try{void Promise.resolve(action()).catch(error);}catch(e){error(e);}});
 async function persist(){stateWrites++;try{await store.save(state);persistError=false;}catch(e){persistError=true;throw e;}finally{stateWrites--;}}
 const navigation=createSessionGuard(()=>({closing,restoring,runStatus:running?.run.status}),()=>running?.controller.abort(),status);
@@ -393,22 +397,53 @@ split.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown'].includes(e.key))
 window.addEventListener('message',event=>{if(event.origin!==location.origin)return;const tab=tabs.find(t=>t.frame.contentWindow===event.source);if(!tab)return;if(event.data?.type==='jueony:status')refreshTab(tab);if(event.data?.type==='jueony:command-state'&&tab===activeTab)chrome.refresh();if(event.data?.type==='jueony:focus-chat'&&tab===activeTab){if(state.focusMode){state.focusMode=false;render();void persist().catch(error);}$('request-input').focus();}if(event.data?.type==='jueony:preferences-state'){recoverySettingsWatcher.refresh();tab.preferenceError=Boolean(event.data.error);tab.preferenceMessage=tab.preferenceError?String(event.data.message):undefined;if(tab.preferenceError)status(tab.preferenceMessage!);}if(event.data?.type==='jueony:new-document'&&tab===activeTab&&cancelNavigation())void newTab().catch(error);if(event.data?.type==='jueony:close-document'&&tab===activeTab)void closeTab(tab).catch(error);});
 function nativeExitSnapshot(){
  const documents=tabs.filter(tab=>!tab.closed);
- return {stamp:JSON.stringify({workspace:state?.activeWorkspaceId,documents:documents.map(tab=>({id:tab.id,workspaceId:tab.workspaceId,revision:tab.api?.revision(),dirty:tab.api?.state().dirty}))}),
+ return {stamp:JSON.stringify({workspace:state?.activeWorkspaceId,documents:documents.map(tab=>({id:tab.id,workspaceId:tab.workspaceId,identity:tab.api?.documentIdentity(),instance:tab.api?.documentInstance(),name:tab.api?.state().name,revision:tab.api?.revision(),dirty:tab.api?.state().dirty}))}),
   blocked:!state||restoring||stateWrites>0||(closing&&!nativeExitPending)||Boolean(running)||documents.some(tab=>!tab.initialized||!tab.api||tab.api.busy()||(tab.pendingWrites??0)>0)||Boolean(document.querySelector('dialog[open]')),
   needsConfirmation:documents.some(tab=>Boolean(tab.api?.state().dirty))};
 }
-function confirmNativeRecoveryExit():Promise<boolean>{
- return new Promise(resolve=>{
+let nativeExitMode:'checkpoint'|'discard'='checkpoint',nativeExitRollback:(()=>Promise<void>)|undefined;
+async function confirmNativeRecoveryExit():Promise<NativeExitConfirmation>{
+ const before=nativeExitSnapshot(),original=JSON.parse(before.stamp),dirty=tabs.filter(tab=>!tab.closed&&tab.api?.state().dirty);
+ const choice=await new Promise<string>(resolve=>{
   const dialog=document.createElement('dialog');dialog.id='native-exit-confirm';dialog.className='jueony-page-dialog';
-  const title=document.createElement('h2');title.textContent='복구본을 보관하고 종료';
-  const message=document.createElement('p');message.textContent='원본 HWP/HWPX 파일에 저장하는 것이 아닙니다. 저장하지 않은 모든 문서의 최신 내용을 이 Windows 계정의 로컬 복구 저장소에 보관한 뒤 종료합니다. 자동복구를 꺼 둔 문서도 이번 종료에 한해서 복구본을 저장합니다. 원본 파일 저장을 원하거나 이 보관에 동의하지 않으면 취소하세요.';
+  const title=document.createElement('h2');title.textContent='변경한 문서를 저장할까요?';
+  const message=document.createElement('p');message.textContent=dirty.map(tab=>tab.api!.state().name).join(', ')+' — 파일에 모두 저장하면 원본 파일(새 문서는 선택한 위치)에 저장합니다. 저장하지 않으면 해당 문서의 로컬 복구본도 폐기합니다. 복구본 보관은 원본 파일에 저장하지 않고 이 Windows 계정에 최신 내용을 보관합니다.';
   const cancel=document.createElement('button');cancel.type='button';cancel.textContent='취소';cancel.onclick=()=>dialog.close('cancel');
   const accept=document.createElement('button');accept.type='button';accept.textContent='복구본을 저장하고 종료';accept.onclick=()=>dialog.close('checkpoint');
-  dialog.append(title,message,cancel,accept);document.body.append(dialog);dialog.addEventListener('close',()=>{const accepted=dialog.returnValue==='checkpoint';dialog.remove();resolve(accepted);},{once:true});dialog.showModal();cancel.focus();
+  const save=document.createElement('button');save.type='button';save.textContent='파일에 모두 저장하고 종료';save.dataset.exitChoice='save';save.onclick=()=>dialog.close('save');
+  const discard=document.createElement('button');discard.type='button';discard.textContent='저장하지 않고 종료';discard.dataset.exitChoice='discard';discard.onclick=()=>dialog.close('discard');
+  dialog.append(title,message,cancel,save,discard,accept);document.body.append(dialog);dialog.addEventListener('close',()=>{const result=dialog.returnValue;dialog.remove();resolve(result);},{once:true});dialog.showModal();cancel.focus();
  });
+ if(!choice||choice==='cancel')return false;
+ if(nativeExitSnapshot().stamp!==before.stamp)throw Error('종료 확인 중 문서가 바뀌었습니다. 다시 확인해 주세요.');
+ if(choice==='checkpoint')return true;
+ if(choice==='discard'){nativeExitMode='discard';return{beforeStamp:before.stamp,approvedSnapshot:before,rollback:async()=>{await nativeExitRollback?.();nativeExitRollback=undefined;}};}
+ if(choice!=='save')return false;
+ const saved:string[]=[],apis=new Map(dirty.map(tab=>[tab,tab.api]));let expected=original;
+ for(const tab of dirty){
+  try{
+   if(tab.api!==apis.get(tab)||nativeExitSnapshot().stamp!==JSON.stringify(expected))throw Error('저장 대상의 문서 버전이 바뀌었습니다.');
+   if(await withExitSaveFrame(tab.frame,()=>tab.api!.save())!=='saved'||tab.api!.state().dirty)throw Error('파일 저장이 취소되었거나 완료되지 않았습니다.');
+   if(tab.api!==apis.get(tab))throw Error('저장 중 문서 연결이 바뀌었습니다.');
+   const actual=JSON.parse(nativeExitSnapshot().stamp);assertExitSavedTransition(expected,actual,tab.id,tab.api!.fileHandle()?.name);
+   saved.push(tab.api!.state().name);expected=actual;
+  }catch(error){throw Error((saved.length?'이미 파일에 저장한 문서: '+saved.join(', ')+'. ':'')+'나머지 문서는 열린 채 유지하며 종료하지 않습니다. '+String(error));}
+ }
+ return{beforeStamp:before.stamp,approvedSnapshot:nativeExitSnapshot()};
 }
 async function commitNativeExitRecovery(){
- const documents=tabs.filter(tab=>!tab.closed);
+ const discarded=nativeExitMode==='discard'?tabs.filter(tab=>!tab.closed&&tab.api?.state().dirty):[];
+ const documents=tabs.filter(tab=>!tab.closed&&!discarded.includes(tab));
+ if(nativeExitMode==='discard'){
+  const updates:SavedDocument[]=[];
+  for(const tab of documents){await tab.persist.catch(()=>{});if(tab.preferenceError)throw Error(tab.preferenceMessage??'문서 환경 설정을 확인해 주세요.');const snapshot=tab.api!.recovery();if(!snapshot)throw Error('문서 복구본을 준비하지 못했습니다.');const fileConnection=snapshot.fileConnection??(!tab.api!.fileHandle()?tab.pendingConnection:undefined);updates.push({id:tab.id,workspaceId:tab.workspaceId,updatedAt:Date.now(),viewUpdatedAt:viewStamp(tab),...snapshot,fileConnection,view:tab.api!.captureDocumentView()});}
+  for(const tab of discarded)await tab.persist.catch(()=>{});
+  const changes=await store.commitExitRecovery(discarded.map(tab=>({id:tab.id,workspaceId:tab.workspaceId})),updates);
+  nativeExitRollback=()=>store.rollbackExitRecovery(changes);
+  await store.verifyExitRecovery(changes);
+  await persist();checkpointExitView();if(viewJournalError)throw Error('문서 보기 상태를 보관하지 못했습니다.');
+  return;
+ }
  for(const tab of documents){await tab.persist.catch(()=>{});if(tab.preferenceError)throw new Error(tab.preferenceMessage??'문서 환경 설정 저장을 확인해 주세요.');if(!await persistTab(tab,'native-exit'))throw new Error('문서 복구본을 준비하지 못해 종료하지 않았습니다.');}
  // Read back committed records, including inactive and other-workspace documents.
  for(const workspaceId of new Set(documents.map(tab=>tab.workspaceId))){
@@ -425,7 +460,7 @@ async function commitNativeExitRecovery(){
 if(nativeHost){
  nativeExit=installNativeExitProtection(nativeHost,{
   snapshot:nativeExitSnapshot,confirm:confirmNativeRecoveryExit,checkpoint:commitNativeExitRecovery,
-  freeze:()=>{const previousClosing=closing;nativeExitPending=true;closing=true;for(const tab of tabs){clearTimeout(tab.timer);tab.recovery?.updateSettings({...recoverySettings,recoveryEnabled:false,idleSaveEnabled:false});}const elements=Array.from(document.body.children).filter((element):element is HTMLElement=>element instanceof HTMLElement);const previous=elements.map(element=>element.inert);elements.forEach(element=>element.inert=true);return()=>{elements.forEach((element,index)=>element.inert=previous[index]);nativeExitPending=false;closing=previousClosing;for(const tab of tabs){tab.recovery?.updateSettings(recoverySettings);refreshTab(tab);}};},
+  freeze:()=>{nativeExitMode='checkpoint';nativeExitRollback=undefined;const previousClosing=closing;nativeExitPending=true;closing=true;for(const tab of tabs){clearTimeout(tab.timer);tab.recovery?.updateSettings({...recoverySettings,recoveryEnabled:false,idleSaveEnabled:false});}const elements=Array.from(document.body.children).filter((element):element is HTMLElement=>element instanceof HTMLElement);const previous=elements.map(element=>element.inert);elements.forEach(element=>element.inert=true);return()=>{elements.forEach((element,index)=>element.inert=previous[index]);nativeExitPending=false;closing=previousClosing;for(const tab of tabs){tab.recovery?.updateSettings(recoverySettings);refreshTab(tab);}};},
   error:value=>status('종료하지 않았습니다. '+(value instanceof Error?value.message:String(value))),
  });
  void nativeExit.ready.catch(value=>status('네이티브 종료 보호를 설치하지 못했습니다. 문서를 파일에 저장한 뒤 종료해 주세요. '+String(value)));

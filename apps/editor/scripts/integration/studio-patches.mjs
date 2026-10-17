@@ -278,7 +278,8 @@ saveHistory = replaceOnce(saveHistory, '  peekUndoTop(): EditCommand | null {', 
    * That command captures its after-state lazily on Undo, including this frame.
    * Do not absorb inverse text commands, submode commands or changed history. */
   absorbSaveFrameSnapshot(previous: EditCommand, current: EditCommand, wasm: WasmBridge): boolean {
-    if (previous?.constructor !== SnapshotCommand || current?.constructor !== SnapshotCommand
+    const isExactSnapshot = (command: EditCommand): boolean => command?.constructor === SnapshotCommand;
+    if (!isExactSnapshot(previous) || !isExactSnapshot(current)
         || current.type !== 'snapshot:jueony:save-table-frames'
         || this.redoStack.length !== 0 || this.undoStack.length < 2
         || this.undoStack[this.undoStack.length - 2] !== previous

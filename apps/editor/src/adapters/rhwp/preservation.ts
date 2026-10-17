@@ -63,6 +63,16 @@ export function capturePreservationEvidence(value:NativeDocument):PreservationEv
  const capture=(path:string,action:()=>Json)=>{try{values[path]=normalized(action());}catch{issues.push({code:'unreadable',path,message:'문서 속성을 읽지 못했습니다'});}};
  const budget=(count:number,limit:number)=>{if(count>limit)throw new Error('검사 크기 한도 초과');};
  const at: {section:number;paragraph:number}[]=[];
+ // The summary strings are a separate semantic contract from their raw OLE/OPF
+ // storage and CAS token. An exposed but unreadable owner must not be replaced
+ // with empty values or silently omitted from a successful save check.
+ if(typeof (doc as Record<string,unknown>).getDocumentMetadata==='function')capture('summary-metadata',()=>{
+  const state=record(read(doc,'getDocumentMetadata')),value=record(state.values);
+  const keys=['title','subject','author','keywords','description'];
+  if(Object.keys(value).length!==keys.length||keys.some(k=>!Object.hasOwn(value,k)||typeof value[k]!=='string'||(value[k] as string).length>4096||/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/u.test(value[k] as string)||/[\ud800-\udfff]/u.test(value[k] as string)))throw Error('Unsupported summary metadata');
+  return value;
+ });
+ else unverified.push('현재 엔진은 제목·주제·작성자·키워드·설명 보존 읽기 API를 제공하지 않습니다.');
  const pageBorder=(section:number,kind?:string):Json=>{
   const {attr:rawBits,...resolved}=record(kind?read(doc,'getPageBorderFillEntry',section,kind):read(doc,'getPageBorderFill',section));
   if(resolved.fillType==='image'&&resolved.image&&typeof (doc as Record<string,unknown>).getPageBackgroundImageBytes==='function'){

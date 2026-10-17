@@ -1,0 +1,482 @@
+{
+  "results": [
+    {
+      "name": "protected-cell",
+      "baselineKnownValues": {
+        "title": "",
+        "subject": "",
+        "author": "edward",
+        "keywords": "",
+        "description": ""
+      },
+      "formalKnownValues": {
+        "title": "",
+        "subject": "",
+        "author": "rhwp",
+        "keywords": "",
+        "description": ""
+      },
+      "streamManifest": [
+        {
+          "path": "DocInfo",
+          "beforeSha256": "9102e927b769692a98e1a2ff8597af714935dfab5660813d017aeacc2410f684",
+          "afterSha256": "9102e927b769692a98e1a2ff8597af714935dfab5660813d017aeacc2410f684",
+          "beforeBytes": 900,
+          "afterBytes": 900
+        },
+        {
+          "path": "PrvText",
+          "beforeSha256": "b7f560303ee2cca55615b53fcff87c6ab2c55f9e71a6cea93c61b572213e7075",
+          "afterSha256": "b7f560303ee2cca55615b53fcff87c6ab2c55f9e71a6cea93c61b572213e7075",
+          "beforeBytes": 4,
+          "afterBytes": 4
+        },
+        {
+          "path": "Scripts/DefaultJScript",
+          "beforeSha256": "1b4833c1d5a47fcf6cc76e769cf6b12b27401152387d99dfd313469881bcf590",
+          "afterSha256": "1b4833c1d5a47fcf6cc76e769cf6b12b27401152387d99dfd313469881bcf590",
+          "beforeBytes": 16,
+          "afterBytes": 16
+        },
+        {
+          "path": "Scripts/JScriptVersion",
+          "beforeSha256": "1322438fbe7c693f50ae634db95d80567379557dea3a970e75d06e63a0e16b55",
+          "afterSha256": "1322438fbe7c693f50ae634db95d80567379557dea3a970e75d06e63a0e16b55",
+          "beforeBytes": 13,
+          "afterBytes": 13
+        },
+        {
+          "path": "BodyText/Section0",
+          "beforeSha256": "0755e7b2bbc42ac89b38438226c18e114ccb519d984415b1111bf6c2614629a1",
+          "afterSha256": "0755e7b2bbc42ac89b38438226c18e114ccb519d984415b1111bf6c2614629a1",
+          "beforeBytes": 390,
+          "afterBytes": 390
+        },
+        {
+          "path": "PrvImage",
+          "beforeSha256": "c1bf607dd7214cb64486934b72c335a64b31d7f5203c40afdea5a1b95c826cf8",
+          "afterSha256": "c1bf607dd7214cb64486934b72c335a64b31d7f5203c40afdea5a1b95c826cf8",
+          "beforeBytes": 68,
+          "afterBytes": 68
+        },
+        {
+          "path": "DocOptions/_LinkDoc",
+          "beforeSha256": "0fab9be824f6540b15651edfcbbf1bb8f5af1b5cf78dbc80e38a1a23d8a9930c",
+          "afterSha256": "0fab9be824f6540b15651edfcbbf1bb8f5af1b5cf78dbc80e38a1a23d8a9930c",
+          "beforeBytes": 524,
+          "afterBytes": 524
+        },
+        {
+          "path": "FileHeader",
+          "beforeSha256": "97c3b165f25e14a9956a3db044a66f96c4c3f0db67c333d5a33ef76bfd2bc177",
+          "afterSha256": "97c3b165f25e14a9956a3db044a66f96c4c3f0db67c333d5a33ef76bfd2bc177",
+          "beforeBytes": 256,
+          "afterBytes": 256
+        },
+        {
+          "path": "RhwpHwpxOrigin",
+          "beforeSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "afterSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "beforeBytes": 1,
+          "afterBytes": 1
+        },
+        {
+          "path": "HwpSummaryInformation",
+          "beforeSha256": "a573de8a9bea578b0e80cdb598c126defaccf12b5be9944a47ef1dfec4fe18c3",
+          "afterSha256": "eed9b1928730afc241f9295c949797246bd5c0ab42bab19f63e5738b469177dd",
+          "beforeBytes": 461,
+          "afterBytes": 457
+        }
+      ],
+      "changed": [
+        {
+          "field": "author",
+          "pid": 4,
+          "before": "edward",
+          "after": "rhwp"
+        }
+      ],
+      "unchangedLogicalStreams": 9,
+      "unknownPidsByteExact": [
+        20,
+        8,
+        9,
+        12,
+        13,
+        11,
+        14,
+        21,
+        0
+      ],
+      "knownMappingExact": true,
+      "allOtherLogicalStreamsExact": true,
+      "summarySha256": {
+        "before": "a573de8a9bea578b0e80cdb598c126defaccf12b5be9944a47ef1dfec4fe18c3",
+        "after": "eed9b1928730afc241f9295c949797246bd5c0ab42bab19f63e5738b469177dd"
+      },
+      "wholeFileByteEqual": false
+    },
+    {
+      "name": "field-cell",
+      "baselineKnownValues": {
+        "title": "",
+        "subject": "",
+        "author": "edward",
+        "keywords": "",
+        "description": ""
+      },
+      "formalKnownValues": {
+        "title": "",
+        "subject": "",
+        "author": "rhwp",
+        "keywords": "",
+        "description": ""
+      },
+      "streamManifest": [
+        {
+          "path": "DocInfo",
+          "beforeSha256": "9102e927b769692a98e1a2ff8597af714935dfab5660813d017aeacc2410f684",
+          "afterSha256": "9102e927b769692a98e1a2ff8597af714935dfab5660813d017aeacc2410f684",
+          "beforeBytes": 900,
+          "afterBytes": 900
+        },
+        {
+          "path": "PrvText",
+          "beforeSha256": "b7f560303ee2cca55615b53fcff87c6ab2c55f9e71a6cea93c61b572213e7075",
+          "afterSha256": "b7f560303ee2cca55615b53fcff87c6ab2c55f9e71a6cea93c61b572213e7075",
+          "beforeBytes": 4,
+          "afterBytes": 4
+        },
+        {
+          "path": "Scripts/DefaultJScript",
+          "beforeSha256": "1b4833c1d5a47fcf6cc76e769cf6b12b27401152387d99dfd313469881bcf590",
+          "afterSha256": "1b4833c1d5a47fcf6cc76e769cf6b12b27401152387d99dfd313469881bcf590",
+          "beforeBytes": 16,
+          "afterBytes": 16
+        },
+        {
+          "path": "Scripts/JScriptVersion",
+          "beforeSha256": "1322438fbe7c693f50ae634db95d80567379557dea3a970e75d06e63a0e16b55",
+          "afterSha256": "1322438fbe7c693f50ae634db95d80567379557dea3a970e75d06e63a0e16b55",
+          "beforeBytes": 13,
+          "afterBytes": 13
+        },
+        {
+          "path": "BodyText/Section0",
+          "beforeSha256": "c339be82a8f9f99a97877247f6ae53fd1d713bc6441cb8a57eeef7ac007c5a92",
+          "afterSha256": "c339be82a8f9f99a97877247f6ae53fd1d713bc6441cb8a57eeef7ac007c5a92",
+          "beforeBytes": 409,
+          "afterBytes": 409
+        },
+        {
+          "path": "PrvImage",
+          "beforeSha256": "c1bf607dd7214cb64486934b72c335a64b31d7f5203c40afdea5a1b95c826cf8",
+          "afterSha256": "c1bf607dd7214cb64486934b72c335a64b31d7f5203c40afdea5a1b95c826cf8",
+          "beforeBytes": 68,
+          "afterBytes": 68
+        },
+        {
+          "path": "DocOptions/_LinkDoc",
+          "beforeSha256": "0fab9be824f6540b15651edfcbbf1bb8f5af1b5cf78dbc80e38a1a23d8a9930c",
+          "afterSha256": "0fab9be824f6540b15651edfcbbf1bb8f5af1b5cf78dbc80e38a1a23d8a9930c",
+          "beforeBytes": 524,
+          "afterBytes": 524
+        },
+        {
+          "path": "FileHeader",
+          "beforeSha256": "97c3b165f25e14a9956a3db044a66f96c4c3f0db67c333d5a33ef76bfd2bc177",
+          "afterSha256": "97c3b165f25e14a9956a3db044a66f96c4c3f0db67c333d5a33ef76bfd2bc177",
+          "beforeBytes": 256,
+          "afterBytes": 256
+        },
+        {
+          "path": "RhwpHwpxOrigin",
+          "beforeSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "afterSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "beforeBytes": 1,
+          "afterBytes": 1
+        },
+        {
+          "path": "HwpSummaryInformation",
+          "beforeSha256": "a573de8a9bea578b0e80cdb598c126defaccf12b5be9944a47ef1dfec4fe18c3",
+          "afterSha256": "eed9b1928730afc241f9295c949797246bd5c0ab42bab19f63e5738b469177dd",
+          "beforeBytes": 461,
+          "afterBytes": 457
+        }
+      ],
+      "changed": [
+        {
+          "field": "author",
+          "pid": 4,
+          "before": "edward",
+          "after": "rhwp"
+        }
+      ],
+      "unchangedLogicalStreams": 9,
+      "unknownPidsByteExact": [
+        20,
+        8,
+        9,
+        12,
+        13,
+        11,
+        14,
+        21,
+        0
+      ],
+      "knownMappingExact": true,
+      "allOtherLogicalStreamsExact": true,
+      "summarySha256": {
+        "before": "a573de8a9bea578b0e80cdb598c126defaccf12b5be9944a47ef1dfec4fe18c3",
+        "after": "eed9b1928730afc241f9295c949797246bd5c0ab42bab19f63e5738b469177dd"
+      },
+      "wholeFileByteEqual": false
+    },
+    {
+      "name": "object-lock",
+      "baselineKnownValues": {
+        "title": "",
+        "subject": "",
+        "author": "edward",
+        "keywords": "",
+        "description": ""
+      },
+      "formalKnownValues": {
+        "title": "",
+        "subject": "",
+        "author": "rhwp",
+        "keywords": "",
+        "description": ""
+      },
+      "streamManifest": [
+        {
+          "path": "DocInfo",
+          "beforeSha256": "9102e927b769692a98e1a2ff8597af714935dfab5660813d017aeacc2410f684",
+          "afterSha256": "9102e927b769692a98e1a2ff8597af714935dfab5660813d017aeacc2410f684",
+          "beforeBytes": 900,
+          "afterBytes": 900
+        },
+        {
+          "path": "PrvText",
+          "beforeSha256": "b7f560303ee2cca55615b53fcff87c6ab2c55f9e71a6cea93c61b572213e7075",
+          "afterSha256": "b7f560303ee2cca55615b53fcff87c6ab2c55f9e71a6cea93c61b572213e7075",
+          "beforeBytes": 4,
+          "afterBytes": 4
+        },
+        {
+          "path": "Scripts/DefaultJScript",
+          "beforeSha256": "1b4833c1d5a47fcf6cc76e769cf6b12b27401152387d99dfd313469881bcf590",
+          "afterSha256": "1b4833c1d5a47fcf6cc76e769cf6b12b27401152387d99dfd313469881bcf590",
+          "beforeBytes": 16,
+          "afterBytes": 16
+        },
+        {
+          "path": "Scripts/JScriptVersion",
+          "beforeSha256": "1322438fbe7c693f50ae634db95d80567379557dea3a970e75d06e63a0e16b55",
+          "afterSha256": "1322438fbe7c693f50ae634db95d80567379557dea3a970e75d06e63a0e16b55",
+          "beforeBytes": 13,
+          "afterBytes": 13
+        },
+        {
+          "path": "BodyText/Section0",
+          "beforeSha256": "e6625117e8f8e5c1d3ea070479fbe7dc22f238790762495476c221b1b653e911",
+          "afterSha256": "e6625117e8f8e5c1d3ea070479fbe7dc22f238790762495476c221b1b653e911",
+          "beforeBytes": 390,
+          "afterBytes": 390
+        },
+        {
+          "path": "PrvImage",
+          "beforeSha256": "c1bf607dd7214cb64486934b72c335a64b31d7f5203c40afdea5a1b95c826cf8",
+          "afterSha256": "c1bf607dd7214cb64486934b72c335a64b31d7f5203c40afdea5a1b95c826cf8",
+          "beforeBytes": 68,
+          "afterBytes": 68
+        },
+        {
+          "path": "DocOptions/_LinkDoc",
+          "beforeSha256": "0fab9be824f6540b15651edfcbbf1bb8f5af1b5cf78dbc80e38a1a23d8a9930c",
+          "afterSha256": "0fab9be824f6540b15651edfcbbf1bb8f5af1b5cf78dbc80e38a1a23d8a9930c",
+          "beforeBytes": 524,
+          "afterBytes": 524
+        },
+        {
+          "path": "FileHeader",
+          "beforeSha256": "97c3b165f25e14a9956a3db044a66f96c4c3f0db67c333d5a33ef76bfd2bc177",
+          "afterSha256": "97c3b165f25e14a9956a3db044a66f96c4c3f0db67c333d5a33ef76bfd2bc177",
+          "beforeBytes": 256,
+          "afterBytes": 256
+        },
+        {
+          "path": "RhwpHwpxOrigin",
+          "beforeSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "afterSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "beforeBytes": 1,
+          "afterBytes": 1
+        },
+        {
+          "path": "HwpSummaryInformation",
+          "beforeSha256": "a573de8a9bea578b0e80cdb598c126defaccf12b5be9944a47ef1dfec4fe18c3",
+          "afterSha256": "eed9b1928730afc241f9295c949797246bd5c0ab42bab19f63e5738b469177dd",
+          "beforeBytes": 461,
+          "afterBytes": 457
+        }
+      ],
+      "changed": [
+        {
+          "field": "author",
+          "pid": 4,
+          "before": "edward",
+          "after": "rhwp"
+        }
+      ],
+      "unchangedLogicalStreams": 9,
+      "unknownPidsByteExact": [
+        20,
+        8,
+        9,
+        12,
+        13,
+        11,
+        14,
+        21,
+        0
+      ],
+      "knownMappingExact": true,
+      "allOtherLogicalStreamsExact": true,
+      "summarySha256": {
+        "before": "a573de8a9bea578b0e80cdb598c126defaccf12b5be9944a47ef1dfec4fe18c3",
+        "after": "eed9b1928730afc241f9295c949797246bd5c0ab42bab19f63e5738b469177dd"
+      },
+      "wholeFileByteEqual": false
+    },
+    {
+      "name": "row-break",
+      "baselineKnownValues": {
+        "title": "",
+        "subject": "",
+        "author": "edward",
+        "keywords": "",
+        "description": ""
+      },
+      "formalKnownValues": {
+        "title": "",
+        "subject": "",
+        "author": "rhwp",
+        "keywords": "",
+        "description": ""
+      },
+      "streamManifest": [
+        {
+          "path": "DocInfo",
+          "beforeSha256": "9102e927b769692a98e1a2ff8597af714935dfab5660813d017aeacc2410f684",
+          "afterSha256": "9102e927b769692a98e1a2ff8597af714935dfab5660813d017aeacc2410f684",
+          "beforeBytes": 900,
+          "afterBytes": 900
+        },
+        {
+          "path": "PrvText",
+          "beforeSha256": "b7f560303ee2cca55615b53fcff87c6ab2c55f9e71a6cea93c61b572213e7075",
+          "afterSha256": "b7f560303ee2cca55615b53fcff87c6ab2c55f9e71a6cea93c61b572213e7075",
+          "beforeBytes": 4,
+          "afterBytes": 4
+        },
+        {
+          "path": "Scripts/DefaultJScript",
+          "beforeSha256": "1b4833c1d5a47fcf6cc76e769cf6b12b27401152387d99dfd313469881bcf590",
+          "afterSha256": "1b4833c1d5a47fcf6cc76e769cf6b12b27401152387d99dfd313469881bcf590",
+          "beforeBytes": 16,
+          "afterBytes": 16
+        },
+        {
+          "path": "Scripts/JScriptVersion",
+          "beforeSha256": "1322438fbe7c693f50ae634db95d80567379557dea3a970e75d06e63a0e16b55",
+          "afterSha256": "1322438fbe7c693f50ae634db95d80567379557dea3a970e75d06e63a0e16b55",
+          "beforeBytes": 13,
+          "afterBytes": 13
+        },
+        {
+          "path": "BodyText/Section0",
+          "beforeSha256": "53e424507fd4d2604336d1750f62f792d3f5aba170eebdd20efb819d9239ae6f",
+          "afterSha256": "53e424507fd4d2604336d1750f62f792d3f5aba170eebdd20efb819d9239ae6f",
+          "beforeBytes": 390,
+          "afterBytes": 390
+        },
+        {
+          "path": "PrvImage",
+          "beforeSha256": "c1bf607dd7214cb64486934b72c335a64b31d7f5203c40afdea5a1b95c826cf8",
+          "afterSha256": "c1bf607dd7214cb64486934b72c335a64b31d7f5203c40afdea5a1b95c826cf8",
+          "beforeBytes": 68,
+          "afterBytes": 68
+        },
+        {
+          "path": "DocOptions/_LinkDoc",
+          "beforeSha256": "0fab9be824f6540b15651edfcbbf1bb8f5af1b5cf78dbc80e38a1a23d8a9930c",
+          "afterSha256": "0fab9be824f6540b15651edfcbbf1bb8f5af1b5cf78dbc80e38a1a23d8a9930c",
+          "beforeBytes": 524,
+          "afterBytes": 524
+        },
+        {
+          "path": "FileHeader",
+          "beforeSha256": "97c3b165f25e14a9956a3db044a66f96c4c3f0db67c333d5a33ef76bfd2bc177",
+          "afterSha256": "97c3b165f25e14a9956a3db044a66f96c4c3f0db67c333d5a33ef76bfd2bc177",
+          "beforeBytes": 256,
+          "afterBytes": 256
+        },
+        {
+          "path": "RhwpHwpxOrigin",
+          "beforeSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "afterSha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "beforeBytes": 1,
+          "afterBytes": 1
+        },
+        {
+          "path": "HwpSummaryInformation",
+          "beforeSha256": "a573de8a9bea578b0e80cdb598c126defaccf12b5be9944a47ef1dfec4fe18c3",
+          "afterSha256": "eed9b1928730afc241f9295c949797246bd5c0ab42bab19f63e5738b469177dd",
+          "beforeBytes": 461,
+          "afterBytes": 457
+        }
+      ],
+      "changed": [
+        {
+          "field": "author",
+          "pid": 4,
+          "before": "edward",
+          "after": "rhwp"
+        }
+      ],
+      "unchangedLogicalStreams": 9,
+      "unknownPidsByteExact": [
+        20,
+        8,
+        9,
+        12,
+        13,
+        11,
+        14,
+        21,
+        0
+      ],
+      "knownMappingExact": true,
+      "allOtherLogicalStreamsExact": true,
+      "summarySha256": {
+        "before": "a573de8a9bea578b0e80cdb598c126defaccf12b5be9944a47ef1dfec4fe18c3",
+        "after": "eed9b1928730afc241f9295c949797246bd5c0ab42bab19f63e5738b469177dd"
+      },
+      "wholeFileByteEqual": false
+    }
+  ],
+  "errors": [],
+  "input": {
+    "name": "outer-hwpx.hwpx",
+    "sha256": "3d4f13c1cf6f7aea60c264bcae26eafffeab91ca5ee2a6513eac3c83121b03e1",
+    "values": {
+      "title": "",
+      "subject": "",
+      "author": "rhwp",
+      "keywords": "",
+      "description": ""
+    }
+  },
+  "helperSha256": "4cd496868e252515483528f72901143686d411c0443d6bc01f156ece9c537f01",
+  "scope": "Independent CFB stream tree and exact PropertySet reconstruction. Only known5 source OPF values may rewrite their own LPWSTR slots. Every other logical stream and unknown summary property/padding remains byte-exact. Physical CFB allocation/offsets can differ because a known string changes size; it is not claimed whole-file byte-identical."
+}

@@ -1,0 +1,47 @@
+PASS openai-responses: actual chat sets 30mm column widths, comparison/undo/redo and safe save preserve remaining state
+PASS anthropic: actual chat sets 30mm column widths, comparison/undo/redo and safe save preserve remaining state
+PASS gemini: actual chat sets 30mm column widths, comparison/undo/redo and safe save preserve remaining state
+PASS openai-compatible: actual chat sets 30mm column widths, comparison/undo/redo and safe save preserve remaining state
+PASS HWP non-overlapping following tables: real manual history, Canvas, safe save and UI reopen
+FAIL hwp: actual outer-margin dialog cancel/apply/undo/redo and safe UI reopen TimeoutError: Waiting failed: 15000ms exceeded
+    at new WaitTask (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/common/WaitTask.js:46:34)
+    at IsolatedWorld.waitForFunction (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Realm.js:49:26)
+    at CdpFrame.waitForFunction (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:585:43)
+    at CdpFrame.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/util/decorators.js:101:27)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-column-width.mjs:70:75
+    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-column-width.mjs:18:124)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-column-width.mjs:65:37
+PASS hwpx: actual outer-margin dialog cancel/apply/undo/redo and safe UI reopen
+PASS long-table post-render ownership: reject/rollback baseline or valid pages and save/reopen after fix
+PASS partial complete column band keeps first column and active cell cursor with explicit 30mm widths
+PASS already equal/partial row/mixed/batch/alias/unknown inputs visibly fail without document writes
+PASS HWP/protected/merged/mixed source advertises readonly and visibly refuses
+PASS injected live resize failure or neighbor/text/layout corruption fully rolls back dirty/history/cursor
+PASS delayed provider cannot overwrite newer cell content
+PASS unsaved workspace restores equal widths/capability/comparison after confirmed restart
+PASS actual UI save/reopen preserves table and text layout with document-owned metrics initialized
+PASS hidden owner: later-section long table uses global page offset, body mapping is read-only and invalid addresses still fail
+PASS hidden owner: ordinary text tail retains own line and actual keyboard insertion after long table saves/reopens
+PASS hidden owner: injected ordinary missing-page error still rolls back before receipt commit
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
++ [
++   'Error: 표 높이 적용 후 저장 재열기의 표·본문 배치가 달라졌습니다.'
++ ]
+- []
+
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-column-width.mjs:93:9 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [ 'Error: 표 높이 적용 후 저장 재열기의 표·본문 배치가 달라졌습니다.' ],
+  expected: [],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v22.22.2

@@ -1,0 +1,79 @@
+{
+  "files": [
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-info.ts",
+      "bytes": 13423,
+      "sha256": "6f2597ba058cb5961677c7f4cf2bf05c6f5f5fa7b142a00a8cc835e5e4355d52"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-metadata.ts",
+      "bytes": 8658,
+      "sha256": "f7564e182cf1e019cd3aff55f450d69530986197e7bdc00686a71e69dab14d85"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "bytes": 20158,
+      "sha256": "d13b406f94e48a42bc072c5a75c506ce5eda6c8e9662db7992983c226073d87b"
+    },
+    {
+      "path": "apps/editor/tests/document-metadata.test.ts",
+      "bytes": 4720,
+      "sha256": "8d17b439fb369debf06202a499e69114882161ec4a1b83070534999a4a117d41"
+    },
+    {
+      "path": "engine/patches/zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-document-summary-metadata.patch",
+      "bytes": 31158,
+      "sha256": "69b458e6f48c0145df400b19981658575d08f88a183ae6975dd67bcf0b146f06"
+    },
+    {
+      "path": "apps/editor/scripts/lib/document-metadata-native.rs",
+      "bytes": 12293,
+      "sha256": "2ca9d8c219cb3d37288a45f22fa6d174eb4801504c758fd388fcbdc943061f0f"
+    },
+    {
+      "path": "apps/editor/scripts/verify-document-metadata-engine.mjs",
+      "bytes": 7423,
+      "sha256": "a29e819523b1bd8b939fe43b0ce3bcca3e629191864ce288479ddd49e4b47462"
+    },
+    {
+      "path": "apps/editor/scripts/verify-document-metadata.mjs",
+      "bytes": 13697,
+      "sha256": "470fa5073d39cd7e2bed7152e614e2cceba1603e14a6588dc3e3ace2d89952c6"
+    },
+    {
+      "path": "apps/editor/scripts/lib/hwp-summary-evidence.mjs",
+      "bytes": 7865,
+      "sha256": "4cd496868e252515483528f72901143686d411c0443d6bc01f156ece9c537f01"
+    },
+    {
+      "path": "build/document-metadata-candidate/read-summary-oracle.py",
+      "bytes": 3190,
+      "sha256": "294dbf935d4d6896eb49642163dd6adf9a10738a0f122cb6c786ab5915bada4a"
+    },
+    {
+      "path": "build/document-metadata-candidate/table-fixture-summary-oracle.py",
+      "bytes": 4855,
+      "sha256": "913b8bb98fa00c8594124718a250520e51d201831e553beb6983b145d8e0469e"
+    },
+    {
+      "path": "build/document-metadata-candidate/inspect-outer-title.py",
+      "bytes": 969,
+      "sha256": "b2b14a9f985ad59241596e6e513bbbb635d258bcd6d0a5c1001f4ae755df0b48"
+    },
+    {
+      "path": "build/document-metadata-candidate/generate-unsafe-summary-diff.mjs",
+      "bytes": 1815,
+      "sha256": "8f9a0317ef6ceea4adc1f68ef2e7c1ee5e5d708c7957e376e1047435187c583f"
+    },
+    {
+      "path": "build/document-metadata-candidate/inspect-unsafe-summary-diff.mjs",
+      "bytes": 1950,
+      "sha256": "f1dd84b9f8461b98285ac9a0cd397c8d1911e785ed3367714a52a046143dbd3e"
+    },
+    {
+      "path": "build/document-metadata-candidate/check-summary-evidence-negatives.mjs",
+      "bytes": 2426,
+      "sha256": "0889180a21650a40a10f93a0420fcc47ea09a4b2613e519d83b8d122c35a3142"
+    }
+  ]
+}

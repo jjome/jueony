@@ -1,0 +1,31 @@
+PASS hwp actual Hancom full comparison with explicitly reported raw summary difference
+PASS hwpx actual Hancom full comparison with explicitly reported raw summary difference
+PASS outer-hwp.hwp repeat strict hwp and untouched active/raw preservation
+PASS outer-hwp.hwp repeat strict hwpx and untouched active/raw preservation
+PASS outer-hwp-hancom.hwp repeat strict hwp and untouched active/raw preservation
+PASS outer-hwp-hancom.hwp repeat strict hwpx and untouched active/raw preservation
+PASS outer-hwpx.hwpx repeat strict hwp and untouched active/raw preservation
+PASS outer-hwpx.hwpx repeat strict hwpx and untouched active/raw preservation
+PASS outer-hwpx-hancom.hwpx repeat strict hwp and untouched active/raw preservation
+PASS outer-hwpx-hancom.hwpx repeat strict hwpx and untouched active/raw preservation
+PASS unsafe scope unchanged protected-cell outer-hwp.hwp
+PASS unsafe scope unchanged protected-cell outer-hwpx.hwpx
+PASS unsafe scope unchanged field-cell outer-hwp.hwp
+PASS unsafe scope unchanged field-cell outer-hwpx.hwpx
+PASS unsafe scope unchanged object-lock outer-hwp.hwp
+PASS unsafe scope unchanged object-lock outer-hwpx.hwpx
+PASS unsafe scope unchanged row-break outer-hwp.hwp
+PASS unsafe scope unchanged row-break outer-hwpx.hwpx
+PASS formal63 unchanged negative textbox-Top.hwp
+PASS formal63 unchanged negative textbox-Top.hwpx
+PASS formal63 unchanged negative textbox-Center.hwp
+PASS formal63 unchanged negative textbox-Center.hwpx
+PASS formal63 unchanged negative textbox-Bottom.hwp
+PASS formal63 unchanged negative textbox-Bottom.hwpx
+PASS formal63 unchanged negative following-hwp-two.hwp
+PASS formal63 unchanged negative following-hwp-three.hwp
+PASS formal63 unchanged negative following-hwp-long.hwp
+PASS formal63 unchanged negative following-hwpx-two.hwpx
+PASS formal63 unchanged negative following-hwpx-three.hwpx
+PASS formal63 unchanged negative following-hwpx-long.hwpx
+PASS formal63 unchanged negative tabs-20-40-60.hwpx

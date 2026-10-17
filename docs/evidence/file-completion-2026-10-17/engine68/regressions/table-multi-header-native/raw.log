@@ -1,0 +1,16 @@
+PASS hwp: two leading rows repeat, shrink, extend, title-only/all and clear with exact preservation and snapshot undo/reopen
+PASS hwpx: two leading rows repeat, shrink, extend, title-only/all and clear with exact preservation and snapshot undo/reopen
+PASS hwp: pre-existing complete two-row block stays editable and can change without reducing other attributes
+PASS hwpx: pre-existing complete two-row block stays editable and can change without reducing other attributes
+PASS partial second row/gap/scattered/unknown title flags remain readonly, not silently normalized
+PASS multi-row protected/mixed/merged sources and invalid whole-table repeat refuse before changes
+PASS third title-cell failure and unexpected later flag restore the full request snapshot
+PASS newer header count or protected second row invalidates detached request capability
+PASS hwp: 2 leading rows render every title exactly once on every page, body labels once overall, repeat off and reopen retain data
+PASS hwp: 3 leading rows render every title exactly once on every page, body labels once overall, repeat off and reopen retain data
+PASS hwpx: 2 leading rows render every title exactly once on every page, body labels once overall, repeat off and reopen retain data
+PASS hwpx: 3 leading rows render every title exactly once on every page, body labels once overall, repeat off and reopen retain data
+PASS multi-row later-section table uses flattened identity without changing earlier content
+PASS hwp: oversized 60-row repeated title block refuses on actual fragment layout, preflight preserves original
+PASS hwpx: oversized 60-row repeated title block refuses on actual fragment layout, preflight preserves original
+PASS missing/unreadable/incomplete actual fragment evidence refuses and snapshot restores flags

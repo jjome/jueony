@@ -11,6 +11,8 @@ export interface DocumentFrameClient extends DocumentEditFacade,DocumentInteract
  busy():boolean;
  revision():string;
  documentIdentity():string;
+ /** Stable for a loaded document across SaveAs renames, changes on replacement. */
+ documentInstance():string;
  fileHandle():FileSystemFileHandle|null;
  open(bytes:Uint8Array,name:string,handle?:FileSystemFileHandle|null,dirty?:boolean):Promise<void>;
  readReference(bytes:Uint8Array):Promise<string>;
@@ -22,7 +24,7 @@ export interface DocumentFrameClient extends DocumentEditFacade,DocumentInteract
  save():Promise<string>;
  discard():Promise<void>;
 }
-const required=['snapshot','state','busy','revision','documentIdentity','fileHandle','open','readReference','recovery','restoreFileConnection','captureDocumentView','suspendDocumentView','restoreDocumentView','save','discard','commands','menus','executeCommand','focusEditor','preflight','apply','undoRequest'];
+const required=['snapshot','state','busy','revision','documentIdentity','documentInstance','fileHandle','open','readReference','recovery','restoreFileConnection','captureDocumentView','suspendDocumentView','restoreDocumentView','save','discard','commands','menus','executeCommand','focusEditor','preflight','apply','undoRequest'];
 export function assertDocumentFrameClient(value:unknown):asserts value is DocumentFrameClient {
  const api=value as Record<string,unknown>|null;
  if(!api||api.bridgeVersion!==1||required.some(name=>typeof api[name]!=='function'))throw new Error('편집기 연결 계약이 일치하지 않습니다. 같은 버전의 Jueony 화면과 편집기를 실행해 주세요.');

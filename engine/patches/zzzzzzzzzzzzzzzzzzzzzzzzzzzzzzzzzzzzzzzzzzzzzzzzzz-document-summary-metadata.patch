@@ -1,0 +1,798 @@
+--- /dev/null
++++ b/src/document_core/document_metadata.rs
+@@ -0,0 +1,723 @@
++//! Bounded, lossless editing of the five user document-summary strings.
++//! Unknown OLE properties and XML metadata are owned by their original bytes.
++use crate::model::document::Document;
++use crate::parser::FileFormat;
++use crate::{DocumentCore, HwpError};
++use quick_xml::{events::Event, Reader};
++use serde::{Deserialize, Serialize};
++use std::collections::{BTreeMap, BTreeSet};
++
++const LIMIT: usize = 1024 * 1024;
++const OPF: &str = "http://www.idpf.org/2007/opf/";
++const KEYS: [&str; 5] = ["title", "subject", "author", "keywords", "description"];
++const XML_NAMES: [&str; 5] = ["", "subject", "creator", "keyword", "description"];
++
++#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
++#[serde(deny_unknown_fields)]
++struct Fields {
++    title: String,
++    subject: String,
++    author: String,
++    keywords: String,
++    description: String,
++}
++impl Fields {
++    fn values(&self) -> [&str; 5] {
++        [
++            &self.title,
++            &self.subject,
++            &self.author,
++            &self.keywords,
++            &self.description,
++        ]
++    }
++    fn from(values: [String; 5]) -> Self {
++        let [title, subject, author, keywords, description] = values;
++        Self {
++            title,
++            subject,
++            author,
++            keywords,
++            description,
++        }
++    }
++    fn validate(&self) -> Result<(), String> {
++        for value in self.values() {
++            if value.encode_utf16().count() > 4096
++                || value
++                    .chars()
++                    .any(|c| c == '\0' || c < ' ' && !matches!(c, '\t' | '\n' | '\r'))
++            {
++                return Err("Document metadata strings exceed the supported limit or contain control characters".into());
++            }
++        }
++        Ok(())
++    }
++}
++fn u32at(b: &[u8], at: usize) -> Result<u32, String> {
++    Ok(u32::from_le_bytes(
++        b.get(at..at.checked_add(4).ok_or("Metadata offset overflow")?)
++            .ok_or("Truncated summary property")?
++            .try_into()
++            .unwrap(),
++    ))
++}
++fn fail() -> String {
++    "Unsupported or ambiguous document metadata storage".into()
++}
++fn summary_path(path: &str) -> bool {
++    path.trim_start_matches(['/', '\u{5}']) == "HwpSummaryInformation"
++}
++
++#[derive(Clone)]
++struct Ole {
++    prefix: Vec<u8>,
++    suffix: Vec<u8>,
++    lead: Vec<u8>,
++    entries: Vec<(u32, Vec<u8>)>,
++    physical: Vec<u32>,
++}
++impl Ole {
++    fn parse(data: &[u8]) -> Result<Self, String> {
++        if data.len() > LIMIT || data.get(..2) != Some(&[0xfe, 0xff]) || u32at(data, 24)? != 1 {
++            return Err(fail());
++        }
++        let offset = u32at(data, 44)? as usize;
++        if offset < 48 || offset > data.len() {
++            return Err(fail());
++        }
++        // Actual HWP and standard SummaryInformation property-set identifiers.
++        let fmt = data.get(28..44).ok_or_else(fail)?;
++        if fmt
++            != [
++                0x60, 0xb6, 0xa2, 0x9f, 0x61, 0x10, 0xd4, 0x11, 0xb4, 0xc6, 0, 0x60, 0x97, 0xc0,
++                0x9d, 0x8c,
++            ]
++            && fmt
++                != [
++                    0xe0, 0x85, 0x9f, 0xf2, 0xf9, 0x4f, 0x68, 0x10, 0xab, 0x91, 8, 0, 0x2b, 0x27,
++                    0xb3, 0xd9,
++                ]
++        {
++            return Err(fail());
++        }
++        let size = u32at(data, offset)? as usize;
++        let count = u32at(data, offset + 4)? as usize;
++        let table_end = 8usize
++            .checked_add(count.checked_mul(8).ok_or_else(fail)?)
++            .ok_or_else(fail)?;
++        if count > 4096
++            || size < table_end
++            || offset.checked_add(size).is_none_or(|v| v > data.len())
++        {
++            return Err(fail());
++        }
++        let mut locs = Vec::new();
++        let mut pids = BTreeSet::new();
++        let mut positions = BTreeSet::new();
++        for n in 0..count {
++            let pid = u32at(data, offset + 8 + n * 8)?;
++            let pos = u32at(data, offset + 12 + n * 8)? as usize;
++            if pos < table_end
++                || pos >= size
++                || pos % 4 != 0
++                || !pids.insert(pid)
++                || !positions.insert(pos)
++            {
++                return Err(fail());
++            }
++            locs.push((pid, pos));
++        }
++        let mut sorted = locs.clone();
++        sorted.sort_by_key(|v| v.1);
++        let mut values = BTreeMap::new();
++        for (i, (pid, pos)) in sorted.iter().enumerate() {
++            let end = sorted.get(i + 1).map_or(size, |v| v.1);
++            values.insert(*pid, data[offset + pos..offset + end].to_vec());
++        }
++        Ok(Self {
++            prefix: data[..offset].to_vec(),
++            suffix: data[offset + size..].to_vec(),
++            lead: data[offset + table_end..offset + sorted.first().map_or(size, |v| v.1)].to_vec(),
++            entries: locs
++                .iter()
++                .map(|v| (v.0, values.remove(&v.0).unwrap()))
++                .collect(),
++            physical: sorted.iter().map(|v| v.0).collect(),
++        })
++    }
++    fn empty() -> Self {
++        let mut header =
++            include_bytes!("../parser/hwpx/blank2010_assets/hwp_summary_information.bin")[..48]
++                .to_vec();
++        header[..2].copy_from_slice(&[0xfe, 0xff]);
++        header[24..28].copy_from_slice(&1u32.to_le_bytes());
++        header[28..44].copy_from_slice(&[
++            0x60, 0xb6, 0xa2, 0x9f, 0x61, 0x10, 0xd4, 0x11, 0xb4, 0xc6, 0, 0x60, 0x97, 0xc0, 0x9d,
++            0x8c,
++        ]);
++        header[44..48].copy_from_slice(&48u32.to_le_bytes());
++        Self {
++            prefix: header,
++            suffix: Vec::new(),
++            lead: Vec::new(),
++            entries: Vec::new(),
++            physical: Vec::new(),
++        }
++    }
++    fn fields(&self) -> Result<Fields, String> {
++        let codepage = self
++            .entries
++            .iter()
++            .find(|v| v.0 == 1)
++            .map(|v| {
++                if u32at(&v.1, 0)? != 2 || v.1.len() < 6 {
++                    return Err(fail());
++                }
++                Ok(u16::from_le_bytes(v.1[4..6].try_into().unwrap()))
++            })
++            .transpose()?;
++        let mut values = std::array::from_fn(|_| String::new());
++        for (i, pid) in (2..=6).enumerate() {
++            let Some((_, raw)) = self.entries.iter().find(|v| v.0 == pid) else {
++                continue;
++            };
++            let kind = u32at(raw, 0)?;
++            let n = u32at(raw, 4)? as usize;
++            if n > 16385 {
++                return Err(fail());
++            }
++            values[i] = match kind {
++                31 => {
++                    let bytes = raw
++                        .get(
++                            8..8usize
++                                .checked_add(n.checked_mul(2).ok_or_else(fail)?)
++                                .ok_or_else(fail)?,
++                        )
++                        .ok_or_else(fail)?;
++                    let mut units = bytes
++                        .chunks_exact(2)
++                        .map(|b| u16::from_le_bytes([b[0], b[1]]))
++                        .collect::<Vec<_>>();
++                    if n > 0 && units.pop() != Some(0) || units.contains(&0) {
++                        return Err(fail());
++                    }
++                    String::from_utf16(&units).map_err(|_| fail())?
++                }
++                30 => {
++                    let bytes = raw.get(8..8 + n).ok_or_else(fail)?;
++                    let content = if n == 0 {
++                        bytes
++                    } else {
++                        if bytes.last() != Some(&0) {
++                            return Err(fail());
++                        }
++                        &bytes[..n - 1]
++                    };
++                    if content.contains(&0) {
++                        return Err(fail());
++                    }
++                    if content.is_ascii() {
++                        std::str::from_utf8(content).unwrap().to_owned()
++                    } else {
++                        match codepage {
++                            Some(65001) => {
++                                std::str::from_utf8(content).map_err(|_| fail())?.to_owned()
++                            }
++                            Some(949) => {
++                                let (s, _, err) = encoding_rs::EUC_KR.decode(content);
++                                if err {
++                                    return Err(fail());
++                                }
++                                s.into_owned()
++                            }
++                            Some(1252) => {
++                                let (s, _, err) = encoding_rs::WINDOWS_1252.decode(content);
++                                if err {
++                                    return Err(fail());
++                                }
++                                s.into_owned()
++                            }
++                            _ => return Err(fail()),
++                        }
++                    }
++                }
++                _ => return Err(fail()),
++            };
++        }
++        let fields = Fields::from(values);
++        fields.validate()?;
++        Ok(fields)
++    }
++    fn write(&self, fields: &Fields) -> Result<Vec<u8>, String> {
++        let old = self.fields()?;
++        let mut values = self.entries.iter().cloned().collect::<BTreeMap<_, _>>();
++        let mut ids = self.entries.iter().map(|v| v.0).collect::<Vec<_>>();
++        let mut new_ids = Vec::new();
++        for (i, value) in fields.values().iter().enumerate() {
++            let pid = i as u32 + 2;
++            if old.values()[i] == *value && values.contains_key(&pid) {
++                continue;
++            }
++            let utf16 = value
++                .encode_utf16()
++                .chain(std::iter::once(0))
++                .collect::<Vec<_>>();
++            let mut raw = 31u32.to_le_bytes().to_vec();
++            raw.extend_from_slice(&(utf16.len() as u32).to_le_bytes());
++            for unit in utf16 {
++                raw.extend_from_slice(&unit.to_le_bytes());
++            }
++            while raw.len() % 4 != 0 {
++                raw.push(0);
++            }
++            if !values.contains_key(&pid) {
++                ids.push(pid);
++                new_ids.push(pid);
++            }
++            values.insert(pid, raw);
++        }
++        // New aligned values precede existing physical slots. In particular an
++        // original unaligned final dictionary/property retains its exact bytes.
++        let physical = new_ids
++            .into_iter()
++            .chain(self.physical.iter().copied())
++            .collect::<Vec<_>>();
++        let header = 8 + ids.len() * 8;
++        let mut body = vec![0u8; header];
++        body.extend_from_slice(&self.lead);
++        let mut offsets = BTreeMap::new();
++        for pid in physical {
++            if body.len() % 4 != 0 {
++                return Err(fail());
++            }
++            offsets.insert(pid, body.len());
++            body.extend_from_slice(values.get(&pid).ok_or_else(fail)?);
++        }
++        let size = body.len() as u32;
++        body[..4].copy_from_slice(&size.to_le_bytes());
++        body[4..8].copy_from_slice(&(ids.len() as u32).to_le_bytes());
++        for (i, pid) in ids.iter().enumerate() {
++            body[8 + i * 8..12 + i * 8].copy_from_slice(&pid.to_le_bytes());
++            body[12 + i * 8..16 + i * 8]
++                .copy_from_slice(&(*offsets.get(pid).ok_or_else(fail)? as u32).to_le_bytes());
++        }
++        let mut result = self.prefix.clone();
++        result.extend(body);
++        result.extend(&self.suffix);
++        if result.len() > LIMIT {
++            return Err(fail());
++        }
++        Ok(result)
++    }
++}
++
++#[derive(Clone)]
++struct XmlField {
++    index: usize,
++    start: usize,
++    end: usize,
++    inner: Option<(usize, usize)>,
++    value: String,
++}
++struct Xml {
++    source: String,
++    fields: Vec<XmlField>,
++    close: usize,
++    empty: Option<(usize, usize)>,
++}
++fn decode(value: &str) -> Result<String, String> {
++    quick_xml::escape::unescape(value)
++        .map(|v| v.into_owned())
++        .map_err(|_| fail())
++}
++fn escaped(value: &str) -> String {
++    quick_xml::escape::escape(value).replace('\r', "&#xD;")
++}
++impl Xml {
++    fn parse(data: &[u8]) -> Result<Self, String> {
++        if data.len() > LIMIT {
++            return Err(fail());
++        }
++        let source = std::str::from_utf8(data).map_err(|_| fail())?.to_owned();
++        let mut reader = Reader::from_str(&source);
++        let mut buf = Vec::new();
++        let mut depth: usize = 0;
++        let mut root_seen = false;
++        let mut metadata = None;
++        let mut inside = false;
++        let mut empty_metadata = None;
++        let mut close = None;
++        let mut namespace = false;
++        let mut fields = Vec::new();
++        let mut active: Option<(usize, usize, usize, String)> = None;
++        let mut seen = BTreeSet::new();
++        loop {
++            let before = reader.buffer_position() as usize;
++            let event = reader.read_event_into(&mut buf).map_err(|_| fail())?;
++            let after = reader.buffer_position() as usize;
++            match event {
++                Event::Start(ref e) | Event::Empty(ref e) => {
++                    let tag = e.name().as_ref().to_owned();
++                    let empty = matches!(event, Event::Empty(_));
++                    if active.is_some() {
++                        return Err(fail());
++                    }
++                    let mut attrs = BTreeMap::new();
++                    for a in e.attributes() {
++                        let a = a.map_err(|_| fail())?;
++                        if attrs
++                            .insert(a.key.as_ref().to_owned(), decode(a.value.as_ref())?)
++                            .is_some()
++                        {
++                            return Err(fail());
++                        }
++                    }
++                    if depth == 0 {
++                        if tag != "opf:package" || root_seen {
++                            return Err(fail());
++                        }
++                        root_seen = true;
++                        namespace = attrs.get("xmlns:opf").is_some_and(|v| v == OPF);
++                    }
++                    if tag == "opf:metadata" {
++                        if depth != 1
++                            || !namespace
++                            || metadata.is_some()
++                            || attrs.keys().any(|k| k.starts_with("xmlns"))
++                        {
++                            return Err(fail());
++                        }
++                        metadata = Some(depth);
++                        inside = !empty;
++                        if empty {
++                            empty_metadata = Some((before, after));
++                            close = Some(before);
++                        }
++                    } else if inside && metadata.is_some_and(|d| depth == d + 1) {
++                        if attrs.keys().any(|k| k.starts_with("xmlns")) {
++                            return Err(fail());
++                        }
++                        if tag == "opf:meta" && attrs.get("name").is_some_and(|n| n == "keywords") {
++                            return Err(fail());
++                        }
++                        let index = if tag == "opf:title" {
++                            Some(0)
++                        } else if tag == "opf:meta" {
++                            attrs.get("name").and_then(|n| match n.as_str() {
++                                "subject" => Some(1),
++                                "creator" => Some(2),
++                                "keyword" => Some(3),
++                                "description" => Some(4),
++                                _ => None,
++                            })
++                        } else {
++                            None
++                        };
++                        if let Some(index) = index {
++                            if index > 0 && attrs.get("content").is_some_and(|v| v != "text") {
++                                return Err(fail());
++                            }
++                            if !seen.insert(index) {
++                                return Err(fail());
++                            }
++                            if empty {
++                                fields.push(XmlField {
++                                    index,
++                                    start: before,
++                                    end: after,
++                                    inner: None,
++                                    value: String::new(),
++                                });
++                            } else {
++                                active = Some((index, before, after, String::new()));
++                            }
++                        }
++                    }
++                    if !empty {
++                        depth += 1;
++                    }
++                }
++                Event::End(ref e) => {
++                    depth = depth.checked_sub(1).ok_or_else(fail)?;
++                    if let Some((index, start, inner_start, value)) = active.take() {
++                        fields.push(XmlField {
++                            index,
++                            start,
++                            end: after,
++                            inner: Some((inner_start, before)),
++                            value,
++                        });
++                    }
++                    if e.name().as_ref() == "opf:metadata" {
++                        inside = false;
++                        if close.replace(before).is_some() {
++                            return Err(fail());
++                        }
++                    }
++                }
++                Event::Text(ref e) => {
++                    if let Some((_, _, _, value)) = active.as_mut() {
++                        value.push_str(&decode(e.as_ref())?);
++                    }
++                }
++                Event::GeneralRef(ref e) => {
++                    if let Some((_, _, _, value)) = active.as_mut() {
++                        value.push_str(&decode(&format!("&{};", e.as_ref()))?);
++                    }
++                }
++                Event::CData(ref e) => {
++                    if let Some((_, _, _, value)) = active.as_mut() {
++                        value.push_str(e.as_ref());
++                    }
++                }
++                Event::Comment(_) | Event::PI(_) => {
++                    if active.is_some() {
++                        return Err(fail());
++                    }
++                }
++                Event::DocType(_) => return Err(fail()),
++                Event::Eof => break,
++                _ => {}
++            }
++            buf.clear();
++        }
++        if depth != 0 || active.is_some() || metadata.is_none() {
++            return Err(fail());
++        }
++        let result = Self {
++            source,
++            fields,
++            close: close.ok_or_else(fail)?,
++            empty: empty_metadata,
++        };
++        result.values()?.validate()?;
++        Ok(result)
++    }
++    fn values(&self) -> Result<Fields, String> {
++        let mut values = std::array::from_fn(|_| String::new());
++        for f in &self.fields {
++            values[f.index] = f.value.clone();
++        }
++        Ok(Fields::from(values))
++    }
++    fn write(&self, values: &Fields) -> Result<Vec<u8>, String> {
++        if let Some((a, b)) = self.empty {
++            let original = &self.source[a..b];
++            let end = original.rfind("/>").ok_or_else(fail)?;
++            let replacement = format!(
++                "{}>{}</opf:metadata>",
++                &original[..end],
++                (0..5)
++                    .map(|i| xml_value(i, values.values()[i]))
++                    .collect::<String>()
++            );
++            let mut out = self.source.clone();
++            out.replace_range(a..b, &replacement);
++            return Ok(out.into_bytes());
++        }
++        let mut edits = Vec::new();
++        let mut present = BTreeSet::new();
++        for f in &self.fields {
++            present.insert(f.index);
++            let value = values.values()[f.index];
++            if value == f.value {
++                continue;
++            }
++            if let Some((a, b)) = f.inner {
++                edits.push((a, b, escaped(value)));
++            } else {
++                let original = &self.source[f.start..f.end];
++                let end = original.rfind("/>").ok_or_else(fail)?;
++                let name = if f.index == 0 {
++                    "opf:title"
++                } else {
++                    "opf:meta"
++                };
++                edits.push((
++                    f.start,
++                    f.end,
++                    format!("{}>{}</{}>", &original[..end], escaped(value), name),
++                ));
++            }
++        }
++        let mut added = String::new();
++        for i in 0..5 {
++            if !present.contains(&i) {
++                added.push_str(&xml_value(i, values.values()[i]));
++            }
++        }
++        if !added.is_empty() {
++            edits.push((self.close, self.close, added));
++        }
++        edits.sort_by_key(|v| std::cmp::Reverse(v.0));
++        let mut source = self.source.clone();
++        for (a, b, value) in edits {
++            source.replace_range(a..b, &value);
++        }
++        if source.len() > LIMIT {
++            return Err(fail());
++        }
++        Ok(source.into_bytes())
++    }
++}
++fn xml_value(i: usize, value: &str) -> String {
++    if i == 0 {
++        format!("<opf:title>{}</opf:title>", escaped(value))
++    } else {
++        format!(
++            "<opf:meta name=\"{}\" content=\"text\">{}</opf:meta>",
++            XML_NAMES[i],
++            escaped(value)
++        )
++    }
++}
++fn new_xml(fields: &Fields) -> Vec<u8> {
++    format!("<opf:package xmlns:opf=\"{}\"><opf:metadata>{}<opf:language>ko</opf:language></opf:metadata></opf:package>",OPF,(0..5).map(|i|xml_value(i,fields.values()[i])).collect::<String>()).into_bytes()
++}
++fn containers(doc: &Document) -> Result<(Option<&Vec<u8>>, Option<&Vec<u8>>), String> {
++    let summary = doc
++        .extra_streams
++        .iter()
++        .filter(|v| summary_path(&v.0))
++        .collect::<Vec<_>>();
++    let xml = doc
++        .hwpx_aux_entries
++        .iter()
++        .filter(|v| v.0 == "Contents/content.hpf")
++        .collect::<Vec<_>>();
++    if summary.len() > 1 || xml.len() > 1 {
++        return Err(fail());
++    }
++    Ok((summary.first().map(|v| &v.1), xml.first().map(|v| &v.1)))
++}
++fn read(doc: &Document) -> Result<Fields, String> {
++    let (s, x) = containers(doc)?;
++    let summary = s
++        .map(|b| Ole::parse(b).and_then(|o| o.fields()))
++        .transpose()?;
++    let xml = x
++        .map(|b| Xml::parse(b).and_then(|x| x.values()))
++        .transpose()?;
++    if doc.provenance.format == crate::model::provenance::SourceFormat::Hwpx {
++        Ok(xml.unwrap_or_default())
++    } else {
++        Ok(summary.unwrap_or_default())
++    }
++}
++fn token(doc: &Document) -> Result<String, String> {
++    let (s, x) = containers(doc)?;
++    let mut h = blake3::Hasher::new();
++    for b in [s, x] {
++        let b = b.map(|v| v.as_slice()).unwrap_or(&[]);
++        h.update(&(b.len() as u64).to_le_bytes());
++        h.update(b);
++    }
++    Ok(h.finalize().to_hex().to_string())
++}
++fn replacements(
++    doc: &Document,
++    fields: &Fields,
++) -> Result<(Vec<(String, Vec<u8>)>, Vec<(String, Vec<u8>)>), String> {
++    let (s, x) = containers(doc)?;
++    let summary = if let Some(b) = s {
++        Ole::parse(b)?
++    } else {
++        Ole::empty()
++    };
++    let summary = summary.write(fields)?;
++    let xml = if let Some(b) = x {
++        Xml::parse(b)?.write(fields)?
++    } else {
++        new_xml(fields)
++    };
++    let mut streams = doc.extra_streams.clone();
++    if let Some(v) = streams.iter_mut().find(|v| summary_path(&v.0)) {
++        v.1 = summary;
++    } else {
++        streams.push(("/\u{5}HwpSummaryInformation".into(), summary));
++    }
++    let mut aux = doc.hwpx_aux_entries.clone();
++    if let Some(v) = aux.iter_mut().find(|v| v.0 == "Contents/content.hpf") {
++        v.1 = xml;
++    } else {
++        aux.push(("Contents/content.hpf".into(), xml));
++    }
++    Ok((streams, aux))
++}
++impl DocumentCore {
++    pub fn get_document_metadata_native(&self) -> String {
++        match read(&self.document) {
++            Ok(values) => {
++                let restriction = self.document.header.encrypted
++                    || self.document.header.distribution
++                    || self.document.provenance.hwp3_lineage
++                    || !matches!(self.source_format, FileFormat::Hwp | FileFormat::Hwpx);
++                let fingerprint = token(&self.document).unwrap();
++                serde_json::json!({"values":values,"editable":!restriction,"fingerprint":fingerprint,"reason":if restriction{Some("암호·배포·HWP3/HML 문서의 속성 편집은 지원하지 않습니다.")}else{None}}).to_string()
++            }
++            Err(error) => serde_json::json!({"editable":false,"reason":error}).to_string(),
++        }
++    }
++    pub fn set_document_metadata_native(
++        &mut self,
++        expected: &str,
++        json: &str,
++    ) -> Result<String, HwpError> {
++        let error = |e: String| HwpError::RenderError(e);
++        if json.len() > 65536 {
++            return Err(error(fail()));
++        }
++        let fields: Fields = serde_json::from_str(json).map_err(|_| error(fail()))?;
++        fields.validate().map_err(error)?;
++        let state: serde_json::Value = serde_json::from_str(&self.get_document_metadata_native())
++            .map_err(|_| error(fail()))?;
++        if state["editable"] != true {
++            return Err(error("Document metadata is read-only".into()));
++        }
++        if state["fingerprint"].as_str() != Some(expected) {
++            return Err(error("Stale document metadata".into()));
++        }
++        let before = read(&self.document).map_err(error)?;
++        let changed = before != fields;
++        if changed {
++            let (streams, aux) = replacements(&self.document, &fields).map_err(error)?;
++            self.document.extra_streams = streams;
++            self.document.hwpx_aux_entries = aux;
++            self.event_log.push(
++                crate::model::event::DocumentEvent::DocumentMetadataChanged {
++                    fields: KEYS
++                        .iter()
++                        .enumerate()
++                        .filter(|(i, _)| before.values()[*i] != fields.values()[*i])
++                        .map(|(_, v)| v.to_string())
++                        .collect(),
++                },
++            );
++        }
++        Ok(serde_json::json!({"changed":changed,"metadata":serde_json::from_str::<serde_json::Value>(&self.get_document_metadata_native()).unwrap()}).to_string())
++    }
++}
++
++/// Export-only format lowering. Never changes live IR or unparseable storage.
++pub(crate) fn sync_hwp_export(doc: &mut Document, source: FileFormat) {
++    if !matches!(source, FileFormat::Hwpx) {
++        return;
++    }
++    let Ok(fields) = read(doc) else {
++        return;
++    };
++    let Ok((streams, _)) = replacements(doc, &fields) else {
++        return;
++    };
++    doc.extra_streams = streams;
++}
++/// Existing HWPX metadata remains verbatim. Native HWP summary strings acquire
++/// their HWPX representation instead of a synthetic unrelated creator name.
++pub(crate) fn hwpx_metadata_source(doc: &Document) -> Option<Vec<u8>> {
++    if doc.hwpx_aux_entry("Contents/content.hpf").is_some() {
++        return None;
++    }
++    read(doc).ok().map(|v| new_xml(&v))
++}
+--- a/src/document_core/mod.rs
++++ b/src/document_core/mod.rs
+@@ -3,6 +3,7 @@
+ //! HWP 문서의 도메인 상태와 로직을 캡슐화한다.
+ //! WASM/PyO3/MCP 등 어떤 어댑터에서도 독립적으로 사용할 수 있다.
+ 
++pub(crate) mod document_metadata;
+ pub(crate) mod helpers;
+ pub(crate) use helpers::*;
+ 
+--- a/src/model/event.rs
++++ b/src/model/event.rs
+@@ -6,6 +6,8 @@
+ /// 문서 변경 이벤트
+ #[derive(Debug, Clone)]
+ pub enum DocumentEvent {
++    /// User summary fields only; no private metadata values are logged.
++    DocumentMetadataChanged { fields: Vec<String> },
+     /// Atomic fixed-form fill; paragraph indices are section-local owning roots.
+     TemplateFilled {
+         section: usize,
+@@ -183,6 +185,7 @@
+     /// 이벤트를 JSON 객체 문자열로 직렬화한다.
+     pub fn to_json(&self) -> String {
+         match self {
++            DocumentEvent::DocumentMetadataChanged { fields } => serde_json::json!({"type":"DocumentMetadataChanged","fields":fields}).to_string(),
+             DocumentEvent::HyperlinkChanged {
+                 section,
+                 para,
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1353,6 +1353,14 @@
+     }
+ 
+     /// 문서 정보를 JSON 문자열로 반환한다.
++    #[wasm_bindgen(js_name = getDocumentMetadata)]
++    pub fn get_document_metadata(&self) -> String { self.core.get_document_metadata_native() }
++
++    #[wasm_bindgen(js_name = setDocumentMetadata)]
++    pub fn set_document_metadata(&mut self, expected: &str, values: &str) -> Result<String, JsValue> {
++        self.core.set_document_metadata_native(expected, values).map_err(|e|e.into())
++    }
++
+     #[wasm_bindgen(js_name = getDocumentInfo)]
+     pub fn get_document_info(&self) -> String {
+         self.core.get_document_info()
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -2497,6 +2497,7 @@
+         self.writeback_reflowed_table_frames(&mut snapshot);
+         self.writeback_edited_overlap_table_tail(&mut snapshot);
+         let _report = convert_if_hwpx_source(&mut snapshot, self.source_format);
++        crate::document_core::document_metadata::sync_hwp_export(&mut snapshot, self.source_format);
+         if self.can_restore_native_whole_stack_hwp_lineage()
+             || self.can_restore_native_single_table_placeholder_hwp_lineage() {
+             // Only remove the marker just generated by pure-HWPX lowering;
+--- a/src/serializer/hwpx/mod.rs
++++ b/src/serializer/hwpx/mod.rs
+@@ -250,11 +250,12 @@
+             is_embedded: e.is_embedded,
+         })
+         .collect();
++    let metadata_source = crate::document_core::document_metadata::hwpx_metadata_source(doc);
+     let content_hpf = content::write_content_hpf(
+         &section_hrefs,
+         &content_bin_entries,
+         &master_items,
+-        doc.hwpx_aux_entry("Contents/content.hpf"),
++        metadata_source.as_deref().or_else(||doc.hwpx_aux_entry("Contents/content.hpf")),
+     )?;
+     z.write_deflated("Contents/content.hpf", &content_hpf)?;
+ 

@@ -1,0 +1,533 @@
+{
+  "createdAt": "2026-10-17T01:33:14.028Z",
+  "status": "PRIVATE_CANDIDATE_VERIFIED_FOR_ROOT_PROMOTION_REVIEW",
+  "productionAppliedAtRecording": false,
+  "freshGuiPerformedByWorker": false,
+  "actualGuiEvidence": "Parent performed Open and SaveAs in installed Hancom2024 before candidate validation. Four copied screenshots are original parent evidence; no new GUI or visual-equality claim.",
+  "final": {
+    "passed": 31,
+    "failed": 0,
+    "testNames": [
+      "hwp original vs actual Hancom full semantics and geometry",
+      "hwpx original vs actual Hancom full semantics and geometry",
+      "outer-hwp.hwp repeat strict hwp and untouched active/raw preservation",
+      "outer-hwp.hwp repeat strict hwpx and untouched active/raw preservation",
+      "outer-hwp-hancom.hwp repeat strict hwp and untouched active/raw preservation",
+      "outer-hwp-hancom.hwp repeat strict hwpx and untouched active/raw preservation",
+      "outer-hwpx.hwpx repeat strict hwp and untouched active/raw preservation",
+      "outer-hwpx.hwpx repeat strict hwpx and untouched active/raw preservation",
+      "outer-hwpx-hancom.hwpx repeat strict hwp and untouched active/raw preservation",
+      "outer-hwpx-hancom.hwpx repeat strict hwpx and untouched active/raw preservation",
+      "unsafe scope unchanged protected-cell outer-hwp.hwp",
+      "unsafe scope unchanged protected-cell outer-hwpx.hwpx",
+      "unsafe scope unchanged field-cell outer-hwp.hwp",
+      "unsafe scope unchanged field-cell outer-hwpx.hwpx",
+      "unsafe scope unchanged object-lock outer-hwp.hwp",
+      "unsafe scope unchanged object-lock outer-hwpx.hwpx",
+      "unsafe scope unchanged row-break outer-hwp.hwp",
+      "unsafe scope unchanged row-break outer-hwpx.hwpx",
+      "formal63 unchanged negative textbox-Top.hwp",
+      "formal63 unchanged negative textbox-Top.hwpx",
+      "formal63 unchanged negative textbox-Center.hwp",
+      "formal63 unchanged negative textbox-Center.hwpx",
+      "formal63 unchanged negative textbox-Bottom.hwp",
+      "formal63 unchanged negative textbox-Bottom.hwpx",
+      "formal63 unchanged negative following-hwp-two.hwp",
+      "formal63 unchanged negative following-hwp-three.hwp",
+      "formal63 unchanged negative following-hwp-long.hwp",
+      "formal63 unchanged negative following-hwpx-two.hwpx",
+      "formal63 unchanged negative following-hwpx-three.hwpx",
+      "formal63 unchanged negative following-hwpx-long.hwpx",
+      "formal63 unchanged negative tabs-20-40-60.hwpx"
+    ],
+    "failures": []
+  },
+  "previous28Pass3Fail": {
+    "passed": 28,
+    "failed": 3,
+    "testNames": [
+      "outer-hwp.hwp repeat strict hwp and untouched active/raw preservation",
+      "outer-hwp.hwp repeat strict hwpx and untouched active/raw preservation",
+      "outer-hwp-hancom.hwp repeat strict hwp and untouched active/raw preservation",
+      "outer-hwp-hancom.hwp repeat strict hwpx and untouched active/raw preservation",
+      "outer-hwpx.hwpx repeat strict hwpx and untouched active/raw preservation",
+      "outer-hwpx-hancom.hwpx repeat strict hwp and untouched active/raw preservation",
+      "outer-hwpx-hancom.hwpx repeat strict hwpx and untouched active/raw preservation",
+      "unsafe scope unchanged protected-cell outer-hwp.hwp",
+      "unsafe scope unchanged protected-cell outer-hwpx.hwpx",
+      "unsafe scope unchanged field-cell outer-hwp.hwp",
+      "unsafe scope unchanged field-cell outer-hwpx.hwpx",
+      "unsafe scope unchanged object-lock outer-hwp.hwp",
+      "unsafe scope unchanged object-lock outer-hwpx.hwpx",
+      "unsafe scope unchanged row-break outer-hwp.hwp",
+      "unsafe scope unchanged row-break outer-hwpx.hwpx",
+      "formal63 unchanged negative textbox-Top.hwp",
+      "formal63 unchanged negative textbox-Top.hwpx",
+      "formal63 unchanged negative textbox-Center.hwp",
+      "formal63 unchanged negative textbox-Center.hwpx",
+      "formal63 unchanged negative textbox-Bottom.hwp",
+      "formal63 unchanged negative textbox-Bottom.hwpx",
+      "formal63 unchanged negative following-hwp-two.hwp",
+      "formal63 unchanged negative following-hwp-three.hwp",
+      "formal63 unchanged negative following-hwp-long.hwp",
+      "formal63 unchanged negative following-hwpx-two.hwpx",
+      "formal63 unchanged negative following-hwpx-three.hwpx",
+      "formal63 unchanged negative following-hwpx-long.hwpx",
+      "formal63 unchanged negative tabs-20-40-60.hwpx"
+    ],
+    "failures": [
+      {
+        "name": "hwp original vs actual Hancom full semantics and geometry",
+        "error": "Error: Full comparison mismatch: semantic=0, geometry=1",
+        "semanticCount": 0,
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 1,
+          "differences": [
+            {
+              "path": "$[0][\"text\"][\"runs\"][13][\"y\"]",
+              "before": 168.7,
+              "after": 153.6,
+              "delta": -15.099999999999994
+            }
+          ]
+        }
+      },
+      {
+        "name": "hwpx original vs actual Hancom full semantics and geometry",
+        "error": "Error: Full comparison mismatch: semantic=0, geometry=1",
+        "semanticCount": 0,
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 1,
+          "differences": [
+            {
+              "path": "$[0][\"text\"][\"runs\"][13][\"y\"]",
+              "before": 168.7,
+              "after": 153.6,
+              "delta": -15.099999999999994
+            }
+          ]
+        }
+      },
+      {
+        "name": "outer-hwpx.hwpx repeat strict hwp and untouched active/raw preservation",
+        "error": "Error: Full comparison mismatch: semantic=0, geometry=19",
+        "semanticCount": 0,
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 19,
+          "differences": [
+            {
+              "path": "$[0][\"controls\"][\"controls\"][0][\"cells\"][0][\"y\"]",
+              "before": 153.6,
+              "after": 168.7,
+              "delta": 15.099999999999994
+            },
+            {
+              "path": "$[0][\"controls\"][\"controls\"][0][\"cells\"][1][\"y\"]",
+              "before": 153.6,
+              "after": 168.7,
+              "delta": 15.099999999999994
+            },
+            {
+              "path": "$[0][\"controls\"][\"controls\"][0][\"cells\"][2][\"y\"]",
+              "before": 170.7,
+              "after": 185.8,
+              "delta": 15.100000000000023
+            },
+            {
+              "path": "$[0][\"controls\"][\"controls\"][0][\"cells\"][3][\"y\"]",
+              "before": 170.7,
+              "after": 185.8,
+              "delta": 15.100000000000023
+            },
+            {
+              "path": "$[0][\"controls\"][\"controls\"][0][\"cells\"][4][\"y\"]",
+              "before": 187.8,
+              "after": 202.9,
+              "delta": 15.099999999999994
+            },
+            {
+              "path": "$[0][\"controls\"][\"controls\"][0][\"cells\"][5][\"y\"]",
+              "before": 187.8,
+              "after": 202.9,
+              "delta": 15.099999999999994
+            },
+            {
+              "path": "$[0][\"controls\"][\"controls\"][0][\"y\"]",
+              "before": 153.6,
+              "after": 168.7,
+              "delta": 15.099999999999994
+            },
+            {
+              "path": "$[0][\"text\"][\"runs\"][1][\"y\"]",
+              "before": 155.5,
+              "after": 170.6,
+              "delta": 15.099999999999994
+            },
+            {
+              "path": "$[0][\"text\"][\"runs\"][2][\"y\"]",
+              "before": 155.5,
+              "after": 170.6,
+              "delta": 15.099999999999994
+            },
+            {
+              "path": "$[0][\"text\"][\"runs\"][3][\"y\"]",
+              "before": 155.5,
+              "after": 170.6,
+              "delta": 15.099999999999994
+            },
+            {
+              "path": "$[0][\"text\"][\"runs\"][4][\"y\"]",
+              "before": 155.5,
+              "after": 170.6,
+              "delta": 15.099999999999994
+            },
+            {
+              "path": "$[0][\"text\"][\"runs\"][5][\"y\"]",
+              "before": 172.6,
+              "after": 187.7,
+              "delta": 15.099999999999994
+            },
+            {
+              "path": "$[0][\"text\"][\"runs\"][6][\"y\"]",
+              "before": 172.6,
+              "after": 187.7,
+              "delta": 15.099999999999994
+            },
+            {
+              "path": "$[0][\"text\"][\"runs\"][7][\"y\"]",
+              "before": 172.6,
+              "after": 187.7,
+              "delta": 15.099999999999994
+            },
+            {
+              "path": "$[0][\"text\"][\"runs\"][8][\"y\"]",
+              "before": 172.6,
+              "after": 187.7,
+              "delta": 15.099999999999994
+            },
+            {
+              "path": "$[0][\"text\"][\"runs\"][9][\"y\"]",
+              "before": 189.7,
+              "after": 204.8,
+              "delta": 15.100000000000023
+            },
+            {
+              "path": "$[0][\"text\"][\"runs\"][10][\"y\"]",
+              "before": 189.7,
+              "after": 204.8,
+              "delta": 15.100000000000023
+            },
+            {
+              "path": "$[0][\"text\"][\"runs\"][11][\"y\"]",
+              "before": 189.7,
+              "after": 204.8,
+              "delta": 15.100000000000023
+            },
+            {
+              "path": "$[0][\"text\"][\"runs\"][12][\"y\"]",
+              "before": 189.7,
+              "after": 204.8,
+              "delta": 15.100000000000023
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "native": {
+    "passed": 10,
+    "failed": 0,
+    "ignored": 0,
+    "log": "logs/native10.log"
+  },
+  "engine": {
+    "candidate": {
+      "sourceId": "private-outer48-12acf5353ab12f36",
+      "wasmSha256": "66fa085b404b60fa2d1ba73c871ac5cbeab7e4df6ba0d3fbd31ffedd60f781db",
+      "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8"
+    },
+    "baseline": {
+      "sourceId": "8deeb52a09ba2b75",
+      "wasmSha256": "e1cff3403dc66cf4e0e46507a27431e863f95931c465d0d84e5acd9fddf72cb8",
+      "jsSha256": "fa507cbfdf856f83e55c7556e8dc024969db41da5102524159ab9bf9f70b02a8"
+    }
+  },
+  "patch": {
+    "path": "outer-placeholder-origin-candidate.patch",
+    "sha256": "12acf5353ab12f366e04496d2d7c59093d80a7bc60293257d8fa603910de0a05"
+  },
+  "verifier": {
+    "path": "verify-candidate.mjs",
+    "sha256": "1c2d33be435f8f36925ca29fe379719a2851c0c1b76a7afe12ec195aa2ea5d59"
+  },
+  "changedRust": [
+    {
+      "path": "src/renderer/layout.rs",
+      "before": "9de295de5963e14b856ee1c6778ac4b20f1cdfea3b054ed75976059de636d617",
+      "after": "ee4012390be0567c556b89ef6b77a8b5c2151acdaca248cc45cd72f8857f355e"
+    },
+    {
+      "path": "src/document_core/commands/document.rs",
+      "before": "5144b3a2a96cfe474503d161429ae5e1fd10511fee5ef33dc04890d2eb46a4da",
+      "after": "d0f52b5e0f3cbc3b4c54d79731d394333140cb088b00feaef96de2f99b8ce82a"
+    }
+  ],
+  "unchangedInputs": [
+    {
+      "path": "build/hancom-owned-file-review-20261017/outer-hwp.hwp",
+      "bytes": 13312,
+      "sha256": "156a114b410d6b332fa92d54e89900234977548b8337c3b25d22b087f9c34f59"
+    },
+    {
+      "path": "build/hancom-owned-file-review-20261017/outer-hwp-hancom.hwp",
+      "bytes": 14848,
+      "sha256": "07a55e4ba8011bd8cbed2fd51d4249bd84352d89c86bb3b19ac82287da1406f8"
+    },
+    {
+      "path": "build/hancom-owned-file-review-20261017/outer-hwpx.hwpx",
+      "bytes": 7969,
+      "sha256": "3d4f13c1cf6f7aea60c264bcae26eafffeab91ca5ee2a6513eac3c83121b03e1"
+    },
+    {
+      "path": "build/hancom-owned-file-review-20261017/outer-hwpx-hancom.hwpx",
+      "bytes": 14687,
+      "sha256": "18b15a30e6451f90f4b0eb3512dea656998b60c86284ab173037aaf3f577cb1d"
+    }
+  ],
+  "rawRecords": [
+    {
+      "name": "outer-hwp.hwp",
+      "inputSha256": "156a114b410d6b332fa92d54e89900234977548b8337c3b25d22b087f9c34f59",
+      "rawSections": [
+        {
+          "name": "Section0",
+          "compressedSha256": "a078e63221e339204995f8e15b9bf26758b9650f62783eb4d120ae79fbfeaab7",
+          "uncompressedSha256": "c99be8f9c354a079129ff867f6a6669fb3ee013620bd95fcb69435cc47ef4195",
+          "paragraphs": [
+            {
+              "index": 0,
+              "headerLineCount": 1,
+              "lineCount": 1,
+              "tabs": []
+            },
+            {
+              "index": 1,
+              "headerLineCount": 1,
+              "lineCount": 1,
+              "tabs": []
+            },
+            {
+              "index": 2,
+              "headerLineCount": 1,
+              "lineCount": 1,
+              "tabs": []
+            }
+          ]
+        }
+      ],
+      "originalUnchanged": true,
+      "validation": "All unchanged native save calls preserved entire decompressed BodyText and matched official63 compressed output policy; actual Hancom compressed coding itself may differ."
+    },
+    {
+      "name": "outer-hwp-hancom.hwp",
+      "inputSha256": "07a55e4ba8011bd8cbed2fd51d4249bd84352d89c86bb3b19ac82287da1406f8",
+      "rawSections": [
+        {
+          "name": "Section0",
+          "compressedSha256": "c07980f1ac5ae0525c1e21aead7fc3c40108299050bcdd266519164cadebc2e4",
+          "uncompressedSha256": "cc82ee55e00c1b87fe733a36d1bd08bba34ca8ed0de85403d3549eec30de6fb3",
+          "paragraphs": [
+            {
+              "index": 0,
+              "headerLineCount": 1,
+              "lineCount": 1,
+              "tabs": []
+            },
+            {
+              "index": 1,
+              "headerLineCount": 1,
+              "lineCount": 1,
+              "tabs": []
+            },
+            {
+              "index": 2,
+              "headerLineCount": 1,
+              "lineCount": 1,
+              "tabs": []
+            }
+          ]
+        }
+      ],
+      "originalUnchanged": true,
+      "validation": "All unchanged native save calls preserved entire decompressed BodyText and matched official63 compressed output policy; actual Hancom compressed coding itself may differ."
+    }
+  ],
+  "saveObservations": [
+    {
+      "name": "actual-pair",
+      "format": "hwp",
+      "semantic": 0,
+      "geometry": 0,
+      "pages": {
+        "before": 1,
+        "after": 1,
+        "equal": true
+      },
+      "tableY": 153.6
+    },
+    {
+      "name": "actual-pair",
+      "format": "hwpx",
+      "semantic": 0,
+      "geometry": 0,
+      "pages": {
+        "before": 1,
+        "after": 1,
+        "equal": true
+      },
+      "tableY": 153.6
+    },
+    {
+      "name": "outer-hwp.hwp",
+      "format": "hwp",
+      "round": 1,
+      "sha256": "156a114b410d6b332fa92d54e89900234977548b8337c3b25d22b087f9c34f59",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "outer-hwp.hwp",
+      "format": "hwp",
+      "round": 2,
+      "sha256": "156a114b410d6b332fa92d54e89900234977548b8337c3b25d22b087f9c34f59",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "outer-hwp.hwp",
+      "format": "hwpx",
+      "round": 1,
+      "sha256": "3d4f13c1cf6f7aea60c264bcae26eafffeab91ca5ee2a6513eac3c83121b03e1",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "outer-hwp.hwp",
+      "format": "hwpx",
+      "round": 2,
+      "sha256": "3d4f13c1cf6f7aea60c264bcae26eafffeab91ca5ee2a6513eac3c83121b03e1",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "outer-hwp-hancom.hwp",
+      "format": "hwp",
+      "round": 1,
+      "sha256": "1909cc125ccc1f316019b489246e01f154860ebf33b7ac5dabf3be3a9bd34652",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "outer-hwp-hancom.hwp",
+      "format": "hwp",
+      "round": 2,
+      "sha256": "1909cc125ccc1f316019b489246e01f154860ebf33b7ac5dabf3be3a9bd34652",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "outer-hwp-hancom.hwp",
+      "format": "hwpx",
+      "round": 1,
+      "sha256": "5e7f0bdb1d511d849a4b6ce3dcfc39e8e4037080b373dcf63d278653871c3f17",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "outer-hwp-hancom.hwp",
+      "format": "hwpx",
+      "round": 2,
+      "sha256": "5e7f0bdb1d511d849a4b6ce3dcfc39e8e4037080b373dcf63d278653871c3f17",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "outer-hwpx.hwpx",
+      "format": "hwp",
+      "round": 1,
+      "sha256": "5dd6837f46f843f4b194cd7ee68c098efdac35eef3c1a8794ebde7372b6d72d5",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "outer-hwpx.hwpx",
+      "format": "hwp",
+      "round": 2,
+      "sha256": "554457c11b85dfe96092db80d05bfa7794e627a5627803545b1e53bb025573a1",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "outer-hwpx.hwpx",
+      "format": "hwpx",
+      "round": 1,
+      "sha256": "3d4f13c1cf6f7aea60c264bcae26eafffeab91ca5ee2a6513eac3c83121b03e1",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "outer-hwpx.hwpx",
+      "format": "hwpx",
+      "round": 2,
+      "sha256": "3d4f13c1cf6f7aea60c264bcae26eafffeab91ca5ee2a6513eac3c83121b03e1",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "outer-hwpx-hancom.hwpx",
+      "format": "hwp",
+      "round": 1,
+      "sha256": "350d5b8d93bede2e30857740bb217fb488f29cd7f461db7151375ffe373e9b07",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "outer-hwpx-hancom.hwpx",
+      "format": "hwp",
+      "round": 2,
+      "sha256": "05e691d18b998226ec13e6134c7fcb17f51af24f3ebe74f62d779f0306368546",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "outer-hwpx-hancom.hwpx",
+      "format": "hwpx",
+      "round": 1,
+      "sha256": "5b6226f78c570a681acc4493472ca0e7bcf5eef4d0952f170b8250a7dabbe82c",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "outer-hwpx-hancom.hwpx",
+      "format": "hwpx",
+      "round": 2,
+      "sha256": "5b6226f78c570a681acc4493472ca0e7bcf5eef4d0952f170b8250a7dabbe82c",
+      "semantic": 0,
+      "geometry": 0
+    }
+  ],
+  "scope": "Full semantics and every published control/text layout field, unchanged0.2px. Two actual source/Hancom pairs,8 repeated format paths/16 saved artifacts,8 unsafe live+exact byte export+reopen comparisons,13 own negatives. No font/WASM/EXE/public content/full snapshot.",
+  "formalVerifierStagedInputsReplay": {
+    "passed": 31,
+    "failed": 0,
+    "originalFixtureFolderUsed": false,
+    "fixtureRoot": "fixtures",
+    "verifier": "apps/editor/scripts/verify-table-outer-hancom.mjs",
+    "verifierSha256": "c58b20eae55d28029d70034ec85a02593fbe439438efa5f2921f627c94d23154",
+    "resultSha256": "18f900a499351a77e64b2ff8510df3a6e6de89524423033de4ab0bdb2cb81aff",
+    "note": "Actual replay of the new formal verifier against only the 17 copied staging fixtures and recorded private/baseline packages. Outputs remained outside this evidence bundle."
+  }
+}

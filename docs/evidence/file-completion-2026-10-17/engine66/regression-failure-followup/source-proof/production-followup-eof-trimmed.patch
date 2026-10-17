@@ -1,0 +1,122 @@
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -387,9 +387,16 @@
+         || table.common.vertical_offset != 0 || table.common.horizontal_offset != 0
+         || table.common.locked || table.common.size_protect || table.caption.is_some()
+         || table.common.attr & (1 << 30) != 0 || table.attr & (1 << 30) != 0
+-        // Known TABLE bit26 materializes nonzero HWPX inMargin. No other
+-        // record flags (including noAdjust0x08) belong to this plain scope.
+-        || table.raw_table_record_attr & !0x0400_0000 != 0
++        // The owned generator keeps raw default0x6 until serialization packs
++        // its explicit None/nonrepeat semantics. Accept only that unsealed
++        // constructor state with synchronized margin copies; never a sealed
++        // source cache or unknown/noAdjust bits.
++        || !(matches!(table.raw_table_record_attr, 0 | 0x0400_0000)
++            || (table.raw_table_record_attr == 6 && table.raw_ctrl_seal.is_none()
++                && table.common.margin.left == table.outer_margin_left
++                && table.common.margin.right == table.outer_margin_right
++                && table.common.margin.top == table.outer_margin_top
++                && table.common.margin.bottom == table.outer_margin_bottom))
+         || !matches!(table.common.height_criterion, crate::model::shape::SizeCriterion::Absolute)
+         || !matches!(table.common.width_criterion, crate::model::shape::SizeCriterion::Absolute)
+         || table.common.width == 0 || table.common.width > i32::MAX as u32
+@@ -451,6 +458,7 @@
+     table: &crate::model::table::Table,
+     measured_height: Option<f64>,
+     dpi: f64,
++    recomputed_native_host: bool,
+     placement: Option<&crate::renderer::float_placement::ParagraphFloatPlacement>,
+ ) -> Option<i32> {
+     let origin = unresolved_single_table_placeholder_origin_hu(
+@@ -461,7 +469,8 @@
+     (matches!(p.flow, crate::renderer::float_placement::ParagraphFloatFlow::Exclusion)
+         && p.table_left.is_none()
+         && p.stored_successor_line_origin.is_none()
+-        && p.stored_host_origin.is_some_and(|v| equal(v, host))
++        && (p.stored_host_origin.is_some_and(|v| equal(v, host))
++            || (recomputed_native_host && p.stored_host_origin.is_none()))
+         && equal(p.anchor_y, host)
+         && equal(p.table_top, host + hwpunit_to_px(table.outer_margin_top as i32, dpi))
+         && equal(p.occupied_bottom, p.table_top
+@@ -11660,6 +11669,7 @@
+                 self.profile.get().hwp5_stored_pagination_layout(),
+                 *zone_column_count, paragraphs, para_index, t,
+                 mt.map(|measured| measured.total_height), self.dpi,
++                self.profile.get().native_hwp5_layout() && self.profile.get().session_edited(),
+                 ctx.paragraph_float_placements.get(&(para_index, control_index)),
+             ).map(|hu| col_area.y + hwpunit_to_px(hu, self.dpi));
+             // 확정 표 원점은 위여백을 이미 소비했다. 같은 계획이 없는 저장 표만
+@@ -17225,6 +17235,24 @@
+         let text:serde_json::Value=serde_json::from_str(&core.get_page_text_layout_native(0).unwrap()).unwrap();
+         assert!((text["runs"][13]["y"].as_f64().unwrap()-153.6).abs()<=0.2);
+     }
++    #[test]fn g050_owned_generated_raw_six_requires_unsealed_matching_margin_copies(){
++        let mut p=fixture();edit_table(&mut p,|t|{t.raw_table_record_attr=6;t.common.margin.left=t.outer_margin_left;t.common.margin.right=t.outer_margin_right;t.common.margin.top=t.outer_margin_top;t.common.margin.bottom=t.outer_margin_bottom;});
++        assert_eq!(probe(&p,true,1,51.28),Some(1600));
++        let mut sealed=p.clone();edit_table(&mut sealed,|t|t.raw_ctrl_seal=Some([0;32]));assert_eq!(probe(&sealed,true,1,51.28),None);
++        let mut mismatch=p.clone();edit_table(&mut mismatch,|t|t.common.margin.top+=1);assert_eq!(probe(&mismatch,true,1,51.28),None);
++        for raw in [1,2,3,4,5,7,8,14,0x4000_0000]{let mut bad=p.clone();edit_table(&mut bad,|t|t.raw_table_record_attr=raw);assert_eq!(probe(&bad,true,1,51.28),None,"raw{raw}");}
++    }
++    #[test]fn g050_missing_stored_origin_requires_edited_native_and_exact_existing_flow(){
++        use crate::renderer::float_placement::{ParagraphFloatFlow,ParagraphFloatPlacement};
++        let p=fixture();let Control::Table(t)=&p[1].controls[0] else{panic!()};
++        let plan=ParagraphFloatPlacement{flow:ParagraphFloatFlow::Exclusion,anchor_y:1600.0/75.0,stored_host_origin:None,stored_successor_line_origin:None,table_left:None,table_top:2734.0/75.0,occupied_bottom:7997.0/75.0};
++        let check=|native,edited,plan:&ParagraphFloatPlacement|unresolved_single_table_placeholder_paint_origin_hu(native,1,&p,1,t,Some(51.28),96.0,edited,Some(plan));
++        assert_eq!(check(true,true,&plan),Some(1600));assert_eq!(check(true,false,&plan),None);assert_eq!(check(false,true,&plan),None);
++        let mut mismatch=plan.clone();mismatch.anchor_y+=0.1;assert_eq!(check(true,true,&mismatch),None);
++        let mut mismatch=plan.clone();mismatch.table_top+=0.1;assert_eq!(check(true,true,&mismatch),None);
++        let mut mismatch=plan.clone();mismatch.occupied_bottom+=0.1;assert_eq!(check(true,true,&mismatch),None);
++        let mut mismatch=plan.clone();mismatch.stored_host_origin=Some(20.0);assert_eq!(check(true,true,&mismatch),None);
++    }
+     #[test]fn g048_actual_owned_source_and_hancom_pairs_take_distinct_contracts(){
+         let root=std::env::var("JUEONY_OUTER_FIXTURES").expect("absolute own fixture root required");
+         for (name, expected) in [("outer-hwp.hwp",Some(1600)),("outer-hwp-hancom.hwp",None),
+@@ -17299,3 +17327,37 @@
+             _=>p[2].controls.push(Control::Table(Box::default()))};assert_eq!(probe(&p,true,1,51.28),None);}
+     }
+ }
++
++#[cfg(test)]
++mod jueony_live_outer_contract_tests {
++    use super::*;
++    #[test]
++    fn g050_live_outer_four_command_paths_match_saved_reopen() {
++        use crate::document_core::DocumentCore;
++        let mut failures=Vec::new();
++        for format in ["hwp","hwpx"] {for loaded in [false,true] {
++            let mut core=DocumentCore::new_empty();core.create_blank_document_native().unwrap();
++            core.insert_text_native(0,0,0,"앞 본문").unwrap();core.split_paragraph_native(0,0,4,None).unwrap();
++            let t:serde_json::Value=serde_json::from_str(&core.create_table_native(0,1,0,3,2).unwrap()).unwrap();
++            let ci=t["controlIdx"].as_u64().unwrap() as usize;
++            for i in 0..6 {core.insert_text_in_cell_native(0,1,ci,i,0,0,&format!("내용 {i}")).unwrap();}
++            if loaded {let b=if format=="hwp" {core.export_hwp_with_adapter_snapshot().unwrap()}else{core.export_hwpx_native().unwrap()};core=DocumentCore::from_bytes(&b).unwrap();}
++            core.set_table_properties_native(0,1,ci,r#"{"outerLeft":567,"outerRight":850,"outerTop":1134,"outerBottom":1417}"#).unwrap();core.paginate();
++
++            let stem=format!("{format}-{}",if loaded{"loaded"}else{"fresh"});
++
++            let before:serde_json::Value=serde_json::from_str(&core.get_page_control_layout_native(0).unwrap()).unwrap();
++            let b=if format=="hwp" {core.export_hwp_with_adapter_snapshot().unwrap()}else{core.export_hwpx_native().unwrap()};let mut read=DocumentCore::from_bytes(&b).unwrap();read.paginate();
++            let after:serde_json::Value=serde_json::from_str(&read.get_page_control_layout_native(0).unwrap()).unwrap();
++            let before_text:serde_json::Value=serde_json::from_str(&core.get_page_text_layout_native(0).unwrap()).unwrap();
++            let after_text:serde_json::Value=serde_json::from_str(&read.get_page_text_layout_native(0).unwrap()).unwrap();
++            fn same(a:&serde_json::Value,b:&serde_json::Value)->bool{match(a,b){
++                (serde_json::Value::Number(a),serde_json::Value::Number(b))=>(a.as_f64().unwrap()-b.as_f64().unwrap()).abs()<=0.2,
++                (serde_json::Value::Array(a),serde_json::Value::Array(b))=>a.len()==b.len()&&a.iter().zip(b).all(|(a,b)|same(a,b)),
++                (serde_json::Value::Object(a),serde_json::Value::Object(b))=>a.len()==b.len()&&a.iter().all(|(k,a)|b.get(k).is_some_and(|b|same(a,b))),
++                _=>a==b}}
++            if !same(&before,&after)||!same(&before_text,&after_text){failures.push(format!("{stem}: whole control/text geometry differs"));}
++        }}
++        assert!(failures.is_empty(),"{}",failures.join("; "));
++    }
++}
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -2486,7 +2486,7 @@
+         if measured.para_index!=1 || measured.control_index!=0 { return false; }
+         crate::renderer::layout::unresolved_single_table_placeholder_paint_origin_hu(
+             self.effective_layout_profile().hwp5_stored_pagination_layout(),1,
+-            &section.paragraphs,1,table,Some(measured.total_height),self.dpi,
++            &section.paragraphs,1,table,Some(measured.total_height),self.dpi,false,
+             column.paragraph_float_placements.get(&(1,0))).is_some()
+     }
+ 

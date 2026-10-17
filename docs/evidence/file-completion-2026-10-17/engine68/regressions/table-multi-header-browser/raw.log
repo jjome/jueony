@@ -1,0 +1,20 @@
+PASS openai-responses: chat applies two leading title rows, comparison/undo/redo and saved flags remain exact
+PASS anthropic: chat applies two leading title rows, comparison/undo/redo and saved flags remain exact
+PASS gemini: chat applies two leading title rows, comparison/undo/redo and saved flags remain exact
+PASS openai-compatible: chat applies two leading title rows, comparison/undo/redo and saved flags remain exact
+PASS hwp: follow-up shrink/extend/off/all-title/clear retains cells/other table and reopens
+PASS hwpx: follow-up shrink/extend/off/all-title/clear retains cells/other table and reopens
+PASS hwp: manual count reads existing two-row block, retains table selection and supports undo/redo
+PASS hwpx: manual count reads existing two-row block, retains table selection and supports undo/redo
+PASS manual invalid counts and repeat with no body row preserve bytes/history; disable title clears whole block
+PASS manual title count change from body cell block preserves selected cells and cancellation changes nothing
+PASS partial second-row/gap/protected title sources reject rather than reduce original flags
+PASS third title-cell live failure restores all flags/history/dirty/caret
+PASS delayed AI and stale manual dialog cannot overwrite newer multi-row title state
+PASS hwp: 2-row rendered titles repeat exactly once on continuation, all body labels remain and off affects only repeat
+PASS hwp: 3-row rendered titles repeat exactly once on continuation, all body labels remain and off affects only repeat
+PASS hwpx: 2-row rendered titles repeat exactly once on continuation, all body labels remain and off affects only repeat
+PASS hwpx: 3-row rendered titles repeat exactly once on continuation, all body labels remain and off affects only repeat
+PASS unsaved workspace recovery restores multi-title block, repeat setting and comparison history after reload
+PASS hwp: oversized title block visibly refuses in manual dialog and preserves actual bytes/history
+PASS hwpx: oversized title block visibly refuses in manual dialog and preserves actual bytes/history

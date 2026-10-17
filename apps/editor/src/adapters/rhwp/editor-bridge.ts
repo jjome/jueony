@@ -151,6 +151,7 @@ export function installAgentBridge(d:Deps){
    assertRevision(base.revision,revision());
   },
   documentIdentity:()=>String(d.wasm.documentGeneration)+':'+d.wasm.fileName,
+  documentInstance:()=>String(d.wasm.documentGeneration),
   async open(bytes:Uint8Array,name:string,handle:any=null,dirty=false){await d.ready;if(api.busy()||applying)throw new Error('문서 작업 중입니다.');await d.load(bytes,name,handle);if(handle)await rememberFileSnapshot(handle,bytes);if(dirty)d.documentState.markDirty('workspace-recovery');},
   async restoreFileConnection(connection:StoredFileConnection,requestPermission=false){
    if(applying||composing||api.busy())throw new Error('문서 작업이 끝난 뒤 원본 파일에 연결해 주세요.');

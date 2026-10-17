@@ -1,0 +1,30 @@
+{
+  "results": [
+    {
+      "file": "summary.hwp",
+      "sha256": "afee10f8e8ead655f5806d840be7b1869e612d51fad4843cfc514f84ab501ddd",
+      "fiveFieldsExact": true,
+      "values": {
+        "title": "제목 <&> 😀",
+        "subject": "공공 업무",
+        "author": "검증 작성자",
+        "keywords": "회계, 업무 & 검증",
+        "description": "설명 첫 줄\n둘째 줄\t탭"
+      }
+    },
+    {
+      "file": "summary.hwpx",
+      "sha256": "f06b1f64f8e73146b1070cdaf3d6a0bb9c2a453e7f941baa54c3b5b51e3b45fd",
+      "fiveFieldsExact": true,
+      "values": {
+        "title": "제목 <&> 😀",
+        "subject": "공공 업무",
+        "author": "검증 작성자",
+        "keywords": "회계, 업무 & 검증",
+        "description": "설명 첫 줄\n둘째 줄\t탭"
+      }
+    }
+  ],
+  "failures": [],
+  "scope": "Independent Python CFB/PropertySet VT_LPWSTR and XML ElementTree OPF readers over our generated fixtures. No Native getter reused. Not a Hancom UI result."
+}

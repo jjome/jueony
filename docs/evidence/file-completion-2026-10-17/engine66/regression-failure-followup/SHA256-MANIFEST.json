@@ -1,0 +1,108 @@
+{
+  "createdAt": "2026-10-17T01:53:51.812858+00:00",
+  "scope": "Additive formal66 failure and Native followup only. The original parent manifest and payload remain immutable. Formal68 outcome belongs elsewhere.",
+  "count": 20,
+  "totalBytes": 444365,
+  "files": [
+    {
+      "path": "failure-and-followup-summary.json",
+      "bytes": 5949,
+      "sha256": "2ed273ef961dedf9aa54f772d06ca815512c43e2ab61d10d78bee65d4bb9936e"
+    },
+    {
+      "path": "native-followup/apply-check66.json",
+      "bytes": 98,
+      "sha256": "b4700469cd4674054e1b201f242f2b62c2ed8a6a8a61b82802299870dcd41f8d"
+    },
+    {
+      "path": "native-followup/candidate-validation.json",
+      "bytes": 2880,
+      "sha256": "02f88fa7fb2fab597957f8d9885a468733c05b006d083b243b5eb471f0d50b33"
+    },
+    {
+      "path": "native-followup/native-live-fixed.log",
+      "bytes": 1434,
+      "sha256": "523cbc6849e72e66107f9ab58826dd6795a974b8e50fb5a11194916390aad98c"
+    },
+    {
+      "path": "native-followup/native-live-trace-runtime.log",
+      "bytes": 3814,
+      "sha256": "4020c9c9eaac8c115a039039e84f81348b584786c6485675ba05d1c95fc6a816"
+    },
+    {
+      "path": "native-followup/native-original10-regression.log",
+      "bytes": 3151,
+      "sha256": "0f65ab5e027eccd0f25f18080783b0dc369515abf9c4be5fa3ba11ec98e65f50"
+    },
+    {
+      "path": "native-followup/owned-live-table-outer-origin-candidate.patch",
+      "bytes": 9061,
+      "sha256": "a17f4769b34b72a9e303c29b5f3ef4b9252adf3f41e770ad848818f73ae7a200"
+    },
+    {
+      "path": "original66/outer-native-original-result.json",
+      "bytes": 15952,
+      "sha256": "b9244997b661de0037b25cd238d24575f701222dad05137e79e5226e68900fd6"
+    },
+    {
+      "path": "original66/outer-native-original.log",
+      "bytes": 506,
+      "sha256": "bcbbd60fa467fc2374e1aa037e6e2447bf64107ffc9cb3276d6a534d4e7f8a87"
+    },
+    {
+      "path": "original66/regressions-original.json",
+      "bytes": 4050,
+      "sha256": "4f4683fdc3baf7e8dd2c78875fb02b6364a27cf1a495ff920ddc8e56f235c6d1"
+    },
+    {
+      "path": "original66/regressions-original.log",
+      "bytes": 950,
+      "sha256": "2b54cf69534e1f7cf08fc30ef15c80ee3938787107c27c813b9c4c56e2731769"
+    },
+    {
+      "path": "original66/width-browser-failure.png",
+      "bytes": 159338,
+      "sha256": "0ab5dfff014c4e0823ae1e49066cbe29477599ba06a88d30854d25ffe2882f0f"
+    },
+    {
+      "path": "original66/width-browser-original-result.json",
+      "bytes": 35226,
+      "sha256": "84753cf0e114d56906a99b02fd66314ccf757cef9a877095c8ce4dff2ddbbce9"
+    },
+    {
+      "path": "original66/width-browser-original.log",
+      "bytes": 3435,
+      "sha256": "c941a87fd0051c7c21de73e0fc4c4e23fd28bfb1f0ab7d44cc99a365620c2783"
+    },
+    {
+      "path": "parent-existing-payload.json",
+      "bytes": 6880,
+      "sha256": "6823176833a922cf709b3658547a473207a91fcb320b00df3e0b50454bf6687d"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3244,
+      "sha256": "9f288cd8683f20674fada8e1e81427b6889f69144f4972dc4ac0422e48f3031f"
+    },
+    {
+      "path": "source-proof/official66-rust-baseline-original.json",
+      "bytes": 174499,
+      "sha256": "ced15c75adab06e4af24b598b98005671c946274c412f91f69f39b690987f159"
+    },
+    {
+      "path": "source-proof/production-eof-only-change.json",
+      "bytes": 982,
+      "sha256": "5944666ecdce263a8a9ad0854f1feabfc8fcec5dc66137b2f55ff89be1cdb058"
+    },
+    {
+      "path": "source-proof/production-followup-eof-trimmed.patch",
+      "bytes": 9059,
+      "sha256": "9b896b2d541e1dd002bd240742d707b0274f95d436bbb0d321600bd63a350845"
+    },
+    {
+      "path": "verify.py",
+      "bytes": 3857,
+      "sha256": "86b2e0b1cc6a4e80d68e42268c7405b05bc494727b791f1080afb23639ed9add"
+    }
+  ]
+}

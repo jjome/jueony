@@ -1,0 +1,8 @@
+PASS plain Rectangle textbox forward/backward multiparagraph Unicode selection is captured/restored without writes
+PASS cursor-only, empty paragraph and first/end offsets are read-only exact addresses
+PASS canonical HWP/HWPX sources retain fingerprints on reread, HWPX live state survives recovery export
+PASS HWP roundtrip state follows actual vertical alignment; changed formats never restore
+PASS equal-length text, nonfocused paragraph formatting and shape identity edits invalidate restoration
+PASS malformed body/story paths, forged fingerprints and out-of-range paragraphs never restore
+PASS caption, nested table, rotation, unknown protection, locked and missing readers fail closed
+PASS groups and nontextbox rectangles are not classified as textbox state

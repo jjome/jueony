@@ -1,0 +1,64 @@
+{
+  "authoritativeSeries": "own-gulimche-11pt97-{width}-{justify|left}-no-ls.hwpx",
+  "sourceMatchedMode": "breakNonLatinWord KEEP_WORD -> HWP bit7=1 -> character breaking, per existing #2185 implementation and original Python3 header5 actual attribute. The schema name is inverse to the existing verified engine semantic.",
+  "measuredHancomCopy": "hancom-width-29868-justify.hwpx",
+  "measuredHancomSha256": "f43e2abfc2248a31c9db6224bd8e9e9292aeadc7ca72e917c2843e83f010fcf2",
+  "measuredRaw": {
+    "paraPr": {
+      "id": "20",
+      "tabPrIDRef": "0",
+      "condense": "0",
+      "fontLineHeight": "0",
+      "snapToGrid": "1",
+      "suppressLineNumbers": "0",
+      "checked": "0",
+      "textDir": "LTR"
+    },
+    "breakSetting": {
+      "breakLatinWord": "KEEP_WORD",
+      "breakNonLatinWord": "KEEP_WORD",
+      "widowOrphan": "0",
+      "keepWithNext": "0",
+      "keepLines": "0",
+      "pageBreakBefore": "0",
+      "lineWrap": "BREAK"
+    },
+    "lineStarts": [
+      "0",
+      "31"
+    ]
+  },
+  "inputRaw": {
+    "paraPr": {
+      "id": "20",
+      "tabPrIDRef": "0",
+      "condense": "0",
+      "fontLineHeight": "0",
+      "snapToGrid": "1",
+      "suppressLineNumbers": "0",
+      "checked": "0"
+    },
+    "breakSetting": {
+      "breakLatinWord": "KEEP_WORD",
+      "breakNonLatinWord": "KEEP_WORD",
+      "widowOrphan": "0",
+      "keepWithNext": "0",
+      "keepLines": "0",
+      "pageBreakBefore": "0",
+      "lineWrap": "BREAK"
+    },
+    "lineStarts": []
+  },
+  "preparationCorrections": [
+    {
+      "series": "*-char-break.hwpx",
+      "correction": "The koreanBreakUnit=1 API correctly emitted KEEP_WORD. Earlier inference of API failure was wrong; these are same character mode as original, not a failed API."
+    },
+    {
+      "series": "*-char-break-v3-no-ls.hwpx",
+      "correction": "Explicit BREAK_WORD is actually bit7=0 word breaking. Despite its preparation filename/manifest label it is a WORD-BREAK NEGATIVE CONTROL, not the source-matched character series. Do not use it as the source oracle."
+    }
+  ],
+  "originalsUnchanged": true,
+  "remainingUnverified": "Actual Hancom left-alignment or boundary-width matrix not yet measured here. Font glyph hmtx equal does not prove hinting/ink/line-fit behavior. Initial own snapToGrid1 differs from source0; width glyph grid is0 and no tabs are present, but no claim of every source property identity is made."
+}

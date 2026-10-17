@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "source": "Self-authored width review76 only",
+  "excluded": [
+    "font program",
+    "public body",
+    "WASM/EXE",
+    "public full snapshots"
+  ],
+  "files": [
+    {
+      "path": "actual-hancom/29868-left-disk-reopened-uia.txt",
+      "bytes": 4097,
+      "sha256": "e4d93e615464a7bab2d9e565c93a92a992d08ec24cb052634b45decba88bb5a7"
+    },
+    {
+      "path": "actual-hancom/29868-left-disk-reopened.png",
+      "bytes": 89757,
+      "sha256": "69d3744493377e736a4279aa32f4b6b2c53dc7799a8ed18e25f2e1a085ca24a8"
+    },
+    {
+      "path": "actual-hancom/29868-left-saved-uia.txt",
+      "bytes": 4097,
+      "sha256": "a2a333c6d70954c97db523b1e6eaa6e0e976c84814a01521599d212bbd96f80b"
+    },
+    {
+      "path": "actual-hancom/29868-left-saved.png",
+      "bytes": 89877,
+      "sha256": "9e76b0462b9f74b9c95508ed4da29e3c233f7265a7a860644bf3cc8f3523f458"
+    },
+    {
+      "path": "actual-hancom/29868-word-justify-saved-uia.txt",
+      "bytes": 4106,
+      "sha256": "d769396ca2c57b1e302b8d50152d30d340063e9627284718d9381ad2eb43e65e"
+    },
+    {
+      "path": "actual-hancom/29868-word-justify-saved.png",
+      "bytes": 89764,
+      "sha256": "5bf23880712273a3f7b3b16ab1ff23fa3ea940d295cfb8da4174321a95cd589c"
+    },
+    {
+      "path": "comparison.json",
+      "bytes": 204133,
+      "sha256": "1abd5923796ec4d1beca405451216f8e32956fef6ac1a0baf6e4fb42b0f0b879"
+    },
+    {
+      "path": "fixtures/hancom-width-29868-justify.hwpx",
+      "bytes": 14317,
+      "sha256": "f43e2abfc2248a31c9db6224bd8e9e9292aeadc7ca72e917c2843e83f010fcf2"
+    },
+    {
+      "path": "fixtures/hancom-width-29868-left.hwpx",
+      "bytes": 14214,
+      "sha256": "f07eb454b23c4b3cb1f38920aa805fdf6faf1e7c36c89a4d9ee3563274435c3d"
+    },
+    {
+      "path": "fixtures/own-gulimche-11pt97-29868-justify-no-ls.hwpx",
+      "bytes": 8046,
+      "sha256": "b382e894fff60d6d09cfe91773bbf1b3fc34693b8e597836a11282ab0bc5a38b"
+    },
+    {
+      "path": "fixtures/own-gulimche-11pt97-29868-left-no-ls.hwpx",
+      "bytes": 8050,
+      "sha256": "95a9f993171ec4c446f49f6a754e7e7ee96863868d351a6dbaff16d142a918bf"
+    },
+    {
+      "path": "four-file-raw-xml.json",
+      "bytes": 7931,
+      "sha256": "8528e50e22445fd3844e72963bbccf0dc27ca97e3f0ea75a37b48abcf6a1eb51"
+    },
+    {
+      "path": "installed-font-numeric-proof.json",
+      "bytes": 1653,
+      "sha256": "d09da299b4ef51547b041687cd7da9b10c2d7e685cf576f8586d96a65af3e67c"
+    },
+    {
+      "path": "package-compact.py",
+      "bytes": 11212,
+      "sha256": "08a5048170e01930c9bbc09bdd6fe6f8609e5a20047453495ec62b59b6389e18"
+    },
+    {
+      "path": "preparation/manifest.json",
+      "bytes": 9877,
+      "sha256": "67e1f4604d59739038726b45bdbfd7b96eb45d262e6ef9bca5fe2e688e28bec7"
+    },
+    {
+      "path": "preparation/prepare-own-widths-char-break.mjs",
+      "bytes": 3420,
+      "sha256": "65d901f0a90ba3b9ca4db7f46141392b8ded4ea3435b4e3aaaee72e03fd79f62"
+    },
+    {
+      "path": "preparation/prepare-own-widths.mjs",
+      "bytes": 3335,
+      "sha256": "1601e6dbc1982959774e6b38eb81098c635581614fb9299208dc5afd9de95b12"
+    },
+    {
+      "path": "preparation/READ-FIRST-CORRECTIONS.json",
+      "bytes": 2467,
+      "sha256": "620f1d9b804ef6ad3c545ccf3f807f1d62dd3f5f4f9dd4091a4888928b2dc02e"
+    },
+    {
+      "path": "preparation-failures-and-corrections.json",
+      "bytes": 2144,
+      "sha256": "a73d0ab6a825c91c08f8d4899a43fbbc2fd07f715bc14a378af06f482c9d1d34"
+    },
+    {
+      "path": "read-four-files.mjs",
+      "bytes": 2310,
+      "sha256": "0a93f7284469f0897573a144801f5e0fcd3fd124dfff01cf082d64ecf2ba6af8"
+    },
+    {
+      "path": "read-installed-font-metrics.py",
+      "bytes": 4758,
+      "sha256": "4111981c870eb9e5de9695f0fc2e06da69434ef3c7ba4e54f3bff7e8cd2fff1f"
+    },
+    {
+      "path": "readback/hancom-width-29868-justify.hwpx.json",
+      "bytes": 310737,
+      "sha256": "4a26134df5825e71ba62dd75eff0cffcfb535eef8d87cdf7577bfe1310bffca0"
+    },
+    {
+      "path": "readback/hancom-width-29868-left.hwpx.json",
+      "bytes": 316063,
+      "sha256": "94b978a6fd2677965ac4bbc49121c8090672660f872d49c97e9a7674d69ee123"
+    },
+    {
+      "path": "readback/own-gulimche-11pt97-29868-justify-no-ls.hwpx.json",
+      "bytes": 310730,
+      "sha256": "bdfebc65896f50c2cadd57a86d90f0a59b437df2b59605e28305d72ef604b83b"
+    },
+    {
+      "path": "readback/own-gulimche-11pt97-29868-left-no-ls.hwpx.json",
+      "bytes": 309749,
+      "sha256": "f5a92d0bed6c7361a89f9006e5da1f4c2af47a319ac07e9a5c0cdbd596a54641"
+    },
+    {
+      "path": "readonly-engine-source-proof.json",
+      "bytes": 14995,
+      "sha256": "92f91678a32ce9a82a7e69824be505145e75ad531a58565a0005057e43a85b21"
+    },
+    {
+      "path": "reproduce.json",
+      "bytes": 1386,
+      "sha256": "2f7e2529ac43d7d1830589c30c4d88755f1b32621857498e04b5581c5d58c8a0"
+    },
+    {
+      "path": "summary.json",
+      "bytes": 7112,
+      "sha256": "15e4cb7cb2ea3429e2d24689872f31468eb219be4db655b6cc3ae9a0163bd716"
+    },
+    {
+      "path": "verify_manifest.py",
+      "bytes": 363,
+      "sha256": "61ca6889f4327ef5325267aff8d5759cb06fc0c8c7d6ca0adfc86ff2ed783b44"
+    }
+  ]
+}

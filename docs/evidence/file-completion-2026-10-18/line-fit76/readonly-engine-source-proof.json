@@ -1,0 +1,324 @@
+{
+  "engineSourceId": "23d2545926a179a5",
+  "files": [
+    {
+      "path": "src/renderer/composer/line_breaking.rs",
+      "sha256": "1ca8e191bccb9783a887336cfb060d3f623f2d1db7be6bd4b33594b82cffc2d2",
+      "excerpts": [
+        {
+          "startLine": 450,
+          "endLine": 466,
+          "lines": [
+            "                max_font_size: font_size,",
+            "                has_inline_control: inline_width > 0.0,",
+            "            });",
+            "            i += 1;",
+            "            continue;",
+            "        }",
+            "",
+            "        // 한글 어절 또는 글자.",
+            "        // [#2185] bit7=1(KEEP_WORD)이 **글자 단위**, bit7=0(BREAK_WORD)이",
+            "        // 어절 단위 — 스키마 명목과 반대 (한컴 통제 실측 3중 확증: #2169",
+            "        // kbu 사다리, 80168 r10, #2185 giant-cell LINE_SEG [0,44,84,122]",
+            "        // 보존 대조). 종전 == 1 어절 분기는 역해석 (0da18bbc 회귀).",
+            "        if is_hangul(ch) {",
+            "            if korean_break_unit == 0 {",
+            "                // 어절 모드: 연속 한글 + 후행 금칙 문자를 하나의 토큰으로",
+            "                let start = i;",
+            "                let mut max_fs = 0.0f64;"
+          ]
+        },
+        {
+          "startLine": 1246,
+          "endLine": 1253,
+          "lines": [
+            "/// px를 HWPUNIT(i32)로 변환 (내림, DPI=96 기준: px * 75)",
+            "///",
+            "#[inline]",
+            "fn to_hwp(px: f64) -> i32 {",
+            "    (px * 75.0) as i32",
+            "}",
+            "",
+            "/// [#7418] 이 공백 앞에 같은 줄의 글자가 하나도 없는가 — 줄 맨 앞 공백."
+          ]
+        },
+        {
+          "startLine": 1469,
+          "endLine": 1510,
+          "lines": [
+            "fn text_token_fits_line_hwp(",
+            "    current_width_hwp: i32,",
+            "    token_width: FitWidthHwp,",
+            "    space_savings_hwp: i32,",
+            "    effective_width_hwp: i32,",
+            "    new_word_natural_before_hwp: Option<i32>,",
+            ") -> bool {",
+            "    text_token_fits_in_line_with_tolerance_hwp(",
+            "        current_width_hwp,",
+            "        token_width,",
+            "        space_savings_hwp,",
+            "        effective_width_hwp,",
+            "        new_word_natural_before_hwp,",
+            "        line_break_tolerance_hwp(effective_width_hwp),",
+            "    )",
+            "}",
+            "",
+            "fn text_token_fits_in_line_with_tolerance_hwp(",
+            "    current_width_hwp: i32,",
+            "    token_width: FitWidthHwp,",
+            "    space_savings_hwp: i32,",
+            "    effective_width_hwp: i32,",
+            "    new_word_natural_before_hwp: Option<i32>,",
+            "    tolerance_hwp: i32,",
+            ") -> bool {",
+            "    let natural_candidate = current_width_hwp + token_width.0;",
+            "    let condensed_candidate = condensed_line_width_hwp(natural_candidate, space_savings_hwp);",
+            "    let limit_hwp = effective_width_hwp + tolerance_hwp;",
+            "    if natural_candidate <= limit_hwp {",
+            "        return true;",
+            "    }",
+            "    // 공백을 줄여야 들어가는 경우 — 줄바꿈 여유(자연폭 추정 오차 흡수용)를 얹지 않는다.",
+            "    // 한/글은 줄인 폭이 상자를 넘으면 받지 않는다: 합성 문단에서 상자를 5·30 HWPUNIT",
+            "    // 넘는 줄(여유 50 안)과 80168 49쪽 `…투자ㆍ운` + `용`(여유 31 안)을 모두 거절한다.",
+            "    if condensed_candidate > effective_width_hwp {",
+            "        return false;",
+            "    }",
+            "    !new_word_natural_before_hwp.is_some_and(|w| w >= effective_width_hwp)",
+            "}",
+            "",
+            "/// Greedy line-fill continuation.",
+            "///"
+          ]
+        },
+        {
+          "startLine": 3797,
+          "endLine": 3827,
+          "lines": [
+            "        return None;",
+            "    }",
+            "",
+            "    let entry_checkpoint = frame.clone();",
+            "    let cache_geometry_matches = stored_rows_reproduce_frame_expectation(para, frame, styles, dpi);",
+            "    if cache_geometry_matches && !stale {",
+            "        return Some(StoredRowResolution::Stored);",
+            "    }",
+            "",
+            "    // Admission commits recomputed rows into the frame. A stale cache must not",
+            "    // leave those rows behind before the fresh fill starts. Rejection already",
+            "    // restores internally, so this is deliberately idempotent on that arm.",
+            "    frame.restore_checkpoint(entry_checkpoint);",
+            "    if !cache_geometry_matches",
+            "        && !stale",
+            "        && miss_policy == StoredRowMissPolicy::UnmodelledUnlessStale",
+            "    {",
+            "        return None;",
+            "    }",
+            "    if !cache_geometry_matches {",
+            "        report_stored_row_key_mismatch(para, frame, styles, dpi);",
+            "    }",
+            "",
+            "    let mut reflow_input = para.clone();",
+            "    // A rejected row cannot remain the provenance template for fresh rows:",
+            "    // placement/empty flags describe the stored physical rows, not this",
+            "    // frame's newly carved projection.",
+            "    reflow_input.line_segs.clear();",
+            "    layout_paragraph_in_frame(&reflow_input, frame, styles, dpi)",
+            "        .map(|_| StoredRowResolution::Reflowed)",
+            "}"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/renderer/composer.rs",
+      "sha256": "6de9f98a67c77d3503daaa50a8477d8b946fb691d5ce6e91f54349c8835d8d33",
+      "excerpts": [
+        {
+          "startLine": 3438,
+          "endLine": 3459,
+          "lines": [
+            "        return;",
+            "    }",
+            "",
+            "    let inner_width_px = cell_box.width_px(dpi);",
+            "    let rebuilt = if has_authoritative_line_segs {",
+            "        // Authentic rows use the same exact cache key as body rows. A clean",
+            "        // match returns Stored without rebuilding; changed cell geometry or a",
+            "        // mutation-dirty text partition falls through to Frame reflow.",
+            "        recompose_stored_lines_in_frame(",
+            "            composed,",
+            "            para,",
+            "            cell_box,",
+            "            inner_width_px,",
+            "            styles,",
+            "            dpi,",
+            "            legacy_hwp3_stored_geometry,",
+            "            line_breaking::StoredRowMissPolicy::UnmodelledUnlessStale,",
+            "            // 셀 줄의 어울림 배제는 #5818 셀 계약이 따로 소유한다.",
+            "            &[],",
+            "        )",
+            "    } else {",
+            "        // NO_LS is the arm this owner normally serves. A synthetic single row"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/renderer/layout/text_measurement.rs",
+      "sha256": "38929d4d8871672dfeb2b3b3ebc5de309c7fde7ae26d72b7f90c33e21e992cdd",
+      "excerpts": [
+        {
+          "startLine": 991,
+          "endLine": 1001,
+          "lines": [
+            "/// 내장 폰트 메트릭으로 문자 폭 측정 (em 단위 → px 변환)",
+            "///",
+            "/// 내장 메트릭이 있으면 JS 브릿지 호출 없이 즉시 반환.",
+            "/// 없으면 None을 반환하여 폴백 경로를 사용하게 한다.",
+            "fn quantize_hwp_px(px: f64) -> f64 {",
+            "    let hwp = (px * 75.0) as i32;",
+            "    hwp as f64 / 75.0",
+            "}",
+            "",
+            "/// Hancom 2024's regular HCR Batang Hangul advance is rounded to four HWPUNITs.",
+            "/// Independent text-only controls distinguish nearest rounding from ceiling:"
+          ]
+        },
+        {
+          "startLine": 1430,
+          "endLine": 1446,
+          "lines": [
+            "        } else if is_halfwidth_punct && !quote_width_is_authentic && glyph_w >= mm.metric.em_size {",
+            "            (mm.metric.em_size / 2, HALFWIDTH_PUNCTUATION_WIDTH_SOURCE)",
+            "        } else {",
+            "            (glyph_w, \"embeddedMetric\")",
+            "        }",
+            "    };",
+            "    EmbeddedWidthDecision {",
+            "        width_px: Some(quantize_hwp_px(",
+            "            w as f64 * font_size / mm.metric.em_size as f64,",
+            "        )),",
+            "        width_source,",
+            "        metric: Some(mm),",
+            "        character_match: \"hit\",",
+            "    }",
+            "}",
+            "",
+            "pub(crate) fn char_width_decision<'a>("
+          ]
+        },
+        {
+          "startLine": 1665,
+          "endLine": 1693,
+          "lines": [
+            "    let (base_width_raw, width_source) = supplement",
+            "        .map(|entry| (entry.natural_advance_px(), entry.width_source()))",
+            "        .unwrap_or((base_width_raw, width_source));",
+            "    let base_width_px = if dash_leader {",
+            "        base_width_raw.min(font_size * 0.3)",
+            "    } else {",
+            "        base_width_raw",
+            "    };",
+            "    let mut final_width_px = base_width_px * ratio",
+            "        + glyph_letter_spacing(letter_spacing, base_width_px * ratio, font_size)",
+            "        + style.extra_char_spacing;",
+            "    if c == ' ' {",
+            "        final_width_px += style.extra_word_spacing;",
+            "    }",
+            "    if dash_leader {",
+            "        final_width_px += style.extra_dash_advance;",
+            "    }",
+            "    let mut negative_spacing_clamped = false;",
+            "    if letter_spacing + style.extra_char_spacing < 0.0 {",
+            "        let min_width = base_width_px * ratio * 0.5;",
+            "        if final_width_px < min_width {",
+            "            final_width_px = min_width;",
+            "            negative_spacing_clamped = true;",
+            "        }",
+            "    }",
+            "    CharWidthDecision {",
+            "        width_source,",
+            "        base_width_px,",
+            "        final_width_px,"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/renderer/layout/paragraph_layout.rs",
+      "sha256": "beb2f0a2c8cf5055895a5d8c96e4095edae18efef6a9db886ee8b4e73e675edd",
+      "excerpts": [
+        {
+          "startLine": 2444,
+          "endLine": 2481,
+          "lines": [
+            "        }",
+            "    } else if total_text_width > available_width && total_char_count > 1 && !has_tabs {",
+            "        // 비정렬(왼쪽/오른쪽/가운데) 텍스트가 오버플로우할 때 글자 간격 압축",
+            "        if suppress_cell_overflow_spacing {",
+            "            (0.0, 0.0, 0.0)",
+            "        } else if converge_auto_shrink_cell {",
+            "            // [#6303] 칸 폭 자동 축소(#6196) 가 선형 slack/N 한 번이면 목표가",
+            "            // 1~2% 헐거워 긴 행 꼬리가 괘선 밖으로 나간다. 저장 한 줄이 안쪽 폭을",
+            "            // 15% 넘게 넘는 칸에서만 줄바꿈은 그대로 두고 실측 폭을 수렴시킨다.",
+            "            // 일반 in_cell 줄까지 수렴하면 page-local hash·text-overlap 이 흔들린다.",
+            "            (",
+            "                0.0,",
+            "                converge_cell_overflow_char_spacing(",
+            "                    comp_line,",
+            "                    styles,",
+            "                    tab_width,",
+            "                    total_char_count,",
+            "                    total_text_width,",
+            "                    available_width,",
+            "                ),",
+            "                0.0,",
+            "            )",
+            "        } else {",
+            "            let raw = (available_width - total_text_width) / total_char_count as f64;",
+            "            let avg_char_w = total_text_width / total_char_count as f64;",
+            "            let min_sp = -avg_char_w * 0.5;",
+            "            (0.0, raw.max(min_sp), 0.0)",
+            "        }",
+            "    } else {",
+            "        // 작성된 자간으로 칸 안에 드는 글줄은 그 폭으로 정렬한다. 자간 없는",
+            "        // 자연 폭이 크다는 이유로 되늘리면 가운데/오른쪽 정렬의 여백을 지운다.",
+            "        (0.0, 0.0, 0.0)",
+            "    }",
+            "}",
+            "",
+            "/// `한글 97 안내문` 머리말의 한컴 회사명 PUA 여섯 글자와 뒤따르는 inline",
+            "/// logo 그림은, HWPX상 `DISTRIBUTE_SPACE` 문단 하나로 저장돼 있다.",
+            "///"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "src/parser/hwpx/header.rs",
+      "sha256": "12ffb195a3b1aebc66a82486d01bba0db2b39819fcd0406c1b0c31a956acb457",
+      "excerpts": [
+        {
+          "startLine": 1115,
+          "endLine": 1127,
+          "lines": [
+            "                        // Do not force this bit globally. Some Hancom-exported",
+            "                        // HWPX paraPr records require it (for example master-page",
+            "                        // page-number AutoNumber paragraphs), while other records",
+            "                        // explicitly do not. Preserve the HWPX contract only when",
+            "                        // the attribute says so.",
+            "                        let value = attr_str(&attr);",
+            "                        if value == \"KEEP_WORD\" {",
+            "                            ps.attr1 |= 1 << 7;",
+            "                        } else {",
+            "                            ps.attr1 &= !(1 << 7);",
+            "                        }",
+            "                    }",
+            "                    b\"widowOrphan\" => {"
+          ]
+        }
+      ]
+    }
+  ],
+  "note": "Existing source only. Stored-row paint compression is downstream of line selection and is not a proven fresh Hancom fit rule."
+}

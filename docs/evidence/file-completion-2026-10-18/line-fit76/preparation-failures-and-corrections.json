@@ -1,0 +1,36 @@
+{
+  "status": "DIAGNOSIS_NOT_A_FIX",
+  "originalInputsChanged": false,
+  "productionMetricOrGuardChanged": false,
+  "errors": [
+    {
+      "kind": "interpretation",
+      "initialClaim": "KEEP_WORD meant word breaking; API koreanBreakUnit=1 failed.",
+      "correction": "Existing engine #2185 contract is inverted relative to the schema label: KEEP_WORD sets bit7=1, character breaking. API output was correct. The original no-ls series is source-matched."
+    },
+    {
+      "kind": "preparation",
+      "initialOperation": "Reused mutable ZipInfo while reading and writing one diagnostic variant.",
+      "result": "In-memory CRC/header-offset error; originals were not changed. Incomplete variant and corrected later variants remain in the parent ignored build folder, outside the measured four-file set."
+    },
+    {
+      "kind": "filename-and-manifest-label",
+      "series": "*-char-break-v3-no-ls.hwpx",
+      "correction": "These explicitly use BREAK_WORD, bit7=0, and are WORD-BREAK negative controls. They are not source-matched character fixtures despite the old filenames/labels."
+    }
+  ],
+  "rejectedHypotheses": [
+    {
+      "claim": "JUSTIFY-specific word-space compression alone explains fresh Hancom acceptance of character 31.",
+      "status": "DISPROVED",
+      "counterexample": "Actual Hancom LEFT output also has lineStarts [0,31] at width 29868HU. LEFT alignment is preserved."
+    }
+  ],
+  "unresolved": "The fresh Hancom line-fit mechanism that accepts character 31 remains unknown. Existing engine paint compression for a stored row does not establish the fresh line-fit rule.",
+  "limitations": [
+    "No global width, fit tolerance, or preservation comparator changes were made.",
+    "The actual Hancom threshold across other widths is not measured.",
+    "Own snapToGrid=1 differs from public source snapToGrid=0. No horizontal character grid or tabs occur, but complete property identity is not claimed.",
+    "Observed imported-row owner and no-LS fresh paths differ. Do not replace original cached rows or normalize layout provenance from this evidence alone."
+  ]
+}

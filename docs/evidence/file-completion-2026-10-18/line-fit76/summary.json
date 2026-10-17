@@ -1,0 +1,286 @@
+{
+  "engineSourceId": "23d2545926a179a5",
+  "engineWasmSha256": "241bf9946102e82ada4e6e825b715f6e3fecd0f231612e977db1b73c923028a2",
+  "result": "REPRODUCED_UNRESOLVED",
+  "actualHancomEvidence": "Root performed actual Open(no-LS own document) and SaveAs; this worker only read files and packaged their own-text evidence.",
+  "fourFiles": [
+    {
+      "name": "own-gulimche-11pt97-29868-justify-no-ls.hwpx",
+      "sha256": "b382e894fff60d6d09cfe91773bbf1b3fc34693b8e597836a11282ab0bc5a38b",
+      "sourceFormat": "hwpx",
+      "partitions": [
+        {
+          "charStart": 0,
+          "textChars": 30,
+          "x": 117.2,
+          "y": 152.5,
+          "w": 398.2,
+          "charX": [
+            0,
+            14.2,
+            24.2,
+            38.4,
+            52.6,
+            66.8,
+            81.1,
+            95.3,
+            105.2,
+            119.5,
+            133.7,
+            147.9,
+            162.1,
+            172.1,
+            186.3,
+            200.5,
+            214.8,
+            229,
+            243.2,
+            257.4,
+            271.7,
+            285.9,
+            300.1,
+            310.1,
+            324.3,
+            338.5,
+            352.7,
+            367,
+            374.1,
+            384,
+            398.2
+          ]
+        },
+        {
+          "charStart": 30,
+          "textChars": 6,
+          "x": 117.2,
+          "y": 171.6,
+          "w": 85.4,
+          "charX": [
+            0,
+            14.2,
+            28.5,
+            42.7,
+            56.9,
+            71.1,
+            85.4
+          ]
+        }
+      ],
+      "hwp5OriginHwpx": true
+    },
+    {
+      "name": "own-gulimche-11pt97-29868-left-no-ls.hwpx",
+      "sha256": "95a9f993171ec4c446f49f6a754e7e7ee96863868d351a6dbaff16d142a918bf",
+      "sourceFormat": "hwpx",
+      "partitions": [
+        {
+          "charStart": 0,
+          "textChars": 30,
+          "x": 117.2,
+          "y": 152.5,
+          "w": 384.1,
+          "charX": [
+            0,
+            14.2,
+            21.3,
+            35.6,
+            49.8,
+            64,
+            78.2,
+            92.5,
+            99.6,
+            113.8,
+            128,
+            142.3,
+            156.5,
+            163.6,
+            177.8,
+            192.1,
+            206.3,
+            220.5,
+            234.7,
+            249,
+            263.2,
+            277.4,
+            291.6,
+            298.8,
+            313,
+            327.2,
+            341.4,
+            355.7,
+            362.8,
+            369.9,
+            384.1
+          ]
+        },
+        {
+          "charStart": 30,
+          "textChars": 6,
+          "x": 117.2,
+          "y": 171.6,
+          "w": 85.4,
+          "charX": [
+            0,
+            14.2,
+            28.5,
+            42.7,
+            56.9,
+            71.1,
+            85.4
+          ]
+        }
+      ],
+      "hwp5OriginHwpx": true
+    },
+    {
+      "name": "hancom-width-29868-justify.hwpx",
+      "sha256": "f43e2abfc2248a31c9db6224bd8e9e9292aeadc7ca72e917c2843e83f010fcf2",
+      "sourceFormat": "hwpx",
+      "partitions": [
+        {
+          "charStart": 0,
+          "textChars": 31,
+          "x": 117.2,
+          "y": 152.5,
+          "w": 398.2,
+          "charX": [
+            0,
+            14.2,
+            21.3,
+            35.5,
+            49.8,
+            64,
+            78.2,
+            92.5,
+            99.5,
+            113.8,
+            128,
+            142.2,
+            156.5,
+            163.5,
+            177.8,
+            192,
+            206.2,
+            220.4,
+            234.7,
+            248.9,
+            263.1,
+            277.4,
+            291.6,
+            298.7,
+            312.9,
+            327.1,
+            341.4,
+            355.6,
+            362.7,
+            369.8,
+            384,
+            398.2
+          ]
+        },
+        {
+          "charStart": 31,
+          "textChars": 5,
+          "x": 117.2,
+          "y": 171.6,
+          "w": 71.1,
+          "charX": [
+            0,
+            14.2,
+            28.5,
+            42.7,
+            56.9,
+            71.1
+          ]
+        }
+      ],
+      "hwp5OriginHwpx": false
+    },
+    {
+      "name": "hancom-width-29868-left.hwpx",
+      "sha256": "f07eb454b23c4b3cb1f38920aa805fdf6faf1e7c36c89a4d9ee3563274435c3d",
+      "sourceFormat": "hwpx",
+      "partitions": [
+        {
+          "charStart": 0,
+          "textChars": 31,
+          "x": 117.2,
+          "y": 152.5,
+          "w": 398.2,
+          "charX": [
+            0,
+            14.2,
+            21.3,
+            35.6,
+            49.8,
+            64,
+            78.2,
+            92.4,
+            99.6,
+            113.8,
+            128,
+            142.2,
+            156.5,
+            163.6,
+            177.8,
+            192,
+            206.2,
+            220.5,
+            234.7,
+            248.9,
+            263.1,
+            277.3,
+            291.6,
+            298.7,
+            312.9,
+            327.1,
+            341.4,
+            355.6,
+            362.7,
+            369.8,
+            384,
+            398.2
+          ]
+        },
+        {
+          "charStart": 31,
+          "textChars": 5,
+          "x": 117.2,
+          "y": 171.6,
+          "w": 71.1,
+          "charX": [
+            0,
+            14.2,
+            28.5,
+            42.7,
+            56.9,
+            71.1
+          ]
+        }
+      ],
+      "hwp5OriginHwpx": false
+    }
+  ],
+  "comparisons": [
+    {
+      "alignment": "justify",
+      "semanticDifferences": 0,
+      "geometryDifferences": 38
+    },
+    {
+      "alignment": "left",
+      "semanticDifferences": 0,
+      "geometryDifferences": 10
+    }
+  ],
+  "publicSourceSeparation": {
+    "source": "Public originals and full public snapshots are deliberately excluded.",
+    "fontSlots": "All source targeted slots resolve to GulimChe, metricEntry588; own fixtures resolve to that same family/metric.",
+    "target1": "Hanging indent -1064HU; raw source starts [0,33], Hancom [0,31], cleared-cache [0,31].",
+    "target2": "Indent0; raw source starts [0,31,63], Hancom [0,31,61], cleared-cache [0,30,60].",
+    "boundary1": "Character30 U+C791 and character31 U+AD8C are ordinary precomposed Hangul; no NBSP/combining boundary.",
+    "boundary2": "Comma U+002C binds to preceding Hangul token in the current tokenizer; this is a different later boundary.",
+    "owner": "Original target rows retain imported row ownership with frameProvenanceIncomplete; fresh no-LS reflows. This prevents attributing the current 92 residual differences to a universal fresh-width rule."
+  },
+  "scope": "Self-authored fixtures, original SHA, engine readback, all existing geometry comparator fields at unchanged0.2, numeric installed font measurements only. No font program/public body/engine binary copied."
+}

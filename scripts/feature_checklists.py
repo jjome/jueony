@@ -173,8 +173,8 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
         return f"[{row['id']}](<{href}>)"
 
     def dashboard(current):
-        lines = ["| 기능 | 구현 완료 | 검증 완료 | Agent 연결 | 현재 상황 · 다음 작업 |",
-                 "| --- | --- | --- | --- | --- |"]
+        lines = ["| 기능 | 상위 완료 | 구현 완료 | 검증 완료 | Agent 연결 | 현재 상황 · 다음 작업 |",
+                 "| --- | --- | --- | --- | --- | --- |"]
         for group in groups:
             items = grouped[group["key"]]
             tasks = [r for r in items if r["kind"] == "TASK"]
@@ -190,15 +190,15 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
             if group.get("working"):
                 next_work = "**통합 검증 중** · " + next_work
             rollups = [r for r in items if r["kind"] != "TASK"]
-            upper = f"<br>상위 완료 {sum(complete(r) for r in rollups)}/{len(rollups)}" if rollups else ""
-            lines.append(f"| {local_link(group['title'], paths[group['key']], current)}{upper} | "
+            upper = f"{sum(complete(r) for r in rollups)}/{len(rollups)}" if rollups else "—"
+            lines.append(f"| {local_link(group['title'], paths[group['key']], current)} | {upper} | "
                          f"{value('implementation', 'DONE')} | {value('verification', 'DONE')} | "
                          f"{value('agent', 'CONNECTED')} | {next_work} |")
-        lines += [f"| **전체 실행 작업** | **{counts['implementation'].get('DONE', 0)}/{counts['taskRows']}** | "
+        lines += [f"| **전체 실행 작업** | — | **{counts['implementation'].get('DONE', 0)}/{counts['taskRows']}** | "
                   f"**{counts['verification'].get('DONE', 0)}/{counts['taskRows']}** | "
                   f"**{counts['agent'].get('CONNECTED', 0)}/{counts['taskRows'] - counts['agent'].get('NA', 0)}** | "
                   f"세 축 완료 **{counts['completedTaskRows']}개** |", "",
-                  "숫자는 **완료·연결 / 해당 세부 실행 작업 수**다. ‘상위’는 상세 작업이 아직 없는 영역의 상위 범위 집계다. "
+                  "‘상위 완료’는 필요한 구현·검증·Agent 연결을 모두 충족한 상위 범위 수다. 나머지 숫자는 **완료·연결 / 해당 세부 실행 작업 수**다. ‘상위’는 상세 작업이 아직 없는 영역의 상위 범위 집계다. "
                   "다른 행의 세부 작업 수와 합산하지 않는다. 전체 기능 완성률이 아니며, 한글 직접 비교와 미검증 변경은 완료에 포함하지 않는다.", ""]
         return lines
 

@@ -83,7 +83,7 @@ class FeatureChecklistTests(unittest.TestCase):
         content = self.outputs[checklist.DOCS / "jueony-progress.md"]
         tables = features.validate_markdown_tables(content)
         self.assertEqual(len(tables), 2 + len(self.groups))
-        self.assertEqual([t["columns"] for t in tables], [5, 4] + [3] * len(self.groups))
+        self.assertEqual([t["columns"] for t in tables], [6, 4] + [3] * len(self.groups))
         for group in self.groups:
             section = content.split(f'<a id="feature-{group["key"]}"></a>', 1)[1].split('<a id="feature-', 1)[0]
             self.assertEqual(len(features.validate_markdown_tables(section)), 1)
@@ -93,7 +93,7 @@ class FeatureChecklistTests(unittest.TestCase):
         readme = self.outputs[checklist.ROOT / "README.md"]
         block = readme.split("<!-- jueony-progress:start -->")[1].split("<!-- jueony-progress:end -->")[0]
         self.assertTrue(overview.splitlines()[2].startswith("| 기능 |"))
-        self.assertEqual(features.validate_markdown_tables(block), [{"columns": 5, "rows": len(self.groups) + 1}])
+        self.assertEqual(features.validate_markdown_tables(block), [{"columns": 6, "rows": len(self.groups) + 1}])
         for group in self.groups:
             self.assertIn(f"[{group['title']}]", block)
             self.assertIn(f"[{group['title']}]", overview.split("문서 구성일:")[0])

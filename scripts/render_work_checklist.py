@@ -78,11 +78,11 @@ def markdown(rows, counts):
                  "| --- | --- | --- | --- | --- | --- |"]
         for r in group:
             evidence = " · ".join(f"[{Path(p.strip()).name}](../{p.strip()})" for p in r["evidence"].split(";"))
-            v = LABELS[r["verification"]] + f"<br>자동:{r['auto_check']} / 한글:{r['hancom_check']}"
-            command = f"<br>`{r['agent_command']}`" if r["agent_command"] else ""
-            text.append(f"| {r['id']} {r['priority']} | **{escape(r['task'])}**<br>{escape(r['scope'])} "
+            v = LABELS[r["verification"]] + f" · 자동:{r['auto_check']} / 한글:{r['hancom_check']}"
+            command = f" · `{r['agent_command']}`" if r["agent_command"] else ""
+            text.append(f"| {r['id']} {r['priority']} | **{escape(r['task'])}** · {escape(r['scope'])} "
                         f"| {LABELS[r['implementation']]} | {v} | {LABELS[r['agent']]}{command} "
-                        f"| {escape(r['next_action'])}<br>{evidence} |")
+                        f"| {escape(r['next_action'])} · {evidence} |")
         text.append("")
     return "\n".join(text).rstrip() + "\n"
 

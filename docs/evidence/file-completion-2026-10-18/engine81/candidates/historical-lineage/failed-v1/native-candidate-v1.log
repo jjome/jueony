@@ -1,0 +1,31 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/mcst-historical-closure80/source-candidate80)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 12s
+     Running tests/jueony_historical_origin.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_historical_origin-a635400907333d66)
+
+running 3 tests
+test historical_edit_snapshot_undo_redo_preserves_origin_owner ... 
+thread 'historical_edit_snapshot_undo_redo_preserves_origin_owner' (227936) panicked at tests/jueony_historical_origin.rs:19:312:
+historical-edited-false: 125 complete-layout differences; [Object {"after": Number(100.3), "before": Number(96.5), "path": String("pages/3/controls/controls/1/cells/0/h")}, Object {"after": Number(903.8), "before": Number(907.6), "path": String("pages/3/controls/controls/1/cells/0/y")}, Object {"after": Number(100.5), "before": Number(96.7), "path": String("pages/3/controls/controls/1/h")}, Object {"after": Number(903.8), "before": Number(907.6), "path": String("pages/3/controls/controls/1/y")}]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test historical_exact_origin_full_layout_and_two_cycles ... 
+thread 'historical_exact_origin_full_layout_and_two_cycles' (227937) panicked at tests/jueony_historical_origin.rs:23:2:
+narrow stream-free owner proof
+FAILED
+test provenance_boundaries_and_opaque_payload_preservation ... 
+thread 'provenance_boundaries_and_opaque_payload_preservation' (227938) panicked at tests/jueony_historical_origin.rs:61:3:
+assertion `left == right` failed: exact-owner origin ownership
+  left: true
+ right: false
+FAILED
+
+failures:
+
+failures:
+    historical_edit_snapshot_undo_redo_preserves_origin_owner
+    historical_exact_origin_full_layout_and_two_cycles
+    provenance_boundaries_and_opaque_payload_preservation
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.44s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_historical_origin`

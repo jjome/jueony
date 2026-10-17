@@ -1,0 +1,59 @@
+diff --git a/src/document_core/converters/hwpx_to_hwp.rs b/src/document_core/converters/hwpx_to_hwp.rs
+--- a/src/document_core/converters/hwpx_to_hwp.rs
++++ b/src/document_core/converters/hwpx_to_hwp.rs
+@@ -21,7 +21,9 @@
+ use crate::model::bin_data::{BinDataStatus, BinDataType};
+ use crate::model::control::Control;
+ use crate::model::document::{
+-    Document, HwpVersion, Section, SectionDef, HWP3_ORIGIN_STREAM_PATH, HWPX_ORIGIN_STREAM_PATH,
++    Document, HwpVersion, Section, SectionDef, HWP3_ORIGIN_HWPX_MARKER_PATH,
++    HWP3_ORIGIN_STREAM_PATH, HWP5_ORIGIN_HWPX_MARKER_PATH,
++    HWP5_ORIGIN_HWPX_PARAGRAPH_AXIS, HWPX_ORIGIN_STREAM_PATH,
+ };
+ use crate::model::image::Picture;
+ use crate::model::paragraph::Paragraph;
+@@ -2556,7 +2558,44 @@
+     } else {
+         0
+     };
++    // A container conversion is not a new layout origin.  The paragraph-axis
++    // HWP5 provenance is explicit, not inferred from cached line coordinates.
++    // Only the unambiguous owner with the parser contract streams is restored;
++    // opaque/legacy/conflicting provenance keeps the existing conversion path.
++    // Existing streams are never removed or rewritten by this decision.
++    let explicit_hwp5_paragraph_origin =
++        doc.provenance.format == crate::model::provenance::SourceFormat::Hwpx
++            && !doc.provenance.hwp3_lineage
++            && !doc.provenance.hwpx_lineage
++            && doc.extra_streams.len() == 6
++            && doc.extra_streams.iter().all(|(path, _)| {
++                matches!(
++                    path.as_str(),
++                    "/PrvText"
++                        | "/PrvImage"
++                        | "/Scripts/DefaultJScript"
++                        | "/HwpSummaryInformation"
++                        | "/DocOptions/_LinkDoc"
++                        | "/Scripts/JScriptVersion"
++                )
++            })
++            && doc.extra_streams.iter().map(|(path, _)| path).collect::<BTreeSet<_>>().len()
++                == doc.extra_streams.len()
++            && !doc
++                .hwpx_aux_entries
++                .iter()
++                .any(|(p, _)| p == HWP3_ORIGIN_HWPX_MARKER_PATH)
++            && {
++                let mut origins = doc
++                    .hwpx_aux_entries
++                    .iter()
++                    .filter(|(p, _)| p == HWP5_ORIGIN_HWPX_MARKER_PATH);
++                matches!(origins.next(), Some((_, payload))
++                    if payload.as_slice() == HWP5_ORIGIN_HWPX_PARAGRAPH_AXIS)
++                    && origins.next().is_none()
++            };
+     if matches!(source_format, FileFormat::Hwpx)
++        && !explicit_hwp5_paragraph_origin
+         && !doc
+             .extra_streams
+             .iter()

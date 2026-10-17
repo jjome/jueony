@@ -1,0 +1,57 @@
+{
+  "status": "PRIVATE_NATIVE_PASS_FORMAL81_NOT_YET_RUN",
+  "baseSourceId": "20fddc2d172763e6",
+  "patch": "font-fallback-delta-formal80.patch",
+  "patchSha256": "51f8f19453df44f9ed01f4345e168f7fc7a48fc3acc104b79f8ab91c29a4dc56",
+  "sourceProof": "source-proof.json",
+  "applyCheck": {
+    "target": "formal80 source-20fddc2d172763e6",
+    "whitespace": "error-all",
+    "exitCode": 0
+  },
+  "native": {
+    "baseline": {
+      "passed": 6,
+      "failed": 3,
+      "ignored": 0
+    },
+    "candidate": {
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0
+    },
+    "actualPublishedFontFamilies": {
+      "targetCount": 3,
+      "differenceCount": 0,
+      "address": {
+        "section": 0,
+        "paragraph": 94,
+        "charStarts": [
+          0,
+          4,
+          6
+        ]
+      },
+      "sourceAndReopened": "HY중고딕,한컴바탕"
+    }
+  },
+  "cause": "HWP5 encoded the declared substitute correctly in FACE_NAME alternate type/name. Parser discarded alternate type and restored only alt_name, while existing renderer lookup consumed only subst_font. Serializer also wrote primary kind into the separate alternate-kind byte.",
+  "scope": "Only complete, well-formed, nonempty, control-free declared TTF alternate type1 is derived into existing SubstFont. Primary face/type, raw alt_name, raw record, typeInfo/defaultName, font metrics and all guards remain unchanged. Unknown/HFT alternatives are retained as raw metadata, not new web fallback authority.",
+  "negativeTests": [
+    "No alternate remains primary only",
+    "Empty or duplicate alternate creates no extra family",
+    "Unknown/HFT types do not authorize web fallback",
+    "Truncated/ill-formed UTF16 preserves historical raw/lossy parser behavior but creates no fallback",
+    "Embedded substitute stays excluded by existing lookup",
+    "Primary embedded metadata remains unchanged by lookup"
+  ],
+  "limits": [
+    "Does not claim global font identity or installation equivalence.",
+    "Does not add HWP5 embedded font program/reference support.",
+    "Does not close MCST full geometry, page basis or cross-format preservation; overflow numeric logs remain in the final Native output.",
+    "Formal81 WASM/whole-document guard and existing regressions must run before promotion."
+  ],
+  "specEvidence": "spec-evidence.json",
+  "sourceInputSha256": "20a3960b4315626c3f97d9c5d47746e3cfadd8fe50dde43a4a424aa3a2a76936",
+  "bodyOrFontProgramCopiesInEvidence": false
+}

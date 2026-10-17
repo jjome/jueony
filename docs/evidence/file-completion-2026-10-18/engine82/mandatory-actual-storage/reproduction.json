@@ -1,0 +1,35 @@
+{
+  "node": "22.22.2",
+  "arguments": [
+    "--experimental-strip-types"
+  ],
+  "environment": {
+    "JUEONY_ENGINE_PACKAGE": "absolute final82 package matching engine-metadata.json",
+    "JUEONY_REPOSITORY": "absolute repository with immutable SHA-pinned fixtures",
+    "JUEONY_TEST_OUTPUT": "fresh absolute group directory"
+  },
+  "dependencies": [
+    {
+      "path": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "sha256": "65a424675905ea8b09f4722e110101910a0327c6f68d19714e6093996cee8b5b"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-save-layout.ts",
+      "sha256": "6c1d119f4723698e9e3769d4fb45c7b38469b6f0bca6f4c575688f3b38638434"
+    },
+    {
+      "path": "apps/editor/scripts/lib/hancom-review.mjs",
+      "sha256": "bf8e4d30b7b232ce4abcc348165e97ebed214cb7bf60a5e14ccf8759413d88bd"
+    }
+  ],
+  "sourceFilesChanged": [
+    "verify-font-fallback-storage-engine.mjs",
+    "verify-mcst-flow-spacing-engine.mjs",
+    "verify-document-save-layout-engine.mjs"
+  ],
+  "runtimeGuardsChanged": false,
+  "comparisonTolerance": 0.2,
+  "unknownGuardVerifiersChanged": false,
+  "existingCorruptDTOInjectionStillRequired": true,
+  "publicBytesSnapshotsFontsAndBinariesCopied": false
+}

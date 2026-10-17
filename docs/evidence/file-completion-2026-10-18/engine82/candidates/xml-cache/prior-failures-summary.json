@@ -1,0 +1,181 @@
+{
+  "numericBaselines": [
+    {
+      "path": "build\\mcst-cross-closure77\\native-v3-lowering-actual.json",
+      "sha256": "ede27a24481179dd18f77d2496c3205058390aee7a2169e8c5c583b3905008ba",
+      "pages": {
+        "after": 16,
+        "before": 16
+      },
+      "geometryDifferences": 411,
+      "failures": null,
+      "stages": []
+    },
+    {
+      "path": "build\\mcst-cross-closure77\\native-page-basis-v1-actual.json",
+      "sha256": "99228a67bb20139e7a4b024364b7900af16c58694c6ae7edc5d1cfa1e62bfa60",
+      "pages": {
+        "after": 16,
+        "before": 16
+      },
+      "geometryDifferences": 358,
+      "failures": null,
+      "stages": []
+    },
+    {
+      "path": "build\\mcst-cross-closure77\\native-page-basis-v2-actual.json",
+      "sha256": "13723cf0d93b45283965e3d08645e3603ce9117e4b020c2bdba6e461cf99595e",
+      "pages": {
+        "after": 16,
+        "before": 16
+      },
+      "geometryDifferences": 335,
+      "failures": null,
+      "stages": []
+    },
+    {
+      "path": "build\\mcst-cross-closure77\\native-paint-v3-actual.json",
+      "sha256": "a778342fe9c4dba1bb759cba6e814d5f1192ff64fd6e03abbe91642bea369830",
+      "pages": {
+        "after": 16,
+        "before": 16
+      },
+      "geometryDifferences": 14496,
+      "failures": null,
+      "stages": []
+    },
+    {
+      "path": "build\\mcst-cross-closure77\\native-paint-v3b-actual.json",
+      "sha256": "e38636091bf759585a438ca3fb0b104c2e9484d529eb827c05b533b232dbeee1",
+      "pages": {
+        "after": 17,
+        "before": 16
+      },
+      "geometryDifferences": 15449,
+      "failures": null,
+      "stages": []
+    },
+    {
+      "path": "build\\mcst-cross-closure77\\native-import-v6minimal80-actual.json",
+      "sha256": "ebcfba699758293be5ac8f3ca5c2fda89629be41349c2f91c382f450f1e9b3be",
+      "pages": {
+        "after": 16,
+        "before": 16
+      },
+      "geometryDifferences": 3,
+      "failures": null,
+      "stages": []
+    },
+    {
+      "path": "build\\mcst-cross-closure77\\native-import-v6minimal80-historical.json",
+      "sha256": "4607f555bc99d000658695ea558db5cb89c7c3fbd4a7686f87dd367b43331629",
+      "pages": {
+        "after": 15,
+        "before": 15
+      },
+      "geometryDifferences": 0,
+      "failures": null,
+      "stages": []
+    },
+    {
+      "path": "build\\mcst-cross-closure77\\native-import-v6minimal80-alternating.json",
+      "sha256": "79e7f462199ab58cb2215818e4b969c11e521cd5de0363c7a2c2ef1823b7453c",
+      "pages": null,
+      "geometryDifferences": null,
+      "failures": 6,
+      "stages": [
+        {
+          "codec": "hwp",
+          "pages": 16,
+          "differences": 3
+        },
+        {
+          "codec": "hwp",
+          "pages": 16,
+          "differences": 3
+        },
+        {
+          "codec": "hwpx",
+          "pages": 16,
+          "differences": 17631
+        },
+        {
+          "codec": "hwp",
+          "pages": 16,
+          "differences": 17631
+        },
+        {
+          "codec": "hwpx",
+          "pages": 16,
+          "differences": 17631
+        },
+        {
+          "codec": "hwp",
+          "pages": 16,
+          "differences": 17631
+        }
+      ]
+    }
+  ],
+  "initialHarnessFailures": [
+    {
+      "path": "build\\mcst-cross-closure77\\native-import-v7compact80.log",
+      "sha256": "fb2f3fe42f1a6672424cdba10a95cab6088d36a4579804efec1b0bfc1f064ea4",
+      "bytes": 816,
+      "resultLines": [
+        "error: could not compile `rhwp` (test \"jueony_mcst_cross\") due to 1 previous error"
+      ],
+      "rawLogRetainedInIgnoredBuild": true
+    },
+    {
+      "path": "build\\mcst-cross-closure77\\native-import-v7compact80-harness-fixed.log",
+      "sha256": "62f886e9f255727ab5b9416f48eb395c0aa628761d8c770224d9eb0c3b3ce995",
+      "bytes": 19928,
+      "resultLines": [
+        "test result: FAILED. 4 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.30s",
+        "error: test failed, to rerun pass `-p rhwp --test jueony_mcst_cross`"
+      ],
+      "rawLogRetainedInIgnoredBuild": true
+    },
+    {
+      "path": "build\\mcst-cross-closure77\\native-import-v7compact80-own-initialized.log",
+      "sha256": "1d33631681dcab1726e519242f78f9cdaa8c49f2e1d129287b46b9fd67792ab8",
+      "bytes": 19518,
+      "resultLines": [
+        "test result: FAILED. 6 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.22s",
+        "error: test failed, to rerun pass `-p rhwp --test jueony_mcst_cross`"
+      ],
+      "rawLogRetainedInIgnoredBuild": true
+    },
+    {
+      "path": "build\\mcst-cross-closure77\\native-import-v7compact80-own-provenance.log",
+      "sha256": "57391465c12e7c3ff4079075735c23ebfdaeccfebb0a3df49e4ce976cfd4e2cc",
+      "bytes": 24782,
+      "resultLines": [
+        "test result: FAILED. 7 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.97s",
+        "error: test failed, to rerun pass `-p rhwp --test jueony_mcst_cross`"
+      ],
+      "rawLogRetainedInIgnoredBuild": true
+    },
+    {
+      "path": "build\\mcst-cross-closure77\\native-import-v7compact80-strict-applied-final.log",
+      "sha256": "ff802aff773cff4e84701f48b3bd6f7fefdd0119d8314032bcd0aa05a13e3461",
+      "bytes": 1877,
+      "resultLines": [
+        "test result: FAILED. 10 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.66s",
+        "error: test failed, to rerun pass `-p rhwp --test jueony_mcst_cross`"
+      ],
+      "rawLogRetainedInIgnoredBuild": true
+    },
+    {
+      "path": "build\\mcst-cross-closure77\\native-import-v7-hancom-readback.log",
+      "sha256": "375b43f9513de7ffd74b50b9ffc935a1786d9d292eb1a1cfce23a94273dac3a3",
+      "bytes": 1523,
+      "resultLines": [
+        "error: no test target named `jueony_mcst_hancom_v7` in default-run packages"
+      ],
+      "rawLogRetainedInIgnoredBuild": true
+    }
+  ],
+  "note": "Large raw logs, model snapshots, original and derived public document bytes are deliberately excluded. The initial provenance-harness failure included unrelated OLE summary-byte normalization and is represented by hash/result only."
+}

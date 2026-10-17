@@ -1,0 +1,26 @@
+{
+  "baseSourceId": "20fddc2d172763e6",
+  "changes": [
+    {
+      "path": "src/parser/doc_info.rs",
+      "beforeSha256": "ca4ead18d98f9c54cf921fc3c7f2c2aa4262cb88d9fd827095d563fdf047bc50",
+      "afterSha256": "f20ba6e02979f2f73d85d80c940d207ff1f565132f7d3214af1c775dd2db7aa9"
+    },
+    {
+      "path": "src/serializer/doc_info.rs",
+      "beforeSha256": "0117da4a59e9e100269b1d35069bd731799c20c38cf69fd09d26654f1e41f89d",
+      "afterSha256": "9e496d315c2322b94c341b97426f79a48f2654c4d9c1e714c57246434d32805a"
+    }
+  ],
+  "patchSha256": "51f8f19453df44f9ed01f4345e168f7fc7a48fc3acc104b79f8ab91c29a4dc56",
+  "productionModified": false,
+  "noChangesTo": [
+    "body_text",
+    "layout",
+    "height_cursor",
+    "vpos",
+    "font metrics",
+    "published comparators",
+    "save guards"
+  ]
+}

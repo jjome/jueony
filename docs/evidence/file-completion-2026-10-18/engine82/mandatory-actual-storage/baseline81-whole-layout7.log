@@ -1,0 +1,7 @@
+PASS own plain hwp: mandatory full-layout save proof passes and source remains immutable
+PASS own plain hwpx: mandatory full-layout save proof passes and source remains immutable
+PASS own table hwp: mandatory full-layout save proof passes and source remains immutable
+PASS own table hwpx: mandatory full-layout save proof passes and source remains immutable
+FAIL actual MCST: sixteen pages and checked full layout through both formats twice plus six alternating saves PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.
+PASS historical-converted MCST: native lineage stays exact across HWP/HWPX two cycles
+PASS real Native handle: changed text-layout metadata with identical semantic getters is rejected, source unchanged

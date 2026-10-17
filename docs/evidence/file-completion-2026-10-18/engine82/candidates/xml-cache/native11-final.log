@@ -1,0 +1,21 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/mcst-cross-closure77/source-import-v7-compact80)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.14s
+     Running tests/jueony_mcst_cross.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_mcst_cross-b10376d130f30934)
+
+running 11 tests
+COMPILED_SOURCE src/document_core/commands/document.rs 842207b2e5291104f82392c9cf5f55190a25207baa82732177435924cc5efae7
+COMPILED_SOURCE src/serializer/body_text.rs c735e19a493132d05b039ec2bc3aabe954b18dce1cc26dab5212867c2881a7cf
+test compiled_minimal80_source_matches_private_disk ... ok
+test origin_controls_soft_hyphen_fixed_space_and_literals_remain_distinct ... ok
+test own_versioned_export_omits_only_generated_cache_and_reconstructs_it ... ok
+test retained_source_map_cannot_override_dirty_or_unresolved_tab_omission ... ok
+test own_edit_snapshot_undo_redo_and_stale_source_cache_storage ... ok
+test native_legacy_unknown_and_conflicting_hwp3_markers_grant_no_new_cache_authority ... ok
+test original_marker_and_conflicting_source_origin_payloads_are_not_rewritten ... ok
+test unsafe_generated_body_cache_owners_are_not_omitted ... ok
+test actual_mcst_hwp_cross_full_layout ... ok
+test historical_mcst_hwp_cross_full_layout ... ok
+test actual_mcst_alternating_codecs_strict_full_layout ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.69s
+

@@ -1,0 +1,121 @@
+{
+  "engine": {
+    "sourceId": "20fddc2d172763e6",
+    "wasmSha256": "ecff1544fe29e820977198190d206a0f7a2d8baee908379262acea8b3f669455",
+    "jsSha256": "72828c03b5b92948e0acd45bcd3de0263c8570bfbfaeab283eb5998e1b72b22d",
+    "buildMode": "wsl-review-no-opt",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f"
+  },
+  "verifierSha256": "f79661307cbfa9f99ece4995f45b2c8d0bdb32311884ce6fbf715aec5654f175",
+  "status": "FONT_SCOPE_FAIL",
+  "results": [],
+  "failures": [
+    {
+      "name": "Declared fallback survives HWP storage at root0/94/0",
+      "error": "AssertionError [ERR_ASSERTION]: Published family must survive exactly\n+ actual - expected\n\n+ 'HY중고딕'\n- 'HY중고딕,한컴바탕'\n        ^\n"
+    },
+    {
+      "name": "Declared fallback survives HWP storage at root0/94/4",
+      "error": "AssertionError [ERR_ASSERTION]: Published family must survive exactly\n+ actual - expected\n\n+ 'HY중고딕'\n- 'HY중고딕,한컴바탕'\n        ^\n"
+    },
+    {
+      "name": "Declared fallback survives HWP storage at root0/94/6",
+      "error": "AssertionError [ERR_ASSERTION]: Published family must survive exactly\n+ actual - expected\n\n+ 'HY중고딕'\n- 'HY중고딕,한컴바탕'\n        ^\n"
+    }
+  ],
+  "fontRuns": [
+    {
+      "charStart": 0,
+      "before": {
+        "page": 7,
+        "section": 0,
+        "paragraph": 94,
+        "charStart": 0,
+        "fontFamily": "HY중고딕,한컴바탕",
+        "fontSize": 14.7
+      },
+      "after": {
+        "page": 7,
+        "section": 0,
+        "paragraph": 94,
+        "charStart": 0,
+        "fontFamily": "HY중고딕",
+        "fontSize": 14.7
+      },
+      "exactFamilyEqual": false
+    },
+    {
+      "charStart": 4,
+      "before": {
+        "page": 7,
+        "section": 0,
+        "paragraph": 94,
+        "charStart": 4,
+        "fontFamily": "HY중고딕,한컴바탕",
+        "fontSize": 16
+      },
+      "after": {
+        "page": 7,
+        "section": 0,
+        "paragraph": 94,
+        "charStart": 4,
+        "fontFamily": "HY중고딕",
+        "fontSize": 16
+      },
+      "exactFamilyEqual": false
+    },
+    {
+      "charStart": 6,
+      "before": {
+        "page": 7,
+        "section": 0,
+        "paragraph": 94,
+        "charStart": 6,
+        "fontFamily": "HY중고딕,한컴바탕",
+        "fontSize": 16
+      },
+      "after": {
+        "page": 7,
+        "section": 0,
+        "paragraph": 94,
+        "charStart": 6,
+        "fontFamily": "HY중고딕",
+        "fontSize": 16
+      },
+      "exactFamilyEqual": false
+    }
+  ],
+  "inputSha256": "20a3960b4315626c3f97d9c5d47746e3cfadd8fe50dde43a4a424aa3a2a76936",
+  "outputSha256": "286e4d2aabe2e70db6c4d9f7ff487bba1898390e841304a583e8781d55d48f3a",
+  "outputBytes": 126976,
+  "lossCount": 0,
+  "sourceUnchanged": true,
+  "inputUnchanged": true,
+  "wholeDocument": {
+    "status": "DIFFERENT_OR_UNREADABLE",
+    "pages": {
+      "before": 16,
+      "after": 15,
+      "equal": false
+    },
+    "geometryDifferences": 22186,
+    "geometryTolerance": 0.2,
+    "semanticDifferences": 0,
+    "readIssues": {
+      "before": 0,
+      "after": 0
+    }
+  },
+  "preservation": {
+    "status": "blocked",
+    "issueCount": 1,
+    "issues": [
+      {
+        "code": "changed",
+        "path": "whole-document-published-layout/pages/length"
+      }
+    ]
+  },
+  "scope": "Exactly three public font-family declarations through real HWP storage. Every full semantic and layout field is compared in memory through the unchanged helper and production guard. No body, snapshots, input copy, converted document or font program is written.",
+  "limitation": "A font-scope PASS does not close MCST cross-format layout or imply Hancom screen/print equality. Overall geometry counts, page counts and blocked conversion status remain separate."
+}

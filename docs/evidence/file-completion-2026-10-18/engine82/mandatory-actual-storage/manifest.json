@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "scope": "Formal81 new-positive failure and formal82 mandatory complete conversion success; no blocked-or-success alternative.",
+  "files": [
+    {
+      "path": "baseline81/font3.json",
+      "bytes": 3619,
+      "sha256": "21c8536df07516547178981788c3ab3422b177e7f12101beeb57bac1d2b8c003"
+    },
+    {
+      "path": "baseline81/mcst15.json",
+      "bytes": 157196,
+      "sha256": "6088e7b11cd819a8d2a70eaaf83dee5114d62bdb8ffc1a200179458419675096"
+    },
+    {
+      "path": "baseline81/whole-layout7.json",
+      "bytes": 9846,
+      "sha256": "4da58d7065b5eb6b6c3ad4c90e1f98aa4757e54a19bcacc4994959e9b5209296"
+    },
+    {
+      "path": "baseline81-font3.log",
+      "bytes": 218,
+      "sha256": "28b88a9c6d929bae48b88b93148ff4e4147746c02b00f415498c47b4814e8193"
+    },
+    {
+      "path": "baseline81-mcst15.log",
+      "bytes": 1597,
+      "sha256": "2c4b3884c27252c7793a3fddcad69033ce2cf3b2adcf6b51e844921e9d38a0e4"
+    },
+    {
+      "path": "baseline81-whole-layout7.log",
+      "bytes": 967,
+      "sha256": "86490fbd4a9e63cddd12c5e8faaf8b2585f8319374e2f559329a62e50a7551fe"
+    },
+    {
+      "path": "engine-metadata.json",
+      "bytes": 15747,
+      "sha256": "2f87442d7ffacdd80c506d541f4cbaa622188fe00a00fc285b4f46d77cc9a03a"
+    },
+    {
+      "path": "final82/font3.json",
+      "bytes": 3361,
+      "sha256": "a3cc729c5eccfcc06bbd88d7d8429533f0300756f4226c043a79febd5c475006"
+    },
+    {
+      "path": "final82/mcst15.json",
+      "bytes": 172457,
+      "sha256": "44337f0616335a75bf9a16448215779f422817056deee8a9f3e787cbc21ba97c"
+    },
+    {
+      "path": "final82/whole-layout7.json",
+      "bytes": 23675,
+      "sha256": "97465ec84b6a92583558d8fbf98d1b6576bad54ade98293f87a4bd5d79d08192"
+    },
+    {
+      "path": "final82-font3.log",
+      "bytes": 177,
+      "sha256": "368092655fbfd25a4970dd987a6eaa35763d32e3bcde25b68650250e63753d02"
+    },
+    {
+      "path": "final82-mcst15.log",
+      "bytes": 1326,
+      "sha256": "6cd5dfc01731ad5b2645eba85aecbf11c12745bd2784043c19ff51fd72ce057d"
+    },
+    {
+      "path": "final82-whole-layout7.log",
+      "bytes": 677,
+      "sha256": "2f01a9e7c760444440c98cc6361e7933d9bb0afb8263b9e9871bd5be1e9af552"
+    },
+    {
+      "path": "package.py",
+      "bytes": 6658,
+      "sha256": "afb889bb8c38fcfbde2c227804c2921e138f2f5c0f510783ecbb9ea31284a30b"
+    },
+    {
+      "path": "raw-result-hashes.json",
+      "bytes": 1532,
+      "sha256": "01147e52b389fa1a8e8137fbc91db0ce1314b7a2929bd233e1e47ca135be37d3"
+    },
+    {
+      "path": "reproduction.json",
+      "bytes": 1249,
+      "sha256": "7516e3cf5f9f7e6dc2f0e9d4cbd3ddb6222584e2652491f92b2784290663b9ee"
+    },
+    {
+      "path": "summary.json",
+      "bytes": 4329,
+      "sha256": "7565fd6fa7cbe32fb6952351ecd104df4604aa84c2bb6d739f483957a51794aa"
+    },
+    {
+      "path": "verify-document-save-layout-engine.mjs",
+      "bytes": 7200,
+      "sha256": "3b473306482ddcf224e2ba0a1b905eaaaad58fed0eab9108c74b7f3351d0dd23"
+    },
+    {
+      "path": "verify-font-fallback-storage-engine.mjs",
+      "bytes": 7120,
+      "sha256": "a22f2bcd32413783e1e6e46127dd773f1022ca6de1ff0dc208b6c8580d257943"
+    },
+    {
+      "path": "verify-mcst-flow-spacing-engine.mjs",
+      "bytes": 8231,
+      "sha256": "8169e9d3ec48d97c71857b2b144203b2ff87449d8a1012fa273d444a2e49515b"
+    },
+    {
+      "path": "verify.py",
+      "bytes": 336,
+      "sha256": "ef4e48627b545720fa934d006e29ebd73e6c84c45d133da89f7c944efaac94d9"
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "engine": {
+    "sourceId": "20fddc2d172763e6",
+    "wasmSha256": "ecff1544fe29e820977198190d206a0f7a2d8baee908379262acea8b3f669455",
+    "jsSha256": "72828c03b5b92948e0acd45bcd3de0263c8570bfbfaeab283eb5998e1b72b22d",
+    "buildMode": "wsl-review-no-opt",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f"
+  },
+  "verifierSha256": "f74b30d0af12568eaf6e92f48601371b941a977199c36fb7b059ba4161fc4f6f",
+  "adapterSha256": "6c1d119f4723698e9e3769d4fb45c7b38469b6f0bca6f4c575688f3b38638434",
+  "preservationSha256": "65a424675905ea8b09f4722e110101910a0327c6f68d19714e6093996cee8b5b",
+  "results": [
+    {
+      "name": "own plain hwp: mandatory full-layout save proof passes and source remains immutable",
+      "status": "PASS"
+    },
+    {
+      "name": "own plain hwpx: mandatory full-layout save proof passes and source remains immutable",
+      "status": "PASS"
+    },
+    {
+      "name": "own table hwp: mandatory full-layout save proof passes and source remains immutable",
+      "status": "PASS"
+    },
+    {
+      "name": "own table hwpx: mandatory full-layout save proof passes and source remains immutable",
+      "status": "PASS"
+    },
+    {
+      "name": "actual MCST HWP crossing: actual complete-layout damage is PreservationError before any write",
+      "status": "PASS"
+    },
+    {
+      "name": "historical-converted MCST: native lineage stays exact across HWP/HWPX two cycles",
+      "status": "FAIL"
+    },
+    {
+      "name": "real Native handle: changed text-layout metadata with identical semantic getters is rejected, source unchanged",
+      "status": "PASS"
+    }
+  ],
+  "failures": [
+    {
+      "name": "historical-converted MCST: native lineage stays exact across HWP/HWPX two cycles",
+      "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/3/controls/controls/1/y: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/3/controls/controls/1/y). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+      "stack": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/3/controls/controls/1/y: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/3/controls/controls/1/y). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.\n    at verifyPreservedExport (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/preservation.ts:249:9)\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-save-layout-engine.mjs:17:37\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-save-layout-engine.mjs:5:38)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-save-layout-engine.mjs:10:1"
+    }
+  ],
+  "observations": [
+    {
+      "fixture": "plain",
+      "format": "hwp",
+      "pages": 1,
+      "bytes": 12800,
+      "sha256": "727b17b41da93a9b427bd7303b0d205d4521c17668555b5ff8f6c54a067bab72",
+      "wholeLayoutChecked": true
+    },
+    {
+      "fixture": "plain",
+      "format": "hwpx",
+      "pages": 1,
+      "bytes": 7422,
+      "sha256": "e1e871826a76680921674f980b578b630dfdf76f9e2e0d111fb808f3283c8c86",
+      "wholeLayoutChecked": true
+    },
+    {
+      "fixture": "table",
+      "format": "hwp",
+      "pages": 1,
+      "bytes": 13312,
+      "sha256": "c7eed455fb694df4516f3d507b06c9254270acd618ec65d529a9fbc88074747a",
+      "wholeLayoutChecked": true
+    },
+    {
+      "fixture": "table",
+      "format": "hwpx",
+      "pages": 1,
+      "bytes": 7951,
+      "sha256": "2da2ebeed934c92619887884891c2cadd6041bc8cf1c3085b390bd69127a06d1",
+      "wholeLayoutChecked": true
+    },
+    {
+      "label": "actual",
+      "inputSha256": "20a3960b4315626c3f97d9c5d47746e3cfadd8fe50dde43a4a424aa3a2a76936",
+      "outputSha256": "286e4d2aabe2e70db6c4d9f7ff487bba1898390e841304a583e8781d55d48f3a",
+      "geometryDifferences": 22186,
+      "semanticDifferences": 0,
+      "pages": {
+        "before": 16,
+        "after": 15,
+        "equal": false
+      },
+      "issue": {
+        "code": "changed",
+        "path": "whole-document-published-layout/pages/length"
+      },
+      "writes": 0,
+      "sourceUnchanged": true
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "scope": "Actual WASM and production verifyPreservedExport. Public input read-only by hash; no source or derived public bytes/snapshots copied here. Full published response objects/ordering, page count and every field retained, measured geometry maximum0.2, all other numbers/IDs exact. Writes counter occurs only after the actual gate returns; actual OS picker UI is a separate verification."
+}

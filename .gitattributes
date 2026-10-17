@@ -72,3 +72,8 @@ docs/evidence/file-completion-2026-10-18/line-fit76/actual-hancom/*-uia.txt whit
 
 # Byte-sealed Native candidate artifacts retain their original line endings.
 docs/evidence/file-completion-2026-10-18/engine78/candidates/** -text whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+
+# Keep sealed file-preservation follow-up evidence byte-identical to its manifests.
+docs/evidence/file-completion-2026-10-18/engine81/** -text whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+docs/evidence/file-completion-2026-10-18/engine82/** -text whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+docs/evidence/file-completion-2026-10-18/engine83/** -text whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof

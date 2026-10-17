@@ -1,0 +1,1974 @@
+{
+  "engine": {
+    "buildMode": "wsl-review-no-opt",
+    "jsSha256": "72828c03b5b92948e0acd45bcd3de0263c8570bfbfaeab283eb5998e1b72b22d",
+    "sourceId": "20fddc2d172763e6",
+    "wasmSha256": "ecff1544fe29e820977198190d206a0f7a2d8baee908379262acea8b3f669455",
+    "patches": [
+      {
+        "name": "border-fill-identity.patch",
+        "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c"
+      },
+      {
+        "name": "default-tabs.patch",
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+      },
+      {
+        "name": "document-insertion.patch",
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+      },
+      {
+        "name": "master-page-editing.patch",
+        "sha256": "b04c7d682e105e3f37f72a18c1b4bb01cbf085424e3219f3919fd8c891dc26c2"
+      },
+      {
+        "name": "merged-table-transpose.patch",
+        "sha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768"
+      },
+      {
+        "name": "note-query-json.patch",
+        "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562"
+      },
+      {
+        "name": "page-border-entries.patch",
+        "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f"
+      },
+      {
+        "name": "page-border-inclusion.patch",
+        "sha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e"
+      },
+      {
+        "name": "page-border-region.patch",
+        "sha256": "ea98aed9ad8568699b802c5f46e4964fe524ba7634bc978d71fe10f44e1d7412"
+      },
+      {
+        "name": "page-border-z-image.patch",
+        "sha256": "97ccd3c9eac24c42b0844fc65e5804b232d3bef9929a6fd5de329cdd007b173b"
+      },
+      {
+        "name": "section-split.patch",
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+      },
+      {
+        "name": "style-reference-deletion.patch",
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+      },
+      {
+        "name": "style-reference-order.patch",
+        "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce"
+      },
+      {
+        "name": "style-shape-stories.patch",
+        "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af"
+      },
+      {
+        "name": "table-creation-consistency.patch",
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+      },
+      {
+        "name": "zz-line-number-settings.patch",
+        "sha256": "4cb8ce4a8d49864f53c3ff95fdfc8ef3e0342b09f86cd525dfb9aa102e2dee72"
+      },
+      {
+        "name": "zzz-page-body-delete.patch",
+        "sha256": "54bf1697627ec92c4379fb8ca314f9bf9d99c2207bf9e90859d35c7324be2e83"
+      },
+      {
+        "name": "zzzz-page-body-copy.patch",
+        "sha256": "45f3331d992f3799dad1f076bfd6d237d8c989541ea510d888e4afb5407749db"
+      },
+      {
+        "name": "zzzzz-page-body-paper-paste.patch",
+        "sha256": "4df977f851378597848aa60581957c123e6565ebf04f9412052dbfdabb2c43a0"
+      },
+      {
+        "name": "zzzzzz-page-body-style-paste.patch",
+        "sha256": "168c4c158bc0db3e71230903eae0b1ae71092a1a139f2ad5747712f95127bd75"
+      },
+      {
+        "name": "zzzzzzz-page-body-image-paste.patch",
+        "sha256": "ac08a167a376bae3e1e890f8109f2f9552ce952abe7882712f813183597ce57a"
+      },
+      {
+        "name": "zzzzzzzz-empty-section-remove.patch",
+        "sha256": "d49d3acc5bc0b3049415e17233a7f7a7249792f6500d475ce6cd39d3ad14d590"
+      },
+      {
+        "name": "zzzzzzzzz-hwpx-body-caret.patch",
+        "sha256": "c073ab44d5460f92915ea6493a791d2cbf24bb60ad66eca5033be0fc9835ac56"
+      },
+      {
+        "name": "zzzzzzzzzz-agent-page-background.patch",
+        "sha256": "74104eca6a40a3a7f06ad6d20ed8f44f816f0c153a2be40fdf584b61fc9ba907"
+      },
+      {
+        "name": "zzzzzzzzzzz-agent-header-footer.patch",
+        "sha256": "415fa55bc5fe0c4f49a7dce025723067022d7bdef076a9fb48b7f456c30cb91a"
+      },
+      {
+        "name": "zzzzzzzzzzzz-agent-paragraph-tabs.patch",
+        "sha256": "d15949747520d51020433aca32539f79c5a8cc0dfdad9de95db221dae651b311"
+      },
+      {
+        "name": "zzzzzzzzzzzzz-agent-paragraph-decoration.patch",
+        "sha256": "2adf2bba46d11a6ca97ce838da1d329c627c8532812674b7329aaef3cdb544fb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzz-agent-paragraph-lists.patch",
+        "sha256": "06e1af9e90e0c54da772a533f9c2ac5279db059c37fb3612c189e0d7e1c7692d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzz-agent-basic-bullets.patch",
+        "sha256": "03138686d9faa51fcf335f1b6299a294248031d36ca079da5346e52d0b531a35"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzz-agent-numbering-clone.patch",
+        "sha256": "a79207f328ca0521515344c018554ccc20092142dabaa5ba413ff162408fa567"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzz-agent-basic-numbering.patch",
+        "sha256": "66ac344e90a16b3e447e97bd6a593edbc7b9e024313cc40f81f2611838f3b102"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzz-agent-paragraph-outline.patch",
+        "sha256": "dfe19d3083f6a4222440ce558b5451f2568cf57b211bcc19babb508c1db2022e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzz-agent-style-metadata.patch",
+        "sha256": "53c6a573df6e8f1d0af4f388dad4e624a700006ad38f7a1de820eabc1d6d44cb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzz-whole-table-edited-host.patch",
+        "sha256": "f90714f601227bba000d63be77e5ac9f3985d192e613990984544b2f70b0f603"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzz-table-default-padding-reflow.patch",
+        "sha256": "903260c4c371a2a1d4b0afa72f8f0e1f191db936bd6e055a974a0a4295badf0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzz-hidden-paragraph-page-owner.patch",
+        "sha256": "13df5f1c5493ef4560866f3806be6a3bd2c748e50a1fc531dac686994e310b6b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-following-table-flow-owner.patch",
+        "sha256": "251cb5ee2d06a1a78732d7c01839bf4bf596a5376ce5af8637b50d8c0633f897"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-memo-tail-owner.patch",
+        "sha256": "5f4eafa802c6dd9dde96a1def6e187ef1be5b3f7e9a99cf8d4569458d0d0bca0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzz-table-outer-margin-owner.patch",
+        "sha256": "6132e26aa3a5b14f506f425d79930882a5c48092eac8e96bc4c8735cc8d42db3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-table-tail-snapshot.patch",
+        "sha256": "11a853d99a9278fd94e2c573d384f3826c53b00a433bcb6b9fa04fb24e344f0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzz-conversion-semantic-storage.patch",
+        "sha256": "65f3e6e87bb1030f2e565cfd96d36b85dc4065de8fb3615a2db24a9d4121a092"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-zone-observation.patch",
+        "sha256": "9dc3ffd29ada303898ab21268fb72e23b1b56bcf7c589a11687716848e80bb70"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-textbox-alignment-storage.patch",
+        "sha256": "b9d8791a5e9b7b5e6b5d1bd794f3a7ebe9012c7bc8403c49333217cfef434122"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-footnote-style-identity.patch",
+        "sha256": "867d4ac34306a4edfb4360b2d9d51d5bb5bc43dedf5abd6919cedeba427894e6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-merged-row-height.patch",
+        "sha256": "6364cba702decf8160fea341932f5b0df6481c51fe135c2d77b6cae1c52192a3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-session-story-evidence.patch",
+        "sha256": "4f59265ba0740ad570a7dcbdd964a06a1d99075052713e70d9c1b755b83caab8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-visible-tail-snapshot.patch",
+        "sha256": "10dbdd14e2603200bec9ebcf34417c224d4f77624fc83ddf76a3c0cb28e8931e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-root-line-snapshot.patch",
+        "sha256": "509a2d497b5fe4c651b26954b6874e1a95ac4a2655391f88446f70f6735c4ef0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-overlap-origin.patch",
+        "sha256": "35f34ab3553354c4920e3ba51810770a997561fc896b40c73fb012f371dcfd96"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-reflow-markers.patch",
+        "sha256": "21e7d77e4f93072efc71718c2ea9e1ce15ff26a0fe343378b474a16a136856c8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-whole-table-flow.patch",
+        "sha256": "4f376b5c88ae4d26c9ec890ebefd352ac004e94b292afbc36ffdbf95525f514a"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-typeset-advance-grid.patch",
+        "sha256": "4b55713647b5567ec88b39853b8a28efe4811bd08025ccf9c1f20c4554732638"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-width.patch",
+        "sha256": "1cc54a1f9c37f31d034f66f8b0fbc4dedd3bffff7fb7094b824ebb88ae187183"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-marker-whole-flow.patch",
+        "sha256": "9b954250e8ddbc67cbfd9eda3898deb1f892de63483e3d9ae8eed2d9b4c574d7"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-origin-hwpx-query.patch",
+        "sha256": "e419b33ca35e25c63b2ec40ba99cec33a7dee2690d3035e070cca2c9efa23581"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-nonflow-prefix-band-origin.patch",
+        "sha256": "7b9f054bb6bf0af8094451cf85797adb6ab9fe06fcfa6641453111bd3561bdf6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-line-cache.patch",
+        "sha256": "2629f5073faed3d9b4f121cb71116143879085396b3ef3421e26a6c4adff64a0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-wrap-separator-spacing.patch",
+        "sha256": "54f38a977dc703e75cc42f3383705182b546efb30f1b3e2fd9669c6c70296aa3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-textbox-storage-flag.patch",
+        "sha256": "6ed35f5dfc24f0f47146b7fa7d1cb24fe3a56bc14f365eb0e7063dd7d85bdaf6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-paragraph-2016-heading-case.patch",
+        "sha256": "ed6f58a7201a4d8514d459b74d90dee6d880d33746e37509d14ba0475e3bfcb3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp-tab-placeholder-line-cache.patch",
+        "sha256": "68ad036c239042df4ae77d6750d1c69323bf1fa499193fc6d47bd2f0ef2b37ce"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-width-declared-height-preservation.patch",
+        "sha256": "5d4bb9a8907fe988741163510618d410b778cb24bfc45b51392780fc1ccc7fd8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-explicit-none-shadow-storage.patch",
+        "sha256": "38c3ddba6b4844f82ac8a3f752dabbabb55c74d31cc3d150c1142d57f57e00e9"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-table-content-height-sync.patch",
+        "sha256": "368dd198802b630da92549f7bc4ddbcb2e6bf7a0822090519ec07a1134a9fe0b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-closed-whole-stack-lineage.patch",
+        "sha256": "5e9b4dce4da46d62427105ce3a70362050f17392388aa507ad54d7894df31bd2"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-single-table-outer-origin.patch",
+        "sha256": "12acf5353ab12f366e04496d2d7c59093d80a7bc60293257d8fa603910de0a05"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-document-summary-metadata.patch",
+        "sha256": "69b458e6f48c0145df400b19981658575d08f88a183ae6975dd67bcf0b146f06"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-live-table-outer-origin.patch",
+        "sha256": "9b896b2d541e1dd002bd240742d707b0274f95d436bbb0d321600bd63a350845"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-offset-visible-edge.patch",
+        "sha256": "0232256c9982e2e20c0d3149abf67b1d0cbf30f9a4b03150086ded05202da0d3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwpx-native-font-descriptors.patch",
+        "sha256": "bdc2692b6fd6e60c70dd8c5880aa4357f67521e6fbef6d7253fe9fc332c0ab3b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stored-numbering-extension-codec.patch",
+        "sha256": "5b01b627c57b3772b93b41269d3a5e644d6003775c6b7c4ab5efd187a43f7ea1"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-table-fullwidth-source-owner.patch",
+        "sha256": "ef63e25bb950f0a8ceb4c70b1987c6b3dca739a4465acdca3a217d41d18f9d54"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-numbering-observed-disk-canonical.patch",
+        "sha256": "88aa2f62cf5601168d46c2ce0e73083f31f845ca9f125f146f3d114465bfb134"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-negative-table-frame-source-owner.patch",
+        "sha256": "2b8d16e911e3af30b9abfb93da33717de6e007b8e971046d5f6ca45a27c44d8d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-unknown-hwpx-control-loss-report.patch",
+        "sha256": "f2004c1fe26b90b03d2e407380536a3d8eebf9529d8bc67c083c75a9b1f4ceec"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-column-stack-source-owner.patch",
+        "sha256": "8ccf80a00cb0aae3c0a71619fb0ad6b55a537ac11c785ece4a4ad568c74efa7d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-reconstructed-body-shared-spacing-origin.patch",
+        "sha256": "1e828ab70011758f833ea59644383f6af9fa3d30400d2d220d9fd410f11f6af5"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-caption-lifecycle-and-partial-properties.patch",
+        "sha256": "0b8c8820f1c3444af15a7336034c3dc952461de6f5c758bb75992660b58b35af"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-transpose-row-measurement-owner.patch",
+        "sha256": "9d13fa135315a0fc550a2b7de3bff62d765816c217f66a4e9143e8283704b51b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-spacing-semantic-boundary.patch",
+        "sha256": "b9e980825c6e772149c9170203da78f183d762537d784f8f6757f253de911da6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-breakable-table-frame.patch",
+        "sha256": "2b9ec8c1ba628c5a3eeb51b15685c47cb8fc69973aac5a060e14ea12b10ea132"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-created-table-neighbor-line-provenance.patch",
+        "sha256": "a72b92a073a39731ea61ac07957d2176a0c5fd2bab6b331bfdcefbdbea229653"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-shape-insertion-wrap-owner.patch",
+        "sha256": "51cff004ad5b68a5fa2724dc200fc8c2b4e7059574e27df390eee0c75a3f8666"
+      }
+    ],
+    "optimized": false,
+    "builtAt": "2026-10-17T18:12:27.3824107Z",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f"
+  },
+  "inputSHA256": "cef8a3b80d6732be5f850c28923b27a09e2f0ff9df9a2835bc3b84c512266452",
+  "sourceInfo": {
+    "version": "5.1.0.0",
+    "sectionCount": 1,
+    "pageCount": 15,
+    "encrypted": false,
+    "hwp3Variant": false,
+    "hwp5OriginHwpx": true,
+    "fallbackFont": "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
+    "fontsUsed": [
+      "HY견명조",
+      "HY중고딕",
+      "HY헤드라인M",
+      "Palatino Linotype",
+      "굴림",
+      "굴림체",
+      "맑은 고딕",
+      "바탕",
+      "한양견고딕",
+      "한양신명조",
+      "한양중고딕",
+      "한컴바탕",
+      "휴먼명조"
+    ],
+    "fontSubstitutions": []
+  },
+  "normalInfo": {
+    "version": "5.1.0.0",
+    "sectionCount": 1,
+    "pageCount": 15,
+    "encrypted": false,
+    "hwp3Variant": false,
+    "hwp5OriginHwpx": false,
+    "fallbackFont": "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
+    "fontsUsed": [
+      "HY견명조",
+      "HY중고딕",
+      "HY헤드라인M",
+      "Palatino Linotype",
+      "굴림",
+      "굴림체",
+      "맑은 고딕",
+      "바탕",
+      "한양견고딕",
+      "한양신명조",
+      "한양중고딕",
+      "한컴바탕",
+      "휴먼명조"
+    ],
+    "fontSubstitutions": []
+  },
+  "counterfactualInfo": {
+    "version": "5.1.0.0",
+    "sectionCount": 1,
+    "pageCount": 15,
+    "encrypted": false,
+    "hwp3Variant": false,
+    "hwp5OriginHwpx": false,
+    "fallbackFont": "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
+    "fontsUsed": [
+      "HY견명조",
+      "HY중고딕",
+      "HY헤드라인M",
+      "Palatino Linotype",
+      "굴림",
+      "굴림체",
+      "맑은 고딕",
+      "바탕",
+      "한양견고딕",
+      "한양신명조",
+      "한양중고딕",
+      "한컴바탕",
+      "휴먼명조"
+    ],
+    "fontSubstitutions": []
+  },
+  "nativeLoss": {
+    "schemaVersion": 1,
+    "outputFormat": "hwp",
+    "count": 0,
+    "losses": []
+  },
+  "normal": {
+    "pages": {
+      "before": 15,
+      "after": 15,
+      "equal": true
+    },
+    "semanticCount": 0,
+    "semanticDifferences": [],
+    "geometryCount": 125,
+    "geometryDifferences": [
+      {
+        "path": "$[3][\"controls\"][\"controls\"][1][\"cells\"][0][\"h\"]",
+        "before": 96.5,
+        "after": 100.3,
+        "delta": 3.799999999999997
+      },
+      {
+        "path": "$[3][\"controls\"][\"controls\"][1][\"cells\"][0][\"y\"]",
+        "before": 907.6,
+        "after": 903.8,
+        "delta": -3.800000000000068
+      },
+      {
+        "path": "$[3][\"controls\"][\"controls\"][1][\"h\"]",
+        "before": 96.7,
+        "after": 100.5,
+        "delta": 3.799999999999997
+      },
+      {
+        "path": "$[3][\"controls\"][\"controls\"][1][\"y\"]",
+        "before": 907.6,
+        "after": 903.8,
+        "delta": -3.800000000000068
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][77][\"y\"]",
+        "before": 922.2,
+        "after": 920.3,
+        "delta": -1.900000000000091
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][78][\"y\"]",
+        "before": 922.2,
+        "after": 920.3,
+        "delta": -1.900000000000091
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][79][\"y\"]",
+        "before": 922.2,
+        "after": 920.3,
+        "delta": -1.900000000000091
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][80][\"y\"]",
+        "before": 922.2,
+        "after": 920.3,
+        "delta": -1.900000000000091
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][81][\"y\"]",
+        "before": 922.2,
+        "after": 920.3,
+        "delta": -1.900000000000091
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][82][\"y\"]",
+        "before": 947.8,
+        "after": 945.9,
+        "delta": -1.8999999999999773
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][83][\"y\"]",
+        "before": 947.8,
+        "after": 945.9,
+        "delta": -1.8999999999999773
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][84][\"y\"]",
+        "before": 947.8,
+        "after": 945.9,
+        "delta": -1.8999999999999773
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][85][\"y\"]",
+        "before": 973.4,
+        "after": 971.5,
+        "delta": -1.8999999999999773
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][86][\"y\"]",
+        "before": 973.4,
+        "after": 971.5,
+        "delta": -1.8999999999999773
+      },
+      {
+        "path": "$[4][\"controls\"][\"controls\"][0][\"cells\"][0][\"h\"]",
+        "before": 315.4,
+        "after": 301.4,
+        "delta": -14
+      },
+      {
+        "path": "$[4][\"controls\"][\"controls\"][0][\"cells\"][0][\"y\"]",
+        "before": 117.1,
+        "after": 113.4,
+        "delta": -3.6999999999999886
+      },
+      {
+        "path": "$[4][\"controls\"][\"controls\"][0][\"h\"]",
+        "before": 315.6,
+        "after": 301.6,
+        "delta": -14
+      },
+      {
+        "path": "$[4][\"controls\"][\"controls\"][0][\"y\"]",
+        "before": 117.1,
+        "after": 113.4,
+        "delta": -3.6999999999999886
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][1][\"y\"]",
+        "before": 126,
+        "after": 115.2,
+        "delta": -10.799999999999997
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][2][\"y\"]",
+        "before": 126,
+        "after": 115.2,
+        "delta": -10.799999999999997
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][3][\"y\"]",
+        "before": 126,
+        "after": 115.2,
+        "delta": -10.799999999999997
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][4][\"y\"]",
+        "before": 126,
+        "after": 115.2,
+        "delta": -10.799999999999997
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][5][\"y\"]",
+        "before": 151.6,
+        "after": 140.8,
+        "delta": -10.799999999999983
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][6][\"y\"]",
+        "before": 177.2,
+        "after": 166.4,
+        "delta": -10.799999999999983
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][7][\"y\"]",
+        "before": 202.8,
+        "after": 192,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][8][\"y\"]",
+        "before": 202.8,
+        "after": 192,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][9][\"y\"]",
+        "before": 202.8,
+        "after": 192,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][10][\"y\"]",
+        "before": 202.8,
+        "after": 192,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][11][\"y\"]",
+        "before": 228.4,
+        "after": 217.6,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][12][\"y\"]",
+        "before": 228.4,
+        "after": 217.6,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][13][\"y\"]",
+        "before": 228.4,
+        "after": 217.6,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][14][\"y\"]",
+        "before": 228.4,
+        "after": 217.6,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][15][\"y\"]",
+        "before": 254,
+        "after": 243.2,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][16][\"y\"]",
+        "before": 254,
+        "after": 243.2,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][17][\"y\"]",
+        "before": 254,
+        "after": 243.2,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][18][\"y\"]",
+        "before": 254,
+        "after": 243.2,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][19][\"y\"]",
+        "before": 279.6,
+        "after": 268.8,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][20][\"y\"]",
+        "before": 279.6,
+        "after": 268.8,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][21][\"y\"]",
+        "before": 279.6,
+        "after": 268.8,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][22][\"y\"]",
+        "before": 279.6,
+        "after": 268.8,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][23][\"y\"]",
+        "before": 305.2,
+        "after": 294.4,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][24][\"y\"]",
+        "before": 305.2,
+        "after": 294.4,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][25][\"y\"]",
+        "before": 305.2,
+        "after": 294.4,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][26][\"y\"]",
+        "before": 305.2,
+        "after": 294.4,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][27][\"y\"]",
+        "before": 305.2,
+        "after": 294.4,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][28][\"y\"]",
+        "before": 305.2,
+        "after": 294.4,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][29][\"y\"]",
+        "before": 305.2,
+        "after": 294.4,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][30][\"y\"]",
+        "before": 305.2,
+        "after": 294.4,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][31][\"y\"]",
+        "before": 305.2,
+        "after": 294.4,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][32][\"y\"]",
+        "before": 305.2,
+        "after": 294.4,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][33][\"y\"]",
+        "before": 330.8,
+        "after": 320,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][34][\"y\"]",
+        "before": 330.8,
+        "after": 320,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][35][\"y\"]",
+        "before": 330.8,
+        "after": 320,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][36][\"y\"]",
+        "before": 330.8,
+        "after": 320,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][37][\"y\"]",
+        "before": 356.4,
+        "after": 345.6,
+        "delta": -10.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][38][\"y\"]",
+        "before": 356.4,
+        "after": 345.6,
+        "delta": -10.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][39][\"y\"]",
+        "before": 356.4,
+        "after": 345.6,
+        "delta": -10.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][40][\"y\"]",
+        "before": 356.4,
+        "after": 345.6,
+        "delta": -10.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][41][\"y\"]",
+        "before": 356.4,
+        "after": 345.6,
+        "delta": -10.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][42][\"y\"]",
+        "before": 382,
+        "after": 371.2,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][43][\"y\"]",
+        "before": 407.6,
+        "after": 396.8,
+        "delta": -10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][44][\"y\"]",
+        "before": 436.5,
+        "after": 418.7,
+        "delta": -17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][45][\"y\"]",
+        "before": 452.6,
+        "after": 434.8,
+        "delta": -17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][46][\"y\"]",
+        "before": 452.6,
+        "after": 434.8,
+        "delta": -17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][47][\"y\"]",
+        "before": 452.6,
+        "after": 434.8,
+        "delta": -17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][48][\"y\"]",
+        "before": 452.6,
+        "after": 434.8,
+        "delta": -17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][49][\"y\"]",
+        "before": 452.6,
+        "after": 434.8,
+        "delta": -17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][50][\"y\"]",
+        "before": 452.6,
+        "after": 434.8,
+        "delta": -17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][51][\"y\"]",
+        "before": 452.6,
+        "after": 434.8,
+        "delta": -17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][52][\"y\"]",
+        "before": 452.6,
+        "after": 434.8,
+        "delta": -17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][53][\"y\"]",
+        "before": 452.6,
+        "after": 434.8,
+        "delta": -17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][54][\"y\"]",
+        "before": 452.6,
+        "after": 434.8,
+        "delta": -17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][55][\"y\"]",
+        "before": 480.4,
+        "after": 462.6,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][56][\"y\"]",
+        "before": 480.4,
+        "after": 462.6,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][57][\"y\"]",
+        "before": 480.4,
+        "after": 462.6,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][58][\"y\"]",
+        "before": 480.4,
+        "after": 462.6,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][59][\"y\"]",
+        "before": 480.4,
+        "after": 462.6,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][60][\"y\"]",
+        "before": 480.4,
+        "after": 462.6,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][61][\"y\"]",
+        "before": 480.4,
+        "after": 462.6,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][62][\"y\"]",
+        "before": 480.4,
+        "after": 462.6,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][63][\"y\"]",
+        "before": 508.1,
+        "after": 490.3,
+        "delta": -17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][64][\"y\"]",
+        "before": 508.1,
+        "after": 490.3,
+        "delta": -17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][65][\"y\"]",
+        "before": 535.8,
+        "after": 518,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][66][\"y\"]",
+        "before": 535.8,
+        "after": 518,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][67][\"y\"]",
+        "before": 535.8,
+        "after": 518,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][68][\"y\"]",
+        "before": 535.8,
+        "after": 518,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][69][\"y\"]",
+        "before": 535.8,
+        "after": 518,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][70][\"y\"]",
+        "before": 563.6,
+        "after": 545.8,
+        "delta": -17.800000000000068
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][71][\"y\"]",
+        "before": 563.6,
+        "after": 545.8,
+        "delta": -17.800000000000068
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][72][\"y\"]",
+        "before": 591.3,
+        "after": 573.5,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][73][\"y\"]",
+        "before": 591.3,
+        "after": 573.5,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][74][\"y\"]",
+        "before": 619,
+        "after": 601.2,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][75][\"y\"]",
+        "before": 619,
+        "after": 601.2,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][76][\"y\"]",
+        "before": 619,
+        "after": 601.2,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][77][\"y\"]",
+        "before": 646.8,
+        "after": 629,
+        "delta": -17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][78][\"y\"]",
+        "before": 678.5,
+        "after": 671.1,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][79][\"y\"]",
+        "before": 678.5,
+        "after": 671.1,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][80][\"y\"]",
+        "before": 710.2,
+        "after": 702.8,
+        "delta": -7.400000000000091
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][81][\"y\"]",
+        "before": 710.2,
+        "after": 702.8,
+        "delta": -7.400000000000091
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][82][\"y\"]",
+        "before": 742,
+        "after": 734.6,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][83][\"y\"]",
+        "before": 742,
+        "after": 734.6,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][84][\"y\"]",
+        "before": 742,
+        "after": 734.6,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][85][\"y\"]",
+        "before": 769.7,
+        "after": 762.3,
+        "delta": -7.400000000000091
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][86][\"y\"]",
+        "before": 769.7,
+        "after": 762.3,
+        "delta": -7.400000000000091
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][87][\"y\"]",
+        "before": 769.7,
+        "after": 762.3,
+        "delta": -7.400000000000091
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][88][\"y\"]",
+        "before": 769.7,
+        "after": 762.3,
+        "delta": -7.400000000000091
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][89][\"y\"]",
+        "before": 769.7,
+        "after": 762.3,
+        "delta": -7.400000000000091
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][90][\"y\"]",
+        "before": 797.4,
+        "after": 790,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][91][\"y\"]",
+        "before": 797.4,
+        "after": 790,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][92][\"y\"]",
+        "before": 797.4,
+        "after": 790,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][93][\"y\"]",
+        "before": 797.4,
+        "after": 790,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][94][\"y\"]",
+        "before": 797.4,
+        "after": 790,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][95][\"y\"]",
+        "before": 797.4,
+        "after": 790,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][96][\"y\"]",
+        "before": 825.2,
+        "after": 817.8,
+        "delta": -7.400000000000091
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][97][\"y\"]",
+        "before": 825.2,
+        "after": 817.8,
+        "delta": -7.400000000000091
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][98][\"y\"]",
+        "before": 856.9,
+        "after": 849.5,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][99][\"y\"]",
+        "before": 856.9,
+        "after": 849.5,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][100][\"y\"]",
+        "before": 856.9,
+        "after": 849.5,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][101][\"y\"]",
+        "before": 856.9,
+        "after": 849.5,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][102][\"y\"]",
+        "before": 856.9,
+        "after": 849.5,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][103][\"y\"]",
+        "before": 884.6,
+        "after": 877.2,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][104][\"y\"]",
+        "before": 912.4,
+        "after": 905,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][105][\"y\"]",
+        "before": 940.1,
+        "after": 932.7,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][106][\"y\"]",
+        "before": 971.8,
+        "after": 964.4,
+        "delta": -7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][107][\"y\"]",
+        "before": 971.8,
+        "after": 964.4,
+        "delta": -7.399999999999977
+      }
+    ]
+  },
+  "counterfactual": {
+    "pages": {
+      "before": 15,
+      "after": 15,
+      "equal": true
+    },
+    "semanticCount": 0,
+    "semanticDifferences": [],
+    "geometryCount": 0,
+    "geometryDifferences": []
+  },
+  "normalToCounterfactual": {
+    "pages": {
+      "before": 15,
+      "after": 15,
+      "equal": true
+    },
+    "semanticCount": 0,
+    "semanticDifferences": [],
+    "geometryCount": 125,
+    "geometryDifferences": [
+      {
+        "path": "$[3][\"controls\"][\"controls\"][1][\"cells\"][0][\"h\"]",
+        "before": 100.3,
+        "after": 96.5,
+        "delta": -3.799999999999997
+      },
+      {
+        "path": "$[3][\"controls\"][\"controls\"][1][\"cells\"][0][\"y\"]",
+        "before": 903.8,
+        "after": 907.6,
+        "delta": 3.800000000000068
+      },
+      {
+        "path": "$[3][\"controls\"][\"controls\"][1][\"h\"]",
+        "before": 100.5,
+        "after": 96.7,
+        "delta": -3.799999999999997
+      },
+      {
+        "path": "$[3][\"controls\"][\"controls\"][1][\"y\"]",
+        "before": 903.8,
+        "after": 907.6,
+        "delta": 3.800000000000068
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][77][\"y\"]",
+        "before": 920.3,
+        "after": 922.2,
+        "delta": 1.900000000000091
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][78][\"y\"]",
+        "before": 920.3,
+        "after": 922.2,
+        "delta": 1.900000000000091
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][79][\"y\"]",
+        "before": 920.3,
+        "after": 922.2,
+        "delta": 1.900000000000091
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][80][\"y\"]",
+        "before": 920.3,
+        "after": 922.2,
+        "delta": 1.900000000000091
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][81][\"y\"]",
+        "before": 920.3,
+        "after": 922.2,
+        "delta": 1.900000000000091
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][82][\"y\"]",
+        "before": 945.9,
+        "after": 947.8,
+        "delta": 1.8999999999999773
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][83][\"y\"]",
+        "before": 945.9,
+        "after": 947.8,
+        "delta": 1.8999999999999773
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][84][\"y\"]",
+        "before": 945.9,
+        "after": 947.8,
+        "delta": 1.8999999999999773
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][85][\"y\"]",
+        "before": 971.5,
+        "after": 973.4,
+        "delta": 1.8999999999999773
+      },
+      {
+        "path": "$[3][\"text\"][\"runs\"][86][\"y\"]",
+        "before": 971.5,
+        "after": 973.4,
+        "delta": 1.8999999999999773
+      },
+      {
+        "path": "$[4][\"controls\"][\"controls\"][0][\"cells\"][0][\"h\"]",
+        "before": 301.4,
+        "after": 315.4,
+        "delta": 14
+      },
+      {
+        "path": "$[4][\"controls\"][\"controls\"][0][\"cells\"][0][\"y\"]",
+        "before": 113.4,
+        "after": 117.1,
+        "delta": 3.6999999999999886
+      },
+      {
+        "path": "$[4][\"controls\"][\"controls\"][0][\"h\"]",
+        "before": 301.6,
+        "after": 315.6,
+        "delta": 14
+      },
+      {
+        "path": "$[4][\"controls\"][\"controls\"][0][\"y\"]",
+        "before": 113.4,
+        "after": 117.1,
+        "delta": 3.6999999999999886
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][1][\"y\"]",
+        "before": 115.2,
+        "after": 126,
+        "delta": 10.799999999999997
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][2][\"y\"]",
+        "before": 115.2,
+        "after": 126,
+        "delta": 10.799999999999997
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][3][\"y\"]",
+        "before": 115.2,
+        "after": 126,
+        "delta": 10.799999999999997
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][4][\"y\"]",
+        "before": 115.2,
+        "after": 126,
+        "delta": 10.799999999999997
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][5][\"y\"]",
+        "before": 140.8,
+        "after": 151.6,
+        "delta": 10.799999999999983
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][6][\"y\"]",
+        "before": 166.4,
+        "after": 177.2,
+        "delta": 10.799999999999983
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][7][\"y\"]",
+        "before": 192,
+        "after": 202.8,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][8][\"y\"]",
+        "before": 192,
+        "after": 202.8,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][9][\"y\"]",
+        "before": 192,
+        "after": 202.8,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][10][\"y\"]",
+        "before": 192,
+        "after": 202.8,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][11][\"y\"]",
+        "before": 217.6,
+        "after": 228.4,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][12][\"y\"]",
+        "before": 217.6,
+        "after": 228.4,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][13][\"y\"]",
+        "before": 217.6,
+        "after": 228.4,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][14][\"y\"]",
+        "before": 217.6,
+        "after": 228.4,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][15][\"y\"]",
+        "before": 243.2,
+        "after": 254,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][16][\"y\"]",
+        "before": 243.2,
+        "after": 254,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][17][\"y\"]",
+        "before": 243.2,
+        "after": 254,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][18][\"y\"]",
+        "before": 243.2,
+        "after": 254,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][19][\"y\"]",
+        "before": 268.8,
+        "after": 279.6,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][20][\"y\"]",
+        "before": 268.8,
+        "after": 279.6,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][21][\"y\"]",
+        "before": 268.8,
+        "after": 279.6,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][22][\"y\"]",
+        "before": 268.8,
+        "after": 279.6,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][23][\"y\"]",
+        "before": 294.4,
+        "after": 305.2,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][24][\"y\"]",
+        "before": 294.4,
+        "after": 305.2,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][25][\"y\"]",
+        "before": 294.4,
+        "after": 305.2,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][26][\"y\"]",
+        "before": 294.4,
+        "after": 305.2,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][27][\"y\"]",
+        "before": 294.4,
+        "after": 305.2,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][28][\"y\"]",
+        "before": 294.4,
+        "after": 305.2,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][29][\"y\"]",
+        "before": 294.4,
+        "after": 305.2,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][30][\"y\"]",
+        "before": 294.4,
+        "after": 305.2,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][31][\"y\"]",
+        "before": 294.4,
+        "after": 305.2,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][32][\"y\"]",
+        "before": 294.4,
+        "after": 305.2,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][33][\"y\"]",
+        "before": 320,
+        "after": 330.8,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][34][\"y\"]",
+        "before": 320,
+        "after": 330.8,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][35][\"y\"]",
+        "before": 320,
+        "after": 330.8,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][36][\"y\"]",
+        "before": 320,
+        "after": 330.8,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][37][\"y\"]",
+        "before": 345.6,
+        "after": 356.4,
+        "delta": 10.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][38][\"y\"]",
+        "before": 345.6,
+        "after": 356.4,
+        "delta": 10.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][39][\"y\"]",
+        "before": 345.6,
+        "after": 356.4,
+        "delta": 10.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][40][\"y\"]",
+        "before": 345.6,
+        "after": 356.4,
+        "delta": 10.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][41][\"y\"]",
+        "before": 345.6,
+        "after": 356.4,
+        "delta": 10.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][42][\"y\"]",
+        "before": 371.2,
+        "after": 382,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][43][\"y\"]",
+        "before": 396.8,
+        "after": 407.6,
+        "delta": 10.800000000000011
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][44][\"y\"]",
+        "before": 418.7,
+        "after": 436.5,
+        "delta": 17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][45][\"y\"]",
+        "before": 434.8,
+        "after": 452.6,
+        "delta": 17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][46][\"y\"]",
+        "before": 434.8,
+        "after": 452.6,
+        "delta": 17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][47][\"y\"]",
+        "before": 434.8,
+        "after": 452.6,
+        "delta": 17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][48][\"y\"]",
+        "before": 434.8,
+        "after": 452.6,
+        "delta": 17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][49][\"y\"]",
+        "before": 434.8,
+        "after": 452.6,
+        "delta": 17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][50][\"y\"]",
+        "before": 434.8,
+        "after": 452.6,
+        "delta": 17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][51][\"y\"]",
+        "before": 434.8,
+        "after": 452.6,
+        "delta": 17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][52][\"y\"]",
+        "before": 434.8,
+        "after": 452.6,
+        "delta": 17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][53][\"y\"]",
+        "before": 434.8,
+        "after": 452.6,
+        "delta": 17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][54][\"y\"]",
+        "before": 434.8,
+        "after": 452.6,
+        "delta": 17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][55][\"y\"]",
+        "before": 462.6,
+        "after": 480.4,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][56][\"y\"]",
+        "before": 462.6,
+        "after": 480.4,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][57][\"y\"]",
+        "before": 462.6,
+        "after": 480.4,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][58][\"y\"]",
+        "before": 462.6,
+        "after": 480.4,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][59][\"y\"]",
+        "before": 462.6,
+        "after": 480.4,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][60][\"y\"]",
+        "before": 462.6,
+        "after": 480.4,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][61][\"y\"]",
+        "before": 462.6,
+        "after": 480.4,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][62][\"y\"]",
+        "before": 462.6,
+        "after": 480.4,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][63][\"y\"]",
+        "before": 490.3,
+        "after": 508.1,
+        "delta": 17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][64][\"y\"]",
+        "before": 490.3,
+        "after": 508.1,
+        "delta": 17.80000000000001
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][65][\"y\"]",
+        "before": 518,
+        "after": 535.8,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][66][\"y\"]",
+        "before": 518,
+        "after": 535.8,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][67][\"y\"]",
+        "before": 518,
+        "after": 535.8,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][68][\"y\"]",
+        "before": 518,
+        "after": 535.8,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][69][\"y\"]",
+        "before": 518,
+        "after": 535.8,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][70][\"y\"]",
+        "before": 545.8,
+        "after": 563.6,
+        "delta": 17.800000000000068
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][71][\"y\"]",
+        "before": 545.8,
+        "after": 563.6,
+        "delta": 17.800000000000068
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][72][\"y\"]",
+        "before": 573.5,
+        "after": 591.3,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][73][\"y\"]",
+        "before": 573.5,
+        "after": 591.3,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][74][\"y\"]",
+        "before": 601.2,
+        "after": 619,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][75][\"y\"]",
+        "before": 601.2,
+        "after": 619,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][76][\"y\"]",
+        "before": 601.2,
+        "after": 619,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][77][\"y\"]",
+        "before": 629,
+        "after": 646.8,
+        "delta": 17.799999999999955
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][78][\"y\"]",
+        "before": 671.1,
+        "after": 678.5,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][79][\"y\"]",
+        "before": 671.1,
+        "after": 678.5,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][80][\"y\"]",
+        "before": 702.8,
+        "after": 710.2,
+        "delta": 7.400000000000091
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][81][\"y\"]",
+        "before": 702.8,
+        "after": 710.2,
+        "delta": 7.400000000000091
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][82][\"y\"]",
+        "before": 734.6,
+        "after": 742,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][83][\"y\"]",
+        "before": 734.6,
+        "after": 742,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][84][\"y\"]",
+        "before": 734.6,
+        "after": 742,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][85][\"y\"]",
+        "before": 762.3,
+        "after": 769.7,
+        "delta": 7.400000000000091
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][86][\"y\"]",
+        "before": 762.3,
+        "after": 769.7,
+        "delta": 7.400000000000091
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][87][\"y\"]",
+        "before": 762.3,
+        "after": 769.7,
+        "delta": 7.400000000000091
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][88][\"y\"]",
+        "before": 762.3,
+        "after": 769.7,
+        "delta": 7.400000000000091
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][89][\"y\"]",
+        "before": 762.3,
+        "after": 769.7,
+        "delta": 7.400000000000091
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][90][\"y\"]",
+        "before": 790,
+        "after": 797.4,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][91][\"y\"]",
+        "before": 790,
+        "after": 797.4,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][92][\"y\"]",
+        "before": 790,
+        "after": 797.4,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][93][\"y\"]",
+        "before": 790,
+        "after": 797.4,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][94][\"y\"]",
+        "before": 790,
+        "after": 797.4,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][95][\"y\"]",
+        "before": 790,
+        "after": 797.4,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][96][\"y\"]",
+        "before": 817.8,
+        "after": 825.2,
+        "delta": 7.400000000000091
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][97][\"y\"]",
+        "before": 817.8,
+        "after": 825.2,
+        "delta": 7.400000000000091
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][98][\"y\"]",
+        "before": 849.5,
+        "after": 856.9,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][99][\"y\"]",
+        "before": 849.5,
+        "after": 856.9,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][100][\"y\"]",
+        "before": 849.5,
+        "after": 856.9,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][101][\"y\"]",
+        "before": 849.5,
+        "after": 856.9,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][102][\"y\"]",
+        "before": 849.5,
+        "after": 856.9,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][103][\"y\"]",
+        "before": 877.2,
+        "after": 884.6,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][104][\"y\"]",
+        "before": 905,
+        "after": 912.4,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][105][\"y\"]",
+        "before": 932.7,
+        "after": 940.1,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][106][\"y\"]",
+        "before": 964.4,
+        "after": 971.8,
+        "delta": 7.399999999999977
+      },
+      {
+        "path": "$[4][\"text\"][\"runs\"][107][\"y\"]",
+        "before": 964.4,
+        "after": 971.8,
+        "delta": 7.399999999999977
+      }
+    ]
+  },
+  "counterfactualProof": {
+    "changedByteOffsets": [
+      2568
+    ],
+    "allLogicalStreamPayloadsExact": true,
+    "logicalStreams": 12,
+    "onlyDirectoryStreamNameChanged": true,
+    "sourceSHA256": "4806297ca27703cccc8065f1989ceed171fe181a1c35711b686d26a162812c30",
+    "counterfactualSHA256": "df6b860bfdc21ac42214cb237bb0c77a489e5be7ee2e26b82ede6144f7967d0c"
+  },
+  "sourceUnchanged": true,
+  "scope": "Read-only causal diagnostic. Source and derived public bytes and full snapshots are not written. No production marker deletion, parser/renderer change, guard relaxation or passing preservation claim."
+}

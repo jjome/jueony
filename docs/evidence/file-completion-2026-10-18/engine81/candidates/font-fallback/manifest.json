@@ -1,0 +1,100 @@
+{
+  "scope": "Metadata-only own Native fixtures and numeric/hashed public-document font diagnosis; no body, font program, binary application or WASM payload. Historical address-index misalignment and preparation failures kept separately.",
+  "files": [
+    {
+      "path": "analyze-address-index-v1.mjs",
+      "bytes": 2834,
+      "sha256": "b37aae4b1bd76c4015b5206151666f424d29f44748d862b326454ee33dc783c2"
+    },
+    {
+      "path": "analyze.mjs",
+      "bytes": 3196,
+      "sha256": "815e79d973121b1e2cf9743ae7981702ac6093cb5888ee415717b40da1550c1d"
+    },
+    {
+      "path": "font-fallback-delta-formal80.patch",
+      "bytes": 3263,
+      "sha256": "51f8f19453df44f9ed01f4345e168f7fc7a48fc3acc104b79f8ab91c29a4dc56"
+    },
+    {
+      "path": "handoff.json",
+      "bytes": 2517,
+      "sha256": "b0850f1499ec539027c593e06a4b1cd45ecb0c290ef67791c7970c990bffd5ca"
+    },
+    {
+      "path": "native-actual-fonts.json",
+      "bytes": 1886,
+      "sha256": "b8182550b95f80e5b9bd2cdc425c0abb3897eb37c3b62b57c2825c25926a01bd"
+    },
+    {
+      "path": "native-baseline80.log",
+      "bytes": 2320,
+      "sha256": "a0ca398080a1de592708f30bff963fce151c61e22206046d6333e26425489e29"
+    },
+    {
+      "path": "native-candidate80-published-final.log",
+      "bytes": 2753,
+      "sha256": "d2de1332bafd3847e61a5a9b7db37eda10a7b073dc2dcad89d70ab477652a91c"
+    },
+    {
+      "path": "native-candidate80.log",
+      "bytes": 1310,
+      "sha256": "b31abf099b79864ce30214559e0d59ad8d9069fd91be0dd56da89ceb239f8ca7"
+    },
+    {
+      "path": "native-preparation-llms-and-subst-field.log",
+      "bytes": 785,
+      "sha256": "7c9d6e685e76b90d196a3c320a359ab9028691479125800fe98554d84af8d298"
+    },
+    {
+      "path": "native-preparation-missing-bindings.log",
+      "bytes": 472,
+      "sha256": "d8df458ccc2d003f090d1c143328db23e3a7662bc6269b969c1a64e391a0d46e"
+    },
+    {
+      "path": "native-preparation-missing-tools.log",
+      "bytes": 482,
+      "sha256": "160193d0d2e067b362b1e393e0beb61fb0fbc0f57fb744fdeee60a4dba25273e"
+    },
+    {
+      "path": "result-address-index-v1-invalid.json",
+      "bytes": 21297,
+      "sha256": "f1eb1a16ed767f0162bfa6f03c05b385c087182149873acca49dba8f47d40628"
+    },
+    {
+      "path": "result.json",
+      "bytes": 21128,
+      "sha256": "2dc728ee1357281124c774f5204e30e0b1bda28a77fa9054f93607cff321449a"
+    },
+    {
+      "path": "run-native.sh",
+      "bytes": 426,
+      "sha256": "85b51bd86b10a2f4de3170a1667fc2685c53a38cda5aae14e080fd2e153b676f"
+    },
+    {
+      "path": "run-owner-aligned.log",
+      "bytes": 3112,
+      "sha256": "d739c66d07b7e601712f599e3546ae66d2d05bff3ba8c861e357a7e17bf634f5"
+    },
+    {
+      "path": "source/tests/jueony_font_fallback.rs",
+      "bytes": 6898,
+      "sha256": "503ae899942a568fc36ffda8dc104bc5ea0ac343b0871113f94bc7fd36f24675"
+    },
+    {
+      "path": "source-proof.json",
+      "bytes": 821,
+      "sha256": "0637a525272d2d090a003029c6285f6afddd50711d35ba26ba387eac5f31ab2a"
+    },
+    {
+      "path": "spec-evidence.json",
+      "bytes": 707,
+      "sha256": "b845019d4933b0e56421454c0706423b1aa5395f9cd38ddfd7180fc65d8d20d6"
+    },
+    {
+      "path": "verify_manifest.py",
+      "bytes": 331,
+      "sha256": "86ff2e672870001716b31cd5e2e6afea024a472b639c439ab703ba24e074b42f"
+    }
+  ]
+}

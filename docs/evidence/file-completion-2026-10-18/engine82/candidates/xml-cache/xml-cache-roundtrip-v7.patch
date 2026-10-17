@@ -1,0 +1,158 @@
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -222,11 +222,19 @@
+             && document
+                 .hwpx_aux_entry(crate::model::document::HWP5_ORIGIN_HWPX_MARKER_PATH)
+                 .is_some();
++        // A producer-owned pure XML binary carries its import contract. The
++        // exact marker payload is required; ordinary/unknown-marker HWP and
++        // HWP3 lineage keep the original native loader path.
++        let xml_origin_binary = Self::owns_versioned_xml_cache_origin(&document, source_format);
+         let use_xml_import_semantics = matches!(
+             source_format,
+             crate::parser::FileFormat::Hwpx | crate::parser::FileFormat::Hml
+         ) && !hwp5_origin_hwpx
+             && !document.layout_profile().hwp3_native_layout();
++        // HWP parser representation-origin bits are already authoritative.
++        // The new binary contract grants cache reconstruction only, never the
++        // XML paragraph-wide metadata normalizer below.
++        let use_xml_cache_reconstruction = use_xml_import_semantics || xml_origin_binary;
+ 
+         // 비표준 lineseg 감지 — reflow 이전 시점에 IR을 그대로 검증.
+         // 경고는 사용자에게 고지되며, 자동 reflow 는 `needs_line_seg_reflow` 조건에만 한정.
+@@ -245,7 +253,7 @@
+         // 원본 HWP3→HWPX 도 같은 계약이다 — XML 이라 해서 빈 줄을 합성하면
+         // sample16 이 64→65, sample11 이 151→152로 갈라진다 (#3518, #3737).
+         let include_empty =
+-            use_xml_import_semantics && !document.layout_profile().hwp3_native_layout();
++            use_xml_cache_reconstruction && !document.layout_profile().hwp3_native_layout();
+         // [#2195] HWP5 native 확장은 **셀 내부의 컨트롤 없는 순수 빈 문단** 한정
+         // (86712 1pt 빈 문단 오라클). 본문 문단 확장은 기각(stage68): 본문 빈
+         // 문단은 typeset 의 em 폴백(#2070 축3)이 담당하고(80168 pi=424 오라클),
+@@ -2490,13 +2498,85 @@
+             column.paragraph_float_placements.get(&(1,0))).is_some()
+     }
+ 
++    /// The original b"1" marker was also produced for HWP5-origin XML in
++    /// legacy releases. Only this new exact payload owns the cache import
++    /// contract; conflicting raw HWP3/HWP5 source evidence always wins.
++    fn owns_versioned_xml_cache_origin(document: &Document, source: crate::parser::FileFormat) -> bool {
++        use crate::model::document::{HWPX_ORIGIN_STREAM_PATH,HWP3_ORIGIN_STREAM_PATH,
++            HWP3_ORIGIN_HWPX_MARKER_PATH,HWP5_ORIGIN_HWPX_MARKER_PATH};
++        matches!(source,crate::parser::FileFormat::Hwp)
++            && document.provenance.format == crate::model::provenance::SourceFormat::Hwp5
++            && document.provenance.hwpx_lineage && document.is_hwpx_variant
++            && !document.provenance.hwp3_lineage && !document.is_hwp3_variant
++            && document.hwpx_aux_entry(HWP3_ORIGIN_HWPX_MARKER_PATH).is_none()
++            && document.hwpx_aux_entry(HWP5_ORIGIN_HWPX_MARKER_PATH).is_none()
++            && !document.extra_streams.iter().any(|(path,_)|path == HWP3_ORIGIN_STREAM_PATH)
++            && document.extra_streams.iter().filter(|(path,_)|path == HWPX_ORIGIN_STREAM_PATH).count() == 1
++            && document.extra_streams.iter().any(|(path,bytes)|
++                path == HWPX_ORIGIN_STREAM_PATH && bytes.as_slice() == b"2:xml-import-v1")
++    }
++
++    /// Creation authority is distinct from read authority. No original
++    /// provenance stream/auxiliary marker is deleted, renamed or overwritten.
++    fn can_create_xml_cache_origin(&self) -> bool {
++        use crate::model::document::{HWPX_ORIGIN_STREAM_PATH,HWP3_ORIGIN_STREAM_PATH,
++            HWP3_ORIGIN_HWPX_MARKER_PATH,HWP5_ORIGIN_HWPX_MARKER_PATH};
++        let document=&self.document;
++        matches!(self.source_format,crate::parser::FileFormat::Hwpx)
++            && document.provenance.format == crate::model::provenance::SourceFormat::Hwpx
++            && !document.provenance.hwp3_lineage && !document.is_hwp3_variant
++            && !document.provenance.hwpx_lineage
++            && document.hwpx_aux_entry(HWP3_ORIGIN_HWPX_MARKER_PATH).is_none()
++            && document.hwpx_aux_entry(HWP5_ORIGIN_HWPX_MARKER_PATH).is_none()
++            && !document.extra_streams.iter().any(|(path,_)|
++                path == HWPX_ORIGIN_STREAM_PATH || path == HWP3_ORIGIN_STREAM_PATH)
++    }
++
++    /// Match the existing HWPX writer's no-source-cache contract for plain
++    /// generated body rows. Do not serialize cumulative render-only rows as
++    /// authoritative HWP physical positions. No stored/empty/nested rows change.
++    fn omit_generated_xml_body_caches(&self, snapshot: &mut Document) {
++        if !(self.can_create_xml_cache_origin()
++            || Self::owns_versioned_xml_cache_origin(&self.document,self.source_format)) { return; }
++        for (si, section) in self.document.sections.iter().enumerate() {
++            for (pi, para) in section.paragraphs.iter().enumerate() {
++                if para.text.is_empty() || para.text.chars().any(char::is_control)
++                    || !para.controls.is_empty() || !para.field_ranges.is_empty()
++                    || !para.orphan_field_ends.is_empty() || !para.range_tags.is_empty()
++                    || !para.title_marks.is_empty() || !para.markpen_marks.is_empty()
++                    || para.ctrl_data_records.iter().any(Option::is_some)
++                    || !para.tab_extended.is_empty() || para.numbering_restart.is_some()
++                    || para.layout_only_fill_lines != 0 || para.cell_format_vpos_dirty
++                    || para.stored_text_partition_is_dirty() || para.source_line_seg_vertical_pos.is_some()
++                    || para.column_type != crate::model::paragraph::ColumnBreakType::None
++                    || para.line_segs.is_empty() || para.line_segs.iter().any(|line|
++                        line.tag & LineSeg::TAG_IMPLEMENTATION_PROPERTY == 0
++                            || line.line_height <= 0 || line.text_height <= 0
++                            || line.segment_width <= 0 || line.line_spacing < 0)
++                { continue; }
++                snapshot.sections[si].paragraphs[pi].line_segs.clear();
++            }
++        }
++    }
++
+     pub fn prepare_hwp_export_snapshot(&self) -> HwpExportSnapshot {
+         use crate::document_core::converters::hwpx_to_hwp::convert_if_hwpx_source;
+ 
+         let mut snapshot = self.document.clone();
+         self.writeback_reflowed_table_frames(&mut snapshot);
+         self.writeback_edited_overlap_table_tail(&mut snapshot);
++        self.omit_generated_xml_body_caches(&mut snapshot);
++        let marker = crate::model::document::HWPX_ORIGIN_STREAM_PATH;
++        let new_xml_contract = self.can_create_xml_cache_origin();
+         let _report = convert_if_hwpx_source(&mut snapshot, self.source_format);
++        if new_xml_contract {
++            if let Some((_, value)) = snapshot.extra_streams.iter_mut()
++                .find(|(path,bytes)|path == marker && bytes.as_slice() == b"1") {
++                // Only the newly generated marker is ours. Existing payloads
++                // remain immutable and grant no new reconstruction authority.
++                *value = b"2:xml-import-v1".to_vec();
++            }
++        }
+         crate::document_core::document_metadata::sync_hwp_export(&mut snapshot, self.source_format);
+         if self.can_restore_native_whole_stack_hwp_lineage()
+             || self.can_restore_native_single_table_placeholder_hwp_lineage() {
+@@ -2666,7 +2746,14 @@
+         let lower_markers = |doc: &mut Document| {
+             super::header_footer_ops::lower_header_footer_field_markers(doc, &self.file_name, true)
+         };
+-        let serialized = if matches!(self.source_format, crate::parser::FileFormat::Hwp) {
++        let serialized = if Self::owns_versioned_xml_cache_origin(&self.document,self.source_format) {
++            // This is a pure XML import that visited an HWP container, not a
++            // native HWP5 document. Keep XML no-cache/paragraph-axis ownership
++            // instead of manufacturing an incompatible HWP5-origin ZIP marker.
++            let mut doc=self.document.clone();
++            lower_markers(&mut doc);
++            serialize(&doc)
++        } else if matches!(self.source_format, crate::parser::FileFormat::Hwp) {
+             let mut doc = self.document.clone();
+             if let Some((_, value)) = doc
+                 .hwpx_aux_entries
+--- a/src/serializer/body_text.rs
++++ b/src/serializer/body_text.rs
+@@ -377,6 +377,22 @@
+         .as_deref()
+         .unwrap_or(serializable_line_segs);
+ 
++    // XML import retains physical source positions before rebuilding cumulative
++    // render rows. Lower only that complete retained source map, just as the
++    // HWPX writer does; never invent coordinates from a render-only cache.
++    // Dirty partitions and unresolved tabs are still omitted below.
++    let source_position_line_segs: Option<Vec<LineSeg>> = para
++        .source_line_seg_vertical_pos
++        .as_deref()
++        .filter(|positions| positions.len() == para.line_segs.len())
++        .filter(|positions| source_line_segs.len() <= positions.len())
++        .map(|positions| source_line_segs.iter().enumerate().map(|(index, line)| {
++            LineSeg { vertical_pos: positions[index], ..line.clone() }
++        }).collect());
++    let source_line_segs = source_position_line_segs
++        .as_deref()
++        .unwrap_or(source_line_segs);
++
+     // [#4677] 본문에 대응하지 않는 lineseg 는 파일에 내보내지 않는다 — 조판 전용 보강 줄과
+     // PARA_TEXT 밖을 가리키는 줄 두 갈래다(판정은 `line_segs_within_text` 주석 참조).
+     // 한글 2022 는 그런 문단을 만나면 본문 전체를 버리고 빈 1쪽 문서로 연다 — rhwp 재파싱만

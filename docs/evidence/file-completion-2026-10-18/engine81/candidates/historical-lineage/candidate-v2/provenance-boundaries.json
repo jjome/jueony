@@ -1,0 +1,144 @@
+{
+  "cases": [
+    {
+      "auxSHA": "66ec33bf44186db7f097bcf1ef6bb662ee8cdb17a6dc461f690b2b8309b8067b",
+      "case": "exact-owner",
+      "markerPresent": false,
+      "outputIRSHA": "62cf1b5985ca11995de635365bf01dcaea068aee201e906ffdb882f72b047e07",
+      "sourceIRSHA": "c81e7822d1787b66700be9e2b758d59383c22fbcdf7449827198ec910de24a14",
+      "streamSHA": "88f1b1e72b92a9794c4baaa8f8b5eac442ae5183579f1a0d36349d8e1443a10f"
+    },
+    {
+      "auxSHA": "97308461c541219b560ae1c678156efd27e5f8253d170dd9ec9868e2d5e46f29",
+      "case": "pure-hwpx",
+      "markerPresent": true,
+      "outputIRSHA": "ad5665ee0f1e89b55a3da6819b10a7d1a922ca933e37b29577d3060efd4aad28",
+      "sourceIRSHA": "692d63507bca7e17c034cc332e55c9dda7963b211cb1ccdfbe45debafd0e4c7c",
+      "streamSHA": "2cc6dc7f4176ac8829d6cf7f92db4c4b94117df159026c601d067f20cf348e37"
+    },
+    {
+      "auxSHA": "298e8288caf30d6d65fef9873d0f310f5980dcfc8ca851ec8ab59cde82514819",
+      "case": "legacy-one",
+      "markerPresent": true,
+      "outputIRSHA": "ef18df8d13754680a68df6477737bf9bac530b990aa289fa716f52b7b8db4c15",
+      "sourceIRSHA": "41c8288195d1e67b0af2ceb30980be3701fb5d781b24381b00fc4b4818f88a30",
+      "streamSHA": "2cc6dc7f4176ac8829d6cf7f92db4c4b94117df159026c601d067f20cf348e37"
+    },
+    {
+      "auxSHA": "46d035df78ce7fec4556040130126f73333815a259c5792c4425e0ac49324959",
+      "case": "unknown-payload",
+      "markerPresent": true,
+      "outputIRSHA": "ab734a1ab3ecfe4fadab0dd0ae03507954c5e2669741f4988e9f44147f23b83a",
+      "sourceIRSHA": "efc0b4b4bc3c49108de403b4954af2018000c5cb8f8e080c10b964cb2eb038ea",
+      "streamSHA": "2cc6dc7f4176ac8829d6cf7f92db4c4b94117df159026c601d067f20cf348e37"
+    },
+    {
+      "auxSHA": "17812b7db1a0be39aae3620b17e03cc00919cb3b382a36a8da6a13001afd7728",
+      "case": "empty-payload",
+      "markerPresent": true,
+      "outputIRSHA": "7d5cc609ba074dc55cb1f37e1100fadc020e4bb1f5476f33999d4614f28a75b7",
+      "sourceIRSHA": "c8a96037afa4a7d5d716a3ccc1c17b2eccd4c307fa9198c8e7d864cce9f21431",
+      "streamSHA": "2cc6dc7f4176ac8829d6cf7f92db4c4b94117df159026c601d067f20cf348e37"
+    },
+    {
+      "auxSHA": "266136e99c198baca812ac9d9bc0f1c1d8aad324ad4c44fbb320418f3b1a5794",
+      "case": "duplicate-native-owner",
+      "markerPresent": true,
+      "outputIRSHA": "d3e17535a89b6503aeb74ea81beb0df6a2afbc269155da12c9fbbe22b2ee79af",
+      "sourceIRSHA": "77ecbce6aa74049f9ad0be95a3308aeb82f2887c0d05116b7b8ecb7f0e89e761",
+      "streamSHA": "2cc6dc7f4176ac8829d6cf7f92db4c4b94117df159026c601d067f20cf348e37"
+    },
+    {
+      "auxSHA": "33f5f67e0d6f9be9c3878b62a9bcb1331ca53ced0eb27ff56c5ce9f0900c506f",
+      "case": "hwp3-aux-conflict",
+      "markerPresent": true,
+      "outputIRSHA": "1f961dd665ff8c5f9a7d41bf2462c660d0ab9a29dbd9f148fefb8d36db3df087",
+      "sourceIRSHA": "500b2f304c88c768d98019df5062d0780c0d7bbb00ccd205a896d4297b62dddd",
+      "streamSHA": "2cc6dc7f4176ac8829d6cf7f92db4c4b94117df159026c601d067f20cf348e37"
+    },
+    {
+      "auxSHA": "66ec33bf44186db7f097bcf1ef6bb662ee8cdb17a6dc461f690b2b8309b8067b",
+      "case": "opaque-extra-owner",
+      "markerPresent": true,
+      "outputIRSHA": "f67ba0b7b8ae7340e9d6ae79b525880cc6af34ca801e424e1b5699b03903b9f6",
+      "sourceIRSHA": "80eaa5e8c7ec5ada7ef9e49013d195fdc4da8b53185ff7bd5893df9374e97fe8",
+      "streamSHA": "5feccd2e8113397093e3d992e6d8273987917c7121ed31af5aab88cf9aa75a24"
+    },
+    {
+      "auxSHA": "66ec33bf44186db7f097bcf1ef6bb662ee8cdb17a6dc461f690b2b8309b8067b",
+      "case": "existing-lineage-one",
+      "markerPresent": true,
+      "outputIRSHA": "c1516d1f20e29cfa48da9d94531f563a7854c2a1b26bf1b126a4e5d96d2ddc34",
+      "sourceIRSHA": "813d16f1b7af0e9405d164eb99ef9643d9e849b04d1ac418b95ffc8db43cba28",
+      "streamSHA": "2cc6dc7f4176ac8829d6cf7f92db4c4b94117df159026c601d067f20cf348e37"
+    },
+    {
+      "auxSHA": "66ec33bf44186db7f097bcf1ef6bb662ee8cdb17a6dc461f690b2b8309b8067b",
+      "case": "existing-lineage-opaque",
+      "markerPresent": true,
+      "outputIRSHA": "8e027e87db39b204fa602e197b95689338ca32fc9d815fa68bac3a8f4f740a2e",
+      "sourceIRSHA": "a434a4d1a2038d5ed7c6addedc70e849b9cf005957f17ebcbec078b6b55f5bdf",
+      "streamSHA": "a95821b62fa6a32f96d6f0e1f2fbb5ccc1f88521ddf957209cd6dff0c27f3f77"
+    },
+    {
+      "auxSHA": "66ec33bf44186db7f097bcf1ef6bb662ee8cdb17a6dc461f690b2b8309b8067b",
+      "case": "existing-hwp3-stream",
+      "markerPresent": true,
+      "outputIRSHA": "d05bce4d3c9639707299f1c07b39f64f571d094a2ced371de024e23549a66a51",
+      "sourceIRSHA": "8881943df22196599acde7ab5571f1409d11161f8056dcab130e72cad37999c4",
+      "streamSHA": "af3b76284142c81621407cd7e4e7ff187ef3af2474911416d399b530831650cf"
+    },
+    {
+      "auxSHA": "66ec33bf44186db7f097bcf1ef6bb662ee8cdb17a6dc461f690b2b8309b8067b",
+      "case": "hwpx-lineage-conflict",
+      "markerPresent": true,
+      "outputIRSHA": "42eade73142e5d7af3d8aef31b14eeb0eb903ac8c9534a64ef4bad108786312e",
+      "sourceIRSHA": "abe6a421a4be98d8e78b4e259b98b6d6947254012c46559d915902b40b9e3cd6",
+      "streamSHA": "2cc6dc7f4176ac8829d6cf7f92db4c4b94117df159026c601d067f20cf348e37"
+    },
+    {
+      "auxSHA": "66ec33bf44186db7f097bcf1ef6bb662ee8cdb17a6dc461f690b2b8309b8067b",
+      "case": "hwp3-lineage-conflict",
+      "markerPresent": true,
+      "outputIRSHA": "155327adaf133d0027c2a0e908545e070669cd9f88fe444cbadcaad5e0d83ce7",
+      "sourceIRSHA": "6e7c25764b48f139f3a6da91b678a6a8fc49ad14b39af367ade0388379de87a8",
+      "streamSHA": "2cc6dc7f4176ac8829d6cf7f92db4c4b94117df159026c601d067f20cf348e37"
+    },
+    {
+      "auxSHA": "66ec33bf44186db7f097bcf1ef6bb662ee8cdb17a6dc461f690b2b8309b8067b",
+      "case": "hwp5-noop",
+      "markerPresent": false,
+      "outputIRSHA": "794c8ac65dfd7e761c55198859cfaca1ad3050f341256e6178b44e3030bffebc",
+      "sourceIRSHA": "794c8ac65dfd7e761c55198859cfaca1ad3050f341256e6178b44e3030bffebc",
+      "streamSHA": "88f1b1e72b92a9794c4baaa8f8b5eac442ae5183579f1a0d36349d8e1443a10f"
+    },
+    {
+      "auxSHA": "66ec33bf44186db7f097bcf1ef6bb662ee8cdb17a6dc461f690b2b8309b8067b",
+      "case": "hwp3-owner",
+      "markerPresent": false,
+      "outputIRSHA": "f5b2c2e2f1e5d1c3d0fa6ecce66c8311a8a2ddcf1fac1f3a928af559e6cb565b",
+      "sourceIRSHA": "87e152867cc32a6960dda90202d47559ba99dcfa095e901be364c766f0258280",
+      "streamSHA": "115bc6bba9d5c01bf6c8ec4d523c123b1341b44cb4d8611e45ad7aa73fffef0f"
+    },
+    {
+      "auxSHA": "66ec33bf44186db7f097bcf1ef6bb662ee8cdb17a6dc461f690b2b8309b8067b",
+      "case": "hml-owner",
+      "markerPresent": false,
+      "outputIRSHA": "cfdf6261396ba8021d2b66a06aa63b300fd26f1bba96239f8958a52eed2e7523",
+      "sourceIRSHA": "cfdf6261396ba8021d2b66a06aa63b300fd26f1bba96239f8958a52eed2e7523",
+      "streamSHA": "88f1b1e72b92a9794c4baaa8f8b5eac442ae5183579f1a0d36349d8e1443a10f"
+    },
+    {
+      "auxSHA": "66ec33bf44186db7f097bcf1ef6bb662ee8cdb17a6dc461f690b2b8309b8067b",
+      "case": "inconsistent-container",
+      "markerPresent": true,
+      "outputIRSHA": "ab2050aab73ea3e20e3cc92e4b557339a30454fc1386034fafe38aee7361b755",
+      "sourceIRSHA": "794c8ac65dfd7e761c55198859cfaca1ad3050f341256e6178b44e3030bffebc",
+      "streamSHA": "2cc6dc7f4176ac8829d6cf7f92db4c4b94117df159026c601d067f20cf348e37"
+    }
+  ],
+  "inputSHA": "cef8a3b80d6732be5f850c28923b27a09e2f0ff9df9a2835bc3b84c512266452",
+  "publishedGeometryToleranceUnchanged": 0.2,
+  "scenarioCount": 17,
+  "sourcePath": "build/hancom-final-file-review-20261017/mcst-bid-2026-hwpx.hwpx"
+}

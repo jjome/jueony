@@ -1,0 +1,106 @@
+{
+  "engine": {
+    "sourceId": "65b8886bcdae0760",
+    "wasmSha256": "e966d691e8be90ae388cc65fbaae474eb3200593f23197bc3a9debe301c0d778",
+    "jsSha256": "72828c03b5b92948e0acd45bcd3de0263c8570bfbfaeab283eb5998e1b72b22d",
+    "buildMode": "wsl-review-no-opt",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f"
+  },
+  "verifierSha256": "a22f2bcd32413783e1e6e46127dd773f1022ca6de1ff0dc208b6c8580d257943",
+  "status": "FONT_SCOPE_PASS_AND_CONVERSION_CHECKED",
+  "results": [
+    "Declared fallback survives HWP storage at root0/94/0",
+    "Declared fallback survives HWP storage at root0/94/4",
+    "Declared fallback survives HWP storage at root0/94/6"
+  ],
+  "failures": [],
+  "fontRuns": [
+    {
+      "charStart": 0,
+      "before": {
+        "page": 7,
+        "section": 0,
+        "paragraph": 94,
+        "charStart": 0,
+        "fontFamily": "HY중고딕,한컴바탕",
+        "fontSize": 14.7
+      },
+      "after": {
+        "page": 7,
+        "section": 0,
+        "paragraph": 94,
+        "charStart": 0,
+        "fontFamily": "HY중고딕,한컴바탕",
+        "fontSize": 14.7
+      },
+      "exactFamilyEqual": true
+    },
+    {
+      "charStart": 4,
+      "before": {
+        "page": 7,
+        "section": 0,
+        "paragraph": 94,
+        "charStart": 4,
+        "fontFamily": "HY중고딕,한컴바탕",
+        "fontSize": 16
+      },
+      "after": {
+        "page": 7,
+        "section": 0,
+        "paragraph": 94,
+        "charStart": 4,
+        "fontFamily": "HY중고딕,한컴바탕",
+        "fontSize": 16
+      },
+      "exactFamilyEqual": true
+    },
+    {
+      "charStart": 6,
+      "before": {
+        "page": 7,
+        "section": 0,
+        "paragraph": 94,
+        "charStart": 6,
+        "fontFamily": "HY중고딕,한컴바탕",
+        "fontSize": 16
+      },
+      "after": {
+        "page": 7,
+        "section": 0,
+        "paragraph": 94,
+        "charStart": 6,
+        "fontFamily": "HY중고딕,한컴바탕",
+        "fontSize": 16
+      },
+      "exactFamilyEqual": true
+    }
+  ],
+  "inputSha256": "20a3960b4315626c3f97d9c5d47746e3cfadd8fe50dde43a4a424aa3a2a76936",
+  "outputSha256": "f83d5bc34b6e1f6ee8f997f79f3fcb7a2c808cfac15412968743075e1489f7e9",
+  "outputBytes": 125440,
+  "lossCount": 0,
+  "sourceUnchanged": true,
+  "inputUnchanged": true,
+  "wholeDocument": {
+    "status": "SAME_WITHIN_PUBLISHED_CONTRACT",
+    "pages": {
+      "before": 16,
+      "after": 16,
+      "equal": true
+    },
+    "geometryDifferences": 0,
+    "geometryTolerance": 0.2,
+    "semanticDifferences": 0,
+    "readIssues": {
+      "before": 0,
+      "after": 0
+    }
+  },
+  "preservation": {
+    "status": "checked",
+    "issueCount": 0
+  },
+  "scope": "Exactly three public font-family declarations through real HWP storage. Every full semantic and layout field is compared in memory through the unchanged helper and production guard. No body, snapshots, input copy, converted document or font program is written.",
+  "limitation": "This verifier now requires font identity and complete same-engine MCST HWP conversion with a checked production guard. It does not claim equality of the original public HWP to the independently Hancom-saved file, Python3 line fitting or native Hancom screen/print output."
+}

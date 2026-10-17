@@ -1,0 +1,73 @@
+{
+  "sourceId": "65b8886bcdae0760",
+  "groups": [
+    {
+      "name": "font3",
+      "passed": 3,
+      "failed": 0,
+      "verifierSha256": "a22f2bcd32413783e1e6e46127dd773f1022ca6de1ff0dc208b6c8580d257943"
+    },
+    {
+      "name": "mcst15",
+      "passed": 15,
+      "failed": 0,
+      "verifierSha256": "8169e9d3ec48d97c71857b2b144203b2ff87449d8a1012fa273d444a2e49515b"
+    },
+    {
+      "name": "whole-layout7",
+      "passed": 7,
+      "failed": 0,
+      "verifierSha256": "3b473306482ddcf224e2ba0a1b905eaaaad58fed0eab9108c74b7f3351d0dd23"
+    }
+  ],
+  "baseline81": [
+    {
+      "name": "font3",
+      "failureCount": 1,
+      "failures": [
+        {
+          "name": "Export, source immutability and unchanged preservation guard",
+          "errorType": "AssertionError"
+        }
+      ]
+    },
+    {
+      "name": "mcst15",
+      "failureCount": 1,
+      "failures": [
+        {
+          "name": "actual sixteen-page MCST: both formats twice and six alternating strict storage steps",
+          "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+          "stack": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.\n    at verifyPreservedExport (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/preservation.ts:249:9)\n    at cycles (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-mcst-flow-spacing-engine.mjs:25:18)\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-mcst-flow-spacing-engine.mjs:58:59\n    at scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-mcst-flow-spacing-engine.mjs:16:45)\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-mcst-flow-spacing-engine.mjs:55:7"
+        }
+      ]
+    },
+    {
+      "name": "whole-layout7",
+      "failureCount": 1,
+      "failures": [
+        {
+          "name": "actual MCST: sixteen pages and checked full layout through both formats twice plus six alternating saves",
+          "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+          "stack": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.\n    at verifyPreservedExport (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/preservation.ts:249:9)\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-save-layout-engine.mjs:17:38\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-save-layout-engine.mjs:5:38)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-save-layout-engine.mjs:8:1"
+        }
+      ]
+    }
+  ],
+  "actualContract": {
+    "bothFormatsTwice": true,
+    "alternatingSixSteps": true,
+    "pageCount": 16,
+    "semanticDifferences": 0,
+    "geometryDifferences": 0,
+    "productionPreservation": "checked",
+    "publicDerivedBytesWritten": 0
+  },
+  "limitations": [
+    "Pinned actual MCST same-engine conversion success is distinct from the original public HWP versus independently Hancom-saved HWPX comparison.",
+    "Historical fifteen-page lineage remains a separate corpus.",
+    "Python3 fresh line fitting and native screen/print equality are not closed here."
+  ],
+  "strictMCSTReopens": 106,
+  "allGroupsPassed": 25
+}

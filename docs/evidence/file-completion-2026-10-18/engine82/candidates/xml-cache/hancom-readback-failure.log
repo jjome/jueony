@@ -1,0 +1,21 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/mcst-cross-closure77/source-import-v7-compact80)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.61s
+     Running tests/jueony_mcst_hancom_v7.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_mcst_hancom_v7-826c4e01d09fd5fc)
+
+running 1 test
+
+thread 'actual_v7_hancom_resave_three_axes_read_only' (244362) panicked at tests/jueony_mcst_hancom_v7.rs:15:289:
+assertion `left == right` failed: Hancom reflow differs; result retained
+  left: Number(5843)
+ right: 0
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test actual_v7_hancom_resave_three_axes_read_only ... FAILED
+
+failures:
+
+failures:
+    actual_v7_hancom_resave_three_axes_read_only
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.40s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_mcst_hancom_v7`

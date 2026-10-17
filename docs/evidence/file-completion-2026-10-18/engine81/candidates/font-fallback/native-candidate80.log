@@ -1,0 +1,19 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/mcst-font-chain-readonly80/source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 45.16s
+     Running tests/jueony_font_fallback.rs (/tmp/jueony-rhwp-engine/target/transpose-closure77/debug/deps/jueony_font_fallback-34563a89beaa272d)
+
+running 9 tests
+test embedded_substitute_is_not_appended_by_existing_lookup ... ok
+test native_ttf_alternate_declaration_is_a_document_fallback ... ok
+test empty_duplicate_unknown_and_hft_alternates_do_not_invent_web_fallback ... ok
+test no_declared_alternate_remains_single_primary ... ok
+test primary_embedded_metadata_is_not_changed_by_read_only_lookup ... ok
+test serializer_uses_alternate_type_not_primary_hft_type ... ok
+test truncated_alternate_does_not_become_a_declared_fallback ... ok
+COMPILED_SOURCE src/parser/doc_info.rs f20ba6e02979f2f73d85d80c940d207ff1f565132f7d3214af1c775dd2db7aa9
+COMPILED_SOURCE src/serializer/doc_info.rs 9e496d315c2322b94c341b97426f79a48f2654c4d9c1e714c57246434d32805a
+test parser_and_serializer_compiled_source_match_candidate_disk ... ok
+test actual_mcst_three_declared_families_survive_hwp_reopen_without_numeric_claim ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+

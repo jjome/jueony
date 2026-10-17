@@ -1,0 +1,88 @@
+{
+  "status": "NATIVE_CANDIDATE_VERIFIED_NOT_FORMAL_WASM",
+  "formalBase": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-20fddc2d172763e6",
+  "candidateSource": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\mcst-historical-closure80\\source-candidate80",
+  "patch": {
+    "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\mcst-historical-closure80\\explicit-hwp5-origin-return80.patch",
+    "sha256": "d79998f948f265811568404926e71f71462b123544b3f0fda9f567a826140bfd"
+  },
+  "changedRuntimeFiles": [
+    {
+      "path": "src/document_core/converters/hwpx_to_hwp.rs",
+      "before": "981c77ed7ebe025c1b33dae59a1f44701f9655dddae3fbe08858c61657dbc931",
+      "after": "f1c2cd8b8dab5ca91faabfc60a37adea9c70df923ceecea9123759bc82a4683c"
+    }
+  ],
+  "runtimeFiles": 1063,
+  "nativeTests": [
+    {
+      "log": "native-candidate-v2.log",
+      "sha256": "27369c0374c25085133be9244154589db58da0035f91d7e6c5cdca0dd069409c",
+      "actualTests": 3,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "log": "native-actual11-v2.log",
+      "sha256": "9db04dec5887e8e4240f7856f484e1d24aa0f8b17b381650a6c2c9950e51abed",
+      "actualTests": 11,
+      "failed": 0,
+      "ignored": 0
+    },
+    {
+      "log": "native-baseline-boundaries.log",
+      "sha256": "d4ee4fe17dfc17e1dde468d056fe252f7757aa33cdccb1540a5e6f02d65ffc11",
+      "actualTests": 1,
+      "failed": 0,
+      "ignored": 0
+    }
+  ],
+  "strictReopens": {
+    "historicalClean": 4,
+    "realEditSnapshotUndoRedo": 4,
+    "actual11BothSourcesBothFormatsTwice": 88,
+    "total": 96
+  },
+  "independentReadOnlyCausality": {
+    "normalGeometry": 125,
+    "counterfactualGeometry": 0,
+    "semantic": 0,
+    "onlyDirectoryNameByteChanged": true,
+    "streamPayloadsExact": true,
+    "evidence": "profile-only-result.json"
+  },
+  "boundaryCases": 17,
+  "unchangedBaselineExclusions": [
+    "pure-hwpx",
+    "legacy-one",
+    "unknown-payload",
+    "empty-payload",
+    "duplicate-native-owner",
+    "hwp3-aux-conflict",
+    "opaque-extra-owner",
+    "existing-lineage-one",
+    "existing-lineage-opaque",
+    "existing-hwp3-stream",
+    "hwpx-lineage-conflict",
+    "hwp3-lineage-conflict",
+    "hwp5-noop",
+    "hwp3-owner",
+    "hml-owner",
+    "inconsistent-container"
+  ],
+  "historicalPages": 15,
+  "publishedGeometryTolerance": 0.2,
+  "metadata5Preserved": true,
+  "sourceLSOrParagraphMutation": false,
+  "existingMarkerRemovalOrRewrite": false,
+  "initialFailure": "failed-v1/native-candidate-v1.log",
+  "initialFailureReason": "Overly strict empty-stream premise rejected actual parser-owned six standard contract streams; expected geometry and page count were unchanged.",
+  "limitations": [
+    "Native candidate only; formal combined WASM and actual production preservation guard still require execution.",
+    "Fifteen-page historical source same-engine preservation is distinct from actual Hancom sixteen-page pagination.",
+    "Actual MCST HWPX crossing and font-family ownership are other independent candidates; not claimed fixed here.",
+    "Legacy/unknown/duplicate origin payloads, HWP3/HML, opaque or duplicate extra streams, and pre-existing HWPX lineage are outside this new origin-creation suppression. Existing behavior/payloads remain unchanged."
+  ],
+  "publicSourceFilesWritten": false,
+  "fullPublicSnapshotsWritten": false
+}

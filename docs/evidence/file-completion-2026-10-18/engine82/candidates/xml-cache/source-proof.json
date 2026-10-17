@@ -1,0 +1,24 @@
+{
+  "baseSource": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-5fd129829b65b02d",
+  "candidateSource": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\mcst-cross-closure77\\source-import-v7-compact80",
+  "baseRustCount": 1063,
+  "changedRustFiles": [
+    {
+      "path": "src/serializer/body_text.rs",
+      "beforeSHA": "1df362dcfea3726cbc308d7a107336950a9ed56803d232053fffbf1934f5ed9f",
+      "afterSHA": "c735e19a493132d05b039ec2bc3aabe954b18dce1cc26dab5212867c2881a7cf"
+    },
+    {
+      "path": "src/document_core/commands/document.rs",
+      "beforeSHA": "859522abed764a92ba973233c36fbec65f563e7fa8d9edc52b29ae754c2f63d2",
+      "afterSHA": "842207b2e5291104f82392c9cf5f55190a25207baa82732177435924cc5efae7"
+    }
+  ],
+  "patchSHA256": "e6c14fa951415784b31a3c4a2720916fe1fe5afaa13b9300f6273c0c6a2e636c",
+  "ownFiles": [
+    "src/document_core/commands/document.rs",
+    "src/serializer/body_text.rs"
+  ],
+  "rendererUnchanged": true,
+  "productionChanged": false
+}

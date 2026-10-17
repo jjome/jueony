@@ -1,0 +1,44 @@
+[
+  {
+    "path": "build\\file-closure81-native-verification\\font3\\result.json",
+    "sha256": "980ae4a2e236beec2ae8e619547a4db030699551ea1461a9afa273a16b2987d7",
+    "bytes": 18844,
+    "archive": "results/font3.json",
+    "transformation": "Engine metadata deduplicated; checked path lists reduced to count and whole-layout presence; issue messages omitted. All pass/fail, exact fonts, source hashes, numeric geometry, pages and cycle outcomes retained."
+  },
+  {
+    "path": "build\\file-closure81-native-verification\\mcst15\\result.json",
+    "sha256": "e0ab2d114ad684785e340a8b53beb6d82cb83ac46ad97c9fd5f9a2366a63e4be",
+    "bytes": 361556,
+    "archive": "results/mcst15.json",
+    "transformation": "Engine metadata deduplicated; checked path lists reduced to count and whole-layout presence; issue messages omitted. All pass/fail, exact fonts, source hashes, numeric geometry, pages and cycle outcomes retained."
+  },
+  {
+    "path": "build\\file-closure81-native-verification\\whole-layout7\\result.json",
+    "sha256": "f7a86822bdcfc8f41c7844b3db58816789dbdb1e67ed711d5c28b6430973dc96",
+    "bytes": 58431,
+    "archive": "results/whole-layout7.json",
+    "transformation": "Engine metadata deduplicated; checked path lists reduced to count and whole-layout presence; issue messages omitted. All pass/fail, exact fonts, source hashes, numeric geometry, pages and cycle outcomes retained."
+  },
+  {
+    "path": "build/font-fallback-storage-baseline80/result.json",
+    "sha256": "0fb4f9a8c428e39f306f67d486addacad1ffc6de9f605d26944bb3063ec42df9",
+    "bytes": 18894,
+    "archive": "baseline80/font3.json",
+    "transformation": "Same compact representation; original baseline failures retained."
+  },
+  {
+    "path": "build/file-closure81-historical-baseline80/result.json",
+    "sha256": "0a4d616217cacdd08a558dc03497fdfa0a9148add287667ac88717ba70f5d257",
+    "bytes": 322063,
+    "archive": "baseline80/mcst15.json",
+    "transformation": "Same compact representation; original baseline failures retained."
+  },
+  {
+    "path": "build/file-closure81-layout-baseline80/result.json",
+    "sha256": "603f7484339ee031bc7b19070f164aafdde047c331b2e075cdd55f21ef43aadb",
+    "bytes": 20060,
+    "archive": "baseline80/whole-layout7.json",
+    "transformation": "Same compact representation; original baseline failures retained."
+  }
+]

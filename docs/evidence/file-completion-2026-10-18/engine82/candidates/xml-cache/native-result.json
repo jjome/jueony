@@ -1,0 +1,77 @@
+{
+  "status": "PRIVATE_NATIVE_PASS_PENDING_WASM_AND_HANCOM",
+  "namedTests": 11,
+  "ignored": 0,
+  "mainLog": "native-import-v7compact80-strict-applied-readonly.log",
+  "staleGuardLog": "native-import-v7compact80-stale-map-guard.log",
+  "duplicateArtifactCheckNotCounted": "native-import-v7compact80-review-artifact.log",
+  "base": "official81/source-5fd129829b65b02d",
+  "patchSHA256": "e6c14fa951415784b31a3c4a2720916fe1fe5afaa13b9300f6273c0c6a2e636c",
+  "sourceChanges": [
+    {
+      "path": "src/serializer/body_text.rs",
+      "beforeSHA": "1df362dcfea3726cbc308d7a107336950a9ed56803d232053fffbf1934f5ed9f",
+      "afterSHA": "c735e19a493132d05b039ec2bc3aabe954b18dce1cc26dab5212867c2881a7cf"
+    },
+    {
+      "path": "src/document_core/commands/document.rs",
+      "beforeSHA": "859522abed764a92ba973233c36fbec65f563e7fa8d9edc52b29ae754c2f63d2",
+      "afterSHA": "842207b2e5291104f82392c9cf5f55190a25207baa82732177435924cc5efae7"
+    }
+  ],
+  "rendererChanges": 0,
+  "actual": {
+    "inputSHA256": "20a3960b4315626c3f97d9c5d47746e3cfadd8fe50dde43a4a424aa3a2a76936",
+    "beforePages": 16,
+    "afterPages": 16,
+    "publishedDifferences": 0
+  },
+  "historicalConverted": {
+    "inputSHA256": "cef8a3b80d6732be5f850c28923b27a09e2f0ff9df9a2835bc3b84c512266452",
+    "beforePages": 15,
+    "afterPages": 15,
+    "publishedDifferences": 0
+  },
+  "alternatingCodecs": [
+    "hwp",
+    "hwp",
+    "hwpx",
+    "hwp",
+    "hwpx",
+    "hwp"
+  ],
+  "alternatingAllPages": 16,
+  "alternatingAllDifferences": 0,
+  "negativeRows": {
+    "unknownAndConflictingReadMarkers": 5,
+    "existingOrConflictingSourceMarkers": 5,
+    "unsafeGeneratedCacheOwners": 9,
+    "literalVsControlRepresentation": 2,
+    "staleCacheSerializationModes": 3
+  },
+  "independentKnownUnresolved": {
+    "publicOriginalHwpSHA256": "c61a13b249183a675d38d5badfa3af610edcf99a403622440fc81b7f52b348f2",
+    "comparison": "public original HWP vs Hancom-resaved HWPX",
+    "nativePages": 15,
+    "hancomPages": 16,
+    "reportedPublishedDifferences": 21310,
+    "status": "NOT_FIXED_BY_THIS_CANDIDATE; independent native/Hancom reflow oracle still required",
+    "sourceSemanticDifferences": 4,
+    "historicalSemanticDifferences": 1,
+    "idDifferences": 1106,
+    "nonIdDifferences": 20204,
+    "oracleEvidence": "build/n002-audit81/result.json"
+  },
+  "uiReviewArtifact": {
+    "path": "mcst-actual-v7-final-native-review.hwp",
+    "bytes": 125440,
+    "sha256": "f83d5bc34b6e1f6ee8f997f79f3fcb7a2c808cfac15412968743075e1489f7e9",
+    "redistribution": "FOR_LOCAL_REVIEW_ONLY_PUBLIC_DERIVED_NOT_FOR_GIT"
+  },
+  "notClaimed": [
+    "production WASM verified",
+    "whole Hancom typography/layout equivalence",
+    "original-public MCST 15->16 reflow fixed",
+    "B009/B005/N002 or whole file part complete"
+  ]
+}

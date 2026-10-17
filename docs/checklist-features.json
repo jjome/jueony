@@ -54,7 +54,7 @@
       "key": "files",
       "file": "05-files-storage-recovery.md",
       "title": "파일·저장·복구·형식 보존",
-      "description": "열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.\n\n**2026-10-18 현재:** 합본80 기존44회귀(직접WASM27·실제 Edge17), 전체 unit930(skip0), 타입 검사·파일/복구 화면62, 캡션7·탭 간격4·전체 지면 보호7·다단24·Agent 문서 정보6을 통과했다. 확보한 실제 한글11쌍의 원본/사본 양쪽×양형식×2회 재열기도 통과했다. 복합 문서2건의 HWP 변환은 손상으로 쓰기 전에 차단되며, 변환 결함·새 줄 수용30/31 차이는 아직 미해결이다. XML/XSD는 제한된 sequence 프로필을 같은 소스로 통합7·독립13 재검수했으며 HWT/XSL·지속 복구·XML Agent는 미지원이다. 실제 Windows OS 저장·독립 창/복구·Rust29 근거는 엔진68로 구별한다. N001·N002와 전체 상위 범위를 완료로 올리지 않았다. [최신 합본·남은 결함](../110-file-preservation-integration.md) · [검수 근거](../evidence/file-completion-2026-10-18/engine80/README.md).",
+      "description": "열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.\n\n**2026-10-18 현재:** 합본82 기존44회귀(직접WASM27·실제 Edge17), unit930(skip0), 타입·모듈 경계와 필수 저장25검수를 통과했다. 복합 actual HWPX는16→16쪽·의미/배치0, 양형식2회·교대6단계 포함 총106 strict 재열기를 확인했다. 실제 한글 재저장에서 각주 바이트 슬롯·요약 정보 prefix 누락을 추가 발견해 후속 수정 중이다. 자체11쌍과 공개 Python/MCST 검수는 다른 입력이며, 직접 한글 oracle의 줄·좌표 차이와 새 줄 수용의 편집/재열기 차이는 아직 남아 있다. 원래 Windows68·화면133·XML 제한 프로필 검수는 각각의 원본 근거로 구별한다. N001·N002와 상위 범위를 완료로 올리지 않았다. [최신 합본·남은 결함](../110-file-preservation-integration.md) · [검수 근거](../evidence/file-completion-2026-10-18/engine82/README.md).",
       "ids": "B001-B002 B005-B006 B009-B011 B014 B021-B022 G065-G073 G090 G092 N001-N002",
       "related": [
         "session",

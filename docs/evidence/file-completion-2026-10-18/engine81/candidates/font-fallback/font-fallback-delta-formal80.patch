@@ -1,0 +1,77 @@
+--- a/src/parser/doc_info.rs
++++ b/src/parser/doc_info.rs
+@@ -16,7 +16,7 @@
+ use crate::model::style::{
+     Alignment, BorderFill, BorderLine, BorderLineType, Bullet, CenterLine, CharShape, DiagonalLine,
+     Fill, FillType, Font, GradientFill, ImageFill, ImageFillMode, LineSpacingType, Numbering,
+-    NumberingHead, ParaShape, SolidFill, Style, TabDef, TabItem, UnderlineType,
++    NumberingHead, ParaShape, SolidFill, Style, SubstFont, TabDef, TabItem, UnderlineType,
+ };
+ 
+ /// DocInfo 파싱 에러
+@@ -294,11 +294,34 @@
+         .read_hwp_string()
+         .map_err(|e| DocInfoError::IoError(e.to_string()))?;
+ 
+-    let alt_name = if attr & 0x80 != 0 {
+-        let _alt_type = r.read_u8().unwrap_or(0);
+-        r.read_hwp_string().ok()
++    let (alt_name, subst_font) = if attr & 0x80 != 0 {
++        let alternate_type = r.read_u8().ok();
++        let name_start = r.position();
++        let name = r.read_hwp_string().ok();
++        // The parser's historical lossy UTF-16 value stays in alt_name, but
++        // malformed source units must not acquire new fallback authority.
++        let valid_utf16 = name.is_some() && data.get(name_start + 2..r.position())
++            .is_some_and(|bytes| {
++                let units: Vec<u16> = bytes.chunks_exact(2)
++                    .map(|unit| u16::from_le_bytes([unit[0], unit[1]])).collect();
++                bytes.len() % 2 == 0 && String::from_utf16(&units).is_ok()
++            });
++        // FACE_NAME's explicit alternate TTF declaration is the same document
++        // fallback carried by HWPX substFont. Keep raw alt_name independently;
++        // unknown/HFT types and incomplete declarations are not web fallbacks.
++        let substitute = name.as_ref().filter(|face| {
++            alternate_type == Some(1) && valid_utf16 && !face.trim().is_empty()
++                && !face.chars().any(char::is_control)
++        }).map(|face| SubstFont {
++            face: face.clone(),
++            font_type: 1,
++            is_embedded: false,
++            bin_item_id_ref: String::new(),
++            resolved_bin_data_id: None,
++        });
++        (name, substitute)
+     } else {
+-        None
++        (None, None)
+     };
+ 
+     let type_info = if attr & 0x40 != 0 {
+@@ -333,8 +356,8 @@
+         alt_name,
+         type_info,
+         default_name,
+-        // HWP5 FACE_NAME 에는 HWPX substFont 개념이 없다.
+-        subst_font: None,
++        // Preserve the declared TTF fallback across the container boundary.
++        subst_font,
+     })
+ }
+ 
+--- a/src/serializer/doc_info.rs
++++ b/src/serializer/doc_info.rs
+@@ -486,7 +486,12 @@
+     w.write_hwp_string(&font.name).unwrap();
+ 
+     if let Some(alt_name) = alt_name {
+-        w.write_u8(font.alt_type & 0x03).unwrap();
++        // The alternate face has its own type; the primary may be HFT while
++        // its document-declared substitute is TTF. Do not copy the primary type.
++        let alternate_type = font.subst_font.as_ref()
++            .filter(|substitute| substitute.face == alt_name)
++            .map_or(font.alt_type & 0x03, |substitute| substitute.font_type);
++        w.write_u8(alternate_type).unwrap();
+         w.write_hwp_string(alt_name).unwrap();
+     }
+     if let Some(type_info) = font.type_info {

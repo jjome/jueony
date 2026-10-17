@@ -1,0 +1,29 @@
+{
+  "state": "WAITING_FOR_FORMAL81_METADATA_AND_BYTES",
+  "enginePackage": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-5fd129829b65b02d\\pkg",
+  "sourceId": "5fd129829b65b02d",
+  "groups": [
+    {
+      "name": "font3",
+      "script": "apps/editor/scripts/verify-font-fallback-storage-engine.mjs",
+      "count": 3,
+      "scriptSha256": "f79661307cbfa9f99ece4995f45b2c8d0bdb32311884ce6fbf715aec5654f175",
+      "output": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\file-closure81-native-verification\\font3"
+    },
+    {
+      "name": "mcst15",
+      "script": "apps/editor/scripts/verify-mcst-flow-spacing-engine.mjs",
+      "count": 15,
+      "scriptSha256": "f4e8b90febaaef27e70f003ed1e2dfcae9aa01f04cc91681bcb430e5b260082a",
+      "output": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\file-closure81-native-verification\\mcst15"
+    },
+    {
+      "name": "whole-layout7",
+      "script": "apps/editor/scripts/verify-document-save-layout-engine.mjs",
+      "count": 7,
+      "scriptSha256": "f74b30d0af12568eaf6e92f48601371b941a977199c36fb7b059ba4161fc4f6f",
+      "output": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\file-closure81-native-verification\\whole-layout7"
+    }
+  ],
+  "scope": "Read-only public originals; no public body, whole snapshot, font programs, WASM or executable copied into compact evidence; unchanged guards and geometry tolerance."
+}

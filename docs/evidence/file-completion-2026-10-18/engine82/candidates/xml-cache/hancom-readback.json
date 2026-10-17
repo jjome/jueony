@@ -1,0 +1,893 @@
+{
+  "candidateSource": "source-import-v7-compact80",
+  "compiledDocumentSourceSha256": "842207b2e5291104f82392c9cf5f55190a25207baa82732177435924cc5efae7",
+  "compiledWriterSourceSha256": "c735e19a493132d05b039ec2bc3aabe954b18dce1cc26dab5212867c2881a7cf",
+  "fullSnapshotsWritten": false,
+  "inputs": [
+    {
+      "bytes": 145995,
+      "path": "build/hancom-final-file-review-20261017/mcst-bid-2026-hwpx-hancom.hwpx",
+      "sha256": "20a3960b4315626c3f97d9c5d47746e3cfadd8fe50dde43a4a424aa3a2a76936"
+    },
+    {
+      "bytes": 125440,
+      "path": "build/mcst-cross-closure77/mcst-actual-v7-final-native-review.hwp",
+      "sha256": "f83d5bc34b6e1f6ee8f997f79f3fcb7a2c808cfac15412968743075e1489f7e9"
+    },
+    {
+      "bytes": 144473,
+      "path": "build/mcst-cross-closure77/mcst-v7-final-native-hancom-resaved.hwpx",
+      "sha256": "5e2c0bee0b8ebf8a67faf75cb9385ed76fe7f6e40c3f4b52b3eeef0dd0de1bc7"
+    }
+  ],
+  "inputsUnchanged": true,
+  "note": "Every published layout field is compared at existing0.2 tolerance. Raw native model comparison retains caches and raw IDs and is not the production TS resolved semantic reader. No source values are projected out to claim equivalence.",
+  "pairs": {
+    "actualToHancom": {
+      "afterPages": 16,
+      "beforePages": 16,
+      "firstNativeModelDifferences": [
+        {
+          "after": {
+            "characters": 64,
+            "kind": "string",
+            "sha256": "e2a1850ab143ced7eac58fab2affbaf612779acac2f3391ac264d5f34b012ccc"
+          },
+          "before": {
+            "characters": 64,
+            "kind": "string",
+            "sha256": "ed83e84ed171e9e9b555376e2666cf250fa294ec5d864d3ada13cd6cf480d80c"
+          },
+          "path": "native-model/docInfoDebugSha256"
+        },
+        {
+          "after": 49,
+          "before": 51,
+          "path": "native-model/sections/0/paragraphs/0/char_shapes/0/char_shape_id"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "native-model/sections/0/paragraphs/0/char_shapes/1/char_shape_id"
+        },
+        {
+          "after": 56623104,
+          "before": 0,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/endnote_shape/separator_length"
+        },
+        {
+          "after": 0,
+          "before": 864,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/endnote_shape/separator_margin_top"
+        },
+        {
+          "after": 55902207,
+          "before": -1,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/footnote_shape/separator_length"
+        },
+        {
+          "after": 0,
+          "before": 852,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/footnote_shape/separator_margin_top"
+        },
+        {
+          "after": 16,
+          "before": 18,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/page_border_fill/border_fill_id"
+        },
+        {
+          "after": 0,
+          "before": 36,
+          "path": "native-model/sections/0/paragraphs/0/controls/3/Footer/paragraphs/0/para_shape_id"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "native-model/sections/0/paragraphs/0/para_shape_id"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "native-model/sections/0/paragraphs/1/char_shapes/0/char_shape_id"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "native-model/sections/0/paragraphs/1/para_shape_id"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "native-model/sections/0/paragraphs/2/char_shapes/0/char_shape_id"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "native-model/sections/0/paragraphs/2/para_shape_id"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "native-model/sections/0/paragraphs/3/char_shapes/0/char_shape_id"
+        },
+        {
+          "after": 82,
+          "before": 89,
+          "path": "native-model/sections/0/paragraphs/3/char_shapes/1/char_shape_id"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "native-model/sections/0/paragraphs/3/para_shape_id"
+        },
+        {
+          "after": 82,
+          "before": 89,
+          "path": "native-model/sections/0/paragraphs/4/char_shapes/0/char_shape_id"
+        },
+        {
+          "after": 83,
+          "before": 90,
+          "path": "native-model/sections/0/paragraphs/5/char_shapes/0/char_shape_id"
+        },
+        {
+          "after": 84,
+          "before": 91,
+          "path": "native-model/sections/0/paragraphs/5/char_shapes/1/char_shape_id"
+        }
+      ],
+      "firstPublishedDifferences": [
+        {
+          "after": 70,
+          "before": 71,
+          "path": "pages/0/text/runs/length"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/0/charShapeId"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "pages/0/text/runs/0/paraShapeId"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/1/charShapeId"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "pages/0/text/runs/1/paraShapeId"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/2/charShapeId"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "pages/0/text/runs/2/paraShapeId"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/3/charShapeId"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "pages/0/text/runs/3/paraShapeId"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/4/charShapeId"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "pages/0/text/runs/4/paraShapeId"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/5/charShapeId"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "pages/0/text/runs/5/paraShapeId"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/6/charShapeId"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "pages/0/text/runs/6/paraShapeId"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/7/charShapeId"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "pages/0/text/runs/7/paraShapeId"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/8/charShapeId"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "pages/0/text/runs/8/paraShapeId"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/9/charShapeId"
+        }
+      ],
+      "nativeModelDifferences": 904,
+      "nativeModelIsProductionSemanticReader": false,
+      "publishedDifferenceFields": {
+        "1": 112,
+        "10": 97,
+        "109": 1,
+        "11": 90,
+        "12": 87,
+        "13": 83,
+        "14": 77,
+        "15": 74,
+        "16": 66,
+        "17": 64,
+        "18": 60,
+        "19": 55,
+        "2": 134,
+        "20": 55,
+        "21": 55,
+        "22": 48,
+        "23": 45,
+        "24": 45,
+        "25": 44,
+        "26": 44,
+        "27": 44,
+        "28": 40,
+        "29": 35,
+        "3": 127,
+        "30": 32,
+        "31": 29,
+        "32": 27,
+        "33": 23,
+        "34": 23,
+        "35": 23,
+        "36": 19,
+        "37": 20,
+        "38": 11,
+        "39": 10,
+        "4": 118,
+        "40": 8,
+        "41": 8,
+        "42": 6,
+        "43": 6,
+        "44": 2,
+        "45": 2,
+        "46": 2,
+        "47": 2,
+        "5": 116,
+        "6": 109,
+        "7": 108,
+        "70": 1,
+        "8": 104,
+        "87": 1,
+        "88": 2,
+        "89": 1,
+        "9": 100,
+        "90": 1,
+        "bold": 9,
+        "cellIdx": 4,
+        "cellParaIdx": 11,
+        "cellParaIndex": 7,
+        "cellPath": 4,
+        "charShapeId": 1021,
+        "charStart": 148,
+        "controlIdx": 4,
+        "fontFamily": 11,
+        "fontSize": 9,
+        "h": 9,
+        "length": 145,
+        "letterSpacing": 41,
+        "paraIdx": 25,
+        "paraShapeId": 1379,
+        "parentParaIdx": 5,
+        "secIdx": 3,
+        "text": 152,
+        "textColor": 22,
+        "w": 146,
+        "x": 144,
+        "y": 48
+      },
+      "publishedGeometryDifferences": 5843
+    },
+    "actualToNative": {
+      "afterPages": 16,
+      "beforePages": 16,
+      "firstNativeModelDifferences": [
+        {
+          "after": {
+            "characters": 64,
+            "kind": "string",
+            "sha256": "135284a04035e8a1bfd40540b936601600216219bf98f6011c589b034fba23bf"
+          },
+          "before": {
+            "characters": 64,
+            "kind": "string",
+            "sha256": "ed83e84ed171e9e9b555376e2666cf250fa294ec5d864d3ada13cd6cf480d80c"
+          },
+          "path": "native-model/docInfoDebugSha256"
+        },
+        {
+          "after": false,
+          "before": true,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/endnote_shape/deco_chars_from_source"
+        },
+        {
+          "after": false,
+          "before": true,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/footnote_shape/deco_chars_from_source"
+        },
+        {
+          "after": 19,
+          "before": 0,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/length"
+        },
+        {
+          "after": 0,
+          "before": null,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/0"
+        },
+        {
+          "after": 0,
+          "before": null,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/1"
+        },
+        {
+          "after": 0,
+          "before": null,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/2"
+        },
+        {
+          "after": 0,
+          "before": null,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/3"
+        },
+        {
+          "after": 0,
+          "before": null,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/4"
+        },
+        {
+          "after": 0,
+          "before": null,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/5"
+        },
+        {
+          "after": 0,
+          "before": null,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/6"
+        },
+        {
+          "after": 0,
+          "before": null,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/7"
+        },
+        {
+          "after": 0,
+          "before": null,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/8"
+        },
+        {
+          "after": 0,
+          "before": null,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/9"
+        },
+        {
+          "after": 0,
+          "before": null,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/10"
+        },
+        {
+          "after": 0,
+          "before": null,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/11"
+        },
+        {
+          "after": 0,
+          "before": null,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/12"
+        },
+        {
+          "after": 0,
+          "before": null,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/13"
+        },
+        {
+          "after": 0,
+          "before": null,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/14"
+        },
+        {
+          "after": 0,
+          "before": null,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/15"
+        }
+      ],
+      "firstPublishedDifferences": [],
+      "nativeModelDifferences": 2534,
+      "nativeModelIsProductionSemanticReader": false,
+      "publishedDifferenceFields": {},
+      "publishedGeometryDifferences": 0
+    },
+    "nativeToHancom": {
+      "afterPages": 16,
+      "beforePages": 16,
+      "firstNativeModelDifferences": [
+        {
+          "after": {
+            "characters": 64,
+            "kind": "string",
+            "sha256": "e2a1850ab143ced7eac58fab2affbaf612779acac2f3391ac264d5f34b012ccc"
+          },
+          "before": {
+            "characters": 64,
+            "kind": "string",
+            "sha256": "135284a04035e8a1bfd40540b936601600216219bf98f6011c589b034fba23bf"
+          },
+          "path": "native-model/docInfoDebugSha256"
+        },
+        {
+          "after": 49,
+          "before": 51,
+          "path": "native-model/sections/0/paragraphs/0/char_shapes/0/char_shape_id"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "native-model/sections/0/paragraphs/0/char_shapes/1/char_shape_id"
+        },
+        {
+          "after": true,
+          "before": false,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/endnote_shape/deco_chars_from_source"
+        },
+        {
+          "after": 56623104,
+          "before": 0,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/endnote_shape/separator_length"
+        },
+        {
+          "after": 0,
+          "before": 864,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/endnote_shape/separator_margin_top"
+        },
+        {
+          "after": true,
+          "before": false,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/footnote_shape/deco_chars_from_source"
+        },
+        {
+          "after": 55902207,
+          "before": -1,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/footnote_shape/separator_length"
+        },
+        {
+          "after": 0,
+          "before": 852,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/footnote_shape/separator_margin_top"
+        },
+        {
+          "after": 16,
+          "before": 18,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/page_border_fill/border_fill_id"
+        },
+        {
+          "after": 0,
+          "before": 19,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/length"
+        },
+        {
+          "after": null,
+          "before": 0,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/0"
+        },
+        {
+          "after": null,
+          "before": 0,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/1"
+        },
+        {
+          "after": null,
+          "before": 0,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/2"
+        },
+        {
+          "after": null,
+          "before": 0,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/3"
+        },
+        {
+          "after": null,
+          "before": 0,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/4"
+        },
+        {
+          "after": null,
+          "before": 0,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/5"
+        },
+        {
+          "after": null,
+          "before": 0,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/6"
+        },
+        {
+          "after": null,
+          "before": 0,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/7"
+        },
+        {
+          "after": null,
+          "before": 0,
+          "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/8"
+        }
+      ],
+      "firstPublishedDifferences": [
+        {
+          "after": 70,
+          "before": 71,
+          "path": "pages/0/text/runs/length"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/0/charShapeId"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "pages/0/text/runs/0/paraShapeId"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/1/charShapeId"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "pages/0/text/runs/1/paraShapeId"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/2/charShapeId"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "pages/0/text/runs/2/paraShapeId"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/3/charShapeId"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "pages/0/text/runs/3/paraShapeId"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/4/charShapeId"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "pages/0/text/runs/4/paraShapeId"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/5/charShapeId"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "pages/0/text/runs/5/paraShapeId"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/6/charShapeId"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "pages/0/text/runs/6/paraShapeId"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/7/charShapeId"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "pages/0/text/runs/7/paraShapeId"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/8/charShapeId"
+        },
+        {
+          "after": 31,
+          "before": 34,
+          "path": "pages/0/text/runs/8/paraShapeId"
+        },
+        {
+          "after": 81,
+          "before": 88,
+          "path": "pages/0/text/runs/9/charShapeId"
+        }
+      ],
+      "nativeModelDifferences": 3434,
+      "nativeModelIsProductionSemanticReader": false,
+      "publishedDifferenceFields": {
+        "1": 112,
+        "10": 97,
+        "109": 1,
+        "11": 90,
+        "12": 87,
+        "13": 83,
+        "14": 77,
+        "15": 74,
+        "16": 66,
+        "17": 64,
+        "18": 60,
+        "19": 55,
+        "2": 134,
+        "20": 55,
+        "21": 55,
+        "22": 48,
+        "23": 45,
+        "24": 45,
+        "25": 44,
+        "26": 44,
+        "27": 44,
+        "28": 40,
+        "29": 35,
+        "3": 127,
+        "30": 32,
+        "31": 29,
+        "32": 27,
+        "33": 23,
+        "34": 23,
+        "35": 23,
+        "36": 19,
+        "37": 20,
+        "38": 11,
+        "39": 10,
+        "4": 118,
+        "40": 8,
+        "41": 8,
+        "42": 6,
+        "43": 6,
+        "44": 2,
+        "45": 2,
+        "46": 2,
+        "47": 2,
+        "5": 116,
+        "6": 109,
+        "7": 108,
+        "70": 1,
+        "8": 104,
+        "87": 1,
+        "88": 2,
+        "89": 1,
+        "9": 100,
+        "90": 1,
+        "bold": 9,
+        "cellIdx": 4,
+        "cellParaIdx": 11,
+        "cellParaIndex": 7,
+        "cellPath": 4,
+        "charShapeId": 1021,
+        "charStart": 148,
+        "controlIdx": 4,
+        "fontFamily": 11,
+        "fontSize": 9,
+        "h": 9,
+        "length": 145,
+        "letterSpacing": 41,
+        "paraIdx": 25,
+        "paraShapeId": 1379,
+        "parentParaIdx": 5,
+        "secIdx": 3,
+        "text": 152,
+        "textColor": 22,
+        "w": 146,
+        "x": 144,
+        "y": 48
+      },
+      "publishedGeometryDifferences": 5843
+    }
+  },
+  "reopenCycles": [
+    {
+      "codec": "hwp",
+      "comparison": {
+        "afterPages": 16,
+        "beforePages": 16,
+        "firstNativeModelDifferences": [
+          {
+            "after": {
+              "characters": 64,
+              "kind": "string",
+              "sha256": "b27256d49b9a71b5de6a3979d96c501c7182d9f6d570a457ff4950484df96c6c"
+            },
+            "before": {
+              "characters": 64,
+              "kind": "string",
+              "sha256": "e2a1850ab143ced7eac58fab2affbaf612779acac2f3391ac264d5f34b012ccc"
+            },
+            "path": "native-model/docInfoDebugSha256"
+          },
+          {
+            "after": false,
+            "before": true,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/endnote_shape/deco_chars_from_source"
+          },
+          {
+            "after": 0,
+            "before": 56623104,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/endnote_shape/separator_length"
+          },
+          {
+            "after": false,
+            "before": true,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/footnote_shape/deco_chars_from_source"
+          },
+          {
+            "after": -1,
+            "before": 55902207,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/footnote_shape/separator_length"
+          },
+          {
+            "after": 19,
+            "before": 0,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/length"
+          },
+          {
+            "after": 0,
+            "before": null,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/0"
+          },
+          {
+            "after": 0,
+            "before": null,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/1"
+          },
+          {
+            "after": 0,
+            "before": null,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/2"
+          },
+          {
+            "after": 0,
+            "before": null,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/3"
+          },
+          {
+            "after": 0,
+            "before": null,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/4"
+          },
+          {
+            "after": 0,
+            "before": null,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/5"
+          },
+          {
+            "after": 0,
+            "before": null,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/6"
+          },
+          {
+            "after": 0,
+            "before": null,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/7"
+          },
+          {
+            "after": 0,
+            "before": null,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/8"
+          },
+          {
+            "after": 0,
+            "before": null,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/9"
+          },
+          {
+            "after": 0,
+            "before": null,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/10"
+          },
+          {
+            "after": 0,
+            "before": null,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/11"
+          },
+          {
+            "after": 0,
+            "before": null,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/12"
+          },
+          {
+            "after": 0,
+            "before": null,
+            "path": "native-model/sections/0/paragraphs/0/controls/0/SectionDef/raw_ctrl_extra/13"
+          }
+        ],
+        "firstPublishedDifferences": [],
+        "nativeModelDifferences": 2537,
+        "nativeModelIsProductionSemanticReader": false,
+        "publishedDifferenceFields": {},
+        "publishedGeometryDifferences": 0
+      },
+      "lossEmpty": true,
+      "outputSha256": "edfc8ec13151f6b5212bebfa4699c2766f74c864233ccbcdeaa1642334cd04f7"
+    },
+    {
+      "codec": "hwpx",
+      "comparison": {
+        "afterPages": 16,
+        "beforePages": 16,
+        "firstNativeModelDifferences": [
+          {
+            "after": {
+              "characters": 64,
+              "kind": "string",
+              "sha256": "a137a6f45117bd14ff4ae05ce113357038dc5df031b5d869201daf7dcfb35f24"
+            },
+            "before": {
+              "characters": 64,
+              "kind": "string",
+              "sha256": "e750b20cb653b814ff027f3abeeda429475a84f765da789c923b8934be5c8c7f"
+            },
+            "path": "native-model/summary/fingerprint"
+          }
+        ],
+        "firstPublishedDifferences": [],
+        "nativeModelDifferences": 1,
+        "nativeModelIsProductionSemanticReader": false,
+        "publishedDifferenceFields": {},
+        "publishedGeometryDifferences": 0
+      },
+      "lossEmpty": true,
+      "outputSha256": "10512c3711d58e7d4c83b0176a22412fc6f1291895036b126612fec52ee9ef0d"
+    }
+  ]
+}

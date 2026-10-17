@@ -1,0 +1,42 @@
+{
+  "controlledValidMetricReplies": 1,
+  "measuredAdvancePx": 40,
+  "activeBefore": true,
+  "activePlan": [
+    {
+      "afterHeight": 9981,
+      "beforeHeight": 0,
+      "cellSpacingHu": 0,
+      "changed": false,
+      "contract": "plain-unprotected-content-frame-v1",
+      "controlIdx": 0,
+      "paraIdx": 1,
+      "rowHeightsHu": [
+        7217,
+        1482,
+        1282
+      ],
+      "sectionIdx": 0
+    }
+  ],
+  "error": null,
+  "activeAfter": true,
+  "portablePlan": [
+    {
+      "afterHeight": 5181,
+      "beforeHeight": 9981,
+      "cellSpacingHu": 0,
+      "changed": false,
+      "contract": "plain-unprotected-content-frame-v1",
+      "controlIdx": 0,
+      "paraIdx": 1,
+      "rowHeightsHu": [
+        2417,
+        1482,
+        1282
+      ],
+      "sectionIdx": 0
+    }
+  ],
+  "note": "Synthetic valid Canvas metric input exercises true Canvas context through actual WASM, not a browser font measurement or independent Hancom oracle."
+}

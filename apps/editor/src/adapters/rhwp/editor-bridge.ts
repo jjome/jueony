@@ -25,6 +25,7 @@ import { createDocumentFacades } from '../../modules/document/public/index.ts';
 import { executeDocumentOperations } from './execute.ts';
 import { readStructure } from './structure.ts';
 import {verifyPreservedExport} from './preservation.ts';
+import {planSaveTableFrames,applySaveTableFrames} from './save-table-frames.ts';
 import {readNativeFormattingState} from './formatting-toolbar.ts';
 import { plainSnapshot } from '../../modules/document/public/index.ts';
 import type { Snapshot, Receipt, EditProposal as Generation } from '../../modules/document/public/index.ts';
@@ -32,6 +33,7 @@ type Deps={wasm:any;eventBus:any;documentState:any;ready:Promise<unknown>;load:(
 export function installAgentBridge(d:Deps){
  const api=(window as any).jueonyEditor;let applying=false,composing=false,damaged=false;
  const applied=new Map<string,Receipt>();
+ const savedRequestRevisions=new Map<string,{before:string;after:string;command:any}>();
  document.addEventListener('compositionstart',()=>composing=true,true);document.addEventListener('compositionend',()=>composing=false,true);
  const revision=()=>api.revision() as string;
  const textOf=(doc:any)=>{const value=JSON.parse(doc.getTextFileUnicode());return typeof value==='string'?value:typeof value.text==='string'?value.text:JSON.stringify(value);};
@@ -78,6 +80,35 @@ export function installAgentBridge(d:Deps){
    return model;
   },
   focusEditor:()=>d.input()?.focus(),
+  async prepareFileSave(format:string){
+   if(format!=='hwp'&&format!=='hwpx')return {changedTables:0};
+   if(applying||damaged||api.busy()||composing)throw new Error('문서 작업 또는 한글 조합이 끝난 뒤 저장해 주세요.');
+   d.input()?.flushDeferredPaginationIfNeeded('jueony-save-layout');
+   const beforeRevision=revision(),plans=planSaveTableFrames(d.wasm);
+   assertRevision(beforeRevision,revision());
+   if(!plans.length)return {changedTables:0};
+   const input=d.input();if(!input)throw new Error('편집기가 준비되지 않았습니다.');
+   const beforeBytes=recoveryBytes(d.wasm,d.wasm.fileName),previous=input.history.peekUndoTop();
+   applying=true;const root=document.getElementById('studio-root')!,inert=root.inert;root.inert=true;
+   const overlay=Object.assign(document.createElement('div'),{id:'jueony-busy',textContent:'표의 저장 높이를 확인하고 있습니다…'});document.body.append(overlay);
+   try{
+    await input.executeDocumentAgentOperation({kind:'snapshot',operationType:'jueony:save-table-frames',operation:(wasm:any)=>{
+     assertRevision(beforeRevision,revision());applySaveTableFrames(wasm,plans,format);return input.getCursorPosition();
+    }},()=>d.render());
+    const current=input.history.peekUndoTop();
+    const absorbedIntoPrevious=Boolean(previous&&input.history.absorbSaveFrameSnapshot(previous,current,d.wasm));
+    if(absorbedIntoPrevious&&previous.type.startsWith('snapshot:jueony:')){
+     const runId=previous.type.slice('snapshot:jueony:'.length),receipt=applied.get(runId);
+     if(receipt?.afterRevision===beforeRevision)savedRequestRevisions.set(runId,{before:beforeRevision,after:revision(),command:previous});
+    }
+    return {changedTables:plans.length,beforeRevision,afterRevision:revision(),absorbedIntoPrevious};
+   }catch(error){
+    let restored=false;
+    try{const bytes=recoveryBytes(d.wasm,d.wasm.fileName);restored=bytes.length===beforeBytes.length&&bytes.every((value:number,index:number)=>value===beforeBytes[index]);}catch{}
+    if(!restored){damaged=true;d.documentState.markDirty('save-table-frame-partial');}
+    throw error;
+   }finally{applying=false;root.inert=inert;overlay.remove();}
+  },
   executeCommand(id:string,params?:Record<string,unknown>){
    if(applying||damaged||api.busy()||composing)throw new Error('문서 작업 또는 한글 조합이 끝난 뒤 실행해 주세요.');
    d.input()?.focus();
@@ -167,10 +198,13 @@ export function installAgentBridge(d:Deps){
   },
   async undoRequest(receipt:Receipt){
    if(applying||api.busy()||composing)throw new Error('다른 작업 중입니다.');
-   assertRevision(receipt.afterRevision,revision());const input=d.input();
+   const input=d.input(),saved=savedRequestRevisions.get(receipt.runId),owned=applied.get(receipt.runId);
+   const expected=saved&&owned?.afterRevision===receipt.afterRevision&&saved.before===receipt.afterRevision&&input?.history?.peekUndoTop()===saved.command?saved.after:receipt.afterRevision;
+   assertRevision(expected,revision());
    if(input?.history?.peekUndoTop()?.type!=='snapshot:jueony:'+receipt.runId)throw new Error('요청 이후 편집 이력이 달라져 이 요청만 되돌릴 수 없습니다.');
    const result=d.automation.execute('edit:undo');if(!result.ok)throw new Error('되돌리기 실패');
    await d.render();const restored=snapshot();if(plainSnapshot(restored)!==receipt.before||receipt.beforeStructure&&JSON.stringify(restored.structure)!==JSON.stringify(receipt.beforeStructure))throw new Error('되돌림 결과를 확인하지 못했습니다.');
+   savedRequestRevisions.delete(receipt.runId);
    // Keep the request ID consumed after undo; replay must use a new run ID.
   },
  };

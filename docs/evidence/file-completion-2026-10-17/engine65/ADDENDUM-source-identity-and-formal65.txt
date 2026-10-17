@@ -1,0 +1,38 @@
+Additive evidence after the original53-file snapshot
+
+The original filehash-manifest.json is byte-unchanged (SHA256
+95a42b6a2d606bfbdbcce1c2dd675960b9cb77228dfa0a0737ae101787103e9b).
+Its listed53 payload files remain unchanged. New evidence is listed separately
+in second-filehash-manifest.json. Use reproduce/verify-second-manifest.py for
+this combined tree. The original strict inventory utility is appropriate for
+the original tree only; it intentionally rejects unregistered additive files.
+
+Read-only source identity diagnosis:
+Eight fresh PowerShell processes reconstructed the existing sourceId input
+without invoking Build-DocumentEngine, PrepareOnly, git apply or Cargo.
+An unordered @{name;sha256} patchEvidence entry serialized with process-dependent
+property order. It reproduced exactly1828b4f4611a3e11 and325a6ca5b67c6fe1.
+Both parsed65-patch lists were identical. An [ordered] entry produced one stable
+control hash across all8 processes. The proposed minimal patch changes only
+that inner hashtable to [ordered]. It has NOT been applied by this analysis.
+The Build script own SHA is also an identity input; applying the fix will rightly
+create a new identity, then subsequent process outputs will be stable.
+
+The two prepared source trees have1332 src files with all raw bytes identical;
+no LF normalization was used for that comparison. Their metadata differs only
+in nonsemantic JSON order and sourceId. The separate private-v4 LF vs official
+CRLF source comparison remains explicit in the original proof.
+
+Parent completed formal65 at source-325a6ca5b67c6fe1/pkg. Actual JS/WASM and both
+TypeScript binding files were compared byte-for-byte with private-v4: all4 equal.
+All8 exported regression artifacts were rerun with formal65 and equal the prior
+private-v4 bytes. The two auto-zero formats therefore equal the exact bytes
+already opened and separately saved in Hancom by root. Their retained actual
+SaveAs comparison is semantic0/full published geometry0/page1/readissues0.
+No additional Hancom UI execution is claimed by this additive analysis.
+
+Formal Node/WASM reruns:20 strict+5 real Canvas context+15 exclusions+2 extended
++12 width=54PASS. These repeat the prior private scopes; never add54 to private68
+as distinct coverage. No formal Rust14, Browser or Windows GUI run is claimed by
+this analysis. Parent and another worker own the remaining release validation.
+No compiled engine, public document, font or full snapshot has been added.

@@ -1,0 +1,76 @@
+{
+  "status": "PERMANENT_STAGING_PRIVATE_EVIDENCE; formal65 prepared but no formalWASM/frontend result claimed here",
+  "selfAuthoredOnly": true,
+  "scope": "Explicit plain unprotected content-frame height synchronization plus narrow closed whole-stack source-spacing and marked-HWPX multiple-table HWP lineage preservation.",
+  "corePrivateCandidate": {
+    "sourceId": "private-height-sync-v4-5e9b4dce4da46d62",
+    "automatedPassed": 63,
+    "failed": 0,
+    "results": "candidate-summary.json"
+  },
+  "additionalAppContextRegression": {
+    "passed": 5,
+    "failed": 0,
+    "results": "app-review/canvas-portable-fixed5.json",
+    "preservedCounterexample": "app-review/canvas-active-height-context-failure.json",
+    "includedInCore63": false
+  },
+  "reproductionSmoke": {
+    "excluded": 15,
+    "fourFiveTable": 2,
+    "alreadyCountedScopes": true,
+    "notAdditionalCoverage": true
+  },
+  "independentActualHancom": {
+    "originalControlledInputs": 5,
+    "actualControlledSaveAs": 5,
+    "integerOracleMatches": 5,
+    "finalOutputFormatsActuallyOpenedAndSavedByRoot": [
+      "hwp",
+      "hwpx"
+    ],
+    "actualHancomComparedSemanticDifferences": 0,
+    "actualHancomComparedPublishedGeometryDifferences": 0,
+    "geometryTolerance": 0.2,
+    "byteIdentityConnectsPrivateV4ToActualUiInput": true,
+    "notANewFormalUiRun": true
+  },
+  "unsupportedProtectedContract": {
+    "unprotectedExamplesCommonBefore": [
+      0,
+      9000
+    ],
+    "unprotectedActualSavedHeight": 5181,
+    "explicitRealCellHeight3000PerRowActualSavedCommon": 9000,
+    "protectedExamplesCommonBefore": [
+      1400,
+      9000
+    ],
+    "protectedActualSavedCommon": 1981,
+    "protectedUiClipsContent": true,
+    "supportedByNew47Command": false,
+    "originalCellHeightsRemainExactAcrossAllFive": true
+  },
+  "remainingLimits": [
+    "Protected clipping/row-floor1981 remains unsupported by47; no content-growth normalization is applied.",
+    "Merged/nested/field/partial/multipage/absolute/unknown sources outside proven narrow boundaries remain unchanged or rejected.",
+    "No new Agent capability is enabled.",
+    "Full unparsed XML/binary ownership, print equivalence and unrelated advanced document features are not proved by these checks.",
+    "Formal combined engine/frontend, real browser app save/history verification and parent integration remain separate."
+  ],
+  "excludedFromBundle": [
+    "public documents or public derivatives",
+    "full semantic/layout snapshots",
+    "font files",
+    "compiled binaries",
+    "WASM/runtime packages",
+    "seven candidate runtime Rust source files (remain in ignored source proof, not redistributed here)"
+  ],
+  "history": "history/failed-v1-v2-history.json",
+  "patches": "proofs/patch-hashes.json",
+  "sourceProof": "proofs/source-proof.json",
+  "actualUiByteLink": "proofs/actual-hancom-byte-link.json",
+  "formalPreparedSource": "source-1828b4f4611a3e11",
+  "formalPreparedPatchCount": 65,
+  "formalBuildNotYetClaimed": true
+}

@@ -1,0 +1,154 @@
+--- a/src/document_core/commands/table_ops.rs
++++ b/src/document_core/commands/table_ops.rs
+@@ -4620,3 +4620,107 @@
+         }
+     }
+ }
++
++impl DocumentCore {
++    /// Read-only plan for an explicit plain-table aggregate-height synchronization.
++    /// The application must bind this plan to its document revision/snapshot.
++    pub fn get_table_content_height_plan_native(&self, section_idx: usize, para_idx: usize, control_idx: usize) -> Result<String, HwpError> {
++        self.plain_table_content_height_plan(section_idx, para_idx, control_idx).map(|plan| plan.to_string())
++    }
++
++    /// Apply only an independently revalidated plan. Export/getters never call this.
++    pub fn apply_table_content_height_plan_native(&mut self, section_idx: usize, para_idx: usize, control_idx: usize, expected_before: u32, expected_after: u32) -> Result<String, HwpError> {
++        let mut plan = self.plain_table_content_height_plan(section_idx, para_idx, control_idx)?;
++        let before = plan["beforeHeight"].as_u64().unwrap() as u32;
++        let after = plan["afterHeight"].as_u64().unwrap() as u32;
++        if before != expected_before || after != expected_after {
++            return Err(HwpError::RenderError("Stale table content-height plan".into()));
++        }
++        if before != after {
++            self.get_table_mut(section_idx, para_idx, control_idx)?.sync_ctrl_height(after);
++            self.document.sections[section_idx].raw_stream = None;
++            self.invalidate_table_geometry_measurement(section_idx, para_idx, control_idx);
++            self.recompose_section(section_idx);
++            self.paginate_if_needed();
++            self.event_log.push(crate::model::event::DocumentEvent::TableContentHeightSynchronized {
++                section: section_idx, para: para_idx, ctrl: control_idx, before, after,
++            });
++        }
++        plan["changed"] = serde_json::Value::Bool(before != after);
++        Ok(plan.to_string())
++    }
++
++    fn plain_table_content_height_plan(&self, section_idx: usize, para_idx: usize, control_idx: usize) -> Result<serde_json::Value, HwpError> {
++        use crate::model::shape::{SizeCriterion, TextWrap, VertRelTo, VertAlign};
++        use crate::model::table::TablePageBreak;
++        use crate::renderer::{height_measurer::HeightMeasurer, pagination::PageItem};
++        let unsupported = || HwpError::RenderError("Unsupported table content-height synchronization scope".into());
++        if self.page_count() != 1 || self.effective_layout_profile().hwp3_layout() { return Err(unsupported()); }
++        let section = self.document.sections.get(section_idx).ok_or_else(unsupported)?;
++        let host = section.paragraphs.get(para_idx).ok_or_else(unsupported)?;
++        let Some(Control::Table(source)) = host.controls.get(control_idx) else { return Err(unsupported()); };
++        let table = source.as_ref();
++        if !host.text.is_empty() || host.controls.iter().filter(|c| matches!(c,Control::Table(_))).count() != 1
++            || host.controls.iter().any(|c| !matches!(c,Control::Table(_) | Control::SectionDef(_) | Control::ColumnDef(_)))
++            || table.common.size_protect || table.common.locked || table.attr & (1 << 30) != 0
++            || table.common.treat_as_char || table.raw_table_record_attr & 8 != 0
++            || table.common.height >= 0x8000_0000 || table.common.width == 0
++            || table.common.height_criterion != SizeCriterion::Absolute
++            || table.common.text_wrap != TextWrap::TopAndBottom
++            || table.common.vert_rel_to != VertRelTo::Para || table.common.vert_align != VertAlign::Top
++            || table.common.vertical_offset >= 0x8000_0000
++            || table.caption.is_some() || !table.zones.is_empty()
++            || table.page_break != TablePageBreak::None
++            || table.row_count == 0 || table.row_count > 128 || table.col_count == 0 || table.col_count > 64
++            || table.cells.len() != usize::from(table.row_count) * usize::from(table.col_count) || table.cells.len() > 4096 {
++            return Err(unsupported());
++        }
++        if !table.raw_ctrl_data.is_empty() && (table.raw_ctrl_data.len() < 20
++            || u32::from_le_bytes(table.raw_ctrl_data[16..20].try_into().unwrap()) != table.common.height) { return Err(unsupported()); }
++        let mut occupied = std::collections::BTreeSet::new();
++        for cell in &table.cells {
++            if cell.row_span != 1 || cell.col_span != 1 || cell.row >= table.row_count || cell.col >= table.col_count
++                || !occupied.insert((cell.row,cell.col)) || cell.width == 0 || cell.width >= 0x8000_0000
++                || cell.height == 0 || cell.height >= 0x8000_0000 || cell.text_direction != 0 || cell.cell_protect() || cell.field_name.is_some()
++                || cell.paragraphs.is_empty() || cell.paragraphs.iter().any(|p| !p.controls.is_empty()
++                    || !p.field_ranges.is_empty() || !p.orphan_field_ends.is_empty() || !p.range_tags.is_empty()
++                    || !p.title_marks.is_empty() || p.ctrl_data_records.iter().any(Option::is_some)
++                    || p.text.chars().any(|ch| ch < ' ')
++                    || p.line_segs.iter().any(|line| line.vertical_pos < 0 || line.line_height <= 0)) { return Err(unsupported()); }
++            let pad = cell.effective_padding(&table.padding);
++            if pad.top < 0 || pad.bottom < 0 || pad.left < 0 || pad.right < 0 { return Err(unsupported()); }
++        }
++        let mut owners = 0;
++        for page in &self.pagination.get(section_idx).ok_or_else(unsupported)?.pages {
++            for column in &page.column_contents { for item in &column.items {
++                match item {
++                    PageItem::Table{para_index,control_index} if *para_index==para_idx && *control_index==control_idx => owners += 1,
++                    PageItem::PartialTable{para_index,control_index,..} if *para_index==para_idx && *control_index==control_idx => return Err(unsupported()),
++                    _ => {}
++                }
++            }}
++        }
++        if owners != 1 { return Err(unsupported()); }
++        // This clone excludes only the derived aggregate frame; all real row/cell
++        // minima, contents, styles and effective margins remain authoritative.
++        let mut probe = table.clone();
++        probe.common.height = 0;
++        let profile = self.effective_layout_profile();
++        let measurer = HeightMeasurer::new(self.dpi)
++            .with_native_hwp5(profile.native_hwp5_layout())
++            .with_hwpx_stored_layout(profile.hwpx_stored_layout())
++            .with_session_edited(profile.session_edited())
++            .with_render_normalization(std::sync::Arc::clone(&self.render_normalization.overlay));
++        let styles = self.styles.for_section(section_idx);
++        let measured = measurer.measure_table(&probe, para_idx, control_idx, &styles);
++        if measured.row_heights.len() != usize::from(table.row_count)
++            || measured.row_heights.iter().any(|h| !h.is_finite() || *h <= 0.0)
++            || !measured.cell_spacing.is_finite() || measured.cell_spacing < 0.0 { return Err(unsupported()); }
++        let body = measured.row_heights.iter().sum::<f64>() + measured.cell_spacing * usize::from(table.row_count).saturating_sub(1) as f64;
++        let hu = body * 7200.0 / self.dpi;
++        if !hu.is_finite() || hu <= 0.0 || hu > i32::MAX as f64 { return Err(unsupported()); }
++        let after = hu.round() as u32;
++        let rows: Vec<u32> = measured.row_heights.iter().map(|h| (*h * 7200.0 / self.dpi).round() as u32).collect();
++        Ok(serde_json::json!({"contract":"plain-unprotected-content-frame-v1","sectionIdx":section_idx,"paraIdx":para_idx,"controlIdx":control_idx,"beforeHeight":table.common.height,"afterHeight":after,"rowHeightsHu":rows,"cellSpacingHu":table.cell_spacing,"changed":false}))
++    }
++}
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -3475,6 +3475,17 @@
+             cell_idx as usize,
+         )
+         .map_err(|e| e.into())
++    }
++
++    /// Read a bounded, read-only aggregate table-height plan.
++    #[wasm_bindgen(js_name = getTableContentHeightPlan)]
++    pub fn get_table_content_height_plan(&self, section_idx: u32, para_idx: u32, control_idx: u32) -> Result<String, JsValue> {
++        self.get_table_content_height_plan_native(section_idx as usize, para_idx as usize, control_idx as usize).map_err(|e| e.into())
++    }
++    /// Apply an explicit plan inside the caller's revision/snapshot transaction.
++    #[wasm_bindgen(js_name = applyTableContentHeightPlan)]
++    pub fn apply_table_content_height_plan(&mut self, section_idx: u32, para_idx: u32, control_idx: u32, expected_before: u32, expected_after: u32) -> Result<String, JsValue> {
++        self.apply_table_content_height_plan_native(section_idx as usize, para_idx as usize, control_idx as usize, expected_before, expected_after).map_err(|e| e.into())
+     }
+ 
+     /// 셀 속성을 수정한다.
+--- a/src/model/event.rs
++++ b/src/model/event.rs
+@@ -78,6 +78,9 @@
+         section: usize,
+         para: usize,
+     },
++
++    /// Explicit aggregate table-frame update; real row/cell minima are unchanged.
++    TableContentHeightSynchronized { section: usize, para: usize, ctrl: usize, before: u32, after: u32 },
+ 
+     // ── 표 구조 ──
+     /// 셀 또는 글상자의 경로로 지정한 내부 표를 삭제했다.
+@@ -373,6 +376,11 @@
+             } => format!(
+                 r#"{{"type":"TableCellsTransposed","section":{},"para":{},"ctrl":{}}}"#,
+                 section, para, ctrl
++            ),
++
++            DocumentEvent::TableContentHeightSynchronized { section, para, ctrl, before, after } => format!(
++                r#"{{"type":"TableContentHeightSynchronized","section":{},"para":{},"ctrl":{},"beforeHeight":{},"afterHeight":{}}}"#,
++                section, para, ctrl, before, after
+             ),
+ 
+             // 개체

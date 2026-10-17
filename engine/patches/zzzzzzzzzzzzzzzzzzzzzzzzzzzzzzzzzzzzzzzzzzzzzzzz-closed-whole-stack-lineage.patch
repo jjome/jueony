@@ -1,0 +1,123 @@
+--- a/src/renderer/float_placement.rs
++++ b/src/renderer/float_placement.rs
+@@ -335,6 +335,45 @@
+         && para.text.is_empty()
+         && only_table
+         && matches!(para.line_segs.as_slice(), [line] if line.segment_width == 0 && line.tag & 0x8000_0000 == 0)
++}
++
++/// A markerless HWPX whole-table source stack closes exactly at the declared
++/// physical frames. Hancom SaveAs removes the HWP5 lineage marker but retains
++/// this integer source proof; its empty host spacing is not another blank row.
++/// Dense, gapped, dirty, protected, absolute or ambiguous ladders do not qualify.
++pub(crate) fn stored_closed_whole_table_stack(paragraphs: &[Paragraph], at: usize) -> bool {
++    fn owner(p: &Paragraph) -> Option<&Table> {
++        let [Control::Table(t)] = p.controls.as_slice() else { return None; };
++        if !object_only_saved_table_anchor(p, t) || p.stored_text_partition_is_dirty()
++            || p.cell_format_vpos_dirty || t.page_break != TablePageBreak::None
++            || t.common.vert_rel_to != VertRelTo::Para || t.common.vert_align != VertAlign::Top
++            || signed_hwpunit(t.common.vertical_offset) != 0 || t.common.size_protect
++            || t.common.locked || t.attr & (1 << 30) != 0 || t.raw_table_record_attr & 8 != 0
++            || t.common.height_criterion != crate::model::shape::SizeCriterion::Absolute
++            || t.common.height == 0 || t.common.height >= 0x8000_0000
++            || t.caption.is_some() || !t.zones.is_empty() || t.cells.is_empty() || t.cells.len() > 4096
++            || t.cells.iter().any(|cell| cell.row_span != 1 || cell.col_span != 1
++                || cell.cell_protect() || cell.field_name.is_some() || cell.text_direction != 0
++                || cell.paragraphs.is_empty() || cell.paragraphs.iter().any(|p|
++                    !p.controls.is_empty() || !p.field_ranges.is_empty() || !p.orphan_field_ends.is_empty()
++                    || !p.range_tags.is_empty() || !p.title_marks.is_empty()
++                    || p.ctrl_data_records.iter().any(Option::is_some)))
++            || !matches!(p.line_segs.as_slice(), [line] if line.vertical_pos >= 0
++                && line.line_height > 0 && line.tag & 0x8000_0000 == 0) { return None; }
++        Some(t)
++    }
++    if paragraphs.get(at).and_then(owner).is_none() { return false; }
++    let has_table=|p: &Paragraph| p.controls.iter().any(|c| matches!(c, Control::Table(_)));
++    let mut start=at; while start>0 && has_table(&paragraphs[start-1]) { start-=1; }
++    let mut end=at+1; while end<paragraphs.len() && has_table(&paragraphs[end]) { end+=1; }
++    if end-start<2 || end-start>64 || !paragraphs[start..end].iter().all(|p| owner(p).is_some()) { return false; }
++    paragraphs[start..end].windows(2).all(|pair| {
++        let previous=owner(&pair[0]).unwrap();
++        let a=&pair[0].line_segs[0]; let b=&pair[1].line_segs[0];
++        let occupied=i64::from(previous.common.height)+i64::from(previous.outer_margin_top)
++            +i64::from(previous.outer_margin_bottom);
++        a.column_start==b.column_start && i64::from(b.vertical_pos)-i64::from(a.vertical_pos)==occupied
++    })
+ }
+ 
+ pub(crate) fn block_table_caption_host_spacing_px(
+--- a/src/renderer/typeset/controls/flow_table.rs
++++ b/src/renderer/typeset/controls/flow_table.rs
+@@ -85,7 +85,8 @@
+ 
+     // Only native single-column adjacent whole-table frames own this empty
+     // anchor spacing. Keep all actual style margins and offset contracts in ft.
+-    let starts_semantic_stack = st.col_count == 1 && st.profile.hwp5_stored_pagination_layout()
++    let starts_semantic_stack = st.col_count == 1 && (st.profile.hwp5_stored_pagination_layout()
++            || (st.profile.hwpx_stored_layout() && crate::renderer::float_placement::stored_closed_whole_table_stack(paragraphs_all, para_idx)))
+             && !st.current_items.iter().any(|item| matches!(item, super::super::PageItem::PartialTable { .. } | super::super::PageItem::Shape { .. }))
+             && matches!(st.current_items.first(), Some(super::super::PageItem::FullParagraph { para_index })
+                 if paragraphs_all.get(*para_index).and_then(|host| host.line_segs.first())
+@@ -118,7 +119,8 @@
+     // Only the already-emitted adjacent native whole-table stack owns this
+     // continuation. The old empty-anchor advance encoded in LINE_SEG is not
+     // an additional blank line after the second physical frame (Hancom 2024).
+-    let semantic_stack = st.col_count == 1 && st.profile.hwp5_stored_pagination_layout()
++    let semantic_stack = st.col_count == 1 && (st.profile.hwp5_stored_pagination_layout()
++            || (st.profile.hwpx_stored_layout() && crate::renderer::float_placement::stored_closed_whole_table_stack(paragraphs_all, para_idx)))
+             && !st.current_items.iter().any(|item| matches!(item, super::super::PageItem::PartialTable { .. } | super::super::PageItem::Shape { .. }))
+             && matches!(st.current_items.first(), Some(super::super::PageItem::FullParagraph { para_index })
+                 if paragraphs_all.get(*para_index).and_then(|host| host.line_segs.first())
+--- a/src/renderer/typeset/table/block/entry.rs
++++ b/src/renderer/typeset/table/block/entry.rs
+@@ -1545,7 +1545,8 @@
+         // An empty host LINE_SEG is a cache, not an independent inter-frame gap.
+         // Use current flow only for an emitted adjacent native whole-table stack;
+         // actual paragraph margins and vertical offsets stay in the placement.
+-        let semantic_whole_stack = st.col_count == 1 && st.profile.hwp5_stored_pagination_layout()
++        let semantic_whole_stack = st.col_count == 1 && (st.profile.hwp5_stored_pagination_layout()
++            || (st.profile.hwpx_stored_layout() && crate::renderer::float_placement::stored_closed_whole_table_stack(paragraphs_all, para_idx)))
+             && !st.current_items.iter().any(|item| matches!(item, PageItem::PartialTable { .. } | PageItem::Shape { .. }))
+             && matches!(st.current_items.first(), Some(PageItem::FullParagraph { para_index })
+                 if paragraphs_all.get(*para_index).and_then(|host| host.line_segs.first())
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -2414,18 +2414,23 @@
+         let ([section], [pagination]) = (self.document.sections.as_slice(), self.pagination.as_slice()) else { return false; };
+         let [page] = pagination.pages.as_slice() else { return false; };
+         let [column] = page.column_contents.as_slice() else { return false; };
++        // The source contract belongs to each already-emitted adjacent whole
++        // frame, not to an arbitrary fixed count of two. A third whole frame
++        // must not turn HWP5-origin cache rows back into pure-HWPX rows.
+         if column.zone_layout.is_some() || column.zone_y_offset != 0.0
+             || column.start_height != 0.0 || column.endnote_flow
+-            || !matches!(column.items.as_slice(), [PageItem::FullParagraph { para_index: 0 },
+-                PageItem::Table { para_index: 1, control_index: 0 },
+-                PageItem::Table { para_index: 2, control_index: 0 }, ..])
+-            || column.items[3..].iter().any(|item| !matches!(item,
+-                PageItem::FullParagraph { para_index } if *para_index >= 3)) { return false; }
++            || !matches!(column.items.first(), Some(PageItem::FullParagraph { para_index: 0 })) {
++            return false;
++        }
++        let table_count=column.items.iter().skip(1).enumerate().take_while(|(i,item)|
++            matches!(item, PageItem::Table { para_index, control_index: 0 } if *para_index == i+1)).count();
++        if table_count<2 || column.items[table_count+1..].iter().any(|item| !matches!(item,
++                PageItem::FullParagraph { para_index } if *para_index >= table_count+1)) { return false; }
+         let Some(first) = section.paragraphs.first() else { return false; };
+         if first.line_segs.first().is_none_or(|l| l.vertical_pos != 0
+                 || l.tag & crate::model::paragraph::LineSeg::TAG_IMPLEMENTATION_PROPERTY != 0)
+             || first.controls.iter().any(|c| !matches!(c, Control::SectionDef(_) | Control::ColumnDef(_))) { return false; }
+-        for pi in [1, 2] {
++        for pi in 1..=table_count {
+             let Some(host) = section.paragraphs.get(pi) else { return false; };
+             let [Control::Table(table)] = host.controls.as_slice() else { return false; };
+             if table.page_break != crate::model::table::TablePageBreak::None
+@@ -2438,7 +2443,7 @@
+                     !matches!(control, Control::AutoNumber(number)
+                         if number.number_type == crate::model::control::AutoNumberType::Table)))) { return false; }
+         }
+-        section.paragraphs.iter().skip(3).all(|p| {
++        section.paragraphs.iter().skip(table_count+1).all(|p| {
+             if p.controls.iter().all(|c| matches!(c, Control::Bookmark(_))) { return true; }
+             let ([Control::Field(field)], [range]) = (p.controls.as_slice(), p.field_ranges.as_slice()) else { return false; };
+             field.field_type == crate::model::control::FieldType::ClickHere

@@ -1,0 +1,41 @@
+{
+  "createdAt": "2026-10-16T19:58:15.405Z",
+  "input": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\table-height-sync-candidate\\wasm19-v3\\auto-zero.hwp",
+  "inputSha256": "a709217ba4cdee7ac7cd7645ff2e9f871c49a55baeaea7b56bd3b5432a6a0118",
+  "output": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\table-height-sync-candidate\\wasm19-v3\\auto-zero-hancom.hwp",
+  "outputSha256": "2c16b341757a5f70603b77265ad2157cb399145754551fef7fb884ddc6107889",
+  "enginePackage": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\table-height-sync-candidate\\source-v3\\pkg",
+  "pages": {
+    "before": 1,
+    "after": 1,
+    "equal": true
+  },
+  "semantic": {
+    "count": 0,
+    "differences": [],
+    "readIssues": {
+      "before": [],
+      "after": []
+    }
+  },
+  "geometry": {
+    "tolerance": 0.2,
+    "count": 0,
+    "differences": []
+  },
+  "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality.",
+  "engine": {
+    "sourceId": "private-height-sync-v3-9b30aefe6f396bd9",
+    "wasmSha256": "d0e1ff88395453d2cfbaea448d0c4f45baa4abbb77e90878ed76f3408915ebbe",
+    "jsSha256": "5781abebe5897b6ec83936856e14956b0574f136a19a2c02319271ff73a7ae3e"
+  },
+  "actualUiOwner": "parent root",
+  "actualUiScreenshots": [
+    "screenshots/auto-zero-hwp-hancom-open.png",
+    "screenshots/auto-zero-hwp-hancom-saved.png"
+  ],
+  "sourceResultSha256": "b1424157c3f3df37268d3a9ad88922ec94db84e5ef71202a0bf003f046edc89d",
+  "sourceResult": "build/table-height-sync-candidate/wasm19-v3/hancom-hwp-comparison/result.json",
+  "stagedInput": "artifacts/auto-zero.hwp",
+  "stagedActualHancomSaveAs": "artifacts/auto-zero-hancom.hwp"
+}

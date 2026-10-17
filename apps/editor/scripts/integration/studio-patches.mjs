@@ -271,10 +271,37 @@ await writeFile(join(root, 'src/ui/document-title.ts'), documentTitle);
 
 // 저장할 Blob에 문서 버전을 연결해 저장 중 발생한 새 편집을 clean 처리하지 않는다.
 let fileCommands = (await readFile(join(root, 'src/command/commands/file.ts'), 'utf8')).replace(/\r\n/g, '\n');
+let saveHistory = (await readFile(join(root, 'src/engine/history.ts'), 'utf8')).replace(/\r\n/g, '\n');
+saveHistory = replaceOnce(saveHistory, "import { NO_TEXT_MUTATION_EFFECTS } from './command';",
+  "import { NO_TEXT_MUTATION_EFFECTS, SnapshotCommand } from './command';", 'save snapshot class identity');
+saveHistory = replaceOnce(saveHistory, '  peekUndoTop(): EditCommand | null {', `  /** A derived save frame belongs to the immediately preceding full snapshot edit.
+   * That command captures its after-state lazily on Undo, including this frame.
+   * Do not absorb inverse text commands, submode commands or changed history. */
+  absorbSaveFrameSnapshot(previous: EditCommand, current: EditCommand, wasm: WasmBridge): boolean {
+    if (previous?.constructor !== SnapshotCommand || current?.constructor !== SnapshotCommand
+        || current.type !== 'snapshot:jueony:save-table-frames'
+        || this.redoStack.length !== 0 || this.undoStack.length < 2
+        || this.undoStack[this.undoStack.length - 2] !== previous
+        || this.undoStack[this.undoStack.length - 1] !== current
+        || previous.snapshotResourceCount?.() !== 1 || current.snapshotResourceCount?.() !== 1
+        || previous.retainOnFailure?.() || current.retainOnFailure?.()) return false;
+    current.discard?.(wasm);
+    this.undoStack.pop();
+    return true;
+  }
+
+  peekUndoTop(): EditCommand | null {`, 'save frame snapshot ownership');
+await writeFile(join(root, 'src/engine/history.ts'), saveHistory);
 fileCommands = "import { confirmDownload } from '../../jueony/download-save';\n" + fileCommands;
 fileCommands = "import { verifyPreservedExport } from '../../jueony/adapters/rhwp/preservation.ts';\n" + fileCommands;
 fileCommands = "import { acknowledgeDownloadedFile, readDownloadedFormat } from '../../jueony/adapters/files/download-connection.ts';\n" + fileCommands;
 fileCommands = "import { rememberSavedFormat, readSavedFormat } from '../../jueony/adapters/files/saved-format.ts';\n" + fileCommands;
+fileCommands = replaceOnce(fileCommands,
+  '    const payload = createSavePayload(services, format, password ?? undefined);',
+  "    await (window as any).jueonyEditor?.prepareFileSave?.(format);\n    const payload = createSavePayload(services, format, password ?? undefined);", 'save-as live table frame transaction');
+fileCommands = replaceOnce(fileCommands,
+  '    const payload = createSavePayload(services, target.format, password ?? undefined);',
+  "    await (window as any).jueonyEditor?.prepareFileSave?.(target.format);\n    const payload = createSavePayload(services, target.format, password ?? undefined);", 'save live table frame transaction');
 fileCommands = replaceOnce(fileCommands,
   'async function chooseSaveAsFormat(services: CommandServices): Promise<SaveFormat | null> {',
   'async function chooseSaveAsFormat(services: CommandServices): Promise<SaveFormat | null> {\n  const savedFormat = readSavedFormat(services.wasm.currentFileHandle) ?? readDownloadedFormat(services.wasm);\n  if (savedFormat) return savedFormat;', 'save-as default follows acknowledged output format');

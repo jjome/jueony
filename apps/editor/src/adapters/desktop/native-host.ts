@@ -1,5 +1,8 @@
 export type NativeInvoke = <T>(command: string, args?: Record<string, unknown>) => Promise<T>;
-type HandleInfo = { token: string; name: string };
+export type NativeHandleInfo = { token: string; name: string };
+type HandleInfo = NativeHandleInfo;
+const nativeTokens = new WeakMap<object, string>();
+export const nativeFileToken = (handle: object | null | undefined): string | undefined => handle ? nativeTokens.get(handle) : undefined;
 type NativeWindow = {
   onCloseRequested(listener: (event: { preventDefault(): void }) => void | Promise<void>): Promise<() => void>;
   destroy(): Promise<void>;
@@ -29,15 +32,19 @@ export function createNativeFilePickers(invoke: NativeInvoke) {
     try { return await operation(); }
     finally { selecting = false; }
   };
-  const makeHandle = (info: HandleInfo): FileSystemFileHandle => {
+  const makeHandle = (info: HandleInfo, bound = false): FileSystemFileHandle => {
     const existing = handles.get(info.token);
     if (existing) return existing;
     const handle = {
       kind: 'file' as const, name: info.name,
       queryPermission: async () => 'granted' as const,
       requestPermission: async () => 'granted' as const,
-      isSameEntry: async (other: unknown) => other === handle,
-      getFile: async () => new File([new Uint8Array(await invoke<number[]>('read_document', { token: info.token }))], info.name),
+      isSameEntry: async (other: unknown) => {
+        if(other===handle)return true;
+        const otherToken=typeof other==='object'&&other!==null?nativeTokens.get(other):undefined;
+        return otherToken?invoke<boolean>('same_document',{token:info.token,otherToken}):false;
+      },
+      getFile: async () => new File([new Uint8Array(await invoke<number[]>(bound?'read_bound_document':'read_document', { token: info.token }))], info.name),
       createWritable: async () => {
         let pending: Blob | null = null, finished = false;
         return {
@@ -56,9 +63,11 @@ export function createNativeFilePickers(invoke: NativeInvoke) {
       },
     } as unknown as FileSystemFileHandle;
     handles.set(info.token, handle);
+    nativeTokens.set(handle, info.token);
     return handle;
   };
   return {
+    fromRecent: (info: HandleInfo) => makeHandle(info,true),
     showOpenFilePicker: () => select(async () => {
       const info = await invoke<HandleInfo | null>('pick_document');
       if (!info) throw new DOMException('취소됨', 'AbortError');
@@ -85,10 +94,21 @@ export function installNativeFilePickers(surface: Window): NativeHost | undefine
   const record = (owner as PickerOwner)[pickerSlot];
   const pickers = record?.host === host ? record.pickers : createNativeFilePickers(host.core.invoke.bind(host.core));
   if (record?.host !== host) Object.defineProperty(owner, pickerSlot, { value: { host, pickers }, configurable: true });
-  for (const [name, picker] of Object.entries(pickers)) {
+  for (const name of ['showOpenFilePicker','showSaveFilePicker'] as const) {
+    const picker = pickers[name];
     Object.defineProperty(surface, name, { value: picker, configurable: true });
   }
   return host;
+}
+
+/** A fresh Rust-approved process token becomes a handle in the picker owner's
+ * realm; persisted paths and former process tokens never enter this contract. */
+export function nativeRecentHandle(surface:Window,info:NativeHandleInfo):FileSystemFileHandle {
+  let owner=surface;
+  try{while(owner.parent!==owner&&owner.parent.location.origin===owner.location.origin&&readNativeHost(owner.parent))owner=owner.parent;}catch{}
+  const record=(owner as PickerOwner)[pickerSlot];
+  if(!record||typeof info?.token!=='string'||!info.token||typeof info.name!=='string'||!info.name)throw new Error('최근 문서의 파일 연결을 확인하지 못했습니다.');
+  return record.pickers.fromRecent(info);
 }
 
 export type NativeExitSnapshot = { stamp: string; blocked: boolean; needsConfirmation: boolean };

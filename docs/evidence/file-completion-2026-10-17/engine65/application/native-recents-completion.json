@@ -1,0 +1,83 @@
+{
+  "scope": "B006 native recent original-file reconnection",
+  "sourceFrozen": true,
+  "files": [
+    {
+      "path": "apps/editor/src-tauri/src/native_recents.rs",
+      "sha256": "1ee44e4d9c1cbbd2a1b6916b5492a8f16d5366627f120bb01e4495894d66b1a2"
+    },
+    {
+      "path": "apps/editor/src-tauri/src/main.rs",
+      "sha256": "57f452635cb2c1079758dedadd9db889468e3b16c4bc0941f56b44eb60ef7981"
+    },
+    {
+      "path": "apps/editor/src-tauri/src/storage.rs",
+      "sha256": "26b9727428c1d53b7ef054e07264e7fb9dc9ad6afd117434c52bff5772ae854e"
+    },
+    {
+      "path": "apps/editor/src-tauri/Cargo.toml",
+      "sha256": "35889481f2e3bddb60fbcf1a860f8ab2cae2b8849afeac2e5f81147346016141"
+    },
+    {
+      "path": "apps/editor/src-tauri/Cargo.lock",
+      "sha256": "e4723f8ae42e219fbf756e81447abceb25163b1d90e955de45cf7cafdd0666c0"
+    },
+    {
+      "path": "apps/editor/src/adapters/desktop/native-recents.ts",
+      "sha256": "e7049ee4be8852c904ff80b80e9ac3e5de76bd2c6e6d001159132723832d9156"
+    },
+    {
+      "path": "apps/editor/src/adapters/desktop/native-host.ts",
+      "sha256": "d99b20b05d4c68db64938a76e4c19ce2b7b91fb3cf570f72c82d5893fd3c15fd"
+    },
+    {
+      "path": "apps/editor/src/shell.ts",
+      "sha256": "76d934b25af2753443d1ab63eac8c02b1d4687c68e5bd7374cf7806e099fcdf9"
+    },
+    {
+      "path": "apps/editor/tests/native-recents.test.ts",
+      "sha256": "8b5702caef56c4500e64c437ef5bd2ef221e83b6da344f2b642473276547d4f3"
+    },
+    {
+      "path": "apps/editor/tests/native-host.test.ts",
+      "sha256": "333e0af711a4aa047e0c861b857ddfdc8c3c229bcb82e0a6648b4c6479095b80"
+    },
+    {
+      "path": "apps/editor/scripts/verify-native-recents.mjs",
+      "sha256": "28c61a90955c391c8178726d11198579d311c5d42880a29dfb775ffa59398ee4"
+    }
+  ],
+  "verification": {
+    "windowsRust": {
+      "passed": 18,
+      "newNativeRecentTests": 9,
+      "existingStorageTests": 9,
+      "ignored": 0,
+      "log": "build/file-part-closure-audit/native-recents-rust-final.log"
+    },
+    "typescriptContract": {
+      "passed": 30,
+      "newRecentTests": 13,
+      "existingHostTests": 17,
+      "skipped": 0,
+      "log": "build/file-part-closure-audit/native-recents-unit.log"
+    },
+    "edge": {
+      "passed": 9,
+      "failed": 0,
+      "result": "build/native-recents-browser-ready/result.json",
+      "resultSha256": "e903e817647a2aa27264de47b36b2879efb585c93576b213d4a48589bd64a397",
+      "pageErrors": 0,
+      "consoleErrors": 0,
+      "externalRequests": 0
+    },
+    "adapterTypeScript": "PASS",
+    "strictFrontendBuild": "apps/editor/evidence/dist-native-recents/build-evidence.json"
+  },
+  "limitations": [
+    "Actual Edge uses production shell/editor/menu with explicitly synthetic native IPC, not real native Windows app picker or executable restart.",
+    "Disk registry restart reconstructed from Windows Rust store; real process/window UI restart remains parent direct verification.",
+    "Agent file lifecycle commands are outside this B006 manual reconnection change."
+  ],
+  "firstFailures": "Sandbox OS Temp atomic rename denied; workspace-local TEMP used without changing guards. Earlier Edge attempts captured unloaded iframe/menu states; final verifier waits for production menu initialization, keeps exact content assertions. Prior failure result folders preserved."
+}

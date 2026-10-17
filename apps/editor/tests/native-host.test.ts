@@ -9,7 +9,7 @@ import {rememberFileSnapshot} from '../src/adapters/files/fingerprints.ts';
 const fakeHost=(invoke:NativeInvoke):NativeHost=>({core:{invoke},window:{getCurrentWindow:()=>({onCloseRequested:async()=>()=>{},destroy:async()=>{}})}});
 test('native parent picker keeps an opaque original handle through exact read/write and save-as',async()=>{
  const disk=new Map([['original',new Uint8Array([1,2,3])],['new',new Uint8Array()]]),calls:{command:string;args:unknown}[]=[];
- const invoke:NativeInvoke=async(command,args)=>{calls.push({command,args});if(command==='pick_document')return {token:'original',name:'원본.hwp'} as any;if(command==='pick_save_document')return {token:'new',name:'새.hwpx'} as any;if(command==='read_document')return Array.from(disk.get(args!.token as string)!) as any;if(command==='write_document'){disk.set(args!.token as string,new Uint8Array(args!.bytes as number[]));return undefined as any;}throw new Error('unregistered');};
+ const invoke:NativeInvoke=async(command,args)=>{calls.push({command,args});if(command==='pick_document')return {token:'original',name:'원본.hwp'} as any;if(command==='pick_save_document')return {token:'new',name:'새.hwpx'} as any;if(command==='same_document')return false as any;if(command==='read_document')return Array.from(disk.get(args!.token as string)!) as any;if(command==='write_document'){disk.set(args!.token as string,new Uint8Array(args!.bytes as number[]));return undefined as any;}throw new Error('unregistered');};
  const pickers=createNativeFilePickers(invoke),[handle]=await pickers.showOpenFilePicker();
  assert.equal(await handle.queryPermission({mode:'readwrite'}),'granted');
  assert.deepEqual(new Uint8Array(await (await handle.getFile()).arrayBuffer()),new Uint8Array([1,2,3]));

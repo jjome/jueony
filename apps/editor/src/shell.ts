@@ -1,4 +1,5 @@
-import {installNativeFilePickers,installNativeExitProtection} from './adapters/desktop/native-host.ts';
+import {installNativeFilePickers,installNativeExitProtection,nativeFileToken,nativeRecentHandle} from './adapters/desktop/native-host.ts';
+import {createNativeRecents} from './adapters/desktop/native-recents.ts';
 import {readDocumentFailure} from './modules/document/public/index.ts';
 import {connectDocumentFrame} from './adapters/iframe/document-client.ts';
 import type {DocumentFrameClient} from './adapters/iframe/document-client.ts';
@@ -63,7 +64,8 @@ const workspace=createWorkspaceFacade({state:{current:()=>state},ids:{next:uid}}
 const chat=()=>workspace.chat(work().id,work().activeChatId);
 const session=createSessionFacade({state:{activeWorkspaceId:()=>state.activeWorkspaceId,workspaces:()=>state.workspaces,tabs:()=>tabs.map(({id,workspaceId,closed})=>({id,workspaceId,closed}))},lifecycle:{setOrder:(id,order)=>{workspace.workspace(id).documentOrder=order;},setActiveDocument:(id,documentId)=>{workspace.workspace(id).activeDocumentId=documentId;}}});
 const button=(label:string,action:()=>unknown)=>{const b=document.createElement('button');b.textContent=label;b.type='button';b.onclick=()=>{try{void Promise.resolve(action()).catch(error);}catch(e){error(e);}};return b;};
-const chrome=installUnifiedChrome({menus:$('unified-menus'),tools:$('unified-tools'),active:()=>activeTab?.initialized?activeTab.api??undefined:undefined,execute:(id,params)=>{if(running?.run.status==='applying')throw new Error('문서 적용 중입니다.');if(id==='file:open'){$('open-document').click();return;}const result=activeTab?.api!.executeCommand(id,params);if(!result?.ok)throw new Error(result?.message??'현재 문서에서 실행할 수 없습니다.');},error});
+const nativeRecents=nativeHost?createNativeRecents({invoke:nativeHost.core.invoke.bind(nativeHost.core),workspace:()=>state?.activeWorkspaceId??'',canNavigate:()=>!closing&&!restoring&&!nativeExitPending&&cancelNavigation(),handle:info=>nativeRecentHandle(window,info),token:nativeFileToken,open:openHandle,confirm:message=>window.confirm(message),notice:status,changed:()=>chrome.refresh()}):undefined;
+const chrome=installUnifiedChrome({menus:$('unified-menus'),tools:$('unified-tools'),active:()=>{const api=activeTab?.initialized?activeTab.api??undefined:undefined;return api?nativeRecents?.wrap(api)??api:undefined;},execute:(id,params)=>{if(running?.run.status==='applying')throw new Error('문서 적용 중입니다.');if(nativeRecents&&(id==='file:open-native-recent'||id==='file:clear-native-recent'))return nativeRecents.execute(id,params);if(id==='file:open'){$('open-document').click();return;}const result=activeTab?.api!.executeCommand(id,params);if(!result?.ok)throw new Error(result?.message??'현재 문서에서 실행할 수 없습니다.');},error});
 const on=(id:string,action:()=>unknown)=>$(id).addEventListener('click',()=>{try{void Promise.resolve(action()).catch(error);}catch(e){error(e);}});
 async function persist(){stateWrites++;try{await store.save(state);persistError=false;}catch(e){persistError=true;throw e;}finally{stateWrites--;}}
 const navigation=createSessionGuard(()=>({closing,restoring,runStatus:running?.run.status}),()=>running?.controller.abort(),status);
@@ -159,6 +161,7 @@ function refreshTab(tab:Tab){
  if(tab.closed||!tab.api||!tab.initialized)return;checkPendingConnection(tab);const s=tab.api!.state();tab.button.textContent=s.name;tab.button.classList.toggle('is-dirty',s.dirty);
  if(tab===activeTab){document.title=work().name+' · '+s.name+' — Jueony';$('active-document-name').textContent=s.name;$('editor-heading').textContent=s.name;chrome.refresh();$('shell-status').textContent=s.dirty?'수정됨':'저장됨';$('reconnect-document').hidden=!tab.pendingConnection||Boolean(tab.api!.fileHandle());}
  tab.recovery?.observe({identity:tab.api.documentIdentity(),...s});
+ if(nativeRecents&&!s.dirty)void nativeRecents.remember(tab.workspaceId,tab.api.fileHandle(),s.revision).catch(e=>status('문서는 유지되지만 최근 문서 목록을 갱신하지 못했습니다. '+String(e)));
  clearTimeout(tab.timer);tab.timer=window.setTimeout(()=>void persistCachedView(tab).catch(error),1400);
 }
 async function persistCachedView(tab:Tab){

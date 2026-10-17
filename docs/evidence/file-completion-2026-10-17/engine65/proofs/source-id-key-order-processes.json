@@ -1,0 +1,110 @@
+{
+  "scope": "Independent read-only reconstruction of sourceId input; Build-DocumentEngine/PrepareOnly/git-apply/Cargo are never invoked.",
+  "freshPowerShellProcessCount": 8,
+  "buildScriptSha256": "9472772921b339527215227c8920c7f90151baade8934444eb6065ba8e27d18d",
+  "wslBuildScriptSha256": "5daf445b05b26a908150b1effbf045f9280167d53472c0eba2d0792f5f59825b",
+  "patchCount": 65,
+  "allSemanticPatchListsEqual": true,
+  "canonicalSemanticPatchListSha256": "75ff7cf685159afb41d52a8e89f5201df3130dc3a7b65bf0d76580498d563e2f",
+  "unorderedObservedSourceIds": [
+    "1828b4f4611a3e11",
+    "325a6ca5b67c6fe1"
+  ],
+  "orderedControlSourceIds": [
+    "1828b4f4611a3e11"
+  ],
+  "runs": [
+    {
+      "pid": 39592,
+      "unorderedSourceId": "325a6ca5b67c6fe1",
+      "unorderedPatchJsonSha256": "0c48766ef4507cc66d11e4d9714204e1ec2109033e806755084a6d546b3237a6",
+      "unorderedFirstEntryKeyOrder": [
+        "sha256",
+        "name"
+      ],
+      "orderedControlSourceId": "1828b4f4611a3e11",
+      "orderedPatchJsonSha256": "75ff7cf685159afb41d52a8e89f5201df3130dc3a7b65bf0d76580498d563e2f"
+    },
+    {
+      "pid": 37076,
+      "unorderedSourceId": "1828b4f4611a3e11",
+      "unorderedPatchJsonSha256": "75ff7cf685159afb41d52a8e89f5201df3130dc3a7b65bf0d76580498d563e2f",
+      "unorderedFirstEntryKeyOrder": [
+        "name",
+        "sha256"
+      ],
+      "orderedControlSourceId": "1828b4f4611a3e11",
+      "orderedPatchJsonSha256": "75ff7cf685159afb41d52a8e89f5201df3130dc3a7b65bf0d76580498d563e2f"
+    },
+    {
+      "pid": 32816,
+      "unorderedSourceId": "1828b4f4611a3e11",
+      "unorderedPatchJsonSha256": "75ff7cf685159afb41d52a8e89f5201df3130dc3a7b65bf0d76580498d563e2f",
+      "unorderedFirstEntryKeyOrder": [
+        "name",
+        "sha256"
+      ],
+      "orderedControlSourceId": "1828b4f4611a3e11",
+      "orderedPatchJsonSha256": "75ff7cf685159afb41d52a8e89f5201df3130dc3a7b65bf0d76580498d563e2f"
+    },
+    {
+      "pid": 35196,
+      "unorderedSourceId": "325a6ca5b67c6fe1",
+      "unorderedPatchJsonSha256": "0c48766ef4507cc66d11e4d9714204e1ec2109033e806755084a6d546b3237a6",
+      "unorderedFirstEntryKeyOrder": [
+        "sha256",
+        "name"
+      ],
+      "orderedControlSourceId": "1828b4f4611a3e11",
+      "orderedPatchJsonSha256": "75ff7cf685159afb41d52a8e89f5201df3130dc3a7b65bf0d76580498d563e2f"
+    },
+    {
+      "pid": 18820,
+      "unorderedSourceId": "325a6ca5b67c6fe1",
+      "unorderedPatchJsonSha256": "0c48766ef4507cc66d11e4d9714204e1ec2109033e806755084a6d546b3237a6",
+      "unorderedFirstEntryKeyOrder": [
+        "sha256",
+        "name"
+      ],
+      "orderedControlSourceId": "1828b4f4611a3e11",
+      "orderedPatchJsonSha256": "75ff7cf685159afb41d52a8e89f5201df3130dc3a7b65bf0d76580498d563e2f"
+    },
+    {
+      "pid": 9420,
+      "unorderedSourceId": "325a6ca5b67c6fe1",
+      "unorderedPatchJsonSha256": "0c48766ef4507cc66d11e4d9714204e1ec2109033e806755084a6d546b3237a6",
+      "unorderedFirstEntryKeyOrder": [
+        "sha256",
+        "name"
+      ],
+      "orderedControlSourceId": "1828b4f4611a3e11",
+      "orderedPatchJsonSha256": "75ff7cf685159afb41d52a8e89f5201df3130dc3a7b65bf0d76580498d563e2f"
+    },
+    {
+      "pid": 38276,
+      "unorderedSourceId": "1828b4f4611a3e11",
+      "unorderedPatchJsonSha256": "75ff7cf685159afb41d52a8e89f5201df3130dc3a7b65bf0d76580498d563e2f",
+      "unorderedFirstEntryKeyOrder": [
+        "name",
+        "sha256"
+      ],
+      "orderedControlSourceId": "1828b4f4611a3e11",
+      "orderedPatchJsonSha256": "75ff7cf685159afb41d52a8e89f5201df3130dc3a7b65bf0d76580498d563e2f"
+    },
+    {
+      "pid": 7212,
+      "unorderedSourceId": "1828b4f4611a3e11",
+      "unorderedPatchJsonSha256": "75ff7cf685159afb41d52a8e89f5201df3130dc3a7b65bf0d76580498d563e2f",
+      "unorderedFirstEntryKeyOrder": [
+        "name",
+        "sha256"
+      ],
+      "orderedControlSourceId": "1828b4f4611a3e11",
+      "orderedPatchJsonSha256": "75ff7cf685159afb41d52a8e89f5201df3130dc3a7b65bf0d76580498d563e2f"
+    }
+  ],
+  "minimalFix": "Change only the patchEvidence inner hashtable literal from @{name=...;sha256=...} to [ordered]@{name=...;sha256=...}. Outer array remains sorted by existing file order.",
+  "whyIdsMatchExactly": "Existing inputText includes patchEvidence JSON serialization. name/sha256 property order varies by PowerShell process; current unchanged source script hashes plus these two JSON encodings reproduce the two exact observed source directory IDs.",
+  "changedScriptOwnHashNote": "Build sourceId also includes the Build script own SHA256. Applying the proposed fix correctly creates another sourceId; orderedControlSourceIds here use the unchanged script SHA as an isolated serialization control and do not predict the post-edit sourceId.",
+  "formalBuildDuringAnalysis": "Parent was compiling source325. Production script and immutable source directories were not modified."
+}

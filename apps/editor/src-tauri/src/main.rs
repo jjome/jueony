@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod storage;
+mod native_recents;
 
 use serde::Serialize;
 use std::{collections::HashMap, path::PathBuf, sync::Mutex};
@@ -9,6 +10,7 @@ use tauri_plugin_dialog::DialogExt;
 
 #[derive(Default)]
 struct Documents(Mutex<HashMap<String, storage::DocumentFile>>);
+struct NativeRecents(Mutex<native_recents::RecentStore>);
 
 #[derive(Serialize)]
 struct HandleInfo {
@@ -51,16 +53,57 @@ fn read_document(documents: State<Documents>, token: String) -> Result<Vec<u8>, 
 }
 
 #[tauri::command]
+fn read_bound_document(documents: State<Documents>, token: String) -> Result<Vec<u8>, String> {
+    documents.0.lock().map_err(|e| e.to_string())?.get(&token)
+        .ok_or("허용되지 않은 파일입니다.")?.read_bound().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 fn write_document(documents: State<Documents>, token: String, bytes: Vec<u8>) -> Result<(), String> {
     documents.0.lock().map_err(|e| e.to_string())?.get_mut(&token)
         .ok_or("허용되지 않은 파일입니다.")?.write(&bytes).map_err(|e| e.to_string())
 }
 
+#[tauri::command]
+fn remember_recent_document(documents: State<Documents>, recents: State<NativeRecents>, workspace: String, token: String)->Result<(),String>{
+    let documents=documents.0.lock().map_err(|e|e.to_string())?;
+    let file=documents.get(&token).ok_or("허용되지 않은 파일입니다.")?;
+    recents.0.lock().map_err(|e|e.to_string())?.remember(&workspace,file).map_err(|e|e.to_string())
+}
+#[tauri::command]
+fn list_recent_documents(recents: State<NativeRecents>, workspace: String)->Result<Vec<native_recents::RecentSummary>,String>{
+    recents.0.lock().map_err(|e|e.to_string())?.list(&workspace).map_err(|e|e.to_string())
+}
+#[tauri::command]
+fn inspect_recent_document(recents: State<NativeRecents>,workspace:String,id:String)->Result<native_recents::Inspection,String>{
+    recents.0.lock().map_err(|e|e.to_string())?.inspect(&workspace,&id).map_err(|e|e.to_string())
+}
+#[tauri::command]
+fn reopen_recent_document(documents:State<Documents>,recents:State<NativeRecents>,workspace:String,id:String,fingerprint:String)->Result<HandleInfo,String>{
+    let file=recents.0.lock().map_err(|e|e.to_string())?.reopen(&workspace,&id,&fingerprint).map_err(|e|e.to_string())?;
+    let name=file.path.file_name().ok_or("파일 이름이 없습니다.")?.to_string_lossy().into_owned();
+    let token=uuid::Uuid::new_v4().to_string();
+    documents.0.lock().map_err(|e|e.to_string())?.insert(token.clone(),file);
+    Ok(HandleInfo{token,name})
+}
+#[tauri::command]
+fn clear_recent_documents(recents:State<NativeRecents>,workspace:String)->Result<(),String>{
+    recents.0.lock().map_err(|e|e.to_string())?.clear(&workspace).map_err(|e|e.to_string())
+}
+#[tauri::command]
+fn same_document(documents:State<Documents>,token:String,other_token:String)->Result<bool,String>{
+    let documents=documents.0.lock().map_err(|e|e.to_string())?;
+    let left=documents.get(&token).ok_or("허용되지 않은 파일입니다.")?;
+    let right=documents.get(&other_token).ok_or("허용되지 않은 파일입니다.")?;
+    Ok(std::fs::canonicalize(&left.path).map_err(|e|e.to_string())?==std::fs::canonicalize(&right.path).map_err(|e|e.to_string())?)
+}
+
 fn main() {
     tauri::Builder::default()
         .manage(Documents::default())
+        .setup(|app| {let file=app.path().app_data_dir()?.join("recent-documents-v1.json");app.manage(NativeRecents(Mutex::new(native_recents::RecentStore::new(file))));Ok(())})
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(tauri::generate_handler![pick_document, pick_save_document, read_document, write_document])
+        .invoke_handler(tauri::generate_handler![pick_document, pick_save_document, read_document, read_bound_document, write_document, remember_recent_document, list_recent_documents, inspect_recent_document, reopen_recent_document, clear_recent_documents, same_document])
         .run(tauri::generate_context!())
         .expect("편집기를 시작하지 못했습니다.");
 }

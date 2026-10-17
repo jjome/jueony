@@ -1,0 +1,328 @@
+{
+  "algorithm": "SHA256",
+  "originalManifestSha256": "95a42b6a2d606bfbdbcce1c2dd675960b9cb77228dfa0a0737ae101787103e9b",
+  "secondManifestSha256": "17c100e7c8b65429fbdcb12c4bc860f1a55a60efb8c3413f92d01b21f9391575",
+  "additionalFiles": [
+    {
+      "path": "application/build-source-id-ordered8.json",
+      "bytes": 517,
+      "sha256": "a2172835752ad0894ad44d9beb1180cb557145dbbe02fef7f98f4d4e85f9dace"
+    },
+    {
+      "path": "application/equal-columns-browser.json",
+      "bytes": 31835,
+      "sha256": "8d68322ce604a7168499a7545e93839a58cd27dac6b163b02f0e2f0d0d69841b"
+    },
+    {
+      "path": "application/final-padding-browser16.json",
+      "bytes": 28944,
+      "sha256": "9d66f20d4f6d10bbc90aeaecf9403709c3d3e9ea1377d4a284c610bdcb433688"
+    },
+    {
+      "path": "application/final-regressions44.json",
+      "bytes": 4050,
+      "sha256": "3e4f86f021636352239be55432e383be358583625668efaba88bc6c733480400"
+    },
+    {
+      "path": "application/frontend-build.log",
+      "bytes": 16105,
+      "sha256": "ec5c953eeee453b278a603c778c3dd5bfbbdf0b4556aecd5008e3dd8af0d5f19"
+    },
+    {
+      "path": "application/native-recents-completion.json",
+      "bytes": 3404,
+      "sha256": "4d4da5b2893dd0e8503749de863ea810e370b144bb079a644e3c8a216375d5a4"
+    },
+    {
+      "path": "application/native-recents-contract30.log",
+      "bytes": 7455,
+      "sha256": "294c401676956f795f09e64b0b434744221fed0a7168074c23327161fd0a765b"
+    },
+    {
+      "path": "application/native-recents-edge9.json",
+      "bytes": 27232,
+      "sha256": "e903e817647a2aa27264de47b36b2879efb585c93576b213d4a48589bd64a397"
+    },
+    {
+      "path": "application/native-recents-windows-rust18.log",
+      "bytes": 2412,
+      "sha256": "ec70fadaf37e3f94a2ff2f5b7b33b17f4c100e0b6a0ae9229a0f20f21495dcc3"
+    },
+    {
+      "path": "application/padding-browser15.json",
+      "bytes": 28844,
+      "sha256": "4bc84a6aeec38edb6da27a06f85530f7e288a4b69d4e4564739530580d1ebba8"
+    },
+    {
+      "path": "application/padding-only-regressions43of44.json",
+      "bytes": 4050,
+      "sha256": "4904c1ecd1bc929e03241685317b459d9743ea4830412165c4361affab411b38"
+    },
+    {
+      "path": "application/padding-transaction25.json",
+      "bytes": 18204,
+      "sha256": "0241be0c7ec0568d54db9bb64ddbc995a17069bf820503b746a2d1b07ac52272"
+    },
+    {
+      "path": "application/save-history-fix-width-failed.json",
+      "bytes": 35440,
+      "sha256": "ad49b40261234675ed5e6e204cc3c9309eae3db65213d43d984fdc2ad362afe0"
+    },
+    {
+      "path": "application/save-preflight14.json",
+      "bytes": 32177,
+      "sha256": "5c7b5176a73de1a30e076cf88e1f9d3e42d05abe9209155524f1474adf75ce0d"
+    },
+    {
+      "path": "application/table-properties-save14.json",
+      "bytes": 32177,
+      "sha256": "665e28bafae33f8373965db51a04be510249db99f3de69bba0fa11c2a665c015"
+    },
+    {
+      "path": "application/table-properties-width-browser.json",
+      "bytes": 32990,
+      "sha256": "2c1555caec094d55041247dc6658295f9ebeb29753b5b4728c365f679b2f21d8"
+    },
+    {
+      "path": "application/unit851.log",
+      "bytes": 200372,
+      "sha256": "75f1ac16de87621d66a06027e2473d18a6b4a0c27e796a7f772010bfad3ea0a6"
+    },
+    {
+      "path": "application/unit852.log",
+      "bytes": 200648,
+      "sha256": "b1fab2b713373bac043c1a62966a7ee3687342f9d3fb81bf24362c8c9b0c2686"
+    },
+    {
+      "path": "regressions/agent-browser/result.json",
+      "bytes": 28944,
+      "sha256": "9d66f20d4f6d10bbc90aeaecf9403709c3d3e9ea1377d4a284c610bdcb433688"
+    },
+    {
+      "path": "regressions/agent-native/result.json",
+      "bytes": 13314,
+      "sha256": "d2810254685d588389acdde0a10eac4dfeb3b765bfb36b29cfa689d01a365d31"
+    },
+    {
+      "path": "regressions/agent-style-next-browser/result.json",
+      "bytes": 321816,
+      "sha256": "16c98dc8aea97658b16fc888df72c4c1e10ae678a879711fe82967f496683ef5"
+    },
+    {
+      "path": "regressions/agent-style-next-native/result.json",
+      "bytes": 13072,
+      "sha256": "e45cbce2703e73b5115ffdaaea98c8a308ba2a3659f0e0fd8e90cbfa4dc5a661"
+    },
+    {
+      "path": "regressions/agent-table-header-browser/result.json",
+      "bytes": 31691,
+      "sha256": "2d9bb3331993ff177a8ea531b4828c47e4adb597c3778fad70f8c22224ffae5b"
+    },
+    {
+      "path": "regressions/agent-table-header-native/result.json",
+      "bytes": 13325,
+      "sha256": "a5d99ae0158383491ec43f60cb55f8f6420fd6a7805561f34c6647c5f4c1aad9"
+    },
+    {
+      "path": "regressions/agent-table-pagination-browser/result.json",
+      "bytes": 27211,
+      "sha256": "183f78a8b0fd2b43f2b1dcd2831774c3cec73fbf8b4c164734a4abfa792b2379"
+    },
+    {
+      "path": "regressions/agent-table-pagination-native/result.json",
+      "bytes": 13123,
+      "sha256": "8884014ee9fa9a31b3f8fbbd236712770604e1e3971b39471a9b1cc83e0cacb9"
+    },
+    {
+      "path": "regressions/browser/result.json",
+      "bytes": 31570,
+      "sha256": "757525b3141543713454bef810bc1e3ab6d75b32ffde0d75804ac2563ad82022"
+    },
+    {
+      "path": "regressions/cell-paragraph-browser/result.json",
+      "bytes": 29580,
+      "sha256": "93d1e9f3606cf1d8d5acb27635a1f1c847cdb02d55c0d95a5f6230a6c9d053ae"
+    },
+    {
+      "path": "regressions/cell-paragraph-native/result.json",
+      "bytes": 14018,
+      "sha256": "d0ea776bbc1d61314e2a524aa17f8c5acbdad99ade521885a28ee053bbdbc1db"
+    },
+    {
+      "path": "regressions/default-native/result.json",
+      "bytes": 12709,
+      "sha256": "24ae712903506f06a128b6b06e2b3aed8b018271ae4e2602891ef6dcb6a1509d"
+    },
+    {
+      "path": "regressions/equal-browser/result.json",
+      "bytes": 31835,
+      "sha256": "645225c8f5f4f5db353d5c07b10a1d20c5956a7f8af9f39a62c1ba8c2e1337b6"
+    },
+    {
+      "path": "regressions/equal-native/result.json",
+      "bytes": 12733,
+      "sha256": "8cfbadede0c3b9fe3a7ffec7b77445fa9d648d4bc040a9373f4df8aae03cc466"
+    },
+    {
+      "path": "regressions/following-native/result.json",
+      "bytes": 12190,
+      "sha256": "afb44fadf51f9fa92d013fb74f94aca1685c6594f8b06bd723905da679205012"
+    },
+    {
+      "path": "regressions/format-conversion-native/result.json",
+      "bytes": 16536,
+      "sha256": "8a76de5f7b112ad31c04cdd9fc9c561543c78ce482f9d2780ced5f27ae55f469"
+    },
+    {
+      "path": "regressions/host-native/result.json",
+      "bytes": 12975,
+      "sha256": "02110638b0e6d08b383dd0a3a110b6ab189ca2c06456f0874be41abefc3ba2af"
+    },
+    {
+      "path": "regressions/memo-native/result.json",
+      "bytes": 12022,
+      "sha256": "6c80f2033d1e90d22eb6b611238b293248c815b5b813dd79fcf1ff4833a40ee6"
+    },
+    {
+      "path": "regressions/merge-browser/result.json",
+      "bytes": 23967,
+      "sha256": "7f9cb9d3b3445715431a80f602510d5a92b0ef1fb46c9384d9874090c72c57b5"
+    },
+    {
+      "path": "regressions/merge-native/result.json",
+      "bytes": 12351,
+      "sha256": "f8dff8716f7f4468bd5ed68a0582e0f0965365ba1a42ee1f6a80794d139a1cdd"
+    },
+    {
+      "path": "regressions/native/result.json",
+      "bytes": 12989,
+      "sha256": "16e0fda628674d5efa0a2465e9c3346a2103857ef7d4679b8e93d4d19168d55b"
+    },
+    {
+      "path": "regressions/outer-native/result.json",
+      "bytes": 12027,
+      "sha256": "469d1a6788f610c183b65f9033fad9076754984e18c78574376f7bcf9a53eabe"
+    },
+    {
+      "path": "regressions/overlap-native/result.json",
+      "bytes": 4936353,
+      "sha256": "82db2b8fcaea4661f7f994eddef1c7096f4ea83296c0375099ab6584e2c7b0c8"
+    },
+    {
+      "path": "regressions/owner-native/result.json",
+      "bytes": 12425,
+      "sha256": "ba5567909d3f7d33eb88f2d9b4d1e593ee478a86cffea047d069f85f8758b023"
+    },
+    {
+      "path": "regressions/selected-object-browser/result.json",
+      "bytes": 16576,
+      "sha256": "144fdad7d637560308cf8a714c08c448b3eae2d84961d03f15fd7ca293ddf04e"
+    },
+    {
+      "path": "regressions/split-browser/result.json",
+      "bytes": 28667,
+      "sha256": "a00a51e22857ce4d1e596e34985887f81807cf323c79a2be434dddb7872993da"
+    },
+    {
+      "path": "regressions/split-native/result.json",
+      "bytes": 12620,
+      "sha256": "7cebadf42e3dee8ccf98186b3e44cd331cb0025c38643c47e3ad923cce575342"
+    },
+    {
+      "path": "regressions/structure-browser/result.json",
+      "bytes": 31751,
+      "sha256": "47bd78ee7a3a81bda41216b04bc65915cedbeb5c209225543639c703b0237965"
+    },
+    {
+      "path": "regressions/structure-native/result.json",
+      "bytes": 12786,
+      "sha256": "789309c54013acfab9b8c688952dbba618f5e3359d903ea3b3293f7dbba14991"
+    },
+    {
+      "path": "regressions/style-stories-native/result.json",
+      "bytes": 12007,
+      "sha256": "80d744f00a80ad6dc98c62b2555967a7b449ffda4ca0abcab602f98f4c27448a"
+    },
+    {
+      "path": "regressions/styles-native/result.json",
+      "bytes": 12189,
+      "sha256": "071875443b9df5369e53f3912c0c062654c414f33d9ff758a61b72f549180a4b"
+    },
+    {
+      "path": "regressions/subdivision-browser/result.json",
+      "bytes": 83639,
+      "sha256": "4d6a3d7797b5cfb5bd6e1897cd7261269ae0b79f8ce49ce720ded736fbae64d3"
+    },
+    {
+      "path": "regressions/subdivision-native/result.json",
+      "bytes": 12977,
+      "sha256": "f7ae0f83269ad2eb76f496740010a076d7184b9b4eea31c730b2919889d7dcb9"
+    },
+    {
+      "path": "regressions/table-conversion-browser/result.json",
+      "bytes": 16541,
+      "sha256": "7162e1bbe2681743a794468897c5f4ef7cc94f2505d4ce5763d73bb10505f782"
+    },
+    {
+      "path": "regressions/table-conversion-native/result.json",
+      "bytes": 13457,
+      "sha256": "c205421793b64b086d94d068b700784f2a6b83ab096037f33540045ff3d3555b"
+    },
+    {
+      "path": "regressions/table-multi-header-browser/result.json",
+      "bytes": 27182,
+      "sha256": "263cf78f3557269cdf68d1750e7e62ba372911144e6c6a9d7bd4d991a8d3b623"
+    },
+    {
+      "path": "regressions/table-multi-header-native/result.json",
+      "bytes": 13656,
+      "sha256": "69dee3c75cb1779d7aa08c4f7895b1c9349685ccfc0d1ebbd9b2ab231754c0b6"
+    },
+    {
+      "path": "regressions/table-protection-browser/result.json",
+      "bytes": 21221,
+      "sha256": "9ef4b399771e0c269b350e04d9ba5a47a5719721cb4e0adb9f8dad501ab22b02"
+    },
+    {
+      "path": "regressions/table-protection-native/result.json",
+      "bytes": 13140,
+      "sha256": "0115d849d25d7a4f1cf08f17e8d2381d2895ca9471bbf849e0cf4819b654bf76"
+    },
+    {
+      "path": "regressions/textbox-browser/result.json",
+      "bytes": 15569,
+      "sha256": "b6353b674916bfbd54157a09ccf9fcf190a010c45dd5ea33b788be6083bbf183"
+    },
+    {
+      "path": "regressions/textbox-native/result.json",
+      "bytes": 12509,
+      "sha256": "3c78dc15233aeefbc6ba18c98d6c9bffc4d1033b689937c683e1d5317e7ed185"
+    },
+    {
+      "path": "regressions/textbox-storage-native/result.json",
+      "bytes": 12725,
+      "sha256": "b5efeec5f5cff5352215bcd06f70aab4b44f1928e9ed92adcc2ea53f2cd2e79a"
+    },
+    {
+      "path": "regressions/width-browser/result.json",
+      "bytes": 32990,
+      "sha256": "2c1555caec094d55041247dc6658295f9ebeb29753b5b4728c365f679b2f21d8"
+    },
+    {
+      "path": "regressions/width-native/result.json",
+      "bytes": 12661,
+      "sha256": "7bc3477f429022394e806af10bb3ed26e8480a15e58dde4d4db4be6f80860a37"
+    },
+    {
+      "path": "reproduce/verify-third-manifest.py",
+      "bytes": 1085,
+      "sha256": "a54ce53afb4c3d96eb188be3f08ebf6c3ec245d7d4f5b76e4f5c843ca197ed94"
+    },
+    {
+      "path": "results/following-table-hancom-formal65.json",
+      "bytes": 13625,
+      "sha256": "a6ed72b8cf6c3f1f4c5037347a5ec9cbb0673bbfca8e017545d270d3f98208f3"
+    }
+  ],
+  "scope": "Formal65 application regression fixes and B006 native recent-file implementation results. Original failing intermediate reports preserved. Not whole Hancom parity or actual new native executable GUI approval."
+}

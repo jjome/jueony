@@ -1,0 +1,49 @@
+{
+  "engine": {
+    "sourceId": "325a6ca5b67c6fe1",
+    "wasmSha256": "62a4b5d08d662ee4924ff6113b59893a5a783f97b0547f8124e87a85491e180a",
+    "jsSha256": "5781abebe5897b6ec83936856e14956b0574f136a19a2c02319271ff73a7ae3e"
+  },
+  "scopes": [
+    {
+      "scope": "strictCommandFacade20",
+      "passed": 20,
+      "failed": 0,
+      "result": "results/formal65-strictCommandFacade20.json",
+      "sameCoverageAsPreviouslyValidatedPrivateScope": true
+    },
+    {
+      "scope": "actualCanvasContext5",
+      "passed": 5,
+      "failed": 0,
+      "result": "results/formal65-actualCanvasContext5.json",
+      "sameCoverageAsPreviouslyValidatedPrivateScope": true
+    },
+    {
+      "scope": "excludedFullGeometry15",
+      "passed": 15,
+      "failed": 0,
+      "result": "results/formal65-excludedFullGeometry15.json",
+      "sameCoverageAsPreviouslyValidatedPrivateScope": true
+    },
+    {
+      "scope": "consecutive4and5Tables2",
+      "passed": 2,
+      "failed": 0,
+      "result": "results/formal65-consecutive4and5Tables2.json",
+      "sameCoverageAsPreviouslyValidatedPrivateScope": true
+    },
+    {
+      "scope": "widthPreservation12",
+      "passed": 12,
+      "failed": 0,
+      "result": "results/formal65-widthPreservation12.json",
+      "sameCoverageAsPreviouslyValidatedPrivateScope": true
+    }
+  ],
+  "formalNodePassed": 54,
+  "formalNodeFailed": 0,
+  "actualRust14": "Private-v4 Native Rust14 previously passed. This additive phase does not rerun Cargo or claim formal-native Rust14 execution.",
+  "browserAndWindowsChecks": "Parent/other worker own; NOT_RUN by this additive analysis.",
+  "coverageCountPolicy": "Formal reruns repeat previous cases; never add54 again to the private68 as distinct coverage."
+}

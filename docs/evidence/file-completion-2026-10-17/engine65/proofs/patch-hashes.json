@@ -1,0 +1,22 @@
+{
+  "candidateBase": "source-8deeb52a09ba2b75",
+  "formalPreparedSource": "source-1828b4f4611a3e11",
+  "formalPatchCount": 65,
+  "formalWasmStatus": "not yet built at staging time",
+  "patches": [
+    {
+      "candidatePath": "build/table-height-sync-candidate/table-content-height-command.patch",
+      "sha256": "368dd198802b630da92549f7bc4ddbcb2e6bf7a0822090519ec07a1134a9fe0b",
+      "productionPaths": [
+        "engine/patches/zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-table-content-height-sync.patch"
+      ]
+    },
+    {
+      "candidatePath": "build/table-height-sync-candidate/closed-whole-stack-and-lineage-v4.patch",
+      "sha256": "5e9b4dce4da46d62427105ce3a70362050f17392388aa507ad54d7894df31bd2",
+      "productionPaths": [
+        "engine/patches/zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-closed-whole-stack-lineage.patch"
+      ]
+    }
+  ]
+}

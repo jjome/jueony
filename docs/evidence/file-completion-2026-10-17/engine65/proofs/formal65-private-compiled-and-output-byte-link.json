@@ -1,0 +1,102 @@
+{
+  "formalEngineSourceId": "325a6ca5b67c6fe1",
+  "privateEngineSourceId": "private-height-sync-v4-5e9b4dce4da46d62",
+  "compiledFiles": [
+    {
+      "file": "rhwp.js",
+      "privateSha256": "5781abebe5897b6ec83936856e14956b0574f136a19a2c02319271ff73a7ae3e",
+      "formalSha256": "5781abebe5897b6ec83936856e14956b0574f136a19a2c02319271ff73a7ae3e",
+      "rawBytesEqual": true
+    },
+    {
+      "file": "rhwp_bg.wasm",
+      "privateSha256": "62a4b5d08d662ee4924ff6113b59893a5a783f97b0547f8124e87a85491e180a",
+      "formalSha256": "62a4b5d08d662ee4924ff6113b59893a5a783f97b0547f8124e87a85491e180a",
+      "rawBytesEqual": true
+    },
+    {
+      "file": "rhwp.d.ts",
+      "privateSha256": "680d438b898da57e60440dcaa5c47cefc2ac523401910dcaa8dfe7956489e9aa",
+      "formalSha256": "680d438b898da57e60440dcaa5c47cefc2ac523401910dcaa8dfe7956489e9aa",
+      "rawBytesEqual": true
+    },
+    {
+      "file": "rhwp_bg.wasm.d.ts",
+      "privateSha256": "742ea6a06f812c6be6263718bebe8846154c2dc3c78c3698d928edd8910219fc",
+      "formalSha256": "742ea6a06f812c6be6263718bebe8846154c2dc3c78c3698d928edd8910219fc",
+      "rawBytesEqual": true
+    }
+  ],
+  "allCompiledFilesRawByteEqual": true,
+  "documents": [
+    {
+      "file": "auto-zero.hwp",
+      "privatePath": "build/table-height-sync-candidate/wasm20-v4/auto-zero.hwp",
+      "formalPath": "build/table-height-sync-candidate/formal65-command20/auto-zero.hwp",
+      "sha256": "a709217ba4cdee7ac7cd7645ff2e9f871c49a55baeaea7b56bd3b5432a6a0118",
+      "rawBytesEqual": true,
+      "actualUiInputAlsoByteEqual": true
+    },
+    {
+      "file": "auto-zero.hwpx",
+      "privatePath": "build/table-height-sync-candidate/wasm20-v4/auto-zero.hwpx",
+      "formalPath": "build/table-height-sync-candidate/formal65-command20/auto-zero.hwpx",
+      "sha256": "e99ac23ec6a85aba39c4c30e771ebddb3d95a629cdfcc93e337aa70bf8cc2533",
+      "rawBytesEqual": true,
+      "actualUiInputAlsoByteEqual": true
+    },
+    {
+      "file": "large.hwp",
+      "privatePath": "build/table-height-sync-candidate/wasm20-v4/large.hwp",
+      "formalPath": "build/table-height-sync-candidate/formal65-command20/large.hwp",
+      "sha256": "a709217ba4cdee7ac7cd7645ff2e9f871c49a55baeaea7b56bd3b5432a6a0118",
+      "rawBytesEqual": true,
+      "actualUiInputAlsoByteEqual": false
+    },
+    {
+      "file": "large.hwpx",
+      "privatePath": "build/table-height-sync-candidate/wasm20-v4/large.hwpx",
+      "formalPath": "build/table-height-sync-candidate/formal65-command20/large.hwpx",
+      "sha256": "e99ac23ec6a85aba39c4c30e771ebddb3d95a629cdfcc93e337aa70bf8cc2533",
+      "rawBytesEqual": true,
+      "actualUiInputAlsoByteEqual": false
+    },
+    {
+      "file": "large-hancom.hwp",
+      "privatePath": "build/table-height-sync-candidate/wasm20-v4/large-hancom.hwp",
+      "formalPath": "build/table-height-sync-candidate/formal65-command20/large-hancom.hwp",
+      "sha256": "4347a4ed98e549fc50a4728b872031029c64910d886cdc7b6f49264c0910600a",
+      "rawBytesEqual": true,
+      "actualUiInputAlsoByteEqual": false
+    },
+    {
+      "file": "large-hancom.hwpx",
+      "privatePath": "build/table-height-sync-candidate/wasm20-v4/large-hancom.hwpx",
+      "formalPath": "build/table-height-sync-candidate/formal65-command20/large-hancom.hwpx",
+      "sha256": "55c88f8a30aa6fe3110aecd443239efde075d167c1ea4087921e46a041673390",
+      "rawBytesEqual": true,
+      "actualUiInputAlsoByteEqual": false
+    },
+    {
+      "file": "explicit-rows-9000.hwp",
+      "privatePath": "build/table-height-sync-candidate/wasm20-v4/explicit-rows-9000.hwp",
+      "formalPath": "build/table-height-sync-candidate/formal65-command20/explicit-rows-9000.hwp",
+      "sha256": "53bfba295bdb774b8875c15ba003b40e217faa4fd61e4fd3bb5b15716e35d3f0",
+      "rawBytesEqual": true,
+      "actualUiInputAlsoByteEqual": false
+    },
+    {
+      "file": "explicit-rows-9000.hwpx",
+      "privatePath": "build/table-height-sync-candidate/wasm20-v4/explicit-rows-9000.hwpx",
+      "formalPath": "build/table-height-sync-candidate/formal65-command20/explicit-rows-9000.hwpx",
+      "sha256": "fe50c827d663d63a21644128107981a15eaad12f16950aeb2b4fe9b37c18a468",
+      "rawBytesEqual": true,
+      "actualUiInputAlsoByteEqual": false
+    }
+  ],
+  "allEightOutputArtifactsRawByteEqual": true,
+  "actualHancomUiInputLink": "proofs/actual-hancom-byte-link.json",
+  "actualUiScope": "Only auto-zero HWP/HWPX were actually opened and separately saved in Hancom by root; their formal output bytes equal those exact already-tested v3/private outputs. Other six outputs have strict engine checks, no fresh Hancom UI claim.",
+  "newUiExecutionClaimed": false,
+  "formalFrontendBuiltBy": "root: apps/editor/evidence/dist-file-completion-final65; this proof does not claim its browser/Windows checks are complete."
+}

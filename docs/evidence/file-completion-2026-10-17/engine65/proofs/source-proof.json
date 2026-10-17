@@ -1,0 +1,93 @@
+{
+  "base": "source-8deeb52a09ba2b75",
+  "changedFiles": [
+    "src/wasm_api.rs",
+    "src/model/event.rs",
+    "src/renderer/float_placement.rs",
+    "src/renderer/typeset/controls/flow_table.rs",
+    "src/renderer/typeset/table/block/entry.rs",
+    "src/document_core/commands/document.rs",
+    "src/document_core/commands/table_ops.rs"
+  ],
+  "commandPatchSha256": "368dd198802b630da92549f7bc4ddbcb2e6bf7a0822090519ec07a1134a9fe0b",
+  "followupPatchSha256": "5e9b4dce4da46d62427105ce3a70362050f17392388aa507ad54d7894df31bd2",
+  "combinedPatchSha256": "fde61d61885939b9c3886ca614d1baa02dca95badd94997d8ceb1709285890ee",
+  "changedSourceSha256": {
+    "src/renderer/float_placement.rs": "817fa469c6cc9e5405674a9ac9a3c013dd5cf687bfb25d4013e0fc9817755c69",
+    "src/renderer/typeset/controls/flow_table.rs": "e5ac40abed1d7f8b9a612425968d47e1c65f7461e294fd6f4f49e338910d1d6e",
+    "src/renderer/typeset/table/block/entry.rs": "f571256397e551ba0ebe7c39519b39b4bf3349351cefa6c4d29b6d937fc608b4",
+    "src/document_core/commands/document.rs": "0ffe1866972dd617bfa227853fdab6b3ece291c8e52c8a54c68b71e91aec2c6d",
+    "src/document_core/commands/table_ops.rs": "44de0fe9345a86b0db2bb836e3937adbd7881f16e290ff8057e8821d98eae126",
+    "src/wasm_api.rs": "57ad10d73f3aec9d622899c063f28a1de81ebd34e26f96e13e0a0340a1286000",
+    "src/model/event.rs": "a48e945b68bcf5ce988ce704f9641ab30be7c64f8781a0e33d786e9ae411adf3"
+  },
+  "patchApplyStrictCheck": true,
+  "patchedFilesExactlyMatchPrivateSource": false,
+  "patchedFilesLfNormalizedMatchPrivateSource": true,
+  "endOfLineDisclosure": "Official63 sources use CRLF; private Python edits use LF. All7 changed files differ from strict-applied candidate by CRLF/LF only. Compiler/artifact equivalence is not inferred; root formal build must independently confirm.",
+  "comparisons": [
+    {
+      "file": "src/wasm_api.rs",
+      "privateSha256": "57ad10d73f3aec9d622899c063f28a1de81ebd34e26f96e13e0a0340a1286000",
+      "patchAppliedSha256": "939468ac7a98f1c2b7b0916b8d323ce05f2f34057dfb91269952249443102cdf",
+      "rawBytesEqual": false,
+      "lfNormalizedBytesEqual": true,
+      "privateCrLf": 0,
+      "patchAppliedCrLf": 9207
+    },
+    {
+      "file": "src/model/event.rs",
+      "privateSha256": "a48e945b68bcf5ce988ce704f9641ab30be7c64f8781a0e33d786e9ae411adf3",
+      "patchAppliedSha256": "62321c86ba39c21c47a6cddba2553f39531822538eb99680591ad5a6caf24016",
+      "rawBytesEqual": false,
+      "lfNormalizedBytesEqual": true,
+      "privateCrLf": 0,
+      "patchAppliedCrLf": 493
+    },
+    {
+      "file": "src/renderer/float_placement.rs",
+      "privateSha256": "817fa469c6cc9e5405674a9ac9a3c013dd5cf687bfb25d4013e0fc9817755c69",
+      "patchAppliedSha256": "b25d382e640e297f3c830ed3c82d78ec2828ab063407414dc03f067f9391b7b1",
+      "rawBytesEqual": false,
+      "lfNormalizedBytesEqual": true,
+      "privateCrLf": 0,
+      "patchAppliedCrLf": 5041
+    },
+    {
+      "file": "src/renderer/typeset/controls/flow_table.rs",
+      "privateSha256": "e5ac40abed1d7f8b9a612425968d47e1c65f7461e294fd6f4f49e338910d1d6e",
+      "patchAppliedSha256": "fbec444ec760b884e49f553748e588132b9955692790244fd3176fb1e1bb28a0",
+      "rawBytesEqual": false,
+      "lfNormalizedBytesEqual": true,
+      "privateCrLf": 0,
+      "patchAppliedCrLf": 247
+    },
+    {
+      "file": "src/renderer/typeset/table/block/entry.rs",
+      "privateSha256": "f571256397e551ba0ebe7c39519b39b4bf3349351cefa6c4d29b6d937fc608b4",
+      "patchAppliedSha256": "8e96e2274fe1999c8fc81954007e147a4bde2f68e732ee90b3650910b6a9c4f2",
+      "rawBytesEqual": false,
+      "lfNormalizedBytesEqual": true,
+      "privateCrLf": 0,
+      "patchAppliedCrLf": 2077
+    },
+    {
+      "file": "src/document_core/commands/document.rs",
+      "privateSha256": "0ffe1866972dd617bfa227853fdab6b3ece291c8e52c8a54c68b71e91aec2c6d",
+      "patchAppliedSha256": "5ceb307246b6be43d52f61bf5997f9379fc94594517e119c492c318ce126ffb9",
+      "rawBytesEqual": false,
+      "lfNormalizedBytesEqual": true,
+      "privateCrLf": 0,
+      "patchAppliedCrLf": 4532
+    },
+    {
+      "file": "src/document_core/commands/table_ops.rs",
+      "privateSha256": "44de0fe9345a86b0db2bb836e3937adbd7881f16e290ff8057e8821d98eae126",
+      "patchAppliedSha256": "aae5b935d4edc36d8e5e195c213f735e11fb5695b42fb611d70b8dcecb240a4f",
+      "rawBytesEqual": false,
+      "lfNormalizedBytesEqual": true,
+      "privateCrLf": 0,
+      "patchAppliedCrLf": 4726
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "history": [
+    {
+      "label": "initial16",
+      "phase": "markerless actual Hancom initial geometry mismatch",
+      "localOriginalPath": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\table-height-sync-candidate\\wasm16\\result.json",
+      "sourceSha256": "833f8ab48031d57b007f6c675407384b0525bba79ff34200844b319177bea7c0",
+      "passed": 13,
+      "failed": 3,
+      "failedScenarios": [
+        {
+          "name": "auto-zero: explicit height command matches independent Hancom, strict both-format repeat save and exact undo",
+          "errorPrefix": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   {\n+     after: 242,\n+     before: 234,\n+     delta: 8,\n+     path: '$[0][\"controls\"][\"controls\"][1][\"cells\"][0][\"y\"]'\n+   },\n+   {\n+     after: 242,\n+     before: 234,\n+     delta: 8,\n+     path: '$[0][\"controls\"][\"c"
+        },
+        {
+          "name": "large: explicit height command matches independent Hancom, strict both-format repeat save and exact undo",
+          "errorPrefix": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   {\n+     after: 242,\n+     before: 234,\n+     delta: 8,\n+     path: '$[0][\"controls\"][\"controls\"][1][\"cells\"][0][\"y\"]'\n+   },\n+   {\n+     after: 242,\n+     before: 234,\n+     delta: 8,\n+     path: '$[0][\"controls\"][\"c"
+        },
+        {
+          "name": "explicit-rows-9000: explicit height command matches independent Hancom, strict both-format repeat save and exact undo",
+          "errorPrefix": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   {\n+     after: 292.9,\n+     before: 284.9,\n+     delta: 8,\n+     path: '$[0][\"controls\"][\"controls\"][1][\"cells\"][0][\"y\"]'\n+   },\n+   {\n+     after: 292.9,\n+     before: 284.9,\n+     delta: 8,\n+     path: '$[0][\"contr"
+        }
+      ],
+      "sourceEngine": {
+        "sourceId": "private-height-sync-base63-368dd198802b630d",
+        "wasmSha256": "d791d756540d49f876bdb9dbb49546d68148b5cffeb036f6f68c607bcab95742",
+        "jsSha256": "5781abebe5897b6ec83936856e14956b0574f136a19a2c02319271ff73a7ae3e"
+      },
+      "fullOriginalRemainsImmutable": true
+    },
+    {
+      "label": "v1-with-facade19",
+      "phase": "same initial geometry mismatch plus successful original facade",
+      "localOriginalPath": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\table-height-sync-candidate\\wasm19-v1\\result.json",
+      "sourceSha256": "a48ff050948ed93f0d1c17aecc1c511ebcaa1a7500e2dd00cd98834e0d108e06",
+      "passed": 16,
+      "failed": 3,
+      "failedScenarios": [
+        {
+          "name": "auto-zero: explicit height command matches independent Hancom, strict both-format repeat save and exact undo",
+          "errorPrefix": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   {\n+     after: 242,\n+     before: 234,\n+     delta: 8,\n+     path: '$[0][\"controls\"][\"controls\"][1][\"cells\"][0][\"y\"]'\n+   },\n+   {\n+     after: 242,\n+     before: 234,\n+     delta: 8,\n+     path: '$[0][\"controls\"][\"c"
+        },
+        {
+          "name": "large: explicit height command matches independent Hancom, strict both-format repeat save and exact undo",
+          "errorPrefix": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   {\n+     after: 242,\n+     before: 234,\n+     delta: 8,\n+     path: '$[0][\"controls\"][\"controls\"][1][\"cells\"][0][\"y\"]'\n+   },\n+   {\n+     after: 242,\n+     before: 234,\n+     delta: 8,\n+     path: '$[0][\"controls\"][\"c"
+        },
+        {
+          "name": "explicit-rows-9000: explicit height command matches independent Hancom, strict both-format repeat save and exact undo",
+          "errorPrefix": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   {\n+     after: 292.9,\n+     before: 284.9,\n+     delta: 8,\n+     path: '$[0][\"controls\"][\"controls\"][1][\"cells\"][0][\"y\"]'\n+   },\n+   {\n+     after: 292.9,\n+     before: 284.9,\n+     delta: 8,\n+     path: '$[0][\"contr"
+        }
+      ],
+      "sourceEngine": {
+        "sourceId": "private-height-sync-base63-368dd198802b630d",
+        "wasmSha256": "d791d756540d49f876bdb9dbb49546d68148b5cffeb036f6f68c607bcab95742",
+        "jsSha256": "5781abebe5897b6ec83936856e14956b0574f136a19a2c02319271ff73a7ae3e"
+      },
+      "fullOriginalRemainsImmutable": true
+    },
+    {
+      "label": "v2-with-facade19",
+      "phase": "initial actual Hancom geometry fixed; HWP re-open +8/+16 remains",
+      "localOriginalPath": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\table-height-sync-candidate\\wasm19-v2\\result.json",
+      "sourceSha256": "4eb6db872aff3b4c027cac7e4403ccb56bfa90d177c4bd90ead826ba0e5b2199",
+      "passed": 16,
+      "failed": 3,
+      "failedScenarios": [
+        {
+          "name": "auto-zero: explicit height command matches independent Hancom, strict both-format repeat save and exact undo",
+          "errorPrefix": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   {\n+     after: 242,\n+     before: 234,\n+     delta: 8,\n+     path: '$[0][\"controls\"][\"controls\"][1][\"cells\"][0][\"y\"]'\n+   },\n+   {\n+     after: 242,\n+     before: 234,\n+     delta: 8,\n+     path: '$[0][\"controls\"][\"c"
+        },
+        {
+          "name": "large: explicit height command matches independent Hancom, strict both-format repeat save and exact undo",
+          "errorPrefix": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   {\n+     after: 242,\n+     before: 234,\n+     delta: 8,\n+     path: '$[0][\"controls\"][\"controls\"][1][\"cells\"][0][\"y\"]'\n+   },\n+   {\n+     after: 242,\n+     before: 234,\n+     delta: 8,\n+     path: '$[0][\"controls\"][\"c"
+        },
+        {
+          "name": "explicit-rows-9000: explicit height command matches independent Hancom, strict both-format repeat save and exact undo",
+          "errorPrefix": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   {\n+     after: 292.9,\n+     before: 284.9,\n+     delta: 8,\n+     path: '$[0][\"controls\"][\"controls\"][1][\"cells\"][0][\"y\"]'\n+   },\n+   {\n+     after: 292.9,\n+     before: 284.9,\n+     delta: 8,\n+     path: '$[0][\"contr"
+        }
+      ],
+      "sourceEngine": {
+        "sourceId": "private-height-sync-v2-b4255196906d284b",
+        "wasmSha256": "df55efb4619421615e3f39eb1cd80d30c78c2b0cca4d53900a7862930fbac060",
+        "jsSha256": "5781abebe5897b6ec83936856e14956b0574f136a19a2c02319271ff73a7ae3e"
+      },
+      "fullOriginalRemainsImmutable": true
+    }
+  ],
+  "resolvedBy": "two distinct candidate fixes, preserving the old failed results; no tolerance/projection change"
+}

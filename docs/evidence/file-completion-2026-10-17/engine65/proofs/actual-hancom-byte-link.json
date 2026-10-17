@@ -1,0 +1,23 @@
+{
+  "results": [
+    {
+      "format": "hwp",
+      "v3Output": "build\\table-height-sync-candidate\\wasm19-v3\\auto-zero.hwp",
+      "finalV4Output": "build\\table-height-sync-candidate\\wasm20-v4\\auto-zero.hwp",
+      "sha256": "a709217ba4cdee7ac7cd7645ff2e9f871c49a55baeaea7b56bd3b5432a6a0118",
+      "byteEqual": true,
+      "actualHancomReadSaveAsComparison": "build\\table-height-sync-candidate\\wasm19-v3\\hancom-hwp-comparison\\result.json",
+      "actualHancomSavedSha256": "2c16b341757a5f70603b77265ad2157cb399145754551fef7fb884ddc6107889"
+    },
+    {
+      "format": "hwpx",
+      "v3Output": "build\\table-height-sync-candidate\\wasm19-v3\\auto-zero.hwpx",
+      "finalV4Output": "build\\table-height-sync-candidate\\wasm20-v4\\auto-zero.hwpx",
+      "sha256": "e99ac23ec6a85aba39c4c30e771ebddb3d95a629cdfcc93e337aa70bf8cc2533",
+      "byteEqual": true,
+      "actualHancomReadSaveAsComparison": "build\\table-height-sync-candidate\\wasm19-v3\\hancom-hwpx-comparison\\result.json",
+      "actualHancomSavedSha256": "1491cd801610eb5e438f2ff01d5842dfe40b3fef1c25b546a984aa259a47ab4d"
+    }
+  ],
+  "note": "Actual Hancom UI Open/SaveAs and its screenshot evidence were performed by root on v3 bytes. Both final private-v4 output formats are byte-identical to those exact input bytes; this is not a newly performed v4 UI run."
+}

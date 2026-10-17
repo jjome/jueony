@@ -1,0 +1,17 @@
+{
+  "sourceA": "build/rhwp-engine/source-1828b4f4611a3e11",
+  "sourceB": "build/rhwp-engine/source-325a6ca5b67c6fe1",
+  "sourceIdsDiffer": true,
+  "baseCommitEqual": true,
+  "orderedSemanticPatchListsEqual": true,
+  "patchCount": 65,
+  "sourceRuntimeFileCount": 1332,
+  "allRuntimeRawBytesEqual": true,
+  "rawByteDifferences": [],
+  "rawTreeSha256A": "a0d38a5ba8880ccbb22cceb33ee75de6c21b2f256e770890126304d27fb0a8dc",
+  "rawTreeSha256B": "a0d38a5ba8880ccbb22cceb33ee75de6c21b2f256e770890126304d27fb0a8dc",
+  "preparedManifestSha256A": "1d56b1931628efbe5029b73ab3a357450cf7f2799bf2328cf116a4f10784aa32",
+  "preparedManifestSha256B": "5590e5df4e454fcfe4c5aa96c574ac38b66fb259118e3b82fdb85065a998cce8",
+  "compiledWasmEquivalenceClaimed": false,
+  "note": "Read-only src directory exhaustive byte comparison while parent compiler runs. No normalization used. Build outputs/Cargo/production scripts were not run or changed by this check."
+}

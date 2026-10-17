@@ -4,7 +4,7 @@
 
 열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.
 
-**2026-10-17 실제 검사 갱신:** Windows HWPX 저장·종료·재실행 복구를 확인했고, 글자폭·탭 폭 수정은 커밋했다. 56패치의 변환 보호·미정 탭 캐시 자동 검수도 통과했다. 실제 한글에서 새 HWP 글상자 손상과 공개 복잡 문서의 지면 차이가 추가로 발견되어 수정 중이다. [완료·실패·남은 검사](../109-file-preservation-hancom-followup.md)를 구분해 읽는다. 파트 전체 완료로 표시하지 않는다.
+**2026-10-17 현재:** 2026-10-17 정식65 후속: 저장 Undo·표 속성 높이 갱신 회귀 수정 중이며 G071은 실제 한글 양형식 재저장 사본의 전체 의미·공개 배치 차이0으로 마감했다. 최근 문서 재연결·문서 정보 편집을 병렬 구현 중이다. 상위10개와 N001·나머지 직접 검증은 아직 미완료다. 상세 완료·실패를 109번 기록에서 구분한다. [완료·실패·잔여](../109-file-preservation-hancom-followup.md).
 
 ## 진행 요약
 
@@ -13,7 +13,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | --- | --- | --- |
 | 구현 | 완료 23/24 · 부분 1 | 완료 0/10 · 부분 9 · 미구현 1 |
-| 검증 | 완료 16/24 · 부분 8 | 완료 0/10 · 부분 6 · 미검증 4 |
+| 검증 | 완료 17/24 · 부분 7 | 완료 0/10 · 부분 7 · 미검증 3 |
 | Agent 연결 | 연결 6/6 · 부분 0 · 해당 없음 18 | 연결 0/10 · 부분 1 · 미연결 9 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -49,7 +49,7 @@
 | [B001](<05-files-storage-recovery.md#b001>) · 범위 | 새 문서 | ◐ 부분 | ☐ 미검증 | ◐ 부분 |
 | [B002](<05-files-storage-recovery.md#b002>) · 범위 | 새 탭 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B005](<05-files-storage-recovery.md#b005>) · 범위 | 불러오기 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [B006](<05-files-storage-recovery.md#b006>) · 범위 | 최근 문서 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B006](<05-files-storage-recovery.md#b006>) · 범위 | 최근 문서 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B009](<05-files-storage-recovery.md#b009>) · 범위 | XML 탭·서식·문서 입출력 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B014](<05-files-storage-recovery.md#b014>) · 범위 | 문서 정보 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
@@ -104,7 +104,7 @@
 | [G068](<05-files-storage-recovery.md#g068>) · 작업 | 복구 렌더와 새 변경 검증의 분리 | ☑ 완료 | ☑ 완료 | ☑ 연결 |
 | [G069](<05-files-storage-recovery.md#g069>) · 작업 | HWPX 기본 탭 저장 값 보정 | ☑ 완료 | ☑ 완료 | ☑ 연결 |
 | [G070](<05-files-storage-recovery.md#g070>) · 작업 | 숨김 끝 문단의 실제 페이지 소유 | ☑ 완료 | ☑ 완료 | ☑ 연결 |
-| [G071](<05-files-storage-recovery.md#g071>) · 작업 | 겹침 금지 HWP 후속 표의 저장 앵커 소유 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
+| [G071](<05-files-storage-recovery.md#g071>) · 작업 | 겹침 금지 HWP 후속 표의 저장 앵커 소유 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 | [G072](<05-files-storage-recovery.md#g072>) · 작업 | HWP 메모 carrier의 본문 소유 분리 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 
 <a id="work-7"></a>
@@ -187,13 +187,13 @@
 <summary>B006 · 최근 문서</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 최근 문서/원본 파일 재연결은 구현됨. 브라우저 handle 권한 및 네이티브 경로 복원 대조.
+- 다음 작업: 최근 원본 재연결 구현: 업무별 native app-data 목록·opaque ID·재시작 새 token·변경 동의/재변경 거절·중복 탭 방지. TS30/Windows Rust18/실제 Edge+합성 native IPC9 통과. 실제 Windows 픽커/프로세스 재시작 UI·한글 동작 대조·Agent 파일 명령은 남음.
 - UI 명령: `file:open-recent`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `PARTIAL;NOT_RUN`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [native-recents-completion.json](<../evidence/file-completion-2026-10-17/engine65/application/native-recents-completion.json>)
+- 원래 기록: `SCOPED_NATIVE_RECENTS_IMPLEMENTED;FULL_NATIVE_GUI_AND_AGENT_PENDING_2026_10_17`
 
 </details>
 
@@ -361,12 +361,12 @@
 <summary>G071 · 겹침 금지 HWP 후속 표의 저장 앵커 소유</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **DONE**.
 - 완료 범위: 실제 앞 표 occupied flow 증거에 한정; 겹침 허용 제외
-- 다음 작업: 정의한 범위 회귀 유지; 한글 비교 대기
-- 근거: [93-storage-table-and-memo-ownership.md](<../93-storage-table-and-memo-ownership.md>)
-- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION`
+- 다음 작업: 마감: 기존 두/세 표·긴 내용 회귀와 실제 한글2024가 별도 저장한 HWP/HWPX 3개 비겹침 표를 정식65에서 전체 의미·공개 배치 차이0으로 확인. 반복 저장/재열기2회 통과. 겹침 허용·복잡 원점은 N001로 남긴다.
+- 근거: [93-storage-table-and-memo-ownership.md](<../93-storage-table-and-memo-ownership.md>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [following-table-hancom-formal65.json](<../evidence/file-completion-2026-10-17/engine65/results/following-table-hancom-formal65.json>)
+- 원래 기록: `SCOPED_COMPLETE;INDEPENDENT_HANCOM_RECHECK_FORMAL65_2026_10_17`
 
 </details>
 
@@ -388,11 +388,11 @@
 
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 검증 구분: 자동 **PARTIAL** / 한글 **PARTIAL**.
 - 완료 범위: 네 방향 semantic/common/raw cache·취소·undo·재열기
-- 다음 작업: 정의한 범위 회귀 유지; 한글 비교 대기
-- 근거: [94-table-width-and-outer-margins.md](<../94-table-width-and-outer-margins.md>)
-- 원래 기록: `DOCUMENTED_SCOPED_IMPLEMENTATION`
+- 다음 작업: 정식63의 HWP/HWPX 각각 실제 한글 재저장에서 의미0/배치20차이 발견. 단일 표 뒤 LINE_SEG Y의 양방향 A/B로 원점 분기 원인을 분리했으며 좁은 후속 수정과 실제 재열기 검수 진행.
+- 근거: [94-table-width-and-outer-margins.md](<../94-table-width-and-outer-margins.md>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>)
+- 원래 기록: `SCOPED_IMPLEMENTED;ACTUAL_HANCOM_OUTER_ORIGIN_FAILURE_2026_10_17`
 
 </details>
 

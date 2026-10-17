@@ -44,6 +44,16 @@ impl DocumentFile {
         Ok(bytes)
     }
 
+    /// Bind a recent-file inspection to the exact baseline already granted to
+    /// this handle. This read never adopts a concurrent external writer.
+    pub fn read_bound(&self) -> io::Result<Vec<u8>> {
+        let bytes = self.read()?;
+        if self.fingerprint != Some(hash(&bytes)) {
+            return Err(invalid("원본 확인 중 파일이 바뀌었습니다. 다시 선택해 주세요."));
+        }
+        Ok(bytes)
+    }
+
     pub fn write(&mut self, bytes: &[u8]) -> io::Result<()> {
         if bytes.is_empty() || bytes.len() as u64 > MAX_BYTES { return Err(invalid("저장 데이터 크기가 올바르지 않습니다.")); }
         let actual = read_optional(&self.path)?.map(|b| hash(&b));

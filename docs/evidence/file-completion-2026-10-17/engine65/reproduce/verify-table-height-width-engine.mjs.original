@@ -1,0 +1,32 @@
+import assert from 'node:assert/strict';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {resolve,isAbsolute} from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
+import {conversionRecordFixture} from './verify-format-conversion-fixture.mjs';
+import {capturePreservationEvidence,verifyPreservedExport} from '../src/adapters/rhwp/preservation.ts';
+for(const key of ['JUEONY_ENGINE_PACKAGE','JUEONY_TEST_OUTPUT']) assert.ok(isAbsolute(process.env[key]??''),key+' must be absolute');
+const pkg=resolve(process.env.JUEONY_ENGINE_PACKAGE),out=resolve(process.env.JUEONY_TEST_OUTPUT),j=JSON.parse,sha=x=>createHash('sha256').update(x).digest('hex');
+await mkdir(out,{recursive:true});
+const engine=j(await readFile(pkg+'/jueony-engine-build.json','utf8'));
+for(const[n,k]of[['rhwp.js','jsSha256'],['rhwp_bg.wasm','wasmSha256']]) assert.equal(sha(await readFile(pkg+'/'+n)),engine[k]);
+const m=await import(pathToFileURL(pkg+'/rhwp.js')); await m.default({module_or_path:await readFile(pkg+'/rhwp_bg.wasm')});
+const {HwpDocument}=m,results=[],failures=[],observations=[];
+async function scenario(name,run){try{await run();results.push(name);console.log('PASS',name);}catch(e){failures.push({name,error:String(e),stack:e.stack});console.error('FAIL',name,e.message);}}
+const props=d=>j(d.getTableProperties(0,1,0)),cell=d=>j(d.getCellProperties(0,1,0,0));
+const layout=d=>Array.from({length:d.pageCount()},(_,p)=>({controls:j(d.getPageControlLayout(p)).controls,runs:j(d.getPageTextLayout(p)).runs}));
+function same(a,b,p=''){if(typeof a==='number'&&typeof b==='number'){assert.ok(Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-b)<=0.2,p+': '+a+' != '+b);return;}if(Array.isArray(a)){assert.equal(a.length,b?.length,p);a.forEach((v,i)=>same(v,b[i],p+'/'+i));return;}if(a&&typeof a==='object'){assert.deepEqual(Object.keys(a),Object.keys(b),p);for(const k of Object.keys(a))same(a[k],b[k],p+'/'+k);return;}assert.deepEqual(a,b,p);}
+function generated(){const d=HwpDocument.createEmpty();d.createBlankDocument();d.insertText(0,0,0,'앞 본문');d.splitParagraph(0,0,4);assert.equal(j(d.createTable(0,1,0,3,2)).ok,true);for(let c=0;c<6;c++)d.insertTextInCell(0,1,0,c,0,0,'업무 '+c);return d;}
+const seed=generated();const seedBytes=seed.exportHwp();seed.free();
+function fixture(height,protect,format){const input=conversionRecordFixture(seedBytes,({tag,data})=>{if(tag===71&&data.subarray(0,4).toString().split('').reverse().join('').trim()==='tbl'){data.writeUInt32LE(height,20);const flags=data.readUInt32LE(4);data.writeUInt32LE((protect?flags|1<<20:flags&~(1<<20))>>>0,4);return true;}return false;});const d=new HwpDocument(input);if(format==='hwp')return d;try{return new HwpDocument(d.exportHwpx());}finally{d.free();}}
+function storedHeight(bytes){let height;conversionRecordFixture(bytes,({tag,data})=>{if(tag===71&&data.subarray(0,4).toString().split('').reverse().join('').trim()==='tbl'){height=data.readUInt32LE(20);return true;}return false;});return height;}
+for(const[mode,height,protect]of[['auto-zero',0,false],['small-protected',1400,true],['large',9000,false],['large-protected',9000,true]])for(const format of['hwp','hwpx'])await scenario(mode+' '+format+': width-only preserves declared/raw height, strict export and undo',async()=>{
+ const d=fixture(height,protect,format);try{const original=d.exportHwp(),token=d.saveSnapshot(),before=props(d),oldCell=cell(d);assert.equal(before.tableHeight,height);d.setCellProperties(0,1,0,0,JSON.stringify({width:oldCell.width+300}));const after=props(d);assert.equal(after.tableHeight,height);assert.equal(after.tableWidth,before.tableWidth+300);assert.deepEqual({...after,tableWidth:before.tableWidth},before);assert.equal(cell(d).height,oldCell.height);
+ const live=layout(d),values=capturePreservationEvidence(d).values;for(const target of['hwp','hwpx']){const artifact=target==='hwp'?d.exportHwpWithReport():d.exportHwpxWithReport();try{const bytes=artifact.takeBytes();verifyPreservedExport(d,bytes,target,j(artifact.contentLoss()),b=>new HwpDocument(b));const r=new HwpDocument(bytes);try{assert.equal(props(r).tableHeight,height);same(live,layout(r));assert.deepEqual(capturePreservationEvidence(r).values,values);assert.equal(storedHeight(r.exportHwp()),height);}finally{r.free();}await writeFile(out+'/'+mode+'-'+format+'.'+target,bytes);observations.push({mode,format,target,storedHeight:height,sha256:sha(bytes)});}finally{artifact.free();}}same(live,layout(d));d.restoreSnapshot(token);d.discardSnapshot(token);assert.deepEqual(d.exportHwp(),original);
+ }finally{d.free();}
+});
+await scenario('unchanged height argument is not a height edit',()=>{const d=fixture(9000,false,'hwp');try{const c=cell(d);d.setCellProperties(0,1,0,0,JSON.stringify({width:c.width+300,height:c.height}));assert.equal(props(d).tableHeight,9000);}finally{d.free();}});
+await scenario('explicit height edit still recalculates row declarations',()=>{const d=fixture(9000,false,'hwp');try{const c=cell(d),before=props(d);d.setCellProperties(0,1,0,0,JSON.stringify({height:c.height+700}));assert.equal(props(d).tableHeight,1546);assert.equal(props(d).tableWidth,before.tableWidth);}finally{d.free();}});
+await scenario('explicit edit of both axes still changes both dimensions',()=>{const d=fixture(9000,false,'hwp');try{const c=cell(d),before=props(d);d.setCellProperties(0,1,0,0,JSON.stringify({width:c.width+300,height:c.height+700}));assert.equal(props(d).tableHeight,1546);assert.equal(props(d).tableWidth,before.tableWidth+300);}finally{d.free();}});
+await scenario('new table width edit preserves its original computed height',()=>{const d=generated();try{const before=props(d),c=cell(d);d.setCellProperties(0,1,0,0,JSON.stringify({width:c.width+300}));assert.equal(props(d).tableHeight,before.tableHeight);}finally{d.free();}});
+await writeFile(out+'/result.json',JSON.stringify({results,failures,observations,engine,verifierSha256:sha(await readFile(new URL(import.meta.url))),scope:{widthOnlyFormatHeightCases:8,noOpHeightArgument:1,heightEditPositive:1,bothAxesPositive:1,newCreation:1},pageErrors:[],consoleErrors:[],externalRequests:[],note:'This checks unrequested declared-height loss during width-only edits. It does not normalize stale content-derived height after padding edits or claim the separate actual Hancom 3846->5181 difference is resolved. No preserved field or geometry tolerance is removed.'},null,2));if(failures.length)process.exitCode=1;

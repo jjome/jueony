@@ -11,7 +11,7 @@ if ($changed) { throw 'The engine reference has local changes. Preserve it and u
 $patchRoot = Join-Path $projectRoot 'engine/patches'
 $patches = @(Get-ChildItem -LiteralPath $patchRoot -Filter '*.patch' | Sort-Object Name)
 if ($patches.Count -eq 0) { throw 'No engine patches found.' }
-$patchEvidence = @($patches | ForEach-Object { @{ name=$_.Name; sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() } })
+$patchEvidence = @($patches | ForEach-Object { [ordered]@{ name=$_.Name; sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant() } })
 $inputText = $baseCommit + ($patchEvidence | ConvertTo-Json -Compress) + (Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash + (Get-FileHash -LiteralPath (Join-Path $PSScriptRoot 'build-document-engine-wsl.sh') -Algorithm SHA256).Hash
 $hashAlgorithm = [System.Security.Cryptography.SHA256]::Create()
 try { $sourceId = [Convert]::ToHexString($hashAlgorithm.ComputeHash([Text.Encoding]::UTF8.GetBytes($inputText))).ToLowerInvariant().Substring(0,16) } finally { $hashAlgorithm.Dispose() }

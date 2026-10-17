@@ -1,0 +1,77 @@
+{
+  "algorithm": "SHA256",
+  "previousManifest": "filehash-manifest.json",
+  "previousManifestSha256": "95a42b6a2d606bfbdbcce1c2dd675960b9cb77228dfa0a0737ae101787103e9b",
+  "previousFileCount": 53,
+  "additionalFiles": [
+    {
+      "path": "ADDENDUM-source-identity-and-formal65.txt",
+      "bytes": 2506,
+      "sha256": "8a6a05af737cb47e49ff2e2decadea195221272c50d9361b152f6e24e9f157bd"
+    },
+    {
+      "path": "proofs/deterministic-source-id-minimal-proposal.patch",
+      "bytes": 1135,
+      "sha256": "17fe61b54739df9686fe5b8f63aa383a5599060bf59fb2ddb16ed5215e8d185d"
+    },
+    {
+      "path": "proofs/formal65-node-validation-summary.json",
+      "bytes": 1777,
+      "sha256": "88c79264b35a6531b35eb12af1c412fd635489e2e7d77f3abc013bcfc71a8346"
+    },
+    {
+      "path": "proofs/formal65-private-compiled-and-output-byte-link.json",
+      "bytes": 4896,
+      "sha256": "40d0f4c48064d1d38bfa390a7950d37bc43c1e20f810dfa815a6f9ffd4c8b313"
+    },
+    {
+      "path": "proofs/formal65-two-id-raw-source-proof.json",
+      "bytes": 953,
+      "sha256": "33401a5d558cddf21078439ec49c96bb410b6e80b72272814aba4ad0d9f11914"
+    },
+    {
+      "path": "proofs/source-id-key-order-processes.json",
+      "bytes": 4990,
+      "sha256": "9dc12875f7f8dc2feb590532846ceea3b519923ec02fa20aa112ed13e79995b2"
+    },
+    {
+      "path": "reproduce/reproduce-source-id-order.ps1",
+      "bytes": 1916,
+      "sha256": "629125dea9dce2da3bb48862c86d9df165f82f60cfbc43ed3392188e98c7630d"
+    },
+    {
+      "path": "reproduce/verify-second-manifest.py",
+      "bytes": 1021,
+      "sha256": "cce6b3bd5ae9935f9c2534997d454f67e447875a5a6ad7baf51127fc256402aa"
+    },
+    {
+      "path": "results/formal65-actualCanvasContext5.json",
+      "bytes": 12938,
+      "sha256": "8936b8c7c76696783ea057bac1cc2b6342b5360ad41cbd01089410b858535d65"
+    },
+    {
+      "path": "results/formal65-consecutive4and5Tables2.json",
+      "bytes": 12963,
+      "sha256": "89d20c9080610742a6b33ab49046a8b67ff1b010eef946afc9d9def828122537"
+    },
+    {
+      "path": "results/formal65-excludedFullGeometry15.json",
+      "bytes": 14980,
+      "sha256": "26b05d86147ae32a01c2a33449c86c8bbb426f18d4c34cb5e06fb30825cbdc3c"
+    },
+    {
+      "path": "results/formal65-strictCommandFacade20.json",
+      "bytes": 17661,
+      "sha256": "3d66a040bc73be1a59bddfb633dcb195790fbf6c568998d488fe81608786e2cb"
+    },
+    {
+      "path": "results/formal65-widthPreservation12.json",
+      "bytes": 16290,
+      "sha256": "902f3c6a12ecaa538df4ed4be7df52dfe3735b911cf665fdae33b5865a89ead2"
+    }
+  ],
+  "additionalFileCount": 13,
+  "additionalTotalBytes": 94026,
+  "excludedSelf": "second-filehash-manifest.json",
+  "scope": "Additive read-only source identity diagnosis, prepared-source raw-byte proof and final65 package/artifact equivalence + actual Node reruns. Original53 manifest and all original listed files remain byte-unchanged."
+}

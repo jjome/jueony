@@ -1,0 +1,10 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/unknown-control-loss-candidate/regression74/source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.98s
+     Running tests/jueony_unknown_bytes_fixture.rs (/tmp/jueony-unknown-control-loss-target/debug/deps/jueony_unknown_bytes_fixture-cd15a8a3047a5158)
+
+running 1 test
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+test make_parseable_owned_unknown_bytes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

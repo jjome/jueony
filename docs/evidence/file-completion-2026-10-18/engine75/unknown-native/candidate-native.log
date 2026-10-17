@@ -1,0 +1,35 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/unknown-control-loss-candidate/source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 55.11s
+     Running tests/jueony_unknown_control_loss.rs (/tmp/jueony-unknown-control-loss-target/debug/deps/jueony_unknown_control_loss-d34bfc9ac9f1682a)
+
+running 11 tests
+test known_containers_have_no_false_loss ... ok
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+test native_core_report_owns_the_same_body_loss ... ok
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+test parsed_hwp_original_unknown_control_receives_report ... ok
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+test supported_hyperlink_is_not_false_loss_and_private_url_never_enters_loss_report ... ok
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+test unknown_body ... ok
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+test unknown_caption ... ok
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+test unknown_footer ... ok
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+test unknown_header ... ok
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+test unknown_master ... ok
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+test unknown_nested_cell ... ok
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x00000000)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+test unknown_zero_identifier_still_reports_unsupported_hwpx_control ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+

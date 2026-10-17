@@ -1,0 +1,19 @@
+{
+  "sourceId": "7f263b032ed27d5f",
+  "nativeGroups": 27,
+  "browserGroups": 17,
+  "actualHancomPairs": {
+    "pass": 10,
+    "fail": 1,
+    "remaining": "column2 geometry 37"
+  },
+  "unknownWasm": "known strict save, exact omitted owner, production guard rejection, source/event/disk unchanged",
+  "sealedRawReports": {
+    "actual11": {
+      "path": "actual11.json.gz",
+      "rawSha256": "60427a897b2b1b39edc7c3481c8b1e1659b297c1c66f67a782679c18c71376f0",
+      "rawBytes": 5421136
+    }
+  },
+  "scope": "WASM/native and actual Edge. Native IPC synthetic where browser verifier uses it. No new Hancom UI save was performed for75. Private native80 historically78pass2reporterfail; same-codec reporter follow-up2pass and official75 actual11 separately recorded."
+}

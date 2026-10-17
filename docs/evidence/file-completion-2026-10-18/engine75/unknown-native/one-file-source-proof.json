@@ -1,0 +1,12 @@
+{
+  "sourceFiles": 1062,
+  "unchanged": 1061,
+  "changed": [
+    {
+      "path": "src/serializer/paragraph_metadata_loss.rs",
+      "beforeSha256": "04cb2d160037697743ddea75c804421ed271a21f31adb060fe2e8b04a580b01d",
+      "afterSha256": "5800fc5553b33736dec5c04c1f58c5d7274ef7144d6460766ebfc3efb21dadbf"
+    }
+  ],
+  "harnessAdditions": "Cargo.toml test target, integration test source, byte-identical compile includes only; immutable baseline and engine/patches untouched."
+}

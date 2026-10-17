@@ -1,0 +1,14 @@
+PASS Top -> hwp: real textbox meaning, runs and repeated save
+PASS Top -> hwpx: real textbox meaning, runs and repeated save
+PASS Center -> hwp: real textbox meaning, runs and repeated save
+PASS Center -> hwpx: real textbox meaning, runs and repeated save
+PASS Bottom -> hwp: real textbox meaning, runs and repeated save
+PASS Bottom -> hwpx: real textbox meaning, runs and repeated save
+PASS new textbox default is Top before and after HWP with no explicit setter
+PASS existing HWP textbox preserves unrelated list_attr bits while semantic alignment changes
+PASS reserved raw alignment 3 stays unknown and unchanged across repeat HWP save
+PASS reserved raw3 explicit Top setter updates only supported alignment bits
+PASS reserved raw3 explicit Center setter updates only supported alignment bits
+PASS reserved raw3 explicit Bottom setter updates only supported alignment bits
+PASS unsupported alignment setter never normalizes reserved raw3
+PASS real textbox alignment corruption remains blocked by unchanged preservation guard

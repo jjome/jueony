@@ -1,0 +1,18 @@
+{
+  "bytesSha256": "ebe8fc48880e7b0cc32ecd6d00ed2fa75af27e98e57c1f507701a09abe46641c",
+  "expectedPath": "section/0/body/paragraph/0/control/0",
+  "report": {
+    "count": 1,
+    "losses": [
+      {
+        "code": "controlOmitted",
+        "path": "section/0/body/paragraph/0/control/0",
+        "reason": "unsupportedByOutputFormat",
+        "subject": "control"
+      }
+    ],
+    "outputFormat": "hwpx",
+    "schemaVersion": 1
+  },
+  "sourceSha256": "f8ed07bda5d3b66e472ef00052fe88b788ddc8b4c21a770b97d3741e6c9852a7"
+}

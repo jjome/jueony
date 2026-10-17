@@ -1,0 +1,9 @@
+{
+  "testSha256": "798d3e28e7f222fe9036b282d699384e3fb27eb39aa0cc1aa15d1e00982e30b3",
+  "testSource": "build\\file-closure69-overlap\\negative-combined-private73-v8\\tests\\jueony_fullwidth_guards.rs",
+  "sourceUnchanged": true,
+  "baselineSha256": "ebd32b5c9b14ddf9fb6a7a3f5003ea99fdea78bba4436ddcf34f8179fed2eefe",
+  "baselineSource": "build/file-closure69-overlap/fullwidth-guard-baseline73/unknownctrl.json",
+  "baselineUnchanged": true,
+  "firstFailure": "native.log selects old70 byte oracle accidentally; not product regression; untouched"
+}

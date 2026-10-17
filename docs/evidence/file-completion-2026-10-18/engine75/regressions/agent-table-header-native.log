@@ -1,0 +1,15 @@
+PASS hwp: repeat changes exactly title flags/repeat/policy; cells/format/other table and snapshot undo/reopen remain
+PASS hwp: title-only changes exactly title flags/repeat/policy; cells/format/other table and snapshot undo/reopen remain
+PASS hwp: clear changes exactly title flags/repeat/policy; cells/format/other table and snapshot undo/reopen remain
+PASS hwpx: repeat changes exactly title flags/repeat/policy; cells/format/other table and snapshot undo/reopen remain
+PASS hwpx: title-only changes exactly title flags/repeat/policy; cells/format/other table and snapshot undo/reopen remain
+PASS hwpx: clear changes exactly title flags/repeat/policy; cells/format/other table and snapshot undo/reopen remain
+PASS invalid combinations/no-op/targets/injection/batches refuse without changing bytes
+PASS partial first row/partial second row/scattered original title flags remain protected
+PASS merged/protected/inline/caption/mixed/field sources and missing cell writer are protected
+PASS changed first title flags/cell content/format/table policy invalidate old source
+PASS second cell failure, false/no-op and extra flag/content/format/placement/style/resource changes reject and restore
+PASS forged current header capability cannot make an empty undo change
+PASS later section flattened table identity changes title flags in the intended section only
+PASS hwp: real multi-page render repeats first-row labels on continuation, disabling repeat removes them
+PASS hwpx: real multi-page render repeats first-row labels on continuation, disabling repeat removes them

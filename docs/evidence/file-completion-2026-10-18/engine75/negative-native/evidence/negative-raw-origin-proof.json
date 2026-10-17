@@ -1,0 +1,351 @@
+{
+  "scope": "Independent CFB/inflate/record parser; original source and actual Hancom raw rows/control words only. No Native getters, source rewrite or cache normalization.",
+  "files": [
+    {
+      "name": "support/negative.hwp",
+      "sha256": "a5c62e0b6cff7a9ba3445517bfc2f47494f841d75694f45400911fb115c3eec8",
+      "roots": [
+        {
+          "para": 0,
+          "textUnits": 21,
+          "lines": [
+            {
+              "textStart": 0,
+              "verticalPos": 0,
+              "lineHeight": 1000,
+              "textHeight": 1000,
+              "baseline": 850,
+              "lineSpacing": 600,
+              "columnStart": 0,
+              "segmentWidth": 42520,
+              "tag": 393216
+            }
+          ],
+          "controls": [
+            {
+              "controlIdHex": "64636573",
+              "rawLength": 47,
+              "rawSha256": "044cf8af78d34e86c0c6b25901b513b5dd4421285493536ee076cbe2bdef4d7a",
+              "commonDwords": [
+                1936024420,
+                0,
+                1134,
+                524288000,
+                65536,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "controlIdHex": "646c6f63",
+              "rawLength": 16,
+              "rawSha256": "a1f722f78ebdb7434bdcc2a00b13426342e2fe6cd56dbe5b6364e9b5a60f0e8e",
+              "commonDwords": [
+                1668246628,
+                4100,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "para": 1,
+          "textUnits": 9,
+          "lines": [
+            {
+              "textStart": 0,
+              "verticalPos": 1600,
+              "lineHeight": 1000,
+              "textHeight": 1000,
+              "baseline": 850,
+              "lineSpacing": 600,
+              "columnStart": 0,
+              "segmentWidth": 0,
+              "tag": 393216
+            }
+          ],
+          "controls": [
+            {
+              "controlIdHex": "206c6274",
+              "rawLength": 46,
+              "rawSha256": "3d33ae6ac4abe75ac18e633b126aa3be055c577c256884604d08b90e6ef69e10",
+              "commonDwords": [
+                1952607264,
+                2753296,
+                0,
+                0,
+                41954,
+                5181,
+                0,
+                18546971
+              ]
+            }
+          ]
+        },
+        {
+          "para": 2,
+          "textUnits": 9,
+          "lines": [
+            {
+              "textStart": 0,
+              "verticalPos": 3200,
+              "lineHeight": 1000,
+              "textHeight": 1000,
+              "baseline": 850,
+              "lineSpacing": 600,
+              "columnStart": 0,
+              "segmentWidth": 0,
+              "tag": 393216
+            }
+          ],
+          "controls": [
+            {
+              "controlIdHex": "206c6274",
+              "rawLength": 46,
+              "rawSha256": "3b705a6ad725a3b1f1cc81901d8fa6f4890e4ab55681743f434dcc51bd5f1a8a",
+              "commonDwords": [
+                1952607264,
+                2769680,
+                4294966296,
+                0,
+                41954,
+                2564,
+                0,
+                18546971
+              ]
+            }
+          ]
+        },
+        {
+          "para": 3,
+          "textUnits": 11,
+          "lines": [
+            {
+              "textStart": 0,
+              "verticalPos": 4800,
+              "lineHeight": 1000,
+              "textHeight": 1000,
+              "baseline": 850,
+              "lineSpacing": 600,
+              "columnStart": 0,
+              "segmentWidth": 42520,
+              "tag": 393216
+            }
+          ],
+          "controls": []
+        },
+        {
+          "para": 4,
+          "textUnits": 1,
+          "lines": [
+            {
+              "textStart": 0,
+              "verticalPos": 6400,
+              "lineHeight": 1000,
+              "textHeight": 1000,
+              "baseline": 850,
+              "lineSpacing": 600,
+              "columnStart": 0,
+              "segmentWidth": 42520,
+              "tag": 393216
+            }
+          ],
+          "controls": []
+        },
+        {
+          "para": 5,
+          "textUnits": 1,
+          "lines": [
+            {
+              "textStart": 0,
+              "verticalPos": 8000,
+              "lineHeight": 1000,
+              "textHeight": 1000,
+              "baseline": 850,
+              "lineSpacing": 600,
+              "columnStart": 0,
+              "segmentWidth": 42520,
+              "tag": 393216
+            }
+          ],
+          "controls": []
+        }
+      ]
+    },
+    {
+      "name": "hancom-current/negative.hwp",
+      "sha256": "dc461180cab9f4a89c21f89eb1d8b3ba44f0fdde78d57e767d9af4553230b7f9",
+      "roots": [
+        {
+          "para": 0,
+          "textUnits": 21,
+          "lines": [
+            {
+              "textStart": 0,
+              "verticalPos": 0,
+              "lineHeight": 1000,
+              "textHeight": 1000,
+              "baseline": 850,
+              "lineSpacing": 600,
+              "columnStart": 0,
+              "segmentWidth": 42520,
+              "tag": 393216
+            }
+          ],
+          "controls": [
+            {
+              "controlIdHex": "64636573",
+              "rawLength": 47,
+              "rawSha256": "044cf8af78d34e86c0c6b25901b513b5dd4421285493536ee076cbe2bdef4d7a",
+              "commonDwords": [
+                1936024420,
+                0,
+                1134,
+                524288000,
+                65536,
+                0,
+                0,
+                0
+              ]
+            },
+            {
+              "controlIdHex": "646c6f63",
+              "rawLength": 16,
+              "rawSha256": "a1f722f78ebdb7434bdcc2a00b13426342e2fe6cd56dbe5b6364e9b5a60f0e8e",
+              "commonDwords": [
+                1668246628,
+                4100,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        {
+          "para": 1,
+          "textUnits": 9,
+          "lines": [
+            {
+              "textStart": 0,
+              "verticalPos": 1600,
+              "lineHeight": 1000,
+              "textHeight": 1000,
+              "baseline": 850,
+              "lineSpacing": 600,
+              "columnStart": 0,
+              "segmentWidth": 0,
+              "tag": 393216
+            }
+          ],
+          "controls": [
+            {
+              "controlIdHex": "206c6274",
+              "rawLength": 48,
+              "rawSha256": "6c7d27fb0055ebe16570e7b7954e3cf216ecde043d8a526c283658a6a3c6f7eb",
+              "commonDwords": [
+                1952607264,
+                2753296,
+                0,
+                0,
+                41954,
+                5181,
+                0,
+                18546971
+              ]
+            }
+          ]
+        },
+        {
+          "para": 2,
+          "textUnits": 9,
+          "lines": [
+            {
+              "textStart": 0,
+              "verticalPos": 7347,
+              "lineHeight": 1000,
+              "textHeight": 1000,
+              "baseline": 850,
+              "lineSpacing": 600,
+              "columnStart": 0,
+              "segmentWidth": 0,
+              "tag": 393216
+            }
+          ],
+          "controls": [
+            {
+              "controlIdHex": "206c6274",
+              "rawLength": 48,
+              "rawSha256": "dea838bf4fcf7e913340696a6fdf3b3b1c379b930fb7033d0aeacc390a459e72",
+              "commonDwords": [
+                1952607264,
+                2769680,
+                4294966296,
+                0,
+                41954,
+                2564,
+                0,
+                18546971
+              ]
+            }
+          ]
+        },
+        {
+          "para": 3,
+          "textUnits": 11,
+          "lines": [
+            {
+              "textStart": 0,
+              "verticalPos": 9477,
+              "lineHeight": 1000,
+              "textHeight": 1000,
+              "baseline": 850,
+              "lineSpacing": 600,
+              "columnStart": 0,
+              "segmentWidth": 42520,
+              "tag": 393216
+            }
+          ],
+          "controls": []
+        },
+        {
+          "para": 4,
+          "textUnits": 1,
+          "lines": [
+            {
+              "textStart": 0,
+              "verticalPos": 11077,
+              "lineHeight": 1000,
+              "textHeight": 1000,
+              "baseline": 850,
+              "lineSpacing": 600,
+              "columnStart": 0,
+              "segmentWidth": 42520,
+              "tag": 393216
+            }
+          ],
+          "controls": []
+        },
+        {
+          "para": 5,
+          "textUnits": 1,
+          "lines": [
+            {
+              "textStart": 0,
+              "verticalPos": 12677,
+              "lineHeight": 1000,
+              "textHeight": 1000,
+              "baseline": 850,
+              "lineSpacing": 600,
+              "columnStart": 0,
+              "segmentWidth": 42520,
+              "tag": 393216
+            }
+          ],
+          "controls": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+PASS vertical-center: exact model/spans/format, first-cell content, save/reopen and snapshot redo
+PASS horizontal-wide: exact model/spans/format, first-cell content, save/reopen and snapshot redo
+PASS rectangle-center: exact model/spans/format, first-cell content, save/reopen and snapshot redo
+PASS unequal-bottom: exact model/spans/format, first-cell content, save/reopen and snapshot redo
+PASS empty-narrow: exact model/spans/format, first-cell content, save/reopen and snapshot redo
+PASS whole-single-cell: exact model/spans/format, first-cell content, save/reopen and snapshot redo
+PASS later-section: exact model/spans/format, first-cell content, save/reopen and snapshot redo
+PASS content minimum grows outer table: reject and restore exact bytes
+PASS invalid args, alias, no-op, overflow and missing cell refuse without writes
+PASS protection, header, field, bookmark, mixed, merged, HWP and inconsistent dimensions close capability
+PASS stale body/target style/grid versions cannot overwrite newer edits
+PASS false/no-op/throw/neighbor corruption reject inside outer snapshot rollback
+PASS same-effect cell zone remains observable and closes every table topology path
+PASS unknown Native cell zone count is readonly without changing the document

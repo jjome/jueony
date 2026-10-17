@@ -1,0 +1,54 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/file-closure69-overlap/fullwidth-comparable-baseline73)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 24s
+     Running tests/jueony_fullwidth_guards.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_fullwidth_guards-6d31817d928aaf47)
+
+running 32 tests
+test absolute ... ok
+test caption ... ok
+test cellfield ... ok
+test closed_gap_drift ... ok
+test colspan ... ok
+test column ... ok
+test dirtycell ... ok
+test dirtyrow ... ok
+test duplicate_grid ... ok
+test emptyhead ... ok
+test field ... ok
+test first_full_width ... ok
+test first_height_drift ... ok
+test first_positive_offset ... ok
+test full_width_drift ... ok
+test huge_offset ... LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=2, type=Table, first=false, y=28633342.9, bottom=1009.1, overflow=28632333.8px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=2, type=Table, first=false, y=28633342.9, bottom=1009.1, overflow=28632333.8px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=2, type=Table, first=false, y=28633346.6, bottom=1009.1, overflow=28632337.5px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=2, type=Table, first=false, y=28633346.6, bottom=1009.1, overflow=28632337.5px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=2, type=Table, first=false, y=28633342.9, bottom=1009.1, overflow=28632333.8px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=2, type=Table, first=false, y=28633342.9, bottom=1009.1, overflow=28632333.8px
+ok
+test leading_dirty ... ok
+test locked ... ok
+test mixed_earlier_negative ... LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~220.0, b=178.7~212.9, overlap=41.3px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~220.0, b=178.7~212.9, overlap=41.3px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=157.4~223.8, b=178.7~212.9, overlap=45.1px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=157.4~223.8, b=178.7~212.9, overlap=45.1px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~220.0, b=178.7~212.9, overlap=41.3px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~220.0, b=178.7~212.9, overlap=41.3px
+ok
+test mixed_previous_negative ... ok
+test negative ... ok
+test pagebreak ... ok
+test positive_control ... ok
+test protected ... ok
+test rowspan ... ok
+test shiftedhead ... ok
+test synthetic ... ok
+test unknownctrl ... [hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+ok
+test width_relative ... ok
+test zero_cell_height ... ok
+test zero_target_width ... ok
+test zone ... ok
+
+test result: ok. 32 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.45s
+

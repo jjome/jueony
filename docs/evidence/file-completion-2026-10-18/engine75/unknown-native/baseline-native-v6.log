@@ -1,0 +1,95 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/unknown-control-loss-candidate/source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.09s
+     Running tests/jueony_unknown_control_loss.rs (/tmp/jueony-unknown-control-loss-target/debug/deps/jueony_unknown_control_loss-d34bfc9ac9f1682a)
+
+running 11 tests
+test known_containers_have_no_false_loss ... ok
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+
+thread 'native_core_report_owns_the_same_body_loss' (132620) panicked at tests/jueony_unknown_control_loss.rs:24:511:
+assertion `left == right` failed
+  left: 0
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test native_core_report_owns_the_same_body_loss ... FAILED
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+
+thread 'parsed_hwp_original_unknown_control_receives_report' (132621) panicked at tests/jueony_unknown_control_loss.rs:27:1291:
+assertion `left == right` failed
+  left: 0
+ right: 1
+test parsed_hwp_original_unknown_control_receives_report ... FAILED
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+
+thread 'supported_hyperlink_is_not_false_loss_and_private_url_never_enters_loss_report' (132622) panicked at tests/jueony_unknown_control_loss.rs:29:1196:
+assertion `left == right` failed
+  left: 0
+ right: 1
+test supported_hyperlink_is_not_false_loss_and_private_url_never_enters_loss_report ... FAILED
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+
+thread 'unknown_body' (132623) panicked at tests/jueony_unknown_control_loss.rs:16:711:
+assertion `left == right` failed: unknown must have exactly one loss, body
+  left: 0
+ right: 1
+test unknown_body ... FAILED
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+
+thread 'unknown_caption' (132624) panicked at tests/jueony_unknown_control_loss.rs:16:711:
+assertion `left == right` failed: unknown must have exactly one loss, caption
+  left: 0
+ right: 1
+test unknown_caption ... FAILED
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+
+thread 'unknown_footer' (132625) panicked at tests/jueony_unknown_control_loss.rs:16:711:
+assertion `left == right` failed: unknown must have exactly one loss, footer
+  left: 0
+ right: 1
+test unknown_footer ... FAILED
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+
+thread 'unknown_header' (132626) panicked at tests/jueony_unknown_control_loss.rs:16:711:
+assertion `left == right` failed: unknown must have exactly one loss, header
+  left: 0
+ right: 1
+test unknown_header ... FAILED
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+
+thread 'unknown_master' (132627) panicked at tests/jueony_unknown_control_loss.rs:16:711:
+assertion `left == right` failed: unknown must have exactly one loss, master
+  left: 0
+ right: 1
+test unknown_master ... FAILED
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+
+thread 'unknown_nested_cell' (132628) panicked at tests/jueony_unknown_control_loss.rs:16:711:
+assertion `left == right` failed: unknown must have exactly one loss, nested-cell
+  left: 0
+ right: 1
+test unknown_nested_cell ... FAILED
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x00000000)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+
+thread 'unknown_zero_identifier_still_reports_unsupported_hwpx_control' (132629) panicked at tests/jueony_unknown_control_loss.rs:25:243:
+assertion `left == right` failed
+  left: 0
+ right: 1
+test unknown_zero_identifier_still_reports_unsupported_hwpx_control ... FAILED
+
+failures:
+
+failures:
+    native_core_report_owns_the_same_body_loss
+    parsed_hwp_original_unknown_control_receives_report
+    supported_hyperlink_is_not_false_loss_and_private_url_never_enters_loss_report
+    unknown_body
+    unknown_caption
+    unknown_footer
+    unknown_header
+    unknown_master
+    unknown_nested_cell
+    unknown_zero_identifier_still_reports_unsupported_hwpx_control
+
+test result: FAILED. 1 passed; 10 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_unknown_control_loss`

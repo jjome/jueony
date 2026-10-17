@@ -1,0 +1,9 @@
+PASS split horizontal keeps all text in primary and restores witnessed unequal grid, formats, other table and save
+PASS split vertical keeps all text in primary and restores witnessed unequal grid, formats, other table and save
+PASS split rectangle keeps all text in primary and restores witnessed unequal grid, formats, other table and save
+PASS split offset keeps all text in primary and restores witnessed unequal grid, formats, other table and save
+PASS empty new cells inherit first paragraph shape while distinct primary paragraph formats remain
+PASS whole merge without witnesses, extra merge, protection, mixed run, HWP, field, bookmark refuse without writes
+PASS invalid coordinates, alias, batch, unmerged target and unknown arguments refuse
+PASS false/no-op/throw and equal-length neighbor text corruption restore exact snapshot bytes
+PASS stale nonfirst merged paragraph format and source grid cannot overwrite current edits

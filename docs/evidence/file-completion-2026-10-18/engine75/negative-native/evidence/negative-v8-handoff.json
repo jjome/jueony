@@ -1,0 +1,110 @@
+{
+  "status": "renderer delta ready; independent unknown-loss-report defect remains correctly failing",
+  "formalBase": "source-5c509946c79e331e / 73 production patches",
+  "patch": "build\\file-closure69-overlap\\negative-v8-delta-formal73.patch",
+  "patchSha256": "2b8d16e911e3af30b9abfb93da33717de6e007b8e971046d5f6ca45a27c44d8d",
+  "productionRuntimeFiles": [
+    "src/renderer/float_placement.rs",
+    "src/renderer/layout.rs",
+    "src/renderer/typeset/controls/flow_table.rs",
+    "src/renderer/typeset/table/block/entry.rs"
+  ],
+  "noParserSerializerModelOrGuardChanges": true,
+  "geometryTolerance": 0.2,
+  "independentOracle": "independent-oracle68.json (unchanged)",
+  "nativeResults": {
+    "negativeActualOriginalAndActualBothFormatsTwoCycles": {
+      "passed": 1,
+      "failed": 0,
+      "log": "combined-v8-negative-actual.log",
+      "geometryReopens": 8,
+      "contentLossRequiredZero": true,
+      "known5RequiredExact": true,
+      "originalIRRequiredExact": true
+    },
+    "negativeRealApiHistory": {
+      "passed": 2,
+      "failed": 0,
+      "log": "combined-v8-negative-history.log",
+      "geometryReopens": 8,
+      "undoRedoFullGeometry": true
+    },
+    "negativeExclusions": {
+      "passed": 29,
+      "failed": 1,
+      "total": 30,
+      "log": "combined-v8-negative-guards30.log",
+      "failure": "unknown control is excluded by ownership proof, but existing writer returns an empty loss report after dropping it",
+      "independentFixOwner": "conversion_storage",
+      "verification": "explicit ownership rejection + original IR unchanged; not a promise to support saving malformed synthetic sources"
+    },
+    "positiveActualBothSourcesTwoCycles": {
+      "passed": 9,
+      "failed": 0,
+      "log": "combined-v8-positive-actual9.log",
+      "geometryReopens": 72
+    },
+    "positiveRealApiHistory": {
+      "passed": 2,
+      "failed": 0,
+      "log": "combined-v8-positive-history2.log",
+      "geometryReopens": 8
+    },
+    "positiveComparable73Exclusions": {
+      "passed": 31,
+      "failed": 1,
+      "total": 32,
+      "log": "fullwidth-comparable-candidate73-v8.log",
+      "baseline": "fullwidth-comparable-baseline73.log (32/32)",
+      "sameFieldsToleranceAndBytes": true,
+      "failure": "existing genuine unknown-control omission returns empty contentLoss after all geometry and exact-byte assertions pass"
+    },
+    "realCellFormat11pt": {
+      "passed": 4,
+      "failed": 0,
+      "log": "actual-cell-format-v8.log",
+      "modes": [
+        "positive-original",
+        "positive-hancom",
+        "negative-original",
+        "negative-hancom"
+      ],
+      "actualModelBaseSize": 1100,
+      "undoRedoFullGeometry": true,
+      "geometryReopens": 16,
+      "contentLoss0AndMetadata5": true,
+      "note": "Native API processes pending nested dirty state before returning; synthetic outer-host dirty bit is a separate scope"
+    }
+  },
+  "scope": {
+    "supported": "single-section source starting with one actual SectionDef and single ColumnDef; first visible original row at0; exactly2 consecutive plain whole zero-width-object-host tables; firstoffset0/secondnegative; cached empty row ladder or exact closed predecessor frame; same positive absolute width and horizontaloffset0; occupied-band flow uses one published plan",
+    "excluded": "multicolumn, header/footer zones, missing/ambiguous section/column owner, thirdtable, captions/zones/fields/opaque controls, protected/locked/merged/dirty/synthetic table hosts, relative dimensions, excessive or partial-margin negative offset, unknown source gaps",
+    "note": "does not close all N001 modes; column2 and old non-reflowed multiline source cache differences stay independent"
+  },
+  "historyPreserved": [
+    "negative-v1-actual.log",
+    "negative-v2-actual.log",
+    "negative-v3-actual.log",
+    "negative-v3-trace-b.log",
+    "negative-v5-history.log",
+    "combined-v8-harness-compile-failure.log",
+    "positive-fullwidth-history2.log",
+    "positive-fullwidth-v3-guards32.log"
+  ],
+  "sourceProof": "build\\file-closure69-overlap\\negative-v8-source-proof73.json",
+  "sourceCodeProof": {
+    "rustFiles": 1062,
+    "allSrcFiles": 1335,
+    "changes": "4 production renderer files + Native private proof-wrapper only",
+    "manifest": "negative-v8-all-src-proof73.json",
+    "manifestSha256": "6699acfaa164a23434758e374335ca3e7cd6dd5f0b8a0b567fe813fe7f4a83cc"
+  },
+  "currentFinalTestCount": {
+    "passed": 78,
+    "failed": 2,
+    "executed": 80,
+    "uniqueOutstandingDefect": "HWPX Unknown stderr-only omission reporter, delegated to conversion_storage",
+    "wasmBrowserOnFormalFinal": "pending parent build; no private WASM"
+  },
+  "fullwidthBaselineContextDiagnostic": "fullwidth-baseline70-vs73-diagnostic.json"
+}

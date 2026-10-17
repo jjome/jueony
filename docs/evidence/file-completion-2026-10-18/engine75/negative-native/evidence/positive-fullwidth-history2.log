@@ -1,0 +1,20 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/file-closure69-overlap/positive-fullwidth-proof)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.13s
+     Running tests/jueony_fullwidth_history.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_fullwidth_history-b0f5b85904ad89a2)
+
+running 2 tests
+test hancom_history ... 
+thread 'hancom_history' (104558) panicked at tests/jueony_fullwidth_history.rs:3:83:
+table/cell geometry remains during successor input/controls/1/cells/0/y: 240.9 != 248.9
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test original_history ... ok
+
+failures:
+
+failures:
+    hancom_history
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_fullwidth_history`

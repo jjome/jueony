@@ -1,0 +1,162 @@
+--- a/src/renderer/float_placement.rs
++++ b/src/renderer/float_placement.rs
+@@ -5079,7 +5079,8 @@
+         table.page_break == TablePageBreak::None && object_only_saved_table_anchor(host, table)
+             && table.common.vert_rel_to == VertRelTo::Para
+             && table.common.vert_align == crate::model::shape::VertAlign::Top
+-            && signed_hwpunit(table.common.vertical_offset) >= 0
++            && (signed_hwpunit(table.common.vertical_offset) >= 0
++                || (para_index==3 && *owner==2 && negative_pair_has_frame_anchor(paragraphs)))
+     })
+ }
+ 
+@@ -5139,3 +5140,77 @@
+     paragraphs[count+1..].iter().all(|p| p.controls.is_empty()
+         && p.line_segs.windows(2).all(|pair|pair[0].text_start<pair[1].text_start))
+ }
++
++/// A narrow two-table signed-offset owner; never an arbitrary saved-line reflow.
++pub(crate) fn plain_negative_offset_pair(paragraphs: &[Paragraph]) -> bool {
++    let at=2;
++    let Some(first)=paragraphs.first() else { return false; };
++    if first.text.is_empty() || first.stored_text_partition_is_dirty() || first.cell_format_vpos_dirty || first.controls.iter().any(|c| !matches!(c, Control::SectionDef(_) | Control::ColumnDef(_)))
++        || !matches!(first.line_segs.as_slice(), [line] if line.vertical_pos==0
++            && line.text_start==0 && line.tag & 0x8000_0000==0) { return false; }
++    // Body-only proof: one actual section and one single-column definition.
++    if first.controls.iter().filter(|c|matches!(c,Control::SectionDef(_))).count()!=1
++        || first.controls.iter().filter(|c|matches!(c,Control::ColumnDef(col) if col.column_count==1)).count()!=1 { return false; }
++    let count=paragraphs.iter().skip(1).take_while(|p| matches!(p.controls.as_slice(), [Control::Table(_)])).count();
++    if count!=2 { return false; }
++    let [Control::Table(target)]=paragraphs[at].controls.as_slice() else { return false; };
++    let [Control::Table(previous)]=paragraphs[1].controls.as_slice() else { return false; };
++    let negative=signed_hwpunit(target.common.vertical_offset);
++    if negative>=0 || previous.common.vertical_offset!=0 || i64::from(negative) < -i64::from(previous.common.height) { return false; }
++    // Partial margin overlap has no independent external witness in this contract.
++    if -i64::from(negative)<i64::from(target.outer_margin_top.max(target.outer_margin_bottom).max(0)) { return false; }
++    let opaque=|p:&Paragraph| !p.field_ranges.is_empty() || !p.orphan_field_ends.is_empty()
++        || !p.range_tags.is_empty() || !p.title_marks.is_empty() || !p.markpen_marks.is_empty()
++        || p.ctrl_data_records.iter().any(Option::is_some);
++    if paragraphs.iter().any(opaque) { return false; }
++    for host in &paragraphs[1..=count] {
++        let [Control::Table(table)]=host.controls.as_slice() else { return false; };
++        let cells=usize::from(table.row_count)*usize::from(table.col_count);
++        if !object_only_saved_table_anchor(host, table) || host.stored_text_partition_is_dirty()
++            || host.cell_format_vpos_dirty || table.page_break!=TablePageBreak::None
++            || table.common.vert_rel_to!=VertRelTo::Para || table.common.vert_align!=VertAlign::Top
++            || !matches!(table.common.horz_rel_to,HorzRelTo::Para|HorzRelTo::Column)
++            || table.common.horz_align!=HorzAlign::Left || table.common.size_protect || table.common.locked
++            || table.attr & (1<<30)!=0 || table.raw_table_record_attr & 8!=0
++            || cells<=1 || table.common.width==0 || table.common.width>=0x8000_0000
++            || table.common.height==0 || table.common.height>=0x8000_0000
++            || table.common.height_criterion!=crate::model::shape::SizeCriterion::Absolute
++            || table.caption.is_some() || !table.zones.is_empty() || cells==0 || cells>4096 || cells!=table.cells.len()
++            || !matches!(host.line_segs.as_slice(), [line] if line.text_start==0 && line.vertical_pos>=0
++                && line.line_height>0 && line.tag & 0x8000_0000==0)
++            || table.cells.iter().map(|c|(c.row,c.col)).collect::<std::collections::BTreeSet<_>>().len()!=cells
++            || table.cells.iter().any(|cell| cell.row>=table.row_count || cell.col>=table.col_count
++                || cell.row_span!=1 || cell.col_span!=1 || cell.width==0 || cell.height==0
++                || cell.cell_protect() || cell.field_name.is_some() || cell.text_direction!=0
++                || cell.paragraphs.is_empty() || cell.paragraphs.iter().any(|p| !p.controls.is_empty() || opaque(p)))
++        { return false; }
++    }
++    if paragraphs[1..=count].windows(2).any(|pair|pair[1].line_segs[0].vertical_pos<pair[0].line_segs[0].vertical_pos) { return false; }
++    paragraphs[count+1..].iter().all(|p| p.controls.is_empty()
++        && p.line_segs.windows(2).all(|pair|pair[0].text_start<pair[1].text_start))
++}
++
++/// Only the exact empty-row ladder is a cached anchor, not a physical table edge.
++pub(crate) fn negative_pair_has_cached_empty_anchor(paragraphs: &[Paragraph]) -> bool {
++    if !plain_negative_offset_pair(paragraphs) { return false; }
++    let before=&paragraphs[1].line_segs[0];
++    let after=&paragraphs[2].line_segs[0];
++    before.line_spacing>0 && before.line_height==after.line_height
++        && before.line_spacing==after.line_spacing
++        && i64::from(after.vertical_pos)==i64::from(before.vertical_pos)+i64::from(before.line_height)+i64::from(before.line_spacing)
++}
++
++/// Two independently recorded native sources: empty-row cache or exactly
++/// closed predecessor outer frame. Arbitrary source gaps remain unowned.
++pub(crate) fn negative_pair_has_frame_anchor(paragraphs:&[Paragraph])->bool {
++    if !plain_negative_offset_pair(paragraphs) { return false; }
++    let [Control::Table(previous)]=paragraphs[1].controls.as_slice() else { return false; };
++    let [Control::Table(target)]=paragraphs[2].controls.as_slice() else { return false; };
++    if previous.common.width!=target.common.width || previous.common.horizontal_offset!=0 || target.common.horizontal_offset!=0
++        || previous.common.width_criterion!=crate::model::shape::SizeCriterion::Absolute
++        || target.common.width_criterion!=crate::model::shape::SizeCriterion::Absolute { return false; }
++    let before=&paragraphs[1].line_segs[0];let after=&paragraphs[2].line_segs[0];
++    negative_pair_has_cached_empty_anchor(paragraphs) ||
++        i64::from(after.vertical_pos)-i64::from(before.vertical_pos)==i64::from(previous.common.height)
++            +i64::from(previous.outer_margin_top)+i64::from(previous.outer_margin_bottom)
++}
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -12145,7 +12145,8 @@
+                         if self.profile.get().hwp5_origin_hwpx()
+                             && !(layout.column_areas.len()==1
+                                 && (crate::renderer::float_placement::plain_positive_offset_stack(paragraphs,para_index)
+-                                    || crate::renderer::float_placement::closed_full_width_positive_pair(paragraphs,para_index)))
++                                    || crate::renderer::float_placement::closed_full_width_positive_pair(paragraphs,para_index)
++                                    || (para_index==2 && crate::renderer::float_placement::negative_pair_has_frame_anchor(paragraphs))))
+                             && !is_current_empty_square_sibling_float
+                             && is_para_topbottom_float(&t.common)
+                             && matches!(t.page_break, TablePageBreak::None)
+--- a/src/renderer/typeset/controls/flow_table.rs
++++ b/src/renderer/typeset/controls/flow_table.rs
+@@ -104,7 +104,8 @@
+                         || crate::renderer::float_placement::closed_full_width_positive_pair(paragraphs_all,para_idx+1))
+                     && following.common.vert_rel_to == crate::model::shape::VertRelTo::Para
+                     && following.common.vert_align == crate::model::shape::VertAlign::Top
+-                    && signed_hwpunit(following.common.vertical_offset) >= 0));
++                    && (signed_hwpunit(following.common.vertical_offset) >= 0
++                        || (para_idx==1 && crate::renderer::float_placement::negative_pair_has_frame_anchor(paragraphs_all)))));
+     if starts_semantic_stack {
+         let single_cell_placeholder = table.row_count == 1 && table.col_count == 1
+             && table.cells.len() == 1 && table.cells[0].paragraphs.iter()
+@@ -132,7 +133,8 @@
+             || crate::renderer::float_placement::closed_full_width_positive_pair(paragraphs_all,para_idx))
+         && table.common.vert_rel_to == crate::model::shape::VertRelTo::Para
+         && table.common.vert_align == crate::model::shape::VertAlign::Top
+-        && signed_hwpunit(table.common.vertical_offset) >= 0
++        && (signed_hwpunit(table.common.vertical_offset) >= 0
++            || (para_idx==2 && crate::renderer::float_placement::negative_pair_has_frame_anchor(paragraphs_all)))
+         && para_idx.checked_sub(1).is_some_and(|previous_index| {
+             paragraphs_all.get(previous_index).is_some_and(|host| matches!(host.controls.as_slice(),
+                 [crate::model::control::Control::Table(previous)] if previous.page_break == crate::model::table::TablePageBreak::None
+@@ -148,6 +150,10 @@
+             true, para, ctrl_idx, next_para).map(|hu| hwpunit_to_px(hu, engine.dpi)).unwrap_or(0.0);
+         ft.host_spacing.after -= cached_host_advance;
+         ft.host_spacing.after_for_fit -= cached_host_advance;
++        if para_idx==2 && crate::renderer::float_placement::negative_pair_has_frame_anchor(paragraphs_all) {
++            ft.host_spacing.after -= hwpunit_to_px(table.outer_margin_bottom.max(0) as i32,engine.dpi);
++            ft.total_height=ft.effective_height+ft.host_spacing.before+ft.host_spacing.after;
++        }
+     }
+ 
+     let issue2439_para_start_height =
+--- a/src/renderer/typeset/table/block/entry.rs
++++ b/src/renderer/typeset/table/block/entry.rs
+@@ -1800,7 +1800,24 @@
+             has_preceding_coanchored_float,
+             dpi: self.dpi,
+         };
++        // The exact two-table empty-row cache is not a trailing host text row.
++        // A negative offset consumes the outer lead until the preceding frame
++        // floor; publish that same occupied frame to pagination and painting.
++        let negative_pair_placement = (st.col_count==1 && st.profile.hwp5_stored_pagination_layout()
++            && para_idx==2 && crate::renderer::float_placement::negative_pair_has_frame_anchor(paragraphs_all)
++            && st.current_zone_y_offset.abs()<0.5
++            && matches!(st.current_items.as_slice(),[PageItem::FullParagraph{para_index:0},PageItem::Table{para_index:1,control_index:0}]))
++            .then(|| {
++                let top=(st.current_height+ft.host_spacing.before
++                    + hwpunit_to_px(signed_hwpunit(table.common.vertical_offset),self.dpi)).max(st.current_height);
++                crate::renderer::float_placement::ParagraphFloatPlacement {
++                    flow:crate::renderer::float_placement::ParagraphFloatFlow::Exclusion,
++                    anchor_y:st.current_height,stored_host_origin:None,stored_successor_line_origin:None,
++                    table_left:None,table_top:top,occupied_bottom:top+ft.effective_height+ft.host_spacing.after,
++                }
++            });
+         let resolved_host_placement = closed_source_frame_placement
++            .or(negative_pair_placement)
+             .or(captioned_column_placement)
+             .or(consumed_whole_anchor)
+             .or_else(|| {

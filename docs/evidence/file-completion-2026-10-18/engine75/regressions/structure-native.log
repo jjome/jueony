@@ -1,0 +1,11 @@
+PASS split two interior boundaries preserves unequal row heights, all text and character styles
+PASS attach freshly split tables restores exact document preservation and root addresses
+PASS later-section root, following tables and flattened control addresses remain correct
+PASS HWP, protected cell/table, merged cells, captions, headers and mixed styles refuse
+PASS out-of-range/no-op/alias/extra arguments and unqueried next target refuse
+PASS attach rejects content between tables, unequal column widths and changed table properties
+PASS stale paragraph format and next-table text cannot overwrite user edits
+PASS native false, no-op, throw, equal-length body/cell and unrelated property corruption fail and restore
+PASS unknown protection flags, native reader failure and missing native writer never imply editable
+PASS empty cell character defaults and custom host paragraph properties survive split and attach
+PASS split and attach HWP output passes strict preservation and same-engine layout reopen

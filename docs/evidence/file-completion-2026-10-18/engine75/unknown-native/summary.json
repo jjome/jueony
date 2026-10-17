@@ -1,0 +1,130 @@
+{
+  "baselineSourceId": "5c509946c79e331e",
+  "changedSourceFiles": 1,
+  "native": {
+    "baselinePassed": 1,
+    "baselineFailed": 10,
+    "candidatePassed": 11,
+    "candidateFailed": 0,
+    "ignored": 0
+  },
+  "pathChecks": [
+    {
+      "mode": "body",
+      "path": "section/0/body/paragraph/0/control/0",
+      "baselineCount": 0,
+      "candidateCount": 1,
+      "hwpBytesUnchanged": true,
+      "hwpxBytesUnchanged": true,
+      "hwpSha256": "c3665e8054b7a663f9ffe232381ebaaec9a203b46637ff5b544eabcacc7b97c7",
+      "hwpxSha256": "a2c0ded6860721ffbd0b0239775f956e6ef4d58b8bf8880cf809471a04ada2de",
+      "liveSourceUnchanged": true
+    },
+    {
+      "mode": "nested-cell",
+      "path": "section/0/body/paragraph/0/control/0/cell/0/paragraph/0/control/0/cell/0/paragraph/0/control/0",
+      "baselineCount": 0,
+      "candidateCount": 1,
+      "hwpBytesUnchanged": true,
+      "hwpxBytesUnchanged": true,
+      "hwpSha256": "cc73fab2afcbcbb5d34109db91324b8cb96651e1fe82da791610ac87ba715415",
+      "hwpxSha256": "5f1c1dc4d98d86d9954807b4944b09b4040c474d439b619b1b43099c9a57afd2",
+      "liveSourceUnchanged": true
+    },
+    {
+      "mode": "header",
+      "path": "section/0/body/paragraph/0/control/0/header/paragraph/0/control/0",
+      "baselineCount": 0,
+      "candidateCount": 1,
+      "hwpBytesUnchanged": true,
+      "hwpxBytesUnchanged": true,
+      "hwpSha256": "83147f09bf3e99592cccbcfdb2a72d2b75d6257f1eb1ea7c5913ded4980868d2",
+      "hwpxSha256": "0b47b6b0378c5eed6245f42212e050c3459e4ce62afce6eb75675fe5590f54d5",
+      "liveSourceUnchanged": true
+    },
+    {
+      "mode": "footer",
+      "path": "section/0/body/paragraph/0/control/0/footer/paragraph/0/control/0",
+      "baselineCount": 0,
+      "candidateCount": 1,
+      "hwpBytesUnchanged": true,
+      "hwpxBytesUnchanged": true,
+      "hwpSha256": "dcda2dfa1c23289e0578a588dbdcd5032b61f7d43ec089b066dc3cf663b60991",
+      "hwpxSha256": "e4afe036358d36a4d015e2be1ab3cc713b4f0a79850aa656a0243019ae564a90",
+      "liveSourceUnchanged": true
+    },
+    {
+      "mode": "caption",
+      "path": "section/0/body/paragraph/0/control/0/caption/paragraph/0/control/0",
+      "baselineCount": 0,
+      "candidateCount": 1,
+      "hwpBytesUnchanged": true,
+      "hwpxBytesUnchanged": true,
+      "hwpSha256": "0caa5dd8e8ad15b201f879cd1c8af182532d799cede115721154f2ccc057cfa1",
+      "hwpxSha256": "d24c4da0537326bbbbb2a4c9d2fee7bf8ce71423e0aa70e21904d04ff14a4fe5",
+      "liveSourceUnchanged": true
+    },
+    {
+      "mode": "master",
+      "path": "section/0/master/0/paragraph/0/control/0",
+      "baselineCount": 0,
+      "candidateCount": 1,
+      "hwpBytesUnchanged": true,
+      "hwpxBytesUnchanged": true,
+      "hwpSha256": "d161df41a635bc0eb118f4fd9da64bc7fe8e740f74e20c2b020901e42b13a767",
+      "hwpxSha256": "773be7b44986dbcc7077a777213bc165214474cb7c1e7f108be69db2b2009dd2",
+      "liveSourceUnchanged": true
+    }
+  ],
+  "parsedHwp": {
+    "expectedPath": "section/0/body/paragraph/2/control/1",
+    "mutatedSourceSha256": "c20e633a2cd6a89a281f383b6026ac6a40d97212ef2f810bc1b188dc1a4e5934",
+    "originalModelSha256": "e4d5b89e1aaa72a671345e35cb4e5e05a3fac0ba776673fbbb0c90dc8e82f2ae",
+    "outputSha256": "7cd8133ce53aaef30335e541793d19b3ce38706080df15759e178ff666599b78",
+    "report": {
+      "count": 1,
+      "losses": [
+        {
+          "code": "controlOmitted",
+          "path": "section/0/body/paragraph/2/control/1",
+          "reason": "unsupportedByOutputFormat",
+          "subject": "control"
+        }
+      ],
+      "outputFormat": "hwpx",
+      "schemaVersion": 1
+    },
+    "sourceBytesSha256": "a5c62e0b6cff7a9ba3445517bfc2f47494f841d75694f45400911fb115c3eec8"
+  },
+  "hyperlinkNegative": {
+    "mixedReport": {
+      "count": 1,
+      "losses": [
+        {
+          "code": "controlOmitted",
+          "path": "section/0/body/paragraph/0/control/1",
+          "reason": "unsupportedByOutputFormat",
+          "subject": "control"
+        }
+      ],
+      "outputFormat": "hwpx",
+      "schemaVersion": 1
+    },
+    "supportedHyperlinkPreserved": true,
+    "urlNotInReport": true
+  },
+  "sourceProof": "one-file-source-proof.json",
+  "patch": "unknown-control-content-loss.patch",
+  "patchSha256": "f2004c1fe26b90b03d2e407380536a3d8eebf9529d8bc67c083c75a9b1f4ceec",
+  "candidateSourceSha256": "5800fc5553b33736dec5c04c1f58c5d7274ef7144d6460766ebfc3efb21dadbf",
+  "harnessSha256": "1fad9519677e4b8a9c2ab78be9775ad0c15ad08b9e075895d35b5ab8fb32c228",
+  "strictPatchCheck": {
+    "command": "git apply --check --whitespace=error-all",
+    "exitCode": 0
+  },
+  "limitations": [
+    "Native only, formal merged WASM/browser guard integration pending",
+    "Unknown is still omitted by writer but truthfully reported; not preserved",
+    "HWP reporting/writer behavior unchanged; no claim that arbitrary raw unknown HWP payloads are supported"
+  ]
+}

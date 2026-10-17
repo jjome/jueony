@@ -1,0 +1,37 @@
+{
+  "formal73Source": "build\\rhwp-engine\\source-5c509946c79e331e",
+  "formalPatchCount": 73,
+  "runtimeRsFilesCompared": 1062,
+  "changed": [
+    {
+      "path": "src/lib.rs",
+      "baseSha256": "7a1c15626fdfc77addb5860cf2700b3e4b4f920190f4187530d35dc5c5cf42eb",
+      "candidateSha256": "b3ad29595f4e80f3bf44180d6bac171a8225a3e480d8859ef381c602585cc72f"
+    },
+    {
+      "path": "src/renderer/float_placement.rs",
+      "baseSha256": "977c04e2e2123458227f804a636691457fc6abeff2b4667649243e2b456b09d3",
+      "candidateSha256": "e96b30ccded7ac161637075336c9f76f11c88d2a43a705dc25a696668cc7582d"
+    },
+    {
+      "path": "src/renderer/layout.rs",
+      "baseSha256": "99c0db02ce598e8adf11bce0ca9f48e5f05e0d74dcba58f088796fbf0dafae08",
+      "candidateSha256": "3334e572ff70f194aeb433436b97f40bc9cedb3e47bfdb1c30b3888e0aa67f35"
+    },
+    {
+      "path": "src/renderer/typeset/controls/flow_table.rs",
+      "baseSha256": "887509a7e17de5077c202408daace84b6e435105a29af45a2175717c4022cc30",
+      "candidateSha256": "0e32eaeeeedf5d5a252236f3e9d9513561a1b7c7078722af19d953755f0deac3"
+    },
+    {
+      "path": "src/renderer/typeset/table/block/entry.rs",
+      "baseSha256": "ea68eb7d6ba049771719eb02f692e207ee4f2387b1bee5839153d274f9332f3b",
+      "candidateSha256": "d7078bb46d777833c5f383dba42846b809e520cd924f50fa6759f203530587b3"
+    }
+  ],
+  "testOnlyLibPrefixExact": true,
+  "testOnlyLibExtra": "one Native pub wrapper to call the private ownership proof; excluded from delta",
+  "productionChangedFiles": 4,
+  "patchSha256": "2b8d16e911e3af30b9abfb93da33717de6e007b8e971046d5f6ca45a27c44d8d",
+  "parserSerializerModelChanges": false
+}

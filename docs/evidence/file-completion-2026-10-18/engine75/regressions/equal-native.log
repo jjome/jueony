@@ -1,0 +1,12 @@
+PASS HWPX whole: exact selected widths, total/remainder, unrelated state and snapshot/reopen
+PASS HWPX band: exact selected widths, total/remainder, unrelated state and snapshot/reopen
+PASS HWPX long: exact selected widths, total/remainder, unrelated state and snapshot/reopen
+PASS HWPX multiple: exact selected widths, total/remainder, unrelated state and snapshot/reopen
+PASS long narrow column widens and row reflow remains stable on save/reopen
+PASS invalid/no-op/partial bands/mixed/aliases/batch/overflow inputs never write
+PASS protected/merged/mixed/field/vertical/inline/inconsistent table sources stay readonly
+PASS stale text/defaults/width/Native protection rejects detached source without writes
+PASS false/no-op/throwing resize or changed text/border/height/padding/unselected width rejects and snapshot restores
+PASS missing layout or injected live cell/text geometry rejects and restores
+PASS empty cells and later section identity preserve actual geometry and safe save
+PASS HWP source remains readonly even with forged eligibility

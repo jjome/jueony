@@ -1,0 +1,14 @@
+--- a/src/serializer/paragraph_metadata_loss.rs
++++ b/src/serializer/paragraph_metadata_loss.rs
+@@ -10,10 +10,11 @@
+     for(i,s)in doc.sections.iter().enumerate().rev(){paragraphs(&mut stack,&s.paragraphs,&format!("section/{i}/body"));for(j,m)in s.section_def.master_pages.iter().enumerate().rev(){paragraphs(&mut stack,&m.paragraphs,&format!("section/{i}/master/{j}"));}}
+     while let Some(node)=stack.pop(){match node{
+         Node::Paragraph(p,path)=>{
+             if p.numbering_restart.is_some(){report.record(ContentLoss{code:ContentLossCode::MetadataReduced,subject:ContentLossSubject::ParagraphProperties,path:format!("{path}/numberingRestart"),reason:ContentLossReason::SerializerNotImplemented,resource_id:None});}
+             for(i,c)in p.controls.iter().enumerate().rev(){let key=format!("{path}/control/{i}");match c{
++                Control::Unknown(_) if report.output_format()==super::content_loss::SerializedFormat::Hwpx=>{report.record(ContentLoss{code:ContentLossCode::ControlOmitted,subject:ContentLossSubject::Control,path:key,reason:ContentLossReason::UnsupportedByOutputFormat,resource_id:None});},
+                 Control::Table(t)=>{caption(&mut stack,t.caption.as_ref(),&key);for(j,c)in t.cells.iter().enumerate().rev(){paragraphs(&mut stack,&c.paragraphs,&format!("{key}/cell/{j}"));}},
+                 Control::Shape(s)=>stack.push(Node::Shape(s,key)),
+                 Control::Picture(p)=>caption(&mut stack,p.caption.as_ref(),&key),
+                 Control::Header(h)=>paragraphs(&mut stack,&h.paragraphs,&format!("{key}/header")),
+                 Control::Footer(h)=>paragraphs(&mut stack,&h.paragraphs,&format!("{key}/footer")),

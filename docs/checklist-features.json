@@ -54,7 +54,7 @@
       "key": "files",
       "file": "05-files-storage-recovery.md",
       "title": "파일·저장·복구·형식 보존",
-      "description": "열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.\n\n**2026-10-18 현재:** 정식73에서 번호 확장 보존·관측 기반 손실 검사와 양수 위치 표의 원본/한글 사본 양형식 재저장을 보강했다. 기존 Native27 회귀, 전체 unit898, Agent Native6·실제 Edge12를 통과했다. 실제 한글11쌍은9통과이며 음수 위치·두 단은 미완료다. 실제 Windows 독립 창/새 탭·복구 보관 종료·재열기·OS 저장과 독립 readback을 확인했고 네이티브 Rust29검사도 통과했다. Agent는 요약5필드와 현재 업무 탭 조회/생성/전환/clean 닫기를 연결했다. 상위10개 전체, XML 서식·모든 문서 호환·OS 저장/종료 Agent 권한은 미완료다. [최신 구현·검수](../110-file-preservation-integration.md) · [이전 결과와 실패](../109-file-preservation-hancom-followup.md).",
+      "description": "열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.\n\n**2026-10-18 현재:** 정식75에서 번호 확장 보존·관측 기반 손실 검사와 양수·음수 위치 표의 원본/한글 사본 양형식 재저장과 미지원 컨트롤의 정확한 손실 보고·저장 차단을 보강했다. 정식75 기존44회귀(Native27·실제 Edge17) 통과. 정식73의 unit898·Agent Native6·Edge12는 별도 기록이다. 실제 한글11쌍은10통과이며 두 단은 통합 검수 중이다. 실제 Windows 독립 창/새 탭·복구 보관 종료·재열기·OS 저장과 독립 readback을 확인했고 네이티브 Rust29검사도 통과했다. Agent는 요약5필드와 현재 업무 탭 조회/생성/전환/clean 닫기를 연결했다. 상위10개 전체, XML 서식·모든 문서 호환·OS 저장/종료 Agent 권한은 미완료다. [최신 구현·검수](../110-file-preservation-integration.md) · [이전 결과와 실패](../109-file-preservation-hancom-followup.md).",
       "ids": "B001-B002 B005-B006 B009-B011 B014 B021-B022 G065-G073 G090 G092 N001-N002",
       "related": [
         "session",

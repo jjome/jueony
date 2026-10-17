@@ -1,0 +1,21 @@
+{
+  "expectedPath": "section/0/body/paragraph/0/control/0/footer/paragraph/0/control/0",
+  "hwpSha256": "dcda2dfa1c23289e0578a588dbdcd5032b61f7d43ec089b066dc3cf663b60991",
+  "hwpxSha256": "e4afe036358d36a4d015e2be1ab3cc713b4f0a79850aa656a0243019ae564a90",
+  "mode": "footer",
+  "report": {
+    "count": 1,
+    "losses": [
+      {
+        "code": "controlOmitted",
+        "path": "section/0/body/paragraph/0/control/0/footer/paragraph/0/control/0",
+        "reason": "unsupportedByOutputFormat",
+        "subject": "control"
+      }
+    ],
+    "outputFormat": "hwpx",
+    "schemaVersion": 1
+  },
+  "sourceSha256": "cfd2aa78aa65ff045cd0e72143bc6b02bf70de009f227f1e1f715220ee3d2a39",
+  "sourceUnchanged": true
+}

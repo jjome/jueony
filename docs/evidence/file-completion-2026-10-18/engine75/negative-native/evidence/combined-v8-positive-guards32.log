@@ -1,0 +1,246 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/file-closure69-overlap/negative-combined-private73-v8)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 17.18s
+     Running tests/jueony_fullwidth_guards.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_fullwidth_guards-6d31817d928aaf47)
+
+running 32 tests
+test absolute ... 
+thread 'absolute' (116382) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: absolute/hwpxSha256
+  left: String("e50a277d595eb63459268b49093d46a86f5106600e388972c13678cf87a43d7f")
+ right: String("9afb68af315198631e1a6753f1817dfa0b16d407939cd7797d0bf525b6fb0a57")
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test caption ... 
+thread 'caption' (116385) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: caption/hwpxSha256
+  left: String("6f66bca51a77f1346dd7b7ed006013448f1cb150f6876ab108e56530055fcb86")
+ right: String("252f96c2bd3d163e1f987bf8c92a720cb8f076cda02e6954858a2d660918e269")
+FAILED
+test cellfield ... 
+thread 'cellfield' (116394) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: cellfield/hwpxSha256
+  left: String("94eaf88983d133451e094f923114bcc952b1a24d34cd8e2698dad8e17b2a65e9")
+ right: String("903455830561e3628cc896a1eb51f41c3d343e5d26eff4a3d22b3768999e193f")
+FAILED
+test closed_gap_drift ... 
+thread 'closed_gap_drift' (116405) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: closed_gap_drift/hwpxSha256
+  left: String("33493507fd9617773452cb2a31c98b09f71605cef071693d6eadf506f43385bc")
+ right: String("07653ab0ef3151364829ae1ac44fbaf5853fefb0afab2dfa8fa8ced8b1527207")
+FAILED
+test colspan ... 
+thread 'colspan' (116423) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: colspan/hwpxSha256
+  left: String("d1f4641a97d213235142b7b79319f699a8fac24d40ad397e65a3eccc2c319984")
+ right: String("be3bc0139be66d07611c211be91b340c8b29b56d88ed6c4f2afdb6edd36f6caf")
+FAILED
+test column ... 
+thread 'column' (116449) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: column/hwpxSha256
+  left: String("866b0de06d9bc253c516e2b3099fe11416bf1e42b2bddd4a6fde3e827290f7b5")
+ right: String("e3cba748e6074422012684c6f582423886c710775da465d6292b39b193511b95")
+FAILED
+test dirtycell ... 
+thread 'dirtycell' (116488) panicked at tests/jueony_fullwidth_guards.rs:45:187:
+assertion `left == right` failed: exact HWPX bytes unchanged
+  left: String("6b611bc08f5ecc71ab7ba4bdbcbb1d3f2a63f6399a169ba37416dbb9cee672e3")
+ right: String("3effa95e1279c936dd65623b8e2b96e4dd71e7bb4cbbdf5b4bea6033e845503d")
+FAILED
+test dirtyrow ... 
+thread 'dirtyrow' (116535) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: dirtyrow/hwpxSha256
+  left: String("9651c85b994517040e6d760234e04290a5dca87715a0706dd151507ed008b649")
+ right: String("f8e458379e0c5904346d3e5782132d73d95cba9e2a096217b71b3e29aad9dd79")
+FAILED
+test duplicate_grid ... 
+thread 'duplicate_grid' (116585) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: duplicate_grid/hwpxSha256
+  left: String("691d2e18aee8488cdfffe2c36b408e44dbe500c5f7630ae78c6dc613a07741a2")
+ right: String("e2d4ac843687d29e60dea3bf7b1e10e7e35c9f40bba758ba6eb880c657b91498")
+FAILED
+test emptyhead ... 
+thread 'emptyhead' (116649) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: emptyhead/hwpxSha256
+  left: String("1742e00beb65e9a8574507f0fcaa1e5edf8b6d24aba381daaf0e6e7d6e2d2984")
+ right: String("94408d57ab333795e02ae1995a45765e77b166d119550b927db90a8eb1721dfe")
+FAILED
+test field ... 
+thread 'field' (116650) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: field/hwpxSha256
+  left: String("7e4d167dba9e310fcdcaac20a46da3d3efaaa405edb8889ae61bf92f6b3a6588")
+ right: String("aa123dc7835d9af9b1492ef94672d1695f0a4a5b8bdb6a85f6d4a05e18260cc2")
+FAILED
+test first_full_width ... 
+thread 'first_full_width' (116651) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: first_full_width/hwpxSha256
+  left: String("c4040bcd7ce6a48439390abd897bfb673d942916254b21972777494d918b52dc")
+ right: String("cf1ebb3b3db98fd89d2343f022dfba369c7f76445444f4270aa1c7a0436236f0")
+FAILED
+test first_height_drift ... 
+thread 'first_height_drift' (116652) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: first_height_drift/hwpxSha256
+  left: String("5097f7a702b27fbaafaae76cbb4481005ff9df6d5b78b2acd8acc5971d97f4af")
+ right: String("15ba2e4c7dd1624f89deea06639dd28d82c9e07b224fd17fb420e66d00c75d62")
+FAILED
+test first_positive_offset ... 
+thread 'first_positive_offset' (116655) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: first_positive_offset/hwpxSha256
+  left: String("071a8f79d81bf21ad38295160b44c8ddec7b7a8582e77c538a563c7e1a106e4b")
+ right: String("5b5ab714d88ebccdcb2e4619ab5176cfc26f0f35ea2a7332d0bdcf9d8e2c7106")
+FAILED
+test full_width_drift ... 
+thread 'full_width_drift' (116657) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: full_width_drift/hwpxSha256
+  left: String("f0867cd1772ca025bfa86403315fec28b60f95773ab1bea1c7f63c432ebb98e3")
+ right: String("2cb170a252b14ffd8d35468dab872322623544e66fa0755288a65e089c8f8765")
+FAILED
+test huge_offset ... LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=2, type=Table, first=false, y=28633342.9, bottom=1009.1, overflow=28632333.8px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=2, type=Table, first=false, y=28633342.9, bottom=1009.1, overflow=28632333.8px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=2, type=Table, first=false, y=28633346.6, bottom=1009.1, overflow=28632337.5px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=2, type=Table, first=false, y=28633346.6, bottom=1009.1, overflow=28632337.5px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=2, type=Table, first=false, y=28633342.9, bottom=1009.1, overflow=28632333.8px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=2, type=Table, first=false, y=28633342.9, bottom=1009.1, overflow=28632333.8px
+
+thread 'huge_offset' (116674) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: huge_offset/hwpxSha256
+  left: String("aa11ec1eb4511e45dc5977016597861d85e8b8a5297224990c33a5ae5a389a78")
+ right: String("2f2d6b30f7c3ae9887cb02d2d86732e7ad65410cacdb3143acc5d104395bd358")
+FAILED
+test leading_dirty ... 
+thread 'leading_dirty' (116675) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: leading_dirty/hwpxSha256
+  left: String("28139a45e46b2fd512d4a1421732b647c03c8bf5ffd18e457d556fd20e00c460")
+ right: String("6a4816edd894c7fcc98b2bff361739c0c090b12e37091c4daf537a7f70af5a87")
+FAILED
+test locked ... 
+thread 'locked' (116676) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: locked/hwpxSha256
+  left: String("2e2ddccd798102ced75235f5f613e68b3c4856c47631456d50681f7f15c3f0f9")
+ right: String("466419319ff8fb46d715f983daf01445876bf0e942df9bfc50acf7aa7179994f")
+FAILED
+test mixed_earlier_negative ... LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~220.0, b=178.7~212.9, overlap=41.3px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~220.0, b=178.7~212.9, overlap=41.3px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=157.4~223.8, b=178.7~212.9, overlap=45.1px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=157.4~223.8, b=178.7~212.9, overlap=45.1px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~220.0, b=178.7~212.9, overlap=41.3px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~220.0, b=178.7~212.9, overlap=41.3px
+
+thread 'mixed_earlier_negative' (116677) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: mixed_earlier_negative/hwpxSha256
+  left: String("796f444609e6f222706aa40b63752a3c03125ad9d2ebb2d4fa97b7802cfee2cf")
+ right: String("30a9c5df9b2caa36ef9c4982a0ad00a1bc83bb577cefcc0344567edb13c68d4d")
+FAILED
+test mixed_previous_negative ... 
+thread 'mixed_previous_negative' (116678) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: mixed_previous_negative/hwpxSha256
+  left: String("fff9ae0b2d4b6e20ad7178907b47c76e89d76856484e00804022c798e492ea8f")
+ right: String("e17a0d7240d19d859baed209780d43e3d81888c086e8e078c47351be380204c2")
+FAILED
+test negative ... 
+thread 'negative' (116679) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: negative/hwpxSha256
+  left: String("d95f919e0c93dab241afa997c45d702f6bd9937a0aefc4c28e55ffd619859e20")
+ right: String("0054473c27e8767ae1bb3fce8c387aacb8fc89dac71d2035c7dfead2816f130c")
+FAILED
+test pagebreak ... 
+thread 'pagebreak' (116680) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: pagebreak/hwpxSha256
+  left: String("ed92d09145e84f66034a9340fede7ffd4d9c28d59936ba36f9d8640eb043dd4d")
+ right: String("c4534d64cdf0e93f3c16b8f7142a3380dd28c97730528dc64c15adec8f800934")
+FAILED
+test positive_control ... ok
+test protected ... 
+thread 'protected' (116701) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: protected/hwpxSha256
+  left: String("68f5c341af91c25bf720bb0deef429f2193e473e7d8ffb2f0c1100cf050cdd83")
+ right: String("2fce28910ec99d09d7b95ee33eef4443bb968c8767ff1894ec5dc07d1019ab59")
+FAILED
+test rowspan ... 
+thread 'rowspan' (116702) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: rowspan/hwpxSha256
+  left: String("c296ee20dca7d854ce5063e84f0200de4c8db6a3a312cdbba63b0d64f87f8a50")
+ right: String("12e90fa83111843f62fdd946aa2abdf9fb93feb7415d56565c5393eb9ba49934")
+FAILED
+test shiftedhead ... 
+thread 'shiftedhead' (116703) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: shiftedhead/hwpxSha256
+  left: String("d4df80947c1cc083b235ce54f7c2ba513f93697cb47af6ffaecb257cab0993d5")
+ right: String("731de6d53319fc829b127be6e34ccf05a9426ac7b0d5aa56b205bcb991fab967")
+FAILED
+test synthetic ... 
+thread 'synthetic' (116704) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: synthetic/hwpxSha256
+  left: String("9651c85b994517040e6d760234e04290a5dca87715a0706dd151507ed008b649")
+ right: String("f8e458379e0c5904346d3e5782132d73d95cba9e2a096217b71b3e29aad9dd79")
+FAILED
+test unknownctrl ... [hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+
+thread 'unknownctrl' (116705) panicked at tests/jueony_fullwidth_guards.rs:45:187:
+assertion `left == right` failed: exact HWPX bytes unchanged
+  left: String("6b611bc08f5ecc71ab7ba4bdbcbb1d3f2a63f6399a169ba37416dbb9cee672e3")
+ right: String("3effa95e1279c936dd65623b8e2b96e4dd71e7bb4cbbdf5b4bea6033e845503d")
+FAILED
+test width_relative ... 
+thread 'width_relative' (116706) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: width_relative/hwpxSha256
+  left: String("3c725915116cbb1e012b58faf1434119cd4b281dc5f6fa1f1d7491d6bfb243d9")
+ right: String("a2cb7275668db4562c9639ea2324b20db876d6598f8b0cdd2a9d8ed79e98d90d")
+FAILED
+test zero_cell_height ... 
+thread 'zero_cell_height' (116707) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: zero_cell_height/hwpxSha256
+  left: String("2a42deafdd773e1464ee5a10788470466f8758437804af3fcfc6dc1aa65927fb")
+ right: String("1c4b588d60fb8ededbc96b226ce18a1c5f9ca9b2c970a32991b943475d0a8467")
+FAILED
+test zero_target_width ... 
+thread 'zero_target_width' (116708) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: zero_target_width/hwpxSha256
+  left: String("c84457493e617b7978c831dfdc1553c3eaedffbcbcea695e4b8cdb0bcd5b4276")
+ right: String("eafdd06504d700fa628a76b499d23ace57840f7b19c2b33724865e8a78a9716b")
+FAILED
+test zone ... 
+thread 'zone' (116709) panicked at tests/jueony_fullwidth_guards.rs:6:493:
+assertion `left == right` failed: zone/hwpxSha256
+  left: String("fd20dc44aaeea7d84ac35ac9044e78dbeab4e4d8615d7588898f86465d5ab603")
+ right: String("edff38bc371358af3d9a7f1ac17d5820ca9b9f1d454c27189af8cadbaf7a5600")
+FAILED
+
+failures:
+
+failures:
+    absolute
+    caption
+    cellfield
+    closed_gap_drift
+    colspan
+    column
+    dirtycell
+    dirtyrow
+    duplicate_grid
+    emptyhead
+    field
+    first_full_width
+    first_height_drift
+    first_positive_offset
+    full_width_drift
+    huge_offset
+    leading_dirty
+    locked
+    mixed_earlier_negative
+    mixed_previous_negative
+    negative
+    pagebreak
+    protected
+    rowspan
+    shiftedhead
+    synthetic
+    unknownctrl
+    width_relative
+    zero_cell_height
+    zero_target_width
+    zone
+
+test result: FAILED. 1 passed; 31 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.07s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_fullwidth_guards`

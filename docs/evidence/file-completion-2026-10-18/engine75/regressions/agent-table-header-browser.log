@@ -1,0 +1,18 @@
+PASS openai-responses: chat applies first-row flags/repeat/row policy atomically, comparison/undo/redo/save preserve contents
+PASS anthropic: chat applies first-row flags/repeat/row policy atomically, comparison/undo/redo/save preserve contents
+PASS gemini: chat applies first-row flags/repeat/row policy atomically, comparison/undo/redo/save preserve contents
+PASS openai-compatible: chat applies first-row flags/repeat/row policy atomically, comparison/undo/redo/save preserve contents
+PASS hwp: title-only/repeat/off/clear follow-up transactions retain both tables/format and saved flags
+PASS hwpx: title-only/repeat/off/clear follow-up transactions retain both tables/format and saved flags
+PASS invalid/no-op/unsupported rows/target/injection/batches refuse unchanged
+PASS partial-first/partial-second/scattered title rows and protected cell/merged/field sources visibly refuse unchanged
+PASS second title cell failure restores first applied flag/policy/dirty/history/caret
+PASS false/no-op/extra header flag/text/format/placement/style/resource mutation rolls back
+PASS delayed model cannot overwrite newer header flags or table-cell text
+PASS body caret and direct typing remain usable after header edit
+PASS saved workspace restores title flags/capability and named repeat comparison
+PASS hwp: manual first-title-row dialog updates all first-row cells/repeat/policy in one undo and saved file
+PASS hwpx: manual first-title-row dialog updates all first-row cells/repeat/policy in one undo and saved file
+PASS manual cancel/no-op/stale dialog preserves existing changes and table selection
+PASS manual cell block selection remains and first row changes even when body cells were selected
+PASS browser/WASM rendered continuation repeats both title labels and turning repeat off removes them

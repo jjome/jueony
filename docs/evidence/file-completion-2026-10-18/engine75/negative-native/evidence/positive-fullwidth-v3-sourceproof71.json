@@ -1,0 +1,36 @@
+{
+  "formal71Source": "build\\rhwp-engine\\source-062096789ed62ef6",
+  "verifiedRuntimeBase": "formal70",
+  "changedFiles": [
+    {
+      "path": "src/renderer/float_placement.rs",
+      "formal71Sha256": "ef72addb7a38434946e583564301eb196982c49a5d1aaa0fc61fee2be917ac96",
+      "formal70Sha256": "ef72addb7a38434946e583564301eb196982c49a5d1aaa0fc61fee2be917ac96",
+      "candidateSha256": "977c04e2e2123458227f804a636691457fc6abeff2b4667649243e2b456b09d3",
+      "base70Equals71": true
+    },
+    {
+      "path": "src/renderer/layout.rs",
+      "formal71Sha256": "e2dd2c9e02f478ea915feba9c10f74bf772c322f2c73fdce0a765c0bb054a507",
+      "formal70Sha256": "e2dd2c9e02f478ea915feba9c10f74bf772c322f2c73fdce0a765c0bb054a507",
+      "candidateSha256": "99c0db02ce598e8adf11bce0ca9f48e5f05e0d74dcba58f088796fbf0dafae08",
+      "base70Equals71": true
+    },
+    {
+      "path": "src/renderer/typeset/controls/flow_table.rs",
+      "formal71Sha256": "fbec444ec760b884e49f553748e588132b9955692790244fd3176fb1e1bb28a0",
+      "formal70Sha256": "fbec444ec760b884e49f553748e588132b9955692790244fd3176fb1e1bb28a0",
+      "candidateSha256": "887509a7e17de5077c202408daace84b6e435105a29af45a2175717c4022cc30",
+      "base70Equals71": true
+    },
+    {
+      "path": "src/renderer/typeset/table/block/entry.rs",
+      "formal71Sha256": "f3b5648b05a7f0722f9f7a3a866210e919a958587753ba10ec28692df5c336a1",
+      "formal70Sha256": "f3b5648b05a7f0722f9f7a3a866210e919a958587753ba10ec28692df5c336a1",
+      "candidateSha256": "ea68eb7d6ba049771719eb02f692e207ee4f2387b1bee5839153d274f9332f3b",
+      "base70Equals71": true
+    }
+  ],
+  "patchSha256": "ef63e25bb950f0a8ceb4c70b1987c6b3dca739a4465acdca3a217d41d18f9d54",
+  "parserSerializerModelChanges": false
+}

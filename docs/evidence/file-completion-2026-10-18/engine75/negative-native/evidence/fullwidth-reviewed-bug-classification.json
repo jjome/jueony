@@ -1,0 +1,33 @@
+{
+  "geometryTolerance": 0.2,
+  "oracleUnchanged": true,
+  "productionGuardUnchanged": true,
+  "cases": {
+    "dirtycell": {
+      "baselineSourceY": 240.9,
+      "baselineHwpReopenedY": 240.9,
+      "baselineHwpxReopenedY": 244.7,
+      "strictBaselineHwpxFailed": true,
+      "baselineSha256": "88f9861ede8ae77c0ae5a9b1157a0de2abec1a3c87c7e0ea6e61cebfcf948d01",
+      "failureHistory": "positive-fullwidth-v3-guards32.log"
+    },
+    "unknownctrl": {
+      "baselineSourceY": 240.9,
+      "baselineHwpReopenedY": 240.9,
+      "baselineHwpxReopenedY": 244.7,
+      "strictBaselineHwpxFailed": true,
+      "baselineSha256": "82dd7723a46d53a70f9b571ddeaa170f1d692f28a3d86a3249314876154d5171",
+      "failureHistory": "positive-fullwidth-v3-guards32.log"
+    },
+    "positive_control": {
+      "baselineSourceY": 240.9,
+      "baselineHwpReopenedY": 240.9,
+      "baselineHwpxReopenedY": 244.7,
+      "strictBaselineHwpxFailed": true,
+      "baselineSha256": "85c29c7d141105fcf8feaa3812f90344c9058d5fa368c294e2664c021ccc709a",
+      "failureHistory": "positive-fullwidth-v3-guards32.log"
+    }
+  },
+  "observedRealApiHistory": "positive-fullwidth-v3-history2.log",
+  "actual9TwoSuccessiveReopens": "positive-fullwidth-v3-actual9-twice.log"
+}

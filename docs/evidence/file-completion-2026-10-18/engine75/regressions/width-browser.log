@@ -1,0 +1,18 @@
+PASS openai-responses: actual chat sets 30mm column widths, comparison/undo/redo and safe save preserve remaining state
+PASS anthropic: actual chat sets 30mm column widths, comparison/undo/redo and safe save preserve remaining state
+PASS gemini: actual chat sets 30mm column widths, comparison/undo/redo and safe save preserve remaining state
+PASS openai-compatible: actual chat sets 30mm column widths, comparison/undo/redo and safe save preserve remaining state
+PASS HWP non-overlapping following tables: real manual history, Canvas, safe save and UI reopen
+PASS hwp: actual outer-margin dialog cancel/apply/undo/redo and safe UI reopen
+PASS hwpx: actual outer-margin dialog cancel/apply/undo/redo and safe UI reopen
+PASS long-table post-render ownership: reject/rollback baseline or valid pages and save/reopen after fix
+PASS partial complete column band keeps first column and active cell cursor with explicit 30mm widths
+PASS already equal/partial row/mixed/batch/alias/unknown inputs visibly fail without document writes
+PASS HWP/protected/merged/mixed source advertises readonly and visibly refuses
+PASS injected live resize failure or neighbor/text/layout corruption fully rolls back dirty/history/cursor
+PASS delayed provider cannot overwrite newer cell content
+PASS unsaved workspace restores equal widths/capability/comparison after confirmed restart
+PASS actual UI save/reopen preserves table and text layout with document-owned metrics initialized
+PASS hidden owner: later-section long table uses global page offset, body mapping is read-only and invalid addresses still fail
+PASS hidden owner: ordinary text tail retains own line and actual keyboard insertion after long table saves/reopens
+PASS hidden owner: injected ordinary missing-page error still rolls back before receipt commit

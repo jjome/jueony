@@ -1,0 +1,46 @@
+{
+  "knownBytes": 13312,
+  "knownSha256": "27336a01192dac8c25e3d59a6bac47c1b856827b15f0bb0f4e773cd4659e63f8",
+  "otherStreamsUnchanged": true,
+  "ownSyntheticOnly": true,
+  "parsedUnknownCount": 1,
+  "recordChanges": [
+    {
+      "after4ccLe": [
+        68,
+        51,
+        34,
+        17
+      ],
+      "before4ccLe": [
+        32,
+        108,
+        98,
+        116
+      ],
+      "changedBytes": 4,
+      "level": 1,
+      "payloadBytes": 46,
+      "payloadOffset": 395,
+      "recordOffset": 391,
+      "tag": 71
+    }
+  ],
+  "report": {
+    "count": 1,
+    "losses": [
+      {
+        "code": "controlOmitted",
+        "path": "section/0/body/paragraph/0/control/2",
+        "reason": "unsupportedByOutputFormat",
+        "subject": "control"
+      }
+    ],
+    "outputFormat": "hwpx",
+    "schemaVersion": 1
+  },
+  "sourceCompressed": true,
+  "sourceModelUnchanged": true,
+  "unknownBytes": 13312,
+  "unknownSha256": "f21bdc770e23fafc8b2c00b966c0b7d8d5e11378eebd9da65aca3896b75453b8"
+}

@@ -1,0 +1,8 @@
+PASS hwpx: actual session caret and forward/backward selection restore without bytes/dirty/focus changes
+PASS hwp: actual session caret and forward/backward selection restore without bytes/dirty/focus changes
+PASS textbox selection persists through actual workspace reload and document-tab switching
+PASS real keyboard edits in unsaved textbox retain bytes, dirty flag and Unicode caret after restart
+PASS equal-length text, paragraph/character style and box identity edits refuse old selection
+PASS wrong paths and fingerprints leave safe body cursor unchanged; unknown saved kind never activates another object
+PASS caption/group/rotation/field/locked/unknown-protection stories never persist as plain textbox
+PASS user input during asynchronous view settle retains its new body caret and cancels stale restore

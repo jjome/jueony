@@ -1,0 +1,20 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/file-closure69-overlap/negative-private-v5)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.52s
+     Running tests/jueony_negative_history.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_negative_history-70832343c3cb3f31)
+
+running 2 tests
+test hancom_history ... 
+thread 'hancom_history' (111978) panicked at tests/jueony_negative_history.rs:3:83:
+edited save/reopen complete geometry/0/text/runs/23/y: 258.6 != 264.4
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test original_history ... ok
+
+failures:
+
+failures:
+    hancom_history
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_negative_history`

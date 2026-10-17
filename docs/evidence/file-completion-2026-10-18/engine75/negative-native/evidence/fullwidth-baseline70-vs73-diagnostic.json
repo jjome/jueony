@@ -1,0 +1,572 @@
+{
+  "oldBaseline": "formal70 before fullwidth/numbering corrections",
+  "comparableBaseline": "formal73 canonical numbering; exactly production source; no negative candidate",
+  "tolerance": 0.2,
+  "cases": [
+    {
+      "case": "absolute",
+      "oldBaselineSha": "9eddec4851abc9813841c5c2aad42e1c1c1c46f3b2726f2a4f8ee8dc2e232891",
+      "comparable73BaselineSha": "f9e11b62e59e83dcfd27337b03bc3a66f690933fbe9d288ee17cc57e76b6f2dc",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "caption",
+      "oldBaselineSha": "3c6456588bf26b2be92e4d6211d86512eb9e9427cdbb6902cb972296e2a6f5d4",
+      "comparable73BaselineSha": "f93aed61d4d939793444fecbe5351b5865467fed3717879e01d484c8df98a2ac",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "cellfield",
+      "oldBaselineSha": "20dcd8b3258740620870b8f193b0a9a7f71f46273c270af1955fff211882e57b",
+      "comparable73BaselineSha": "998bd60220675fb69dfb762980a3c55547920ee8838d8a088c61a77e16e43c0b",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "closed_gap_drift",
+      "oldBaselineSha": "6c8101ed197fab2d8985501f70da36fa5077eed7ba7c2611071f999377194067",
+      "comparable73BaselineSha": "91d9c5bc69a9a9fc5c9a504f6ab056a566363c29a1ce7d2b2a875c4e0bc44744",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "colspan",
+      "oldBaselineSha": "7f915028abd41421799f569785e738e15560125482def48b3462d4f6c36cc55c",
+      "comparable73BaselineSha": "c2fe851c063c3b24fbcb8e7f67db47c3351456d48f3770697597049bee061cfc",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "column",
+      "oldBaselineSha": "0c1dc6aa79ab5b88539f420bcb1cec5b59e6f5cdc9682d720a9a46e8808a6e09",
+      "comparable73BaselineSha": "49c4630db786a5487377f8caa1ed47bf2e3ad1e7ff5f63466aca83aa3b5972d7",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "dirtycell",
+      "oldBaselineSha": "88f9861ede8ae77c0ae5a9b1157a0de2abec1a3c87c7e0ea6e61cebfcf948d01",
+      "comparable73BaselineSha": "4e02ca9f9e68b745b10a27b628ac752ce59452dafd24ab766fd28a6d113498a8",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": [
+        {
+          "path": "/0/controls/controls/1/cells/0/y",
+          "before": 244.7,
+          "after": 240.9
+        },
+        {
+          "path": "/0/controls/controls/1/cells/1/y",
+          "before": 244.7,
+          "after": 240.9
+        },
+        {
+          "path": "/0/controls/controls/1/cells/2/y",
+          "before": 261.8,
+          "after": 258.0
+        },
+        {
+          "path": "/0/controls/controls/1/cells/3/y",
+          "before": 261.8,
+          "after": 258.0
+        },
+        {
+          "path": "/0/controls/controls/1/y",
+          "before": 244.7,
+          "after": 240.9
+        },
+        {
+          "path": "/0/text/runs/14/y",
+          "before": 246.5,
+          "after": 242.8
+        },
+        {
+          "path": "/0/text/runs/15/y",
+          "before": 246.5,
+          "after": 242.8
+        },
+        {
+          "path": "/0/text/runs/16/y",
+          "before": 246.5,
+          "after": 242.8
+        },
+        {
+          "path": "/0/text/runs/17/y",
+          "before": 246.5,
+          "after": 242.8
+        },
+        {
+          "path": "/0/text/runs/18/y",
+          "before": 263.6,
+          "after": 259.9
+        },
+        {
+          "path": "/0/text/runs/19/y",
+          "before": 263.6,
+          "after": 259.9
+        },
+        {
+          "path": "/0/text/runs/20/y",
+          "before": 263.6,
+          "after": 259.9
+        },
+        {
+          "path": "/0/text/runs/21/y",
+          "before": 263.6,
+          "after": 259.9
+        },
+        {
+          "path": "/0/text/runs/22/y",
+          "before": 244.7,
+          "after": 240.9
+        }
+      ]
+    },
+    {
+      "case": "dirtyrow",
+      "oldBaselineSha": "649ebba63566ff6ddb746a0a9f1aed9470ee730729ac5d3a4f8970604b811800",
+      "comparable73BaselineSha": "ec451aa526f8e05085078c7d830846e1419ce4823bb384c207b7e94983dcf2b8",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "duplicate_grid",
+      "oldBaselineSha": "1d90cbb418a02012a953f9aa45140f4cb543edc56a7c752535851359bda9068e",
+      "comparable73BaselineSha": "a37e3ce30c3646894413ce5e91927f4e34fc27ccd0dada49a24f5da96bfe0690",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "emptyhead",
+      "oldBaselineSha": "5186eff43044d9df206ef04383b660a4959fc4bf83d9ec335705cd2ae8c51a83",
+      "comparable73BaselineSha": "48947d0fc92f94574b100d6b567516c87007a61a4ad5b5d0f0cf2ba764eb8141",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "field",
+      "oldBaselineSha": "99428950cef7935089f6ded80734603b7fd47538b1a16aefaedd0ab0bddd03fe",
+      "comparable73BaselineSha": "956d00e59acfa2eb4c4b3e541054b8809554e8a6329b2680bf4e20a386c15f44",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "first_full_width",
+      "oldBaselineSha": "093eb1834c6ef970713f4ccd680fe8a323ce26da826464e49b65ed5de8753f48",
+      "comparable73BaselineSha": "bc17cfc591901c576f179bc32e9d80732261fce84f05fa931dc3e31930e472e7",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "first_height_drift",
+      "oldBaselineSha": "2252a408dc9300dcf540acb022366155916121394ca0acd19d407d963aea2345",
+      "comparable73BaselineSha": "cda4012442589fa1a6f5d6ec4c1077a94ed924a2765f72d6d11836bd9ef196d3",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "first_positive_offset",
+      "oldBaselineSha": "54b2f3a5a0515d32541ac091bcdc2f2622691e17f1832e550bf7d9c3068e5dbd",
+      "comparable73BaselineSha": "ce295a15696442878e370bc1784cdb33561069a1ee649fbba99c1ecd558542ee",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "full_width_drift",
+      "oldBaselineSha": "c61856c02b176387403e6b487a8d7aed3b6af30c0edf0bb40b2ecce37858da1b",
+      "comparable73BaselineSha": "4a7dd484fafc3c3d243ccd3be1cbf6a57c4c0f668beba4776c37df05cace91b3",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "huge_offset",
+      "oldBaselineSha": "4cbc5535e742f52e0fa4a12bb943607dfa1d49f662b63f02f8fe498b57bacf51",
+      "comparable73BaselineSha": "c895434a193316494332f23000373ea0712c9d605b65c6c3e57e2a7f687a7d8e",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "leading_dirty",
+      "oldBaselineSha": "a7fb3416434da40a61b92eb83642808c11dd2b25143e6c2446d464f017e134e5",
+      "comparable73BaselineSha": "3dfef484c689943b81fc9cecb91168d895024c1e1676ef8a090b6896bd7e90ee",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "locked",
+      "oldBaselineSha": "5a2ce777e49f35470d3d9921456b9ed8652cb7f8b8e57ce4b6ab9f69c4a40826",
+      "comparable73BaselineSha": "e19c16af1671da982b1197c9ab4cd975791c1acd0ce9ad685105c5336c60526c",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "mixed_earlier_negative",
+      "oldBaselineSha": "e0c8551596ed1d1c1f9656bed8ab8bc4c5fc099f70ff1f0a5ca7c5bb947b3197",
+      "comparable73BaselineSha": "f2c0a01d61b2ee5f70a7479916793808905981aee901f14c214f30b0694daf9f",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "mixed_previous_negative",
+      "oldBaselineSha": "cc727c04aad1d9228e58554c3c4288a16fb85591a71d99262d77bd23a7b700bf",
+      "comparable73BaselineSha": "1657bfb35358d9da16f4c4bdecdf7e8f681d56fb01d055d85ae96697b1dcc163",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "negative",
+      "oldBaselineSha": "86f50a7febfe775a2133624140d064e173e32e9e1d7063e7312265f5fa470620",
+      "comparable73BaselineSha": "5db349de6d030e14263ff49d2532e7de8c0043bd00143251cd057b2f9df70d05",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "pagebreak",
+      "oldBaselineSha": "3b7e9de74c0dd502f0c3579b2cf1e089330cbe6d5e6878522d1f4905dbd75f0b",
+      "comparable73BaselineSha": "6c87ba5c00b6bd4666fd8c8d8c920a78482ea128ecbf136a4d0378d32e3880fc",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "positive_control",
+      "oldBaselineSha": "85c29c7d141105fcf8feaa3812f90344c9058d5fa368c294e2664c021ccc709a",
+      "comparable73BaselineSha": "59892feb396aa70694d1138857ba68d822cee561c4c195e07c3ca1f923570562",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": [
+        {
+          "path": "/0/controls/controls/1/cells/0/y",
+          "before": 244.7,
+          "after": 240.9
+        },
+        {
+          "path": "/0/controls/controls/1/cells/1/y",
+          "before": 244.7,
+          "after": 240.9
+        },
+        {
+          "path": "/0/controls/controls/1/cells/2/y",
+          "before": 261.8,
+          "after": 258.0
+        },
+        {
+          "path": "/0/controls/controls/1/cells/3/y",
+          "before": 261.8,
+          "after": 258.0
+        },
+        {
+          "path": "/0/controls/controls/1/y",
+          "before": 244.7,
+          "after": 240.9
+        },
+        {
+          "path": "/0/text/runs/14/y",
+          "before": 246.5,
+          "after": 242.8
+        },
+        {
+          "path": "/0/text/runs/15/y",
+          "before": 246.5,
+          "after": 242.8
+        },
+        {
+          "path": "/0/text/runs/16/y",
+          "before": 246.5,
+          "after": 242.8
+        },
+        {
+          "path": "/0/text/runs/17/y",
+          "before": 246.5,
+          "after": 242.8
+        },
+        {
+          "path": "/0/text/runs/18/y",
+          "before": 263.6,
+          "after": 259.9
+        },
+        {
+          "path": "/0/text/runs/19/y",
+          "before": 263.6,
+          "after": 259.9
+        },
+        {
+          "path": "/0/text/runs/20/y",
+          "before": 263.6,
+          "after": 259.9
+        },
+        {
+          "path": "/0/text/runs/21/y",
+          "before": 263.6,
+          "after": 259.9
+        },
+        {
+          "path": "/0/text/runs/22/y",
+          "before": 244.7,
+          "after": 240.9
+        }
+      ]
+    },
+    {
+      "case": "protected",
+      "oldBaselineSha": "559a65e2be7723229477e6ab22eb62d07a9a7f3fb867983e18519f34c656e609",
+      "comparable73BaselineSha": "532f16001d0bd68e9227eb5858474416f7378401d60973fbf8fb2e4cd5a2a567",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "rowspan",
+      "oldBaselineSha": "90a77fd4f997e137dc16e24f35e294e5820b32195592a0b93fa9778aff4c94a9",
+      "comparable73BaselineSha": "f85d50f0bf3eafbfedd147ba3027d6bb4ea6387582ba494915ab462c385155a6",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "shiftedhead",
+      "oldBaselineSha": "619133b9527a19bac8edcf6a5e3ddea8d088a7bacd642a42b38446d114f01a7f",
+      "comparable73BaselineSha": "48a73a7e817d2f4840d0c0618b41f5792a863023d25d769c8bea09f998bf3620",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "synthetic",
+      "oldBaselineSha": "ad9349138d4ed7c8680a0ff824fbe0976de7a8d5e8df662428c9e0e00375ba03",
+      "comparable73BaselineSha": "44a83119e9130c0d51c2d9052ea1f663b5cb3f284f8f1cd39cb17da883548653",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "unknownctrl",
+      "oldBaselineSha": "82dd7723a46d53a70f9b571ddeaa170f1d692f28a3d86a3249314876154d5171",
+      "comparable73BaselineSha": "ebd32b5c9b14ddf9fb6a7a3f5003ea99fdea78bba4436ddcf34f8179fed2eefe",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": [
+        {
+          "path": "/0/controls/controls/1/cells/0/y",
+          "before": 244.7,
+          "after": 240.9
+        },
+        {
+          "path": "/0/controls/controls/1/cells/1/y",
+          "before": 244.7,
+          "after": 240.9
+        },
+        {
+          "path": "/0/controls/controls/1/cells/2/y",
+          "before": 261.8,
+          "after": 258.0
+        },
+        {
+          "path": "/0/controls/controls/1/cells/3/y",
+          "before": 261.8,
+          "after": 258.0
+        },
+        {
+          "path": "/0/controls/controls/1/y",
+          "before": 244.7,
+          "after": 240.9
+        },
+        {
+          "path": "/0/text/runs/14/y",
+          "before": 246.5,
+          "after": 242.8
+        },
+        {
+          "path": "/0/text/runs/15/y",
+          "before": 246.5,
+          "after": 242.8
+        },
+        {
+          "path": "/0/text/runs/16/y",
+          "before": 246.5,
+          "after": 242.8
+        },
+        {
+          "path": "/0/text/runs/17/y",
+          "before": 246.5,
+          "after": 242.8
+        },
+        {
+          "path": "/0/text/runs/18/y",
+          "before": 263.6,
+          "after": 259.9
+        },
+        {
+          "path": "/0/text/runs/19/y",
+          "before": 263.6,
+          "after": 259.9
+        },
+        {
+          "path": "/0/text/runs/20/y",
+          "before": 263.6,
+          "after": 259.9
+        },
+        {
+          "path": "/0/text/runs/21/y",
+          "before": 263.6,
+          "after": 259.9
+        },
+        {
+          "path": "/0/text/runs/22/y",
+          "before": 244.7,
+          "after": 240.9
+        }
+      ]
+    },
+    {
+      "case": "width_relative",
+      "oldBaselineSha": "25137c315b2f13f3097f4c77863d2580cd937db9882ee85f927a181a729e311e",
+      "comparable73BaselineSha": "78e70845632acd06bb3106066aefc6310681d1f6c9eac47aed4c10f899f629ff",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "zero_cell_height",
+      "oldBaselineSha": "cea97e409ba2007b36095d1875fb60bbfb78196316f728db946e11b57bff1c04",
+      "comparable73BaselineSha": "80f07add29e78373ba1bf5bbe3f3b5e38492aebf789a19f780553068a0c55886",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "zero_target_width",
+      "oldBaselineSha": "f00a7ca742a7140be7f2d203876b7e872963b80a0f35f0095473348e20d5bb30",
+      "comparable73BaselineSha": "4f0b85f8ea998bb27115265914becf83157d4b596293b8399e80ce5cb7b54208",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    },
+    {
+      "case": "zone",
+      "oldBaselineSha": "23014b2b14a521588620a546b13ed37b48decb082f7fc115761423063a6769dc",
+      "comparable73BaselineSha": "57aeaba6457c235bf1f381c39f461b60bc356891183dc80131c0c061a83b4c12",
+      "originalIrExact": true,
+      "hwpBytesExact": true,
+      "hwpxBytesExact": false,
+      "liveGeometry": [],
+      "hwpReopenedGeometry": [],
+      "hwpxReopenedGeometry": []
+    }
+  ]
+}

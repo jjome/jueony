@@ -1,0 +1,26 @@
+{
+  "baselineSourceId": "c2c0c48efdd724e2",
+  "sourceChanges": [
+    {
+      "path": "src/lib.rs",
+      "baselineSha256": "7a1c15626fdfc77addb5860cf2700b3e4b4f920190f4187530d35dc5c5cf42eb",
+      "candidateSha256": "4f188747b99a99d2e820a926500a4233dac66038e590feee69d517f9ed7f5f92"
+    },
+    {
+      "path": "src/serializer/paragraph_metadata_loss.rs",
+      "baselineSha256": "04cb2d160037697743ddea75c804421ed271a21f31adb060fe2e8b04a580b01d",
+      "candidateSha256": "5800fc5553b33736dec5c04c1f58c5d7274ef7144d6460766ebfc3efb21dadbf"
+    }
+  ],
+  "harnessOnlyLibVisibility": true,
+  "tests": [
+    {
+      "path": "tests\\jueony_fullwidth_guards.rs",
+      "sha256": "561f49a534ea7a702e97d56ece4bfc917968fd06d80d87fadf42d4df1b2809ca"
+    },
+    {
+      "path": "tests\\jueony_negative_guards.rs",
+      "sha256": "72efcd1bcfe8e75fc994e1faf13f412f83cf96d53a8e1a14d958c8fd018ec98f"
+    }
+  ]
+}

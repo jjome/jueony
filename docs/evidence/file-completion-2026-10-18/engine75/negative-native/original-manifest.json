@@ -1,0 +1,220 @@
+{
+  "status": "78 PASS / 2 independent existing reporter failures; no private WASM; formal parent integration pending",
+  "files": [
+    {
+      "path": "artifacts/negative-hancom.hwp",
+      "size": 15360,
+      "sha256": "0621335e74fe74a412a7536f8a2ae5024f6433877865626ad0c4711b7a12f415"
+    },
+    {
+      "path": "artifacts/negative-hancom.hwpx",
+      "size": 8318,
+      "sha256": "95cb1f7ee7da7b6dae6c974f793f9c608e8e0dddf53eb8fee8c79579ba0a3cdd"
+    },
+    {
+      "path": "artifacts/negative-original.hwp",
+      "size": 13312,
+      "sha256": "a5c62e0b6cff7a9ba3445517bfc2f47494f841d75694f45400911fb115c3eec8"
+    },
+    {
+      "path": "artifacts/negative-original.hwpx",
+      "size": 8316,
+      "sha256": "7cd8133ce53aaef30335e541793d19b3ce38706080df15759e178ff666599b78"
+    },
+    {
+      "path": "evidence/actual-cell-format/negative-false.json",
+      "size": 184,
+      "sha256": "882a6fd7f6ecf78c57f8dc29dbce5b82d5b9fbef86409cfaa71cecb8bc19b474"
+    },
+    {
+      "path": "evidence/actual-cell-format/negative-true.json",
+      "size": 183,
+      "sha256": "5f399d463f583131c15a60b6b2ca3fad6d6bdc086a56c6f5b0c5046a9d598d6c"
+    },
+    {
+      "path": "evidence/actual-cell-format/offset-false.json",
+      "size": 182,
+      "sha256": "81e444b555a4090007a95dce17ee4a0bcc13361b37060e006632b5c79d0d4e02"
+    },
+    {
+      "path": "evidence/actual-cell-format/offset-true.json",
+      "size": 181,
+      "sha256": "7ebb59523c14d3f123536a35deeeefd81ee42e2a6b60f46f8b8a3e19e7734f32"
+    },
+    {
+      "path": "evidence/actual-cell-format-v8.log",
+      "size": 604,
+      "sha256": "466350c32f25e0e5ee6820f4874d4c6fe78e0f6f4d6e5b1afc36b521d1e54620"
+    },
+    {
+      "path": "evidence/combined-v8-negative-actual.log",
+      "size": 490,
+      "sha256": "79b62a3358b66d27d957c833920dc1835a766f152485bc6ce4c498dd3abb9034"
+    },
+    {
+      "path": "evidence/combined-v8-negative-guards30.log",
+      "size": 1729,
+      "sha256": "f4518cca7788b888797c793726cdb74c2e4f21a08988a913d459916ff7ab49d4"
+    },
+    {
+      "path": "evidence/combined-v8-negative-history.log",
+      "size": 520,
+      "sha256": "a53895e818ddd5a55c8fbf7212cfd1083c23763a8d4bbb7cbdec4d725303ff18"
+    },
+    {
+      "path": "evidence/combined-v8-positive-actual9.log",
+      "size": 712,
+      "sha256": "5a518ba27181d6cc356957da5fff054c08e4de69d9df05987edd117598cc6257"
+    },
+    {
+      "path": "evidence/combined-v8-positive-guards32.log",
+      "size": 13397,
+      "sha256": "5424d0cda73dd924fc47834fe8a242ab0b8169fba0d6d4e24a53b747d963b046"
+    },
+    {
+      "path": "evidence/combined-v8-positive-history2.log",
+      "size": 522,
+      "sha256": "bdb04fefdec8d4038988e32be89850131c26b4c485514570754e981023e84498"
+    },
+    {
+      "path": "evidence/fullwidth-baseline70-vs73-diagnostic.json",
+      "size": 19106,
+      "sha256": "656b631ae8d5b4001bdb18dbf8618dfa5addcf84ee7c6973232b153510e0e270"
+    },
+    {
+      "path": "evidence/fullwidth-comparable-baseline73.log",
+      "size": 3047,
+      "sha256": "2da9ff7141500470c1b9947ee55fca6cf4d9fd6cbe138a3621c08e2ac309f389"
+    },
+    {
+      "path": "evidence/fullwidth-comparable-candidate73-v8.log",
+      "size": 3800,
+      "sha256": "0747042e182e96cfe6f1d98f7cc3f59b25f037aa591a959b227d9697b1514468"
+    },
+    {
+      "path": "evidence/fullwidth-reviewed-bug-classification.json",
+      "size": 1271,
+      "sha256": "d61aa6b7c4357413b02bf7d6e3a5448b9c5358a211517ed1f6ad28949e150b89"
+    },
+    {
+      "path": "evidence/negative-raw-origin-proof.json",
+      "size": 9534,
+      "sha256": "821050fad460fa4ccb8d0034f645064f4e02390234f5cc4ee80bdd5aa1cb01d1"
+    },
+    {
+      "path": "evidence/negative-raw-origin-proof.py",
+      "size": 2941,
+      "sha256": "8a40e06d2b47b93432a6a311c63619b43e95b95ae5760f607a0fd2a5c21209b8"
+    },
+    {
+      "path": "evidence/negative-v1-actual.log",
+      "size": 8404,
+      "sha256": "cda04039fc3dc84704fcccb7c85619177f8a03a9f9d54eda3f23bbcb40a3ce41"
+    },
+    {
+      "path": "evidence/negative-v2-actual.log",
+      "size": 1093,
+      "sha256": "df49189682c3a7e614e4eabd39887585d3ada3776009645c800caf05e4b306bf"
+    },
+    {
+      "path": "evidence/negative-v3-actual.log",
+      "size": 1094,
+      "sha256": "196aca6f77ba1958a9e02a4a84ff2ea12a2f38f7e400e3f3232662d8c50d3205"
+    },
+    {
+      "path": "evidence/negative-v3-trace-b.log",
+      "size": 4022,
+      "sha256": "8a88c4aecdefd91e530633fb3d32abf440bbaa34ade42e1380162477b73fda71"
+    },
+    {
+      "path": "evidence/negative-v5-history.log",
+      "size": 866,
+      "sha256": "7de0e1b290128a5b1cb6a832c7d79a9ed601565290fe9b3ceb8f114888ffd5ac"
+    },
+    {
+      "path": "evidence/negative-v8-all-src-proof73.json",
+      "size": 348601,
+      "sha256": "6699acfaa164a23434758e374335ca3e7cd6dd5f0b8a0b567fe813fe7f4a83cc"
+    },
+    {
+      "path": "evidence/negative-v8-delta-formal73.patch",
+      "size": 11595,
+      "sha256": "2b8d16e911e3af30b9abfb93da33717de6e007b8e971046d5f6ca45a27c44d8d"
+    },
+    {
+      "path": "evidence/negative-v8-handoff.json",
+      "size": 4865,
+      "sha256": "37fcfeead67ff6e87939b6f027c7ef374e2c05f5048c4adc0e6567abc4f681f5"
+    },
+    {
+      "path": "evidence/negative-v8-source-proof73.json",
+      "size": 1682,
+      "sha256": "cbd1ed85d8be7db12d74187d98a8f483c02784d862a85fd273f8e1b23ea9b272"
+    },
+    {
+      "path": "evidence/positive-fullwidth-history2.log",
+      "size": 893,
+      "sha256": "709b29843b45ea3fc5a639865e41981d76673d03ae81d240a451dea78c30e83b"
+    },
+    {
+      "path": "evidence/positive-fullwidth-v3-delta-formal71.patch",
+      "size": 8875,
+      "sha256": "ef63e25bb950f0a8ceb4c70b1987c6b3dca739a4465acdca3a217d41d18f9d54"
+    },
+    {
+      "path": "evidence/positive-fullwidth-v3-history2.log",
+      "size": 517,
+      "sha256": "9ff5f6d8653ff56d8b2db491e7b6040cd954d7fc33e2d0a436a2108bdeb83f86"
+    },
+    {
+      "path": "evidence/positive-fullwidth-v3-sourceproof71.json",
+      "size": 1776,
+      "sha256": "2b299b7ee5b8da56d108807d8c4a80e3ae30b6120948314175694b69e388f7f9"
+    },
+    {
+      "path": "fixtures/hancom-current/negative.hwp",
+      "size": 16384,
+      "sha256": "dc461180cab9f4a89c21f89eb1d8b3ba44f0fdde78d57e767d9af4553230b7f9"
+    },
+    {
+      "path": "fixtures/support/negative.hwp",
+      "size": 13312,
+      "sha256": "a5c62e0b6cff7a9ba3445517bfc2f47494f841d75694f45400911fb115c3eec8"
+    },
+    {
+      "path": "native-tests/jueony_actual_cell_format.rs",
+      "size": 3991,
+      "sha256": "3ee45a65d089b52bec616f438252ad44631116ba9a0520c2bd17bd48b02949a2"
+    },
+    {
+      "path": "native-tests/jueony_fullwidth_guards.rs",
+      "size": 9901,
+      "sha256": "798d3e28e7f222fe9036b282d699384e3fb27eb39aa0cc1aa15d1e00982e30b3"
+    },
+    {
+      "path": "native-tests/jueony_fullwidth_history.rs",
+      "size": 3255,
+      "sha256": "8e3e5a7dce69ae3b0acd8d10203a4d4149fd4711bda87ba8d2b42820eec05110"
+    },
+    {
+      "path": "native-tests/jueony_negative_actual.rs",
+      "size": 6964,
+      "sha256": "8c999a092e4b397b93df3994ca1c8369fc2fbbe2ac9302a5fe182ae6134e46c8"
+    },
+    {
+      "path": "native-tests/jueony_negative_guards.rs",
+      "size": 6821,
+      "sha256": "72efcd1bcfe8e75fc994e1faf13f412f83cf96d53a8e1a14d958c8fd018ec98f"
+    },
+    {
+      "path": "native-tests/jueony_negative_history.rs",
+      "size": 3254,
+      "sha256": "ef4371904bd10d7c6fbe568fce8faabd8ef4567bb6406da0a2409f269e0cc72c"
+    },
+    {
+      "path": "native-tests/jueony_overlap_closure.rs",
+      "size": 6972,
+      "sha256": "ea40087beafaae41bb2533103e8197522e10c0fd908243ddbcfce5a6cbd81996"
+    }
+  ]
+}

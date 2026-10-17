@@ -1,0 +1,49 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/file-closure69-overlap/negative-combined-private73-v8)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.31s
+     Running tests/jueony_negative_guards.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_negative_guards-289a147c954e8a84)
+
+running 30 tests
+test absolute ... ok
+test actual_column_exclusion ... ok
+test caption ... ok
+test cellfield ... ok
+test colspan ... ok
+test dirtycell ... ok
+test dirtyrow ... ok
+test duplicate_grid ... ok
+test emptyhead ... ok
+test field ... ok
+test horizontal_offset ... ok
+test huge_negative ... ok
+test leading_dirty ... ok
+test locked ... ok
+test missing_column ... ok
+test missing_section ... ok
+test pagebreak ... ok
+test partial_margin ... ok
+test positive_offset ... ok
+test protected ... ok
+test relative_height ... ok
+test rowspan ... ok
+test shiftedhead ... ok
+test synthetic ... ok
+test two_columns ... ok
+test unknownctrl ... [hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+
+thread 'unknownctrl' (113904) panicked at tests/jueony_negative_guards.rs:48:396:
+genuine opaque control loss stays reported
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test width_relative ... ok
+test zero_cell_height ... ok
+test zero_width ... ok
+test zone ... ok
+
+failures:
+
+failures:
+    unknownctrl
+
+test result: FAILED. 29 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.13s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_negative_guards`

@@ -1,0 +1,19 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/file-closure69-overlap/negative-private-v2)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 21s
+     Running tests/jueony_overlap_closure.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_overlap_closure-880db1ab5de0683e)
+
+running 1 test
+test actual_negative ... 
+thread 'actual_negative' (97123) panicked at tests/jueony_overlap_closure.rs:18:408:
+actual negative 3 full geometry differences; [Object {"after": Number(264.4), "before": Number(289.5), "path": String("/text/runs/23/y")}, Object {"after": Number(285.7), "before": Number(310.9), "path": String("/text/runs/24/y")}, Object {"after": Number(307.1), "before": Number(332.2), "path": String("/text/runs/25/y")}]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    actual_negative
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 13 filtered out; finished in 0.18s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_overlap_closure`

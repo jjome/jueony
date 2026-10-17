@@ -1,0 +1,32 @@
+{
+  "baselineSourceId": "c2c0c48efdd724e2",
+  "productionDelta": "../unknown-control-content-loss.patch",
+  "productionDeltaSha256": "f2004c1fe26b90b03d2e407380536a3d8eebf9529d8bc67c083c75a9b1f4ceec",
+  "results": {
+    "passed": 2,
+    "failed": 0,
+    "ignored": 0,
+    "tests": [
+      "jueony_fullwidth_guards::unknownctrl",
+      "jueony_negative_guards::unknownctrl"
+    ]
+  },
+  "sameCodec": true,
+  "originalTestsUnmodified": true,
+  "strictGeometryTolerance": 0.2,
+  "fullwidthChecks": [
+    "whole published live and reopened geometry",
+    "exact paragraph tree SHA",
+    "exact HWP bytes",
+    "exact HWPX bytes",
+    "nonempty genuine Unknown loss report"
+  ],
+  "negativeChecks": [
+    "private frame owner must stay excluded",
+    "live paragraph tree unchanged",
+    "genuine Unknown loss report nonempty"
+  ],
+  "sourceMutations": "Only reporting delta + harness-only lib wrapper/Cargo targets; immutable baseline untouched",
+  "firstPreparationFailure": "native.log/first-old70-oracle-test.rs preserve wrong old70 oracle selection; no passing claim for that run",
+  "scope": "Native only; official75 WASM/browser integration parent-owned"
+}

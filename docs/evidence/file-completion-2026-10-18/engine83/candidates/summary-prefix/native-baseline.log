@@ -1,0 +1,31 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/metadata-author-closure82/source-prefix-baseline82)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 12s
+     Running tests/jueony_summary_prefix.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_summary_prefix-8a1e5fd07d449f19)
+
+running 5 tests
+COMPILED_PREFIX_SOURCE src/parser/hwpx/contract_streams.rs 26122115cd496b3d4bd8ad9dcb9fd953b8d0073881638b3417baf94a3de96651
+COMPILED_PREFIX_SOURCE src/document_core/converters/hwpx_to_hwp.rs f1c2cd8b8dab5ca91faabfc60a37adea9c70df923ceecea9123759bc82a4683c
+test compiled_prefix_source_matches_disk ... ok
+
+thread 'own_xml_to_hwp_standard_summary_owner_five_fields' (254664) panicked at tests/jueony_summary_prefix.rs:11:478:
+assertion failed: ns.contains(&"/\u{5}HwpSummaryInformation".into())
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test own_xml_to_hwp_standard_summary_owner_five_fields ... FAILED
+
+thread 'historical_exact_six_accepts_one_summary_spelling_only' (254662) panicked at tests/jueony_summary_prefix.rs:13:1086:
+assertion `left == right` failed: standard
+  left: true
+ right: false
+test historical_exact_six_accepts_one_summary_spelling_only ... FAILED
+test original_native_ascii_stream_is_never_renamed ... ok
+test actual_historical_full_layout_exact ... ok
+
+failures:
+
+failures:
+    historical_exact_six_accepts_one_summary_spelling_only
+    own_xml_to_hwp_standard_summary_owner_five_fields
+
+test result: FAILED. 3 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.68s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_summary_prefix`

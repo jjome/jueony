@@ -1,0 +1,44 @@
+{
+  "baseSource": "source-65b8886bcdae0760",
+  "runtimePatch": "standard-summary-prefix-private82.patch",
+  "runtimePatchSha256": "ae4ee5b45c06032203b114ace797bf3ead878b476ea490b7aeb3854fb06bf8cd",
+  "sourceProof": "prefix-candidate-source-proof.json",
+  "namedNativeTests": 5,
+  "baseline": {
+    "passed": 3,
+    "failed": 2,
+    "ignored": 0,
+    "log": "native-prefix-baseline82.log"
+  },
+  "candidate": {
+    "passed": 5,
+    "failed": 0,
+    "ignored": 0,
+    "log": "native-prefix-candidate82.log"
+  },
+  "nativeCaseScope": [
+    "owned five fields and standard CFB summary path",
+    "original native ASCII owner is not renamed",
+    "exact6 standard/ASCII singly accepted; duplicate alias/missing/opaque/case rejected",
+    "actual16/historical15 complete published control/text layout unchanged",
+    "strict patch output and actual compiled source bytes identical"
+  ],
+  "actualHancomControl": {
+    "prefix0": {
+      "exactFields": 0,
+      "total": 5,
+      "report": "prefix0-actual-five-field-readback.json"
+    },
+    "prefix5": {
+      "exactFields": 5,
+      "total": 5,
+      "report": "prefix5-actual-five-field-readback.json"
+    },
+    "allStreamPayloadsBetweenInputsByteIdentical": true,
+    "onlyDirectoryNameChanged": true
+  },
+  "productionWasm": "PENDING",
+  "originalLegacyAsciiRepair": "NOT_IMPLEMENTED_OR_AUTHORIZED",
+  "sourceValuesLogged": "Only hashes except own synthetic metadata fixture values",
+  "publicDocumentFilesRedistributed": false
+}

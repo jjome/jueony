@@ -1,0 +1,7 @@
+PASS own plain hwp: mandatory full-layout save proof passes and source remains immutable
+PASS own plain hwpx: mandatory full-layout save proof passes and source remains immutable
+PASS own table hwp: mandatory full-layout save proof passes and source remains immutable
+PASS own table hwpx: mandatory full-layout save proof passes and source remains immutable
+PASS actual MCST: sixteen pages and checked full layout through both formats twice plus six alternating saves
+PASS historical-converted MCST: native lineage stays exact across HWP/HWPX two cycles
+PASS real Native handle: changed text-layout metadata with identical semantic getters is rejected, source unchanged

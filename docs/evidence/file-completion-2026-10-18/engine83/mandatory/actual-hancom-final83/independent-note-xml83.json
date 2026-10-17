@@ -1,0 +1,50 @@
+{
+  "schema": "independent-standard-library-xml-note-property-evidence-v1",
+  "files": [
+    {
+      "file": "build\\hancom-final-file-review-20261017\\mcst-bid-2026-hwpx-hancom.hwpx",
+      "sha256": "20a3960b4315626c3f97d9c5d47746e3cfadd8fe50dde43a4a424aa3a2a76936",
+      "bytes": 145995,
+      "notes": [
+        {
+          "entry": "Contents/section0.xml",
+          "kind": "footNotePr",
+          "allPropertiesSha256": "71a28b60fc39adc9393f09615aeebf3e4b8a322d70d801691c73b9dd0fd8f662",
+          "nodes": 6,
+          "attributes": 16
+        },
+        {
+          "entry": "Contents/section0.xml",
+          "kind": "endNotePr",
+          "allPropertiesSha256": "b6375a3dfcba1b20db8b7636829bc720b502147b0483157b98962bcd918ae4fb",
+          "nodes": 6,
+          "attributes": 16
+        }
+      ]
+    },
+    {
+      "file": "build\\file-closure83-native-handoff\\mcst-final83-hancom.hwpx",
+      "sha256": "65a60049e50636076dfff2eb4a6c7a3c850e838399af2ddf034d2992e1fb88dd",
+      "bytes": 144484,
+      "notes": [
+        {
+          "entry": "Contents/section0.xml",
+          "kind": "footNotePr",
+          "allPropertiesSha256": "71a28b60fc39adc9393f09615aeebf3e4b8a322d70d801691c73b9dd0fd8f662",
+          "nodes": 6,
+          "attributes": 16
+        },
+        {
+          "entry": "Contents/section0.xml",
+          "kind": "endNotePr",
+          "allPropertiesSha256": "b6375a3dfcba1b20db8b7636829bc720b502147b0483157b98962bcd918ae4fb",
+          "nodes": 6,
+          "attributes": 16
+        }
+      ]
+    }
+  ],
+  "differences": [],
+  "sourceWrites": 0,
+  "scope": "Every XML note property attribute and ordered child element is compared exactly, namespaces included; no defaults inserted, no attribute dropped, no numeric tolerance. Public document XML/body is not emitted."
+}

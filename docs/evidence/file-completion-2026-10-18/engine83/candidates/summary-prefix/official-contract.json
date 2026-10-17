@@ -1,0 +1,21 @@
+{
+  "sources": [
+    {
+      "url": "https://cdn.hancom.com/link/docs/%ED%95%9C%EA%B8%80%EB%AC%B8%EC%84%9C%ED%8C%8C%EC%9D%BC%ED%98%95%EC%8B%9D_5.0_revision1.3.pdf",
+      "section": "3.2.4/table7",
+      "claim": "The HWP document-summary property-set stream uses the U+0005-prefixed owner name and PIDs2..6."
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-oleps/f7933d28-2cc4-4b36-bc23-8861cbcd37c4",
+      "section": "2.25.1",
+      "claim": "Author is PID4; summary typed strings have a documented property contract."
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-oleps/b8910736-7f4a-469a-9644-aed68a71d7d1",
+      "section": "2.18.2",
+      "claim": "CodePage1 is specified, but actual Hancom files also lack it and use LPWSTR. This candidate does not rewrite either representation."
+    }
+  ],
+  "actualEvidence": "summary-wire-inventory.json",
+  "candidateBoundary": "Only the newly generated XML fallback owner name changes. Native original streams and opaque property payloads are never rewritten."
+}

@@ -1,0 +1,70 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/note-shape-i32-candidate82/baseline)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.51s
+     Running tests/jueony_note_i32.rs (/tmp/jueony-rhwp-engine/target/transpose-closure77/debug/deps/jueony_note_i32-f394199ddc467b5b)
+
+running 10 tests
+
+thread 'documented_26byte_legacy_record_has_separate_16bit_layout' (246943) panicked at tests/jueony_note_i32.rs:13:142:
+assertion `left == right` failed
+  left: Object {"above": Number(852), "below": Number(284), "between": Number(769), "color": Number(0), "length": Number(-1), "prefix": String("("), "start": Number(7), "suffix": String(")"), "type": Number(51), "user": String("*"), "width": Number(34)}
+ right: Object {"above": Number(852), "below": Number(568), "between": Number(284), "color": Number(1122867), "length": Number(-1), "prefix": String("("), "start": Number(7), "suffix": String(")"), "type": Number(1), "user": String("*"), "width": Number(3)}
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'independent_native_28byte_fixture_preserves_length_above_below_between' (246945) panicked at tests/jueony_note_i32.rs:11:141:
+assertion `left == right` failed
+  left: Object {"above": Number(-1), "below": Number(568), "between": Number(284), "color": Number(1122867), "length": Number(-1), "prefix": String("("), "start": Number(7), "suffix": String(")"), "type": Number(1), "user": String("*"), "width": Number(3)}
+ right: Object {"above": Number(852), "below": Number(568), "between": Number(284), "color": Number(1122867), "length": Number(-1), "prefix": String("("), "start": Number(7), "suffix": String(")"), "type": Number(1), "user": String("*"), "width": Number(3)}
+
+thread 'separator_length_preserves_full_signed_i32_range_and_wide_sentinel' (246948) panicked at tests/jueony_note_i32.rs:12:199:
+assertion `left == right` failed
+  left: 55902207
+ right: -1
+test documented_26byte_legacy_record_has_separate_16bit_layout ... FAILED
+test independent_native_28byte_fixture_preserves_length_above_below_between ... FAILED
+test separator_length_preserves_full_signed_i32_range_and_wide_sentinel ... FAILED
+
+thread 'signed_spacing_and_color_tail_are_not_shifted_or_clamped' (246949) panicked at tests/jueony_note_i32.rs:14:213:
+assertion `left == right` failed
+  left: [0, 0, 0, 0, 42, 0, 40, 0, 41, 0, 7, 0, 248, 47, 133, 255, 0, 0, 22, 255, 255, 255, 1, 3, 153, 102, 51, 0]
+ right: [0, 0, 0, 0, 42, 0, 40, 0, 41, 0, 7, 0, 248, 47, 224, 0, 133, 255, 22, 255, 255, 255, 1, 3, 153, 102, 51, 0]
+
+thread 'writer_emits_exact_real_28byte_offsets_not_two_i16_length_words' (246950) panicked at tests/jueony_note_i32.rs:10:167:
+assertion `left == right` failed
+  left: [0, 0, 0, 0, 42, 0, 40, 0, 41, 0, 7, 0, 255, 255, 84, 3, 0, 0, 56, 2, 28, 1, 1, 3, 51, 34, 17, 0]
+ right: [0, 0, 0, 0, 42, 0, 40, 0, 41, 0, 7, 0, 255, 255, 255, 255, 84, 3, 56, 2, 28, 1, 1, 3, 51, 34, 17, 0]
+test signed_spacing_and_color_tail_are_not_shifted_or_clamped ... FAILED
+test writer_emits_exact_real_28byte_offsets_not_two_i16_length_words ... FAILED
+COMPILED_SOURCE src/parser/body_text.rs 8d66fca26fc910d533c6fb7fed25e8bfadc5cf6d5f2f3b22b9b12d97c0c8b166
+COMPILED_SOURCE src/serializer/control.rs f55a86dce01145bcd62b04de86da075ed0319fa7e7e1b6e7390ed7886c7b3bcb
+test real_endnote_api_history_and_native_storage_keep_all_requested_spacing ... ok
+test hwp3_native_conversion_retains_independent_separator_and_spacing ... ok
+COMPILED_SOURCE src/parser/hwp3/mod.rs c5c6a2c74d5008a4f1b3e8f899948c395de335cfaac5ca779b79159572e74508
+COMPILED_SOURCE src/document_core/commands/object_ops/shape.rs 00267f458a4f780630b6b1fb4f9d171f448e95614a0a3e1bdbf7a346b5eb301a
+test compiled_codec_sources_are_exactly_the_selected_physical_source ... ok
+
+thread 'real_native_mcst_notes_decode_against_independent_record_values' (246947) panicked at tests/jueony_note_i32.rs:16:283:
+assertion `left == right` failed
+  left: (-1, -1, 568, 284)
+ right: (-1, 852, 568, 284)
+test real_native_mcst_notes_decode_against_independent_record_values ... FAILED
+
+thread 'actual_xml_note_shapes_export_independently_decodable_native_fields' (246941) panicked at tests/jueony_note_i32.rs:15:354:
+assertion `left == right` failed
+  left: [0, 0, 0, 0, 0, 0, 0, 0, 41, 0, 1, 0, 255, 255, 84, 3, 0, 0, 56, 2, 28, 1, 1, 1, 0, 0, 0, 0]
+ right: [0, 0, 0, 0, 0, 0, 0, 0, 41, 0, 1, 0, 255, 255, 255, 255, 84, 3, 56, 2, 28, 1, 1, 1, 0, 0, 0, 0]
+test actual_xml_note_shapes_export_independently_decodable_native_fields ... FAILED
+
+failures:
+
+failures:
+    actual_xml_note_shapes_export_independently_decodable_native_fields
+    documented_26byte_legacy_record_has_separate_16bit_layout
+    independent_native_28byte_fixture_preserves_length_above_below_between
+    real_native_mcst_notes_decode_against_independent_record_values
+    separator_length_preserves_full_signed_i32_range_and_wide_sentinel
+    signed_spacing_and_color_tail_are_not_shifted_or_clamped
+    writer_emits_exact_real_28byte_offsets_not_two_i16_length_words
+
+test result: FAILED. 3 passed; 7 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_note_i32`

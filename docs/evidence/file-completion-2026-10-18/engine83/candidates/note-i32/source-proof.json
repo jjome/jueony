@@ -1,0 +1,39 @@
+{
+  "baseSourceId": "65b8886bcdae0760",
+  "productionChanged": false,
+  "files": [
+    {
+      "path": "src/parser/body_text.rs",
+      "baselineSha256": "8d66fca26fc910d533c6fb7fed25e8bfadc5cf6d5f2f3b22b9b12d97c0c8b166",
+      "candidateSha256": "2e56bd8bea99c954bccc293b30af52f64b38334cb31ead6d4fdd59dc3b0ed5dc"
+    },
+    {
+      "path": "src/serializer/control.rs",
+      "baselineSha256": "f55a86dce01145bcd62b04de86da075ed0319fa7e7e1b6e7390ed7886c7b3bcb",
+      "candidateSha256": "7bf017495f25d74dbb6c2e6262ae8ef7972731a365646b68c85f01af63a80102"
+    },
+    {
+      "path": "src/model/footnote.rs",
+      "baselineSha256": "da313cd070cd894d654411e73fe66a90314bccbe16afd06defc26f93becf3dbe",
+      "candidateSha256": "d5b8a2e0d9e90189a303436e46eea9ba992334294f7ab9f6b4162a507b4dfe35"
+    },
+    {
+      "path": "src/parser/hwp3/mod.rs",
+      "baselineSha256": "c5c6a2c74d5008a4f1b3e8f899948c395de335cfaac5ca779b79159572e74508",
+      "candidateSha256": "7e8a4b6bf3eebf113965ddc5ba637495ffb220041392bb5ead9c0e4ea0e4aaee"
+    },
+    {
+      "path": "src/document_core/commands/object_ops/shape.rs",
+      "baselineSha256": "00267f458a4f780630b6b1fb4f9d171f448e95614a0a3e1bdbf7a346b5eb301a",
+      "candidateSha256": "df05d27d8641ca96301de0602fbb4de2abb7283841f71bb464018a8c3200e1f0"
+    }
+  ],
+  "spec": {
+    "url": "https://cdn.hancom.com/link/docs/%ED%95%9C%EA%B8%80%EB%AC%B8%EC%84%9C%ED%8C%8C%EC%9D%BC%ED%98%95%EC%8B%9D_5.0_revision1.3.pdf",
+    "section": "4.3.10.1.2",
+    "table": 133,
+    "pdfPageOneBased": 60,
+    "documentPage": 55,
+    "discrepancy": "The public table describes a26-byte i16 length layout. Independent Hancom native28-byte originals use i32 length atoffset12, above16,below18,between20,type22,width23,color24. Candidate supports the documented26-byte layout separately."
+  }
+}

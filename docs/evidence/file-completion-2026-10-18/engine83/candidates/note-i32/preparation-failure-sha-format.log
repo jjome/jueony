@@ -1,0 +1,27 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/note-shape-i32-candidate82/baseline)
+error[E0277]: the trait bound `Array<u8, ...>: LowerHex` is not satisfied
+  --> tests/jueony_note_i32.rs:19:624
+   |
+19 | ...e} {:x}",Sha256::digest(raw));}}
+   |       ----  ^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound
+   |       |
+   |       required by this formatting parameter
+   |
+   = help: the trait `LowerHex` is not implemented for `Array<u8, ...>`
+   = help: the following other types implement trait `LowerHex`:
+             &...
+             &mut ...
+             Saturating<...>
+             Wrapping<...>
+             Signature
+             bf16
+             f16
+             i128
+           and 71 others
+   = note: the full name for the type has been written to '/tmp/jueony-rhwp-engine/target/transpose-closure77/debug/deps/jueony_note_i32-f394199ddc467b5b.long-type-14197392245661744200.txt'
+   = note: consider using `--verbose` to print the full type name to the console
+   = note: this error originates in the macro `$crate::format_args_nl` which comes from the expansion of the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `rhwp` (test "jueony_note_i32") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

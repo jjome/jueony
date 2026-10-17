@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "scope": "Official83 actual Hancom disk readback, summary and note properties; unresolved strict and resource differences retained. Public/derived document bytes are excluded.",
+  "files": [
+    {
+      "path": "actual-vs-produced83.json.gz",
+      "bytes": 11497,
+      "sha256": "8520c4a45022a6ab67b29e3273294ef7f511f7a9e69209f1ae192d5f55498aaf",
+      "source": "build/file-closure83-native-handoff/actual-vs-produced83.json",
+      "rawBytes": 131082,
+      "rawSha256": "1be0b4db55b555180dfef6d6234d60aad683b58d3a483cdbd9fef32a4c04bcf9"
+    },
+    {
+      "path": "produced-vs-hancom83.json.gz",
+      "bytes": 13439,
+      "sha256": "5e1cecc0cd647649e5ba81dabdeb9d3e65046f71822c6c8aa7db0c36937e6454",
+      "source": "build/file-closure83-native-handoff/produced-vs-hancom83.json",
+      "rawBytes": 167033,
+      "rawSha256": "6764988f729b6bb24c09f88947ae1b9a83597d88e715dd6b52200bd1f3260b1d"
+    },
+    {
+      "path": "actual-vs-hancom83.json.gz",
+      "bytes": 13455,
+      "sha256": "338f5e9b4e914d6e2512cac5f08129438990ef9364f5f84fcc150725ae3057bb",
+      "source": "build/file-closure83-native-handoff/actual-vs-hancom83.json",
+      "rawBytes": 167042,
+      "rawSha256": "91c1db7960231d3f1c082a5b467c15e8d2eb75a60a3d01c3c625567f91d852ba"
+    },
+    {
+      "path": "independent-note-xml83.json",
+      "bytes": 1851,
+      "sha256": "26732b43d451b17c469381136af0d7eab5e32a73ebedb1a18031f5ef1cb05da3",
+      "source": "build/file-closure83-native-handoff/independent-note-xml83.json"
+    },
+    {
+      "path": "independent-opf-summary83.json",
+      "bytes": 2275,
+      "sha256": "1c3db0f499e61f3c20145a346c8d4ec4c60e98b2876a409414f927bca1463c24",
+      "source": "build/file-closure83-native-handoff/independent-opf-summary83.json"
+    },
+    {
+      "path": "independent-cfb-summary-note83.json",
+      "bytes": 2343,
+      "sha256": "070bdb37f753e8b3027995b1899e90549f5b037be477f2338cab0fc8d9352e2e",
+      "source": "build/file-closure83-native-handoff/independent-cfb-summary-note83.json"
+    },
+    {
+      "path": "reproduce/independent-note-xml83.py",
+      "bytes": 2966,
+      "sha256": "8b7d4052a80fdf18b50bcb814bd41a9c0f9356f5e80eb61c86385ff859f5505e",
+      "source": "build/file-closure83-native-handoff/independent-note-xml83.py"
+    },
+    {
+      "path": "reproduce/independent-opf-summary83.py",
+      "bytes": 1685,
+      "sha256": "8975c0496cadc2036c4a6953f847b0fd92da927835728c62773db68a0d39e84a",
+      "source": "build/file-closure83-native-handoff/independent-opf-summary83.py"
+    },
+    {
+      "path": "reproduce/independent-cfb-summary-note83.mjs",
+      "bytes": 2269,
+      "sha256": "907cefe10e2f870618d415d10ae051fb32118564edb823495a849a18d9fe352e",
+      "source": "build/file-closure83-native-handoff/independent-cfb-summary-note83.mjs"
+    },
+    {
+      "path": "reproduce/review-logical-final83.mjs",
+      "bytes": 9111,
+      "sha256": "7ead417543848d364e5189b01091c5133c4b45028d8b095856707b59976b7ccc",
+      "source": "build/file-closure83-native-handoff/review-logical-final83.mjs"
+    },
+    {
+      "path": "engine-build.json",
+      "bytes": 16213,
+      "sha256": "c62924aa034c84e7f1fe7b6f71e44718bb53fea5fe777b9307864cd2b8b347c2",
+      "source": "build\\rhwp-engine\\source-ad6186043c15532f\\pkg\\jueony-engine-build.json"
+    },
+    {
+      "path": "production-handoff-manifest.json",
+      "bytes": 24768,
+      "sha256": "157cca3643249ba138904ab558a2953b5f2cc3e22f9594d429561dc11c26747e",
+      "source": "build/file-closure83-native-handoff/manifest.json"
+    },
+    {
+      "path": "actual-native-actions.json",
+      "bytes": 1289,
+      "sha256": "7d88906e00ad197abb8ff652279923e558b209d87ac0da43203568179f5a84c4"
+    },
+    {
+      "path": "summary.json",
+      "bytes": 4914,
+      "sha256": "c1f57556641549d906193022500843439a85f9a6846df7cd2137ce43095ab5d4"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2602,
+      "sha256": "d080398bbe9e2c55b07c4091018c855aab3cfef71161b2d0f4798444915ffeca"
+    }
+  ],
+  "filesExcludingManifest": 15,
+  "bytesExcludingManifest": 110677
+}

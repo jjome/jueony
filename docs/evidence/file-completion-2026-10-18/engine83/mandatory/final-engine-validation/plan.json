@@ -1,0 +1,35 @@
+{
+  "enginePackage": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-ad6186043c15532f\\pkg",
+  "sourceId": "ad6186043c15532f",
+  "state": "WAITING_FOR_RELEASE_SUCCESS_AND_ENGINE_METADATA",
+  "groups": [
+    {
+      "name": "note4",
+      "script": "apps/editor/scripts/verify-note-shape-storage-engine.mjs",
+      "count": 4,
+      "verifierSha256": "8151c9bb158b322b6ba4bb9f16a80fd33bcab2a4c1caab594757aa2eefc86436",
+      "output": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\file-closure83-validation\\note4"
+    },
+    {
+      "name": "font3",
+      "script": "apps/editor/scripts/verify-font-fallback-storage-engine.mjs",
+      "count": 3,
+      "verifierSha256": "a22f2bcd32413783e1e6e46127dd773f1022ca6de1ff0dc208b6c8580d257943",
+      "output": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\file-closure83-validation\\font3"
+    },
+    {
+      "name": "mcst15",
+      "script": "apps/editor/scripts/verify-mcst-flow-spacing-engine.mjs",
+      "count": 15,
+      "verifierSha256": "8169e9d3ec48d97c71857b2b144203b2ff87449d8a1012fa273d444a2e49515b",
+      "output": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\file-closure83-validation\\mcst15"
+    },
+    {
+      "name": "whole7",
+      "script": "apps/editor/scripts/verify-document-save-layout-engine.mjs",
+      "count": 7,
+      "verifierSha256": "3b473306482ddcf224e2ba0a1b905eaaaad58fed0eab9108c74b7f3351d0dd23",
+      "output": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\file-closure83-validation\\whole7"
+    }
+  ]
+}

@@ -1,0 +1,480 @@
+{
+  "engine": {
+    "sourceId": "ad6186043c15532f",
+    "wasmSha256": "e2c8881c7b5cb76bc447c04d5aeb4d0e5b80cb3baff5cd47f8d992438c49fbde",
+    "jsSha256": "72828c03b5b92948e0acd45bcd3de0263c8570bfbfaeab283eb5998e1b72b22d",
+    "buildMode": "wsl-review-no-opt",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f"
+  },
+  "verifierSha256": "8151c9bb158b322b6ba4bb9f16a80fd33bcab2a4c1caab594757aa2eefc86436",
+  "independentReaderSha256": "92931cef313dc87bdba7047df192911a6f2b7d25e931e7497ade32b5e53ccedf",
+  "results": [
+    "actual MCST native note records and complete layout survive two cycles of each format plus six alternating saves",
+    "real endnote format API, snapshot Undo/Redo and both storage formats preserve requested independent slots",
+    "native original note payloads remain immutable through unedited native save",
+    "corrupted published layout injection is still rejected before any sink write"
+  ],
+  "failures": [],
+  "observations": [
+    {
+      "kind": "actual-note-contract",
+      "nativeInputSha256": "c61a13b249183a675d38d5badfa3af610edcf99a403622440fc81b7f52b348f2",
+      "xmlInputSha256": "20a3960b4315626c3f97d9c5d47746e3cfadd8fe50dde43a4a424aa3a2a76936",
+      "expected": [
+        {
+          "section": "BodyText/Section0",
+          "level": 2,
+          "rawHex": "000000000000000029000100ffffffff540338021c01010100000000",
+          "length": -1,
+          "above": 852,
+          "below": 568,
+          "between": 284,
+          "lineType": 1,
+          "lineWidth": 1,
+          "color": 0
+        },
+        {
+          "section": "BodyText/Section0",
+          "level": 2,
+          "rawHex": "00000000000000002900010000000000600340020000000100000000",
+          "length": 0,
+          "above": 864,
+          "below": 576,
+          "between": 0,
+          "lineType": 0,
+          "lineWidth": 1,
+          "color": 0
+        }
+      ],
+      "cycles": [
+        {
+          "step": 1,
+          "format": "hwp",
+          "sha256": "910a3629eb187692dc91533792c4d6341c8ab7071e53a147ae55b46e9774637b",
+          "pages": {
+            "before": 16,
+            "after": 16,
+            "equal": true
+          },
+          "semanticDifferences": 0,
+          "geometryDifferences": 0,
+          "guardStatus": "checked",
+          "nativeNotes": [
+            {
+              "section": "BodyText/Section0",
+              "level": 2,
+              "rawHex": "000000000000000029000100ffffffff540338021c01010100000000",
+              "length": -1,
+              "above": 852,
+              "below": 568,
+              "between": 284,
+              "lineType": 1,
+              "lineWidth": 1,
+              "color": 0
+            },
+            {
+              "section": "BodyText/Section0",
+              "level": 2,
+              "rawHex": "00000000000000002900010000000000600340020000000100000000",
+              "length": 0,
+              "above": 864,
+              "below": 576,
+              "between": 0,
+              "lineType": 0,
+              "lineWidth": 1,
+              "color": 0
+            }
+          ]
+        },
+        {
+          "step": 2,
+          "format": "hwp",
+          "sha256": "f37623456bd002f21fb6f7fc38cae2a9a5d68166766acc6fee889cfa7e94bafb",
+          "pages": {
+            "before": 16,
+            "after": 16,
+            "equal": true
+          },
+          "semanticDifferences": 0,
+          "geometryDifferences": 0,
+          "guardStatus": "checked",
+          "nativeNotes": [
+            {
+              "section": "BodyText/Section0",
+              "level": 2,
+              "rawHex": "000000000000000029000100ffffffff540338021c01010100000000",
+              "length": -1,
+              "above": 852,
+              "below": 568,
+              "between": 284,
+              "lineType": 1,
+              "lineWidth": 1,
+              "color": 0
+            },
+            {
+              "section": "BodyText/Section0",
+              "level": 2,
+              "rawHex": "00000000000000002900010000000000600340020000000100000000",
+              "length": 0,
+              "above": 864,
+              "below": 576,
+              "between": 0,
+              "lineType": 0,
+              "lineWidth": 1,
+              "color": 0
+            }
+          ]
+        },
+        {
+          "step": 1,
+          "format": "hwpx",
+          "sha256": "8c4834b036e500419464b0773d519e43baf7815b9d38d9a089709d1f97ba3b52",
+          "pages": {
+            "before": 16,
+            "after": 16,
+            "equal": true
+          },
+          "semanticDifferences": 0,
+          "geometryDifferences": 0,
+          "guardStatus": "checked"
+        },
+        {
+          "step": 2,
+          "format": "hwpx",
+          "sha256": "8c4834b036e500419464b0773d519e43baf7815b9d38d9a089709d1f97ba3b52",
+          "pages": {
+            "before": 16,
+            "after": 16,
+            "equal": true
+          },
+          "semanticDifferences": 0,
+          "geometryDifferences": 0,
+          "guardStatus": "checked"
+        },
+        {
+          "step": 1,
+          "format": "hwp",
+          "sha256": "910a3629eb187692dc91533792c4d6341c8ab7071e53a147ae55b46e9774637b",
+          "pages": {
+            "before": 16,
+            "after": 16,
+            "equal": true
+          },
+          "semanticDifferences": 0,
+          "geometryDifferences": 0,
+          "guardStatus": "checked",
+          "nativeNotes": [
+            {
+              "section": "BodyText/Section0",
+              "level": 2,
+              "rawHex": "000000000000000029000100ffffffff540338021c01010100000000",
+              "length": -1,
+              "above": 852,
+              "below": 568,
+              "between": 284,
+              "lineType": 1,
+              "lineWidth": 1,
+              "color": 0
+            },
+            {
+              "section": "BodyText/Section0",
+              "level": 2,
+              "rawHex": "00000000000000002900010000000000600340020000000100000000",
+              "length": 0,
+              "above": 864,
+              "below": 576,
+              "between": 0,
+              "lineType": 0,
+              "lineWidth": 1,
+              "color": 0
+            }
+          ]
+        },
+        {
+          "step": 2,
+          "format": "hwpx",
+          "sha256": "e26182ad82da828d68a7e5fb87ad2785efd84bfcdfbf71e2589e3170f9d19d31",
+          "pages": {
+            "before": 16,
+            "after": 16,
+            "equal": true
+          },
+          "semanticDifferences": 0,
+          "geometryDifferences": 0,
+          "guardStatus": "checked"
+        },
+        {
+          "step": 3,
+          "format": "hwp",
+          "sha256": "e84bb2b745315bcbf6d5cc66e5df2ace8356d5aa3ca75641fbaecf4ef289f9d6",
+          "pages": {
+            "before": 16,
+            "after": 16,
+            "equal": true
+          },
+          "semanticDifferences": 0,
+          "geometryDifferences": 0,
+          "guardStatus": "checked",
+          "nativeNotes": [
+            {
+              "section": "BodyText/Section0",
+              "level": 2,
+              "rawHex": "000000000000000029000100ffffffff540338021c01010100000000",
+              "length": -1,
+              "above": 852,
+              "below": 568,
+              "between": 284,
+              "lineType": 1,
+              "lineWidth": 1,
+              "color": 0
+            },
+            {
+              "section": "BodyText/Section0",
+              "level": 2,
+              "rawHex": "00000000000000002900010000000000600340020000000100000000",
+              "length": 0,
+              "above": 864,
+              "below": 576,
+              "between": 0,
+              "lineType": 0,
+              "lineWidth": 1,
+              "color": 0
+            }
+          ]
+        },
+        {
+          "step": 4,
+          "format": "hwpx",
+          "sha256": "e26182ad82da828d68a7e5fb87ad2785efd84bfcdfbf71e2589e3170f9d19d31",
+          "pages": {
+            "before": 16,
+            "after": 16,
+            "equal": true
+          },
+          "semanticDifferences": 0,
+          "geometryDifferences": 0,
+          "guardStatus": "checked"
+        },
+        {
+          "step": 5,
+          "format": "hwp",
+          "sha256": "e84bb2b745315bcbf6d5cc66e5df2ace8356d5aa3ca75641fbaecf4ef289f9d6",
+          "pages": {
+            "before": 16,
+            "after": 16,
+            "equal": true
+          },
+          "semanticDifferences": 0,
+          "geometryDifferences": 0,
+          "guardStatus": "checked",
+          "nativeNotes": [
+            {
+              "section": "BodyText/Section0",
+              "level": 2,
+              "rawHex": "000000000000000029000100ffffffff540338021c01010100000000",
+              "length": -1,
+              "above": 852,
+              "below": 568,
+              "between": 284,
+              "lineType": 1,
+              "lineWidth": 1,
+              "color": 0
+            },
+            {
+              "section": "BodyText/Section0",
+              "level": 2,
+              "rawHex": "00000000000000002900010000000000600340020000000100000000",
+              "length": 0,
+              "above": 864,
+              "below": 576,
+              "between": 0,
+              "lineType": 0,
+              "lineWidth": 1,
+              "color": 0
+            }
+          ]
+        },
+        {
+          "step": 6,
+          "format": "hwpx",
+          "sha256": "e26182ad82da828d68a7e5fb87ad2785efd84bfcdfbf71e2589e3170f9d19d31",
+          "pages": {
+            "before": 16,
+            "after": 16,
+            "equal": true
+          },
+          "semanticDifferences": 0,
+          "geometryDifferences": 0,
+          "guardStatus": "checked"
+        }
+      ],
+      "sourceUnchanged": true
+    },
+    {
+      "kind": "real-api-history",
+      "requested": {
+        "ok": true,
+        "numberFormat": "digit",
+        "userChar": "",
+        "prefixChar": "",
+        "suffixChar": ")",
+        "startNumber": 1,
+        "separatorEnabled": true,
+        "separatorLength": 12345,
+        "separatorMarginTop": 852,
+        "separatorMarginBottom": 568,
+        "noteSpacing": 284,
+        "separatorLineType": 1,
+        "separatorLineWidth": 2,
+        "separatorColor": "#112233",
+        "numberCodeSuperscript": false,
+        "printInlineAfterText": false,
+        "numbering": "continue",
+        "placement": "documentEnd"
+      },
+      "cycles": [
+        {
+          "step": 1,
+          "format": "hwp",
+          "sha256": "66d441042af421f3236a4d00f49db69242e9fb2e3098d754c6619faf45dbee26",
+          "pages": {
+            "before": 1,
+            "after": 1,
+            "equal": true
+          },
+          "semanticDifferences": 0,
+          "geometryDifferences": 0,
+          "guardStatus": "checked",
+          "nativeNotes": [
+            {
+              "section": "BodyText/Section0",
+              "level": 2,
+              "rawHex": "000000000000000029000100ffffffff520337021b01010100000000",
+              "length": -1,
+              "above": 850,
+              "below": 567,
+              "between": 283,
+              "lineType": 1,
+              "lineWidth": 1,
+              "color": 0
+            },
+            {
+              "section": "BodyText/Section0",
+              "level": 2,
+              "rawHex": "00000000000000002900010039300000540338021c01010211223300",
+              "length": 12345,
+              "above": 852,
+              "below": 568,
+              "between": 284,
+              "lineType": 1,
+              "lineWidth": 2,
+              "color": 3351057
+            }
+          ]
+        },
+        {
+          "step": 2,
+          "format": "hwp",
+          "sha256": "66d441042af421f3236a4d00f49db69242e9fb2e3098d754c6619faf45dbee26",
+          "pages": {
+            "before": 1,
+            "after": 1,
+            "equal": true
+          },
+          "semanticDifferences": 0,
+          "geometryDifferences": 0,
+          "guardStatus": "checked",
+          "nativeNotes": [
+            {
+              "section": "BodyText/Section0",
+              "level": 2,
+              "rawHex": "000000000000000029000100ffffffff520337021b01010100000000",
+              "length": -1,
+              "above": 850,
+              "below": 567,
+              "between": 283,
+              "lineType": 1,
+              "lineWidth": 1,
+              "color": 0
+            },
+            {
+              "section": "BodyText/Section0",
+              "level": 2,
+              "rawHex": "00000000000000002900010039300000540338021c01010211223300",
+              "length": 12345,
+              "above": 852,
+              "below": 568,
+              "between": 284,
+              "lineType": 1,
+              "lineWidth": 2,
+              "color": 3351057
+            }
+          ]
+        },
+        {
+          "step": 1,
+          "format": "hwpx",
+          "sha256": "0c43b3362ddf8f73b1fee9387cef1e4b78e5c5fd8bd1fd72f939b8c1e95e68f7",
+          "pages": {
+            "before": 1,
+            "after": 1,
+            "equal": true
+          },
+          "semanticDifferences": 0,
+          "geometryDifferences": 0,
+          "guardStatus": "checked"
+        },
+        {
+          "step": 2,
+          "format": "hwpx",
+          "sha256": "0c43b3362ddf8f73b1fee9387cef1e4b78e5c5fd8bd1fd72f939b8c1e95e68f7",
+          "pages": {
+            "before": 1,
+            "after": 1,
+            "equal": true
+          },
+          "semanticDifferences": 0,
+          "geometryDifferences": 0,
+          "guardStatus": "checked"
+        }
+      ],
+      "sourceUnchanged": true
+    },
+    {
+      "kind": "native-original-raw-notes",
+      "inputSha256": "c61a13b249183a675d38d5badfa3af610edcf99a403622440fc81b7f52b348f2",
+      "outputSha256": "f6e1e0dc78677c6e03d309a1e6da696f36e541c835718c105a9717d0d4bb6317",
+      "records": [
+        {
+          "section": "BodyText/Section0",
+          "level": 2,
+          "rawHex": "000000000000000029000100ffffffff540338021c01010100000000",
+          "length": -1,
+          "above": 852,
+          "below": 568,
+          "between": 284,
+          "lineType": 1,
+          "lineWidth": 1,
+          "color": 0
+        },
+        {
+          "section": "BodyText/Section0",
+          "level": 2,
+          "rawHex": "00000000000000002900010000000000600340020000000100000000",
+          "length": 0,
+          "above": 864,
+          "below": 576,
+          "between": 0,
+          "lineType": 0,
+          "lineWidth": 1,
+          "color": 0
+        }
+      ]
+    },
+    {
+      "kind": "corrupt-layout-negative",
+      "writes": 0
+    }
+  ],
+  "scope": "Actual WASM plus unchanged production preservation gate. Independent CFB/native 28-byte i32 note decoding, real note API/history, both formats twice and alternating six steps. Public originals are SHA-pinned and read-only. No public derivative bytes, document text/snapshots, fonts or binaries written. Full published geometry tolerance remains0.2; complete semantic fields are exact. This is not native Hancom UI or all note rendering compatibility."
+}

@@ -1,0 +1,59 @@
+{
+  "baseSourceId": "65b8886bcdae0760",
+  "status": "PRIVATE_CANDIDATE_NATIVE11_PASS_PENDING_FORMAL_INTEGRATION_AND_HANCOM_REOPEN",
+  "patchSha256": "a36d4572ea1f4527e8e5dda7c5211983776f3ee8f8c45cdf8b76f69e3d77bbfe",
+  "baselineNative": {
+    "sameTenTests": true,
+    "passed": 3,
+    "failed": 7
+  },
+  "candidateNative": {
+    "sameTenPassed": 10,
+    "extendedTotalPassed": 11,
+    "failed": 0,
+    "ignored": 0
+  },
+  "strictApplyFormal82": "PASS_WHITESPACE_ERROR_ALL_CHECK",
+  "actualRoundTrip": {
+    "sourcePages": 16,
+    "bothFormats": true,
+    "cyclesEach": 2,
+    "publishedGeometryDifferences": 0,
+    "numericTolerance": 0.2,
+    "noteFieldsExact": true,
+    "originalUnchanged": true
+  },
+  "independentNativeRecordProof": {
+    "records": 2,
+    "entire28BytePayloadsEqualNativeHancomOriginal": true,
+    "malformedBaselinePreserved": true
+  },
+  "reviewFile": {
+    "path": "build/note-shape-i32-candidate82/mcst-note-i32-native-review.hwp",
+    "sha256": "9ef86a7b5bfc6a05d057badf82fd454b675b542cfa966138072b3b12fc90cc8e",
+    "bytes": 125440,
+    "publicDerivativeNotArchived": true
+  },
+  "sourceFiles": [
+    "src/parser/body_text.rs",
+    "src/serializer/control.rs",
+    "src/model/footnote.rs",
+    "src/parser/hwp3/mod.rs",
+    "src/document_core/commands/object_ops/shape.rs"
+  ],
+  "contract": {
+    "native28": "i32 separator length@12; i16 above@16; i16 below@18; u16 between@20; type@22;width@23;color@24",
+    "documented26": "Separate legacy i16 length branch; never read modern high length word as above margin",
+    "canonicalIR": "separator_margin_top is actual above. separator_margin_bottom remains a legacy alias; new import, API edit and HWP3 mapping use canonical top. note_spacing and raw_unknown names retained for below/between API compatibility.",
+    "negativeValues": "Signed length and spacing retained without heuristic or numeric clamp in parser/writer."
+  },
+  "limits": [
+    "Original unedited native raw-stream owner remains unchanged; existing malformed old producer bytes are not automatically guessed or repaired.",
+    "Independent Native full-layout comparison is not production TypeScript guard or fresh WASM integration. Root must build final merged engine and rerun strict guards.",
+    "No actual Hancom opening of this new candidate is claimed until root provides UI/readback evidence.",
+    "Legacy26 input branch follows published table133; no actual legacy26 Hancom UI fixture was supplied.",
+    "HWP3 sample regression is one existing fixture, not all HWP3 corpus compatibility."
+  ],
+  "productionOrGuardChanged": false,
+  "cargoReleased": true
+}

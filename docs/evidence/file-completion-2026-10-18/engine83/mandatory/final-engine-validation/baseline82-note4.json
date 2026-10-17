@@ -1,0 +1,65 @@
+{
+  "engine": {
+    "sourceId": "65b8886bcdae0760",
+    "wasmSha256": "e966d691e8be90ae388cc65fbaae474eb3200593f23197bc3a9debe301c0d778",
+    "jsSha256": "72828c03b5b92948e0acd45bcd3de0263c8570bfbfaeab283eb5998e1b72b22d",
+    "buildMode": "wsl-review-no-opt",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f"
+  },
+  "verifierSha256": "8151c9bb158b322b6ba4bb9f16a80fd33bcab2a4c1caab594757aa2eefc86436",
+  "independentReaderSha256": "92931cef313dc87bdba7047df192911a6f2b7d25e931e7497ade32b5e53ccedf",
+  "results": [
+    "native original note payloads remain immutable through unedited native save",
+    "corrupted published layout injection is still rejected before any sink write"
+  ],
+  "failures": [
+    {
+      "name": "actual MCST native note records and complete layout survive two cycles of each format plus six alternating saves",
+      "errorType": "AssertionError",
+      "error": "AssertionError [ERR_ASSERTION]: Complete native note payloads must match independent Hancom original\n+ actual - expected\n\n  [\n    {\n+     above: 0,\n-     above: 852,\n      below: 568,\n      between: 284,\n      color: 0,\n+     length: 55902207,\n-     length: -1,\n      level: 2,\n      lineType: 1,\n      lineWidth: 1,\n+     rawHex: '000000000000000029000100ffff5403000038021c01010100000000',\n-     rawHex: '000000000000000029000100ffffffff540338021c01010100000000',\n      section: 'BodyText/Section0'\n    },\n    {\n+     above: 0,\n-     above: 864,\n      below: 576,\n      between: 0,\n      color: 0,\n+     length: 56623104,\n-     length: 0,\n      level: 2,\n      lineType: 0,\n      lineWidth: 1,\n+     rawHex: '00000000000000002900010000006003000040020000000100000000',\n-     rawHex: '00000000000000002900010000000000600340020000000100000000',\n      section: 'BodyText/Section0'\n    }\n  ]\n"
+    },
+    {
+      "name": "real endnote format API, snapshot Undo/Redo and both storage formats preserve requested independent slots",
+      "errorType": "AssertionError",
+      "error": "AssertionError [ERR_ASSERTION]: independent native note length\n+ actual - expected\n\n+ 55849017\n- 12345\n"
+    }
+  ],
+  "observations": [
+    {
+      "kind": "native-original-raw-notes",
+      "inputSha256": "c61a13b249183a675d38d5badfa3af610edcf99a403622440fc81b7f52b348f2",
+      "outputSha256": "f6e1e0dc78677c6e03d309a1e6da696f36e541c835718c105a9717d0d4bb6317",
+      "records": [
+        {
+          "section": "BodyText/Section0",
+          "level": 2,
+          "rawHex": "000000000000000029000100ffffffff540338021c01010100000000",
+          "length": -1,
+          "above": 852,
+          "below": 568,
+          "between": 284,
+          "lineType": 1,
+          "lineWidth": 1,
+          "color": 0
+        },
+        {
+          "section": "BodyText/Section0",
+          "level": 2,
+          "rawHex": "00000000000000002900010000000000600340020000000100000000",
+          "length": 0,
+          "above": 864,
+          "below": 576,
+          "between": 0,
+          "lineType": 0,
+          "lineWidth": 1,
+          "color": 0
+        }
+      ]
+    },
+    {
+      "kind": "corrupt-layout-negative",
+      "writes": 0
+    }
+  ],
+  "scope": "Actual WASM plus unchanged production preservation gate. Independent CFB/native 28-byte i32 note decoding, real note API/history, both formats twice and alternating six steps. Public originals are SHA-pinned and read-only. No public derivative bytes, document text/snapshots, fonts or binaries written. Full published geometry tolerance remains0.2; complete semantic fields are exact. This is not native Hancom UI or all note rendering compatibility."
+}

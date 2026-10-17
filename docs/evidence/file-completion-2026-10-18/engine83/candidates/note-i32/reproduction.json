@@ -1,0 +1,24 @@
+{
+  "nodeOrWasm": "Not used for this private candidate; no private WASM built.",
+  "native": "With existing offline toolchain, append [[test]] name jueony_note_i32 path tests/jueony_note_i32.rs to a disposable formal82 source, add the archived harness, apply the archived delta only for candidate, and run cargo test --offline --locked --test jueony_note_i32 -p rhwp -- --nocapture. Root repo env JUEONY_REPO is required.",
+  "fixtures": [
+    {
+      "path": "build/hancom-final-file-review-20261017/mcst-bid-2026-hwpx-hancom.hwpx",
+      "sha256": "20a3960b4315626c3f97d9c5d47746e3cfadd8fe50dde43a4a424aa3a2a76936"
+    },
+    {
+      "path": "build/hancom-final-file-review-20261017/source-mcst-bid-2026.hwp",
+      "sha256": "c61a13b249183a675d38d5badfa3af610edcf99a403622440fc81b7f52b348f2"
+    },
+    {
+      "path": "upstream/rhwp-source/samples/hwp3-pagedef-1915.hwp",
+      "sha256": "b272fdd218b4e91355167e63438a1605ef6902d75970c4ff5b8bae67087122d0"
+    },
+    {
+      "path": "build/file-closure69-public/independent-resource-graph.py",
+      "sha256": "91d2e53991d03216b8bdf3c3af20931c95c6854a1dd0bc0f7326864d54583740"
+    }
+  ],
+  "sourceHashProof": "The harness uses compile-time include_str! and compares it byte-for-byte with the selected physical source before reporting hashes.",
+  "publicOriginalsBodyFontsBinariesArchived": false
+}

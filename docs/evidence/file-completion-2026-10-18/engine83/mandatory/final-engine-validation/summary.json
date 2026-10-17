@@ -1,0 +1,91 @@
+{
+  "sourceId": "ad6186043c15532f",
+  "groups": [
+    {
+      "name": "note4",
+      "passed": 4,
+      "failed": 0,
+      "verifierSha256": "8151c9bb158b322b6ba4bb9f16a80fd33bcab2a4c1caab594757aa2eefc86436"
+    },
+    {
+      "name": "font3",
+      "passed": 3,
+      "failed": 0,
+      "verifierSha256": "a22f2bcd32413783e1e6e46127dd773f1022ca6de1ff0dc208b6c8580d257943"
+    },
+    {
+      "name": "mcst15",
+      "passed": 15,
+      "failed": 0,
+      "verifierSha256": "8169e9d3ec48d97c71857b2b144203b2ff87449d8a1012fa273d444a2e49515b"
+    },
+    {
+      "name": "whole7",
+      "passed": 7,
+      "failed": 0,
+      "verifierSha256": "3b473306482ddcf224e2ba0a1b905eaaaad58fed0eab9108c74b7f3351d0dd23"
+    }
+  ],
+  "passed": 29,
+  "failed": 0,
+  "actualContract": {
+    "pageCount": 16,
+    "bothFormatsTwice": true,
+    "alternatingSix": true,
+    "semanticDifferences": 0,
+    "geometryDifferences": 0,
+    "independentNativeNoteBytesMatch": true,
+    "realApiUndoRedo": true,
+    "productionGate": "checked"
+  },
+  "limits": [
+    "These groups prove preservation of the pinned actual-Hancom MCST source through this engine, not equality of the original public HWP and the independently saved Hancom HWPX.",
+    "Historical native lineage fifteen-page source remains separately preserved, not compared equal to sixteen pages.",
+    "Python3 fresh line fitting and complex-document print equality are outside these passed groups.",
+    "No new OS picker UI was performed by these Node verifiers; actual Hancom note-property evidence is a separate sibling archive."
+  ],
+  "actualIndependentNotes": [
+    {
+      "section": "BodyText/Section0",
+      "level": 2,
+      "rawHex": "000000000000000029000100ffffffff540338021c01010100000000",
+      "length": -1,
+      "above": 852,
+      "below": 568,
+      "between": 284,
+      "lineType": 1,
+      "lineWidth": 1,
+      "color": 0
+    },
+    {
+      "section": "BodyText/Section0",
+      "level": 2,
+      "rawHex": "00000000000000002900010000000000600340020000000100000000",
+      "length": 0,
+      "above": 864,
+      "below": 576,
+      "between": 0,
+      "lineType": 0,
+      "lineWidth": 1,
+      "color": 0
+    }
+  ],
+  "mcstStrictReopens": 106,
+  "sameVerifierBaseline82": {
+    "passed": 2,
+    "failed": 2,
+    "failures": [
+      {
+        "name": "actual MCST native note records and complete layout survive two cycles of each format plus six alternating saves",
+        "errorType": "AssertionError",
+        "error": "AssertionError [ERR_ASSERTION]: Complete native note payloads must match independent Hancom original\n+ actual - expected\n\n  [\n    {\n+     above: 0,\n-     above: 852,\n      below: 568,\n      between: 284,\n      color: 0,\n+     length: 55902207,\n-     length: -1,\n      level: 2,\n      lineType: 1,\n      lineWidth: 1,\n+     rawHex: '000000000000000029000100ffff5403000038021c01010100000000',\n-     rawHex: '000000000000000029000100ffffffff540338021c01010100000000',\n      section: 'BodyText/Section0'\n    },\n    {\n+     above: 0,\n-     above: 864,\n      below: 576,\n      between: 0,\n      color: 0,\n+     length: 56623104,\n-     length: 0,\n      level: 2,\n      lineType: 0,\n      lineWidth: 1,\n+     rawHex: '00000000000000002900010000006003000040020000000100000000',\n-     rawHex: '00000000000000002900010000000000600340020000000100000000',\n      section: 'BodyText/Section0'\n    }\n  ]\n"
+      },
+      {
+        "name": "real endnote format API, snapshot Undo/Redo and both storage formats preserve requested independent slots",
+        "errorType": "AssertionError",
+        "error": "AssertionError [ERR_ASSERTION]: independent native note length\n+ actual - expected\n\n+ 55849017\n- 12345\n"
+      }
+    ],
+    "sha256": "bbe4ddaf3dccf173527db17ab3a262a9296408ad975fe9fb21215dd1912df046"
+  }
+}

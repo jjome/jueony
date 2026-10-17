@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "scope": "Private note-shape i32 candidate based on formal82, retains baseline failures and actual record evidence. Actual Hancom new candidate UI not yet claimed.",
+  "files": [
+    {
+      "path": "actual-native-roundtrip-proof.json",
+      "bytes": 3082,
+      "sha256": "07beb739436d4344eabe443a8c2a806a060b3544f6dc27f280ee4c7b1260ec09"
+    },
+    {
+      "path": "independent-note-wire-baseline.json",
+      "bytes": 2218,
+      "sha256": "5ac876582aa787e0cf065862c704cf4398f7c54b2bd0d4334f307c2cc862e353"
+    },
+    {
+      "path": "independent-note-wire-final.json",
+      "bytes": 3068,
+      "sha256": "a0693f91ca4db1a782d3b4831793665980e77f4d0d55eef603ad35a6d1903784"
+    },
+    {
+      "path": "jueony_note_i32.rs",
+      "bytes": 10370,
+      "sha256": "d077c6d674f8f2f885d685abd162fdf6d831e539202abea34cc9fea3f6dad03b"
+    },
+    {
+      "path": "native-baseline.log",
+      "bytes": 5284,
+      "sha256": "996709f0719cb1b09c2fc3cb06a69ef7f2473843f6e2da11f213e6520eeae712"
+    },
+    {
+      "path": "native-candidate-extended.log",
+      "bytes": 1759,
+      "sha256": "da6ebca7fdf20be82f6b807514e0eeae39e71483a14a66b941c60fef2f80c74f"
+    },
+    {
+      "path": "native-candidate.log",
+      "bytes": 1667,
+      "sha256": "08d003dcef0e3def44c2b6ff5b0e7d060816f1a3f3142a72a06bba51eacc7aa9"
+    },
+    {
+      "path": "note-shape-i32-delta-formal82.patch",
+      "bytes": 11454,
+      "sha256": "a36d4572ea1f4527e8e5dda7c5211983776f3ee8f8c45cdf8b76f69e3d77bbfe"
+    },
+    {
+      "path": "preparation-failure-crlf.log",
+      "bytes": 135,
+      "sha256": "cae3d032fe29cbea37f5a03ec6c4e6d09341c49e0b8d23b1d2afe4ac2b27e440"
+    },
+    {
+      "path": "preparation-failure-sha-format.log",
+      "bytes": 1425,
+      "sha256": "ca6df3ba032599d3d5f999df30d4a3c0dc8c312429af07da040d94cd54793250"
+    },
+    {
+      "path": "read-wire.py",
+      "bytes": 2771,
+      "sha256": "131d8079fb1b224c3c9cce07cdb0702e6a86da460208dff1f32601915d0fff8e"
+    },
+    {
+      "path": "reproduction.json",
+      "bytes": 1375,
+      "sha256": "e17b038ea2ddb0a11be74817d40fa8b893a13230ad0c8092e102b83653dbc87d"
+    },
+    {
+      "path": "run-native.sh",
+      "bytes": 417,
+      "sha256": "bb2661d7f343d21bb267b2436c32f6d99347ab99f1bd5decf02414d5f8fa2fe2"
+    },
+    {
+      "path": "source-proof.json",
+      "bytes": 1850,
+      "sha256": "ba36485bdb7db947b086730c70b1e70460737d463fb3d96c396acc24b306e9cd"
+    },
+    {
+      "path": "summary.json",
+      "bytes": 2676,
+      "sha256": "1ec9e76010ac8587a691c1209d52409659dadb6a5b265b38ebf30014f4e6adf4"
+    },
+    {
+      "path": "verify.py",
+      "bytes": 336,
+      "sha256": "ef4e48627b545720fa934d006e29ebd73e6c84c45d133da89f7c944efaac94d9"
+    }
+  ]
+}

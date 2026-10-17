@@ -1,0 +1,33 @@
+{
+  "source": "Parent root actual Hancom2024 UI observations, reported in this task; no screenshots distributed.",
+  "output": {
+    "path": "build/file-closure83-native-handoff/mcst-final83-hancom.hwpx",
+    "bytes": 144484,
+    "sha256": "65a60049e50636076dfff2eb4a6c7a3c850e838399af2ddf034d2992e1fb88dd",
+    "bytesDistributed": false
+  },
+  "actions": [
+    {
+      "order": 1,
+      "action": "Open exact official83 production HWP in actual Hancom2024 and SaveAs a separate HWPX",
+      "result": "saved new on-disk HWPX; original inputs preserved"
+    },
+    {
+      "order": 2,
+      "action": "Ctrl+PageDown to document end",
+      "observedTotalPages": 16,
+      "observedNativeCharacterCount": 14383
+    },
+    {
+      "order": 3,
+      "action": "Ctrl+F4 close clean review tab",
+      "result": "review document tab closed"
+    },
+    {
+      "order": 4,
+      "action": "Open file dialog, type exact saved HWPX disk path, reopen",
+      "result": "disk reopen succeeded; first page total16 confirmed"
+    }
+  ],
+  "scope": "This records actual human-facing native UI actions separately from the engine readback. No other user windows or documents were closed. The native14383 count differs from all-story published14463 glyphs, which include generated page/header content."
+}

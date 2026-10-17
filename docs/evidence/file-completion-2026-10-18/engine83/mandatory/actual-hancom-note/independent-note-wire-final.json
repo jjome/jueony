@@ -1,0 +1,101 @@
+{
+  "readerSha256": "91d2e53991d03216b8bdf3c3af20931c95c6854a1dd0bc0f7326864d54583740",
+  "records": [
+    {
+      "path": "build\\hancom-final-file-review-20261017\\source-mcst-bid-2026.hwp",
+      "sha256": "c61a13b249183a675d38d5badfa3af610edcf99a403622440fc81b7f52b348f2",
+      "bytes": 141312,
+      "notes": [
+        {
+          "section": "Section0",
+          "rawHex": "000000000000000029000100ffffffff540338021c01010100000000",
+          "bytes": 28,
+          "length": -1,
+          "above": 852,
+          "below": 568,
+          "between": 284,
+          "type": 1,
+          "width": 1,
+          "color": 0
+        },
+        {
+          "section": "Section0",
+          "rawHex": "00000000000000002900010000000000600340020000000100000000",
+          "bytes": 28,
+          "length": 0,
+          "above": 864,
+          "below": 576,
+          "between": 0,
+          "type": 0,
+          "width": 1,
+          "color": 0
+        }
+      ]
+    },
+    {
+      "path": "build\\mcst-cross-closure77\\mcst-actual-v7-final-native-review.hwp",
+      "sha256": "f83d5bc34b6e1f6ee8f997f79f3fcb7a2c808cfac15412968743075e1489f7e9",
+      "bytes": 125440,
+      "notes": [
+        {
+          "section": "Section0",
+          "rawHex": "000000000000000029000100ffff5403000038021c01010100000000",
+          "bytes": 28,
+          "length": 55902207,
+          "above": 0,
+          "below": 568,
+          "between": 284,
+          "type": 1,
+          "width": 1,
+          "color": 0
+        },
+        {
+          "section": "Section0",
+          "rawHex": "00000000000000002900010000006003000040020000000100000000",
+          "bytes": 28,
+          "length": 56623104,
+          "above": 0,
+          "below": 576,
+          "between": 0,
+          "type": 0,
+          "width": 1,
+          "color": 0
+        }
+      ]
+    },
+    {
+      "path": "build\\note-shape-i32-candidate82\\mcst-note-i32-native-review.hwp",
+      "sha256": "9ef86a7b5bfc6a05d057badf82fd454b675b542cfa966138072b3b12fc90cc8e",
+      "bytes": 125440,
+      "notes": [
+        {
+          "section": "Section0",
+          "rawHex": "000000000000000029000100ffffffff540338021c01010100000000",
+          "bytes": 28,
+          "length": -1,
+          "above": 852,
+          "below": 568,
+          "between": 284,
+          "type": 1,
+          "width": 1,
+          "color": 0
+        },
+        {
+          "section": "Section0",
+          "rawHex": "00000000000000002900010000000000600340020000000100000000",
+          "bytes": 28,
+          "length": 0,
+          "above": 864,
+          "below": 576,
+          "between": 0,
+          "type": 0,
+          "width": 1,
+          "color": 0
+        }
+      ]
+    }
+  ],
+  "candidateMatchesOriginalEntire28BytePayloads": true,
+  "originalsUnchanged": true,
+  "scope": "Independent CFB+deflate record decoder, no engine parser/serializer used. Numeric note shapes and structural bytes only; no document body or font bytes copied."
+}

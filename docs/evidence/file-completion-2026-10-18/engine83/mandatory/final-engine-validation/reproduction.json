@@ -1,0 +1,28 @@
+{
+  "node": "22.22.2",
+  "arguments": [
+    "--experimental-strip-types"
+  ],
+  "instructions": "Run each exact-hash original script from the unchanged repository, using the absolute environment values in plan.json with a fresh per-group JUEONY_TEST_OUTPUT. Public inputs are pinned in the scripts and remain ignored/read-only.",
+  "dependencies": [
+    {
+      "path": "apps/editor/scripts/lib/hwp-summary-evidence.mjs",
+      "sha256": "92931cef313dc87bdba7047df192911a6f2b7d25e931e7497ade32b5e53ccedf"
+    },
+    {
+      "path": "apps/editor/scripts/lib/hancom-review.mjs",
+      "sha256": "bf8e4d30b7b232ce4abcc348165e97ebed214cb7bf60a5e14ccf8759413d88bd"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "sha256": "65a424675905ea8b09f4722e110101910a0327c6f68d19714e6093996cee8b5b"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-save-layout.ts",
+      "sha256": "6c1d119f4723698e9e3769d4fb45c7b38469b6f0bca6f4c575688f3b38638434"
+    }
+  ],
+  "runtimeGuardOrComparisonChanged": false,
+  "comparisonTolerance": 0.2,
+  "publicDerivativesBodySnapshotsFontProgramsOrBinariesArchived": false
+}

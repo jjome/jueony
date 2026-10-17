@@ -1,0 +1,333 @@
+{
+  "hypothesis": "HWPX parser generated a nonstandard summary-stream owner name; same-engine metadata reader tolerated it, native Hancom did not.",
+  "controlledMutation": {
+    "directoryEntryOffset": 1664,
+    "changedByteOffsets": [
+      1664,
+      1666,
+      1668,
+      1670,
+      1672,
+      1674,
+      1678,
+      1680,
+      1682,
+      1684,
+      1686,
+      1688,
+      1690,
+      1692,
+      1694,
+      1696,
+      1698,
+      1700,
+      1702,
+      1704,
+      1706,
+      1728
+    ],
+    "propertyPayloadsExact": true,
+    "allLogicalStreamPayloadsExact": true,
+    "summaryOldNameCodePoints": [
+      72,
+      119,
+      112,
+      83,
+      117,
+      109,
+      109,
+      97,
+      114,
+      121,
+      73,
+      110,
+      102,
+      111,
+      114,
+      109,
+      97,
+      116,
+      105,
+      111,
+      110
+    ],
+    "summaryNewNameCodePoints": [
+      5,
+      72,
+      119,
+      112,
+      83,
+      117,
+      109,
+      109,
+      97,
+      114,
+      121,
+      73,
+      110,
+      102,
+      111,
+      114,
+      109,
+      97,
+      116,
+      105,
+      111,
+      110
+    ]
+  },
+  "sourceCounterfactualFiles": [
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\metadata-author-closure82\\own-summary-five-fields-xml-origin.hwp",
+      "bytes": 6656,
+      "sha256": "e159efa30fbb03dac8752e4209294c0e6622e6f5c3f203e7a278a6e50e91dd1a"
+    },
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\metadata-author-closure82\\own-summary-five-fields-prefix-only.hwp",
+      "bytes": 6656,
+      "sha256": "1e0d44a96979da09601dce0f598a689af887a0bc2d80a97f9db3d3551fcf596b"
+    }
+  ],
+  "actualHancomComparison": {
+    "prefix0FieldsEqual": 0,
+    "prefix5FieldsEqual": 5,
+    "totalFields": 5,
+    "prefix0": {
+      "files": [
+        {
+          "p": "own-summary-five-fields-source.hwpx",
+          "sha256": "384155b8fa5e38462606e912638783cdb1dd3ce817c3b109c1978bdf3510b72b",
+          "hashes": {
+            "author": {
+              "characters": 16,
+              "sha256": "a35655013fc51d507e5e0ed75b5730a78f559e907677fb01a8bd2001d9fc5e6d"
+            },
+            "description": {
+              "characters": 20,
+              "sha256": "0cbc1137f9d16d8466685da7b4a2e9186a87c30ee98cb8ec599d122b34990b68"
+            },
+            "keywords": {
+              "characters": 18,
+              "sha256": "6e7b003ca958eb9eea0a7001c3aa4d1e4e2bc9f302c572c64a679c21a5bb4e4b"
+            },
+            "subject": {
+              "characters": 16,
+              "sha256": "8f960fe0260da7017d7c70f406c2e765b61012a5ded5cfb76ad6ae1dc87f66b2"
+            },
+            "title": {
+              "characters": 14,
+              "sha256": "a66444d4f5a055b6da90d88225715632010ac26ca9f2d56e404ff1f82045394a"
+            }
+          }
+        },
+        {
+          "p": "own-summary-xml-origin-hancom.hwpx",
+          "sha256": "4eed364aeac10fae3817229b716b3dc8d4478394ea31eb780b4b6441be6c6ef3",
+          "hashes": {
+            "author": {
+              "characters": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "description": {
+              "characters": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "keywords": {
+              "characters": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "subject": {
+              "characters": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "title": {
+              "characters": 13,
+              "sha256": "c0a95f19b8455d8ec37828f6dea14066e80df5f61decab997b1daccda7f5ddc4"
+            }
+          }
+        }
+      ],
+      "fields": [
+        {
+          "key": "author",
+          "equal": false,
+          "before": {
+            "characters": 16,
+            "sha256": "a35655013fc51d507e5e0ed75b5730a78f559e907677fb01a8bd2001d9fc5e6d"
+          },
+          "after": {
+            "characters": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        {
+          "key": "description",
+          "equal": false,
+          "before": {
+            "characters": 20,
+            "sha256": "0cbc1137f9d16d8466685da7b4a2e9186a87c30ee98cb8ec599d122b34990b68"
+          },
+          "after": {
+            "characters": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        {
+          "key": "keywords",
+          "equal": false,
+          "before": {
+            "characters": 18,
+            "sha256": "6e7b003ca958eb9eea0a7001c3aa4d1e4e2bc9f302c572c64a679c21a5bb4e4b"
+          },
+          "after": {
+            "characters": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        {
+          "key": "subject",
+          "equal": false,
+          "before": {
+            "characters": 16,
+            "sha256": "8f960fe0260da7017d7c70f406c2e765b61012a5ded5cfb76ad6ae1dc87f66b2"
+          },
+          "after": {
+            "characters": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        {
+          "key": "title",
+          "equal": false,
+          "before": {
+            "characters": 14,
+            "sha256": "a66444d4f5a055b6da90d88225715632010ac26ca9f2d56e404ff1f82045394a"
+          },
+          "after": {
+            "characters": 13,
+            "sha256": "c0a95f19b8455d8ec37828f6dea14066e80df5f61decab997b1daccda7f5ddc4"
+          }
+        }
+      ]
+    },
+    "prefix5": {
+      "files": [
+        {
+          "p": "own-summary-five-fields-source.hwpx",
+          "sha256": "384155b8fa5e38462606e912638783cdb1dd3ce817c3b109c1978bdf3510b72b",
+          "hashes": {
+            "author": {
+              "characters": 16,
+              "sha256": "a35655013fc51d507e5e0ed75b5730a78f559e907677fb01a8bd2001d9fc5e6d"
+            },
+            "description": {
+              "characters": 20,
+              "sha256": "0cbc1137f9d16d8466685da7b4a2e9186a87c30ee98cb8ec599d122b34990b68"
+            },
+            "keywords": {
+              "characters": 18,
+              "sha256": "6e7b003ca958eb9eea0a7001c3aa4d1e4e2bc9f302c572c64a679c21a5bb4e4b"
+            },
+            "subject": {
+              "characters": 16,
+              "sha256": "8f960fe0260da7017d7c70f406c2e765b61012a5ded5cfb76ad6ae1dc87f66b2"
+            },
+            "title": {
+              "characters": 14,
+              "sha256": "a66444d4f5a055b6da90d88225715632010ac26ca9f2d56e404ff1f82045394a"
+            }
+          }
+        },
+        {
+          "p": "own-summary-prefix-only-hancom.hwpx",
+          "sha256": "d7bac80e9591943846dbad86bf9827a1661a8eff04480128c16bfccc59f72767",
+          "hashes": {
+            "author": {
+              "characters": 16,
+              "sha256": "a35655013fc51d507e5e0ed75b5730a78f559e907677fb01a8bd2001d9fc5e6d"
+            },
+            "description": {
+              "characters": 20,
+              "sha256": "0cbc1137f9d16d8466685da7b4a2e9186a87c30ee98cb8ec599d122b34990b68"
+            },
+            "keywords": {
+              "characters": 18,
+              "sha256": "6e7b003ca958eb9eea0a7001c3aa4d1e4e2bc9f302c572c64a679c21a5bb4e4b"
+            },
+            "subject": {
+              "characters": 16,
+              "sha256": "8f960fe0260da7017d7c70f406c2e765b61012a5ded5cfb76ad6ae1dc87f66b2"
+            },
+            "title": {
+              "characters": 14,
+              "sha256": "a66444d4f5a055b6da90d88225715632010ac26ca9f2d56e404ff1f82045394a"
+            }
+          }
+        }
+      ],
+      "fields": [
+        {
+          "key": "author",
+          "equal": true,
+          "before": {
+            "characters": 16,
+            "sha256": "a35655013fc51d507e5e0ed75b5730a78f559e907677fb01a8bd2001d9fc5e6d"
+          },
+          "after": {
+            "characters": 16,
+            "sha256": "a35655013fc51d507e5e0ed75b5730a78f559e907677fb01a8bd2001d9fc5e6d"
+          }
+        },
+        {
+          "key": "description",
+          "equal": true,
+          "before": {
+            "characters": 20,
+            "sha256": "0cbc1137f9d16d8466685da7b4a2e9186a87c30ee98cb8ec599d122b34990b68"
+          },
+          "after": {
+            "characters": 20,
+            "sha256": "0cbc1137f9d16d8466685da7b4a2e9186a87c30ee98cb8ec599d122b34990b68"
+          }
+        },
+        {
+          "key": "keywords",
+          "equal": true,
+          "before": {
+            "characters": 18,
+            "sha256": "6e7b003ca958eb9eea0a7001c3aa4d1e4e2bc9f302c572c64a679c21a5bb4e4b"
+          },
+          "after": {
+            "characters": 18,
+            "sha256": "6e7b003ca958eb9eea0a7001c3aa4d1e4e2bc9f302c572c64a679c21a5bb4e4b"
+          }
+        },
+        {
+          "key": "subject",
+          "equal": true,
+          "before": {
+            "characters": 16,
+            "sha256": "8f960fe0260da7017d7c70f406c2e765b61012a5ded5cfb76ad6ae1dc87f66b2"
+          },
+          "after": {
+            "characters": 16,
+            "sha256": "8f960fe0260da7017d7c70f406c2e765b61012a5ded5cfb76ad6ae1dc87f66b2"
+          }
+        },
+        {
+          "key": "title",
+          "equal": true,
+          "before": {
+            "characters": 14,
+            "sha256": "a66444d4f5a055b6da90d88225715632010ac26ca9f2d56e404ff1f82045394a"
+          },
+          "after": {
+            "characters": 14,
+            "sha256": "a66444d4f5a055b6da90d88225715632010ac26ca9f2d56e404ff1f82045394a"
+          }
+        }
+      ]
+    }
+  },
+  "note": "This is not an LPSTR/LPWSTR conversion. Exact same stream payloads under two directory names were compared using actual Hancom SaveAs and independent final82 metadata reads. Existing original native ASCII-owner streams are intentionally not migrated by the candidate; only newly generated XML fallback uses the standard property-set name."
+}

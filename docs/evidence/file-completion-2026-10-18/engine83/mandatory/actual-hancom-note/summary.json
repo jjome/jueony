@@ -1,0 +1,27 @@
+{
+  "status": "PASS_NOTE_PROPERTIES_AFTER_ACTUAL_HANCOM_SAVEAS",
+  "actualUiActor": "Parent agent; native Hancom Open candidate HWP and SaveAs a separate HWPX completed before this independent read-only check.",
+  "sourceXmlSha256": "20a3960b4315626c3f97d9c5d47746e3cfadd8fe50dde43a4a424aa3a2a76936",
+  "candidateHwpSha256": "9ef86a7b5bfc6a05d057badf82fd454b675b542cfa966138072b3b12fc90cc8e",
+  "actualHancomHwpXSha256": "9a02598407a6a34f372d13e89086ecb5142c512b8a41b169dd1b862b53ca88fc",
+  "allXmlNotePropertySetsExact": 2,
+  "native28BytePayloadsExactlyMatchIndependentOriginal": 2,
+  "footnote": {
+    "length": -1,
+    "above": 852,
+    "below": 568,
+    "between": 284
+  },
+  "endnote": {
+    "length": 0,
+    "above": 864,
+    "below": 576,
+    "between": 0
+  },
+  "limits": [
+    "Exact all note attributes are verified, including number/placement/line/color/decorations.",
+    "Original public HWP to actual Hancom whole-document layout/raw-ID comparison remains distinct; no full-document equality is claimed.",
+    "Actual public documents and screenshots containing source body are not archived."
+  ],
+  "reproduce": "python verify-hancom-note-xml.py --repository <absolute unchanged repo with SHA-pinned ignored source files> --output <fresh absolute report>"
+}

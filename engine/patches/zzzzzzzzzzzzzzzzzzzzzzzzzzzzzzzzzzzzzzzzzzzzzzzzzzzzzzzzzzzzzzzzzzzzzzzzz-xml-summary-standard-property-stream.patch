@@ -1,0 +1,38 @@
+--- a/src/parser/hwpx/contract_streams.rs
++++ b/src/parser/hwpx/contract_streams.rs
+@@ -117,12 +117,11 @@
+     // [Stage 2.2] HWPX 컨테이너에 동등 데이터가 없는 contract 3 스트림 fallback.
+     // 한컴 정답지가 모든 HWP 파일에 요구하는 최소 OLE Property Set / 메타.
+     //
+-    // 주의: 스트림 경로는 OLE 표준의 `\x05` 선두 prefix (Property Set 표시) 가
+-    // 정답지의 실제 이름이나, mini_cfb 가 path 형식으로 처리하므로 일반
+-    // ASCII path 로 작성 후 한컴이 정상 인식. form-01 정답지의 실제 경로
+-    // `\x05HwpSummaryInformation` 와 byte-level 차이는 Stage 2.3 검증.
++    // This is a newly generated OLE property-set owner, not an original stream.
++    // Hancom looks up the standard U+0005-prefixed name for document metadata.
++    // Existing HWP/opaque streams are never renamed by this XML-only factory.
+     streams.push((
+-        "/HwpSummaryInformation".to_string(),
++        "/\u{5}HwpSummaryInformation".to_string(),
+         FALLBACK_HWP_SUMMARY.to_vec(),
+     ));
+     streams.push((
+--- a/src/document_core/converters/hwpx_to_hwp.rs
++++ b/src/document_core/converters/hwpx_to_hwp.rs
+@@ -2575,11 +2575,15 @@
+                         | "/PrvImage"
+                         | "/Scripts/DefaultJScript"
+                         | "/HwpSummaryInformation"
++                        | "/\u{5}HwpSummaryInformation"
+                         | "/DocOptions/_LinkDoc"
+                         | "/Scripts/JScriptVersion"
+                 )
+             })
+-            && doc.extra_streams.iter().map(|(path, _)| path).collect::<BTreeSet<_>>().len()
++            && doc.extra_streams.iter().map(|(path, _)| {
++                if path == "/\u{5}HwpSummaryInformation" { "/HwpSummaryInformation" }
++                else { path.as_str() }
++            }).collect::<BTreeSet<_>>().len()
+                 == doc.extra_streams.len()
+             && !doc
+                 .hwpx_aux_entries

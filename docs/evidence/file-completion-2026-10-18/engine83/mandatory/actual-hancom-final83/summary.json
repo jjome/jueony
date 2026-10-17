@@ -1,0 +1,163 @@
+{
+  "engineSourceId": "ad6186043c15532f",
+  "wasmSha256": "e2c8881c7b5cb76bc447c04d5aeb4d0e5b80cb3baff5cd47f8d992438c49fbde",
+  "inputs": [
+    {
+      "path": "build/hancom-final-file-review-20261017/mcst-bid-2026-hwpx-hancom.hwpx",
+      "bytes": 145995,
+      "sha256": "20a3960b4315626c3f97d9c5d47746e3cfadd8fe50dde43a4a424aa3a2a76936",
+      "bytesDistributed": false
+    },
+    {
+      "path": "build/file-closure83-native-handoff/mcst-final83-produced.hwp",
+      "bytes": 125440,
+      "sha256": "910a3629eb187692dc91533792c4d6341c8ab7071e53a147ae55b46e9774637b",
+      "bytesDistributed": false
+    },
+    {
+      "path": "build/file-closure83-native-handoff/mcst-final83-hancom.hwpx",
+      "bytes": 144484,
+      "sha256": "65a60049e50636076dfff2eb4a6c7a3c850e838399af2ddf034d2992e1fb88dd",
+      "bytesDistributed": false
+    }
+  ],
+  "actualToProduction": {
+    "status": "SAME_WITHIN_PUBLISHED_CONTRACT",
+    "semantic": 0,
+    "geometry": 0,
+    "pages": {
+      "before": 16,
+      "after": 16,
+      "equal": true
+    }
+  },
+  "actualToHancomSavedStrict": {
+    "status": "DIFFERENT_OR_UNREADABLE",
+    "semantic": 164,
+    "geometry": 5843,
+    "pages": {
+      "before": 16,
+      "after": 16,
+      "equal": true
+    }
+  },
+  "summaryFiveFieldsExact": true,
+  "summaryFieldProof": [
+    {
+      "field": "author",
+      "equal": true,
+      "before": {
+        "kind": "string",
+        "length": 4,
+        "sha256": "e33fa4cffc6af4b900b8cf538ffa7388fcb9978ebd76a009f83a83114b0ffb07"
+      },
+      "after": {
+        "kind": "string",
+        "length": 4,
+        "sha256": "e33fa4cffc6af4b900b8cf538ffa7388fcb9978ebd76a009f83a83114b0ffb07"
+      }
+    },
+    {
+      "field": "description",
+      "equal": true,
+      "before": {
+        "kind": "string",
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "after": {
+        "kind": "string",
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "field": "keywords",
+      "equal": true,
+      "before": {
+        "kind": "string",
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "after": {
+        "kind": "string",
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "field": "subject",
+      "equal": true,
+      "before": {
+        "kind": "string",
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "after": {
+        "kind": "string",
+        "length": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "field": "title",
+      "equal": true,
+      "before": {
+        "kind": "string",
+        "length": 5,
+        "sha256": "68cbfe06ebebdfe11cbe283f4c14e9659483421749416a65e15780433ccb6827"
+      },
+      "after": {
+        "kind": "string",
+        "length": 5,
+        "sha256": "68cbfe06ebebdfe11cbe283f4c14e9659483421749416a65e15780433ccb6827"
+      }
+    }
+  ],
+  "noteProperties": {
+    "independentCanonicalXMLNotes": 2,
+    "allAttributes": 32,
+    "orderedElements": 12,
+    "exactDifferences": 0,
+    "rawHwpRecords": 2,
+    "rawHwpRecordBytes": 28,
+    "separatorI32Proof": true
+  },
+  "logicalPublishedCharacterCount": 14463,
+  "logicalCharacterDiffCounts": {
+    "geometry": 0,
+    "text": 0,
+    "paint": 0,
+    "rawIDs": 14382,
+    "missingOwner": 0
+  },
+  "fullRawOpaqueRuns": {
+    "before": 15,
+    "after": 15,
+    "differences": 0
+  },
+  "emptyRuns": {
+    "count": 87,
+    "rawIDReferenceDifferences": 157,
+    "allOtherPublishedFieldsDifference": 0
+  },
+  "allRunSpanCoverage": {
+    "strictPartitionDifferences": 9,
+    "maximumBidirectionalDistance": 0.04999999999999716,
+    "existingCoordinateTolerance": 0.2
+  },
+  "perCharacterResolvedProductionSemanticDifferences": 0,
+  "unresolved": {
+    "productionStrictSemantic": 164,
+    "productionStrictGeometry": 5843,
+    "visibleGlyphRawIDReferences": 14382,
+    "emptyResourceFullModel": "Initial official82-compatible typed diagnostic42 equal/115 different out of157. Exact official83 full-model rerun is queued separately, not counted as passed here.",
+    "nativeOwnerAbsentRuns": 15,
+    "runWidthAndCharAxisContractObservations": 50,
+    "rawCachesAndUninterpretedResourceBytes": "Not proven equivalent. Production comparator and raw ID failures remain unchanged.",
+    "originalPublicHwp15VsActualHancom16": "A separate unresolved original-public layout axis, not covered by this successful actual-HancomXML self-storage/readback."
+  },
+  "sourceAndRuntimeWrites": 0,
+  "publicBytesDistributed": false,
+  "overallStatus": "SCOPED_SUMMARY_AND_NOTE_INTEROPERABILITY_VERIFIED_STRICT_LAYOUT_DIFFERENCES_RETAINED"
+}

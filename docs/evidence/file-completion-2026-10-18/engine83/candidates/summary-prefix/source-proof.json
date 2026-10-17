@@ -1,0 +1,20 @@
+{
+  "base": "build\\rhwp-engine\\source-65b8886bcdae0760",
+  "candidate": "build\\metadata-author-closure82\\source-prefix-candidate82",
+  "changed": [
+    {
+      "path": "src/parser/hwpx/contract_streams.rs",
+      "beforeSha256": "26122115cd496b3d4bd8ad9dcb9fd953b8d0073881638b3417baf94a3de96651",
+      "afterSha256": "4b2266b2f9cb1a23feb01385b2cd5598c4a12b4a8deac14d800f493573c8dad8",
+      "strictApplyExact": true
+    },
+    {
+      "path": "src/document_core/converters/hwpx_to_hwp.rs",
+      "beforeSha256": "f1c2cd8b8dab5ca91faabfc60a37adea9c70df923ceecea9123759bc82a4683c",
+      "afterSha256": "8fc2eeb9d9c9b288606a8578c5767f01595f393e2fa95a6b84971d2230001071",
+      "strictApplyExact": true
+    }
+  ],
+  "patchSha256": "ae4ee5b45c06032203b114ace797bf3ead878b476ea490b7aeb3854fb06bf8cd",
+  "baselineRustFiles": 1063
+}

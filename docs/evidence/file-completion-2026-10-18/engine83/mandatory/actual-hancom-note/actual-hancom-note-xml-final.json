@@ -1,0 +1,210 @@
+{
+  "status": "PASS_ALL_ACTUAL_NOTE_XML_PROPERTIES_EXACT",
+  "verifierSha256": "0cd721da17c48d8b5767f2543d3ae75f5caf9d32e6da19e2aa5c15710e04d842",
+  "rows": [
+    {
+      "path": "build/hancom-final-file-review-20261017/mcst-bid-2026-hwpx-hancom.hwpx",
+      "sha256": "20a3960b4315626c3f97d9c5d47746e3cfadd8fe50dde43a4a424aa3a2a76936",
+      "bytes": 145995,
+      "notes": [
+        {
+          "section": "Contents/section0.xml",
+          "kind": "footNotePr",
+          "properties": [
+            {
+              "name": "autoNumFormat",
+              "attributes": {
+                "type": "DIGIT",
+                "userChar": "",
+                "prefixChar": "",
+                "suffixChar": ")",
+                "supscript": "0"
+              }
+            },
+            {
+              "name": "noteLine",
+              "attributes": {
+                "length": "-1",
+                "type": "SOLID",
+                "width": "0.12 mm",
+                "color": "#000000"
+              }
+            },
+            {
+              "name": "noteSpacing",
+              "attributes": {
+                "betweenNotes": "284",
+                "belowLine": "568",
+                "aboveLine": "852"
+              }
+            },
+            {
+              "name": "numbering",
+              "attributes": {
+                "type": "CONTINUOUS",
+                "newNum": "1"
+              }
+            },
+            {
+              "name": "placement",
+              "attributes": {
+                "place": "EACH_COLUMN",
+                "beneathText": "0"
+              }
+            }
+          ]
+        },
+        {
+          "section": "Contents/section0.xml",
+          "kind": "endNotePr",
+          "properties": [
+            {
+              "name": "autoNumFormat",
+              "attributes": {
+                "type": "DIGIT",
+                "userChar": "",
+                "prefixChar": "",
+                "suffixChar": ")",
+                "supscript": "0"
+              }
+            },
+            {
+              "name": "noteLine",
+              "attributes": {
+                "length": "0",
+                "type": "NONE",
+                "width": "0.12 mm",
+                "color": "#000000"
+              }
+            },
+            {
+              "name": "noteSpacing",
+              "attributes": {
+                "betweenNotes": "0",
+                "belowLine": "576",
+                "aboveLine": "864"
+              }
+            },
+            {
+              "name": "numbering",
+              "attributes": {
+                "type": "CONTINUOUS",
+                "newNum": "1"
+              }
+            },
+            {
+              "name": "placement",
+              "attributes": {
+                "place": "END_OF_DOCUMENT",
+                "beneathText": "0"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "build/note-shape-i32-candidate82/mcst-note-i32-hancom.hwpx",
+      "sha256": "9a02598407a6a34f372d13e89086ecb5142c512b8a41b169dd1b862b53ca88fc",
+      "bytes": 144483,
+      "notes": [
+        {
+          "section": "Contents/section0.xml",
+          "kind": "footNotePr",
+          "properties": [
+            {
+              "name": "autoNumFormat",
+              "attributes": {
+                "type": "DIGIT",
+                "userChar": "",
+                "prefixChar": "",
+                "suffixChar": ")",
+                "supscript": "0"
+              }
+            },
+            {
+              "name": "noteLine",
+              "attributes": {
+                "length": "-1",
+                "type": "SOLID",
+                "width": "0.12 mm",
+                "color": "#000000"
+              }
+            },
+            {
+              "name": "noteSpacing",
+              "attributes": {
+                "betweenNotes": "284",
+                "belowLine": "568",
+                "aboveLine": "852"
+              }
+            },
+            {
+              "name": "numbering",
+              "attributes": {
+                "type": "CONTINUOUS",
+                "newNum": "1"
+              }
+            },
+            {
+              "name": "placement",
+              "attributes": {
+                "place": "EACH_COLUMN",
+                "beneathText": "0"
+              }
+            }
+          ]
+        },
+        {
+          "section": "Contents/section0.xml",
+          "kind": "endNotePr",
+          "properties": [
+            {
+              "name": "autoNumFormat",
+              "attributes": {
+                "type": "DIGIT",
+                "userChar": "",
+                "prefixChar": "",
+                "suffixChar": ")",
+                "supscript": "0"
+              }
+            },
+            {
+              "name": "noteLine",
+              "attributes": {
+                "length": "0",
+                "type": "NONE",
+                "width": "0.12 mm",
+                "color": "#000000"
+              }
+            },
+            {
+              "name": "noteSpacing",
+              "attributes": {
+                "betweenNotes": "0",
+                "belowLine": "576",
+                "aboveLine": "864"
+              }
+            },
+            {
+              "name": "numbering",
+              "attributes": {
+                "type": "CONTINUOUS",
+                "newNum": "1"
+              }
+            },
+            {
+              "name": "placement",
+              "attributes": {
+                "place": "END_OF_DOCUMENT",
+                "beneathText": "0"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "originalsUnchanged": true,
+  "scope": "All note XML attributes independently compared after actual Hancom Open/SaveAs. No body, full snapshot, font or document file is copied; this is not a full-document layout/ID equality claim."
+}

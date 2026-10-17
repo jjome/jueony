@@ -1,0 +1,22 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/note-shape-i32-candidate82/source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 11s
+     Running tests/jueony_note_i32.rs (/tmp/jueony-rhwp-engine/target/transpose-closure77/debug/deps/jueony_note_i32-f394199ddc467b5b)
+
+running 10 tests
+test documented_26byte_legacy_record_has_separate_16bit_layout ... ok
+test independent_native_28byte_fixture_preserves_length_above_below_between ... ok
+test writer_emits_exact_real_28byte_offsets_not_two_i16_length_words ... ok
+test signed_spacing_and_color_tail_are_not_shifted_or_clamped ... ok
+test separator_length_preserves_full_signed_i32_range_and_wide_sentinel ... ok
+COMPILED_SOURCE src/parser/body_text.rs 2e56bd8bea99c954bccc293b30af52f64b38334cb31ead6d4fdd59dc3b0ed5dc
+COMPILED_SOURCE src/serializer/control.rs 7bf017495f25d74dbb6c2e6262ae8ef7972731a365646b68c85f01af63a80102
+test real_endnote_api_history_and_native_storage_keep_all_requested_spacing ... ok
+test hwp3_native_conversion_retains_independent_separator_and_spacing ... ok
+COMPILED_SOURCE src/parser/hwp3/mod.rs 7e8a4b6bf3eebf113965ddc5ba637495ffb220041392bb5ead9c0e4ea0e4aaee
+COMPILED_SOURCE src/document_core/commands/object_ops/shape.rs df05d27d8641ca96301de0602fbb4de2abb7283841f71bb464018a8c3200e1f0
+test compiled_codec_sources_are_exactly_the_selected_physical_source ... ok
+test real_native_mcst_notes_decode_against_independent_record_values ... ok
+test actual_xml_note_shapes_export_independently_decodable_native_fields ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+

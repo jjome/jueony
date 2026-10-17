@@ -1,0 +1,12 @@
+PASS openai-responses: actual merged paragraph chat, compare, one undo/redo, safe save and UI reopen
+PASS anthropic: actual merged paragraph chat, compare, one undo/redo, safe save and UI reopen
+PASS gemini: actual merged paragraph chat, compare, one undo/redo, safe save and UI reopen
+PASS openai-compatible: actual merged paragraph chat, compare, one undo/redo, safe save and UI reopen
+PASS invalid original/coordinate, alias, missing target, overflow, no-op and batch never write
+PASS HWP, protection, lock, mixed characters, field and bookmark remain readonly
+PASS actual live fault restores bytes/history/dirty/cursor without an extra undo entry
+PASS actual strict post-render geometry fault rolls back, then next request works
+PASS late model response cannot overwrite a newer user cell edit
+PASS empty paragraph, reinsertion and unsupported growth keep request-sized undo and safe save
+PASS unsaved merged paragraph state survives workspace restart without redistributing text
+PASS no unexpected console/page errors or external assets

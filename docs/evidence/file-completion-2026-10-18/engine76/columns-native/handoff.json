@@ -1,0 +1,49 @@
+{
+  "status": "PRIVATE_NATIVE40_PASS_WASM_STRICT_PENDING",
+  "base": "source-c2c0c48efdd724e2",
+  "productionFiles": [
+    {
+      "path": "src/renderer/generated_column_stack.rs",
+      "baselineSha256": null,
+      "candidateSha256": "037a4d094fab6cf51f50e187a04302f0cbd90b92286a46d7c5352bef43662d7b"
+    },
+    {
+      "path": "src/renderer/mod.rs",
+      "baselineSha256": "347325b3b0779dc26e1b8d5c46d5750d8c04ecd78c1c2963cc8797beabb503e3",
+      "candidateSha256": "2fce0d3e560352491ea5e7a6aca25b3518a312063008a2719ae5446215787c46"
+    },
+    {
+      "path": "src/renderer/typeset/controls/flow_table.rs",
+      "baselineSha256": "0e32eaeeeedf5d5a252236f3e9d9513561a1b7c7078722af19d953755f0deac3",
+      "candidateSha256": "80c19ac503bda09f71b761b046d761b4b32e1941f2bb842daf57b73e9218373e"
+    }
+  ],
+  "patchSha256": "8ccf80a00cb0aae3c0a71619fb0ad6b55a537ac11c785ece4a4ad568c74efa7d",
+  "nativeFinal": "native-valid-candidate40-compact-oracle.log",
+  "baselineFinal": "native-valid-baseline31-final.log",
+  "candidateProvenance": {
+    "embeddedFlowSha256": "80c19ac503bda09f71b761b046d761b4b32e1941f2bb842daf57b73e9218373e",
+    "hasCandidateRuntimeCall": true,
+    "manifestDir": "/mnt/c/Users/jjome/Documents/work/jueony/build/file-closure69-public/column2-candidate74/source",
+    "mode": "candidate",
+    "targetDir": "/tmp/jueony-rhwp-engine/target/columns74-candidate"
+  },
+  "baselineProvenance": {
+    "embeddedFlowSha256": "0e32eaeeeedf5d5a252236f3e9d9513561a1b7c7078722af19d953755f0deac3",
+    "hasCandidateRuntimeCall": false,
+    "manifestDir": "/mnt/c/Users/jjome/Documents/work/jueony/build/file-closure69-public/column2-candidate74/baseline-source",
+    "mode": "baseline",
+    "targetDir": "/tmp/jueony-rhwp-engine/target/columns74-baseline"
+  },
+  "helperProvenance": {
+    "embeddedHelperSha256": "037a4d094fab6cf51f50e187a04302f0cbd90b92286a46d7c5352bef43662d7b",
+    "manifestDir": "/mnt/c/Users/jjome/Documents/work/jueony/build/file-closure69-public/column2-candidate74/source",
+    "targetDir": "/tmp/jueony-rhwp-engine/target/columns74-candidate"
+  },
+  "scope": "Generated equal-width LTR two-column single-frame ordinary full-body-width whole-table pair only; anchor/paint/occupied-bottom share one physical band; no cache/source/serializer/guard changes",
+  "remaining": "Formal combined WASM production preservation/strict guard and browser regressions pending. No new Hancom GUI launch here.",
+  "nativeSourceHarnessSha256": "1661414c8410abc7116d806bf6b8786d26613a7e6d43b4bb5bdc76d95f3ad039",
+  "baselineHarnessSha256": "1632f4466fcc12e5280786e14d9f99a72ce2047e069ea2423c6309411a5f2500",
+  "nativeCount": 40,
+  "negativeScope": "30 unchanged baseline boundary comparisons; six fresh serialized fixture-property assertions; separately classified existing unsupported payload/cache behaviors, not every disk feature is preserved."
+}

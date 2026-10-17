@@ -1,0 +1,24 @@
+PASS actual Hancom pair: every published semantic/control/text field
+PASS frozen historical Hancom layout remains the exact oracle
+PASS support/column2.hwp: strict hwp save/reopen twice; active document unchanged
+PASS support/column2.hwp: strict hwpx save/reopen twice; active document unchanged
+PASS hancom-current/column2.hwp: strict hwp save/reopen twice; active document unchanged
+PASS hancom-current/column2.hwp: strict hwpx save/reopen twice; active document unchanged
+PASS support/column2.hwp: actual insert, snapshot Undo/Redo, strict both-format repeated storage
+PASS hancom-current/column2.hwp: actual insert, snapshot Undo/Redo, strict both-format repeated storage
+PASS valid disk negative unchanged: single_column
+PASS valid disk negative unchanged: three_columns
+PASS valid disk negative unchanged: rtl
+PASS valid disk negative unchanged: distribute
+PASS valid disk negative unchanged: unequal_columns
+PASS valid disk negative unchanged: asymmetric_margin
+PASS existing fixed actual pair unchanged: caption-prepared.hwp
+PASS existing fixed actual pair unchanged: multiline-prepared.hwp
+PASS existing fixed actual pair unchanged: negative.hwp
+PASS existing fixed actual pair unchanged: offset.hwp
+PASS existing fixed actual pair unchanged: plain.hwp
+PASS existing fixed actual pair unchanged: positive-prepared.hwp
+PASS existing fixed actual pair unchanged: superscript.hwp
+PASS existing fixed actual pair unchanged: three.hwp
+PASS existing fixed actual pair unchanged: two.hwp
+PASS existing fixed actual pair unchanged: unicode.hwp

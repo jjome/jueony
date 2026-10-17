@@ -1,0 +1,12 @@
+PASS openai-responses: actual chat basic split, compare, undo/redo, safe save and UI reopen
+PASS anthropic: actual chat basic split, compare, undo/redo, safe save and UI reopen
+PASS gemini: actual chat basic split, compare, undo/redo, safe save and UI reopen
+PASS openai-compatible: actual chat basic split, compare, undo/redo, safe save and UI reopen
+PASS offset rectangle split keeps primary paragraphs and cursor, new cells empty
+PASS unmerged target, alias, missing table, overflow, arbitrary split and batch never write
+PASS HWP, protection, second merge, mixed original, field and missing grid witness remain readonly
+PASS live split then throw or equal-length other-table contamination restores bytes/history/dirty/cursor
+PASS post-render split geometry failure restores snapshot and next request succeeds
+PASS late model response cannot overwrite newer unmerged user cell edit
+PASS unsaved split restores after workspace restart and another split is no-op refusal
+PASS later section split mapping and actual UI save/reopen

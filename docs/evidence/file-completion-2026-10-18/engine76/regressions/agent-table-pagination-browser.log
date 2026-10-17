@@ -1,0 +1,13 @@
+PASS openai-responses: chat changes policy, comparison/one request undo/redo and real file save work
+PASS anthropic: chat changes policy, comparison/one request undo/redo and real file save work
+PASS gemini: chat changes policy, comparison/one request undo/redo and real file save work
+PASS openai-compatible: chat changes policy, comparison/one request undo/redo and real file save work
+PASS hwp: cell/row/none follow-up settings keep both tables/cells and survive file-handle reopen
+PASS hwpx: cell/row/none follow-up settings keep both tables/cells and survive file-handle reopen
+PASS no-op/unsupported policy/target/injected header and command mixing leave bytes/history unchanged
+PASS protected/merged/inline/caption/mixed/field documents visibly refuse unchanged
+PASS live first mutation then throw restores policy/cells/dirty/history/caret
+PASS false/no-op/wrong policy and unexpected repeated header/placement/cell/style/resource changes roll back
+PASS delayed model cannot overwrite newer table policy or cell text
+PASS body caret and direct typing remain usable after table metadata edit
+PASS saved workspace reload restores policy/capability and named comparison

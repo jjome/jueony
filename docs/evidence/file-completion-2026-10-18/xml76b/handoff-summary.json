@@ -1,0 +1,74 @@
+{
+  "status": "B009 standalone XML vertical implemented and scoped verified; full B009 remains partial, Agent XML not connected",
+  "frontend": "apps/editor/evidence/dist-file-closure-final76b",
+  "sourceId": "23d2545926a179a5",
+  "wasmSha256": "241bf9946102e82ada4e6e825b715f6e3fecd0f231612e977db1b73c923028a2",
+  "customSourceSha256": "fd1c9ec6f339321ba822f0f8a2aa97985c6e7c5fffd44181f754ccaaf12558d4",
+  "checks": {
+    "dedicatedUnit": 12,
+    "allUnitPassed": 910,
+    "allUnitSkipped": 0,
+    "strictTypeScript": "PASS",
+    "boundaries": "PASS/moduleCount10",
+    "realStandaloneEdge": 13,
+    "realIntegratedEdge": 7,
+    "externalRequests": 0,
+    "pageErrors": 0,
+    "consoleErrors": 0
+  },
+  "implemented": [
+    "Host file-menu XML workspace isolated from HWP editor and native file authority",
+    "Actual local UTF8 XML/XSD input with 2MB pre-allocation size checks and strict parser bounds",
+    "Fail-closed local-sequence-v1 supported schema profile with namespace URI/QName/form, explicit elements and primitive string/integer/decimal/boolean, min/maxOccurs",
+    "Validated field replacement, repeated/deleted elements, revision/original-value guards and independent undo/redo",
+    "Actual XML + unchanged XSD download/reopen; no unverified saved/clean claim; comments preserved for tested field replacements",
+    "Source HWP full bytes/state/snapshot/history unchanged; opened XML modal blocks actual shell native exit coordinator before freeze/destroy"
+  ],
+  "limitations": [
+    "Not HWPML/HML export; existing two-format HWP/HWPX storage/recovery contract unchanged",
+    "No HWT template mapping/library, XSL visual transformation or XML/HWP field mapping",
+    "General XSD simpleType facets, named types/references/extensions/attributes/choice/import/include unsupported; entire unsupported schema rejected",
+    "Separate XML work is memory-local; explicit dirty-close and browser beforeunload protection, no persistent XML recovery claim",
+    "Downloads request new copies only and do not prove OS disk commit; original files never attached for writing",
+    "Agent XML capabilities are not registered",
+    "Actual Hancom XML template golden unavailable due native modal activation error; installed schema structure shows additional unsupported constructs, no installed source copied"
+  ],
+  "officialReferences": [
+    "https://help.hancom.com/hoffice/multi/ko_kr/hwp/file/xml_document/xml%28form_make%29.htm",
+    "https://help.hancom.com/hoffice/multi/ko_kr/hwp/file/xml_document/xml%28open%29.htm",
+    "https://help.hancom.com/hoffice/multi/ko_kr/hwp/file/xml_document/xml%28save%29.htm",
+    "https://help.hancom.com/hoffice110/ko-KR/Hwp/toolbox/state_XML.htm",
+    "https://www.w3.org/TR/xmlschema-1/",
+    "https://www.w3.org/TR/xmlschema-2/"
+  ],
+  "priorFailures": [
+    "build/xml-documents-first (9PASS/3FAIL; modal download and readiness investigation)",
+    "build/xml-documents-second (10PASS/2FAIL)",
+    "build/xml-documents-third (10PASS/2FAIL; download canceled at Windows CDP forward-slash path)",
+    "build/xml-documents-fourth (11PASS/1FAIL; old dialog removed asynchronously)",
+    "build/xml-documents-integrated76b (initial verifier CSS typo; source unchanged)",
+    "build/file-closure-final76-unit.log (905PASS/1FAIL exact module count9->10/4skip missing engine environment)"
+  ],
+  "resultFiles": [
+    {
+      "path": "build/xml-documents-final76b/result.json",
+      "sha256": "31aeb61eaa1ac995880e64f19045586e11d23fa40260dd7a4aeb558086713b70"
+    },
+    {
+      "path": "build/xml-documents-integrated76b-ready/result.json",
+      "sha256": "998879e3d525c0f1a293e689a2a2510f7a122ee2c886d382bab0e2e5f353df2f"
+    },
+    {
+      "path": "build/file-closure-final76b-unit.log",
+      "sha256": "9d22e8cb60cd86f3680606af4ef96e62a3884b2d548643bca1d2aac8cc054d1f"
+    },
+    {
+      "path": "build/file-closure-final76b-typescript.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "build/file-closure-final76b-boundaries.json",
+      "sha256": "eaf07ee0b875df664e3107a19bd09c834ba12167e110ed0a2a380882b977032f"
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "status": "PRIVATE_NATIVE40_PASS_BASELINE31_PASS_FORMAL76_WASM_PENDING",
+  "candidatePatchSha256": "8ccf80a00cb0aae3c0a71619fb0ad6b55a537ac11c785ece4a4ad568c74efa7d",
+  "base": "formal74 source-c2c0c48efdd724e2",
+  "scope": "Native HWP lineage, equal-width LTR two-column, ordinary first frame, exactly two full-body-width simple unprotected whole tables. Shared anchor/paint/occupied-bottom authority. Computed row heights preserve all real cell minima.",
+  "unchanged": [
+    "original source/cache/LINE_SEG bytes",
+    "serializer",
+    "loss/geometry protection",
+    "0.2 geometry comparator",
+    "single-column positive and negative contracts"
+  ],
+  "native": {
+    "candidate": {
+      "pass": 40,
+      "fail": 0,
+      "ignored": 0
+    },
+    "baseline": {
+      "pass": 31,
+      "fail": 0,
+      "ignored": 0
+    }
+  },
+  "fixedOracle": {
+    "originalSha256": "eccfd4cf9a1cffe8673b7d793a1cfb0b1a56476a1353f3e303b3ef1b2dc860d6",
+    "compact": "fixed-oracle-compact.json",
+    "note": "All 11 exact complete afterLayout arrays and fixture identity fields used by these tests. The original 5.4 MB snapshot is unchanged; this derived view is not a replacement or normalization of the comparator."
+  },
+  "negativeScope": "30 boundaries compare complete live/IR/export-loss/reopened layout evidence exactly against an independently compiled baseline. Six previously stale low-level fixtures are rebuilt with actual raw_attr/common-margin dual writes and disk property assertions. Decoded feature proof separately labels existing unsupported synthetic Field/Unknown/cache/reset representations; they are NOT claimed as preserved disk features.",
+  "failureHistory": "All earlier failures are retained, including mtime/shared-target suspect results, fresh-source 35/39 failures, natural-height first failures and invalid-fixture failures. Fresh separate physical source/target plus compile-time flow/helper SHA is the basis for final results.",
+  "wasm73Canary": {
+    "pass": 18,
+    "fail": 6,
+    "note": "Expected pre-fix failures: actual column2 37 fields, fixed oracle, strict HWPX layout guard, actual edit paths and old negative17. No API execution error. Not a candidate PASS."
+  },
+  "edge": {
+    "pass": 5,
+    "fail": 0,
+    "profile": "dist-file-closure-final76",
+    "sourceId": "23d2545926a179a5",
+    "output": "edge76-columns-isolated2",
+    "keyboardUndoRedo": true,
+    "actualSaveAsUi": true,
+    "sourceUnchanged": true,
+    "writersEach": 3,
+    "pickersEach": 1,
+    "consolePageErrors": 0,
+    "canvasFontMetricsActive": false,
+    "note": "Actual editor rendering and keyboard/UI commands; do not generalize to a separately activated Canvas font-metric mode. First sandbox launch failed with OS username/password error and is preserved separately; isolated escalated retry passed."
+  },
+  "pending": [
+    "Root formal76 WASM24/actual11 results are reported PASS but final result files must be appended by root",
+    "root integration regressions",
+    "XML-only final76b profile (different frontend fingerprint) is not covered by this first final76 browser run"
+  ],
+  "nativeGui": "No GUI launched by this worker. Actual Hancom inputs and immutable oracle were provided by root; no fresh Hancom screen/print equivalence is asserted.",
+  "content": "Only owned synthetic fixtures, source diffs, small logs and compact evidence; no public/user documents, font programs, WASM, EXE or original full snapshots."
+}

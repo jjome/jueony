@@ -1,0 +1,50 @@
+FAIL actual Hancom pair: every published semantic/control/text field Full contract differs: semantic=0, geometry=37
+FAIL frozen historical Hancom layout remains the exact oracle Expected values to be strictly deep-equal:
++ actual - expected
+
++ [
++   {
++     after: 153.6,
++     before: 157.4,
++     delta: -3.8000000000000114,
++     path: '$[0]["controls"]["controls"][0]["cells"][0]["y"]'
++   },
++   {
++     after: 15
+PASS support/column2.hwp: strict hwp save/reopen twice; active document unchanged
+FAIL support/column2.hwp: strict hwpx save/reopen twice; active document unchanged 저장 후 문서 보존 검사에 실패했습니다 (native-hwp-overlapping-table-layout: HWP 겹침 표의 저장 재열기 배치를 확인하지 못했습니다. 원본 파일은 쓰지 않습니다 (저장 전후 표·본문 배치 차이).). 원본과 기존 복구본은 유지됩니다.
+PASS hancom-current/column2.hwp: strict hwp save/reopen twice; active document unchanged
+PASS hancom-current/column2.hwp: strict hwpx save/reopen twice; active document unchanged
+FAIL support/column2.hwp: actual insert, snapshot Undo/Redo, strict both-format repeated storage 저장 후 문서 보존 검사에 실패했습니다 (native-hwp-overlapping-table-layout: HWP 겹침 표의 저장 재열기 배치를 확인하지 못했습니다. 원본 파일은 쓰지 않습니다 (저장 전후 표·본문 배치 차이).). 원본과 기존 복구본은 유지됩니다.
+FAIL hancom-current/column2.hwp: actual insert, snapshot Undo/Redo, strict both-format repeated storage Expected values to be strictly deep-equal:
++ actual - expected
+... Skipped lines
+
+  {
+    controls: [
+      {
+        cells: [
+          {
+...
+            x: 117.2,
++           y: 242
+-           y: 234
+          },
+          {
+            
+PASS valid disk negative unchanged: single_column
+PASS valid disk negative unchanged: three_columns
+PASS valid disk negative unchanged: rtl
+PASS valid disk negative unchanged: distribute
+PASS valid disk negative unchanged: unequal_columns
+PASS valid disk negative unchanged: asymmetric_margin
+PASS existing fixed actual pair unchanged: caption-prepared.hwp
+PASS existing fixed actual pair unchanged: multiline-prepared.hwp
+FAIL existing fixed actual pair unchanged: negative.hwp Full contract differs: semantic=0, geometry=17
+PASS existing fixed actual pair unchanged: offset.hwp
+PASS existing fixed actual pair unchanged: plain.hwp
+PASS existing fixed actual pair unchanged: positive-prepared.hwp
+PASS existing fixed actual pair unchanged: superscript.hwp
+PASS existing fixed actual pair unchanged: three.hwp
+PASS existing fixed actual pair unchanged: two.hwp
+PASS existing fixed actual pair unchanged: unicode.hwp

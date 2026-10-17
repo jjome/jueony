@@ -1,0 +1,147 @@
+{
+  "results": [
+    {
+      "name": "real XML/XSD file inputs compile namespace-aware sequence profile and show structure",
+      "status": "PASS"
+    },
+    {
+      "name": "real field edit escapes markup and preserves emoji, comments and other fields",
+      "status": "PASS"
+    },
+    {
+      "name": "invalid integer edit is transactional and adds no history",
+      "status": "PASS"
+    },
+    {
+      "name": "repeat max and delete min are enforced with unchanged rejected state",
+      "status": "PASS"
+    },
+    {
+      "name": "UI undo/redo restores exact field values and repeat history",
+      "status": "PASS"
+    },
+    {
+      "name": "actual XML and XSD downloads reparse, validate and preserve non-field comments/source schema",
+      "status": "FAIL"
+    },
+    {
+      "name": "malformed XML/DTD/PI/invalid encoding and unsupported XSD are rejected, never fetched",
+      "status": "PASS"
+    },
+    {
+      "name": "failed file open preserves existing dirty XML, undo and export content",
+      "status": "PASS"
+    },
+    {
+      "name": "cancelled replacement and dirty close preserve current XML workspace",
+      "status": "FAIL"
+    },
+    {
+      "name": "DOM codec rejects destructive complex edits, illegal Unicode and stale requests",
+      "status": "PASS"
+    },
+    {
+      "name": "UTF-8 XML download reopens through actual file UI with no original source writes",
+      "status": "FAIL"
+    },
+    {
+      "name": "no external requests, console errors or page errors",
+      "status": "PASS"
+    }
+  ],
+  "failures": [
+    {
+      "name": "actual XML and XSD downloads reparse, validate and preserve non-field comments/source schema",
+      "error": "Error: download not completed {\"file\":\"own-report.xml\",\"before\":[]}",
+      "stack": "Error: download not completed {\"file\":\"own-report.xml\",\"before\":[]}\n    at download (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-xml-documents.mjs:17:305)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-xml-documents.mjs:26:131\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-xml-documents.mjs:12:39)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-xml-documents.mjs:26:2"
+    },
+    {
+      "name": "cancelled replacement and dirty close preserve current XML workspace",
+      "error": "TimeoutError: Waiting failed: 30000ms exceeded",
+      "stack": "TimeoutError: Waiting failed: 30000ms exceeded\n    at new WaitTask (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/common/WaitTask.js:46:34)\n    at IsolatedWorld.waitForFunction (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Realm.js:49:26)\n    at CdpFrame.waitForFunction (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:585:43)\n    at CdpFrame.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/util/decorators.js:101:27)\n    at CdpPage.waitForFunction (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Page.js:1537:37)\n    at load (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-xml-documents.mjs:16:255)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-xml-documents.mjs:29:118\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-xml-documents.mjs:12:39)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-xml-documents.mjs:29:2"
+    },
+    {
+      "name": "UTF-8 XML download reopens through actual file UI with no original source writes",
+      "error": "TimeoutError: Waiting failed: 30000ms exceeded",
+      "stack": "TimeoutError: Waiting failed: 30000ms exceeded\n    at new WaitTask (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/common/WaitTask.js:46:34)\n    at IsolatedWorld.waitForFunction (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Realm.js:49:26)\n    at CdpFrame.waitForFunction (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:585:43)\n    at CdpFrame.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/util/decorators.js:101:27)\n    at CdpPage.waitForFunction (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Page.js:1537:37)\n    at load (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-xml-documents.mjs:16:255)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-xml-documents.mjs:31:197\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-xml-documents.mjs:12:39)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-xml-documents.mjs:31:2"
+    }
+  ],
+  "observations": [
+    {
+      "errors": [
+        {
+          "name": "malformed",
+          "rejected": true
+        },
+        {
+          "name": "doctype",
+          "rejected": true
+        },
+        {
+          "name": "entity",
+          "rejected": true
+        },
+        {
+          "name": "stylesheet",
+          "rejected": true
+        },
+        {
+          "name": "bad-type",
+          "rejected": true
+        },
+        {
+          "name": "include",
+          "rejected": true
+        },
+        {
+          "name": "mixed",
+          "rejected": true
+        },
+        {
+          "name": "unknown-attribute",
+          "rejected": true
+        },
+        {
+          "name": "wrong-namespace",
+          "rejected": true
+        }
+      ],
+      "encoding": true
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "sourceHashes": [
+    {
+      "path": "src/modules/xml-documents/public/contracts.ts",
+      "sha256": "f0d77d4988fd5ff4f3d31dd016113b68f7b2a21480240dc28aae3ef867e8a133"
+    },
+    {
+      "path": "src/modules/xml-documents/public/index.ts",
+      "sha256": "d98b81bee14f632e58c1bed7da0fb9522a6a0a599fbe1754f0bc249a35de7bb7"
+    },
+    {
+      "path": "src/modules/xml-documents/domain/schema.ts",
+      "sha256": "bd6d2224c492ac152cec38ebd11e626d49870492fdbb8c84afc2e527cd1d5910"
+    },
+    {
+      "path": "src/modules/xml-documents/ports/xml-codec.ts",
+      "sha256": "3d8427090956763055991fdc7a323860a8cdacbc4c861123cbfe7b2152cc032b"
+    },
+    {
+      "path": "src/modules/xml-documents/application/workspace.ts",
+      "sha256": "5fab870753fed52e7966088759d8cdc0fa698c2f8ef3356ced7afebc5f5e1040"
+    },
+    {
+      "path": "src/adapters/xml/browser-parser.ts",
+      "sha256": "d501b25f13660836bd10d0551040beccba28bd52a1b7a783966a628a87c37ab3"
+    },
+    {
+      "path": "src/ui/xml-document-dialog.ts",
+      "sha256": "fc07e7f0a51efef058738aa6325a3d11ae10d7d6b85888622fdd9d34d0984a25"
+    }
+  ],
+  "verifierSha256": "e3a5a4be9ee95f42deae4d01d513d94585af7685989fe3fea79daf584dd51743",
+  "scope": "Real isolated Edge and actual compiled production XML module/dialog/file inputs/download/reopen. No HWP editor, HML/HWT or XSL rendering support claimed. Root app menu integration and actual Hancom review are separate. Own fixtures only; no native handles, user files, font bytes or external resource loads."
+}

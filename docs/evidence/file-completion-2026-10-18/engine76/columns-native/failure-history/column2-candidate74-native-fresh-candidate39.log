@@ -1,0 +1,96 @@
+
+running 39 tests
+test compiled_source_provenance ... ok
+test compiled_helper_provenance ... ok
+test first_model_contract_probe ... ok
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=2, para_b=1, a=205.1~239.3, b=226.5~295.5, overlap=12.9px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=2, para_b=1, a=205.1~239.3, b=226.5~295.5, overlap=12.9px
+
+thread 'hancom_api_history' (155659) panicked at tests/jueony_generated_columns.rs:42:5:
+[{"after":242.0,"before":234.0,"path":"/controls/1/cells/0/y"},{"after":242.0,"before":234.0,"path":"/controls/1/cells/1/y"},{"after":259.1,"before":251.1,"path":"/controls/1/cells/2/y"},{"after":259.1,"before":251.1,"path":"/controls/1/cells/3/y"},{"after":242.0,"before":234.0,"path":"/controls/1/y"}]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test hancom_api_history ... FAILED
+
+thread 'actual_column2_full_geometry' (155644) panicked at tests/jueony_generated_columns.rs:42:5:
+[{"after":157.4,"before":153.6,"path":"/0/controls/controls/0/cells/0/y"},{"after":157.4,"before":153.6,"path":"/0/controls/controls/0/cells/1/y"},{"after":189.6,"before":185.8,"path":"/0/controls/controls/0/cells/2/y"},{"after":189.6,"before":185.8,"path":"/0/controls/controls/0/cells/3/y"},{"after":209.4,"before":205.6,"path":"/0/controls/controls/0/cells/4/y"},{"after":209.4,"before":205.6,"path":"/0/controls/controls/0/cells/5/y"},{"after":157.4,"before":153.6,"path":"/0/controls/controls/0/y"},{"after":234.0,"before":230.7,"path":"/0/controls/controls/1/cells/0/y"},{"after":234.0,"before":230.7,"path":"/0/controls/controls/1/cells/1/y"},{"after":251.1,"before":247.8,"path":"/0/controls/controls/1/cells/2/y"},{"after":251.1,"before":247.8,"path":"/0/controls/controls/1/cells/3/y"},{"after":234.0,"before":230.7,"path":"/0/controls/controls/1/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/1/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/2/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/3/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/4/y"},{"after":191.5,"before":187.7,"path":"/0/text/runs/5/y"},{"after":191.5,"before":187.7,"path":"/0/text/runs/6/y"},{"after":192.8,"before":189.0,"path":"/0/text/runs/7/y"},{"after":192.8,"before":189.0,"path":"/0/text/runs/8/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/9/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/10/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/11/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/12/y"},{"after":157.4,"before":153.6,"path":"/0/text/runs/13/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/14/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/15/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/16/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/17/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/18/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/19/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/20/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/21/y"},{"after":234.0,"before":230.7,"path":"/0/text/runs/22/y"},{"after":272.0,"before":264.9,"path":"/0/text/runs/23/y"},{"after":293.3,"before":286.2,"path":"/0/text/runs/24/y"},{"after":314.6,"before":307.5,"path":"/0/text/runs/25/y"}]
+test actual_column2_full_geometry ... FAILED
+test actual_negative_pair_remains_exact ... ok
+test both_sources_both_formats_twice ... FAILED
+
+thread 'both_sources_both_formats_twice' (155647) panicked at tests/jueony_generated_columns.rs:42:5:
+[{"after":157.4,"before":153.6,"path":"/0/controls/controls/0/cells/0/y"},{"after":157.4,"before":153.6,"path":"/0/controls/controls/0/cells/1/y"},{"after":189.6,"before":185.8,"path":"/0/controls/controls/0/cells/2/y"},{"after":189.6,"before":185.8,"path":"/0/controls/controls/0/cells/3/y"},{"after":209.4,"before":205.6,"path":"/0/controls/controls/0/cells/4/y"},{"after":209.4,"before":205.6,"path":"/0/controls/controls/0/cells/5/y"},{"after":157.4,"before":153.6,"path":"/0/controls/controls/0/y"},{"after":234.0,"before":230.7,"path":"/0/controls/controls/1/cells/0/y"},{"after":234.0,"before":230.7,"path":"/0/controls/controls/1/cells/1/y"},{"after":251.1,"before":247.8,"path":"/0/controls/controls/1/cells/2/y"},{"after":251.1,"before":247.8,"path":"/0/controls/controls/1/cells/3/y"},{"after":234.0,"before":230.7,"path":"/0/controls/controls/1/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/1/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/2/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/3/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/4/y"},{"after":191.5,"before":187.7,"path":"/0/text/runs/5/y"},{"after":191.5,"before":187.7,"path":"/0/text/runs/6/y"},{"after":192.8,"before":189.0,"path":"/0/text/runs/7/y"},{"after":192.8,"before":189.0,"path":"/0/text/runs/8/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/9/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/10/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/11/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/12/y"},{"after":157.4,"before":153.6,"path":"/0/text/runs/13/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/14/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/15/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/16/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/17/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/18/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/19/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/20/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/21/y"},{"after":234.0,"before":230.7,"path":"/0/text/runs/22/y"},{"after":272.0,"before":264.9,"path":"/0/text/runs/23/y"},{"after":293.3,"before":286.2,"path":"/0/text/runs/24/y"},{"after":314.6,"before":307.5,"path":"/0/text/runs/25/y"}]
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=2, para_b=1, a=205.1~239.3, b=226.5~295.5, overlap=12.9px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=2, para_b=1, a=205.1~239.3, b=226.5~295.5, overlap=12.9px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=34 line=0 y=1012.4 col_bottom=1009.1 overflow=3.3px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=34, type=FullParagraph, first=false, y=1012.4, bottom=1009.1, overflow=3.3px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=35 line=0 y=1033.7 col_bottom=1009.1 overflow=24.6px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=35, type=FullParagraph, first=false, y=1033.7, bottom=1009.1, overflow=24.6px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=36 line=0 y=1055.1 col_bottom=1009.1 overflow=46.0px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=36, type=FullParagraph, first=false, y=1055.1, bottom=1009.1, overflow=46.0px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=34 line=0 y=1012.4 col_bottom=1009.1 overflow=3.3px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=34, type=FullParagraph, first=false, y=1012.4, bottom=1009.1, overflow=3.3px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=35 line=0 y=1033.7 col_bottom=1009.1 overflow=24.6px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=35, type=FullParagraph, first=false, y=1033.7, bottom=1009.1, overflow=24.6px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=36 line=0 y=1055.1 col_bottom=1009.1 overflow=46.0px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=36, type=FullParagraph, first=false, y=1055.1, bottom=1009.1, overflow=46.0px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=157.4~226.5, b=208.9~243.1, overlap=17.6px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=157.4~226.5, b=208.9~243.1, overlap=17.6px
+test absolute ... ok
+test distribute ... ok
+test column_reset ... ok
+test field ... ok
+test height1 ... ok
+test common_unknown ... ok
+test cellfield ... ok
+test caption ... ok
+test asymmetric_margin ... ok
+test colspan ... ok
+test locked ... ok
+LAYOUT_OVERFLOW_DRAW: section=0 pi=34 line=0 y=1012.4 col_bottom=1009.1 overflow=3.3px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=34, type=FullParagraph, first=false, y=1012.4, bottom=1009.1, overflow=3.3px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=35 line=0 y=1033.7 col_bottom=1009.1 overflow=24.6px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=35, type=FullParagraph, first=false, y=1033.7, bottom=1009.1, overflow=24.6px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=36 line=0 y=1055.1 col_bottom=1009.1 overflow=46.0px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=36, type=FullParagraph, first=false, y=1055.1, bottom=1009.1, overflow=46.0px
+test host_text ... ok
+LAYOUT_OVERFLOW_DRAW: section=0 pi=34 line=0 y=1012.4 col_bottom=1009.1 overflow=3.3px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=34, type=FullParagraph, first=false, y=1012.4, bottom=1009.1, overflow=3.3px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=35 line=0 y=1033.7 col_bottom=1009.1 overflow=24.6px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=35, type=FullParagraph, first=false, y=1033.7, bottom=1009.1, overflow=24.6px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=36 line=0 y=1055.1 col_bottom=1009.1 overflow=46.0px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=36, type=FullParagraph, first=false, y=1055.1, bottom=1009.1, overflow=46.0px
+test negative_offset ... ok
+test mixed_authentic_cache ... ok
+test protected ... ok
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+test positive_offset ... ok
+test positive_cached_origin ... ok
+test single_column ... ok
+test rowspan ... ok
+test rtl ... ok
+test size_protected ... ok
+test rowbreak ... ok
+test many_following_lines ... ok
+test section_reset ... ok
+
+thread 'original_api_history' (155674) panicked at tests/jueony_generated_columns.rs:42:5:
+[{"after":157.4,"before":153.6,"path":"/0/controls/controls/0/cells/0/y"},{"after":157.4,"before":153.6,"path":"/0/controls/controls/0/cells/1/y"},{"after":189.6,"before":185.8,"path":"/0/controls/controls/0/cells/2/y"},{"after":189.6,"before":185.8,"path":"/0/controls/controls/0/cells/3/y"},{"after":209.4,"before":205.6,"path":"/0/controls/controls/0/cells/4/y"},{"after":209.4,"before":205.6,"path":"/0/controls/controls/0/cells/5/y"},{"after":157.4,"before":153.6,"path":"/0/controls/controls/0/y"},{"after":234.0,"before":230.7,"path":"/0/controls/controls/1/cells/0/y"},{"after":234.0,"before":230.7,"path":"/0/controls/controls/1/cells/1/y"},{"after":251.1,"before":247.8,"path":"/0/controls/controls/1/cells/2/y"},{"after":251.1,"before":247.8,"path":"/0/controls/controls/1/cells/3/y"},{"after":234.0,"before":230.7,"path":"/0/controls/controls/1/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/1/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/2/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/3/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/4/y"},{"after":191.5,"before":187.7,"path":"/0/text/runs/5/y"},{"after":191.5,"before":187.7,"path":"/0/text/runs/6/y"},{"after":192.8,"before":189.0,"path":"/0/text/runs/7/y"},{"after":192.8,"before":189.0,"path":"/0/text/runs/8/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/9/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/10/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/11/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/12/y"},{"after":157.4,"before":153.6,"path":"/0/text/runs/13/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/14/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/15/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/16/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/17/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/18/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/19/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/20/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/21/y"},{"after":234.0,"before":230.7,"path":"/0/text/runs/22/y"},{"after":272.0,"before":264.9,"path":"/0/text/runs/23/y"},{"after":293.3,"before":286.2,"path":"/0/text/runs/24/y"},{"after":314.6,"before":307.5,"path":"/0/text/runs/25/y"}]
+test original_api_history ... FAILED
+test unknown ... ok
+test width1 ... ok
+test unequal_columns ... ok
+test three_columns ... ok
+test width_relative ... ok
+test zones ... ok
+test existing_actual_nine_pairs_remain_exact ... ok
+
+failures:
+
+failures:
+    actual_column2_full_geometry
+    both_sources_both_formats_twice
+    hancom_api_history
+    original_api_history
+
+test result: FAILED. 35 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.46s
+

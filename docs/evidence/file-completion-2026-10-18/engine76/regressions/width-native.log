@@ -1,0 +1,12 @@
+PASS explicit column one: actual width, untouched cells, snapshot and saved layout
+PASS explicit column band: actual width, untouched cells, snapshot and saved layout
+PASS explicit column whole: actual width, untouched cells, snapshot and saved layout
+PASS explicit column long: actual width, untouched cells, snapshot and saved layout
+PASS explicit column multiple: actual width, untouched cells, snapshot and saved layout
+PASS explicit column later: actual width, untouched cells, snapshot and saved layout
+PASS single-column table width applies and saves with no hidden neighbor changes
+PASS narrow/widen reflows long text and retains exact requested stored widths
+PASS out of body/partial bands/invalid/mixed/batch/HWP/no-op never write
+PASS protected, merged, mixed, fields, vertical, inline and ragged sources refuse
+PASS position and outer margins reduce the width budget; absolute/centered placements refuse
+PASS stale dimensions/defaults, injected mutation and geometry failures roll back

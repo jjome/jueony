@@ -1,0 +1,9 @@
+PASS merge horizontal preserves paragraphs, attributes, saved layout and other table
+PASS merge vertical preserves paragraphs, attributes, saved layout and other table
+PASS merge rectangle preserves paragraphs, attributes, saved layout and other table
+PASS merge whole preserves paragraphs, attributes, saved layout and other table
+PASS empty secondary adds no paragraph; empty primary remains
+PASS distinct cell paragraph and character formats survive as merged paragraphs
+PASS invalid rectangle, alias, no-op, batch and unequal cell attributes refuse without writes
+PASS HWP, protected, merged, mixed, bookmarked and field-bearing sources never write
+PASS stale source, false/no-op and neighbor corruption cannot commit

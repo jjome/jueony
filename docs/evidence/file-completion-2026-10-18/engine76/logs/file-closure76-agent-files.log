@@ -1,0 +1,12 @@
+PASS openai-compatible actual outer input applies five metadata strings in one snapshot with undo/redo and unchanged Canvas/body
+PASS openai-responses actual outer input applies five metadata strings in one snapshot with undo/redo and unchanged Canvas/body
+PASS anthropic actual outer input applies five metadata strings in one snapshot with undo/redo and unchanged Canvas/body
+PASS gemini actual outer input applies five metadata strings in one snapshot with undo/redo and unchanged Canvas/body
+PASS stale metadata fingerprint rejects without dirty/history/bytes/OS writes
+PASS Agent tab list returns actual receipt, new blank tab preserves existing dirty documents and independent history
+PASS clean-close IDB abort freezes public mutations and function navigation while preserving every tab/checkpoint
+PASS clean-close compares exact checkpoint and preserves a concurrent newer recovery record
+PASS Agent activates queried current-workspace tab and clean-close is exact, preserving original file and other tabs
+PASS Agent refuses dirty-close rather than discarding and OS save remains user-required with no write IPC
+PASS model never receives other-workspace tabs and foreign queried-in-old-context ID is refused
+PASS actual file Agent pipeline has no unexpected browser errors or external requests

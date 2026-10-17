@@ -1,0 +1,14 @@
+PASS openai-responses: actual chat equalizes full rows, comparison/undo/redo/save and untouched table
+PASS anthropic: actual chat equalizes full rows, comparison/undo/redo/save and untouched table
+PASS gemini: actual chat equalizes full rows, comparison/undo/redo/save and untouched table
+PASS openai-compatible: actual chat equalizes full rows, comparison/undo/redo/save and untouched table
+PASS direct one-row height preserves other rows, exact actual height and active cell cursor
+PASS partial complete-row band preserves total and unselected rows
+PASS invalid/no-op/partial columns/mixed/batch/alias and overflow requests fail visibly without writes
+PASS content minimum rejects smaller actual height and next valid request still works
+PASS HWP/protected/merged/mixed sources remain readonly and never write
+PASS partial live setter failure or neighboring width/text corruption restores history/dirty/cursor
+PASS post-render actual-height mismatch rolls back after native operation returned, before receipt commit
+PASS delayed model cannot overwrite newer user content
+PASS unsaved workspace restores height/capability after confirmed restart
+PASS later section row height and document mapping survive actual UI save/reopen

@@ -1,0 +1,8 @@
+PASS Ctrl+Alt+T creates a fresh same-window tab with independent history and source bytes
+PASS Alt+N creates real separate Edge surface through native request/ready contract without replacing main
+PASS same-origin windows keep independent dirty documents, workspace aggregates and checkpoints across reload
+PASS child guarded close stores its own recovery and registry reopen retains same context
+PASS native create failure does not mutate existing tabs or claim successful new tab
+PASS outer Agent input keeps its draft and routes Ctrl+Alt+T to an independent document tab
+PASS 30 allocated tabs limit refuses the next allocation before document creation
+PASS isolated native-window contract has no unexpected browser errors or external requests

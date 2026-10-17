@@ -1,0 +1,37 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/file-closure69-public/column2-candidate74/source)
+error[E0061]: this function takes 9 arguments but 8 arguments were supplied
+  --> src/renderer/typeset/controls/flow_table.rs:96:12
+   |
+96 | ...&& crate...frame(
+   |       ^^^^^...^^^^^
+97 | ...    page....out(),page.layout.column_areas.len(),
+   |        -----...----- -------------------------... type `std::sync::Arc<RenderNormalizationOverlay>` is missing
+   |        |
+   |        expected `LayoutCompatibilityProfile`, found `bool`
+   |
+note: function defined here
+  --> src/renderer/generated_column_stack.rs:16:15
+   |
+16 | pub(crate) fn ...ated_frame(
+   |               ...^^^^^^^^^^
+17 |     ...ityProfile,
+   |     ...----------
+18 |     ...onOverlay>,
+   |     ...----------
+help: provide the argument
+   |
+96 ~         && crate::renderer::generated_column_stack::owns_generated_frame(
+97 +             /* LayoutCompatibilityProfile */,
+98 +             /* std::sync::Arc<RenderNormalizationOverlay> */,
+99 +             page.layout.column_areas.len(),
+100+             page.layout.body_area.width,
+101+             paragraphs_all,
+102+             para_idx,
+103+             measured_tables,
+104+             styles,
+105+             engine.dpi,
+106~         );
+   |
+
+For more information about this error, try `rustc --explain E0061`.
+error: could not compile `rhwp` (lib) due to 1 previous error

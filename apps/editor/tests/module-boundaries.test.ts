@@ -46,6 +46,6 @@ test('domain cannot import its application orchestration', () => {
 
 test('repository module contracts satisfy the same rules as negative fixtures', async () => {
   const report = await auditRepository();
-  assert.equal(report.moduleCount, 9);
+  assert.equal(report.moduleCount, 10);
   assert.equal(report.ok, true, JSON.stringify(report.diagnostics, null, 2));
 });

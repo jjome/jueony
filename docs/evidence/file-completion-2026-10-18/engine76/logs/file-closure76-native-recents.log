@@ -1,0 +1,9 @@
+PASS native picker open records original identity without renderer path exposure
+PASS reload restores recent registry but reacquires fresh process token through real file-menu UI
+PASS changed-file cancellation and missing/denied failure preserve current document and registry
+PASS approved changed original loads only fresh bytes after process restart
+PASS successful save updates stable recent identity and restart reopens saved bytes
+PASS backend revalidation rejects second source change with exact document preservation
+PASS workspace switch during pending inspection never opens old workspace original
+PASS current-workspace clear is explicit, cancellation preserves and success leaves original bytes
+PASS isolated Edge has no unexpected page/console errors or external requests

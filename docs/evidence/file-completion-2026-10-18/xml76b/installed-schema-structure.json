@@ -1,0 +1,498 @@
+{
+  "source": "Local licensed Hancom installation, read-only metadata only; no vendor files redistributed.",
+  "schemas": [
+    {
+      "name": "absence.xsd",
+      "bytes": 1774,
+      "sha256": "85ba8bf8a35b92cd99e8ed464cbd797a0dc64c38a0041bf2749c5e515f23fcaa",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 15,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+        "{http://www.w3.org/2001/XMLSchema}simpleType": 3,
+        "{http://www.w3.org/2001/XMLSchema}restriction": 3,
+        "{http://www.w3.org/2001/XMLSchema}pattern": 1,
+        "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+        "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "base",
+        "elementFormDefault",
+        "maxOccurs",
+        "name",
+        "type",
+        "value"
+      ]
+    },
+    {
+      "name": "booksreg.xsd",
+      "bytes": 1160,
+      "sha256": "e33205b2cfebf44610782b3e367c49cf5f1351771f1cd98fcc68f849257fb201",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 10,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+        "{http://www.w3.org/2001/XMLSchema}simpleType": 1,
+        "{http://www.w3.org/2001/XMLSchema}restriction": 1,
+        "{http://www.w3.org/2001/XMLSchema}pattern": 1
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "base",
+        "elementFormDefault",
+        "maxOccurs",
+        "minOccurs",
+        "name",
+        "type",
+        "value"
+      ]
+    },
+    {
+      "name": "business.xsd",
+      "bytes": 808,
+      "sha256": "7e095196f608d942ab582299a60b4adbe6b2bf26400118be953a09940b906745",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 7,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 2
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "elementFormDefault",
+        "name",
+        "type"
+      ]
+    },
+    {
+      "name": "career.xsd",
+      "bytes": 2209,
+      "sha256": "8d2c795696947cc97a416d32c26710a1526a585aecdf07437a4e1b9efa3d258e",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 19,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+        "{http://www.w3.org/2001/XMLSchema}simpleType": 4,
+        "{http://www.w3.org/2001/XMLSchema}restriction": 4,
+        "{http://www.w3.org/2001/XMLSchema}pattern": 2,
+        "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+        "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "base",
+        "elementFormDefault",
+        "maxOccurs",
+        "name",
+        "type",
+        "value"
+      ]
+    },
+    {
+      "name": "company.xsd",
+      "bytes": 1518,
+      "sha256": "b75b9785119375bb24ca60e52d91850cabb0554bc31fe164f506d68a73139efe",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 11,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+        "{http://www.w3.org/2001/XMLSchema}simpleType": 3,
+        "{http://www.w3.org/2001/XMLSchema}restriction": 3,
+        "{http://www.w3.org/2001/XMLSchema}pattern": 1,
+        "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+        "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "base",
+        "elementFormDefault",
+        "name",
+        "type",
+        "value"
+      ]
+    },
+    {
+      "name": "consultation.xsd",
+      "bytes": 1824,
+      "sha256": "1e1d0c3327e35bd8c9a746c44b2e56d5cd5fa01e56068aad7778b4bbd214d8bd",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 16,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+        "{http://www.w3.org/2001/XMLSchema}simpleType": 3,
+        "{http://www.w3.org/2001/XMLSchema}restriction": 3,
+        "{http://www.w3.org/2001/XMLSchema}pattern": 1,
+        "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+        "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "base",
+        "elementFormDefault",
+        "name",
+        "type",
+        "value"
+      ]
+    },
+    {
+      "name": "cooperation.xsd",
+      "bytes": 1526,
+      "sha256": "c401d3887b5dbd5f17c1a0754ad56adc38091b7d93d1ee68a6574da0955ca6c1",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 11,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+        "{http://www.w3.org/2001/XMLSchema}simpleType": 3,
+        "{http://www.w3.org/2001/XMLSchema}restriction": 3,
+        "{http://www.w3.org/2001/XMLSchema}pattern": 1,
+        "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+        "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "base",
+        "elementFormDefault",
+        "name",
+        "type",
+        "value"
+      ]
+    },
+    {
+      "name": "employment.xsd",
+      "bytes": 3391,
+      "sha256": "b057bea1bffb7bdce42d120bf0146585e3274ad03814b5726c7418629a77245b",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 32,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+        "{http://www.w3.org/2001/XMLSchema}simpleType": 6,
+        "{http://www.w3.org/2001/XMLSchema}restriction": 6,
+        "{http://www.w3.org/2001/XMLSchema}enumeration": 4,
+        "{http://www.w3.org/2001/XMLSchema}pattern": 2,
+        "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+        "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "base",
+        "elementFormDefault",
+        "maxOccurs",
+        "name",
+        "type",
+        "value"
+      ]
+    },
+    {
+      "name": "evidence.xsd",
+      "bytes": 1911,
+      "sha256": "9c9da39d8d242c10f89b9db2f8841c110ef38b9cd9ec50b4796009c96c9dcc68",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 13,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+        "{http://www.w3.org/2001/XMLSchema}simpleType": 4,
+        "{http://www.w3.org/2001/XMLSchema}restriction": 4,
+        "{http://www.w3.org/2001/XMLSchema}enumeration": 2,
+        "{http://www.w3.org/2001/XMLSchema}pattern": 1,
+        "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+        "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "base",
+        "elementFormDefault",
+        "maxOccurs",
+        "name",
+        "type",
+        "value"
+      ]
+    },
+    {
+      "name": "holiday.xsd",
+      "bytes": 1851,
+      "sha256": "28cf6007c3a8d73464d897aa9bd9356d14c266cfe10b00d04ae27f36a6f0142a",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 17,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+        "{http://www.w3.org/2001/XMLSchema}simpleType": 3,
+        "{http://www.w3.org/2001/XMLSchema}restriction": 3,
+        "{http://www.w3.org/2001/XMLSchema}pattern": 1,
+        "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+        "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "base",
+        "elementFormDefault",
+        "name",
+        "type",
+        "value"
+      ]
+    },
+    {
+      "name": "office.xsd",
+      "bytes": 1967,
+      "sha256": "811cbba5daedeb1b53ca29d3e07cd6b901f7e56c3597b9625b8a9e2e4ff98e08",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 15,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+        "{http://www.w3.org/2001/XMLSchema}simpleType": 4,
+        "{http://www.w3.org/2001/XMLSchema}restriction": 4,
+        "{http://www.w3.org/2001/XMLSchema}pattern": 2,
+        "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+        "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "base",
+        "elementFormDefault",
+        "maxOccurs",
+        "name",
+        "type",
+        "value"
+      ]
+    },
+    {
+      "name": "olidaywork.xsd",
+      "bytes": 1123,
+      "sha256": "d5e3314d10ec89a7965ca46f68220f77605da94b19b6d6211871a8a4ce310e31",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 13,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 2
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "elementFormDefault",
+        "name",
+        "type"
+      ]
+    },
+    {
+      "name": "personal.xsd",
+      "bytes": 7567,
+      "sha256": "884bc1e78929e8661e161e6197444d01d371d17396c5c0250542ab5674415cc7",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 60,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 17,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 16,
+        "{http://www.w3.org/2001/XMLSchema}simpleType": 9,
+        "{http://www.w3.org/2001/XMLSchema}restriction": 9,
+        "{http://www.w3.org/2001/XMLSchema}pattern": 4,
+        "{http://www.w3.org/2001/XMLSchema}enumeration": 19,
+        "{http://www.w3.org/2001/XMLSchema}simpleContent": 1,
+        "{http://www.w3.org/2001/XMLSchema}extension": 1,
+        "{http://www.w3.org/2001/XMLSchema}attribute": 5
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "base",
+        "elementFormDefault",
+        "maxOccurs",
+        "minOccurs",
+        "name",
+        "ref",
+        "type",
+        "use",
+        "value"
+      ]
+    },
+    {
+      "name": "quotesht.xsd",
+      "bytes": 3045,
+      "sha256": "135a998cc89a76a9524371b825ca2faebd332ba1f0786f3648beecf7e05dd503",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 31,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 6,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 6,
+        "{http://www.w3.org/2001/XMLSchema}simpleType": 5,
+        "{http://www.w3.org/2001/XMLSchema}restriction": 5,
+        "{http://www.w3.org/2001/XMLSchema}pattern": 1
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "base",
+        "elementFormDefault",
+        "maxOccurs",
+        "minOccurs",
+        "name",
+        "ref",
+        "type",
+        "value"
+      ]
+    },
+    {
+      "name": "report.xsd",
+      "bytes": 1972,
+      "sha256": "9ef02ccba38c6f80482397bbbb39b0d18b5c7984efedbfa02172d3c324a461c6",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 15,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+        "{http://www.w3.org/2001/XMLSchema}simpleType": 4,
+        "{http://www.w3.org/2001/XMLSchema}restriction": 4,
+        "{http://www.w3.org/2001/XMLSchema}enumeration": 2,
+        "{http://www.w3.org/2001/XMLSchema}pattern": 1,
+        "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+        "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "base",
+        "elementFormDefault",
+        "name",
+        "type",
+        "value"
+      ]
+    },
+    {
+      "name": "resignation.xsd",
+      "bytes": 2726,
+      "sha256": "057abc76fe6fbefd202e79299bdc4ab7ad7ddb67872442b5a797659126661d38",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 24,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 5,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 5,
+        "{http://www.w3.org/2001/XMLSchema}simpleType": 4,
+        "{http://www.w3.org/2001/XMLSchema}restriction": 4,
+        "{http://www.w3.org/2001/XMLSchema}pattern": 2,
+        "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+        "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "base",
+        "elementFormDefault",
+        "maxOccurs",
+        "name",
+        "type",
+        "value"
+      ]
+    },
+    {
+      "name": "retirement.xsd",
+      "bytes": 996,
+      "sha256": "c43e0d44dd9efb7170575613d7f732febf010799b61e285813cbc4df5e0e15ff",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 11,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 2
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "elementFormDefault",
+        "name",
+        "type"
+      ]
+    },
+    {
+      "name": "timeout.xsd",
+      "bytes": 3075,
+      "sha256": "a6bb5ea04a98309b84f5e77b3df74583f4b3bfe8505ba04e5016e0659b7fa599",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 33,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 3,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 3,
+        "{http://www.w3.org/2001/XMLSchema}simpleType": 4,
+        "{http://www.w3.org/2001/XMLSchema}restriction": 4,
+        "{http://www.w3.org/2001/XMLSchema}minInclusive": 4,
+        "{http://www.w3.org/2001/XMLSchema}maxInclusive": 4
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "base",
+        "elementFormDefault",
+        "name",
+        "type",
+        "value"
+      ]
+    },
+    {
+      "name": "withdrawal.xsd",
+      "bytes": 1589,
+      "sha256": "f1fcea08eda79dd485dfb5bfd58900edb05b9301cc90f1c6d7acac9f01d0dc9d",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 12,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+        "{http://www.w3.org/2001/XMLSchema}simpleType": 3,
+        "{http://www.w3.org/2001/XMLSchema}restriction": 3,
+        "{http://www.w3.org/2001/XMLSchema}pattern": 1,
+        "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+        "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "base",
+        "elementFormDefault",
+        "name",
+        "type",
+        "value"
+      ]
+    },
+    {
+      "name": "worker.xsd",
+      "bytes": 1689,
+      "sha256": "e59cd4090bb843474eaf7c8631990421cb0b1b29338a69e8a47c779b465d56bc",
+      "root": "{http://www.w3.org/2001/XMLSchema}schema",
+      "tags": {
+        "{http://www.w3.org/2001/XMLSchema}schema": 1,
+        "{http://www.w3.org/2001/XMLSchema}element": 19,
+        "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+        "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+        "{http://www.w3.org/2001/XMLSchema}simpleType": 1,
+        "{http://www.w3.org/2001/XMLSchema}restriction": 1,
+        "{http://www.w3.org/2001/XMLSchema}pattern": 1
+      },
+      "attributes": [
+        "attributeFormDefault",
+        "base",
+        "elementFormDefault",
+        "maxOccurs",
+        "name",
+        "type",
+        "value"
+      ]
+    }
+  ]
+}

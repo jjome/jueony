@@ -1,0 +1,21 @@
+Reproduce from the shared workspace; do not overwrite existing fixtures.
+
+1. Run verify_manifest.py on this compact directory before copying anything.
+2. Use formal74 source-c2c0c48efdd724e2, separate physical baseline/candidate
+   sources, offline --locked Cargo, and DIFFERENT targets columns74-baseline
+   and columns74-candidate. Do not alternate identical packages in one target.
+3. The provided Native harness and run scripts record compile-time included
+   flow/helper SHA and actual source/target directory. Candidate patch is only
+   the three source files; Cargo test registration is private harness setup.
+4. Fixtures retain original repository-relative paths and SHA. Restore only
+   absent files into a clean temporary workspace, or verify existing hashes.
+   The compact fixed oracle can be selected with JUEONY_COLUMN_ORACLE; it
+   contains every afterLayout field consumed by the fixed geometry tests.
+5. Final Native replay is native-valid-candidate40-compact-oracle.log. Old
+   failures are in failure-history and remain failures, not replaced by this run.
+6. For formal76 WASM use Node22 --experimental-strip-types and the ORIGINAL
+   build-path verify-generated-columns.mjs (relative production reader imports).
+   Set absolute JUEONY_REPO, JUEONY_ENGINE_PACKAGE,
+   JUEONY_BASELINE_ENGINE_PACKAGE, JUEONY_TEST_OUTPUT (new empty output).
+   The verifier uses unchanged production preservation/strict guard and every
+   semantic/control/text geometry field; root appends the formal result later.

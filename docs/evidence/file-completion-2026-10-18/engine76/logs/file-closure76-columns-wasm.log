@@ -1,0 +1,16 @@
+node:internal/fs/promises:639
+  return new FileHandle(await PromisePrototypeThen(
+                        ^
+
+Error: ENOENT: no such file or directory, open 'C:\Users\jjome\Documents\work\jueony\build\rhwp-engine\source-c2c0c48efdd724e2\pkg\jueony-engine-build.json'
+    at async open (node:internal/fs/promises:639:25)
+    at async readFile (node:internal/fs/promises:1249:14)
+    at async loadReviewEngine (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/lib/hancom-review.mjs:10:60)
+    at async file:///C:/Users/jjome/Documents/work/jueony/build/file-closure69-public/column2-candidate74/verify-generated-columns.mjs:14:16 {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-c2c0c48efdd724e2\\pkg\\jueony-engine-build.json'
+}
+
+Node.js v22.22.2

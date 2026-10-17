@@ -1,0 +1,14 @@
+PASS hwp: set one next-style edge preserving all current paragraphs/shapes/metadata, snapshot undo and reopen
+PASS hwp: existing split command follows the target only at paragraph end and preserves target formatting
+PASS hwp: default destination, self continuation and two-step cycles are legitimate paragraph edges
+PASS hwpx: set one next-style edge preserving all current paragraphs/shapes/metadata, snapshot undo and reopen
+PASS hwpx: existing split command follows the target only at paragraph end and preserves target formatting
+PASS hwpx: default destination, self continuation and two-step cycles are legitimate paragraph edges
+PASS a full 256-style catalog still permits one edge update
+PASS default/character/missing IDs, no-op, injected fields and batching refuse unchanged
+PASS stale source or destination shapes/names/edges refuse without overwriting current state
+PASS false/no-op/wrong edge, unexpected names/fonts/body/resources refuse and restore snapshot
+PASS locked/opaque source and destination definitions and field documents are protected
+PASS foreign source and target language remain unchanged
+PASS forged current-edge metadata cannot manufacture a no-op undo entry
+PASS unavailable Native metadata disables capability and cannot be bypassed by an old snapshot

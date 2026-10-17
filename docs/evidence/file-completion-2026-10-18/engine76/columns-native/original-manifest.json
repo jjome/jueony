@@ -1,0 +1,827 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": "baseline-source/tests/jueony_generated_columns.rs",
+      "bytes": 18999,
+      "sha256": "1632f4466fcc12e5280786e14d9f99a72ce2047e069ea2423c6309411a5f2500"
+    },
+    {
+      "path": "candidate-source/src/renderer/generated_column_stack.rs",
+      "bytes": 12365,
+      "sha256": "037a4d094fab6cf51f50e187a04302f0cbd90b92286a46d7c5352bef43662d7b"
+    },
+    {
+      "path": "candidate-source/src/renderer/mod.rs",
+      "bytes": 162766,
+      "sha256": "2fce0d3e560352491ea5e7a6aca25b3518a312063008a2719ae5446215787c46"
+    },
+    {
+      "path": "candidate-source/src/renderer/typeset/controls/flow_table.rs",
+      "bytes": 15428,
+      "sha256": "80c19ac503bda09f71b761b046d761b4b32e1941f2bb842daf57b73e9218373e"
+    },
+    {
+      "path": "candidate-source/tests/jueony_generated_columns.rs",
+      "bytes": 21248,
+      "sha256": "1661414c8410abc7116d806bf6b8786d26613a7e6d43b4bb5bdc76d95f3ad039"
+    },
+    {
+      "path": "edge76-columns/result.json",
+      "bytes": 32469,
+      "sha256": "f115144f5aea7a334246a2a33c414c7e351e06fc6bae78a208997deaacd3a65e"
+    },
+    {
+      "path": "edge76-columns-isolated2/hancom-current-column2.hwp-hwp.hwp",
+      "bytes": 15360,
+      "sha256": "12dca8394b6514e1b3ed48d2f3bca89d05c45ba5b236357e6c81717ef00719ed"
+    },
+    {
+      "path": "edge76-columns-isolated2/hancom-current-column2.hwp-hwp.png",
+      "bytes": 170821,
+      "sha256": "b8c4ddb9399173b3a148f2b323efc406cc8ecd5d700cd8b80b38a516ab761256"
+    },
+    {
+      "path": "edge76-columns-isolated2/hancom-current-column2.hwp-hwpx.hwpx",
+      "bytes": 8301,
+      "sha256": "288b36e127d0402583ac58dd3f5c2a7970c3f3aba4d8244a02217bf1b898c4ac"
+    },
+    {
+      "path": "edge76-columns-isolated2/hancom-current-column2.hwp-hwpx.png",
+      "bytes": 171084,
+      "sha256": "03f9ffef889857c4bf85941c25ca97f46e05dfb86188fca757e894229e8f7a7a"
+    },
+    {
+      "path": "edge76-columns-isolated2/result.json",
+      "bytes": 33424,
+      "sha256": "f8eaf82446fefa66885893fd1ed13b0d849423cfe9f86872453af15bb46b3da2"
+    },
+    {
+      "path": "edge76-columns-isolated2/support-column2.hwp-hwp.hwp",
+      "bytes": 13312,
+      "sha256": "0330e6bbf369d17d93196c9c8372222b99f5de970ea507f2fac6e440964feaf5"
+    },
+    {
+      "path": "edge76-columns-isolated2/support-column2.hwp-hwp.png",
+      "bytes": 170565,
+      "sha256": "17fe95e9b49179119e140cf2529c26354d21f2ef58d03985dd6ae0bcdd17ad4d"
+    },
+    {
+      "path": "edge76-columns-isolated2/support-column2.hwp-hwpx.hwpx",
+      "bytes": 8282,
+      "sha256": "297310fdebd5c0fb67ef238a19e37fae54db0354a30fa43cd9fb052bd303344a"
+    },
+    {
+      "path": "edge76-columns-isolated2/support-column2.hwp-hwpx.png",
+      "bytes": 171118,
+      "sha256": "2741ae1adda021cd292abac800627d78ac3c91d6390f89b22e5e21ef6b6e5369"
+    },
+    {
+      "path": "edge76-columns-isolated2.log",
+      "bytes": 515,
+      "sha256": "379ba81709c541d3756d51f0ce0cadcfc1bb58bf8aae6b6737b0b52d060266e0"
+    },
+    {
+      "path": "edge76-columns.log",
+      "bytes": 50,
+      "sha256": "000936daabd2effd9665ee9c77f1b24b33318c8740fa832b7a2548b2b654f535"
+    },
+    {
+      "path": "failure-history/column2-candidate73-native-final35.log",
+      "bytes": 10213,
+      "sha256": "26c5dcef8e44b4c4da27d5aebbb4b317aeabb807a4c2af37e620f5e6b2b2527d"
+    },
+    {
+      "path": "failure-history/column2-candidate73-native-negative-baseline29.log",
+      "bytes": 3969,
+      "sha256": "f137881d064f7db39fdc6400c7cf6388857b477c77873350cf630f71977fd3b2"
+    },
+    {
+      "path": "failure-history/column2-candidate73-native-probe.log",
+      "bytes": 7294,
+      "sha256": "b3a68a6eb362dda5534f72959ce656035edc5023466bd185ecbb9f9ac8d44076"
+    },
+    {
+      "path": "failure-history/column2-candidate73-native-v1-trace.log",
+      "bytes": 6932,
+      "sha256": "f4f1b2d0b2a2a2c02e9dec376a7136a66dc3c0d72b56934fae8405fa7705719b"
+    },
+    {
+      "path": "failure-history/column2-candidate73-native-v1.log",
+      "bytes": 5644,
+      "sha256": "f0193ad3960ff70fdc63cba9874f7f4aea783bc3545572d14f4bf74e28f5d0a3"
+    },
+    {
+      "path": "failure-history/column2-candidate74-native-fresh-candidate39.log",
+      "bytes": 12475,
+      "sha256": "89e476e788ef376f96d2a9b350213299193a39b8b28329ef5bb19d84e72d6125"
+    },
+    {
+      "path": "failure-history/column2-candidate74-native-natural-height39-rerun.log",
+      "bytes": 8733,
+      "sha256": "c9f3e78b40ceece69be2ba25470524a452c65d5d56e34fbb592a39cd47d2af4f"
+    },
+    {
+      "path": "failure-history/column2-candidate74-native-natural-height39.log",
+      "bytes": 1474,
+      "sha256": "f4a3a981b7d8fbbd94016c7673e43993debac90573b2c09d9ab5be60a7b5754e"
+    },
+    {
+      "path": "failure-history/column2-candidate74-native-natural-tail39.log",
+      "bytes": 7174,
+      "sha256": "1b4c5a3704251799ab66dec614c4a25c245924184f7473ac4efb668ba1983b5a"
+    },
+    {
+      "path": "failure-history/column2-candidate74-native-valid-baseline31-fixed-dual.log",
+      "bytes": 5012,
+      "sha256": "af4ab8c971969a595b70204419d35731c4559e52d4c499c2ad3fbbbc886a4eba"
+    },
+    {
+      "path": "failure-history/column2-candidate74-native-valid-baseline31.log",
+      "bytes": 5012,
+      "sha256": "334bd36657dc20e7527c0f6295a05883c579000385c6369844bf746b7d159483"
+    },
+    {
+      "path": "failure-history/column2-candidate74-native-valid-candidate39.log",
+      "bytes": 5338,
+      "sha256": "11a83ff5660912d5a285423bb58ce05d7261fc27dc19ab28ae076f181e850d28"
+    },
+    {
+      "path": "failure-history/index.json",
+      "bytes": 6391,
+      "sha256": "25e612f7d02c66105e806d6c0e74b187bc89cbc8e6f8f994b341164bd07213ed"
+    },
+    {
+      "path": "fixed-oracle-compact.json",
+      "bytes": 153378,
+      "sha256": "254989957ad15aff7d94adb281fca37294ccedf270cc8780421c5546e14e6930"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/caption-original-prepared.hwp",
+      "bytes": 13312,
+      "sha256": "5d13d39b186e1851383b044a783441fb77c43a6b95855c4a3b136c94a9b891c8"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/final-inputs/offset.hwp",
+      "bytes": 13312,
+      "sha256": "9934d639cff4127a630007137d816a5d404e8375ac2d34105a174e2f894f2c8d"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/final-inputs/plain.hwp",
+      "bytes": 13312,
+      "sha256": "a55d3e1f59e2d249f1d63214731dbb026d3f8101f217f3a385cee9002bc476e4"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/final-inputs/superscript.hwp",
+      "bytes": 13312,
+      "sha256": "341edb377d7deaacc85e20138e27dfedfd33356b54eee14395ffe418f6d485bc"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/final-inputs/three.hwp",
+      "bytes": 13312,
+      "sha256": "5def8e265d9c9c1a6658656288d74d3db4163ad52d5f2a25960aea8036b3cebf"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/final-inputs/two.hwp",
+      "bytes": 13312,
+      "sha256": "81c425b627ce2b23d456fd95ac6772a657bf2bb153e782e4d7a81180f47261c9"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/final-inputs/unicode.hwp",
+      "bytes": 13312,
+      "sha256": "afe3853b0e33a30a225470007f103edda4b516e289b86a549986f33f943f4bee"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/caption-prepared.hwp",
+      "bytes": 22016,
+      "sha256": "cb54492b848fa13f5637f94e9f8ea5a379b8bd1bc460b291fa8c40369d190d3f"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/column2.hwp",
+      "bytes": 16384,
+      "sha256": "18e6f0cb207077016119167a3ff6b17c4b6970ce201172b6e21615b8335461d8"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/multiline-prepared.hwp",
+      "bytes": 29184,
+      "sha256": "79f55c9258e3fb35e280a39c5793a1d3682336184d92069b52f110ea00e33fd1"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/negative.hwp",
+      "bytes": 16384,
+      "sha256": "dc461180cab9f4a89c21f89eb1d8b3ba44f0fdde78d57e767d9af4553230b7f9"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/offset.hwp",
+      "bytes": 15360,
+      "sha256": "592741e04a853fb4942992d300b4addc99d9bfc532e00bb197532e80086cfd02"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/plain.hwp",
+      "bytes": 16384,
+      "sha256": "822891383045c0614203624d918a8150bd2c122f6863d86cdaebe69df9d9f80b"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/positive-prepared.hwp",
+      "bytes": 16896,
+      "sha256": "0e62fcc37b7bc2e0c915a4bd789f04ac008afa55ee949561aef7d7e87fad855f"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/superscript.hwp",
+      "bytes": 16384,
+      "sha256": "6514105fcfa00b80445d49e443f134dabdef752301d700299afd05f5eb099d1b"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/three.hwp",
+      "bytes": 16384,
+      "sha256": "1bf78dd66298d83e357a542dcab315e26f533da95535e66cb0a96ffbe52627a5"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/two.hwp",
+      "bytes": 15360,
+      "sha256": "4462b8950f4d5602eb8d13392f870aa6e632f9b2ab968514e58972ecb429ee84"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/unicode.hwp",
+      "bytes": 16896,
+      "sha256": "c6154b3b868d126f6936f0da0eb816d3538e2ca29616fb319cf61c42d949db40"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/multiline-original-prepared.hwp",
+      "bytes": 15360,
+      "sha256": "f1094b81038cbde1fa6797ba4f72a6f5d4c4005b63e87225c0125ebe40e5e8bf"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/positive-original-prepared.hwp",
+      "bytes": 13312,
+      "sha256": "c17099d199c20bb42ca6e546f8ac392bd150466d089a7188fae60690ca9ab526"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/support/column2.hwp",
+      "bytes": 13312,
+      "sha256": "ca9301227aa08d9ec57355989e5ec7a817399c2f9c5eee6c849a3942cae88de6"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/support/negative.hwp",
+      "bytes": 13312,
+      "sha256": "a5c62e0b6cff7a9ba3445517bfc2f47494f841d75694f45400911fb115c3eec8"
+    },
+    {
+      "path": "fixtures/build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-asymmetric_margin.hwp",
+      "bytes": 13312,
+      "sha256": "3ba817fe20afa035739168eddcd1eae6fa08e7bd28b4322db3ec7f6f1f85830e"
+    },
+    {
+      "path": "fixtures/build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-distribute.hwp",
+      "bytes": 13312,
+      "sha256": "9b35480c316ee54c1d5ef0ecbe4a2d5223b7321143aded0dbab43b1d5f569452"
+    },
+    {
+      "path": "fixtures/build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-rtl.hwp",
+      "bytes": 13312,
+      "sha256": "f48a715a8ea47cb8081b735f89512dbac9209a0e99ab5d68877396d030056742"
+    },
+    {
+      "path": "fixtures/build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-single_column.hwp",
+      "bytes": 13312,
+      "sha256": "9778d66926e3138ce4bb51fadfd16173ee3d439aeec0a02a8f0af34b7fac0f3b"
+    },
+    {
+      "path": "fixtures/build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-three_columns.hwp",
+      "bytes": 13312,
+      "sha256": "db5e90e7217912d928d26d87d0e2877bf2682e90d1812bdef274aee83972cb79"
+    },
+    {
+      "path": "fixtures/build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-unequal_columns.hwp",
+      "bytes": 13312,
+      "sha256": "2ee00d6ef1ea96b9c5fb7fd4f2a4a278b0d676dcb964afdae2dcb49b0ab4016e"
+    },
+    {
+      "path": "generated-column-stack-delta-formal74.patch",
+      "bytes": 17164,
+      "sha256": "8ccf80a00cb0aae3c0a71619fb0ad6b55a537ac11c785ece4a4ad568c74efa7d"
+    },
+    {
+      "path": "handoff.json",
+      "bytes": 2914,
+      "sha256": "7ce0c074cbb6595944e12517f48dc23cd6e0f8f9ebb0df7ebd4a164011801a1f"
+    },
+    {
+      "path": "helper-provenance.json",
+      "bytes": 281,
+      "sha256": "212317bd1b3c352eb2583256e7e25690a3b0b8a263c8f377e2af45420a64365e"
+    },
+    {
+      "path": "invalid-negative-fixture-proof.json",
+      "bytes": 3171,
+      "sha256": "d282780411bcfc8c19887951e0cea89a8910d053215442eacbcc1656e47ad93d"
+    },
+    {
+      "path": "native-valid-baseline31-final.log",
+      "bytes": 4646,
+      "sha256": "b546da298766aef51ec4876f677ac49a3f680b6be2c573a2cf52a6e9f6b4462b"
+    },
+    {
+      "path": "native-valid-candidate40-compact-oracle.log",
+      "bytes": 5014,
+      "sha256": "28dbe3800937403b36378e72a5cdacb696ffde10cff37c85d9e997a2ac7bc609"
+    },
+    {
+      "path": "native-valid-candidate40-final.log",
+      "bytes": 5014,
+      "sha256": "ba3ef0957c5e513c4bd6a63c770104918e555aac9c2e18227498c046a01f57cb"
+    },
+    {
+      "path": "native-valid-candidate40-model-proof.log",
+      "bytes": 5173,
+      "sha256": "7cd35e8500ce77145b3589f77bbb81d082a3a0b170fea10784422f8c9f9f4fca"
+    },
+    {
+      "path": "negative-disk-feature-proof.json",
+      "bytes": 18682,
+      "sha256": "2ed0f1d847513e1823f305a39fe8d090d89df84ce9ef5a902083975e6809165e"
+    },
+    {
+      "path": "package-compact.py",
+      "bytes": 10830,
+      "sha256": "022789277087b44962bb10dc3c376ed0d0d017a08668497ab1815ceff53c5da8"
+    },
+    {
+      "path": "REPRODUCE.txt",
+      "bytes": 1536,
+      "sha256": "13dcf7f28b0ff1553b6f8b79b96ec6b312aa984821dffc51d56d1ae5d964b495"
+    },
+    {
+      "path": "run-baseline-tests-only.sh",
+      "bytes": 1113,
+      "sha256": "41083bd0320d792609a9ae8bf4b83c5a6a92ed39ba3f7ad767b4527e74a90d4a"
+    },
+    {
+      "path": "run-baseline.sh",
+      "bytes": 1041,
+      "sha256": "c6b42e463959d7bbf3201516806dbc5914b8fbfb3b078b1ce18ac31a463cef85"
+    },
+    {
+      "path": "run-candidate-tests-only.sh",
+      "bytes": 1075,
+      "sha256": "bda77cd7f853529f4d81c33c66aa855a81fdc62d6e11fb2b0fae6c3d096e34d6"
+    },
+    {
+      "path": "run-candidate.sh",
+      "bytes": 1003,
+      "sha256": "be213d046dead2972d7155e140b4dc7441673787d6814e263d0360c0a4d151e5"
+    },
+    {
+      "path": "scope.json",
+      "bytes": 3508,
+      "sha256": "bc834b215cd8a76f6998cef72f61aa0fa4e16ad832134b96bf40f37b087d0c2b"
+    },
+    {
+      "path": "source-provenance-baseline.json",
+      "bytes": 345,
+      "sha256": "f4578180e950761883c19f392a9f5897d16563b80287f3780ec6447053832df9"
+    },
+    {
+      "path": "source-provenance-candidate.json",
+      "bytes": 337,
+      "sha256": "5580bfa26ccac305248786d2b8c94c74eebc3ee938f6261210e584992dd8d4a9"
+    },
+    {
+      "path": "verify-columns-browser.mjs",
+      "bytes": 10380,
+      "sha256": "920b7188c66a1239029e308fe54617644e250f50002a8e2acc717dfe8368fd8c"
+    },
+    {
+      "path": "verify-generated-columns-canary73.mjs",
+      "bytes": 7406,
+      "sha256": "2ec9fac876516ff68cf00ffe5718ab2ecbdbf973bf71a280e5397ca317fdaf30"
+    },
+    {
+      "path": "verify-generated-columns.mjs",
+      "bytes": 7548,
+      "sha256": "4d6d00544481159f388006a68f2eec342d7a61ecc299267841644bb040587ce3"
+    },
+    {
+      "path": "verify_manifest.py",
+      "bytes": 473,
+      "sha256": "43d9ab04c3b26902ad5cea16d77272d9694369ce6e51cf9a25649180dfce8da0"
+    },
+    {
+      "path": "wasm73-negative-canary/result.json",
+      "bytes": 61880,
+      "sha256": "98fba04d01a008844f06ef9afddf973bff7cc2a02a521e2b1281beb4a1a38d5e"
+    },
+    {
+      "path": "wasm73-negative-canary.log",
+      "bytes": 2763,
+      "sha256": "9a15484526f504e56b27f855ae86f41dd1c979906f8fff54759d00cd07106d4c"
+    }
+  ],
+  "origins": [
+    {
+      "path": "handoff.json",
+      "source": "build/file-closure69-public/column2-candidate74/handoff.json",
+      "sourceSha256": "7ce0c074cbb6595944e12517f48dc23cd6e0f8f9ebb0df7ebd4a164011801a1f",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "generated-column-stack-delta-formal74.patch",
+      "source": "build/file-closure69-public/column2-candidate74/generated-column-stack-delta-formal74.patch",
+      "sourceSha256": "8ccf80a00cb0aae3c0a71619fb0ad6b55a537ac11c785ece4a4ad568c74efa7d",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "source-provenance-baseline.json",
+      "source": "build/file-closure69-public/column2-candidate74/source-provenance-baseline.json",
+      "sourceSha256": "f4578180e950761883c19f392a9f5897d16563b80287f3780ec6447053832df9",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "source-provenance-candidate.json",
+      "source": "build/file-closure69-public/column2-candidate74/source-provenance-candidate.json",
+      "sourceSha256": "5580bfa26ccac305248786d2b8c94c74eebc3ee938f6261210e584992dd8d4a9",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "helper-provenance.json",
+      "source": "build/file-closure69-public/column2-candidate74/helper-provenance.json",
+      "sourceSha256": "212317bd1b3c352eb2583256e7e25690a3b0b8a263c8f377e2af45420a64365e",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "invalid-negative-fixture-proof.json",
+      "source": "build/file-closure69-public/column2-candidate74/invalid-negative-fixture-proof.json",
+      "sourceSha256": "d282780411bcfc8c19887951e0cea89a8910d053215442eacbcc1656e47ad93d",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "negative-disk-feature-proof.json",
+      "source": "build/file-closure69-public/column2-candidate74/negative-disk-feature-proof.json",
+      "sourceSha256": "2ed0f1d847513e1823f305a39fe8d090d89df84ce9ef5a902083975e6809165e",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixed-oracle-compact.json",
+      "source": "build/file-closure69-public/column2-candidate74/fixed-oracle-compact.json",
+      "sourceSha256": "254989957ad15aff7d94adb281fca37294ccedf270cc8780421c5546e14e6930",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "verify-generated-columns.mjs",
+      "source": "build/file-closure69-public/column2-candidate74/verify-generated-columns.mjs",
+      "sourceSha256": "4d6d00544481159f388006a68f2eec342d7a61ecc299267841644bb040587ce3",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "verify-generated-columns-canary73.mjs",
+      "source": "build/file-closure69-public/column2-candidate74/verify-generated-columns-canary73.mjs",
+      "sourceSha256": "2ec9fac876516ff68cf00ffe5718ab2ecbdbf973bf71a280e5397ca317fdaf30",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "verify-columns-browser.mjs",
+      "source": "build/file-closure69-public/column2-candidate74/verify-columns-browser.mjs",
+      "sourceSha256": "920b7188c66a1239029e308fe54617644e250f50002a8e2acc717dfe8368fd8c",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "run-baseline.sh",
+      "source": "build/file-closure69-public/column2-candidate74/run-baseline.sh",
+      "sourceSha256": "c6b42e463959d7bbf3201516806dbc5914b8fbfb3b078b1ce18ac31a463cef85",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "run-candidate.sh",
+      "source": "build/file-closure69-public/column2-candidate74/run-candidate.sh",
+      "sourceSha256": "be213d046dead2972d7155e140b4dc7441673787d6814e263d0360c0a4d151e5",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "run-baseline-tests-only.sh",
+      "source": "build/file-closure69-public/column2-candidate74/run-baseline-tests-only.sh",
+      "sourceSha256": "41083bd0320d792609a9ae8bf4b83c5a6a92ed39ba3f7ad767b4527e74a90d4a",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "run-candidate-tests-only.sh",
+      "source": "build/file-closure69-public/column2-candidate74/run-candidate-tests-only.sh",
+      "sourceSha256": "bda77cd7f853529f4d81c33c66aa855a81fdc62d6e11fb2b0fae6c3d096e34d6",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "native-valid-baseline31-final.log",
+      "source": "build/file-closure69-public/column2-candidate74/native-valid-baseline31-final.log",
+      "sourceSha256": "b546da298766aef51ec4876f677ac49a3f680b6be2c573a2cf52a6e9f6b4462b",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "native-valid-candidate40-final.log",
+      "source": "build/file-closure69-public/column2-candidate74/native-valid-candidate40-final.log",
+      "sourceSha256": "ba3ef0957c5e513c4bd6a63c770104918e555aac9c2e18227498c046a01f57cb",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "native-valid-candidate40-model-proof.log",
+      "source": "build/file-closure69-public/column2-candidate74/native-valid-candidate40-model-proof.log",
+      "sourceSha256": "7cd35e8500ce77145b3589f77bbb81d082a3a0b170fea10784422f8c9f9f4fca",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "native-valid-candidate40-compact-oracle.log",
+      "source": "build/file-closure69-public/column2-candidate74/native-valid-candidate40-compact-oracle.log",
+      "sourceSha256": "28dbe3800937403b36378e72a5cdacb696ffde10cff37c85d9e997a2ac7bc609",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "candidate-source/src/renderer/generated_column_stack.rs",
+      "source": "build/file-closure69-public/column2-candidate74/source/src/renderer/generated_column_stack.rs",
+      "sourceSha256": "037a4d094fab6cf51f50e187a04302f0cbd90b92286a46d7c5352bef43662d7b",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "candidate-source/src/renderer/mod.rs",
+      "source": "build/file-closure69-public/column2-candidate74/source/src/renderer/mod.rs",
+      "sourceSha256": "2fce0d3e560352491ea5e7a6aca25b3518a312063008a2719ae5446215787c46",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "candidate-source/src/renderer/typeset/controls/flow_table.rs",
+      "source": "build/file-closure69-public/column2-candidate74/source/src/renderer/typeset/controls/flow_table.rs",
+      "sourceSha256": "80c19ac503bda09f71b761b046d761b4b32e1941f2bb842daf57b73e9218373e",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "candidate-source/tests/jueony_generated_columns.rs",
+      "source": "build/file-closure69-public/column2-candidate74/source/tests/jueony_generated_columns.rs",
+      "sourceSha256": "1661414c8410abc7116d806bf6b8786d26613a7e6d43b4bb5bdc76d95f3ad039",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "baseline-source/tests/jueony_generated_columns.rs",
+      "source": "build/file-closure69-public/column2-candidate74/baseline-source/tests/jueony_generated_columns.rs",
+      "sourceSha256": "1632f4466fcc12e5280786e14d9f99a72ce2047e069ea2423c6309411a5f2500",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "wasm73-negative-canary.log",
+      "source": "build/file-closure69-public/column2-candidate74/wasm73-negative-canary.log",
+      "sourceSha256": "9a15484526f504e56b27f855ae86f41dd1c979906f8fff54759d00cd07106d4c",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "wasm73-negative-canary/result.json",
+      "source": "build/file-closure69-public/column2-candidate74/wasm73-negative-canary/result.json",
+      "sourceSha256": "98fba04d01a008844f06ef9afddf973bff7cc2a02a521e2b1281beb4a1a38d5e",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "edge76-columns.log",
+      "source": "build/file-closure69-public/column2-candidate74/edge76-columns.log",
+      "sourceSha256": "000936daabd2effd9665ee9c77f1b24b33318c8740fa832b7a2548b2b654f535",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "edge76-columns/result.json",
+      "source": "build/file-closure69-public/column2-candidate74/edge76-columns/result.json",
+      "sourceSha256": "f115144f5aea7a334246a2a33c414c7e351e06fc6bae78a208997deaacd3a65e",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "edge76-columns-isolated2.log",
+      "source": "build/file-closure69-public/column2-candidate74/edge76-columns-isolated2.log",
+      "sourceSha256": "379ba81709c541d3756d51f0ce0cadcfc1bb58bf8aae6b6737b0b52d060266e0",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "edge76-columns-isolated2/hancom-current-column2.hwp-hwp.hwp",
+      "source": "build/file-closure69-public/column2-candidate74/edge76-columns-isolated2/hancom-current-column2.hwp-hwp.hwp",
+      "sourceSha256": "12dca8394b6514e1b3ed48d2f3bca89d05c45ba5b236357e6c81717ef00719ed",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "edge76-columns-isolated2/hancom-current-column2.hwp-hwp.png",
+      "source": "build/file-closure69-public/column2-candidate74/edge76-columns-isolated2/hancom-current-column2.hwp-hwp.png",
+      "sourceSha256": "b8c4ddb9399173b3a148f2b323efc406cc8ecd5d700cd8b80b38a516ab761256",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "edge76-columns-isolated2/hancom-current-column2.hwp-hwpx.hwpx",
+      "source": "build/file-closure69-public/column2-candidate74/edge76-columns-isolated2/hancom-current-column2.hwp-hwpx.hwpx",
+      "sourceSha256": "288b36e127d0402583ac58dd3f5c2a7970c3f3aba4d8244a02217bf1b898c4ac",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "edge76-columns-isolated2/hancom-current-column2.hwp-hwpx.png",
+      "source": "build/file-closure69-public/column2-candidate74/edge76-columns-isolated2/hancom-current-column2.hwp-hwpx.png",
+      "sourceSha256": "03f9ffef889857c4bf85941c25ca97f46e05dfb86188fca757e894229e8f7a7a",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "edge76-columns-isolated2/result.json",
+      "source": "build/file-closure69-public/column2-candidate74/edge76-columns-isolated2/result.json",
+      "sourceSha256": "f8eaf82446fefa66885893fd1ed13b0d849423cfe9f86872453af15bb46b3da2",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "edge76-columns-isolated2/support-column2.hwp-hwp.hwp",
+      "source": "build/file-closure69-public/column2-candidate74/edge76-columns-isolated2/support-column2.hwp-hwp.hwp",
+      "sourceSha256": "0330e6bbf369d17d93196c9c8372222b99f5de970ea507f2fac6e440964feaf5",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "edge76-columns-isolated2/support-column2.hwp-hwp.png",
+      "source": "build/file-closure69-public/column2-candidate74/edge76-columns-isolated2/support-column2.hwp-hwp.png",
+      "sourceSha256": "17fe95e9b49179119e140cf2529c26354d21f2ef58d03985dd6ae0bcdd17ad4d",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "edge76-columns-isolated2/support-column2.hwp-hwpx.hwpx",
+      "source": "build/file-closure69-public/column2-candidate74/edge76-columns-isolated2/support-column2.hwp-hwpx.hwpx",
+      "sourceSha256": "297310fdebd5c0fb67ef238a19e37fae54db0354a30fa43cd9fb052bd303344a",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "edge76-columns-isolated2/support-column2.hwp-hwpx.png",
+      "source": "build/file-closure69-public/column2-candidate74/edge76-columns-isolated2/support-column2.hwp-hwpx.png",
+      "sourceSha256": "2741ae1adda021cd292abac800627d78ac3c91d6390f89b22e5e21ef6b6e5369",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/caption-original-prepared.hwp",
+      "source": "build/file-closure69-overlap/caption-original-prepared.hwp",
+      "sourceSha256": "5d13d39b186e1851383b044a783441fb77c43a6b95855c4a3b136c94a9b891c8",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/final-inputs/offset.hwp",
+      "source": "build/file-closure69-overlap/final-inputs/offset.hwp",
+      "sourceSha256": "9934d639cff4127a630007137d816a5d404e8375ac2d34105a174e2f894f2c8d",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/final-inputs/plain.hwp",
+      "source": "build/file-closure69-overlap/final-inputs/plain.hwp",
+      "sourceSha256": "a55d3e1f59e2d249f1d63214731dbb026d3f8101f217f3a385cee9002bc476e4",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/final-inputs/superscript.hwp",
+      "source": "build/file-closure69-overlap/final-inputs/superscript.hwp",
+      "sourceSha256": "341edb377d7deaacc85e20138e27dfedfd33356b54eee14395ffe418f6d485bc",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/final-inputs/three.hwp",
+      "source": "build/file-closure69-overlap/final-inputs/three.hwp",
+      "sourceSha256": "5def8e265d9c9c1a6658656288d74d3db4163ad52d5f2a25960aea8036b3cebf",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/final-inputs/two.hwp",
+      "source": "build/file-closure69-overlap/final-inputs/two.hwp",
+      "sourceSha256": "81c425b627ce2b23d456fd95ac6772a657bf2bb153e782e4d7a81180f47261c9",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/final-inputs/unicode.hwp",
+      "source": "build/file-closure69-overlap/final-inputs/unicode.hwp",
+      "sourceSha256": "afe3853b0e33a30a225470007f103edda4b516e289b86a549986f33f943f4bee",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/caption-prepared.hwp",
+      "source": "build/file-closure69-overlap/hancom-current/caption-prepared.hwp",
+      "sourceSha256": "cb54492b848fa13f5637f94e9f8ea5a379b8bd1bc460b291fa8c40369d190d3f",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/column2.hwp",
+      "source": "build/file-closure69-overlap/hancom-current/column2.hwp",
+      "sourceSha256": "18e6f0cb207077016119167a3ff6b17c4b6970ce201172b6e21615b8335461d8",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/multiline-prepared.hwp",
+      "source": "build/file-closure69-overlap/hancom-current/multiline-prepared.hwp",
+      "sourceSha256": "79f55c9258e3fb35e280a39c5793a1d3682336184d92069b52f110ea00e33fd1",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/negative.hwp",
+      "source": "build/file-closure69-overlap/hancom-current/negative.hwp",
+      "sourceSha256": "dc461180cab9f4a89c21f89eb1d8b3ba44f0fdde78d57e767d9af4553230b7f9",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/offset.hwp",
+      "source": "build/file-closure69-overlap/hancom-current/offset.hwp",
+      "sourceSha256": "592741e04a853fb4942992d300b4addc99d9bfc532e00bb197532e80086cfd02",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/plain.hwp",
+      "source": "build/file-closure69-overlap/hancom-current/plain.hwp",
+      "sourceSha256": "822891383045c0614203624d918a8150bd2c122f6863d86cdaebe69df9d9f80b",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/positive-prepared.hwp",
+      "source": "build/file-closure69-overlap/hancom-current/positive-prepared.hwp",
+      "sourceSha256": "0e62fcc37b7bc2e0c915a4bd789f04ac008afa55ee949561aef7d7e87fad855f",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/superscript.hwp",
+      "source": "build/file-closure69-overlap/hancom-current/superscript.hwp",
+      "sourceSha256": "6514105fcfa00b80445d49e443f134dabdef752301d700299afd05f5eb099d1b",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/three.hwp",
+      "source": "build/file-closure69-overlap/hancom-current/three.hwp",
+      "sourceSha256": "1bf78dd66298d83e357a542dcab315e26f533da95535e66cb0a96ffbe52627a5",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/two.hwp",
+      "source": "build/file-closure69-overlap/hancom-current/two.hwp",
+      "sourceSha256": "4462b8950f4d5602eb8d13392f870aa6e632f9b2ab968514e58972ecb429ee84",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/unicode.hwp",
+      "source": "build/file-closure69-overlap/hancom-current/unicode.hwp",
+      "sourceSha256": "c6154b3b868d126f6936f0da0eb816d3538e2ca29616fb319cf61c42d949db40",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/multiline-original-prepared.hwp",
+      "source": "build/file-closure69-overlap/multiline-original-prepared.hwp",
+      "sourceSha256": "f1094b81038cbde1fa6797ba4f72a6f5d4c4005b63e87225c0125ebe40e5e8bf",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/positive-original-prepared.hwp",
+      "source": "build/file-closure69-overlap/positive-original-prepared.hwp",
+      "sourceSha256": "c17099d199c20bb42ca6e546f8ac392bd150466d089a7188fae60690ca9ab526",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/support/column2.hwp",
+      "source": "build/file-closure69-overlap/support/column2.hwp",
+      "sourceSha256": "ca9301227aa08d9ec57355989e5ec7a817399c2f9c5eee6c849a3942cae88de6",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/support/negative.hwp",
+      "source": "build/file-closure69-overlap/support/negative.hwp",
+      "sourceSha256": "a5c62e0b6cff7a9ba3445517bfc2f47494f841d75694f45400911fb115c3eec8",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-asymmetric_margin.hwp",
+      "source": "build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-asymmetric_margin.hwp",
+      "sourceSha256": "3ba817fe20afa035739168eddcd1eae6fa08e7bd28b4322db3ec7f6f1f85830e",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-distribute.hwp",
+      "source": "build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-distribute.hwp",
+      "sourceSha256": "9b35480c316ee54c1d5ef0ecbe4a2d5223b7321143aded0dbab43b1d5f569452",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-rtl.hwp",
+      "source": "build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-rtl.hwp",
+      "sourceSha256": "f48a715a8ea47cb8081b735f89512dbac9209a0e99ab5d68877396d030056742",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-single_column.hwp",
+      "source": "build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-single_column.hwp",
+      "sourceSha256": "9778d66926e3138ce4bb51fadfd16173ee3d439aeec0a02a8f0af34b7fac0f3b",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-three_columns.hwp",
+      "source": "build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-three_columns.hwp",
+      "sourceSha256": "db5e90e7217912d928d26d87d0e2877bf2682e90d1812bdef274aee83972cb79",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "fixtures/build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-unequal_columns.hwp",
+      "source": "build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-unequal_columns.hwp",
+      "sourceSha256": "2ee00d6ef1ea96b9c5fb7fd4f2a4a278b0d676dcb964afdae2dcb49b0ab4016e",
+      "derivation": "byte-exact copy"
+    },
+    {
+      "path": "package-compact.py",
+      "source": "build/file-closure69-public/column2-candidate74/package-compact.py",
+      "sourceSha256": "022789277087b44962bb10dc3c376ed0d0d017a08668497ab1815ceff53c5da8",
+      "derivation": "byte-exact copy"
+    }
+  ],
+  "totalBytes": 1864427,
+  "immutableOriginals": true,
+  "note": "Prepared in ignored build only. Permanent docs/evidence untouched; formal76 results pending."
+}

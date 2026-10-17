@@ -1,0 +1,83 @@
+{
+  "sourceId": "23d2545926a179a5",
+  "wasmSha256": "241bf9946102e82ada4e6e825b715f6e3fecd0f231612e977db1b73c923028a2",
+  "frontend": "file-closure-final76b",
+  "existingRegressionGroups": {
+    "directWasm": 27,
+    "realEdge": 17
+  },
+  "reports": {
+    "actual11": {
+      "gzip": "actual11.json.gz",
+      "rawBytes": 5417059,
+      "rawSha256": "bdda75cd2da7d563d23e9f1ad25513a9753c68c80de339488d3f01d1fb62d953",
+      "pass": 11
+    },
+    "columns24": {
+      "gzip": "columns24.json.gz",
+      "rawBytes": 32892,
+      "rawSha256": "523b26ccc2fe50af29a2d46851efbe4d90e12873cfed40b63295be53331724a7",
+      "pass": 24
+    },
+    "columnsArchiveReplay24": {
+      "gzip": "columnsArchiveReplay24.json.gz",
+      "rawBytes": 32892,
+      "rawSha256": "437a0a4dbda754be8b318e4e57daf37f57be95f2a4f6292e0b15ab48dfe41f99",
+      "pass": 24
+    },
+    "agent12": {
+      "gzip": "agent12.json.gz",
+      "rawBytes": 893593,
+      "rawSha256": "2d3310e1e47182f852fc18eceea0254b2c8bd242abfcb8a92fe2f7b299dcab6d",
+      "pass": 12
+    },
+    "agentNative6": {
+      "gzip": "agentNative6.json.gz",
+      "rawBytes": 15758,
+      "rawSha256": "0925d112fea4bee18bc2f115d8a19f647c947be0841e9cad1b33c8c9cbc72b98",
+      "pass": 6
+    },
+    "native-shell": {
+      "gzip": "native-shell.json.gz",
+      "rawBytes": 32650,
+      "rawSha256": "67fea65accb0f448d39a6d5ff99d8c9aab07bffb81f7951869464f0e6af60f8a",
+      "pass": 11
+    },
+    "native-recents": {
+      "gzip": "native-recents.json.gz",
+      "rawBytes": 32020,
+      "rawSha256": "99891e42a7268ed5bf9fa3ccf940442cb2975cd091a59686bc7c1d99abcbd652",
+      "pass": 9
+    },
+    "document-lifecycle": {
+      "gzip": "document-lifecycle.json.gz",
+      "rawBytes": 40623,
+      "rawSha256": "13c075ba5317d06f22422679f84daed1ddb3d3867051d1b171261a884e041cdb",
+      "pass": 10
+    },
+    "document-windows": {
+      "gzip": "document-windows.json.gz",
+      "rawBytes": 36294,
+      "rawSha256": "3720eeec49eba4a22c7e64a31abd6d6343c2b00d834ca858527c4a598a60e586",
+      "pass": 8
+    }
+  },
+  "unknownControlGuard": "PASS same exact Unknown loss and source/event/disk immutability",
+  "columnsNativePrivate": {
+    "rustTests": 40,
+    "baselineTests": 31,
+    "edgeScenarios": 5,
+    "frontend": "file-closure-final76",
+    "countCaution": "Different scopes, not summed into overall compatibility rate."
+  },
+  "xml": "../xml76b/handoff-summary.json",
+  "unit": "../xml76b/unit910.log",
+  "limitations": [
+    "Actual11 compares own original and real Hancom-saved copy through current published engine contract, not Hancom screenshot/PDF pixel identity.",
+    "Native27 labels mean direct Node WASM regression groups; separate Rust40/Linux and WindowsRust29 have separate records.",
+    "Column correction has closed physical-owner preconditions; ambiguous, protected, field or other column arrangements stay excluded.",
+    "No new engine76 actual OS dialog or Hancom launch; those prior GUI checks remain engine68 scope.",
+    "Public MCST/Python3 geometry/line breaks, full HWT/XSL and Agent OS privileges remain separate incomplete scope.",
+    "Wrong nonexistent baseline74 pkg launch is preserved in logs; same verifier executed against76/75 then sealed fixture replay has exact matching results and observations."
+  ]
+}

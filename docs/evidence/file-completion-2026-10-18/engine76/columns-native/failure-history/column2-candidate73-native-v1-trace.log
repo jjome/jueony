@@ -1,0 +1,40 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/file-closure69-public/column2-candidate73/source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 50.22s
+     Running tests/jueony_generated_columns.rs (/tmp/jueony-rhwp-engine/target/numbering-encoding-review/debug/deps/jueony_generated_columns-6613db5066793188)
+
+running 2 tests
+GENERATED_RUNTIME at=1 column=0 cols=2 exclusions=0 native=true width=566.9333333333334 measured=[(1, 69.08), (2, 34.18666666666667)]
+GENERATED_SCOPE_REJECT_3
+GENERATED_RUNTIME at=1 column=0 cols=2 exclusions=0 native=true width=566.9333333333334 measured=[(1, 69.08), (2, 34.18666666666667)]
+GENERATED_SCOPE_REJECT_3
+GENERATED_RUNTIME at=2 column=0 cols=2 exclusions=0 native=true width=566.9333333333334 measured=[(1, 69.08), (2, 34.18666666666667)]
+GENERATED_SCOPE_REJECT_3
+GENERATED_RUNTIME at=2 column=0 cols=2 exclusions=0 native=true width=566.9333333333334 measured=[(1, 69.08), (2, 34.18666666666667)]
+GENERATED_SCOPE_REJECT_3
+GENERATED_RUNTIME at=1 column=0 cols=2 exclusions=0 native=true width=566.9333333333334 measured=[(1, 69.08), (2, 34.18666666666667)]
+GENERATED_SCOPE_REJECT_3
+GENERATED_RUNTIME at=2 column=0 cols=2 exclusions=0 native=true width=566.9333333333334 measured=[(1, 69.08), (2, 34.18666666666667)]
+GENERATED_SCOPE_REJECT_3
+GENERATED_RUNTIME at=1 column=0 cols=2 exclusions=0 native=true width=566.9333333333334 measured=[(1, 69.08), (2, 34.18666666666667)]
+GENERATED_SCOPE_REJECT_3
+GENERATED_RUNTIME at=2 column=0 cols=2 exclusions=0 native=true width=566.9333333333334 measured=[(1, 69.08), (2, 34.18666666666667)]
+GENERATED_SCOPE_REJECT_3
+
+thread 'actual_column2_full_geometry' (119143) panicked at tests/jueony_generated_columns.rs:6:72:
+[{"after":157.4,"before":153.6,"path":"/0/controls/controls/0/cells/0/y"},{"after":157.4,"before":153.6,"path":"/0/controls/controls/0/cells/1/y"},{"after":189.6,"before":185.8,"path":"/0/controls/controls/0/cells/2/y"},{"after":189.6,"before":185.8,"path":"/0/controls/controls/0/cells/3/y"},{"after":209.4,"before":205.6,"path":"/0/controls/controls/0/cells/4/y"},{"after":209.4,"before":205.6,"path":"/0/controls/controls/0/cells/5/y"},{"after":157.4,"before":153.6,"path":"/0/controls/controls/0/y"},{"after":234.0,"before":230.7,"path":"/0/controls/controls/1/cells/0/y"},{"after":234.0,"before":230.7,"path":"/0/controls/controls/1/cells/1/y"},{"after":251.1,"before":247.8,"path":"/0/controls/controls/1/cells/2/y"},{"after":251.1,"before":247.8,"path":"/0/controls/controls/1/cells/3/y"},{"after":234.0,"before":230.7,"path":"/0/controls/controls/1/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/1/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/2/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/3/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/4/y"},{"after":191.5,"before":187.7,"path":"/0/text/runs/5/y"},{"after":191.5,"before":187.7,"path":"/0/text/runs/6/y"},{"after":192.8,"before":189.0,"path":"/0/text/runs/7/y"},{"after":192.8,"before":189.0,"path":"/0/text/runs/8/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/9/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/10/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/11/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/12/y"},{"after":157.4,"before":153.6,"path":"/0/text/runs/13/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/14/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/15/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/16/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/17/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/18/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/19/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/20/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/21/y"},{"after":234.0,"before":230.7,"path":"/0/text/runs/22/y"},{"after":272.0,"before":264.9,"path":"/0/text/runs/23/y"},{"after":293.3,"before":286.2,"path":"/0/text/runs/24/y"},{"after":314.6,"before":307.5,"path":"/0/text/runs/25/y"}]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test actual_column2_full_geometry ... FAILED
+
+thread 'both_sources_both_formats_twice' (119144) panicked at tests/jueony_generated_columns.rs:6:72:
+[{"after":157.4,"before":153.6,"path":"/0/controls/controls/0/cells/0/y"},{"after":157.4,"before":153.6,"path":"/0/controls/controls/0/cells/1/y"},{"after":189.6,"before":185.8,"path":"/0/controls/controls/0/cells/2/y"},{"after":189.6,"before":185.8,"path":"/0/controls/controls/0/cells/3/y"},{"after":209.4,"before":205.6,"path":"/0/controls/controls/0/cells/4/y"},{"after":209.4,"before":205.6,"path":"/0/controls/controls/0/cells/5/y"},{"after":157.4,"before":153.6,"path":"/0/controls/controls/0/y"},{"after":234.0,"before":230.7,"path":"/0/controls/controls/1/cells/0/y"},{"after":234.0,"before":230.7,"path":"/0/controls/controls/1/cells/1/y"},{"after":251.1,"before":247.8,"path":"/0/controls/controls/1/cells/2/y"},{"after":251.1,"before":247.8,"path":"/0/controls/controls/1/cells/3/y"},{"after":234.0,"before":230.7,"path":"/0/controls/controls/1/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/1/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/2/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/3/y"},{"after":166.3,"before":162.5,"path":"/0/text/runs/4/y"},{"after":191.5,"before":187.7,"path":"/0/text/runs/5/y"},{"after":191.5,"before":187.7,"path":"/0/text/runs/6/y"},{"after":192.8,"before":189.0,"path":"/0/text/runs/7/y"},{"after":192.8,"before":189.0,"path":"/0/text/runs/8/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/9/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/10/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/11/y"},{"after":211.2,"before":207.5,"path":"/0/text/runs/12/y"},{"after":157.4,"before":153.6,"path":"/0/text/runs/13/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/14/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/15/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/16/y"},{"after":235.9,"before":232.6,"path":"/0/text/runs/17/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/18/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/19/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/20/y"},{"after":253.0,"before":249.7,"path":"/0/text/runs/21/y"},{"after":234.0,"before":230.7,"path":"/0/text/runs/22/y"},{"after":272.0,"before":264.9,"path":"/0/text/runs/23/y"},{"after":293.3,"before":286.2,"path":"/0/text/runs/24/y"},{"after":314.6,"before":307.5,"path":"/0/text/runs/25/y"}]
+test both_sources_both_formats_twice ... FAILED
+
+failures:
+
+failures:
+    actual_column2_full_geometry
+    both_sources_both_formats_twice
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_generated_columns`

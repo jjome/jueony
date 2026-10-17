@@ -1,0 +1,235 @@
+{
+  "results": [
+    {
+      "name": "real XML/XSD file inputs compile namespace-aware sequence profile and show structure",
+      "status": "PASS"
+    },
+    {
+      "name": "real field edit escapes markup and preserves emoji, comments and other fields",
+      "status": "PASS"
+    },
+    {
+      "name": "invalid integer edit is transactional and adds no history",
+      "status": "PASS"
+    },
+    {
+      "name": "repeat max and delete min are enforced with unchanged rejected state",
+      "status": "PASS"
+    },
+    {
+      "name": "UI undo/redo restores exact field values and repeat history",
+      "status": "PASS"
+    },
+    {
+      "name": "actual XML and XSD downloads reparse, validate and preserve non-field comments/source schema",
+      "status": "PASS"
+    },
+    {
+      "name": "malformed XML/DTD/PI/invalid encoding and unsupported XSD are rejected, never fetched",
+      "status": "PASS"
+    },
+    {
+      "name": "failed file open preserves existing dirty XML, undo and export content",
+      "status": "PASS"
+    },
+    {
+      "name": "oversized XML and XSD refuse before either file arrayBuffer allocation and preserve current workspace",
+      "status": "PASS"
+    },
+    {
+      "name": "cancelled replacement and dirty close preserve current XML workspace",
+      "status": "PASS"
+    },
+    {
+      "name": "DOM codec rejects destructive complex edits, illegal Unicode and stale requests",
+      "status": "PASS"
+    },
+    {
+      "name": "UTF-8 XML download reopens through actual file UI with no original source writes",
+      "status": "PASS"
+    },
+    {
+      "name": "no external requests, console errors or page errors",
+      "status": "PASS"
+    }
+  ],
+  "failures": [],
+  "observations": [
+    {
+      "errors": [
+        {
+          "name": "malformed",
+          "rejected": true
+        },
+        {
+          "name": "doctype",
+          "rejected": true
+        },
+        {
+          "name": "entity",
+          "rejected": true
+        },
+        {
+          "name": "stylesheet",
+          "rejected": true
+        },
+        {
+          "name": "bad-type",
+          "rejected": true
+        },
+        {
+          "name": "include",
+          "rejected": true
+        },
+        {
+          "name": "mixed",
+          "rejected": true
+        },
+        {
+          "name": "unknown-attribute",
+          "rejected": true
+        },
+        {
+          "name": "wrong-namespace",
+          "rejected": true
+        }
+      ],
+      "encoding": true
+    }
+  ],
+  "downloadEvents": [
+    {
+      "frameId": "19CF5B0F9413DD5F73DBEC495E570FAC",
+      "guid": "e507da88-879c-4091-acfb-7479a7c33972",
+      "url": "blob:http://127.0.0.1:4484/7a459e0c-0320-4a7c-a85f-036e01df5acd",
+      "suggestedFilename": "own-report.xml"
+    },
+    {
+      "guid": "e507da88-879c-4091-acfb-7479a7c33972",
+      "totalBytes": 153,
+      "receivedBytes": 0,
+      "state": "inProgress"
+    },
+    {
+      "guid": "e507da88-879c-4091-acfb-7479a7c33972",
+      "totalBytes": 153,
+      "receivedBytes": 153,
+      "state": "inProgress"
+    },
+    {
+      "guid": "e507da88-879c-4091-acfb-7479a7c33972",
+      "totalBytes": 153,
+      "receivedBytes": 153,
+      "state": "inProgress"
+    },
+    {
+      "guid": "e507da88-879c-4091-acfb-7479a7c33972",
+      "totalBytes": 153,
+      "receivedBytes": 153,
+      "state": "inProgress"
+    },
+    {
+      "guid": "e507da88-879c-4091-acfb-7479a7c33972",
+      "totalBytes": 153,
+      "receivedBytes": 153,
+      "state": "inProgress"
+    },
+    {
+      "guid": "e507da88-879c-4091-acfb-7479a7c33972",
+      "totalBytes": 153,
+      "receivedBytes": 153,
+      "state": "inProgress"
+    },
+    {
+      "guid": "e507da88-879c-4091-acfb-7479a7c33972",
+      "totalBytes": 153,
+      "receivedBytes": 153,
+      "state": "completed",
+      "filePath": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-documents-final76b\\downloads\\own-report.xml"
+    },
+    {
+      "frameId": "19CF5B0F9413DD5F73DBEC495E570FAC",
+      "guid": "0c3ae6e4-f895-4488-b592-e18ea5734ce4",
+      "url": "blob:http://127.0.0.1:4484/4e15cbc9-07bc-49e8-b045-fc5d9976739a",
+      "suggestedFilename": "own-report.xsd"
+    },
+    {
+      "guid": "0c3ae6e4-f895-4488-b592-e18ea5734ce4",
+      "totalBytes": 280,
+      "receivedBytes": 0,
+      "state": "inProgress"
+    },
+    {
+      "guid": "0c3ae6e4-f895-4488-b592-e18ea5734ce4",
+      "totalBytes": 280,
+      "receivedBytes": 280,
+      "state": "inProgress"
+    },
+    {
+      "guid": "0c3ae6e4-f895-4488-b592-e18ea5734ce4",
+      "totalBytes": 280,
+      "receivedBytes": 280,
+      "state": "inProgress"
+    },
+    {
+      "guid": "0c3ae6e4-f895-4488-b592-e18ea5734ce4",
+      "totalBytes": 280,
+      "receivedBytes": 280,
+      "state": "inProgress"
+    },
+    {
+      "guid": "0c3ae6e4-f895-4488-b592-e18ea5734ce4",
+      "totalBytes": 280,
+      "receivedBytes": 280,
+      "state": "inProgress"
+    },
+    {
+      "guid": "0c3ae6e4-f895-4488-b592-e18ea5734ce4",
+      "totalBytes": 280,
+      "receivedBytes": 280,
+      "state": "inProgress"
+    },
+    {
+      "guid": "0c3ae6e4-f895-4488-b592-e18ea5734ce4",
+      "totalBytes": 280,
+      "receivedBytes": 280,
+      "state": "completed",
+      "filePath": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-documents-final76b\\downloads\\own-report.xsd"
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "sourceHashes": [
+    {
+      "path": "src/modules/xml-documents/public/contracts.ts",
+      "sha256": "f0d77d4988fd5ff4f3d31dd016113b68f7b2a21480240dc28aae3ef867e8a133"
+    },
+    {
+      "path": "src/modules/xml-documents/public/index.ts",
+      "sha256": "d98b81bee14f632e58c1bed7da0fb9522a6a0a599fbe1754f0bc249a35de7bb7"
+    },
+    {
+      "path": "src/modules/xml-documents/domain/schema.ts",
+      "sha256": "bd6d2224c492ac152cec38ebd11e626d49870492fdbb8c84afc2e527cd1d5910"
+    },
+    {
+      "path": "src/modules/xml-documents/ports/xml-codec.ts",
+      "sha256": "3d8427090956763055991fdc7a323860a8cdacbc4c861123cbfe7b2152cc032b"
+    },
+    {
+      "path": "src/modules/xml-documents/application/workspace.ts",
+      "sha256": "5fab870753fed52e7966088759d8cdc0fa698c2f8ef3356ced7afebc5f5e1040"
+    },
+    {
+      "path": "src/adapters/xml/browser-parser.ts",
+      "sha256": "d501b25f13660836bd10d0551040beccba28bd52a1b7a783966a628a87c37ab3"
+    },
+    {
+      "path": "src/ui/xml-document-dialog.ts",
+      "sha256": "fc921df2b4c98fcd2a51df468ace016b9c8f0771213e05961a975bbdfb3ad4e5"
+    }
+  ],
+  "verifierSha256": "c467771728a1d1989c3a519ae33a3f77082494f29ee60cca8d205d4bb801f974",
+  "scope": "Real isolated Edge and actual compiled production XML module/dialog/file inputs/download/reopen. No HWP editor, HML/HWT or XSL rendering support claimed. Root app menu integration and actual Hancom review are separate. Own fixtures only; no native handles, user files, font bytes or external resource loads."
+}

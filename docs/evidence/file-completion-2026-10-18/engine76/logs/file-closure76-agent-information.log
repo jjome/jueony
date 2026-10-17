@@ -1,0 +1,6 @@
+PASS hwp current metadata and engine statistics are actually observed
+PASS hwp single metadata operation preserves body and passes both formats before live mutation
+PASS hwp stale fingerprint and host-only operation refuse without changing live bytes
+PASS hwpx current metadata and engine statistics are actually observed
+PASS hwpx single metadata operation preserves body and passes both formats before live mutation
+PASS hwpx stale fingerprint and host-only operation refuse without changing live bytes

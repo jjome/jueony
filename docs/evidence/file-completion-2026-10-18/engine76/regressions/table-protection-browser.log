@@ -1,0 +1,14 @@
+PASS openai-responses: protected context is readonly; real chat write refuses, unprotected neighbour still edits/saves/undoes
+PASS anthropic: protected context is readonly; real chat write refuses, unprotected neighbour still edits/saves/undoes
+PASS gemini: protected context is readonly; real chat write refuses, unprotected neighbour still edits/saves/undoes
+PASS openai-compatible: protected context is readonly; real chat write refuses, unprotected neighbour still edits/saves/undoes
+PASS hwp: protected text/format/range/all axes/mixed batch visibly refuse with bytes/history unchanged
+PASS hwpx: protected text/format/range/all axes/mixed batch visibly refuse with bytes/history unchanged
+PASS hwp: neighbour background/bold keeps protected shared edge/content/format/flag through undo and file reopen
+PASS hwpx: neighbour background/bold keeps protected shared edge/content/format/flag through undo and file reopen
+PASS forged old editable flags cannot bypass live Native protection or overwrite its current flag
+PASS Native cell protection reader unavailable fails closed and leaves current file unchanged
+PASS unexpected protected neighbour text/format/unprotect drift rolls back whole live edit
+PASS new protection introduced during a live batch restores all earlier text and flags
+PASS delayed provider cannot overwrite normal user snapshot protection change
+PASS saved workspace reload restores readonly flags and neighbour edit history/comparison

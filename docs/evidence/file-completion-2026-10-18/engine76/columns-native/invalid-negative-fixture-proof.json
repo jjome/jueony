@@ -1,0 +1,150 @@
+{
+  "status": "REJECTED_HARNESS_BASELINES_RETAINED",
+  "cause": "Low-level mutation changed typed ColumnDef but retained raw_attr; asymmetric margin changed Table.outer_margin_top by 1 HU without CommonObjAttr.margin.top/raw CTRL_HEADER bytes28..30 dual-write. Frozen outputs reverted to eligible original values. New fixture inputs perform existing command dual writes and assert real serialized values. Existing failed evidence and expected geometry/tolerance are unchanged.",
+  "observations": [
+    {
+      "name": "single_column",
+      "oldFrozenSha256": "b85a5511e99b1a5babb11029ff7b35d5eadae36bba16b439923e172ad67b7625",
+      "liveControls": [
+        [
+          117.2,
+          153.6
+        ],
+        [
+          117.2,
+          230.7
+        ]
+      ],
+      "hwpReopenControls": [
+        [
+          117.2,
+          153.6
+        ],
+        [
+          117.2,
+          230.7
+        ]
+      ]
+    },
+    {
+      "name": "three_columns",
+      "oldFrozenSha256": "96f0ca7dc1109fb39f88490394c81a2962aceef0f41631f7718d49d96291569d",
+      "liveControls": [
+        [
+          117.2,
+          153.6
+        ],
+        [
+          117.2,
+          230.7
+        ]
+      ],
+      "hwpReopenControls": [
+        [
+          117.2,
+          153.6
+        ],
+        [
+          117.2,
+          230.7
+        ]
+      ]
+    },
+    {
+      "name": "rtl",
+      "oldFrozenSha256": "e10843b6e5359913e23cb541e1506c7256dba0cd37b56fded60c16a356b5f2d2",
+      "liveControls": [
+        [
+          407.3,
+          153.6
+        ],
+        [
+          407.3,
+          230.7
+        ]
+      ],
+      "hwpReopenControls": [
+        [
+          117.2,
+          153.6
+        ],
+        [
+          117.2,
+          230.7
+        ]
+      ]
+    },
+    {
+      "name": "distribute",
+      "oldFrozenSha256": "524d0f412310ab84986cc0008a189b049882e69f1a6ab1542c0ef50feab40d14",
+      "liveControls": [
+        [
+          117.2,
+          153.6
+        ],
+        [
+          117.2,
+          230.7
+        ]
+      ],
+      "hwpReopenControls": [
+        [
+          117.2,
+          153.6
+        ],
+        [
+          117.2,
+          230.7
+        ]
+      ]
+    },
+    {
+      "name": "unequal_columns",
+      "oldFrozenSha256": "e7be6269fd59956c6e1748850a021b3f2e9c375027a90ab8033a7a80da380a70",
+      "liveControls": [
+        [
+          117.2,
+          153.6
+        ],
+        [
+          117.2,
+          230.7
+        ]
+      ],
+      "hwpReopenControls": [
+        [
+          117.2,
+          153.6
+        ],
+        [
+          117.2,
+          230.7
+        ]
+      ]
+    },
+    {
+      "name": "asymmetric_margin",
+      "oldFrozenSha256": "0a66c3d7f01852f2edd5cbbfcbe4b05b117cff0e3f7eccfc19ff8c61d2eb74cb",
+      "liveControls": [
+        [
+          117.2,
+          153.6
+        ],
+        [
+          117.2,
+          230.7
+        ]
+      ],
+      "hwpReopenControls": [
+        [
+          117.2,
+          153.6
+        ],
+        [
+          117.2,
+          230.7
+        ]
+      ]
+    }
+  ]
+}

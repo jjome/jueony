@@ -1,0 +1,82 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/file-closure69-public/column2-candidate74/baseline-source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 39.15s
+     Running tests/jueony_generated_columns.rs (/tmp/jueony-rhwp-engine/target/columns74-baseline/debug/deps/jueony_generated_columns-6613db5066793188)
+
+running 31 tests
+test compiled_source_provenance ... ok
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=2, para_b=1, a=205.1~239.3, b=226.5~295.5, overlap=12.9px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=2, para_b=1, a=205.1~239.3, b=226.5~295.5, overlap=12.9px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=34 line=0 y=1012.4 col_bottom=1009.1 overflow=3.3px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=34, type=FullParagraph, first=false, y=1012.4, bottom=1009.1, overflow=3.3px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=35 line=0 y=1033.7 col_bottom=1009.1 overflow=24.6px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=35, type=FullParagraph, first=false, y=1033.7, bottom=1009.1, overflow=24.6px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=36 line=0 y=1055.1 col_bottom=1009.1 overflow=46.0px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=36, type=FullParagraph, first=false, y=1055.1, bottom=1009.1, overflow=46.0px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=34 line=0 y=1012.4 col_bottom=1009.1 overflow=3.3px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=34, type=FullParagraph, first=false, y=1012.4, bottom=1009.1, overflow=3.3px
+
+thread 'asymmetric_margin' (164516) panicked at tests/jueony_generated_columns.rs:306:13:
+assertion `left == right` failed
+  left: 283
+ right: 358
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+LAYOUT_OVERFLOW_DRAW: section=0 pi=35 line=0 y=1033.7 col_bottom=1009.1 overflow=24.6px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=35, type=FullParagraph, first=false, y=1033.7, bottom=1009.1, overflow=24.6px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=36 line=0 y=1055.1 col_bottom=1009.1 overflow=46.0px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=36, type=FullParagraph, first=false, y=1055.1, bottom=1009.1, overflow=46.0px
+test asymmetric_margin ... FAILED
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=2, para_b=1, a=205.1~239.3, b=226.5~295.5, overlap=12.9px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=2, para_b=1, a=205.1~239.3, b=226.5~295.5, overlap=12.9px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=157.4~226.5, b=208.9~243.1, overlap=17.6px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=157.4~226.5, b=208.9~243.1, overlap=17.6px
+test mixed_authentic_cache ... ok
+test caption ... ok
+test height1 ... ok
+test field ... ok
+test locked ... ok
+test colspan ... ok
+test positive_cached_origin ... ok
+test common_unknown ... ok
+test column_reset ... ok
+test cellfield ... ok
+test absolute ... ok
+test host_text ... ok
+test distribute ... ok
+test negative_offset ... ok
+LAYOUT_OVERFLOW_DRAW: section=0 pi=34 line=0 y=1012.4 col_bottom=1009.1 overflow=3.3px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=34, type=FullParagraph, first=false, y=1012.4, bottom=1009.1, overflow=3.3px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=35 line=0 y=1033.7 col_bottom=1009.1 overflow=24.6px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=35, type=FullParagraph, first=false, y=1033.7, bottom=1009.1, overflow=24.6px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=36 line=0 y=1055.1 col_bottom=1009.1 overflow=46.0px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=36, type=FullParagraph, first=false, y=1055.1, bottom=1009.1, overflow=46.0px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=34 line=0 y=1012.4 col_bottom=1009.1 overflow=3.3px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=34, type=FullParagraph, first=false, y=1012.4, bottom=1009.1, overflow=3.3px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=35 line=0 y=1033.7 col_bottom=1009.1 overflow=24.6px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=35, type=FullParagraph, first=false, y=1033.7, bottom=1009.1, overflow=24.6px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=36 line=0 y=1055.1 col_bottom=1009.1 overflow=46.0px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=36, type=FullParagraph, first=false, y=1055.1, bottom=1009.1, overflow=46.0px
+test positive_offset ... ok
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+test rowbreak ... ok
+test protected ... ok
+test rowspan ... ok
+test section_reset ... ok
+test size_protected ... ok
+test width1 ... ok
+test unknown ... ok
+test zones ... ok
+test width_relative ... ok
+test single_column ... ok
+test rtl ... ok
+test many_following_lines ... ok
+test three_columns ... ok
+test unequal_columns ... ok
+
+failures:
+
+failures:
+    asymmetric_margin
+
+test result: FAILED. 30 passed; 1 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.28s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_generated_columns`

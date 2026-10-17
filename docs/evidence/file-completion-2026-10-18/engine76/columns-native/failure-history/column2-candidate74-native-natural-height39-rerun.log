@@ -1,0 +1,124 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/file-closure69-public/column2-candidate74/source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 44.18s
+     Running tests/jueony_generated_columns.rs (/tmp/jueony-rhwp-engine/target/columns74-candidate/debug/deps/jueony_generated_columns-6613db5066793188)
+
+running 39 tests
+test compiled_helper_provenance ... ok
+test compiled_source_provenance ... ok
+test first_model_contract_probe ... ok
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=2, para_b=1, a=205.1~239.3, b=226.5~295.5, overlap=12.9px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=2, para_b=1, a=205.1~239.3, b=226.5~295.5, overlap=12.9px
+test actual_column2_full_geometry ... ok
+test actual_negative_pair_remains_exact ... ok
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=2, para_b=1, a=205.1~239.3, b=226.5~295.5, overlap=12.9px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=2, para_b=1, a=205.1~239.3, b=226.5~295.5, overlap=12.9px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=157.4~226.5, b=208.9~243.1, overlap=17.6px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=157.4~226.5, b=208.9~243.1, overlap=17.6px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=34 line=0 y=1012.4 col_bottom=1009.1 overflow=3.3px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=34, type=FullParagraph, first=false, y=1012.4, bottom=1009.1, overflow=3.3px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=35 line=0 y=1033.7 col_bottom=1009.1 overflow=24.6px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=35, type=FullParagraph, first=false, y=1033.7, bottom=1009.1, overflow=24.6px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=36 line=0 y=1055.1 col_bottom=1009.1 overflow=46.0px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=36, type=FullParagraph, first=false, y=1055.1, bottom=1009.1, overflow=46.0px
+test field ... ok
+test cellfield ... ok
+test absolute ... ok
+LAYOUT_OVERFLOW_DRAW: section=0 pi=34 line=0 y=1012.4 col_bottom=1009.1 overflow=3.3px
+
+thread 'asymmetric_margin' (158995) panicked at tests/jueony_generated_columns.rs:295:9:
+assertion `left == right` failed: Excluded scenario must remain byte-exact published/IR/loss evidence:asymmetric_margin
+[oversize line retained in original; utf8Sha256=2199e17d14976fb22e45fdd2be9c7a4b3b812e69053c258bf70ea5f4296255e4]
+LAYOUT_OVERFLOW_DRAW: section=0 pi=35 line=0 y=1033.7 col_bottom=1009.1 overflow=24.6px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=35, type=FullParagraph, first=false, y=1033.7, bottom=1009.1, overflow=24.6px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=36 line=0 y=1055.1 col_bottom=1009.1 overflow=46.0px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=36, type=FullParagraph, first=false, y=1055.1, bottom=1009.1, overflow=46.0px
+[oversize line retained in original; utf8Sha256=ac6224e8a3f5ef9f505b97469cefdf23f5c0a69b5037a9a9703897957bb1fa09]
+test column_reset ... ok
+[oversize line retained in original; utf8Sha256=fa46760b7813cde068608f42c611aa74cbac49346863d4dd196de4b02907b3b2]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test asymmetric_margin ... FAILED
+test colspan ... ok
+test host_text ... ok
+
+thread 'distribute' (159004) panicked at tests/jueony_generated_columns.rs:295:9:
+assertion `left == right` failed: Excluded scenario must remain byte-exact published/IR/loss evidence:distribute
+test height1 ... ok
+[oversize line retained in original; utf8Sha256=364af5e56b5719fe2b50a9c65fa1c6f57345f88ac567a8732ecb3c65b8dcbed1]
+test distribute ... FAILED
+test common_unknown ... ok
+test caption ... ok
+test original_api_history ... FAILED
+[oversize line retained in original; utf8Sha256=2d3587ac449fb12299792020da33e31a7519f0475b011082e13b6d4897ebb7b7]
+
+thread 'original_api_history' (159015) panicked at tests/jueony_generated_columns.rs:42:5:
+[{"after":153.6,"before":157.4,"path":"/controls/0/cells/0/y"},{"after":153.6,"before":157.4,"path":"/controls/0/cells/1/y"},{"after":185.8,"before":189.6,"path":"/controls/0/cells/2/y"},{"after":185.8,"before":189.6,"path":"/controls/0/cells/3/y"},{"after":205.6,"before":209.4,"path":"/controls/0/cells/4/y"},{"after":205.6,"before":209.4,"path":"/controls/0/cells/5/y"},{"after":153.6,"before":157.4,"path":"/controls/0/y"},{"after":230.7,"before":234.0,"path":"/controls/1/cells/0/y"},{"after":230.7,"before":234.0,"path":"/controls/1/cells/1/y"},{"after":247.8,"before":251.1,"path":"/controls/1/cells/2/y"},{"after":247.8,"before":251.1,"path":"/controls/1/cells/3/y"},{"after":230.7,"before":234.0,"path":"/controls/1/y"}]
+test locked ... ok
+LAYOUT_OVERFLOW_DRAW: section=0 pi=34 line=0 y=1012.4 col_bottom=1009.1 overflow=3.3px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=34, type=FullParagraph, first=false, y=1012.4, bottom=1009.1, overflow=3.3px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=35 line=0 y=1033.7 col_bottom=1009.1 overflow=24.6px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=35, type=FullParagraph, first=false, y=1033.7, bottom=1009.1, overflow=24.6px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=36 line=0 y=1055.1 col_bottom=1009.1 overflow=46.0px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=36, type=FullParagraph, first=false, y=1055.1, bottom=1009.1, overflow=46.0px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=34 line=0 y=1012.4 col_bottom=1009.1 overflow=3.3px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=34, type=FullParagraph, first=false, y=1012.4, bottom=1009.1, overflow=3.3px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=35 line=0 y=1033.7 col_bottom=1009.1 overflow=24.6px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=35, type=FullParagraph, first=false, y=1033.7, bottom=1009.1, overflow=24.6px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=36 line=0 y=1055.1 col_bottom=1009.1 overflow=46.0px
+LAYOUT_OVERFLOW: page=0, sec=0, col=0, para=36, type=FullParagraph, first=false, y=1055.1, bottom=1009.1, overflow=46.0px
+test hancom_api_history ... ok
+test positive_cached_origin ... ok
+test negative_offset ... ok
+
+thread 'rtl' (159021) panicked at tests/jueony_generated_columns.rs:295:9:
+assertion `left == right` failed: Excluded scenario must remain byte-exact published/IR/loss evidence:rtl
+[oversize line retained in original; utf8Sha256=e3db78f0498fbc3a08f7c5f832feb8d0e2da959c5b26a4b803edf2319fb656f1]
+test rtl ... FAILED
+test mixed_authentic_cache ... ok
+test positive_offset ... ok
+[oversize line retained in original; utf8Sha256=b7c0ddb1a8fed7bb5bd3b675958342116538c9fd89fd2ae3844ec37d2620dfc3]
+test protected ... ok
+test rowbreak ... ok
+test rowspan ... ok
+[hwpx] 경고: 인식할 수 없는 컨트롤(ctrl_id=0x11223344)을 HWPX로 저장할 수 없어 드롭됩니다 — 원본 컨트롤의 세부 데이터가 보존되지 않아 이 변환은 지원되지 않습니다.
+
+thread 'single_column' (159023) panicked at tests/jueony_generated_columns.rs:295:9:
+assertion `left == right` failed: Excluded scenario must remain byte-exact published/IR/loss evidence:single_column
+[oversize line retained in original; utf8Sha256=cbe1021d7ceecf638ebeed50892763f5ccbeb35987090fc40e9d53798e790223]
+[oversize line retained in original; utf8Sha256=ff0bd300be3a0796261de4e2cd6a3c33387bf80cab38933bb02d89ead71c1000]
+test single_column ... FAILED
+test section_reset ... ok
+test size_protected ... ok
+
+thread 'three_columns' (159025) panicked at tests/jueony_generated_columns.rs:295:9:
+assertion `left == right` failed: Excluded scenario must remain byte-exact published/IR/loss evidence:three_columns
+[oversize line retained in original; utf8Sha256=7c726502d559348f76da853dab9b46e0502064ca9fde6e1fec526fac544a0155]
+[oversize line retained in original; utf8Sha256=49691efe6f0a04544793583cfd66f0d9791413b2ecaf3654eecb149473503775]
+test three_columns ... FAILED
+test many_following_lines ... ok
+test unknown ... ok
+test width1 ... ok
+
+thread 'unequal_columns' (159026) panicked at tests/jueony_generated_columns.rs:295:9:
+assertion `left == right` failed: Excluded scenario must remain byte-exact published/IR/loss evidence:unequal_columns
+[oversize line retained in original; utf8Sha256=39ad8b73783e624a580db64052daa02be1805a041713edea12faf8877b9a3582]
+test unequal_columns ... FAILED
+[oversize line retained in original; utf8Sha256=142c34075d4bc2428db29a2cc80ecf7a21c3ca9ade68e86aa5ff59b7b00bd4a4]
+test width_relative ... ok
+test zones ... ok
+test both_sources_both_formats_twice ... ok
+test existing_actual_nine_pairs_remain_exact ... ok
+
+failures:
+
+failures:
+    asymmetric_margin
+    distribute
+    original_api_history
+    rtl
+    single_column
+    three_columns
+    unequal_columns
+
+test result: FAILED. 32 passed; 7 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.55s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_generated_columns`

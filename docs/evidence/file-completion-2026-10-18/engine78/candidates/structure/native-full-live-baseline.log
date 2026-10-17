@@ -1,0 +1,21 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/structure-closure77/source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.60s
+     Running tests/jueony_structure_layout.rs (/tmp/jueony-rhwp-engine/target/transpose-closure77/debug/deps/jueony_structure_layout-7f214eed82e42a2a)
+
+running 2 tests
+
+thread 'current_later_section_roundtrip' (196126) panicked at tests/jueony_structure_layout.rs:31:576:
+[{"differences":[],"format":"hwp"},{"differences":[{"after":178.2,"before":174.9,"path":"/2/text/runs/4/y"},{"after":199.6,"before":196.3,"path":"/2/text/runs/5/y"},{"after":220.9,"before":217.6,"path":"/2/text/runs/6/y"}],"format":"hwpx"}]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test current_later_section_roundtrip ... FAILED
+CONTROLS:[{"mode":"source-cache-reset","reopenedDifferences":3,"sourceDifferences":0},{"mode":"loaded-cache-reset","reopenedDifferences":0,"sourceDifferences":3},{"mode":"source-vpos-current","reopenedDifferences":3,"sourceDifferences":0},{"mode":"loaded-vpos-current","reopenedDifferences":0,"sourceDifferences":3},{"mode":"source-clear-snapshots","reopenedDifferences":3,"sourceDifferences":0},{"mode":"loaded-clear-snapshots","reopenedDifferences":0,"sourceDifferences":3},{"mode":"loaded-clear-host-lines","reopenedDifferences":0,"sourceDifferences":3},{"mode":"loaded-clear-tail-lines","reopenedDifferences":0,"sourceDifferences":3}]
+test cache_and_source_vpos_control_diagnostics ... ok
+
+failures:
+
+failures:
+    current_later_section_roundtrip
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_structure_layout`

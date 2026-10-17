@@ -1,0 +1,23 @@
+--- a/src/document_core/commands/object_ops/shape.rs
++++ b/src/document_core/commands/object_ops/shape.rs
+@@ -1258,7 +1258,7 @@
+             h
+         };
+ 
+-        let common = CommonObjAttr {
++        let mut common = CommonObjAttr {
+             ctrl_id,
+             attr,
+             vertical_offset: vert_offset,
+@@ -1311,6 +1311,11 @@
+             },
+             ..Default::default()
+         };
++
++        // The insertion default carries InFrontOfText bits, but callers may
++        // choose any resolved wrap mode. Keep the live raw query and both
++        // codecs consistent at creation, rather than fixing only on export.
++        crate::serializer::control::sync_text_wrap_bits(&mut common);
+ 
+         let has_textbox = shape_type == "textbox";
+         let has_fill = shape_type != "line" && !is_connector;

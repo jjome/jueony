@@ -1,0 +1,87 @@
+{
+  "scope": {
+    "engineBase": "formal77; private Native only for final caption v2, formal78 WASM still pending",
+    "tests": 10,
+    "strictReopens": 36,
+    "initialFailure": "First v1 explicit7 fixture had stale raw DocProperties and duplicate SectionDef at1. Failed log retained. Correcting seed owners kept expected7; no serializer relaxation.",
+    "runtimeFiles": 2,
+    "excluded": [
+      "public docs",
+      "font binaries",
+      "WASM",
+      "full source copy"
+    ]
+  },
+  "files": [
+    {
+      "path": "baseline77.json",
+      "bytes": 4509,
+      "sha256": "4e3c2392619fa02633cc10f354f1cb6e64a95c85e141739e33bbe972c8355b70"
+    },
+    {
+      "path": "baseline77.mjs",
+      "bytes": 1271,
+      "sha256": "41afdfa3da62d9d801d7182084e250f6784a9531b302ad612de1170157d2bde9"
+    },
+    {
+      "path": "caption-lifecycle-partial77-v2.patch",
+      "bytes": 1990,
+      "sha256": "0b8c8820f1c3444af15a7336034c3dc952461de6f5c758bb75992660b58b35af"
+    },
+    {
+      "path": "direction-only-partial-result.json",
+      "bytes": 838,
+      "sha256": "0ee1eb7e7f2e83d3e21f7b545ca081655c2fd29835d662fddd22f3e0cd80f7b8"
+    },
+    {
+      "path": "explicit-start-seven-result.json",
+      "bytes": 830,
+      "sha256": "c1cdab2e532e9c1c6b667a8f1a2cd91f665d1e9cf9a2df46f59e6fefaec4eb90"
+    },
+    {
+      "path": "final-source-proof77-v2.json",
+      "bytes": 836,
+      "sha256": "38b72b719350932ec508d696d7a2374ae2806c33dc83d8c5607f50def7321d5b"
+    },
+    {
+      "path": "native-caption77-v2.log",
+      "bytes": 1146,
+      "sha256": "aef54a00b6f39e983dfdc6f8fe6d6b0de3a5ab7e34a67029517b45cca5d2d3b3"
+    },
+    {
+      "path": "native-caption77.log",
+      "bytes": 1731,
+      "sha256": "beb766235c579b2058d86865e8c3f449ad852fd59fecdb98e33b87a1bb292c34"
+    },
+    {
+      "path": "parent-reproduction-1.hwp",
+      "bytes": 13312,
+      "sha256": "18551af24b4684b7bdb8140e712d10a551ca1946224c8ec43ba22e59c1f014cd"
+    },
+    {
+      "path": "parent-reproduction-1.hwpx",
+      "bytes": 8172,
+      "sha256": "8fcfa55016254ddd078d6434185eec4487b93fdea3394c7a26952c64f1f86a72"
+    },
+    {
+      "path": "parent-reproduction-result.json",
+      "bytes": 826,
+      "sha256": "6077035d437f2cbb949da52c6463eeddedbdb87ceaee4c3bd3d0d9db3f3bcd92"
+    },
+    {
+      "path": "source-candidate77-v2/tests/jueony_caption_lifecycle.rs",
+      "bytes": 9552,
+      "sha256": "f0449c3fcffeef02842fd37dd527ab4f4207d30f1b5457bc110418fac0adad2a"
+    },
+    {
+      "path": "unrelated-shape-key-result.json",
+      "bytes": 826,
+      "sha256": "a89de5c1db9938b0f68a3494b0f6994199113c1432c4c1b6bf18814502b170e9"
+    },
+    {
+      "path": "verify-caption-lifecycle-engine.mjs",
+      "bytes": 6693,
+      "sha256": "0923e1cfbfc96710c01af4f9c95414cc69ec25bc2a7d87f382514408e23623fe"
+    }
+  ]
+}

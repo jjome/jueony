@@ -1,0 +1,16 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/structure-closure77/source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 41.35s
+     Running tests/jueony_structure_layout.rs (/tmp/jueony-rhwp-engine/target/transpose-closure77/debug/deps/jueony_structure_layout-7f214eed82e42a2a)
+
+running 6 tests
+FACTORY_COMPILED_SOURCE_SHA:d809e25d9c1b3c3d206be638b6884b7ea9756fd99509c8c94a8e89686d149a10
+test existing_imported_rows_and_invalid_constructor_are_not_reclassified ... ok
+test factory_provenance_source_and_imported_ladder_bytes_are_separate ... ok
+test current_later_section_roundtrip ... ok
+test full_live_two_codecs_two_cycles_and_snapshot_history ... ok
+test original_later_section_split_attach_live_sequence ... ok
+CONTROLS:[{"mode":"source-cache-reset","reopenedDifferences":0,"sourceDifferences":0},{"mode":"loaded-cache-reset","reopenedDifferences":0,"sourceDifferences":0},{"mode":"source-vpos-current","reopenedDifferences":0,"sourceDifferences":0},{"mode":"loaded-vpos-current","reopenedDifferences":0,"sourceDifferences":0},{"mode":"source-clear-snapshots","reopenedDifferences":0,"sourceDifferences":0},{"mode":"loaded-clear-snapshots","reopenedDifferences":0,"sourceDifferences":0},{"mode":"loaded-clear-host-lines","reopenedDifferences":0,"sourceDifferences":0},{"mode":"loaded-clear-tail-lines","reopenedDifferences":0,"sourceDifferences":0},{"mode":"source-clear-p0-lines","reopenedDifferences":0,"sourceDifferences":0},{"mode":"loaded-restore-p0-lines","reopenedDifferences":0,"sourceDifferences":0},{"mode":"loaded-restore-rawCtrl","reopenedDifferences":0,"sourceDifferences":0},{"mode":"source-clear-rawCtrl","reopenedDifferences":0,"sourceDifferences":0},{"mode":"loaded-restore-rawTableAttr","reopenedDifferences":0,"sourceDifferences":0},{"mode":"source-force-rawTableAttr","reopenedDifferences":0,"sourceDifferences":0},{"mode":"loaded-replace-p0-model","reopenedDifferences":0,"sourceDifferences":0},{"mode":"source-replace-p0-model","reopenedDifferences":0,"sourceDifferences":0},{"mode":"loaded-replace-table-model","reopenedDifferences":0,"sourceDifferences":0},{"mode":"source-replace-table-model","reopenedDifferences":0,"sourceDifferences":0}]
+test cache_and_source_vpos_control_diagnostics ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.84s
+

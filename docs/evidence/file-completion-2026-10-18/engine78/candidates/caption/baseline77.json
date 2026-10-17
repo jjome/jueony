@@ -1,0 +1,172 @@
+{
+  "before": {
+    "runs": [
+      {
+        "text": "",
+        "x": 233.4,
+        "y": 132.3,
+        "w": 0,
+        "h": 0,
+        "charX": [
+          0
+        ],
+        "fontFamily": "함초롬바탕",
+        "fontSize": 13.3,
+        "bold": false,
+        "italic": false,
+        "ratio": 1,
+        "letterSpacing": 0,
+        "underline": false,
+        "strikethrough": false,
+        "textColor": "#000000",
+        "charShapeId": 0,
+        "paraShapeId": 0,
+        "secIdx": 0,
+        "paraIdx": 0,
+        "charStart": 1
+      },
+      {
+        "text": "그림 0  ",
+        "x": 113.4,
+        "y": 185.6,
+        "w": 53.3,
+        "h": 13.3,
+        "charX": [
+          0,
+          13,
+          25.9,
+          32.6,
+          39.9,
+          46.6,
+          53.3
+        ],
+        "fontFamily": "함초롬바탕",
+        "fontSize": 13.3,
+        "bold": false,
+        "italic": false,
+        "ratio": 1,
+        "letterSpacing": 0,
+        "underline": false,
+        "strikethrough": false,
+        "textColor": "#000000",
+        "charShapeId": 0,
+        "paraShapeId": 0,
+        "secIdx": 0,
+        "paraIdx": 0,
+        "charStart": 0
+      }
+    ]
+  },
+  "after": {
+    "runs": [
+      {
+        "text": "",
+        "x": 233.4,
+        "y": 132.3,
+        "w": 0,
+        "h": 0,
+        "charX": [
+          0
+        ],
+        "fontFamily": "함초롬바탕",
+        "fontSize": 13.3,
+        "bold": false,
+        "italic": false,
+        "ratio": 1,
+        "letterSpacing": 0,
+        "underline": false,
+        "strikethrough": false,
+        "textColor": "#000000",
+        "charShapeId": 0,
+        "paraShapeId": 0,
+        "secIdx": 0,
+        "paraIdx": 0,
+        "charStart": 1
+      },
+      {
+        "text": "그림 1  ",
+        "x": 113.4,
+        "y": 185.6,
+        "w": 53.3,
+        "h": 13.3,
+        "charX": [
+          0,
+          13,
+          25.9,
+          32.6,
+          39.9,
+          46.6,
+          53.3
+        ],
+        "fontFamily": "함초롬바탕",
+        "fontSize": 13.3,
+        "bold": false,
+        "italic": false,
+        "ratio": 1,
+        "letterSpacing": 0,
+        "underline": false,
+        "strikethrough": false,
+        "textColor": "#000000",
+        "charShapeId": 0,
+        "paraShapeId": 0,
+        "secIdx": 0,
+        "paraIdx": 0,
+        "charStart": 0
+      }
+    ]
+  },
+  "error": {
+    "schemaVersion": 1,
+    "status": "blocked",
+    "format": "hwp",
+    "checked": [
+      "summary-metadata",
+      "list-definitions",
+      "sections",
+      "section/0/page",
+      "section/0/definition",
+      "section/0/columns",
+      "section/0/outline-definition",
+      "section/0/page-border",
+      "section/0/page-border-entries",
+      "section/0/master-pages",
+      "section/0/line-numbers",
+      "section/0/paragraph-count",
+      "section/0/paragraph/0",
+      "section/0/header/0",
+      "section/0/header/1",
+      "section/0/header/2",
+      "section/0/footer/0",
+      "section/0/footer/1",
+      "section/0/footer/2",
+      "section/0/header/0/format",
+      "section/0/header/1/format",
+      "section/0/header/2/format",
+      "section/0/footer/0/format",
+      "section/0/footer/1/format",
+      "section/0/footer/2/format",
+      "text",
+      "fields",
+      "bookmarks",
+      "controls",
+      "styles",
+      "cells",
+      "objects",
+      "image-resources"
+    ],
+    "unverified": [
+      "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+      "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+      "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+      "글상자·캡션 안의 모든 글자 서식은 검사 범위 밖입니다. 텍스트와 컨트롤 속성은 별도 비교합니다.",
+      "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+    ],
+    "issues": [
+      {
+        "code": "changed",
+        "path": "whole-document-published-layout/pages/0/text/runs/1/text",
+        "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/0/text/runs/1/text). 원본 파일은 쓰지 않습니다."
+      }
+    ]
+  }
+}

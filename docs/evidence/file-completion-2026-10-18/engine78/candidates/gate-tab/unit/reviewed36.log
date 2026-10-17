@@ -1,0 +1,241 @@
+TAP version 13
+# Subtest: mandatory whole-document gate covers plain documents and every response field with no provenance exception
+ok 1 - mandatory whole-document gate covers plain documents and every response field with no provenance exception
+  ---
+  duration_ms: 2.1358
+  type: 'test'
+  ...
+# Subtest: source and reopened page counts/order/array lengths are exact, not only selected frames
+ok 2 - source and reopened page counts/order/array lengths are exact, not only selected frames
+  ---
+  duration_ms: 0.5449
+  type: 'test'
+  ...
+# Subtest: existing 0.2 geometry maximum is retained while owner IDs and nongeometry numbers remain exact
+ok 3 - existing 0.2 geometry maximum is retained while owner IDs and nongeometry numbers remain exact
+  ---
+  duration_ms: 1.3576
+  type: 'test'
+  ...
+# Subtest: text/metadata/new fields/raw shape IDs are never projected or silently normalized
+ok 4 - text/metadata/new fields/raw shape IDs are never projected or silently normalized
+  ---
+  duration_ms: 0.5575
+  type: 'test'
+  ...
+# Subtest: missing getters and invalid responses are failures, never not-applicable or an empty successful proof
+ok 5 - missing getters and invalid responses are failures, never not-applicable or an empty successful proof
+  ---
+  duration_ms: 0.3658
+  type: 'test'
+  ...
+# Subtest: page and nested JSON budgets fail closed before any write authority can be reached
+ok 6 - page and nested JSON budgets fail closed before any write authority can be reached
+  ---
+  duration_ms: 0.224
+  type: 'test'
+  ...
+# Subtest: Canvas is selected portable only during capture and restored after success
+ok 7 - Canvas is selected portable only during capture and restored after success
+  ---
+  duration_ms: 0.1454
+  type: 'test'
+  ...
+# Subtest: query/reopen/changed failures preserve original metric mode and free only owned reopened handles
+ok 8 - query/reopen/changed failures preserve original metric mode and free only owned reopened handles
+  ---
+  duration_ms: 0.2455
+  type: 'test'
+  ...
+# Subtest: failed portable switch still restores Canvas, and restoring failure is not success
+ok 9 - failed portable switch still restores Canvas, and restoring failure is not success
+  ---
+  duration_ms: 0.2706
+  type: 'test'
+  ...
+# Subtest: reopen alias cannot free or mutate the source handle; unsupported formats never pass
+ok 10 - reopen alias cannot free or mutate the source handle; unsupported formats never pass
+  ---
+  duration_ms: 0.282
+  type: 'test'
+  ...
+# Subtest: UTF8 byte budget is enforced before JSON parsing instead of treating multibyte text as one byte
+ok 11 - UTF8 byte budget is enforced before JSON parsing instead of treating multibyte text as one byte
+  ---
+  duration_ms: 40.1577
+  type: 'test'
+  ...
+# Subtest: mutable DTO alias cannot rewrite the already captured before-layout proof
+ok 12 - mutable DTO alias cannot rewrite the already captured before-layout proof
+  ---
+  duration_ms: 1.6115
+  type: 'test'
+  ...
+# Subtest: only established rectangle and glyph coordinate paths use tolerance, arbitrary nested x/y/w/h metadata is exact
+ok 13 - only established rectangle and glyph coordinate paths use tolerance, arbitrary nested x/y/w/h metadata is exact
+  ---
+  duration_ms: 0.5216
+  type: 'test'
+  ...
+# Subtest: hwp: actual WASM mixed character runs survive export/reopen
+ok 14 - hwp: actual WASM mixed character runs survive export/reopen
+  ---
+  duration_ms: 93.6188
+  type: 'test'
+  ...
+# Subtest: hwpx: actual WASM mixed character runs survive export/reopen
+ok 15 - hwpx: actual WASM mixed character runs survive export/reopen
+  ---
+  duration_ms: 31.7317
+  type: 'test'
+  ...
+# Subtest: HWP no-hatch code zero survives HWPX canonical minus-one without hiding real hatch changes
+ok 16 - HWP no-hatch code zero survives HWPX canonical minus-one without hiding real hatch changes
+  ---
+  duration_ms: 18.1589
+  type: 'test'
+  ...
+# Subtest: body text equality cannot conceal a lost non-first character run
+ok 17 - body text equality cannot conceal a lost non-first character run
+  ---
+  duration_ms: 9.4437
+  type: 'test'
+  ...
+# Subtest: an omitted unidentified control is blocked even when serializer reports zero losses
+ok 18 - an omitted unidentified control is blocked even when serializer reports zero losses
+  ---
+  duration_ms: 5.8402
+  type: 'test'
+  ...
+# Subtest: actual WASM Unknown omission rejects both its real report and a forged zero report (legacy/core versus reviewed engine)
+ok 19 - actual WASM Unknown omission rejects both its real report and a forged zero report (legacy/core versus reviewed engine)
+  ---
+  duration_ms: 19.543
+  type: 'test'
+  ...
+# Subtest: image asset byte changes are blocked independently of matching text and counts
+ok 20 - image asset byte changes are blocked independently of matching text and counts
+  ---
+  duration_ms: 5.664
+  type: 'test'
+  ...
+# Subtest: actual cell border, fill, padding and geometry changes are detected even with identical text and runs
+ok 21 - actual cell border, fill, padding and geometry changes are detected even with identical text and runs
+  ---
+  duration_ms: 30.6777
+  type: 'test'
+  ...
+# Subtest: malformed and nonzero serializer reports cannot be interpreted as no loss
+ok 22 - malformed and nonzero serializer reports cannot be interpreted as no loss
+  ---
+  duration_ms: 10.6088
+  type: 'test'
+  ...
+# Subtest: reopened handle is freed after failed comparison and source document is untouched
+ok 23 - reopened handle is freed after failed comparison and source document is untouched
+  ---
+  duration_ms: 5.6386
+  type: 'test'
+  ...
+# Subtest: semantic first reopen rejects source aliases without freeing the live document
+ok 24 - semantic first reopen rejects source aliases without freeing the live document
+  ---
+  duration_ms: 4.227
+  type: 'test'
+  ...
+# Subtest: hwp: actual native image payload is checked without emitting image bytes
+ok 25 - hwp: actual native image payload is checked without emitting image bytes
+  ---
+  duration_ms: 10.2449
+  type: 'test'
+  ...
+# Subtest: hwpx: actual native image payload is checked without emitting image bytes
+ok 26 - hwpx: actual native image payload is checked without emitting image bytes
+  ---
+  duration_ms: 9.7115
+  type: 'test'
+  ...
+# Subtest: hwp: durable page hide and caption properties preserve their values
+not ok 27 - hwp: durable page hide and caption properties preserve their values
+  ---
+  duration_ms: 13.2558
+  type: 'test'
+  location: 'C:\\Users\\jjome\\Documents\\work\\jueony\\apps\\editor\\tests\\preservation.test.ts:159:45'
+  failureType: 'testCodeFailure'
+  error: '저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/0/text/runs/1/text: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/0/text/runs/1/text). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'PreservationError'
+  stack: |-
+    verifyPreservedExport (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/preservation.ts:249:9)
+    check (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/tests/preservation.test.ts:18:13)
+    TestContext.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/tests/preservation.test.ts:165:16)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: hwpx: durable page hide and caption properties preserve their values
+ok 28 - hwpx: durable page hide and caption properties preserve their values
+  ---
+  duration_ms: 12.0802
+  type: 'test'
+  ...
+# Subtest: a changed durable hide flag is detected even when the control still exists
+ok 29 - a changed durable hide flag is detected even when the control still exists
+  ---
+  duration_ms: 5.073
+  type: 'test'
+  ...
+# Subtest: hwp: fixture table including all cell character runs is checked
+ok 30 - hwp: fixture table including all cell character runs is checked
+  ---
+  duration_ms: 163.4688
+  type: 'test'
+  ...
+# Subtest: hwpx: fixture table including all cell character runs is checked
+ok 31 - hwpx: fixture table including all cell character runs is checked
+  ---
+  duration_ms: 15.8437
+  type: 'test'
+  ...
+# Subtest: HWPX table caption right-middle/remove/undo compares resolved wrap rather than stale raw attr bits
+ok 32 - HWPX table caption right-middle/remove/undo compares resolved wrap rather than stale raw attr bits
+  ---
+  duration_ms: 34.9125
+  type: 'test'
+  ...
+# Subtest: hwp: header text is read beyond the root control list
+ok 33 - hwp: header text is read beyond the root control list
+  ---
+  duration_ms: 9.3081
+  type: 'test'
+  ...
+# Subtest: hwpx: header text is read beyond the root control list
+ok 34 - hwpx: header text is read beyond the root control list
+  ---
+  duration_ms: 8.1435
+  type: 'test'
+  ...
+# Subtest: every preservation stage rejects a changing reopen factory source alias at call 2
+ok 35 - every preservation stage rejects a changing reopen factory source alias at call 2
+  ---
+  duration_ms: 19.7338
+  type: 'test'
+  ...
+# Subtest: every preservation stage rejects a changing reopen factory source alias at call 3
+ok 36 - every preservation stage rejects a changing reopen factory source alias at call 3
+  ---
+  duration_ms: 26.3002
+  type: 'test'
+  ...
+1..36
+# tests 36
+# suites 0
+# pass 35
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 780.633

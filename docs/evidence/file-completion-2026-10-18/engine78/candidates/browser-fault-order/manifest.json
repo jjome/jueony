@@ -1,0 +1,170 @@
+{
+  "scope": {
+    "engine": "formal77 source-de849bf3aacef6f1",
+    "frontend": "dist-file-closure-final77 frozen prior save gate; fresh78 rerun required",
+    "passedScenarios": 47,
+    "counts": {
+      "padding": 14,
+      "width": 18,
+      "equal": 15
+    },
+    "originalFailures": "Baseline measurement invoked recovery/export while intentionally poisoned; initial lifetime correction also poisoned rollback. Both failures preserved.",
+    "correction": "Capture clean baseline, arm after real mutation, poison only while original cell state has not been restored, verify poison observed then exact full rollback state. Renamed HWP preflight kept its original read-only fault path.",
+    "productionChanges": false,
+    "geometryTolerance": 0.2,
+    "noPageConsoleExternalErrors": true,
+    "excluded": [
+      "public docs",
+      "fonts",
+      "vendor WASM",
+      "app binaries"
+    ]
+  },
+  "files": [
+    {
+      "path": "agent-browser-before.log",
+      "bytes": 4733,
+      "sha256": "4f086e42465be82fceb2720d6b360120bbbf45175ff756b9dfaf552da76dd8d0"
+    },
+    {
+      "path": "equal-after-result.json.gz",
+      "bytes": 8927,
+      "sha256": "2485996aa41c7198df0e51b21ebc577d03c8d9b1f77f1d75ec49c767bf60bcd4"
+    },
+    {
+      "path": "equal-after-v2-result.json.gz",
+      "bytes": 8062,
+      "sha256": "688662608652d8c5c637d9a6863f08cfe667b62c56062b48de08dddf0452ce94"
+    },
+    {
+      "path": "equal-after-v2.log",
+      "bytes": 1545,
+      "sha256": "7fa9fbc19ab491b13d8459fd934eda4a7d7b21d989198c3b40a0eafceeac397f"
+    },
+    {
+      "path": "equal-after.log",
+      "bytes": 10506,
+      "sha256": "1a0f071ffad867ce8606b449c77f3bae908c4243b1e91736e3d1317052126b44"
+    },
+    {
+      "path": "equal-browser-before.log",
+      "bytes": 3142,
+      "sha256": "e859381f24dd92b50e8f65d2911f9ff3b8ba30a83ea2a2bb0e723bdab5ae35e3"
+    },
+    {
+      "path": "final-tests/verify-cell-padding.mjs",
+      "bytes": 29309,
+      "sha256": "67b90758d4294f37c4bcefbe2ae1aaee106821397b62d04b4b70857c182477c3"
+    },
+    {
+      "path": "final-tests/verify-column-width.mjs",
+      "bytes": 34008,
+      "sha256": "9df65a528b9dbf29607583f282e435ad33ad7bf85c6d62b00d0933e8fc6cc9f7"
+    },
+    {
+      "path": "final-tests/verify-equal-columns.mjs",
+      "bytes": 27910,
+      "sha256": "1562cad53da8215ba4a2340b588571f816eea3312e1c9e74dfd54bd54ea85046"
+    },
+    {
+      "path": "injection-lifetime-v2.json",
+      "bytes": 1018,
+      "sha256": "bdc00ba1f9427120554850a912f87f597d62b80dbe643b5aedbb65b2d009b346"
+    },
+    {
+      "path": "padding-after-result.json.gz",
+      "bytes": 8826,
+      "sha256": "f3f59431d3ccd2e820b725ca271474e418933e399f76bdbf8336af1713d552cf"
+    },
+    {
+      "path": "padding-after-v2-result.json.gz",
+      "bytes": 7973,
+      "sha256": "6776df782e8cc3d50f0ee9cd324eb6c6206bc23cb8129113a9105b374f6bf21c"
+    },
+    {
+      "path": "padding-after-v2.log",
+      "bytes": 1304,
+      "sha256": "fdce7955be5911e01a0825fbb705784ecc479c73b287baf15dec8a7ebd3d2b2e"
+    },
+    {
+      "path": "padding-after.log",
+      "bytes": 7026,
+      "sha256": "e8d6e6e41d69e8d045e4913822ecc3f50990132ded24c56564803320ac0afb7a"
+    },
+    {
+      "path": "source-changes.json",
+      "bytes": 1365,
+      "sha256": "e89a96d6778bcac2180f6c4292767df27b95fba2d89446607cba74646a08b74b"
+    },
+    {
+      "path": "verify-cell-padding-before.mjs",
+      "bytes": 27621,
+      "sha256": "4d4f4befc268dd07d11ee0f12e1d14452e47fcb86ef9bbbd0f7e8b232a6a8b53"
+    },
+    {
+      "path": "verify-cell-padding-first-lifetime-attempt.mjs",
+      "bytes": 28993,
+      "sha256": "8652eaacc84d9f8ed1a196bdaf2873a205f9c98d17f2e934cc1153404d838015"
+    },
+    {
+      "path": "verify-cell-padding-test-order.patch",
+      "bytes": 13691,
+      "sha256": "83e3926840146f8c494cca6d480b8faee655662abf78bb71fe22d8d98073a4a8"
+    },
+    {
+      "path": "verify-column-width-before.mjs",
+      "bytes": 32961,
+      "sha256": "3dc6dbf74e5351f7152f9a395676d086f79f21bec1faea74da83a8b5ff17001a"
+    },
+    {
+      "path": "verify-column-width-first-lifetime-attempt.mjs",
+      "bytes": 33848,
+      "sha256": "295cf0eacb959c0d132ab877227b4b582737320e8135e1858c7b3d0a87e66c23"
+    },
+    {
+      "path": "verify-column-width-test-order.patch",
+      "bytes": 13486,
+      "sha256": "f5df5275ef334956a545e956915faac7a186720c4ea0609143e41114650fcec9"
+    },
+    {
+      "path": "verify-equal-columns-before.mjs",
+      "bytes": 26863,
+      "sha256": "006690b44a8efe811389861b9911e000e66105b08a34d95d718cb00ef7b6a496"
+    },
+    {
+      "path": "verify-equal-columns-first-lifetime-attempt.mjs",
+      "bytes": 27750,
+      "sha256": "c4bec1ceb0d5edb3e8b28f8cdff6ebcecdba579fdaf87d0d73916bd3e255aa16"
+    },
+    {
+      "path": "verify-equal-columns-test-order.patch",
+      "bytes": 13369,
+      "sha256": "f7db24aab4c76d15f3d891b209b8828e40c708a0a58a99e6ebac8f2fd25961e4"
+    },
+    {
+      "path": "width-after-result.json.gz",
+      "bytes": 9035,
+      "sha256": "ed13a80f2687d375c29c1fe7a78fd72470bad1391bd88c8f96d5a3bcb18e925e"
+    },
+    {
+      "path": "width-after-v2-result.json.gz",
+      "bytes": 8176,
+      "sha256": "97856b6e357e33d1c07d867df0d7201d365a612beffc3515a53dc6a9d2663b32"
+    },
+    {
+      "path": "width-after-v2.log",
+      "bytes": 1818,
+      "sha256": "69b84f459b1fc9eda6724ccd5600d21991295f35817a863827c518cf0dfe244c"
+    },
+    {
+      "path": "width-after.log",
+      "bytes": 10775,
+      "sha256": "7991e63c7392907f3ff57102dfc6e4278684a88b01add16f745ce62c848887f6"
+    },
+    {
+      "path": "width-browser-before.log",
+      "bytes": 3409,
+      "sha256": "e5656d25411fa8dc2c025e57ad30fbcc6420f565e6339941f59e5e01cc2b3bd9"
+    }
+  ]
+}

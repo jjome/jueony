@@ -1,0 +1,40 @@
+{
+  "engineSourceId": "23d2545926a179a5",
+  "productionChanged": false,
+  "files": {
+    "adapter": "22ae8c5105340f9a9c81e42648a41a884bca92c231c7ab0cb3552c2e29a015b5",
+    "preservation": "0867b7715d76dea9ef70f087c40bfd229a2d0429af4248e9d43415c8a3133934"
+  },
+  "results": [
+    {
+      "name": "object-response shared mutable storage",
+      "finding": "FALSE_PASS",
+      "sourceXAtCapture": 1,
+      "reopenedX": 101,
+      "proof": {
+        "pages": 1
+      },
+      "writes": 1,
+      "limitation": "Current official WASM getters return strings. This reproduces a hole in the explicitly supported object-response contract."
+    },
+    {
+      "name": "unknown metadata coordinate-named number",
+      "finding": "UNKNOWN_FIELD_TOLERANCE",
+      "field": "text.newPublishedMetadata.x",
+      "before": 123,
+      "after": 123.1,
+      "proof": {
+        "pages": 1
+      },
+      "limitation": "This is not an existing engine field failure. The comparator promise that every future metadata number is exact is broader than its global key-name test."
+    },
+    {
+      "name": "semantic pre-gate source alias",
+      "finding": "SOURCE_HANDLE_FREED",
+      "actualEngineSource": "23d2545926a179a5",
+      "sourceFreeCalls": 1,
+      "exception": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/layout-query: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (layout-query). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+      "limitation": "Injected invalid reopen callback. Production reopen constructors allocate new handles, but the entry contract currently destroys the source before the explicit downstream alias guard can protect it."
+    }
+  ]
+}

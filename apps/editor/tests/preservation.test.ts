@@ -2,14 +2,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {deflateRawSync,inflateRawSync} from 'node:zlib';
-import init,{HwpDocument} from '@rhwp/core';
+import {resolve} from 'node:path';
+import {pathToFileURL,fileURLToPath} from 'node:url';
+import type {HwpDocument as HwpDocumentType} from '@rhwp/core';
+const enginePackage=process.env.JUEONY_ENGINE_PACKAGE?resolve(process.env.JUEONY_ENGINE_PACKAGE):fileURLToPath(new URL('../node_modules/@rhwp/core/',import.meta.url));
+const {default:init,HwpDocument}=await import(pathToFileURL(enginePackage+'/rhwp.js').href);
 import {capturePreservationEvidence,comparePreservationEvidence,PreservationError,verifyPreservedExport} from '../src/adapters/rhwp/preservation.ts';
 import {captionPatch} from '../src/adapters/rhwp/manual-commands.ts';
 
-await init({module_or_path:await readFile(new URL('../node_modules/@rhwp/core/rhwp_bg.wasm',import.meta.url))});
+await init({module_or_path:await readFile(enginePackage+'/rhwp_bg.wasm')});
 const blank=()=>{const doc=HwpDocument.createEmpty();doc.createBlankDocument();return doc;};
 const clean=(format:'hwp'|'hwpx')=>({schemaVersion:1,outputFormat:format,count:0,losses:[]});
-const check=(doc:HwpDocument,format:'hwp'|'hwpx')=>{
+const check=(doc:HwpDocumentType,format:'hwp'|'hwpx')=>{
  const artifact=format==='hwp'?doc.exportHwpWithReport():doc.exportHwpxWithReport();
  try{return verifyPreservedExport(doc,artifact.takeBytes(),format,artifact.contentLoss(),bytes=>new HwpDocument(bytes));}finally{artifact.free();}
 };
@@ -65,7 +69,7 @@ test('HWP no-hatch code zero survives HWPX canonical minus-one without hiding re
 });
 
 test('body text equality cannot conceal a lost non-first character run',()=>{
- const doc=blank();let reopened:HwpDocument|undefined;try{
+ const doc=blank();let reopened:HwpDocumentType|undefined;try{
   doc.insertText(0,0,0,'보통 굵음');doc.applyCharFormat(0,0,3,5,JSON.stringify({bold:true}));
   const before=capturePreservationEvidence(doc);reopened=new HwpDocument(doc.exportHwp());reopened.applyCharFormat(0,0,0,5,JSON.stringify({bold:false}));
   assert.equal(doc.getTextFileUnicode(),reopened.getTextFileUnicode());
@@ -84,14 +88,18 @@ test('an omitted unidentified control is blocked even when serializer reports ze
  }finally{doc.free();}
 });
 
-test('actual WASM Unknown-control HWPX omission is blocked despite a zero-loss native report',()=>{
- const original=blank();let doc:HwpDocument|undefined;
+test('actual WASM Unknown omission rejects both its real report and a forged zero report (legacy/core versus reviewed engine)',()=>{
+ const original=blank();let doc:HwpDocumentType|undefined;
  try{
   doc=new HwpDocument(withUnknownControl(original.exportHwp()));
   assert.ok(JSON.parse(doc.getControls()).some((c:{ctrlId:string})=>c.ctrlId===''));
   const artifact=doc.exportHwpxWithReport();try{
-   assert.equal(JSON.parse(artifact.contentLoss()).count,0,'reproduces pinned engine omission reporting gap');
-   assert.throws(()=>verifyPreservedExport(doc!,artifact.takeBytes(),'hwpx',artifact.contentLoss(),b=>new HwpDocument(b)),error=>{
+   const loss=JSON.parse(artifact.contentLoss()),bytes=artifact.takeBytes();
+   if(process.env.JUEONY_ENGINE_PACKAGE){assert.equal(loss.count,1);assert.deepEqual(loss.losses,[{code:'controlOmitted',subject:'control',path:'section/0/body/paragraph/0/control/1',reason:'unsupportedByOutputFormat'}]);}
+   else assert.equal(loss.count,0,'legacy pinned core still reproduces the original reporting gap');
+   // The independent semantic guard must still reject missing controls even if
+   // a producer supplies a forged zero report after native reporting is fixed.
+   for(const report of[loss,clean('hwpx')])assert.throws(()=>verifyPreservedExport(doc!,bytes,'hwpx',report,b=>new HwpDocument(b)),error=>{
     assert.ok(error instanceof PreservationError);assert.ok(error.report.issues.some(i=>i.path==='controls'));return true;
    });
   }finally{artifact.free();}
@@ -137,6 +145,7 @@ test('reopened handle is freed after failed comparison and source document is un
   assert.equal(freed,1);assert.equal(doc.getTextFileUnicode(),before);
  }finally{doc.free();}
 });
+test('semantic first reopen rejects source aliases without freeing the live document',()=>{for(const wrapped of[false,true]){const doc=blank();try{doc.insertText(0,0,0,'OWN ALIAS SOURCE');const bytes=doc.exportHwp(),text=doc.getTextFileUnicode();let frees=0;const release=doc.free.bind(doc);doc.free=()=>{frees++;};try{assert.throws(()=>verifyPreservedExport(doc,bytes,'hwp',clean('hwp'),()=>wrapped?{borrowDocumentHandle:()=>doc,free:()=>{frees++;}}:doc),PreservationError);assert.equal(frees,0);assert.equal(doc.getTextFileUnicode(),text);}finally{doc.free=release;}}finally{doc.free();}}});
 
 for(const format of ['hwp','hwpx'] as const)test(`${format}: actual native image payload is checked without emitting image bytes`,()=>{
  const doc=blank();try{
@@ -154,6 +163,41 @@ for(const format of ['hwp','hwpx'] as const)test(`${format}: durable page hide a
   doc.attachCaptionAt(created.paraIdx,created.controlIdx);
   doc.setShapeProperties(0,created.paraIdx,created.controlIdx,JSON.stringify({captionDirection:'Top',captionVertAlign:'Center',captionSpacing:850,captionWidth:8504}));
   const report=check(doc,format);assert.equal(report.status,'checked');assert.ok(report.checked.includes('objects'));
+ }finally{doc.free();}
+});
+
+for(const inline of[false,true])test(`created shape wrap owner is coherent before export (inline=${inline})`,()=>{
+ for(const [textWrap,bits]of[['Square',0],['TopAndBottom',1],['BehindText',2],['InFrontOfText',3]]as const){
+  const doc=blank();try{
+   const made=JSON.parse(doc.createShapeControl(JSON.stringify({sectionIdx:0,paraIdx:0,charOffset:0,width:9000,height:4000,treatAsChar:inline,textWrap,shapeType:'rectangle'})));
+   const raw=JSON.parse(doc.getControls()).find((c:{ctrlId:string})=>c.ctrlId==='gso');
+   assert.equal(raw.props.TextWrap,bits,`live raw wrap must match ${textWrap}`);
+   assert.equal(JSON.parse(doc.getShapeProperties(0,made.paraIdx,made.controlIdx)).textWrap,textWrap);
+   for(const format of['hwp','hwpx']as const)assert.equal(check(doc,format).status,'checked');
+  }finally{doc.free();}
+ }
+});
+
+for(const format of['hwp','hwpx']as const)test(`${format}: real Canvas session survives successful and rejected portable save proofs`,()=>{
+ const doc=blank();try{
+  doc.insertText(0,0,0,'OWN CANVAS ADVANCE ع');
+  const batch=JSON.parse(doc.collectCanvasMetricRequests(91,23));
+  assert.ok(batch.requests.length>0,'must enter the real native supplemental-metric path');
+  // Controlled measurements exercise the native session protocol; this is
+  // deliberately not a browser-font or Hancom rendering equivalence test.
+  const replies=batch.requests.map((r:{key:string;cluster:string;font:string})=>({...r,resolvedFont:r.font,measuredAdvancePx:18}));
+  doc.registerCanvasMetricReplies(91,23,batch.revision,JSON.stringify(replies));
+  doc.selectCanvasMetrics(true);assert.equal(doc.canvasMetricsActive(),true);
+  doc.selectCanvasMetrics(false);let bytes:Uint8Array;
+  try{bytes=format==='hwp'?doc.exportHwp():doc.exportHwpx();}finally{doc.selectCanvasMetrics(true);}
+  const before=doc.getPageTextLayout(0);
+  const checked=verifyPreservedExport(doc,bytes,format,clean(format),b=>new HwpDocument(b));
+  assert.equal(checked.status,'checked');assert.equal(doc.canvasMetricsActive(),true);assert.equal(doc.getPageTextLayout(0),before);
+  assert.throws(()=>verifyPreservedExport(doc,bytes,format,clean(format),b=>{
+   const r=new HwpDocument(b),read=r.getPageTextLayout.bind(r);
+   r.getPageTextLayout=p=>JSON.stringify({...JSON.parse(read(p)),injectedSaveMismatch:true});return r;
+  }),PreservationError);
+  assert.equal(doc.canvasMetricsActive(),true);assert.equal(doc.getPageTextLayout(0),before);
  }finally{doc.free();}
 });
 
@@ -206,4 +250,22 @@ for(const format of ['hwp','hwpx'] as const)test(`${format}: header text is read
   doc.createHeaderFooter(0,true,0);doc.insertTextInHeaderFooter(0,true,0,0,0,'공문 머리말');
   const report=check(doc,format);assert.equal(report.status,'checked');assert.ok(report.checked.includes('section/0/header/0'));
  }finally{doc.free();}
+});
+
+for(const aliasAt of[2,3])test(`every preservation stage rejects a changing reopen factory source alias at call ${aliasAt}`,()=>{
+ for(const wrapped of[false,true]){
+  const made=blank();let doc:HwpDocumentType|undefined;
+  try{
+   made.createTable(0,0,0,1,1);made.splitParagraph(0,0,made.getParagraphLength(0,0));made.createTable(0,1,0,1,1);made.setTableProperties(0,1,0,JSON.stringify({allowOverlap:true}));
+   doc=new HwpDocument(made.exportHwp());const live=doc,bytes=live.exportHwp(),text=live.getTextFileUnicode();
+   assert.equal(JSON.parse(live.getTableProperties(0,1,0)).allowOverlap,true,'fixture must enter the existing overlap proof');
+   const release=live.free.bind(live);let calls=0,frees=0;live.free=()=>{frees++;};
+   try{
+    assert.throws(()=>verifyPreservedExport(live,bytes,'hwp',clean('hwp'),input=>{
+     calls++;return calls===aliasAt?(wrapped?{borrowDocumentHandle:()=>live,free:()=>{frees++;}}:live):new HwpDocument(input);
+    }),PreservationError);
+    assert.equal(calls,aliasAt,'all earlier proof stages must actually succeed');assert.equal(frees,0);assert.equal(live.getTextFileUnicode(),text);
+   }finally{live.free=release;}
+  }finally{doc?.free();made.free();}
+ }
 });

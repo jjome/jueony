@@ -1,0 +1,25 @@
+PASS openai-responses: actual chat equalizes columns, comparison/undo/redo and safe save preserve remaining state
+PASS anthropic: actual chat equalizes columns, comparison/undo/redo and safe save preserve remaining state
+PASS gemini: actual chat equalizes columns, comparison/undo/redo and safe save preserve remaining state
+PASS openai-compatible: actual chat equalizes columns, comparison/undo/redo and safe save preserve remaining state
+PASS long-table post-render ownership: reject/rollback baseline or valid pages and save/reopen after fix
+PASS partial complete column band keeps first column and active cell cursor while distributing exact remainder
+PASS already equal/partial row/mixed/batch/alias/unknown inputs visibly fail without document writes
+PASS HWP/protected/merged/mixed source advertises readonly and visibly refuses
+FAIL injected live resize failure or neighbor/text/layout corruption fully rolls back dirty/history/cursor or: PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/0/text/runs/1/x: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/0/text/runs/1/x). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.
+    at  ( at CdpFrame.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/util/decorators.js:101:27), <anonymous>:0:77)
+    at #evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/cdp/ExecutionContext.js:402:19)
+    at async ExecutionContext.evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/cdp/ExecutionContext.js:288:16)
+    at async IsolatedWorld.evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/cdp/IsolatedWorld.js:104:16)
+    at async CdpFrame.evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:364:20)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-equal-columns.mjs:64:1132
+    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-equal-columns.mjs:18:124)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-equal-columns.mjs:64:2
+    at recovery (http://127.0.0.1:4361/assets/editor-D93thOdR.js:91:1513)
+    at Fm (http://127.0.0.1:4361/assets/editor-D93thOdR.js:90:42392)
+PASS delayed provider cannot overwrite newer cell content
+PASS unsaved workspace restores equal widths/capability/comparison after confirmed restart
+PASS actual UI save/reopen preserves table and text layout with document-owned metrics initialized
+PASS hidden owner: later-section long table uses global page offset, body mapping is read-only and invalid addresses still fail
+PASS hidden owner: ordinary text tail retains own line and actual keyboard insertion after long table saves/reopens
+PASS hidden owner: injected ordinary missing-page error still rolls back before receipt commit

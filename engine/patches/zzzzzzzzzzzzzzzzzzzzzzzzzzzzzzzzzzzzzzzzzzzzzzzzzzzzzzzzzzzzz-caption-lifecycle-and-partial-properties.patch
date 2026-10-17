@@ -1,0 +1,47 @@
+--- a/src/document_core/commands/object_ops/shape.rs
++++ b/src/document_core/commands/object_ops/shape.rs
+@@ -95,11 +95,13 @@
+     fn apply_shape_caption_props(shape: &mut ShapeObject, props_json: &str) -> bool {
+         use crate::document_core::helpers::{json_bool, json_i16, json_str, json_u32};
+ 
+-        let Some(has_caption) = json_bool(props_json, "hasCaption") else {
+-            return false;
+-        };
+-        if !has_caption {
+-            return Self::clear_shape_caption(shape);
++        match json_bool(props_json, "hasCaption") {
++            Some(false) => return Self::clear_shape_caption(shape),
++            Some(true) => {},
++            // Partial caption properties may update an existing caption, but
++            // only an explicit hasCaption:true command may create one.
++            None if Self::shape_caption_ref(shape).is_none() => return false,
++            None => {},
+         }
+ 
+         let default_max_width = shape.common().width;
+--- a/src/document_core/queries/hwpctrl_sets.rs
++++ b/src/document_core/queries/hwpctrl_sets.rs
+@@ -1737,6 +1737,12 @@
+         });
+         shape.common_mut().attr |= 1 << 29;
+         section.raw_stream = None;
++        // Caption AutoNumber is a live derived value, not an export-time fixup.
++        // Use the same numbering/composition lifecycle as hasCaption creation.
++        crate::parser::assign_auto_numbers(&mut self.document);
++        self.recompose_section(sec);
++        self.paginate_if_needed();
++        self.invalidate_page_tree_cache();
+         Ok(r#"{"ok":true,"pos":12}"#.to_string())
+     }
+ 
+@@ -1764,6 +1770,10 @@
+         if had {
+             shape.common_mut().attr &= !(1u32 << 29);
+             section.raw_stream = None;
++            crate::parser::assign_auto_numbers(&mut self.document);
++            self.recompose_section(sec);
++            self.paginate_if_needed();
++            self.invalidate_page_tree_cache();
+         }
+         Ok(format!("{{\"ok\":{}}}", had))
+     }

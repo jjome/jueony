@@ -1,0 +1,20 @@
+{
+  "files": [
+    {
+      "file": "apps/editor/scripts/verify-cell-padding.mjs",
+      "firstAttemptSHA": "8652eaacc84d9f8ed1a196bdaf2873a205f9c98d17f2e934cc1153404d838015",
+      "afterSHA": "67b90758d4294f37c4bcefbe2ae1aaee106821397b62d04b4b70857c182477c3"
+    },
+    {
+      "file": "apps/editor/scripts/verify-column-width.mjs",
+      "firstAttemptSHA": "295cf0eacb959c0d132ab877227b4b582737320e8135e1858c7b3d0a87e66c23",
+      "afterSHA": "9df65a528b9dbf29607583f282e435ad33ad7bf85c6d62b00d0933e8fc6cc9f7"
+    },
+    {
+      "file": "apps/editor/scripts/verify-equal-columns.mjs",
+      "firstAttemptSHA": "c4bec1ceb0d5edb3e8b28f8cdff6ebcecdba579fdaf87d0d73916bd3e255aa16",
+      "afterSHA": "1562cad53da8215ba4a2340b588571f816eea3312e1c9e74dfd54bd54ea85046"
+    }
+  ],
+  "reason": "Observation poison follows the actual changed cell state and automatically becomes inactive when snapshot rollback restores original properties. Removing the test hook is not a production rollback operation."
+}

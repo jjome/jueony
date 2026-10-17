@@ -1,0 +1,26 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/caption-closure77/source-candidate77)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 06s
+     Running tests/jueony_caption_lifecycle.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_caption_lifecycle-02a55666f2ef1999)
+
+running 8 tests
+test invalid_owner_does_not_mutate_body_or_assign_any_numbers ... ok
+test duplicate_attach_and_absent_detach_are_true_noops ... ok
+
+thread 'explicit_picture_start_is_respected_instead_of_hardcoded_one' (175487) panicked at tests/jueony_caption_lifecycle.rs:14:1074:
+strict save failed: Some(Object {"artifact": String("explicit-start-seven-1.hwp"), "cycle": Number(1), "firstDifferences": Array [Object {"after": String("그림 1  "), "before": String("그림 7  "), "path": String("$/0/text/runs/1/text")}], "format": String("hwp"), "geometryDifferences": Number(1), "metadata5Equal": Bool(true), "sourceUnchanged": Bool(true)})
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test explicit_picture_start_is_respected_instead_of_hardcoded_one ... FAILED
+test exact_parent_hide_and_caption_properties_reproduction ... ok
+test real_caption_properties_and_ellipse_preserve_layout ... ok
+test detach_renumbers_remaining_live_caption_and_reopens ... ok
+test attach_caption_assigns_one_before_any_property_or_export ... ok
+test attach_detach_snapshot_history_preserves_exact_layout ... ok
+
+failures:
+
+failures:
+    explicit_picture_start_is_respected_instead_of_hardcoded_one
+
+test result: FAILED. 7 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_caption_lifecycle`

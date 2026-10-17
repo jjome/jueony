@@ -1,0 +1,138 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/file-closure75-public-readonly/metrics-plan-candidate76-v5)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 59.57s
+     Running tests/jueony_actual11.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_actual11-fe22ee15b1047bcd)
+
+running 11 tests
+test actual_positive_offset ... ok
+test actual_two ... ok
+test actual_unicode ... ok
+test actual_positive ... ok
+test actual_plain ... ok
+test actual_superscript ... ok
+test actual_column_two ... ok
+test actual_negative ... ok
+test actual_three ... ok
+test actual_caption ... ok
+test actual_multiline ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.83s
+
+     Running tests/jueony_mcst_boundary.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_mcst_boundary-f23ac5dba16fd2d0)
+
+running 1 test
+test valid_inpage_restore_and_real_dirty_owner_match_formal76 ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.45s
+
+     Running tests/jueony_mcst_exclusions.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_mcst_exclusions-0b38567b4a7c535d)
+
+running 1 test
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=0 y=1030.8 col_bottom=1009.1 overflow=21.7px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=1 y=1058.6 col_bottom=1009.1 overflow=49.4px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=2 y=1086.3 col_bottom=1009.1 overflow=77.1px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=3 y=1114.0 col_bottom=1009.1 overflow=104.9px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=57, type=FullParagraph, first=false, y=1114.0, bottom=1009.1, overflow=104.9px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=0 y=1030.8 col_bottom=1009.1 overflow=21.7px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=1 y=1058.6 col_bottom=1009.1 overflow=49.4px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=2 y=1086.3 col_bottom=1009.1 overflow=77.1px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=3 y=1114.0 col_bottom=1009.1 overflow=104.9px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=57, type=FullParagraph, first=false, y=1114.0, bottom=1009.1, overflow=104.9px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=0 y=1030.8 col_bottom=1009.1 overflow=21.7px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=1 y=1058.6 col_bottom=1009.1 overflow=49.4px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=2 y=1086.3 col_bottom=1009.1 overflow=77.1px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=3 y=1114.0 col_bottom=1009.1 overflow=104.9px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=57, type=FullParagraph, first=false, y=1114.0, bottom=1009.1, overflow=104.9px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=0 y=1030.8 col_bottom=1009.1 overflow=21.7px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=1 y=1058.6 col_bottom=1009.1 overflow=49.4px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=2 y=1086.3 col_bottom=1009.1 overflow=77.1px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=3 y=1114.0 col_bottom=1009.1 overflow=104.9px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=57, type=FullParagraph, first=false, y=1114.0, bottom=1009.1, overflow=104.9px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=0 y=1030.8 col_bottom=1009.1 overflow=21.7px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=1 y=1058.6 col_bottom=1009.1 overflow=49.4px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=2 y=1086.3 col_bottom=1009.1 overflow=77.1px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=3 y=1114.0 col_bottom=1009.1 overflow=104.9px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=57, type=FullParagraph, first=false, y=1114.0, bottom=1009.1, overflow=104.9px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=0 y=1030.8 col_bottom=1009.1 overflow=21.7px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=1 y=1058.6 col_bottom=1009.1 overflow=49.4px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=2 y=1086.3 col_bottom=1009.1 overflow=77.1px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=3 y=1114.0 col_bottom=1009.1 overflow=104.9px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=57, type=FullParagraph, first=false, y=1114.0, bottom=1009.1, overflow=104.9px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=0 y=1030.8 col_bottom=1009.1 overflow=21.7px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=1 y=1058.6 col_bottom=1009.1 overflow=49.4px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=2 y=1086.3 col_bottom=1009.1 overflow=77.1px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=3 y=1114.0 col_bottom=1009.1 overflow=104.9px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=57, type=FullParagraph, first=false, y=1114.0, bottom=1009.1, overflow=104.9px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=0 y=1030.8 col_bottom=1009.1 overflow=21.7px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=1 y=1058.6 col_bottom=1009.1 overflow=49.4px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=2 y=1086.3 col_bottom=1009.1 overflow=77.1px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=3 y=1114.0 col_bottom=1009.1 overflow=104.9px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=57, type=FullParagraph, first=false, y=1114.0, bottom=1009.1, overflow=104.9px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=0 y=1030.8 col_bottom=1009.1 overflow=21.7px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=1 y=1058.6 col_bottom=1009.1 overflow=49.4px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=2 y=1086.3 col_bottom=1009.1 overflow=77.1px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=3 y=1114.0 col_bottom=1009.1 overflow=104.9px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=57, type=FullParagraph, first=false, y=1114.0, bottom=1009.1, overflow=104.9px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=0 y=1030.8 col_bottom=1009.1 overflow=21.7px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=1 y=1058.6 col_bottom=1009.1 overflow=49.4px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=2 y=1086.3 col_bottom=1009.1 overflow=77.1px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=3 y=1114.0 col_bottom=1009.1 overflow=104.9px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=57, type=FullParagraph, first=false, y=1114.0, bottom=1009.1, overflow=104.9px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=0 y=1030.8 col_bottom=1009.1 overflow=21.7px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=1 y=1058.6 col_bottom=1009.1 overflow=49.4px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=2 y=1086.3 col_bottom=1009.1 overflow=77.1px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=3 y=1114.0 col_bottom=1009.1 overflow=104.9px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=57, type=FullParagraph, first=false, y=1114.0, bottom=1009.1, overflow=104.9px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=0 y=1030.8 col_bottom=1009.1 overflow=21.7px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=1 y=1058.6 col_bottom=1009.1 overflow=49.4px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=2 y=1086.3 col_bottom=1009.1 overflow=77.1px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=3 y=1114.0 col_bottom=1009.1 overflow=104.9px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=57, type=FullParagraph, first=false, y=1114.0, bottom=1009.1, overflow=104.9px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=0 y=1030.8 col_bottom=1009.1 overflow=21.7px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=1 y=1058.6 col_bottom=1009.1 overflow=49.4px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=2 y=1086.3 col_bottom=1009.1 overflow=77.1px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=3 y=1114.0 col_bottom=1009.1 overflow=104.9px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=57, type=FullParagraph, first=false, y=1114.0, bottom=1009.1, overflow=104.9px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=0 y=1030.8 col_bottom=1009.1 overflow=21.7px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=1 y=1058.6 col_bottom=1009.1 overflow=49.4px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=2 y=1086.3 col_bottom=1009.1 overflow=77.1px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=57 line=3 y=1114.0 col_bottom=1009.1 overflow=104.9px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=57, type=FullParagraph, first=false, y=1114.0, bottom=1009.1, overflow=104.9px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=54 line=2 y=1030.6 col_bottom=1009.1 overflow=21.5px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=54 line=3 y=1058.3 col_bottom=1009.1 overflow=49.2px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=54, type=FullParagraph, first=false, y=1058.3, bottom=1009.1, overflow=49.2px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=55 line=0 y=1090.1 col_bottom=1009.1 overflow=80.9px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=55, type=FullParagraph, first=false, y=1090.1, bottom=1009.1, overflow=80.9px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=56 line=0 y=1121.8 col_bottom=1009.1 overflow=112.7px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=56, type=FullParagraph, first=false, y=1121.8, bottom=1009.1, overflow=112.7px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=54 line=2 y=1030.6 col_bottom=1009.1 overflow=21.5px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=54 line=3 y=1058.3 col_bottom=1009.1 overflow=49.2px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=54, type=FullParagraph, first=false, y=1058.3, bottom=1009.1, overflow=49.2px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=55 line=0 y=1090.1 col_bottom=1009.1 overflow=80.9px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=55, type=FullParagraph, first=false, y=1090.1, bottom=1009.1, overflow=80.9px
+LAYOUT_OVERFLOW_DRAW: section=0 pi=56 line=0 y=1121.8 col_bottom=1009.1 overflow=112.7px
+LAYOUT_OVERFLOW: page=4, sec=0, col=0, para=56, type=FullParagraph, first=false, y=1121.8, bottom=1009.1, overflow=112.7px
+test retained_source_origin_exclusions_match_formal76_full_geometry ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.06s
+
+     Running tests/jueony_mcst_hwpx.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_mcst_hwpx-69a3fb93e56a3afe)
+
+running 2 tests
+test mcst_actual_hwpx_sixteen_pages_and_strict_two_reopens ... ok
+test mcst_actual_hwpx_api_edit_snapshot_undo_redo ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.51s
+
+     Running tests/jueony_mcst_readonly.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_mcst_readonly-bb049691d3d34f18)
+
+running 1 test
+MCST_TRACE_BEGIN actual
+MCST_TRACE_END actual pages16
+MCST_TRACE_BEGIN explicit56
+MCST_TRACE_END explicit56 pages16
+MCST_TRACE_BEGIN converted
+MCST_TRACE_END converted pages15
+test mcst_readonly_actual_page_boundary_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.19s
+

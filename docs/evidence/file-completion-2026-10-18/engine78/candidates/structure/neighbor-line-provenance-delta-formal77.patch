@@ -1,0 +1,13 @@
+--- a/src/document_core/commands/object_ops/table.rs
++++ b/src/document_core/commands/object_ops/table.rs
+@@ -690,7 +690,9 @@
+                     baseline_distance: 850,
+                     line_spacing: 600,
+                     segment_width: content_width as i32,
+-                    tag: LineSeg::TAG_SINGLE_SEGMENT_LINE,
++                    // This freshly generated neighbor is not a saved layout anchor.
++                    // Keep the same provenance when HWPX omits synthetic LINE_SEG.
++                    tag: LineSeg::TAG_SINGLE_SEGMENT_LINE | LineSeg::TAG_IMPLEMENTATION_PROPERTY,
+                     ..Default::default()
+                 }],
+                 has_para_text: false,

@@ -1,0 +1,35 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/table-origin-closure77/source-baseline77)
+error: expected one of `)`, `,`, `.`, `?`, or an operator, found `"}"`
+  --> tests/jueony_table_origin.rs:23:82
+   |
+23 | ...eaa"}"#)....
+   |       -^^
+   |       |
+   |       expected one of `)`, `,`, `.`, `?`, or an operator
+   |       help: missing `,`
+
+error: expected one of `)`, `,`, `.`, `?`, or an operator, found `#`
+  --> tests/jueony_table_origin.rs:23:85
+   |
+23 | ..."}"#).u...
+   |       ^ expected one of `)`, `,`, `.`, `?`, or an operator
+
+error[E0061]: this method takes 4 arguments but 3 arguments were supplied
+    --> tests/jueony_table_origin.rs:19:72
+     |
+  19 | ...;d.split_paragraph_native(0,0,len).un...
+     |       ^^^^^^^^^^^^^^^^^^^^^^--------- argument #4 of type `Option<Par...issing
+     |
+note: method defined here
+    --> /mnt/c/Users/jjome/Documents/work/jueony/build/table-origin-closure77/source-baseline77/src/document_core/commands/text_editing.rs:3554:12
+     |
+3554 | ...fn spl..._native(
+     |       ^^^...^^^^^^^
+help: provide the argument
+     |
+  19 -  let len=d.document().sections[0].paragraphs[0].text.chars().count();d.split_paragraph_native(0,0,len).unwrap();
+  19 +  let len=d.document().sections[0].paragraphs[0].text.chars().count();d.split_paragraph_native(0, 0, len, /* Option<ParaMeta> */).unwrap();
+     |
+
+For more information about this error, try `rustc --explain E0061`.
+error: could not compile `rhwp` (test "jueony_table_origin") due to 3 previous errors

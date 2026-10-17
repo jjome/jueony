@@ -1,0 +1,183 @@
+{
+  "patchSHA256": "2b9ec8c1ba628c5a3eeb51b15685c47cb8fc69973aac5a060e14ea12b10ea132",
+  "sourceProof": {
+    "base": "formal77 source-de849bf3aacef6f1 plus independently frozen caption two-file delta",
+    "runtimeFileCount": 1336,
+    "unchangedRuntimeFiles": 1335,
+    "newChanges": [
+      {
+        "path": "src/renderer/typeset/table/block/entry.rs",
+        "baselineSHA256": "d7078bb46d777833c5f383dba42846b809e520cd924f50fa6759f203530587b3",
+        "candidateSHA256": "3edafad7a4f7b67631d25f86a889d6859597169e5dc94abcf44f161cc23c4244"
+      }
+    ],
+    "patchSHA256": "2b9ec8c1ba628c5a3eeb51b15685c47cb8fc69973aac5a060e14ea12b10ea132",
+    "runtimeSourceManifestSHA256": "d9a23b4f3334b7e9ff0c99fac1bb8639da2dcb285f716278460417fb65245666",
+    "scope": "Whole emitted adjacent plain grid CellBreak/RowBreak frame; no PartialTable, nested control, rowspan, clipping protection, locked, ambiguous address, zero row height or explicit vertical-offset extension. No serialized or model fields changed. Actual Hancom absolute geometry remains separate oracle."
+  },
+  "tests": [
+    {
+      "log": "native-final-origin77.log",
+      "passed": 8,
+      "ignored": 0,
+      "sha256": "e53db0547b969d9908eee35a075cf779588703df1b89fd5bc780f7b8ccd2b0af"
+    },
+    {
+      "log": "native-actual11.log",
+      "passed": 11,
+      "ignored": 0,
+      "sha256": "88341f6c6aad2762e1f632d663f6e934a45a99746aaa10741bd7e37cede2ddcd"
+    },
+    {
+      "log": "native-mcst-v5.log",
+      "passed": 2,
+      "ignored": 0,
+      "sha256": "a00437e6e58487dabdbab4bc2b4bd32e3b3904f7459f07e411f3a70ac823438e"
+    }
+  ],
+  "passedNativeTests": 21,
+  "strictFullGeometryReopens": 112,
+  "counts": {
+    "ownTablePolicyAndHistory": 20,
+    "actual11TwoSourcesTwoFormatsTwoCycles": 88,
+    "MCSTHWPXCurrentAndHistory": 4,
+    "negativeCasesUnchanged": 11,
+    "actualPartialFragmentCase": 1
+  },
+  "before": [
+    {
+      "policy": -1,
+      "geometryDifferences": 0,
+      "sourceUnchanged": true
+    },
+    {
+      "policy": 0,
+      "geometryDifferences": 0,
+      "sourceUnchanged": true
+    },
+    {
+      "policy": 1,
+      "geometryDifferences": 12,
+      "sourceUnchanged": true
+    },
+    {
+      "policy": 2,
+      "geometryDifferences": 12,
+      "sourceUnchanged": true
+    }
+  ],
+  "after": [
+    {
+      "policy": -1,
+      "geometryDifferences": 0,
+      "sourceUnchanged": true
+    },
+    {
+      "policy": 0,
+      "geometryDifferences": 0,
+      "sourceUnchanged": true
+    },
+    {
+      "policy": 1,
+      "geometryDifferences": 0,
+      "sourceUnchanged": true
+    },
+    {
+      "policy": 2,
+      "geometryDifferences": 0,
+      "sourceUnchanged": true
+    }
+  ],
+  "negativeResults": [
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "modelSame": true,
+      "name": "nested-wrapper-large-after"
+    },
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "modelSame": true,
+      "name": "previous-protected"
+    },
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "modelSame": true,
+      "name": "previous-locked"
+    },
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "modelSame": true,
+      "name": "previous-overlap"
+    },
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "modelSame": true,
+      "name": "previous-span"
+    },
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "modelSame": true,
+      "name": "previous-zero-height"
+    },
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "modelSame": true,
+      "name": "successor-overlap"
+    },
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "modelSame": true,
+      "name": "successor-positive"
+    },
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "modelSame": true,
+      "name": "successor-negative"
+    },
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "modelSame": true,
+      "name": "positive-stored-gap"
+    },
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "modelSame": true,
+      "name": "ambiguous-address"
+    }
+  ],
+  "partialResult": {
+    "fragmentCellCounts": [
+      98,
+      82
+    ],
+    "fullGeometryDifferences": [],
+    "pages": 2,
+    "sourceModelUnchanged": true,
+    "sourceSHA256": "6602d4b1d5249d0eb318c508d1f7e7a62a9f8dccf4c7bfd4d2b984ce6cf51b92"
+  },
+  "failureHistory": [
+    "native-baseline77-harness-compile-failed.log",
+    "failed-v1/native-candidate77.log",
+    "failed-v2/native-candidate77.log",
+    "native-trace77.log",
+    "native-trace77-existing-diagnostics.log"
+  ],
+  "contract": "No source/model/serializer changes. Existing None guard preserved verbatim. Only a bounded plain complete-grid whole breakable frame whose source first-line advance and actual current consumed height match the existing HeightMeasurer + table::format queries may reject a cached successor origin inside that painted frame. Numeric geometry tolerance remains0.2.",
+  "limitations": [
+    "Formal WASM/public guard/fresh browser integration still required by root.",
+    "Actual Hancom HWPX absolute first/second top157.4/218.9 versus this own live153.6/223.1 remain a separate native interpretation difference, not claimed corrected.",
+    "Nested large-after runtime negative uses default Center cell vertical alignment; controls exclusion is independent of that alignment. It does not by itself exercise the transparent Top-wrapper measurement shortcut.",
+    "No expansion of partial-table/merged/protected/explicit-offset support. Existing unsupported behavior is retained, not reported as saved successfully."
+  ]
+}

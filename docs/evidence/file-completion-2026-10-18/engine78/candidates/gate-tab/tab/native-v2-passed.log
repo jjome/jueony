@@ -1,0 +1,19 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/tab-spacing-closure77/source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 38.24s
+     Running tests/jueony_tab_spacing.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_tab_spacing-ec0030f778453239)
+
+running 5 tests
+TAB_FACTS [] text "test resolved_real_tab_payload_does_not_enter_the_new_spacing_only_reflow ... okB\t
+3" rawBefore 0
+AFTER_FACTS [] rawAfter 75 line [LineSeg { text_start: 0, vertical_pos: 4837, line_height: 1000, text_height: 1000, baseline_distance: 850, line_spacing: 600, column_start: 0, segment_width: 42520, tag: 393216 }]
+TAB_FACTS [] text "B\t3" rawBefore 0
+AFTER_FACTS [] rawAfter 283 line [LineSeg { text_start: 0, vertical_pos: 4941, line_height: 1000, text_height: 1000, baseline_distance: 850, line_spacing: 600, column_start: 0, segment_width: 42520, tag: 393216 }]
+test ordinary_spacing_noop_and_unrelated_style_do_not_gain_tab_reflow ... ok
+test tab_spacing_snapshot_undo_redo_restores_exact_live_and_saved_state ... ok
+TAB_FACTS [] text "B\t3" rawBefore 0
+AFTER_FACTS [] rawAfter 1000 line [LineSeg { text_start: 0, vertical_pos: 5300, line_height: 1000, text_height: 1000, baseline_distance: 850, line_spacing: 600, column_start: 0, segment_width: 42520, tag: 393216 }]
+test tab_spacing_after_moves_following_lines_and_preserves_both_codecs ... ok
+test tab_spacing_before_is_visible_immediately_and_preserves_both_codecs ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+

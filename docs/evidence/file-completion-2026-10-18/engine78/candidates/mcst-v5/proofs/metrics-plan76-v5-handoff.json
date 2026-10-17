@@ -1,0 +1,628 @@
+{
+  "scope": "MCST actual HWPX fit/paint consumption agreement, not all N002 completion",
+  "candidateType": "private Native only; no WASM or production promotion",
+  "sourceProof": {
+    "base": "build\\rhwp-engine\\source-23d2545926a179a5",
+    "candidate": "build\\file-closure75-public-readonly\\metrics-plan-candidate76-v5",
+    "srcFiles": 1336,
+    "unchangedFiles": 1333,
+    "changed": [
+      {
+        "path": "src/renderer/typeset/paragraph.rs",
+        "baseSHA": "fd6df6dcf1e6c7c2dc3c0757854335c633750c776d1c4feec22c71a7c3f50a7d",
+        "candidateSHA": "11221aeeb7ebe0036c1d56eaea4bd3943513c5eccf691dccf3e29cc3d4851772"
+      },
+      {
+        "path": "src/renderer/typeset/section/vpos.rs",
+        "baseSHA": "04636bb90f9c021e4dfad4ebc867a6d7927b0c95e74cdbb263a90ec3f83159c2",
+        "candidateSHA": "c6e28e78c6f7017885d3b545d852b78f36e39116e01e19098522aa853e9de313"
+      },
+      {
+        "path": "src/renderer/typeset.rs",
+        "baseSHA": "4c01ece299e66bd4b877f06d2deccf1d33fc354c775a491f008b831d862c6ea9",
+        "candidateSHA": "2018bbd17fd47461ff2aaca28c6348d57edcca97e4a82fbbfb517a2a51a068e3"
+      }
+    ],
+    "patchSHA": "1e828ab70011758f833ea59644383f6af9fa3d30400d2d220d9fd410f11f6af5",
+    "parserSerializerMetricsUnchanged": true
+  },
+  "actualInput": {
+    "file": "build/hancom-final-file-review-20261017/mcst-bid-2026-hwpx-hancom.hwpx",
+    "sha256": "20a3960b4315626c3f97d9c5d47746e3cfadd8fe50dde43a4a424aa3a2a76936",
+    "externalPageOracle": 16
+  },
+  "actualPages": 16,
+  "historicalConvertedPages": 15,
+  "actualP55to57": [
+    {
+      "displayPage": 5,
+      "paragraph": 55,
+      "charStart": 0,
+      "y": 954.0
+    },
+    {
+      "displayPage": 5,
+      "paragraph": 55,
+      "charStart": 9,
+      "y": 954.0
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 56,
+      "charStart": 0,
+      "y": 117.4
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 56,
+      "charStart": 9,
+      "y": 117.4
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 56,
+      "charStart": 21,
+      "y": 117.4
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 56,
+      "charStart": 22,
+      "y": 117.4
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 56,
+      "charStart": 32,
+      "y": 117.4
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 56,
+      "charStart": 33,
+      "y": 117.4
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 57,
+      "charStart": 0,
+      "y": 149.1
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 57,
+      "charStart": 9,
+      "y": 149.1
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 57,
+      "charStart": 39,
+      "y": 149.1
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 57,
+      "charStart": 40,
+      "y": 149.1
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 57,
+      "charStart": 46,
+      "y": 176.8
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 57,
+      "charStart": 83,
+      "y": 176.8
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 57,
+      "charStart": 84,
+      "y": 204.6
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 57,
+      "charStart": 85,
+      "y": 204.6
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 57,
+      "charStart": 86,
+      "y": 204.6
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 57,
+      "charStart": 88,
+      "y": 204.6
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 57,
+      "charStart": 89,
+      "y": 204.6
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 57,
+      "charStart": 91,
+      "y": 204.6
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 57,
+      "charStart": 93,
+      "y": 204.6
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 57,
+      "charStart": 121,
+      "y": 204.6
+    },
+    {
+      "displayPage": 6,
+      "paragraph": 57,
+      "charStart": 122,
+      "y": 232.3
+    }
+  ],
+  "publishedGeometryBetweenHistoricalConvertedAndActual": {
+    "differences": 21310,
+    "notResolved": true,
+    "pathCategories": {
+      "$.length": 1,
+      "y": 951,
+      "h": 50,
+      "runs.length": 10,
+      "1": 661,
+      "2": 698,
+      "3": 670,
+      "w": 793,
+      "5": 601,
+      "6": 563,
+      "7": 528,
+      "8": 483,
+      "9": 464,
+      "10": 445,
+      "11": 421,
+      "12": 397,
+      "13": 385,
+      "14": 370,
+      "15": 362,
+      "16": 354,
+      "17": 340,
+      "18": 328,
+      "19": 322,
+      "20": 309,
+      "21": 295,
+      "22": 285,
+      "x": 786,
+      "4": 634,
+      "charX.length": 719,
+      "text": 808,
+      "charShapeId": 621,
+      "charStart": 774,
+      "letterSpacing": 419,
+      "23": 277,
+      "24": 270,
+      "25": 260,
+      "26": 243,
+      "27": 237,
+      "28": 229,
+      "29": 219,
+      "30": 215,
+      "31": 206,
+      "32": 202,
+      "33": 198,
+      "34": 196,
+      "35": 184,
+      "36": 163,
+      "37": 156,
+      "38": 139,
+      "39": 113,
+      "40": 85,
+      "41": 56,
+      "42": 34,
+      "43": 21,
+      "paraIdx": 536,
+      "paraShapeId": 485,
+      "bold": 161,
+      "textColor": 170,
+      "44": 16,
+      "45": 11,
+      "46": 5,
+      "fontFamily": 26,
+      "fontSize": 48,
+      "secIdx": 10,
+      "103": 1,
+      "cellIdx": 39,
+      "cellParaIdx": 55,
+      "cellPath": 39,
+      "controlIdx": 39,
+      "parentParaIdx": 39,
+      "underline": 10,
+      "cellParaIndex": 16,
+      "91": 1,
+      "92": 1,
+      "77": 1,
+      "100": 2,
+      "99": 1,
+      "96": 1,
+      "97": 1,
+      "86": 1,
+      "113": 2,
+      "114": 2,
+      "115": 2,
+      "116": 1,
+      "117": 1,
+      "104": 1,
+      "105": 1,
+      "106": 1,
+      "107": 1,
+      "108": 1,
+      "109": 1,
+      "110": 1,
+      "111": 1,
+      "112": 1,
+      "controls.length": 1,
+      "0": 1,
+      "47": 1,
+      "48": 1,
+      "49": 1,
+      "50": 1,
+      "51": 1,
+      "52": 1,
+      "53": 1,
+      "54": 1,
+      "55": 1,
+      "56": 1,
+      "57": 1,
+      "58": 1,
+      "59": 1,
+      "60": 1,
+      "61": 1,
+      "62": 1,
+      "63": 1,
+      "64": 1,
+      "65": 1,
+      "66": 1,
+      "67": 1,
+      "68": 1,
+      "69": 1,
+      "70": 1,
+      "71": 1,
+      "72": 1
+    }
+  },
+  "sameFormat": {
+    "beforePages": 16,
+    "case": "actual-hwpx-only",
+    "rawSourceSHA": "45811ad6ff0ab42d36e5ba2baca030190c9ccba1a5a8a76e9bbe7a7387cd81fd",
+    "results": [
+      {
+        "artifact": "build/file-closure75-public-readonly/metrics-plan76-v5-actual-hwpx-only-1.hwpx",
+        "cycle": 1,
+        "firstDifferences": [],
+        "format": "hwpx",
+        "geometryDifferences": 0,
+        "loss": {
+          "count": 0,
+          "losses": [],
+          "outputFormat": "hwpx",
+          "schemaVersion": 1
+        },
+        "lossEmpty": true,
+        "metadataSame": true,
+        "pages": 16,
+        "passed": true,
+        "sha256": "8c4834b036e500419464b0773d519e43baf7815b9d38d9a089709d1f97ba3b52",
+        "sourceDocumentUnchanged": true
+      },
+      {
+        "artifact": "build/file-closure75-public-readonly/metrics-plan76-v5-actual-hwpx-only-2.hwpx",
+        "cycle": 2,
+        "firstDifferences": [],
+        "format": "hwpx",
+        "geometryDifferences": 0,
+        "loss": {
+          "count": 0,
+          "losses": [],
+          "outputFormat": "hwpx",
+          "schemaVersion": 1
+        },
+        "lossEmpty": true,
+        "metadataSame": true,
+        "pages": 16,
+        "passed": true,
+        "sha256": "8c4834b036e500419464b0773d519e43baf7815b9d38d9a089709d1f97ba3b52",
+        "sourceDocumentUnchanged": true
+      }
+    ]
+  },
+  "actualEditHistory": {
+    "cycles": [
+      {
+        "beforePages": 16,
+        "case": "history",
+        "rawSourceSHA": "434a465f534a052cfc17ed6e87b65c0d49a18357a140d5fe560078052f4d6224",
+        "results": [
+          {
+            "artifact": "build/file-closure75-public-readonly/metrics-plan76-v5-history-1.hwpx",
+            "cycle": 1,
+            "firstDifferences": [],
+            "format": "hwpx",
+            "geometryDifferences": 0,
+            "loss": {
+              "count": 0,
+              "losses": [],
+              "outputFormat": "hwpx",
+              "schemaVersion": 1
+            },
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 16,
+            "passed": true,
+            "sha256": "dd0260795c41ee9e7398af85a8d9f2c0f243802b0bb306b64181b47b6e8db63f",
+            "sourceDocumentUnchanged": true
+          },
+          {
+            "artifact": "build/file-closure75-public-readonly/metrics-plan76-v5-history-2.hwpx",
+            "cycle": 2,
+            "firstDifferences": [],
+            "format": "hwpx",
+            "geometryDifferences": 0,
+            "loss": {
+              "count": 0,
+              "losses": [],
+              "outputFormat": "hwpx",
+              "schemaVersion": 1
+            },
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 16,
+            "passed": true,
+            "sha256": "dd0260795c41ee9e7398af85a8d9f2c0f243802b0bb306b64181b47b6e8db63f",
+            "sourceDocumentUnchanged": true
+          }
+        ]
+      }
+    ],
+    "redoDifferences": [],
+    "undoDifferences": []
+  },
+  "sourceOwnerExclusions": [
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "matchesBaselineModel": true,
+      "mode": "missing",
+      "modelSHA": "af4c996a9a43ffe08fc047f2d43ec82ef9dddca54ac222be0fee564e648b96dd",
+      "pages": 15,
+      "passed": true,
+      "readOnly": true
+    },
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "matchesBaselineModel": true,
+      "mode": "count",
+      "modelSHA": "c6e50375c2b221646daa9ab7cb2e4f72b985d490e67a304a141c6fb859949a02",
+      "pages": 15,
+      "passed": true,
+      "readOnly": true
+    },
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "matchesBaselineModel": true,
+      "mode": "negative",
+      "modelSHA": "5d66212a8e2b58eab0cb9d9cc2c34c0127401ead5df64413c3fece96a30f029d",
+      "pages": 15,
+      "passed": true,
+      "readOnly": true
+    },
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "matchesBaselineModel": true,
+      "mode": "zero",
+      "modelSHA": "fdf9cff785485dfbcb37a061d599f87c48caba21654282c53be01ff2e9cd811e",
+      "pages": 15,
+      "passed": true,
+      "readOnly": true
+    },
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "matchesBaselineModel": true,
+      "mode": "nonmonotone",
+      "modelSHA": "ccb1294835799c8aa3265b9274370b8ca1ec9e3860db7e6ebdf6651be0739666",
+      "pages": 15,
+      "passed": true,
+      "readOnly": true
+    },
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "matchesBaselineModel": true,
+      "mode": "dirty",
+      "modelSHA": "a5cff5811ec864c10fc2de9ceac01c472928e8aac62ab7af6c232b1c6d18d7d3",
+      "pages": 15,
+      "passed": true,
+      "readOnly": true
+    },
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "matchesBaselineModel": true,
+      "mode": "cell-dirty",
+      "modelSHA": "a5cff5811ec864c10fc2de9ceac01c472928e8aac62ab7af6c232b1c6d18d7d3",
+      "pages": 15,
+      "passed": true,
+      "readOnly": true
+    },
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "matchesBaselineModel": true,
+      "mode": "synthetic",
+      "modelSHA": "f8757318021b316f52d0e4f8d0c7c3e818b8c24025c7c3643bf3ca471316eb04",
+      "pages": 16,
+      "passed": true,
+      "readOnly": true
+    },
+    {
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "matchesBaselineModel": true,
+      "mode": "control-owner",
+      "modelSHA": "964abd36bf4ca4345462ad864463f573626dab12218a97236945c7d3f6246949",
+      "pages": 15,
+      "passed": true,
+      "readOnly": true
+    }
+  ],
+  "inPageAndApiEdit": [
+    {
+      "dirtyOwner": false,
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "mode": "inpage-rebuilt-owner",
+      "modelSame": true,
+      "pages": 1,
+      "passed": true,
+      "readOnly": true
+    },
+    {
+      "dirtyOwner": false,
+      "firstDifferences": [],
+      "geometryDifferences": 0,
+      "mode": "actual-dirty-predecessor",
+      "modelSame": true,
+      "pages": 1,
+      "passed": true,
+      "readOnly": true
+    }
+  ],
+  "inPageContexts": [
+    {
+      "mode": "inpage-rebuilt-owner",
+      "pages": 1,
+      "source": [
+        [
+          1000
+        ],
+        [
+          3400
+        ],
+        [
+          5800
+        ],
+        [
+          8200
+        ],
+        [
+          10600
+        ],
+        [
+          13000
+        ]
+      ],
+      "rebuilt": [
+        [
+          1100
+        ],
+        [
+          3500
+        ],
+        [
+          5900
+        ],
+        [
+          8300
+        ],
+        [
+          10700
+        ],
+        [
+          13100
+        ]
+      ],
+      "immediateDirtyFlag": false,
+      "modelSHA": "97be39c9e0e117c27ac2f5a96560846afd4a1603afe1f76cdc27435eae03738f"
+    },
+    {
+      "mode": "actual-dirty-predecessor",
+      "pages": 1,
+      "source": [
+        [
+          1000
+        ],
+        null,
+        [
+          5800
+        ],
+        [
+          8200
+        ],
+        [
+          10600
+        ],
+        [
+          13000
+        ]
+      ],
+      "rebuilt": [
+        [
+          1100
+        ],
+        [
+          3480
+        ],
+        [
+          5860
+        ],
+        [
+          8260
+        ],
+        [
+          10660
+        ],
+        [
+          13060
+        ]
+      ],
+      "immediateDirtyFlag": false,
+      "modelSHA": "1be72b90465d35453b6c246d874650db275c2807b29e556027d19a567e977d3c"
+    }
+  ],
+  "tests": {
+    "nativeTests": 16,
+    "actualHancomPairs": 11,
+    "originalOwnerExclusions": 9,
+    "newInPageAndApiEditContrasts": 2,
+    "positiveAndHistory": 2,
+    "functionalScenarios": 24,
+    "fullGeometryReopens": 92,
+    "diagnosticFiles": 3
+  },
+  "unchangedLimitations": [
+    "MCST HWP cross-format already rejects full published geometry on formal75; serializer v3/v4 rejected and not included",
+    "Remaining historical converted-vs-Hancom layout and metadata differences remain visible; neither global N002 nor exact complete document rendering is claimed",
+    "No global glyph-width correction, source cache deletion, raw page-break rewrite, geometry tolerance relaxation, or semantic normalization"
+  ],
+  "history": [
+    "metrics76-private.patch is superseded because source/IR mismatch did not alone prove failed restoration",
+    "formal76-boundary-baseline-initial-flag-assumption-failed.log preserves incorrect harness expectation that API dirty flag survives synchronous reflow",
+    "candidate75-v1-strict-cycles.json",
+    "candidate75-v3-strict-cycles.json",
+    "candidate75-v4-strict-cycles.json"
+  ]
+}

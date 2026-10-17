@@ -1,0 +1,208 @@
+--- a/src/renderer/typeset/paragraph.rs
++++ b/src/renderer/typeset/paragraph.rs
+@@ -257,6 +257,10 @@
+         st.col_count,
+         trim_spacing_before_for_flow,
+         st.vpos_ladder_dirty
++                || source_spacing_trim_changes_next_origin(
++                    st, para_idx, para, fmt, paragraphs, styles,
++                    trim_spacing_before_for_flow, st.vpos_page_base.is_none() && st.vpos_lazy_base.is_some(), dpi,
++                )
+             || !spacing_trim_restorable(paragraphs, para_idx)
+             || next_boundary_reverts_spacing_trim(
+                 st.profile.hwpx_stored_layout() && !st.profile.hwp3_layout(),
+@@ -285,6 +289,10 @@
+             st.col_count,
+             trim_spacing_before_for_flow,
+             st.vpos_ladder_dirty
++                || source_spacing_trim_changes_next_origin(
++                    st, para_idx, para, fmt, paragraphs, styles,
++                    trim_spacing_before_for_flow, st.vpos_page_base.is_none() && st.vpos_lazy_base.is_some(), dpi,
++                )
+                 || !spacing_trim_restorable(paragraphs, para_idx)
+                 || next_boundary_reverts_spacing_trim(
+                     st.profile.hwpx_stored_layout() && !st.profile.hwp3_layout(),
+@@ -375,6 +383,10 @@
+             st.col_count,
+             trim_spacing_before_for_flow,
+             st.vpos_ladder_dirty
++                || source_spacing_trim_changes_next_origin(
++                    st, para_idx, para, fmt, paragraphs, styles,
++                    trim_spacing_before_for_flow, false, dpi,
++                )
+                 || !spacing_trim_restorable(paragraphs, para_idx)
+                 || next_boundary_reverts_spacing_trim(
+                     st.profile.hwpx_stored_layout() && !st.profile.hwp3_layout(),
+@@ -472,6 +484,10 @@
+             st.col_count,
+             trim_spacing_before_for_flow,
+             st.vpos_ladder_dirty
++                || source_spacing_trim_changes_next_origin(
++                    st, para_idx, para, fmt, paragraphs, styles,
++                    trim_spacing_before_for_flow, false, dpi,
++                )
+                 || !spacing_trim_restorable(paragraphs, para_idx)
+                 || next_boundary_reverts_spacing_trim(
+                     st.profile.hwpx_stored_layout() && !st.profile.hwp3_layout(),
+@@ -488,6 +504,10 @@
+                 st.col_count,
+                 trim_spacing_before_for_flow,
+                 st.vpos_ladder_dirty
++                || source_spacing_trim_changes_next_origin(
++                    st, para_idx, para, fmt, paragraphs, styles,
++                    trim_spacing_before_for_flow, false, dpi,
++                )
+                     || !spacing_trim_restorable(paragraphs, para_idx)
+                     || next_boundary_reverts_spacing_trim(
+                         st.profile.hwpx_stored_layout() && !st.profile.hwp3_layout(),
+@@ -960,3 +980,57 @@
+     }
+     true
+ }
++
++/// A changed source-vpos snapshot identifies a reconstructed ordinary body, but
++/// is not itself a failed snap. Compare the actual HeightCursor decisions at
++/// trimmed and full consumption; retain trimming only if both reach exactly
++/// the same position and the same future page/lazy origin.
++#[allow(clippy::too_many_arguments)]
++pub(super) fn source_spacing_trim_changes_next_origin(
++    st: &TypesetState, para_idx: usize, para: &Paragraph, fmt: &FormattedParagraph,
++    paragraphs: &[Paragraph], styles: &ResolvedStyleSet,
++    trim_before: bool, lazy_base: bool, dpi: f64,
++) -> bool {
++    if st.col_count != 1 || !st.profile.hwpx_stored_layout()
++        || st.profile.session_edited() || para.stored_text_partition_is_dirty()
++        || para.cell_format_vpos_dirty || !para.controls.is_empty()
++        || !para.field_ranges.is_empty() || !para.orphan_field_ends.is_empty()
++        || para.text.contains('\t')
++    { return false; }
++    let Some(source) = para.source_line_seg_vertical_pos.as_ref() else { return false; };
++    if source.len() != para.line_segs.len() || source.is_empty()
++        || !source.iter().any(|&v| v > 0) || source.iter().any(|&v| v < 0)
++        || source.windows(2).any(|w| w[1] < w[0])
++        || para.line_segs.iter().any(is_synthetic_line_seg)
++        || source.iter().zip(&para.line_segs).all(|(&v, line)| v == line.vertical_pos)
++    { return false; }
++    let Some(next) = paragraphs.get(para_idx + 1) else { return false; };
++    if !next.controls.is_empty() || !next.field_ranges.is_empty()
++        || !next.orphan_field_ends.is_empty() || next.stored_text_partition_is_dirty()
++        || next.cell_format_vpos_dirty || next.line_segs.is_empty()
++        || next.line_segs.iter().any(is_synthetic_line_seg)
++    { return false; }
++    // The existing uniform-filler cursor is a whole-section predicate. A local
++    // multi-row paragraph disproves its necessary one-row condition without
++    // rescanning an arbitrarily large section for every body paragraph.
++    let local_nonuniform = paragraphs.len() < 8
++        || paragraphs[para_idx.saturating_sub(1)..(para_idx + 2).min(paragraphs.len())]
++            .iter().any(|p| p.line_segs.len() != 1);
++    if !local_nonuniform { return false; }
++    let trimmed = fmt.flow_advance_height(para, 1, trim_before, false, lazy_base);
++    if trimmed >= fmt.total_height { return false; }
++    let mut a = super::shared_body_height_cursor(st, dpi, false, st.profile.session_edited());
++    a.prev_layout_para = Some(para_idx);
++    a.prev_item_was_partial_table = false;
++    a.trimmed_prev_spacing_before_px = if st.profile.hwp5_stored_pagination_layout() {
++        fmt.flow_trimmed_spacing_before(para, 1, trim_before, false, lazy_base)
++    } else { 0.0 };
++    let mut b = super::shared_body_height_cursor(st, dpi, false, st.profile.session_edited());
++    b.prev_layout_para = Some(para_idx);
++    b.prev_item_was_partial_table = false;
++    b.trimmed_prev_spacing_before_px = 0.0;
++    let from_trim = a.vpos_adjust(st.current_height + trimmed, para_idx + 1, paragraphs, styles);
++    let from_full = b.vpos_adjust(st.current_height + fmt.total_height, para_idx + 1, paragraphs, styles);
++    from_trim != from_full || a.vpos_page_base != b.vpos_page_base
++        || a.vpos_lazy_base != b.vpos_lazy_base
++}
+--- a/src/renderer/typeset/section/vpos.rs
++++ b/src/renderer/typeset/section/vpos.rs
+@@ -1,6 +1,6 @@
+ //! 구역 vpos 책임. 기존 조건과 호출 순서를 보존한다.
+ use crate::renderer::typeset::{
+-    stored_ladder_encodes_spacing_before, HeightCursor, Paragraph, ResolvedStyleSet, TypesetEngine,
++    stored_ladder_encodes_spacing_before, Paragraph, ResolvedStyleSet, TypesetEngine,
+     TypesetState,
+ };
+ impl TypesetEngine {
+@@ -61,31 +61,9 @@
+             );
+             st.record_vpos_ladder_validity(false);
+         }
+-        let mut hc = HeightCursor {
+-            dpi: self.dpi,
+-            col_area_y: 0.0,
+-            col_area_height: st.base_available_height(),
+-            col_anchor_y: st.vpos_col_anchor,
+-            vpos_page_base: st.vpos_page_base,
+-            vpos_lazy_base: st.vpos_lazy_base,
+-            stored_column_origin: st.vpos_page_base.map(|base| (base, st.vpos_col_anchor)),
+-            prev_layout_para: st.vpos_prev_layout_para,
+-            prev_item_was_partial_table: st.vpos_prev_partial_table,
+-            skip_spacing_before_prededuct: st.skip_spacing_before_prededuct,
+-            trimmed_prev_spacing_before_px: st.vpos_prev_trimmed_sb_px,
+-            allow_vpos_rewind: false,
+-            allow_start_height_backtrack: false,
+-            suppress_large_forward_jump: false,
+-            suppress_hwpx_stale_forward: st.profile.hwpx_stored_layout(),
+-            uniform_filler_ladder: self.uniform_filler_ladder.get(),
+-            endnote_between_notes_hu: 0,
+-            prev_item_content_bottom_y: None,
+-            prev_item_flow_line_bottom_y: None,
+-            last_compacted_endnote_title_gap: false,
+-            min_flow_floor: f64::MIN,
+-            session_edited: self.profile.get().session_edited(),
+-            curr_item_is_table_fragment: false,
+-        };
++        let mut hc = crate::renderer::typeset::shared_body_height_cursor(
++            st, self.dpi, self.uniform_filler_ladder.get(), self.profile.get().session_edited(),
++        );
+         let semantic_successor = crate::renderer::float_placement::native_whole_stack_owns_successor(
+             st.profile.hwp5_stored_pagination_layout(), st.col_count == 1, &st.current_items, para_idx, paragraphs);
+         let mut y = if semantic_successor {
+--- a/src/renderer/typeset.rs
++++ b/src/renderer/typeset.rs
+@@ -5559,6 +5559,9 @@
+                 st.col_count,
+                 trim_sb,
+                 st.vpos_ladder_dirty
++                    || paragraph::source_spacing_trim_changes_next_origin(
++                        st, next_idx, next, &fmt_n, paragraphs_all, styles, trim_sb, false, self.dpi,
++                    )
+                     || !spacing_trim_restorable(paragraphs_all, next_idx)
+                     || next_boundary_reverts_spacing_trim(
+                         st.profile.hwpx_stored_layout() && !st.profile.hwp3_layout(),
+@@ -8318,3 +8321,35 @@
+         );
+     }
+ }
++
++// Keep the fit cursor and spacing-restoration proof on the same policy inputs.
++fn shared_body_height_cursor(
++    st: &TypesetState, dpi: f64, uniform_filler_ladder: bool, session_edited: bool,
++) -> HeightCursor {
++    HeightCursor {
++            dpi: dpi,
++            col_area_y: 0.0,
++            col_area_height: st.base_available_height(),
++            col_anchor_y: st.vpos_col_anchor,
++            vpos_page_base: st.vpos_page_base,
++            vpos_lazy_base: st.vpos_lazy_base,
++            stored_column_origin: st.vpos_page_base.map(|base| (base, st.vpos_col_anchor)),
++            prev_layout_para: st.vpos_prev_layout_para,
++            prev_item_was_partial_table: st.vpos_prev_partial_table,
++            skip_spacing_before_prededuct: st.skip_spacing_before_prededuct,
++            trimmed_prev_spacing_before_px: st.vpos_prev_trimmed_sb_px,
++            allow_vpos_rewind: false,
++            allow_start_height_backtrack: false,
++            suppress_large_forward_jump: false,
++            suppress_hwpx_stale_forward: st.profile.hwpx_stored_layout(),
++            uniform_filler_ladder: uniform_filler_ladder,
++            endnote_between_notes_hu: 0,
++            prev_item_content_bottom_y: None,
++            prev_item_flow_line_bottom_y: None,
++            last_compacted_endnote_title_gap: false,
++            min_flow_floor: f64::MIN,
++            session_edited: session_edited,
++            curr_item_is_table_fragment: false,
++
++    }
++}

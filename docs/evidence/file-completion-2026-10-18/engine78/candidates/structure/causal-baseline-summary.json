@@ -1,0 +1,123 @@
+{
+  "status": "BASELINE_FAIL_CAUSAL_PROOF",
+  "originalFullScenario": [
+    {
+      "format": "hwp",
+      "differences": []
+    },
+    {
+      "format": "hwpx",
+      "differences": [
+        {
+          "after": 178.2,
+          "before": 174.9,
+          "path": "/2/text/runs/4/y"
+        },
+        {
+          "after": 199.6,
+          "before": 196.3,
+          "path": "/2/text/runs/5/y"
+        },
+        {
+          "after": 220.9,
+          "before": 217.6,
+          "path": "/2/text/runs/6/y"
+        }
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "mode": "source-cache-reset",
+      "sourceDifferences": 0,
+      "reopenedDifferences": 3
+    },
+    {
+      "mode": "loaded-cache-reset",
+      "sourceDifferences": 3,
+      "reopenedDifferences": 0
+    },
+    {
+      "mode": "source-vpos-current",
+      "sourceDifferences": 0,
+      "reopenedDifferences": 3
+    },
+    {
+      "mode": "loaded-vpos-current",
+      "sourceDifferences": 3,
+      "reopenedDifferences": 0
+    },
+    {
+      "mode": "source-clear-snapshots",
+      "sourceDifferences": 0,
+      "reopenedDifferences": 3
+    },
+    {
+      "mode": "loaded-clear-snapshots",
+      "sourceDifferences": 3,
+      "reopenedDifferences": 0
+    },
+    {
+      "mode": "loaded-clear-host-lines",
+      "sourceDifferences": 3,
+      "reopenedDifferences": 0
+    },
+    {
+      "mode": "loaded-clear-tail-lines",
+      "sourceDifferences": 3,
+      "reopenedDifferences": 0
+    },
+    {
+      "mode": "source-clear-p0-lines",
+      "sourceDifferences": 3,
+      "reopenedDifferences": 0
+    },
+    {
+      "mode": "loaded-restore-p0-lines",
+      "sourceDifferences": 0,
+      "reopenedDifferences": 3
+    },
+    {
+      "mode": "loaded-restore-rawCtrl",
+      "sourceDifferences": 3,
+      "reopenedDifferences": 0
+    },
+    {
+      "mode": "source-clear-rawCtrl",
+      "sourceDifferences": 0,
+      "reopenedDifferences": 3
+    },
+    {
+      "mode": "loaded-restore-rawTableAttr",
+      "sourceDifferences": 3,
+      "reopenedDifferences": 0
+    },
+    {
+      "mode": "source-force-rawTableAttr",
+      "sourceDifferences": 0,
+      "reopenedDifferences": 3
+    },
+    {
+      "mode": "loaded-replace-p0-model",
+      "sourceDifferences": 0,
+      "reopenedDifferences": 3
+    },
+    {
+      "mode": "source-replace-p0-model",
+      "sourceDifferences": 3,
+      "reopenedDifferences": 0
+    },
+    {
+      "mode": "loaded-replace-table-model",
+      "sourceDifferences": 3,
+      "reopenedDifferences": 0
+    },
+    {
+      "mode": "source-replace-table-model",
+      "sourceDifferences": 0,
+      "reopenedDifferences": 3
+    }
+  ],
+  "conclusion": "Only source section2 p0 synthetic LINE_SEG presence changes the successor three y coordinates. Cache reset, source-vpos, raw table attrs/ctrl data and table model replacement do not. Candidate not yet validated.",
+  "baselineRawSha256": "5b80140ef7bdc40bfc3117a694ef377d124f4eefd5d0e93120bf1dc7b7478f65"
+}

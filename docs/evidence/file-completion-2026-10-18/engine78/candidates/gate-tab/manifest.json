@@ -1,0 +1,465 @@
+{
+  "schemaVersion": 1,
+  "scope": "Intermediate official76/77 gate and failed/passing private tab v2. Final78 not run. No public/derived binary, full document snapshot, font or engine payload.",
+  "files": [
+    {
+      "path": "source/document-save-layout.ts",
+      "source": "apps/editor/src/adapters/rhwp/document-save-layout.ts",
+      "compression": "none",
+      "rawBytes": 7137,
+      "rawSHA256": "6c1d119f4723698e9e3769d4fb45c7b38469b6f0bca6f4c575688f3b38638434",
+      "storedBytes": 7137,
+      "storedSHA256": "6c1d119f4723698e9e3769d4fb45c7b38469b6f0bca6f4c575688f3b38638434"
+    },
+    {
+      "path": "source/preservation.ts",
+      "source": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "compression": "none",
+      "rawBytes": 21302,
+      "rawSHA256": "65a424675905ea8b09f4722e110101910a0327c6f68d19714e6093996cee8b5b",
+      "storedBytes": 21302,
+      "storedSHA256": "65a424675905ea8b09f4722e110101910a0327c6f68d19714e6093996cee8b5b"
+    },
+    {
+      "path": "source/document-save-layout.test.ts",
+      "source": "apps/editor/tests/document-save-layout.test.ts",
+      "compression": "none",
+      "rawBytes": 7229,
+      "rawSHA256": "9ea7204d31e2e065c4de3d8f6b744ce295c656eafa7b517d158a7dab81b8bfae",
+      "storedBytes": 7229,
+      "storedSHA256": "9ea7204d31e2e065c4de3d8f6b744ce295c656eafa7b517d158a7dab81b8bfae"
+    },
+    {
+      "path": "source/preservation.test.ts",
+      "source": "apps/editor/tests/preservation.test.ts",
+      "compression": "none",
+      "rawBytes": 17494,
+      "rawSHA256": "41464f93ad7ee5f8b5af19abb6754ac124e2cb84a531f6d407580263985425fd",
+      "storedBytes": 17494,
+      "storedSHA256": "41464f93ad7ee5f8b5af19abb6754ac124e2cb84a531f6d407580263985425fd"
+    },
+    {
+      "path": "source/paragraph-sort.test.ts",
+      "source": "apps/editor/tests/paragraph-sort.test.ts",
+      "compression": "none",
+      "rawBytes": 4829,
+      "rawSHA256": "b9e15ef8cca8a699b4718de48fbaa36526969e274457c1e9a7c48a063aa6d41b",
+      "storedBytes": 4829,
+      "storedSHA256": "b9e15ef8cca8a699b4718de48fbaa36526969e274457c1e9a7c48a063aa6d41b"
+    },
+    {
+      "path": "reproduce/verify-document-save-layout-engine.mjs",
+      "source": "apps/editor/scripts/verify-document-save-layout-engine.mjs",
+      "compression": "none",
+      "rawBytes": 5415,
+      "rawSHA256": "faefb7aa0d70b310e42efea31686efe3b9ee94a57a9cda6dae934d618878431a",
+      "storedBytes": 5415,
+      "storedSHA256": "faefb7aa0d70b310e42efea31686efe3b9ee94a57a9cda6dae934d618878431a"
+    },
+    {
+      "path": "reproduce/verify-mcst-flow-spacing-engine.mjs",
+      "source": "apps/editor/scripts/verify-mcst-flow-spacing-engine.mjs",
+      "compression": "none",
+      "rawBytes": 7456,
+      "rawSHA256": "6a14af5afbe818404e8cfbfe93c5cd30420d6e49f65b018be31aafe5118e0a0e",
+      "storedBytes": 7456,
+      "storedSHA256": "6a14af5afbe818404e8cfbfe93c5cd30420d6e49f65b018be31aafe5118e0a0e"
+    },
+    {
+      "path": "reproduce/verify-tab-spacing-storage-engine.mjs",
+      "source": "apps/editor/scripts/verify-tab-spacing-storage-engine.mjs",
+      "compression": "none",
+      "rawBytes": 4294,
+      "rawSHA256": "832581e1db91a18d77373c22c3f9094ce926fd69007a33ba8eb957f7c10a6525",
+      "storedBytes": 4294,
+      "storedSHA256": "832581e1db91a18d77373c22c3f9094ce926fd69007a33ba8eb957f7c10a6525"
+    },
+    {
+      "path": "reproduce/hancom-review.mjs",
+      "source": "apps/editor/scripts/lib/hancom-review.mjs",
+      "compression": "none",
+      "rawBytes": 4818,
+      "rawSHA256": "bf8e4d30b7b232ce4abcc348165e97ebed214cb7bf60a5e14ccf8759413d88bd",
+      "storedBytes": 4818,
+      "storedSHA256": "bf8e4d30b7b232ce4abcc348165e97ebed214cb7bf60a5e14ccf8759413d88bd"
+    },
+    {
+      "path": "review/initial-review-findings.json",
+      "source": "build/save-gate-review76/review-findings.json",
+      "compression": "none",
+      "rawBytes": 1776,
+      "rawSHA256": "959c18198b6d1288f566835196d37da52d7a6d5f8a8a061ecdb0886b3562d547",
+      "storedBytes": 1776,
+      "storedSHA256": "959c18198b6d1288f566835196d37da52d7a6d5f8a8a061ecdb0886b3562d547"
+    },
+    {
+      "path": "review/fixed-review.json",
+      "source": "build/save-gate-review76/fixed-review/result.json",
+      "compression": "none",
+      "rawBytes": 741,
+      "rawSHA256": "be8216cec5024b3d3f92fcf518dc4928ed17f2c1f40ae85f67b17ba1f9923f21",
+      "storedBytes": 741,
+      "storedSHA256": "be8216cec5024b3d3f92fcf518dc4928ed17f2c1f40ae85f67b17ba1f9923f21"
+    },
+    {
+      "path": "review/reproduce-initial.mjs",
+      "source": "build/save-gate-review76/reproduce-review.mjs",
+      "compression": "none",
+      "rawBytes": 3493,
+      "rawSHA256": "0ecd390aee4223560f365c0605a441eff58ee04f27b4262f30d9c033304b1506",
+      "storedBytes": 3493,
+      "storedSHA256": "0ecd390aee4223560f365c0605a441eff58ee04f27b4262f30d9c033304b1506"
+    },
+    {
+      "path": "review/reproduce-fixed.mjs",
+      "source": "build/save-gate-review76/recheck-fixed.mjs",
+      "compression": "none",
+      "rawBytes": 2788,
+      "rawSHA256": "bfbef5c6ccd3ffdb778272c192fa61112c699152ec607e4b5317595fedef7c9c",
+      "storedBytes": 2788,
+      "storedSHA256": "bfbef5c6ccd3ffdb778272c192fa61112c699152ec607e4b5317595fedef7c9c"
+    },
+    {
+      "path": "native/gate76-first.json",
+      "source": "build/document-save-layout-native76-first/result.json",
+      "compression": "none",
+      "rawBytes": 17968,
+      "rawSHA256": "611400786bd6dd8849efc11aef12108b32d0081b51034ce6c161f1fd82f85042",
+      "storedBytes": 17968,
+      "storedSHA256": "611400786bd6dd8849efc11aef12108b32d0081b51034ce6c161f1fd82f85042"
+    },
+    {
+      "path": "native/gate77-initial.json",
+      "source": "build/document-save-layout-native77/result.json",
+      "compression": "none",
+      "rawBytes": 18166,
+      "rawSHA256": "de5d27a0ad87d6760c26e991c9a22e30eca30b74f782d216326aed82ff024bd1",
+      "storedBytes": 18166,
+      "storedSHA256": "de5d27a0ad87d6760c26e991c9a22e30eca30b74f782d216326aed82ff024bd1"
+    },
+    {
+      "path": "native/gate77-reviewed.json",
+      "source": "build/document-save-layout-reviewed-native77/result.json",
+      "compression": "none",
+      "rawBytes": 18166,
+      "rawSHA256": "eb00cfbdf6cb1433b9c8db9f959008ffe2fb1e4ddc8b71f49331c5b63997302e",
+      "storedBytes": 18166,
+      "storedSHA256": "eb00cfbdf6cb1433b9c8db9f959008ffe2fb1e4ddc8b71f49331c5b63997302e"
+    },
+    {
+      "path": "native/mcst76-original-baseline.json.gz",
+      "source": "build/file-closure75-public-readonly/formal76-wasm-verifier-baseline/result.json",
+      "compression": "gzip",
+      "rawBytes": 275637,
+      "rawSHA256": "90f8cb100c1d9358c9a76a8bbc8164319a4b2810eab02d4913693e3720a342b8",
+      "storedBytes": 12303,
+      "storedSHA256": "848a2b2e83090a36aa271882d9ef6a1cc7a73fdff201d5506db70cf178fb7006"
+    },
+    {
+      "path": "native/mcst77-initial.json.gz",
+      "source": "build/document-save-layout-mcst77/result.json",
+      "compression": "gzip",
+      "rawBytes": 320185,
+      "rawSHA256": "c613e96ed91487ffa352f897bac1e8a933df8e5d966ee69faa8839be85b61c3c",
+      "storedBytes": 13307,
+      "storedSHA256": "37dd2f216460148aaea6fd1524882b75de4d3038e28d3d3fb9abfe27ddeca4e6"
+    },
+    {
+      "path": "native/mcst77-reviewed.json.gz",
+      "source": "build/document-save-layout-reviewed-mcst77/result.json",
+      "compression": "gzip",
+      "rawBytes": 320185,
+      "rawSHA256": "c613e96ed91487ffa352f897bac1e8a933df8e5d966ee69faa8839be85b61c3c",
+      "storedBytes": 13307,
+      "storedSHA256": "37dd2f216460148aaea6fd1524882b75de4d3038e28d3d3fb9abfe27ddeca4e6"
+    },
+    {
+      "path": "unit/initial920.log.gz",
+      "source": "build/document-save-layout-unit920-initial.log",
+      "compression": "gzip",
+      "rawBytes": 219732,
+      "rawSHA256": "49308571ad3e5967c6d94eeaa695606400792be44c915a10e8974c054c771b53",
+      "storedBytes": 42339,
+      "storedSHA256": "85a631685e1ffeb5658035ce1cfbacf23fd1ab7612a49d50be2002ead5138398"
+    },
+    {
+      "path": "unit/formal77-921.log.gz",
+      "source": "build/document-save-layout-unit921-formal77.log",
+      "compression": "gzip",
+      "rawBytes": 220847,
+      "rawSHA256": "c552c645e64f7e8b056a0157f6aa74b658893da0c6f949710a397418ab2cd502",
+      "storedBytes": 42524,
+      "storedSHA256": "b6bf074258e8d21d6f29a768f3b5735e5e8ebb75eddc8dedc84969d2aad6ccc8"
+    },
+    {
+      "path": "unit/reviewed36.log",
+      "source": "build/document-save-layout-reviewed-stage-unit77.log",
+      "compression": "none",
+      "rawBytes": 9911,
+      "rawSHA256": "93171f02ec1e661c3589f5a252283dcba39ebfbaea2c26f06bd5b15559b9589c",
+      "storedBytes": 9911,
+      "storedSHA256": "93171f02ec1e661c3589f5a252283dcba39ebfbaea2c26f06bd5b15559b9589c"
+    },
+    {
+      "path": "unit/reviewed34.log",
+      "source": "build/document-save-layout-reviewed-unit77.log",
+      "compression": "none",
+      "rawBytes": 9436,
+      "rawSHA256": "cf977a7fccdde5131e6226cbf7bc36a7521867784dc8e426166c9a80d5d45f56",
+      "storedBytes": 9436,
+      "storedSHA256": "cf977a7fccdde5131e6226cbf7bc36a7521867784dc8e426166c9a80d5d45f56"
+    },
+    {
+      "path": "unit/gate10.log",
+      "source": "build/document-save-layout-unit-first.log",
+      "compression": "none",
+      "rawBytes": 2653,
+      "rawSHA256": "132738a2c701cc824d43535002db5923da8cb8ace60ce7d652ab34a429d0912e",
+      "storedBytes": 2653,
+      "storedSHA256": "132738a2c701cc824d43535002db5923da8cb8ace60ce7d652ab34a429d0912e"
+    },
+    {
+      "path": "unit/gate11.log",
+      "source": "build/document-save-layout-unit-v2.log",
+      "compression": "none",
+      "rawBytes": 2920,
+      "rawSHA256": "c3d2550a09ba60e47cbc547927afed90e24c20320401baf7d550f36dc3c228c1",
+      "storedBytes": 2920,
+      "storedSHA256": "c3d2550a09ba60e47cbc547927afed90e24c20320401baf7d550f36dc3c228c1"
+    },
+    {
+      "path": "unit/stage-alias-first-fixture-failure.log",
+      "source": "build/document-save-layout-stage-alias77-real.log",
+      "compression": "none",
+      "rawBytes": 2190,
+      "rawSHA256": "9552c2a41af75fddfd9902bebd9ff94575d521a02f94cd8bfa77ee218fe3caf3",
+      "storedBytes": 2190,
+      "storedSHA256": "9552c2a41af75fddfd9902bebd9ff94575d521a02f94cd8bfa77ee218fe3caf3"
+    },
+    {
+      "path": "unit/stage-alias2-pass.log",
+      "source": "build/document-save-layout-stage-alias77-v2.log",
+      "compression": "none",
+      "rawBytes": 603,
+      "rawSHA256": "be061c7a14b3aa194477ef76bba6bb5d5ea787f5dfcbd4b9d5206fa5cb605020",
+      "storedBytes": 603,
+      "storedSHA256": "be061c7a14b3aa194477ef76bba6bb5d5ea787f5dfcbd4b9d5206fa5cb605020"
+    },
+    {
+      "path": "typecheck/initial-failure.log",
+      "source": "build/document-save-layout-first-ts.log",
+      "compression": "none",
+      "rawBytes": 3018,
+      "rawSHA256": "4ec0d5fa36be8599f6d04970ab60faa3921c3a4d3ad22bdb09a91abbcbca7917",
+      "storedBytes": 3018,
+      "storedSHA256": "4ec0d5fa36be8599f6d04970ab60faa3921c3a4d3ad22bdb09a91abbcbca7917"
+    },
+    {
+      "path": "typecheck/reviewed-pass.log",
+      "source": "build/document-save-layout-reviewed-stage-ts.log",
+      "compression": "none",
+      "rawBytes": 0,
+      "rawSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedBytes": 0,
+      "storedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "diagnostic/spacing-matrix77.json",
+      "source": "build/document-save-layout-spacing-matrix77.json",
+      "compression": "none",
+      "rawBytes": 5602,
+      "rawSHA256": "6422a0ad01abbe377ed2e97be72d02d85804aeb82c375db36bca42e0b9d6bdfa",
+      "storedBytes": 5602,
+      "storedSHA256": "6422a0ad01abbe377ed2e97be72d02d85804aeb82c375db36bca42e0b9d6bdfa"
+    },
+    {
+      "path": "diagnostic/spacing-matrix77.mjs",
+      "source": "build/document-save-layout-spacing-matrix77.mjs",
+      "compression": "none",
+      "rawBytes": 1658,
+      "rawSHA256": "1157b5d57cc8dbd581e852bdeeead1202029904c1db4e21a5f3fea1227b01e62",
+      "storedBytes": 1658,
+      "storedSHA256": "1157b5d57cc8dbd581e852bdeeead1202029904c1db4e21a5f3fea1227b01e62"
+    },
+    {
+      "path": "diagnostic/tableY77.json",
+      "source": "build/document-save-layout-table-diagnostic77/result.json",
+      "compression": "none",
+      "rawBytes": 5082,
+      "rawSHA256": "30965608ca533774deda1b660e1045b93fd36ef492a88fad1b2c57be20807b5a",
+      "storedBytes": 5082,
+      "storedSHA256": "30965608ca533774deda1b660e1045b93fd36ef492a88fad1b2c57be20807b5a"
+    },
+    {
+      "path": "diagnostic/structureY77.json",
+      "source": "build/document-save-layout-structure-diagnostic77/result.json",
+      "compression": "none",
+      "rawBytes": 1854,
+      "rawSHA256": "4a754358c74f5bba8a326112fca6eec4b72fe9ea2aeed9a53a33fa120c563584",
+      "storedBytes": 1854,
+      "storedSHA256": "4a754358c74f5bba8a326112fca6eec4b72fe9ea2aeed9a53a33fa120c563584"
+    },
+    {
+      "path": "diagnostic/caption76.json",
+      "source": "build/document-save-layout-caption76.json",
+      "compression": "none",
+      "rawBytes": 4509,
+      "rawSHA256": "4e3c2392619fa02633cc10f354f1cb6e64a95c85e141739e33bbe972c8355b70",
+      "storedBytes": 4509,
+      "storedSHA256": "4e3c2392619fa02633cc10f354f1cb6e64a95c85e141739e33bbe972c8355b70"
+    },
+    {
+      "path": "diagnostic/sort76-failure.log",
+      "source": "build/document-save-layout-sort76.log",
+      "compression": "none",
+      "rawBytes": 2189,
+      "rawSHA256": "3d46c060f9561465cc3fbb8fb8878516427eb140a7514da46f289d4c26619e24",
+      "storedBytes": 2189,
+      "storedSHA256": "3d46c060f9561465cc3fbb8fb8878516427eb140a7514da46f289d4c26619e24"
+    },
+    {
+      "path": "tab/patch-v1-failed.patch",
+      "source": "build/tab-spacing-closure77/tab-spacing-lifecycle.patch",
+      "compression": "none",
+      "rawBytes": 1790,
+      "rawSHA256": "12b20ea7c7f092cbb7235c56afb1887ae2e0a987bb4a7cecfbf46cd8ef6e922e",
+      "storedBytes": 1790,
+      "storedSHA256": "12b20ea7c7f092cbb7235c56afb1887ae2e0a987bb4a7cecfbf46cd8ef6e922e"
+    },
+    {
+      "path": "tab/patch-v2-native-passed.patch",
+      "source": "build/tab-spacing-closure77/tab-spacing-boundary-v2.patch",
+      "compression": "none",
+      "rawBytes": 2366,
+      "rawSHA256": "b9e980825c6e772149c9170203da78f183d762537d784f8f6757f253de911da6",
+      "storedBytes": 2366,
+      "storedSHA256": "b9e980825c6e772149c9170203da78f183d762537d784f8f6757f253de911da6"
+    },
+    {
+      "path": "tab/source-proof-v1.json",
+      "source": "build/tab-spacing-closure77/source-proof.json",
+      "compression": "none",
+      "rawBytes": 420,
+      "rawSHA256": "4dbce7bdadc84d74bfff47acced7108b12f64cabc9286f3d4d0c630448af762a",
+      "storedBytes": 420,
+      "storedSHA256": "4dbce7bdadc84d74bfff47acced7108b12f64cabc9286f3d4d0c630448af762a"
+    },
+    {
+      "path": "tab/source-proof-v2.json",
+      "source": "build/tab-spacing-closure77/source-proof-v2.json",
+      "compression": "none",
+      "rawBytes": 420,
+      "rawSHA256": "497a4a00ab0e258ade2d984ccd0233e79378396895e7227978e8827e5d46699f",
+      "storedBytes": 420,
+      "storedSHA256": "497a4a00ab0e258ade2d984ccd0233e79378396895e7227978e8827e5d46699f"
+    },
+    {
+      "path": "tab/handoff-v2.json",
+      "source": "build/tab-spacing-closure77/handoff-v2.json",
+      "compression": "none",
+      "rawBytes": 3151,
+      "rawSHA256": "d505eeb5962b951d244f15a15ef5b444f2ec14317107f88b0302e08b08e99750",
+      "storedBytes": 3151,
+      "storedSHA256": "d505eeb5962b951d244f15a15ef5b444f2ec14317107f88b0302e08b08e99750"
+    },
+    {
+      "path": "tab/native-baseline.log",
+      "source": "build/tab-spacing-closure77/native-baseline.log",
+      "compression": "none",
+      "rawBytes": 1737,
+      "rawSHA256": "9ce8b752a58dd9785670383c779ef70f63318f7022e1dd721a793333a4c9483e",
+      "storedBytes": 1737,
+      "storedSHA256": "9ce8b752a58dd9785670383c779ef70f63318f7022e1dd721a793333a4c9483e"
+    },
+    {
+      "path": "tab/native-v1-failed.log",
+      "source": "build/tab-spacing-closure77/native-v1.log",
+      "compression": "none",
+      "rawBytes": 1728,
+      "rawSHA256": "6dd5875cd1279ea74389da24c1e3c39ad933cf367986691b67f69919cc56423f",
+      "storedBytes": 1728,
+      "storedSHA256": "6dd5875cd1279ea74389da24c1e3c39ad933cf367986691b67f69919cc56423f"
+    },
+    {
+      "path": "tab/native-v1-raw-facts.log",
+      "source": "build/tab-spacing-closure77/native-v1-facts.log",
+      "compression": "none",
+      "rawBytes": 1177,
+      "rawSHA256": "242fcc2b030a4cc48c44627c839b452a0bae3872a9a045f82de17a3f2c723b2a",
+      "storedBytes": 1177,
+      "storedSHA256": "242fcc2b030a4cc48c44627c839b452a0bae3872a9a045f82de17a3f2c723b2a"
+    },
+    {
+      "path": "tab/native-v2-passed.log",
+      "source": "build/tab-spacing-closure77/native-v2.log",
+      "compression": "none",
+      "rawBytes": 1578,
+      "rawSHA256": "f82fb883127882ae8026d46e51e7139cc16710d0f76f7811f5497f0335897102",
+      "storedBytes": 1578,
+      "storedSHA256": "f82fb883127882ae8026d46e51e7139cc16710d0f76f7811f5497f0335897102"
+    },
+    {
+      "path": "tab/rust-baseline-harness.rs",
+      "source": "build/tab-spacing-closure77/baseline-source/tests/jueony_tab_spacing.rs",
+      "compression": "none",
+      "rawBytes": 4815,
+      "rawSHA256": "58490fc1c7f15eacc464d8202bad7300fd16d7476bf821973fc256d82ba0251e",
+      "storedBytes": 4815,
+      "storedSHA256": "58490fc1c7f15eacc464d8202bad7300fd16d7476bf821973fc256d82ba0251e"
+    },
+    {
+      "path": "tab/rust-candidate-harness.rs",
+      "source": "build/tab-spacing-closure77/source/tests/jueony_tab_spacing.rs",
+      "compression": "none",
+      "rawBytes": 5331,
+      "rawSHA256": "6838261bd2fddd8ea1256614a3ef1480fbfd580f25adfbaa74660ed8eaf33fc4",
+      "storedBytes": 5331,
+      "storedSHA256": "6838261bd2fddd8ea1256614a3ef1480fbfd580f25adfbaa74660ed8eaf33fc4"
+    },
+    {
+      "path": "tab/run-baseline.sh",
+      "source": "build/tab-spacing-closure77/run-baseline.sh",
+      "compression": "none",
+      "rawBytes": 492,
+      "rawSHA256": "38f242b95cd2eba54f6dfbba8a5306ce1076cfccaf3a453d4b256d5731c02144",
+      "storedBytes": 492,
+      "storedSHA256": "38f242b95cd2eba54f6dfbba8a5306ce1076cfccaf3a453d4b256d5731c02144"
+    },
+    {
+      "path": "tab/run-candidate-v2.sh",
+      "source": "build/tab-spacing-closure77/run-native-v2.sh",
+      "compression": "none",
+      "rawBytes": 477,
+      "rawSHA256": "b7131f97401705d5be5c865ea2481dcd715380495e70d27b7087a9690c2f34d2",
+      "storedBytes": 477,
+      "storedSHA256": "b7131f97401705d5be5c865ea2481dcd715380495e70d27b7087a9690c2f34d2"
+    },
+    {
+      "path": "tab/wasm-baseline77.json",
+      "source": "build/tab-spacing-closure77/wasm-baseline77/result.json",
+      "compression": "none",
+      "rawBytes": 20244,
+      "rawSHA256": "cba626fbb4689c7e9baabd0847b1f7ce1ed8ac00802a6adc02c399be55db2097",
+      "storedBytes": 20244,
+      "storedSHA256": "cba626fbb4689c7e9baabd0847b1f7ce1ed8ac00802a6adc02c399be55db2097"
+    },
+    {
+      "path": "README.md",
+      "source": "generated compact scope/index",
+      "compression": "none",
+      "rawBytes": 2641,
+      "rawSHA256": "22f75a7d8ddd12b14abe94476b23d487c587d7d83b7427cca7e73cb63772a505",
+      "storedBytes": 2641,
+      "storedSHA256": "22f75a7d8ddd12b14abe94476b23d487c587d7d83b7427cca7e73cb63772a505"
+    },
+    {
+      "path": "summary.json",
+      "source": "generated compact scope/index",
+      "compression": "none",
+      "rawBytes": 1971,
+      "rawSHA256": "13527574250803aa8b457237ba2adbda4157c14b67241f2bf0d3f84a396dcdcf",
+      "storedBytes": 1971,
+      "storedSHA256": "13527574250803aa8b457237ba2adbda4157c14b67241f2bf0d3f84a396dcdcf"
+    }
+  ]
+}

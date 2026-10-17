@@ -54,7 +54,7 @@
       "key": "files",
       "file": "05-files-storage-recovery.md",
       "title": "파일·저장·복구·형식 보존",
-      "description": "열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.\n\n**2026-10-18 현재:** 정식76에서 확보된 실제 한글11쌍 모두 의미·지면 비교와 양형식 엄격 재저장을 통과했다. 두 단 별도 WASM24·Edge5, 기존 Native27, Agent Native6·Edge12도 통과했다. 별도 XML/XSD 작업 영역은 sequence 프로필·Undo/Redo·실제 사본 내보내기를 구현했고 독립/통합 Edge20 및 전체 unit910(skip0)·타입·모듈 경계 검사를 통과했다. 기존 실제 Windows 독립 창/복구/OS 저장·Rust29는 엔진68/해당 네이티브 소스 검사로 분리한다. 공개 복합 문서의 쪽/줄 차이, HWT/XSL·XML Agent·OS 저장/종료 Agent 등 전체 상위 범위는 미완료다. [최신 구현·검수](../110-file-preservation-integration.md) · [이전 결과와 실패](../109-file-preservation-hancom-followup.md).",
+      "description": "열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.\n\n**2026-10-18 현재:** 합본80 기존44회귀(직접WASM27·실제 Edge17), 전체 unit930(skip0), 타입 검사·파일/복구 화면62, 캡션7·탭 간격4·전체 지면 보호7·다단24·Agent 문서 정보6을 통과했다. 확보한 실제 한글11쌍의 원본/사본 양쪽×양형식×2회 재열기도 통과했다. 복합 문서2건의 HWP 변환은 손상으로 쓰기 전에 차단되며, 변환 결함·새 줄 수용30/31 차이는 아직 미해결이다. XML/XSD는 제한된 sequence 프로필을 같은 소스로 통합7·독립13 재검수했으며 HWT/XSL·지속 복구·XML Agent는 미지원이다. 실제 Windows OS 저장·독립 창/복구·Rust29 근거는 엔진68로 구별한다. N001·N002와 전체 상위 범위를 완료로 올리지 않았다. [최신 합본·남은 결함](../110-file-preservation-integration.md) · [검수 근거](../evidence/file-completion-2026-10-18/engine80/README.md).",
       "ids": "B001-B002 B005-B006 B009-B011 B014 B021-B022 G065-G073 G090 G092 N001-N002",
       "related": [
         "session",

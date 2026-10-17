@@ -1,0 +1,108 @@
+PASS openai-responses: actual chat equalizes columns, comparison/undo/redo and safe save preserve remaining state
+PASS anthropic: actual chat equalizes columns, comparison/undo/redo and safe save preserve remaining state
+PASS gemini: actual chat equalizes columns, comparison/undo/redo and safe save preserve remaining state
+PASS openai-compatible: actual chat equalizes columns, comparison/undo/redo and safe save preserve remaining state
+PASS long-table post-render ownership: reject/rollback baseline or valid pages and save/reopen after fix
+PASS partial complete column band keeps first column and active cell cursor while distributing exact remainder
+PASS already equal/partial row/mixed/batch/alias/unknown inputs visibly fail without document writes
+PASS HWP/protected/merged/mixed source advertises readonly and visibly refuses
+FAIL injected live resize failure or neighbor/text/layout corruption fully rolls back dirty/history/cursor AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+... Skipped lines
+
+  {
+    bytes: [
+      80,
+      75,
+      3,
+...
+    ],
++   dirty: true,
+-   dirty: false,
+    history: null,
+    revision: '23:22'
+  }
+
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-equal-columns.mjs:84:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-equal-columns.mjs:19:124)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-equal-columns.mjs:65:2 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [Object],
+  expected: [Object],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+FAIL delayed provider cannot overwrite newer cell content Error: 문서 작업 또는 한글 조합이 끝난 뒤 다시 요청해 주세요.
+    at  ( at CdpFrame.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/util/decorators.js:101:27), <anonymous>:0:25)
+    at #evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/cdp/ExecutionContext.js:402:19)
+    at async ExecutionContext.evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/cdp/ExecutionContext.js:288:16)
+    at async IsolatedWorld.evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/cdp/IsolatedWorld.js:104:16)
+    at async CdpFrame.evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:364:20)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-equal-columns.mjs:88:117
+    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-equal-columns.mjs:19:124)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-equal-columns.mjs:88:2
+    at l (http://127.0.0.1:4361/assets/editor-D93thOdR.js:90:90135)
+FAIL unsaved workspace restores equal widths/capability/comparison after confirmed restart TimeoutError: Timed out after waiting 15000ms
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/common/util.js:221:19
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1944:31
+    at OperatorSubscriber2._this._next (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1001:9)
+    at Subscriber2.next (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:704:12)
+    at AsyncAction2.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:2288:20)
+    at AsyncAction2._execute (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1368:12)
+    at AsyncAction2.execute (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1357:22)
+    at AsyncScheduler2.flush (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1435:26)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7) {
+  [cause]: undefined
+}
+FAIL actual UI save/reopen preserves table and text layout with document-owned metrics initialized TimeoutError: Timed out after waiting 15000ms
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/common/util.js:221:19
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1944:31
+    at OperatorSubscriber2._this._next (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1001:9)
+    at Subscriber2.next (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:704:12)
+    at AsyncAction2.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:2288:20)
+    at AsyncAction2._execute (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1368:12)
+    at AsyncAction2.execute (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1357:22)
+    at AsyncScheduler2.flush (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1435:26)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7) {
+  [cause]: undefined
+}
+FAIL hidden owner: later-section long table uses global page offset, body mapping is read-only and invalid addresses still fail TimeoutError: Timed out after waiting 15000ms
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/common/util.js:221:19
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1944:31
+    at OperatorSubscriber2._this._next (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1001:9)
+    at Subscriber2.next (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:704:12)
+    at AsyncAction2.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:2288:20)
+    at AsyncAction2._execute (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1368:12)
+    at AsyncAction2.execute (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1357:22)
+    at AsyncScheduler2.flush (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1435:26)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7) {
+  [cause]: undefined
+}
+FAIL hidden owner: ordinary text tail retains own line and actual keyboard insertion after long table saves/reopens TimeoutError: Timed out after waiting 15000ms
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/common/util.js:221:19
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1944:31
+    at OperatorSubscriber2._this._next (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1001:9)
+    at Subscriber2.next (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:704:12)
+    at AsyncAction2.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:2288:20)
+    at AsyncAction2._execute (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1368:12)
+    at AsyncAction2.execute (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1357:22)
+    at AsyncScheduler2.flush (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1435:26)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7) {
+  [cause]: undefined
+}
+FAIL hidden owner: injected ordinary missing-page error still rolls back before receipt commit Error: 문서 작업 또는 한글 조합이 끝난 뒤 다시 요청해 주세요.
+    at  ( at CdpFrame.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/util/decorators.js:101:27), <anonymous>:0:25)
+    at #evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/cdp/ExecutionContext.js:402:19)
+    at async ExecutionContext.evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/cdp/ExecutionContext.js:288:16)
+    at async IsolatedWorld.evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/cdp/IsolatedWorld.js:104:16)
+    at async CdpFrame.evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:364:20)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-equal-columns.mjs:95:157
+    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-equal-columns.mjs:19:124)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-equal-columns.mjs:95:3
+    at l (http://127.0.0.1:4361/assets/editor-D93thOdR.js:90:90135)

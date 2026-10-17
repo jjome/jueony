@@ -1,0 +1,15 @@
+--- a/src/document_core/commands/table_ops.rs
++++ b/src/document_core/commands/table_ops.rs
+@@ -907,7 +907,11 @@
+             control_idx,
+             &changed_cells,
+         );
+-        self.mark_section_dirty(section_idx);
++        // Transposition assigns different cells/spans to each row. A previous
++        // text-edit row-height floor belongs to the old row identities and
++        // must not constrain the transposed grid (even for a square table).
++        self.invalidate_table_geometry_measurement(section_idx, parent_para_idx, control_idx);
++        self.recompose_section(section_idx);
+         self.paginate_if_needed();
+ 
+         self.event_log.push(DocumentEvent::TableCellsTransposed {

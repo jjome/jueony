@@ -1,0 +1,266 @@
+{
+  "files": [
+    {
+      "path": "fixtures/caption-original-prepared.hwp",
+      "bytes": 13312,
+      "sha256": "5d13d39b186e1851383b044a783441fb77c43a6b95855c4a3b136c94a9b891c8"
+    },
+    {
+      "path": "fixtures/final-inputs/offset.hwp",
+      "bytes": 13312,
+      "sha256": "9934d639cff4127a630007137d816a5d404e8375ac2d34105a174e2f894f2c8d"
+    },
+    {
+      "path": "fixtures/final-inputs/plain.hwp",
+      "bytes": 13312,
+      "sha256": "a55d3e1f59e2d249f1d63214731dbb026d3f8101f217f3a385cee9002bc476e4"
+    },
+    {
+      "path": "fixtures/final-inputs/superscript.hwp",
+      "bytes": 13312,
+      "sha256": "341edb377d7deaacc85e20138e27dfedfd33356b54eee14395ffe418f6d485bc"
+    },
+    {
+      "path": "fixtures/final-inputs/three.hwp",
+      "bytes": 13312,
+      "sha256": "5def8e265d9c9c1a6658656288d74d3db4163ad52d5f2a25960aea8036b3cebf"
+    },
+    {
+      "path": "fixtures/final-inputs/two.hwp",
+      "bytes": 13312,
+      "sha256": "81c425b627ce2b23d456fd95ac6772a657bf2bb153e782e4d7a81180f47261c9"
+    },
+    {
+      "path": "fixtures/final-inputs/unicode.hwp",
+      "bytes": 13312,
+      "sha256": "afe3853b0e33a30a225470007f103edda4b516e289b86a549986f33f943f4bee"
+    },
+    {
+      "path": "fixtures/hancom-current/caption-prepared.hwp",
+      "bytes": 22016,
+      "sha256": "cb54492b848fa13f5637f94e9f8ea5a379b8bd1bc460b291fa8c40369d190d3f"
+    },
+    {
+      "path": "fixtures/hancom-current/column2.hwp",
+      "bytes": 16384,
+      "sha256": "18e6f0cb207077016119167a3ff6b17c4b6970ce201172b6e21615b8335461d8"
+    },
+    {
+      "path": "fixtures/hancom-current/multiline-prepared.hwp",
+      "bytes": 29184,
+      "sha256": "79f55c9258e3fb35e280a39c5793a1d3682336184d92069b52f110ea00e33fd1"
+    },
+    {
+      "path": "fixtures/hancom-current/negative.hwp",
+      "bytes": 16384,
+      "sha256": "dc461180cab9f4a89c21f89eb1d8b3ba44f0fdde78d57e767d9af4553230b7f9"
+    },
+    {
+      "path": "fixtures/hancom-current/offset.hwp",
+      "bytes": 15360,
+      "sha256": "592741e04a853fb4942992d300b4addc99d9bfc532e00bb197532e80086cfd02"
+    },
+    {
+      "path": "fixtures/hancom-current/plain.hwp",
+      "bytes": 16384,
+      "sha256": "822891383045c0614203624d918a8150bd2c122f6863d86cdaebe69df9d9f80b"
+    },
+    {
+      "path": "fixtures/hancom-current/positive-prepared.hwp",
+      "bytes": 16896,
+      "sha256": "0e62fcc37b7bc2e0c915a4bd789f04ac008afa55ee949561aef7d7e87fad855f"
+    },
+    {
+      "path": "fixtures/hancom-current/superscript.hwp",
+      "bytes": 16384,
+      "sha256": "6514105fcfa00b80445d49e443f134dabdef752301d700299afd05f5eb099d1b"
+    },
+    {
+      "path": "fixtures/hancom-current/three.hwp",
+      "bytes": 16384,
+      "sha256": "1bf78dd66298d83e357a542dcab315e26f533da95535e66cb0a96ffbe52627a5"
+    },
+    {
+      "path": "fixtures/hancom-current/two.hwp",
+      "bytes": 15360,
+      "sha256": "4462b8950f4d5602eb8d13392f870aa6e632f9b2ab968514e58972ecb429ee84"
+    },
+    {
+      "path": "fixtures/hancom-current/unicode.hwp",
+      "bytes": 16896,
+      "sha256": "c6154b3b868d126f6936f0da0eb816d3538e2ca29616fb319cf61c42d949db40"
+    },
+    {
+      "path": "fixtures/independent-oracle68.json",
+      "bytes": 176505,
+      "sha256": "4110c5a686160a1f939d9745c7971be813e8f3190e3d9d1b52cc4854ee841dbb"
+    },
+    {
+      "path": "fixtures/multiline-original-prepared.hwp",
+      "bytes": 15360,
+      "sha256": "f1094b81038cbde1fa6797ba4f72a6f5d4c4005b63e87225c0125ebe40e5e8bf"
+    },
+    {
+      "path": "fixtures/positive-original-prepared.hwp",
+      "bytes": 13312,
+      "sha256": "c17099d199c20bb42ca6e546f8ac392bd150466d089a7188fae60690ca9ab526"
+    },
+    {
+      "path": "fixtures/support/column2.hwp",
+      "bytes": 13312,
+      "sha256": "ca9301227aa08d9ec57355989e5ec7a817399c2f9c5eee6c849a3942cae88de6"
+    },
+    {
+      "path": "fixtures/support/negative.hwp",
+      "bytes": 13312,
+      "sha256": "a5c62e0b6cff7a9ba3445517bfc2f47494f841d75694f45400911fb115c3eec8"
+    },
+    {
+      "path": "history/formal76-production-guard-baseline.json",
+      "bytes": 275637,
+      "sha256": "823eee12821457ad82b6f1470c0a646b27241f6d6cf11459fccd634cee3895c4"
+    },
+    {
+      "path": "history/metrics-plan76-v5-before-whitespace-cleanup.patch",
+      "bytes": 10680,
+      "sha256": "5b4f4f250d5d493900c589962752541b55db2f35d165a0c0b576866318865b11"
+    },
+    {
+      "path": "history/metrics-plan76-v5-source-proof-before-whitespace-cleanup.json",
+      "bytes": 1066,
+      "sha256": "071a20b0bd7793c9bb691d2363d02e73a9e45d5aa0c4763f982682f8a72c80ee"
+    },
+    {
+      "path": "history/rejected-candidates-compact.json",
+      "bytes": 14345,
+      "sha256": "aefa55ab54d9948374ba691883e4da47a134e5673c300c17ef7d7d47fdfb919f"
+    },
+    {
+      "path": "proofs/formal75-baseline-cross-format.json",
+      "bytes": 15232,
+      "sha256": "076229c8d3ff8720f0d9bc8ce5bba2695238b982e0fca1b78fffd9939033d54f"
+    },
+    {
+      "path": "proofs/formal76-boundary-baseline-initial-flag-assumption-failed.log",
+      "bytes": 917,
+      "sha256": "5d6fbeabfd9c0ff314c893c3c545560fdecaf3dd6f3e2a17e69b7fba6ccbbedb"
+    },
+    {
+      "path": "proofs/formal76-boundary-baseline.json",
+      "bytes": 264,
+      "sha256": "0abf1b328b1b7267c8604ecc6f0e8e5e4d3853a660024523daed23f4ca5e44ec"
+    },
+    {
+      "path": "proofs/input-manifest.json",
+      "bytes": 4420,
+      "sha256": "7b0dfbea4eef67431b7ba33a2fd46c1d06203c4e659b87c77aa62c21862eeb45"
+    },
+    {
+      "path": "proofs/metrics-plan76-v5-boundary-result.json",
+      "bytes": 422,
+      "sha256": "2f01064afb1bdb623ded3fbe57b36fb8293650f9bf8f6fb4348990fbd7d4cea8"
+    },
+    {
+      "path": "proofs/metrics-plan76-v5-exclusion-result.json",
+      "bytes": 2405,
+      "sha256": "28b64016c697ead6da052d4abdeab7466092a9fa0f19f49e4765ffb228e339bb"
+    },
+    {
+      "path": "proofs/metrics-plan76-v5-final-source-proof.json",
+      "bytes": 1066,
+      "sha256": "c36361857e7133f959c1fc7e0a9ba446c31ad6c232dcd531eebfa6ec85910544"
+    },
+    {
+      "path": "proofs/metrics-plan76-v5-final.log",
+      "bytes": 10385,
+      "sha256": "983f3d1887da46ee084448274a839b8b5ecb0e4323e86a979143facbbcecbe28"
+    },
+    {
+      "path": "proofs/metrics-plan76-v5-handoff.json",
+      "bytes": 15372,
+      "sha256": "6c9fe7b415e12cca2af814f9fb81168ad5e76cad181f65d98316d16e2a6d1d99"
+    },
+    {
+      "path": "proofs/metrics-plan76-v5-inpage-cursor-trace.log",
+      "bytes": 268327,
+      "sha256": "072994fc2121af4f4f9746076be01f7504c81e40b44bca48b35c0683c1685cb7"
+    },
+    {
+      "path": "proofs/metrics-plan76-v5-whitespace-equivalence.json",
+      "bytes": 307,
+      "sha256": "f579d0bc80fbf134d5977ca5df1371608d74a9f44803a629d2569854d951de0f"
+    },
+    {
+      "path": "README.txt",
+      "bytes": 1800,
+      "sha256": "2e8f03b05441fa6a07cc1b584b2776d1af3e04f58de6e849efa7a5047337a83c"
+    },
+    {
+      "path": "reproduction/apps/editor/scripts/verify-mcst-flow-spacing-engine.mjs",
+      "bytes": 7456,
+      "sha256": "6a14af5afbe818404e8cfbfe93c5cd30420d6e49f65b018be31aafe5118e0a0e"
+    },
+    {
+      "path": "reproduction/metrics-plan76-v5-final.patch",
+      "bytes": 10672,
+      "sha256": "1e828ab70011758f833ea59644383f6af9fa3d30400d2d220d9fd410f11f6af5"
+    },
+    {
+      "path": "reproduction/prepare-flow-plan-v5.py",
+      "bytes": 7463,
+      "sha256": "f6afdd99c9cf15cf406f7f6ba758e9c64c9db4d7c383932564d45e62c6b67b50"
+    },
+    {
+      "path": "reproduction/prepare-inpage-boundary.py",
+      "bytes": 3857,
+      "sha256": "c735a72dbaed0453bea18cfc7faca9a7c5875d9d7e31bbf09024d6548641b629"
+    },
+    {
+      "path": "reproduction/run-boundary-baseline76.sh",
+      "bytes": 559,
+      "sha256": "8536658f9e2ddad433e87080081bf2a7b0fe49b1e43734a6ba7b4a92e0be6ab4"
+    },
+    {
+      "path": "reproduction/run-metrics-plan76-v5-final.sh",
+      "bytes": 653,
+      "sha256": "aa9351d197d524baf3882e457454c10234f9be1edf10c3ee53712e01ac605a08"
+    },
+    {
+      "path": "reproduction/summarize-flow-plan-v5.py",
+      "bytes": 5038,
+      "sha256": "eba7eec70509468422033e24dc4a395c96734a50c9c0ef9e9c11a110ee42521b"
+    },
+    {
+      "path": "reproduction/tests/jueony_actual11.rs",
+      "bytes": 5958,
+      "sha256": "9df76c678c74260acdaa9898ac155889f30debdf18f013519577c0e3cf195770"
+    },
+    {
+      "path": "reproduction/tests/jueony_mcst_boundary.rs",
+      "bytes": 4913,
+      "sha256": "10fbd63d30ad6b13fb9633120bc7c0051d5c21df3bcc15e721a048fc446813ab"
+    },
+    {
+      "path": "reproduction/tests/jueony_mcst_exclusions.rs",
+      "bytes": 4546,
+      "sha256": "f4765ff8aef53b502b556570d9b3adea1893cc83336679d52d5995320d515d69"
+    },
+    {
+      "path": "reproduction/tests/jueony_mcst_hwpx.rs",
+      "bytes": 5108,
+      "sha256": "2a9db05572d4e4a8c9a943a49da0f7ad1f37f4a4ca02be563787e179a5ff2cca"
+    },
+    {
+      "path": "reproduction/tests/jueony_mcst_readonly.rs",
+      "bytes": 1926,
+      "sha256": "08d355a832bd037d56e352976a5f2ac6f3f1569359ea69936001908b1072234c"
+    },
+    {
+      "path": "reproduction/verify-mcst-flow-spacing-engine.mjs",
+      "bytes": 7435,
+      "sha256": "bd15e302f756f76e7f227e7366cf5efb3ebdfee0132a74f442d9313c307d4af7"
+    }
+  ],
+  "count": 52,
+  "bytes": 1210846
+}

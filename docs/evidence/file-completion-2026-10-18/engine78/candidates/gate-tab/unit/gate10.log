@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: mandatory whole-document gate covers plain documents and every response field with no provenance exception
+ok 1 - mandatory whole-document gate covers plain documents and every response field with no provenance exception
+  ---
+  duration_ms: 1.511
+  type: 'test'
+  ...
+# Subtest: source and reopened page counts/order/array lengths are exact, not only selected frames
+ok 2 - source and reopened page counts/order/array lengths are exact, not only selected frames
+  ---
+  duration_ms: 0.4808
+  type: 'test'
+  ...
+# Subtest: existing 0.2 geometry maximum is retained while owner IDs and nongeometry numbers remain exact
+ok 3 - existing 0.2 geometry maximum is retained while owner IDs and nongeometry numbers remain exact
+  ---
+  duration_ms: 0.7534
+  type: 'test'
+  ...
+# Subtest: text/metadata/new fields/raw shape IDs are never projected or silently normalized
+ok 4 - text/metadata/new fields/raw shape IDs are never projected or silently normalized
+  ---
+  duration_ms: 0.2727
+  type: 'test'
+  ...
+# Subtest: missing getters and invalid responses are failures, never not-applicable or an empty successful proof
+ok 5 - missing getters and invalid responses are failures, never not-applicable or an empty successful proof
+  ---
+  duration_ms: 0.2869
+  type: 'test'
+  ...
+# Subtest: page and nested JSON budgets fail closed before any write authority can be reached
+ok 6 - page and nested JSON budgets fail closed before any write authority can be reached
+  ---
+  duration_ms: 0.2087
+  type: 'test'
+  ...
+# Subtest: Canvas is selected portable only during capture and restored after success
+ok 7 - Canvas is selected portable only during capture and restored after success
+  ---
+  duration_ms: 0.1226
+  type: 'test'
+  ...
+# Subtest: query/reopen/changed failures preserve original metric mode and free only owned reopened handles
+ok 8 - query/reopen/changed failures preserve original metric mode and free only owned reopened handles
+  ---
+  duration_ms: 0.1995
+  type: 'test'
+  ...
+# Subtest: failed portable switch still restores Canvas, and restoring failure is not success
+ok 9 - failed portable switch still restores Canvas, and restoring failure is not success
+  ---
+  duration_ms: 0.2315
+  type: 'test'
+  ...
+# Subtest: reopen alias cannot free or mutate the source handle; unsupported formats never pass
+ok 10 - reopen alias cannot free or mutate the source handle; unsupported formats never pass
+  ---
+  duration_ms: 0.2554
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 95.0429

@@ -1,0 +1,245 @@
+{
+  "scope": "Self-owned test documents and compact results only. Public MCST document, Hancom external source bytes, fonts, vendor binaries, WASM and full source copies excluded. Actual11 oracle inputs remain immutable at original referenced paths.",
+  "files": [
+    {
+      "path": "baseline-observations.json.gz",
+      "bytes": 3368,
+      "sha256": "8ad6519c2df6230b639b9bb3044d2bf3257f844e282c89ce8d07f23b45f86f97"
+    },
+    {
+      "path": "candidate/exclusion-results.json",
+      "bytes": 1354,
+      "sha256": "b441452104e6c27bb5c928a22d1dd8f47c6cca60748f614d0811a69dd64335c5"
+    },
+    {
+      "path": "candidate/partial-negative-result.json",
+      "bytes": 213,
+      "sha256": "93fb594767df1358a80a9b40d0eede6038255d3bcb5bf5c6b0c76223b2cf02a7"
+    },
+    {
+      "path": "candidate-observations.json.gz",
+      "bytes": 2871,
+      "sha256": "16f980eedc50834a54a61b91f315da0c2dac6e734f7b138f5a44425b07396f3b"
+    },
+    {
+      "path": "candidate-proof.json",
+      "bytes": 951,
+      "sha256": "8545f486cc936b679dec53fa5102e469301beb4901da32d653c853f1e526ea3d"
+    },
+    {
+      "path": "completed-breakable-frame77.patch",
+      "bytes": 8644,
+      "sha256": "2b9ec8c1ba628c5a3eeb51b15685c47cb8fc69973aac5a060e14ea12b10ea132"
+    },
+    {
+      "path": "failed-v1/candidate-proof.json",
+      "bytes": 951,
+      "sha256": "4d4390da615b26df849f14efcd00e439c7f61adea14a86edd08f8eca20324429"
+    },
+    {
+      "path": "failed-v1/completed-breakable-frame77.patch",
+      "bytes": 5399,
+      "sha256": "ebbf38059b63a685d52b680510c8428af83df21e710bdec26ee750d9b8a23611"
+    },
+    {
+      "path": "failed-v1/native-candidate77.log",
+      "bytes": 8508,
+      "sha256": "e8b6f185ee31892b798b7b8d6fb75b18bd97ab39a20fdd1658b0052a585c9266"
+    },
+    {
+      "path": "failed-v2/candidate-proof.json",
+      "bytes": 951,
+      "sha256": "944bbe4e23626ce843fead1534ebff5b2f28983542d90d9c05be18ccb16c993a"
+    },
+    {
+      "path": "failed-v2/completed-breakable-frame77.patch",
+      "bytes": 7137,
+      "sha256": "89165984ce730e7306bb9cc01e7598401300bf51f293cb889abe8257caa41098"
+    },
+    {
+      "path": "failed-v2/native-candidate77.log",
+      "bytes": 8508,
+      "sha256": "c3dfa563e875e2a2ea400397f26381e2f9b8a70db6e1b4ef915f165a2865be61"
+    },
+    {
+      "path": "finalize-proof.py",
+      "bytes": 1722,
+      "sha256": "5e7ffe17ecb904c390c69254df3296fd35cf103828a7c87b0cc5dd2ed674a1d3"
+    },
+    {
+      "path": "handoff-final-v3.json",
+      "bytes": 5879,
+      "sha256": "b7e3a2a20855e2c759301d168c2c7f2518c6d56390e8771b9f18d23a63fd4fef"
+    },
+    {
+      "path": "native-actual11.log",
+      "bytes": 799,
+      "sha256": "88341f6c6aad2762e1f632d663f6e934a45a99746aaa10741bd7e37cede2ddcd"
+    },
+    {
+      "path": "native-baseline77-harness-compile-failed.log",
+      "bytes": 1537,
+      "sha256": "1e0d509c9e9efd969378139ee4f6d55ae4270f8228e2e7e9e8826a2ac45947cb"
+    },
+    {
+      "path": "native-baseline77.log",
+      "bytes": 2721,
+      "sha256": "4f2dc6cb6153fbbf1be32031be2d88277bfe7aafa9338ecc9bf9e9d386142435"
+    },
+    {
+      "path": "native-candidate77-interrupted.log",
+      "bytes": 116,
+      "sha256": "a1fa7e921e707c4a8b4eae080eadecf4f679a95afc4556cfc0ebd0f450482d56"
+    },
+    {
+      "path": "native-final-origin77.log",
+      "bytes": 4542,
+      "sha256": "e53db0547b969d9908eee35a075cf779588703df1b89fd5bc780f7b8ccd2b0af"
+    },
+    {
+      "path": "native-mcst-v5.log",
+      "bytes": 561,
+      "sha256": "a00437e6e58487dabdbab4bc2b4bd32e3b3904f7459f07e411f3a70ac823438e"
+    },
+    {
+      "path": "native-trace77-existing-diagnostics.log",
+      "bytes": 18453,
+      "sha256": "1d68337690eca38b69763a51048056ffdcfe8c5e673c13e0d90a75f27d5ab20d"
+    },
+    {
+      "path": "native-trace77.log.gz",
+      "bytes": 2475,
+      "sha256": "6f65327ea19cf75ac9444815360d12afbb4832d54bfb0f770194e39a7fdfb8d6"
+    },
+    {
+      "path": "own-artifacts/cell-break-whole-1.hwp",
+      "bytes": 13312,
+      "sha256": "66ee926790d4b12047f46c0880b6709fed403274438f719a7b70e34e2c226c01"
+    },
+    {
+      "path": "own-artifacts/cell-break-whole-1.hwpx",
+      "bytes": 8269,
+      "sha256": "8d68bdd3abdc8f2f0d76b93da8617fc51d0d70d5a48d77163dc4c891a776ac17"
+    },
+    {
+      "path": "own-artifacts/cell-break-whole-result.json",
+      "bytes": 814,
+      "sha256": "29bb8cc49d994b52dc2b0760e7e651a245f2280fb06f4ecff2c82257e257ec24"
+    },
+    {
+      "path": "own-artifacts/default-whole-1.hwp",
+      "bytes": 13312,
+      "sha256": "3b02115d8c83f068c83800d3835b480438339687b3cf9b2933b015bda7025b1d"
+    },
+    {
+      "path": "own-artifacts/default-whole-1.hwpx",
+      "bytes": 8248,
+      "sha256": "d7f0362537d2fa5adb619efedd163dab1fc5a91da8adf17f696ae061c157eab3"
+    },
+    {
+      "path": "own-artifacts/default-whole-result.json",
+      "bytes": 802,
+      "sha256": "f1d2cb4baf8449a0076bd1f107943e07b4530155540eb12faf13a7cd153ceab5"
+    },
+    {
+      "path": "own-artifacts/history-cell-break-1.hwp",
+      "bytes": 13312,
+      "sha256": "66ee926790d4b12047f46c0880b6709fed403274438f719a7b70e34e2c226c01"
+    },
+    {
+      "path": "own-artifacts/history-cell-break-1.hwpx",
+      "bytes": 8269,
+      "sha256": "8d68bdd3abdc8f2f0d76b93da8617fc51d0d70d5a48d77163dc4c891a776ac17"
+    },
+    {
+      "path": "own-artifacts/history-cell-break-result.json",
+      "bytes": 822,
+      "sha256": "dc2805ada51ea07a2be2df94052b80b6dad436329c79abe295b65d469aa13d31"
+    },
+    {
+      "path": "own-artifacts/none-whole-1.hwp",
+      "bytes": 13312,
+      "sha256": "ea7f9caae07690704a9b0182775181aa1617936769a2adaaab700b05a8e4d271"
+    },
+    {
+      "path": "own-artifacts/none-whole-1.hwpx",
+      "bytes": 8260,
+      "sha256": "0ac7517ff7e034209ef895b1008d0a4a05f85be8fed9a0b6ccc5cd78718f1c33"
+    },
+    {
+      "path": "own-artifacts/none-whole-result.json",
+      "bytes": 790,
+      "sha256": "b0d1c4b842856c225e1fb62f0a5284a3430b3088d8406c23985e2de94514578e"
+    },
+    {
+      "path": "own-artifacts/row-break-whole-1.hwp",
+      "bytes": 13312,
+      "sha256": "9d829a8734b558e7a57b691d73f4e3d6827f371a8551798928a761f4197d58a7"
+    },
+    {
+      "path": "own-artifacts/row-break-whole-1.hwpx",
+      "bytes": 8268,
+      "sha256": "61b910c7a7dc03fcef17b423f67ec98b330012765e6e58b79313c365f521991a"
+    },
+    {
+      "path": "own-artifacts/row-break-whole-result.json",
+      "bytes": 810,
+      "sha256": "7c20a667e5b72d98479d00342e754836920ebe30332f602dacb8c91d37f710a7"
+    },
+    {
+      "path": "package-handoff.py",
+      "bytes": 5099,
+      "sha256": "706fa10b0b9bf9ac44b8bea671ac946389df277ef3af7212978bd8b4afad7da9"
+    },
+    {
+      "path": "partial-negative-baseline77.json",
+      "bytes": 426597,
+      "sha256": "ec49fbafeeb1fb90a7aea08ba9c3d783a5b3874a58277505454ec8b946ed0750"
+    },
+    {
+      "path": "partial-negative.hwp",
+      "bytes": 14336,
+      "sha256": "6602d4b1d5249d0eb318c508d1f7e7a62a9f8dccf4c7bfd4d2b984ce6cf51b92"
+    },
+    {
+      "path": "prepare-partial-negative.mjs",
+      "bytes": 1385,
+      "sha256": "b2659e0a9873428a0cb63d3da82b8cb8b21507cbc5417baf937af69e2b410ec8"
+    },
+    {
+      "path": "resume-candidate.sh",
+      "bytes": 799,
+      "sha256": "f45aedce35cd2851595e559f41e13aabac89a727aef2829642aea943ec06bff0"
+    },
+    {
+      "path": "run-final-origin.sh",
+      "bytes": 565,
+      "sha256": "acd833e7151947ee7e183b72b78c10ed73631237d53a7645c1d717ab37f53eeb"
+    },
+    {
+      "path": "runtime-manifest.json.gz",
+      "bytes": 74226,
+      "sha256": "6a7e07a7b9a19643251f256ee6ee9751bc4441488c827ffbdea29f324562d563"
+    },
+    {
+      "path": "source-candidate77/tests/jueony_actual11.rs",
+      "bytes": 6978,
+      "sha256": "bcd20f63fbce0a783cc0ce14348113d2795bb6f3f5def622cf6408f67aebffc7"
+    },
+    {
+      "path": "source-candidate77/tests/jueony_mcst_hwpx.rs",
+      "bytes": 5075,
+      "sha256": "80fc6b43026767b2acadc9378b1a4e0c66a3c1f786c1def667a52ee1889d558b"
+    },
+    {
+      "path": "source-candidate77/tests/jueony_table_origin.rs",
+      "bytes": 11410,
+      "sha256": "2f444710e1dfb9163f2f8c0b93598179d80a88ad3a4c2d791c3fb6edc0725459"
+    },
+    {
+      "path": "verify-completed-breakable-frame-engine.mjs",
+      "bytes": 4596,
+      "sha256": "a7da5408b19dd775531496e5fa8bed1715c53756fe749582b0cb4fa3edcb6b77"
+    }
+  ]
+}

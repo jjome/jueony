@@ -1,0 +1,87 @@
+PASS openai-responses: chat sets HWPX padding, comparison/undo/redo/save preserve remaining cells and table
+PASS anthropic: chat sets HWPX padding, comparison/undo/redo/save preserve remaining cells and table
+PASS gemini: chat sets HWPX padding, comparison/undo/redo/save preserve remaining cells and table
+PASS openai-compatible: chat sets HWPX padding, comparison/undo/redo/save preserve remaining cells and table
+PASS table-default reset retains dormant values, native manual cell properties display same custom values and cancel is unchanged
+PASS no-op/incomplete/mixed/width overflow/alias/batch/raw fields visibly refuse unchanged
+PASS protected anywhere, merged, mixed and field original remain readonly for padding
+PASS HWP remains visibly readonly and never changes the document
+FAIL renamed HWP retains source-format readonly rejection despite injected geometry AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+true !== false
+
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-cell-padding.mjs:75:59
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-cell-padding.mjs:21:39)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-cell-padding.mjs:72:2 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: true,
+  expected: false,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+PASS second-cell live failure restores padding/dirty/history/caret
+FAIL unrequested neighboring padding/table-default mutation or differing layout causes full rollback AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+... Skipped lines
+
+  {
+    bytes: [
+      80,
+      75,
+      3,
+...
+    ],
++   dirty: true,
+-   dirty: false,
+    history: null,
+    revision: '24:19'
+  }
+
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-cell-padding.mjs:92:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-cell-padding.mjs:21:39)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-cell-padding.mjs:82:2 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: [Object],
+  expected: [Object],
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+FAIL delayed provider cannot overwrite newer ordinary cell text Error: 문서 작업 또는 한글 조합이 끝난 뒤 다시 요청해 주세요.
+    at  ( at CdpFrame.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/util/decorators.js:101:27), <anonymous>:0:25)
+    at #evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/cdp/ExecutionContext.js:402:19)
+    at async ExecutionContext.evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/cdp/ExecutionContext.js:288:16)
+    at async IsolatedWorld.evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/cdp/IsolatedWorld.js:104:16)
+    at async CdpFrame.evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:364:20)
+    at async table (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-cell-padding.mjs:54:23)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-cell-padding.mjs:95:122
+    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-cell-padding.mjs:21:39)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-cell-padding.mjs:95:2
+    at l (http://127.0.0.1:4357/assets/editor-D93thOdR.js:90:90135)
+FAIL unsaved workspace restores custom padding, capability and comparison after confirmed restart TimeoutError: Timed out after waiting 15000ms
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/common/util.js:221:19
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1944:31
+    at OperatorSubscriber2._this._next (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1001:9)
+    at Subscriber2.next (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:704:12)
+    at AsyncAction2.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:2288:20)
+    at AsyncAction2._execute (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1368:12)
+    at AsyncAction2.execute (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1357:22)
+    at AsyncScheduler2.flush (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/third_party/rxjs/rxjs.js:1435:26)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7) {
+  [cause]: undefined
+}
+FAIL request undo after Save still refuses a genuine later edit without changing bytes or history Error: 문서 작업 또는 한글 조합이 끝난 뒤 다시 요청해 주세요.
+    at  ( at CdpFrame.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/util/decorators.js:101:27), <anonymous>:0:25)
+    at #evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/cdp/ExecutionContext.js:402:19)
+    at async ExecutionContext.evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/cdp/ExecutionContext.js:288:16)
+    at async IsolatedWorld.evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/cdp/IsolatedWorld.js:104:16)
+    at async CdpFrame.evaluate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:364:20)
+    at async table (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-cell-padding.mjs:54:23)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-cell-padding.mjs:98:43
+    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-cell-padding.mjs:21:39)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-cell-padding.mjs:97:2
+    at l (http://127.0.0.1:4357/assets/editor-D93thOdR.js:90:90135)

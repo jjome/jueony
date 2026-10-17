@@ -1,0 +1,26 @@
+src/adapters/rhwp/document-save-layout.ts(23,93): error TS2345: Argument of type '{} | undefined' is not assignable to parameter of type 'object'.
+  Type 'undefined' is not assignable to type 'object'.
+src/adapters/rhwp/document-save-layout.ts(24,36): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Argument of type '{} | undefined' is not assignable to parameter of type '{}'.
+      Type 'undefined' is not assignable to type '{}'.
+src/adapters/rhwp/document-save-layout.ts(29,137): error TS18046: 'count' is of type 'unknown'.
+src/adapters/rhwp/document-save-layout.ts(31,22): error TS18046: 'count' is of type 'unknown'.
+src/adapters/rhwp/document-save-layout.ts(34,20): error TS18047: 'controls.controls' is possibly 'null'.
+src/adapters/rhwp/document-save-layout.ts(34,38): error TS2339: Property 'length' does not exist on type 'string | number | boolean | Value[] | { [key: string]: Value; }'.
+  Property 'length' does not exist on type 'number'.
+src/adapters/rhwp/document-save-layout.ts(34,58): error TS18047: 'text.runs' is possibly 'null'.
+src/adapters/rhwp/document-save-layout.ts(34,68): error TS2339: Property 'length' does not exist on type 'string | number | boolean | Value[] | { [key: string]: Value; }'.
+  Property 'length' does not exist on type 'number'.
+src/adapters/rhwp/document-save-layout.ts(35,105): error TS2488: Type 'string | number | boolean | Value[] | { [key: string]: Value; }' must have a '[Symbol.iterator]()' method that returns an iterator.
+src/adapters/rhwp/document-save-layout.ts(35,105): error TS18047: 'items' is possibly 'null'.
+src/adapters/rhwp/document-save-layout.ts(47,147): error TS18047: 'a' is possibly 'null'.
+src/adapters/rhwp/document-save-layout.ts(47,149): error TS2339: Property 'length' does not exist on type 'string | number | boolean | Value[] | { [key: string]: Value; }'.
+  Property 'length' does not exist on type 'number'.
+src/adapters/rhwp/document-save-layout.ts(47,168): error TS18047: 'a' is possibly 'null'.
+src/adapters/rhwp/document-save-layout.ts(47,168): error TS7053: Element implicitly has an 'any' type because expression of type 'number' can't be used to index type 'string | number | boolean | Value[] | { [key: string]: Value; }'.
+  No index signature with a parameter of type 'number' was found on type 'string | number | boolean | Value[] | { [key: string]: Value; }'.
+src/adapters/rhwp/document-save-layout.ts(47,173): error TS18047: 'b' is possibly 'null'.
+src/adapters/rhwp/document-save-layout.ts(47,173): error TS7053: Element implicitly has an 'any' type because expression of type 'number' can't be used to index type 'string | number | boolean | Value[] | { [key: string]: Value; }'.
+  No index signature with a parameter of type 'number' was found on type 'string | number | boolean | Value[] | { [key: string]: Value; }'.
+src/adapters/rhwp/document-save-layout.ts(61,132): error TS2322: Type 'unknown' is not assignable to type 'boolean | undefined'.

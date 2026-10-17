@@ -1,0 +1,31 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/tab-spacing-closure77/source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 10s
+     Running tests/jueony_tab_spacing.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_tab_spacing-ec0030f778453239)
+
+running 5 tests
+test resolved_real_tab_payload_does_not_enter_the_new_spacing_only_reflow ... ok
+
+thread 'tab_spacing_before_is_visible_immediately_and_preserves_both_codecs' (192111) panicked at tests/jueony_tab_spacing.rs:7:487:
+gap 75 must affect the live line
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test tab_spacing_before_is_visible_immediately_and_preserves_both_codecs ... FAILED
+
+thread 'tab_spacing_after_moves_following_lines_and_preserves_both_codecs' (192110) panicked at tests/jueony_tab_spacing.rs:5:242:
+pages/0/text/runs/4/y: 217.6->218.1
+test tab_spacing_after_moves_following_lines_and_preserves_both_codecs ... FAILED
+
+thread 'tab_spacing_snapshot_undo_redo_restores_exact_live_and_saved_state' (192112) panicked at tests/jueony_tab_spacing.rs:5:242:
+pages/0/text/runs/3/y: 196.3->198.2
+test tab_spacing_snapshot_undo_redo_restores_exact_live_and_saved_state ... FAILED
+test ordinary_spacing_noop_and_unrelated_style_do_not_gain_tab_reflow ... ok
+
+failures:
+
+failures:
+    tab_spacing_after_moves_following_lines_and_preserves_both_codecs
+    tab_spacing_before_is_visible_immediately_and_preserves_both_codecs
+    tab_spacing_snapshot_undo_redo_restores_exact_live_and_saved_state
+
+test result: FAILED. 2 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_tab_spacing`

@@ -1,0 +1,72 @@
+{
+  "gateReviewed77": {
+    "passed": 7,
+    "failed": 0
+  },
+  "mcstReviewed77": {
+    "passed": 15,
+    "failed": 0,
+    "knownCrossFormatGeometryLoss": "remains actual, now blocked before write"
+  },
+  "review": {
+    "initialReportedScenarios": 3,
+    "fixedScenarios": 4,
+    "note": "Original reviewer had three cases, not four; fixed run separates direct and borrowed aliases."
+  },
+  "unit": {
+    "unit/initial920.log": {
+      "tests": 920,
+      "pass": 918,
+      "fail": 2,
+      "skipped": 0,
+      "failedNames": [
+        "native sorting moves mixed runs, paragraph formats and styles together without changing surrounding text\r",
+        "hwp: durable page hide and caption properties preserve their values\r"
+      ]
+    },
+    "unit/formal77-921.log": {
+      "tests": 921,
+      "pass": 918,
+      "fail": 3,
+      "skipped": 0,
+      "failedNames": [
+        "native sorting moves mixed runs, paragraph formats and styles together without changing surrounding text\r",
+        "actual WASM Unknown-control HWPX omission is blocked despite a zero-loss native report\r",
+        "hwp: durable page hide and caption properties preserve their values\r"
+      ]
+    },
+    "unit/reviewed36.log": {
+      "tests": 36,
+      "pass": 35,
+      "fail": 1,
+      "skipped": 0,
+      "failedNames": [
+        "hwp: durable page hide and caption properties preserve their values\r"
+      ]
+    }
+  },
+  "tabNative": {
+    "baseline": {
+      "passed": 2,
+      "failed": 3
+    },
+    "candidateV1": {
+      "passed": 2,
+      "failed": 3
+    },
+    "candidateV2": {
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "tabWasm77": {
+    "passed": 1,
+    "failed": 3,
+    "finalCombined78": "PENDING"
+  },
+  "productionFrozenSHA256": {
+    "source/document-save-layout.ts": "6c1d119f4723698e9e3769d4fb45c7b38469b6f0bca6f4c575688f3b38638434",
+    "source/preservation.ts": "65a424675905ea8b09f4722e110101910a0327c6f68d19714e6093996cee8b5b"
+  }
+}

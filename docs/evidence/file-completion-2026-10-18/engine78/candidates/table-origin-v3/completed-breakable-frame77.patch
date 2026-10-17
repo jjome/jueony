@@ -1,0 +1,105 @@
+--- a/src/renderer/typeset/table/block/entry.rs
++++ b/src/renderer/typeset/table/block/entry.rs
+@@ -1645,6 +1645,102 @@
+                                         if previous_table.page_break == crate::model::table::TablePageBreak::None
+                                         && crate::renderer::float_placement::object_only_saved_table_anchor(host, previous_table)))))
+                     { return None; }
++                    // A completed breakable table need not publish a shared empty-
++                    // host placement (that contract is currently None-only). Prove
++                    // its actual consumed frame with the same measurement/format
++                    // queries instead of treating a monotone anchor as a free gap.
++                    let previous_is_whole = matches!(st.current_items.as_slice(),
++                        [PageItem::FullParagraph { para_index: first },
++                         PageItem::Table { para_index: previous, control_index: 0 }]
++                            if *previous == previous_index && *first + 1 == previous_index);
++                    let plain_grid = |t: &crate::model::table::Table| {
++                        let rows = usize::from(t.row_count);
++                        let columns = usize::from(t.col_count);
++                        let mut addresses = std::collections::BTreeSet::new();
++                        rows > 0 && columns > 0 && t.cells.len() <= 4096
++                            && rows.checked_mul(columns) == Some(t.cells.len())
++                            && !t.common.size_protect && !t.common.locked
++                            && !t.common.allow_overlap && t.caption.is_none() && t.zones.is_empty()
++                            && t.cells.iter().all(|cell| cell.row_span == 1 && cell.col_span == 1
++                                && usize::from(cell.row) < rows && usize::from(cell.col) < columns
++                                && addresses.insert((cell.row, cell.col))
++                                && cell.height > 0 && cell.height <= i32::MAX as u32
++                                && cell.width > 0 && cell.width <= i32::MAX as u32
++                                && !cell.cell_protect() && cell.field_name.is_none()
++                                && cell.text_direction == 0 && !cell.paragraphs.is_empty()
++                                && cell.paragraphs.iter().all(|p| p.controls.is_empty()
++                                    && p.field_ranges.is_empty() && p.orphan_field_ends.is_empty()
++                                    && p.range_tags.is_empty() && p.title_marks.is_empty()
++                                    && p.markpen_marks.is_empty()
++                                    && !p.ctrl_data_records.iter().any(Option::is_some)))
++                    };
++                    if previous_is_whole && plain_grid(table)
++                        && table.page_break == crate::model::table::TablePageBreak::None
++                        && signed_hwpunit(table.common.vertical_offset) == 0
++                        && crate::renderer::float_placement::object_only_saved_table_anchor(para, table)
++                    {
++                        if let (Some(host), Some(first), Some(first_composed)) = (
++                            paragraphs_all.get(previous_index),
++                            previous_index.checked_sub(1).and_then(|i| paragraphs_all.get(i)),
++                            previous_index.checked_sub(1).and_then(|i| composed_all.get(i)),
++                        ) {
++                            if let ([Control::Table(previous)], [first_line], [composed_line], [host_line]) = (
++                                host.controls.as_slice(), first.line_segs.as_slice(),
++                                first_composed.lines.as_slice(), host.line_segs.as_slice(),
++                            ) {
++                                let ordinary_first = !first.text.is_empty()
++                                    && first.controls.iter().all(|c| matches!(c, Control::SectionDef(_) | Control::ColumnDef(_)))
++                                    && first.field_ranges.is_empty() && first.orphan_field_ends.is_empty()
++                                    && first.range_tags.is_empty() && first.title_marks.is_empty()
++                                    && first.markpen_marks.is_empty()
++                                    && !first.ctrl_data_records.iter().any(Option::is_some)
++                                    && first_line.vertical_pos == 0 && first_line.line_height > 0
++                                    && first_line.line_height == composed_line.line_height
++                                    && first_line.line_spacing == composed_line.line_spacing
++                                    && i64::from(host_line.vertical_pos)
++                                        == i64::from(first_line.line_height) + i64::from(first_line.line_spacing)
++                                    && styles.para_styles.get(first_composed.para_style_id as usize)
++                                        .is_some_and(|style| style.spacing_before == 0.0 && style.spacing_after == 0.0);
++                                if ordinary_first && plain_grid(previous) && previous.row_count > 1
++                                    && matches!(previous.page_break,
++                                        crate::model::table::TablePageBreak::CellBreak | crate::model::table::TablePageBreak::RowBreak)
++                                    && crate::renderer::float_placement::object_only_saved_table_anchor(host, previous)
++                                    && previous.common.vert_rel_to == crate::model::shape::VertRelTo::Para
++                                    && previous.common.vert_align == crate::model::shape::VertAlign::Top
++                                    && signed_hwpunit(previous.common.vertical_offset) == 0
++                                {
++                                    let measured = crate::renderer::height_measurer::HeightMeasurer::new(self.dpi)
++                                        .with_native_hwp5(st.profile.native_hwp5_layout())
++                                        .with_hwpx_stored_layout(st.profile.hwpx_stored_layout())
++                                        .with_session_edited(st.profile.session_edited())
++                                        .with_render_normalization(self.render_normalization.clone())
++                                        .with_float_carve_evidence(self.float_carve_evidence.borrow().clone())
++                                        .measure_table(previous, previous_index, 0, styles);
++                                    let previous_format = crate::renderer::typeset::table::format(
++                                        crate::renderer::typeset::table::TableFormatInput {
++                                            para: host, para_idx: previous_index, ctrl_idx: 0, table: previous,
++                                            measured_tables: std::slice::from_ref(&measured), styles,
++                                            composed: composed_all.get(previous_index), next_para: Some(para),
++                                            is_column_top: false,
++                                        }, self.dpi, || st.profile, || false,
++                                    );
++                                    let previous_top = st.vpos_col_anchor + hwpunit_to_px(host_line.vertical_pos, self.dpi);
++                                    let painted_end = previous_top + previous_format.effective_height;
++                                    let consumed_end = painted_end + previous_format.host_spacing.before
++                                        + previous_format.host_spacing.after_for_fit;
++                                    let candidate_top = origin + ft.host_spacing.before;
++                                    if [previous_top, painted_end, consumed_end, candidate_top, st.current_height]
++                                        .iter().all(|value| value.is_finite())
++                                        && previous_format.effective_height > 0.0
++                                        && (consumed_end - st.current_height).abs() <= 0.5
++                                        && candidate_top >= previous_top
++                                        && candidate_top + 0.5 < painted_end
++                                        && painted_end <= st.current_height + 0.5
++                                    { return None; }
++                                }
++                            }
++                        }
++                    }
+                 }
+             }
+             Some(origin)

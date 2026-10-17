@@ -1,0 +1,21 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/tab-spacing-closure77/source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.19s
+     Running tests/jueony_tab_spacing.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_tab_spacing-ec0030f778453239)
+
+running 1 test
+TAB_FACTS [] text "B\t3" rawBefore 0
+AFTER_FACTS [] rawAfter 75 line [LineSeg { text_start: 0, vertical_pos: 4800, line_height: 1000, text_height: 1000, baseline_distance: 850, line_spacing: 600, column_start: 0, segment_width: 42520, tag: 393216 }]
+
+thread 'tab_spacing_before_is_visible_immediately_and_preserves_both_codecs' (192225) panicked at tests/jueony_tab_spacing.rs:7:1015:
+gap 75 must affect the live line
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test tab_spacing_before_is_visible_immediately_and_preserves_both_codecs ... FAILED
+
+failures:
+
+failures:
+    tab_spacing_before_is_visible_immediately_and_preserves_both_codecs
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.02s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_tab_spacing`

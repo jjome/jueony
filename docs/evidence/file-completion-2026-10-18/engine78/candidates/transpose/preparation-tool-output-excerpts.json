@@ -1,0 +1,11 @@
+{
+  "scope": "Original terminal excerpt retained separately from disk logs; not a reconstructed complete process log.",
+  "initialMissingFixture": "error: couldn't read `src/document_core/commands/../../../saved/blank2010.hwp`: No such file or directory (os error 2)",
+  "initialSandbox": "First WSL invocation returned Wsl/E_ACCESSDENIED. Existing WSL tooling ran after sandbox approval.",
+  "harnessFixes": "Missing saved/mydocs source includes copied byte-for-byte from formal77. Initial assumed control index0 corrected to the actual table control slot. Rust JSON raw string delimiter/sha2v0.11 formatting and unsupported Document serialization corrected before valid baseline.",
+  "failureLogsRetained": [
+    "native-baseline.log",
+    "native-baseline-valid.log"
+  ],
+  "productionAssertionsOrToleranceChanged": false
+}

@@ -69,3 +69,6 @@ docs/evidence/file-completion-2026-10-18/xml76b/**/*.log whitespace=cr-at-eol,-b
 
 # Preserve raw accessibility text from the owned Hancom line-fit experiment.
 docs/evidence/file-completion-2026-10-18/line-fit76/actual-hancom/*-uia.txt whitespace=cr-at-eol,-blank-at-eol
+
+# Byte-sealed Native candidate artifacts retain their original line endings.
+docs/evidence/file-completion-2026-10-18/engine78/candidates/** -text whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof

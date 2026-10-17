@@ -1,0 +1,72 @@
+--- a/src/renderer/typeset/table/block/entry.rs
++++ b/src/renderer/typeset/table/block/entry.rs
+@@ -1645,6 +1645,69 @@
+                                         if previous_table.page_break == crate::model::table::TablePageBreak::None
+                                         && crate::renderer::float_placement::object_only_saved_table_anchor(host, previous_table)))))
+                     { return None; }
++                    // Cell/row splitting permission does not make a table that
++                    // was actually emitted whole cease to own its painted rows.
++                    // Retain the existing None case above; this extra proof is
++                    // limited to a last, adjacent, complete breakable frame.
++                    let completed_breakable_frame = matches!(st.current_items.last(),
++                        Some(PageItem::Table { para_index, control_index })
++                            if *para_index == previous_index && *control_index == 0)
++                        && crate::renderer::float_placement::object_only_saved_table_anchor(para, table)
++                        && table.page_break == crate::model::table::TablePageBreak::None
++                        && table.caption.is_none()
++                        && signed_hwpunit(table.common.vertical_offset) == 0;
++                    if completed_breakable_frame {
++                        if let (Some(host), Some(placement)) = (
++                            paragraphs_all.get(previous_index),
++                            st.paragraph_float_placements.get(&(previous_index, 0)),
++                        ) {
++                            if let [Control::Table(previous)] = host.controls.as_slice() {
++                                let rows = usize::from(previous.row_count);
++                                let columns = usize::from(previous.col_count);
++                                if matches!(previous.page_break,
++                                    crate::model::table::TablePageBreak::CellBreak
++                                    | crate::model::table::TablePageBreak::RowBreak)
++                                    && crate::renderer::float_placement::object_only_saved_table_anchor(host, previous)
++                                    && previous.caption.is_none()
++                                    && !previous.common.allow_overlap
++                                    && !previous.common.size_protect && !previous.common.locked
++                                    && signed_hwpunit(previous.common.vertical_offset) == 0
++                                    && rows > 0 && columns > 0
++                                    && rows.checked_mul(columns) == Some(previous.cells.len())
++                                {
++                                    let mut row_minima = vec![0u32; rows];
++                                    let mut addresses = std::collections::BTreeSet::new();
++                                    let complete_grid = previous.cells.iter().all(|cell| {
++                                        let row = usize::from(cell.row);
++                                        let column = usize::from(cell.col);
++                                        if cell.row_span != 1 || cell.col_span != 1
++                                            || row >= rows || column >= columns
++                                            || cell.height == 0 || cell.height > i32::MAX as u32
++                                            || cell.paragraphs.iter().any(|paragraph| !paragraph.controls.is_empty())
++                                            || !addresses.insert((row, column)) { return false; }
++                                        row_minima[row] = row_minima[row].max(cell.height);
++                                        true
++                                    });
++                                    let minimum_height_hu: u64 = row_minima.iter().map(|&v| u64::from(v)).sum();
++                                    if complete_grid && minimum_height_hu <= i32::MAX as u64 {
++                                        // This is a lower bound inside the actual row frame,
++                                        // not common.height or unpainted trailing spacing.
++                                        let painted_minimum_end = placement.table_top
++                                            + hwpunit_to_px(minimum_height_hu as i32, self.dpi);
++                                        let candidate_top = origin + ft.host_spacing.before;
++                                        if [placement.table_top, placement.occupied_bottom,
++                                            painted_minimum_end, candidate_top, st.current_height]
++                                            .iter().all(|v| v.is_finite())
++                                            && candidate_top >= placement.table_top
++                                            && candidate_top + 0.5 < painted_minimum_end
++                                            && painted_minimum_end <= placement.occupied_bottom + 0.5
++                                            && painted_minimum_end <= st.current_height + 0.5
++                                        { return None; }
++                                    }
++                                }
++                            }
++                        }
++                    }
+                 }
+             }
+             Some(origin)

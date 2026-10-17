@@ -1,0 +1,102 @@
+{
+  "scope": "Only body paragraphs with missing/placeholder tab payload and a genuinely changed spacingBefore/After use the existing semantic vpos-boundary lifecycle. Existing line partition and ordinary/resolved/noop behavior remain.",
+  "baselineEngine": "de849bf3aacef6f1",
+  "sourceRustFilesCompared": 1063,
+  "sourceDelta": [
+    {
+      "path": "src/document_core/commands/formatting.rs",
+      "beforeSHA": "210e8c2e9bbf982a7c4a0dfc9f872b3965518c98d777d8b934d3d86d4f3b6bab",
+      "afterSHA": "21d958af5851fb2256bd3e4b54b81171a69e4c5fc757bb2543194b7fd70609ef"
+    }
+  ],
+  "native": {
+    "baseline": {
+      "pass": 2,
+      "fail": 3,
+      "ignored": 0
+    },
+    "candidateV1": {
+      "pass": 2,
+      "fail": 3,
+      "ignored": 0
+    },
+    "candidateV2": {
+      "pass": 5,
+      "fail": 0,
+      "ignored": 0
+    }
+  },
+  "wasm": {
+    "baseline77": {
+      "pass": 1,
+      "fail": 3
+    },
+    "candidate": "PENDING official combined build"
+  },
+  "limitations": [
+    "Native Hancom not run for this spacing-only mutation.",
+    "No table/header/cell/story or general spacing semantics changes."
+  ],
+  "files": [
+    {
+      "path": "tab-spacing-lifecycle.patch",
+      "bytes": 1790,
+      "sha256": "12b20ea7c7f092cbb7235c56afb1887ae2e0a987bb4a7cecfbf46cd8ef6e922e"
+    },
+    {
+      "path": "tab-spacing-boundary-v2.patch",
+      "bytes": 2366,
+      "sha256": "b9e980825c6e772149c9170203da78f183d762537d784f8f6757f253de911da6"
+    },
+    {
+      "path": "source-proof-v2.json",
+      "bytes": 420,
+      "sha256": "497a4a00ab0e258ade2d984ccd0233e79378396895e7227978e8827e5d46699f"
+    },
+    {
+      "path": "native-baseline.log",
+      "bytes": 1737,
+      "sha256": "9ce8b752a58dd9785670383c779ef70f63318f7022e1dd721a793333a4c9483e"
+    },
+    {
+      "path": "native-v1.log",
+      "bytes": 1728,
+      "sha256": "6dd5875cd1279ea74389da24c1e3c39ad933cf367986691b67f69919cc56423f"
+    },
+    {
+      "path": "native-v1-facts.log",
+      "bytes": 1177,
+      "sha256": "242fcc2b030a4cc48c44627c839b452a0bae3872a9a045f82de17a3f2c723b2a"
+    },
+    {
+      "path": "native-v2.log",
+      "bytes": 1578,
+      "sha256": "f82fb883127882ae8026d46e51e7139cc16710d0f76f7811f5497f0335897102"
+    },
+    {
+      "path": "source/tests/jueony_tab_spacing.rs",
+      "bytes": 5331,
+      "sha256": "6838261bd2fddd8ea1256614a3ef1480fbfd580f25adfbaa74660ed8eaf33fc4"
+    },
+    {
+      "path": "run-native-v2.sh",
+      "bytes": 477,
+      "sha256": "b7131f97401705d5be5c865ea2481dcd715380495e70d27b7087a9690c2f34d2"
+    },
+    {
+      "path": "run-baseline.sh",
+      "bytes": 492,
+      "sha256": "38f242b95cd2eba54f6dfbba8a5306ce1076cfccaf3a453d4b256d5731c02144"
+    },
+    {
+      "path": "wasm-baseline77/result.json",
+      "bytes": 20244,
+      "sha256": "cba626fbb4689c7e9baabd0847b1f7ce1ed8ac00802a6adc02c399be55db2097"
+    },
+    {
+      "path": "../../apps/editor/scripts/verify-tab-spacing-storage-engine.mjs",
+      "bytes": 4294,
+      "sha256": "832581e1db91a18d77373c22c3f9094ce926fd69007a33ba8eb957f7c10a6525"
+    }
+  ]
+}

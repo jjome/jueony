@@ -1,0 +1,25 @@
+{
+  "base": "build\\rhwp-engine\\source-23d2545926a179a5",
+  "candidate": "build\\file-closure75-public-readonly\\metrics-plan-candidate76-v5",
+  "srcFiles": 1336,
+  "unchangedFiles": 1333,
+  "changed": [
+    {
+      "path": "src/renderer/typeset/paragraph.rs",
+      "baseSHA": "fd6df6dcf1e6c7c2dc3c0757854335c633750c776d1c4feec22c71a7c3f50a7d",
+      "candidateSHA": "11221aeeb7ebe0036c1d56eaea4bd3943513c5eccf691dccf3e29cc3d4851772"
+    },
+    {
+      "path": "src/renderer/typeset/section/vpos.rs",
+      "baseSHA": "04636bb90f9c021e4dfad4ebc867a6d7927b0c95e74cdbb263a90ec3f83159c2",
+      "candidateSHA": "c6e28e78c6f7017885d3b545d852b78f36e39116e01e19098522aa853e9de313"
+    },
+    {
+      "path": "src/renderer/typeset.rs",
+      "baseSHA": "4c01ece299e66bd4b877f06d2deccf1d33fc354c775a491f008b831d862c6ea9",
+      "candidateSHA": "4a50417c07a854214d0076316f989a2d594dbe9cc5bc61ebf4120a4d04fd4d3a"
+    }
+  ],
+  "patchSHA": "5b4f4f250d5d493900c589962752541b55db2f35d165a0c0b576866318865b11",
+  "parserSerializerMetricsUnchanged": true
+}

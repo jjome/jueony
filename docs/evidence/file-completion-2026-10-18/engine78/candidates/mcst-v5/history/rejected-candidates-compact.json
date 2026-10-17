@@ -1,0 +1,392 @@
+[
+  {
+    "file": "candidate75-v1-strict-cycles.json",
+    "sha256": "ce1d57d8790930d8f02a16cc9d311fa6f0c44346fc40ce46d7ff9f66f38a5ca2",
+    "summary": [
+      {
+        "beforePages": 16,
+        "case": "actual",
+        "rawSourceSHA": "45811ad6ff0ab42d36e5ba2baca030190c9ccba1a5a8a76e9bbe7a7387cd81fd",
+        "results": [
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v1-actual-1.hwp",
+            "cycle": 1,
+            "format": "hwp",
+            "geometryDifferences": 22186,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 15,
+            "passed": false,
+            "sha256": "286e4d2aabe2e70db6c4d9f7ff487bba1898390e841304a583e8781d55d48f3a",
+            "sourceDocumentUnchanged": true
+          },
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v1-actual-2.hwp",
+            "cycle": 2,
+            "format": "hwp",
+            "geometryDifferences": 22186,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 15,
+            "passed": false,
+            "sha256": "300502d99478bd341edf67e4828bfec64dee536a97b917521246212b41be8b4c",
+            "sourceDocumentUnchanged": true
+          }
+        ]
+      },
+      {
+        "beforePages": 16,
+        "case": "actual",
+        "rawSourceSHA": "45811ad6ff0ab42d36e5ba2baca030190c9ccba1a5a8a76e9bbe7a7387cd81fd",
+        "results": [
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v1-actual-1.hwpx",
+            "cycle": 1,
+            "format": "hwpx",
+            "geometryDifferences": 0,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 16,
+            "passed": true,
+            "sha256": "8c4834b036e500419464b0773d519e43baf7815b9d38d9a089709d1f97ba3b52",
+            "sourceDocumentUnchanged": true
+          },
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v1-actual-2.hwpx",
+            "cycle": 2,
+            "format": "hwpx",
+            "geometryDifferences": 0,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 16,
+            "passed": true,
+            "sha256": "8c4834b036e500419464b0773d519e43baf7815b9d38d9a089709d1f97ba3b52",
+            "sourceDocumentUnchanged": true
+          }
+        ]
+      },
+      {
+        "beforePages": 15,
+        "case": "converted",
+        "rawSourceSHA": "3e01623ff75cc4c1c5bdfeb833065106f61cc1374ec6224307907161e016fb09",
+        "results": [
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v1-converted-1.hwp",
+            "cycle": 1,
+            "format": "hwp",
+            "geometryDifferences": 125,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 15,
+            "passed": false,
+            "sha256": "4806297ca27703cccc8065f1989ceed171fe181a1c35711b686d26a162812c30",
+            "sourceDocumentUnchanged": true
+          },
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v1-converted-2.hwp",
+            "cycle": 2,
+            "format": "hwp",
+            "geometryDifferences": 125,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 15,
+            "passed": false,
+            "sha256": "f6e63643b927bee0622d9b5a73d4e4d96a4bed0ece331634b34ec6d963c2d73d",
+            "sourceDocumentUnchanged": true
+          }
+        ]
+      },
+      {
+        "beforePages": 15,
+        "case": "converted",
+        "rawSourceSHA": "3e01623ff75cc4c1c5bdfeb833065106f61cc1374ec6224307907161e016fb09",
+        "results": [
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v1-converted-1.hwpx",
+            "cycle": 1,
+            "format": "hwpx",
+            "geometryDifferences": 0,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 15,
+            "passed": true,
+            "sha256": "cef8a3b80d6732be5f850c28923b27a09e2f0ff9df9a2835bc3b84c512266452",
+            "sourceDocumentUnchanged": true
+          },
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v1-converted-2.hwpx",
+            "cycle": 2,
+            "format": "hwpx",
+            "geometryDifferences": 0,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 15,
+            "passed": true,
+            "sha256": "cef8a3b80d6732be5f850c28923b27a09e2f0ff9df9a2835bc3b84c512266452",
+            "sourceDocumentUnchanged": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "candidate75-v3-strict-cycles.json",
+    "sha256": "c6533826f355fb6a8b76a73453bb2afb2f00abc20cbc1258a3413c207c771577",
+    "summary": [
+      {
+        "beforePages": 16,
+        "case": "actual",
+        "rawSourceSHA": "45811ad6ff0ab42d36e5ba2baca030190c9ccba1a5a8a76e9bbe7a7387cd81fd",
+        "results": [
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v3-actual-1.hwp",
+            "cycle": 1,
+            "format": "hwp",
+            "geometryDifferences": 411,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 16,
+            "passed": false,
+            "sha256": "db7c8100ba6dc814e5c6663d1c7c19f5e73dee18cdaadeebeb665173584dd2d5",
+            "sourceDocumentUnchanged": true
+          },
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v3-actual-2.hwp",
+            "cycle": 2,
+            "format": "hwp",
+            "geometryDifferences": 411,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 16,
+            "passed": false,
+            "sha256": "96255d4f54a968a81ba3d3a09aef51deffa1a20feb1854e2926676291ee5c9d6",
+            "sourceDocumentUnchanged": true
+          }
+        ]
+      },
+      {
+        "beforePages": 16,
+        "case": "actual",
+        "rawSourceSHA": "45811ad6ff0ab42d36e5ba2baca030190c9ccba1a5a8a76e9bbe7a7387cd81fd",
+        "results": [
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v3-actual-1.hwpx",
+            "cycle": 1,
+            "format": "hwpx",
+            "geometryDifferences": 0,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 16,
+            "passed": true,
+            "sha256": "8c4834b036e500419464b0773d519e43baf7815b9d38d9a089709d1f97ba3b52",
+            "sourceDocumentUnchanged": true
+          },
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v3-actual-2.hwpx",
+            "cycle": 2,
+            "format": "hwpx",
+            "geometryDifferences": 0,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 16,
+            "passed": true,
+            "sha256": "8c4834b036e500419464b0773d519e43baf7815b9d38d9a089709d1f97ba3b52",
+            "sourceDocumentUnchanged": true
+          }
+        ]
+      },
+      {
+        "beforePages": 15,
+        "case": "converted",
+        "rawSourceSHA": "3e01623ff75cc4c1c5bdfeb833065106f61cc1374ec6224307907161e016fb09",
+        "results": [
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v3-converted-1.hwp",
+            "cycle": 1,
+            "format": "hwp",
+            "geometryDifferences": 125,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 15,
+            "passed": false,
+            "sha256": "4806297ca27703cccc8065f1989ceed171fe181a1c35711b686d26a162812c30",
+            "sourceDocumentUnchanged": true
+          },
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v3-converted-2.hwp",
+            "cycle": 2,
+            "format": "hwp",
+            "geometryDifferences": 125,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 15,
+            "passed": false,
+            "sha256": "f6e63643b927bee0622d9b5a73d4e4d96a4bed0ece331634b34ec6d963c2d73d",
+            "sourceDocumentUnchanged": true
+          }
+        ]
+      },
+      {
+        "beforePages": 15,
+        "case": "converted",
+        "rawSourceSHA": "3e01623ff75cc4c1c5bdfeb833065106f61cc1374ec6224307907161e016fb09",
+        "results": [
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v3-converted-1.hwpx",
+            "cycle": 1,
+            "format": "hwpx",
+            "geometryDifferences": 0,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 15,
+            "passed": true,
+            "sha256": "cef8a3b80d6732be5f850c28923b27a09e2f0ff9df9a2835bc3b84c512266452",
+            "sourceDocumentUnchanged": true
+          },
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v3-converted-2.hwpx",
+            "cycle": 2,
+            "format": "hwpx",
+            "geometryDifferences": 0,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 15,
+            "passed": true,
+            "sha256": "cef8a3b80d6732be5f850c28923b27a09e2f0ff9df9a2835bc3b84c512266452",
+            "sourceDocumentUnchanged": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "file": "candidate75-v4-strict-cycles.json",
+    "sha256": "a3f11b486f4f9e14c64c391c4cc11fe90e10bf5bf011876ce986f75ee701f869",
+    "summary": [
+      {
+        "beforePages": 16,
+        "case": "actual",
+        "rawSourceSHA": "45811ad6ff0ab42d36e5ba2baca030190c9ccba1a5a8a76e9bbe7a7387cd81fd",
+        "results": [
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v4-actual-1.hwp",
+            "cycle": 1,
+            "format": "hwp",
+            "geometryDifferences": 18031,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 17,
+            "passed": false,
+            "sha256": "28452f0f2f7e05f070782108635a8fcc8badd004b85fcc63772421456179f49d",
+            "sourceDocumentUnchanged": true
+          },
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v4-actual-2.hwp",
+            "cycle": 2,
+            "format": "hwp",
+            "geometryDifferences": 18031,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 17,
+            "passed": false,
+            "sha256": "12bea872434f2ed20c4f1214e74669eb27d163693ae4e126673f5577f32073b1",
+            "sourceDocumentUnchanged": true
+          }
+        ]
+      },
+      {
+        "beforePages": 16,
+        "case": "actual",
+        "rawSourceSHA": "45811ad6ff0ab42d36e5ba2baca030190c9ccba1a5a8a76e9bbe7a7387cd81fd",
+        "results": [
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v4-actual-1.hwpx",
+            "cycle": 1,
+            "format": "hwpx",
+            "geometryDifferences": 0,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 16,
+            "passed": true,
+            "sha256": "8c4834b036e500419464b0773d519e43baf7815b9d38d9a089709d1f97ba3b52",
+            "sourceDocumentUnchanged": true
+          },
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v4-actual-2.hwpx",
+            "cycle": 2,
+            "format": "hwpx",
+            "geometryDifferences": 0,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 16,
+            "passed": true,
+            "sha256": "8c4834b036e500419464b0773d519e43baf7815b9d38d9a089709d1f97ba3b52",
+            "sourceDocumentUnchanged": true
+          }
+        ]
+      },
+      {
+        "beforePages": 15,
+        "case": "converted",
+        "rawSourceSHA": "3e01623ff75cc4c1c5bdfeb833065106f61cc1374ec6224307907161e016fb09",
+        "results": [
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v4-converted-1.hwp",
+            "cycle": 1,
+            "format": "hwp",
+            "geometryDifferences": 125,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 15,
+            "passed": false,
+            "sha256": "4806297ca27703cccc8065f1989ceed171fe181a1c35711b686d26a162812c30",
+            "sourceDocumentUnchanged": true
+          },
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v4-converted-2.hwp",
+            "cycle": 2,
+            "format": "hwp",
+            "geometryDifferences": 125,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 15,
+            "passed": false,
+            "sha256": "f6e63643b927bee0622d9b5a73d4e4d96a4bed0ece331634b34ec6d963c2d73d",
+            "sourceDocumentUnchanged": true
+          }
+        ]
+      },
+      {
+        "beforePages": 15,
+        "case": "converted",
+        "rawSourceSHA": "3e01623ff75cc4c1c5bdfeb833065106f61cc1374ec6224307907161e016fb09",
+        "results": [
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v4-converted-1.hwpx",
+            "cycle": 1,
+            "format": "hwpx",
+            "geometryDifferences": 0,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 15,
+            "passed": true,
+            "sha256": "cef8a3b80d6732be5f850c28923b27a09e2f0ff9df9a2835bc3b84c512266452",
+            "sourceDocumentUnchanged": true
+          },
+          {
+            "artifact": "build/file-closure75-public-readonly/candidate75-v4-converted-2.hwpx",
+            "cycle": 2,
+            "format": "hwpx",
+            "geometryDifferences": 0,
+            "lossEmpty": true,
+            "metadataSame": true,
+            "pages": 15,
+            "passed": true,
+            "sha256": "cef8a3b80d6732be5f850c28923b27a09e2f0ff9df9a2835bc3b84c512266452",
+            "sourceDocumentUnchanged": true
+          }
+        ]
+      }
+    ]
+  }
+]

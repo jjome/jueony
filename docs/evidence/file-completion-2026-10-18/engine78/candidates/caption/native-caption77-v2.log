@@ -1,0 +1,18 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/caption-closure77/source-candidate77-v2)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 06s
+     Running tests/jueony_caption_lifecycle.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_caption_lifecycle-02a55666f2ef1999)
+
+running 10 tests
+test invalid_owner_does_not_mutate_body_or_assign_any_numbers ... ok
+test duplicate_attach_and_absent_detach_are_true_noops ... ok
+test existing_caption_accepts_direction_only_partial_update ... ok
+test explicit_picture_start_is_respected_instead_of_hardcoded_one ... ok
+test detach_renumbers_remaining_live_caption_and_reopens ... ok
+test attach_caption_assigns_one_before_any_property_or_export ... ok
+test partial_caption_keys_cannot_create_caption_and_unrelated_keys_do_not_mutate_it ... ok
+test real_caption_properties_and_ellipse_preserve_layout ... ok
+test exact_parent_hide_and_caption_properties_reproduction ... ok
+test attach_detach_snapshot_history_preserves_exact_layout ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+

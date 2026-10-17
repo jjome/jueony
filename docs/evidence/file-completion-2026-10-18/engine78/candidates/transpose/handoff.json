@@ -1,0 +1,64 @@
+{
+  "scope": "Transpose-only successful-operation derived-state owner retirement; no writer, metric, safety gate or coordinate comparison changes.",
+  "baseline": {
+    "tests": 9,
+    "pass": 5,
+    "fail": 4,
+    "ignored": 0,
+    "failures": [
+      "fresh_merged_transpose",
+      "loaded_hwp_merged_transpose",
+      "loaded_hwpx_merged_transpose",
+      "batch_transpose"
+    ],
+    "geometryDifferencesPerFailure": 38,
+    "log": "native-baseline-fixtures-ready.log"
+  },
+  "candidate": {
+    "firstTests": 9,
+    "pass": 9,
+    "fail": 0,
+    "finalTests": 11,
+    "finalPass": 11,
+    "ignored": 0,
+    "log": "native-candidate-history-and-trace.log",
+    "important": "One final diagnostic test records the UNRESOLVED separate tableY12 failure. It is not a claim that tableY is fixed."
+  },
+  "verification": [
+    "Fresh mixed/multi-paragraph merged cells",
+    "Loaded HWP and HWPX inputs",
+    "Two consecutive HWP and HWPX export/reopen cycles with zero loss report",
+    "Full published fields exact except existing measured rectangles/charX maximum0.2",
+    "Cell spans/contents/shape runs/model dimensions unchanged across save",
+    "Unmerged and unchanged negatives",
+    "Double transpose and batch",
+    "Protected cell rejection leaves table model and layout unchanged",
+    "Snapshot Undo/Redo exact live geometry",
+    "Compile-time include_str SHA matches runtime source bytes",
+    "Formal77 git apply --check --whitespace=error-all passed"
+  ],
+  "pending": [
+    "Root formal WASM merged-table conversion verifier and mandatory production save gate",
+    "No GUI/Hancom comparison performed by this worker"
+  ],
+  "sourceProof": {
+    "formal77": "de849bf3aacef6f1",
+    "file": "src/document_core/commands/table_ops.rs",
+    "afterSha256": "c778c565babb8ad5d619b47f22e6386afe614910c90767d73c4eacead673b2c3",
+    "patchSha256": "9d13fa135315a0fc550a2b7de3bff62d765816c217f66a4e9143e8283704b51b",
+    "scope": "One successful transpose operation retires only its obsolete measured table owner and recomposes structure. Existing model transpose, line metrics, protection and serializer/gate contracts are unchanged.",
+    "beforeNormalizedLfTextSha256": "44de0fe9345a86b0db2bb836e3937adbd7881f16e290ff8057e8821d98eae126",
+    "beforeSha256": "aae5b935d4edc36d8e5e195c213f735e11fb5695b42fb611d70b8dcecb240a4f",
+    "normalizationNote": "Original source copied as CRLF, actual byte SHA matches compiled baseline include_str SHA. Python unified-diff generation normalized line endings to LF; normalized text SHA is reported separately."
+  },
+  "preparationFailures": {
+    "logs": [
+      "native-baseline.log",
+      "native-baseline-valid.log"
+    ],
+    "details": [
+      "Initial private copy omitted saved/blank2010.hwp and mydocs include_str files; copied original unchanged fixtures afterward.",
+      "Harness corrected dynamic table control index, Rust raw string delimiter, sha2 0.11 digest format and non-Serialize Document projection before the valid baseline. No production assertion or tolerance was changed."
+    ]
+  }
+}

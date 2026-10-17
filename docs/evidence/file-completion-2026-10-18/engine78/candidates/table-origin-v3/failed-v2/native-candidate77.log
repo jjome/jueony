@@ -1,0 +1,79 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/table-origin-closure77/source-candidate77)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 36.83s
+     Running tests/jueony_table_origin.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_table_origin-579eeffc6f09fb20)
+
+running 7 tests
+test baseline_observations ... LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~273.6, b=178.7~212.9, overlap=94.9px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~273.6, b=178.7~212.9, overlap=94.9px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=192.0~226.2, overlap=15.5px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=192.0~226.2, overlap=15.5px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+ok
+test cell_break_whole_frame_strict_reopens ... LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+
+thread 'cell_break_whole_frame_strict_reopens' (196538) panicked at tests/jueony_table_origin.rs:14:1074:
+strict save failed: Some(Object {"artifact": String("cell-break-whole-1.hwp"), "cycle": Number(1), "firstDifferences": Array [Object {"after": Number(178.7), "before": Number(223.1), "path": String("$/0/controls/controls/1/cells/0/y")}, Object {"after": Number(178.7), "before": Number(223.1), "path": String("$/0/controls/controls/1/cells/1/y")}, Object {"after": Number(195.8), "before": Number(240.2), "path": String("$/0/controls/controls/1/cells/2/y")}, Object {"after": Number(195.8), "before": Number(240.2), "path": String("$/0/controls/controls/1/cells/3/y")}, Object {"after": Number(178.7), "before": Number(223.1), "path": String("$/0/controls/controls/1/y")}], "format": String("hwp"), "geometryDifferences": Number(12), "metadata5Equal": Bool(true), "sourceUnchanged": Bool(true)})
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test default_contract_unchanged_strict_reopens ... ok
+test exclusions_preserve_baseline_full_geometry_and_model ... LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~273.6, b=178.7~212.9, overlap=94.9px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~273.6, b=178.7~212.9, overlap=94.9px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=192.0~226.2, overlap=15.5px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=192.0~226.2, overlap=15.5px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+ok
+test none_contract_unchanged_strict_reopens ... ok
+test policy_history_restores_exact_layout ... LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+
+thread 'policy_history_restores_exact_layout' (196542) panicked at tests/jueony_table_origin.rs:14:1074:
+strict save failed: Some(Object {"artifact": String("history-cell-break-1.hwp"), "cycle": Number(1), "firstDifferences": Array [Object {"after": Number(178.7), "before": Number(223.1), "path": String("$/0/controls/controls/1/cells/0/y")}, Object {"after": Number(178.7), "before": Number(223.1), "path": String("$/0/controls/controls/1/cells/1/y")}, Object {"after": Number(195.8), "before": Number(240.2), "path": String("$/0/controls/controls/1/cells/2/y")}, Object {"after": Number(195.8), "before": Number(240.2), "path": String("$/0/controls/controls/1/cells/3/y")}, Object {"after": Number(178.7), "before": Number(223.1), "path": String("$/0/controls/controls/1/y")}], "format": String("hwp"), "geometryDifferences": Number(12), "metadata5Equal": Bool(true), "sourceUnchanged": Bool(true)})
+FAILED
+test row_break_whole_frame_strict_reopens ... LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+LAYOUT_TABLE_OVERLAP: page=0, sec=0, para_a=1, para_b=2, a=153.6~207.5, b=178.7~212.9, overlap=28.8px
+
+thread 'row_break_whole_frame_strict_reopens' (196543) panicked at tests/jueony_table_origin.rs:14:1074:
+strict save failed: Some(Object {"artifact": String("row-break-whole-1.hwp"), "cycle": Number(1), "firstDifferences": Array [Object {"after": Number(178.7), "before": Number(223.1), "path": String("$/0/controls/controls/1/cells/0/y")}, Object {"after": Number(178.7), "before": Number(223.1), "path": String("$/0/controls/controls/1/cells/1/y")}, Object {"after": Number(195.8), "before": Number(240.2), "path": String("$/0/controls/controls/1/cells/2/y")}, Object {"after": Number(195.8), "before": Number(240.2), "path": String("$/0/controls/controls/1/cells/3/y")}, Object {"after": Number(178.7), "before": Number(223.1), "path": String("$/0/controls/controls/1/y")}], "format": String("hwp"), "geometryDifferences": Number(12), "metadata5Equal": Bool(true), "sourceUnchanged": Bool(true)})
+FAILED
+
+failures:
+
+failures:
+    cell_break_whole_frame_strict_reopens
+    policy_history_restores_exact_layout
+    row_break_whole_frame_strict_reopens
+
+test result: FAILED. 4 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.71s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_table_origin`

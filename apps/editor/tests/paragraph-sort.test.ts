@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import init, { HwpDocument } from '../node_modules/@rhwp/core/rhwp.js';
+import {resolve} from 'node:path';
+import {pathToFileURL,fileURLToPath} from 'node:url';
+const enginePackage=process.env.JUEONY_ENGINE_PACKAGE?resolve(process.env.JUEONY_ENGINE_PACKAGE):fileURLToPath(new URL('../node_modules/@rhwp/core/',import.meta.url));
+const {default:init,HwpDocument}=await import(pathToFileURL(enginePackage+'/rhwp.js').href);
 import { planParagraphSort } from '../src/modules/document/public/paragraph-sort.ts';
 import { readParagraphSortPlan, executeParagraphSort, preflightParagraphSort } from '../src/adapters/rhwp/paragraph-sort-native.ts';
 const options = { mode: 'number' as const, descending: false, keepFirst: true, column: 2 };
@@ -18,7 +21,7 @@ test('paragraph sorting uses exact signed decimal keys, stable ties, title exemp
 });
 
 test('native sorting moves mixed runs, paragraph formats and styles together without changing surrounding text', async () => {
-  await init({ module_or_path: await readFile(new URL('../node_modules/@rhwp/core/rhwp_bg.wasm', import.meta.url)) });
+  await init({ module_or_path: await readFile(enginePackage+'/rhwp_bg.wasm') });
   for (const ext of ['Hwp', 'Hwpx']) {
     const doc: any = HwpDocument.createEmpty(); doc.createBlankDocument(); let reopened: any;
     try {
@@ -39,7 +42,7 @@ test('native sorting moves mixed runs, paragraph formats and styles together wit
 });
 
 test('stale source formatting and partial selections are refused before sorting', async () => {
-  await init({ module_or_path: await readFile(new URL('../node_modules/@rhwp/core/rhwp_bg.wasm', import.meta.url)) });
+  await init({ module_or_path: await readFile(enginePackage+'/rhwp_bg.wasm') });
   const doc: any = HwpDocument.createEmpty(); doc.createBlankDocument();
   try {
     doc.insertText(0, 0, 0, '2'); doc.splitParagraph(0, 0, 1); doc.insertText(0, 1, 0, '1');

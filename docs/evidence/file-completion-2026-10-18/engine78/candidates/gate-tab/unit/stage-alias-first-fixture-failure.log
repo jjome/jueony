@@ -1,0 +1,60 @@
+TAP version 13
+# Subtest: every preservation stage rejects a changing reopen factory source alias at call 2
+not ok 1 - every preservation stage rejects a changing reopen factory source alias at call 2
+  ---
+  duration_ms: 45.403
+  type: 'test'
+  location: 'C:\\Users\\jjome\\Documents\\work\\jueony\\apps\\editor\\tests\\preservation.test.ts:220:27'
+  failureType: 'testCodeFailure'
+  error: |-
+    fixture must enter the existing overlap proof
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/tests/preservation.test.ts:226:11)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: every preservation stage rejects a changing reopen factory source alias at call 3
+not ok 2 - every preservation stage rejects a changing reopen factory source alias at call 3
+  ---
+  duration_ms: 2.7572
+  type: 'test'
+  location: 'C:\\Users\\jjome\\Documents\\work\\jueony\\apps\\editor\\tests\\preservation.test.ts:220:27'
+  failureType: 'testCodeFailure'
+  error: |-
+    fixture must enter the existing overlap proof
+    
+    false !== true
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/tests/preservation.test.ts:226:11)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 203.037

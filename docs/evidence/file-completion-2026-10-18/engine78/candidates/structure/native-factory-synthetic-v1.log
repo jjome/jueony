@@ -1,0 +1,26 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/structure-closure77/source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 18s
+     Running tests/jueony_structure_layout.rs (/tmp/jueony-rhwp-engine/target/transpose-closure77/debug/deps/jueony_structure_layout-7f214eed82e42a2a)
+
+running 3 tests
+
+thread 'full_live_two_codecs_two_cycles_and_snapshot_history' (202154) panicked at tests/jueony_structure_layout.rs:59:47:
+hwp cycle1 [{"after":462.5,"before":466.3,"path":"/1/controls/controls/1/cells/0/y"},{"after":462.5,"before":466.3,"path":"/1/controls/controls/1/cells/1/y"},{"after":462.5,"before":466.3,"path":"/1/controls/controls/1/y"},{"after":489.1,"before":492.9,"path":"/1/text/runs/21/y"},{"after":489.1,"before":492.9,"path":"/1/text/runs/22/y"},{"after":489.1,"before":492.9,"path":"/1/text/runs/23/y"},{"after":489.1,"before":492.9,"path":"/1/text/runs/24/y"},{"after":462.5,"before":466.3,"path":"/1/text/runs/25/y"},{"after":153.6,"before":157.4,"path":"/2/controls/controls/0/cells/0/y"},{"after":153.6,"before":157.4,"path":"/2/controls/controls/0/cells/1/y"},{"after":153.6,"before":157.4,"path":"/2/controls/controls/0/y"},{"after":155.5,"before":159.3,"path":"/2/text/runs/1/y"},{"after":155.5,"before":159.3,"path":"/2/text/runs/2/y"},{"after":153.6,"before":157.4,"path":"/2/text/runs/3/y"}]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test full_live_two_codecs_two_cycles_and_snapshot_history ... FAILED
+
+thread 'current_later_section_roundtrip' (202153) panicked at tests/jueony_structure_layout.rs:31:577:
+[{"differences":[{"after":462.5,"before":466.3,"path":"/1/controls/controls/1/cells/0/y"},{"after":462.5,"before":466.3,"path":"/1/controls/controls/1/cells/1/y"},{"after":462.5,"before":466.3,"path":"/1/controls/controls/1/y"},{"after":489.1,"before":492.9,"path":"/1/text/runs/21/y"},{"after":489.1,"before":492.9,"path":"/1/text/runs/22/y"},{"after":489.1,"before":492.9,"path":"/1/text/runs/23/y"},{"after":489.1,"before":492.9,"path":"/1/text/runs/24/y"},{"after":462.5,"before":466.3,"path":"/1/text/runs/25/y"},{"after":153.6,"before":157.4,"path":"/2/controls/controls/0/cells/0/y"},{"after":153.6,"before":157.4,"path":"/2/controls/controls/0/cells/1/y"},{"after":153.6,"before":157.4,"path":"/2/controls/controls/0/y"},{"after":155.5,"before":159.3,"path":"/2/text/runs/1/y"},{"after":155.5,"before":159.3,"path":"/2/text/runs/2/y"},{"after":153.6,"before":157.4,"path":"/2/text/runs/3/y"}],"format":"hwp"},{"differences":[{"after":178.2,"before":170.7,"path":"/2/text/runs/4/y"},{"after":199.6,"before":192.0,"path":"/2/text/runs/5/y"},{"after":220.9,"before":213.4,"path":"/2/text/runs/6/y"}],"format":"hwpx"}]
+test current_later_section_roundtrip ... FAILED
+CONTROLS:[{"mode":"source-cache-reset","reopenedDifferences":3,"sourceDifferences":0},{"mode":"loaded-cache-reset","reopenedDifferences":0,"sourceDifferences":3},{"mode":"source-vpos-current","reopenedDifferences":3,"sourceDifferences":0},{"mode":"loaded-vpos-current","reopenedDifferences":0,"sourceDifferences":3},{"mode":"source-clear-snapshots","reopenedDifferences":3,"sourceDifferences":0},{"mode":"loaded-clear-snapshots","reopenedDifferences":0,"sourceDifferences":3},{"mode":"loaded-clear-host-lines","reopenedDifferences":0,"sourceDifferences":3},{"mode":"loaded-clear-tail-lines","reopenedDifferences":0,"sourceDifferences":3},{"mode":"source-clear-p0-lines","reopenedDifferences":3,"sourceDifferences":0},{"mode":"loaded-restore-p0-lines","reopenedDifferences":0,"sourceDifferences":3},{"mode":"loaded-restore-rawCtrl","reopenedDifferences":0,"sourceDifferences":3},{"mode":"source-clear-rawCtrl","reopenedDifferences":3,"sourceDifferences":0},{"mode":"loaded-restore-rawTableAttr","reopenedDifferences":0,"sourceDifferences":3},{"mode":"source-force-rawTableAttr","reopenedDifferences":3,"sourceDifferences":0},{"mode":"loaded-replace-p0-model","reopenedDifferences":0,"sourceDifferences":3},{"mode":"source-replace-p0-model","reopenedDifferences":3,"sourceDifferences":0},{"mode":"loaded-replace-table-model","reopenedDifferences":0,"sourceDifferences":3},{"mode":"source-replace-table-model","reopenedDifferences":3,"sourceDifferences":0}]
+test cache_and_source_vpos_control_diagnostics ... ok
+
+failures:
+
+failures:
+    current_later_section_roundtrip
+    full_live_two_codecs_two_cycles_and_snapshot_history
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.78s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_structure_layout`

@@ -1,0 +1,19 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/file-closure75-public-readonly/baseline76)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 01s
+     Running tests/jueony_mcst_boundary.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_mcst_boundary-f23ac5dba16fd2d0)
+
+running 1 test
+
+thread 'valid_inpage_restore_and_real_dirty_owner_match_formal76' (173857) panicked at tests/jueony_mcst_boundary.rs:33:249:
+must exercise real API dirty owner
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test valid_inpage_restore_and_real_dirty_owner_match_formal76 ... FAILED
+
+failures:
+
+failures:
+    valid_inpage_restore_and_real_dirty_owner_match_formal76
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_mcst_boundary`

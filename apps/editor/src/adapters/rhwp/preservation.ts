@@ -1,5 +1,6 @@
 import {sha256} from '@noble/hashes/sha2.js';
 import {assertOverlapSaveLayout,OverlapSaveLayoutError} from './overlap-save-layout.ts';
+import {assertDocumentSaveLayout,DocumentSaveLayoutError} from './document-save-layout.ts';
 
 /** Read-only export evidence. This is an engine round-trip check, not a Hancom layout check. */
 type Json = null | boolean | number | string | Json[] | {[key:string]:Json};
@@ -222,18 +223,29 @@ export function comparePreservationEvidence(before:PreservationEvidence,after:Pr
 
 /** Call before any disk/download/recovery commit, and for each AI edited clone before applying it. */
 export function verifyPreservedExport(source:NativeDocument,bytes:Uint8Array,format:Format,contentLoss:unknown,open:(bytes:Uint8Array)=>NativeDocument & {free():void}):PreservationReport {
- const before=capturePreservationEvidence(source);let reopened:ReturnType<typeof open>|undefined;
+ const sourceHandle=native(source),before=capturePreservationEvidence(sourceHandle);
+ // Every proof stage shares the same ownership check. An injected factory may
+ // return a different handle each time; no stage may receive/free the live one.
+ const guardedOpen:typeof open=bytes=>{const result=open(bytes);if(result===source||result===sourceHandle||native(result)===sourceHandle)throw new Error('source alias');return result;};
+ let reopened:ReturnType<typeof open>|undefined,safeToFree=false;
  let after:PreservationEvidence;
- try{if(!bytes.length)throw new Error('empty');reopened=open(bytes);after=capturePreservationEvidence(reopened);}
+ try{if(!bytes.length)throw new Error('empty');reopened=guardedOpen(bytes);const reopenedHandle=native(reopened);safeToFree=true;after=capturePreservationEvidence(reopenedHandle);}
  catch{after={values:{},unverified:[],issues:[{code:'unreadable',path:'reopen',message:'저장 사본을 다시 열지 못했습니다'}]};}
- finally{reopened?.free();}
+ finally{if(safeToFree)reopened?.free();}
  const report=comparePreservationEvidence(before,after,format,contentLoss);
  if(report.status==='blocked')throw new PreservationError(report);
  try{
-  const layout=assertOverlapSaveLayout(source,bytes,format,open);
+  const layout=assertOverlapSaveLayout(source,bytes,format,guardedOpen);
   if(layout.status==='checked')report.checked.push('native-hwp-overlapping-table-layout');
  }catch(error){
   const issue:PreservationIssue={code:error instanceof OverlapSaveLayoutError?error.code:'unreadable',path:'native-hwp-overlapping-table-layout',message:error instanceof Error?error.message:'저장 후 겹침 표 배치를 확인하지 못했습니다'};
+  throw new PreservationError({...report,status:'blocked',issues:[...report.issues,issue]});
+ }
+ try{
+  assertDocumentSaveLayout(source,bytes,format,guardedOpen);
+  report.checked.push('whole-document-published-layout');
+ }catch(error){
+  const issue:PreservationIssue={code:error instanceof DocumentSaveLayoutError?error.code:'unreadable',path:'whole-document-published-layout'+(error instanceof DocumentSaveLayoutError?'/'+error.path:''),message:error instanceof Error?error.message:'저장 후 문서 전체 배치를 확인하지 못했습니다'};
   throw new PreservationError({...report,status:'blocked',issues:[...report.issues,issue]});
  }
  return report;

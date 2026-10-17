@@ -1,0 +1,22 @@
+{
+  "formalSource": "build/rhwp-engine/source-de849bf3aacef6f1",
+  "sourceBaseByteProof": "candidate-source-proof.json",
+  "steps": [
+    "Copy the complete prepared formal77 source, including saved/blank2010.hwp and mydocs include_str inputs, to a new ignored private directory. Do not overwrite formal77.",
+    "Copy fixtures/properties.hwp and properties.hwpx under build/document-save-transpose77; these are self-authored inputs used by the compiled harness.",
+    "Register native-tests-final.rs as explicit Cargo [[test]] jueony_transpose_layout. Supply JUEONY_REPO and JUEONY_TABLE_OPS_SHA from the actual private source bytes.",
+    "Run unchanged source with JUEONY_TRANSPOSE_MODE=baseline. The four merged/batch positive failures are expected original defects; 5/9 pass.",
+    "Apply only the included delta with git apply --check --whitespace=error-all first, then run JUEONY_TRANSPOSE_MODE=candidate with the changed source SHA.",
+    "Final harness contains10 transpose/protection/provenance checks plus1 explicit known-unresolved separate tableY diagnostic. Do not count that diagnostic as a tableY repair.",
+    "Root must run formal WASM table-conversion and save-gate checks after integration. Native evidence is not actual Hancom/GUI equality."
+  ],
+  "fixtureLabels": "historical-transpose-export files are original formal77 serializer outputs, not exports claimed to come from the new candidate. Candidate readbacks are actual Native output snapshots; subsequent root formal integration provides final binaries.",
+  "excluded": [
+    "vendor source",
+    "public documents",
+    "font programs",
+    "whole source tree",
+    "WASM",
+    "EXE"
+  ]
+}

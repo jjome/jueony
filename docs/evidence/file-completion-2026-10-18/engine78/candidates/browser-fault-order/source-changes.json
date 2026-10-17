@@ -1,0 +1,27 @@
+{
+  "files": [
+    {
+      "file": "apps/editor/scripts/verify-cell-padding.mjs",
+      "beforeSHA": "4d4f4befc268dd07d11ee0f12e1d14452e47fcb86ef9bbbd0f7e8b232a6a8b53",
+      "afterSHA": "67b90758d4294f37c4bcefbe2ae1aaee106821397b62d04b4b70857c182477c3",
+      "beforeLineEndings": "CRLF",
+      "afterLineEndings": "CRLF"
+    },
+    {
+      "file": "apps/editor/scripts/verify-column-width.mjs",
+      "beforeSHA": "3dc6dbf74e5351f7152f9a395676d086f79f21bec1faea74da83a8b5ff17001a",
+      "afterSHA": "9df65a528b9dbf29607583f282e435ad33ad7bf85c6d62b00d0933e8fc6cc9f7",
+      "beforeLineEndings": "LF",
+      "afterLineEndings": "LF"
+    },
+    {
+      "file": "apps/editor/scripts/verify-equal-columns.mjs",
+      "beforeSHA": "006690b44a8efe811389861b9911e000e66105b08a34d95d718cb00ef7b6a496",
+      "afterSHA": "1562cad53da8215ba4a2340b588571f816eea3312e1c9e74dfd54bd54ea85046",
+      "beforeLineEndings": "LF",
+      "afterLineEndings": "LF"
+    }
+  ],
+  "scope": "fault timing and observation order only; production guard and byte/history/cursor assertions unchanged; live mutation and poisoned post-mutation read assertions added",
+  "initialRecorderFailure": "A proof-only assertion assumed original CRLF. Source was valid LF. No behavioral test or source expectation was changed to resolve this path-independent recording error."
+}

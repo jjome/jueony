@@ -1,0 +1,27 @@
+{
+  "engineSourceId": "23d2545926a179a5",
+  "adapterSha256": "6c1d119f4723698e9e3769d4fb45c7b38469b6f0bca6f4c575688f3b38638434",
+  "preservationSha256": "65a424675905ea8b09f4722e110101910a0327c6f68d19714e6093996cee8b5b",
+  "sourceChangedByReviewer": false,
+  "results": [
+    {
+      "name": "shared object immutable snapshot",
+      "status": "PASS",
+      "writes": 0
+    },
+    {
+      "name": "arbitrary coordinate-named metadata is exact",
+      "status": "PASS"
+    },
+    {
+      "name": "direct semantic source alias retains live handle",
+      "status": "PASS",
+      "sourceFreeCalls": 0
+    },
+    {
+      "name": "borrowed semantic source alias retains live handle",
+      "status": "PASS",
+      "sourceFreeCalls": 0
+    }
+  ]
+}

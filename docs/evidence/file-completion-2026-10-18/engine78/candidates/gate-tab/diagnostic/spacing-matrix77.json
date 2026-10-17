@@ -1,0 +1,250 @@
+{
+  "observations": [
+    {
+      "mode": "plain-two",
+      "gap": 0,
+      "semantic": 0,
+      "differences": []
+    },
+    {
+      "mode": "plain-two",
+      "gap": 75,
+      "semantic": 0,
+      "differences": []
+    },
+    {
+      "mode": "plain-two",
+      "gap": 283,
+      "semantic": 0,
+      "differences": []
+    },
+    {
+      "mode": "plain-two",
+      "gap": 1000,
+      "semantic": 0,
+      "differences": []
+    },
+    {
+      "mode": "plain-six",
+      "gap": 0,
+      "semantic": 0,
+      "differences": []
+    },
+    {
+      "mode": "plain-six",
+      "gap": 75,
+      "semantic": 0,
+      "differences": []
+    },
+    {
+      "mode": "plain-six",
+      "gap": 283,
+      "semantic": 0,
+      "differences": []
+    },
+    {
+      "mode": "plain-six",
+      "gap": 1000,
+      "semantic": 0,
+      "differences": []
+    },
+    {
+      "mode": "tabs-six",
+      "gap": 0,
+      "semantic": 0,
+      "differences": []
+    },
+    {
+      "mode": "tabs-six",
+      "gap": 75,
+      "semantic": 0,
+      "differences": [
+        {
+          "path": "$[0][\"text\"][\"runs\"][3][\"y\"]",
+          "before": 196.3,
+          "after": 196.8,
+          "delta": 0.5
+        },
+        {
+          "path": "$[0][\"text\"][\"runs\"][4][\"y\"]",
+          "before": 217.6,
+          "after": 218.1,
+          "delta": 0.5
+        },
+        {
+          "path": "$[0][\"text\"][\"runs\"][5][\"y\"]",
+          "before": 238.9,
+          "after": 239.4,
+          "delta": 0.5
+        }
+      ]
+    },
+    {
+      "mode": "tabs-six",
+      "gap": 283,
+      "semantic": 0,
+      "differences": [
+        {
+          "path": "$[0][\"text\"][\"runs\"][3][\"y\"]",
+          "before": 196.3,
+          "after": 198.2,
+          "delta": 1.8999999999999773
+        },
+        {
+          "path": "$[0][\"text\"][\"runs\"][4][\"y\"]",
+          "before": 217.6,
+          "after": 219.5,
+          "delta": 1.9000000000000057
+        },
+        {
+          "path": "$[0][\"text\"][\"runs\"][5][\"y\"]",
+          "before": 238.9,
+          "after": 240.8,
+          "delta": 1.9000000000000057
+        }
+      ]
+    },
+    {
+      "mode": "tabs-six",
+      "gap": 1000,
+      "semantic": 0,
+      "differences": [
+        {
+          "path": "$[0][\"text\"][\"runs\"][3][\"y\"]",
+          "before": 196.3,
+          "after": 202.9,
+          "delta": 6.599999999999994
+        },
+        {
+          "path": "$[0][\"text\"][\"runs\"][4][\"y\"]",
+          "before": 217.6,
+          "after": 224.3,
+          "delta": 6.700000000000017
+        },
+        {
+          "path": "$[0][\"text\"][\"runs\"][5][\"y\"]",
+          "before": 238.9,
+          "after": 245.6,
+          "delta": 6.699999999999989
+        }
+      ]
+    },
+    {
+      "mode": "mixed-six",
+      "gap": 0,
+      "semantic": 0,
+      "differences": []
+    },
+    {
+      "mode": "mixed-six",
+      "gap": 75,
+      "semantic": 0,
+      "differences": [
+        {
+          "path": "$[0][\"text\"][\"runs\"][5][\"y\"]",
+          "before": 196.3,
+          "after": 196.8,
+          "delta": 0.5
+        },
+        {
+          "path": "$[0][\"text\"][\"runs\"][6][\"y\"]",
+          "before": 196.3,
+          "after": 196.8,
+          "delta": 0.5
+        },
+        {
+          "path": "$[0][\"text\"][\"runs\"][7][\"y\"]",
+          "before": 217.6,
+          "after": 218.1,
+          "delta": 0.5
+        },
+        {
+          "path": "$[0][\"text\"][\"runs\"][8][\"y\"]",
+          "before": 217.6,
+          "after": 218.1,
+          "delta": 0.5
+        },
+        {
+          "path": "$[0][\"text\"][\"runs\"][9][\"y\"]",
+          "before": 238.9,
+          "after": 239.4,
+          "delta": 0.5
+        }
+      ]
+    },
+    {
+      "mode": "mixed-six",
+      "gap": 283,
+      "semantic": 0,
+      "differences": [
+        {
+          "path": "$[0][\"text\"][\"runs\"][5][\"y\"]",
+          "before": 196.3,
+          "after": 198.2,
+          "delta": 1.8999999999999773
+        },
+        {
+          "path": "$[0][\"text\"][\"runs\"][6][\"y\"]",
+          "before": 196.3,
+          "after": 198.2,
+          "delta": 1.8999999999999773
+        },
+        {
+          "path": "$[0][\"text\"][\"runs\"][7][\"y\"]",
+          "before": 217.6,
+          "after": 219.5,
+          "delta": 1.9000000000000057
+        },
+        {
+          "path": "$[0][\"text\"][\"runs\"][8][\"y\"]",
+          "before": 217.6,
+          "after": 219.5,
+          "delta": 1.9000000000000057
+        },
+        {
+          "path": "$[0][\"text\"][\"runs\"][9][\"y\"]",
+          "before": 238.9,
+          "after": 240.8,
+          "delta": 1.9000000000000057
+        }
+      ]
+    },
+    {
+      "mode": "mixed-six",
+      "gap": 1000,
+      "semantic": 0,
+      "differences": [
+        {
+          "path": "$[0][\"text\"][\"runs\"][5][\"y\"]",
+          "before": 196.3,
+          "after": 202.9,
+          "delta": 6.599999999999994
+        },
+        {
+          "path": "$[0][\"text\"][\"runs\"][6][\"y\"]",
+          "before": 196.3,
+          "after": 202.9,
+          "delta": 6.599999999999994
+        },
+        {
+          "path": "$[0][\"text\"][\"runs\"][7][\"y\"]",
+          "before": 217.6,
+          "after": 224.3,
+          "delta": 6.700000000000017
+        },
+        {
+          "path": "$[0][\"text\"][\"runs\"][8][\"y\"]",
+          "before": 217.6,
+          "after": 224.3,
+          "delta": 6.700000000000017
+        },
+        {
+          "path": "$[0][\"text\"][\"runs\"][9][\"y\"]",
+          "before": 238.9,
+          "after": 245.6,
+          "delta": 6.699999999999989
+        }
+      ]
+    }
+  ]
+}

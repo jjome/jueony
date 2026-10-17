@@ -1,0 +1,57 @@
+{
+  "status": "PRIVATE_NATIVE_PASS_FORMAL_WASM_PENDING",
+  "baseline": "formal77 source-de849bf3aacef6f1",
+  "scope": "Only freshly generated empty neighbor LINE_SEG provenance in create_table_with_options_native; host anchors, external stored rows, dimensions, parser, serializer, guards and tolerances unchanged.",
+  "sourceSha256": "d809e25d9c1b3c3d206be638b6884b7ea9756fd99509c8c94a8e89686d149a10",
+  "compiledSourceSha256": "d809e25d9c1b3c3d206be638b6884b7ea9756fd99509c8c94a8e89686d149a10",
+  "patchSha256": "a72b92a073a39731ea61ac07957d2176a0c5fd2bab6b331bfdcefbdbea229653",
+  "applyCheck": {
+    "target": "build/rhwp-engine/source-de849bf3aacef6f1",
+    "command": "git apply --check --whitespace=error-all --unsafe-paths --directory=build/rhwp-engine/source-de849bf3aacef6f1 build/structure-closure77/neighbor-line-provenance-delta-formal77.patch",
+    "exitCode": 0
+  },
+  "nativeTests": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "ignored": 0,
+    "functional": 4,
+    "diagnostic": 1,
+    "compileTimeProof": 1
+  },
+  "baselineFailure": {
+    "hwp": 0,
+    "hwpx": 3,
+    "paths": [
+      "page2/runs4/y",
+      "page2/runs5/y",
+      "page2/runs6/y"
+    ],
+    "before": [
+      174.9,
+      196.3,
+      217.6
+    ],
+    "reopened": [
+      178.2,
+      199.6,
+      220.9
+    ]
+  },
+  "candidate": {
+    "hwp": 0,
+    "hwpx": 0,
+    "liveAndReopenedTailY": [
+      178.2,
+      199.6,
+      220.9
+    ]
+  },
+  "rejectedCandidate": "factory-line-provenance-v1.patch marked host AND neighbor and failed HWP14/HWPX3; not recommended",
+  "cause": "Constructor empty neighbor carried a saved-looking tag. A synthetic first body paragraph provided page_base0 live, but HWPX omits that synthetic cache. The saved-looking neighbor then rewound live content into the prior table occupied band, whereas loaded NO_LS path retained actual flow. Assigning provenance only to the generated neighbor consistently consumes the real table end.",
+  "notRun": [
+    "Official WASM merged regression",
+    "Latest native GUI",
+    "Hancom direct comparison"
+  ]
+}

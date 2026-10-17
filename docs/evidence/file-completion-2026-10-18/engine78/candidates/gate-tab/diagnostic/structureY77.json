@@ -1,0 +1,51 @@
+{
+  "status": "DIFFERENT_OR_UNREADABLE",
+  "formats": {
+    "before": "hwpx",
+    "after": "hwpx"
+  },
+  "pages": {
+    "before": 3,
+    "after": 3,
+    "equal": true
+  },
+  "semantic": {
+    "count": 0,
+    "differences": [],
+    "readIssues": {
+      "before": [],
+      "after": []
+    }
+  },
+  "geometry": {
+    "tolerance": 0.2,
+    "count": 3,
+    "differences": [
+      {
+        "path": "$[2][\"text\"][\"runs\"][4][\"y\"]",
+        "before": 174.9,
+        "after": 178.2,
+        "delta": 3.299999999999983
+      },
+      {
+        "path": "$[2][\"text\"][\"runs\"][5][\"y\"]",
+        "before": 196.3,
+        "after": 199.6,
+        "delta": 3.299999999999983
+      },
+      {
+        "path": "$[2][\"text\"][\"runs\"][6][\"y\"]",
+        "before": 217.6,
+        "after": 220.9,
+        "delta": 3.3000000000000114
+      }
+    ]
+  },
+  "unverified": [
+    "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+    "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+    "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+    "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+  ],
+  "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality."
+}

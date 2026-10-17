@@ -1,0 +1,25 @@
+--- a/src/document_core/commands/formatting.rs
++++ b/src/document_core/commands/formatting.rs
+@@ -1576,7 +1576,21 @@
+         // 줄바꿈에 영향을 주는 변경 시 LineSeg 재계산 (compose는 LineSeg 값을 그대로
+         // 사용하므로). 줄간격뿐 아니라 여백/들여쓰기/줄나눔 단위도 사용 가능 폭·토큰
+         // 경계를 바꾼다 — [#4324] para_shape_mods_affect_text_flow(:16 부근) 참고.
+-        if para_shape_mods_affect_text_flow(&mods) {
++        // Unresolved inline tabs intentionally serialize without stored LINE_SEG.
++        // A spacing-only change must therefore use the same fresh paragraph flow
++        // now, rather than retain a saved origin that ignores the new gap until
++        // reopen. Do not reflow ordinary spacing-only or unchanged properties.
++        let para = &self.document.sections[sec_idx].paragraphs[para_idx];
++        let unresolved_tab = para.text.chars().filter(|&c| c == '\t').enumerate()
++            .any(|(index, _)| para.tab_extended.get(index).map_or(true, |ext| {
++                crate::model::paragraph::tab_ext_is_placeholder(ext)
++            }));
++        let tab_spacing_changed = unresolved_tab
++            && self.document.doc_info.para_shapes.get(base_id as usize)
++                .zip(self.document.doc_info.para_shapes.get(new_id as usize))
++                .is_some_and(|(before, after)| before.spacing_before != after.spacing_before
++                    || before.spacing_after != after.spacing_after);
++        if para_shape_mods_affect_text_flow(&mods) || tab_spacing_changed {
+             let styles = self.resolve_render_styles_for_section(sec_idx);
+             let section = &self.document.sections[sec_idx];
+             let page_def = &section.section_def.page_def;

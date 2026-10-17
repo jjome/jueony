@@ -1,0 +1,144 @@
+{
+  "scope": "B001/B002 distinct native new-document window and same-window new tab; no fullFileAgent privilege added",
+  "reports": {
+    "windows": {
+      "path": "build/document-windows-final68/browser/result.json",
+      "sha256": "81d7dfef7efeccd29b3fe9f8a484012a2f45f05d27bb803ca8e1601dcda3f5d1",
+      "passed": 8,
+      "failed": 0,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "externalRequests": [],
+      "build": "3841230206b05c6d4c9cac8288f72e5b86b4e6a4d24bb84f6ce8c5d2262afb73",
+      "engine": "4a9acaf931b91b967f93b777cf5b987c7e73d23cff0f0a9a9c719b5e244938e9"
+    },
+    "lifecycle": {
+      "path": "build/document-windows-final68/lifecycle/result.json",
+      "sha256": "624e578c597cf68d8bb830053269824f36225ba8695b1938ea876b52e8f7a1ca",
+      "passed": 10,
+      "failed": 0,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "externalRequests": [],
+      "build": "3841230206b05c6d4c9cac8288f72e5b86b4e6a4d24bb84f6ce8c5d2262afb73",
+      "engine": "4a9acaf931b91b967f93b777cf5b987c7e73d23cff0f0a9a9c719b5e244938e9"
+    },
+    "recents": {
+      "path": "build/document-windows-final68/recents/result.json",
+      "sha256": "36be84be18fb30e34ca520f14f36014bad29b67b8363d45bf9b446c6d33b53d5",
+      "passed": 9,
+      "failed": 0,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "externalRequests": [],
+      "build": "3841230206b05c6d4c9cac8288f72e5b86b4e6a4d24bb84f6ce8c5d2262afb73",
+      "engine": "4a9acaf931b91b967f93b777cf5b987c7e73d23cff0f0a9a9c719b5e244938e9"
+    },
+    "nativeShell": {
+      "path": "build/document-windows-final68/native-shell-current-contract/result.json",
+      "sha256": "e555ddc012dd097819314f369b4e9bc4abb2f9d8fe6c412f75a9b786e9a321a9",
+      "passed": 11,
+      "failed": 0,
+      "pageErrors": [],
+      "consoleErrors": [],
+      "externalRequests": [],
+      "build": "3841230206b05c6d4c9cac8288f72e5b86b4e6a4d24bb84f6ce8c5d2262afb73",
+      "engine": "4a9acaf931b91b967f93b777cf5b987c7e73d23cff0f0a9a9c719b5e244938e9"
+    }
+  },
+  "source": [
+    {
+      "path": "apps/editor/src-tauri/src/main.rs",
+      "sha256": "1635438473100355e1d0fc39274bfe94c897cca5e49801577bb136f08ff855b6"
+    },
+    {
+      "path": "apps/editor/src-tauri/src/document_windows.rs",
+      "sha256": "4c66178486d365bba70881b3f467cb96d462574635768a7316ccfa8c22f75359"
+    },
+    {
+      "path": "apps/editor/src-tauri/src/file_bindings.rs",
+      "sha256": "68e85ae216b9887a56bc50a3e2cb774b88eaac9fed6682f150b8f7bb3f13fe11"
+    },
+    {
+      "path": "apps/editor/src/adapters/desktop/document-windows.ts",
+      "sha256": "df78a6cfb813c78ae71413a26b74475ae52baddb8b69dd0d6509d1633074844e"
+    },
+    {
+      "path": "apps/editor/src/adapters/desktop/native-host.ts",
+      "sha256": "f8cf62cbb767e5a25c530bdd6b46965c41eeea6ede831b4625288187ffd7cb4a"
+    },
+    {
+      "path": "apps/editor/src/adapters/storage/indexeddb-workspace.ts",
+      "sha256": "195b323cc5837a3c60b6677f60602649282abda61b4979f206e5a29c5d81a14d"
+    },
+    {
+      "path": "apps/editor/src/shell.ts",
+      "sha256": "42dc93daf6d85052f1aa4a9118420588e8d4b39f0360466e15ce87b4cf8f5bf7"
+    },
+    {
+      "path": "apps/editor/src/shortcuts/install.ts",
+      "sha256": "a441f380f9093e69d7326178f00e4e5662403d98137bd55d2b1c1d20966af942"
+    },
+    {
+      "path": "apps/editor/src/shortcuts/keymap.ts",
+      "sha256": "95a0c2d0e414925a9e9eef95feb011cce0e187621225d638499ec8788b68816a"
+    },
+    {
+      "path": "apps/editor/tests/document-windows.test.ts",
+      "sha256": "1be5a8611f2302f555af2aa9d299128902a412eaa47df06114b3a8f75ec10490"
+    },
+    {
+      "path": "apps/editor/scripts/verify-document-windows.mjs",
+      "sha256": "a90e38ca8ed1a686e37418b8d188709fe036ff48453946bb89a7a012789daf49"
+    },
+    {
+      "path": "apps/editor/scripts/verify-document-lifecycle.mjs",
+      "sha256": "01da3b9c01de5f196c451e1bd09efe1657f6a49c69c8d5aa9b070be49c172e53"
+    },
+    {
+      "path": "apps/editor/scripts/verify-native-recents.mjs",
+      "sha256": "4a3e58138b97a237383f34c060267adf046f0743c79b331721814fcba8750354"
+    },
+    {
+      "path": "apps/editor/scripts/verify-native-shell.mjs",
+      "sha256": "2ae3e4077ffbb3bcdca1358008e8b5ba15fed650c897dba9b2e05024c024be80"
+    },
+    {
+      "path": "scripts/Prepare-DocumentWindowReview.ps1",
+      "sha256": "3917aaa4f101d39f7378d30281153a234d4c00161e217298b42dc2f48ec99802"
+    }
+  ],
+  "logs": {
+    "build/document-windows-rust-final29-verified.log": "32473447f91479e792595ede00311043bcfab3ccd4c589de4aa9af7b9ecc72b8",
+    "build/document-windows-all-unit-patched68.log": "03f83a904c8e34c35f34f0fcf42165dbe7b1ffe2bd8fec90a87637a0d720ad92",
+    "build/document-windows-final-ts.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "counts": {
+    "windowsRust": 29,
+    "node": 878,
+    "nodeSkipped": 0,
+    "browserWindows": 8,
+    "browserLifecycle": 10,
+    "browserRecents": 9,
+    "browserNativeShell": 11
+  },
+  "references": [
+    "https://help.hancom.com/hoffice130/ko-KR/Hwp/file/new/new.htm",
+    "https://help.hancom.com/hoffice130/ko-KR/Hwp/file/new_tab.htm"
+  ],
+  "limits": [
+    "Native window IPC/builder/focus/close exercised by Windows Rust model plus synthetic IPC on actual Edge; actual packaged WebView2 multi-window GUI remains for root.",
+    "Tab30 edge test verifies real pending iframe allocation guard with held navigation; ordinary new tab history/default bytes verified with real engine.",
+    "Each separate native window explicitly owns independent workspace/chat/document DB. Main DB remains unchanged; registry retains closed context reopening.",
+    "Agent create_document retains existing side-tab semantics; full file lifecycle Agent integration remains separate.",
+    "Historical window registry 1000 entries / 5000 request safety limits fail explicitly, preserve all stored data.",
+    "Application profile here uses official68 engine; root final69 integration rerun remains."
+  ],
+  "failedAttemptsPreserved": [
+    "build/document-windows-browser68",
+    "build/document-windows-browser68-v2",
+    "build/document-windows-browser68-v3",
+    "build/document-windows-browser68-v4",
+    "build/document-windows-final68/native-shell"
+  ]
+}

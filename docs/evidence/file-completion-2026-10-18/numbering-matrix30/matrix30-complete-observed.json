@@ -1,0 +1,2297 @@
+{
+  "status": "ACTUAL_MATRIX30_COMPLETE",
+  "selfAuthored": true,
+  "manifest": "build\\file-closure69-public\\hancom-direct\\numbering-format-checkable-matrix30-used-manifest.json",
+  "nativeFile": "build\\file-closure69-public\\hancom-direct\\numbering-format-checkable-matrix30-used.hwp",
+  "nativeSha256": "2857efe6bfc1c43c3f32f0edada9c38b195d59a31544fb875787a0d0666689bd",
+  "diskReverseFile": "build\\file-closure69-public\\hancom-direct\\numbering-matrix30-used-disk-roundtrip.hwpx",
+  "diskReverseSha256": "1ce430eb230e485dae38882ea1fd96b838163e22b444c6f3c272b734c068ce37",
+  "nativeDefinitions": 31,
+  "reverseDefinitions": 31,
+  "cases": [
+    {
+      "input": {
+        "id": 2,
+        "code": 0,
+        "numFormat": "DIGIT",
+        "level8Checkable": 0,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT00-CHECKABLE0",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt00-checkable0",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT00-CHECKABLE0",
+        "bodyParagraphId": 1,
+        "paraPrID": 20,
+        "headingRefType": "NUMBER",
+        "headingRefId": 2
+      },
+      "nativeRecordIndex": 1,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT00-CHECKABLE0"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "fd80f7cd5766d3c550fcb2c3c71ec1a10fe1ba5035ae6a78b672a739a26abeae"
+      },
+      "reverse": {
+        "id": "2",
+        "numFormat": "DIGIT",
+        "checkable": "0",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT00-CHECKABLE0"
+      },
+      "normalizes": false,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 3,
+        "code": 0,
+        "numFormat": "DIGIT",
+        "level8Checkable": 1,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT00-CHECKABLE1",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt00-checkable1",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT00-CHECKABLE1",
+        "bodyParagraphId": 2,
+        "paraPrID": 21,
+        "headingRefType": "NUMBER",
+        "headingRefId": 3
+      },
+      "nativeRecordIndex": 2,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT00-CHECKABLE1"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "7522307dc9ae5dd32872774a8f94ee7b617db5ff90f1387604670fb436fa8b50"
+      },
+      "reverse": {
+        "id": "3",
+        "numFormat": "DIGIT",
+        "checkable": "0",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT00-CHECKABLE1"
+      },
+      "normalizes": true,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 4,
+        "code": 1,
+        "numFormat": "CIRCLED_DIGIT",
+        "level8Checkable": 0,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT01-CHECKABLE0",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt01-checkable0",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT01-CHECKABLE0",
+        "bodyParagraphId": 3,
+        "paraPrID": 22,
+        "headingRefType": "NUMBER",
+        "headingRefId": 4
+      },
+      "nativeRecordIndex": 3,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 32,
+            "numberFormatCode": 1,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "200000000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT01-CHECKABLE0"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "4dc65e5d2805e9c9fc97b5bc46a0bd3d7a71bc2571352b8733471dd6db016cb4"
+      },
+      "reverse": {
+        "id": "4",
+        "numFormat": "CIRCLED_DIGIT",
+        "checkable": "1",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT01-CHECKABLE0"
+      },
+      "normalizes": true,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 5,
+        "code": 1,
+        "numFormat": "CIRCLED_DIGIT",
+        "level8Checkable": 1,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT01-CHECKABLE1",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt01-checkable1",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT01-CHECKABLE1",
+        "bodyParagraphId": 4,
+        "paraPrID": 23,
+        "headingRefType": "NUMBER",
+        "headingRefId": 5
+      },
+      "nativeRecordIndex": 4,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 32,
+            "numberFormatCode": 1,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "200000000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT01-CHECKABLE1"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "b77cce4a50d2fd02bb73f898a0cc80525ec55438a371f3fc8907c10b46f61770"
+      },
+      "reverse": {
+        "id": "5",
+        "numFormat": "CIRCLED_DIGIT",
+        "checkable": "1",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT01-CHECKABLE1"
+      },
+      "normalizes": false,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 6,
+        "code": 2,
+        "numFormat": "ROMAN_CAPITAL",
+        "level8Checkable": 0,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT02-CHECKABLE0",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt02-checkable0",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT02-CHECKABLE0",
+        "bodyParagraphId": 5,
+        "paraPrID": 24,
+        "headingRefType": "NUMBER",
+        "headingRefId": 6
+      },
+      "nativeRecordIndex": 5,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 64,
+            "numberFormatCode": 2,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "400000000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT02-CHECKABLE0"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "7f817ce2d17bcf2379b41feb7cb22532dd434214e4d417813b3443ec2d80933e"
+      },
+      "reverse": {
+        "id": "6",
+        "numFormat": "ROMAN_CAPITAL",
+        "checkable": "0",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT02-CHECKABLE0"
+      },
+      "normalizes": false,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 7,
+        "code": 2,
+        "numFormat": "ROMAN_CAPITAL",
+        "level8Checkable": 1,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT02-CHECKABLE1",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt02-checkable1",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT02-CHECKABLE1",
+        "bodyParagraphId": 6,
+        "paraPrID": 25,
+        "headingRefType": "NUMBER",
+        "headingRefId": 7
+      },
+      "nativeRecordIndex": 6,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 64,
+            "numberFormatCode": 2,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "400000000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT02-CHECKABLE1"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "8ad70d262b2854c663323a200dbedaa4b06e87ba101ccf00b34d9356aeef4e40"
+      },
+      "reverse": {
+        "id": "7",
+        "numFormat": "ROMAN_CAPITAL",
+        "checkable": "0",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT02-CHECKABLE1"
+      },
+      "normalizes": true,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 8,
+        "code": 3,
+        "numFormat": "ROMAN_SMALL",
+        "level8Checkable": 0,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT03-CHECKABLE0",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt03-checkable0",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT03-CHECKABLE0",
+        "bodyParagraphId": 7,
+        "paraPrID": 26,
+        "headingRefType": "NUMBER",
+        "headingRefId": 8
+      },
+      "nativeRecordIndex": 7,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 96,
+            "numberFormatCode": 3,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "600000000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT03-CHECKABLE0"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "4570852198e90be56342bbd5d10075747961e7704621aebb77d9ff7bd3c751ca"
+      },
+      "reverse": {
+        "id": "8",
+        "numFormat": "ROMAN_SMALL",
+        "checkable": "1",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT03-CHECKABLE0"
+      },
+      "normalizes": true,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 9,
+        "code": 3,
+        "numFormat": "ROMAN_SMALL",
+        "level8Checkable": 1,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT03-CHECKABLE1",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt03-checkable1",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT03-CHECKABLE1",
+        "bodyParagraphId": 8,
+        "paraPrID": 27,
+        "headingRefType": "NUMBER",
+        "headingRefId": 9
+      },
+      "nativeRecordIndex": 8,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 96,
+            "numberFormatCode": 3,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "600000000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT03-CHECKABLE1"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "2bd98e6746508ae0650e0b3b2b4260fca3e8b747394ae100a9f4f22e5e74f07d"
+      },
+      "reverse": {
+        "id": "9",
+        "numFormat": "ROMAN_SMALL",
+        "checkable": "1",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT03-CHECKABLE1"
+      },
+      "normalizes": false,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 10,
+        "code": 4,
+        "numFormat": "LATIN_CAPITAL",
+        "level8Checkable": 0,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT04-CHECKABLE0",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt04-checkable0",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT04-CHECKABLE0",
+        "bodyParagraphId": 9,
+        "paraPrID": 28,
+        "headingRefType": "NUMBER",
+        "headingRefId": 10
+      },
+      "nativeRecordIndex": 9,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 128,
+            "numberFormatCode": 4,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "800000000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT04-CHECKABLE0"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "e741e9a58ad483ec9cb22cb8b02ae0d10a0c6e3715f07538d274d0c96d7f6686"
+      },
+      "reverse": {
+        "id": "10",
+        "numFormat": "LATIN_CAPITAL",
+        "checkable": "0",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT04-CHECKABLE0"
+      },
+      "normalizes": false,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 11,
+        "code": 4,
+        "numFormat": "LATIN_CAPITAL",
+        "level8Checkable": 1,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT04-CHECKABLE1",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt04-checkable1",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT04-CHECKABLE1",
+        "bodyParagraphId": 10,
+        "paraPrID": 29,
+        "headingRefType": "NUMBER",
+        "headingRefId": 11
+      },
+      "nativeRecordIndex": 10,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 128,
+            "numberFormatCode": 4,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "800000000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT04-CHECKABLE1"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "6030be399d2c617d2c61acf07624e6ad257bed514b9408a3f8c7cfe40ab06100"
+      },
+      "reverse": {
+        "id": "11",
+        "numFormat": "LATIN_CAPITAL",
+        "checkable": "0",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT04-CHECKABLE1"
+      },
+      "normalizes": true,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 12,
+        "code": 5,
+        "numFormat": "LATIN_SMALL",
+        "level8Checkable": 0,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT05-CHECKABLE0",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt05-checkable0",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT05-CHECKABLE0",
+        "bodyParagraphId": 11,
+        "paraPrID": 30,
+        "headingRefType": "NUMBER",
+        "headingRefId": 12
+      },
+      "nativeRecordIndex": 11,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 160,
+            "numberFormatCode": 5,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "a00000000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT05-CHECKABLE0"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "7375d435bcba4ef5433b72ccf50b5b1f582567c1f35fbadd9f0d786bd8988ddc"
+      },
+      "reverse": {
+        "id": "12",
+        "numFormat": "LATIN_SMALL",
+        "checkable": "1",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT05-CHECKABLE0"
+      },
+      "normalizes": true,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 13,
+        "code": 5,
+        "numFormat": "LATIN_SMALL",
+        "level8Checkable": 1,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT05-CHECKABLE1",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt05-checkable1",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT05-CHECKABLE1",
+        "bodyParagraphId": 12,
+        "paraPrID": 31,
+        "headingRefType": "NUMBER",
+        "headingRefId": 13
+      },
+      "nativeRecordIndex": 12,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 160,
+            "numberFormatCode": 5,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "a00000000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT05-CHECKABLE1"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "750f33cf7425321fb1075d93239279810650cf15dc38e069d0c3ff37b6e626bb"
+      },
+      "reverse": {
+        "id": "13",
+        "numFormat": "LATIN_SMALL",
+        "checkable": "1",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT05-CHECKABLE1"
+      },
+      "normalizes": false,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 14,
+        "code": 6,
+        "numFormat": "CIRCLED_LATIN_CAPITAL",
+        "level8Checkable": 0,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT06-CHECKABLE0",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt06-checkable0",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT06-CHECKABLE0",
+        "bodyParagraphId": 13,
+        "paraPrID": 32,
+        "headingRefType": "NUMBER",
+        "headingRefId": 14
+      },
+      "nativeRecordIndex": 13,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 192,
+            "numberFormatCode": 6,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "c00000000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT06-CHECKABLE0"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "fa6b38daff149371bcfe378ffcb444dad71d3b344cfeba1dbfa4119c69753b54"
+      },
+      "reverse": {
+        "id": "14",
+        "numFormat": "CIRCLED_LATIN_CAPITAL",
+        "checkable": "0",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT06-CHECKABLE0"
+      },
+      "normalizes": false,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 15,
+        "code": 6,
+        "numFormat": "CIRCLED_LATIN_CAPITAL",
+        "level8Checkable": 1,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT06-CHECKABLE1",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt06-checkable1",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT06-CHECKABLE1",
+        "bodyParagraphId": 14,
+        "paraPrID": 33,
+        "headingRefType": "NUMBER",
+        "headingRefId": 15
+      },
+      "nativeRecordIndex": 14,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 192,
+            "numberFormatCode": 6,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "c00000000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT06-CHECKABLE1"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "67c5d69e36ee551ef5f86902ca1c5ace39801aa63ecbdc5fd8acc008cb513e1a"
+      },
+      "reverse": {
+        "id": "15",
+        "numFormat": "CIRCLED_LATIN_CAPITAL",
+        "checkable": "0",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT06-CHECKABLE1"
+      },
+      "normalizes": true,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 16,
+        "code": 7,
+        "numFormat": "CIRCLED_LATIN_SMALL",
+        "level8Checkable": 0,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT07-CHECKABLE0",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt07-checkable0",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT07-CHECKABLE0",
+        "bodyParagraphId": 15,
+        "paraPrID": 34,
+        "headingRefType": "NUMBER",
+        "headingRefId": 16
+      },
+      "nativeRecordIndex": 15,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 224,
+            "numberFormatCode": 7,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "e00000000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT07-CHECKABLE0"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "9ab421fd5bf2c1fc89e04cbf5f70b34bb2f4fdbd1871d29dd2fe1849f21eb064"
+      },
+      "reverse": {
+        "id": "16",
+        "numFormat": "CIRCLED_LATIN_SMALL",
+        "checkable": "1",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT07-CHECKABLE0"
+      },
+      "normalizes": true,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 17,
+        "code": 7,
+        "numFormat": "CIRCLED_LATIN_SMALL",
+        "level8Checkable": 1,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT07-CHECKABLE1",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt07-checkable1",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT07-CHECKABLE1",
+        "bodyParagraphId": 16,
+        "paraPrID": 35,
+        "headingRefType": "NUMBER",
+        "headingRefId": 17
+      },
+      "nativeRecordIndex": 16,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 224,
+            "numberFormatCode": 7,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "e00000000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT07-CHECKABLE1"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "e6dc6ee86ea6204513c56e5e9bc4e0a4f5fc1ad94455653ec4b63579ff12f0ee"
+      },
+      "reverse": {
+        "id": "17",
+        "numFormat": "CIRCLED_LATIN_SMALL",
+        "checkable": "1",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT07-CHECKABLE1"
+      },
+      "normalizes": false,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 18,
+        "code": 8,
+        "numFormat": "HANGUL_SYLLABLE",
+        "level8Checkable": 0,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT08-CHECKABLE0",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt08-checkable0",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT08-CHECKABLE0",
+        "bodyParagraphId": 17,
+        "paraPrID": 36,
+        "headingRefType": "NUMBER",
+        "headingRefId": 18
+      },
+      "nativeRecordIndex": 17,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 256,
+            "numberFormatCode": 8,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000100000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT08-CHECKABLE0"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "e5003ea0a70eeac471b064a20b2f7dcf005ada2185ecb3b323e5c3b2c9d504ef"
+      },
+      "reverse": {
+        "id": "18",
+        "numFormat": "HANGUL_SYLLABLE",
+        "checkable": "0",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT08-CHECKABLE0"
+      },
+      "normalizes": false,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 19,
+        "code": 8,
+        "numFormat": "HANGUL_SYLLABLE",
+        "level8Checkable": 1,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT08-CHECKABLE1",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt08-checkable1",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT08-CHECKABLE1",
+        "bodyParagraphId": 18,
+        "paraPrID": 37,
+        "headingRefType": "NUMBER",
+        "headingRefId": 19
+      },
+      "nativeRecordIndex": 18,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 256,
+            "numberFormatCode": 8,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000100000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT08-CHECKABLE1"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "d9661ed5863f50d08dd11ce3024dd1ef7332ce4dfdf8df1a252aef6b55e3a3df"
+      },
+      "reverse": {
+        "id": "19",
+        "numFormat": "HANGUL_SYLLABLE",
+        "checkable": "0",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT08-CHECKABLE1"
+      },
+      "normalizes": true,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 20,
+        "code": 9,
+        "numFormat": "CIRCLED_HANGUL_SYLLABLE",
+        "level8Checkable": 0,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT09-CHECKABLE0",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt09-checkable0",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT09-CHECKABLE0",
+        "bodyParagraphId": 19,
+        "paraPrID": 38,
+        "headingRefType": "NUMBER",
+        "headingRefId": 20
+      },
+      "nativeRecordIndex": 19,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 288,
+            "numberFormatCode": 9,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "200100000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT09-CHECKABLE0"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "33446d3c7ecc14834bd976d55c50d8dec5351e9b69ce79592c11f739bc988c6c"
+      },
+      "reverse": {
+        "id": "20",
+        "numFormat": "CIRCLED_HANGUL_SYLLABLE",
+        "checkable": "1",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT09-CHECKABLE0"
+      },
+      "normalizes": true,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 21,
+        "code": 9,
+        "numFormat": "CIRCLED_HANGUL_SYLLABLE",
+        "level8Checkable": 1,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT09-CHECKABLE1",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt09-checkable1",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT09-CHECKABLE1",
+        "bodyParagraphId": 20,
+        "paraPrID": 39,
+        "headingRefType": "NUMBER",
+        "headingRefId": 21
+      },
+      "nativeRecordIndex": 20,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 288,
+            "numberFormatCode": 9,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "200100000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT09-CHECKABLE1"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "ecd84b7f7c6207b26f81e85c393a21c2e1f9601eb768a8f69daf64b9dd803d78"
+      },
+      "reverse": {
+        "id": "21",
+        "numFormat": "CIRCLED_HANGUL_SYLLABLE",
+        "checkable": "1",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT09-CHECKABLE1"
+      },
+      "normalizes": false,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 22,
+        "code": 10,
+        "numFormat": "HANGUL_JAMO",
+        "level8Checkable": 0,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT10-CHECKABLE0",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt10-checkable0",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT10-CHECKABLE0",
+        "bodyParagraphId": 21,
+        "paraPrID": 40,
+        "headingRefType": "NUMBER",
+        "headingRefId": 22
+      },
+      "nativeRecordIndex": 21,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 320,
+            "numberFormatCode": 10,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "400100000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT10-CHECKABLE0"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "19fe2f1162abcf51f5c1857b6dbe1bcad3841d8c0f54a1589a320951b74fd03b"
+      },
+      "reverse": {
+        "id": "22",
+        "numFormat": "HANGUL_JAMO",
+        "checkable": "0",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT10-CHECKABLE0"
+      },
+      "normalizes": false,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 23,
+        "code": 10,
+        "numFormat": "HANGUL_JAMO",
+        "level8Checkable": 1,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT10-CHECKABLE1",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt10-checkable1",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT10-CHECKABLE1",
+        "bodyParagraphId": 22,
+        "paraPrID": 41,
+        "headingRefType": "NUMBER",
+        "headingRefId": 23
+      },
+      "nativeRecordIndex": 22,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 320,
+            "numberFormatCode": 10,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "400100000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT10-CHECKABLE1"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "2935cb12017c8e487d3ad0dd8f1196c03613b09a7da829323a9c3e08ed3bd887"
+      },
+      "reverse": {
+        "id": "23",
+        "numFormat": "HANGUL_JAMO",
+        "checkable": "0",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT10-CHECKABLE1"
+      },
+      "normalizes": true,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 24,
+        "code": 11,
+        "numFormat": "CIRCLED_HANGUL_JAMO",
+        "level8Checkable": 0,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT11-CHECKABLE0",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt11-checkable0",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT11-CHECKABLE0",
+        "bodyParagraphId": 23,
+        "paraPrID": 42,
+        "headingRefType": "NUMBER",
+        "headingRefId": 24
+      },
+      "nativeRecordIndex": 23,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 352,
+            "numberFormatCode": 11,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "600100000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT11-CHECKABLE0"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "5d0576cd5cc47fe89dc818fc3f13bc7e1efe302af9ee4a70b1eb9274ae460347"
+      },
+      "reverse": {
+        "id": "24",
+        "numFormat": "CIRCLED_HANGUL_JAMO",
+        "checkable": "1",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT11-CHECKABLE0"
+      },
+      "normalizes": true,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 25,
+        "code": 11,
+        "numFormat": "CIRCLED_HANGUL_JAMO",
+        "level8Checkable": 1,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT11-CHECKABLE1",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt11-checkable1",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT11-CHECKABLE1",
+        "bodyParagraphId": 24,
+        "paraPrID": 43,
+        "headingRefType": "NUMBER",
+        "headingRefId": 25
+      },
+      "nativeRecordIndex": 24,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 352,
+            "numberFormatCode": 11,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "600100000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT11-CHECKABLE1"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "ba659b543b3bf54adc30bc3fb4392de155a97506585896250d53da63a966a5b4"
+      },
+      "reverse": {
+        "id": "25",
+        "numFormat": "CIRCLED_HANGUL_JAMO",
+        "checkable": "1",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT11-CHECKABLE1"
+      },
+      "normalizes": false,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 26,
+        "code": 12,
+        "numFormat": "HANGUL_PHONETIC",
+        "level8Checkable": 0,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT12-CHECKABLE0",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt12-checkable0",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT12-CHECKABLE0",
+        "bodyParagraphId": 25,
+        "paraPrID": 44,
+        "headingRefType": "NUMBER",
+        "headingRefId": 26
+      },
+      "nativeRecordIndex": 25,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 384,
+            "numberFormatCode": 12,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "800100000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT12-CHECKABLE0"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "4a19fe513ddbe7a3e33757c148e018759113b9deb9345f24a6e1d6cd84109cd9"
+      },
+      "reverse": {
+        "id": "26",
+        "numFormat": "HANGUL_PHONETIC",
+        "checkable": "0",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT12-CHECKABLE0"
+      },
+      "normalizes": false,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 27,
+        "code": 12,
+        "numFormat": "HANGUL_PHONETIC",
+        "level8Checkable": 1,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT12-CHECKABLE1",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt12-checkable1",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT12-CHECKABLE1",
+        "bodyParagraphId": 26,
+        "paraPrID": 45,
+        "headingRefType": "NUMBER",
+        "headingRefId": 27
+      },
+      "nativeRecordIndex": 26,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 384,
+            "numberFormatCode": 12,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "800100000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT12-CHECKABLE1"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "22ff4fc9f078db65cc6785385d4c311780cbfc6bda0a43cca56ef53ea7ce7a16"
+      },
+      "reverse": {
+        "id": "27",
+        "numFormat": "HANGUL_PHONETIC",
+        "checkable": "0",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT12-CHECKABLE1"
+      },
+      "normalizes": true,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 28,
+        "code": 13,
+        "numFormat": "IDEOGRAPH",
+        "level8Checkable": 0,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT13-CHECKABLE0",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt13-checkable0",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT13-CHECKABLE0",
+        "bodyParagraphId": 27,
+        "paraPrID": 46,
+        "headingRefType": "NUMBER",
+        "headingRefId": 28
+      },
+      "nativeRecordIndex": 27,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 416,
+            "numberFormatCode": 13,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "a00100000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT13-CHECKABLE0"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "8345a0cd5f654139befed82469a67e3717aa83c2ca82695c44c5931e519145ff"
+      },
+      "reverse": {
+        "id": "28",
+        "numFormat": "IDEOGRAPH",
+        "checkable": "1",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT13-CHECKABLE0"
+      },
+      "normalizes": true,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 29,
+        "code": 13,
+        "numFormat": "IDEOGRAPH",
+        "level8Checkable": 1,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT13-CHECKABLE1",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt13-checkable1",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT13-CHECKABLE1",
+        "bodyParagraphId": 28,
+        "paraPrID": 47,
+        "headingRefType": "NUMBER",
+        "headingRefId": 29
+      },
+      "nativeRecordIndex": 28,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 416,
+            "numberFormatCode": 13,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "a00100000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT13-CHECKABLE1"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "a46b4e92f97d7b5140ad62f54a448e3c13e42c3c284ea219a9f879bf5b8201bc"
+      },
+      "reverse": {
+        "id": "29",
+        "numFormat": "IDEOGRAPH",
+        "checkable": "1",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT13-CHECKABLE1"
+      },
+      "normalizes": false,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 30,
+        "code": 14,
+        "numFormat": "CIRCLED_IDEOGRAPH",
+        "level8Checkable": 0,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT14-CHECKABLE0",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt14-checkable0",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT14-CHECKABLE0",
+        "bodyParagraphId": 29,
+        "paraPrID": 48,
+        "headingRefType": "NUMBER",
+        "headingRefId": 30
+      },
+      "nativeRecordIndex": 29,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 448,
+            "numberFormatCode": 14,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "c00100000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT14-CHECKABLE0"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "7e75a0d1d0d4389067bcfda24f5919e0dd528d05fceb5261867762bd3cd527f1"
+      },
+      "reverse": {
+        "id": "30",
+        "numFormat": "CIRCLED_IDEOGRAPH",
+        "checkable": "0",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT14-CHECKABLE0"
+      },
+      "normalizes": false,
+      "nativeCodeMatches": true
+    },
+    {
+      "input": {
+        "id": 31,
+        "code": 14,
+        "numFormat": "CIRCLED_IDEOGRAPH",
+        "level8Checkable": 1,
+        "level8Format": "^8 JUEONY-NUMFMT-MATRIX-FMT14-CHECKABLE1",
+        "levels9And10": {
+          "numFormat": "DIGIT",
+          "checkable": 0,
+          "text": ""
+        },
+        "label": "fmt14-checkable1",
+        "nativeIdentityToken": "JUEONY-NUMFMT-MATRIX-FMT14-CHECKABLE1",
+        "bodyParagraphId": 30,
+        "paraPrID": 49,
+        "headingRefType": "NUMBER",
+        "headingRefId": 31
+      },
+      "nativeRecordIndex": 30,
+      "native": {
+        "heads": [
+          {
+            "level": 8,
+            "attr": 448,
+            "numberFormatCode": 14,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "c00100000000000000000000",
+            "text": "^8 JUEONY-NUMFMT-MATRIX-FMT14-CHECKABLE1"
+          },
+          {
+            "level": 9,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          },
+          {
+            "level": 10,
+            "attr": 0,
+            "numberFormatCode": 0,
+            "widthAdjust": 0,
+            "textOffset": 0,
+            "charRef": 0,
+            "head12Hex": "000000000000000000000000",
+            "text": ""
+          }
+        ],
+        "starts": [
+          1,
+          1,
+          1
+        ],
+        "exactEnd": true,
+        "unknownTailHex": "",
+        "sha256": "e35a31ce584f521068d2568e30f99437f9345517898fab303b7cfaf21428dcc3"
+      },
+      "reverse": {
+        "id": "31",
+        "numFormat": "CIRCLED_IDEOGRAPH",
+        "checkable": "0",
+        "text": "^8 JUEONY-NUMFMT-MATRIX-FMT14-CHECKABLE1"
+      },
+      "normalizes": true,
+      "nativeCodeMatches": true
+    }
+  ],
+  "pairs": [
+    {
+      "code": 0,
+      "name": "DIGIT",
+      "head12EqualBetweenInputCheckables": true,
+      "nativeStartsEqual": true,
+      "reverseCheckables": [
+        "0",
+        "0"
+      ]
+    },
+    {
+      "code": 1,
+      "name": "CIRCLED_DIGIT",
+      "head12EqualBetweenInputCheckables": true,
+      "nativeStartsEqual": true,
+      "reverseCheckables": [
+        "1",
+        "1"
+      ]
+    },
+    {
+      "code": 2,
+      "name": "ROMAN_CAPITAL",
+      "head12EqualBetweenInputCheckables": true,
+      "nativeStartsEqual": true,
+      "reverseCheckables": [
+        "0",
+        "0"
+      ]
+    },
+    {
+      "code": 3,
+      "name": "ROMAN_SMALL",
+      "head12EqualBetweenInputCheckables": true,
+      "nativeStartsEqual": true,
+      "reverseCheckables": [
+        "1",
+        "1"
+      ]
+    },
+    {
+      "code": 4,
+      "name": "LATIN_CAPITAL",
+      "head12EqualBetweenInputCheckables": true,
+      "nativeStartsEqual": true,
+      "reverseCheckables": [
+        "0",
+        "0"
+      ]
+    },
+    {
+      "code": 5,
+      "name": "LATIN_SMALL",
+      "head12EqualBetweenInputCheckables": true,
+      "nativeStartsEqual": true,
+      "reverseCheckables": [
+        "1",
+        "1"
+      ]
+    },
+    {
+      "code": 6,
+      "name": "CIRCLED_LATIN_CAPITAL",
+      "head12EqualBetweenInputCheckables": true,
+      "nativeStartsEqual": true,
+      "reverseCheckables": [
+        "0",
+        "0"
+      ]
+    },
+    {
+      "code": 7,
+      "name": "CIRCLED_LATIN_SMALL",
+      "head12EqualBetweenInputCheckables": true,
+      "nativeStartsEqual": true,
+      "reverseCheckables": [
+        "1",
+        "1"
+      ]
+    },
+    {
+      "code": 8,
+      "name": "HANGUL_SYLLABLE",
+      "head12EqualBetweenInputCheckables": true,
+      "nativeStartsEqual": true,
+      "reverseCheckables": [
+        "0",
+        "0"
+      ]
+    },
+    {
+      "code": 9,
+      "name": "CIRCLED_HANGUL_SYLLABLE",
+      "head12EqualBetweenInputCheckables": true,
+      "nativeStartsEqual": true,
+      "reverseCheckables": [
+        "1",
+        "1"
+      ]
+    },
+    {
+      "code": 10,
+      "name": "HANGUL_JAMO",
+      "head12EqualBetweenInputCheckables": true,
+      "nativeStartsEqual": true,
+      "reverseCheckables": [
+        "0",
+        "0"
+      ]
+    },
+    {
+      "code": 11,
+      "name": "CIRCLED_HANGUL_JAMO",
+      "head12EqualBetweenInputCheckables": true,
+      "nativeStartsEqual": true,
+      "reverseCheckables": [
+        "1",
+        "1"
+      ]
+    },
+    {
+      "code": 12,
+      "name": "HANGUL_PHONETIC",
+      "head12EqualBetweenInputCheckables": true,
+      "nativeStartsEqual": true,
+      "reverseCheckables": [
+        "0",
+        "0"
+      ]
+    },
+    {
+      "code": 13,
+      "name": "IDEOGRAPH",
+      "head12EqualBetweenInputCheckables": true,
+      "nativeStartsEqual": true,
+      "reverseCheckables": [
+        "1",
+        "1"
+      ]
+    },
+    {
+      "code": 14,
+      "name": "CIRCLED_IDEOGRAPH",
+      "head12EqualBetweenInputCheckables": true,
+      "nativeStartsEqual": true,
+      "reverseCheckables": [
+        "0",
+        "0"
+      ]
+    }
+  ],
+  "normalizationCount": 15,
+  "noProductionCanonicalInferenceMade": true
+}

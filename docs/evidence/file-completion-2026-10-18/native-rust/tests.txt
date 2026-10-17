@@ -1,0 +1,33 @@
+running 29 tests
+test document_windows::tests::context_requires_registered_label_and_exact_local_scope ... ok
+test document_windows::tests::corrupt_registry_is_preserved ... ok
+test document_windows::tests::failed_creation_and_failed_destroy_are_explicit_and_reversible ... ok
+test document_windows::tests::focusing_an_opening_window_does_not_forge_readiness ... ok
+test document_windows::tests::limit_failure_is_a_replayable_receipt_without_new_context ... ok
+test document_windows::tests::restart_and_closed_window_reuse_exact_namespace ... ok
+test document_windows::tests::same_request_is_idempotent_and_owner_bound ... ok
+test document_windows::tests::stale_ready_receipt_needs_a_new_readiness_proof ... ok
+test document_windows::tests::unknown_restore_and_malformed_request_never_create_context ... ok
+test file_bindings::tests::cross_window_read_write_and_comparison_are_refused ... ok
+test file_bindings::tests::two_owned_handles_compare_but_close_revokes_only_its_owner ... ok
+test native_recents::tests::changed_and_second_change_never_adopt_unapproved_bytes ... ok
+test native_recents::tests::corrupt_registry_fails_without_overwrite ... ok
+test native_recents::tests::directory_substitution_cannot_be_reopened_or_drop_the_record ... ok
+test native_recents::tests::missing_original_is_not_recreated_and_record_survives ... ok
+test native_recents::tests::restart_reopens_exact_original_with_new_bound_file ... ok
+test native_recents::tests::same_names_are_distinct_and_repeat_keeps_identity ... ok
+test native_recents::tests::saved_revision_updates_registry_but_later_external_change_blocks_writes ... ok
+test native_recents::tests::windows_locked_source_is_unavailable_and_retry_keeps_original_identity ... ok
+test native_recents::tests::workspace_ids_cannot_cross_and_clear_is_scoped ... ok
+test storage::tests::competing_creation_and_invalid_input_do_not_overwrite ... ok
+test storage::tests::oversized_and_non_file_sources_are_rejected_before_reading ... ok
+test storage::tests::read_cannot_adopt_a_competing_new_file ... ok
+test storage::tests::reading_an_external_edit_does_not_adopt_it_as_the_write_baseline ... ok
+test storage::tests::removed_existing_file_is_not_silently_recreated ... ok
+test storage::tests::save_and_external_change_guard ... ok
+test storage::tests::windows_exclusive_share_lock_refuses_read_and_write_without_temp_leaks ... ok
+test storage::tests::windows_read_only_target_stays_unchanged_and_retry_after_unlock_succeeds ... ok
+test storage::tests::windows_replace_denial_preserves_original_and_removes_staging_file ... ok
+
+test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+

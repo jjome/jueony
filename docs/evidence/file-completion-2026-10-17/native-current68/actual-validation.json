@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-17",
+  "status": "ACTUAL_WINDOWS_HWP_FLOW_PASS",
+  "exe": "build/native-file-final68-20261017/JueonyNativeFinal68Review.exe",
+  "exeSha256": "382757d18deee426a43db2b87b29b39ea426b4c486b4a2c111bf7b426d7d397b",
+  "engineSourceId": "cda65172283c6657",
+  "gui": "@oai/sky actual Windows actions, no synthetic IPC",
+  "observations": [
+    "Actual OS picker opened own copied HWP, loaded full visible table and body.",
+    "Actual canvas click and type inserted GUI68; Ctrl+S changed bytes and cleared dirty.",
+    "Independent CFB/inflate/PARA_TEXT and formal68 reopen found GUI68 exactly once.",
+    "Inserted unsaved RECOVERY68; Alt+F4 showed four explicit exit choices.",
+    "Cancel retained open edited document and dirty state.",
+    "Recovery-only exit closed the actual review window; subsequent window inventory contained no matching app.",
+    "Source disk HWP SHA stayed 2a513516ed04436e7b914cc867aaba450b4b8a73b4862cd7e56f71a64c06b410.",
+    "Relaunched the same executable; new actual window ID with original workspace/tabs and GUI68 RECOVERY68 displayed dirty.",
+    "File menu SaveAs then actual OS save picker created recovered-copy.hwp; source file unchanged.",
+    "Independent recovery CFB readback found exact final body and one recovery marker; strict HWP reopen passed."
+  ],
+  "limits": [
+    "Only this own HWP path tested here; four exit branches not all separately exercised through Windows UI.",
+    "Fresh separate-window implementation is newer than this immutable executable and is not covered.",
+    "API backend absent and no paid LLM used.",
+    "Ctrl+Shift+S on recovered editor reported unavailable; actual File menu SaveAs was used.",
+    "Enter did not submit inner SaveAs prompt; explicit confirm click worked."
+  ]
+}

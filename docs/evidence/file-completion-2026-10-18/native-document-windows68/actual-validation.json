@@ -1,0 +1,30 @@
+{
+  "status": "ACTUAL_WINDOWS_WINDOW_TAB_RECOVERY_AND_FILE_SAVE_VERIFIED",
+  "enginePatchCount": 68,
+  "exeSha256": "5d100377304e296157200a0e8461ff0454779b3dabc47b18eea7e2754c70a6e6",
+  "identifier": "local.jueony.documentwindows.review8a6800c2bd084863a135c3728e726138",
+  "windowScope": "3cb9c3b9-f49c-4b38-a6f5-378727dceac7",
+  "method": "Windows Computer Use; real packaged Tauri WebView2, OS window creation/close, OS save picker, then separate raw CFB and engine readback",
+  "observations": [
+    "Relative frontend path loads the embedded app at http://tauri.localhost/; old absolute path incorrectly showed a file:// directory listing.",
+    "Alt+N created a second native window with a UUID-owned context; main remained a separate one-tab blank workspace.",
+    "Clicked document canvas and entered CHILD WINDOW RECOVERY 68; visible text and dirty state verified.",
+    "Ctrl+Alt+T created a second tab within that same child window and preserved the first dirty tab.",
+    "Alt+F4 displayed the four-choice exit dialog. Keep recovery exited that child; a fresh window listing proved its absence and main presence.",
+    "Main File menu registry showed the same scope as recovery kept. Reopening created a new native window with that exact scope and both tabs.",
+    "Selecting the first restored tab showed the exact text and dirty state.",
+    "The actual OS save picker saved child-recovered.hwp to an isolated build path. Native UI reported saved and cleared dirty.",
+    "Separate raw CFB PARA_TEXT read found the marker once; engine exact text, both-format strict reopen, live and disk immutability passed."
+  ],
+  "failedBuildRetained": {
+    "id": "95103b56a0f24323a7587963e8d150a3",
+    "exeSha256": "5ab13692938b37c3e39952028b71254caf277bed0cb50d1af1b554f53acb96d0",
+    "issue": "Absolute Windows frontendDist parsed as URL, producing a directory listing. That executable was not a working app validation."
+  },
+  "limits": [
+    "This immutable GUI build contains engine68, not later engine candidates or the new Agent file commands.",
+    "No claim of all Hancom import/export formats, XML schemas, full metadata history, forced power failure or whole product parity.",
+    "The unchanged previous user app and Hancom documents were left open; no API credentials or private workspace data are packaged.",
+    "The build manifest retains launched=false from preparation. This separate actual report records subsequent GUI actions."
+  ]
+}

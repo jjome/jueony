@@ -4,7 +4,7 @@
 
 열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.
 
-**2026-10-17 현재:** 저장 Undo·표 속성 높이 회귀를 수정하고 정식68에서 기존44회귀를 통과했다. G071·G073은 제한된 실제 한글 사본·지면 검수까지 마감했다. 최근 문서 재연결과 문서 요약5필드를 구현·검수했고 닫기·종료의 네 가지 선택과 다문서 원자 복구도 구현·검수했다. 최신 실제 Windows 흐름은 아직 미검수다. 상위10개 전체·N001 등 남은 검수는 미완료이며 세부 완료 수로 대신하지 않는다. [실제 완료·실패·잔여](../109-file-preservation-hancom-followup.md).
+**2026-10-17 현재:** 저장 Undo·표 속성 높이 회귀를 수정하고 정식68에서 기존44회귀를 통과했다. G071·G073은 제한된 실제 한글 사본·지면 검수까지 마감했다. 최근 문서 재연결과 문서 요약5필드를 구현·검수했고 닫기·종료의 네 가지 선택과 다문서 원자 복구도 구현·검수했다. 정식68의 실제 Windows HWP 열기·수정·저장·종료 취소·복구 보관 종료·재실행 복원도 확인했다. 현재 긴 본문·캡션·Unicode·위 첨자 한글 재저장 검수로 G096·G105를 완료 처리했고, 양수/음수 위치·다단 결함은 실패 그대로 추적한다. 상위10개 전체·N001 등 남은 검수는 미완료이며 세부 완료 수로 대신하지 않는다. [실제 완료·실패·잔여](../109-file-preservation-hancom-followup.md).
 
 ## 진행 요약
 
@@ -13,7 +13,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | --- | --- | --- |
 | 구현 | 완료 23/24 · 부분 1 | 완료 0/10 · 부분 9 · 미구현 1 |
-| 검증 | 완료 18/24 · 부분 6 | 완료 0/10 · 부분 7 · 미검증 3 |
+| 검증 | 완료 20/24 · 부분 4 | 완료 0/10 · 부분 7 · 미검증 3 |
 | Agent 연결 | 연결 6/6 · 부분 0 · 해당 없음 18 | 연결 0/10 · 부분 1 · 미연결 9 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -22,9 +22,9 @@
 
 ## 먼저 할 일
 
-- **구현** [N001](<05-files-storage-recovery.md#n001>) **HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존** — 정식63 이후 표 높이/원점 후속 통합 회귀와 실제 한글 재저장 검수를 진행. 글줄·탭 폭 변경과 원점 보호 대조를 분리하고 선언 높이를 임의 정규화하지 않는다.
+- **구현** [N001](<05-files-storage-recovery.md#n001>) **HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존** — 정식68 실제 한글 11쌍 중 8통과·양수 위치/음수 위치/두 단 3실패를 보존했다. 여백의 표시 원점과 흐름 예약 계산을 분리해 수정·재검수한다. 전체 지면 0.2 기준과 원시 필드는 유지한다.
 - **검증** [N002](<05-files-storage-recovery.md#n002>) **공개 형식 변환의 필드 보존 차이 4건** — 정식63에서 python1 표 좌표142차이 해소. 실제 한글 raw ID 재인덱싱40과 python3 줄/참조·MCST 복잡 지면/쪽 수 차이는 별도 원인 분리·수정 검수. 원래 네 필드 보존 수정은 통과.
-- **검증** [G090](<05-files-storage-recovery.md#g090>) **HWP 단순 겹침 표 tail의 저장 snapshot 원점 기록** — 최종 실제 UI 저장·재열기·반복 저장 검증 완료, 한글 직접 지면 비교는 대기. N001의 복잡 원본 전체 범위는 부분 유지.
+- **검증** [G090](<05-files-storage-recovery.md#g090>) **HWP 단순 겹침 표 tail의 저장 snapshot 원점 기록** — 정식68 실제 한글 11쌍 중 8통과·양수 위치/음수 위치/두 단 3실패를 보존했다. 여백의 표시 원점과 흐름 예약 계산을 분리해 수정·재검수한다. 전체 지면 0.2 기준과 원시 필드는 유지한다.
 
 ## 기능별 작업표
 
@@ -123,9 +123,9 @@
 | --- | --- | --- | --- | --- |
 | [G090](<05-files-storage-recovery.md#g090>) · 작업 | HWP 단순 겹침 표 tail의 저장 snapshot 원점 기록 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [N001](<05-files-storage-recovery.md#n001>) · 작업 | HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [G096](<05-files-storage-recovery.md#g096>) · 작업 | HWP 겹침 표 뒤 단일 본문 글줄의 저장 원점 보존 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
+| [G096](<05-files-storage-recovery.md#g096>) · 작업 | HWP 겹침 표 뒤 단일 본문 글줄의 저장 원점 보존 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 | [G097](<05-files-storage-recovery.md#g097>) · 작업 | 알려진 HWP 겹침 배치 손상의 원본 쓰기 차단 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
-| [G105](<05-files-storage-recovery.md#g105>) · 작업 | 겹침 표 후속 여러 줄 본문·캡션 원점 보존 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
+| [G105](<05-files-storage-recovery.md#g105>) · 작업 | 겹침 표 후속 여러 줄 본문·캡션 원점 보존 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 | [G106](<05-files-storage-recovery.md#g106>) · 작업 | 후속 통째 표의 의미 흐름과 실제 양수 offset 보존 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-9"></a>
@@ -402,11 +402,11 @@
 
 - 종류: 실행 작업 · 우선순위: P0.
 - 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 검증 구분: 자동 **PASS** / 한글 **PARTIAL**.
 - 완료 범위: 한 쪽·한 단·통째 object-only 표 tail 및 고유 단일 줄 빈 후속 본문; live불변/snapshot/반복저장/배치보존
-- 다음 작업: 최종 실제 UI 저장·재열기·반복 저장 검증 완료, 한글 직접 지면 비교는 대기. N001의 복잡 원본 전체 범위는 부분 유지.
+- 다음 작업: 정식68 실제 한글 11쌍 중 8통과·양수 위치/음수 위치/두 단 3실패를 보존했다. 여백의 표시 원점과 흐름 예약 계산을 분리해 수정·재검수한다. 전체 지면 0.2 기준과 원시 필드는 유지한다.
 - 상위 항목: [N001](<05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존
-- 근거: [100-storage-conversion-and-overlap.md](<../100-storage-conversion-and-overlap.md>) · [verification-summary.json](<../evidence/overlap-table-tail-2026-10-15/verification-summary.json>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>)
+- 근거: [100-storage-conversion-and-overlap.md](<../100-storage-conversion-and-overlap.md>) · [verification-summary.json](<../evidence/overlap-table-tail-2026-10-15/verification-summary.json>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [actual11-formal68.json](<../evidence/file-completion-2026-10-17/hancom-current68/actual11-formal68.json>)
 - 원래 기록: `SCOPED_STORAGE_TAIL_WRITEBACK`
 
 </details>
@@ -416,11 +416,11 @@
 
 - 종류: 실행 작업 · 우선순위: P0.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
+- 검증 구분: 자동 **PARTIAL** / 한글 **PARTIAL**.
 - 완료 범위: 확인한 단일 단 HWP 겹침 표·직접 본문 줄·혼합 서식·읽기 전용 책갈피/필드 표시의 흐름·저장 소유를 보강했다. bare LINE_SEG 캐시와 실제 여백/offset을 구분한다. 다단·복합/불명확 원점의 지원 확대는 완료로 표시하지 않는다.
-- 다음 작업: 정식63 이후 표 높이/원점 후속 통합 회귀와 실제 한글 재저장 검수를 진행. 글줄·탭 폭 변경과 원점 보호 대조를 분리하고 선언 높이를 임의 정규화하지 않는다.
+- 다음 작업: 정식68 실제 한글 11쌍 중 8통과·양수 위치/음수 위치/두 단 3실패를 보존했다. 여백의 표시 원점과 흐름 예약 계산을 분리해 수정·재검수한다. 전체 지면 0.2 기준과 원시 필드는 유지한다.
 - 상위 항목: [B153](<08-tables.md#b153>) 셀 속성
-- 근거: [100-storage-conversion-and-overlap.md](<../100-storage-conversion-and-overlap.md>) · [verification-summary.json](<../evidence/overlap-table-tail-2026-10-15/verification-summary.json>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [summary.json](<../evidence/file-completion-2026-10-17/engine51/summary.json>)
+- 근거: [100-storage-conversion-and-overlap.md](<../100-storage-conversion-and-overlap.md>) · [verification-summary.json](<../evidence/overlap-table-tail-2026-10-15/verification-summary.json>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [summary.json](<../evidence/file-completion-2026-10-17/engine51/summary.json>) · [actual11-formal68.json](<../evidence/file-completion-2026-10-17/hancom-current68/actual11-formal68.json>)
 - 원래 기록: `PARTIAL;INDEPENDENT_HANCOM_FAILURES_FOUND_AND_FOLLOWUP_2026_10_17`
 
 </details>
@@ -487,14 +487,14 @@
 <summary>G096 · HWP 겹침 표 뒤 단일 본문 글줄의 저장 원점 보존</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **DONE**.
 - 완료 범위: Native HWP5 한 쪽·한 단 인접 겹침 표의 고유한 단일 본문 줄: 원문/서식/전체 공개 기하·Unicode·위첨자·동일 번호 표 셀 소유 구분, undo/redo·안전 저장·UI 재열기를 검증한다.
-- 다음 작업: 최종 실제 UI 저장·재열기·반복 저장 검증 완료, 한글 직접 지면 비교는 대기. N001의 복잡 원본 전체 범위는 부분 유지.
+- 다음 작업: 정식68 최신 편집·저장 출력과 실제 한글 2024 별도 재저장본의 전체 의미·0.2 기준 지면 일치, 양형식 엄격 재저장·재열기까지 완료. 옛 캐시 줄 경계와 복잡 배치 전체는 N001에서 추적한다.
 - 상위 항목: [N001](<05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존
 - UI 명령: `table:cell-props`
-- 근거: [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>)
-- 원래 기록: `SCOPED_IMPLEMENTED;ENGINE_BROWSER_VERIFIED_2026_10_16`
+- 근거: [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [actual11-formal68.json](<../evidence/file-completion-2026-10-17/hancom-current68/actual11-formal68.json>) · [SHA256-MANIFEST.json](<../evidence/file-completion-2026-10-17/hancom-current68/SHA256-MANIFEST.json>)
+- 원래 기록: `SCOPED_IMPLEMENTED;CURRENT_EDIT_SAVE_AND_ACTUAL_HANCOM_VERIFIED_2026_10_17;OLD_CACHE_N001_PARTIAL`
 
 </details>
 
@@ -573,13 +573,13 @@
 <summary>G105 · 겹침 표 후속 여러 줄 본문·캡션 원점 보존</summary>
 
 - 종류: 실행 작업 · 우선순위: P0.
-- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PARTIAL** / 한글 **PARTIAL**.
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **DONE**.
 - 완료 범위: 한쪽/한단·정확한 원시 호스트의 Native HWP5에서 직접 본문 줄의 index/vpos/Unicode·UTF16 시작/연속 원문 전체를 일대일 확인해 snapshot 줄 위치만 보정. 캡션 story 소유 분리, raw payload 차이·전체 배치·반복 저장·undo/재적용·실제 UI 저장/재열기 검증.
-- 다음 작업: 실제 한글에서 확인한 줄 분할·글자폭과 표 흐름 차이를 수정. 정식63 이후 표 높이/원점 후속 회귀 및 새 파일의 실제 한글 재저장 비교 진행; 선언 높이 변화는 별도 관측으로 보존.
+- 다음 작업: 정식68 최신 편집·저장 출력과 실제 한글 2024 별도 재저장본의 전체 의미·0.2 기준 지면 일치, 양형식 엄격 재저장·재열기까지 완료. 옛 캐시 줄 경계와 복잡 배치 전체는 N001에서 추적한다.
 - 상위 항목: [N001](<05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존
-- 근거: [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [baseline-failures.json](<../evidence/file-completion-2026-10-17/hancom/baseline-failures.json>)
-- 원래 기록: `SCOPED_IMPLEMENTED;INDEPENDENT_HANCOM_FAILURES_FOUND;FINAL_INTEGRATION_IN_PROGRESS_2026_10_17`
+- 근거: [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [baseline-failures.json](<../evidence/file-completion-2026-10-17/hancom/baseline-failures.json>) · [actual11-formal68.json](<../evidence/file-completion-2026-10-17/hancom-current68/actual11-formal68.json>) · [SHA256-MANIFEST.json](<../evidence/file-completion-2026-10-17/hancom-current68/SHA256-MANIFEST.json>)
+- 원래 기록: `SCOPED_IMPLEMENTED;CURRENT_EDIT_SAVE_AND_ACTUAL_HANCOM_VERIFIED_2026_10_17;OLD_CACHE_N001_PARTIAL`
 
 </details>
 
@@ -590,9 +590,9 @@
 - 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PARTIAL** / 한글 **PARTIAL**.
 - 완료 범위: 실제 한글 재저장본에 따라 빈 표 host LINE_SEG의 양수 캐시를 사용자 간격으로 취급한 이전 기대를 정정. 확인한 Native 한 단 인접 통째 표의 현재 흐름을 사용하고 실제 문단 여백·명시 offset과 원시 바이트를 보존한다.
-- 다음 작업: 정식63 이후 표 높이/원점 후속의 긍정·제외 대조와 실제 한글 재저장 검수를 마친다. 양수 cache 값 자체와 사용자 간격 의도를 혼동하지 않는다.
+- 다음 작업: 정식68 실제 한글 11쌍 중 8통과·양수 위치/음수 위치/두 단 3실패를 보존했다. 여백의 표시 원점과 흐름 예약 계산을 분리해 수정·재검수한다. 전체 지면 0.2 기준과 원시 필드는 유지한다.
 - 상위 항목: [N001](<05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존
-- 근거: [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [baseline-failures.json](<../evidence/file-completion-2026-10-17/hancom/baseline-failures.json>)
+- 근거: [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [baseline-failures.json](<../evidence/file-completion-2026-10-17/hancom/baseline-failures.json>) · [actual11-formal68.json](<../evidence/file-completion-2026-10-17/hancom-current68/actual11-formal68.json>)
 - 원래 기록: `SCOPED_IMPLEMENTED;INDEPENDENT_HANCOM_FAILURES_FOUND;FINAL_INTEGRATION_IN_PROGRESS_2026_10_17`
 
 </details>

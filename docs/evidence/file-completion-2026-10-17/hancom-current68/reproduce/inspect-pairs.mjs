@@ -1,0 +1,19 @@
+import{readFile,writeFile}from'node:fs/promises';import{pathToFileURL}from'node:url';import{createHash}from'node:crypto';
+import{capturePreservationEvidence,verifyPreservedExport}from'../../apps/editor/src/adapters/rhwp/preservation.ts';
+import{planSaveTableFrames,applySaveTableFrames}from'../../apps/editor/src/adapters/rhwp/save-table-frames.ts';
+const root='C:/Users/jjome/Documents/work/jueony',pkg=root+'/build/rhwp-engine/source-cda65172283c6657/pkg',input=root+'/build/hancom-file-preservation-20261017',m=await import(pathToFileURL(pkg+'/rhwp.js'));await m.default({module_or_path:await readFile(pkg+'/rhwp_bg.wasm')});const j=x=>typeof x==='string'?JSON.parse(x):x,sha=b=>createHash('sha256').update(b).digest('hex');
+function layout(d){return Array.from({length:d.pageCount()},(_,p)=>({controls:j(d.getPageControlLayout(p)).controls,runs:j(d.getPageTextLayout(p)).runs}));}
+function diff(a,b,t,path='',r=[]){if(typeof a==='number'&&typeof b==='number'){if(!Number.isFinite(a)||!Number.isFinite(b)||Math.abs(a-b)>t)r.push({path,before:a,after:b});return r;}if(!a||!b||typeof a!=='object'||typeof b!=='object'){if(a!==b)r.push({path,before:a,after:b});return r;}for(const k of new Set([...Object.keys(a),...Object.keys(b)]))diff(a[k],b[k],t,path+'/'+k,r);return r;}
+const observations=[];
+for(const[mode,names]of [['multiline',['overlap-body-native-multiline.hwp','hancom-multiline-roundtrip.hwp']],['caption',['overlap-body-native-caption-multiline.hwp','hancom-caption-multiline-roundtrip.hwp']],['positive',['overlap-positive-native-caption-source-gap-10500.hwp','hancom-positive-roundtrip.hwp']]])for(const stage of['cached','reflow','reflow-prepared']){
+const states=[];for(const name of names){const bytes=await readFile(input+'/'+name),d=new m.HwpDocument(bytes),record={name,sha256:sha(bytes),stage};try{
+record.beforeLayout=layout(d);record.beforeValues=capturePreservationEvidence(d).values;
+if(stage!=='cached'){const n=d.getParagraphLength(0,3);d.insertText(0,3,n,'X');d.deleteText(0,3,n,1);}
+record.plans=planSaveTableFrames(d);if(stage==='reflow-prepared')applySaveTableFrames(d,record.plans,'hwp');
+record.layout=layout(d);record.values=capturePreservationEvidence(d).values;record.inputEditSemanticDiff=diff(record.beforeValues,record.values,0);
+record.characters=Array.from({length:d.getParagraphLength(0,3)},(_,at)=>j(d.getCharPropertiesAt(0,3,at)));record.para=j(d.getParaPropertiesAt(0,3));record.exports=[];
+for(const format of['hwp','hwpx']){const a=d[format==='hwp'?'exportHwpWithReport':'exportHwpxWithReport']();let r;const x={format};try{const b=a.takeBytes();x.sha256=sha(b);if(stage==='reflow-prepared'){x.file=mode+'-'+(name===names[0]?'original':'hancom')+'-prepared.'+format;await writeFile(root+'/build/file-closure69-overlap/'+x.file,b);}try{x.preservation=verifyPreservedExport(d,b,format,j(a.contentLoss()),v=>new m.HwpDocument(v));}catch(e){x.error=String(e);}r=new m.HwpDocument(b);x.geometryDifferences=diff(record.layout,layout(r),.2);x.semanticDifferences=diff(record.values,capturePreservationEvidence(r).values,0);}finally{r?.free();a.free();}record.exports.push(x);}
+}catch(e){record.error=String(e);record.stack=e.stack;}finally{d.free();}states.push(record);}
+observations.push({mode,stage,states,geometryDifferences:diff(states[0].layout,states[1].layout,.2),semanticDifferences:diff(states[0].values,states[1].values,0),charPropertyDifferences:diff(states[0].characters,states[1].characters,0)});
+console.log(mode,stage,'geometry',observations.at(-1).geometryDifferences.length,'semantic',observations.at(-1).semanticDifferences.length,'char',observations.at(-1).charPropertyDifferences.length,'errors',states.map(x=>x.error));}
+await writeFile(root+'/build/file-closure69-overlap/pair-diagnosis.json',JSON.stringify({engine:j(await readFile(pkg+'/jueony-engine-build.json','utf8')),observations},null,2));

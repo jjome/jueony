@@ -1,0 +1,4663 @@
+{
+  "engine": {
+    "jsSha256": "72828c03b5b92948e0acd45bcd3de0263c8570bfbfaeab283eb5998e1b72b22d",
+    "buildMode": "wsl-review-no-opt",
+    "optimized": false,
+    "sourceId": "cda65172283c6657",
+    "wasmSha256": "4a9acaf931b91b967f93b777cf5b987c7e73d23cff0f0a9a9c719b5e244938e9",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "patches": [
+      {
+        "name": "border-fill-identity.patch",
+        "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c"
+      },
+      {
+        "name": "default-tabs.patch",
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+      },
+      {
+        "name": "document-insertion.patch",
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+      },
+      {
+        "name": "master-page-editing.patch",
+        "sha256": "b04c7d682e105e3f37f72a18c1b4bb01cbf085424e3219f3919fd8c891dc26c2"
+      },
+      {
+        "name": "merged-table-transpose.patch",
+        "sha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768"
+      },
+      {
+        "name": "note-query-json.patch",
+        "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562"
+      },
+      {
+        "name": "page-border-entries.patch",
+        "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f"
+      },
+      {
+        "name": "page-border-inclusion.patch",
+        "sha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e"
+      },
+      {
+        "name": "page-border-region.patch",
+        "sha256": "ea98aed9ad8568699b802c5f46e4964fe524ba7634bc978d71fe10f44e1d7412"
+      },
+      {
+        "name": "page-border-z-image.patch",
+        "sha256": "97ccd3c9eac24c42b0844fc65e5804b232d3bef9929a6fd5de329cdd007b173b"
+      },
+      {
+        "name": "section-split.patch",
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+      },
+      {
+        "name": "style-reference-deletion.patch",
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+      },
+      {
+        "name": "style-reference-order.patch",
+        "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce"
+      },
+      {
+        "name": "style-shape-stories.patch",
+        "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af"
+      },
+      {
+        "name": "table-creation-consistency.patch",
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+      },
+      {
+        "name": "zz-line-number-settings.patch",
+        "sha256": "4cb8ce4a8d49864f53c3ff95fdfc8ef3e0342b09f86cd525dfb9aa102e2dee72"
+      },
+      {
+        "name": "zzz-page-body-delete.patch",
+        "sha256": "54bf1697627ec92c4379fb8ca314f9bf9d99c2207bf9e90859d35c7324be2e83"
+      },
+      {
+        "name": "zzzz-page-body-copy.patch",
+        "sha256": "45f3331d992f3799dad1f076bfd6d237d8c989541ea510d888e4afb5407749db"
+      },
+      {
+        "name": "zzzzz-page-body-paper-paste.patch",
+        "sha256": "4df977f851378597848aa60581957c123e6565ebf04f9412052dbfdabb2c43a0"
+      },
+      {
+        "name": "zzzzzz-page-body-style-paste.patch",
+        "sha256": "168c4c158bc0db3e71230903eae0b1ae71092a1a139f2ad5747712f95127bd75"
+      },
+      {
+        "name": "zzzzzzz-page-body-image-paste.patch",
+        "sha256": "ac08a167a376bae3e1e890f8109f2f9552ce952abe7882712f813183597ce57a"
+      },
+      {
+        "name": "zzzzzzzz-empty-section-remove.patch",
+        "sha256": "d49d3acc5bc0b3049415e17233a7f7a7249792f6500d475ce6cd39d3ad14d590"
+      },
+      {
+        "name": "zzzzzzzzz-hwpx-body-caret.patch",
+        "sha256": "c073ab44d5460f92915ea6493a791d2cbf24bb60ad66eca5033be0fc9835ac56"
+      },
+      {
+        "name": "zzzzzzzzzz-agent-page-background.patch",
+        "sha256": "74104eca6a40a3a7f06ad6d20ed8f44f816f0c153a2be40fdf584b61fc9ba907"
+      },
+      {
+        "name": "zzzzzzzzzzz-agent-header-footer.patch",
+        "sha256": "415fa55bc5fe0c4f49a7dce025723067022d7bdef076a9fb48b7f456c30cb91a"
+      },
+      {
+        "name": "zzzzzzzzzzzz-agent-paragraph-tabs.patch",
+        "sha256": "d15949747520d51020433aca32539f79c5a8cc0dfdad9de95db221dae651b311"
+      },
+      {
+        "name": "zzzzzzzzzzzzz-agent-paragraph-decoration.patch",
+        "sha256": "2adf2bba46d11a6ca97ce838da1d329c627c8532812674b7329aaef3cdb544fb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzz-agent-paragraph-lists.patch",
+        "sha256": "06e1af9e90e0c54da772a533f9c2ac5279db059c37fb3612c189e0d7e1c7692d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzz-agent-basic-bullets.patch",
+        "sha256": "03138686d9faa51fcf335f1b6299a294248031d36ca079da5346e52d0b531a35"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzz-agent-numbering-clone.patch",
+        "sha256": "a79207f328ca0521515344c018554ccc20092142dabaa5ba413ff162408fa567"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzz-agent-basic-numbering.patch",
+        "sha256": "66ac344e90a16b3e447e97bd6a593edbc7b9e024313cc40f81f2611838f3b102"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzz-agent-paragraph-outline.patch",
+        "sha256": "dfe19d3083f6a4222440ce558b5451f2568cf57b211bcc19babb508c1db2022e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzz-agent-style-metadata.patch",
+        "sha256": "53c6a573df6e8f1d0af4f388dad4e624a700006ad38f7a1de820eabc1d6d44cb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzz-whole-table-edited-host.patch",
+        "sha256": "f90714f601227bba000d63be77e5ac9f3985d192e613990984544b2f70b0f603"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzz-table-default-padding-reflow.patch",
+        "sha256": "903260c4c371a2a1d4b0afa72f8f0e1f191db936bd6e055a974a0a4295badf0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzz-hidden-paragraph-page-owner.patch",
+        "sha256": "13df5f1c5493ef4560866f3806be6a3bd2c748e50a1fc531dac686994e310b6b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-following-table-flow-owner.patch",
+        "sha256": "251cb5ee2d06a1a78732d7c01839bf4bf596a5376ce5af8637b50d8c0633f897"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-memo-tail-owner.patch",
+        "sha256": "5f4eafa802c6dd9dde96a1def6e187ef1be5b3f7e9a99cf8d4569458d0d0bca0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzz-table-outer-margin-owner.patch",
+        "sha256": "6132e26aa3a5b14f506f425d79930882a5c48092eac8e96bc4c8735cc8d42db3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-table-tail-snapshot.patch",
+        "sha256": "11a853d99a9278fd94e2c573d384f3826c53b00a433bcb6b9fa04fb24e344f0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzz-conversion-semantic-storage.patch",
+        "sha256": "65f3e6e87bb1030f2e565cfd96d36b85dc4065de8fb3615a2db24a9d4121a092"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-zone-observation.patch",
+        "sha256": "9dc3ffd29ada303898ab21268fb72e23b1b56bcf7c589a11687716848e80bb70"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-textbox-alignment-storage.patch",
+        "sha256": "b9d8791a5e9b7b5e6b5d1bd794f3a7ebe9012c7bc8403c49333217cfef434122"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-footnote-style-identity.patch",
+        "sha256": "867d4ac34306a4edfb4360b2d9d51d5bb5bc43dedf5abd6919cedeba427894e6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-merged-row-height.patch",
+        "sha256": "6364cba702decf8160fea341932f5b0df6481c51fe135c2d77b6cae1c52192a3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-session-story-evidence.patch",
+        "sha256": "4f59265ba0740ad570a7dcbdd964a06a1d99075052713e70d9c1b755b83caab8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-visible-tail-snapshot.patch",
+        "sha256": "10dbdd14e2603200bec9ebcf34417c224d4f77624fc83ddf76a3c0cb28e8931e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-root-line-snapshot.patch",
+        "sha256": "509a2d497b5fe4c651b26954b6874e1a95ac4a2655391f88446f70f6735c4ef0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-overlap-origin.patch",
+        "sha256": "35f34ab3553354c4920e3ba51810770a997561fc896b40c73fb012f371dcfd96"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-reflow-markers.patch",
+        "sha256": "21e7d77e4f93072efc71718c2ea9e1ce15ff26a0fe343378b474a16a136856c8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-whole-table-flow.patch",
+        "sha256": "4f376b5c88ae4d26c9ec890ebefd352ac004e94b292afbc36ffdbf95525f514a"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-typeset-advance-grid.patch",
+        "sha256": "4b55713647b5567ec88b39853b8a28efe4811bd08025ccf9c1f20c4554732638"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-width.patch",
+        "sha256": "1cc54a1f9c37f31d034f66f8b0fbc4dedd3bffff7fb7094b824ebb88ae187183"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-marker-whole-flow.patch",
+        "sha256": "9b954250e8ddbc67cbfd9eda3898deb1f892de63483e3d9ae8eed2d9b4c574d7"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-origin-hwpx-query.patch",
+        "sha256": "e419b33ca35e25c63b2ec40ba99cec33a7dee2690d3035e070cca2c9efa23581"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-nonflow-prefix-band-origin.patch",
+        "sha256": "7b9f054bb6bf0af8094451cf85797adb6ab9fe06fcfa6641453111bd3561bdf6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-line-cache.patch",
+        "sha256": "2629f5073faed3d9b4f121cb71116143879085396b3ef3421e26a6c4adff64a0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-wrap-separator-spacing.patch",
+        "sha256": "54f38a977dc703e75cc42f3383705182b546efb30f1b3e2fd9669c6c70296aa3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-textbox-storage-flag.patch",
+        "sha256": "6ed35f5dfc24f0f47146b7fa7d1cb24fe3a56bc14f365eb0e7063dd7d85bdaf6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-paragraph-2016-heading-case.patch",
+        "sha256": "ed6f58a7201a4d8514d459b74d90dee6d880d33746e37509d14ba0475e3bfcb3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp-tab-placeholder-line-cache.patch",
+        "sha256": "68ad036c239042df4ae77d6750d1c69323bf1fa499193fc6d47bd2f0ef2b37ce"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-width-declared-height-preservation.patch",
+        "sha256": "5d4bb9a8907fe988741163510618d410b778cb24bfc45b51392780fc1ccc7fd8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-explicit-none-shadow-storage.patch",
+        "sha256": "38c3ddba6b4844f82ac8a3f752dabbabb55c74d31cc3d150c1142d57f57e00e9"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-table-content-height-sync.patch",
+        "sha256": "368dd198802b630da92549f7bc4ddbcb2e6bf7a0822090519ec07a1134a9fe0b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-closed-whole-stack-lineage.patch",
+        "sha256": "5e9b4dce4da46d62427105ce3a70362050f17392388aa507ad54d7894df31bd2"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-single-table-outer-origin.patch",
+        "sha256": "12acf5353ab12f366e04496d2d7c59093d80a7bc60293257d8fa603910de0a05"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-document-summary-metadata.patch",
+        "sha256": "69b458e6f48c0145df400b19981658575d08f88a183ae6975dd67bcf0b146f06"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-live-table-outer-origin.patch",
+        "sha256": "9b896b2d541e1dd002bd240742d707b0274f95d436bbb0d321600bd63a350845"
+      }
+    ],
+    "builtAt": "2026-10-17T01:53:51.6229786Z"
+  },
+  "results": [
+    "multiline: Hancom-saved source survives strict Jueony resave and repeated native reopen",
+    "caption-multiline: Hancom-saved source survives strict Jueony resave and repeated native reopen",
+    "positive-caption-gap: full public control/text layout within unchanged 0.2 maximum",
+    "positive-caption-gap: Hancom-saved source survives strict Jueony resave and repeated native reopen"
+  ],
+  "failures": [
+    {
+      "name": "multiline: exact body/page count and semantic preservation from independently Hancom-saved fixture",
+      "error": "AssertionError [ERR_ASSERTION]: [{\"path\":\"/controls/2/props/Height\",\"before\":3846,\"after\":5181,\"delta\":1335},{\"path\":\"/objects/0/properties/tableHeight\",\"before\":3846,\"after\":5181,\"delta\":1335}]\n\n2 !== 0\n",
+      "stack": "AssertionError [ERR_ASSERTION]: [{\"path\":\"/controls/2/props/Height\",\"before\":3846,\"after\":5181,\"delta\":1335},{\"path\":\"/objects/0/properties/tableHeight\",\"before\":3846,\"after\":5181,\"delta\":1335}]\n\n2 !== 0\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hancom-overlap-roundtrip.mjs:11:188\n    at scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hancom-overlap-roundtrip.mjs:8:45)\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hancom-overlap-roundtrip.mjs:11:8"
+    },
+    {
+      "name": "multiline: full public control/text layout within unchanged 0.2 maximum",
+      "error": "AssertionError [ERR_ASSERTION]: [{\"path\":\"/0/runs/25/text\",\"before\":\"본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 \",\"after\":\"본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내\"},{\"path\":\"/0/runs/25/w\",\"before\":573.9,\"after\":566.9,\"delta\":-7},{\"path\":\"/0/runs/25/charX/3\",\"before\":32.6,\"after\":33.2,\"delta\":0.6000000000000014},{\"path\":\"/0/runs/25/charX/4\",\"before\":45.5,\"after\":46.2,\"delta\":0.7000000000000028},{\"path\":\"/0/runs/25/charX/5\",\"before\":58.5,\"after\":59.2,\"delta\":0.7000000000000028},{\"path\":\"/0/runs/25/charX/6\",\"before\":65.2,\"after\":66.5,\"delta\":1.2999999999999972},{\"path\":\"/0/runs/25/charX/7\",\"before\":78.1,\"after\":79.5,\"delta\":1.4000000000000057},{\"path\":\"/0/runs/25/charX/8\",\"before\":84.8,\"after\":86.8,\"delta\":2},{\"path\":\"/0/runs/25/charX/9\",\"before\":97.8,\"after\":99.7,\"delta\":1.9000000000000057},{\"path\":\"/0/runs/25/charX/10\",\"before\":110.7,\"after\":112.7,\"delta\":2},{\"path\":\"/0/runs/25/charX/11\",\"before\":117.4,\"after\":120,\"delta\":2.5999999999999943},{\"path\":\"/0/runs/25/charX/12\",\"before\":130.3,\"after\":133,\"delta\":2.6999999999999886},{\"path\":\"/0/runs/25/charX/13\",\"before\":143.3,\"after\":146,\"delta\":2.6999999999999886},{\"path\":\"/0/runs/25/charX/14\",\"before\":150,\"after\":153.3,\"delta\":3.3000000000000114},{\"path\":\"/0/runs/25/charX/15\",\"before\":162.9,\"after\":166.2,\"delta\":3.299999999999983},{\"path\":\"/0/runs/25/charX/16\",\"before\":169.6,\"after\":173.6,\"delta\":4},{\"path\":\"/0/runs/25/charX/17\",\"before\":182.5,\"after\":186.5,\"delta\":4},{\"path\":\"/0/runs/25/charX/18\",\"before\":195.5,\"after\":199.5,\"delta\":4},{\"path\":\"/0/runs/25/charX/19\",\"before\":202.2,\"after\":206.8,\"delta\":4.600000000000023},{\"path\":\"/0/runs/25/charX/20\",\"before\":215.1,\"after\":219.8,\"delta\":4.700000000000017}]\n\n501 !== 0\n",
+      "stack": "AssertionError [ERR_ASSERTION]: [{\"path\":\"/0/runs/25/text\",\"before\":\"본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 \",\"after\":\"본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내\"},{\"path\":\"/0/runs/25/w\",\"before\":573.9,\"after\":566.9,\"delta\":-7},{\"path\":\"/0/runs/25/charX/3\",\"before\":32.6,\"after\":33.2,\"delta\":0.6000000000000014},{\"path\":\"/0/runs/25/charX/4\",\"before\":45.5,\"after\":46.2,\"delta\":0.7000000000000028},{\"path\":\"/0/runs/25/charX/5\",\"before\":58.5,\"after\":59.2,\"delta\":0.7000000000000028},{\"path\":\"/0/runs/25/charX/6\",\"before\":65.2,\"after\":66.5,\"delta\":1.2999999999999972},{\"path\":\"/0/runs/25/charX/7\",\"before\":78.1,\"after\":79.5,\"delta\":1.4000000000000057},{\"path\":\"/0/runs/25/charX/8\",\"before\":84.8,\"after\":86.8,\"delta\":2},{\"path\":\"/0/runs/25/charX/9\",\"before\":97.8,\"after\":99.7,\"delta\":1.9000000000000057},{\"path\":\"/0/runs/25/charX/10\",\"before\":110.7,\"after\":112.7,\"delta\":2},{\"path\":\"/0/runs/25/charX/11\",\"before\":117.4,\"after\":120,\"delta\":2.5999999999999943},{\"path\":\"/0/runs/25/charX/12\",\"before\":130.3,\"after\":133,\"delta\":2.6999999999999886},{\"path\":\"/0/runs/25/charX/13\",\"before\":143.3,\"after\":146,\"delta\":2.6999999999999886},{\"path\":\"/0/runs/25/charX/14\",\"before\":150,\"after\":153.3,\"delta\":3.3000000000000114},{\"path\":\"/0/runs/25/charX/15\",\"before\":162.9,\"after\":166.2,\"delta\":3.299999999999983},{\"path\":\"/0/runs/25/charX/16\",\"before\":169.6,\"after\":173.6,\"delta\":4},{\"path\":\"/0/runs/25/charX/17\",\"before\":182.5,\"after\":186.5,\"delta\":4},{\"path\":\"/0/runs/25/charX/18\",\"before\":195.5,\"after\":199.5,\"delta\":4},{\"path\":\"/0/runs/25/charX/19\",\"before\":202.2,\"after\":206.8,\"delta\":4.600000000000023},{\"path\":\"/0/runs/25/charX/20\",\"before\":215.1,\"after\":219.8,\"delta\":4.700000000000017}]\n\n501 !== 0\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hancom-overlap-roundtrip.mjs:12:98\n    at scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hancom-overlap-roundtrip.mjs:8:45)\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hancom-overlap-roundtrip.mjs:12:8"
+    },
+    {
+      "name": "caption-multiline: exact body/page count and semantic preservation from independently Hancom-saved fixture",
+      "error": "AssertionError [ERR_ASSERTION]: [{\"path\":\"/controls/2/props/Height\",\"before\":3846,\"after\":5181,\"delta\":1335},{\"path\":\"/objects/0/properties/tableHeight\",\"before\":3846,\"after\":5181,\"delta\":1335}]\n\n2 !== 0\n",
+      "stack": "AssertionError [ERR_ASSERTION]: [{\"path\":\"/controls/2/props/Height\",\"before\":3846,\"after\":5181,\"delta\":1335},{\"path\":\"/objects/0/properties/tableHeight\",\"before\":3846,\"after\":5181,\"delta\":1335}]\n\n2 !== 0\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hancom-overlap-roundtrip.mjs:11:188\n    at scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hancom-overlap-roundtrip.mjs:8:45)\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hancom-overlap-roundtrip.mjs:11:8"
+    },
+    {
+      "name": "caption-multiline: full public control/text layout within unchanged 0.2 maximum",
+      "error": "AssertionError [ERR_ASSERTION]: [{\"path\":\"/0/runs/26/text\",\"before\":\"본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 \",\"after\":\"본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내\"},{\"path\":\"/0/runs/26/w\",\"before\":573.9,\"after\":566.9,\"delta\":-7},{\"path\":\"/0/runs/26/charX/3\",\"before\":32.6,\"after\":33.2,\"delta\":0.6000000000000014},{\"path\":\"/0/runs/26/charX/4\",\"before\":45.5,\"after\":46.2,\"delta\":0.7000000000000028},{\"path\":\"/0/runs/26/charX/5\",\"before\":58.5,\"after\":59.2,\"delta\":0.7000000000000028},{\"path\":\"/0/runs/26/charX/6\",\"before\":65.2,\"after\":66.5,\"delta\":1.2999999999999972},{\"path\":\"/0/runs/26/charX/7\",\"before\":78.1,\"after\":79.5,\"delta\":1.4000000000000057},{\"path\":\"/0/runs/26/charX/8\",\"before\":84.8,\"after\":86.8,\"delta\":2},{\"path\":\"/0/runs/26/charX/9\",\"before\":97.8,\"after\":99.7,\"delta\":1.9000000000000057},{\"path\":\"/0/runs/26/charX/10\",\"before\":110.7,\"after\":112.7,\"delta\":2},{\"path\":\"/0/runs/26/charX/11\",\"before\":117.4,\"after\":120,\"delta\":2.5999999999999943},{\"path\":\"/0/runs/26/charX/12\",\"before\":130.3,\"after\":133,\"delta\":2.6999999999999886},{\"path\":\"/0/runs/26/charX/13\",\"before\":143.3,\"after\":146,\"delta\":2.6999999999999886},{\"path\":\"/0/runs/26/charX/14\",\"before\":150,\"after\":153.3,\"delta\":3.3000000000000114},{\"path\":\"/0/runs/26/charX/15\",\"before\":162.9,\"after\":166.2,\"delta\":3.299999999999983},{\"path\":\"/0/runs/26/charX/16\",\"before\":169.6,\"after\":173.6,\"delta\":4},{\"path\":\"/0/runs/26/charX/17\",\"before\":182.5,\"after\":186.5,\"delta\":4},{\"path\":\"/0/runs/26/charX/18\",\"before\":195.5,\"after\":199.5,\"delta\":4},{\"path\":\"/0/runs/26/charX/19\",\"before\":202.2,\"after\":206.8,\"delta\":4.600000000000023},{\"path\":\"/0/runs/26/charX/20\",\"before\":215.1,\"after\":219.8,\"delta\":4.700000000000017}]\n\n186 !== 0\n",
+      "stack": "AssertionError [ERR_ASSERTION]: [{\"path\":\"/0/runs/26/text\",\"before\":\"본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 \",\"after\":\"본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내\"},{\"path\":\"/0/runs/26/w\",\"before\":573.9,\"after\":566.9,\"delta\":-7},{\"path\":\"/0/runs/26/charX/3\",\"before\":32.6,\"after\":33.2,\"delta\":0.6000000000000014},{\"path\":\"/0/runs/26/charX/4\",\"before\":45.5,\"after\":46.2,\"delta\":0.7000000000000028},{\"path\":\"/0/runs/26/charX/5\",\"before\":58.5,\"after\":59.2,\"delta\":0.7000000000000028},{\"path\":\"/0/runs/26/charX/6\",\"before\":65.2,\"after\":66.5,\"delta\":1.2999999999999972},{\"path\":\"/0/runs/26/charX/7\",\"before\":78.1,\"after\":79.5,\"delta\":1.4000000000000057},{\"path\":\"/0/runs/26/charX/8\",\"before\":84.8,\"after\":86.8,\"delta\":2},{\"path\":\"/0/runs/26/charX/9\",\"before\":97.8,\"after\":99.7,\"delta\":1.9000000000000057},{\"path\":\"/0/runs/26/charX/10\",\"before\":110.7,\"after\":112.7,\"delta\":2},{\"path\":\"/0/runs/26/charX/11\",\"before\":117.4,\"after\":120,\"delta\":2.5999999999999943},{\"path\":\"/0/runs/26/charX/12\",\"before\":130.3,\"after\":133,\"delta\":2.6999999999999886},{\"path\":\"/0/runs/26/charX/13\",\"before\":143.3,\"after\":146,\"delta\":2.6999999999999886},{\"path\":\"/0/runs/26/charX/14\",\"before\":150,\"after\":153.3,\"delta\":3.3000000000000114},{\"path\":\"/0/runs/26/charX/15\",\"before\":162.9,\"after\":166.2,\"delta\":3.299999999999983},{\"path\":\"/0/runs/26/charX/16\",\"before\":169.6,\"after\":173.6,\"delta\":4},{\"path\":\"/0/runs/26/charX/17\",\"before\":182.5,\"after\":186.5,\"delta\":4},{\"path\":\"/0/runs/26/charX/18\",\"before\":195.5,\"after\":199.5,\"delta\":4},{\"path\":\"/0/runs/26/charX/19\",\"before\":202.2,\"after\":206.8,\"delta\":4.600000000000023},{\"path\":\"/0/runs/26/charX/20\",\"before\":215.1,\"after\":219.8,\"delta\":4.700000000000017}]\n\n186 !== 0\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hancom-overlap-roundtrip.mjs:12:98\n    at scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hancom-overlap-roundtrip.mjs:8:45)\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hancom-overlap-roundtrip.mjs:12:8"
+    },
+    {
+      "name": "positive-caption-gap: exact body/page count and semantic preservation from independently Hancom-saved fixture",
+      "error": "AssertionError [ERR_ASSERTION]: [{\"path\":\"/controls/2/props/Height\",\"before\":3846,\"after\":5181,\"delta\":1335},{\"path\":\"/objects/0/properties/tableHeight\",\"before\":3846,\"after\":5181,\"delta\":1335}]\n\n2 !== 0\n",
+      "stack": "AssertionError [ERR_ASSERTION]: [{\"path\":\"/controls/2/props/Height\",\"before\":3846,\"after\":5181,\"delta\":1335},{\"path\":\"/objects/0/properties/tableHeight\",\"before\":3846,\"after\":5181,\"delta\":1335}]\n\n2 !== 0\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hancom-overlap-roundtrip.mjs:11:188\n    at scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hancom-overlap-roundtrip.mjs:8:45)\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hancom-overlap-roundtrip.mjs:11:8"
+    }
+  ],
+  "observations": [
+    {
+      "mode": "multiline",
+      "original": {
+        "name": "overlap-body-native-multiline.hwp",
+        "sha256": "7efc35816157338223ac3a7e2a0df61a572e56a55affbf47f3010f845e6ab524",
+        "bytes": 14848
+      },
+      "hancom": {
+        "name": "hancom-multiline-roundtrip.hwp",
+        "sha256": "e8efe1eefcdf5146e4ae5e875c79bf45e8c9648ba94c51edd7acc55c285875e1",
+        "bytes": 29184
+      },
+      "geometryDifferences": [
+        {
+          "path": "/0/runs/25/text",
+          "before": "본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 ",
+          "after": "본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내"
+        },
+        {
+          "path": "/0/runs/25/w",
+          "before": 573.9,
+          "after": 566.9,
+          "delta": -7
+        },
+        {
+          "path": "/0/runs/25/charX/3",
+          "before": 32.6,
+          "after": 33.2,
+          "delta": 0.6000000000000014
+        },
+        {
+          "path": "/0/runs/25/charX/4",
+          "before": 45.5,
+          "after": 46.2,
+          "delta": 0.7000000000000028
+        },
+        {
+          "path": "/0/runs/25/charX/5",
+          "before": 58.5,
+          "after": 59.2,
+          "delta": 0.7000000000000028
+        },
+        {
+          "path": "/0/runs/25/charX/6",
+          "before": 65.2,
+          "after": 66.5,
+          "delta": 1.2999999999999972
+        },
+        {
+          "path": "/0/runs/25/charX/7",
+          "before": 78.1,
+          "after": 79.5,
+          "delta": 1.4000000000000057
+        },
+        {
+          "path": "/0/runs/25/charX/8",
+          "before": 84.8,
+          "after": 86.8,
+          "delta": 2
+        },
+        {
+          "path": "/0/runs/25/charX/9",
+          "before": 97.8,
+          "after": 99.7,
+          "delta": 1.9000000000000057
+        },
+        {
+          "path": "/0/runs/25/charX/10",
+          "before": 110.7,
+          "after": 112.7,
+          "delta": 2
+        },
+        {
+          "path": "/0/runs/25/charX/11",
+          "before": 117.4,
+          "after": 120,
+          "delta": 2.5999999999999943
+        },
+        {
+          "path": "/0/runs/25/charX/12",
+          "before": 130.3,
+          "after": 133,
+          "delta": 2.6999999999999886
+        },
+        {
+          "path": "/0/runs/25/charX/13",
+          "before": 143.3,
+          "after": 146,
+          "delta": 2.6999999999999886
+        },
+        {
+          "path": "/0/runs/25/charX/14",
+          "before": 150,
+          "after": 153.3,
+          "delta": 3.3000000000000114
+        },
+        {
+          "path": "/0/runs/25/charX/15",
+          "before": 162.9,
+          "after": 166.2,
+          "delta": 3.299999999999983
+        },
+        {
+          "path": "/0/runs/25/charX/16",
+          "before": 169.6,
+          "after": 173.6,
+          "delta": 4
+        },
+        {
+          "path": "/0/runs/25/charX/17",
+          "before": 182.5,
+          "after": 186.5,
+          "delta": 4
+        },
+        {
+          "path": "/0/runs/25/charX/18",
+          "before": 195.5,
+          "after": 199.5,
+          "delta": 4
+        },
+        {
+          "path": "/0/runs/25/charX/19",
+          "before": 202.2,
+          "after": 206.8,
+          "delta": 4.600000000000023
+        },
+        {
+          "path": "/0/runs/25/charX/20",
+          "before": 215.1,
+          "after": 219.8,
+          "delta": 4.700000000000017
+        },
+        {
+          "path": "/0/runs/25/charX/21",
+          "before": 228.1,
+          "after": 232.7,
+          "delta": 4.599999999999994
+        },
+        {
+          "path": "/0/runs/25/charX/22",
+          "before": 234.8,
+          "after": 240.1,
+          "delta": 5.299999999999983
+        },
+        {
+          "path": "/0/runs/25/charX/23",
+          "before": 247.7,
+          "after": 253,
+          "delta": 5.300000000000011
+        },
+        {
+          "path": "/0/runs/25/charX/24",
+          "before": 254.4,
+          "after": 260.4,
+          "delta": 5.999999999999972
+        },
+        {
+          "path": "/0/runs/25/charX/25",
+          "before": 267.3,
+          "after": 273.3,
+          "delta": 6
+        },
+        {
+          "path": "/0/runs/25/charX/26",
+          "before": 280.3,
+          "after": 286.3,
+          "delta": 6
+        },
+        {
+          "path": "/0/runs/25/charX/27",
+          "before": 287,
+          "after": 293.6,
+          "delta": 6.600000000000023
+        },
+        {
+          "path": "/0/runs/25/charX/28",
+          "before": 299.9,
+          "after": 306.6,
+          "delta": 6.7000000000000455
+        },
+        {
+          "path": "/0/runs/25/charX/29",
+          "before": 312.9,
+          "after": 319.5,
+          "delta": 6.600000000000023
+        },
+        {
+          "path": "/0/runs/25/charX/30",
+          "before": 319.6,
+          "after": 326.9,
+          "delta": 7.2999999999999545
+        },
+        {
+          "path": "/0/runs/25/charX/31",
+          "before": 332.5,
+          "after": 339.8,
+          "delta": 7.300000000000011
+        },
+        {
+          "path": "/0/runs/25/charX/32",
+          "before": 339.2,
+          "after": 347.1,
+          "delta": 7.900000000000034
+        },
+        {
+          "path": "/0/runs/25/charX/33",
+          "before": 352.1,
+          "after": 360.1,
+          "delta": 8
+        },
+        {
+          "path": "/0/runs/25/charX/34",
+          "before": 365.1,
+          "after": 373.1,
+          "delta": 8
+        },
+        {
+          "path": "/0/runs/25/charX/35",
+          "before": 371.8,
+          "after": 380.4,
+          "delta": 8.599999999999966
+        },
+        {
+          "path": "/0/runs/25/charX/36",
+          "before": 384.7,
+          "after": 393.4,
+          "delta": 8.699999999999989
+        },
+        {
+          "path": "/0/runs/25/charX/37",
+          "before": 397.7,
+          "after": 406.3,
+          "delta": 8.600000000000023
+        },
+        {
+          "path": "/0/runs/25/charX/38",
+          "before": 404.3,
+          "after": 413.6,
+          "delta": 9.300000000000011
+        },
+        {
+          "path": "/0/runs/25/charX/39",
+          "before": 417.3,
+          "after": 426.6,
+          "delta": 9.300000000000011
+        },
+        {
+          "path": "/0/runs/25/charX/40",
+          "before": 424,
+          "after": 433.9,
+          "delta": 9.899999999999977
+        },
+        {
+          "path": "/0/runs/25/charX/41",
+          "before": 436.9,
+          "after": 446.9,
+          "delta": 10
+        },
+        {
+          "path": "/0/runs/25/charX/42",
+          "before": 449.9,
+          "after": 459.9,
+          "delta": 10
+        },
+        {
+          "path": "/0/runs/25/charX/43",
+          "before": 456.6,
+          "after": 467.2,
+          "delta": 10.599999999999966
+        },
+        {
+          "path": "/0/runs/25/charX/44",
+          "before": 469.5,
+          "after": 480.1,
+          "delta": 10.600000000000023
+        },
+        {
+          "path": "/0/runs/25/charX/45",
+          "before": 482.5,
+          "after": 493.1,
+          "delta": 10.600000000000023
+        },
+        {
+          "path": "/0/runs/25/charX/46",
+          "before": 489.1,
+          "after": 500.4,
+          "delta": 11.299999999999955
+        },
+        {
+          "path": "/0/runs/25/charX/47",
+          "before": 502.1,
+          "after": 513.4,
+          "delta": 11.299999999999955
+        },
+        {
+          "path": "/0/runs/25/charX/48",
+          "before": 508.8,
+          "after": 520.7,
+          "delta": 11.900000000000034
+        },
+        {
+          "path": "/0/runs/25/charX/49",
+          "before": 521.7,
+          "after": 533.7,
+          "delta": 12
+        },
+        {
+          "path": "/0/runs/25/charX/50",
+          "before": 534.7,
+          "after": 546.6,
+          "delta": 11.899999999999977
+        },
+        {
+          "path": "/0/runs/25/charX/51",
+          "before": 541.3,
+          "after": 554,
+          "delta": 12.700000000000045
+        },
+        {
+          "path": "/0/runs/25/charX/52",
+          "before": 554.3,
+          "after": 566.9,
+          "delta": 12.600000000000023
+        },
+        {
+          "path": "/0/runs/25/charX/53",
+          "before": 567.3
+        },
+        {
+          "path": "/0/runs/25/charX/54",
+          "before": 573.9
+        },
+        {
+          "path": "/0/runs/26/text",
+          "before": "긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 ",
+          "after": "용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본"
+        },
+        {
+          "path": "/0/runs/26/w",
+          "before": 573.9,
+          "after": 566.9,
+          "delta": -7
+        },
+        {
+          "path": "/0/runs/26/charX/2",
+          "before": 20.3,
+          "after": 19.9,
+          "delta": -0.40000000000000213
+        },
+        {
+          "path": "/0/runs/26/charX/3",
+          "before": 33.3,
+          "after": 32.9,
+          "delta": -0.3999999999999986
+        },
+        {
+          "path": "/0/runs/26/charX/4",
+          "before": 46.2,
+          "after": 39.8,
+          "delta": -6.400000000000006
+        },
+        {
+          "path": "/0/runs/26/charX/5",
+          "before": 53.6,
+          "after": 52.8,
+          "delta": -0.8000000000000043
+        },
+        {
+          "path": "/0/runs/26/charX/6",
+          "before": 66.5,
+          "after": 65.8,
+          "delta": -0.7000000000000028
+        },
+        {
+          "path": "/0/runs/26/charX/7",
+          "before": 79.5,
+          "after": 72.7,
+          "delta": -6.799999999999997
+        },
+        {
+          "path": "/0/runs/26/charX/8",
+          "before": 86.8,
+          "after": 85.7,
+          "delta": -1.0999999999999943
+        },
+        {
+          "path": "/0/runs/26/charX/9",
+          "before": 99.8,
+          "after": 98.6,
+          "delta": -1.2000000000000028
+        },
+        {
+          "path": "/0/runs/26/charX/10",
+          "before": 107.1,
+          "after": 105.6,
+          "delta": -1.5
+        },
+        {
+          "path": "/0/runs/26/charX/11",
+          "before": 120.1,
+          "after": 118.6,
+          "delta": -1.5
+        },
+        {
+          "path": "/0/runs/26/charX/12",
+          "before": 133.1,
+          "after": 125.5,
+          "delta": -7.599999999999994
+        },
+        {
+          "path": "/0/runs/26/charX/13",
+          "before": 140.4,
+          "after": 138.5,
+          "delta": -1.9000000000000057
+        },
+        {
+          "path": "/0/runs/26/charX/14",
+          "before": 153.4,
+          "after": 151.5,
+          "delta": -1.9000000000000057
+        },
+        {
+          "path": "/0/runs/26/charX/15",
+          "before": 166.3,
+          "after": 158.4,
+          "delta": -7.900000000000006
+        },
+        {
+          "path": "/0/runs/26/charX/16",
+          "before": 173.7,
+          "after": 171.4,
+          "delta": -2.299999999999983
+        },
+        {
+          "path": "/0/runs/26/charX/17",
+          "before": 186.6,
+          "after": 184.3,
+          "delta": -2.299999999999983
+        },
+        {
+          "path": "/0/runs/26/charX/18",
+          "before": 194,
+          "after": 191.3,
+          "delta": -2.6999999999999886
+        },
+        {
+          "path": "/0/runs/26/charX/19",
+          "before": 206.9,
+          "after": 204.3,
+          "delta": -2.5999999999999943
+        },
+        {
+          "path": "/0/runs/26/charX/20",
+          "before": 219.9,
+          "after": 211.2,
+          "delta": -8.700000000000017
+        },
+        {
+          "path": "/0/runs/26/charX/21",
+          "before": 227.3,
+          "after": 224.2,
+          "delta": -3.1000000000000227
+        },
+        {
+          "path": "/0/runs/26/charX/22",
+          "before": 240.2,
+          "after": 237.1,
+          "delta": -3.0999999999999943
+        },
+        {
+          "path": "/0/runs/26/charX/23",
+          "before": 253.2,
+          "after": 244.1,
+          "delta": -9.099999999999994
+        },
+        {
+          "path": "/0/runs/26/charX/24",
+          "before": 260.5,
+          "after": 257.1,
+          "delta": -3.3999999999999773
+        },
+        {
+          "path": "/0/runs/26/charX/25",
+          "before": 273.5,
+          "after": 270,
+          "delta": -3.5
+        },
+        {
+          "path": "/0/runs/26/charX/26",
+          "before": 280.8,
+          "after": 277,
+          "delta": -3.8000000000000114
+        },
+        {
+          "path": "/0/runs/26/charX/27",
+          "before": 293.8,
+          "after": 289.9,
+          "delta": -3.900000000000034
+        },
+        {
+          "path": "/0/runs/26/charX/28",
+          "before": 306.7,
+          "after": 296.9,
+          "delta": -9.800000000000011
+        },
+        {
+          "path": "/0/runs/26/charX/29",
+          "before": 314.1,
+          "after": 309.9,
+          "delta": -4.2000000000000455
+        },
+        {
+          "path": "/0/runs/26/charX/30",
+          "before": 327.1,
+          "after": 322.8,
+          "delta": -4.300000000000011
+        },
+        {
+          "path": "/0/runs/26/charX/31",
+          "before": 340,
+          "after": 329.8,
+          "delta": -10.199999999999989
+        },
+        {
+          "path": "/0/runs/26/charX/32",
+          "before": 347.4,
+          "after": 342.8,
+          "delta": -4.599999999999966
+        },
+        {
+          "path": "/0/runs/26/charX/33",
+          "before": 360.3,
+          "after": 355.7,
+          "delta": -4.600000000000023
+        },
+        {
+          "path": "/0/runs/26/charX/34",
+          "before": 367.7,
+          "after": 362.7,
+          "delta": -5
+        },
+        {
+          "path": "/0/runs/26/charX/35",
+          "before": 380.6,
+          "after": 375.6,
+          "delta": -5
+        },
+        {
+          "path": "/0/runs/26/charX/36",
+          "before": 393.6,
+          "after": 382.6,
+          "delta": -11
+        },
+        {
+          "path": "/0/runs/26/charX/37",
+          "before": 400.9,
+          "after": 395.6,
+          "delta": -5.2999999999999545
+        },
+        {
+          "path": "/0/runs/26/charX/38",
+          "before": 413.9,
+          "after": 408.5,
+          "delta": -5.399999999999977
+        },
+        {
+          "path": "/0/runs/26/charX/39",
+          "before": 426.9,
+          "after": 415.5,
+          "delta": -11.399999999999977
+        },
+        {
+          "path": "/0/runs/26/charX/40",
+          "before": 434.2,
+          "after": 428.4,
+          "delta": -5.800000000000011
+        },
+        {
+          "path": "/0/runs/26/charX/41",
+          "before": 447.2,
+          "after": 441.4,
+          "delta": -5.800000000000011
+        },
+        {
+          "path": "/0/runs/26/charX/42",
+          "before": 454.5,
+          "after": 448.4,
+          "delta": -6.100000000000023
+        },
+        {
+          "path": "/0/runs/26/charX/43",
+          "before": 467.5,
+          "after": 461.3,
+          "delta": -6.199999999999989
+        },
+        {
+          "path": "/0/runs/26/charX/44",
+          "before": 480.4,
+          "after": 468.3,
+          "delta": -12.099999999999966
+        },
+        {
+          "path": "/0/runs/26/charX/45",
+          "before": 487.8,
+          "after": 481.2,
+          "delta": -6.600000000000023
+        },
+        {
+          "path": "/0/runs/26/charX/46",
+          "before": 500.7,
+          "after": 494.2,
+          "delta": -6.5
+        },
+        {
+          "path": "/0/runs/26/charX/47",
+          "before": 513.7,
+          "after": 501.2,
+          "delta": -12.500000000000057
+        },
+        {
+          "path": "/0/runs/26/charX/48",
+          "before": 521,
+          "after": 514.1,
+          "delta": -6.899999999999977
+        },
+        {
+          "path": "/0/runs/26/charX/49",
+          "before": 534,
+          "after": 527.1,
+          "delta": -6.899999999999977
+        },
+        {
+          "path": "/0/runs/26/charX/50",
+          "before": 541.3,
+          "after": 534.1,
+          "delta": -7.199999999999932
+        },
+        {
+          "path": "/0/runs/26/charX/51",
+          "before": 554.3,
+          "after": 547,
+          "delta": -7.2999999999999545
+        },
+        {
+          "path": "/0/runs/26/charX/52",
+          "before": 567.3,
+          "after": 554,
+          "delta": -13.299999999999955
+        },
+        {
+          "path": "/0/runs/26/charX/53",
+          "before": 574.6,
+          "after": 566.9,
+          "delta": -7.7000000000000455
+        },
+        {
+          "path": "/0/runs/26/charStart",
+          "before": 160,
+          "after": 158,
+          "delta": -2
+        },
+        {
+          "path": "/0/runs/27/text",
+          "before": "내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 ",
+          "after": "문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 "
+        },
+        {
+          "path": "/0/runs/27/charX/2",
+          "before": 25.9,
+          "after": 20.3,
+          "delta": -5.599999999999998
+        },
+        {
+          "path": "/0/runs/27/charX/7",
+          "before": 79.5,
+          "after": 73.9,
+          "delta": -5.599999999999994
+        },
+        {
+          "path": "/0/runs/27/charX/10",
+          "before": 112.8,
+          "after": 107.1,
+          "delta": -5.700000000000003
+        },
+        {
+          "path": "/0/runs/27/charX/15",
+          "before": 166.3,
+          "after": 160.7,
+          "delta": -5.600000000000023
+        },
+        {
+          "path": "/0/runs/27/charX/18",
+          "before": 199.6,
+          "after": 194,
+          "delta": -5.599999999999994
+        },
+        {
+          "path": "/0/runs/27/charX/23",
+          "before": 253.2,
+          "after": 247.6,
+          "delta": -5.599999999999994
+        },
+        {
+          "path": "/0/runs/27/charX/26",
+          "before": 286.4,
+          "after": 280.8,
+          "delta": -5.599999999999966
+        },
+        {
+          "path": "/0/runs/27/charX/31",
+          "before": 340,
+          "after": 334.4,
+          "delta": -5.600000000000023
+        },
+        {
+          "path": "/0/runs/27/charX/34",
+          "before": 373.3,
+          "after": 367.7,
+          "delta": -5.600000000000023
+        },
+        {
+          "path": "/0/runs/27/charX/39",
+          "before": 426.9,
+          "after": 421.2,
+          "delta": -5.699999999999989
+        },
+        {
+          "path": "/0/runs/27/charX/42",
+          "before": 460.1,
+          "after": 454.5,
+          "delta": -5.600000000000023
+        },
+        {
+          "path": "/0/runs/27/charX/47",
+          "before": 513.7,
+          "after": 508.1,
+          "delta": -5.600000000000023
+        },
+        {
+          "path": "/0/runs/27/charX/50",
+          "before": 547,
+          "after": 541.3,
+          "delta": -5.7000000000000455
+        },
+        {
+          "path": "/0/runs/27/charStart",
+          "before": 213,
+          "after": 211,
+          "delta": -2
+        },
+        {
+          "path": "/0/runs/28/text",
+          "before": "본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 ",
+          "after": "긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 "
+        },
+        {
+          "path": "/0/runs/28/charX/2",
+          "before": 25.9,
+          "after": 20.3,
+          "delta": -5.599999999999998
+        },
+        {
+          "path": "/0/runs/28/charX/3",
+          "before": 32.6,
+          "after": 33.3,
+          "delta": 0.6999999999999957
+        },
+        {
+          "path": "/0/runs/28/charX/4",
+          "before": 45.5,
+          "after": 46.2,
+          "delta": 0.7000000000000028
+        },
+        {
+          "path": "/0/runs/28/charX/5",
+          "before": 58.5,
+          "after": 53.6,
+          "delta": -4.899999999999999
+        },
+        {
+          "path": "/0/runs/28/charX/6",
+          "before": 65.2,
+          "after": 66.5,
+          "delta": 1.2999999999999972
+        },
+        {
+          "path": "/0/runs/28/charX/7",
+          "before": 78.1,
+          "after": 79.5,
+          "delta": 1.4000000000000057
+        },
+        {
+          "path": "/0/runs/28/charX/8",
+          "before": 84.8,
+          "after": 86.8,
+          "delta": 2
+        },
+        {
+          "path": "/0/runs/28/charX/9",
+          "before": 97.8,
+          "after": 99.8,
+          "delta": 2
+        },
+        {
+          "path": "/0/runs/28/charX/10",
+          "before": 110.7,
+          "after": 107.1,
+          "delta": -3.6000000000000085
+        },
+        {
+          "path": "/0/runs/28/charX/11",
+          "before": 117.4,
+          "after": 120.1,
+          "delta": 2.6999999999999886
+        },
+        {
+          "path": "/0/runs/28/charX/12",
+          "before": 130.3,
+          "after": 133.1,
+          "delta": 2.799999999999983
+        },
+        {
+          "path": "/0/runs/28/charX/13",
+          "before": 143.3,
+          "after": 140.4,
+          "delta": -2.9000000000000057
+        },
+        {
+          "path": "/0/runs/28/charX/14",
+          "before": 150,
+          "after": 153.4,
+          "delta": 3.4000000000000057
+        },
+        {
+          "path": "/0/runs/28/charX/15",
+          "before": 162.9,
+          "after": 166.3,
+          "delta": 3.4000000000000057
+        },
+        {
+          "path": "/0/runs/28/charX/16",
+          "before": 169.6,
+          "after": 173.7,
+          "delta": 4.099999999999994
+        },
+        {
+          "path": "/0/runs/28/charX/17",
+          "before": 182.5,
+          "after": 186.6,
+          "delta": 4.099999999999994
+        },
+        {
+          "path": "/0/runs/28/charX/18",
+          "before": 195.5,
+          "after": 194,
+          "delta": -1.5
+        },
+        {
+          "path": "/0/runs/28/charX/19",
+          "before": 202.2,
+          "after": 206.9,
+          "delta": 4.700000000000017
+        },
+        {
+          "path": "/0/runs/28/charX/20",
+          "before": 215.1,
+          "after": 219.9,
+          "delta": 4.800000000000011
+        },
+        {
+          "path": "/0/runs/28/charX/21",
+          "before": 228.1,
+          "after": 227.3,
+          "delta": -0.799999999999983
+        },
+        {
+          "path": "/0/runs/28/charX/22",
+          "before": 234.8,
+          "after": 240.2,
+          "delta": 5.399999999999977
+        },
+        {
+          "path": "/0/runs/28/charX/23",
+          "before": 247.7,
+          "after": 253.2,
+          "delta": 5.5
+        },
+        {
+          "path": "/0/runs/28/charX/24",
+          "before": 254.4,
+          "after": 260.5,
+          "delta": 6.099999999999994
+        },
+        {
+          "path": "/0/runs/28/charX/25",
+          "before": 267.3,
+          "after": 273.5,
+          "delta": 6.199999999999989
+        },
+        {
+          "path": "/0/runs/28/charX/26",
+          "before": 280.3,
+          "after": 280.8,
+          "delta": 0.5
+        },
+        {
+          "path": "/0/runs/28/charX/27",
+          "before": 287,
+          "after": 293.8,
+          "delta": 6.800000000000011
+        },
+        {
+          "path": "/0/runs/28/charX/28",
+          "before": 299.9,
+          "after": 306.7,
+          "delta": 6.800000000000011
+        },
+        {
+          "path": "/0/runs/28/charX/29",
+          "before": 312.9,
+          "after": 314.1,
+          "delta": 1.2000000000000455
+        },
+        {
+          "path": "/0/runs/28/charX/30",
+          "before": 319.6,
+          "after": 327.1,
+          "delta": 7.5
+        },
+        {
+          "path": "/0/runs/28/charX/31",
+          "before": 332.5,
+          "after": 340,
+          "delta": 7.5
+        },
+        {
+          "path": "/0/runs/28/charX/32",
+          "before": 339.2,
+          "after": 347.4,
+          "delta": 8.199999999999989
+        },
+        {
+          "path": "/0/runs/28/charX/33",
+          "before": 352.1,
+          "after": 360.3,
+          "delta": 8.199999999999989
+        },
+        {
+          "path": "/0/runs/28/charX/34",
+          "before": 365.1,
+          "after": 367.7,
+          "delta": 2.599999999999966
+        },
+        {
+          "path": "/0/runs/28/charX/35",
+          "before": 371.8,
+          "after": 380.6,
+          "delta": 8.800000000000011
+        },
+        {
+          "path": "/0/runs/28/charX/36",
+          "before": 384.7,
+          "after": 393.6,
+          "delta": 8.900000000000034
+        },
+        {
+          "path": "/0/runs/28/charX/37",
+          "before": 397.7,
+          "after": 400.9,
+          "delta": 3.1999999999999886
+        },
+        {
+          "path": "/0/runs/28/charX/38",
+          "before": 404.3,
+          "after": 413.9,
+          "delta": 9.599999999999966
+        },
+        {
+          "path": "/0/runs/28/charX/39",
+          "before": 417.3,
+          "after": 426.9,
+          "delta": 9.599999999999966
+        },
+        {
+          "path": "/0/runs/28/charX/40",
+          "before": 424,
+          "after": 434.2,
+          "delta": 10.199999999999989
+        },
+        {
+          "path": "/0/runs/28/charX/41",
+          "before": 436.9,
+          "after": 447.2,
+          "delta": 10.300000000000011
+        },
+        {
+          "path": "/0/runs/28/charX/42",
+          "before": 449.9,
+          "after": 454.5,
+          "delta": 4.600000000000023
+        },
+        {
+          "path": "/0/runs/28/charX/43",
+          "before": 456.6,
+          "after": 467.5,
+          "delta": 10.899999999999977
+        },
+        {
+          "path": "/0/runs/28/charX/44",
+          "before": 469.5,
+          "after": 480.4,
+          "delta": 10.899999999999977
+        },
+        {
+          "path": "/0/runs/28/charX/45",
+          "before": 482.5,
+          "after": 487.8,
+          "delta": 5.300000000000011
+        },
+        {
+          "path": "/0/runs/28/charX/46",
+          "before": 489.1,
+          "after": 500.7,
+          "delta": 11.599999999999966
+        },
+        {
+          "path": "/0/runs/28/charX/47",
+          "before": 502.1,
+          "after": 513.7,
+          "delta": 11.600000000000023
+        },
+        {
+          "path": "/0/runs/28/charX/48",
+          "before": 508.8,
+          "after": 521,
+          "delta": 12.199999999999989
+        },
+        {
+          "path": "/0/runs/28/charX/49",
+          "before": 521.7,
+          "after": 534,
+          "delta": 12.299999999999955
+        },
+        {
+          "path": "/0/runs/28/charX/50",
+          "before": 534.7,
+          "after": 541.3,
+          "delta": 6.599999999999909
+        },
+        {
+          "path": "/0/runs/28/charX/51",
+          "before": 541.3,
+          "after": 554.3,
+          "delta": 13
+        },
+        {
+          "path": "/0/runs/28/charX/52",
+          "before": 554.3,
+          "after": 567.3,
+          "delta": 13
+        },
+        {
+          "path": "/0/runs/28/charX/53",
+          "before": 567.3,
+          "after": 574.6,
+          "delta": 7.300000000000068
+        },
+        {
+          "path": "/0/runs/28/charX/54",
+          "before": 573.9
+        },
+        {
+          "path": "/0/runs/28/charStart",
+          "before": 266,
+          "after": 264,
+          "delta": -2
+        },
+        {
+          "path": "/0/runs/29/text",
+          "before": "긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 ",
+          "after": "내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 "
+        },
+        {
+          "path": "/0/runs/29/charX/2",
+          "before": 20.3,
+          "after": 25.9,
+          "delta": 5.599999999999998
+        },
+        {
+          "path": "/0/runs/29/charX/10",
+          "before": 107.1,
+          "after": 112.8,
+          "delta": 5.700000000000003
+        },
+        {
+          "path": "/0/runs/29/charX/18",
+          "before": 194,
+          "after": 199.6,
+          "delta": 5.599999999999994
+        },
+        {
+          "path": "/0/runs/29/charX/26",
+          "before": 280.8,
+          "after": 286.4,
+          "delta": 5.599999999999966
+        },
+        {
+          "path": "/0/runs/29/charX/34",
+          "before": 367.7,
+          "after": 373.3,
+          "delta": 5.600000000000023
+        },
+        {
+          "path": "/0/runs/29/charX/42",
+          "before": 454.5,
+          "after": 460.1,
+          "delta": 5.600000000000023
+        },
+        {
+          "path": "/0/runs/29/charX/50",
+          "before": 541.3,
+          "after": 547,
+          "delta": 5.7000000000000455
+        },
+        {
+          "path": "/0/runs/29/charStart",
+          "before": 320,
+          "after": 317,
+          "delta": -3
+        },
+        {
+          "path": "/0/runs/30/text",
+          "before": "내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 ",
+          "after": "본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내"
+        },
+        {
+          "path": "/0/runs/30/w",
+          "before": 573.9,
+          "after": 566.9,
+          "delta": -7
+        },
+        {
+          "path": "/0/runs/30/charX/5",
+          "before": 53.6,
+          "after": 59.2,
+          "delta": 5.600000000000001
+        },
+        {
+          "path": "/0/runs/30/charX/13",
+          "before": 140.4,
+          "after": 146,
+          "delta": 5.599999999999994
+        },
+        {
+          "path": "/0/runs/30/charX/21",
+          "before": 227.3,
+          "after": 232.7,
+          "delta": 5.399999999999977
+        },
+        {
+          "path": "/0/runs/30/charX/29",
+          "before": 314.1,
+          "after": 319.5,
+          "delta": 5.399999999999977
+        },
+        {
+          "path": "/0/runs/30/charX/30",
+          "before": 327.1,
+          "after": 326.9,
+          "delta": -0.20000000000004547
+        },
+        {
+          "path": "/0/runs/30/charX/32",
+          "before": 347.4,
+          "after": 347.1,
+          "delta": -0.2999999999999545
+        },
+        {
+          "path": "/0/runs/30/charX/35",
+          "before": 380.6,
+          "after": 380.4,
+          "delta": -0.20000000000004547
+        },
+        {
+          "path": "/0/runs/30/charX/36",
+          "before": 393.6,
+          "after": 393.4,
+          "delta": -0.20000000000004547
+        },
+        {
+          "path": "/0/runs/30/charX/37",
+          "before": 400.9,
+          "after": 406.3,
+          "delta": 5.400000000000034
+        },
+        {
+          "path": "/0/runs/30/charX/38",
+          "before": 413.9,
+          "after": 413.6,
+          "delta": -0.2999999999999545
+        },
+        {
+          "path": "/0/runs/30/charX/39",
+          "before": 426.9,
+          "after": 426.6,
+          "delta": -0.2999999999999545
+        },
+        {
+          "path": "/0/runs/30/charX/40",
+          "before": 434.2,
+          "after": 433.9,
+          "delta": -0.30000000000001137
+        },
+        {
+          "path": "/0/runs/30/charX/41",
+          "before": 447.2,
+          "after": 446.9,
+          "delta": -0.30000000000001137
+        },
+        {
+          "path": "/0/runs/30/charX/42",
+          "before": 460.1,
+          "after": 459.9,
+          "delta": -0.20000000000004547
+        },
+        {
+          "path": "/0/runs/30/charX/43",
+          "before": 467.5,
+          "after": 467.2,
+          "delta": -0.30000000000001137
+        },
+        {
+          "path": "/0/runs/30/charX/44",
+          "before": 480.4,
+          "after": 480.1,
+          "delta": -0.2999999999999545
+        },
+        {
+          "path": "/0/runs/30/charX/45",
+          "before": 487.8,
+          "after": 493.1,
+          "delta": 5.300000000000011
+        },
+        {
+          "path": "/0/runs/30/charX/46",
+          "before": 500.7,
+          "after": 500.4,
+          "delta": -0.30000000000001137
+        },
+        {
+          "path": "/0/runs/30/charX/47",
+          "before": 513.7,
+          "after": 513.4,
+          "delta": -0.3000000000000682
+        },
+        {
+          "path": "/0/runs/30/charX/48",
+          "before": 521,
+          "after": 520.7,
+          "delta": -0.2999999999999545
+        },
+        {
+          "path": "/0/runs/30/charX/49",
+          "before": 534,
+          "after": 533.7,
+          "delta": -0.2999999999999545
+        },
+        {
+          "path": "/0/runs/30/charX/50",
+          "before": 547,
+          "after": 546.6,
+          "delta": -0.39999999999997726
+        },
+        {
+          "path": "/0/runs/30/charX/51",
+          "before": 554.3,
+          "after": 554,
+          "delta": -0.2999999999999545
+        },
+        {
+          "path": "/0/runs/30/charX/52",
+          "before": 567.3,
+          "after": 566.9,
+          "delta": -0.39999999999997726
+        },
+        {
+          "path": "/0/runs/30/charX/53",
+          "before": 574.6
+        },
+        {
+          "path": "/0/runs/30/charStart",
+          "before": 373,
+          "after": 370,
+          "delta": -3
+        },
+        {
+          "path": "/0/runs/31/text",
+          "before": "본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 ",
+          "after": "용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본"
+        },
+        {
+          "path": "/0/runs/31/w",
+          "before": 573.9,
+          "after": 566.9,
+          "delta": -7
+        },
+        {
+          "path": "/0/runs/31/charX/2",
+          "before": 25.9,
+          "after": 19.9,
+          "delta": -6
+        },
+        {
+          "path": "/0/runs/31/charX/3",
+          "before": 32.6,
+          "after": 32.9,
+          "delta": 0.29999999999999716
+        },
+        {
+          "path": "/0/runs/31/charX/4",
+          "before": 45.5,
+          "after": 39.8,
+          "delta": -5.700000000000003
+        },
+        {
+          "path": "/0/runs/31/charX/5",
+          "before": 58.5,
+          "after": 52.8,
+          "delta": -5.700000000000003
+        },
+        {
+          "path": "/0/runs/31/charX/6",
+          "before": 65.2,
+          "after": 65.8,
+          "delta": 0.5999999999999943
+        },
+        {
+          "path": "/0/runs/31/charX/7",
+          "before": 78.1,
+          "after": 72.7,
+          "delta": -5.3999999999999915
+        },
+        {
+          "path": "/0/runs/31/charX/8",
+          "before": 84.8,
+          "after": 85.7,
+          "delta": 0.9000000000000057
+        },
+        {
+          "path": "/0/runs/31/charX/9",
+          "before": 97.8,
+          "after": 98.6,
+          "delta": 0.7999999999999972
+        },
+        {
+          "path": "/0/runs/31/charX/10",
+          "before": 110.7,
+          "after": 105.6,
+          "delta": -5.1000000000000085
+        },
+        {
+          "path": "/0/runs/31/charX/11",
+          "before": 117.4,
+          "after": 118.6,
+          "delta": 1.1999999999999886
+        },
+        {
+          "path": "/0/runs/31/charX/12",
+          "before": 130.3,
+          "after": 125.5,
+          "delta": -4.800000000000011
+        },
+        {
+          "path": "/0/runs/31/charX/13",
+          "before": 143.3,
+          "after": 138.5,
+          "delta": -4.800000000000011
+        },
+        {
+          "path": "/0/runs/31/charX/14",
+          "before": 150,
+          "after": 151.5,
+          "delta": 1.5
+        },
+        {
+          "path": "/0/runs/31/charX/15",
+          "before": 162.9,
+          "after": 158.4,
+          "delta": -4.5
+        },
+        {
+          "path": "/0/runs/31/charX/16",
+          "before": 169.6,
+          "after": 171.4,
+          "delta": 1.8000000000000114
+        },
+        {
+          "path": "/0/runs/31/charX/17",
+          "before": 182.5,
+          "after": 184.3,
+          "delta": 1.8000000000000114
+        },
+        {
+          "path": "/0/runs/31/charX/18",
+          "before": 195.5,
+          "after": 191.3,
+          "delta": -4.199999999999989
+        },
+        {
+          "path": "/0/runs/31/charX/19",
+          "before": 202.2,
+          "after": 204.3,
+          "delta": 2.1000000000000227
+        },
+        {
+          "path": "/0/runs/31/charX/20",
+          "before": 215.1,
+          "after": 211.2,
+          "delta": -3.9000000000000057
+        },
+        {
+          "path": "/0/runs/31/charX/21",
+          "before": 228.1,
+          "after": 224.2,
+          "delta": -3.9000000000000057
+        },
+        {
+          "path": "/0/runs/31/charX/22",
+          "before": 234.8,
+          "after": 237.1,
+          "delta": 2.299999999999983
+        },
+        {
+          "path": "/0/runs/31/charX/23",
+          "before": 247.7,
+          "after": 244.1,
+          "delta": -3.5999999999999943
+        },
+        {
+          "path": "/0/runs/31/charX/24",
+          "before": 254.4,
+          "after": 257.1,
+          "delta": 2.700000000000017
+        },
+        {
+          "path": "/0/runs/31/charX/25",
+          "before": 267.3,
+          "after": 270,
+          "delta": 2.6999999999999886
+        },
+        {
+          "path": "/0/runs/31/charX/26",
+          "before": 280.3,
+          "after": 277,
+          "delta": -3.3000000000000114
+        },
+        {
+          "path": "/0/runs/31/charX/27",
+          "before": 287,
+          "after": 289.9,
+          "delta": 2.8999999999999773
+        },
+        {
+          "path": "/0/runs/31/charX/28",
+          "before": 299.9,
+          "after": 296.9,
+          "delta": -3
+        },
+        {
+          "path": "/0/runs/31/charX/29",
+          "before": 312.9,
+          "after": 309.9,
+          "delta": -3
+        },
+        {
+          "path": "/0/runs/31/charX/30",
+          "before": 319.6,
+          "after": 322.8,
+          "delta": 3.1999999999999886
+        },
+        {
+          "path": "/0/runs/31/charX/31",
+          "before": 332.5,
+          "after": 329.8,
+          "delta": -2.6999999999999886
+        },
+        {
+          "path": "/0/runs/31/charX/32",
+          "before": 339.2,
+          "after": 342.8,
+          "delta": 3.6000000000000227
+        },
+        {
+          "path": "/0/runs/31/charX/33",
+          "before": 352.1,
+          "after": 355.7,
+          "delta": 3.599999999999966
+        },
+        {
+          "path": "/0/runs/31/charX/34",
+          "before": 365.1,
+          "after": 362.7,
+          "delta": -2.400000000000034
+        },
+        {
+          "path": "/0/runs/31/charX/35",
+          "before": 371.8,
+          "after": 375.6,
+          "delta": 3.8000000000000114
+        },
+        {
+          "path": "/0/runs/31/charX/36",
+          "before": 384.7,
+          "after": 382.6,
+          "delta": -2.099999999999966
+        },
+        {
+          "path": "/0/runs/31/charX/37",
+          "before": 397.7,
+          "after": 395.6,
+          "delta": -2.099999999999966
+        },
+        {
+          "path": "/0/runs/31/charX/38",
+          "before": 404.3,
+          "after": 408.5,
+          "delta": 4.199999999999989
+        },
+        {
+          "path": "/0/runs/31/charX/39",
+          "before": 417.3,
+          "after": 415.5,
+          "delta": -1.8000000000000114
+        },
+        {
+          "path": "/0/runs/31/charX/40",
+          "before": 424,
+          "after": 428.4,
+          "delta": 4.399999999999977
+        },
+        {
+          "path": "/0/runs/31/charX/41",
+          "before": 436.9,
+          "after": 441.4,
+          "delta": 4.5
+        },
+        {
+          "path": "/0/runs/31/charX/42",
+          "before": 449.9,
+          "after": 448.4,
+          "delta": -1.5
+        },
+        {
+          "path": "/0/runs/31/charX/43",
+          "before": 456.6,
+          "after": 461.3,
+          "delta": 4.699999999999989
+        },
+        {
+          "path": "/0/runs/31/charX/44",
+          "before": 469.5,
+          "after": 468.3,
+          "delta": -1.1999999999999886
+        },
+        {
+          "path": "/0/runs/31/charX/45",
+          "before": 482.5,
+          "after": 481.2,
+          "delta": -1.3000000000000114
+        },
+        {
+          "path": "/0/runs/31/charX/46",
+          "before": 489.1,
+          "after": 494.2,
+          "delta": 5.099999999999966
+        },
+        {
+          "path": "/0/runs/31/charX/47",
+          "before": 502.1,
+          "after": 501.2,
+          "delta": -0.9000000000000341
+        },
+        {
+          "path": "/0/runs/31/charX/48",
+          "before": 508.8,
+          "after": 514.1,
+          "delta": 5.300000000000011
+        },
+        {
+          "path": "/0/runs/31/charX/49",
+          "before": 521.7,
+          "after": 527.1,
+          "delta": 5.399999999999977
+        },
+        {
+          "path": "/0/runs/31/charX/50",
+          "before": 534.7,
+          "after": 534.1,
+          "delta": -0.6000000000000227
+        },
+        {
+          "path": "/0/runs/31/charX/51",
+          "before": 541.3,
+          "after": 547,
+          "delta": 5.7000000000000455
+        },
+        {
+          "path": "/0/runs/31/charX/52",
+          "before": 554.3,
+          "after": 554,
+          "delta": -0.2999999999999545
+        },
+        {
+          "path": "/0/runs/31/charX/53",
+          "before": 567.3,
+          "after": 566.9,
+          "delta": -0.39999999999997726
+        },
+        {
+          "path": "/0/runs/31/charX/54",
+          "before": 573.9
+        },
+        {
+          "path": "/0/runs/31/charStart",
+          "before": 426,
+          "after": 422,
+          "delta": -4
+        },
+        {
+          "path": "/0/runs/32/text",
+          "before": "긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 ",
+          "after": "문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 "
+        },
+        {
+          "path": "/0/runs/32/charX/7",
+          "before": 79.5,
+          "after": 73.9,
+          "delta": -5.599999999999994
+        },
+        {
+          "path": "/0/runs/32/charX/15",
+          "before": 166.3,
+          "after": 160.7,
+          "delta": -5.600000000000023
+        },
+        {
+          "path": "/0/runs/32/charX/23",
+          "before": 253.2,
+          "after": 247.6,
+          "delta": -5.599999999999994
+        },
+        {
+          "path": "/0/runs/32/charX/31",
+          "before": 340,
+          "after": 334.4,
+          "delta": -5.600000000000023
+        },
+        {
+          "path": "/0/runs/32/charX/39",
+          "before": 426.9,
+          "after": 421.2,
+          "delta": -5.699999999999989
+        },
+        {
+          "path": "/0/runs/32/charX/47",
+          "before": 513.7,
+          "after": 508.1,
+          "delta": -5.600000000000023
+        },
+        {
+          "path": "/0/runs/32/charStart",
+          "before": 480,
+          "after": 475,
+          "delta": -5
+        },
+        {
+          "path": "/0/runs/33/text",
+          "before": "내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 ",
+          "after": "긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 "
+        },
+        {
+          "path": "/0/runs/33/charX/2",
+          "before": 25.9,
+          "after": 20.3,
+          "delta": -5.599999999999998
+        },
+        {
+          "path": "/0/runs/33/charX/10",
+          "before": 112.8,
+          "after": 107.1,
+          "delta": -5.700000000000003
+        },
+        {
+          "path": "/0/runs/33/charX/18",
+          "before": 199.6,
+          "after": 194,
+          "delta": -5.599999999999994
+        },
+        {
+          "path": "/0/runs/33/charX/26",
+          "before": 286.4,
+          "after": 280.8,
+          "delta": -5.599999999999966
+        },
+        {
+          "path": "/0/runs/33/charX/34",
+          "before": 373.3,
+          "after": 367.7,
+          "delta": -5.600000000000023
+        },
+        {
+          "path": "/0/runs/33/charX/42",
+          "before": 460.1,
+          "after": 454.5,
+          "delta": -5.600000000000023
+        },
+        {
+          "path": "/0/runs/33/charX/50",
+          "before": 547,
+          "after": 541.3,
+          "delta": -5.7000000000000455
+        },
+        {
+          "path": "/0/runs/33/charStart",
+          "before": 533,
+          "after": 528,
+          "delta": -5
+        },
+        {
+          "path": "/0/runs/34/text",
+          "before": "본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 ",
+          "after": "내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 "
+        },
+        {
+          "path": "/0/runs/34/charX/3",
+          "before": 32.6,
+          "after": 33.3,
+          "delta": 0.6999999999999957
+        },
+        {
+          "path": "/0/runs/34/charX/4",
+          "before": 45.5,
+          "after": 46.2,
+          "delta": 0.7000000000000028
+        },
+        {
+          "path": "/0/runs/34/charX/5",
+          "before": 58.5,
+          "after": 53.6,
+          "delta": -4.899999999999999
+        },
+        {
+          "path": "/0/runs/34/charX/6",
+          "before": 65.2,
+          "after": 66.5,
+          "delta": 1.2999999999999972
+        },
+        {
+          "path": "/0/runs/34/charX/7",
+          "before": 78.1,
+          "after": 79.5,
+          "delta": 1.4000000000000057
+        },
+        {
+          "path": "/0/runs/34/charX/8",
+          "before": 84.8,
+          "after": 86.8,
+          "delta": 2
+        },
+        {
+          "path": "/0/runs/34/charX/9",
+          "before": 97.8,
+          "after": 99.8,
+          "delta": 2
+        },
+        {
+          "path": "/0/runs/34/charX/10",
+          "before": 110.7,
+          "after": 112.8,
+          "delta": 2.0999999999999943
+        },
+        {
+          "path": "/0/runs/34/charX/11",
+          "before": 117.4,
+          "after": 120.1,
+          "delta": 2.6999999999999886
+        },
+        {
+          "path": "/0/runs/34/charX/12",
+          "before": 130.3,
+          "after": 133.1,
+          "delta": 2.799999999999983
+        },
+        {
+          "path": "/0/runs/34/charX/13",
+          "before": 143.3,
+          "after": 140.4,
+          "delta": -2.9000000000000057
+        },
+        {
+          "path": "/0/runs/34/charX/14",
+          "before": 150,
+          "after": 153.4,
+          "delta": 3.4000000000000057
+        },
+        {
+          "path": "/0/runs/34/charX/15",
+          "before": 162.9,
+          "after": 166.3,
+          "delta": 3.4000000000000057
+        },
+        {
+          "path": "/0/runs/34/charX/16",
+          "before": 169.6,
+          "after": 173.7,
+          "delta": 4.099999999999994
+        },
+        {
+          "path": "/0/runs/34/charX/17",
+          "before": 182.5,
+          "after": 186.6,
+          "delta": 4.099999999999994
+        },
+        {
+          "path": "/0/runs/34/charX/18",
+          "before": 195.5,
+          "after": 199.6,
+          "delta": 4.099999999999994
+        },
+        {
+          "path": "/0/runs/34/charX/19",
+          "before": 202.2,
+          "after": 206.9,
+          "delta": 4.700000000000017
+        },
+        {
+          "path": "/0/runs/34/charX/20",
+          "before": 215.1,
+          "after": 219.9,
+          "delta": 4.800000000000011
+        },
+        {
+          "path": "/0/runs/34/charX/21",
+          "before": 228.1,
+          "after": 227.3,
+          "delta": -0.799999999999983
+        },
+        {
+          "path": "/0/runs/34/charX/22",
+          "before": 234.8,
+          "after": 240.2,
+          "delta": 5.399999999999977
+        },
+        {
+          "path": "/0/runs/34/charX/23",
+          "before": 247.7,
+          "after": 253.2,
+          "delta": 5.5
+        },
+        {
+          "path": "/0/runs/34/charX/24",
+          "before": 254.4,
+          "after": 260.5,
+          "delta": 6.099999999999994
+        },
+        {
+          "path": "/0/runs/34/charX/25",
+          "before": 267.3,
+          "after": 273.5,
+          "delta": 6.199999999999989
+        },
+        {
+          "path": "/0/runs/34/charX/26",
+          "before": 280.3,
+          "after": 286.4,
+          "delta": 6.099999999999966
+        },
+        {
+          "path": "/0/runs/34/charX/27",
+          "before": 287,
+          "after": 293.8,
+          "delta": 6.800000000000011
+        },
+        {
+          "path": "/0/runs/34/charX/28",
+          "before": 299.9,
+          "after": 306.7,
+          "delta": 6.800000000000011
+        },
+        {
+          "path": "/0/runs/34/charX/29",
+          "before": 312.9,
+          "after": 314.1,
+          "delta": 1.2000000000000455
+        },
+        {
+          "path": "/0/runs/34/charX/30",
+          "before": 319.6,
+          "after": 327.1,
+          "delta": 7.5
+        },
+        {
+          "path": "/0/runs/34/charX/31",
+          "before": 332.5,
+          "after": 340,
+          "delta": 7.5
+        },
+        {
+          "path": "/0/runs/34/charX/32",
+          "before": 339.2,
+          "after": 347.4,
+          "delta": 8.199999999999989
+        },
+        {
+          "path": "/0/runs/34/charX/33",
+          "before": 352.1,
+          "after": 360.3,
+          "delta": 8.199999999999989
+        },
+        {
+          "path": "/0/runs/34/charX/34",
+          "before": 365.1,
+          "after": 373.3,
+          "delta": 8.199999999999989
+        },
+        {
+          "path": "/0/runs/34/charX/35",
+          "before": 371.8,
+          "after": 380.6,
+          "delta": 8.800000000000011
+        },
+        {
+          "path": "/0/runs/34/charX/36",
+          "before": 384.7,
+          "after": 393.6,
+          "delta": 8.900000000000034
+        },
+        {
+          "path": "/0/runs/34/charX/37",
+          "before": 397.7,
+          "after": 400.9,
+          "delta": 3.1999999999999886
+        },
+        {
+          "path": "/0/runs/34/charX/38",
+          "before": 404.3,
+          "after": 413.9,
+          "delta": 9.599999999999966
+        },
+        {
+          "path": "/0/runs/34/charX/39",
+          "before": 417.3,
+          "after": 426.9,
+          "delta": 9.599999999999966
+        },
+        {
+          "path": "/0/runs/34/charX/40",
+          "before": 424,
+          "after": 434.2,
+          "delta": 10.199999999999989
+        },
+        {
+          "path": "/0/runs/34/charX/41",
+          "before": 436.9,
+          "after": 447.2,
+          "delta": 10.300000000000011
+        },
+        {
+          "path": "/0/runs/34/charX/42",
+          "before": 449.9,
+          "after": 460.1,
+          "delta": 10.200000000000045
+        },
+        {
+          "path": "/0/runs/34/charX/43",
+          "before": 456.6,
+          "after": 467.5,
+          "delta": 10.899999999999977
+        },
+        {
+          "path": "/0/runs/34/charX/44",
+          "before": 469.5,
+          "after": 480.4,
+          "delta": 10.899999999999977
+        },
+        {
+          "path": "/0/runs/34/charX/45",
+          "before": 482.5,
+          "after": 487.8,
+          "delta": 5.300000000000011
+        },
+        {
+          "path": "/0/runs/34/charX/46",
+          "before": 489.1,
+          "after": 500.7,
+          "delta": 11.599999999999966
+        },
+        {
+          "path": "/0/runs/34/charX/47",
+          "before": 502.1,
+          "after": 513.7,
+          "delta": 11.600000000000023
+        },
+        {
+          "path": "/0/runs/34/charX/48",
+          "before": 508.8,
+          "after": 521,
+          "delta": 12.199999999999989
+        },
+        {
+          "path": "/0/runs/34/charX/49",
+          "before": 521.7,
+          "after": 534,
+          "delta": 12.299999999999955
+        },
+        {
+          "path": "/0/runs/34/charX/50",
+          "before": 534.7,
+          "after": 547,
+          "delta": 12.299999999999955
+        },
+        {
+          "path": "/0/runs/34/charX/51",
+          "before": 541.3,
+          "after": 554.3,
+          "delta": 13
+        },
+        {
+          "path": "/0/runs/34/charX/52",
+          "before": 554.3,
+          "after": 567.3,
+          "delta": 13
+        },
+        {
+          "path": "/0/runs/34/charX/53",
+          "before": 567.3,
+          "after": 574.6,
+          "delta": 7.300000000000068
+        },
+        {
+          "path": "/0/runs/34/charX/54",
+          "before": 573.9
+        },
+        {
+          "path": "/0/runs/34/charStart",
+          "before": 586,
+          "after": 581,
+          "delta": -5
+        },
+        {
+          "path": "/0/runs/35/text",
+          "before": "긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 ",
+          "after": "본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내"
+        },
+        {
+          "path": "/0/runs/35/w",
+          "before": 573.9,
+          "after": 566.9,
+          "delta": -7
+        },
+        {
+          "path": "/0/runs/35/charX/2",
+          "before": 20.3,
+          "after": 25.9,
+          "delta": 5.599999999999998
+        },
+        {
+          "path": "/0/runs/35/charX/5",
+          "before": 53.6,
+          "after": 59.2,
+          "delta": 5.600000000000001
+        },
+        {
+          "path": "/0/runs/35/charX/10",
+          "before": 107.1,
+          "after": 112.7,
+          "delta": 5.6000000000000085
+        },
+        {
+          "path": "/0/runs/35/charX/13",
+          "before": 140.4,
+          "after": 146,
+          "delta": 5.599999999999994
+        },
+        {
+          "path": "/0/runs/35/charX/18",
+          "before": 194,
+          "after": 199.5,
+          "delta": 5.5
+        },
+        {
+          "path": "/0/runs/35/charX/21",
+          "before": 227.3,
+          "after": 232.7,
+          "delta": 5.399999999999977
+        },
+        {
+          "path": "/0/runs/35/charX/26",
+          "before": 280.8,
+          "after": 286.3,
+          "delta": 5.5
+        },
+        {
+          "path": "/0/runs/35/charX/29",
+          "before": 314.1,
+          "after": 319.5,
+          "delta": 5.399999999999977
+        },
+        {
+          "path": "/0/runs/35/charX/30",
+          "before": 327.1,
+          "after": 326.9,
+          "delta": -0.20000000000004547
+        },
+        {
+          "path": "/0/runs/35/charX/32",
+          "before": 347.4,
+          "after": 347.1,
+          "delta": -0.2999999999999545
+        },
+        {
+          "path": "/0/runs/35/charX/34",
+          "before": 367.7,
+          "after": 373.1,
+          "delta": 5.400000000000034
+        },
+        {
+          "path": "/0/runs/35/charX/35",
+          "before": 380.6,
+          "after": 380.4,
+          "delta": -0.20000000000004547
+        },
+        {
+          "path": "/0/runs/35/charX/36",
+          "before": 393.6,
+          "after": 393.4,
+          "delta": -0.20000000000004547
+        },
+        {
+          "path": "/0/runs/35/charX/37",
+          "before": 400.9,
+          "after": 406.3,
+          "delta": 5.400000000000034
+        },
+        {
+          "path": "/0/runs/35/charX/38",
+          "before": 413.9,
+          "after": 413.6,
+          "delta": -0.2999999999999545
+        },
+        {
+          "path": "/0/runs/35/charX/39",
+          "before": 426.9,
+          "after": 426.6,
+          "delta": -0.2999999999999545
+        },
+        {
+          "path": "/0/runs/35/charX/40",
+          "before": 434.2,
+          "after": 433.9,
+          "delta": -0.30000000000001137
+        },
+        {
+          "path": "/0/runs/35/charX/41",
+          "before": 447.2,
+          "after": 446.9,
+          "delta": -0.30000000000001137
+        },
+        {
+          "path": "/0/runs/35/charX/42",
+          "before": 454.5,
+          "after": 459.9,
+          "delta": 5.399999999999977
+        },
+        {
+          "path": "/0/runs/35/charX/43",
+          "before": 467.5,
+          "after": 467.2,
+          "delta": -0.30000000000001137
+        },
+        {
+          "path": "/0/runs/35/charX/44",
+          "before": 480.4,
+          "after": 480.1,
+          "delta": -0.2999999999999545
+        },
+        {
+          "path": "/0/runs/35/charX/45",
+          "before": 487.8,
+          "after": 493.1,
+          "delta": 5.300000000000011
+        },
+        {
+          "path": "/0/runs/35/charX/46",
+          "before": 500.7,
+          "after": 500.4,
+          "delta": -0.30000000000001137
+        },
+        {
+          "path": "/0/runs/35/charX/47",
+          "before": 513.7,
+          "after": 513.4,
+          "delta": -0.3000000000000682
+        },
+        {
+          "path": "/0/runs/35/charX/48",
+          "before": 521,
+          "after": 520.7,
+          "delta": -0.2999999999999545
+        },
+        {
+          "path": "/0/runs/35/charX/49",
+          "before": 534,
+          "after": 533.7,
+          "delta": -0.2999999999999545
+        },
+        {
+          "path": "/0/runs/35/charX/50",
+          "before": 541.3,
+          "after": 546.6,
+          "delta": 5.300000000000068
+        },
+        {
+          "path": "/0/runs/35/charX/51",
+          "before": 554.3,
+          "after": 554,
+          "delta": -0.2999999999999545
+        },
+        {
+          "path": "/0/runs/35/charX/52",
+          "before": 567.3,
+          "after": 566.9,
+          "delta": -0.39999999999997726
+        },
+        {
+          "path": "/0/runs/35/charX/53",
+          "before": 574.6
+        },
+        {
+          "path": "/0/runs/35/charStart",
+          "before": 640,
+          "after": 634,
+          "delta": -6
+        },
+        {
+          "path": "/0/runs/36/text",
+          "before": "내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 ",
+          "after": "용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본"
+        },
+        {
+          "path": "/0/runs/36/w",
+          "before": 573.9,
+          "after": 566.9,
+          "delta": -7
+        },
+        {
+          "path": "/0/runs/36/charX/2",
+          "before": 25.9,
+          "after": 19.9,
+          "delta": -6
+        },
+        {
+          "path": "/0/runs/36/charX/3",
+          "before": 33.3,
+          "after": 32.9,
+          "delta": -0.3999999999999986
+        },
+        {
+          "path": "/0/runs/36/charX/4",
+          "before": 46.2,
+          "after": 39.8,
+          "delta": -6.400000000000006
+        },
+        {
+          "path": "/0/runs/36/charX/5",
+          "before": 53.6,
+          "after": 52.8,
+          "delta": -0.8000000000000043
+        },
+        {
+          "path": "/0/runs/36/charX/6",
+          "before": 66.5,
+          "after": 65.8,
+          "delta": -0.7000000000000028
+        },
+        {
+          "path": "/0/runs/36/charX/7",
+          "before": 79.5,
+          "after": 72.7,
+          "delta": -6.799999999999997
+        },
+        {
+          "path": "/0/runs/36/charX/8",
+          "before": 86.8,
+          "after": 85.7,
+          "delta": -1.0999999999999943
+        },
+        {
+          "path": "/0/runs/36/charX/9",
+          "before": 99.8,
+          "after": 98.6,
+          "delta": -1.2000000000000028
+        },
+        {
+          "path": "/0/runs/36/charX/10",
+          "before": 112.8,
+          "after": 105.6,
+          "delta": -7.200000000000003
+        },
+        {
+          "path": "/0/runs/36/charX/11",
+          "before": 120.1,
+          "after": 118.6,
+          "delta": -1.5
+        },
+        {
+          "path": "/0/runs/36/charX/12",
+          "before": 133.1,
+          "after": 125.5,
+          "delta": -7.599999999999994
+        },
+        {
+          "path": "/0/runs/36/charX/13",
+          "before": 140.4,
+          "after": 138.5,
+          "delta": -1.9000000000000057
+        },
+        {
+          "path": "/0/runs/36/charX/14",
+          "before": 153.4,
+          "after": 151.5,
+          "delta": -1.9000000000000057
+        },
+        {
+          "path": "/0/runs/36/charX/15",
+          "before": 166.3,
+          "after": 158.4,
+          "delta": -7.900000000000006
+        },
+        {
+          "path": "/0/runs/36/charX/16",
+          "before": 173.7,
+          "after": 171.4,
+          "delta": -2.299999999999983
+        },
+        {
+          "path": "/0/runs/36/charX/17",
+          "before": 186.6,
+          "after": 184.3,
+          "delta": -2.299999999999983
+        },
+        {
+          "path": "/0/runs/36/charX/18",
+          "before": 199.6,
+          "after": 191.3,
+          "delta": -8.299999999999983
+        },
+        {
+          "path": "/0/runs/36/charX/19",
+          "before": 206.9,
+          "after": 204.3,
+          "delta": -2.5999999999999943
+        },
+        {
+          "path": "/0/runs/36/charX/20",
+          "before": 219.9,
+          "after": 211.2,
+          "delta": -8.700000000000017
+        },
+        {
+          "path": "/0/runs/36/charX/21",
+          "before": 227.3,
+          "after": 224.2,
+          "delta": -3.1000000000000227
+        },
+        {
+          "path": "/0/runs/36/charX/22",
+          "before": 240.2,
+          "after": 237.1,
+          "delta": -3.0999999999999943
+        },
+        {
+          "path": "/0/runs/36/charX/23",
+          "before": 253.2,
+          "after": 244.1,
+          "delta": -9.099999999999994
+        },
+        {
+          "path": "/0/runs/36/charX/24",
+          "before": 260.5,
+          "after": 257.1,
+          "delta": -3.3999999999999773
+        },
+        {
+          "path": "/0/runs/36/charX/25",
+          "before": 273.5,
+          "after": 270,
+          "delta": -3.5
+        },
+        {
+          "path": "/0/runs/36/charX/26",
+          "before": 286.4,
+          "after": 277,
+          "delta": -9.399999999999977
+        },
+        {
+          "path": "/0/runs/36/charX/27",
+          "before": 293.8,
+          "after": 289.9,
+          "delta": -3.900000000000034
+        },
+        {
+          "path": "/0/runs/36/charX/28",
+          "before": 306.7,
+          "after": 296.9,
+          "delta": -9.800000000000011
+        },
+        {
+          "path": "/0/runs/36/charX/29",
+          "before": 314.1,
+          "after": 309.9,
+          "delta": -4.2000000000000455
+        },
+        {
+          "path": "/0/runs/36/charX/30",
+          "before": 327.1,
+          "after": 322.8,
+          "delta": -4.300000000000011
+        },
+        {
+          "path": "/0/runs/36/charX/31",
+          "before": 340,
+          "after": 329.8,
+          "delta": -10.199999999999989
+        },
+        {
+          "path": "/0/runs/36/charX/32",
+          "before": 347.4,
+          "after": 342.8,
+          "delta": -4.599999999999966
+        },
+        {
+          "path": "/0/runs/36/charX/33",
+          "before": 360.3,
+          "after": 355.7,
+          "delta": -4.600000000000023
+        },
+        {
+          "path": "/0/runs/36/charX/34",
+          "before": 373.3,
+          "after": 362.7,
+          "delta": -10.600000000000023
+        },
+        {
+          "path": "/0/runs/36/charX/35",
+          "before": 380.6,
+          "after": 375.6,
+          "delta": -5
+        },
+        {
+          "path": "/0/runs/36/charX/36",
+          "before": 393.6,
+          "after": 382.6,
+          "delta": -11
+        },
+        {
+          "path": "/0/runs/36/charX/37",
+          "before": 400.9,
+          "after": 395.6,
+          "delta": -5.2999999999999545
+        },
+        {
+          "path": "/0/runs/36/charX/38",
+          "before": 413.9,
+          "after": 408.5,
+          "delta": -5.399999999999977
+        },
+        {
+          "path": "/0/runs/36/charX/39",
+          "before": 426.9,
+          "after": 415.5,
+          "delta": -11.399999999999977
+        },
+        {
+          "path": "/0/runs/36/charX/40",
+          "before": 434.2,
+          "after": 428.4,
+          "delta": -5.800000000000011
+        },
+        {
+          "path": "/0/runs/36/charX/41",
+          "before": 447.2,
+          "after": 441.4,
+          "delta": -5.800000000000011
+        },
+        {
+          "path": "/0/runs/36/charX/42",
+          "before": 460.1,
+          "after": 448.4,
+          "delta": -11.700000000000045
+        },
+        {
+          "path": "/0/runs/36/charX/43",
+          "before": 467.5,
+          "after": 461.3,
+          "delta": -6.199999999999989
+        },
+        {
+          "path": "/0/runs/36/charX/44",
+          "before": 480.4,
+          "after": 468.3,
+          "delta": -12.099999999999966
+        },
+        {
+          "path": "/0/runs/36/charX/45",
+          "before": 487.8,
+          "after": 481.2,
+          "delta": -6.600000000000023
+        },
+        {
+          "path": "/0/runs/36/charX/46",
+          "before": 500.7,
+          "after": 494.2,
+          "delta": -6.5
+        },
+        {
+          "path": "/0/runs/36/charX/47",
+          "before": 513.7,
+          "after": 501.2,
+          "delta": -12.500000000000057
+        },
+        {
+          "path": "/0/runs/36/charX/48",
+          "before": 521,
+          "after": 514.1,
+          "delta": -6.899999999999977
+        },
+        {
+          "path": "/0/runs/36/charX/49",
+          "before": 534,
+          "after": 527.1,
+          "delta": -6.899999999999977
+        },
+        {
+          "path": "/0/runs/36/charX/50",
+          "before": 547,
+          "after": 534.1,
+          "delta": -12.899999999999977
+        },
+        {
+          "path": "/0/runs/36/charX/51",
+          "before": 554.3,
+          "after": 547,
+          "delta": -7.2999999999999545
+        },
+        {
+          "path": "/0/runs/36/charX/52",
+          "before": 567.3,
+          "after": 554,
+          "delta": -13.299999999999955
+        },
+        {
+          "path": "/0/runs/36/charX/53",
+          "before": 574.6,
+          "after": 566.9,
+          "delta": -7.7000000000000455
+        },
+        {
+          "path": "/0/runs/36/charStart",
+          "before": 693,
+          "after": 686,
+          "delta": -7
+        },
+        {
+          "path": "/0/runs/37/text",
+          "before": "본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 ",
+          "after": "문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 "
+        },
+        {
+          "path": "/0/runs/37/w",
+          "before": 566.9,
+          "after": 573.9,
+          "delta": 7
+        },
+        {
+          "path": "/0/runs/37/charX/2",
+          "before": 25.7,
+          "after": 20.3,
+          "delta": -5.399999999999999
+        },
+        {
+          "path": "/0/runs/37/charX/3",
+          "before": 32.2,
+          "after": 33.3,
+          "delta": 1.0999999999999943
+        },
+        {
+          "path": "/0/runs/37/charX/4",
+          "before": 45,
+          "after": 46.2,
+          "delta": 1.2000000000000028
+        },
+        {
+          "path": "/0/runs/37/charX/5",
+          "before": 57.9,
+          "after": 53.6,
+          "delta": -4.299999999999997
+        },
+        {
+          "path": "/0/runs/37/charX/6",
+          "before": 64.4,
+          "after": 66.5,
+          "delta": 2.0999999999999943
+        },
+        {
+          "path": "/0/runs/37/charX/7",
+          "before": 77.2,
+          "after": 73.9,
+          "delta": -3.299999999999997
+        },
+        {
+          "path": "/0/runs/37/charX/8",
+          "before": 83.8,
+          "after": 86.8,
+          "delta": 3
+        },
+        {
+          "path": "/0/runs/37/charX/9",
+          "before": 96.6,
+          "after": 99.8,
+          "delta": 3.200000000000003
+        },
+        {
+          "path": "/0/runs/37/charX/10",
+          "before": 109.4,
+          "after": 107.1,
+          "delta": -2.3000000000000114
+        },
+        {
+          "path": "/0/runs/37/charX/11",
+          "before": 116,
+          "after": 120.1,
+          "delta": 4.099999999999994
+        },
+        {
+          "path": "/0/runs/37/charX/12",
+          "before": 128.8,
+          "after": 133.1,
+          "delta": 4.299999999999983
+        },
+        {
+          "path": "/0/runs/37/charX/13",
+          "before": 141.6,
+          "after": 140.4,
+          "delta": -1.1999999999999886
+        },
+        {
+          "path": "/0/runs/37/charX/14",
+          "before": 148.1,
+          "after": 153.4,
+          "delta": 5.300000000000011
+        },
+        {
+          "path": "/0/runs/37/charX/15",
+          "before": 161,
+          "after": 160.7,
+          "delta": -0.30000000000001137
+        },
+        {
+          "path": "/0/runs/37/charX/16",
+          "before": 167.5,
+          "after": 173.7,
+          "delta": 6.199999999999989
+        },
+        {
+          "path": "/0/runs/37/charX/17",
+          "before": 180.3,
+          "after": 186.6,
+          "delta": 6.299999999999983
+        },
+        {
+          "path": "/0/runs/37/charX/18",
+          "before": 193.2,
+          "after": 194,
+          "delta": 0.8000000000000114
+        },
+        {
+          "path": "/0/runs/37/charX/19",
+          "before": 199.7,
+          "after": 206.9,
+          "delta": 7.200000000000017
+        },
+        {
+          "path": "/0/runs/37/charX/20",
+          "before": 212.5,
+          "after": 219.9,
+          "delta": 7.400000000000006
+        },
+        {
+          "path": "/0/runs/37/charX/21",
+          "before": 225.4,
+          "after": 227.3,
+          "delta": 1.9000000000000057
+        },
+        {
+          "path": "/0/runs/37/charX/22",
+          "before": 231.9,
+          "after": 240.2,
+          "delta": 8.299999999999983
+        },
+        {
+          "path": "/0/runs/37/charX/23",
+          "before": 244.7,
+          "after": 247.6,
+          "delta": 2.9000000000000057
+        },
+        {
+          "path": "/0/runs/37/charX/24",
+          "before": 251.3,
+          "after": 260.5,
+          "delta": 9.199999999999989
+        },
+        {
+          "path": "/0/runs/37/charX/25",
+          "before": 264.1,
+          "after": 273.5,
+          "delta": 9.399999999999977
+        },
+        {
+          "path": "/0/runs/37/charX/26",
+          "before": 276.9,
+          "after": 280.8,
+          "delta": 3.900000000000034
+        },
+        {
+          "path": "/0/runs/37/charX/27",
+          "before": 283.5,
+          "after": 293.8,
+          "delta": 10.300000000000011
+        },
+        {
+          "path": "/0/runs/37/charX/28",
+          "before": 296.3,
+          "after": 306.7,
+          "delta": 10.399999999999977
+        },
+        {
+          "path": "/0/runs/37/charX/29",
+          "before": 309.1,
+          "after": 314.1,
+          "delta": 5
+        },
+        {
+          "path": "/0/runs/37/charX/30",
+          "before": 315.7,
+          "after": 327.1,
+          "delta": 11.400000000000034
+        },
+        {
+          "path": "/0/runs/37/charX/31",
+          "before": 328.5,
+          "after": 334.4,
+          "delta": 5.899999999999977
+        },
+        {
+          "path": "/0/runs/37/charX/32",
+          "before": 335,
+          "after": 347.4,
+          "delta": 12.399999999999977
+        },
+        {
+          "path": "/0/runs/37/charX/33",
+          "before": 347.9,
+          "after": 360.3,
+          "delta": 12.400000000000034
+        },
+        {
+          "path": "/0/runs/37/charX/34",
+          "before": 360.7,
+          "after": 367.7,
+          "delta": 7
+        },
+        {
+          "path": "/0/runs/37/charX/35",
+          "before": 367.2,
+          "after": 380.6,
+          "delta": 13.400000000000034
+        },
+        {
+          "path": "/0/runs/37/charX/36",
+          "before": 380.1,
+          "after": 393.6,
+          "delta": 13.5
+        },
+        {
+          "path": "/0/runs/37/charX/37",
+          "before": 392.9,
+          "after": 400.9,
+          "delta": 8
+        },
+        {
+          "path": "/0/runs/37/charX/38",
+          "before": 399.4,
+          "after": 413.9,
+          "delta": 14.5
+        },
+        {
+          "path": "/0/runs/37/charX/39",
+          "before": 412.2,
+          "after": 421.2,
+          "delta": 9
+        },
+        {
+          "path": "/0/runs/37/charX/40",
+          "before": 418.8,
+          "after": 434.2,
+          "delta": 15.399999999999977
+        },
+        {
+          "path": "/0/runs/37/charX/41",
+          "before": 431.6,
+          "after": 447.2,
+          "delta": 15.599999999999966
+        },
+        {
+          "path": "/0/runs/37/charX/42",
+          "before": 444.4,
+          "after": 454.5,
+          "delta": 10.100000000000023
+        },
+        {
+          "path": "/0/runs/37/charX/43",
+          "before": 451,
+          "after": 467.5,
+          "delta": 16.5
+        },
+        {
+          "path": "/0/runs/37/charX/44",
+          "before": 463.8,
+          "after": 480.4,
+          "delta": 16.599999999999966
+        },
+        {
+          "path": "/0/runs/37/charX/45",
+          "before": 476.6,
+          "after": 487.8,
+          "delta": 11.199999999999989
+        },
+        {
+          "path": "/0/runs/37/charX/46",
+          "before": 483.2,
+          "after": 500.7,
+          "delta": 17.5
+        },
+        {
+          "path": "/0/runs/37/charX/47",
+          "before": 496,
+          "after": 508.1,
+          "delta": 12.100000000000023
+        },
+        {
+          "path": "/0/runs/37/charX/48",
+          "before": 502.5,
+          "after": 521,
+          "delta": 18.5
+        },
+        {
+          "path": "/0/runs/37/charX/49",
+          "before": 515.4,
+          "after": 534,
+          "delta": 18.600000000000023
+        },
+        {
+          "path": "/0/runs/37/charX/50",
+          "before": 528.2,
+          "after": 541.3,
+          "delta": 13.099999999999909
+        },
+        {
+          "path": "/0/runs/37/charX/51",
+          "before": 534.7,
+          "after": 554.3,
+          "delta": 19.59999999999991
+        },
+        {
+          "path": "/0/runs/37/charX/52",
+          "before": 547.6,
+          "after": 567.3,
+          "delta": 19.699999999999932
+        },
+        {
+          "path": "/0/runs/37/charX/53",
+          "before": 560.4,
+          "after": 574.6,
+          "delta": 14.200000000000045
+        },
+        {
+          "path": "/0/runs/37/charX/54",
+          "before": 566.9
+        },
+        {
+          "path": "/0/runs/37/charStart",
+          "before": 746,
+          "after": 739,
+          "delta": -7
+        },
+        {
+          "path": "/0/runs/38/text",
+          "before": "",
+          "after": "긴 본문 내용 "
+        },
+        {
+          "path": "/0/runs/38/w",
+          "before": 566.9,
+          "after": 84.8,
+          "delta": -482.09999999999997
+        },
+        {
+          "path": "/0/runs/38/charX/1",
+          "after": 13
+        },
+        {
+          "path": "/0/runs/38/charX/2",
+          "after": 19.6
+        },
+        {
+          "path": "/0/runs/38/charX/3",
+          "after": 32.6
+        },
+        {
+          "path": "/0/runs/38/charX/4",
+          "after": 45.5
+        },
+        {
+          "path": "/0/runs/38/charX/5",
+          "after": 52.2
+        },
+        {
+          "path": "/0/runs/38/charX/6",
+          "after": 65.2
+        },
+        {
+          "path": "/0/runs/38/charX/7",
+          "after": 78.1
+        },
+        {
+          "path": "/0/runs/38/charX/8",
+          "after": 84.8
+        },
+        {
+          "path": "/0/runs/38/paraIdx",
+          "before": 4,
+          "after": 3,
+          "delta": -1
+        },
+        {
+          "path": "/0/runs/38/charStart",
+          "before": 0,
+          "after": 792,
+          "delta": 792
+        },
+        {
+          "path": "/0/runs/39/paraIdx",
+          "before": 5,
+          "after": 4,
+          "delta": -1
+        },
+        {
+          "path": "/0/runs/40",
+          "after": {
+            "text": "",
+            "x": 113.4,
+            "y": 634.6,
+            "w": 566.9,
+            "h": 13.3,
+            "charX": [
+              0
+            ],
+            "fontFamily": "함초롬바탕",
+            "fontSize": 13.3,
+            "bold": false,
+            "italic": false,
+            "ratio": 1,
+            "letterSpacing": 0,
+            "underline": false,
+            "strikethrough": false,
+            "textColor": "#000000",
+            "charShapeId": 0,
+            "paraShapeId": 0,
+            "secIdx": 0,
+            "paraIdx": 5,
+            "charStart": 0
+          }
+        }
+      ],
+      "meaningDifferences": [
+        {
+          "path": "/controls/2/props/Height",
+          "before": 3846,
+          "after": 5181,
+          "delta": 1335
+        },
+        {
+          "path": "/objects/0/properties/tableHeight",
+          "before": 3846,
+          "after": 5181,
+          "delta": 1335
+        }
+      ],
+      "jueonyResave": {
+        "sha256": "c7a0ea698dbd9c5ef7b0e15e0478dc18e4fd934ca6e2960011174274af464b54",
+        "bytes": 28672,
+        "geometryDifferences": [],
+        "report": {
+          "schemaVersion": 1,
+          "status": "checked",
+          "format": "hwp",
+          "checked": [
+            "summary-metadata",
+            "list-definitions",
+            "sections",
+            "section/0/page",
+            "section/0/definition",
+            "section/0/columns",
+            "section/0/outline-definition",
+            "section/0/page-border",
+            "section/0/page-border-entries",
+            "section/0/master-pages",
+            "section/0/line-numbers",
+            "section/0/paragraph-count",
+            "section/0/paragraph/0",
+            "section/0/paragraph/1",
+            "section/0/paragraph/2",
+            "section/0/paragraph/3",
+            "section/0/paragraph/4",
+            "section/0/paragraph/5",
+            "section/0/header/0",
+            "section/0/header/1",
+            "section/0/header/2",
+            "section/0/footer/0",
+            "section/0/footer/1",
+            "section/0/footer/2",
+            "section/0/header/0/format",
+            "section/0/header/1/format",
+            "section/0/header/2/format",
+            "section/0/footer/0/format",
+            "section/0/footer/1/format",
+            "section/0/footer/2/format",
+            "text",
+            "fields",
+            "bookmarks",
+            "controls",
+            "styles",
+            "cells",
+            "objects",
+            "image-resources",
+            "native-hwp-overlapping-table-layout"
+          ],
+          "unverified": [
+            "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+            "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+            "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+            "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+          ],
+          "issues": []
+        }
+      }
+    },
+    {
+      "mode": "caption-multiline",
+      "original": {
+        "name": "overlap-body-native-caption-multiline.hwp",
+        "sha256": "8fa62ef0ff3711ff814773d8d361dffd947d34fa62cbc3b2cdfd12afc304ee61",
+        "bytes": 13312
+      },
+      "hancom": {
+        "name": "hancom-caption-multiline-roundtrip.hwp",
+        "sha256": "1184d0381c650386152a2d789b747f0b4be25473e9f6768d6371aa38fedb920e",
+        "bytes": 22016
+      },
+      "geometryDifferences": [
+        {
+          "path": "/0/runs/26/text",
+          "before": "본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 ",
+          "after": "본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내"
+        },
+        {
+          "path": "/0/runs/26/w",
+          "before": 573.9,
+          "after": 566.9,
+          "delta": -7
+        },
+        {
+          "path": "/0/runs/26/charX/3",
+          "before": 32.6,
+          "after": 33.2,
+          "delta": 0.6000000000000014
+        },
+        {
+          "path": "/0/runs/26/charX/4",
+          "before": 45.5,
+          "after": 46.2,
+          "delta": 0.7000000000000028
+        },
+        {
+          "path": "/0/runs/26/charX/5",
+          "before": 58.5,
+          "after": 59.2,
+          "delta": 0.7000000000000028
+        },
+        {
+          "path": "/0/runs/26/charX/6",
+          "before": 65.2,
+          "after": 66.5,
+          "delta": 1.2999999999999972
+        },
+        {
+          "path": "/0/runs/26/charX/7",
+          "before": 78.1,
+          "after": 79.5,
+          "delta": 1.4000000000000057
+        },
+        {
+          "path": "/0/runs/26/charX/8",
+          "before": 84.8,
+          "after": 86.8,
+          "delta": 2
+        },
+        {
+          "path": "/0/runs/26/charX/9",
+          "before": 97.8,
+          "after": 99.7,
+          "delta": 1.9000000000000057
+        },
+        {
+          "path": "/0/runs/26/charX/10",
+          "before": 110.7,
+          "after": 112.7,
+          "delta": 2
+        },
+        {
+          "path": "/0/runs/26/charX/11",
+          "before": 117.4,
+          "after": 120,
+          "delta": 2.5999999999999943
+        },
+        {
+          "path": "/0/runs/26/charX/12",
+          "before": 130.3,
+          "after": 133,
+          "delta": 2.6999999999999886
+        },
+        {
+          "path": "/0/runs/26/charX/13",
+          "before": 143.3,
+          "after": 146,
+          "delta": 2.6999999999999886
+        },
+        {
+          "path": "/0/runs/26/charX/14",
+          "before": 150,
+          "after": 153.3,
+          "delta": 3.3000000000000114
+        },
+        {
+          "path": "/0/runs/26/charX/15",
+          "before": 162.9,
+          "after": 166.2,
+          "delta": 3.299999999999983
+        },
+        {
+          "path": "/0/runs/26/charX/16",
+          "before": 169.6,
+          "after": 173.6,
+          "delta": 4
+        },
+        {
+          "path": "/0/runs/26/charX/17",
+          "before": 182.5,
+          "after": 186.5,
+          "delta": 4
+        },
+        {
+          "path": "/0/runs/26/charX/18",
+          "before": 195.5,
+          "after": 199.5,
+          "delta": 4
+        },
+        {
+          "path": "/0/runs/26/charX/19",
+          "before": 202.2,
+          "after": 206.8,
+          "delta": 4.600000000000023
+        },
+        {
+          "path": "/0/runs/26/charX/20",
+          "before": 215.1,
+          "after": 219.8,
+          "delta": 4.700000000000017
+        },
+        {
+          "path": "/0/runs/26/charX/21",
+          "before": 228.1,
+          "after": 232.7,
+          "delta": 4.599999999999994
+        },
+        {
+          "path": "/0/runs/26/charX/22",
+          "before": 234.8,
+          "after": 240.1,
+          "delta": 5.299999999999983
+        },
+        {
+          "path": "/0/runs/26/charX/23",
+          "before": 247.7,
+          "after": 253,
+          "delta": 5.300000000000011
+        },
+        {
+          "path": "/0/runs/26/charX/24",
+          "before": 254.4,
+          "after": 260.4,
+          "delta": 5.999999999999972
+        },
+        {
+          "path": "/0/runs/26/charX/25",
+          "before": 267.3,
+          "after": 273.3,
+          "delta": 6
+        },
+        {
+          "path": "/0/runs/26/charX/26",
+          "before": 280.3,
+          "after": 286.3,
+          "delta": 6
+        },
+        {
+          "path": "/0/runs/26/charX/27",
+          "before": 287,
+          "after": 293.6,
+          "delta": 6.600000000000023
+        },
+        {
+          "path": "/0/runs/26/charX/28",
+          "before": 299.9,
+          "after": 306.6,
+          "delta": 6.7000000000000455
+        },
+        {
+          "path": "/0/runs/26/charX/29",
+          "before": 312.9,
+          "after": 319.5,
+          "delta": 6.600000000000023
+        },
+        {
+          "path": "/0/runs/26/charX/30",
+          "before": 319.6,
+          "after": 326.9,
+          "delta": 7.2999999999999545
+        },
+        {
+          "path": "/0/runs/26/charX/31",
+          "before": 332.5,
+          "after": 339.8,
+          "delta": 7.300000000000011
+        },
+        {
+          "path": "/0/runs/26/charX/32",
+          "before": 339.2,
+          "after": 347.1,
+          "delta": 7.900000000000034
+        },
+        {
+          "path": "/0/runs/26/charX/33",
+          "before": 352.1,
+          "after": 360.1,
+          "delta": 8
+        },
+        {
+          "path": "/0/runs/26/charX/34",
+          "before": 365.1,
+          "after": 373.1,
+          "delta": 8
+        },
+        {
+          "path": "/0/runs/26/charX/35",
+          "before": 371.8,
+          "after": 380.4,
+          "delta": 8.599999999999966
+        },
+        {
+          "path": "/0/runs/26/charX/36",
+          "before": 384.7,
+          "after": 393.4,
+          "delta": 8.699999999999989
+        },
+        {
+          "path": "/0/runs/26/charX/37",
+          "before": 397.7,
+          "after": 406.3,
+          "delta": 8.600000000000023
+        },
+        {
+          "path": "/0/runs/26/charX/38",
+          "before": 404.3,
+          "after": 413.6,
+          "delta": 9.300000000000011
+        },
+        {
+          "path": "/0/runs/26/charX/39",
+          "before": 417.3,
+          "after": 426.6,
+          "delta": 9.300000000000011
+        },
+        {
+          "path": "/0/runs/26/charX/40",
+          "before": 424,
+          "after": 433.9,
+          "delta": 9.899999999999977
+        },
+        {
+          "path": "/0/runs/26/charX/41",
+          "before": 436.9,
+          "after": 446.9,
+          "delta": 10
+        },
+        {
+          "path": "/0/runs/26/charX/42",
+          "before": 449.9,
+          "after": 459.9,
+          "delta": 10
+        },
+        {
+          "path": "/0/runs/26/charX/43",
+          "before": 456.6,
+          "after": 467.2,
+          "delta": 10.599999999999966
+        },
+        {
+          "path": "/0/runs/26/charX/44",
+          "before": 469.5,
+          "after": 480.1,
+          "delta": 10.600000000000023
+        },
+        {
+          "path": "/0/runs/26/charX/45",
+          "before": 482.5,
+          "after": 493.1,
+          "delta": 10.600000000000023
+        },
+        {
+          "path": "/0/runs/26/charX/46",
+          "before": 489.1,
+          "after": 500.4,
+          "delta": 11.299999999999955
+        },
+        {
+          "path": "/0/runs/26/charX/47",
+          "before": 502.1,
+          "after": 513.4,
+          "delta": 11.299999999999955
+        },
+        {
+          "path": "/0/runs/26/charX/48",
+          "before": 508.8,
+          "after": 520.7,
+          "delta": 11.900000000000034
+        },
+        {
+          "path": "/0/runs/26/charX/49",
+          "before": 521.7,
+          "after": 533.7,
+          "delta": 12
+        },
+        {
+          "path": "/0/runs/26/charX/50",
+          "before": 534.7,
+          "after": 546.6,
+          "delta": 11.899999999999977
+        },
+        {
+          "path": "/0/runs/26/charX/51",
+          "before": 541.3,
+          "after": 554,
+          "delta": 12.700000000000045
+        },
+        {
+          "path": "/0/runs/26/charX/52",
+          "before": 554.3,
+          "after": 566.9,
+          "delta": 12.600000000000023
+        },
+        {
+          "path": "/0/runs/26/charX/53",
+          "before": 567.3
+        },
+        {
+          "path": "/0/runs/26/charX/54",
+          "before": 573.9
+        },
+        {
+          "path": "/0/runs/27/text",
+          "before": "긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 ",
+          "after": "용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본"
+        },
+        {
+          "path": "/0/runs/27/w",
+          "before": 573.9,
+          "after": 566.9,
+          "delta": -7
+        },
+        {
+          "path": "/0/runs/27/charX/2",
+          "before": 20.3,
+          "after": 19.9,
+          "delta": -0.40000000000000213
+        },
+        {
+          "path": "/0/runs/27/charX/3",
+          "before": 33.3,
+          "after": 32.9,
+          "delta": -0.3999999999999986
+        },
+        {
+          "path": "/0/runs/27/charX/4",
+          "before": 46.2,
+          "after": 39.8,
+          "delta": -6.400000000000006
+        },
+        {
+          "path": "/0/runs/27/charX/5",
+          "before": 53.6,
+          "after": 52.8,
+          "delta": -0.8000000000000043
+        },
+        {
+          "path": "/0/runs/27/charX/6",
+          "before": 66.5,
+          "after": 65.8,
+          "delta": -0.7000000000000028
+        },
+        {
+          "path": "/0/runs/27/charX/7",
+          "before": 79.5,
+          "after": 72.7,
+          "delta": -6.799999999999997
+        },
+        {
+          "path": "/0/runs/27/charX/8",
+          "before": 86.8,
+          "after": 85.7,
+          "delta": -1.0999999999999943
+        },
+        {
+          "path": "/0/runs/27/charX/9",
+          "before": 99.8,
+          "after": 98.6,
+          "delta": -1.2000000000000028
+        },
+        {
+          "path": "/0/runs/27/charX/10",
+          "before": 107.1,
+          "after": 105.6,
+          "delta": -1.5
+        },
+        {
+          "path": "/0/runs/27/charX/11",
+          "before": 120.1,
+          "after": 118.6,
+          "delta": -1.5
+        },
+        {
+          "path": "/0/runs/27/charX/12",
+          "before": 133.1,
+          "after": 125.5,
+          "delta": -7.599999999999994
+        },
+        {
+          "path": "/0/runs/27/charX/13",
+          "before": 140.4,
+          "after": 138.5,
+          "delta": -1.9000000000000057
+        },
+        {
+          "path": "/0/runs/27/charX/14",
+          "before": 153.4,
+          "after": 151.5,
+          "delta": -1.9000000000000057
+        },
+        {
+          "path": "/0/runs/27/charX/15",
+          "before": 166.3,
+          "after": 158.4,
+          "delta": -7.900000000000006
+        },
+        {
+          "path": "/0/runs/27/charX/16",
+          "before": 173.7,
+          "after": 171.4,
+          "delta": -2.299999999999983
+        },
+        {
+          "path": "/0/runs/27/charX/17",
+          "before": 186.6,
+          "after": 184.3,
+          "delta": -2.299999999999983
+        },
+        {
+          "path": "/0/runs/27/charX/18",
+          "before": 194,
+          "after": 191.3,
+          "delta": -2.6999999999999886
+        },
+        {
+          "path": "/0/runs/27/charX/19",
+          "before": 206.9,
+          "after": 204.3,
+          "delta": -2.5999999999999943
+        },
+        {
+          "path": "/0/runs/27/charX/20",
+          "before": 219.9,
+          "after": 211.2,
+          "delta": -8.700000000000017
+        },
+        {
+          "path": "/0/runs/27/charX/21",
+          "before": 227.3,
+          "after": 224.2,
+          "delta": -3.1000000000000227
+        },
+        {
+          "path": "/0/runs/27/charX/22",
+          "before": 240.2,
+          "after": 237.1,
+          "delta": -3.0999999999999943
+        },
+        {
+          "path": "/0/runs/27/charX/23",
+          "before": 253.2,
+          "after": 244.1,
+          "delta": -9.099999999999994
+        },
+        {
+          "path": "/0/runs/27/charX/24",
+          "before": 260.5,
+          "after": 257.1,
+          "delta": -3.3999999999999773
+        },
+        {
+          "path": "/0/runs/27/charX/25",
+          "before": 273.5,
+          "after": 270,
+          "delta": -3.5
+        },
+        {
+          "path": "/0/runs/27/charX/26",
+          "before": 280.8,
+          "after": 277,
+          "delta": -3.8000000000000114
+        },
+        {
+          "path": "/0/runs/27/charX/27",
+          "before": 293.8,
+          "after": 289.9,
+          "delta": -3.900000000000034
+        },
+        {
+          "path": "/0/runs/27/charX/28",
+          "before": 306.7,
+          "after": 296.9,
+          "delta": -9.800000000000011
+        },
+        {
+          "path": "/0/runs/27/charX/29",
+          "before": 314.1,
+          "after": 309.9,
+          "delta": -4.2000000000000455
+        },
+        {
+          "path": "/0/runs/27/charX/30",
+          "before": 327.1,
+          "after": 322.8,
+          "delta": -4.300000000000011
+        },
+        {
+          "path": "/0/runs/27/charX/31",
+          "before": 340,
+          "after": 329.8,
+          "delta": -10.199999999999989
+        },
+        {
+          "path": "/0/runs/27/charX/32",
+          "before": 347.4,
+          "after": 342.8,
+          "delta": -4.599999999999966
+        },
+        {
+          "path": "/0/runs/27/charX/33",
+          "before": 360.3,
+          "after": 355.7,
+          "delta": -4.600000000000023
+        },
+        {
+          "path": "/0/runs/27/charX/34",
+          "before": 367.7,
+          "after": 362.7,
+          "delta": -5
+        },
+        {
+          "path": "/0/runs/27/charX/35",
+          "before": 380.6,
+          "after": 375.6,
+          "delta": -5
+        },
+        {
+          "path": "/0/runs/27/charX/36",
+          "before": 393.6,
+          "after": 382.6,
+          "delta": -11
+        },
+        {
+          "path": "/0/runs/27/charX/37",
+          "before": 400.9,
+          "after": 395.6,
+          "delta": -5.2999999999999545
+        },
+        {
+          "path": "/0/runs/27/charX/38",
+          "before": 413.9,
+          "after": 408.5,
+          "delta": -5.399999999999977
+        },
+        {
+          "path": "/0/runs/27/charX/39",
+          "before": 426.9,
+          "after": 415.5,
+          "delta": -11.399999999999977
+        },
+        {
+          "path": "/0/runs/27/charX/40",
+          "before": 434.2,
+          "after": 428.4,
+          "delta": -5.800000000000011
+        },
+        {
+          "path": "/0/runs/27/charX/41",
+          "before": 447.2,
+          "after": 441.4,
+          "delta": -5.800000000000011
+        },
+        {
+          "path": "/0/runs/27/charX/42",
+          "before": 454.5,
+          "after": 448.4,
+          "delta": -6.100000000000023
+        },
+        {
+          "path": "/0/runs/27/charX/43",
+          "before": 467.5,
+          "after": 461.3,
+          "delta": -6.199999999999989
+        },
+        {
+          "path": "/0/runs/27/charX/44",
+          "before": 480.4,
+          "after": 468.3,
+          "delta": -12.099999999999966
+        },
+        {
+          "path": "/0/runs/27/charX/45",
+          "before": 487.8,
+          "after": 481.2,
+          "delta": -6.600000000000023
+        },
+        {
+          "path": "/0/runs/27/charX/46",
+          "before": 500.7,
+          "after": 494.2,
+          "delta": -6.5
+        },
+        {
+          "path": "/0/runs/27/charX/47",
+          "before": 513.7,
+          "after": 501.2,
+          "delta": -12.500000000000057
+        },
+        {
+          "path": "/0/runs/27/charX/48",
+          "before": 521,
+          "after": 514.1,
+          "delta": -6.899999999999977
+        },
+        {
+          "path": "/0/runs/27/charX/49",
+          "before": 534,
+          "after": 527.1,
+          "delta": -6.899999999999977
+        },
+        {
+          "path": "/0/runs/27/charX/50",
+          "before": 541.3,
+          "after": 534.1,
+          "delta": -7.199999999999932
+        },
+        {
+          "path": "/0/runs/27/charX/51",
+          "before": 554.3,
+          "after": 547,
+          "delta": -7.2999999999999545
+        },
+        {
+          "path": "/0/runs/27/charX/52",
+          "before": 567.3,
+          "after": 554,
+          "delta": -13.299999999999955
+        },
+        {
+          "path": "/0/runs/27/charX/53",
+          "before": 574.6,
+          "after": 566.9,
+          "delta": -7.7000000000000455
+        },
+        {
+          "path": "/0/runs/27/charStart",
+          "before": 160,
+          "after": 158,
+          "delta": -2
+        },
+        {
+          "path": "/0/runs/28/text",
+          "before": "내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 ",
+          "after": "문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 "
+        },
+        {
+          "path": "/0/runs/28/charX/2",
+          "before": 25.9,
+          "after": 20.3,
+          "delta": -5.599999999999998
+        },
+        {
+          "path": "/0/runs/28/charX/7",
+          "before": 79.5,
+          "after": 73.9,
+          "delta": -5.599999999999994
+        },
+        {
+          "path": "/0/runs/28/charX/10",
+          "before": 112.8,
+          "after": 107.1,
+          "delta": -5.700000000000003
+        },
+        {
+          "path": "/0/runs/28/charX/15",
+          "before": 166.3,
+          "after": 160.7,
+          "delta": -5.600000000000023
+        },
+        {
+          "path": "/0/runs/28/charX/18",
+          "before": 199.6,
+          "after": 194,
+          "delta": -5.599999999999994
+        },
+        {
+          "path": "/0/runs/28/charX/23",
+          "before": 253.2,
+          "after": 247.6,
+          "delta": -5.599999999999994
+        },
+        {
+          "path": "/0/runs/28/charX/26",
+          "before": 286.4,
+          "after": 280.8,
+          "delta": -5.599999999999966
+        },
+        {
+          "path": "/0/runs/28/charX/31",
+          "before": 340,
+          "after": 334.4,
+          "delta": -5.600000000000023
+        },
+        {
+          "path": "/0/runs/28/charX/34",
+          "before": 373.3,
+          "after": 367.7,
+          "delta": -5.600000000000023
+        },
+        {
+          "path": "/0/runs/28/charX/39",
+          "before": 426.9,
+          "after": 421.2,
+          "delta": -5.699999999999989
+        },
+        {
+          "path": "/0/runs/28/charX/42",
+          "before": 460.1,
+          "after": 454.5,
+          "delta": -5.600000000000023
+        },
+        {
+          "path": "/0/runs/28/charX/47",
+          "before": 513.7,
+          "after": 508.1,
+          "delta": -5.600000000000023
+        },
+        {
+          "path": "/0/runs/28/charX/50",
+          "before": 547,
+          "after": 541.3,
+          "delta": -5.7000000000000455
+        },
+        {
+          "path": "/0/runs/28/charStart",
+          "before": 213,
+          "after": 211,
+          "delta": -2
+        },
+        {
+          "path": "/0/runs/29/text",
+          "before": "본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 ",
+          "after": "긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 내용 긴 본문 "
+        },
+        {
+          "path": "/0/runs/29/charX/2",
+          "before": 25.9,
+          "after": 20.3,
+          "delta": -5.599999999999998
+        },
+        {
+          "path": "/0/runs/29/charX/3",
+          "before": 32.6,
+          "after": 33.3,
+          "delta": 0.6999999999999957
+        },
+        {
+          "path": "/0/runs/29/charX/4",
+          "before": 45.5,
+          "after": 46.2,
+          "delta": 0.7000000000000028
+        },
+        {
+          "path": "/0/runs/29/charX/5",
+          "before": 58.5,
+          "after": 53.6,
+          "delta": -4.899999999999999
+        },
+        {
+          "path": "/0/runs/29/charX/6",
+          "before": 65.2,
+          "after": 66.5,
+          "delta": 1.2999999999999972
+        },
+        {
+          "path": "/0/runs/29/charX/7",
+          "before": 78.1,
+          "after": 79.5,
+          "delta": 1.4000000000000057
+        },
+        {
+          "path": "/0/runs/29/charX/8",
+          "before": 84.8,
+          "after": 86.8,
+          "delta": 2
+        },
+        {
+          "path": "/0/runs/29/charX/9",
+          "before": 97.8,
+          "after": 99.8,
+          "delta": 2
+        },
+        {
+          "path": "/0/runs/29/charX/10",
+          "before": 110.7,
+          "after": 107.1,
+          "delta": -3.6000000000000085
+        },
+        {
+          "path": "/0/runs/29/charX/11",
+          "before": 117.4,
+          "after": 120.1,
+          "delta": 2.6999999999999886
+        },
+        {
+          "path": "/0/runs/29/charX/12",
+          "before": 130.3,
+          "after": 133.1,
+          "delta": 2.799999999999983
+        },
+        {
+          "path": "/0/runs/29/charX/13",
+          "before": 143.3,
+          "after": 140.4,
+          "delta": -2.9000000000000057
+        },
+        {
+          "path": "/0/runs/29/charX/14",
+          "before": 150,
+          "after": 153.4,
+          "delta": 3.4000000000000057
+        },
+        {
+          "path": "/0/runs/29/charX/15",
+          "before": 162.9,
+          "after": 166.3,
+          "delta": 3.4000000000000057
+        },
+        {
+          "path": "/0/runs/29/charX/16",
+          "before": 169.6,
+          "after": 173.7,
+          "delta": 4.099999999999994
+        },
+        {
+          "path": "/0/runs/29/charX/17",
+          "before": 182.5,
+          "after": 186.6,
+          "delta": 4.099999999999994
+        },
+        {
+          "path": "/0/runs/29/charX/18",
+          "before": 195.5,
+          "after": 194,
+          "delta": -1.5
+        },
+        {
+          "path": "/0/runs/29/charX/19",
+          "before": 202.2,
+          "after": 206.9,
+          "delta": 4.700000000000017
+        },
+        {
+          "path": "/0/runs/29/charX/20",
+          "before": 215.1,
+          "after": 219.9,
+          "delta": 4.800000000000011
+        },
+        {
+          "path": "/0/runs/29/charX/21",
+          "before": 228.1,
+          "after": 227.3,
+          "delta": -0.799999999999983
+        },
+        {
+          "path": "/0/runs/29/charX/22",
+          "before": 234.8,
+          "after": 240.2,
+          "delta": 5.399999999999977
+        },
+        {
+          "path": "/0/runs/29/charX/23",
+          "before": 247.7,
+          "after": 253.2,
+          "delta": 5.5
+        },
+        {
+          "path": "/0/runs/29/charX/24",
+          "before": 254.4,
+          "after": 260.5,
+          "delta": 6.099999999999994
+        },
+        {
+          "path": "/0/runs/29/charX/25",
+          "before": 267.3,
+          "after": 273.5,
+          "delta": 6.199999999999989
+        },
+        {
+          "path": "/0/runs/29/charX/26",
+          "before": 280.3,
+          "after": 280.8,
+          "delta": 0.5
+        },
+        {
+          "path": "/0/runs/29/charX/27",
+          "before": 287,
+          "after": 293.8,
+          "delta": 6.800000000000011
+        },
+        {
+          "path": "/0/runs/29/charX/28",
+          "before": 299.9,
+          "after": 306.7,
+          "delta": 6.800000000000011
+        },
+        {
+          "path": "/0/runs/29/charX/29",
+          "before": 312.9,
+          "after": 314.1,
+          "delta": 1.2000000000000455
+        },
+        {
+          "path": "/0/runs/29/charX/30",
+          "before": 319.6,
+          "after": 327.1,
+          "delta": 7.5
+        },
+        {
+          "path": "/0/runs/29/charX/31",
+          "before": 332.5,
+          "after": 340,
+          "delta": 7.5
+        },
+        {
+          "path": "/0/runs/29/charX/32",
+          "before": 339.2,
+          "after": 347.4,
+          "delta": 8.199999999999989
+        },
+        {
+          "path": "/0/runs/29/charX/33",
+          "before": 352.1,
+          "after": 360.3,
+          "delta": 8.199999999999989
+        },
+        {
+          "path": "/0/runs/29/charX/34",
+          "before": 365.1,
+          "after": 367.7,
+          "delta": 2.599999999999966
+        },
+        {
+          "path": "/0/runs/29/charX/35",
+          "before": 371.8,
+          "after": 380.6,
+          "delta": 8.800000000000011
+        },
+        {
+          "path": "/0/runs/29/charX/36",
+          "before": 384.7,
+          "after": 393.6,
+          "delta": 8.900000000000034
+        },
+        {
+          "path": "/0/runs/29/charX/37",
+          "before": 397.7,
+          "after": 400.9,
+          "delta": 3.1999999999999886
+        },
+        {
+          "path": "/0/runs/29/charX/38",
+          "before": 404.3,
+          "after": 413.9,
+          "delta": 9.599999999999966
+        },
+        {
+          "path": "/0/runs/29/charX/39",
+          "before": 417.3,
+          "after": 426.9,
+          "delta": 9.599999999999966
+        },
+        {
+          "path": "/0/runs/29/charX/40",
+          "before": 424,
+          "after": 434.2,
+          "delta": 10.199999999999989
+        },
+        {
+          "path": "/0/runs/29/charX/41",
+          "before": 436.9,
+          "after": 447.2,
+          "delta": 10.300000000000011
+        },
+        {
+          "path": "/0/runs/29/charX/42",
+          "before": 449.9,
+          "after": 454.5,
+          "delta": 4.600000000000023
+        },
+        {
+          "path": "/0/runs/29/charX/43",
+          "before": 456.6,
+          "after": 467.5,
+          "delta": 10.899999999999977
+        },
+        {
+          "path": "/0/runs/29/charX/44",
+          "before": 469.5,
+          "after": 480.4,
+          "delta": 10.899999999999977
+        },
+        {
+          "path": "/0/runs/29/charX/45",
+          "before": 482.5,
+          "after": 487.8,
+          "delta": 5.300000000000011
+        },
+        {
+          "path": "/0/runs/29/charX/46",
+          "before": 489.1,
+          "after": 500.7,
+          "delta": 11.599999999999966
+        },
+        {
+          "path": "/0/runs/29/charX/47",
+          "before": 502.1,
+          "after": 513.7,
+          "delta": 11.600000000000023
+        },
+        {
+          "path": "/0/runs/29/charX/48",
+          "before": 508.8,
+          "after": 521,
+          "delta": 12.199999999999989
+        },
+        {
+          "path": "/0/runs/29/charX/49",
+          "before": 521.7,
+          "after": 534,
+          "delta": 12.299999999999955
+        },
+        {
+          "path": "/0/runs/29/charX/50",
+          "before": 534.7,
+          "after": 541.3,
+          "delta": 6.599999999999909
+        },
+        {
+          "path": "/0/runs/29/charX/51",
+          "before": 541.3,
+          "after": 554.3,
+          "delta": 13
+        },
+        {
+          "path": "/0/runs/29/charX/52",
+          "before": 554.3,
+          "after": 567.3,
+          "delta": 13
+        },
+        {
+          "path": "/0/runs/29/charX/53",
+          "before": 567.3,
+          "after": 574.6,
+          "delta": 7.300000000000068
+        },
+        {
+          "path": "/0/runs/29/charX/54",
+          "before": 573.9
+        },
+        {
+          "path": "/0/runs/29/charStart",
+          "before": 266,
+          "after": 264,
+          "delta": -2
+        },
+        {
+          "path": "/0/runs/30/text",
+          "before": "뒤 본문 간격 보존",
+          "after": "내용 뒤 본문 간격 보존"
+        },
+        {
+          "path": "/0/runs/30/w",
+          "before": 110.7,
+          "after": 143.3,
+          "delta": 32.60000000000001
+        },
+        {
+          "path": "/0/runs/30/charX/2",
+          "before": 19.6,
+          "after": 25.9,
+          "delta": 6.299999999999997
+        },
+        {
+          "path": "/0/runs/30/charX/11",
+          "after": 117.4
+        },
+        {
+          "path": "/0/runs/30/charX/12",
+          "after": 130.3
+        },
+        {
+          "path": "/0/runs/30/charX/13",
+          "after": 143.3
+        },
+        {
+          "path": "/0/runs/30/charStart",
+          "before": 320,
+          "after": 317,
+          "delta": -3
+        }
+      ],
+      "meaningDifferences": [
+        {
+          "path": "/controls/2/props/Height",
+          "before": 3846,
+          "after": 5181,
+          "delta": 1335
+        },
+        {
+          "path": "/objects/0/properties/tableHeight",
+          "before": 3846,
+          "after": 5181,
+          "delta": 1335
+        }
+      ],
+      "jueonyResave": {
+        "sha256": "71d805af9ca75efa038cc75b90b2251d35a3f2c40e8d1eda29cc0efdb483ef3c",
+        "bytes": 21504,
+        "geometryDifferences": [],
+        "report": {
+          "schemaVersion": 1,
+          "status": "checked",
+          "format": "hwp",
+          "checked": [
+            "summary-metadata",
+            "list-definitions",
+            "sections",
+            "section/0/page",
+            "section/0/definition",
+            "section/0/columns",
+            "section/0/outline-definition",
+            "section/0/page-border",
+            "section/0/page-border-entries",
+            "section/0/master-pages",
+            "section/0/line-numbers",
+            "section/0/paragraph-count",
+            "section/0/paragraph/0",
+            "section/0/paragraph/1",
+            "section/0/paragraph/2",
+            "section/0/paragraph/3",
+            "section/0/paragraph/4",
+            "section/0/paragraph/5",
+            "section/0/header/0",
+            "section/0/header/1",
+            "section/0/header/2",
+            "section/0/footer/0",
+            "section/0/footer/1",
+            "section/0/footer/2",
+            "section/0/header/0/format",
+            "section/0/header/1/format",
+            "section/0/header/2/format",
+            "section/0/footer/0/format",
+            "section/0/footer/1/format",
+            "section/0/footer/2/format",
+            "text",
+            "fields",
+            "bookmarks",
+            "controls",
+            "styles",
+            "cells",
+            "objects",
+            "image-resources",
+            "native-hwp-overlapping-table-layout"
+          ],
+          "unverified": [
+            "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+            "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+            "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+            "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+          ],
+          "issues": []
+        }
+      }
+    },
+    {
+      "mode": "positive-caption-gap",
+      "original": {
+        "name": "overlap-positive-native-caption-source-gap-10500.hwp",
+        "sha256": "c65cd03a5e0c2893cc39983fe7825db38c324d7d8ff36d38afc2e9389f2e6e4c",
+        "bytes": 13312
+      },
+      "hancom": {
+        "name": "hancom-positive-roundtrip.hwp",
+        "sha256": "09f356b978431d94dc23c88394b17b1dbf332d85038267e8552ad9a778d5f18d",
+        "bytes": 16896
+      },
+      "geometryDifferences": [],
+      "meaningDifferences": [
+        {
+          "path": "/controls/2/props/Height",
+          "before": 3846,
+          "after": 5181,
+          "delta": 1335
+        },
+        {
+          "path": "/objects/0/properties/tableHeight",
+          "before": 3846,
+          "after": 5181,
+          "delta": 1335
+        }
+      ],
+      "jueonyResave": {
+        "sha256": "ec96227027c4ef49d690386d9f1ed6779bc581399970fd022342ed9ab609a964",
+        "bytes": 15872,
+        "geometryDifferences": [],
+        "report": {
+          "schemaVersion": 1,
+          "status": "checked",
+          "format": "hwp",
+          "checked": [
+            "summary-metadata",
+            "list-definitions",
+            "sections",
+            "section/0/page",
+            "section/0/definition",
+            "section/0/columns",
+            "section/0/outline-definition",
+            "section/0/page-border",
+            "section/0/page-border-entries",
+            "section/0/master-pages",
+            "section/0/line-numbers",
+            "section/0/paragraph-count",
+            "section/0/paragraph/0",
+            "section/0/paragraph/1",
+            "section/0/paragraph/2",
+            "section/0/paragraph/3",
+            "section/0/paragraph/4",
+            "section/0/paragraph/5",
+            "section/0/header/0",
+            "section/0/header/1",
+            "section/0/header/2",
+            "section/0/footer/0",
+            "section/0/footer/1",
+            "section/0/footer/2",
+            "section/0/header/0/format",
+            "section/0/header/1/format",
+            "section/0/header/2/format",
+            "section/0/footer/0/format",
+            "section/0/footer/1/format",
+            "section/0/footer/2/format",
+            "text",
+            "fields",
+            "bookmarks",
+            "controls",
+            "styles",
+            "cells",
+            "objects",
+            "image-resources",
+            "native-hwp-overlapping-table-layout"
+          ],
+          "unverified": [
+            "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+            "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+            "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+            "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+          ],
+          "issues": []
+        }
+      }
+    }
+  ],
+  "originalFullDiagnosticPath": "build/file-closure69-overlap/original-comparison/result.json",
+  "originalFullDiagnosticSha256": "51bff06b12647d6cd8b27ceccccf38de6842b78ea39dddbd22ec9091cfc7db5d",
+  "scope": "Independent Hancom UI save pairs supplied by parent. No geometry normalization/tolerance change, all public control/text raw fields retained. Native portable metrics are not Hancom pixels. External Hancom changes are reported, not silently accepted as Jueony serialization preservation."
+}

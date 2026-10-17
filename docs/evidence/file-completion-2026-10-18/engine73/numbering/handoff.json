@@ -1,0 +1,102 @@
+{
+  "status": "NATIVE17_PASS_CANDIDATE_FOR_ROOT_FORMAL_BUILD",
+  "baseFormalSource": "source-062096789ed62ef6",
+  "patch": "build/file-closure69-public/numbering-canonical-candidate71/canonical-observed-followup71.patch",
+  "patchSha256": "88aa2f62cf5601168d46c2ce0e73083f31f845ca9f125f146f3d114465bfb134",
+  "strictApplyCheck": true,
+  "changedFiles": [
+    "src/parser/numbering_extension.rs",
+    "src/serializer/hwpx/header.rs",
+    "src/serializer/numbering_extension_loss.rs"
+  ],
+  "changedFileHashes": {
+    "src/parser/numbering_extension.rs": "cfb62230e4cce1b2f7d5c2d1892117f1537e04323bbfe41d0ece5892e9d65187",
+    "src/serializer/hwpx/header.rs": "c285ab29643039742cd8fafa5d30fe8b34e4560dcc09c7e35d1f1d77cff6f328",
+    "src/serializer/numbering_extension_loss.rs": "a391575a09af29c55cfb1a4d785898ea02fff141c9bc07de11995849b12b88f0"
+  },
+  "native": {
+    "passed": 17,
+    "failed": 0,
+    "ignored": 0,
+    "filtered": 0,
+    "log": "build/file-closure69-public/numbering-canonical-candidate71/native-observed-producer17.log",
+    "logSha256": "92ec74dda1fb37276840b1b7d4998bdd7023f0b317198ac6548262a9bca619bd",
+    "testFile": "build/file-closure69-public/numbering-canonical-candidate71/source/tests/jueony_numbering_extension.rs",
+    "testSha256": "a6d520fa6a7f13452ce19fd808e325fc17382cb3435e04fb7c0b3c3554177e00",
+    "target": "/tmp/jueony-rhwp-engine/target/numbering-encoding-review",
+    "runner": "build/file-closure69-public/run-native-numbering-canonical71.sh"
+  },
+  "actualHancomOracle": {
+    "file": "build/file-closure69-public/hancom-direct/matrix30-complete-observed.json",
+    "sha256": "b552aa936c41a26221a079878ff41b80f96c6b4ec9a9b1400a9cf6a25216367f",
+    "usedDefinitions": 31,
+    "controlledCases": 30,
+    "observedFormats": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "canonicalValues": [
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0,
+      1,
+      0
+    ],
+    "workflow": "HWPX SaveAs HWP, close, reopen that HWP from disk, SaveAs HWPX; root GUI, independent raw CFB/XML token mapping",
+    "explicitControlledMismatches": 15,
+    "frozenOld70BaseAdditionalGenuineMismatch": 1,
+    "baseMismatchReason": "Original blank-document producer emitted CIRCLED_DIGIT/checkable0 at levels8..10. Original input unchanged; extra loss retained, new no-raw-XML fallback now emits observed canonical value."
+  },
+  "coverage": {
+    "actualMatrixCanonical30": true,
+    "exactMismatchPathsControlled15PlusBase1": true,
+    "publicPythonSources": 4,
+    "publicFormatsPerSource": 2,
+    "publicExportRealLoss0AndFullPublishedControlTextParaReopenDiff0": true,
+    "numericToleranceUnchanged": 0.2,
+    "liveStateUnchanged": true,
+    "nativeBodyTextboxThreeRepeatedCycles": true,
+    "unknownDuplicatePartialControlBoundsNegative": true,
+    "oldVersionNegative": true,
+    "agentEditableLevelsStill7": true,
+    "rawXmlSpliceUnchanged": true,
+    "actualNativeWholeNumberingRecordPreserved": true,
+    "newProducerCanonical": true
+  },
+  "previousFailuresPreserved": [
+    "matrix30-red-before-canonical-fix.log",
+    "native-observed-matrix16.log"
+  ],
+  "limitations": [
+    "Formal WASM/frontend/Agent-provider/browser regressions pending root build; Native17 does not replace them.",
+    "Full actual N002 cross-application layout remains failing: python3 real line partition/text coordinates and MCST actual16 vs engine15 are separate open defects.",
+    "Public sources emit existing ClickHere/Memo parameter diagnostic and overlap warnings. Real artifact contentLoss report and layout equality passed for same-engine conversions; this is not actual Hancom page equality.",
+    "Observed canonical mapping is scoped to native numbering format values0..14 verified by the actual matrix; unknown formats and explicit incompatible original XML remain fail-closed."
+  ],
+  "productionUnchanged": true,
+  "guiPerformedByThisWorker": false,
+  "privateWasmBuilt": false
+}

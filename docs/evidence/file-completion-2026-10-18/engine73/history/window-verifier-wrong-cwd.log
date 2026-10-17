@@ -1,0 +1,12 @@
+file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/cdp/Frame.js:187
+                        ? new Error(`${response.errorText} at ${url}`)
+                          ^
+
+Error: net::ERR_CONNECTION_REFUSED at http://127.0.0.1:4466
+    at navigate (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/cdp/Frame.js:187:27)
+    at async Deferred.race (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/util/Deferred.js:33:20)
+    at async CdpFrame.goto (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/cdp/Frame.js:153:25)
+    at async CdpPage.goto (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Page.js:582:20)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-windows.mjs:13:421
+
+Node.js v22.22.2

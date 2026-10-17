@@ -1,0 +1,10 @@
+PASS parent shell Open obtains a native token and original CtrlS updates native IPC bytes
+PASS pending native picker rejects parent and iframe duplicates without queueing another OS invocation
+PASS cancel native exit with recovery disabled writes no checkpoint and preserves dirty undo and original disk
+PASS explicit recovery consent commits latest exact dirty bytes and readback while original remains unchanged
+PASS native recovery approval includes inactive tabs and restart restores dirty contents without old native authority
+PASS put-throw: failed native exit keeps window editable and never approves close
+PASS put-abort: failed native exit keeps window editable and never approves close
+PASS readback-abort: failed native exit keeps window editable and never approves close
+PASS native destroy IPC denial restores editing and a later verified retry succeeds
+PASS native close with an editor dialog open is blocked before confirmation or checkpoint

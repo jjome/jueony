@@ -1,0 +1,98 @@
+[
+  {
+    "path": "summary.json",
+    "source": "build/agent-files-final73/summary.json",
+    "sourceSha256": "4f7d11d9162a6d9fe7ae3aa5310aa28311118a0e676d1aa488975a0bd506efb4",
+    "copyMode": "exact bytes"
+  },
+  {
+    "path": "native6.json",
+    "source": "build/agent-files-final73/native/result.json",
+    "sourceSha256": "e888d3e289dec9aa290afa0bb3143a811e36e745936e280dea91c781e1af3b16",
+    "copyMode": "exact bytes"
+  },
+  {
+    "path": "unit898.log",
+    "source": "build/agent-files-final73-unit.log",
+    "sourceSha256": "9bc1954ac6ce54edc1997616c10c91cb1dfa06739bc21d510dfd12c98df2ab5b",
+    "copyMode": "exact bytes"
+  },
+  {
+    "path": "typescript.log",
+    "source": "build/agent-files-final73-ts.log",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "copyMode": "exact bytes"
+  },
+  {
+    "path": "module-boundaries.json",
+    "source": "build/agent-files-boundaries.log",
+    "sourceSha256": "e0ee071c878fe3db4e0958236d0b09eec634ea47179cac0fa37b8a0d83daaef4",
+    "copyMode": "exact bytes"
+  },
+  {
+    "path": "launcher52.log",
+    "source": "build/agent-files71-launcher-root-unit.log",
+    "sourceSha256": "08ae161dd1d5a180512600e1786c11d49917f01111f0471687f8e4c3ade96c48",
+    "copyMode": "exact bytes"
+  },
+  {
+    "path": "frontend-build.json",
+    "source": "apps/editor/evidence/dist-agent-files-final73/build-evidence.json",
+    "sourceSha256": "e4eb03edf101faff84086fb41d19ef48976e17816251ae7c46329eb779131480",
+    "copyMode": "exact bytes"
+  },
+  {
+    "path": "engine73.json",
+    "source": "build/rhwp-engine/source-5c509946c79e331e/pkg/jueony-engine-build.json",
+    "sourceSha256": "480344386720ca08ab545716386edaba3ec12d08c2c50fac0c5544531277d3c2",
+    "copyMode": "exact bytes"
+  },
+  {
+    "path": "source-handoff.json",
+    "source": "build/agent-files-handoff.json",
+    "sourceSha256": "346611ae83d32193542900c90d441a206ef9e6533780f1cc796ca655a7a16c97",
+    "copyMode": "exact bytes"
+  },
+  {
+    "path": "reproduction/verify-agent-files.mjs",
+    "source": "apps/editor/scripts/verify-agent-files.mjs",
+    "sourceSha256": "f3441c292b4fb27212b03d5b43e5f3e861d211ca45e02711cc4c5adddc8e8ac7",
+    "copyMode": "exact bytes"
+  },
+  {
+    "path": "reproduction/verify-agent-document-information-engine.mjs",
+    "source": "apps/editor/scripts/verify-agent-document-information-engine.mjs",
+    "sourceSha256": "358f1af678bddc5f7d5874a252e519ad844bc6238cec03c5fd12ea6e502b34f7",
+    "copyMode": "exact bytes"
+  },
+  {
+    "path": "reproduction/agent-files.test.ts",
+    "source": "apps/editor/tests/agent-files.test.ts",
+    "sourceSha256": "925d39c73514ce4be0adc7f2c10a030dc2f89a9165bed7effedd49acba06e5e6",
+    "copyMode": "exact bytes"
+  },
+  {
+    "path": "reproduction/agent-document-information.test.ts",
+    "source": "apps/editor/tests/agent-document-information.test.ts",
+    "sourceSha256": "98db4b46b22b00ae79ce42012be14c3cfd5b7a03bb0a242029e957b586e4501b",
+    "copyMode": "exact bytes"
+  },
+  {
+    "path": "reproduction/document-instance-contract.test.ts",
+    "source": "apps/editor/tests/document-instance-contract.test.ts",
+    "sourceSha256": "cda2876c6fd0fcfdbfbf99f88ec5a0af40e7f50b36b6f119b5523e38924af584",
+    "copyMode": "exact bytes"
+  },
+  {
+    "path": "browser12.json",
+    "source": "build/agent-files-final73/browser-ready/result.json",
+    "sourceSha256": "6602a65e9547ccb7496f1dc5a54fff12188f00a9c2df0dae6e112469392e1770",
+    "copyMode": "JSON selection; only repeated calls omitted, failures/results unchanged"
+  },
+  {
+    "path": "initial-readiness-failure.json",
+    "source": "build/agent-files-final73/browser/result.json",
+    "sourceSha256": "3bfa4be886f278f406a5a8ba96a23e03f74f0fea30768b28f01f48b4544f0444",
+    "copyMode": "JSON selection; only repeated calls omitted, failures/results unchanged"
+  }
+]

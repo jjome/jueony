@@ -1,0 +1,107 @@
+diff --git a/src/parser/numbering_extension.rs b/src/parser/numbering_extension.rs
+--- a/src/parser/numbering_extension.rs
++++ b/src/parser/numbering_extension.rs
+@@ -9,16 +9,27 @@
+     pub starts: [u32; 3],
+     pub checked: [bool; 3],
+ }
++/// HWP stores number format, not an independent XML checkable bit.
++/// The actual Hancom2024 matrix (all15 formats × both checkable values), saved
++/// as HWP, closed, reloaded from disk and saved as HWPX, observed these exact
++/// canonical values. An explicitly different XML value still reports loss.
++pub(crate) fn canonical_checkable(number_format: u8) -> Option<bool> {
++    const OBSERVED: [bool; 15] = [
++        false, true, false, true, false, true, false, true, false, true, false, true, false, true,
++        false,
++    ];
++    OBSERVED.get(number_format as usize).copied()
++}
+ impl Extension {
+-    /// No independent HWP5 checkable bit was present in actual single-attribute A/B.
+-    /// Hancom disk reload normalizes circled heads from checkable=0 to1. Do not
+-    /// claim either direction preserves that XML value without a native codec.
+-    pub(crate) fn has_unrepresentable_checkable(&self) -> bool {
+-        self.checked.iter().any(|checked| *checked)
+-            || self
+-                .heads
+-                .iter()
+-                .any(|head| matches!(head.number_format, 1 | 6 | 7 | 9 | 11 | 14))
++    pub(crate) fn explicit_checkable_differs_from_native(&self) -> bool {
++        self.heads.iter().zip(self.checked).any(|(head, checked)| {
++            canonical_checkable(head.number_format).is_none_or(|expected| expected != checked)
++        })
++    }
++    pub(crate) fn native_checkable_unresolved(&self) -> bool {
++        self.heads
++            .iter()
++            .any(|head| canonical_checkable(head.number_format).is_none())
+     }
+ }
+ 
+@@ -214,6 +225,7 @@
+         if ext.heads[i].number_format > 14 {
+             return Err("unsupported extended numbering format".into());
+         }
++        ext.checked[i] = canonical_checkable(ext.heads[i].number_format).unwrap_or(false);
+         ext.formats[i] = string(raw, &mut p)?;
+         if !xml_chars(&ext.formats[i]) {
+             return Err("extended numbering contains non-XML characters".into());
+@@ -258,7 +270,7 @@
+                 &n.heads[i],
+                 n.level_start_numbers[i],
+                 &n.level_formats[i],
+-                false,
++                canonical_checkable(n.heads[i].number_format).unwrap_or(false),
+             )
+         } else {
+             (
+diff --git a/src/serializer/hwpx/header.rs b/src/serializer/hwpx/header.rs
+--- a/src/serializer/hwpx/header.rs
++++ b/src/serializer/hwpx/header.rs
+@@ -859,6 +859,16 @@
+         let align = numbering_head_align_str(h.attr);
+         let use_inst_width = if (h.attr >> 2) & 0x01 != 0 { "1" } else { "0" };
+         let auto_indent = if (h.attr >> 3) & 0x01 != 0 { "1" } else { "0" };
++        // Newly generated heads have no original XML value to preserve. Use the
++        // actual Hancom disk-roundtrip value for this native number format.
++        // The raw_para_heads splice above must remain byte-for-byte unchanged.
++        let checkable = if crate::parser::numbering_extension::canonical_checkable(h.number_format)
++            .unwrap_or(false)
++        {
++            "1"
++        } else {
++            "0"
++        };
+         let attrs = [
+             ("start", start_s.as_str()),
+             ("level", level_s.as_str()),
+@@ -870,7 +880,7 @@
+             ("textOffset", text_offset_s.as_str()),
+             ("numFormat", num_format),
+             ("charPrIDRef", char_pr_id_ref_s.as_str()),
+-            ("checkable", "0"),
++            ("checkable", checkable),
+         ];
+         // [#3838] 번호 형식 문자열은 `hh:paraHead` 의 **텍스트 내용**이다("^1." 등).
+         // 자기닫힘으로 내보내면 형식이 사라져 문단 번호가 아예 렌더되지 않는다.
+diff --git a/src/serializer/numbering_extension_loss.rs b/src/serializer/numbering_extension_loss.rs
+--- a/src/serializer/numbering_extension_loss.rs
++++ b/src/serializer/numbering_extension_loss.rs
+@@ -23,7 +23,7 @@
+                 } else if let Some(raw) = &n.raw_para_heads {
+                     match crate::parser::numbering_extension::from_xml(raw) {
+                         Ok(Some(ext)) => {
+-                            ext.has_unrepresentable_checkable()
++                            ext.explicit_checkable_differs_from_native()
+                                 || (
+                                     doc.header.version.major,
+                                     doc.header.version.minor,
+@@ -40,7 +40,7 @@
+             }
+             SerializedFormat::Hwpx => n.raw_data.as_ref().is_some_and(|raw| {
+                 match crate::parser::numbering_extension::from_binary_record(raw) {
+-                    Ok(Some(ext)) => ext.has_unrepresentable_checkable(),
++                    Ok(Some(ext)) => ext.native_checkable_unresolved(),
+                     Ok(None) => false,
+                     Err(_) => n.raw_para_heads.is_none(),
+                 }

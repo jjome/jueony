@@ -1,21 +1,14 @@
 import {capturePreservationEvidence, verifyPreservedExport} from './preservation.ts';
 
-export const DOCUMENT_METADATA_KEYS = ['title', 'subject', 'author', 'keywords', 'description'] as const;
-export type DocumentMetadataValues = Record<typeof DOCUMENT_METADATA_KEYS[number], string>;
+import {DOCUMENT_METADATA_KEYS,validateDocumentMetadataValues} from '../../modules/document/public/index.ts';
+import type {DocumentMetadataValues} from '../../modules/document/public/index.ts';
+export {DOCUMENT_METADATA_KEYS,validateDocumentMetadataValues};
+export type {DocumentMetadataValues};
 export type DocumentMetadata = {editable: boolean; values?: DocumentMetadataValues; fingerprint?: string; reason?: string};
 const parse = (value: any): any => typeof value === 'string' ? JSON.parse(value) : value;
 const native = (value: any): any => value.borrowDocumentHandle?.() ?? value;
 const canonical = (v: any): any => Array.isArray(v) ? v.map(canonical) : v && typeof v === 'object' ? Object.fromEntries(Object.keys(v).sort().map(k => [k, canonical(v[k])])) : v;
 const same = (a: unknown, b: unknown): boolean => JSON.stringify(canonical(a)) === JSON.stringify(canonical(b));
-
-/** Five summary strings, not revision history or arbitrary raw metadata. */
-export function validateDocumentMetadataValues(value: unknown): DocumentMetadataValues {
-  if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).length !== 5 || !DOCUMENT_METADATA_KEYS.every(k => Object.hasOwn(value, k))) throw new Error('문서 속성의 다섯 항목을 읽지 못했습니다.');
-  for (const item of Object.values(value)) {
-    if (typeof item !== 'string' || item.length > 4096 || /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/u.test(item) || /[\ud800-\udfff]/u.test(item)) throw new Error('문서 속성은 항목별 4,096자 이내의 유효한 Unicode 문자로 입력하세요.');
-  }
-  return {...value} as DocumentMetadataValues;
-}
 
 export function readDocumentMetadata(wasm: any): DocumentMetadata {
   const d = native(wasm);

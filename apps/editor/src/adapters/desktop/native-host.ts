@@ -171,10 +171,10 @@ export function createNativeExitCoordinator(hooks: NativeExitHooks) {
   return { request, isApproved };
 }
 
-export function installNativeExitProtection(host: NativeHost, hooks: Omit<NativeExitHooks, 'close'>) {
+export function installNativeExitProtection(host: NativeHost, hooks: Omit<NativeExitHooks, 'close'>, close?: () => Promise<void>) {
   const appWindow = host.window.getCurrentWindow();
   // Tauri's onCloseRequested wrapper otherwise calls destroy outside our catch.
   // Destroy only after the explicit checkpoint approval, and catch IPC denial here.
-  const coordinator = createNativeExitCoordinator({ ...hooks, close: () => appWindow.destroy() });
+  const coordinator = createNativeExitCoordinator({ ...hooks, close: close ?? (() => appWindow.destroy()) });
   return { ...coordinator, ready: appWindow.onCloseRequested(coordinator.request) };
 }

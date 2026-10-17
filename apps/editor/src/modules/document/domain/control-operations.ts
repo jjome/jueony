@@ -1,3 +1,5 @@
+import {agentFileKinds,validateAgentFileOperation} from './agent-file-operations.ts';
+import {validateAgentDocumentMetadata} from './agent-document-information.ts';
 import {cellParagraphPlan} from './cell-paragraph.ts';
 import {tableSubdivisionPlan} from './table-subdivision.ts';
 import {tableStructurePlan} from './table-structure.ts';
@@ -82,6 +84,8 @@ export function pageProperties(current: DocumentProperties | undefined, props: R
   return next as DocumentProperties;
 }
 export function validateControlOperations(operations: EditOp[], snapshot: Snapshot): void {
+ if(operations.some(op=>(agentFileKinds as readonly string[]).includes(op.kind))){if(operations.length!==1)throw Error('파일 명령은 문서 편집과 섞지 말고 단독 요청하세요.');validateAgentFileOperation(operations[0],snapshot.fileContext);return;}
+ if(operations.some(op=>op.kind==='set_document_metadata')){if(operations.length!==1)throw Error('문서 요약 변경은 단독 요청으로 실행하세요.');validateAgentDocumentMetadata(operations[0],snapshot);return;}
   const structure = snapshot.structure; if (!structure) fail('이 문서는 구조 조회 후 편집해야 합니다.');
   const tables = new Map(structure!.tables.map(t => [t.id, structuredClone(t)]));
   const pages = new Map(structure!.sections.map(s => [s.index, s.page]));

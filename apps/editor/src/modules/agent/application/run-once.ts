@@ -1,10 +1,13 @@
+import {agentFileKinds,validateAgentFileOperation} from '../../document/public/index.ts';
+import type {AgentFileReceipt} from '../../document/public/index.ts';
+import type {AgentFilePort} from '../public/contracts.ts';
 import {validateGeneration} from '../domain/generation.ts';
 import {assertRevision} from '../../document/public/index.ts';
 import type {ModelGatewayPort as LLMPort,ModelInput as LLMInput,ModelConfig} from '../../connections/public/index.ts';
 import type {Snapshot,Receipt} from '../../document/public/index.ts';
 import type {Generation,RunStatus} from '../public/contracts.ts';
 export type EditorTool={snapshot():Snapshot;apply(id:string,snapshot:Snapshot,result:Generation):Promise<Receipt>;preflight?(snapshot:Snapshot,result:Generation):Promise<void>};
-export type RunOptions={runId:string;context:LLMInput;model:ModelConfig;port:LLMPort;editor:EditorTool;createDocument:()=>Promise<EditorTool>;signal:AbortSignal;isCurrent:()=>boolean;state:(s:RunStatus)=>void};
+export type RunOptions={filePort?:AgentFilePort;runId:string;context:LLMInput;model:ModelConfig;port:LLMPort;editor:EditorTool;createDocument:()=>Promise<EditorTool>;signal:AbortSignal;isCurrent:()=>boolean;state:(s:RunStatus)=>void};
 export function checkRun(options:RunOptions){
  options.signal.throwIfAborted();
  if(!options.isCurrent())throw new DOMException('업무·채팅·문서가 전환되었습니다.','AbortError');
@@ -19,9 +22,17 @@ export function awaitRunRead<T>(work:Promise<T>,signal:AbortSignal):Promise<T>{
   work.then(resolve,reject).finally(()=>signal.removeEventListener('abort',cancel));
  });
 }
+export type CommitResult={message:string;sourceIds:string[];receipt?:Receipt;fileReceipt?:AgentFileReceipt;generation:Generation};
 /** One final validated plan crosses this boundary, regardless of the model call count. */
-export async function commitGeneration(options:RunOptions,result:Generation){
+export async function commitGeneration(options:RunOptions,result:Generation):Promise<CommitResult>{
  checkRun(options);
+ if(result.operations.length===1&&(agentFileKinds as readonly string[]).includes(result.operations[0].kind)){
+  if(!options.filePort||!options.context.document.fileContext)throw Error('현재 창에는 Agent 문서 탭 제어가 연결되지 않았습니다.');
+  const expected=options.context.document.fileContext,operation=validateAgentFileOperation(result.operations[0],expected);options.state('applying');
+  const fileReceipt=await options.filePort.execute(options.runId,operation,expected,options.signal);
+  if(!fileReceipt||fileReceipt.runId!==options.runId||fileReceipt.kind!==operation.kind||fileReceipt.status!=='completed'||fileReceipt.beforeStamp!==expected.stamp||fileReceipt.operationCount!==1||fileReceipt.documentMutations!==0){const error=Error('파일 명령의 실제 완료 증거가 일치하지 않습니다. 현재 탭 상태를 확인하세요.');if(operation.kind!=='list_document_tabs')error.name='PartialApplyError';throw error;}
+  return{message:result.message,sourceIds:result.sourceIds,receipt:undefined,fileReceipt,generation:result};
+ }
  if(!result.operations.length)return {message:result.message,sourceIds:result.sourceIds,receipt:undefined,generation:result};
  if(options.editor.preflight){await awaitRunRead(options.editor.preflight(options.context.document,result),options.signal);checkRun(options);}
  let editor=options.editor,base=options.context.document;

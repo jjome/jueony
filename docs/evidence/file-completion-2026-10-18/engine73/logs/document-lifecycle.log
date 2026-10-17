@@ -1,0 +1,10 @@
+PASS File menu Close uses dirty save/discard/cancel lifecycle and only closes selected tab
+PASS native File menu Exit cancellation preserves every document, bytes and checkpoint
+PASS save all writes exact original files then checkpoints and destroys once
+PASS later file-save failure reports partial save, retains remaining dirty document and resumes editing
+PASS new-document exit SaveAs cancellation preserves original state; approved name retains document instance
+PASS discard batch abort is atomic across dirty documents and preserves clean third-document checkpoint
+PASS discard destroy failure atomically restores removed checkpoints before editable state returns
+PASS failed destroy compensation CAS preserves a newer valid checkpoint instead of overwriting it
+PASS discard success removes only dirty recovery, retains clean third document and original files
+PASS recovery-only choice preserves unsaved bytes without writing original files

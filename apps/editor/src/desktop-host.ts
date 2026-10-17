@@ -3,13 +3,18 @@ import {installNativeFilePickers,installNativeExitProtection} from './adapters/d
 type Host = { wasm: any; eventBus: any; documentState: any; ready: Promise<unknown>; save: () => Promise<string>; discard: () => Promise<void> };
 
 export function installDesktopHost({ wasm, eventBus, documentState, ready, save, discard }: Host) {
-  let sequence = 0;
+  let sequence = 0, hostMutationLocks = 0;
+  const assertHostMutationAllowed = () => { if (hostMutationLocks) throw new Error('문서 탭 명령이 끝난 뒤 편집해 주세요.'); };
+  const acquireHostMutationLock = () => { hostMutationLocks++; let released = false; return () => { if (!released) { released = true; hostMutationLocks--; } }; };
   eventBus.on('document-mutated', () => sequence++);
   const revision = () => `${wasm.documentGeneration}:${sequence}`;
   // 부모 탭 호스트도 같은 엔진의 상태와 저장 명령을 사용한다.
   (window as any).jueonyEditor = {
     bridgeVersion: 1,
-    ready, revision, save, discard,
+    ready, revision,
+    acquireHostMutationLock, hostMutationLocked: () => hostMutationLocks > 0,
+    save: async () => { assertHostMutationAllowed(); return save(); },
+    discard: async () => { assertHostMutationAllowed(); return discard(); },
     fileHandle: () => wasm.currentFileHandle,
     // A dialog may validate its own synchronous commit without opening the document to other callers.
     busy: (ownedDialog?: HTMLDialogElement) => Boolean(document.getElementById('jueony-busy') || document.getElementById('jueony-download-confirm') || [...document.querySelectorAll('.jueony-page-dialog[open]')].some(dialog => dialog !== ownedDialog)) || document.documentElement.classList.contains('rhwp-busy'),

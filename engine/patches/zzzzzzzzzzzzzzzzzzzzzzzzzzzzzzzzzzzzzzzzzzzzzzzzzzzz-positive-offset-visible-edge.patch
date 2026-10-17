@@ -1,0 +1,80 @@
+--- a/src/renderer/float_placement.rs
++++ b/src/renderer/float_placement.rs
+@@ -335,6 +335,49 @@
+         && para.text.is_empty()
+         && only_table
+         && matches!(para.line_segs.as_slice(), [line] if line.segment_width == 0 && line.tag & 0x8000_0000 == 0)
++}
++
++/// Exact source owners for the positive-offset edge of an adjacent whole stack.
++/// This does not authorize changing a saved line partition or absolute origin.
++pub(crate) fn plain_positive_offset_stack(paragraphs: &[Paragraph], at: usize) -> bool {
++    let Some(first)=paragraphs.first() else { return false; };
++    if first.text.is_empty() || first.controls.iter().any(|c| !matches!(c, Control::SectionDef(_) | Control::ColumnDef(_)))
++        || !matches!(first.line_segs.as_slice(), [line] if line.vertical_pos==0
++            && line.text_start==0 && line.tag & 0x8000_0000==0) { return false; }
++    let count=paragraphs.iter().skip(1).take_while(|p| matches!(p.controls.as_slice(), [Control::Table(_)])).count();
++    if !(2..=64).contains(&count) || at<2 || at>count { return false; }
++    let [Control::Table(target)]=paragraphs[at].controls.as_slice() else { return false; };
++    if signed_hwpunit(target.common.vertical_offset)<=0 { return false; }
++    let opaque=|p:&Paragraph| !p.field_ranges.is_empty() || !p.orphan_field_ends.is_empty()
++        || !p.range_tags.is_empty() || !p.title_marks.is_empty() || !p.markpen_marks.is_empty()
++        || p.ctrl_data_records.iter().any(Option::is_some);
++    if paragraphs.iter().any(opaque) { return false; }
++    for host in &paragraphs[1..=count] {
++        let [Control::Table(table)]=host.controls.as_slice() else { return false; };
++        let cells=usize::from(table.row_count)*usize::from(table.col_count);
++        if !object_only_saved_table_anchor(host, table) || host.stored_text_partition_is_dirty()
++            || host.cell_format_vpos_dirty || table.page_break!=TablePageBreak::None
++            || signed_hwpunit(table.common.vertical_offset)<0
++            || table.common.vert_rel_to!=VertRelTo::Para || table.common.vert_align!=VertAlign::Top
++            || !matches!(table.common.horz_rel_to,HorzRelTo::Para|HorzRelTo::Column)
++            || table.common.horz_align!=HorzAlign::Left || table.common.size_protect || table.common.locked
++            || table.attr & (1<<30)!=0 || table.raw_table_record_attr & 8!=0
++            || table.common.height==0 || table.common.height>=0x8000_0000
++            || table.common.height_criterion!=crate::model::shape::SizeCriterion::Absolute
++            || table.caption.is_some() || !table.zones.is_empty() || cells==0 || cells>4096 || cells!=table.cells.len()
++            || !matches!(host.line_segs.as_slice(), [line] if line.text_start==0 && line.vertical_pos>=0
++                && line.line_height>0 && line.tag & 0x8000_0000==0)
++            || table.cells.iter().map(|c|(c.row,c.col)).collect::<std::collections::BTreeSet<_>>().len()!=cells
++            || table.cells.iter().any(|cell| cell.row>=table.row_count || cell.col>=table.col_count
++                || cell.row_span!=1 || cell.col_span!=1 || cell.width==0 || cell.height==0
++                || cell.cell_protect() || cell.field_name.is_some() || cell.text_direction!=0
++                || cell.paragraphs.is_empty() || cell.paragraphs.iter().any(|p| !p.controls.is_empty() || opaque(p)))
++        { return false; }
++    }
++    if paragraphs[1..=count].windows(2).any(|pair|pair[1].line_segs[0].vertical_pos<pair[0].line_segs[0].vertical_pos) { return false; }
++    paragraphs[count+1..].iter().all(|p| p.controls.is_empty()
++        && p.line_segs.iter().all(|l| l.tag & 0x8000_0000==0)
++        && p.line_segs.windows(2).all(|pair|pair[0].text_start<pair[1].text_start))
+ }
+ 
+ /// A markerless HWPX whole-table source stack closes exactly at the declared
+--- a/src/renderer/typeset/table/block/entry.rs
++++ b/src/renderer/typeset/table/block/entry.rs
+@@ -1773,14 +1773,23 @@
+                 }
+             });
+         let unconstrained_host_placement = unconstrained_host_placement.or_else(|| {
++            // The explicit positive offset names the visible table edge from
++            // the occupied flow edge. Keep the complete reserved outer band:
++            // moving this inset must not move the following paragraph cursor.
++            let top_inset=hwpunit_to_px(table.outer_margin_top as i32,self.dpi);
++            let offset_paint_inset=if semantic_whole_stack && top_inset>0.0
++                && ft.host_spacing.before>=top_inset
++                && crate::renderer::float_placement::plain_positive_offset_stack(paragraphs_all,para_idx) {
++                top_inset
++            } else { 0.0 };
+             crate::renderer::float_placement::ParagraphFloatPlacement::from_empty_reflow_host(
+                 para,
+                 table,
+                 st.current_height,
+                 source_host_origin,
+                 ft.effective_height,
+-                ft.host_spacing.before,
+-                ft.host_spacing.after,
++                ft.host_spacing.before-offset_paint_inset,
++                ft.host_spacing.after+offset_paint_inset,
+                 self.dpi,
+             )
+         });

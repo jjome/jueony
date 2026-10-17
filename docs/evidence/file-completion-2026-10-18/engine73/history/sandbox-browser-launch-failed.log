@@ -1,0 +1,13 @@
+오류: 사용자 이름 또는 암호가 올바르지 않습니다.
+file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:223
+                throw new Error(`The browser is already running for ${launchArgs.userDataDir}. Use a different \`userDataDir\` or stop the running browser first.`);
+                      ^
+
+Error: The browser is already running for C:\Users\jjome\AppData\Local\Packages\sandbox.{f6ccb1db-729e-42c2-b3de-1e074dde06ed}\AC\Temp\puppeteer_dev_chrome_profile-xwtTli. Use a different `userDataDir` or stop the running browser first.
+    at ChromeLauncher.launch (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/node/BrowserLauncher.js:223:23)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async ChromeLauncher.launch (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js:39:16)
+    at async PuppeteerNode.launch (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/node/PuppeteerNode.js:124:16)
+    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-split.mjs:54:10
+
+Node.js v22.22.2

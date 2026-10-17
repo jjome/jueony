@@ -1,0 +1,69 @@
+{
+  "sourceId": "5c509946c79e331e",
+  "engineWasmSha256": "de82cfa5b974a07c1799a253c38a26323a498a7c2731466ae4a6c4c63f031bc6",
+  "regressionGroups": 44,
+  "nativeGroups": 27,
+  "browserGroups": 17,
+  "reports": {
+    "native-shell": {
+      "path": "build\\file-closure73-native-shell\\result.json",
+      "rawSha256": "f31e65d89f7151ac1fec1000d987dee5469989ff91c894060e8d3460455087e1",
+      "rawBytes": 31304,
+      "gzip": "native-shell.json.gz",
+      "passed": 11,
+      "failures": [],
+      "scope": ""
+    },
+    "native-recents": {
+      "path": "build\\file-closure73-native-recents\\result.json",
+      "rawSha256": "2a9de688bc3ad82191be84e5d9e7f114fad9fc0f7bebf92d2a9e7aa081df7741",
+      "rawBytes": 30674,
+      "gzip": "native-recents.json.gz",
+      "passed": 9,
+      "failures": [],
+      "scope": "Real Edge and production shell/editor/menu with explicitly synthetic native IPC backed by localStorage, process-token reset on reload. Native registry/OS atomic I/O separately covered by Windows Rust tests. Actual Windows app approval/picker/restart UI not exercised here."
+    },
+    "document-lifecycle": {
+      "path": "build\\file-closure73-document-lifecycle\\result.json",
+      "rawSha256": "2367e062c57bac51d9d8eb3d8782a8dba6a33cb1d3061f0424a868fbcbebe64d",
+      "rawBytes": 39277,
+      "gzip": "document-lifecycle.json.gz",
+      "passed": 10,
+      "failures": [],
+      "scope": "Real isolated Edge + production shell/editor/file-menu + synthetic native IPC and destroy only; actual Windows app/picker/destroy UI not executed. Owned generated fixtures only."
+    },
+    "document-windows-retry": {
+      "path": "build\\file-closure73-document-windows-retry\\result.json",
+      "rawSha256": "d3a885b50c3de3e1bf3325a5d9b7649ca0cb057d0cffc964998209ccc357b905",
+      "rawBytes": 34948,
+      "gzip": "document-windows-retry.json.gz",
+      "passed": 8,
+      "failures": [],
+      "scope": "Production shell, real Edge pages and engine; native IPC/window creation explicitly synthetic. Native caller/registry/token/OS I/O separately Windows Rust tests. Actual OS window permissions/focus/picker reviewed separately. Tab limit uses intentionally aborted pending iframe allocations; ordinary tab history checked with real editor."
+    },
+    "actual11": {
+      "path": "build\\file-closure73-actual11\\result.json",
+      "rawSha256": "a0d8a8c6e165e904bd7163cf8665719a1db5f4f5a0448b77376e51b44ed2accf",
+      "rawBytes": 5422633,
+      "gzip": "actual11.json.gz",
+      "passed": 9,
+      "failures": [
+        {
+          "name": "column2.hwp",
+          "error": "AssertionError [ERR_ASSERTION]: Independent Hancom whole geometry differs\n\n37 !== 0\n"
+        },
+        {
+          "name": "negative.hwp",
+          "error": "AssertionError [ERR_ASSERTION]: Independent Hancom whole geometry differs\n\n17 !== 0\n"
+        }
+      ],
+      "scope": "Actual independent Hancom UI SaveAs supplied by root. Full semantics including all known5, full public geometry0.2, independent raw HWP PropertySet values and both-format strict self re-save. No normalization or accepted-difference waiver."
+    }
+  },
+  "limitations": [
+    "Negative offset and two-column whole geometry remain failed.",
+    "Genuine Unknown HWPX omission report remains a separate reproduced defect.",
+    "Positive-table native guards used old70 whole-byte baseline and retain two old reopen differences; final73 whole regressions and actual11 comparisons are separate results.",
+    "Native-window GUI evidence uses engine68; browser-native IPC here is synthetic."
+  ]
+}

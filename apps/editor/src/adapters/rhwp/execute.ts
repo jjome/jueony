@@ -1,3 +1,5 @@
+import {agentFileKinds} from '../../modules/document/public/index.ts';
+import {executeAgentDocumentMetadata} from './agent-document-information.ts';
 import {executeCellParagraph} from './cell-paragraph.ts';
 import {executeTableSubdivision} from './table-subdivision.ts';
 import {executeTableStructure} from './table-structure.ts';
@@ -14,7 +16,9 @@ import { nativeDocument } from './structure.ts';
 // Called inside the editor's single SnapshotCommand. IDs retain their meaning
 // while structural insertions move native paragraph indices within this batch.
 export function executeDocumentOperations(wasm: any, base: Snapshot, operations: EditOp[]) {
+  if(operations.some(op=>(agentFileKinds as readonly string[]).includes(op.kind)))throw Error('문서 탭 명령은 업무 소유 façade에서만 실행합니다.');
   const snapshot = structuredClone(base), doc = nativeDocument(wasm);
+  if(operations.length===1&&operations[0].kind==='set_document_metadata'){executeAgentDocumentMetadata(doc,snapshot,operations[0]);return;}
   if(operations.length===1&&operations[0].kind==='remove_empty_section')return executeAgentEmptySection(doc,snapshot,operations[0]);
   if(operations.length===1&&operations[0].kind==='merge_sections')return executeAgentSectionMerge(doc,snapshot,operations[0]);
   if(operations.length===1&&operations[0].kind==='merge_table_cells')return executeTableMerge(doc,snapshot,operations[0]);

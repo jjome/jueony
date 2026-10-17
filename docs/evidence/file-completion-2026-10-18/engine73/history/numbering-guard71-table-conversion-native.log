@@ -1,0 +1,468 @@
+PASS hwp: rectangular preset preserves protected unselected vertical merge and selection boundary lines
+PASS hwp: explicit months series scratch/save/reopen preserves anchored dates and target formatting
+PASS hwp: explicit years series scratch/save/reopen preserves anchored dates and target formatting
+PASS hwp: merged whole-table transpose retains cell spans, multiple paragraphs and mixed formats
+PASS hwp: literal Unicode/empty-cell conversion, scratch preflight and two saved roundtrips
+FAIL hwpx: rectangular preset preserves protected unselected vertical merge and selection boundary lines PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+    at verifyPreservedExport (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/preservation.ts:231:37)
+    at save (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/edit-preflight.ts:9:47)
+    at preflightDocumentEdit (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/edit-preflight.ts:13:24)
+    at preflightTablePreset (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/table-presets-native.ts:75:3)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:30:44
+    at test (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:21:46)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:23:9 {
+  report: {
+    schemaVersion: 1,
+    status: 'blocked',
+    format: 'hwpx',
+    checked: [
+      'summary-metadata',
+      'list-definitions',
+      'sections',
+      'section/0/page',
+      'section/0/definition',
+      'section/0/columns',
+      'section/0/outline-definition',
+      'section/0/page-border',
+      'section/0/page-border-entries',
+      'section/0/master-pages',
+      'section/0/line-numbers',
+      'section/0/paragraph-count',
+      'section/0/paragraph/0',
+      'section/0/paragraph/1',
+      'section/0/header/0',
+      'section/0/header/1',
+      'section/0/header/2',
+      'section/0/footer/0',
+      'section/0/footer/1',
+      'section/0/footer/2',
+      'section/0/header/0/format',
+      'section/0/header/1/format',
+      'section/0/header/2/format',
+      'section/0/footer/0/format',
+      'section/0/footer/1/format',
+      'section/0/footer/2/format',
+      'text',
+      'fields',
+      'bookmarks',
+      'controls',
+      'styles',
+      'cells',
+      'objects',
+      'image-resources'
+    ],
+    unverified: [
+      '원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.',
+      '같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.',
+      '머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.',
+      '렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다.'
+    ],
+    issues: [ [Object] ]
+  }
+}
+FAIL hwpx: explicit months series scratch/save/reopen preserves anchored dates and target formatting PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+    at verifyPreservedExport (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/preservation.ts:231:37)
+    at save (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/table-auto-fill-native.ts:60:78)
+    at preflightAutoFill (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/table-auto-fill-native.ts:64:24)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:45:7
+    at test (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:21:46)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:40:122 {
+  report: {
+    schemaVersion: 1,
+    status: 'blocked',
+    format: 'hwpx',
+    checked: [
+      'summary-metadata',
+      'list-definitions',
+      'sections',
+      'section/0/page',
+      'section/0/definition',
+      'section/0/columns',
+      'section/0/outline-definition',
+      'section/0/page-border',
+      'section/0/page-border-entries',
+      'section/0/master-pages',
+      'section/0/line-numbers',
+      'section/0/paragraph-count',
+      'section/0/paragraph/0',
+      'section/0/paragraph/1',
+      'section/0/header/0',
+      'section/0/header/1',
+      'section/0/header/2',
+      'section/0/footer/0',
+      'section/0/footer/1',
+      'section/0/footer/2',
+      'section/0/header/0/format',
+      'section/0/header/1/format',
+      'section/0/header/2/format',
+      'section/0/footer/0/format',
+      'section/0/footer/1/format',
+      'section/0/footer/2/format',
+      'text',
+      'fields',
+      'bookmarks',
+      'controls',
+      'styles',
+      'cells',
+      'objects',
+      'image-resources'
+    ],
+    unverified: [
+      '원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.',
+      '같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.',
+      '머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.',
+      '렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다.'
+    ],
+    issues: [ [Object] ]
+  }
+}
+FAIL hwpx: explicit years series scratch/save/reopen preserves anchored dates and target formatting PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+    at verifyPreservedExport (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/preservation.ts:231:37)
+    at save (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/table-auto-fill-native.ts:60:78)
+    at preflightAutoFill (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/table-auto-fill-native.ts:64:24)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:45:7
+    at test (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:21:46)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:40:122 {
+  report: {
+    schemaVersion: 1,
+    status: 'blocked',
+    format: 'hwpx',
+    checked: [
+      'summary-metadata',
+      'list-definitions',
+      'sections',
+      'section/0/page',
+      'section/0/definition',
+      'section/0/columns',
+      'section/0/outline-definition',
+      'section/0/page-border',
+      'section/0/page-border-entries',
+      'section/0/master-pages',
+      'section/0/line-numbers',
+      'section/0/paragraph-count',
+      'section/0/paragraph/0',
+      'section/0/paragraph/1',
+      'section/0/header/0',
+      'section/0/header/1',
+      'section/0/header/2',
+      'section/0/footer/0',
+      'section/0/footer/1',
+      'section/0/footer/2',
+      'section/0/header/0/format',
+      'section/0/header/1/format',
+      'section/0/header/2/format',
+      'section/0/footer/0/format',
+      'section/0/footer/1/format',
+      'section/0/footer/2/format',
+      'text',
+      'fields',
+      'bookmarks',
+      'controls',
+      'styles',
+      'cells',
+      'objects',
+      'image-resources'
+    ],
+    unverified: [
+      '원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.',
+      '같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.',
+      '머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.',
+      '렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다.'
+    ],
+    issues: [ [Object] ]
+  }
+}
+FAIL hwpx: merged whole-table transpose retains cell spans, multiple paragraphs and mixed formats PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+    at verifyPreservedExport (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/preservation.ts:231:37)
+    at save (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/edit-preflight.ts:9:47)
+    at preflightDocumentEdit (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/edit-preflight.ts:13:24)
+    at preflightTranspose (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/transpose-table.ts:35:3)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:59:7
+    at test (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:21:46)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:50:9 {
+  report: {
+    schemaVersion: 1,
+    status: 'blocked',
+    format: 'hwpx',
+    checked: [
+      'summary-metadata',
+      'list-definitions',
+      'sections',
+      'section/0/page',
+      'section/0/definition',
+      'section/0/columns',
+      'section/0/outline-definition',
+      'section/0/page-border',
+      'section/0/page-border-entries',
+      'section/0/master-pages',
+      'section/0/line-numbers',
+      'section/0/paragraph-count',
+      'section/0/paragraph/0',
+      'section/0/paragraph/1',
+      'section/0/header/0',
+      'section/0/header/1',
+      'section/0/header/2',
+      'section/0/footer/0',
+      'section/0/footer/1',
+      'section/0/footer/2',
+      'section/0/header/0/format',
+      'section/0/header/1/format',
+      'section/0/header/2/format',
+      'section/0/footer/0/format',
+      'section/0/footer/1/format',
+      'section/0/footer/2/format',
+      'text',
+      'fields',
+      'bookmarks',
+      'controls',
+      'styles',
+      'cells',
+      'objects',
+      'image-resources'
+    ],
+    unverified: [
+      '원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.',
+      '같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.',
+      '머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.',
+      '렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다.'
+    ],
+    issues: [ [Object] ]
+  }
+}
+FAIL hwpx: literal Unicode/empty-cell conversion, scratch preflight and two saved roundtrips PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+    at verifyPreservedExport (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/preservation.ts:231:37)
+    at checkedExport (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/table-conversion-native.ts:168:78)
+    at preflightTableConversion (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/table-conversion-native.ts:173:20)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:78:44
+    at test (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:21:46)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:68:9 {
+  report: {
+    schemaVersion: 1,
+    status: 'blocked',
+    format: 'hwpx',
+    checked: [
+      'summary-metadata',
+      'list-definitions',
+      'sections',
+      'section/0/page',
+      'section/0/definition',
+      'section/0/columns',
+      'section/0/outline-definition',
+      'section/0/page-border',
+      'section/0/page-border-entries',
+      'section/0/master-pages',
+      'section/0/line-numbers',
+      'section/0/paragraph-count',
+      'section/0/paragraph/0',
+      'section/0/paragraph/1',
+      'section/0/paragraph/2',
+      'section/0/paragraph/3',
+      'section/0/paragraph/4',
+      'section/0/header/0',
+      'section/0/header/1',
+      'section/0/header/2',
+      'section/0/footer/0',
+      'section/0/footer/1',
+      'section/0/footer/2',
+      'section/0/header/0/format',
+      'section/0/header/1/format',
+      'section/0/header/2/format',
+      'section/0/footer/0/format',
+      'section/0/footer/1/format',
+      'section/0/footer/2/format',
+      'text',
+      'fields',
+      'bookmarks',
+      'controls',
+      'styles',
+      'cells',
+      'objects',
+      'image-resources'
+    ],
+    unverified: [
+      '원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.',
+      '같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.',
+      '머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.',
+      '렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다.'
+    ],
+    issues: [ [Object] ]
+  }
+}
+PASS native unsafe conversion refuses stale content, merged/protected cells and literal host tabs without mutations
+PASS hwp: selected integer series preserves target style/geometry and unrelated cells through scratch/save/reopen
+FAIL hwpx: selected integer series preserves target style/geometry and unrelated cells through scratch/save/reopen PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+    at verifyPreservedExport (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/preservation.ts:231:37)
+    at save (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/table-auto-fill-native.ts:60:78)
+    at preflightAutoFill (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/table-auto-fill-native.ts:64:24)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:120:5
+    at test (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:21:46)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:113:42 {
+  report: {
+    schemaVersion: 1,
+    status: 'blocked',
+    format: 'hwpx',
+    checked: [
+      'summary-metadata',
+      'list-definitions',
+      'sections',
+      'section/0/page',
+      'section/0/definition',
+      'section/0/columns',
+      'section/0/outline-definition',
+      'section/0/page-border',
+      'section/0/page-border-entries',
+      'section/0/master-pages',
+      'section/0/line-numbers',
+      'section/0/paragraph-count',
+      'section/0/paragraph/0',
+      'section/0/paragraph/1',
+      'section/0/header/0',
+      'section/0/header/1',
+      'section/0/header/2',
+      'section/0/footer/0',
+      'section/0/footer/1',
+      'section/0/footer/2',
+      'section/0/header/0/format',
+      'section/0/header/1/format',
+      'section/0/header/2/format',
+      'section/0/footer/0/format',
+      'section/0/footer/1/format',
+      'section/0/footer/2/format',
+      'text',
+      'fields',
+      'bookmarks',
+      'controls',
+      'styles',
+      'cells',
+      'objects',
+      'image-resources'
+    ],
+    unverified: [
+      '원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.',
+      '같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.',
+      '머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.',
+      '렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다.'
+    ],
+    issues: [ [Object] ]
+  }
+}
+PASS hwp: table gallery on a fresh production document, four presets and mixed text preservation
+PASS hwp: exact numeric paragraph sort preserves mixed formatting and title/neighbor paragraphs
+FAIL hwpx: table gallery on a fresh production document, four presets and mixed text preservation PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+    at verifyPreservedExport (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/preservation.ts:231:37)
+    at save (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/edit-preflight.ts:9:47)
+    at preflightDocumentEdit (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/edit-preflight.ts:13:24)
+    at preflightTablePreset (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/table-presets-native.ts:75:3)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:138:102
+    at test (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:21:46)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:130:9 {
+  report: {
+    schemaVersion: 1,
+    status: 'blocked',
+    format: 'hwpx',
+    checked: [
+      'summary-metadata',
+      'list-definitions',
+      'sections',
+      'section/0/page',
+      'section/0/definition',
+      'section/0/columns',
+      'section/0/outline-definition',
+      'section/0/page-border',
+      'section/0/page-border-entries',
+      'section/0/master-pages',
+      'section/0/line-numbers',
+      'section/0/paragraph-count',
+      'section/0/paragraph/0',
+      'section/0/paragraph/1',
+      'section/0/header/0',
+      'section/0/header/1',
+      'section/0/header/2',
+      'section/0/footer/0',
+      'section/0/footer/1',
+      'section/0/footer/2',
+      'section/0/header/0/format',
+      'section/0/header/1/format',
+      'section/0/header/2/format',
+      'section/0/footer/0/format',
+      'section/0/footer/1/format',
+      'section/0/footer/2/format',
+      'text',
+      'fields',
+      'bookmarks',
+      'controls',
+      'styles',
+      'cells',
+      'objects',
+      'image-resources'
+    ],
+    unverified: [
+      '원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.',
+      '같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.',
+      '머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.',
+      '렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다.'
+    ],
+    issues: [ [Object] ]
+  }
+}
+FAIL hwpx: exact numeric paragraph sort preserves mixed formatting and title/neighbor paragraphs PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+    at verifyPreservedExport (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/preservation.ts:231:37)
+    at save (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/edit-preflight.ts:9:47)
+    at preflightDocumentEdit (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/edit-preflight.ts:13:24)
+    at preflightParagraphSort (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/paragraph-sort-native.ts:28:3)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:152:97
+    at test (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:21:46)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-table-conversion-engine.mjs:146:9 {
+  report: {
+    schemaVersion: 1,
+    status: 'blocked',
+    format: 'hwpx',
+    checked: [
+      'summary-metadata',
+      'list-definitions',
+      'sections',
+      'section/0/page',
+      'section/0/definition',
+      'section/0/columns',
+      'section/0/outline-definition',
+      'section/0/page-border',
+      'section/0/page-border-entries',
+      'section/0/master-pages',
+      'section/0/line-numbers',
+      'section/0/paragraph-count',
+      'section/0/paragraph/0',
+      'section/0/paragraph/1',
+      'section/0/paragraph/2',
+      'section/0/paragraph/3',
+      'section/0/paragraph/4',
+      'section/0/paragraph/5',
+      'section/0/header/0',
+      'section/0/header/1',
+      'section/0/header/2',
+      'section/0/footer/0',
+      'section/0/footer/1',
+      'section/0/footer/2',
+      'section/0/header/0/format',
+      'section/0/header/1/format',
+      'section/0/header/2/format',
+      'section/0/footer/0/format',
+      'section/0/footer/1/format',
+      'section/0/footer/2/format',
+      'text',
+      'fields',
+      'bookmarks',
+      'controls',
+      'styles',
+      'cells',
+      'objects',
+      'image-resources'
+    ],
+    unverified: [
+      '원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.',
+      '같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.',
+      '머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.',
+      '렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다.'
+    ],
+    issues: [ [Object] ]
+  }
+}

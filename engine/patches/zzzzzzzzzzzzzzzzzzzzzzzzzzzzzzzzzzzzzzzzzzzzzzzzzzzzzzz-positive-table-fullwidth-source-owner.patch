@@ -1,0 +1,119 @@
+--- a/src/renderer/float_placement.rs
++++ b/src/renderer/float_placement.rs
+@@ -5082,3 +5082,60 @@
+             && signed_hwpunit(table.common.vertical_offset) >= 0
+     })
+ }
++
++
++/// A full-width empty source host is a distinct closed physical owner; never
++/// classify it as the existing zero-width object-only anchor. The signed
++/// offset remains in the ordinary paint formula, outside the stored frame.
++pub(crate) fn closed_full_width_positive_pair(paragraphs: &[Paragraph], at: usize) -> bool {
++    let Some(first)=paragraphs.first() else { return false; };
++    if first.text.is_empty() || first.stored_text_partition_is_dirty() || first.cell_format_vpos_dirty
++        || first.controls.iter().any(|c| !matches!(c, Control::SectionDef(_) | Control::ColumnDef(_)))
++        || !matches!(first.line_segs.as_slice(), [line] if line.vertical_pos==0
++            && line.text_start==0 && line.tag & 0x8000_0000==0) { return false; }
++    let count=paragraphs.iter().skip(1).take_while(|p| matches!(p.controls.as_slice(), [Control::Table(_)])).count();
++    if count!=2 || at!=2 || first.line_segs[0].segment_width==0 { return false; }
++    let [Control::Table(target)]=paragraphs[at].controls.as_slice() else { return false; };
++    if signed_hwpunit(target.common.vertical_offset)<=0 { return false; }
++    let opaque=|p:&Paragraph| !p.field_ranges.is_empty() || !p.orphan_field_ends.is_empty()
++        || !p.range_tags.is_empty() || !p.title_marks.is_empty() || !p.markpen_marks.is_empty()
++        || p.ctrl_data_records.iter().any(Option::is_some);
++    if paragraphs.iter().any(opaque) { return false; }
++    for (slot,host) in paragraphs[1..=count].iter().enumerate() {
++        let [Control::Table(table)]=host.controls.as_slice() else { return false; };
++        let cells=usize::from(table.row_count)*usize::from(table.col_count);
++        let source_owner=if slot==0 { object_only_saved_table_anchor(host,table) } else {
++            !table.common.treat_as_char && is_para_topbottom_float(&table.common)
++                && host.text.is_empty() && host.controls.len()==1
++                && matches!(host.line_segs.as_slice(),[line] if line.segment_width==first.line_segs[0].segment_width)
++        };
++        if !source_owner || host.stored_text_partition_is_dirty()
++            || host.cell_format_vpos_dirty || table.page_break!=TablePageBreak::None
++            || signed_hwpunit(table.common.vertical_offset)<0
++            || table.common.vert_rel_to!=VertRelTo::Para || table.common.vert_align!=VertAlign::Top
++            || !matches!(table.common.horz_rel_to,HorzRelTo::Para|HorzRelTo::Column)
++            || table.common.horz_align!=HorzAlign::Left || table.common.size_protect || table.common.locked
++            || table.attr & (1<<30)!=0 || table.raw_table_record_attr & 8!=0
++            || table.common.height==0 || table.common.height>=0x8000_0000
++            || table.common.width_criterion!=crate::model::shape::SizeCriterion::Absolute
++            || table.common.height_criterion!=crate::model::shape::SizeCriterion::Absolute
++            || table.caption.is_some() || !table.zones.is_empty() || cells==0 || cells>4096 || cells!=table.cells.len()
++            || !matches!(host.line_segs.as_slice(), [line] if line.text_start==0 && line.vertical_pos>=0
++                && line.line_height>0 && line.tag & 0x8000_0000==0)
++            || table.cells.iter().map(|c|(c.row,c.col)).collect::<std::collections::BTreeSet<_>>().len()!=cells
++            || table.cells.iter().any(|cell| cell.row>=table.row_count || cell.col>=table.col_count
++                || cell.row_span!=1 || cell.col_span!=1 || cell.width==0 || cell.height==0
++                || cell.cell_protect() || cell.field_name.is_some() || cell.text_direction!=0
++                || cell.paragraphs.is_empty() || cell.paragraphs.iter().any(|p| !p.controls.is_empty() || opaque(p)))
++        { return false; }
++    }
++    let [Control::Table(previous)]=paragraphs[1].controls.as_slice() else { return false; };
++    if previous.common.vertical_offset!=0
++        || i64::from(signed_hwpunit(target.common.vertical_offset))>i64::from(previous.common.height)
++        || i64::from(paragraphs[2].line_segs[0].vertical_pos)-i64::from(paragraphs[1].line_segs[0].vertical_pos)
++            !=i64::from(previous.common.height)+i64::from(previous.outer_margin_top)+i64::from(previous.outer_margin_bottom)
++    { return false; }
++    if paragraphs[1..=count].windows(2).any(|pair|pair[1].line_segs[0].vertical_pos<pair[0].line_segs[0].vertical_pos) { return false; }
++    paragraphs[count+1..].iter().all(|p| p.controls.is_empty()
++        && p.line_segs.windows(2).all(|pair|pair[0].text_start<pair[1].text_start))
++}
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -12143,6 +12143,9 @@
+                         // 한컴 2020 #7265 셀 서식 편집본: 본문 132.3px,
+                         // 표 테두리 136.0px = 본문 + 283HU.
+                         if self.profile.get().hwp5_origin_hwpx()
++                            && !(layout.column_areas.len()==1
++                                && (crate::renderer::float_placement::plain_positive_offset_stack(paragraphs,para_index)
++                                    || crate::renderer::float_placement::closed_full_width_positive_pair(paragraphs,para_index)))
+                             && !is_current_empty_square_sibling_float
+                             && is_para_topbottom_float(&t.common)
+                             && matches!(t.page_break, TablePageBreak::None)
+--- a/src/renderer/typeset/controls/flow_table.rs
++++ b/src/renderer/typeset/controls/flow_table.rs
+@@ -100,7 +100,8 @@
+         && next_para.is_some_and(|next| matches!(next.controls.as_slice(),
+             [crate::model::control::Control::Table(following)]
+                 if following.page_break == crate::model::table::TablePageBreak::None
+-                    && crate::renderer::float_placement::object_only_saved_table_anchor(next, following)
++                    && (crate::renderer::float_placement::object_only_saved_table_anchor(next, following)
++                        || crate::renderer::float_placement::closed_full_width_positive_pair(paragraphs_all,para_idx+1))
+                     && following.common.vert_rel_to == crate::model::shape::VertRelTo::Para
+                     && following.common.vert_align == crate::model::shape::VertAlign::Top
+                     && signed_hwpunit(following.common.vertical_offset) >= 0));
+@@ -127,7 +128,8 @@
+                     .is_some_and(|line| line.vertical_pos == 0
+                         && line.tag & crate::model::paragraph::LineSeg::TAG_IMPLEMENTATION_PROPERTY == 0))
+         && table.page_break == crate::model::table::TablePageBreak::None
+-        && crate::renderer::float_placement::object_only_saved_table_anchor(para, table)
++        && (crate::renderer::float_placement::object_only_saved_table_anchor(para, table)
++            || crate::renderer::float_placement::closed_full_width_positive_pair(paragraphs_all,para_idx))
+         && table.common.vert_rel_to == crate::model::shape::VertRelTo::Para
+         && table.common.vert_align == crate::model::shape::VertAlign::Top
+         && signed_hwpunit(table.common.vertical_offset) >= 0
+--- a/src/renderer/typeset/table/block/entry.rs
++++ b/src/renderer/typeset/table/block/entry.rs
+@@ -1553,7 +1553,8 @@
+                     .is_some_and(|line| line.vertical_pos == 0
+                         && line.tag & crate::model::paragraph::LineSeg::TAG_IMPLEMENTATION_PROPERTY == 0))
+             && table.page_break == crate::model::table::TablePageBreak::None
+-            && crate::renderer::float_placement::object_only_saved_table_anchor(para, table)
++            && (crate::renderer::float_placement::object_only_saved_table_anchor(para, table)
++                || crate::renderer::float_placement::closed_full_width_positive_pair(paragraphs_all,para_idx))
+             && table.common.vert_rel_to == crate::model::shape::VertRelTo::Para
+             && table.common.vert_align == crate::model::shape::VertAlign::Top
+             && signed_hwpunit(table.common.vertical_offset) >= 0
+@@ -1779,7 +1780,8 @@
+             let top_inset=hwpunit_to_px(table.outer_margin_top as i32,self.dpi);
+             let offset_paint_inset=if semantic_whole_stack && top_inset>0.0
+                 && ft.host_spacing.before>=top_inset
+-                && crate::renderer::float_placement::plain_positive_offset_stack(paragraphs_all,para_idx) {
++                && (crate::renderer::float_placement::plain_positive_offset_stack(paragraphs_all,para_idx)
++                    || crate::renderer::float_placement::closed_full_width_positive_pair(paragraphs_all,para_idx)) {
+                 top_inset
+             } else { 0.0 };
+             crate::renderer::float_placement::ParagraphFloatPlacement::from_empty_reflow_host(

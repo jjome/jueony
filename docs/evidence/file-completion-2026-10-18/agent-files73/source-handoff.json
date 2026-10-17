@@ -1,0 +1,146 @@
+{
+  "status": "Final73 Native6 + Edge12 + 898 unit + TS PASS",
+  "source": [
+    {
+      "path": "apps/editor/src/adapters/desktop/agent-files.ts",
+      "sha256": "5dc4116cbd55364f590f7d5df70235dbe71055f2d00e60f2b1844bafd4420409"
+    },
+    {
+      "path": "apps/editor/src/desktop-host.ts",
+      "sha256": "8c0aa0d49ad1d5f5a05d14c3c0d911ec4548df662465d2ab4f9b5df5c51ae2c6"
+    },
+    {
+      "path": "apps/editor/src/adapters/iframe/document-client.ts",
+      "sha256": "2d356a29a856cbe01ba2e1567532256cbec2c13bd28797f8c503029292d7f64d"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-document-information.ts",
+      "sha256": "834d03e78674a0e21688bc8c2753203cadd36b671afc050add83228fe6ef55ec"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-metadata.ts",
+      "sha256": "dd0263a8fd500b02c2bff1be11ee3a7d9f552ae01ae9f7cb316965a630e41ea0"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "sha256": "097a306d83073716c5c2c63b5efe0cd71f2a921dfbce7eeac14940e43e92791f"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/execute.ts",
+      "sha256": "2604150500f3d3630b24c3e91c8331e466b4b1c35a5a905bca62ec131481cb5e"
+    },
+    {
+      "path": "apps/editor/src/adapters/storage/indexeddb-workspace.ts",
+      "sha256": "d30b831213efd4a68a4bc9384ded54c4d2d580b2481effa0a7344cd32335200b"
+    },
+    {
+      "path": "apps/editor/src/modules/agent/application/run-once.ts",
+      "sha256": "bdbc5d2eeeea98e94dc5878eecd442f42f080397f00cbb3a31aa31eef8bbf50a"
+    },
+    {
+      "path": "apps/editor/src/modules/agent/public/contracts.ts",
+      "sha256": "e65c88b83d8862c515464d31f863e7961b10a748409812f26294b8c6049f719a"
+    },
+    {
+      "path": "apps/editor/src/modules/agent/public/index.ts",
+      "sha256": "f54757bb273949a5b90c5583d01c9746302854b65d60292cad71f271c42e4c7b"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-document-information.ts",
+      "sha256": "6521c9e1997ee582274e0e225311be94e796003833c064e6a70293ea923e57ca"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-file-operations.ts",
+      "sha256": "8656058c1726a7b7ab850e7755e8fe09d5f05e40a822703e28522130fa120f31"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/document-metadata-values.ts",
+      "sha256": "217552f049156aa917fc5b63cad0d582b09ac9d4523e5be748bf7a81d25c703a"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "sha256": "f66aadf86347fe3bed4f12f510fcec0c9f7e160b076e335422e34815aec1b857"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "sha256": "9c71b1dde0e33f1fe1edc21e7049e6d6c7d88fd215f19a9406b433a5aebbbb0e"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/index.ts",
+      "sha256": "4be5c03f5edb06d9a74944b1090ffaaae18ddf37cbfa880b7f16afdcb267fc7f"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/types.ts",
+      "sha256": "ff6b8af43be7614689b4327dfa9c3ef42a99730b1d16efe22161b4cf164b5b8b"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/wire-schema.mjs",
+      "sha256": "b38d8b34fe51281f685483ad18a7eeefa63f9f4985185756dcdbd682b1fa1e02"
+    },
+    {
+      "path": "apps/editor/src/shell.ts",
+      "sha256": "b1ee888a72a9b2bbb4a196ae0e0f7dceab80d3c509719d40835171c2a6e8c23e"
+    },
+    {
+      "path": "apps/launcher/providers/control-contract.mjs",
+      "sha256": "f1100ebbe675c2a3c1459d17bff391ee1f6c8fb83ad44ac362da5a30b1411438"
+    },
+    {
+      "path": "apps/editor/tests/agent-document-information.test.ts",
+      "sha256": "98db4b46b22b00ae79ce42012be14c3cfd5b7a03bb0a242029e957b586e4501b"
+    },
+    {
+      "path": "apps/editor/tests/agent-files.test.ts",
+      "sha256": "925d39c73514ce4be0adc7f2c10a030dc2f89a9165bed7effedd49acba06e5e6"
+    },
+    {
+      "path": "apps/editor/tests/document-instance-contract.test.ts",
+      "sha256": "cda2876c6fd0fcfdbfbf99f88ec5a0af40e7f50b36b6f119b5523e38924af584"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-document-information-engine.mjs",
+      "sha256": "358f1af678bddc5f7d5874a252e519ad844bc6238cec03c5fd12ea6e502b34f7"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-files.mjs",
+      "sha256": "f3441c292b4fb27212b03d5b43e5f3e861d211ca45e02711cc4c5adddc8e8ac7"
+    }
+  ],
+  "additionalTestEdits": "Existing editor and launcher tests change only canonical wire count51 to56, retaining operation-specific assertions. See git diff for explicit files.",
+  "implementedAgent": [
+    "Current document metadata/statistics read with absent-source reasons",
+    "Exactly five summary fields with source fingerprint; single snapshot; actual undo/redo; full preservation and both formats reopen preflight",
+    "Current-workspace tab list/new/activate/clean-close via optional host port and actual distinct receipt",
+    "Host mutation leases; current-window/all-tab exact source stamp; exact recovery checkpoint CAS; no replay after partial host failures"
+  ],
+  "stillUserUiRequired": [
+    "OS file picker/open",
+    "Recent native file reconnection/clear",
+    "Save and SaveAs original binding",
+    "Preferences/recovery restore",
+    "Dirty close/discard",
+    "Application exit",
+    "Native new OS window"
+  ],
+  "fullFileAgent": false,
+  "verification": {
+    "editorUnit": {
+      "passed": 898,
+      "failed": 0,
+      "skipped": 0,
+      "log": "build/agent-files71-complete-unit.log"
+    },
+    "launcherUnit": {
+      "passed": 52,
+      "failed": 0,
+      "log": "build/agent-files71-launcher-root-unit.log"
+    },
+    "boundaries": "build/agent-files-boundaries.log",
+    "prior70Native": "build/agent-files70-native/result.json",
+    "prior70Browser": "build/agent-files70-browser/result.json",
+    "intermediate71GuardFailure": "build/agent-files-locked71-browser/result.json",
+    "intermediate71CasPass": "build/agent-files-locked71-cas-valid-browser/result.json",
+    "final73": "build/agent-files-final73/summary.json"
+  },
+  "scope": "No new engine/OS file rights, no actual credentials/user files. Browser provider/native IPC replies are synthetic; real engine/history/workspace IDB and outer input used."
+}

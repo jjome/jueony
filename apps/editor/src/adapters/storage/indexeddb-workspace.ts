@@ -9,9 +9,10 @@ import { sealRecoveryRecord } from './recovery-integrity.ts';
 const writer = createSerializedWriter();
 export class WorkspaceStore {
   private db!: IDBDatabase;
-  async open(): Promise<void> {
+  async open(documentWindow?: string): Promise<void> {
+    if(documentWindow!==undefined&&!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(documentWindow))throw new Error('문서 창 저장소 식별자가 올바르지 않습니다.');
     this.db = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open('jueony-workspaces', 1);
+      const request = indexedDB.open(documentWindow?'jueony-document-window-'+documentWindow:'jueony-workspaces', 1);
       request.onupgradeneeded = () => {
         request.result.createObjectStore('state');
         request.result.createObjectStore('documents', { keyPath: 'id' });
@@ -53,6 +54,14 @@ export class WorkspaceStore {
   }
   async removeDocument(id: string): Promise<void> {
     await this.request('documents', 'readwrite', store => store.delete(id));
+  }
+  /** An Agent clean-close may remove only the exact checkpoint it inspected. */
+  async removeDocumentIfUnchanged(id:string,workspaceId:string,expected:SavedDocument|undefined):Promise<void>{
+    const captured=structuredClone(expected);
+    await this.exitTransaction([{id,workspaceId}],(key,current)=>{
+      if(!sameRecoveryValue(current,captured))throw Error('복구본이 바뀌어 문서 탭을 닫지 않았습니다. 최신 문서를 다시 확인하세요.');
+      return{id:key.id,workspaceId:key.workspaceId,before:current,after:undefined};
+    });
   }
   /** Dirty deletions and clean checkpoints commit together. The token contains
    * exact prior/committed values so an IPC failure can compensate with CAS. */

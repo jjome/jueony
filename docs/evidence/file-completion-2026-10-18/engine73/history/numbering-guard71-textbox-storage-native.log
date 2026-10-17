@@ -1,0 +1,18 @@
+PASS Top -> hwp: real textbox meaning, runs and repeated save
+FAIL Top -> hwpx: real textbox meaning, runs and repeated save 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+PASS Center -> hwp: real textbox meaning, runs and repeated save
+FAIL Center -> hwpx: real textbox meaning, runs and repeated save 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+PASS Bottom -> hwp: real textbox meaning, runs and repeated save
+FAIL Bottom -> hwpx: real textbox meaning, runs and repeated save 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+PASS new textbox default is Top before and after HWP with no explicit setter
+PASS existing HWP textbox preserves unrelated list_attr bits while semantic alignment changes
+FAIL reserved raw alignment 3 stays unknown and unchanged across repeat HWP save The validation function is expected to return "true". Received false
+
+Caught error:
+
+PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다; objects: 저장 전후 값이 다릅니다). 원본과 기존 복구본은 유지됩니다.
+PASS reserved raw3 explicit Top setter updates only supported alignment bits
+PASS reserved raw3 explicit Center setter updates only supported alignment bits
+PASS reserved raw3 explicit Bottom setter updates only supported alignment bits
+PASS unsupported alignment setter never normalizes reserved raw3
+PASS real textbox alignment corruption remains blocked by unchanged preservation guard

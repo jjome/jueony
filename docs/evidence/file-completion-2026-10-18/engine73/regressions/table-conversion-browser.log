@@ -1,0 +1,18 @@
+PASS hwp: actual selection → conversion dialog → table; undo/redo, native save/reopen and inverse conversion
+PASS hwpx: actual selection → conversion dialog → table; undo/redo, native save/reopen and inverse conversion
+PASS cancel and concurrently changed document refuse conversion without applying old selected text
+PASS native failure after source deletion restores content and leaves no partial table or undo receipt
+PASS hwp: integer autofill previews overwrite, preserves formats/other cells, one undo and repeat no-op
+PASS hwpx: integer autofill previews overwrite, preserves formats/other cells, one undo and repeat no-op
+PASS hwp: real selected-cell preset dialog preserves outer cells and merged block, undo/save
+PASS hwp: explicit monthly/yearly auto fill previews anchored dates and uses one undo/save
+PASS hwp: object T transposes merged table with mixed/multiple paragraphs; one undo and save/reopen
+PASS hwp: real table preset dialog, cancel, one undo/redo and guarded save of mixed text
+PASS hwp: real numeric paragraph sort dialog keeps title and format, undo/redo and save
+PASS hwpx: real selected-cell preset dialog preserves outer cells and merged block, undo/save
+PASS hwpx: explicit monthly/yearly auto fill previews anchored dates and uses one undo/save
+PASS hwpx: object T transposes merged table with mixed/multiple paragraphs; one undo and save/reopen
+PASS hwpx: real table preset dialog, cancel, one undo/redo and guarded save of mixed text
+PASS hwpx: real numeric paragraph sort dialog keeps title and format, undo/redo and save
+PASS table preset failure after first cell restores every property and leaves history unchanged
+PASS paragraph sort failure after text replacement restores every run and leaves history unchanged

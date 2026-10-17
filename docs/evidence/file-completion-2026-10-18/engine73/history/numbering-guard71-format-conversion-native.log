@@ -1,0 +1,32 @@
+PASS mcst-bid-2026 -> hwp: unchanged strict export evidence and live state
+PASS mcst-bid-2026 -> hwpx: unchanged strict export evidence and live state
+PASS python-hwpx-0 -> hwp: unchanged strict export evidence and live state
+PASS python-hwpx-0 -> hwpx: unchanged strict export evidence and live state
+FAIL python-hwpx-1 -> hwp: unchanged strict export evidence and live state 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+PASS python-hwpx-1 -> hwpx: unchanged strict export evidence and live state
+FAIL python-hwpx-2 -> hwp: unchanged strict export evidence and live state 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+PASS python-hwpx-2 -> hwpx: unchanged strict export evidence and live state
+FAIL python-hwpx-3 -> hwp: unchanged strict export evidence and live state 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+PASS python-hwpx-3 -> hwpx: unchanged strict export evidence and live state
+FAIL self-authored Latin KEEP_WORD: effective unit and strict evidence both formats 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+FAIL self-authored Latin HYPHENATION: effective unit and strict evidence both formats 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+FAIL self-authored Latin BREAK_WORD: effective unit and strict evidence both formats 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+FAIL self-authored root plus cell memos: owned lists keep field identity and text 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+PASS duplicate root and cell memo index: ambiguous carrier is retained and strict save blocked
+FAIL self-authored orphan-index: whole ownership resolution refuses partial attachment The validation function is expected to return "true". Received false
+
+Caught error:
+
+PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다; section/0/paragraph-count: 저장 전후 값이 다릅니다; text: 저장 전후 값이 다릅니다). 원본과 기존 복구본은 유지됩니다.
+FAIL self-authored empty-carrier: whole ownership resolution refuses partial attachment The validation function is expected to return "true". Received false
+
+Caught error:
+
+PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다; section/0/paragraph-count: 저장 전후 값이 다릅니다; text: 저장 전후 값이 다릅니다). 원본과 기존 복구본은 유지됩니다.
+FAIL self-authored flow=false overlap=false: getter is resolved common state 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+FAIL self-authored flow=false overlap=true: getter is resolved common state 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+FAIL self-authored flow=true overlap=false: getter is resolved common state 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+FAIL self-authored flow=true overlap=true: getter is resolved common state 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+FAIL self-authored locked and unlocked table: lock survives HWP then HWPX 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+FAIL reopened table lock changes preserve both raw-cache and sealed source paths 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+PASS preservation still rejects real flow, overlap and lock corruption

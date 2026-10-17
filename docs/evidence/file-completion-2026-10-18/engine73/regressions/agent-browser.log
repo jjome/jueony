@@ -1,0 +1,16 @@
+PASS openai-responses: chat sets HWPX padding, comparison/undo/redo/save preserve remaining cells and table
+PASS anthropic: chat sets HWPX padding, comparison/undo/redo/save preserve remaining cells and table
+PASS gemini: chat sets HWPX padding, comparison/undo/redo/save preserve remaining cells and table
+PASS openai-compatible: chat sets HWPX padding, comparison/undo/redo/save preserve remaining cells and table
+PASS table-default reset retains dormant values, native manual cell properties display same custom values and cancel is unchanged
+PASS no-op/incomplete/mixed/width overflow/alias/batch/raw fields visibly refuse unchanged
+PASS protected anywhere, merged, mixed and field original remain readonly for padding
+PASS HWP remains visibly readonly and never changes the document
+PASS renamed HWP with injected geometry cannot bypass actual layout guard
+PASS second-cell live failure restores padding/dirty/history/caret
+PASS unrequested neighboring padding/table-default mutation or differing layout causes full rollback
+PASS delayed provider cannot overwrite newer ordinary cell text
+PASS unsaved workspace restores custom padding, capability and comparison after confirmed restart
+PASS request undo after Save still refuses a genuine later edit without changing bytes or history
+PASS hwp: manual table default padding cancel/apply/undo/redo/save uses inherited cells and preserves custom cell
+PASS hwpx: manual table default padding cancel/apply/undo/redo/save uses inherited cells and preserves custom cell

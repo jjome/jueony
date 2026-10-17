@@ -55,3 +55,10 @@ export type {AgentParagraphTabStop,AgentParagraphTabsOp,AgentParagraphTabSource}
 export type {AgentParagraphDecorationOp,AgentParagraphDecorationSource} from './types.ts';
 
 export type {AgentCellPaddingSource,AgentEqualColumnSource,AgentRowHeightSource} from './types.ts';
+
+export {DOCUMENT_METADATA_KEYS,validateDocumentMetadataValues} from '../domain/document-metadata-values.ts';
+export type {DocumentMetadataValues} from '../domain/document-metadata-values.ts';
+export type {AgentDocumentInformation,AgentDocumentMetadataOp} from './types.ts';
+
+export type {AgentFileContext,AgentFileOp,AgentFileReceipt} from './types.ts';
+export {agentFileKinds,validateAgentFileOperation} from '../domain/agent-file-operations.ts';

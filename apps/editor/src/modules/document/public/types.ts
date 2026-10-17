@@ -1,3 +1,4 @@
+import type {DocumentMetadataValues} from '../domain/document-metadata-values.ts';
 export type AgentCellParagraphOp={kind:"replace_cell_paragraph";target:string;row:number;column:number;paragraph:number;originalText:string;text:string};
 export type AgentCellParagraphSource={editable:boolean;fingerprint?:string;cells?:Array<{index:number;row:number;column:number;rowSpan:number;columnSpan:number;paragraphs:Array<{index:number;text:string}>}>;reason?:string};
 export type AgentTableSubdivisionOp={kind:"split_table_cell_into";target:string;row:number;column:number;rows:number;columns:number};
@@ -62,13 +63,20 @@ export type AgentTableStructureOp={kind:"split_table";target:string;atRow:number
 export type AgentTableStructureSource={editable:boolean;fingerprint?:string;splitRows?:number[];nextTarget?:string;reason?:string};
 export type AgentTableSplitOp={kind:"split_table_cell";target:string;row:number;column:number};
 export type AgentTableSplitSource={editable:boolean;fingerprint?:string;widths?:number[];heights?:number[];reason?:string};
-export type Snapshot = { cellParagraphSources?:Record<string,AgentCellParagraphSource>; tableSubdivisionSources?:Record<string,AgentTableSubdivisionSource>; tableStructureSources?:Record<string,AgentTableStructureSource>; tableSplitSources?:Record<string,AgentTableSplitSource>; tableMergeSources?:Record<string,AgentTableMergeSource>; rowHeightSources?:Record<string,AgentRowHeightSource>; equalColumnSources?:Record<string,AgentEqualColumnSource>; cellPaddingSources?:Record<string,AgentCellPaddingSource>; tableHeaderSources?:Record<string,AgentTableHeaderSource>; tablePaginationSources?:Record<string,AgentTablePaginationSource>; revision: string; name: string; plainText?: string; styleNextSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string;currentNextStyleId:number}>; styleNextTargets?:Record<string,{fingerprint:string}>; styleRenameSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; styleCreationSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; paragraphOutlineSources?:Record<string,AgentParagraphOutlineSource>; numberingDefinitionSources?:AgentNumberingDefinitionSource[]; paragraphTabSources?:Record<string,AgentParagraphTabSource>; basicNumberingSources?:Record<string,AgentParagraphTabSource>; basicBulletSources?:Record<string,AgentParagraphTabSource>; paragraphListSources?:Record<string,AgentParagraphTabSource>; listCatalog?:AgentListCatalog; paragraphDecorationSources?:Record<string,AgentParagraphDecorationSource>; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
+export type AgentFileContext={stamp:string;activeTabId:string;tabs:{id:string;name:string;dirty:boolean;fingerprint:string}[];capabilities:{list:boolean;new:boolean;activate:boolean;closeClean:boolean}};
+export type AgentFileOp={kind:'list_document_tabs';contextStamp:string}|{kind:'new_document_tab';contextStamp:string}|{kind:'activate_document_tab';contextStamp:string;tabId:string}|{kind:'close_document_tab';contextStamp:string;tabId:string};
+export type AgentFileReceipt={runId:string;kind:AgentFileOp['kind'];status:'completed';beforeStamp:string;after:AgentFileContext;operationCount:1;documentMutations:0;message:string};
+export type AgentDocumentInformation={metadata:{editable:boolean;values?:DocumentMetadataValues;fingerprint?:string;reason?:string};statistics?:Record<string,JsonValue>;reason?:string};
+export type AgentDocumentMetadataOp={kind:'set_document_metadata';originalFingerprint:string;values:DocumentMetadataValues};
+export type Snapshot = { fileContext?:AgentFileContext; documentInformation?:AgentDocumentInformation; cellParagraphSources?:Record<string,AgentCellParagraphSource>; tableSubdivisionSources?:Record<string,AgentTableSubdivisionSource>; tableStructureSources?:Record<string,AgentTableStructureSource>; tableSplitSources?:Record<string,AgentTableSplitSource>; tableMergeSources?:Record<string,AgentTableMergeSource>; rowHeightSources?:Record<string,AgentRowHeightSource>; equalColumnSources?:Record<string,AgentEqualColumnSource>; cellPaddingSources?:Record<string,AgentCellPaddingSource>; tableHeaderSources?:Record<string,AgentTableHeaderSource>; tablePaginationSources?:Record<string,AgentTablePaginationSource>; revision: string; name: string; plainText?: string; styleNextSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string;currentNextStyleId:number}>; styleNextTargets?:Record<string,{fingerprint:string}>; styleRenameSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; styleCreationSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; paragraphOutlineSources?:Record<string,AgentParagraphOutlineSource>; numberingDefinitionSources?:AgentNumberingDefinitionSource[]; paragraphTabSources?:Record<string,AgentParagraphTabSource>; basicNumberingSources?:Record<string,AgentParagraphTabSource>; basicBulletSources?:Record<string,AgentParagraphTabSource>; paragraphListSources?:Record<string,AgentParagraphTabSource>; listCatalog?:AgentListCatalog; paragraphDecorationSources?:Record<string,AgentParagraphDecorationSource>; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
 export type BodyOp =
  | { kind: 'create_document'; paragraphs: string[] }
  | { kind: 'insert_body_paragraphs'; after: string; paragraphs: string[] }
  | { kind: 'replace_body_text'; target: string; start: number; count: number; text: string }
  | { kind: 'delete_body_text'; target: string; start: number; count: number };
 export type ControlOp =
+  | AgentDocumentMetadataOp
+  | AgentFileOp
   | AgentCellParagraphOp
   | AgentTableSubdivisionOp
   | AgentTableStructureOp
@@ -109,7 +117,7 @@ export type ControlOp =
   | { kind: 'delete_table_row' | 'delete_table_column'; target: string; index: number }
   | { kind: 'set_page_setup'; section: number; properties: Record<string, unknown> };
 export type EditOp = BodyOp | ControlOp;
-export type Receipt = { runId: string; beforeRevision: string; afterRevision: string; before: string; after: string; operationCount: number; beforeStructure?: Structure; afterStructure?: Structure };
+export type Receipt = { metadata?:{before:DocumentMetadataValues;after:DocumentMetadataValues}; runId: string; beforeRevision: string; afterRevision: string; before: string; after: string; operationCount: number; beforeStructure?: Structure; afterStructure?: Structure };
 export function plainSnapshot(snapshot: Snapshot): string { return snapshot.nodes.map(node => node.text).join('\n'); }
 
 /** Metadata accompanying a batch proposed by a caller; no agent implementation types. */

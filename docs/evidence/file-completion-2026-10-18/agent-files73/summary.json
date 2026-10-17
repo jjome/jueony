@@ -1,0 +1,83 @@
+{
+  "enginePackage": "C:/Users/jjome/Documents/work/jueony/build/rhwp-engine/source-5c509946c79e331e/pkg",
+  "frontend": "C:/Users/jjome/Documents/work/jueony/apps/editor/evidence/dist-agent-files-final73",
+  "engineWasmSha256": "de82cfa5b974a07c1799a253c38a26323a498a7c2731466ae4a6c4c63f031bc6",
+  "native": {
+    "passed": 6,
+    "failed": 0
+  },
+  "browser": {
+    "passed": 12,
+    "failed": 0,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "externalRequests": 0
+  },
+  "unit": {
+    "passed": 898,
+    "failed": 0,
+    "skipped": 0
+  },
+  "launcher": {
+    "passed": 52,
+    "failed": 0,
+    "scope": "same frozen Agent/provider source; independent synthetic loopback/DPAPI boundary tests"
+  },
+  "typescript": "PASS",
+  "moduleBoundaries": "PASS",
+  "priorFailedArtifact": "build/agent-files-final73/browser/result.json",
+  "priorFailureCause": "Verifier initially considered iframe API readiness sufficient during workspace creation. Failure screenshot clearly shows tab not initialized and explicit prepare-message; production correctly refused. Final verifier additionally requires real active tab label and persisted workspace+activeDocumentId+checkpoint agreement before sending foreign-ID negative request. Original failed artifact retained.",
+  "scope": "Real Edge/Native WASM/history/outer Agent input/workspace IDB; 4 provider response protocols and native picker/disk IPC are explicitly synthetic. No actual OS picker or production credential invocation. User preference disables automatic checkpoint timers to isolate explicit close/CAS transactions; autosave covered separately. No claim of fullFileAgent/OS save/dirty discard/exit authority.",
+  "files": [
+    {
+      "path": "build/agent-files-final73/native/result.json",
+      "sha256": "e888d3e289dec9aa290afa0bb3143a811e36e745936e280dea91c781e1af3b16",
+      "bytes": 15097
+    },
+    {
+      "path": "build/agent-files-final73/browser-ready/result.json",
+      "sha256": "6602a65e9547ccb7496f1dc5a54fff12188f00a9c2df0dae6e112469392e1770",
+      "bytes": 892247
+    },
+    {
+      "path": "build/agent-files-final73-unit.log",
+      "sha256": "9bc1954ac6ce54edc1997616c10c91cb1dfa06739bc21d510dfd12c98df2ab5b",
+      "bytes": 211692
+    },
+    {
+      "path": "build/agent-files-final73-ts.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "build/agent-files-final73-build.log",
+      "sha256": "cecf46faf1d5059e0d64d9dc1e5dca79cd5c4c962689c9cc02f3127b02d092fe",
+      "bytes": 17746
+    },
+    {
+      "path": "apps/editor/evidence/dist-agent-files-final73/build-evidence.json",
+      "sha256": "e4eb03edf101faff84086fb41d19ef48976e17816251ae7c46329eb779131480",
+      "bytes": 15520
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-files.mjs",
+      "sha256": "f3441c292b4fb27212b03d5b43e5f3e861d211ca45e02711cc4c5adddc8e8ac7",
+      "bytes": 23289
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-document-information-engine.mjs",
+      "sha256": "358f1af678bddc5f7d5874a252e519ad844bc6238cec03c5fd12ea6e502b34f7",
+      "bytes": 4401
+    },
+    {
+      "path": "build/agent-files71-launcher-root-unit.log",
+      "sha256": "08ae161dd1d5a180512600e1786c11d49917f01111f0471687f8e4c3ade96c48",
+      "bytes": 12735
+    },
+    {
+      "path": "build/agent-files-boundaries.log",
+      "sha256": "e0ee071c878fe3db4e0958236d0b09eec634ea47179cac0fa37b8a0d83daaef4",
+      "bytes": 166889
+    }
+  ]
+}

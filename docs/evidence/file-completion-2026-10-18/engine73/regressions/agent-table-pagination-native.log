@@ -1,0 +1,15 @@
+PASS hwp: cell changes only one table pagination policy and snapshot undo/reopen preserve cells/format
+PASS hwp: row changes only one table pagination policy and snapshot undo/reopen preserve cells/format
+PASS hwp: none changes only one table pagination policy and snapshot undo/reopen preserve cells/format
+PASS hwpx: cell changes only one table pagination policy and snapshot undo/reopen preserve cells/format
+PASS hwpx: row changes only one table pagination policy and snapshot undo/reopen preserve cells/format
+PASS hwpx: none changes only one table pagination policy and snapshot undo/reopen preserve cells/format
+PASS existing repeated-header and header-cell flags remain unchanged
+PASS same/unsupported policy, unknown targets, injection and batches refuse unchanged
+PASS source geometry/text/format/policy mutation invalidates previously queried capability
+PASS false/noop/wrong policy and unexpected header/width/text/style/resource changes refuse and restore
+PASS merged/protected/inline/caption/overlap/field/mixed-format and oversized tables are protected
+PASS missing writer disables capability and rejects old snapshots
+PASS resolved TextWrap tolerates stale cached control bits but rejects a real placement change
+PASS flattened table identity in a later section changes the intended object only
+PASS multi-page row policy renders all stored table cells and survives both saved formats

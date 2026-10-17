@@ -4,7 +4,7 @@
 
 열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.
 
-**2026-10-17 현재:** 저장 Undo·표 속성 높이 회귀를 수정하고 정식68에서 기존44회귀를 통과했다. G071·G073은 제한된 실제 한글 사본·지면 검수까지 마감했다. 최근 문서 재연결과 문서 요약5필드를 구현·검수했고 닫기·종료의 네 가지 선택과 다문서 원자 복구도 구현·검수했다. 정식68의 실제 Windows HWP 열기·수정·저장·종료 취소·복구 보관 종료·재실행 복원도 확인했다. 현재 긴 본문·캡션·Unicode·위 첨자 한글 재저장 검수로 G096·G105를 완료 처리했고, 양수/음수 위치·다단 결함은 실패 그대로 추적한다. 상위10개 전체·N001 등 남은 검수는 미완료이며 세부 완료 수로 대신하지 않는다. [실제 완료·실패·잔여](../109-file-preservation-hancom-followup.md).
+**2026-10-18 현재:** 정식73에서 번호 확장 보존·관측 기반 손실 검사와 양수 위치 표의 원본/한글 사본 양형식 재저장을 보강했다. 기존 Native27 회귀, 전체 unit898, Agent Native6·실제 Edge12를 통과했다. 실제 한글11쌍은9통과이며 음수 위치·두 단은 미완료다. 실제 Windows 독립 창/새 탭·복구 보관 종료·재열기·OS 저장과 독립 readback을 확인했고 네이티브 Rust29검사도 통과했다. Agent는 요약5필드와 현재 업무 탭 조회/생성/전환/clean 닫기를 연결했다. 상위10개 전체, XML 서식·모든 문서 호환·OS 저장/종료 Agent 권한은 미완료다. [최신 구현·검수](../110-file-preservation-integration.md) · [이전 결과와 실패](../109-file-preservation-hancom-followup.md).
 
 ## 진행 요약
 
@@ -13,8 +13,8 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | --- | --- | --- |
 | 구현 | 완료 23/24 · 부분 1 | 완료 0/10 · 부분 9 · 미구현 1 |
-| 검증 | 완료 20/24 · 부분 4 | 완료 0/10 · 부분 7 · 미검증 3 |
-| Agent 연결 | 연결 6/6 · 부분 0 · 해당 없음 18 | 연결 0/10 · 부분 1 · 미연결 9 |
+| 검증 | 완료 20/24 · 부분 4 | 완료 0/10 · 부분 9 · 미검증 1 |
+| Agent 연결 | 연결 6/6 · 부분 0 · 해당 없음 18 | 연결 0/10 · 부분 4 · 미연결 6 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
@@ -46,12 +46,12 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B001](<05-files-storage-recovery.md#b001>) · 범위 | 새 문서 | ◐ 부분 | ☐ 미검증 | ◐ 부분 |
-| [B002](<05-files-storage-recovery.md#b002>) · 범위 | 새 탭 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B001](<05-files-storage-recovery.md#b001>) · 범위 | 새 문서 | ◐ 부분 | ◐ 부분 | ◐ 부분 |
+| [B002](<05-files-storage-recovery.md#b002>) · 범위 | 새 탭 | ◐ 부분 | ◐ 부분 | ◐ 부분 |
 | [B005](<05-files-storage-recovery.md#b005>) · 범위 | 불러오기 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B006](<05-files-storage-recovery.md#b006>) · 범위 | 최근 문서 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B009](<05-files-storage-recovery.md#b009>) · 범위 | XML 탭·서식·문서 입출력 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B014](<05-files-storage-recovery.md#b014>) · 범위 | 문서 정보 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
+| [B014](<05-files-storage-recovery.md#b014>) · 범위 | 문서 정보 | ◐ 부분 | ◐ 부분 | ◐ 부분 |
 
 <a id="work-2"></a>
 
@@ -80,7 +80,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B021](<05-files-storage-recovery.md#b021>) · 범위 | 문서 닫기 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
+| [B021](<05-files-storage-recovery.md#b021>) · 범위 | 문서 닫기 | ◐ 부분 | ◐ 부분 | ◐ 부분 |
 | [G104](<05-files-storage-recovery.md#g104>) · 작업 | 복구본 폐기 실패 시 열린 문서 상태 보존 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 
 <a id="work-5"></a>
@@ -145,13 +145,13 @@
 <summary>B001 · 새 문서</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ◐ 부분.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 새 창과 새 탭 구분 관찰 필요
+- 다음 작업: 실제 Windows Alt+N 독립 창·Ctrl+Alt+T 새 탭·고유 저장소·복구 보관 종료·동일 UUID 재열기·OS 저장과 독립 readback 완료. 정식73 Native 창/파일29검사와 Agent6/Edge12 통과. 한글 전체 문맥·서식·대화상자 동등성은 별도 검수.
 - UI 명령: `file:new-doc`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `PARTIAL;NOT_RUN`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [110-file-preservation-integration.md](<../110-file-preservation-integration.md>)
+- 원래 기록: `PARTIAL;NOT_RUN;SCOPED_NATIVE_WINDOWS_AND_AGENT_FILE_PORT_REVIEWED_2026_10_18`
 
 </details>
 
@@ -159,13 +159,14 @@
 <summary>B002 · 새 탭</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: shell 문서 탭으로 위임
+- 다음 작업: 실제 Windows Alt+N 독립 창·Ctrl+Alt+T 새 탭·고유 저장소·복구 보관 종료·동일 UUID 재열기·OS 저장과 독립 readback 완료. 정식73 Native 창/파일29검사와 Agent6/Edge12 통과. 한글 전체 문맥·서식·대화상자 동등성은 별도 검수.
 - UI 명령: `file:new-doc`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `WIRED;NOT_RUN`
+- Agent 명령: `list_document_tabs;new_document_tab;activate_document_tab`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [110-file-preservation-integration.md](<../110-file-preservation-integration.md>)
+- 원래 기록: `WIRED;NOT_RUN;SCOPED_NATIVE_WINDOWS_AND_AGENT_FILE_PORT_REVIEWED_2026_10_18`
 
 </details>
 
@@ -204,9 +205,9 @@
 - 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
 - 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 일반 XML 서식/스키마 UI 없음. HML 엔진·저장 경로는 존재하며 shell 열기 연결과 구분.
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 다음 작업: 한글 XML은 XSD→HWT 서식·필드/그룹·유효성 검사·XML/XSL 입출력으로 HML과 별개. HML 엔진은 있으나 shell 필터/네이티브 저장·복구 형식 계약도 미연결. 필터만 열어 복구 형식을 혼동하지 않도록 명시적 계약부터 구현.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [110-file-preservation-integration.md](<../110-file-preservation-integration.md>)
+- 원래 기록: `MISSING;NOT_RUN;SCOPED_NATIVE_WINDOWS_AND_AGENT_FILE_PORT_REVIEWED_2026_10_18`
 
 </details>
 
@@ -242,13 +243,14 @@
 <summary>B014 · 문서 정보</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 정식68에서 제목·주제·작성자·키워드·설명5필드 원자 편집과 한 번 Undo/Redo, 두 형식 저장 재열기 구현. Native15/API9/실제 Edge10 통과, 실제 한글 HWP5필드 표시만 확인. 작성·수정일/이력·한글 통계 동일성·HWPX 한글 재저장·Agent 연결은 남음.
+- 다음 작업: 제목·주제·작성자·키워드·설명5필드 CAS 편집·양형식 보존·요청단위 Undo/Redo와 Agent 조회/수정 연결. 정식73 Native6·실제 Edge12·unit898 통과(제공자 응답 fixture). 작성·수정일/이력·한글 통계 동일성·전체 한글 재저장 검수는 남음.
 - UI 명령: `file:document-info`
-- 근거: [parity-result.json](<../evidence/features-2026-10-11/parity-result.json>) · [editor-tests.txt](<../evidence/features-2026-10-11/editor-tests.txt>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [README.md](<../evidence/file-completion-2026-10-17/engine68/metadata/README.md>)
-- 원래 기록: `PARTIAL;FIVE_FIELD_METADATA_EDIT_AND_ROUNDTRIP_VERIFIED_FULL_INFORMATION_PARITY_PENDING_2026_10_17`
+- Agent 명령: `set_document_metadata`
+- 근거: [parity-result.json](<../evidence/features-2026-10-11/parity-result.json>) · [editor-tests.txt](<../evidence/features-2026-10-11/editor-tests.txt>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [README.md](<../evidence/file-completion-2026-10-17/engine68/metadata/README.md>) · [110-file-preservation-integration.md](<../110-file-preservation-integration.md>)
+- 원래 기록: `PARTIAL;FIVE_FIELD_METADATA_EDIT_AND_ROUNDTRIP_VERIFIED_FULL_INFORMATION_PARITY_PENDING_2026_10_17;SCOPED_NATIVE_WINDOWS_AND_AGENT_FILE_PORT_REVIEWED_2026_10_18`
 
 </details>
 
@@ -256,13 +258,14 @@
 <summary>B021 · 문서 닫기</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 통합 파일 메뉴 닫기를 기존 탭 저장/폐기/취소와 연결. 실제 Edge 종료/닫기10사례 및 취소·저장 실패의 열린 상태 보존 검수. 최신 실제 Windows·한글 전체 수명 비교와 Agent 연결은 남음.
+- 다음 작업: 사용자 UI의 저장/폐기/복구 보관/취소와 실패 원복 유지. Agent는 현재 업무의 조회한 clean 탭만 CAS로 닫고 신규 복구본/다른 업무/dirty 탭/부분 실패를 거절. 전체 OS 종료·dirty 폐기 Agent 권한과 모든 한글 문맥 검수는 남음.
 - UI 명령: `ext:jueony-close`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [completion.json](<../evidence/file-completion-2026-10-17/engine68/lifecycle/completion.json>)
-- 원래 기록: `PARTIAL;HOST_MENU_CLOSE_AND_EXIT_LIFECYCLE_VERIFIED_NATIVE_HANCOM_AGENT_PENDING_2026_10_17`
+- Agent 명령: `close_document_tab`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [completion.json](<../evidence/file-completion-2026-10-17/engine68/lifecycle/completion.json>) · [110-file-preservation-integration.md](<../110-file-preservation-integration.md>)
+- 원래 기록: `PARTIAL;HOST_MENU_CLOSE_AND_EXIT_LIFECYCLE_VERIFIED_NATIVE_HANCOM_AGENT_PENDING_2026_10_17;SCOPED_NATIVE_WINDOWS_AND_AGENT_FILE_PORT_REVIEWED_2026_10_18`
 
 </details>
 
@@ -273,10 +276,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: OS X와 파일 메뉴 끝에 같은 coordinator 연결. 모두 파일 저장/저장 안 함/복구본 보관/취소, stable 문서 instance·API·출력 이름, 다문서·다른 업무 checkpoint 원자 변경/실패 CAS 보상 구현. 실제 Edge+합성 Native IPC10·unit29 통과. 새 흐름 실제 Windows/Hancom·Agent 연결은 남음.
+- 다음 작업: 실제 Windows 종료 취소·복구 보관 종료·프로세스 재실행과 독립 창만 종료/같은 UUID 재열기 검수 완료. 원본 파일 불변·최신 dirty 복원·별도 OS 저장 readback 확인. 전체 다창 종료 정책·모든 저장 실패/한글 비교·Agent OS 종료는 남음.
 - UI 명령: `file:exit`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [completion.json](<../evidence/file-completion-2026-10-17/engine68/lifecycle/completion.json>)
-- 원래 기록: `PARTIAL;ATOMIC_SAVE_DISCARD_RECOVERY_CANCEL_IMPLEMENTED_DIRECT_NATIVE_AND_AGENT_PENDING_2026_10_17`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [completion.json](<../evidence/file-completion-2026-10-17/engine68/lifecycle/completion.json>) · [110-file-preservation-integration.md](<../110-file-preservation-integration.md>)
+- 원래 기록: `PARTIAL;ATOMIC_SAVE_DISCARD_RECOVERY_CANCEL_IMPLEMENTED_DIRECT_NATIVE_AND_AGENT_PENDING_2026_10_17;SCOPED_NATIVE_WINDOWS_AND_AGENT_FILE_PORT_REVIEWED_2026_10_18`
 
 </details>
 

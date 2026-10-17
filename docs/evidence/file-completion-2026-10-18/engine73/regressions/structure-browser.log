@@ -1,0 +1,14 @@
+PASS openai-responses: actual chat split/attach, compare, undo/redo, safe save and UI reopen
+PASS anthropic: actual chat split/attach, compare, undo/redo, safe save and UI reopen
+PASS gemini: actual chat split/attach, compare, undo/redo, safe save and UI reopen
+PASS openai-compatible: actual chat split/attach, compare, undo/redo, safe save and UI reopen
+PASS second interior boundary and explicit next target retain row/column widths and cursor
+PASS first/last boundary, alias, missing table, arbitrary next target and batch never write
+PASS HWP, protection, merged grid, mixed original, field, bookmark and caption remain readonly
+PASS attach rejects nonblank gap, unequal next columns, caption and foreign next target
+PASS live split false/no-op/throw or equal-length body/cell contamination restores bytes/history/dirty/cursor
+PASS live attach throw or unrelated equal-length body contamination restores both tables
+PASS post-render split geometry failure restores snapshot and next request succeeds
+PASS late model response cannot overwrite newer user cell edit
+PASS unsaved split restores after workspace restart then attaches and undoes
+PASS later section split/attach mapping, following table and actual UI save/reopen

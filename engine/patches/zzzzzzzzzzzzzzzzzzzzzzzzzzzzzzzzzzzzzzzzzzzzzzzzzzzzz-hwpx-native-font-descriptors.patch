@@ -1,0 +1,22 @@
+diff --git a/src/parser/hwpx/header.rs b/src/parser/hwpx/header.rs
+index 30d1ffc..f3fb51d 100644
+--- a/src/parser/hwpx/header.rs
++++ b/src/parser/hwpx/header.rs
+@@ -581,7 +581,7 @@ fn synthesize_serif_type(font_name: &str, font_type: u8) -> u8 {
+     }
+ 
+     match font_name {
+-        "굴림" => 11,
++        "굴림" | "굴림체" | "맑은 고딕" => 11,
+         name if name.contains("바탕") || name.contains("명조") => 3,
+         _ => 0,
+     }
+@@ -602,7 +602,7 @@ fn hwp5_default_font_name(name: &str) -> Option<&'static str> {
+         "신명 태고딕" => Some("Sinmyeong TaeGothic"),
+         "신명 태그래픽" => Some("Sinmyeong TaeGraphic"),
+         "한양견명조" => Some("HY GyeonMyeongJo"),
+-        "한양신명조" => Some("HY ShinMyungJo"),
++        "한양신명조" => Some("HY Sinmyeongjo"),
+         "한양중고딕" => Some("HY JungGothic"),
+         "명조" => Some("Myeongjo"),
+         _ => None,

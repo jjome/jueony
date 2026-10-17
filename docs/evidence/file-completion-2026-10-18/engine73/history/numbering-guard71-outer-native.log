@@ -1,0 +1,4 @@
+PASS hwp fresh: four outer margins, live geometry, repeated export, snapshot and preserved cells
+PASS hwp loaded: four outer margins, live geometry, repeated export, snapshot and preserved cells
+FAIL hwpx fresh: four outer margins, live geometry, repeated export, snapshot and preserved cells 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 1건의 손실을 보고했습니다). 원본과 기존 복구본은 유지됩니다.
+PASS hwpx loaded: four outer margins, live geometry, repeated export, snapshot and preserved cells

@@ -1,0 +1,17 @@
+PASS hwp: rectangular preset preserves protected unselected vertical merge and selection boundary lines
+PASS hwp: explicit months series scratch/save/reopen preserves anchored dates and target formatting
+PASS hwp: explicit years series scratch/save/reopen preserves anchored dates and target formatting
+PASS hwp: merged whole-table transpose retains cell spans, multiple paragraphs and mixed formats
+PASS hwp: literal Unicode/empty-cell conversion, scratch preflight and two saved roundtrips
+PASS hwpx: rectangular preset preserves protected unselected vertical merge and selection boundary lines
+PASS hwpx: explicit months series scratch/save/reopen preserves anchored dates and target formatting
+PASS hwpx: explicit years series scratch/save/reopen preserves anchored dates and target formatting
+PASS hwpx: merged whole-table transpose retains cell spans, multiple paragraphs and mixed formats
+PASS hwpx: literal Unicode/empty-cell conversion, scratch preflight and two saved roundtrips
+PASS native unsafe conversion refuses stale content, merged/protected cells and literal host tabs without mutations
+PASS hwp: selected integer series preserves target style/geometry and unrelated cells through scratch/save/reopen
+PASS hwpx: selected integer series preserves target style/geometry and unrelated cells through scratch/save/reopen
+PASS hwp: table gallery on a fresh production document, four presets and mixed text preservation
+PASS hwp: exact numeric paragraph sort preserves mixed formatting and title/neighbor paragraphs
+PASS hwpx: table gallery on a fresh production document, four presets and mixed text preservation
+PASS hwpx: exact numeric paragraph sort preserves mixed formatting and title/neighbor paragraphs

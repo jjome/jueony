@@ -1,3 +1,5 @@
+import {createAgentFilePort} from './adapters/desktop/agent-files.ts';
+import {readDocumentWindowContext,mainDocumentWindow,createDocumentWindows,assertTabCapacity} from './adapters/desktop/document-windows.ts';
 import {installNativeFilePickers,installNativeExitProtection,nativeFileToken,nativeRecentHandle} from './adapters/desktop/native-host.ts';
 import {createNativeRecents} from './adapters/desktop/native-recents.ts';
 import {createDocumentLifecycle,assertExitSavedTransition} from './adapters/desktop/document-lifecycle.ts';
@@ -38,6 +40,8 @@ const {store,connections:port,modelGateway}=createWorkbenchServices();
 let state:AppState,activeTab:Tab|undefined,restoring=false,persistError=false,closing=false,stateWrites=0;
 let running:{controller:AbortController;run:Run}|undefined;
 const nativeHost=installNativeFilePickers(window);
+let documentWindow=mainDocumentWindow;
+let agentFilePending=false;const agentFileAuthority=Symbol('agent-current-workspace-tab-action');
 let nativeExitPending=false,nativeExit:ReturnType<typeof installNativeExitProtection>|undefined;
 type Tab={id:string;workspaceId:string;frame:HTMLIFrameElement;wrapper:HTMLElement;button:HTMLButtonElement;ready:Promise<DocumentFrameClient|null>;api:DocumentFrameClient|null;closed:boolean;initialized:boolean;restoreError?:string;pendingConnection?:StoredFileConnection;pendingIdentity?:string;handle?:FileSystemFileHandle;timer?:number;persistError?:boolean;preferenceError?:boolean;preferenceMessage?:string;pendingWrites?:number;persist:Promise<void>;recovery?:ReturnType<typeof createRecoveryCoordinator>;disposeTabCycle?:()=>void;cachedDocument?:SavedDocument};
 const tabs:Tab[]=[];const loaded=new Set<string>();let recoveryWarning=false;let selected:Reference[]=[];
@@ -68,12 +72,13 @@ const chat=()=>workspace.chat(work().id,work().activeChatId);
 const session=createSessionFacade({state:{activeWorkspaceId:()=>state.activeWorkspaceId,workspaces:()=>state.workspaces,tabs:()=>tabs.map(({id,workspaceId,closed})=>({id,workspaceId,closed}))},lifecycle:{setOrder:(id,order)=>{workspace.workspace(id).documentOrder=order;},setActiveDocument:(id,documentId)=>{workspace.workspace(id).activeDocumentId=documentId;}}});
 const button=(label:string,action:()=>unknown)=>{const b=document.createElement('button');b.textContent=label;b.type='button';b.onclick=()=>{try{void Promise.resolve(action()).catch(error);}catch(e){error(e);}};return b;};
 const nativeRecents=nativeHost?createNativeRecents({invoke:nativeHost.core.invoke.bind(nativeHost.core),workspace:()=>state?.activeWorkspaceId??'',canNavigate:()=>!closing&&!restoring&&!nativeExitPending&&cancelNavigation(),handle:info=>nativeRecentHandle(window,info),token:nativeFileToken,open:openHandle,confirm:message=>window.confirm(message),notice:status,changed:()=>chrome.refresh()}):undefined;
+const documentWindows=createDocumentWindows({invoke:nativeHost?.core.invoke.bind(nativeHost.core),canNavigate:()=>Boolean(state)&&!nativeExitPending&&!closing&&!restoring&&!running&&!activeTab?.api?.busy()&&!document.querySelector('dialog[open]'),newTab:()=>newTab(),changed:()=>chrome.refresh()});
 const lifecycle=createDocumentLifecycle({canClose:()=>Boolean(activeTab?.initialized&&activeTab.api&&!activeTab.api.busy()&&!closing&&!restoring&&!nativeExitPending&&!running&&!document.querySelector('dialog[open]')),canExit:()=>Boolean(nativeExit&&!nativeExitSnapshot().blocked),close:async()=>{if(activeTab)await closeTab(activeTab);},exit:async()=>{if(!nativeExit)throw Error('프로그램 종료 보호를 확인할 수 없습니다.');await nativeExit.request({preventDefault(){}});}});
-const chrome=installUnifiedChrome({menus:$('unified-menus'),tools:$('unified-tools'),active:()=>{const api=activeTab?.initialized?activeTab.api??undefined:undefined;return api?lifecycle.wrap(nativeRecents?.wrap(api)??api):undefined;},execute:(id,params)=>{if(running?.run.status==='applying')throw new Error('문서 적용 중입니다.');if(id==='ext:jueony-close'||id==='file:exit')return lifecycle.execute(id);if(nativeRecents&&(id==='file:open-native-recent'||id==='file:clear-native-recent'))return nativeRecents.execute(id,params);if(id==='file:open'){$('open-document').click();return;}const result=activeTab?.api!.executeCommand(id,params);if(!result?.ok)throw new Error(result?.message??'현재 문서에서 실행할 수 없습니다.');},error});
-const on=(id:string,action:()=>unknown)=>$(id).addEventListener('click',()=>{try{void Promise.resolve(action()).catch(error);}catch(e){error(e);}});
+const chrome=installUnifiedChrome({menus:$('unified-menus'),tools:$('unified-tools'),active:()=>{const api=activeTab?.initialized?activeTab.api??undefined:undefined;return api?documentWindows.wrap(lifecycle.wrap(nativeRecents?.wrap(api)??api)):undefined;},execute:(id,params)=>{if(running?.run.status==='applying')throw new Error('문서 적용 중입니다.');if(id==='file:new-doc'||id==='file:new-tab'||id==='file:restore-document-window')return documentWindows.execute(id,params);if(id==='ext:jueony-close'||id==='file:exit')return lifecycle.execute(id);if(nativeRecents&&(id==='file:open-native-recent'||id==='file:clear-native-recent'))return nativeRecents.execute(id,params);if(id==='file:open'){$('open-document').click();return;}const result=activeTab?.api!.executeCommand(id,params);if(!result?.ok)throw new Error(result?.message??'현재 문서에서 실행할 수 없습니다.');},error});
+const on=(id:string,action:()=>unknown)=>$(id).addEventListener('click',()=>{if(agentFilePending){status('Agent 문서 탭 작업을 마친 뒤 실행하세요.');return;}try{void Promise.resolve(action()).catch(error);}catch(e){error(e);}});
 async function persist(){stateWrites++;try{await store.save(state);persistError=false;}catch(e){persistError=true;throw e;}finally{stateWrites--;}}
 const navigation=createSessionGuard(()=>({closing,restoring,runStatus:running?.run.status}),()=>running?.controller.abort(),status);
-const cancelNavigation=()=>navigation.canNavigate();
+const cancelNavigation=()=>{if(agentFilePending){status('Agent 문서 탭 작업 중에는 업무와 문서를 전환하지 않습니다.');return false;}return navigation.canNavigate();};
 function options(select:HTMLSelectElement,items:{value:string;text:string}[],value?:string){select.replaceChildren(...items.map(item=>{const o=document.createElement('option');o.value=item.value;o.textContent=item.text;return o;}));if(value&&items.some(x=>x.value===value))select.value=value;}
 const connectionUI=installConnectionsPanel({port,models:()=>state.models,replaceModels:models=>{state.models=models;},chat,isRunning:()=>Boolean(running),persist,renderModels,status,error,uid});
 function renderModels(){
@@ -175,8 +180,10 @@ async function persistCachedView(tab:Tab){
  tab.persist=tab.persist.catch(()=>{}).then(()=>store.saveDocument(data));
  try{await tab.persist;tab.cachedDocument=data;tab.persistError=false;}catch(e){tab.persistError=true;throw e;}finally{tab.pendingWrites!--;}
 }
-function selectTab(tab:Tab){if(!session.canSelect(tab.id))return;if(activeTab?.initialized&&activeTab!==tab){activeTab.api!.suspendDocumentView();void persistTab(activeTab).catch(error);}if(!session.select(tab.id))return;activeTab=tab;for(const t of tabs){t.frame.hidden=t!==tab;t.wrapper.hidden=t.workspaceId!==work().id;t.wrapper.classList.toggle('is-active',t===tab);t.button.setAttribute('aria-selected',String(t===tab));}refreshTab(tab);tab.frame.contentWindow?.dispatchEvent(new Event('resize'));void persist().catch(error);}
-async function newTab(workspaceId=work().id,saved?:SavedDocument,forExisting=false){
+function selectTab(tab:Tab,authority?:symbol){if(agentFilePending&&authority!==agentFileAuthority)return;if(!session.canSelect(tab.id))return;if(activeTab?.initialized&&activeTab!==tab){activeTab.api!.suspendDocumentView();void persistTab(activeTab).catch(error);}if(!session.select(tab.id))return;activeTab=tab;for(const t of tabs){t.frame.hidden=t!==tab;t.wrapper.hidden=t.workspaceId!==work().id;t.wrapper.classList.toggle('is-active',t===tab);t.button.setAttribute('aria-selected',String(t===tab));}refreshTab(tab);tab.frame.contentWindow?.dispatchEvent(new Event('resize'));void persist().catch(error);}
+async function newTab(workspaceId=work().id,saved?:SavedDocument,forExisting=false,authority?:symbol){
+ if(agentFilePending&&authority!==agentFileAuthority)throw Error('Agent 문서 탭 작업을 마친 뒤 새 문서를 여세요.');
+ assertTabCapacity(tabs.filter(tab=>!tab.closed).length);
  if(saved)assertRecoveryRecord(saved,workspaceId,recoveryIntegrity);
  const frame=document.createElement('iframe');const wrapper=document.createElement('div');wrapper.className='document-tab-wrap';
  const tab:Tab={id:saved?.id??uid(),workspaceId,frame,wrapper,button:button('문서 준비 중…',()=>{if(cancelNavigation())selectTab(tab);}),closed:false,initialized:false,pendingConnection:saved?.fileConnection,api:null,ready:Promise.resolve(null),persist:Promise.resolve()};
@@ -185,7 +192,7 @@ async function newTab(workspaceId=work().id,saved?:SavedDocument,forExisting=fal
  frame.className='editor-frame';frame.title='한글 문서 편집기';const url=new URL('./editor.html',location.href);url.searchParams.set('child','1');url.searchParams.set('skipRecovery','1');if(saved||forExisting)url.searchParams.set('skipDefaults','1');if(new URLSearchParams(location.search).get('storage')==='download')url.searchParams.set('storage','download');frame.src=url.href;
  tabs.push(tab);session.opened(tab);$('documents').append(frame);$('document-tab-list').append(wrapper);
  tab.ready=connectDocumentFrame(frame,()=>tab.closed).then(api=>{tab.api=api;return api;});
- if(workspaceId===work().id)selectTab(tab);else frame.hidden=true;
+ if(workspaceId===work().id)selectTab(tab,authority);else frame.hidden=true;
  try {
   const api=(await tab.ready)!;
   // Fix the final viewport before restoring scroll; hiding chrome afterward clamps bottom positions.
@@ -254,10 +261,25 @@ async function closeTab(tab:Tab){
  // Embedded frames have no private autosave owner. Deleting the workspace draft
  // is the discard commit: until that succeeds, keep the live dirty/undo state so
  // a failed IDB delete cannot turn unsaved work into an apparently saved tab.
- clearTimeout(tab.timer);tab.closed=true;await tab.persist.catch(()=>{});try{await store.removeDocument(tab.id);}catch(e){tab.closed=false;refreshTab(tab);throw e;}tab.recovery?.dispose();tab.disposeTabCycle?.();tabs.splice(tabs.indexOf(tab),1);const nextId=session.closed(tab);tab.frame.remove();tab.wrapper.remove();
- const next=tabs.find(t=>t.id===nextId);if(next)selectTab(next);else await newTab();
+ await commitClosedTab(tab);
  }finally{closing=false;}
 }
+function closeVersion(tab:Tab){return{api:tab.api,instance:tab.api!.documentInstance(),revision:tab.api!.revision(),identity:tab.api!.documentIdentity(),handle:tab.api!.fileHandle(),dirty:tab.api!.state().dirty,workspaceId:tab.workspaceId};}
+async function commitClosedTab(tab:Tab,authority?:symbol,expected?:ReturnType<typeof closeVersion>){
+ const assertOwned=()=>{if(tab.closed||!tabs.includes(tab)||!tab.api||!tab.initialized)throw Error('닫을 문서 탭의 소유 정보가 바뀌었습니다.');if(authority===agentFileAuthority){if(!agentFilePending||!expected||work().id!==expected.workspaceId||tab.workspaceId!==expected.workspaceId||tab.api!==expected.api||tab.api.documentInstance()!==expected.instance||tab.api.revision()!==expected.revision||tab.api.documentIdentity()!==expected.identity||tab.api.fileHandle()!==expected.handle||tab.api.state().dirty||tab.api.busy())throw Error('문서가 바뀌어 Agent가 닫지 않았습니다. 사용자 확인으로 닫아 주세요.');}};
+ assertOwned();clearTimeout(tab.timer);tab.closed=true;
+ try{await tab.persist.catch(()=>{});tab.closed=false;assertOwned();tab.closed=true;
+  if(authority===agentFileAuthority){const record=(await store.documents(tab.workspaceId)).find(record=>record.id===tab.id);tab.closed=false;assertOwned();tab.closed=true;await store.removeDocumentIfUnchanged(tab.id,tab.workspaceId,record);}else await store.removeDocument(tab.id);
+ }catch(error){tab.closed=false;refreshTab(tab);throw error;}
+ tab.recovery?.dispose();tab.disposeTabCycle?.();tabs.splice(tabs.indexOf(tab),1);const nextId=session.closed(tab);tab.frame.remove();tab.wrapper.remove();
+ const next=tabs.find(t=>t.id===nextId);if(next)selectTab(next,authority);else await newTab(work().id,undefined,false,authority);
+}
+const agentFilePort=createAgentFilePort({read:()=>({workspaceId:state?.activeWorkspaceId??'',activeTabId:activeTab?.id??'',blocked:!state||closing||restoring||nativeExitPending||Boolean(document.querySelector('dialog[open]')),tabs:tabs.filter(tab=>!tab.closed).map(tab=>({id:tab.id,workspaceId:tab.workspaceId,name:tab.api?.state().name??'',dirty:tab.api?.state().dirty??true,revision:tab.api?.revision()??'',instance:tab.api?.documentInstance()??'',busy:tab.api?.busy()??true,initialized:tab.initialized}))}),
+ freeze:()=>{if(agentFilePending||nativeExitPending||closing||restoring)throw Error('다른 문서 작업 중입니다.');const leases:(()=>void)[]=[];try{for(const tab of tabs.filter(tab=>!tab.closed))if(tab.api)leases.push(tab.api.acquireHostMutationLock());}catch(error){for(const release of leases.reverse())release();throw error;}agentFilePending=true;const elements=Array.from(document.body.children).filter((e):e is HTMLElement=>e instanceof HTMLElement),previous=elements.map(e=>e.inert);elements.forEach(e=>e.inert=true);return()=>{elements.forEach((e,i)=>e.inert=previous[i]);for(const release of leases.reverse())release();agentFilePending=false;};},
+ newTab:async()=>{await newTab(work().id,undefined,false,agentFileAuthority);},
+ activate:async id=>{const tab=tabs.find(tab=>tab.id===id&&tab.workspaceId===work().id);if(!tab)throw Error('현재 업무의 탭이 아닙니다.');selectTab(tab,agentFileAuthority);await persist();},
+ closeClean:async id=>{const tab=tabs.find(tab=>tab.id===id&&tab.workspaceId===work().id);if(!tab?.api||tab.api.state().dirty)throw Error('수정한 문서는 사용자 확인으로 닫아 주세요.');await commitClosedTab(tab,agentFileAuthority,closeVersion(tab));await persist();},
+});
 async function switchWorkspace(id:string){
  if(restoring||closing||!cancelNavigation()){render();return;}restoring=true;
  try{if(activeTab?.initialized)activeTab.api!.suspendDocumentView();if(activeTab?.initialized&&!await persistTab(activeTab))throw new Error('문서 작업이 끝난 뒤 업무를 전환해 주세요.');state.activeWorkspaceId=id;selected=[];activeTab=undefined;render();
@@ -266,18 +288,19 @@ async function switchWorkspace(id:string){
   const tab=tabs.find(t=>t.id===session.preferred(id,previousDocumentId))??await newTab(id);selectTab(tab);render();await renderFolders();await persist();
  }finally{restoring=false;}
 }
-function updateRun(){const busy=Boolean(running);$<HTMLButtonElement>('send-request').disabled=busy;$<HTMLButtonElement>('cancel-run').disabled=!busy||running?.run.status==='applying';$('run-status').textContent=running?runLabels[running.run.status]:'지원: 본문 · 서식 · 표 · 용지/여백';}
+function updateRun(){const busy=Boolean(running);$<HTMLButtonElement>('send-request').disabled=busy;$<HTMLButtonElement>('cancel-run').disabled=!busy||running?.run.status==='applying';$('run-status').textContent=running?runLabels[running.run.status]:'지원: 본문 · 서식 · 표 · 문서 요약 · 현재 업무의 탭 조회/생성/선택/수정하지 않은 탭 닫기';}
 async function send(){
  const input=$<HTMLTextAreaElement>('request-input');const request=input.value.trim();if(!request)return;
  $('request-error').hidden=true;
  if(running)throw new Error('현재 요청이 진행 중입니다. 완료를 기다리거나 중지한 뒤 전송해 주세요.');
+ if(agentFilePending||closing||nativeExitPending)throw new Error('문서 작업을 마친 뒤 요청하세요.');
  if(restoring)throw new Error('문서를 준비하고 있습니다. 준비 완료 후 다시 전송해 주세요.');
  const model=state.models.find(m=>m.id===$<HTMLSelectElement>('model-select').value);if(!model)throw new Error('먼저 AI 연결을 등록해 주세요.');
  const original=activeTab;if(!original?.api||!original.initialized||original.workspaceId!==work().id)throw new Error('문서 준비를 기다려 주세요.');
  const workspaceId=work().id,chatId=chat().id,run:Run={id:uid(),workspaceId,chatId,documentId:original.id,status:'preparing_context',model:{adapterId:model.adapterId,label:model.label,endpoint:model.endpoint,modelId:model.modelId,maxOutputTokens:model.maxOutputTokens},sources:[],createdAt:Date.now()};
  const controller=new AbortController();running={controller,run};state.runs.push(run);workspace.appendMessage(workspaceId,chatId,{id:uid(),role:'user',text:request,runId:run.id});input.value='';renderMessages();updateRun();
  try{
-  await persist();const snapshot:Snapshot=original.api!.snapshot();
+  await persist();const snapshot:Snapshot={...original.api!.snapshot(),fileContext:agentFilePort.snapshot()};
   const references=await readReferences([...selected],state.folders,workspaceId,bytes=>original.api!.readReference(bytes),controller.signal,async handle=>{
    for(const tab of tabs.filter(t=>t.workspaceId===workspaceId&&t.api?.fileHandle()))if(await handle.isSameEntry(tab.api!.fileHandle()!)){const current:Snapshot=tab.api!.snapshot();return {text:current.plainText??current.nodes.map(n=>n.text).join('\n'),revision:current.revision};}
    return undefined;
@@ -286,14 +309,14 @@ async function send(){
   const retrieved=state.retrieveSources?await agent.contextWithRetrieval([state,workspaceId,chatId,snapshot,references,request],controller.signal):undefined;
   const context=retrieved?.context??agent.context(state,workspaceId,chatId,snapshot,references,request);
   run.sources=context.references.map(({text,...source})=>source);run.retrieval=retrieved?.retrieval;run.events=[];
-  const result=await agent.execute({runId:run.id,context,model,port:modelGateway,editor:original.api,signal:controller.signal,
+  const result=await agent.execute({runId:run.id,context,model,port:modelGateway,editor:original.api,filePort:agentFilePort,signal:controller.signal,
    isCurrent:()=>work().id===workspaceId&&chat().id===chatId&&activeTab?.id===run.documentId,
    createDocument:async()=>{const tab=await newTab(workspaceId);run.documentId=tab.id;return tab.api!;},
    onEvent:(event:any)=>{run.events!.push(event);if(run.events!.length>40)run.events!.shift();renderMessages();},
    state:s=>{run.status=s;updateRun();renderMessages();void persist().catch(error);}},state.reviewBeforeApply?'bounded':'single');
-  run.status='completed';run.receipt=result.receipt;run.usedSourceIds=result.sourceIds;
+  run.status='completed';run.receipt=result.receipt;run.usedSourceIds=result.sourceIds;if(result.fileReceipt)run.documentId=result.fileReceipt.after.activeTabId;
   if(result.receipt&&result.generation)try{run.macroTemplate=automation.capture(result.generation,snapshot);}catch{/* Unsupported command groups are not offered as recordable macros. */}
-  workspace.appendMessage(workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:result.message+'\n\n'+(result.receipt?result.receipt.operationCount+'개 명령을 실제 문서에 적용했습니다. 파일 저장은 별도로 실행하세요.':'문서에 적용한 변경은 없습니다.')});
+  workspace.appendMessage(workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:result.message+'\n\n'+(result.fileReceipt?result.fileReceipt.message:result.receipt?result.receipt.operationCount+'개 명령을 실제 문서에 적용했습니다. 파일 저장은 별도로 실행하세요.':'문서에 적용한 변경은 없습니다.')});
   const tab=tabs.find(t=>t.id===run.documentId);
   try{if(tab)await persistTab(tab);status('AI 요청이 완료되었습니다.');}catch(e){persistError=true;run.error='문서 변경은 적용됐지만 로컬 복구본 저장에 실패했습니다. 문서를 파일로 저장해 주세요.';workspace.appendMessage(workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:run.error});status(run.error);}
  }catch(e){
@@ -354,7 +377,7 @@ async function executeMacro(){
  finally{running=undefined;await persist().catch(error);renderMessages();updateRun();}
 }
 installDocumentDefaultsPanel({status,error});
-window.addEventListener('keydown',e=>{if(nativeExitPending){if(!document.getElementById('native-exit-confirm')?.contains(e.target as Node)){e.preventDefault();e.stopImmediatePropagation();}return;}if(e.isComposing||document.querySelector('dialog[open]'))return;if(e.key==='F6'&&e.altKey&&!e.ctrlKey&&!e.shiftKey){e.preventDefault();if(document.activeElement===activeTab?.frame)$('request-input').focus();else activeTab?.api?.focusEditor();}if(e.ctrlKey&&!e.altKey&&!e.shiftKey&&e.code==='KeyS'){e.preventDefault();$('save-document').click();}});
+window.addEventListener('keydown',e=>{if(agentFilePending){e.preventDefault();e.stopImmediatePropagation();return;}if(nativeExitPending){if(!document.getElementById('native-exit-confirm')?.contains(e.target as Node)){e.preventDefault();e.stopImmediatePropagation();}return;}if(e.isComposing||document.querySelector('dialog[open]'))return;if(!e.metaKey&&!e.shiftKey&&e.altKey&&((!e.ctrlKey&&e.code==='KeyN')||(e.ctrlKey&&e.code==='KeyT'))){e.preventDefault();if(!e.repeat)void documentWindows.execute(e.ctrlKey?'file:new-tab':'file:new-doc').catch(error);return;}if(e.key==='F6'&&e.altKey&&!e.ctrlKey&&!e.shiftKey){e.preventDefault();if(document.activeElement===activeTab?.frame)$('request-input').focus();else activeTab?.api?.focusEditor();}if(e.ctrlKey&&!e.altKey&&!e.shiftKey&&e.code==='KeyS'){e.preventDefault();$('save-document').click();}});
 on('add-workspace',async()=>{if(!cancelNavigation())return;const name=prompt('새 업무 이름');if(!name?.trim())return;const w=workspace.addWorkspace(name);await switchWorkspace(w.id);});
 on('rename-workspace',async()=>{const name=prompt('업무 이름',work().name);if(name?.trim()){work().name=name.trim();render();await persist();}});
 $('workspace-select').addEventListener('change',()=>void switchWorkspace($<HTMLSelectElement>('workspace-select').value).catch(error));
@@ -394,11 +417,11 @@ split.addEventListener('pointerdown',e=>{dragging=true;split.setPointerCapture(e
 split.addEventListener('pointermove',e=>{if(!dragging)return;const rect=$('sidebar').getBoundingClientRect();state.split=Math.max(20,Math.min(75,Math.round((e.clientY-rect.top)/rect.height*100)));$('sidebar').style.setProperty('--chat-share',state.split+'%');split.setAttribute('aria-valuenow',String(state.split));});
 split.addEventListener('pointerup',()=>{dragging=false;void persist().catch(error);});
 split.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();state.split=Math.max(20,Math.min(75,state.split+(e.key==='ArrowUp'?-3:3)));$('sidebar').style.setProperty('--chat-share',state.split+'%');split.setAttribute('aria-valuenow',String(state.split));void persist().catch(error);}});
-window.addEventListener('message',event=>{if(event.origin!==location.origin)return;const tab=tabs.find(t=>t.frame.contentWindow===event.source);if(!tab)return;if(event.data?.type==='jueony:status')refreshTab(tab);if(event.data?.type==='jueony:command-state'&&tab===activeTab)chrome.refresh();if(event.data?.type==='jueony:focus-chat'&&tab===activeTab){if(state.focusMode){state.focusMode=false;render();void persist().catch(error);}$('request-input').focus();}if(event.data?.type==='jueony:preferences-state'){recoverySettingsWatcher.refresh();tab.preferenceError=Boolean(event.data.error);tab.preferenceMessage=tab.preferenceError?String(event.data.message):undefined;if(tab.preferenceError)status(tab.preferenceMessage!);}if(event.data?.type==='jueony:new-document'&&tab===activeTab&&cancelNavigation())void newTab().catch(error);if(event.data?.type==='jueony:close-document'&&tab===activeTab)void closeTab(tab).catch(error);});
+window.addEventListener('message',event=>{if(event.origin!==location.origin)return;const tab=tabs.find(t=>t.frame.contentWindow===event.source);if(!tab)return;if(event.data?.type==='jueony:status')refreshTab(tab);if(event.data?.type==='jueony:command-state'&&tab===activeTab)chrome.refresh();if(event.data?.type==='jueony:focus-chat'&&tab===activeTab){if(state.focusMode){state.focusMode=false;render();void persist().catch(error);}$('request-input').focus();}if(event.data?.type==='jueony:preferences-state'){recoverySettingsWatcher.refresh();tab.preferenceError=Boolean(event.data.error);tab.preferenceMessage=tab.preferenceError?String(event.data.message):undefined;if(tab.preferenceError)status(tab.preferenceMessage!);}if(['jueony:new-document','jueony:new-tab'].includes(event.data?.type)&&tab===activeTab&&cancelNavigation())void documentWindows.execute('file:new-tab').catch(error);if(event.data?.type==='jueony:new-document-window'&&tab===activeTab)void documentWindows.execute('file:new-doc').catch(error);if(event.data?.type==='jueony:close-document'&&tab===activeTab)void closeTab(tab).catch(error);});
 function nativeExitSnapshot(){
  const documents=tabs.filter(tab=>!tab.closed);
  return {stamp:JSON.stringify({workspace:state?.activeWorkspaceId,documents:documents.map(tab=>({id:tab.id,workspaceId:tab.workspaceId,identity:tab.api?.documentIdentity(),instance:tab.api?.documentInstance(),name:tab.api?.state().name,revision:tab.api?.revision(),dirty:tab.api?.state().dirty}))}),
-  blocked:!state||restoring||stateWrites>0||(closing&&!nativeExitPending)||Boolean(running)||documents.some(tab=>!tab.initialized||!tab.api||tab.api.busy()||(tab.pendingWrites??0)>0)||Boolean(document.querySelector('dialog[open]')),
+  blocked:!state||agentFilePending||restoring||stateWrites>0||(closing&&!nativeExitPending)||Boolean(running)||documents.some(tab=>!tab.initialized||!tab.api||tab.api.busy()||(tab.pendingWrites??0)>0)||Boolean(document.querySelector('dialog[open]')),
   needsConfirmation:documents.some(tab=>Boolean(tab.api?.state().dirty))};
 }
 let nativeExitMode:'checkpoint'|'discard'='checkpoint',nativeExitRollback:(()=>Promise<void>)|undefined;
@@ -462,7 +485,7 @@ if(nativeHost){
   snapshot:nativeExitSnapshot,confirm:confirmNativeRecoveryExit,checkpoint:commitNativeExitRecovery,
   freeze:()=>{nativeExitMode='checkpoint';nativeExitRollback=undefined;const previousClosing=closing;nativeExitPending=true;closing=true;for(const tab of tabs){clearTimeout(tab.timer);tab.recovery?.updateSettings({...recoverySettings,recoveryEnabled:false,idleSaveEnabled:false});}const elements=Array.from(document.body.children).filter((element):element is HTMLElement=>element instanceof HTMLElement);const previous=elements.map(element=>element.inert);elements.forEach(element=>element.inert=true);return()=>{elements.forEach((element,index)=>element.inert=previous[index]);nativeExitPending=false;closing=previousClosing;for(const tab of tabs){tab.recovery?.updateSettings(recoverySettings);refreshTab(tab);}};},
   error:value=>status('종료하지 않았습니다. '+(value instanceof Error?value.message:String(value))),
- });
+ },async()=>{if(documentWindow.kind==='document')await nativeHost.core.invoke('close_document_window',{recoverable:nativeExitMode!=='discard'&&tabs.some(tab=>!tab.closed&&tab.api?.state().dirty)});else await nativeHost.window.getCurrentWindow().destroy();});
  void nativeExit.ready.catch(value=>status('네이티브 종료 보호를 설치하지 못했습니다. 문서를 파일에 저장한 뒤 종료해 주세요. '+String(value)));
 }
 window.addEventListener('beforeunload',event=>{
@@ -475,11 +498,11 @@ window.addEventListener('beforeunload',event=>{
  if(protect){event.preventDefault();event.returnValue='';}
 });
 window.addEventListener('pagehide',checkpointExitView);
-async function start(){await store.open();state=await store.load();installPaneResize({root:$('app-shell'),sidebar:$('sidebar'),handle:$('agent-editor-split'),chat:$('chat-panel'),initialWidth:state.agentWidth,commit:width=>{state.agentWidth=width;void persist().catch(error);}});try{await connectionUI.refresh();}catch{connectionUI.notice='AI 서버를 최신 실행기로 다시 시작해 주세요. 로컬 문서 편집은 사용할 수 있습니다.';}if(!state.workspaces.length)workspace.addWorkspace('내 업무');if(!state.workspaces.some(w=>w.id===state.activeWorkspaceId))state.activeWorkspaceId=state.workspaces[0].id;render();await switchWorkspace(state.activeWorkspaceId);status('로컬 업무 준비 완료 · '+(tabs.some(t=>t.preferenceError)?tabs.find(t=>t.preferenceError)!.preferenceMessage:recoveryWarning||tabs.some(t=>t.restoreError)?'일부 문서 복원 실패: 기존 복구본은 보존했습니다.':tabs.some(t=>t.pendingConnection)?'복구 문서의 원본 연결을 확인하세요.':connectionUI.notice||'AI 연결 설정에서 연결과 키를 변경할 수 있습니다.'));}
+async function start(){await store.open(documentWindow.windowId??undefined);if(documentWindow.kind==='document'){document.title='Jueony · 독립 문서 창';$('app-title').title='독립 문서 창: 이 창의 업무·채팅·문서·복구본은 기본 창과 별도로 보관됩니다.';$('app-title').append(document.createTextNode(' · 독립 문서 창'));}$('new-document').textContent='+ 새 탭';state=await store.load();installPaneResize({root:$('app-shell'),sidebar:$('sidebar'),handle:$('agent-editor-split'),chat:$('chat-panel'),initialWidth:state.agentWidth,commit:width=>{state.agentWidth=width;void persist().catch(error);}});try{await connectionUI.refresh();}catch{connectionUI.notice='AI 서버를 최신 실행기로 다시 시작해 주세요. 로컬 문서 편집은 사용할 수 있습니다.';}if(!state.workspaces.length)workspace.addWorkspace(documentWindow.kind==='document'?'독립 문서 창':'내 업무');if(!state.workspaces.some(w=>w.id===state.activeWorkspaceId))state.activeWorkspaceId=state.workspaces[0].id;render();await switchWorkspace(state.activeWorkspaceId);if(documentWindow.kind==='document'){if(recoveryWarning||tabs.some(tab=>tab.restoreError))throw Error('독립 문서 창의 일부 복구본을 열지 못했습니다. 기존 기록을 보존했습니다.');await nativeHost!.core.invoke('ready_document_window');}status((documentWindow.kind==='document'?'독립 문서 창 준비 완료 · 기본 창의 업무와 별도 보관':'로컬 업무 준비 완료')+' · '+(tabs.some(t=>t.preferenceError)?tabs.find(t=>t.preferenceError)!.preferenceMessage:recoveryWarning||tabs.some(t=>t.restoreError)?'일부 문서 복원 실패: 기존 복구본은 보존했습니다.':tabs.some(t=>t.pendingConnection)?'복구 문서의 원본 연결을 확인하세요.':connectionUI.notice||'AI 연결 설정에서 연결과 키를 변경할 수 있습니다.'));}
 // One writer per browser profile/origin prevents whole-state writes from
 // competing application windows from overwriting each other's workspaces.
-void navigator.locks.request('jueony-workspace-writer',{ifAvailable:true},async lock=>{
+void readDocumentWindowContext(nativeHost?.core.invoke.bind(nativeHost.core),location.search).then(context=>{documentWindow=context;return navigator.locks.request('jueony-workspace-writer'+(context.windowId?'-'+context.windowId:''),{ifAvailable:true},async lock=>{
  if(!lock){$('app-title').inert=true;$('unified-menus').inert=true;$('unified-tools').inert=true;$('app-shell').inert=true;$<HTMLButtonElement>('connection-settings').disabled=true;status('다른 Jueony 창이 열려 있습니다. 기존 창을 사용하거나 닫은 뒤 이 창을 새로고침해 주세요.');return;}
  try{await start();}catch(e){$('unified-menus').inert=true;$('unified-tools').inert=true;$('app-shell').inert=true;$<HTMLButtonElement>('connection-settings').disabled=true;error(e);return;}
  await new Promise<void>(()=>{});
-}).catch(error);
+});}).catch(value=>{$('app-shell').inert=true;error(value);});

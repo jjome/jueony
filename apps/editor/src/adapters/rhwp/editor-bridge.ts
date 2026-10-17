@@ -1,3 +1,5 @@
+import {readAgentDocumentInformation,preflightAgentDocumentMetadata,assertAgentDocumentMetadata} from './agent-document-information.ts';
+import {readDocumentMetadata,DOCUMENT_METADATA_KEYS} from './document-metadata.ts';
 import {readCellParagraphSources,assertCellParagraphResult} from './cell-paragraph.ts';
 import {readTableSubdivisionSources,assertTableSubdivisionResult} from './table-subdivision.ts';
 import {readTableStructureSources,assertTableStructureResult} from './table-structure.ts';
@@ -59,7 +61,7 @@ export function installAgentBridge(d:Deps){
   const structure=readStructure(d.wasm);assertRevision(before,revision());
   const paragraphTabSources=readAgentParagraphTabSources(d.wasm,nodes),paragraphDecorationSources=readAgentParagraphDecorationSources(d.wasm,nodes);assertRevision(before,revision());
   const lists=readAgentParagraphLists(d.wasm,nodes),outlines=readAgentParagraphOutlineSources(d.wasm,nodes,lists.listCatalog);assertRevision(before,revision());
-  return {revision:before,name:d.wasm.fileName,nodes,plainText,structure,cellParagraphSources:readCellParagraphSources(d.wasm,structure.tables,d.wasm.fileName),tableSubdivisionSources:readTableSubdivisionSources(d.wasm,structure.tables,d.wasm.fileName),tableStructureSources:readTableStructureSources(d.wasm,structure.tables,d.wasm.fileName),tableSplitSources:readTableSplitSources(d.wasm,structure.tables,d.wasm.fileName),tableMergeSources:readTableMergeSources(d.wasm,structure.tables,d.wasm.fileName),rowHeightSources:readRowHeightSources(d.wasm,structure.tables,d.wasm.fileName),equalColumnSources:readEqualColumnSources(d.wasm,structure.tables,d.wasm.fileName),cellPaddingSources:readCellPaddingSources(d.wasm,structure.tables,d.wasm.fileName),tablePaginationSources:readAgentTablePaginationSources(d.wasm,structure.tables),tableHeaderSources:readAgentTableHeaderSources(d.wasm,structure.tables),...lists,...outlines,...readAgentStyleCreationSources(d.wasm),...readAgentStyleRenameSources(d.wasm),...readAgentStyleNextSources(d.wasm),...(paragraphTabSources?{paragraphTabSources}:{}),...(paragraphDecorationSources?{paragraphDecorationSources}:{}),limitations:['본문·표의 텍스트와 서식·쪽 설정을 읽습니다. 그림 안 글자/OCR은 읽지 않습니다.','AI 편집: 보호 셀/표는 내용·서식·행/열 변경을 거절합니다. 본문 단순 표 쪽 나눔 none/cell/row(단독 요청, 맨 위 연속 제목 행 수 지정/해제·반복과 쪽 나눔 설정은 단독 요청 지원; 부분/흩어진 제목 원본은 보호), 단순 본문, 글꼴·글자·문단 서식, 새 표·단순 셀·셀 서식·행/열 추가와 삭제, HWPX 본문 단순 표 전체 행에 걸친 두 열 이상 너비 같게(단독 요청, 총너비 유지)·단일 단 구역의 전체 행 열 너비 mm 직접 지정(단독 요청, 본문 폭 이내; 행 높이 같게/직접 지정은 HWPX 한 쪽 단순 표의 전체 행·단독 요청 지원, 내용 최소 높이 초과 시 거절), HWPX 원본의 기존 본문 단순 표 셀 안 여백 네 방향 직접 지정/표 기본값 복귀(단독 요청), 일반 본문 구역 나누기·합치기·검증된 빈 본문 구역 삭제·기존 단순 머리말/꼬리말 텍스트·기본 글자 서식·정렬/백분율 줄 간격 수정·일반 문서의 새 정의 생성/기존 정의 삭제(각 단독 요청), 일반 본문 점 책갈피 추가·이름 변경·삭제(단독 요청), 저장 문단 스타일의 모양을 공유하는 새 이름 정의 생성(단독 요청, 본문 적용은 후속 요청)·기존 문단 스타일 이름/다음 문단 스타일 변경(필드 문서·바탕글/글자/잠금/비정규 원본 제외, 단독 요청), 저장된 구역 개요 모양의 본문 수준 지정·해제(다른 문단 전용 묶음), 새 기본 숫자 번호 3종·7수준·시작 값 생성(단독 요청), 조회된 기본 번호 모양 복제·지정 수준 시작 값·새 목록 적용(단독 요청, 원본 모양 보존 가능 시), 기본 문자 글머리표 8종 새 정의 생성·적용(단독 요청), 현재 문서에 저장된 문단 번호·글머리표 정의 적용/번호 7수준/해제(전용 묶음), 일반 본문 문단 기본 테두리/단색 배경·간격·연결/여백 무시, 일반 본문 문단별 사용자 탭 32개·양 끝 자동 탭(다른 문단 탭끼리 최대 30명령), 구역별 용지·여백·다단·기본 탭, HWPX 기본 본문 줄 번호·기본 단색 쪽 배경·기본 텍스트 바탕쪽, 기존 문단 스타일, 쪽 감추기. 줄 번호는 현재 구역의 editable과 파일 형식을 확인합니다. HWPX 한 쪽 평면 본문 표의 동일 셀 속성 사각형 병합과 주변 격자가 확인된 병합 주 셀 하나의 기본 분할은 단독 요청 지원합니다. 기본 분할은 내용을 주 셀에 유지하고 새 셀은 비웁니다. 조회 가능한 HWPX 한 쪽 평면 표의 행 경계 나누기와 동일 속성의 다음 표 붙이기도 단독 요청 지원합니다. 조회된 비보호 HWPX 병합 셀의 단순 개별 문단 교체와 합성 셀 영역이 없는 한 쪽 평면 표의 임의 행·열 분할은 단독 요청 지원합니다. 분할은 외형이 늘거나 쪽이 나뉘면 거절합니다. 복합 병합 원본/중첩 표·합성 셀 영역의 구조 변경·개체·필드 편집은 아직 미지원입니다.']} as Snapshot;
+  return {revision:before,name:d.wasm.fileName,documentInformation:readAgentDocumentInformation(d.wasm,d.wasm.fileName,d.automation.getContext().isEditable===true&&!d.automation.getContext().isFormMode&&!d.wasm.requiresPasswordForSave),nodes,plainText,structure,cellParagraphSources:readCellParagraphSources(d.wasm,structure.tables,d.wasm.fileName),tableSubdivisionSources:readTableSubdivisionSources(d.wasm,structure.tables,d.wasm.fileName),tableStructureSources:readTableStructureSources(d.wasm,structure.tables,d.wasm.fileName),tableSplitSources:readTableSplitSources(d.wasm,structure.tables,d.wasm.fileName),tableMergeSources:readTableMergeSources(d.wasm,structure.tables,d.wasm.fileName),rowHeightSources:readRowHeightSources(d.wasm,structure.tables,d.wasm.fileName),equalColumnSources:readEqualColumnSources(d.wasm,structure.tables,d.wasm.fileName),cellPaddingSources:readCellPaddingSources(d.wasm,structure.tables,d.wasm.fileName),tablePaginationSources:readAgentTablePaginationSources(d.wasm,structure.tables),tableHeaderSources:readAgentTableHeaderSources(d.wasm,structure.tables),...lists,...outlines,...readAgentStyleCreationSources(d.wasm),...readAgentStyleRenameSources(d.wasm),...readAgentStyleNextSources(d.wasm),...(paragraphTabSources?{paragraphTabSources}:{}),...(paragraphDecorationSources?{paragraphDecorationSources}:{}),limitations:['본문·표의 텍스트와 서식·쪽 설정을 읽습니다. 그림 안 글자/OCR은 읽지 않습니다.','AI 편집: 보호 셀/표는 내용·서식·행/열 변경을 거절합니다. 본문 단순 표 쪽 나눔 none/cell/row(단독 요청, 맨 위 연속 제목 행 수 지정/해제·반복과 쪽 나눔 설정은 단독 요청 지원; 부분/흩어진 제목 원본은 보호), 단순 본문, 글꼴·글자·문단 서식, 새 표·단순 셀·셀 서식·행/열 추가와 삭제, HWPX 본문 단순 표 전체 행에 걸친 두 열 이상 너비 같게(단독 요청, 총너비 유지)·단일 단 구역의 전체 행 열 너비 mm 직접 지정(단독 요청, 본문 폭 이내; 행 높이 같게/직접 지정은 HWPX 한 쪽 단순 표의 전체 행·단독 요청 지원, 내용 최소 높이 초과 시 거절), HWPX 원본의 기존 본문 단순 표 셀 안 여백 네 방향 직접 지정/표 기본값 복귀(단독 요청), 일반 본문 구역 나누기·합치기·검증된 빈 본문 구역 삭제·기존 단순 머리말/꼬리말 텍스트·기본 글자 서식·정렬/백분율 줄 간격 수정·일반 문서의 새 정의 생성/기존 정의 삭제(각 단독 요청), 일반 본문 점 책갈피 추가·이름 변경·삭제(단독 요청), 저장 문단 스타일의 모양을 공유하는 새 이름 정의 생성(단독 요청, 본문 적용은 후속 요청)·기존 문단 스타일 이름/다음 문단 스타일 변경(필드 문서·바탕글/글자/잠금/비정규 원본 제외, 단독 요청), 저장된 구역 개요 모양의 본문 수준 지정·해제(다른 문단 전용 묶음), 새 기본 숫자 번호 3종·7수준·시작 값 생성(단독 요청), 조회된 기본 번호 모양 복제·지정 수준 시작 값·새 목록 적용(단독 요청, 원본 모양 보존 가능 시), 기본 문자 글머리표 8종 새 정의 생성·적용(단독 요청), 현재 문서에 저장된 문단 번호·글머리표 정의 적용/번호 7수준/해제(전용 묶음), 일반 본문 문단 기본 테두리/단색 배경·간격·연결/여백 무시, 일반 본문 문단별 사용자 탭 32개·양 끝 자동 탭(다른 문단 탭끼리 최대 30명령), 구역별 용지·여백·다단·기본 탭, HWPX 기본 본문 줄 번호·기본 단색 쪽 배경·기본 텍스트 바탕쪽, 기존 문단 스타일, 쪽 감추기. 줄 번호는 현재 구역의 editable과 파일 형식을 확인합니다. HWPX 한 쪽 평면 본문 표의 동일 셀 속성 사각형 병합과 주변 격자가 확인된 병합 주 셀 하나의 기본 분할은 단독 요청 지원합니다. 기본 분할은 내용을 주 셀에 유지하고 새 셀은 비웁니다. 조회 가능한 HWPX 한 쪽 평면 표의 행 경계 나누기와 동일 속성의 다음 표 붙이기도 단독 요청 지원합니다. 조회된 비보호 HWPX 병합 셀의 단순 개별 문단 교체와 합성 셀 영역이 없는 한 쪽 평면 표의 임의 행·열 분할은 단독 요청 지원합니다. 분할은 외형이 늘거나 쪽이 나뉘면 거절합니다. 복합 병합 원본/중첩 표·합성 셀 영역의 구조 변경·개체·필드 편집은 아직 미지원입니다.']} as Snapshot;
  }
  const native = {
   snapshot,
@@ -82,7 +84,7 @@ export function installAgentBridge(d:Deps){
   focusEditor:()=>d.input()?.focus(),
   async prepareFileSave(format:string){
    if(format!=='hwp'&&format!=='hwpx')return {changedTables:0};
-   if(applying||damaged||api.busy()||composing)throw new Error('문서 작업 또는 한글 조합이 끝난 뒤 저장해 주세요.');
+   if(applying||damaged||(api.busy()||api.hostMutationLocked())||composing)throw new Error('문서 작업 또는 한글 조합이 끝난 뒤 저장해 주세요.');
    d.input()?.flushDeferredPaginationIfNeeded('jueony-save-layout');
    const beforeRevision=revision(),plans=planSaveTableFrames(d.wasm);
    assertRevision(beforeRevision,revision());
@@ -110,15 +112,16 @@ export function installAgentBridge(d:Deps){
    }finally{applying=false;root.inert=inert;overlay.remove();}
   },
   executeCommand(id:string,params?:Record<string,unknown>){
-   if(applying||damaged||api.busy()||composing)throw new Error('문서 작업 또는 한글 조합이 끝난 뒤 실행해 주세요.');
+   if(applying||damaged||(api.busy()||api.hostMutationLocked())||composing)throw new Error('문서 작업 또는 한글 조합이 끝난 뒤 실행해 주세요.');
    d.input()?.focus();
    if(id==='file:open-recent'&&typeof params?.id!=='string')return {ok:false,message:'최근 문서 식별자가 없습니다. 파일 메뉴를 다시 열어 주세요.'};
    return d.automation.execute(id,params,{allowDialog:true});
   },
   async preflight(base:Snapshot,generation:Generation){
-   if(applying||damaged||api.busy()||composing)throw new Error('문서 작업이 끝난 뒤 다시 요청해 주세요.');
+   if(applying||damaged||(api.busy()||api.hostMutationLocked())||composing)throw new Error('문서 작업이 끝난 뒤 다시 요청해 주세요.');
    assertRevision(base.revision,revision());
    const validated=generation;
+   if(validated.operations.length===1&&validated.operations[0].kind==='set_document_metadata'){preflightAgentDocumentMetadata(d.wasm,base,validated.operations[0]);assertRevision(base.revision,revision());return;}
    const {HwpDocument}=d.wasm.getWasmModuleExports();
    const creating=validated.operations[0]?.kind==='create_document';
    let copy=creating?HwpDocument.createEmpty():new HwpDocument(recoveryBytes(d.wasm,d.wasm.fileName));
@@ -152,13 +155,13 @@ export function installAgentBridge(d:Deps){
   },
   documentIdentity:()=>String(d.wasm.documentGeneration)+':'+d.wasm.fileName,
   documentInstance:()=>String(d.wasm.documentGeneration),
-  async open(bytes:Uint8Array,name:string,handle:any=null,dirty=false){await d.ready;if(api.busy()||applying)throw new Error('문서 작업 중입니다.');await d.load(bytes,name,handle);if(handle)await rememberFileSnapshot(handle,bytes);if(dirty)d.documentState.markDirty('workspace-recovery');},
+  async open(bytes:Uint8Array,name:string,handle:any=null,dirty=false){await d.ready;if((api.busy()||api.hostMutationLocked())||applying)throw new Error('문서 작업 중입니다.');await d.load(bytes,name,handle);if(handle)await rememberFileSnapshot(handle,bytes);if(dirty)d.documentState.markDirty('workspace-recovery');},
   async restoreFileConnection(connection:StoredFileConnection,requestPermission=false){
-   if(applying||composing||api.busy())throw new Error('문서 작업이 끝난 뒤 원본 파일에 연결해 주세요.');
+   if(applying||composing||(api.busy()||api.hostMutationLocked()))throw new Error('문서 작업이 끝난 뒤 원본 파일에 연결해 주세요.');
    const generation=d.wasm.documentGeneration,name=d.wasm.fileName;
    if(connection?.handle?.name!==name)return {status:'unavailable',message:'현재 문서와 원본 파일 이름이 다릅니다. 복구 내용은 유지하며 다른 이름으로 저장해 주세요.'};
    const result=await restoreFileConnection(connection,{requestPermission});
-   if(generation!==d.wasm.documentGeneration||name!==d.wasm.fileName)throw new Error('원본 연결을 확인하는 동안 다른 문서가 열렸습니다. 다시 연결해 주세요.');
+   if(api.hostMutationLocked()||generation!==d.wasm.documentGeneration||name!==d.wasm.fileName)throw new Error('원본 연결을 확인하는 동안 다른 문서가 열렸습니다. 다시 연결해 주세요.');
    if(result.status==='connected')d.wasm.currentFileHandle=result.handle;
    return result;
   },
@@ -166,12 +169,12 @@ export function installAgentBridge(d:Deps){
   async readReference(bytes:Uint8Array){await d.ready;const {HwpDocument}=d.wasm.getWasmModuleExports();const doc=new HwpDocument(bytes);try{return textOf(doc);}finally{doc.free();}},
   async apply(runId:string,base:Snapshot,generation:Generation):Promise<Receipt>{
    if(applied.has(runId))throw new Error('이미 적용한 요청입니다.');
-   if(applying||damaged||composing||api.busy())throw new Error('문서 작업 또는 한글 조합 중입니다.');
+   if(applying||damaged||composing||(api.busy()||api.hostMutationLocked()))throw new Error('문서 작업 또는 한글 조합 중입니다.');
    assertRevision(base.revision,revision());
    const validated=generation;
    if(!validated.operations.length)throw new Error('적용할 명령이 없습니다.');
    await api.preflight(base,validated);assertRevision(base.revision,revision());
-   if(applying||damaged||api.busy()||composing)throw new Error('검사 중 다른 문서 작업이 시작되어 적용하지 않았습니다.');
+   if(applying||damaged||(api.busy()||api.hostMutationLocked())||composing)throw new Error('검사 중 다른 문서 작업이 시작되어 적용하지 않았습니다.');
    const before=plainSnapshot(base),beforeBytes=recoveryBytes(d.wasm,d.wasm.fileName);let executed=false;
    applying=true;const root=document.getElementById('studio-root')!;const inert=root.inert;root.inert=true;
    const overlay=Object.assign(document.createElement('div'),{id:'jueony-busy',textContent:'AI 변경을 문서에 적용하고 있습니다…'});document.body.append(overlay);
@@ -179,16 +182,16 @@ export function installAgentBridge(d:Deps){
     const input=d.input();if(!input)throw new Error('편집기가 준비되지 않았습니다.');
     let afterStructure:Snapshot['structure'],renderAttempt=0;
     await input.executeDocumentAgentOperation({kind:'snapshot',operationType:'jueony:'+runId,operation:(wasm:any)=>{
-     assertRevision(base.revision,revision());executed=true;return executeDocumentOperations(wasm,base,validated.operations)??(validated.operations.length===1&&(['create_paragraph_style','rename_paragraph_style','set_next_paragraph_style','set_table_pagination','set_table_header'].includes(validated.operations[0].kind)||(validated.operations[0].kind==='format_table_cells'&&(Object.hasOwn(validated.operations[0].properties,'equalizeColumns')||Object.hasOwn(validated.operations[0].properties,'columnWidthMm')||Object.hasOwn(validated.operations[0].properties,'equalizeRows')||Object.hasOwn(validated.operations[0].properties,'rowHeightMm'))))?input.getCursorPosition():{sectionIndex:0,paragraphIndex:0,charOffset:0});
+     assertRevision(base.revision,revision());executed=true;return executeDocumentOperations(wasm,base,validated.operations)??(validated.operations.length===1&&(['set_document_metadata','create_paragraph_style','rename_paragraph_style','set_next_paragraph_style','set_table_pagination','set_table_header'].includes(validated.operations[0].kind)||(validated.operations[0].kind==='format_table_cells'&&(Object.hasOwn(validated.operations[0].properties,'equalizeColumns')||Object.hasOwn(validated.operations[0].properties,'columnWidthMm')||Object.hasOwn(validated.operations[0].properties,'equalizeRows')||Object.hasOwn(validated.operations[0].properties,'rowHeightMm'))))?input.getCursorPosition():{sectionIndex:0,paragraphIndex:0,charOffset:0});
     }},async()=>{
      // InputHandler invokes this callback again after restoring a failed transaction.
      // Only the first render describes the proposed mutation; recovery renders the original.
      const verifyMutation=renderAttempt++===0;await d.render();if(!verifyMutation)return;
-     afterStructure=readStructure(d.wasm);for(const op of validated.operations){if(op.kind==='replace_cell_paragraph')assertCellParagraphResult(d.wasm,base,op);if(op.kind==='split_table_cell_into')assertTableSubdivisionResult(d.wasm,base,op);if(op.kind==='split_table'||op.kind==='attach_table')assertTableStructureResult(d.wasm,base,op);if(op.kind==='split_table_cell')assertTableSplitResult(d.wasm,base,op);if(op.kind==='merge_table_cells')assertTableMergeResult(d.wasm,base,op);if(op.kind==='format_table_cells'&&(Object.hasOwn(op.properties,'equalizeRows')||Object.hasOwn(op.properties,'rowHeightMm')))assertRowHeightResult(d.wasm,base,op);}});
+     afterStructure=readStructure(d.wasm);for(const op of validated.operations){if(op.kind==='set_document_metadata')assertAgentDocumentMetadata(d.wasm,op);if(op.kind==='replace_cell_paragraph')assertCellParagraphResult(d.wasm,base,op);if(op.kind==='split_table_cell_into')assertTableSubdivisionResult(d.wasm,base,op);if(op.kind==='split_table'||op.kind==='attach_table')assertTableStructureResult(d.wasm,base,op);if(op.kind==='split_table_cell')assertTableSplitResult(d.wasm,base,op);if(op.kind==='merge_table_cells')assertTableMergeResult(d.wasm,base,op);if(op.kind==='format_table_cells'&&(Object.hasOwn(op.properties,'equalizeRows')||Object.hasOwn(op.properties,'rowHeightMm')))assertRowHeightResult(d.wasm,base,op);}});
     const afterRevision=revision();applying=false;
     // snapshot requires the busy gate to be removed; read the body directly while still gated.
     const after:string[]=[];for(let s=0;s<d.wasm.getSectionCount();s++)for(let p=0;p<d.wasm.getParagraphCount(s);p++)after.push(d.wasm.getTextRange(s,p,0,d.wasm.getParagraphLength(s,p)));
-    const receipt={runId,beforeRevision:base.revision,afterRevision,before,after:after.join('\n'),beforeStructure:base.structure,afterStructure,operationCount:validated.operations.length};applied.set(runId,receipt);return receipt;
+    const receipt={runId,beforeRevision:base.revision,afterRevision,before,after:after.join('\n'),beforeStructure:base.structure,afterStructure,operationCount:validated.operations.length,...(validated.operations[0].kind==='set_document_metadata'?{metadata:{before:base.documentInformation!.metadata.values!,after:validated.operations[0].values}}:{})};applied.set(runId,receipt);return receipt;
    }catch(error){
     const e=error instanceof Error?error:new Error(typeof error==='string'?error:'문서 적용 실패');
     const body:string[]=[];try{for(let s=0;s<d.wasm.getSectionCount();s++)for(let p=0;p<d.wasm.getParagraphCount(s);p++)body.push(d.wasm.getTextRange(s,p,0,d.wasm.getParagraphLength(s,p)));}catch{}
@@ -198,13 +201,14 @@ export function installAgentBridge(d:Deps){
    }finally{applying=false;root.inert=inert;overlay.remove();}
   },
   async undoRequest(receipt:Receipt){
-   if(applying||api.busy()||composing)throw new Error('다른 작업 중입니다.');
+   if(applying||(api.busy()||api.hostMutationLocked())||composing)throw new Error('다른 작업 중입니다.');
    const input=d.input(),saved=savedRequestRevisions.get(receipt.runId),owned=applied.get(receipt.runId);
    const expected=saved&&owned?.afterRevision===receipt.afterRevision&&saved.before===receipt.afterRevision&&input?.history?.peekUndoTop()===saved.command?saved.after:receipt.afterRevision;
    assertRevision(expected,revision());
    if(input?.history?.peekUndoTop()?.type!=='snapshot:jueony:'+receipt.runId)throw new Error('요청 이후 편집 이력이 달라져 이 요청만 되돌릴 수 없습니다.');
    const result=d.automation.execute('edit:undo');if(!result.ok)throw new Error('되돌리기 실패');
    await d.render();const restored=snapshot();if(plainSnapshot(restored)!==receipt.before||receipt.beforeStructure&&JSON.stringify(restored.structure)!==JSON.stringify(receipt.beforeStructure))throw new Error('되돌림 결과를 확인하지 못했습니다.');
+   if(owned?.metadata){const metadata=readDocumentMetadata(d.wasm);if(!metadata.values||!DOCUMENT_METADATA_KEYS.every(k=>metadata.values![k]===owned.metadata!.before[k]))throw Error('요청 되돌림의 문서 요약을 확인하지 못했습니다.');}
    savedRequestRevisions.delete(receipt.runId);
    // Keep the request ID consumed after undo; replay must use a new run ID.
   },

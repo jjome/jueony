@@ -1,0 +1,13 @@
+PASS hwpx: custom rectangular padding and table-default reset preserve exact other state, snapshot undo/redo and reopen
+PASS hwpx: latent individual sides never activate accidentally; zero table defaults restored without clearing stored custom padding
+PASS hwpx: actual text origin shifts inside padding and rendered row grows while stored dimensions and text remain
+PASS invalid incomplete/mixed/noop/overflow/alias/batch/raw-injection requests refuse without writes
+PASS protected anywhere/merged/mixed/field/vertical/inline/negative or unknown padding sources stay readonly
+PASS changed table defaults/individual padding/cell text/width or Native protection invalidates detached source
+PASS second-cell failure, noop/false setter and unexpected text/border/defaults/neighbor/geometry/protection mutation reject and restore
+PASS later-section table identity applies padding only to requested root table
+PASS HWP source padding remains readonly while expanded layout cases are unresolved
+PASS renamed HWP with injected live geometry cannot bypass actual saved layout check, snapshot restores whole request
+PASS missing/changed actual text/cell layout rejects and restores padding
+PASS empty cells accept padding-only transaction without character formatting
+PASS Native simple HWP host-origin diagnostic matches saved geometry after engine fix

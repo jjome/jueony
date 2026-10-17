@@ -1,0 +1,14 @@
+PASS hwp: Native protected cell is readonly in context and text/all format/axis writes reject unchanged
+PASS hwp: forged/old editable flags cannot bypass independent live Native protection checks
+PASS hwp: neighbour text/format writes succeed and undo/reopen retain protected cell text/flag
+PASS hwp: unchanged protected input roundtrip persists protection and refusal
+PASS hwpx: Native protected cell is readonly in context and text/all format/axis writes reject unchanged
+PASS hwpx: forged/old editable flags cannot bypass independent live Native protection checks
+PASS hwpx: neighbour text/format writes succeed and undo/reopen retain protected cell text/flag
+PASS hwpx: unchanged protected input roundtrip persists protection and refusal
+PASS readonly or unreadable Native table/cell protection flags fail closed despite forged context
+PASS forged Native cell index and empty range cannot call a writer
+PASS second-operation protection change inside snapshot rejects and full snapshot restoration retains original bytes
+PASS new table aliases and follow-up row/column/text/format commands remain writable
+PASS unselected protected neighbour text/format/protection drift fails the whole snapshot transaction
+PASS axis guard scans every actual Native cell even when a forged context omits protected cells

@@ -9,7 +9,7 @@ const binding = (keys: string, command: string, label: string, scope: Scope = 'd
 export const hangulBindings: Binding[] = [
   ...[['Ctrl+C', 'edit:copy', '복사하기'], ['Ctrl+X', 'edit:cut', '오려 두기'], ['Ctrl+V', 'edit:paste', '붙이기'], ['Shift+Delete', 'edit:cut', '오려 두기'], ['Shift+Insert', 'edit:paste', '붙이기']].map(([keys, command, label]) => ({ ...binding(keys, command, label), nativeClipboard: true })),
   binding('Alt+N', 'file:new-doc', '새 문서'),
-  binding('Ctrl+Alt+T', 'file:new-doc', '새 탭'),
+  binding('Ctrl+Alt+T', 'file:new-tab', '새 탭'),
   binding('Alt+O', 'file:open', '불러오기'),
   binding('Alt+S', 'file:save', '저장하기'), binding('Ctrl+S', 'file:save', '저장하기'),
   binding('Alt+V', 'file:save-as', '다른 이름으로 저장하기'),

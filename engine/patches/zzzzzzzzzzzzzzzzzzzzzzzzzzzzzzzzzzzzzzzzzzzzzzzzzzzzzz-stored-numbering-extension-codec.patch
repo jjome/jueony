@@ -1,0 +1,534 @@
+diff --git a/src/parser/doc_info.rs b/src/parser/doc_info.rs
+--- a/src/parser/doc_info.rs
++++ b/src/parser/doc_info.rs
+@@ -871,6 +871,13 @@
+         numbering.level_start_numbers[level] = r.read_u32().unwrap_or(1);
+     }
+ 
++    // HWP5.1 stored extension values get an XML view for lossless HWPX export;
++    // this does not add levels to the editable/Agent seven-level model.
++    if let Ok(Some(ext)) = crate::parser::numbering_extension::from_binary_record(data) {
++        numbering.raw_para_heads = Some(crate::parser::numbering_extension::xml_view(
++            &numbering, &ext,
++        ));
++    }
+     Ok(numbering)
+ }
+ 
+diff --git a/src/parser/hwpx/header.rs b/src/parser/hwpx/header.rs
+--- a/src/parser/hwpx/header.rs
++++ b/src/parser/hwpx/header.rs
+@@ -2281,7 +2281,7 @@
+     Ok(())
+ }
+ 
+-fn parse_numbering_para_head_attrs(
++pub(crate) fn parse_numbering_para_head_attrs(
+     e: &quick_xml::events::BytesStart,
+ ) -> (usize, NumberingHead, Option<u32>, String) {
+     let mut level: usize = 0;
+@@ -3915,3 +3915,40 @@
+         );
+     }
+ }
++
++/// Strict sibling of the legacy permissive number-format parser for raw extension export.
++pub(crate) fn numbering_format_code_strict(value: &str) -> Option<u8> {
++    if matches!(
++        value,
++        "DIGIT"
++            | "ARABIC"
++            | "CIRCLED_DIGIT"
++            | "CIRCLE_DIGIT"
++            | "ROMAN_CAPITAL"
++            | "ROMAN_UPPER"
++            | "ROMAN"
++            | "ROMAN_SMALL"
++            | "ROMAN_LOWER"
++            | "LATIN_CAPITAL"
++            | "LATIN_UPPER"
++            | "ALPHA_CAPITAL"
++            | "LATIN_SMALL"
++            | "LATIN_LOWER"
++            | "ALPHA_SMALL"
++            | "CIRCLED_LATIN_CAPITAL"
++            | "CIRCLED_LATIN_SMALL"
++            | "HANGUL_SYLLABLE"
++            | "CIRCLED_HANGUL_SYLLABLE"
++            | "HANGUL_JAMO"
++            | "CIRCLED_HANGUL_JAMO"
++            | "HANGUL_PHONETIC"
++            | "HANGUL_NUMBER"
++            | "IDEOGRAPH"
++            | "HANJA_NUMBER"
++            | "CIRCLED_IDEOGRAPH"
++    ) {
++        Some(parse_numbering_format_code(value))
++    } else {
++        value.parse::<u8>().ok().filter(|n| *n <= 14)
++    }
++}
+diff --git a/src/parser/mod.rs b/src/parser/mod.rs
+--- a/src/parser/mod.rs
++++ b/src/parser/mod.rs
+@@ -3813,3 +3813,5 @@
+         );
+     }
+ }
++
++pub(crate) mod numbering_extension;
+diff --git a/src/parser/numbering_extension.rs b/src/parser/numbering_extension.rs
+new file mode 100644
+--- /dev/null
++++ b/src/parser/numbering_extension.rs
+@@ -0,0 +1,299 @@
++//! Private interchange codec for stored numbering levels8..10; no Agent level API.
++use crate::model::style::{Numbering, NumberingHead};
++use crate::parser::hwpx::utils::{attr_str, local_name};
++use quick_xml::{events::Event, Reader};
++#[derive(Clone, Debug)]
++pub(crate) struct Extension {
++    pub heads: [NumberingHead; 3],
++    pub formats: [String; 3],
++    pub starts: [u32; 3],
++    pub checked: [bool; 3],
++}
++impl Extension {
++    /// No independent HWP5 checkable bit was present in actual single-attribute A/B.
++    /// Hancom disk reload normalizes circled heads from checkable=0 to1. Do not
++    /// claim either direction preserves that XML value without a native codec.
++    pub(crate) fn has_unrepresentable_checkable(&self) -> bool {
++        self.checked.iter().any(|checked| *checked)
++            || self
++                .heads
++                .iter()
++                .any(|head| matches!(head.number_format, 1 | 6 | 7 | 9 | 11 | 14))
++    }
++}
++
++impl Default for Extension {
++    fn default() -> Self {
++        Self {
++            heads: [NumberingHead::default(); 3],
++            formats: Default::default(),
++            starts: [1; 3],
++            checked: [false; 3],
++        }
++    }
++}
++fn text(reader: &mut Reader<&[u8]>) -> Result<String, String> {
++    let mut result = String::new();
++    let mut buf = Vec::new();
++    loop {
++        match reader
++            .read_event_into(&mut buf)
++            .map_err(|e| e.to_string())?
++        {
++            Event::Text(t) => result
++                .push_str(&quick_xml::escape::unescape(t.as_ref()).map_err(|e| e.to_string())?),
++            Event::CData(t) => result.push_str(t.as_ref()),
++            Event::GeneralRef(t) => result.push_str(
++                &quick_xml::escape::unescape(&format!("&{};", t.as_ref()))
++                    .map_err(|e| e.to_string())?,
++            ),
++            Event::Comment(_) => {}
++            Event::End(e) if local_name(e.name().as_ref()) == b"paraHead" => return Ok(result),
++            _ => return Err("nested or incomplete numbering head".into()),
++        }
++        buf.clear();
++    }
++}
++fn xml_chars(s: &str) -> bool {
++    s.chars().all(|c| {
++        matches!(c, '\t' | '\n' | '\r')
++            || matches!(c,'\u{20}'..='\u{d7ff}'|'\u{e000}'..='\u{fffd}'|'\u{10000}'..='\u{10ffff}')
++    })
++}
++fn boolean(s: &str) -> bool {
++    matches!(s, "1" | "true")
++}
++pub(crate) fn from_xml(raw: &str) -> Result<Option<Extension>, String> {
++    if raw.len() > 512 * 1024 {
++        return Err("numbering XML exceeds bounded codec limit".into());
++    }
++    let mut reader = Reader::from_str(raw);
++    let mut buf = Vec::new();
++    let mut out = Extension::default();
++    let mut seen = [false; 3];
++    loop {
++        let event = reader
++            .read_event_into(&mut buf)
++            .map_err(|e| e.to_string())?;
++        match event {
++            Event::Start(ref e) | Event::Empty(ref e)
++                if local_name(e.name().as_ref()) == b"paraHead" =>
++            {
++                let empty = matches!(&event, Event::Empty(_));
++                let attrs = e
++                    .attributes()
++                    .collect::<Result<Vec<_>, _>>()
++                    .map_err(|e| e.to_string())?;
++                let level = attr_str(
++                    attrs
++                        .iter()
++                        .find(|a| a.key.as_ref().as_bytes() == b"level")
++                        .ok_or("missing level")?,
++                )
++                .parse::<usize>()
++                .map_err(|e| e.to_string())?;
++                if !(1..=10).contains(&level) {
++                    return Err("numbering level outside stored1..10".into());
++                }
++                if level < 8 {
++                    if !empty {
++                        let _ = text(&mut reader)?;
++                    }
++                    buf.clear();
++                    continue;
++                }
++                let index = level - 8;
++                if seen[index] {
++                    return Err("duplicate extended level".into());
++                }
++                seen[index] = true;
++                for a in &attrs {
++                    let key = a.key.as_ref();
++                    let value = attr_str(a);
++                    let good = match key.as_bytes() {
++                        b"level" => true,
++                        b"start" | b"charPrIDRef" => value.parse::<u32>().is_ok(),
++                        b"widthAdjust" | b"textOffset" => value.parse::<i16>().is_ok(),
++                        b"align" => matches!(value.as_str(), "LEFT" | "CENTER" | "RIGHT"),
++                        b"textOffsetType" => matches!(value.as_str(), "PERCENT" | "HWPUNIT"),
++                        b"useInstWidth" | b"autoIndent" | b"checkable" => {
++                            matches!(value.as_str(), "0" | "1" | "false" | "true")
++                        }
++                        b"numFormat" => {
++                            super::hwpx::header::numbering_format_code_strict(&value).is_some()
++                        }
++                        b"text" => true,
++                        _ => false,
++                    };
++                    if !good {
++                        return Err(format!("unsupported extended numbering attribute {key}"));
++                    }
++                }
++                let (_, head, start, mut format) =
++                    super::hwpx::header::parse_numbering_para_head_attrs(e);
++                if !empty {
++                    format.push_str(&text(&mut reader)?);
++                }
++                if !xml_chars(&format) || format.encode_utf16().count() > u16::MAX as usize {
++                    return Err("extended numbering format exceeds UINT16 length".into());
++                }
++                out.heads[index] = head;
++                out.starts[index] = start.unwrap_or(1);
++                out.formats[index] = format;
++                out.checked[index] = attrs
++                    .iter()
++                    .find(|a| a.key.as_ref().as_bytes() == b"checkable")
++                    .is_some_and(|a| boolean(&attr_str(a)));
++            }
++            Event::Text(t) if t.as_ref().trim().is_empty() => {}
++            Event::Comment(_) => {}
++            Event::Eof => break,
++            _ => return Err("unsupported numbering XML content".into()),
++        }
++        buf.clear();
++    }
++    if seen.iter().all(|x| !*x) {
++        Ok(None)
++    } else if seen.iter().all(|x| *x) {
++        Ok(Some(out))
++    } else {
++        Err("partial extended numbering definition".into())
++    }
++}
++fn take<'a>(b: &'a [u8], p: &mut usize, n: usize) -> Result<&'a [u8], String> {
++    let end = p.checked_add(n).ok_or("offset overflow")?;
++    let v = b.get(*p..end).ok_or("truncated numbering extension")?;
++    *p = end;
++    Ok(v)
++}
++fn u16_at(b: &[u8], p: &mut usize) -> Result<u16, String> {
++    Ok(u16::from_le_bytes(take(b, p, 2)?.try_into().unwrap()))
++}
++fn u32_at(b: &[u8], p: &mut usize) -> Result<u32, String> {
++    Ok(u32::from_le_bytes(take(b, p, 4)?.try_into().unwrap()))
++}
++fn string(b: &[u8], p: &mut usize) -> Result<String, String> {
++    let n = u16_at(b, p)? as usize;
++    let units = take(b, p, n * 2)?
++        .chunks_exact(2)
++        .map(|v| u16::from_le_bytes(v.try_into().unwrap()))
++        .collect::<Vec<_>>();
++    String::from_utf16(&units).map_err(|e| e.to_string())
++}
++/// Exact modern extended-head payload observed in Hancom files. Unknown tails fail closed.
++pub(crate) fn from_binary_record(raw: &[u8]) -> Result<Option<Extension>, String> {
++    let mut p = 0;
++    for _ in 0..7 {
++        take(raw, &mut p, 12)?;
++        let _ = string(raw, &mut p)?;
++    }
++    take(raw, &mut p, 2)?;
++    if p == raw.len() {
++        return Ok(None);
++    }
++    take(raw, &mut p, 28)?;
++    if p == raw.len() {
++        return Ok(None);
++    }
++    let mut ext = Extension::default();
++    for i in 0..3 {
++        let attr = u32_at(raw, &mut p)?;
++        if attr & !0x1ff != 0 || attr & 3 == 3 {
++            return Err("unknown extended head attribute bits".into());
++        }
++        let width = i16::from_le_bytes(take(raw, &mut p, 2)?.try_into().unwrap());
++        let distance = i16::from_le_bytes(take(raw, &mut p, 2)?.try_into().unwrap());
++        let id = u32_at(raw, &mut p)?;
++        ext.heads[i] = NumberingHead {
++            attr,
++            width_adjust: width,
++            text_distance: distance,
++            char_shape_id: id,
++            number_format: ((attr >> 5) & 15) as u8,
++        };
++        if ext.heads[i].number_format > 14 {
++            return Err("unsupported extended numbering format".into());
++        }
++        ext.formats[i] = string(raw, &mut p)?;
++        if !xml_chars(&ext.formats[i]) {
++            return Err("extended numbering contains non-XML characters".into());
++        }
++    }
++    for i in 0..3 {
++        ext.starts[i] = u32_at(raw, &mut p)?;
++    }
++    if p != raw.len() {
++        return Err("unknown bytes after extended numbering starts".into());
++    }
++    Ok(Some(ext))
++}
++fn format_name(code: u8) -> &'static str {
++    [
++        "DIGIT",
++        "CIRCLED_DIGIT",
++        "ROMAN_CAPITAL",
++        "ROMAN_SMALL",
++        "LATIN_CAPITAL",
++        "LATIN_SMALL",
++        "CIRCLED_LATIN_CAPITAL",
++        "CIRCLED_LATIN_SMALL",
++        "HANGUL_SYLLABLE",
++        "CIRCLED_HANGUL_SYLLABLE",
++        "HANGUL_JAMO",
++        "CIRCLED_HANGUL_JAMO",
++        "HANGUL_PHONETIC",
++        "IDEOGRAPH",
++        "CIRCLED_IDEOGRAPH",
++    ]
++    .get(code as usize)
++    .copied()
++    .unwrap_or("DIGIT")
++}
++/// Reconstruct a value-preserving XML view from HWP metadata; not original XML provenance.
++pub(crate) fn xml_view(n: &Numbering, ext: &Extension) -> String {
++    let mut out = String::new();
++    for i in 0..10 {
++        let (h, start, format, checked) = if i < 7 {
++            (
++                &n.heads[i],
++                n.level_start_numbers[i],
++                &n.level_formats[i],
++                false,
++            )
++        } else {
++            (
++                &ext.heads[i - 7],
++                ext.starts[i - 7],
++                &ext.formats[i - 7],
++                ext.checked[i - 7],
++            )
++        };
++        let align = match h.attr & 3 {
++            1 => "CENTER",
++            2 => "RIGHT",
++            _ => "LEFT",
++        };
++        let level = i + 1;
++        let use_inst_width = (h.attr >> 2) & 1;
++        let auto_indent = (h.attr >> 3) & 1;
++        let width_adjust = h.width_adjust;
++        let offset_type = if h.attr & 16 != 0 {
++            "HWPUNIT"
++        } else {
++            "PERCENT"
++        };
++        let text_offset = h.text_distance;
++        let number_format = format_name(h.number_format);
++        let char_ref = h.char_shape_id;
++        let checkable = if checked { 1 } else { 0 };
++        let escaped_format = quick_xml::escape::escape(format);
++        out.push_str(&format!(
++            "<hh:paraHead start=\"{start}\" level=\"{level}\" align=\"{align}\" \
++             useInstWidth=\"{use_inst_width}\" autoIndent=\"{auto_indent}\" \
++             widthAdjust=\"{width_adjust}\" textOffsetType=\"{offset_type}\" \
++             textOffset=\"{text_offset}\" numFormat=\"{number_format}\" \
++             charPrIDRef=\"{char_ref}\" checkable=\"{checkable}\">{escaped_format}</hh:paraHead>"
++        ));
++    }
++    out
++}
+diff --git a/src/serializer/cfb_writer.rs b/src/serializer/cfb_writer.rs
+--- a/src/serializer/cfb_writer.rs
++++ b/src/serializer/cfb_writer.rs
+@@ -218,6 +218,7 @@
+     // 6. CFB 컨테이너 조립
+     let mut content_loss = ContentLossReport::new(SerializedFormat::Hwp);
+     super::paragraph_metadata_loss::record(doc,&mut content_loss);
++    super::numbering_extension_loss::record(doc, &mut content_loss);
+     let mut extra_streams = doc.extra_streams.clone();
+     extra_streams.retain(|(path, _)| path != crate::model::hyperlink_format::HWP_STREAM);
+     if let Some(bytes) = crate::model::hyperlink_format::encode(doc) {
+diff --git a/src/serializer/doc_info.rs b/src/serializer/doc_info.rs
+--- a/src/serializer/doc_info.rs
++++ b/src/serializer/doc_info.rs
+@@ -666,7 +666,13 @@
+     w.into_bytes()
+ }
+ 
+-pub(crate) fn agent_numbering_raw_supported(n:&Numbering)->bool{n.raw_data.as_ref().is_none_or(|raw|*raw==serialize_numbering(n))}
++pub(crate) fn agent_numbering_raw_supported(n: &Numbering) -> bool {
++    let mut basic = n.clone();
++    basic.raw_para_heads = None;
++    n.raw_data
++        .as_ref()
++        .is_none_or(|raw| *raw == serialize_numbering(&basic))
++}
+ 
+ fn serialize_numbering(numbering: &Numbering) -> Vec<u8> {
+     let mut w = ByteWriter::new();
+@@ -701,6 +707,25 @@
+         w.write_u32(numbering.level_start_numbers[level]).unwrap();
+     }
+ 
++    // The public/Agent model remains seven levels. Only complete stored extension metadata
++    // is emitted here; unsupported XML is recorded by numbering_extension_loss before bytes
++    // leave the reported serializer. Original sealed HWP records still bypass this writer.
++    if let Some(raw) = &numbering.raw_para_heads {
++        if let Ok(Some(ext)) = crate::parser::numbering_extension::from_xml(raw) {
++            for i in 0..3 {
++                let head = &ext.heads[i];
++                let attr = (head.attr & !(15 << 5)) | ((head.number_format as u32 & 15) << 5);
++                w.write_u32(attr).unwrap();
++                w.write_i16(head.width_adjust).unwrap();
++                w.write_i16(head.text_distance).unwrap();
++                w.write_u32(head.char_shape_id).unwrap();
++                w.write_hwp_string(&ext.formats[i]).unwrap();
++            }
++            for start in ext.starts {
++                w.write_u32(start).unwrap();
++            }
++        }
++    }
+     w.into_bytes()
+ }
+ 
+diff --git a/src/serializer/hwpx/mod.rs b/src/serializer/hwpx/mod.rs
+--- a/src/serializer/hwpx/mod.rs
++++ b/src/serializer/hwpx/mod.rs
+@@ -58,6 +58,7 @@
+     // 1-pass: ID 풀 구성
+     let mut ctx = SerializeContext::collect_from_document(doc);
+     super::paragraph_metadata_loss::record(doc,&mut ctx.content_loss);
++    super::numbering_extension_loss::record(doc, &mut ctx.content_loss);
+ 
+     let mut z = HwpxZipWriter::new();
+ 
+diff --git a/src/serializer/mod.rs b/src/serializer/mod.rs
+--- a/src/serializer/mod.rs
++++ b/src/serializer/mod.rs
+@@ -124,3 +124,5 @@
+         assert_eq!(MockSerializer.serialize(&doc).unwrap(), vec![0xDE, 0xAD]);
+     }
+ }
++
++mod numbering_extension_loss;
+diff --git a/src/serializer/numbering_extension_loss.rs b/src/serializer/numbering_extension_loss.rs
+new file mode 100644
+--- /dev/null
++++ b/src/serializer/numbering_extension_loss.rs
+@@ -0,0 +1,71 @@
++//! Stored numbering extension export must never silently replace unsupported values.
++use super::content_loss::{
++    ContentLoss, ContentLossCode, ContentLossReason, ContentLossReport, ContentLossSubject,
++    SerializedFormat,
++};
++use crate::model::document::Document;
++pub(super) fn record(doc: &Document, report: &mut ContentLossReport) {
++    for (i, n) in doc.doc_info.numberings.iter().enumerate() {
++        let native_raw = n.raw_data.as_ref().filter(|_| {
++            crate::model::raw_provenance::record_raw_permitted(
++                doc.doc_info
++                    .raw_provenance
++                    .as_ref()
++                    .map(|s| &s.record_seals.numberings[..]),
++                i,
++                n,
++            )
++        });
++        let lost = match report.output_format() {
++            SerializedFormat::Hwp => {
++                if native_raw.is_some() {
++                    false
++                } else if let Some(raw) = &n.raw_para_heads {
++                    match crate::parser::numbering_extension::from_xml(raw) {
++                        Ok(Some(ext)) => {
++                            ext.has_unrepresentable_checkable()
++                                || (
++                                    doc.header.version.major,
++                                    doc.header.version.minor,
++                                    doc.header.version.build,
++                                    doc.header.version.revision,
++                                ) < (5, 1, 0, 0)
++                        }
++                        Ok(None) => false,
++                        Err(_) => true,
++                    }
++                } else {
++                    false
++                }
++            }
++            SerializedFormat::Hwpx => n.raw_data.as_ref().is_some_and(|raw| {
++                match crate::parser::numbering_extension::from_binary_record(raw) {
++                    Ok(Some(ext)) => ext.has_unrepresentable_checkable(),
++                    Ok(None) => false,
++                    Err(_) => n.raw_para_heads.is_none(),
++                }
++            }),
++        };
++        let reason = if report.output_format() == SerializedFormat::Hwp
++            && (
++                doc.header.version.major,
++                doc.header.version.minor,
++                doc.header.version.build,
++                doc.header.version.revision,
++            ) < (5, 1, 0, 0)
++        {
++            ContentLossReason::UnsupportedByOutputFormat
++        } else {
++            ContentLossReason::SerializerNotImplemented
++        };
++        if lost {
++            report.record(ContentLoss {
++                code: ContentLossCode::MetadataReduced,
++                subject: ContentLossSubject::ParagraphProperties,
++                path: format!("docInfo/numbering/{i}/extendedLevels8To10"),
++                reason,
++                resource_id: None,
++            });
++        }
++    }
++}

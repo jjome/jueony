@@ -1,0 +1,59 @@
+{
+  "engine": {
+    "sourceId": "b59322fd380dc175",
+    "patches": 95,
+    "wasmSHA256": "ef130c08536b38349bfb0c9b94a4478094c85df04ba2969ef4e4f65d05363f17",
+    "jsSHA256": "72828c03b5b92948e0acd45bcd3de0263c8570bfbfaeab283eb5998e1b72b22d"
+  },
+  "metricSource": [
+    {
+      "path": "src/renderer/composer/line_breaking.rs",
+      "candidateSHA256": "b0b3abad2708bc3049f0999700d189eb60c2476fc027dc4465f46af370835983",
+      "formal86SHA256": "b0b3abad2708bc3049f0999700d189eb60c2476fc027dc4465f46af370835983",
+      "byteExact": true
+    },
+    {
+      "path": "src/renderer/layout/text_measurement.rs",
+      "candidateSHA256": "40c5caac29acf7a79ff1bfb540a19a1027acc4036e07310575440dffd1119430",
+      "formal86SHA256": "40c5caac29acf7a79ff1bfb540a19a1027acc4036e07310575440dffd1119430",
+      "byteExact": true
+    },
+    {
+      "path": "src/renderer/style_resolver.rs",
+      "candidateSHA256": "b28a36d364259e964db4ef415f52b0640f56b27f2ca24b0c672f478bb4bd2054",
+      "formal86SHA256": "b28a36d364259e964db4ef415f52b0640f56b27f2ca24b0c672f478bb4bd2054",
+      "byteExact": true
+    }
+  ],
+  "metric": {
+    "verifierSHA256": "9d65f374b19424c9f504d30095c2d578330fdf3caec1ad215feea2a5542b9b03",
+    "passed": 23,
+    "failed": 0,
+    "scope": {
+      "scenarios": 23,
+      "functionalScenarios": 12,
+      "independentXmlScenarios": 11,
+      "supportedScenarios": 8,
+      "mixedExactXmlAndUnsupportedHwpScenarios": 2,
+      "unsupportedFontCheckScenarios": 2,
+      "blockedScenarios": 4,
+      "independentNativeAdmissionChecks": 136,
+      "sharedNaturalGlyphDecisions": 30,
+      "strictGeometryReopens": 16,
+      "strictGeometryReopensByFormat": {
+        "hwp": 6,
+        "hwpx": 10
+      },
+      "blockedHwpDirections": 2,
+      "blockedFontOwners": 2,
+      "geometryTolerance": 0.2,
+      "everyPublishedField": true,
+      "fullSemanticGuard": true,
+      "metadata5": true
+    },
+    "allIndependentXmlValid": true
+  },
+  "meaning": "지원기능8·XML지원/HWP미지원혼합2·font미지원2·독립XML11. textDir미지원과 UNKNOWN→REP손실은 guard 차단이며 지원성공 아님. 공개 초기MCST/Python3 실제차이 미해결.",
+  "prior85Proof": "compact-final-aa660/manifest.json",
+  "prior85ProofSHA256": "136b6bbac5b40b40bdf39dea475dca13e805d887886308fa9c9c5d20f1c8c53c"
+}

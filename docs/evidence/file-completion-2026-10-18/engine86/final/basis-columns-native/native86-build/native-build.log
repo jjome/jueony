@@ -1,0 +1,16 @@
+        Info Looking up installed tauri packages to check mismatched versions...
+   Compiling jueony-editor v0.0.1 (C:\Users\jjome\Documents\work\jueony\build\native-file-final86-20261018\project\src-tauri)
+warning: method `begin` is never used
+   --> src\document_windows.rs:211:12
+    |
+ 75 | impl WindowStore {
+    | ---------------- method in this implementation
+...
+211 |     pub fn begin(
+    |            ^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `jueony-editor` (bin "jueony-native-final86-review") generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 29.18s
+       Built application at: C:\Users\jjome\Documents\work\jueony\apps\editor\src-tauri\target\debug\jueony-native-final86-review.exe

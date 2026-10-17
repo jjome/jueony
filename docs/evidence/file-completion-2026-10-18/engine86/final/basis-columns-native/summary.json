@@ -1,0 +1,81 @@
+{
+  "status": "WASM86_12_OF_12_PASS_NATIVE86_BUILT_NOT_GUI_TESTED",
+  "engine": {
+    "sourceId": "b59322fd380dc175",
+    "wasmSHA": "ef130c08536b38349bfb0c9b94a4478094c85df04ba2969ef4e4f65d05363f17",
+    "javascriptSHA": "72828c03b5b92948e0acd45bcd3de0263c8570bfbfaeab283eb5998e1b72b22d",
+    "patches": [
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-reconstruction-page-basis-and-edit-lifetime.patch",
+        "sha256": "1db1c17717df23c546c32410efe14492aaf6db0b3bfe2243627a30891411a242"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-text-direction-preservation-and-loss-report.patch",
+        "sha256": "24c68a269cc0bd6e4d0dd8d7c3709a37d42fc4b766dbcde97e422ffe251dd113"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-raw-resource-namespace-ownership.patch",
+        "sha256": "173fef15aa86447c81aa9d7d5b124363fa3256e033a4478636bf1cf3386e7955"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-font-source-type-authority-and-loss.patch",
+        "sha256": "fce0993013db18c8baba21c08b04dd1f4ce5943b02191d42f1ab200c81edfa06"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-three-column-frame-ownership.patch",
+        "sha256": "df1739fea178622af38a6231ab089c3505aeeb104e03f46e5a44b898e272eb58"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stable-session-story-font-provenance.patch",
+        "sha256": "9613f523b63dc89e0aa23914055c5b0b7674a2515f2c076ecef0c178894bdd59"
+      }
+    ]
+  },
+  "wasm": {
+    "basisV2Passed": 3,
+    "column3Passed": 9,
+    "failed": 0,
+    "semanticAndWholeLayoutGuard": "unchanged production checks mandatory",
+    "separateOutputFrom85": true
+  },
+  "native": {
+    "status": "BUILD_INPUT_AND_ARTIFACT_PROVENANCE_PASS_NO_GUI_RUN",
+    "binarySHA": "f1a3d7206413765de6f4845de017fb0705e94da76590f9fd8fb2c76b8140a676",
+    "binaryBytes": 58507264,
+    "validPEHeader": true,
+    "productionInputs": 12,
+    "frontendFiles": 85,
+    "oldExeCountUnchanged": 7,
+    "actualGuiValidation": "NOT_RUN",
+    "appLaunched": false,
+    "appApprovalRequested": false,
+    "apiBackend": "NOT_INCLUDED",
+    "warning": "One dead_code warning for FileBindings::begin; compile exited0."
+  },
+  "native68Scope": "Exact8 old production Rust/config inputs still match; storage.rs and native_recents.rs are unchanged. main routing and two new services differ. TS actual68 per-file identity unproven because old build was dirty. No equivalence claim for latest OS UI.",
+  "prior85ManifestUnchanged": "df1453eaaf9400e26c6110b62468c72afc6e6c189cfe9530cdb7af99c2a9fae8",
+  "sourceWitness": {
+    "src/renderer/generated_column_stack.rs": "2815808d5edfc8a2bec9b8c6edf3b33ccb918068e0093bf8c589633a302b3c7d",
+    "src/renderer/layout.rs": "41ceafd2dd3bf12c14577dc341cd20dfa05327ced84817bc2d666fed11a99b05",
+    "src/renderer/typeset/section/vpos.rs": "c4e74eaedfea4baf8e1838a0ccf20cb1407e77c64d5674b6e853e6ea3996e567",
+    "src/model/document.rs": "b445d998b8023106dd4b7d4265727b2abd35291af96d20bed54f0485bd7ab5cf",
+    "src/document_core/commands/document.rs": "49a81356d2a4109b5a8e0dbab0ad15e8b3bc4933b473dffef87f9d351faeab5a",
+    "src/wasm_api/session_story.rs": "b23e2860de5ce2910716860ed02282919e95ecc439c08ba4ade04b5a4936e174"
+  },
+  "limitations": [
+    "Latest native executable was not launched/approved/installed, so actual OS picker/IPC/window/recovery behavior is not revalidated.",
+    "Native file preview includes no API backend; root standalone4355 is separate.",
+    "ActualXML explicit textDir cannot be guaranteed in HWP and exactly188 losses must reject that conversion; HWPX passes.",
+    "Pinned old83 native file had already lost explicit textDir; its existing-file edit lifecycle is a distinct positive.",
+    "Original public MCST15vsactual16 full compatibility and new actual Hancom3-column placement are not claimed complete."
+  ],
+  "excluded": [
+    "binary executables",
+    "WASM",
+    "font programs",
+    "public original or derived document bytes",
+    "full public snapshots",
+    "authentication keys",
+    "user app data"
+  ]
+}

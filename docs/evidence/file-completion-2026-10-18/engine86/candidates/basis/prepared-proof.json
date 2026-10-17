@@ -1,0 +1,24 @@
+{
+  "status": "FIRST_CANDIDATE_REJECTED",
+  "formalSource": "ad6186043c15532f",
+  "files": [
+    {
+      "path": "src/renderer/layout.rs",
+      "formal83Sha256": "3334e572ff70f194aeb433436b97f40bc9cedb3e47bfdb1c30b3888e0aa67f35",
+      "compiledCandidateDiskSha256": "4d03f1fa72a4ba33489185a5e61a120161f3b0e72ffac6d0c3695d516bdccef3",
+      "promotionTextSha256": "4587eb41236d2d5eb325c55f031e0ba80c383d4b664969711fa28df5d870203e"
+    },
+    {
+      "path": "src/renderer/typeset/section/vpos.rs",
+      "formal83Sha256": "c6e28e78c6f7017885d3b545d852b78f36e39116e01e19098522aa853e9de313",
+      "compiledCandidateDiskSha256": "be3099644c5abb709e4e7ee92be9fa9d8d841776fc8ea729a58c2d7cd89799e9",
+      "promotionTextSha256": "be3099644c5abb709e4e7ee92be9fa9d8d841776fc8ea729a58c2d7cd89799e9"
+    }
+  ],
+  "patchSha256": "56476803e78689f8000d8991ab0c119c935625e7dce20f9831d177c0fc8b9f49",
+  "scope": "plain head, complete single-cell TAC frame, plain successor; matching retained physical/cumulative offset; positive inset exactly equals all three resolved margins; no hardcoded page/doc/300HU/4px",
+  "excluded": "missing/inconsistent map, original native/HWP3, edited/dirty, field/range/unknown control/nested/cell-protection/locked, multi-column, off-body source frame",
+  "firstTrace": "native-trace.log",
+  "privateDiagnosticExportExcludedFromDelta": true,
+  "reason": "Third source-map offset is66582, first/table is66882: reconstruction has already consumed exactly the successor spacing300HU. Candidate did not apply; no wrong geometry accepted."
+}

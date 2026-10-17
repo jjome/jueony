@@ -1,0 +1,31 @@
+FAIL shared thirty natural glyph decisions in the real TTF document path Expected values to be strictly equal:
+
+450 !== 448
+
+FAIL independent native admission source:own-gulimche-floor4-matrix-no-ls.hwpx table 2
++ actual - expected
+
+  [
+    0,
++   30
+-   31
+  ]
+
+PASS both formats twice source:own-gulimche-floor4-matrix-no-ls.hwpx
+PASS independent native admission hancom:own-gulimche-floor4-matrix-no-ls.hwpx
+PASS both formats twice hancom:own-gulimche-floor4-matrix-no-ls.hwpx
+FAIL independent native admission source:own-gulimche-half-glyph-matrix-no-ls.hwpx table 1
++ actual - expected
+
+  [
+    0,
++   30
+-   31
+  ]
+
+PASS both formats twice source:own-gulimche-half-glyph-matrix-no-ls.hwpx
+PASS independent native admission hancom:own-gulimche-half-glyph-matrix-no-ls.hwpx
+PASS both formats twice hancom:own-gulimche-half-glyph-matrix-no-ls.hwpx
+FAIL actual cell edit, snapshot undo redo and strict both-format two reopens 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/0/text/runs/0/text: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/0/text/runs/0/text). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.
+FAIL unowned font relabel is refused before writing: unknown-type The frozen codec-owner counterexample must remain real; do not manufacture a refusal.
+FAIL unowned font relabel is refused before writing: embedded-unowned The frozen codec-owner counterexample must remain real; do not manufacture a refusal.

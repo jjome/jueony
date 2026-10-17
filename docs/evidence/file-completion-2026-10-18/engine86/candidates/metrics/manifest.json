@@ -1,0 +1,450 @@
+{
+  "scope": "정규 GulimChe TTF 자체 문서 측정·행경계 후보와 정식84 실제 검수. ns0 XML 저장 7건 실패를 포함하며 전체 파일 파트 완료 주장 없음.",
+  "excluded": "공개 입력·공개 문서 전체 snapshot·글꼴 프로그램·WASM·실행 바이너리 미포함. 공개 원문 없이 숫자 해석 정정만 포함.",
+  "native": {
+    "passed": 19,
+    "admissionChecks": 136,
+    "glyphDecisions": 30,
+    "strictReopens": 108
+  },
+  "formal84": {
+    "functionalPassed": 12,
+    "functionalFailed": 0,
+    "independentXmlPassed": 4,
+    "independentXmlFailed": 7
+  },
+  "files": [
+    {
+      "path": "evidence/gulimche-natural-advance-final83.patch",
+      "sourcePath": "build/gulimche-admission-candidate81/gulimche-natural-advance-final83.patch",
+      "sha256": "1b7673af7d20093b9a43e9b157670926f2042c9b7b7156f87a9afecc2099d67b",
+      "bytes": 22317
+    },
+    {
+      "path": "evidence/source-proof-final83.json",
+      "sourcePath": "build/gulimche-admission-candidate81/source-proof-final83.json",
+      "sha256": "8577664840952a9ceaff6b0f7c1389bd54217160782e736c50653ce100a236fb",
+      "bytes": 1678
+    },
+    {
+      "path": "evidence/hcr-restored-v5.json",
+      "sourcePath": "build/gulimche-admission-candidate81/hcr-restored-v5.json",
+      "sha256": "197eb72ea47e8633a3c22ca4a727cb8b359cc015ab104f0a213dfe2751c8755b",
+      "bytes": 435
+    },
+    {
+      "path": "evidence/handoff-final83.json",
+      "sourcePath": "build/gulimche-admission-candidate81/handoff-final83.json",
+      "sha256": "57006bb08a505babd47362a2c04810ef6fdbdef1b101b04528fffd499bc07599",
+      "bytes": 2391
+    },
+    {
+      "path": "evidence/formal84-source-and-result-proof.json",
+      "sourcePath": "build/gulimche-admission-candidate81/formal84-source-and-result-proof.json",
+      "sha256": "990dddf02e9eaf0dccfb807633aefcc1d0cdb034ae955aacb83e83f1294be4e3",
+      "bytes": 1487
+    },
+    {
+      "path": "evidence/independent-admission-oracle.json",
+      "sourcePath": "build/gulimche-admission-candidate81/independent-admission-oracle.json",
+      "sha256": "31826de3a8ec003e71b6b5f0435531cb8fa7044cb5e82c636209c70f3240b7dd",
+      "bytes": 8225
+    },
+    {
+      "path": "evidence/glyph-probe.json",
+      "sourcePath": "build/gulimche-admission-candidate81/glyph-probe.json",
+      "sha256": "66e0702f025f1540c4f6049bae8685724c32ce3a8a6cfab3b602e64d699a29cd",
+      "bytes": 3761
+    },
+    {
+      "path": "evidence/owned-glyph-probe.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/owned-glyph-probe.hwpx",
+      "sha256": "776b924cce7be57616efa05bd936efa0a5332d53c194400d0e920fbacac7a63f",
+      "bytes": 7893
+    },
+    {
+      "path": "evidence/owned-exclusions-v5.json",
+      "sourcePath": "build/gulimche-admission-candidate81/owned-exclusions-v5.json",
+      "sha256": "a9d06a65868c6ffc7869d2c366fb7338674c11f478f06b899590b3d13b0533a1",
+      "bytes": 57668
+    },
+    {
+      "path": "evidence/negative-v5-vs-formal83-wasm.json",
+      "sourcePath": "build/gulimche-admission-candidate81/negative-v5-vs-formal83-wasm.json",
+      "sha256": "200cf1a23d221eb79260a1d572b4ff9d1550c64f82f4af011962e856460cbc9c",
+      "bytes": 25461
+    },
+    {
+      "path": "evidence/public-metric-interpretation-correction.json",
+      "sourcePath": "build/gulimche-admission-candidate81/public-metric-interpretation-correction.json",
+      "sha256": "3259d15c5c03ed730f2367614781a5431095aab9141b063172e05fd7ffea5660",
+      "bytes": 9170
+    },
+    {
+      "path": "evidence/integer-budget-trace-proof.json",
+      "sourcePath": "build/gulimche-admission-candidate81/integer-budget-trace-proof.json",
+      "sha256": "d71d490976695d78a79f0c2dacf1daade4da8cdb784ebec5e6306dc0ebcdda3d",
+      "bytes": 1637
+    },
+    {
+      "path": "evidence/native-candidate-v1-fixtures-fixed.log",
+      "sourcePath": "build/gulimche-admission-candidate81/native-candidate-v1-fixtures-fixed.log",
+      "sha256": "baa6717e2262636ad90a9d0b2dfc49cd572b6aa3ea3691999678fdccbbe31972",
+      "bytes": 2039
+    },
+    {
+      "path": "evidence/native-candidate-v2.log",
+      "sourcePath": "build/gulimche-admission-candidate81/native-candidate-v2.log",
+      "sha256": "0370e7b4dd127819cfb57f9ae9ae6581dedbcc5d18e000e59653a88880aa64ce",
+      "bytes": 4334
+    },
+    {
+      "path": "evidence/native-candidate-v3.log",
+      "sourcePath": "build/gulimche-admission-candidate81/native-candidate-v3.log",
+      "sha256": "27eabe0dbbca707f86e8346044712babcc70cc51303e85f5212f964163028758",
+      "bytes": 4383
+    },
+    {
+      "path": "evidence/native-candidate-v4.log",
+      "sourcePath": "build/gulimche-admission-candidate81/native-candidate-v4.log",
+      "sha256": "5713d2f4bb50fc6ba08789fca217ff196c586228c245825521f219a9f73e2c75",
+      "bytes": 4435
+    },
+    {
+      "path": "evidence/native-candidate-v5.log",
+      "sourcePath": "build/gulimche-admission-candidate81/native-candidate-v5.log",
+      "sha256": "04f246093cc62b0facafa7b5e7b8daecb21a9a88548279c6bb2ea75967f81899",
+      "bytes": 4435
+    },
+    {
+      "path": "evidence/native-actual11-candidate-v5.log",
+      "sourcePath": "build/gulimche-admission-candidate81/native-actual11-candidate-v5.log",
+      "sha256": "7ad2575dc3650ea34f8dc8ce5507bd26a28774b496846d67f526899a3b1fe6d2",
+      "bytes": 756
+    },
+    {
+      "path": "evidence/native-baseline83.log",
+      "sourcePath": "build/gulimche-admission-candidate81/native-baseline83.log",
+      "sha256": "ac7328662d15319842c9c8f3c29d4e3e22eb1b0b519fb7a338e451f789a39449",
+      "bytes": 510
+    },
+    {
+      "path": "evidence/verify-gulimche-admission-engine.mjs",
+      "sourcePath": "build/gulimche-admission-candidate81/verify-gulimche-admission-engine.mjs",
+      "sha256": "039beb92aa2007499e18855caeec9dc634f265efcadbcc720131f9351884b3f4",
+      "bytes": 10412
+    },
+    {
+      "path": "evidence/validate-hwpx-xml.py",
+      "sourcePath": "build/gulimche-admission-candidate81/validate-hwpx-xml.py",
+      "sha256": "e508d5e67b4487f9034246bc3b7c3f02f04a3d5b15e86e5992768352a7febcd5",
+      "bytes": 1066
+    },
+    {
+      "path": "evidence/verify-v5-negative-baseline83.mjs",
+      "sourcePath": "build/gulimche-admission-candidate81/verify-v5-negative-baseline83.mjs",
+      "sha256": "c92bf320f59a5ea167fd8c151481c0502e184131302c5a0a06d2a381dbd60a9d",
+      "bytes": 2509
+    },
+    {
+      "path": "evidence/fix-exclusion-fixtures.py",
+      "sourcePath": "build/gulimche-admission-candidate81/fix-exclusion-fixtures.py",
+      "sha256": "3ae3d5127bedf7d5ef5f07b42ef1bd44d276086df98382597f8f0a05c62bd365",
+      "bytes": 3439
+    },
+    {
+      "path": "evidence/prepare-glyph-probe.py",
+      "sourcePath": "build/gulimche-admission-candidate81/prepare-glyph-probe.py",
+      "sha256": "00e7c35d269da27443a674ff1bb0bef48e764bbd18f1526b505d6322fdc41d84",
+      "bytes": 1919
+    },
+    {
+      "path": "evidence/wasm-baseline83-final-verifier.log",
+      "sourcePath": "build/gulimche-admission-candidate81/wasm-baseline83-final-verifier.log",
+      "sha256": "d979d3e70ca5d2906a02b701db5dfc8d652415b0ec49d063d9742f440184d696",
+      "bytes": 1562
+    },
+    {
+      "path": "evidence/wasm-formal84-independent-xml.log",
+      "sourcePath": "build/gulimche-admission-candidate81/wasm-formal84-independent-xml.log",
+      "sha256": "6edc40bb219bbe9f09c38f323bda755bddad70ac9fe4cd5cb964673623b7be30",
+      "bytes": 2326
+    },
+    {
+      "path": "tests/jueony_gulimche_admission.rs",
+      "sourcePath": "build/gulimche-admission-candidate81/source-candidate-v5/tests/jueony_gulimche_admission.rs",
+      "sha256": "fa4d5258bfa2341be59dfb6a263f7c171d5567cb82c90dc24a77cea3c23ebadd",
+      "bytes": 17371
+    },
+    {
+      "path": "tests/jueony_actual11.rs",
+      "sourcePath": "build/gulimche-admission-candidate81/source-candidate-v5/tests/jueony_actual11.rs",
+      "sha256": "bcd20f63fbce0a783cc0ce14348113d2795bb6f3f5def622cf6408f67aebffc7",
+      "bytes": 6978
+    },
+    {
+      "path": "candidate-source/src/renderer/composer/line_breaking.rs",
+      "sourcePath": "build/gulimche-admission-candidate81/source-candidate-v5/src/renderer/composer/line_breaking.rs",
+      "sha256": "b0b3abad2708bc3049f0999700d189eb60c2476fc027dc4465f46af370835983",
+      "bytes": 281371
+    },
+    {
+      "path": "candidate-source/src/renderer/layout/text_measurement.rs",
+      "sourcePath": "build/gulimche-admission-candidate81/source-candidate-v5/src/renderer/layout/text_measurement.rs",
+      "sha256": "40c5caac29acf7a79ff1bfb540a19a1027acc4036e07310575440dffd1119430",
+      "bytes": 151677
+    },
+    {
+      "path": "candidate-source/src/renderer/style_resolver.rs",
+      "sourcePath": "build/gulimche-admission-candidate81/source-candidate-v5/src/renderer/style_resolver.rs",
+      "sha256": "b28a36d364259e964db4ef415f52b0640f56b27f2ca24b0c672f478bb4bd2054",
+      "bytes": 79922
+    },
+    {
+      "path": "fixtures/own-gulimche-floor4-matrix-no-ls.hwpx",
+      "sourcePath": "build/line-fit-threshold80/own-gulimche-floor4-matrix-no-ls.hwpx",
+      "sha256": "e0c358f025f94a4a532cf820f699b0016003e46a846292de00c81c34c6549a40",
+      "bytes": 8791
+    },
+    {
+      "path": "fixtures/hancom-gulimche-floor4-matrix.hwpx",
+      "sourcePath": "build/line-fit-threshold80/hancom-gulimche-floor4-matrix.hwpx",
+      "sha256": "2fdcca7cefa489b814da06d2cd2540ab125c287fe29f53774abaa2b612e2913d",
+      "bytes": 25224
+    },
+    {
+      "path": "fixtures/own-gulimche-half-glyph-matrix-no-ls.hwpx",
+      "sourcePath": "build/line-fit-threshold80/own-gulimche-half-glyph-matrix-no-ls.hwpx",
+      "sha256": "0e7f9eb219e190fbabd461fa58b4d6f97fdb3f5b8dfa6a7a1d9189e2c08286d1",
+      "bytes": 8621
+    },
+    {
+      "path": "fixtures/hancom-gulimche-half-glyph-matrix.hwpx",
+      "sourcePath": "build/line-fit-threshold80/hancom-gulimche-half-glyph-matrix.hwpx",
+      "sha256": "b05e369f37c82713d6bc0198b9feeb8533fea09a17fa091413e0b383a51bdbdc",
+      "bytes": 24036
+    },
+    {
+      "path": "fixtures/exclusions/other-font.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/owned-exclusions/other-font.hwpx",
+      "sha256": "35387d639aa1b89b4020cafcefff6047e0ec90961e8eebd7cb05251a58ab2605",
+      "bytes": 8785
+    },
+    {
+      "path": "fixtures/exclusions/hft.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/owned-exclusions/hft.hwpx",
+      "sha256": "ec1f3e05792494a2fee71b453f70c166a8cf5c30182c1f59d18abf66e1284973",
+      "bytes": 8796
+    },
+    {
+      "path": "fixtures/exclusions/unknown-face.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/owned-exclusions/unknown-face.hwpx",
+      "sha256": "d05e595e75a08e28b34fd149bddc4e6954b330db9cb3f8ded94fc33964de558a",
+      "bytes": 8797
+    },
+    {
+      "path": "fixtures/exclusions/unknown-type.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/owned-exclusions/unknown-type.hwpx",
+      "sha256": "393f4e7b2188dcece70c90b1450e61aade111ed51256d1447905df772e47e6e6",
+      "bytes": 8799
+    },
+    {
+      "path": "fixtures/exclusions/fractional-height.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/owned-exclusions/fractional-height.hwpx",
+      "sha256": "55e536727c924414ae8b78317cd2bcbebe5f60bc97b9a7a03170de10f5de551d",
+      "bytes": 8773
+    },
+    {
+      "path": "fixtures/exclusions/zero-ratio.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/owned-exclusions/zero-ratio.hwpx",
+      "sha256": "c61dac51af5f3a17bea2816e3b85587a8e8118be947cd2e8b7f790d54335596f",
+      "bytes": 8764
+    },
+    {
+      "path": "fixtures/exclusions/bold.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/owned-exclusions/bold.hwpx",
+      "sha256": "14677ef36889517f8fedfbe0234cf5dccd8a09d2cc1dca592f59019875475382",
+      "bytes": 8796
+    },
+    {
+      "path": "fixtures/exclusions/italic.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/owned-exclusions/italic.hwpx",
+      "sha256": "5f90c42f73ceb3bcd646dd5421a4306ea0662b9b3c75abdcdbad374aca75a22b",
+      "bytes": 8798
+    },
+    {
+      "path": "fixtures/exclusions/kerning.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/owned-exclusions/kerning.hwpx",
+      "sha256": "28affe74aac7820d4d82614eeae1f7ece14a9a3a9d143f6d0ba54f1d96ad0988",
+      "bytes": 8793
+    },
+    {
+      "path": "fixtures/exclusions/font-space.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/owned-exclusions/font-space.hwpx",
+      "sha256": "fa6b8235123db654089fae25d74cf0549ff1465d0012c04b08982f9ee3e7f0b4",
+      "bytes": 8790
+    },
+    {
+      "path": "fixtures/exclusions/tracking.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/owned-exclusions/tracking.hwpx",
+      "sha256": "5cbf7f874a2808c42f228becca33d7e268928e347dd05339c44d9338f96a7ac5",
+      "bytes": 8762
+    },
+    {
+      "path": "fixtures/exclusions/embedded-unowned.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/owned-exclusions/embedded-unowned.hwpx",
+      "sha256": "bf527bbd46e03b58ef810d737250d9b2b67df9b1fba8419111cb20717ca4e4bd",
+      "bytes": 8828
+    },
+    {
+      "path": "independent-oracle/prepare-floor4-matrix.py",
+      "sourcePath": "build/line-fit-threshold80/prepare-floor4-matrix.py",
+      "sha256": "4e15270477b1b13f206e6819d85ad8c743658a3e6835a07b9ea232e1ad59e3c8",
+      "bytes": 6400
+    },
+    {
+      "path": "independent-oracle/read-floor4-matrix.py",
+      "sourcePath": "build/line-fit-threshold80/read-floor4-matrix.py",
+      "sha256": "7a308ad46a30aa4b858e34e66f7f959450011725436d1bf851cc239efd08f2a9",
+      "bytes": 5370
+    },
+    {
+      "path": "independent-oracle/prepare-half-glyph-matrix.py",
+      "sourcePath": "build/line-fit-threshold80/prepare-half-glyph-matrix.py",
+      "sha256": "637b14a4559cac116fb025005cfa4bf528bde304af945b37135418684797e38a",
+      "bytes": 5180
+    },
+    {
+      "path": "independent-oracle/read-half-glyph-matrix.py",
+      "sourcePath": "build/line-fit-threshold80/read-half-glyph-matrix.py",
+      "sha256": "4343d32b7b079ca3c40bb182be978c3f6773699933d8c4338d0cda5222f0ce79",
+      "bytes": 5471
+    },
+    {
+      "path": "independent-oracle/floor4-matrix-input-manifest.json",
+      "sourcePath": "build/line-fit-threshold80/floor4-matrix-input-manifest.json",
+      "sha256": "2198c7151cccf72a6f76ed5492765dc77eb536b6aea40c69464d35924f037073",
+      "bytes": 35365
+    },
+    {
+      "path": "independent-oracle/floor4-matrix-hancom-comparison.json",
+      "sourcePath": "build/line-fit-threshold80/floor4-matrix-hancom-comparison.json",
+      "sha256": "ca5d7bbc5384a64dc4e1f7504ad71e51ddb4be4da63a7735c00ad46f23d790b2",
+      "bytes": 18044
+    },
+    {
+      "path": "independent-oracle/half-glyph-matrix-hancom-comparison.json",
+      "sourcePath": "build/line-fit-threshold80/half-glyph-matrix-hancom-comparison.json",
+      "sha256": "563b6465112bc9f374cab6706f301701403dd913d6f543510fe8aff2a471bdb0",
+      "bytes": 16627
+    },
+    {
+      "path": "native-results/admission68.json",
+      "sourcePath": "build/gulimche-admission-candidate81/candidate-v5/admission68.json",
+      "sha256": "81752b5f462da086c64fe59eef982914ae9e8cee0ae2abea631a6a20450312c6",
+      "bytes": 26675
+    },
+    {
+      "path": "native-results/glyph-decisions.json",
+      "sourcePath": "build/gulimche-admission-candidate81/candidate-v5/glyph-decisions.json",
+      "sha256": "0cd75a935e5c27bab3b034e7d19ce01a330c9f918b04f4e3f6421d1f947bda0c",
+      "bytes": 4188
+    },
+    {
+      "path": "native-results/excluded-contexts.json",
+      "sourcePath": "build/gulimche-admission-candidate81/candidate-v5/excluded-contexts.json",
+      "sha256": "95d5cb64e21bf25b4ec9328d08e39fb94938bd5d285be6950fb456082db50131",
+      "bytes": 2755
+    },
+    {
+      "path": "native-results/own68-save-cycles.json",
+      "sourcePath": "build/gulimche-admission-candidate81/candidate-v5/own68-save-cycles.json",
+      "sha256": "a2cb01be7a0fe704576b54ef124c445301708268290a7a6a44ef6fca8830a819",
+      "bytes": 4614
+    },
+    {
+      "path": "native-results/real-history.json",
+      "sourcePath": "build/gulimche-admission-candidate81/candidate-v5/real-history.json",
+      "sha256": "302310a8504ed4cfdc2e78fc8810b7361dadbb5cbb130d828ee9ac0738eba855",
+      "bytes": 118
+    },
+    {
+      "path": "wasm-formal84-independent-xml/01-source_own-gulimche-floor4-matrix-no-ls_hwpx-1.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/wasm-formal84-independent-xml/01-source_own-gulimche-floor4-matrix-no-ls_hwpx-1.hwpx",
+      "sha256": "f456ee240c2cbb5171b00a26883aed946ed62801880d93ec17a9c9c359ed72c5",
+      "bytes": 9183
+    },
+    {
+      "path": "wasm-formal84-independent-xml/02-source_own-gulimche-floor4-matrix-no-ls_hwpx-2.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/wasm-formal84-independent-xml/02-source_own-gulimche-floor4-matrix-no-ls_hwpx-2.hwpx",
+      "sha256": "f456ee240c2cbb5171b00a26883aed946ed62801880d93ec17a9c9c359ed72c5",
+      "bytes": 9183
+    },
+    {
+      "path": "wasm-formal84-independent-xml/03-hancom_own-gulimche-floor4-matrix-no-ls_hwpx-1.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/wasm-formal84-independent-xml/03-hancom_own-gulimche-floor4-matrix-no-ls_hwpx-1.hwpx",
+      "sha256": "8a8be25984228f21485f414eac82e477eaa62d6bba984396fa72dcf4a00b5805",
+      "bytes": 17814
+    },
+    {
+      "path": "wasm-formal84-independent-xml/04-hancom_own-gulimche-floor4-matrix-no-ls_hwpx-2.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/wasm-formal84-independent-xml/04-hancom_own-gulimche-floor4-matrix-no-ls_hwpx-2.hwpx",
+      "sha256": "8a8be25984228f21485f414eac82e477eaa62d6bba984396fa72dcf4a00b5805",
+      "bytes": 17814
+    },
+    {
+      "path": "wasm-formal84-independent-xml/05-source_own-gulimche-half-glyph-matrix-no-ls_hwpx-1.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/wasm-formal84-independent-xml/05-source_own-gulimche-half-glyph-matrix-no-ls_hwpx-1.hwpx",
+      "sha256": "a14d5e322ebce2ea55be81f0449827bb838d4f3cd9a487b308d3f0f77d83c68b",
+      "bytes": 9010
+    },
+    {
+      "path": "wasm-formal84-independent-xml/06-source_own-gulimche-half-glyph-matrix-no-ls_hwpx-2.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/wasm-formal84-independent-xml/06-source_own-gulimche-half-glyph-matrix-no-ls_hwpx-2.hwpx",
+      "sha256": "a14d5e322ebce2ea55be81f0449827bb838d4f3cd9a487b308d3f0f77d83c68b",
+      "bytes": 9010
+    },
+    {
+      "path": "wasm-formal84-independent-xml/07-hancom_own-gulimche-half-glyph-matrix-no-ls_hwpx-1.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/wasm-formal84-independent-xml/07-hancom_own-gulimche-half-glyph-matrix-no-ls_hwpx-1.hwpx",
+      "sha256": "cc2ae27233a8a927f9c63038386998e59ae655f7203fc76c58372c85bb099456",
+      "bytes": 15984
+    },
+    {
+      "path": "wasm-formal84-independent-xml/08-hancom_own-gulimche-half-glyph-matrix-no-ls_hwpx-2.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/wasm-formal84-independent-xml/08-hancom_own-gulimche-half-glyph-matrix-no-ls_hwpx-2.hwpx",
+      "sha256": "cc2ae27233a8a927f9c63038386998e59ae655f7203fc76c58372c85bb099456",
+      "bytes": 15984
+    },
+    {
+      "path": "wasm-formal84-independent-xml/09-edited-cell-1.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/wasm-formal84-independent-xml/09-edited-cell-1.hwpx",
+      "sha256": "2eb55904a8b074301ee9259142a09c9a85e0dd0afe8c7d34960d3eb82ba1a6ab",
+      "bytes": 9182
+    },
+    {
+      "path": "wasm-formal84-independent-xml/10-edited-cell-2.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/wasm-formal84-independent-xml/10-edited-cell-2.hwpx",
+      "sha256": "2eb55904a8b074301ee9259142a09c9a85e0dd0afe8c7d34960d3eb82ba1a6ab",
+      "bytes": 9182
+    },
+    {
+      "path": "wasm-formal84-independent-xml/11-guard-unknown-type.hwpx",
+      "sourcePath": "build/gulimche-admission-candidate81/wasm-formal84-independent-xml/11-guard-unknown-type.hwpx",
+      "sha256": "f456ee240c2cbb5171b00a26883aed946ed62801880d93ec17a9c9c359ed72c5",
+      "bytes": 9183
+    },
+    {
+      "path": "wasm-formal84-independent-xml/result.json",
+      "sourcePath": "build/gulimche-admission-candidate81/wasm-formal84-independent-xml/result.json",
+      "sha256": "7939e91699f0950ecb499679b5256aa56d4d35b3428125907f7b3949e37dea56",
+      "bytes": 146295
+    },
+    {
+      "path": "wasm-baseline83-final-verifier/result.json",
+      "sourcePath": "build/gulimche-admission-candidate81/wasm-baseline83-final-verifier/result.json",
+      "sha256": "eb2c81e1b5ebbfb84fcf4cd1a3ce32b1706ac27befe27c22db33f3d2501c80a3",
+      "bytes": 94166
+    }
+  ]
+}

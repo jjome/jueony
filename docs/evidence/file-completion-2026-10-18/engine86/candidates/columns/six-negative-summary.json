@@ -1,0 +1,115 @@
+{
+  "originalRawSHA": "5040c3a99767a732ba2b6acd62420ac3869dd169c1d52382fc0584471bd3216f",
+  "originalRawBytes": 633306,
+  "rawPayloadOmitted": "Full self-authored snapshot omitted from permanent pack; negative-baselines.mjs regenerates it with the pinned formal83 package and sealed own fixtures.",
+  "scenarios": [
+    {
+      "name": "single_column",
+      "inputSHA": "9778d66926e3138ce4bb51fadfd16173ee3d439aeec0a02a8f0af34b7fac0f3b",
+      "beforeCanonicalJSONSHA": "90d67d97b758e9ade279f70e7d926ce7ae6b92bcd11b368080644da87252a79a",
+      "publishedPages": 1,
+      "exports": [
+        {
+          "format": "hwp",
+          "lossCount": 0,
+          "canonicalLayoutSHA": "90d67d97b758e9ade279f70e7d926ce7ae6b92bcd11b368080644da87252a79a"
+        },
+        {
+          "format": "hwpx",
+          "lossCount": 0,
+          "canonicalLayoutSHA": "4a2ec3cf58c55a22ce77ee821d038c46e1251d1566ab6cc00d36197898872bbc"
+        }
+      ]
+    },
+    {
+      "name": "three_columns",
+      "inputSHA": "db5e90e7217912d928d26d87d0e2877bf2682e90d1812bdef274aee83972cb79",
+      "beforeCanonicalJSONSHA": "b8f874131582e1a67741b4b0030c24bf6a6abaf5e7bdd8fc86da6e3c14842f07",
+      "publishedPages": 1,
+      "exports": [
+        {
+          "format": "hwp",
+          "lossCount": 0,
+          "canonicalLayoutSHA": "b8f874131582e1a67741b4b0030c24bf6a6abaf5e7bdd8fc86da6e3c14842f07"
+        },
+        {
+          "format": "hwpx",
+          "lossCount": 0,
+          "canonicalLayoutSHA": "00c706834fcc5cbb62b95248d7c63132b8f310b2dc88e874200d2c8d79563cfe"
+        }
+      ]
+    },
+    {
+      "name": "rtl",
+      "inputSHA": "f48a715a8ea47cb8081b735f89512dbac9209a0e99ab5d68877396d030056742",
+      "beforeCanonicalJSONSHA": "60b5ebdb26001281a5fc6fe0c9fa57d4411b39055e1c45c48571a3c6d931f61a",
+      "publishedPages": 1,
+      "exports": [
+        {
+          "format": "hwp",
+          "lossCount": 0,
+          "canonicalLayoutSHA": "60b5ebdb26001281a5fc6fe0c9fa57d4411b39055e1c45c48571a3c6d931f61a"
+        },
+        {
+          "format": "hwpx",
+          "lossCount": 0,
+          "canonicalLayoutSHA": "444a5c8fc4ea43d1c1d08bdd70864676beb6a0c98dd7b36fea84311d04f11d67"
+        }
+      ]
+    },
+    {
+      "name": "distribute",
+      "inputSHA": "9b35480c316ee54c1d5ef0ecbe4a2d5223b7321143aded0dbab43b1d5f569452",
+      "beforeCanonicalJSONSHA": "d46f9fb7bf7db388b86a2d5e4e985c92147f1f57399c7fce3539c7a2d038eb0b",
+      "publishedPages": 1,
+      "exports": [
+        {
+          "format": "hwp",
+          "lossCount": 0,
+          "canonicalLayoutSHA": "d46f9fb7bf7db388b86a2d5e4e985c92147f1f57399c7fce3539c7a2d038eb0b"
+        },
+        {
+          "format": "hwpx",
+          "lossCount": 0,
+          "canonicalLayoutSHA": "dc8fdee9a51a150dd3d2f6fde0cb4f6287603be20a81c1a453fd6ee22c2ff28a"
+        }
+      ]
+    },
+    {
+      "name": "unequal_columns",
+      "inputSHA": "2ee00d6ef1ea96b9c5fb7fd4f2a4a278b0d676dcb964afdae2dcb49b0ab4016e",
+      "beforeCanonicalJSONSHA": "17bca56aec47fb59c16d7417cf52ad785dbd36ea598981419d09a8a1dab737b2",
+      "publishedPages": 1,
+      "exports": [
+        {
+          "format": "hwp",
+          "lossCount": 0,
+          "canonicalLayoutSHA": "17bca56aec47fb59c16d7417cf52ad785dbd36ea598981419d09a8a1dab737b2"
+        },
+        {
+          "format": "hwpx",
+          "lossCount": 0,
+          "canonicalLayoutSHA": "127980fea12a642256b158039799250aa0b0ff3f63f58ee8243193c90df878c6"
+        }
+      ]
+    },
+    {
+      "name": "asymmetric_margin",
+      "inputSHA": "3ba817fe20afa035739168eddcd1eae6fa08e7bd28b4322db3ec7f6f1f85830e",
+      "beforeCanonicalJSONSHA": "d46f9fb7bf7db388b86a2d5e4e985c92147f1f57399c7fce3539c7a2d038eb0b",
+      "publishedPages": 1,
+      "exports": [
+        {
+          "format": "hwp",
+          "lossCount": 0,
+          "canonicalLayoutSHA": "d46f9fb7bf7db388b86a2d5e4e985c92147f1f57399c7fce3539c7a2d038eb0b"
+        },
+        {
+          "format": "hwpx",
+          "lossCount": 0,
+          "canonicalLayoutSHA": "dc8fdee9a51a150dd3d2f6fde0cb4f6287603be20a81c1a453fd6ee22c2ff28a"
+        }
+      ]
+    }
+  ]
+}

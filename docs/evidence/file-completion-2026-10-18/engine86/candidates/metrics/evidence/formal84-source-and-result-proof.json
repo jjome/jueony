@@ -1,0 +1,39 @@
+{
+  "scope": "정식84 실제 WASM과 검증한 v5의 3개 런타임 소스 일치",
+  "sources": [
+    {
+      "path": "src/renderer/composer/line_breaking.rs",
+      "candidateSHA256": "b0b3abad2708bc3049f0999700d189eb60c2476fc027dc4465f46af370835983",
+      "formal84SHA256": "b0b3abad2708bc3049f0999700d189eb60c2476fc027dc4465f46af370835983",
+      "bytesExact": true
+    },
+    {
+      "path": "src/renderer/layout/text_measurement.rs",
+      "candidateSHA256": "40c5caac29acf7a79ff1bfb540a19a1027acc4036e07310575440dffd1119430",
+      "formal84SHA256": "40c5caac29acf7a79ff1bfb540a19a1027acc4036e07310575440dffd1119430",
+      "bytesExact": true
+    },
+    {
+      "path": "src/renderer/style_resolver.rs",
+      "candidateSHA256": "b28a36d364259e964db4ef415f52b0640f56b27f2ca24b0c672f478bb4bd2054",
+      "formal84SHA256": "b28a36d364259e964db4ef415f52b0640f56b27f2ca24b0c672f478bb4bd2054",
+      "bytesExact": true
+    }
+  ],
+  "engineWasmSHA256": "4c9674be212cbddc51dc875b0047762a7dbd078a2ec27eedd44a6955be371a45",
+  "engineJsSHA256": "72828c03b5b92948e0acd45bcd3de0263c8570bfbfaeab283eb5998e1b72b22d",
+  "functional": {
+    "passed": 12,
+    "failed": 0
+  },
+  "independentXML": {
+    "checks": 11,
+    "valid": 4,
+    "invalid": 7
+  },
+  "overall": {
+    "passed": 16,
+    "failed": 7
+  },
+  "note": "기능과 내부 보호 통과를 올바른 XML 저장 성공으로 대체하지 않음. ns0 원본 결함을 별도 실패로 보존."
+}

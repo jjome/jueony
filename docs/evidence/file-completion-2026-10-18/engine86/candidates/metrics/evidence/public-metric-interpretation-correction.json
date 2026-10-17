@@ -1,0 +1,292 @@
+{
+  "정정": "두 문서를 같은 엔진으로 비교한 잔여 차이의 건수가 그대로인 것을 측정 미적용으로 잘못 해석했습니다. 원시 TTF 선언과 resolved trusted/Exact가 확인되며, 실제 source/한글 사본 모두 charX가 변합니다. clean 저장 partition은 바꾸지 않습니다.",
+  "조건범위": "새 HFT/별칭/불명확 프로그램 권한을 추가하지 않습니다.",
+  "rows": [
+    {
+      "axis": "mcst-original-to-actual",
+      "beforeResidualCount": 20579,
+      "afterResidualCount": 20579,
+      "selectedOperandChanges": []
+    },
+    {
+      "axis": "mcst-historical-to-actual",
+      "beforeResidualCount": 20579,
+      "afterResidualCount": 20579,
+      "selectedOperandChanges": []
+    },
+    {
+      "axis": "python3-direct-to-actual",
+      "beforeResidualCount": 727,
+      "afterResidualCount": 727,
+      "selectedOperandChanges": [
+        {
+          "side": "source",
+          "page": 2,
+          "cell": 0,
+          "paragraph": 1,
+          "charStart": 1,
+          "fields": {},
+          "charXChangedValues": 20,
+          "maximumCharXChangePx": 0.30000000000001137,
+          "textSHA256": "45ada6abe1d8b064be960e00089d71b8b94c55458b8fb32a211ad1b755f088f0"
+        },
+        {
+          "side": "source",
+          "page": 2,
+          "cell": 0,
+          "paragraph": 1,
+          "charStart": 33,
+          "fields": {
+            "w": {
+              "before": 78.2,
+              "after": 78.0
+            }
+          },
+          "charXChangedValues": 5,
+          "maximumCharXChangePx": 0.20000000000000284,
+          "textSHA256": "8fbc1c0af495f306cd6ad40a1cb3c93f5e193d6371f783dc7a27235131784952"
+        },
+        {
+          "side": "source",
+          "page": 2,
+          "cell": 2,
+          "paragraph": 0,
+          "charStart": 0,
+          "fields": {},
+          "charXChangedValues": 20,
+          "maximumCharXChangePx": 0.30000000000001137,
+          "textSHA256": "eabf0662fefea7fe206a6136c932c3e4a0159426ee242c1a8c09e15428c97f6b"
+        },
+        {
+          "side": "source",
+          "page": 2,
+          "cell": 2,
+          "paragraph": 0,
+          "charStart": 31,
+          "fields": {},
+          "charXChangedValues": 18,
+          "maximumCharXChangePx": 0.20000000000004547,
+          "textSHA256": "62648c018f4d927dabf0e8748725b89cc27b755b818db0a0ef81fe034e649c2d"
+        },
+        {
+          "side": "source",
+          "page": 2,
+          "cell": 2,
+          "paragraph": 0,
+          "charStart": 63,
+          "fields": {
+            "w": {
+              "before": 355.7,
+              "after": 354.7
+            }
+          },
+          "charXChangedValues": 28,
+          "maximumCharXChangePx": 1.0,
+          "textSHA256": "9fb3bb9e33111db45335093c9457be647826dd3606c39dc3fcc55d5d5da711d0"
+        },
+        {
+          "side": "hancom",
+          "page": 2,
+          "cell": 0,
+          "paragraph": 1,
+          "charStart": 1,
+          "fields": {},
+          "charXChangedValues": 22,
+          "maximumCharXChangePx": 0.30000000000001137,
+          "textSHA256": "976732f046f725485704ba2d82c2be4b2b25b0b61065f3b715d8f42396958e87"
+        },
+        {
+          "side": "hancom",
+          "page": 2,
+          "cell": 0,
+          "paragraph": 1,
+          "charStart": 31,
+          "fields": {
+            "w": {
+              "before": 99.6,
+              "after": 99.3
+            }
+          },
+          "charXChangedValues": 6,
+          "maximumCharXChangePx": 0.29999999999999716,
+          "textSHA256": "46a2b4810e193be915cd5907c933dea6a081b629cfe81777c9919491d76ac783"
+        },
+        {
+          "side": "hancom",
+          "page": 2,
+          "cell": 2,
+          "paragraph": 0,
+          "charStart": 0,
+          "fields": {},
+          "charXChangedValues": 20,
+          "maximumCharXChangePx": 0.30000000000001137,
+          "textSHA256": "eabf0662fefea7fe206a6136c932c3e4a0159426ee242c1a8c09e15428c97f6b"
+        },
+        {
+          "side": "hancom",
+          "page": 2,
+          "cell": 2,
+          "paragraph": 0,
+          "charStart": 31,
+          "fields": {},
+          "charXChangedValues": 15,
+          "maximumCharXChangePx": 0.19999999999998863,
+          "textSHA256": "202eeed14327df646a40beef8fdb8fe17cc00cb8bbbeaa8e79a34f7af30e3181"
+        },
+        {
+          "side": "hancom",
+          "page": 2,
+          "cell": 2,
+          "paragraph": 0,
+          "charStart": 61,
+          "fields": {
+            "w": {
+              "before": 377.0,
+              "after": 375.9
+            }
+          },
+          "charXChangedValues": 30,
+          "maximumCharXChangePx": 1.1000000000000227,
+          "textSHA256": "51122c4969ce0d3717dda141236c3a1fc2f8599e04ec895949e7d7b307f124d8"
+        }
+      ]
+    },
+    {
+      "axis": "python3-unclaimed-diagnostic-to-actual",
+      "beforeResidualCount": 407,
+      "afterResidualCount": 407,
+      "selectedOperandChanges": [
+        {
+          "side": "source",
+          "page": 2,
+          "cell": 0,
+          "paragraph": 1,
+          "charStart": 1,
+          "fields": {},
+          "charXChangedValues": 20,
+          "maximumCharXChangePx": 0.30000000000001137,
+          "textSHA256": "45ada6abe1d8b064be960e00089d71b8b94c55458b8fb32a211ad1b755f088f0"
+        },
+        {
+          "side": "source",
+          "page": 2,
+          "cell": 0,
+          "paragraph": 1,
+          "charStart": 33,
+          "fields": {
+            "w": {
+              "before": 78.2,
+              "after": 78.0
+            }
+          },
+          "charXChangedValues": 5,
+          "maximumCharXChangePx": 0.20000000000000284,
+          "textSHA256": "8fbc1c0af495f306cd6ad40a1cb3c93f5e193d6371f783dc7a27235131784952"
+        },
+        {
+          "side": "source",
+          "page": 2,
+          "cell": 2,
+          "paragraph": 0,
+          "charStart": 0,
+          "fields": {},
+          "charXChangedValues": 20,
+          "maximumCharXChangePx": 0.30000000000001137,
+          "textSHA256": "eabf0662fefea7fe206a6136c932c3e4a0159426ee242c1a8c09e15428c97f6b"
+        },
+        {
+          "side": "source",
+          "page": 2,
+          "cell": 2,
+          "paragraph": 0,
+          "charStart": 31,
+          "fields": {},
+          "charXChangedValues": 18,
+          "maximumCharXChangePx": 0.20000000000004547,
+          "textSHA256": "62648c018f4d927dabf0e8748725b89cc27b755b818db0a0ef81fe034e649c2d"
+        },
+        {
+          "side": "source",
+          "page": 2,
+          "cell": 2,
+          "paragraph": 0,
+          "charStart": 63,
+          "fields": {
+            "w": {
+              "before": 355.7,
+              "after": 354.7
+            }
+          },
+          "charXChangedValues": 28,
+          "maximumCharXChangePx": 1.0,
+          "textSHA256": "9fb3bb9e33111db45335093c9457be647826dd3606c39dc3fcc55d5d5da711d0"
+        },
+        {
+          "side": "hancom",
+          "page": 2,
+          "cell": 0,
+          "paragraph": 1,
+          "charStart": 1,
+          "fields": {},
+          "charXChangedValues": 22,
+          "maximumCharXChangePx": 0.30000000000001137,
+          "textSHA256": "976732f046f725485704ba2d82c2be4b2b25b0b61065f3b715d8f42396958e87"
+        },
+        {
+          "side": "hancom",
+          "page": 2,
+          "cell": 0,
+          "paragraph": 1,
+          "charStart": 31,
+          "fields": {
+            "w": {
+              "before": 99.6,
+              "after": 99.3
+            }
+          },
+          "charXChangedValues": 6,
+          "maximumCharXChangePx": 0.29999999999999716,
+          "textSHA256": "46a2b4810e193be915cd5907c933dea6a081b629cfe81777c9919491d76ac783"
+        },
+        {
+          "side": "hancom",
+          "page": 2,
+          "cell": 2,
+          "paragraph": 0,
+          "charStart": 0,
+          "fields": {},
+          "charXChangedValues": 20,
+          "maximumCharXChangePx": 0.30000000000001137,
+          "textSHA256": "eabf0662fefea7fe206a6136c932c3e4a0159426ee242c1a8c09e15428c97f6b"
+        },
+        {
+          "side": "hancom",
+          "page": 2,
+          "cell": 2,
+          "paragraph": 0,
+          "charStart": 31,
+          "fields": {},
+          "charXChangedValues": 15,
+          "maximumCharXChangePx": 0.19999999999998863,
+          "textSHA256": "202eeed14327df646a40beef8fdb8fe17cc00cb8bbbeaa8e79a34f7af30e3181"
+        },
+        {
+          "side": "hancom",
+          "page": 2,
+          "cell": 2,
+          "paragraph": 0,
+          "charStart": 61,
+          "fields": {
+            "w": {
+              "before": 377.0,
+              "after": 375.9
+            }
+          },
+          "charXChangedValues": 30,
+          "maximumCharXChangePx": 1.1000000000000227,
+          "textSHA256": "51122c4969ce0d3717dda141236c3a1fc2f8599e04ec895949e7d7b307f124d8"
+        }
+      ]
+    }
+  ]
+}

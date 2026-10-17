@@ -1,0 +1,411 @@
+{
+  "status": "READ_ONLY_LAYERED_PROVENANCE_NOT_CURRENT_GUI_VALIDATION",
+  "actualOS68EvidenceReference": "docs/109-file-preservation-hancom-followup.md:18-19; OS-owned picker HWP open/edit/CtrlS + dirty cancel/recovery exit/restart/SaveAs. This script did not execute these UI actions.",
+  "native68Build": {
+    "resultSHA": "f07191ea9e88566c2db3233451b7136c456a0eb35113e344a684c0e5a1309f1b",
+    "binary": {
+      "path": "build/native-file-final68-20261017/JueonyNativeFinal68Review.exe",
+      "bytes": 52376064,
+      "sha256": "382757d18deee426a43db2b87b29b39ea426b4c486b4a2c111bf7b426d7d397b"
+    },
+    "binaryMatchesBuildManifest": true,
+    "engineSource": "cda65172283c6657",
+    "wasmSHA": "4a9acaf931b91b967f93b777cf5b987c7e73d23cff0f0a9a9c719b5e244938e9",
+    "initialBuildReportWasNotGUIValidation": "BUILT_NOT_GUI_TESTED",
+    "laterActualUIFiles": [
+      {
+        "path": "build/native-final68-actual-review/after-save.png",
+        "bytes": 171934,
+        "sha256": "bd97c930ac6d6ca46ed75296bd612e04e503733e83861600cd6efe4c5963107c"
+      },
+      {
+        "path": "build/native-final68-actual-review/exit-choices.png",
+        "bytes": 161687,
+        "sha256": "3912ea711768c68bb0741844d5cdd9bcb9877edea82e90eed8d60e243c0187a5"
+      },
+      {
+        "path": "build/native-final68-actual-review/native-input.hwp",
+        "bytes": 13312,
+        "sha256": "2a513516ed04436e7b914cc867aaba450b4b8a73b4862cd7e56f71a64c06b410"
+      },
+      {
+        "path": "build/native-final68-actual-review/recovered-copy.hwp",
+        "bytes": 13312,
+        "sha256": "a089fac69869fe6bb93b067f1fc8017c0635fa04c97389a6bbbc9ec3fb64f366"
+      },
+      {
+        "path": "build/native-final68-actual-review/recovered-uia.txt",
+        "bytes": 13138,
+        "sha256": "d6917c3eb8429644a85727a43095d7f4502527d572a6233a103b5dd12a6a6fc4"
+      },
+      {
+        "path": "build/native-final68-actual-review/recovered.png",
+        "bytes": 174578,
+        "sha256": "187524c57d81a857a524932001f15b407889efffff75df17b78aeb3901a9f131"
+      }
+    ]
+  },
+  "immutable68Frontend": {
+    "fileCount": 85,
+    "allChecksMatch": true,
+    "manifestSHA": "5bc30006c5e43ac4146ac007df3aa45c8001b01201e48834d213d1363b060d82",
+    "applicationSourceCommit": "013df6aeb6ed702e4e8dd98e5b24242f6ef4ae8f",
+    "applicationSourceDirty": true,
+    "customSourceSHA": "ab444f120e8f85966712326a2736beffac0d7f2cf7e924f191601b89d6b32e2c"
+  },
+  "rustInputs": [
+    {
+      "relative": "Cargo.toml",
+      "recordedProduction68SHA": "35889481f2e3bddb60fbcf1a860f8ab2cae2b8849afeac2e5f81147346016141",
+      "isolatedBuildInput68": {
+        "path": "build/native-file-final68-20261017/project/src-tauri/Cargo.toml",
+        "bytes": 505,
+        "sha256": "317d9cfd549fb8277058cdc1b6d8d8b4dfd977b7c91f6d7308408722f5a75ee7"
+      },
+      "current85": {
+        "path": "apps/editor/src-tauri/Cargo.toml",
+        "bytes": 420,
+        "sha256": "35889481f2e3bddb60fbcf1a860f8ab2cae2b8849afeac2e5f81147346016141"
+      },
+      "productionByteIdentical": true,
+      "isolatedBuildInputMatchesRecordedProduction": false
+    },
+    {
+      "relative": "Cargo.lock",
+      "recordedProduction68SHA": "e4723f8ae42e219fbf756e81447abceb25163b1d90e955de45cf7cafdd0666c0",
+      "isolatedBuildInput68": {
+        "path": "build/native-file-final68-20261017/project/src-tauri/Cargo.lock",
+        "bytes": 109195,
+        "sha256": "e4723f8ae42e219fbf756e81447abceb25163b1d90e955de45cf7cafdd0666c0"
+      },
+      "current85": {
+        "path": "apps/editor/src-tauri/Cargo.lock",
+        "bytes": 109195,
+        "sha256": "e4723f8ae42e219fbf756e81447abceb25163b1d90e955de45cf7cafdd0666c0"
+      },
+      "productionByteIdentical": true,
+      "isolatedBuildInputMatchesRecordedProduction": true
+    },
+    {
+      "relative": "build.rs",
+      "recordedProduction68SHA": "487059eaf8a947b80f20a9aacac038a5047b2ad69d2401b827376c67d6fe847f",
+      "isolatedBuildInput68": {
+        "path": "build/native-file-final68-20261017/project/src-tauri/build.rs",
+        "bytes": 39,
+        "sha256": "487059eaf8a947b80f20a9aacac038a5047b2ad69d2401b827376c67d6fe847f"
+      },
+      "current85": {
+        "path": "apps/editor/src-tauri/build.rs",
+        "bytes": 39,
+        "sha256": "487059eaf8a947b80f20a9aacac038a5047b2ad69d2401b827376c67d6fe847f"
+      },
+      "productionByteIdentical": true,
+      "isolatedBuildInputMatchesRecordedProduction": true
+    },
+    {
+      "relative": "tauri.conf.json",
+      "recordedProduction68SHA": "c377f499d3a61c5e786b2c895b24fff1787b10bf8a12268d3c5a9b6e8138a54f",
+      "isolatedBuildInput68": {
+        "path": "build/native-file-final68-20261017/project/src-tauri/tauri.conf.json",
+        "bytes": 756,
+        "sha256": "c377f499d3a61c5e786b2c895b24fff1787b10bf8a12268d3c5a9b6e8138a54f"
+      },
+      "current85": {
+        "path": "apps/editor/src-tauri/tauri.conf.json",
+        "bytes": 756,
+        "sha256": "c377f499d3a61c5e786b2c895b24fff1787b10bf8a12268d3c5a9b6e8138a54f"
+      },
+      "productionByteIdentical": true,
+      "isolatedBuildInputMatchesRecordedProduction": true
+    },
+    {
+      "relative": "capabilities/main.json",
+      "recordedProduction68SHA": "de9d8cc1bf67d5f18d27b0f62cce1f0a0970a748add67e664c2ec41001aa5da6",
+      "isolatedBuildInput68": {
+        "path": "build/native-file-final68-20261017/project/src-tauri/capabilities/main.json",
+        "bytes": 148,
+        "sha256": "de9d8cc1bf67d5f18d27b0f62cce1f0a0970a748add67e664c2ec41001aa5da6"
+      },
+      "current85": {
+        "path": "apps/editor/src-tauri/capabilities/main.json",
+        "bytes": 148,
+        "sha256": "de9d8cc1bf67d5f18d27b0f62cce1f0a0970a748add67e664c2ec41001aa5da6"
+      },
+      "productionByteIdentical": true,
+      "isolatedBuildInputMatchesRecordedProduction": true
+    },
+    {
+      "relative": "icons/icon.ico",
+      "recordedProduction68SHA": "8a7886a266fa3481e452d7630e80e6bde0d55b250ed7ab52af79f3edc43d4bf9",
+      "isolatedBuildInput68": {
+        "path": "build/native-file-final68-20261017/project/src-tauri/icons/icon.ico",
+        "bytes": 4286,
+        "sha256": "8a7886a266fa3481e452d7630e80e6bde0d55b250ed7ab52af79f3edc43d4bf9"
+      },
+      "current85": {
+        "path": "apps/editor/src-tauri/icons/icon.ico",
+        "bytes": 4286,
+        "sha256": "8a7886a266fa3481e452d7630e80e6bde0d55b250ed7ab52af79f3edc43d4bf9"
+      },
+      "productionByteIdentical": true,
+      "isolatedBuildInputMatchesRecordedProduction": true
+    },
+    {
+      "relative": "src/main.rs",
+      "recordedProduction68SHA": "57f452635cb2c1079758dedadd9db889468e3b16c4bc0941f56b44eb60ef7981",
+      "isolatedBuildInput68": {
+        "path": "build/native-file-final68-20261017/project/src-tauri/src/main.rs",
+        "bytes": 5935,
+        "sha256": "57f452635cb2c1079758dedadd9db889468e3b16c4bc0941f56b44eb60ef7981"
+      },
+      "current85": {
+        "path": "apps/editor/src-tauri/src/main.rs",
+        "bytes": 15251,
+        "sha256": "1635438473100355e1d0fc39274bfe94c897cca5e49801577bb136f08ff855b6"
+      },
+      "productionByteIdentical": false,
+      "isolatedBuildInputMatchesRecordedProduction": true
+    },
+    {
+      "relative": "src/storage.rs",
+      "recordedProduction68SHA": "26b9727428c1d53b7ef054e07264e7fb9dc9ad6afd117434c52bff5772ae854e",
+      "isolatedBuildInput68": {
+        "path": "build/native-file-final68-20261017/project/src-tauri/src/storage.rs",
+        "bytes": 10604,
+        "sha256": "26b9727428c1d53b7ef054e07264e7fb9dc9ad6afd117434c52bff5772ae854e"
+      },
+      "current85": {
+        "path": "apps/editor/src-tauri/src/storage.rs",
+        "bytes": 10604,
+        "sha256": "26b9727428c1d53b7ef054e07264e7fb9dc9ad6afd117434c52bff5772ae854e"
+      },
+      "productionByteIdentical": true,
+      "isolatedBuildInputMatchesRecordedProduction": true
+    },
+    {
+      "relative": "src/native_recents.rs",
+      "recordedProduction68SHA": "1ee44e4d9c1cbbd2a1b6916b5492a8f16d5366627f120bb01e4495894d66b1a2",
+      "isolatedBuildInput68": {
+        "path": "build/native-file-final68-20261017/project/src-tauri/src/native_recents.rs",
+        "bytes": 12955,
+        "sha256": "1ee44e4d9c1cbbd2a1b6916b5492a8f16d5366627f120bb01e4495894d66b1a2"
+      },
+      "current85": {
+        "path": "apps/editor/src-tauri/src/native_recents.rs",
+        "bytes": 12955,
+        "sha256": "1ee44e4d9c1cbbd2a1b6916b5492a8f16d5366627f120bb01e4495894d66b1a2"
+      },
+      "productionByteIdentical": true,
+      "isolatedBuildInputMatchesRecordedProduction": true
+    }
+  ],
+  "newCurrentRustFiles": [
+    {
+      "path": "apps/editor/src-tauri/src/file_bindings.rs",
+      "bytes": 3500,
+      "sha256": "68e85ae216b9887a56bc50a3e2cb774b88eaac9fed6682f150b8f7bb3f13fe11"
+    },
+    {
+      "path": "apps/editor/src-tauri/src/document_windows.rs",
+      "bytes": 16630,
+      "sha256": "4c66178486d365bba70881b3f467cb96d462574635768a7316ccfa8c22f75359"
+    }
+  ],
+  "typescriptInputs": [
+    {
+      "current": {
+        "path": "apps/editor/src/adapters/desktop/native-host.ts",
+        "bytes": 9339,
+        "sha256": "f8cf62cbb767e5a25c530bdd6b46965c41eeea6ede831b4625288187ffd7cb4a"
+      },
+      "recorded68CommitBlobExists": true,
+      "recorded68CommitBlobSHA": "d99b20b05d4c68db64938a76e4c19ce2b7b91fb3cf570f72c82d5893fd3c15fd",
+      "currentEqualsRecorded68CommitBlob": false,
+      "actual68BuildFileIdentity": "UNPROVEN: old frontend records applicationSourceDirty=true and only an aggregate customSourceSha256; commit blob equality does not prove the dirty built TS input."
+    },
+    {
+      "current": {
+        "path": "apps/editor/src/adapters/desktop/document-lifecycle.ts",
+        "bytes": 2834,
+        "sha256": "f80c350a2d3eb3159aa65ed026c9289b87541cc214015c5ea719590cf513bd68"
+      },
+      "recorded68CommitBlobExists": false,
+      "recorded68CommitBlobSHA": null,
+      "currentEqualsRecorded68CommitBlob": false,
+      "actual68BuildFileIdentity": "UNPROVEN: old frontend records applicationSourceDirty=true and only an aggregate customSourceSha256; commit blob equality does not prove the dirty built TS input."
+    },
+    {
+      "current": {
+        "path": "apps/editor/src/adapters/desktop/document-windows.ts",
+        "bytes": 6413,
+        "sha256": "df78a6cfb813c78ae71413a26b74475ae52baddb8b69dd0d6509d1633074844e"
+      },
+      "recorded68CommitBlobExists": false,
+      "recorded68CommitBlobSHA": null,
+      "currentEqualsRecorded68CommitBlob": false,
+      "actual68BuildFileIdentity": "UNPROVEN: old frontend records applicationSourceDirty=true and only an aggregate customSourceSha256; commit blob equality does not prove the dirty built TS input."
+    },
+    {
+      "current": {
+        "path": "apps/editor/src/adapters/desktop/native-recents.ts",
+        "bytes": 6274,
+        "sha256": "e7049ee4be8852c904ff80b80e9ac3e5de76bd2c6e6d001159132723832d9156"
+      },
+      "recorded68CommitBlobExists": true,
+      "recorded68CommitBlobSHA": "e7049ee4be8852c904ff80b80e9ac3e5de76bd2c6e6d001159132723832d9156",
+      "currentEqualsRecorded68CommitBlob": true,
+      "actual68BuildFileIdentity": "UNPROVEN: old frontend records applicationSourceDirty=true and only an aggregate customSourceSha256; commit blob equality does not prove the dirty built TS input."
+    },
+    {
+      "current": {
+        "path": "apps/editor/src/adapters/desktop/exit-save-frame.ts",
+        "bytes": 1276,
+        "sha256": "009ea13e195480ffdf8d2d81a610167a29af5e3cae017b4e0781cf95ae20562d"
+      },
+      "recorded68CommitBlobExists": false,
+      "recorded68CommitBlobSHA": null,
+      "currentEqualsRecorded68CommitBlob": false,
+      "actual68BuildFileIdentity": "UNPROVEN: old frontend records applicationSourceDirty=true and only an aggregate customSourceSha256; commit blob equality does not prove the dirty built TS input."
+    },
+    {
+      "current": {
+        "path": "apps/editor/src/adapters/desktop/agent-files.ts",
+        "bytes": 5126,
+        "sha256": "5dc4116cbd55364f590f7d5df70235dbe71055f2d00e60f2b1844bafd4420409"
+      },
+      "recorded68CommitBlobExists": false,
+      "recorded68CommitBlobSHA": null,
+      "currentEqualsRecorded68CommitBlob": false,
+      "actual68BuildFileIdentity": "UNPROVEN: old frontend records applicationSourceDirty=true and only an aggregate customSourceSha256; commit blob equality does not prove the dirty built TS input."
+    },
+    {
+      "current": {
+        "path": "apps/editor/src/adapters/files/file-connection.ts",
+        "bytes": 3658,
+        "sha256": "924173b389494e130e58f812987912172af2ae0f4442f86940864c4302aee36c"
+      },
+      "recorded68CommitBlobExists": true,
+      "recorded68CommitBlobSHA": "924173b389494e130e58f812987912172af2ae0f4442f86940864c4302aee36c",
+      "currentEqualsRecorded68CommitBlob": true,
+      "actual68BuildFileIdentity": "UNPROVEN: old frontend records applicationSourceDirty=true and only an aggregate customSourceSha256; commit blob equality does not prove the dirty built TS input."
+    },
+    {
+      "current": {
+        "path": "apps/editor/src/adapters/files/save-runtime.ts",
+        "bytes": 1866,
+        "sha256": "742f15895460944f4de5d1e655fcbd6bb935353440be9c0bcf01e9e787ddfb19"
+      },
+      "recorded68CommitBlobExists": true,
+      "recorded68CommitBlobSHA": "742f15895460944f4de5d1e655fcbd6bb935353440be9c0bcf01e9e787ddfb19",
+      "currentEqualsRecorded68CommitBlob": true,
+      "actual68BuildFileIdentity": "UNPROVEN: old frontend records applicationSourceDirty=true and only an aggregate customSourceSha256; commit blob equality does not prove the dirty built TS input."
+    },
+    {
+      "current": {
+        "path": "apps/editor/src/adapters/files/download-save.ts",
+        "bytes": 2519,
+        "sha256": "3bef9bcd75ca851d99d0417af7eda27a2370743c83970f838b0cea32c8c7fa22"
+      },
+      "recorded68CommitBlobExists": true,
+      "recorded68CommitBlobSHA": "3bef9bcd75ca851d99d0417af7eda27a2370743c83970f838b0cea32c8c7fa22",
+      "currentEqualsRecorded68CommitBlob": true,
+      "actual68BuildFileIdentity": "UNPROVEN: old frontend records applicationSourceDirty=true and only an aggregate customSourceSha256; commit blob equality does not prove the dirty built TS input."
+    },
+    {
+      "current": {
+        "path": "apps/editor/src/adapters/storage/indexeddb-workspace.ts",
+        "bytes": 8239,
+        "sha256": "d30b831213efd4a68a4bc9384ded54c4d2d580b2481effa0a7344cd32335200b"
+      },
+      "recorded68CommitBlobExists": true,
+      "recorded68CommitBlobSHA": "b4bfeefec527a7bf10e2913206bf7703a899440a63affd19648f5d0ffa648989",
+      "currentEqualsRecorded68CommitBlob": false,
+      "actual68BuildFileIdentity": "UNPROVEN: old frontend records applicationSourceDirty=true and only an aggregate customSourceSha256; commit blob equality does not prove the dirty built TS input."
+    },
+    {
+      "current": {
+        "path": "apps/editor/src/adapters/storage/serialized-writer.ts",
+        "bytes": 400,
+        "sha256": "0316745c77a20d9a7388f007b79907e488ebe0839e96a2460bb86bb9e7ad1fcf"
+      },
+      "recorded68CommitBlobExists": true,
+      "recorded68CommitBlobSHA": "0316745c77a20d9a7388f007b79907e488ebe0839e96a2460bb86bb9e7ad1fcf",
+      "currentEqualsRecorded68CommitBlob": true,
+      "actual68BuildFileIdentity": "UNPROVEN: old frontend records applicationSourceDirty=true and only an aggregate customSourceSha256; commit blob equality does not prove the dirty built TS input."
+    },
+    {
+      "current": {
+        "path": "apps/editor/src/modules/document-files/application/write-snapshot.ts",
+        "bytes": 2327,
+        "sha256": "7e6613af02ec32a72b1bc400f4e82975baf3373c50b3fb5b36e2c42336822c2b"
+      },
+      "recorded68CommitBlobExists": true,
+      "recorded68CommitBlobSHA": "7e6613af02ec32a72b1bc400f4e82975baf3373c50b3fb5b36e2c42336822c2b",
+      "currentEqualsRecorded68CommitBlob": true,
+      "actual68BuildFileIdentity": "UNPROVEN: old frontend records applicationSourceDirty=true and only an aggregate customSourceSha256; commit blob equality does not prove the dirty built TS input."
+    },
+    {
+      "current": {
+        "path": "apps/editor/src/modules/document-files/application/export-recovery.ts",
+        "bytes": 452,
+        "sha256": "82fbe5398ae2e597f459f3e61240590237c0ccb05f2d6f056968b7077a549132"
+      },
+      "recorded68CommitBlobExists": true,
+      "recorded68CommitBlobSHA": "82fbe5398ae2e597f459f3e61240590237c0ccb05f2d6f056968b7077a549132",
+      "currentEqualsRecorded68CommitBlob": true,
+      "actual68BuildFileIdentity": "UNPROVEN: old frontend records applicationSourceDirty=true and only an aggregate customSourceSha256; commit blob equality does not prove the dirty built TS input."
+    },
+    {
+      "current": {
+        "path": "apps/editor/src/adapters/rhwp/preservation.ts",
+        "bytes": 22271,
+        "sha256": "14e396848f1689d3d1c618d9300e356165e0a74d188d92cf04d7e54337299904"
+      },
+      "recorded68CommitBlobExists": true,
+      "recorded68CommitBlobSHA": "5d8a2ed688e228da83ac7b39b1f82f4b029834f57196485650f80f58498d7931",
+      "currentEqualsRecorded68CommitBlob": false,
+      "actual68BuildFileIdentity": "UNPROVEN: old frontend records applicationSourceDirty=true and only an aggregate customSourceSha256; commit blob equality does not prove the dirty built TS input."
+    },
+    {
+      "current": {
+        "path": "apps/editor/src/adapters/rhwp/document-save-layout.ts",
+        "bytes": 7137,
+        "sha256": "6c1d119f4723698e9e3769d4fb45c7b38469b6f0bca6f4c575688f3b38638434"
+      },
+      "recorded68CommitBlobExists": false,
+      "recorded68CommitBlobSHA": null,
+      "currentEqualsRecorded68CommitBlob": false,
+      "actual68BuildFileIdentity": "UNPROVEN: old frontend records applicationSourceDirty=true and only an aggregate customSourceSha256; commit blob equality does not prove the dirty built TS input."
+    },
+    {
+      "current": {
+        "path": "apps/editor/src/adapters/rhwp/save-table-frames.ts",
+        "bytes": 9971,
+        "sha256": "70dbde730afad28c7d76347f1ae65171d51394edb7df909492868ebaf2e404dc"
+      },
+      "recorded68CommitBlobExists": true,
+      "recorded68CommitBlobSHA": "059426dec44b94f99a5f37410038ff7ac2e27eb5286560ec2d0c8288fe433cb9",
+      "currentEqualsRecorded68CommitBlob": false,
+      "actual68BuildFileIdentity": "UNPROVEN: old frontend records applicationSourceDirty=true and only an aggregate customSourceSha256; commit blob equality does not prove the dirty built TS input."
+    }
+  ],
+  "provenUnchangedScopes": [
+    "src/storage.rs entire bytes identical: atomic disk read/write, bound fingerprint conflict checking and safe replacement implementation are the same source as68.",
+    "src/native_recents.rs entire bytes identical: recent store serialization/reopen verification implementation is the same source as68."
+  ],
+  "changedOrUnprovenScopes": [
+    "main.rs command routing changed: global token HashMap in68 became window/context-scoped FileBindings; old get_webview_window(main) picker owner became invoking WebviewWindow. Whole command/permission/service behavior is not byte-identical.",
+    "file_bindings.rs and document_windows.rs are additional current source not present in the recorded68 build.",
+    "Capabilities/config/Cargo changes are reported per file and must not be inferred unchanged from storage.rs identity.",
+    "TS frontend per-file build identity is unproven because68 had dirty source and only aggregate source hash. Old commit equality is reported separately and is not promoted into actual build identity.",
+    "Engine85 and planned86 have different WASM and frontend code from68. Prior OS68 run cannot prove latest renderer, preservation guard, recovery, native window routing or actual Windows picker behavior."
+  ],
+  "operations": {
+    "launchedApp": false,
+    "clickedDialog": false,
+    "ranCargo": false,
+    "modifiedProduction": false,
+    "modifiedOldBuild": false,
+    "publicDocumentBytesCopied": false
+  }
+}

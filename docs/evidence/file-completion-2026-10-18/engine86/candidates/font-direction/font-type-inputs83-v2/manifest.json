@@ -1,0 +1,39 @@
+{
+  "ownFixture": true,
+  "source": "build\\metadata-author-closure82\\own-summary-five-fields-source.hwpx",
+  "sourceSha256": "384155b8fa5e38462606e912638783cdb1dd3ce817c3b109c1978bdf3510b72b",
+  "fontsEmbedded": false,
+  "fixtures": [
+    {
+      "path": "build\\text-direction-closure83\\font-type-inputs83-v2\\own-font-REP.hwpx",
+      "sha256": "fec799177e954bfef416b7063aa1aff7f6ac3656d1dba523d3b8459d22806cc0",
+      "firstFontType": "REP",
+      "onlyLogicalInputDelta": "First hh:font type attribute; ZIP entry content otherwise unchanged."
+    },
+    {
+      "path": "build\\text-direction-closure83\\font-type-inputs83-v2\\own-font-TTF.hwpx",
+      "sha256": "7a88d00977f01a5c127d47732c62a47622839dfff3dfea8dfa2cca01f73bd184",
+      "firstFontType": "TTF",
+      "onlyLogicalInputDelta": "First hh:font type attribute; ZIP entry content otherwise unchanged."
+    },
+    {
+      "path": "build\\text-direction-closure83\\font-type-inputs83-v2\\own-font-HFT.hwpx",
+      "sha256": "9315a5f206483f3657db2f65083143ce56e85c8952b2e97abd91860d39b25434",
+      "firstFontType": "HFT",
+      "onlyLogicalInputDelta": "First hh:font type attribute; ZIP entry content otherwise unchanged."
+    },
+    {
+      "path": "build\\text-direction-closure83\\font-type-inputs83-v2\\own-font-UNKNOWN.hwpx",
+      "sha256": "4fd03d900e905acc292ca79aa9cbbbd87368b3fc17ed927a3e5736d3e3866530",
+      "firstFontType": "UNKNOWN",
+      "onlyLogicalInputDelta": "First hh:font type attribute; ZIP entry content otherwise unchanged."
+    },
+    {
+      "path": "build\\text-direction-closure83\\font-type-inputs83-v2\\own-font-MISSING.hwpx",
+      "sha256": "87aae9a8b88cca062874fe54009241650e73493c5d52cb787fd393e107d73667",
+      "firstFontType": "MISSING",
+      "onlyLogicalInputDelta": "First hh:font type attribute; ZIP entry content otherwise unchanged."
+    }
+  ],
+  "initialPreparationFailure": "font-type-inputs83 retained partial fixture. Reusing mutable ZipInfo while writing changed source offset; v2 reads all bytes first and copies ZipInfo."
+}

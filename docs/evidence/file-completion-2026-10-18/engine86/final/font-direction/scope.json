@@ -1,0 +1,43 @@
+{
+  "engineSourceId": "b59322fd380dc175",
+  "wasmSha256": "ef130c08536b38349bfb0c9b94a4478094c85df04ba2969ef4e4f65d05363f17",
+  "functionalCases": {
+    "direction": 3,
+    "font": 11,
+    "passed": 14,
+    "failed": 0
+  },
+  "independentXml": {
+    "exports": 14,
+    "xmlHpfEntries": 98,
+    "crcAndAllXmlWellFormed": true
+  },
+  "sourceBytes": {
+    "caseInputFiles": 13,
+    "fixtureBaseFiles": 1,
+    "allSealedHashesVerifiedAgainstOriginal": true
+  },
+  "nativeEvidence": "Separate immutable build/xml-source-contracts-compact-native83: Native direction8/font11. Native font EOL-only code identity caveat retained; final strict WASM is this distinct artifact.",
+  "binaryCapability": "Explicit paragraph textDir AUTO/LTR/RTL and unknown spelling are unsupported by the current HWP writer and rejected through exact metadata loss before OS writes. No assumption AUTO==absence. Known REP is preserved in XML; unknown/missing font types cannot acquire TTF authority and unsupported lowering reports exact resource loss. Native unknown0 remains unchanged in same-codec HWP.",
+  "limitations": [
+    "No actual new Hancom GUI golden for these own enum fixtures; prior GUI activation failed.",
+    "No real OS file writing was exercised: write callbacks are simulated after the actual production preservation guard.",
+    "No RTL renderer implementation added.",
+    "Native IR11 and WASM public byte-input11 are distinct scopes, not duplicate proof of all internal branches.",
+    "Diagnostic preview HWP/HWPX artifacts include intentionally blocked exports. Their existence in evidence is not a successful user save.",
+    "Public MCST original/actual interoperability and old formal83 successful exports retain their version scope and are not converted into new successes by these tests.",
+    "No comparison field is dropped, raw shape ID is not ignored, published coordinate tolerance remains 0.2."
+  ],
+  "reproduction": {
+    "verifier": "reproduce/verify-xml-source-contracts-engine.mjs",
+    "reader": "reproduce/xml-source-contract-audit.py",
+    "requiredAbsoluteEnv": [
+      "JUEONY_REPOSITORY",
+      "JUEONY_ENGINE_PACKAGE",
+      "JUEONY_TEST_OUTPUT"
+    ],
+    "python": "JUEONY_PYTHON may select an absolute local Python executable.",
+    "placement": "Repository-relative adapter imports require restoring the verifier and reader to build/text-direction-closure83 or running originals. Use a fresh empty absolute output directory."
+  },
+  "excluded": "No public/user document bytes, full public snapshots, actual proprietary font programs, API keys, WASM, executables, screenshots, or PDF."
+}

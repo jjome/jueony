@@ -1,0 +1,15 @@
+PASS actual Hancom sixteen pages, retained p55/p56 physical boundary and strict HWPX two reopens
+PASS real API edit, snapshot undo redo and strict HWPX two reopens
+PASS actual two: immutable source pair, every layout field and both formats twice
+PASS actual three: immutable source pair, every layout field and both formats twice
+PASS actual offset: immutable source pair, every layout field and both formats twice
+PASS actual plain: immutable source pair, every layout field and both formats twice
+PASS actual unicode: immutable source pair, every layout field and both formats twice
+PASS actual superscript: immutable source pair, every layout field and both formats twice
+PASS actual negative: immutable source pair, every layout field and both formats twice
+PASS actual column2: immutable source pair, every layout field and both formats twice
+PASS actual multiline-prepared: immutable source pair, every layout field and both formats twice
+PASS actual caption-prepared: immutable source pair, every layout field and both formats twice
+PASS actual positive-prepared: immutable source pair, every layout field and both formats twice
+FAIL actual sixteen-page MCST: both formats twice and six alternating strict storage steps 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 188건의 손실을 보고했습니다. 원본의 명시적 글 방향을 HWP로 보존하는 변환은 지원하지 않습니다. HWPX로 저장해 보존 검사를 진행해 주세요). 원본과 기존 복구본은 유지됩니다.
+PASS historical-converted: explicit native HWP5 lineage survives both formats twice

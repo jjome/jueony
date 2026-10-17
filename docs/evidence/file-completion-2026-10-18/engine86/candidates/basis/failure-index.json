@@ -1,0 +1,42 @@
+[
+  {
+    "file": "build\\mcst-leading-gap83\\native-trace-preparation-missing-blank.log",
+    "sha256": "c5276ff6c3fa3140407c54e77eb92e009e81cb8230abba52dde4c5899739983e",
+    "bytes": 403,
+    "classification": "PREPARATION_ONLY_MISSING_UPSTREAM_BLANK",
+    "copied": false,
+    "reason": "Full raw preparation/early failure retained ignored; source published body/snapshot can occur in early no-op assertion, not suitable for permanent export."
+  },
+  {
+    "file": "build\\mcst-leading-gap83\\native-trace-preparation-missing-docs.log",
+    "sha256": "6d929983a85091c3296d0335911cfb548efd2e34c5eabe008e68b000c95327cb",
+    "bytes": 2252,
+    "classification": "PREPARATION_ONLY_MISSING_UPSTREAM_INCLUDE_DOCS",
+    "copied": false,
+    "reason": "Full raw preparation/early failure retained ignored; source published body/snapshot can occur in early no-op assertion, not suitable for permanent export."
+  },
+  {
+    "file": "build\\mcst-leading-gap83\\native-candidate-preparation-section-serde.log",
+    "sha256": "95073f815bd726d6c400b2cf5fdd5e28cb78d80e6cfbcd6125f57c4c457e4b32",
+    "bytes": 4175,
+    "classification": "PREPARATION_ONLY_HARNESS_SECTION_SERIALIZE",
+    "copied": false,
+    "reason": "Full raw preparation/early failure retained ignored; source published body/snapshot can occur in early no-op assertion, not suitable for permanent export."
+  },
+  {
+    "file": "build\\mcst-leading-gap83\\native-candidate-first-six.log",
+    "sha256": "949a6adef7f936a39164669b9eeca4196453f91cd4c3a2f03ddb55302619caa2",
+    "bytes": 2093118,
+    "classification": "V1_REJECTED_4PASS_2FAIL_SOURCE_PREDICATE_NONE_AND_NOOP_API",
+    "copied": false,
+    "reason": "Full raw preparation/early failure retained ignored; source published body/snapshot can occur in early no-op assertion, not suitable for permanent export."
+  },
+  {
+    "file": "build\\mcst-leading-gap83\\native-candidate-actual11-first.log",
+    "sha256": "c5166bdb54509901411cb09d59cb45bd9dd42756c57e6a64ed463670878940a9",
+    "bytes": 614583,
+    "classification": "ACTUAL11_11PASS_CROSS_COLUMN2_NEGATIVE2PASS_OLD_COLUMN3_37FAIL",
+    "copied": false,
+    "reason": "Full raw preparation/early failure retained ignored; source published body/snapshot can occur in early no-op assertion, not suitable for permanent export."
+  }
+]

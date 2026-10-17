@@ -1,0 +1,65 @@
+{
+  "status": "PRIVATE_NATIVE_VALIDATED_NOT_PROMOTED",
+  "formalBase": "ad6186043c15532f",
+  "patchSha256": "1db1c17717df23c546c32410efe14492aaf6db0b3bfe2243627a30891411a242",
+  "native": {
+    "newContract": {
+      "pass": 9,
+      "fail": 0
+    },
+    "actualHancomOwnedPairs": {
+      "pass": 11,
+      "fail": 0
+    },
+    "twoColumnAndNegativeCross": {
+      "pass": 2,
+      "fail": 0
+    },
+    "sourceProof": {
+      "pass": 1,
+      "fail": 0
+    },
+    "preExistingThreeColumn": {
+      "fail": 1,
+      "strictDifferences": 37,
+      "baselineSame": true
+    }
+  },
+  "before": {
+    "originalNativeTableY": 152.9,
+    "actualXmlRenderedY": 148.9,
+    "sourceRawPhysicalHeadHU": 300,
+    "sourceRawPhysicalTableHU": 2680,
+    "runtimeReconstructedHeadHU": 67182,
+    "runtimeReconstructedTableHU": 69562,
+    "nativeVsActualPages": [
+      15,
+      16
+    ],
+    "editedBinaryHwpReopenStrictDiff187": 187,
+    "v2GlobalEditedFailure": 226
+  },
+  "after": {
+    "originalNativeTableY": 152.9,
+    "actualXmlRenderedY": 152.9,
+    "sourceVsActualTargetDelta": 0,
+    "actualUneditedTwoCodecsTwoCyclesSemanticAndGeometry": 0,
+    "remoteXmlEditTwoCodecs": 0,
+    "remoteBinaryEditTwoCodecs": 0,
+    "undoRedo": 0,
+    "sourceTripletByteStableAfterRemoteEdit": true,
+    "exactB2And14OriginConflictCases": "PASS",
+    "nativeEditedPolicyUnchanged": true
+  },
+  "scope": [
+    "Source coordinate ownership only; no document text/font/LS values are changed by the page basis helper.",
+    "Same exact b2 read identity is shared between import reconstruction and model edit lifetime; old/unknown/duplicated/conflicting origins retain native edit policy.",
+    "Existing global dirty checks remain; actual local style/size/spacing edits invalidate source ownership. Explicit exact-font/shaping contexts are not authorized by the source frame helper.",
+    "First source/actual frame parity does not resolve original-public15-vs-actual16 pagination or all public glyph/resource differences.",
+    "Fresh formal WASM/production whole-layout verification still required. Prepared ignored verifier has formal83 positive-contract baseline1PASS/2FAIL with mandatory productionguard."
+  ],
+  "noPublicDocumentBytes": true,
+  "noFontOrWasmExe": true,
+  "noProductionCodeOrGitChangedByWorker": true,
+  "finalVerifier": "verify-edit-lifetime.mjs; first-cell physical x/y/w/h/font and text-hash oracle included; positive baseline1PASS/2FAIL preserved in separate physicaltext output"
+}

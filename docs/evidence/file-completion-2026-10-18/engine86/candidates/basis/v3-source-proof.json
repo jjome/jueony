@@ -1,0 +1,51 @@
+{
+  "status": "NATIVE_VALIDATED_NOT_PROMOTED",
+  "files": [
+    {
+      "path": "src/model/document.rs",
+      "baselineSHA": "ae309819453c69b68cc4fac4f42b03eb0cdbcf5d3b914498f6915be45e12bf61",
+      "compiledCandidateSHA": "b6d30a1d05af21a51445ab6a36d652c0a1f3350669ab8dada02a8067d77d6501",
+      "promotionNormalizedSHA": "b6d30a1d05af21a51445ab6a36d652c0a1f3350669ab8dada02a8067d77d6501"
+    },
+    {
+      "path": "src/document_core/commands/document.rs",
+      "baselineSHA": "842207b2e5291104f82392c9cf5f55190a25207baa82732177435924cc5efae7",
+      "compiledCandidateSHA": "21354a969fad7adbba8a909ae1e6abb2c05f9dc481d9f27ae0d1521060493ed0",
+      "promotionNormalizedSHA": "21354a969fad7adbba8a909ae1e6abb2c05f9dc481d9f27ae0d1521060493ed0"
+    },
+    {
+      "path": "src/renderer/layout.rs",
+      "baselineSHA": "3334e572ff70f194aeb433436b97f40bc9cedb3e47bfdb1c30b3888e0aa67f35",
+      "compiledCandidateSHA": "75692dc7fb15d53897bd6b573e43ac3fe10db422a48d6bf00b5739eb35560d91",
+      "promotionNormalizedSHA": "c59a60af9e4815deedd7ea11c0e98a42e904a51c9c879d523dd80684b6af1877"
+    },
+    {
+      "path": "src/renderer/typeset/section/vpos.rs",
+      "baselineSHA": "c6e28e78c6f7017885d3b545d852b78f36e39116e01e19098522aa853e9de313",
+      "compiledCandidateSHA": "be3099644c5abb709e4e7ee92be9fa9d8d841776fc8ea729a58c2d7cd89799e9",
+      "promotionNormalizedSHA": "be3099644c5abb709e4e7ee92be9fa9d8d841776fc8ea729a58c2d7cd89799e9"
+    }
+  ],
+  "patchSHA": "1db1c17717df23c546c32410efe14492aaf6db0b3bfe2243627a30891411a242",
+  "source": "ad6186043c15532f",
+  "privateDiagnosticExportExcluded": true,
+  "sourceIdentity": "Same exact70 b2 conditions; Core uses same model method. Only verifiedXML binary cache lifetime is exempt from native raw-stream edit policy; renderer global dirty guards remain.",
+  "compiledProof": "native-candidate-v3-source-proof.log",
+  "nativeNewTests": {
+    "passed": 9,
+    "failed": 0
+  },
+  "independentActual11": {
+    "passed": 11,
+    "failed": 0
+  },
+  "crossColumn2AndNegative": {
+    "passed": 2,
+    "failed": 0
+  },
+  "preExistingColumn3": {
+    "status": "FAIL_PRESERVED",
+    "differences": 37,
+    "formal83Baseline": "formal83-column3-baseline.json"
+  }
+}

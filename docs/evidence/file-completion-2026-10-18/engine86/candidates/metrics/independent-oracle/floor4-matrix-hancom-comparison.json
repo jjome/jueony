@@ -1,0 +1,806 @@
+{
+  "input": {
+    "file": "own-gulimche-floor4-matrix-no-ls.hwpx",
+    "sha256": "e0c358f025f94a4a532cf820f699b0016003e46a846292de00c81c34c6549a40"
+  },
+  "hancom": {
+    "file": "hancom-gulimche-floor4-matrix.hwpx",
+    "sha256": "2fdcca7cefa489b814da06d2cd2540ab125c287fe29f53774abaa2b612e2913d"
+  },
+  "tables": 36,
+  "predictedBoundaryMatches": 32,
+  "failures": [
+    {
+      "tableIndex": 1,
+      "expectedFirstBreak": 31,
+      "actualLineStarts": [
+        0,
+        30
+      ]
+    },
+    {
+      "tableIndex": 4,
+      "expectedFirstBreak": 21,
+      "actualLineStarts": [
+        0,
+        20
+      ]
+    },
+    {
+      "tableIndex": 13,
+      "expectedFirstBreak": 31,
+      "actualLineStarts": [
+        0,
+        30
+      ]
+    },
+    {
+      "tableIndex": 16,
+      "expectedFirstBreak": 21,
+      "actualLineStarts": [
+        0,
+        20
+      ]
+    }
+  ],
+  "measurementPropertyChanges": [],
+  "results": [
+    {
+      "tableIndex": 0,
+      "groupIndex": 0,
+      "heightHU": 900,
+      "ratio": 100,
+      "mixture": "A",
+      "alignment": "LEFT",
+      "widthHU": 25184,
+      "predictedThresholdHU": 25188,
+      "predictedFirstBreak": 30,
+      "actualLineStarts": [
+        0,
+        30
+      ],
+      "nativeLineWidthsHU": [
+        25184,
+        25184
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 1,
+      "groupIndex": 0,
+      "heightHU": 900,
+      "ratio": 100,
+      "mixture": "A",
+      "alignment": "LEFT",
+      "widthHU": 25188,
+      "predictedThresholdHU": 25188,
+      "predictedFirstBreak": 31,
+      "actualLineStarts": [
+        0,
+        30
+      ],
+      "nativeLineWidthsHU": [
+        25188,
+        25188
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 2,
+      "groupIndex": 0,
+      "heightHU": 900,
+      "ratio": 100,
+      "mixture": "A",
+      "alignment": "LEFT",
+      "widthHU": 25192,
+      "predictedThresholdHU": 25188,
+      "predictedFirstBreak": 31,
+      "actualLineStarts": [
+        0,
+        31
+      ],
+      "nativeLineWidthsHU": [
+        25192,
+        25192
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 3,
+      "groupIndex": 1,
+      "heightHU": 900,
+      "ratio": 100,
+      "mixture": "B",
+      "alignment": "LEFT",
+      "widthHU": 17088,
+      "predictedThresholdHU": 17092,
+      "predictedFirstBreak": 20,
+      "actualLineStarts": [
+        0,
+        20
+      ],
+      "nativeLineWidthsHU": [
+        17088,
+        17088
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 4,
+      "groupIndex": 1,
+      "heightHU": 900,
+      "ratio": 100,
+      "mixture": "B",
+      "alignment": "LEFT",
+      "widthHU": 17092,
+      "predictedThresholdHU": 17092,
+      "predictedFirstBreak": 21,
+      "actualLineStarts": [
+        0,
+        20
+      ],
+      "nativeLineWidthsHU": [
+        17092,
+        17092
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 5,
+      "groupIndex": 1,
+      "heightHU": 900,
+      "ratio": 100,
+      "mixture": "B",
+      "alignment": "LEFT",
+      "widthHU": 17096,
+      "predictedThresholdHU": 17092,
+      "predictedFirstBreak": 21,
+      "actualLineStarts": [
+        0,
+        21
+      ],
+      "nativeLineWidthsHU": [
+        17096,
+        17096
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 6,
+      "groupIndex": 2,
+      "heightHU": 1000,
+      "ratio": 97,
+      "mixture": "A",
+      "alignment": "LEFT",
+      "widthHU": 27100,
+      "predictedThresholdHU": 27104,
+      "predictedFirstBreak": 30,
+      "actualLineStarts": [
+        0,
+        30
+      ],
+      "nativeLineWidthsHU": [
+        27100,
+        27100
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 7,
+      "groupIndex": 2,
+      "heightHU": 1000,
+      "ratio": 97,
+      "mixture": "A",
+      "alignment": "LEFT",
+      "widthHU": 27104,
+      "predictedThresholdHU": 27104,
+      "predictedFirstBreak": 31,
+      "actualLineStarts": [
+        0,
+        31
+      ],
+      "nativeLineWidthsHU": [
+        27104,
+        27104
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 8,
+      "groupIndex": 2,
+      "heightHU": 1000,
+      "ratio": 97,
+      "mixture": "A",
+      "alignment": "LEFT",
+      "widthHU": 27108,
+      "predictedThresholdHU": 27104,
+      "predictedFirstBreak": 31,
+      "actualLineStarts": [
+        0,
+        31
+      ],
+      "nativeLineWidthsHU": [
+        27108,
+        27108
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 9,
+      "groupIndex": 3,
+      "heightHU": 1000,
+      "ratio": 97,
+      "mixture": "B",
+      "alignment": "LEFT",
+      "widthHU": 18388,
+      "predictedThresholdHU": 18392,
+      "predictedFirstBreak": 20,
+      "actualLineStarts": [
+        0,
+        20
+      ],
+      "nativeLineWidthsHU": [
+        18388,
+        18388
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 10,
+      "groupIndex": 3,
+      "heightHU": 1000,
+      "ratio": 97,
+      "mixture": "B",
+      "alignment": "LEFT",
+      "widthHU": 18392,
+      "predictedThresholdHU": 18392,
+      "predictedFirstBreak": 21,
+      "actualLineStarts": [
+        0,
+        21
+      ],
+      "nativeLineWidthsHU": [
+        18392,
+        18392
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 11,
+      "groupIndex": 3,
+      "heightHU": 1000,
+      "ratio": 97,
+      "mixture": "B",
+      "alignment": "LEFT",
+      "widthHU": 18396,
+      "predictedThresholdHU": 18392,
+      "predictedFirstBreak": 21,
+      "actualLineStarts": [
+        0,
+        21
+      ],
+      "nativeLineWidthsHU": [
+        18396,
+        18396
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 12,
+      "groupIndex": 4,
+      "heightHU": 1100,
+      "ratio": 100,
+      "mixture": "A",
+      "alignment": "LEFT",
+      "widthHU": 30784,
+      "predictedThresholdHU": 30788,
+      "predictedFirstBreak": 30,
+      "actualLineStarts": [
+        0,
+        30
+      ],
+      "nativeLineWidthsHU": [
+        30784,
+        30784
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 13,
+      "groupIndex": 4,
+      "heightHU": 1100,
+      "ratio": 100,
+      "mixture": "A",
+      "alignment": "LEFT",
+      "widthHU": 30788,
+      "predictedThresholdHU": 30788,
+      "predictedFirstBreak": 31,
+      "actualLineStarts": [
+        0,
+        30
+      ],
+      "nativeLineWidthsHU": [
+        30788,
+        30788
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 14,
+      "groupIndex": 4,
+      "heightHU": 1100,
+      "ratio": 100,
+      "mixture": "A",
+      "alignment": "LEFT",
+      "widthHU": 30792,
+      "predictedThresholdHU": 30788,
+      "predictedFirstBreak": 31,
+      "actualLineStarts": [
+        0,
+        31
+      ],
+      "nativeLineWidthsHU": [
+        30792,
+        30792
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 15,
+      "groupIndex": 5,
+      "heightHU": 1100,
+      "ratio": 100,
+      "mixture": "B",
+      "alignment": "LEFT",
+      "widthHU": 20888,
+      "predictedThresholdHU": 20892,
+      "predictedFirstBreak": 20,
+      "actualLineStarts": [
+        0,
+        20
+      ],
+      "nativeLineWidthsHU": [
+        20888,
+        20888
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 16,
+      "groupIndex": 5,
+      "heightHU": 1100,
+      "ratio": 100,
+      "mixture": "B",
+      "alignment": "LEFT",
+      "widthHU": 20892,
+      "predictedThresholdHU": 20892,
+      "predictedFirstBreak": 21,
+      "actualLineStarts": [
+        0,
+        20
+      ],
+      "nativeLineWidthsHU": [
+        20892,
+        20892
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 17,
+      "groupIndex": 5,
+      "heightHU": 1100,
+      "ratio": 100,
+      "mixture": "B",
+      "alignment": "LEFT",
+      "widthHU": 20896,
+      "predictedThresholdHU": 20892,
+      "predictedFirstBreak": 21,
+      "actualLineStarts": [
+        0,
+        21
+      ],
+      "nativeLineWidthsHU": [
+        20896,
+        20896
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 18,
+      "groupIndex": 6,
+      "heightHU": 1100,
+      "ratio": 97,
+      "mixture": "A",
+      "alignment": "LEFT",
+      "widthHU": 29788,
+      "predictedThresholdHU": 29792,
+      "predictedFirstBreak": 30,
+      "actualLineStarts": [
+        0,
+        30
+      ],
+      "nativeLineWidthsHU": [
+        29788,
+        29788
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 19,
+      "groupIndex": 6,
+      "heightHU": 1100,
+      "ratio": 97,
+      "mixture": "A",
+      "alignment": "LEFT",
+      "widthHU": 29792,
+      "predictedThresholdHU": 29792,
+      "predictedFirstBreak": 31,
+      "actualLineStarts": [
+        0,
+        31
+      ],
+      "nativeLineWidthsHU": [
+        29792,
+        29792
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 20,
+      "groupIndex": 6,
+      "heightHU": 1100,
+      "ratio": 97,
+      "mixture": "A",
+      "alignment": "LEFT",
+      "widthHU": 29796,
+      "predictedThresholdHU": 29792,
+      "predictedFirstBreak": 31,
+      "actualLineStarts": [
+        0,
+        31
+      ],
+      "nativeLineWidthsHU": [
+        29796,
+        29796
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 21,
+      "groupIndex": 7,
+      "heightHU": 1100,
+      "ratio": 97,
+      "mixture": "B",
+      "alignment": "LEFT",
+      "widthHU": 20212,
+      "predictedThresholdHU": 20216,
+      "predictedFirstBreak": 20,
+      "actualLineStarts": [
+        0,
+        20
+      ],
+      "nativeLineWidthsHU": [
+        20212,
+        20212
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 22,
+      "groupIndex": 7,
+      "heightHU": 1100,
+      "ratio": 97,
+      "mixture": "B",
+      "alignment": "LEFT",
+      "widthHU": 20216,
+      "predictedThresholdHU": 20216,
+      "predictedFirstBreak": 21,
+      "actualLineStarts": [
+        0,
+        21
+      ],
+      "nativeLineWidthsHU": [
+        20216,
+        20216
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 23,
+      "groupIndex": 7,
+      "heightHU": 1100,
+      "ratio": 97,
+      "mixture": "B",
+      "alignment": "LEFT",
+      "widthHU": 20220,
+      "predictedThresholdHU": 20216,
+      "predictedFirstBreak": 21,
+      "actualLineStarts": [
+        0,
+        21
+      ],
+      "nativeLineWidthsHU": [
+        20220,
+        20220
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 24,
+      "groupIndex": 8,
+      "heightHU": 1200,
+      "ratio": 100,
+      "mixture": "A",
+      "alignment": "LEFT",
+      "widthHU": 33596,
+      "predictedThresholdHU": 33600,
+      "predictedFirstBreak": 30,
+      "actualLineStarts": [
+        0,
+        30
+      ],
+      "nativeLineWidthsHU": [
+        33596,
+        33596
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 25,
+      "groupIndex": 8,
+      "heightHU": 1200,
+      "ratio": 100,
+      "mixture": "A",
+      "alignment": "LEFT",
+      "widthHU": 33600,
+      "predictedThresholdHU": 33600,
+      "predictedFirstBreak": 31,
+      "actualLineStarts": [
+        0,
+        31
+      ],
+      "nativeLineWidthsHU": [
+        33600,
+        33600
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 26,
+      "groupIndex": 8,
+      "heightHU": 1200,
+      "ratio": 100,
+      "mixture": "A",
+      "alignment": "LEFT",
+      "widthHU": 33604,
+      "predictedThresholdHU": 33600,
+      "predictedFirstBreak": 31,
+      "actualLineStarts": [
+        0,
+        31
+      ],
+      "nativeLineWidthsHU": [
+        33604,
+        33604
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 27,
+      "groupIndex": 9,
+      "heightHU": 1200,
+      "ratio": 100,
+      "mixture": "B",
+      "alignment": "LEFT",
+      "widthHU": 22796,
+      "predictedThresholdHU": 22800,
+      "predictedFirstBreak": 20,
+      "actualLineStarts": [
+        0,
+        20
+      ],
+      "nativeLineWidthsHU": [
+        22796,
+        22796
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 28,
+      "groupIndex": 9,
+      "heightHU": 1200,
+      "ratio": 100,
+      "mixture": "B",
+      "alignment": "LEFT",
+      "widthHU": 22800,
+      "predictedThresholdHU": 22800,
+      "predictedFirstBreak": 21,
+      "actualLineStarts": [
+        0,
+        21
+      ],
+      "nativeLineWidthsHU": [
+        22800,
+        22800
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 29,
+      "groupIndex": 9,
+      "heightHU": 1200,
+      "ratio": 100,
+      "mixture": "B",
+      "alignment": "LEFT",
+      "widthHU": 22804,
+      "predictedThresholdHU": 22800,
+      "predictedFirstBreak": 21,
+      "actualLineStarts": [
+        0,
+        21
+      ],
+      "nativeLineWidthsHU": [
+        22804,
+        22804
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 30,
+      "groupIndex": 10,
+      "heightHU": 1100,
+      "ratio": 97,
+      "mixture": "A",
+      "alignment": "JUSTIFY",
+      "widthHU": 29788,
+      "predictedThresholdHU": 29792,
+      "predictedFirstBreak": 30,
+      "actualLineStarts": [
+        0,
+        30
+      ],
+      "nativeLineWidthsHU": [
+        29788,
+        29788
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 31,
+      "groupIndex": 10,
+      "heightHU": 1100,
+      "ratio": 97,
+      "mixture": "A",
+      "alignment": "JUSTIFY",
+      "widthHU": 29792,
+      "predictedThresholdHU": 29792,
+      "predictedFirstBreak": 31,
+      "actualLineStarts": [
+        0,
+        31
+      ],
+      "nativeLineWidthsHU": [
+        29792,
+        29792
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 32,
+      "groupIndex": 10,
+      "heightHU": 1100,
+      "ratio": 97,
+      "mixture": "A",
+      "alignment": "JUSTIFY",
+      "widthHU": 29796,
+      "predictedThresholdHU": 29792,
+      "predictedFirstBreak": 31,
+      "actualLineStarts": [
+        0,
+        31
+      ],
+      "nativeLineWidthsHU": [
+        29796,
+        29796
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 33,
+      "groupIndex": 11,
+      "heightHU": 1100,
+      "ratio": 97,
+      "mixture": "B",
+      "alignment": "JUSTIFY",
+      "widthHU": 20212,
+      "predictedThresholdHU": 20216,
+      "predictedFirstBreak": 20,
+      "actualLineStarts": [
+        0,
+        20
+      ],
+      "nativeLineWidthsHU": [
+        20212,
+        20212
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 34,
+      "groupIndex": 11,
+      "heightHU": 1100,
+      "ratio": 97,
+      "mixture": "B",
+      "alignment": "JUSTIFY",
+      "widthHU": 20216,
+      "predictedThresholdHU": 20216,
+      "predictedFirstBreak": 21,
+      "actualLineStarts": [
+        0,
+        21
+      ],
+      "nativeLineWidthsHU": [
+        20216,
+        20216
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    },
+    {
+      "tableIndex": 35,
+      "groupIndex": 11,
+      "heightHU": 1100,
+      "ratio": 97,
+      "mixture": "B",
+      "alignment": "JUSTIFY",
+      "widthHU": 20220,
+      "predictedThresholdHU": 20216,
+      "predictedFirstBreak": 21,
+      "actualLineStarts": [
+        0,
+        21
+      ],
+      "nativeLineWidthsHU": [
+        20220,
+        20220
+      ],
+      "propertiesUnchanged": true,
+      "fontDescriptorChanged": true
+    }
+  ],
+  "scope": "Actual Hancom readback of self-authored glyph admission matrix. Exact text SHA and resolved measurement properties are checked. Glyph-placement advances, font-size generalization outside this matrix and global cached-row changes are not proved by line-partition thresholds alone."
+}

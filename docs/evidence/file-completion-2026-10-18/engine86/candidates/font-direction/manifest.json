@@ -1,0 +1,259 @@
+{
+  "files": [
+    {
+      "path": "xml-text-direction-exact83-v2.patch",
+      "bytes": 6955,
+      "sha256": "24c68a269cc0bd6e4d0dd8d7c3709a37d42fc4b766dbcde97e422ffe251dd113",
+      "source": "build/text-direction-closure83/xml-text-direction-exact83-v2.patch"
+    },
+    {
+      "path": "xml-exact-strict-source-proof83-v2-final.json",
+      "bytes": 2563,
+      "sha256": "fe67e9845a7ba6f0b60276e611b371a3aa816397c0853fc7a062f9cc09d6c750",
+      "source": "build/text-direction-closure83/xml-exact-strict-source-proof83-v2-final.json"
+    },
+    {
+      "path": "native-xml-exact-candidate83.log",
+      "bytes": 3595,
+      "sha256": "ffaa12fb38b124d2ed3c9697b5dd2395a9e5ffd0e216b8e31aec5cc3d0021ec1",
+      "source": "build/text-direction-closure83/native-xml-exact-candidate83.log"
+    },
+    {
+      "path": "native-xml-exact-candidate83-fresh.log",
+      "bytes": 1015,
+      "sha256": "5fe996fa90f1ef31173eec3c8e9eeb0f2be5766251f27f5eceff613ad5feeac7",
+      "source": "build/text-direction-closure83/native-xml-exact-candidate83-fresh.log"
+    },
+    {
+      "path": "native-xml-exact-candidate83-strict-fresh.log",
+      "bytes": 1015,
+      "sha256": "5360afded4cd797fb474090b6360d2e86061b59b61cf7017e1a4704dd18d604c",
+      "source": "build/text-direction-closure83/native-xml-exact-candidate83-strict-fresh.log"
+    },
+    {
+      "path": "run-xml-exact-candidate83-strict-fresh.sh",
+      "bytes": 575,
+      "sha256": "684506450341d3c2ac80e9898bda3786ded530cf82c3a36c0a0c9d9de4c7a357",
+      "source": "build/text-direction-closure83/run-xml-exact-candidate83-strict-fresh.sh"
+    },
+    {
+      "path": "source-xml-exact-candidate83/tests/jueony_xml_text_direction.rs",
+      "bytes": 7037,
+      "sha256": "baaa77e16a0e6eb85676d8f638debbc48888e8e146e0b1a837e8234a3bbc8d10",
+      "source": "build/text-direction-closure83/source-xml-exact-candidate83/tests/jueony_xml_text_direction.rs"
+    },
+    {
+      "path": "textDir-v2-handoff.json",
+      "bytes": 3229,
+      "sha256": "475407fa05bb742d02e7b7ecda9852099c7b99c64fa0de64f53a53e1d631b42c",
+      "source": "build/text-direction-closure83/textDir-v2-handoff.json"
+    },
+    {
+      "path": "textDir-adoption-policy83.json",
+      "bytes": 1049,
+      "sha256": "733de444b7b7e046f31a0d099c475fe3927b2c416f140f033b0c23e2c72f3034",
+      "source": "build/text-direction-closure83/textDir-adoption-policy83.json"
+    },
+    {
+      "path": "auto-default-observations83.json",
+      "bytes": 1816,
+      "sha256": "2ce42400b99606b32b2cb881ee0119362678fbe19afa4d2c77903272bb2c075a",
+      "source": "build/text-direction-closure83/auto-default-observations83.json"
+    },
+    {
+      "path": "xml-text-direction-initial-eol-proof83.json",
+      "bytes": 1849,
+      "sha256": "9fe9c4bde0f3af41952388f1f95420642ec843109c61d0f5c4007a6d2958c88b",
+      "source": "build/text-direction-closure83/xml-text-direction-initial-eol-proof83.json"
+    },
+    {
+      "path": "baseline-wasm83.json",
+      "bytes": 18709,
+      "sha256": "6f7919b3a7038323109344851ba934f84b8b2e141aba5d017cc86bd2382ea857",
+      "source": "build/text-direction-closure83/baseline-wasm83.json"
+    },
+    {
+      "path": "baseline-wasm83-corrected.json",
+      "bytes": 17710,
+      "sha256": "065623402f021cab6e9d88d85177c302c912c839f68c9c66fd13e470abafe260",
+      "source": "build/text-direction-closure83/baseline-wasm83-corrected.json"
+    },
+    {
+      "path": "valid-v2/inputs.json",
+      "bytes": 1122,
+      "sha256": "cc4f939ee9ae6e71a4b273522d76958a54aceb1f3dbea94daae51cbed9a3b516",
+      "source": "build/text-direction-closure83/valid-v2/inputs.json"
+    },
+    {
+      "path": "valid-v2/own-LTR.hwpx",
+      "bytes": 7545,
+      "sha256": "616da60248ef663d0490caf5b96aa7c4ab4438b3a3b3abc13b127c020c7626f4",
+      "source": "build/text-direction-closure83/valid-v2/own-LTR.hwpx"
+    },
+    {
+      "path": "valid-v2/own-RTL.hwpx",
+      "bytes": 7545,
+      "sha256": "f75bd959a4c03fc5d3aa61ef279883b70e8451262b0b84edf2dea8da7cacd387",
+      "source": "build/text-direction-closure83/valid-v2/own-RTL.hwpx"
+    },
+    {
+      "path": "valid-v2/own-AUTO.hwpx",
+      "bytes": 7546,
+      "sha256": "4f0b0e7e500f97908a0e4cafef200948707459e97318375bcdcb1f09cc421046",
+      "source": "build/text-direction-closure83/valid-v2/own-AUTO.hwpx"
+    },
+    {
+      "path": "valid-v2/reproduce-baseline83.mjs",
+      "bytes": 1237,
+      "sha256": "199b32b325e5432541a1289def4e47220308e07df74432ab2c912bbb4f961fdf",
+      "source": "build/text-direction-closure83/valid-v2/reproduce-baseline83.mjs"
+    },
+    {
+      "path": "valid-v2/baseline-wasm83-corrected.json",
+      "bytes": 17710,
+      "sha256": "4fbb64659718a6b4598b7ac7dbdc01b00d7d30061ca49c8ba5725273a28a98c6",
+      "source": "build/text-direction-closure83/valid-v2/baseline-wasm83-corrected.json"
+    },
+    {
+      "path": "valid-v2/baseline-independent-xml.json",
+      "bytes": 486,
+      "sha256": "0a17390d23a4ba75aec46acdfa9efb18c01713a4bb3a839489bf706dce24c460",
+      "source": "build/text-direction-closure83/valid-v2/baseline-independent-xml.json"
+    },
+    {
+      "path": "font-type-authority83.patch",
+      "bytes": 12893,
+      "sha256": "fce0993013db18c8baba21c08b04dd1f4ce5943b02191d42f1ab200c81edfa06",
+      "source": "build/text-direction-closure83/font-type-authority83.patch"
+    },
+    {
+      "path": "font-type-source-proof83.json",
+      "bytes": 6785,
+      "sha256": "d3875923ffee1c7aa8012b5a68c5dd632f99bc463d238663d517c34b22680807",
+      "source": "build/text-direction-closure83/font-type-source-proof83.json"
+    },
+    {
+      "path": "font-type-authority-contract83.json",
+      "bytes": 1522,
+      "sha256": "d317472e183fefc3fadcd42d8cd2e17a8b02d7e56eba1b1e9bd443ff0821c2c4",
+      "source": "build/text-direction-closure83/font-type-authority-contract83.json"
+    },
+    {
+      "path": "font-type-strict-initial83.json",
+      "bytes": 3564,
+      "sha256": "4c6a419aecc483249abdbb6e541fb6e62a03947252df23e1640cfe12b0be7d50",
+      "source": "build/text-direction-closure83/font-type-strict-initial83.json"
+    },
+    {
+      "path": "source-font-type-candidate83/tests/jueony_font_type_origin.rs",
+      "bytes": 7824,
+      "sha256": "5a083e9401597163c1ba0883feeaa4e55798dbccc19be5b617ffc9e014a87f8e",
+      "source": "build/text-direction-closure83/source-font-type-candidate83/tests/jueony_font_type_origin.rs"
+    },
+    {
+      "path": "native-font-type-candidate83-first.log",
+      "bytes": 554,
+      "sha256": "335585d7548014fe750f330a25e868a7404da77fc9299dc7c4b9046858beb24a",
+      "source": "build/text-direction-closure83/native-font-type-candidate83-first.log"
+    },
+    {
+      "path": "native-font-type-candidate83-second.log",
+      "bytes": 1170,
+      "sha256": "436ef4912219d82a852253582024868c809cd5a4819310a80bcffdb0914a2f2f",
+      "source": "build/text-direction-closure83/native-font-type-candidate83-second.log"
+    },
+    {
+      "path": "run-font-type-candidate83-second.sh",
+      "bytes": 567,
+      "sha256": "03f4a452f7208c84db69e79ff1c797b60a831f9d14aec36fb529893ca16800ee",
+      "source": "build/text-direction-closure83/run-font-type-candidate83-second.sh"
+    },
+    {
+      "path": "font-type-inputs83-v2/manifest.json",
+      "bytes": 2080,
+      "sha256": "9aa6dff2b08fe9a372fdddfc5a72e8e4570147f172f8027083272676b2008219",
+      "source": "build/text-direction-closure83/font-type-inputs83-v2/manifest.json"
+    },
+    {
+      "path": "font-type-inputs83-v2/own-font-REP.hwpx",
+      "bytes": 7546,
+      "sha256": "fec799177e954bfef416b7063aa1aff7f6ac3656d1dba523d3b8459d22806cc0",
+      "source": "build/text-direction-closure83/font-type-inputs83-v2/own-font-REP.hwpx"
+    },
+    {
+      "path": "font-type-inputs83-v2/own-font-TTF.hwpx",
+      "bytes": 7533,
+      "sha256": "7a88d00977f01a5c127d47732c62a47622839dfff3dfea8dfa2cca01f73bd184",
+      "source": "build/text-direction-closure83/font-type-inputs83-v2/own-font-TTF.hwpx"
+    },
+    {
+      "path": "font-type-inputs83-v2/own-font-HFT.hwpx",
+      "bytes": 7546,
+      "sha256": "9315a5f206483f3657db2f65083143ce56e85c8952b2e97abd91860d39b25434",
+      "source": "build/text-direction-closure83/font-type-inputs83-v2/own-font-HFT.hwpx"
+    },
+    {
+      "path": "font-type-inputs83-v2/own-font-UNKNOWN.hwpx",
+      "bytes": 7549,
+      "sha256": "4fd03d900e905acc292ca79aa9cbbbd87368b3fc17ed927a3e5736d3e3866530",
+      "source": "build/text-direction-closure83/font-type-inputs83-v2/own-font-UNKNOWN.hwpx"
+    },
+    {
+      "path": "font-type-inputs83-v2/own-font-MISSING.hwpx",
+      "bytes": 7543,
+      "sha256": "87aae9a8b88cca062874fe54009241650e73493c5d52cb787fd393e107d73667",
+      "source": "build/text-direction-closure83/font-type-inputs83-v2/own-font-MISSING.hwpx"
+    },
+    {
+      "path": "font-type-inputs83-v2/baseline83-result.json",
+      "bytes": 19321,
+      "sha256": "397fad1693bef5cbd328a50562985b0a7fbbd2e7f3c5cbf3d06fba7af507a202",
+      "source": "build/text-direction-closure83/font-type-inputs83-v2/baseline83-result.json"
+    },
+    {
+      "path": "font-type-inputs83-v2/baseline83-independent-xml.json",
+      "bytes": 1757,
+      "sha256": "4df585f9ae0a3d7c2bed6519fc48dc5f2fa283acfd06aa9a31a84e50168aff96",
+      "source": "build/text-direction-closure83/font-type-inputs83-v2/baseline83-independent-xml.json"
+    },
+    {
+      "path": "reproduce-font-type-baseline83.mjs",
+      "bytes": 1574,
+      "sha256": "82a865f195c6b17c6ba1f0cbfee3bfb55162dc5367a074dab5569be345c7c534",
+      "source": "build/text-direction-closure83/reproduce-font-type-baseline83.mjs"
+    },
+    {
+      "path": "verify-xml-source-contracts-engine.mjs",
+      "bytes": 11488,
+      "sha256": "3d47df771153d8796df435d451a877d973e3dd8384a2d19f518d1a277743f23a",
+      "source": "build/text-direction-closure83/verify-xml-source-contracts-engine.mjs"
+    },
+    {
+      "path": "xml-source-contract-audit.py",
+      "bytes": 4893,
+      "sha256": "ba705dec16adcdbb70103d2aed354b8a1d579e26ab9b81313fda559ba313def8",
+      "source": "build/text-direction-closure83/xml-source-contract-audit.py"
+    },
+    {
+      "path": "harness-preparation-check83/result.json",
+      "bytes": 929,
+      "sha256": "799597cec0dd46a415b041589a9e8a239cbde7351c7b04b65f1a3c2a1f8ad307",
+      "source": "build/text-direction-closure83/harness-preparation-check83/result.json"
+    },
+    {
+      "path": "own-source/own-summary-five-fields-source.hwpx",
+      "bytes": 7553,
+      "sha256": "384155b8fa5e38462606e912638783cdb1dd3ce817c3b109c1978bdf3510b72b",
+      "source": "build/metadata-author-closure82/own-summary-five-fields-source.hwpx"
+    },
+    {
+      "path": "scope.json",
+      "bytes": 2539,
+      "sha256": "1acb119366c7b42c33d1d7b41a9e186f678ef13d836dc9e203cf5382dbfa779d",
+      "source": "generated explicit evidence scope"
+    }
+  ],
+  "fileCount": 42,
+  "totalBytes": 235038,
+  "scope": "Native/own-input evidence only; original source SHA verified per copied file."
+}

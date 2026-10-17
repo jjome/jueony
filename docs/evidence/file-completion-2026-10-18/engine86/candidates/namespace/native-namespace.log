@@ -1,0 +1,15 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.14s
+     Running tests/jueony_raw_namespace.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_raw_namespace-2f74dd779507e5dc)
+
+running 8 tests
+test raw_namespace::tests::raw_namespace83_generated_xml_is_validated_without_repair ... ok
+test raw_namespace::tests::raw_namespace83_default_and_escaped_uri_preserved_once ... ok
+test raw_namespace::tests::raw_namespace83_head_prefix_collision_and_stable_roundtrip ... ok
+test raw_namespace::tests::raw_namespace83_inherited_alias_fragment_stays_exact ... ok
+test raw_namespace::tests::raw_namespace83_shadowed_prefixes_stay_local ... ok
+test raw_namespace::tests::raw_namespace83_unbound_and_duplicate_contexts_rejected ... ok
+test raw_namespace::tests::raw_namespace83_ownership_limits_fail_closed ... ok
+test raw_namespace83_actual_engine_own_matrix_two_xml_cycles ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+

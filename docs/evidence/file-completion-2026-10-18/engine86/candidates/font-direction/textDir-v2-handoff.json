@@ -1,0 +1,88 @@
+{
+  "baseSource": "formal83/ad6186043c15532f",
+  "status": "Candidate native8 passed; production promotion pending explicit AUTO native-equivalence decision.",
+  "tests": {
+    "passed": 8,
+    "failed": 0,
+    "ignored": 0
+  },
+  "patchScope": {
+    "runtime": 6,
+    "mechanicalOldTestFixtureCompatibility": 1
+  },
+  "meaningScope": [
+    "HWPX explicit AUTO/LTR/RTL lexical attribute roundtrip exact.",
+    "Opaque unknown lexical direction roundtrip exact without AUTO normalization.",
+    "Absence remains absence.",
+    "All explicit directions currently report unsupported HWP writer mapping; no binary bits guessed.",
+    "No RTL rendering support claim.",
+    "No generic semantic/geometry gate changed."
+  ],
+  "limitations": [
+    "AUTO default HWP equivalence is observed indirectly through actual native→XML output but not formally established.",
+    "No actual Hancom own LTR/RTL/AUTO three-way golden was produced; GUI activation failed.",
+    "Existing v2 strict source+test evidence is immutable; any later policy change needs separate version and execution."
+  ],
+  "files": [
+    {
+      "path": "xml-text-direction-exact83-v2.patch",
+      "bytes": 6955,
+      "sha256": "24c68a269cc0bd6e4d0dd8d7c3709a37d42fc4b766dbcde97e422ffe251dd113"
+    },
+    {
+      "path": "xml-exact-strict-source-proof83-v2-final.json",
+      "bytes": 2563,
+      "sha256": "fe67e9845a7ba6f0b60276e611b371a3aa816397c0853fc7a062f9cc09d6c750"
+    },
+    {
+      "path": "native-xml-exact-candidate83-strict-fresh.log",
+      "bytes": 1015,
+      "sha256": "5360afded4cd797fb474090b6360d2e86061b59b61cf7017e1a4704dd18d604c"
+    },
+    {
+      "path": "run-xml-exact-candidate83-strict-fresh.sh",
+      "bytes": 575,
+      "sha256": "684506450341d3c2ac80e9898bda3786ded530cf82c3a36c0a0c9d9de4c7a357"
+    },
+    {
+      "path": "auto-default-observations83.json",
+      "bytes": 1816,
+      "sha256": "2ce42400b99606b32b2cb881ee0119362678fbe19afa4d2c77903272bb2c075a"
+    },
+    {
+      "path": "source-xml-exact-candidate83/tests/jueony_xml_text_direction.rs",
+      "bytes": 7037,
+      "sha256": "baaa77e16a0e6eb85676d8f638debbc48888e8e146e0b1a837e8234a3bbc8d10"
+    },
+    {
+      "path": "valid-v2/baseline-independent-xml.json",
+      "bytes": 486,
+      "sha256": "0a17390d23a4ba75aec46acdfa9efb18c01713a4bb3a839489bf706dce24c460"
+    },
+    {
+      "path": "valid-v2/baseline-wasm83-corrected.json",
+      "bytes": 17710,
+      "sha256": "4fbb64659718a6b4598b7ac7dbdc01b00d7d30061ca49c8ba5725273a28a98c6"
+    },
+    {
+      "path": "valid-v2/inputs.json",
+      "bytes": 1122,
+      "sha256": "cc4f939ee9ae6e71a4b273522d76958a54aceb1f3dbea94daae51cbed9a3b516"
+    },
+    {
+      "path": "valid-v2/own-LTR.hwpx",
+      "bytes": 7545,
+      "sha256": "616da60248ef663d0490caf5b96aa7c4ab4438b3a3b3abc13b127c020c7626f4"
+    },
+    {
+      "path": "valid-v2/own-RTL.hwpx",
+      "bytes": 7545,
+      "sha256": "f75bd959a4c03fc5d3aa61ef279883b70e8451262b0b84edf2dea8da7cacd387"
+    },
+    {
+      "path": "valid-v2/own-AUTO.hwpx",
+      "bytes": 7546,
+      "sha256": "4f0b0e7e500f97908a0e4cafef200948707459e97318375bcdcb1f09cc421046"
+    }
+  ]
+}

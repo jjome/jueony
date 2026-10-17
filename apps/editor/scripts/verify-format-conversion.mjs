@@ -18,10 +18,26 @@ const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 function exportArtifact(doc,format){const a=format==='hwp'?doc.exportHwpWithReport():doc.exportHwpxWithReport();try{const loss=JSON.parse(a.contentLoss());return {bytes:a.takeBytes(),loss};}finally{a.free();}}
 function queryTable(doc){const ctrl=JSON.parse(doc.getControls()).find(c=>c.ctrlId==='tbl'&&c.list===0);assert.ok(ctrl);return {ctrl,properties:JSON.parse(doc.getTableProperties(0,ctrl.para,ctrl.controlIndex))};}
 const sources=JSON.parse(await readFile(join(root,'.tools/public-documents/manifest.json'),'utf8')).filter(v=>v.status==='downloaded');
-for(const source of sources)for(const format of ['hwp','hwpx'])await scenario(`${source.id} -> ${format}: unchanged strict export evidence and live state`,async()=>{
+for(const source of sources){
+ const inputPath=join(root,'.tools/public-documents',source.file);
+ const directionRead=spawnSync('C:/Python314/python.exe',[join(root,'apps/editor/scripts/lib/hwpx-direction-evidence.py'),inputPath],{encoding:'utf8',windowsHide:true,maxBuffer:4*1024*1024});
+ assert.equal(directionRead.status,0,directionRead.stderr);
+ const directions=JSON.parse(directionRead.stdout);assert.equal(directions.inputSHA256,source.sha256);
+ for(const format of ['hwp','hwpx'])await scenario(`${source.id} -> ${format}: ${format==='hwp'&&directions.resources.length?'unsupported XML direction is refused before document writes':'unchanged strict export evidence and live state'}`,async()=>{
  const input=await readFile(join(root,'.tools/public-documents',source.file));assert.equal(hash(input),source.sha256);
  const doc=new HwpDocument(input);try{
   const before=capturePreservationEvidence(doc),originalBytes=doc.exportHwpx(),{bytes,loss}=exportArtifact(doc,format);
+  if(format==='hwp'&&directions.resources.length){
+   assert.equal(loss.schemaVersion,1);assert.equal(loss.outputFormat,'hwp');
+   assert.equal(loss.count,directions.resources.length);assert.equal(loss.losses.length,directions.resources.length);
+   assert.deepEqual(loss.losses.map(item=>item.path).sort(),directions.resources.map(item=>item.path).sort());
+   for(const item of loss.losses){assert.equal(item.code,'metadataReduced');assert.equal(item.subject,'paragraphProperties');assert.equal(item.reason,'serializerNotImplemented');}
+   assert.throws(()=>verifyPreservedExport(doc,bytes,format,loss,b=>new HwpDocument(b)),error=>error?.name==='PreservationError'&&error.report.status==='blocked'&&error.report.issues.some(issue=>issue.code==='content-loss'));
+   assert.deepEqual(capturePreservationEvidence(doc),before);assert.deepEqual(doc.exportHwpx(),originalBytes);
+   assert.equal(hash(await readFile(inputPath)),source.sha256);
+   publicReports.push({id:source.id,inputSha256:source.sha256,format,status:'blocked',supported:false,documentSinkWrites:0,sourceDirectionResources:directions.resources,lossCount:loss.count,liveUnchanged:true,repeatedExportChecked:false});
+   return;
+  }
   const validation=verifyPreservedExport(doc,bytes,format,loss,b=>new HwpDocument(b));assert.equal(validation.status,'checked');
   assert.deepEqual(capturePreservationEvidence(doc),before);assert.deepEqual(doc.exportHwpx(),originalBytes);
   const reopened=new HwpDocument(bytes);try{const repeated=exportArtifact(reopened,format);assert.equal(verifyPreservedExport(reopened,repeated.bytes,format,repeated.loss,b=>new HwpDocument(b)).status,'checked');
@@ -35,6 +51,7 @@ for(const source of sources)for(const format of ['hwp','hwpx'])await scenario(`$
   publicReports.push({id:source.id,inputSha256:source.sha256,format,bytes:bytes.length,status:validation.status,liveUnchanged:true,repeatedExportChecked:true,issues:validation.issues});
  }finally{doc.free();}
 });
+}
 
 const blank=HwpDocument.createEmpty();blank.createBlankDocument();await writeFile(join(out,'self-authored-blank.hwpx'),blank.exportHwpx());blank.free();
 const latinMade=spawnSync('C:/Python314/python.exe',['-c',`import sys,zipfile,re\nfrom pathlib import Path\np=Path(sys.argv[1]);files={n:zipfile.ZipFile(p/'self-authored-blank.hwpx').read(n) for n in zipfile.ZipFile(p/'self-authored-blank.hwpx').namelist()}\nfor token in ['KEEP_WORD','HYPHENATION','BREAK_WORD']:\n h=files['Contents/header.xml'].decode();assert 'breakLatinWord=' in h;h=re.sub(r'breakLatinWord="[^"]*"','breakLatinWord="'+token+'"',h)\n with zipfile.ZipFile(p/('latin-'+token+'.hwpx'),'w',compression=zipfile.ZIP_DEFLATED) as z:\n  for n,b in files.items():z.writestr(n,h.encode() if n=='Contents/header.xml' else b)`,out],{encoding:'utf8',windowsHide:true});assert.equal(latinMade.status,0,latinMade.stderr);
@@ -80,5 +97,5 @@ await scenario('reopened table lock changes preserve both raw-cache and sealed s
 await scenario('preservation still rejects real flow, overlap and lock corruption',()=>{
  const d=HwpDocument.createEmpty();d.createBlankDocument();try{d.createTable(0,0,0,2,2);const baseline=d.exportHwpx();for(const name of ['restrictInPage','allowOverlap','Lock']){const changed=new HwpDocument(baseline);try{const {ctrl}=queryTable(changed);if(name==='Lock')changed.setControlLock(ctrl.para,ctrl.controlIndex,true);else changed.setTableProperties(0,ctrl.para,ctrl.controlIndex,JSON.stringify({[name]:!queryTable(d).properties[name]}));const corrupted=exportArtifact(changed,'hwpx');assert.throws(()=>verifyPreservedExport(d,corrupted.bytes,'hwpx',corrupted.loss,b=>new HwpDocument(b)),error=>error.report?.issues.some(i=>i.code==='changed')&&!error.report.issues.some(i=>i.path==='serializer-report'));}finally{changed.free();}}}finally{d.free();}
 });
-await writeFile(join(out,'result.json'),JSON.stringify({results,failures,publicReports,engine:JSON.parse(await readFile(join(pkg,'jueony-engine-build.json'),'utf8')),note:'Native WASM and repeated same-engine export; Hancom comparison NOT_RUN. Public source and converted bytes remain ignored and are not distribution inputs.'},null,2));
+await writeFile(join(out,'result.json'),JSON.stringify({results,failures,publicReports,publicCounts:{supported:publicReports.filter(row=>row.status==='checked').length,unsupportedBlocked:publicReports.filter(row=>row.status==='blocked').length},engine:JSON.parse(await readFile(join(pkg,'jueony-engine-build.json'),'utf8')),note:'Native WASM and repeated same-engine export; Hancom comparison NOT_RUN. Unsupported XML directions are explicitly tested as pre-write refusals, never as successful HWP conversion. Public source and converted bytes remain ignored and are not distribution inputs.'},null,2));
 if(failures.length)process.exitCode=1;

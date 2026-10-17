@@ -1,0 +1,41 @@
+{
+  "scope": "Read-only actual native-to-XML observation; not a universal default-direction equivalence proof.",
+  "observations": [
+    {
+      "path": "build/metadata-author-closure82/own-summary-five-fields-source.hwpx",
+      "sha256": "384155b8fa5e38462606e912638783cdb1dd3ce817c3b109c1978bdf3510b72b",
+      "paraPrTextDirCounts": {
+        "ABSENT": 20
+      }
+    },
+    {
+      "path": "build/metadata-author-closure82/own-summary-prefix-only-hancom.hwpx",
+      "sha256": "d7bac80e9591943846dbad86bf9827a1661a8eff04480128c16bfccc59f72767",
+      "paraPrTextDirCounts": {
+        "AUTO": 20
+      }
+    },
+    {
+      "path": "build/file-closure83-native-handoff/mcst-final83-hancom.hwpx",
+      "sha256": "65a60049e50636076dfff2eb4a6c7a3c850e838399af2ddf034d2992e1fb88dd",
+      "paraPrTextDirCounts": {
+        "AUTO": 178
+      }
+    },
+    {
+      "path": "build/hancom-final-file-review-20261017/mcst-bid-2026-hwpx-hancom.hwpx",
+      "sha256": "20a3960b4315626c3f97d9c5d47746e3cfadd8fe50dde43a4a424aa3a2a76936",
+      "paraPrTextDirCounts": {
+        "LTR": 188
+      }
+    }
+  ],
+  "localHwp5Specification": {
+    "path": "upstream/rhwp-source/mydocs/tech/한글문서파일형식_5.0_revision1.3.md",
+    "sha256": "746a628a44d4253c7d3c3c5026311101ce09a9635108a2aa733057b6ed624f5f",
+    "section": "4.2.10 tables 43-46",
+    "textDirectionSlot": "Not identified. Reserved bits not inferred."
+  },
+  "officialReference": "https://cdn.hancom.com/link/docs/%ED%95%9C%EA%B8%80%EB%AC%B8%EC%84%9C%ED%8C%8C%EC%9D%BC%ED%98%95%EC%8B%9D_5.0_revision1.2.pdf",
+  "status": "AUTO is observed after actual Hancom HWP input. Exact semantic equivalence for arbitrary explicit AUTO vs absent is not established by this sample alone. LTR/RTL native mapping remains unproven."
+}

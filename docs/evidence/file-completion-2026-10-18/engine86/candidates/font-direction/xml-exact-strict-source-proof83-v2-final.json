@@ -1,0 +1,63 @@
+{
+  "baseSourceId": "ad6186043c15532f",
+  "changed": [
+    {
+      "path": "src/model/style.rs",
+      "afterSha256": "bfa5b55aded8fede1708d0e63a0fa7eb0509f0027a972f9b0952c038b6dd69fc"
+    },
+    {
+      "path": "src/parser/doc_info.rs",
+      "afterSha256": "18aa3d0827e16feed42144eedcba4d4804df229061f8e149c0125584c965bdb5"
+    },
+    {
+      "path": "src/parser/hwpx/header.rs",
+      "afterSha256": "59ad32defc6d8c1f8fd714dd51a5f33c89b46ff941325db3574585b8f32a4234"
+    },
+    {
+      "path": "src/serializer/doc_info/tests.rs",
+      "afterSha256": "5ae332af06f82df111db6b0a6ca84b74b6c2120b2489623913af166cf62cce8e"
+    },
+    {
+      "path": "src/serializer/hml/preflight.rs",
+      "afterSha256": "c9e536eb46c367a559984630679a44adccf371bf43b2df16ac2e56fc08e697c4"
+    },
+    {
+      "path": "src/serializer/hwpx/header.rs",
+      "afterSha256": "d74c7ff570be45c2a81b995c39ad85c1e8643deaf39a53220c5a01f5dc22f19d"
+    },
+    {
+      "path": "src/serializer/paragraph_metadata_loss.rs",
+      "afterSha256": "bf41182051c045f13509ead447adecb78bfcce7bd60f5bbac9a29dc4aae9f03a"
+    }
+  ],
+  "runtimeFilesChanged": 6,
+  "legacyTestFixtureFileChanged": 1,
+  "patchSha256": "24c68a269cc0bd6e4d0dd8d7c3709a37d42fc4b766dbcde97e422ffe251dd113",
+  "strictApply": true,
+  "strictAppliedFilesCopiedBeforeFinalCompile": true,
+  "testsSha256": "baaa77e16a0e6eb85676d8f638debbc48888e8e146e0b1a837e8234a3bbc8d10",
+  "state": "Final strict-applied actual native test execution passed.",
+  "native": {
+    "passed": 8,
+    "failed": 0,
+    "ignored": 0,
+    "compiledLibrary": true,
+    "log": "native-xml-exact-candidate83-strict-fresh.log",
+    "logSha256": "5360afded4cd797fb474090b6360d2e86061b59b61cf7017e1a4704dd18d604c",
+    "namedTests": [
+      "exact_direction_participates_in_resource_dedup_equality",
+      "unused_direction_definition_is_not_silently_dropped_from_hwp_report",
+      "unknown_spelling_preserved_as_opaque_metadata_without_auto_authority",
+      "real_paragraph_edit_snapshot_undo_redo_preserves_exact_xml_direction",
+      "absent_native_source_keeps_absence_without_manufactured_auto",
+      "known_rtl_exact_xml_and_explicit_hwp_loss",
+      "known_auto_exact_xml_and_explicit_hwp_loss",
+      "known_ltr_exact_xml_and_explicit_hwp_loss"
+    ]
+  },
+  "constraints": [
+    "No RTL renderer support claimed.",
+    "HWP AUTO default-equivalence not established; v2 reports explicit AUTO as loss pending separate decision.",
+    "No production comparator or runtime source changed."
+  ]
+}

@@ -1,0 +1,514 @@
+--- a/src/renderer/composer/line_breaking.rs
++++ b/src/renderer/composer/line_breaking.rs
+@@ -1336,6 +1336,12 @@
+     token_idx: usize,
+     line_start: usize,
+ ) -> Option<i32> {
++    new_word_natural_before_with_units_hwp(tokens, token_idx, line_start, false)
++}
++
++fn new_word_natural_before_with_units_hwp(
++    tokens: &[BreakToken], token_idx: usize, line_start: usize, integral: bool,
++) -> Option<i32> {
+     let mut k = token_idx;
+     while k > 0 {
+         match &tokens[k - 1] {
+@@ -1346,7 +1352,7 @@
+     if k == token_idx {
+         return None;
+     }
+-    let width = recalc_width_hwp(tokens, k, line_start);
++    let width = recalc_width_with_units_hwp(tokens, k, line_start, integral);
+     (width > 0).then_some(width)
+ }
+ 
+@@ -1531,6 +1537,8 @@
+     word_gap_natural_hwp: Option<i32>,
+     /// 물리 프레임의 폭이 확정되면 추정 메트릭의 초과 허용을 얹지 않는다.
+     allow_metric_tolerance: bool,
++    integral_advances: bool,
++    integral_interval_hwp: Option<i32>,
+     finished: bool,
+     emitted_any: bool,
+ }
+@@ -1553,6 +1561,8 @@
+             fs_at_last_break: 0.0,
+             word_gap_natural_hwp: None,
+             allow_metric_tolerance: true,
++            integral_advances: false,
++            integral_interval_hwp: None,
+             finished: false,
+             emitted_any: false,
+         }
+@@ -1575,6 +1585,44 @@
+     }
+ }
+ 
++
++/// Integer TTF advances may be consumed without the estimated-font allowance.
++/// This is a measurement proof for every scalar, not a font-name shortcut.
++/// Controls, authored condense, markers and any unproved scalar keep their
++/// established fill owner and conversion rules.
++fn paragraph_has_integral_gulimche_advances(
++    para: &Paragraph,
++    styles: &ResolvedStyleSet,
++    space_metric: SpaceMetric,
++) -> bool {
++    if para.text.is_empty() || !para.controls.is_empty()
++        || !styles.para_styles.get(para.para_shape_id as usize).is_some_and(|p|
++            p.condense_min_space == 0 && p.head_type == HeadType::None
++                && p.numbering_id == 0 && p.indent == 0.0)
++    {
++        return false;
++    }
++    let chars: Vec<_> = para.text.chars().collect();
++    let metric_scope = ParagraphMetricScope::new(&chars, styles)
++        .with_reflow_slots(&chars).with_space_metric(space_metric);
++    let mut lang = 0;
++    chars.iter().enumerate().all(|(index, &ch)| {
++        let offset = para.char_offsets.get(index).copied().unwrap_or(index as u32);
++        let id = find_active_char_shape(&para.char_shapes, offset);
++        let slot = char_lang_slot(ch, &mut lang, punct_latin_slot(styles, id));
++        let style = metric_scope.style(styles, id, slot, index);
++        crate::renderer::layout::trace_char_width_decisions(&ch.to_string(), &style)
++            .first().is_some_and(|d| d.integral_advance_hwp.is_some())
++    })
++}
++
++/// Restore the integer sum of proven glyph advances transported through px.
++/// The interval budget is never recovered from a float: ParagraphBox / Frame
++/// supply their original integer extent separately.
++fn fill_units_hwp(px: f64, integral: bool) -> i32 {
++    if integral { (px * 75.0).round() as i32 } else { to_hwp(px) }
++}
++
+ /// Fill all scalar intervals through the resumable greedy continuation.
+ fn fill_lines(
+     tokens: &[BreakToken],
+@@ -1587,9 +1635,13 @@
+     letter_spacing_px: &[f64],
+     initial_start_idx: usize,
+     initial_is_first_line: bool,
++    integral_width_hwp: Option<i32>,
+     mut kerning: Option<&mut crate::renderer::kerning::KerningParagraphBreakSession<'_, '_, '_>>,
+ ) -> Vec<LineBreakResult> {
+     let mut cursor = FillCursor::new(initial_start_idx, initial_is_first_line);
++    cursor.integral_advances = integral_width_hwp.is_some();
++    cursor.integral_interval_hwp = integral_width_hwp;
++    cursor.allow_metric_tolerance = !cursor.integral_advances;
+     let mut results = Vec::new();
+ 
+     while let Some(interval) = fill_one_interval(
+@@ -1624,6 +1676,8 @@
+     mut kerning: Option<&mut crate::renderer::kerning::KerningParagraphBreakSession<'_, '_, '_>>,
+ ) -> Option<FilledInterval> {
+     let allow_metric_tolerance = cursor.allow_metric_tolerance;
++    let integral = cursor.integral_advances;
++    let to_fill_hwp = |px| fill_units_hwp(px, integral);
+     let fits_physical_line = |current, token, savings, width, word| {
+         text_token_fits_in_line_with_tolerance_hwp(
+             current,
+@@ -1662,20 +1716,27 @@
+         48.0
+     };
+     let eff_w = |first: bool| -> i32 {
++        if integral {
++            // The proof excludes paragraph indentation and list markers.
++            // Use the very interval extent the frame / edit box owns.
++            if let Some(width) = cursor.integral_interval_hwp {
++                return width;
++            }
++        }
+         if indent_px > 0.0 {
+             if first {
+-                to_hwp((available_width_px - indent_px).max(1.0))
++                to_fill_hwp((available_width_px - indent_px).max(1.0))
+             } else {
+-                to_hwp(available_width_px)
++                to_fill_hwp(available_width_px)
+             }
+         } else if indent_px < 0.0 {
+             if first {
+-                to_hwp(available_width_px)
++                to_fill_hwp(available_width_px)
+             } else {
+-                to_hwp((available_width_px + indent_px).max(1.0))
++                to_fill_hwp((available_width_px + indent_px).max(1.0))
+             }
+         } else {
+-            to_hwp(available_width_px)
++            to_fill_hwp(available_width_px)
+         }
+     };
+ 
+@@ -1747,7 +1808,7 @@
+                 // 탭 계산은 px로 수행 후 HWPUNIT 변환 (정밀도 유지)
+                 let lw_px = cursor.lw as f64 / 75.0;
+                 let next_tab_px = ((lw_px / tab_w_px).floor() + 1.0) * tab_w_px;
+-                let next_tab_hwp = to_hwp(next_tab_px);
++                let next_tab_hwp = to_fill_hwp(next_tab_px);
+                 if *max_font_size > cursor.line_max_fs {
+                     cursor.line_max_fs = *max_font_size;
+                 }
+@@ -1781,7 +1842,7 @@
+                     cursor.last_break_token_idx = None;
+                     let lw_px2 = cursor.lw as f64 / 75.0;
+                     let next_tab2 = ((lw_px2 / tab_w_px).floor() + 1.0) * tab_w_px;
+-                    cursor.lw = to_hwp(next_tab2);
++                    cursor.lw = to_fill_hwp(next_tab2);
+                     cursor.token_index += 1;
+                     cursor.emitted_any = true;
+                     return Some(FilledInterval {
+@@ -1809,13 +1870,13 @@
+                 if *max_font_size > cursor.line_max_fs {
+                     cursor.line_max_fs = *max_font_size;
+                 }
+-                let space_hwp = to_hwp(*width);
++                let space_hwp = to_fill_hwp(*width);
+                 // [#7418] 줄 맨 앞 공백은 condense 로 줄지 않는다.
+                 let leading = space_is_line_leading(text_chars, cursor.line_start_idx, *idx);
+                 let space_savings = if leading {
+                     0
+                 } else {
+-                    condense_space_savings_hwp(to_hwp(*condense_base), condense_min_space)
++                    condense_space_savings_hwp(to_fill_hwp(*condense_base), condense_min_space)
+                 };
+                 if let Some(cut) = overflowing_space_cut(
+                     cursor.line_start_idx,
+@@ -1910,7 +1971,7 @@
+                         let rel_idx = ci - *start_idx;
+                         let char_w = base_char_widths
+                             .get(rel_idx)
+-                            .map(|width| to_hwp(*width))
++                            .map(|width| to_fill_hwp(*width))
+                             .unwrap_or_else(|| {
+                                 let ch = text_chars[ci];
+                                 let char_w_px = if is_cjk_char(ch) {
+@@ -1918,13 +1979,13 @@
+                                 } else {
+                                     cursor.line_max_fs.max(12.0) * 0.5
+                                 };
+-                                to_hwp(char_w_px)
++                                to_fill_hwp(char_w_px)
+                             });
+                         let current_width = eff_w(cursor.is_first_line);
+                         let candidate_base = cursor.lw + char_w;
+                         let candidate_width = if let Some(session) = kerning.as_deref_mut() {
+                             candidate_base
+-                                + to_hwp(
++                                + to_fill_hwp(
+                                     session
+                                         .boundary_pair_adjustment(cursor.line_start_idx, ci + 1)?,
+                                 )
+@@ -1972,7 +2033,7 @@
+                     cursor.line_max_fs = *max_font_size;
+                 }
+ 
+-                let w_hwp = to_hwp(*base_width);
++                let w_hwp = to_fill_hwp(*base_width);
+                 let effective_width = eff_w(cursor.is_first_line);
+                 // 전진폭은 유지하며 일반 자동 줄 경계 비교에서만 후보의 끝 자간을 뺀다.
+                 // 작성된 줄바꿈 또는 문단 끝의 압축 자간은 전진폭으로 판정한다.
+@@ -1991,7 +2052,7 @@
+                     FitWidthHwp::trimmed(w_hwp, letter_spacing_px, *end_idx)
+                 };
+                 let pair_adjustment_hwp = if let Some(session) = kerning.as_deref_mut() {
+-                    to_hwp(session.boundary_pair_adjustment(cursor.line_start_idx, *end_idx)?)
++                    to_fill_hwp(session.boundary_pair_adjustment(cursor.line_start_idx, *end_idx)?)
+                 } else {
+                     0
+                 };
+@@ -2060,7 +2121,7 @@
+                                 next_start += 1;
+                             }
+                             cursor.line_start_idx = next_start;
+-                            cursor.lw = recalc_width_hwp(tokens, ti, next_start);
++                            cursor.lw = recalc_width_with_units_hwp(tokens, ti, next_start, integral);
+                             cursor.line_space_savings = recalc_space_savings_hwp(
+                                 tokens,
+                                 ti,
+@@ -2095,7 +2156,7 @@
+                                 cursor.lw,
+                                 w_hwp_fit.with_pair_adjustment(
+                                     if let Some(session) = kerning.as_deref_mut() {
+-                                        to_hwp(session.boundary_pair_adjustment(
++                                        to_fill_hwp(session.boundary_pair_adjustment(
+                                             cursor.line_start_idx,
+                                             *end_idx,
+                                         )?)
+@@ -2105,7 +2166,7 @@
+                                 ),
+                                 cursor.line_space_savings,
+                                 eff_w(false),
+-                                new_word_natural_before_hwp(tokens, ti, cursor.line_start_idx),
++                                new_word_natural_before_with_units_hwp(tokens, ti, cursor.line_start_idx, integral),
+                             ) {
+                                 cursor.lw += w_hwp;
+                                 cursor.token_index += 1;
+@@ -2464,6 +2525,12 @@
+ 
+ /// 줄 바꿈 지점 이후 토큰의 누적 폭 재계산 (HWPUNIT)
+ fn recalc_width_hwp(tokens: &[BreakToken], current_token_idx: usize, new_line_start: usize) -> i32 {
++    recalc_width_with_units_hwp(tokens, current_token_idx, new_line_start, false)
++}
++
++fn recalc_width_with_units_hwp(
++    tokens: &[BreakToken], current_token_idx: usize, new_line_start: usize, integral: bool,
++) -> i32 {
+     let mut w = 0i32;
+     for t in &tokens[..current_token_idx] {
+         match t {
+@@ -2472,10 +2539,10 @@
+                 base_width,
+                 ..
+             } if *start_idx >= new_line_start => {
+-                w += to_hwp(*base_width);
++                w += fill_units_hwp(*base_width, integral);
+             }
+             BreakToken::Space { idx, width, .. } if *idx >= new_line_start => {
+-                w += to_hwp(*width);
++                w += fill_units_hwp(*width, integral);
+             }
+             _ => {}
+         }
+@@ -3348,6 +3415,8 @@
+     // 확정된 물리 구간은 원본 격자 폭 자체가 경계다. 추정 여유를 더하면
+     // 4 HU 격자로 내린 칸에도 26 HU 초과 글자가 들어가 격자 계약이 무효화된다.
+     cursor.allow_metric_tolerance = false;
++    cursor.integral_advances = !frame.models_exclusions()
++        && paragraph_has_integral_gulimche_advances(para, styles, space_metric);
+ 
+     let result = (|| {
+         while !cursor.finished {
+@@ -3407,6 +3476,12 @@
+                     .fold(0.0, f64::max);
+                 for (interval_index, interval) in intervals.into_iter().enumerate() {
+                     let available_width_px = interval_width(interval_index, &interval);
++                    cursor.integral_interval_hwp = cursor.integral_advances.then_some(
++                        if interval_index == 0 {
++                            interval.end.saturating_sub(interval.start).max(75)
++                        } else {
++                            interval.end.saturating_sub(interval.start)
++                        });
+                     // 같은 물리 줄의 다른 구간에 온전한 낱말이 들어가면 그대로 보존한다.
+                     // 넓은 구간을 채운 뒤 좁은 옆 구간 때문에 글자 단위로 쪼개지 않는다.
+                     if cursor.fallback_char_idx.is_none() {
+@@ -3449,6 +3524,8 @@
+                             cursor.is_first_line,
+                         );
+                         replay.allow_metric_tolerance = false;
++                        replay.integral_advances = cursor.integral_advances;
++                        replay.integral_interval_hwp = cursor.integral_interval_hwp;
+                         let filled = fill_one_interval(
+                             terminal_tokens,
+                             &text_chars,
+@@ -4613,6 +4690,8 @@
+         &resolved_letter_spacing_px(&text_chars, &para.char_offsets, &para.char_shapes, styles),
+         reflow_start_idx,
+         reflow_is_first_line,
++        paragraph_has_integral_gulimche_advances(para, styles, reflow_space_metric)
++            .then_some(seg_width_hwp.max(75)),
+         kerning_break_session.as_mut(),
+     );
+     let kerning_failed = kerning_break_session
+@@ -4633,6 +4712,8 @@
+             &resolved_letter_spacing_px(&text_chars, &para.char_offsets, &para.char_shapes, styles),
+             reflow_start_idx,
+             reflow_is_first_line,
++            paragraph_has_integral_gulimche_advances(para, styles, reflow_space_metric)
++                .then_some(seg_width_hwp.max(75)),
+             None,
+         );
+     }
+@@ -5134,6 +5215,7 @@
+             initial_start_idx,
+             initial_is_first_line,
+             None,
++            None,
+         );
+         let resumed = collect_one_interval_at_a_time(
+             tokens,
+--- a/src/renderer/layout/text_measurement.rs
++++ b/src/renderer/layout/text_measurement.rs
+@@ -1249,6 +1249,8 @@
+     pub(crate) width_source: &'static str,
+     pub(crate) base_width_px: f64,
+     pub(crate) final_width_px: f64,
++    /// Exact natural integer advance, before any painter spacing.
++    pub(crate) integral_advance_hwp: Option<i32>,
+     pub(crate) metric: Option<font_metrics_data::MetricLookupDecision<'a>>,
+     pub(crate) character_match: &'static str,
+     pub(crate) dash_leader: bool,
+@@ -1443,6 +1445,78 @@
+     }
+ }
+ 
++/// Native Hancom fresh-row controls distinguish GulimChe's four-HWPUNIT
++/// natural advances: Hangul and ordinary blank truncate; nonblank ASCII rounds.
++/// Source TTF ownership and the actual selected metric must agree. This does
++/// not enlarge a physical interval or change authored spacing/row boundaries.
++fn regular_gulimche_natural_advance_hwp(
++    character: char,
++    style: &TextStyle,
++    font_size: f64,
++    ratio: f64,
++    letter_spacing: f64,
++    trusted: bool,
++    metric: Option<font_metrics_data::MetricLookupDecision<'_>>,
++) -> Option<i32> {
++    let selected = metric?;
++    if !trusted
++        || selected.metric.name != "GulimChe"
++        || selected.bold_fallback
++        || selected.match_kind != font_metrics_data::MetricMatchKind::Exact
++        || style.font_size <= 0.0
++        || style.ratio <= 0.0
++        || style.bold
++        || style.italic
++        || style.kerning
++        || style.superscript
++        || style.subscript
++        || style.hft_hangul_face
++        || style.hft_fullwidth_dot
++        || style.font_space_em.is_some()
++        || style.supplemental_metrics.is_some()
++        || letter_spacing != 0.0
++        || !font_size.is_finite()
++        || font_size <= 0.0
++        || !ratio.is_finite()
++        || ratio <= 0.0
++    {
++        return None;
++    }
++    let full = matches!(character, '\u{AC00}'..='\u{D7A3}');
++    let blank = character == ' ';
++    if !full && !blank && !character.is_ascii_graphic() {
++        return None;
++    }
++    let glyph_units = selected.metric.get_width(character)?;
++    let expected_units = if full {
++        selected.metric.em_size
++    } else {
++        selected.metric.em_size / 2
++    };
++    if glyph_units != expected_units {
++        return None;
++    }
++    // Font height and ratio originate in integer HWPUNIT / percentage fields.
++    // Recover those units before evaluating their rational glyph advance;
++    // do not introduce a per-token epsilon or an available-width allowance.
++    let height_hwp = (font_size * 75.0).round();
++    let percent = (ratio * 100.0).round();
++    if height_hwp <= 0.0 || height_hwp > u32::MAX as f64
++        || font_size != height_hwp / 75.0
++        || !(1.0..=255.0).contains(&percent) || ratio != percent / 100.0
++    {
++        return None;
++    }
++    let quarter_units = height_hwp * percent * f64::from(glyph_units)
++        / (400.0 * f64::from(selected.metric.em_size));
++    let advance_hwp = if full || blank {
++        quarter_units.floor() * 4.0
++    } else {
++        quarter_units.round() * 4.0
++    };
++    (advance_hwp > 0.0 && advance_hwp <= i32::MAX as f64).then_some(advance_hwp as i32)
++}
++
+ pub(crate) fn char_width_decision<'a>(
+     chars: &[char],
+     cluster_len: &[u8],
+@@ -1466,6 +1540,7 @@
+             width_source: "clusterContinuation",
+             base_width_px: 0.0,
+             final_width_px: 0.0,
++            integral_advance_hwp: None,
+             metric: None,
+             character_match: "notApplicable",
+             dash_leader: false,
+@@ -1477,6 +1552,7 @@
+             width_source: "inlineObjectPlaceholder",
+             base_width_px: 0.0,
+             final_width_px: 0.0,
++            integral_advance_hwp: None,
+             metric: None,
+             character_match: "notApplicable",
+             dash_leader: false,
+@@ -1505,6 +1581,7 @@
+             width_source: "figureSpace",
+             base_width_px,
+             final_width_px,
++            integral_advance_hwp: None,
+             metric: None,
+             character_match: "notApplicable",
+             dash_leader: false,
+@@ -1670,8 +1747,20 @@
+     } else {
+         base_width_raw
+     };
+-    let mut final_width_px = base_width_px * ratio
+-        + glyph_letter_spacing(letter_spacing, base_width_px * ratio, font_size)
++    let natural_advance_hwp = (!dash_leader)
++        .then(|| regular_gulimche_natural_advance_hwp(
++            c, style, font_size, ratio, letter_spacing,
++            latin.map_or(style.font_metric_trusted, |l| l.font_metric_trusted),
++            metric,
++        ))
++        .flatten();
++    let integral_advance_hwp = natural_advance_hwp.filter(|_| style.extra_char_spacing == 0.0
++        && style.extra_word_spacing == 0.0 && style.extra_dash_advance == 0.0);
++    let natural_advance = natural_advance_hwp
++        .map(|width| f64::from(width) / 75.0)
++        .unwrap_or(base_width_px * ratio);
++    let mut final_width_px = natural_advance
++        + glyph_letter_spacing(letter_spacing, natural_advance, font_size)
+         + style.extra_char_spacing;
+     if c == ' ' {
+         final_width_px += style.extra_word_spacing;
+@@ -1691,6 +1780,7 @@
+         width_source,
+         base_width_px,
+         final_width_px,
++        integral_advance_hwp,
+         metric,
+         character_match,
+         dash_leader,
+@@ -1785,6 +1875,16 @@
+ /// 한다. 따라서 글꼴명이나 고정 글자 크기에 의존하지 않는다.
+ pub(crate) fn hancom_regenerated_space_width(style: &TextStyle) -> Option<f64> {
+     let (font_size, ratio, _) = style_params(style);
++    // The measured GulimChe blank already has the regenerated natural width.
++    // Do not replace its shared advance with the older unquantized half-em.
++    let family = style.metric_font_family.as_deref().unwrap_or(&style.font_family);
++    if regular_gulimche_natural_advance_hwp(
++        ' ', style, font_size, ratio, style.letter_spacing,
++        style.font_metric_trusted,
++        font_metrics_data::find_metric_decision(family, style.bold, style.italic),
++    ).is_some() {
++        return None;
++    }
+     // [#7387] `use_font_space` run 은 반각이 아니라 영문 슬롯 글꼴의 공백폭이 기준이다.
+     // 이 값을 그대로 두면 아래 `stored_width` 비교가 늘 참이 되어, 고친 공백폭을
+     // 다시 반각으로 되돌린다.
+--- a/src/renderer/style_resolver.rs
++++ b/src/renderer/style_resolver.rs
+@@ -736,6 +736,8 @@
+         font_families_metric_trusted.push(
+             decision.alt_type == Some(1)
+                 && !substituted
++                && !(decision.embedded == Some(true)
++                    && matches!(decision.requested_face.as_deref(), Some("굴림체" | "GulimChe")))
+                 && decision
+                     .requested_face
+                     .as_deref()
+@@ -994,7 +996,9 @@
+ fn metric_widths_verified_face(face: &str) -> bool {
+     matches!(
+         face.trim(),
+-        "HY신명조"
++        "굴림체"
++            | "GulimChe"
++            | "HY신명조"
+             | "HYSinMyeongJo-Medium"
+             | "HY헤드라인M"
+             | "HYHeadLine-Medium"

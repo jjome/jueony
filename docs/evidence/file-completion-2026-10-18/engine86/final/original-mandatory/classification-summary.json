@@ -1,0 +1,98 @@
+{
+  "engine": {
+    "sourceId": "b59322fd380dc175",
+    "patches": 95,
+    "wasmSHA256": "ef130c08536b38349bfb0c9b94a4478094c85df04ba2969ef4e4f65d05363f17",
+    "jsSHA256": "72828c03b5b92948e0acd45bcd3de0263c8570bfbfaeab283eb5998e1b72b22d"
+  },
+  "groups": [
+    {
+      "group": "note4",
+      "plannedScopeCount": 4,
+      "passedRecordedEvents": 3,
+      "failedRecordedEvents": 1,
+      "script": "apps/editor/scripts/verify-note-shape-storage-engine.mjs",
+      "scriptSHA256": "8151c9bb158b322b6ba4bb9f16a80fd33bcab2a4c1caab594757aa2eefc86436",
+      "scopePassed": false,
+      "failureNamesExact85": true,
+      "resultSHA256": "396bdf61c7046d539e549ad7fa0ec1e3f6fd67983a7d7177e2008df1897d8456"
+    },
+    {
+      "group": "font3",
+      "plannedScopeCount": 3,
+      "passedRecordedEvents": 3,
+      "failedRecordedEvents": 1,
+      "script": "apps/editor/scripts/verify-font-fallback-storage-engine.mjs",
+      "scriptSHA256": "a22f2bcd32413783e1e6e46127dd773f1022ca6de1ff0dc208b6c8580d257943",
+      "scopePassed": false,
+      "failureNamesExact85": true,
+      "resultSHA256": "0892e1de058fbf1cbdc9d4e06d41f6e443790f7ce5ed5c151addf2a450f6b952"
+    },
+    {
+      "group": "mcst15",
+      "plannedScopeCount": 15,
+      "passedRecordedEvents": 14,
+      "failedRecordedEvents": 1,
+      "script": "apps/editor/scripts/verify-mcst-flow-spacing-engine.mjs",
+      "scriptSHA256": "8169e9d3ec48d97c71857b2b144203b2ff87449d8a1012fa273d444a2e49515b",
+      "scopePassed": false,
+      "failureNamesExact85": true,
+      "resultSHA256": "d1e93ef01058212cd3b7e01decbe9f5bcb077a915c5448a881e069e7ffd26359"
+    },
+    {
+      "group": "whole7",
+      "plannedScopeCount": 7,
+      "passedRecordedEvents": 6,
+      "failedRecordedEvents": 1,
+      "script": "apps/editor/scripts/verify-document-save-layout-engine.mjs",
+      "scriptSHA256": "3b473306482ddcf224e2ba0a1b905eaaaad58fed0eab9108c74b7f3351d0dd23",
+      "scopePassed": false,
+      "failureNamesExact85": true,
+      "resultSHA256": "44349a0e0cbf9ccc6606dfe81d725b0284111c2bdccda285ece43c5537659e5b"
+    }
+  ],
+  "plannedScopeCount": 29,
+  "passedRecordedEvents": 26,
+  "failedRecordedEvents": 4,
+  "note": "font3의별도공통변환실패event로총기록30개. 26/29성공으로집계하지않음. 네원형실패는188LTR의HWP미지원차단이고지원성공재분류없음.",
+  "independentSourceDirections": {
+    "inputSHA256": "20a3960b4315626c3f97d9c5d47746e3cfadd8fe50dde43a4a424aa3a2a76936",
+    "count": 188,
+    "values": [
+      "LTR"
+    ],
+    "sourceIDsAndLossPathsExact": true
+  },
+  "font3WholeDocument": {
+    "wholeDocument": {
+      "status": "SAME_WITHIN_PUBLISHED_CONTRACT",
+      "pages": {
+        "before": 16,
+        "after": 16,
+        "equal": true
+      },
+      "geometryDifferences": 0,
+      "geometryTolerance": 0.2,
+      "semanticDifferences": 0,
+      "readIssues": {
+        "before": 0,
+        "after": 0
+      }
+    },
+    "preservation": {
+      "status": "blocked",
+      "issueCount": 1,
+      "issues": [
+        {
+          "code": "content-loss",
+          "path": "serializer-report"
+        }
+      ]
+    },
+    "sourceUnchanged": true,
+    "inputUnchanged": true,
+    "lossCount": 188
+  },
+  "otherNewFailuresComparedTo85": false,
+  "sourceAndGuardsModified": false
+}

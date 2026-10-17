@@ -1,0 +1,127 @@
+{
+  "base": "ad6186043c15532f",
+  "runtimeAndCompatibleTests": [
+    {
+      "path": "src/document_core/commands/agent_numbering_clone.rs",
+      "beforeSha256": "808c8abfd55a662e9b3b56143e167b263591e09f22c83e1b25db705e6ceb4ffb",
+      "afterSha256": "ce873b863f2347574b2c5311703734f9700889dcd708e3d8d4092bdcd5f9dbb0"
+    },
+    {
+      "path": "src/document_core/commands/agent_paragraph_lists.rs",
+      "beforeSha256": "ff6df5166c991a6d59001263a655f4ced460ace1da71f13a24bc7f6512f5018b",
+      "afterSha256": "04f5db1c8d458dc051d856c1c8c041ac2d278df69bd02792ea85c07a4e81dfc3"
+    },
+    {
+      "path": "src/model/style.rs",
+      "beforeSha256": "0ba31025b5ae121345d05bfa57b3eb4b7fd9d72bf14281138893ea35b95b271d",
+      "afterSha256": "9a613b15f661638fbf637373431f375103cbfb0d0e6d703b478f88c0d45bf885"
+    },
+    {
+      "path": "src/parser/doc_info.rs",
+      "beforeSha256": "c89ee02347dac1b7606631a9e9b2a1a755d8b6d1e0a4f715bef0730979994b11",
+      "afterSha256": "ca49f49135b17b77b4ab16508e00a77193e610cbae55de3fcb9d8f590b5dbdae"
+    },
+    {
+      "path": "src/parser/hwpx/header.rs",
+      "beforeSha256": "12ffb195a3b1aebc66a82486d01bba0db2b39819fcd0406c1b0c31a956acb457",
+      "afterSha256": "7ed9c100d3efd560768c128585a9e9ef90a78b6212cb71b6ddc74b57393cfdad"
+    },
+    {
+      "path": "src/parser/hwpx/mod.rs",
+      "beforeSha256": "b800c358e9d4ea87e6b2b285c8101b11ef454f8fa0c87eb7c4ac9ed5637472b9",
+      "afterSha256": "ec299ac1cf787614fb5c220b8e3bc02e9c831a24f239e6179db02b736668580b"
+    },
+    {
+      "path": "src/parser/hwpx/raw_namespace.rs",
+      "beforeSha256": null,
+      "afterSha256": "dfd4c19a53caab1f4819172b7320f37f33e81bd235da9cae815e813fb2191994"
+    },
+    {
+      "path": "src/renderer/layout/tests.rs",
+      "beforeSha256": "3443c3d64d117b6e083ddd776530531de8cf8cd571f72d7bf58256de62241c30",
+      "afterSha256": "dc4e2737e3165944115351368f0075d787f4caebf5259034389b2873a810feef"
+    },
+    {
+      "path": "src/serializer/doc_info/tests.rs",
+      "beforeSha256": "bff5f9494c36f157e95f1dc8aeed4ae7dd9f318ae24df50ed2ff13bf4f4c7676",
+      "afterSha256": "c43cc3f5d470e75159d07f6486d52598d881da3a7eaa89cefc55e39e6e1775fb"
+    },
+    {
+      "path": "src/serializer/hwpx/header.rs",
+      "beforeSha256": "da35ac62a2bdd8d83447052ca5ad9094ece77fef677bbbc792d996ed61955fc1",
+      "afterSha256": "66414c61fdc81071bea26d48aa92b52698af55704da82b8b009ce77f5d471294"
+    },
+    {
+      "path": "src/serializer/hwpx/writer.rs",
+      "beforeSha256": "29e5327483cb1c19e3ce5e3a9c8a37eb9d8ce66b1ebc95b7a35cfe62e3b965fb",
+      "afterSha256": "d883b203ad167f2d395ba4c72fabc80c80e1153eb936938713b977ed14c6c72e"
+    }
+  ],
+  "changedRustFiles": 11,
+  "patchSha256": "173fef15aa86447c81aa9d7d5b124363fa3256e033a4478636bf1cf3386e7955",
+  "nativeTests": {
+    "passed": 8,
+    "failed": 0,
+    "ignored": 0
+  },
+  "independentPythonXml": [
+    {
+      "path": "build/raw-namespace-closure83/own-0-cycle0.hwpx",
+      "sha256": "cbe5c21fa4c8227f475133f9aae35400bf39c30fe04a5ac310e12ed5307471b7",
+      "independentXmlEntries": [
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "settings.xml",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ]
+    },
+    {
+      "path": "build/raw-namespace-closure83/own-0-cycle1.hwpx",
+      "sha256": "1c78ced568635871f82987da7c57374a101f3b31486a759fe8d89f327a62590e",
+      "independentXmlEntries": [
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "settings.xml",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ]
+    },
+    {
+      "path": "build/raw-namespace-closure83/own-1-cycle0.hwpx",
+      "sha256": "593da931b0dc9f57ed9f18e84d4768c53ff1e941a502999925801674ddf2fae0",
+      "independentXmlEntries": [
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "settings.xml",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ]
+    },
+    {
+      "path": "build/raw-namespace-closure83/own-1-cycle1.hwpx",
+      "sha256": "7a4f727d5fa61c6003703ed59f7414ef435ecf526ce6461e7f99980d81e198e3",
+      "independentXmlEntries": [
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "settings.xml",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ]
+    }
+  ],
+  "preparationFailures": [
+    "preparation-failure-lib-tests.log",
+    "preparation-failure-missing-env.log"
+  ],
+  "publicBytesIncluded": false,
+  "sourceInputsUnchanged": true
+}

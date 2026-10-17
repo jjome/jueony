@@ -54,7 +54,7 @@
       "key": "files",
       "file": "05-files-storage-recovery.md",
       "title": "파일·저장·복구·형식 보존",
-      "description": "열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.\n\n**2026-10-18 현재:** 합본83에서 각주/미주의 i32 길이·간격 슬롯과 XML 출처 요약 stream 이름을 수정했다. 직접WASM27·실제 Edge17·파일/복구 화면133·unit930(skip0)·타입·경계·필수 저장29검수가 통과했다. 실제 한글2024의 합본 HWP 재저장·닫기·디스크 재열기16쪽을 확인했다. 요약5필드와 각주 XML 속성은 보존되지만, 외부 재조판의 raw strict 의미164/배치5843과 원 공개 문서의 초기 조판·줄 수용 차이는 구별하여 후속 감사한다. N001·N002와 상위 범위를 완료로 올리지 않았다. [최신 합본·남은 결함](../110-file-preservation-integration.md) · [검수 근거](../evidence/file-completion-2026-10-18/engine83/README.md).",
+      "description": "열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.\n\n**최종86 검수:** XML namespace·표 원점/편집 수명·새3단·폰트 유형·v1 커서 보존을 수정했다. 같은 빌드에서 unit933(skip0)·직접WASM27군·실제Edge17군·파일/복구133사례가 통과했다. 공개 변환은7조합 지원/3조합 명시 글 방향 미지원 차단으로 구별한다. 원형 필수 저장군의 HWP 변환 실패와 원MCST/Python3 초기 조판 차이, 최신 실제 Windows/한글 검수는 남아 있다. **이 파트 전체 완료는 아니다.** [최신 판정·실행](../111-file-storage-final-review.md) · [검수 근거](../evidence/file-completion-2026-10-18/engine86/README.md).",
       "ids": "B001-B002 B005-B006 B009-B011 B014 B021-B022 G065-G073 G090 G092 N001-N002",
       "related": [
         "session",

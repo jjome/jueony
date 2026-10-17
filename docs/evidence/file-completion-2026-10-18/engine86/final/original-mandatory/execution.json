@@ -1,0 +1,121 @@
+{
+  "engine": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-b59322fd380dc175\\pkg",
+  "frozenPlanSource": "build/file-closure83-validation/plan.json",
+  "rows": [
+    {
+      "group": "note4",
+      "script": "apps/editor/scripts/verify-note-shape-storage-engine.mjs",
+      "verifierSHA256": "8151c9bb158b322b6ba4bb9f16a80fd33bcab2a4c1caab594757aa2eefc86436",
+      "exitCode": 1,
+      "log": "note4.log",
+      "result": "note4\\result.json",
+      "results": [
+        "real endnote format API, snapshot Undo/Redo and both storage formats preserve requested independent slots",
+        "native original note payloads remain immutable through unedited native save",
+        "corrupted published layout injection is still rejected before any sink write"
+      ],
+      "failures": [
+        {
+          "name": "actual MCST native note records and complete layout survive two cycles of each format plus six alternating saves",
+          "errorType": "PreservationError",
+          "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 188건의 손실을 보고했습니다. 원본의 명시적 글 방향을 HWP로 보존하는 변환은 지원하지 않습니다. HWPX로 저장해 보존 검사를 진행해 주세요). 원본과 기존 복구본은 유지됩니다."
+        }
+      ]
+    },
+    {
+      "group": "font3",
+      "script": "apps/editor/scripts/verify-font-fallback-storage-engine.mjs",
+      "verifierSHA256": "a22f2bcd32413783e1e6e46127dd773f1022ca6de1ff0dc208b6c8580d257943",
+      "exitCode": 1,
+      "log": "font3.log",
+      "result": "font3\\result.json",
+      "results": [
+        "Declared fallback survives HWP storage at root0/94/0",
+        "Declared fallback survives HWP storage at root0/94/4",
+        "Declared fallback survives HWP storage at root0/94/6"
+      ],
+      "failures": [
+        {
+          "name": "Export, source immutability and unchanged preservation guard",
+          "errorType": "AssertionError"
+        }
+      ]
+    },
+    {
+      "group": "mcst15",
+      "script": "apps/editor/scripts/verify-mcst-flow-spacing-engine.mjs",
+      "verifierSHA256": "8169e9d3ec48d97c71857b2b144203b2ff87449d8a1012fa273d444a2e49515b",
+      "exitCode": 1,
+      "log": "mcst15.log",
+      "result": "mcst15\\result.json",
+      "results": [
+        "actual Hancom sixteen pages, retained p55/p56 physical boundary and strict HWPX two reopens",
+        "real API edit, snapshot undo redo and strict HWPX two reopens",
+        "actual two: immutable source pair, every layout field and both formats twice",
+        "actual three: immutable source pair, every layout field and both formats twice",
+        "actual offset: immutable source pair, every layout field and both formats twice",
+        "actual plain: immutable source pair, every layout field and both formats twice",
+        "actual unicode: immutable source pair, every layout field and both formats twice",
+        "actual superscript: immutable source pair, every layout field and both formats twice",
+        "actual negative: immutable source pair, every layout field and both formats twice",
+        "actual column2: immutable source pair, every layout field and both formats twice",
+        "actual multiline-prepared: immutable source pair, every layout field and both formats twice",
+        "actual caption-prepared: immutable source pair, every layout field and both formats twice",
+        "actual positive-prepared: immutable source pair, every layout field and both formats twice",
+        "historical-converted: explicit native HWP5 lineage survives both formats twice"
+      ],
+      "failures": [
+        {
+          "name": "actual sixteen-page MCST: both formats twice and six alternating strict storage steps",
+          "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 188건의 손실을 보고했습니다. 원본의 명시적 글 방향을 HWP로 보존하는 변환은 지원하지 않습니다. HWPX로 저장해 보존 검사를 진행해 주세요). 원본과 기존 복구본은 유지됩니다.",
+          "stack": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 188건의 손실을 보고했습니다. 원본의 명시적 글 방향을 HWP로 보존하는 변환은 지원하지 않습니다. HWPX로 저장해 보존 검사를 진행해 주세요). 원본과 기존 복구본은 유지됩니다.\n    at verifyPreservedExport (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/preservation.ts:248:37)\n    at cycles (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-mcst-flow-spacing-engine.mjs:25:18)\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-mcst-flow-spacing-engine.mjs:58:59\n    at scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-mcst-flow-spacing-engine.mjs:16:45)\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-mcst-flow-spacing-engine.mjs:55:7"
+        }
+      ]
+    },
+    {
+      "group": "whole7",
+      "script": "apps/editor/scripts/verify-document-save-layout-engine.mjs",
+      "verifierSHA256": "3b473306482ddcf224e2ba0a1b905eaaaad58fed0eab9108c74b7f3351d0dd23",
+      "exitCode": 1,
+      "log": "whole7.log",
+      "result": "whole7\\result.json",
+      "results": [
+        {
+          "name": "own plain hwp: mandatory full-layout save proof passes and source remains immutable",
+          "status": "PASS"
+        },
+        {
+          "name": "own plain hwpx: mandatory full-layout save proof passes and source remains immutable",
+          "status": "PASS"
+        },
+        {
+          "name": "own table hwp: mandatory full-layout save proof passes and source remains immutable",
+          "status": "PASS"
+        },
+        {
+          "name": "own table hwpx: mandatory full-layout save proof passes and source remains immutable",
+          "status": "PASS"
+        },
+        {
+          "name": "actual MCST: sixteen pages and checked full layout through both formats twice plus six alternating saves",
+          "status": "FAIL"
+        },
+        {
+          "name": "historical-converted MCST: native lineage stays exact across HWP/HWPX two cycles",
+          "status": "PASS"
+        },
+        {
+          "name": "real Native handle: changed text-layout metadata with identical semantic getters is rejected, source unchanged",
+          "status": "PASS"
+        }
+      ],
+      "failures": [
+        {
+          "name": "actual MCST: sixteen pages and checked full layout through both formats twice plus six alternating saves",
+          "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 188건의 손실을 보고했습니다. 원본의 명시적 글 방향을 HWP로 보존하는 변환은 지원하지 않습니다. HWPX로 저장해 보존 검사를 진행해 주세요). 원본과 기존 복구본은 유지됩니다.",
+          "stack": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 188건의 손실을 보고했습니다. 원본의 명시적 글 방향을 HWP로 보존하는 변환은 지원하지 않습니다. HWPX로 저장해 보존 검사를 진행해 주세요). 원본과 기존 복구본은 유지됩니다.\n    at verifyPreservedExport (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/src/adapters/rhwp/preservation.ts:248:37)\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-save-layout-engine.mjs:17:38\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-save-layout-engine.mjs:5:38)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-document-save-layout-engine.mjs:8:1"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "기준소스": "build/rhwp-engine/source-ad6186043c15532f (공식83)",
+  "후보소스": "build/gulimche-admission-candidate81/source-candidate-v5",
+  "확인한Rust원본수": 1063,
+  "변경소스": [
+    {
+      "path": "src/renderer/composer/line_breaking.rs",
+      "formal83SHA256": "1ca8e191bccb9783a887336cfb060d3f623f2d1db7be6bd4b33594b82cffc2d2",
+      "candidateSHA256": "b0b3abad2708bc3049f0999700d189eb60c2476fc027dc4465f46af370835983"
+    },
+    {
+      "path": "src/renderer/layout/text_measurement.rs",
+      "formal83SHA256": "38929d4d8871672dfeb2b3b3ebc5de309c7fde7ae26d72b7f90c33e21e992cdd",
+      "candidateSHA256": "40c5caac29acf7a79ff1bfb540a19a1027acc4036e07310575440dffd1119430"
+    },
+    {
+      "path": "src/renderer/style_resolver.rs",
+      "formal83SHA256": "d12625d397ee8d94f9096e5d4d5f00297a1f22f8205630ccecac955f5b15b77b",
+      "candidateSHA256": "b28a36d364259e964db4ef415f52b0640f56b27f2ca24b0c672f478bb4bd2054"
+    }
+  ],
+  "패치": "gulimche-natural-advance-final83.patch",
+  "패치SHA256": "1b7673af7d20093b9a43e9b157670926f2042c9b7b7156f87a9afecc2099d67b",
+  "기존HCR함수완전원복": {
+    "function": "regular_hcr_hangul_advance",
+    "formal83SHA256": "58b1fda1f8f3dffda3ffe7192d60f0fe144cf24f6ff472bf4475e3002f902746",
+    "candidateSHA256": "58b1fda1f8f3dffda3ffe7192d60f0fe144cf24f6ff472bf4475e3002f902746",
+    "exactUnchanged": true,
+    "v4IncorrectInsertionPreserved": true,
+    "rawByteSHA256": "d18653ca804b40fdce6df0b34151e14f7d9cd4546256f96ad666fa1196cf610e",
+    "rawBytesExact": true,
+    "rawByteLength": 750
+  },
+  "생산원본수정": false,
+  "개별WASM빌드": false
+}

@@ -1,0 +1,44 @@
+{
+  "baseEngine": "formal83/ad6186043c15532f",
+  "status": "Native candidates sealed; final strict WASM14 execution pending in separate additive evidence.",
+  "native": {
+    "textDir": {
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "strictAppliedBytes": true
+    },
+    "font": {
+      "passed": 11,
+      "failed": 0,
+      "ignored": 0,
+      "strictAppliedBytes": false,
+      "normalizedCodeIdenticalToStrictApply": true
+    }
+  },
+  "sourceByteCaveat": "Font native tests compiled the candidate initial LF bytes, with 12 include_bytes witnesses. Strict applied 11 files differ only in EOL. Root will compile full strict production WASM; no strict-byte Native re-execution is claimed.",
+  "binaryCapability": "All retained explicit paragraph textDir values, including AUTO, are currently unsupported in HWP and report exact per-resource metadata loss before OS writes. No reserved bit mapping or AUTO==absent assumption.",
+  "fontCapability": "REP/TTF/HFT source types are distinct. Unknown/missing types cannot acquire TTF authority on save. Native unknown values retain HWP records; unsupported XML/binary type lowering is explicitly reported.",
+  "actualHancomNewOracle": false,
+  "rtlRenderingSupport": false,
+  "actualOSWriteTests": false,
+  "fixtures": "Own synthetic documents only. Public/user documents, full public snapshots, actual font programs, API keys, WASM and executables are excluded.",
+  "initialFailures": [
+    "Initial textDir call-signature/fixture encoding evidence is retained separately from valid-v2 baseline.",
+    "Initial font Rust compile failed before running any test due to a mechanical FontNameDecision constructor field; corrected run executed 11 tests.",
+    "Initial font ZIP fixture preparation failed because mutable ZipInfo offsets were reused; version2 reads all source bytes first and copies ZipInfo. This last failure was observed in tool output; no original raw log is fabricated."
+  ],
+  "reproduction": {
+    "verifier": "verify-xml-source-contracts-engine.mjs",
+    "independentReader": "xml-source-contract-audit.py",
+    "requiredAbsoluteEnv": [
+      "JUEONY_REPOSITORY",
+      "JUEONY_ENGINE_PACKAGE",
+      "JUEONY_TEST_OUTPUT"
+    ],
+    "optionalAbsoluteEnv": [
+      "JUEONY_PYTHON"
+    ],
+    "placement": "The verifier uses repository-relative adapter imports. Run the original build/text-direction-closure83 path, or restore the copied verifier and Python reader there. Choose a new empty output directory."
+  }
+}

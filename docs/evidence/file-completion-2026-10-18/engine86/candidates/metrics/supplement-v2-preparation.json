@@ -1,0 +1,24 @@
+{
+  "scope": "v2 준비 코드와 기존 MCST 폰트프로그램 숫자 진단. v2는 최종pkg 실제 실행 전이며 통과 결과로 간주하지 않음. 폰트 바이너리 없음.",
+  "parentManifestSHA256": "48ccb3efa000a3288c841146a18174f8eeceec1c8308ce860c49fb2f529fb118",
+  "files": [
+    {
+      "path": "final-verifier-v2/verify-gulimche-admission-engine-v2.mjs",
+      "source": "build/gulimche-admission-candidate81/verify-gulimche-admission-engine-v2.mjs",
+      "sha256": "895323fb5132d3b48a929b1cf5651f23edacd328f7c4ce31c1e87a17c8661b7e",
+      "bytes": 14554
+    },
+    {
+      "path": "final-verifier-v2/validate-hwpx-xml-v2.py",
+      "source": "build/gulimche-admission-candidate81/validate-hwpx-xml-v2.py",
+      "sha256": "238463351026e7387a4b9ed6853fcf96575080490b73fe54b4b834f4f91b4009",
+      "bytes": 1675
+    },
+    {
+      "path": "mcst-first-width-readonly84/font-program-numeric.json",
+      "source": "build/mcst-first-width-readonly84/font-program-numeric.json",
+      "sha256": "1734096b492fc27e47f5a5821d0bd4bd4e33e70ecba3a5a74e8d6e06007e3cd9",
+      "bytes": 7067
+    }
+  ]
+}

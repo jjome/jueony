@@ -1,0 +1,11 @@
+{
+  "decision": "Parent selected full textDir v2, including explicit native HWP loss reporting for every Some direction.",
+  "patch": "xml-text-direction-exact83-v2.patch",
+  "patchSha256": "24c68a269cc0bd6e4d0dd8d7c3709a37d42fc4b766dbcde97e422ffe251dd113",
+  "native8": "8 passed; 0 failed; 0 ignored; actual library compile+7 source witnesses.",
+  "rejectedAssumption": "AUTO is not assumed equivalent to absence without native format mapping evidence.",
+  "binaryScope": "Explicit AUTO/LTR/RTL/unknown lexical metadata cannot currently be promised in HWP; exact per-resource content loss causes preservation gate rejection before OS write.",
+  "existingEvidence": "Earlier formal83 successful MCST HWP exports and actual Hancom readbacks retain their original engine/version scope. New blocked exports are not reclassified as newly successful.",
+  "xmlOnlySplit": "Prepared before final policy; NOT selected for production because it would leave known native omission unreported.",
+  "rendererClaim": "No RTL rendering support added."
+}

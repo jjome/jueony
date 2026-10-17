@@ -1,0 +1,20 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/session-font-provenance-closure84/source-candidate)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 10.47s
+     Running tests/jueony_session_font_origin.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_session_font_origin-35572b8d9729eb32)
+
+running 12 tests
+test compiled_runtime_file_is_exact_strict_applied_candidate ... ok
+test original_v1_full_font_and_paragraph_wire_are_exactly_compatible ... ok
+test missing_required_type_is_not_merged_with_native_none ... ok
+test real_font_name_change_is_not_hidden_by_canonical_source_type ... ok
+test inconsistent_known_type_claim_remains_observable ... ok
+test consistent_hft_spelling_only_is_native_equivalent ... ok
+test opaque_unknown_type_spelling_remains_in_story_identity ... ok
+test representative_zero_is_not_merged_with_unknown_native_zero ... ok
+test every_present_xml_direction_stays_observable ... ok
+test real_header_both_formats_restore_same_semantic_story ... ok
+test real_footnote_both_formats_restore_same_semantic_story ... ok
+test real_footer_both_formats_restore_same_semantic_story ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+

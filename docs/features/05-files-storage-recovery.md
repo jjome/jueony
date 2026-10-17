@@ -4,7 +4,7 @@
 
 열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.
 
-**2026-10-18 현재:** 합본83에서 각주/미주의 i32 길이·간격 슬롯과 XML 출처 요약 stream 이름을 수정했다. 직접WASM27·실제 Edge17·파일/복구 화면133·unit930(skip0)·타입·경계·필수 저장29검수가 통과했다. 실제 한글2024의 합본 HWP 재저장·닫기·디스크 재열기16쪽을 확인했다. 요약5필드와 각주 XML 속성은 보존되지만, 외부 재조판의 raw strict 의미164/배치5843과 원 공개 문서의 초기 조판·줄 수용 차이는 구별하여 후속 감사한다. N001·N002와 상위 범위를 완료로 올리지 않았다. [최신 합본·남은 결함](../110-file-preservation-integration.md) · [검수 근거](../evidence/file-completion-2026-10-18/engine83/README.md).
+**최종86 검수:** XML namespace·표 원점/편집 수명·새3단·폰트 유형·v1 커서 보존을 수정했다. 같은 빌드에서 unit933(skip0)·직접WASM27군·실제Edge17군·파일/복구133사례가 통과했다. 공개 변환은7조합 지원/3조합 명시 글 방향 미지원 차단으로 구별한다. 원형 필수 저장군의 HWP 변환 실패와 원MCST/Python3 초기 조판 차이, 최신 실제 Windows/한글 검수는 남아 있다. **이 파트 전체 완료는 아니다.** [최신 판정·실행](../111-file-storage-final-review.md) · [검수 근거](../evidence/file-completion-2026-10-18/engine86/README.md).
 
 ## 진행 요약
 
@@ -22,8 +22,8 @@
 
 ## 먼저 할 일
 
-- **구현** [N001](<05-files-storage-recovery.md#n001>) **HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존** — 합본83 각주/미주 i32 슬롯·요약 stream prefix 수정,44회귀·화면133·unit930·필수 저장29 통과. 실제 한글 재저장·닫기·디스크 재열기16쪽과 요약5필드·각주 전체속성 보존을 확인했다. 원 공개 MCST 초기 조판·새 줄 수용 차이와 외부 raw strict 차이를 구별해 계속 수정·검수한다.
-- **검증** [N002](<05-files-storage-recovery.md#n002>) **공개 형식 변환의 필드 보존 차이 4건** — 기존4필드 보존 수정과 합본83 각주/요약 보존을 유지한다. 공개 입력의 실제 한글 직접 oracle에서 Python3 줄/charX92·원 MCST15→16쪽이 남는다. raw ID/분할 차이는 참조 자원 전체 값으로 별도 감사하며 strict 비교와0.2는 바꾸지 않는다.
+- **구현** [N001](<05-files-storage-recovery.md#n001>) **HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존** — 최종86 XML namespace·표 원점/수명·새3단·GulimChe·v1 커서 교정. 같은 빌드 unit933/44군/화면133 통과. 원MCST15→16 초기 glyph fallback, 최신 실제 Windows/한글 검수는 남아 있으며 완료로 올리지 않음.
+- **검증** [N002](<05-files-storage-recovery.md#n002>) **공개 형식 변환의 필드 보존 차이 4건** — 기존4필드와83 각주/요약 보존 유지. 최종86 글방향·REP/미지 폰트 소실을 고치고 표현불가HWP 변환은 독립XML과 정확loss 경로를 대조해 차단. 공개7조합 지원/3조합 거절, 원형29범위4군 실패·Python3 초기차이92는 보존.
 
 ## 기능별 작업표
 
@@ -421,10 +421,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PARTIAL** / 한글 **PARTIAL**.
 - 완료 범위: 확인한 단일 단 HWP 겹침 표·직접 본문 줄·혼합 서식·읽기 전용 책갈피/필드 표시의 흐름·저장 소유를 보강했다. bare LINE_SEG 캐시와 실제 여백/offset을 구분한다. 다단·복합/불명확 원점의 지원 확대는 완료로 표시하지 않는다.
-- 다음 작업: 합본83 각주/미주 i32 슬롯·요약 stream prefix 수정,44회귀·화면133·unit930·필수 저장29 통과. 실제 한글 재저장·닫기·디스크 재열기16쪽과 요약5필드·각주 전체속성 보존을 확인했다. 원 공개 MCST 초기 조판·새 줄 수용 차이와 외부 raw strict 차이를 구별해 계속 수정·검수한다.
+- 다음 작업: 최종86 XML namespace·표 원점/수명·새3단·GulimChe·v1 커서 교정. 같은 빌드 unit933/44군/화면133 통과. 원MCST15→16 초기 glyph fallback, 최신 실제 Windows/한글 검수는 남아 있으며 완료로 올리지 않음.
 - 상위 항목: [B153](<08-tables.md#b153>) 셀 속성
-- 근거: [100-storage-conversion-and-overlap.md](<../100-storage-conversion-and-overlap.md>) · [verification-summary.json](<../evidence/overlap-table-tail-2026-10-15/verification-summary.json>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [summary.json](<../evidence/file-completion-2026-10-17/engine51/summary.json>) · [actual11-formal68.json](<../evidence/file-completion-2026-10-17/hancom-current68/actual11-formal68.json>) · [110-file-preservation-integration.md](<../110-file-preservation-integration.md>) · [summary.json](<../evidence/file-completion-2026-10-18/engine75/summary.json>) · [summary.json](<../evidence/file-completion-2026-10-18/engine76/summary.json>) · [README.md](<../evidence/file-completion-2026-10-18/engine80/README.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine82/README.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine83/README.md>)
-- 원래 기록: `PARTIAL;INDEPENDENT_HANCOM_FAILURES_FOUND_AND_FOLLOWUP_2026_10_17;FORMAL80_SCOPED_REGRESSIONS_PASS_CROSS_FORMAT_AND_NATIVE_LINE_FIT_OPEN;FORMAL82_STRICT_ROUNDTRIP_PASS_NATIVE_INTEROP_FOLLOWUP_OPEN;FORMAL83_NOTE_SUMMARY_NATIVE_ROUNDTRIP_INITIAL_PARITY_OPEN`
+- 근거: [100-storage-conversion-and-overlap.md](<../100-storage-conversion-and-overlap.md>) · [verification-summary.json](<../evidence/overlap-table-tail-2026-10-15/verification-summary.json>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [summary.json](<../evidence/file-completion-2026-10-17/engine51/summary.json>) · [actual11-formal68.json](<../evidence/file-completion-2026-10-17/hancom-current68/actual11-formal68.json>) · [110-file-preservation-integration.md](<../110-file-preservation-integration.md>) · [summary.json](<../evidence/file-completion-2026-10-18/engine75/summary.json>) · [summary.json](<../evidence/file-completion-2026-10-18/engine76/summary.json>) · [README.md](<../evidence/file-completion-2026-10-18/engine80/README.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine82/README.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine83/README.md>) · [111-file-storage-final-review.md](<../111-file-storage-final-review.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine86/README.md>)
+- 원래 기록: `PARTIAL;INDEPENDENT_HANCOM_FAILURES_FOUND_AND_FOLLOWUP_2026_10_17;FORMAL80_SCOPED_REGRESSIONS_PASS_CROSS_FORMAT_AND_NATIVE_LINE_FIT_OPEN;FORMAL82_STRICT_ROUNDTRIP_PASS_NATIVE_INTEROP_FOLLOWUP_OPEN;FORMAL83_NOTE_SUMMARY_NATIVE_ROUNDTRIP_INITIAL_PARITY_OPEN;FORMAL86_SAFE_STORAGE_UNSUPPORTED_DIRECTIONS_BLOCKED_NATIVE_GUI_PENDING`
 
 </details>
 
@@ -435,10 +435,10 @@
 - 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **PARTIAL**.
 - 완료 범위: 기록된 공개5문서10변환의4개 차이; common배치조회·영어단위·Lock·표셀메모 소유; 보존검사 유지
-- 다음 작업: 기존4필드 보존 수정과 합본83 각주/요약 보존을 유지한다. 공개 입력의 실제 한글 직접 oracle에서 Python3 줄/charX92·원 MCST15→16쪽이 남는다. raw ID/분할 차이는 참조 자원 전체 값으로 별도 감사하며 strict 비교와0.2는 바꾸지 않는다.
+- 다음 작업: 기존4필드와83 각주/요약 보존 유지. 최종86 글방향·REP/미지 폰트 소실을 고치고 표현불가HWP 변환은 독립XML과 정확loss 경로를 대조해 차단. 공개7조합 지원/3조합 거절, 원형29범위4군 실패·Python3 초기차이92는 보존.
 - 상위 항목: [B077](<10-headers-notes-fields.md#b077>) 필드
-- 근거: [100-storage-conversion-and-overlap.md](<../100-storage-conversion-and-overlap.md>) · [summary.json](<../evidence/format-conversion-2026-10-15/summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine82/README.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine83/README.md>)
-- 원래 기록: `EXPLICIT_SCOPED_FIX;INDEPENDENT_HANCOM_GEOMETRY_FAILURES_FOUND_2026_10_17;FORMAL82_STRICT_ROUNDTRIP_PASS_NATIVE_INTEROP_FOLLOWUP_OPEN;FORMAL83_NOTE_SUMMARY_NATIVE_ROUNDTRIP_INITIAL_PARITY_OPEN`
+- 근거: [100-storage-conversion-and-overlap.md](<../100-storage-conversion-and-overlap.md>) · [summary.json](<../evidence/format-conversion-2026-10-15/summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine82/README.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine83/README.md>) · [111-file-storage-final-review.md](<../111-file-storage-final-review.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine86/README.md>)
+- 원래 기록: `EXPLICIT_SCOPED_FIX;INDEPENDENT_HANCOM_GEOMETRY_FAILURES_FOUND_2026_10_17;FORMAL82_STRICT_ROUNDTRIP_PASS_NATIVE_INTEROP_FOLLOWUP_OPEN;FORMAL83_NOTE_SUMMARY_NATIVE_ROUNDTRIP_INITIAL_PARITY_OPEN;FORMAL86_SAFE_STORAGE_UNSUPPORTED_DIRECTIONS_BLOCKED_NATIVE_GUI_PENDING`
 
 </details>
 
@@ -508,11 +508,11 @@
 - 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
 - 완료 범위: 지원 HWP/HWPX 저장 전체에 쪽 수와 공개 control/text 응답의 필수 보존 검사. 알려진 좌표만0.2, 나머지 필드·순서·ID는 정확 비교. 읽기 실패·한도·source alias·공유 DTO 변경을 쓰기 전 거절하고 원본/복구본/Canvas 모드를 유지한다. 원시 미관측 레코드와 실제 한글 출력 동일성은 별도다.
-- 다음 작업: 합본83 실제 MCST16쪽의 양형식2회·교대6단계와106 strict 재열기 통과. 변조 필드·source alias·공유 DTO·한도·Canvas 복원 음성은 유지했다. 같은 합본44회귀·화면133·unit930·필수29 통과. 실제 한글 원시 codec 검수는 별도 근거로 연결한다.
+- 다음 작업: 최종86 의미·공개전체지면·0.2·한도·alias 보호 유지. XML 잘못된namespace/폰트유형 추측·명시글방향 HWP손실을 쓰기전 차단. unit933/44군/화면133 통과; 실제OS/한글 최신검수와 구별.
 - 상위 항목: [N001](<05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존
 - UI 명령: `file:save`
-- 근거: [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [110-file-preservation-integration.md](<../110-file-preservation-integration.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine80/README.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine82/README.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine83/README.md>)
-- 원래 기록: `SCOPED_IMPLEMENTED;ENGINE_BROWSER_VERIFIED_2026_10_16;MANDATORY_PUBLISHED_LAYOUT_PROOF_FORMAL80;FORMAL82_STRICT_ROUNDTRIP_PASS_NATIVE_INTEROP_FOLLOWUP_OPEN;FORMAL83_NOTE_SUMMARY_NATIVE_ROUNDTRIP_INITIAL_PARITY_OPEN`
+- 근거: [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [110-file-preservation-integration.md](<../110-file-preservation-integration.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine80/README.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine82/README.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine83/README.md>) · [111-file-storage-final-review.md](<../111-file-storage-final-review.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine86/README.md>)
+- 원래 기록: `SCOPED_IMPLEMENTED;ENGINE_BROWSER_VERIFIED_2026_10_16;MANDATORY_PUBLISHED_LAYOUT_PROOF_FORMAL80;FORMAL82_STRICT_ROUNDTRIP_PASS_NATIVE_INTEROP_FOLLOWUP_OPEN;FORMAL83_NOTE_SUMMARY_NATIVE_ROUNDTRIP_INITIAL_PARITY_OPEN;FORMAL86_SAFE_STORAGE_UNSUPPORTED_DIRECTIONS_BLOCKED_NATIVE_GUI_PENDING`
 
 </details>
 

@@ -1,0 +1,309 @@
+--- a/src/document_core/commands/formatting.rs
++++ b/src/document_core/commands/formatting.rs
+@@ -944,6 +944,7 @@
+             type_info: None,
+             default_name: None,
+             subst_font: None,
++            hwpx_type_origin: None,
+         };
+ 
+         let font_faces = &mut self.document.doc_info.font_faces;
+@@ -994,6 +995,7 @@
+             type_info: None,
+             default_name: None,
+             subst_font: None,
++            hwpx_type_origin: None,
+         };
+ 
+         let font_faces = &mut self.document.doc_info.font_faces;
+--- a/src/model/style.rs
++++ b/src/model/style.rs
+@@ -47,9 +47,24 @@
+         .unwrap_or("0.1")
+ }
+ 
++/// XML type spelling is source evidence, not permission to infer a TTF face.
++#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
++pub enum FontTypeOrigin { Representative, TrueType, HwpFont, Missing, Unrecognized(String) }
++impl FontTypeOrigin {
++    pub fn from_lexical(value:String)->Self { match value.as_str(){
++        "REP"=>Self::Representative,"TTF"=>Self::TrueType,"HFT"=>Self::HwpFont,
++        _=>Self::Unrecognized(value),
++    }}
++    pub fn native_type(&self)->Option<u8>{match self{
++        Self::Representative=>Some(0),Self::TrueType=>Some(1),Self::HwpFont=>Some(2),_=>None,
++    }}
++}
++
+ /// 글꼴 정보 (HWPTAG_FACE_NAME)
+ #[derive(Debug, Clone, Default, serde::Serialize)]
+ pub struct Font {
++    /// Exact XML enum source; absent for native binary/generated resources.
++    pub hwpx_type_origin: Option<FontTypeOrigin>,
+     /// 원본 레코드 바이트 (라운드트립 보존용)
+     pub raw_data: Option<Vec<u8>>,
+     /// 글꼴 이름
+@@ -83,6 +98,8 @@
+ /// (예: HFT 글꼴이 TTF 대체 글꼴을 가질 수 있음).
+ #[derive(Debug, Clone, Default, PartialEq, serde::Serialize)]
+ pub struct SubstFont {
++    /// The substitute has its own independent type spelling and authority.
++    pub hwpx_type_origin: Option<FontTypeOrigin>,
+     /// 대체 글꼴 이름
+     pub face: String,
+     /// 대체 글꼴 유형 (0: 알 수 없음, 1: TTF, 2: HFT)
+--- a/src/parser/doc_info.rs
++++ b/src/parser/doc_info.rs
+@@ -313,6 +313,7 @@
+             alternate_type == Some(1) && valid_utf16 && !face.trim().is_empty()
+                 && !face.chars().any(char::is_control)
+         }).map(|face| SubstFont {
++            hwpx_type_origin: None,
+             face: face.clone(),
+             font_type: 1,
+             is_embedded: false,
+@@ -347,6 +348,7 @@
+     };
+ 
+     Ok(Font {
++        hwpx_type_origin: None,
+         raw_data: None,
+         name,
+         alt_type: attr & 0x03,
+--- a/src/parser/hwpx/header.rs
++++ b/src/parser/hwpx/header.rs
+@@ -443,6 +443,7 @@
+ ) -> Result<(), HwpxError> {
+     let mut name = String::new();
+     let mut font_type = 0u8;
++    let mut font_type_origin = crate::model::style::FontTypeOrigin::Missing;
+     let mut is_embedded = false;
+     let mut bin_item_id_ref = String::new();
+     let mut type_info = None;
+@@ -452,7 +453,9 @@
+         match attr.key.as_ref().as_bytes() {
+             b"face" => name = attr_str(&attr),
+             b"type" => {
+-                font_type = match attr_str(&attr).as_str() {
++                let spelling=attr_str(&attr);
++                font_type_origin=crate::model::style::FontTypeOrigin::from_lexical(spelling.clone());
++                font_type = match spelling.as_str() {
+                     "TTF" => 1,
+                     "HFT" => 2,
+                     _ => 0,
+@@ -493,6 +496,7 @@
+     if !name.is_empty() {
+         let default_name = hwp5_default_font_name(&name).map(str::to_string);
+         let font = Font {
++            hwpx_type_origin: Some(font_type_origin),
+             name,
+             alt_type: font_type,
+             is_embedded,
+@@ -542,12 +546,13 @@
+ /// `<hh:substFont face="…" type="…" isEmbedded="…" binaryItemIDRef="…"/>` 4개
+ /// 속성을 보존한다. 부모 `<hh:font>` 와 별개의 type/임베드 정보를 가질 수 있다.
+ fn parse_subst_font(e: &quick_xml::events::BytesStart) -> SubstFont {
+-    let mut sf = SubstFont::default();
++    let mut sf = SubstFont{hwpx_type_origin:Some(crate::model::style::FontTypeOrigin::Missing),..Default::default()};
+     for attr in e.attributes().flatten() {
+         let value = attr_str(&attr);
+         match attr.key.as_ref().as_bytes() {
+             b"face" => sf.face = value,
+             b"type" => {
++                sf.hwpx_type_origin=Some(crate::model::style::FontTypeOrigin::from_lexical(value.clone()));
+                 sf.font_type = match value.as_str() {
+                     "TTF" => 1,
+                     "HFT" => 2,
+@@ -3368,6 +3373,7 @@
+         assert_eq!(
+             hft.subst_font,
+             Some(SubstFont {
++                hwpx_type_origin: Some(crate::model::style::FontTypeOrigin::TrueType),
+                 face: "한컴바탕".to_string(),
+                 font_type: 1,
+                 is_embedded: false,
+@@ -3381,6 +3387,7 @@
+         assert_eq!(
+             ttf.subst_font,
+             Some(SubstFont {
++                hwpx_type_origin: Some(crate::model::style::FontTypeOrigin::TrueType),
+                 face: "함초롬바탕".to_string(),
+                 font_type: 1,
+                 is_embedded: false,
+--- a/src/renderer/composer/re_sample_gen.rs
++++ b/src/renderer/composer/re_sample_gen.rs
+@@ -44,6 +44,7 @@
+                 type_info: None,
+                 default_name: None,
+                 subst_font: None,
++            hwpx_type_origin: None,
+             });
+             (fonts.len() - 1) as u16
+         };
+--- a/src/serializer/cfb_writer/tests.rs
++++ b/src/serializer/cfb_writer/tests.rs
+@@ -144,6 +144,7 @@
+         type_info: None,
+         default_name: None,
+         subst_font: None,
++            hwpx_type_origin: None,
+     });
+     doc_info.char_shapes.push(CharShape {
+         font_ids: [0; 7],
+--- a/src/serializer/content_loss.rs
++++ b/src/serializer/content_loss.rs
+@@ -47,6 +47,7 @@
+     Control,
+     FieldParameters,
+     ParagraphProperties,
++    FontProperties,
+ }
+ 
+ /// 손실이 필요해진 원인.
+--- a/src/serializer/doc_info/tests.rs
++++ b/src/serializer/doc_info/tests.rs
+@@ -66,6 +66,7 @@
+         type_info: None,
+         default_name: None,
+         subst_font: None,
++            hwpx_type_origin: None,
+     };
+ 
+     let data = serialize_face_name(&font);
+@@ -89,6 +90,7 @@
+         type_info: None,
+         default_name: None,
+         subst_font: None,
++            hwpx_type_origin: None,
+     };
+ 
+     let data = serialize_face_name(&font);
+@@ -116,6 +118,7 @@
+         type_info: Some([2, 11, 6, 0, 0, 1, 1, 1, 1, 1]),
+         default_name: Some("Gulim".to_string()),
+         subst_font: None,
++            hwpx_type_origin: None,
+     };
+ 
+     let data = serialize_face_name(&font);
+@@ -625,6 +628,7 @@
+         type_info: None,
+         default_name: None,
+         subst_font: None,
++            hwpx_type_origin: None,
+     });
+     doc_info.char_shapes.push(CharShape {
+         raw_data: None,
+--- a/src/serializer/hml/preflight.rs
++++ b/src/serializer/hml/preflight.rs
+@@ -122,7 +122,9 @@
+                 || font.alt_name.is_some()
+                 || font.type_info.is_some()
+                 || font.default_name.is_some()
+-                || font.subst_font.is_some();
++                || font.subst_font.is_some()
++                || font.hwpx_type_origin.as_ref().is_some_and(|origin| origin.native_type()!=Some(font.alt_type)
++                    ||matches!(origin,crate::model::style::FontTypeOrigin::Representative));
+             push_if(
+                 omitted,
+                 &font_path,
+--- a/src/serializer/hwpx/header.rs
++++ b/src/serializer/hwpx/header.rs
+@@ -192,7 +192,7 @@
+             let mut font_attrs = vec![
+                 ("id", id_str.as_str()),
+                 ("face", font.name.as_str()),
+-                ("type", font_type_str(font.alt_type)),
++                ("type", font_type_str(font.alt_type, font.hwpx_type_origin.as_ref())),
+                 ("isEmbedded", if font.is_embedded { "1" } else { "0" }),
+             ];
+             if !binary_item_id_ref.is_empty() {
+@@ -241,12 +241,11 @@
+     }
+ }
+ 
+-fn font_type_str(alt_type: u8) -> &'static str {
+-    match alt_type {
+-        1 => "TTF",
+-        2 => "HFT",
+-        _ => "TTF", // 기본: TTF (한컴 샘플 관찰값)
+-    }
++fn font_type_str(alt_type: u8, origin:Option<&crate::model::style::FontTypeOrigin>) -> &'static str {
++    // Unknown source types never become a measured TTF declaration. The
++    // corresponding resource-level content-loss report blocks unsupported output.
++    if origin.is_some_and(|o|o.native_type()!=Some(alt_type)){return "REP";}
++    match alt_type {1=>"TTF",2=>"HFT",_=>"REP"}
+ }
+ 
+ /// `parse_font_type_info` 의 역함수.
+@@ -302,7 +301,7 @@
+         "hh:substFont",
+         &[
+             ("face", &sf.face),
+-            ("type", font_type_str(sf.font_type)),
++            ("type", font_type_str(sf.font_type, sf.hwpx_type_origin.as_ref())),
+             ("isEmbedded", if sf.is_embedded { "1" } else { "0" }),
+             ("binaryItemIDRef", binary_item_id_ref.as_str()),
+         ],
+@@ -1685,6 +1684,7 @@
+     #[test]
+     fn write_subst_font_emits_all_four_attributes_in_order() {
+         let sf = SubstFont {
++            hwpx_type_origin: None,
+             face: "한컴바탕".to_string(),
+             font_type: 1,
+             is_embedded: false,
+@@ -1711,7 +1711,8 @@
+             alt_type: 1,
+             type_info: Some([2, 3, 6, 0, 0, 1, 1, 1, 1, 1]),
+             subst_font: Some(SubstFont {
+-                face: "한컴바탕".to_string(),
++                hwpx_type_origin: None,
++            face: "한컴바탕".to_string(),
+                 font_type: 1,
+                 is_embedded: false,
+                 bin_item_id_ref: String::new(),
+@@ -1786,7 +1787,8 @@
+             bin_item_id_ref: "font-resource-alpha".to_string(),
+             resolved_bin_data_id: Some(2),
+             subst_font: Some(SubstFont {
+-                face: "Embedded Substitute".to_string(),
++                hwpx_type_origin: None,
++            face: "Embedded Substitute".to_string(),
+                 font_type: 1,
+                 is_embedded: true,
+                 bin_item_id_ref: "font-resource-beta".to_string(),
+--- a/src/serializer/paragraph_metadata_loss.rs
++++ b/src/serializer/paragraph_metadata_loss.rs
+@@ -1,6 +1,13 @@
+ //! Unsupported paragraph restart overrides must never produce a zero-loss report.
+ use crate::model::{document::Document,paragraph::Paragraph,control::Control,shape::ShapeObject};
+ use super::content_loss::{ContentLoss,ContentLossCode,ContentLossReason,ContentLossSubject,ContentLossReport};
++fn font_type_loss(format:super::content_loss::SerializedFormat,code:u8,origin:Option<&crate::model::style::FontTypeOrigin>)->bool{
++    match origin {
++        Some(value)=>value.native_type()!=Some(code)
++            ||(format==super::content_loss::SerializedFormat::Hwp&&matches!(value,crate::model::style::FontTypeOrigin::Representative)),
++        None=>format==super::content_loss::SerializedFormat::Hwpx&&code!=1&&code!=2,
++    }
++}
+ enum Node<'a>{Paragraph(&'a Paragraph,String),Shape(&'a ShapeObject,String)}
+ fn paragraphs<'a>(stack:&mut Vec<Node<'a>>,items:&'a [Paragraph],path:&str){for(i,p)in items.iter().enumerate().rev(){stack.push(Node::Paragraph(p,format!("{path}/paragraph/{i}")));}}
+ fn caption<'a>(stack:&mut Vec<Node<'a>>,value:Option<&'a crate::model::shape::Caption>,path:&str){if let Some(c)=value{paragraphs(stack,&c.paragraphs,&format!("{path}/caption"));}}
+@@ -17,6 +24,17 @@
+             });}
+         }
+     }
++    for(language,fonts)in doc.doc_info.font_faces.iter().enumerate(){for(index,font)in fonts.iter().enumerate(){
++        let format=report.output_format();
++        if font_type_loss(format,font.alt_type,font.hwpx_type_origin.as_ref()){
++            report.record(ContentLoss{code:ContentLossCode::MetadataReduced,subject:ContentLossSubject::FontProperties,
++                path:format!("docInfo/font/{language}/{index}/type"),reason:ContentLossReason::SerializerNotImplemented,resource_id:None});
++        }
++        if let Some(substitute)=&font.subst_font{if font_type_loss(format,substitute.font_type,substitute.hwpx_type_origin.as_ref()){
++            report.record(ContentLoss{code:ContentLossCode::MetadataReduced,subject:ContentLossSubject::FontProperties,
++                path:format!("docInfo/font/{language}/{index}/substFont/type"),reason:ContentLossReason::SerializerNotImplemented,resource_id:None});
++        }}
++    }}
+     let mut stack=Vec::new();
+     for(i,s)in doc.sections.iter().enumerate().rev(){paragraphs(&mut stack,&s.paragraphs,&format!("section/{i}/body"));for(j,m)in s.section_def.master_pages.iter().enumerate().rev(){paragraphs(&mut stack,&m.paragraphs,&format!("section/{i}/master/{j}"));}}
+     while let Some(node)=stack.pop(){match node{

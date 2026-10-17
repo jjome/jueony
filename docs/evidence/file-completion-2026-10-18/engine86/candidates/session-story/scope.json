@@ -1,0 +1,22 @@
+{
+  "baseSource": "aa660128b2c13b40",
+  "runtimeChange": "One read-only Rust session story DTO file; no model/parser/writer/generic fingerprint ignore changes.",
+  "adoptedPatch": "known-font-story-wire84-v2.patch",
+  "policy": [
+    "Absent newly introduced font origin key omitted for original v1 wire shape.",
+    "Exactly consistent TTF1/HFT2 source provenance is the same prior native semantic DTO.",
+    "REP0, missing/unknown spelling and inconsistent claims are retained.",
+    "Absent XML paragraph direction key omitted; all present AUTO/LTR/RTL/opaque direction fields retained."
+  ],
+  "stages": {
+    "baselineWasm": "Header/footer/footnote HWP raw graph diff0, HWPX raw65 each:42 new font provenance fields +22 existing no-fill sentinel +1 typed root provenance.",
+    "v1Native": "10/10 but null key did not restore pre-feature v1 key set; superseded, not final compatibility.",
+    "v2InitialNative": "11/12; old oracle collection used JSON.parse/stringify and changed JSON f64 spellings to integers. Full Font7 already equal.",
+    "v2FinalNative": "12/12 with actual old83 raw JSON string oracle, no runtime code change for preparation correction.",
+    "original85Unit": "933 total,931 pass,2 failed; source log SHA and exact failure excerpts retained.",
+    "newFinalWasm": "Pending, separate additive bundle required."
+  },
+  "sourceByteProof": "V2 was strict-applied before real library compile; witness includes actual runtime file bytes.",
+  "numericFailure": "No runtime number rounding or field deletion. Actual old Rust raw JSON string preserves native f64 spelling for exact serde_json value comparison.",
+  "scope": "Own generated stories/metadata only; no public/user document bytes, font programs, credentials, screenshots, WASM or executables. Synthetic caret host callback is separately identified from actual engine observation."
+}

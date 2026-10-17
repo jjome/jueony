@@ -1,0 +1,90 @@
+--- a/src/renderer/generated_column_stack.rs
++++ b/src/renderer/generated_column_stack.rs
+@@ -25,7 +25,7 @@
+     dpi: f64,
+ ) -> bool {
+     if !profile.native_hwp5_layout()
+-        || columns != 2
++        || !matches!(columns, 2 | 3)
+         || paragraphs.len() < 4
+         || paragraphs.len() > 128
+     {
+@@ -61,6 +61,8 @@
+     let mut section = 0;
+     let mut column = 0;
+     let mut body_width_hu = None;
++    let mut declared_section = None;
++    let mut declared_columns = None;
+     for c in &first.controls {
+         match c {
+             Control::SectionDef(sd) => {
+@@ -70,6 +72,7 @@
+                 body_width_hu = i64::from(sd.page_def.width)
+                     .checked_sub(i64::from(sd.page_def.margin_left))
+                     .and_then(|width| width.checked_sub(i64::from(sd.page_def.margin_right)));
++                declared_section = Some(sd);
+                 section += 1;
+             }
+             Control::ColumnDef(c)
+@@ -81,6 +84,7 @@
+                     && c.widths.is_empty()
+                     && c.gaps.is_empty() =>
+             {
++                declared_columns = Some(c);
+                 column += 1
+             }
+             _ => return false,
+@@ -171,6 +175,33 @@
+     if !fully_generated && !closed {
+         return false;
+     }
++    // The three-column extension owns only freshly generated rows whose
++    // integer paragraph box belongs to the actual declaration. Merely changing
++    // ColumnDef from two to three while retaining two-column source widths is
++    // not evidence. Keep the older two-column/closed-anchor contract unchanged.
++    let declared_three_width = if columns == 3 {
++        if !fully_generated || !dpi.is_finite() || dpi <= 0.0 {
++            return false;
++        }
++        let (Some(sd), Some(cd)) = (declared_section, declared_columns) else {
++            return false;
++        };
++        if sd.page_def.width == 0 || sd.page_def.height == 0 {
++            return false;
++        }
++        let page = super::page_layout::PageLayoutInfo::from_page_def(&sd.page_def, cd, dpi);
++        if page.column_areas.len() != columns
++            || page.column_areas.iter().any(|area| {
++                !area.width.is_finite() || area.width <= 0.0
++                    || !area.height.is_finite() || area.height <= 0.0
++            })
++        {
++            return false;
++        }
++        Some(page.column_areas[0].width)
++    } else {
++        None
++    };
+     for (pi, p) in paragraphs.iter().enumerate() {
+         if !plain(p) || (pi > 0 && p.column_type != crate::model::paragraph::ColumnBreakType::None)
+         {
+@@ -190,6 +221,19 @@
+         .any(|v| v.abs() > 0.001)
+         {
+             return false;
++        }
++        if let Some(width) = declared_three_width {
++            let expected = super::layout_frame::ParagraphBox::body_for_style(
++                width, Some(s), dpi,
++            );
++            if expected.width_hwp() <= 0
++                || p.line_segs.iter().any(|line| {
++                    line.column_start != expected.effective().start
++                        || line.segment_width != expected.width_hwp()
++                })
++            {
++                return false;
++            }
+         }
+         if pi > count && !p.controls.is_empty() {
+             return false;

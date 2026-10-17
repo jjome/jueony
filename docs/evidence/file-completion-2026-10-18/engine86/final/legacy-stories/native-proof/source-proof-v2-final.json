@@ -1,0 +1,50 @@
+{
+  "baseSourceId": "aa660128b2c13b40",
+  "runtimeFilesChanged": [
+    "src/wasm_api/session_story.rs"
+  ],
+  "strictApply": true,
+  "strictAppliedCandidateBytesCompiled": true,
+  "runtimeSha256": "b23e2860de5ce2910716860ed02282919e95ecc439c08ba4ade04b5a4936e174",
+  "patch": "known-font-story-wire84-v2.patch",
+  "patchSha256": "9613f523b63dc89e0aa23914055c5b0b7674a2515f2c076ecef0c178894bdd59",
+  "testsSha256": "526d9acf5e4b3e5820629532b9709fd61dd09efd0d2ffa2b8ef599651d510ca7",
+  "native": {
+    "passed": 12,
+    "failed": 0,
+    "ignored": 0,
+    "names": [
+      "compiled_runtime_file_is_exact_strict_applied_candidate",
+      "original_v1_full_font_and_paragraph_wire_are_exactly_compatible",
+      "missing_required_type_is_not_merged_with_native_none",
+      "real_font_name_change_is_not_hidden_by_canonical_source_type",
+      "inconsistent_known_type_claim_remains_observable",
+      "consistent_hft_spelling_only_is_native_equivalent",
+      "opaque_unknown_type_spelling_remains_in_story_identity",
+      "representative_zero_is_not_merged_with_unknown_native_zero",
+      "every_present_xml_direction_stays_observable",
+      "real_header_both_formats_restore_same_semantic_story",
+      "real_footnote_both_formats_restore_same_semantic_story",
+      "real_footer_both_formats_restore_same_semantic_story"
+    ],
+    "runtimeLibraryCompiledOnV2FirstRun": "37.45s, exact source byte witness passed.",
+    "finalHarnessRerun": "Runtime byte unchanged; corrected actual old83 raw-JSON oracle, 10.47s package compile/link."
+  },
+  "oracle": {
+    "path": "legacy-v1-raw-wire83.json",
+    "sha256": "b2d5d0749d78e1e17aa38e7df93d9830dd7ba7eed39e525ecd97d013c2487b7b",
+    "source": "Actual formal83 WASM getSessionStoryEvidence v1 raw JSON string, not field projected or JS-normalized."
+  },
+  "preservedInitialFailure": {
+    "log": "native-session-font-origin84-v2.log",
+    "sha256": "8b9756ee3316664cf6f147b53c9e2eb42467998fd8d187be51033f20624633fc",
+    "cause": "JS parsed/re-serialized legacy fixture changed f64 JSON spelling 0.0/160.0 to integer spellings. Font comparison passed; paragraph numeric representation mismatch only. Runtime unchanged for correction."
+  },
+  "policy": [
+    "Absent font type origin omits the new key to preserve prior v1 schema.",
+    "Exactly matching explicit TTF1/HFT2 provenance omits only that new provenance key.",
+    "Representative0, missing/unknown lexical types and known-type mismatches remain fully observable.",
+    "Absent paragraph XML direction omits the new key; every present AUTO/LTR/RTL/unknown direction remains fully observable.",
+    "No model, parser, serializer, JS fingerprint ignore rule, font value or guard changed."
+  ]
+}

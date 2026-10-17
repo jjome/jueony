@@ -1,0 +1,18 @@
+{
+  "source": "source-trace-v1 (v1 plus diagnostic printing only)",
+  "allSpacesFailure": [
+    "GULI_FIT intervalPx=335.83999999999997499 intervalHU=25187.99999999999636202 indent=0.00000000000000000 currentHU=24288 tokenPx=12.00000000000000000 tokenHU=900 budgetHU=25187 start=30 end=31 tolerance=false chars=36",
+    "GULI_FIT intervalPx=335.83999999999997499 intervalHU=25187.99999999999636202 indent=0.00000000000000000 currentHU=24288 tokenPx=12.00000000000000000 tokenHU=900 budgetHU=25187 start=30 end=31 tolerance=false chars=36"
+  ],
+  "scalarHistory": [
+    "GULI_FIT intervalPx=335.78666666666669016 intervalHU=25184.00000000000000000 indent=0.00000000000000000 currentHU=19792 tokenPx=12.00000000000000000 tokenHU=900 budgetHU=25184 start=24 end=25 tolerance=true chars=37",
+    "GULI_FIT intervalPx=335.78666666666669016 intervalHU=25184.00000000000000000 indent=0.00000000000000000 currentHU=20692 tokenPx=12.00000000000000000 tokenHU=900 budgetHU=25184 start=25 end=26 tolerance=true chars=37",
+    "GULI_FIT intervalPx=335.78666666666669016 intervalHU=25184.00000000000000000 indent=0.00000000000000000 currentHU=21592 tokenPx=18.02666666666666728 tokenHU=1352 budgetHU=25184 start=26 end=28 tolerance=true chars=37",
+    "GULI_FIT intervalPx=335.78666666666669016 intervalHU=25184.00000000000000000 indent=0.00000000000000000 currentHU=23392 tokenPx=12.00000000000000000 tokenHU=900 budgetHU=25184 start=29 end=30 tolerance=true chars=37"
+  ],
+  "exactBudgetHU": 25188,
+  "integerConsumedHU": 25188,
+  "transportedBudget": 25187.999999999996,
+  "legacyCastBudgetHU": 25187,
+  "noAllowanceAdded": true
+}

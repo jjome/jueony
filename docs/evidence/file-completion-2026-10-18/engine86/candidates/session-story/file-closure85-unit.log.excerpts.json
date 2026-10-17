@@ -1,0 +1,18 @@
+{
+  "source": "build/file-closure85-unit.log",
+  "sourceSha256": "1bc4bb5e921cca30cc483ace34a99cc89496225fb34f7043fcc93819f1387b35",
+  "summary": [
+    "# tests 933",
+    "# suites 0",
+    "# pass 931",
+    "# fail 2",
+    "# cancelled 0",
+    "# skipped 0",
+    "# todo 0"
+  ],
+  "failedBlocks": [
+    "# Subtest: patched WASM header and footer targets survive both save formats and remain unchanged by restoration\nnot ok 754 - patched WASM header and footer targets survive both save formats and remain unchanged by restoration\n  ---\n  duration_ms: 414.1329\n  type: 'test'\n  location: 'C:\\\\Users\\\\jjome\\\\Documents\\\\work\\\\jueony\\\\apps\\\\editor\\\\tests\\\\session-cursor.test.ts:248:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly equal:\n    \n    false !== true\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: true\n  actual: false\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/tests/session-cursor.test.ts:258:98)\n    async Test.run (node:internal/test_runner/test:1054:7)\n    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)\n  ...",
+    "# Subtest: patched WASM body footnote keeps its control binding and Unicode caret after HWP/HWPX reopen\nnot ok 755 - patched WASM body footnote keeps its control binding and Unicode caret after HWP/HWPX reopen\n  ---\n  duration_ms: 217.8015\n  type: 'test'\n  location: 'C:\\\\Users\\\\jjome\\\\Documents\\\\work\\\\jueony\\\\apps\\\\editor\\\\tests\\\\session-cursor.test.ts:263:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly equal:\n    \n    false !== true\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: true\n  actual: false\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/tests/session-cursor.test.ts:276:97)\n    async Test.run (node:internal/test_runner/test:1054:7)\n    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)\n  ..."
+  ],
+  "scope": "Failure excerpts and total counts only; complete original TAP remains unchanged at its build path."
+}

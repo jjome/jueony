@@ -1,0 +1,73 @@
+{
+  "patchSha256": "fce0993013db18c8baba21c08b04dd1f4ce5943b02191d42f1ab200c81edfa06",
+  "strictApply": true,
+  "rows": [
+    {
+      "path": "src/document_core/commands/formatting.rs",
+      "strictAppliedSha256": "54153402c2fd3da55e75d551634bd82b5a6ba3609e8052b6ebcdc057e43b2b7a",
+      "candidateSha256": "65407f0b2ae4e0305271f4e9804edfc49e632e7634738ee87ca8d666e430f25e",
+      "utf8NormalizedCodeIdentical": true
+    },
+    {
+      "path": "src/model/style.rs",
+      "strictAppliedSha256": "b8f83d5e8244902d3e67449a5e910f98676b87edf2f77f52e6dbe8afb0731595",
+      "candidateSha256": "47d8dbbbf43e077490bceddab27c93151757e7f04f8a073dbf8b97d30261618b",
+      "utf8NormalizedCodeIdentical": true
+    },
+    {
+      "path": "src/parser/doc_info.rs",
+      "strictAppliedSha256": "866e7094143c69a44b8cd86b8a5844b2fdf210f963aed647be2a57dbc3e0061b",
+      "candidateSha256": "342305a4cd3f629cfc8dad7b0c6da318497493a02e499f967afc6daa98191c6f",
+      "utf8NormalizedCodeIdentical": true
+    },
+    {
+      "path": "src/parser/hwpx/header.rs",
+      "strictAppliedSha256": "829777e775225a4048d90765b643a8005abaf2a242638c9e137800e80a4420ff",
+      "candidateSha256": "714aa56117bc694bcceb808062ac9ec4923a3a66a8599bf3aabe70c0cacdf322",
+      "utf8NormalizedCodeIdentical": true
+    },
+    {
+      "path": "src/renderer/composer/re_sample_gen.rs",
+      "strictAppliedSha256": "628f7624ad99a94c4ecb98585607963541f61a04dce8d0327ac95ed5553e8319",
+      "candidateSha256": "58d3dbeff3c8d3195b4760533433a317789df5c41b0e7cb3757bbf79980085c8",
+      "utf8NormalizedCodeIdentical": true
+    },
+    {
+      "path": "src/serializer/cfb_writer/tests.rs",
+      "strictAppliedSha256": "5fa62fd447e16f924e9b01d9b57047bc73a9d61c0da29f38699cca2850b1a9dc",
+      "candidateSha256": "ad0790233b821bb329e71fc6ad79b8cdc39aec9bb06bc6c4436383a6e707dad8",
+      "utf8NormalizedCodeIdentical": true
+    },
+    {
+      "path": "src/serializer/content_loss.rs",
+      "strictAppliedSha256": "bb6fd19572d483284c8d92e075314dd43835e5caceec2a7ff762cf97bd60883e",
+      "candidateSha256": "9120caf97225f0cf57fb33f2f3f6d5ebb72dc4096b260c380799dd5bdfce032b",
+      "utf8NormalizedCodeIdentical": true
+    },
+    {
+      "path": "src/serializer/doc_info/tests.rs",
+      "strictAppliedSha256": "af1594d897cdae4edd3935443ddd02fe89eace558150c176ac76a9f749a0f346",
+      "candidateSha256": "69d60870bc93934671493879b69cf6de05b93a9550b394357ef606489a5830bb",
+      "utf8NormalizedCodeIdentical": true
+    },
+    {
+      "path": "src/serializer/hml/preflight.rs",
+      "strictAppliedSha256": "bdf9362727d168e3d456dc87f37b9209b7e703e09b92bf81dd6273901a7a059c",
+      "candidateSha256": "a79ac72b23f0c717b0d22ebee7fe8b0d1f529a177beb648417e24d64e2878434",
+      "utf8NormalizedCodeIdentical": true
+    },
+    {
+      "path": "src/serializer/hwpx/header.rs",
+      "strictAppliedSha256": "c43c23b4dc1530a494db3b9da8d7e7ce753e7894f9f7c67be9db6381580c97a9",
+      "candidateSha256": "2cd63e79f8462b9dc68533c01bc1fcdc3611434a8938e7f8fabef1a0cdfe04ec",
+      "utf8NormalizedCodeIdentical": true
+    },
+    {
+      "path": "src/serializer/paragraph_metadata_loss.rs",
+      "strictAppliedSha256": "9f2bbec868fb17fd64f366ab542207b63bbcde320956ec6db3d9f5603fc95cab",
+      "candidateSha256": "1caa28227886e1fe4b90be230446c57207ee76b51cbcabfbf787eb2455825a7a",
+      "utf8NormalizedCodeIdentical": true
+    }
+  ],
+  "compiledExactBytes": "Not yet. Existing in-flight Native tests use candidate initial bytes; strict source final recheck needed."
+}

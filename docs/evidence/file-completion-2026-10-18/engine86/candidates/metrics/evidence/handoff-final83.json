@@ -1,0 +1,78 @@
+{
+  "상태": "정규 GulimChe TTF 최소 후보 인계 준비 완료; 정식WASM 검수는 다음 단계",
+  "Native검사": {
+    "새검사": 8,
+    "actual11": 11,
+    "실행실패": 0,
+    "실측행경계": 136,
+    "글자측정": 30,
+    "형식재열기": 108,
+    "실제셀편집UndoRedo": true,
+    "다른측정컨텍스트21": true
+  },
+  "실제XML변형": {
+    "문서수": 12,
+    "원본과다른typed변형확인": true,
+    "초기nsPrefix준비오류": "failed-exclusion-namespace-v4에원본보존"
+  },
+  "독립공식83대조": {
+    "모든12원본liveGeometry차이": 0,
+    "모든24출력bytes및loss정확일치": true,
+    "10개의완전불변음성": [
+      "other-font",
+      "hft",
+      "unknown-face",
+      "fractional-height",
+      "zero-ratio",
+      "bold",
+      "italic",
+      "kerning",
+      "font-space",
+      "tracking"
+    ],
+    "기존codec재표기2건": [
+      {
+        "문서": "unknown-type",
+        "liveGeometry차이": 0,
+        "출력후차이": [
+          {
+            "hwpx": false,
+            "bytesExact": true,
+            "lossExact": true,
+            "geometryDifferences": 0
+          },
+          {
+            "hwpx": true,
+            "bytesExact": true,
+            "lossExact": true,
+            "geometryDifferences": 495
+          }
+        ]
+      },
+      {
+        "문서": "embedded-unowned",
+        "liveGeometry차이": 0,
+        "출력후차이": [
+          {
+            "hwpx": false,
+            "bytesExact": true,
+            "lossExact": true,
+            "geometryDifferences": 495
+          },
+          {
+            "hwpx": true,
+            "bytesExact": true,
+            "lossExact": true,
+            "geometryDifferences": 0
+          }
+        ]
+      }
+    ]
+  },
+  "정식WASM대기": [
+    "136행경계·30측정·실제셀편집UndoRedo·양형식20왕복",
+    "unknown-type XML재표기와 embedded-program HWP재표기를 실제productionguard가거절하는지확인",
+    "기존ns0 numbering-splice의unbound-prefix는별도serializer결함;검사정상화금지"
+  ],
+  "공개문서판정": "원공개MCST15→16/Python3잔여 차이는 미해결. 같은측정으로양쪽을읽어잔여건수가같아도실제operand는변함. public-metric-interpretation-correction.json 참조."
+}

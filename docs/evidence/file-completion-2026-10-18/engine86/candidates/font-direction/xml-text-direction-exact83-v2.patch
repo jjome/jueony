@@ -1,0 +1,147 @@
+--- a/src/model/style.rs
++++ b/src/model/style.rs
+@@ -316,9 +316,28 @@
+     Bullet,
+ }
+ 
++/// Explicit XML paragraph direction, retained separately from unproven HWP5 bits.
++/// Known lexical values acquire a semantic enum; unknown source values keep their
++/// exact original spelling and never silently become AUTO.
++#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
++pub enum ParagraphTextDirection { Auto, Ltr, Rtl, Unknown(String) }
++impl ParagraphTextDirection {
++    pub fn from_lexical(value: String) -> Self { match value.as_str() {
++        "AUTO" => Self::Auto, "LTR" => Self::Ltr, "RTL" => Self::Rtl,
++        _ => Self::Unknown(value),
++    }}
++    pub fn lexical(&self) -> &str { match self {
++        Self::Auto => "AUTO", Self::Ltr => "LTR", Self::Rtl => "RTL",
++        Self::Unknown(value) => value.as_str(),
++    }}
++}
++
+ /// 문단 모양 (HWPTAG_PARA_SHAPE)
+ #[derive(Debug, Clone, Default, serde::Serialize)]
+ pub struct ParaShape {
++    /// Original hh:paraPr@textDir, including explicit AUTO versus absence.
++    /// Metadata preservation only; this does not add RTL shaping support.
++    pub hwpx_text_direction: Option<ParagraphTextDirection>,
+     /// HWPX paragraph line-number suppression; binary mapping is not inferred.
+     pub suppress_line_numbers: bool,
+     /// 원본 레코드 바이트 (라운드트립 보존용)
+@@ -401,7 +420,8 @@
+ /// ParaShape 비교: raw_data 필드 제외 (라운드트립용 원본 바이트는 논리적 동일성과 무관)
+ impl PartialEq for ParaShape {
+     fn eq(&self, other: &Self) -> bool {
+-        self.suppress_line_numbers == other.suppress_line_numbers
++        self.hwpx_text_direction == other.hwpx_text_direction
++            && self.suppress_line_numbers == other.suppress_line_numbers
+             && self.attr1 == other.attr1
+             && self.margin_left == other.margin_left
+             && self.margin_right == other.margin_right
+--- a/src/parser/doc_info.rs
++++ b/src/parser/doc_info.rs
+@@ -819,6 +819,8 @@
+     let para_level = (((attr1 >> 25) & 0x07) as u8).max(outline_level_tail.min(9) as u8);
+ 
+     Ok(ParaShape {
++        // No HWP5 direction bit is inferred from reserved or undocumented bits.
++        hwpx_text_direction: None,
+         suppress_line_numbers: false,
+         raw_data: None,
+         attr1,
+--- a/src/parser/hwpx/header.rs
++++ b/src/parser/hwpx/header.rs
+@@ -922,6 +922,7 @@
+                     ps.attr1 &= !(1 << 22);
+                 }
+             }
++            b"textDir" => ps.hwpx_text_direction=Some(crate::model::style::ParagraphTextDirection::from_lexical(attr_str(&attr))),
+             b"suppressLineNumbers" => ps.suppress_line_numbers=parse_bool(&attr),
+             b"snapToGrid" => {
+                 if parse_bool(&attr) {
+--- a/src/serializer/doc_info/tests.rs
++++ b/src/serializer/doc_info/tests.rs
+@@ -287,6 +287,7 @@
+         line_spacing_v2: 0,
+         head_type: crate::model::style::HeadType::None,
+         para_level: 0,
++        hwpx_text_direction: None,
+         break_latin_word: None,
+         hwpx_plain_para_margin: false,
+         hwpx_plain_para_margin_physical: false,
+@@ -678,6 +679,7 @@
+         line_spacing_v2: 0,
+         head_type: crate::model::style::HeadType::None,
+         para_level: 0,
++        hwpx_text_direction: None,
+         break_latin_word: None,
+         hwpx_plain_para_margin: false,
+         hwpx_plain_para_margin_physical: false,
+--- a/src/serializer/hml/preflight.rs
++++ b/src/serializer/hml/preflight.rs
+@@ -227,7 +227,8 @@
+         || shape.attr3 != 0
+         || shape.line_spacing_v2 != 0
+         || shape.head_type != Default::default()
+-        || shape.break_latin_word.is_some();
++        || shape.break_latin_word.is_some()
++        || shape.hwpx_text_direction.is_some();
+     push_if(
+         omitted,
+         path,
+--- a/src/serializer/hwpx/header.rs
++++ b/src/serializer/hwpx/header.rs
+@@ -1029,19 +1029,19 @@
+     let condense = ((ps.attr1 >> 9) & 0x7f).to_string();
+     let font_line_height = ((ps.attr1 >> 22) & 1).to_string();
+     let snap_to_grid = ((ps.attr1 >> 8) & 1).to_string();
+-    start_tag_attrs(
+-        w,
+-        "hh:paraPr",
+-        &[
+-            ("id", &id.to_string()),
+-            ("tabPrIDRef", &ps.tab_def_id.to_string()),
+-            ("condense", &condense),
+-            ("fontLineHeight", &font_line_height),
+-            ("snapToGrid", &snap_to_grid),
+-            ("suppressLineNumbers", if ps.suppress_line_numbers {"1"} else {"0"}),
+-            ("checked", "0"),
+-        ],
+-    )?;
++    let id_text = id.to_string();
++    let tab_text = ps.tab_def_id.to_string();
++    let mut attributes = vec![
++        ("id", id_text.as_str()), ("tabPrIDRef", tab_text.as_str()),
++        ("condense", condense.as_str()), ("fontLineHeight", font_line_height.as_str()),
++        ("snapToGrid", snap_to_grid.as_str()),
++        ("suppressLineNumbers", if ps.suppress_line_numbers {"1"} else {"0"}),
++        ("checked", "0"),
++    ];
++    if let Some(direction) = &ps.hwpx_text_direction {
++        attributes.push(("textDir", direction.lexical()));
++    }
++    start_tag_attrs(w, "hh:paraPr", &attributes)?;
+ 
+     // 자식 순서 (한컴 원본 관찰):
+     // align, heading, breakSetting, autoSpacing, switch(margin+lineSpacing), border
+--- a/src/serializer/paragraph_metadata_loss.rs
++++ b/src/serializer/paragraph_metadata_loss.rs
+@@ -6,6 +6,17 @@
+ fn caption<'a>(stack:&mut Vec<Node<'a>>,value:Option<&'a crate::model::shape::Caption>,path:&str){if let Some(c)=value{paragraphs(stack,&c.paragraphs,&format!("{path}/caption"));}}
+ fn drawing<'a>(stack:&mut Vec<Node<'a>>,value:&'a crate::model::shape::DrawingObjAttr,path:&str){caption(stack,value.caption.as_ref(),path);if let Some(t)=&value.text_box{paragraphs(stack,&t.paragraphs,&format!("{path}/textbox"));}}
+ pub(super) fn record(doc:&Document,report:&mut ContentLossReport){
++    // The XML attribute is retained exactly, but this HWP5 writer has no proven
++    // binary mapping. Report each source resource once (including unused styles)
++    // rather than manufacturing a direction from reserved bits or dropping it.
++    if report.output_format()==super::content_loss::SerializedFormat::Hwp {
++        for(i,shape)in doc.doc_info.para_shapes.iter().enumerate(){
++            if shape.hwpx_text_direction.is_some(){report.record(ContentLoss{
++                code:ContentLossCode::MetadataReduced,subject:ContentLossSubject::ParagraphProperties,
++                path:format!("docInfo/paraShape/{i}/textDir"),reason:ContentLossReason::SerializerNotImplemented,resource_id:None,
++            });}
++        }
++    }
+     let mut stack=Vec::new();
+     for(i,s)in doc.sections.iter().enumerate().rev(){paragraphs(&mut stack,&s.paragraphs,&format!("section/{i}/body"));for(j,m)in s.section_def.master_pages.iter().enumerate().rev(){paragraphs(&mut stack,&m.paragraphs,&format!("section/{i}/master/{j}"));}}
+     while let Some(node)=stack.pop(){match node{

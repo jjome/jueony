@@ -1,0 +1,11 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/text-direction-closure83/source-font-type-candidate83)
+error[E0560]: struct `FontNameDecision` has no field named `hwpx_type_origin`
+    --> src/renderer/style_resolver.rs:1020:13
+     |
+1020 | ...   hwpx...origin: N...
+     |       ^^^^...^^^^^^ `FontNameDecision` does not have this field
+     |
+     = note: all struct fields are already assigned
+
+For more information about this error, try `rustc --explain E0560`.
+error: could not compile `rhwp` (lib) due to 1 previous error

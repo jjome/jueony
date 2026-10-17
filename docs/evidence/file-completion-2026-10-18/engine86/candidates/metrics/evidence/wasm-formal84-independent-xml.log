@@ -1,0 +1,44 @@
+PASS shared thirty natural glyph decisions in the real TTF document path
+PASS independent native admission source:own-gulimche-floor4-matrix-no-ls.hwpx
+PASS both formats twice source:own-gulimche-floor4-matrix-no-ls.hwpx
+PASS independent native admission hancom:own-gulimche-floor4-matrix-no-ls.hwpx
+PASS both formats twice hancom:own-gulimche-floor4-matrix-no-ls.hwpx
+PASS independent native admission source:own-gulimche-half-glyph-matrix-no-ls.hwpx
+PASS both formats twice source:own-gulimche-half-glyph-matrix-no-ls.hwpx
+PASS independent native admission hancom:own-gulimche-half-glyph-matrix-no-ls.hwpx
+PASS both formats twice hancom:own-gulimche-half-glyph-matrix-no-ls.hwpx
+PASS actual cell edit, snapshot undo redo and strict both-format two reopens
+PASS unowned font relabel is refused before writing: unknown-type
+PASS unowned font relabel is refused before writing: embedded-unowned
+PASS independent package XML hancom:own-gulimche-floor4-matrix-no-ls.hwpx-1
+FAIL independent package XML source:own-gulimche-floor4-matrix-no-ls.hwpx-1 [{"part":"Contents/header.xml","error":"unbound prefix: line 1, column 26148"}]
+
+1 !== 0
+
+PASS independent package XML hancom:own-gulimche-floor4-matrix-no-ls.hwpx-2
+FAIL independent package XML source:own-gulimche-floor4-matrix-no-ls.hwpx-2 [{"part":"Contents/header.xml","error":"unbound prefix: line 1, column 26148"}]
+
+1 !== 0
+
+FAIL independent package XML source:own-gulimche-half-glyph-matrix-no-ls.hwpx-1 [{"part":"Contents/header.xml","error":"unbound prefix: line 1, column 23762"}]
+
+1 !== 0
+
+FAIL independent package XML source:own-gulimche-half-glyph-matrix-no-ls.hwpx-2 [{"part":"Contents/header.xml","error":"unbound prefix: line 1, column 23762"}]
+
+1 !== 0
+
+PASS independent package XML hancom:own-gulimche-half-glyph-matrix-no-ls.hwpx-1
+PASS independent package XML hancom:own-gulimche-half-glyph-matrix-no-ls.hwpx-2
+FAIL independent package XML edited-cell-1 [{"part":"Contents/header.xml","error":"unbound prefix: line 1, column 26148"}]
+
+1 !== 0
+
+FAIL independent package XML edited-cell-2 [{"part":"Contents/header.xml","error":"unbound prefix: line 1, column 26148"}]
+
+1 !== 0
+
+FAIL independent package XML guard-unknown-type [{"part":"Contents/header.xml","error":"unbound prefix: line 1, column 26148"}]
+
+1 !== 0
+

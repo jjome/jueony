@@ -1,0 +1,16 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/text-direction-closure83/source-xml-exact-candidate83)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 10s
+     Running tests/jueony_xml_text_direction.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_xml_text_direction-3b98bf2119f744fa)
+
+running 8 tests
+test exact_direction_participates_in_resource_dedup_equality ... ok
+test unused_direction_definition_is_not_silently_dropped_from_hwp_report ... ok
+test unknown_spelling_preserved_as_opaque_metadata_without_auto_authority ... ok
+test real_paragraph_edit_snapshot_undo_redo_preserves_exact_xml_direction ... ok
+test absent_native_source_keeps_absence_without_manufactured_auto ... ok
+test known_rtl_exact_xml_and_explicit_hwp_loss ... ok
+test known_auto_exact_xml_and_explicit_hwp_loss ... ok
+test known_ltr_exact_xml_and_explicit_hwp_loss ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

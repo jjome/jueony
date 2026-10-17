@@ -1,0 +1,41 @@
+{
+  "sourceId": "b59322fd380dc175",
+  "wasmSha256": "ef130c08536b38349bfb0c9b94a4478094c85df04ba2969ef4e4f65d05363f17",
+  "legacySourceId": "ad6186043c15532f",
+  "stories": 3,
+  "wholeRawWireDifferences": 0,
+  "wholeExistingSemanticCanonicalDifferences": 0,
+  "actualProductionFingerprintEqual": true,
+  "reopens": {
+    "old83Exports": 6,
+    "new86Exports": 6,
+    "total": 12,
+    "formats": [
+      "hwp",
+      "hwpx"
+    ],
+    "consumedBookmark": "Captured on actual old83 WASM; restored on final86."
+  },
+  "allReopenedExportsUnchangedByRestoration": true,
+  "runtimeStrictNativeProof": {
+    "file": "src/wasm_api/session_story.rs",
+    "sha256": "b23e2860de5ce2910716860ed02282919e95ecc439c08ba4ade04b5a4936e174",
+    "finalRuntimeByteMatchesCompiledNativeCandidate": true,
+    "nativePassed": 12,
+    "failed": 0,
+    "ignored": 0
+  },
+  "scope": [
+    "Entire legacy v1 raw story graphs compared without arbitrary new-field deletion, ordinal projection, raw-ID removal or numeric tolerance.",
+    "The unchanged production session-story fingerprint adapter also computes identical hashes.",
+    "Real WASM getters, target ownership, body return point, Unicode caret bounds and source formats are exercised.",
+    "Host UI caret application uses an explicitly synthetic callback; no actual browser/native caret input or real OS writes occurred.",
+    "Unknown/missing/REP/mismatched font provenance and all present XML directions stay observable in independent Native negative cases.",
+    "Original v1/v2 preparatory failures and formal85 933-test 2-failure state remain in the separate immutable native compact."
+  ],
+  "earlierNativeCompact": {
+    "directory": "build/session-font-provenance-compact-native84",
+    "manifestSha256": "de76a507e3f94c179eef4591df0bbd32a21fc8f4dbc0a2338c6bc0ebdeea86bb"
+  },
+  "excluded": "No public/user documents, font programs, API keys, full public snapshots, binaries, screenshots or PDF."
+}

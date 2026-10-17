@@ -1,0 +1,39 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/column3-closure83/candidate-source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 10s
+test actual_api_set_columns_three_and_undo_redo ... 
+thread 'actual_api_set_columns_three_and_undo_redo' (298729) panicked at tests/jueony_column3_storage.rs:92:81:
+test compiled_source_proof ... COMPILED_SOURCE src/renderer/generated_column_stack.rs b90b0d696d529042a47eb82dd65c285e8002d0ff61c45344b03db6388cc7bb67
+COMPILED_SOURCE src/renderer/layout.rs 75692dc7fb15d53897bd6b573e43ac3fe10db422a48d6bf00b5739eb35560d91
+COMPILED_SOURCE src/model/document.rs b6d30a1d05af21a51445ab6a36d652c0a1f3350669ab8dada02a8067d77d6501
+test declared_three_with_stale_two_width_and_five_other_negatives_unchanged ... ok
+test existing_two_column_contract_unchanged ... 
+thread 'existing_two_column_contract_unchanged' (298732) panicked at tests/jueony_column3_storage.rs:74:5:
+test fresh_three_column_both_codecs_two_cycles ... 
+thread 'fresh_three_column_both_codecs_two_cycles' (298733) panicked at tests/jueony_column3_storage.rs:74:5:
+test fresh_three_column_real_edit_undo_redo ... 
+thread 'fresh_three_column_real_edit_undo_redo' (298734) panicked at tests/jueony_column3_storage.rs:74:5:
+failures:
+failures:
+    actual_api_set_columns_three_and_undo_redo
+    existing_two_column_contract_unchanged
+    fresh_three_column_both_codecs_two_cycles
+    fresh_three_column_real_edit_undo_redo
+test result: FAILED. 2 passed; 4 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.06s
+error: test failed, to rerun pass `-p rhwp --test jueony_column3_storage`
+test actual_caption ... ok
+test actual_column_two ... ok
+test actual_multiline ... ok
+test actual_negative ... ok
+test actual_plain ... ok
+test actual_positive ... ok
+test actual_positive_offset ... ok
+test actual_superscript ... ok
+test actual_three ... ok
+test actual_two ... ok
+test actual_unicode ... ok
+test closure_column_three ... [own full snapshot omitted]
+test closure_column_two ... [own full snapshot omitted]
+test closure_negative_offset ... [own full snapshot omitted]
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.96s
+error: 1 target failed:
+    `-p rhwp --test jueony_column3_storage`

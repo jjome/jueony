@@ -1,0 +1,150 @@
+{
+  "files": [
+    {
+      "path": "baseline-result.json",
+      "bytes": 59928,
+      "sha256": "e62fc5c7277c61d37a3436aeca375082c46866d2b30ec2912466a96724ca68ba",
+      "source": "build/session-font-provenance-closure84/baseline-result.json"
+    },
+    {
+      "path": "known-font-story-wire84.patch",
+      "bytes": 4214,
+      "sha256": "406c52d11baf518858fa3d89b4280e8fb38707908d2d297674c14f7ab7ba7f9e",
+      "source": "build/session-font-provenance-closure84/known-font-story-wire84.patch"
+    },
+    {
+      "path": "source-proof-v1-passed.json",
+      "bytes": 521,
+      "sha256": "1350a3f8aff987236227a488df1073e6e26b4a64d66b0a77f908901e3707f15f",
+      "source": "build/session-font-provenance-closure84/source-proof-v1-passed.json"
+    },
+    {
+      "path": "native-session-font-origin84.log",
+      "bytes": 1134,
+      "sha256": "1529fb56bc653f08ef330e91b9ffcac14981a5aeae88be6011cc1aa4aa9b0990",
+      "source": "build/session-font-provenance-closure84/native-session-font-origin84.log"
+    },
+    {
+      "path": "v1-source/session_story.rs",
+      "bytes": 16758,
+      "sha256": "8aa88a45511130439c0444f4b005945524eeafd74e3d1a7046fb2ee040e340db",
+      "source": "build/session-font-provenance-closure84/v1-source/session_story.rs"
+    },
+    {
+      "path": "v1-source/jueony_session_font_origin.rs",
+      "bytes": 4786,
+      "sha256": "28381474985db127dd6b33e51e74c8227fd5ac68f2b407b485997603072c2593",
+      "source": "build/session-font-provenance-closure84/v1-source/jueony_session_font_origin.rs"
+    },
+    {
+      "path": "known-font-story-wire84-v2.patch",
+      "bytes": 5600,
+      "sha256": "9613f523b63dc89e0aa23914055c5b0b7674a2515f2c076ecef0c178894bdd59",
+      "source": "build/session-font-provenance-closure84/known-font-story-wire84-v2.patch"
+    },
+    {
+      "path": "source-proof-v2-final.json",
+      "bytes": 2752,
+      "sha256": "10d17b99bbfc7bdd0c9690152e2d7c4c9bc28c7f5ba5e1b50fe9621ba35c775a",
+      "source": "build/session-font-provenance-closure84/source-proof-v2-final.json"
+    },
+    {
+      "path": "native-session-font-origin84-v2.log",
+      "bytes": 6863,
+      "sha256": "8b9756ee3316664cf6f147b53c9e2eb42467998fd8d187be51033f20624633fc",
+      "source": "build/session-font-provenance-closure84/native-session-font-origin84-v2.log"
+    },
+    {
+      "path": "native-session-font-origin84-v2-raw-oracle.log",
+      "bytes": 1267,
+      "sha256": "0881a4e1405d34ba8794d0c0886731bf266eeb7f96ce9d8cd9c11ed54ccac07b",
+      "source": "build/session-font-provenance-closure84/native-session-font-origin84-v2-raw-oracle.log"
+    },
+    {
+      "path": "native-session-font-v2-initial-harness.rs",
+      "bytes": 5992,
+      "sha256": "4495f2a827303361aec13529fac0b1ed7f436768da8c0682f1b65633fabc2ee0",
+      "source": "build/session-font-provenance-closure84/native-session-font-v2-initial-harness.rs"
+    },
+    {
+      "path": "source-candidate/tests/jueony_session_font_origin.rs",
+      "bytes": 6148,
+      "sha256": "526d9acf5e4b3e5820629532b9709fd61dd09efd0d2ffa2b8ef599651d510ca7",
+      "source": "build/session-font-provenance-closure84/source-candidate/tests/jueony_session_font_origin.rs"
+    },
+    {
+      "path": "source-candidate/src/wasm_api/session_story.rs",
+      "bytes": 17102,
+      "sha256": "b23e2860de5ce2910716860ed02282919e95ecc439c08ba4ade04b5a4936e174",
+      "source": "build/session-font-provenance-closure84/source-candidate/src/wasm_api/session_story.rs"
+    },
+    {
+      "path": "run-native-session-font-origin84-v2.sh",
+      "bytes": 563,
+      "sha256": "bf4aa9b2488df6c4b3c78d2267e679ae80cda5e0d5644acd850e7c57025b9323",
+      "source": "build/session-font-provenance-closure84/run-native-session-font-origin84-v2.sh"
+    },
+    {
+      "path": "run-native-session-font-origin84-v2-raw-oracle.sh",
+      "bytes": 557,
+      "sha256": "1c0c632aecc0c502059b533aac0c61385356dc37a370524b96017257901dd4c2",
+      "source": "build/session-font-provenance-closure84/run-native-session-font-origin84-v2-raw-oracle.sh"
+    },
+    {
+      "path": "legacy-v1-wire83.json",
+      "bytes": 22053,
+      "sha256": "0b980aa6ebb0b9f5fd7a3c280dab48aba30136228ea4fca6993761b2562afaea",
+      "source": "build/session-font-provenance-closure84/legacy-v1-wire83.json"
+    },
+    {
+      "path": "legacy-v1-raw-wire83.json",
+      "bytes": 51611,
+      "sha256": "b2d5d0749d78e1e17aa38e7df93d9830dd7ba7eed39e525ecd97d013c2487b7b",
+      "source": "build/session-font-provenance-closure84/legacy-v1-raw-wire83.json"
+    },
+    {
+      "path": "reproduce/diagnose-session-font-origin84.mjs",
+      "bytes": 2003,
+      "sha256": "cbb2b0c9f08ae35959b217d4688bba917d23c34dc04728c516e5731b0b060a7e",
+      "source": "build/text-direction-closure83/diagnose-session-font-origin84.mjs"
+    },
+    {
+      "path": "reproduce/make-legacy-story-wire83.mjs",
+      "bytes": 1178,
+      "sha256": "0248e0c4b668b4a5723ff856fe48a733668066e39c9b9526e62dda56bd88e366",
+      "source": "build/text-direction-closure83/make-legacy-story-wire83.mjs"
+    },
+    {
+      "path": "reproduce/make-legacy-story-raw-wire83.mjs",
+      "bytes": 977,
+      "sha256": "1c023bc69fec2cf1d4b6be317832b963217a5d131ea6deb79d3e737f74c746f9",
+      "source": "build/text-direction-closure83/make-legacy-story-raw-wire83.mjs"
+    },
+    {
+      "path": "reproduce/verify-legacy-story-wire-engine.mjs",
+      "bytes": 6551,
+      "sha256": "a664462abaedba35bdbe9eaaac5199fa3bdee5842113edeb4d85b027909299e5",
+      "source": "build/text-direction-closure83/verify-legacy-story-wire-engine.mjs"
+    },
+    {
+      "path": "file-closure85-unit.log.excerpts.json",
+      "bytes": 2267,
+      "sha256": "f461e4c6697cd944b2128440e3f3461d6f51f53774e00a33379d416978636d0d",
+      "source": "build/file-closure85-unit.log (explicit excerpt)"
+    },
+    {
+      "path": "file-closure85-unit-preparation-wrong-default-engine.log.excerpts.json",
+      "bytes": 6026,
+      "sha256": "4bd1203a8d93ed1c1e2db6309278ed233fd1bae97b6f3f8995c78194b8683207",
+      "source": "build/file-closure85-unit-preparation-wrong-default-engine.log (explicit excerpt)"
+    },
+    {
+      "path": "scope.json",
+      "bytes": 1886,
+      "sha256": "e8d3d276cea8eb903ac5001a9a5d860809709c41fec273e3ae81c8927f8cbee6",
+      "source": "generated explicit scope"
+    }
+  ],
+  "fileCount": 24,
+  "totalBytes": 228737
+}

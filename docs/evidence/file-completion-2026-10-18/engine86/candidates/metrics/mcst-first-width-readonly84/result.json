@@ -1,0 +1,287 @@
+{
+  "상태": "원공개 MCST 첫 실제 inline advance 차이의 직접 원인 분리. 실제 한글이 저장 행을 3→4로 바꾼 근본 fit 원인은 미확정.",
+  "입력": [
+    {
+      "path": "build/hancom-final-file-review-20261017/source-mcst-bid-2026.hwp",
+      "sha256": "c61a13b249183a675d38d5badfa3af610edcf99a403622440fc81b7f52b348f2"
+    },
+    {
+      "path": "build/hancom-final-file-review-20261017/mcst-bid-2026-hwpx-hancom.hwpx",
+      "sha256": "20a3960b4315626c3f97d9c5d47746e3cfadd8fe50dde43a4a424aa3a2a76936"
+    }
+  ],
+  "엔진": "build/rhwp-engine/source-b6d44520624bd7e1/pkg",
+  "범위": {
+    "section": 0,
+    "paragraph": 60,
+    "pageZeroBased": 5,
+    "첫차이문자": "literal SPACE, index0",
+    "본문기록": false,
+    "원본수정": false,
+    "Cargo사용": false
+  },
+  "원시서식동일": {
+    "fontIDs": [
+      4,
+      4,
+      4,
+      4,
+      4,
+      4,
+      4
+    ],
+    "declaredFaces": [
+      "휴먼명조",
+      "휴먼명조",
+      "휴먼명조",
+      "휴먼명조",
+      "휴먼명조",
+      "휴먼명조",
+      "휴먼명조"
+    ],
+    "declaredTypes": [
+      "TTF",
+      "TTF",
+      "TTF",
+      "TTF",
+      "TTF",
+      "TTF",
+      "TTF"
+    ],
+    "HWPfaceAttributes": [
+      97,
+      97,
+      97,
+      97,
+      97,
+      97,
+      97
+    ],
+    "embedded": false,
+    "substitution": null,
+    "baseSizeHU": 1300,
+    "ratios": [
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100
+    ],
+    "relativeSizes": [
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100
+    ],
+    "charShapeRuns": [
+      {
+        "start": 0,
+        "id": 21,
+        "spacingPercent": 0
+      },
+      {
+        "start": 3,
+        "id": 74,
+        "spacingPercent": -4
+      },
+      {
+        "start": 45,
+        "id": 21,
+        "spacingPercent": 0
+      },
+      {
+        "start": 46,
+        "id": 75,
+        "spacingPercent": -3
+      },
+      {
+        "start": 88,
+        "id": 53,
+        "spacingPercent": -6
+      }
+    ]
+  },
+  "원시행": {
+    "source": [
+      [
+        0,
+        20220,
+        1300,
+        1300,
+        1105,
+        780,
+        0,
+        48188,
+        393216
+      ],
+      [
+        46,
+        22300,
+        1300,
+        1300,
+        1105,
+        780,
+        0,
+        48188,
+        1441792
+      ],
+      [
+        88,
+        24380,
+        1300,
+        1300,
+        1105,
+        780,
+        0,
+        48188,
+        1441792
+      ]
+    ],
+    "hancom": [
+      [
+        0,
+        20220,
+        1300,
+        1300,
+        1105,
+        780,
+        0,
+        48188,
+        393216
+      ],
+      [
+        44,
+        22300,
+        1300,
+        1300,
+        1105,
+        780,
+        0,
+        48188,
+        1441792
+      ],
+      [
+        86,
+        24380,
+        1300,
+        1300,
+        1105,
+        780,
+        0,
+        48188,
+        1441792
+      ],
+      [
+        128,
+        26460,
+        1300,
+        1300,
+        1105,
+        780,
+        0,
+        48188,
+        1441792
+      ]
+    ],
+    "fieldOrder": [
+      "textpos",
+      "vertpos",
+      "vertsize",
+      "textheight",
+      "baseline",
+      "spacing",
+      "horzpos",
+      "horzsize",
+      "flags"
+    ],
+    "해석": "HWP LINE_SEG와 HWPX lineseg는 per-character charX를 저장하지 않는다. 저장 행의 시작·폭과 서식을 소비해 paint가 charX를 만든다."
+  },
+  "원시→paint": {
+    "sourceRowStarts": [
+      0,
+      46,
+      88
+    ],
+    "hancomRowStarts": [
+      0,
+      44,
+      86,
+      128
+    ],
+    "sourcePaintY": [
+      383,
+      410.7,
+      438.4
+    ],
+    "hancomPaintY": [
+      383,
+      410.7,
+      438.4,
+      466.2
+    ],
+    "rawAndPaintStartsExact": true,
+    "sourceFirstRunCharX": [
+      0,
+      8.8,
+      17.5,
+      26.3
+    ],
+    "hancomFirstRunCharX": [
+      0,
+      10.4,
+      19.1,
+      29.5
+    ]
+  },
+  "첫문자측정": {
+    "languageSlot": 5,
+    "inheritedLanguageSlot": 5,
+    "face": "휴먼명조",
+    "aliasResolvedFace": "HumanMyeongJo",
+    "metricEntry": 599,
+    "matchKind": "exact",
+    "widthSource": "metricHalfSpace",
+    "sourceNaturalAdvanceHU": 649,
+    "hancomNaturalAdvanceHU": 649,
+    "sourceExtraWordSpacingPx": 0.12890666666669404,
+    "hancomExtraWordSpacingPx": 1.7595733333333556,
+    "deltaWordSpacingPx": 1.6306666666666616,
+    "sourceFinalAdvanceHU": 659,
+    "hancomFinalAdvanceHU": 781,
+    "sourcePaintAdvancePx": 8.8,
+    "hancomPaintAdvancePx": 10.4
+  },
+  "대조문자": {
+    "index1": {
+      "widthSource": "heuristicHalfwidth",
+      "characterMatch": "miss",
+      "sourceAndHancomNaturalAndFinalAdvanceHU": 649,
+      "wordSpacingApplied": false
+    },
+    "index3": {
+      "widthSource": "embeddedMetric",
+      "sourceAndHancomNaturalAdvanceHU": 1299,
+      "trackingPx": -0.6933333333333332,
+      "sourceAndHancomFinalAdvanceHU": 1248
+    },
+    "index7": {
+      "widthSource": "metricHalfSpace",
+      "sourceAndHancomNaturalAdvanceHU": 649,
+      "trackingPx": -0.6933333333333332,
+      "sourceFinalAdvanceHU": 633,
+      "hancomFinalAdvanceHU": 755
+    }
+  },
+  "코드소유": {
+    "paintDistribution": "renderer/layout/paragraph_layout.rs:2234 needs_justify → rendered_space_slots/effective_used → slack/slots, extra_word_spacing 소비",
+    "metricSPACE": "renderer/layout/text_measurement.rs:1340 metricHalfSpace; metricEntry599/EM2의 동일 자연폭",
+    "원시행": "clean authentic source LINE_SEG가 구성한 stored partition을 양쪽 입력에서 각각 유지. 폭 차이 때문에 일괄 저장 캐시를 삭제하거나 source를 한글 partition으로 바꾸지 않았다."
+  },
+  "미확정": "왜 실제 한글이 같은 원시 TTF/size/ratio/tracking에 44/86/128을 새로 택했는지는 별도 자연 측정·토큰 fit oracle가 필요하다. 현재 query는 자체 renderer metric599 선택을 보여줄 뿐 실제 한글의 사용 글꼴 프로그램/실제 glyph advance까지 증명하지 않는다. HumanMyeongJo에 GulimChe 4HU 규칙을 옮길 근거 없음.",
+  "수정안": "현재 조사만으로 생산 수정하지 않음. 원본 저장 partition과 의미를 유지하며 첫 fit 차이의 실제 글꼴/토큰 측정 근거를 추가 확보해야 함."
+}

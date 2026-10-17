@@ -1,5 +1,7 @@
 # Jueony — 공무원용 AI 문서 편집기
 
+[파일·저장·복구 최신 검수와 실행 방법](docs/111-file-storage-final-review.md) — 수정한 결함과 남은 완료 조건을 구분합니다.
+
 ## [전체 진행 현황 · 기능별 작업 문서 바로가기](docs/jueony-progress.md)
 
 **16개 기능별 문서의 구현 · 검증 · Agent 연결 상태와 다음 작업을 한눈에 확인합니다.**

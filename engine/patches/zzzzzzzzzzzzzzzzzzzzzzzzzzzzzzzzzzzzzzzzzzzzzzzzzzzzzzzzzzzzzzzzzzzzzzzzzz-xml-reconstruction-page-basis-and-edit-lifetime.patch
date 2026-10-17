@@ -1,0 +1,200 @@
+--- a/src/model/document.rs
++++ b/src/model/document.rs
+@@ -384,6 +384,22 @@
+             .map(|(_, d)| d.as_slice())
+     }
+ 
++    /// Read authority for the existing versioned XML-cache binary contract.
++    /// The model identity is shared by import reconstruction and layout lifetime;
++    /// an arbitrary, legacy, duplicated or conflicting origin grants no authority.
++    pub(crate) fn owns_versioned_xml_cache_origin(&self) -> bool {
++        use crate::model::provenance::SourceFormat;
++        self.provenance.format == SourceFormat::Hwp5
++            && self.provenance.hwpx_lineage && self.is_hwpx_variant
++            && !self.provenance.hwp3_lineage && !self.is_hwp3_variant
++            && self.hwpx_aux_entry(HWP3_ORIGIN_HWPX_MARKER_PATH).is_none()
++            && self.hwpx_aux_entry(HWP5_ORIGIN_HWPX_MARKER_PATH).is_none()
++            && !self.extra_streams.iter().any(|(path,_)|path == HWP3_ORIGIN_STREAM_PATH)
++            && self.extra_streams.iter().filter(|(path,_)|path == HWPX_ORIGIN_STREAM_PATH).count() == 1
++            && self.extra_streams.iter().any(|(path,bytes)|
++                path == HWPX_ORIGIN_STREAM_PATH && bytes.as_slice() == b"2:xml-import-v1")
++    }
++
+     /// [#2403 Stage 1] 레이아웃 호환 정책 질의 표면.
+     ///
+     /// 기존 분기의 1:1 파생 — `hwp3_layout` = `is_hwp3_variant`,
+@@ -429,6 +445,10 @@
+         // 발동). 봉인 존재를 함께 요구해 실제 로드된 문서의 편집만 잡는다.
+         .with_session_edited(
+             self.provenance.format == SourceFormat::Hwp5
++                // A verified XML-import binary keeps the same cache lifetime
++                // after an edit as its XML source. Native/unknown origins retain
++                // the original raw-stream edit policy.
++                && !self.owns_versioned_xml_cache_origin()
+                 && self
+                     .sections
+                     .iter()
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -2502,18 +2502,8 @@
+     /// legacy releases. Only this new exact payload owns the cache import
+     /// contract; conflicting raw HWP3/HWP5 source evidence always wins.
+     fn owns_versioned_xml_cache_origin(document: &Document, source: crate::parser::FileFormat) -> bool {
+-        use crate::model::document::{HWPX_ORIGIN_STREAM_PATH,HWP3_ORIGIN_STREAM_PATH,
+-            HWP3_ORIGIN_HWPX_MARKER_PATH,HWP5_ORIGIN_HWPX_MARKER_PATH};
+         matches!(source,crate::parser::FileFormat::Hwp)
+-            && document.provenance.format == crate::model::provenance::SourceFormat::Hwp5
+-            && document.provenance.hwpx_lineage && document.is_hwpx_variant
+-            && !document.provenance.hwp3_lineage && !document.is_hwp3_variant
+-            && document.hwpx_aux_entry(HWP3_ORIGIN_HWPX_MARKER_PATH).is_none()
+-            && document.hwpx_aux_entry(HWP5_ORIGIN_HWPX_MARKER_PATH).is_none()
+-            && !document.extra_streams.iter().any(|(path,_)|path == HWP3_ORIGIN_STREAM_PATH)
+-            && document.extra_streams.iter().filter(|(path,_)|path == HWPX_ORIGIN_STREAM_PATH).count() == 1
+-            && document.extra_streams.iter().any(|(path,bytes)|
+-                path == HWPX_ORIGIN_STREAM_PATH && bytes.as_slice() == b"2:xml-import-v1")
++            && document.owns_versioned_xml_cache_origin()
+     }
+ 
+     /// Creation authority is distinct from read authority. No original
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -3506,6 +3506,96 @@
+ /// 쪽 첫 저장 줄의 vpos가 문단 앞 간격을 포함하면 쪽 원점은 0이다.
+ /// 다음 문단의 저장 사다리도 앞 간격을 계상하는지 확인하여 측정과 배치가
+ /// 같은 원점을 소비한다. 명시적 쪽 나눔과 합성 줄은 이 증거로 사용하지 않는다.
++/// A reflowed XML page can retain a complete physical source frame while its
++/// runtime LINE_SEG ladder is section-cumulative. Authenticate the same offset
++/// across a plain page head, one whole TAC table and its plain successor; the
++/// original positive inset belongs to the page, not to the cumulative origin.
++/// Unknown/edited/control-bearing text and incomplete object frames stay on the
++/// existing path. This does not rewrite stored coordinates or infer an inset.
++pub(crate) fn reconstructed_tac_page_basis(
++    first: &Paragraph, next: Option<&Paragraph>, after: Option<&Paragraph>,
++    styles: &ResolvedStyleSet, dpi: f64, body_height: f64,
++) -> Option<i32> {
++    use crate::model::paragraph::{ColumnBreakType, LineSeg};
++    use crate::model::shape::{TextWrap, VertAlign, VertRelTo};
++    let next = next?;
++    let after = after?;
++    if !body_height.is_finite() || body_height <= 0.0 || !dpi.is_finite() || dpi <= 0.0
++        || styles.kerning_measurement_context.is_some()
++        || styles.horizontal_shaping_context.is_some()
++    { return None; }
++    let closed_paragraph = |p: &Paragraph| {
++        !p.stored_text_partition_is_dirty() && !p.cell_format_vpos_dirty
++            && p.column_type == ColumnBreakType::None
++            && p.field_ranges.is_empty() && p.orphan_field_ends.is_empty()
++            && p.range_tags.is_empty() && p.title_marks.is_empty()
++            && p.markpen_marks.is_empty() && p.ctrl_data_records.iter().all(Option::is_none)
++            && p.tab_extended.is_empty() && p.numbering_restart.is_none()
++            && p.layout_only_fill_lines == 0 && !p.text.contains('\t')
++    };
++    if !closed_paragraph(first) || !closed_paragraph(next) || !closed_paragraph(after)
++        || !first.controls.is_empty() || !after.controls.is_empty()
++        || !para_has_visible_text(first) || !para_has_visible_text(after)
++        || first.line_segs.len() != 1 || next.line_segs.len() != 1
++        || after.line_segs.len() != 1
++    { return None; }
++    let [Control::Table(table)] = next.controls.as_slice() else { return None; };
++    if !table.common.treat_as_char || table.common.locked || table.common.size_protect
++        || table.common.allow_overlap
++        || !matches!(table.page_break, crate::model::table::TablePageBreak::RowBreak)
++        || table.raw_table_record_attr & (1 << 30) != 0
++        || table.common.vertical_offset != 0 || table.common.horizontal_offset != 0
++        || !matches!(table.common.text_wrap, TextWrap::TopAndBottom)
++        || !matches!(table.common.vert_rel_to, VertRelTo::Para)
++        || !matches!(table.common.vert_align, VertAlign::Top)
++        || table.caption.is_some() || table.row_count != 1 || table.col_count != 1
++        || table.cells.len() != 1 || !table.zones.is_empty()
++        || table.common.height == 0 || table.common.width == 0
++        || table.outer_margin_top < 0 || table.outer_margin_bottom < 0
++    { return None; }
++    let cell = &table.cells[0];
++    if cell.dirty_flag || cell.cell_protect() || cell.field_name.is_some()
++        || cell.row_span != 1 || cell.col_span != 1 || cell.text_direction != 0
++        || cell.line_wrap != 0 || cell.paragraphs.is_empty()
++        || cell.paragraphs.iter().any(|p| !closed_paragraph(p) || !p.controls.is_empty())
++    { return None; }
++    let saved = |line: &LineSeg| line.line_height > 0 && line.text_height > 0
++        && line.segment_width > 0 && line.line_spacing >= 0
++        && line.tag & LineSeg::TAG_IMPLEMENTATION_PROPERTY == 0;
++    let physical = |p: &Paragraph| -> Option<i32> {
++        let [source] = p.source_line_seg_vertical_pos.as_deref()? else { return None; };
++        saved(&p.line_segs[0]).then_some(*source)
++    };
++    let a = physical(first)?;
++    let b = physical(next)?;
++    let c = physical(after)?;
++    if c.checked_add(after.line_segs[0].line_height)?
++        > crate::renderer::px_to_hwpunit(body_height, dpi) { return None; }
++    let l = &first.line_segs[0];
++    let t = &next.line_segs[0];
++    let base = l.vertical_pos.checked_sub(a)?;
++    let before = |p: &Paragraph| -> Option<i32> {
++        let value = styles.para_styles.get(p.para_shape_id as usize)?.spacing_before;
++        if !value.is_finite() || value <= 0.0 { return None; }
++        Some(crate::renderer::px_to_hwpunit(value, dpi))
++    };
++    let gap = before(first)?;
++    if base <= 0 || a != gap || before(next)? != gap || before(after)? != gap
++        || a.checked_add(l.line_height)?.checked_add(l.line_spacing)?.checked_add(gap)? != b
++        || b.checked_add(t.line_height)?.checked_add(t.line_spacing)?.checked_add(gap)? != c
++        || t.vertical_pos.checked_sub(b)? != base
++        // Import reconstruction closes an inline saved table at its own
++        // advance and clears source_anchor_end. The next plain paragraph's
++        // physical leading margin is then consumed by paint, not runtime vpos.
++        || after.line_segs[0].vertical_pos.checked_sub(c)? != base.checked_sub(gap)?
++        || t.vertical_pos.checked_add(t.line_height)?.checked_add(t.line_spacing)?
++            != after.line_segs[0].vertical_pos
++        || i64::from(t.line_height) != i64::from(table.common.height)
++            + i64::from(table.outer_margin_top) + i64::from(table.outer_margin_bottom)
++    { return None; }
++    Some(base)
++}
++
+ pub(crate) fn stored_first_margin_is_page_relative(
+     first: &Paragraph,
+     next: Option<&Paragraph>,
+@@ -8028,7 +8118,20 @@
+                 // vpos(예: 1000HU)는 쪽 원점이 아니다. 도형은 자체 좌표로 그려지고
+                 // 뒤따르는 본문은 쪽-상대 vpos를 그대로 따른다. 제목 vpos를
+                 // page_base로 빼면 뒤의 문단·표가 그만큼 위로 밀린다.
+-                if saved_inline_heading_page || stored_first_margin_is_page_relative_in_column {
++                let reconstructed = if zone_column_count == 1 && self.profile.get().hwpx_stored_layout()
++                    && !self.profile.get().hwp3_layout()
++                    && !self.profile.get().session_edited() && !col_content.endnote_flow
++                {
++                    match col_content.items.first() {
++                        Some(PageItem::FullParagraph { para_index }) => paragraphs.get(*para_index)
++                            .and_then(|first| reconstructed_tac_page_basis(
++                                first, paragraphs.get(*para_index + 1),
++                                paragraphs.get(*para_index + 2), styles, self.dpi, col_area.height)),
++                        _ => None,
++                    }
++                } else { None };
++                if let Some(origin) = reconstructed { origin }
++                else if saved_inline_heading_page || stored_first_margin_is_page_relative_in_column {
+                     0
+                 } else {
+                     base
+--- a/src/renderer/typeset/section/vpos.rs
++++ b/src/renderer/typeset/section/vpos.rs
+@@ -42,7 +42,17 @@
+                                     self.dpi,
+                                 )
+                             });
+-                        if margin_is_page_relative {
++                        let reconstructed = if st.profile.hwpx_stored_layout()
++                            && !st.profile.hwp3_layout() && !st.profile.session_edited()
++                            && !st.current_endnote_flow
++                        {
++                            paragraphs.get(para_idx).and_then(|first|
++                                crate::renderer::layout::reconstructed_tac_page_basis(
++                                    first, paragraphs.get(para_idx + 1),
++                                    paragraphs.get(para_idx + 2), styles, self.dpi, st.layout.available_body_height()))
++                        } else { None };
++                        if let Some(origin) = reconstructed { origin }
++                        else if margin_is_page_relative {
+                             0
+                         } else {
+                             seg.vertical_pos

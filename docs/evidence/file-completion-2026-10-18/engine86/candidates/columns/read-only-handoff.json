@@ -1,0 +1,79 @@
+{
+  "status": "BASELINE83_FAIL_READONLY_ANALYSIS_NOT_IMPLEMENTED",
+  "sourceSHA": "2617f3ab26bccdb6fed37c9f83c2816cbf590f634f71fce64306c862a812a16b",
+  "exportedSHA": "76f080c6d8212ca282609a1f7d134f67ea2a7a1a522cd1b4fa5edc701bf91f4a",
+  "semanticDifferences": 0,
+  "geometryDifferences": 37,
+  "geometryFields": [
+    "y"
+  ],
+  "owners": {
+    "table1ParentAndCells": 7,
+    "table2ParentAndCells": 5,
+    "textRuns": 25
+  },
+  "firstExactDifference": {
+    "path": "$[0][\"controls\"][\"controls\"][0][\"cells\"][0][\"y\"]",
+    "before": 153.6,
+    "after": 157.4,
+    "delta": 3.8000000000000114
+  },
+  "firstRootTableBeforeAfter": [
+    153.6,
+    157.4
+  ],
+  "secondRootTableBeforeAfter": [
+    230.7,
+    234
+  ],
+  "followingBodyBeforeAfter": [
+    264.9,
+    272
+  ],
+  "bandOwnershipHU": {
+    "columnBodyTop": 9920,
+    "headerAdvance": 1600,
+    "tableHeights": [
+      5181,
+      2564
+    ],
+    "eachOuterTopBottom": 283,
+    "sourceTable1HostSpacing": 600,
+    "sourceStackAdvanceWithoutHeader": 8345,
+    "physicalStackAdvanceWithoutHeader": 8877,
+    "followingDelta": 532,
+    "firstTopDelta": 283,
+    "secondTopDelta": 249
+  },
+  "storage": {
+    "rootOriginalLineCount": 6,
+    "originalRootLineTagHex": "0x80060000",
+    "originalRootVposAllZero": true,
+    "exportedRootLineCacheCounts": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "marker": [
+      {
+        "path": "META-INF/rhwp-hwp5-origin",
+        "payload": "2:paragraph-utf16"
+      }
+    ]
+  },
+  "currentMinimumExclusion": "generated_column_stack.rs owns_generated_frame: columns !=2 returnsfalse; same complete whole-stack physical contract currently certifiedonly2columns",
+  "safeCandidateDesign": [
+    "Keep the existing2-column contract unchanged. Add3-column authority only if first section/column controls are ordinary same-width LTR and every generated root row exactly matches ParagraphBox::body_for_style for the actual declared3-column frame.",
+    "Reuse existing column box quantization; no new tolerance, line-width edit, LS cache rewrite or source normalization.",
+    "Retain every existing fields/unknown/nested/offset/caption/RowBreak/zone/asymmetric/height/fit/latercolumn blocker.",
+    "The existing3-column negative declares3columns but retains2-column source width20760HU; fresh real column3 uses13504HU. Exact frame-width ownership separates them.",
+    "Independent actual Hancom3-column Open/SaveAs is required before recommending physical-placement extension.",
+    "Native baseline/candidate, APIcolumn3 generation, later edit/snapshot UndoRedo, bothcodecs2cycles+productionguard and existing40negative/actual11/columns24 must all be reviewed with oldfailures preserved."
+  ],
+  "nativeCargoUsed": false,
+  "productionModified": false,
+  "sourceBasisV3Frozen": true
+}

@@ -1,0 +1,120 @@
+{
+  "base": "formal83 + full textDir strict v2",
+  "patch": "font-type-authority83.patch",
+  "patchSha256": "fce0993013db18c8baba21c08b04dd1f4ce5943b02191d42f1ab200c81edfa06",
+  "strictApply": true,
+  "runtimeFiles": 9,
+  "legacyTestCompatibilityFiles": 2,
+  "files": [
+    {
+      "path": "src/document_core/commands/formatting.rs",
+      "baseSha256": "7adbfa58e881aa9026954dd36161743f5ba4426b1835a42fb5951ed1c313b7e5",
+      "nativeCompiledInitialSha256": "65407f0b2ae4e0305271f4e9804edfc49e632e7634738ee87ca8d666e430f25e",
+      "strictAppliedSha256": "54153402c2fd3da55e75d551634bd82b5a6ba3609e8052b6ebcdc057e43b2b7a",
+      "normalizedUtf8CodeSha256": "65407f0b2ae4e0305271f4e9804edfc49e632e7634738ee87ca8d666e430f25e",
+      "normalizedCodeIdentical": true
+    },
+    {
+      "path": "src/model/style.rs",
+      "baseSha256": "bfa5b55aded8fede1708d0e63a0fa7eb0509f0027a972f9b0952c038b6dd69fc",
+      "nativeCompiledInitialSha256": "47d8dbbbf43e077490bceddab27c93151757e7f04f8a073dbf8b97d30261618b",
+      "strictAppliedSha256": "b8f83d5e8244902d3e67449a5e910f98676b87edf2f77f52e6dbe8afb0731595",
+      "normalizedUtf8CodeSha256": "47d8dbbbf43e077490bceddab27c93151757e7f04f8a073dbf8b97d30261618b",
+      "normalizedCodeIdentical": true
+    },
+    {
+      "path": "src/parser/doc_info.rs",
+      "baseSha256": "18aa3d0827e16feed42144eedcba4d4804df229061f8e149c0125584c965bdb5",
+      "nativeCompiledInitialSha256": "342305a4cd3f629cfc8dad7b0c6da318497493a02e499f967afc6daa98191c6f",
+      "strictAppliedSha256": "866e7094143c69a44b8cd86b8a5844b2fdf210f963aed647be2a57dbc3e0061b",
+      "normalizedUtf8CodeSha256": "342305a4cd3f629cfc8dad7b0c6da318497493a02e499f967afc6daa98191c6f",
+      "normalizedCodeIdentical": true
+    },
+    {
+      "path": "src/parser/hwpx/header.rs",
+      "baseSha256": "59ad32defc6d8c1f8fd714dd51a5f33c89b46ff941325db3574585b8f32a4234",
+      "nativeCompiledInitialSha256": "714aa56117bc694bcceb808062ac9ec4923a3a66a8599bf3aabe70c0cacdf322",
+      "strictAppliedSha256": "829777e775225a4048d90765b643a8005abaf2a242638c9e137800e80a4420ff",
+      "normalizedUtf8CodeSha256": "714aa56117bc694bcceb808062ac9ec4923a3a66a8599bf3aabe70c0cacdf322",
+      "normalizedCodeIdentical": true
+    },
+    {
+      "path": "src/renderer/composer/re_sample_gen.rs",
+      "baseSha256": "80b7e7537dc4535f88b2fd862a41e0648ce7c477121b6f4012a8ccf7c9620052",
+      "nativeCompiledInitialSha256": "58d3dbeff3c8d3195b4760533433a317789df5c41b0e7cb3757bbf79980085c8",
+      "strictAppliedSha256": "628f7624ad99a94c4ecb98585607963541f61a04dce8d0327ac95ed5553e8319",
+      "normalizedUtf8CodeSha256": "58d3dbeff3c8d3195b4760533433a317789df5c41b0e7cb3757bbf79980085c8",
+      "normalizedCodeIdentical": true
+    },
+    {
+      "path": "src/serializer/cfb_writer/tests.rs",
+      "baseSha256": "25f281051d690577a5e2c827d9adf820b782fa3c7daa05b90cb5cb2d1cbf92e0",
+      "nativeCompiledInitialSha256": "ad0790233b821bb329e71fc6ad79b8cdc39aec9bb06bc6c4436383a6e707dad8",
+      "strictAppliedSha256": "5fa62fd447e16f924e9b01d9b57047bc73a9d61c0da29f38699cca2850b1a9dc",
+      "normalizedUtf8CodeSha256": "ad0790233b821bb329e71fc6ad79b8cdc39aec9bb06bc6c4436383a6e707dad8",
+      "normalizedCodeIdentical": true
+    },
+    {
+      "path": "src/serializer/content_loss.rs",
+      "baseSha256": "f56e00a162229adf1eabcd0f83c5332ec6033637c51e42bc4fc19ae8d9b798ec",
+      "nativeCompiledInitialSha256": "9120caf97225f0cf57fb33f2f3f6d5ebb72dc4096b260c380799dd5bdfce032b",
+      "strictAppliedSha256": "bb6fd19572d483284c8d92e075314dd43835e5caceec2a7ff762cf97bd60883e",
+      "normalizedUtf8CodeSha256": "9120caf97225f0cf57fb33f2f3f6d5ebb72dc4096b260c380799dd5bdfce032b",
+      "normalizedCodeIdentical": true
+    },
+    {
+      "path": "src/serializer/doc_info/tests.rs",
+      "baseSha256": "5ae332af06f82df111db6b0a6ca84b74b6c2120b2489623913af166cf62cce8e",
+      "nativeCompiledInitialSha256": "69d60870bc93934671493879b69cf6de05b93a9550b394357ef606489a5830bb",
+      "strictAppliedSha256": "af1594d897cdae4edd3935443ddd02fe89eace558150c176ac76a9f749a0f346",
+      "normalizedUtf8CodeSha256": "69d60870bc93934671493879b69cf6de05b93a9550b394357ef606489a5830bb",
+      "normalizedCodeIdentical": true
+    },
+    {
+      "path": "src/serializer/hml/preflight.rs",
+      "baseSha256": "c9e536eb46c367a559984630679a44adccf371bf43b2df16ac2e56fc08e697c4",
+      "nativeCompiledInitialSha256": "a79ac72b23f0c717b0d22ebee7fe8b0d1f529a177beb648417e24d64e2878434",
+      "strictAppliedSha256": "bdf9362727d168e3d456dc87f37b9209b7e703e09b92bf81dd6273901a7a059c",
+      "normalizedUtf8CodeSha256": "a79ac72b23f0c717b0d22ebee7fe8b0d1f529a177beb648417e24d64e2878434",
+      "normalizedCodeIdentical": true
+    },
+    {
+      "path": "src/serializer/hwpx/header.rs",
+      "baseSha256": "d74c7ff570be45c2a81b995c39ad85c1e8643deaf39a53220c5a01f5dc22f19d",
+      "nativeCompiledInitialSha256": "2cd63e79f8462b9dc68533c01bc1fcdc3611434a8938e7f8fabef1a0cdfe04ec",
+      "strictAppliedSha256": "c43c23b4dc1530a494db3b9da8d7e7ce753e7894f9f7c67be9db6381580c97a9",
+      "normalizedUtf8CodeSha256": "2cd63e79f8462b9dc68533c01bc1fcdc3611434a8938e7f8fabef1a0cdfe04ec",
+      "normalizedCodeIdentical": true
+    },
+    {
+      "path": "src/serializer/paragraph_metadata_loss.rs",
+      "baseSha256": "bf41182051c045f13509ead447adecb78bfcce7bd60f5bbac9a29dc4aae9f03a",
+      "nativeCompiledInitialSha256": "1caa28227886e1fe4b90be230446c57207ee76b51cbcabfbf787eb2455825a7a",
+      "strictAppliedSha256": "9f2bbec868fb17fd64f366ab542207b63bbcde320956ec6db3d9f5603fc95cab",
+      "normalizedUtf8CodeSha256": "1caa28227886e1fe4b90be230446c57207ee76b51cbcabfbf787eb2455825a7a",
+      "normalizedCodeIdentical": true
+    }
+  ],
+  "native": {
+    "passed": 11,
+    "failed": 0,
+    "ignored": 0,
+    "actualLibraryCompile": "1m15",
+    "log": "native-font-type-candidate83-second.log",
+    "logSha256": "436ef4912219d82a852253582024868c809cd5a4819310a80bcffdb0914a2f2f",
+    "compiledWitnessIncludes": 12,
+    "scope": "Initial candidate byte hashes, separately proven UTF8 code-identical to strict applied source; strict-byte Native re-execution pending next slot."
+  },
+  "firstCompileFailure": {
+    "testsRun": 0,
+    "log": "native-font-type-candidate83-first.log",
+    "sha256": "335585d7548014fe750f330a25e868a7404da77fc9299dc7c4b9046858beb24a",
+    "cause": "Mechanical constructor-field addition also hit FontNameDecision. Removed; no renderer policy changed."
+  },
+  "mechanicalOnlyRuntimeFiles": [
+    "src/document_core/commands/formatting.rs",
+    "src/renderer/composer/re_sample_gen.rs"
+  ],
+  "sourceResolverPolicyChanged": false,
+  "nativeSlot": "Released to native_gui_preparation column3."
+}

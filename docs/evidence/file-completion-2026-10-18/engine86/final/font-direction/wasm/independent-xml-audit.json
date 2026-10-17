@@ -1,0 +1,310 @@
+{
+  "implementation": "Python standard library zipfile + ElementTree, independent of engine parser.",
+  "status": "PASS",
+  "results": [
+    {
+      "label": "direction-LTR-xml",
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\direction-LTR-xml.hwpx",
+      "sha256": "977077fbc68aebb3cbd10e4fe07fe6bcc4397fa4b613559e294338494c6660be",
+      "parsedEntries": [
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "settings.xml",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ],
+      "firstFontType": "TTF",
+      "firstDirection": "LTR",
+      "fullFirstParagraphResourceEqual": true,
+      "status": "PASS"
+    },
+    {
+      "label": "direction-RTL-xml",
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\direction-RTL-xml.hwpx",
+      "sha256": "05159146c1575636bfb1e714d24f9aea979a7ddcfbd3cd1de0471f94ac5ff618",
+      "parsedEntries": [
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "settings.xml",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ],
+      "firstFontType": "TTF",
+      "firstDirection": "RTL",
+      "fullFirstParagraphResourceEqual": true,
+      "status": "PASS"
+    },
+    {
+      "label": "direction-AUTO-xml",
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\direction-AUTO-xml.hwpx",
+      "sha256": "cbb0a6dace4d2623dc788b22c66901a3575bd57c6293ccbc9720da5c0c53e51d",
+      "parsedEntries": [
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "settings.xml",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ],
+      "firstFontType": "TTF",
+      "firstDirection": "AUTO",
+      "fullFirstParagraphResourceEqual": true,
+      "status": "PASS"
+    },
+    {
+      "label": "font-ttf-xml",
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\font-ttf-xml.hwpx",
+      "sha256": "00c51a32ef41d7775375cb2de08b1dbbbf492a0c0eb9bb2ed4a27d2b1f2b1ddc",
+      "parsedEntries": [
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "settings.xml",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ],
+      "firstFontType": "TTF",
+      "fullFirstFontResourceEqual": true,
+      "status": "PASS"
+    },
+    {
+      "label": "font-hft-xml",
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\font-hft-xml.hwpx",
+      "sha256": "d0ac0e7c48ba46d203385651b10da0cdbac938f52de11c2e9d89423347bbe8bd",
+      "parsedEntries": [
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "settings.xml",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ],
+      "firstFontType": "HFT",
+      "fullFirstFontResourceEqual": true,
+      "status": "PASS"
+    },
+    {
+      "label": "font-rep-xml",
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\font-rep-xml.hwpx",
+      "sha256": "e36530a080d70e7060a6dfd851ea2c89441b43f4edcaace234e3d9398f98bce8",
+      "parsedEntries": [
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "settings.xml",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ],
+      "firstFontType": "REP",
+      "fullFirstFontResourceEqual": true,
+      "status": "PASS"
+    },
+    {
+      "label": "font-unknown-xml",
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\font-unknown-xml.hwpx",
+      "sha256": "e36530a080d70e7060a6dfd851ea2c89441b43f4edcaace234e3d9398f98bce8",
+      "parsedEntries": [
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "settings.xml",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ],
+      "firstFontType": "REP",
+      "status": "PASS"
+    },
+    {
+      "label": "font-missing-xml",
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\font-missing-xml.hwpx",
+      "sha256": "e36530a080d70e7060a6dfd851ea2c89441b43f4edcaace234e3d9398f98bce8",
+      "parsedEntries": [
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "settings.xml",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ],
+      "firstFontType": "REP",
+      "status": "PASS"
+    },
+    {
+      "label": "font-unknown-substitute-xml",
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\font-unknown-substitute-xml.hwpx",
+      "sha256": "9795bd6bf81617098e073f1f13b2e53beca89d1c3415a9e025484b69d5a08a8e",
+      "parsedEntries": [
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "settings.xml",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ],
+      "firstFontType": "TTF",
+      "status": "PASS"
+    },
+    {
+      "label": "font-hft-ttf-substitute-xml",
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\font-hft-ttf-substitute-xml.hwpx",
+      "sha256": "bc48786e9424ee2032a37ccc1e7aa2ca75747a6504221411711cafbb6f307b68",
+      "parsedEntries": [
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "settings.xml",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ],
+      "firstFontType": "HFT",
+      "fullFirstFontResourceEqual": true,
+      "status": "PASS"
+    },
+    {
+      "label": "font-rep-substitute-xml",
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\font-rep-substitute-xml.hwpx",
+      "sha256": "9795bd6bf81617098e073f1f13b2e53beca89d1c3415a9e025484b69d5a08a8e",
+      "parsedEntries": [
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "settings.xml",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ],
+      "firstFontType": "TTF",
+      "fullFirstFontResourceEqual": true,
+      "status": "PASS"
+    },
+    {
+      "label": "font-missing-substitute-xml",
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\font-missing-substitute-xml.hwpx",
+      "sha256": "9795bd6bf81617098e073f1f13b2e53beca89d1c3415a9e025484b69d5a08a8e",
+      "parsedEntries": [
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "settings.xml",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ],
+      "firstFontType": "TTF",
+      "status": "PASS"
+    },
+    {
+      "label": "font-lowercase-unknown-xml",
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\font-lowercase-unknown-xml.hwpx",
+      "sha256": "e36530a080d70e7060a6dfd851ea2c89441b43f4edcaace234e3d9398f98bce8",
+      "parsedEntries": [
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "settings.xml",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ],
+      "firstFontType": "REP",
+      "status": "PASS"
+    },
+    {
+      "label": "font-native-unknown-zero-xml",
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\font-native-unknown-zero-xml.hwpx",
+      "sha256": "3fc99ed8328007960e77f761aad4c821c7a8ae311f53d646bf6833a92f671e12",
+      "parsedEntries": [
+        "version.xml",
+        "Contents/header.xml",
+        "Contents/section0.xml",
+        "settings.xml",
+        "Contents/content.hpf",
+        "META-INF/container.xml",
+        "META-INF/manifest.xml"
+      ],
+      "firstFontType": "REP",
+      "status": "PASS"
+    }
+  ],
+  "inputImmutability": [
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\text-direction-closure83\\valid-v2\\own-LTR.hwpx",
+      "sha256": "616da60248ef663d0490caf5b96aa7c4ab4438b3a3b3abc13b127c020c7626f4",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\text-direction-closure83\\valid-v2\\own-RTL.hwpx",
+      "sha256": "f75bd959a4c03fc5d3aa61ef279883b70e8451262b0b84edf2dea8da7cacd387",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\text-direction-closure83\\valid-v2\\own-AUTO.hwpx",
+      "sha256": "4f0b0e7e500f97908a0e4cafef200948707459e97318375bcdcb1f09cc421046",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\text-direction-closure83\\font-type-inputs83-v2\\own-font-TTF.hwpx",
+      "sha256": "7a88d00977f01a5c127d47732c62a47622839dfff3dfea8dfa2cca01f73bd184",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\text-direction-closure83\\font-type-inputs83-v2\\own-font-HFT.hwpx",
+      "sha256": "9315a5f206483f3657db2f65083143ce56e85c8952b2e97abd91860d39b25434",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\text-direction-closure83\\font-type-inputs83-v2\\own-font-REP.hwpx",
+      "sha256": "fec799177e954bfef416b7063aa1aff7f6ac3656d1dba523d3b8459d22806cc0",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\text-direction-closure83\\font-type-inputs83-v2\\own-font-UNKNOWN.hwpx",
+      "sha256": "4fd03d900e905acc292ca79aa9cbbbd87368b3fc17ed927a3e5736d3e3866530",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\text-direction-closure83\\font-type-inputs83-v2\\own-font-MISSING.hwpx",
+      "sha256": "87aae9a8b88cca062874fe54009241650e73493c5d52cb787fd393e107d73667",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\generated-inputs\\unknown-substitute.hwpx",
+      "sha256": "fbed1a564c1d89b489b1b7cb576064a46c1f39ea143cabf251d0b5784a8eefcd",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\generated-inputs\\hft-ttf-substitute.hwpx",
+      "sha256": "fe53712dc26503006542b896f720a93e2ab02ec669eda5ca10ec8163e85e4f0e",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\generated-inputs\\rep-substitute.hwpx",
+      "sha256": "739847fb8d0bc62f0cfcf2b6e875e07b1103be07439d129e443c53a491da33ac",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\generated-inputs\\missing-substitute.hwpx",
+      "sha256": "a59596eac8fae57dda3f4e97115b3da4fe4c896b83025d97122235ccb1a22ae5",
+      "unchanged": true
+    },
+    {
+      "path": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-source-contracts-final86-wasm\\generated-inputs\\lowercase-primary.hwpx",
+      "sha256": "7f78966c3bcc93bbc43183a70b16d04664fa0456f5ca59b2cd43e1321f1849fe",
+      "unchanged": true
+    }
+  ],
+  "failures": [],
+  "actualNativeHancomExecution": false
+}

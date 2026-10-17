@@ -1,0 +1,77 @@
+    Blocking waiting for file lock on package cache
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/text-direction-closure83/source-xml-exact-candidate83)
+error[E0432]: unresolved import `rhwp::model::style::ParagraphTextDirection`
+ --> tests/jueony_xml_text_direction.rs:1:50
+  |
+1 | ...pe,ParagraphTextDirection}};
+  |       ^^^^^^^^^^^^^^^^^^^^^^ no `ParagraphTextDire...odel::style`
+
+error[E0609]: no field `hwpx_text_direction` on type `ParaShape`
+ --> tests/jueony_xml_text_direction.rs:6:163
+  |
+6 | ...e].hwpx_text_direction.cl...
+  |       ^^^^^^^^^^^^^^^^^^^ unknown field
+  |
+  = note: available fields are: `suppress_line_numbers`, `raw_data`, `attr1`, `margin_left`, `margin_right` ... and 18 others
+
+error[E0609]: no field `hwpx_text_direction` on type `&...`
+  --> tests/jueony_xml_text_direction.rs:12:292
+   |
+12 | ...|s.hwpx_text_direction.is...
+   |       ^^^^^^^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `suppress_line_numbers`, `raw_data`, `attr1`, `margin_left`, `margin_right` ... and 18 others
+   = note: the full name for the type has been written to '/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_xml_text_direction-3b98bf2119f744fa.long-type-6183356778160586686.txt'
+   = note: consider using `--verbose` to print the full type name to the console
+
+error[E0609]: no field `hwpx_text_direction` on type `ParaShape`
+  --> tests/jueony_xml_text_direction.rs:13:297
+   |
+13 | ...0].hwpx_text_direction=So...
+   |       ^^^^^^^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `suppress_line_numbers`, `raw_data`, `attr1`, `margin_left`, `margin_right` ... and 18 others
+
+error[E0609]: no field `hwpx_text_direction` on type `ParaShape`
+  --> tests/jueony_xml_text_direction.rs:14:118
+   |
+14 | ...;b.hwpx_text_direction=So...
+   |       ^^^^^^^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `suppress_line_numbers`, `raw_data`, `attr1`, `margin_left`, `margin_right` ... and 18 others
+
+error[E0609]: no field `hwpx_text_direction` on type `ParaShape`
+  --> tests/jueony_xml_text_direction.rs:14:211
+   |
+14 | ...;c.hwpx_text_direction=So...
+   |       ^^^^^^^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `suppress_line_numbers`, `raw_data`, `attr1`, `margin_left`, `margin_right` ... and 18 others
+
+error[E0609]: no field `hwpx_text_direction` on type `ParaShape`
+  --> tests/jueony_xml_text_direction.rs:14:303
+   |
+14 | ...;d.hwpx_text_direction=So...
+   |       ^^^^^^^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `suppress_line_numbers`, `raw_data`, `attr1`, `margin_left`, `margin_right` ... and 18 others
+
+error[E0609]: no field `hwpx_text_direction` on type `ParaShape`
+  --> tests/jueony_xml_text_direction.rs:14:409
+   |
+14 | ...(d.hwpx_text_direction,So...
+   |       ^^^^^^^^^^^^^^^^^^^ unknown field
+   |
+   = note: available fields are: `suppress_line_numbers`, `raw_data`, `attr1`, `margin_left`, `margin_right` ... and 18 others
+
+error[E0560]: struct `ParaShape` has no field named `hwpx_text_direction`
+  --> tests/jueony_xml_text_direction.rs:15:348
+   |
+15 | ...pe{hwpx_text_direction:So...
+   |       ^^^^^^^^^^^^^^^^^^^ `ParaShape` does not have this field
+   |
+   = note: available fields are: `suppress_line_numbers`, `raw_data`, `attr1`, `margin_left`, `margin_right` ... and 18 others
+
+Some errors have detailed explanations: E0432, E0560, E0609.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `rhwp` (test "jueony_xml_text_direction") due to 9 previous errors

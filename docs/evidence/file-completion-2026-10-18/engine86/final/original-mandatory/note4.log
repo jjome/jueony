@@ -1,0 +1,4 @@
+FAIL actual MCST native note records and complete layout survive two cycles of each format plus six alternating saves PreservationError
+PASS real endnote format API, snapshot Undo/Redo and both storage formats preserve requested independent slots
+PASS native original note payloads remain immutable through unedited native save
+PASS corrupted published layout injection is still rejected before any sink write

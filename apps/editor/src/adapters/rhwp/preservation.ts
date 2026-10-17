@@ -208,12 +208,24 @@ export function capturePreservationEvidence(value:NativeDocument):PreservationEv
  return {values,issues,unverified:[...new Set(unverified)]};
 }
 
+function serializerLossMessage(count:number,losses:unknown[],format:Format):string {
+ const has=(subject:string,path:RegExp)=>losses.some(item=>{
+  if(!item||typeof item!=='object'||Array.isArray(item))return false;
+  const value=item as Record<string,unknown>;
+  return value.code==='metadataReduced'&&value.subject===subject&&typeof value.path==='string'&&path.test(value.path);
+ });
+ const details:string[]=[];
+ if(format==='hwp'&&has('paragraphProperties',/^docInfo\/paraShape\/\d+\/textDir$/))details.push('원본의 명시적 글 방향을 HWP로 보존하는 변환은 지원하지 않습니다. HWPX로 저장해 보존 검사를 진행해 주세요');
+ if(has('fontProperties',/^docInfo\/font\/\d+\/\d+\/(?:substFont\/)?type$/))details.push('원본 글꼴 유형을 안전하게 보존할 수 없어 저장을 중단했습니다');
+ return `직렬화기가 ${count}건의 손실을 보고했습니다`+(details.length?`. ${details.join('. ')}`:'');
+}
+
 export function comparePreservationEvidence(before:PreservationEvidence,after:PreservationEvidence,format:Format,contentLoss:unknown):PreservationReport {
  const issues=[...before.issues,...after.issues],checked:string[]=[];
  let loss:Record<string,unknown>|undefined;
  try{loss=(typeof contentLoss==='string'?JSON.parse(contentLoss):contentLoss) as Record<string,unknown>;}catch{}
  if(!loss||loss.schemaVersion!==1||loss.outputFormat!==format||!Number.isSafeInteger(loss.count)||!Array.isArray(loss.losses)||loss.count!==loss.losses.length)issues.push({code:'unreadable',path:'serializer-report',message:'유효한 손실 보고서가 없습니다'});
- else if(loss.count!==0)issues.push({code:'content-loss',path:'serializer-report',message:`직렬화기가 ${loss.count}건의 손실을 보고했습니다`});
+ else if(loss.count!==0)issues.push({code:'content-loss',path:'serializer-report',message:serializerLossMessage(loss.count as number,loss.losses,format)});
  for(const path of new Set([...Object.keys(before.values),...Object.keys(after.values)])){
   if(!(path in before.values)||!(path in after.values)||signature(before.values[path])!==signature(after.values[path]))issues.push({code:'changed',path,message:'저장 전후 값이 다릅니다'});
   else checked.push(path);

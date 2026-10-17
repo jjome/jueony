@@ -1,0 +1,38 @@
+{
+  "schema": {
+    "path": "upstream\\rhwp-source\\mydocs\\manual\\OWPML SCHEMA\\Header XML schema.xml",
+    "sha256": "9c836d7d73727dff176ef9e9cd98c216a16911e457f74f166ea4b8da30cb0bd8",
+    "fontAndSubstituteType": {
+      "required": true,
+      "enum": [
+        "REP",
+        "TTF",
+        "HFT"
+      ],
+      "REP": "Representative font; distinct from TTF and HFT."
+    }
+  },
+  "hwp5Specification": {
+    "path": "upstream\\rhwp-source\\mydocs\\tech\\한글문서파일형식_5.0_revision1.3.md",
+    "sha256": "746a628a44d4253c7d3c3c5026311101ce09a9635108a2aa733057b6ed624f5f",
+    "table21": {
+      "0": "Unknown original type",
+      "1": "TTF",
+      "2": "HFT"
+    },
+    "representativeMapping": "No proven mapping; no reserved bits guessed."
+  },
+  "candidatePolicy": {
+    "xmlExplicitREP": "Exact REP output, no TTF authority.",
+    "xmlExplicitTTFAndHFT": "Exact known output.",
+    "xmlUnknownOrMissing": "No TTF relabeling; explicit resource-level loss before writing.",
+    "nativeOrGeneratedUnknown0": "HWP retains unknown native value. HWPX report required because representative identity is not established.",
+    "fieldScope": "Primary Font and each SubstFont separately, including unused resources."
+  },
+  "limitations": [
+    "No inferred trust by face name.",
+    "No font installation, extraction, embedding, or network fonts.",
+    "No renderer metric guard changes.",
+    "Candidate not yet executed; source compilation is separately required."
+  ]
+}

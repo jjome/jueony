@@ -1,0 +1,120 @@
+{
+  "status": "BUILD_INPUT_AND_ARTIFACT_PROVENANCE_PASS_NO_GUI_RUN",
+  "engineSourceId": "b59322fd380dc175",
+  "wasmSHA": "ef130c08536b38349bfb0c9b94a4478094c85df04ba2969ef4e4f65d05363f17",
+  "binarySHA": "f1a3d7206413765de6f4845de017fb0705e94da76590f9fd8fb2c76b8140a676",
+  "binaryBytes": 58507264,
+  "validPEHeader": true,
+  "frontendInputFilesVerified": 85,
+  "productionInputFilesVerified": 12,
+  "oldExecutablesUnchanged": 7,
+  "isolatedNativeSourceProof": [
+    {
+      "path": "build.rs",
+      "productionSHA": "487059eaf8a947b80f20a9aacac038a5047b2ad69d2401b827376c67d6fe847f",
+      "isolatedBuildSHA": "487059eaf8a947b80f20a9aacac038a5047b2ad69d2401b827376c67d6fe847f",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "capabilities/main.json",
+      "productionSHA": "de9d8cc1bf67d5f18d27b0f62cce1f0a0970a748add67e664c2ec41001aa5da6",
+      "isolatedBuildSHA": "de9d8cc1bf67d5f18d27b0f62cce1f0a0970a748add67e664c2ec41001aa5da6",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "Cargo.lock",
+      "productionSHA": "e4723f8ae42e219fbf756e81447abceb25163b1d90e955de45cf7cafdd0666c0",
+      "isolatedBuildSHA": "e4723f8ae42e219fbf756e81447abceb25163b1d90e955de45cf7cafdd0666c0",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "Cargo.toml",
+      "productionSHA": "35889481f2e3bddb60fbcf1a860f8ab2cae2b8849afeac2e5f81147346016141",
+      "isolatedBuildSHA": "d2312cac7de8c5b4c66507e76feb93e0a46d0d634df095929f63c29156e9b62c",
+      "byteIdenticalToProduction": false
+    },
+    {
+      "path": "icons/icon.ico",
+      "productionSHA": "8a7886a266fa3481e452d7630e80e6bde0d55b250ed7ab52af79f3edc43d4bf9",
+      "isolatedBuildSHA": "8a7886a266fa3481e452d7630e80e6bde0d55b250ed7ab52af79f3edc43d4bf9",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "icons/README.md",
+      "productionSHA": "604acd09d74b3875493b35d1cc74cf1ef0f5c30eaf511207c8a8cbea3b7e0c42",
+      "isolatedBuildSHA": "604acd09d74b3875493b35d1cc74cf1ef0f5c30eaf511207c8a8cbea3b7e0c42",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "src/document_windows.rs",
+      "productionSHA": "4c66178486d365bba70881b3f467cb96d462574635768a7316ccfa8c22f75359",
+      "isolatedBuildSHA": "4c66178486d365bba70881b3f467cb96d462574635768a7316ccfa8c22f75359",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "src/file_bindings.rs",
+      "productionSHA": "68e85ae216b9887a56bc50a3e2cb774b88eaac9fed6682f150b8f7bb3f13fe11",
+      "isolatedBuildSHA": "68e85ae216b9887a56bc50a3e2cb774b88eaac9fed6682f150b8f7bb3f13fe11",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "src/main.rs",
+      "productionSHA": "1635438473100355e1d0fc39274bfe94c897cca5e49801577bb136f08ff855b6",
+      "isolatedBuildSHA": "1635438473100355e1d0fc39274bfe94c897cca5e49801577bb136f08ff855b6",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "src/native_recents.rs",
+      "productionSHA": "1ee44e4d9c1cbbd2a1b6916b5492a8f16d5366627f120bb01e4495894d66b1a2",
+      "isolatedBuildSHA": "1ee44e4d9c1cbbd2a1b6916b5492a8f16d5366627f120bb01e4495894d66b1a2",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "src/storage.rs",
+      "productionSHA": "26b9727428c1d53b7ef054e07264e7fb9dc9ad6afd117434c52bff5772ae854e",
+      "isolatedBuildSHA": "26b9727428c1d53b7ef054e07264e7fb9dc9ad6afd117434c52bff5772ae854e",
+      "byteIdenticalToProduction": true
+    },
+    {
+      "path": "tauri.conf.json",
+      "productionSHA": "c377f499d3a61c5e786b2c895b24fff1787b10bf8a12268d3c5a9b6e8138a54f",
+      "isolatedBuildSHA": "c377f499d3a61c5e786b2c895b24fff1787b10bf8a12268d3c5a9b6e8138a54f",
+      "byteIdenticalToProduction": true
+    }
+  ],
+  "configuration": {
+    "sha256": "4a4ccf75be7ac8865397108f069593504be4f6d811150cfba1630fe65b5d779f",
+    "identifier": "local.jueony.nativefinal86review20261018",
+    "frontendDist": "../../../../apps/editor/evidence/dist-file-closure-check86",
+    "embeddedAssetPathNotAbsoluteURL": true,
+    "mainURL": "index.html",
+    "csp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data: blob:; connect-src 'self' ipc: http://ipc.localhost; worker-src 'self' blob:; object-src 'none'; base-uri 'self'"
+  },
+  "capability": {
+    "sourceSHA": "de9d8cc1bf67d5f18d27b0f62cce1f0a0970a748add67e664c2ec41001aa5da6",
+    "compiledSHA": "b4eb8d17885d85c4797aa609754068bd383f988f90849dcaf507d4e9362e86e7",
+    "sourceAndCompiledPermissionSetsExact": true,
+    "permissions": [
+      "core:default",
+      "core:window:allow-close",
+      "core:window:allow-destroy"
+    ]
+  },
+  "productionSourceUnchanged": true,
+  "frontendUnchanged": true,
+  "lockfileUnchanged": true,
+  "limitations": [
+    "The new86 application was never launched, approved, installed, or used to control any OS dialog.",
+    "Static relative embedded-asset configuration is proven; actual runtime navigation/picker/IPC/recovery behavior is not revalidated.",
+    "API backend is not included in this native file preview. Root standalone4355 backend is a separate deliverable.",
+    "Prior actual Windows68 GUI success applies to that older binary. Current storage.rs/recents source identity does not make all current command routing or UI behavior identical."
+  ],
+  "actions": {
+    "cargoWindowsOfflineLocked": true,
+    "cargoWSLUsed": false,
+    "launchedApp": false,
+    "requestedApproval": false,
+    "terminatedWindowOrServer": false,
+    "copiedBinaryIntoEvidence": false
+  }
+}

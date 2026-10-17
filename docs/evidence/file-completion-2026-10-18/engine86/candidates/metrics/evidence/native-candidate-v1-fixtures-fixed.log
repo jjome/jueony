@@ -1,0 +1,26 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.83s
+     Running tests/jueony_gulimche_admission.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_gulimche_admission-3681010be003f08d)
+
+running 5 tests
+test guli_excluded_measurement_contexts ... ok
+test guli_own68_both_formats_two_cycles ... ok
+test guli_own68_independent_native_admission_boundaries ... 
+thread 'guli_own68_independent_native_admission_boundaries' (252194) panicked at tests/jueony_gulimche_admission.rs:22:167:
+1 native admission mismatches; [Object {"actual": Array [Number(0), Number(30)], "actualInput": Bool(false), "expected": Array [Number(0), Number(31)], "file": String("build/line-fit-threshold80/own-gulimche-half-glyph-matrix-no-ls.hwpx"), "table": Number(1)}]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+test guli_real_cell_edit_snapshot_history ... 
+thread 'guli_real_cell_edit_snapshot_history' (252195) panicked at tests/jueony_gulimche_admission.rs:13:97:
+real edit first save: 7 full geometry differences; [Object {"after": Null, "before": Number(335.8), "path": String("pages/0/text/runs/0/charX/31")}, Object {"after": Object {"characters": Number(30), "sha256": String("eca65af41f4aa0da6d57fda55e09c71a0a2f65faee471079a0007732e4280ac6")}, "before": Object {"characters": Number(31), "sha256": String("b6d400237552db5f4c93c85198cd8c18fcde784b28215a3da0e3bd9bcca7a85a")}, "path": String("pages/0/text/runs/0/text")}, Object {"after": Number(323.9), "before": Number(335.8), "path": String("pages/0/text/runs/0/w")}, Object {"after": Number(30), "before": Number(31), "path": String("pages/0/text/runs/1/charStart")}]
+FAILED
+test guli_shared_measured_glyph_decisions ... ok
+
+failures:
+
+failures:
+    guli_own68_independent_native_admission_boundaries
+    guli_real_cell_edit_snapshot_history
+
+test result: FAILED. 3 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.18s
+
+error: test failed, to rerun pass `-p rhwp --test jueony_gulimche_admission`

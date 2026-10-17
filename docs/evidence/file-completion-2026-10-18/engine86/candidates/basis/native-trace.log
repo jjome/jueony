@@ -1,0 +1,30 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/mcst-leading-gap83/source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.66s
+     Running tests/jueony_mcst_leading_gap83.rs (/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/jueony_mcst_leading_gap83-1734d764441496fe)
+
+running 1 test
+GAP83_INPUT original
+GAP83_SNAP_IN pi=43 empty=true current=0 anchor=0 pagebase=None lazy=None before=4
+GAP83_SNAP_OUT pi=43 current=0 result=0 pagebase=Some(0) lazy=None
+GAP83_TAC_ENTER pi=44 hwp=true hwpx=false edited=false current=31.733333333333334 anchor=0 base=Some(0) lazy=None before=4 shared=0 source=None runtime=[LineSeg { text_start: 0, vertical_pos: 2680, line_height: 36277, text_height: 36277, baseline_distance: 30835, line_spacing: 456, column_start: 500, segment_width: 47688, tag: 393216 }]
+GAP83_TAC_PLAN single=true source_top=35.733333333333334 flow=31.733333333333334 saved=35.733333333333334
+GAP83_SNAP_IN pi=45 empty=false current=525.5066666666667 anchor=0 pagebase=Some(0) lazy=None before=4
+VPOS_CORR: path=page pi=45 prev_pi=44 prev_vpos=2680 prev_lh=36277 prev_ls=456 vpos_end=39713 base=0 col_y=0.00 y_in=525.51 end_y=525.51 result=525.51 stale_forward=false large_gap_body_stale=false current_title=false title_bottom=false page_tail=false equation_tail=false single_tail=false zero_gap_title=false compact_new_note=false compact_stale_note_gap=false compact_tac_pic_gap=false compact_bottom_rewind=false compact_deep_backtrack=false compact_safe_backtrack=false applied=true
+GAP83_SNAP_OUT pi=45 current=525.5066666666667 result=525.5066666666667 pagebase=Some(0) lazy=None
+VPOS_CORR: path=page pi=44 prev_pi=43 prev_vpos=300 prev_lh=1300 prev_ls=780 vpos_end=2680 base=0 col_y=113.36 y_in=145.09 end_y=145.09 result=145.09 stale_forward=false large_gap_body_stale=false current_title=false title_bottom=false page_tail=false equation_tail=false single_tail=false zero_gap_title=false compact_new_note=false compact_stale_note_gap=false compact_tac_pic_gap=false compact_bottom_rewind=false compact_deep_backtrack=false compact_safe_backtrack=false applied=true
+GAP83_INPUT actual
+GAP83_SNAP_IN pi=43 empty=false current=895.7600000000001 anchor=0 pagebase=Some(0) lazy=None before=4
+VPOS_CORR: path=page pi=43 prev_pi=42 prev_vpos=13832 prev_lh=52570 prev_ls=780 vpos_end=67182 base=0 col_y=0.00 y_in=895.76 end_y=891.76 result=891.76 stale_forward=false large_gap_body_stale=false current_title=false title_bottom=false page_tail=false equation_tail=false single_tail=false zero_gap_title=false compact_new_note=false compact_stale_note_gap=false compact_tac_pic_gap=false compact_bottom_rewind=false compact_deep_backtrack=false compact_safe_backtrack=false applied=true
+GAP83_SNAP_OUT pi=43 current=895.7600000000001 result=891.76 pagebase=Some(0) lazy=None
+GAP83_TAC_ENTER pi=44 hwp=false hwpx=true edited=false current=31.733333333333334 anchor=0 base=None lazy=None before=4 shared=0 source=Some([2680]) runtime=[LineSeg { text_start: 0, vertical_pos: 69562, line_height: 36277, text_height: 36277, baseline_distance: 30835, line_spacing: 456, column_start: 500, segment_width: 47688, tag: 393216 }]
+GAP83_TAC_REJECT saved=927.4933333333333 current=31.733333333333334 unreserved=35.733333333333334
+GAP83_TAC_ENTER pi=44 hwp=false hwpx=true edited=false current=31.733333333333334 anchor=0 base=None lazy=None before=4 shared=0 source=Some([2680]) runtime=[LineSeg { text_start: 0, vertical_pos: 69562, line_height: 36277, text_height: 36277, baseline_distance: 30835, line_spacing: 456, column_start: 500, segment_width: 47688, tag: 393216 }]
+GAP83_TAC_REJECT saved=927.4933333333333 current=31.733333333333334 unreserved=35.733333333333334
+GAP83_SNAP_IN pi=45 empty=false current=525.5066666666667 anchor=0 pagebase=None lazy=None before=4
+VPOS_CORR: path=lazy pi=45 prev_pi=44 prev_vpos=69562 prev_lh=36277 prev_ls=456 vpos_end=106295 base=66882 col_y=0.00 y_in=525.51 end_y=521.51 result=521.51 stale_forward=false large_gap_body_stale=false current_title=false title_bottom=false page_tail=false equation_tail=false single_tail=false zero_gap_title=false compact_new_note=false compact_stale_note_gap=false compact_tac_pic_gap=false compact_bottom_rewind=false compact_deep_backtrack=false compact_safe_backtrack=false applied=true
+GAP83_SNAP_OUT pi=45 current=525.5066666666667 result=521.5066666666667 pagebase=None lazy=Some(66882)
+VPOS_CORR: path=page pi=44 prev_pi=43 prev_vpos=67182 prev_lh=1300 prev_ls=780 vpos_end=69562 base=67182 col_y=113.36 y_in=145.09 end_y=141.09 result=141.09 stale_forward=false large_gap_body_stale=false current_title=false title_bottom=false page_tail=false equation_tail=false single_tail=false zero_gap_title=false compact_new_note=false compact_stale_note_gap=false compact_tac_pic_gap=false compact_bottom_rewind=false compact_deep_backtrack=false compact_safe_backtrack=false applied=true
+test original_native_vs_actual_xml_leading_gap_trace ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.67s
+

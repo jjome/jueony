@@ -1,0 +1,210 @@
+   Compiling rhwp-password-crypto v0.1.0 (/mnt/c/Users/jjome/Documents/work/jueony/build/raw-namespace-closure83/source/crates/rhwp-password-crypto)
+   Compiling rhwp-contracts v0.1.0 (/mnt/c/Users/jjome/Documents/work/jueony/build/raw-namespace-closure83/source/crates/rhwp-contracts)
+   Compiling rhwp-ooxml-chart v0.1.0 (/mnt/c/Users/jjome/Documents/work/jueony/build/raw-namespace-closure83/source/crates/rhwp-ooxml-chart)
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/raw-namespace-closure83/source)
+error: couldn't read `/mnt/c/Users/jjome/Documents/work/jueony/build/raw-namespace-closure83/source/crates/rhwp-contracts/../../mydocs/tech/agent_runtime/version_policy.md`: No such file or directory (os error 2)
+   --> crates/rhwp-contracts/src/schema_registry.rs:155:39
+    |
+155 |           const POLICY_DOCUMENT: &str = incl...
+    |  _______________________________________^
+156 | |             env!("CARGO_MANIFEST_DIR"),
+157 | |             "/../../mydocs/tech/agent_runt...
+158 | |         ));
+    | |__________^
+
+error: could not compile `rhwp-contracts` (lib test) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: couldn't read `src/document_core/commands/../../../samples/3-09월_교육_통합_2022.hwp`: No such file or directory (os error 2)
+    --> src/document_core/commands/document.rs:3736:34
+     |
+3736 | ...es(include_bytes!("../../../samples/3-09월_교육_통합_2022.hwp"))
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/document_core/commands/../../../samples/hml/formatting_table.hml`: No such file or directory (os error 2)
+    --> src/document_core/commands/document.rs:3762:38
+     |
+3762 | ...es(include_bytes!("../../../samples/hml/formatting_table.hml"))
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/document_core/commands/../../../samples/hwp3-sample16-hwp5.hwp`: No such file or directory (os error 2)
+    --> src/document_core/commands/formatting.rs:2522:38
+     |
+2522 | ...es(include_bytes!("../../../samples/hwp3-sample16-hwp5.hwp"))
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/document_core/queries/../../../samples/render-p35-font-native-bitmap.hwpx`: No such file or directory (os error 2)
+    --> src/document_core/queries/rendering.rs:9122:21
+     |
+9122 | ... = include_bytes!("../../../samples/render-p35-font-native-bitmap.hwpx");
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/document_core/queries/../../../tests/fixtures/fonts/RHWPBitmapSvgGlyphSmoke.ttf`: No such file or directory (os error 2)
+    --> src/document_core/queries/rendering.rs:9335:19
+     |
+9335 | ...a: include_by...
+     |       ^^^^^^^^^^...
+
+error: couldn't read `src/document_core/queries/../../../samples/render-p35-font-native-bitmap.hwpx`: No such file or directory (os error 2)
+    --> src/document_core/queries/rendering.rs:9409:21
+     |
+9409 | ... = include_bytes!("../../../samples/render-p35-font-native-bitmap.hwpx");
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/paint/../../tests/fixtures/fonts/RHWPBitmapSvgGlyphSmoke.ttf`: No such file or directory (os error 2)
+   --> src/paint/builder.rs:546:20
+    |
+546 | ... = include_bytes!("../../tests/fixtures/fonts/RHWPBitmapSvgGlyphSmoke.ttf");
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/paint/../../tests/fixtures/fonts/RHWPBitmapSvgGlyphSmoke.ttf`: No such file or directory (os error 2)
+    --> src/paint/font_glyph.rs:1005:9
+     |
+1005 | ...   ...moke.ttf")
+     |       ...^^^^^^^^^^
+
+error: couldn't read `src/paint/../../tests/fixtures/fonts/RHWPExactFaceSmoke.ttc`: No such file or directory (os error 2)
+    --> src/paint/font_glyph.rs:1014:9
+     |
+1014 | ...   ...moke.ttc")
+     |       ...^^^^^^^^^^
+
+error: couldn't read `src/paint/../../tests/fixtures/fonts/RHWPExactFaceSmoke.ttc`: No such file or directory (os error 2)
+    --> src/paint/json.rs:3245:32
+     |
+3245 | ... = include_bytes!("../../tests/fixtures/fonts/RHWPExactFaceSmoke.ttc");
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/paint/../../tests/fixtures/fonts/RHWPExactFaceSmoke.ttc`: No such file or directory (os error 2)
+   --> src/paint/text_v2.rs:840:32
+    |
+840 | ... = include_bytes!("../../tests/fixtures/fonts/RHWPExactFaceSmoke.ttc");
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/parser/../../samples/hml/formatting_table.hml`: No such file or directory (os error 2)
+    --> src/parser/mod.rs:2957:42
+     |
+2957 | ...ta(include_bytes!("../../samples/hml/formatting_table.hml"))
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/renderer/../../ttfs/opensource/NotoSansKR-Regular.ttf`: No such file or directory (os error 2)
+   --> src/renderer/font_metrics_data.rs:321:9
+    |
+321 | ...   i...lar.ttf");
+    |       ^...^^^^^^^^^
+
+error: couldn't read `src/renderer/../../tests/fixtures/fonts/RHWPExactFaceSmoke.ttc`: No such file or directory (os error 2)
+    --> src/renderer/layer_renderer.rs:1058:32
+     |
+1058 | ... = include_bytes!("../../tests/fixtures/fonts/RHWPExactFaceSmoke.ttc");
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/renderer/svg/../../../tests/fixtures/fonts/RHWPHostFixture-Regular.ttf`: No such file or directory (os error 2)
+   --> src/renderer/svg/tests.rs:349:19
+    |
+349 | ... = include_byt...
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/renderer/svg/../../../tests/fixtures/fonts/RHWPBitmapSvgGlyphSmoke.ttf`: No such file or directory (os error 2)
+   --> src/renderer/svg/tests.rs:350:23
+    |
+350 | ... = include_bytes!("../../../tests/fixtures/fonts/RHWPBitmapSvgGlyphSmoke.ttf");
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/renderer/svg/../../../tests/fixtures/fonts/RHWPHostFixture.ttc`: No such file or directory (os error 2)
+   --> src/renderer/svg/tests.rs:351:22
+    |
+351 | ... = include_bytes!("../../../tests/fixtures/fonts/RHWPHostFixture.ttc");
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/serializer/hwpx/../../../samples/hwpx/aift.hwpx`: No such file or directory (os error 2)
+    --> src/serializer/hwpx/header.rs:1580:21
+     |
+1580 | ... = include_bytes!("../../../samples/hwpx/aift.hwpx");
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/serializer/hwpx/../../../samples/hwpx/ref/ref_empty.hwpx`: No such file or directory (os error 2)
+    --> src/serializer/hwpx/header.rs:1602:21
+     |
+1602 | ... = include_bytes!("../../../samples/hwpx/ref/ref_empty.hwpx");
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/serializer/hwpx/../../../samples/hwpx/ref/ref_empty.hwpx`: No such file or directory (os error 2)
+    --> src/serializer/hwpx/header.rs:1615:21
+     |
+1615 | ... = include_bytes!("../../../samples/hwpx/ref/ref_empty.hwpx");
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/serializer/hwpx/../../../samples/hwpx/ref/ref_empty.hwpx`: No such file or directory (os error 2)
+    --> src/serializer/hwpx/header.rs:1641:21
+     |
+1641 | ... = include_bytes!("../../../samples/hwpx/ref/ref_empty.hwpx");
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/serializer/hwpx/../../../samples/hwpx/ref/ref_empty.hwpx`: No such file or directory (os error 2)
+    --> src/serializer/hwpx/header.rs:1665:21
+     |
+1665 | ... = include_bytes!("../../../samples/hwpx/ref/ref_empty.hwpx");
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/serializer/hwpx/../../../samples/hwpx/ref/ref_empty.hwpx`: No such file or directory (os error 2)
+    --> src/serializer/hwpx/header.rs:1830:21
+     |
+1830 | ... = include_bytes!("../../../samples/hwpx/ref/ref_empty.hwpx");
+     |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/wasm_api/../../samples/hml/formatting_table.hml`: No such file or directory (os error 2)
+     --> src/wasm_api/tests.rs:24728:17
+      |
+24728 | ... = include...l");
+      |       ^^^^^^^...^^^
+
+error: couldn't read `src/wasm_api/../../samples/hml/formatting_table.hml`: No such file or directory (os error 2)
+     --> src/wasm_api/tests.rs:24748:17
+      |
+24748 | ... = include...l");
+      |       ^^^^^^^...^^^
+
+error: couldn't read `src/wasm_api/../../samples/hml/formatting_table.hml`: No such file or directory (os error 2)
+     --> src/wasm_api/tests.rs:24768:17
+      |
+24768 | ... = include...l");
+      |       ^^^^^^^...^^^
+
+error: couldn't read `src/wasm_api/../../samples/hml/formatting_table.hml`: No such file or directory (os error 2)
+     --> src/wasm_api/tests.rs:24803:39
+      |
+24803 | ...f8(include_bytes!("../../samples/hml/formatting_table.hml"))
+      |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/wasm_api/../../samples/hml/formatting_table.hml`: No such file or directory (os error 2)
+     --> src/wasm_api/tests.rs:24822:39
+      |
+24822 | ...f8(include_bytes!("../../samples/hml/formatting_table.hml"))
+      |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error: couldn't read `src/wasm_api/../../samples/hml/formatting_table.hml`: No such file or directory (os error 2)
+     --> src/wasm_api/tests.rs:24863:39
+      |
+24863 | ...f8(include_bytes!("../../samples/hml/formatting_table.hml"))
+      |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `quick_xml::events::attributes::Attribute::<'a>::decode_and_unescape_value`: decoding is no longer needed, use `Self::normalized_value()` instead
+  --> src/parser/hwpx/raw_namespace.rs:99:26
+   |
+99 | ...tr.decode_and_unescape_value(ch...
+   |       ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+error[E0599]: no method named `decoder` found for struct `NsReader<...>` in the current scope
+  --> src/parser/hwpx/raw_namespace.rs:99:58
+   |
+99 | ...ck.decoder())...
+   |       ^^^^^^^ method not found in `NsReader<...>`
+   |
+   = note: the full name for the type has been written to '/tmp/jueony-rhwp-engine/target/negative-closure70/debug/deps/rhwp-397bfb8c6fdfc3e6.long-type-7150562953930664188.txt'
+   = note: consider using `--verbose` to print the full type name to the console
+
+For more information about this error, try `rustc --explain E0599`.
+warning: `rhwp` (lib test) generated 1 warning
+error: could not compile `rhwp` (lib test) due to 30 previous errors; 1 warning emitted

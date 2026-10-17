@@ -1,0 +1,776 @@
+{
+  "directWasmGroups/result.json": {
+    "source": "build/file-closure86-native-regressions/result.json",
+    "file": "regressions/directWasmGroups/result.json.gz",
+    "sourceSHA256": "8430c6eb201916c47f77cf0dd92cdb72a2ac372d4c672121367513ccae50845e",
+    "sourceBytes": 26249
+  },
+  "directWasmGroups/agent-native/result.json": {
+    "source": "build/file-closure86-native-regressions/agent-native/result.json",
+    "file": "regressions/directWasmGroups/agent-native/result.json.gz",
+    "sourceSHA256": "f18518936238fce37da566afb5527ae6e11442b9295ca27278c19df4bd57aa76",
+    "sourceBytes": 20125
+  },
+  "directWasmGroups/agent-style-next-native/result.json": {
+    "source": "build/file-closure86-native-regressions/agent-style-next-native/result.json",
+    "file": "regressions/directWasmGroups/agent-style-next-native/result.json.gz",
+    "sourceSHA256": "9b5faaa963a0445761b0cb1ae8336d1984a27370615ed697c7c83980d4ba3430",
+    "sourceBytes": 19883
+  },
+  "directWasmGroups/agent-table-header-native/result.json": {
+    "source": "build/file-closure86-native-regressions/agent-table-header-native/result.json",
+    "file": "regressions/directWasmGroups/agent-table-header-native/result.json.gz",
+    "sourceSHA256": "713152455160233728239704c1830874f83fca7902c304fa90c1f613d758008e",
+    "sourceBytes": 20136
+  },
+  "directWasmGroups/agent-table-pagination-native/result.json": {
+    "source": "build/file-closure86-native-regressions/agent-table-pagination-native/result.json",
+    "file": "regressions/directWasmGroups/agent-table-pagination-native/result.json.gz",
+    "sourceSHA256": "60afa94406703362a61da1d4fc3e422773572029cef8785ad51ef56bb4ad1bf1",
+    "sourceBytes": 19934
+  },
+  "directWasmGroups/cell-paragraph-native/result.json": {
+    "source": "build/file-closure86-native-regressions/cell-paragraph-native/result.json",
+    "file": "regressions/directWasmGroups/cell-paragraph-native/result.json.gz",
+    "sourceSHA256": "781abe713228bdf4844716e15b7880a935ec25b769b769e1a7018fa5322a5c79",
+    "sourceBytes": 20829
+  },
+  "directWasmGroups/default-native/result.json": {
+    "source": "build/file-closure86-native-regressions/default-native/result.json",
+    "file": "regressions/directWasmGroups/default-native/result.json.gz",
+    "sourceSHA256": "ee3d69d20ad331a271cfadac423ba97a91f0caeda550afdb074c20e0489c31d7",
+    "sourceBytes": 19520
+  },
+  "directWasmGroups/equal-native/result.json": {
+    "source": "build/file-closure86-native-regressions/equal-native/result.json",
+    "file": "regressions/directWasmGroups/equal-native/result.json.gz",
+    "sourceSHA256": "dc62627560426b2f2b86a79e0cc8398da590bce2c415728dc5e26f2ff71051fc",
+    "sourceBytes": 19544
+  },
+  "directWasmGroups/following-native/result.json": {
+    "source": "build/file-closure86-native-regressions/following-native/result.json",
+    "file": "regressions/directWasmGroups/following-native/result.json.gz",
+    "sourceSHA256": "508fe74ee3321d6dce8f616e59fc6fcd7af714322860aada31fe86e69d2d81b9",
+    "sourceBytes": 19001
+  },
+  "directWasmGroups/format-conversion-native/result.json": {
+    "source": "build/file-closure86-native-regressions/format-conversion-native/result.json",
+    "file": "regressions/directWasmGroups/format-conversion-native/result.json.gz",
+    "sourceSHA256": "e1b3dd1ae4c18fbae8b0b43b8f107970923d3fcf1d488b69faaf0ea6d86a422e",
+    "sourceBytes": 29565
+  },
+  "directWasmGroups/host-native/result.json": {
+    "source": "build/file-closure86-native-regressions/host-native/result.json",
+    "file": "regressions/directWasmGroups/host-native/result.json.gz",
+    "sourceSHA256": "a3605b496ab84aff177c902677e2c78645ccd426a57242d1ed340b11e4558212",
+    "sourceBytes": 19786
+  },
+  "directWasmGroups/memo-native/result.json": {
+    "source": "build/file-closure86-native-regressions/memo-native/result.json",
+    "file": "regressions/directWasmGroups/memo-native/result.json.gz",
+    "sourceSHA256": "2837a5b0d1fa9d02e35fa19ce3e884087c5fb2f64dfd989c78cd99179e4952b7",
+    "sourceBytes": 18833
+  },
+  "directWasmGroups/merge-native/result.json": {
+    "source": "build/file-closure86-native-regressions/merge-native/result.json",
+    "file": "regressions/directWasmGroups/merge-native/result.json.gz",
+    "sourceSHA256": "7ae7d1430caea28c30592e69e33a19ecf912ce9b374cdb9aa35f36536c728985",
+    "sourceBytes": 19162
+  },
+  "directWasmGroups/native/result.json": {
+    "source": "build/file-closure86-native-regressions/native/result.json",
+    "file": "regressions/directWasmGroups/native/result.json.gz",
+    "sourceSHA256": "717555d38bbf72c6c2f68c73bb83ef6abd4484ee7c72e10a75fc2f9cc893c5c2",
+    "sourceBytes": 19800
+  },
+  "directWasmGroups/outer-native/result.json": {
+    "source": "build/file-closure86-native-regressions/outer-native/result.json",
+    "file": "regressions/directWasmGroups/outer-native/result.json.gz",
+    "sourceSHA256": "19ef5d072be9cff700448749c08b63343b97207016fd0942cd29cf9b48a4b58f",
+    "sourceBytes": 18838
+  },
+  "directWasmGroups/overlap-native/result.json": {
+    "source": "build/file-closure86-native-regressions/overlap-native/result.json",
+    "file": "regressions/directWasmGroups/overlap-native/result.json.gz",
+    "sourceSHA256": "b351e409fdd41a7d270c850fbff4ff3a2eb7974331e140dffe0dbd1f1a27c3a8",
+    "sourceBytes": 4948988
+  },
+  "directWasmGroups/owner-native/result.json": {
+    "source": "build/file-closure86-native-regressions/owner-native/result.json",
+    "file": "regressions/directWasmGroups/owner-native/result.json.gz",
+    "sourceSHA256": "7a11d0f1cba184d35f401c91729662867c626bc1277a304f819cbcc2f9d76077",
+    "sourceBytes": 19236
+  },
+  "directWasmGroups/split-native/result.json": {
+    "source": "build/file-closure86-native-regressions/split-native/result.json",
+    "file": "regressions/directWasmGroups/split-native/result.json.gz",
+    "sourceSHA256": "c2f5ac480731f2c7ca05a8be24a2d53ce52e46b995779a1669acc542bfd8c7cf",
+    "sourceBytes": 19431
+  },
+  "directWasmGroups/structure-native/result.json": {
+    "source": "build/file-closure86-native-regressions/structure-native/result.json",
+    "file": "regressions/directWasmGroups/structure-native/result.json.gz",
+    "sourceSHA256": "3abcb11d05e6beb102654ab40577ad3fe1502195d2c55389f2088daef7bafb01",
+    "sourceBytes": 19597
+  },
+  "directWasmGroups/style-stories-native/result.json": {
+    "source": "build/file-closure86-native-regressions/style-stories-native/result.json",
+    "file": "regressions/directWasmGroups/style-stories-native/result.json.gz",
+    "sourceSHA256": "772720cab0fe4ed784e8a9cabe8019fa154646163d95c7226dc73499989a2759",
+    "sourceBytes": 18818
+  },
+  "directWasmGroups/styles-native/result.json": {
+    "source": "build/file-closure86-native-regressions/styles-native/result.json",
+    "file": "regressions/directWasmGroups/styles-native/result.json.gz",
+    "sourceSHA256": "238e9fe81717d8614cae74d0fe69065bd4aec0ce87ebdc6fa8fcb1f180414a39",
+    "sourceBytes": 19000
+  },
+  "directWasmGroups/subdivision-native/result.json": {
+    "source": "build/file-closure86-native-regressions/subdivision-native/result.json",
+    "file": "regressions/directWasmGroups/subdivision-native/result.json.gz",
+    "sourceSHA256": "15c0792a6a84908ffa451bdcd2805fa94c4c5bba44ddb28de23df50420425c4d",
+    "sourceBytes": 19788
+  },
+  "directWasmGroups/table-conversion-native/result.json": {
+    "source": "build/file-closure86-native-regressions/table-conversion-native/result.json",
+    "file": "regressions/directWasmGroups/table-conversion-native/result.json.gz",
+    "sourceSHA256": "6db3a2d6660db69c733ad7d8795134cd9bcd6168a31b50eeb6abbee3438c8efd",
+    "sourceBytes": 20268
+  },
+  "directWasmGroups/table-multi-header-native/result.json": {
+    "source": "build/file-closure86-native-regressions/table-multi-header-native/result.json",
+    "file": "regressions/directWasmGroups/table-multi-header-native/result.json.gz",
+    "sourceSHA256": "3e25907c0beabaf7b16db37baa08d0c19a24fb759498ca46a4081e23bdc3980d",
+    "sourceBytes": 20467
+  },
+  "directWasmGroups/table-protection-native/result.json": {
+    "source": "build/file-closure86-native-regressions/table-protection-native/result.json",
+    "file": "regressions/directWasmGroups/table-protection-native/result.json.gz",
+    "sourceSHA256": "55c6689ae3df6757250afaa3c06d739e40ac72d3e77dbdeb15cebcdca7ab9144",
+    "sourceBytes": 19951
+  },
+  "directWasmGroups/textbox-native/result.json": {
+    "source": "build/file-closure86-native-regressions/textbox-native/result.json",
+    "file": "regressions/directWasmGroups/textbox-native/result.json.gz",
+    "sourceSHA256": "e2fcf895ed4c1e71b19a01537ed47b087a608f7515375f4a67eecf6c00edeee5",
+    "sourceBytes": 19320
+  },
+  "directWasmGroups/textbox-storage-native/result.json": {
+    "source": "build/file-closure86-native-regressions/textbox-storage-native/result.json",
+    "file": "regressions/directWasmGroups/textbox-storage-native/result.json.gz",
+    "sourceSHA256": "cdf53b242518e413e388a5647e17d8359adbe175b250bd0a4ee73103bf97309a",
+    "sourceBytes": 19536
+  },
+  "directWasmGroups/width-native/result.json": {
+    "source": "build/file-closure86-native-regressions/width-native/result.json",
+    "file": "regressions/directWasmGroups/width-native/result.json.gz",
+    "sourceSHA256": "d633bea26694844512b32e114e65e62e75d62e81d74086dedc70c447d8533347",
+    "sourceBytes": 19472
+  },
+  "directWasmGroups/logs/agent-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/agent-native.log",
+    "file": "regressions/directWasmGroups/logs/agent-native.log.gz",
+    "sourceSHA256": "ed839ba1518153f601e286e10d488770ba637fa0fe8e22441e2983cb7d13f8d7",
+    "sourceBytes": 1345
+  },
+  "directWasmGroups/logs/agent-style-next-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/agent-style-next-native.log",
+    "file": "regressions/directWasmGroups/logs/agent-style-next-native.log.gz",
+    "sourceSHA256": "a98876a86e48b410be9a1631ec89f8f1eb15b90878e1c3789e9bb84e892a6ea5",
+    "sourceBytes": 1284
+  },
+  "directWasmGroups/logs/agent-table-header-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/agent-table-header-native.log",
+    "file": "regressions/directWasmGroups/logs/agent-table-header-native.log.gz",
+    "sourceSHA256": "94989d62f572097a0d80a50cdbd6e1895250ba4cf8df8e9eb7b1a3eece8f1f10",
+    "sourceBytes": 1565
+  },
+  "directWasmGroups/logs/agent-table-pagination-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/agent-table-pagination-native.log",
+    "file": "regressions/directWasmGroups/logs/agent-table-pagination-native.log.gz",
+    "sourceSHA256": "a196f3f702899c90fbd6876065895776da4abc246fc0ad423549efd9c1c99245",
+    "sourceBytes": 1401
+  },
+  "directWasmGroups/logs/cell-paragraph-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/cell-paragraph-native.log",
+    "file": "regressions/directWasmGroups/logs/cell-paragraph-native.log.gz",
+    "sourceSHA256": "2e4766ac99fa9a874c0d1365fa43fcfa799952506e00b6d7d09d370309c180fd",
+    "sourceBytes": 2278
+  },
+  "directWasmGroups/logs/default-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/default-native.log",
+    "file": "regressions/directWasmGroups/logs/default-native.log.gz",
+    "sourceSHA256": "baa692dd7ff4ee852b14028cc850194fe34a05cde13da6a25bdc1cbd38c13828",
+    "sourceBytes": 898
+  },
+  "directWasmGroups/logs/equal-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/equal-native.log",
+    "file": "regressions/directWasmGroups/logs/equal-native.log.gz",
+    "sourceSHA256": "62c4a026f79b556a6ec4681207d08c80e2587b66625ee7ea32bbd80951a1a4fc",
+    "sourceBytes": 1049
+  },
+  "directWasmGroups/logs/following-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/following-native.log",
+    "file": "regressions/directWasmGroups/logs/following-native.log.gz",
+    "sourceSHA256": "662e085123b1f09dcc57e9569657bf53f3a607f16171ab0d6bc9888e4e9f3e94",
+    "sourceBytes": 567
+  },
+  "directWasmGroups/logs/format-conversion-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/format-conversion-native.log",
+    "file": "regressions/directWasmGroups/logs/format-conversion-native.log.gz",
+    "sourceSHA256": "7f8050611786ebe25398f5bce3f2328e013dd02d89f939971926e702cb0a77dc",
+    "sourceBytes": 1928
+  },
+  "directWasmGroups/logs/host-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/host-native.log",
+    "file": "regressions/directWasmGroups/logs/host-native.log.gz",
+    "sourceSHA256": "bec62a2bb8fb4bde88ac3aba2bdcafd9d5412dd148384db06ca2d68a7d212bd1",
+    "sourceBytes": 1141
+  },
+  "directWasmGroups/logs/memo-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/memo-native.log",
+    "file": "regressions/directWasmGroups/logs/memo-native.log.gz",
+    "sourceSHA256": "acb3f9692bbdb621e815b21a85755cddc3dc017610425991c7f242600ab79a69",
+    "sourceBytes": 309
+  },
+  "directWasmGroups/logs/merge-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/merge-native.log",
+    "file": "regressions/directWasmGroups/logs/merge-native.log.gz",
+    "sourceSHA256": "63322dd7d9f15687274ab4cfd9bb2264b991d79459c600a7d867c2193caee8cc",
+    "sourceBytes": 722
+  },
+  "directWasmGroups/logs/native.log": {
+    "source": "build/file-closure86-native-regressions/logs/native.log",
+    "file": "regressions/directWasmGroups/logs/native.log.gz",
+    "sourceSHA256": "ad4d7fed72f791bc1feca0115820848c35d5848f1823a7d30c9a61e866beff3d",
+    "sourceBytes": 1314
+  },
+  "directWasmGroups/logs/outer-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/outer-native.log",
+    "file": "regressions/directWasmGroups/logs/outer-native.log.gz",
+    "sourceSHA256": "ff1d1ad3621a4f973462b73ecec1101c67cf63f01c27ff81072a2402d3f3f467",
+    "sourceBytes": 392
+  },
+  "directWasmGroups/logs/overlap-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/overlap-native.log",
+    "file": "regressions/directWasmGroups/logs/overlap-native.log.gz",
+    "sourceSHA256": "23d3c5263b272f58a24d1cae222db8acbc7f51defc2a41a30d3c843f7d5a6593",
+    "sourceBytes": 1263
+  },
+  "directWasmGroups/logs/owner-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/owner-native.log",
+    "file": "regressions/directWasmGroups/logs/owner-native.log.gz",
+    "sourceSHA256": "a627ac09a0ee30182457e36c429941957ecc0f21def94760eee6ce8e0425c5ed",
+    "sourceBytes": 643
+  },
+  "directWasmGroups/logs/split-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/split-native.log",
+    "file": "regressions/directWasmGroups/logs/split-native.log.gz",
+    "sourceSHA256": "b2f57d3072935ca68984aa86b03f484d425a8acfbae9fb0dd0ccbe39a5faf933",
+    "sourceBytes": 937
+  },
+  "directWasmGroups/logs/structure-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/structure-native.log",
+    "file": "regressions/directWasmGroups/logs/structure-native.log.gz",
+    "sourceSHA256": "0337fc79813c2fe34d7b5fd77ff08ccb0bef7d2329aadde040c967cbe9b68e88",
+    "sourceBytes": 1006
+  },
+  "directWasmGroups/logs/style-stories-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/style-stories-native.log",
+    "file": "regressions/directWasmGroups/logs/style-stories-native.log.gz",
+    "sourceSHA256": "a935d80e02648009443aa9b55c3976d9158c979d1856dc4509fa695ec6f19e22",
+    "sourceBytes": 360
+  },
+  "directWasmGroups/logs/styles-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/styles-native.log",
+    "file": "regressions/directWasmGroups/logs/styles-native.log.gz",
+    "sourceSHA256": "696daef251585c246114ca8c3488a1c00a011540d52dec9b594f94494d67c854",
+    "sourceBytes": 533
+  },
+  "directWasmGroups/logs/subdivision-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/subdivision-native.log",
+    "file": "regressions/directWasmGroups/logs/subdivision-native.log.gz",
+    "sourceSHA256": "22ad76c85b7076c4be92e66f1fd43a182f2a4baaae7aadfa90d4e785a2e24e15",
+    "sourceBytes": 1255
+  },
+  "directWasmGroups/logs/table-conversion-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/table-conversion-native.log",
+    "file": "regressions/directWasmGroups/logs/table-conversion-native.log.gz",
+    "sourceSHA256": "e34d62046ca0c1e134dc18b3a52895f3c86670a00a4667086b03bd740021f41d",
+    "sourceBytes": 1722
+  },
+  "directWasmGroups/logs/table-multi-header-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/table-multi-header-native.log",
+    "file": "regressions/directWasmGroups/logs/table-multi-header-native.log.gz",
+    "sourceSHA256": "aa05b29ea6124f5132ff2dd90bd43ee3ca1f369067f2089019e8800c7f955e52",
+    "sourceBytes": 1791
+  },
+  "directWasmGroups/logs/table-protection-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/table-protection-native.log",
+    "file": "regressions/directWasmGroups/logs/table-protection-native.log.gz",
+    "sourceSHA256": "84f637f11905ddce42374ec97ea2e391861adacd3ca4a535238de9696686219e",
+    "sourceBytes": 1307
+  },
+  "directWasmGroups/logs/textbox-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/textbox-native.log",
+    "file": "regressions/directWasmGroups/logs/textbox-native.log.gz",
+    "sourceSHA256": "3cb86c21085d9f7fe9012e29b32b3569e09de9fb87cbecdec5a96202a5db00a1",
+    "sourceBytes": 765
+  },
+  "directWasmGroups/logs/textbox-storage-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/textbox-storage-native.log",
+    "file": "regressions/directWasmGroups/logs/textbox-storage-native.log.gz",
+    "sourceSHA256": "cf86194f5829e993efbea9d1723a814da5c5b5fe8efa52354e56a3398d7e22f3",
+    "sourceBytes": 1028
+  },
+  "directWasmGroups/logs/width-native.log": {
+    "source": "build/file-closure86-native-regressions/logs/width-native.log",
+    "file": "regressions/directWasmGroups/logs/width-native.log.gz",
+    "sourceSHA256": "8c67c1bf3725de98fbaeb1408af71c0bf7fce25e608077e212dcd267c3640f7b",
+    "sourceBytes": 998
+  },
+  "edgeGroups/result.json": {
+    "source": "build/file-closure86-browser-regressions/result.json",
+    "file": "regressions/edgeGroups/result.json.gz",
+    "sourceSHA256": "3edf64976761ffcff12925a9207046b7c7ae71b2b1f5e919d9405bba9019aed7",
+    "sourceBytes": 23588
+  },
+  "edgeGroups/agent-browser/result.json": {
+    "source": "build/file-closure86-browser-regressions/agent-browser/result.json",
+    "file": "regressions/edgeGroups/agent-browser/result.json.gz",
+    "sourceSHA256": "0b0e2330d3bc423630f054274942c293247aa8de3b34b5e427ee1941468d738c",
+    "sourceBytes": 36746
+  },
+  "edgeGroups/agent-style-next-browser/result.json": {
+    "source": "build/file-closure86-browser-regressions/agent-style-next-browser/result.json",
+    "file": "regressions/edgeGroups/agent-style-next-browser/result.json.gz",
+    "sourceSHA256": "934d0f53227c2a808a340c05e8a08e53a35495465e09d196e7d2e5e89bbb6877",
+    "sourceBytes": 328873
+  },
+  "edgeGroups/agent-table-header-browser/result.json": {
+    "source": "build/file-closure86-browser-regressions/agent-table-header-browser/result.json",
+    "file": "regressions/edgeGroups/agent-table-header-browser/result.json.gz",
+    "sourceSHA256": "e45673dec71c4edab7a5f3f2d79327778f26e63e6cde710dbb28e18f0f4e431c",
+    "sourceBytes": 38742
+  },
+  "edgeGroups/agent-table-pagination-browser/result.json": {
+    "source": "build/file-closure86-browser-regressions/agent-table-pagination-browser/result.json",
+    "file": "regressions/edgeGroups/agent-table-pagination-browser/result.json.gz",
+    "sourceSHA256": "ab922bbec4a479cfec0acfafb03c0f2dadb4e8048aa50d51251258d0552e8d01",
+    "sourceBytes": 34262
+  },
+  "edgeGroups/browser/result.json": {
+    "source": "build/file-closure86-browser-regressions/browser/result.json",
+    "file": "regressions/edgeGroups/browser/result.json.gz",
+    "sourceSHA256": "b3e2a01248542e28be0cb73955a6f47260ab1813610a37a8e02c73229c6223b2",
+    "sourceBytes": 38621
+  },
+  "edgeGroups/cell-paragraph-browser/result.json": {
+    "source": "build/file-closure86-browser-regressions/cell-paragraph-browser/result.json",
+    "file": "regressions/edgeGroups/cell-paragraph-browser/result.json.gz",
+    "sourceSHA256": "5f1b2a7ff183f6ccd6906c4ee404c93d0f3fe91f8e47f34314a3266bf212cc49",
+    "sourceBytes": 43442
+  },
+  "edgeGroups/equal-browser/result.json": {
+    "source": "build/file-closure86-browser-regressions/equal-browser/result.json",
+    "file": "regressions/edgeGroups/equal-browser/result.json.gz",
+    "sourceSHA256": "d169961ab626b257d0d1ce2debc998af21046c5ba4d420f094c863a4b263b2b0",
+    "sourceBytes": 39662
+  },
+  "edgeGroups/merge-browser/result.json": {
+    "source": "build/file-closure86-browser-regressions/merge-browser/result.json",
+    "file": "regressions/edgeGroups/merge-browser/result.json.gz",
+    "sourceSHA256": "8a196b987fd83cc3121f3a0e38ab99ebb6079c442207249207aad1985cb755cf",
+    "sourceBytes": 31018
+  },
+  "edgeGroups/selected-object-browser/result.json": {
+    "source": "build/file-closure86-browser-regressions/selected-object-browser/result.json",
+    "file": "regressions/edgeGroups/selected-object-browser/result.json.gz",
+    "sourceSHA256": "916093b7737e3c18e1deb7c52452e03e484db7124251c8fabd2990cd21784f49",
+    "sourceBytes": 23627
+  },
+  "edgeGroups/split-browser/result.json": {
+    "source": "build/file-closure86-browser-regressions/split-browser/result.json",
+    "file": "regressions/edgeGroups/split-browser/result.json.gz",
+    "sourceSHA256": "7df30895d5c519ac643eeb7bec3d5e65c59a6b333eeb20025474ea859de8ee13",
+    "sourceBytes": 35718
+  },
+  "edgeGroups/structure-browser/result.json": {
+    "source": "build/file-closure86-browser-regressions/structure-browser/result.json",
+    "file": "regressions/edgeGroups/structure-browser/result.json.gz",
+    "sourceSHA256": "9a942cecbe4cb56b85d79f9c5d2f9c40db46e5f7893d53e478519414e1a941e4",
+    "sourceBytes": 38802
+  },
+  "edgeGroups/subdivision-browser/result.json": {
+    "source": "build/file-closure86-browser-regressions/subdivision-browser/result.json",
+    "file": "regressions/edgeGroups/subdivision-browser/result.json.gz",
+    "sourceSHA256": "207313ca6a8f8b9108a84587bac8826149df0b40bbf80f7cf7c7200cb4c330ed",
+    "sourceBytes": 90690
+  },
+  "edgeGroups/table-conversion-browser/result.json": {
+    "source": "build/file-closure86-browser-regressions/table-conversion-browser/result.json",
+    "file": "regressions/edgeGroups/table-conversion-browser/result.json.gz",
+    "sourceSHA256": "e07209a027785ff4a238334f97a0bf60a8695a18a76d97cda15de413fe3ad358",
+    "sourceBytes": 23592
+  },
+  "edgeGroups/table-multi-header-browser/result.json": {
+    "source": "build/file-closure86-browser-regressions/table-multi-header-browser/result.json",
+    "file": "regressions/edgeGroups/table-multi-header-browser/result.json.gz",
+    "sourceSHA256": "4c3f0abf61abb573c2a0449da9a4ea6a374c41215dff14613ad1055e8a2a6a6d",
+    "sourceBytes": 34233
+  },
+  "edgeGroups/table-protection-browser/result.json": {
+    "source": "build/file-closure86-browser-regressions/table-protection-browser/result.json",
+    "file": "regressions/edgeGroups/table-protection-browser/result.json.gz",
+    "sourceSHA256": "b670023c6da1a5b80cb86885df5633b5d22c7a855b45f50171bf6bdd13343362",
+    "sourceBytes": 28272
+  },
+  "edgeGroups/textbox-browser/result.json": {
+    "source": "build/file-closure86-browser-regressions/textbox-browser/result.json",
+    "file": "regressions/edgeGroups/textbox-browser/result.json.gz",
+    "sourceSHA256": "0bbab9ada38b97ae62d13f28a469114236cc42bf6fea189ed163dab813dbb11f",
+    "sourceBytes": 22620
+  },
+  "edgeGroups/width-browser/result.json": {
+    "source": "build/file-closure86-browser-regressions/width-browser/result.json",
+    "file": "regressions/edgeGroups/width-browser/result.json.gz",
+    "sourceSHA256": "63257d8f97c77150b6e2d0ee419655c047d8241d7a80f6c45eb90391d219aea9",
+    "sourceBytes": 40817
+  },
+  "edgeGroups/logs/agent-browser.log": {
+    "source": "build/file-closure86-browser-regressions/logs/agent-browser.log",
+    "file": "regressions/edgeGroups/logs/agent-browser.log.gz",
+    "sourceSHA256": "87e10b66f8d782a5ef52f10205f9150991f71aee506c9c122944749e62224b3c",
+    "sourceBytes": 1519
+  },
+  "edgeGroups/logs/agent-style-next-browser.log": {
+    "source": "build/file-closure86-browser-regressions/logs/agent-style-next-browser.log",
+    "file": "regressions/edgeGroups/logs/agent-style-next-browser.log.gz",
+    "sourceSHA256": "f3c8723088c7182a76a730e24fbc459f93294e8fe1ef0f574b3ac33ba796de9d",
+    "sourceBytes": 1345
+  },
+  "edgeGroups/logs/agent-table-header-browser.log": {
+    "source": "build/file-closure86-browser-regressions/logs/agent-table-header-browser.log",
+    "file": "regressions/edgeGroups/logs/agent-table-header-browser.log.gz",
+    "sourceSHA256": "4c2426aa0d8744cad2937f0a606f3fea2973ffd5bf4828c467a489ac490a4efb",
+    "sourceBytes": 1796
+  },
+  "edgeGroups/logs/agent-table-pagination-browser.log": {
+    "source": "build/file-closure86-browser-regressions/logs/agent-table-pagination-browser.log",
+    "file": "regressions/edgeGroups/logs/agent-table-pagination-browser.log.gz",
+    "sourceSHA256": "40efd081bb4dd77e1965032ba6e1751a3228ba730f3d162ee1348d340c66cbf0",
+    "sourceBytes": 1174
+  },
+  "edgeGroups/logs/browser.log": {
+    "source": "build/file-closure86-browser-regressions/logs/browser.log",
+    "file": "regressions/edgeGroups/logs/browser.log.gz",
+    "sourceSHA256": "e3a47a01464362873e540d5d6591edf63f738aff7933fffbb8eeae8bf4d903ad",
+    "sourceBytes": 1228
+  },
+  "edgeGroups/logs/cell-paragraph-browser.log": {
+    "source": "build/file-closure86-browser-regressions/logs/cell-paragraph-browser.log",
+    "file": "regressions/edgeGroups/logs/cell-paragraph-browser.log.gz",
+    "sourceSHA256": "6a86b925453825b5114e639bf91edfea47eda2c09cb86a3bc3f944dda86fd86a",
+    "sourceBytes": 1042
+  },
+  "edgeGroups/logs/equal-browser.log": {
+    "source": "build/file-closure86-browser-regressions/logs/equal-browser.log",
+    "file": "regressions/edgeGroups/logs/equal-browser.log.gz",
+    "sourceSHA256": "8a9cbbbdf5b10c673d0f1d5aabb6465958545f193dad79392ecf02f5defe0326",
+    "sourceBytes": 1530
+  },
+  "edgeGroups/logs/merge-browser.log": {
+    "source": "build/file-closure86-browser-regressions/logs/merge-browser.log",
+    "file": "regressions/edgeGroups/logs/merge-browser.log.gz",
+    "sourceSHA256": "0bbc22d56c22509468ec4bf58ef4d4b34d40c078f37636062710bce92d7faa8f",
+    "sourceBytes": 1023
+  },
+  "edgeGroups/logs/selected-object-browser.log": {
+    "source": "build/file-closure86-browser-regressions/logs/selected-object-browser.log",
+    "file": "regressions/edgeGroups/logs/selected-object-browser.log.gz",
+    "sourceSHA256": "8ca8d17ce1b9fce5e619a90842da15f9e1b1e6d439b288bcc29e35b3876bfc97",
+    "sourceBytes": 1685
+  },
+  "edgeGroups/logs/split-browser.log": {
+    "source": "build/file-closure86-browser-regressions/logs/split-browser.log",
+    "file": "regressions/edgeGroups/logs/split-browser.log.gz",
+    "sourceSHA256": "388bfb5dc2fc5863fc06155f89e7927cc702a9d93fd9f58c9df11e08488fe819",
+    "sourceBytes": 1031
+  },
+  "edgeGroups/logs/structure-browser.log": {
+    "source": "build/file-closure86-browser-regressions/logs/structure-browser.log",
+    "file": "regressions/edgeGroups/logs/structure-browser.log.gz",
+    "sourceSHA256": "33cf383b29ed701da32380561f3c438b16f73f4c76a92c33f8b2dba0adf6090d",
+    "sourceBytes": 1228
+  },
+  "edgeGroups/logs/subdivision-browser.log": {
+    "source": "build/file-closure86-browser-regressions/logs/subdivision-browser.log",
+    "file": "regressions/edgeGroups/logs/subdivision-browser.log.gz",
+    "sourceSHA256": "4ade9ce2bbf8516c3806089c1587d70d1975047397a50f3234843122cd494bc4",
+    "sourceBytes": 1062
+  },
+  "edgeGroups/logs/table-conversion-browser.log": {
+    "source": "build/file-closure86-browser-regressions/logs/table-conversion-browser.log",
+    "file": "regressions/edgeGroups/logs/table-conversion-browser.log.gz",
+    "sourceSHA256": "dd16475a56306594b5b572e99351f43966fc30f050d9a11155e39524432aff45",
+    "sourceBytes": 1760
+  },
+  "edgeGroups/logs/table-multi-header-browser.log": {
+    "source": "build/file-closure86-browser-regressions/logs/table-multi-header-browser.log",
+    "file": "regressions/edgeGroups/logs/table-multi-header-browser.log.gz",
+    "sourceSHA256": "624feaed39032bd99028aca12874ad0fa9f4fa646073202249a23fe1bd08a56f",
+    "sourceBytes": 2078
+  },
+  "edgeGroups/logs/table-protection-browser.log": {
+    "source": "build/file-closure86-browser-regressions/logs/table-protection-browser.log",
+    "file": "regressions/edgeGroups/logs/table-protection-browser.log.gz",
+    "sourceSHA256": "4988c535ad2fa2ccf9ec2d4f4767ecc5240146d84c75a7e5f8ba0fa504f9631f",
+    "sourceBytes": 1460
+  },
+  "edgeGroups/logs/textbox-browser.log": {
+    "source": "build/file-closure86-browser-regressions/logs/textbox-browser.log",
+    "file": "regressions/edgeGroups/logs/textbox-browser.log.gz",
+    "sourceSHA256": "869c4e29645bd49ddf24b453b84bb2cbcecd2750ec9bef2958093a9536946761",
+    "sourceBytes": 813
+  },
+  "edgeGroups/logs/width-browser.log": {
+    "source": "build/file-closure86-browser-regressions/logs/width-browser.log",
+    "file": "regressions/edgeGroups/logs/width-browser.log.gz",
+    "sourceSHA256": "da18b983e22a0c6f4fec8f5f2124febd15f4deb20eca93c6c997ec1816a94b05",
+    "sourceBytes": 1800
+  },
+  "fileWorkflowCases/result.json": {
+    "source": "build/file-closure86-file-workflows/result.json",
+    "file": "regressions/fileWorkflowCases/result.json.gz",
+    "sourceSHA256": "4836b733410ff8d4e60633753b5af4d55ac4aaa94a66f9c43da10fde2c1dcc50",
+    "sourceBytes": 45555
+  },
+  "fileWorkflowCases/agent-files/result.json": {
+    "source": "build/file-closure86-file-workflows/agent-files/result.json",
+    "file": "regressions/fileWorkflowCases/agent-files/result.json.gz",
+    "sourceSHA256": "989a43cdd05975e404833a0951113f5c91ec7b770cd3ffd37089d0722ccb4a87",
+    "sourceBytes": 902667
+  },
+  "fileWorkflowCases/close-recovery/result.json": {
+    "source": "build/file-closure86-file-workflows/close-recovery/result.json",
+    "file": "regressions/fileWorkflowCases/close-recovery/result.json.gz",
+    "sourceSHA256": "833e5050bd6930c6725e2937be2619e61bc408e8da06b993eec5bd4aefe5c142",
+    "sourceBytes": 41429
+  },
+  "fileWorkflowCases/document-lifecycle/result.json": {
+    "source": "build/file-closure86-file-workflows/document-lifecycle/result.json",
+    "file": "regressions/fileWorkflowCases/document-lifecycle/result.json.gz",
+    "sourceSHA256": "13bdd737e74b2263de0e84f1f766d64def89f080e761a709d94b3bdbd9aecfcc",
+    "sourceBytes": 49697
+  },
+  "fileWorkflowCases/document-metadata/result.json": {
+    "source": "build/file-closure86-file-workflows/document-metadata/result.json",
+    "file": "regressions/fileWorkflowCases/document-metadata/result.json.gz",
+    "sourceSHA256": "d337af7a2f65b1da6cd05d32d80fb90dbddc74793710a53191b4819a89a2fba7",
+    "sourceBytes": 42254
+  },
+  "fileWorkflowCases/document-windows/result.json": {
+    "source": "build/file-closure86-file-workflows/document-windows/result.json",
+    "file": "regressions/fileWorkflowCases/document-windows/result.json.gz",
+    "sourceSHA256": "95a35d9cda12f3d8f914c3c54e8e95c60caa047635b74b613e84abf27ed14a3b",
+    "sourceBytes": 45368
+  },
+  "fileWorkflowCases/download-connection/result.json": {
+    "source": "build/file-closure86-file-workflows/download-connection/result.json",
+    "file": "regressions/fileWorkflowCases/download-connection/result.json.gz",
+    "sourceSHA256": "c85e932d10e818538ede294d25a4e24ffa5d2e263d090fc3a12d0ecdbf6b1615",
+    "sourceBytes": 45365
+  },
+  "fileWorkflowCases/native-recents/result.json": {
+    "source": "build/file-closure86-file-workflows/native-recents/result.json",
+    "file": "regressions/fileWorkflowCases/native-recents/result.json.gz",
+    "sourceSHA256": "5a078dd3ead65e5f03bcfd61d07913889f0692c2ae9adc579070b4c45868fa93",
+    "sourceBytes": 41094
+  },
+  "fileWorkflowCases/native-shell/result.json": {
+    "source": "build/file-closure86-file-workflows/native-shell/result.json",
+    "file": "regressions/fileWorkflowCases/native-shell/result.json.gz",
+    "sourceSHA256": "b7ee0f300a91a1a9dad3bdaa50d6c6a9f678fc6c78d4500965e10c73577f9af8",
+    "sourceBytes": 41724
+  },
+  "fileWorkflowCases/recovery-integrity/result.json": {
+    "source": "build/file-closure86-file-workflows/recovery-integrity/result.json",
+    "file": "regressions/fileWorkflowCases/recovery-integrity/result.json.gz",
+    "sourceSHA256": "30e735f8767b33e3a17470baf6d74a4d2072212862eaad34a7ede448ca1dc5d8",
+    "sourceBytes": 24293
+  },
+  "fileWorkflowCases/save-recovery/result.json": {
+    "source": "build/file-closure86-file-workflows/save-recovery/result.json",
+    "file": "regressions/fileWorkflowCases/save-recovery/result.json.gz",
+    "sourceSHA256": "9f2800f95cc0f83853d690f5f8839bb365e2690a5bf87ac01eb639622fb73a74",
+    "sourceBytes": 41826
+  },
+  "fileWorkflowCases/xml-documents/result.json": {
+    "source": "build/file-closure86-file-workflows/xml-documents/result.json",
+    "file": "regressions/fileWorkflowCases/xml-documents/result.json.gz",
+    "sourceSHA256": "c95ec5a17864027f731a0ff3e66ffb410437daee79a8019477b7f0e503a380af",
+    "sourceBytes": 6964
+  },
+  "fileWorkflowCases/xml-documents-integrated/result.json": {
+    "source": "build/file-closure86-file-workflows/xml-documents-integrated/result.json",
+    "file": "regressions/fileWorkflowCases/xml-documents-integrated/result.json.gz",
+    "sourceSHA256": "826bb1fe3ed3c010f606c01da901926d93f1b3ed8212c9d4531352dab9d73056",
+    "sourceBytes": 41803
+  },
+  "fileWorkflowCases/logs/agent-files.log": {
+    "source": "build/file-closure86-file-workflows/logs/agent-files.log",
+    "file": "regressions/fileWorkflowCases/logs/agent-files.log.gz",
+    "sourceSHA256": "174ebeee336d3a57d244095bbf3c989f0c4d28d2cb444e8db0af696f272d0e20",
+    "sourceBytes": 1302
+  },
+  "fileWorkflowCases/logs/close-recovery.log": {
+    "source": "build/file-closure86-file-workflows/logs/close-recovery.log",
+    "file": "regressions/fileWorkflowCases/logs/close-recovery.log.gz",
+    "sourceSHA256": "6c23677f6dce01c390f6790a2aef02cdf202c9073ffd6bbd3db222f9d93e13d4",
+    "sourceBytes": 366
+  },
+  "fileWorkflowCases/logs/document-lifecycle.log": {
+    "source": "build/file-closure86-file-workflows/logs/document-lifecycle.log",
+    "file": "regressions/fileWorkflowCases/logs/document-lifecycle.log.gz",
+    "sourceSHA256": "f97cde3000efd3edfc42ff11854bd20315e76eb7c1f00636f61c895df808cf00",
+    "sourceBytes": 948
+  },
+  "fileWorkflowCases/logs/document-metadata.log": {
+    "source": "build/file-closure86-file-workflows/logs/document-metadata.log",
+    "file": "regressions/fileWorkflowCases/logs/document-metadata.log.gz",
+    "sourceSHA256": "93bf84e4898f1d300dcc456702010e31f85dc555cf70fbb814224bb3f0d54d0a",
+    "sourceBytes": 993
+  },
+  "fileWorkflowCases/logs/document-windows.log": {
+    "source": "build/file-closure86-file-workflows/logs/document-windows.log",
+    "file": "regressions/fileWorkflowCases/logs/document-windows.log.gz",
+    "sourceSHA256": "08100eb45830e147bfaa36aa36587d18bf110975251f285118eeb9d737c41381",
+    "sourceBytes": 747
+  },
+  "fileWorkflowCases/logs/download-connection.log": {
+    "source": "build/file-closure86-file-workflows/logs/download-connection.log",
+    "file": "regressions/fileWorkflowCases/logs/download-connection.log.gz",
+    "sourceSHA256": "3a14d705b5820c8df5366d30a9ada596c8a7da307395beac464ac4ed7cc2a3ce",
+    "sourceBytes": 920
+  },
+  "fileWorkflowCases/logs/native-recents.log": {
+    "source": "build/file-closure86-file-workflows/logs/native-recents.log",
+    "file": "regressions/fileWorkflowCases/logs/native-recents.log.gz",
+    "sourceSHA256": "010e84dde7246949f58c7ac0c2fa2eca2dfb5f7dec3d185615831f596ddde3a0",
+    "sourceBytes": 784
+  },
+  "fileWorkflowCases/logs/native-shell.log": {
+    "source": "build/file-closure86-file-workflows/logs/native-shell.log",
+    "file": "regressions/fileWorkflowCases/logs/native-shell.log.gz",
+    "sourceSHA256": "368c598b88d7b5b781e4b477e9442a2c8613cab8bb37339fce9678635b82177d",
+    "sourceBytes": 957
+  },
+  "fileWorkflowCases/logs/recovery-integrity.log": {
+    "source": "build/file-closure86-file-workflows/logs/recovery-integrity.log",
+    "file": "regressions/fileWorkflowCases/logs/recovery-integrity.log.gz",
+    "sourceSHA256": "b6d6ad1a0e76d87c80ef3c5edba2a383123c24103d9c7cd8bc235734f831a4bd",
+    "sourceBytes": 689
+  },
+  "fileWorkflowCases/logs/save-recovery.log": {
+    "source": "build/file-closure86-file-workflows/logs/save-recovery.log",
+    "file": "regressions/fileWorkflowCases/logs/save-recovery.log.gz",
+    "sourceSHA256": "a4634b0bab15c0c44312b48c53f72c40befd3b0dfc4d68a412a839fe7fdd5e0a",
+    "sourceBytes": 2434
+  },
+  "fileWorkflowCases/logs/xml-documents-integrated.log": {
+    "source": "build/file-closure86-file-workflows/logs/xml-documents-integrated.log",
+    "file": "regressions/fileWorkflowCases/logs/xml-documents-integrated.log.gz",
+    "sourceSHA256": "33ab388adde817fd4afb871bb7d285eba0afacdaa9f06f87245fe82fb2894236",
+    "sourceBytes": 624
+  },
+  "fileWorkflowCases/logs/xml-documents.log": {
+    "source": "build/file-closure86-file-workflows/logs/xml-documents.log",
+    "file": "regressions/fileWorkflowCases/logs/xml-documents.log.gz",
+    "sourceSHA256": "29fbf5f05d32adb97f491b859603eb09902b735b988a425e2d2c4f07e787fdbf",
+    "sourceBytes": 1049
+  },
+  "engine.json": {
+    "source": "build/rhwp-engine/source-b59322fd380dc175/pkg/jueony-engine-build.json",
+    "file": "regressions/engine.json.gz",
+    "sourceSHA256": "5697c37c1ac64b5167708f925c5898da1f95cbe03371ba20c87084234d23b43c",
+    "sourceBytes": 17887
+  },
+  "frontend.json": {
+    "source": "apps/editor/evidence/dist-file-closure-check86/build-evidence.json",
+    "file": "regressions/frontend.json.gz",
+    "sourceSHA256": "2f8ac9cabac7f3d6da7cfc3621e3060c6f4898ed009d3c28ebc56d2961768438",
+    "sourceBytes": 20642
+  },
+  "unit933.log": {
+    "source": "build/file-closure86-unit.log",
+    "file": "regressions/unit933.log.gz",
+    "sourceSHA256": "df3acd430a2d9c9ed4c3d1f571c89a3272b732196ca4f87677fc388e192942d3",
+    "sourceBytes": 220341
+  },
+  "typescript.log": {
+    "source": "build/file-closure86-typescript.log",
+    "file": "regressions/typescript.log.gz",
+    "sourceSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sourceBytes": 0
+  },
+  "boundaries.json": {
+    "source": "build/file-closure86-boundaries.json",
+    "file": "regressions/boundaries.json.gz",
+    "sourceSHA256": "e96d9cd83f68e3d23d017044eb11a92ff42113d4eea8c5b3f383b99ed201c860",
+    "sourceBytes": 170277
+  },
+  "engine-build.log": {
+    "source": "build/file-closure86-integrated-engine.log",
+    "file": "regressions/engine-build.log.gz",
+    "sourceSHA256": "4384199ff1cd7d9b38aa8b427f36fff8aa9919f765fa47a3a4329fd1cc91c708",
+    "sourceBytes": 281
+  },
+  "frontend-build.log": {
+    "source": "build/file-closure86-frontend.log",
+    "file": "regressions/frontend-build.log.gz",
+    "sourceSHA256": "290ef2d358987baac2d835818bf89a8cd09cf6b4f71777b738f037a4278c6364",
+    "sourceBytes": 22966
+  },
+  "assembly1064.json": {
+    "source": "build/file-closure86-assembly-proof.json",
+    "file": "regressions/assembly1064.json.gz",
+    "sourceSHA256": "f15f96ddb4942e09258c252023b28715c938272a898f756c221f085823256a36",
+    "sourceBytes": 174324
+  },
+  "bundle.json": {
+    "source": "build/jueony-file-review86/bundle-evidence.json",
+    "file": "regressions/bundle.json.gz",
+    "sourceSHA256": "394e7e63eb9f8d13fc50de3dbed1168a7cbfa73dd0b6fb81430b3de3e73f3b6a",
+    "sourceBytes": 24168
+  },
+  "bundle-smoke.json": {
+    "source": "build/file-closure86-bundle-smoke.json",
+    "file": "regressions/bundle-smoke.json.gz",
+    "sourceSHA256": "ff3e3797e918cb12fb01fcbad3cbdfe223c56be46d7363657fda3d4b86db0ca3",
+    "sourceBytes": 18908
+  },
+  "bundle-build.log": {
+    "source": "build/file-closure86-standalone-build.log",
+    "file": "regressions/bundle-build.log.gz",
+    "sourceSHA256": "64fac4f00c9f2c8d236955edd2040f5d4bb298a9f67c7f10e97a7e9c3bcc8b27",
+    "sourceBytes": 97
+  },
+  "preliminary85-unit-two-failures.log": {
+    "source": "build/file-closure85-unit.log",
+    "file": "regressions/preliminary85-unit-two-failures.log.gz",
+    "sourceSHA256": "1bc4bb5e921cca30cc483ace34a99cc89496225fb34f7043fcc93819f1387b35",
+    "sourceBytes": 221598
+  },
+  "preliminary85-native-result.json": {
+    "source": "build/file-closure85-native-regressions/result.json",
+    "file": "regressions/preliminary85-native-result.json.gz",
+    "sourceSHA256": "9eeca2cacc1d0ff770945c3736b9123a6813c71f38e3b8536492b49ee54e94ce",
+    "sourceBytes": 26277
+  },
+  "preliminary85-format-result.json": {
+    "source": "build/file-closure85-native-regressions/format-conversion-native/result.json",
+    "file": "regressions/preliminary85-format-result.json.gz",
+    "sourceSHA256": "35c31ddf19ecb0d559045e6940630a4c2f98933c6278048b3ba4f0b254f2f832",
+    "sourceBytes": 25904
+  }
+}

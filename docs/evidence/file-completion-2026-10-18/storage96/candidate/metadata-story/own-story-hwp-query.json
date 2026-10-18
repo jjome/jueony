@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "basis": "canonical-model-paragraphs",
+  "counts": {
+    "paragraphs": 4,
+    "unicodeScalars": 35,
+    "utf16Units": 39,
+    "textScalars": 35,
+    "nonWhitespaceTextScalars": 33
+  },
+  "stories": [
+    {
+      "kind": "body",
+      "counts": {
+        "paragraphs": 1,
+        "unicodeScalars": 8,
+        "utf16Units": 9,
+        "textScalars": 8,
+        "nonWhitespaceTextScalars": 8
+      }
+    },
+    {
+      "kind": "footer",
+      "counts": {
+        "paragraphs": 1,
+        "unicodeScalars": 9,
+        "utf16Units": 10,
+        "textScalars": 9,
+        "nonWhitespaceTextScalars": 9
+      }
+    },
+    {
+      "kind": "footnote",
+      "counts": {
+        "paragraphs": 1,
+        "unicodeScalars": 9,
+        "utf16Units": 10,
+        "textScalars": 9,
+        "nonWhitespaceTextScalars": 7
+      }
+    },
+    {
+      "kind": "header",
+      "counts": {
+        "paragraphs": 1,
+        "unicodeScalars": 9,
+        "utf16Units": 10,
+        "textScalars": 9,
+        "nonWhitespaceTextScalars": 9
+      }
+    }
+  ],
+  "paragraphs": [
+    {
+      "section": 0,
+      "story": "body",
+      "path": "section/0/body/p/0",
+      "text": "BODY_가A😀"
+    },
+    {
+      "section": 0,
+      "story": "footnote",
+      "path": "section/0/body/p/0/control/2/footnote/p/0",
+      "text": "NOTE_다😀  "
+    },
+    {
+      "section": 0,
+      "story": "header",
+      "path": "section/0/body/p/0/control/3/header/p/0",
+      "text": "HEADER_가😀"
+    },
+    {
+      "section": 0,
+      "story": "footer",
+      "path": "section/0/body/p/0/control/4/footer/p/0",
+      "text": "FOOTER_나😀"
+    }
+  ],
+  "objects": {
+    "tables": 0,
+    "pictures": 0,
+    "shapes": 0,
+    "groups": 0,
+    "charts": 0,
+    "ole": 0,
+    "equations": 0,
+    "fields": 0,
+    "unknownControls": 0
+  },
+  "limitations": [
+    "Canonical current model only; not Hancom statistics or raw file text.",
+    "Header/footer/master definitions are counted once, not per rendered page; owned table cells once, not merged grid slots.",
+    "textScalars excludes C0 except TAB, DEL and U+FFFC; nonWhitespaceTextScalars additionally excludes Rust Unicode whitespace.",
+    "Excluded: equation scripts, ruby/overlap strings, field commands/guide residues/parameters, OLE/unknown payload, image OCR and alternate fallback representations."
+  ]
+}

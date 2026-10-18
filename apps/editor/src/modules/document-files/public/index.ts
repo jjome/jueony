@@ -7,3 +7,5 @@ export {createSnapshotWriter} from '../application/write-snapshot.ts';
 export {exportRecovery} from '../application/export-recovery.ts';
 export type {SnapshotSinkPort,SnapshotWriteDependencies} from '../ports/snapshot-write.ts';
 export type {RecoveryExportPort} from '../ports/recovery-export.ts';
+export type {HistoryScope,HistoryOwner,HistoryMeta,HistoryRecords} from '../ports/history.ts';
+export {createDocumentHistory,historyScopeKey,assertHistorySnapshot} from '../application/document-history.ts';

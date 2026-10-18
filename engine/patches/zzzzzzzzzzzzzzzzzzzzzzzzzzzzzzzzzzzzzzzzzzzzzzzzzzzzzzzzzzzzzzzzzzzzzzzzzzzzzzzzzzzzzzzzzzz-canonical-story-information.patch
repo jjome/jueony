@@ -1,0 +1,130 @@
+--- a/src/document_core/mod.rs
++++ b/src/document_core/mod.rs
+@@ -4,6 +4,7 @@
+ //! WASM/PyO3/MCP 등 어떤 어댑터에서도 독립적으로 사용할 수 있다.
+ 
+ pub(crate) mod document_metadata;
++mod document_story_information;
+ pub(crate) mod helpers;
+ pub(crate) use helpers::*;
+ 
+--- /dev/null
++++ b/src/document_core/document_story_information.rs
+@@ -0,0 +1,102 @@
++//! Read-only, bounded census of canonical owned paragraph lists, not Hancom statistics.
++use crate::{DocumentCore, HwpError};
++use crate::model::{document::Document, paragraph::Paragraph, control::Control, shape::{ShapeObject, Caption, DrawingObjAttr}};
++use serde::Serialize;
++use std::collections::BTreeMap;
++const MAX_PARAGRAPHS: usize = 20_000;
++const MAX_NODES: usize = 100_000;
++const MAX_DEPTH: usize = 64;
++const MAX_TEXT_BYTES: usize = 8 * 1024 * 1024;
++const MAX_JSON_BYTES: usize = 16 * 1024 * 1024;
++#[derive(Default, Clone, Copy, Serialize)]
++#[serde(rename_all="camelCase")]
++struct Counts { paragraphs: usize, unicode_scalars: usize, utf16_units: usize, text_scalars: usize, non_whitespace_text_scalars: usize }
++impl Counts {
++    fn add(&mut self, other: Self) { self.paragraphs+=other.paragraphs; self.unicode_scalars+=other.unicode_scalars; self.utf16_units+=other.utf16_units; self.text_scalars+=other.text_scalars; self.non_whitespace_text_scalars+=other.non_whitespace_text_scalars; }
++    fn text(text: &str) -> Self { let mut n=Self {paragraphs:1,..Self::default()}; for ch in text.chars() { n.unicode_scalars+=1; n.utf16_units+=ch.len_utf16(); if !matches!(ch,'\0'..='\u{8}' | '\n'..='\u{1f}' | '\u{7f}' | '\u{fffc}') { n.text_scalars+=1; if !ch.is_whitespace() { n.non_whitespace_text_scalars+=1; } } } n }
++}
++#[derive(Default, Serialize)]
++#[serde(rename_all="camelCase")]
++struct Objects { tables:usize,pictures:usize,shapes:usize,groups:usize,charts:usize,ole:usize,equations:usize,fields:usize,unknown_controls:usize }
++#[derive(Serialize)]
++struct Entry<'a> {section:usize,story:&'static str,path:String,text:&'a str}
++#[derive(Serialize)]
++struct Story {kind:&'static str,counts:Counts}
++#[derive(Serialize)]
++#[serde(rename_all="camelCase")]
++struct Report<'a> { schema_version:u8,basis:&'static str,counts:Counts,stories:Vec<Story>,paragraphs:Vec<Entry<'a>>,objects:Objects,limitations:Vec<&'static str> }
++#[derive(Default)]
++struct Walk<'a> { entries:Vec<Entry<'a>>, kinds:BTreeMap<&'static str,Counts>,counts:Counts,objects:Objects,nodes:usize,text_bytes:usize,json_estimate:usize }
++fn limit() -> HwpError {HwpError::InvalidFile("Document story census exceeds bounded paragraph/node/depth/text/JSON limits; no partial result".into())}
++impl<'a> Walk<'a> {
++ fn node(&mut self,depth:usize)->Result<(),HwpError> {self.nodes+=1;if depth>MAX_DEPTH || self.nodes>MAX_NODES {return Err(limit())} Ok(())}
++ fn paras(&mut self,ps:&'a [Paragraph],section:usize,kind:&'static str,path:&str,depth:usize)->Result<(),HwpError> {
++  self.node(depth)?;
++  for (i,p) in ps.iter().enumerate() {self.node(depth)?;let path=format!("{path}/p/{i}"); self.text_bytes=self.text_bytes.checked_add(p.text.len()).ok_or_else(limit)?;
++   let escaped=p.text.chars().map(|c|if c<' ' {6}else if matches!(c,'"'|'\\') {2}else {c.len_utf8()}).sum::<usize>();
++   self.json_estimate=self.json_estimate.checked_add(escaped+path.len()+512).ok_or_else(limit)?;
++   if self.entries.len()>=MAX_PARAGRAPHS || self.text_bytes>MAX_TEXT_BYTES || self.json_estimate>MAX_JSON_BYTES {return Err(limit())}
++   let counts=Counts::text(&p.text);self.counts.add(counts);self.kinds.entry(kind).or_default().add(counts);
++   self.entries.push(Entry{section,story:kind,path:path.clone(),text:&p.text});
++   for (j,c) in p.controls.iter().enumerate() {let cp=format!("{path}/control/{j}");self.node(depth+1)?;
++    match c {
++     Control::Table(t)=>{self.objects.tables+=1;for(k,cell)in t.cells.iter().enumerate(){self.paras(&cell.paragraphs,section,"tableCell",&format!("{cp}/cell/{k}"),depth+1)?}self.caption(t.caption.as_ref(),section,&cp,depth+1)?;},
++     Control::Shape(s)=>self.shape(s,section,&cp,depth+1)?,
++     Control::Picture(p)=>{self.objects.pictures+=1;self.caption(p.caption.as_ref(),section,&cp,depth+1)?},
++     Control::Header(v)=>self.paras(&v.paragraphs,section,"header",&format!("{cp}/header"),depth+1)?,
++     Control::Footer(v)=>self.paras(&v.paragraphs,section,"footer",&format!("{cp}/footer"),depth+1)?,
++     Control::Footnote(v)=>self.paras(&v.paragraphs,section,"footnote",&format!("{cp}/footnote"),depth+1)?,
++     Control::Endnote(v)=>self.paras(&v.paragraphs,section,"endnote",&format!("{cp}/endnote"),depth+1)?,
++     Control::HiddenComment(v)=>self.paras(&v.paragraphs,section,"hiddenComment",&format!("{cp}/hiddenComment"),depth+1)?,
++     // FieldEnd is a field_ranges/orphan_field_ends marker, not a Control::Field.
++     Control::Field(v)=>{self.objects.fields+=1;self.paras(&v.memo_paragraphs,section,"fieldMemo",&format!("{cp}/fieldMemo"),depth+1)?},
++     Control::Equation(_)=>self.objects.equations+=1,
++     Control::Unknown(_)=>self.objects.unknown_controls+=1,
++     // SectionDef controls mirror section.section_def. Never traverse that duplicate.
++     _=>{}
++    }
++   }
++  } Ok(())
++ }
++ fn caption(&mut self,c:Option<&'a Caption>,section:usize,path:&str,depth:usize)->Result<(),HwpError>{if let Some(c)=c{self.paras(&c.paragraphs,section,"caption",&format!("{path}/caption"),depth)?}Ok(())}
++ fn drawing(&mut self,d:&'a DrawingObjAttr,section:usize,path:&str,depth:usize)->Result<(),HwpError>{if let Some(t)=&d.text_box{self.paras(&t.paragraphs,section,"textBox",&format!("{path}/textBox"),depth)?}self.caption(d.caption.as_ref(),section,&format!("{path}/drawing"),depth)}
++ fn shape(&mut self,s:&'a ShapeObject,section:usize,path:&str,depth:usize)->Result<(),HwpError>{self.node(depth)?;match s{
++  ShapeObject::Group(g)=>{self.objects.groups+=1;for(i,child)in g.children.iter().enumerate(){self.shape(child,section,&format!("{path}/child/{i}"),depth+1)?}self.caption(g.caption.as_ref(),section,path,depth+1)?},
++  ShapeObject::Picture(p)=>{self.objects.pictures+=1;self.caption(p.caption.as_ref(),section,path,depth+1)?},
++  ShapeObject::Chart(c)=>{self.objects.charts+=1;self.drawing(&c.drawing,section,path,depth+1)?;self.caption(c.caption.as_ref(),section,path,depth+1)?},
++  ShapeObject::Ole(o)=>{self.objects.ole+=1;self.drawing(&o.drawing,section,path,depth+1)?;self.caption(o.caption.as_ref(),section,path,depth+1)?},
++  _=>{self.objects.shapes+=1;if let Some(d)=s.drawing(){self.drawing(d,section,path,depth+1)?}}
++ }Ok(())}
++}
++fn collect(document:&Document)->Result<String,HwpError>{let mut w=Walk::default();for(i,s)in document.sections.iter().enumerate(){let base=format!("section/{i}");w.paras(&s.paragraphs,i,"body",&format!("{base}/body"),0)?;for(j,m)in s.section_def.master_pages.iter().enumerate(){w.paras(&m.paragraphs,i,"masterPage",&format!("{base}/master/{j}"),0)?}}
++ let result=Report{schema_version:1,basis:"canonical-model-paragraphs",counts:w.counts,stories:w.kinds.into_iter().map(|(kind,counts)|Story{kind,counts}).collect(),paragraphs:w.entries,objects:w.objects,limitations:vec!["Canonical current model only; not Hancom statistics or raw file text.","Header/footer/master definitions are counted once, not per rendered page; owned table cells once, not merged grid slots.","textScalars excludes C0 except TAB, DEL and U+FFFC; nonWhitespaceTextScalars additionally excludes Rust Unicode whitespace.","Excluded: equation scripts, ruby/overlap strings, field commands/guide residues/parameters, OLE/unknown payload, image OCR and alternate fallback representations."]};
++ let json=serde_json::to_string(&result).map_err(|e|HwpError::InvalidFile(e.to_string()))?;if json.len()>MAX_JSON_BYTES{return Err(limit())}Ok(json)
++}
++impl DocumentCore { pub fn get_document_story_information_native(&self)->Result<String,HwpError>{collect(&self.document)} }
++#[cfg(test)]
++mod tests {
++ use super::*;
++ use crate::model::{document::{Section,SectionDef},header_footer::{Header,Footer,MasterPage},footnote::{Footnote,Endnote},control::{HiddenComment,Field},shape::{RectangleShape,GroupShape,TextBox},table::{Table,Cell},image::Picture};
++ fn p(s:&str)->Paragraph {Paragraph{text:s.into(),..Paragraph::default()}}
++ fn cap(s:&str)->Option<Caption>{Some(Caption{paragraphs:vec![p(s)],..Caption::default()})}
++ fn fixture()->Document {
++  let mut para=p("BODY");
++  para.controls.push(Control::Header(Box::new(Header{paragraphs:vec![p("HEADER")],..Header::default()})));
++  para.controls.push(Control::Footer(Box::new(Footer{paragraphs:vec![p("FOOTER")],..Footer::default()})));
++  para.controls.push(Control::Footnote(Box::new(Footnote{paragraphs:vec![p("FOOTNOTE")],..Footnote::default()})));
++  para.controls.push(Control::Endnote(Box::new(Endnote{paragraphs:vec![p("ENDNOTE")],..Endnote::default()})));
++  para.controls.push(Control::HiddenComment(Box::new(HiddenComment{paragraphs:vec![p("HIDDEN")]})));
++  para.controls.push(Control::Field(Field{memo_paragraphs:vec![p("MEMO")],..Field::default()}));
++  para.controls.push(Control::Table(Box::new(Table{cells:vec![Cell{paragraphs:vec![p("CELL")],..Cell::default()}],caption:cap("TABLE_CAPTION"),..Table::default()})));
++  let mut rectangle=RectangleShape::default();rectangle.drawing.text_box=Some(TextBox{paragraphs:vec![p("GROUP_TEXT")],..TextBox::default()});
++  para.controls.push(Control::Shape(Box::new(ShapeObject::Group(GroupShape{children:vec![ShapeObject::Rectangle(rectangle)],caption:cap("GROUP_CAPTION"),..GroupShape::default()}))));
++  para.controls.push(Control::Picture(Box::new(Picture{caption:cap("PICTURE_CAPTION"),..Picture::default()})));
++  let def=SectionDef{master_pages:vec![MasterPage{paragraphs:vec![p("MASTER")],..MasterPage::default()}],..SectionDef::default()};
++  para.controls.push(Control::SectionDef(Box::new(def.clone())));
++  Document{sections:vec![Section{section_def:def,paragraphs:vec![para],..Section::default()}],..Document::default()}
++ }
++ #[test] fn all_owned_story_lists_once_and_no_mutation(){let doc=fixture();let before=format!("{doc:?}");let out:serde_json::Value=serde_json::from_str(&collect(&doc).unwrap()).unwrap();assert_eq!(out["counts"]["paragraphs"],13);assert_eq!(out["objects"]["fields"],1);assert_eq!(out["objects"]["tables"],1);assert_eq!(out["objects"]["groups"],1);assert_eq!(out["objects"]["shapes"],1);assert_eq!(out["paragraphs"].as_array().unwrap().iter().filter(|p|p["text"]=="MASTER").count(),1);assert_eq!(before,format!("{doc:?}"));}
++ #[test] fn scalar_contract_not_utf16_or_hancom(){let doc=Document{sections:vec![Section{paragraphs:vec![p("가A😀 \t\n\u{0}\u{fffc}\u{85}")],..Section::default()}],..Document::default()};let out:serde_json::Value=serde_json::from_str(&collect(&doc).unwrap()).unwrap();let n=&out["counts"];assert_eq!(n["unicodeScalars"],9);assert_eq!(n["utf16Units"],10);assert_eq!(n["textScalars"],6);assert_eq!(n["nonWhitespaceTextScalars"],3);}
++ #[test] fn bounded_depth_refuses_partial(){let mut s=ShapeObject::Rectangle(RectangleShape::default());for _ in 0..70{s=ShapeObject::Group(GroupShape{children:vec![s],..GroupShape::default()})}let mut para=p("ROOT");para.controls.push(Control::Shape(Box::new(s)));let doc=Document{sections:vec![Section{paragraphs:vec![para],..Section::default()}],..Document::default()};assert!(collect(&doc).is_err());}
++ #[test] fn bounded_paragraphs_and_bytes_refuse_partial(){let doc=Document{sections:vec![Section{paragraphs:vec![p("");MAX_PARAGRAPHS+1],..Section::default()}],..Document::default()};assert!(collect(&doc).is_err());let doc=Document{sections:vec![Section{paragraphs:vec![p(&"a".repeat(MAX_TEXT_BYTES+1))],..Section::default()}],..Document::default()};assert!(collect(&doc).is_err());}
++}
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1359,6 +1359,12 @@
+     /// Stored timestamps only; never inferred from the current clock.
+     #[wasm_bindgen(js_name = getDocumentStoredInformation)]
+     pub fn get_document_stored_information(&self) -> String { self.core.get_document_stored_information_native() }
++
++    /// Bounded canonical owned-paragraph text; independent of HwpCtrl extraction order.
++    #[wasm_bindgen(js_name = getDocumentStoryInformation)]
++    pub fn get_document_story_information(&self) -> Result<String, JsValue> {
++        self.core.get_document_story_information_native().map_err(|e| e.into())
++    }
+ 
+     #[wasm_bindgen(js_name = setDocumentMetadata)]
+     pub fn set_document_metadata(&mut self, expected: &str, values: &str) -> Result<String, JsValue> {

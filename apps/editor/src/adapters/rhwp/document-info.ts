@@ -1,6 +1,8 @@
 import {DOCUMENT_METADATA_KEYS, readDocumentMetadata, preflightDocumentMetadata, applyDocumentMetadata} from './document-metadata.ts';
 import type {DocumentMetadata, DocumentMetadataValues} from './document-metadata.ts';
 import {captureSessionCursor, restoreSessionCursor} from './session-cursor.ts';
+import {readStoredDocumentInformation} from './document-stored-information.ts';
+import {readStoryInformation,STORY_KINDS} from './document-story-information.ts';
 /** Statistics and bounded summary metadata over the current in-memory document. */
 type NativeControl = { ctrlId?: string; userDesc?: string };
 type NativeField = { cellField?: boolean };
@@ -53,7 +55,7 @@ export function readDocumentStatistics(wasm: any, name?: string): DocumentStatis
   });
 }
 
-export function showDocumentInformation(stats: DocumentStatistics, onClose: () => void, metadata?: {state: DocumentMetadata; editable: boolean; apply(values: DocumentMetadataValues): void}): void {
+export function showDocumentInformation(stats: DocumentStatistics, onClose: () => void, metadata?: {state: DocumentMetadata; editable: boolean; apply(values: DocumentMetadataValues): void}, stored?:ReturnType<typeof readStoredDocumentInformation>, stories?:ReturnType<typeof readStoryInformation>): void {
   const existing = document.getElementById('jueony-document-info');
   if (existing) { existing.querySelector('button')?.focus(); return; }
   const overlay = document.createElement('div'); overlay.id = 'jueony-document-info'; overlay.className = 'modal-overlay';
@@ -80,7 +82,31 @@ export function showDocumentInformation(stats: DocumentStatistics, onClose: () =
   scope.textContent = metadata?.state.values ? '다섯 요약 항목만 편집합니다. 항목별 4,096자 이내이며 한 번에 되돌릴 수 있습니다. 작성·수정 시각과 저장 이력은 편집하지 않습니다. 저장 재열기의 본문·서식·지면 검사를 통과한 문서에서 지원합니다.' : '이 문서의 요약 속성을 읽지 못했습니다. 비어 있는 입력란은 원본 값이 없다는 뜻이 아닙니다.';
   if (!metadata?.editable) scope.textContent += ' ' + (metadata?.state.reason ?? '읽기 전용 상태에서는 요약을 편집할 수 없습니다.');
   summary.append(scope); panel.append(summary);
+  if(stored){
+    const persisted=document.createElement('fieldset'),legend=document.createElement('legend');legend.textContent='파일에 저장된 날짜·시간';persisted.append(legend);
+    if(stored.value){
+      for(const[key,label]of [['created','작성 시각'],['modified','수정 시각'],['lastPrinted','마지막 인쇄 시각'],['editingDuration','누적 편집 시간']]as const){
+        const item=stored.value[key],row=document.createElement('p');row.dataset.storedInformation=key;
+        row.textContent=label+': '+(item.state==='absent'?'원본 값 없음':item.state==='invalid'?'원본 값 해석 불가 (임의 보정하지 않음)':key==='editingDuration'?`${(item as {ticks100ns:string}).ticks100ns} × 100ns`:(item as {utc:string}).utc+' (UTC)');persisted.append(row);
+      }
+      for(const issue of stored.value.issues){const note=document.createElement('p');note.textContent=issue;persisted.append(note);}
+    }else{const note=document.createElement('p');note.textContent=stored.reason??'저장된 날짜 정보 조회 불가';persisted.append(note);}
+    const note=document.createElement('p');note.textContent='원본에 기록된 값입니다. 현재 시각으로 추정하거나 저장·편집 시 자동 갱신하지 않습니다.';persisted.append(note);panel.append(persisted);
+  }
+  if(stories){
+    const field=document.createElement('fieldset'),legend=document.createElement('legend');legend.textContent='전체 저장 모델의 문단 텍스트';field.append(legend);
+    if(stories.value){
+      const value=stories.value,total=document.createElement('p');total.dataset.documentStoryTotal='';
+      total.textContent=`문단 ${value.counts.paragraphs.toLocaleString('ko-KR')}개 · 글자 ${value.counts.textScalars.toLocaleString('ko-KR')}자 · 공백 제외 ${value.counts.nonWhitespaceTextScalars.toLocaleString('ko-KR')}자`;field.append(total);
+      const labels={body:'본문',tableCell:'표 셀',textBox:'글상자',header:'머리말',footer:'꼬리말',footnote:'각주',endnote:'미주',hiddenComment:'숨은 설명',fieldMemo:'필드 메모',caption:'캡션',masterPage:'바탕쪽'};
+      for(const kind of STORY_KINDS){const story=value.stories.find(s=>s.kind===kind);if(!story)continue;const row=document.createElement('p');row.dataset.documentStory=kind;row.textContent=`${labels[kind]}: 문단 ${story.counts.paragraphs.toLocaleString('ko-KR')}개 · 글자 ${story.counts.textScalars.toLocaleString('ko-KR')}자`;field.append(row);}
+      const objectLabels={tables:'표',pictures:'그림',shapes:'도형',groups:'묶음',charts:'차트',ole:'OLE',equations:'수식',fields:'필드',unknownControls:'미분류 개체'};
+      const objects=document.createElement('p');objects.dataset.documentStoryObjects='';objects.textContent='저장 모델의 개체: '+Object.entries(objectLabels).map(([key,label])=>`${label} ${value.objects[key as keyof typeof value.objects].toLocaleString('ko-KR')}`).join(' · ');field.append(objects);
+    }else{const note=document.createElement('p');note.textContent=stories.reason??'전체 저장 모델 집계 불가';field.append(note);}
+    const note=document.createElement('p');note.textContent='현재 저장 모델에 있는 문단을 셉니다. 반복되는 머리말·꼬리말·바탕쪽은 정의를 한 번만 셉니다. 수식 코드·그림 OCR·겹침 글자 등의 별도 문자열과 해석하지 못한 개체 내용은 포함하지 않습니다. 한글의 문서 통계와는 집계 방식이 다릅니다.';field.append(note);panel.append(field);
+  }
   const table = document.createElement('table'); table.style.width = '100%'; table.style.borderCollapse = 'collapse';
+  const basic=document.createElement('h3');basic.textContent='본문·기본 추출 정보';panel.append(basic);
   const rows: [string, string | number][] = [
     ['쪽', stats.pages], ['구역', stats.sections], ['본문 문단', stats.bodyParagraphs], ['내부 목록 문단', stats.nestedParagraphs],
     ['추출한 글자 · 공백 포함', stats.charactersWithSpaces], ['추출한 글자 · 공백 제외', stats.charactersWithoutSpaces],
@@ -148,7 +174,7 @@ export function installDocumentInformation({ registry, input }: { registry: any;
         if (saved) restoreSessionCursor(ih, saved);
         const actual = readDocumentMetadata(wasm).values;
         if (!actual || !DOCUMENT_METADATA_KEYS.every(k => actual[k] === values[k])) throw new Error('문서 속성 적용 결과를 확인하지 못했습니다.');
-      }});
+      }},readStoredDocumentInformation(wasm),readStoryInformation(wasm));
     },
   });
 }

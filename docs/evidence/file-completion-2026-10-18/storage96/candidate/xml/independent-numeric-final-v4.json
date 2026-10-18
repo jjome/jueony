@@ -1,0 +1,315 @@
+{
+  "scope": "Independent only; not general XSD support. Own fixtures, all matrix values compared; actual downloaded artifact schema fully compiled by libxml2. No production projection/ignored failures.",
+  "lxmlVersion": [
+    6,
+    1,
+    1,
+    0
+  ],
+  "libxmlVersion": [
+    2,
+    11,
+    9
+  ],
+  "results": [
+    {
+      "id": "typed-integer-enumeration",
+      "schemaSha256": "a04b3a0e05c0a4828c838a65edc5b1f870d7fd3ca9daa73c19edd2162d75248c",
+      "values": [
+        {
+          "inputSha256": "e9bcaf28c00345f073e4946add28c410878d783da26cbc0957c3f7071b28fd43",
+          "valid": true
+        },
+        {
+          "inputSha256": "b6c42d548b0d23adc463a651723210fb6b26a9b91b2f71393ae98afb0c32ff41",
+          "valid": true
+        },
+        {
+          "inputSha256": "5384bff65361bbea5ea83e895c5f292f3ebbb221e100f897640ff1a410e669f6",
+          "valid": false
+        },
+        {
+          "inputSha256": "64ed9318cde61bf989fc6ed86e8db5bbdbd24d1438c2c4c0cd446fbbf6694a8d",
+          "valid": false
+        }
+      ],
+      "schemaValid": true,
+      "oracle": "libxml2 XSD1.0"
+    },
+    {
+      "id": "typed-decimal-zero-enumeration",
+      "schemaSha256": "31076eee7973713d4e0f6ea27b9085af81b0d8282ab8a8c2b58976194e0ac97d",
+      "values": [
+        {
+          "inputSha256": "b8c997b4ac74bffec2799cca058937cca26beb0a248737092ad391589ee6531f",
+          "valid": true
+        },
+        {
+          "inputSha256": "4fdd2b5fa5ff57a5c4657af2a7327c36966f7197de428bf2b38d661fd4bc90fc",
+          "valid": true
+        },
+        {
+          "inputSha256": "4a7f3719b747769dc747fd47f622e696e33c775f2f2bd578a5d1450ad6f9793c",
+          "valid": false
+        },
+        {
+          "inputSha256": "f6c30feed7364988510f151e9f4d5d095802d24f0816df76e170152df7e0d4ef",
+          "valid": false
+        }
+      ],
+      "schemaValid": true,
+      "oracle": "libxml2 XSD1.0"
+    },
+    {
+      "id": "precise-decimal-range",
+      "schemaSha256": "4ab2206fb37e962f86e216fbc7578637ad16359ffbd63dd02e947d5a484484a3",
+      "values": [
+        {
+          "inputSha256": "d0e88276054a5b3b6a24e5e244ead7130fe331084e6862fc4d2d5294106ee004",
+          "valid": false
+        },
+        {
+          "inputSha256": "286b2cc32eb5986f8eb6cbed4c6d75a43d0a12eebfc96a75a3953ba21c7e22f2",
+          "valid": true
+        },
+        {
+          "inputSha256": "eb3ade413648867eb15a5f73c7c0ad6f26f3ce0a28461eb0ae32338981a34307",
+          "valid": true
+        },
+        {
+          "inputSha256": "b28c32d240ba902d3bcab783aabaa4d1f2fbc26ff5e99591087b7ed4d4aeeadb",
+          "valid": false
+        }
+      ],
+      "schemaValid": true,
+      "schemaErrorType": "XMLSchemaParseError",
+      "libxmlSchemaValid": false,
+      "oracle": "Python fractions.Fraction, exact base10 rational",
+      "libxmlDiagnostic": "Element '{http://www.w3.org/2001/XMLSchema}minExclusive': '9007199254740992.000000000000000001' is not a valid value of the atomic type 'xs:decimal'., line 1"
+    },
+    {
+      "id": "xml-character-length",
+      "schemaSha256": "9c933afc585ec4678ea6c563e79be8127352df0bff3c526ed806b8db3b2c0f94",
+      "values": [
+        {
+          "inputSha256": "4db505465a1340db47633507c50cf2a3531d69933a46f73521ea5d9f00d14413",
+          "valid": true
+        },
+        {
+          "inputSha256": "5e9d42bd636a2ad397017d4eefe5265d877df729818335db64a3fc1b42bbaa38",
+          "valid": true
+        },
+        {
+          "inputSha256": "9520344c96d9fe684c062fca95fa1d33ae3a248d588976f44ca3b4457b830f9b",
+          "valid": false
+        },
+        {
+          "inputSha256": "2d5478ab76bbcfdaccd9b2ff233a6e55994041e11e58e0d91b99f8e152567674",
+          "valid": false
+        }
+      ],
+      "schemaValid": true,
+      "oracle": "libxml2 XSD1.0"
+    },
+    {
+      "id": "string-whitespace-enumeration",
+      "schemaSha256": "9e29409fcd1cdd02189e1dc356bd9ee568c8db5be86bbc0926d9c34caa2e5daa",
+      "values": [
+        {
+          "inputSha256": "2d5478ab76bbcfdaccd9b2ff233a6e55994041e11e58e0d91b99f8e152567674",
+          "valid": true
+        },
+        {
+          "inputSha256": "634b86b22fed99fc66ce0486a9bdf59dbacbe74ba0b909237f740a5a41c33248",
+          "valid": false
+        },
+        {
+          "inputSha256": "54a9ad2e295cf5c1420b9f2a8ef304f2d2f70a4b403c6ff4ec30750b4155654f",
+          "valid": false
+        }
+      ],
+      "schemaValid": true,
+      "oracle": "libxml2 XSD1.0"
+    },
+    {
+      "id": "inherited-enumeration-intersection",
+      "schemaSha256": "17e88694ff89b077d385526a8c3df0756b38f7bdaeaac32685b22ec64bdd77e3",
+      "values": [
+        {
+          "inputSha256": "e8056bdd92bf350d3186e2b117a400711c7ae8708c829b26fb7461fcd6741503",
+          "valid": false
+        },
+        {
+          "inputSha256": "e9bcaf28c00345f073e4946add28c410878d783da26cbc0957c3f7071b28fd43",
+          "valid": true
+        },
+        {
+          "inputSha256": "b6c42d548b0d23adc463a651723210fb6b26a9b91b2f71393ae98afb0c32ff41",
+          "valid": true
+        }
+      ],
+      "schemaValid": true,
+      "oracle": "libxml2 XSD1.0"
+    },
+    {
+      "id": "valid-empty-value-space",
+      "schemaSha256": "a78ee614296863a6e836a51c017abbc1e7fa6a731403403144fac7b6ef6a7b51",
+      "values": [
+        {
+          "inputSha256": "e8056bdd92bf350d3186e2b117a400711c7ae8708c829b26fb7461fcd6741503",
+          "valid": false
+        },
+        {
+          "inputSha256": "e9bcaf28c00345f073e4946add28c410878d783da26cbc0957c3f7071b28fd43",
+          "valid": false
+        }
+      ],
+      "schemaValid": true,
+      "oracle": "libxml2 XSD1.0"
+    },
+    {
+      "id": "boolean-alias",
+      "schemaSha256": "545f930dc932e5e43929a7404f4ddc3d81e723a201db168b795c7c172326d940",
+      "values": [
+        {
+          "inputSha256": "8ad2df70a41133661dc3a3f5e6c1978c51d0362ffa7381959cfc7cd34b6068ad",
+          "valid": true
+        },
+        {
+          "inputSha256": "e8056bdd92bf350d3186e2b117a400711c7ae8708c829b26fb7461fcd6741503",
+          "valid": true
+        },
+        {
+          "inputSha256": "a94a6ed6754df89e0690a386b4c84cdb617cbbe1bb0093b27b22954f92e48acc",
+          "valid": true
+        },
+        {
+          "inputSha256": "aeb221665a763943cb218d69b7199a34271e810a8c2292a974ca23a7f65f9123",
+          "valid": false
+        }
+      ],
+      "schemaValid": true,
+      "oracle": "libxml2 XSD1.0"
+    },
+    {
+      "id": "invalid-boolean-enumeration",
+      "schemaSha256": "8ac77df1a1921cdc2819cc2bf76cea373068fa7ad1040f4439dfee607ebc0034",
+      "values": [],
+      "schemaValid": false,
+      "schemaErrorType": "XMLSchemaParseError"
+    },
+    {
+      "id": "invalid-widened-range",
+      "schemaSha256": "78d255657f32d99d305037011c2c5e70408ca65542f0891b5c29c81c1d0e1731",
+      "values": [],
+      "schemaValid": false,
+      "schemaErrorType": "XMLSchemaParseError"
+    },
+    {
+      "id": "invalid-base-enumeration-bound",
+      "schemaSha256": "f202a931ff4a3f5cd9d67a9beafcd8efc819284e0ff32354cc9fecf422d6c85d",
+      "values": [],
+      "schemaValid": false,
+      "schemaErrorType": "XMLSchemaParseError"
+    },
+    {
+      "id": "same-inherited-exclusive-min-primary",
+      "schemaSha256": "89d9fa8e4dcc8aa0cf7de7c0b436377cfa131df948eae2d5e70a6586cf73d780",
+      "values": [
+        {
+          "inputSha256": "e8056bdd92bf350d3186e2b117a400711c7ae8708c829b26fb7461fcd6741503",
+          "valid": false
+        },
+        {
+          "inputSha256": "e9bcaf28c00345f073e4946add28c410878d783da26cbc0957c3f7071b28fd43",
+          "valid": true
+        },
+        {
+          "inputSha256": "a3a9d4dfcea44df5b12698c01b92dda7689aee8badbfb0ba3ca9eb8ac7c1280c",
+          "valid": true
+        },
+        {
+          "inputSha256": "171d08ac11b0c61a9a29fab9a1205e1ce6bf6c5d8e3bdf9b1909265bfc1addb7",
+          "valid": false
+        }
+      ],
+      "schemaValid": true,
+      "schemaErrorType": "XMLSchemaParseError",
+      "libxmlSchemaValid": false,
+      "oracle": "Python fractions.Fraction, exact base10 rational",
+      "libxmlDiagnostic": "Element '{http://www.w3.org/2001/XMLSchema}minExclusive': [facet 'minExclusive'] The value '1' must be greater than '1'., line 1",
+      "primarySource": "https://www.w3.org/TR/xmlschema-2/#rf-minExclusive",
+      "primaryConstraint": "Exclusive facet definition explicitly permits a value equal to the inherited exclusive bound. Repeated bounds do not alter its exact mathematical interval. libxml2 refuses this declaration; its disagreement is retained, not used to over-reject the supported profile."
+    },
+    {
+      "id": "same-inherited-exclusive-max-primary",
+      "schemaSha256": "410bff8be91038cc63fbbd5737258050a30f7ccb0c277ba55d0812edfbe15650",
+      "values": [
+        {
+          "inputSha256": "e8056bdd92bf350d3186e2b117a400711c7ae8708c829b26fb7461fcd6741503",
+          "valid": false
+        },
+        {
+          "inputSha256": "e9bcaf28c00345f073e4946add28c410878d783da26cbc0957c3f7071b28fd43",
+          "valid": true
+        },
+        {
+          "inputSha256": "a3a9d4dfcea44df5b12698c01b92dda7689aee8badbfb0ba3ca9eb8ac7c1280c",
+          "valid": true
+        },
+        {
+          "inputSha256": "171d08ac11b0c61a9a29fab9a1205e1ce6bf6c5d8e3bdf9b1909265bfc1addb7",
+          "valid": false
+        }
+      ],
+      "schemaValid": true,
+      "schemaErrorType": "XMLSchemaParseError",
+      "libxmlSchemaValid": false,
+      "oracle": "Python fractions.Fraction, exact base10 rational",
+      "libxmlDiagnostic": "Element '{http://www.w3.org/2001/XMLSchema}maxExclusive': [facet 'maxExclusive'] The value '5' must be less than '5'., line 1",
+      "primarySource": "https://www.w3.org/TR/xmlschema-2/#rf-maxExclusive",
+      "primaryConstraint": "Exclusive facet definition explicitly permits a value equal to the inherited exclusive bound. Repeated bounds do not alter its exact mathematical interval. libxml2 refuses this declaration; its disagreement is retained, not used to over-reject the supported profile."
+    },
+    {
+      "id": "invalid-cyclic-type",
+      "schemaSha256": "05964b44550093d1ae25f4f9ffa86699a4154babb9404a82d1640c20e986c17b",
+      "values": [],
+      "schemaValid": false,
+      "schemaErrorType": "XMLSchemaParseError"
+    }
+  ],
+  "artifact": {
+    "xmlSourceSha256": "6503c16af419d3d286df43e93fa8b88376b991a4651ebec9cc84dfd126814a39",
+    "xmlExportSha256": "d5e67068b2e59656310e1c16dd3c380aede30dfcb02796873b3f5fb74940cb8e",
+    "schemaSourceSha256": "c7cbbf22e498d02ae1096cb26d5944f11a6b9e4ca0335fd3710b478eda671e0c",
+    "schemaExportSha256": "c7cbbf22e498d02ae1096cb26d5944f11a6b9e4ca0335fd3710b478eda671e0c",
+    "oracle": "libxml2 XSD1.0",
+    "schemaValid": true,
+    "comments": 2,
+    "exactFields": true
+  },
+  "limitations": [
+    {
+      "id": "precise-decimal-range",
+      "scope": "libxml2 decimal facet digit capacity; no claim that libxml2 independently compiled this XSD",
+      "diagnostic": "Element '{http://www.w3.org/2001/XMLSchema}minExclusive': '9007199254740992.000000000000000001' is not a valid value of the atomic type 'xs:decimal'., line 1",
+      "replacementOracle": "exact Fraction decimal rational, no float conversion"
+    },
+    {
+      "id": "same-inherited-exclusive-min-primary",
+      "scope": "libxml2 declaration refusal differs from the W3C facet definition same-bound exception",
+      "diagnostic": "Element '{http://www.w3.org/2001/XMLSchema}minExclusive': [facet 'minExclusive'] The value '1' must be greater than '1'., line 1",
+      "primarySource": "https://www.w3.org/TR/xmlschema-2/#rf-minExclusive",
+      "replacementOracle": "W3C same-bound exception and independent exact Fraction interval, no float conversion or skipped values"
+    },
+    {
+      "id": "same-inherited-exclusive-max-primary",
+      "scope": "libxml2 declaration refusal differs from the W3C facet definition same-bound exception",
+      "diagnostic": "Element '{http://www.w3.org/2001/XMLSchema}maxExclusive': [facet 'maxExclusive'] The value '5' must be less than '5'., line 1",
+      "primarySource": "https://www.w3.org/TR/xmlschema-2/#rf-maxExclusive",
+      "replacementOracle": "W3C same-bound exception and independent exact Fraction interval, no float conversion or skipped values"
+    }
+  ],
+  "failures": [],
+  "scriptSha256": "2e07cd2da67c877ecd6eafedecdc430e508abaeec46c49e3a2e9071822254761"
+}

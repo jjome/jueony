@@ -102,6 +102,9 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
   }
   registry.register({ id: 'ext:jueony-close', label: '문서 닫기', canExecute: () => window.parent !== window, execute: () => window.parent.postMessage({ type: 'jueony:close-document' }, location.origin) });
   for(const [id,type,label] of [['file:new-doc','jueony:new-document-window','새 문서'],['file:new-tab','jueony:new-tab','새 탭']])registry.register({id,label,canExecute:()=>window.parent!==window,execute:()=>window.parent.postMessage({type},location.origin)});
+  // The host owns file selection and document IDs. In-place iframe loading
+  // would overwrite a workspace tab while retaining its recovery/history key.
+  if(window.parent!==window)registry.register({id:'file:open',label:'불러오기',canExecute:()=>true,execute:()=>window.parent.postMessage({type:'jueony:open-document'},location.origin)});
   const labels = new Map<string, string[]>();
   for (const b of hangulBindings) { if (!labels.has(b.command)) labels.set(b.command, []); labels.get(b.command)!.push(b.keys); }
   for (const [id, keys] of labels) { const old = registry.get(id); if (old) registry.register({ ...old, shortcutLabel: keys.join(' / ') }); }

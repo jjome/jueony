@@ -1,6 +1,7 @@
 import {sha256} from '@noble/hashes/sha2.js';
 import {assertOverlapSaveLayout,OverlapSaveLayoutError} from './overlap-save-layout.ts';
 import {assertDocumentSaveLayout,DocumentSaveLayoutError} from './document-save-layout.ts';
+import {storedInformationForPreservation} from './document-stored-information.ts';
 
 /** Read-only export evidence. This is an engine round-trip check, not a Hancom layout check. */
 type Json = null | boolean | number | string | Json[] | {[key:string]:Json};
@@ -74,6 +75,8 @@ export function capturePreservationEvidence(value:NativeDocument):PreservationEv
   return value;
  });
  else unverified.push('현재 엔진은 제목·주제·작성자·키워드·설명 보존 읽기 API를 제공하지 않습니다.');
+ if(typeof (doc as Record<string,unknown>).getDocumentStoredInformation==='function')capture('stored-date-information',()=>storedInformationForPreservation(read(doc,'getDocumentStoredInformation')) as Json);
+ else unverified.push('현재 엔진은 원본에 기록된 날짜·편집 시간의 보존 읽기 API를 제공하지 않습니다.');
  const pageBorder=(section:number,kind?:string):Json=>{
   const {attr:rawBits,...resolved}=record(kind?read(doc,'getPageBorderFillEntry',section,kind):read(doc,'getPageBorderFill',section));
   if(resolved.fillType==='image'&&resolved.image&&typeof (doc as Record<string,unknown>).getPageBackgroundImageBytes==='function'){

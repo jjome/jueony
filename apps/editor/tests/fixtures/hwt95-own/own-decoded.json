@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "readOnly": true,
+  "schemaAddressesValidated": false,
+  "sourceSha256": "1805d68ae0af16b140afc29c6767c21fb334c5317b6b491b90ad60daed9bdacb",
+  "schema": "<?xml version=\"1.0\" encoding=\"UTF-16\"?><xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"><xs:element name=\"report\"><xs:complexType><xs:sequence><xs:element name=\"title\" type=\"xs:string\"/></xs:sequence></xs:complexType></xs:element></xs:schema>",
+  "mapping": "<?xml version=\"1.0\" encoding=\"UTF-16\"?><XMLELEMENT Name=\"report\" SchemaXPath=\"/xs:schema/xs:element[position()=1]\"><XMLELEMENT Name=\"title\" SchemaXPath=\"/xs:schema/xs:element[position()=1]/xs:complexType[position()=1]/xs:sequence[position()=1]/xs:element[position()=1]\"/></XMLELEMENT>",
+  "schemaName": "own95",
+  "streams": [
+    {
+      "path": "/XMLTemplate/Schema",
+      "storedBytes": 217,
+      "storedSha256": "2d850cb2342c7e8f61f159b19911285ab8e78ff4a6fde5ec207ad7e760c547a7",
+      "utf16Bytes": 496
+    },
+    {
+      "path": "/XMLTemplate/Instance",
+      "storedBytes": 203,
+      "storedSha256": "95deab7a621e0366a62cb42d1cc0c665c54b98717da456d45f54fb7dd23775b5",
+      "utf16Bytes": 568
+    },
+    {
+      "path": "/XMLTemplate/_SchemaName",
+      "storedBytes": 14,
+      "storedSha256": "f57f97b0c1cdb973c739380f10d95532f19edfcf201b8dba94881bdb2600d13c",
+      "utf16Bytes": 10
+    }
+  ],
+  "limitations": [
+    "SchemaXPath/Name binding requires separate validation; HWP body fields are not resolved.",
+    "No HWT editing, template creation, XML instance editing or XSL layout capability."
+  ]
+}

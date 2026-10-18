@@ -1,0 +1,70 @@
+{
+  "baseSourceId": "source-7c10dba04ed65742",
+  "patchSha256": "5954884f693ae5b9dcdd1cbed05a2b612e553ff3be6bebf55f08aa6a89240eb0",
+  "fileCount": 9,
+  "files": [
+    {
+      "path": "src/document_core/commands/text_editing.rs",
+      "baseRawSha256": "46ec48d94fe4ec68e69489b046119b8f22ad7ef9253e1a586d5b0a003c34e4fb",
+      "candidateRawSha256": "1a4491f370b5b05060055312b9b196e00983709b1ed3bdb3b9cad4d723403650",
+      "baseCanonicalSha256": "506464071c43bf1c0605f12be2131f783d8ee7890148f9c97976afd74b4a082c",
+      "candidateCanonicalSha256": "1a4491f370b5b05060055312b9b196e00983709b1ed3bdb3b9cad4d723403650"
+    },
+    {
+      "path": "src/model/native_computed_resource.rs",
+      "baseRawSha256": "08d23267188b35bee71451b587ea28a4938333ff6160ae21bb33c1b5b6d193e7",
+      "candidateRawSha256": "2d232d7f0316aca3f7a624ce60f1aca258f143a36b4dc33e037294b13adb78d2",
+      "baseCanonicalSha256": "d18916e864b1a922f98052297effbd6a00d1a6a4be6460e673f8e8af35eee63d",
+      "candidateCanonicalSha256": "04c684adcd5c2bb5999930969c243f51ecc89420e060c420c63557d4404af146"
+    },
+    {
+      "path": "src/renderer/composer/line_breaking.rs",
+      "baseRawSha256": "b0b3abad2708bc3049f0999700d189eb60c2476fc027dc4465f46af370835983",
+      "candidateRawSha256": "4f911aa243c151c3ad7402a50f03a60ec7f0a7a259cc833b63516ef71a957406",
+      "baseCanonicalSha256": "6e5672760412bdc2dcc1e9299b8a0bccbeb8673648892353da4f91675a5bd599",
+      "candidateCanonicalSha256": "4f911aa243c151c3ad7402a50f03a60ec7f0a7a259cc833b63516ef71a957406"
+    },
+    {
+      "path": "src/renderer/composer/tests.rs",
+      "baseRawSha256": "17d88c51de345356d3d0dea77eb66409abcc52638f5942864558b6e01229698b",
+      "candidateRawSha256": "8030ff308c6987338559afc64017e2d4febc2cca1cfe39c6969ec8d40cb1569a",
+      "baseCanonicalSha256": "7f00a2f60686d0a4e90da18b43221316d926974ddfb16ddaa34c8a2c91813424",
+      "candidateCanonicalSha256": "8030ff308c6987338559afc64017e2d4febc2cca1cfe39c6969ec8d40cb1569a"
+    },
+    {
+      "path": "src/renderer/composer.rs",
+      "baseRawSha256": "6de9f98a67c77d3503daaa50a8477d8b946fb691d5ce6e91f54349c8835d8d33",
+      "candidateRawSha256": "ced4febf9685924c7a7d91b613d8b0beb3cf2dd2226c0d88f3bfcb5cf1d0f87a",
+      "baseCanonicalSha256": "22b2bfe0e80332d1696babd6ae413aab42ad778bbb83250ae83dce9902912d7b",
+      "candidateCanonicalSha256": "ced4febf9685924c7a7d91b613d8b0beb3cf2dd2226c0d88f3bfcb5cf1d0f87a"
+    },
+    {
+      "path": "src/renderer/height_measurer.rs",
+      "baseRawSha256": "ef750733b1d18d23597d95d9cee7426724521b5a656c4d4b54b71ed6ebf8c401",
+      "candidateRawSha256": "b5e2b0c31d54211435e1dda8f147bc664fdee901a2229e5663af258c9cb3acbd",
+      "baseCanonicalSha256": "c71e4166c3d701bf702d6ebd2efbb9a7e53fa6046f45beb9ec2469c1c18e1ddd",
+      "candidateCanonicalSha256": "b5e2b0c31d54211435e1dda8f147bc664fdee901a2229e5663af258c9cb3acbd"
+    },
+    {
+      "path": "src/renderer/layout/table_layout.rs",
+      "baseRawSha256": "b202a2eb70f5c9c69a1ba248b641771903e3b58dead90d57bd584d58c6a0d3ee",
+      "candidateRawSha256": "64f9d973d2cbb012c678cb19ad211669b3b17195ded48e36cff505a03aedb24b",
+      "baseCanonicalSha256": "1dcbd3254a0f68b7de40c922f10e15cb62f2ef85e2c59fb24050bb143fa5f5f9",
+      "candidateCanonicalSha256": "64f9d973d2cbb012c678cb19ad211669b3b17195ded48e36cff505a03aedb24b"
+    },
+    {
+      "path": "src/renderer/layout/table_partial.rs",
+      "baseRawSha256": "27b8950090d3ff839ca92aa89c568e2f7d9ff16715457ebbd9f5294e1349867a",
+      "candidateRawSha256": "183065a727e66d1622e2783601d99bb24411b754db5aae033b2131c36266763c",
+      "baseCanonicalSha256": "9e0a4d66d00906d4c949481088dba04d81d1f04ac1091b09188d65a9140ddeab",
+      "candidateCanonicalSha256": "183065a727e66d1622e2783601d99bb24411b754db5aae033b2131c36266763c"
+    },
+    {
+      "path": "src/renderer/style_resolver.rs",
+      "baseRawSha256": "b28a36d364259e964db4ef415f52b0640f56b27f2ca24b0c672f478bb4bd2054",
+      "candidateRawSha256": "1975ca44ba3b32c384589333f6c11e86b9b75d1fd601ec7157044ead97ee93a6",
+      "baseCanonicalSha256": "23523f7962efa62b1d3b613db6304c8d2a0fdea43b1e392ac3b4a9ea22d5b9b5",
+      "candidateCanonicalSha256": "1975ca44ba3b32c384589333f6c11e86b9b75d1fd601ec7157044ead97ee93a6"
+    }
+  ]
+}

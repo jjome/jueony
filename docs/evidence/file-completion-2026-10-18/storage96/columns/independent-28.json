@@ -1,0 +1,2281 @@
+{
+  "schemaVersion": 1,
+  "engine": {
+    "sourceId": "2feb978b45e2964e",
+    "wasmSha256": "5f40eebea9726b42d049f9f57694c0d686099cfef9ca4dc61d621ebc35e00fd8"
+  },
+  "scope": "All 28 sealed original HWP fixture bytes underlying 24 column scenarios. Independent strict CFB/OLE property extraction and exact u64 FILETIME/UTC7 digits, compared directly to selected WASM readonly API. No date normalization across distinct source/oracle files, no baseline API invention, no source changes.",
+  "results": [
+    {
+      "path": "fixtures/build/file-closure69-overlap/caption-original-prepared.hwp",
+      "sha256": "5d13d39b186e1851383b044a783441fb77c43a6b95855c4a3b136c94a9b891c8",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134167468730440000",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+          "rawFileTime100ns": "134167468730440000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134167468730440000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/final-inputs/offset.hwp",
+      "sha256": "9934d639cff4127a630007137d816a5d404e8375ac2d34105a174e2f894f2c8d",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134167468730440000",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+          "rawFileTime100ns": "134167468730440000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134167468730440000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/final-inputs/plain.hwp",
+      "sha256": "a55d3e1f59e2d249f1d63214731dbb026d3f8101f217f3a385cee9002bc476e4",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134167468730440000",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+          "rawFileTime100ns": "134167468730440000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134167468730440000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/final-inputs/superscript.hwp",
+      "sha256": "341edb377d7deaacc85e20138e27dfedfd33356b54eee14395ffe418f6d485bc",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134167468730440000",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+          "rawFileTime100ns": "134167468730440000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134167468730440000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/final-inputs/three.hwp",
+      "sha256": "5def8e265d9c9c1a6658656288d74d3db4163ad52d5f2a25960aea8036b3cebf",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134167468730440000",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+          "rawFileTime100ns": "134167468730440000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134167468730440000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/final-inputs/two.hwp",
+      "sha256": "81c425b627ce2b23d456fd95ac6772a657bf2bb153e782e4d7a81180f47261c9",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134167468730440000",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+          "rawFileTime100ns": "134167468730440000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134167468730440000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/final-inputs/unicode.hwp",
+      "sha256": "afe3853b0e33a30a225470007f103edda4b516e289b86a549986f33f943f4bee",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134167468730440000",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+          "rawFileTime100ns": "134167468730440000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134167468730440000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/caption-prepared.hwp",
+      "sha256": "cb54492b848fa13f5637f94e9f8ea5a379b8bd1bc460b291fa8c40369d190d3f",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "d47e13842dc9c9f50b8d6f8d2ebfe1408ada8a5241a8dc9d0dc8599fdb19fa44",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134366807100220000",
+          "utc": "2026-10-17T03:18:30.0220000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "7d65578b9b4682123af93681593e90be5a4442e6e711ec0a29c01ceeccc36a09",
+          "rawFileTime100ns": "134366807100220000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134366807100220000",
+          "state": "value",
+          "utc": "2026-10-17T03:18:30.0220000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/column2.hwp",
+      "sha256": "18e6f0cb207077016119167a3ff6b17c4b6970ce201172b6e21615b8335461d8",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "71ebad8bf87c8c4cda3f4a3f61675e89d6b3c512742223c720c1a119beed6ac9",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134366809623930000",
+          "utc": "2026-10-17T03:22:42.3930000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "c2e2138d90eb9f58f9420a114bf66d6cad870e3db0c1d344f1fb2b3db2a205dc",
+          "rawFileTime100ns": "134366809623930000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134366809623930000",
+          "state": "value",
+          "utc": "2026-10-17T03:22:42.3930000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/multiline-prepared.hwp",
+      "sha256": "79f55c9258e3fb35e280a39c5793a1d3682336184d92069b52f110ea00e33fd1",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "d5aec84bd652824bed1b2186683ca28df3783919199b55cde304372df10a0c00",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134366806194570000",
+          "utc": "2026-10-17T03:16:59.4570000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "b2fc61dc3d02435bd88bb3d54d0424a1193a0407cfb6a329055aee1bd560378e",
+          "rawFileTime100ns": "134366806194570000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134366806194570000",
+          "state": "value",
+          "utc": "2026-10-17T03:16:59.4570000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/negative.hwp",
+      "sha256": "dc461180cab9f4a89c21f89eb1d8b3ba44f0fdde78d57e767d9af4553230b7f9",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "c6d476fc59baeac72985b7705a1dd9cc57b7b78effd3051d465d906b273c30a6",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134366808925860000",
+          "utc": "2026-10-17T03:21:32.5860000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "84774070cedcac3f1a3c6761692f87d068cd7dea48b109151a11db00b70974bd",
+          "rawFileTime100ns": "134366808925860000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134366808925860000",
+          "state": "value",
+          "utc": "2026-10-17T03:21:32.5860000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/offset.hwp",
+      "sha256": "592741e04a853fb4942992d300b4addc99d9bfc532e00bb197532e80086cfd02",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "cac6c980f4186014a0f05591b4a368e12df1926e2cff127d9aa0c5462f52fb9c",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134366803658780000",
+          "utc": "2026-10-17T03:12:45.8780000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "bd367f3e2eb8800af00cd11f25c0305bc3f2df0844851baf85efbf9ae2c05384",
+          "rawFileTime100ns": "134366803658780000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134366803658780000",
+          "state": "value",
+          "utc": "2026-10-17T03:12:45.8780000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/plain.hwp",
+      "sha256": "822891383045c0614203624d918a8150bd2c122f6863d86cdaebe69df9d9f80b",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "082d0c6e3cde64c05953f4991cf40f76262498337ee779fc450f9a8c82c2b2d2",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134366804188780000",
+          "utc": "2026-10-17T03:13:38.8780000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "119218edede3b3c4f9a793d526d8707cbad0a79707bc9a4657fd72387493f327",
+          "rawFileTime100ns": "134366804188780000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134366804188780000",
+          "state": "value",
+          "utc": "2026-10-17T03:13:38.8780000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/positive-prepared.hwp",
+      "sha256": "0e62fcc37b7bc2e0c915a4bd789f04ac008afa55ee949561aef7d7e87fad855f",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "84622375ae31d03d39924adb42667a90678f31133e39840b3be7df29c6244927",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134366808023700000",
+          "utc": "2026-10-17T03:20:02.3700000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "53785c6a12140823e8e4802cc887842a478bd925337a0099e438b718296bc0ab",
+          "rawFileTime100ns": "134366808023700000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134366808023700000",
+          "state": "value",
+          "utc": "2026-10-17T03:20:02.3700000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/superscript.hwp",
+      "sha256": "6514105fcfa00b80445d49e443f134dabdef752301d700299afd05f5eb099d1b",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "6f16174a2c6289335de281c8cb902c0ca0e757caf7a4973e06632e29f7ea2c4f",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134366805393590000",
+          "utc": "2026-10-17T03:15:39.3590000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "4802b6b35d63fde9476545f5d40076ebe978d4485d4e5a3e430861b65c98a71b",
+          "rawFileTime100ns": "134366805393590000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134366805393590000",
+          "state": "value",
+          "utc": "2026-10-17T03:15:39.3590000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/three.hwp",
+      "sha256": "1bf78dd66298d83e357a542dcab315e26f533da95535e66cb0a96ffbe52627a5",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "5d51c14f8d40940efeda86219e96baa3b33606bce4e9521b77ff43cd7d21625f",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134366803102870000",
+          "utc": "2026-10-17T03:11:50.2870000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "e6b9b560c06064a415ca11de781456f106445ce47dbae186ac727ea3b56c3ff8",
+          "rawFileTime100ns": "134366803102870000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134366803102870000",
+          "state": "value",
+          "utc": "2026-10-17T03:11:50.2870000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/two.hwp",
+      "sha256": "4462b8950f4d5602eb8d13392f870aa6e632f9b2ab968514e58972ecb429ee84",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "3250700d4a55e9c55f03268a71863be8d210c909d4ea07f3b9f288ef7a653ab8",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134366802542040000",
+          "utc": "2026-10-17T03:10:54.2040000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "07dec8861acb9800def6635340957979a5cd1a532b645701fe77b107a2133b9b",
+          "rawFileTime100ns": "134366802542040000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134366802542040000",
+          "state": "value",
+          "utc": "2026-10-17T03:10:54.2040000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/hancom-current/unicode.hwp",
+      "sha256": "c6154b3b868d126f6936f0da0eb816d3538e2ca29616fb319cf61c42d949db40",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "59f1bf774d9697dd1ad683313ca24c906301297ac18a1032c71dd35d95203dad",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134366804842370000",
+          "utc": "2026-10-17T03:14:44.2370000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "e1b0afb75c20788422b90ca9944d7b2abca36c5a5e98d46357dcb3f2492c4719",
+          "rawFileTime100ns": "134366804842370000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134366804842370000",
+          "state": "value",
+          "utc": "2026-10-17T03:14:44.2370000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/multiline-original-prepared.hwp",
+      "sha256": "f1094b81038cbde1fa6797ba4f72a6f5d4c4005b63e87225c0125ebe40e5e8bf",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134167468730440000",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+          "rawFileTime100ns": "134167468730440000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134167468730440000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/positive-original-prepared.hwp",
+      "sha256": "c17099d199c20bb42ca6e546f8ac392bd150466d089a7188fae60690ca9ab526",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134167468730440000",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+          "rawFileTime100ns": "134167468730440000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134167468730440000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/support/column2.hwp",
+      "sha256": "ca9301227aa08d9ec57355989e5ec7a817399c2f9c5eee6c849a3942cae88de6",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134167468730440000",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+          "rawFileTime100ns": "134167468730440000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134167468730440000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-overlap/support/negative.hwp",
+      "sha256": "a5c62e0b6cff7a9ba3445517bfc2f47494f841d75694f45400911fb115c3eec8",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134167468730440000",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+          "rawFileTime100ns": "134167468730440000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134167468730440000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-asymmetric_margin.hwp",
+      "sha256": "3ba817fe20afa035739168eddcd1eae6fa08e7bd28b4322db3ec7f6f1f85830e",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134167468730440000",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+          "rawFileTime100ns": "134167468730440000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134167468730440000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-distribute.hwp",
+      "sha256": "9b35480c316ee54c1d5ef0ecbe4a2d5223b7321143aded0dbab43b1d5f569452",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134167468730440000",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+          "rawFileTime100ns": "134167468730440000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134167468730440000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-rtl.hwp",
+      "sha256": "f48a715a8ea47cb8081b735f89512dbac9209a0e99ab5d68877396d030056742",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134167468730440000",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+          "rawFileTime100ns": "134167468730440000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134167468730440000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-single_column.hwp",
+      "sha256": "9778d66926e3138ce4bb51fadfd16173ee3d439aeec0a02a8f0af34b7fac0f3b",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134167468730440000",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+          "rawFileTime100ns": "134167468730440000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134167468730440000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-three_columns.hwp",
+      "sha256": "db5e90e7217912d928d26d87d0e2877bf2682e90d1812bdef274aee83972cb79",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134167468730440000",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+          "rawFileTime100ns": "134167468730440000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134167468730440000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    },
+    {
+      "path": "fixtures/build/file-closure69-public/column2-candidate74/valid-negative-disk/baseline-unequal_columns.hwp",
+      "sha256": "2ee00d6ef1ea96b9c5fb7fd4f2a4a278b0d676dcb964afdae2dcb49b0ab4016e",
+      "summaryPath": "\u0005HwpSummaryInformation",
+      "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+      "value": {
+        "created": {
+          "state": "value",
+          "fileTime100ns": "134167468416830000",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "state": "value",
+          "fileTime100ns": "134167468730440000",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "state": "value",
+          "fileTime100ns": "0",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "records": [
+        {
+          "key": "created",
+          "pid": 12,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+          "rawFileTime100ns": "134167468416830000",
+          "state": "value"
+        },
+        {
+          "key": "modified",
+          "pid": 13,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+          "rawFileTime100ns": "134167468730440000",
+          "state": "value"
+        },
+        {
+          "key": "lastPrinted",
+          "pid": 11,
+          "type": 64,
+          "rawBytes": 12,
+          "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+          "rawFileTime100ns": "0",
+          "state": "value"
+        },
+        {
+          "key": "editingDuration",
+          "pid": 10,
+          "state": "absent"
+        }
+      ],
+      "api": {
+        "created": {
+          "fileTime100ns": "134167468416830000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:21.6830000Z"
+        },
+        "modified": {
+          "fileTime100ns": "134167468730440000",
+          "state": "value",
+          "utc": "2026-02-28T10:07:53.0440000Z"
+        },
+        "lastPrinted": {
+          "fileTime100ns": "0",
+          "state": "value",
+          "utc": "1601-01-01T00:00:00.0000000Z"
+        },
+        "editingDuration": {
+          "state": "absent"
+        }
+      },
+      "status": "PASS"
+    }
+  ],
+  "passed": 28,
+  "total": 28,
+  "sourceInputHashesChecked": true
+}

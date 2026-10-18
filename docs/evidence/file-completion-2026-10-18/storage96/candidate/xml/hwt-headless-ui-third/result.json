@@ -1,0 +1,228 @@
+{
+  "results": [
+    {
+      "name": "native own CFB receipt resolves exact Name/SchemaXPath while exposing no body write capability",
+      "status": "PASS"
+    },
+    {
+      "name": "missing engine capability rejects rather than pretending ordinary XML support",
+      "status": "PASS"
+    },
+    {
+      "name": "source ownership, readOnly, version and fixed stream receipt defects all reject",
+      "status": "PASS"
+    },
+    {
+      "name": "mapping Name mismatch and XPath injection reject after real DOM namespace parsing",
+      "status": "PASS"
+    },
+    {
+      "name": "opaque CFB copies are byte exact, isolated from caller and every returned copy",
+      "status": "PASS"
+    },
+    {
+      "name": "malformed response, allocation limits, DTD and unsupported roots cannot become read success",
+      "status": "PASS"
+    },
+    {
+      "name": "installed supported16 prove exact Name/schema address ownership without granting any HWP field binding",
+      "status": "PASS"
+    },
+    {
+      "name": "installed ambiguous or unsupported5 mappings reject rather than becoming a partial successful template",
+      "status": "PASS"
+    },
+    {
+      "name": "actual XML UI opens independent HWT inspector and preserves dirty XML/history/recovery bytes",
+      "status": "PASS"
+    },
+    {
+      "name": "XML dialog without an engine HWT capability keeps the entry disabled and honest",
+      "status": "PASS"
+    },
+    {
+      "name": "owned source bytes remain unchanged with zero external requests or browser errors",
+      "status": "PASS"
+    }
+  ],
+  "failures": [],
+  "observations": [
+    {
+      "name": "(DB)sample01.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 51,
+      "readOnly": true,
+      "unverifiedBodyBindings": 51
+    },
+    {
+      "name": "(DB)sample02.hwt",
+      "status": "UNSUPPORTED",
+      "error": "HwtMappingError95: 지원하지 않는 HWT SchemaXPath 단계입니다."
+    },
+    {
+      "name": "sample01.hwt",
+      "status": "UNSUPPORTED",
+      "error": "HwtMappingError95: 같은 부모의 HWT 매핑 이름이 모호합니다."
+    },
+    {
+      "name": "sample02.hwt",
+      "status": "UNSUPPORTED",
+      "error": "HwtMappingError95: HWT 매핑 Name이 실제 스키마 선언과 다릅니다."
+    },
+    {
+      "name": "sample03.hwt",
+      "status": "UNSUPPORTED",
+      "error": "HwtMappingError95: HWT 매핑 Name이 실제 스키마 선언과 다릅니다."
+    },
+    {
+      "name": "sample04.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 15,
+      "readOnly": true,
+      "unverifiedBodyBindings": 15
+    },
+    {
+      "name": "sample05.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 19,
+      "readOnly": true,
+      "unverifiedBodyBindings": 19
+    },
+    {
+      "name": "sample06.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 32,
+      "readOnly": true,
+      "unverifiedBodyBindings": 32
+    },
+    {
+      "name": "sample07.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 19,
+      "readOnly": true,
+      "unverifiedBodyBindings": 19
+    },
+    {
+      "name": "sample08.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 15,
+      "readOnly": true,
+      "unverifiedBodyBindings": 15
+    },
+    {
+      "name": "sample09.hwt",
+      "status": "UNSUPPORTED",
+      "error": "HwtMappingError95: 같은 부모의 HWT 매핑 이름이 모호합니다."
+    },
+    {
+      "name": "sample10.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 11,
+      "readOnly": true,
+      "unverifiedBodyBindings": 11
+    },
+    {
+      "name": "sample11.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 7,
+      "readOnly": true,
+      "unverifiedBodyBindings": 7
+    },
+    {
+      "name": "sample12.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 11,
+      "readOnly": true,
+      "unverifiedBodyBindings": 11
+    },
+    {
+      "name": "sample13.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 11,
+      "readOnly": true,
+      "unverifiedBodyBindings": 11
+    },
+    {
+      "name": "sample14.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 15,
+      "readOnly": true,
+      "unverifiedBodyBindings": 15
+    },
+    {
+      "name": "sample15.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 12,
+      "readOnly": true,
+      "unverifiedBodyBindings": 12
+    },
+    {
+      "name": "sample16.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 16,
+      "readOnly": true,
+      "unverifiedBodyBindings": 16
+    },
+    {
+      "name": "sample17.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 17,
+      "readOnly": true,
+      "unverifiedBodyBindings": 17
+    },
+    {
+      "name": "sample18.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 13,
+      "readOnly": true,
+      "unverifiedBodyBindings": 13
+    },
+    {
+      "name": "sample19.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 33,
+      "readOnly": true,
+      "unverifiedBodyBindings": 33
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "scope": "Production TS domain/adapter in isolated headless browser using own Native extractor receipt. Installed XML only transient memory; output is counts/filenames, no vendor XML. Own actual nested XML/HWT DOM dialog, dirty history/checkpoint and allocation preflight tested. Supported installed16, unsupported5 explicitly rejected (original all21 failure preserved). No WASM/native UI/field edits/template save/XSL/general-XSD support claim.",
+  "sourceHashes": [
+    {
+      "path": "src/adapters/xml/hwt-template95.ts",
+      "sha256": "6f9d7b7a6e4c719d432378b87aafc6fec368c46aa82b62c4715e3a1232cc3360"
+    },
+    {
+      "path": "src/modules/xml-documents/public/hwt-template95.ts",
+      "sha256": "816388376425e4a0529d158ec34cd0e197fec6f223f2c49a0471acc4b4b4d169"
+    },
+    {
+      "path": "src/adapters/xml/browser-parser.ts",
+      "sha256": "d501b25f13660836bd10d0551040beccba28bd52a1b7a783966a628a87c37ab3"
+    },
+    {
+      "path": "src/ui/xml-document-dialog.ts",
+      "sha256": "b388ac11291857ea12a6a99fdaccb50967b40cd2fa5fc7fc58a1515d3fc2aed2"
+    },
+    {
+      "path": "src/adapters/storage/xml-recovery.ts",
+      "sha256": "26fa94ff799300a9271154f403794cbe4904596611aa5a657f5e7053dc4426b5"
+    },
+    {
+      "path": "src/modules/xml-documents/domain/hwt-mapping95.ts",
+      "sha256": "dd507815511b09ddd2b6053d1bea0a2cae98633b08669c31a1f74865d4698ced"
+    },
+    {
+      "path": "src/ui/hwt-template95-dialog.ts",
+      "sha256": "ef12d0ff8fea4ab14da588e8136ef440a6abbfbb06df9f502ff0f5b90033c122"
+    }
+  ],
+  "inputSha256": {
+    "ownHwt": "1805d68ae0af16b140afc29c6767c21fb334c5317b6b491b90ad60daed9bdacb",
+    "ownReceipt": "98602e972e2c190dd7c482257a5d26ebdfe93d1568acc425997113410500ea04"
+  },
+  "verifierSha256": "3499442435038b1abb52d8256e2fe0db7df9bf2f6386170638cb086c10fd9790",
+  "bundleSha256": "144fce8f89bd86e760c3469d3e089b8d04d60a7c59e1a7ad510ef5baa5214415"
+}

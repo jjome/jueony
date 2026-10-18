@@ -2,9 +2,18 @@ import type {Snapshot,AgentDocumentInformation,AgentDocumentMetadataOp} from '..
 import {validateAgentDocumentMetadata} from '../../modules/document/public/engine-integration.ts';
 import {readDocumentMetadata,preflightDocumentMetadata,applyDocumentMetadata,DOCUMENT_METADATA_KEYS} from './document-metadata.ts';
 import {readDocumentStatistics} from './document-info.ts';
+import {readStoredDocumentInformation} from './document-stored-information.ts';
+import {readStoryInformation} from './document-story-information.ts';
 export function readAgentDocumentInformation(wasm:any,name:string,canEdit:boolean):AgentDocumentInformation{
  const source=readDocumentMetadata(wasm),metadata=canEdit?source:{...source,editable:false,reason:source.reason??'현재 문서가 읽기 전용 상태입니다.'};
- try{return{metadata,statistics:{...readDocumentStatistics(wasm,name)}};}catch{return{metadata,reason:'일부 문서 통계를 읽지 못했습니다. 값이 0이라는 뜻이 아닙니다.'};}
+ try{
+  const stored=readStoredDocumentInformation(wasm),stories=readStoryInformation(wasm);
+  return{metadata,statistics:{...readDocumentStatistics(wasm,name),
+   storedFileInformation:stored.value?{readOnly:true,...stored.value}:{unavailableReason:stored.reason??'조회 불가'},
+   canonicalStories:stories.value?{basis:stories.value.basis,counts:{...stories.value.counts},objects:{...stories.value.objects},
+    stories:stories.value.stories.map(s=>({kind:s.kind,counts:{...s.counts}})),limitations:stories.value.limitations}:{unavailableReason:stories.reason??'조회 불가'},
+  }};
+ }catch{return{metadata,reason:'일부 문서 통계를 읽지 못했습니다. 값이 0이라는 뜻이 아닙니다.'};}
 }
 function current(wasm:any,base:Snapshot,op:AgentDocumentMetadataOp){
  const value=validateAgentDocumentMetadata(op,base),source=readDocumentMetadata(wasm);

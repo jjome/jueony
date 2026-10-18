@@ -1,0 +1,99 @@
+{
+  "scope": "Private exact integer cell extent and derived BREAK-cell correction; original Hancom full parity remains incomplete",
+  "patchSha256": "5954884f693ae5b9dcdd1cbed05a2b612e553ff3be6bebf55f08aa6a89240eb0",
+  "enginePackage": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\initial-layout95\\pkg-v4-frozen",
+  "wasmSha256": "45e6284e9d33f5c42b21aca77cdd74f40e82bd5e9153fc3f9458c5a2a4e7f2ce",
+  "resourceSha256": "b068882aaa440590c7f55786de252795d874227503825b4dd8409a19be076b4a",
+  "nativeTests": {
+    "owned": 7,
+    "composer": 66,
+    "computed": 11,
+    "editing": 41,
+    "failed": 0,
+    "ignored": 0,
+    "limitation": "Private source byte cohort with copied compile-only fixtures; no direct official full native suite claimed"
+  },
+  "actualVerifier": {
+    "passed": 13,
+    "failed": 0,
+    "initialOracleBefore": 731,
+    "initialOracleAfter": 680,
+    "remainingAbsoluteTargetDeltaPx": 115.5,
+    "caretChecks": 180,
+    "strictMixedExports": 12
+  },
+  "remaining": [
+    "Python original680 whole-published differences (includes319 shape reference-ID differences) remain; absolute table placements not corrected by this scoped change",
+    "MCST original15 pages versus independently Hancom-saved16; unowned missing glyph fallback selection remains unobserved",
+    "Other Hancom-saved codec failures remain separately recorded in five-file actual result"
+  ],
+  "assetsIncluded": false,
+  "officialSourcesUntouched": true,
+  "manifest": [
+    {
+      "path": "actual-v4-result.json",
+      "bytes": 35765,
+      "sha256": "15260dbf425bb96123e13084341a8c810dd55159ef109ba3e4b987d5d8e07acc"
+    },
+    {
+      "path": "candidate-source-proof.json",
+      "bytes": 4285,
+      "sha256": "daa6da9f78f6276e606ef261a89d3b7b17b51ff9757e7b1aefbf19ef402fc770"
+    },
+    {
+      "path": "native-final.log",
+      "bytes": 14466,
+      "sha256": "82ab3ced8df2f48165aa821fed1c3166d32da7d7ad994754fc6cae502fc9b761"
+    },
+    {
+      "path": "owned-native-cell-layout95.patch",
+      "bytes": 24467,
+      "sha256": "5954884f693ae5b9dcdd1cbed05a2b612e553ff3be6bebf55f08aa6a89240eb0"
+    },
+    {
+      "path": "portable-resource-generation.json",
+      "bytes": 68686,
+      "sha256": "9a5df189ed63b11c35c578f074b4af53683ec699c98eacd05c7d324212ca4c8a"
+    },
+    {
+      "path": "private-compile-fixtures.json",
+      "bytes": 2047,
+      "sha256": "af1044c8bc51f8452cfa1281642cee15d958b1930f246b4d0cebd94f4008b377"
+    },
+    {
+      "path": "production-verifier/result.json",
+      "bytes": 50141,
+      "sha256": "602629e634860c53588361a5a6f53ccffc5ea63cfbe60b6439039e061542491b"
+    },
+    {
+      "path": "production-verifier-v4-absolute.log",
+      "bytes": 861,
+      "sha256": "cb7b3bdb78bb924635e2d033e60a5ea8b67b8e758d1ef873b7fb2af3256de52f"
+    },
+    {
+      "path": "production-verifier-v4-final.log",
+      "bytes": 861,
+      "sha256": "cb7b3bdb78bb924635e2d033e60a5ea8b67b8e758d1ef873b7fb2af3256de52f"
+    },
+    {
+      "path": "source-row-immutability.json",
+      "bytes": 970,
+      "sha256": "a21ee41a34eccdb7e82d7d695a69856ed6e3c5f3ba1acfe766d3d1b01a461bec"
+    },
+    {
+      "path": "verify-owned-native-cell-layout.mjs",
+      "bytes": 13195,
+      "sha256": "78b499ee0dde3ea40b45bd49145e9c7141fbadba66d4751490f132cc40125a09"
+    },
+    {
+      "path": "wasm-build-v4.log",
+      "bytes": 163,
+      "sha256": "3b19f8b55531d1103740ff4f336d98c154c855e942d18819aac711d6a0e53099"
+    }
+  ],
+  "verifierSha256": "78b499ee0dde3ea40b45bd49145e9c7141fbadba66d4751490f132cc40125a09",
+  "externalInputsContract": [
+    "JUEONY_TEST_SOURCE absolute and pinnedSHA",
+    "JUEONY_TEST_ORACLE absolute and pinnedSHA"
+  ]
+}

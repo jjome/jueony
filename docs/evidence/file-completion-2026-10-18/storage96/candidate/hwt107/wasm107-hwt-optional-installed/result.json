@@ -1,0 +1,387 @@
+{
+  "engine": {
+    "pkg": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-2feb978b45e2964e\\pkg",
+    "sourceId": "2feb978b45e2964e",
+    "wasmSha256": "5f40eebea9726b42d049f9f57694c0d686099cfef9ca4dc61d621ebc35e00fd8",
+    "jsSha256": "5b10dbb379d8d609e466b816ccf25697d87a376f0e17481f63e4d9ef0156c57a"
+  },
+  "fixtureManifestSha256": "f2688418d358f78e2932100296c7969871e6c4931c29151eedf650ffbc976f67",
+  "provider": "actual-WASM export; synthetic receipts only for explicit malformed-receipt negative guards",
+  "wasmSourceGuards": [
+    {
+      "name": "invalid-container",
+      "status": "REJECTED",
+      "sourceUnchanged": true
+    },
+    {
+      "name": "allocation-budget",
+      "status": "REJECTED",
+      "sourceUnchanged": true
+    },
+    {
+      "name": "missing-template-flag",
+      "status": "REJECTED",
+      "sourceUnchanged": true
+    },
+    {
+      "name": "encrypted",
+      "status": "REJECTED",
+      "sourceUnchanged": true
+    },
+    {
+      "name": "distribution",
+      "status": "REJECTED",
+      "sourceUnchanged": true
+    },
+    {
+      "name": "drm",
+      "status": "REJECTED",
+      "sourceUnchanged": true
+    },
+    {
+      "name": "public-key",
+      "status": "REJECTED",
+      "sourceUnchanged": true
+    }
+  ],
+  "wasmRequests": [
+    {
+      "sourceSha256": "1805d68ae0af16b140afc29c6767c21fb334c5317b6b491b90ad60daed9bdacb",
+      "bytes": 20480,
+      "status": "ACCEPTED"
+    },
+    {
+      "sourceSha256": "1805d68ae0af16b140afc29c6767c21fb334c5317b6b491b90ad60daed9bdacb",
+      "bytes": 20480,
+      "status": "ACCEPTED"
+    },
+    {
+      "sourceSha256": "1805d68ae0af16b140afc29c6767c21fb334c5317b6b491b90ad60daed9bdacb",
+      "bytes": 20480,
+      "status": "ACCEPTED"
+    },
+    {
+      "sourceSha256": "3ae625057387535132d920e50a5189921e6f527501f2b6ee7dddd4046bbfa40d",
+      "bytes": 19,
+      "status": "REJECTED",
+      "error": "HWT_CFB_INVALID"
+    }
+  ],
+  "optionalInstalled": {
+    "requested": true,
+    "count": 21,
+    "inputs": [
+      {
+        "name": "(DB)sample01.hwt",
+        "sourceSha256": "a95b4b68492649d1ed55d0c1f0053bcc9e2a97b4ca4a45ca5db2bc7ff988b7c5"
+      },
+      {
+        "name": "(DB)sample02.hwt",
+        "sourceSha256": "925507658eed0f476189795e2ba3b1c92899d40bcdc2bd2d130f78f486c9cea3"
+      },
+      {
+        "name": "sample01.hwt",
+        "sourceSha256": "39f71e8d4838b2f1bce32f011ccdf0634e93cb7e4442c041c2a6864fd0d6d944"
+      },
+      {
+        "name": "sample02.hwt",
+        "sourceSha256": "e226a2c75b60d117ea037393399552ef61c6e588c4679e93ed571892626af6ab"
+      },
+      {
+        "name": "sample03.hwt",
+        "sourceSha256": "1b4ab2b70f967a1126fc9a325b63c8820fe47227823c1baf28ec01848493c2a6"
+      },
+      {
+        "name": "sample04.hwt",
+        "sourceSha256": "51198c33bd35dc0085d3b9046a9b5e5a9e61071c1afbe3776744b7a1fc34ea3c"
+      },
+      {
+        "name": "sample05.hwt",
+        "sourceSha256": "b80d18fbdd61abc24be4e1415dee9e7687b34c3c9c489b4c71cdddcd04bf5c4e"
+      },
+      {
+        "name": "sample06.hwt",
+        "sourceSha256": "0596a22307a58220ba9d6b131eac3c4b7ef3bd4cd6e0a4a64a7335c62740b786"
+      },
+      {
+        "name": "sample07.hwt",
+        "sourceSha256": "d626f917cdc1ec1fec412bc2553f771e16868b43c0c50c41dc8ade4a39d77525"
+      },
+      {
+        "name": "sample08.hwt",
+        "sourceSha256": "355822673b7265fe8c6d36554a515ec82294067cd5b9f2d0d26eb32c1f87d2de"
+      },
+      {
+        "name": "sample09.hwt",
+        "sourceSha256": "188382937641532d0019bb546839601b76a3623796d49bc5c0ba7beb31af572b"
+      },
+      {
+        "name": "sample10.hwt",
+        "sourceSha256": "6ab16421763bf70a72d145372a0bd1afd2e89608aaa8e07cbc9bca2500c9ed1b"
+      },
+      {
+        "name": "sample11.hwt",
+        "sourceSha256": "054177eac081c6a4160ef2700bd85bccf39c1d3aad83adc040b49e833147e3bc"
+      },
+      {
+        "name": "sample12.hwt",
+        "sourceSha256": "8aa0098e52201280f2e9938332e743db2fb08ffb76664d2298cb838e929e50c4"
+      },
+      {
+        "name": "sample13.hwt",
+        "sourceSha256": "6aabaf99766a67fb99a46cf0fd6221c904bf0faeb03931aeeb58384191603e96"
+      },
+      {
+        "name": "sample14.hwt",
+        "sourceSha256": "832554742b7ff12b5e60bd9d3565b562500251daf03f1f476733d9cb2d6ded8b"
+      },
+      {
+        "name": "sample15.hwt",
+        "sourceSha256": "0a4ddd33eac3c3d0b97e23785f93241c5e498dd49782cfc2d7a10383e8cb3fd6"
+      },
+      {
+        "name": "sample16.hwt",
+        "sourceSha256": "d097495a2b1beed60c27209a28931769b60ca8ffd9ec05bea402003cda6aa517"
+      },
+      {
+        "name": "sample17.hwt",
+        "sourceSha256": "9b2c2b4033123722d8c24ab1d55255804a917dc81ae1b39bc91aebd40f681b9f"
+      },
+      {
+        "name": "sample18.hwt",
+        "sourceSha256": "317bbf3637ea75f5acb8d9b69e1d5175889e7b5c7486e9cd43173c0b82e7085a"
+      },
+      {
+        "name": "sample19.hwt",
+        "sourceSha256": "2ef5c9733d8303d0721c13fc631cb8d97505fff5995c832a222c12b77c183e77"
+      }
+    ]
+  },
+  "results": [
+    {
+      "name": "actual WASM own CFB receipt resolves exact Name/SchemaXPath while exposing no body write capability",
+      "status": "PASS"
+    },
+    {
+      "name": "missing engine capability rejects rather than pretending ordinary XML support",
+      "status": "PASS"
+    },
+    {
+      "name": "source ownership, readOnly, version and fixed stream receipt defects all reject",
+      "status": "PASS"
+    },
+    {
+      "name": "mapping Name mismatch and XPath injection reject after real DOM namespace parsing",
+      "status": "PASS"
+    },
+    {
+      "name": "opaque CFB copies are byte exact, isolated from caller and every returned copy",
+      "status": "PASS"
+    },
+    {
+      "name": "malformed response, allocation limits, DTD and unsupported roots cannot become read success",
+      "status": "PASS"
+    },
+    {
+      "name": "installed supported16 prove exact Name/schema address ownership without granting any HWP field binding",
+      "status": "PASS"
+    },
+    {
+      "name": "installed ambiguous or unsupported5 mappings reject rather than becoming a partial successful template",
+      "status": "PASS"
+    },
+    {
+      "name": "actual XML UI opens independent HWT inspector and preserves dirty XML/history/recovery bytes",
+      "status": "PASS"
+    },
+    {
+      "name": "XML dialog without an engine HWT capability keeps the entry disabled and honest",
+      "status": "PASS"
+    },
+    {
+      "name": "owned source bytes remain unchanged with zero external requests or browser errors",
+      "status": "PASS"
+    }
+  ],
+  "failures": [],
+  "observations": [
+    {
+      "name": "(DB)sample01.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 51,
+      "readOnly": true,
+      "unverifiedBodyBindings": 51
+    },
+    {
+      "name": "(DB)sample02.hwt",
+      "status": "UNSUPPORTED",
+      "error": "HwtMappingError95: 지원하지 않는 HWT SchemaXPath 단계입니다."
+    },
+    {
+      "name": "sample01.hwt",
+      "status": "UNSUPPORTED",
+      "error": "HwtMappingError95: 같은 부모의 HWT 매핑 이름이 모호합니다."
+    },
+    {
+      "name": "sample02.hwt",
+      "status": "UNSUPPORTED",
+      "error": "HwtMappingError95: HWT 매핑 Name이 실제 스키마 선언과 다릅니다."
+    },
+    {
+      "name": "sample03.hwt",
+      "status": "UNSUPPORTED",
+      "error": "HwtMappingError95: HWT 매핑 Name이 실제 스키마 선언과 다릅니다."
+    },
+    {
+      "name": "sample04.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 15,
+      "readOnly": true,
+      "unverifiedBodyBindings": 15
+    },
+    {
+      "name": "sample05.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 19,
+      "readOnly": true,
+      "unverifiedBodyBindings": 19
+    },
+    {
+      "name": "sample06.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 32,
+      "readOnly": true,
+      "unverifiedBodyBindings": 32
+    },
+    {
+      "name": "sample07.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 19,
+      "readOnly": true,
+      "unverifiedBodyBindings": 19
+    },
+    {
+      "name": "sample08.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 15,
+      "readOnly": true,
+      "unverifiedBodyBindings": 15
+    },
+    {
+      "name": "sample09.hwt",
+      "status": "UNSUPPORTED",
+      "error": "HwtMappingError95: 같은 부모의 HWT 매핑 이름이 모호합니다."
+    },
+    {
+      "name": "sample10.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 11,
+      "readOnly": true,
+      "unverifiedBodyBindings": 11
+    },
+    {
+      "name": "sample11.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 7,
+      "readOnly": true,
+      "unverifiedBodyBindings": 7
+    },
+    {
+      "name": "sample12.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 11,
+      "readOnly": true,
+      "unverifiedBodyBindings": 11
+    },
+    {
+      "name": "sample13.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 11,
+      "readOnly": true,
+      "unverifiedBodyBindings": 11
+    },
+    {
+      "name": "sample14.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 15,
+      "readOnly": true,
+      "unverifiedBodyBindings": 15
+    },
+    {
+      "name": "sample15.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 12,
+      "readOnly": true,
+      "unverifiedBodyBindings": 12
+    },
+    {
+      "name": "sample16.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 16,
+      "readOnly": true,
+      "unverifiedBodyBindings": 16
+    },
+    {
+      "name": "sample17.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 17,
+      "readOnly": true,
+      "unverifiedBodyBindings": 17
+    },
+    {
+      "name": "sample18.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 13,
+      "readOnly": true,
+      "unverifiedBodyBindings": 13
+    },
+    {
+      "name": "sample19.hwt",
+      "status": "SUPPORTED_READ_ONLY",
+      "entries": 33,
+      "readOnly": true,
+      "unverifiedBodyBindings": 33
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "scope": "Actual hash-verified WASM fixed-path extractor + production TS domain/adapter in isolated headless browser. Tracked own fixture and entire independent Native DTO compared without projection. Mandatory suite has no installed/Python/build-source dependency. Synthetic malformed receipts are separate adapter guards. Installed XML only transient memory; output is counts/filenames, no vendor XML. Own actual nested XML/HWT DOM dialog, dirty history/checkpoint and allocation preflight tested. Optional installed corpus is classified only when explicitly requested; the known21 cohort has a supported16/unsupported5 bounded mapping profile, with its original all21 failure preserved. WASM executes in the Node host through an exposed test bridge; no claim of production iframe integration until the parent combined profile is tested. No native UI/field edits/template save/XSL/general-XSD support claim.",
+  "sourceHashes": [
+    {
+      "path": "src/adapters/xml/hwt-template95.ts",
+      "sha256": "6f9d7b7a6e4c719d432378b87aafc6fec368c46aa82b62c4715e3a1232cc3360"
+    },
+    {
+      "path": "src/modules/xml-documents/public/hwt-template95.ts",
+      "sha256": "816388376425e4a0529d158ec34cd0e197fec6f223f2c49a0471acc4b4b4d169"
+    },
+    {
+      "path": "src/adapters/xml/browser-parser.ts",
+      "sha256": "d501b25f13660836bd10d0551040beccba28bd52a1b7a783966a628a87c37ab3"
+    },
+    {
+      "path": "src/ui/xml-document-dialog.ts",
+      "sha256": "b388ac11291857ea12a6a99fdaccb50967b40cd2fa5fc7fc58a1515d3fc2aed2"
+    },
+    {
+      "path": "src/adapters/storage/xml-recovery.ts",
+      "sha256": "26fa94ff799300a9271154f403794cbe4904596611aa5a657f5e7053dc4426b5"
+    },
+    {
+      "path": "src/modules/xml-documents/domain/hwt-mapping95.ts",
+      "sha256": "309cc604dd1d2a3aa35fac3fcce9413b9cd99c91fd3c9cfcf48b9d139045f354"
+    },
+    {
+      "path": "src/ui/hwt-template95-dialog.ts",
+      "sha256": "ef12d0ff8fea4ab14da588e8136ef440a6abbfbb06df9f502ff0f5b90033c122"
+    }
+  ],
+  "inputSha256": {
+    "ownHwt": "1805d68ae0af16b140afc29c6767c21fb334c5317b6b491b90ad60daed9bdacb",
+    "nativeOracle": "98602e972e2c190dd7c482257a5d26ebdfe93d1568acc425997113410500ea04",
+    "actualWasmReceipt": "b25935036025a6934b20b4b8b93d130417926b2f1c31e1ea570f233f75b22064"
+  },
+  "verifierSha256": "cdc1847cfe29c1e54f02a9db166c3d545bbca770df667c423207d172a74f2646",
+  "bundleSha256": "7f70ad7c5a324b0d6331c338f476bd4ea30533092b5e1ab902caf66f7f9d9923"
+}

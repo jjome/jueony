@@ -42,6 +42,10 @@ function zip(parts){
  const directory=Buffer.concat(central),e=Buffer.alloc(22);e.writeUInt32LE(0x06054b50);e.writeUInt16LE(parts.size,8);e.writeUInt16LE(parts.size,10);e.writeUInt32LE(directory.length,12);e.writeUInt32LE(offset,16);return Buffer.concat([...local,directory,e]);
 }
 const blank=HwpDocument.createEmpty();blank.createBlankDocument();blank.insertText(0,0,0,'원본 본문 😀');const base=unzip(blank.exportHwpx());blank.free();
+// These fixtures model independent external XML packages with deliberately
+// replaced standard metadata, not a tampered raw-summary transport. Its strict
+// binding/refusal cases are tested separately by verify-stored-information95.
+base.delete('META-INF/jueony-summary-properties-v1.json');
 const opf='http://www.idpf.org/2007/opf/',cust='urn:jueony:owned-preservation';
 const cases=[
  {name:'metadata attributes and unknown child',metadata:`<opf:metadata id="owned-meta" xml:lang="ko"><opf:title>원본 제목</opf:title><x:opaque xmlns:x="${cust}" flag="&quot;&gt;">비표준 정보 😀</x:opaque></opf:metadata>`},

@@ -1,0 +1,17 @@
+diff --git a/src/document_core/document_metadata_stored.rs b/src/document_core/document_metadata_stored.rs
+--- a/src/document_core/document_metadata_stored.rs
++++ b/src/document_core/document_metadata_stored.rs
+@@ -124,6 +124,13 @@
+ struct Carrier {schema_version:u32,metadata_blake3:String,summary_base64:String}
+ pub(crate) fn encode_summary_carrier(doc:&Document,content:&[u8])->Result<Option<Vec<u8>>,String>{
+  let Some(mut ole)=summary(doc)? else{return Ok(None);};let fields=Xml::parse(content)?.values()?;let dates=date_xml(content)?;
++ // Uninterpreted XML timestamp text is still owned by the original metadata
++ // bytes. A pure XML factory has only the five generated summary strings, so
++ // same-format XML can preserve that text without manufacturing an OLE time.
++ // Imported opaque/native properties must never be discarded by this branch.
++ if matches!(doc.provenance.format,crate::model::provenance::SourceFormat::Hwpx)
++     && (matches!(dates.created,Stored::Invalid(_)) || matches!(dates.modified,Stored::Invalid(_)))
++     && ole.entries.iter().all(|(pid,_)|(2..=6).contains(pid)) {return Ok(None);}
+  if matches!(doc.provenance.format,crate::model::provenance::SourceFormat::Hwpx){set_time(&mut ole,12,&dates.created)?;set_time(&mut ole,13,&dates.modified)?;}
+  if ole_value(&ole,12)!=dates.created||ole_value(&ole,13)!=dates.modified{return Err("Standard timestamps and raw summary disagree".into());}
+  let raw=ole.write(&fields)?;let carrier=Carrier {schema_version:1,metadata_blake3:blake3::hash(dates.block.as_bytes()).to_hex().to_string(),summary_base64:base64::engine::general_purpose::STANDARD.encode(raw)};

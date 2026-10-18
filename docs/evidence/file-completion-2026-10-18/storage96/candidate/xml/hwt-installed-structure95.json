@@ -1,0 +1,1400 @@
+{
+  "scope": "Installed files read-only structure metadata only; no document/vendor XML text or font payload copied. This is not a supported HWT reader or editor.",
+  "files": [
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\(DB)sample01.hwt",
+      "bytes": 83968,
+      "sha256": "a95b4b68492649d1ed55d0c1f0053bcc9e2a97b4ca4a45ca5db2bc7ff988b7c5",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 973,
+          "sha256": "26860bc1cdd75788bd07d0986fc066e54c80c376282de501f866e707dd8fc11b",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 6128,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 68,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 51,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 8,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 8
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault",
+            "minOccurs",
+            "name",
+            "type"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 1857,
+          "sha256": "3ea7b1fe98df35a8d0bdb7eee9a3dc060f1e20f20e77d37580d1cdc9db7770c4",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 23150,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 51,
+          "tagCounts": {
+            "XMLELEMENT": 51
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 14,
+          "sha256": "1fbef29aab19cf25596c96b52a3ae938816544cbd49ef761c253529d8eff053a",
+          "compression": "none",
+          "declaredUtf16Bytes": 10
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\(DB)sample02.hwt",
+      "bytes": 41984,
+      "sha256": "925507658eed0f476189795e2ba3b1c92899d40bcdc2bd2d130f78f486c9cea3",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 719,
+          "sha256": "5f13b623304f2b39a5646724abb5cc1c48b6136621651642456f405822af7f9c",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 4200,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 61,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 21,
+            "{http://www.w3.org/2001/XMLSchema}annotation": 14,
+            "{http://www.w3.org/2001/XMLSchema}documentation": 14,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 1,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 3,
+            "{http://www.w3.org/2001/XMLSchema}group": 4,
+            "{http://www.w3.org/2001/XMLSchema}simpleType": 1,
+            "{http://www.w3.org/2001/XMLSchema}restriction": 1,
+            "{http://www.w3.org/2001/XMLSchema}pattern": 1
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "base",
+            "elementFormDefault",
+            "fixed",
+            "minOccurs",
+            "name",
+            "ref",
+            "type",
+            "value"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 350,
+          "sha256": "0141b8082e5a2f76f4bc5beecbe0b9cec8d29d9d4f24dc65c10d6ff9b78410a7",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 2744,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 11,
+          "tagCounts": {
+            "XMLELEMENT": 11
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 14,
+          "sha256": "0d14d469b3bda95b7cbd3e50ce832112a75261bf218eccb6b78dc6a5ee31f41c",
+          "compression": "none",
+          "declaredUtf16Bytes": 10
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample01.hwt",
+      "bytes": 61952,
+      "sha256": "39f71e8d4838b2f1bce32f011ccdf0634e93cb7e4442c041c2a6864fd0d6d944",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 579,
+          "sha256": "e4201de61d5b14f803138c11328252cef4bbb12ac51f558fe62ce0cca47b11c9",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 2150,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 18,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 10,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+            "{http://www.w3.org/2001/XMLSchema}simpleType": 1,
+            "{http://www.w3.org/2001/XMLSchema}restriction": 1,
+            "{http://www.w3.org/2001/XMLSchema}pattern": 1
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "base",
+            "elementFormDefault",
+            "maxOccurs",
+            "minOccurs",
+            "name",
+            "type",
+            "value",
+            "{http://www.haansoft.com/HWP}FieldInfo"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 2783,
+          "sha256": "ffd8ce93ee490c517312a679eec291498a17cfee528ab12aad12265551c4cf71",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 41006,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 91,
+          "tagCounts": {
+            "XMLELEMENT": 91
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 12,
+          "sha256": "fcf946b20e0fc4a5fe541643174f0f525950e485332b833fb91f3fd4d0d6f0e9",
+          "compression": "none",
+          "declaredUtf16Bytes": 8
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample02.hwt",
+      "bytes": 101376,
+      "sha256": "e226a2c75b60d117ea037393399552ef61c6e588c4679e93ed571892626af6ab",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 1124,
+          "sha256": "ffae3375e9b178d5713d08f44d466bca80372b3495059de48cab6dd22e8f8211",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 6082,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 55,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 31,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 6,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 6,
+            "{http://www.w3.org/2001/XMLSchema}simpleType": 5,
+            "{http://www.w3.org/2001/XMLSchema}restriction": 5,
+            "{http://www.w3.org/2001/XMLSchema}pattern": 1
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "base",
+            "elementFormDefault",
+            "maxOccurs",
+            "minOccurs",
+            "name",
+            "ref",
+            "type",
+            "value",
+            "{http://www.haansoft.com/HWP}FieldInfo"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 5561,
+          "sha256": "82841849643227c4197b6111dd0748fa2229dccca3ea48f781943ed81ecb26b8",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 79096,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 180,
+          "tagCounts": {
+            "XMLELEMENT": 180
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 10,
+          "sha256": "f8daf7d94027fb9e82b3f8a7dbd16f43b1d715d73696a8a169c25fdfacecad7c",
+          "compression": "none",
+          "declaredUtf16Bytes": 6
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample03.hwt",
+      "bytes": 61440,
+      "sha256": "1b4ab2b70f967a1126fc9a325b63c8820fe47227823c1baf28ec01848493c2a6",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 2541,
+          "sha256": "7e8b01a2b7d80feaec6404e2a25990f385d26cc7f7e95e7c2990d1649c3314b0",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 17132,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 142,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 60,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 17,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 16,
+            "{http://www.w3.org/2001/XMLSchema}simpleType": 9,
+            "{http://www.w3.org/2001/XMLSchema}restriction": 9,
+            "{http://www.w3.org/2001/XMLSchema}pattern": 4,
+            "{http://www.w3.org/2001/XMLSchema}enumeration": 19,
+            "{http://www.w3.org/2001/XMLSchema}simpleContent": 1,
+            "{http://www.w3.org/2001/XMLSchema}extension": 1,
+            "{http://www.w3.org/2001/XMLSchema}attribute": 5
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "base",
+            "elementFormDefault",
+            "maxOccurs",
+            "minOccurs",
+            "name",
+            "ref",
+            "type",
+            "use",
+            "value",
+            "{http://www.haansoft.com/HWP}FieldInfo"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 1919,
+          "sha256": "12a3f6eb6d63f332c5a3649b04fc7dddd5f41850f57ca8692cc7e273ff9070ae",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 23582,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 61,
+          "tagCounts": {
+            "XMLELEMENT": 56,
+            "XMLATTRIBUTE": 5
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 10,
+          "sha256": "58657537bece85fd0703a49008887f8dc23d6a3cc3f9623ec09f0fd0f63aa428",
+          "compression": "none",
+          "declaredUtf16Bytes": 6
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample04.hwt",
+      "bytes": 41472,
+      "sha256": "51198c33bd35dc0085d3b9046a9b5e5a9e61071c1afbe3776744b7a1fc34ea3c",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 714,
+          "sha256": "9e76abb6ca7ca78c5c20786d79f42216c384a8c7fcf2fb8565ae60e4fdd9a530",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 3548,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 31,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 15,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+            "{http://www.w3.org/2001/XMLSchema}simpleType": 3,
+            "{http://www.w3.org/2001/XMLSchema}restriction": 3,
+            "{http://www.w3.org/2001/XMLSchema}pattern": 1,
+            "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+            "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "base",
+            "elementFormDefault",
+            "maxOccurs",
+            "name",
+            "type",
+            "value",
+            "{http://www.haansoft.com/HWP}FieldInfo"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 561,
+          "sha256": "6b2c9b3b2701de83e553d12557086ad7af4e02a19f1c816cdc62440d397ea46c",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 6710,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 15,
+          "tagCounts": {
+            "XMLELEMENT": 15
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 14,
+          "sha256": "9a890de0758fee0ff2c448971750600e5e0797113f778b1ee23af2189b65bced",
+          "compression": "none",
+          "declaredUtf16Bytes": 10
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample05.hwt",
+      "bytes": 32256,
+      "sha256": "b80d18fbdd61abc24be4e1415dee9e7687b34c3c9c489b4c71cdddcd04bf5c4e",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 650,
+          "sha256": "acf40b1151778ef89adc059e4d45ffdce6b7690b7b75603af297ab52cef92b60",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 3456,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 38,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 19,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+            "{http://www.w3.org/2001/XMLSchema}simpleType": 4,
+            "{http://www.w3.org/2001/XMLSchema}restriction": 4,
+            "{http://www.w3.org/2001/XMLSchema}pattern": 2,
+            "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+            "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "base",
+            "elementFormDefault",
+            "maxOccurs",
+            "name",
+            "type",
+            "value"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 708,
+          "sha256": "12e298f3f8cbb0cbf55630550dae8ecdfb5f7cd0320b53292eed44d97cf82bf0",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 8600,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 19,
+          "tagCounts": {
+            "XMLELEMENT": 19
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 14,
+          "sha256": "ce6af3729411f6c9b987dc7925b59cf64a60abf9f06d9f63ea714344e0561c49",
+          "compression": "none",
+          "declaredUtf16Bytes": 10
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample06.hwt",
+      "bytes": 45568,
+      "sha256": "0596a22307a58220ba9d6b131eac3c4b7ef3bd4cd6e0a4a64a7335c62740b786",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 1398,
+          "sha256": "0686437529b6129249494e5be8bfe1cdf4c4985c4afd933390835c5f3af9d6f6",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 9378,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 59,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 32,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+            "{http://www.w3.org/2001/XMLSchema}simpleType": 6,
+            "{http://www.w3.org/2001/XMLSchema}restriction": 6,
+            "{http://www.w3.org/2001/XMLSchema}enumeration": 4,
+            "{http://www.w3.org/2001/XMLSchema}pattern": 2,
+            "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+            "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "base",
+            "elementFormDefault",
+            "maxOccurs",
+            "name",
+            "type",
+            "value",
+            "{http://www.haansoft.com/HWP}FieldInfo"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 1089,
+          "sha256": "f8a2db03858fa284cfda90d11fe92f2075aded04ad797901e6ab87b8b40d8496",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 14724,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 32,
+          "tagCounts": {
+            "XMLELEMENT": 32
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 14,
+          "sha256": "5e3d54b811dc5c364f121b62f8bd5dc372766be43981975443797a7413de9efe",
+          "compression": "none",
+          "declaredUtf16Bytes": 10
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample07.hwt",
+      "bytes": 36864,
+      "sha256": "d626f917cdc1ec1fec412bc2553f771e16868b43c0c50c41dc8ade4a39d77525",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 1232,
+          "sha256": "c0e86d41cd275ab5f82c8fdf7b94de604086adc6702487e0aa659052a8219eee",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 9238,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 27,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 19,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+            "{http://www.w3.org/2001/XMLSchema}simpleType": 1,
+            "{http://www.w3.org/2001/XMLSchema}restriction": 1,
+            "{http://www.w3.org/2001/XMLSchema}pattern": 1
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "base",
+            "elementFormDefault",
+            "maxOccurs",
+            "name",
+            "type",
+            "value",
+            "{http://www.haansoft.com/HWP}FieldInfo"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 747,
+          "sha256": "cf7966d82199dcd2fc815b598ec3d479c2a1fa2dbe02ebc6f21deb9cbaa7d8f7",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 8602,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 19,
+          "tagCounts": {
+            "XMLELEMENT": 19
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 14,
+          "sha256": "87f86e9a237b8c4c18def720c74f7ce3ad35161a6a9248c137d95c69fa74da23",
+          "compression": "none",
+          "declaredUtf16Bytes": 10
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample08.hwt",
+      "bytes": 31232,
+      "sha256": "355822673b7265fe8c6d36554a515ec82294067cd5b9f2d0d26eb32c1f87d2de",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 1062,
+          "sha256": "684ba809c266570ed71a5c50d5b6207d9813544b033201fa378c57c5d801e942",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 8084,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 35,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 15,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+            "{http://www.w3.org/2001/XMLSchema}simpleType": 4,
+            "{http://www.w3.org/2001/XMLSchema}restriction": 4,
+            "{http://www.w3.org/2001/XMLSchema}enumeration": 2,
+            "{http://www.w3.org/2001/XMLSchema}pattern": 1,
+            "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+            "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "base",
+            "elementFormDefault",
+            "name",
+            "type",
+            "value",
+            "{http://www.haansoft.com/HWP}FieldInfo"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 571,
+          "sha256": "f9865204da0c954c3d8ac70e4ba252196eec997739129f0a99f0b7cab20602ae",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 6712,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 15,
+          "tagCounts": {
+            "XMLELEMENT": 15
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 10,
+          "sha256": "a70d034246bb38ce17300ea26986a6f764e09deb5040974c1af47931f4e03dab",
+          "compression": "none",
+          "declaredUtf16Bytes": 6
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample09.hwt",
+      "bytes": 43008,
+      "sha256": "188382937641532d0019bb546839601b76a3623796d49bc5c0ba7beb31af572b",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 1079,
+          "sha256": "a32e5f8a1c4962918005773c9eae0486647828fbf239a7a766d1367274d49962",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 6162,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 49,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 24,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 5,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 5,
+            "{http://www.w3.org/2001/XMLSchema}simpleType": 4,
+            "{http://www.w3.org/2001/XMLSchema}restriction": 4,
+            "{http://www.w3.org/2001/XMLSchema}pattern": 2,
+            "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+            "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "base",
+            "elementFormDefault",
+            "maxOccurs",
+            "name",
+            "type",
+            "value",
+            "{http://www.haansoft.com/HWP}FieldInfo"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 2363,
+          "sha256": "fb3c73e2c3815c80148c89508aa17a0e44cd4a89f6a6073171186c6b3385c5b1",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 37314,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 68,
+          "tagCounts": {
+            "XMLELEMENT": 68
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 10,
+          "sha256": "22a8940f3f5c671bd8a54bfd9998374b09b71baa121fc22bfa0a8d73ee9cd40a",
+          "compression": "none",
+          "declaredUtf16Bytes": 6
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample10.hwt",
+      "bytes": 34816,
+      "sha256": "6ab16421763bf70a72d145372a0bd1afd2e89608aaa8e07cbc9bca2500c9ed1b",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 519,
+          "sha256": "191306002ce06749bba4e1d2a4401f1b988a9b1ab62971aa740da19bd9d289c6",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 3066,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 16,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 11,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 2
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault",
+            "name",
+            "type",
+            "{http://www.haansoft.com/HWP}FieldInfo"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 504,
+          "sha256": "b5c5b27fbb32b9f68ab6432c4d189f9083326f913d57ccf6ed1390cb0f0b1d25",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 4826,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 11,
+          "tagCounts": {
+            "XMLELEMENT": 11
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 10,
+          "sha256": "540cf127d914a6bca81bd9c511e7d836dc8e56908ae117fa3606933472792ee6",
+          "compression": "none",
+          "declaredUtf16Bytes": 6
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample11.hwt",
+      "bytes": 27136,
+      "sha256": "054177eac081c6a4160ef2700bd85bccf39c1d3aad83adc040b49e833147e3bc",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 483,
+          "sha256": "21f8901446a511c12da598aea88424e005cc3eb71a490917e6afc3f9edab3e4c",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 3154,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 12,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 7,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 2
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault",
+            "name",
+            "type",
+            "{http://www.haansoft.com/HWP}FieldInfo"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 313,
+          "sha256": "edb2ab80fb6941a18204a7da9b95748b2b6035a4d3a00a7965511c4cefa8a188",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 2978,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 7,
+          "tagCounts": {
+            "XMLELEMENT": 7
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 12,
+          "sha256": "33651f5be4282ba0f5201d5e4d909d721d5917182f903c4d476d5e222d49d43d",
+          "compression": "none",
+          "declaredUtf16Bytes": 8
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample12.hwt",
+      "bytes": 31232,
+      "sha256": "8aa0098e52201280f2e9938332e743db2fb08ffb76664d2298cb838e929e50c4",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 903,
+          "sha256": "26a7590eae14761ddc84288be55070c3f86d6952dd6d3d3baf03774ba56812b6",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 5920,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 27,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 11,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+            "{http://www.w3.org/2001/XMLSchema}simpleType": 3,
+            "{http://www.w3.org/2001/XMLSchema}restriction": 3,
+            "{http://www.w3.org/2001/XMLSchema}pattern": 1,
+            "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+            "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "base",
+            "elementFormDefault",
+            "name",
+            "type",
+            "value",
+            "{http://www.haansoft.com/HWP}FieldInfo"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 498,
+          "sha256": "ab6ff2053d8c1d028e4437d89dfee17b2a3ac22f97cdba493c6af41f1e18f778",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 4828,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 11,
+          "tagCounts": {
+            "XMLELEMENT": 11
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 14,
+          "sha256": "df82f20e91491f3e62b50af9fc3ee22016c7f1f7bce054c7beeddf37791b3c7e",
+          "compression": "none",
+          "declaredUtf16Bytes": 10
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample13.hwt",
+      "bytes": 40448,
+      "sha256": "6aabaf99766a67fb99a46cf0fd6221c904bf0faeb03931aeeb58384191603e96",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 530,
+          "sha256": "692578fc44c7720a803858b738e64c5557cc63b98a3b386f03bb5bbcfaa287a3",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 2388,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 27,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 11,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+            "{http://www.w3.org/2001/XMLSchema}simpleType": 3,
+            "{http://www.w3.org/2001/XMLSchema}restriction": 3,
+            "{http://www.w3.org/2001/XMLSchema}pattern": 1,
+            "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+            "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "base",
+            "elementFormDefault",
+            "name",
+            "type",
+            "value"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 505,
+          "sha256": "47773f89cc163765307085d883c994606dbd56f6192cc5f7cf32b261f9149286",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 4822,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 11,
+          "tagCounts": {
+            "XMLELEMENT": 11
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 12,
+          "sha256": "0ce1e872a7202f9b99bba506c75505791c60bb60e043bd5937b3d1d77963793c",
+          "compression": "none",
+          "declaredUtf16Bytes": 8
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample14.hwt",
+      "bytes": 31744,
+      "sha256": "832554742b7ff12b5e60bd9d3565b562500251daf03f1f476733d9cb2d6ded8b",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 611,
+          "sha256": "bc43dab95353c163102ac110ae0a6fc363cdc589dfd133dde09bce884c826bc7",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 3116,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 34,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 15,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+            "{http://www.w3.org/2001/XMLSchema}simpleType": 4,
+            "{http://www.w3.org/2001/XMLSchema}restriction": 4,
+            "{http://www.w3.org/2001/XMLSchema}pattern": 2,
+            "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+            "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "base",
+            "elementFormDefault",
+            "maxOccurs",
+            "name",
+            "type",
+            "value"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 556,
+          "sha256": "ee16d6ab1a9a509bc4fdc5a8dad948045950fee7bd9514cf5f424ce21d10342b",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 6708,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 15,
+          "tagCounts": {
+            "XMLELEMENT": 15
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 14,
+          "sha256": "d61d76f1445a8f32203e6e7889291e7d1f3da68299a2ae2c8e947ba938f57d89",
+          "compression": "none",
+          "declaredUtf16Bytes": 10
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample15.hwt",
+      "bytes": 42496,
+      "sha256": "0a4ddd33eac3c3d0b97e23785f93241c5e498dd49782cfc2d7a10383e8cb3fd6",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 779,
+          "sha256": "1203e9a07a654423701533ed01672ef479fe93d8f61ffd56c552ba1000b21aac",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 4444,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 28,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 12,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+            "{http://www.w3.org/2001/XMLSchema}simpleType": 3,
+            "{http://www.w3.org/2001/XMLSchema}restriction": 3,
+            "{http://www.w3.org/2001/XMLSchema}pattern": 1,
+            "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+            "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "base",
+            "elementFormDefault",
+            "name",
+            "type",
+            "value",
+            "{http://www.haansoft.com/HWP}FieldInfo"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 508,
+          "sha256": "c666850f469c6803e9ec594f5a376430f3ffb471ac8b08e8ce29840e386a38e6",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 5308,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 12,
+          "tagCounts": {
+            "XMLELEMENT": 12
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 10,
+          "sha256": "42030326b1a070947872ec9c39e6397aa74fb560729ba2cf54803da4ee99c43d",
+          "compression": "none",
+          "declaredUtf16Bytes": 6
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample16.hwt",
+      "bytes": 33792,
+      "sha256": "d097495a2b1beed60c27209a28931769b60ca8ffd9ec05bea402003cda6aa517",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 1035,
+          "sha256": "ee4de5dfae3e8f203a673c99a33eedc22a8ee9fafe70e418e9ca0cab53fd6b5c",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 8298,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 32,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 16,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+            "{http://www.w3.org/2001/XMLSchema}simpleType": 3,
+            "{http://www.w3.org/2001/XMLSchema}restriction": 3,
+            "{http://www.w3.org/2001/XMLSchema}pattern": 1,
+            "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+            "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "base",
+            "elementFormDefault",
+            "name",
+            "type",
+            "value",
+            "{http://www.haansoft.com/HWP}FieldInfo"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 560,
+          "sha256": "4347d375869a6aa464ef79b131810794c3f7b8d1f12530cca7e36805946adfaa",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 7192,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 16,
+          "tagCounts": {
+            "XMLELEMENT": 16
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 10,
+          "sha256": "ef7ce28a270466c64e5cf06719dc328c3c30918987765b298357a6e6b22e5b8c",
+          "compression": "none",
+          "declaredUtf16Bytes": 6
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample17.hwt",
+      "bytes": 37376,
+      "sha256": "9b2c2b4033123722d8c24ab1d55255804a917dc81ae1b39bc91aebd40f681b9f",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 691,
+          "sha256": "48bf8c23ea117eebb4d46701156b2c525ff87012f135baba9d3cb4087e467baa",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 3658,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 33,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 17,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 2,
+            "{http://www.w3.org/2001/XMLSchema}simpleType": 3,
+            "{http://www.w3.org/2001/XMLSchema}restriction": 3,
+            "{http://www.w3.org/2001/XMLSchema}pattern": 1,
+            "{http://www.w3.org/2001/XMLSchema}minInclusive": 2,
+            "{http://www.w3.org/2001/XMLSchema}maxInclusive": 2
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "base",
+            "elementFormDefault",
+            "name",
+            "type",
+            "value",
+            "{http://www.haansoft.com/HWP}FieldInfo"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 583,
+          "sha256": "3497f00b570f9c2e7fc3d562696b9d2d5e802067f2b5564b69ec3582ed4f1acc",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 7642,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 17,
+          "tagCounts": {
+            "XMLELEMENT": 17
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 10,
+          "sha256": "6e41c6459e243701f3e4a04ff5d93a04619a9694e870733a7fd25bc6dae1a0f1",
+          "compression": "none",
+          "declaredUtf16Bytes": 6
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample18.hwt",
+      "bytes": 41984,
+      "sha256": "317bbf3637ea75f5acb8d9b69e1d5175889e7b5c7486e9cd43173c0b82e7085a",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 786,
+          "sha256": "7bcc878af1e979e3a22ab57e7c6a17e5c6585a71d421e692f356e3b21d52764b",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 4808,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 18,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 13,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 2,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 2
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault",
+            "name",
+            "type",
+            "{http://www.haansoft.com/HWP}FieldInfo"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 535,
+          "sha256": "6e11ddeea4c35b7bf54f0e20a176b70aeeb2a8bbae5133e2e3f629069a147f9c",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 5776,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 13,
+          "tagCounts": {
+            "XMLELEMENT": 13
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 16,
+          "sha256": "c1ed971c323a4c7a76d4b258ad8009c943a890c17224e51f587fddd155cc4b0b",
+          "compression": "none",
+          "declaredUtf16Bytes": 12
+        }
+      ]
+    },
+    {
+      "path": "C:\\Program Files (x86)\\Hnc\\Office 2024\\HOffice130\\Shared\\HwpTemplate\\XML\\ko-KR\\sample19.hwt",
+      "bytes": 49152,
+      "sha256": "2ef5c9733d8303d0721c13fc631cb8d97505fff5995c832a222c12b77c183e77",
+      "streams": [
+        {
+          "path": "/XMLTemplate/Schema",
+          "bytes": 1738,
+          "sha256": "833110517c926a520c80462e7c7585b2152b811d693a8a6334a3bb4aae443423",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 16398,
+          "rootTag": "{http://www.w3.org/2001/XMLSchema}schema",
+          "rootAttributeNames": [
+            "attributeFormDefault",
+            "elementFormDefault"
+          ],
+          "elements": 56,
+          "tagCounts": {
+            "{http://www.w3.org/2001/XMLSchema}schema": 1,
+            "{http://www.w3.org/2001/XMLSchema}element": 33,
+            "{http://www.w3.org/2001/XMLSchema}complexType": 3,
+            "{http://www.w3.org/2001/XMLSchema}sequence": 3,
+            "{http://www.w3.org/2001/XMLSchema}simpleType": 4,
+            "{http://www.w3.org/2001/XMLSchema}restriction": 4,
+            "{http://www.w3.org/2001/XMLSchema}minInclusive": 4,
+            "{http://www.w3.org/2001/XMLSchema}maxInclusive": 4
+          },
+          "attributeNames": [
+            "attributeFormDefault",
+            "base",
+            "elementFormDefault",
+            "name",
+            "type",
+            "value",
+            "{http://www.haansoft.com/HWP}FieldInfo"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/Instance",
+          "bytes": 1111,
+          "sha256": "5c9fc15bca52a849d3008686890d8c13f3f3aec41cfae4a5abf3c8f73c73d6f4",
+          "compression": "raw-deflate",
+          "declaredUtf16Bytes": 15060,
+          "rootTag": "XMLELEMENT",
+          "rootAttributeNames": [
+            "Name",
+            "SchemaXPath"
+          ],
+          "elements": 33,
+          "tagCounts": {
+            "XMLELEMENT": 33
+          },
+          "attributeNames": [
+            "Name",
+            "SchemaXPath"
+          ]
+        },
+        {
+          "path": "/XMLTemplate/_SchemaName",
+          "bytes": 24,
+          "sha256": "4b6380bac48915c7d19855557ee63e09ec6b3293a310a75fb49694922d6e7667",
+          "compression": "none",
+          "declaredUtf16Bytes": 20
+        }
+      ]
+    }
+  ],
+  "conclusion": "Schema streams contain length-prefixed UTF16LE XSD compressed as raw deflate. Instance streams contain XMLELEMENT mapping trees with SchemaXPath/field bindings; they are not ordinary XML instance documents. HWT editing requires explicit mapping/body synchronization, not the standalone XML workspace.",
+  "helperSha256": "a6a47027c66f2646cef7ce5d259117749242a0f2c86fab149fe218aeb4ad5494",
+  "scriptSha256": "b7e4a54afee24fd286785c22c87b886027c811a9fd78eebfe17a84b7e319fc04"
+}

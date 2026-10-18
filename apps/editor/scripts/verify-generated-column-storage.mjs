@@ -5,6 +5,7 @@ import {resolve, join, isAbsolute} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {loadReviewEngine, snapshot, compareSnapshots, differences, hash} from './lib/hancom-review.mjs';
 import {verifyPreservedExport} from '../src/adapters/rhwp/preservation.ts';
+import {assertStandardHwpStoredDates} from './lib/standard-ole-dates.mjs';
 
 for (const key of ['JUEONY_ENGINE_PACKAGE','JUEONY_BASELINE_ENGINE_PACKAGE','JUEONY_TEST_OUTPUT','JUEONY_COLUMN_EVIDENCE']) {
   assert.ok(process.env[key] && isAbsolute(process.env[key]), `${key} must be absolute`);
@@ -16,6 +17,10 @@ const baseline=await loadReviewEngine(resolve(process.env.JUEONY_BASELINE_ENGINE
 const fixtureRoot=join(evidence,'fixtures/build/file-closure69-overlap');
 const ownRoot=join(evidence,'fixtures/build/file-closure69-public/column2-candidate74');
 const results=[], failures=[], observations=[];
+const sealed=JSON.parse(await readFile(join(evidence,'original-manifest.json'),'utf8'));
+for(const item of sealed.files.filter(x=>x.path.startsWith('fixtures/')&&x.path.endsWith('.hwp'))){
+  const bytes=await readFile(join(evidence,item.path));assert.equal(bytes.length,item.bytes);assert.equal(hash(bytes),item.sha256);
+}
 async function scenario(name, action) {
   try {await action();results.push(name);console.log('PASS',name);}
   catch(error){failures.push({name,error:String(error),stack:error.stack,comparison:error.comparison,preservationReport:error.report});console.error('FAIL',name,String(error.message).slice(0,240));}
@@ -29,6 +34,23 @@ function equal(a,b){
   assert.deepEqual(comparison.semantic.readIssues,{before:[],after:[]});
   return comparison;
 }
+// A separate historical document and an older engine are not save/reopen
+// outputs. Retain the FULL comparator result, and require its entire semantic
+// difference to equal precisely the newly observable, independently parsed
+// original OLE dates. Never use this exception on the strict save path below.
+function historicalDates(a,b,leftBytes,rightBytes,label,olderEngine=false){
+  const left=assertStandardHwpStoredDates(leftBytes,a),right=olderEngine?null:assertStandardHwpStoredDates(rightBytes,b);
+  if(olderEngine)assert.equal(typeof b.getDocumentStoredInformation,'undefined');
+  const comparison=compareSnapshots(snapshot(a),snapshot(b));
+  const expected=differences({'stored-date-information':left.value},right?{'stored-date-information':right.value}:{},0);
+  assert.deepEqual(comparison.semantic.differences,expected,'no difference beyond exact original OLE dates is permitted');
+  assert.deepEqual(comparison.semantic.readIssues,{before:[],after:[]});
+  assert.equal(comparison.pages.equal,true);assert.deepEqual(comparison.geometry.differences,[]);
+  assert.equal(comparison.status,expected.length?'DIFFERENT_OR_UNREADABLE':'SAME_WITHIN_PUBLISHED_CONTRACT');
+  observations.push({name:label,classification:olderEngine?'OLDER_ENGINE_CANNOT_OBSERVE_STORED_DATES':'INDEPENDENT_FILES_HAVE_DISTINCT_STORED_DATES',
+    leftInputSha256:hash(leftBytes),rightInputSha256:hash(rightBytes),independentLeft:left,independentRight:right,comparison});
+  return comparison;
+}
 function strictBytes(doc,format){
   const artifact=doc[format==='hwp'?'exportHwpWithReport':'exportHwpxWithReport']();
   try{
@@ -38,10 +60,10 @@ function strictBytes(doc,format){
   }finally{artifact.free();}
 }
 const names=['support/column2.hwp','hancom-current/column2.hwp'];
-await scenario('actual Hancom pair: every published semantic/control/text field',async()=>{
-  const a=new candidate.HwpDocument(await readFile(join(fixtureRoot,names[0])));
-  const b=new candidate.HwpDocument(await readFile(join(fixtureRoot,names[1])));
-  try{observations.push({name:'actual-column2',...equal(a,b)});}finally{a.free();b.free();}
+await scenario('historical Hancom pair: full comparison plus independent original OLE date differences',async()=>{
+  const left=await readFile(join(fixtureRoot,names[0])),right=await readFile(join(fixtureRoot,names[1]));
+  const a=new candidate.HwpDocument(left),b=new candidate.HwpDocument(right);
+  try{historicalDates(a,b,left,right,'actual-column2');}finally{a.free();b.free();}
 });
 await scenario('frozen historical Hancom layout remains the exact oracle',async()=>{
   const frozen=JSON.parse(await readFile(join(evidence,'fixed-oracle-compact.json'),'utf8'));
@@ -88,7 +110,7 @@ for(const name of negatives)await scenario(`valid disk source layout unchanged a
   const bytes=await readFile(join(ownRoot,'valid-negative-disk',`baseline-${name}.hwp`));
   const a=new candidate.HwpDocument(bytes), b=new baseline.HwpDocument(bytes);
   try{
-    equal(a,b);
+    historicalDates(a,b,bytes,bytes,'same-source-older-engine:'+name,true);
     for(const format of ['hwp','hwpx']){
       const aa=a[format==='hwp'?'exportHwpWithReport':'exportHwpxWithReport']();
       const bb=b[format==='hwp'?'exportHwpWithReport':'exportHwpxWithReport']();
@@ -110,8 +132,8 @@ const frozen=JSON.parse(await readFile(join(evidence,'fixed-oracle-compact.json'
 for(const item of frozen.observations.filter(x=>x.name!=='column2.hwp'))await scenario(`existing fixed actual pair unchanged: ${item.name}`,async()=>{
   const source=join(fixtureRoot,item.name==='negative.hwp'?'support/negative.hwp':item.original.path.split('/build/file-closure69-overlap/')[1]);
   const actual=join(fixtureRoot,'hancom-current',item.name);
-  const a=new candidate.HwpDocument(await readFile(source)), b=new candidate.HwpDocument(await readFile(actual));
-  try{equal(a,b);}finally{a.free();b.free();}
+  const left=await readFile(source),right=await readFile(actual),a=new candidate.HwpDocument(left),b=new candidate.HwpDocument(right);
+  try{historicalDates(a,b,left,right,'historical-pair:'+item.name);}finally{a.free();b.free();}
 });
-await writeFile(join(out,'result.json'),JSON.stringify({createdAt:new Date().toISOString(),results,failures,observations,candidate:candidate.metadata,baseline:baseline.metadata,verifierSha256:hash(await readFile(fileURLToPath(import.meta.url))),scope:'Owned synthetic column2 actual oracle and strict unchanged production preservation reader, all semantic fields and every published control/text geometry field with 0.2 numeric tolerance. Native fixtures assert real serialized column/margin properties. No raw cache, source, guard, comparator or oracle normalization. Hancom GUI not run here.'},null,2));
+await writeFile(join(out,'result.json'),JSON.stringify({createdAt:new Date().toISOString(),results,failures,observations,candidate:candidate.metadata,baseline:baseline.metadata,independentDateReaderSha256:hash(await readFile(new URL('./lib/standard-ole-dates.mjs',import.meta.url))),verifierSha256:hash(await readFile(fileURLToPath(import.meta.url))),scope:'Owned synthetic column2 actual oracle and strict unchanged production preservation reader, all semantic fields and every published control/text geometry field with 0.2 numeric tolerance. Native fixtures assert real serialized column/margin properties. No raw cache, source, guard, comparator or oracle normalization. Full historical comparisons retain actual source/oracle modified-date differences, exactly matched against independently read original OLE bytes; the older engine has no date API and its one missing observation is explicitly recorded. Strict candidate save/reopen still requires every semantic/date field to match with zero exceptions. Historical date classification is not a claim that those separate files have equal metadata. Hancom GUI not run here.'},null,2));
 if(failures.length)process.exitCode=1;

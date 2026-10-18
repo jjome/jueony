@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?><xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:o="urn:own95" targetNamespace="urn:own95" elementFormDefault="qualified">
+ <xs:element name="report"><xs:complexType><xs:sequence><xs:element name="title" type="o:Title"/><xs:element name="status" type="o:Status"/><xs:element name="count" type="o:Count"/><xs:element name="amount" type="o:Amount"/></xs:sequence></xs:complexType></xs:element>
+ <xs:simpleType name="Title"><xs:restriction base="xs:string"><xs:minLength value="1"/><xs:maxLength value="12"/></xs:restriction></xs:simpleType>
+ <xs:simpleType name="Status"><xs:restriction base="xs:string"><xs:enumeration value="대기"/><xs:enumeration value="완료"/></xs:restriction></xs:simpleType>
+ <xs:simpleType name="Count"><xs:restriction base="xs:integer"><xs:minInclusive value="1"/><xs:maxExclusive value="100"/></xs:restriction></xs:simpleType>
+ <xs:simpleType name="Amount"><xs:restriction base="xs:decimal"><xs:minExclusive value="9007199254740992.1"/><xs:maxInclusive value="9007199254740992.3"/></xs:restriction></xs:simpleType>
+</xs:schema>

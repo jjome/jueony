@@ -1,0 +1,332 @@
+{
+  "schemaVersion": 1,
+  "status": "CONFIRMED_FINITE_PAGE_ORIGIN_DEFECT_AND_SEPARATE_UNPROVED_FRESH_FONT_FIT",
+  "inputs": [
+    {
+      "path": "build/hancom-final-file-review-20261017/source-mcst-bid-2026.hwp",
+      "sha256": "c61a13b249183a675d38d5badfa3af610edcf99a403622440fc81b7f52b348f2"
+    },
+    {
+      "path": "build/hancom-final-file-review-20261017/mcst-bid-2026-hwpx-hancom.hwpx",
+      "sha256": "20a3960b4315626c3f97d9c5d47746e3cfadd8fe50dde43a4a424aa3a2a76936"
+    }
+  ],
+  "engine": {
+    "sourceId": "912dbc660d171d5f",
+    "wasmSha256": "c871e6310cbf0c9dd4b0ab43334d624f1486370afd5429dfba83af5a3f3086c5"
+  },
+  "operations": {
+    "gui": 0,
+    "hancomOrCom": 0,
+    "productionSourceEdits": 0,
+    "commercialFontProgramCopies": 0,
+    "inputWrites": 0
+  },
+  "observations": {
+    "pages": [
+      15,
+      16
+    ],
+    "firstRootGeometryDifference": {
+      "paragraph": 48,
+      "source": [
+        {
+          "page": 3,
+          "y": 793.5,
+          "minChar": 0,
+          "endChar": 44
+        },
+        {
+          "page": 3,
+          "y": 821.3,
+          "minChar": 44,
+          "endChar": 83
+        },
+        {
+          "page": 3,
+          "y": 849,
+          "minChar": 83,
+          "endChar": 122
+        },
+        {
+          "page": 3,
+          "y": 876.7,
+          "minChar": 122,
+          "endChar": 134
+        }
+      ],
+      "oracle": [
+        {
+          "page": 3,
+          "y": 789.5,
+          "minChar": 0,
+          "endChar": 44
+        },
+        {
+          "page": 3,
+          "y": 817.3,
+          "minChar": 44,
+          "endChar": 83
+        },
+        {
+          "page": 3,
+          "y": 845,
+          "minChar": 83,
+          "endChar": 122
+        },
+        {
+          "page": 3,
+          "y": 872.7,
+          "minChar": 122,
+          "endChar": 134
+        }
+      ]
+    },
+    "firstRootPartitionDifference": {
+      "paragraph": 60,
+      "source": [
+        {
+          "page": 5,
+          "y": 383,
+          "minChar": 0,
+          "endChar": 46
+        },
+        {
+          "page": 5,
+          "y": 410.7,
+          "minChar": 46,
+          "endChar": 88
+        },
+        {
+          "page": 5,
+          "y": 438.4,
+          "minChar": 88,
+          "endChar": 131
+        }
+      ],
+      "oracle": [
+        {
+          "page": 5,
+          "y": 383,
+          "minChar": 0,
+          "endChar": 44
+        },
+        {
+          "page": 5,
+          "y": 410.7,
+          "minChar": 44,
+          "endChar": 86
+        },
+        {
+          "page": 5,
+          "y": 438.4,
+          "minChar": 86,
+          "endChar": 128
+        },
+        {
+          "page": 5,
+          "y": 466.2,
+          "minChar": 128,
+          "endChar": 131
+        }
+      ]
+    },
+    "paragraph48TablePropertiesExact": true,
+    "paragraph48CellPropertiesExact": true,
+    "paragraph60UnusedOnlyPropertyDifference": {
+      "patternType": [
+        -1,
+        0
+      ]
+    },
+    "paragraph60MetricRows": 131,
+    "paragraph60BaseAndDocumentFontDifferences": 0,
+    "selectedCharacterEvidence": [
+      {
+        "offset": 0,
+        "codePoint": 32,
+        "sameCodePoint": true,
+        "sameDoc": true,
+        "sourceNatural": 649,
+        "oracleNatural": 649,
+        "sourceFinal": 659,
+        "oracleFinal": 781,
+        "widthSource": "metricHalfSpace",
+        "characterMatch": "hit"
+      },
+      {
+        "offset": 1,
+        "codePoint": 8729,
+        "sameCodePoint": true,
+        "sameDoc": true,
+        "sourceNatural": 649,
+        "oracleNatural": 649,
+        "sourceFinal": 649,
+        "oracleFinal": 649,
+        "widthSource": "heuristicHalfwidth",
+        "characterMatch": "miss"
+      },
+      {
+        "offset": 3,
+        "codePoint": 49688,
+        "sameCodePoint": true,
+        "sameDoc": true,
+        "sourceNatural": 1299,
+        "oracleNatural": 1299,
+        "sourceFinal": 1248,
+        "oracleFinal": 1248,
+        "widthSource": "embeddedMetric",
+        "characterMatch": "hit"
+      },
+      {
+        "offset": 7,
+        "codePoint": 32,
+        "sameCodePoint": true,
+        "sameDoc": true,
+        "sourceNatural": 649,
+        "oracleNatural": 649,
+        "sourceFinal": 633,
+        "oracleFinal": 755,
+        "widthSource": "metricHalfSpace",
+        "characterMatch": "hit"
+      }
+    ],
+    "sourceRawGapHU": 300,
+    "rawHostCacheFieldsExact": true,
+    "p48TablePublished": [
+      [
+        {
+          "type": "table",
+          "x": 79.4,
+          "y": 907.6,
+          "w": 635,
+          "h": 96.7,
+          "rowCount": 1,
+          "colCount": 1,
+          "secIdx": 0,
+          "paraIdx": 48,
+          "controlIdx": 0,
+          "plane": 2,
+          "zOrder": 0,
+          "stableIndex": [
+            0,
+            48,
+            0
+          ],
+          "cells": [
+            {
+              "x": 79.4,
+              "y": 907.6,
+              "w": 635,
+              "h": 96.5,
+              "row": 0,
+              "col": 0,
+              "rowSpan": 1,
+              "colSpan": 1,
+              "cellIdx": 0
+            }
+          ]
+        }
+      ],
+      [
+        {
+          "type": "table",
+          "x": 79.4,
+          "y": 903.8,
+          "w": 635,
+          "h": 100.5,
+          "rowCount": 1,
+          "colCount": 1,
+          "secIdx": 0,
+          "paraIdx": 48,
+          "controlIdx": 0,
+          "plane": 2,
+          "zOrder": 0,
+          "stableIndex": [
+            0,
+            48,
+            0
+          ],
+          "cells": [
+            {
+              "x": 79.4,
+              "y": 903.8,
+              "w": 635,
+              "h": 100.3,
+              "row": 0,
+              "col": 0,
+              "rowSpan": 1,
+              "colSpan": 1,
+              "cellIdx": 0
+            }
+          ]
+        }
+      ]
+    ],
+    "rejoinAtParagraph56": [
+      {
+        "page": 5,
+        "y": 117.4,
+        "minChar": 0,
+        "endChar": 45
+      },
+      {
+        "page": 5,
+        "y": 117.4,
+        "minChar": 0,
+        "endChar": 45
+      }
+    ]
+  },
+  "confirmedOwnershipChain": [
+    "Both raw formats preserve original p48 first vpos51013 and p47 prior end50713, gap300HU.",
+    "HWPX load normalization clears source_anchor_end on non-TAC floating table host; current/previous normalized endpoints both117295. Native keeps51013/50713.",
+    "HeightCursor vpos_end_is_table_host_top becomes false only for normalized XML and pre-deducts resolved paragraph before-spacing4px.",
+    "The same body layout then adds before-spacing once: native incoming789.533→793.533; XML785.533→789.533.",
+    "PartialTable placement consumes that shifted host. It is separate from p60 partition3→4, and p48 drift rejoins atp56."
+  ],
+  "candidateScope": {
+    "primaryFile": "src/document_core/commands/document.rs, source_anchor_end ownership around790–831",
+    "alternativeConsumer": "src/renderer/height_cursor.rs, original-source bound paragraph-top predicate around748–843",
+    "notPermitted": [
+      "blanket source-profile relabel",
+      "fixed4px correction",
+      "missing-glyph guessedwidth",
+      "clean source partition rewrite",
+      "guard relaxation"
+    ],
+    "closedHelperPreconditions": [
+      "Current untouched authentic source rows, no dirty/reflowed/synthetic rows.",
+      "Previous plain source anchor already owned; same physical axis; no explicit Page/Section/Column break.",
+      "One visible-text host and exactly one non-TAC Para/TopAndBottom table; no other controls/caption/overlay.",
+      "Current original first equals previous original end plus resolved positive before-spacing, all within current body frame.",
+      "Preserve only that source gap at normalization; retain existing post-host anchor reset."
+    ],
+    "acceptance": [
+      "Pinned source and oracle rawSHA unchanged.",
+      "p48 host firstpaint aligns with raw51013+pageorigin; tabletop/fragmentheight equality through same frame.",
+      "No claimed15→16 completion solely from p48; p60 different stored partitions remain distinct.",
+      "Negative: explicit resets, synthetic rows, dirtyedited rows, multiple/Square/TAC/empty hosts and unknowngap cannot gain this authority.",
+      "Existing whole semantic/layout guard, columns24 and savedHWP/HWPX/Undo remain unchanged."
+    ]
+  },
+  "fontConclusion": "U+2219 is absent from the previously read HMKMM cmap, but actual Hancom fallback/typeface and fresh fit remain unobserved. Both current-engine parses use649HU heuristicHalfwidth and every p60 natural/doc-font value agrees. SPACE659vs781HU is justify output of distinct stored partitions, not evidence for changing its natural metric.",
+  "files": [
+    {
+      "path": "audit.mjs",
+      "sha256": "1ff02aac3140995776137f7331ed27dd1dc4a366f000af834eed117ff55b8ea2"
+    },
+    {
+      "path": "read-caches.py",
+      "sha256": "05b1aeda54e125bf6b67a93a9907cb0c1c031a93b4a4f80888db9aa6c075dc76"
+    },
+    {
+      "path": "raw-source-and-oracle.json",
+      "sha256": "3f2140bb9d90e6bc7a1846f4e2ef5332e7e012ba751008ebcc090a1a0e889a82"
+    },
+    {
+      "path": "native-trace-v2.log",
+      "sha256": "b535b2a97b6a3cdae9aa56be8efd4756c1666b10760b63b27f784dff9e115b29"
+    }
+  ]
+}

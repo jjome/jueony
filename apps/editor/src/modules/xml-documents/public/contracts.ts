@@ -8,13 +8,13 @@ export interface XmlValidationIssue { path:string; message:string }
 export interface XmlFieldValue { path:number[]; name:string; namespace:string; value:string; simple:boolean }
 export interface XmlWorkspaceSnapshot {
  revision:number; dirty:boolean; canUndo:boolean; canRedo:boolean;
- fields:XmlFieldValue[]; profile:'local-sequence-v1';
+ fields:XmlFieldValue[]; profile:'local-sequence-restrictions-v2';
  limitations:readonly string[];
 }
 export type XmlEditRequest =
  | {kind:'replace';revision:number;path:readonly number[];originalText:string;text:string}
  | {kind:'repeat'|'remove';revision:number;path:readonly number[]};
-export interface XmlExportArtifact { xml:string; schema:string; profile:'local-sequence-v1' }
+export interface XmlExportArtifact { xml:string; schema:string; profile:'local-sequence-restrictions-v2' }
 /** Recovery preserves exact source strings and both sides of Undo/Redo. */
 export interface XmlRecoveryState {
  version:1; source:string; schema:string; current:string;

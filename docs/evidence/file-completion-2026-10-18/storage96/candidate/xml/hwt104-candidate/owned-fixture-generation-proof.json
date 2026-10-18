@@ -1,0 +1,33 @@
+{
+  "fixturePinned": true,
+  "fixtureSha256": "1805d68ae0af16b140afc29c6767c21fb334c5317b6b491b90ad60daed9bdacb",
+  "newGenerationSha256": "583153f7894dcd160a152fb2c9743c0f6941fc0d8af8393b7529be8448903b1f",
+  "rawChangedByteCount": 20,
+  "rawChangedOffsets": [
+    8420,
+    8421,
+    8422,
+    8423,
+    8424,
+    8428,
+    8429,
+    8430,
+    8431,
+    8432,
+    8548,
+    8549,
+    8550,
+    8551,
+    8552,
+    8556,
+    8557,
+    8558,
+    8559,
+    8560
+  ],
+  "dtoChangedKeys": [
+    "sourceSha256"
+  ],
+  "allStoredXmlStreamsAndDecodedContentEqual": true,
+  "note": "New cfb::CompoundFile generation is not claimed byte-reproducible (directory metadata timestamps differ); original pinned synthetic fixture and its Native oracle are unchanged. Actual finalWASM must read pinned fixture and exactly match that whole oracle."
+}

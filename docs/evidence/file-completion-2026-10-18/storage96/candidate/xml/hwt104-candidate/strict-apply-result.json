@@ -1,0 +1,54 @@
+{
+  "passed": true,
+  "baseline": "source-912dbc660d171d5f/104patches",
+  "whitespace": "error-all",
+  "files": [
+    {
+      "path": "src/parser/cfb_reader.rs",
+      "oldSha256": "f4bf5aa7c6e0420d7207d5c860269f84c59df9eae8e177b293e3709e72459da8",
+      "patchNormalizedPostSha256": "e6b192a430385aa01680030c2e29f11e905a6f9c0a7e4680426209400fbc8b74",
+      "nativeCompiledSha256": "c0dc1ae755163fb8629a529f30db8f698ecb5d851c2c1c0296fc2ff75ba56959",
+      "strictPostSha256": "c0dc1ae755163fb8629a529f30db8f698ecb5d851c2c1c0296fc2ff75ba56959",
+      "strictPostBytes": 85657,
+      "crlf": 2073
+    },
+    {
+      "path": "src/parser/xml_template.rs",
+      "oldSha256": null,
+      "patchNormalizedPostSha256": "bc8e237bed7a24cfce5060db51557ebc60690f9afb5b71dac9f697174fb73e45",
+      "nativeCompiledSha256": "bc8e237bed7a24cfce5060db51557ebc60690f9afb5b71dac9f697174fb73e45",
+      "strictPostSha256": "8f123a2aecc49703627c27b679ef4e4772d37909a6b3fbce829344830d7647a6",
+      "strictPostBytes": 6209,
+      "crlf": 94
+    },
+    {
+      "path": "src/wasm_api/xml_template.rs",
+      "oldSha256": null,
+      "patchNormalizedPostSha256": "eeaa8fad9ce719311298b4c22fcf146ad8d3eb2718908ba3002397127f2119bc",
+      "nativeCompiledSha256": "eeaa8fad9ce719311298b4c22fcf146ad8d3eb2718908ba3002397127f2119bc",
+      "strictPostSha256": "30a304fc927aaaeb2a14e785f12b821b88ea35c804765335ad6252a174c0d876",
+      "strictPostBytes": 436,
+      "crlf": 8
+    },
+    {
+      "path": "src/parser/mod.rs",
+      "oldSha256": "69fa9bf0111c4a1efa9badd18a4f0f7d76d95120ddbbf42c893d3f5f32a0359e",
+      "patchNormalizedPostSha256": "96ee8a928ff56e9dc3170f81785dbb761a2ba8401f17d1ae8f6f04c255021cbf",
+      "nativeCompiledSha256": "96ee8a928ff56e9dc3170f81785dbb761a2ba8401f17d1ae8f6f04c255021cbf",
+      "strictPostSha256": "5c0d59260ad24d13f903fe9dbb98a6fb25abb60de32072512298e137fc2b2adf",
+      "strictPostBytes": 161489,
+      "crlf": 3822
+    },
+    {
+      "path": "src/wasm_api.rs",
+      "oldSha256": "37697920b801fcd57d28fa95e8cd0c05388fafcadb5c0fbce0ce9c52e5497548",
+      "patchNormalizedPostSha256": "2d6119daf490cd5f54defaa48a93bc39b19c3cc5664512f2ad2de0ce1e7b9fee",
+      "nativeCompiledSha256": "e00bb8007757a39533c6fbc9a1c9237794cb9003304235e4c013e68d787c6431",
+      "strictPostSha256": "2a1397129149e2aef452342254eb916a429ac1d3990c88a3ecfd898725fc5eb5",
+      "strictPostBytes": 356793,
+      "crlf": 9220
+    }
+  ],
+  "native": "21 tests passed; private source102, exact compiled5 byte witnesses at native-artifacts-seventh/compiled-source-proof.json. CFB/header/namespace dependencies originally equal104. wasm_api104 adds unrelated root storedInformation4lines not claimed as samefullNativebinary. ParentfinalWASM must compile strict104postimages.",
+  "scope": "Reuses existing strictCFB; adds exact bounded fixed-path entry query, no globalstoragewalk. No HWT/body editing, mapping write authority, XSL or genericXSD capability. Bare rawdeflate, malformed trailer/UTF16/XML, crypto, unsupported/ambiguous mappings are not silently accepted."
+}

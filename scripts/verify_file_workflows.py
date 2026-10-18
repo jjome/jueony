@@ -10,14 +10,20 @@ CASES=[('native-shell',11),('native-recents',9),('document-lifecycle',10),
        ('close-recovery',4),('save-recovery',29),('document-metadata',10),
        ('agent-files',15),('xml-documents-integrated',7),('xml-documents',13),('xml-recovery',13),
        ('package-preservation',14),('native-row-preservation',13),('native-row-engine',19),
-       ('reflowed-native-storage',12),('reflowed-native-ui',13),('computed-row-package',22)]
+       ('reflowed-native-storage',12),('reflowed-native-ui',13),('computed-row-package',22),
+       ('document-history95',16),('history-ui95',12),('xml-simple-types95',10),('stored-information95',17),
+       ('hwt-template95',9),('document-story-information96',5)]
 sha=lambda b:hashlib.sha256(b).hexdigest()
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('--engine',type=Path,required=True)
     p.add_argument('--dist',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--node',required=True);p.add_argument('--workers',type=int,choices=[1,2],default=2)
+    p.add_argument('--baseline-engine',type=Path);p.add_argument('--native-cell-source',type=Path);p.add_argument('--native-cell-oracle',type=Path)
     a=p.parse_args();engine=a.engine.resolve();dist=a.dist.resolve();out=a.output.resolve()
+    optional=[a.baseline_engine,a.native_cell_source,a.native_cell_oracle]
+    assert all(optional) or not any(optional),'native-cell regression requires baseline engine, source and oracle together'
+    cases=CASES+[('owned-native-cell-layout',13)] if all(optional) else CASES
     meta=json.loads((engine/'jueony-engine-build.json').read_bytes())
     build=json.loads((dist/'build-evidence.json').read_bytes())
     assert sha((engine/'rhwp_bg.wasm').read_bytes())==meta['wasmSha256']==build['engineWasmSha256']
@@ -26,6 +32,7 @@ def main():
     def run(case):
         name,count=case;script=APP/'scripts'/f'verify-{name}.mjs';fingerprint=sha(script.read_bytes())
         target=out/name;env=dict(os.environ,JUEONY_ENGINE_PACKAGE=str(engine),JUEONY_TEST_DIST=str(dist),JUEONY_TEST_OUTPUT=str(target))
+        if name=='owned-native-cell-layout':env.update(JUEONY_BASELINE_ENGINE_PACKAGE=str(a.baseline_engine.resolve()),JUEONY_TEST_SOURCE=str(a.native_cell_source.resolve()),JUEONY_TEST_ORACLE=str(a.native_cell_oracle.resolve()))
         with (out/'logs'/f'{name}.log').open('w',encoding='utf-8') as log:
             proc=subprocess.run([a.node,'--experimental-strip-types',str(script)],cwd=APP,env=env,stdout=log,stderr=subprocess.STDOUT,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
         row={'name':name,'exitCode':proc.returncode,'expectedCases':count,'verifierSHA256':fingerprint,'scriptUnchanged':sha(script.read_bytes())==fingerprint}
@@ -34,13 +41,14 @@ def main():
             assert proc.returncode==0 and row['scriptUnchanged']
             assert len(r['results'])==count and r['failures']==[],(name,r.get('failures'))
             engine_only=name in ['package-preservation','native-row-engine',
-                                 'reflowed-native-storage','computed-row-package']
+                                 'reflowed-native-storage','computed-row-package','stored-information95',
+                                 'document-story-information96','owned-native-cell-layout']
             if not engine_only:
                 for key in ['pageErrors','consoleErrors','externalRequests']:assert r[key]==[],(name,key)
             for item in r['results']:
                 if isinstance(item,dict):assert item['status']=='PASS',(name,item)
-            independent=name in ['xml-documents','xml-recovery']
-            if engine_only:
+            independent=name in ['xml-documents','xml-recovery','document-history95','xml-simple-types95']
+            if engine_only or name=='hwt-template95':
                 # Direct WASM; package suite additionally inspects independent ZIPs.
                 assert r['engine']['wasmSha256']==meta['wasmSha256'] and r['engine']['jsSha256']==meta['jsSha256']
                 assert r['verifierSha256']==fingerprint
@@ -57,9 +65,9 @@ def main():
             row.update(status='PASS',passed=count,resultSHA256=sha(raw),engineUsed=not independent)
         except Exception as e:row.update(status='FAIL',error=str(e))
         print(name,row['status'],flush=True);return row
-    with ThreadPoolExecutor(max_workers=a.workers)as pool:rows=list(pool.map(run,CASES))
+    with ThreadPoolExecutor(max_workers=a.workers)as pool:rows=list(pool.map(run,cases))
     failed=[x for x in rows if x['status']!='PASS']
-    result={'engine':meta,'build':build,'suites':rows,'failures':failed,'passedCases':sum(x.get('passed',0)for x in rows),'totalCases':sum(count for _,count in CASES),'scope':'Production file/recovery UI exercised through isolated headless Edge profiles and native IPC seams, not actual OS dialog/Hancom screen certification. Standalone XML and XML-recovery suites attested separately without HWP engine; package/native-row/reflow storage suites use direct WASM. The old native-row safety cases permit detected mismatch refusal; the separate reflowed-native-storage and reflowed-native-ui suites REQUIRE actual successful saves, reopens and follow-up edits. A refusal is a failure there. Computed-row-package inspects standard ZIP payloads and rejects invalid cache authority. The Agent suite includes explicit bound save and stale generation refusal.'}
+    result={'engine':meta,'build':build,'suites':rows,'failures':failed,'passedCases':sum(x.get('passed',0)for x in rows),'totalCases':sum(count for _,count in cases),'externalNativeCellCorpusIncluded':all(optional),'scope':'Production file/recovery UI exercised through isolated headless Edge profiles and native IPC seams, not actual OS dialog/Hancom screen certification. Standalone XML and history IDB suites attest exact sources separately. HWT uses actual WASM and an explicit browser test bridge; history-ui also tests its actual production iframe facade and host menu. Optional native-cell regression requires three explicit paths and SHA-pinned source/oracle; absence adds no PASS or silent skipped case. The old native-row safety cases permit detected mismatch refusal; separate reflowed-native-storage/UI REQUIRE successful saves/reopens/follow-up edits. Computed-row-package independently checks ZIP authority. Agent suite includes actual approved-bound save and stale generation refusal.'}
     (out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     return int(bool(failed))
 

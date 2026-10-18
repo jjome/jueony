@@ -1,0 +1,240 @@
+[
+  {
+    "id": "typed-integer-enumeration",
+    "schema": "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"><xs:simpleType name=\"T\"><xs:restriction base=\"xs:integer\"><xs:enumeration value=\"+0002\"/></xs:restriction></xs:simpleType><xs:element name=\"n\" type=\"T\"/></xs:schema>",
+    "schemaValid": true,
+    "values": [
+      {
+        "xml": "<n>2</n>",
+        "valid": true
+      },
+      {
+        "xml": "<n>+002</n>",
+        "valid": true
+      },
+      {
+        "xml": "<n>3</n>",
+        "valid": false
+      },
+      {
+        "xml": "<n>2.0</n>",
+        "valid": false
+      }
+    ]
+  },
+  {
+    "id": "typed-decimal-zero-enumeration",
+    "schema": "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"><xs:simpleType name=\"T\"><xs:restriction base=\"xs:decimal\"><xs:enumeration value=\"-0.0\"/></xs:restriction></xs:simpleType><xs:element name=\"n\" type=\"T\"/></xs:schema>",
+    "schemaValid": true,
+    "values": [
+      {
+        "xml": "<n>+0.00</n>",
+        "valid": true
+      },
+      {
+        "xml": "<n>-0</n>",
+        "valid": true
+      },
+      {
+        "xml": "<n>0.01</n>",
+        "valid": false
+      },
+      {
+        "xml": "<n>NaN</n>",
+        "valid": false
+      }
+    ]
+  },
+  {
+    "id": "precise-decimal-range",
+    "schema": "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"><xs:simpleType name=\"T\"><xs:restriction base=\"xs:decimal\"><xs:minExclusive value=\"9007199254740992.000000000000000001\"/><xs:maxInclusive value=\"9007199254740992.000000000000000003\"/></xs:restriction></xs:simpleType><xs:element name=\"n\" type=\"T\"/></xs:schema>",
+    "schemaValid": true,
+    "values": [
+      {
+        "xml": "<n>9007199254740992.000000000000000001</n>",
+        "valid": false
+      },
+      {
+        "xml": "<n>9007199254740992.000000000000000002</n>",
+        "valid": true
+      },
+      {
+        "xml": "<n>9007199254740992.000000000000000003</n>",
+        "valid": true
+      },
+      {
+        "xml": "<n>9007199254740992.000000000000000004</n>",
+        "valid": false
+      }
+    ]
+  },
+  {
+    "id": "xml-character-length",
+    "schema": "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"><xs:simpleType name=\"T\"><xs:restriction base=\"xs:string\"><xs:length value=\"2\"/></xs:restriction></xs:simpleType><xs:element name=\"n\" type=\"T\"/></xs:schema>",
+    "schemaValid": true,
+    "values": [
+      {
+        "xml": "<n>가😀</n>",
+        "valid": true
+      },
+      {
+        "xml": "<n>é</n>",
+        "valid": true
+      },
+      {
+        "xml": "<n>😀</n>",
+        "valid": false
+      },
+      {
+        "xml": "<n> A </n>",
+        "valid": false
+      }
+    ]
+  },
+  {
+    "id": "string-whitespace-enumeration",
+    "schema": "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"><xs:simpleType name=\"T\"><xs:restriction base=\"xs:string\"><xs:enumeration value=\" A \"/></xs:restriction></xs:simpleType><xs:element name=\"n\" type=\"T\"/></xs:schema>",
+    "schemaValid": true,
+    "values": [
+      {
+        "xml": "<n> A </n>",
+        "valid": true
+      },
+      {
+        "xml": "<n>A</n>",
+        "valid": false
+      },
+      {
+        "xml": "<n>  A </n>",
+        "valid": false
+      }
+    ]
+  },
+  {
+    "id": "inherited-enumeration-intersection",
+    "schema": "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"><xs:simpleType name=\"Base\"><xs:restriction base=\"xs:integer\"><xs:enumeration value=\"1\"/><xs:enumeration value=\"2\"/></xs:restriction></xs:simpleType><xs:simpleType name=\"T\"><xs:restriction base=\"Base\"><xs:minInclusive value=\"2\"/></xs:restriction></xs:simpleType><xs:element name=\"n\" type=\"T\"/></xs:schema>",
+    "schemaValid": true,
+    "values": [
+      {
+        "xml": "<n>1</n>",
+        "valid": false
+      },
+      {
+        "xml": "<n>2</n>",
+        "valid": true
+      },
+      {
+        "xml": "<n>+002</n>",
+        "valid": true
+      }
+    ]
+  },
+  {
+    "id": "valid-empty-value-space",
+    "schema": "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"><xs:simpleType name=\"T\"><xs:restriction base=\"xs:integer\"><xs:minInclusive value=\"2\"/><xs:enumeration value=\"1\"/></xs:restriction></xs:simpleType><xs:element name=\"n\" type=\"T\"/></xs:schema>",
+    "schemaValid": true,
+    "values": [
+      {
+        "xml": "<n>1</n>",
+        "valid": false
+      },
+      {
+        "xml": "<n>2</n>",
+        "valid": false
+      }
+    ]
+  },
+  {
+    "id": "boolean-alias",
+    "schema": "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"><xs:simpleType name=\"T\"><xs:restriction base=\"xs:boolean\"></xs:restriction></xs:simpleType><xs:element name=\"n\" type=\"T\"/></xs:schema>",
+    "schemaValid": true,
+    "values": [
+      {
+        "xml": "<n>true</n>",
+        "valid": true
+      },
+      {
+        "xml": "<n>1</n>",
+        "valid": true
+      },
+      {
+        "xml": "<n> false </n>",
+        "valid": true
+      },
+      {
+        "xml": "<n>TRUE</n>",
+        "valid": false
+      }
+    ]
+  },
+  {
+    "id": "invalid-boolean-enumeration",
+    "schema": "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"><xs:simpleType name=\"T\"><xs:restriction base=\"xs:boolean\"><xs:enumeration value=\"1\"/></xs:restriction></xs:simpleType><xs:element name=\"n\" type=\"T\"/></xs:schema>",
+    "schemaValid": false,
+    "values": []
+  },
+  {
+    "id": "invalid-widened-range",
+    "schema": "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"><xs:simpleType name=\"Base\"><xs:restriction base=\"xs:integer\"><xs:minInclusive value=\"3\"/></xs:restriction></xs:simpleType><xs:simpleType name=\"T\"><xs:restriction base=\"Base\"><xs:minInclusive value=\"2\"/></xs:restriction></xs:simpleType><xs:element name=\"n\" type=\"T\"/></xs:schema>",
+    "schemaValid": false,
+    "values": []
+  },
+  {
+    "id": "invalid-base-enumeration-bound",
+    "schema": "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"><xs:simpleType name=\"Base\"><xs:restriction base=\"xs:integer\"><xs:enumeration value=\"1\"/><xs:enumeration value=\"2\"/></xs:restriction></xs:simpleType><xs:simpleType name=\"T\"><xs:restriction base=\"Base\"><xs:minInclusive value=\"3\"/></xs:restriction></xs:simpleType><xs:element name=\"n\" type=\"T\"/></xs:schema>",
+    "schemaValid": false,
+    "values": []
+  },
+  {
+    "id": "same-inherited-exclusive-min-primary",
+    "schema": "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"><xs:simpleType name=\"Base\"><xs:restriction base=\"xs:integer\"><xs:minExclusive value=\"1\"/><xs:maxExclusive value=\"5\"/></xs:restriction></xs:simpleType><xs:simpleType name=\"T\"><xs:restriction base=\"Base\"><xs:minExclusive value=\"1\"/></xs:restriction></xs:simpleType><xs:element name=\"n\" type=\"T\"/></xs:schema>",
+    "schemaValid": true,
+    "values": [
+      {
+        "xml": "<n>1</n>",
+        "valid": false
+      },
+      {
+        "xml": "<n>2</n>",
+        "valid": true
+      },
+      {
+        "xml": "<n>4</n>",
+        "valid": true
+      },
+      {
+        "xml": "<n>5</n>",
+        "valid": false
+      }
+    ]
+  },
+  {
+    "id": "same-inherited-exclusive-max-primary",
+    "schema": "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"><xs:simpleType name=\"Base\"><xs:restriction base=\"xs:integer\"><xs:minExclusive value=\"1\"/><xs:maxExclusive value=\"5\"/></xs:restriction></xs:simpleType><xs:simpleType name=\"T\"><xs:restriction base=\"Base\"><xs:maxExclusive value=\"5\"/></xs:restriction></xs:simpleType><xs:element name=\"n\" type=\"T\"/></xs:schema>",
+    "schemaValid": true,
+    "values": [
+      {
+        "xml": "<n>1</n>",
+        "valid": false
+      },
+      {
+        "xml": "<n>2</n>",
+        "valid": true
+      },
+      {
+        "xml": "<n>4</n>",
+        "valid": true
+      },
+      {
+        "xml": "<n>5</n>",
+        "valid": false
+      }
+    ]
+  },
+  {
+    "id": "invalid-cyclic-type",
+    "schema": "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\"><xs:simpleType name=\"T\"><xs:restriction base=\"B\"></xs:restriction></xs:simpleType><xs:simpleType name=\"B\"><xs:restriction base=\"T\"></xs:restriction></xs:simpleType><xs:element name=\"n\" type=\"T\"/></xs:schema>",
+    "schemaValid": false,
+    "values": []
+  }
+]

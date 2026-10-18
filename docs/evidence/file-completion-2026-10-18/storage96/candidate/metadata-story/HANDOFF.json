@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "scope": "Stored timestamp preservation and canonical paragraph story census; parent owns final production integration and total feature verdict.",
+  "installedCommercialInputs": 0,
+  "credentials": 0,
+  "userFilesOrState": 0,
+  "guiActions": 0,
+  "fixtures": "Own generated blank HWP/HWPX only. Rust native tests use synthetic models and original in-repo metadata samples; no installed commercial corpus.",
+  "results": {
+    "metadataOld102": "0/16 (all fail as expected)",
+    "metadataOld103": "16/17 (ambiguous XML date same-format failure)",
+    "metadataCandidate104": "17/17",
+    "metadataNative": "17/17, 0 skip",
+    "storyOld104": "1/5 (old extraction omission control passes; four new capabilities fail)",
+    "storyCandidate": "5/5; mandatory production TS validator + preservation guard + exact disk readback",
+    "storyNative": "4/4, 0 skip"
+  },
+  "implementation": {
+    "metadataPatch": "build/metadata-audit95/stored-timestamp-preservation95.patch",
+    "metadataFollowup": "build/metadata-audit95/v2/ambiguous-xml-date-passthrough95.patch",
+    "storyPatch": "build/story-audit96/canonical-story-information96.patch",
+    "storyPackage": "build/story-audit96/source/pkg",
+    "storyVerifier": "apps/editor/scripts/verify-document-story-information96.mjs"
+  },
+  "limitations": [
+    "Not Hancom statistics or all-visual-layout equivalence.",
+    "Native parser automatic-number space placeholders remain canonical model text.",
+    "Story excludes equation scripts/field guides+commands/ruby+overlap/OCR/opaque payload/alternate fallback representations.",
+    "Queries retain stored times; no current-clock timestamp guessing, no active editing-duration accrual.",
+    "HWT structured read is separate; it is not general HWT field editing/conversion completion."
+  ],
+  "files": [
+    {
+      "path": "metadata-old102.json",
+      "source": "build/metadata-audit95/promoted-before102/result.json",
+      "sha256": "d2a87cb1ecf6f3bd2055baeca959cdbb9825d4a7ab6ae88099c13ba713c2b6a9",
+      "bytes": 32543
+    },
+    {
+      "path": "metadata-old103.json",
+      "source": "build/metadata-audit95/v2/before/result.json",
+      "sha256": "528844b205fb8be70db0e89d91d35244431e3c06ae576c0c3b8e870bb9613360",
+      "bytes": 23502
+    },
+    {
+      "path": "metadata-candidate104.json",
+      "source": "build/metadata-audit95/v2/after/result.json",
+      "sha256": "ee26018f3ffc4c06404e9de93c2caad6cc4b4e2654706046919804f6c0fc8b66",
+      "bytes": 23549
+    },
+    {
+      "path": "metadata-native17.log",
+      "source": "build/metadata-audit95/native-tests.log",
+      "sha256": "e66ddb122478dbfc4b61b2e71c315f8a96648766a2e9f18ad05271afb39d7187",
+      "bytes": 2669
+    },
+    {
+      "path": "story-old104.json",
+      "source": "build/story-audit96/production-before-final/result.json",
+      "sha256": "706f3f7c8b69df17bf873aa9a33511b890f173db86678e9bdc7bf4adf4f5ce92",
+      "bytes": 24194
+    },
+    {
+      "path": "story-candidate.json",
+      "source": "build/story-audit96/production-after-final/result.json",
+      "sha256": "86e1959a59258a4725abf3313a61acef2b82673058478e62694c2eb2eedf2586",
+      "bytes": 22808
+    },
+    {
+      "path": "story-native4.log",
+      "source": "build/story-audit96/native-test.log",
+      "sha256": "67cfe71b9c7b4555ee38fa107a34e2bf55b6ff1a9a032d1837a46b946ea3bfbf",
+      "bytes": 803
+    },
+    {
+      "path": "story-native-raw-control-proof.json",
+      "source": "build/story-audit96/raw-control-proof.json",
+      "sha256": "084f8bae09bd4b6e618316d41ea5424cd00fe3ad555aca574b635b774d4d087f",
+      "bytes": 607
+    },
+    {
+      "path": "own-story.hwp",
+      "source": "build/story-audit96/production-after-final/stories.hwp",
+      "sha256": "4741bddb1b72d1fc02f72dfd89a7d259fc8ea04ae1ea88dee928e772a31d0069",
+      "bytes": 13312
+    },
+    {
+      "path": "own-story.hwpx",
+      "source": "build/story-audit96/production-after-final/stories.hwpx",
+      "sha256": "7e29aa550d1de451f8d134dcb79d785022c63a9bd8c47a5c98c0518e7a3459f9",
+      "bytes": 8267
+    },
+    {
+      "path": "own-story-hwp-query.json",
+      "source": "build/story-audit96/production-after-final/hwp-query.json",
+      "sha256": "ca4c6bb6df95559927b45c838be7170566eeb260eb8169ad748c9bb512e497e8",
+      "bytes": 2355
+    },
+    {
+      "path": "own-story-hwpx-query.json",
+      "source": "build/story-audit96/production-after-final/hwpx-query.json",
+      "sha256": "ca4c6bb6df95559927b45c838be7170566eeb260eb8169ad748c9bb512e497e8",
+      "bytes": 2355
+    }
+  ]
+}

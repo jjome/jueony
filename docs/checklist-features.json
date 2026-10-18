@@ -54,14 +54,14 @@
       "key": "files",
       "file": "05-files-storage-recovery.md",
       "title": "파일·저장·복구·형식 보존",
-      "description": "열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.\n\n**현재 구현94:** 앞 문단의 줄/쪽 재조판 뒤 HWPX 저장 차단과 HWPX→HWP→HWPX 후속 저장 결함을 수정했다. 실제 저장12/12·UI13/13·독립 ZIP22/22를 포함해 동일 공식 빌드242/242, 단위970·기존단표24·Windows저장10 통과. 한글 직접 비교는 보류한다. 원MCST/Python3 최초 조판·글꼴, 명시 글 방향 매핑과 상위 파일 메뉴 범위는 남아 파트 전체 부분 상태를 유지한다. [이번 완료 범위·증거·잔여 표](../116-reflowed-native-storage.md).",
+      "description": "열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.\n\n**현재 합본96:** 문서별 격리 이력·정확한 저장 날짜 보존·문서 story 정보·제한 XSD·실제 WASM HWT 읽기와 표 셀 줄바꿈을 추가했다. 공식 동일 빌드324/324·단위1008·기존 단표24·Windows저장10·실행묶음7 통과. 원MCST/Python3 최초 조판과 글 방향 매핑은 남아 파트 전체 부분 상태를 유지한다. [이번 수정·검수·잔여 표](../117-file-storage-closure.md).",
       "ids": "B001-B002 B005-B006 B009-B011 B014 B021-B022 G065-G073 G090 G092 N001-N002",
       "related": [
         "session",
         "tables",
         "architecture"
       ],
-      "update": "재조판 저장 차단 수정 · 자동242/242 통과 · 잔여 범위 유지"
+      "update": "이력·저장날짜·XML/HWT·셀 줄바꿈 합본324 통과 · 최초 조판 잔여"
     },
     {
       "key": "editing",

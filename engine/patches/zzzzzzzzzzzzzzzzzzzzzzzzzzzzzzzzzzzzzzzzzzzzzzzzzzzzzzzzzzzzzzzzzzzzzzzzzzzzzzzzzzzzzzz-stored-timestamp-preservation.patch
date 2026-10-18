@@ -1,0 +1,276 @@
+diff --git a/src/document_core/document_metadata.rs b/src/document_core/document_metadata.rs
+--- a/src/document_core/document_metadata.rs
++++ b/src/document_core/document_metadata.rs
+@@ -6,6 +6,10 @@
+ use quick_xml::events::Event;
+ use serde::{Deserialize, Serialize};
+ use std::collections::{BTreeMap, BTreeSet};
++
++#[path = "document_metadata_stored.rs"]
++mod stored;
++pub(crate) use stored::{empty_hwpx_summary, stored_hwpx_source, encode_summary_carrier, restore_summary_carrier, validate_hwp_storage, SUMMARY_CARRIER_PATH, SUMMARY_CARRIER_LIMIT};
+ 
+ const LIMIT: usize = 1024 * 1024;
+ const OPF: &str = "http://www.idpf.org/2007/opf/";
+@@ -647,7 +651,7 @@
+     let xml = if let Some(b) = x {
+         Xml::parse(b)?.write(fields)?
+     } else {
+-        new_xml(fields)
++        stored::new_xml_with_stored_dates(fields, &summary)?
+     };
+     let mut streams = doc.extra_streams.clone();
+     if let Some(v) = streams.iter_mut().find(|v| summary_path(&v.0)) {
+@@ -729,6 +733,7 @@
+         return;
+     };
+     doc.extra_streams = streams;
++    let _ = stored::sync_hwp_dates(doc); // CFB writer rejects any unresolved/date mismatch.
+ }
+ /// Existing HWPX metadata remains verbatim. Native HWP summary strings acquire
+ /// their HWPX representation instead of a synthetic unrelated creator name.
+diff --git a/src/document_core/document_metadata_stored.rs b/src/document_core/document_metadata_stored.rs
+new file mode 100644
+--- /dev/null
++++ b/src/document_core/document_metadata_stored.rs
+@@ -0,0 +1,156 @@
++//! Stored summary timestamps and bounded opaque OLE metadata transport.
++//! Standard CreatedDate/ModifiedDate are the authoritative XML timestamp owner.
++//! Opaque properties are restored only when the exact metadata block and its
++//! standard fields agree with a unique, bounded carrier. No wall clock is used.
++use super::*;
++use base64::Engine;
++use quick_xml::{name::ResolveResult, reader::NsReader};
++use serde_json::{json,Value};
++pub(crate) const SUMMARY_CARRIER_PATH:&str="META-INF/jueony-summary-properties-v1.json";
++pub(crate) const SUMMARY_CARRIER_LIMIT:usize=2*1024*1024;
++const TICKS:i128=10_000_000;
++const EPOCH_DAYS:i64=134774; // Gregorian days from 1601-01-01 to 1970-01-01.
++
++fn days(y:i64,m:i64,d:i64)->i64 {
++ let y=y-i64::from(m<=2);let era=y.div_euclid(400);let yo=y-era*400;
++ let mp=m+if m>2{-3}else{9};era*146097+yo*365+yo/4-yo/100+(153*mp+2)/5+d-1-719468
++}
++fn civil(z:i64)->(i64,i64,i64) {
++ let z=z+719468;let era=z.div_euclid(146097);let doe=z-era*146097;
++ let yo=(doe-doe/1460+doe/36524-doe/146096)/365;let mut y=yo+era*400;
++ let doy=doe-(365*yo+yo/4-yo/100);let mp=(5*doy+2)/153;let d=doy-(153*mp+2)/5+1;
++ let m=mp+if mp<10{3}else{-9};y+=i64::from(m<=2);(y,m,d)
++}
++fn utc(ticks:u64)->Option<String>{
++ let seconds=ticks/10_000_000;let day=(seconds/86400) as i64-EPOCH_DAYS;let(y,m,d)=civil(day);
++ if !(1601..=9999).contains(&y){return None;}
++ let sec=seconds%86400;Some(format!("{y:04}-{m:02}-{d:02}T{:02}:{:02}:{:02}.{:07}Z",sec/3600,sec/60%60,sec%60,ticks%10_000_000))
++}
++fn timestamp(s:&str)->Option<u64>{
++ let b=s.as_bytes();if b.len()<20 || !b.is_ascii() || b[4]!=b'-'||b[7]!=b'-'||b[10]!=b'T'||b[13]!=b':'||b[16]!=b':'{return None;}
++ let n=|a,b|{let v=s.get(a..b)?;if !v.as_bytes().iter().all(u8::is_ascii_digit){return None;}v.parse::<i64>().ok()};
++ let(y,m,d,h,min,sec)=(n(0,4)?,n(5,7)?,n(8,10)?,n(11,13)?,n(14,16)?,n(17,19)?);
++ if !(1601..=9999).contains(&y)||!(1..=12).contains(&m)||!(1..=31).contains(&d)||h>23||min>59||sec>59||civil(days(y,m,d))!=(y,m,d){return None;}
++ let mut pos=19;let mut fraction=0u64;
++ if b.get(pos)==Some(&b'.') {pos+=1;let start=pos;while b.get(pos).is_some_and(u8::is_ascii_digit){pos+=1;}
++  let count=pos-start;if count==0||count>7{return None;}fraction=s[start..pos].parse::<u64>().ok()?*10u64.pow((7-count)as u32);
++ }
++ let zone=match b.get(pos)? {b'Z' if pos+1==b.len()=>0i64,b'+'|b'-' if pos+6==b.len() && b.get(pos+3)==Some(&b':')=>{
++  let zh=n(pos+1,pos+3)?;let zm=n(pos+4,pos+6)?;if zh>14||zm>59||zh==14&&zm!=0{return None;}(zh*3600+zm*60)*if b[pos]==b'+'{1}else{-1}
++ },_=>return None};
++ let seconds=((days(y,m,d)+EPOCH_DAYS)as i128)*86400+(h*3600+min*60+sec-zone)as i128;
++ let value=seconds.checked_mul(TICKS)?.checked_add(fraction as i128)?;let ticks=u64::try_from(value).ok()?;utc(ticks)?;Some(ticks)
++}
++#[derive(Clone,Debug,PartialEq,Eq,Default)]
++enum Stored {#[default] Absent, Value(u64), Invalid(String)}
++impl Stored {
++ fn json(&self,duration:bool)->Value {match self {
++  Self::Absent=>json!({"state":"absent"}),Self::Invalid(raw)=>json!({"state":"invalid","rawBlake3":raw}),
++  Self::Value(ticks)=>if duration {json!({"state":"value","ticks100ns":ticks.to_string()})} else {
++   match utc(*ticks){Some(value)=>json!({"state":"value","fileTime100ns":ticks.to_string(),"utc":value}),None=>json!({"state":"invalid","fileTime100ns":ticks.to_string()})}
++  }
++ }}
++}
++fn invalid(bytes:&[u8])->Stored {Stored::Invalid(blake3::hash(bytes).to_hex().to_string())}
++fn ole_value(ole:&Ole,pid:u32)->Stored {
++ let Some((_,raw))=ole.entries.iter().find(|(id,_)|*id==pid) else{return Stored::Absent;};
++ if raw.len()<12 || u32at(raw,0).ok()!=Some(64) || raw.get(12..).is_some_and(|b|b.iter().any(|v|*v!=0)) {return invalid(raw);}
++ let ticks=u64::from_le_bytes(raw[4..12].try_into().unwrap());
++ if pid!=10 && utc(ticks).is_none(){return invalid(raw);}Stored::Value(ticks)
++}
++fn set_raw(ole:&mut Ole,pid:u32,value:Option<Vec<u8>>) {
++ if let Some(v)=value {if let Some((_,raw))=ole.entries.iter_mut().find(|(id,_)|*id==pid){*raw=v;}else{ole.entries.push((pid,v));ole.physical.insert(0,pid);}}
++ else {ole.entries.retain(|(id,_)|*id!=pid);ole.physical.retain(|id|*id!=pid);}
++}
++fn set_time(ole:&mut Ole,pid:u32,value:&Stored)->Result<(),String>{match value {
++ Stored::Absent=>set_raw(ole,pid,None),Stored::Value(v)=>{let mut b=64u32.to_le_bytes().to_vec();b.extend(v.to_le_bytes());set_raw(ole,pid,Some(b));},Stored::Invalid(_)=>return Err("Malformed or unsupported stored timestamp".into())}Ok(())}
++#[derive(Default)]
++struct Dates {created:Stored,modified:Stored,block:String}
++fn date_xml(bytes:&[u8])->Result<Dates,String>{
++ let _=Xml::parse(bytes)?;let source=std::str::from_utf8(bytes).map_err(|_|fail())?;
++ let mut reader=NsReader::from_str(source);reader.resolver_mut().set_max_namespace_bindings(256);
++ let mut depth=0usize;let mut owner=None;let mut inside=false;let mut block_start=0;let mut result=Dates::default();let mut seen=BTreeSet::new();
++ let mut active:Option<(usize,String)>=None;
++ loop {let start=reader.buffer_position()as usize;let event=reader.read_event().map_err(|_|fail())?;let end=reader.buffer_position()as usize;
++  match event {
++   ev @ (Event::Start(_)|Event::Empty(_))=>{let empty=matches!(ev,Event::Empty(_));let e=match ev{Event::Start(e)|Event::Empty(e)=>e,_=>unreachable!()};
++    if active.is_some(){return Err(fail());}let q=e.name();let(ns,local)=reader.resolver().resolve_element(q);let opf=matches!(ns,ResolveResult::Bound(n)if n.as_ref()==OPF);
++    if depth==1&&opf&&local.as_ref()=="metadata" {if owner.is_some(){return Err(fail());}owner=Some(depth);inside=!empty;block_start=start;if empty{result.block=source[start..end].into();}}
++    else if inside&&depth==2&&opf&&local.as_ref()=="meta" {
++     let mut name=None;let mut content=None;for a in e.attributes(){let a=a.map_err(|_|fail())?;if a.key.as_ref()=="name" {name=Some(a.normalized_value(quick_xml::XmlVersion::Implicit1_0).map_err(|_|fail())?.into_owned());}else if a.key.as_ref()=="content" {content=Some(a.normalized_value(quick_xml::XmlVersion::Implicit1_0).map_err(|_|fail())?.into_owned());}}
++     let index=match name.as_deref(){Some("CreatedDate")=>Some(0),Some("ModifiedDate")=>Some(1),_=>None};
++     if let Some(index)=index {if !seen.insert(index)||content.as_deref().is_some_and(|s|s!="text"){return Err(fail());}if !empty{active=Some((index,String::new()));}}
++    }
++    if !empty{depth+=1;}
++   },Event::End(_)=>{depth=depth.checked_sub(1).ok_or_else(fail)?;if let Some((index,text))=active.take(){let value=if text.is_empty(){Stored::Absent}else{timestamp(&text).map(Stored::Value).unwrap_or_else(||invalid(text.as_bytes()))};if index==0{result.created=value;}else{result.modified=value;}}
++    if inside&&depth==1 {inside=false;result.block=source[block_start..end].into();}
++   },Event::Text(e)=>{if let Some((_,v))=&mut active{v.push_str(&decode(e.as_ref())?);}},Event::CData(e)=>{if let Some((_,v))=&mut active{v.push_str(e.as_ref());}},Event::GeneralRef(e)=>{if let Some((_,v))=&mut active{v.push_str(&decode(&format!("&{};",e.as_ref()))?);}},
++   Event::Comment(_)|Event::PI(_)=>{if active.is_some(){return Err(fail());}},Event::DocType(_)=>return Err(fail()),Event::Eof=>break,_=>{}
++  }
++ }
++ if result.block.is_empty(){return Err(fail());}Ok(result)
++}
++fn summary(doc:&Document)->Result<Option<Ole>,String>{containers(doc)?.0.map(|b|Ole::parse(b)).transpose()}
++pub(crate) fn empty_hwpx_summary()->Vec<u8>{Ole::empty().write(&Fields::default()).expect("empty summary owner")}
++pub(crate) fn sync_hwp_dates(doc:&mut Document)->Result<(),String>{
++ let Some(xml)=containers(doc)?.1 else{return Ok(());};let dates=date_xml(xml)?;
++ let mut ole=summary(doc)?.unwrap_or_else(Ole::empty);set_time(&mut ole,12,&dates.created)?;set_time(&mut ole,13,&dates.modified)?;
++ let bytes=ole.write(&read(doc)?)?;
++ if let Some((_,v))=doc.extra_streams.iter_mut().find(|v|summary_path(&v.0)){*v=bytes;}else{doc.extra_streams.push(("/\u{5}HwpSummaryInformation".into(),bytes));}Ok(())
++}
++pub(crate) fn validate_hwp_storage(doc:&Document)->Result<(),String>{
++ if doc.hwpx_aux_entry(SUMMARY_CARRIER_PATH).is_some(){return Err("Unvalidated stored-summary carrier".into());}
++ if matches!(doc.provenance.format,crate::model::provenance::SourceFormat::Hwpx) {
++  let Some(xml)=containers(doc)?.1 else{return Err(fail());};let dates=date_xml(xml)?;let ole=summary(doc)?.ok_or_else(fail)?;
++  if dates.created!=ole_value(&ole,12)||dates.modified!=ole_value(&ole,13)||matches!(dates.created,Stored::Invalid(_))||matches!(dates.modified,Stored::Invalid(_)){return Err("Stored timestamp conversion did not preserve the authoritative XML owner".into());}
++ }Ok(())
++}
++pub(super) fn new_xml_with_stored_dates(fields:&Fields,summary:&[u8])->Result<Vec<u8>,String> {
++ let ole=Ole::parse(summary)?;new_xml_with_ole_dates(fields,&ole)
++}
++fn new_xml_with_ole_dates(fields:&Fields,ole:&Ole)->Result<Vec<u8>,String> {
++ let mut xml=String::from_utf8(new_xml(fields)).map_err(|_|fail())?;let mut added=String::new();
++ for(pid,name)in[(12,"CreatedDate"),(13,"ModifiedDate")] {match ole_value(ole,pid){Stored::Value(t)=>{let value=utc(t).ok_or_else(fail)?;added.push_str(&format!("<opf:meta name=\"{name}\" content=\"text\">{value}</opf:meta>"));},Stored::Absent=>{},Stored::Invalid(_)=>return Err("Malformed or unsupported source FILETIME; no timestamp guessed".into())}}
++ xml=xml.replace("</opf:metadata>",&format!("{added}</opf:metadata>"));Ok(xml.into_bytes())
++}
++pub(crate) fn stored_hwpx_source(doc:&Document)->Result<Option<Vec<u8>>,String>{
++ if doc.hwpx_aux_entry(SUMMARY_CARRIER_PATH).is_some(){return Err("Unvalidated stored-summary carrier".into());}
++ if doc.hwpx_aux_entry("Contents/content.hpf").is_some(){return Ok(None);}
++ let Some(ole)=summary(doc)? else{return Ok(super::hwpx_metadata_source(doc));};
++ Ok(Some(new_xml_with_ole_dates(&ole.fields()?,&ole)?))
++}
++#[derive(Serialize,Deserialize)]
++#[serde(deny_unknown_fields,rename_all="camelCase")]
++struct Carrier {schema_version:u32,metadata_blake3:String,summary_base64:String}
++pub(crate) fn encode_summary_carrier(doc:&Document,content:&[u8])->Result<Option<Vec<u8>>,String>{
++ let Some(mut ole)=summary(doc)? else{return Ok(None);};let fields=Xml::parse(content)?.values()?;let dates=date_xml(content)?;
++ if matches!(doc.provenance.format,crate::model::provenance::SourceFormat::Hwpx){set_time(&mut ole,12,&dates.created)?;set_time(&mut ole,13,&dates.modified)?;}
++ if ole_value(&ole,12)!=dates.created||ole_value(&ole,13)!=dates.modified{return Err("Standard timestamps and raw summary disagree".into());}
++ let raw=ole.write(&fields)?;let carrier=Carrier {schema_version:1,metadata_blake3:blake3::hash(dates.block.as_bytes()).to_hex().to_string(),summary_base64:base64::engine::general_purpose::STANDARD.encode(raw)};
++ let out=serde_json::to_vec(&carrier).map_err(|_|fail())?;if out.len()>SUMMARY_CARRIER_LIMIT{return Err(fail());}Ok(Some(out))
++}
++pub(crate) fn restore_summary_carrier(doc:&mut Document,bytes:&[u8])->Result<(),String>{
++ if bytes.len()>SUMMARY_CARRIER_LIMIT{return Err(fail());}let carrier:Carrier=serde_json::from_slice(bytes).map_err(|_|fail())?;
++ if carrier.schema_version!=1||carrier.summary_base64.len()>((LIMIT+2)/3)*4{return Err(fail());}
++ let raw=base64::engine::general_purpose::STANDARD.decode(&carrier.summary_base64).map_err(|_|fail())?;let ole=Ole::parse(&raw)?;
++ let Some(xml)=containers(doc)?.1 else{return Err(fail());};let parsed=Xml::parse(xml)?;let dates=date_xml(xml)?;
++ if carrier.metadata_blake3!=blake3::hash(dates.block.as_bytes()).to_hex().as_str()||ole.fields()?!=parsed.values()?||ole_value(&ole,12)!=dates.created||ole_value(&ole,13)!=dates.modified{return Err("Stored summary carrier does not match standard metadata".into());}
++ if let Some((_,value))=doc.extra_streams.iter_mut().find(|v|summary_path(&v.0)){*value=raw;}else{doc.extra_streams.push(("/\u{5}HwpSummaryInformation".into(),raw));}Ok(())
++}
++impl DocumentCore {
++ pub fn get_document_stored_information_native(&self)->String {
++  let doc=&self.document;let mut issues=Vec::new();let xml_source=matches!(doc.provenance.format,crate::model::provenance::SourceFormat::Hwpx);
++  let mut values=[Stored::Absent,Stored::Absent,Stored::Absent,Stored::Absent];
++  match summary(doc){Ok(Some(ole))=>{values=[ole_value(&ole,12),ole_value(&ole,13),ole_value(&ole,11),ole_value(&ole,10)];},Ok(None)=>{},Err(e)=>{issues.push(e);values=std::array::from_fn(|_|invalid(b"unreadable OLE summary"));}}
++  if xml_source {match containers(doc).and_then(|(_,x)|x.ok_or_else(fail)).and_then(|x|date_xml(x)){Ok(d)=>{values[0]=d.created;values[1]=d.modified;},Err(e)=>{issues.push(e);values[0]=invalid(b"unreadable XML timestamps");values[1]=values[0].clone();}}}
++  if values.iter().any(|v|matches!(v,Stored::Invalid(_))){issues.push("One or more original stored timestamp values are malformed or outside the supported UTC range".into());}
++  json!({"schemaVersion":1,"sourceFormat":if xml_source{"hwpx"}else{"hwp"},"created":values[0].json(false),"modified":values[1].json(false),"lastPrinted":values[2].json(false),"editingDuration":values[3].json(true),"issues":issues}).to_string()
++ }
++}
++#[cfg(test)] mod tests {
++ use super::*;
++ #[test]fn exact_100ns_and_timezones(){for s in ["1601-01-01T00:00:00.0000000Z","2020-02-29T23:59:59.1234567Z","9999-12-31T23:59:59.9999999Z"]{let t=timestamp(s).unwrap();assert_eq!(utc(t).as_deref(),Some(s));}assert_eq!(timestamp("2024-01-01T09:00:00+09:00"),timestamp("2024-01-01T00:00:00Z"));for s in ["2023-02-29T00:00:00Z","2024-01-01T00:00:60Z","2024-01-01T00:00:00.12345678Z","2024-01-01T00:00:00+14:01","1600-12-31T00:00:00Z"]{assert_eq!(timestamp(s),None,"{s}");}}
++ #[test]fn factory_has_no_sample_dates(){let o=Ole::parse(&empty_hwpx_summary()).unwrap();for pid in [10,11,12,13]{assert_eq!(ole_value(&o,pid),Stored::Absent);}}
++ #[test]fn raw_unknown_and_duration_keep_exact(){let mut o=Ole::empty();set_time(&mut o,10,&Stored::Value(u64::MAX)).unwrap();set_raw(&mut o,999,Some(vec![3,0,0,0,7,0,0,0]));let b=o.write(&Fields::default()).unwrap();let x=Ole::parse(&b).unwrap();assert_eq!(ole_value(&x,10),Stored::Value(u64::MAX));assert_eq!(x.entries.iter().find(|v|v.0==999).unwrap().1,vec![3,0,0,0,7,0,0,0]);}
++ #[test]fn xml_owner_and_namespace_are_exact(){let xml=format!("<p:package xmlns:p='{OPF}'><p:metadata><p:meta name='CreatedDate'>2024-01-01T00:00:00Z</p:meta><x:meta xmlns:x='urn:foreign' name='ModifiedDate'>no</x:meta></p:metadata></p:package>");let d=date_xml(xml.as_bytes()).unwrap();assert!(matches!(d.created,Stored::Value(_)));assert_eq!(d.modified,Stored::Absent);let dup=xml.replace("</p:metadata>","<p:meta name='CreatedDate'/></p:metadata>");assert!(date_xml(dup.as_bytes()).is_err());}
++}
+diff --git a/src/wasm_api.rs b/src/wasm_api.rs
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1355,6 +1355,10 @@
+     /// 문서 정보를 JSON 문자열로 반환한다.
+     #[wasm_bindgen(js_name = getDocumentMetadata)]
+     pub fn get_document_metadata(&self) -> String { self.core.get_document_metadata_native() }
++
++    /// Stored timestamps only; never inferred from the current clock.
++    #[wasm_bindgen(js_name = getDocumentStoredInformation)]
++    pub fn get_document_stored_information(&self) -> String { self.core.get_document_stored_information_native() }
+ 
+     #[wasm_bindgen(js_name = setDocumentMetadata)]
+     pub fn set_document_metadata(&mut self, expected: &str, values: &str) -> Result<String, JsValue> {
+diff --git a/src/parser/hwpx/mod.rs b/src/parser/hwpx/mod.rs
+--- a/src/parser/hwpx/mod.rs
++++ b/src/parser/hwpx/mod.rs
+@@ -734,6 +734,20 @@
+             crate::model::native_computed_rows::decode(&mut doc,&bytes,header_xml.as_bytes(),&computed_section_hashes);
+         }
+     }
++    let summary_carrier = crate::document_core::document_metadata::SUMMARY_CARRIER_PATH;
++    if reader.file_names().iter().any(|p|p.eq_ignore_ascii_case(summary_carrier) || p.replace('\\',"/").eq_ignore_ascii_case(summary_carrier)) {
++        if !raw_zip_authority::unique_private_entry(data,summary_carrier) || !reader.has_unique_exact_entry(summary_carrier)
++            || !raw_zip_authority::unique_private_entry(data,"Contents/content.hpf") || !reader.has_unique_exact_entry("Contents/content.hpf") {
++            return Err(HwpxError::XmlError("Ambiguous stored-summary metadata carrier".into()));
++        }
++        let exact_content=reader.read_file_bytes_limited("Contents/content.hpf",1024*1024)?;
++        if std::str::from_utf8(&exact_content).is_err() || doc.hwpx_aux_entry("Contents/content.hpf")!=Some(exact_content.as_slice()) {
++            return Err(HwpxError::XmlError("Stored-summary carrier requires exact UTF-8 metadata bytes".into()));
++        }
++        let bytes=reader.read_file_bytes_limited(summary_carrier,crate::document_core::document_metadata::SUMMARY_CARRIER_LIMIT)?;
++        crate::document_core::document_metadata::restore_summary_carrier(&mut doc,&bytes)
++            .map_err(HwpxError::XmlError)?;
++    }
+     caret::restore(&mut doc);
+     Ok(doc)
+ }
+diff --git a/src/parser/hwpx/contract_streams.rs b/src/parser/hwpx/contract_streams.rs
+--- a/src/parser/hwpx/contract_streams.rs
++++ b/src/parser/hwpx/contract_streams.rs
+@@ -122,7 +122,7 @@
+     // Existing HWP/opaque streams are never renamed by this XML-only factory.
+     streams.push((
+         "/\u{5}HwpSummaryInformation".to_string(),
+-        FALLBACK_HWP_SUMMARY.to_vec(),
++        crate::document_core::document_metadata::empty_hwpx_summary(),
+     ));
+     streams.push((
+         "/DocOptions/_LinkDoc".to_string(),
+diff --git a/src/serializer/hwpx/mod.rs b/src/serializer/hwpx/mod.rs
+--- a/src/serializer/hwpx/mod.rs
++++ b/src/serializer/hwpx/mod.rs
+@@ -261,7 +261,8 @@
+             is_embedded: e.is_embedded,
+         })
+         .collect();
+-    let metadata_source = crate::document_core::document_metadata::hwpx_metadata_source(doc);
++    let metadata_source = crate::document_core::document_metadata::stored_hwpx_source(doc)
++        .map_err(SerializeError::XmlError)?;
+     let content_hpf = content::write_content_hpf(
+         &section_hrefs,
+         &content_bin_entries,
+@@ -269,6 +270,9 @@
+         metadata_source.as_deref().or_else(||doc.hwpx_aux_entry("Contents/content.hpf")),
+     )?;
+     z.write_deflated("Contents/content.hpf", &content_hpf)?;
++    if let Some(carrier) = crate::document_core::document_metadata::encode_summary_carrier(doc, &content_hpf).map_err(SerializeError::XmlError)? {
++        z.write_deflated(crate::document_core::document_metadata::SUMMARY_CARRIER_PATH, &carrier)?;
++    }
+ 
+     // 10. META-INF/container.xml
+     z.write_deflated("META-INF/container.xml", META_INF_CONTAINER_XML.as_bytes())?;
+diff --git a/src/serializer/cfb_writer.rs b/src/serializer/cfb_writer.rs
+--- a/src/serializer/cfb_writer.rs
++++ b/src/serializer/cfb_writer.rs
+@@ -67,6 +67,7 @@
+     password: Option<&[u8]>,
+     warning_mode: ContentLossWarningMode,
+ ) -> Result<SerializedDocument, SerializeError> {
++    crate::document_core::document_metadata::validate_hwp_storage(doc).map_err(SerializeError::XmlError)?;
+     // 1. FileHeader 직렬화
+     // [Task #1768] 배포용/암호화 문서 강하: IR 은 이미 복호화된 평문이고 본 직렬화는
+     // ViewText/DISTRIBUTE_DOC_DATA 를 생성하지 않으므로, 플래그를 유지하면 산출물

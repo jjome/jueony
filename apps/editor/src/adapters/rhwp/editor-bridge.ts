@@ -1,4 +1,6 @@
 import {readAgentDocumentInformation,preflightAgentDocumentMetadata,assertAgentDocumentMetadata} from './agent-document-information.ts';
+import {configureDocumentHistoryScope} from '../browser/document-history-context.ts';
+import type {HistoryScope} from '../../modules/document-files/public/index.ts';
 import {readDocumentMetadata,DOCUMENT_METADATA_KEYS} from './document-metadata.ts';
 import {readCellParagraphSources,assertCellParagraphResult} from './cell-paragraph.ts';
 import {readTableSubdivisionSources,assertTableSubdivisionResult} from './table-subdivision.ts';
@@ -156,6 +158,14 @@ export function installAgentBridge(d:Deps){
   },
   documentIdentity:()=>String(d.wasm.documentGeneration)+':'+d.wasm.fileName,
   documentInstance:()=>String(d.wasm.documentGeneration),
+  configureHistoryScope(scope:HistoryScope){configureDocumentHistoryScope(scope,()=>({instance:api.documentInstance(),revision:api.revision(),available:!applying&&!composing&&!damaged&&!api.hostMutationLocked()}));},
+  canInspectHwtTemplate:()=>typeof d.wasm.getWasmModuleExports().extractHwtXmlTemplate==='function',
+  inspectHwtTemplate(bytes:Uint8Array){
+   if(!ArrayBuffer.isView(bytes)||Object.prototype.toString.call(bytes)!=='[object Uint8Array]'||bytes.byteLength>32*1024*1024)throw Error('HWT 원본은 32MiB 이하여야 합니다.');
+   const extract=d.wasm.getWasmModuleExports().extractHwtXmlTemplate;
+   if(typeof extract!=='function')throw Error('현재 엔진은 HWT XML 서식 구조 읽기를 지원하지 않습니다.');
+   return extract(new Uint8Array(bytes));
+  },
   async open(bytes:Uint8Array,name:string,handle:any=null,dirty=false){await d.ready;if((api.busy()||api.hostMutationLocked())||applying)throw new Error('문서 작업 중입니다.');await d.load(bytes,name,handle);if(handle)await rememberFileSnapshot(handle,bytes);if(dirty)d.documentState.markDirty('workspace-recovery');},
   async restoreFileConnection(connection:StoredFileConnection,requestPermission=false){
    if(applying||composing||(api.busy()||api.hostMutationLocked()))throw new Error('문서 작업이 끝난 뒤 원본 파일에 연결해 주세요.');

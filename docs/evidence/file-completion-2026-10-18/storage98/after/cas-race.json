@@ -1,0 +1,25 @@
+{
+  "results": [
+    {
+      "name": "actual hidden array property corruption is rejected on ordinary catalog read",
+      "status": "PASS"
+    },
+    {
+      "name": "concurrent noncanonical array corruption must conflict rather than be silently overwritten",
+      "status": "PASS"
+    },
+    {
+      "name": "ordinary same-shape concurrent JSON change conflicts with catalog replacement",
+      "status": "PASS"
+    },
+    {
+      "name": "concurrent negative zero survives typed CAS conflict despite identical JSON encoding",
+      "status": "PASS"
+    }
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "scope": "Owned headless profile and real IndexedDB only; concurrent raw-catalog corruption compared before durable CAS. No user state, credentials or native windows."
+}

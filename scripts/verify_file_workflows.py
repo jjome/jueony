@@ -11,7 +11,7 @@ CASES=[('native-shell',11),('native-recents',9),('document-lifecycle',10),
        ('agent-files',15),('xml-documents-integrated',7),('xml-documents',13),('xml-recovery',13),
        ('package-preservation',14),('native-row-preservation',13),('native-row-engine',19),
        ('reflowed-native-storage',12),('reflowed-native-ui',13),('computed-row-package',22),
-       ('document-history95',16),('history-ui95',12),('xml-simple-types95',10),('stored-information95',17),
+       ('document-history95',20),('history-ui95',12),('xml-simple-types95',10),('stored-information95',17),
        ('hwt-template95',9),('document-story-information96',5)]
 sha=lambda b:hashlib.sha256(b).hexdigest()
 

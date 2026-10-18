@@ -4,6 +4,21 @@
 
 문서별 이력·저장 날짜·문서 정보·XML/HWT 읽기·표 셀 줄바꿈을 공식107패치 합본으로 구현하고 자동 검증했다. 사용자 한글 창과 파일은 조작하지 않았다. 원MCST/Python3 최초 조판 등 아래 잔여가 있어 파트 전체 완료로 표시하지 않는다.
 
+## 최신 후속98
+
+이력의 읽기 직후 실제 IndexedDB에서 JSON에 나타나지 않는 배열 속성이 바뀌어도 저장이 성공하던 경쟁 쓰기 결함을 추가로 재현·수정했다. 실제 저장 데이터의 타입·own key·값을 원자적 트랜잭션 안에서 비교하며 `-0/0`도 구별한다. 기존 카탈로그 용량·문단/노드 허용 범위를 줄이지 않았다.
+
+| 최신 검사 | 결과 | 근거 |
+| --- | --- | --- |
+| 공식107·프런트98의 파일/복구26군 | 328/328 | [고정 근거](evidence/file-completion-2026-10-18/storage98/README.md) |
+| 실제 IndexedDB 이력 | 20/20 | 기존16+새4; 위328에 포함 |
+| 실제 host/iframe UI | 12/12 | 위328에 포함 |
+| 단위 | 1008/1008 · skip0 | 공식107 엔진 지정 |
+| TypeScript·경계·작업표 | 통과 | 기존 생성 규칙 유지 |
+| 새 실행 묶음 | 7/7 | 격리 서버·CSP·WASM·인증 거절 |
+
+`Start-Jueony-FileReview.cmd`는 이제 `build/jueony-file-review98`을 연다. 아래96의 Windows10·단표24·독립 OLE28·저장 샘플24는 같은 엔진의 이전 검증을 재사용하며 이번 재실행으로 세지 않는다. 프런트98의 합본·단위·실행 묶음은 새로 검사했다. 파트 전체 잔여는 아래와 같다.
+
 ## 이번 수정
 
 | 영역 | 실제 변경 | 한계 |
@@ -46,9 +61,9 @@
 
 ## 실행과 재검증
 
-- `Start-Jueony-FileReview.cmd`: 새 `build/jueony-file-review96`의 실행본을 연다. 이전 사용자 실행본은 종료하지 않았다.
+- `Start-Jueony-FileReview.cmd`: 새 `build/jueony-file-review98`의 실행본을 연다. 이전 사용자 실행본은 종료하지 않았다.
 - `scripts/Build-DocumentEngine.ps1 -Runtime Wsl`: 공식 패치를 적용·컴파일한다.
-- `JUEONY_ENGINE_PACKAGE`에 해당 pkg를 지정하고 `JUEONY_BUILD_PROFILE=file-storage96`으로 `apps/editor/scripts/build.mjs`를 실행한다.
+- `JUEONY_ENGINE_PACKAGE`에 해당 pkg를 지정하고 `JUEONY_BUILD_PROFILE=file-storage98`으로 `apps/editor/scripts/build.mjs`를 실행한다.
 - `scripts/verify_file_workflows.py --help`: 동일 엔진·프런트·새 출력 폴더·Node22를 명시한다. 원본 셀 추가 검사는 baseline/source/oracle 세 경로를 모두 지정해야 하며 누락을 PASS로 세지 않는다.
 - `python docs/evidence/file-completion-2026-10-18/storage96/verify.py`: 저장한206개 바이트 기록과 최종 집계를 재검증한다.
 

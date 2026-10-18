@@ -24,7 +24,7 @@
 
 ## 근거 읽기와 원형 보존
 
-`candidate/`에는 후보 당시의 통합 대기·실패/수정 기록을 보존했다. 최종 공식 결과는 workflows가 기준이다. HWT의 이전 Native JSON receipt 검사와 최종 실제 WASM, 실제 host→iframe 연결을 구분했다. Native 선택 검사를 공식 Rust 전체 통과라고 부르지 않는다. 로그는 gzip으로 포장했고 펼친 원본 바이트는 그대로다. 내부 인계 manifest의 log 경로에는 `.gz`를 붙여 펼쳐 확인한다.
+`candidate/`에는 후보 당시의 통합 대기·실패/수정 기록을 보존했다. 최종 공식 결과는 workflows가 기준이다. HWT의 이전 Native JSON receipt 검사와 최종 실제 WASM, 실제 host→iframe 연결을 구분했다. Native 선택 검사를 공식 Rust 전체 통과라고 부르지 않는다. 로그는 gzip으로 포장했고 펼친 원본 바이트는 그대로다. 내부 인계 manifest의 log·패치 경로에는 `.gz`를 붙여 펼쳐 확인한다. 통일 diff 패치의 문맥 공백도 원형 그대로다.
 
 `official-source-proof.json`은 새5패치의 공식 소스 raw SHA와 CRLF→LF만 적용한 text SHA를 따로 기록한다. 좌표·문서·비교 결과는 정규화하지 않았다. 폰트 프로그램·설치된 상용 XML·브라우저 profile·실행파일·API 키는 포함하지 않는다. samples24개는 자체 시험 데이터의 실제 저장 파일이다.
 

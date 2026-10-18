@@ -1,5 +1,28 @@
 import type {HistoryRecords} from '../../modules/document-files/public/index.ts';
 
+// IndexedDB preserves enumerable named array properties which JSON omits.
+// Compare the entire stored data shape, so a concurrent noncanonical record
+// cannot disappear under a successful JSON-equal replacement. The expected
+// catalog has already passed the domain's smaller per-snapshot/byte budgets.
+function sameStoredRecord(a: unknown, b: unknown, depth = 0, budget = {nodes: 5_000_000}): boolean {
+  if (--budget.nodes < 0 || depth > 64 || typeof a !== typeof b) return false;
+  if (a === null || b === null) return a === b;
+  if (typeof a === 'number') return Number.isFinite(a) && Object.is(a,b);
+  if (typeof a === 'string' || typeof a === 'boolean') return a === b;
+  if (typeof a !== 'object' || typeof b !== 'object') return false;
+  const aa = Array.isArray(a), ab = Array.isArray(b);
+  if (aa !== ab || (aa && (a.length !== (b as unknown[]).length || a.length > budget.nodes))) return false;
+  if (!aa && (![Object.prototype,null].includes(Object.getPrototypeOf(a)) || ![Object.prototype,null].includes(Object.getPrototypeOf(b)))) return false;
+  const left = Reflect.ownKeys(a), right = Reflect.ownKeys(b);
+  if (left.length !== right.length || left.length > budget.nodes) return false;
+  return left.every((key,i) => {
+    if (typeof key !== 'string' || key !== right[i]) return false;
+    const x = Object.getOwnPropertyDescriptor(a,key)!, y = Object.getOwnPropertyDescriptor(b,key)!;
+    return 'value' in x && 'value' in y && (aa && key === 'length' || x.enumerable && y.enumerable)
+      && sameStoredRecord(x.value,y.value,depth+1,budget);
+  });
+}
+
 /** Scoped records only. Never opens, migrates, evicts or clears the legacy global database. */
 export function indexedDbDocumentHistory(factory: IDBFactory): HistoryRecords {
   let connection: Promise<IDBDatabase> | undefined;
@@ -18,7 +41,7 @@ export function indexedDbDocumentHistory(factory: IDBFactory): HistoryRecords {
     });},
     async exchange(key, expected, value, assertOwner) {const db = await open(); await new Promise<void>((resolve,reject) => {
       const tx = db.transaction('catalogs','readwrite',{durability:'strict'}), store = tx.objectStore('catalogs'), r = store.get(key); let failure: unknown;
-      r.onsuccess = () => {try {assertOwner(); if (JSON.stringify(r.result ?? null) !== JSON.stringify(expected ?? null)) throw Error('다른 창에서 문서 이력이 바뀌었습니다. 목록을 다시 여세요.');
+      r.onsuccess = () => {try {assertOwner(); if (!sameStoredRecord(r.result ?? null, expected ?? null)) throw Error('다른 창에서 문서 이력이 바뀌었습니다. 목록을 다시 여세요.');
         const write=value === null ? store.delete(key) : store.put(value,key);
         // A request success event is still before transaction commit. Catch
         // owner changes during serialization/other success listeners as well.

@@ -4,7 +4,7 @@
 
 열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.
 
-**현재 합본96:** 문서별 격리 이력·정확한 저장 날짜 보존·문서 story 정보·제한 XSD·실제 WASM HWT 읽기와 표 셀 줄바꿈을 추가했다. 공식 동일 빌드324/324·단위1008·기존 단표24·Windows저장10·실행묶음7 통과. 원MCST/Python3 최초 조판과 글 방향 매핑은 남아 파트 전체 부분 상태를 유지한다. [이번 수정·검수·잔여 표](../117-file-storage-closure.md).
+**현재 합본98:** 문서별 격리 이력·정확한 저장 날짜 보존·문서 story 정보·제한 XSD·실제 WASM HWT 읽기와 표 셀 줄바꿈을 추가했다. 공식107·새 프런트 동일 빌드328/328·이력20·단위1008·실행묶음7 통과. Windows10·단표24·날짜28은 같은 엔진의 직전 검증을 재사용한다. 원MCST/Python3 최초 조판과 글 방향 매핑은 남아 파트 전체 부분 상태를 유지한다. [이번 수정·검수·잔여 표](../117-file-storage-closure.md).
 
 ## 진행 요약
 
@@ -207,7 +207,7 @@
 - 다음 작업: 제한 XSD named/inline 단순형·문자열/정수/소수/boolean 제약과 지속 복구를 연결. 실제 Rust/WASM HWT 고정 스트림 추출·읽기 전용 DOM 화면을 추가했고 부모→iframe 실제 엔진 연결도 검사했다. HWT 본문 필드 쓰기·재저장·XSL·일반 XSD·Agent 편집은 남음. 상세 범위·검사 결과는117참조. 한글 직접 비교 보류.
 - UI 명령: `file:xml-workspace`
 - 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [110-file-preservation-integration.md](<../110-file-preservation-integration.md>) · [handoff-summary.json](<../evidence/file-completion-2026-10-18/xml76b/handoff-summary.json>) · [112-file-recovery-implementation.md](<../112-file-recovery-implementation.md>) · [117-file-storage-closure.md](<../117-file-storage-closure.md>)
-- 원래 기록: `MISSING;NOT_RUN;SCOPED_NATIVE_WINDOWS_AND_AGENT_FILE_PORT_REVIEWED_2026_10_18;SCOPED_XML_SEQUENCE_WORKSPACE_EDGE20_PASS_HWT_XSL_AND_AGENT_UNSUPPORTED_2026_10_18;XML_WORKSPACE_PERSISTENT_RECOVERY_IMPLEMENTED_HEADLESS_VERIFIED_2026_10_18;FILE_STORAGE96_COMBINED324_UNIT1008_WINDOWS10_PASS_2026_10_18`
+- 원래 기록: `MISSING;NOT_RUN;SCOPED_NATIVE_WINDOWS_AND_AGENT_FILE_PORT_REVIEWED_2026_10_18;SCOPED_XML_SEQUENCE_WORKSPACE_EDGE20_PASS_HWT_XSL_AND_AGENT_UNSUPPORTED_2026_10_18;XML_WORKSPACE_PERSISTENT_RECOVERY_IMPLEMENTED_HEADLESS_VERIFIED_2026_10_18;FILE_STORAGE98_CAS_HARDENED_COMBINED328_HISTORY20_UNIT1008_PASS_2026_10_18`
 
 </details>
 
@@ -251,7 +251,7 @@
 - UI 명령: `file:document-info`
 - Agent 명령: `set_document_metadata`
 - 근거: [parity-result.json](<../evidence/features-2026-10-11/parity-result.json>) · [editor-tests.txt](<../evidence/features-2026-10-11/editor-tests.txt>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [README.md](<../evidence/file-completion-2026-10-17/engine68/metadata/README.md>) · [110-file-preservation-integration.md](<../110-file-preservation-integration.md>) · [113-file-format-preservation.md](<../113-file-format-preservation.md>) · [README.md](<../evidence/file-completion-2026-10-18/package91/README.md>) · [117-file-storage-closure.md](<../117-file-storage-closure.md>)
-- 원래 기록: `PARTIAL;FIVE_FIELD_METADATA_EDIT_AND_ROUNDTRIP_VERIFIED_FULL_INFORMATION_PARITY_PENDING_2026_10_17;SCOPED_NATIVE_WINDOWS_AND_AGENT_FILE_PORT_REVIEWED_2026_10_18;FILE_STORAGE96_COMBINED324_UNIT1008_WINDOWS10_PASS_2026_10_18`
+- 원래 기록: `PARTIAL;FIVE_FIELD_METADATA_EDIT_AND_ROUNDTRIP_VERIFIED_FULL_INFORMATION_PARITY_PENDING_2026_10_17;SCOPED_NATIVE_WINDOWS_AND_AGENT_FILE_PORT_REVIEWED_2026_10_18;FILE_STORAGE98_CAS_HARDENED_COMBINED328_HISTORY20_UNIT1008_PASS_2026_10_18`
 
 </details>
 
@@ -425,7 +425,7 @@
 - 다음 작업: 96에서 실제 원본 셀 폭의 정수 HWP 단위 손실과 과밀 BREAK 셀 줄 경계를 수정. Python3 공개 비교731→680(319개는서식ID, 실제지면361차이). 원MCST/Python3 최초 조판·복합 프레임은 계속 수정 중. 저장/원본행/undo/redo 보호 유지.117참조; 한글 직접 비교 보류.
 - 상위 항목: [B153](<08-tables.md#b153>) 셀 속성
 - 근거: [100-storage-conversion-and-overlap.md](<../100-storage-conversion-and-overlap.md>) · [verification-summary.json](<../evidence/overlap-table-tail-2026-10-15/verification-summary.json>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [summary.json](<../evidence/file-completion-2026-10-17/engine51/summary.json>) · [actual11-formal68.json](<../evidence/file-completion-2026-10-17/hancom-current68/actual11-formal68.json>) · [110-file-preservation-integration.md](<../110-file-preservation-integration.md>) · [summary.json](<../evidence/file-completion-2026-10-18/engine75/summary.json>) · [summary.json](<../evidence/file-completion-2026-10-18/engine76/summary.json>) · [README.md](<../evidence/file-completion-2026-10-18/engine80/README.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine82/README.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine83/README.md>) · [111-file-storage-final-review.md](<../111-file-storage-final-review.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine86/README.md>) · [112-file-recovery-implementation.md](<../112-file-recovery-implementation.md>) · [113-file-format-preservation.md](<../113-file-format-preservation.md>) · [README.md](<../evidence/file-completion-2026-10-18/package91/README.md>) · [114-native-row-storage.md](<../114-native-row-storage.md>) · [README.md](<../evidence/file-completion-2026-10-18/native-rows92/README.md>) · [115-column-width-storage.md](<../115-column-width-storage.md>) · [README.md](<../evidence/file-completion-2026-10-18/columns93/README.md>) · [116-reflowed-native-storage.md](<../116-reflowed-native-storage.md>) · [README.md](<../evidence/file-completion-2026-10-18/reflow94/README.md>) · [117-file-storage-closure.md](<../117-file-storage-closure.md>)
-- 원래 기록: `PARTIAL;INDEPENDENT_HANCOM_FAILURES_FOUND_AND_FOLLOWUP_2026_10_17;FORMAL80_SCOPED_REGRESSIONS_PASS_CROSS_FORMAT_AND_NATIVE_LINE_FIT_OPEN;FORMAL82_STRICT_ROUNDTRIP_PASS_NATIVE_INTEROP_FOLLOWUP_OPEN;FORMAL83_NOTE_SUMMARY_NATIVE_ROUNDTRIP_INITIAL_PARITY_OPEN;FORMAL86_SAFE_STORAGE_UNSUPPORTED_DIRECTIONS_BLOCKED_NATIVE_GUI_PENDING;COMPUTED_PREFIX94_AUTOMATED_CLOSURE_PASS_NATIVE_PARITY_OPEN;FILE_STORAGE96_COMBINED324_UNIT1008_WINDOWS10_PASS_2026_10_18`
+- 원래 기록: `PARTIAL;INDEPENDENT_HANCOM_FAILURES_FOUND_AND_FOLLOWUP_2026_10_17;FORMAL80_SCOPED_REGRESSIONS_PASS_CROSS_FORMAT_AND_NATIVE_LINE_FIT_OPEN;FORMAL82_STRICT_ROUNDTRIP_PASS_NATIVE_INTEROP_FOLLOWUP_OPEN;FORMAL83_NOTE_SUMMARY_NATIVE_ROUNDTRIP_INITIAL_PARITY_OPEN;FORMAL86_SAFE_STORAGE_UNSUPPORTED_DIRECTIONS_BLOCKED_NATIVE_GUI_PENDING;COMPUTED_PREFIX94_AUTOMATED_CLOSURE_PASS_NATIVE_PARITY_OPEN;FILE_STORAGE98_CAS_HARDENED_COMBINED328_HISTORY20_UNIT1008_PASS_2026_10_18`
 
 </details>
 
@@ -439,7 +439,7 @@
 - 다음 작업: 107패치 합본에서 표준 날짜·정확 OLE summary 정보까지 보존 읽기/양형식 왕복·손상 거절 추가. 명시 textDir HWP5 매핑과 최초 조판 차이는 별도 잔여이며 손실 변환 차단 유지.117참조; 한글 직접 비교 보류.
 - 상위 항목: [B077](<10-headers-notes-fields.md#b077>) 필드
 - 근거: [100-storage-conversion-and-overlap.md](<../100-storage-conversion-and-overlap.md>) · [summary.json](<../evidence/format-conversion-2026-10-15/summary.json>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine82/README.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine83/README.md>) · [111-file-storage-final-review.md](<../111-file-storage-final-review.md>) · [README.md](<../evidence/file-completion-2026-10-18/engine86/README.md>) · [112-file-recovery-implementation.md](<../112-file-recovery-implementation.md>) · [113-file-format-preservation.md](<../113-file-format-preservation.md>) · [README.md](<../evidence/file-completion-2026-10-18/package91/README.md>) · [114-native-row-storage.md](<../114-native-row-storage.md>) · [README.md](<../evidence/file-completion-2026-10-18/native-rows92/README.md>) · [115-column-width-storage.md](<../115-column-width-storage.md>) · [README.md](<../evidence/file-completion-2026-10-18/columns93/README.md>) · [116-reflowed-native-storage.md](<../116-reflowed-native-storage.md>) · [README.md](<../evidence/file-completion-2026-10-18/reflow94/README.md>) · [117-file-storage-closure.md](<../117-file-storage-closure.md>)
-- 원래 기록: `EXPLICIT_SCOPED_FIX;INDEPENDENT_HANCOM_GEOMETRY_FAILURES_FOUND_2026_10_17;FORMAL82_STRICT_ROUNDTRIP_PASS_NATIVE_INTEROP_FOLLOWUP_OPEN;FORMAL83_NOTE_SUMMARY_NATIVE_ROUNDTRIP_INITIAL_PARITY_OPEN;FORMAL86_SAFE_STORAGE_UNSUPPORTED_DIRECTIONS_BLOCKED_NATIVE_GUI_PENDING;COMPUTED_PREFIX94_AUTOMATED_CLOSURE_PASS_NATIVE_PARITY_OPEN;FILE_STORAGE96_COMBINED324_UNIT1008_WINDOWS10_PASS_2026_10_18`
+- 원래 기록: `EXPLICIT_SCOPED_FIX;INDEPENDENT_HANCOM_GEOMETRY_FAILURES_FOUND_2026_10_17;FORMAL82_STRICT_ROUNDTRIP_PASS_NATIVE_INTEROP_FOLLOWUP_OPEN;FORMAL83_NOTE_SUMMARY_NATIVE_ROUNDTRIP_INITIAL_PARITY_OPEN;FORMAL86_SAFE_STORAGE_UNSUPPORTED_DIRECTIONS_BLOCKED_NATIVE_GUI_PENDING;COMPUTED_PREFIX94_AUTOMATED_CLOSURE_PASS_NATIVE_PARITY_OPEN;FILE_STORAGE98_CAS_HARDENED_COMBINED328_HISTORY20_UNIT1008_PASS_2026_10_18`
 
 </details>
 

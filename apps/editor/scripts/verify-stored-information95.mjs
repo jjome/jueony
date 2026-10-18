@@ -99,4 +99,3 @@ await run('Uninterpreted XML timestamp text retains exact bytes in same-format s
 });
 assert.deepEqual(await fingerprintSources(),sourceHashes,'production guard sources changed during verification');
 await writeFile(out+'/result.json',JSON.stringify({schemaVersion:1,engine,wasmSha256:sha(wasm),verifierSha256:sha(await readFile(fileURLToPath(import.meta.url))),sourceHashes,scope:'Actual WASM standard OPF dates and independent CFB FILETIME properties, exact raw OLE summary roundtrip, 100ns query precision, mandatory production guard, disk readback, and explicit untrusted carrier refusals. Own built-in fixture only. No Hancom UI or equivalence claim.',fixtureSourceSha256:sha(source),originalSummarySha256:sha(summary),results,failures,passed:results.filter(x=>x.status==='PASS').length,total:results.length},null,2));console.log(JSON.stringify({passed:results.filter(x=>x.status==='PASS').length,total:results.length,failures}));if(failures.length)process.exitCode=1;
-

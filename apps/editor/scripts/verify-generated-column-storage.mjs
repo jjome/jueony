@@ -84,7 +84,7 @@ for(const name of names)await scenario(`${name}: actual insert, snapshot Undo/Re
   }finally{d.free();}
 });
 const negatives=['single_column','three_columns','rtl','distribute','unequal_columns','asymmetric_margin'];
-for(const name of negatives)await scenario(`valid disk negative unchanged: ${name}`,async()=>{
+for(const name of negatives)await scenario(`valid disk source layout unchanged and strict storage repaired: ${name}`,async()=>{
   const bytes=await readFile(join(ownRoot,'valid-negative-disk',`baseline-${name}.hwp`));
   const a=new candidate.HwpDocument(bytes), b=new baseline.HwpDocument(bytes);
   try{
@@ -94,8 +94,14 @@ for(const name of negatives)await scenario(`valid disk negative unchanged: ${nam
       const bb=b[format==='hwp'?'exportHwpWithReport':'exportHwpxWithReport']();
       try{
         assert.equal(aa.contentLoss(),bb.contentLoss());
-        const ar=new candidate.HwpDocument(aa.takeBytes()), br=new baseline.HwpDocument(bb.takeBytes());
-        try{equal(ar,br);}finally{ar.free();br.free();}
+        const output=aa.takeBytes(), ar=new candidate.HwpDocument(output), br=new baseline.HwpDocument(bb.takeBytes());
+        try{
+          // The old HWPX output lost authored native rows. Keep the original
+          // source layout invariant, but do not require reproducing that loss.
+          assert.equal(verifyPreservedExport(a,output,format,aa.contentLoss(),data=>new candidate.HwpDocument(data)).status,'checked');
+          equal(a,ar);
+          observations.push({name,format,repairedStorage:true,baselineGeometry:compareSnapshots(snapshot(b),snapshot(br)).geometry.count});
+        }finally{ar.free();br.free();}
       }finally{aa.free();bb.free();}
     }
   }finally{a.free();b.free();}

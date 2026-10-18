@@ -1,0 +1,66 @@
+{
+  "status": "PRIVATE_CANDIDATE_VERIFIED_NOT_PRODUCTION_PROMOTED",
+  "sourceId": "private-native-synthetic-caret-exact90",
+  "wasmSha256": "b3cf2690e950bede3385cf235c2e2171dc7ddb9981676c4f4361d353a9b7b662",
+  "patchSha256": "eedb6ac4c47befebfdeb727099222b83a5b7b6550d55b98546a050366b9b5f4c",
+  "rustOwnershipTests": 7,
+  "exportArtifacts": 110,
+  "checked": 90,
+  "blocked": 20,
+  "existingDirectionLossBlocked": 8,
+  "prefixReflowSafelyBlocked": 12,
+  "semanticOrGeometryDifferencesInAcceptedExports": 0,
+  "historyStatesCompared": 48,
+  "productionGuardModified": false,
+  "productionEnginePromoted": false,
+  "visibleUiUsed": false,
+  "nativeHancomCompared": false,
+  "artifacts": [
+    {
+      "path": "unsupported-origin-storage-caret-exact90.json",
+      "sha256": "a1099b0f8a3374b06cd0ac3d16bd797f4184500a696d58c7963f17fd8a7b4de2",
+      "bytes": 135448
+    },
+    {
+      "path": "source-frame-body-edit-caret-exact90.json",
+      "sha256": "5d54d8f6d8bba110b2ed014b0f4a0f29d86d51dea824fd2390d2c8b456091e8c",
+      "bytes": 53573
+    },
+    {
+      "path": "source-frame-hwpx-tail-edit-caret-exact90.json",
+      "sha256": "e854fa306d7b3d013c8edf96de7e3012eca81cc06f4429b3a4f959134730312d",
+      "bytes": 53585
+    },
+    {
+      "path": "source-frame-cycles-stress-caret-exact90.json",
+      "sha256": "bbaad7da02df95b2efa628d27597b2d5a0b3be70e8545cf32df3f2424c55748a",
+      "bytes": 7619164
+    },
+    {
+      "path": "native-source-owner-tests-caret-exact.log",
+      "sha256": "496920a93bcd1055a286f882801a49428f576c2c656b88c790aadcc2515faadc",
+      "bytes": 2069
+    },
+    {
+      "path": "wasm-build-caret-exact.log",
+      "sha256": "4d0a26f7cc5f3fa3a147fd864427671718c9bec0c4c093cdc67dc105c3cd5454",
+      "bytes": 159
+    },
+    {
+      "path": "candidate-source-proof.json",
+      "sha256": "4c6373df730e02e1748938c7c0e186365f770aed2a1161f39f885db4ec27a28b",
+      "bytes": 3406
+    },
+    {
+      "path": "native-source-synthetic-rows90.patch",
+      "sha256": "eedb6ac4c47befebfdeb727099222b83a5b7b6550d55b98546a050366b9b5f4c",
+      "bytes": 34159
+    }
+  ],
+  "limits": [
+    "Original native Hancom pagination/font parity is separate and unverified here.",
+    "Prefix wrap/page reflow HWPX still fails strict preservation and is not claimed supported.",
+    "Eight existing pure HWPX to HWP textDir-loss conversions remain blocked.",
+    "Frontend/OPFS/native UI validation and engine98 resource patch integration are root follow-up."
+  ]
+}

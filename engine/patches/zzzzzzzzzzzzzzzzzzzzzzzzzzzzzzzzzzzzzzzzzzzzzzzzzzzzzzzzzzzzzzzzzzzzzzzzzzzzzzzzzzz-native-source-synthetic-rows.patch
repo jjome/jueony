@@ -1,0 +1,664 @@
+--- a/src/diagnostics/ir_field_sweep.rs
++++ b/src/diagnostics/ir_field_sweep.rs
+@@ -664,6 +664,8 @@
+         // 행 메트릭의 출처와 계산한 번호는 직렬화 원문에 없는 파생값이다.
+         layout_space_metrics: _,
+         numbering_marker: _,
++        native_source_synthetic_seal: _,
++        native_source_synthetic_context: _,
+     } = a;
+ 
+     macro_rules! f {
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -343,6 +343,7 @@
+ 
+         doc.rebuild_embedded_exact_font_sources();
+         doc.recompose_all_with_horizontal_shaping();
++        doc.document.bind_native_source_synthetic_context();
+         doc.paginate();
+ 
+         // [#4488/#4495] 로드 픽스업(손상 lineseg 제거·빈 문단 reflow·안내문 제거)과
+--- a/src/document_core/queries/rendering.rs
++++ b/src/document_core/queries/rendering.rs
+@@ -4826,7 +4826,8 @@
+                 Some(column_width),
+             )
+         };
+-        let typesetter = TypesetEngine::new(self.dpi)
++        let typesetter = TypesetEngine::new(self.dpi).with_native_source_synthetic_context(
++                Some(self.document.native_source_synthetic_context_digest()))
+             .with_render_normalization(std::sync::Arc::clone(&self.render_normalization.overlay));
+         let Some(renderer_job) = typesetter.begin_resumable_table_pagination(
+             paragraphs,
+@@ -4927,7 +4928,8 @@
+                     page_count: self.page_count(),
+                 };
+             };
+-            TypesetEngine::new(self.dpi)
++            TypesetEngine::new(self.dpi).with_native_source_synthetic_context(
++                Some(self.document.native_source_synthetic_context_digest()))
+                 .with_render_normalization(std::sync::Arc::clone(
+                     &self.render_normalization.overlay,
+                 ))
+@@ -4954,7 +4956,8 @@
+         let section_index = pending.descriptor.section_index;
+         let result = {
+             let section = &self.document.sections[section_index];
+-            let Some(mut result) = TypesetEngine::new(self.dpi)
++            let Some(mut result) = TypesetEngine::new(self.dpi).with_native_source_synthetic_context(
++                Some(self.document.native_source_synthetic_context_digest()))
+                 .with_render_normalization(std::sync::Arc::clone(
+                     &self.render_normalization.overlay,
+                 ))
+@@ -5431,7 +5434,8 @@
+                 } else {
+                     EndnoteDeferral::None
+                 };
+-                let typesetter = TypesetEngine::new(self.dpi).with_render_normalization(
++                let typesetter = TypesetEngine::new(self.dpi).with_native_source_synthetic_context(
++                Some(self.document.native_source_synthetic_context_digest())).with_render_normalization(
+                     std::sync::Arc::clone(&self.render_normalization.overlay),
+                 );
+                 typesetter.typeset_section_with_variant(
+@@ -6459,7 +6463,8 @@
+ 
+     fn dump_section_typesetter(&self, sec_idx: usize) -> TypesetEngine {
+         let default_tab_styles = self.styles.for_section(sec_idx);
+-        let typesetter = TypesetEngine::new(self.dpi)
++        let typesetter = TypesetEngine::new(self.dpi).with_native_source_synthetic_context(
++                Some(self.document.native_source_synthetic_context_digest()))
+             .with_render_normalization(std::sync::Arc::clone(&self.render_normalization.overlay));
+         typesetter.apply_section_format_context(
+             self.section_render_paragraphs(sec_idx),
+@@ -7668,6 +7673,8 @@
+         // (variant → flow spacing_before)는 다음 줄이 종전 순서대로 덮어쓴다.
+         self.layout_engine
+             .set_layout_profile(self.effective_layout_profile());
++        self.layout_engine.set_native_source_synthetic_context(
++            Some(self.document.native_source_synthetic_context_digest()));
+         self.layout_engine.set_hwp3_origin_flow_spacing_before(
+             uses_hwp3_origin_flow_spacing_before(&self.document),
+         );
+--- a/src/model/paragraph.rs
++++ b/src/model/paragraph.rs
+@@ -87,6 +87,13 @@
+     /// (`serde(skip)` — IR dump/ir-sweep 축의 필드 집합을 바꾸지 않는다.)
+     #[serde(skip_serializing)]
+     pub source_line_seg_vertical_pos: Option<Vec<i32>>,
++    /// Authentication of implementation-tagged rows actually present in a native
++    /// HWP5 source (or its explicit paragraph-axis HWPX projection). Runtime
++    /// reflow rows have no such owner. Never serialized or exposed as content.
++    #[serde(skip_serializing)]
++    pub(crate) native_source_synthetic_seal: Option<[u8; 32]>,
++    #[serde(skip_serializing)]
++    pub(crate) native_source_synthetic_context: Option<[u8; 32]>,
+     /// 영역 태그 정보
+     pub range_tags: Vec<RangeTag>,
+     /// 필드 텍스트 범위 (0x03~0x04 사이 텍스트 인덱스 + 컨트롤 인덱스)
+@@ -817,11 +824,48 @@
+         &self.line_segs[..source_len]
+     }
+ 
++    /// Mark only rows read from an explicit native-source persistence boundary.
++    /// A rendering fallback must never call this method.
++    pub(crate) fn seal_native_source_synthetic_rows(&mut self) {
++        self.native_source_synthetic_seal = (self.line_segs.len() == 1
++            && self.layout_only_fill_lines == 0 && !self.stored_text_partition_dirty
++            && self.line_segs.iter().all(|line| line.tag == 0x8006_0000
++                && line.text_start == 0 && line.vertical_pos == 0
++                && line.line_height > 0 && line.text_height == line.line_height
++                && line.line_spacing >= 0 && line.segment_width > 0))
++            .then(|| self.native_source_synthetic_digest());
++    }
++
++    fn native_source_synthetic_digest(&self) -> [u8; 32] {
++        crate::model::raw_provenance::record_digest(&(
++            &self.text, self.char_count, &self.char_offsets, &self.char_shapes,
++            &self.line_segs, self.para_shape_id, self.style_id, self.column_type,
++            self.raw_break_type, &self.tab_extended,
++        ))
++    }
++
++    pub(crate) fn bind_native_source_synthetic_context(&mut self, context: [u8; 32]) {
++        if self.native_source_synthetic_context.is_none()
++            && self.native_source_synthetic_seal
++                .is_some_and(|seal| seal == self.native_source_synthetic_digest()) {
++            self.native_source_synthetic_context = Some(context);
++        }
++    }
++
++    pub(crate) fn owns_native_source_synthetic_rows(&self, context: [u8; 32]) -> bool {
++        self.layout_only_fill_lines == 0 && !self.stored_text_partition_dirty
++            && self.native_source_synthetic_context == Some(context)
++            && self.native_source_synthetic_seal
++                .is_some_and(|seal| seal == self.native_source_synthetic_digest())
++    }
++
+     /// Invalidate every layout result derived from text or CharShapeRef input.
+     /// Existing rows remain as edit-reflow metric templates, but cannot be
+     /// admitted or serialized as the current text partition.
+     #[inline]
+     pub fn invalidate_layout_inputs(&mut self) {
++        self.native_source_synthetic_seal = None;
++        self.native_source_synthetic_context = None;
+         self.stored_text_partition_dirty = true;
+     }
+ 
+@@ -832,6 +876,8 @@
+ 
+     /// Replace stored rows and their validity state at one owner boundary.
+     pub(crate) fn replace_line_segs(&mut self, line_segs: Vec<LineSeg>) {
++        self.native_source_synthetic_seal = None;
++        self.native_source_synthetic_context = None;
+         self.line_segs = line_segs;
+         self.layout_space_metrics.clear();
+         // A fresh vector has no renderer-appended suffix and cannot reuse a
+@@ -1768,6 +1814,8 @@
+             layout_only_fill_lines: 0,
+             // 편집으로 갈라진 문단의 원본 vertpos 스냅샷은 무효다 (#5847).
+             source_line_seg_vertical_pos: None,
++            native_source_synthetic_seal: None,
++            native_source_synthetic_context: None,
+             // 새로 계산된 줄은 `char_offsets` 와 같은 HWP5 축에서 나오므로 보정이 없다 (#5961).
+             hwpx_axis_shift: 0,
+             range_tags: new_range_tags,
+--- a/src/model/raw_provenance.rs
++++ b/src/model/raw_provenance.rs
+@@ -323,47 +323,51 @@
+ /// 컨트롤은 봉인 없이 남아 **종전 계약(raw 우선)** 으로 동작한다 — 새 검증이
+ /// 빠지는 것이지 새 손실이 생기는 방향이 아니다.
+ fn seal_raw_bearing_controls(paragraphs: &mut [crate::model::paragraph::Paragraph]) {
++    seal_raw_bearing_controls_with_source_owner(paragraphs, None);
++}
++
++fn seal_raw_bearing_controls_with_source_owner(paragraphs: &mut [crate::model::paragraph::Paragraph], synthetic_context: Option<[u8; 32]>) {
+     use crate::model::control::Control;
+     use crate::model::shape::ShapeObject;
+ 
+-    fn walk_caption(caption: &mut crate::model::shape::Caption) {
+-        seal_raw_bearing_controls(&mut caption.paragraphs);
+-    }
+-
+-    fn walk_drawing(drawing: &mut crate::model::shape::DrawingObjAttr) {
++    fn walk_caption(caption: &mut crate::model::shape::Caption, synthetic_context: Option<[u8; 32]>) {
++        seal_raw_bearing_controls_with_source_owner(&mut caption.paragraphs, synthetic_context);
++    }
++
++    fn walk_drawing(drawing: &mut crate::model::shape::DrawingObjAttr, synthetic_context: Option<[u8; 32]>) {
+         if let Some(text_box) = &mut drawing.text_box {
+-            seal_raw_bearing_controls(&mut text_box.paragraphs);
++            seal_raw_bearing_controls_with_source_owner(&mut text_box.paragraphs, synthetic_context);
+         }
+         if let Some(caption) = &mut drawing.caption {
+-            walk_caption(caption);
+-        }
+-    }
+-
+-    fn walk_shape(shape: &mut ShapeObject) {
++            walk_caption(caption, synthetic_context);
++        }
++    }
++
++    fn walk_shape(shape: &mut ShapeObject, synthetic_context: Option<[u8; 32]>) {
+         match shape {
+             ShapeObject::Picture(pic) => {
+                 if let Some(caption) = &mut pic.caption {
+-                    walk_caption(caption);
++                    walk_caption(caption, synthetic_context);
+                 }
+             }
+             ShapeObject::Group(group) => {
+                 for child in &mut group.children {
+-                    walk_shape(child);
++                    walk_shape(child, synthetic_context);
+                 }
+                 if let Some(caption) = &mut group.caption {
+-                    walk_caption(caption);
++                    walk_caption(caption, synthetic_context);
+                 }
+             }
+             ShapeObject::Chart(chart) => {
+-                walk_drawing(&mut chart.drawing);
++                walk_drawing(&mut chart.drawing, synthetic_context);
+                 if let Some(caption) = &mut chart.caption {
+-                    walk_caption(caption);
++                    walk_caption(caption, synthetic_context);
+                 }
+             }
+             ShapeObject::Ole(ole) => {
+-                walk_drawing(&mut ole.drawing);
++                walk_drawing(&mut ole.drawing, synthetic_context);
+                 if let Some(caption) = &mut ole.caption {
+-                    walk_caption(caption);
++                    walk_caption(caption, synthetic_context);
+                 }
+                 if !ole.raw_tag_data.is_empty() {
+                     ole.raw_tag_seal = Some(ole_payload_digest(ole));
+@@ -371,21 +375,22 @@
+             }
+             _ => {
+                 if let Some(drawing) = shape.drawing_mut() {
+-                    walk_drawing(drawing);
++                    walk_drawing(drawing, synthetic_context);
+                 }
+             }
+         }
+     }
+ 
+     for para in paragraphs {
++        if let Some(context) = synthetic_context { para.bind_native_source_synthetic_context(context); }
+         for control in &mut para.controls {
+             match control {
+                 Control::Table(table) => {
+                     for cell in &mut table.cells {
+-                        seal_raw_bearing_controls(&mut cell.paragraphs);
++                        seal_raw_bearing_controls_with_source_owner(&mut cell.paragraphs, synthetic_context);
+                     }
+                     if let Some(caption) = &mut table.caption {
+-                        walk_caption(caption);
++                        walk_caption(caption, synthetic_context);
+                     }
+                     if !table.raw_ctrl_data.is_empty() {
+                         table.raw_ctrl_seal = Some(record_digest(&table.common));
+@@ -398,21 +403,21 @@
+                 }
+                 Control::Picture(pic) => {
+                     if let Some(caption) = &mut pic.caption {
+-                        walk_caption(caption);
++                        walk_caption(caption, synthetic_context);
+                     }
+                 }
+-                Control::Shape(shape) => walk_shape(shape),
+-                Control::Header(header) => seal_raw_bearing_controls(&mut header.paragraphs),
+-                Control::Footer(footer) => seal_raw_bearing_controls(&mut footer.paragraphs),
+-                Control::Footnote(fnote) => seal_raw_bearing_controls(&mut fnote.paragraphs),
+-                Control::Endnote(enote) => seal_raw_bearing_controls(&mut enote.paragraphs),
++                Control::Shape(shape) => walk_shape(shape, synthetic_context),
++                Control::Header(header) => seal_raw_bearing_controls_with_source_owner(&mut header.paragraphs, synthetic_context),
++                Control::Footer(footer) => seal_raw_bearing_controls_with_source_owner(&mut footer.paragraphs, synthetic_context),
++                Control::Footnote(fnote) => seal_raw_bearing_controls_with_source_owner(&mut fnote.paragraphs, synthetic_context),
++                Control::Endnote(enote) => seal_raw_bearing_controls_with_source_owner(&mut enote.paragraphs, synthetic_context),
+                 Control::HiddenComment(comment) => {
+-                    seal_raw_bearing_controls(&mut comment.paragraphs)
+-                }
+-                Control::Field(field) => seal_raw_bearing_controls(&mut field.memo_paragraphs),
++                    seal_raw_bearing_controls_with_source_owner(&mut comment.paragraphs, synthetic_context)
++                }
++                Control::Field(field) => seal_raw_bearing_controls_with_source_owner(&mut field.memo_paragraphs, synthetic_context),
+                 Control::SectionDef(section_def) => {
+                     for master_page in &mut section_def.master_pages {
+-                        seal_raw_bearing_controls(&mut master_page.paragraphs);
++                        seal_raw_bearing_controls_with_source_owner(&mut master_page.paragraphs, synthetic_context);
+                     }
+                 }
+                 _ => {}
+@@ -422,6 +427,67 @@
+ }
+ 
+ impl crate::model::document::Document {
++    /// Shared font definitions, section geometry, whole content/order and every
++    /// nested object frame participate. A cloned paragraph cannot import this
++    /// authority into a different document/frame or after a shared style edit.
++    pub(crate) fn native_source_synthetic_context_digest(&self) -> [u8; 32] {
++        #[derive(Serialize)]
++        struct ParagraphFrame<'a> {
++            identity: Option<[u8; 4]>,
++            para_shape: u16,
++            style: u8,
++            break_type: crate::model::paragraph::ColumnBreakType,
++            raw_break_type: u8,
++            shape_ids: Vec<u32>,
++            controls: &'a [crate::model::control::Control],
++        }
++        #[derive(Serialize)]
++        struct SectionFrame<'a> {
++            section: &'a crate::model::document::SectionDef,
++            paragraphs: Vec<ParagraphFrame<'a>>,
++        }
++        let sections: Vec<_> = self.sections.iter().map(|s| SectionFrame {
++            section: &s.section_def,
++            paragraphs: s.paragraphs.iter().map(|p| {
++                let mut shape_ids: Vec<_> = p.char_shapes.iter().map(|r| r.char_shape_id).collect();
++                shape_ids.sort_unstable(); shape_ids.dedup();
++                ParagraphFrame {
++                    identity: p.raw_header_extra.get(6..10).and_then(|id| id.try_into().ok()),
++                    para_shape: p.para_shape_id, style: p.style_id, break_type: p.column_type,
++                    raw_break_type: p.raw_break_type, shape_ids, controls: &p.controls,
++                }
++            }).collect(),
++        }).collect();
++        // Plain body text and derived LINE_SEGs are checked by each local seal,
++        // not a global source revocation: typing in a later plain paragraph
++        // cannot erase a preceding table's frame authority. All object trees,
++        // cell content, paragraph order/identity, page/column declarations and
++        // referenced font/style definitions remain part of this owner context.
++        // A stored caret is session state, not a page/frame input. The
++        // DOCUMENT_PROPERTIES parser/writer puts exactly three u32 caret
++        // fields after seven u16 values (payload 14..26). Keep every other
++        // raw byte, raw length and unknown extension bound to this owner.
++        let mut frame_properties = self.doc_properties.clone();
++        if let Some(raw) = &mut frame_properties.raw_data {
++            if let Some(caret) = raw.get_mut(14..26) { caret.fill(0); }
++        }
++        frame_properties.caret_list_id = 0;
++        frame_properties.caret_para_id = 0;
++        frame_properties.caret_char_pos = 0;
++        record_digest(&(doc_info_model_digest(&self.doc_info, &frame_properties), sections))
++    }
++
++    /// Called once after initial load materialization; never by edit or export.
++    pub(crate) fn bind_native_source_synthetic_context(&mut self) {
++        let context = self.native_source_synthetic_context_digest();
++        for section in &mut self.sections {
++            seal_raw_bearing_controls_with_source_owner(&mut section.paragraphs, Some(context));
++            for page in &mut section.section_def.master_pages {
++                seal_raw_bearing_controls_with_source_owner(&mut page.paragraphs, Some(context));
++            }
++        }
++    }
++
+     /// [#4488/#4495] 본문 raw 캐시 전부를 봉인한다 — 파싱(+로드 픽스업) 완료
+     /// 시점에 호출. 컨트롤 봉인을 먼저 세우고(봉인 필드는 `#[serde(skip)]` 이라
+     /// Section 다이제스트에 실리지 않는다) Section 봉인을 계산한다.
+@@ -525,3 +591,119 @@
+         );
+     }
+ }
++
++#[cfg(test)]
++mod native_synthetic_source_owner_tests {
++    use crate::model::{document::{Document, Section}, paragraph::{Paragraph, LineSeg}, style::CharShape};
++
++    fn source() -> Document {
++        let mut para = Paragraph::new_empty();
++        para.text = "OWN".into(); para.char_count = 4;
++        para.char_offsets = vec![0, 1, 2];
++        para.line_segs[0].tag = 0x8006_0000;
++        para.line_segs[0].segment_width = 40000;
++        para.char_shapes = vec![crate::model::paragraph::CharShapeRef { start_pos: 0, char_shape_id: 0 }];
++        para.controls.push(crate::model::control::Control::ColumnDef(crate::model::page::ColumnDef::default()));
++        para.controls.push(crate::model::control::Control::Table(Box::new(crate::model::table::Table::default())));
++        para.seal_native_source_synthetic_rows();
++        let mut doc = Document::default();
++        doc.doc_info.char_shapes.push(CharShape::default());
++        doc.sections.push(Section { paragraphs: vec![para], ..Section::default() });
++        doc.bind_native_source_synthetic_context();
++        doc
++    }
++    fn owns(doc: &Document) -> bool {
++        doc.sections[0].paragraphs[0].owns_native_source_synthetic_rows(
++            doc.native_source_synthetic_context_digest())
++    }
++    #[test]
++    fn exact_clone_and_restored_state_keep_source_authority() {
++        let doc = source(); assert!(owns(&doc)); assert!(owns(&doc.clone()));
++        let mut changed = doc.clone(); changed.sections[0].section_def.page_def.width += 7200;
++        assert!(!owns(&changed)); changed = doc.clone(); assert!(owns(&changed));
++    }
++    #[test]
++    fn shared_font_and_page_frame_changes_cannot_reuse_source_rows() {
++        for mutation in 0..9 {
++            let mut doc = source();
++            match mutation {
++                0 => doc.sections[0].section_def.page_def.width += 1,
++                1 => doc.sections[0].section_def.page_def.margin_left += 1,
++                2 => doc.doc_info.char_shapes[0].base_size += 1,
++                3 => doc.doc_info.char_shapes[0].font_ids[0] += 1,
++                4 => if let crate::model::control::Control::ColumnDef(c) = &mut doc.sections[0].paragraphs[0].controls[0] { c.column_count += 1; },
++                5 => if let crate::model::control::Control::Table(t) = &mut doc.sections[0].paragraphs[0].controls[1] { t.common.width += 1; },
++                6 => if let crate::model::control::Control::Table(t) = &mut doc.sections[0].paragraphs[0].controls[1] { t.common.height += 1; },
++                7 => doc.sections[0].paragraphs[0].char_shapes[0].char_shape_id += 1,
++                _ => doc.sections[0].paragraphs.push(Paragraph::new_empty()),
++            }
++            assert!(!owns(&doc));
++            doc.bind_native_source_synthetic_context();
++            assert!(!owns(&doc), "rebinding must not bless a changed frame");
++        }
++    }
++    #[test]
++    fn unrelated_plain_body_text_does_not_revoke_a_preceding_frame() {
++        let mut doc = source();
++        doc.sections[0].paragraphs.push(Paragraph::new_empty());
++        // This is the initial source frame, not a post-edit rebind.
++        doc.sections[0].paragraphs[0].native_source_synthetic_context = None;
++        doc.bind_native_source_synthetic_context();
++        assert!(owns(&doc));
++        doc.sections[0].paragraphs[1].text = "later text grows".into();
++        doc.sections[0].paragraphs[1].char_count = 17;
++        doc.sections[0].paragraphs[1].invalidate_layout_inputs();
++        assert!(owns(&doc));
++    }
++
++    #[test]
++    fn row_edit_and_reflow_clear_original_source_authority() {
++        let mut doc = source(); doc.sections[0].paragraphs[0].invalidate_layout_inputs();
++        assert!(!owns(&doc));
++        let mut doc = source();
++        let rows = doc.sections[0].paragraphs[0].line_segs.clone();
++        doc.sections[0].paragraphs[0].replace_line_segs(rows);
++        assert!(!owns(&doc));
++        doc.bind_native_source_synthetic_context(); assert!(!owns(&doc));
++    }
++    #[test]
++    fn source_row_transplant_into_a_changed_owner_is_rejected() {
++        let mut doc = source();
++        let mut foreign = source(); foreign.sections[0].section_def.page_def.height += 1;
++        doc.sections[0].paragraphs[0] = foreign.sections[0].paragraphs[0].clone();
++        // The foreign source was bound before its frame changed; no new authority
++        // appears merely because source paragraph bytes happen to match.
++        foreign.bind_native_source_synthetic_context(); assert!(!owns(&foreign));
++        doc.sections[0].section_def.page_def.height += 1;
++        assert!(!owns(&doc));
++    }
++    #[test]
++    fn unowned_runtime_rows_never_gain_authority_by_binding() {
++        let mut doc = source();
++        doc.sections[0].paragraphs[0].native_source_synthetic_seal = None;
++        doc.sections[0].paragraphs[0].native_source_synthetic_context = None;
++        doc.bind_native_source_synthetic_context(); assert!(!owns(&doc));
++    }
++
++
++    #[test]
++    fn saved_caret_is_not_a_frame_input_but_unknown_raw_suffix_is() {
++        let mut doc = source();
++        doc.doc_properties.raw_data = Some(vec![0; 30]);
++        doc.sections[0].paragraphs[0].native_source_synthetic_context = None;
++        doc.bind_native_source_synthetic_context();
++        doc.doc_properties.caret_list_id = 7;
++        doc.doc_properties.caret_para_id = 5;
++        doc.doc_properties.caret_char_pos = 12;
++        doc.doc_properties.raw_data.as_mut().unwrap()[14..26].fill(9);
++        assert!(owns(&doc));
++        let mut changed = doc.clone();
++        changed.doc_properties.raw_data.as_mut().unwrap()[29] = 1;
++        assert!(!owns(&changed), "unknown suffix remains bound");
++        let mut changed = doc.clone();
++        changed.doc_properties.raw_data.as_mut().unwrap()[13] = 1;
++        assert!(!owns(&changed), "non-caret prefix remains bound");
++        doc.doc_properties.page_start_num += 1;
++        assert!(!owns(&doc), "numbering remains a layout input");
++    }
++}
+--- a/src/parser/body_text.rs
++++ b/src/parser/body_text.rs
+@@ -378,6 +378,7 @@
+     }
+ 
+     para.import_markpen_range_tags();
++    para.seal_native_source_synthetic_rows();
+     Ok(para)
+ }
+ 
+--- a/src/parser/hwpx/section.rs
++++ b/src/parser/hwpx/section.rs
+@@ -1189,6 +1189,12 @@
+     header_extra.extend_from_slice(&hp_p_id.to_le_bytes()); // instanceId
+     para.raw_header_extra = header_extra;
+ 
++    // Only the versioned HWP5 paragraph-axis projection can carry authored
++    // native synthetic rows; pure XML runtime rows remain unowned.
++    if HWPX_HWP5_ORIGIN_SOURCE.with(|active| active.get())
++        && HWPX_PARAGRAPH_AXIS.with(|active| active.get()) {
++        para.seal_native_source_synthetic_rows();
++    }
+     Ok((para, sec_def))
+ }
+ 
+--- a/src/renderer/generated_column_stack.rs
++++ b/src/renderer/generated_column_stack.rs
+@@ -15,6 +15,7 @@
+ 
+ pub(crate) fn owns_generated_frame(
+     profile: crate::model::provenance::LayoutCompatibilityProfile,
++    native_source_context: Option<[u8; 32]>,
+     overlay: std::sync::Arc<super::render_normalization::RenderNormalizationOverlay>,
+     columns: usize,
+     body_width: f64,
+@@ -24,7 +25,10 @@
+     styles: &ResolvedStyleSet,
+     dpi: f64,
+ ) -> bool {
+-    if !profile.native_hwp5_layout()
++    let authenticated_native_projection = profile.hwp5_origin_hwpx()
++        && native_source_context.is_some_and(|context| !paragraphs.is_empty()
++            && paragraphs.iter().take(3).all(|p| p.owns_native_source_synthetic_rows(context)));
++    if !(profile.native_hwp5_layout() || authenticated_native_projection)
+         || !matches!(columns, 2 | 3)
+         || paragraphs.len() < 4
+         || paragraphs.len() > 128
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -3881,6 +3881,7 @@
+     /// [#2403] 소스분기 질의 표면 — set_layout_profile 로 배선 (종전 hwp3_variant/
+     /// hwpx_source Cell 2개 통합).
+     profile: std::cell::Cell<crate::model::provenance::LayoutCompatibilityProfile>,
++    native_source_synthetic_context: std::cell::Cell<Option<[u8; 32]>>,
+     /// HWP3 원본 및 HWP3-origin HWP5 변환본의 본문 흐름 spacing_before 보정 여부.
+     use_hwp3_origin_flow_spacing_before: std::cell::Cell<bool>,
+     /// [#2308] Source IR로부터 재생성되는 render-only width/TAC projection.
+@@ -4047,6 +4048,7 @@
+             current_page_height: std::cell::Cell::new(0.0),
+             overflow_cell_lines: std::cell::Cell::new(0),
+             profile: std::cell::Cell::new(Default::default()),
++            native_source_synthetic_context: std::cell::Cell::new(None),
+             use_hwp3_origin_flow_spacing_before: std::cell::Cell::new(false),
+             render_normalization: std::cell::RefCell::new(std::sync::Arc::new(
+                 crate::renderer::render_normalization::RenderNormalizationOverlay::default(),
+@@ -4631,6 +4633,10 @@
+         self.profile.set(profile);
+         self.use_hwp3_origin_flow_spacing_before
+             .set(profile.hwp3_layout());
++    }
++
++    pub(crate) fn set_native_source_synthetic_context(&self, context: Option<[u8; 32]>) {
++        self.native_source_synthetic_context.set(context);
+     }
+ 
+     pub fn set_hwp3_origin_flow_spacing_before(&self, enabled: bool) {
+@@ -12246,6 +12252,11 @@
+                         // 한컴 2020 #7265 셀 서식 편집본: 본문 132.3px,
+                         // 표 테두리 136.0px = 본문 + 283HU.
+                         if self.profile.get().hwp5_origin_hwpx()
++                            // This explicit native row already owns the same
++                            // pre-inset frame used before HWP -> XML storage.
++                            // Do not add its outer margin again at paint time.
++                            && !self.native_source_synthetic_context.get()
++                                .is_some_and(|context| para.owns_native_source_synthetic_rows(context))
+                             && !(layout.column_areas.len()==1
+                                 && (crate::renderer::float_placement::plain_positive_offset_stack(paragraphs,para_index)
+                                     || crate::renderer::float_placement::closed_full_width_positive_pair(paragraphs,para_index)
+--- a/src/renderer/typeset/controls/flow_table.rs
++++ b/src/renderer/typeset/controls/flow_table.rs
+@@ -94,7 +94,7 @@
+             _=>false,
+         })
+         && crate::renderer::generated_column_stack::owns_generated_frame(
+-            page.profile,std::sync::Arc::clone(&engine.render_normalization),page.layout.column_areas.len(),
++            page.profile,engine.native_source_synthetic_context.get(),std::sync::Arc::clone(&engine.render_normalization),page.layout.column_areas.len(),
+             page.layout.body_area.width,paragraphs_all,para_idx,measured_tables,styles,engine.dpi);
+     if generated {
+         let column=page.layout.column_areas[0];
+--- a/src/renderer/typeset.rs
++++ b/src/renderer/typeset.rs
+@@ -312,6 +312,7 @@
+     /// [#2403] 현재 조판 입력의 레이아웃 호환 프로파일 — typeset 진입 시 set.
+     /// (HWPX 저장 시멘틱·HWP3 변환본 판단 등 소스분기의 단일 질의 표면.)
+     profile: std::cell::Cell<crate::model::provenance::LayoutCompatibilityProfile>,
++    native_source_synthetic_context: std::cell::Cell<Option<[u8; 32]>>,
+     /// [#5854] 현재 구역의 저장 LINE_SEG 사다리가 통짜 합성값인지 — 구역 진입 시 set.
+     /// 참이면 줄 metrics 를 저장값이 아니라 글꼴·문단 스타일에서 다시 뽑는다.
+     uniform_filler_ladder: std::cell::Cell<bool>,
+@@ -3463,12 +3464,18 @@
+         Self {
+             dpi,
+             profile: std::cell::Cell::new(Default::default()),
++            native_source_synthetic_context: std::cell::Cell::new(None),
+             uniform_filler_ladder: std::cell::Cell::new(false),
+             float_carve_evidence: std::cell::RefCell::new(Vec::new()),
+             render_normalization: std::sync::Arc::new(
+                 crate::renderer::render_normalization::RenderNormalizationOverlay::default(),
+             ),
+         }
++    }
++
++    pub(crate) fn with_native_source_synthetic_context(self, context: Option<[u8; 32]>) -> Self {
++        self.native_source_synthetic_context.set(context);
++        self
+     }
+ 
+     pub(crate) fn with_render_normalization(
+--- a/src/serializer/hwpx/context.rs
++++ b/src/serializer/hwpx/context.rs
+@@ -161,6 +161,9 @@
+     pub line_segs_on_hwpx_axis: bool,
+     /// 새 HWP5 계보 산출물은 실제 방출된 문단의 제어 슬롯을 함께 센다.
+     pub line_segs_on_paragraph_axis: bool,
++    /// Only non-HWP3 native lineage may persist authenticated bit31 source rows.
++    pub preserve_native_source_synthetic_rows: bool,
++    pub native_source_synthetic_context: Option<[u8; 32]>,
+     /// 이번 HWPX 산출물에서 발생한 사용자 내용 손실 (#4430).
+     ///
+     /// ID 풀과 마찬가지로 한 번의 직렬화 생명주기에만 속하며, 완료 시 바이트와 함께
+@@ -174,6 +177,8 @@
+             char_shape_ids: IdPool::default(),
+             line_segs_on_hwpx_axis: false,
+             line_segs_on_paragraph_axis: false,
++            preserve_native_source_synthetic_rows: false,
++            native_source_synthetic_context: None,
+             para_shape_ids: IdPool::default(),
+             border_fill_ids: IdPool::default(),
+             tab_pr_ids: IdPool::default(),
+@@ -209,6 +214,11 @@
+         ctx.line_segs_on_paragraph_axis = doc
+             .hwpx_aux_entry(crate::model::document::HWP5_ORIGIN_HWPX_MARKER_PATH)
+             == Some(crate::model::document::HWP5_ORIGIN_HWPX_PARAGRAPH_AXIS);
++        ctx.preserve_native_source_synthetic_rows = ctx.line_segs_on_paragraph_axis
++            && !doc.provenance.hwp3_lineage && !doc.provenance.hwpx_lineage
++            && doc.hwpx_aux_entry(crate::model::document::HWP3_ORIGIN_HWPX_MARKER_PATH).is_none();
++        ctx.native_source_synthetic_context = ctx.preserve_native_source_synthetic_rows
++            .then(|| doc.native_source_synthetic_context_digest());
+         // [#7526] rhwp 원본 마커를 싣는 산출물은 rhwp 축 계약을 따른다. 그 파일에서 읽은
+         // 문단은 이미 그 축이고(`hwpx_axis_shift` 0 아님), 편집으로 다시 조판한 문단만
+         // HWP5 축이라 문단마다 가른다(`render_paragraph_parts`).
+--- a/src/serializer/hwpx/section.rs
++++ b/src/serializer/hwpx/section.rs
+@@ -924,7 +924,16 @@
+             .iter()
+             .all(|s| s.tag & LineSeg::TAG_IMPLEMENTATION_PROPERTY != 0);
+ 
+-    if !axis_line_segs.is_empty() && position_axis_intact && !all_synthetic {
++    // bit31 alone does not mean "created by this XML reader": third-party
++    // HWP writers also store it in native LINE_SEG records. Retain only an
++    // unchanged source-authenticated native row under the explicit axis owner.
++    // Dirty text, new runtime rows, pure XML and all old invalid-axis guards
++    // keep the existing no-cache behavior.
++    let authored_native_synthetic = ctx.preserve_native_source_synthetic_rows
++        && ctx.native_source_synthetic_context
++            .is_some_and(|context| para.owns_native_source_synthetic_rows(context));
++    if !axis_line_segs.is_empty() && position_axis_intact
++        && (!all_synthetic || authored_native_synthetic) {
+         // IR 기반 출력 — 원본 lineseg 값 보존 (#177)
+         //
+         // [#5847] reflow 의 구역 단위 vpos 재계산이 원본 캐시 보유 문단의

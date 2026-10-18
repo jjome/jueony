@@ -9,7 +9,7 @@ CASES=[('native-shell',11),('native-recents',9),('document-lifecycle',10),
        ('document-windows',8),('recovery-integrity',10),('download-connection',10),
        ('close-recovery',4),('save-recovery',29),('document-metadata',10),
        ('agent-files',15),('xml-documents-integrated',7),('xml-documents',13),('xml-recovery',13),
-       ('package-preservation',14)]
+       ('package-preservation',14),('native-row-preservation',13),('native-row-engine',18)]
 sha=lambda b:hashlib.sha256(b).hexdigest()
 
 def main():
@@ -32,13 +32,14 @@ def main():
             path=target/'result.json';raw=path.read_bytes();r=json.loads(raw)
             assert proc.returncode==0 and row['scriptUnchanged']
             assert len(r['results'])==count and r['failures']==[],(name,r.get('failures'))
-            if name!='package-preservation':
+            engine_only=name in ['package-preservation','native-row-engine']
+            if not engine_only:
                 for key in ['pageErrors','consoleErrors','externalRequests']:assert r[key]==[],(name,key)
             for item in r['results']:
                 if isinstance(item,dict):assert item['status']=='PASS',(name,item)
             independent=name in ['xml-documents','xml-recovery']
-            if name=='package-preservation':
-                # Direct WASM + independent ZIP inspection; no browser/app UI.
+            if engine_only:
+                # Direct WASM; package suite additionally inspects independent ZIPs.
                 assert r['engine']['wasmSha256']==meta['wasmSha256'] and r['engine']['jsSha256']==meta['jsSha256']
                 assert r['verifierSha256']==fingerprint
                 for source in r['sourceHashes']:
@@ -56,7 +57,7 @@ def main():
         print(name,row['status'],flush=True);return row
     with ThreadPoolExecutor(max_workers=a.workers)as pool:rows=list(pool.map(run,CASES))
     failed=[x for x in rows if x['status']!='PASS']
-    result={'engine':meta,'build':build,'suites':rows,'failures':failed,'passedCases':sum(x.get('passed',0)for x in rows),'totalCases':sum(count for _,count in CASES),'scope':'Production file/recovery UI exercised through isolated headless Edge profiles and native IPC seams, not actual OS dialog/Hancom screen certification. Standalone XML and XML-recovery suites attested separately without HWP engine. The expanded Agent suite includes explicit bound save and stale generation refusal.'}
+    result={'engine':meta,'build':build,'suites':rows,'failures':failed,'passedCases':sum(x.get('passed',0)for x in rows),'totalCases':sum(count for _,count in CASES),'scope':'Production file/recovery UI exercised through isolated headless Edge profiles and native IPC seams, not actual OS dialog/Hancom screen certification. Standalone XML and XML-recovery suites attested separately without HWP engine; package/native-row engine suites use direct WASM. Prefix reflow safety may pass by refusing a detected mismatch and is not a supported conversion claim. The Agent suite includes explicit bound save and stale generation refusal.'}
     (out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     return int(bool(failed))
 

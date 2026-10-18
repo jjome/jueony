@@ -26,7 +26,7 @@
 
 ## 실행
 
-루트 `Start-Jueony-FileReview.cmd`는 새 `build/jueony-file-review91/Start-Jueony.cmd`를 사용한다. 포트4358이며 LLM 백엔드를 포함한다. 기존 앱/서버/문서는 종료하거나 교체하지 않았다. 새 실행 묶음의 로컬 서버·보호 설정·WASM·wire 계약7검사를 통과했으며 데스크톱 창을 열지는 않았다. 이전 포트의 업무·키·복구본을 새 origin으로 자동 이관하지 않는다.
+루트 `Start-Jueony-FileReview.cmd`는 새 `build/jueony-file-review91/Start-Jueony.cmd`를 사용한다. 포트4358이며 LLM 백엔드를 포함한다. 기존 앱/서버/문서는 종료하거나 교체하지 않았다. 새 실행 묶음의 로컬 서버·보호 설정·WASM·wire 계약7검사를 통과했으며 데스크톱 창을 열지는 않았다. 이전 포트의 업무·선택 상태·복구본을 새 origin으로 자동 이관하지 않는다. 백엔드의 API 키는 포트별 브라우저 데이터와 별개인 기존 Windows 암호화 연결 저장소를 사용한다.
 
 ```powershell
 $env:JUEONY_ENGINE_PACKAGE=(Resolve-Path 'build/rhwp-engine/source-f339aba305da3aa9/pkg').Path

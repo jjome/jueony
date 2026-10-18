@@ -58,3 +58,6 @@ rhwp 원문의 MIT 고지와 별도 third-party 고지를 유지한다. 변경�
 `zzzzzzzzzzzzzzzzzzzzz-table-default-padding-reflow.patch`는 표 기본 여백의 유효 수평 내용 폭 변화에 대해 상속 셀의 저장 줄을 공통 reflow 경로로 갱신한다. 표·셀의 유효 내용 상자/크기가 바뀌면 그 표의 파생 측정만 무효화하여 텍스트 편집용 초기 행 배분 하한을 다른 기하에 재사용하지 않는다. 모델의 선언 크기와 다른 표의 측정·기존 텍스트 편집 규칙은 유지한다. 0 기본 여백+다른 글자 크기의 HWP 진단과 수동 HWP/HWPX 저장 재열기를 확인했다. 여러 표 후속 앵커는 미완료다. [90번](../docs/90-table-default-padding-reflow.md)을 따른다.
 
 `zzzzzzzzzzzzzzzzzzzzzz-hidden-paragraph-page-owner.patch`는 기존 빈 끝 쪽 제거 규칙을 바꾸지 않고 실제 흡수한 문단 ID를 숨김 집합에 보존한다. 문단→쪽 조회는 그 정보와 앞선 실제 PageItem의 끝 쪽 소유를 사용하며, 일반 누락/비어 있지 않은 문단의 오류는 유지한다. 기존 문서 덤프의 숨김 소유 규칙과 일치한다. 이전/이후 전체 쪽 geometry 불변과 긴 표 Native/Canvas 요청·저장 재열기는 [92번](../docs/92-terminal-paragraph-page-owner.md)을 따른다. 엔진 `source-d46ea37c6fc63c03/pkg`이며 HWP Agent 크기 제한과 독립 한글 검수는 유지한다.
+
+
+원본 HWP implementation 줄과 런타임 줄의 소유를 분리하는 `native-source-synthetic-rows.patch` 후속은 [114번 저장 보존](../docs/114-native-row-storage.md)에 기록한다. 로컬 행/공유 프레임/명시 원본 축이 맞을 때만 HWPX에 보존하고 실제 커서 필드만 비교에서 제외한다. 앞 문단 재조판 후 저장 차단은 아직 남으며 임시 행을 원본으로 재봉인하지 않는다. 공식99패치 엔진은 단위970·파일/복구194·기존단표24검사를 통과했다.

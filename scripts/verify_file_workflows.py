@@ -8,7 +8,8 @@ APP=ROOT/'apps/editor'
 CASES=[('native-shell',11),('native-recents',9),('document-lifecycle',10),
        ('document-windows',8),('recovery-integrity',10),('download-connection',10),
        ('close-recovery',4),('save-recovery',29),('document-metadata',10),
-       ('agent-files',15),('xml-documents-integrated',7),('xml-documents',13),('xml-recovery',13)]
+       ('agent-files',15),('xml-documents-integrated',7),('xml-documents',13),('xml-recovery',13),
+       ('package-preservation',14)]
 sha=lambda b:hashlib.sha256(b).hexdigest()
 
 def main():
@@ -31,11 +32,18 @@ def main():
             path=target/'result.json';raw=path.read_bytes();r=json.loads(raw)
             assert proc.returncode==0 and row['scriptUnchanged']
             assert len(r['results'])==count and r['failures']==[],(name,r.get('failures'))
-            for key in ['pageErrors','consoleErrors','externalRequests']:assert r[key]==[],(name,key)
+            if name!='package-preservation':
+                for key in ['pageErrors','consoleErrors','externalRequests']:assert r[key]==[],(name,key)
             for item in r['results']:
                 if isinstance(item,dict):assert item['status']=='PASS',(name,item)
             independent=name in ['xml-documents','xml-recovery']
-            if not independent:
+            if name=='package-preservation':
+                # Direct WASM + independent ZIP inspection; no browser/app UI.
+                assert r['engine']['wasmSha256']==meta['wasmSha256'] and r['engine']['jsSha256']==meta['jsSha256']
+                assert r['verifierSha256']==fingerprint
+                for source in r['sourceHashes']:
+                    assert sha((APP/source['path']).read_bytes())==source['sha256']
+            elif not independent:
                 assert r['engine']['wasmSha256']==meta['wasmSha256'] and r['engine']['jsSha256']==meta['jsSha256']
                 assert r['build']['engineBuild']['sourceId']==meta['sourceId']
                 assert r['build']['customSourceSha256']==build['customSourceSha256']

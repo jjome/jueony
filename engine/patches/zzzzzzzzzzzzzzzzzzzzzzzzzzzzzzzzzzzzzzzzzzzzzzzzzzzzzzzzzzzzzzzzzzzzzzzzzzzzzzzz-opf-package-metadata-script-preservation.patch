@@ -1,0 +1,623 @@
+diff --git a/src/serializer/hwpx/content.rs b/src/serializer/hwpx/content.rs
+--- a/src/serializer/hwpx/content.rs
++++ b/src/serializer/hwpx/content.rs
+@@ -20,41 +20,303 @@
+     pub is_embedded: bool,
+ }
+ 
+-/// 원본 content.hpf 에서 `<opf:metadata> … </opf:metadata>` 블록(태그 포함)을
+-/// 그대로 추출한다.
+-///
+-/// metadata 는 본문(섹션/BinData)과 무관한 저작자·일자·주제 정보라, manifest/spine 을
+-/// IR 로 재생성하더라도 이 블록만은 원본을 보존해야 손실이 없다. self-closing
+-/// (`<opf:metadata/>`) 형태도 처리한다. 형태를 인식하지 못하면 `None` 을 돌려
+-/// 호출자가 하드코딩 기본값으로 폴백하도록 한다.
+-/// [#3557] 원본 content.hpf 에서 `Scripts/` 항목의 `<opf:item .../>` 태그 원문과
+-/// 그 id 목록을 추출한다 — 스크립트 파트는 IR 로 모델링되지 않으므로 매니페스트
+-/// 참조도 원문 그대로 보존해야 패키지가 정합한다(zip 통과는 mod.rs).
+-fn extract_script_items(original: &str) -> Vec<(String, String)> {
+-    let mut out = Vec::new();
+-    let mut rest = original;
+-    while let Some(start) = rest.find("<opf:item ") {
+-        let tail = &rest[start..];
+-        let Some(end) = tail.find("/>") else { break };
+-        let tag = &tail[..end + 2];
+-        if tag.contains("href=\"Scripts/") {
+-            let id = tag
+-                .split("id=\"")
+-                .nth(1)
+-                .and_then(|t| t.split('"').next())
+-                .unwrap_or("")
+-                .to_string();
+-            out.push((id, tag.to_string()));
++const PACKAGE_ATTRIBUTES: &[(&str, &str)] = &[
++    ("xmlns:ha", "http://www.hancom.co.kr/hwpml/2011/app"),
++    ("xmlns:hp", "http://www.hancom.co.kr/hwpml/2011/paragraph"),
++    ("xmlns:hp10", "http://www.hancom.co.kr/hwpml/2016/paragraph"),
++    ("xmlns:hs", "http://www.hancom.co.kr/hwpml/2011/section"),
++    ("xmlns:hc", "http://www.hancom.co.kr/hwpml/2011/core"),
++    ("xmlns:hh", "http://www.hancom.co.kr/hwpml/2011/head"),
++    ("xmlns:hhs", "http://www.hancom.co.kr/hwpml/2011/history"),
++    ("xmlns:hm", "http://www.hancom.co.kr/hwpml/2011/master-page"),
++    ("xmlns:hpf", "http://www.hancom.co.kr/schema/2011/hpf"),
++    ("xmlns:dc", "http://purl.org/dc/elements/1.1/"),
++    ("xmlns:opf", "http://www.idpf.org/2007/opf/"),
++    (
++        "xmlns:ooxmlchart",
++        "http://www.hancom.co.kr/hwpml/2016/ooxmlchart",
++    ),
++    (
++        "xmlns:hwpunitchar",
++        "http://www.hancom.co.kr/hwpml/2016/HwpUnitChar",
++    ),
++    ("xmlns:epub", "http://www.idpf.org/2007/ops"),
++    (
++        "xmlns:config",
++        "urn:oasis:names:tc:opendocument:xmlns:config:1.0",
++    ),
++    ("version", ""),
++    ("unique-identifier", ""),
++    ("id", ""),
++];
++
++const OPF_NAMESPACE: &str = "http://www.idpf.org/2007/opf/";
++
++/// Retain a source subtree together with its lexical namespace owner. The
++/// generated package uses canonical prefixes, but unknown metadata and Scripts
++/// may inherit aliases/default namespaces from the original package.
++#[derive(Debug)]
++struct PreservedPart {
++    xml: String,
++    attrs: std::collections::BTreeMap<String, String>,
++}
++
++fn original_parts(
++    original: &str,
++    parent: &str,
++    local: &str,
++) -> Result<Vec<PreservedPart>, SerializeError> {
++    use quick_xml::{
++        events::Event,
++        name::{PrefixDeclaration, ResolveResult},
++        reader::NsReader,
++    };
++    use std::collections::BTreeMap;
++    let error =
++        |message: String| SerializeError::XmlError(format!("content.hpf preservation: {message}"));
++    crate::parser::hwpx::raw_namespace::validate(original).map_err(error)?;
++    let mut reader = NsReader::from_str(original);
++    reader.resolver_mut().set_max_namespace_bindings(256);
++    let mut stack: Vec<(bool, String)> = Vec::new();
++    let mut parts = Vec::new();
++    // (start, opening-end, depth, namespace attributes, source attributes)
++    let mut active: Option<(usize, usize, usize, String, BTreeMap<String, String>)> = None;
++    loop {
++        let before = reader.buffer_position() as usize;
++        let event = reader.read_event().map_err(|e| error(e.to_string()))?;
++        let after = reader.buffer_position() as usize;
++        match event {
++            event @ (Event::Start(_) | Event::Empty(_)) => {
++                let empty = matches!(event, Event::Empty(_));
++                let e = match event {
++                    Event::Start(e) | Event::Empty(e) => e,
++                    _ => unreachable!(),
++                };
++                let qualified = e.name();
++                let (namespace, name) = reader.resolver().resolve_element(qualified);
++                let is_opf =
++                    matches!(namespace,ResolveResult::Bound(uri) if uri.as_ref()==OPF_NAMESPACE);
++                let expected_depth = if parent == "package" { 1 } else { 2 };
++                let capture = active.is_none()
++                    && stack.len() == expected_depth
++                    && stack
++                        .first()
++                        .is_some_and(|(opf, name)| *opf && name == "package")
++                    && is_opf
++                    && name.as_ref() == local
++                    && stack
++                        .last()
++                        .is_some_and(|(opf, name)| *opf && name == parent);
++                if capture {
++                    let mut attrs = BTreeMap::new();
++                    let mut declared = std::collections::BTreeSet::new();
++                    for attr in e.attributes() {
++                        let attr = attr.map_err(|e| error(e.to_string()))?;
++                        if let Some(prefix) = attr.key.as_namespace_binding() {
++                            declared.insert(match prefix {
++                                PrefixDeclaration::Default => "".to_string(),
++                                PrefixDeclaration::Named(p) => p.to_string(),
++                            });
++                        }
++                        let key = attr.key.as_ref().to_string();
++                        let value = attr
++                            .normalized_value(quick_xml::XmlVersion::Implicit1_0)
++                            .map_err(|e| error(e.to_string()))?
++                            .into_owned();
++                        attrs.insert(key, value);
++                    }
++                    let mut bindings = String::new();
++                    for (prefix, uri) in reader.resolver().bindings() {
++                        let prefix = match prefix {
++                            PrefixDeclaration::Default => "",
++                            PrefixDeclaration::Named(p) => p,
++                        };
++                        if declared.contains(prefix) || prefix == "xml" {
++                            continue;
++                        }
++                        let value = quick_xml::escape::unescape(uri.into_inner())
++                            .map_err(|e| error(e.to_string()))?;
++                        let key = if prefix.is_empty() {
++                            "xmlns".to_owned()
++                        } else {
++                            format!("xmlns:{prefix}")
++                        };
++                        if PACKAGE_ATTRIBUTES
++                            .iter()
++                            .any(|(k, v)| *k == key && *v == value)
++                        {
++                            continue;
++                        }
++                        bindings.push_str(&format!(
++                            " {key}=\"{}\"",
++                            quick_xml::escape::escape(value.as_ref())
++                        ));
++                    }
++                    if empty {
++                        let split = after - 2;
++                        parts.push(PreservedPart {
++                            xml: format!(
++                                "{}{}{}",
++                                &original[before..split],
++                                bindings,
++                                &original[split..after]
++                            ),
++                            attrs,
++                        });
++                    } else {
++                        active = Some((before, after, stack.len(), bindings, attrs));
++                    }
++                }
++                if !empty {
++                    stack.push((is_opf, name.as_ref().to_string()));
++                }
++            }
++            Event::End(_) => {
++                stack.pop();
++                if active.as_ref().is_some_and(|v| v.2 == stack.len()) {
++                    let (start, opening_end, _, bindings, attrs) = active.take().unwrap();
++                    let split = opening_end - 1;
++                    parts.push(PreservedPart {
++                        xml: format!(
++                            "{}{}{}",
++                            &original[start..split],
++                            bindings,
++                            &original[split..after]
++                        ),
++                        attrs,
++                    });
++                }
++            }
++            Event::Eof => break,
++            _ => {}
+         }
+-        rest = &tail[end + 2..];
+-    }
+-    out
+-}
+-
+-fn extract_metadata_block(original: &str) -> Option<&str> {
+-    let open = original.find("<opf:metadata>")?;
+-    let close = original[open..].find("</opf:metadata>")? + open + "</opf:metadata>".len();
+-    Some(&original[open..close])
++    }
++    Ok(parts)
++}
++
++fn extract_metadata_block(original: &str) -> Result<Option<String>, SerializeError> {
++    let mut parts = original_parts(original, "package", "metadata")?;
++    if parts.len() > 1 {
++        return Err(SerializeError::XmlError(
++            "Ambiguous duplicate OPF metadata".into(),
++        ));
++    }
++    Ok(parts.pop().map(|v| v.xml))
++}
++
++fn extract_script_items(original: &str) -> Result<Vec<(String, String)>, SerializeError> {
++    original_parts(original, "manifest", "item")?
++        .into_iter()
++        .filter(|p| {
++            p.attrs
++                .get("href")
++                .is_some_and(|v| v.starts_with("Scripts/"))
++        })
++        .map(|p| {
++            let id = p
++                .attrs
++                .get("id")
++                .filter(|id| !id.is_empty())
++                .cloned()
++                .ok_or_else(|| SerializeError::XmlError("Script manifest item has no id".into()))?;
++            Ok((id, p.xml))
++        })
++        .collect()
++}
++
++fn extract_script_refs(
++    original: &str,
++    items: &[(String, String)],
++) -> Result<Vec<String>, SerializeError> {
++    Ok(original_parts(original, "spine", "itemref")?
++        .into_iter()
++        .filter(|p| {
++            p.attrs
++                .get("idref")
++                .is_some_and(|id| items.iter().any(|(script, _)| id == script))
++        })
++        .map(|p| p.xml)
++        .collect())
++}
++
++/// Package attributes can carry the dc:identifier binding and vendor metadata.
++/// Preserve their expanded names; refuse an ambiguous prefix collision instead
++/// of rebinding generated OPF elements or silently dropping the attribute.
++fn package_attributes(original: Option<&str>) -> Result<Vec<(String, String)>, SerializeError> {
++    use quick_xml::{events::Event, name::ResolveResult, reader::NsReader};
++    let mut attrs: Vec<_> = PACKAGE_ATTRIBUTES
++        .iter()
++        .map(|(k, v)| (k.to_string(), v.to_string()))
++        .collect();
++    let Some(source) = original else {
++        return Ok(attrs);
++    };
++    crate::parser::hwpx::raw_namespace::validate(source).map_err(SerializeError::XmlError)?;
++    let mut reader = NsReader::from_str(source);
++    reader.resolver_mut().set_max_namespace_bindings(256);
++    loop {
++        match reader
++            .read_event()
++            .map_err(|e| SerializeError::XmlError(e.to_string()))?
++        {
++            Event::Start(e) | Event::Empty(e) => {
++                let qualified = e.name();
++                let (namespace, local) = reader.resolver().resolve_element(qualified);
++                if local.as_ref() != "package"
++                    || !matches!(namespace,ResolveResult::Bound(uri) if uri.as_ref()==OPF_NAMESPACE)
++                {
++                    return Err(SerializeError::XmlError(
++                        "Original OPF package namespace is unsupported".into(),
++                    ));
++                }
++                for attribute in e.attributes() {
++                    let attribute =
++                        attribute.map_err(|e| SerializeError::XmlError(e.to_string()))?;
++                    if attribute.key.as_namespace_binding().is_some() {
++                        continue;
++                    }
++                    let name = attribute.key.as_ref().to_string();
++                    let value = attribute
++                        .normalized_value(quick_xml::XmlVersion::Implicit1_0)
++                        .map_err(|e| SerializeError::XmlError(e.to_string()))?
++                        .into_owned();
++                    if let Some((prefix, _)) = name.split_once(':').filter(|(p, _)| *p != "xml") {
++                        let (namespace, _) = reader.resolver().resolve_attribute(attribute.key);
++                        let ResolveResult::Bound(uri) = namespace else {
++                            return Err(SerializeError::XmlError(
++                                "Unbound OPF package attribute".into(),
++                            ));
++                        };
++                        let uri = quick_xml::escape::unescape(uri.into_inner())
++                            .map_err(|e| SerializeError::XmlError(e.to_string()))?
++                            .into_owned();
++                        let declaration = format!("xmlns:{prefix}");
++                        if let Some((_, existing)) = attrs.iter().find(|(k, _)| k == &declaration) {
++                            if existing != &uri {
++                                return Err(SerializeError::XmlError(
++                                    "Conflicting OPF package attribute namespace".into(),
++                                ));
++                            }
++                        } else {
++                            attrs.push((declaration, uri));
++                        }
++                    }
++                    if let Some((_, existing)) = attrs.iter_mut().find(|(k, _)| k == &name) {
++                        *existing = value;
++                    } else {
++                        attrs.push((name, value));
++                    }
++                }
++                return Ok(attrs);
++            }
++            Event::Eof => {
++                return Err(SerializeError::XmlError(
++                    "Missing original OPF package".into(),
++                ))
++            }
++            _ => {}
++        }
++    }
+ }
+ 
+ /// content.hpf XML 생성
+@@ -67,7 +329,10 @@
+ ) -> Result<Vec<u8>, SerializeError> {
+     // 원본 metadata 블록(있으면) — 본문과 무관한 저작자/일자/주제 보존용.
+     let original_str = original_content_hpf.and_then(|b| std::str::from_utf8(b).ok());
+-    let original_metadata = original_str.and_then(extract_metadata_block);
++    let original_metadata = original_str
++        .map(extract_metadata_block)
++        .transpose()?
++        .flatten();
+ 
+     let buf = Cursor::new(Vec::new());
+     let mut w = Writer::new(buf);
+@@ -75,39 +340,12 @@
+     write_xml_decl(&mut w)?;
+ 
+     // 한컴 HWPX 2011/2016 네임스페이스 + 표준 스키마
+-    start_tag_attrs(
+-        &mut w,
+-        "opf:package",
+-        &[
+-            ("xmlns:ha", "http://www.hancom.co.kr/hwpml/2011/app"),
+-            ("xmlns:hp", "http://www.hancom.co.kr/hwpml/2011/paragraph"),
+-            ("xmlns:hp10", "http://www.hancom.co.kr/hwpml/2016/paragraph"),
+-            ("xmlns:hs", "http://www.hancom.co.kr/hwpml/2011/section"),
+-            ("xmlns:hc", "http://www.hancom.co.kr/hwpml/2011/core"),
+-            ("xmlns:hh", "http://www.hancom.co.kr/hwpml/2011/head"),
+-            ("xmlns:hhs", "http://www.hancom.co.kr/hwpml/2011/history"),
+-            ("xmlns:hm", "http://www.hancom.co.kr/hwpml/2011/master-page"),
+-            ("xmlns:hpf", "http://www.hancom.co.kr/schema/2011/hpf"),
+-            ("xmlns:dc", "http://purl.org/dc/elements/1.1/"),
+-            ("xmlns:opf", "http://www.idpf.org/2007/opf/"),
+-            (
+-                "xmlns:ooxmlchart",
+-                "http://www.hancom.co.kr/hwpml/2016/ooxmlchart",
+-            ),
+-            (
+-                "xmlns:hwpunitchar",
+-                "http://www.hancom.co.kr/hwpml/2016/HwpUnitChar",
+-            ),
+-            ("xmlns:epub", "http://www.idpf.org/2007/ops"),
+-            (
+-                "xmlns:config",
+-                "urn:oasis:names:tc:opendocument:xmlns:config:1.0",
+-            ),
+-            ("version", ""),
+-            ("unique-identifier", ""),
+-            ("id", ""),
+-        ],
+-    )?;
++    let package_attrs = package_attributes(original_str)?;
++    let package_attrs: Vec<_> = package_attrs
++        .iter()
++        .map(|(k, v)| (k.as_str(), v.as_str()))
++        .collect();
++    start_tag_attrs(&mut w, "opf:package", &package_attrs)?;
+ 
+     // <opf:metadata> — 원본 블록이 있으면 그대로 splice(저작자/일자/주제 보존),
+     // 없으면(HWP5 등) 하드코딩 기본값으로 폴백.
+@@ -210,8 +448,28 @@
+     )?;
+ 
+     // [#3557] Scripts/* 항목 — 원본 태그 원문 splice(id·media-type 보존).
+-    let script_items: Vec<(String, String)> =
+-        original_str.map(extract_script_items).unwrap_or_default();
++    let script_items: Vec<(String, String)> = original_str
++        .map(extract_script_items)
++        .transpose()?
++        .unwrap_or_default();
++    let mut owned_ids =
++        std::collections::BTreeSet::from(["header".to_string(), "settings".to_string()]);
++    for index in 0..section_hrefs.len() {
++        owned_ids.insert(format!("section{index}"));
++    }
++    for (_, id, _) in master_items {
++        owned_ids.insert(id.clone());
++    }
++    for entry in bin_data {
++        owned_ids.insert(entry.id.clone());
++    }
++    for (id, _) in &script_items {
++        if !owned_ids.insert(id.clone()) {
++            return Err(SerializeError::XmlError(
++                "Duplicate or conflicting script manifest id".into(),
++            ));
++        }
++    }
+     for (_, tag) in &script_items {
+         w.get_mut()
+             .write_all(tag.as_bytes())
+@@ -248,14 +506,13 @@
+             &[("idref", id.as_str()), ("linear", "yes")],
+         )?;
+     }
+-    // [#3557] Scripts spine 참조 — 한컴 원본은 스크립트 항목도 spine 에 나열한다.
+-    for (id, _) in &script_items {
+-        if !id.is_empty() {
+-            empty_tag(
+-                &mut w,
+-                "opf:itemref",
+-                &[("idref", id.as_str()), ("linear", "yes")],
+-            )?;
++    // Keep only references actually present in the source, including their
++    // linear/properties attributes and order. Do not invent linear=yes links.
++    if let Some(original) = original_str {
++        for raw in extract_script_refs(original, &script_items)? {
++            w.get_mut()
++                .write_all(raw.as_bytes())
++                .map_err(|e| SerializeError::XmlError(format!("script spine splice: {e}")))?;
+         }
+     }
+     end_tag(&mut w, "opf:spine")?;
+@@ -325,10 +582,164 @@
+     /// metadata 블록을 인식하지 못하면(깨진 입력) None → 폴백.
+     #[test]
+     fn extract_metadata_handles_missing() {
+-        assert_eq!(extract_metadata_block("<opf:package/>"), None);
+         assert_eq!(
+-            extract_metadata_block("<opf:metadata><opf:title/></opf:metadata>"),
+-            Some("<opf:metadata><opf:title/></opf:metadata>")
+-        );
+-    }
+-}
++            extract_metadata_block(&format!("<opf:package xmlns:opf=\"{OPF_NAMESPACE}\"/>"))
++                .unwrap(),
++            None
++        );
++        let original=format!("<opf:package xmlns:opf=\"{OPF_NAMESPACE}\"><opf:metadata><opf:title/></opf:metadata></opf:package>");
++        assert!(extract_metadata_block(&original)
++            .unwrap()
++            .unwrap()
++            .contains("<opf:title/>"));
++    }
++
++    fn preserved90(source: &str) -> String {
++        let bytes = write_content_hpf(
++            &["Contents/section0.xml".into()],
++            &[],
++            &[],
++            Some(source.as_bytes()),
++        )
++        .unwrap();
++        let result = String::from_utf8(bytes).unwrap();
++        crate::parser::hwpx::raw_namespace::validate(&result).unwrap();
++        result
++    }
++    #[test]
++    fn package_preservation90_metadata_attributes_and_payload() {
++        let payload="<!--keep--><opf:title>문서 &amp; 내용</opf:title><opf:meta name='vendor' content='text'><![CDATA[a<b>]]></opf:meta>";
++        let source=format!("<opf:package xmlns:opf='{OPF_NAMESPACE}'><opf:metadata xml:lang='ko' id='summary'>{payload}</opf:metadata></opf:package>");
++        let out = preserved90(&source);
++        assert!(out.contains(payload));
++        assert!(out.contains("xml:lang='ko' id='summary'"));
++        assert!(!out.contains(">rhwp<"));
++    }
++    #[test]
++    fn package_preservation90_empty_metadata_stays_empty() {
++        let source = format!(
++            "<opf:package xmlns:opf='{OPF_NAMESPACE}'><opf:metadata id='empty'/></opf:package>"
++        );
++        let out = preserved90(&source);
++        assert!(!out.contains(">rhwp<"));
++        assert!(out.contains("id='empty'"));
++        assert!(original_parts(&out, "package", "metadata").unwrap()[0]
++            .xml
++            .ends_with("/>"));
++    }
++    #[test]
++    fn package_preservation90_alias_and_inherited_extension_namespace() {
++        let payload =
++            "<p:title>alias</p:title><v:entry v:kind='kept'/><p:meta name='unknown'>kept</p:meta>";
++        let source=format!("<p:package xmlns:p='{OPF_NAMESPACE}' xmlns:v='urn:a&amp;b'><p:metadata>{payload}</p:metadata></p:package>");
++        let out = preserved90(&source);
++        assert!(out.contains(payload));
++        assert!(out.contains("xmlns:v=\"urn:a&amp;b\""));
++        assert!(!out.contains("&amp;amp;"));
++    }
++    #[test]
++    fn package_preservation90_default_namespace_and_local_shadowing() {
++        let payload = "<title>default</title><v:entry xmlns:v='urn:local' v:x='kept'/>";
++        let source=format!("<package xmlns='{OPF_NAMESPACE}' xmlns:v='urn:outer'><metadata>{payload}</metadata></package>");
++        let out = preserved90(&source);
++        assert!(out.contains(payload));
++        assert!(out.contains(&format!("xmlns=\"{OPF_NAMESPACE}\"")));
++    }
++    #[test]
++    fn package_preservation90_script_quotes_whitespace_and_paired_elements() {
++        let source=format!("<p:package xmlns:p='{OPF_NAMESPACE}' xmlns:v='urn:script'><p:metadata/><p:manifest><p:item\n id='script&amp;one' href='Scripts/run.js' media-type='text/javascript' v:flag='1'></p:item></p:manifest><p:spine><p:itemref idref='script&amp;one' linear='no' properties='scripted'/></p:spine></p:package>");
++        let out = preserved90(&source);
++        assert!(out.contains("href='Scripts/run.js'"));
++        assert!(out.contains("v:flag='1'"));
++        assert!(out.contains("idref='script&amp;one' linear='no' properties='scripted'"));
++        assert!(!out.contains("idref=\"script&amp;one\" linear=\"yes\""));
++    }
++    #[test]
++    fn package_preservation90_no_invented_script_spine_reference() {
++        let source=format!("<opf:package xmlns:opf='{OPF_NAMESPACE}'><opf:metadata/><opf:manifest><opf:item id='script' href='Scripts/a.js'/></opf:manifest><opf:spine/></opf:package>");
++        let out = preserved90(&source);
++        assert!(out.contains("href='Scripts/a.js'"));
++        assert!(!out.contains("idref=\"script\""));
++        assert!(!out.contains("idref='script'"));
++    }
++    #[test]
++    fn package_preservation90_foreign_metadata_cannot_replace_opf_metadata() {
++        let source=format!("<opf:package xmlns:opf='{OPF_NAMESPACE}' xmlns:v='urn:vendor'><v:metadata><v:title>decoy</v:title></v:metadata><opf:metadata><opf:title>real</opf:title></opf:metadata></opf:package>");
++        let out = preserved90(&source);
++        assert!(out.contains("<opf:title>real</opf:title>"));
++        assert!(!out.contains("decoy"));
++    }
++    #[test]
++    fn package_preservation90_duplicate_and_broken_source_refused() {
++        let duplicate = format!(
++            "<opf:package xmlns:opf='{OPF_NAMESPACE}'><opf:metadata/><opf:metadata/></opf:package>"
++        );
++        assert!(write_content_hpf(&[], &[], &[], Some(duplicate.as_bytes())).is_err());
++        for source in [
++            "<opf:package><opf:metadata/></opf:package>",
++            "<a>&missing;</a>",
++            "<a><b></a>",
++        ] {
++            assert!(write_content_hpf(&[], &[], &[], Some(source.as_bytes())).is_err());
++        }
++    }
++    #[test]
++    fn package_preservation90_repeated_roundtrip_does_not_accumulate_bindings() {
++        let mut current=format!("<p:package xmlns:p='{OPF_NAMESPACE}' xmlns:v='urn:vendor'><p:metadata><v:entry/></p:metadata></p:package>");
++        current = preserved90(&current);
++        let first = current.clone();
++        for _ in 0..5 {
++            current = preserved90(&current);
++            assert_eq!(current, first);
++        }
++    }
++
++    #[test]
++    fn package_preservation90_identifier_and_vendor_root_attributes() {
++        let source=format!("<p:package xmlns:p='{OPF_NAMESPACE}' xmlns:v='urn:vendor' version='3.0' unique-identifier='book-id' id='pkg' xml:lang='ko' v:review='a&amp;b'><p:metadata><p:identifier id='book-id'>real-id</p:identifier></p:metadata></p:package>");
++        let out = preserved90(&source);
++        assert!(out.contains("unique-identifier=\"book-id\""));
++        assert!(out.contains("version=\"3.0\""));
++        assert!(out.contains(" id=\"pkg\""));
++        assert!(out.contains("xml:lang=\"ko\""));
++        assert!(out.contains("xmlns:v=\"urn:vendor\""));
++        assert!(out.contains("v:review=\"a&amp;b\""));
++        assert!(out.contains("<p:identifier id='book-id'>real-id</p:identifier>"));
++    }
++    #[test]
++    fn package_preservation90_conflicting_root_attribute_namespace_refused() {
++        let source=format!("<p:package xmlns:p='{OPF_NAMESPACE}' xmlns:opf='urn:vendor' opf:custom='kept'><p:metadata/></p:package>");
++        assert!(write_content_hpf(&[], &[], &[], Some(source.as_bytes())).is_err());
++    }
++
++    #[test]
++    fn package_preservation90_nested_metadata_parts_are_not_package_references() {
++        let payload="<opf:manifest><opf:item id='decoy' href='Scripts/decoy.js'/></opf:manifest><opf:spine><opf:itemref idref='decoy'/></opf:spine><opf:package><opf:metadata id='nested'/></opf:package>";
++        let source=format!("<opf:package xmlns:opf='{OPF_NAMESPACE}'><opf:metadata>{payload}</opf:metadata><opf:manifest/><opf:spine/></opf:package>");
++        let out = preserved90(&source);
++        assert!(out.contains(payload));
++        assert!(extract_script_items(&out).unwrap().is_empty());
++        assert_eq!(
++            original_parts(&out, "package", "metadata").unwrap().len(),
++            1
++        );
++    }
++    #[test]
++    fn package_preservation90_duplicate_and_generated_script_ids_refused() {
++        for ids in [
++            ["duplicate", "duplicate"],
++            ["header", "other"],
++            ["settings", "other"],
++            ["section0", "other"],
++        ] {
++            let source=format!("<opf:package xmlns:opf='{OPF_NAMESPACE}'><opf:metadata/><opf:manifest><opf:item id='{}' href='Scripts/a.js'/><opf:item id='{}' href='Scripts/b.js'/></opf:manifest></opf:package>",ids[0],ids[1]);
++            assert!(write_content_hpf(
++                &["Contents/section0.xml".into()],
++                &[],
++                &[],
++                Some(source.as_bytes())
++            )
++            .is_err());
++        }
++    }
++}

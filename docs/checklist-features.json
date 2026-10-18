@@ -54,7 +54,7 @@
       "key": "files",
       "file": "05-files-storage-recovery.md",
       "title": "파일·저장·복구·형식 보존",
-      "description": "열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.\n\n**현재 구현89:** XML 원문/XSD/Undo·Redo 지속 복구와 업무·독립 창 격리, 최근 목록 크기 보호, 취소 후 Native 저장 경합을 수정했다. Agent의 승인된 활성 원본 저장을 HWP/HWPX에 연결했다. 단위970·같은 빌드 파일/복구149사례·Windows library32 통과. 사용자 요청으로 한글 직접 비교는 보류한다. 명시 글 방향 매핑·미수록 기호 fallback 및 HWT/XSL/일반XSD 등은 남아 있다. [구현·실행·정확한 남은 범위](../112-file-recovery-implementation.md).",
+      "description": "열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.\n\n**현재 구현91:** HWPX metadata·package 식별자·확장 namespace·Scripts 참조와 문서 정보 읽기/수정의 실제 소실·차단 결함을 수정했다. 같은 빌드163/163·단위970/970·독립ZIP14사례 통과. N001 음수 배치6개 저장 결함의 후속 후보를 검증 중이며 파트 전체 완료는 아니다. 한글 직접 비교는 보류한다. [변경·검증·남은 결함](../113-file-format-preservation.md).",
       "ids": "B001-B002 B005-B006 B009-B011 B014 B021-B022 G065-G073 G090 G092 N001-N002",
       "related": [
         "session",

@@ -1,6 +1,6 @@
 # Jueony — 공무원용 AI 문서 편집기
 
-[파일·저장·복구 최신 구현 현황](docs/112-file-recovery-implementation.md) — XML 지속 복구·저장 취소 경합·최근 목록 보호·Agent 기존 원본 저장. 단위970·파일/복구149사례. 한글 비교는 보류합니다.
+[파일·저장·복구 최신 구현 현황](docs/113-file-format-preservation.md) — HWPX 문서 정보·식별자·namespace·Script 참조 보존 수정. 단위970·파일/복구163사례. 남은 음수 표 배치 저장 결함을 수정 중이며 한글 직접 비교는 보류합니다.
 
 ## [전체 진행 현황 · 기능별 작업 문서 바로가기](docs/jueony-progress.md)
 

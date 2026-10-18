@@ -1,0 +1,122 @@
+diff --git a/src/serializer/hwpx/content.rs b/src/serializer/hwpx/content.rs
+--- a/src/serializer/hwpx/content.rs
++++ b/src/serializer/hwpx/content.rs
+@@ -61,6 +61,27 @@
+     attrs: std::collections::BTreeMap<String, String>,
+ }
+ 
++const PRESERVED_CONTEXT_BYTES: usize = 4 * 1024 * 1024;
++const PRESERVED_PARTS_BYTES: usize = 32 * 1024 * 1024;
++
++fn preserved_xml(
++    before: &str,
++    bindings: &str,
++    after: &str,
++    allocated: &mut usize,
++) -> Result<String, SerializeError> {
++    let size = before
++        .len()
++        .checked_add(bindings.len())
++        .and_then(|n| n.checked_add(after.len()))
++        .ok_or_else(|| SerializeError::XmlError("OPF fragment size overflow".into()))?;
++    *allocated = allocated
++        .checked_add(size)
++        .filter(|n| *n <= PRESERVED_PARTS_BYTES)
++        .ok_or_else(|| SerializeError::XmlError("OPF preserved fragments exceed 32 MiB".into()))?;
++    Ok(format!("{before}{bindings}{after}"))
++}
++
+ fn original_parts(
+     original: &str,
+     parent: &str,
+@@ -79,6 +100,7 @@
+     reader.resolver_mut().set_max_namespace_bindings(256);
+     let mut stack: Vec<(bool, String)> = Vec::new();
+     let mut parts = Vec::new();
++    let mut allocated = 0usize;
+     // (start, opening-end, depth, namespace attributes, source attributes)
+     let mut active: Option<(usize, usize, usize, String, BTreeMap<String, String>)> = None;
+     loop {
+@@ -147,20 +169,31 @@
+                         {
+                             continue;
+                         }
+-                        bindings.push_str(&format!(
+-                            " {key}=\"{}\"",
+-                            quick_xml::escape::escape(value.as_ref())
+-                        ));
++                        // Check before repeated scope expansion can amplify a
++                        // small original manifest into unbounded allocations.
++                        if value.len() > PRESERVED_CONTEXT_BYTES {
++                            return Err(error("OPF namespace context exceeds 4 MiB".into()));
++                        }
++                        let escaped = quick_xml::escape::escape(value.as_ref());
++                        let size = bindings
++                            .len()
++                            .checked_add(key.len())
++                            .and_then(|n| n.checked_add(escaped.len()))
++                            .and_then(|n| n.checked_add(4));
++                        if size.is_none_or(|n| n > PRESERVED_CONTEXT_BYTES) {
++                            return Err(error("OPF namespace context exceeds 4 MiB".into()));
++                        }
++                        bindings.push_str(&format!(" {key}=\"{escaped}\""));
+                     }
+                     if empty {
+                         let split = after - 2;
+                         parts.push(PreservedPart {
+-                            xml: format!(
+-                                "{}{}{}",
++                            xml: preserved_xml(
+                                 &original[before..split],
+-                                bindings,
+-                                &original[split..after]
+-                            ),
++                                &bindings,
++                                &original[split..after],
++                                &mut allocated,
++                            )?,
+                             attrs,
+                         });
+                     } else {
+@@ -177,12 +210,12 @@
+                     let (start, opening_end, _, bindings, attrs) = active.take().unwrap();
+                     let split = opening_end - 1;
+                     parts.push(PreservedPart {
+-                        xml: format!(
+-                            "{}{}{}",
++                        xml: preserved_xml(
+                             &original[start..split],
+-                            bindings,
+-                            &original[split..after]
+-                        ),
++                            &bindings,
++                            &original[split..after],
++                            &mut allocated,
++                        )?,
+                         attrs,
+                     });
+                 }
+@@ -742,4 +775,22 @@
+             .is_err());
+         }
+     }
+-}
++
++    #[test]
++    fn package_preservation90_repeated_namespace_scope_budget_is_bounded() {
++        let namespace = format!("urn:{}", "x".repeat(1024 * 1024));
++        let items = (0..33)
++            .map(|i| format!("<opf:item id='script{i}' href='Scripts/{i}.js'/>"))
++            .collect::<String>();
++        let source=format!("<opf:package xmlns:opf='{OPF_NAMESPACE}' xmlns:v='{namespace}'><opf:manifest>{items}</opf:manifest></opf:package>");
++        let error = original_parts(&source, "manifest", "item").unwrap_err();
++        assert!(matches!(error,SerializeError::XmlError(message) if message.contains("32 MiB")));
++    }
++    #[test]
++    fn package_preservation90_namespace_context_budget_precedes_expansion() {
++        let namespace = format!("urn:{}", "x".repeat(PRESERVED_CONTEXT_BYTES));
++        let source=format!("<opf:package xmlns:opf='{OPF_NAMESPACE}' xmlns:v='{namespace}'><opf:metadata/></opf:package>");
++        let error = extract_metadata_block(&source).unwrap_err();
++        assert!(matches!(error,SerializeError::XmlError(message) if message.contains("4 MiB")));
++    }
++}

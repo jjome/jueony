@@ -1,0 +1,15 @@
+{
+  "scope": "Production Xml parser/writer and Fields validation, unchanged production namespace validator compiled in a minimal isolated Rust harness. Serde derive-only traits and unrelated OLE/Core are outside harness; full actual WASM verification is separate.",
+  "passed": 13,
+  "skipped": 0,
+  "patch": "engine\\patches\\zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-metadata-namespace-read-write.patch",
+  "patchSha256": "7ece8bcc570b5c83994efcad39661fd57a327a49fa06cb756d022abca8bd58ee",
+  "xmlCodeSha256": "2c550d60c2ef098b252e0098fe8794714f1bb0f3ff8b9097ef80d2d526f64923",
+  "files": {
+    "before.rs": "e28f9cf2de3f4dccc81f4917dbdc71284a32d65505804a5b40a376610965b473",
+    "after.rs": "9a26ce0021f2ae6c0281cf158732d12ee7e984c53141e2b31cbc93f7c22591e4",
+    "harness\\src\\lib.rs": "2c8e8cd88a5fae03cebaa7d2c78810bea314d31406e5c155fdc86476443454b1",
+    "harness\\src\\raw_namespace.rs": "483936c4a38a6f818134f6a8d768dd4340430796f7768c8f4f96f41a542594c6",
+    "rust-tests-final.log": "bfe1a2a9b9c0e4e1d3bfda5071c90f559ea24e3e99d3daad3e0b1b2f108406b8"
+  }
+}

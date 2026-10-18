@@ -1,0 +1,428 @@
+diff --git a/src/document_core/document_metadata.rs b/src/document_core/document_metadata.rs
+--- a/src/document_core/document_metadata.rs
++++ b/src/document_core/document_metadata.rs
+@@ -3,7 +3,7 @@
+ use crate::model::document::Document;
+ use crate::parser::FileFormat;
+ use crate::{DocumentCore, HwpError};
+-use quick_xml::{events::Event, Reader};
++use quick_xml::events::Event;
+ use serde::{Deserialize, Serialize};
+ use std::collections::{BTreeMap, BTreeSet};
+ 
+@@ -320,12 +320,14 @@
+     end: usize,
+     inner: Option<(usize, usize)>,
+     value: String,
++    name: String,
+ }
+ struct Xml {
+     source: String,
+     fields: Vec<XmlField>,
+     close: usize,
+     empty: Option<(usize, usize)>,
++    metadata_name: String,
+ }
+ fn decode(value: &str) -> Result<String, String> {
+     quick_xml::escape::unescape(value)
+@@ -337,75 +339,79 @@
+ }
+ impl Xml {
+     fn parse(data: &[u8]) -> Result<Self, String> {
++        use quick_xml::{name::ResolveResult, reader::NsReader};
+         if data.len() > LIMIT {
+             return Err(fail());
+         }
+         let source = std::str::from_utf8(data).map_err(|_| fail())?.to_owned();
+-        let mut reader = Reader::from_str(&source);
+-        let mut buf = Vec::new();
+-        let mut depth: usize = 0;
++        crate::parser::hwpx::raw_namespace::validate(&source).map_err(|_| fail())?;
++        let mut reader = NsReader::from_str(&source);
++        reader.resolver_mut().set_max_namespace_bindings(256);
++        let mut depth = 0usize;
+         let mut root_seen = false;
+         let mut metadata = None;
++        let mut metadata_name = None;
+         let mut inside = false;
+         let mut empty_metadata = None;
+         let mut close = None;
+-        let mut namespace = false;
+         let mut fields = Vec::new();
+-        let mut active: Option<(usize, usize, usize, String)> = None;
++        let mut active: Option<(usize, usize, usize, String, String)> = None;
+         let mut seen = BTreeSet::new();
+         loop {
+             let before = reader.buffer_position() as usize;
+-            let event = reader.read_event_into(&mut buf).map_err(|_| fail())?;
++            let event = reader.read_event().map_err(|_| fail())?;
+             let after = reader.buffer_position() as usize;
+             match event {
+-                Event::Start(ref e) | Event::Empty(ref e) => {
+-                    let tag = e.name().as_ref().to_owned();
++                event @ (Event::Start(_) | Event::Empty(_)) => {
+                     let empty = matches!(event, Event::Empty(_));
++                    let e = match event {
++                        Event::Start(e) | Event::Empty(e) => e,
++                        _ => unreachable!(),
++                    };
+                     if active.is_some() {
+                         return Err(fail());
+                     }
+-                    let mut attrs = BTreeMap::new();
+-                    for a in e.attributes() {
+-                        let a = a.map_err(|_| fail())?;
+-                        if attrs
+-                            .insert(a.key.as_ref().to_owned(), decode(a.value.as_ref())?)
+-                            .is_some()
+-                        {
++                    let qualified = e.name();
++                    let (namespace, local) = reader.resolver().resolve_element(qualified);
++                    let is_opf = matches!(namespace,ResolveResult::Bound(uri) if uri.as_ref()==OPF);
++                    let tag = qualified.as_ref().to_owned();
++                    let local = local.as_ref();
++                    let mut attrs: BTreeMap<String, String> = BTreeMap::new();
++                    for attr in e.attributes() {
++                        let attr = attr.map_err(|_| fail())?;
++                        let value = attr
++                            .normalized_value(quick_xml::XmlVersion::Implicit1_0)
++                            .map_err(|_| fail())?
++                            .into_owned();
++                        if attrs.insert(attr.key.as_ref().to_owned(), value).is_some() {
+                             return Err(fail());
+                         }
+                     }
+                     if depth == 0 {
+-                        if tag != "opf:package" || root_seen {
++                        if root_seen || !is_opf || local != "package" {
+                             return Err(fail());
+                         }
+                         root_seen = true;
+-                        namespace = attrs.get("xmlns:opf").is_some_and(|v| v == OPF);
+-                    }
+-                    if tag == "opf:metadata" {
+-                        if depth != 1
+-                            || !namespace
+-                            || metadata.is_some()
+-                            || attrs.keys().any(|k| k.starts_with("xmlns"))
+-                        {
++                    }
++                    if depth == 1 && is_opf && local == "metadata" {
++                        if metadata.is_some() {
+                             return Err(fail());
+                         }
+                         metadata = Some(depth);
++                        metadata_name = Some(tag.clone());
+                         inside = !empty;
+                         if empty {
+                             empty_metadata = Some((before, after));
+                             close = Some(before);
+                         }
+-                    } else if inside && metadata.is_some_and(|d| depth == d + 1) {
+-                        if attrs.keys().any(|k| k.starts_with("xmlns")) {
++                    } else if inside && depth == 2 && is_opf {
++                        if local == "meta" && attrs.get("name").is_some_and(|n| n == "keywords") {
+                             return Err(fail());
+                         }
+-                        if tag == "opf:meta" && attrs.get("name").is_some_and(|n| n == "keywords") {
+-                            return Err(fail());
+-                        }
+-                        let index = if tag == "opf:title" {
++                        let index = if local == "title" {
+                             Some(0)
+-                        } else if tag == "opf:meta" {
+-                            attrs.get("name").and_then(|n| match n.as_str() {
++                        } else if local == "meta" {
++                            attrs.get("name").and_then(|name| match name.as_str() {
+                                 "subject" => Some(1),
+                                 "creator" => Some(2),
+                                 "keyword" => Some(3),
+@@ -429,9 +435,10 @@
+                                     end: after,
+                                     inner: None,
+                                     value: String::new(),
++                                    name: tag,
+                                 });
+                             } else {
+-                                active = Some((index, before, after, String::new()));
++                                active = Some((index, before, after, String::new(), tag));
+                             }
+                         }
+                     }
+@@ -439,36 +446,37 @@
+                         depth += 1;
+                     }
+                 }
+-                Event::End(ref e) => {
++                Event::End(_) => {
+                     depth = depth.checked_sub(1).ok_or_else(fail)?;
+-                    if let Some((index, start, inner_start, value)) = active.take() {
++                    if let Some((index, start, inner_start, value, name)) = active.take() {
+                         fields.push(XmlField {
+                             index,
+                             start,
+                             end: after,
+                             inner: Some((inner_start, before)),
+                             value,
++                            name,
+                         });
+                     }
+-                    if e.name().as_ref() == "opf:metadata" {
++                    if inside && depth == 1 {
+                         inside = false;
+                         if close.replace(before).is_some() {
+                             return Err(fail());
+                         }
+                     }
+                 }
+-                Event::Text(ref e) => {
+-                    if let Some((_, _, _, value)) = active.as_mut() {
++                Event::Text(e) => {
++                    if let Some((_, _, _, value, _)) = active.as_mut() {
+                         value.push_str(&decode(e.as_ref())?);
+                     }
+                 }
+-                Event::GeneralRef(ref e) => {
+-                    if let Some((_, _, _, value)) = active.as_mut() {
++                Event::GeneralRef(e) => {
++                    if let Some((_, _, _, value, _)) = active.as_mut() {
+                         value.push_str(&decode(&format!("&{};", e.as_ref()))?);
+                     }
+                 }
+-                Event::CData(ref e) => {
+-                    if let Some((_, _, _, value)) = active.as_mut() {
++                Event::CData(e) => {
++                    if let Some((_, _, _, value, _)) = active.as_mut() {
+                         value.push_str(e.as_ref());
+                     }
+                 }
+@@ -481,7 +489,6 @@
+                 Event::Eof => break,
+                 _ => {}
+             }
+-            buf.clear();
+         }
+         if depth != 0 || active.is_some() || metadata.is_none() {
+             return Err(fail());
+@@ -491,6 +498,7 @@
+             fields,
+             close: close.ok_or_else(fail)?,
+             empty: empty_metadata,
++            metadata_name: metadata_name.ok_or_else(fail)?,
+         };
+         result.values()?.validate()?;
+         Ok(result)
+@@ -501,20 +509,31 @@
+             values[f.index] = f.value.clone();
+         }
+         Ok(Fields::from(values))
++    }
++    fn xml_value(&self, index: usize, value: &str) -> String {
++        let prefix = self
++            .metadata_name
++            .strip_suffix("metadata")
++            .expect("validated OPF metadata QName");
++        xml_value_with_prefix(index, value, prefix)
+     }
+     fn write(&self, values: &Fields) -> Result<Vec<u8>, String> {
+         if let Some((a, b)) = self.empty {
+             let original = &self.source[a..b];
+             let end = original.rfind("/>").ok_or_else(fail)?;
+             let replacement = format!(
+-                "{}>{}</opf:metadata>",
++                "{}>{}</{}>",
+                 &original[..end],
+                 (0..5)
+-                    .map(|i| xml_value(i, values.values()[i]))
+-                    .collect::<String>()
++                    .map(|i| self.xml_value(i, values.values()[i]))
++                    .collect::<String>(),
++                self.metadata_name
+             );
+             let mut out = self.source.clone();
+             out.replace_range(a..b, &replacement);
++            if out.len() > LIMIT {
++                return Err(fail());
++            }
+             return Ok(out.into_bytes());
+         }
+         let mut edits = Vec::new();
+@@ -530,22 +549,17 @@
+             } else {
+                 let original = &self.source[f.start..f.end];
+                 let end = original.rfind("/>").ok_or_else(fail)?;
+-                let name = if f.index == 0 {
+-                    "opf:title"
+-                } else {
+-                    "opf:meta"
+-                };
+                 edits.push((
+                     f.start,
+                     f.end,
+-                    format!("{}>{}</{}>", &original[..end], escaped(value), name),
++                    format!("{}>{}</{}>", &original[..end], escaped(value), f.name),
+                 ));
+             }
+         }
+         let mut added = String::new();
+         for i in 0..5 {
+             if !present.contains(&i) {
+-                added.push_str(&xml_value(i, values.values()[i]));
++                added.push_str(&self.xml_value(i, values.values()[i]));
+             }
+         }
+         if !added.is_empty() {
+@@ -563,11 +577,14 @@
+     }
+ }
+ fn xml_value(i: usize, value: &str) -> String {
++    xml_value_with_prefix(i, value, "opf:")
++}
++fn xml_value_with_prefix(i: usize, value: &str, prefix: &str) -> String {
+     if i == 0 {
+-        format!("<opf:title>{}</opf:title>", escaped(value))
++        format!("<{prefix}title>{}</{prefix}title>", escaped(value))
+     } else {
+         format!(
+-            "<opf:meta name=\"{}\" content=\"text\">{}</opf:meta>",
++            "<{prefix}meta name=\"{}\" content=\"text\">{}</{prefix}meta>",
+             XML_NAMES[i],
+             escaped(value)
+         )
+@@ -721,3 +738,136 @@
+     }
+     read(doc).ok().map(|v| new_xml(&v))
+ }
++
++#[cfg(test)]
++mod namespace_preservation90_tests {
++    use super::*;
++    fn values(title: &str) -> Fields {
++        Fields {
++            title: title.into(),
++            ..Fields::default()
++        }
++    }
++    fn check(source: &str, title: &str) -> Xml {
++        let xml = Xml::parse(source.as_bytes()).unwrap();
++        assert_eq!(xml.values().unwrap().title, title);
++        xml
++    }
++    fn rewrite(source: &str, title: &str) -> String {
++        let xml = Xml::parse(source.as_bytes()).unwrap();
++        let result = String::from_utf8(xml.write(&values(title)).unwrap()).unwrap();
++        crate::parser::hwpx::raw_namespace::validate(&result).unwrap();
++        check(&result, title);
++        result
++    }
++    #[test]
++    fn metadata_namespace90_attributes_and_unknown_payload_keep_raw_spans() {
++        let opaque = "<!--keep--><v:opaque v:x='a&amp;b'><![CDATA[raw<xml>]]></v:opaque>";
++        let source=format!("<opf:package xmlns:opf='{OPF}' xmlns:v='urn:vendor'><opf:metadata xml:lang='ko' id='summary' xmlns:x='urn:other'>{opaque}<opf:title>before</opf:title></opf:metadata></opf:package>");
++        let out = rewrite(&source, "after & 변경");
++        assert!(out.contains(opaque));
++        assert!(out.contains("xml:lang='ko' id='summary' xmlns:x='urn:other'"));
++    }
++    #[test]
++    fn metadata_namespace90_alias_fields_and_empty_field_closing_qname() {
++        let source=format!("<p:package xmlns:p='{OPF}'><p:metadata><p:title id='t'/><p:meta name='subject' content='text'>kept</p:meta></p:metadata></p:package>");
++        let xml = check(&source, "");
++        let mut fields = xml.values().unwrap();
++        fields.title = "new".into();
++        let out = String::from_utf8(xml.write(&fields).unwrap()).unwrap();
++        check(&out, "new");
++        assert!(out.contains("<p:title id='t'>new</p:title>"));
++        assert!(out.contains("<p:meta name='subject' content='text'>kept</p:meta>"));
++        assert!(!out.contains("opf:"));
++    }
++    #[test]
++    fn metadata_namespace90_default_namespace_fields_and_inserted_values() {
++        let source =
++            format!("<package xmlns='{OPF}'><metadata><title>default</title></metadata></package>");
++        let out = rewrite(&source, "new");
++        assert!(out.contains("<title>new</title>"));
++        assert!(out.contains("<meta name=\"creator\""));
++        assert!(!out.contains("opf:"));
++    }
++    #[test]
++    fn metadata_namespace90_empty_alias_metadata_expands_same_qname() {
++        let source = format!(
++            "<p:package xmlns:p='{OPF}'><p:metadata id='empty' xmlns:v='urn:v'/></p:package>"
++        );
++        let out = rewrite(&source, "new");
++        assert!(out.contains("<p:metadata id='empty' xmlns:v='urn:v'>"));
++        assert!(out.contains("</p:metadata>"));
++        assert!(!out.contains("opf:"));
++    }
++    #[test]
++    fn metadata_namespace90_empty_default_metadata_expands_same_qname() {
++        let source = format!("<package xmlns='{OPF}'><metadata id='empty'/></package>");
++        let out = rewrite(&source, "new");
++        assert!(out.contains("<metadata id='empty'>"));
++        assert!(out.contains("</metadata>"));
++        assert!(!out.contains("opf:"));
++    }
++    #[test]
++    fn metadata_namespace90_field_local_alias_preserves_declaration_and_qname() {
++        let source=format!("<opf:package xmlns:opf='{OPF}'><opf:metadata><a:title xmlns:a='{OPF}' id='t'/></opf:metadata></opf:package>");
++        let out = rewrite(&source, "new");
++        assert!(out.contains(&format!("<a:title xmlns:a='{OPF}' id='t'>new</a:title>")));
++    }
++    #[test]
++    fn metadata_namespace90_foreign_same_lexical_prefix_is_not_a_field() {
++        let unknown="<opf:title xmlns:opf='urn:foreign'>foreign</opf:title><v:meta name='creator'>vendor</v:meta>";
++        let source=format!("<opf:package xmlns:opf='{OPF}' xmlns:v='urn:foreign'><opf:metadata>{unknown}</opf:metadata></opf:package>");
++        let xml = check(&source, "");
++        assert_eq!(xml.values().unwrap().author, "");
++        let out = rewrite(&source, "new");
++        assert!(out.contains(unknown));
++    }
++    #[test]
++    fn metadata_namespace90_nested_known_tags_are_not_direct_metadata_fields() {
++        let unknown="<v:opaque><opf:title>nested</opf:title><opf:meta name='creator'>nested author</opf:meta><opf:metadata/></v:opaque>";
++        let source=format!("<opf:package xmlns:opf='{OPF}' xmlns:v='urn:foreign'><opf:metadata>{unknown}<opf:title>real</opf:title></opf:metadata></opf:package>");
++        let out = rewrite(&source, "new");
++        assert!(out.contains(unknown));
++    }
++    #[test]
++    fn metadata_namespace90_duplicate_expanded_fields_are_refused() {
++        let source=format!("<opf:package xmlns:opf='{OPF}' xmlns:p='{OPF}'><opf:metadata><opf:title/><p:title/></opf:metadata></opf:package>");
++        assert!(Xml::parse(source.as_bytes()).is_err());
++    }
++    #[test]
++    fn metadata_namespace90_mixed_markup_comments_pi_inside_known_field_refused() {
++        for payload in ["a<opf:title/>b", "a<!--keep-->b", "a<?keep x?>b"] {
++            let source=format!("<opf:package xmlns:opf='{OPF}'><opf:metadata><opf:title>{payload}</opf:title></opf:metadata></opf:package>");
++            assert!(Xml::parse(source.as_bytes()).is_err());
++        }
++    }
++    #[test]
++    fn metadata_namespace90_entities_and_cdata_unchanged_value_keep_original_bytes() {
++        let raw = "<p:title>A&amp;B<![CDATA[<C>]]>&#x1F600;</p:title>";
++        let source =
++            format!("<p:package xmlns:p='{OPF}'><p:metadata>{raw}</p:metadata></p:package>");
++        let xml = check(&source, "A&B<C>😀");
++        let mut values = xml.values().unwrap();
++        values.author = "author".into();
++        let out = String::from_utf8(xml.write(&values).unwrap()).unwrap();
++        assert!(out.contains(raw));
++        check(&out, "A&B<C>😀");
++    }
++    #[test]
++    fn metadata_namespace90_wrong_root_or_missing_bound_metadata_refused() {
++        for source in ["<opf:package xmlns:opf='urn:foreign'><opf:metadata/></opf:package>","<package><metadata/></package>","<p:package xmlns:p='http://www.idpf.org/2007/opf/'><p:metadata xmlns:p='urn:foreign'/></p:package>"] {assert!(Xml::parse(source.as_bytes()).is_err());}
++    }
++    #[test]
++    fn metadata_namespace90_empty_metadata_expansion_respects_total_limit() {
++        let wrapper =
++            format!("<opf:package xmlns:opf='{OPF}'><!-- --><opf:metadata/></opf:package>");
++        let source = wrapper.replacen(
++            "<!-- -->",
++            &format!("<!--{}-->", "x".repeat(LIMIT - wrapper.len())),
++            1,
++        );
++        assert!(source.len() < LIMIT);
++        let xml = Xml::parse(source.as_bytes()).unwrap();
++        assert!(xml.write(&values("new")).is_err());
++    }
++}

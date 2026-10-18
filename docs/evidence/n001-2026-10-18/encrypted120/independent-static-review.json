@@ -1,0 +1,80 @@
+{
+  "kind": "independent read-only encrypted-row120 static review",
+  "baseOfficial": "704c7d510eb58bc2",
+  "sourceEdited": false,
+  "compileOrActualTestsExecutedByReviewer": false,
+  "actionableFindings": [],
+  "patchSha256": "54462473ff865ee5ba1159101bf723fd8a08eb8d3bbf1e67f33042df93b263a7",
+  "files": [
+    {
+      "path": "src/parser/mod.rs",
+      "baseRawSha256": "af9b8b9555da8a9c16cb0825929f5ffaaa77f5d441584c33d0672601f23db91b",
+      "candidateRawSha256": "db0702c6e2d0ad98dd0348b7bc1249b4ee05cb7e1a8714b6893c448f54e71825",
+      "canonicalSha256": "67fb930cefd2122584c8adb283a9fa2f49ba22dd13595f136892441408e9c39a"
+    },
+    {
+      "path": "src/parser/native_computed_rows.rs",
+      "baseRawSha256": "f319bb32bc47249eb8d032943a975cbb19aefac228c0e1a4e1c9f24db67abc40",
+      "candidateRawSha256": "88805a99b547b964671e56e31a58631a3e34a421e40a5cad366b3a927a66fc8f",
+      "canonicalSha256": "341a9621a62d363e5984e52c6f01e587653986770a2a70db1c3873b0cbc56032"
+    },
+    {
+      "path": "src/serializer/cfb_writer.rs",
+      "baseRawSha256": "523dd6234ef5945eaff26eaa32c0d2ce16331e9d4af0f45e981bbcbcfafcf1e6",
+      "candidateRawSha256": "5d21b64a4d6cd5009eb006510e448ec3b8def8a85aad9d0eff1ebaacc21cb743",
+      "canonicalSha256": "080e4161038068986bb799b5b4aa9e6728becc8eb4a3d36045f34583f68b142c"
+    },
+    {
+      "path": "src/serializer/native_computed_rows.rs",
+      "baseRawSha256": "e73eb338984b24aa81f4d00f9d5f7300436c4d7b51cfa4019d20aaa145a4fa85",
+      "candidateRawSha256": "c375008926eb636086df9b9fa6e503698df7df067b03c0696cd7bf31d4518c32",
+      "canonicalSha256": "4e1761b7141fb887addd8fd0eaaa5f7f21dea78ffed72c7ec137f494c0643561"
+    },
+    {
+      "path": "src/model/native_computed_resource.rs",
+      "baseRawSha256": "ab086f6e75f250fa41589e84c74dc71a2598f368785623cedce2785bfc024d10",
+      "candidateRawSha256": "7057f6f40b5ea65b37b531b7693122f9ca96cef834e64f9b0e5c01eadfc397a5",
+      "canonicalSha256": "462577a8067908aac512c6a06174cb0172fa7ce447598bde207d11c4e90fdd7b"
+    }
+  ],
+  "resource": {
+    "count": 243,
+    "all237Retained": true,
+    "addedExactlySix": true,
+    "independentlyRecomputedSha256": "f941ef2be64175b9299e4dad80ddaa24640a2a61db2e0d4019a7f960021cfb5f",
+    "constantAndAuthorProofMatch": true
+  },
+  "verifiedBoundaries": [
+    "Strict FileHeader supported EncryptVersion validation and missing-password rejection precede primary DocInfo/body bounded decryption and parse; private restore is called only after those succeeded.",
+    "Exact canonical reserved stream + exactly one casefold/storage-child conflict gate preserved. Raw ciphertext <=2MiB before temporary decrypt. Cipher transform preserves byte length; no generic decompression introduced.",
+    "Temporary decode retains original raw ciphertext untouched on unknown/stale/wrong resource/plan/binding/invalid JSON. extra stream consumed only after unchanged all-or-none typed decoder returns true.",
+    "Header and uncompressed DocInfo length+SHA binding, actual emitted section SHA, exact row/text/style/charshape emit checks remain unchanged; no old-resource allowlist or new lease issuance added.",
+    "Only newly generated encode_representation output from export_authorized owners is encrypted with requested password. Any reserved raw collision records loss and cannot be overwritten or re-encrypted.",
+    "CFB generic extra-stream writer encrypts Scripts/BinData only, so private descriptor receives exactly one encryption; unknown reserved ciphertext remains exact opaque across password changes.",
+    "Distribution/HWP3 exclusions remain; encrypted eligibility removal is paired with actual parser password gate, current typed binding and writer ownership checks.",
+    "All-or-none native decoder, shared package model/resource comparison, source row semantics, guard and epsilon are byte-identical to base."
+  ],
+  "authorEvidenceReadOnly": {
+    "nativeOwnFailOld": "build/encrypted-rows120/baseline119-own-final-failure.log",
+    "nativeOwnPassNew": "build/encrypted-rows120/candidate-own-result.log",
+    "nativeSafety3AndStamped4": "build/encrypted-rows120/native-matrix-first.log",
+    "stampedSuccessfulDiskExports": 20,
+    "blocked": 0,
+    "complexCycles": "build/encrypted-rows120/native-complex-cycles-first.log",
+    "complexDiskReopens": 12,
+    "complexHistorySnapshotExports": 4,
+    "internalResourceUnit": "build/encrypted-rows120/native-resource-final.log",
+    "actualWasmBaseline": "build/encrypted-rows120/baseline119-wasm/result.json",
+    "actualWasmBaselinePass": 0,
+    "actualWasmBaselineFail": 7,
+    "candidateWasm": "NOT YET RUN",
+    "privateVerifier": "build/encrypted-rows120/verify-wasm120.mjs",
+    "privateVerifierSha256": "adc2a312f8983474782af1245e8c9a42885d53c4c25927f464074659ac37c09f",
+    "ownFixtureSha256": "51bdce72eab69916db500b3f8213f997083a879bcc4e63723b78ae1f365fc5e8"
+  },
+  "limits": [
+    "Author Native20/stamped,12complex+4history,7tamper/safety and resource result are recorded author evidence, not reviewer reruns.",
+    "Candidate actual WASM final official proof remains root responsibility; old119 actual0/7 failing baseline is preserved.",
+    "No generic unknown stream encryption support or whole-file-part completion claimed."
+  ]
+}

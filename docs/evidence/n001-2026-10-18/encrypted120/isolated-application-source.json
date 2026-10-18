@@ -1,0 +1,2778 @@
+{
+  "applicationSourceCommit": "8509733e93525d9d154345063b557035490f66b4",
+  "sourceRoot": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\n001-clean-review120",
+  "archiveSha256": "1e30a43df5d52b8f14a68bb6315e3a54eaefbf62cb3164d7ab8b50908d947c15",
+  "engineAdditionalPatch": "engine/patches/zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-encrypted-owned-native-row-storage.patch",
+  "engineAdditionalPatchSha256": "db687106d3584c20a2e41d02d7bccc0cf0dac78e9d0ecb3df9e630b9e926a551",
+  "applicationChanges": [],
+  "excludedUncommittedFeatures": [
+    "stored-time save lifecycle",
+    "Agent recent documents"
+  ],
+  "files": [
+    {
+      "path": "apps/editor/src/adapters/browser/calendar-format-preference.ts",
+      "sha256": "3040ae4602d32ee91bc194bf42e97211abeaa230d44f0c2153ae2463df5a9f18"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/calendar-stamp-dialog.ts",
+      "sha256": "2419a50a7ebebd22b6feabf12ed370e094c4384d5c6a831fcfecc7f949e4d2d3"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/content-hash.ts",
+      "sha256": "8f5487ee6173a3c057469ddd479d02c56990912b24b58d294c71e941b7119507"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/context-menu-keyboard.ts",
+      "sha256": "84ed345d43e43e72b541fe752e29ae50d98bcb0d9d4f60aeba03adda6c3c25aa"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/document-history-context.ts",
+      "sha256": "89a6710c01649fdaf9fa74759752a3d7885c7b0b7e9cb560f415b6b50b53a0dd"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/document-insertion-dialog.ts",
+      "sha256": "03c234eb650a753a9081b51e2ba106ae9cbc28cc0e0811c0755804d5099da5c2"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/document-tab-cycle.ts",
+      "sha256": "7ce473d9d32eebd52f49e046a6108de1ec42fa2fbf86263bbc927ff9110b74fe"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/modal-keyboard.ts",
+      "sha256": "121a40386b6a2dcfb9b081c21b53e11ffcf53d0cb5f51c79e04ff090b6cc74da"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/paragraph-sort-dialog.ts",
+      "sha256": "217d5033069048cc1de751aaa75c45cee063c9b19ba796be1b7bd3464d10ef87"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/plain-text-dialog.ts",
+      "sha256": "88fa3aa63e89b9c6e7c48e0c3d65218c26fe2342a44f1e7c32d3440854607001"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/preferences-binding.ts",
+      "sha256": "12748b5e0cbd61046153935a455f3c8df3c681187611709fe730414da8ac55f6"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/recovery-settings.ts",
+      "sha256": "446299f6df6686ac3bd9745887fdb8e8d61354449599af7d28378bf6b33e4079"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/settings-backup-dialog.ts",
+      "sha256": "ccf6558dceff125c12f5375dd69e91ebae1cf59ab8aa0e63247c676e8bce18bc"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/snippet-dialog.ts",
+      "sha256": "e8a49e99ac4be95feafde7cac54b26e129673db5fbeb17406c21abdb5f6cc7be"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/style-package-dialog.ts",
+      "sha256": "9df07140d8f76c69e94a5a5b3ec2a18a908283c1b0baea6b631d3fefd053158d"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/table-auto-fill-dialog.ts",
+      "sha256": "a61ea40e830e6503bc07cba37dd6eaddf6219b8ee0294051c9f81b2d9925a791"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/table-conversion-dialog.ts",
+      "sha256": "d1bf50ba1f4c16bda53ab3b84a04cbd5c8e456d3245d4a81c0438e3484999c34"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/table-header-dialog.ts",
+      "sha256": "da3769c1ccf2dba0420362c1edebf429d197ad336e82e8d9cffb62ca92fa8d57"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/table-presets-dialog.ts",
+      "sha256": "fa27508c6160a81dfaa91a97883d4839ebd196110ee47d41883f2882f1b0be03"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/text-transform-dialog.ts",
+      "sha256": "15eecd7b49e05828dca69e537a212babb8482f174427ce0365df6fa0d8b2b491"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/work-template-dialog.ts",
+      "sha256": "c316026458dfe792cff48586d70da537a3c073c9676361bd9e76302de559cc4b"
+    },
+    {
+      "path": "apps/editor/src/adapters/browser/xml-workspace.ts",
+      "sha256": "ef81cbd479e02bc9a6b795e1ca5c49fda9c908c28418fe36f777cf5f10e2f451"
+    },
+    {
+      "path": "apps/editor/src/adapters/desktop/agent-files.ts",
+      "sha256": "3d6d44a19320c6e466395f50bf81d5c816574aa3966a8da661f79a1e052ed6ee"
+    },
+    {
+      "path": "apps/editor/src/adapters/desktop/document-lifecycle.ts",
+      "sha256": "eb9e33b88d8cee6ca35dd3b3bb4357acad93db7e00fc43d2aa16815e2d92eae3"
+    },
+    {
+      "path": "apps/editor/src/adapters/desktop/document-windows.ts",
+      "sha256": "df78a6cfb813c78ae71413a26b74475ae52baddb8b69dd0d6509d1633074844e"
+    },
+    {
+      "path": "apps/editor/src/adapters/desktop/exit-save-frame.ts",
+      "sha256": "d38b04d7462bd9ea860ee0a2c06f64adc67a52bf16263f74075dd1167eb72024"
+    },
+    {
+      "path": "apps/editor/src/adapters/desktop/native-host.ts",
+      "sha256": "2e37e25c1d0667574f9b2d79f187688e4e0129d74df19bf29f3b14ff892f5bf8"
+    },
+    {
+      "path": "apps/editor/src/adapters/desktop/native-recents.ts",
+      "sha256": "b206ee228d01db639b18b8d12399d7e6cec2b1f5f97a6aaa40aa9eeda220c16d"
+    },
+    {
+      "path": "apps/editor/src/adapters/files/bound-save.ts",
+      "sha256": "fd07dfe553fafb1abf8dd3219057bf4f3ce2210eb60c9402b003a500af4da434"
+    },
+    {
+      "path": "apps/editor/src/adapters/files/download-connection.ts",
+      "sha256": "16909ed3a040c0033915a8ef318196660eccc941725472f3d1820dee21fb1247"
+    },
+    {
+      "path": "apps/editor/src/adapters/files/download-save.ts",
+      "sha256": "3e3364cbf08c52c9b0319a46c7487c8facb6e79b4bde24c0ddcbb4daf796cd39"
+    },
+    {
+      "path": "apps/editor/src/adapters/files/file-connection.ts",
+      "sha256": "482cab713bd43f7e5a64ddb43f7eef4a9d8d29e91fc26fb9c9139f6b011a7bc3"
+    },
+    {
+      "path": "apps/editor/src/adapters/files/fingerprints.ts",
+      "sha256": "418ee6f07116291fd66a158f7dcb84b7f278d67ec16b338983b2eb1e8fa02ad4"
+    },
+    {
+      "path": "apps/editor/src/adapters/files/hwt-copy-picker.ts",
+      "sha256": "b563cb248e7ee99d75ef213a055a7f61fabb49abd7bde95ff0b1afe209453cbb"
+    },
+    {
+      "path": "apps/editor/src/adapters/files/hwt-leaf-save.ts",
+      "sha256": "26fb20b0d525a55a00c1479caf781e6f709e0346b2f048a6f54b72862bcfd479"
+    },
+    {
+      "path": "apps/editor/src/adapters/files/recovery-export.ts",
+      "sha256": "35b5d77975bfcb33d94fdfbfb5a2bd6d487a02526a44a25feb8bc81fca7de300"
+    },
+    {
+      "path": "apps/editor/src/adapters/files/references.ts",
+      "sha256": "2a23c1cf0f130560dd5e11d7f42b0b5200cdd2c2b523aeaea16471e15b3367d7"
+    },
+    {
+      "path": "apps/editor/src/adapters/files/save-runtime.ts",
+      "sha256": "548aa2fde172334a823240f8497e81fe0898e9a1057e672fb6fe339f2eb01129"
+    },
+    {
+      "path": "apps/editor/src/adapters/files/saved-format.ts",
+      "sha256": "80f10812219fdc02c0b7b50c7eb51caf8acb7ae817abe0fe003ebf4ed7c14c51"
+    },
+    {
+      "path": "apps/editor/src/adapters/files/temporary-references.ts",
+      "sha256": "0f4f92984b0991f051fc8c19ef1d54ab55dd2471e2458de93a7f71a534c2b212"
+    },
+    {
+      "path": "apps/editor/src/adapters/http/local-model-gateway.ts",
+      "sha256": "a925f419396ff4805bfb38cba9b245a7ff71789676e7e480bf041c2792085ed0"
+    },
+    {
+      "path": "apps/editor/src/adapters/iframe/document-client.ts",
+      "sha256": "925e8ebf0f2ab7eaef46c73b0bc241d47108663817d3ddc6bfb654b8af926738"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-basic-bullet.ts",
+      "sha256": "84dc999e4c85e3bc93c8e72fbc455a978bdb9196aa4cd0b59bda8034f1563358"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-basic-numbering.ts",
+      "sha256": "8f26e13248453b386d6a8fd5d6095590def65f2bbb5dc9557b5bf3a6f59c2579"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-bookmarks.ts",
+      "sha256": "902abf2dbfea1931c0e45ce4f8cd015e21257910661cfcd72a9b205e6e9ef6cf"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-document-information.ts",
+      "sha256": "d0b9c455728571a9016c5d80b6e9090f19b87bd3e95dbf100979e09c8ff4762f"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-empty-section.ts",
+      "sha256": "f9c89d50e79b6b8f3bcea80033c53f432c304411468716c397b2235e72f592aa"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-header-footer-create.ts",
+      "sha256": "b1558b01f2fac12c1b56557edd54e6d1b8d8b0eb280323ddb295f80e51354349"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-header-footer-delete.ts",
+      "sha256": "036d46408496688d737185a38c9db5fa3e67a87d441b6dd51b9d652f6adb41f3"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-header-footer-structure.ts",
+      "sha256": "2af36e1d0aa5f46f8c9109d1b68992bc3fcad768ee8c021495e013af71ae0e56"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-header-footer.ts",
+      "sha256": "ea837fa5ab0047deed32b00fe9d5d5ecf7c958fc02e4a26c2a08deaabcd1b4d7"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-master-pages.ts",
+      "sha256": "d12fd4a8a53a52d36721f76077f7349233c2f3435a29aa4bfde8509e4a6b262d"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-numbering-clone.ts",
+      "sha256": "6286092a6d6540b5acff54d070fec617cf807bc09ef6c7c5894a4509ad38a3d8"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-page-background.ts",
+      "sha256": "df47103282aaceeb7dca6beafa7b2b4710d7e51e50834a0360b2638c3865078e"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-paragraph-decoration.ts",
+      "sha256": "dd43e3398e35f01c1f7be9f84baf871111c22b24453977f5c8b83be07367f0fc"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-paragraph-list.ts",
+      "sha256": "4399b8afa47a12aa3dddba9a69421d5b28cc755be75994c58a936efe738a93f6"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-paragraph-outline.ts",
+      "sha256": "bae8c9113815ec187cd64dd578e015e204fb529ab47b18d8c47f6f0993979a92"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-paragraph-tabs.ts",
+      "sha256": "460907de59ea3a222dd4c8883ccf7bf9e680f1a556fd5749f53704bf0c903c48"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-section-merge.ts",
+      "sha256": "d459bbf5e3390956a46cc0a7133b8332535b700fc5f94f365e4a53ebfda5e105"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-section-settings.ts",
+      "sha256": "41303750943e9195f20822e7dfecc74122260dfad25405ff8ba6f8bc7be0e0b4"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-section-split.ts",
+      "sha256": "9b8209c5d9488a9b486cd7d678075c091d2fd949e9f4a8005402e1801b79cf76"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-style-create.ts",
+      "sha256": "f44aa5d45aa73ab60a2dc44fa1448f490dc15f02eaef9e0b8e81d5dee6e46749"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-style-next.ts",
+      "sha256": "0bca8032bf991b3e9e03cc85cbaff598a31dfb0e3a0341fe425eac50d941fb1e"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-style-rename.ts",
+      "sha256": "62e899a879080faa168648e14119e6d8cf0e24ac65c593bd875ace529d0ac8a7"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-style-source.ts",
+      "sha256": "3ada07486a6dc407fee25129dce143bb39032d656e0e284806e5fcb3f9210a18"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-table-header.ts",
+      "sha256": "01bdbc07e349007141711681da60bf7358e135e9d254ea0dffb998d49aa524c5"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-table-pagination.ts",
+      "sha256": "bf5a742eefd053b467b471eb3d1b19812a0c51692c470cd8404e1a4032dac539"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/basic-text-commands.ts",
+      "sha256": "9bffc27d302db2ff37ab23a23fc889186155ff50d33ceba213152856d8183921"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/body-caret.ts",
+      "sha256": "045ee5694dc2fa2ba8fdaa699b45e8d29fbbfa12a239da4f85d742c26d356d83"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/body-operations.ts",
+      "sha256": "af9d1850034ff6c2905ef3265aa08c4f2e34175eb10b6c4045f8c38ec6efc360"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/body-preservation.ts",
+      "sha256": "a87954e44a0f6b1b41e990c352849de009516665bf46c6613bcb7f19d2c1985d"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/calendar-stamp.ts",
+      "sha256": "9d96f2e0373148a4e06a46e0499442c84b8775aace8129a97f0df8bcab068f94"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/cell-padding.ts",
+      "sha256": "fa4295fdd15ed3c714ec6082a5f0c8879f76d0c0a914a3b91c006718b5df1a13"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/cell-paragraph.ts",
+      "sha256": "f1e7ad99cb62593eba55add0476e424a2b6bad55a337fec170b3c47c2e07877e"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/dialog-property-delta.ts",
+      "sha256": "613b438fe7a96f6fe777df853a9b540abbd6ed2ddbad7d4cea0a294bffe65d61"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-created-information111.ts",
+      "sha256": "3ffee9430c98899be91d86e15e1d96f93c33bf9405fb92631197156b1839bdfe"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-defaults.ts",
+      "sha256": "da82edee5e183cad4d648eceef381b1cfdc0ef4fd618dc182253cdcf6892345f"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-info.ts",
+      "sha256": "f111c636557b802bfb0c050a678bfb6bb66d0cf6ab925648c08f84dc9118442a"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-insertion.ts",
+      "sha256": "44ddceb904294460b4409a3dc2b23d80f566e437b3276a2a736080923cb91b07"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-metadata.ts",
+      "sha256": "dd0263a8fd500b02c2bff1be11ee3a7d9f552ae01ae9f7cb316965a630e41ea0"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-save-layout.ts",
+      "sha256": "8489a3bef9ac0facd6bcfdfcdd52e93be8457a14d4d96006445fe435e7e266de"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-stored-information.ts",
+      "sha256": "56426901e3ba25297f1673182977531e6b3951cf3348d9bac6920f82e93eeb08"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-story-information.ts",
+      "sha256": "83a51f9c387aab38ce055bfc9eaf7cc0a549e85347ac5c889dee94c5d5bc59ad"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/edit-preflight.ts",
+      "sha256": "31f8479855e1e816de37535f270eb619c8887edb6e951fe283cc53639c10e7e1"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "sha256": "1cc222f8666c3713d49fb9ac5892d4753b4ce4fcfbeb0f72d4baf4ac7bb72575"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/empty-section-removal.ts",
+      "sha256": "69e3c43569c594c126592849a9708d41410ac7cb563074786d2584348428ce80"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/equal-columns.ts",
+      "sha256": "db58c2ace0bf39244590cc63db6059a699121555deae125ea664e7e20d0f1685"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/execute.ts",
+      "sha256": "2604150500f3d3630b24c3e91c8331e466b4b1c35a5a905bca62ec131481cb5e"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/formatting-toolbar.ts",
+      "sha256": "a2665166e32c47049d573e9d68a67d5fe5222f43cf2cfee2eee4dbd89c78d10e"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/hanging-indent.ts",
+      "sha256": "018ffa4a6b44f90eb073d9e2809787b96330de51e044b3f148804377a4c135fb"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/line-numbers.ts",
+      "sha256": "dde07a3de1be533f41bb4ebbd14b43eaf0fec6e0e290c0c603babec6c209a54a"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/manual-commands.ts",
+      "sha256": "b14e94ac5347d15c7556e1e8fbe6ea6173f1f00bf448d8bd4bf77414ad9eaaff"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/master-pages.ts",
+      "sha256": "46debc0b8ab786fbd9bb9475d1ee73ada92a9ec36bf8a15e3e381e97e00452f2"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/navigation-history.ts",
+      "sha256": "11cc8a01a4e9511c908afd36d58395c6d6acc8b7f9c6b334590a587b2d7576f3"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/operations.ts",
+      "sha256": "c3e5da5a7ffbe68f38c29aa60df4b66e544fcaf288922b4d9e3f0c99bf2b490b"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/overlap-save-layout.ts",
+      "sha256": "1a7a78d41a690705b6333d258ab92faa12a4cb4d90c019dc3aa55b56443cc681"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/page-background-image.ts",
+      "sha256": "80037626a8fc446790456c322abb662217b380e1c07505f47a461cd0f7c8e850"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/page-body-clipboard.ts",
+      "sha256": "0b58ed4c820c5e13ec6e53fb10cc657df870fa3e9926f3a190ac5710867dbbe9"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/page-body-deletion.ts",
+      "sha256": "21721beb0fb0b13e6ae1f9e4fa6a5ec2cb019f30f98c49aaf3cb0ed31bf22881"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/page-border-settings.ts",
+      "sha256": "6e6d6cb7b389a4a9c01cec9c1c2b10b8f2c8dfa45fa34bbcb65f5a7241c2d32d"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/page-controls.ts",
+      "sha256": "b9c4268453ec8ceaf5a99c55d7ff8b52850c4c77cea32855d50c8df1838a8ef9"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/page-setup-settings.ts",
+      "sha256": "227bf950271ba0ac7290311738dbb5f31a424af6199338fc2fb3e7b36bda3747"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/paragraph-sort-native.ts",
+      "sha256": "29b93a9a789051c4505b9e72f83df86b4ae0e45cfdf03652a3b1b8b88d30003b"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/paragraph-sort.ts",
+      "sha256": "4a089a0ed39eefff4eb5323a29aafe9003bcc5b6e55c7a0d759ac4b3bd7601b1"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/paragraph-spacing.ts",
+      "sha256": "ac4e7fc886ae58e5501cf537fe0cf21df1c4abc7c8a2dd1d8162d85200f06481"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/plain-text-native.ts",
+      "sha256": "b43ef6d3514834d2d9c7edd945967b7dafd87ee7ff735876badc3d75b0b148ac"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "sha256": "752e8fa32843b271a60524a1fb0e638a8e003be787640593f89622a2184469bc"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/row-heights.ts",
+      "sha256": "e60dd9cd485b0fb07da7520bc45e977695cc8b51a6a3a9998c17b0a789242b73"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/save-table-frames.ts",
+      "sha256": "70dbde730afad28c7d76347f1ae65171d51394edb7df909492868ebaf2e404dc"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/section-boundary.ts",
+      "sha256": "ced63be20e8b66b9d64f77df97004eda23aecbf5a3763a8da9a769228080ffa2"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/selected-object-properties.ts",
+      "sha256": "d5850e0aacb2607a96ca8419bc44b55ec9f9999e92684b2827b77f50307df003"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/session-cursor.ts",
+      "sha256": "4b6d2696d857ef383158c9cdd58c3e15fad06ac4a8bf4627affba648aee3ab96"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/session-story.ts",
+      "sha256": "70279b16e54a05b7e2e8504883616c9065aa70de2c33fa7f0b6f178fa5fae446"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/session-textbox.ts",
+      "sha256": "ce10de9adb453d590e6d6f7eb3f24bcce239407081c982647b0179c8ad6005dd"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/snippets.ts",
+      "sha256": "d7d2436fab1134bc21e7151206373d7734e2c7b560280dac6d171c58a6c9ed64"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/structure.ts",
+      "sha256": "5c6ec2d14000587c85e719e709f531a5a32fa64f9be18e80bfbf569fc219cb96"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/style-flow.ts",
+      "sha256": "8e0583ba0658ccd1087471c564ebde4101aa5d757a8a59eb2336bcbf3e4010ec"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/style-management.ts",
+      "sha256": "8bfeae2713e5579318d05c7caf109504253c9482dfb17db828f9acfed14c06ac"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/style-package-native.ts",
+      "sha256": "26ef4c0ff62b88ebf731678f69e63388993ee7956f16839114a5e6e347753d1a"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/style-package.ts",
+      "sha256": "4172379c19b8ddcd7b9be93e9409af33464d02efc4cef96deba0fff8a1f04f31"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-auto-fill-native.ts",
+      "sha256": "40e443859755d050f38a111bce06da20a5abdfa945c1625d74f58d51ef01b27c"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-auto-fill.ts",
+      "sha256": "d15a2faa6cc51c2c0cf2c67c0589bd22103d98c3f6d147fef3ac9b37785846c3"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-conversion-native.ts",
+      "sha256": "3db144b483ccc18243cd8e1004925cbe10c6c4353ca884e9c29a098ee881a670"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-conversion.ts",
+      "sha256": "247eadc2f91722624eaf0085f6ce20e95991210492750f1ca53dd5d7623ef401"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-header.ts",
+      "sha256": "b392b565cb02cd711dd5810b1b1ca0bf478ccab07d441d7fc4fbefbe267f6119"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-layout-evidence.ts",
+      "sha256": "d421985b2b7f04ff980d0a302e8b5328f6c68d19ca66a68bb5ad739b3bfdbe35"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-merge.ts",
+      "sha256": "d88c4727b1784ec074cf8f972badd30ef0e7588b1e98fe4595ffea2cd731441d"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-presets-native.ts",
+      "sha256": "211cda8e9f8b07ce2a9a3e68d2e8125b4872a0bc597cbd23e5f5e3a6943a5380"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-presets.ts",
+      "sha256": "916e77e3bec49100c798e32fa03e0bf51a1d0a801bc702b81f1111b25ba86fff"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-split.ts",
+      "sha256": "5bc7d7e3385d04e4a91eb71ceb5e44565ca9369e392eb16939d524e63cb03be4"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-structure.ts",
+      "sha256": "0bcd58895508b338475d88ff70c12d326253bb17773eb8232902bba7145a1e80"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-subdivision.ts",
+      "sha256": "23a7d06ae859a0fb22674a94495c6a9ba82fee98c4bf0b8ef10f78a69e872dbc"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-topology-evidence.ts",
+      "sha256": "d0543ae0855343f7f6b9862449889e79026849cd80d8b3eb645e0f7c1be3ae8a"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/table-write-guard.ts",
+      "sha256": "149f8e20eae8e236541d026addefb84f4b481b8997f160d231084d4051114e71"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/text-transform-native.ts",
+      "sha256": "1daf8178da27e53d3633e4f158129c3a88d38e76fa7ab1f6eee109e62649c611"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/transpose-table.ts",
+      "sha256": "cba706e4b33ebc477a087a038eec22e2b8ee1962d1ff4eff4eca88a1b7ce2a30"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/work-templates-native.ts",
+      "sha256": "7bed4fee92156e24d0297c06397d32c912369d564bb91782204b8e931b687dc8"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/work-templates.ts",
+      "sha256": "b31b4e0047e85355a8b75c2e4c535cbb65d715880411d18b5cac442e22691483"
+    },
+    {
+      "path": "apps/editor/src/adapters/storage/document-history.ts",
+      "sha256": "db347c0dd433534e7949c9ea14fdf8449e20878fee0c99f39e593360626ed2a4"
+    },
+    {
+      "path": "apps/editor/src/adapters/storage/hwt-leaf-records.ts",
+      "sha256": "1e3a6854bec09b703e6fc3c1a0a335155c2fec765dce33e1f89205762df5c722"
+    },
+    {
+      "path": "apps/editor/src/adapters/storage/hwt-leaf-recovery.ts",
+      "sha256": "a3b28ef011f032b5449839dcec918ffc4f5ff9556ad7c632eb33c1234faa2ef5"
+    },
+    {
+      "path": "apps/editor/src/adapters/storage/indexeddb-workspace.ts",
+      "sha256": "d30b831213efd4a68a4bc9384ded54c4d2d580b2481effa0a7344cd32335200b"
+    },
+    {
+      "path": "apps/editor/src/adapters/storage/legacy-records.ts",
+      "sha256": "b78c62164daf236218cc4825b40a2030b6d7a2eab9cf6da74ef23851316d0a1e"
+    },
+    {
+      "path": "apps/editor/src/adapters/storage/legacy-state-validator.ts",
+      "sha256": "2198df97973ee49e9b90827d5bc6a15f08ab7be471aeaa2826d621d5a2547b74"
+    },
+    {
+      "path": "apps/editor/src/adapters/storage/recovery-integrity.ts",
+      "sha256": "43589d5eaf568aaecc14351da45c89ee8f359726d9e93dcc01cc7044fe9d4c2e"
+    },
+    {
+      "path": "apps/editor/src/adapters/storage/serialized-writer.ts",
+      "sha256": "65f0f0030a70d086169c841de74e19547d4dbf5ea37a5da2c8da9580c12c2756"
+    },
+    {
+      "path": "apps/editor/src/adapters/storage/xml-recovery.ts",
+      "sha256": "85de93271f91694cf03b2207fce790313269e78e8c6db2ca09b90e9451310bbe"
+    },
+    {
+      "path": "apps/editor/src/adapters/xml/browser-parser.ts",
+      "sha256": "2d599806332bd767f1926ac068045268d63d3169b48dfa2cbed6a326effcd9ce"
+    },
+    {
+      "path": "apps/editor/src/adapters/xml/hwt-leaf.ts",
+      "sha256": "0fce84dda28188fd00dfa1f5129d67945a62ba5f4e62ba445a78626409001567"
+    },
+    {
+      "path": "apps/editor/src/adapters/xml/hwt-template95.ts",
+      "sha256": "266437ba5768dc76228b930a20f8986ee3b9be463c37a8e7e36c710974ac1fbc"
+    },
+    {
+      "path": "apps/editor/src/agent/run-bounded.ts",
+      "sha256": "aa6a50b11980432260c93a11138556532cea04cdd9cab0c9aae6129bff520ddc"
+    },
+    {
+      "path": "apps/editor/src/boot.js",
+      "sha256": "4225f3e09426bcaecb7a10e978a1d48f9f7a15eb77597fcc922a971fae7f4da3"
+    },
+    {
+      "path": "apps/editor/src/chrome-2024.ts",
+      "sha256": "c6354ca896f37e18801dbd1c9c16eaf86bb31bec48a0489b8a8b773c2194f372"
+    },
+    {
+      "path": "apps/editor/src/composition/agent.ts",
+      "sha256": "0c8354ce5b0d5f1fa83010863e1cfb9872b6297c190f3477ff075272b3219ccb"
+    },
+    {
+      "path": "apps/editor/src/composition/references.ts",
+      "sha256": "21d15df472aae6c72893d17d9d2a2deb6ae27cd9b0432b450a5a216f0ea7107b"
+    },
+    {
+      "path": "apps/editor/src/composition/workbench.ts",
+      "sha256": "f015efba67fb654bef9b0c474c008185ab9a8c16419f74e7599471e9990c2492"
+    },
+    {
+      "path": "apps/editor/src/desktop-host.ts",
+      "sha256": "57c5d282c7c4aaaa005c34a86428ac7d983c9e3fe0a74cf8d9547b006edeaee7"
+    },
+    {
+      "path": "apps/editor/src/document-control/describe.ts",
+      "sha256": "5a9ccf5690be6fe6f85c61d8332c6ac9ecaf474bff90db8a0b5ef2da03ec80e0"
+    },
+    {
+      "path": "apps/editor/src/document-control/execute.ts",
+      "sha256": "0ad5a2e897331ce7af096a66749853e7b8d34624b12201b00716ff403732a1ef"
+    },
+    {
+      "path": "apps/editor/src/document-control/operations.ts",
+      "sha256": "284482411bd47ae0512449ff584d590497eb21255a4d1fecc8b74a452a5f2022"
+    },
+    {
+      "path": "apps/editor/src/document-control/structure.ts",
+      "sha256": "caad752c50a1e599d32d240f864a1ee48e927df5ee066fad5ce719faddae5611"
+    },
+    {
+      "path": "apps/editor/src/download-save.ts",
+      "sha256": "58e4a307470cff5f9f61be644f108c48405567d5d4411d96ebb2e6a123f755ce"
+    },
+    {
+      "path": "apps/editor/src/editor-actions/equal-cells.ts",
+      "sha256": "1e0a9af2d25fb72a21a4d6c7caeccf1f4202ee2d1bfc3b75ecebbb0b240ddc30"
+    },
+    {
+      "path": "apps/editor/src/editor-actions/navigation-pane.ts",
+      "sha256": "76ae1dd069170cc42bb44b0fe4ed88d07772d966d487d7d660b9566ea5fe6e7a"
+    },
+    {
+      "path": "apps/editor/src/editor-actions/search-model.ts",
+      "sha256": "dc9e1ccf6b9a41f60cafa72aea2869f090750cb1fdb8256f67b217d5c8e6bed2"
+    },
+    {
+      "path": "apps/editor/src/editor.css",
+      "sha256": "f3f9c07064a2e1723678d09dc743b81c5fd083930178bab05869cf5f58e00f47"
+    },
+    {
+      "path": "apps/editor/src/file-connection.ts",
+      "sha256": "02533131b1e708bd1ffb73e7fe106f81e76844d633a2a507ce4f1564aeeaabd8"
+    },
+    {
+      "path": "apps/editor/src/icons.ts",
+      "sha256": "ed27c1098443411de1a804cdb21fd976f0f8191e9155ed037710279411260d1d"
+    },
+    {
+      "path": "apps/editor/src/macros/commands.ts",
+      "sha256": "153ed9de543b86492dd884f37fbd736d9608dbc44399b34ccc5d782ae5273173"
+    },
+    {
+      "path": "apps/editor/src/modules/agent/application/context.ts",
+      "sha256": "0fc25c934f07e4ae9933969d2463c22c16b092492dbf04739bc92558256c1e73"
+    },
+    {
+      "path": "apps/editor/src/modules/agent/application/facade.ts",
+      "sha256": "b287fe056e4e475b7300c6a439a04837addcacbf7d7a0008df89a224b08e7d8e"
+    },
+    {
+      "path": "apps/editor/src/modules/agent/application/failure-result.ts",
+      "sha256": "9d8430081708591c1d3929433a35348527c0a627a0ca85402e649b9327993854"
+    },
+    {
+      "path": "apps/editor/src/modules/agent/application/run-bounded.ts",
+      "sha256": "0cec366e907d755add9b11462e29265e1bfaed8f201b724d7d5f6fa264271f8c"
+    },
+    {
+      "path": "apps/editor/src/modules/agent/application/run-once.ts",
+      "sha256": "0fde2a485c6db7a316946ae8a1ae541996c6247944b2addbc4361b78a6780faf"
+    },
+    {
+      "path": "apps/editor/src/modules/agent/domain/generation.ts",
+      "sha256": "bd6d0885417579ac224e4a5cefe724ea4e770a2ba68af15b62f1f163f6ece6a3"
+    },
+    {
+      "path": "apps/editor/src/modules/agent/public/contracts.ts",
+      "sha256": "e65c88b83d8862c515464d31f863e7961b10a748409812f26294b8c6049f719a"
+    },
+    {
+      "path": "apps/editor/src/modules/agent/public/index.ts",
+      "sha256": "a4fceabd72fae5d82f636b0553695e0661b60f24c57ac32c46885aa81b6e960b"
+    },
+    {
+      "path": "apps/editor/src/modules/automation/application/describe-template.ts",
+      "sha256": "18fdde2ee352209d76b6dfd8ea0fcb9b48a34878234af020c134b4ac2361faee"
+    },
+    {
+      "path": "apps/editor/src/modules/automation/application/facade.ts",
+      "sha256": "faf0cda1981a258628a7b8fc96c1db6b8866d2957e6bdd6bb00504b4c34950da"
+    },
+    {
+      "path": "apps/editor/src/modules/automation/domain/commands.ts",
+      "sha256": "2be8be9af7e3a042ca121fa877b7c5ecdb47cc5b09f212d953770b548f75e5ac"
+    },
+    {
+      "path": "apps/editor/src/modules/automation/public/contracts.ts",
+      "sha256": "7e27cdaee54488b7d9129686503cf8eea64a1fc647e170e66618e45d8375e75d"
+    },
+    {
+      "path": "apps/editor/src/modules/automation/public/index.ts",
+      "sha256": "2337e0bee1fdf2a65da0db94ccc2aa132cd59473d74211e7896a4295cab30931"
+    },
+    {
+      "path": "apps/editor/src/modules/connections/public/index.ts",
+      "sha256": "0c50078767d15c6ffa252fb6900b4928739ab0d0ae7fa33c67725ea268b1b340"
+    },
+    {
+      "path": "apps/editor/src/modules/document/application/describe-structure.ts",
+      "sha256": "1e219aab5af188dcfd685feb23aa08e38bc1973ae542782ba919bfcada045df2"
+    },
+    {
+      "path": "apps/editor/src/modules/document/application/facades.ts",
+      "sha256": "57bdcd0a6174a8d0da3cad36969b6e77efa12564d9e727aa299f5d57899c01f4"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-basic-bullet.ts",
+      "sha256": "bf2a3c0306a113804562b2f9634e7bf28effca125e494d998f857d634761431c"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-basic-numbering.ts",
+      "sha256": "900d7863ef0255bec9e8513891110106af5ad74426da297e2b800c61ffaedc83"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-bookmarks.ts",
+      "sha256": "3d820362e3b159dc9cbf4154fbc60a2e3ea0cf7583732d6f1978f07225f52dcc"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-document-information.ts",
+      "sha256": "6521c9e1997ee582274e0e225311be94e796003833c064e6a70293ea923e57ca"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-empty-section.ts",
+      "sha256": "ee8c8b7fba8c255a8837f746563132b217732a8d2d65f141f9fcb00bc9f55476"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-file-operations.ts",
+      "sha256": "02d6673d1839a1000d9f1b75875591ee8280ff5e6a6ca28161795a3f7b43c6a0"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-header-footer.ts",
+      "sha256": "440f99ec4213297baf840c50dad8ee897a35dfd5cc9d00f90d4bd1994e4cf52d"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-master-pages.ts",
+      "sha256": "9bc6cd98d95c7cf3965c2f3aa4ca984aad76334dcef3482ba50ca610196a3739"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-numbering-clone.ts",
+      "sha256": "7fc9bc83832c28fce98612c9629339e2ae8860291fc8452b51c06b0236ddb370"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-paragraph-decoration.ts",
+      "sha256": "7bd1914eda02543bb61946ab30f32c5a3fea0eb15f450fff7e6c47c35657f31a"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-paragraph-list.ts",
+      "sha256": "4b65162085cb1b273fa619a0469b3eedc4af8e07e315396f8d26024ae5d8c66b"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-paragraph-outline.ts",
+      "sha256": "1b468803f006c9a26b880aefaaab490740abb9e6fd55a421b023ed3f9557f85a"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-paragraph-tabs.ts",
+      "sha256": "b21b3a31216dad042b08504c8b048a8655ca5b3e5e4e519b6049bb0d1094cdea"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-section-merge.ts",
+      "sha256": "3e85d97b95b7ab3c0142e752e0b9aaa9d8c053b2f5624eaa4ef58c3950e28da5"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-section-settings.ts",
+      "sha256": "631e2095c14d3e7ee626f10a848a70ad033e0e99b0c3199095421170ae02a676"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-section-split.ts",
+      "sha256": "e1925f2279da22f3273876dde33f280b78fd443a7b4ba0c4f4754249e4d353dc"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-style-create.ts",
+      "sha256": "0281448fb5dc6bae859f0cb49eb72f8545d56bdcb9191bef22dd17d85563f18f"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-style-name.ts",
+      "sha256": "3e818729b7d52195d57585d352cdc1a57dbfa388369fe6caade818db5ef0eb73"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-style-next.ts",
+      "sha256": "8d03822a8fe809f14147fac7e4b35bd3d1ed859336bb921107a51174b2172f7d"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-style-rename.ts",
+      "sha256": "3cbca5c5b404c111ce72fb5d093f1304623b64558738d9286c0c73dbd6e3c080"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-table-header.ts",
+      "sha256": "b0cb7bf7963a3a8b9ead652b83b72544a3280355518d11cde31b5ad419d61fbc"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/agent-table-pagination.ts",
+      "sha256": "0dc2e88818e6f8978f14232f7631c514a8141e96e40c09fb892f77dbf1f9943b"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/calendar-stamp.ts",
+      "sha256": "d8ea3bd6698be38f01ed6a3f6c3b7457f7981cbcf282315315fbf87e984ce7ba"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/cell-padding.ts",
+      "sha256": "02fb1604746d595f3d966fd734dafa02902b7cb79244d89fbeb13776cf03b92c"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/cell-paragraph.ts",
+      "sha256": "ba57dbeaadfa966c45da01746e9fe1427d8790f4b0add62c56ecf95b1e236621"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/control-operations.ts",
+      "sha256": "f66aadf86347fe3bed4f12f510fcec0c9f7e160b076e335422e34815aec1b857"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/document-metadata-values.ts",
+      "sha256": "217552f049156aa917fc5b63cad0d582b09ac9d4523e5be748bf7a81d25c703a"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/edit-operations.ts",
+      "sha256": "c01029edcee39496f1084f30b74df441d54c31161324f8c90246974c285e11f6"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/edit-proposal.ts",
+      "sha256": "faa4c76f48035d6b0e721140a684cb6dc9d01096b57937967b59fb9c3189aba4"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/empty-section-removal.ts",
+      "sha256": "b5e88721cc5c4ee0df4360448be82bc7d4f0b2c22c6c3cb4e213c4d481b2040b"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/equal-columns.ts",
+      "sha256": "74688d2c9401cbd8adad2af0d353b4ef6b19283abe30ecc9b8a50c0899f76d52"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/formatting-toolbar.ts",
+      "sha256": "b0e315722fc27986c4f2b79c5a1535ea48fb059bf32414c7eb8064a4834ddbc7"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/hanging-indent.ts",
+      "sha256": "2e28c8718150fefe1ad38ffd5378dbf117529bab2179149f575477aee5294ee3"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/line-number-settings.ts",
+      "sha256": "1dcbc752754a49ca735d66782ff16ae49937980aad44c988b1e2856427c2872e"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/master-page-settings.ts",
+      "sha256": "11d2c6acd4549e3bcd55fdfd0d263719d55f4439b227d4a9cd394c016f895dd1"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/page-body-clipboard.ts",
+      "sha256": "ae2b4d432e30bc1329a4c32aa58ff55115c16914d2e5c3f149ebd03b8ecb00a8"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/page-body-deletion.ts",
+      "sha256": "600e6675f3b1d8131487df1056e42878c531aded24041230bdd8ec1adbf6aafa"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/page-body-paste-plan.ts",
+      "sha256": "521410d4e86d81d49bdc3f87205f8cee0f3588ce66896c4952725cb43c129870"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/page-border-settings.ts",
+      "sha256": "a1cacfeeac20ef1fee3831f102584f921a8aa8600eef727a96fe5a4011fbf09c"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/page-setup-settings.ts",
+      "sha256": "775600a834bb88cce200957f092f748dfc0216226b05a80142eb5f0a53f4cc31"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/paragraph-sort.ts",
+      "sha256": "77d539b80d0fb11efd1c0eadc1c3aa4b2d4963b38b65d0fc2a58060267882be3"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/row-heights.ts",
+      "sha256": "8a1f71ea817e70f9f6ce374a399986e9bb6fc08c2d6950dbe7330281dc5af1f1"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/style-definition.ts",
+      "sha256": "aa45b344e961885743f3feb9cc1bd327b5e3b3f07c8d4e67a2c2f7b9ee70e228"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/style-package.ts",
+      "sha256": "a80a1390fa1e26b8133e4158a46f3140f5956e9666c0875eac8ba7129b9e37d3"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/table-auto-fill.ts",
+      "sha256": "6fb05aebf5695f89cb7aa7eaf3a188e5ead0a704e8b3c0785a5a60195c13b66b"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/table-conversion.ts",
+      "sha256": "7f174fecae5dcb94cd17ae74cd3769f51f49f33fab562caeb67d66cfadf42023"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/table-merge.ts",
+      "sha256": "453b0eeb1cfa6733f63da8f4ce2b5496354f2c47de1170e92cda01dbbaa55d82"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/table-presets.ts",
+      "sha256": "38e6d315029b02635bc69ecd4c65b0c226e6c481ac4853c6c66b6d1f86e2cd6a"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/table-series.ts",
+      "sha256": "4351539da276afd60ff98a3bcc04f9e8e0668b8074dcd162950547892ffa039e"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/table-split.ts",
+      "sha256": "0d52b54fb98b71c3b8599dc14d84f4143231af188125fc4cfcff7da3f037870e"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/table-structure.ts",
+      "sha256": "f1a140edabd7b8241fc304d4a10b5a2d734f971a07612c59675713aab9da789b"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/table-subdivision.ts",
+      "sha256": "f274be89d7b03873f7eec9feae98ed64ca3ed66da7ec94dedaeac3728f964c3f"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/text-transform.ts",
+      "sha256": "8e9956a8f87108ce9fa9aaa95cf76b19f8d87c882ae5f37da7c5ebaaf683f7db"
+    },
+    {
+      "path": "apps/editor/src/modules/document/domain/work-templates.ts",
+      "sha256": "6f51e11c658cdf21eefa36e2dd794699fcd3c76254cffdbe6581dca85bfecfa1"
+    },
+    {
+      "path": "apps/editor/src/modules/document/ports/engine.ts",
+      "sha256": "1d3e0647133a1aa9cf4ccb1b6a164335f04418b4fa431646d52051cb43fbc9c4"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/engine-integration.ts",
+      "sha256": "9c71b1dde0e33f1fe1edc21e7049e6d6c7d88fd215f19a9406b433a5aebbbb0e"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/facades.ts",
+      "sha256": "df1a28ce28c05482d1e1c896131dd628da2f272fff15f3eadd394d69424a074c"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/failure.ts",
+      "sha256": "93cc46f5394d90738a6a362efe629b3fa6fbb18b81ff3a0fe04b95a70e38d38e"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/index.ts",
+      "sha256": "4be5c03f5edb06d9a74944b1090ffaaae18ddf37cbfa880b7f16afdcb267fc7f"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/interaction.ts",
+      "sha256": "629118ef871c83b0596be9d98ca2d02416c0a2a55da006b41fa4c43cc6d21920"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/paragraph-sort.ts",
+      "sha256": "69e39176224db41bef351fc05fc72074e15724a318797a5288c09f74273a490b"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/style-package.ts",
+      "sha256": "df84f8ba8bc31ce69a5d6dc8f3aec56981fb15ecd6fdbd45dc1692f4545392db"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/table-auto-fill.ts",
+      "sha256": "e961e291214f042796b97f6efd5d0dd6a1c9568bfa3531b3d5a48d5330f0dec9"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/table-conversion.ts",
+      "sha256": "b046d54f3c38e8b62f72b0686bbced9b47dbc9a7c2c92e18ac3bf5da6003cf87"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/table-presets.ts",
+      "sha256": "b476fcc027ccee7c8c78370c639cacb84eeb0e9fea285005914b02fdec19ba32"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/text-transform.ts",
+      "sha256": "f30cb83ea59a8c48ca0e0303b6584298bce89e6b0064672314ad9b519185fe1d"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/types.ts",
+      "sha256": "a1100277ea2faeff7e76e4cb9339e5d2d975b454501986377300b9baa021237e"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/wire-schema.d.mts",
+      "sha256": "5e1f251afcc1bfba96c7dea14199673a736740c46cab0408a860973e609a7835"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/wire-schema.mjs",
+      "sha256": "2af6ce45a2c79721b713fde2b7ace9bf9213b66f1919af6c2f09e7893b8d1bbf"
+    },
+    {
+      "path": "apps/editor/src/modules/document/public/work-templates.ts",
+      "sha256": "ef341d403fe1c26be7abef26d40985a2e68059492fd71b5812de72d39f567f84"
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/application/document-history.ts",
+      "sha256": "522b2055b4094b7d451127823e2b6abb92b8d602f9c171e470cab5c1465d5e9d"
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/application/export-recovery.ts",
+      "sha256": "1d4935539ceeb74ae097fbdf1fa2cb9f9ad6f05716140bf7eb9e0c09bc2e9a9c"
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/application/write-snapshot.ts",
+      "sha256": "9ea8bc4f23df2c01f1b7bbe8918da1caee65a706676abad462463a72b7b14bd9"
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/domain/recovery-export.ts",
+      "sha256": "d5d97161b1f004fca702a38a5e624eec6a1eef49b8289017856595a7e2f1387c"
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/domain/recovery-record.ts",
+      "sha256": "b18d3e90e5df8d4f8206d0a059235ad7d3c02c8e84cdc39e743797398d0cabb9"
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/domain/save-revision.ts",
+      "sha256": "e994e587ccc51b28cf573d0f373615e359a3b483086a724df7a03d8421cfa8e8"
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/ports/history.ts",
+      "sha256": "844b761b5ec74f64c83421565fd016b8e831b772b9cb4a13f044c5528e8b93de"
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/ports/recovery-export.ts",
+      "sha256": "ac7ea26754f43ac63c1b21a86bbfeb4a8e89286b0980b44e6142d829de5ecfb1"
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/ports/recovery-integrity.ts",
+      "sha256": "5dea2592b5e7911751b90222ec6573141c87a9583ab7ade1ca7b372ed13ff484"
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/ports/snapshot-write.ts",
+      "sha256": "83026fdc4d34221097973e5bd663c4f20dfa8cdcb27e523fdad75b168388c28c"
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/public/contracts.ts",
+      "sha256": "ec81c72cf0005189cd7d7c6dbc3472f631f119faa863f0fc31e853eabec8ecf0"
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/public/index.ts",
+      "sha256": "e9dc2f58bf83b67dc0b11c9ae3aa0078852ffbababac640003470bc044dae03f"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/application/document-defaults.ts",
+      "sha256": "172e7be05399457daaacde7f93589bf288211435bdee3b154691604eb75ef81e"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/application/document-view.ts",
+      "sha256": "5977ee5911352f78e3a736146cb32f9e793216a985c6b6de6329a68b0f6a1c62"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/application/persistence.ts",
+      "sha256": "37c6ec6614a396ea2e6dc87d1240dcad5ea6ab58156424c1774634302c0e2681"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/application/recovery-coordinator.ts",
+      "sha256": "3b312feaa92207c86562610bea7ef204ca9937bf424e274cc9f905c4f77b27c6"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/application/settings-backup.ts",
+      "sha256": "394967712647c3d0e2a85a0cc2770d3b3b9c2ec2c5edb1ae974680c325e61c6e"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/application/snippets.ts",
+      "sha256": "0fa229be4bef9757c480c3ce504f1cca9df33129c961e64dc2f00c22171eacea"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/application/view-journal.ts",
+      "sha256": "4f39dd0afa80719588ff3cf2ea974445cbcb9bedf377d7fdca3ecda14ee34496"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/body-caret.ts",
+      "sha256": "fcd1fd87a502affd05898f0849db7ffdb5480eebedbb714b2114188d715b6a37"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/document-defaults.ts",
+      "sha256": "e50ecf4b8dd019392d1cc17f762a83210a94ddea51690478b2d4262e99f6050a"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/document-view.ts",
+      "sha256": "d944b481e624c51951378014ea617459f3d59ec4fe4cdcbe1637115ff6491e15"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/merge.ts",
+      "sha256": "a6f7217729ebb18445411b69035ec85d04c81beb99c02145d94ca8621deca549"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/navigation-history.ts",
+      "sha256": "dea38cbb65b58d54aaa0552ce9c90b6b7195c0c13d6ada9c737cd783c9045426"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/recovery-policy.ts",
+      "sha256": "61ac2cfdf2a4919cf269c3b2aa8db3d2fa78ffb6b25b820c9d7ac6ca622cd913"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/session-cursor.ts",
+      "sha256": "8799cb49607e627698adb1b4ea631c5f1599aa0b36230760a58c967ceefbefb9"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/settings-backup.ts",
+      "sha256": "90ed26681eef9bda488949bd56db8c255567bf181c3bfb7aebd28f25342a5f9e"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/snippets.ts",
+      "sha256": "9c90ce8eff1469547255635ccd1e8801679a7bd03fbf766578615fbe6ddc500f"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/domain/textbox-bookmark.ts",
+      "sha256": "faa55510824ce458ccd66ea410a106a9bb1292d71109cde08712f050b491b9ab"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/ports/storage.ts",
+      "sha256": "a674023f1546383c57e60f0499551bc93b412d0d97e8635f6a119c80995e6117"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/ports/viewport.ts",
+      "sha256": "223cfd938a4c9863fa76355b5d29d8032129248ad21664b72886277f523925a5"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/public/contracts.ts",
+      "sha256": "2060f11a18aba51a712e0559e6966101084f2dacb6843db874b557f17b8361b0"
+    },
+    {
+      "path": "apps/editor/src/modules/preferences/public/index.ts",
+      "sha256": "d8e49c07e1d01614db2ae9a593bfbb0575e952a00c85bb30db398d3be9763003"
+    },
+    {
+      "path": "apps/editor/src/modules/references/application/facade.ts",
+      "sha256": "78cd013565fbd1245d6450b239f02569057fc8eeaa930448fc53e8aef6a13777"
+    },
+    {
+      "path": "apps/editor/src/modules/references/application/selected-sources.ts",
+      "sha256": "ad2564af3aad767685c34644e0cb437fa705f1652af2ae35bc66a2252b3512b7"
+    },
+    {
+      "path": "apps/editor/src/modules/references/ports/content-hash.ts",
+      "sha256": "3ce697b43c4a6f10f7fc0964696f9fc4570cd413765c40bd0445c6bc467f1c03"
+    },
+    {
+      "path": "apps/editor/src/modules/references/public/contracts.ts",
+      "sha256": "fed367a92614eae14eb45ed94bb57f4e36883858eda086a04a87c49442d1d5fd"
+    },
+    {
+      "path": "apps/editor/src/modules/references/public/index.ts",
+      "sha256": "753f378f201f0e16a3060d0a9aebf2e295314f10edcea9e7ddc7cc980418cffe"
+    },
+    {
+      "path": "apps/editor/src/modules/session/application/facade.ts",
+      "sha256": "66f99130e42166ba78690cc874eb28bdf201d4880044d4af5c1bd24c0832c72d"
+    },
+    {
+      "path": "apps/editor/src/modules/session/application/navigation.ts",
+      "sha256": "fc12c293ac43c31d963500d997ca0a6f70a08f7cdbb5f236791e01199189f5c4"
+    },
+    {
+      "path": "apps/editor/src/modules/session/domain/document-order.ts",
+      "sha256": "73fcf1bc158b839504b87455f1205b511dd57e5835e7c45b5ad6c556df0b9859"
+    },
+    {
+      "path": "apps/editor/src/modules/session/domain/document-tab-cycle.ts",
+      "sha256": "bce62251613da01c6a0d2b6350e4f375ef465fee2dd58f8794ca6f71aeb7dc61"
+    },
+    {
+      "path": "apps/editor/src/modules/session/domain/exit-protection.ts",
+      "sha256": "4527b1653d676fb4f5ee9bfc4c5f8fbe6972fce6f700b0dcf6db8e8401a3a047"
+    },
+    {
+      "path": "apps/editor/src/modules/session/domain/tabs.ts",
+      "sha256": "667f8ef347caae9cbaea3bb086597326b6eeb749688be76f007e6d43ce793dee"
+    },
+    {
+      "path": "apps/editor/src/modules/session/ports/lifecycle.ts",
+      "sha256": "0c14d8d53107d21b2c96bf075a3bc9cf75c87b3af2c7ae347801e1ac8e5d2310"
+    },
+    {
+      "path": "apps/editor/src/modules/session/public/contracts.ts",
+      "sha256": "f1b5b099fd28eee902405457e2b6ca4f5dd58824c7e65eb5890062d382c856d8"
+    },
+    {
+      "path": "apps/editor/src/modules/session/public/index.ts",
+      "sha256": "acda17f2ba745cf4633fd7dd94b2f27db2f282549b7575cc899b4137f171114a"
+    },
+    {
+      "path": "apps/editor/src/modules/workspace/application/facade.ts",
+      "sha256": "8d900faecfa38b444ada65d1512df58e711ffb0902baa8f91f280c75667e4880"
+    },
+    {
+      "path": "apps/editor/src/modules/workspace/domain/workspace.ts",
+      "sha256": "56288d6bd42461b2646f500fc0392c9e3180ffcfcd8d91dc7cdb621e5d8f2b3f"
+    },
+    {
+      "path": "apps/editor/src/modules/workspace/ports/state.ts",
+      "sha256": "94d3a7a203a985f23054dc87a7873d11f593ebb5ef9b005db8e30c2ada271103"
+    },
+    {
+      "path": "apps/editor/src/modules/workspace/public/contracts.ts",
+      "sha256": "f3ce9ed294fb57b42cb520e7e7c0cc7619818d8363c56f89ca6a68ebdf405edd"
+    },
+    {
+      "path": "apps/editor/src/modules/workspace/public/index.ts",
+      "sha256": "9a3d8bd4d4a5ac7cbd1decb6e3c85980d7d35b59d41f0a655278d7eca18eb426"
+    },
+    {
+      "path": "apps/editor/src/modules/xml-documents/application/hwt-leaf-workspace.ts",
+      "sha256": "a9d202878fbac13a9eea7104aee519d5a03a7c78bc638aa42edd1cfdebd32cb2"
+    },
+    {
+      "path": "apps/editor/src/modules/xml-documents/application/workspace.ts",
+      "sha256": "73599af52fb0051b10f67a3a44d9afdea82b5898b60f6ca176a303b9db99ffef"
+    },
+    {
+      "path": "apps/editor/src/modules/xml-documents/domain/hwt-mapping95.ts",
+      "sha256": "bb649b30445fc23acff560d377270438bb1c82507fb809eb0278f1f66e76f610"
+    },
+    {
+      "path": "apps/editor/src/modules/xml-documents/domain/recovery.ts",
+      "sha256": "801132a6c9ef8168f17df354f5cacb7547b9c4a4cfeecf0a5d1fd8aff1664443"
+    },
+    {
+      "path": "apps/editor/src/modules/xml-documents/domain/schema.ts",
+      "sha256": "b896d6f6f2cd1d3458d78646efc85e65b177708fc2625c41f83d7518df5c1a1b"
+    },
+    {
+      "path": "apps/editor/src/modules/xml-documents/domain/simple-types95.ts",
+      "sha256": "8fceef5d8b39937546f11e240f45b08a3789bcc010d0587adeb52ccf3806e1ab"
+    },
+    {
+      "path": "apps/editor/src/modules/xml-documents/ports/xml-codec.ts",
+      "sha256": "6cb8e831b90fc3d001a2d7753d98f1ddc16ccb90a0c6ab3c888d0e23e70d3a07"
+    },
+    {
+      "path": "apps/editor/src/modules/xml-documents/public/contracts.ts",
+      "sha256": "15254acebbedc97d713965d8b1aa7b45e8fcc8b625c2a72149855469e997eb57"
+    },
+    {
+      "path": "apps/editor/src/modules/xml-documents/public/hwt-leaf.ts",
+      "sha256": "2b05494e8e78dd62630a1f3b5f39a394b476eaf7be60aee6964edd51ea74e81d"
+    },
+    {
+      "path": "apps/editor/src/modules/xml-documents/public/hwt-template95.ts",
+      "sha256": "0e568e8bd00d224fa4e725df8da52285fea0f26f83bfffd3393ef8b2212da1e8"
+    },
+    {
+      "path": "apps/editor/src/modules/xml-documents/public/index.ts",
+      "sha256": "a29a224db53789d9d277924e4559b03d98ecdf91772eea92af2f9483b8aeebc6"
+    },
+    {
+      "path": "apps/editor/src/mvp/context.ts",
+      "sha256": "0d10af30c2e60949d92c986cb4c1d4002729adfd6a3ae7efe3af255319fe9729"
+    },
+    {
+      "path": "apps/editor/src/mvp/document-order.ts",
+      "sha256": "7b3a089f709e00b22e972d4a3ce1c6a2812902735c590bf82fb342331ff33250"
+    },
+    {
+      "path": "apps/editor/src/mvp/edit-schema.ts",
+      "sha256": "f1de96c7066955b65916f3bd094b9ca3b8221553f2d744f421a13dc3e1975649"
+    },
+    {
+      "path": "apps/editor/src/mvp/editor-bridge.ts",
+      "sha256": "2ba44be32e7dc0dbff80509999eec8644cc6e0da234382a4c9f23111da730e38"
+    },
+    {
+      "path": "apps/editor/src/mvp/llm.ts",
+      "sha256": "ff96c93c0d8afdb7d1afb9d4b8cbdd50dddcc0a1e0aa05aee1db6f9a0ad08fb6"
+    },
+    {
+      "path": "apps/editor/src/mvp/model.ts",
+      "sha256": "2af672640e822eaf9535946da8f58743e74f90da7908b466637ea87eab460f39"
+    },
+    {
+      "path": "apps/editor/src/mvp/provider-presets.ts",
+      "sha256": "7dbc2a2a3cbcf6a34f4e1dbc2e4c1de1bc00cc2c599d894f114e091339e09387"
+    },
+    {
+      "path": "apps/editor/src/mvp/recovery-export.ts",
+      "sha256": "ba7e81b4e60fb5a9ac046a59fc71b7774d9e91d65c6503d49e65c01357b16220"
+    },
+    {
+      "path": "apps/editor/src/mvp/recovery-record.ts",
+      "sha256": "2bbb3ad421009dd2441cbcea0eed0e2fd57c8276f37ea403a40059a015b78ead"
+    },
+    {
+      "path": "apps/editor/src/mvp/references.ts",
+      "sha256": "3d260bfe0753ccfc1e7e4f3fe741dee7670092721ac19165db10604cdb39cb9d"
+    },
+    {
+      "path": "apps/editor/src/mvp/run-once.ts",
+      "sha256": "118d3f315d3351c5bb7a8663bb6f59b24c7e2ce3e2854f8095386ecf3b9fbe55"
+    },
+    {
+      "path": "apps/editor/src/mvp/store.ts",
+      "sha256": "46d7a35f22d0ac3d67199ab46a341c4b1ee1fff8d63fc0399b8f4db3969758fc"
+    },
+    {
+      "path": "apps/editor/src/mvp/temporary-references.ts",
+      "sha256": "c45ed6ba20dd161f68972ede5f6f066198f6cc1616e036bf30a469a93302d45c"
+    },
+    {
+      "path": "apps/editor/src/mvp/validate-state.ts",
+      "sha256": "f769a6acb72f203cf18b72a587f39a882b6a059922becafea0377a1ae41fcd10"
+    },
+    {
+      "path": "apps/editor/src/pane-layout.ts",
+      "sha256": "678ed3ca8f0300a0252f230633d7ebc5211338ca30d334d98e02fa6fff63598e"
+    },
+    {
+      "path": "apps/editor/src/preferences/binding.ts",
+      "sha256": "fd0b5347723f0ec7a828630010956c94e7c6cbba4d7864fff31050c95bc0b203"
+    },
+    {
+      "path": "apps/editor/src/preferences/document-defaults.ts",
+      "sha256": "82df790472efc96fe2e4c1801aa2f3ab4798b80b2b7fc511f35e895722ab294f"
+    },
+    {
+      "path": "apps/editor/src/preferences/document-view.ts",
+      "sha256": "2f64671b71cc02b28c033fcce79e11bca4a5bc1047d650a9b966c13926898e67"
+    },
+    {
+      "path": "apps/editor/src/preferences/persistence.ts",
+      "sha256": "8b705e3130818e69ab97ab90a19d4852df5ceb7d7a5e03f2423fb076d9063702"
+    },
+    {
+      "path": "apps/editor/src/retrieval/selected-sources.ts",
+      "sha256": "4b0320a16cc29a7ef02c20f110be34304334f2130c3f11e2318702e9f65b2914"
+    },
+    {
+      "path": "apps/editor/src/save-guard.ts",
+      "sha256": "748cf27032d6b032e28af943e78fc1cdcf3fb7256660fd381483712da1ad602e"
+    },
+    {
+      "path": "apps/editor/src/shell.css",
+      "sha256": "99bbbbcc9aa0d42d28d5711a5bd60b5972e637bb135ad69a855dd5bf2d2f0b28"
+    },
+    {
+      "path": "apps/editor/src/shell.html",
+      "sha256": "118923bd1c7d71640c16bfc5568e51e0a0ca2be2e831647a3e10bf1fd8de8311"
+    },
+    {
+      "path": "apps/editor/src/shell.ts",
+      "sha256": "fbeeba4e4eb37613c4d02b623f590eb7277e608ec83f01873ebf720fb15578d3"
+    },
+    {
+      "path": "apps/editor/src/shortcuts/cell-band.ts",
+      "sha256": "925222080c50dc74407bb98496dd69a331aafff347ab20dce1620d5883647415"
+    },
+    {
+      "path": "apps/editor/src/shortcuts/install.ts",
+      "sha256": "3d14f847f3629a684a413b9a19ad819947998cca831a3e532ba35e01a78738ca"
+    },
+    {
+      "path": "apps/editor/src/shortcuts/keymap.ts",
+      "sha256": "95a0c2d0e414925a9e9eef95feb011cce0e187621225d638499ec8788b68816a"
+    },
+    {
+      "path": "apps/editor/src/shortcuts/paragraph-spacing.ts",
+      "sha256": "78fd672015a65c48d7fe99b01e8978305c8624998293208f146acbe51dba72ec"
+    },
+    {
+      "path": "apps/editor/src/shortcuts/style-slots.ts",
+      "sha256": "cc875d92597cfe861298f957b71c9a71104bb3e8e8558f47aa054cb6ba2689de"
+    },
+    {
+      "path": "apps/editor/src/ui/connections-panel.ts",
+      "sha256": "268d444b3d5182c43935806599800349f0f947f8ee9bb74b148439f2f3870314"
+    },
+    {
+      "path": "apps/editor/src/ui/document-defaults-panel.ts",
+      "sha256": "02e3422a35624cbbcdd3a33b3098b59137c929b7518a05fbae13b468e2bccc36"
+    },
+    {
+      "path": "apps/editor/src/ui/dom.ts",
+      "sha256": "b63ecef22f5ed1e76ec2a1e3a2204295bdff83970a6591ad2efbc1f85731692f"
+    },
+    {
+      "path": "apps/editor/src/ui/hwt-leaf-dialog.ts",
+      "sha256": "7e7fafa1967a5e2dd67da4d66bcf62d36e227a516e303d161932abd0ba6277c5"
+    },
+    {
+      "path": "apps/editor/src/ui/hwt-template95-dialog.ts",
+      "sha256": "549e0686ebf91d2fd0e310e7b54a9707ba28d2c38a88c19a2e044fcef2c4e890"
+    },
+    {
+      "path": "apps/editor/src/ui/xml-document-dialog.ts",
+      "sha256": "1446350e35e94abac82e24e5192e25ea023f0f433196d409aee4bb305f354714"
+    },
+    {
+      "path": "apps/editor/src/unified-chrome.ts",
+      "sha256": "87af115f8110ea9309a27473f62e00c2512d6a77f11539fd2ea6e02b12ef41ee"
+    },
+    {
+      "path": "apps/editor/scripts/agent-background-fixture.py",
+      "sha256": "85ea3c04b1c084077f6c276757feca9601647e5f0287feae54deb70583e6e492"
+    },
+    {
+      "path": "apps/editor/scripts/agent-header-fixture.py",
+      "sha256": "833f639778671c73c43cf0d90614b27e05969e687965da59d99c4fe380dddde2"
+    },
+    {
+      "path": "apps/editor/scripts/agent-master-fixture.py",
+      "sha256": "519fc9ea8029cf7c925736aad0b64a9517dcd011ea5a80946f8b4c539d17193f"
+    },
+    {
+      "path": "apps/editor/scripts/agent-style-rename-fixture.py",
+      "sha256": "9cc519b9e79da104d4b3990391b3e888932c457f5251d010aa955e7da87274fd"
+    },
+    {
+      "path": "apps/editor/scripts/build.mjs",
+      "sha256": "afc460912f0be08ad4b901319db349b00ce54cb11090e5ec1d5f67b220b94b68"
+    },
+    {
+      "path": "apps/editor/scripts/compare-hancom-file.mjs",
+      "sha256": "ee434a62583d4129c8857a5efce3ce250df4acd0b40184fe0730d9c9a7d75f26"
+    },
+    {
+      "path": "apps/editor/scripts/diagnose-header-page-fields.mjs",
+      "sha256": "4c01ccb8f5413ebd349a0765fd7229c876a1eb32a2d49094c1b50c8662cb0ab8"
+    },
+    {
+      "path": "apps/editor/scripts/download-public-corpus.mjs",
+      "sha256": "20c8252e6c097404cf8328afcb5939666b86fb96b78e478521bd7d71fa9e77e4"
+    },
+    {
+      "path": "apps/editor/scripts/generate-legacy-stack-fixtures115.mjs",
+      "sha256": "a27b793a035771fce5b69ef4ba5a76529d0b8096adfde1009e993c09db1d80b7"
+    },
+    {
+      "path": "apps/editor/scripts/hwpx-caret-fixture.py",
+      "sha256": "237ae8f9e1d8eefedd9a159891b204759c206e77a8a4cd159d5c8a4a2edeaeb1"
+    },
+    {
+      "path": "apps/editor/scripts/inspect-document.mjs",
+      "sha256": "a238c65d71fecc794bbda514069a8e492889e19b5c4ba3b5b7d169dfdf24a058"
+    },
+    {
+      "path": "apps/editor/scripts/inspect-native-paragraph-spacing.py",
+      "sha256": "ffb342f18d860ef753ed0850bc5597b5dcb098cf57edb1dbe21aa2c13a0f3a7e"
+    },
+    {
+      "path": "apps/editor/scripts/integration/agent-bound-save-patches.mjs",
+      "sha256": "53a223eb3de17839115de8a326463e0233b12d4386dc78ba53ef7a22157d8156"
+    },
+    {
+      "path": "apps/editor/scripts/integration/document-created-information-patches.mjs",
+      "sha256": "66c141fa8d063f201eea5c50aca308cdafcb0afd1bbd4c5ffcf7e7c25e75c714"
+    },
+    {
+      "path": "apps/editor/scripts/integration/document-history-patches.mjs",
+      "sha256": "76975bf9d165c26f3ccaff3c749860289ae9a60e8432b92c408b6129b914d396"
+    },
+    {
+      "path": "apps/editor/scripts/integration/document-insertion-patches.mjs",
+      "sha256": "900c59c433a015170893e496d455bf591b0045b2b437e40a97e34e0f7f84281f"
+    },
+    {
+      "path": "apps/editor/scripts/integration/document-swap-state-patches.mjs",
+      "sha256": "c08760f3a250e6b362e349a07d8f475639cb58a27ee80ac8925f4950a51610a4"
+    },
+    {
+      "path": "apps/editor/scripts/integration/document-tab-cycle-patches.mjs",
+      "sha256": "6e604d34496c8c07459c0bc93d9b9d69b32af6ba91ada5f80f490dd18033a26f"
+    },
+    {
+      "path": "apps/editor/scripts/integration/export-metadata-loss-patches.mjs",
+      "sha256": "53936bc8e22103c42f624d11c842e4d82a3abf03a148772ffdedcd457b93d875"
+    },
+    {
+      "path": "apps/editor/scripts/integration/formatting-toolbar-patches.mjs",
+      "sha256": "03f40ebe53d94d9c78518d87715f45d6e3447518ff3402aa9e8c62c772ae6b65"
+    },
+    {
+      "path": "apps/editor/scripts/integration/hwp-tab-evidence.mjs",
+      "sha256": "e3ce963eea624e5b762e2dc4edaafb8de6fc3de63c3e57fe8015b260adc3491d"
+    },
+    {
+      "path": "apps/editor/scripts/integration/hwpx-shadow-evidence.mjs",
+      "sha256": "eba1185806541cb7efb80266b3318c502e716497b197fd26f6fc4732e46b8183"
+    },
+    {
+      "path": "apps/editor/scripts/integration/hwpx-tab-evidence.mjs",
+      "sha256": "e77d076afc0a6e7ba9c021dc4308c6cf9a369d07074ba45da68bf7782386e392"
+    },
+    {
+      "path": "apps/editor/scripts/integration/keyboard-context-patches.mjs",
+      "sha256": "e28278ed94c3daf940f528bf97a671ca9458c536cdf134803b4ebb113db1f022"
+    },
+    {
+      "path": "apps/editor/scripts/integration/manual-feature-patches.mjs",
+      "sha256": "ed01522dda3caabd91a2468f3dae29e08f17ecfa4b36ead9093e11aefcb6d440"
+    },
+    {
+      "path": "apps/editor/scripts/integration/page-border-patches.mjs",
+      "sha256": "b4b45d63db11d5d805c360c6529cbdae99ab75068479a2baa331adbaf87b272f"
+    },
+    {
+      "path": "apps/editor/scripts/integration/recovery-patches.mjs",
+      "sha256": "9b944815669658ce9c2e30bbacf6b3b6ef588f3e299aec1811cedefae18fbe5a"
+    },
+    {
+      "path": "apps/editor/scripts/integration/section-boundary-patches.mjs",
+      "sha256": "ca345606b5eb9766cd45a86dfee519f28b238313342f3668c8a23f7f77741669"
+    },
+    {
+      "path": "apps/editor/scripts/integration/selected-object-properties-patches.mjs",
+      "sha256": "cf44046fbd489662da52f8e8994d53bb8926fe99e9583ebea0587d77cc8d1638"
+    },
+    {
+      "path": "apps/editor/scripts/integration/studio-patches.mjs",
+      "sha256": "a88d40883733a4b1b4ff2da2363c6287f1da229d34192313a7ac418ab8d081ca"
+    },
+    {
+      "path": "apps/editor/scripts/integration/style-flow-patches.mjs",
+      "sha256": "38221e7d4963b5f3f7c4df87888e0617c9e642d345372bae95a50ce707d635ed"
+    },
+    {
+      "path": "apps/editor/scripts/integration/style-management-patches.mjs",
+      "sha256": "2ec89f7565ad09ec46b92cc5dd34d6929e72c6b5ac159a033bd0e777430294fe"
+    },
+    {
+      "path": "apps/editor/scripts/integration/tab-feature-patches.mjs",
+      "sha256": "528654fa9b34bffef038aec8030cfb4f8a63aef8b7abefb2ebcd450241cdd2ec"
+    },
+    {
+      "path": "apps/editor/scripts/integration/table-conversion-patches.mjs",
+      "sha256": "56a7f828a8c1385388e671858c16fe40d9d6c401fe92566a00db527c8b24d155"
+    },
+    {
+      "path": "apps/editor/scripts/lib/document-metadata-native.rs",
+      "sha256": "794072be1e47423d95988e355746219b953ca80d4d3a0cc00929ea2d26d32fac"
+    },
+    {
+      "path": "apps/editor/scripts/lib/hancom-review.mjs",
+      "sha256": "c9db530d8b120582ec990554ef729a55663dd560e760274e864dc9f80366fcd0"
+    },
+    {
+      "path": "apps/editor/scripts/lib/hwp-summary-evidence.mjs",
+      "sha256": "5c721eeddff15ded3f7fcee6f7e4fbc9f887ba2d12eb2a880e6bcdad19ee4527"
+    },
+    {
+      "path": "apps/editor/scripts/lib/hwpx-direction-evidence.py",
+      "sha256": "66684c70d76e1b8d72db4073d53ccd1fce958a4b92821aa8635588a12366884d"
+    },
+    {
+      "path": "apps/editor/scripts/lib/owned-zip.mjs",
+      "sha256": "2bdb95e686a32de475b7c8c825e5e2b8d1a9a8d55db95fc3088bfcda81d1d587"
+    },
+    {
+      "path": "apps/editor/scripts/lib/preview-raw-audit117.rs",
+      "sha256": "05768736af5f2443212921ab3a92505ecddc03fbf48506f78ae8749822ae80b6"
+    },
+    {
+      "path": "apps/editor/scripts/lib/standard-ole-dates.mjs",
+      "sha256": "5ff86e18fa5a73811b9bb8eaf826c032620f58e094b0dfdc564ffb512e214438"
+    },
+    {
+      "path": "apps/editor/scripts/lib/table-height-width-native.rs",
+      "sha256": "28a6ed32b4d0aa7028036ce2f3d624687146a3d1cdb214e3b7144e31ad7321ed"
+    },
+    {
+      "path": "apps/editor/scripts/lib/textbox-storage-native.rs",
+      "sha256": "bb647ab576a1fa94b248cae722f2ebfd358cf8a8749115f47d004220c43e63ee"
+    },
+    {
+      "path": "apps/editor/scripts/line-number-inspect.py",
+      "sha256": "3c05fea607ccbf7535b334f4583ea00d91653e75a8a865c62f9ac42c199abf5a"
+    },
+    {
+      "path": "apps/editor/scripts/list-style-fixture.py",
+      "sha256": "3aecf842ee17c003ad9b846955a33dfef31dd0b4110aa77e8976d8ae4b3b442d"
+    },
+    {
+      "path": "apps/editor/scripts/make-memo-fixtures.py",
+      "sha256": "a7046d82b0e17fedb16370202e02236d8b54af7126cd72b1114814732b35f273"
+    },
+    {
+      "path": "apps/editor/scripts/master-page-fixture.py",
+      "sha256": "03359fbb53d370634e481804fd8fc15908a19baa41ca0f7721e9554241a35e09"
+    },
+    {
+      "path": "apps/editor/scripts/page-border-inspect.py",
+      "sha256": "9492fd045a8e13b3650b6338add214fc1bae2d91ca6bb3f8fafd3c11449f3f8b"
+    },
+    {
+      "path": "apps/editor/scripts/page-copy-inspect.py",
+      "sha256": "30d2b9f7d00cf4cf763a678a573df7a8f86aa2e915f14a2b52135347e4c7cfbf"
+    },
+    {
+      "path": "apps/editor/scripts/page-image-fixture.py",
+      "sha256": "a533778b0d61630fd124f8c01a123bc1bdc158b9d8914f7b1dcd9736498d5a23"
+    },
+    {
+      "path": "apps/editor/scripts/page-image-paste-fixture.py",
+      "sha256": "e93cb2afb289560d52850947833c8eebbaca27a28a74f13ba4572f21ee1b2f0d"
+    },
+    {
+      "path": "apps/editor/scripts/page-style-fixture.py",
+      "sha256": "1430773367a79374ab720aa66fa58cd4c8f8210fae3d7d59e96cb021be5626c4"
+    },
+    {
+      "path": "apps/editor/scripts/prepare-hwt-leaf-fixtures115.mjs",
+      "sha256": "723b6e5eee10c85181845218694996ba4e8502f3eb5cca6263c9204b2a7184c1"
+    },
+    {
+      "path": "apps/editor/scripts/prepare-preview-raw-auditor117.mjs",
+      "sha256": "02795a11989ef03f5a9bbf6582ad6f4c0e2cb4ab9aaddefb43e151e575331073"
+    },
+    {
+      "path": "apps/editor/scripts/prepare-public-hancom-review.mjs",
+      "sha256": "9486cde586dff4d2cba6a9f9b4c8d9a09f5dc58f5ea7093471e786ce8d4b1dc2"
+    },
+    {
+      "path": "apps/editor/scripts/probe.mjs",
+      "sha256": "ea588d919023cbfe490023a83744977a425dd52cd15277a9aa6886a8a94673f4"
+    },
+    {
+      "path": "apps/editor/scripts/serve.mjs",
+      "sha256": "baddfa3f6e5802111dacdd64e2259a899338d5ad7c5b62fd0517dd24926f89b1"
+    },
+    {
+      "path": "apps/editor/scripts/style-reference-fixture.py",
+      "sha256": "9703b00e8c20e95e488c3133c1bb1f2a5c1cc8bcaf48965570b836e4d3e4562d"
+    },
+    {
+      "path": "apps/editor/scripts/style-stories-fixture.py",
+      "sha256": "5f9c7f06ff0a8df1b66f27af22bf405dbb9d36aec53654f7f2892ea77c252520"
+    },
+    {
+      "path": "apps/editor/scripts/verify-advanced-evidence.mjs",
+      "sha256": "a9c4c4201119e105bfbf8680e66520cdd4876c48bb4a7ba0a3856546fb95083d"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-background-engine.mjs",
+      "sha256": "01308d65605af6836821d4ab01c0a76b3626cf6814b4b7226e279d3beb982a55"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-background.mjs",
+      "sha256": "1348d970ff9720f82f36316b0714425d9736d39a16a9c638810bbb7bfb8bb4ed"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-basic-numbering-engine.mjs",
+      "sha256": "ee444e672331350b4bbfebd9c5ad347fe40284fb7dfe73d9645a6682cd0c9247"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-basic-numbering-evidence.mjs",
+      "sha256": "0a86abe0545f338b3f9c8648cedb814273779228222d29f676ac80873e3c6ab8"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-basic-numbering.mjs",
+      "sha256": "d735c795a2714802390c9e79f40f1210e630d405c01e43f0eae599d5bfe9e2cb"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-bookmarks-engine.mjs",
+      "sha256": "cdbdd1d7e74db98002740f0cf0ae9c548833f2dbb6a9f390071d285e4a15c82a"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-bookmarks.mjs",
+      "sha256": "42dbe77f4e93af77ebd7ca19ea5b631300e3519d6a0db53f177c2b2c62d30d2b"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-bullets-engine.mjs",
+      "sha256": "ec8f010c191207b77a5ee6208ec5e36b246271c4099d00a2f05a778e4b2f9135"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-bullets.mjs",
+      "sha256": "1f484af2c15a6274e591a3b5c154fe370b64b09b9d1ebf018ef7e3cee9a2ffd2"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-document-information-engine.mjs",
+      "sha256": "358f1af678bddc5f7d5874a252e519ad844bc6238cec03c5fd12ea6e502b34f7"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-empty-engine.mjs",
+      "sha256": "e7720f853541de436a3b9c71bbd079db451f912274630b80ec0f12750e2df2c6"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-empty.mjs",
+      "sha256": "bbb937669850cf8ce1727b597a6a543a99378a08632302ec7a100f5ab844772e"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-files.mjs",
+      "sha256": "8eeaada31252ba1abb26850dabc5e8f1ce5dfc9a93a8f17e3bb6c30cedd2093a"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-header-create-engine.mjs",
+      "sha256": "5d6b3ea332d32b9e1b80dd09a7ef436c3fe32ddc1f37f4f56e69e90217093fea"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-header-create.mjs",
+      "sha256": "b228a41d6bf8e8985bb3fb41ac292bc9476942fc42871a764d3c0ca920ba5514"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-header-delete-engine.mjs",
+      "sha256": "5dc8338b9ef2592fea19b624331683b9da8e292e02a2addfa941ba5c6bf2b015"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-header-delete.mjs",
+      "sha256": "739af8e3994718b0ecc6a60ddb35a2e185454bfe082cd16a1a53c38b4afc9cf8"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-header-engine.mjs",
+      "sha256": "40d6a293e27681adbd953e104ec46691501e08a7fb95644ff93629256c36a6d1"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-header-format-engine.mjs",
+      "sha256": "9ecd845828beadb8ae1a2e147ca4d201ca000dba19bd77998e17c067aa470226"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-header-format.mjs",
+      "sha256": "50bdf1b63329fdb7ea93a3a69a06ebc2a229ce2ea533cb9b475acdae3e399243"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-header-paragraph-engine.mjs",
+      "sha256": "34e35c3bb49fc4a35e18ac42e7aa45ec87f765a96450181e3820c976a1ed24a6"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-header-paragraph.mjs",
+      "sha256": "ffcdccb2dea7dbc268ed538022697767142774e1ce83503e5ff2286c82b4cbc7"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-header.mjs",
+      "sha256": "45fc5f56b19df26290bce97d1107876a364debc7e737e13584ed35a685b5a409"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-interaction.mjs",
+      "sha256": "810d34830330fcc1b15423014e8bac46817f452a06169b3aa7f439fc5e641291"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-lists-engine.mjs",
+      "sha256": "55c4306e3dc3b228e82338358fb9bf9ba93c4bbc76f8a7adc5920a72143bd3d9"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-lists.mjs",
+      "sha256": "438a95038d6ffe33c741322c7d84019af097ea5b2aca00a1152c8bfb316e1c9b"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-masters-engine.mjs",
+      "sha256": "ebe1ea0f65cf96c7988cab5ea33381b56cbfed75a701df3d3a7888802809599d"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-masters.mjs",
+      "sha256": "5cd1941549776468c0937d8f4ceb41c578cd2bebf3ab9d8c1f2ab3001a90f265"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-merge-engine.mjs",
+      "sha256": "36044cfc0dedd72c726ba5f4a78adf1b65ede83c9b301ee3afd6842adb519338"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-merge.mjs",
+      "sha256": "7975b1593ce4b69cbe63d0358419bf21d0dcc347a8528477c768e63725a0187d"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-numbering-engine.mjs",
+      "sha256": "e7bde39c6f7d6c40d489eadd6f5c760457ad56a0941eafd86d032cc5cf1ae5d9"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-numbering-evidence.mjs",
+      "sha256": "e867cbc4ad3ee11181a87d4d54888c3b05b53ff374a5d6178487ddbf11af06aa"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-numbering.mjs",
+      "sha256": "db0826dc289333f0b343bf176c2bef7b4a1a2b36e94401b4e1c9c00d8ba400ac"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-outline-engine.mjs",
+      "sha256": "e355c62044a738de30920c1cad71f4c9628bd55adbc371ecdaf833f583ab11dc"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-outline-evidence.mjs",
+      "sha256": "c753756b4321ca7c9aad66d5bc2ca74c6fbcff1173af8c7d2fe3da525f3815fd"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-outline.mjs",
+      "sha256": "165b4e5619e15ade29f50b43520c798debf3133bee243d939f0b6eebd56de6a4"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-para-box-engine.mjs",
+      "sha256": "d998538755410b4de4d76586f5c5c03235e093d497d87aa0afe63507f2e9d35b"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-para-box.mjs",
+      "sha256": "8d5a4e8c3e1828f41ed7690cba2c0a2621fe103a2b0a1be28cd1bdbc4734e91b"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-para-tabs-engine.mjs",
+      "sha256": "e8987e807cce79cd6b424a6e5b1d07e3fce0b37aaadd4fd6a947c08534508560"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-para-tabs.mjs",
+      "sha256": "1e57d7c52522ae28c916ef92b42f66f85b3ebb7314a40eac93df9acecc8ae2b4"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-preflight.mjs",
+      "sha256": "c48f99d4071e930345a09115cb7d6d34802f7072af9e6530d79208214085c223"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-sections-engine.mjs",
+      "sha256": "05e1ac034758be6ad8816b8fbca100e2183c093ee9b833f52abbbf2a0a424ac1"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-sections.mjs",
+      "sha256": "ca6a6354ce3a8accd1f8038810a5d15705228d77e169688d70a53f6b31e8452d"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-split-engine.mjs",
+      "sha256": "1634be0d4dda6d103e55c9d5c139b2964e37cf67f377ccb372fc73e9814d505f"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-split.mjs",
+      "sha256": "a131cef8256e5bc09da263880de9b9c0a580f3a0b81bfb7a115caeaf4dbf46b6"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-style-create-engine.mjs",
+      "sha256": "aa0465eeae1c945eac109e7e29b5ff804d9c5fa80370892072d1deb73a5985e4"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-style-create-evidence.mjs",
+      "sha256": "e72aac167efbf96e2f257efbbb20c5a209274b41cb5ad9fbac6f229e26b5712b"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-style-create.mjs",
+      "sha256": "af98b25fab11211674fd73b8963f863722f6170a36bf60c1e42b0964ed02c094"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-style-next-engine.mjs",
+      "sha256": "453137b77d1be7712b55167ba60d22a20308bf701f0ca7f0748489bdc1b81337"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-style-next-evidence.mjs",
+      "sha256": "c659ab21cde58087dc5f286b830dd8125a443e94cfaf5d55b8370f7f73bb4e45"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-style-next.mjs",
+      "sha256": "2ac450aef8f1c2d52bbe8e98fe0e82798095a1ae8fd32e791cb2136c08948608"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-style-rename-engine.mjs",
+      "sha256": "e170d96001ff1b6a25d87bde85a1eb3b2dedb77eed63e5e65411d18ec3d83083"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-style-rename-evidence.mjs",
+      "sha256": "d6a359f25bfc0f0d25b442040333d0634b5618c01455f3923e07f47a95733954"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-style-rename.mjs",
+      "sha256": "1be205ad34dac6b3669973f0e68b4605b79e39c63a93ccda716cc026036be9b0"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-table-header-engine.mjs",
+      "sha256": "15e4615d1093851851d60a7dd3add786f4978f5928010b312f7ffb929b600f2a"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-table-header-evidence.mjs",
+      "sha256": "a36c491c6594fcf2486b11e9297e0115b7ceb386156fb05087e427bb846aa0a0"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-table-header.mjs",
+      "sha256": "cc1b74286dd2c20ba30bb98da62fb65f3d8f38ef7dcf9db46a5649a4973bd094"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-table-pagination-engine.mjs",
+      "sha256": "bc5cf535bcfa2d743cd33fec4b1fa13dbe5f685f58b0395d4a9232deeccaaa15"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-table-pagination-evidence.mjs",
+      "sha256": "c9fb5efeee5d2208c3930e15049e54999a28c2347ffefee79a81757406ee2956"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-table-pagination.mjs",
+      "sha256": "2e6770010b5d2a64e6e4f9e70b61ee12c3c5d231c22550d73372eb5723c65a8c"
+    },
+    {
+      "path": "apps/editor/scripts/verify-agent-workbench.mjs",
+      "sha256": "0cef6e342ff4a2c8aa7d562bfea9cf0148da9d288de8055600c6eaca7ad868e0"
+    },
+    {
+      "path": "apps/editor/scripts/verify-authored-floating-gap-layout.mjs",
+      "sha256": "e4e4bf686026001508558d383f968d42e7f050ffa44e752f890bbe2205668a44"
+    },
+    {
+      "path": "apps/editor/scripts/verify-basic-text.mjs",
+      "sha256": "a99c6f4c25df0582853c96f02054bc70d7a719aed071fb565b1855a441a442be"
+    },
+    {
+      "path": "apps/editor/scripts/verify-caption-lifecycle-engine.mjs",
+      "sha256": "d8a4c0d18481a1a163a2cc0a39673da460706753dcc6c65aeb3e16f7cce49322"
+    },
+    {
+      "path": "apps/editor/scripts/verify-cell-padding-engine.mjs",
+      "sha256": "83b6edab939aecd4c15a29190ac09d287d54883bfe2256ccceb1f5e55e7ba350"
+    },
+    {
+      "path": "apps/editor/scripts/verify-cell-padding-evidence.mjs",
+      "sha256": "c450f274f6f49bdf3940d85b99f52849dfc47f0d93a8748ccb4675747d4716d1"
+    },
+    {
+      "path": "apps/editor/scripts/verify-cell-padding-hwp-engine.mjs",
+      "sha256": "ee746b81ee2f580c2e5daf747946628b4827358f0961c9990f32307bcb03182e"
+    },
+    {
+      "path": "apps/editor/scripts/verify-cell-padding-hwp-evidence.mjs",
+      "sha256": "00ee74e342155c1b4c8b1ac404dfe1ff442c53768d51190d91f621dfe4360435"
+    },
+    {
+      "path": "apps/editor/scripts/verify-cell-padding.mjs",
+      "sha256": "67b90758d4294f37c4bcefbe2ae1aaee106821397b62d04b4b70857c182477c3"
+    },
+    {
+      "path": "apps/editor/scripts/verify-cell-paragraph-engine.mjs",
+      "sha256": "d9e96ed1e145d5b3f2f46a960b3419b8e1b2f43ab048eeada8b0cfff9c6d4304"
+    },
+    {
+      "path": "apps/editor/scripts/verify-cell-paragraph.mjs",
+      "sha256": "814af17a276b593ab263e38fa6c50979b6928e29e92b2eada1f1f18173e17dee"
+    },
+    {
+      "path": "apps/editor/scripts/verify-claude-live.mjs",
+      "sha256": "2fe048eeab9230acfb63ed497d468f4c003a95f30285099114fd693c0e7af3d7"
+    },
+    {
+      "path": "apps/editor/scripts/verify-claude-workbench.mjs",
+      "sha256": "a9d2b8b14752f7e3502e4b36ce8d5c2c846b35b15c0c38efda361dab3607062c"
+    },
+    {
+      "path": "apps/editor/scripts/verify-close-recovery.mjs",
+      "sha256": "01f52cc12755f85c1d68665c2318519cc60dc5542b33796b2ae8e3aab758f6ad"
+    },
+    {
+      "path": "apps/editor/scripts/verify-column-width-engine.mjs",
+      "sha256": "ee387653827998beef9e59ff76bae9759cee790fe43fd2b25366d1f30e76d167"
+    },
+    {
+      "path": "apps/editor/scripts/verify-column-width.mjs",
+      "sha256": "1d098b5f9d523d9ede7c909b605927d3f3cf1fc3f52d7983cfad210b2b78c346"
+    },
+    {
+      "path": "apps/editor/scripts/verify-computed-row-package.mjs",
+      "sha256": "411520e1b932078fe3ce0a6a672394ff763d23108e01af9b6b12b42a77ec9de6"
+    },
+    {
+      "path": "apps/editor/scripts/verify-connections.mjs",
+      "sha256": "96437039e99964fe40b9489a92ea269dee7ce3e4744f9978ba2070d0d949bd7e"
+    },
+    {
+      "path": "apps/editor/scripts/verify-control-live.mjs",
+      "sha256": "ecdd3fd4222ed24196555a7a70c8be915b61112ae601df177cf4e548f095a592"
+    },
+    {
+      "path": "apps/editor/scripts/verify-converted-download-recovery.mjs",
+      "sha256": "90261bbb1f50196e7bbbdc0155bb9f08bf0fb2b78a4a42c037558f7ddc137be3"
+    },
+    {
+      "path": "apps/editor/scripts/verify-document-control.mjs",
+      "sha256": "4554da04a4a485cb1581ef4483c0d1c09557342d346b16c42b61a0a7a5cacc3f"
+    },
+    {
+      "path": "apps/editor/scripts/verify-document-created-information111.mjs",
+      "sha256": "5ad2c48227fbfd0bead3d5f69c61cce3b12348b859d0181775aab73111e51e18"
+    },
+    {
+      "path": "apps/editor/scripts/verify-document-history95.mjs",
+      "sha256": "ce1c4040ffbabdce15e269390f8706cc9d4fbe3ced389e345f50cf2a9d442ab5"
+    },
+    {
+      "path": "apps/editor/scripts/verify-document-insertion-engine.mjs",
+      "sha256": "35996e9499ef8ba12b73e991757c961fb5dff8b62ac19db9d2a9ede99bdaa358"
+    },
+    {
+      "path": "apps/editor/scripts/verify-document-lifecycle.mjs",
+      "sha256": "01da3b9c01de5f196c451e1bd09efe1657f6a49c69c8d5aa9b070be49c172e53"
+    },
+    {
+      "path": "apps/editor/scripts/verify-document-metadata-engine.mjs",
+      "sha256": "66015b5f9f7407e2ce94110928817dbf267188c9582a7c23b730f1ed052627bb"
+    },
+    {
+      "path": "apps/editor/scripts/verify-document-metadata.mjs",
+      "sha256": "5e83edca6f2807ea0a0cdc119973b4ab97b0cf8e09a02f74f3a2c5c95353231f"
+    },
+    {
+      "path": "apps/editor/scripts/verify-document-save-layout-engine.mjs",
+      "sha256": "f43afce9ef57beee2f7737c9886d6699ce992beadf7882670443eca722754e18"
+    },
+    {
+      "path": "apps/editor/scripts/verify-document-state.mjs",
+      "sha256": "d3b57cfd828ddb5a5fa7ff4e57d2873e6efdcb6504195940b1d3f7e683114071"
+    },
+    {
+      "path": "apps/editor/scripts/verify-document-story-information96.mjs",
+      "sha256": "bb9161f355b81545529bc06f3bea61fe360d0b2c1e9cb4b18127f2da851cf16d"
+    },
+    {
+      "path": "apps/editor/scripts/verify-document-windows.mjs",
+      "sha256": "a90e38ca8ed1a686e37418b8d188709fe036ff48453946bb89a7a012789daf49"
+    },
+    {
+      "path": "apps/editor/scripts/verify-download-connection.mjs",
+      "sha256": "691a5a18ce1c2a71ac79f665a9275d84954e563d4c9247e1ff2bd02538da3c3c"
+    },
+    {
+      "path": "apps/editor/scripts/verify-editor-actions.mjs",
+      "sha256": "1026788469ee51db80b629496a94e8b97780147f3510af2ce599695294e8f9f1"
+    },
+    {
+      "path": "apps/editor/scripts/verify-empty-section-engine.mjs",
+      "sha256": "4c98b934e5a32ed24ab93047d38b52894958482b4e25d59dca3eb69df552d0b6"
+    },
+    {
+      "path": "apps/editor/scripts/verify-empty-section.mjs",
+      "sha256": "cd2867c3e7cbd45b1e23dbf36f192e88367adb41fa270c7cf45d6f47ad25ac79"
+    },
+    {
+      "path": "apps/editor/scripts/verify-equal-columns-engine.mjs",
+      "sha256": "c3d12c063a7140dbfc0c554c109f20f2e9ee472179e1990b6cd047a2a0d48dcc"
+    },
+    {
+      "path": "apps/editor/scripts/verify-equal-columns-evidence.mjs",
+      "sha256": "84fdfaf74a5785f2fea4dfde06a46c41205941b84ca202b2b3edab68ffa1e3f0"
+    },
+    {
+      "path": "apps/editor/scripts/verify-equal-columns.mjs",
+      "sha256": "ccccf8e589c58b0ac49b3bcc2c4fe8016c258a6196046837e839b4718f016c55"
+    },
+    {
+      "path": "apps/editor/scripts/verify-file-review-bundle.mjs",
+      "sha256": "73bf55aa057d2ab99c34828a133dedee18a5fce821061dbe6189b125c1fc5fc3"
+    },
+    {
+      "path": "apps/editor/scripts/verify-following-table-engine.mjs",
+      "sha256": "85a31b2b84635d707816f90f565b4f2ed1e6f9f7003f0f1b8770f0b9b536b312"
+    },
+    {
+      "path": "apps/editor/scripts/verify-following-table-hancom.mjs",
+      "sha256": "29d0eb2ce5f9cad91434d52205f585cd24bec132629c2611c0acf765b8510d27"
+    },
+    {
+      "path": "apps/editor/scripts/verify-font-fallback-storage-engine.mjs",
+      "sha256": "de9c62ce611bb9d9ba5f85f73ba20b35c1e364437119e0ebdbaa43012044fe76"
+    },
+    {
+      "path": "apps/editor/scripts/verify-format-conversion-fixture.mjs",
+      "sha256": "e77ee73847c28428449e6e0feb3346535766d264b3999f208d3483b7028db301"
+    },
+    {
+      "path": "apps/editor/scripts/verify-format-conversion.mjs",
+      "sha256": "28f9cc62f5ff569ffd348e16bd5816c85e7d1c52b99f8e43d3588adbca5def5b"
+    },
+    {
+      "path": "apps/editor/scripts/verify-formatting-toolbar.mjs",
+      "sha256": "b9febf7f7cbbf0e0849a3983c472aad54a9877cfd74ec75cfd04e435d7d4c608"
+    },
+    {
+      "path": "apps/editor/scripts/verify-generated-column-storage.mjs",
+      "sha256": "1f2a0fbf5273e19db1a8a2a46a95f5f98af5869b9d67e85deed219322b583331"
+    },
+    {
+      "path": "apps/editor/scripts/verify-generated-wrap-boundaries-engine.mjs",
+      "sha256": "9e226556dea025e72421d90fbbbc02999ed339db362661e22aca4ed117492ca7"
+    },
+    {
+      "path": "apps/editor/scripts/verify-generated-wrap-spacing-canvas.mjs",
+      "sha256": "d6aaaa93f0db2e458dff510981c493858c28213a567baad1df65d90f2d31781d"
+    },
+    {
+      "path": "apps/editor/scripts/verify-generated-wrap-spacing-engine.mjs",
+      "sha256": "b64f2eb7e900274732ad9a7fcaecc755b602706be09f8d63ff0027011362d51e"
+    },
+    {
+      "path": "apps/editor/scripts/verify-heading-case-engine.mjs",
+      "sha256": "a05faa344febf326e8232bb2ebb0c5b3575898d878ed5bcd111e6cecce49f019"
+    },
+    {
+      "path": "apps/editor/scripts/verify-history-ui95.mjs",
+      "sha256": "5831cffd96cde13c99c4878b7d182f5d82be13ead3c5c6fd1540bb657317a06f"
+    },
+    {
+      "path": "apps/editor/scripts/verify-hwp-tab-cache-engine.mjs",
+      "sha256": "a4e83521f36a1a7bd349fde66a8426b689002dcc7b5fe145b9acc9cbc7f1a78c"
+    },
+    {
+      "path": "apps/editor/scripts/verify-hwp5-origin-fixture.mjs",
+      "sha256": "bacb2a013d410503be14e889013465c264445a0c6b25ae456be878ef2b0102d4"
+    },
+    {
+      "path": "apps/editor/scripts/verify-hwpx-caret-engine.mjs",
+      "sha256": "4c4ee62ea70022b29fe2c917701e052ca23e4cd22eae6c3dba33fc9d9a03899a"
+    },
+    {
+      "path": "apps/editor/scripts/verify-hwpx-caret.mjs",
+      "sha256": "8a6d1b16075e9ae24e44fc318eab86cfdd9ebee6f11a753f904a706884929673"
+    },
+    {
+      "path": "apps/editor/scripts/verify-hwt-leaf-integrated115.mjs",
+      "sha256": "470526abcdac2bd88342c168e6253739966e71ae9b30de4a1a73063f684388a9"
+    },
+    {
+      "path": "apps/editor/scripts/verify-hwt-leaf-native-ui115.mjs",
+      "sha256": "fdf5c31e2cc01ff4adfb3584e7fc08d5eaa377409ce95b74a69b984d7cc1ce78"
+    },
+    {
+      "path": "apps/editor/scripts/verify-hwt-leaf115.mjs",
+      "sha256": "91f843fb11aa448ed07404681b67a89828e77a2afd8b93e31887c3a30a257905"
+    },
+    {
+      "path": "apps/editor/scripts/verify-hwt-template95.mjs",
+      "sha256": "e62fb7d7681b4c7f58fbf76e8d56581397d90067808841f0617e5f78c804d442"
+    },
+    {
+      "path": "apps/editor/scripts/verify-hyperclova-live.mjs",
+      "sha256": "98610eb7b3c37c07347d791698a69f5ac549cf7532befac82f4c9dc0c18b5110"
+    },
+    {
+      "path": "apps/editor/scripts/verify-legacy-stack-storage115.mjs",
+      "sha256": "d26c3a56a5a85fae698cf2270ce6efb045b0a6ad0f5fb15bb9804b0364590f3b"
+    },
+    {
+      "path": "apps/editor/scripts/verify-line-numbers-engine.mjs",
+      "sha256": "3ae131777ea37571d6b1205e48eaddec528f77845bd1da12f4848f882907596a"
+    },
+    {
+      "path": "apps/editor/scripts/verify-line-numbers.mjs",
+      "sha256": "09245ee90144176a6152db561512e4c41d0a67abf742e28993836a140a2b73eb"
+    },
+    {
+      "path": "apps/editor/scripts/verify-master-page-engine.mjs",
+      "sha256": "5fdf654ffd886a2b2e835175c57d9e94f9504a84b0ef7b0c88618f35c93a2aad"
+    },
+    {
+      "path": "apps/editor/scripts/verify-master-page.mjs",
+      "sha256": "2d3c2c1e9e303d5ee66bd20c3acb1b20ca20d0a87c3670d0fc773de4e165ae2c"
+    },
+    {
+      "path": "apps/editor/scripts/verify-mcst-flow-spacing-engine.mjs",
+      "sha256": "94c3365a0e0c40ef3407170f466c9a75c956750909f5786ffd759d60a99e45f1"
+    },
+    {
+      "path": "apps/editor/scripts/verify-memo-tail-engine.mjs",
+      "sha256": "d10157fc8c0871ac862ad164ee866d92d704ac3f5b041ee91adc69c5c9d6e72f"
+    },
+    {
+      "path": "apps/editor/scripts/verify-merged-row-height-engine.mjs",
+      "sha256": "eeab9ca1875671815733c4fab8043e56d79ca2cfac82cb38e5fe525eb489ad1f"
+    },
+    {
+      "path": "apps/editor/scripts/verify-merged-row-height.mjs",
+      "sha256": "c78a03e362b33d6dea1d93586a5ab38710fc9d89b50fe696056c0d685e763981"
+    },
+    {
+      "path": "apps/editor/scripts/verify-mvp-isolated.mjs",
+      "sha256": "ce1f1cf5141dacf88d66630cf8e286929a94450072f3cf04373f9a637a95ebb0"
+    },
+    {
+      "path": "apps/editor/scripts/verify-mvp.mjs",
+      "sha256": "2fd8da64e293db163dfa7f7724fec3084341789b28a95dcd80b41b2f3cd2c13e"
+    },
+    {
+      "path": "apps/editor/scripts/verify-native-file-storage.mjs",
+      "sha256": "e423d90f2119fa521782d49be25c787dc6d6c045c0b648f180f44ef46d775a2d"
+    },
+    {
+      "path": "apps/editor/scripts/verify-native-prefix-storage.mjs",
+      "sha256": "7fc61b2dc14236ba3ec0aaf536d9835cd71be0778198c1b08e040f9c071f32a9"
+    },
+    {
+      "path": "apps/editor/scripts/verify-native-prefix-ui.mjs",
+      "sha256": "f0b24f5511454bfbf5540531b4cb435cc80f34d888b363aa1c08026f3ce38e95"
+    },
+    {
+      "path": "apps/editor/scripts/verify-native-providers.mjs",
+      "sha256": "ebc7df73e5da058be68e8fc58060341088624ff98d3237065ecf82895832fe8e"
+    },
+    {
+      "path": "apps/editor/scripts/verify-native-recents.mjs",
+      "sha256": "4a3e58138b97a237383f34c060267adf046f0743c79b331721814fcba8750354"
+    },
+    {
+      "path": "apps/editor/scripts/verify-native-row-engine.mjs",
+      "sha256": "9375c54adc983acd506e0c2a4617e0e5f07650f5838dbed282c148d0d0e76677"
+    },
+    {
+      "path": "apps/editor/scripts/verify-native-row-preservation.mjs",
+      "sha256": "6309c38fe09353fb39814055293be883fdd54a5623695efcee911b0533283c9d"
+    },
+    {
+      "path": "apps/editor/scripts/verify-native-section-merge.mjs",
+      "sha256": "d919d3a321fcfb8bfad545fb407837ce66e616a8b10bb6cebb2f8e1a5896e455"
+    },
+    {
+      "path": "apps/editor/scripts/verify-native-shell.mjs",
+      "sha256": "2ae3e4077ffbb3bcdca1358008e8b5ba15fed650c897dba9b2e05024c024be80"
+    },
+    {
+      "path": "apps/editor/scripts/verify-native-window-readback.mjs",
+      "sha256": "f38642159d350342520df13fb62c9cbe2efb1750cae508cfa714710aa47a435c"
+    },
+    {
+      "path": "apps/editor/scripts/verify-none-shadow-engine.mjs",
+      "sha256": "e75231c8567888976270462d8d71246cd83b465107df4c10e4816df6952b1c2c"
+    },
+    {
+      "path": "apps/editor/scripts/verify-nonflow-prefix-engine.mjs",
+      "sha256": "f20ee31a39f271e912e65dda8314bc2c1d34d604a32827c430ecd9e31d4e05f3"
+    },
+    {
+      "path": "apps/editor/scripts/verify-note-shape-storage-engine.mjs",
+      "sha256": "6dfc5ddf231343adaf9c0607d3aebff0dd52c058d46f8c5e6b0e7ccc8910d4de"
+    },
+    {
+      "path": "apps/editor/scripts/verify-original-overlap-conversion.mjs",
+      "sha256": "9397d68a5d621252e5ebdab0b1e01c83d93b147bb3d7fc44f8a9246441b4880e"
+    },
+    {
+      "path": "apps/editor/scripts/verify-overlap-body-lines-engine.mjs",
+      "sha256": "e9090c152c989f29e8f859edc4a644c70cd9dd8bc573f119de2119730a8e7ce3"
+    },
+    {
+      "path": "apps/editor/scripts/verify-overlap-fixture.mjs",
+      "sha256": "d8c8b15535a0cf8b846e4acee511145991e3a203a6059c3d952f811336764424"
+    },
+    {
+      "path": "apps/editor/scripts/verify-overlap-format-browser.mjs",
+      "sha256": "16b1e31ef1aa0a32ad3a84251a219e1a38f97b2a397be22cfab5d177742c5375"
+    },
+    {
+      "path": "apps/editor/scripts/verify-overlap-format-engine.mjs",
+      "sha256": "649cb9ce69e15b21046f39bc2c2842a7b17ba54e0126e1aba486433444eaa7fb"
+    },
+    {
+      "path": "apps/editor/scripts/verify-overlap-native-flow-engine.mjs",
+      "sha256": "9728ab0cdff1d61162cd48e3b8be725495c123ae84bd7c3a15c274b3644e5bee"
+    },
+    {
+      "path": "apps/editor/scripts/verify-overlap-positive-gap-engine.mjs",
+      "sha256": "bee0ce0d950619321f445a55cb11fa3e844ff8fe71a5c0fe51b27d139e2fd506"
+    },
+    {
+      "path": "apps/editor/scripts/verify-overlap-raw-fixture.mjs",
+      "sha256": "c757481690911f5445594a59dd73823f1bc64409e04e6eedf2c656ee552445a2"
+    },
+    {
+      "path": "apps/editor/scripts/verify-overlap-save-layout-engine.mjs",
+      "sha256": "c677d202d5cad1b6af0d736b0598b8faade75556c639aebafe78e6d6f2de6ae4"
+    },
+    {
+      "path": "apps/editor/scripts/verify-overlap-table-tail-engine.mjs",
+      "sha256": "352302735fbffe0c34ec6f971f929f29514b5c8d945c93a444ed4c61ba541efb"
+    },
+    {
+      "path": "apps/editor/scripts/verify-overlap-visible-fixture.mjs",
+      "sha256": "68f7284d29142d8496145e4696bbfa2de235d0308f2d88dc8e400dd3b3998b66"
+    },
+    {
+      "path": "apps/editor/scripts/verify-overlap-visible-tail-engine.mjs",
+      "sha256": "a30160008d8b09d90ac904bf1b35d22df63a3167e50766d5722393f6239ad5cc"
+    },
+    {
+      "path": "apps/editor/scripts/verify-overlap-visible-tail.mjs",
+      "sha256": "1a490adb2a2b4589d39a1f0ddd8021406c135b7eafe87c011681a6ddd5622a29"
+    },
+    {
+      "path": "apps/editor/scripts/verify-owned-native-cell-layout.mjs",
+      "sha256": "9f9d6c593105a6bad5739e712b7d59cf41d748dad8c83fcb3de2ce260b526487"
+    },
+    {
+      "path": "apps/editor/scripts/verify-owned-python-frame-layout.mjs",
+      "sha256": "5fdae930487ee69e8144a16366d7af479b3f4bd319556f0052666b62b4489629"
+    },
+    {
+      "path": "apps/editor/scripts/verify-package-preservation.mjs",
+      "sha256": "706fd431ba00e453323c77258ad8663d22482077c3de58fc0c6d4796bba767b4"
+    },
+    {
+      "path": "apps/editor/scripts/verify-page-border-engine.mjs",
+      "sha256": "496175c4622b4831f2334d6655a8f2381f168406760948542c244b5f12fe9389"
+    },
+    {
+      "path": "apps/editor/scripts/verify-page-border.mjs",
+      "sha256": "85dcedc8c9070322df301320ec90234586278c0152d6efefdb7ecdcc399d1ab7"
+    },
+    {
+      "path": "apps/editor/scripts/verify-page-copy-engine.mjs",
+      "sha256": "fc27556580811734e1e424ba9d6e5c269f914c52f5b47a3897393ba520a6710c"
+    },
+    {
+      "path": "apps/editor/scripts/verify-page-copy.mjs",
+      "sha256": "03355e2036ac044a7c85fd9651227f590b6ce2c5f282bfa2c53b1f2518687dd7"
+    },
+    {
+      "path": "apps/editor/scripts/verify-page-delete-engine.mjs",
+      "sha256": "500dbb9166afe0e4caa6ba0bd0cfb769676270b4ebb5f18284a8d81cac0d6021"
+    },
+    {
+      "path": "apps/editor/scripts/verify-page-delete.mjs",
+      "sha256": "78dd50ca3893a255609ffc1244590531cc9e5aedb713a1247c04135a3cb09bcd"
+    },
+    {
+      "path": "apps/editor/scripts/verify-page-image-engine.mjs",
+      "sha256": "31720d939eea8c50de75935c94d2781454fa80555c95d2c9f7ff8a3279c6d3a0"
+    },
+    {
+      "path": "apps/editor/scripts/verify-page-image-paste-engine.mjs",
+      "sha256": "85d0af246569af0199bbcae518026be0d6378b290794aa7e182cd9d0987d33f7"
+    },
+    {
+      "path": "apps/editor/scripts/verify-page-image-paste.mjs",
+      "sha256": "02147e0163730f449fc1d0c0a58d327ce5ec66ca184f80de21ad4a45c4b23458"
+    },
+    {
+      "path": "apps/editor/scripts/verify-page-image.mjs",
+      "sha256": "18d71dc4bb809c115f5623cb625cb79a1057ebc993d593873d3965494b1a75d4"
+    },
+    {
+      "path": "apps/editor/scripts/verify-page-paper-engine.mjs",
+      "sha256": "bd3b3146853ef54c63ec10d2cee25dcbf690fd335db62532fb1d85feb86700cc"
+    },
+    {
+      "path": "apps/editor/scripts/verify-page-paper.mjs",
+      "sha256": "6299fd718a38940f61bbb1e22139aa46e8aa349561432eb4751aad6c668b66a6"
+    },
+    {
+      "path": "apps/editor/scripts/verify-page-style-engine.mjs",
+      "sha256": "28cd7d7f29e03b42b7b87256f0fe8bc5fdac878d98fc3247094c8c5657072215"
+    },
+    {
+      "path": "apps/editor/scripts/verify-page-style.mjs",
+      "sha256": "6256ac29f9d24668d69829006e85d8cee5ae543fe1d8ba8edbfac06872ee9244"
+    },
+    {
+      "path": "apps/editor/scripts/verify-paragraph-page-owner-engine.mjs",
+      "sha256": "22257204ea316cae3b972b0defe8f8e319dac30f2370495374d552c84ef2a3c4"
+    },
+    {
+      "path": "apps/editor/scripts/verify-paragraph-page-owner-evidence.mjs",
+      "sha256": "413b3bd811c1406d318aa83dde59529d4df7625e93f875eb3ce5c68afb7b98a3"
+    },
+    {
+      "path": "apps/editor/scripts/verify-paragraph-page-owner-geometry.mjs",
+      "sha256": "014175efa316ed99410ed33bd85ec636d3f7b0f9e18264bebd814baba3be33e4"
+    },
+    {
+      "path": "apps/editor/scripts/verify-paragraph-spacing-xml.py",
+      "sha256": "15f0579fac50c35cad8d7c2c4f9fdb5098647b7f818e1fb9d87c4ce48cc13e6f"
+    },
+    {
+      "path": "apps/editor/scripts/verify-parallel-editor-evidence.mjs",
+      "sha256": "62d95449d83ff96eba9fcd44738b5b2a85418755bcf4ae08e6780fac57863c76"
+    },
+    {
+      "path": "apps/editor/scripts/verify-parity-features.mjs",
+      "sha256": "f1e0f99c21c274899e08a298f96ae8b43dacb9631e3772a74dc031cf79650413"
+    },
+    {
+      "path": "apps/editor/scripts/verify-parity-shortcuts.mjs",
+      "sha256": "ee6ac76dded7a91720885b68ff96e62c260c9ed7f836f4ba89d23b89329480ca"
+    },
+    {
+      "path": "apps/editor/scripts/verify-parity-state.mjs",
+      "sha256": "9bf66ee802dda01b98dca35c46958e7fea881e5c863a6b017afc08763cc5c367"
+    },
+    {
+      "path": "apps/editor/scripts/verify-pre-agent-evidence.mjs",
+      "sha256": "837691d2b5c9bb53d5465a8541f6e61a0aed7198112adaea48b847bbc66e8f46"
+    },
+    {
+      "path": "apps/editor/scripts/verify-preview-utf16-storage117.mjs",
+      "sha256": "d117afc3654527f1b2e902ad40f68b3a897a61bd2ff18a21c27eaf630199da18"
+    },
+    {
+      "path": "apps/editor/scripts/verify-public-browser.mjs",
+      "sha256": "b0597e1525b5b103f16f62804480a61080d5c30f9c8ead809b978f9e654af6f9"
+    },
+    {
+      "path": "apps/editor/scripts/verify-public-corpus.mjs",
+      "sha256": "89d896dc6036519f0e6265c4f3489c90a1d9dd1409bff2a6590f31cd36c6a75d"
+    },
+    {
+      "path": "apps/editor/scripts/verify-python-edit-storage.mjs",
+      "sha256": "fdefed762f53c8bc23609161aa46b37f2a4b17f103d3de43050a7b3a08e05730"
+    },
+    {
+      "path": "apps/editor/scripts/verify-python-edit-ui.mjs",
+      "sha256": "511c26ec9a2fa15833c9f327aa3e9a1d60bebcc03d988f28f93a2561133a8ef3"
+    },
+    {
+      "path": "apps/editor/scripts/verify-recovery-integrity.mjs",
+      "sha256": "3c302af2e33fe773800b42adfba8016b4af0a2b6586385f492a2f607826ed300"
+    },
+    {
+      "path": "apps/editor/scripts/verify-refactor-compatibility.mjs",
+      "sha256": "772e26f231d96e18bbacc12bc6d7acd1a0be1ed5ec2121077da382ee4ce67648"
+    },
+    {
+      "path": "apps/editor/scripts/verify-reflowed-native-storage.mjs",
+      "sha256": "0e186add820aa2b86ae95a47a518a73d04132983f65360afabe934be2bc37a5a"
+    },
+    {
+      "path": "apps/editor/scripts/verify-reflowed-native-ui.mjs",
+      "sha256": "7bbc1ec5450fd0aafe42b1dfda8e0073ae77d5a943bd39ab02cace85148bdefe"
+    },
+    {
+      "path": "apps/editor/scripts/verify-remaining-evidence.mjs",
+      "sha256": "a07382bab88070538e4b5ed21fd8621d573928b8336a9de55c0082c657388113"
+    },
+    {
+      "path": "apps/editor/scripts/verify-row-heights-engine.mjs",
+      "sha256": "df0b19c8946004cfd0277533dbe100c60ea6c7d41bdaffa24c4020335b054a61"
+    },
+    {
+      "path": "apps/editor/scripts/verify-row-heights-evidence.mjs",
+      "sha256": "7593e7635e30a33838fe7725683c82d2794100334898d57da034bca027f4ca8c"
+    },
+    {
+      "path": "apps/editor/scripts/verify-row-heights.mjs",
+      "sha256": "4d548a304124691253b2d7ab635a4364edd7b84bf83e03bc6439c1c76bf7b972"
+    },
+    {
+      "path": "apps/editor/scripts/verify-save-recovery.mjs",
+      "sha256": "d186fb6da61718094211db567b31a963415d8760ff630af0091122b8f47f9810"
+    },
+    {
+      "path": "apps/editor/scripts/verify-save-table-controls-evidence.mjs",
+      "sha256": "0b0b3f8e085bcfd770daca630738705c73e28192437b284a1f499581c9d89672"
+    },
+    {
+      "path": "apps/editor/scripts/verify-save-table-frames.mjs",
+      "sha256": "a31ab6288a1e5a4a5334f204c69641f6f6b22e6465d2d7d8fa4bc21753fecc4c"
+    },
+    {
+      "path": "apps/editor/scripts/verify-section-macros-engine.mjs",
+      "sha256": "b6476e6bc2f8f897fa7596b80dd40e4921ae2b8763ed6eb9ed6a002e0b1d6f70"
+    },
+    {
+      "path": "apps/editor/scripts/verify-section-macros.mjs",
+      "sha256": "baa290cb075b2e693954fab3b50e45f4e82c7975e0683af6fd4e1c03f2dcfbba"
+    },
+    {
+      "path": "apps/editor/scripts/verify-section-merge.mjs",
+      "sha256": "80a67261aa09c75dd82ec7a570ab395a257bc47de8a6e16c57e98695950245b3"
+    },
+    {
+      "path": "apps/editor/scripts/verify-sections-tabs.mjs",
+      "sha256": "01f812943f8df75c8020009a60b98bac3180ae31c57dd4f2bc3ea2322312e044"
+    },
+    {
+      "path": "apps/editor/scripts/verify-selected-object-properties.mjs",
+      "sha256": "96a78eafc10f47dc6c2e10d79b9e89e0096c2fc19f009f06d43b1d05f47815ab"
+    },
+    {
+      "path": "apps/editor/scripts/verify-session-expansion.mjs",
+      "sha256": "75452736d46b514b037035c99c4f6de8ef888ed9e6f2a24bf2903c470bcfa51a"
+    },
+    {
+      "path": "apps/editor/scripts/verify-session-story-engine.mjs",
+      "sha256": "f2d4296f749a8e981521e28f20086c8cba53e2e717f4854cd6fb35ca7a9fb6a7"
+    },
+    {
+      "path": "apps/editor/scripts/verify-session-story-fixture.mjs",
+      "sha256": "16de4d16fb6b1c50b4ba785fd4dfd4b8ec3c559ecc018bee8b1d0eb52bbdc0fe"
+    },
+    {
+      "path": "apps/editor/scripts/verify-session-story.mjs",
+      "sha256": "df41ddcbb27be4894e34af1887acbadaaf25d1c241229d2ae274534b39315468"
+    },
+    {
+      "path": "apps/editor/scripts/verify-session-textbox-engine.mjs",
+      "sha256": "eb45533cf0f5a206ecdf743842a5116e1db5682334078ab42dda067c39cb31f6"
+    },
+    {
+      "path": "apps/editor/scripts/verify-session-textbox.mjs",
+      "sha256": "2fb2f0e91b121f310eaa05792b5325e80dc3e411eae1af4248bea3a41bc00c71"
+    },
+    {
+      "path": "apps/editor/scripts/verify-shortcuts.mjs",
+      "sha256": "5ceb0551456b30dd324d77c474fc148e00d68419b8cb7ba9d37d432849cc76df"
+    },
+    {
+      "path": "apps/editor/scripts/verify-stamped-export112.mjs",
+      "sha256": "7d7b291e077f85bc4230594d4184319b1ba6a6bccd1f75e695334cae93058fb0"
+    },
+    {
+      "path": "apps/editor/scripts/verify-stored-information95.mjs",
+      "sha256": "665e762ffe5e4845367e4ea4d5929bc9695e7cf8728f2edfac338227d8c9219f"
+    },
+    {
+      "path": "apps/editor/scripts/verify-stored-time111.mjs",
+      "sha256": "744b0cfe4e86a115540e239b647fc914a2d86ece097fef003a9d79d966e0872b"
+    },
+    {
+      "path": "apps/editor/scripts/verify-style-engine.mjs",
+      "sha256": "5d2c8f934d17bb817c375c2c226611aac2b3daf54188b31dc4b358b5eefbedbe"
+    },
+    {
+      "path": "apps/editor/scripts/verify-style-stories.mjs",
+      "sha256": "4b29eb14ab8b530560e7ef32d4f8e6052dce1e2efd450a3c48120e2380ab229c"
+    },
+    {
+      "path": "apps/editor/scripts/verify-tab-cache-engine.mjs",
+      "sha256": "3b271cb37aa08331addd033914fe8a1200bf79f3dc3320d99f77ea29296d0246"
+    },
+    {
+      "path": "apps/editor/scripts/verify-tab-placeholder-canvas.mjs",
+      "sha256": "eca7b0a81d0972c374c9af8623dcdfd369c02be4b6a956734066031f292e00e2"
+    },
+    {
+      "path": "apps/editor/scripts/verify-tab-placeholder-engine.mjs",
+      "sha256": "7c11d289e65192a2457a5768c034d1f97afef23adcfcc11ce468418d4e9aaf3b"
+    },
+    {
+      "path": "apps/editor/scripts/verify-tab-spacing-storage-engine.mjs",
+      "sha256": "832581e1db91a18d77373c22c3f9094ce926fd69007a33ba8eb957f7c10a6525"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-content-height-engine.mjs",
+      "sha256": "2f189bbaddb04ab874b1f25d8be75adc06e491a901c9cbec9e2d2801ebff47dd"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-conversion-engine.mjs",
+      "sha256": "bf53e26502123588931a8f10db428548f379c176d47550d0504ff875a2afd262"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-conversion.mjs",
+      "sha256": "e8e0f8be8e974311cd57dcbf3753fc40501bfc17feffacaa56b0e843d44a7865"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-default-padding-engine.mjs",
+      "sha256": "b7dabed0aa6678b55a49840a1dfb366e2c8eb246b501c1b796bd60744e341d8b"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-default-padding-evidence.mjs",
+      "sha256": "b8e076530c44eb6c25d8e96b64359f750113349dd13b9c229eaae182033f243e"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-height-width-engine.mjs",
+      "sha256": "aaca162d73b1c0e3df73eb45207e1b59147ef70b1e6b1fa77e9cec5c91f4eb72"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-merge-engine.mjs",
+      "sha256": "c7894bc336de76f6140e2669ee733389e75a74dbb448c712dce0ae2a5ed8dfc6"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-merge-evidence.mjs",
+      "sha256": "f9de91b5141051f937d62a76595f85e708ceb0c7023a39fa5e89a6867dc461f2"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-merge.mjs",
+      "sha256": "2001e8143eb87b8f788f1d82f3821f6b31d6a58edded2f90399a3f8f76ae0a21"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-multi-header-engine.mjs",
+      "sha256": "1d3fdc7f07d622490d1289c23644396d94d7a1765a5a59a86ee538299b873474"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-multi-header-evidence.mjs",
+      "sha256": "524d920a77304bfb6c2d6f1e863dc94fa9468f8f93bbe11fdef13d4ecf13e004"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-multi-header.mjs",
+      "sha256": "8223807c242a5b6e0c5c69c561896fd0233383987cf4614ff0b09a27dce85532"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-outer-hancom.mjs",
+      "sha256": "b5e9293fb2d70e2a93d4e073bc023f787558873fc635f9bcc811324e87ee7b52"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-outer-margin-engine.mjs",
+      "sha256": "7665c6f6e6bf864778eb90de990f8e7689dc71bcbd59a43f136482a736a158aa"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-protection-engine.mjs",
+      "sha256": "fa74f91275580040be66c70172b13c9fe25157ba258a746c8175b753bd42a0e5"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-protection-evidence.mjs",
+      "sha256": "1a317b89e1a8e854786e852f29b587188f79307e9fe0a2a08d388e245f180f3a"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-protection.mjs",
+      "sha256": "72c7cc43295696b1e2f8929781b0935fde442b91111079b3535d13a8d5931b62"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-split-engine.mjs",
+      "sha256": "9af8d5be971dea1143c361d36108d7bd94144debc22aec7019226f4f268e7849"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-split-evidence.mjs",
+      "sha256": "0489c26bb4b15436f18f53813fa81e9dd5d6e95bcd557ed5307eaa83cc851e60"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-split.mjs",
+      "sha256": "dc12c6b9e84b139fde470b91c5ffbd59ab0749fded5fec0e5cc0dec83bc26cb9"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-structure-engine.mjs",
+      "sha256": "dd4bfc62eebe7a60c28f6d877d57f64e86a141d7e148736e26d27741096d14ba"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-structure-evidence.mjs",
+      "sha256": "4a3a29992aa4e6c43d83947d781f2c9cd9ea00e4d2af22cdff7ee7971787f378"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-structure.mjs",
+      "sha256": "845abd1f681a555e559d407859cd245efa6f0fa41eefdea11a6ae88764c1fca3"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-subdivision-engine.mjs",
+      "sha256": "e89408d47bc8f768badd3fc430397b6ac9a94288ce05748c76d7201a1f7eb89f"
+    },
+    {
+      "path": "apps/editor/scripts/verify-table-subdivision.mjs",
+      "sha256": "cd3d8871693910c062a8e84d292040017cabf0ab7540d6eb8e616553fddc65ad"
+    },
+    {
+      "path": "apps/editor/scripts/verify-textbox-alignment-engine.mjs",
+      "sha256": "ab817bd82790a6618b443412fe945df99efbdc6f66ce16522b18c663d9828871"
+    },
+    {
+      "path": "apps/editor/scripts/verify-textbox-storage-contract-engine.mjs",
+      "sha256": "6c2950b5205085e33ceb7d00560346a8501fed0294a12c9cc90bfaff4d607871"
+    },
+    {
+      "path": "apps/editor/scripts/verify-typeset-canvas.mjs",
+      "sha256": "cd51c00384a86a9544b0de5d6dcfb6866ccfae708cbda666d7dbcecb9066a16c"
+    },
+    {
+      "path": "apps/editor/scripts/verify-typeset-controls-engine.mjs",
+      "sha256": "dd511bd126bbefaa06def3b46e26aaef6f04c0251ab7a3727be3b38ff7a18426"
+    },
+    {
+      "path": "apps/editor/scripts/verify-typeset-reflow-engine.mjs",
+      "sha256": "049a72c3195eef37e9111d5bf5bcf7b6c334e1277c930232b5119624d6d3ff8a"
+    },
+    {
+      "path": "apps/editor/scripts/verify-unified-chrome.mjs",
+      "sha256": "4c925eb5391af5f92ec77bf0bb4a67c271aaeaf172f20324a8ba36310556fcd8"
+    },
+    {
+      "path": "apps/editor/scripts/verify-unified-recents.mjs",
+      "sha256": "0548780384d6207b999ec316c5e6662bc770fae81a72af861e2f0b2f17f2b0e6"
+    },
+    {
+      "path": "apps/editor/scripts/verify-unknown-control-loss-engine.mjs",
+      "sha256": "5fc60a0bb1d8e27ef8f969e2b82578e389b51d08f250fb40a05ba1ce473acd7f"
+    },
+    {
+      "path": "apps/editor/scripts/verify-xml-documents-integrated.mjs",
+      "sha256": "29202056a097e1cd5c0d0cfe150cf0049c3f683158e93a59ea9123f79915bc82"
+    },
+    {
+      "path": "apps/editor/scripts/verify-xml-documents.mjs",
+      "sha256": "c467771728a1d1989c3a519ae33a3f77082494f29ee60cca8d205d4bb801f974"
+    },
+    {
+      "path": "apps/editor/scripts/verify-xml-recovery.mjs",
+      "sha256": "e14547a9738d25a861f0055131efb0e4b1102213af712992b751d57aa0ab13bd"
+    },
+    {
+      "path": "apps/editor/scripts/verify-xml-simple-types95.mjs",
+      "sha256": "779f31a97c02ec91702b3b5fa9ef61fb1bfa67e3a517a72bab673e60f88c086a"
+    },
+    {
+      "path": "scripts/build-document-engine-wsl.sh",
+      "sha256": "5daf445b05b26a908150b1effbf045f9280167d53472c0eba2d0792f5f59825b"
+    },
+    {
+      "path": "scripts/Build-DocumentEngine.ps1",
+      "sha256": "7b1b3a2893c440c3e1d2ac2ba5a70834b2114cdd623297ba36de9777091bc9fa"
+    },
+    {
+      "path": "scripts/Build-Jueony.ps1",
+      "sha256": "2860ef6b20149404e73755a38d58c015243e625c8aaafe310b55c5133e9d9bb2"
+    },
+    {
+      "path": "scripts/Build-Standalone.ps1",
+      "sha256": "9e4e46fe2d4bd9d74f2f2df6863a5478eb01a0fc6a2174272ddd46dd5ab27f5f"
+    },
+    {
+      "path": "scripts/check-module-boundaries.mjs",
+      "sha256": "853b0ec4d79c608614fe994d76980406695d26fe8dad93908799fb97b00a17aa"
+    },
+    {
+      "path": "scripts/diagnose-native-process.ps1",
+      "sha256": "82b7f6298bf6727755cf8adb07e4945fc6890e4648659b1725720d3820f75d78"
+    },
+    {
+      "path": "scripts/feature_checklists.py",
+      "sha256": "3c68e8918a69545a3792fb0a06d2294ba8b987dce333f4e3d740e9e28bf51cea"
+    },
+    {
+      "path": "scripts/generate-native-icon.mjs",
+      "sha256": "fda99a339b9e0a7579bd1e3f30d22e33bb6974747f6689a4d832daf148317a39"
+    },
+    {
+      "path": "scripts/generate-rag-corpus.mjs",
+      "sha256": "48b059c26035b09ddcf470878bd8bf58da8311dab026d113e4df75c68c7474a9"
+    },
+    {
+      "path": "scripts/hangul-style-recovery.mjs",
+      "sha256": "3a9ad25fba643dba1bb39cdf54b60660d3e7175b0f8e5990dd100c5f206dcec0"
+    },
+    {
+      "path": "scripts/module-boundaries.json",
+      "sha256": "694628f7fef725958ffd8288742a47dbf22b8f96dd533d03bd235cf36fda392a"
+    },
+    {
+      "path": "scripts/Prepare-DocumentWindowReview.ps1",
+      "sha256": "3d47d3a77fae78e5c6a4792f6d63ef7d84eca42f342cab590cbe52efc3acb7c1"
+    },
+    {
+      "path": "scripts/Rename-Project-Folder.ps1",
+      "sha256": "abde71f07fefc6fc440134f2715bdf560e080ce3eb1c0464ff7bf40a998c43b2"
+    },
+    {
+      "path": "scripts/render_work_checklist.py",
+      "sha256": "38572183bee3db0ea67383164bf4852a8462b8f00de7cba26900a981e7416c21"
+    },
+    {
+      "path": "scripts/Start-Jueony.ps1",
+      "sha256": "0a2807a0a1b7a1a8913dd6dc0be5d16c696e10fdfdb19ffce1692ef68a6aa80b"
+    },
+    {
+      "path": "scripts/test_feature_checklists.py",
+      "sha256": "cf470d5b843a7e5c9674da5cc218da54303d393535267417150264c11be76ac2"
+    },
+    {
+      "path": "scripts/verify-rag-corpus.mjs",
+      "sha256": "1378a5f17e9b2483d34345794c60c52d68aebfdcec9c3c15ef85b57ac9016dea"
+    },
+    {
+      "path": "scripts/verify_feature_tables.mjs",
+      "sha256": "2484da85aea9e588d5a0d9eb01d4fa4099f7c35f454a4d931d0d5b720ff16787"
+    },
+    {
+      "path": "scripts/verify_file_preservation.py",
+      "sha256": "7bb5dad479449ea92b6fb9ad6f7863581b48f8294ec5e20282eeefad839d3da1"
+    },
+    {
+      "path": "scripts/verify_file_workflows.py",
+      "sha256": "2b418544afb4d0524fe9f0024c6bd37642baad0071fa78a198f389c31767f1d9"
+    }
+  ]
+}

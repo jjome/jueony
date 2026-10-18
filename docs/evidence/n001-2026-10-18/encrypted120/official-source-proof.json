@@ -1,0 +1,23 @@
+{
+  "baseSourceId": "704c7d510eb58bc2",
+  "sourceId": "045cc9e7bb7d46ad",
+  "changedFiles": {
+    "src/parser/mod.rs": "67fb930cefd2122584c8adb283a9fa2f49ba22dd13595f136892441408e9c39a",
+    "src/parser/native_computed_rows.rs": "341a9621a62d363e5984e52c6f01e587653986770a2a70db1c3873b0cbc56032",
+    "src/serializer/cfb_writer.rs": "080e4161038068986bb799b5b4aa9e6728becc8eb4a3d36045f34583f68b142c",
+    "src/serializer/native_computed_rows.rs": "4e1761b7141fb887addd8fd0eaaa5f7f21dea78ffed72c7ec137f494c0643561",
+    "src/model/native_computed_resource.rs": "462577a8067908aac512c6a06174cb0172fa7ce447598bde207d11c4e90fdd7b"
+  },
+  "unchangedOtherRust": 1102,
+  "unexpectedChanges": [],
+  "resourceCount": 243,
+  "resourceSha256": "f941ef2be64175b9299e4dad80ddaa24640a2a61db2e0d4019a7f960021cfb5f",
+  "compiledRawHashes": {
+    "src/parser/mod.rs": "db0702c6e2d0ad98dd0348b7bc1249b4ee05cb7e1a8714b6893c448f54e71825",
+    "src/parser/native_computed_rows.rs": "88805a99b547b964671e56e31a58631a3e34a421e40a5cad366b3a927a66fc8f",
+    "src/serializer/cfb_writer.rs": "5d21b64a4d6cd5009eb006510e448ec3b8def8a85aad9d0eff1ebaacc21cb743",
+    "src/serializer/native_computed_rows.rs": "c375008926eb636086df9b9fa6e503698df7df067b03c0696cd7bf31d4518c32",
+    "src/model/native_computed_resource.rs": "7057f6f40b5ea65b37b531b7693122f9ca96cef834e64f9b0e5c01eadfc397a5"
+  },
+  "scope": "N001 encrypted computed-row preservation only. No frontend/Agent/save-clock changes."
+}

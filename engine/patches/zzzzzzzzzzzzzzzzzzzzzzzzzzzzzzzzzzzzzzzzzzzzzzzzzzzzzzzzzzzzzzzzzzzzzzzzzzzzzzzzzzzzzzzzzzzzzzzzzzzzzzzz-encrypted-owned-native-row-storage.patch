@@ -1,0 +1,118 @@
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[85, 217, 107, 144, 18, 202, 254, 148, 128, 18, 185, 58, 53, 223, 5, 55, 4, 199, 96, 123, 101, 189, 156, 156, 165, 226, 174, 247, 153, 216, 133, 20];
++pub(crate) const RESOURCE:[u8;32]=[249, 65, 239, 43, 230, 65, 117, 185, 41, 158, 77, 173, 128, 221, 170, 36, 100, 10, 42, 97, 219, 46, 13, 64, 25, 167, 249, 96, 2, 28, 251, 95];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -243,6 +243,12 @@
+             ("src/serializer/hwpx/section.rs",include_bytes!("../serializer/hwpx/section.rs").as_slice()),
+             ("src/serializer/control.rs",include_bytes!("../serializer/control.rs").as_slice()),
+             ("src/document_core/document_metadata_stamped_export.rs",include_bytes!("../document_core/document_metadata_stamped_export.rs").as_slice()),
++            ("src/parser/mod.rs",include_bytes!("../parser/mod.rs").as_slice()),
++            ("src/parser/native_computed_rows.rs",include_bytes!("../parser/native_computed_rows.rs").as_slice()),
++            ("src/serializer/cfb_writer.rs",include_bytes!("../serializer/cfb_writer.rs").as_slice()),
++            ("src/serializer/native_computed_rows.rs",include_bytes!("../serializer/native_computed_rows.rs").as_slice()),
++            ("crates/rhwp-password-crypto/Cargo.toml",include_bytes!("../../crates/rhwp-password-crypto/Cargo.toml").as_slice()),
++            ("crates/rhwp-password-crypto/src/lib.rs",include_bytes!("../../crates/rhwp-password-crypto/src/lib.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- a/src/parser/mod.rs
++++ b/src/parser/mod.rs
+@@ -613,7 +613,7 @@
+             crate::model::hyperlink_format::decode(&mut doc, &bytes);
+         }
+     }
+-    native_computed_rows::restore(&mut doc);
++    native_computed_rows::restore(&mut doc, password);
+     Ok(doc)
+ }
+ 
+--- a/src/parser/native_computed_rows.rs
++++ b/src/parser/native_computed_rows.rs
+@@ -33,7 +33,7 @@
+ }
+ 
+ pub(crate) fn eligible(doc: &Document) -> bool {
+-    !doc.header.encrypted && !doc.header.distribution && !doc.is_hwp3_variant
++    !doc.header.distribution && !doc.is_hwp3_variant
+         && !doc.provenance.hwp3_lineage
+         && !doc.extra_streams.iter().any(|(path, _)|
+             path.to_uppercase() == crate::model::document::HWP3_ORIGIN_STREAM_PATH.to_uppercase())
+@@ -43,14 +43,23 @@
+ /// completed rows. Invalid/unknown/stale streams remain opaque and unchanged.
+ /// Consuming an owned stream avoids treating its later legitimate regeneration
+ /// as permission to overwrite an unrelated raw-stream collision.
+-pub(crate) fn restore(doc: &mut Document) -> bool {
++// Password availability here is supplied exclusively by the strict HWP parser,
++// after supported header/version and actual DocInfo/body decryption succeeded.
++// No live credential or decrypted copy is retained in the document model.
++pub(crate) fn restore(doc: &mut Document, password: Option<&[u8]>) -> bool {
+     if !eligible(doc) { return false; }
+     let matches = doc.extra_streams.iter().enumerate()
+         .filter(|(_, (path, _))| conflicting_path(path)).collect::<Vec<_>>();
+     if matches.len() != 1 || matches[0].1.0 != STREAM { return false; }
+     let index = matches[0].0;
+-    let bytes = matches[0].1.1.clone();
+-    if bytes.len() > contract::MAX_BYTES { return false; }
++    let raw = &matches[0].1.1;
++    if raw.len() > contract::MAX_BYTES { return false; }
++    // Decode a bounded temporary only. Invalid/stale/unknown descriptor bytes
++    // remain the exact original opaque ciphertext in extra_streams.
++    let bytes = if doc.header.encrypted {
++        let Some(password) = password else { return false; };
++        crate::password_crypto::decrypt_hwp5_stream(raw, password)
++    } else { raw.clone() };
+     let Some(header) = doc.header.raw_data.as_deref() else { return false; };
+     let Some(info) = doc.doc_info.raw_stream.as_deref() else { return false; };
+     let binding = binding_header(header, info);
+--- a/src/serializer/cfb_writer.rs
++++ b/src/serializer/cfb_writer.rs
+@@ -235,7 +235,7 @@
+     if let Some(bytes) = crate::model::hyperlink_format::encode(doc) {
+         extra_streams.push((crate::model::hyperlink_format::HWP_STREAM.into(), bytes));
+     }
+-    super::native_computed_rows::append(doc, &header_bytes, &doc_info_bytes, &section_bytes_list, password.is_some(), &mut extra_streams, &mut content_loss);
++    super::native_computed_rows::append(doc, &header_bytes, &doc_info_bytes, &section_bytes_list, password, &mut extra_streams, &mut content_loss);
+     let bytes = write_hwp_cfb(
+         &header_bytes,
+         &doc_info_bytes,
+--- a/src/serializer/native_computed_rows.rs
++++ b/src/serializer/native_computed_rows.rs
+@@ -32,12 +32,12 @@
+ }
+ 
+ pub(crate) fn append(doc: &Document, header: &[u8], doc_info: &[u8],
+-    sections: &[Vec<u8>], password: bool, extra: &mut Vec<(String, Vec<u8>)>,
++    sections: &[Vec<u8>], password: Option<&[u8]>, extra: &mut Vec<(String, Vec<u8>)>,
+     report: &mut ContentLossReport) {
+     let needed = doc.sections.iter().any(|s|
+         s.paragraphs.iter().any(|p|p.exports_completed_native_rows()));
+     if !needed { return; } // Absent/revoked authority can never mint a stream.
+-    if password || !adapter::eligible(doc)
++    if !adapter::eligible(doc)
+         || extra.iter().any(|(path,_)|adapter::conflicting_path(path))
+         || !emitted_rows_match(doc, sections) {
+         lost(report); return;
+@@ -45,7 +45,15 @@
+     let binding = adapter::binding_header(header, doc_info);
+     let hashes = sections.iter().map(|bytes|contract::sha(bytes)).collect::<Vec<_>>();
+     match contract::encode_representation(doc, &binding, &hashes, false) {
+-        Some(bytes) => extra.push((STREAM.into(), bytes)),
++        Some(bytes) => {
++            // Encrypt only this newly produced, validated owner. Opaque reserved
++            // collisions never reach this branch and must never be re-encrypted.
++            let bytes = match password {
++                Some(value) => crate::password_crypto::encrypt_hwp5_stream(&bytes, value),
++                None => bytes,
++            };
++            extra.push((STREAM.into(), bytes));
++        },
+         None => lost(report),
+     }
+ }

@@ -1,0 +1,686 @@
+--- a/src/document_core/queries/rendering.rs
++++ b/src/document_core/queries/rendering.rs
+@@ -4990,7 +4990,7 @@
+         if self.pagination.len() <= section_index {
+             self.pagination
+                 .resize_with(section_index + 1, || PaginationResult {
+-                selected_composition_trace: None,
++                selected_composition_trace: None, required_plain_paint:None,
+                     pages: Vec::new(),
+                     wrap_around_paras: Vec::new(),
+                     hidden_empty_paras: std::collections::HashSet::new(),
+@@ -5195,7 +5195,7 @@
+         let sec_count = self.document.sections.len();
+         while self.pagination.len() < sec_count {
+             self.pagination.push(PaginationResult {
+-                selected_composition_trace: None,
++                selected_composition_trace: None, required_plain_paint:None,
+                 pages: Vec::new(),
+                 wrap_around_paras: Vec::new(),
+                 hidden_empty_paras: std::collections::HashSet::new(),
+@@ -7999,9 +7999,17 @@
+                     ||self.deferred_pagination_descriptor.is_some()||self.dirty_sections.iter().any(|v|*v){return None;}
+                 self.pagination.get(sec_idx).zip(self.measured_tables.get(sec_idx)).and_then(|(result,measured)|crate::renderer::current_frame_rows_plan::CurrentEqualColumnStackCandidate::from_current(&self.document,self.source_format,result,&default_tab_styles,measured,self.effective_layout_profile(),self.dpi)).map(|p|p.paint_plan())
+             }),
+-            self.pagination.get(sec_idx).and_then(|result|crate::renderer::current_accepted_composition::CurrentAcceptedCompositionView::from_current(
+-                result,render_paragraphs,&default_tab_styles,self.effective_layout_profile(),self.dpi)),
++            if let Some(result)=self.pagination.get(sec_idx){
++                let ordinary=crate::renderer::current_accepted_composition::CurrentAcceptedCompositionView::from_current(
++                    result,render_paragraphs,&default_tab_styles,self.effective_layout_profile(),self.dpi);
++                crate::renderer::current_accepted_composition::CurrentAcceptedCompositionView::attach_required(
++                    ordinary,result,render_paragraphs,&default_tab_styles,self.effective_layout_profile(),self.dpi)
++                    .map_err(|message|HwpError::RenderError(message.into()))?
++            }else{None},
+         );
++        if tree.invalid_required_plain_paint {
++            return Err(HwpError::RenderError("current suffix formatter row/width binding failed; legacy repaint refused".into()));
++        }
+         // 확장 바탕쪽 추가 렌더링
+         for ext_mp in &extra_mps {
+             self.layout_engine.build_master_page_into(
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[44, 26, 144, 51, 24, 91, 120, 112, 223, 109, 157, 199, 217, 32, 191, 254, 122, 158, 115, 253, 68, 76, 4, 31, 220, 48, 12, 40, 177, 247, 169, 1];
++pub(crate) const RESOURCE:[u8;32]=[215, 153, 218, 49, 191, 74, 20, 197, 13, 182, 188, 155, 95, 62, 235, 21, 182, 250, 175, 183, 47, 237, 13, 125, 18, 55, 12, 128, 56, 221, 199, 208];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -267,6 +267,7 @@
+             ("src/renderer/current_equal_column_prefix.rs",include_bytes!("../renderer/current_equal_column_prefix.rs").as_slice()),
+             ("src/renderer/current_page_frames135.rs",include_bytes!("../renderer/current_page_frames135.rs").as_slice()),
+             ("src/renderer/current_equal_column_stack137.rs",include_bytes!("../renderer/current_equal_column_stack137.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/current_suffix.rs",include_bytes!("../renderer/typeset/paragraph/current_suffix.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- a/src/renderer/current_accepted_composition.rs
++++ b/src/renderer/current_accepted_composition.rs
+@@ -5,17 +5,38 @@
+ use super::{composer::ComposedParagraph,pagination::PaginationResult,selected_composition_observer127::FinalizedSelectedCompositionTrace,
+  style_resolver::ResolvedStyleSet};
+ #[derive(Debug,Clone)]
+-pub(crate) struct CurrentAcceptedCompositionView {trace:Arc<FinalizedSelectedCompositionTrace>}
++pub(crate) struct CurrentAcceptedCompositionView {trace:Option<Arc<FinalizedSelectedCompositionTrace>>,
++ required:Option<Arc<FinalizedSelectedCompositionTrace>>,required_tokens:Vec<usize>}
+ pub(crate) struct AcceptedPlainPaint {pub composition:Arc<ComposedParagraph>,pub line_box_width:f64}
+ impl CurrentAcceptedCompositionView {
+  pub(crate) fn from_current(result:&PaginationResult,paras:&[Paragraph],styles:&ResolvedStyleSet,profile:LayoutCompatibilityProfile,dpi:f64)->Option<Self>{
+   if dpi!=super::DEFAULT_DPI||styles.supplemental_metrics.is_some()||styles.kerning_measurement_context.is_some()||styles.horizontal_shaping_context.is_some(){return None;}
+   let trace=result.selected_composition_trace.as_ref()?;
+   if !trace.matches_source(paras,styles.reset_flow_context,profile,dpi)||!trace.matches_finalized_result(result){return None;}
+-  Some(Self{trace:Arc::clone(trace)})
++  Some(Self{trace:Some(Arc::clone(trace)),required:None,required_tokens:vec![]})
+  }
++ /// Attach the allocator's required formatter objects without publishing them
++ /// as the optional full fact trace or an export/standard-row permission.
++ pub(crate) fn attach_required(current:Option<Self>,result:&PaginationResult,paras:&[Paragraph],styles:&ResolvedStyleSet,
++ profile:LayoutCompatibilityProfile,dpi:f64)->Result<Option<Self>,&'static str>{
++  let Some(required)=result.required_plain_paint.as_ref()else{return Ok(current);};
++  // Other paragraphs may also rely on the original complete formatter set.
++  // A remapped paragraph is not permission to publish their legacy fallback
++  // after a report budget or unsupported path removed that complete set.
++  if current.is_none(){return Err("complete current formatter set unavailable or exceeds supported budgets");}
++  let trace=required.paint_trace().ok_or("current suffix allocation has no valid source/frame binding")?;
++  if dpi!=super::DEFAULT_DPI||styles.supplemental_metrics.is_some()||styles.kerning_measurement_context.is_some()||styles.horizontal_shaping_context.is_some()
++   ||!trace.matches_paint_source(paras,styles.reset_flow_context,profile,dpi)||!trace.matches_finalized_result(result)
++   ||required.paragraph_bindings().iter().any(|(i,token)|paras.get(*i).map(|p|p as *const Paragraph as usize)!=Some(*token)){
++   return Err("current suffix formatter belongs to a different source or allocation");
++  }
++  let mut view=current.unwrap_or(Self{trace:None,required:None,required_tokens:vec![]});
++  view.required=Some(Arc::clone(trace));view.required_tokens=required.paragraph_bindings().iter().map(|(_,token)|*token).collect();Ok(Some(view))
++ }
++ pub(crate) fn requires_para(&self,para:&Paragraph)->bool{self.required_tokens.contains(&(para as *const Paragraph as usize))}
+  pub(crate) fn plain_paint(&self,para:&Paragraph,section:usize,page:u32,column:u16,start:usize,end:usize,physical_width:f64,styles:&ResolvedStyleSet,dpi:f64)->Option<AcceptedPlainPaint>{
+-  if section!=self.trace.section()||!physical_width.is_finite()||physical_width<=0.0||dpi!=super::DEFAULT_DPI
++  let trace=if self.requires_para(para){self.required.as_ref()?}else{self.trace.as_ref()?};
++  if section!=trace.section()||!physical_width.is_finite()||physical_width<=0.0||dpi!=super::DEFAULT_DPI
+    ||!para.field_ranges.is_empty()||!para.range_tags.is_empty()||!para.orphan_field_ends.is_empty()||!para.tab_extended.is_empty()
+    ||para.numbering_restart.is_some()||!para.title_marks.is_empty()||!para.markpen_marks.is_empty()
+    ||para.text.contains(['\t','\n','\r','\u{fffc}'])||para.controls.iter().any(|c|!matches!(c,Control::SectionDef(_)|Control::ColumnDef(_))){return None;}
+@@ -27,10 +48,10 @@
+   for (ch,at) in para.text.chars().zip(&para.char_offsets){if *at!=source_offset{return None;}source_offset=source_offset.checked_add(ch.len_utf16() as u32)?;}
+   if para.char_count!=source_offset.checked_add(1)?{return None;}
+   let token=para as *const Paragraph as usize;
+-  let mut candidates=self.trace.commits().iter().filter(|c|c.section==section&&c.page==Some(page)&&c.column==column&&c.row_start==start&&c.row_end==end&&c.paragraph_token_matches);
+-  let commit=candidates.find(|c|self.trace.format(c.format_id).is_some_and(|f|f.paragraph_token==token))?;
+-  if candidates.any(|c|self.trace.format(c.format_id).is_some_and(|f|f.paragraph_token==token)){return None;}
+-  let format=self.trace.format(commit.format_id)?;
++  let mut candidates=trace.commits().iter().filter(|c|c.section==section&&c.page==Some(page)&&c.column==column&&c.row_start==start&&c.row_end==end&&c.paragraph_token_matches);
++  let commit=candidates.find(|c|trace.format(c.format_id).is_some_and(|f|f.paragraph_token==token))?;
++  if candidates.any(|c|trace.format(c.format_id).is_some_and(|f|f.paragraph_token==token)){return None;}
++  let format=trace.format(commit.format_id)?;
+   if format.source_text!=para.text||format.source_char_offsets!=para.char_offsets{return None;}
+   if format.has_numbering||format.has_horizontal_shaping||format.known_square_band
+    ||format.before!=0.0||format.after!=0.0||format.lines.is_empty()||format.lines.len()>4096
+@@ -44,31 +65,52 @@
+   // This corrects only actual reuse across different physical column widths.
+   // A narrow row remains the exact accepted row in a wider frame. It is NOT a
+   // claim that this composition was recomputed at that later physical width.
+-  let commits=self.trace.commits().iter().filter(|c|c.paragraph==commit.paragraph).collect::<Vec<_>>();
++  let commits=trace.commits().iter().filter(|c|c.paragraph==commit.paragraph).collect::<Vec<_>>();
+   if commits.len()<2||!commits.iter().any(|c|c.actual_column_width_px!=input_width){return None;}
+-  let mut next=0usize;
++  // Each committed fragment keeps its own actual formatter identity. A later
++  // narrower-frame formatter can use a different row index, but must begin at
++  // exactly the next full-paragraph scalar/UTF16 boundary. Old commits are not
++  // rewritten and unused prefix rows of a new full composition are not painted.
++  let mut next_scalar=0usize;let mut next_utf16=0u32;
++  let mut validated=std::collections::BTreeSet::new();
+   for c in &commits{
+-   if c.format_id!=commit.format_id||c.row_start!=next||c.row_end<=next||c.final_membership!=Some(true)
+-    ||!c.metrics_still_match_selected_format||!c.range_inside_selected_composition{return None;}
+-   next=c.row_end;
++   let f=trace.format(c.format_id)?;
++   if f.paragraph_token!=token||c.section!=section||!c.paragraph_token_matches||c.final_membership!=Some(true)
++    ||!c.metrics_still_match_selected_format||!c.range_inside_selected_composition||c.row_start>=c.row_end||c.row_end>f.lines.len()
++    ||!c.actual_column_width_px.is_finite()||c.actual_column_width_px<=0.0{return None;}
++   if validated.insert(c.format_id)&&!exact_plain_format(para,f,dpi){return None;}
++   let first=&f.lines[c.row_start];let last=&f.lines[c.row_end-1];
++   if first.scalar_start!=next_scalar||first.unicode_utf16_start!=Some(next_utf16){return None;}
++   next_scalar=last.scalar_end?;next_utf16=last.unicode_utf16_end?;
++   let width=f.actual_input_width_px?.min(c.actual_column_width_px);
++   let bound=super::px_to_hwpunit(width,dpi);
++   if bound<=0||f.lines[c.row_start..c.row_end].iter().any(|l|l.width_hu<=0||l.width_hu>bound){return None;}
+   }
+-  if next!=format.lines.len(){return None;}
+-  if format.actual_heights.len()!=format.lines.len()||format.actual_spacings.len()!=format.lines.len()
+-   ||format.lines.iter().enumerate().any(|(i,l)|format.actual_heights[i]!=super::hwpunit_to_px(l.height_hu,dpi)
+-    ||format.actual_spacings[i]!=super::hwpunit_to_px(l.spacing_hu,dpi)){return None;}
+-  let mut scalar=0usize;let mut utf16=0u32;
+-  for line in &format.lines{
+-   if line.scalar_start!=scalar||line.unicode_utf16_start!=Some(utf16)||!line.exact_source_text_span||line.has_line_break||line.height_hu<=0||line.spacing_hu<0
+-    ||line.baseline_hu<0||line.baseline_hu>line.height_hu||line.column_start_hu!=0{return None;}
+-   let next=line.scalar_end?;
+-   for run in &line.runs{utf16=utf16.checked_add(u32::try_from(run.utf16_units).ok()?)?;}
+-   if line.unicode_utf16_end!=Some(utf16)||line.original_hwp_char_offset!=para.char_offsets.get(scalar).copied(){return None;}
+-   scalar=next;
+-  }
+-  if scalar!=para.text.chars().count(){return None;}
++  if next_scalar!=para.text.chars().count()||next_utf16!=para.text.encode_utf16().count() as u32{return None;}
+   let line_box_width=input_width.min(physical_width);let bound=super::px_to_hwpunit(line_box_width,dpi);
+   if bound<=0||format.lines[start..end].iter().any(|l|l.width_hu<=0||l.width_hu>bound){return None;}
+-  let composition=self.trace.selected_composition(commit.format_id)?;
++  let composition=trace.selected_composition(commit.format_id)?;
+   Some(AcceptedPlainPaint{composition,line_box_width})
+  }
+ }
++
++/// Validate every actual selected composition in full, including unused prefix
++/// rows. Scalar positions and Unicode UTF16 offsets are independent of row IDs.
++fn exact_plain_format(para:&Paragraph,f:&super::selected_composition_observer127::SelectedFormatFact,dpi:f64)->bool{
++ (||->Option<()>{
++  if f.source_text!=para.text||f.source_char_offsets!=para.char_offsets||f.dpi!=dpi||f.has_numbering||f.has_horizontal_shaping||f.known_square_band
++   ||f.before!=0.0||f.after!=0.0||f.lines.is_empty()||f.lines.len()>4096
++   ||f.actual_heights.len()!=f.lines.len()||f.actual_spacings.len()!=f.lines.len(){return None;}
++  let width=f.actual_input_width_px?;if !width.is_finite()||width<=0.0{return None;}
++  let mut scalar=0usize;let mut utf16=0u32;
++  for (i,l) in f.lines.iter().enumerate(){
++   if l.scalar_start!=scalar||l.unicode_utf16_start!=Some(utf16)||!l.exact_source_text_span||l.has_line_break||l.height_hu<=0||l.spacing_hu<0
++    ||l.baseline_hu<0||l.baseline_hu>l.height_hu||l.column_start_hu!=0
++    ||f.actual_heights[i]!=super::hwpunit_to_px(l.height_hu,dpi)||f.actual_spacings[i]!=super::hwpunit_to_px(l.spacing_hu,dpi)
++    ||l.original_hwp_char_offset!=para.char_offsets.get(scalar).copied(){return None;}
++   for r in &l.runs{utf16=utf16.checked_add(u32::try_from(r.utf16_units).ok()?)?;}
++   if l.unicode_utf16_end!=Some(utf16){return None;}let end=l.scalar_end?;if end<=scalar{return None;}scalar=end;
++  }
++  (scalar==para.text.chars().count()).then_some(())
++ })().is_some()
++}
+--- a/src/renderer/layout/paragraph_layout.rs
++++ b/src/renderer/layout/paragraph_layout.rs
+@@ -4011,6 +4011,11 @@
+         // The allocator selected this precise line partition. Rebuilding the
+         // whole paragraph at a later, unequal column width and then applying
+         // the old line indices would silently drop/duplicate source characters.
++        if tree.current_accepted_composition.as_ref().is_some_and(|view|view.requires_para(para))
++            && (multi_col_width_hu.is_some()||wrap_anchor.is_some()||!matches!(col_node.node_type,RenderNodeType::Column(_))){
++            tree.invalid_required_plain_paint=true;
++            return y_start;
++        }
+         if multi_col_width_hu.is_none()&&wrap_anchor.is_none(){
+             if let RenderNodeType::Column(column)=col_node.node_type{
+                 let accepted=tree.current_accepted_composition.as_ref().and_then(|view|
+@@ -4019,6 +4024,10 @@
+                     let mut line_box=*col_area;line_box.width=accepted.line_box_width;
+                     return self.layout_composed_paragraph(tree,col_node,&accepted.composition,styles,&line_box,y_start,start_line,end_line,
+                         section_index,para_index,None,true,false,0.0,None,Some(para),bin_data_content,None);
++                }
++                if tree.current_accepted_composition.as_ref().is_some_and(|view|view.requires_para(para)){
++                    tree.invalid_required_plain_paint=true;
++                    return y_start;
+                 }
+             }
+         }
+--- a/src/renderer/pagination.rs
++++ b/src/renderer/pagination.rs
+@@ -150,6 +150,8 @@
+ pub struct PaginationResult {
+     /// Actual selected-composition facts from this allocator pass; no export permission.
+     pub(crate) selected_composition_trace: Option<std::sync::Arc<super::selected_composition_observer127::FinalizedSelectedCompositionTrace>>,
++    /// Actual formatter objects required by a current remapped fragment; no export permission.
++    pub(crate) required_plain_paint: Option<std::sync::Arc<super::selected_composition_observer127::RequiredPlainPaint>>,
+     /// 페이지별 콘텐츠 목록
+     pub pages: Vec<PageContent>,
+     /// 어울림 배치 표와 나란히 배치되는 빈 리턴 문단 목록 (전체)
+--- a/src/renderer/pagination/engine.rs
++++ b/src/renderer/pagination/engine.rs
+@@ -1156,7 +1156,7 @@
+         Self::finalize_pages(&mut st.pages, &hf_entries, &page_number_pos, paragraphs);
+ 
+         PaginationResult {
+-            selected_composition_trace: None,
++            selected_composition_trace: None, required_plain_paint:None,
+             pages: st.pages,
+             wrap_around_paras: all_wrap_around_paras,
+             hidden_empty_paras,
+--- a/src/renderer/render_tree.rs
++++ b/src/renderer/render_tree.rs
+@@ -1804,6 +1804,8 @@
+     pub(crate) current_physical_selections: super::current_physical_selections::CurrentPhysicalSelections,
+     pub(crate) current_frame_paint_plan: Option<super::current_frame_rows_plan::CurrentFramePaintPlan>,
+     pub(crate) current_accepted_composition: Option<super::current_accepted_composition::CurrentAcceptedCompositionView>,
++    /// Never publish legacy paint after a required actual formatter failed binding.
++    pub(crate) invalid_required_plain_paint: bool,
+     /// 다음 노드 ID 카운터
+     next_id: NodeId,
+     /// 인라인 Shape 좌표 맵: (section, para, control, cell_path) → (x, y)
+@@ -1823,6 +1825,7 @@
+     pub fn new(page_index: u32, width: f64, height: f64) -> Self {
+         Self {
+             current_accepted_composition: None,
++            invalid_required_plain_paint: false,
+             next_id: 1,
+             inline_shape_positions: std::collections::HashMap::new(),
+             page_index,
+--- a/src/renderer/selected_composition_observer127.rs
++++ b/src/renderer/selected_composition_observer127.rs
+@@ -85,7 +85,25 @@
+  pub overflowed:bool,pub unsupported_observed:bool,pub nested_rejected:bool,
+  pub not_an_export_permission:bool,
+ }
+-struct Active {scope:u64,report:SelectedCompositionReport,compositions:Vec<Option<std::sync::Arc<ComposedParagraph>>>}
++const MAX_REQUIRED_BYTES:usize=16*1024*1024;
++const MAX_REQUIRED_COMMITS:usize=4096;
++struct RequiredBuilder {
++ token:usize,paragraph:usize,formats:Vec<(SelectedFormatFact,std::sync::Arc<ComposedParagraph>)>,commits:Vec<CommitFact>,failed:bool,
++}
++/// Actual allocator-selected formatter objects needed by a remapped fragment.
++/// This is paint data only: it is never installed as the full selected trace,
++/// and cannot authorize row serialization, a source cache or an export lease.
++#[derive(Debug)]
++pub(crate) struct RequiredPlainPaint {
++ trace:Option<std::sync::Arc<FinalizedSelectedCompositionTrace>>,
++ paragraphs:Vec<(usize,usize)>,
++}
++impl RequiredPlainPaint {
++ pub(crate) fn paint_trace(&self)->Option<&std::sync::Arc<FinalizedSelectedCompositionTrace>>{self.trace.as_ref()}
++ pub(crate) fn paragraph_bindings(&self)->&[(usize,usize)]{&self.paragraphs}
++}
++struct Active {scope:u64,report:SelectedCompositionReport,compositions:Vec<Option<std::sync::Arc<ComposedParagraph>>>,
++ required:Vec<RequiredBuilder>,required_bytes:usize}
+ thread_local! {
+  static ACTIVE:RefCell<Option<Active>>=const {RefCell::new(None)};
+  static NEXT_SCOPE:Cell<u64>=const {Cell::new(0)};
+@@ -98,7 +116,7 @@
+  let scope=NEXT_SCOPE.with(|n|n.get().checked_add(1).map(|v|{n.set(v);v})).ok_or("scope sequence exhausted")?;
+  let started=ACTIVE.with(|a|{let Ok(mut a)=a.try_borrow_mut()else{return false;};
+   if let Some(a)=a.as_mut(){a.report.nested_rejected=true;return false;}
+-  *a=Some(Active{scope,compositions:vec![],report:SelectedCompositionReport{cookie,formats:vec![],commits:vec![],tables:vec![],whole_tables:vec![],finalizations:vec![],encoded_bytes:0,
++  *a=Some(Active{scope,compositions:vec![],required:vec![],required_bytes:0,report:SelectedCompositionReport{cookie,formats:vec![],commits:vec![],tables:vec![],whole_tables:vec![],finalizations:vec![],encoded_bytes:0,
+    overflowed:false,unsupported_observed:false,nested_rejected:false,not_an_export_permission:true}});true});
+  if !started{return Err("nested or reentrant observation");}
+  let guard=Scope;let result=run();
+@@ -166,14 +184,58 @@
+   r.formats.push(fact);Some(SelectedObservationHandle{scope:active.scope,index:id})
+  })
+ }
++/// Read only the actual selected object in this allocator pass. Diagnostic
++/// reports and finalized snapshots cannot populate this arena or mint handles.
++pub(crate) fn current_for_flow(handle:SelectedObservationHandle,para:&Paragraph)
++ ->Option<(std::sync::Arc<ComposedParagraph>,SelectedFormatFact)>{
++ if RUNTIME_DEPTH.with(|d|d.get())!=1{return None;}
++ ACTIVE.with(|a|{let a=a.try_borrow().ok()?;let a=a.as_ref()?;
++  if a.scope!=handle.scope||a.report.overflowed||a.report.unsupported_observed{return None;}
++  let f=a.report.formats.get(handle.index)?;
++  if f.paragraph_token!=para as *const Paragraph as usize{return None;}
++  Some((std::sync::Arc::clone(a.compositions.get(handle.index)?.as_ref()?),f.clone()))
++ })
++}
++/// Reserve a bounded immutable formatter pair before the allocator changes any
++/// row cursor. Only actual current-pass handles can register this dependency.
++pub(crate) fn require_plain_paint(old:SelectedObservationHandle,new:SelectedObservationHandle,para:&Paragraph)->bool{
++ if RUNTIME_DEPTH.with(|d|d.get())!=1{return false;}
++ ACTIVE.with(|a|{let Ok(mut a)=a.try_borrow_mut()else{return false;};let Some(a)=a.as_mut()else{return false;};
++  if a.scope!=old.scope||a.scope!=new.scope||a.report.overflowed||a.report.unsupported_observed{return false;}
++  let token=para as *const Paragraph as usize;
++  let Some(oldf)=a.report.formats.get(old.index)else{return false;};let Some(newf)=a.report.formats.get(new.index)else{return false;};
++  if oldf.paragraph_token!=token||newf.paragraph_token!=token||!newf.selected_recomposition||!para.controls.is_empty(){return false;}
++  let prior=a.report.commits.iter().filter(|c|a.report.formats.get(c.format_id).is_some_and(|f|f.paragraph_token==token)).cloned().collect::<Vec<_>>();
++  let Some(first)=prior.first()else{return false;};let paragraph=first.paragraph;
++  if prior.len()>MAX_REQUIRED_COMMITS||prior.iter().any(|c|c.paragraph!=paragraph||!c.paragraph_token_matches
++   ||!c.metrics_still_match_selected_format||!c.range_inside_selected_composition){return false;}
++  let existing=a.required.iter().position(|b|b.token==token);
++  let mut add=vec![];let mut bytes=0usize;
++  for id in [old.index,new.index]{
++   if existing.is_some_and(|i|a.required[i].formats.iter().any(|(f,_)|f.observation_id==id)){continue;}
++   let Some(f)=a.report.formats.get(id)else{return false;};let Some(Some(c))=a.compositions.get(id)else{return false;};
++   let Ok(raw)=serde_json::to_vec(f)else{return false;};let Some(n)=bytes.checked_add(raw.len())else{return false;};bytes=n;
++   add.push((f.clone(),std::sync::Arc::clone(c)));
++  }
++  if existing.is_none(){let Some(n)=bytes.checked_add(MAX_REQUIRED_COMMITS*std::mem::size_of::<CommitFact>())else{return false;};bytes=n;}
++  if bytes>MAX_REQUIRED_BYTES.saturating_sub(a.required_bytes){if let Some(i)=existing{a.required[i].failed=true;}return false;}
++  a.required_bytes+=bytes;
++  if let Some(i)=existing{a.required[i].formats.extend(add);}else{a.required.push(RequiredBuilder{token,paragraph,formats:add,commits:prior,failed:false});}
++  true
++ })
++}
++pub(crate) fn invalidate_required_plain(para:&Paragraph){
++ if RUNTIME_DEPTH.with(|d|d.get())!=1{return;}
++ ACTIVE.with(|a|{if let Ok(mut a)=a.try_borrow_mut(){if let Some(a)=a.as_mut(){if let Some(b)=a.required.iter_mut().find(|b|b.token==para as *const Paragraph as usize){b.failed=true;}}}});
++}
+ #[allow(clippy::too_many_arguments)]
+ pub(crate) fn commit(handle:Option<SelectedObservationHandle>,para:&Paragraph,section:usize,page:Option<u32>,column:u16,index:usize,
+  start:usize,end:usize,flow_before:f64,flow_after:f64,advance:f64,available:Option<f64>,cumulative:Option<f64>,trimmed:f64,
+  width:f64,multicol:bool,heights:&[f64],spacings:&[f64],before:f64,after:f64,total:f64,fit:f64,items:&[PageItem]){
+  if RUNTIME_DEPTH.with(|d|d.get())!=1{return;}
+  let Some(handle)=handle else{return;};ACTIVE.with(|a|{let Ok(mut a)=a.try_borrow_mut()else{return;};let Some(a)=a.as_mut()else{return;};
+-  if a.scope!=handle.scope{return;}let r=&mut a.report;if r.overflowed{return;}
+-  if r.commits.len()>=MAX_COMMITS{r.overflowed=true;return;}
++  if a.scope!=handle.scope{return;}let r=&mut a.report;
++  if r.commits.len()>=MAX_COMMITS{r.overflowed=true;}
+   let Some(format)=r.formats.get(handle.index)else{r.unsupported_observed=true;return;};
+   let indices=items.iter().enumerate().filter_map(|(i,item)|match item{
+    PageItem::FullParagraph{para_index}if *para_index==index&&start==0=>Some(i),
+@@ -188,7 +250,11 @@
+    final_membership:None,finalization_index:None,not_physical_y:true};
+   if [flow_before,flow_after,advance,trimmed,width].iter().any(|x|!x.is_finite()) || available.is_some_and(|x|!x.is_finite()) || cumulative.is_some_and(|x|!x.is_finite()){
+    r.unsupported_observed=true;return;}
+-  if charge(r,&fact){r.commits.push(fact);}
++  if let Some(required)=a.required.iter_mut().find(|b|b.token==para as *const Paragraph as usize){
++   if required.commits.len()>=MAX_REQUIRED_COMMITS||!required.formats.iter().any(|(f,_)|f.observation_id==handle.index){required.failed=true;}
++   else{required.commits.push(fact.clone());}
++  }
++  if !r.overflowed&&charge(r,&fact){r.commits.push(fact);}
+  });
+ }
+ pub(crate) fn finalize(section:usize,result:&PaginationResult){ACTIVE.with(|a|{
+@@ -252,8 +318,11 @@
+ /// Immutable facts produced by one actual allocator pass. No deserializer or
+ /// public constructor exists. This is not a row lease or export permission:
+ /// consumers must still prove actual paint, UTF16, metrics and physical frames.
++#[derive(Debug,Clone,Copy,PartialEq,Eq)]
++enum ActualCompositionPurpose { CompleteAllocation, RequiredPaint }
+ #[derive(Debug)]
+ pub(crate) struct FinalizedSelectedCompositionTrace {
++ purpose:ActualCompositionPurpose,
+  generation:u64,section:usize,resource:[u8;32],source:[u8;32],final_frame:[u8;32],
+  formats:Vec<SelectedFormatFact>,commits:Vec<CommitFact>,
+  tables:Vec<TableAcceptedFact>,whole_tables:Vec<WholeTableAcceptedFact>,
+@@ -272,6 +341,10 @@
+  }
+  pub(crate) fn format(&self,id:usize)->Option<&SelectedFormatFact>{self.formats.iter().find(|f|f.observation_id==id)}
+  pub(crate) fn matches_source(&self,paragraphs:&[Paragraph],context:Option<[u8;32]>,profile:LayoutCompatibilityProfile,dpi:f64)->bool{
++  self.purpose==ActualCompositionPurpose::CompleteAllocation && self.matches_paint_source(paragraphs,context,profile,dpi)
++ }
++ /// Exact read-only paint binding; never authorizes standard rows/export.
++ pub(crate) fn matches_paint_source(&self,paragraphs:&[Paragraph],context:Option<[u8;32]>,profile:LayoutCompatibilityProfile,dpi:f64)->bool{
+   self.resource==crate::model::native_computed_resource::RESOURCE
+    && source_key(self.section,paragraphs,context,profile,dpi)==Some(self.source)
+  }
+@@ -369,7 +442,7 @@
+  // A bounded exact in-process frame snapshot, not a portable serialization.
+  // Includes final column items, zones, reservations and page/column geometry.
+  // The trace itself is deliberately excluded to avoid recursive self-binding.
+- let PaginationResult{selected_composition_trace:_,pages:_,wrap_around_paras,hidden_empty_paras,pre_emitted_host_paras,
++ let PaginationResult{selected_composition_trace:_,required_plain_paint:_,pages:_,wrap_around_paras,hidden_empty_paras,pre_emitted_host_paras,
+   pre_emitted_host_heights,pre_emitted_host_content_heights,endnotes,endnote_paragraphs,endnote_para_sources,
+   endnote_between_notes_hu,endnote_separator_above_hu,endnote_separator_below_hu}=result;
+  write!(&mut h,"actual-final-allocation127-1:{:?}",(pages,wrap_around_paras,hidden_empty_paras,pre_emitted_host_paras,
+@@ -409,13 +482,48 @@
+   if previous_depth!=0{if let Some(active)=a.as_mut(){active.report.nested_rejected=true;active.report.unsupported_observed=true;}return(None,false);}
+   let scope=NEXT_SCOPE.with(|n|n.get().checked_add(1).map(|v|{n.set(v);v}));let Some(scope)=scope else{return(None,false);};
+   let saved=a.take();
+-  *a=Some(Active{scope,compositions:vec![],report:SelectedCompositionReport{cookie:[0;32],formats:vec![],commits:vec![],tables:vec![],whole_tables:vec![],finalizations:vec![],encoded_bytes:0,
++  *a=Some(Active{scope,compositions:vec![],required:vec![],required_bytes:0,report:SelectedCompositionReport{cookie:[0;32],formats:vec![],commits:vec![],tables:vec![],whole_tables:vec![],finalizations:vec![],encoded_bytes:0,
+    overflowed:false,unsupported_observed:source.is_none(),nested_rejected:false,not_an_export_permission:true}});
+   (saved,true)
+  });
+  RuntimePassGuard{previous_depth,saved_active,owns_arena,enabled:previous_depth==0&&owns_arena,generation,section,source,first_format:0,first_commit:0,first_table:0}
+ }
+ impl RuntimePassGuard {
++ /// Finalize actual paint dependencies independently of the optional fact
++ /// report's budget. Any failure remains a PRESENT invalid dependency and is
++ /// surfaced as RenderError; a remapped index never falls back to legacy paint.
++ pub(crate) fn finish_required(&self,result:&PaginationResult,paragraphs:&[Paragraph],context:Option<[u8;32]>,profile:LayoutCompatibilityProfile,dpi:f64)
++  ->Option<std::sync::Arc<RequiredPlainPaint>>{
++  if !self.enabled{return None;}
++  ACTIVE.with(|a|{
++   let invalid=||Some(std::sync::Arc::new(RequiredPlainPaint{trace:None,paragraphs:vec![]}));
++   let Ok(a)=a.try_borrow()else{return invalid();};let Some(active)=a.as_ref()else{return invalid();};
++   if active.required.is_empty(){return None;}
++   let owned=active.required.iter().map(|b|(b.paragraph,b.token)).collect::<Vec<_>>();
++   let trace=(||->Option<std::sync::Arc<FinalizedSelectedCompositionTrace>>{
++    if active.report.nested_rejected||active.required.iter().any(|b|b.failed){return None;}
++    let source=self.source?;if source_key(self.section,paragraphs,context,profile,dpi)!=Some(source){return None;}
++    let frame=frame_key(result)?;let generation=self.generation?;
++    let mut formats=vec![];let mut compositions=vec![None;active.compositions.len()];let mut commits=vec![];
++    let mut pages=std::collections::HashSet::new();
++    for p in &result.pages{if !pages.insert(p.page_index){return None;}let mut cols=std::collections::HashSet::new();for c in &p.column_contents{if !cols.insert(c.column_index){return None;}}}
++    for b in &active.required{
++     if paragraphs.get(b.paragraph).map(|p|p as *const Paragraph as usize)!=Some(b.token){return None;}
++     for(f,c)in &b.formats{if compositions.get(f.observation_id)?.is_some(){return None;}compositions[f.observation_id]=Some(std::sync::Arc::clone(c));formats.push(f.clone());}
++     for c in &b.commits{
++      let item=c.page.and_then(|n|result.pages.iter().find(|p|p.page_index==n)).and_then(|p|p.column_contents.iter().find(|cc|cc.column_index==c.column))
++       .and_then(|cc|c.committed_item_index.and_then(|i|cc.items.get(i)));
++      if !matches!(item,Some(PageItem::PartialParagraph{para_index,start_line,end_line})if *para_index==b.paragraph&&*start_line==c.row_start&&*end_line==c.row_end)
++       ||!c.paragraph_token_matches||!c.metrics_still_match_selected_format||!c.range_inside_selected_composition{return None;}
++      let mut c=c.clone();c.final_membership=Some(true);commits.push(c);
++     }
++    }
++    Some(std::sync::Arc::new(FinalizedSelectedCompositionTrace{purpose:ActualCompositionPurpose::RequiredPaint,generation,section:self.section,resource:crate::model::native_computed_resource::RESOURCE,
++     source,final_frame:frame,formats,commits,tables:vec![],whole_tables:vec![],compositions}))
++   })();
++   Some(std::sync::Arc::new(RequiredPlainPaint{trace,paragraphs:owned}))
++  })
++ }
+  pub(crate) fn finish(self,result:&PaginationResult,paragraphs:&[Paragraph],context:Option<[u8;32]>,profile:LayoutCompatibilityProfile,dpi:f64)
+   ->Option<std::sync::Arc<FinalizedSelectedCompositionTrace>>{
+   if !self.enabled{return None;}finalize(self.section,result);
+@@ -432,7 +540,7 @@
+    let tables=r.tables.get(self.first_table..)?.to_vec();let whole_tables=r.whole_tables.clone();
+    if commits.iter().any(|c|!c.paragraph_token_matches||!c.metrics_still_match_selected_format||!c.range_inside_selected_composition||c.final_membership!=Some(true)){return None;}
+    if tables.iter().any(|c|c.final_membership!=Some(true))||whole_tables.iter().any(|c|c.final_membership!=Some(true)){return None;}
+-   Some(std::sync::Arc::new(FinalizedSelectedCompositionTrace{generation,section:self.section,
++   Some(std::sync::Arc::new(FinalizedSelectedCompositionTrace{purpose:ActualCompositionPurpose::CompleteAllocation,generation,section:self.section,
+     resource:crate::model::native_computed_resource::RESOURCE,source,final_frame,formats,commits,tables,whole_tables,compositions:active.compositions.clone()}))
+   })
+  }
+--- a/src/renderer/typeset.rs
++++ b/src/renderer/typeset.rs
+@@ -3898,6 +3898,7 @@
+         is_last_in_section: bool,
+     ) {
+         paragraph::flow::place(
++            self,
+             st,
+             paragraph::flow::ParagraphFlowInput {
+                 para_idx,
+--- a/src/renderer/typeset/paragraph.rs
++++ b/src/renderer/typeset/paragraph.rs
+@@ -12,6 +12,7 @@
+ pub(super) mod mixed_tac_owner;
+ pub(super) mod boundary;
+ mod columns;
++mod current_suffix;
+ pub(super) mod context;
+ pub(super) mod empty;
+ mod entry;
+@@ -48,6 +49,8 @@
+ /// 전체 문단 재시도와 조각 배치 후 이월을 구분한다. 진입 시 고정한 기준 예산은 유지한다.
+ #[allow(clippy::too_many_arguments)]
+ pub(super) fn place_split_paragraph(
++    engine: &super::TypesetEngine,
++    styles: &ResolvedStyleSet,
+     st: &mut TypesetState,
+     para_idx: usize,
+     para: &Paragraph,
+@@ -62,10 +65,19 @@
+     is_tac_picture_stack: bool,
+     dpi: f64,
+ ) {
++    let mut current_format=fmt.clone();
++    let mut line_count=line_count;
++    let mut remapped=false;
+     // 줄 단위 분할 루프
+     let mut cursor_line = st.take_prefilled_line_prefix(para_idx);
+     let mut on_entry_page = true;
+     while cursor_line < line_count {
++        if forced_page_break_line.is_none() && native_hwp5_existing_footnote_reset_line.is_none() && !is_tac_picture_stack {
++            if let Some((fresh,row))=current_suffix::reformat(engine,st,para,&current_format,cursor_line,styles,dpi){
++                current_format=fresh;cursor_line=row;line_count=current_format.line_count();remapped=true;
++            }
++        }
++        let fmt=&current_format;
+         let page_avail = if cursor_line == 0 || on_entry_page {
+             // 저장 HWPX의 실제 FootnoteArea 경계를 진입 fit과 공유한다.
+             // 여기서 별도 각주 높이와 40px 여백을 다시 빼면 물리적으로
+@@ -105,7 +117,9 @@
+             end_line,
+             cumulative,
+             used_saved_tail_vpos_fit,
+-        } = scan::scan_lines(
++        } = if remapped { match current_suffix::scan(fmt,cursor_line,avail_for_lines){Some(scan)=>scan,None=>{
++            crate::renderer::selected_composition_observer127::invalidate_required_plain(para);break;
++        }} } else { scan::scan_lines(
+             para,
+             fmt,
+             paragraphs,
+@@ -119,12 +133,12 @@
+             is_tac_picture_stack,
+             &st.paragraph_line_scan_page(),
+             dpi,
+-        );
++        ) };
+ 
+         let split::SplitBoundary {
+             end_line,
+             cumulative,
+-        } = split::refine_split_boundary(
++        } = if remapped { split::SplitBoundary {end_line,cumulative} } else { split::refine_split_boundary(
+             para,
+             fmt,
+             paragraphs.get(para_idx + 1),
+@@ -138,7 +152,7 @@
+                 end_line,
+                 cumulative,
+             },
+-        );
++        ) };
+ 
+         let Some(fragment) = placement::plan_fragment(
+             fmt,
+@@ -448,6 +462,7 @@
+ /// 일반 fit/넘침 허용 실패 뒤 빈 구성 결과 또는 분할 진입을 조정한다.
+ #[allow(clippy::too_many_arguments)]
+ pub(super) fn place_after_failed_fit(
++    engine: &super::TypesetEngine,
+     st: &mut TypesetState,
+     para_idx: usize,
+     para: &Paragraph,
+@@ -566,6 +581,7 @@
+     }
+ 
+     place_split_paragraph(
++        engine, styles,
+         st,
+         para_idx,
+         para,
+--- /dev/null
++++ b/src/renderer/typeset/paragraph/current_suffix.rs
+@@ -0,0 +1,76 @@
++//! Actual narrow-frame continuation of plain body text. This never reads saved
++//! row positions as allocation authority and never rewrites prior commits.
++use crate::model::paragraph::{Paragraph,ColumnBreakType};
++use crate::renderer::{hwpunit_to_px,px_to_hwpunit,selected_composition_observer127 as observation};
++use crate::renderer::style_resolver::ResolvedStyleSet;
++use super::super::{TypesetEngine,TypesetState};
++use super::metrics::FormattedParagraph;
++
++fn plain(para:&Paragraph,styles:&ResolvedStyleSet)->Option<usize>{
++ if !para.controls.is_empty()||para.column_type!=ColumnBreakType::None||!para.field_ranges.is_empty()
++  ||!para.range_tags.is_empty()||!para.orphan_field_ends.is_empty()||!para.tab_extended.is_empty()
++  ||para.numbering_restart.is_some()||!para.title_marks.is_empty()||!para.markpen_marks.is_empty()
++  ||para.text.contains(['\t','\n','\r','\u{fffc}'])||para.text.len()>2*1024*1024{return None;}
++ let style=styles.para_styles.get(usize::from(para.para_shape_id))?;
++ if style.margin_left!=0.0||style.margin_right!=0.0||style.indent!=0.0||style.spacing_before!=0.0||style.spacing_after!=0.0
++  ||!matches!(style.head_type,crate::model::style::HeadType::None)||styles.supplemental_metrics.is_some()
++  ||styles.kerning_measurement_context.is_some()||styles.horizontal_shaping_context.is_some(){return None;}
++ let mut units=0u32;let mut count=0usize;
++ for (ch,offset) in para.text.chars().zip(&para.char_offsets){if *offset!=units{return None;}units=units.checked_add(ch.len_utf16() as u32)?;count+=1;}
++ (count>0&&count==para.text.chars().count()&&count==para.char_offsets.len()&&para.char_count==units.checked_add(1)?).then_some(count)
++}
++fn exact_format(f:&observation::SelectedFormatFact,fmt:&FormattedParagraph,para:&Paragraph,dpi:f64)->Option<()>{
++ if f.source_text!=para.text||f.source_char_offsets!=para.char_offsets||f.dpi!=dpi||f.known_square_band
++  ||f.has_numbering||f.has_horizontal_shaping||!f.inline_controls.is_empty()||!f.tac_controls.is_empty()
++  ||!f.footnote_positions.is_empty()||!f.tab_extended.is_empty()||f.lines.is_empty()||f.lines.len()>4096
++  ||f.before!=0.0||f.after!=0.0||f.actual_heights!=fmt.line_heights||f.actual_spacings!=fmt.line_spacings
++  ||f.lines.len()!=fmt.line_count(){return None;}
++ let mut scalar=0usize;let mut units=0u32;
++ for (i,l) in f.lines.iter().enumerate(){
++  if l.scalar_start!=scalar||l.unicode_utf16_start!=Some(units)||!l.exact_source_text_span||l.has_line_break
++   ||l.height_hu<=0||l.spacing_hu<0||l.baseline_hu<0||l.baseline_hu>l.height_hu||l.column_start_hu!=0
++   ||fmt.line_heights[i]!=hwpunit_to_px(l.height_hu,dpi)||fmt.line_spacings[i]!=hwpunit_to_px(l.spacing_hu,dpi)
++   ||l.original_hwp_char_offset!=para.char_offsets.get(scalar).copied(){return None;}
++  for run in &l.runs{if run.inserted_control_text||run.display_text.is_some()||run.overlap.is_some()||run.footnote_marker.is_some(){return None;}
++   units=units.checked_add(u32::try_from(run.utf16_units).ok()?)?;}
++  let end=l.scalar_end?;if end<=scalar{return None;}scalar=end;if l.unicode_utf16_end!=Some(units){return None;}
++ }
++ (scalar==para.text.chars().count()).then_some(())
++}
++/// Only a continuation at an empty ordinary column can choose a new formatter.
++/// Its exact consumed scalar must already be a real line start in that actual
++/// formatter; no row is fabricated, retagged, relabelled, or retroactively moved.
++pub(super) fn reformat(engine:&TypesetEngine,st:&TypesetState,para:&Paragraph,old:&FormattedParagraph,
++ cursor:usize,styles:&ResolvedStyleSet,dpi:f64)->Option<(FormattedParagraph,usize)>{
++ if cursor==0||dpi!=crate::renderer::DEFAULT_DPI||st.col_count<=1||!st.current_items.is_empty()||st.current_height!=0.0
++  ||st.current_endnote_flow||st.current_footnote_height!=0.0||st.current_bottom_fixed_exclusion!=0.0||st.current_zone_y_offset!=0.0
++  ||st.current_zone_layout.is_some()||st.wrap_around_cs>=0||!st.current_column_wrap_anchors.is_empty()
++  ||!st.current_column_wrap_around_paras.is_empty()||!st.side_wrap_exclusions.is_empty()||!st.visible_float_exclusions.is_empty(){return None;}
++ plain(para,styles)?;
++ let width=st.layout.column_areas.get(usize::from(st.current_column))?.width;
++ let (composition,fact)=observation::current_for_flow(old.selected_observation127?,para)?;
++ exact_format(&fact,old,para,dpi)?;
++ let previous_width=fact.actual_input_width_px?;
++ if !width.is_finite()||width<=0.0||!previous_width.is_finite()||width>=previous_width{return None;}
++ let bound=px_to_hwpunit(width,dpi);if bound<=0||!fact.lines.get(cursor..)?.iter().any(|l|l.width_hu>bound){return None;}
++ let consumed=fact.lines.get(cursor)?.scalar_start;
++ let fmt=engine.format_paragraph_with_known_square_band(para,Some(&composition),styles,Some(width),false);
++ let (_,fresh)=observation::current_for_flow(fmt.selected_observation127?,para)?;
++ exact_format(&fresh,&fmt,para,dpi)?;
++ if !fresh.selected_recomposition||fresh.actual_input_width_px!=Some(width)||fresh.lines.iter().any(|l|l.width_hu<=0||l.width_hu>bound){return None;}
++ let row=fresh.lines.iter().position(|l|l.scalar_start==consumed)?;
++ if row==0||fresh.lines[row].unicode_utf16_start!=fact.lines[cursor].unicode_utf16_start{return None;}
++ if !observation::require_plain_paint(old.selected_observation127?,fmt.selected_observation127?,para){return None;}
++ Some((fmt,row))
++}
++/// This branch scans actual new rows only. Saved row indices refer to another
++/// composition and must not be applied to the remapped continuation.
++pub(super) fn scan(fmt:&FormattedParagraph,start:usize,available:f64)->Option<super::scan::LineScanResult>{
++ if !available.is_finite()||available<0.0||start>=fmt.line_count(){return None;}
++ let mut end=start;let mut cumulative=0.0;
++ for i in start..fmt.line_count(){let h=fmt.line_heights[i];let step=fmt.line_advance(i);
++  if !h.is_finite()||h<=0.0||!step.is_finite()||step<h{return None;}
++  if end>start&&cumulative+h>available{break;}cumulative+=step;end=i+1;
++ }
++ Some(super::scan::LineScanResult{end_line:end,cumulative,used_saved_tail_vpos_fit:false})
++}
+--- a/src/renderer/typeset/paragraph/flow.rs
++++ b/src/renderer/typeset/paragraph/flow.rs
+@@ -18,6 +18,7 @@
+ }
+ 
+ pub(in crate::renderer::typeset) fn place(
++    engine: &crate::renderer::typeset::TypesetEngine,
+     st: &mut TypesetState,
+     input: ParagraphFlowInput<'_>,
+     dpi: f64,
+@@ -92,6 +93,7 @@
+         // 앞 쪽의 선행 조각이 소유한 줄을 whole-fit으로 다시 배치하지 않는다.
+         let base_available = (st.base_available_height() - layout_drift_safety_px).max(0.0);
+         paragraph::place_split_paragraph(
++            engine, styles,
+             st,
+             para_idx,
+             para,
+@@ -170,6 +172,7 @@
+     }
+ 
+     paragraph::place_after_failed_fit(
++        engine,
+         st,
+         para_idx,
+         para,
+--- a/src/renderer/typeset/section.rs
++++ b/src/renderer/typeset/section.rs
+@@ -504,6 +504,7 @@
+         }
+ 
+         let mut result=st.into_result();
++        result.required_plain_paint=selected_pass127.finish_required(&result,paragraphs,styles.reset_flow_context,profile,self.dpi);
+         result.selected_composition_trace=selected_pass127.finish(&result,paragraphs,styles.reset_flow_context,profile,self.dpi);
+         result
+     }
+--- a/src/renderer/typeset/state/commands.rs
++++ b/src/renderer/typeset/state/commands.rs
+@@ -429,7 +429,7 @@
+         self,
+     ) -> crate::renderer::pagination::PaginationResult {
+         PaginationResult {
+-            selected_composition_trace: None,
++            selected_composition_trace: None, required_plain_paint:None,
+             pages: self.data.pages,
+             wrap_around_paras: Vec::new(),
+             hidden_empty_paras: self.data.hidden_empty_paras,

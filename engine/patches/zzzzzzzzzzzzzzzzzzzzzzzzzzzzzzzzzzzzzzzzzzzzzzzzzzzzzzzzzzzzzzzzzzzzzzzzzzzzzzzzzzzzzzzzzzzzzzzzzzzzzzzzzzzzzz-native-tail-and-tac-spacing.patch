@@ -1,0 +1,457 @@
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -2816,7 +2816,14 @@
+         }else{
+             self.layout_engine.current_whole_stack_export_plan(profile,page,paragraphs,composed,&styles,measured,self.dpi)
+         }?;
+-        crate::serializer::hwpx::standard_rows::CurrentStandardRowsProjection::from_current_stack(&document,&plan,&styles,page.layout.body_area.width,self.dpi)
++        use crate::serializer::hwpx::standard_rows::TailExportRepresentation;
++        // Match the exact existing hwpx_document_for_export_document branch.
++        // This selects only an output representation; no layout/source authority.
++        let representation=if matches!(self.source_format,crate::parser::FileFormat::Hwp)
++            && !Self::owns_versioned_xml_cache_origin(document,self.source_format) {
++            TailExportRepresentation::Hwp5MissingRowsMaterialized
++        }else{TailExportRepresentation::Original};
++        crate::serializer::hwpx::standard_rows::CurrentStandardRowsProjection::from_current_stack(&document,&plan,&styles,page.layout.body_area.width,self.dpi,representation)
+     }
+ 
+     /// Document IR을 HWPX(ZIP+XML)로 직렬화 (네이티브 에러 타입)
+@@ -4874,3 +4881,17 @@
+         }assert_eq!(owned(&p),None,"case {n}");}
+     }
+ }
++
++#[cfg(test)] mod exact_current_rows_tail_lowering128_tests {
++ use super::*;
++ #[test] fn exact_tail_projection_matches_the_existing_native_hwpx_materializer(){
++  for pattern in 0..8 {let mut source=Document::default();source.sections.push(Default::default());
++   source.sections[0].paragraphs=(0..6).map(|i|{let mut p=Paragraph::default();p.text=format!("tail {i}");
++    if i<3 || (pattern&(1<<(i-3)))!=0 {p.line_segs.push(LineSeg{line_height:1000,vertical_pos:i as i32*1600,..Default::default()});}p}).collect();
++   let witness=format!("{source:?}");let mut output=source.clone();
++   DocumentCore::materialize_hwp5_missing_linesegs_for_hwpx_export(&mut output);
++   assert!(crate::serializer::hwpx::standard_rows::test_matches_existing_tail_materialization(&source.sections[0].paragraphs,&output.sections[0].paragraphs,3));
++   assert_eq!(format!("{source:?}"),witness,"materialization/projection must not alter source");
++  }
++ }
++}
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[223, 111, 146, 149, 82, 62, 48, 71, 35, 29, 252, 104, 115, 174, 249, 45, 42, 215, 238, 67, 36, 228, 37, 237, 130, 79, 200, 144, 34, 113, 160, 85];
++pub(crate) const RESOURCE:[u8;32]=[151, 62, 124, 193, 92, 236, 20, 38, 144, 244, 62, 166, 8, 235, 41, 211, 150, 195, 70, 215, 224, 191, 160, 5, 41, 96, 113, 218, 1, 20, 113, 119];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -254,6 +254,8 @@
+             ("src/parser/hwpx/mod.rs",include_bytes!("../parser/hwpx/mod.rs").as_slice()),
+             ("src/parser/hwpx/reader.rs",include_bytes!("../parser/hwpx/reader.rs").as_slice()),
+             ("src/parser/hwpx/raw_zip_authority.rs",include_bytes!("../parser/hwpx/raw_zip_authority.rs").as_slice()),
++            ("src/renderer/composer/unchanged_native_tac.rs",include_bytes!("../renderer/composer/unchanged_native_tac.rs").as_slice()),
++            ("src/model/native_tac_spacing_input126.rs",include_bytes!("native_tac_spacing_input126.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- /dev/null
++++ b/src/model/native_tac_spacing_input126.rs
+@@ -0,0 +1,42 @@
++//! Read-only parsed input for Native's pre-existing half-spacing rule only.
++//! Absolute root vpos is not an input of that rule. All other root row fields,
++//! complete nested payloads and exact definitions remain bound. No row, origin,
++//! reset, raw reuse, serializer or CompletedRows permission is issued here.
++use super::*;
++use crate::model::{paragraph::{Paragraph,LineSeg,ColumnBreakType},control::Control};
++pub(super) fn input(index:usize,paragraph:&Paragraph,next:Option<&Paragraph>,context:[u8;32],budget:&mut usize)->Option<[u8;32]>{
++    let next=next?;let next_index=index.checked_add(1)?;let next_tag=next.line_segs.first().map(|row|row.tag);
++    // NoStoredFirstRow is a spacing-policy equivalence class: either there
++    // is no first row, or its implementation bit is present. Both source and
++    // current inputs then make the existing full-spacing predicate false,
++    // before vpos/text/style can affect it. This binds the immediate slot,
++    // NOT next-paragraph identity, row values, or None/present transitions.
++    // A missing next paragraph is rejected above; stored first rows reject.
++    if next_tag.is_some_and(|tag|tag&LineSeg::TAG_IMPLEMENTATION_PROPERTY==0){return None;}
++    if paragraph.controls.len()!=1 || !matches!(&paragraph.controls[0],Control::Table(t)if t.common.treat_as_char)
++      || !paragraph.text.is_empty() || paragraph.char_count!=9 || !paragraph.char_offsets.is_empty()
++      || paragraph.line_segs.len()!=1 || paragraph.column_type!=ColumnBreakType::None
++      || paragraph.raw_break_type!=0 || paragraph.page_break_synthesized
++      || paragraph.stored_text_partition_is_dirty() || paragraph.cell_format_vpos_dirty
++      || paragraph.hwpx_axis_shift!=0 || paragraph.layout_only_fill_lines!=0
++      || paragraph.source_line_seg_vertical_pos.is_some(){return None;}
++    let row=&paragraph.line_segs[0];
++    if row.tag&LineSeg::TAG_IMPLEMENTATION_PROPERTY!=0 || row.text_start!=0 || row.vertical_pos<0
++      || row.line_height<=0 || row.text_height<=0 || row.text_height>row.line_height
++      || row.baseline_distance<0 || row.baseline_distance>row.line_height || row.line_spacing<=0
++      || row.vertical_pos.checked_add(row.line_height)?.checked_add(row.line_spacing).is_none(){return None;}
++    // Exhaustive destructuring forces review of future Paragraph fields. Only
++    // root vpos is omitted from serialized content; existing derived/private
++    // cache fields are not content and are never turned into this observation.
++    let Paragraph{char_count,control_mask,para_shape_id,style_id,column_type,raw_break_type,page_break_synthesized,
++      text,char_offsets,char_shapes,line_segs:_,layout_space_metrics:_,hwpx_axis_shift,layout_only_fill_lines,
++      source_line_seg_vertical_pos:_,native_source_synthetic_seal:_,native_source_synthetic_context:_,completed_native_rows:_,
++      native_frame_observation:_,reset_flow_observation:_,range_tags,field_ranges,orphan_field_ends,controls,
++      ctrl_data_records,char_count_msb,raw_header_extra,has_para_text,tab_extended,title_marks,markpen_marks,
++      numbering_restart,stored_text_partition_dirty:_,cell_format_vpos_dirty:_,cell_vpos_reset:_,numbering_marker:_}=paragraph;
++    bounded_reset_digest(&(("rhwp-native-tac-half-spacing-policy-2",context,index,next_index,"NoStoredFirstRow"),
++      (char_count,control_mask,para_shape_id,style_id,column_type,raw_break_type,page_break_synthesized,text,char_offsets,char_shapes),
++      (hwpx_axis_shift,layout_only_fill_lines,range_tags,field_ranges,orphan_field_ends,controls,ctrl_data_records),
++      (char_count_msb,raw_header_extra,has_para_text,tab_extended,title_marks,markpen_marks,numbering_restart),
++      (row.text_start,row.line_height,row.text_height,row.baseline_distance,row.line_spacing,row.column_start,row.segment_width,row.tag)),budget)
++}
+--- a/src/model/raw_provenance.rs
++++ b/src/model/raw_provenance.rs
+@@ -493,6 +493,7 @@
+     /// Section 다이제스트에 실리지 않는다) Section 봉인을 계산한다.
+     pub fn seal_body_raw_provenance(&mut self) {
+         let reset_contexts = self.reset_flow_contexts();
++        let native_plain_spacing=self.layout_profile().native_hwp5_layout();
+         for (index, section) in self.sections.iter_mut().enumerate() {
+             seal_raw_bearing_controls(&mut section.paragraphs);
+             for master_page in &mut section.section_def.master_pages {
+@@ -501,7 +502,7 @@
+             // These are only the two actual parser/load call sites. The Some
+             // synthetic-owner walker above never observes reset inputs.
+             observe_loaded_reset_inputs(&mut section.paragraphs,
+-                reset_contexts.get(index).copied().flatten());
++                reset_contexts.get(index).copied().flatten(),native_plain_spacing);
+             section.seal_raw_provenance();
+         }
+     }
+@@ -721,8 +722,11 @@
+ pub(crate) struct ResetFlowObservation {
+     input: [u8; 32],
+     context: [u8; 32],
+-}
+-
++    native_tac_spacing_input: Option<[u8;32]>,
++}
++
++#[path="native_tac_spacing_input126.rs"]
++mod native_tac_spacing_input;
+ const RESET_INPUT_MAX_BYTES: usize = 2 * 1024 * 1024;
+ const RESET_INPUT_PASS_BYTES: usize = 16 * 1024 * 1024;
+ const RESET_INPUT_MAX_DEPTH: usize = 64;
+@@ -817,18 +821,40 @@
+     }
+ }
+ 
+-fn observe_loaded_reset_inputs(paragraphs: &mut [crate::model::paragraph::Paragraph], context: Option<[u8; 32]>) {
++fn observe_loaded_reset_inputs(paragraphs: &mut [crate::model::paragraph::Paragraph], context: Option<[u8; 32]>,native_plain:bool) {
+     let mut budget = RESET_INPUT_PASS_BYTES;
+-    for (index, paragraph) in paragraphs.iter_mut().enumerate() {
+-        paragraph.reset_flow_observation = context.and_then(|context|
+-            bounded_reset_digest(&(index, &*paragraph), &mut budget)
+-                .map(|input| ResetFlowObservation { input, context }));
+-    }
++    // This independent lane must not consume or change the existing reset
++    // observation's byte budget, input digest, lifetime or interpretation.
++    let mut spacing_budget=RESET_INPUT_PASS_BYTES;
++    for index in 0..paragraphs.len() {
++        let spacing=context.filter(|_|native_plain).and_then(|context|
++            native_tac_spacing_input::input(index,&paragraphs[index],paragraphs.get(index+1),context,&mut spacing_budget));
++        let original=context.and_then(|context|
++            bounded_reset_digest(&(index,&paragraphs[index]),&mut budget)
++                .map(|input|ResetFlowObservation{input,context,native_tac_spacing_input:spacing}));
++        paragraphs[index].reset_flow_observation=original;
++    }
++}
++pub(crate) fn unchanged_native_tac_spacing_input(index:usize,paragraph:&crate::model::paragraph::Paragraph,
++    next:Option<&crate::model::paragraph::Paragraph>,context:Option<[u8;32]>,portable_resources:bool)->bool{
++    if !portable_resources{return false;}
++    let (Some(context),Some(observed))=(context,paragraph.reset_flow_observation)else{return false;};
++    let Some(expected)=observed.native_tac_spacing_input else{return false;};
++    let mut budget=RESET_INPUT_MAX_BYTES;
++    observed.context==context && native_tac_spacing_input::input(index,paragraph,next,context,&mut budget)==Some(expected)
+ }
+ 
+ /// Compute once at section entry, not once per reset or nested paragraph. The
+ /// existing dirty/raw/physical checks remain separate requirements. Dynamically
+ /// supplied measurement resources are outside this portable observation scope.
++pub(crate) fn unchanged_reset_input(index:usize, paragraph:&crate::model::paragraph::Paragraph,
++    context:Option<[u8;32]>, portable_resources:bool)->bool {
++    if !portable_resources{return false;}
++    let (Some(context),Some(observed))=(context,paragraph.reset_flow_observation)else{return false;};
++    let mut budget=RESET_INPUT_MAX_BYTES;
++    observed.context==context && bounded_reset_digest(&(index,paragraph),&mut budget)==Some(observed.input)
++}
++
+ pub(crate) fn unchanged_reset_inputs(
+     paragraphs: &[crate::model::paragraph::Paragraph], context: Option<[u8; 32]>,
+     portable_resources: bool,
+--- a/src/renderer/composer.rs
++++ b/src/renderer/composer.rs
+@@ -641,6 +641,12 @@
+ /// TAC 표를 소유한 줄이 실제 흐름에 남기는 양의 후행 간격.
+ /// 저장 HWP5의 표 소유 줄과 현재 재조판한 단일 RowBreak 줄은
+ /// 개체 프레임 뒤의 간격 절반을 물리 흐름에 남긴다.
++/// Preserve only the already-parsed Native trailing-space rule for one locally
++/// unchanged blank TAC host. No row/cache authority or source geometry is issued.
++#[path="composer/unchanged_native_tac.rs"]
++mod unchanged_native_tac;
++pub(crate) use unchanged_native_tac::unchanged_native_tac_spacing;
++
+ pub(crate) fn tac_host_trailing_spacing(
+     para: &Paragraph,
+     control_index: usize,
+--- /dev/null
++++ b/src/renderer/composer/unchanged_native_tac.rs
+@@ -0,0 +1,53 @@
++//! Source input identity plus consistent current table measurement.
++//! Only selects Native's existing half-spacing policy. This proves neither
++//! physical fit nor a source-row, reset, origin, or serialization authority.
++use super::*;
++use crate::renderer::height_measurer::MeasuredTable;
++use crate::model::table::TablePageBreak;
++fn exact(a:f64,b:f64)->bool{a.is_finite()&&b.is_finite()&&(a-b).abs()<=f64::EPSILON*a.abs().max(b.abs()).max(1.0)*8.0}
++#[allow(clippy::too_many_arguments)]
++pub(crate) fn unchanged_native_tac_spacing(index:usize,para:&Paragraph,next:Option<&Paragraph>,ci:usize,seg:&LineSeg,
++    measurements:&[MeasuredTable],styles:&ResolvedStyleSet,dpi:f64)->bool{
++    if ci!=0 || para.controls.len()!=1 || !para.text.is_empty() || para.char_count!=9
++      || !para.char_offsets.is_empty() || para.line_segs.len()!=1
++      || !std::ptr::eq(seg,&para.line_segs[0]) || seg.text_start!=0
++      || seg.tag&LineSeg::TAG_IMPLEMENTATION_PROPERTY!=0 || seg.line_spacing<=0
++      || seg.line_height<=0 || seg.text_height<=0 || seg.text_height>seg.line_height
++      || seg.baseline_distance<0 || seg.baseline_distance>seg.line_height
++      || para.stored_text_partition_is_dirty() || para.hwpx_axis_shift!=0
++      || para.source_line_seg_vertical_pos.is_some() || para.cell_format_vpos_dirty
++      || !para.field_ranges.is_empty() || !para.range_tags.is_empty()
++      || !para.orphan_field_ends.is_empty() || !para.tab_extended.is_empty()
++      || !dpi.is_finite() || dpi<=0.0 {return false;}
++    if seg.vertical_pos<0 || seg.vertical_pos.checked_add(seg.line_height).and_then(|v|v.checked_add(seg.line_spacing)).is_none(){return false;}
++    let Control::Table(table)=&para.controls[0]else{return false;};
++    let mut owners=measurements.iter().filter(|m|m.para_index==index&&m.control_index==ci);
++    let Some(measured)=owners.next()else{return false;};if owners.next().is_some(){return false;}
++    if measured.para_index!=index || measured.control_index!=ci
++      || !table.common.treat_as_char || table.page_break!=TablePageBreak::None
++      || table.caption.is_some() || table.repeat_header || table.common.allow_overlap
++      || table.common.horizontal_offset!=0 || table.common.vertical_offset!=0
++      || table.common.width==0 || table.common.height==0 || table.common.height>=0x80000000
++      || table.row_count==0 || table.row_count>128 || table.col_count==0 || table.col_count>32
++      || measured.caption_height!=0.0 || measured.row_heights.len()!=table.row_count as usize
++      || measured.row_heights.iter().any(|h|!h.is_finite()||*h<=0.0)
++      || measured.cumulative_heights.len()!=measured.row_heights.len()+1
++      || !exact(measured.total_height,hwpunit_to_px(table.common.height as i32,dpi))
++      || !exact(*measured.cumulative_heights.last().unwrap_or(&f64::NAN),measured.total_height)
++      || table.cells.iter().any(|c|c.dirty_flag||c.paragraphs.iter().any(|p|!p.controls.is_empty()||!p.field_ranges.is_empty())) {return false;}
++    if !measured.cell_spacing.is_finite() || measured.cell_spacing<0.0 || measured.cumulative_heights.first()!=Some(&0.0){return false;}
++    let mut cursor=0.0;
++    for (i,height) in measured.row_heights.iter().enumerate(){
++        cursor+=*height;if i>0{cursor+=measured.cell_spacing;}
++        if !cursor.is_finite() || !exact(measured.cumulative_heights[i+1],cursor){return false;}
++    }
++    if !exact(cursor,measured.total_height){return false;}
++    let margins=[table.outer_margin_left,table.outer_margin_right,table.outer_margin_top,table.outer_margin_bottom];
++    if margins.iter().any(|v|*v<0) || table.common.margin.left!=margins[0]
++      || table.common.margin.right!=margins[1] || table.common.margin.top!=margins[2]
++      || table.common.margin.bottom!=margins[3] {return false;}
++    // The half-spacing formula reads no frame top, width, or available height.
++    // Allocation/overflow checks remain with the existing layout pipeline.
++    crate::model::raw_provenance::unchanged_native_tac_spacing_input(index,para,next,styles.reset_flow_context,
++      styles.supplemental_metrics.is_none()&&styles.kerning_measurement_context.is_none()&&styles.horizontal_shaping_context.is_none())
++}
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -14819,9 +14819,10 @@
+                 let mut stored_lh_covers_om = false;
+                 if let Some(seg) = host_seg {
+                     if seg.line_spacing > 0 {
+-                        let native_stored_layout =
+-                            self.profile.get().hwp5_stored_pagination_layout()
+-                                && !self.profile.get().session_edited();
++                        let native_stored_layout = self.profile.get().hwp5_stored_pagination_layout()
++                            && (!self.profile.get().session_edited() || (self.profile.get().native_hwp5_layout() && crate::renderer::composer::unchanged_native_tac_spacing(
++                                para_index,para,paragraphs.get(para_index+1),control_index,seg,measured_tables,
++                                styles,self.dpi)));
+                         y_offset += if crate::renderer::composer::tac_next_line_full_spacing(
+                             para,
+                             paragraphs.get(para_index + 1),
+--- a/src/renderer/typeset/controls.rs
++++ b/src/renderer/typeset/controls.rs
+@@ -208,6 +208,7 @@
+     height_before: f64,
+     measured_tac_floor: Option<f64>,
+     flow: tac_flow::TacFlowQuery<'_>,
++    styles:&crate::renderer::style_resolver::ResolvedStyleSet,
+ ) {
+     let dpi = flow.dpi();
+     let tac_reconcile::TacHeightCap {
+@@ -226,6 +227,7 @@
+         height_before,
+         st.tac_height_page().profile,
+         &flow,
++        styles,
+         |ci, prior_tac_count, lh, ls_extra| {
+             if std::env::var("RHWP_DIAG_TACSIB").is_ok() {
+                 eprintln!(
+--- a/src/renderer/typeset/controls/paragraph_flow.rs
++++ b/src/renderer/typeset/controls/paragraph_flow.rs
+@@ -287,6 +287,7 @@
+             height_before,
+             measured_tac_floor,
+             engine.tac_flow_query(),
++            styles,
+         );
+     }
+ }
+--- a/src/renderer/typeset/controls/tac_reconcile.rs
++++ b/src/renderer/typeset/controls/tac_reconcile.rs
+@@ -37,6 +37,7 @@
+     height_before: f64,
+     profile: LayoutCompatibilityProfile,
+     flow: &TacFlowQuery<'_>,
++    styles:&crate::renderer::style_resolver::ResolvedStyleSet,
+     mut trace_sibling: impl FnMut(usize, usize, f64, f64),
+ ) -> TacHeightCap {
+     let dpi = flow.dpi();
+@@ -68,7 +69,9 @@
+                             ci,
+                             seg,
+                             profile.hwpx_stored_layout(),
+-                            profile.hwp5_stored_pagination_layout() && (!profile.session_edited() || current_owned_row == Some(seg_index)),
++                            profile.hwp5_stored_pagination_layout() && (!profile.session_edited() || current_owned_row == Some(seg_index)
++                                || (profile.native_hwp5_layout() && crate::renderer::composer::unchanged_native_tac_spacing(para_idx,para,next_para,ci,seg,
++                                    measured_tables,styles,dpi))),
+                             dpi,
+                         )
+                     } else {
+--- a/src/serializer/hwpx/standard_rows.rs
++++ b/src/serializer/hwpx/standard_rows.rs
+@@ -9,8 +9,33 @@
+ pub(crate) struct CurrentStandardRowsProjection {
+     definitions:[u8;32],
+     dependent_paragraphs:[u8;32],
++    source_dependent_paragraphs:[u8;32],
+     inputs:Vec<[u8;32]>,
+     rows:Vec<Vec<LineSeg>>,
++}
++
++/// The actual already-selected HWPX writer lowering, not a layout/source mode.
++#[derive(Clone,Copy)]
++pub(crate) enum TailExportRepresentation { Original, Hwp5MissingRowsMaterialized }
++
++fn dependent_export_digest(paragraphs:&[Paragraph],projected_count:usize,
++    representation:TailExportRepresentation)->Option<[u8;32]> {
++ if projected_count==0 || projected_count>paragraphs.len(){return None;}
++ if matches!(representation,TailExportRepresentation::Original){return digest(&paragraphs);}
++ // Exactly the existing HWP5->HWPX absent-LINE_SEG marker materialization.
++ // A whole-stack plan admits only control-free plain tail paragraphs. Do not
++ // recurse into an unknown graph or normalize any authored/nonempty row.
++ let mut expected=paragraphs.to_vec();
++ for paragraph in expected.iter_mut().skip(projected_count) {
++  if !paragraph.controls.is_empty(){return None;}
++  if paragraph.line_segs.is_empty(){paragraph.line_segs.push(LineSeg::missing_lineseg_placeholder());}
++ }
++ digest(&expected)
++}
++
++#[cfg(test)]
++pub(crate) fn test_matches_existing_tail_materialization(source:&[Paragraph],target:&[Paragraph],count:usize)->bool {
++ dependent_export_digest(source,count,TailExportRepresentation::Hwp5MissingRowsMaterialized)==digest(&target)
+ }
+ 
+ // A serialization byte/depth bound, not a claim of a total CPU-time bound.
+@@ -40,15 +65,17 @@
+ }
+ impl CurrentStandardRowsProjection {
+  pub(crate) fn from_current_stack(doc:&Document,plan:&crate::renderer::layout::CurrentWholeStackPlan,
+-   styles:&crate::renderer::style_resolver::ResolvedStyleSet,width:f64,dpi:f64)->Option<Self>{
++   styles:&crate::renderer::style_resolver::ResolvedStyleSet,width:f64,dpi:f64,
++   representation:TailExportRepresentation)->Option<Self>{
+   use crate::renderer::composer::{reflow_line_segs,compose_paragraph_in_context,ParagraphBox};
+   if doc.sections.len()!=1 || !dpi.is_finite() || dpi<=0.0 || !width.is_finite() || width<=0.0
+     || doc.sections.iter().any(|s|s.paragraphs.iter().any(|p|p.completed_native_rows.is_some())) {return None;}
+   let definitions=definitions(doc)?;
+-  let dependent_paragraphs=digest(&doc.sections[0].paragraphs)?;
++  let source_dependent_paragraphs=digest(&doc.sections[0].paragraphs)?;
+   let paragraphs=&doc.sections[0].paragraphs;
+   let count=plan.prefixes.len().checked_add(plan.hosts.len())?;
+   if count==0 || count>128{return None;}
++  let dependent_paragraphs=dependent_export_digest(paragraphs,count,representation)?;
+   let mut inputs=Vec::with_capacity(count);let mut rows=Vec::with_capacity(count);
+   for index in 0..count {
+    let p=paragraphs.get(index)?;let input=digest(&(index,p))?;let mut fresh=p.clone();
+@@ -87,7 +114,7 @@
+    }
+    inputs.push(input);rows.push(fresh.line_segs);
+   }
+-  Some(Self{definitions,dependent_paragraphs,inputs,rows})
++  Some(Self{definitions,dependent_paragraphs,source_dependent_paragraphs,inputs,rows})
+  }
+  // Rebind only an unchanged export clone. Byte packages cannot construct this
+  // ephemeral projection or acquire a new CompletedRows lease.
+@@ -95,6 +122,7 @@
+   if doc.sections.len()!=1 || self.inputs.is_empty() || self.inputs.len()>128 || self.rows.len()!=self.inputs.len()
+     || definitions(doc)?!=self.definitions || digest(&doc.sections[0].paragraphs)?!=self.dependent_paragraphs{return None;}
+   let paragraphs=&doc.sections[0].paragraphs;
++  let _source_witness=self.source_dependent_paragraphs;
+   let mut bound=HashMap::new();
+   for index in 0..self.inputs.len() {let p=paragraphs.get(index)?;
+    if p.stored_text_partition_is_dirty() || p.cell_format_vpos_dirty || p.source_line_seg_vertical_pos.is_some(){return None;}
+@@ -111,7 +139,7 @@
+  fn sample()->(Document,CurrentStandardRowsProjection){
+   let mut d=Document::default();d.sections.push(Default::default());
+   d.sections[0].paragraphs=(0..3).map(|index|{let mut p=Paragraph::default();p.text=format!("paragraph {index}");p}).collect();
+-  let p=CurrentStandardRowsProjection{definitions:definitions(&d).unwrap(),dependent_paragraphs:digest(&d.sections[0].paragraphs).unwrap(),
++  let p=CurrentStandardRowsProjection{definitions:definitions(&d).unwrap(),dependent_paragraphs:digest(&d.sections[0].paragraphs).unwrap(),source_dependent_paragraphs:digest(&d.sections[0].paragraphs).unwrap(),
+    inputs:d.sections[0].paragraphs.iter().enumerate().map(|(i,p)|digest(&(i,p)).unwrap()).collect(),
+    rows:vec![vec![LineSeg::default()];3]};(d,p)
+  }
+@@ -133,7 +161,7 @@
+  #[test] fn dynamic_projection_bounds_and_exact_source_binding(){
+   for count in [1usize,2,4,16,128] {
+    let(mut d,mut p)=sample();d.sections[0].paragraphs=(0..count).map(|index|{let mut para=Paragraph::default();para.text=format!("fresh input {index}");para}).collect();
+-   p.definitions=definitions(&d).unwrap();p.dependent_paragraphs=digest(&d.sections[0].paragraphs).unwrap();
++   p.definitions=definitions(&d).unwrap();p.dependent_paragraphs=digest(&d.sections[0].paragraphs).unwrap();p.source_dependent_paragraphs=p.dependent_paragraphs;
+    p.inputs=d.sections[0].paragraphs.iter().enumerate().map(|(index,para)|digest(&(index,para)).unwrap()).collect();p.rows=vec![vec![LineSeg::default()];count];
+    let clone=d.clone();assert_eq!(p.bind_for_export(&clone).unwrap().len(),count);
+    let mut changed=d.clone();changed.sections[0].paragraphs[count-1].raw_header_extra.push(0xe1);assert!(p.bind_for_export(&changed).is_none());
+@@ -145,7 +173,7 @@
+  }
+  #[test] fn unprojected_tail_control_or_order_change_cannot_rebind_partial_plan(){
+   let(mut d,mut p)=sample();d.sections[0].paragraphs.push(Paragraph::default());
+-  p.dependent_paragraphs=digest(&d.sections[0].paragraphs).unwrap();assert_eq!(p.bind_for_export(&d).unwrap().len(),3);
++  p.dependent_paragraphs=digest(&d.sections[0].paragraphs).unwrap();p.source_dependent_paragraphs=p.dependent_paragraphs;assert_eq!(p.bind_for_export(&d).unwrap().len(),3);
+   for change in 0..4 {let mut changed=d.clone();match change {
+    0=>changed.sections[0].paragraphs[3].controls.push(crate::model::control::Control::Table(Box::default())),
+    1=>changed.sections[0].paragraphs[3].raw_header_extra.push(0x51),
+@@ -158,4 +186,38 @@
+   let mut changed=d.clone();changed.sections[0].section_def.raw_ctrl_extra.push(0x71);assert!(p.bind_for_export(&changed).is_none());
+   let mut changed=d.clone();changed.sections[0].paragraphs[0].source_line_seg_vertical_pos=Some(vec![0]);assert!(p.bind_for_export(&changed).is_none());
+  }
+-}
++ #[test] fn native_tail_representation_owns_only_exact_absent_rows_lowering(){
++  let(mut d,mut projection)=sample();
++  d.sections[0].paragraphs.push(Paragraph::default());
++  let original=d.clone();let paras=&d.sections[0].paragraphs;
++  projection.source_dependent_paragraphs=digest(paras).unwrap();
++  projection.dependent_paragraphs=dependent_export_digest(paras,3,TailExportRepresentation::Hwp5MissingRowsMaterialized).unwrap();
++  assert_ne!(projection.source_dependent_paragraphs,projection.dependent_paragraphs);
++  assert!(projection.bind_for_export(&original).is_none(),"Native branch requires the actual selected lowered representation");
++  d.sections[0].paragraphs[3].line_segs.push(LineSeg::missing_lineseg_placeholder());
++  assert_eq!(projection.bind_for_export(&d).unwrap().len(),3);
++  for field in 0..9 {let mut changed=d.clone();let row=&mut changed.sections[0].paragraphs[3].line_segs[0];
++   match field {0=>row.text_start=1,1=>row.vertical_pos=1,2=>row.line_height=1,3=>row.text_height=1,4=>row.baseline_distance=1,
++    5=>row.line_spacing=1,6=>row.column_start=1,7=>row.segment_width=1,8=>row.tag^=1,_=>unreachable!()}
++   assert!(projection.bind_for_export(&changed).is_none(),"marker field {field}");
++  }
++  for change in 0..5 {let mut changed=d.clone();let p=&mut changed.sections[0].paragraphs[3];
++   match change {0=>p.text.push('x'),1=>p.raw_header_extra.push(7),2=>p.line_segs.push(LineSeg::default()),
++    3=>p.controls.push(crate::model::control::Control::Table(Box::default())),4=>p.para_shape_id=1,_=>unreachable!()}
++   assert!(projection.bind_for_export(&changed).is_none(),"tail mutation {change}");
++  }
++  assert_eq!(original.sections[0].paragraphs[3].line_segs.len(),0,"source untouched");
++ }
++ #[test] fn original_tail_representation_never_normalizes_nonempty_or_unknown_rows(){
++  let(mut d,_)=sample();d.sections[0].paragraphs.push(Paragraph::default());
++  let original=digest(&d.sections[0].paragraphs).unwrap();
++  assert_eq!(dependent_export_digest(&d.sections[0].paragraphs,3,TailExportRepresentation::Original),Some(original));
++  d.sections[0].paragraphs[3].line_segs.push(LineSeg::default());
++  let stored=digest(&d.sections[0].paragraphs).unwrap();
++  assert_eq!(dependent_export_digest(&d.sections[0].paragraphs,3,TailExportRepresentation::Hwp5MissingRowsMaterialized),Some(stored));
++  d.sections[0].paragraphs[3].controls.push(crate::model::control::Control::Table(Box::default()));
++  assert!(dependent_export_digest(&d.sections[0].paragraphs,3,TailExportRepresentation::Hwp5MissingRowsMaterialized).is_none());
++  assert!(dependent_export_digest(&d.sections[0].paragraphs,0,TailExportRepresentation::Original).is_none());
++ }
++
++}

@@ -1,0 +1,1831 @@
+{
+  "engine": "official124/source-587008f751f4f6dc",
+  "inputs": [
+    {
+      "columns": 1,
+      "initialXmlGeometryDiff": [],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": false,
+      "name": "one-float",
+      "nativePages": 1,
+      "nativeSha256": "62f6b0ddaa3906d2f519e7fbda0fb2554eefaf0237c6387cf8b0baa88de35e5f",
+      "offset": false,
+      "shortPage": false,
+      "tableCount": 1,
+      "tac": false,
+      "unequal": false
+    },
+    {
+      "columns": 1,
+      "initialXmlGeometryDiff": [],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": false,
+      "name": "two-float-control",
+      "nativePages": 1,
+      "nativeSha256": "a9cbceeb3cc4029ae064f2dff47511777229eded6c1b3ea430178feab4418c23",
+      "offset": false,
+      "shortPage": false,
+      "tableCount": 2,
+      "tac": false,
+      "unequal": false
+    },
+    {
+      "columns": 1,
+      "initialXmlGeometryDiff": [],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": false,
+      "name": "three-float",
+      "nativePages": 1,
+      "nativeSha256": "bd5a75b9e2ea30b9f3decddb190d4cead9f89c2b12f37cec157a92fcfdc37684",
+      "offset": false,
+      "shortPage": false,
+      "tableCount": 3,
+      "tac": false,
+      "unequal": false
+    },
+    {
+      "columns": 1,
+      "initialXmlGeometryDiff": [],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": false,
+      "name": "four-float",
+      "nativePages": 1,
+      "nativeSha256": "847e176f74dc4854a49b10a7d88202fdf535625397c98f68466e72bc829c0644",
+      "offset": false,
+      "shortPage": false,
+      "tableCount": 4,
+      "tac": false,
+      "unequal": false
+    },
+    {
+      "columns": 1,
+      "initialXmlGeometryDiff": [],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": true,
+      "name": "three-float-interleaved",
+      "nativePages": 1,
+      "nativeSha256": "23217d3406a66e43e64e299c25496fe5f0acfa80001b71ba4a0cdedf76b81c17",
+      "offset": false,
+      "shortPage": false,
+      "tableCount": 3,
+      "tac": false,
+      "unequal": false
+    },
+    {
+      "columns": 1,
+      "initialXmlGeometryDiff": [],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": true,
+      "name": "four-float-interleaved",
+      "nativePages": 1,
+      "nativeSha256": "806e91ef4c472a5adc13313639802367e35d9f99ad4a4c3f9a8e81cc16c17cc9",
+      "offset": false,
+      "shortPage": false,
+      "tableCount": 4,
+      "tac": false,
+      "unequal": false
+    },
+    {
+      "columns": 1,
+      "initialXmlGeometryDiff": [],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": false,
+      "name": "one-tac",
+      "nativePages": 1,
+      "nativeSha256": "d696873821b7af1624e912226c76492d95f03ab365a41f5fc043319a595e6672",
+      "offset": false,
+      "shortPage": false,
+      "tableCount": 1,
+      "tac": true,
+      "unequal": false
+    },
+    {
+      "columns": 1,
+      "initialXmlGeometryDiff": [],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": false,
+      "name": "two-tac-control",
+      "nativePages": 1,
+      "nativeSha256": "7b67582b5e1fd764f3b75451459ef7cc1890ac266c5b914fa6b47b9dc7c66288",
+      "offset": false,
+      "shortPage": false,
+      "tableCount": 2,
+      "tac": true,
+      "unequal": false
+    },
+    {
+      "columns": 1,
+      "initialXmlGeometryDiff": [],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": false,
+      "name": "three-tac",
+      "nativePages": 1,
+      "nativeSha256": "be82db716891fea49ebfaf93aa470cbd75eb420431cea4a45692d47408e42402",
+      "offset": false,
+      "shortPage": false,
+      "tableCount": 3,
+      "tac": true,
+      "unequal": false
+    },
+    {
+      "columns": 1,
+      "initialXmlGeometryDiff": [],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": false,
+      "name": "four-tac",
+      "nativePages": 1,
+      "nativeSha256": "36405c60a5b26d472cffa2595dfdc20e701e422d2ee424b9521e295a34ade4c7",
+      "offset": false,
+      "shortPage": false,
+      "tableCount": 4,
+      "tac": true,
+      "unequal": false
+    },
+    {
+      "columns": 1,
+      "initialXmlGeometryDiff": [],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": true,
+      "name": "three-interleaved",
+      "nativePages": 1,
+      "nativeSha256": "c1c52b71267da471ff2c6e18ff8d28231a839c0a65be252a980c00c45d286962",
+      "offset": false,
+      "shortPage": false,
+      "tableCount": 3,
+      "tac": true,
+      "unequal": false
+    },
+    {
+      "columns": 1,
+      "initialXmlGeometryDiff": [],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": true,
+      "name": "four-interleaved",
+      "nativePages": 1,
+      "nativeSha256": "5075ed1caad540a3b0113c197d3544330c65a9e3774ba99727376f31e8442c20",
+      "offset": false,
+      "shortPage": false,
+      "tableCount": 4,
+      "tac": true,
+      "unequal": false
+    },
+    {
+      "columns": 1,
+      "initialXmlGeometryDiff": [],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": false,
+      "name": "one-offset",
+      "nativePages": 1,
+      "nativeSha256": "81b63caabe49b12613f7011961d45e4705f2efb9a9056340e44fb4b18e893d47",
+      "offset": true,
+      "shortPage": false,
+      "tableCount": 1,
+      "tac": false,
+      "unequal": false
+    },
+    {
+      "columns": 1,
+      "initialXmlGeometryDiff": [],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": true,
+      "name": "three-offset",
+      "nativePages": 1,
+      "nativeSha256": "25307ccab67160e11c96733aa24020da14e5a4be70e213c629afd54df00ae119",
+      "offset": true,
+      "shortPage": false,
+      "tableCount": 3,
+      "tac": false,
+      "unequal": false
+    },
+    {
+      "columns": 1,
+      "initialXmlGeometryDiff": [],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": true,
+      "name": "three-multipage",
+      "nativePages": 2,
+      "nativeSha256": "1e3ae17d747ee66ddf2112ac9a0f45fdd6d2fd32e9e721eda644fc42eab14f1b",
+      "offset": false,
+      "shortPage": true,
+      "tableCount": 3,
+      "tac": true,
+      "unequal": false
+    },
+    {
+      "columns": 1,
+      "initialXmlGeometryDiff": [],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": true,
+      "name": "four-multipage",
+      "nativePages": 2,
+      "nativeSha256": "6a8e3623757d5a920fd6d97faf99db5b4518cb6df968ca085108bc2a30d9ab45",
+      "offset": false,
+      "shortPage": true,
+      "tableCount": 4,
+      "tac": true,
+      "unequal": false
+    },
+    {
+      "columns": 2,
+      "initialXmlGeometryDiff": [
+        {
+          "after": 56.7,
+          "before": 49.4,
+          "path": "$/layout/0/text/runs/0/charX/4"
+        },
+        {
+          "after": 64.2,
+          "before": 56.9,
+          "path": "$/layout/0/text/runs/0/charX/5"
+        },
+        {
+          "after": 71.4,
+          "before": 64.1,
+          "path": "$/layout/0/text/runs/0/charX/6"
+        },
+        {
+          "after": 79.8,
+          "before": 72.5,
+          "path": "$/layout/0/text/runs/0/charX/7"
+        },
+        {
+          "after": 87.0,
+          "before": 79.7,
+          "path": "$/layout/0/text/runs/0/charX/8"
+        },
+        {
+          "after": 93.4,
+          "before": 86.1,
+          "path": "$/layout/0/text/runs/0/charX/9"
+        },
+        {
+          "after": 100.9,
+          "before": 93.6,
+          "path": "$/layout/0/text/runs/0/charX/10"
+        },
+        {
+          "after": 104.8,
+          "before": 97.5,
+          "path": "$/layout/0/text/runs/0/charX/11"
+        },
+        {
+          "after": 112.1,
+          "before": 104.8,
+          "path": "$/layout/0/text/runs/0/charX/12"
+        },
+        {
+          "after": 115.9,
+          "before": 108.6,
+          "path": "$/layout/0/text/runs/0/charX/13"
+        },
+        {
+          "after": 123.5,
+          "before": 116.2,
+          "path": "$/layout/0/text/runs/0/charX/14"
+        },
+        {
+          "after": 130.8,
+          "before": 123.5,
+          "path": "$/layout/0/text/runs/0/charX/15"
+        },
+        {
+          "after": 138.6,
+          "before": 131.3,
+          "path": "$/layout/0/text/runs/0/charX/16"
+        },
+        {
+          "after": 147.1,
+          "before": 139.8,
+          "path": "$/layout/0/text/runs/0/charX/17"
+        },
+        {
+          "after": 151.8,
+          "before": 144.5,
+          "path": "$/layout/0/text/runs/0/charX/18"
+        },
+        {
+          "after": 180.7,
+          "before": 166.1,
+          "path": "$/layout/0/text/runs/0/charX/19"
+        },
+        {
+          "after": 188.7,
+          "before": 174.1,
+          "path": "$/layout/0/text/runs/0/charX/20"
+        },
+        {
+          "after": 195.1,
+          "before": 180.4,
+          "path": "$/layout/0/text/runs/0/charX/21"
+        },
+        {
+          "after": 202.2,
+          "before": 187.6,
+          "path": "$/layout/0/text/runs/0/charX/22"
+        },
+        {
+          "after": 206.9,
+          "before": 192.3,
+          "path": "$/layout/0/text/runs/0/charX/23"
+        },
+        {
+          "after": 210.8,
+          "before": 196.2,
+          "path": "$/layout/0/text/runs/0/charX/24"
+        },
+        {
+          "after": 218.0,
+          "before": 203.4,
+          "path": "$/layout/0/text/runs/0/charX/25"
+        },
+        {
+          "after": 222.3,
+          "before": 207.6,
+          "path": "$/layout/0/text/runs/0/charX/26"
+        },
+        {
+          "after": 251.2,
+          "before": 229.2,
+          "path": "$/layout/0/text/runs/0/charX/27"
+        },
+        {
+          "after": 260.9,
+          "before": 239.0,
+          "path": "$/layout/0/text/runs/0/charX/28"
+        },
+        {
+          "after": 270.5,
+          "before": 248.6,
+          "path": "$/layout/0/text/runs/0/charX/29"
+        },
+        {
+          "after": 279.0,
+          "before": 257.1,
+          "path": "$/layout/0/text/runs/0/charX/30"
+        },
+        {
+          "after": 307.9,
+          "before": 278.7,
+          "path": "$/layout/0/text/runs/0/charX/31"
+        },
+        {
+          "after": 285.7,
+          "before": 278.7,
+          "path": "$/layout/0/text/runs/0/w"
+        },
+        {
+          "after": 152.4,
+          "before": 133.2,
+          "path": "$/layout/0/text/runs/1/charX/15"
+        },
+        {
+          "after": 160.3,
+          "before": 141.1,
+          "path": "$/layout/0/text/runs/1/charX/16"
+        },
+        {
+          "after": 166.7,
+          "before": 147.5,
+          "path": "$/layout/0/text/runs/1/charX/17"
+        },
+        {
+          "after": 173.8,
+          "before": 154.6,
+          "path": "$/layout/0/text/runs/1/charX/18"
+        },
+        {
+          "after": 178.6,
+          "before": 159.4,
+          "path": "$/layout/0/text/runs/1/charX/19"
+        },
+        {
+          "after": 182.4,
+          "before": 163.2,
+          "path": "$/layout/0/text/runs/1/charX/20"
+        },
+        {
+          "after": 189.6,
+          "before": 170.4,
+          "path": "$/layout/0/text/runs/1/charX/21"
+        },
+        {
+          "after": 193.9,
+          "before": 174.7,
+          "path": "$/layout/0/text/runs/1/charX/22"
+        },
+        {
+          "after": 251.2,
+          "before": 212.8,
+          "path": "$/layout/0/text/runs/1/charX/23"
+        },
+        {
+          "after": 260.9,
+          "before": 222.5,
+          "path": "$/layout/0/text/runs/1/charX/24"
+        },
+        {
+          "after": 270.5,
+          "before": 232.1,
+          "path": "$/layout/0/text/runs/1/charX/25"
+        },
+        {
+          "after": 279.0,
+          "before": 240.6,
+          "path": "$/layout/0/text/runs/1/charX/26"
+        },
+        {
+          "after": 336.3,
+          "before": 278.7,
+          "path": "$/layout/0/text/runs/1/charX/27"
+        },
+        {
+          "after": 285.7,
+          "before": 278.7,
+          "path": "$/layout/0/text/runs/1/w"
+        },
+        {
+          "after": 152.4,
+          "before": 133.2,
+          "path": "$/layout/0/text/runs/2/charX/15"
+        },
+        {
+          "after": 160.3,
+          "before": 141.1,
+          "path": "$/layout/0/text/runs/2/charX/16"
+        },
+        {
+          "after": 166.7,
+          "before": 147.5,
+          "path": "$/layout/0/text/runs/2/charX/17"
+        },
+        {
+          "after": 173.8,
+          "before": 154.6,
+          "path": "$/layout/0/text/runs/2/charX/18"
+        },
+        {
+          "after": 178.6,
+          "before": 159.4,
+          "path": "$/layout/0/text/runs/2/charX/19"
+        },
+        {
+          "after": 182.4,
+          "before": 163.2,
+          "path": "$/layout/0/text/runs/2/charX/20"
+        },
+        {
+          "after": 189.6,
+          "before": 170.4,
+          "path": "$/layout/0/text/runs/2/charX/21"
+        },
+        {
+          "after": 193.9,
+          "before": 174.7,
+          "path": "$/layout/0/text/runs/2/charX/22"
+        },
+        {
+          "after": 251.2,
+          "before": 212.8,
+          "path": "$/layout/0/text/runs/2/charX/23"
+        },
+        {
+          "after": 260.9,
+          "before": 222.5,
+          "path": "$/layout/0/text/runs/2/charX/24"
+        },
+        {
+          "after": 270.5,
+          "before": 232.1,
+          "path": "$/layout/0/text/runs/2/charX/25"
+        },
+        {
+          "after": 279.0,
+          "before": 240.6,
+          "path": "$/layout/0/text/runs/2/charX/26"
+        },
+        {
+          "after": 336.3,
+          "before": 278.7,
+          "path": "$/layout/0/text/runs/2/charX/27"
+        },
+        {
+          "after": 285.7,
+          "before": 278.7,
+          "path": "$/layout/0/text/runs/2/w"
+        }
+      ],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": true,
+      "name": "two-columns",
+      "nativePages": 1,
+      "nativeSha256": "056c3b89ca3d27fdf68234289ff4ab2a181e8a004124a7c5cb29157b474490f8",
+      "offset": false,
+      "shortPage": false,
+      "tableCount": 3,
+      "tac": true,
+      "unequal": false
+    },
+    {
+      "columns": 3,
+      "initialXmlGeometryDiff": [
+        {
+          "after": 37.1,
+          "before": 33.9,
+          "path": "$/layout/0/text/runs/0/charX/4"
+        },
+        {
+          "after": 44.5,
+          "before": 41.4,
+          "path": "$/layout/0/text/runs/0/charX/5"
+        },
+        {
+          "after": 51.7,
+          "before": 48.5,
+          "path": "$/layout/0/text/runs/0/charX/6"
+        },
+        {
+          "after": 60.2,
+          "before": 57.0,
+          "path": "$/layout/0/text/runs/0/charX/7"
+        },
+        {
+          "after": 67.3,
+          "before": 64.1,
+          "path": "$/layout/0/text/runs/0/charX/8"
+        },
+        {
+          "after": 73.7,
+          "before": 70.5,
+          "path": "$/layout/0/text/runs/0/charX/9"
+        },
+        {
+          "after": 81.3,
+          "before": 78.1,
+          "path": "$/layout/0/text/runs/0/charX/10"
+        },
+        {
+          "after": 85.1,
+          "before": 81.9,
+          "path": "$/layout/0/text/runs/0/charX/11"
+        },
+        {
+          "after": 92.4,
+          "before": 89.2,
+          "path": "$/layout/0/text/runs/0/charX/12"
+        },
+        {
+          "after": 96.3,
+          "before": 93.1,
+          "path": "$/layout/0/text/runs/0/charX/13"
+        },
+        {
+          "after": 103.8,
+          "before": 100.7,
+          "path": "$/layout/0/text/runs/0/charX/14"
+        },
+        {
+          "after": 111.1,
+          "before": 107.9,
+          "path": "$/layout/0/text/runs/0/charX/15"
+        },
+        {
+          "after": 118.9,
+          "before": 115.7,
+          "path": "$/layout/0/text/runs/0/charX/16"
+        },
+        {
+          "after": 127.4,
+          "before": 124.2,
+          "path": "$/layout/0/text/runs/0/charX/17"
+        },
+        {
+          "after": 132.1,
+          "before": 128.9,
+          "path": "$/layout/0/text/runs/0/charX/18"
+        },
+        {
+          "after": 141.4,
+          "before": 135.0,
+          "path": "$/layout/0/text/runs/0/charX/19"
+        },
+        {
+          "after": 149.3,
+          "before": 142.9,
+          "path": "$/layout/0/text/runs/0/charX/20"
+        },
+        {
+          "after": 155.7,
+          "before": 149.3,
+          "path": "$/layout/0/text/runs/0/charX/21"
+        },
+        {
+          "after": 162.8,
+          "before": 156.5,
+          "path": "$/layout/0/text/runs/0/charX/22"
+        },
+        {
+          "after": 167.6,
+          "before": 161.2,
+          "path": "$/layout/0/text/runs/0/charX/23"
+        },
+        {
+          "after": 171.4,
+          "before": 165.0,
+          "path": "$/layout/0/text/runs/0/charX/24"
+        },
+        {
+          "after": 178.6,
+          "before": 172.3,
+          "path": "$/layout/0/text/runs/0/charX/25"
+        },
+        {
+          "after": 182.9,
+          "before": 176.5,
+          "path": "$/layout/0/text/runs/0/charX/26"
+        },
+        {
+          "after": 192.1,
+          "before": 182.6,
+          "path": "$/layout/0/text/runs/0/charX/27"
+        },
+        {
+          "after": 189.6,
+          "before": 182.6,
+          "path": "$/layout/0/text/runs/0/w"
+        },
+        {
+          "after": 37.1,
+          "before": 33.9,
+          "path": "$/layout/0/text/runs/1/charX/4"
+        },
+        {
+          "after": 44.5,
+          "before": 41.4,
+          "path": "$/layout/0/text/runs/1/charX/5"
+        },
+        {
+          "after": 51.7,
+          "before": 48.5,
+          "path": "$/layout/0/text/runs/1/charX/6"
+        },
+        {
+          "after": 60.2,
+          "before": 57.0,
+          "path": "$/layout/0/text/runs/1/charX/7"
+        },
+        {
+          "after": 67.3,
+          "before": 64.1,
+          "path": "$/layout/0/text/runs/1/charX/8"
+        },
+        {
+          "after": 73.7,
+          "before": 70.5,
+          "path": "$/layout/0/text/runs/1/charX/9"
+        },
+        {
+          "after": 81.3,
+          "before": 78.1,
+          "path": "$/layout/0/text/runs/1/charX/10"
+        },
+        {
+          "after": 85.1,
+          "before": 81.9,
+          "path": "$/layout/0/text/runs/1/charX/11"
+        },
+        {
+          "after": 92.4,
+          "before": 89.2,
+          "path": "$/layout/0/text/runs/1/charX/12"
+        },
+        {
+          "after": 96.3,
+          "before": 93.1,
+          "path": "$/layout/0/text/runs/1/charX/13"
+        },
+        {
+          "after": 103.8,
+          "before": 100.7,
+          "path": "$/layout/0/text/runs/1/charX/14"
+        },
+        {
+          "after": 111.1,
+          "before": 107.9,
+          "path": "$/layout/0/text/runs/1/charX/15"
+        },
+        {
+          "after": 118.9,
+          "before": 115.7,
+          "path": "$/layout/0/text/runs/1/charX/16"
+        },
+        {
+          "after": 127.4,
+          "before": 124.2,
+          "path": "$/layout/0/text/runs/1/charX/17"
+        },
+        {
+          "after": 132.1,
+          "before": 128.9,
+          "path": "$/layout/0/text/runs/1/charX/18"
+        },
+        {
+          "after": 141.4,
+          "before": 135.0,
+          "path": "$/layout/0/text/runs/1/charX/19"
+        },
+        {
+          "after": 149.3,
+          "before": 142.9,
+          "path": "$/layout/0/text/runs/1/charX/20"
+        },
+        {
+          "after": 155.7,
+          "before": 149.3,
+          "path": "$/layout/0/text/runs/1/charX/21"
+        },
+        {
+          "after": 162.8,
+          "before": 156.5,
+          "path": "$/layout/0/text/runs/1/charX/22"
+        },
+        {
+          "after": 167.6,
+          "before": 161.2,
+          "path": "$/layout/0/text/runs/1/charX/23"
+        },
+        {
+          "after": 171.4,
+          "before": 165.0,
+          "path": "$/layout/0/text/runs/1/charX/24"
+        },
+        {
+          "after": 178.6,
+          "before": 172.3,
+          "path": "$/layout/0/text/runs/1/charX/25"
+        },
+        {
+          "after": 182.9,
+          "before": 176.5,
+          "path": "$/layout/0/text/runs/1/charX/26"
+        },
+        {
+          "after": 192.1,
+          "before": 182.6,
+          "path": "$/layout/0/text/runs/1/charX/27"
+        },
+        {
+          "after": 189.6,
+          "before": 182.6,
+          "path": "$/layout/0/text/runs/1/w"
+        },
+        {
+          "after": 37.1,
+          "before": 33.9,
+          "path": "$/layout/0/text/runs/2/charX/4"
+        },
+        {
+          "after": 44.5,
+          "before": 41.4,
+          "path": "$/layout/0/text/runs/2/charX/5"
+        },
+        {
+          "after": 51.7,
+          "before": 48.5,
+          "path": "$/layout/0/text/runs/2/charX/6"
+        },
+        {
+          "after": 60.2,
+          "before": 57.0,
+          "path": "$/layout/0/text/runs/2/charX/7"
+        },
+        {
+          "after": 67.3,
+          "before": 64.1,
+          "path": "$/layout/0/text/runs/2/charX/8"
+        },
+        {
+          "after": 73.7,
+          "before": 70.5,
+          "path": "$/layout/0/text/runs/2/charX/9"
+        },
+        {
+          "after": 81.3,
+          "before": 78.1,
+          "path": "$/layout/0/text/runs/2/charX/10"
+        },
+        {
+          "after": 85.1,
+          "before": 81.9,
+          "path": "$/layout/0/text/runs/2/charX/11"
+        },
+        {
+          "after": 92.4,
+          "before": 89.2,
+          "path": "$/layout/0/text/runs/2/charX/12"
+        },
+        {
+          "after": 96.3,
+          "before": 93.1,
+          "path": "$/layout/0/text/runs/2/charX/13"
+        },
+        {
+          "after": 103.8,
+          "before": 100.7,
+          "path": "$/layout/0/text/runs/2/charX/14"
+        },
+        {
+          "after": 111.1,
+          "before": 107.9,
+          "path": "$/layout/0/text/runs/2/charX/15"
+        },
+        {
+          "after": 118.9,
+          "before": 115.7,
+          "path": "$/layout/0/text/runs/2/charX/16"
+        },
+        {
+          "after": 127.4,
+          "before": 124.2,
+          "path": "$/layout/0/text/runs/2/charX/17"
+        },
+        {
+          "after": 132.1,
+          "before": 128.9,
+          "path": "$/layout/0/text/runs/2/charX/18"
+        },
+        {
+          "after": 141.4,
+          "before": 135.0,
+          "path": "$/layout/0/text/runs/2/charX/19"
+        },
+        {
+          "after": 149.3,
+          "before": 142.9,
+          "path": "$/layout/0/text/runs/2/charX/20"
+        },
+        {
+          "after": 155.7,
+          "before": 149.3,
+          "path": "$/layout/0/text/runs/2/charX/21"
+        },
+        {
+          "after": 162.8,
+          "before": 156.5,
+          "path": "$/layout/0/text/runs/2/charX/22"
+        },
+        {
+          "after": 167.6,
+          "before": 161.2,
+          "path": "$/layout/0/text/runs/2/charX/23"
+        },
+        {
+          "after": 171.4,
+          "before": 165.0,
+          "path": "$/layout/0/text/runs/2/charX/24"
+        },
+        {
+          "after": 178.6,
+          "before": 172.3,
+          "path": "$/layout/0/text/runs/2/charX/25"
+        },
+        {
+          "after": 182.9,
+          "before": 176.5,
+          "path": "$/layout/0/text/runs/2/charX/26"
+        },
+        {
+          "after": 192.1,
+          "before": 182.6,
+          "path": "$/layout/0/text/runs/2/charX/27"
+        },
+        {
+          "after": 189.6,
+          "before": 182.6,
+          "path": "$/layout/0/text/runs/2/w"
+        }
+      ],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": true,
+      "name": "three-columns",
+      "nativePages": 1,
+      "nativeSha256": "fdf821350d29dedabdaa63821f7a4b4b22ece7f85541927df6973aadd7b1c95a",
+      "offset": false,
+      "shortPage": false,
+      "tableCount": 4,
+      "tac": true,
+      "unequal": false
+    },
+    {
+      "columns": 2,
+      "initialXmlGeometryDiff": [
+        {
+          "after": 40.9,
+          "before": 36.4,
+          "path": "$/layout/0/text/runs/0/charX/4"
+        },
+        {
+          "after": 48.4,
+          "before": 43.9,
+          "path": "$/layout/0/text/runs/0/charX/5"
+        },
+        {
+          "after": 55.6,
+          "before": 51.1,
+          "path": "$/layout/0/text/runs/0/charX/6"
+        },
+        {
+          "after": 64.0,
+          "before": 59.6,
+          "path": "$/layout/0/text/runs/0/charX/7"
+        },
+        {
+          "after": 71.2,
+          "before": 66.7,
+          "path": "$/layout/0/text/runs/0/charX/8"
+        },
+        {
+          "after": 77.5,
+          "before": 73.1,
+          "path": "$/layout/0/text/runs/0/charX/9"
+        },
+        {
+          "after": 85.1,
+          "before": 80.7,
+          "path": "$/layout/0/text/runs/0/charX/10"
+        },
+        {
+          "after": 89.0,
+          "before": 84.5,
+          "path": "$/layout/0/text/runs/0/charX/11"
+        },
+        {
+          "after": 96.3,
+          "before": 91.8,
+          "path": "$/layout/0/text/runs/0/charX/12"
+        },
+        {
+          "after": 100.1,
+          "before": 95.6,
+          "path": "$/layout/0/text/runs/0/charX/13"
+        },
+        {
+          "after": 107.7,
+          "before": 103.2,
+          "path": "$/layout/0/text/runs/0/charX/14"
+        },
+        {
+          "after": 114.9,
+          "before": 110.5,
+          "path": "$/layout/0/text/runs/0/charX/15"
+        },
+        {
+          "after": 122.8,
+          "before": 118.3,
+          "path": "$/layout/0/text/runs/0/charX/16"
+        },
+        {
+          "after": 131.3,
+          "before": 126.8,
+          "path": "$/layout/0/text/runs/0/charX/17"
+        },
+        {
+          "after": 136.0,
+          "before": 131.5,
+          "path": "$/layout/0/text/runs/0/charX/18"
+        },
+        {
+          "after": 149.1,
+          "before": 140.1,
+          "path": "$/layout/0/text/runs/0/charX/19"
+        },
+        {
+          "after": 157.1,
+          "before": 148.1,
+          "path": "$/layout/0/text/runs/0/charX/20"
+        },
+        {
+          "after": 163.4,
+          "before": 154.5,
+          "path": "$/layout/0/text/runs/0/charX/21"
+        },
+        {
+          "after": 170.6,
+          "before": 161.6,
+          "path": "$/layout/0/text/runs/0/charX/22"
+        },
+        {
+          "after": 175.3,
+          "before": 166.4,
+          "path": "$/layout/0/text/runs/0/charX/23"
+        },
+        {
+          "after": 179.1,
+          "before": 170.2,
+          "path": "$/layout/0/text/runs/0/charX/24"
+        },
+        {
+          "after": 186.4,
+          "before": 177.4,
+          "path": "$/layout/0/text/runs/0/charX/25"
+        },
+        {
+          "after": 190.6,
+          "before": 181.7,
+          "path": "$/layout/0/text/runs/0/charX/26"
+        },
+        {
+          "after": 203.7,
+          "before": 190.3,
+          "path": "$/layout/0/text/runs/0/charX/27"
+        },
+        {
+          "after": 197.3,
+          "before": 190.3,
+          "path": "$/layout/0/text/runs/0/w"
+        },
+        {
+          "after": 40.9,
+          "before": 36.4,
+          "path": "$/layout/0/text/runs/1/charX/4"
+        },
+        {
+          "after": 48.4,
+          "before": 43.9,
+          "path": "$/layout/0/text/runs/1/charX/5"
+        },
+        {
+          "after": 55.6,
+          "before": 51.1,
+          "path": "$/layout/0/text/runs/1/charX/6"
+        },
+        {
+          "after": 64.0,
+          "before": 59.6,
+          "path": "$/layout/0/text/runs/1/charX/7"
+        },
+        {
+          "after": 71.2,
+          "before": 66.7,
+          "path": "$/layout/0/text/runs/1/charX/8"
+        },
+        {
+          "after": 77.5,
+          "before": 73.1,
+          "path": "$/layout/0/text/runs/1/charX/9"
+        },
+        {
+          "after": 85.1,
+          "before": 80.7,
+          "path": "$/layout/0/text/runs/1/charX/10"
+        },
+        {
+          "after": 89.0,
+          "before": 84.5,
+          "path": "$/layout/0/text/runs/1/charX/11"
+        },
+        {
+          "after": 96.3,
+          "before": 91.8,
+          "path": "$/layout/0/text/runs/1/charX/12"
+        },
+        {
+          "after": 100.1,
+          "before": 95.6,
+          "path": "$/layout/0/text/runs/1/charX/13"
+        },
+        {
+          "after": 107.7,
+          "before": 103.2,
+          "path": "$/layout/0/text/runs/1/charX/14"
+        },
+        {
+          "after": 114.9,
+          "before": 110.5,
+          "path": "$/layout/0/text/runs/1/charX/15"
+        },
+        {
+          "after": 122.8,
+          "before": 118.3,
+          "path": "$/layout/0/text/runs/1/charX/16"
+        },
+        {
+          "after": 131.3,
+          "before": 126.8,
+          "path": "$/layout/0/text/runs/1/charX/17"
+        },
+        {
+          "after": 136.0,
+          "before": 131.5,
+          "path": "$/layout/0/text/runs/1/charX/18"
+        },
+        {
+          "after": 149.1,
+          "before": 140.1,
+          "path": "$/layout/0/text/runs/1/charX/19"
+        },
+        {
+          "after": 157.1,
+          "before": 148.1,
+          "path": "$/layout/0/text/runs/1/charX/20"
+        },
+        {
+          "after": 163.4,
+          "before": 154.5,
+          "path": "$/layout/0/text/runs/1/charX/21"
+        },
+        {
+          "after": 170.6,
+          "before": 161.6,
+          "path": "$/layout/0/text/runs/1/charX/22"
+        },
+        {
+          "after": 175.3,
+          "before": 166.4,
+          "path": "$/layout/0/text/runs/1/charX/23"
+        },
+        {
+          "after": 179.1,
+          "before": 170.2,
+          "path": "$/layout/0/text/runs/1/charX/24"
+        },
+        {
+          "after": 186.4,
+          "before": 177.4,
+          "path": "$/layout/0/text/runs/1/charX/25"
+        },
+        {
+          "after": 190.6,
+          "before": 181.7,
+          "path": "$/layout/0/text/runs/1/charX/26"
+        },
+        {
+          "after": 203.7,
+          "before": 190.3,
+          "path": "$/layout/0/text/runs/1/charX/27"
+        },
+        {
+          "after": 197.3,
+          "before": 190.3,
+          "path": "$/layout/0/text/runs/1/w"
+        },
+        {
+          "after": 40.9,
+          "before": 36.4,
+          "path": "$/layout/0/text/runs/2/charX/4"
+        },
+        {
+          "after": 48.4,
+          "before": 43.9,
+          "path": "$/layout/0/text/runs/2/charX/5"
+        },
+        {
+          "after": 55.6,
+          "before": 51.1,
+          "path": "$/layout/0/text/runs/2/charX/6"
+        },
+        {
+          "after": 64.0,
+          "before": 59.6,
+          "path": "$/layout/0/text/runs/2/charX/7"
+        },
+        {
+          "after": 71.2,
+          "before": 66.7,
+          "path": "$/layout/0/text/runs/2/charX/8"
+        },
+        {
+          "after": 77.5,
+          "before": 73.1,
+          "path": "$/layout/0/text/runs/2/charX/9"
+        },
+        {
+          "after": 85.1,
+          "before": 80.7,
+          "path": "$/layout/0/text/runs/2/charX/10"
+        },
+        {
+          "after": 89.0,
+          "before": 84.5,
+          "path": "$/layout/0/text/runs/2/charX/11"
+        },
+        {
+          "after": 96.3,
+          "before": 91.8,
+          "path": "$/layout/0/text/runs/2/charX/12"
+        },
+        {
+          "after": 100.1,
+          "before": 95.6,
+          "path": "$/layout/0/text/runs/2/charX/13"
+        },
+        {
+          "after": 107.7,
+          "before": 103.2,
+          "path": "$/layout/0/text/runs/2/charX/14"
+        },
+        {
+          "after": 114.9,
+          "before": 110.5,
+          "path": "$/layout/0/text/runs/2/charX/15"
+        },
+        {
+          "after": 122.8,
+          "before": 118.3,
+          "path": "$/layout/0/text/runs/2/charX/16"
+        },
+        {
+          "after": 131.3,
+          "before": 126.8,
+          "path": "$/layout/0/text/runs/2/charX/17"
+        },
+        {
+          "after": 136.0,
+          "before": 131.5,
+          "path": "$/layout/0/text/runs/2/charX/18"
+        },
+        {
+          "after": 149.1,
+          "before": 140.1,
+          "path": "$/layout/0/text/runs/2/charX/19"
+        },
+        {
+          "after": 157.1,
+          "before": 148.1,
+          "path": "$/layout/0/text/runs/2/charX/20"
+        },
+        {
+          "after": 163.4,
+          "before": 154.5,
+          "path": "$/layout/0/text/runs/2/charX/21"
+        },
+        {
+          "after": 170.6,
+          "before": 161.6,
+          "path": "$/layout/0/text/runs/2/charX/22"
+        },
+        {
+          "after": 175.3,
+          "before": 166.4,
+          "path": "$/layout/0/text/runs/2/charX/23"
+        },
+        {
+          "after": 179.1,
+          "before": 170.2,
+          "path": "$/layout/0/text/runs/2/charX/24"
+        },
+        {
+          "after": 186.4,
+          "before": 177.4,
+          "path": "$/layout/0/text/runs/2/charX/25"
+        },
+        {
+          "after": 190.6,
+          "before": 181.7,
+          "path": "$/layout/0/text/runs/2/charX/26"
+        },
+        {
+          "after": 203.7,
+          "before": 190.3,
+          "path": "$/layout/0/text/runs/2/charX/27"
+        },
+        {
+          "after": 197.3,
+          "before": 190.3,
+          "path": "$/layout/0/text/runs/2/w"
+        }
+      ],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": true,
+      "name": "unequal-two",
+      "nativePages": 1,
+      "nativeSha256": "253fcf87242c4156ceb0fe988707249a4aba96d143362005a9e39d3fba6bd9c0",
+      "offset": false,
+      "shortPage": false,
+      "tableCount": 3,
+      "tac": true,
+      "unequal": true
+    },
+    {
+      "columns": 3,
+      "initialXmlGeometryDiff": [
+        {
+          "after": 93.6,
+          "before": 67.4,
+          "path": "$/layout/0/text/runs/2/charX/8"
+        },
+        {
+          "after": 103.4,
+          "before": 77.2,
+          "path": "$/layout/0/text/runs/2/charX/9"
+        },
+        {
+          "after": 113.0,
+          "before": 86.8,
+          "path": "$/layout/0/text/runs/2/charX/10"
+        },
+        {
+          "after": 121.4,
+          "before": 95.2,
+          "path": "$/layout/0/text/runs/2/charX/11"
+        },
+        {
+          "after": 173.5,
+          "before": 121.1,
+          "path": "$/layout/0/text/runs/2/charX/12"
+        },
+        {
+          "after": 128.1,
+          "before": 121.1,
+          "path": "$/layout/0/text/runs/2/w"
+        }
+      ],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": true,
+      "name": "unequal-three",
+      "nativePages": 1,
+      "nativeSha256": "544b347d4244ba624ca8410d3c3c98d22f52a055f365a83711d2410eeae6abf6",
+      "offset": false,
+      "shortPage": false,
+      "tableCount": 4,
+      "tac": true,
+      "unequal": true
+    },
+    {
+      "columns": 2,
+      "initialXmlGeometryDiff": [
+        {
+          "after": 56.7,
+          "before": 49.4,
+          "path": "$/layout/0/text/runs/0/charX/4"
+        },
+        {
+          "after": 64.2,
+          "before": 56.9,
+          "path": "$/layout/0/text/runs/0/charX/5"
+        },
+        {
+          "after": 71.4,
+          "before": 64.1,
+          "path": "$/layout/0/text/runs/0/charX/6"
+        },
+        {
+          "after": 79.8,
+          "before": 72.5,
+          "path": "$/layout/0/text/runs/0/charX/7"
+        },
+        {
+          "after": 87.0,
+          "before": 79.7,
+          "path": "$/layout/0/text/runs/0/charX/8"
+        },
+        {
+          "after": 93.4,
+          "before": 86.1,
+          "path": "$/layout/0/text/runs/0/charX/9"
+        },
+        {
+          "after": 100.9,
+          "before": 93.6,
+          "path": "$/layout/0/text/runs/0/charX/10"
+        },
+        {
+          "after": 104.8,
+          "before": 97.5,
+          "path": "$/layout/0/text/runs/0/charX/11"
+        },
+        {
+          "after": 112.1,
+          "before": 104.8,
+          "path": "$/layout/0/text/runs/0/charX/12"
+        },
+        {
+          "after": 115.9,
+          "before": 108.6,
+          "path": "$/layout/0/text/runs/0/charX/13"
+        },
+        {
+          "after": 123.5,
+          "before": 116.2,
+          "path": "$/layout/0/text/runs/0/charX/14"
+        },
+        {
+          "after": 130.8,
+          "before": 123.5,
+          "path": "$/layout/0/text/runs/0/charX/15"
+        },
+        {
+          "after": 138.6,
+          "before": 131.3,
+          "path": "$/layout/0/text/runs/0/charX/16"
+        },
+        {
+          "after": 147.1,
+          "before": 139.8,
+          "path": "$/layout/0/text/runs/0/charX/17"
+        },
+        {
+          "after": 151.8,
+          "before": 144.5,
+          "path": "$/layout/0/text/runs/0/charX/18"
+        },
+        {
+          "after": 180.7,
+          "before": 166.1,
+          "path": "$/layout/0/text/runs/0/charX/19"
+        },
+        {
+          "after": 188.7,
+          "before": 174.1,
+          "path": "$/layout/0/text/runs/0/charX/20"
+        },
+        {
+          "after": 195.1,
+          "before": 180.4,
+          "path": "$/layout/0/text/runs/0/charX/21"
+        },
+        {
+          "after": 202.2,
+          "before": 187.6,
+          "path": "$/layout/0/text/runs/0/charX/22"
+        },
+        {
+          "after": 206.9,
+          "before": 192.3,
+          "path": "$/layout/0/text/runs/0/charX/23"
+        },
+        {
+          "after": 210.8,
+          "before": 196.2,
+          "path": "$/layout/0/text/runs/0/charX/24"
+        },
+        {
+          "after": 218.0,
+          "before": 203.4,
+          "path": "$/layout/0/text/runs/0/charX/25"
+        },
+        {
+          "after": 222.3,
+          "before": 207.6,
+          "path": "$/layout/0/text/runs/0/charX/26"
+        },
+        {
+          "after": 251.2,
+          "before": 229.2,
+          "path": "$/layout/0/text/runs/0/charX/27"
+        },
+        {
+          "after": 260.9,
+          "before": 239.0,
+          "path": "$/layout/0/text/runs/0/charX/28"
+        },
+        {
+          "after": 270.5,
+          "before": 248.6,
+          "path": "$/layout/0/text/runs/0/charX/29"
+        },
+        {
+          "after": 279.0,
+          "before": 257.1,
+          "path": "$/layout/0/text/runs/0/charX/30"
+        },
+        {
+          "after": 307.9,
+          "before": 278.7,
+          "path": "$/layout/0/text/runs/0/charX/31"
+        },
+        {
+          "after": 285.7,
+          "before": 278.7,
+          "path": "$/layout/0/text/runs/0/w"
+        },
+        {
+          "after": 152.4,
+          "before": 133.2,
+          "path": "$/layout/0/text/runs/1/charX/15"
+        },
+        {
+          "after": 160.3,
+          "before": 141.1,
+          "path": "$/layout/0/text/runs/1/charX/16"
+        },
+        {
+          "after": 166.7,
+          "before": 147.5,
+          "path": "$/layout/0/text/runs/1/charX/17"
+        },
+        {
+          "after": 173.8,
+          "before": 154.6,
+          "path": "$/layout/0/text/runs/1/charX/18"
+        },
+        {
+          "after": 178.6,
+          "before": 159.4,
+          "path": "$/layout/0/text/runs/1/charX/19"
+        },
+        {
+          "after": 182.4,
+          "before": 163.2,
+          "path": "$/layout/0/text/runs/1/charX/20"
+        },
+        {
+          "after": 189.6,
+          "before": 170.4,
+          "path": "$/layout/0/text/runs/1/charX/21"
+        },
+        {
+          "after": 193.9,
+          "before": 174.7,
+          "path": "$/layout/0/text/runs/1/charX/22"
+        },
+        {
+          "after": 251.2,
+          "before": 212.8,
+          "path": "$/layout/0/text/runs/1/charX/23"
+        },
+        {
+          "after": 260.9,
+          "before": 222.5,
+          "path": "$/layout/0/text/runs/1/charX/24"
+        },
+        {
+          "after": 270.5,
+          "before": 232.1,
+          "path": "$/layout/0/text/runs/1/charX/25"
+        },
+        {
+          "after": 279.0,
+          "before": 240.6,
+          "path": "$/layout/0/text/runs/1/charX/26"
+        },
+        {
+          "after": 336.3,
+          "before": 278.7,
+          "path": "$/layout/0/text/runs/1/charX/27"
+        },
+        {
+          "after": 285.7,
+          "before": 278.7,
+          "path": "$/layout/0/text/runs/1/w"
+        },
+        {
+          "after": 152.4,
+          "before": 133.2,
+          "path": "$/layout/0/text/runs/2/charX/15"
+        },
+        {
+          "after": 160.3,
+          "before": 141.1,
+          "path": "$/layout/0/text/runs/2/charX/16"
+        },
+        {
+          "after": 166.7,
+          "before": 147.5,
+          "path": "$/layout/0/text/runs/2/charX/17"
+        },
+        {
+          "after": 173.8,
+          "before": 154.6,
+          "path": "$/layout/0/text/runs/2/charX/18"
+        },
+        {
+          "after": 178.6,
+          "before": 159.4,
+          "path": "$/layout/0/text/runs/2/charX/19"
+        },
+        {
+          "after": 182.4,
+          "before": 163.2,
+          "path": "$/layout/0/text/runs/2/charX/20"
+        },
+        {
+          "after": 189.6,
+          "before": 170.4,
+          "path": "$/layout/0/text/runs/2/charX/21"
+        },
+        {
+          "after": 193.9,
+          "before": 174.7,
+          "path": "$/layout/0/text/runs/2/charX/22"
+        },
+        {
+          "after": 251.2,
+          "before": 212.8,
+          "path": "$/layout/0/text/runs/2/charX/23"
+        },
+        {
+          "after": 260.9,
+          "before": 222.5,
+          "path": "$/layout/0/text/runs/2/charX/24"
+        },
+        {
+          "after": 270.5,
+          "before": 232.1,
+          "path": "$/layout/0/text/runs/2/charX/25"
+        },
+        {
+          "after": 279.0,
+          "before": 240.6,
+          "path": "$/layout/0/text/runs/2/charX/26"
+        },
+        {
+          "after": 336.3,
+          "before": 278.7,
+          "path": "$/layout/0/text/runs/2/charX/27"
+        },
+        {
+          "after": 285.7,
+          "before": 278.7,
+          "path": "$/layout/0/text/runs/2/w"
+        }
+      ],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": true,
+      "name": "two-columns-multipage",
+      "nativePages": 2,
+      "nativeSha256": "f6ddcf861cf6d5c52cc7c46f6286e3f1a6e9fa74495757d69e265594b9cc9002",
+      "offset": false,
+      "shortPage": true,
+      "tableCount": 3,
+      "tac": true,
+      "unequal": false
+    },
+    {
+      "columns": 3,
+      "initialXmlGeometryDiff": [
+        {
+          "after": 93.6,
+          "before": 67.4,
+          "path": "$/layout/0/text/runs/2/charX/8"
+        },
+        {
+          "after": 103.4,
+          "before": 77.2,
+          "path": "$/layout/0/text/runs/2/charX/9"
+        },
+        {
+          "after": 113.0,
+          "before": 86.8,
+          "path": "$/layout/0/text/runs/2/charX/10"
+        },
+        {
+          "after": 121.4,
+          "before": 95.2,
+          "path": "$/layout/0/text/runs/2/charX/11"
+        },
+        {
+          "after": 173.5,
+          "before": 121.1,
+          "path": "$/layout/0/text/runs/2/charX/12"
+        },
+        {
+          "after": 128.1,
+          "before": 121.1,
+          "path": "$/layout/0/text/runs/2/w"
+        }
+      ],
+      "initialXmlLoss": {
+        "count": 0,
+        "losses": [],
+        "outputFormat": "hwpx",
+        "schemaVersion": 1
+      },
+      "initialXmlSemanticDiff": [],
+      "interleave": true,
+      "name": "unequal-three-offset",
+      "nativePages": 2,
+      "nativeSha256": "8c13b9dbbf1f603454dda6c5ac7cb1595c70a6aeaf9e16047911d349dbb9366d",
+      "offset": true,
+      "shortPage": true,
+      "tableCount": 4,
+      "tac": false,
+      "unequal": true
+    }
+  ]
+}

@@ -6,7 +6,7 @@
 | [AI 연결·Agent 실행](<features/02-agent-and-models.md>) | — | 14/20 · 부분 2 | 9/20 · 부분 3 | 13/19 | 구현 [N024](<features/02-agent-and-models.md#n024>) 브라우저 인증 링크 기반 계정 연결 |
 | [참고 자료·검색·RAG](<features/03-references-and-rag.md>) | — | 5/10 · 부분 2 | 4/10 · 부분 1 | 1/6 | 구현 [N033](<features/03-references-and-rag.md#n033>) 검색 순위·구본 우선 문제와 무답 판별 |
 | [반복 작업·공무원 업무 양식](<features/04-macros-and-business.md>) | 0/5 | 3/6 · 부분 1 | 3/6 | 3/6 | 구현 [N038](<features/04-macros-and-business.md#n038>) 반복 작업의 표·개체 명령 확장 |
-| [파일·저장·복구·형식 보존](<features/05-files-storage-recovery.md>) | 0/10 | 23/24 · 부분 1 | 22/24 · 부분 2 | 6/6 | N001의 좁힌 저장 결함 수정 · 공식124 자동 검수 완료 · 원래 복합 배치·한글 비교 잔여 · 구현 [N001](<features/05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존 |
+| [파일·저장·복구·형식 보존](<features/05-files-storage-recovery.md>) | 0/10 | 23/24 · 부분 1 | 22/24 · 부분 2 | 6/6 | N001 Rust126 수정 · 합본501 통과 · 복합 배치13/88 및 공개 편집22/56 실패 잔여 · 구현 [N001](<features/05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존 |
 | [본문 편집·입력·선택·찾기](<features/06-editing-and-selection.md>) | 0/20 | 7/7 | 0/7 · 부분 7 | 4/4 | 검증 [A001](<features/06-editing-and-selection.md#a001>) 새 본문 문서 작성 |
 | [글자·문단·스타일·번호](<features/07-formatting-and-styles.md>) | 0/18 | 19/23 · 부분 2 | 0/23 · 부분 19 | 13/16 | 구현 [N011](<features/07-formatting-and-styles.md#n011>) 스타일 가져오기·내보내기 |
 | [표·셀·크기·계산](<features/08-tables.md>) | 0/24 | 32/38 · 부분 2 | 3/38 · 부분 31 | 26/33 · 부분 3 | 구현 [N004](<features/08-tables.md#n004>) 기존 병합 원본의 후속 Agent 셀 편집 |

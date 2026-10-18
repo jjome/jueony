@@ -1,0 +1,9 @@
+import assert from 'node:assert/strict';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {resolve,isAbsolute} from 'node:path';
+import {createHash} from 'node:crypto';
+import {pathToFileURL} from 'node:url';
+const hash=b=>createHash('sha256').update(b).digest('hex');
+const pkg=process.env.JUEONY_ENGINE_PACKAGE,out=process.env.JUEONY_TEST_OUTPUT;assert.ok(isAbsolute(pkg??''));assert.ok(isAbsolute(out??''));const meta=JSON.parse(await readFile(resolve(pkg,'jueony-engine-build.json'),'utf8')),wasm=await readFile(resolve(pkg,'rhwp_bg.wasm')),js=await readFile(resolve(pkg,'rhwp.js'));assert.equal(hash(wasm),'059042712aea0db19beb8383d3aee53db0dfd0a2c134c378d256ef665263e1ed');assert.equal(meta.wasmSha256,hash(wasm));assert.equal(meta.jsSha256,hash(js));const m=await import(pathToFileURL(resolve(pkg,'rhwp.js')));await m.default({module_or_path:wasm});const manifest=JSON.parse(await readFile(new URL('manifest.json',import.meta.url),'utf8'));await mkdir(out,{recursive:true});const cases=[];
+for(const f of manifest.fixtures){const input=await readFile(new URL(f.file,import.meta.url));assert.equal(hash(input),f.sha256);const d=new m.HwpDocument(input);let a;try{a=d.exportHwpxWithReport();const loss=JSON.parse(a.contentLoss());assert.equal(loss.count,0);const bytes=Buffer.from(a.takeBytes());await writeFile(resolve(out,f.xmlFile),bytes);const expected=await readFile(new URL(f.xmlFile,import.meta.url));cases.push({input:f.file,output:f.xmlFile,inputSha256:hash(input),sha256:hash(bytes),expectedSha256:f.xmlSha256,exact:bytes.equals(expected)});}finally{a?.free();d.free();}}
+await writeFile(resolve(out,'result.json'),JSON.stringify({engine:meta,verifierSha256:hash(await readFile(new URL(import.meta.url))),cases,failures:cases.filter(c=>!c.exact)},null,2));assert.ok(cases.every(c=>c.exact),'All XML outputs must match the original124 bytes, not only semantic equality.');console.log('22/22 XML outputs byte exact');

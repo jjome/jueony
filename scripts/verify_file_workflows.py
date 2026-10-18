@@ -26,6 +26,8 @@ def main():
     p.add_argument('--hwt-leaf',action='store_true',help='Include actual HWT leaf engine/IDB, full shell/iframe and synthetic Native copy IPC regressions')
     p.add_argument('--encrypted-native-rows',action='store_true',help='Include N001 encrypted row preservation: actual WASM and password UI saves of repository-owned inputs')
     p.add_argument('--legacy-native-row-archive',action='store_true',help='Include N001 stale Native row payload preservation through both file formats and password changes')
+    p.add_argument('--general-native-layout',action='store_true',help='Include N001 public-edit general-layout WASM and actual application save/history regressions')
+    p.add_argument('--native-tac-spacing',action='store_true',help='Include N001 fixed Native table-as-character spacing in the actual app save/history flow')
     a=p.parse_args();engine=a.engine.resolve();dist=a.dist.resolve();out=a.output.resolve()
     optional=[a.baseline_engine,a.native_cell_source,a.native_cell_oracle,a.frame_baseline_engine]
     assert all(optional) or not any(optional),'native-cell/frame regressions require baseline engine, source, oracle and independent frame baseline together'
@@ -42,6 +44,8 @@ def main():
     if a.hwt_leaf:cases=cases+[('hwt-leaf115',13),('hwt-leaf-integrated115',7),('hwt-leaf-native-ui115',10),('preview-utf16-storage117',7)]
     if a.encrypted_native_rows:cases=cases+[('encrypted-native-rows120',7),('encrypted-native-rows-ui120',3)]
     if a.legacy_native_row_archive:cases=cases+[('legacy-native-row-archive122',16),('legacy-native-row-ui122',5)]
+    if a.general_native_layout:cases=cases+[('general-native-layout125',56),('general-layout-corpus125',88),('general-native-layout-ui125',29)]
+    if a.native_tac_spacing:cases=cases+[('native-tac-spacing-ui126',9)]
     meta=json.loads((engine/'jueony-engine-build.json').read_bytes())
     build=json.loads((dist/'build-evidence.json').read_bytes())
     assert sha((engine/'rhwp_bg.wasm').read_bytes())==meta['wasmSha256']==build['engineWasmSha256']
@@ -62,10 +66,11 @@ def main():
             assert proc.returncode==0 and row['scriptUnchanged']
             assert len(r['results'])==count and r['failures']==[],(name,r.get('failures'))
             engine_only=name in ['package-preservation','native-row-engine',
-                                 'reflowed-native-storage','computed-row-package','stored-information95','encrypted-native-rows120','legacy-native-row-archive122',
+                                 'reflowed-native-storage','computed-row-package','stored-information95','encrypted-native-rows120','legacy-native-row-archive122','general-native-layout125','general-layout-corpus125',
                                  'document-story-information96','owned-native-cell-layout','owned-python-frame-layout','authored-floating-gap-layout','native-prefix-storage','python-edit-storage','preview-utf16-storage117']
             if not engine_only:
                 for key in ['pageErrors','consoleErrors','externalRequests']:assert r[key]==[],(name,key)
+            if name=='general-native-layout-ui125':assert r['fullMatrix'] is True and len(r['selectedCases'])==14,'A diagnostic subset is not a full matrix'
             for item in r['results']:
                 if isinstance(item,dict):assert item['status']=='PASS',(name,item)
             independent=name in ['xml-documents','xml-recovery','document-history95','xml-simple-types95']

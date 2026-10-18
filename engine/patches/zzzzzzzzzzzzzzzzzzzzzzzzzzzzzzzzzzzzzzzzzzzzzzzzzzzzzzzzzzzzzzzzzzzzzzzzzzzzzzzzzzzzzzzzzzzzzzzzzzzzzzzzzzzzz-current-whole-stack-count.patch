@@ -1,0 +1,275 @@
+--- a/src/renderer/layout/current_body_stack.rs
++++ b/src/renderer/layout/current_body_stack.rs
+@@ -14,7 +14,8 @@
+     pub prefix_end_hu: i32,
+     pub column_width_hu: i32,
+     pub body_height_hu: i32,
+-    pub hosts: [CurrentStackHost; 2],
++    pub hosts: Vec<CurrentStackHost>,
++    pub prefixes: Vec<CurrentStackPrefix>,
+ }
+ 
+ impl CurrentWholeStackPlan {
+@@ -23,6 +24,16 @@
+     pub(crate) fn matches_fresh_prefix(&self,candidate:&ComposedParagraph)->bool {
+         same_composition(&self.fresh_prefix,candidate)
+     }
++}
++
++pub(crate) struct CurrentStackPrefix {
++    pub para_index: usize,
++    pub logical_start_hu: i32,
++    pub logical_end_hu: i32,
++    pub fresh: ComposedParagraph,
++}
++impl CurrentStackPrefix {
++    pub(crate) fn matches(&self, candidate:&ComposedParagraph)->bool {same_composition(&self.fresh,candidate)}
+ }
+ 
+ pub(crate) struct CurrentStackHost {
+@@ -63,7 +74,7 @@
+ fn same_composition(a:&ComposedParagraph,b:&ComposedParagraph)->bool {
+     a.para_style_id==b.para_style_id && a.lines.len()==b.lines.len()
+         && a.numbering_text.is_none() && b.numbering_text.is_none()
+-        && a.inline_controls.len()==2 && b.inline_controls.len()==2
++        && a.inline_controls.len()==b.inline_controls.len() && a.inline_controls.len()<=2
+         && a.inline_controls.iter().zip(&b.inline_controls).enumerate().all(|(i,(a,b))|
+             a.control_index==i && b.control_index==i
+                 && a.control_type==crate::renderer::composer::InlineControlType::Other
+@@ -129,7 +140,7 @@
+ fn current_whole_stack_with_column_source(ctx:&ColumnItemCtx<'_>,dpi:f64,column_source:ColumnSource)->Option<CurrentWholeStackPlan> {
+     use crate::renderer::composer::{compose_paragraph_in_context,recompose_stored_lines_in_frame,ParagraphBox};
+     use crate::model::{paragraph::ColumnBreakType,style::HeadType};
+-    if ctx.paragraphs.len()<4 || ctx.paragraphs.len()>128
++    if ctx.paragraphs.len()<2 || ctx.paragraphs.len()>128
+         || ctx.zone_column_count!=1 || ctx.layout.column_areas.len()!=1
+         || ctx.page_content.page_index!=0 || ctx.page_content.section_index!=0
+         || ctx.page_content.column_contents.len()!=1 || !ctx.page_content.footnotes.is_empty()
+@@ -144,13 +155,24 @@
+     if col.column_index!=0 || col.start_height!=0.0 || col.endnote_flow
+         || col.zone_layout.is_some() || col.zone_y_offset!=0.0
+         || !col.overlay_continuations.is_empty() || !col.overlay_cuts.is_empty()
+-        || !matches!(col.items.get(..3),Some([PageItem::FullParagraph{para_index:0},
+-            PageItem::Table{para_index:1,control_index:0},PageItem::Table{para_index:2,control_index:0}]))
+-        || col.items.iter().skip(3).any(|item|!matches!(item,PageItem::FullParagraph{para_index} if *para_index>=3))
++
+     {return None;}
++    // Read the actual frame allocation, not a template's paragraph ordinals.
++    // Every admitted item must own one whole, ordered paragraph in this frame.
++    let prefix_count=col.items.iter().take_while(|item|matches!(item,PageItem::FullParagraph{..})).count();
++    let host_count=col.items.iter().skip(prefix_count).take_while(|item|matches!(item,PageItem::Table{..})).count();
++    if prefix_count==0 || host_count==0 || prefix_count.checked_add(host_count)?>ctx.paragraphs.len()
++        || col.items.len()!=ctx.paragraphs.len() {return None;}
++    for (index,item) in col.items.iter().enumerate() {
++        let valid=if (prefix_count..prefix_count+host_count).contains(&index) {
++            matches!(item,PageItem::Table{para_index,control_index:0} if *para_index==index)
++        }else{matches!(item,PageItem::FullParagraph{para_index} if *para_index==index)};
++        if !valid{return None;}
++    }
+     let width=hu(ctx.col_area.width,dpi)?;let body=hu(ctx.col_area.height,dpi)?;
+     if width<=0 || body<=0 || ctx.col_area.x!=ctx.layout.body_area.x
+         || ctx.col_area.width!=ctx.layout.body_area.width {return None;}
++
+     let first=ctx.paragraphs.first()?;
+     if !plain(first) || first.text.is_empty() || first.text.chars().count()>4096
+         || first.text.chars().any(|c|c<' ' || c=='\u{fffc}')
+@@ -204,7 +226,8 @@
+     let fresh=recompose_stored_lines_in_frame(&initial,&input,ParagraphBox::content_for_style(ctx.col_area.width,
+         Some(style),dpi),ctx.col_area.width,ctx.styles,dpi,false,
+         crate::renderer::composer::StoredRowMissPolicy::Reflow,&[])?;
+-    if !same_composition(actual,&fresh) || actual.lines.len()!=first.line_segs.len(){return None;}
++    if actual.inline_controls.len()!=2 || fresh.inline_controls.len()!=2
++        || !same_composition(actual,&fresh) || actual.lines.len()!=first.line_segs.len(){return None;}
+     let mut end=0i32;
+     for (i,(line,row)) in actual.lines.iter().zip(&first.line_segs).enumerate(){
+         let start=if i==0 {0} else {*first.char_offsets.get(line.char_start)?};
+@@ -217,8 +240,44 @@
+         end=end.checked_add(row.line_height)?.checked_add(row.line_spacing)?;
+     }
+     if end<=0 || end>body{return None;}
+-    let mut reserved=end;let mut consumed_before=0i32;let mut hosts=Vec::with_capacity(2);
+-    for pi in 1..=2 {
++
++    let mut prefixes=vec![CurrentStackPrefix{para_index:0,logical_start_hu:0,logical_end_hu:end,fresh:fresh.clone()}];
++    for pi in 1..prefix_count {
++        let p=ctx.paragraphs.get(pi)?;
++        if !plain(p) || !p.controls.is_empty() || p.column_type!=ColumnBreakType::None
++            || p.para_shape_id!=first.para_shape_id || p.style_id!=first.style_id
++            || p.text.chars().count()>4096 || p.text.chars().any(|c|c<' ' || c=='\u{fffc}')
++            || p.char_shapes.is_empty() || p.char_shapes.windows(2).any(|s|s[0].start_pos>=s[1].start_pos)
++            || p.char_shapes.iter().any(|s|s.char_shape_id as usize>=ctx.styles.char_styles.len()) {return None;}
++        let mut offset=0u32;
++        if p.char_offsets.len()!=p.text.chars().count(){return None;}
++        for (c,at) in p.text.chars().zip(&p.char_offsets){if *at!=offset{return None;}offset=offset.checked_add(c.len_utf16() as u32)?;}
++        if p.char_count!=offset.checked_add(1)?{return None;}
++        let mut input=p.clone();input.line_segs.clear();input.layout_space_metrics.clear();
++        input.completed_native_rows=None;input.native_source_synthetic_seal=None;input.native_source_synthetic_context=None;
++        input.native_frame_observation.set(None);
++        let initial=compose_paragraph_in_context(&input,ctx.styles);
++        let current=ctx.composed.get(pi)?;
++        let fresh=recompose_stored_lines_in_frame(&initial,&input,ParagraphBox::content_for_style(ctx.col_area.width,
++            Some(style),dpi),ctx.col_area.width,ctx.styles,dpi,false,
++            crate::renderer::composer::StoredRowMissPolicy::Reflow,&[])?;
++        if !current.inline_controls.is_empty() || !fresh.inline_controls.is_empty()
++            || !same_composition(current,&fresh) || current.lines.len()!=p.line_segs.len(){return None;}
++        let start=end;
++        for (i,(line,row)) in current.lines.iter().zip(&p.line_segs).enumerate(){
++            let text_start=if i==0{0}else{*p.char_offsets.get(line.char_start)?};
++            if row.tag!=0x80060000 || row.text_start!=text_start || row.vertical_pos!=end
++                || row.line_height<=0 || row.text_height!=row.line_height || row.line_height!=line.line_height
++                || row.line_spacing!=line.line_spacing || row.line_spacing<0 || row.baseline_distance!=line.baseline_distance
++                || row.column_start!=0 || row.column_start!=line.column_start || row.segment_width!=width
++                || row.segment_width!=line.segment_width{return None;}
++            end=end.checked_add(row.line_height)?.checked_add(row.line_spacing)?;
++        }
++        if end<=start || end>body{return None;}
++        prefixes.push(CurrentStackPrefix{para_index:pi,logical_start_hu:start,logical_end_hu:end,fresh});
++    }
++    let mut reserved=end;let mut consumed_before=0i32;let mut hosts=Vec::with_capacity(host_count);
++    for pi in prefix_count..prefix_count+host_count {
+         let p=&ctx.paragraphs[pi];let [Control::Table(table)]=p.controls.as_slice() else{return None;};
+         let [row]=p.line_segs.as_slice() else{return None;};
+         if !plain(p) || !p.text.is_empty() || p.char_count!=9 || !p.char_offsets.is_empty()
+@@ -256,7 +315,7 @@
+         if f.page!=0 || f.column!=0 || f.control!=0 || f.source_row_vpos!=end
+             || f.outer_top!=table.outer_margin_top || before!=i32::from(table.outer_margin_top)
+             || height!=hu(m.total_height,dpi)? || hu(f.raw_top,dpi)?!=reserved
+-            || after!=if pi==1 {row.line_spacing} else {0}
++            || after!=if pi+1<prefix_count+host_count {row.line_spacing} else {0}
+         {return None;}
+         let bottom=reserved.checked_add(before)?.checked_add(height)?.checked_add(after)?;
+         if bottom!=hu(f.reserved_bottom,dpi)? || bottom>body{return None;}
+@@ -265,8 +324,9 @@
+             physical_top_hu:top,before_hu:before,body_hu:height,after_hu:after,reserved_bottom_hu:bottom});
+         reserved=bottom;consumed_before=consumed_before.checked_add(before)?;
+     }
+-    if ctx.paragraphs.iter().skip(3).any(|p|!p.controls.is_empty() || !plain(p)){return None;}
+-    Some(CurrentWholeStackPlan{fresh_prefix:fresh,prefix_end_hu:end,column_width_hu:width,body_height_hu:body,hosts:hosts.try_into().ok()?})
++    if ctx.paragraphs.iter().skip(prefix_count+host_count).any(|p|!p.controls.is_empty() || !plain(p)){return None;}
++
++    Some(CurrentWholeStackPlan{fresh_prefix:fresh,prefix_end_hu:end,column_width_hu:width,body_height_hu:body,hosts,prefixes})
+ }
+ 
+ #[cfg(test)]mod native_common_optional_absent121_tests{
+--- a/src/serializer/hwpx/standard_rows.rs
++++ b/src/serializer/hwpx/standard_rows.rs
+@@ -8,6 +8,7 @@
+ #[derive(Debug)]
+ pub(crate) struct CurrentStandardRowsProjection {
+     definitions:[u8;32],
++    dependent_paragraphs:[u8;32],
+     inputs:Vec<[u8;32]>,
+     rows:Vec<Vec<LineSeg>>,
+ }
+@@ -44,9 +45,12 @@
+   if doc.sections.len()!=1 || !dpi.is_finite() || dpi<=0.0 || !width.is_finite() || width<=0.0
+     || doc.sections.iter().any(|s|s.paragraphs.iter().any(|p|p.completed_native_rows.is_some())) {return None;}
+   let definitions=definitions(doc)?;
++  let dependent_paragraphs=digest(&doc.sections[0].paragraphs)?;
+   let paragraphs=&doc.sections[0].paragraphs;
+-  let mut inputs=Vec::with_capacity(3);let mut rows=Vec::with_capacity(3);
+-  for index in 0..3 {
++  let count=plan.prefixes.len().checked_add(plan.hosts.len())?;
++  if count==0 || count>128{return None;}
++  let mut inputs=Vec::with_capacity(count);let mut rows=Vec::with_capacity(count);
++  for index in 0..count {
+    let p=paragraphs.get(index)?;let input=digest(&(index,p))?;let mut fresh=p.clone();
+    fresh.line_segs.clear();fresh.layout_space_metrics.clear();
+    fresh.source_line_seg_vertical_pos=None;fresh.layout_only_fill_lines=0;fresh.hwpx_axis_shift=0;
+@@ -64,14 +68,17 @@
+     end=end.checked_add(row.line_height)?.checked_add(row.line_spacing)?;
+     if end>plan.body_height_hu{return None;}
+    }
+-   if index==0 {
+-    if end!=plan.prefix_end_hu || !plan.matches_fresh_prefix(&compose_paragraph_in_context(&fresh,styles)){return None;}
++   if let Some(prefix)=plan.prefixes.get(index) {
++    if prefix.para_index!=index || prefix.logical_end_hu.checked_sub(prefix.logical_start_hu)?!=end
++      || !prefix.matches(&compose_paragraph_in_context(&fresh,styles)){return None;}
++    for row in &mut fresh.line_segs {row.vertical_pos=row.vertical_pos.checked_add(prefix.logical_start_hu)?;}
+    } else {
+-    let host=plan.hosts.get(index-1)?;
++    let host_index=index.checked_sub(plan.prefixes.len())?;
++    let host=plan.hosts.get(host_index)?;
+     if host.para_index!=index || host.control_index!=0 || fresh.line_segs.len()!=1
+       || host.logical_anchor_hu!=plan.prefix_end_hu || host.physical_top_hu<0
+       || host.reserved_bottom_hu>plan.body_height_hu
+-      || host.after_hu!=if index==1 {fresh.line_segs[0].line_spacing} else {0}{return None;}
++      || host.after_hu!=if host_index+1<plan.hosts.len() {fresh.line_segs[0].line_spacing} else {0}{return None;}
+     // Logical generated-row anchor and physical object reservation are distinct
+     // quantities in this proven current stack. No imported row supplies either.
+     let row=fresh.line_segs.first_mut()?;
+@@ -80,16 +87,16 @@
+    }
+    inputs.push(input);rows.push(fresh.line_segs);
+   }
+-  Some(Self{definitions,inputs,rows})
++  Some(Self{definitions,dependent_paragraphs,inputs,rows})
+  }
+  // Rebind only an unchanged export clone. Byte packages cannot construct this
+  // ephemeral projection or acquire a new CompletedRows lease.
+  pub(crate) fn bind_for_export(&self,doc:&Document)->Option<HashMap<usize,Vec<LineSeg>>>{
+-  if doc.sections.len()!=1 || self.inputs.len()!=3 || self.rows.len()!=3
+-    || definitions(doc)?!=self.definitions{return None;}
++  if doc.sections.len()!=1 || self.inputs.is_empty() || self.inputs.len()>128 || self.rows.len()!=self.inputs.len()
++    || definitions(doc)?!=self.definitions || digest(&doc.sections[0].paragraphs)?!=self.dependent_paragraphs{return None;}
+   let paragraphs=&doc.sections[0].paragraphs;
+   let mut bound=HashMap::new();
+-  for index in 0..3 {let p=paragraphs.get(index)?;
++  for index in 0..self.inputs.len() {let p=paragraphs.get(index)?;
+    if p.stored_text_partition_is_dirty() || p.cell_format_vpos_dirty || p.source_line_seg_vertical_pos.is_some(){return None;}
+    if digest(&(index,p))?!=self.inputs[index]{return None;}
+    bound.insert(p as *const Paragraph as usize,self.rows[index].clone());
+@@ -104,7 +111,7 @@
+  fn sample()->(Document,CurrentStandardRowsProjection){
+   let mut d=Document::default();d.sections.push(Default::default());
+   d.sections[0].paragraphs=(0..3).map(|index|{let mut p=Paragraph::default();p.text=format!("paragraph {index}");p}).collect();
+-  let p=CurrentStandardRowsProjection{definitions:definitions(&d).unwrap(),
++  let p=CurrentStandardRowsProjection{definitions:definitions(&d).unwrap(),dependent_paragraphs:digest(&d.sections[0].paragraphs).unwrap(),
+    inputs:d.sections[0].paragraphs.iter().enumerate().map(|(i,p)|digest(&(i,p)).unwrap()).collect(),
+    rows:vec![vec![LineSeg::default()];3]};(d,p)
+  }
+@@ -122,4 +129,33 @@
+   assert!(digest(&"a".repeat(16*1024*1024)).is_none());
+   let mut v=serde_json::Value::Null;for _ in 0..65{v=serde_json::json!([v]);}assert!(digest(&v).is_none());
+  }
++
++ #[test] fn dynamic_projection_bounds_and_exact_source_binding(){
++  for count in [1usize,2,4,16,128] {
++   let(mut d,mut p)=sample();d.sections[0].paragraphs=(0..count).map(|index|{let mut para=Paragraph::default();para.text=format!("fresh input {index}");para}).collect();
++   p.definitions=definitions(&d).unwrap();p.dependent_paragraphs=digest(&d.sections[0].paragraphs).unwrap();
++   p.inputs=d.sections[0].paragraphs.iter().enumerate().map(|(index,para)|digest(&(index,para)).unwrap()).collect();p.rows=vec![vec![LineSeg::default()];count];
++   let clone=d.clone();assert_eq!(p.bind_for_export(&clone).unwrap().len(),count);
++   let mut changed=d.clone();changed.sections[0].paragraphs[count-1].raw_header_extra.push(0xe1);assert!(p.bind_for_export(&changed).is_none());
++   let mut changed=d.clone();changed.sections[0].paragraphs[count-1].text.push('x');assert!(p.bind_for_export(&changed).is_none());
++   p.rows.pop();assert!(p.bind_for_export(&d).is_none());
++  }
++  let(d,mut p)=sample();p.inputs.clear();p.rows.clear();assert!(p.bind_for_export(&d).is_none());
++  p.inputs=vec![[0;32];129];p.rows=vec![vec![];129];assert!(p.bind_for_export(&d).is_none());
++ }
++ #[test] fn unprojected_tail_control_or_order_change_cannot_rebind_partial_plan(){
++  let(mut d,mut p)=sample();d.sections[0].paragraphs.push(Paragraph::default());
++  p.dependent_paragraphs=digest(&d.sections[0].paragraphs).unwrap();assert_eq!(p.bind_for_export(&d).unwrap().len(),3);
++  for change in 0..4 {let mut changed=d.clone();match change {
++   0=>changed.sections[0].paragraphs[3].controls.push(crate::model::control::Control::Table(Box::default())),
++   1=>changed.sections[0].paragraphs[3].raw_header_extra.push(0x51),
++   2=>changed.sections[0].paragraphs[3].text.push('x'),
++   3=>changed.sections[0].paragraphs.swap(2,3),_=>unreachable!()}
++   assert!(p.bind_for_export(&changed).is_none(),"tail case {change}");}
++ }
++ #[test] fn multi_section_or_unknown_definition_never_binds(){
++  let(d,p)=sample();let mut changed=d.clone();changed.sections.push(Default::default());assert!(p.bind_for_export(&changed).is_none());
++  let mut changed=d.clone();changed.sections[0].section_def.raw_ctrl_extra.push(0x71);assert!(p.bind_for_export(&changed).is_none());
++  let mut changed=d.clone();changed.sections[0].paragraphs[0].source_line_seg_vertical_pos=Some(vec![0]);assert!(p.bind_for_export(&changed).is_none());
++ }
+ }
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[22, 9, 9, 23, 146, 16, 92, 145, 75, 33, 234, 131, 32, 148, 29, 87, 167, 159, 251, 4, 116, 112, 45, 70, 58, 251, 196, 208, 106, 221, 217, 233];
++pub(crate) const RESOURCE:[u8;32]=[223, 111, 146, 149, 82, 62, 48, 71, 35, 29, 252, 104, 115, 174, 249, 45, 42, 215, 238, 67, 36, 228, 37, 237, 130, 79, 200, 144, 34, 113, 160, 85];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {

@@ -1,0 +1,111 @@
+{
+  "results": [
+    {
+      "name": "audit array-shaped IR owners must not bypass JSON digest fields",
+      "status": "PASS"
+    },
+    {
+      "name": "audit owner change at put-success before commit must leave durable bytes unchanged",
+      "status": "PASS"
+    },
+    {
+      "name": "audit normal 32MiB retention evicts only oldest captured-scope entries",
+      "status": "PASS"
+    },
+    {
+      "name": "actual IndexedDB checkpoint survives page restart with Unicode and exact snapshot",
+      "status": "PASS"
+    },
+    {
+      "name": "workspace, document and window scopes cannot read another catalog",
+      "status": "PASS"
+    },
+    {
+      "name": "same stable document scope retains history after SaveAs filename change",
+      "status": "PASS"
+    },
+    {
+      "name": "independent real IDB transactions allow exactly one competing CAS writer",
+      "status": "PASS"
+    },
+    {
+      "name": "stale visible catalog cannot clear a newer checkpoint",
+      "status": "PASS"
+    },
+    {
+      "name": "changed revision or document invalidates all pending history methods",
+      "status": "PASS"
+    },
+    {
+      "name": "owner change immediately before real write aborts atomically",
+      "status": "PASS"
+    },
+    {
+      "name": "durable write failure never reports success or replaces previous checkpoint",
+      "status": "PASS"
+    },
+    {
+      "name": "24 entry retention and clear affect only captured document scope",
+      "status": "PASS"
+    },
+    {
+      "name": "corrupt actual IDB payload is rejected without repair, deletion or exposure",
+      "status": "PASS"
+    },
+    {
+      "name": "trusted parent configuration rejects unscoped or rebound editor access",
+      "status": "PASS"
+    },
+    {
+      "name": "existing legacy global history remains byte-equivalent and is never migrated into current catalogs",
+      "status": "PASS"
+    },
+    {
+      "name": "actual hidden array property corruption is rejected on ordinary catalog read",
+      "status": "PASS"
+    },
+    {
+      "name": "concurrent noncanonical array corruption must conflict rather than be silently overwritten",
+      "status": "PASS"
+    },
+    {
+      "name": "ordinary same-shape concurrent JSON change conflicts with catalog replacement",
+      "status": "PASS"
+    },
+    {
+      "name": "concurrent negative zero survives typed CAS conflict despite identical JSON encoding",
+      "status": "PASS"
+    },
+    {
+      "name": "no browser errors, content logs or external requests",
+      "status": "PASS"
+    }
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "sourceHashes": [
+    {
+      "path": "src/modules/document-files/application/document-history.ts",
+      "sha256": "522b2055b4094b7d451127823e2b6abb92b8d602f9c171e470cab5c1465d5e9d"
+    },
+    {
+      "path": "src/adapters/storage/document-history.ts",
+      "sha256": "db347c0dd433534e7949c9ea14fdf8449e20878fee0c99f39e593360626ed2a4"
+    },
+    {
+      "path": "src/adapters/browser/document-history-context.ts",
+      "sha256": "89a6710c01649fdaf9fa74759752a3d7885c7b0b7e9cb560f415b6b50b53a0dd"
+    },
+    {
+      "path": "src/modules/document-files/ports/history.ts",
+      "sha256": "844b761b5ec74f64c83421565fd016b8e831b772b9cb4a13f044c5528e8b93de"
+    },
+    {
+      "path": "src/modules/document-files/public/index.ts",
+      "sha256": "e9dc2f58bf83b67dc0b11c9ae3aa0078852ffbababac640003470bc044dae03f"
+    }
+  ],
+  "scope": "Real isolated Edge IndexedDB. No desktop, Hancom, real user data or OS dialogs. Quota failure injected explicitly before durable write."
+}

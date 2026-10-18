@@ -1,0 +1,70 @@
+--- a/src/document_core/queries/rendering.rs
++++ b/src/document_core/queries/rendering.rs
+@@ -1037,6 +1037,13 @@
+ }
+ 
+ impl DocumentCore {
++    /// Rendering consumes this authority only for explicit native-origin XML.
++    /// Keep load/export binding unconditional; never cache across model writes.
++    fn native_source_row_render_context(&self) -> Option<[u8; 32]> {
++        self.effective_layout_profile().hwp5_origin_hwpx()
++            .then(|| self.document.native_source_synthetic_context_digest())
++    }
++
+     /// Exact registry의 한 immutable snapshot에서 W9와 Q2-B contexts를 함께
+     /// 만든다. 둘 중 하나만 남는 부분 갱신은 허용하지 않는다.
+     pub(crate) fn refresh_exact_font_measurement_contexts(&mut self) {
+@@ -4827,7 +4834,7 @@
+             )
+         };
+         let typesetter = TypesetEngine::new(self.dpi).with_native_source_synthetic_context(
+-                Some(self.document.native_source_synthetic_context_digest()))
++                self.native_source_row_render_context())
+             .with_render_normalization(std::sync::Arc::clone(&self.render_normalization.overlay));
+         let Some(renderer_job) = typesetter.begin_resumable_table_pagination(
+             paragraphs,
+@@ -4929,7 +4936,7 @@
+                 };
+             };
+             TypesetEngine::new(self.dpi).with_native_source_synthetic_context(
+-                Some(self.document.native_source_synthetic_context_digest()))
++                self.native_source_row_render_context())
+                 .with_render_normalization(std::sync::Arc::clone(
+                     &self.render_normalization.overlay,
+                 ))
+@@ -4957,7 +4964,7 @@
+         let result = {
+             let section = &self.document.sections[section_index];
+             let Some(mut result) = TypesetEngine::new(self.dpi).with_native_source_synthetic_context(
+-                Some(self.document.native_source_synthetic_context_digest()))
++                self.native_source_row_render_context())
+                 .with_render_normalization(std::sync::Arc::clone(
+                     &self.render_normalization.overlay,
+                 ))
+@@ -5435,7 +5442,7 @@
+                     EndnoteDeferral::None
+                 };
+                 let typesetter = TypesetEngine::new(self.dpi).with_native_source_synthetic_context(
+-                Some(self.document.native_source_synthetic_context_digest())).with_render_normalization(
++                self.native_source_row_render_context()).with_render_normalization(
+                     std::sync::Arc::clone(&self.render_normalization.overlay),
+                 );
+                 typesetter.typeset_section_with_variant(
+@@ -6464,7 +6471,7 @@
+     fn dump_section_typesetter(&self, sec_idx: usize) -> TypesetEngine {
+         let default_tab_styles = self.styles.for_section(sec_idx);
+         let typesetter = TypesetEngine::new(self.dpi).with_native_source_synthetic_context(
+-                Some(self.document.native_source_synthetic_context_digest()))
++                self.native_source_row_render_context())
+             .with_render_normalization(std::sync::Arc::clone(&self.render_normalization.overlay));
+         typesetter.apply_section_format_context(
+             self.section_render_paragraphs(sec_idx),
+@@ -7674,7 +7681,7 @@
+         self.layout_engine
+             .set_layout_profile(self.effective_layout_profile());
+         self.layout_engine.set_native_source_synthetic_context(
+-            Some(self.document.native_source_synthetic_context_digest()));
++            self.native_source_row_render_context());
+         self.layout_engine.set_hwp3_origin_flow_spacing_before(
+             uses_hwp3_origin_flow_spacing_before(&self.document),
+         );

@@ -61,3 +61,6 @@ rhwp 원문의 MIT 고지와 별도 third-party 고지를 유지한다. 변경�
 
 
 원본 HWP implementation 줄과 런타임 줄의 소유를 분리하는 `native-source-synthetic-rows.patch` 후속은 [114번 저장 보존](../docs/114-native-row-storage.md)에 기록한다. 로컬 행/공유 프레임/명시 원본 축이 맞을 때만 HWPX에 보존하고 실제 커서 필드만 비교에서 제외한다. 앞 문단 재조판 후 저장 차단은 아직 남으며 임시 행을 원본으로 재봉인하지 않는다. 공식99패치 엔진은 단위970·파일/복구194·기존단표24검사를 통과했다.
+
+
+후속 `proportional-column-persistence.patch`는 native 비례 단 너비를 공통 계산으로 HWPX의 실제 본문 단위에 기록하고 frame/정수 범위가 불명확하면 ContentLoss로 알린다. `lazy-native-row-render-context.patch`는 render-only 지문을 origin HWPX에서만 계산하며 load/export 검사를 유지한다. 공식101패치 source-448ba81d29c9095a의 결과·잔여 제약은 [115번](../docs/115-column-width-storage.md)을 따른다.

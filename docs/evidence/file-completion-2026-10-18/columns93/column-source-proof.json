@@ -1,0 +1,35 @@
+{
+  "base": "frozen native-source-synthetic-rows90.patch (official99 equivalent code)",
+  "status": "PRIVATE_WASM_110_AND_RUST_13_VERIFIED_NOT_PRODUCTION_PROMOTED",
+  "productionModified": false,
+  "patchSha256": "43bf22538170222f634321eae536026c969af85d956cc3ebb8d2b9901a6b7e12",
+  "files": [
+    {
+      "path": "src/model/page.rs",
+      "beforeSha256": "9dd5a507a32f2fad91af3cc7b5f5955bde87b0a72563a9a378d599d510e0aa9f",
+      "afterSha256": "5a4aefc6675ab7391d526c972ffbd17c4f8a6e703a0e447e2bc6d7c5a91e7821"
+    },
+    {
+      "path": "src/renderer/page_layout.rs",
+      "beforeSha256": "96c71427373881762b00adcdb9b622eb93d7dd9a2929b156c7cfb4cf158e3f82",
+      "afterSha256": "c1cbe5f424c91cbefd9f156858bbe7276e97bcd97df2aec8470ebc8bdaaeacd9"
+    },
+    {
+      "path": "src/serializer/hwpx/context.rs",
+      "beforeSha256": "eccda753bd05e2496e034b79219c31cf98784dfb359436170d2da71f51e724cd",
+      "afterSha256": "d7ed5b5a113b9cd177952513ac587a996204ba5fc601856b1644d9dbf7743c6b"
+    },
+    {
+      "path": "src/serializer/hwpx/section.rs",
+      "beforeSha256": "1b21d9c168ee93e3420489e8c7de70b913ec0cf9318b013c36b31d86489f6a44",
+      "afterSha256": "b497768b6249e0cd9ea7fe6b6a287dab3e83d45aa043464fd6abae82ad2005a8"
+    }
+  ],
+  "newRustTests": 6,
+  "scope": "Root body proportional widths only; nested frames without known extent are explicitly loss-reported, not guessed. Oversized integer output is not wrapped; current i16 reader range is loss-reported. No runtime-row authority changed.",
+  "productionIntegration": {
+    "sourceId": "448ba81d29c9095a",
+    "patches": 101,
+    "all4AfterHashesMatch": true
+  }
+}

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile, writeFile, mkdir} from 'node:fs/promises';
 import {resolve, dirname, isAbsolute, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {inflateRawSync} from 'node:zlib';
 import {loadReviewEngine, snapshot, compareSnapshots, hash} from './lib/hancom-review.mjs';
 import {verifyPreservedExport} from '../src/adapters/rhwp/preservation.ts';
 
@@ -11,6 +12,9 @@ for (const key of ['JUEONY_ENGINE_PACKAGE', 'JUEONY_TEST_OUTPUT']) {
 }
 const app = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const repo = resolve(app, '../..'), out = resolve(process.env.JUEONY_TEST_OUTPUT);
+const sourcePaths = ['scripts/lib/hancom-review.mjs', 'src/adapters/rhwp/preservation.ts', 'src/adapters/rhwp/document-save-layout.ts', 'src/adapters/rhwp/overlap-save-layout.ts'];
+const fingerprintSources = () => Promise.all(sourcePaths.map(async path => ({path, sha256: hash(await readFile(join(app, path)))})));
+const initialSourceHashes = await fingerprintSources();
 await mkdir(out, {recursive: true});
 const engine = await loadReviewEngine(process.env.JUEONY_ENGINE_PACKAGE);
 const pinned = {
@@ -31,6 +35,30 @@ function same(before, after) {
   const comparison = compareSnapshots(before, after);
   assert.equal(comparison.status, 'SAME_WITHIN_PUBLISHED_CONTRACT', JSON.stringify({semantic: comparison.semantic.count, geometry: comparison.geometry.count, pages: comparison.pages}));
   return comparison;
+}
+// Independent ZIP inspection catches column fields absent from the public
+// semantic getter, even when cached source rows conceal a bad width in layout.
+function sectionXml(value) {
+  const b = Buffer.from(value); let end = -1, found;
+  for (let p = b.length - 22; p >= Math.max(0, b.length - 65557); p--) if (b.readUInt32LE(p) === 0x06054b50) {end = p; break;}
+  assert.ok(end >= 0, 'ZIP end directory'); let p = b.readUInt32LE(end + 16);
+  for (let i = 0; i < b.readUInt16LE(end + 10); i++) {
+    assert.equal(b.readUInt32LE(p), 0x02014b50);
+    const method = b.readUInt16LE(p + 10), size = b.readUInt32LE(p + 20), length = b.readUInt32LE(p + 24);
+    const nl = b.readUInt16LE(p + 28), el = b.readUInt16LE(p + 30), cl = b.readUInt16LE(p + 32), local = b.readUInt32LE(p + 42);
+    const name = b.subarray(p + 46, p + 46 + nl).toString('utf8');
+    if (name === 'Contents/section0.xml') {
+      assert.equal(found, undefined, 'duplicate section entry'); assert.equal(b.readUInt32LE(local), 0x04034b50);
+      const offset = local + 30 + b.readUInt16LE(local + 26) + b.readUInt16LE(local + 28), packed = b.subarray(offset, offset + size);
+      found = method === 0 ? Buffer.from(packed) : method === 8 ? inflateRawSync(packed, {maxOutputLength: 4 * 1024 * 1024}) : assert.fail('ZIP compression');
+      assert.equal(found.length, length);
+      let crc = 0xffffffff;
+      for (const byte of found) {crc ^= byte; for (let bit = 0; bit < 8; bit++) crc = (crc & 1) ? 0xedb88320 ^ (crc >>> 1) : crc >>> 1;}
+      assert.equal((crc ^ 0xffffffff) >>> 0, b.readUInt32LE(p + 16));
+    }
+    p += 46 + nl + el + cl;
+  }
+  assert.ok(found, 'section0.xml missing'); return found.toString('utf8');
 }
 function exported(doc, format, permitRefusal = false) {
   const before = snapshot(doc), artifact = doc[format === 'hwp' ? 'exportHwpWithReport' : 'exportHwpxWithReport']();
@@ -90,6 +118,8 @@ for (const [name, sha] of Object.entries(pinned)) {
         const before = snapshot(doc), undo = doc.saveSnapshot();
         doc.insertText(0, 0, doc.getParagraphLength(0, 0), text);
         const edited = snapshot(doc), redo = doc.saveSnapshot();
+        assert.notDeepEqual(edited.semantic.values, before.semantic.values, 'prefix edit must actually change the document');
+        assert.ok(doc.getTextFileUnicode().includes(text), 'the entire requested prefix text must be present');
         const exports = ['hwp', 'hwpx'].map(format => exported(doc, format, true).record);
         doc.restoreSnapshot(undo); assert.deepEqual(snapshot(doc), before);
         doc.restoreSnapshot(redo); assert.deepEqual(snapshot(doc), edited);
@@ -101,6 +131,20 @@ for (const [name, sha] of Object.entries(pinned)) {
     observations.push({name, phase: 'prefix-safety', stress, sourceUnchanged: true});
   });
 }
-const sourceHashes = await Promise.all(['scripts/lib/hancom-review.mjs', 'src/adapters/rhwp/preservation.ts', 'src/adapters/rhwp/document-save-layout.ts', 'src/adapters/rhwp/overlap-save-layout.ts'].map(async path => ({path, sha256: hash(await readFile(join(app, path)))})));
+await scenario('native unequal column weights become actual HWPX units in independent XML', async () => {
+  const input = await readFile(join(fixtureRoot, 'baseline-unequal_columns.hwp'));
+  assert.equal(hash(input), pinned.unequal_columns);
+  const doc = new engine.HwpDocument(input);
+  try {
+    const saved = exported(doc, 'hwpx'), xml = sectionXml(saved.bytes);
+    // The pinned generator's 42520HU body and native [12000,20768]+1000
+    // weights have sum33768. These are the independent expected whole units.
+    const sizes = [...xml.matchAll(/<hp:colSz\b[^>]*width="(\d+)"[^>]*gap="(\d+)"[^>]*\/>/g)].map(m => [Number(m[1]), Number(m[2])]);
+    assert.deepEqual(sizes, [[15110, 1259], [26150, 0]]);
+    observations.push({phase: 'independent-column-XML', sourceSha256: hash(input), columnSizes: sizes, export: saved.record});
+  } finally {doc.free();}
+});
+const sourceHashes = await fingerprintSources();
+assert.deepEqual(sourceHashes, initialSourceHashes, 'verification dependencies changed during the run');
 await writeFile(join(out, 'result.json'), JSON.stringify({engine: engine.metadata, results, failures, observations, fixtureHashes: pinned, verifierSha256: hash(await readFile(fileURLToPath(import.meta.url))), sourceHashes, scope: 'Actual WASM mixed storage and native text/history regression on six pinned owned HWP fixtures. Every published semantic/control/text field; unchanged production preservation guard. Prefix safety may PASS by refusing an independently detected mismatch, which does NOT mean the unsupported export is implemented. No OS/Hancom UI, user files, font resources or real API calls.'}, null, 2));
 if (failures.length) process.exitCode = 1;

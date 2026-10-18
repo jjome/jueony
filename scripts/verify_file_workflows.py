@@ -9,7 +9,7 @@ CASES=[('native-shell',11),('native-recents',9),('document-lifecycle',10),
        ('document-windows',8),('recovery-integrity',10),('download-connection',10),
        ('close-recovery',4),('save-recovery',29),('document-metadata',10),
        ('agent-files',15),('xml-documents-integrated',7),('xml-documents',13),('xml-recovery',13),
-       ('package-preservation',14),('native-row-preservation',13),('native-row-engine',18)]
+       ('package-preservation',14),('native-row-preservation',13),('native-row-engine',19)]
 sha=lambda b:hashlib.sha256(b).hexdigest()
 
 def main():

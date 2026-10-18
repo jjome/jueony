@@ -1,0 +1,269 @@
+--- a/src/model/page.rs
++++ b/src/model/page.rs
+@@ -146,6 +146,25 @@
+     pub raw_attr: u16,
+ }
+ 
++impl ColumnDef {
++    /// Resolve HWP5 unsigned proportional words in the caller's actual frame
++    /// units. Paint and HWPX persistence use this one formula; direction only
++    /// changes placement order and must not reverse the stored width list.
++    pub(crate) fn proportional_dimensions(&self, extent: f64) -> Option<Vec<(f64, f64)>> {
++        let count = self.column_count.max(1) as usize;
++        if count <= 1 || self.same_width || !self.proportional_widths || self.widths.len() < count {
++            return None;
++        }
++        let total: f64 = self.widths.iter().chain(self.gaps.iter())
++            .map(|&v| (v as u16) as f64).sum();
++        let scale = if total > 0.0 { extent / total } else { 1.0 };
++        Some((0..count).map(|i| (
++            (self.widths[i] as u16) as f64 * scale,
++            self.gaps.get(i).map(|&g| (g as u16) as f64 * scale).unwrap_or(0.0),
++        )).collect())
++    }
++}
++
+ /// 단 종류
+ #[derive(Debug, Clone, Copy, Default, PartialEq, serde::Serialize)]
+ pub enum ColumnType {
+--- a/src/renderer/page_layout.rs
++++ b/src/renderer/page_layout.rs
+@@ -226,25 +226,9 @@
+         if column_def.proportional_widths {
+             // HWP 5.0 바이너리: widths/gaps는 비례값 (합계=32768)
+             // body_area.width에 대한 비례로 변환
+-            let total: f64 = column_def
+-                .widths
+-                .iter()
+-                .chain(column_def.gaps.iter())
+-                .map(|&v| (v as u16) as f64)
+-                .sum();
+-            let scale = if total > 0.0 {
+-                body_area.width / total
+-            } else {
+-                1.0
+-            };
+-
+-            for i in 0..col_count {
+-                let w = (column_def.widths[i] as u16) as f64 * scale;
+-                let gap = if i < column_def.gaps.len() {
+-                    (column_def.gaps[i] as u16) as f64 * scale
+-                } else {
+-                    0.0
+-                };
++            let dimensions = column_def.proportional_dimensions(body_area.width)
++                .expect("the native proportional-width preconditions were checked");
++            for (w, gap) in dimensions {
+                 areas.push(LayoutRect {
+                     x,
+                     y: body_area.y,
+--- a/src/serializer/hwpx/context.rs
++++ b/src/serializer/hwpx/context.rs
+@@ -145,6 +145,8 @@
+     /// 방출했으므로 중복 방지를 위해 건너뛴다. `write_section` 이 첫 문단 렌더 직전
+     /// true 로 설정하고, 첫 본문 ColumnDef 방출 시 `render_control_slot` 이 소거한다.
+     pub body_coldef_template_pending: bool,
++    /// Actual section body extent; never used for nested subList frames.
++    pub body_column_extent_hu: Option<i32>,
+     /// [#5943] 저장 lineseg 의 `textpos` 가 이미 HWPX 슬롯 축인지 여부.
+     ///
+     /// `LineSeg::text_start` 는 파서가 파일 값을 그대로 담으므로 **출처마다 축이 다르다**
+@@ -192,6 +194,7 @@
+             generated_hyperlink_id: u32::MAX,
+             sub_list_depth: 0,
+             body_coldef_template_pending: false,
++            body_column_extent_hu: None,
+             content_loss: ContentLossReport::new(SerializedFormat::Hwpx),
+         }
+     }
+--- a/src/serializer/hwpx/section.rs
++++ b/src/serializer/hwpx/section.rs
+@@ -531,6 +531,10 @@
+     ctx: &mut SerializeContext,
+ ) -> Result<Vec<u8>, SerializeError> {
+     let mut vert_cursor: u32 = 0;
++    // PageAreas is the paint resolver's authority for landscape, mirrored
++    // margins and gutter. Proportional binary words are not XML HWPUNITs.
++    let prior_column_extent = ctx.body_column_extent_hu;
++    ctx.body_column_extent_hu = body_column_extent(&section.section_def.page_def);
+ 
+     let first_para = section.paragraphs.first();
+     // [#1584] 첫 문단 렌더 직전 set — 본문 첫 ColumnDef(섹션 템플릿 흡수분)의 인라인
+@@ -596,7 +600,7 @@
+             .iter()
+             .find(|c| matches!(c, Control::ColumnDef(_)))
+         {
+-            out = out.replacen(TEMPLATE_BODY_COL_PR, &render_col_pr_ctrl(cd), 1);
++            out = out.replacen(TEMPLATE_BODY_COL_PR, &render_col_pr_ctrl(cd, ctx.body_column_extent_hu, ctx), 1);
+         }
+     }
+ 
+@@ -648,7 +652,7 @@
+             {
+                 // 위 #1407 치환이 이미 심어 둔 IR colPr 블록을 정확히 되찾아
+                 // (render_col_pr_ctrl 은 결정적) secPr 앞으로 옮긴다.
+-                let rendered = render_col_pr_ctrl(cd);
++                let rendered = render_col_pr_ctrl(cd, ctx.body_column_extent_hu, ctx);
+                 if let Some(colpr_at) = out.find(&rendered) {
+                     out.replace_range(colpr_at..colpr_at + rendered.len(), "");
+                     if let Some(secpr_at) = out.find("<hp:secPr ") {
+@@ -688,6 +692,7 @@
+         out = out.replacen(PARA_CLOSE, &format!("</hp:p>{}</hs:sec>", extra), 1);
+     }
+ 
++    ctx.body_column_extent_hu = prior_column_extent;
+     Ok(out.into_bytes())
+ }
+ 
+@@ -774,6 +779,12 @@
+     vert_start: u32,
+     ctx: &mut SerializeContext,
+ ) -> (String, String, u32) {
++    if ctx.sub_list_depth == 0 && !ctx.body_coldef_template_pending {
++        if let Some(Control::SectionDef(definition)) = para.controls.iter()
++            .find(|control| matches!(control, Control::SectionDef(_))) {
++            ctx.body_column_extent_hu = body_column_extent(&definition.page_def);
++        }
++    }
+     // 첫 run의 secPr/colPr는 각각 실제 8유닛 슬롯이다. 원본에 없는 정의만
+     // 템플릿이 추가하면 뒤 줄의 시작도 같은 폭만큼 전진해야 한다.
+     let injected_prefix_units = if ctx.line_segs_on_paragraph_axis
+@@ -2559,7 +2570,7 @@
+             if ctx.sub_list_depth == 0 && ctx.body_coldef_template_pending {
+                 ctx.body_coldef_template_pending = false;
+             } else {
+-                out.push_str(&render_col_pr_ctrl(cd));
++                out.push_str(&render_col_pr_ctrl(cd, if ctx.sub_list_depth == 0 { ctx.body_column_extent_hu } else { None }, ctx));
+             }
+         }
+         // [#4388] Unknown은 HWPX 로 옮길 대응 표현이 없어 여기서도 드롭된다.
+@@ -2673,7 +2684,14 @@
+ 
+ /// 셀·글상자 subList 인라인 `<hp:ctrl><hp:colPr .../></hp:ctrl>` (#1379 3단계).
+ /// `parse_col_pr` / `parse_col_line` / `parse_col_sz`(parser/hwpx/section.rs)의 역매핑.
+-fn render_col_pr_ctrl(cd: &ColumnDef) -> String {
++fn body_column_extent(page: &crate::model::page::PageDef) -> Option<i32> {
++    let width = if page.landscape { page.height } else { page.width } as u64;
++    let margin = page.margin_left as u64 + page.margin_right as u64 + page.margin_gutter as u64;
++    if width == 0 || width > i32::MAX as u64 || margin >= width { return None; }
++    Some(crate::model::page::PageAreas::from_page_def(page).body_area.width())
++}
++
++fn render_col_pr_ctrl(cd: &ColumnDef, body_extent_hu: Option<i32>, ctx: &mut SerializeContext) -> String {
+     let col_type = match cd.column_type {
+         ColumnType::Distribute => "BalancedNewspaper",
+         ColumnType::Parallel => "Parallel",
+@@ -2693,10 +2711,33 @@
+     // 왕복에서 불균등 단 너비가 사라지고 렌더러(page_layout.rs
+     // calculate_column_areas)가 균등 분할로 저하한다.
+     let mut col_sz_xml = String::new();
++    let wants_proportional = !cd.same_width && cd.proportional_widths && cd.column_count > 1;
++    let valid_shape = (2..=255).contains(&cd.column_count)
++        && cd.widths.len() == cd.column_count as usize && cd.gaps.len() <= cd.widths.len();
++    let total = cd.widths.iter().chain(cd.gaps.iter()).try_fold(0u64,
++        |sum,&word| sum.checked_add((word as u16) as u64));
++    let absolute = if wants_proportional && valid_shape && total.is_some_and(|sum|sum>0) {
++        body_extent_hu.filter(|&extent| extent>0)
++            .and_then(|extent| cd.proportional_dimensions(extent as f64))
++    } else { None };
++    // A valid XML integer may still exceed this engine's current i16 reader.
++    // Emit its honest extent, but report the roundtrip limitation rather than
++    // silently wrapping/clamping it or claiming a preserved save.
++    if wants_proportional && (absolute.is_none() || absolute.as_ref().is_some_and(|values|
++        values.iter().any(|(w,g)| !w.is_finite() || !g.is_finite()
++            || *w<1.0 || *g<0.0 || *w>i16::MAX as f64 || *g>i16::MAX as f64))) {
++        use crate::serializer::content_loss::{ContentLoss,ContentLossCode,ContentLossSubject,ContentLossReason};
++        ctx.content_loss.record(ContentLoss {code:ContentLossCode::MetadataReduced,
++            subject:ContentLossSubject::Control,path:"ColumnDef.proportionalWidths".into(),
++            reason:ContentLossReason::SerializerNotImplemented,resource_id:None});
++    }
+     if !cd.same_width {
+         for (i, w) in cd.widths.iter().enumerate() {
+-            let gap = cd.gaps.get(i).copied().unwrap_or(0);
+-            col_sz_xml.push_str(&format!(r#"<hp:colSz width="{}" gap="{}"/>"#, w, gap));
++            // Match renderer::px_to_hwpunit's truncation, without an i16 cast:
++            // XML positiveInteger can represent a body column above 32767HU.
++            let (width, gap) = absolute.as_ref().map(|v| (v[i].0 as i64, v[i].1 as i64))
++                .unwrap_or((*w as i64, cd.gaps.get(i).copied().unwrap_or(0) as i64));
++            col_sz_xml.push_str(&format!(r#"<hp:colSz width="{}" gap="{}"/>"#, width, gap));
+         }
+     }
+     if cd.separator_type != 0 || !col_sz_xml.is_empty() {
+@@ -6726,3 +6767,77 @@
+         assert!(xml.contains("<hp:shadow"), "shadow 방출: {xml}");
+     }
+ }
++
++#[cfg(test)]
++mod proportional_column_persistence_tests {
++    use super::*;
++    fn xml(columns:&ColumnDef, extent:Option<i32>)->String {
++        render_col_pr_ctrl(columns,extent,&mut SerializeContext::default())
++    }
++    fn columns() -> ColumnDef { ColumnDef {
++        column_count: 2, same_width: false, proportional_widths: true,
++        widths: vec![12000, 20768], gaps: vec![1000], ..ColumnDef::default()
++    } }
++    #[test]
++    fn binary_weights_are_xml_absolute_units() {
++        let xml = xml(&columns(), Some(42520));
++        assert!(xml.contains(r#"<hp:colSz width="15110" gap="1259"/>"#));
++        assert!(xml.contains(r#"<hp:colSz width="26150" gap="0"/>"#));
++        assert!(!xml.contains(r#"width="12000""#));
++    }
++    #[test]
++    fn existing_absolute_columns_are_not_scaled_again() {
++        let mut columns = columns(); columns.proportional_widths = false;
++        assert_eq!(xml(&columns,Some(42520)), xml(&columns,None));
++        assert!(xml(&columns,Some(42520)).contains(r#"width="12000" gap="1000""#));
++    }
++    #[test]
++    fn unknown_nested_body_extent_is_not_invented() {
++        assert!(xml(&columns(),None).contains(r#"width="12000" gap="1000""#));
++    }
++    #[test]
++    fn page_frame_landscape_gutter_and_direction_share_native_resolver() {
++        use crate::model::page::{PageDef,PageAreas,ColumnDirection};
++        use crate::renderer::{hwpunit_to_px,px_to_hwpunit,DEFAULT_DPI};
++        for landscape in [false,true] {
++            for direction in [ColumnDirection::LeftToRight,ColumnDirection::RightToLeft,ColumnDirection::Mirror] {
++                let page=PageDef {width:59528,height:84186,margin_left:8504,margin_right:6504,
++                    margin_gutter:2000,landscape,..PageDef::default()};
++                let extent=PageAreas::from_page_def(&page).body_area.width();
++                let mut columns=columns(); columns.direction=direction;
++                let lengths=columns.proportional_dimensions(extent as f64).unwrap();
++                let layout=crate::renderer::page_layout::PageLayoutInfo::from_page_def(&page,&columns,DEFAULT_DPI);
++                let xml=xml(&columns,Some(extent));
++                for (i,(width,gap)) in lengths.iter().enumerate() {
++                    let source_index=if direction==ColumnDirection::RightToLeft {1-i}else{i};
++                    let native=layout.column_areas[source_index].width;
++                    assert!((native-hwpunit_to_px(*width as i32,DEFAULT_DPI)).abs()<0.02);
++                    assert_eq!(*width as i32,px_to_hwpunit(native,DEFAULT_DPI));
++                    assert!(xml.contains(&format!(r#"<hp:colSz width="{}" gap="{}"/>"#,*width as i64,*gap as i64)));
++                }
++            }
++        }
++    }
++    #[test]
++    fn unsigned_native_words_and_source_model_are_preserved() {
++        let mut columns=columns(); columns.widths=vec![-32768,16384];
++        let original=columns.widths.clone();
++        let dimensions=columns.proportional_dimensions(48000.0).unwrap();
++        assert!(dimensions[0].0>dimensions[1].0);
++        let xml=xml(&columns,Some(48000));
++        assert!(!xml.contains(r#"width="-32768""#)); assert_eq!(columns.widths,original);
++    }
++    #[test]
++    fn unrepresentable_widths_and_unknown_frames_report_loss() {
++        for (mut columns,extent) in [(columns(),None),(columns(),Some(0)),(columns(),Some(200000)),
++            (columns(),Some(42520)),(columns(),Some(42520)),(columns(),Some(42520))].into_iter().enumerate()
++            .map(|(i,(mut c,e))| {match i {3=>c.widths=vec![0,0],4=>c.column_count=3,5=>c.gaps=vec![1,2,3],_=>{}}(c,e)}) {
++            let mut context=SerializeContext::default();
++            render_col_pr_ctrl(&columns,extent,&mut context);
++            assert!(!context.content_loss.is_empty());
++        }
++        let invalid=crate::model::page::PageDef{width:100,margin_left:80,margin_right:80,..Default::default()};
++        assert_eq!(body_column_extent(&invalid),None);
++    }
++
++}

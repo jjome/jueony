@@ -1,5 +1,7 @@
 # 재조판 뒤 저장과 미리보기 보존: 합본110
 
+[최신 합본111: 새 문서 날짜 초기화](124-new-document-time-storage.md).
+
 [파일 작업표](features/05-files-storage-recovery.md) · [HWT 사본 작업](122-hwt-copy-storage.md) · [직전 합본](121-local-edit-storage.md).
 
 최종 합본의 자동 검사 **475개가 통과했다**. 한 번의461개 실행과 동일 엔진의 별도14개 검사로 구성한다. 파일·저장·복구·형식 보존만 변경했다. 한글 직접 비교는 사용자 요청에 따라 수행하지 않았다. [고정 결과](evidence/file-completion-2026-10-18/storage110/README.md).

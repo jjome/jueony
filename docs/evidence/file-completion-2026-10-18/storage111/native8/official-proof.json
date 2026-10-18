@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "sourceId": "b443fe8f896f3e7b",
+  "sourceMutation": false,
+  "native": {
+    "officialSourceDependency": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-b443fe8f896f3e7b",
+    "harnessManifest": "build/stored-time-transaction111/official118-harness/Cargo.toml",
+    "harnessCargoLockSha256": "af28d42999cb5183a843a95d2112c253dbf0cc1a3d366d76507d6d23a7e28a09",
+    "result": {
+      "regressions": 7,
+      "compiledSourceWitnessTests": 1,
+      "totalPassed": 8,
+      "failed": 0,
+      "ignored": 0
+    },
+    "log": "build/stored-time-transaction111/official118-native.log",
+    "logSha256": "8f0355f811f7b8af949b973bcb734fb0317d5dfc0fc1f628b831abdffea086ca",
+    "witnesses": [
+      {
+        "compiledRawSha256": "2d0ed166214e5c42d83993588c7d1a767c6a5bff3ef38793079de472c55be9d9",
+        "path": "src/document_core/document_metadata_stored_transaction.rs"
+      },
+      {
+        "compiledRawSha256": "88691856276dcbae2a2e2ad0aca2d07cab2d79e24753ab2fc516fe615dbad90a",
+        "path": "src/document_core/document_metadata_stored.rs"
+      },
+      {
+        "compiledRawSha256": "f746db47927c22a41facdf99b4e7a7834b4699bbf6ad047d8e7f8c8d0dba0b29",
+        "path": "src/wasm_api.rs"
+      },
+      {
+        "compiledRawSha256": "b94cce442b3f5052017e84b5082cca3b8ef5f4ae8437cf9b9bf273de8be9deea",
+        "path": "src/model/native_computed_resource.rs"
+      }
+    ],
+    "diskReadbackAndReopen": 6,
+    "privateFirstRun": "7/7 separate candidate run, not additive to official regressions"
+  },
+  "wasm": {
+    "authoritativeRootRun": "build/stored-time111-official118/result.json",
+    "supplementalDuplicateRun": "build/stored-time-transaction111/official118-wasm-first/result.json",
+    "doNotCountSupplementalRunTwice": true,
+    "passed": 14,
+    "failed": 0,
+    "actualWasmSha256": "22679c4eed3efb564b6a1aa61cf34d1f5d8dfd842d10db08d72cde8debcf27f4",
+    "verifierSha256": "744b0cfe4e86a115540e239b647fc914a2d86ece097fef003a9d79d966e0872b",
+    "diskReadbackStrictGuardObservations": 16,
+    "baseline117Passed": 0,
+    "baseline117Total": 14
+  },
+  "scope": "Explicit typed stored-time CAS primitive only. Automatic clocks/session/print/undo acknowledgement and Hancom equivalence remain separate."
+}

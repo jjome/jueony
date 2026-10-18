@@ -1,0 +1,86 @@
+✔ clock uses one injected integer millisecond value and exact100ns arithmetic (0.5364ms)
+✔ new blank metadata uses preview+CAS, keeps printzero exact and rejects repeat (7.6374ms)
+✔ missing capability, nonempty body and invalid clock refuse before writes (0.2605ms)
+✔ inherited print history is never reset or disguised (0.1308ms)
+✔ preview mutation and unauthorized field changes reject without commit (0.3062ms)
+✔ wrong commit receipt is not accepted as initialized (0.2253ms)
+(node:33896) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✖ actual patched create prepares metadata and digest before publishing and retires old once (3.0647ms)
+✖ actual patched create preserves existing connection/document on initialize failure (0.4439ms)
+✖ actual patched create preserves existing connection/document on digest failure (0.7259ms)
+✔ unexpected original function body edit and duplicate anchor both refuse (0.3121ms)
+✔ hook is only explicit creation and manifest fingerprints its implementation (1.9786ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 8
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 102.331
+
+✖ failing tests:
+
+test at apps\editor\tests\document-created-information111.test.ts:33:1
+✖ actual patched create prepares metadata and digest before publishing and retires old once (3.0647ms)
+  :29
+    }
+   }; return Bridge;
+      ^^^^^^^^^^^^^^
+  
+  SyntaxError [ERR_INVALID_TYPESCRIPT_SYNTAX]: Return statement is not allowed here
+      at parseTypeScript (node:internal/modules/typescript:72:36)
+      at processTypeScriptCode (node:internal/modules/typescript:146:42)
+      at stripTypeScriptTypes (node:internal/modules/typescript:123:10)
+      at bridge (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/tests/document-created-information111.test.ts:29:11)
+      at TestContext.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/tests/document-created-information111.test.ts:33:129)
+      at Test.runInAsyncScope (node:async_hooks:228:14)
+      at Test.run (node:internal/test_runner/test:1118:25)
+      at Test.start (node:internal/test_runner/test:1015:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17)
+      at run (node:internal/test_runner/harness:369:12) {
+    code: 'ERR_INVALID_TYPESCRIPT_SYNTAX'
+  }
+
+test at apps\editor\tests\document-created-information111.test.ts:34:46
+✖ actual patched create preserves existing connection/document on initialize failure (0.4439ms)
+  :29
+    }
+   }; return Bridge;
+      ^^^^^^^^^^^^^^
+  
+  SyntaxError [ERR_INVALID_TYPESCRIPT_SYNTAX]: Return statement is not allowed here
+      at parseTypeScript (node:internal/modules/typescript:72:36)
+      at processTypeScriptCode (node:internal/modules/typescript:146:42)
+      at stripTypeScriptTypes (node:internal/modules/typescript:123:10)
+      at bridge (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/tests/document-created-information111.test.ts:29:11)
+      at TestContext.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/tests/document-created-information111.test.ts:34:167)
+      at Test.runInAsyncScope (node:async_hooks:228:14)
+      at Test.run (node:internal/test_runner/test:1118:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:787:18)
+      at Test.postRun (node:internal/test_runner/test:1247:19)
+      at Test.run (node:internal/test_runner/test:1175:12) {
+    code: 'ERR_INVALID_TYPESCRIPT_SYNTAX'
+  }
+
+test at apps\editor\tests\document-created-information111.test.ts:34:46
+✖ actual patched create preserves existing connection/document on digest failure (0.7259ms)
+  :29
+    }
+   }; return Bridge;
+      ^^^^^^^^^^^^^^
+  
+  SyntaxError [ERR_INVALID_TYPESCRIPT_SYNTAX]: Return statement is not allowed here
+      at parseTypeScript (node:internal/modules/typescript:72:36)
+      at processTypeScriptCode (node:internal/modules/typescript:146:42)
+      at stripTypeScriptTypes (node:internal/modules/typescript:123:10)
+      at bridge (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/tests/document-created-information111.test.ts:29:11)
+      at TestContext.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/tests/document-created-information111.test.ts:34:167)
+      at Test.runInAsyncScope (node:async_hooks:228:14)
+      at Test.run (node:internal/test_runner/test:1118:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:787:18)
+      at Test.postRun (node:internal/test_runner/test:1247:19)
+      at Test.run (node:internal/test_runner/test:1175:12) {
+    code: 'ERR_INVALID_TYPESCRIPT_SYNTAX'
+  }

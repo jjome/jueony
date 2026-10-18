@@ -1,0 +1,14 @@
+{
+  "baseSource": "b20b9eb0ed097b92",
+  "sourceId": "b443fe8f896f3e7b",
+  "changedFiles": {
+    "src/document_core/document_metadata_stored_transaction.rs": "91fb1a70e2d1e15e946209242571c0bd72356c6423adf24f333780b7fd7e66b8",
+    "src/document_core/document_metadata_stored.rs": "dd2c777cab539cfe7c9544f38dc5b1be3ae0fefa506190c241932f69db876c48",
+    "src/wasm_api.rs": "c3c005832a6d3603a0366ff304c5b2cf511c41c5eed11eae8a65e9e35c9c1918"
+  },
+  "unchangedOtherRust": 1076,
+  "resourceFiles": 236,
+  "resourceSha256": "e13ceab437308fd70c49dbe967902165d363cd89c1e18da1d97005476c2946b4",
+  "unexpectedChanges": [],
+  "scope": "Typed stored-time metadata and its explicit WASM API only; all physical row inputs and resource bytes unchanged. Full patch/WASM identity remains separately attested."
+}

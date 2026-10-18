@@ -1,0 +1,22 @@
+✔ clock uses one injected integer millisecond value and exact100ns arithmetic (0.5343ms)
+✔ new blank metadata uses preview+CAS, keeps printzero exact and rejects repeat (7.4405ms)
+✔ missing capability, nonempty body and invalid clock refuse before writes (0.2502ms)
+✔ inherited print history is never reset or disguised (0.1346ms)
+✔ preview mutation and unauthorized field changes reject without commit (0.3062ms)
+✔ wrong commit receipt is not accepted as initialized (0.2225ms)
+[WasmBridge] 새 문서 생성: 1페이지
+(node:18208) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ actual patched create prepares metadata and digest before publishing and retires old once (1.996ms)
+✔ actual patched create preserves existing connection/document on initialize failure (0.5382ms)
+✔ actual patched create preserves existing connection/document on digest failure (0.6949ms)
+✔ unexpected original function body edit and duplicate anchor both refuse (0.3071ms)
+✔ hook is only explicit creation and manifest fingerprints its implementation (1.4716ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 101.4004

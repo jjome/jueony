@@ -1,0 +1,111 @@
+{
+  "baseSourceId": "b20b9eb0ed097b92",
+  "source": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\stored-time-transaction111\\source",
+  "patch": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\stored-time-transaction111\\handoff-final\\stored-time-transaction111.patch",
+  "patchSha256": "c50456efadc9ba58db364b7ed891803116bc5c3c0bbaaf6f7f4b6705cd80789a",
+  "files": [
+    {
+      "path": "src/document_core/document_metadata_stored_transaction.rs",
+      "baseCanonicalSha256": null,
+      "canonicalSha256": "91fb1a70e2d1e15e946209242571c0bd72356c6423adf24f333780b7fd7e66b8",
+      "rawCompiledSha256": "2d0ed166214e5c42d83993588c7d1a767c6a5bff3ef38793079de472c55be9d9"
+    },
+    {
+      "path": "src/document_core/document_metadata_stored.rs",
+      "baseCanonicalSha256": "ee9324c8af478319442f5b5c7a5f84d5e06d5649bb30c8cc7f7ec710bf2efd3f",
+      "canonicalSha256": "dd2c777cab539cfe7c9544f38dc5b1be3ae0fefa506190c241932f69db876c48",
+      "rawCompiledSha256": "b449dc5fd9a0ea7992bb37defbd7689f224fedf5b8bb48e5b97dfa19b720010f"
+    },
+    {
+      "path": "src/wasm_api.rs",
+      "baseCanonicalSha256": "4e34e7b7a27fa29958f989200ca04ff18c215a4905338a5816778c9cb6225060",
+      "canonicalSha256": "c3c005832a6d3603a0366ff304c5b2cf511c41c5eed11eae8a65e9e35c9c1918",
+      "rawCompiledSha256": "66dec44b23a13d2488b883f3aebe49c5bb0d815d7aa02077a5d2ea23a96eae5e"
+    }
+  ],
+  "runtimeFrozen": true,
+  "state": "NATIVE_FINAL_7_PASS_0_FAIL_0_IGNORED",
+  "clockRead": false,
+  "diskAcknowledgementImplemented": false,
+  "current236ProductionInputsChanged": [],
+  "testOnlyManifestChange": "Private source/Cargo.toml appends [[test]] stored_time111. It is excluded from production patch, and the private compiled manifest differs from the final production manifest; do not claim this private tree is an exact official resource cohort.",
+  "nativeFirst": "build/stored-time-transaction111/native-first.log",
+  "nativeFinal": "build/stored-time-transaction111/native-final.log",
+  "scope": "Explicit metadata-time CAS primitive only. Automatic lifecycle clocks, session duration, print acknowledgement, UI/Agent integration and undo-safe acknowledged audit lane remain separate.",
+  "nativeFinalCounts": {
+    "pass": 7,
+    "fail": 0,
+    "ignored": 0,
+    "actualDiskExportsAndReopens": 6,
+    "strictRejectedMalformedRequests": 21
+  },
+  "independentStaticReview": "format_gap_fix: no actionable finding on frozen three runtime files; source raw SHA 2d0ed166214e5c42d83993588c7d1a767c6a5bff3ef38793079de472c55be9d9",
+  "actualWasmValidation": "Official118 direct14 PASS, root canonical report build/stored-time111-official118/result.json; own duplicate report retained, not counted twice.",
+  "actualPrivate236InputsChanged": [
+    "Cargo.toml"
+  ],
+  "artifacts": [
+    {
+      "path": "build/stored-time-transaction111/native-final.log",
+      "sha256": "a668f6d6d28c2f7565a68d9dae7c2a5008986321050d919386c6972eedf9519f",
+      "bytes": 917
+    },
+    {
+      "path": "build/stored-time-transaction111/native-first.log",
+      "sha256": "0acbff9d5589809fc8dd20fb9105344a27d25f2c8cbb7301adc801164cfacf4f",
+      "bytes": 7780
+    },
+    {
+      "path": "build/stored-time-transaction111/check.log",
+      "sha256": "c3ac1bfbbeda5f543de844c645019b9a63fe63dc6b7cf04c89d6af5db57455c1",
+      "bytes": 181
+    },
+    {
+      "path": "build/stored-time-transaction111/source/tests/stored_time111.rs",
+      "sha256": "2cbdf9a865b1fda8c298367c1b0379353815bfc3a3904cf31fcfbe269ee01059",
+      "bytes": 13915
+    },
+    {
+      "path": "build/stored-time-transaction111/native-final/actual-roundtrip.json",
+      "sha256": "764d3b2f9c44db5bef9d29a3eacd1fc33750469ca20e8b2d18c21cc782cb5943",
+      "bytes": 2581
+    },
+    {
+      "path": "build/stored-time-transaction111/native-final/cycle-0.hwp",
+      "sha256": "31477133e032f6b02c2b95bbeffa988ee72f210bac2d9d65448290698b662439",
+      "bytes": 12800
+    },
+    {
+      "path": "build/stored-time-transaction111/native-final/cycle-1.hwpx",
+      "sha256": "df64f3673ca4dc2ad90c14335fdcdfa4dc74d13d4d5f790f0311d001974488a5",
+      "bytes": 8013
+    },
+    {
+      "path": "build/stored-time-transaction111/native-final/cycle-2.hwp",
+      "sha256": "12767ab2b57baf6ef2e5c5ea5c6b27f344449ab6162ef5fbc68a5b98badf987d",
+      "bytes": 6656
+    },
+    {
+      "path": "build/stored-time-transaction111/native-final/cycle-3.hwpx",
+      "sha256": "b8c617d35d97d03d151f180c695fc61f9ae50c8911752bc073f9a770572e5ddd",
+      "bytes": 7974
+    },
+    {
+      "path": "build/stored-time-transaction111/native-final/cycle-4.hwp",
+      "sha256": "12767ab2b57baf6ef2e5c5ea5c6b27f344449ab6162ef5fbc68a5b98badf987d",
+      "bytes": 6656
+    },
+    {
+      "path": "build/stored-time-transaction111/native-final/cycle-5.hwpx",
+      "sha256": "b8c617d35d97d03d151f180c695fc61f9ae50c8911752bc073f9a770572e5ddd",
+      "bytes": 7974
+    },
+    {
+      "path": "build/stored-time-transaction111/native-final/request-negatives.json",
+      "sha256": "b2284976980650f17a6d9f04939f511fae80abab154ef7723da491e082963928",
+      "bytes": 55
+    }
+  ],
+  "official118Proof": "build/stored-time-transaction111/official118-proof.json",
+  "officialNative": "Official118 external harness: 7 regression +1 raw-source witness =8 PASS,0 failed/ignored. Official source/Cargo unmodified."
+}

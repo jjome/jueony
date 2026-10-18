@@ -1,0 +1,29 @@
+{
+  "kind": "independent-read-only-review",
+  "base": "build/rhwp-engine/source-b20b9eb0ed097b92",
+  "reviewedSource": "build\\stored-time-transaction111\\source",
+  "runtimeHashes": {
+    "src/document_core/document_metadata_stored_transaction.rs": "2d0ed166214e5c42d83993588c7d1a767c6a5bff3ef38793079de472c55be9d9",
+    "src/document_core/document_metadata_stored.rs": "b449dc5fd9a0ea7992bb37defbd7689f224fedf5b8bb48e5b97dfa19b720010f",
+    "src/wasm_api.rs": "66dec44b23a13d2488b883f3aebe49c5bb0d815d7aa02077a5d2ea23a96eae5e"
+  },
+  "sourceEdited": false,
+  "compileOrTestsExecutedByReviewer": false,
+  "actionableFindings": [],
+  "checked": [
+    "4096-byte request guard before parsing; schemaVersion1, 1-4 known value fields, unknown top-level fields denied",
+    "duplicate decoded JSON keys rejected at every object depth; trailing input denied",
+    "canonical decimal unsigned strings; u64 overflow denied; full u64 duration; dates confined to supported1601-9999 UTC",
+    "original exact metadata fingerprint checked before prepare; malformed/restricted/duplicate source owners denied",
+    "preview immutable; all OLE/XML construction and mapping checks finish before mutating stream and aux owners",
+    "standard OPF namespace exact, foreign elements and original attributes preserved by byte-range edits",
+    "unknown OLE properties, prefix/suffix and untouched raw time padding survive existing Ole owner writer",
+    "new wasm hooks directly forward explicit transaction only; no hidden clock, disk acknowledgement, source-row or layout permission changes"
+  ],
+  "limits": [
+    "Static read-only review is separate from author Native and parent actual WASM tests.",
+    "Does not implement automatic modified/print clocks or editor undo/history policy.",
+    "Unknown OLE preservation relies on bounded existing Ole parser/writer contract; malformed original storage is rejected.",
+    "No whole file-part completion claim."
+  ]
+}

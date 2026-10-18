@@ -54,7 +54,7 @@
       "key": "files",
       "file": "05-files-storage-recovery.md",
       "title": "파일·저장·복구·형식 보존",
-      "description": "열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.\n\n**현재 합본110:** 앞 문단 재조판·구버전 표준 행·양형식 왕복 저장과 미리보기 Unicode 손실 결함 해결. 기존424+HWT/미리보기37=461개 단일 실행과 별도 구버전14개, 총475개 통과. unit1025·Native25·단표24·실제Windows11·실행묶음7 통과. 일반 XSD/XSL·복합 HWT·문서 시간 수명과 전체 한글 동등성은 잔여다. [수정·검수·남은 범위](../123-current-stack-and-preview-storage.md).",
+      "description": "열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.\n\n**현재 합본111:** 구버전 재조판 저장·HWT 사본·미리보기 보존에 새 문서 작성/수정 시각 초기화 추가. 기존461+구버전14+날짜14+새문서12=501개 통과. unit1036·공식Native7+지문1·단표24·Windows11·묶음7 통과. 저장 시각 승인·편집 시간 누적, 일반 XSD/XSL·복합 HWT와 전체 한글 동등성은 잔여다. [수정·검수·남은 범위](../124-new-document-time-storage.md).",
       "ids": "B001-B002 B005-B006 B009-B011 B014 B021-B022 G065-G073 G090 G092 N001-N002",
       "related": [
         "session",

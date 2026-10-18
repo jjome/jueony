@@ -1,0 +1,36 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {stripTypeScriptTypes} from 'node:module';
+import {pathToFileURL} from 'node:url';
+import {resolve} from 'node:path';
+import {creationFileTime100ns,initializeDocumentCreatedInformation} from '../src/adapters/rhwp/document-created-information111.ts';
+const patches=await import(pathToFileURL(resolve(import.meta.dirname,'../scripts/integration/document-created-information-patches.mjs')).href);
+const time=(tick:string)=>({state:'value',fileTime100ns:tick,utc:new Date(Number(BigInt(tick)/10000n)-11644473600000).toISOString().replace('.000Z','.0000000Z')});
+const tick='134000000000000000';
+function fake(){
+ let information:any={schemaVersion:1,sourceFormat:'hwp',created:time('0'),modified:time('0'),lastPrinted:time('0'),editingDuration:{state:'absent'},issues:[]};let fp='a'.repeat(64);let writes=0;
+ const d={getSectionCount:()=>1,getParagraphCount:()=>1,getParagraphLength:()=>0,
+ getDocumentStoredInformationEditState:()=>JSON.stringify({editable:true,fingerprint:fp,information,reason:null}),
+ previewDocumentStoredInformation:(expected:string,r:string)=>{assert.equal(expected,fp);const v=JSON.parse(r).values;return JSON.stringify({changed:true,originalFingerprint:fp,information:{...information,created:time(v.created),modified:time(v.modified),editingDuration:{state:'value',ticks100ns:v.editingDuration}}});},
+ setDocumentStoredInformation:(expected:string,r:string)=>{const p=JSON.parse(d.previewDocumentStoredInformation(expected,r));information=p.information;fp='b'.repeat(64);writes++;return JSON.stringify({changed:true,fingerprint:fp,information});},
+ alter:(f:(i:any)=>void)=>f(information),writes:()=>writes};return d;
+}
+test('clock uses one injected integer millisecond value and exact100ns arithmetic',()=>{let n=0;assert.equal(creationFileTime100ns(()=>{n++;return 0;}),'116444736000000000');assert.equal(n,1);for(const x of [NaN,Infinity,1.5,Number.MAX_SAFE_INTEGER])assert.throws(()=>creationFileTime100ns(()=>x));});
+test('new blank metadata uses preview+CAS, keeps printzero exact and rejects repeat',()=>{const d=fake();const before=JSON.parse(d.getDocumentStoredInformationEditState()).information;const out=initializeDocumentCreatedInformation(d,()=>tick);assert.deepEqual(out.information.lastPrinted,before.lastPrinted);assert.equal(out.information.created.state,'value');assert.equal(d.writes(),1);assert.throws(()=>initializeDocumentCreatedInformation(d,()=>tick),/이미/);});
+test('missing capability, nonempty body and invalid clock refuse before writes',()=>{assert.throws(()=>initializeDocumentCreatedInformation({}));const d=fake();d.getParagraphLength=()=>1;assert.throws(()=>initializeDocumentCreatedInformation(d,()=>tick));assert.equal(d.writes(),0);for(const t of ['01','-1','18446744073709551616']){const d=fake();assert.throws(()=>initializeDocumentCreatedInformation(d,()=>t));assert.equal(d.writes(),0);}});
+test('inherited print history is never reset or disguised',()=>{const d=fake();d.alter(i=>i.lastPrinted=time(tick));assert.throws(()=>initializeDocumentCreatedInformation(d,()=>tick),/인쇄/);assert.equal(d.writes(),0);});
+test('preview mutation and unauthorized field changes reject without commit',()=>{for(const mutation of [false,true]){const d=fake();const original=d.previewDocumentStoredInformation;d.previewDocumentStoredInformation=(f,r)=>{const out=JSON.parse(original(f,r));if(mutation)d.alter(i=>i.issues.push('changed'));else out.information.lastPrinted=time(tick);return JSON.stringify(out);};assert.throws(()=>initializeDocumentCreatedInformation(d,()=>tick));assert.equal(d.writes(),0);}});
+test('wrong commit receipt is not accepted as initialized',()=>{const d=fake();d.setDocumentStoredInformation=()=>JSON.stringify({changed:true,fingerprint:'c'.repeat(64),information:JSON.parse(d.getDocumentStoredInformationEditState()).information});assert.throws(()=>initializeDocumentCreatedInformation(d,()=>tick));});
+const original=await readFile(resolve(import.meta.dirname,'../../../upstream/rhwp-source/rhwp-studio/src/core/wasm-bridge.ts'),'utf8').then(s=>s.replace(/\r\n/g,'\n'));
+function bridge(failure=''){
+ const source=patches.patchDocumentCreatedBridge(original);const a=source.indexOf('  createNewDocument(): DocumentInfo {'),b=source.indexOf('\n  get fileName(): string {',a);const method=source.slice(a,b);
+ const events:string[]=[];const old={free:()=>events.push('oldfree')};const next={createBlankDocument:()=>{events.push('blank');return '{"pageCount":1}';},setFileName:()=>{},exportHwp:()=>{events.push('digest');if(failure==='digest')throw Error('digest');return new Uint8Array([1]);},free:()=>events.push('candidatefree')};
+ const js=stripTypeScriptTypes('class Bridge { '+method+' };')+' return Bridge;';
+ const Klass=new Function('HwpDocument','initializeDocumentCreatedInformation','bytesToHex','blake3',js)({createEmpty:()=>next},()=>{events.push('initialize');if(failure==='initialize')throw Error('init');},()=> 'hash',()=>new Uint8Array([1]));
+ const value=new Klass();Object.assign(value,{doc:old,_fileName:'existing.hwp',_currentFileHandle:{token:'old'},_requiresPasswordForSave:true,_documentDigest:'oldDigest',_documentGeneration:7,ensureParagraphStableIdsFor:(d:unknown)=>{assert.equal(d,next);events.push('ids');},releaseCanvasFontResources:()=>events.push('release')});return{value,events,old,next};
+}
+test('actual patched create prepares metadata and digest before publishing and retires old once',()=>{const {value,events,next}=bridge();value.createNewDocument();assert.equal(value.doc,next);assert.deepEqual(events,['blank','initialize','ids','digest','release','oldfree']);assert.equal(value._currentFileHandle,null);assert.equal(value._documentGeneration,8);});
+for(const failure of ['initialize','digest'])test('actual patched create preserves existing connection/document on '+failure+' failure',()=>{const {value,events,old}=bridge(failure);const before={name:value._fileName,handle:value._currentFileHandle,digest:value._documentDigest,generation:value._documentGeneration};assert.throws(()=>value.createNewDocument());assert.equal(value.doc,old);assert.deepEqual({name:value._fileName,handle:value._currentFileHandle,digest:value._documentDigest,generation:value._documentGeneration},before);assert.equal(events.filter(x=>x==='candidatefree').length,1);assert.ok(!events.includes('oldfree'));});
+test('unexpected original function body edit and duplicate anchor both refuse',()=>{assert.throws(()=>patches.patchDocumentCreatedBridge(original.replace('this.ensureParagraphStableIds();','this.unreviewedMutation();')));assert.throws(()=>patches.patchDocumentCreatedBridge(original+'\n  createNewDocument(): DocumentInfo {'));});
+test('hook is only explicit creation and manifest fingerprints its implementation',async()=>{const integration=await readFile(resolve(import.meta.dirname,'../scripts/integration/document-created-information-patches.mjs'),'utf8');assert.match(integration,/copy\.createBlankDocument\(\);\\n     initializeDocumentCreatedInformation\(copy\)/);const build=await readFile(resolve(import.meta.dirname,'../scripts/build.mjs'),'utf8');assert.match(build,/await applyDocumentCreatedInformationPatches\(\{root\}\)/);assert.match(build,/documentCreatedInformationPatchSha256/);});

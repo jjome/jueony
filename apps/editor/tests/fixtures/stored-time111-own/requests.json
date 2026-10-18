@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "origin": "Own synthetic timestamp transaction requests; no user/commercial document, account, private key or installed font.",
+  "values": {
+    "created": "133536420001234567",
+    "modified": "133536420007654321",
+    "lastPrinted": "133536420000000006",
+    "editingDuration": "18446744073709551615"
+  },
+  "utc": {
+    "created": "2024-02-29T01:00:00.1234567Z",
+    "modified": "2024-02-29T01:00:00.7654321Z",
+    "lastPrinted": "2024-02-29T01:00:00.0000006Z"
+  },
+  "invalidRequests": [
+    "{}",
+    "{\"schemaVersion\":2,\"values\":{\"created\":\"0\"}}",
+    "{\"schemaVersion\":1,\"values\":{}}",
+    "{\"schemaVersion\":1,\"values\":{\"created\":null}}",
+    "{\"schemaVersion\":1,\"values\":{\"created\":0}}",
+    "{\"schemaVersion\":1,\"values\":{\"created\":\"-1\"}}",
+    "{\"schemaVersion\":1,\"values\":{\"created\":\"01\"}}",
+    "{\"schemaVersion\":1,\"values\":{\"created\":\"1.0\"}}",
+    "{\"schemaVersion\":1,\"values\":{\"created\":\"1e2\"}}",
+    "{\"schemaVersion\":1,\"values\":{\"created\":\"18446744073709551615\"}}",
+    "{\"schemaVersion\":1,\"values\":{\"editingDuration\":\"18446744073709551616\"}}",
+    "{\"schemaVersion\":1,\"values\":{\"unknown\":\"0\"}}",
+    "{\"schemaVersion\":1,\"values\":{\"created\":\"0\"},\"other\":true}",
+    "{\"schemaVersion\":1,\"schemaVersion\":1,\"values\":{\"created\":\"0\"}}",
+    "{\"schemaVersion\":1,\"values\":{\"created\":\"0\",\"created\":\"1\"}}",
+    "{\"schemaVersion\":1,\"values\":{\"created\":\"0\"},\"values\":{\"created\":\"1\"}}",
+    "{\"schemaVersion\":1,\"values\":{\"created\":\"0\"}}false",
+    "{\"schemaVersion\":1,\"values\":{\"created\":\"+1\"}}",
+    "{\"schemaVersion\":1,\"values\":{\"created\":\" 1\"}}",
+    "{\"schemaVersion\":1,\"values\":{\"created\":\"\"}}"
+  ]
+}

@@ -83,7 +83,7 @@ export function showDocumentInformation(stats: DocumentStatistics, onClose: () =
   if (!metadata?.editable) scope.textContent += ' ' + (metadata?.state.reason ?? '읽기 전용 상태에서는 요약을 편집할 수 없습니다.');
   summary.append(scope); panel.append(summary);
   if(stored){
-    const persisted=document.createElement('fieldset'),legend=document.createElement('legend');legend.textContent='파일에 저장된 날짜·시간';persisted.append(legend);
+    const persisted=document.createElement('fieldset'),legend=document.createElement('legend');legend.textContent='문서의 날짜·시간';persisted.append(legend);
     if(stored.value){
       for(const[key,label]of [['created','작성 시각'],['modified','수정 시각'],['lastPrinted','마지막 인쇄 시각'],['editingDuration','누적 편집 시간']]as const){
         const item=stored.value[key],row=document.createElement('p');row.dataset.storedInformation=key;
@@ -91,7 +91,7 @@ export function showDocumentInformation(stats: DocumentStatistics, onClose: () =
       }
       for(const issue of stored.value.issues){const note=document.createElement('p');note.textContent=issue;persisted.append(note);}
     }else{const note=document.createElement('p');note.textContent=stored.reason??'저장된 날짜 정보 조회 불가';persisted.append(note);}
-    const note=document.createElement('p');note.textContent='원본에 기록된 값입니다. 현재 시각으로 추정하거나 저장·편집 시 자동 갱신하지 않습니다.';persisted.append(note);panel.append(persisted);
+    const note=document.createElement('p');note.textContent='새 문서는 작성·수정 시각을 생성 시점으로 초기화합니다. 불러온 문서의 기존 값과 인쇄 시각은 보존합니다. 저장·편집에 따른 시각·누적 시간 자동 갱신은 아직 지원하지 않습니다.';persisted.append(note);panel.append(persisted);
   }
   if(stories){
     const field=document.createElement('fieldset'),legend=document.createElement('legend');legend.textContent='전체 저장 모델의 문단 텍스트';field.append(legend);

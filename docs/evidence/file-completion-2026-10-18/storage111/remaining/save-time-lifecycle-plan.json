@@ -1,0 +1,353 @@
+{
+  "schemaVersion": 1,
+  "status": "READ_ONLY_DESIGN_NOT_IMPLEMENTED",
+  "basis": {
+    "officialEngine": "b20b9eb0ed097b92",
+    "frontend": "dist-file-storage110 / studio-file-storage110",
+    "productionWrites": 0,
+    "uiOrServersStarted": 0,
+    "scope": "B014 automatic creation/modification/active-edit time save lifecycle only; existing summary five-field edit and strict guards remain."
+  },
+  "currentFindings": [
+    {
+      "id": "B014-TEMPLATE-TIME",
+      "state": "OBSERVED_ACTUAL_WASM",
+      "evidence": "build/b014-blank-stored-time111-observation.json",
+      "created": "2026-02-28T10:07:21.6830000Z",
+      "modified": "2026-02-28T10:07:53.0440000Z",
+      "editingDuration": "absent",
+      "conclusion": "A newly created logical document inherits template dates. Testing created.absent alone is insufficient. Only explicit logical-new intent may replace these dates; open/restore/SaveAs must not reset created."
+    },
+    {
+      "id": "B014-EXACT-GUARD",
+      "state": "CODE_CONFIRMED",
+      "conclusion": "A live or export-only timestamp change without typed intentional-delta proof causes existing stored-date preservation rejection; remove/ignore/normalize timestamp fields is forbidden."
+    },
+    {
+      "id": "B014-UNDO-LANE",
+      "state": "CODE_CONFIRMED_DESIGN_BLOCKER",
+      "conclusion": "Native snapshots own full Document including summary/XML metadata. Setter after save outside user history is undone by a later full snapshot restore. A standalone typed setter does not implement complete save lifecycle."
+    },
+    {
+      "id": "B014-MUTATION-IS-NOT-ACTIVE-EDIT",
+      "state": "CODE_CONFIRMED",
+      "conclusion": "document-mutated is also emitted by derived pagination/save preparation and by undo/redo. Do not add duration on every event or infer active time from dirty/Date.now-openedAt."
+    },
+    {
+      "id": "B014-RECOVERY-LEDGER",
+      "state": "CODE_CONFIRMED",
+      "conclusion": "Recovery currently persists file bytes and timestamp of checkpoint, not pending active-edit ticks; current integrity hash would not bind an arbitrary appended ledger."
+    }
+  ],
+  "rustPeerContract": {
+    "agent": "/root/preservation_audit",
+    "status": "TENTATIVE_ISOLATED_TYPED_CAS_TRANSACTION",
+    "read": "getDocumentStoredInformationEditState() -> {editable,fingerprint,information,reason?}",
+    "write": "setDocumentStoredInformation(expectedFingerprint, requestJSON) -> {changed,fingerprint,information}",
+    "request": {
+      "schemaVersion": 1,
+      "values": "1..4 exact keys among created/modified/lastPrinted/editingDuration; canonical unsigned U64 decimal100ns ticks; no null/remove/unknown"
+    },
+    "owner": "Exact OLE raw summary and XML owner token; unknown bytes included; validate all fields before assigning either metadata container. No Rust clock, implicit disk acknowledgement or automatic frontend invocation.",
+    "important": "Use on isolated export clone first. Current manual setter must remain explicitly opt-in/undoable; it is not itself a last-saved time lane."
+  },
+  "minimalCompleteBehavior": {
+    "creation": "At explicit new-document intent, capture injected wall FILETIME once and bind it to trusted logical document token. Do not derive newness from file name, dirty, missing dates, current source format or template bytes alone. Restore carries original pending creation; open/import and SaveAs preserve original created. Agent create_document needs its own explicit creation intent because native replacement may not change outer documentGeneration.",
+    "modification": "Proposed deterministic policy: capture wall FILETIME when explicit Save/SaveAs snapshot is prepared after frame preparation, and commit it only after the same artifact is acknowledged. Label it as saved-artifact preparation time, not readback completion time. A different product policy (last committed edit time or clean-save unchanged) must be explicitly chosen and tested before implementation; none is claimed Hancom-equivalent.",
+    "editingDuration": "Use an injected monotonic active-edit accumulator, never time since file open or wall clock difference. Exact encoded100ns integer ticks do not claim actual clock resolution100ns. Prior stored duration + acknowledged captured pending ticks; source absent/invalid and U64 overflow handled explicitly by typed capability, not assumed0 without a creation/absence policy.",
+    "lastPrinted": "Preserve exact original; no actual print acknowledgement exists in this task, so do not stamp it on Save/preview/export.",
+    "unsupportedOwners": "Keep safe exact-preserving save possible with explicit timeStatus preserved-uneditable if policy allows; never label its times updated. If an automatic-time intent is mandatory but owner is ambiguous/invalid/unrepresentable, reject before file writing. No silent fallback to current time or dropping unknown metadata."
+  },
+  "activeEditAccumulator": {
+    "proposedPureHelper": "modules/document-files/domain/edit-time-ledger.ts (proposed only)",
+    "injectedPorts": [
+      "wallNowFileTime100ns():canonicalU64Decimal",
+      "monotonicNowTicks100ns():bigint",
+      "isActiveOwner():boolean",
+      "idleWindowTicks:bigint (explicit product policy, not a claimed Hancom constant)"
+    ],
+    "ownership": [
+      "authenticated windowScope",
+      "workspaceId",
+      "documentId/tabId",
+      "stable documentInstance",
+      "logical creation token",
+      "clockSessionId"
+    ],
+    "activity": "Start/resume only on a proven successful text/format/structural user or Agent edit. Source-normalization, save table frames, timer pagination, focus/navigation, queries, previews, failed or rolled-back commands and the time-ack itself are excluded. Undo/redo may be explicit edit activity, but may not subtract cumulative effort.",
+    "segments": "Accumulate only foreground/current-tab focused editing segments; close at blur/hidden/workspace or tab switch, native exit freeze, save preparation or defined idle deadline. Save/picker/IO waiting is not active editing. Monotonic decrease/invalid integer invalidates segment; no clamping or wall-clock substitution.",
+    "freeze": "At save capture, close current segment and snapshot cumulative pending ticks. Cancel/failure retains these exact pending ticks. Successful receipt consumes only its captured delta once; do not double count on retry or consume post-capture edits.",
+    "recovery": "Persist closed pending integer total, acknowledged baseline and pending creation under versioned integrity+owner binding. Never persist a performance.now anchor as meaningful across restart. Restore starts paused and counts no time while browser/app was closed."
+  },
+  "saveTransaction": [
+    {
+      "stage": "capture",
+      "action": "After options/password and existing frame preparation, acquire trusted host mutation lease; pin window/workspace/tab, API object, stable instance, revision, current handle/connection fingerprint and requested format. Capture time edit-state fingerprint and ledger token. SaveAs rename must not change instance; arbitrary navigation invalidates ownership."
+    },
+    {
+      "stage": "prepare",
+      "action": "Build exact isolated export snapshot preserving live bytes/history/view. Apply only typed created/modified/editingDuration intent on the clone with expected metadata fingerprint. Ensure native creation/fresh-row lowering uses the existing owned snapshot pipeline, not serialize a raw clone that skips writebacks."
+    },
+    {
+      "stage": "verify",
+      "action": "Validate live→intent-clone difference consists exactly of requested typed time fields plus the already-owned frame lowering. Reopen serialized bytes and run existing verifyPreservedExport against that intentional clone, including all time fields, whole published layout0.2 and known table checks. Existing content-loss, read budgets, aliases and source invariants remain."
+    },
+    {
+      "stage": "write",
+      "action": "Use the current fingerprint/revision protected writeSnapshot path. Carry opaque transaction token + exact artifact byte hash on payload beside jueonyRevision. No LLM path or picker authority. Permission/cancel before write yields live-time ack0."
+    },
+    {
+      "stage": "acknowledge",
+      "action": "After close and exact disk readback, recheck same owner/instance/revision/connection and prepared metadata token, then atomically acknowledge live saved-time lane and consume captured ledger delta. Only then bind new handle/name/format and mark clean. Duplicate or stale receipts refuse; known time-ack revision advance must be explicit in returned receipt, never ignored."
+    },
+    {
+      "stage": "partial",
+      "action": "If any write may have started, close/readback fails, or metadata ack CAS fails after disk success, return failed_partial; preserve live edit/undo and pending ledger, do not mark clean or report unchanged. Disk may contain prepared artifact even though live acknowledgement failed."
+    }
+  ],
+  "undoRequirement": {
+    "stopShip": true,
+    "recommendedBoundary": "A save-specific acknowledged time lane owned by the native DocumentCore/document instance outside user SnapshotCommand state, with typed reapplication to restored snapshots before they become observable. Initial open/set_document/logical-new/reset clears or rebinds it; explicit user metadata edits remain normal undo transactions. This is a requirement for a separate narrow peer/root design, not implemented or silently added here.",
+    "alternative": "A frontend ledger with verified reapplication at every manual/Agent/history restore and rollback boundary can work only if all paths are closed atomically. Do not implement it as an asynchronous event listener after UI publication. Export-only metadata with no live acknowledgement is insufficient if UI promises current stored dates.",
+    "existingSpecificIntegration": "Bound-save complete currently returns void and verifies revision unchanged; a typed ack can advance metadata revision. Extend this completion receipt explicitly and preserve savedRequestRevisions/history command identity used by Agent undoRequest. Do not inject a standalone save-time user undo item or absorb arbitrary history commands."
+  },
+  "downloadReceipt": "Preserve existing explicit user acknowledgement. A download starts before its confirmation, so cancelled confirmation means live metadata/ledger ack0 but cannot mean copy write0. Distinguish receipt evidence readback vs user-acknowledged-download; do not present downloaded data as independently disk-verified.",
+  "recoveryRequirement": {
+    "version": "Add optional versioned document-specific time ledger with exact fields and budget to RecoveryRecord and integrity payload; old records have unknown pending duration, not guessed elapsed time. Preserve old v1 verification; no resealing corrupt/stale records.",
+    "scope": "Trusted documentWindow.scope/workspace/document ID and bytes/instance lineage. No same-origin/global singleton accumulator across frames/windows.",
+    "saveRecovery": "recoveryBytes/exportRecovery must not stamp explicit-save times, consume pending edit duration, or mark clean. Repeated recovery/export/query calls are observational. A save-time lane must remain consistent with byte snapshot even after user Undo."
+  },
+  "proposedOwnershipForLaterApproval": {
+    "new": [
+      "src/modules/document-files/domain/edit-time-ledger.ts",
+      "src/modules/document-files/ports/save-time.ts",
+      "src/adapters/rhwp/document-save-time.ts",
+      "src/adapters/browser/document-time-clock.ts",
+      "scripts/integration/save-time-patches.mjs",
+      "tests/document-save-time.test.ts"
+    ],
+    "existingMinimal": [
+      "src/adapters/rhwp/editor-bridge.ts",
+      "src/desktop-host.ts",
+      "src/adapters/files/save-runtime.ts",
+      "src/adapters/files/bound-save.ts",
+      "src/adapters/iframe/document-client.ts",
+      "src/modules/document-files/public/contracts.ts",
+      "src/adapters/storage/recovery-integrity.ts",
+      "src/shell.ts (trusted scope/activation/recovery only; root ownership)",
+      "scripts/integration/studio-patches.mjs (delegate to new integration helper)",
+      "scripts/integration/agent-bound-save-patches.mjs (typed completion receipt only)"
+    ],
+    "engineNeedsRootApproval": [
+      "Save-time export clone/typed acknowledgement hook in document_core, reusing peer exact CAS transaction.",
+      "Undo-independent acknowledged time lane/restore contract. Peer current setter alone does not satisfy this."
+    ],
+    "notTouched": [
+      "all tracked frontend sources",
+      "official engine/source/patch directory",
+      "docs/canonical CSV/Git",
+      "native-host/native Rust IO",
+      "HWT/XML/XSL editing or unrelated capabilities"
+    ]
+  },
+  "acceptanceTests": [
+    "Injected-clock new logical document overrides template creation exactly once; loaded/imported/SaveAs preserves source created.",
+    "No-op queries, preview, save-recovery export, derived pagination and frame preparation add0 editing ticks.",
+    "Focused active segments accumulate deterministically; hidden/background/other tab/workspace, picker/IO wait and app-closed time add0.",
+    "At least3 explicit saves plus continued edits consume each captured pending duration exactly once without overflow or double ack.",
+    "Before-write cancel/permission/conflict yields write0 and live metadata/history/ledger unchanged; download cancel separately retains live dirty state without claiming copy write0.",
+    "After write/close/readback mismatch or late abort returns failed_partial, ack0, pending duration retained and original current document/undo survives.",
+    "API/instance/revision/window/workspace/connection changes at each await reject stale receipt; SaveAs rename with same pinned instance and exact accepted result succeeds.",
+    "Ordinary manual Undo/Redo and Agent undoRequest after save preserve acknowledged saved-time lane and user history identity; failure rolls back exact state.",
+    "Full file roundtrip both requested supported formats retains exact intended100ns fields plus every unrelated raw/semantic/layout value, including unknown summary bytes.",
+    "Unsupported/malformed/ambiguous time owners and loss reports are explicit; no timestamps are dropped from preservation comparison.",
+    "Recovery restart resumes pending ticks/creation intent with fresh monotonic session; corrupted or cross-scope ledger/old record keeps original checkpoint intact.",
+    "Password saves maintain strict snapshot ownership and recovery encryption policy; protected recovery never drops password protection to persist a ledger.",
+    "Existing supported save/Agent/table-frame/history/lifecycle suites pass unchanged; no blanket timestamp whitelist or relaxed geometry comparator."
+  ],
+  "completionClaim": "This is read-only integration design, not implemented B014 automation and not whole B014 parity. Rust manual typed CAS is an enabling vertical only; active-time policy, creation intent, undo-independent acknowledgement and recovery binding must be implemented and verified before lifecycle completion.",
+  "references": [
+    {
+      "kind": "requirement",
+      "path": "docs/features/05-files-storage-recovery.md",
+      "line": 244,
+      "sha256": "1c078287ff843bdcea09c99c585c88e8fdda191abc43467c3deae526d4e8bdce",
+      "evidence": "B014 is full document information lifecycle; stored read exists, automatic modification/edit accumulation not complete."
+    },
+    {
+      "kind": "newBlank",
+      "path": "build/rhwp-engine/source-b20b9eb0ed097b92/src/document_core/commands/document.rs",
+      "line": 2035,
+      "sha256": "9bbe3512dc341363d741ff02e1e305b3fd424b9e632069a167268d6f466946da",
+      "evidence": "create_blank_document_native parses built-in blank2010 without new logical creation clock."
+    },
+    {
+      "kind": "exportSnapshot",
+      "path": "build/rhwp-engine/source-b20b9eb0ed097b92/src/document_core/commands/document.rs",
+      "line": 2643,
+      "sha256": "9bbe3512dc341363d741ff02e1e305b3fd424b9e632069a167268d6f466946da",
+      "evidence": "prepare_hwp_export_snapshot clones and performs owned lowering; no time intention/clock."
+    },
+    {
+      "kind": "nativeSnapshots",
+      "path": "build/rhwp-engine/source-b20b9eb0ed097b92/src/document_core/commands/document.rs",
+      "line": 3454,
+      "sha256": "9bbe3512dc341363d741ff02e1e305b3fd424b9e632069a167268d6f466946da",
+      "evidence": "save snapshot clones full Document; restore3492 assigns full Document, so out-of-history metadata edits can be reverted."
+    },
+    {
+      "kind": "savePreparation",
+      "path": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "line": 88,
+      "sha256": "1cc222f8666c3713d49fb9ac5892d4753b4ce4fcfbeb0f72d4baf4ac7bb72575",
+      "evidence": "prepareFileSave flushes pagination and may execute/absorb table-frame snapshot; returns early on plans0."
+    },
+    {
+      "kind": "payload",
+      "path": "apps/editor/.build/studio-file-storage110/src/command/commands/file.ts",
+      "line": 151,
+      "sha256": "13479d1d46ddd5625dee40a84cd6fc9204cd00b4db16ee497077ae4f508a9ea1",
+      "evidence": "createSavePayload exports then verifies against live source and attaches only jueonyRevision."
+    },
+    {
+      "kind": "sourceIntegration",
+      "path": "apps/editor/scripts/integration/studio-patches.mjs",
+      "line": 300,
+      "sha256": "9f7c9cc78a991f37f48f33686612ab3283bf01d363fada6153e7061e2d47af7c",
+      "evidence": "Tracked source integration for actual file.ts save/payload/completion; edit generated .build source is not production."
+    },
+    {
+      "kind": "completion",
+      "path": "apps/editor/.build/studio-file-storage110/src/command/commands/file.ts",
+      "line": 227,
+      "sha256": "13479d1d46ddd5625dee40a84cd6fc9204cd00b4db16ee497077ae4f508a9ea1",
+      "evidence": "completeHandleSave binds handle/name, updates recent and marks clean after successful persist; has no typed save-time ack."
+    },
+    {
+      "kind": "snapshotWriter",
+      "path": "apps/editor/src/modules/document-files/application/write-snapshot.ts",
+      "line": 14,
+      "sha256": "7e6613af02ec32a72b1bc400f4e82975baf3373c50b3fb5b36e2c42336822c2b",
+      "evidence": "revision, existing disk fingerprint, write/close/readback exact; no save-time transaction or receipt token."
+    },
+    {
+      "kind": "saveBoundary",
+      "path": "apps/editor/src/adapters/files/save-runtime.ts",
+      "line": 19,
+      "sha256": "742f15895460944f4de5d1e655fcbd6bb935353440be9c0bcf01e9e787ddfb19",
+      "evidence": "writeSnapshot converts blob and uses strict writer; currently Promise<void>."
+    },
+    {
+      "kind": "download",
+      "path": "apps/editor/src/adapters/files/download-save.ts",
+      "line": 6,
+      "sha256": "3bef9bcd75ca851d99d0417af7eda27a2370743c83970f838b0cea32c8c7fa22",
+      "evidence": "Starts download before final user attestation; cancelled confirmation does not prove disk write0."
+    },
+    {
+      "kind": "downloadIdentity",
+      "path": "apps/editor/src/adapters/files/download-connection.ts",
+      "line": 10,
+      "sha256": "b41d217593b3c80b548572ed97c2dd5937f4ff36fff44cd3c2ecf3a2066a748f",
+      "evidence": "Name/format/original detachment only after user acknowledgement; bound to documentGeneration."
+    },
+    {
+      "kind": "boundSave",
+      "path": "apps/editor/src/adapters/files/bound-save.ts",
+      "line": 38,
+      "sha256": "4634dce9576ac9d27885a2958cebca6d39119388a1ba4d34a862082b4dab70d1",
+      "evidence": "Approved current handle, instance/revision/connection CAS, owner callback, permission checks, write-attempt partial classification."
+    },
+    {
+      "kind": "boundIntegration",
+      "path": "apps/editor/scripts/integration/agent-bound-save-patches.mjs",
+      "line": 29,
+      "sha256": "ccf82573b1a7ef565f04a45d3a411f971c4af76fe80635f879ef56aceb0c7a52",
+      "evidence": "Reuses ordinary payload and completeHandleSave. complete returns void and currently assumes revision unchanged after completion."
+    },
+    {
+      "kind": "revision",
+      "path": "apps/editor/src/desktop-host.ts",
+      "line": 11,
+      "sha256": "57c5d282c7c4aaaa005c34a86428ac7d983c9e3fe0a74cf8d9547b006edeaee7",
+      "evidence": "Per frame mutation sequence; revision generation:sequence. document-mutated includes pagination and derived save changes."
+    },
+    {
+      "kind": "instance",
+      "path": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "line": 159,
+      "sha256": "1cc222f8666c3713d49fb9ac5892d4753b4ce4fcfbeb0f72d4baf4ac7bb72575",
+      "evidence": "Identity includes filename; stable documentInstance is documentGeneration and survives SaveAs name changes."
+    },
+    {
+      "kind": "frameContract",
+      "path": "apps/editor/src/adapters/iframe/document-client.ts",
+      "line": 7,
+      "sha256": "925e8ebf0f2ab7eaef46c73b0bc241d47108663817d3ddc6bfb654b8af926738",
+      "evidence": "Same-origin version1 facade; parent trusted scope/host lease; optional lifecycle additions require same-bundle checks."
+    },
+    {
+      "kind": "trustedScope",
+      "path": "apps/editor/src/shell.ts",
+      "line": 228,
+      "sha256": "fbeeba4e4eb37613c4d02b623f590eb7277e608ec83f01873ebf720fb15578d3",
+      "evidence": "configureHistoryScope receives windowScope/workspaceId/documentId from trusted host, not URL or name."
+    },
+    {
+      "kind": "persistScope",
+      "path": "apps/editor/src/shell.ts",
+      "line": 252,
+      "sha256": "fbeeba4e4eb37613c4d02b623f590eb7277e608ec83f01873ebf720fb15578d3",
+      "evidence": "persistTab captures API identity/revision and bytes, binds saved document to workspace/tab; no elapsed-time payload."
+    },
+    {
+      "kind": "restore",
+      "path": "apps/editor/src/shell.ts",
+      "line": 232,
+      "sha256": "fbeeba4e4eb37613c4d02b623f590eb7277e608ec83f01873ebf720fb15578d3",
+      "evidence": "Recovery opens saved bytes dirty and reconnects handle only after permission/fingerprint. Monotonic clock origin cannot survive process."
+    },
+    {
+      "kind": "timeRead",
+      "path": "apps/editor/src/adapters/rhwp/document-stored-information.ts",
+      "line": 1,
+      "sha256": "5c510c0b85bcd3cb5f37ff37d84ac17d965e65f9ce04055a72ee03b4d37e8157",
+      "evidence": "Validates exact U64 decimal FILETIME/duration and states absent/value/invalid; never substitutes Date.now."
+    },
+    {
+      "kind": "timePreservation",
+      "path": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "line": 78,
+      "sha256": "752e8fa32843b271a60524a1fb0e638a8e003be787640593f89622a2184469bc",
+      "evidence": "stored-date-information is part of exact semantic evidence; no blanket timestamp ignore allowed."
+    },
+    {
+      "kind": "UI",
+      "path": "apps/editor/src/adapters/rhwp/document-info.ts",
+      "line": 88,
+      "sha256": "3c2aab714f8c45507c1ba28385c81fb6ba869989bc17e7dd19aed08f56318cae",
+      "evidence": "Shows only actual stored values or absent/invalid; source truth must not silently become wall-clock estimate."
+    },
+    {
+      "kind": "recoveryContract",
+      "path": "apps/editor/src/modules/document-files/public/contracts.ts",
+      "line": 3,
+      "sha256": "57f6d9563c580106342ee362735daf38d56e552cc88747a63d68f3d075e3153a",
+      "evidence": "RecoveryRecord has bytes/scope/name/dirty/updatedAt but no time ledger."
+    },
+    {
+      "kind": "recoveryIntegrity",
+      "path": "apps/editor/src/adapters/storage/recovery-integrity.ts",
+      "line": 5,
+      "sha256": "a501592db5322db58b800123e1d460cb6c9bbd695f27d169d11a4c35966d65b8",
+      "evidence": "Current hash excludes unknown appended fields; new time ledger cannot safely be added without versioned integrity binding."
+    },
+    {
+      "kind": "committedMutation",
+      "path": "apps/editor/.build/studio-file-storage110/src/engine/input-handler.ts",
+      "line": 3314,
+      "sha256": "1f0a33780331b11a125a3de3c82a4ba51f3de84ea5793f1e32bfe4214d0ff152",
+      "evidence": "Successful document-agent mutation notification occurs after strict render/rollback; afterEdit3394 also used for undo/redo; pagination emits other mutations."
+    }
+  ]
+}

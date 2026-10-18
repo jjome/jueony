@@ -15,6 +15,7 @@ import {applyFormattingToolbarPatches} from './integration/formatting-toolbar-pa
 import {applyDocumentTabCyclePatches} from './integration/document-tab-cycle-patches.mjs';
 import {applyKeyboardContextPatches} from './integration/keyboard-context-patches.mjs';
 import {applyDocumentSwapStatePatches} from './integration/document-swap-state-patches.mjs';
+import {applyDocumentCreatedInformationPatches} from './integration/document-created-information-patches.mjs';
 import {applyDocumentHistoryPatches} from './integration/document-history-patches.mjs';
 import {auditRepository} from '../../../scripts/check-module-boundaries.mjs';
 import { cp, mkdir, readFile, writeFile, readdir } from 'node:fs/promises';
@@ -101,6 +102,7 @@ await applyDocumentTabCyclePatches({root});
 await applyKeyboardContextPatches({root});
 await applyDocumentSwapStatePatches({root});
 await applyDocumentHistoryPatches({root});
+await applyDocumentCreatedInformationPatches({root});
 await build({
   configFile: false, root, base: './', publicDir: join(root, 'public'),
   define: { __APP_VERSION__: JSON.stringify('0.8.7'), __RHWP_DISABLE_EXTERNAL_WEBFONTS__: 'true', __RHWP_HWPCTRL__: 'false' },
@@ -145,6 +147,7 @@ const evidence = {
   documentTabCyclePatchSha256: sha256(await readFile(join(app,'scripts/integration/document-tab-cycle-patches.mjs'))),
   keyboardContextPatchSha256: sha256(await readFile(join(app,'scripts/integration/keyboard-context-patches.mjs'))),
   documentSwapStatePatchSha256: sha256(await readFile(join(app,'scripts/integration/document-swap-state-patches.mjs'))),
+  documentCreatedInformationPatchSha256: sha256(await readFile(join(app,'scripts/integration/document-created-information-patches.mjs'))),
   documentHistoryPatchSha256: sha256(await readFile(join(app,'scripts/integration/document-history-patches.mjs'))),
   exportMetadataLossPatchSha256: sha256(await readFile(join(app,'scripts/integration/export-metadata-loss-patches.mjs'))),
   customSourceSha256: sha256(customSource.join('\n')),

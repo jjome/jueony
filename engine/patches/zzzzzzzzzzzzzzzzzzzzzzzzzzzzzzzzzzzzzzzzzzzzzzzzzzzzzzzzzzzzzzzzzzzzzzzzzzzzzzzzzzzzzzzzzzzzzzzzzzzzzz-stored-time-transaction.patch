@@ -1,0 +1,285 @@
+--- /dev/null
++++ b/src/document_core/document_metadata_stored_transaction.rs
+@@ -0,0 +1,247 @@
++//! Explicit stored-time transactions. The caller supplies exact integer ticks;
++//! this layer never reads a clock or acknowledges a disk save/print operation.
++//! Preview is immutable and mutation is an atomic metadata-owner CAS.
++use super::*;
++
++const TIME_KEYS: [&str; 4] = ["created", "modified", "lastPrinted", "editingDuration"];
++const PIDS: [u32; 4] = [12, 13, 11, 10];
++
++#[derive(Deserialize)]
++#[serde(deny_unknown_fields, rename_all = "camelCase")]
++struct Request {
++    schema_version: u32,
++    values: BTreeMap<String, String>,
++}
++
++fn request(source: &str) -> Result<BTreeMap<usize, u64>, String> {
++    if source.len() > 4096 { return Err("Stored-time request budget exceeded".into()); }
++    // serde's default map accepts duplicate JSON keys. Reject them explicitly,
++    // including top-level schemaVersion/values, before constructing a request.
++    struct Unique;
++    impl<'de> serde::de::DeserializeSeed<'de> for Unique {
++        type Value = ();
++        fn deserialize<D: serde::Deserializer<'de>>(self, d: D) -> Result<(), D::Error> {
++            struct Visitor;
++            impl<'de> serde::de::Visitor<'de> for Visitor {
++                type Value = ();
++                fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result { f.write_str("unique JSON object keys") }
++                fn visit_map<M: serde::de::MapAccess<'de>>(self, mut m: M) -> Result<(), M::Error> {
++                    let mut keys = BTreeSet::new();
++                    while let Some(key) = m.next_key::<String>()? {
++                        if !keys.insert(key) { return Err(serde::de::Error::custom("Duplicate stored-time key")); }
++                        m.next_value_seed(Unique)?;
++                    }
++                    Ok(())
++                }
++                fn visit_str<E: serde::de::Error>(self, _: &str) -> Result<(), E> { Ok(()) }
++                fn visit_u64<E: serde::de::Error>(self, _: u64) -> Result<(), E> { Ok(()) }
++                fn visit_i64<E: serde::de::Error>(self, _: i64) -> Result<(), E> { Ok(()) }
++                fn visit_f64<E: serde::de::Error>(self, _: f64) -> Result<(), E> { Ok(()) }
++                fn visit_bool<E: serde::de::Error>(self, _: bool) -> Result<(), E> { Ok(()) }
++                fn visit_unit<E: serde::de::Error>(self) -> Result<(), E> { Ok(()) }
++            }
++            d.deserialize_any(Visitor)
++        }
++    }
++    use serde::de::DeserializeSeed;
++    let mut decoder = serde_json::Deserializer::from_str(source);
++    Unique.deserialize(&mut decoder).map_err(|_| "Invalid or duplicate stored-time keys")?;
++    decoder.end().map_err(|_| "Trailing stored-time request bytes")?;
++    let parsed: Request = serde_json::from_str(source).map_err(|_| "Invalid stored-time request")?;
++    if parsed.schema_version != 1 || parsed.values.is_empty() || parsed.values.len() > 4 {
++        return Err("Unsupported or empty stored-time request".into());
++    }
++    let mut out = BTreeMap::new();
++    for (key, value) in parsed.values {
++        let index = TIME_KEYS.iter().position(|v| *v == key).ok_or("Unknown stored-time field")?;
++        if value.is_empty() || value.len() > 20 || !value.bytes().all(|b| b.is_ascii_digit())
++            || (value.len() > 1 && value.starts_with('0')) { return Err("Expected canonical unsigned ticks".into()); }
++        let ticks = value.parse::<u64>().map_err(|_| "Stored-time integer overflow")?;
++        if index != 3 && utc(ticks).is_none() { return Err("Stored timestamp outside supported UTC range".into()); }
++        out.insert(index, ticks);
++    }
++    Ok(out)
++}
++
++/// Validate both original owners. XML's factory summary may contain only the
++/// five strings; any actual native date must agree with the XML date owner.
++fn original(doc: &Document) -> Result<([Stored; 4], Ole), String> {
++    let (raw, xml) = containers(doc)?;
++    if doc.hwpx_aux_entry(SUMMARY_CARRIER_PATH).is_some() { return Err("Unvalidated summary carrier".into()); }
++    let ole = raw.map(|b| Ole::parse(b)).transpose()?.unwrap_or_else(Ole::empty);
++    let mut values = std::array::from_fn(|i| ole_value(&ole, PIDS[i]));
++    if values.iter().any(|v| matches!(v, Stored::Invalid(_))) { return Err("Original stored time is malformed".into()); }
++    if let Some(xml) = xml {
++        let dates = date_xml(xml)?;
++        let authoritative = [dates.created, dates.modified];
++        for i in 0..2 {
++            if matches!(authoritative[i], Stored::Invalid(_)) { return Err("Original XML time is malformed".into()); }
++            if values[i] != authoritative[i]
++                && !(matches!(doc.provenance.format, crate::model::provenance::SourceFormat::Hwpx)
++                    && values[i] == Stored::Absent && ole.entries.iter().all(|(pid, _)| (2..=6).contains(pid))) {
++                return Err("Original OLE and XML time owners disagree".into());
++            }
++            values[i] = authoritative[i].clone();
++        }
++    }
++    Ok((values, ole))
++}
++
++// Replace only the inner text of a standard date or expand its exact empty
++// start tag. Unknown attributes, foreign elements, root/metadata QNames and all
++// unrelated bytes remain owned by the source. date_xml validates ambiguous
++// direct fields and nested children before this scan can prepare any edit.
++fn write_dates(bytes: &[u8], changes: &BTreeMap<usize, u64>) -> Result<Vec<u8>, String> {
++    let parsed = Xml::parse(bytes)?;
++    date_xml(bytes)?;
++    let mut reader = NsReader::from_str(&parsed.source);
++    reader.resolver_mut().set_max_namespace_bindings(256);
++    let mut depth = 0usize;
++    let mut inside = false;
++    let mut active: Option<(usize, usize, usize, String)> = None;
++    let mut edits = Vec::new();
++    let mut present = BTreeSet::new();
++    loop {
++        let start = reader.buffer_position() as usize;
++        let event = reader.read_event().map_err(|_| fail())?;
++        let end = reader.buffer_position() as usize;
++        match event {
++            ev @ (Event::Start(_) | Event::Empty(_)) => {
++                let empty = matches!(ev, Event::Empty(_));
++                let e = match ev { Event::Start(e) | Event::Empty(e) => e, _ => unreachable!() };
++                let q = e.name();
++                let (ns, local) = reader.resolver().resolve_element(q);
++                let opf = matches!(ns, ResolveResult::Bound(n) if n.as_ref() == OPF);
++                if depth == 1 && opf && local.as_ref() == "metadata" { inside = !empty; }
++                if inside && depth == 2 && opf && local.as_ref() == "meta" {
++                    let mut name = None;
++                    for a in e.attributes() {
++                        let a = a.map_err(|_| fail())?;
++                        if a.key.as_ref() == "name" { name = Some(a.normalized_value(quick_xml::XmlVersion::Implicit1_0).map_err(|_| fail())?.into_owned()); }
++                    }
++                    let index = match name.as_deref() { Some("CreatedDate") => Some(0), Some("ModifiedDate") => Some(1), _ => None };
++                    if let Some(index) = index.filter(|i| changes.contains_key(i)) {
++                        present.insert(index);
++                        let text = utc(changes[&index]).ok_or_else(fail)?;
++                        if empty {
++                            let original = &parsed.source[start..end];
++                            let close = original.rfind("/>").ok_or_else(fail)?;
++                            let qname = e.name().as_ref().to_owned();
++                            edits.push((start, end, format!("{}>{text}</{qname}>", &original[..close])));
++                        } else { active = Some((index, start, end, text)); }
++                    }
++                }
++                if !empty { depth += 1; }
++            }
++            Event::End(_) => {
++                depth = depth.checked_sub(1).ok_or_else(fail)?;
++                if depth == 2 {
++                    if let Some((_, _, inner, text)) = active.take() { edits.push((inner, start, text)); }
++                }
++                if depth == 1 { inside = false; }
++            }
++            Event::Eof => break,
++            _ => {}
++        }
++    }
++    let prefix = parsed.metadata_name.strip_suffix("metadata").ok_or_else(fail)?;
++    let mut added = String::new();
++    for (&index, &ticks) in changes {
++        if index > 1 || present.contains(&index) { continue; }
++        let name = if index == 0 { "CreatedDate" } else { "ModifiedDate" };
++        added.push_str(&format!("<{prefix}meta name=\"{name}\" content=\"text\">{}</{prefix}meta>", utc(ticks).ok_or_else(fail)?));
++    }
++    if !added.is_empty() {
++        if let Some((a, b)) = parsed.empty {
++            let tag = &parsed.source[a..b];
++            let end = tag.rfind("/>").ok_or_else(fail)?;
++            edits.push((a, b, format!("{}>{added}</{}>", &tag[..end], parsed.metadata_name)));
++        } else { edits.push((parsed.close, parsed.close, added)); }
++    }
++    let mut out = parsed.source;
++    edits.sort_by_key(|v| std::cmp::Reverse(v.0));
++    for (a, b, value) in edits { out.replace_range(a..b, &value); }
++    if out.len() > LIMIT { return Err(fail()); }
++    date_xml(out.as_bytes())?;
++    Ok(out.into_bytes())
++}
++
++struct Prepared {
++    changed: bool,
++    streams: Vec<(String, Vec<u8>)>,
++    aux: Vec<(String, Vec<u8>)>,
++    information: Value,
++    fingerprint: String,
++    changed_fields: Vec<String>,
++}
++fn information(doc: &Document, values: &[Stored; 4]) -> Value {
++    json!({"schemaVersion":1,"sourceFormat":if matches!(doc.provenance.format,crate::model::provenance::SourceFormat::Hwpx){"hwpx"}else{"hwp"},
++        "created":values[0].json(false),"modified":values[1].json(false),"lastPrinted":values[2].json(false),"editingDuration":values[3].json(true),"issues":[]})
++}
++fn prepare(doc: &Document, changes: &BTreeMap<usize, u64>) -> Result<Prepared, String> {
++    let (mut values, mut ole) = original(doc)?;
++    let mut changed = false;
++    let mut actual = BTreeMap::new();
++    for (&index, &ticks) in changes {
++        if values[index] != Stored::Value(ticks) { values[index] = Stored::Value(ticks); actual.insert(index, ticks); changed = true; }
++    }
++    if !changed { return Ok(Prepared { changed, streams: doc.extra_streams.clone(), aux: doc.hwpx_aux_entries.clone(), information: information(doc, &values), fingerprint: token(doc)?, changed_fields: vec![] }); }
++    // Align both standard owners, including a pure XML factory's absent OLE
++    // fields, before replacing any source container. Opaque properties survive.
++    for index in 0..4 { if ole_value(&ole, PIDS[index]) != values[index] { set_time(&mut ole, PIDS[index], &values[index])?; } }
++    let fields = read(doc)?;
++    let summary = ole.write(&fields)?;
++    let xml = if let Some(xml) = containers(doc)?.1 { write_dates(xml, &actual)? }
++        else { new_xml_with_ole_dates(&fields, &ole)? };
++    let check = date_xml(&xml)?;
++    if check.created != values[0] || check.modified != values[1] { return Err("Prepared standard time mapping disagrees".into()); }
++    let verified = Ole::parse(&summary)?;
++    for index in 0..4 { if ole_value(&verified, PIDS[index]) != values[index] { return Err("Prepared OLE time mapping disagrees".into()); } }
++    let mut hash = blake3::Hasher::new();
++    for bytes in [&summary, &xml] { hash.update(&(bytes.len() as u64).to_le_bytes()); hash.update(bytes); }
++    let fingerprint = hash.finalize().to_hex().to_string();
++    let changed_fields = actual.keys().map(|i| TIME_KEYS[*i].to_owned()).collect();
++    let mut streams = doc.extra_streams.clone();
++    if let Some((_, raw)) = streams.iter_mut().find(|v| summary_path(&v.0)) { *raw = summary; }
++    else { streams.push(("/\u{5}HwpSummaryInformation".into(), summary)); }
++    let mut aux = doc.hwpx_aux_entries.clone();
++    if let Some((_, raw)) = aux.iter_mut().find(|v| v.0 == "Contents/content.hpf") { *raw = xml; }
++    else { aux.push(("Contents/content.hpf".into(), xml)); }
++    Ok(Prepared { changed, streams, aux, information: information(doc, &values), fingerprint, changed_fields })
++}
++
++impl DocumentCore {
++    pub fn get_document_stored_information_edit_state_native(&self) -> String {
++        let metadata: Value = serde_json::from_str(&self.get_document_metadata_native()).unwrap_or(Value::Null);
++        let information: Value = serde_json::from_str(&self.get_document_stored_information_native()).unwrap_or(Value::Null);
++        let validated = original(&self.document);
++        let editable = metadata["editable"] == true && validated.is_ok();
++        json!({"editable":editable,"fingerprint":metadata["fingerprint"],"information":information,
++            "reason":if !editable {Some(validated.err().unwrap_or_else(||"Stored document times are read-only in this document".into()))}else{None}}).to_string()
++    }
++    fn prepare_stored_information(&self, expected: &str, source: &str) -> Result<Prepared, HwpError> {
++        let fail = |message: String| HwpError::RenderError(message);
++        if expected.len() != 64 || !expected.bytes().all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b)) {
++            return Err(fail("Invalid original stored-time fingerprint".into()));
++        }
++        let state: Value = serde_json::from_str(&self.get_document_stored_information_edit_state_native()).map_err(|_| fail("Unreadable stored-time edit state".into()))?;
++        if state["editable"] != true { return Err(fail("Stored document times are read-only".into())); }
++        if state["fingerprint"].as_str() != Some(expected) { return Err(fail("Stale original stored-time owner".into())); }
++        prepare(&self.document, &request(source).map_err(fail)?).map_err(fail)
++    }
++    pub fn preview_document_stored_information_native(&self, expected: &str, source: &str) -> Result<String, HwpError> {
++        let prepared = self.prepare_stored_information(expected, source)?;
++        Ok(json!({"changed":prepared.changed,"originalFingerprint":expected,"information":prepared.information}).to_string())
++    }
++    pub fn set_document_stored_information_native(&mut self, expected: &str, source: &str) -> Result<String, HwpError> {
++        let prepared = self.prepare_stored_information(expected, source)?;
++        if prepared.changed {
++            self.document.extra_streams = prepared.streams;
++            self.document.hwpx_aux_entries = prepared.aux;
++            self.event_log.push(crate::model::event::DocumentEvent::DocumentMetadataChanged {
++                fields: prepared.changed_fields,
++            });
++        }
++        Ok(json!({"changed":prepared.changed,"fingerprint":prepared.fingerprint,"information":prepared.information}).to_string())
++    }
++}
+--- a/src/document_core/document_metadata_stored.rs
++++ b/src/document_core/document_metadata_stored.rs
+@@ -2,6 +2,8 @@
+ //! Standard CreatedDate/ModifiedDate are the authoritative XML timestamp owner.
+ //! Opaque properties are restored only when the exact metadata block and its
+ //! standard fields agree with a unique, bounded carrier. No wall clock is used.
++#[path = "document_metadata_stored_transaction.rs"]
++mod transaction;
+ use super::*;
+ use base64::Engine;
+ use quick_xml::{name::ResolveResult, reader::NsReader};
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -1360,6 +1360,21 @@
+     /// Stored timestamps only; never inferred from the current clock.
+     #[wasm_bindgen(js_name = getDocumentStoredInformation)]
+     pub fn get_document_stored_information(&self) -> String { self.core.get_document_stored_information_native() }
++
++    /// Explicit injected 100ns values only; never reads or acknowledges a clock.
++    #[wasm_bindgen(js_name = getDocumentStoredInformationEditState)]
++    pub fn get_document_stored_information_edit_state(&self) -> String {
++        self.core.get_document_stored_information_edit_state_native()
++    }
++    /// Read-only preview. Dropping the result leaves all document data unchanged.
++    #[wasm_bindgen(js_name = previewDocumentStoredInformation)]
++    pub fn preview_document_stored_information(&self, expected: &str, request: &str) -> Result<String, JsValue> {
++        self.core.preview_document_stored_information_native(expected, request).map_err(|e|e.into())
++    }
++    #[wasm_bindgen(js_name = setDocumentStoredInformation)]
++    pub fn set_document_stored_information(&mut self, expected: &str, request: &str) -> Result<String, JsValue> {
++        self.core.set_document_stored_information_native(expected, request).map_err(|e|e.into())
++    }
+ 
+     /// Bounded canonical owned-paragraph text; independent of HwpCtrl extraction order.
+     #[wasm_bindgen(js_name = getDocumentStoryInformation)]

@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": "source/document-created-information111.ts",
+      "source": "apps/editor/src/adapters/rhwp/document-created-information111.ts",
+      "size": 6059,
+      "sha256": "d84441801474cef466124a5c1c88dbb2f880ff59c76d784327067afe3bb9f406"
+    },
+    {
+      "path": "source/document-created-information-patches.mjs",
+      "source": "apps/editor/scripts/integration/document-created-information-patches.mjs",
+      "size": 2822,
+      "sha256": "26368cdd23dea6d47bce01bca0947400d018ae0d3981f0a00b9ab329a96ff280"
+    },
+    {
+      "path": "source/build.mjs",
+      "source": "apps/editor/scripts/build.mjs",
+      "size": 12321,
+      "sha256": "e66da0eba85c99bf30a8cf2405f115eb71cfa04a6ffc641fcd4718bd3729bf70"
+    },
+    {
+      "path": "tests/document-created-information111.test.ts",
+      "source": "apps/editor/tests/document-created-information111.test.ts",
+      "size": 7333,
+      "sha256": "9cb05bef8c4e7da751580103be446fdb40902e78faa3046cd4d8d49b889a0e85"
+    },
+    {
+      "path": "tests/verify-document-created-information111.mjs",
+      "source": "apps/editor/scripts/verify-document-created-information111.mjs",
+      "size": 13211,
+      "sha256": "e26a4a588e87543ad48e1d56e7ed9be783027f20156704fc4b5eed03c51dc442"
+    },
+    {
+      "path": "results/unit-initial.log",
+      "source": "build/document-created-information111/unit-initial.log",
+      "size": 4838,
+      "sha256": "7512852c70b5ac967c44afce92f984164decd9b6cb5f6c9df772e26ae718f774"
+    },
+    {
+      "path": "results/unit-final.log",
+      "source": "build/document-created-information111/unit-final.log",
+      "size": 1328,
+      "sha256": "0a182b225caa3a46d9cda811a8b858e46d19fba23b66caf1b79fbb3a18fd5632"
+    },
+    {
+      "path": "results/headless-first.json",
+      "source": "build/document-created-information111/headless-final118-first/result.json",
+      "size": 60591,
+      "sha256": "66c1c98ac8a89f913b588ff8e52069e52ed030f95ca88a8811daae5889821180"
+    },
+    {
+      "path": "results/headless-diagnostic2.json",
+      "source": "build/document-created-information111/headless-final118-diagnostic2/result.json",
+      "size": 80414,
+      "sha256": "b0352f50cdbd0ebdcdcfed3870b4e82bf99feca716be46bb2c767dd6e788ae25"
+    },
+    {
+      "path": "results/headless-final.json",
+      "source": "build/document-created-information111/headless-final118-ready3/result.json",
+      "size": 55185,
+      "sha256": "4c83d1fe3f023f59511add74ebcdee5b5d2e43a1c65ba5674ab43ac5ec7bc77c"
+    },
+    {
+      "path": "tests/verifier-first.mjs",
+      "source": "build/document-created-information111/verifier-first.mjs",
+      "size": 12521,
+      "sha256": "fa23168d570a39e4d6aae067ab2bc2307ce37c4a2879b74fa57922ed2c1b76a9"
+    },
+    {
+      "path": "tests/verifier-diagnostic2.mjs",
+      "source": "build/document-created-information111/verifier-diagnostic2.mjs",
+      "size": 12871,
+      "sha256": "774c2d059ab078fc08eab798546b3025b133abe3379e751ccf837a20364982d1"
+    },
+    {
+      "path": "provenance/frontend-build-evidence.json",
+      "source": "apps/editor/evidence/dist-file-storage111/build-evidence.json",
+      "size": 26680,
+      "sha256": "fe4e1cf4ba211accb9e5c95d4b77371e2bcdb6d92d364e7e2e1209143f8cff39"
+    },
+    {
+      "path": "provenance/engine-build.json",
+      "source": "build/rhwp-engine/source-b443fe8f896f3e7b/pkg/jueony-engine-build.json",
+      "size": 23523,
+      "sha256": "1dca1adea09d81e2c82d7f0b3e07f872de4ab30c58da694d6f9e05d38f5edd44"
+    },
+    {
+      "path": "SUMMARY.json",
+      "size": 2111,
+      "sha256": "b77ef378be16a6050e7010d2096db5e8f330d03fcb2b70b2e3a706bf0cb4f0cb"
+    }
+  ]
+}

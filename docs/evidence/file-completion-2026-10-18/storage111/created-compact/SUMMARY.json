@@ -1,0 +1,36 @@
+{
+  "scope": "B014 explicit logical NEW document initialization only. Not automatic save/modified/session-time accounting.",
+  "engine": "b443fe8f896f3e7b",
+  "engineWasmSha256": "22679c4eed3efb564b6a1aa61cf34d1f5d8dfd842d10db08d72cde8debcf27f4",
+  "frontendCustomSourceSha256": "aafe3e975b479a0c777e2c2d268c990635628d80a920438ac905e8fda766e633",
+  "unit": {
+    "pass": 11,
+    "fail": 0,
+    "skip": 0
+  },
+  "headless": {
+    "pass": 12,
+    "fail": 0,
+    "pageErrors": 0,
+    "consoleErrors": 0,
+    "externalRequests": 0
+  },
+  "preliminaryFailures": {
+    "unit": "Top-level return in test-only stripTypeScriptTypes harness, fixed by appending return after stripping. Runtime unchanged.",
+    "firstHeadless": "8PASS/4FAIL: new-tab wait invoked recovery before pageCount>0 and emitted pptr evaluation errors; SaveAs options dialog not confirmed before disk read.",
+    "diagnostic2": "Same two readiness failures and SaveAs preparation missing options confirmation, with actual pptr stacks retained.",
+    "final": "Same frozen product source/profile; actual readiness and dialog steps completed; no errors ignored."
+  },
+  "contracts": [
+    "One injected millisecond clock converted to exact100ns FILETIME; created==modified, duration0.",
+    "lastPrinted raw0 preserved exactly; nonzero/invalid inherited print history refuses creation.",
+    "Isolated candidate metadata preview+CAS+stable IDs+digest before publication; old document connection/history preserved on failure.",
+    "Imported HWP/HWPX, dirty recovery, SaveAs and direct native fixture creation not initialized.",
+    "Actual Agent disposable create preflight initialized; actual create apply and snapshot Undo/Redo preserve creation values."
+  ],
+  "limitations": [
+    "No automatic modified-on-save/editing duration accumulator/print clock.",
+    "Picker choice injected; actual OPFS write/close/readback. No native GUI/Hancom/COM/real LLM or network.",
+    "Recovery verification reads actual recovery serialized bytes and dirty recovery open, not a new dedicated IDB recovery crash test."
+  ]
+}

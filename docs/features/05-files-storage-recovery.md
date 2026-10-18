@@ -4,7 +4,7 @@
 
 열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.
 
-**현재 합본110:** 앞 문단 재조판·구버전 표준 행·양형식 왕복 저장과 미리보기 Unicode 손실 결함 해결. 기존424+HWT/미리보기37=461개 단일 실행과 별도 구버전14개, 총475개 통과. unit1025·Native25·단표24·실제Windows11·실행묶음7 통과. 일반 XSD/XSL·복합 HWT·문서 시간 수명과 전체 한글 동등성은 잔여다. [수정·검수·남은 범위](../123-current-stack-and-preview-storage.md).
+**현재 합본111:** 구버전 재조판 저장·HWT 사본·미리보기 보존에 새 문서 작성/수정 시각 초기화 추가. 기존461+구버전14+날짜14+새문서12=501개 통과. unit1036·공식Native7+지문1·단표24·Windows11·묶음7 통과. 저장 시각 승인·편집 시간 누적, 일반 XSD/XSL·복합 HWT와 전체 한글 동등성은 잔여다. [수정·검수·남은 범위](../124-new-document-time-storage.md).
 
 ## 진행 요약
 
@@ -247,11 +247,11 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 저장된 작성/수정/인쇄일·편집 시간을 실제 OLE/OPF에서 정확한100ns 단위로 읽고 양형식 보존·UI·Agent 문맥 연결. 문서별 CAS 이력과 본문/표/글상자/머리말/각주 등 모델 통계 추가. 현재 시각 갱신·편집 시간 누적·한글 통계 동등성은 미완료. 기존5속성 수정·Undo/Redo·엄격 저장 유지.117참조.
+- 다음 작업: 합본111: 새 문서 작성·수정 시각 현재값/편집시간0 초기화, 독립후보준비 후교체·실패시기존연결보존. 실제앱12·정확100ns WASM14·공식Native7+지문1·전체501·unit1036 통과. 기존 문서/복구/SaveAs 날짜와 원시정보 보존. 저장완료 후시각승인·활성편집시간누적·인쇄/Undo수명·한글통계동등성은 잔여;124참조.
 - UI 명령: `file:document-info`
 - Agent 명령: `set_document_metadata`
-- 근거: [parity-result.json](<../evidence/features-2026-10-11/parity-result.json>) · [editor-tests.txt](<../evidence/features-2026-10-11/editor-tests.txt>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [README.md](<../evidence/file-completion-2026-10-17/engine68/metadata/README.md>) · [110-file-preservation-integration.md](<../110-file-preservation-integration.md>) · [113-file-format-preservation.md](<../113-file-format-preservation.md>) · [README.md](<../evidence/file-completion-2026-10-18/package91/README.md>) · [117-file-storage-closure.md](<../117-file-storage-closure.md>)
-- 원래 기록: `PARTIAL;FIVE_FIELD_METADATA_EDIT_AND_ROUNDTRIP_VERIFIED_FULL_INFORMATION_PARITY_PENDING_2026_10_17;SCOPED_NATIVE_WINDOWS_AND_AGENT_FILE_PORT_REVIEWED_2026_10_18;FILE_STORAGE98_CAS_HARDENED_COMBINED328_HISTORY20_UNIT1008_PASS_2026_10_18`
+- 근거: [parity-result.json](<../evidence/features-2026-10-11/parity-result.json>) · [editor-tests.txt](<../evidence/features-2026-10-11/editor-tests.txt>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [README.md](<../evidence/file-completion-2026-10-17/engine68/metadata/README.md>) · [110-file-preservation-integration.md](<../110-file-preservation-integration.md>) · [113-file-format-preservation.md](<../113-file-format-preservation.md>) · [README.md](<../evidence/file-completion-2026-10-18/package91/README.md>) · [117-file-storage-closure.md](<../117-file-storage-closure.md>) · [124-new-document-time-storage.md](<../124-new-document-time-storage.md>)
+- 원래 기록: `PARTIAL;FIVE_FIELD_METADATA_EDIT_AND_ROUNDTRIP_VERIFIED_FULL_INFORMATION_PARITY_PENDING_2026_10_17;SCOPED_NATIVE_WINDOWS_AND_AGENT_FILE_PORT_REVIEWED_2026_10_18;FILE_STORAGE98_CAS_HARDENED_COMBINED328_HISTORY20_UNIT1008_PASS_2026_10_18;EXPLICIT_NEW_CREATED_TIME111_OFFICIAL118_NATIVE8_WASM14_HEADLESS12_COMBINED501_PASS_SAVE_CLOCK_PENDING`
 
 </details>
 

@@ -1,0 +1,106 @@
+{
+  "scope": "Actual official118 vs candidate ordinary None exports. Full reports retained. All stored information, five summary fields, complete story data and published layout JSON compared exactly; artifacts independently hashed and raw-byte differences retained, not normalized or claimed identical. RESOURCE237 legitimately reissues derived frame metadata.",
+  "cases": [
+    {
+      "fixture": "blank-native",
+      "format": "hwp",
+      "differingFields": [],
+      "baselineArtifactSha256": "6e219a47e02ae8456338076d03e1182a74460a00ce309d7d2af8ccf4853f345e",
+      "candidateArtifactSha256": "6e219a47e02ae8456338076d03e1182a74460a00ce309d7d2af8ccf4853f345e",
+      "baselineBytes": 13312,
+      "candidateBytes": 13312,
+      "allRecordedSemanticsAndLayoutExact": true
+    },
+    {
+      "fixture": "blank-native",
+      "format": "hwpx",
+      "differingFields": [],
+      "baselineArtifactSha256": "c3d4896d40e7fc4cfd8c6bbdcee86a1ec2000c4ff8e42eca7897dc5407d92dd5",
+      "candidateArtifactSha256": "c3d4896d40e7fc4cfd8c6bbdcee86a1ec2000c4ff8e42eca7897dc5407d92dd5",
+      "baselineBytes": 8025,
+      "candidateBytes": 8025,
+      "allRecordedSemanticsAndLayoutExact": true
+    },
+    {
+      "fixture": "blank-xml",
+      "format": "hwp",
+      "differingFields": [],
+      "baselineArtifactSha256": "63483a683e689e2f2f1a31d0450e980101c7c9f1b6997c6f9fed8e8e96f78e5f",
+      "candidateArtifactSha256": "63483a683e689e2f2f1a31d0450e980101c7c9f1b6997c6f9fed8e8e96f78e5f",
+      "baselineBytes": 6656,
+      "candidateBytes": 6656,
+      "allRecordedSemanticsAndLayoutExact": true
+    },
+    {
+      "fixture": "blank-xml",
+      "format": "hwpx",
+      "differingFields": [],
+      "baselineArtifactSha256": "aab05e6353de2e07907fdbbe26daab66731ceb910bc7ff981fc57b3103a85021",
+      "candidateArtifactSha256": "aab05e6353de2e07907fdbbe26daab66731ceb910bc7ff981fc57b3103a85021",
+      "baselineBytes": 8059,
+      "candidateBytes": 8059,
+      "allRecordedSemanticsAndLayoutExact": true
+    },
+    {
+      "fixture": "prefix-native",
+      "format": "hwp",
+      "differingFields": [],
+      "baselineArtifactSha256": "c130c61777775304f96085db8084041da700b55fc51f51d5959b8b6470d7894c",
+      "candidateArtifactSha256": "c130c61777775304f96085db8084041da700b55fc51f51d5959b8b6470d7894c",
+      "baselineBytes": 16384,
+      "candidateBytes": 16384,
+      "allRecordedSemanticsAndLayoutExact": true
+    },
+    {
+      "fixture": "prefix-native",
+      "format": "hwpx",
+      "differingFields": [],
+      "baselineArtifactSha256": "792893e2180cde28a7cf4dc1764b7a307874224e04d3f0b403e01647860871b2",
+      "candidateArtifactSha256": "792893e2180cde28a7cf4dc1764b7a307874224e04d3f0b403e01647860871b2",
+      "baselineBytes": 10123,
+      "candidateBytes": 10123,
+      "allRecordedSemanticsAndLayoutExact": true
+    },
+    {
+      "fixture": "prefix-xml",
+      "format": "hwp",
+      "differingFields": [],
+      "baselineArtifactSha256": "966729871e9601ef2e7054b3dddc1f0a961333a1c40718c3a68002562b9cbabd",
+      "candidateArtifactSha256": "966729871e9601ef2e7054b3dddc1f0a961333a1c40718c3a68002562b9cbabd",
+      "baselineBytes": 9728,
+      "candidateBytes": 9728,
+      "allRecordedSemanticsAndLayoutExact": true
+    },
+    {
+      "fixture": "prefix-xml",
+      "format": "hwpx",
+      "differingFields": [],
+      "baselineArtifactSha256": "080510fb53ac3246ed946857e69e7573213cf1b4a80a45f0719fde0830aa50e4",
+      "candidateArtifactSha256": "080510fb53ac3246ed946857e69e7573213cf1b4a80a45f0719fde0830aa50e4",
+      "baselineBytes": 10157,
+      "candidateBytes": 10157,
+      "allRecordedSemanticsAndLayoutExact": true
+    },
+    {
+      "fixture": "mixed-native",
+      "format": "hwp",
+      "differingFields": [],
+      "baselineArtifactSha256": "da0cf082830e1e0de960e783f18fddd41c14a5a67454b9588ed8431451104df8",
+      "candidateArtifactSha256": "da0cf082830e1e0de960e783f18fddd41c14a5a67454b9588ed8431451104df8",
+      "baselineBytes": 8192,
+      "candidateBytes": 8192,
+      "allRecordedSemanticsAndLayoutExact": true
+    },
+    {
+      "fixture": "mixed-native",
+      "format": "hwpx",
+      "differingFields": [],
+      "baselineArtifactSha256": "ffa8302d5b5f942a2ea95564a5e36381cb5e3babb0b251b825c13cb1d8fe4048",
+      "candidateArtifactSha256": "ffa8302d5b5f942a2ea95564a5e36381cb5e3babb0b251b825c13cb1d8fe4048",
+      "baselineBytes": 9085,
+      "candidateBytes": 9085,
+      "allRecordedSemanticsAndLayoutExact": true
+    }
+  ],
+  "geometryOrSemanticDifferences": []
+}

@@ -46,3 +46,5 @@ Native GUI·한글 직접 비교는 사용자 요청에 따라 수행하지 않�
 ## 실행
 
 `Start-Jueony-FileReview.cmd` → `build/jueony-file-review111/Start-Jueony.cmd`, `127.0.0.1:4382`. 검수용 별도 실행본이며 기존 창·문서·프로그램 실행본은 변경하지 않았다.
+
+다음 엔진 단계: [원본을 바꾸지 않는 날짜 포함 저장 사본](125-stamped-export-storage.md). 앱의 자동 저장 완료 처리는 별도로 연결·검증한다.

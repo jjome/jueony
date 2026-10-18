@@ -1,0 +1,311 @@
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -2641,9 +2641,14 @@
+     }
+ 
+     pub fn prepare_hwp_export_snapshot(&self) -> HwpExportSnapshot {
++        self.prepare_hwp_export_snapshot_document(self.document.clone())
++    }
++
++    // Both callers supply a literal clone of this exact source; stamped export
++    // may replace only validated summary/time owners before ordinary lowering.
++    fn prepare_hwp_export_snapshot_document(&self, mut snapshot: Document) -> HwpExportSnapshot {
+         use crate::document_core::converters::hwpx_to_hwp::convert_if_hwpx_source;
+ 
+-        let mut snapshot = self.document.clone();
+         self.writeback_reflowed_table_frames(&mut snapshot);
+         self.writeback_edited_overlap_table_tail(&mut snapshot);
+         self.omit_generated_xml_body_caches(&mut snapshot);
+@@ -2791,14 +2796,18 @@
+     }
+ 
+     fn current_standard_rows_for_export(&self)->Option<crate::serializer::hwpx::standard_rows::CurrentStandardRowsProjection>{
+-        if self.document.sections.len()!=1 || self.pagination.len()!=1 || self.page_count()!=1
++        self.current_standard_rows_for_export_document(&self.document)
++    }
++
++    fn current_standard_rows_for_export_document(&self, document: &Document)->Option<crate::serializer::hwpx::standard_rows::CurrentStandardRowsProjection>{
++        if document.sections.len()!=1 || self.pagination.len()!=1 || self.page_count()!=1
+             || self.batch_mode || self.pending_pagination_job.is_some()
+             || self.deferred_pagination_descriptor.is_some() || self.dirty_sections.iter().any(|dirty|*dirty)
+             || !self.computed_row_resources_supported(){return None;}
+         let page=self.pagination.first()?.pages.first()?;
+         let styles=self.resolve_render_styles_for_section(0);
+         let profile=self.effective_layout_profile();
+-        let paragraphs=&self.document.sections.first()?.paragraphs;
++        let paragraphs=&document.sections.first()?.paragraphs;
+         let composed=self.composed.first()?;let measured=self.measured_tables.first()?;
+         // Each representation has its own exact admission proof. No profile is
+         // relabeled and the XML renderer's source gate remains unchanged.
+@@ -2807,7 +2816,7 @@
+         }else{
+             self.layout_engine.current_whole_stack_export_plan(profile,page,paragraphs,composed,&styles,measured,self.dpi)
+         }?;
+-        crate::serializer::hwpx::standard_rows::CurrentStandardRowsProjection::from_current_stack(&self.document,&plan,&styles,page.layout.body_area.width,self.dpi)
++        crate::serializer::hwpx::standard_rows::CurrentStandardRowsProjection::from_current_stack(&document,&plan,&styles,page.layout.body_area.width,self.dpi)
+     }
+ 
+     /// Document IR을 HWPX(ZIP+XML)로 직렬화 (네이티브 에러 타입)
+@@ -2853,21 +2862,31 @@
+             &crate::model::document::Document,
+         ) -> Result<T, crate::serializer::SerializeError>,
+     ) -> Result<T, HwpError> {
++        self.hwpx_document_for_export_document(&self.document, serialize)
++    }
++
++    fn hwpx_document_for_export_document<T>(
++        &self,
++        document: &Document,
++        serialize: impl FnOnce(
++            &crate::model::document::Document,
++        ) -> Result<T, crate::serializer::SerializeError>,
++    ) -> Result<T, HwpError> {
+         let hwp3_origin = matches!(self.source_format, crate::parser::FileFormat::Hwp3)
+-            || self.document.provenance.hwp3_lineage;
++            || document.provenance.hwp3_lineage;
+         let lower_markers = |doc: &mut Document| {
+             super::header_footer_ops::lower_header_footer_field_markers(doc, &self.file_name, true)
+         };
+-        let serialized = if Self::owns_versioned_xml_cache_origin(&self.document,self.source_format) {
++        let serialized = if Self::owns_versioned_xml_cache_origin(&document,self.source_format) {
+             // This is a pure XML import that visited an HWP container, not a
+             // native HWP5 document. Keep XML no-cache/paragraph-axis ownership
+             // instead of manufacturing an incompatible HWP5-origin ZIP marker.
+-            let mut doc=self.document.clone();
++            let mut doc=document.clone();
+             lower_markers(&mut doc);
+             self.authorize_completed_native_export(&mut doc);
+             serialize(&doc)
+         } else if matches!(self.source_format, crate::parser::FileFormat::Hwp) {
+-            let mut doc = self.document.clone();
++            let mut doc = document.clone();
+             if let Some((_, value)) = doc
+                 .hwpx_aux_entries
+                 .iter_mut()
+@@ -2889,13 +2908,12 @@
+             self.authorize_completed_native_export(&mut doc);
+             serialize(&doc)
+         } else if hwp3_origin
+-            || self
+-                .document
++            || document
+                 .hwpx_aux_entry(crate::model::document::HWP5_ORIGIN_HWPX_MARKER_PATH)
+                 .is_some()
+-            || super::header_footer_ops::has_header_footer_field_markers(&self.document)
++            || super::header_footer_ops::has_header_footer_field_markers(&document)
+         {
+-            let mut doc = self.document.clone();
++            let mut doc = document.clone();
+             if let Some((_, value)) = doc
+                 .hwpx_aux_entries
+                 .iter_mut()
+@@ -2910,9 +2928,34 @@
+             self.authorize_completed_native_export(&mut doc);
+             serialize(&doc)
+         } else {
+-            serialize(&self.document)
++            serialize(&document)
+         };
+         serialized.map_err(|e| HwpError::RenderError(e.to_string()))
++    }
++
++    pub(crate) fn export_with_stored_time_intent(
++        &self, format: &str, password: Option<&[u8]>,
++        intent: &crate::document_core::document_metadata::StoredTimeExportIntent<'_>,
++    ) -> Result<crate::serializer::SerializedDocument, HwpError> {
++        if !matches!(format, "hwp" | "hwpx") {
++            return Err(HwpError::RenderError("Unsupported stamped-export format".into()));
++        }
++        let document = intent.stamped_source_document(&self.document)
++            .map_err(HwpError::RenderError)?;
++        if format == "hwp" {
++            let snapshot = self.prepare_hwp_export_snapshot_document(document);
++            let result = if let Some(password) = password {
++                crate::serializer::serialize_hwp_with_password_and_report(snapshot.document(), password)
++            } else { crate::serializer::serialize_document_with_report(snapshot.document()) };
++            result.map_err(|e| HwpError::RenderError(e.to_string()))
++        } else {
++            let projection = self.current_standard_rows_for_export_document(&document);
++            self.hwpx_document_for_export_document(&document, |lowered| {
++                if let Some(password) = password {
++                    crate::serializer::hwpx::serialize_hwpx_with_current_rows_and_password(lowered, projection.as_ref(), password)
++                } else { crate::serializer::hwpx::serialize_hwpx_with_current_rows(lowered, projection.as_ref()) }
++            })
++        }
+     }
+ 
+     /// HWP3 계보 마커를 export 사본에 심는다(중복 방지).
+--- a/src/document_core/document_metadata.rs
++++ b/src/document_core/document_metadata.rs
+@@ -9,6 +9,7 @@
+ 
+ #[path = "document_metadata_stored.rs"]
+ mod stored;
++pub(crate) use stored::StoredTimeExportIntent;
+ pub(crate) use stored::{empty_hwpx_summary, stored_hwpx_source, encode_summary_carrier, restore_summary_carrier, validate_hwp_storage, SUMMARY_CARRIER_PATH, SUMMARY_CARRIER_LIMIT};
+ 
+ const LIMIT: usize = 1024 * 1024;
+--- /dev/null
++++ b/src/document_core/document_metadata_stamped_export.rs
+@@ -0,0 +1,72 @@
++//! Never-swap stamped exports. An intent borrows the exact immutable source;
++//! only a literal source clone receives the validated metadata replacements.
++//! Ordinary physical preparation and serializer guards retain their ownership.
++use super::*;
++
++pub(crate) struct StoredTimeExportIntent<'a> {
++    source: &'a Document,
++    original_fingerprint: String,
++    prepared: Prepared,
++    requested_values: Value,
++    before: Value,
++}
++
++impl StoredTimeExportIntent<'_> {
++    pub(crate) fn stamped_source_document(&self, source: &Document) -> Result<Document, String> {
++        if !std::ptr::eq(source, self.source) || token(source)? != self.original_fingerprint {
++            return Err("Stored-time export intent belongs to another source document".into());
++        }
++        let mut document = source.clone();
++        document.extra_streams = self.prepared.streams.clone();
++        document.hwpx_aux_entries = self.prepared.aux.clone();
++        // No body, styles, provenance, geometry, cached rows or lease is edited.
++        if token(&document)? != self.prepared.fingerprint {
++            return Err("Stamped metadata owner differs from the validated preview".into());
++        }
++        Ok(document)
++    }
++    fn receipt(&self) -> String {
++        json!({"schemaVersion":1,"originalFingerprint":self.original_fingerprint,
++            "stampedFingerprint":self.prepared.fingerprint,"changed":self.prepared.changed,
++            "requestedValues":self.requested_values,"before":self.before,
++            "after":self.prepared.information}).to_string()
++    }
++}
++
++impl DocumentCore {
++    /// Explicit metadata intent only: no clock, live mutation, history event,
++    /// successful-save acknowledgement, or new file permission is produced.
++    pub fn export_stamped_stored_information_native(
++        &self, format: &str, expected: &str, source: &str, password: Option<&[u8]>,
++    ) -> Result<(crate::serializer::SerializedDocument, String), HwpError> {
++        let prepared = self.prepare_stored_information(expected, source)?;
++        let requested = request(source).map_err(HwpError::RenderError)?;
++        let requested_values = Value::Object(requested.into_iter().map(|(index, ticks)|
++            (TIME_KEYS[index].into(), Value::String(ticks.to_string()))).collect());
++        let before = serde_json::from_str(&self.get_document_stored_information_native())
++            .map_err(|_| HwpError::RenderError("Unreadable original stored information".into()))?;
++        let intent = StoredTimeExportIntent { source: &self.document,
++            original_fingerprint: expected.into(), prepared, requested_values, before };
++        let output = self.export_with_stored_time_intent(format, password, &intent)?;
++        Ok((output, intent.receipt()))
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    #[test]
++    fn stored_time_export_intent_rejects_distinct_byte_identical_document() {
++        let source = Document::default();
++        let changes = request(r#"{"schemaVersion":1,"values":{"modified":"133536420007654321"}}"#).unwrap();
++        let prepared = prepare(&source, &changes).unwrap();
++        let intent = StoredTimeExportIntent { source: &source,
++            original_fingerprint: token(&source).unwrap(), prepared,
++            requested_values: json!({"modified":"133536420007654321"}),
++            before: json!({}) };
++        let foreign = source.clone();
++        assert_eq!(token(&foreign).unwrap(), token(&source).unwrap());
++        assert!(intent.stamped_source_document(&foreign).is_err());
++        assert!(intent.stamped_source_document(&source).is_ok());
++    }
++}
+--- a/src/document_core/document_metadata_stored.rs
++++ b/src/document_core/document_metadata_stored.rs
+@@ -4,6 +4,7 @@
+ //! standard fields agree with a unique, bounded carrier. No wall clock is used.
+ #[path = "document_metadata_stored_transaction.rs"]
+ mod transaction;
++pub(crate) use transaction::StoredTimeExportIntent;
+ use super::*;
+ use base64::Engine;
+ use quick_xml::{name::ResolveResult, reader::NsReader};
+--- a/src/document_core/document_metadata_stored_transaction.rs
++++ b/src/document_core/document_metadata_stored_transaction.rs
+@@ -1,6 +1,9 @@
+ //! Explicit stored-time transactions. The caller supplies exact integer ticks;
+ //! this layer never reads a clock or acknowledges a disk save/print operation.
+ //! Preview is immutable and mutation is an atomic metadata-owner CAS.
++#[path = "document_metadata_stamped_export.rs"]
++mod stamped_export;
++pub(crate) use stamped_export::StoredTimeExportIntent;
+ use super::*;
+ 
+ const TIME_KEYS: [&str; 4] = ["created", "modified", "lastPrinted", "editingDuration"];
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[225, 60, 234, 180, 55, 48, 143, 215, 12, 73, 219, 233, 103, 144, 33, 101, 211, 99, 205, 137, 193, 225, 141, 161, 217, 112, 5, 71, 108, 41, 70, 180];
++pub(crate) const RESOURCE:[u8;32]=[85, 217, 107, 144, 18, 202, 254, 148, 128, 18, 185, 58, 53, 223, 5, 55, 4, 199, 96, 123, 101, 189, 156, 156, 165, 226, 174, 247, 153, 216, 133, 20];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -242,6 +242,7 @@
+             ("src/serializer/hwpx/context.rs",include_bytes!("../serializer/hwpx/context.rs").as_slice()),
+             ("src/serializer/hwpx/section.rs",include_bytes!("../serializer/hwpx/section.rs").as_slice()),
+             ("src/serializer/control.rs",include_bytes!("../serializer/control.rs").as_slice()),
++            ("src/document_core/document_metadata_stamped_export.rs",include_bytes!("../document_core/document_metadata_stamped_export.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -422,6 +422,25 @@
+     }
+ }
+ 
++/// Stamped bytes and exact typed time intent from the same immutable export.
++/// It is not a disk-save acknowledgement and never changes the source document.
++#[wasm_bindgen]
++pub struct StampedDocumentExport {
++    export: DocumentExport,
++    metadata_intent_json: String,
++}
++#[wasm_bindgen]
++impl StampedDocumentExport {
++    #[wasm_bindgen(js_name = contentLoss)]
++    pub fn content_loss(&self) -> String { self.export.content_loss() }
++    #[wasm_bindgen(js_name = metadataIntent)]
++    pub fn metadata_intent(&self) -> String { self.metadata_intent_json.clone() }
++    #[wasm_bindgen(js_name = hasBytes)]
++    pub fn has_bytes(&self) -> bool { self.export.has_bytes() }
++    #[wasm_bindgen(js_name = takeBytes)]
++    pub fn take_bytes(&mut self) -> Result<Vec<u8>, JsValue> { self.export.take_bytes() }
++}
++
+ impl std::ops::Deref for HwpDocument {
+     type Target = DocumentCore;
+     fn deref(&self) -> &DocumentCore {
+@@ -1374,6 +1393,19 @@
+     #[wasm_bindgen(js_name = setDocumentStoredInformation)]
+     pub fn set_document_stored_information(&mut self, expected: &str, request: &str) -> Result<String, JsValue> {
+         self.core.set_document_stored_information_native(expected, request).map_err(|e|e.into())
++    }
++
++    #[wasm_bindgen(js_name = exportStampedDocumentWithReport)]
++    pub fn export_stamped_document_with_report(&self, format: &str, expected: &str, request: &str) -> Result<StampedDocumentExport, JsValue> {
++        self.core.export_stamped_stored_information_native(format, expected, request, None)
++            .map(|(output, intent)| StampedDocumentExport { export: output.into(), metadata_intent_json: intent })
++            .map_err(|e|e.into())
++    }
++    #[wasm_bindgen(js_name = exportStampedDocumentWithPasswordAndReport)]
++    pub fn export_stamped_document_with_password_and_report(&self, format: &str, expected: &str, request: &str, password: &[u8]) -> Result<StampedDocumentExport, JsValue> {
++        self.core.export_stamped_stored_information_native(format, expected, request, Some(password))
++            .map(|(output, intent)| StampedDocumentExport { export: output.into(), metadata_intent_json: intent })
++            .map_err(|e|e.into())
+     }
+ 
+     /// Bounded canonical owned-paragraph text; independent of HwpCtrl extraction order.

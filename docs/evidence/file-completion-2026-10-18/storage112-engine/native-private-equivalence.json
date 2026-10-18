@@ -1,0 +1,40 @@
+{
+  "scope": "byte-exact private Native engine equivalence to official119, not a new runtime run",
+  "files": [
+    {
+      "path": "src/document_core/document_metadata_stamped_export.rs",
+      "sha256": "418833f6ed6b78cb5f3982d1b8c7c9fdf8550d91bd436043dcd54b2ae659e9d5",
+      "privateEqualsOfficial119": true
+    },
+    {
+      "path": "src/document_core/document_metadata_stored_transaction.rs",
+      "sha256": "04ecfef25027e572bd6520c9a5e07207816290d04033b26e6ac87dcd0c768795",
+      "privateEqualsOfficial119": true
+    },
+    {
+      "path": "src/document_core/document_metadata_stored.rs",
+      "sha256": "d8e61325d707b46a6eceb9a19c26347c21706d83c4056c7309e90294f3600f5f",
+      "privateEqualsOfficial119": true
+    },
+    {
+      "path": "src/document_core/document_metadata.rs",
+      "sha256": "06a80c6e061953f7b3a25329bea5d80b002a58cd833a20ac297d9d879e13057f",
+      "privateEqualsOfficial119": true
+    },
+    {
+      "path": "src/document_core/commands/document.rs",
+      "sha256": "6c2e6962b26474b11b1d66ad3a260c2fb37856161e46152adb9742a909efdd2b",
+      "privateEqualsOfficial119": true
+    },
+    {
+      "path": "src/wasm_api.rs",
+      "sha256": "3cd052e6301944487216675804ff0ca867dae683eb536ecf3e47ae9564116ea3",
+      "privateEqualsOfficial119": true
+    },
+    {
+      "path": "src/model/native_computed_resource.rs",
+      "sha256": "ab086f6e75f250fa41589e84c74dc71a2598f368785623cedce2785bfc024d10",
+      "privateEqualsOfficial119": true
+    }
+  ]
+}

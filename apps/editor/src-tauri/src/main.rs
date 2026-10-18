@@ -105,6 +105,32 @@ async fn pick_save_document(
     .map_err(|e| e.to_string())?
 }
 #[tauri::command]
+async fn pick_save_hwt_copy(
+    app: tauri::AppHandle,
+    window: WebviewWindow,
+    suggested_name: String,
+) -> Result<Option<HandleInfo>, String> {
+    let owner = context(&app, &window)?.label;
+    tauri::async_runtime::spawn_blocking(move || {
+        let name = PathBuf::from(&suggested_name).file_name().unwrap_or_default().to_string_lossy().into_owned();
+        if !name.to_ascii_lowercase().ends_with(".hwt") { return Err("HWT 사본 이름이 필요합니다.".into()); }
+        app.dialog().file().set_parent(&window).set_file_name(name)
+            .add_filter("HWT 일반 필드 사본", &["hwt"]).blocking_save_file()
+            .map(|selected| {
+                let path = selected.into_path().map_err(|e| e.to_string())?;
+                let file = storage::DocumentFile::open_hwt_copy(path).map_err(|e| e.to_string())?;
+                app.state::<Documents>().0.lock().map_err(|e| e.to_string())?
+                    .insert(&owner, file).map_err(|e| e.to_string())
+            }).transpose()
+    }).await.map_err(|e| e.to_string())?
+}
+#[tauri::command]
+fn read_hwt_copy(app: tauri::AppHandle, window: WebviewWindow, documents: State<Documents>, token: String) -> Result<Vec<u8>, String> {
+    let owner=context(&app,&window)?.label;
+    documents.0.lock().map_err(|e| e.to_string())?.file(&owner,&token)
+        .and_then(|file| file.read_hwt_copy()).map_err(|e| e.to_string())
+}
+#[tauri::command]
 fn read_document(
     app: tauri::AppHandle,
     window: WebviewWindow,
@@ -469,6 +495,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             pick_document,
             pick_save_document,
+            pick_save_hwt_copy,
+            read_hwt_copy,
             read_document,
             read_bound_document,
             write_document,

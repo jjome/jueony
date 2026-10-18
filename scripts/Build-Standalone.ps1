@@ -26,6 +26,11 @@ foreach ($guide in @('13-llm-provider-adapters.md', '14-hyperclova-x-api-guide.m
     Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination (Join-Path $output $guide) -Force
 }
 $llmEvidence = Join-Path $output 'evidence'
+foreach ($guide in @('122-hwt-copy-storage.md','123-current-stack-and-preview-storage.md')) {
+    if (Test-Path -LiteralPath (Join-Path $projectRoot ('docs/' + $guide))) {
+        Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination $output -Force
+    }
+}
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/42-document-insertion-result.md') -Destination $output -Force
 Copy-Item -LiteralPath (Join-Path $projectRoot 'docs/43-style-management-result.md') -Destination $output -Force
 if (Test-Path -LiteralPath (Join-Path $projectRoot 'docs/44-editor-stages-result.md')) {

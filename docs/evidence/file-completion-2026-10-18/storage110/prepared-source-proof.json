@@ -1,0 +1,62 @@
+{
+  "baseSource": "2a1d408f1d0d7ea5",
+  "sourceId": "b20b9eb0ed097b92",
+  "changedFiles": [
+    {
+      "path": "src/document_core/commands/document.rs",
+      "canonicalSha256": "b1ff108d16c8c8f31ad686e625e7eb5f5800556660d9505eeacc339c70d3fd7d"
+    },
+    {
+      "path": "src/hwt_leaf115.rs",
+      "canonicalSha256": "d19b4c7bd89e1b5970a5f3bd986f1b67e79d1583edf6914f0a15530095a32c51"
+    },
+    {
+      "path": "src/model/native_computed_resource.rs",
+      "canonicalSha256": "9fff5a27cb26cc070f35eb126a76f14b81cdd9e4744e4775dd7d25c5aa3ad9d7"
+    },
+    {
+      "path": "src/parser/cfb_reader.rs",
+      "canonicalSha256": "6923e2611a37e0efa394ccaf9ade50fe41f8e7b88c977be8c9a3e4ad44044930"
+    },
+    {
+      "path": "src/parser/mod.rs",
+      "canonicalSha256": "c537043831569f7fc01621c36d85158282eedb45f0da2cf2e7beb84486b846c5"
+    },
+    {
+      "path": "src/renderer/generated_column_stack.rs",
+      "canonicalSha256": "797db6321b92674d247d2cb79d74a03fa3b3bff74e1c29bf5c722bb18488f88f"
+    },
+    {
+      "path": "src/renderer/layout.rs",
+      "canonicalSha256": "91feb91ce000495d5997c9be15d576753d6c5629a43f0f530bd14f5b87225fff"
+    },
+    {
+      "path": "src/renderer/layout/current_body_stack.rs",
+      "canonicalSha256": "0ce30016044f9bbfcab3292f72c5980819ba2f79b50b9741bced478b4c6e09e4"
+    },
+    {
+      "path": "src/serializer/cfb_writer.rs",
+      "canonicalSha256": "8b52cdd0c07dfd2c64f4f726a28ee5f2f6987c519bd5aa4bc72986211e5ed435"
+    },
+    {
+      "path": "src/serializer/hwpx/context.rs",
+      "canonicalSha256": "53ea1bfcbb559727747dfb9a0eaa3f2cfbd7adeffb774266c5ba234795d2918e"
+    },
+    {
+      "path": "src/serializer/hwpx/mod.rs",
+      "canonicalSha256": "1a7bb86f34a5133aa2add5ce74a015fe2086b6fa3ca602381ccf2e25f4ad7ed3"
+    },
+    {
+      "path": "src/serializer/hwpx/section.rs",
+      "canonicalSha256": "96f93042c5c971556494655dcf782ad2b2d1029a34e60f71448deb734f0bf716"
+    },
+    {
+      "path": "src/serializer/hwpx/standard_rows.rs",
+      "canonicalSha256": "68d6f12c69f987185282802deae7459b349c499ba953c001da4fdeed8f1ff4c8"
+    }
+  ],
+  "unchangedOtherRust": 1065,
+  "resourceSha256": "e13ceab437308fd70c49dbe967902165d363cd89c1e18da1d97005476c2946b4",
+  "resourceFiles": 236,
+  "unexpectedChanges": []
+}

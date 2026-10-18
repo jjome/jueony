@@ -1,0 +1,61 @@
+   Compiling rhwp-password-crypto v0.1.0 (/mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/source-v4/crates/rhwp-password-crypto)
+   Compiling rhwp-contracts v0.1.0 (/mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/source-v4/crates/rhwp-contracts)
+   Compiling svg2pdf v0.13.0 (/mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/source-v4/vendor/svg2pdf)
+   Compiling rhwp-ooxml-chart v0.1.0 (/mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/source-v4/crates/rhwp-ooxml-chart)
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/source-v4)
+error[E0425]: cannot find function `preflight` in this scope
+   --> /mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/source-v4/src/hwt_leaf115.rs:160:82
+    |
+160 | ...al=preflight(so...
+    |       ^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `preflight` in this scope
+   --> /mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/source-v4/src/hwt_leaf115.rs:161:5
+    |
+161 |  if preflight(so...
+    |     ^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `preflight` in this scope
+   --> /mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/source-v4/src/hwt_leaf115.rs:173:206
+    |
+173 | ...)?;preflight(by...
+    |       ^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `preflight` in this scope
+   --> /mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/source-v4/src/hwt_leaf115.rs:184:53
+    |
+184 | ... b=preflight(&s...
+    |       ^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `preflight` in this scope
+   --> /mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/source-v4/src/hwt_leaf115.rs:189:9
+    |
+189 | ... b=preflight(&s...
+    |       ^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `preflight` in this scope
+   --> /mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/source-v4/src/hwt_leaf115.rs:199:16
+    |
+199 | ...ed=preflight(&s...
+    |       ^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `preflight` in this scope
+   --> /mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/source-v4/src/hwt_leaf115.rs:203:6
+    |
+203 |   if preflight(&b...
+    |      ^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `preflight` in this scope
+   --> /mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/source-v4/src/hwt_leaf115.rs:226:65
+    |
+226 | ...ds=preflight(by...
+    |       ^^^^^^^^^ not found in this scope
+
+error[E0425]: cannot find function `preflight` in this scope
+   --> /mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/source-v4/src/hwt_leaf115.rs:233:52
+    |
+233 | ...ld=preflight(by...
+    |       ^^^^^^^^^ not found in this scope
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `rhwp` (lib) due to 9 previous errors

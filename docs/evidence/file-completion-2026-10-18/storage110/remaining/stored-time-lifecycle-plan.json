@@ -1,0 +1,126 @@
+{
+  "review": "B014 finite metadata lifecycle follow-up plan",
+  "scope": "Read-only code and current feature05 review; no implementation, clock access, user data access or GUI comparison performed.",
+  "reviewedAtUtc": "2026-10-18T12:41:09.149347+00:00",
+  "sourceId": "b20b9eb0ed097b92",
+  "sources": [
+    {
+      "path": "build/rhwp-engine/source-b20b9eb0ed097b92/src/document_core/document_metadata_stored.rs",
+      "sha256": "70c61c56c226d76cb2576701102be78c659d0f1d9b8325487ced935a4aa35599"
+    },
+    {
+      "path": "build/rhwp-engine/source-b20b9eb0ed097b92/src/document_core/document_metadata.rs",
+      "sha256": "415d04585fd4bac76f2042aa11cd0df60357c72d7eb9d9461b58aab6be3cdcef"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-info.ts",
+      "sha256": "3c2aab714f8c45507c1ba28385c81fb6ba869989bc17e7dd19aed08f56318cae"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-stored-information.ts",
+      "sha256": "5c510c0b85bcd3cb5f37ff37d84ac17d965e65f9ce04055a72ee03b4d37e8157"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/agent-document-information.ts",
+      "sha256": "d0b9c455728571a9016c5d80b6e9090f19b87bd3e95dbf100979e09c8ff4762f"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "sha256": "752e8fa32843b271a60524a1fb0e638a8e003be787640593f89622a2184469bc"
+    },
+    {
+      "path": "apps/editor/src/adapters/files/bound-save.ts",
+      "sha256": "4634dce9576ac9d27885a2958cebca6d39119388a1ba4d34a862082b4dab70d1"
+    },
+    {
+      "path": "apps/editor/src/adapters/files/save-runtime.ts",
+      "sha256": "742f15895460944f4de5d1e655fcbd6bb935353440be9c0bcf01e9e787ddfb19"
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/application/write-snapshot.ts",
+      "sha256": "7e6613af02ec32a72b1bc400f4e82975baf3373c50b3fb5b36e2c42336822c2b"
+    },
+    {
+      "path": "docs/features/05-files-storage-recovery.md",
+      "sha256": "bbb0b94f3f65f637509df968eec6f614d02953ca03343cc334bbe6ffdc70f044"
+    }
+  ],
+  "alreadyImplemented": [
+    "Four stored date/duration query values with absent/value/invalid distinction and exact 100ns precision.",
+    "HWP PID12/PID13 to standard HWPX CreatedDate/ModifiedDate, bounded exact raw OLE carrier for last print/duration and unknown properties.",
+    "Read-only date/duration information UI and Agent statistics context; strict stored-date preservation comparison.",
+    "Five editable summary strings with fingerprint CAS, undo/redo; document-scoped CAS history and full model-story counts."
+  ],
+  "actualRemaining": [
+    "No automatic creation/modification timestamp lifecycle; stored-information module explicitly uses no wall clock and UI explicitly promises no automatic updates.",
+    "No current-session active editing duration accumulator or successful-save acknowledgement of consumed time.",
+    "No print-success timestamp transaction. Existing lastPrinted is stored original information only.",
+    "Hancom-equivalent statistics and editing-time policy are unverified and remain separate from implemented exact model-story counting."
+  ],
+  "smallestImplementationSlices": [
+    {
+      "order": 1,
+      "name": "Typed metadata transaction in isolated sibling Rust module",
+      "locations": [
+        "build/rhwp-engine/source-b20b9eb0ed097b92/src/document_core/document_metadata_stored.rs:58-68",
+        "build/rhwp-engine/source-b20b9eb0ed097b92/src/document_core/document_metadata.rs:630-666",
+        "build/rhwp-engine/source-b20b9eb0ed097b92/src/document_core/document_metadata.rs:684-733"
+      ],
+      "change": "Add checked prepare/apply system metadata transaction with expected original owner token, explicit created/modified/lastPrinted/duration fields as u64 decimal strings, and no internal clock. Reuse Ole parse/write and raw-span XML namespace writer. Update only standard CreatedDate/ModifiedDate plus OLE PID12/13, PID11 only actual print success, PID10 only acknowledged accumulated duration; preserve all other bytes/unknown properties. Invalid/duplicate/malformed original values remain refusal, never absent/zero. Start with pure native setter/clone transaction tests, not autosave wiring."
+    },
+    {
+      "order": 2,
+      "name": "Session clock and exact operation owner",
+      "locations": [
+        "apps/editor/src/modules/document-files/application/new document-edit-time module (proposed)",
+        "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+        "apps/editor/src/shell.ts"
+      ],
+      "change": "Inject wall UTC ticks only for explicit creation/save/print transactions, and a monotonic clock for bounded active-edit intervals. Scope session accounting by document instance and window; detect clock rollback, disallow negative elapsed, exclude hidden/background/sleep intervals by an explicit documented policy. Inherit exact original duration without rounding. Do not infer Hancom-equivalent policy before deferred comparison."
+    },
+    {
+      "order": 3,
+      "name": "Strict save-snapshot and acknowledgement integration",
+      "locations": [
+        "apps/editor/src/adapters/files/bound-save.ts:67-104",
+        "apps/editor/src/adapters/files/save-runtime.ts:18-30",
+        "apps/editor/src/modules/document-files/application/write-snapshot.ts:12-47",
+        "apps/editor/src/adapters/rhwp/preservation.ts:78,240",
+        "current patched payload/export producer (locate exact build injection before editing)"
+      ],
+      "change": "Prepare timestamped export clone and compare emitted bytes against that exact expected clone using unchanged preservation guard. Keep live original owner unchanged through picker/cancel/CAS failure and partial write/readback failure. After acknowledged disk readback and exact document instance/revision, commit only the corresponding metadata receipt and consumed duration once; preserve elapsed time accrued after snapshot. Ordinary exports/preflight/recovery/downloads without disk acknowledgement must not consume elapsed time or advance saved clock. Do not omit stored-date evidence or relax equality to allow timestamp changes. Agent bound-save and UI save must share the transaction."
+    },
+    {
+      "order": 4,
+      "name": "History and recovery separation",
+      "locations": [
+        "existing snapshot history and recovery boundaries",
+        "document-stored-information UI and Agent context"
+      ],
+      "change": "Define automatic saved audit values separately from user-edit undo snapshots so undo/redo does not roll back an acknowledged lastSaved/elapsed receipt or double-count time. Recovery must restore unacknowledged elapsed information only under the same document owner and cannot claim a successful disk save. Expose original stored time and pending session time distinctly until acknowledged."
+    }
+  ],
+  "boundedAcceptanceCases": [
+    "New explicit document establishes creation once; imported document does not manufacture missing creation.",
+    "Read-only open and query/export alone change no stored time.",
+    "Editing then real successful HWP save updates modified and duration exactly.",
+    "Same successful HWPX save updates canonical metadata owner and reverse HWP PID12/13 exactly.",
+    "Last print unchanged without successful print receipt.",
+    "Repeated save without new elapsed interval does not double-count.",
+    "Picker cancellation preserves live metadata and pending elapsed.",
+    "CAS refusal preserves metadata and pending elapsed.",
+    "Write or close failure does not acknowledge time.",
+    "Post-close readback mismatch does not acknowledge time.",
+    "Acknowledgement with changed instance/revision rejected.",
+    "Two simultaneous save attempts cannot consume same interval twice.",
+    "Two documents/windows do not share elapsed ownership.",
+    "Clock rollback does not subtract duration.",
+    "Hidden/suspend intervals obey stated policy.",
+    "Duration overflow rejected, original 100ns fractional precision retained.",
+    "Malformed OLE/duplicate XML/unknown attributes remain unchanged or rejected.",
+    "Unknown OLE properties/carrier binding preserved with exact standard values.",
+    "Undo/redo after acknowledged save does not roll back audit receipt.",
+    "Recovery restores pending interval without falsely marking disk saved."
+  ],
+  "completionWarning": "This plan does not mark B014 complete. Stored-original read-only preservation is already implemented; lifecycle mutation and Hancom-equivalent policy are actual remaining scope. Preserve their independent status."
+}

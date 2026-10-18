@@ -1,0 +1,13 @@
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+TimeoutError: Waiting failed: 90000ms exceeded
+    at new WaitTask (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/common/WaitTask.js:46:34)
+    at IsolatedWorld.waitForFunction (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Realm.js:49:26)
+    at CdpFrame.waitForFunction (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Frame.js:585:43)
+    at CdpFrame.<anonymous> (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/util/decorators.js:101:27)
+    at CdpPage.waitForFunction (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/node_modules/puppeteer-core/lib/puppeteer/api/Page.js:1537:37)
+    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hwt-leaf-native-ui115.mjs:34:37
+
+Node.js v22.22.2

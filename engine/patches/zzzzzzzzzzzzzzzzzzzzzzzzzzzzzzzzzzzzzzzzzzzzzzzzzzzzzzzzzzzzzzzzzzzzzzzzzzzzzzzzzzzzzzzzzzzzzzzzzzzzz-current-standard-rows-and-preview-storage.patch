@@ -1,0 +1,858 @@
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -2790,23 +2790,50 @@
+         })
+     }
+ 
++    fn current_standard_rows_for_export(&self)->Option<crate::serializer::hwpx::standard_rows::CurrentStandardRowsProjection>{
++        if self.document.sections.len()!=1 || self.pagination.len()!=1 || self.page_count()!=1
++            || self.batch_mode || self.pending_pagination_job.is_some()
++            || self.deferred_pagination_descriptor.is_some() || self.dirty_sections.iter().any(|dirty|*dirty)
++            || !self.computed_row_resources_supported(){return None;}
++        let page=self.pagination.first()?.pages.first()?;
++        let styles=self.resolve_render_styles_for_section(0);
++        let profile=self.effective_layout_profile();
++        let paragraphs=&self.document.sections.first()?.paragraphs;
++        let composed=self.composed.first()?;let measured=self.measured_tables.first()?;
++        // Each representation has its own exact admission proof. No profile is
++        // relabeled and the XML renderer's source gate remains unchanged.
++        let plan=if profile.native_hwp5_layout(){
++            self.layout_engine.current_native_whole_stack_export_plan(profile,page,paragraphs,composed,&styles,measured,self.dpi)
++        }else{
++            self.layout_engine.current_whole_stack_export_plan(profile,page,paragraphs,composed,&styles,measured,self.dpi)
++        }?;
++        crate::serializer::hwpx::standard_rows::CurrentStandardRowsProjection::from_current_stack(&self.document,&plan,&styles,page.layout.body_area.width,self.dpi)
++    }
++
+     /// Document IR을 HWPX(ZIP+XML)로 직렬화 (네이티브 에러 타입)
+     pub fn export_hwpx_native(&self) -> Result<Vec<u8>, HwpError> {
+-        self.hwpx_document_for_export(|document| crate::serializer::serialize_hwpx(document))
++        let projection=self.current_standard_rows_for_export();
++        let result=self.hwpx_document_for_export(|document| crate::serializer::hwpx::serialize_hwpx_with_current_rows(document,projection.as_ref()))?;
++        result.content_loss().write_warnings_to_stderr();
++        Ok(result.into_bytes())
+     }
+ 
+     /// HWPX 저장 바이트와 바로 그 산출물의 내용 손실을 함께 반환한다 (#4430).
+     pub fn export_hwpx_native_with_report(
+         &self,
+     ) -> Result<crate::serializer::SerializedDocument, HwpError> {
+-        self.hwpx_document_for_export(crate::serializer::serialize_hwpx_with_report)
++        let projection=self.current_standard_rows_for_export();
++        self.hwpx_document_for_export(|document|crate::serializer::hwpx::serialize_hwpx_with_current_rows(document,projection.as_ref()))
+     }
+ 
+     /// Document IR을 ODF AES-256-CBC 비밀번호 보호 HWPX로 직렬화한다.
+     pub fn export_hwpx_native_with_password(&self, password: &[u8]) -> Result<Vec<u8>, HwpError> {
+-        self.hwpx_document_for_export(|document| {
+-            crate::serializer::serialize_hwpx_with_password(document, password)
+-        })
++        let projection=self.current_standard_rows_for_export();
++        let result=self.hwpx_document_for_export(|document| {
++            crate::serializer::hwpx::serialize_hwpx_with_current_rows_and_password(document,projection.as_ref(),password)
++        })?;
++        result.content_loss().write_warnings_to_stderr();
++        Ok(result.into_bytes())
+     }
+ 
+     /// 비밀번호 HWPX 저장 바이트 + 내용 손실 보고 (#4430).
+@@ -2814,8 +2841,9 @@
+         &self,
+         password: &[u8],
+     ) -> Result<crate::serializer::SerializedDocument, HwpError> {
++        let projection=self.current_standard_rows_for_export();
+         self.hwpx_document_for_export(|document| {
+-            crate::serializer::serialize_hwpx_with_password_and_report(document, password)
++            crate::serializer::hwpx::serialize_hwpx_with_current_rows_and_password(document,projection.as_ref(),password)
+         })
+     }
+ 
+--- a/src/hwt_leaf115.rs
++++ b/src/hwt_leaf115.rs
+@@ -128,24 +128,32 @@
+  close(&header,counts,seen)?;Ok(out)
+ }
+ 
++fn body_preview(doc:&crate::model::document::Document)->Vec<u8>{
++ let mut text=String::new();
++ 'sections:for section in &doc.sections{for paragraph in &section.paragraphs{
++  let line=paragraph.text.trim_end_matches('\0');if line.is_empty(){continue;}text.push_str(line);text.push_str("\r\n");
++  if text.chars().count()>=1000{text=text.chars().take(1000).collect();break 'sections;}
++ }}text.encode_utf16().flat_map(u16::to_le_bytes).collect()
++}
++fn source_preview_is_derived(source:&[u8],raw:&[u8])->Result<bool>{
++ if raw.len()>8192||raw.len()%2!=0{return fail("HWT_PREVIEW_BUDGET");}
++ let units=raw.chunks_exact(2).map(|p|u16::from_le_bytes([p[0],p[1]])).collect::<Vec<_>>();
++ let text=String::from_utf16(&units).map_err(|_|"HWT_PREVIEW_UTF16")?;
++ if text.trim().is_empty(){return Ok(true);}
++ let original=DocumentCore::from_bytes(source).map_err(|_|"HWT_PREVIEW_SOURCE")?;
++ Ok(raw==body_preview(original.document()))
++}
+ fn exact_container_preservation(source:&[u8],output:&[u8],current:&crate::model::document::Document)->Result<()> {
+  let before=container_streams(source)?;let after=container_streams(output)?;
+  if before.keys().collect::<Vec<_>>()!=after.keys().collect::<Vec<_>>(){return fail("HWT_CONTAINER_STREAM_SET");}
+  for(path,original)in &before{
+   let emitted=&after[path];if original==emitted{continue;}
+-  // The standard writer only supplements an empty/whitespace preview. Prove
+-  // that exact derived output; never exempt an arbitrary PrvText difference.
++  // Only a blank source preview or an exact preview of the SOURCE body is derived.
++  // Reparse source independently: the edited current body must not grant source authority.
+   if path!="/PrvText"||original.len()>8192||emitted.len()>8192||original.len()%2!=0{return fail("HWT_EXACT_CONTAINER_STREAMS");}
+-  let units=original.chunks_exact(2).map(|p|u16::from_le_bytes([p[0],p[1]])).collect::<Vec<_>>();
+-  let old=String::from_utf16(&units).map_err(|_|"HWT_PREVIEW_UTF16")?;
+-  if !old.trim().is_empty()||current.preview.as_ref().and_then(|p|p.text.as_deref())!=Some(old.as_str()){return fail("HWT_PREVIEW_NOT_EMPTY_SOURCE");}
+-  let mut expected=String::new();
+-  'sections:for section in &current.sections{for paragraph in &section.paragraphs{
+-   let text=paragraph.text.trim_end_matches('\0');if text.is_empty(){continue;}expected.push_str(text);expected.push_str("\r\n");
+-   if expected.chars().count()>=1000{expected=expected.chars().take(1000).collect();break 'sections;}
+-  }}
+-  if expected.trim().is_empty(){return fail("HWT_PREVIEW_NOT_GENERATED");}
+-  let encoded=expected.encode_utf16().flat_map(u16::to_le_bytes).collect::<Vec<_>>();if emitted!=&encoded{return fail("HWT_PREVIEW_DERIVATION");}
++  if !source_preview_is_derived(source,original)?{return fail("HWT_PREVIEW_SOURCE_NOT_DERIVED");}
++  let encoded=body_preview(current);
++  if emitted!=&encoded{return fail("HWT_PREVIEW_DERIVATION");}
+  }
+  Ok(())
+ }
+@@ -222,7 +230,17 @@
+  /// The caller still owns actual safe OS writing; this candidate never writes files.
+  pub fn export_checked(&self)->Result<Vec<u8>>{
+   let expected=preflight(&self.source,&self.doc)?;
+-  let output=self.doc.export_hwp_with_adapter_snapshot_with_report().map_err(|_|"HWT_EXPORT")?;
++  // The normal adapter snapshot still owns all body lowering. Only a proven
++  // source-derived preview is regenerated on this isolated export clone.
++  let mut snapshot=self.doc.prepare_hwp_export_snapshot().document().clone();
++  if let Some(raw)=container_streams(&self.source)?.get("/PrvText"){
++   if source_preview_is_derived(&self.source,raw)?{
++    let encoded=body_preview(self.doc.document());
++    let units=encoded.chunks_exact(2).map(|p|u16::from_le_bytes([p[0],p[1]])).collect::<Vec<_>>();
++    snapshot.preview.get_or_insert_with(Default::default).text=Some(String::from_utf16(&units).map_err(|_|"HWT_PREVIEW_UTF16")?);
++   }
++  }
++  let output=crate::serializer::serialize_document_with_report(&snapshot).map_err(|_|"HWT_EXPORT")?;
+   if !output.content_loss().is_empty(){return fail("HWT_CONTENT_LOSS");}
+   let bytes=output.into_bytes();exact_container_preservation(&self.source,&bytes,self.doc.document())?;if body_projection(&self.source,&self.edited_field_ids)?!=body_projection(&bytes,&self.edited_field_ids)?{return fail("HWT_EXACT_BODY_STRUCTURE");}let reopened=DocumentCore::from_bytes(&bytes).map_err(|_|"HWT_REOPEN")?;
+   if preflight(&bytes,&reopened)?!=expected{return fail("HWT_FIELD_ROUNDTRIP");}
+--- a/src/parser/cfb_reader.rs
++++ b/src/parser/cfb_reader.rs
+@@ -8,6 +8,14 @@
+ //! - BinData/BIN{XXXX}.{ext}: 바이너리 데이터
+ 
+ use std::io::{Cursor, Read};
++
++/// Optional malformed previews retain bounded opaque source ownership.
++pub(crate) const MAX_OPAQUE_PREVIEW_TEXT_BYTES: usize = 64 * 1024;
++pub(crate) fn decode_preview_utf16(data: &[u8]) -> Option<String> {
++    if data.len() % 2 != 0 { return None; }
++    let units = data.chunks_exact(2).map(|b|u16::from_le_bytes([b[0],b[1]])).collect::<Vec<_>>();
++    String::from_utf16(&units).ok()
++}
+ 
+ /// CFB 컨테이너 리더
+ pub struct CfbReader {
+@@ -376,22 +384,8 @@
+ 
+         let data = self.read_stream_raw("/PrvText").ok()?;
+ 
+-        // UTF-16LE 디코딩
+-        if data.len() < 2 {
+-            return None;
+-        }
+-
+-        let text: String = data
+-            .chunks(2)
+-            .filter_map(|chunk| {
+-                if chunk.len() == 2 {
+-                    let code = u16::from_le_bytes([chunk[0], chunk[1]]);
+-                    char::from_u32(code as u32)
+-                } else {
+-                    None
+-                }
+-            })
+-            .collect();
++        // Decode complete scalar values; isolated surrogate code units are not characters.
++        let text = decode_preview_utf16(&data)?;
+ 
+         if text.is_empty() {
+             None
+--- a/src/parser/mod.rs
++++ b/src/parser/mod.rs
+@@ -474,6 +474,10 @@
+     // 5-7. 미리보기, BinData, 추가 스트림
+     // Preview is optional document metadata.  A malformed or disproportionately
+     // large thumbnail must not prevent the actual document from opening.
++    if cfb.has_stream("/PrvText") {
++        cfb.read_stream_raw_limited("/PrvText",cfb_reader::MAX_OPAQUE_PREVIEW_TEXT_BYTES)
++            .map_err(ParseError::CfbError)?;
++    }
+     let preview = extract_preview(&mut cfb, MAX_THUMBNAIL_BYTES);
+     let bin_data_content = load_bin_data_content(
+         &mut cfb,
+@@ -1887,6 +1891,14 @@
+         .collect();
+ 
+     for path in &all_streams {
++        // Invalid optional preview text cannot be represented by String. Keep
++        // exactly one raw owner instead of silently dropping UTF-16 code units.
++        if path == "/PrvText" {
++            if let Ok(data)=cfb.read_stream_raw_limited(path,cfb_reader::MAX_OPAQUE_PREVIEW_TEXT_BYTES) {
++                if cfb_reader::decode_preview_utf16(&data).is_none() { extra.push((path.clone(),data)); }
++            }
++            continue;
++        }
+         // 이미 파싱된 스트림은 제외
+         if path == "/FileHeader"
+             || path == "/DocInfo"
+--- a/src/renderer/generated_column_stack.rs
++++ b/src/renderer/generated_column_stack.rs
+@@ -303,7 +303,7 @@
+     }
+     true
+ }
+-fn plain_table(t: &Table, plain: impl Fn(&Paragraph) -> bool) -> bool {
++pub(crate) fn plain_table(t: &Table, plain: impl Fn(&Paragraph) -> bool) -> bool {
+     if t.common.treat_as_char
+         || !super::float_placement::is_para_topbottom_float(&t.common)
+         || t.common.vert_rel_to != VertRelTo::Para
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -12116,6 +12116,12 @@
+         let mut tac_seg_applied = false;
+         let mut para_float_lane_info: Option<(f64, f64, f64, f64, f64, Option<f64>)> = None;
+         if let Some(Control::Table(t)) = para.controls.get(control_index) {
++            let (font_slots,font_sources,_,_)=self.exact_font_source_registry_counts();
++            let current_stack = (self.profile.get().hwp5_origin_hwpx()
++                && !self.profile.get().hwp3_layout() && !self.profile.get().hangul2024_layout()
++                && font_slots==0 && font_sources==0).then(||
++                current_body_stack::current_table_top(ctx, para_index, control_index, y_offset, self.dpi)).flatten();
++            if let Some(plan) = current_stack { para_y_for_table = plan.table_top; }
+             if self.owns_completed_native_frame(para,control_index,page_content,col_area,layout,y_offset) {
+                 para_y_for_table=y_offset;
+             }
+@@ -12672,7 +12678,9 @@
+                         stored_topbottom_flow_advance_hu(para, paragraphs.get(para_index + 1), t)
+                             .map(|height| hwpunit_to_px(height as i32, self.dpi))
+                     });
+-                    let raw_top = if let Some(placement) = ctx
++                    let raw_top = if let Some(plan) = current_stack {
++                        plan.table_top
++                    } else if let Some(placement) = ctx
+                         .paragraph_float_placements
+                         .get(&(para_index, control_index))
+                     {
+@@ -18011,3 +18019,57 @@
+         }assert!(!eligible(&p),"case {n}");}
+     }
+ }
++
++mod current_body_stack;
++pub(crate) use current_body_stack::{CurrentWholeStackPlan,CurrentStackHost};
++
++impl LayoutEngine {
++    /// Read-only current-format proof. The caller must pass the actual current
++    /// page, composition, styles and measurements. No imported row lease is
++    /// minted or copied; renderer flow admission remains a separate check.
++    #[allow(clippy::too_many_arguments)]
++    pub(crate) fn current_whole_stack_export_plan(&self,
++        profile:crate::model::provenance::LayoutCompatibilityProfile,
++        page:&PageContent, paragraphs:&[Paragraph], composed:&[ComposedParagraph],
++        styles:&ResolvedStyleSet, measured:&[MeasuredTable], dpi:f64,
++    )->Option<CurrentWholeStackPlan> {
++        let (slots,sources,_,_)=self.exact_font_source_registry_counts();
++        if !profile.hwp5_origin_hwpx() || profile.hwp3_layout() || profile.hangul2024_layout()
++            || slots!=0 || sources!=0 || !dpi.is_finite() || dpi<=0.0 || dpi!=self.dpi {return None;}
++        let col=page.column_contents.first()?;
++        let ctx=ColumnItemCtx{page_content:page,paragraphs,composed,styles,bin_data_content:&[],
++            measured_tables:measured,layout:&page.layout,col_area:page.layout.column_areas.first()?,
++            zone_column_count:page.layout.column_areas.len(),outline_numbering_id:0,multi_col_width:None,
++            prev_tac_seg_applied:false,wrap_around_paras:&col.wrap_around_paras,wrap_anchors:&col.wrap_anchors,
++            inline_placements:&col.inline_placements,inline_flow_plans:&col.inline_flow_plans,
++            paragraph_float_placements:&col.paragraph_float_placements};
++        current_body_stack::current_whole_stack(&ctx,dpi)
++    }
++}
++
++
++impl LayoutEngine {
++    /// Separate Native-container export producer. This neither changes Native
++    /// painting nor pretends that the document was read from HWPX. Every current
++    /// row, composition and physical allocation must close under the same proof.
++    #[allow(clippy::too_many_arguments)]
++    pub(crate) fn current_native_whole_stack_export_plan(&self,
++        profile:crate::model::provenance::LayoutCompatibilityProfile,
++        page:&PageContent, paragraphs:&[Paragraph], composed:&[ComposedParagraph],
++        styles:&ResolvedStyleSet, measured:&[MeasuredTable], dpi:f64,
++    )->Option<CurrentWholeStackPlan> {
++        let (slots,sources,_,_)=self.exact_font_source_registry_counts();
++        if !profile.native_hwp5_layout() || profile.hwp5_origin_hwpx() || profile.hwpx_container()
++            || profile.hwpx_stored_layout() || profile.legacy_hwp3_stored_geometry()
++            || profile.hwp3_password_layout() || profile.hangul2024_layout()
++            || slots!=0 || sources!=0 || !dpi.is_finite() || dpi<=0.0 || dpi!=self.dpi {return None;}
++        let col=page.column_contents.first()?;
++        let ctx=ColumnItemCtx{page_content:page,paragraphs,composed,styles,bin_data_content:&[],
++            measured_tables:measured,layout:&page.layout,col_area:page.layout.column_areas.first()?,
++            zone_column_count:page.layout.column_areas.len(),outline_numbering_id:0,multi_col_width:None,
++            prev_tac_seg_applied:false,wrap_around_paras:&col.wrap_around_paras,wrap_anchors:&col.wrap_anchors,
++            inline_placements:&col.inline_placements,inline_flow_plans:&col.inline_flow_plans,
++            paragraph_float_placements:&col.paragraph_float_placements};
++        current_body_stack::current_native_whole_stack(&ctx,dpi)
++    }
++}
+--- /dev/null
++++ b/src/renderer/layout/current_body_stack.rs
+@@ -0,0 +1,267 @@
++//! Current-format proof for a single-column, whole, full-width logical stack.
++//! No imported completed-row descriptor, source seal, resource generation or
++//! observation's selected-inset label grants this plan. Current text is freshly
++//! composed without source rows and the actual allocation closes independently.
++use super::*;
++
++#[derive(Clone,Copy)]
++pub(super) struct CurrentTableTop { pub table_top:f64 }
++
++/// Current composition and physical allocation only; this is not an imported
++/// row owner, a descriptor permission, or a request to change document rows.
++pub(crate) struct CurrentWholeStackPlan {
++    pub fresh_prefix: ComposedParagraph,
++    pub prefix_end_hu: i32,
++    pub column_width_hu: i32,
++    pub body_height_hu: i32,
++    pub hosts: [CurrentStackHost; 2],
++}
++
++impl CurrentWholeStackPlan {
++    /// Full current row/run identity, including the selected space policy.
++    /// This comparison does not authorize a source flag or imported lease.
++    pub(crate) fn matches_fresh_prefix(&self,candidate:&ComposedParagraph)->bool {
++        same_composition(&self.fresh_prefix,candidate)
++    }
++}
++
++pub(crate) struct CurrentStackHost {
++    pub para_index: usize,
++    pub control_index: usize,
++    pub logical_anchor_hu: i32,
++    pub physical_top_hu: i32,
++    pub before_hu: i32,
++    pub body_hu: i32,
++    pub after_hu: i32,
++    pub reserved_bottom_hu: i32,
++}
++
++fn plain(p:&Paragraph)->bool {
++    p.text.len()<=64*1024 && p.line_segs.len()<=4096 && p.char_shapes.len()<=128
++        && p.ctrl_data_records.len()<=2 && p.raw_header_extra.len()<=128
++        && !p.stored_text_partition_is_dirty() && !p.cell_format_vpos_dirty
++        && p.hwpx_axis_shift==0 && p.source_line_seg_vertical_pos.is_none()
++        && p.layout_only_fill_lines==0 && p.field_ranges.is_empty()
++        && p.orphan_field_ends.is_empty() && p.range_tags.is_empty()
++        && p.title_marks.is_empty() && p.markpen_marks.is_empty()
++        && p.tab_extended.is_empty() && p.numbering_restart.is_none()
++        && p.ctrl_data_records.iter().all(Option::is_none)
++}
++
++// This is a typed HU comparison, never a rounding of published coordinates.
++// All operands below originate in integer source metrics or integer table
++// declarations. Reject a fractional metric rather than fitting it to the source.
++fn hu(px:f64,dpi:f64)->Option<i32> {
++    if !px.is_finite() || px<0.0 || !dpi.is_finite() || dpi<=0.0{return None;}
++    let value=px*7200.0/dpi;
++    if value>i32::MAX as f64{return None;}
++    let integer=value.round();
++    // Bound only floating-point arithmetic roundoff (far less than one HU).
++    ((value-integer).abs()<=f64::EPSILON*value.abs().max(1.0)*8.0).then_some(integer as i32)
++}
++
++fn same_composition(a:&ComposedParagraph,b:&ComposedParagraph)->bool {
++    a.para_style_id==b.para_style_id && a.lines.len()==b.lines.len()
++        && a.numbering_text.is_none() && b.numbering_text.is_none()
++        && a.inline_controls.len()==2 && b.inline_controls.len()==2
++        && a.inline_controls.iter().zip(&b.inline_controls).enumerate().all(|(i,(a,b))|
++            a.control_index==i && b.control_index==i
++                && a.control_type==crate::renderer::composer::InlineControlType::Other
++                && a.control_type==b.control_type && a.line_index==b.line_index)
++        && a.tac_controls.is_empty() && b.tac_controls.is_empty()
++        && a.footnote_positions.is_empty() && b.footnote_positions.is_empty()
++        && a.tab_extended.is_empty() && b.tab_extended.is_empty()
++        && a.horizontal_shaping.is_none() && b.horizontal_shaping.is_none()
++        && a.lines.iter().zip(&b.lines).all(|(a,b)|
++            a.char_start==b.char_start && a.line_height==b.line_height
++                && a.baseline_distance==b.baseline_distance && a.line_spacing==b.line_spacing
++                && a.column_start==b.column_start && a.segment_width==b.segment_width
++                && !a.has_line_break && !b.has_line_break && a.runs.len()==b.runs.len()
++                && a.runs.iter().zip(&b.runs).all(|(a,b)| a.text==b.text
++                    && a.char_style_id==b.char_style_id && a.lang_index==b.lang_index
++                    && a.supplemental_metrics_blocked==b.supplemental_metrics_blocked
++                    && a.space_metric==b.space_metric && a.char_overlap.is_none() && b.char_overlap.is_none()
++                    && a.footnote_marker.is_none() && b.footnote_marker.is_none()
++                    && !a.inserted_control_text && !b.inserted_control_text
++                    && a.display_text.is_none() && b.display_text.is_none()))
++}
++
++pub(super) fn current_table_top(ctx:&ColumnItemCtx<'_>, index:usize, control:usize,
++    current_flow:f64,dpi:f64)->Option<CurrentTableTop> {
++    let plan=current_whole_stack(ctx,dpi)?;
++    let host=plan.hosts.iter().find(|p|p.para_index==index && p.control_index==control)?;
++    if hu(current_flow-ctx.col_area.y,dpi)?!=host.physical_top_hu {return None;}
++    Some(CurrentTableTop{table_top:current_flow})
++}
++
++#[derive(Clone,Copy)]
++enum ColumnSource { XmlModel, NativePacked }
++
++pub(super) fn current_whole_stack(ctx:&ColumnItemCtx<'_>,dpi:f64)->Option<CurrentWholeStackPlan> {
++    current_whole_stack_with_column_source(ctx,dpi,ColumnSource::XmlModel)
++}
++pub(super) fn current_native_whole_stack(ctx:&ColumnItemCtx<'_>,dpi:f64)->Option<CurrentWholeStackPlan> {
++    current_whole_stack_with_column_source(ctx,dpi,ColumnSource::NativePacked)
++}
++// Native CTRL_HEADER has a fixed 42-byte empty-description CommonObjAttr.
++// Match every known current field, not an imported raw seal or opaque payload.
++fn native_common_matches(table:&crate::model::table::Table)->bool {
++    let c=&table.common;
++    if table.raw_ctrl_data.len()!=42 || !c.description.is_empty() || !c.raw_extra.is_empty()
++        || c.attr!=crate::serializer::control::pack_common_attr_bits(c)
++        || c.ctrl_id!=0 || c.z_order!=0 || c.prevent_page_break!=0
++        || !matches!(c.numbering_type,crate::model::shape::ObjectNumberingType::None)
++        || !matches!(c.drop_cap_style,crate::model::shape::DropCapStyle::None)
++        || c.margin.left!=table.outer_margin_left || c.margin.right!=table.outer_margin_right
++        || c.margin.top!=table.outer_margin_top || c.margin.bottom!=table.outer_margin_bottom {return false;}
++    let mut bytes=Vec::with_capacity(42);
++    for value in [c.attr,c.vertical_offset,c.horizontal_offset,c.width,c.height] {bytes.extend(value.to_le_bytes());}
++    bytes.extend(c.z_order.to_le_bytes());
++    for value in [c.margin.left,c.margin.right,c.margin.top,c.margin.bottom] {bytes.extend(value.to_le_bytes());}
++    bytes.extend(c.instance_id.to_le_bytes());bytes.extend(c.prevent_page_break.to_le_bytes());
++    bytes.extend(0u16.to_le_bytes());
++    bytes==table.raw_ctrl_data
++}
++
++fn current_whole_stack_with_column_source(ctx:&ColumnItemCtx<'_>,dpi:f64,column_source:ColumnSource)->Option<CurrentWholeStackPlan> {
++    use crate::renderer::composer::{compose_paragraph_in_context,recompose_stored_lines_in_frame,ParagraphBox};
++    use crate::model::{paragraph::ColumnBreakType,style::HeadType};
++    if ctx.paragraphs.len()<4 || ctx.paragraphs.len()>128
++        || ctx.zone_column_count!=1 || ctx.layout.column_areas.len()!=1
++        || ctx.page_content.page_index!=0 || ctx.page_content.section_index!=0
++        || ctx.page_content.column_contents.len()!=1 || !ctx.page_content.footnotes.is_empty()
++        || ctx.page_content.active_header.is_some() || ctx.page_content.active_footer.is_some()
++        || ctx.page_content.active_master_page.is_some() || !ctx.page_content.extra_master_pages.is_empty()
++        || !ctx.wrap_anchors.is_empty() || !ctx.wrap_around_paras.is_empty()
++        || !ctx.inline_placements.is_empty() || !ctx.inline_flow_plans.is_empty()
++        || !ctx.paragraph_float_placements.is_empty()
++        || ctx.styles.supplemental_metrics.is_some() || ctx.styles.kerning_measurement_context.is_some()
++        || ctx.styles.horizontal_shaping_context.is_some() {return None;}
++    let col=&ctx.page_content.column_contents[0];
++    if col.column_index!=0 || col.start_height!=0.0 || col.endnote_flow
++        || col.zone_layout.is_some() || col.zone_y_offset!=0.0
++        || !col.overlay_continuations.is_empty() || !col.overlay_cuts.is_empty()
++        || !matches!(col.items.get(..3),Some([PageItem::FullParagraph{para_index:0},
++            PageItem::Table{para_index:1,control_index:0},PageItem::Table{para_index:2,control_index:0}]))
++        || col.items.iter().skip(3).any(|item|!matches!(item,PageItem::FullParagraph{para_index} if *para_index>=3))
++    {return None;}
++    let width=hu(ctx.col_area.width,dpi)?;let body=hu(ctx.col_area.height,dpi)?;
++    if width<=0 || body<=0 || ctx.col_area.x!=ctx.layout.body_area.x
++        || ctx.col_area.width!=ctx.layout.body_area.width {return None;}
++    let first=ctx.paragraphs.first()?;
++    if !plain(first) || first.text.is_empty() || first.text.chars().count()>4096
++        || first.text.chars().any(|c|c<' ' || c=='\u{fffc}')
++        || first.line_segs.is_empty() || first.line_segs.len()>256
++        || first.char_shapes.is_empty() || first.char_shapes.len()>128
++        || first.char_shapes.windows(2).any(|p|p[0].start_pos>=p[1].start_pos)
++        || first.char_shapes.iter().any(|s|s.char_shape_id as usize>=ctx.styles.char_styles.len())
++        || !matches!(first.column_type,ColumnBreakType::Section)
++        || !matches!(first.controls.as_slice(),[Control::SectionDef(_),Control::ColumnDef(c)]
++            if c.column_count==1 && c.same_width && c.widths.is_empty() && c.gaps.is_empty()
++                && c.direction==crate::model::page::ColumnDirection::LeftToRight
++                && c.column_type==crate::model::page::ColumnType::Normal
++                && match column_source {
++                    ColumnSource::XmlModel=>c.raw_attr==0,
++                    // Native parser::body_text reads count from bits2..9 and
++                    // same-width from bit12. serializer::control emits these
++                    // exact bits for the already-required one-column LTR Normal
++                    // model. No reserved/other raw attribute bits are admitted.
++                    ColumnSource::NativePacked=>c.raw_attr==((1u16<<2)|(1u16<<12)),
++                })
++    {return None;}
++    let Control::SectionDef(section)=&first.controls[0] else{return None;};
++    if !section.master_pages.is_empty() || !section.extra_child_records.is_empty()
++        || section.extra_page_border_fills.len()>3 || section.raw_ctrl_extra.len()>64
++        || section.raw_ctrl_extra.iter().any(|b|*b!=0) || section.text_direction!=0 {return None;}
++    let style=ctx.styles.para_styles.get(first.para_shape_id as usize)?;
++    if [style.margin_left,style.margin_right,style.indent,style.spacing_before,style.spacing_after]
++        .iter().any(|v|*v!=0.0) || !matches!(style.head_type,HeadType::None)
++        || style.border_spacing.iter().any(|v|*v!=0.0) || style.border_connect || style.page_break_before || style.keep_with_next || style.keep_lines
++    {return None;}
++    if style.border_fill_id!=0 {
++        let border=ctx.styles.border_styles.get(usize::from(style.border_fill_id.checked_sub(1)?))?;
++        if border.borders.iter().any(|b|!matches!(b.line_type,crate::model::style::BorderLineType::None))
++            || border.fill_color.is_some() || border.pattern.is_some() || border.gradient.is_some()
++            || border.image_fill.is_some() || border.diagonal_attr!=0
++            || !matches!(border.center_line,crate::model::style::CenterLine::None) {return None;}
++    }
++    // Exactly two known eight-unit leading structural controls. A hidden gap
++    // elsewhere cannot become a fresh text-position witness.
++    let chars:Vec<char>=first.text.chars().collect();let mut offset=16u32;
++    if first.char_offsets.len()!=chars.len(){return None;}
++    for (i,c) in chars.iter().enumerate(){if first.char_offsets[i]!=offset{return None;}
++        offset=offset.checked_add(c.len_utf16() as u32)?;}
++    if first.char_count!=offset.checked_add(1)? {return None;}
++    let actual=ctx.composed.first()?;
++    let mut input=first.clone();input.line_segs.clear();
++    input.layout_space_metrics.clear();input.completed_native_rows=None;
++    input.native_source_synthetic_seal=None;input.native_source_synthetic_context=None;
++    input.native_frame_observation.set(None);
++    let initial=compose_paragraph_in_context(&input,ctx.styles);
++    let fresh=recompose_stored_lines_in_frame(&initial,&input,ParagraphBox::content_for_style(ctx.col_area.width,
++        Some(style),dpi),ctx.col_area.width,ctx.styles,dpi,false,
++        crate::renderer::composer::StoredRowMissPolicy::Reflow,&[])?;
++    if !same_composition(actual,&fresh) || actual.lines.len()!=first.line_segs.len(){return None;}
++    let mut end=0i32;
++    for (i,(line,row)) in actual.lines.iter().zip(&first.line_segs).enumerate(){
++        let start=if i==0 {0} else {*first.char_offsets.get(line.char_start)?};
++        if row.tag!=0x80060000 || row.text_start!=start || row.vertical_pos!=end
++            || row.line_height<=0 || row.text_height!=row.line_height
++            || row.line_height!=line.line_height || row.line_spacing!=line.line_spacing
++            || row.baseline_distance!=line.baseline_distance || row.column_start!=line.column_start
++            || row.column_start!=0 || row.segment_width!=line.segment_width || row.segment_width!=width
++            || row.line_spacing<0 {return None;}
++        end=end.checked_add(row.line_height)?.checked_add(row.line_spacing)?;
++    }
++    if end<=0 || end>body{return None;}
++    let mut reserved=end;let mut consumed_before=0i32;let mut hosts=Vec::with_capacity(2);
++    for pi in 1..=2 {
++        let p=&ctx.paragraphs[pi];let [Control::Table(table)]=p.controls.as_slice() else{return None;};
++        let [row]=p.line_segs.as_slice() else{return None;};
++        if !plain(p) || !p.text.is_empty() || p.char_count!=9 || !p.char_offsets.is_empty()
++            || p.para_shape_id!=first.para_shape_id || p.style_id!=first.style_id
++            || p.column_type!=ColumnBreakType::None || row.tag!=0x80060000
++            || row.text_start!=0 || row.vertical_pos!=end || row.column_start!=0
++            || row.line_height<=0 || row.text_height!=row.line_height || row.line_spacing<0
++            || table.raw_table_record_extra.iter().any(|b|*b!=0)
++            || !match column_source {
++                ColumnSource::XmlModel=>table.raw_ctrl_data.is_empty(),
++                ColumnSource::NativePacked=>native_common_matches(table),
++            }
++            || table.cells.iter().map(|c|c.paragraphs.len()).sum::<usize>()>1024
++            || !crate::renderer::generated_column_stack::plain_table(table,plain)
++            || i32::try_from(table.common.width).ok()?.checked_add(i32::from(table.outer_margin_left))?
++                .checked_add(i32::from(table.outer_margin_right))?!=width
++        {return None;}
++        let mut measured=ctx.measured_tables.iter().filter(|m|m.para_index==pi && m.control_index==0);
++        let m=measured.next()?;if measured.next().is_some() || m.caption_height!=0.0
++            || m.row_heights.len()!=usize::from(table.row_count) || m.row_heights.iter().any(|v|!v.is_finite() || *v<=0.0)
++            || hu(m.total_height,dpi)?!=i32::try_from(table.common.height).ok()? {return None;}
++        for row_index in 0..usize::from(table.row_count) {
++            let row_height=hu(*m.row_heights.get(row_index)?,dpi)?;
++            let row_cells=table.cells.get(row_index*usize::from(table.col_count)..(row_index+1)*usize::from(table.col_count))?;
++            let mut row_width=0i32;
++            for (col_index,cell) in row_cells.iter().enumerate() {
++                row_width=row_width.checked_add(i32::try_from(cell.width).ok()?)?;
++                if i32::try_from(cell.height).ok()?>row_height
++                    || cell.width!=table.cells.get(col_index)?.width {return None;}
++            }
++            if row_width!=i32::try_from(table.common.width).ok()? {return None;}
++        }
++        let f=p.native_frame_observation.get()?;
++        let before=hu(f.before,dpi)?;let height=hu(f.body_height,dpi)?;let after=hu(f.after,dpi)?;
++        if f.page!=0 || f.column!=0 || f.control!=0 || f.source_row_vpos!=end
++            || f.outer_top!=table.outer_margin_top || before!=i32::from(table.outer_margin_top)
++            || height!=hu(m.total_height,dpi)? || hu(f.raw_top,dpi)?!=reserved
++            || after!=if pi==1 {row.line_spacing} else {0}
++        {return None;}
++        let bottom=reserved.checked_add(before)?.checked_add(height)?.checked_add(after)?;
++        if bottom!=hu(f.reserved_bottom,dpi)? || bottom>body{return None;}
++        let top=reserved.checked_sub(consumed_before)?;
++        hosts.push(CurrentStackHost{para_index:pi,control_index:0,logical_anchor_hu:end,
++            physical_top_hu:top,before_hu:before,body_hu:height,after_hu:after,reserved_bottom_hu:bottom});
++        reserved=bottom;consumed_before=consumed_before.checked_add(before)?;
++    }
++    if ctx.paragraphs.iter().skip(3).any(|p|!p.controls.is_empty() || !plain(p)){return None;}
++    Some(CurrentWholeStackPlan{fresh_prefix:fresh,prefix_end_hu:end,column_width_hu:width,body_height_hu:body,hosts:hosts.try_into().ok()?})
++}
+--- a/src/serializer/cfb_writer.rs
++++ b/src/serializer/cfb_writer.rs
+@@ -214,7 +214,17 @@
+     // 템플릿에서 만든 새 문서는 템플릿의 placeholder 미리보기("\r\n")를 물고
+     // 나가 탐색기·한컴 미리보기에 빈 문서로 보인다. 원본 미리보기가 없거나
+     // placeholder 일 때만 본문에서 새로 만든다 — 실문서의 원본 미리보기는 건드리지 않는다.
+-    let preview = supplement_preview(doc);
++    let preview_entries=doc.extra_streams.iter().filter(|(path,_)|path=="/PrvText").collect::<Vec<_>>();
++    let opaque_preview=preview_entries.iter().any(|(_,raw)|crate::parser::cfb_reader::decode_preview_utf16(raw).is_none());
++    if opaque_preview && (preview_entries.len()!=1 || preview_entries[0].1.len()>crate::parser::cfb_reader::MAX_OPAQUE_PREVIEW_TEXT_BYTES) {
++        return Err(SerializeError::CfbError("UNOWNED_OPAQUE_PRVTEXT".into()));
++    }
++    if opaque_preview && doc.preview.as_ref().and_then(|p|p.text.as_ref()).is_some() {
++        return Err(SerializeError::CfbError("CONFLICTING_OPAQUE_PRVTEXT".into()));
++    }
++    let mut preview = supplement_preview(doc);
++    if opaque_preview { if let Some(p)=&mut preview { p.text=None; } }
++
+ 
+     // 6. CFB 컨테이너 조립
+     let mut content_loss = ContentLossReport::new(SerializedFormat::Hwp);
+--- a/src/serializer/hwpx/context.rs
++++ b/src/serializer/hwpx/context.rs
+@@ -94,6 +94,8 @@
+ /// 1-pass 스캔으로 구축되는 직렬화 컨텍스트.
+ #[derive(Debug)]
+ pub struct SerializeContext {
++    /// Pointer keys belong only to the currently borrowed export document.
++    pub(crate) current_standard_rows: HashMap<usize,Vec<crate::model::paragraph::LineSeg>>,
+     pub char_shape_ids: IdPool<u32>,
+     pub para_shape_ids: IdPool<u16>,
+     pub border_fill_ids: IdPool<u16>,
+@@ -177,6 +179,7 @@
+     fn default() -> Self {
+         Self {
+             char_shape_ids: IdPool::default(),
++            current_standard_rows: HashMap::new(),
+             line_segs_on_hwpx_axis: false,
+             line_segs_on_paragraph_axis: false,
+             preserve_native_source_synthetic_rows: false,
+--- a/src/serializer/hwpx/mod.rs
++++ b/src/serializer/hwpx/mod.rs
+@@ -24,6 +24,7 @@
+ pub mod section;
+ pub mod shape;
+ pub mod static_assets;
++pub(crate) mod standard_rows;
+ pub mod table;
+ pub mod utils;
+ pub mod writer;
+@@ -53,10 +54,20 @@
+ 
+ /// HWPX 직렬화 바이트와 바로 그 산출물의 내용 손실을 함께 반환한다 (#4430).
+ pub fn serialize_hwpx_with_report(doc: &Document) -> Result<SerializedDocument, SerializeError> {
++    serialize_hwpx_with_current_rows(doc,None)
++}
++
++pub(crate) fn serialize_hwpx_with_current_rows(doc:&Document,projection:Option<&standard_rows::CurrentStandardRowsProjection>)->Result<SerializedDocument,SerializeError>{
+     use static_assets::*;
++    // Malformed native preview bytes have an opaque HWP owner, not XML text.
++    if doc.extra_streams.iter().any(|(path,raw)|path=="/PrvText"&&crate::parser::cfb_reader::decode_preview_utf16(raw).is_none()) {
++        return Err(SerializeError::CfbError("HWPX_UNREPRESENTABLE_OPAQUE_PRVTEXT".into()));
++    }
++
+ 
+     // 1-pass: ID 풀 구성
+     let mut ctx = SerializeContext::collect_from_document(doc);
++    ctx.current_standard_rows=projection.and_then(|p|p.bind_for_export(doc)).unwrap_or_default();
+     super::paragraph_metadata_loss::record(doc,&mut ctx.content_loss);
+     super::numbering_extension_loss::record(doc, &mut ctx.content_loss);
+ 
+@@ -121,6 +132,7 @@
+     z.write_deflated(
+         "Preview/PrvText.txt",
+         doc.hwpx_aux_entry("Preview/PrvText.txt")
++            .or_else(||doc.preview.as_ref().and_then(|p|p.text.as_deref()).map(str::as_bytes))
+             .unwrap_or(PRV_TEXT),
+     )?;
+     z.write_deflated(
+@@ -330,6 +342,12 @@
+     Ok(SerializedDocument::new(bytes, content_loss))
+ }
+ 
++pub(crate) fn serialize_hwpx_with_current_rows_and_password(doc:&Document, projection:Option<&standard_rows::CurrentStandardRowsProjection>,password:&[u8])->Result<SerializedDocument,SerializeError>{
++    let serialized=serialize_hwpx_with_current_rows(doc,projection)?;
++    let (plain,loss)=serialized.into_parts();
++    Ok(SerializedDocument::new(encrypt_hwpx_bytes(&plain,password)?,loss))
++}
++
+ fn encrypt_hwpx_bytes(plain: &[u8], password: &[u8]) -> Result<Vec<u8>, SerializeError> {
+     crate::password_crypto::encrypt_hwpx_package(plain, password)
+         .map_err(|error| SerializeError::CryptoError(error.to_string()))
+--- a/src/serializer/hwpx/section.rs
++++ b/src/serializer/hwpx/section.rs
+@@ -865,7 +865,12 @@
+     hwp5_only_slot_positions.sort_unstable();
+     hwp5_only_slot_positions.dedup();
+     let hwp5_only_units = 8 * hwp5_only_slot_positions.len() as u32;
+-    let serializable_line_segs = para.serializable_line_segs();
++    // A current export projection is a separate input, never a replacement of
++    // source LINE_SEG, its source-vpos snapshot, or any model ownership field.
++    let projected = (ctx.sub_list_depth==0).then(||ctx.current_standard_rows
++        .get(&(para as *const Paragraph as usize)).cloned()).flatten();
++    let fresh_projection=projected.is_some();
++    let serializable_line_segs = projected.as_deref().unwrap_or_else(||para.serializable_line_segs());
+     let rebased_line_segs: Option<Vec<LineSeg>> = ((!hwp5_only_slot_positions.is_empty()
+         || ctx.line_segs_on_paragraph_axis)
+         && !serializable_line_segs.is_empty())
+@@ -944,7 +949,7 @@
+         && ctx.native_source_synthetic_context
+             .is_some_and(|context| para.owns_native_source_synthetic_rows(context));
+     if !axis_line_segs.is_empty() && position_axis_intact
+-        && (!all_synthetic || authored_native_synthetic || para.exports_completed_native_rows()) {
++        && (!all_synthetic || authored_native_synthetic || para.exports_completed_native_rows() || fresh_projection) {
+         // IR 기반 출력 — 원본 lineseg 값 보존 (#177)
+         //
+         // [#5847] reflow 의 구역 단위 vpos 재계산이 원본 캐시 보유 문단의
+@@ -952,12 +957,13 @@
+         // 쪽-상대 좌표로 되돌려 낸다 — 누적 좌표가 파일로 나가면 한글 2022 가
+         // 캐시를 신뢰해 조판을 폐기한다(08818: 81쪽 → 5쪽). axis 절단은 앞
+         // 접두 슬라이스라 인덱스가 그대로 대응한다.
+-        let completed_vpos=para.completed_xml_vpos();
+-        let source_vpos = completed_vpos.as_deref().or_else(|| para
++        let completed_vpos=if fresh_projection {None} else {para.completed_xml_vpos()};
++        let source_vpos = completed_vpos.as_deref().or_else(|| (!fresh_projection).then_some(para)
++            .and_then(|para| para
+             .source_line_seg_vertical_pos
+             .as_deref()
+             .filter(|v| v.len() == para.line_segs.len())
+-            .map(|v| &v[..axis_line_segs.len()]));
++            .map(|v| &v[..axis_line_segs.len()])));
+         let linesegs = format!(
+             "{}{}{}",
+             LINESEG_SLOT_OPEN,
+--- /dev/null
++++ b/src/serializer/hwpx/standard_rows.rs
+@@ -0,0 +1,125 @@
++//! Ephemeral fresh composition rows for one readonly export, never an imported
++//! row/cache lease. The producer must own a current independently closed stack.
++//! Nothing here is persisted in Document or the computed-row descriptor.
++use crate::model::{document::Document,paragraph::{Paragraph,LineSeg}};
++use serde::Serialize;
++use std::collections::HashMap;
++
++#[derive(Debug)]
++pub(crate) struct CurrentStandardRowsProjection {
++    definitions:[u8;32],
++    inputs:Vec<[u8;32]>,
++    rows:Vec<Vec<LineSeg>>,
++}
++
++// A serialization byte/depth bound, not a claim of a total CPU-time bound.
++struct Digest { hash:blake3::Hasher, bytes:usize, depth:usize, quoted:bool, escaped:bool }
++impl std::io::Write for Digest {
++ fn write(&mut self,b:&[u8])->std::io::Result<usize>{
++  if b.len()>16*1024*1024-self.bytes{return Err(std::io::ErrorKind::InvalidData.into());}
++  for &c in b {if self.quoted {if self.escaped{self.escaped=false;}else if c==b'\\'{self.escaped=true;}else if c==b'"'{self.quoted=false;}}
++   else {match c {b'"'=>self.quoted=true,b'{'|b'['=>{self.depth+=1;if self.depth>64{return Err(std::io::ErrorKind::InvalidData.into());}},b'}'|b']'=>self.depth=self.depth.checked_sub(1).ok_or(std::io::ErrorKind::InvalidData)?,_=>{}}}}
++  self.bytes+=b.len();self.hash.update(b);Ok(b.len())
++ }
++ fn flush(&mut self)->std::io::Result<()>{Ok(())}
++}
++fn digest<T:Serialize>(v:&T)->Option<[u8;32]>{let mut w=Digest{hash:blake3::Hasher::new(),bytes:0,depth:0,quoted:false,escaped:false};
++ serde_json::to_writer(&mut w,v).ok()?;(w.depth==0&&!w.quoted).then(||*w.hash.finalize().as_bytes())}
++fn definitions(doc:&Document)->Option<[u8;32]>{
++ use crate::model::document::DocInfo;
++ let DocInfo{bin_data_list,font_faces,border_fills,char_shapes,tab_defs,numberings,bullets,
++  para_shapes,styles,extra_records,print_method,raw_stream,bullet_count,memo_shape_count,
++  memo_properties_xml,distribute_doc_data_removed,raw_stream_dirty:_,hwpx_head_tail,hwpml_version,
++  raw_provenance:_}=&doc.doc_info;
++ // Exhaustive definition binding, including unknown input bytes. Only derived
++ // cache-validity/seal fields are excluded; this does not mint either seal.
++ digest(&((bin_data_list,font_faces,border_fills,char_shapes,tab_defs,numberings,bullets,
++  para_shapes,styles,extra_records),(print_method,raw_stream,bullet_count,memo_shape_count,
++  memo_properties_xml,distribute_doc_data_removed,hwpx_head_tail,hwpml_version,&doc.doc_properties,&doc.sections.first()?.section_def)))
++}
++impl CurrentStandardRowsProjection {
++ pub(crate) fn from_current_stack(doc:&Document,plan:&crate::renderer::layout::CurrentWholeStackPlan,
++   styles:&crate::renderer::style_resolver::ResolvedStyleSet,width:f64,dpi:f64)->Option<Self>{
++  use crate::renderer::composer::{reflow_line_segs,compose_paragraph_in_context,ParagraphBox};
++  if doc.sections.len()!=1 || !dpi.is_finite() || dpi<=0.0 || !width.is_finite() || width<=0.0
++    || doc.sections.iter().any(|s|s.paragraphs.iter().any(|p|p.completed_native_rows.is_some())) {return None;}
++  let definitions=definitions(doc)?;
++  let paragraphs=&doc.sections[0].paragraphs;
++  let mut inputs=Vec::with_capacity(3);let mut rows=Vec::with_capacity(3);
++  for index in 0..3 {
++   let p=paragraphs.get(index)?;let input=digest(&(index,p))?;let mut fresh=p.clone();
++   fresh.line_segs.clear();fresh.layout_space_metrics.clear();
++   fresh.source_line_seg_vertical_pos=None;fresh.layout_only_fill_lines=0;fresh.hwpx_axis_shift=0;
++   fresh.native_source_synthetic_seal=None;fresh.native_source_synthetic_context=None;
++   fresh.completed_native_rows=None;fresh.native_frame_observation.set(None);
++   let shape=usize::from(fresh.para_shape_id);
++   let frame=ParagraphBox::content_for_style(width,styles.para_styles.get(shape),dpi);
++   reflow_line_segs(&mut fresh,frame,styles,dpi);
++   if fresh.line_segs.is_empty() || fresh.line_segs.len()>256{return None;}
++   let mut end=0i32;
++   for row in &fresh.line_segs {
++    if row.vertical_pos!=end || row.line_height<=0 || row.text_height!=row.line_height
++      || row.line_spacing<0 || row.column_start!=0 || row.segment_width!=plan.column_width_hu
++      || row.baseline_distance<0 || row.baseline_distance>row.line_height{return None;}
++    end=end.checked_add(row.line_height)?.checked_add(row.line_spacing)?;
++    if end>plan.body_height_hu{return None;}
++   }
++   if index==0 {
++    if end!=plan.prefix_end_hu || !plan.matches_fresh_prefix(&compose_paragraph_in_context(&fresh,styles)){return None;}
++   } else {
++    let host=plan.hosts.get(index-1)?;
++    if host.para_index!=index || host.control_index!=0 || fresh.line_segs.len()!=1
++      || host.logical_anchor_hu!=plan.prefix_end_hu || host.physical_top_hu<0
++      || host.reserved_bottom_hu>plan.body_height_hu
++      || host.after_hu!=if index==1 {fresh.line_segs[0].line_spacing} else {0}{return None;}
++    // Logical generated-row anchor and physical object reservation are distinct
++    // quantities in this proven current stack. No imported row supplies either.
++    let row=fresh.line_segs.first_mut()?;
++    row.vertical_pos=row.vertical_pos.checked_add(host.logical_anchor_hu)?;
++    if row.vertical_pos.checked_add(end)?>plan.body_height_hu{return None;}
++   }
++   inputs.push(input);rows.push(fresh.line_segs);
++  }
++  Some(Self{definitions,inputs,rows})
++ }
++ // Rebind only an unchanged export clone. Byte packages cannot construct this
++ // ephemeral projection or acquire a new CompletedRows lease.
++ pub(crate) fn bind_for_export(&self,doc:&Document)->Option<HashMap<usize,Vec<LineSeg>>>{
++  if doc.sections.len()!=1 || self.inputs.len()!=3 || self.rows.len()!=3
++    || definitions(doc)?!=self.definitions{return None;}
++  let paragraphs=&doc.sections[0].paragraphs;
++  let mut bound=HashMap::new();
++  for index in 0..3 {let p=paragraphs.get(index)?;
++   if p.stored_text_partition_is_dirty() || p.cell_format_vpos_dirty || p.source_line_seg_vertical_pos.is_some(){return None;}
++   if digest(&(index,p))?!=self.inputs[index]{return None;}
++   bound.insert(p as *const Paragraph as usize,self.rows[index].clone());
++  }
++  Some(bound)
++ }
++}
++
++#[cfg(test)]
++mod tests {
++ use super::*;
++ fn sample()->(Document,CurrentStandardRowsProjection){
++  let mut d=Document::default();d.sections.push(Default::default());
++  d.sections[0].paragraphs=(0..3).map(|index|{let mut p=Paragraph::default();p.text=format!("paragraph {index}");p}).collect();
++  let p=CurrentStandardRowsProjection{definitions:definitions(&d).unwrap(),
++   inputs:d.sections[0].paragraphs.iter().enumerate().map(|(i,p)|digest(&(i,p)).unwrap()).collect(),
++   rows:vec![vec![LineSeg::default()];3]};(d,p)
++ }
++ #[test] fn fresh_standard_rows_bind_only_exact_export_input_and_top_level_pointers(){
++  let(d,p)=sample();let clone=d.clone();let map=p.bind_for_export(&clone).unwrap();
++  assert_eq!(map.len(),3);
++  for row in &clone.sections[0].paragraphs{assert!(map.contains_key(&(row as *const Paragraph as usize)));}
++  for row in &d.sections[0].paragraphs{assert!(!map.contains_key(&(row as *const Paragraph as usize)));}
++  let mut changed=d.clone();changed.sections[0].paragraphs.swap(0,1);assert!(p.bind_for_export(&changed).is_none());
++  let mut changed=d.clone();changed.sections[0].paragraphs[1].raw_header_extra.push(0x51);assert!(p.bind_for_export(&changed).is_none());
++  let mut changed=d.clone();changed.doc_info.font_faces.push(Default::default());assert!(p.bind_for_export(&changed).is_none());
++ }
++ #[test] fn fresh_standard_rows_hash_budget_and_json_depth_are_conservative(){
++  assert!(digest(&"\"[{}]\\").is_some());
++  assert!(digest(&"a".repeat(16*1024*1024)).is_none());
++  let mut v=serde_json::Value::Null;for _ in 0..65{v=serde_json::json!([v]);}assert!(digest(&v).is_none());
++ }
++}
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[174, 32, 220, 68, 152, 123, 224, 200, 120, 113, 172, 89, 6, 126, 147, 155, 35, 76, 42, 96, 66, 186, 65, 35, 200, 250, 97, 163, 9, 143, 149, 162];
++pub(crate) const RESOURCE:[u8;32]=[225, 60, 234, 180, 55, 48, 143, 215, 12, 73, 219, 233, 103, 144, 33, 101, 211, 99, 205, 137, 193, 225, 141, 161, 217, 112, 5, 71, 108, 41, 70, 180];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -236,8 +236,12 @@
+             ("src/document_core/queries/rendering.rs",include_bytes!("../document_core/queries/rendering.rs").as_slice()),
+             ("src/model/paragraph.rs",include_bytes!("../model/paragraph.rs").as_slice()),
+             ("src/model/raw_provenance.rs",include_bytes!("../model/raw_provenance.rs").as_slice()),
+-            ("src/lib.rs",include_bytes!("../lib.rs").as_slice()),
+-            ("src/hwt_leaf115.rs",include_bytes!("../hwt_leaf115.rs").as_slice()),
++            ("src/renderer/layout/current_body_stack.rs",include_bytes!("../renderer/layout/current_body_stack.rs").as_slice()),
++            ("src/serializer/hwpx/standard_rows.rs",include_bytes!("../serializer/hwpx/standard_rows.rs").as_slice()),
++            ("src/serializer/hwpx/mod.rs",include_bytes!("../serializer/hwpx/mod.rs").as_slice()),
++            ("src/serializer/hwpx/context.rs",include_bytes!("../serializer/hwpx/context.rs").as_slice()),
++            ("src/serializer/hwpx/section.rs",include_bytes!("../serializer/hwpx/section.rs").as_slice()),
++            ("src/serializer/control.rs",include_bytes!("../serializer/control.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {

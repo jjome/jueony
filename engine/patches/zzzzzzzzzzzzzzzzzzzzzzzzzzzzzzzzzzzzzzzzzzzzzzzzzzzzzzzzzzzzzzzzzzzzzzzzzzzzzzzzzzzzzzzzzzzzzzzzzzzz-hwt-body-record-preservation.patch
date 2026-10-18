@@ -1,0 +1,109 @@
+--- a/src/hwt_leaf115.rs
++++ b/src/hwt_leaf115.rs
+@@ -82,6 +82,52 @@
+  Ok(out)
+ }
+ 
++
++fn body_records(bytes:&[u8])->Result<Vec<crate::parser::record::Record>>{
++ let mut reader=crate::parser::cfb_reader::CfbReader::open(bytes).map_err(|_|"HWT_CFB")?;
++ let body=reader.read_body_text_section_limited(0,true,16*1024*1024).map_err(|_|"HWT_BODY_BUDGET")?;
++ crate::parser::record::Record::read_all(&body).map_err(|_|"HWT_BODY_RECORD".into())
++}
++fn body_projection(bytes:&[u8],edited:&BTreeSet<u32>)->Result<Vec<(u16,u16,Vec<u8>)>>{
++ use crate::parser::tags::*;
++ let mut out=Vec::new();let mut header:Option<Vec<u8>>=None;let mut counts=[0usize;3];let mut seen=[false;3];
++ fn close(header:&Option<Vec<u8>>,counts:[usize;3],seen:[bool;3])->Result<()>{
++  if let Some(h)=header{
++   if !seen[0]||!seen[1]||(u32::from_le_bytes(h[0..4].try_into().unwrap())&0x7fff_ffff)as usize!=counts[0]||u16::from_le_bytes(h[12..14].try_into().unwrap())as usize!=counts[1]||u16::from_le_bytes(h[14..16].try_into().unwrap())!=0||u16::from_le_bytes(h[16..18].try_into().unwrap())as usize!=counts[2]{return fail("HWT_BODY_DECLARED_COUNTS");}
++  }else{return fail("HWT_BODY_PARAGRAPH_OWNER");}Ok(())
++ }
++ for record in body_records(bytes)?{
++  let mut data=record.data;
++  match record.tag_id{
++   HWPTAG_PARA_HEADER=>{
++    if header.is_some(){close(&header,counts,seen)?;}
++    if record.level!=0||data.len()<22||data.len()>64{return fail("HWT_PARA_HEADER_PROFILE");}
++    header=Some(data.clone());counts=[0;3];seen=[false;3];
++    let last=data[3]&0x80;data[0..4].fill(0);data[3]=last;data[12..14].fill(0);data[16..18].fill(0);
++   },
++   HWPTAG_PARA_TEXT|HWPTAG_PARA_CHAR_SHAPE|HWPTAG_PARA_LINE_SEG=>{
++    if header.is_none()||record.level!=1{return fail("HWT_BODY_PARAGRAPH_OWNER");}
++    let(index,size)=match record.tag_id{HWPTAG_PARA_TEXT=>(0,2),HWPTAG_PARA_CHAR_SHAPE=>(1,8),_=>(2,36)};
++    if seen[index]||data.len()%size!=0{return fail("HWT_BODY_RECORD_PROFILE");}seen[index]=true;counts[index]=data.len()/size;data.clear();
++   },
++   HWPTAG_CTRL_HEADER=>{
++    if data.len()<4{return fail("HWT_CONTROL_HEADER_PROFILE");}
++    if u32::from_le_bytes(data[..4].try_into().unwrap())==FIELD_CLICKHERE{
++     if data.len()<19{return fail("HWT_FIELD_HEADER_PROFILE");}
++     let len=u16::from_le_bytes(data[9..11].try_into().unwrap())as usize;
++     let at=11usize.checked_add(len.checked_mul(2).ok_or("HWT_FIELD_HEADER_PROFILE")?).ok_or("HWT_FIELD_HEADER_PROFILE")?;
++     if at.checked_add(8)!=Some(data.len()){return fail("HWT_FIELD_HEADER_PROFILE");}
++     let id=u32::from_le_bytes(data[at..at+4].try_into().unwrap());
++     // Only the actually edited ClickHere may acquire the existing filled bit.
++     if edited.contains(&id){data[5]&=0x7f;}
++    }
++   },_=>{}
++  }
++  out.push((record.tag_id,record.level,data));
++ }
++ close(&header,counts,seen)?;Ok(out)
++}
++
+ fn exact_container_preservation(source:&[u8],output:&[u8],current:&crate::model::document::Document)->Result<()> {
+  let before=container_streams(source)?;let after=container_streams(output)?;
+  if before.keys().collect::<Vec<_>>()!=after.keys().collect::<Vec<_>>(){return fail("HWT_CONTAINER_STREAM_SET");}
+@@ -134,7 +180,7 @@
+  if result.len()!=names.len(){return fail("FIELD_MAPPING_INCOMPLETE");}Ok(result)
+ }
+ #[derive(Debug,Clone)]pub struct Lease{pub instance:u64,pub revision:u64,pub source_sha:String,pub field_id:u32,pub old_value:String}
+-pub struct Session{doc:DocumentCore,source:Vec<u8>,instance:u64,revision:u64,undo:Vec<(u32,u32)>,redo:Vec<(u32,u32)>}
++pub struct Session{doc:DocumentCore,source:Vec<u8>,instance:u64,revision:u64,undo:Vec<(u32,u32)>,redo:Vec<(u32,u32)>,edited_field_ids:BTreeSet<u32>}
+ fn edit_delta(before:&crate::model::document::Document,after:&DocumentCore,source:&[u8],id:u32,value:&str)->Result<()> {
+  let mut a=DocumentCore::new_empty();a.set_document(before.clone());let original=preflight(source,&a)?;let mut expected=original.clone();let target=expected.iter_mut().find(|b|b.field_id==id).ok_or("DELTA_TARGET")?;target.value=value.into();
+  if preflight(source,after)?!=expected{return fail("EDIT_OTHER_FIELD_CHANGED");}
+@@ -149,7 +195,14 @@
+  }Ok(())
+ }
+ impl Session{
+- pub fn open(bytes:&[u8],instance:u64)->Result<Self>{crate::parser::xml_template::extract_hwt_xml_template(bytes)?;container_streams(bytes)?;let doc=DocumentCore::from_bytes(bytes).map_err(|_|"HWT_OPEN")?;preflight(bytes,&doc)?;Ok(Self{doc,source:bytes.to_vec(),instance,revision:0,undo:vec![],redo:vec![]})}
++ pub fn open(bytes:&[u8],instance:u64)->Result<Self>{crate::parser::xml_template::extract_hwt_xml_template(bytes)?;container_streams(bytes)?;let doc=DocumentCore::from_bytes(bytes).map_err(|_|"HWT_OPEN")?;preflight(bytes,&doc)?;
++ // Refuse an unowned source representation before exposing an editable session.
++ let baseline=doc.export_hwp_with_adapter_snapshot_with_report().map_err(|_|"HWT_SOURCE_EXPORT")?;
++ if !baseline.content_loss().is_empty(){return fail("HWT_SOURCE_CONTENT_LOSS");}
++ let source_records=body_records(bytes)?;let baseline_records=body_records(baseline.bytes())?;
++ if source_records.len()!=baseline_records.len()||source_records.iter().zip(&baseline_records).any(|(a,b)|a.tag_id!=b.tag_id||a.level!=b.level||a.data!=b.data){return fail("HWT_SOURCE_RAW_OWNER");}
++ body_projection(bytes,&BTreeSet::new())?;
++ Ok(Self{doc,source:bytes.to_vec(),instance,revision:0,undo:vec![],redo:vec![],edited_field_ids:BTreeSet::new()})}
+  pub fn document(&self)->&DocumentCore{&self.doc}
+  pub fn undo(&mut self)->Result<()>{let pair=self.undo.pop().ok_or("NO_UNDO")?;self.doc.restore_snapshot_native(pair.0).map_err(|_|"UNDO_FAILED")?;self.redo.push(pair);self.revision+=1;Ok(())}
+  pub fn redo(&mut self)->Result<()>{let pair=self.redo.pop().ok_or("NO_REDO")?;self.doc.restore_snapshot_native(pair.1).map_err(|_|"REDO_FAILED")?;self.undo.push(pair);self.revision+=1;Ok(())}
+@@ -163,7 +216,7 @@
+   let model_before=self.doc.document().clone();let before=self.doc.save_snapshot_native();
+   let result=self.doc.set_field_value_by_id(lease.field_id,value).map_err(|_|"FIELD_EDIT_FAILED".to_string()).and_then(|_|edit_delta(&model_before,&self.doc,&self.source,lease.field_id,value));
+   if let Err(e)=result{self.doc.restore_snapshot_native(before).map_err(|_|"ROLLBACK_FAILED")?;self.doc.discard_snapshot_native(before);return Err(e.into());}
+-  let after=self.doc.save_snapshot_native();for(a,b)in self.redo.drain(..){self.doc.discard_snapshot_native(a);self.doc.discard_snapshot_native(b);}self.undo.push((before,after));self.revision+=1;Ok(())
++  let after=self.doc.save_snapshot_native();for(a,b)in self.redo.drain(..){self.doc.discard_snapshot_native(a);self.doc.discard_snapshot_native(b);}self.undo.push((before,after));self.edited_field_ids.insert(lease.field_id);self.revision+=1;Ok(())
+  }
+  /// Returns bytes only after same-format and strict post-write evidence checks.
+  /// The caller still owns actual safe OS writing; this candidate never writes files.
+@@ -171,7 +224,7 @@
+   let expected=preflight(&self.source,&self.doc)?;
+   let output=self.doc.export_hwp_with_adapter_snapshot_with_report().map_err(|_|"HWT_EXPORT")?;
+   if !output.content_loss().is_empty(){return fail("HWT_CONTENT_LOSS");}
+-  let bytes=output.into_bytes();exact_container_preservation(&self.source,&bytes,self.doc.document())?;let reopened=DocumentCore::from_bytes(&bytes).map_err(|_|"HWT_REOPEN")?;
++  let bytes=output.into_bytes();exact_container_preservation(&self.source,&bytes,self.doc.document())?;if body_projection(&self.source,&self.edited_field_ids)?!=body_projection(&bytes,&self.edited_field_ids)?{return fail("HWT_EXACT_BODY_STRUCTURE");}let reopened=DocumentCore::from_bytes(&bytes).map_err(|_|"HWT_REOPEN")?;
+   if preflight(&bytes,&reopened)?!=expected{return fail("HWT_FIELD_ROUNDTRIP");}
+   let before=self.doc.document();let after=reopened.document();
+   if before.header.flags!=after.header.flags||before.header.raw_data!=after.header.raw_data||before.extra_streams!=after.extra_streams{return fail("HWT_RAW_STREAM_PRESERVATION");}
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[60, 124, 212, 204, 203, 174, 84, 27, 203, 88, 195, 154, 102, 130, 23, 213, 52, 148, 137, 175, 89, 72, 84, 232, 66, 78, 47, 204, 85, 24, 162, 206];
++pub(crate) const RESOURCE:[u8;32]=[174, 32, 220, 68, 152, 123, 224, 200, 120, 113, 172, 89, 6, 126, 147, 155, 35, 76, 42, 96, 66, 186, 65, 35, 200, 250, 97, 163, 9, 143, 149, 162];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {

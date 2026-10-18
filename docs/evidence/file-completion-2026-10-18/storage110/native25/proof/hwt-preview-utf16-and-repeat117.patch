@@ -1,0 +1,179 @@
+--- a/src/hwt_leaf115.rs
++++ b/src/hwt_leaf115.rs
+@@ -128,24 +128,32 @@
+  close(&header,counts,seen)?;Ok(out)
+ }
+ 
++fn body_preview(doc:&crate::model::document::Document)->Vec<u8>{
++ let mut text=String::new();
++ 'sections:for section in &doc.sections{for paragraph in &section.paragraphs{
++  let line=paragraph.text.trim_end_matches('\0');if line.is_empty(){continue;}text.push_str(line);text.push_str("\r\n");
++  if text.chars().count()>=1000{text=text.chars().take(1000).collect();break 'sections;}
++ }}text.encode_utf16().flat_map(u16::to_le_bytes).collect()
++}
++fn source_preview_is_derived(source:&[u8],raw:&[u8])->Result<bool>{
++ if raw.len()>8192||raw.len()%2!=0{return fail("HWT_PREVIEW_BUDGET");}
++ let units=raw.chunks_exact(2).map(|p|u16::from_le_bytes([p[0],p[1]])).collect::<Vec<_>>();
++ let text=String::from_utf16(&units).map_err(|_|"HWT_PREVIEW_UTF16")?;
++ if text.trim().is_empty(){return Ok(true);}
++ let original=DocumentCore::from_bytes(source).map_err(|_|"HWT_PREVIEW_SOURCE")?;
++ Ok(raw==body_preview(original.document()))
++}
+ fn exact_container_preservation(source:&[u8],output:&[u8],current:&crate::model::document::Document)->Result<()> {
+  let before=container_streams(source)?;let after=container_streams(output)?;
+  if before.keys().collect::<Vec<_>>()!=after.keys().collect::<Vec<_>>(){return fail("HWT_CONTAINER_STREAM_SET");}
+  for(path,original)in &before{
+   let emitted=&after[path];if original==emitted{continue;}
+-  // The standard writer only supplements an empty/whitespace preview. Prove
+-  // that exact derived output; never exempt an arbitrary PrvText difference.
++  // Only a blank source preview or an exact preview of the SOURCE body is derived.
++  // Reparse source independently: the edited current body must not grant source authority.
+   if path!="/PrvText"||original.len()>8192||emitted.len()>8192||original.len()%2!=0{return fail("HWT_EXACT_CONTAINER_STREAMS");}
+-  let units=original.chunks_exact(2).map(|p|u16::from_le_bytes([p[0],p[1]])).collect::<Vec<_>>();
+-  let old=String::from_utf16(&units).map_err(|_|"HWT_PREVIEW_UTF16")?;
+-  if !old.trim().is_empty()||current.preview.as_ref().and_then(|p|p.text.as_deref())!=Some(old.as_str()){return fail("HWT_PREVIEW_NOT_EMPTY_SOURCE");}
+-  let mut expected=String::new();
+-  'sections:for section in &current.sections{for paragraph in &section.paragraphs{
+-   let text=paragraph.text.trim_end_matches('\0');if text.is_empty(){continue;}expected.push_str(text);expected.push_str("\r\n");
+-   if expected.chars().count()>=1000{expected=expected.chars().take(1000).collect();break 'sections;}
+-  }}
+-  if expected.trim().is_empty(){return fail("HWT_PREVIEW_NOT_GENERATED");}
+-  let encoded=expected.encode_utf16().flat_map(u16::to_le_bytes).collect::<Vec<_>>();if emitted!=&encoded{return fail("HWT_PREVIEW_DERIVATION");}
++  if !source_preview_is_derived(source,original)?{return fail("HWT_PREVIEW_SOURCE_NOT_DERIVED");}
++  let encoded=body_preview(current);
++  if emitted!=&encoded{return fail("HWT_PREVIEW_DERIVATION");}
+  }
+  Ok(())
+ }
+@@ -222,7 +230,17 @@
+  /// The caller still owns actual safe OS writing; this candidate never writes files.
+  pub fn export_checked(&self)->Result<Vec<u8>>{
+   let expected=preflight(&self.source,&self.doc)?;
+-  let output=self.doc.export_hwp_with_adapter_snapshot_with_report().map_err(|_|"HWT_EXPORT")?;
++  // The normal adapter snapshot still owns all body lowering. Only a proven
++  // source-derived preview is regenerated on this isolated export clone.
++  let mut snapshot=self.doc.prepare_hwp_export_snapshot().document().clone();
++  if let Some(raw)=container_streams(&self.source)?.get("/PrvText"){
++   if source_preview_is_derived(&self.source,raw)?{
++    let encoded=body_preview(self.doc.document());
++    let units=encoded.chunks_exact(2).map(|p|u16::from_le_bytes([p[0],p[1]])).collect::<Vec<_>>();
++    snapshot.preview.get_or_insert_with(Default::default).text=Some(String::from_utf16(&units).map_err(|_|"HWT_PREVIEW_UTF16")?);
++   }
++  }
++  let output=crate::serializer::serialize_document_with_report(&snapshot).map_err(|_|"HWT_EXPORT")?;
+   if !output.content_loss().is_empty(){return fail("HWT_CONTENT_LOSS");}
+   let bytes=output.into_bytes();exact_container_preservation(&self.source,&bytes,self.doc.document())?;if body_projection(&self.source,&self.edited_field_ids)?!=body_projection(&bytes,&self.edited_field_ids)?{return fail("HWT_EXACT_BODY_STRUCTURE");}let reopened=DocumentCore::from_bytes(&bytes).map_err(|_|"HWT_REOPEN")?;
+   if preflight(&bytes,&reopened)?!=expected{return fail("HWT_FIELD_ROUNDTRIP");}
+--- a/src/parser/cfb_reader.rs
++++ b/src/parser/cfb_reader.rs
+@@ -8,6 +8,14 @@
+ //! - BinData/BIN{XXXX}.{ext}: 바이너리 데이터
+ 
+ use std::io::{Cursor, Read};
++
++/// Optional malformed previews retain bounded opaque source ownership.
++pub(crate) const MAX_OPAQUE_PREVIEW_TEXT_BYTES: usize = 64 * 1024;
++pub(crate) fn decode_preview_utf16(data: &[u8]) -> Option<String> {
++    if data.len() % 2 != 0 { return None; }
++    let units = data.chunks_exact(2).map(|b|u16::from_le_bytes([b[0],b[1]])).collect::<Vec<_>>();
++    String::from_utf16(&units).ok()
++}
+ 
+ /// CFB 컨테이너 리더
+ pub struct CfbReader {
+@@ -376,22 +384,8 @@
+ 
+         let data = self.read_stream_raw("/PrvText").ok()?;
+ 
+-        // UTF-16LE 디코딩
+-        if data.len() < 2 {
+-            return None;
+-        }
+-
+-        let text: String = data
+-            .chunks(2)
+-            .filter_map(|chunk| {
+-                if chunk.len() == 2 {
+-                    let code = u16::from_le_bytes([chunk[0], chunk[1]]);
+-                    char::from_u32(code as u32)
+-                } else {
+-                    None
+-                }
+-            })
+-            .collect();
++        // Decode complete scalar values; isolated surrogate code units are not characters.
++        let text = decode_preview_utf16(&data)?;
+ 
+         if text.is_empty() {
+             None
+--- a/src/parser/mod.rs
++++ b/src/parser/mod.rs
+@@ -474,6 +474,10 @@
+     // 5-7. 미리보기, BinData, 추가 스트림
+     // Preview is optional document metadata.  A malformed or disproportionately
+     // large thumbnail must not prevent the actual document from opening.
++    if cfb.has_stream("/PrvText") {
++        cfb.read_stream_raw_limited("/PrvText",cfb_reader::MAX_OPAQUE_PREVIEW_TEXT_BYTES)
++            .map_err(ParseError::CfbError)?;
++    }
+     let preview = extract_preview(&mut cfb, MAX_THUMBNAIL_BYTES);
+     let bin_data_content = load_bin_data_content(
+         &mut cfb,
+@@ -1887,6 +1891,14 @@
+         .collect();
+ 
+     for path in &all_streams {
++        // Invalid optional preview text cannot be represented by String. Keep
++        // exactly one raw owner instead of silently dropping UTF-16 code units.
++        if path == "/PrvText" {
++            if let Ok(data)=cfb.read_stream_raw_limited(path,cfb_reader::MAX_OPAQUE_PREVIEW_TEXT_BYTES) {
++                if cfb_reader::decode_preview_utf16(&data).is_none() { extra.push((path.clone(),data)); }
++            }
++            continue;
++        }
+         // 이미 파싱된 스트림은 제외
+         if path == "/FileHeader"
+             || path == "/DocInfo"
+--- a/src/serializer/cfb_writer.rs
++++ b/src/serializer/cfb_writer.rs
+@@ -214,7 +214,17 @@
+     // 템플릿에서 만든 새 문서는 템플릿의 placeholder 미리보기("\r\n")를 물고
+     // 나가 탐색기·한컴 미리보기에 빈 문서로 보인다. 원본 미리보기가 없거나
+     // placeholder 일 때만 본문에서 새로 만든다 — 실문서의 원본 미리보기는 건드리지 않는다.
+-    let preview = supplement_preview(doc);
++    let preview_entries=doc.extra_streams.iter().filter(|(path,_)|path=="/PrvText").collect::<Vec<_>>();
++    let opaque_preview=preview_entries.iter().any(|(_,raw)|crate::parser::cfb_reader::decode_preview_utf16(raw).is_none());
++    if opaque_preview && (preview_entries.len()!=1 || preview_entries[0].1.len()>crate::parser::cfb_reader::MAX_OPAQUE_PREVIEW_TEXT_BYTES) {
++        return Err(SerializeError::CfbError("UNOWNED_OPAQUE_PRVTEXT".into()));
++    }
++    if opaque_preview && doc.preview.as_ref().and_then(|p|p.text.as_ref()).is_some() {
++        return Err(SerializeError::CfbError("CONFLICTING_OPAQUE_PRVTEXT".into()));
++    }
++    let mut preview = supplement_preview(doc);
++    if opaque_preview { if let Some(p)=&mut preview { p.text=None; } }
++
+ 
+     // 6. CFB 컨테이너 조립
+     let mut content_loss = ContentLossReport::new(SerializedFormat::Hwp);
+--- a/src/serializer/hwpx/mod.rs
++++ b/src/serializer/hwpx/mod.rs
+@@ -54,6 +54,11 @@
+ /// HWPX 직렬화 바이트와 바로 그 산출물의 내용 손실을 함께 반환한다 (#4430).
+ pub fn serialize_hwpx_with_report(doc: &Document) -> Result<SerializedDocument, SerializeError> {
+     use static_assets::*;
++    // Malformed native preview bytes have an opaque HWP owner, not XML text.
++    if doc.extra_streams.iter().any(|(path,raw)|path=="/PrvText"&&crate::parser::cfb_reader::decode_preview_utf16(raw).is_none()) {
++        return Err(SerializeError::CfbError("HWPX_UNREPRESENTABLE_OPAQUE_PRVTEXT".into()));
++    }
++
+ 
+     // 1-pass: ID 풀 구성
+     let mut ctx = SerializeContext::collect_from_document(doc);
+@@ -121,6 +126,7 @@
+     z.write_deflated(
+         "Preview/PrvText.txt",
+         doc.hwpx_aux_entry("Preview/PrvText.txt")
++            .or_else(||doc.preview.as_ref().and_then(|p|p.text.as_deref()).map(str::as_bytes))
+             .unwrap_or(PRV_TEXT),
+     )?;
+     z.write_deflated(

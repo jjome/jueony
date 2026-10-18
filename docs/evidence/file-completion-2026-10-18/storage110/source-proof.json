@@ -1,0 +1,105 @@
+{
+  "parentCommit": "4dab28b",
+  "files": [
+    {
+      "path": "apps/editor/native-storage-tests/lib.rs",
+      "sha256": "cc03579e6363b51c48eac5687a6eaca6edd516f7f74518748d3d1323467a8754"
+    },
+    {
+      "path": "apps/editor/scripts/generate-legacy-stack-fixtures115.mjs",
+      "sha256": "b2b5e9470d10bb00127c61c5e591891a28b878907dce6bba8f8e72e55416aa4f"
+    },
+    {
+      "path": "apps/editor/scripts/verify-legacy-stack-storage115.mjs",
+      "sha256": "ace6a2d988baa2413d2953be804b05d56a18f9edc8635636f96d4c9708971112"
+    },
+    {
+      "path": "apps/editor/src/adapters/desktop/native-host.ts",
+      "sha256": "2e37e25c1d0667574f9b2d79f187688e4e0129d74df19bf29f3b14ff892f5bf8"
+    },
+    {
+      "path": "apps/editor/src/adapters/files/hwt-copy-picker.ts",
+      "sha256": "b7b20dc6251261d007aceed6bc4c4fde3a30737ab7dac7620d627a5cdd1c94ce"
+    },
+    {
+      "path": "apps/editor/src/adapters/files/hwt-leaf-save.ts",
+      "sha256": "f216c0f2fa4964f29577a260898e4f1c2fae1123241d8e5e2620a5ddd4617c47"
+    },
+    {
+      "path": "apps/editor/src/adapters/iframe/document-client.ts",
+      "sha256": "925e8ebf0f2ab7eaef46c73b0bc241d47108663817d3ddc6bfb654b8af926738"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/editor-bridge.ts",
+      "sha256": "1cc222f8666c3713d49fb9ac5892d4753b4ce4fcfbeb0f72d4baf4ac7bb72575"
+    },
+    {
+      "path": "apps/editor/src/adapters/storage/hwt-leaf-records.ts",
+      "sha256": "fcd5a4702861d15096c0d62879eb793bd2008ec01dd2379b944b4bec7a49f497"
+    },
+    {
+      "path": "apps/editor/src/adapters/storage/hwt-leaf-recovery.ts",
+      "sha256": "54c98eef7c913650c76705e094c592f10d0deb9a5f6389846b3b8b86ea2b7e8f"
+    },
+    {
+      "path": "apps/editor/src/adapters/xml/hwt-leaf.ts",
+      "sha256": "27232611dd4381cc0d98ee4c72585d5466dffb864e225891c8a0c5aa26d23fea"
+    },
+    {
+      "path": "apps/editor/src/adapters/xml/hwt-template95.ts",
+      "sha256": "6f9d7b7a6e4c719d432378b87aafc6fec368c46aa82b62c4715e3a1232cc3360"
+    },
+    {
+      "path": "apps/editor/src/modules/xml-documents/application/hwt-leaf-workspace.ts",
+      "sha256": "c73b94b652e25f01693a44e1ceedabd6486ce89ec0373e0cf46a4e42d0fc8823"
+    },
+    {
+      "path": "apps/editor/src/modules/xml-documents/domain/hwt-mapping95.ts",
+      "sha256": "309cc604dd1d2a3aa35fac3fcce9413b9cd99c91fd3c9cfcf48b9d139045f354"
+    },
+    {
+      "path": "apps/editor/src/modules/xml-documents/public/hwt-leaf.ts",
+      "sha256": "c5a1009943663a9d5bb950f3a309bd7e3c37157448a59554f8121a29b99689ba"
+    },
+    {
+      "path": "apps/editor/src/modules/xml-documents/public/hwt-template95.ts",
+      "sha256": "816388376425e4a0529d158ec34cd0e197fec6f223f2c49a0471acc4b4b4d169"
+    },
+    {
+      "path": "apps/editor/src/mvp/editor-bridge.ts",
+      "sha256": "4cde58aaa486693fc7844d5c54ed20e238b35bdd551ec76414a0c24c56191b63"
+    },
+    {
+      "path": "apps/editor/src/shell.ts",
+      "sha256": "fbeeba4e4eb37613c4d02b623f590eb7277e608ec83f01873ebf720fb15578d3"
+    },
+    {
+      "path": "apps/editor/src/ui/hwt-leaf-dialog.ts",
+      "sha256": "a3ad99c6878aff70a33de5a33655c149a1924e96ea581441373f552e03729fa0"
+    },
+    {
+      "path": "apps/editor/src/ui/hwt-template95-dialog.ts",
+      "sha256": "ef12d0ff8fea4ab14da588e8136ef440a6abbfbb06df9f502ff0f5b90033c122"
+    },
+    {
+      "path": "apps/editor/src/ui/xml-document-dialog.ts",
+      "sha256": "dfd20024d9db4c5f8237443d7a531e4e66b3def0d09d44e6f0b64065db89c70a"
+    },
+    {
+      "path": "apps/editor/src-tauri/src/main.rs",
+      "sha256": "2ca4e9ac671436b34c163d0116d758ced8c8263abd2610d3f8912260c94b3721"
+    },
+    {
+      "path": "apps/editor/src-tauri/src/storage.rs",
+      "sha256": "820cc2751c86da92722881783e0d244c02251e20ecf2e67ee41b2701c9b1560f"
+    },
+    {
+      "path": "scripts/Build-Standalone.ps1",
+      "sha256": "d0ba2e5a6afe628f362d8dd6e5a74f4fa1710abcf78e451a4883fad967f6a7dc"
+    },
+    {
+      "path": "scripts/verify_file_workflows.py",
+      "sha256": "c181d95950b9108703c09d90bfccc5366db3baaaf76c6a3871eb0a713036d670"
+    }
+  ]
+}

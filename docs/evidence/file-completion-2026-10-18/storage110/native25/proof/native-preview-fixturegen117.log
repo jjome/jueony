@@ -1,0 +1,13 @@
+   Compiling hwt-leaf115-native v0.1.0 (/mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/native-preview-fixturegen)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.75s
+     Running unittests src/lib.rs (/tmp/jueony-rhwp-engine/target/hwt-leaf115-conversion/debug/deps/hwt_leaf115_native-0ebbc19b6b991a56)
+
+running 1 test
+test tests::emit_preview_fixtures ... PREVIEW_FIXTURE valid-astrl-korean.hwp sourceSHA=5bac76d9084861e8ed122e530593a969528918da7d624ff51635f28c6b9b23e5 previewSHA=fe6dab3541f73023bfb5d45fd61bfb8e62c4e59d400bda7d4a692a9f16941636
+PREVIEW_FIXTURE unpaired-high.hwp sourceSHA=ca8214aafd433ab1a20bf25a55adfc895e6bf7caec52e6bbdd96dff5c28d7b72 previewSHA=c960f09cfe75e9a56f97b04ec02553be742dc5a00d66b06e0adf8f9187242385
+PREVIEW_FIXTURE unpaired-low.hwp sourceSHA=cfe074d643554c3de84a67ec43adca738964f2e5b01ec6fe1b40c84d5c9df2bd previewSHA=c8d4f509baf51eddf1028d6a1eb27c44046ec1db82d3b795fd123607277068e8
+PREVIEW_FIXTURE odd-byte.hwp sourceSHA=ca1454385eb1d453d9770c9f2265e8ac61a2fc1a3beae10ce43ee6fde2da42c2 previewSHA=d52a657f66feeaef63fd06fbe227890397aae1fbb0525aa8a1fd2ca595728c49
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 25 filtered out; finished in 0.07s
+

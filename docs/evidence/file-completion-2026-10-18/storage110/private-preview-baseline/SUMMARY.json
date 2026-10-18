@@ -1,0 +1,37 @@
+{
+  "status": "NATIVE_READY_WASM_PENDING",
+  "runtimePatchSha256": "f0a0f45382147d183ded62ea18a815fb4dfb7680a866dc47b9786d70d6c932d9",
+  "native": {
+    "pass": 25,
+    "fail": 0,
+    "ignored": 0
+  },
+  "baseline116PreviewWasm": {
+    "pass": 2,
+    "fail": 5,
+    "cases": 7
+  },
+  "baseline116HwtStandalone": {
+    "pass": 11,
+    "fail": 2,
+    "cases": 13
+  },
+  "baseline116HwtActualShell": {
+    "pass": 6,
+    "fail": 1,
+    "cases": 7
+  },
+  "baseline116HwtNativeShim": {
+    "status": "SETUP_FAILED",
+    "casesExecuted": 0,
+    "cause": "verifier used get_document_window_context instead of production document_window_context; fixed verifier retained in reproduction"
+  },
+  "limits": [
+    "Normal preview budget64KiB; invalid/odd preview retains exact HWP opaque owner, HWPX4APIs explicitly reject.",
+    "HWT preview regeneration only on existing adapter export clone after exact source-body-producer proof; current output must exactly equal current producer.",
+    "No generic HWT/forms/groups/HWT-XSL support claim.",
+    "Typed+opaque raw conflict is a Native-only injected IR state; public WASM parser cannot generate both owners from a single /PrvText file stream.",
+    "No official source, engine patch folder, GUI/COM/user/public document/font bytes/network/Git writes.",
+    "Old failed evidence preserved; finalWASM suites13/7/10 pluspreview7 pending root package."
+  ]
+}

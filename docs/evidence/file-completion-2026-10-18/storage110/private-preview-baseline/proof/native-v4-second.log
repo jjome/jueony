@@ -1,0 +1,39 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/source-v4)
+   Compiling hwt-leaf115-native v0.1.0 (/mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/native-v4)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 09s
+     Running unittests src/lib.rs (/tmp/jueony-rhwp-engine/target/hwt-leaf115-conversion/debug/deps/hwt_leaf115_native-0ebbc19b6b991a56)
+
+running 17 tests
+test tests::arbitrary_nonempty_preview_cannot_gain_current_body_derivation ... ok
+test tests::duplicate_known_body_record_cannot_disappear_while_save_succeeds ... raw repeated PAGE_DEF refused by save: HWT_EXACT_BODY_STRUCTURE
+ok
+test tests::duplicate_name_refuses_before_mutation ... ok
+test tests::form_and_unknown_and_duplicate_id_refuse ... ok
+test tests::group_or_object_range_refuses ... ok
+test tests::hidden_master_and_xml_lineage_refuse ... ok
+test tests::instance_source_cas_noop_and_controls_refuse_without_changes ... ok
+test tests::malformed_hwt_and_missing_body_mapping_refuse ... ok
+test tests::own_artifacts_and_source_witness ... compiled-candidate-sha256=ae533b41610c49c9ea95ddc94f250e9cf83c6f5531a01e08c3041504bd092371
+ok
+test tests::own_hwt_leaf_edit_same_hwt_roundtrip_and_other_field_preserved ... own HWT same-format source=e9951e45f2628caca9bfee9444620c789dd542f56f3da10d870418e91635f1c9 output=9c969ebbf9105643674457aa8e74133acc82716affb8f61108a4fb9bad49b452 pages=1 XMLTemplate3 raw exact
+ok
+test tests::own_hwt_undo_redo_and_stale_revision ... ok
+test tests::protected_field_refuses ... ok
+
+thread 'tests::repeated_edits_disk_reopen_three_cycles_and_history' (553376) panicked at src/lib.rs:26:415:
+called `Result::unwrap()` on an `Err` value: "HWT_PREVIEW_DERIVATION"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test tests::repeated_edits_disk_reopen_three_cycles_and_history ... FAILED
+test tests::schema_mismatch_xpath_group_and_duplicate_mapping_refuse ... ok
+test tests::stateless_api_source_and_value_cas_and_same_format ... ok
+test tests::stateless_unknown_request_keys_and_wrong_original_rejected ... ok
+test tests::unknown_body_record_and_trailing_bytes_are_not_silently_lost ... ok
+
+failures:
+
+failures:
+    tests::repeated_edits_disk_reopen_three_cycles_and_history
+
+test result: FAILED. 16 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.44s
+
+error: test failed, to rerun pass `--lib`

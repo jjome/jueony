@@ -160,6 +160,19 @@ export function installAgentBridge(d:Deps){
   documentInstance:()=>String(d.wasm.documentGeneration),
   configureHistoryScope(scope:HistoryScope){configureDocumentHistoryScope(scope,()=>({instance:api.documentInstance(),revision:api.revision(),available:!applying&&!composing&&!damaged&&!api.hostMutationLocked()}));},
   canInspectHwtTemplate:()=>typeof d.wasm.getWasmModuleExports().extractHwtXmlTemplate==='function',
+  canEditHwtLeaf:()=>{const module=d.wasm.getWasmModuleExports();return typeof module.inspectHwtLeafDocument==='function'&&typeof module.editHwtLeafDocument==='function';},
+  inspectHwtLeaf(bytes:Uint8Array){
+   if(!ArrayBuffer.isView(bytes)||Object.prototype.toString.call(bytes)!=='[object Uint8Array]'||!bytes.byteLength||bytes.byteLength>32*1024*1024)throw Error('HWT 원본은 32MiB 이하여야 합니다.');
+   const inspect=d.wasm.getWasmModuleExports().inspectHwtLeafDocument;
+   if(typeof inspect!=='function')throw Error('현재 엔진은 HWT 일반 필드 편집을 지원하지 않습니다.');
+   return inspect(new Uint8Array(bytes));
+  },
+  editHwtLeaf(bytes:Uint8Array,request:string){
+   if(!ArrayBuffer.isView(bytes)||Object.prototype.toString.call(bytes)!=='[object Uint8Array]'||!bytes.byteLength||bytes.byteLength>32*1024*1024||typeof request!=='string'||request.length>100000)throw Error('HWT 원본 또는 편집 요청 크기가 올바르지 않습니다.');
+   const edit=d.wasm.getWasmModuleExports().editHwtLeafDocument;
+   if(typeof edit!=='function')throw Error('현재 엔진은 HWT 일반 필드 편집을 지원하지 않습니다.');
+   return new Uint8Array(edit(new Uint8Array(bytes),request));
+  },
   inspectHwtTemplate(bytes:Uint8Array){
    if(!ArrayBuffer.isView(bytes)||Object.prototype.toString.call(bytes)!=='[object Uint8Array]'||bytes.byteLength>32*1024*1024)throw Error('HWT 원본은 32MiB 이하여야 합니다.');
    const extract=d.wasm.getWasmModuleExports().extractHwtXmlTemplate;

@@ -1,0 +1,23 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/source-v4)
+   Compiling hwt-leaf115-native v0.1.0 (/mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/native-v4)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 36.52s
+     Running unittests src/lib.rs (/tmp/jueony-rhwp-engine/target/hwt-leaf115-conversion/debug/deps/hwt_leaf115_native-0ebbc19b6b991a56)
+
+running 1 test
+test tests::ordinary_hwp_preview_korean_astral_is_exact_on_open_save ... OWN_PREVIEW beforeSHA=fe6dab3541f73023bfb5d45fd61bfb8e62c4e59d400bda7d4a692a9f16941636 afterSHA=dba1edbe3ad834b32e7693616b1a35bb5caf57641daa3bdcc329c9f5d3c90566 rawBytes=42 emittedBytes=34
+
+thread 'tests::ordinary_hwp_preview_korean_astral_is_exact_on_open_save' (557510) panicked at src/lib.rs:29:975:
+assertion `left == right` failed: ordinary HWP raw astral preview must remain exact
+  left: [144, 199, 180, 204, 32, 0, 75, 0, 111, 0, 114, 0, 101, 0, 97, 0, 110, 0, 32, 0, 32, 0, 32, 0, 101, 0, 110, 0, 100, 0, 13, 0, 10, 0]
+ right: [144, 199, 180, 204, 32, 0, 75, 0, 111, 0, 114, 0, 101, 0, 97, 0, 110, 0, 32, 0, 61, 216, 0, 222, 32, 0, 64, 216, 0, 220, 32, 0, 101, 0, 110, 0, 100, 0, 13, 0, 10, 0]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    tests::ordinary_hwp_preview_korean_astral_is_exact_on_open_save
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 17 filtered out; finished in 0.03s
+
+error: test failed, to rerun pass `--lib`

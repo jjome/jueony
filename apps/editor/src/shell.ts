@@ -1,7 +1,12 @@
 import {inspectHwtTemplate95} from './adapters/xml/hwt-template95.ts';
+import {createHwtLeafEngine} from './adapters/xml/hwt-leaf.ts';
+import {createHwtLeafRecoveryStore} from './adapters/storage/hwt-leaf-recovery.ts';
+import {indexedDbHwtLeafRecords} from './adapters/storage/hwt-leaf-records.ts';
+import {createHwtLeafSavePort} from './adapters/files/hwt-leaf-save.ts';
+import {browserHwtCopyPicker} from './adapters/files/hwt-copy-picker.ts';
 import {createAgentFilePort} from './adapters/desktop/agent-files.ts';
 import {readDocumentWindowContext,mainDocumentWindow,createDocumentWindows,assertTabCapacity} from './adapters/desktop/document-windows.ts';
-import {installNativeFilePickers,installNativeExitProtection,nativeFileToken,nativeRecentHandle} from './adapters/desktop/native-host.ts';
+import {installNativeFilePickers,installNativeExitProtection,nativeFileToken,nativeRecentHandle,pickNativeHwtCopy} from './adapters/desktop/native-host.ts';
 import {createNativeRecents} from './adapters/desktop/native-recents.ts';
 import {createDocumentLifecycle,assertExitSavedTransition} from './adapters/desktop/document-lifecycle.ts';
 import {withExitSaveFrame} from './adapters/desktop/exit-save-frame.ts';
@@ -80,7 +85,25 @@ const nativeRecents=nativeHost?createNativeRecents({invoke:nativeHost.core.invok
 const documentWindows=createDocumentWindows({invoke:nativeHost?.core.invoke.bind(nativeHost.core),canNavigate:()=>Boolean(state)&&!nativeExitPending&&!closing&&!restoring&&!running&&!activeTab?.api?.busy()&&!document.querySelector('dialog[open]'),newTab:()=>newTab(),changed:()=>chrome.refresh()});
 const lifecycle=createDocumentLifecycle({canClose:()=>Boolean(activeTab?.initialized&&activeTab.api&&!activeTab.api.busy()&&!closing&&!restoring&&!nativeExitPending&&!running&&!document.querySelector('dialog[open]')),canExit:()=>Boolean(nativeExit&&!nativeExitSnapshot().blocked),close:async()=>{if(activeTab)await closeTab(activeTab);},exit:async()=>{if(!nativeExit)throw Error('프로그램 종료 보호를 확인할 수 없습니다.');await nativeExit.request({preventDefault(){}});}});
 const xmlRecoveryRecords=indexedDbXmlRecoveryRecords(indexedDB);
-const xmlDocuments=createXmlDocuments({canOpen:()=>Boolean(state)&&!closing&&!restoring&&!nativeExitPending&&!agentFilePending&&!running&&!activeTab?.api?.busy()&&!document.querySelector('dialog[open]'),open:()=>{const api=activeTab?.api;showXmlDocumentDialog({recovery:createXmlRecoveryStore({scope:documentWindow.scope,workspaceId:work().id,records:xmlRecoveryRecords}),inspectHwt:api?.canInspectHwtTemplate?.()?bytes=>inspectHwtTemplate95(bytes,{extractHwtXmlTemplate:value=>api.inspectHwtTemplate!(value)}):undefined});}});
+const hwtRecoveryRecords=indexedDbHwtLeafRecords(indexedDB);
+const xmlDocuments=createXmlDocuments({canOpen:()=>Boolean(state)&&!closing&&!restoring&&!nativeExitPending&&!agentFilePending&&!running&&!activeTab?.api?.busy()&&!document.querySelector('dialog[open]'),open:()=>{
+ const api=activeTab?.api;
+ const pickHwtCopy=nativeHost?(name:string)=>pickNativeHwtCopy(window,name):browserHwtCopyPicker(window);
+ showXmlDocumentDialog({
+  recovery:createXmlRecoveryStore({scope:documentWindow.scope,workspaceId:work().id,records:xmlRecoveryRecords}),
+  inspectHwt:api?.canInspectHwtTemplate?.()?bytes=>inspectHwtTemplate95(bytes,{extractHwtXmlTemplate:value=>api.inspectHwtTemplate!(value)}):undefined,
+  hwtLeaf:api?.canEditHwtLeaf?.()&&api.inspectHwtLeaf&&api.editHwtLeaf?{
+   engine:createHwtLeafEngine({inspectHwtLeafDocument:bytes=>api.inspectHwtLeaf!(bytes),editHwtLeafDocument:(bytes,request)=>api.editHwtLeaf!(bytes,request)}),
+   recovery:createHwtLeafRecoveryStore({scope:documentWindow.scope,workspaceId:work().id,records:hwtRecoveryRecords}),
+   createSaveCopy:pickHwtCopy?revision=>createHwtLeafSavePort({
+    revision,pick:pickHwtCopy,
+    // The modal owns its independent workspace and holds its busy latch through
+    // picker/write/readback; its revision closure still guards the disk CAS.
+    beginSaving:()=>({finish(){}}),
+   }):undefined,
+  }:undefined,
+ });
+}});
 const chrome=installUnifiedChrome({menus:$('unified-menus'),tools:$('unified-tools'),active:()=>{const api=activeTab?.initialized?activeTab.api??undefined:undefined;return api?xmlDocuments.wrap(documentWindows.wrap(lifecycle.wrap(nativeRecents?.wrap(api)??api))):undefined;},execute:(id,params)=>{if(running?.run.status==='applying')throw new Error('문서 적용 중입니다.');if(id===XML_WORKSPACE_COMMAND)return xmlDocuments.execute(id);if(id==='file:new-doc'||id==='file:new-tab'||id==='file:restore-document-window')return documentWindows.execute(id,params);if(id==='ext:jueony-close'||id==='file:exit')return lifecycle.execute(id);if(nativeRecents&&(id==='file:open-native-recent'||id==='file:clear-native-recent'))return nativeRecents.execute(id,params);if(id==='file:open'){$('open-document').click();return;}const result=activeTab?.api!.executeCommand(id,params);if(!result?.ok)throw new Error(result?.message??'현재 문서에서 실행할 수 없습니다.');},error});
 const on=(id:string,action:()=>unknown)=>$(id).addEventListener('click',()=>{if(agentFilePending){status('Agent 문서 탭 작업을 마친 뒤 실행하세요.');return;}try{void Promise.resolve(action()).catch(error);}catch(e){error(e);}});
 async function persist(){stateWrites++;try{await store.save(state);persistError=false;}catch(e){persistError=true;throw e;}finally{stateWrites--;}}

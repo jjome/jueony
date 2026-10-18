@@ -1,0 +1,19 @@
+PASS actual WASM closes own bindings and refuses malformed or mapping-only HWT
+PASS actual WASM refuses duplicate PAGE_DEF loss before any save and retains all source bytes
+PASS actual XML dialog enters the separately owned HWT workspace and opens actual-WASM body fields
+PASS actual HWT UI edit, Undo and Redo use guarded native bytes and preserve unrelated field
+PASS cancelled local save preserves dirty bytes and prior OPFS file
+PASS actual OPFS write-close-readback returns same HWT bytes which reopen in the actual WASM
+FAIL dirty HWT close and independent IDB recovery restore full Undo/Redo while preserving XML checkpoint: AssertionError [ERR_ASSERTION]: The input did not match the regular expression /복구할 값/. Input:
+
+'title: 자체 변경 😀'
+
+FAIL failed checkpoint keeps current edit and Undo, without overwriting the last IDB checkpoint: AssertionError [ERR_ASSERTION]: The input did not match the regular expression /복구본 저장에 실패/. Input:
+
+'HWT_PREVIEW_NOT_EMPTY_SOURCE'
+
+PASS malformed replacement HWT leaves the current fields and recovery untouched
+PASS actual native edit CAS refuses a stale request before any second mutation
+PASS actual IDB exact CAS retains named array metadata and aborts non-cloneable writes atomically
+PASS corrupt HWT recovery is refused and retained; the ordinary XML checkpoint remains exact
+PASS owned input bytes immutable and no page/console errors or external requests

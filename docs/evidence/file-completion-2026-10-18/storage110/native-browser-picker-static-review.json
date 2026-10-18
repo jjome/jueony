@@ -1,0 +1,71 @@
+{
+  "review": "hwt-native-copy115 browser picker extraction follow-up",
+  "scope": "Static source review only; no runtime or GUI tests and no product edits. Prior review artifact retained unchanged.",
+  "supersedesForCurrentSource": "build/hwt-native-copy115-static-review.json",
+  "reviewedAtUtc": "2026-10-18T12:39:35.811992+00:00",
+  "files": [
+    {
+      "path": "apps/editor/src-tauri/src/storage.rs",
+      "sha256": "820cc2751c86da92722881783e0d244c02251e20ecf2e67ee41b2701c9b1560f",
+      "unchangedSince115Review": true
+    },
+    {
+      "path": "apps/editor/src-tauri/src/main.rs",
+      "sha256": "2ca4e9ac671436b34c163d0116d758ced8c8263abd2610d3f8912260c94b3721",
+      "unchangedSince115Review": true
+    },
+    {
+      "path": "apps/editor/src-tauri/src/file_bindings.rs",
+      "sha256": "68e85ae216b9887a56bc50a3e2cb774b88eaac9fed6682f150b8f7bb3f13fe11",
+      "unchangedSince115Review": true
+    },
+    {
+      "path": "apps/editor/src/adapters/desktop/native-host.ts",
+      "sha256": "2e37e25c1d0667574f9b2d79f187688e4e0129d74df19bf29f3b14ff892f5bf8",
+      "unchangedSince115Review": true
+    },
+    {
+      "path": "apps/editor/src/adapters/files/hwt-leaf-save.ts",
+      "sha256": "f216c0f2fa4964f29577a260898e4f1c2fae1123241d8e5e2620a5ddd4617c47",
+      "unchangedSince115Review": true
+    },
+    {
+      "path": "apps/editor/src/shell.ts",
+      "sha256": "fbeeba4e4eb37613c4d02b623f590eb7277e608ec83f01873ebf720fb15578d3",
+      "unchangedSince115Review": false
+    },
+    {
+      "path": "apps/editor/src/modules/document-files/application/write-snapshot.ts",
+      "sha256": "7e6613af02ec32a72b1bc400f4e82975baf3373c50b3fb5b36e2c42336822c2b",
+      "unchangedSince115Review": true
+    },
+    {
+      "path": "apps/editor/src/ui/hwt-leaf-dialog.ts",
+      "sha256": "a3ad99c6878aff70a33de5a33655c149a1924e96ea581441373f552e03729fa0",
+      "unchangedSince115Review": true
+    },
+    {
+      "path": "apps/editor/src/modules/xml-documents/application/hwt-leaf-workspace.ts",
+      "sha256": "c73b94b652e25f01693a44e1ceedabd6486ce89ec0373e0cf46a4e42d0fc8823",
+      "unchangedSince115Review": true
+    },
+    {
+      "path": "apps/editor/src/adapters/files/hwt-copy-picker.ts",
+      "sha256": "b7b20dc6251261d007aceed6bc4c4fde3a30737ab7dac7620d627a5cdd1c94ce"
+    }
+  ],
+  "changedSince115": [
+    "apps/editor/src/shell.ts"
+  ],
+  "checked": {
+    "separateGrant": "Normal DocumentFile::open retains only .hwp/.hwpx. HWT requires explicit .hwt picker/open_hwt_copy; ordinary open behavior is unchanged.",
+    "newVersusDeleted": "read_hwt_copy returns empty only when originally granted fingerprint was None. Missing originally existing target errors. Existing empty target has Some(hash(empty)) and is distinct from absent.",
+    "perWindow": "Both picker and read/write commands resolve native current context and FileBindings restricts token to owner label; handles contain opaque process-local tokens, no persisted path authority.",
+    "CAS": "Native write compares original grant fingerprint before staging, rechecks before replacing existing target, uses persist_noclobber for new target, and does not adopt externally read bytes as baseline.",
+    "readback": "Native write verifies committed bytes before updating fingerprint. Snapshot writer hashes disk bytes after close before returning success; HWT save adapter returns failed_partial after any attempted write failure and UI leaves dirty state.",
+    "busyAndRevision": "HWT modal holds busy latch through picker/write/readback and blocks edit/undo/redo/close. Save port snapshots bytes and revision; snapshot writer rechecks revision around writing and UI markSaved checks exact artifact revision/source SHA.",
+    "browserExtraction": "Optional capability is read from the passed Window, called with that same Window receiver, and returns only actual File System Access save picker handles. No browser download fallback or synthetic receipt. Shell selects native picker exclusively when Native host exists; absence of browser capability disables createSaveCopy. Existing leaf-save port independently validates .hwt handle, reads baseline, captures revision, executes CAS writer, and verifies disk readback."
+  },
+  "findings": [],
+  "result": "No actionable new defect found; unrelated unchanged files inherit earlier static audit only."
+}

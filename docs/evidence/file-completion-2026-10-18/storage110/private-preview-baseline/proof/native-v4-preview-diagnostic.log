@@ -1,0 +1,24 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/source-v4)
+   Compiling hwt-leaf115-native v0.1.0 (/mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/native-v4)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 28.87s
+     Running unittests src/lib.rs (/tmp/jueony-rhwp-engine/target/hwt-leaf115-conversion/debug/deps/hwt_leaf115_native-0ebbc19b6b991a56)
+
+running 1 test
+test tests::repeated_edits_disk_reopen_three_cycles_and_history ... preview-cycle=0
+own-preview="first own 😀\r\n" body=["first own 😀", ""]
+preview-cycle=1
+own-preview="first own \r\n" body=["second own value", ""]
+
+thread 'tests::repeated_edits_disk_reopen_three_cycles_and_history' (553856) panicked at src/lib.rs:26:924:
+called `Result::unwrap()` on an `Err` value: "HWT_PREVIEW_DERIVATION"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+FAILED
+
+failures:
+
+failures:
+    tests::repeated_edits_disk_reopen_three_cycles_and_history
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 16 filtered out; finished in 0.26s
+
+error: test failed, to rerun pass `--lib`

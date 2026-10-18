@@ -1,0 +1,44 @@
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/source-v4)
+   Compiling hwt-leaf115-native v0.1.0 (/mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/native-v4)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 41.99s
+     Running unittests src/lib.rs (/tmp/jueony-rhwp-engine/target/hwt-leaf115-conversion/debug/deps/hwt_leaf115_native-0ebbc19b6b991a56)
+
+running 25 tests
+test tests::arbitrary_nonempty_preview_cannot_gain_current_body_derivation ... ok
+test tests::duplicate_known_body_record_cannot_disappear_while_save_succeeds ... raw repeated PAGE_DEF refused by save: HWT_EXACT_BODY_STRUCTURE
+ok
+test tests::duplicate_name_refuses_before_mutation ... ok
+test tests::existing_xml_preview_aux_has_exact_priority_over_native_fallback ... ok
+test tests::form_and_unknown_and_duplicate_id_refuse ... ok
+test tests::group_or_object_range_refuses ... ok
+test tests::hidden_master_and_xml_lineage_refuse ... ok
+test tests::instance_source_cas_noop_and_controls_refuse_without_changes ... ok
+test tests::malformed_hwt_and_missing_body_mapping_refuse ... ok
+test tests::opaque_preview_budget_refuses_open_without_dropping_original ... ok
+test tests::opaque_preview_duplicate_and_valid_conflict_cannot_mint_owner ... ok
+test tests::opaque_preview_high_surrogate_raw_hwp_preserved_xml_refused ... ok
+test tests::opaque_preview_low_surrogate_raw_hwp_preserved_xml_refused ... ok
+test tests::opaque_preview_odd_byte_raw_hwp_preserved_xml_refused ... ok
+test tests::ordinary_hwp_preview_korean_astral_is_exact_on_open_save ... OWN_PREVIEW beforeSHA=fe6dab3541f73023bfb5d45fd61bfb8e62c4e59d400bda7d4a692a9f16941636 afterSHA=fe6dab3541f73023bfb5d45fd61bfb8e62c4e59d400bda7d4a692a9f16941636 rawBytes=42 emittedBytes=42
+ok
+test tests::own_artifacts_and_source_witness ... compiled-candidate-sha256=dee1e82536bce7f8ee72223ba610cfe229aaf3ff5b1e7a2a054129ae2c02b95f
+ok
+test tests::own_hwt_leaf_edit_same_hwt_roundtrip_and_other_field_preserved ... own HWT same-format source=4bc95d99fbc69fe5c3ea4fa165bca5265a77279fa84caf9960d3df689c195119 output=9c969ebbf9105643674457aa8e74133acc82716affb8f61108a4fb9bad49b452 pages=1 XMLTemplate3 raw exact
+ok
+test tests::own_hwt_undo_redo_and_stale_revision ... ok
+test tests::protected_field_refuses ... ok
+test tests::repeated_edits_disk_reopen_three_cycles_and_history ... ok
+test tests::schema_mismatch_xpath_group_and_duplicate_mapping_refuse ... ok
+test tests::stateless_api_source_and_value_cas_and_same_format ... ok
+test tests::stateless_unknown_request_keys_and_wrong_original_rejected ... ok
+test tests::unknown_body_record_and_trailing_bytes_are_not_silently_lost ... ok
+test tests::valid_preview_hwp_to_hwpx_to_hwp_exact ... ok
+
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.95s
+
+   Doc-tests hwt_leaf115_native
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

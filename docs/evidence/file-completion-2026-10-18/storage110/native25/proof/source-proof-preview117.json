@@ -1,0 +1,59 @@
+{
+  "base": "official116/source-2a1d408f1d0d7ea5",
+  "candidate": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\hwt-leaf115\\source-v4",
+  "files": [
+    {
+      "path": "src/hwt_leaf115.rs",
+      "baseRawSha256": "32ec6464d510def4b9109c2b663fc7c6fef8abad8ca69332683e71db0ef1de87",
+      "baseCanonicalLfSha256": "6215e72a1ecb6aa62f7f55a064f721ebb2a96071c6be3cba1a31a58f370380ea",
+      "candidateRawSha256": "d19b4c7bd89e1b5970a5f3bd986f1b67e79d1583edf6914f0a15530095a32c51",
+      "candidateCanonicalLfSha256": "d19b4c7bd89e1b5970a5f3bd986f1b67e79d1583edf6914f0a15530095a32c51"
+    },
+    {
+      "path": "src/parser/cfb_reader.rs",
+      "baseRawSha256": "c0dc1ae755163fb8629a529f30db8f698ecb5d851c2c1c0296fc2ff75ba56959",
+      "baseCanonicalLfSha256": "e6b192a430385aa01680030c2e29f11e905a6f9c0a7e4680426209400fbc8b74",
+      "candidateRawSha256": "6923e2611a37e0efa394ccaf9ade50fe41f8e7b88c977be8c9a3e4ad44044930",
+      "candidateCanonicalLfSha256": "6923e2611a37e0efa394ccaf9ade50fe41f8e7b88c977be8c9a3e4ad44044930"
+    },
+    {
+      "path": "src/parser/mod.rs",
+      "baseRawSha256": "5c0d59260ad24d13f903fe9dbb98a6fb25abb60de32072512298e137fc2b2adf",
+      "baseCanonicalLfSha256": "96ee8a928ff56e9dc3170f81785dbb761a2ba8401f17d1ae8f6f04c255021cbf",
+      "candidateRawSha256": "c537043831569f7fc01621c36d85158282eedb45f0da2cf2e7beb84486b846c5",
+      "candidateCanonicalLfSha256": "c537043831569f7fc01621c36d85158282eedb45f0da2cf2e7beb84486b846c5"
+    },
+    {
+      "path": "src/serializer/cfb_writer.rs",
+      "baseRawSha256": "16730d914890bf036b10c72479896096f273e068aa557b47733681655afb4282",
+      "baseCanonicalLfSha256": "3c1258897ec4bbfd454e9cfa0638781c6b523ec8df0c7cf05553159bad5a6600",
+      "candidateRawSha256": "8b52cdd0c07dfd2c64f4f726a28ee5f2f6987c519bd5aa4bc72986211e5ed435",
+      "candidateCanonicalLfSha256": "8b52cdd0c07dfd2c64f4f726a28ee5f2f6987c519bd5aa4bc72986211e5ed435"
+    },
+    {
+      "path": "src/serializer/hwpx/mod.rs",
+      "baseRawSha256": "a89b2f376e9f6e2357b797491e83d1370b239c2f568245668da8dfce64c67eab",
+      "baseCanonicalLfSha256": "5c23539513bb0312b76f9795f65df13e632ad702e60d313a2cad5830dae15220",
+      "candidateRawSha256": "950d67c308db5d5d1485bdf45e744154789d3150c8c2e2a1c7e576d97b06a0b5",
+      "candidateCanonicalLfSha256": "950d67c308db5d5d1485bdf45e744154789d3150c8c2e2a1c7e576d97b06a0b5"
+    }
+  ],
+  "patchSha256": "f0a0f45382147d183ded62ea18a815fb4dfb7680a866dc47b9786d70d6c932d9",
+  "native": {
+    "log": "native-preview-scalar117.log",
+    "tests": 25,
+    "passed": 25,
+    "failed": 0,
+    "ignored": 0,
+    "harnessSha256": "dee1e82536bce7f8ee72223ba610cfe229aaf3ff5b1e7a2a054129ae2c02b95f",
+    "logSha256": "432307349aae554bcc4f710c5b2380951a79420b16d0dc1b98d084930041cc67"
+  },
+  "baselineFailures": [
+    "ordinary-preview-baseline116.log",
+    "native-v4-preview-diagnostic.log",
+    "final116-standalone/result.json",
+    "final116-integrated/result.json"
+  ],
+  "limit": "PrvText bound65536B; malformed native preview remains opaque HWP raw, HWPX all4 APIs explicitly reject; arbitrary native raw preview never newly authorized; valid existing XML extra_stream contract unchanged. HWT exact derived source preview regenerated on export clone only. All other body/container/layout/source CAS guards retained.",
+  "integration": "Root current-rows shared serializer must receive opaque guard in actual implementation, not only public delegating wrapper; resource fingerprint regeneration root-owned."
+}

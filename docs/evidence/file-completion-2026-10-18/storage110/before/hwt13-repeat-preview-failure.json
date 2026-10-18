@@ -1,0 +1,83 @@
+{
+  "engine": {
+    "pkg": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-2a1d408f1d0d7ea5\\pkg",
+    "wasmSha256": "e0c610a335f3d97bf69ff7ca930420b87fa26ef0184b65d1f412ac95afaf5406",
+    "jsSha256": "a642f4688cb7fa5a46f7092fe436b366365863812f736e4931a8ef978e69af45"
+  },
+  "sourceHash": "d8a693b6bac7f1573ef1ff3dde310bd84a10ec2ccc3facdfd8a0a975b7162a71",
+  "results": [
+    {
+      "name": "actual WASM closes own bindings and refuses malformed or mapping-only HWT",
+      "status": "PASS"
+    },
+    {
+      "name": "actual WASM refuses duplicate PAGE_DEF loss before any save and retains all source bytes",
+      "status": "PASS"
+    },
+    {
+      "name": "actual XML dialog enters the separately owned HWT workspace and opens actual-WASM body fields",
+      "status": "PASS"
+    },
+    {
+      "name": "actual HWT UI edit, Undo and Redo use guarded native bytes and preserve unrelated field",
+      "status": "PASS"
+    },
+    {
+      "name": "cancelled local save preserves dirty bytes and prior OPFS file",
+      "status": "PASS"
+    },
+    {
+      "name": "actual OPFS write-close-readback returns same HWT bytes which reopen in the actual WASM",
+      "status": "PASS"
+    },
+    {
+      "name": "dirty HWT close and independent IDB recovery restore full Undo/Redo while preserving XML checkpoint",
+      "status": "FAIL"
+    },
+    {
+      "name": "failed checkpoint keeps current edit and Undo, without overwriting the last IDB checkpoint",
+      "status": "FAIL"
+    },
+    {
+      "name": "malformed replacement HWT leaves the current fields and recovery untouched",
+      "status": "PASS"
+    },
+    {
+      "name": "actual native edit CAS refuses a stale request before any second mutation",
+      "status": "PASS"
+    },
+    {
+      "name": "actual IDB exact CAS retains named array metadata and aborts non-cloneable writes atomically",
+      "status": "PASS"
+    },
+    {
+      "name": "corrupt HWT recovery is refused and retained; the ordinary XML checkpoint remains exact",
+      "status": "PASS"
+    },
+    {
+      "name": "owned input bytes immutable and no page/console errors or external requests",
+      "status": "PASS"
+    }
+  ],
+  "failures": [
+    {
+      "name": "dirty HWT close and independent IDB recovery restore full Undo/Redo while preserving XML checkpoint",
+      "error": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /복구할 값/. Input:\n\n'title: 자체 변경 😀'\n",
+      "stack": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /복구할 값/. Input:\n\n'title: 자체 변경 😀'\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hwt-leaf115.mjs:37:215\n    at async run (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hwt-leaf115.mjs:12:33)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hwt-leaf115.mjs:37:2"
+    },
+    {
+      "name": "failed checkpoint keeps current edit and Undo, without overwriting the last IDB checkpoint",
+      "error": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /복구본 저장에 실패/. Input:\n\n'HWT_PREVIEW_NOT_EMPTY_SOURCE'\n",
+      "stack": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /복구본 저장에 실패/. Input:\n\n'HWT_PREVIEW_NOT_EMPTY_SOURCE'\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hwt-leaf115.mjs:38:255\n    at async run (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hwt-leaf115.mjs:12:33)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-hwt-leaf115.mjs:38:2"
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "nativeCalls": {
+    "inspect": 14,
+    "edit": 4
+  },
+  "scope": "Isolated actual HWT UI + actual selected Node WASM through typed boundary, browser IDB and real OPFS write/close/readback. Picker choice is synthetic; no native Windows picker/write/Hancom/COM/LLM/user file. General HWT, groups/forms/complex schema/XSL remain unsupported.",
+  "verifierSha256": "0de0a9c061933a5b62a1432270af6761f89864887669d9b22c346667e91c94b4"
+}

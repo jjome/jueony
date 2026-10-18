@@ -21,6 +21,10 @@ export interface DocumentFrameClient extends DocumentEditFacade,DocumentInteract
  configureHistoryScope(scope:HistoryScope):void;
  canInspectHwtTemplate?():boolean;
  inspectHwtTemplate?(bytes:Uint8Array):string;
+ /** Stateless HWT copies; never replace the active HWP document. */
+ canEditHwtLeaf?():boolean;
+ inspectHwtLeaf?(bytes:Uint8Array):string;
+ editHwtLeaf?(bytes:Uint8Array,request:string):Uint8Array;
  fileHandle():FileSystemFileHandle|null;
  open(bytes:Uint8Array,name:string,handle?:FileSystemFileHandle|null,dirty?:boolean):Promise<void>;
  readReference(bytes:Uint8Array):Promise<string>;

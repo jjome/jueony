@@ -32,7 +32,7 @@ export function createNativeFilePickers(invoke: NativeInvoke) {
     try { return await operation(); }
     finally { selecting = false; }
   };
-  const makeHandle = (info: HandleInfo, bound = false): FileSystemFileHandle => {
+  const makeHandle = (info: HandleInfo, bound = false, hwtCopy = false): FileSystemFileHandle => {
     const existing = handles.get(info.token);
     if (existing) return existing;
     const handle = {
@@ -44,7 +44,7 @@ export function createNativeFilePickers(invoke: NativeInvoke) {
         const otherToken=typeof other==='object'&&other!==null?nativeTokens.get(other):undefined;
         return otherToken?invoke<boolean>('same_document',{token:info.token,otherToken}):false;
       },
-      getFile: async () => new File([new Uint8Array(await invoke<number[]>(bound?'read_bound_document':'read_document', { token: info.token }))], info.name),
+      getFile: async () => new File([new Uint8Array(await invoke<number[]>(hwtCopy?'read_hwt_copy':bound?'read_bound_document':'read_document', { token: info.token }))], info.name),
       createWritable: async () => {
         let pending: Blob | null = null, finished = false, closing = false, committing = false;
         return {
@@ -95,11 +95,26 @@ export function createNativeFilePickers(invoke: NativeInvoke) {
       if (!info) throw new DOMException('취소됨', 'AbortError');
       return makeHandle(info);
     }),
+    hwtCopy: (name:string) => select(async () => {
+      if(!name.toLowerCase().endsWith('.hwt'))throw Error('HWT 사본 이름이 필요합니다.');
+      const info=await invoke<HandleInfo|null>('pick_save_hwt_copy',{suggestedName:name});
+      if(!info)throw new DOMException('취소됨','AbortError');
+      if(!info.name.toLowerCase().endsWith('.hwt'))throw Error('HWT 사본 저장 위치가 올바르지 않습니다.');
+      return makeHandle(info,false,true);
+    }),
   };
 }
 
 const pickerSlot = Symbol.for('jueony.native-file-pickers.v1');
 type PickerOwner = Window & { [pickerSlot]?: { host: NativeHost; pickers: ReturnType<typeof createNativeFilePickers> } };
+/** Share the normal picker latch and opaque per-window tokens; never bind a HWP source. */
+export function pickNativeHwtCopy(surface:Window,name:string):Promise<FileSystemFileHandle>{
+  let owner=surface;
+  try{while(owner.parent!==owner&&owner.parent.location.origin===surface.location.origin&&readNativeHost(owner.parent))owner=owner.parent;}catch{/* No cross-origin authority. */}
+  const record=(owner as PickerOwner)[pickerSlot];
+  if(!record||record.host!==readNativeHost(owner))throw Error('Native HWT 파일 저장 연결이 준비되지 않았습니다.');
+  return record.pickers.hwtCopy(name);
+}
 export function installNativeFilePickers(surface: Window): NativeHost | undefined {
   let owner = surface;
   try {

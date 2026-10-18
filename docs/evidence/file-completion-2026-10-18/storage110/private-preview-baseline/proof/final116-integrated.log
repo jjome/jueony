@@ -1,0 +1,10 @@
+PASS official shell file menu exposes only the actual iframe HWT capability
+PASS production iframe guarded HWT edit and Undo/Redo leave the active HWP byte/history/view exact
+PASS production shell copy picker writes actual OPFS HWT bytes and reopens through the actual iframe API
+PASS production HWT file re-selection is an actual .hwt disk reopen, preserving all unrelated values
+FAIL production HWT IDB recovery after modal close restores current bytes and both history sides: AssertionError [ERR_ASSERTION]: The input did not match the regular expression /Integrated recovery/. Input:
+
+'title: Integrated own 😀'
+
+PASS malformed HWT is rejected through production bridge without replacing current document or history
+PASS source HWT and original HWP remain immutable; no external requests/page/console errors

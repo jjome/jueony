@@ -1,0 +1,42 @@
+{
+  "patchSha256": "f0a0f45382147d183ded62ea18a815fb4dfb7680a866dc47b9786d70d6c932d9",
+  "strictWhitespaceErrorAllApply": true,
+  "files": [
+    {
+      "path": "src/hwt_leaf115.rs",
+      "appliedRawSha256": "e67fea7381437e0ac63db15c05f1f8d7825d762081562e203e74dc584aa96d4d",
+      "candidateRawSha256": "d19b4c7bd89e1b5970a5f3bd986f1b67e79d1583edf6914f0a15530095a32c51",
+      "canonicalLfEqual": true,
+      "rawBytesEqual": false
+    },
+    {
+      "path": "src/parser/cfb_reader.rs",
+      "appliedRawSha256": "4a3f49ab4511b73d9012571f07886875a150b56ce1685a540b679aa6e236551b",
+      "candidateRawSha256": "6923e2611a37e0efa394ccaf9ade50fe41f8e7b88c977be8c9a3e4ad44044930",
+      "canonicalLfEqual": true,
+      "rawBytesEqual": false
+    },
+    {
+      "path": "src/parser/mod.rs",
+      "appliedRawSha256": "af9b8b9555da8a9c16cb0825929f5ffaaa77f5d441584c33d0672601f23db91b",
+      "candidateRawSha256": "c537043831569f7fc01621c36d85158282eedb45f0da2cf2e7beb84486b846c5",
+      "canonicalLfEqual": true,
+      "rawBytesEqual": false
+    },
+    {
+      "path": "src/serializer/cfb_writer.rs",
+      "appliedRawSha256": "523dd6234ef5945eaff26eaa32c0d2ce16331e9d4af0f45e981bbcbcfafcf1e6",
+      "candidateRawSha256": "8b52cdd0c07dfd2c64f4f726a28ee5f2f6987c519bd5aa4bc72986211e5ed435",
+      "canonicalLfEqual": true,
+      "rawBytesEqual": false
+    },
+    {
+      "path": "src/serializer/hwpx/mod.rs",
+      "appliedRawSha256": "78ee15107c5c40ae08d11757a67a80faef4f9d7194196d42d39bdce12a80c828",
+      "candidateRawSha256": "950d67c308db5d5d1485bdf45e744154789d3150c8c2e2a1c7e576d97b06a0b5",
+      "canonicalLfEqual": true,
+      "rawBytesEqual": false
+    }
+  ],
+  "scope": "Own isolated five-file base116 copy; no official source or Git state mutated."
+}

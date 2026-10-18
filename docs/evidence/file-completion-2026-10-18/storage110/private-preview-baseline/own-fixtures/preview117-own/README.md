@@ -1,0 +1,3 @@
+자체 생성 일반 HWP 네 개: 같은 빈 문서에 UTF-16LE PrvText만 유효 한글/astral 또는 단독 high/low surrogate/홀수 byte로 구성. 상용·공개 문서/폰트 프로그램 없음. malformed preview도 기존 optional-open 정책으로 열되 원시 PrvText를 HWP에 정확 보존하고 HWPX 변환은 명시 거절해야 한다. 64KiB 초과는 메타데이터 예산 거절. Native 생성 및 25개 엔진 검수는 build/hwt-leaf115/native-preview-final25.rs와 native-preview-fixturegen117.log에 별도 보존.
+
+existing-xml-aux.hwpx는 별도 자체 HWPX이며 생성 시 native preview fallback과 다른 XML auxiliary 값을 사용해 기존aux 우선순위를 검사했다. Node 실제WASM에서는 XML auxiliary의 양형식 재저장 보존을 검사한다. typed preview+opaque raw 충돌은 파서가 생성하지 않는 IR 조합이므로 Native25에서만 주입하여 거절을 확인했고 Node publicAPI에서 같은 상태를 만들어냈다고 주장하지 않는다.

@@ -28,9 +28,20 @@ fn hash(bytes: &[u8]) -> [u8; 32] { Sha256::digest(bytes).into() }
 
 impl DocumentFile {
     pub fn open(path: PathBuf) -> io::Result<Self> {
+        Self::open_selected(path, false)
+    }
+
+    /// HWT bytes are owned and validated by the separate template workspace.
+    /// Grant a user-selected copy target without admitting HWT into HWP opening.
+    pub fn open_hwt_copy(path: PathBuf) -> io::Result<Self> {
+        Self::open_selected(path, true)
+    }
+
+    fn open_selected(path: PathBuf, hwt_copy: bool) -> io::Result<Self> {
         let extension = path.extension().and_then(|s| s.to_str()).unwrap_or("").to_ascii_lowercase();
-        if !path.is_absolute() || !matches!(extension.as_str(), "hwp" | "hwpx") {
-            return Err(invalid("HWP 또는 HWPX 파일을 선택해 주세요."));
+        let allowed = if hwt_copy { extension == "hwt" } else { matches!(extension.as_str(), "hwp" | "hwpx") };
+        if !path.is_absolute() || !allowed {
+            return Err(invalid(if hwt_copy { "HWT 사본 저장 위치를 선택해 주세요." } else { "HWP 또는 HWPX 파일을 선택해 주세요." }));
         }
         let fingerprint = read_optional(&path)?.map(|b| hash(&b));
         Ok(Self { path, fingerprint })
@@ -42,6 +53,19 @@ impl DocumentFile {
         // writer's version. Only an explicit new file binding or verified commit
         // advances the baseline; otherwise a read could bypass the next guard.
         Ok(bytes)
+    }
+
+    /// Only an explicitly granted new HWT copy target may expose an empty
+    /// baseline. A removed existing copy must still fail, never be recreated.
+    pub fn read_hwt_copy(&self) -> io::Result<Vec<u8>> {
+        if !self.path.extension().and_then(|s| s.to_str()).is_some_and(|s| s.eq_ignore_ascii_case("hwt")) {
+            return Err(invalid("HWT 사본 저장 연결이 아닙니다."));
+        }
+        match read_optional(&self.path)? {
+            Some(bytes) => Ok(bytes),
+            None if self.fingerprint.is_none() => Ok(Vec::new()),
+            None => Err(invalid("기존 HWT 사본 파일이 삭제됐습니다. 다시 선택해 주세요.")),
+        }
     }
 
     /// Bind a recent-file inspection to the exact baseline already granted to

@@ -1,0 +1,22 @@
+{
+  "review": "PrvText117 changes vs completed physical-row resource contract",
+  "scope": "Static patch and existing owner-context review only; no product/resource code modified, no new runtime-test claim.",
+  "patch": "build\\hwt-leaf115\\hwt-preview-utf16-and-repeat117.patch",
+  "patchSHA256": "f0a0f45382147d183ded62ea18a815fb4dfb7680a866dc47b9786d70d6c932d9",
+  "changedPaths": [
+    "src/hwt_leaf115.rs",
+    "src/parser/cfb_reader.rs",
+    "src/parser/mod.rs",
+    "src/serializer/cfb_writer.rs",
+    "src/serializer/hwpx/mod.rs"
+  ],
+  "unchangedFrameResourceRecommended": "Exact230/a170 for this metadata-only cohort, subject to original230 canonical equality. No old-resource allowlist.",
+  "reason": "Delta changes preview decoding, bounded opaque preview preservation, derived HWT preview regeneration and output preview text. Body rows, DocInfo, section/control graph, physical allocations and completed-row plan construction are unchanged. Owner context excludes document Preview and opaque /PrvText.",
+  "ioBehaviorChanges": [
+    "Oversized /PrvText may reject opening.",
+    "Malformed opaque preview cannot be represented in HWPX and conversion rejects.",
+    "Valid supplementary UTF16 preview scalars are preserved instead of silently discarded."
+  ],
+  "futureBoundary": "Actual fresh standard-row projection in serializer/hwpx/mod.rs is a real new planner/serialization dependency and requires inventory expansion and new resource generation.",
+  "findings": []
+}

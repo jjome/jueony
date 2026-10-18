@@ -1,5 +1,7 @@
 # 무관 편집 후 단·표 배치 보존: 합본107
 
+[최신 합본110: 구버전 저장·HWT 사본·미리보기 보존](123-current-stack-and-preview-storage.md).
+
 2026-10-18. [파일 작업표](features/05-files-storage-recovery.md) · [직전 합본106](120-native-prefix-storage.md) · [고정 검수 근거](evidence/file-completion-2026-10-18/storage107/README.md).
 
 **뒤쪽 본문·셀을 편집하면 앞쪽 표와 단 경계가 바뀌던 결함을 수정했다.** 공식114에서 Python 예제30경로·150회 저장/재열기와 브라우저7개 검사가 통과했다. 앞서 수정한 MCST32경로도 회귀 통과했다. 이전 버전이 만든 일부 HWPX의 측정 캐시를 거절한 뒤 배치가 달라지는 호환성 결함은 새로 분리해 수정 중이다. 파일 파트 전체 완료를 뜻하지 않는다.

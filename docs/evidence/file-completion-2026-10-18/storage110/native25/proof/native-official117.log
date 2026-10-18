@@ -1,0 +1,54 @@
+   Compiling rhwp-password-crypto v0.1.0 (/mnt/c/Users/jjome/Documents/work/jueony/build/rhwp-engine/source-b20b9eb0ed097b92/crates/rhwp-password-crypto)
+   Compiling rhwp-contracts v0.1.0 (/mnt/c/Users/jjome/Documents/work/jueony/build/rhwp-engine/source-b20b9eb0ed097b92/crates/rhwp-contracts)
+   Compiling svg2pdf v0.13.0 (/mnt/c/Users/jjome/Documents/work/jueony/build/rhwp-engine/source-b20b9eb0ed097b92/vendor/svg2pdf)
+   Compiling rhwp-ooxml-chart v0.1.0 (/mnt/c/Users/jjome/Documents/work/jueony/build/rhwp-engine/source-b20b9eb0ed097b92/crates/rhwp-ooxml-chart)
+   Compiling rhwp v0.8.7 (/mnt/c/Users/jjome/Documents/work/jueony/build/rhwp-engine/source-b20b9eb0ed097b92)
+   Compiling hwt-leaf115-native v0.1.0 (/mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/native-official117)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1m 15s
+     Running unittests src/lib.rs (/tmp/jueony-rhwp-engine/target/hwt-leaf115-conversion/debug/deps/hwt_leaf115_native-0ebbc19b6b991a56)
+
+running 25 tests
+test tests::arbitrary_nonempty_preview_cannot_gain_current_body_derivation ... ok
+test tests::duplicate_known_body_record_cannot_disappear_while_save_succeeds ... raw repeated PAGE_DEF refused by save: HWT_EXACT_BODY_STRUCTURE
+ok
+test tests::duplicate_name_refuses_before_mutation ... ok
+test tests::existing_xml_preview_aux_has_exact_priority_over_native_fallback ... ok
+test tests::form_and_unknown_and_duplicate_id_refuse ... ok
+test tests::group_or_object_range_refuses ... ok
+test tests::hidden_master_and_xml_lineage_refuse ... ok
+test tests::instance_source_cas_noop_and_controls_refuse_without_changes ... ok
+test tests::malformed_hwt_and_missing_body_mapping_refuse ... ok
+test tests::opaque_preview_budget_refuses_open_without_dropping_original ... ok
+test tests::opaque_preview_duplicate_and_valid_conflict_cannot_mint_owner ... ok
+test tests::opaque_preview_high_surrogate_raw_hwp_preserved_xml_refused ... ok
+test tests::opaque_preview_low_surrogate_raw_hwp_preserved_xml_refused ... ok
+test tests::opaque_preview_odd_byte_raw_hwp_preserved_xml_refused ... ok
+test tests::ordinary_hwp_preview_korean_astral_is_exact_on_open_save ... OWN_PREVIEW beforeSHA=fe6dab3541f73023bfb5d45fd61bfb8e62c4e59d400bda7d4a692a9f16941636 afterSHA=fe6dab3541f73023bfb5d45fd61bfb8e62c4e59d400bda7d4a692a9f16941636 rawBytes=42 emittedBytes=42
+ok
+test tests::own_artifacts_and_source_witness ... compiled-candidate-sha256=3f2827f81d9e1854223b38c2a01d0f94b5c2a58f255e86497b1bd389913c8344
+OFFICIAL117_SOURCE src/hwt_leaf115.rs sha256=e67fea7381437e0ac63db15c05f1f8d7825d762081562e203e74dc584aa96d4d
+OFFICIAL117_SOURCE src/parser/cfb_reader.rs sha256=4a3f49ab4511b73d9012571f07886875a150b56ce1685a540b679aa6e236551b
+OFFICIAL117_SOURCE src/parser/mod.rs sha256=af9b8b9555da8a9c16cb0825929f5ffaaa77f5d441584c33d0672601f23db91b
+OFFICIAL117_SOURCE src/serializer/cfb_writer.rs sha256=523dd6234ef5945eaff26eaa32c0d2ce16331e9d4af0f45e981bbcbcfafcf1e6
+OFFICIAL117_SOURCE src/serializer/hwpx/mod.rs sha256=f694e6448b37ef54da06cd6fd80e20d65bbec6306b938672777bbef527a2119d
+OFFICIAL117_SOURCE src/model/native_computed_resource.rs sha256=b94cce442b3f5052017e84b5082cca3b8ef5f4ae8437cf9b9bf273de8be9deea
+ok
+test tests::own_hwt_leaf_edit_same_hwt_roundtrip_and_other_field_preserved ... own HWT same-format source=945b58c775bcd9943c3c20fe05666787f254f12b32a7a44a4527110143aa82b3 output=9c969ebbf9105643674457aa8e74133acc82716affb8f61108a4fb9bad49b452 pages=1 XMLTemplate3 raw exact
+ok
+test tests::own_hwt_undo_redo_and_stale_revision ... ok
+test tests::protected_field_refuses ... ok
+test tests::repeated_edits_disk_reopen_three_cycles_and_history ... ok
+test tests::schema_mismatch_xpath_group_and_duplicate_mapping_refuse ... ok
+test tests::stateless_api_source_and_value_cas_and_same_format ... ok
+test tests::stateless_unknown_request_keys_and_wrong_original_rejected ... ok
+test tests::unknown_body_record_and_trailing_bytes_are_not_silently_lost ... ok
+test tests::valid_preview_hwp_to_hwpx_to_hwp_exact ... ok
+
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.01s
+
+   Doc-tests hwt_leaf115_native
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,70 @@
+FAIL valid ordinary HWP Korean and astral preview survive same-format raw streams exactly: AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
+  {
+    '/BodyText/Section0': '4100419ec1aff7e73ca6d29a66f400b9a660d1fc7fff0a8191c5caa8608ac18c',
+    '/DocInfo': 'ab826f6feb0491337c0fab565a7efa4c6d048082c3ce36e1aa4b68de159e7d06',
+    '/DocOptions/_LinkDoc': '0fab9be824f6540b15651edfcbbf1bb8f5af1b5cf78dbc80e38a1a23d8a9930c',
+    '/FileHeader': 'cfb806a1fd4ee8680b1d738aea175b8558170136b3089f55994a143aa22a0878',
+    '/PrvImage': '2103d51fb863769afce086d2aa45eda343808e1c478527a9d40b3dfbebe513c6',
++   '/PrvText': 'dba1edbe3ad834b32e7693616b1a35bb5caf57641daa3bdcc329c9f5d3c90566',
+-   '/PrvText': 'fe6dab3541f73023bfb5d45fd61bfb8e62c4e59d400bda7d4a692a9f16941636',
+    '/Scripts/DefaultJScript': '1b4833c1d5a47fcf6cc76e769cf6b12b27401152387d99dfd313469881bcf590',
+    '/Scripts/JScriptVersion': '1322438fbe7c693f50ae634db95d80567379557dea3a970e75d06e63a0e16b55',
+    '/\x05HwpSummaryInformation': '8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929'
+  }
+
+FAIL valid native preview uses exact UTF8 HWPX fallback and returns exact UTF16 HWP preview: AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
++ actual - expected
+
++ '\r\n'
+- '자체 Korean 😀 𠀀 end\r\n'
+
+PASS existing XML preview auxiliary remains exact and has priority over native fallback
+FAIL unpaired-high.hwp: optional open preserves all raw HWP streams and all four HWPX APIs reject: AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
+  {
+    '/BodyText/Section0': '4100419ec1aff7e73ca6d29a66f400b9a660d1fc7fff0a8191c5caa8608ac18c',
+    '/DocInfo': 'ab826f6feb0491337c0fab565a7efa4c6d048082c3ce36e1aa4b68de159e7d06',
+    '/DocOptions/_LinkDoc': '0fab9be824f6540b15651edfcbbf1bb8f5af1b5cf78dbc80e38a1a23d8a9930c',
+    '/FileHeader': 'cfb806a1fd4ee8680b1d738aea175b8558170136b3089f55994a143aa22a0878',
+    '/PrvImage': '2103d51fb863769afce086d2aa45eda343808e1c478527a9d40b3dfbebe513c6',
+-   '/PrvText': 'c960f09cfe75e9a56f97b04ec02553be742dc5a00d66b06e0adf8f9187242385',
+    '/Scripts/DefaultJScript': '1b4833c1d5a47fcf6cc76e769cf6b12b27401152387d99dfd313469881bcf590',
+    '/Scripts/JScriptVersion': '1322438fbe7c693f50ae634db95d80567379557dea3a970e75d06e63a0e16b55',
+    '/\x05HwpSummaryInformation': '8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929'
+  }
+
+FAIL unpaired-low.hwp: optional open preserves all raw HWP streams and all four HWPX APIs reject: AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
+  {
+    '/BodyText/Section0': '4100419ec1aff7e73ca6d29a66f400b9a660d1fc7fff0a8191c5caa8608ac18c',
+    '/DocInfo': 'ab826f6feb0491337c0fab565a7efa4c6d048082c3ce36e1aa4b68de159e7d06',
+    '/DocOptions/_LinkDoc': '0fab9be824f6540b15651edfcbbf1bb8f5af1b5cf78dbc80e38a1a23d8a9930c',
+    '/FileHeader': 'cfb806a1fd4ee8680b1d738aea175b8558170136b3089f55994a143aa22a0878',
+    '/PrvImage': '2103d51fb863769afce086d2aa45eda343808e1c478527a9d40b3dfbebe513c6',
+-   '/PrvText': 'c8d4f509baf51eddf1028d6a1eb27c44046ec1db82d3b795fd123607277068e8',
+    '/Scripts/DefaultJScript': '1b4833c1d5a47fcf6cc76e769cf6b12b27401152387d99dfd313469881bcf590',
+    '/Scripts/JScriptVersion': '1322438fbe7c693f50ae634db95d80567379557dea3a970e75d06e63a0e16b55',
+    '/\x05HwpSummaryInformation': '8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929'
+  }
+
+FAIL odd-byte.hwp: optional open preserves all raw HWP streams and all four HWPX APIs reject: AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
++ actual - expected
+
+  {
+    '/BodyText/Section0': '4100419ec1aff7e73ca6d29a66f400b9a660d1fc7fff0a8191c5caa8608ac18c',
+    '/DocInfo': 'ab826f6feb0491337c0fab565a7efa4c6d048082c3ce36e1aa4b68de159e7d06',
+    '/DocOptions/_LinkDoc': '0fab9be824f6540b15651edfcbbf1bb8f5af1b5cf78dbc80e38a1a23d8a9930c',
+    '/FileHeader': 'cfb806a1fd4ee8680b1d738aea175b8558170136b3089f55994a143aa22a0878',
+    '/PrvImage': '2103d51fb863769afce086d2aa45eda343808e1c478527a9d40b3dfbebe513c6',
++   '/PrvText': 'ffe9aaeaa2a2d5048174df0b80599ef0197ec024c4b051bc9860cff58ef7f9f3',
+-   '/PrvText': 'd52a657f66feeaef63fd06fbe227890397aae1fbb0525aa8a1fd2ca595728c49',
+    '/Scripts/DefaultJScript': '1b4833c1d5a47fcf6cc76e769cf6b12b27401152387d99dfd313469881bcf590',
+    '/Scripts/JScriptVersion': '1322438fbe7c693f50ae634db95d80567379557dea3a970e75d06e63a0e16b55',
+    '/\x05HwpSummaryInformation': '8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929'
+  }
+
+PASS all authored source bytes match immutable fixture manifest

@@ -1,0 +1,18 @@
+[package]
+name = "hwt-leaf115-native"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rhwp = { path = "../../rhwp-engine/source-b20b9eb0ed097b92" }
+cfb = "0.15"
+quick-xml = "0.42"
+serde_json = { version = "1", features = ["float_roundtrip"] }
+sha2 = "0.11"
+flate2 = "1"
+crc32fast = "1"
+
+[workspace]
+
+[patch.crates-io]
+svg2pdf = { path = "../../rhwp-engine/source-b20b9eb0ed097b92/vendor/svg2pdf" }

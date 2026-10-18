@@ -1,0 +1,36 @@
+{
+  "officialSourceId": "b20b9eb0ed097b92",
+  "candidateRuntimeFourFiles": [
+    {
+      "path": "src/hwt_leaf115.rs",
+      "canonicalLfSha256": "d19b4c7bd89e1b5970a5f3bd986f1b67e79d1583edf6914f0a15530095a32c51",
+      "exactCandidateCanonicalLf": true
+    },
+    {
+      "path": "src/parser/cfb_reader.rs",
+      "canonicalLfSha256": "6923e2611a37e0efa394ccaf9ade50fe41f8e7b88c977be8c9a3e4ad44044930",
+      "exactCandidateCanonicalLf": true
+    },
+    {
+      "path": "src/parser/mod.rs",
+      "canonicalLfSha256": "c537043831569f7fc01621c36d85158282eedb45f0da2cf2e7beb84486b846c5",
+      "exactCandidateCanonicalLf": true
+    },
+    {
+      "path": "src/serializer/cfb_writer.rs",
+      "canonicalLfSha256": "8b52cdd0c07dfd2c64f4f726a28ee5f2f6987c519bd5aa4bc72986211e5ed435",
+      "exactCandidateCanonicalLf": true
+    }
+  ],
+  "mergedHwpxSerializer": {
+    "path": "src/serializer/hwpx/mod.rs",
+    "canonicalLfSha256": "1a7bb86f34a5133aa2add5ce74a015fe2086b6fa3ca602381ccf2e25f4ad7ed3",
+    "opaqueGuardInActualSharedImplementation": true,
+    "fallbackExactAuxThenNativeThenConstant": true,
+    "wholeFileEqualsCandidate": false,
+    "reason": "Root separately merged current standard rows implementation; only our exact two hunks are compared."
+  },
+  "resource": "e13ceab437308fd70c49dbe967902165d363cd89c1e18da1d97005476c2946b4",
+  "nativeStatus": "RUNNING",
+  "officialSourceWrites": 0
+}

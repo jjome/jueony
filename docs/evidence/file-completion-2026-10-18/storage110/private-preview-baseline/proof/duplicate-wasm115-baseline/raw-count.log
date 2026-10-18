@@ -1,0 +1,17 @@
+     Locking 28 packages to latest compatible versions
+   Compiling crc32fast v1.5.2
+   Compiling adler2 v2.0.1
+   Compiling cfg-if v1.0.4
+   Compiling simd-adler32 v0.3.10
+   Compiling fnv v1.0.7
+   Compiling uuid v1.24.1
+   Compiling web-time v1.1.0
+   Compiling miniz_oxide v0.9.1
+   Compiling cfb v0.15.0
+   Compiling flate2 v1.1.10
+   Compiling hwt-record-count-audit v0.1.0 (/mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/body-record-count-audit115)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.02s
+     Running `/tmp/jueony-rhwp-engine/target/hwt-leaf115-rawaudit/debug/hwt-record-count-audit /mnt/c/Users/jjome/Documents/work/jueony/apps/editor/tests/fixtures/hwt-leaf115-own/duplicate-page-def.hwt /mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/duplicate-wasm115-baseline/accepted-output.hwt`
+OWN_PAGE_DEF path=/mnt/c/Users/jjome/Documents/work/jueony/apps/editor/tests/fixtures/hwt-leaf115-own/duplicate-page-def.hwt count=2 uncompressedBodyBytes=929
+OWN_PAGE_DEF path=/mnt/c/Users/jjome/Documents/work/jueony/build/hwt-leaf115/duplicate-wasm115-baseline/accepted-output.hwt count=1 uncompressedBodyBytes=903
+BASELINE_REAL_RAW_LOSS_CONFIRMED; not a passing save

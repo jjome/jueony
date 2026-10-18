@@ -1,8 +1,8 @@
 @echo off
 setlocal
-set "JUEONY_FILE_REVIEW=%~dp0build\jueony-file-review111\Start-Jueony.cmd"
+set "JUEONY_FILE_REVIEW=%~dp0build\n001-clean-review123\build\jueony-n001-review124\Start-Jueony.cmd"
 if not exist "%JUEONY_FILE_REVIEW%" (
-  echo Build the file review bundle first. See docs\124-new-document-time-storage.md.
+  echo Build the N001 review bundle first. See docs\127-n001-legacy-layout-storage.md.
   exit /b 1
 )
 call "%JUEONY_FILE_REVIEW%"

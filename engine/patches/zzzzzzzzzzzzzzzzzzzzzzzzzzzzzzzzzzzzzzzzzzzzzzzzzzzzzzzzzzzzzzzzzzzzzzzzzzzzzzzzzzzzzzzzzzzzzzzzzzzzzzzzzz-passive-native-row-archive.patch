@@ -1,0 +1,271 @@
+--- a/crates/rhwp-password-crypto/src/lib.rs
++++ b/crates/rhwp-password-crypto/src/lib.rs
+@@ -586,6 +586,7 @@
+ }
+ 
+ fn hwpx_plaintext_limit(path: &str) -> usize {
++    if path=="META-INF/rhwp-opaque-native-row-stream-v1.bin"{return 2*1024*1024;}
+     if path.to_ascii_lowercase().starts_with("bindata/") {
+         HWPX_MAX_BINDATA_SIZE
+     } else {
+@@ -791,7 +792,7 @@
+             let bytes = if is_hwpx_xml_budget_path(&name) {
+                 read_hwpx_xml_limited(&mut input, &name, &mut xml_remaining)?
+             } else {
+-                read_zip_entry_limited(&mut input, &name, HWPX_MAX_BINDATA_SIZE)?
++                read_zip_entry_limited(&mut input, &name, if name=="META-INF/rhwp-opaque-native-row-stream-v1.bin"{2*1024*1024+4096}else{HWPX_MAX_BINDATA_SIZE})?
+             };
+             if let Some(entry) = protected_by_path.get(name.as_str()) {
+                 selected.insert(entry.path.as_str());
+@@ -844,7 +845,8 @@
+ }
+ 
+ fn is_hwpx_protected_path(path: &str) -> bool {
+-    path.starts_with("BinData/")
++    path=="META-INF/rhwp-opaque-native-row-stream-v1.bin"
++        || path.starts_with("BinData/")
+         // [#3546] 차트 XML 은 문서 내용(데이터 값·라벨)이다. 종전에는
+         // BinData/*.ooxml_chart 로 방출돼 위 분기로 암호화됐으나, 원형
+         // Chart/chartN.xml 방출로 바뀌며 평문으로 남지 않도록 포함한다.
+@@ -974,7 +976,7 @@
+         let data = if is_dir {
+             Vec::new()
+         } else {
+-            read_zip_entry_limited(&mut input, &name, HWPX_MAX_BINDATA_SIZE)?
++            read_zip_entry_limited(&mut input, &name, if name=="META-INF/rhwp-opaque-native-row-stream-v1.bin"{2*1024*1024}else{HWPX_MAX_BINDATA_SIZE})?
+         };
+         if name == HWPX_MANIFEST_PATH {
+             manifest = Some(data.clone());
+--- a/src/model/mod.rs
++++ b/src/model/mod.rs
+@@ -99,3 +99,5 @@
+ pub(crate) mod native_computed_rows;
+ 
+ pub(crate) mod native_computed_resource;
++
++pub(crate) mod opaque_native_row_archive;
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[194, 212, 211, 168, 102, 62, 73, 111, 232, 199, 241, 128, 215, 81, 23, 34, 10, 105, 56, 51, 165, 245, 44, 117, 237, 155, 5, 114, 179, 223, 242, 179];
++pub(crate) const RESOURCE:[u8;32]=[183, 207, 155, 231, 211, 160, 240, 208, 59, 71, 115, 206, 58, 102, 119, 42, 48, 40, 231, 168, 148, 87, 45, 142, 82, 137, 91, 69, 170, 89, 77, 34];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -249,6 +249,10 @@
+             ("src/serializer/native_computed_rows.rs",include_bytes!("../serializer/native_computed_rows.rs").as_slice()),
+             ("crates/rhwp-password-crypto/Cargo.toml",include_bytes!("../../crates/rhwp-password-crypto/Cargo.toml").as_slice()),
+             ("crates/rhwp-password-crypto/src/lib.rs",include_bytes!("../../crates/rhwp-password-crypto/src/lib.rs").as_slice()),
++            ("src/model/opaque_native_row_archive.rs",include_bytes!("opaque_native_row_archive.rs").as_slice()),
++            ("src/model/mod.rs",include_bytes!("mod.rs").as_slice()),
++            ("src/parser/hwpx/mod.rs",include_bytes!("../parser/hwpx/mod.rs").as_slice()),
++            ("src/parser/hwpx/reader.rs",include_bytes!("../parser/hwpx/reader.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- /dev/null
++++ b/src/model/opaque_native_row_archive.rs
+@@ -0,0 +1,94 @@
++//! Passive transport for one unconsumed native row-cache stream.
++//! The inner bytes are never parsed as rows, fonts, text, geometry or a lease.
++//! Imported valid Native envelopes normalize to the existing private AUX part;
++//! exports encode a new envelope and encrypt only that newly generated packet.
++use super::document::Document;
++use sha2::{Digest,Sha256};
++pub(crate) const ACTIVE: &str="/RhwpComputedNativeRowsV1";
++pub(crate) const ARCHIVE: &str="/RhwpArchivedNativeRowsV1";
++pub(crate) const ZIP: &str="META-INF/rhwp-opaque-native-row-stream-v1.bin";
++pub(crate) const LIMIT: usize=2*1024*1024;
++pub(crate) const ENVELOPE_LIMIT:usize=LIMIT+60;
++const MAGIC:&[u8;16]=b"RHWP-OPAQUE-ROW\0";
++const MAX_OWNERS:usize=4;
++fn error()->String{"Ambiguous, unsupported or oversized passive native-row archive".into()}
++fn key(path:&str)->String{
++ let slash=path.replace('\\',"/");let mut parts=Vec::new();
++ for p in slash.split('/') {match p {""|"."=>{},".."=>{parts.pop();},_=>parts.push(p)}}
++ parts.join("/").to_ascii_uppercase()
++}
++pub(crate) fn related(path:&str,target:&str)->bool{let p=key(path);let t=key(target);p==t||p.strip_prefix(&t).is_some_and(|v|v.starts_with('/'))}
++fn merge(out:&mut Option<Vec<u8>>,raw:&[u8],count:&mut usize)->Result<(),String>{
++ *count=count.checked_add(1).ok_or_else(error)?;
++ if *count>MAX_OWNERS||raw.len()>LIMIT{return Err(error());}
++ if out.as_ref().is_some_and(|old|old.as_slice()!=raw){return Err(error());}
++ if out.is_none(){*out=Some(raw.to_vec());}Ok(())
++}
++pub(crate) fn envelope(raw:&[u8])->Result<Vec<u8>,String>{
++ if raw.len()>LIMIT{return Err(error());}let mut out=Vec::with_capacity(60+raw.len());
++ out.extend(MAGIC);out.extend(1u32.to_le_bytes());out.extend((raw.len()as u64).to_le_bytes());out.extend(Sha256::digest(raw));out.extend(raw);Ok(out)
++}
++pub(crate) fn decode(bytes:&[u8])->Result<&[u8],String>{
++ if bytes.len()<60||bytes.len()>ENVELOPE_LIMIT||&bytes[..16]!=MAGIC||bytes[16..20]!=1u32.to_le_bytes(){return Err(error());}
++ let n=u64::from_le_bytes(bytes[20..28].try_into().map_err(|_|error())?);
++ if n>LIMIT as u64||bytes.len()!=60+n as usize{return Err(error());}
++ let raw=&bytes[60..];if bytes[28..60]!=Sha256::digest(raw)[..]{return Err(error());}Ok(raw)
++}
++/// Only exact bounded private owners may be combined. Equality is byte exact;
++/// a duplicate, alternate spelling or child cannot overwrite another payload.
++pub(crate) fn payload(doc:&Document)->Result<Option<Vec<u8>>,String>{
++ let mut out=None;let mut count=0;
++ for(path,raw)in &doc.extra_streams{
++  if related(path,ACTIVE){if path!=ACTIVE{return Err(error());}merge(&mut out,raw,&mut count)?;}
++  else if related(path,ARCHIVE){if path!=ARCHIVE{return Err(error());}merge(&mut out,decode(raw)?,&mut count)?;}
++ }
++ for(path,raw)in &doc.hwpx_aux_entries{if related(path,ZIP){if path!=ZIP{return Err(error());}merge(&mut out,raw,&mut count)?;}}
++ Ok(out)
++}
++/// A strict Native parser calls this only after the supported password/header
++/// and actual DocInfo/body parse succeeded. Invalid cipher/envelopes are an
++/// explicit refusal; they never become a normalized owner or enter a row decoder.
++pub(crate) fn restore_native(doc:&mut Document,password:Option<&[u8]>)->Result<(),String>{
++ let mut out=None;let mut count=0;
++ for(path,raw)in &doc.extra_streams{if related(path,ARCHIVE){
++  if path!=ARCHIVE||raw.len()>ENVELOPE_LIMIT{return Err(error());}
++  let plain=if doc.header.encrypted{let pwd=password.ok_or_else(error)?;crate::password_crypto::decrypt_hwp5_stream(raw,pwd)}else{raw.clone()};
++  merge(&mut out,decode(&plain)?,&mut count)?;
++ }}
++ if let Some(raw)=out{
++  for(path,value)in &doc.hwpx_aux_entries{if related(path,ZIP){if path!=ZIP{return Err(error());}merge(&mut Some(raw.clone()),value,&mut count)?;}}
++  // Validate coexistence with the original unconsumed active owner before
++  // changing this local parsed document. No old descriptor is interpreted.
++  for(path,value)in &doc.extra_streams{if related(path,ACTIVE){if path!=ACTIVE||value.as_slice()!=raw{return Err(error());}}}
++  doc.extra_streams.retain(|(path,_)|path!=ARCHIVE);
++  doc.hwpx_aux_entries.retain(|(path,_)|path!=ZIP);
++  doc.hwpx_aux_entries.push((ZIP.into(),raw));
++ }Ok(())
++}
++/// Work only on the serializer's extra-stream copy. Original model owners and
++/// every current physical/cache authorization remain untouched.
++pub(crate) fn prepare_native(doc:&Document,password:Option<&[u8]>,extra:&mut Vec<(String,Vec<u8>)>)->Result<(),String>{
++ let Some(raw)=payload(doc)? else{return Ok(());};
++ // An unconsumed original active stream remains exact opaque data. Do not
++ // relocate it merely to free the name for a new current descriptor. Any new
++ // current-row collision must continue to report a safe serialization loss.
++ if doc.extra_streams.iter().any(|(path,_)|path==ACTIVE){
++  extra.retain(|(path,_)|path!=ARCHIVE);return Ok(());
++ }
++ let plain=envelope(&raw)?;
++ let encoded=match password{Some(p)=>crate::password_crypto::encrypt_hwp5_stream(&plain,p),None=>plain};
++ extra.retain(|(path,_)|path!=ARCHIVE);extra.push((ARCHIVE.into(),encoded));Ok(())
++}
++#[cfg(test)]mod tests{
++ use super::*;
++ #[test]fn passive_archive122_codec_rejects_tamper_versions_and_preserves_arbitrary_inner_cipher(){
++  for raw in [vec![],vec![0,255,0,127],b"secret opaque cipher never decode me".to_vec()]{let e=envelope(&raw).unwrap();assert_eq!(decode(&e).unwrap(),raw);for i in [0,16,20,28,59]{let mut b=e.clone();b[i]^=1;assert!(decode(&b).is_err());}let mut b=e.clone();b.push(0);assert!(decode(&b).is_err());}
++  assert!(envelope(&vec![0;LIMIT+1]).is_err());assert!(decode(&vec![0;ENVELOPE_LIMIT+1]).is_err());
++ }
++ #[test]fn passive_archive122_owner_merge_requires_exact_payload_and_fixed_paths(){
++  let mut d=Document::default();d.extra_streams.push((ACTIVE.into(),b"raw".to_vec()));d.hwpx_aux_entries.push((ZIP.into(),b"raw".to_vec()));assert_eq!(payload(&d).unwrap(),Some(b"raw".to_vec()));
++  d.extra_streams.push((ARCHIVE.into(),envelope(b"raw").unwrap()));assert_eq!(payload(&d).unwrap(),Some(b"raw".to_vec()));
++  d.hwpx_aux_entries[0].1=b"other".to_vec();assert!(payload(&d).is_err());
++  for path in ["/rhwpcomputednativerowsv1","/RhwpComputedNativeRowsV1/child","/./RhwpComputedNativeRowsV1"]{let mut q=Document::default();q.extra_streams.push((path.into(),b"raw".to_vec()));assert!(payload(&q).is_err());}
++ }
++}
+--- a/src/parser/hwpx/mod.rs
++++ b/src/parser/hwpx/mod.rs
+@@ -446,6 +446,9 @@
+         }
+     }
+ 
++    if let Some(raw)=reader.read_passive_native_row_archive()?{
++        hwpx_aux_entries.push((crate::model::opaque_native_row_archive::ZIP.into(),raw));
++    }
+     // 2. content.hpf → 섹션 파일 목록 + BinData 목록
+     let content_xml = reader.read_file("Contents/content.hpf")?;
+     // content.hpf 의 manifest/spine 은 본문 의존(섹션/BinData)이라 재생성하지만,
+--- a/src/parser/hwpx/reader.rs
++++ b/src/parser/hwpx/reader.rs
+@@ -247,6 +247,19 @@
+     }
+ 
+     /// 아카이브 내 파일 목록을 반환한다.
++    pub(crate) fn read_passive_native_row_archive(&mut self)->Result<Option<Vec<u8>>,HwpxError>{
++        use crate::model::opaque_native_row_archive as a;
++        let mut out:Option<Vec<u8>>=None;let mut count=0usize;
++        for index in 0..self.archive.len(){
++            let mut file=self.archive.by_index(index).map_err(|e|HwpxError::XmlError(e.to_string()))?;
++            let name=file.name().to_string();if a::related(&name,a::ZIP){
++            count+=1;if count>4||name!=a::ZIP{return Err(HwpxError::XmlError("Ambiguous passive native-row archive ZIP path".into()));}
++            let raw=read_limited(&mut file,a::LIMIT).map_err(|e|HwpxError::XmlError(e.to_string()))?;
++            if out.as_ref().is_some_and(|v|v!=&raw){return Err(HwpxError::XmlError("Conflicting passive native-row archive ZIP bytes".into()));}
++            out=Some(raw);
++        }}Ok(out)
++    }
++
+     pub fn file_names(&self) -> Vec<String> {
+         self.archive.file_names().map(|s| s.to_string()).collect()
+     }
+--- a/src/parser/mod.rs
++++ b/src/parser/mod.rs
+@@ -424,6 +424,15 @@
+     }
+ 
+     native_computed_rows::check_stream_budget(&mut cfb).map_err(ParseError::CfbError)?;
++    for (path,_,is_stream) in cfb.list_all_entries(){
++        use crate::model::opaque_native_row_archive as a;
++        for (target,limit) in [(a::ACTIVE,a::LIMIT),(a::ARCHIVE,a::ENVELOPE_LIMIT)]{
++            if a::related(&path,target){
++                if path!=target||!is_stream{return Err(ParseError::CfbError(cfb_reader::CfbError::StreamError("Ambiguous passive native archive path".into())));}
++                cfb.read_stream_raw_limited(&path,limit).map_err(ParseError::CfbError)?;
++            }
++        }
++    }
+ 
+     let compressed = file_header.flags.compressed;
+     let distribution = file_header.flags.distribution;
+@@ -613,7 +622,11 @@
+             crate::model::hyperlink_format::decode(&mut doc, &bytes);
+         }
+     }
++    // Only the canonical active stream can enter the existing exact decoder.
++    // A valid current owner may coexist with a distinct old passive payload.
+     native_computed_rows::restore(&mut doc, password);
++    crate::model::opaque_native_row_archive::restore_native(&mut doc,password)
++        .map_err(|e|ParseError::CfbError(cfb_reader::CfbError::StreamError(e)))?;
+     Ok(doc)
+ }
+ 
+@@ -911,6 +924,11 @@
+     password: Option<&[u8]>,
+     limits: Hwp5DocumentOpenDecompressionLimits,
+ ) -> Result<Document, ParseError> {
++    if lenient.list_entries().iter().any(|(path,_,_,_)|
++        crate::model::opaque_native_row_archive::related(path,crate::model::opaque_native_row_archive::ARCHIVE)
++        || crate::model::opaque_native_row_archive::related(path,crate::model::opaque_native_row_archive::ACTIVE)){
++        return Err(ParseError::CfbError(cfb_reader::CfbError::StreamError("Cannot preserve native-row archive in lenient CFB fallback".into())));
++    }
+     // FileHeader 파싱
+     let header_data = lenient.read_file_header().map_err(ParseError::CfbError)?;
+     let file_header = header::parse_file_header(&header_data).map_err(ParseError::HeaderError)?;
+--- a/src/serializer/cfb_writer.rs
++++ b/src/serializer/cfb_writer.rs
+@@ -235,6 +235,8 @@
+     if let Some(bytes) = crate::model::hyperlink_format::encode(doc) {
+         extra_streams.push((crate::model::hyperlink_format::HWP_STREAM.into(), bytes));
+     }
++    crate::model::opaque_native_row_archive::prepare_native(doc,password,&mut extra_streams)
++        .map_err(SerializeError::CfbError)?;
+     super::native_computed_rows::append(doc, &header_bytes, &doc_info_bytes, &section_bytes_list, password, &mut extra_streams, &mut content_loss);
+     let bytes = write_hwp_cfb(
+         &header_bytes,
+--- a/src/serializer/hwpx/mod.rs
++++ b/src/serializer/hwpx/mod.rs
+@@ -65,6 +65,8 @@
+     }
+ 
+ 
++    let passive_rows=crate::model::opaque_native_row_archive::payload(doc)
++        .map_err(SerializeError::CfbError)?;
+     // 1-pass: ID 풀 구성
+     let mut ctx = SerializeContext::collect_from_document(doc);
+     ctx.current_standard_rows=projection.and_then(|p|p.bind_for_export(doc)).unwrap_or_default();
+@@ -76,6 +78,7 @@
+     // 1. mimetype (반드시 최초 엔트리, STORED, extra field 없음)
+     z.write_stored("mimetype", b"application/hwp+zip")?;
+ 
++    if let Some(raw)=&passive_rows {z.write_deflated(crate::model::opaque_native_row_archive::ZIP,raw)?;}
+     // 2. version.xml — 원본 보존 우선 (없으면 하드코딩 상수).
+     //    하드코딩 상수는 Windows/특정 빌드 고정값이라 한컴 변환본의 실제 플랫폼
+     //    버전을 덮어쓴다. 원본 보조 엔트리가 있으면 그대로 출력한다.

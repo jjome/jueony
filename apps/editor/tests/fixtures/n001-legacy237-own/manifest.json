@@ -1,0 +1,17 @@
+{
+  "engine": "704c7d510eb58bc2",
+  "inputSha256": "9778d66926e3138ce4bb51fadfd16173ee3d439aeec0a02a8f0af34b7fac0f3b",
+  "operation": "Public insert followed by ordinary or explicit timestamped HWP export; no descriptor edited/removed and no private lease constructed.",
+  "files": [
+    {
+      "path": "ordinary-prefix-native.hwp",
+      "bytes": 16384,
+      "sha256": "c130c61777775304f96085db8084041da700b55fc51f51d5959b8b6470d7894c"
+    },
+    {
+      "path": "stamped-prefix-native.hwp",
+      "bytes": 16384,
+      "sha256": "66c29b4047707b4aa7077b0f531146163cb2110102dd2395709d4aee9b6c99d9"
+    }
+  ]
+}

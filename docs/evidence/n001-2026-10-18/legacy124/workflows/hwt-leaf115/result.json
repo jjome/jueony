@@ -1,0 +1,72 @@
+{
+  "engine": {
+    "pkg": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-587008f751f4f6dc\\pkg",
+    "wasmSha256": "059042712aea0db19beb8383d3aee53db0dfd0a2c134c378d256ef665263e1ed",
+    "jsSha256": "0033f22069ac5e3139f68230b45b89761a421858db9d882e9975a4e1f7be40d8"
+  },
+  "sourceHash": "d8a693b6bac7f1573ef1ff3dde310bd84a10ec2ccc3facdfd8a0a975b7162a71",
+  "results": [
+    {
+      "name": "actual WASM closes own bindings and refuses malformed or mapping-only HWT",
+      "status": "PASS"
+    },
+    {
+      "name": "actual WASM refuses duplicate PAGE_DEF loss before any save and retains all source bytes",
+      "status": "PASS"
+    },
+    {
+      "name": "actual XML dialog enters the separately owned HWT workspace and opens actual-WASM body fields",
+      "status": "PASS"
+    },
+    {
+      "name": "actual HWT UI edit, Undo and Redo use guarded native bytes and preserve unrelated field",
+      "status": "PASS"
+    },
+    {
+      "name": "cancelled local save preserves dirty bytes and prior OPFS file",
+      "status": "PASS"
+    },
+    {
+      "name": "actual OPFS write-close-readback returns same HWT bytes which reopen in the actual WASM",
+      "status": "PASS"
+    },
+    {
+      "name": "dirty HWT close and independent IDB recovery restore full Undo/Redo while preserving XML checkpoint",
+      "status": "PASS"
+    },
+    {
+      "name": "failed checkpoint keeps current edit and Undo, without overwriting the last IDB checkpoint",
+      "status": "PASS"
+    },
+    {
+      "name": "malformed replacement HWT leaves the current fields and recovery untouched",
+      "status": "PASS"
+    },
+    {
+      "name": "actual native edit CAS refuses a stale request before any second mutation",
+      "status": "PASS"
+    },
+    {
+      "name": "actual IDB exact CAS retains named array metadata and aborts non-cloneable writes atomically",
+      "status": "PASS"
+    },
+    {
+      "name": "corrupt HWT recovery is refused and retained; the ordinary XML checkpoint remains exact",
+      "status": "PASS"
+    },
+    {
+      "name": "owned input bytes immutable and no page/console errors or external requests",
+      "status": "PASS"
+    }
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "nativeCalls": {
+    "inspect": 20,
+    "edit": 4
+  },
+  "scope": "Isolated actual HWT UI + actual selected Node WASM through typed boundary, browser IDB and real OPFS write/close/readback. Picker choice is synthetic; no native Windows picker/write/Hancom/COM/LLM/user file. General HWT, groups/forms/complex schema/XSL remain unsupported.",
+  "verifierSha256": "91f843fb11aa448ed07404681b67a89828e77a2afd8b93e31887c3a30a257905"
+}

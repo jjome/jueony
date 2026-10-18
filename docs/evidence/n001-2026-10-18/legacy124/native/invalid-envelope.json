@@ -1,0 +1,15 @@
+{
+  "cipherRejected": true,
+  "corruptBodyRejected": true,
+  "rejected": [
+    "magic",
+    "version",
+    "length",
+    "hash",
+    "payload",
+    "trailing",
+    "truncated",
+    "oversize"
+  ],
+  "status": "PASS"
+}

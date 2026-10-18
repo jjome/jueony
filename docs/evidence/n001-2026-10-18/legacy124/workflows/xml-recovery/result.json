@@ -1,0 +1,91 @@
+{
+  "results": [
+    {
+      "name": "real IndexedDB persists exact source/schema and both history branches across reload",
+      "status": "PASS"
+    },
+    {
+      "name": "dialog waits for explicit restore and blocks replacing unreviewed recovery",
+      "status": "PASS"
+    },
+    {
+      "name": "UI redo and undo checkpoint exact revised values and source dirty baseline",
+      "status": "PASS"
+    },
+    {
+      "name": "workspace and independent window scopes are isolated in actual IndexedDB",
+      "status": "PASS"
+    },
+    {
+      "name": "close and reopen restore user editing and undo history without native document writes",
+      "status": "PASS"
+    },
+    {
+      "name": "real cross-page atomic CAS accepts exactly one simultaneous writer",
+      "status": "PASS"
+    },
+    {
+      "name": "stale UI write preserves live edit, old checkpoint and offers explicit export/retry",
+      "status": "PASS"
+    },
+    {
+      "name": "cancelled close preserves uncheckpointed edits; forced reload retains only acknowledged prior checkpoint",
+      "status": "PASS"
+    },
+    {
+      "name": "failed durable write preserves current fields and previous record; retry succeeds after failure clears",
+      "status": "PASS"
+    },
+    {
+      "name": "discard cancels safely, then atomically removes only the selected checkpoint",
+      "status": "PASS"
+    },
+    {
+      "name": "actual file inputs create a fresh durable checkpoint before reporting recovery saved",
+      "status": "PASS"
+    },
+    {
+      "name": "corrupt IndexedDB record is not silently repaired, replaced or exposed in an editable dialog",
+      "status": "PASS"
+    },
+    {
+      "name": "owned fixture bytes remain unchanged; no external requests or browser errors",
+      "status": "PASS"
+    }
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "sourceHashes": [
+    {
+      "path": "src/ui/xml-document-dialog.ts",
+      "sha256": "1446350e35e94abac82e24e5192e25ea023f0f433196d409aee4bb305f354714"
+    },
+    {
+      "path": "src/adapters/xml/browser-parser.ts",
+      "sha256": "2d599806332bd767f1926ac068045268d63d3169b48dfa2cbed6a326effcd9ce"
+    },
+    {
+      "path": "src/modules/xml-documents/public/index.ts",
+      "sha256": "a29a224db53789d9d277924e4559b03d98ecdf91772eea92af2f9483b8aeebc6"
+    },
+    {
+      "path": "src/adapters/storage/xml-recovery.ts",
+      "sha256": "85de93271f91694cf03b2207fce790313269e78e8c6db2ca09b90e9451310bbe"
+    },
+    {
+      "path": "src/modules/xml-documents/application/workspace.ts",
+      "sha256": "73599af52fb0051b10f67a3a44d9afdea82b5898b60f6ca176a303b9db99ffef"
+    },
+    {
+      "path": "src/modules/xml-documents/domain/recovery.ts",
+      "sha256": "801132a6c9ef8168f17df354f5cacb7547b9c4a4cfeecf0a5d1fd8aff1664443"
+    },
+    {
+      "path": "src/modules/xml-documents/public/contracts.ts",
+      "sha256": "15254acebbedc97d713965d8b1aa7b45e8fcc8b625c2a72149855469e997eb57"
+    }
+  ],
+  "scope": "Isolated headless Edge, owned XML/XSD, real IndexedDB and UI recovery. No Windows desktop input, Hancom or real OS file-dialog comparison. Quota failure deliberately injected before durable write."
+}

@@ -1,0 +1,36 @@
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[92, 28, 250, 47, 242, 111, 97, 189, 88, 203, 60, 142, 66, 231, 133, 183, 229, 95, 237, 214, 76, 194, 190, 75, 170, 165, 85, 32, 117, 61, 178, 172];
++pub(crate) const RESOURCE:[u8;32]=[22, 9, 9, 23, 146, 16, 92, 145, 75, 33, 234, 131, 32, 148, 29, 87, 167, 159, 251, 4, 116, 112, 45, 70, 58, 251, 196, 208, 106, 221, 217, 233];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+--- a/src/parser/hwpx/raw_zip_authority.rs
++++ b/src/parser/hwpx/raw_zip_authority.rs
+@@ -41,7 +41,10 @@
+             let id=u16_at(bytes,q)?;let length=u16_at(bytes,q.checked_add(2)?)?;q=q.checked_add(4)?.checked_add(length)?;
+             if q>comment || id==0x7075 || id==0x0001{return None;}
+         }
+-        if alias(name,expected){
++        let owned_name=if expected==crate::model::opaque_native_row_archive::ZIP{
++            std::str::from_utf8(name).is_ok_and(|text|crate::model::opaque_native_row_archive::related(text,expected))
++        }else{alias(name,expected)};
++        if owned_name{
+             found+=1;if found>1 || name!=expected.as_bytes(){return Some(false);}
+         }
+         p=end;
+@@ -68,6 +71,10 @@
+   let mut b=package(&[path]);let at=46+path.len();b[30..32].copy_from_slice(&4u16.to_le_bytes());b.splice(at..at,[0x75,0x70,0,0]);let end=b.len()-22;b[end+12..end+16].copy_from_slice(&(end as u32).to_le_bytes());
+   assert!(has_related_private_entry(&b,path));assert!(!unique_private_entry(&b,path));
+   assert!(has_related_private_entry(&package(&[path,path]),path));assert!(!unique_private_entry(&package(&[path,path]),path));
++  let child="META-INF/rhwp-opaque-native-row-stream-v1.bin/child";
++  assert!(!unique_private_entry(&package(&[path,child]),path));
++  let mut b=package(&[path,child]);let second=46+path.len();let at=second+46+child.len();b[second+30..second+32].copy_from_slice(&4u16.to_le_bytes());b.splice(at..at,[0x75,0x70,0,0]);let end=b.len()-22;b[end+12..end+16].copy_from_slice(&(end as u32).to_le_bytes());
++  assert!(has_related_private_entry(&b,path));assert!(!unique_private_entry(&b,path));
+  }
+  #[test]fn raw_directory_unique_owned_entry(){assert!(unique_private_entry(&package(&["mimetype",PATH]),PATH));assert!(!unique_private_entry(&package(&["mimetype"]),PATH));}
+  #[test]fn raw_directory_duplicate_and_aliases_never_authorize(){for other in [PATH,"meta-inf/rhwp-computed-native-rows-v1.json","/META-INF/rhwp-computed-native-rows-v1.json","META-INF/./rhwp-computed-native-rows-v1.json","META-INF\\rhwp-computed-native-rows-v1.json"]{assert!(!unique_private_entry(&package(&[PATH,other]),PATH));assert_eq!(unique_private_entry(&package(&[other]),PATH),other==PATH);}}

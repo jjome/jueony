@@ -1,0 +1,65 @@
+{
+  "sourceId": "587008f751f4f6dc",
+  "allInputFilesCanonicalMatch": 1392,
+  "changedFiles": [
+    {
+      "path": "crates/rhwp-password-crypto/src/lib.rs",
+      "canonicalSha256": "d28b1fb512c31fcaadf154c91d139709b5e83e1f63d4960825a2e2a99066089d",
+      "officialRawSha256": "bb95c4df0541138ad1526d8abf75d1cb7caeb30a391963a8bb5f897831ba2ef8"
+    },
+    {
+      "path": "src/model/mod.rs",
+      "canonicalSha256": "a4e7e43fc544828520dc33c85c94254a9a5f99f6caa357c2fba82c2c220ab8a0",
+      "officialRawSha256": "392a0054062a62927544dd3d81c575c1448dbe09193544b588547a2b6b784233"
+    },
+    {
+      "path": "src/model/native_computed_resource.rs",
+      "canonicalSha256": "3605f4e4cb426e2fc644673c2f9ebdf471180f7952175f279507ac199a64d9c4",
+      "officialRawSha256": "f2ca60e6b578235b9bab3ca68ac6caf137f501c01bce2b481ff45f42d5ba0058"
+    },
+    {
+      "path": "src/model/opaque_native_row_archive.rs",
+      "canonicalSha256": "4dd8d56d142c25cb3f468c3bc169dc58bb7336be1ef093acae8a9a540b9a5fb2",
+      "officialRawSha256": "988757ddb6c29d3a4e49369c207b3ffdc8faefc0dc8e0c6a236b617961468e90"
+    },
+    {
+      "path": "src/parser/hwpx/mod.rs",
+      "canonicalSha256": "dbdd6dad3bb57856eeb6c21ae6f09780a8e92e95d04d226ed6b1cdc54d14edd3",
+      "officialRawSha256": "bc11cab60d84feaaf7d59df9bfb4c7f5eb9928b74ff3858b6ff6a1b4af915c77"
+    },
+    {
+      "path": "src/parser/hwpx/raw_zip_authority.rs",
+      "canonicalSha256": "f4cb0db7a1a00e5b9a75ae601d47e987bccd2307200ab0acdaaf46e442ef9c41",
+      "officialRawSha256": "0fa0e2b235fef0d58d561652bb80918d3a1e7fd56bd7062f8d74c9cec1ef0d33"
+    },
+    {
+      "path": "src/parser/hwpx/reader.rs",
+      "canonicalSha256": "d4e04ec2fae39570be26a1570d180ff2e5fafa0f5b50d910c56bde01670a0f3c",
+      "officialRawSha256": "46e7ccaedd3bda31e9ac2d34de8661e47aeae2fb00919a5b97102480e90be2f6"
+    },
+    {
+      "path": "src/parser/mod.rs",
+      "canonicalSha256": "54de7b09ccb0a9adf4f89b866770c3bedec3b589b109ae253f1c8574c2de23e6",
+      "officialRawSha256": "17b492596b7437aabe1d65ce56095c69b7881ca1480cd713e025854ba10cfa36"
+    },
+    {
+      "path": "src/renderer/layout/current_body_stack.rs",
+      "canonicalSha256": "51fd6395ec887263da471d430a79cdd9e3b79ec0425bada7e07aedf2ece47bcd",
+      "officialRawSha256": "6bf50fb39dfef49debdb2ddb82cbc3e4961b8844ad3a638ce8ed7e9eb5812c05"
+    },
+    {
+      "path": "src/serializer/cfb_writer.rs",
+      "canonicalSha256": "edf7738020b561eafa847dd75eaef09036e0c91ba1118674f7f5914e3ec7ee63",
+      "officialRawSha256": "9c49db924926f9f6302a919d8bd944b0cd827a8da51448567deb8b6a274af82a"
+    },
+    {
+      "path": "src/serializer/hwpx/mod.rs",
+      "canonicalSha256": "b85342753ca714caf3e81133a8a856b511a9217d5d848a0ccfa393aabfac5b7f",
+      "officialRawSha256": "5917d639cdc3db952a76e2606300be6c43e44d247e687b980e8133fe80b56430"
+    }
+  ],
+  "resourceSha256": "1609091792105c914b21ea8320941d57a79ffb0474702d463afbc4d06addd9e9",
+  "retainedAll243And248Inputs": true,
+  "otherRuntimeInputFilesUnchanged": 1381,
+  "noOtherRuntimeChanges": true
+}

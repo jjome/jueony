@@ -1,0 +1,114 @@
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[183, 207, 155, 231, 211, 160, 240, 208, 59, 71, 115, 206, 58, 102, 119, 42, 48, 40, 231, 168, 148, 87, 45, 142, 82, 137, 91, 69, 170, 89, 77, 34];
++pub(crate) const RESOURCE:[u8;32]=[92, 28, 250, 47, 242, 111, 97, 189, 88, 203, 60, 142, 66, 231, 133, 183, 229, 95, 237, 214, 76, 194, 190, 75, 170, 165, 85, 32, 117, 61, 178, 172];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -253,6 +253,7 @@
+             ("src/model/mod.rs",include_bytes!("mod.rs").as_slice()),
+             ("src/parser/hwpx/mod.rs",include_bytes!("../parser/hwpx/mod.rs").as_slice()),
+             ("src/parser/hwpx/reader.rs",include_bytes!("../parser/hwpx/reader.rs").as_slice()),
++            ("src/parser/hwpx/raw_zip_authority.rs",include_bytes!("../parser/hwpx/raw_zip_authority.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- a/src/parser/hwpx/mod.rs
++++ b/src/parser/hwpx/mod.rs
+@@ -381,6 +381,7 @@
+ pub fn parse_hwpx(data: &[u8]) -> Result<Document, HwpxError> {
+     // 1. ZIP 컨테이너 열기
+     let mut reader = reader::HwpxReader::open(data)?;
++    reader.validate_passive_native_row_directory(data)?;
+ 
+     // [Issue #1946] 암호화 HWPX 조기 감지. META-INF/manifest.xml 은 암호화 문서에서도
+     // 평문이며, 암호화된 엔트리마다 <odf:encryption-data> 블록을 갖는다. 감지하면
+@@ -761,6 +762,7 @@
+ /// `parse_hwpx` 경로로 들어간다. 비암호 HWPX에 비밀번호를 넘기면 원본 바이트를
+ /// 다시 쓰지 않고 종전 파서 결과를 그대로 반환한다.
+ pub fn parse_hwpx_with_password(data: &[u8], password: &[u8]) -> Result<Document, HwpxError> {
++    reader::HwpxReader::open(data)?.validate_passive_native_row_directory(data)?;
+     match crypto::decrypt_hwpx_package(data, password)? {
+         Some(decrypted) => parse_hwpx(&decrypted),
+         None => parse_hwpx(data),
+--- a/src/parser/hwpx/raw_zip_authority.rs
++++ b/src/parser/hwpx/raw_zip_authority.rs
+@@ -9,7 +9,7 @@
+     for part in slash.split('/') {match part {""|"."=>{},".."=>{segments.pop();},part=>segments.push(part)}}
+     segments.join("/").eq_ignore_ascii_case(expected)
+ }
+-fn unique_inner(bytes:&[u8],expected:&str)->Option<bool>{
++fn unique_inner(bytes:&[u8],expected:&str,presence_only:bool)->Option<bool>{
+     if bytes.len()<22{return None;}
+     let eocd=(bytes.len().saturating_sub(65557)..=bytes.len()-22).rev().find(|p|
+         bytes.get(*p..*p+4)==Some(&[0x50,0x4b,0x05,0x06])
+@@ -27,6 +27,15 @@
+         let start=p.checked_add(46)?;let extra=start.checked_add(name_len)?;let comment=extra.checked_add(extra_len)?;let end=comment.checked_add(comment_len)?;
+         if end>eocd{return None;}
+         let name=bytes.get(start..extra)?;if name.contains(&0){return None;}
++        // Presence is only a reason to run the strict uniqueness validator,
++        // never permission to keep or interpret this part. Inspect the literal
++        // central name before extras can replace the ZIP reader's index key.
++        if presence_only {
++            if let Ok(text)=std::str::from_utf8(name){
++                if crate::model::opaque_native_row_archive::related(text,expected){return Some(true);}
++            }
++            p=end;continue;
++        }
+         // Unicode-path extras can replace the index key; ZIP64 changes offsets.
+         let mut q=extra;while q<comment{
+             let id=u16_at(bytes,q)?;let length=u16_at(bytes,q.checked_add(2)?)?;q=q.checked_add(4)?.checked_add(length)?;
+@@ -39,7 +48,9 @@
+     }
+     Some(p==eocd && found==1)
+ }
+-pub(crate) fn unique_private_entry(bytes:&[u8],expected:&str)->bool{unique_inner(bytes,expected)==Some(true)}
++pub(crate) fn unique_private_entry(bytes:&[u8],expected:&str)->bool{unique_inner(bytes,expected,false)==Some(true)}
++/// Bounded raw-name observation; absent or unsupported directories grant no presence proof.
++pub(crate) fn has_related_private_entry(bytes:&[u8],expected:&str)->bool{unique_inner(bytes,expected,true)==Some(true)}
+ 
+ #[cfg(test)] mod tests{
+  use super::*;
+@@ -48,6 +59,16 @@
+   let mut b=Vec::new();for name in names{let mut h=[0u8;46];h[..4].copy_from_slice(&[0x50,0x4b,0x01,0x02]);h[28..30].copy_from_slice(&(name.len()as u16).to_le_bytes());b.extend(h);b.extend(name.as_bytes());}
+   let size=b.len()as u32;let mut end=[0u8;22];end[..4].copy_from_slice(&[0x50,0x4b,0x05,0x06]);end[8..10].copy_from_slice(&(names.len()as u16).to_le_bytes());end[10..12].copy_from_slice(&(names.len()as u16).to_le_bytes());end[12..16].copy_from_slice(&size.to_le_bytes());b.extend(end);b
+  }
++ #[test]fn passive_archive122_raw_presence_survives_name_remapping_without_granting_uniqueness(){
++  let path="META-INF/rhwp-opaque-native-row-stream-v1.bin";
++  assert!(!has_related_private_entry(&package(&["mimetype"]),path));
++  for name in [path,"META-INF/./rhwp-opaque-native-row-stream-v1.bin","meta-inf/rhwp-opaque-native-row-stream-v1.bin","META-INF/rhwp-opaque-native-row-stream-v1.bin/child"]{
++   assert!(has_related_private_entry(&package(&[name]),path));
++  }
++  let mut b=package(&[path]);let at=46+path.len();b[30..32].copy_from_slice(&4u16.to_le_bytes());b.splice(at..at,[0x75,0x70,0,0]);let end=b.len()-22;b[end+12..end+16].copy_from_slice(&(end as u32).to_le_bytes());
++  assert!(has_related_private_entry(&b,path));assert!(!unique_private_entry(&b,path));
++  assert!(has_related_private_entry(&package(&[path,path]),path));assert!(!unique_private_entry(&package(&[path,path]),path));
++ }
+  #[test]fn raw_directory_unique_owned_entry(){assert!(unique_private_entry(&package(&["mimetype",PATH]),PATH));assert!(!unique_private_entry(&package(&["mimetype"]),PATH));}
+  #[test]fn raw_directory_duplicate_and_aliases_never_authorize(){for other in [PATH,"meta-inf/rhwp-computed-native-rows-v1.json","/META-INF/rhwp-computed-native-rows-v1.json","META-INF/./rhwp-computed-native-rows-v1.json","META-INF\\rhwp-computed-native-rows-v1.json"]{assert!(!unique_private_entry(&package(&[PATH,other]),PATH));assert_eq!(unique_private_entry(&package(&[other]),PATH),other==PATH);}}
+  #[test]fn raw_directory_malformed_count_size_and_zip64_never_authorize(){let b=package(&[PATH]);for n in 0..b.len(){assert!(!unique_private_entry(&b[..n],PATH));}for offset in [4,6,8,10,12,16]{let mut x=b.clone();let p=x.len()-22+offset;x[p]^=1;assert!(!unique_private_entry(&x,PATH));}let mut z=b;let p=z.len()-22;z[p+10..p+12].copy_from_slice(&0xffffu16.to_le_bytes());assert!(!unique_private_entry(&z,PATH));}
+--- a/src/parser/hwpx/reader.rs
++++ b/src/parser/hwpx/reader.rs
+@@ -247,6 +247,19 @@
+     }
+ 
+     /// 아카이브 내 파일 목록을 반환한다.
++    /// The indexed names establish possible presence only, never uniqueness.
++    /// ZIP readers may collapse duplicate raw central-directory entries, and
++    /// password decryption rewrites the package, so callers check original
++    /// bytes before either ordinary parsing or crypto package rewriting.
++    pub(crate) fn validate_passive_native_row_directory(&self,data:&[u8])->Result<(),HwpxError>{
++        use crate::model::opaque_native_row_archive as a;
++        if (self.archive.file_names().any(|name|a::related(name,a::ZIP))
++            || super::raw_zip_authority::has_related_private_entry(data,a::ZIP))
++            && !super::raw_zip_authority::unique_private_entry(data,a::ZIP){
++            return Err(HwpxError::XmlError("Ambiguous raw passive native-row archive ZIP directory".into()));
++        }
++        Ok(())
++    }
+     pub(crate) fn read_passive_native_row_archive(&mut self)->Result<Option<Vec<u8>>,HwpxError>{
+         use crate::model::opaque_native_row_archive as a;
+         let mut out:Option<Vec<u8>>=None;let mut count=0usize;

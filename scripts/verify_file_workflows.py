@@ -25,6 +25,7 @@ def main():
     p.add_argument('--python-edit-baseline',type=Path);p.add_argument('--python-edit-source',type=Path);p.add_argument('--python-edit-oracle',type=Path)
     p.add_argument('--hwt-leaf',action='store_true',help='Include actual HWT leaf engine/IDB, full shell/iframe and synthetic Native copy IPC regressions')
     p.add_argument('--encrypted-native-rows',action='store_true',help='Include N001 encrypted row preservation: actual WASM and password UI saves of repository-owned inputs')
+    p.add_argument('--legacy-native-row-archive',action='store_true',help='Include N001 stale Native row payload preservation through both file formats and password changes')
     a=p.parse_args();engine=a.engine.resolve();dist=a.dist.resolve();out=a.output.resolve()
     optional=[a.baseline_engine,a.native_cell_source,a.native_cell_oracle,a.frame_baseline_engine]
     assert all(optional) or not any(optional),'native-cell/frame regressions require baseline engine, source, oracle and independent frame baseline together'
@@ -40,6 +41,7 @@ def main():
     if all(python_edit):cases=cases+[('python-edit-storage',30),('python-edit-ui',7)]
     if a.hwt_leaf:cases=cases+[('hwt-leaf115',13),('hwt-leaf-integrated115',7),('hwt-leaf-native-ui115',10),('preview-utf16-storage117',7)]
     if a.encrypted_native_rows:cases=cases+[('encrypted-native-rows120',7),('encrypted-native-rows-ui120',3)]
+    if a.legacy_native_row_archive:cases=cases+[('legacy-native-row-archive122',16),('legacy-native-row-ui122',5)]
     meta=json.loads((engine/'jueony-engine-build.json').read_bytes())
     build=json.loads((dist/'build-evidence.json').read_bytes())
     assert sha((engine/'rhwp_bg.wasm').read_bytes())==meta['wasmSha256']==build['engineWasmSha256']
@@ -60,7 +62,7 @@ def main():
             assert proc.returncode==0 and row['scriptUnchanged']
             assert len(r['results'])==count and r['failures']==[],(name,r.get('failures'))
             engine_only=name in ['package-preservation','native-row-engine',
-                                 'reflowed-native-storage','computed-row-package','stored-information95','encrypted-native-rows120',
+                                 'reflowed-native-storage','computed-row-package','stored-information95','encrypted-native-rows120','legacy-native-row-archive122',
                                  'document-story-information96','owned-native-cell-layout','owned-python-frame-layout','authored-floating-gap-layout','native-prefix-storage','python-edit-storage','preview-utf16-storage117']
             if not engine_only:
                 for key in ['pageErrors','consoleErrors','externalRequests']:assert r[key]==[],(name,key)

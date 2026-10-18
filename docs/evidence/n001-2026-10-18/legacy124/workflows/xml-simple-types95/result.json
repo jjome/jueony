@@ -1,0 +1,318 @@
+{
+  "results": [
+    {
+      "name": "raw namespace XML/XSD resolve forward named restrictions without any external resources",
+      "status": "PASS"
+    },
+    {
+      "name": "raw XML restriction chains intersect inherited enumeration values exactly",
+      "status": "PASS"
+    },
+    {
+      "name": "raw XML oracle matrix preserves typed lexical/value and invalid-schema boundaries",
+      "status": "PASS"
+    },
+    {
+      "name": "actual file inputs display existing XML dialog with honest HWT/XSL limits",
+      "status": "PASS"
+    },
+    {
+      "name": "invalid enumerated and exact-decimal edits preserve UI, history and acknowledged recovery bytes",
+      "status": "PASS"
+    },
+    {
+      "name": "valid Unicode and enumerated edits update real DOM, then persist undo and redo branches",
+      "status": "PASS"
+    },
+    {
+      "name": "closing the owned headless browser and reopening its own profile restores real IndexedDB history",
+      "status": "PASS"
+    },
+    {
+      "name": "actual UTF8 XML and exact XSD downloads reparse and retain comments and type declarations",
+      "status": "PASS"
+    },
+    {
+      "name": "unsupported patterns, cyclic references and bad namespaces reject before replacing current XML",
+      "status": "PASS"
+    },
+    {
+      "name": "the original fixture bytes and all non-user browser error boundaries remain unchanged",
+      "status": "PASS"
+    }
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "downloadEvents": [
+    {
+      "frameId": "ED09DB710D24835E211E1BD6C6E4792B",
+      "guid": "587039fb-e294-4877-9004-43412f7e59e2",
+      "url": "blob:null/ef9a756a-d233-4e82-b195-c664bda94581",
+      "suggestedFilename": "own.xml"
+    },
+    {
+      "guid": "587039fb-e294-4877-9004-43412f7e59e2",
+      "totalBytes": 250,
+      "receivedBytes": 0,
+      "state": "inProgress"
+    },
+    {
+      "guid": "587039fb-e294-4877-9004-43412f7e59e2",
+      "totalBytes": 250,
+      "receivedBytes": 250,
+      "state": "inProgress"
+    },
+    {
+      "guid": "587039fb-e294-4877-9004-43412f7e59e2",
+      "totalBytes": 250,
+      "receivedBytes": 250,
+      "state": "inProgress"
+    },
+    {
+      "guid": "587039fb-e294-4877-9004-43412f7e59e2",
+      "totalBytes": 250,
+      "receivedBytes": 250,
+      "state": "inProgress"
+    },
+    {
+      "guid": "587039fb-e294-4877-9004-43412f7e59e2",
+      "totalBytes": 250,
+      "receivedBytes": 250,
+      "state": "inProgress"
+    },
+    {
+      "guid": "587039fb-e294-4877-9004-43412f7e59e2",
+      "totalBytes": 250,
+      "receivedBytes": 250,
+      "state": "inProgress"
+    },
+    {
+      "frameId": "ED09DB710D24835E211E1BD6C6E4792B",
+      "guid": "2bb00891-57ce-44be-9908-407b035caa29",
+      "url": "blob:null/8d7b5c92-f5de-4ddd-be74-917cd04c2401",
+      "suggestedFilename": "own.xsd"
+    },
+    {
+      "guid": "587039fb-e294-4877-9004-43412f7e59e2",
+      "totalBytes": 250,
+      "receivedBytes": 250,
+      "state": "completed",
+      "filePath": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\n001-final124-workflows\\xml-simple-types95\\downloads\\own.xml"
+    },
+    {
+      "guid": "2bb00891-57ce-44be-9908-407b035caa29",
+      "totalBytes": 1105,
+      "receivedBytes": 0,
+      "state": "inProgress"
+    },
+    {
+      "guid": "2bb00891-57ce-44be-9908-407b035caa29",
+      "totalBytes": 1105,
+      "receivedBytes": 1105,
+      "state": "inProgress"
+    },
+    {
+      "guid": "2bb00891-57ce-44be-9908-407b035caa29",
+      "totalBytes": 1105,
+      "receivedBytes": 1105,
+      "state": "inProgress"
+    },
+    {
+      "guid": "2bb00891-57ce-44be-9908-407b035caa29",
+      "totalBytes": 1105,
+      "receivedBytes": 1105,
+      "state": "inProgress"
+    },
+    {
+      "guid": "2bb00891-57ce-44be-9908-407b035caa29",
+      "totalBytes": 1105,
+      "receivedBytes": 1105,
+      "state": "inProgress"
+    },
+    {
+      "guid": "2bb00891-57ce-44be-9908-407b035caa29",
+      "totalBytes": 1105,
+      "receivedBytes": 1105,
+      "state": "inProgress"
+    },
+    {
+      "guid": "2bb00891-57ce-44be-9908-407b035caa29",
+      "totalBytes": 1105,
+      "receivedBytes": 0,
+      "state": "canceled"
+    }
+  ],
+  "oracleObservations": [
+    {
+      "id": "typed-integer-enumeration",
+      "schemaValid": true,
+      "values": [
+        true,
+        true,
+        false,
+        false
+      ]
+    },
+    {
+      "id": "typed-decimal-zero-enumeration",
+      "schemaValid": true,
+      "values": [
+        true,
+        true,
+        false,
+        false
+      ]
+    },
+    {
+      "id": "precise-decimal-range",
+      "schemaValid": true,
+      "values": [
+        false,
+        true,
+        true,
+        false
+      ]
+    },
+    {
+      "id": "xml-character-length",
+      "schemaValid": true,
+      "values": [
+        true,
+        true,
+        false,
+        false
+      ]
+    },
+    {
+      "id": "string-whitespace-enumeration",
+      "schemaValid": true,
+      "values": [
+        true,
+        false,
+        false
+      ]
+    },
+    {
+      "id": "inherited-enumeration-intersection",
+      "schemaValid": true,
+      "values": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "id": "valid-empty-value-space",
+      "schemaValid": true,
+      "values": [
+        false,
+        false
+      ]
+    },
+    {
+      "id": "boolean-alias",
+      "schemaValid": true,
+      "values": [
+        true,
+        true,
+        true,
+        false
+      ]
+    },
+    {
+      "id": "invalid-boolean-enumeration",
+      "schemaValid": false,
+      "values": [],
+      "error": "XmlContractError: XML Schema 1.0의 boolean 자료형은 enumeration 제한을 허용하지 않습니다."
+    },
+    {
+      "id": "invalid-widened-range",
+      "schemaValid": false,
+      "values": [],
+      "error": "XmlContractError: 수치 경계 값이 상속한 기본 자료형의 값 범위를 벗어났습니다."
+    },
+    {
+      "id": "invalid-base-enumeration-bound",
+      "schemaValid": false,
+      "values": [],
+      "error": "XmlContractError: 수치 경계 값이 상속한 기본 자료형의 값 범위를 벗어났습니다."
+    },
+    {
+      "id": "same-inherited-exclusive-min-primary",
+      "schemaValid": true,
+      "values": [
+        false,
+        true,
+        true,
+        false
+      ]
+    },
+    {
+      "id": "same-inherited-exclusive-max-primary",
+      "schemaValid": true,
+      "values": [
+        false,
+        true,
+        true,
+        false
+      ]
+    },
+    {
+      "id": "invalid-cyclic-type",
+      "schemaValid": false,
+      "values": [],
+      "error": "XmlContractError: XSD 자료형 참조가 순환하거나 깊이 제한을 초과했습니다."
+    }
+  ],
+  "sourceHashes": [
+    {
+      "path": "src/ui/xml-document-dialog.ts",
+      "sha256": "1446350e35e94abac82e24e5192e25ea023f0f433196d409aee4bb305f354714"
+    },
+    {
+      "path": "src/adapters/xml/browser-parser.ts",
+      "sha256": "2d599806332bd767f1926ac068045268d63d3169b48dfa2cbed6a326effcd9ce"
+    },
+    {
+      "path": "src/modules/xml-documents/public/index.ts",
+      "sha256": "a29a224db53789d9d277924e4559b03d98ecdf91772eea92af2f9483b8aeebc6"
+    },
+    {
+      "path": "src/adapters/storage/xml-recovery.ts",
+      "sha256": "85de93271f91694cf03b2207fce790313269e78e8c6db2ca09b90e9451310bbe"
+    },
+    {
+      "path": "src/modules/xml-documents/domain/simple-types95.ts",
+      "sha256": "8fceef5d8b39937546f11e240f45b08a3789bcc010d0587adeb52ccf3806e1ab"
+    },
+    {
+      "path": "src/modules/xml-documents/domain/schema.ts",
+      "sha256": "b896d6f6f2cd1d3458d78646efc85e65b177708fc2625c41f83d7518df5c1a1b"
+    },
+    {
+      "path": "src/modules/xml-documents/domain/recovery.ts",
+      "sha256": "801132a6c9ef8168f17df354f5cacb7547b9c4a4cfeecf0a5d1fd8aff1664443"
+    },
+    {
+      "path": "src/modules/xml-documents/application/workspace.ts",
+      "sha256": "73599af52fb0051b10f67a3a44d9afdea82b5898b60f6ca176a303b9db99ffef"
+    },
+    {
+      "path": "src/modules/xml-documents/public/contracts.ts",
+      "sha256": "15254acebbedc97d713965d8b1aa7b45e8fcc8b625c2a72149855469e997eb57"
+    },
+    {
+      "path": "src/modules/xml-documents/ports/xml-codec.ts",
+      "sha256": "6cb8e831b90fc3d001a2d7753d98f1ddc16ccb90a0c6ab3c888d0e23e70d3a07"
+    }
+  ],
+  "bundleSha256": "6f5555075bf86a06eccc8b155c8e4ed7ed51a967e5ea2cb6ad1e24b6cd63ab7d",
+  "verifierSha256": "779f31a97c02ec91702b3b5fa9ef61fb1bfa67e3a517a72bab673e60f88c086a",
+  "inputSha256": {
+    "xml": "6503c16af419d3d286df43e93fa8b88376b991a4651ebec9cc84dfd126814a39",
+    "xsd": "c7cbbf22e498d02ae1096cb26d5944f11a6b9e4ca0335fd3710b478eda671e0c"
+  },
+  "scope": "Exact current production XML module/DOM dialog in isolated headless Edge; file-origin real IndexedDB close/reopen; actual owned downloads. No server, visible GUI, native/Hancom/HWT mapping or general XSD/XSL support claim."
+}

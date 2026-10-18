@@ -1,0 +1,35 @@
+{
+  "files": [
+    {
+      "path": "apps/editor/scripts/verify-encrypted-native-rows120.mjs",
+      "rawSha256": "b139e9cbb1e2b51bf9f5342dffb8868d244feec02ce04a52f18d33a7d1e139be",
+      "canonicalLfSha256": "354c80a0d30e4a862eebab344576671cda770743d055f455d38ba81cd0405344",
+      "sealed": "source/verifiers/verify-encrypted-native-rows120.mjs.gz"
+    },
+    {
+      "path": "apps/editor/scripts/verify-legacy-native-row-archive122.mjs",
+      "rawSha256": "597ae2678c09f316cc17ded0503289ae2dc840d30eb04de7413964a6eb89c858",
+      "canonicalLfSha256": "597ae2678c09f316cc17ded0503289ae2dc840d30eb04de7413964a6eb89c858",
+      "sealed": "source/verifiers/verify-legacy-native-row-archive122.mjs.gz"
+    },
+    {
+      "path": "apps/editor/scripts/verify-legacy-native-row-ui122.mjs",
+      "rawSha256": "9a861b57c90a916bdca0ad88225b95a1af900c241af972d75dcd8b89aa7c43d8",
+      "canonicalLfSha256": "0d00a4fda90b7e105e6ae13859a5698865a0448038c0d354a153e7d53e5b7a7f",
+      "sealed": "source/verifiers/verify-legacy-native-row-ui122.mjs.gz"
+    },
+    {
+      "path": "apps/editor/scripts/generate-n001-legacy-row-fixtures.mjs",
+      "rawSha256": "4b436447b66f41906e7cbbdc74c8cda6d7b3aedb20ee4286147f14bb030c941c",
+      "canonicalLfSha256": "4b436447b66f41906e7cbbdc74c8cda6d7b3aedb20ee4286147f14bb030c941c",
+      "sealed": "source/verifiers/generate-n001-legacy-row-fixtures.mjs.gz"
+    },
+    {
+      "path": "apps/editor/scripts/lib/n001-owned-container.mjs",
+      "rawSha256": "c8d4dacbb7109483fe8b106498d03464d9b3197db85288758037eb36f048706c",
+      "canonicalLfSha256": "c8d4dacbb7109483fe8b106498d03464d9b3197db85288758037eb36f048706c",
+      "sealed": "source/verifiers/n001-owned-container.mjs.gz"
+    }
+  ],
+  "policy": "Exact actual verifier bytes are retained with -text checkout attributes, and independently compressed here. No verifier/engine/app byte changes or reruns were made to achieve source equality."
+}

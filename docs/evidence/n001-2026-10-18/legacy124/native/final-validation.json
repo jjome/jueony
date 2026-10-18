@@ -1,0 +1,115 @@
+{
+  "scope": "N001 only; private frozen v5 Native actual artifact tests and selected Rust units, not a claim that all engine tests or Hancom comparison passed",
+  "status": "PASS",
+  "baseOfficial120": "045cc9e7bb7d46ad",
+  "runtimeSource": "build\\opaque-native-archive122\\source",
+  "runtimeResource": "1609091792105c914b21ea8320941d57a79ffb0474702d463afbc4d06addd9e9",
+  "resourceInputCount": 248,
+  "allOriginal243Retained": true,
+  "dedicatedNativeTarget": "/tmp/jueony-opaque-native-archive122-target",
+  "patch": "build\\opaque-native-archive122\\handoff-final\\passive-native-row-archive122-final.patch",
+  "patchSha256": "0cc81d9a7d3bce14254c27d093b99ce85208738b3d5a64f003b68e782c1f7d1e",
+  "finalFollowup": "build\\opaque-native-archive122\\handoff-final\\passive-raw-child124.patch",
+  "finalFollowupSha256": "5b828dfa13b7ceeb4835c663bc3cb384f1cc39d4235533b5bf61769ed93be8c0",
+  "sourceProof": "build\\opaque-native-archive122\\handoff-final\\source-proof.json",
+  "runtimeSourceUnchangedSinceFreeze": true,
+  "logs": [
+    {
+      "path": "build\\opaque-native-archive122\\native-v5-final.log",
+      "sha256": "0ea5c872c2f0298585b5ed94d583102d13260f3da0139c51856b673feb54f5b6",
+      "testFunctions": [
+        1,
+        4,
+        5
+      ],
+      "fail": 0,
+      "ignored": 0
+    },
+    {
+      "path": "build\\opaque-native-archive122\\codec-v5-units.log",
+      "sha256": "ff71be9c79fc26eaafb3fd877eb30ca262d62f1df3535af10e5181cc355e6061",
+      "testFunctions": [
+        3
+      ],
+      "fail": 0,
+      "ignored": 0
+    },
+    {
+      "path": "build\\opaque-native-archive122\\resource-v5-unit.log",
+      "sha256": "b752eeb556243e365f91facd1d43f304ebbcffd51ff2ca356f884621a6c0ff6c",
+      "testFunctions": [
+        1
+      ],
+      "fail": 0,
+      "ignored": 0
+    },
+    {
+      "path": "build\\opaque-native-archive122\\raw-authority-v5-units.log",
+      "sha256": "fc1732c879f220ee2c5b7faa58a202ce7c4527ab44356a7903a6bd797fbd6678",
+      "testFunctions": [
+        4
+      ],
+      "fail": 0,
+      "ignored": 0
+    }
+  ],
+  "actualLegacy119ArtifactPaths": 8,
+  "legacy119MatrixSha256": "52c309f8175ee0f56afcaebe0228bf36873883e328e7483531bc6766916c9b74",
+  "unchangedOriginal120HarnessSha256": "2f145017afbaa768322b29cf2e30d5ae558c45908fbb5a8b56595956e43b3ed3",
+  "passiveSafetyEvidence": [
+    {
+      "path": "build\\opaque-native-archive122\\passive-negative\\invalid-envelope.json",
+      "sha256": "253ced697c50d5128c5cf8dcc23556a0d011900d3b12806627e940bb0e28ffac",
+      "status": "PASS"
+    },
+    {
+      "path": "build\\opaque-native-archive122\\passive-negative\\password-cycles.json",
+      "sha256": "8eea8bcf1dbefd850ca5f4081a5949b330a6be82d5b754c725ea9698e4fe8cdf",
+      "status": "PASS"
+    },
+    {
+      "path": "build\\opaque-native-archive122\\passive-negative\\producer-rejection.json",
+      "sha256": "39c4a76e21b117ebbebaeda9658c595e14375997ab981e6d7337222b66e4be39",
+      "status": "PASS"
+    },
+    {
+      "path": "build\\opaque-native-archive122\\passive-negative\\raw-directory-duplicates.json",
+      "sha256": "df2d39a1265eb920cd561d4f77964a0a47c960781235161b58507fcba07cd50f",
+      "status": "PASS"
+    },
+    {
+      "path": "build\\opaque-native-archive122\\passive-negative\\unicode-path-remap.json",
+      "sha256": "93ca6a298742329f29b5a2369eb7b8b1b9a0c8bba1530fd40a3794decc748a11",
+      "status": "PASS"
+    }
+  ],
+  "harnessSourceHashes": [
+    {
+      "path": "build\\opaque-native-archive122\\harness\\tests\\archive122.rs",
+      "sha256": "93bbe90ecfd2ea28e21a69ac8cc3542aaa913b094379e250606d61e2d067f18f"
+    },
+    {
+      "path": "build\\opaque-native-archive122\\harness\\tests\\encrypted_safety120.rs",
+      "sha256": "2f145017afbaa768322b29cf2e30d5ae558c45908fbb5a8b56595956e43b3ed3"
+    },
+    {
+      "path": "build\\opaque-native-archive122\\harness\\tests\\passive_safety122.rs",
+      "sha256": "99c58b8beef6fbba99f90fa9d133f36c9f8fd14853e2d73856e13a09321d2a8d"
+    }
+  ],
+  "preservedFailures": [
+    "native-first.log: setup compile error, restored unchanged variables; no engine pass claimed",
+    "native-second.log: harness Option<Vec> compile mismatch; no engine pass claimed",
+    "passive-negative-first.log: harness sha2 LowerHex output mismatch; no engine pass claimed",
+    "duplicate-before.log: genuine old raw duplicate accepted, fail-old assertion preserved",
+    "Root build/n001-legacy122-on122-negative-final/result.json: actual WASM old duplicate failures; root owns final actual WASM"
+  ],
+  "nonClaims": [
+    "No actual Hancom/GUI/COM used",
+    "No old resource or cache whitelist",
+    "No opaque payload decoded or given row authority",
+    "No generic preservation guard weakening or comparison tolerance expansion",
+    "No unknown general CFB/ZIP preservation claim",
+    "No engine clock/history/B014/B006 work included"
+  ]
+}

@@ -1,0 +1,187 @@
+--- a/src/renderer/typeset.rs
++++ b/src/renderer/typeset.rs
+@@ -5814,7 +5814,7 @@
+ 
+     fn fp(lines: usize) -> FormattedParagraph {
+         FormattedParagraph {
+-            source_rows_match_current_format: false,
++            source_rows_match_current_format: false, source_mixed_tac_row: None,
+             tail_line_remaining_width: None,
+             computed_host_lines: None,
+             square_host_plan: None,
+--- a/src/renderer/typeset/paragraph.rs
++++ b/src/renderer/typeset/paragraph.rs
+@@ -9,6 +9,7 @@
+ //! 강제 경계 후보의 우선순위와 전체 fit 선택·호환성 spill을 조정한다.
+ //! 하위 Query는 원본 IR이나 페이지 상태를 변경하지 않으며, 확정 조각 적용은 state가 맡는다.
+ 
++pub(super) mod mixed_tac_owner;
+ pub(super) mod boundary;
+ mod columns;
+ pub(super) mod context;
+--- a/src/renderer/typeset/paragraph/format.rs
++++ b/src/renderer/typeset/paragraph/format.rs
+@@ -191,6 +191,8 @@
+         source_rows_match_current_format: ctx.profile().hwp5_stored_pagination_layout()
+             && ctx.profile().session_edited()
+             && super::actual_composition_matches_saved(para,composed),
++        source_mixed_tac_row: (ctx.profile().hwp5_stored_pagination_layout() && ctx.profile().session_edited())
++            .then(||super::mixed_tac_owner::actual_row(para, composed, &line_heights, &line_spacings, ctx.dpi())).flatten(),
+         tail_line_remaining_width,
+         computed_host_lines,
+         square_host_plan: None,
+--- a/src/renderer/typeset/paragraph/metrics.rs
++++ b/src/renderer/typeset/paragraph/metrics.rs
+@@ -13,6 +13,7 @@
+     /// The selected current composition exactly matches the plain source rows,
+     /// including character partition, physical box, baseline and effective IDs.
+     pub(in crate::renderer::typeset) source_rows_match_current_format: bool,
++    pub(in crate::renderer::typeset) source_mixed_tac_row: Option<usize>,
+     /// Measured remaining inline space on the composed tail line. None means
+     /// that this path has no reliable width result (not an implicit overflow).
+     pub(in crate::renderer::typeset) tail_line_remaining_width: Option<f64>,
+@@ -46,6 +47,7 @@
+         dpi: f64,
+     ) {
+         self.source_rows_match_current_format = false;
++        self.source_mixed_tac_row = None;
+         let Some(rows) = plan.text_rows.as_ref() else {
+             return;
+         };
+--- a/src/renderer/typeset/controls/tac_reconcile.rs
++++ b/src/renderer/typeset/controls/tac_reconcile.rs
+@@ -47,7 +47,8 @@
+     for (ci, c) in para.controls.iter().enumerate() {
+         if let Control::Table(t) = c {
+             if flow.is_effective_tac_table(para, t, fmt) {
+-                let seg_index =
++                let current_owned_row = fmt.source_mixed_tac_row.filter(|_| profile.hwp5_stored_pagination_layout() && profile.session_edited());
++                let seg_index = if let Some(index) = current_owned_row { index } else
+                     if profile.hwp5_stored_pagination_layout() && !profile.session_edited() {
+                         crate::renderer::layout::control_line_seg_index(para, ci).unwrap_or(tac_idx)
+                     } else {
+@@ -67,7 +68,7 @@
+                             ci,
+                             seg,
+                             profile.hwpx_stored_layout(),
+-                            profile.hwp5_stored_pagination_layout() && !profile.session_edited(),
++                            profile.hwp5_stored_pagination_layout() && (!profile.session_edited() || current_owned_row == Some(seg_index)),
+                             dpi,
+                         )
+                     } else {
+--- /dev/null
++++ b/src/renderer/typeset/paragraph/mixed_tac_owner.rs
+@@ -0,0 +1,68 @@
++//! Binds a current, fully formatted mixed host to one exact stored inline row.
++//! This is a row-owner proof; it does not grant source-coordinate or height trust.
++use crate::model::{control::Control,paragraph::{Paragraph,LineSeg,ColumnBreakType}};
++use crate::renderer::{composer::ComposedParagraph,hwpunit_to_px};
++pub(in crate::renderer::typeset) fn actual_row(p:&Paragraph,comp:Option<&ComposedParagraph>,heights:&[f64],spaces:&[f64],dpi:f64)->Option<usize>{
++    let clean=|p:&Paragraph| !p.stored_text_partition_is_dirty()&&!p.cell_format_vpos_dirty
++        &&p.field_ranges.is_empty()&&p.orphan_field_ends.is_empty()&&p.range_tags.is_empty()
++        &&p.title_marks.is_empty()&&p.markpen_marks.is_empty()&&p.ctrl_data_records.iter().all(Option::is_none)
++        &&p.tab_extended.is_empty()&&p.numbering_restart.is_none()&&p.layout_only_fill_lines==0
++        &&p.column_type==ColumnBreakType::None&&p.hwpx_axis_shift==0
++        &&p.text.chars().all(|c|c>'\u{001f}'&&c!='\u{fffc}');
++    if !clean(p)||!dpi.is_finite()||dpi<=0.0||p.line_segs.len()<2||p.line_segs.len()>4096||p.text.len()>1_000_000
++        ||p.char_shapes.windows(2).any(|w|w[0].start_pos>=w[1].start_pos){return None;}
++    let [Control::Table(t)]=p.controls.as_slice()else{return None;};
++    if !t.common.treat_as_char||t.common.locked||t.common.size_protect||t.common.allow_overlap
++        ||t.caption.is_some()||t.row_count!=1||t.col_count!=1||t.cells.len()!=1||!t.zones.is_empty()
++        ||t.raw_table_record_attr&(1<<30)!=0||t.common.height==0
++        ||t.outer_margin_top<0||t.outer_margin_bottom<0
++        ||t.page_break!=crate::model::table::TablePageBreak::RowBreak{return None;}
++    let c=&t.cells[0];
++    if c.dirty_flag||c.cell_protect()||c.field_name.is_some()||c.row_span!=1||c.col_span!=1
++        ||c.text_direction!=0||c.line_wrap!=0||c.paragraphs.is_empty()||c.paragraphs.len()>4096
++        ||c.paragraphs.iter().any(|q|!clean(q)||!q.controls.is_empty()){return None;}
++    let chars:Vec<char>=p.text.chars().collect();
++    if !chars.iter().any(|c|!c.is_whitespace())||p.char_offsets.len()!=chars.len(){return None;}
++    let positions=p.control_text_positions();let [at]=positions.as_slice()else{return None;};
++    if *at>chars.len(){return None;}
++    let mut offset=0u32;
++    for(i,c)in chars.iter().enumerate(){if i==*at{offset=offset.checked_add(8)?;}
++        if p.char_offsets[i]!=offset{return None;}offset=offset.checked_add(c.len_utf16()as u32)?;}
++    if *at==chars.len(){offset=offset.checked_add(8)?;}
++    if offset.checked_add(1)!=Some(p.char_count){return None;}
++    let row=crate::renderer::layout::control_line_seg_index(p,0)?;
++    let owned=p.line_segs.get(row)?;
++    let outer=i64::from(t.common.height)+i64::from(t.outer_margin_top)+i64::from(t.outer_margin_bottom);
++    if p.line_segs.iter().filter(|line|i64::from(line.line_height)==outer).count()!=1{return None;}
++    if i64::from(owned.line_height)!=i64::from(t.common.height)+i64::from(t.outer_margin_top)+i64::from(t.outer_margin_bottom){return None;}
++    // Wide block-like TACs are deliberately absent from composed.tac_controls.
++    // inline_controls.line_index is a legacy placeholder (always zero), not row authority.
++    // The exact eight-unit source slot, unique table-height row and actual full
++    // composition below own this cap; in-line width-reflow tables remain excluded.
++    if crate::renderer::height_measurer::is_tac_table_inline_in_para(t,p.line_segs[0].segment_width,p){return None;}
++    let comp=comp?;
++    if comp.para_style_id!=p.para_shape_id||comp.lines.len()!=p.line_segs.len()||heights.len()!=comp.lines.len()||spaces.len()!=comp.lines.len()
++        ||comp.numbering_text.is_some()||!comp.footnote_positions.is_empty()||!comp.tab_extended.is_empty()||comp.horizontal_shaping.is_some()
++        ||!comp.tac_controls.is_empty()||comp.inline_controls.len()!=1
++        ||comp.inline_controls.iter().any(|c|c.control_index!=0||c.control_type!=crate::renderer::composer::InlineControlType::Table){return None;}
++    for(i,(l,s))in comp.lines.iter().zip(&p.line_segs).enumerate(){
++        if s.line_height<=0||s.text_height<=0||s.text_height>s.line_height||s.line_spacing<0||s.segment_width<=0
++            ||s.tag&LineSeg::TAG_IMPLEMENTATION_PROPERTY!=0||s.vertical_pos<0
++            ||s.vertical_pos.checked_add(s.line_height).and_then(|v|v.checked_add(s.line_spacing)).is_none()
++            ||s.column_start<0||s.column_start.checked_add(s.segment_width).is_none()
++            ||p.source_line_seg_vertical_pos.as_ref().is_some_and(|v|v.len()!=p.line_segs.len()||v[i]!=s.vertical_pos)
++            ||heights[i]!=hwpunit_to_px(s.line_height,dpi)||spaces[i]!=hwpunit_to_px(s.line_spacing,dpi){return None;}
++        let start=p.char_offsets.binary_search(&s.text_start).ok()?;
++        let end=if let Some(next)=p.line_segs.get(i+1){p.char_offsets.binary_search(&next.text_start).ok()?}else{chars.len()};
++        if start>=end||l.char_start!=start||l.line_height!=s.line_height||l.line_spacing!=s.line_spacing
++            ||l.baseline_distance!=s.baseline_distance||l.column_start!=s.column_start||l.segment_width!=s.segment_width||l.has_line_break{return None;}
++        let mut k=start;
++        for run in &l.runs{if run.char_overlap.is_some()||run.footnote_marker.is_some()||run.inserted_control_text||run.display_text.is_some(){return None;}
++            for c in run.text.chars(){if k>=end||chars[k]!=c{return None;}
++                let x=p.char_shapes.partition_point(|v|v.start_pos<=p.char_offsets[k]);
++                let expected=x.checked_sub(1).map_or(0,|j|p.char_shapes[j].char_shape_id);
++                if run.char_style_id!=expected{return None;}k+=1;}}
++        if k!=end{return None;}
++    }
++    Some(row)
++}
+--- a/src/renderer/typeset/table/block/entry.rs
++++ b/src/renderer/typeset/table/block/entry.rs
+@@ -869,6 +869,9 @@
+             // p2 로 셀 내용을 이어 배치). 상한 없이는 통짜 배치 후 쪽 밖 clip 으로
+             // 내용이 소실된다.
+             && table_total <= declared_object_total * SINGLE_ROW_DECLARED_TRUST_MAX_RATIO
++            // A source cell box extending beyond the object cannot be wholly
++            // owned by the smaller object declaration, regardless of container.
++            && crate::renderer::typeset::table_declared_object_covers_cell_row_frames(table,self.dpi)
+             && st.current_height + declared_object_total <= available;
+ 
+         let mut source_anchor_splits_here = false;
+@@ -2205,3 +2208,13 @@
+         })
+     }
+ }
++
++#[cfg(test)]
++mod declared_object_cell_frame_106_tests {
++    use crate::model::table::{Table,Cell};
++    fn covered(table:&Table)->bool{crate::renderer::typeset::table_declared_object_covers_cell_row_frames(table,96.0)}
++    fn table(object:u32,cell:u32)->Table{let mut t=Table::default();t.common.height=object;t.row_count=1;t.col_count=1;t.cells.push(Cell{height:cell,row_span:1,col_span:1,..Default::default()});t}
++    #[test]fn declared_object_covers_current_cell_frame(){let t=table(1000,1000);let before=serde_json::to_value(&t).unwrap();assert!(covered(&t));assert_eq!(serde_json::to_value(&t).unwrap(),before);}
++    #[test]fn a_short_object_does_not_own_a_taller_source_cell(){let t=table(48262,67349);assert!(!covered(&t));assert!(!covered(&table(1000,u32::MAX)));assert!(!covered(&table(0,1)));}
++    #[test]fn native_raw_declared_height_is_not_silently_replaced(){let mut t=table(1000,900);assert!(covered(&t));let range=crate::model::shape::common_obj_offsets::HEIGHT;t.raw_ctrl_data.resize(range.end,0);t.raw_ctrl_data[range].copy_from_slice(&800_u32.to_le_bytes());assert!(!covered(&t));}
++}
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[130, 7, 8, 3, 240, 104, 187, 202, 176, 80, 82, 98, 66, 93, 87, 178, 55, 79, 108, 66, 222, 12, 68, 196, 69, 45, 235, 108, 102, 22, 132, 203];
++pub(crate) const RESOURCE:[u8;32]=[242, 201, 37, 170, 53, 249, 5, 213, 20, 84, 50, 161, 117, 171, 19, 115, 13, 6, 38, 177, 104, 106, 47, 153, 109, 238, 92, 224, 26, 31, 154, 212];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -176,6 +176,7 @@
+             ("src/renderer/typeset/paragraph/format.rs",include_bytes!("../renderer/typeset/paragraph/format.rs").as_slice()),
+             ("src/renderer/typeset/paragraph/line_queries.rs",include_bytes!("../renderer/typeset/paragraph/line_queries.rs").as_slice()),
+             ("src/renderer/typeset/paragraph/metrics.rs",include_bytes!("../renderer/typeset/paragraph/metrics.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/mixed_tac_owner.rs",include_bytes!("../renderer/typeset/paragraph/mixed_tac_owner.rs").as_slice()),
+             ("src/renderer/typeset/paragraph/overflow.rs",include_bytes!("../renderer/typeset/paragraph/overflow.rs").as_slice()),
+             ("src/renderer/typeset/paragraph/placement.rs",include_bytes!("../renderer/typeset/paragraph/placement.rs").as_slice()),
+             ("src/renderer/typeset/paragraph/scan.rs",include_bytes!("../renderer/typeset/paragraph/scan.rs").as_slice()),

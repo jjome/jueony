@@ -1,5 +1,7 @@
 # 표 기준점·바깥 여백 저장: 합본104
 
+[최신 합본106: 앞 문단 저장 수정과 남은 Python 편집 결함](120-native-prefix-storage.md).
+
 2026-10-18. [파일 작업표](features/05-files-storage-recovery.md) · [직전 합본101](118-authored-host-storage.md) · [고정 검증 근거](evidence/file-completion-2026-10-18/storage104/README.md).
 
 Python 예제에서 다른 표의 원본 행을 빌려 쓰던 기준점과 아래 여백 누락을 수정했다. 공식111·같은 프런트104의 파일/복구351개가 통과했다. **원본 MCST의 편집 저장은 별도 미해결이며 파트 전체 완료가 아니다.**

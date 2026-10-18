@@ -17,9 +17,12 @@ const guardPaths=['src/adapters/rhwp/preservation.ts','src/adapters/rhwp/documen
 const fingerprints=()=>Promise.all(guardPaths.map(async path=>({path,sha256:hash(await readFile(join(app,path)))})));
 const guardsBefore=await fingerprints();
 async function check(name,f){try{await f();results.push({name,status:'PASS'});}catch(error){const message=String(error.stack??error);results.push({name,status:'FAIL',message});failures.push(name);}}
-const oldDoc=new baseline.HwpDocument(source),doc=new candidate.HwpDocument(source),refDoc=new candidate.HwpDocument(oracle);
+// Pin the original frame proof to its original reference engine. A later fix
+// to the Native reference must be proved separately, never hidden by rebasing
+// the expected difference count or dropping fields from the comparison.
+const oldDoc=new baseline.HwpDocument(source),doc=new candidate.HwpDocument(source),refDoc=new baseline.HwpDocument(oracle),currentRefDoc=new candidate.HwpDocument(oracle);
 try{
-const before=snapshot(oldDoc),after=snapshot(doc),reference=snapshot(refDoc);
+const before=snapshot(oldDoc),after=snapshot(doc),reference=snapshot(refDoc),currentReference=snapshot(currentRefDoc);
 await check('independent frame delta is 90 y fields, disjoint from repaired target cell',()=>{
  const delta=differences(before.layout,after.layout,.2);assert.equal(delta.length,90);assert.ok(delta.every(d=>d.path.endsWith('["y"]')));
  const targets=s=>s.layout.flatMap(p=>p.text.runs.filter(r=>r.parentParaIdx===100&&r.cellIdx===2&&r.paraIdx===0));assert.deepEqual(targets(before),targets(after));observations.push({delta});
@@ -30,7 +33,15 @@ await check('three known table origins match independent saved Hancom geometry',
  for(const [para,y] of [[0,409.1],[2,503.9],[4,864.2]]){
   const actual=current.find(t=>t.paraIdx===para&&Math.abs(t.y-y)<=.2);const expected=oracle.find(t=>t.paraIdx===para&&Math.abs(t.y-y)<=.2);assert.ok(actual&&expected,JSON.stringify({para,y}));assert.ok(old.every(t=>t.paraIdx!==para||Math.abs(t.y-y)>.2));
  }
- const a=compareSnapshots(before,reference),b=compareSnapshots(after,reference);assert.equal(a.geometry.count,680);assert.equal(b.geometry.count,590);assert.equal(before.pages,3);assert.equal(after.pages,3);observations.push({remainingGeometry:b.geometry.count,pages:after.pages});
+ const a=compareSnapshots(before,reference),b=compareSnapshots(after,reference);assert.equal(a.geometry.count,680);assert.equal(b.geometry.count,590);assert.equal(before.pages,3);assert.equal(after.pages,3);observations.push({referenceEngine:baseline.metadata.sourceId,remainingGeometryWithFixedReference:b.geometry.count,pages:after.pages});
+});
+await check('Native reference empty-trailing correction is independently bounded to 92 y fields',()=>{
+ const delta=differences(reference.layout,currentReference.layout,.2);
+ assert.equal(delta.length,92);assert.ok(delta.every(d=>d.path.endsWith('["y"]')&&Math.abs(d.delta+8.8)<=.2));
+ assert.equal(reference.pages,currentReference.pages);
+ const oldComparison=compareSnapshots(before,currentReference),currentComparison=compareSnapshots(after,currentReference);
+ assert.equal(oldComparison.geometry.count,588);assert.equal(currentComparison.geometry.count,498);
+ observations.push({nativeReferenceDelta:delta,remainingGeometryWithCurrentReference:498,currentReferenceEngine:candidate.metadata.sourceId});
 });
 for(const format of ['hwp','hwpx'])await check('unchanged full storage guard and real disk reopen '+format,async()=>{
  const artifact=doc[format==='hwp'?'exportHwpWithReport':'exportHwpxWithReport']();try{
@@ -39,5 +50,5 @@ for(const format of ['hwp','hwpx'])await check('unchanged full storage guard and
  }finally{artifact.free();}
 });
 await check('original source and oracle bytes immutable',async()=>{assert.equal(hash(await readFile(process.env.JUEONY_TEST_SOURCE)),hash(source));assert.equal(hash(await readFile(process.env.JUEONY_TEST_ORACLE)),hash(oracle));});
-}finally{oldDoc.free();doc.free();refDoc.free();}
-assert.equal(results.length,5);assert.deepEqual(await fingerprints(),guardsBefore);const report={guardFingerprints:guardsBefore,sourceHashes:guardsBefore,scope:'Exact source-owned column frame and positive outer-bottom margin; independent saved reference and actual unchanged full storage guard. No Hancom UI/COM invocation or complete parity claim.',engine:candidate.metadata,baseline:baseline.metadata,verifierSha256:hash(await readFile(new URL(import.meta.url))),sourceSha256:hash(source),oracleSha256:hash(oracle),results,failures,observations};await writeFile(resolve(out,'result.json'),JSON.stringify(report,null,2));console.log(JSON.stringify({total:results.length,failures}));if(failures.length)process.exitCode=1;
+}finally{oldDoc.free();doc.free();refDoc.free();currentRefDoc.free();}
+assert.equal(results.length,6);assert.deepEqual(await fingerprints(),guardsBefore);const report={guardFingerprints:guardsBefore,sourceHashes:guardsBefore,scope:'Exact source-owned column frame and positive outer-bottom margin; original saved reference uses fixed baseline110. The current Native reference correction is independently checked as exactly 92 y fields (-8.8px) with full comparisons and unchanged full storage guard. No Hancom UI/COM invocation or complete parity claim.',engine:candidate.metadata,baseline:baseline.metadata,verifierSha256:hash(await readFile(new URL(import.meta.url))),sourceSha256:hash(source),oracleSha256:hash(oracle),results,failures,observations};await writeFile(resolve(out,'result.json'),JSON.stringify(report,null,2));console.log(JSON.stringify({total:results.length,failures}));if(failures.length)process.exitCode=1;

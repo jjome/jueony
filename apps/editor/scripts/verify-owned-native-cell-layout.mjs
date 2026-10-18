@@ -68,7 +68,9 @@ function checked(doc, format) {
 }
 let targetText, independentFrameDelta;
 await scenario('independent saved Hancom target improves initially without edits', () => {
-  const old = new baseline.HwpDocument(source), doc = new engine.HwpDocument(source), oracle = new engine.HwpDocument(oracleBytes);
+  // This row-partition regression keeps its original reference engine fixed.
+  // Independently prove any later correction to the Native reference itself.
+  const old = new baseline.HwpDocument(source), doc = new engine.HwpDocument(source), oracle = new frameBaseline.HwpDocument(oracleBytes), currentOracle = new engine.HwpDocument(oracleBytes);
   try {
     const before = snapshot(old), after = snapshot(doc), reference = snapshot(oracle);
     assert.deepEqual(targetStarts(before), [0, 31, 63], 'fixed baseline demonstrates the original failure');
@@ -78,6 +80,11 @@ await scenario('independent saved Hancom target improves initially without edits
     const absoluteTargetDelta = targetRuns(reference)[0].y - targetRuns(after)[0].y;
     const oldDiff = compareSnapshots(before, reference), newDiff = compareSnapshots(after, reference);
     assert.equal(oldDiff.geometry.count, 731); assert.ok(newDiff.geometry.count <= 680);
+    const referenceDelta = differences(reference.layout, snapshot(currentOracle).layout, .2);
+    assert.equal(referenceDelta.length, 92);
+    assert.ok(referenceDelta.every(d => d.path.endsWith('["y"]') && Math.abs(d.delta + 8.8) <= .2));
+    observations.push({name: 'independent Native reference correction', fixedReferenceEngine: frameBaseline.metadata.sourceId,
+      currentReferenceEngine: engine.metadata.sourceId, differences: referenceDelta});
     assert.equal(after.pages, reference.pages);
     const frameDoc = new frameBaseline.HwpDocument(source);
     try {
@@ -94,7 +101,7 @@ await scenario('independent saved Hancom target improves initially without edits
     targetText = targetRuns(after).map(r => r.text).join(''); assert.equal([...targetText].length, 93);
     observations.push({name: 'initial oracle', before: compact(oldDiff), after: compact(newDiff), remainingAbsoluteTargetDelta: absoluteTargetDelta, completeHancomParity: newDiff.status === 'SAME_WITHIN_PUBLISHED_CONTRACT'});
     return {baselineDifferences: oldDiff.geometry.count, candidateDifferences: newDiff.geometry.count, affectedHorizontalAndLocalRowDifferences: 0, remainingAbsoluteTargetDelta: absoluteTargetDelta};
-  } finally {old.free(); doc.free(); oracle.free();}
+  } finally {old.free(); doc.free(); oracle.free(); currentOracle.free();}
 });
 assert.equal(typeof targetText, 'string', 'positive fixture control is required before negative cases');
 

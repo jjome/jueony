@@ -1,0 +1,689 @@
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -3676,6 +3676,100 @@
+     Some(base)
+ }
+ 
++/// Binds one current inline table to its own published row. Extended control
++/// coverage is exactly one 8-unit slot; no imported flag grants this witness.
++fn current_mixed_tac_row(para:&Paragraph)->Option<usize>{
++    if para.controls.len()!=1 || !matches!(para.controls[0],Control::Table(_))
++        || para.text.contains('\t') || !para.tab_extended.is_empty()
++        || !para.text.chars().any(|c|!c.is_whitespace()&&c>'\u{001f}'&&c!='\u{fffc}')
++        || para.char_offsets.len()!=para.text.chars().count()
++    {return None;}
++    let positions=para.control_text_positions();let [control_at]=positions.as_slice() else{return None;};
++    let count=para.text.chars().count();if *control_at>count{return None;}
++    let mut offset=0u32;
++    for(i,c)in para.text.chars().enumerate(){
++        if i==*control_at{offset=offset.checked_add(crate::model::control::CTRL_CHAR_CODE_UNITS)?;}
++        if para.char_offsets.get(i)!=Some(&offset){return None;}
++        offset=offset.checked_add(c.len_utf16()as u32)?;
++    }
++    if *control_at==count{offset=offset.checked_add(crate::model::control::CTRL_CHAR_CODE_UNITS)?;}
++    if offset.checked_add(1)!=Some(para.char_count)
++        || para.line_segs.iter().any(|r|r.text_start!=0&&para.char_offsets.binary_search(&r.text_start).is_err())
++    {return None;}
++    control_line_seg_index(para,0).filter(|index|*index<para.line_segs.len())
++}
++
++/// An unrelated edit does not revoke an intact source column's leading-space
++/// owner. A plain source paragraph closes against a following plain paragraph
++/// or intact whole TAC object row. Altered/cut/recomputed rows remain fresh.
++pub(crate) fn current_stored_margin_frame(
++    first: &Paragraph, next: Option<&Paragraph>, column_width_hu: i32, column_height_hu: i32,
++    styles: &ResolvedStyleSet, dpi: f64,
++) -> bool {
++    use crate::model::paragraph::{ColumnBreakType, LineSeg};
++    let Some(next)=next else{return false;};
++    let original=|p:&Paragraph|p.column_type==ColumnBreakType::None
++        && !p.stored_text_partition_dirty && !p.cell_format_vpos_dirty
++        && p.hwpx_axis_shift==0 && p.layout_only_fill_lines==0
++        && p.range_tags.is_empty() && p.field_ranges.is_empty() && p.orphan_field_ends.is_empty()
++        && p.source_line_seg_vertical_pos.as_ref().is_none_or(|source|
++            source.len()==p.line_segs.len() && source.iter().zip(&p.line_segs).all(|(a,b)|*a==b.vertical_pos));
++    if !original(first)||!original(next)||!first.controls.is_empty()
++        || first.line_segs.is_empty() || next.line_segs.is_empty() || next.controls.len()>1
++        || column_width_hu<=0 || column_height_hu<=0 || !para_has_visible_text(first)
++    {return false;}
++    let row_end=|r:&LineSeg|r.vertical_pos.checked_add(r.line_height).and_then(|v|v.checked_add(r.line_spacing));
++    let Some(right)=first.line_segs[0].column_start.checked_add(first.line_segs[0].segment_width) else{return false;};
++    let row=|r:&LineSeg|r.tag&LineSeg::TAG_IMPLEMENTATION_PROPERTY==0
++        && r.vertical_pos>=0 && r.line_height>0 && r.text_height>0
++        && r.baseline_distance>=0 && r.baseline_distance<=r.line_height && r.line_spacing>=0
++        && row_end(r).is_some_and(|end|end<=column_height_hu)
++        && r.column_start>=0 && r.segment_width>0 && right>0 && right<=column_width_hu
++        && r.column_start.checked_add(r.segment_width)==Some(right);
++    let closed=|p:&Paragraph|p.line_segs[0].text_start==0 && p.line_segs.iter().all(row)
++        && p.line_segs.windows(2).all(|w|w[0].text_start<w[1].text_start && row_end(&w[0])==Some(w[1].vertical_pos));
++    let coverage=|p:&Paragraph|{
++        // TAB is an extended source slot, never a guessed one-unit plaintext gap.
++        if p.text.is_empty() || p.text.contains('\t') || !p.tab_extended.is_empty()
++            || p.char_offsets.len()!=p.text.chars().count(){return false;}
++        let mut offset=0u32;
++        for(i,c)in p.text.chars().enumerate(){
++            if p.char_offsets.get(i)!=Some(&offset){return false;}
++            let Some(next)=offset.checked_add(c.len_utf16()as u32)else{return false;};offset=next;
++        }
++        offset<=p.char_count && p.char_count-offset<=1
++            && p.line_segs.iter().all(|r|p.char_offsets.binary_search(&r.text_start).is_ok())
++    };
++    if !closed(first)||!closed(next)||!coverage(first){return false;}
++    let a=&first.line_segs[0];let last=first.line_segs.last().unwrap();let b=&next.line_segs[0];
++    let Some(first_before)=styles.para_styles.get(first.para_shape_id as usize)
++        .map(|s|px_to_hwpunit(s.spacing_before,dpi)) else{return false;};
++    let Some(next_before)=styles.para_styles.get(next.para_shape_id as usize)
++        .map(|s|px_to_hwpunit(s.spacing_before,dpi)) else{return false;};
++    if first_before<=0 || next_before<=0 || a.vertical_pos!=first_before
++        || row_end(last).and_then(|v|v.checked_add(next_before))!=Some(b.vertical_pos)
++    {return false;}
++    if next.controls.is_empty(){return para_has_visible_text(next)&&coverage(next)
++        && stored_first_margin_is_page_relative(first,Some(next),styles,dpi);}
++    let Control::Table(t)=&next.controls[0] else{return false;};
++    // Pristine whole-line source and checked current mixed-flow ownership are
++    // separate witnesses. A following table can never impersonate the first row.
++    enum Owner{Pristine(usize),Mixed(usize)}
++    let owner=if next.line_segs.len()==1 && crate::renderer::composer::stored_first_tac_line(next).is_some(){Owner::Pristine(0)}
++        else{let Some(index)=current_mixed_tac_row(next)else{return false;};Owner::Mixed(index)};
++    let index=match owner{Owner::Pristine(index)|Owner::Mixed(index)=>index};
++    let table_row=&next.line_segs[index];
++    if !t.common.treat_as_char || t.caption.is_some() || t.common.allow_overlap
++        || t.raw_ctrl_seal!=Some(crate::model::raw_provenance::record_digest(&t.common))
++        || t.outer_margin_top<0 || t.outer_margin_bottom<0
++        || i64::from(table_row.line_height)!=i64::from(t.common.height)+i64::from(t.outer_margin_top)+i64::from(t.outer_margin_bottom)
++        || t.cells.is_empty() || t.cells.iter().any(|cell|cell.dirty_flag
++            || cell.paragraphs.iter().any(|p|p.stored_text_partition_dirty || p.cell_format_vpos_dirty
++                || !p.controls.is_empty()))
++    {return false;}
++    stored_first_margin_is_page_relative(first,Some(next),styles,dpi)
++}
++
+ pub(crate) fn stored_first_margin_is_page_relative(
+     first: &Paragraph,
+     next: Option<&Paragraph>,
+@@ -3707,6 +3801,11 @@
+         .get(next.para_shape_id as usize)
+         .map(|style| style.spacing_before)
+         .unwrap_or(0.0);
++    let Some(stored_gap) = next_seg.vertical_pos
++        .checked_sub(last_seg.vertical_pos)
++        .and_then(|v| v.checked_sub(last_seg.line_height))
++        .and_then(|v| v.checked_sub(last_seg.line_spacing))
++    else { return false; };
+     // 글자처럼 취급되는 도형이 있는 첫 문단은 제목과 개체가 저장 원점을 함께
+     // 소유한다. 문단 앞 여백만으로 쪽 원점을 다시 정하면 후속 표가 그 여백만큼
+     // 위로 이동한다. 일반 텍스트 문단의 여백 사다리와 구분한다(#6797 7쪽).
+@@ -3723,10 +3822,7 @@
+         && next_before > 0.5
+         && (hwpunit_to_px(first_seg.vertical_pos, dpi) - first_before).abs() <= 0.5
+         && (hwpunit_to_px(
+-            next_seg.vertical_pos
+-                - last_seg.vertical_pos
+-                - last_seg.line_height
+-                - last_seg.line_spacing,
++            stored_gap,
+             dpi,
+         ) - next_before)
+             .abs()
+@@ -8162,9 +8258,20 @@
+             Some(PageItem::FullParagraph { para_index })
+                 if (self.profile.get().hwpx_stored_layout()
+                     || self.profile.get().hwp5_stored_pagination_layout())
+-                    && !self.profile.get().session_edited()
+                     && paragraphs.get(*para_index).is_some_and(|first| {
+-                        stored_first_margin_is_page_relative(
++                        (!self.profile.get().session_edited()
++                            || (self.profile.get().hwp5_stored_pagination_layout()
++                                && current_stored_margin_frame(first,paragraphs.get(*para_index+1),
++                                    px_to_hwpunit(col_area.width,self.dpi),px_to_hwpunit(col_area.height,self.dpi),styles,self.dpi)
++                                && !col_content.endnote_flow && col_content.start_height==0.0
++                                && col_content.zone_layout.is_none() && col_content.zone_y_offset==0.0
++                                && !col_content.wrap_anchors.contains_key(para_index)
++                                && !column_wrap_around_paras.iter().any(|w| w.para_index==*para_index)
++                                && super::typeset::current_native_plain_format_matches_saved(
++                                    first,composed.get(*para_index),styles,self.dpi,col_area.width,&self.profile,
++                                    crate::renderer::stored_line_ladder_is_uniform_filler(paragraphs,styles),
++                                    &self.body_float_carve_evidence)))
++                        && stored_first_margin_is_page_relative(
+                             first, paragraphs.get(*para_index + 1), styles, self.dpi,
+                         )
+                     })
+@@ -8253,6 +8360,14 @@
+             col_content.endnote_flow,
+         );
+         hcursor.suppress_hwpx_stale_forward = self.profile.get().hwpx_stored_layout();
++        hcursor.native_stored_plain_trailing = self.profile.get().hwp5_stored_pagination_layout()
++            && !col_content.endnote_flow && col_content.start_height==0.0
++            && col_content.zone_y_offset==0.0 && col_anchor_y==visual_col_y
++            && vpos_page_base_init.is_some_and(|base|match col_content.items.first() {
++                Some(PageItem::Table{para_index,control_index})=>paragraphs.get(*para_index)
++                    .and_then(|p|crate::renderer::composer::stored_table_column_line_vpos(p,*control_index))==Some(base),
++                _=>false,
++            });
+         // [#5854] 통짜 합성 LINE_SEG 사다리 판정 — 본문 단에서만 갱신한다. 미주 단은
+         // `paragraphs` 가 미주 전용 재색인 배열이라 구역 판정의 근거가 아니므로 본문에서
+         // 정해진 값을 그대로 이어 쓴다 (조판 경로 `TypesetEngine` 과 같은 구역 단위 값).
+@@ -17582,6 +17697,69 @@
+         assert!(failures.is_empty(),"{}",failures.join("; "));
+     }
+ }
++#[cfg(test)]
++mod current_stored_margin_frame_tests {
++    use super::*;
++    use crate::model::paragraph::{ColumnBreakType, LineSeg};
++    use crate::model::table::{Cell, Table};
++    use crate::renderer::style_resolver::ResolvedParaStyle;
++    pub(super) fn fixture()->(Paragraph,Paragraph,ResolvedStyleSet){
++        let line=|y,h,s,left,width|LineSeg{text_start:0,vertical_pos:y,line_height:h,text_height:h,baseline_distance:h*3/4,line_spacing:s,column_start:left,segment_width:width,tag:0x60000};
++        let first=Paragraph{text:"source body".into(),char_offsets:(0..11).collect(),char_count:12,line_segs:vec![line(100,100,60,0,1000)],..Paragraph::default()};
++        let mut t=Table::default();t.common.treat_as_char=true;t.common.height=1000;t.outer_margin_top=10;t.outer_margin_bottom=20;
++        t.cells=vec![Cell{paragraphs:vec![Paragraph::default()],..Cell::default()}];
++        t.raw_ctrl_seal=Some(crate::model::raw_provenance::record_digest(&t.common));
++        let next=Paragraph{line_segs:vec![line(360,1030,60,50,950)],controls:vec![Control::Table(Box::new(t))],..Paragraph::default()};
++        let styles=ResolvedStyleSet{para_styles:vec![ResolvedParaStyle{spacing_before:100.0/75.0,..ResolvedParaStyle::default()}],..ResolvedStyleSet::default()};
++        (first,next,styles)
++    }
++    #[test]fn intact_original_frame_is_a_readonly_current_owner(){let(a,b,s)=fixture();let before=serde_json::to_value((&a,&b)).unwrap();assert!(current_stored_margin_frame(&a,Some(&b),1000,10000,&s,96.0));assert!(current_stored_margin_frame(&a,Some(&b),1002,10000,&s,96.0));assert!(!current_stored_margin_frame(&a,Some(&b),999,10000,&s,96.0));assert_eq!(serde_json::to_value((&a,&b)).unwrap(),before);}
++    #[test]fn changed_cut_and_unowned_frames_are_not_source_authority(){for i in 0..10{let(mut a,mut b,s)=fixture();match i{0=>a.stored_text_partition_dirty=true,1=>b.stored_text_partition_dirty=true,2=>a.hwpx_axis_shift=8,3=>a.column_type=ColumnBreakType::Page,4=>b.line_segs[0].segment_width-=1,5=>a.line_segs[0].tag|=LineSeg::TAG_IMPLEMENTATION_PROPERTY,6=>a.source_line_seg_vertical_pos=Some(vec![0]),7=>if let Control::Table(t)=&mut b.controls[0]{t.raw_ctrl_seal=None},8=>if let Control::Table(t)=&mut b.controls[0]{t.common.height+=1},_=>if let Control::Table(t)=&mut b.controls[0]{t.cells[0].dirty_flag=true}}assert!(!current_stored_margin_frame(&a,Some(&b),1000,10000,&s,96.0),"mutation {i}");}}
++    #[test]fn malformed_row_extremes_are_rejected_without_overflow(){for i in 0..6{let(mut a,mut b,s)=fixture();match i{0=>a.line_segs[0].line_height=i32::MAX,1=>a.line_segs[0].line_spacing=i32::MAX,2=>a.line_segs[0].vertical_pos=i32::MIN,3=>b.line_segs[0].vertical_pos=i32::MAX,4=>b.line_segs[0].column_start=i32::MAX,_=>b.line_segs[0].line_height=i32::MAX}assert!(!current_stored_margin_frame(&a,Some(&b),1000,10000,&s,96.0),"extreme {i}");}}
++    #[test]fn legacy_leading_margin_delta_is_checked_without_tolerance_change(){let(a,b,s)=fixture();assert!(stored_first_margin_is_page_relative(&a,Some(&b),&s,96.0));for i in 0..3{let mut a=a.clone();let mut b=b.clone();match i{0=>a.line_segs[0].line_height=i32::MAX,1=>a.line_segs[0].line_spacing=i32::MAX,_=>{a.line_segs[0].vertical_pos=i32::MIN;b.line_segs[0].vertical_pos=i32::MAX;}}assert!(!stored_first_margin_is_page_relative(&a,Some(&b),&s,96.0),"extreme {i}");}let mut b=b.clone();b.line_segs[0].vertical_pos-=10;assert!(stored_first_margin_is_page_relative(&a,Some(&b),&s,96.0));}
++}
++
++#[cfg(test)]mod current_stored_margin_frame_bounds_tests{use super::*;
++    #[test]fn invalid_tail_end_cannot_inherit_the_leading_origin(){
++        use crate::model::paragraph::LineSeg;use crate::model::table::{Table,Cell};use crate::renderer::style_resolver::ResolvedParaStyle;
++        let row=|y,h,sp|LineSeg{text_start:0,vertical_pos:y,line_height:h,text_height:1,baseline_distance:1,line_spacing:sp,column_start:0,segment_width:1000,tag:0x60000};
++        let mut t=Table::default();t.common.treat_as_char=true;t.common.height=1030;t.raw_ctrl_seal=Some(crate::model::raw_provenance::record_digest(&t.common));t.cells=vec![Cell{paragraphs:vec![Paragraph::default()],..Cell::default()}];
++        let a=Paragraph{text:"body".into(),char_offsets:(0..4).collect(),char_count:5,line_segs:vec![row(100,100,60)],..Paragraph::default()};let b=Paragraph{line_segs:vec![row(360,1030,60)],controls:vec![Control::Table(Box::new(t))],..Paragraph::default()};
++        let s=ResolvedStyleSet{para_styles:vec![ResolvedParaStyle{spacing_before:100.0/75.0,..ResolvedParaStyle::default()}],..ResolvedStyleSet::default()};
++        assert!(current_stored_margin_frame(&a,Some(&b),1000,1450,&s,96.0));assert!(!current_stored_margin_frame(&a,Some(&b),1000,1449,&s,96.0));assert!(!current_stored_margin_frame(&a,Some(&b),1000,0,&s,96.0));
++        let mut a=a;let mut b=b;a.line_segs[0].line_height=i32::MAX-260;b.line_segs[0].vertical_pos=i32::MAX;
++        assert!(!current_stored_margin_frame(&a,Some(&b),1000,i32::MAX,&s,96.0));
++    }}
++
++#[cfg(test)]mod current_stored_margin_frame_plain_tests{use super::*;
++    #[test]fn exact_multiline_plain_source_frame_requires_complete_text_coverage(){
++        let(a,mut b,s)=super::current_stored_margin_frame_tests::fixture();b.controls.clear();b.text="abcdefghijklmnopqrst".into();b.char_offsets=(0..20).collect();b.char_count=21;
++        let mut first=b.line_segs[0].clone();first.line_height=100;first.text_height=100;first.baseline_distance=80;first.line_spacing=60;first.column_start=0;first.segment_width=1000;
++        let mut second=first.clone();second.text_start=10;second.vertical_pos=520;b.line_segs=vec![first,second];
++        let before=serde_json::to_value((&a,&b)).unwrap();assert!(current_stored_margin_frame(&a,Some(&b),1002,10000,&s,96.0));assert_eq!(serde_json::to_value((&a,&b)).unwrap(),before);
++        for i in 0..5{let mut b=b.clone();match i{0=>b.char_offsets.pop().map(|_|()).unwrap(),1=>b.line_segs[1].text_start=21,2=>b.line_segs[1].vertical_pos+=1,3=>b.line_segs[1].segment_width-=1,_=>b.line_segs[1].tag|=crate::model::paragraph::LineSeg::TAG_IMPLEMENTATION_PROPERTY}assert!(!current_stored_margin_frame(&a,Some(&b),1002,10000,&s,96.0),"plain negative {i}");}
++    }}
++
++#[cfg(test)]mod current_stored_margin_frame_mixed_tests{use super::*;
++    fn fixture(prefix:bool)->(Paragraph,Paragraph,ResolvedStyleSet){
++        let(a,mut b,s)=super::current_stored_margin_frame_tests::fixture();b.text=if prefix{"가 ".into()}else{" 가".into()};b.char_offsets=if prefix{vec![0,9]}else{vec![8,9]};b.char_count=11;
++        if prefix{let mut row=b.line_segs[0].clone();row.line_height=100;row.text_height=100;row.baseline_distance=80;row.line_spacing=60;let mut tail=b.line_segs[0].clone();tail.text_start=9;tail.vertical_pos=520;b.line_segs=vec![row,tail];}
++        (a,b,s)
++    }
++    #[test]fn current_prefix_and_suffix_bind_their_actual_control_row(){for prefix in[false,true]{let(a,b,s)=fixture(prefix);let before=serde_json::to_value((&a,&b)).unwrap();assert_eq!(current_mixed_tac_row(&b),Some(usize::from(prefix)));assert!(current_stored_margin_frame(&a,Some(&b),1002,10000,&s,96.0));assert_eq!(serde_json::to_value((&a,&b)).unwrap(),before);}}
++    #[test]fn ambiguous_control_coverage_and_changed_box_never_borrow_a_row(){for i in 0..7{let(a,mut b,s)=fixture(true);match i{0=>b.char_offsets[1]=8,1=>b.char_count+=1,2=>b.line_segs[1].text_start=8,3=>b.line_segs[1].line_height-=1,4=>b.controls.push(Control::Table(Box::default())),5=>b.stored_text_partition_dirty=true,_=>if let Control::Table(t)=&mut b.controls[0]{t.raw_ctrl_seal=None}}assert!(!current_stored_margin_frame(&a,Some(&b),1002,10000,&s,96.0),"mixed negative {i}");}}
++}
++
++#[cfg(test)]mod current_stored_margin_frame_plain_coverage_tests{use super::*;
++    #[test]fn hidden_offset_gap_is_not_plain_text_authority(){let(mut a,b,s)=super::current_stored_margin_frame_tests::fixture();assert!(current_stored_margin_frame(&a,Some(&b),1002,10000,&s,96.0));for offset in &mut a.char_offsets[5..]{*offset+=7;}a.char_count+=7;assert!(!current_stored_margin_frame(&a,Some(&b),1002,10000,&s,96.0));}
++    #[test]fn supplementary_unicode_keeps_its_exact_utf16_boundaries(){let(mut a,b,s)=super::current_stored_margin_frame_tests::fixture();a.text="𐐀abc".into();a.char_offsets=vec![0,2,3,4];a.char_count=6;assert!(current_stored_margin_frame(&a,Some(&b),1002,10000,&s,96.0));a.char_offsets[1]=1;assert!(!current_stored_margin_frame(&a,Some(&b),1002,10000,&s,96.0));}
++}
++
++#[cfg(test)]mod current_stored_margin_frame_tab_tests{use super::*;
++    #[test]fn unowned_tab_is_never_inferred_as_one_utf16_unit(){
++        let(mut a,b,s)=super::current_stored_margin_frame_tests::fixture();a.text="a\tb".into();a.char_offsets=vec![0,1,2];a.char_count=4;assert!(!current_stored_margin_frame(&a,Some(&b),1002,10000,&s,96.0));
++        let(a,mut b,s)=super::current_stored_margin_frame_tests::fixture();b.text="가\t ".into();b.char_offsets=vec![0,9,10];b.char_count=12;let mut row=b.line_segs[0].clone();row.line_height=100;row.text_height=100;row.baseline_distance=80;row.line_spacing=60;let mut tail=b.line_segs[0].clone();tail.vertical_pos=520;tail.text_start=9;b.line_segs=vec![row,tail];assert!(!current_stored_margin_frame(&a,Some(&b),1002,10000,&s,96.0));
++    }}
+ 
+ #[cfg(test)]
+ mod coanchored_outer_bottom102_tests {
+--- a/src/renderer/height_cursor.rs
++++ b/src/renderer/height_cursor.rs
+@@ -96,6 +96,8 @@
+     pub vpos_lazy_base: Option<i32>,
+     /// 처음 확정한 저장 단 원점. TAC 뒤 활성 기준이 지워져도 독립 대조에 보존한다.
+     pub stored_column_origin: Option<(i32, f64)>,
++    /// Native stored rows may prove that an already rendered empty row spent its trailing gap.
++    pub native_stored_plain_trailing: bool,
+     /// native HWP5 의 저장 vpos 는 쪽 상대 절대 좌표 —
+     /// page_base 가 소거된 상황에서도 lazy 역산(부정확 기준) 대신 base=0 페이지
+     /// 경로를 쓴다 (재현 문서 C pi4: lazy 2748 로 저장 958 대신 921 에 그려져
+@@ -183,6 +185,7 @@
+             vpos_page_base,
+             vpos_lazy_base: None,
+             stored_column_origin: vpos_page_base.map(|base| (base, col_anchor_y)),
++            native_stored_plain_trailing: false,
+             prev_layout_para: None,
+             prev_item_was_partial_table: false,
+             skip_spacing_before_prededuct,
+@@ -208,6 +211,50 @@
+     /// 보정이 적용되면 보정된 y, 아니면 입력 `y_offset` 을 그대로 반환한다.
+     /// `vpos_lazy_base` 는 지연 산출 시 갱신된다.
+     ///
++    /// Read-only continuity of an authored empty row and the following visible
++    /// body row. Both its accepted column origin and actual rendered line bottom
++    /// must reproduce the stored physical frame before a bridge is redundant.
++    fn native_empty_trailing_was_rendered(&self, y:f64, previous:&Paragraph,
++        current:&Paragraph, styles:&ResolvedStyleSet)->bool {
++        use crate::model::paragraph::{ColumnBreakType,LineSeg};
++        if !self.native_stored_plain_trailing
++            || !self.dpi.is_finite() || self.dpi<=0.0 || !y.is_finite()
++            || !previous.text.is_empty() || !para_has_visible_text(current)
++        {return false;}
++        let plain=|p:&Paragraph|p.controls.is_empty() && p.line_segs.len()==1
++            && p.column_type==ColumnBreakType::None && !p.stored_text_partition_dirty
++            && !p.cell_format_vpos_dirty && p.layout_only_fill_lines==0
++            && p.source_line_seg_vertical_pos.is_none() && p.hwpx_axis_shift==0
++            && p.range_tags.is_empty() && p.field_ranges.is_empty()
++            && p.orphan_field_ends.is_empty() && p.tab_extended.is_empty()
++            && p.ctrl_data_records.is_empty()
++            && styles.para_styles.get(p.para_shape_id as usize).is_some_and(|style|
++                style.spacing_before==0.0 && style.spacing_after==0.0 && !style.page_break_before);
++        if !plain(previous)||!plain(current){return false;}
++        let (prev,next)=(&previous.line_segs[0],&current.line_segs[0]);
++        let valid=|row:&LineSeg|row.text_start==0 && row.vertical_pos>=0
++            && row.line_height>0 && row.text_height>0 && row.line_spacing>=0
++            && row.column_start==0 && row.segment_width>0
++            && row.tag&LineSeg::TAG_IMPLEMENTATION_PROPERTY==0;
++        if !valid(prev)||!valid(next)||prev.segment_width!=next.segment_width{return false;}
++        let Some(end)=prev.vertical_pos.checked_add(prev.line_height)
++            .and_then(|v|v.checked_add(prev.line_spacing)) else{return false;};
++        let Some(next_end)=next.vertical_pos.checked_add(next.line_height)
++            .and_then(|v|v.checked_add(next.line_spacing)) else{return false;};
++        if prev.line_spacing<=0 || next.vertical_pos!=end{return false;}
++        let (Some((base,anchor)),Some(bottom))=(self.stored_column_origin,self.prev_item_flow_line_bottom_y)
++            else{return false;};
++        if base<0 || !anchor.is_finite() || anchor!=self.col_area_y || !bottom.is_finite()
++            || !self.col_area_height.is_finite() || self.col_area_height<=0.0
++        {return false;}
++        let Some(span)=next_end.checked_sub(base) else{return false;};
++        if prev.vertical_pos<base || span<0 || hwpunit_to_px(span,self.dpi)>self.col_area_height{return false;}
++        let epsilon=self.dpi/7200.0;
++        (y-(anchor+hwpunit_to_px(end-base,self.dpi))).abs()<=epsilon
++            && (bottom-(anchor+hwpunit_to_px(prev.vertical_pos-base+prev.line_height,self.dpi))).abs()<=epsilon
++            && (y-bottom-hwpunit_to_px(prev.line_spacing,self.dpi)).abs()<=epsilon
++    }
++
+     /// 호출자는 `!shape_jumped && !prev_tac_seg_applied` 가드 안에서 호출한다.
+     pub(crate) fn vpos_adjust(
+         &mut self,
+@@ -496,9 +543,12 @@
+                     let stored_gap = hwpunit_to_px(seg.line_spacing.max(0), self.dpi);
+                     stored_gap > 0.0 && (gap - stored_gap).abs() < 0.1
+                 });
++            let native_plain_spent_trailing = paragraphs.get(item_para)
++                .is_some_and(|current|self.native_empty_trailing_was_rendered(y_offset,prev_para,current,styles));
+             let trailing_ls_hu = if (vpos_continuous && prev_has_text)
+                 || picture_spent_trailing
+                 || rendered_spent_trailing
++                || native_plain_spent_trailing
+             {
+                 0
+             } else {
+@@ -2023,6 +2073,48 @@
+         assert!((got - (100.0 + 2000.0 / 75.0)).abs() < 1e-6, "got={got}");
+     }
+ 
++    #[test]
++    fn native_empty_trailing105_requires_actual_accepted_frame_and_plain_rows() {
++        let mut c=cursor(None);c.native_stored_plain_trailing=true;c.prev_layout_para=Some(0);
++        c.stored_column_origin=Some((800,COL_Y));c.prev_item_flow_line_bottom_y=Some(116.0);
++        let mut ps=vec![para(0,1000,1000,600,5000),para(0,2600,1000,0,5000)];
++        ps[1].text="본문".into();for p in &mut ps {p.line_segs[0].text_height=p.line_segs[0].line_height;}c.session_edited=true;assert!(c.native_empty_trailing_was_rendered(124.0,&ps[0],&ps[1],&styles(0.0)));
++        assert!((c.vpos_adjust(124.0,1,&ps,&styles(0.0))-124.0).abs()<1e-9);
++        assert_eq!(c.vpos_lazy_base,Some(800));
++    }
++    #[test]
++    fn native_empty_trailing105_excludes_reserved_or_overlay_column_push() {
++        let mut c=cursor(None);c.native_stored_plain_trailing=true;c.prev_layout_para=Some(0);
++        c.stored_column_origin=Some((800,COL_Y+8.0));c.prev_item_flow_line_bottom_y=Some(124.0);
++        let mut ps=vec![para(0,1000,1000,600,5000),para(0,2600,1000,0,5000)];
++        ps[1].text="본문".into();for p in &mut ps {p.line_segs[0].text_height=p.line_segs[0].line_height;}
++        assert!(!c.native_empty_trailing_was_rendered(132.0,&ps[0],&ps[1],&styles(0.0)),"physical anchor was pushed outside the supported column-top frame");
++    }
++    #[test]
++    fn native_empty_trailing105_excludes_unknown_reset_stale_or_unmeasured_frames() {
++        for which in 0..18 {
++            let mut c=cursor(None);c.native_stored_plain_trailing=true;c.prev_layout_para=Some(0);
++            c.stored_column_origin=Some((800,COL_Y));c.prev_item_flow_line_bottom_y=Some(116.0);
++            let mut ps=vec![para(0,1000,1000,600,5000),para(0,2600,1000,0,5000)];ps[1].text="본문".into();for p in &mut ps {p.line_segs[0].text_height=p.line_segs[0].line_height;}
++            match which {
++                0=>c.native_stored_plain_trailing=false,1=>ps[0].hwpx_axis_shift=1,
++                2=>c.stored_column_origin=None,3=>c.prev_item_flow_line_bottom_y=None,
++                4=>c.stored_column_origin=Some((798,COL_Y)),5=>c.prev_item_flow_line_bottom_y=Some(115.9),
++                6=>ps[0].stored_text_partition_dirty=true,7=>ps[1].cell_format_vpos_dirty=true,
++                8=>ps[0].text="앞".into(),9=>ps[1].text.clear(),
++                10=>ps[1].column_type=crate::model::paragraph::ColumnBreakType::Column,
++                11=>ps[0].line_segs[0].tag|=LineSeg::TAG_IMPLEMENTATION_PROPERTY,
++                12=>ps[1].line_segs[0].vertical_pos+=1,
++                13=>ps[0].line_segs[0].segment_width+=1,
++                14=>ps[1].line_segs[0].line_height=i32::MAX,
++                15=>ps[0].source_line_seg_vertical_pos=Some(vec![1000]),
++                16=>ps[1].controls.push(Control::Field(Default::default())),
++                _=>ps[0].ctrl_data_records.push(Some(vec![1])),
++            }
++            assert!(!c.native_empty_trailing_was_rendered(124.0,&ps[0],&ps[1],&styles(0.0)),"case {which}");
++        }
++    }
++
+     /// page_path + sb 사전 차감(#643): end_y 에서 spacing_before(px) 만큼 당겨짐.
+     #[test]
+     fn page_path_sb_prededuct() {
+--- a/src/renderer/typeset.rs
++++ b/src/renderer/typeset.rs
+@@ -5814,6 +5814,7 @@
+ 
+     fn fp(lines: usize) -> FormattedParagraph {
+         FormattedParagraph {
++            source_rows_match_current_format: false,
+             tail_line_remaining_width: None,
+             computed_host_lines: None,
+             square_host_plan: None,
+@@ -8343,6 +8344,24 @@
+     }
+ }
+ 
++/// Renderer and paginator query the same selected format owner before an edited
++/// native plain source row may authorize a column origin. This query does not
++/// grant a new layout profile or alter source/cache data.
++#[allow(clippy::too_many_arguments)]
++pub(crate) fn current_native_plain_format_matches_saved(
++    para:&Paragraph, composed:Option<&ComposedParagraph>, styles:&ResolvedStyleSet,
++    dpi:f64, column_width:f64, profile:&std::cell::Cell<crate::model::provenance::LayoutCompatibilityProfile>,
++    uniform_ladder:bool, float_carve:&std::cell::RefCell<Vec<crate::renderer::float_placement::FloatCarveEvidence>>,
++)->bool {
++    if !profile.get().hwp5_stored_pagination_layout() || !profile.get().session_edited()
++        || !column_width.is_finite() || column_width<=0.0 {return false;}
++    let uniform=std::cell::Cell::new(uniform_ladder);
++    let context=paragraph::context::ParagraphFormatContext::new(dpi,profile,&uniform,float_carve);
++    let formatted=paragraph::format::format_paragraph_for_flow(
++        &context,para,composed,styles,Some(column_width),false,false);
++    paragraph::composed_rows_equal_saved(para,&formatted,dpi)
++}
++
+ // Keep the fit cursor and spacing-restoration proof on the same policy inputs.
+ fn shared_body_height_cursor(
+     st: &TypesetState, dpi: f64, uniform_filler_ladder: bool, session_edited: bool,
+@@ -8355,6 +8374,7 @@
+             vpos_page_base: st.vpos_page_base,
+             vpos_lazy_base: st.vpos_lazy_base,
+             stored_column_origin: st.vpos_page_base.map(|base| (base, st.vpos_col_anchor)),
++            native_stored_plain_trailing: false, // height-only pass has no actual rendered column witness
+             prev_layout_para: st.vpos_prev_layout_para,
+             prev_item_was_partial_table: st.vpos_prev_partial_table,
+             skip_spacing_before_prededuct: st.skip_spacing_before_prededuct,
+--- a/src/renderer/typeset/paragraph.rs
++++ b/src/renderer/typeset/paragraph.rs
+@@ -852,7 +852,8 @@
+     // 같은 원본 줄 사다리와 실제 흐름은 컨테이너 형식과 무관하게 같은 쪽을 소유한다.
+     let anchored_stored_body_reset_line = ((st.profile.hwpx_stored_layout()
+         || st.profile.hwp5_stored_pagination_layout())
+-        && !st.profile.session_edited()
++        && (!st.profile.session_edited()
++            || native_edited_reset_witness(st,para,fmt,current_page_vpos_base,available,dpi))
+         && para_has_visible_text(para)
+         && fmt.line_heights.len() == para.line_segs.len())
+     .then(|| {
+@@ -981,6 +982,104 @@
+     true
+ }
+ 
++/// Unchanged ordinary native rows have no control/story/formatting owner outside
++/// this paragraph. A runtime recomposition, stale source projection or local edit
++/// cannot use this saved partition as a pagination witness.
++pub(super) fn unchanged_native_plain_rows(para: &Paragraph) -> bool {
++    use crate::model::paragraph::ColumnBreakType;
++    if para.char_offsets.len()!=para.text.chars().count(){return false;}
++    let mut utf16=0u32;
++    for(i,c)in para.text.chars().enumerate(){
++        if para.char_offsets.get(i)!=Some(&utf16){return false;}
++        let Some(next)=utf16.checked_add(c.len_utf16() as u32)else{return false;};utf16=next;
++    }
++    if para.char_count!=utf16 && utf16.checked_add(1)!=Some(para.char_count){return false;}
++    !para.stored_text_partition_is_dirty() && !para.cell_format_vpos_dirty
++        && para.controls.is_empty() && para.field_ranges.is_empty()
++        && para.orphan_field_ends.is_empty() && para.range_tags.is_empty()
++        && para.ctrl_data_records.iter().all(Option::is_none)
++        && para.tab_extended.is_empty() && para.title_marks.is_empty() && para.markpen_marks.is_empty()
++        && para.numbering_restart.is_none()
++        && para.column_type == ColumnBreakType::None && para.hwpx_axis_shift == 0
++        && para.layout_only_fill_lines == 0 && !para.line_segs.is_empty()
++        && para_has_visible_text(para) && !para.text.chars().any(|c| c < ' ' || c == '\u{fffc}')
++        && para.line_segs.first().is_some_and(|s| s.text_start == 0)
++        && para.line_segs.iter().all(|r| !is_synthetic_line_seg(r)
++            && r.vertical_pos >= 0 && r.line_height > 0 && r.text_height > 0
++            && r.baseline_distance >= 0 && r.baseline_distance <= r.line_height
++            && r.line_spacing >= 0 && r.column_start >= 0 && r.segment_width > 0
++            && r.column_start.checked_add(r.segment_width).is_some()
++            && r.vertical_pos.checked_add(r.line_height).and_then(|v| v.checked_add(r.line_spacing)).is_some()
++            && (r.text_start == 0 || para.char_offsets.binary_search(&r.text_start).is_ok()))
++        && para.line_segs.windows(2).all(|w| w[0].text_start < w[1].text_start)
++        && para.source_line_seg_vertical_pos.as_ref().is_none_or(|v|
++            v.len() == para.line_segs.len() && v.iter().zip(&para.line_segs).all(|(a,b)| *a == b.vertical_pos))
++}
++/// Issued by the format owner after it has selected the actual current
++/// composition. Equal row heights alone do not prove the saved partition.
++pub(super) fn actual_composition_matches_saved(para:&Paragraph, composed:Option<&crate::renderer::composer::ComposedParagraph>)->bool {
++    if !unchanged_native_plain_rows(para){return false;}
++    let Some(comp)=composed else{return false;};
++    if comp.para_style_id!=para.para_shape_id || comp.lines.len()!=para.line_segs.len()
++        || !comp.inline_controls.is_empty() || comp.numbering_text.is_some()
++        || !comp.tac_controls.is_empty() || !comp.footnote_positions.is_empty()
++        || !comp.tab_extended.is_empty() || comp.horizontal_shaping.is_some()
++        || para.char_shapes.windows(2).any(|w|w[0].start_pos>=w[1].start_pos)
++    {return false;}
++    let chars:Vec<char>=para.text.chars().collect();
++    for(i,(line,row))in comp.lines.iter().zip(&para.line_segs).enumerate(){
++        let Ok(start)=para.char_offsets.binary_search(&row.text_start)else{return false;};
++        let end=if let Some(next)=para.line_segs.get(i+1){let Ok(end)=para.char_offsets.binary_search(&next.text_start)else{return false;};end}else{chars.len()};
++        if line.char_start!=start || line.line_height!=row.line_height || line.line_spacing!=row.line_spacing
++            || line.baseline_distance!=row.baseline_distance || line.column_start!=row.column_start
++            || line.segment_width!=row.segment_width || line.has_line_break || start>=end
++        {return false;}
++        let mut at=start;
++        for run in &line.runs {
++            if run.char_overlap.is_some() || run.footnote_marker.is_some() || run.inserted_control_text || run.display_text.is_some(){return false;}
++            for c in run.text.chars(){
++                if at>=end || chars[at]!=c {return false;}
++                let index=para.char_shapes.partition_point(|s|s.start_pos<=para.char_offsets[at]);
++                let expected=index.checked_sub(1).map_or(0,|i|para.char_shapes[i].char_shape_id);
++                if run.char_style_id!=expected{return false;}at+=1;
++            }
++        }
++        if at!=end{return false;}
++    }
++    true
++}
++pub(super) fn composed_rows_equal_saved(para: &Paragraph, fmt: &metrics::FormattedParagraph, dpi:f64) -> bool {
++    fmt.source_rows_match_current_format && dpi.is_finite() && dpi > 0.0 && fmt.line_count() == para.line_segs.len()
++        && para.line_segs.iter().enumerate().all(|(i,r)|
++            fmt.line_heights[i] == crate::renderer::hwpunit_to_px(r.line_height,dpi)
++            && fmt.line_spacings[i] == crate::renderer::hwpunit_to_px(r.line_spacing,dpi))
++}
++/// A saved prefix only owns visible rows inside this actual available frame.
++/// Trailing line spacing is not ink, so its page-tail trimming remains separate.
++pub(super) fn native_reset_prefix_fits(para:&Paragraph, break_line:usize, base:i32, available:f64, dpi:f64)->bool {
++    if !available.is_finite() || available<=0.0 || !dpi.is_finite() || dpi<=0.0
++        || break_line==0 || break_line>=para.line_segs.len(){return false;}
++    para.line_segs[..break_line].iter().all(|r| {
++        if r.line_height<=0 || r.text_height<=0 || r.text_height>r.line_height {return false;}
++        let Some(top)=r.vertical_pos.checked_sub(base).filter(|v|*v>=0)else{return false;};
++        let Some(end)=top.checked_add(r.line_height)else{return false;};
++        crate::renderer::hwpunit_to_px(end,dpi)<=available
++    })
++}
++fn native_edited_reset_witness(st:&TypesetState, para:&Paragraph, fmt:&metrics::FormattedParagraph, base:Option<i32>, available:f64, dpi:f64)->bool {
++    if !st.profile.hwp5_stored_pagination_layout() || !st.profile.session_edited()
++        || st.col_count != 1 || !unchanged_native_plain_rows(para)
++        || !composed_rows_equal_saved(para,fmt,dpi) { return false; }
++    let Some(base)=base else{return false;};
++    let Some(first)=para.line_segs.first() else{return false;};
++    let Some(delta)=first.vertical_pos.checked_sub(base) else{return false;};
++    if crate::renderer::px_to_hwpunit(st.current_height+fmt.spacing_before,dpi)!=delta {return false;}
++    let resets=para.line_segs.windows(2).filter(|w|w[1].vertical_pos<w[0].vertical_pos).count();
++    let Some(break_line)=para.line_segs.windows(2).position(|w|w[1].vertical_pos<w[0].vertical_pos).map(|i|i+1)else{return false;};
++    resets==1 && native_reset_prefix_fits(para,break_line,base,available,dpi) && para.line_segs.windows(2).all(|w| w[1].vertical_pos==0
++        || w[0].vertical_pos.checked_add(w[0].line_height).and_then(|v|v.checked_add(w[0].line_spacing))==Some(w[1].vertical_pos))
++}
++
+ /// A changed source-vpos snapshot identifies a reconstructed ordinary body, but
+ /// is not itself a failed snap. Compare the actual HeightCursor decisions at
+ /// trimmed and full consumption; retain trimming only if both reach exactly
+@@ -991,18 +1090,23 @@
+     paragraphs: &[Paragraph], styles: &ResolvedStyleSet,
+     trim_before: bool, lazy_base: bool, dpi: f64,
+ ) -> bool {
+-    if st.col_count != 1 || !st.profile.hwpx_stored_layout()
+-        || st.profile.session_edited() || para.stored_text_partition_is_dirty()
++    let native_edited = st.profile.hwp5_stored_pagination_layout() && st.profile.session_edited();
++    if st.col_count != 1 || !(st.profile.hwpx_stored_layout() || native_edited)
++        || (st.profile.session_edited() && !native_edited) || para.stored_text_partition_is_dirty()
+         || para.cell_format_vpos_dirty || !para.controls.is_empty()
+         || !para.field_ranges.is_empty() || !para.orphan_field_ends.is_empty()
+         || para.text.contains('\t')
+     { return false; }
+-    let Some(source) = para.source_line_seg_vertical_pos.as_ref() else { return false; };
++    let current_rows:Vec<i32>;
++    let source = if native_edited {
++        if !unchanged_native_plain_rows(para) || !composed_rows_equal_saved(para,fmt,dpi) {return false;}
++        current_rows=para.line_segs.iter().map(|r|r.vertical_pos).collect(); &current_rows
++    } else {let Some(source)=para.source_line_seg_vertical_pos.as_ref() else{return false;}; source};
+     if source.len() != para.line_segs.len() || source.is_empty()
+         || !source.iter().any(|&v| v > 0) || source.iter().any(|&v| v < 0)
+         || source.windows(2).any(|w| w[1] < w[0])
+         || para.line_segs.iter().any(is_synthetic_line_seg)
+-        || source.iter().zip(&para.line_segs).all(|(&v, line)| v == line.vertical_pos)
++        || (!native_edited && source.iter().zip(&para.line_segs).all(|(&v, line)| v == line.vertical_pos))
+     { return false; }
+     let Some(next) = paragraphs.get(para_idx + 1) else { return false; };
+     if !next.controls.is_empty() || !next.field_ranges.is_empty()
+@@ -1017,6 +1121,14 @@
+         || paragraphs[para_idx.saturating_sub(1)..(para_idx + 2).min(paragraphs.len())]
+             .iter().any(|p| p.line_segs.len() != 1);
+     if !local_nonuniform { return false; }
++    if native_edited {
++        if !unchanged_native_plain_rows(next)
++            || next.line_segs.windows(2).filter(|w|w[1].vertical_pos<w[0].vertical_pos).count()>1
++            || next.line_segs.windows(2).any(|w|w[1].vertical_pos!=0 && w[0].vertical_pos.checked_add(w[0].line_height).and_then(|v|v.checked_add(w[0].line_spacing))!=Some(w[1].vertical_pos)) {return false;}
++        let Some(base)=st.vpos_page_base.or(st.vpos_lazy_base) else{return false;};
++        let Some(delta)=para.line_segs[0].vertical_pos.checked_sub(base) else{return false;};
++        if crate::renderer::px_to_hwpunit(st.current_height+fmt.spacing_before,dpi)!=delta{return false;}
++    }
+     let trimmed = fmt.flow_advance_height(para, 1, trim_before, false, lazy_base);
+     if trimmed >= fmt.total_height { return false; }
+     let mut a = super::shared_body_height_cursor(st, dpi, false, st.profile.session_edited());
+@@ -1031,6 +1143,28 @@
+     b.trimmed_prev_spacing_before_px = 0.0;
+     let from_trim = a.vpos_adjust(st.current_height + trimmed, para_idx + 1, paragraphs, styles);
+     let from_full = b.vpos_adjust(st.current_height + fmt.total_height, para_idx + 1, paragraphs, styles);
++    if native_edited {
++        let Some(base)=st.vpos_page_base.or(st.vpos_lazy_base) else{return false;};
++        let Some(delta)=next.line_segs[0].vertical_pos.checked_sub(base) else{return false;};
++        let Some(next_style)=styles.para_styles.get(next.para_shape_id as usize) else{return false;};
++        if crate::renderer::px_to_hwpunit(from_full+next_style.spacing_before,dpi)!=delta || b.vpos_page_base!=st.vpos_page_base || b.vpos_lazy_base!=st.vpos_lazy_base {return false;}
++    }
+     from_trim != from_full || a.vpos_page_base != b.vpos_page_base
+         || a.vpos_lazy_base != b.vpos_lazy_base
+ }
++
++#[cfg(test)]
++mod native_current_body_boundary_tests {
++use crate::model::{paragraph::{Paragraph,LineSeg,RangeTag,FieldRange},control::{Control,UnknownControl}};
++use serde_json::{Value,json};
++fn cases()->Vec<Value>{let row=|text_start,v|LineSeg{text_start,vertical_pos:v,line_height:100,text_height:100,baseline_distance:75,line_spacing:60,column_start:0,segment_width:1000,tag:0x60000};let p=Paragraph{text:"A😀B".into(),char_count:5,char_offsets:vec![0,1,3],line_segs:vec![row(0,100),row(3,0)],..Default::default()};let mut cases=vec![("positive-plain-emoji",p.clone(),true)];macro_rules! bad{($name:expr,$change:expr)=>{{let mut q=p.clone();($change)(&mut q);cases.push(($name,q,false));}};}bad!("dirty",|q:&mut Paragraph|q.stored_text_partition_dirty=true);bad!("cell-dirty",|q:&mut Paragraph|q.cell_format_vpos_dirty=true);bad!("synthetic",|q:&mut Paragraph|q.line_segs[0].tag|=LineSeg::TAG_IMPLEMENTATION_PROPERTY);bad!("hidden-utf16-slot",|q:&mut Paragraph|q.char_offsets[2]=11);bad!("char-count",|q:&mut Paragraph|q.char_count+=8);bad!("unknown-control",|q:&mut Paragraph|q.controls.push(Control::Unknown(UnknownControl{ctrl_id:0x11223344})));bad!("range-tag",|q:&mut Paragraph|q.range_tags.push(RangeTag::default()));bad!("field",|q:&mut Paragraph|q.field_ranges.push(FieldRange::default()));bad!("stale-source-vpos",|q:&mut Paragraph|q.source_line_seg_vertical_pos=Some(vec![100,1]));bad!("row-end-overflow",|q:&mut Paragraph|q.line_segs[0].vertical_pos=i32::MAX);bad!("raw-control-payload",|q:&mut Paragraph|q.ctrl_data_records.push(Some(vec![0])));bad!("literal-tab",|q:&mut Paragraph|q.text="A\tB".into());cases.into_iter().map(|(name,p,expected)|json!({"name":name,"expected":expected,"actual":super::unchanged_native_plain_rows(&p)})).collect()}
++
++fn composed_cases()->Vec<Value>{use crate::renderer::composer::{ComposedParagraph,ComposedLine,ComposedTextRun};let row=|text_start,v|LineSeg{text_start,vertical_pos:v,line_height:100,text_height:100,baseline_distance:75,line_spacing:60,column_start:0,segment_width:1000,tag:0x60000};let p=Paragraph{text:"A😀B".into(),char_count:5,char_offsets:vec![0,1,3],line_segs:vec![row(0,100),row(3,0)],..Default::default()};let line=|start,text:&str|ComposedLine{runs:vec![ComposedTextRun{text:text.into(),..Default::default()}],line_height:100,baseline_distance:75,segment_width:1000,column_start:0,line_spacing:60,has_line_break:false,char_start:start};let c=ComposedParagraph{lines:vec![line(0,"A😀"),line(2,"B")],para_style_id:0,inline_controls:vec![],numbering_text:None,tac_controls:vec![],footnote_positions:vec![],tab_extended:vec![],horizontal_shaping:None};let mut cases=vec![("actual-full-row-exact",c.clone(),true)];macro_rules! bad{($name:expr,$change:expr)=>{{let mut q=c.clone();($change)(&mut q);cases.push(($name,q,false));}};}bad!("fresh-same-height-start-changed",|q:&mut ComposedParagraph|q.lines[1].char_start=1);bad!("fresh-same-height-width-changed",|q:&mut ComposedParagraph|q.lines[0].segment_width=999);bad!("fresh-same-height-baseline-changed",|q:&mut ComposedParagraph|q.lines[0].baseline_distance=74);bad!("fresh-same-height-column-changed",|q:&mut ComposedParagraph|q.lines[0].column_start=1);bad!("partition-text-loss",|q:&mut ComposedParagraph|q.lines[0].runs[0].text="A".into());bad!("same-text-style-ID-changed",|q:&mut ComposedParagraph|q.lines[0].runs[0].char_style_id=1);bad!("hidden-note-owner",|q:&mut ComposedParagraph|q.lines[0].runs[0].footnote_marker=Some(1));cases.into_iter().map(|(name,c,expected)|json!({"name":name,"expected":expected,"actual":super::actual_composition_matches_saved(&p,Some(&c))})).collect()}
++
++fn prefix_cases()->Vec<Value>{let row=|v|LineSeg{text_start:0,vertical_pos:v,line_height:100,text_height:100,baseline_distance:75,line_spacing:60,column_start:0,segment_width:1000,tag:0x60000};let p=Paragraph{line_segs:vec![row(100),row(0)],..Default::default()};let mut cases=vec![("prefix-visible-end-inside",p.clone(),0,200.0/75.0,true),("prefix-visible-end-outside",p.clone(),0,199.0/75.0,false),("prefix-before-frame-origin",p.clone(),101,200.0/75.0,false),("nonfinite-budget",p.clone(),0,f64::NAN,false)];let mut overflow=p.clone();overflow.line_segs[0].vertical_pos=i32::MAX;cases.push(("prefix-checked-end-overflow",overflow,0,200.0/75.0,false));let mut zero=p.clone();zero.line_segs[0].line_height=0;cases.push(("prefix-zero-height",zero,0,200.0/75.0,false));cases.into_iter().map(|(name,p,base,available,expected)|json!({"name":name,"expected":expected,"actual":super::native_reset_prefix_fits(&p,1,base,available,96.0)})).collect()}
++
++fn check(cases:Vec<Value>,expected:usize){assert_eq!(cases.len(),expected);for case in cases{assert_eq!(case["actual"],case["expected"],"{}",case["name"]);}}
++#[test]fn source_owner_13(){check(cases(),13);}
++#[test]fn actual_format_8(){check(composed_cases(),8);}
++#[test]fn visible_prefix_6(){check(prefix_cases(),6);}
++}
+--- a/src/renderer/typeset/paragraph/format.rs
++++ b/src/renderer/typeset/paragraph/format.rs
+@@ -188,6 +188,9 @@
+         (available.is_finite() && available > 0.0 && remaining.is_finite()).then_some(remaining)
+     })();
+     FormattedParagraph {
++        source_rows_match_current_format: ctx.profile().hwp5_stored_pagination_layout()
++            && ctx.profile().session_edited()
++            && super::actual_composition_matches_saved(para,composed),
+         tail_line_remaining_width,
+         computed_host_lines,
+         square_host_plan: None,
+--- a/src/renderer/typeset/paragraph/metrics.rs
++++ b/src/renderer/typeset/paragraph/metrics.rs
+@@ -10,6 +10,9 @@
+ /// 문단 format() 결과: 문단의 실제 렌더링 높이 정보
+ #[derive(Debug, Clone)]
+ pub(in crate::renderer::typeset) struct FormattedParagraph {
++    /// The selected current composition exactly matches the plain source rows,
++    /// including character partition, physical box, baseline and effective IDs.
++    pub(in crate::renderer::typeset) source_rows_match_current_format: bool,
+     /// Measured remaining inline space on the composed tail line. None means
+     /// that this path has no reliable width result (not an implicit overflow).
+     pub(in crate::renderer::typeset) tail_line_remaining_width: Option<f64>,
+@@ -42,6 +45,7 @@
+         plan: crate::renderer::inline_flow::InlineFlowPlan,
+         dpi: f64,
+     ) {
++        self.source_rows_match_current_format = false;
+         let Some(rows) = plan.text_rows.as_ref() else {
+             return;
+         };
+--- a/src/renderer/typeset/section/flow.rs
++++ b/src/renderer/typeset/section/flow.rs
+@@ -188,6 +188,7 @@
+                 paragraphs,
+                 styles,
+                 formatted.spacing_before,
++                &formatted,
+             );
+             if let Some(crate::model::control::Control::Table(prev_table)) =
+                 st.current_items.last().and_then(|item| match item {
+--- a/src/renderer/typeset/section/vpos.rs
++++ b/src/renderer/typeset/section/vpos.rs
+@@ -17,6 +17,7 @@
+         paragraphs: &[Paragraph],
+         styles: &ResolvedStyleSet,
+         spacing_before_px: f64,
++        formatted: &crate::renderer::typeset::paragraph::metrics::FormattedParagraph,
+     ) {
+         if st.col_count != 1 {
+             return; // 다단은 Stage E
+@@ -33,7 +34,25 @@
+                         // 배치가 보존하는 문단 앞 여백을 측정의 쪽 원점으로 빼지 않는다.
+                         let margin_is_page_relative = (st.profile.hwpx_stored_layout()
+                             || st.profile.hwp5_stored_pagination_layout())
+-                            && !st.profile.session_edited()
++                            && (!st.profile.session_edited()
++                                || (st.profile.hwp5_stored_pagination_layout()
++                                    && st.col_count == 1 && !st.current_endnote_flow
++                                    && st.current_height == 0.0 && st.current_zone_y_offset == 0.0
++                                    && st.current_zone_layout.is_none()
++                                    && !st.wrap_around_derived_band
++                                    && !st.current_column_wrap_anchors.contains_key(&para_idx)
++                                    && st.available_height().is_finite()
++                                    && formatted.total_height <= st.available_height()
++                                    && paragraphs.get(para_idx).is_some_and(|first| {
++                                        let Some(area)=st.layout.column_areas.get(st.current_column as usize) else{return false;};
++                                        crate::renderer::typeset::paragraph::unchanged_native_plain_rows(first)
++                                            && crate::renderer::typeset::paragraph::composed_rows_equal_saved(first,formatted,self.dpi)
++                                            && crate::renderer::layout::current_stored_margin_frame(
++                                                first,paragraphs.get(para_idx+1),
++                                                crate::renderer::px_to_hwpunit(area.width,self.dpi),
++                                                crate::renderer::px_to_hwpunit(area.height,self.dpi),
++                                                styles,self.dpi)
++                                    })))
+                             && paragraphs.get(para_idx).is_some_and(|first| {
+                                 crate::renderer::layout::stored_first_margin_is_page_relative(
+                                     first,
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[91, 153, 115, 240, 44, 72, 70, 52, 208, 21, 220, 129, 28, 234, 170, 237, 233, 101, 245, 73, 106, 240, 231, 180, 192, 163, 142, 121, 175, 25, 110, 146];
++pub(crate) const RESOURCE:[u8;32]=[130, 7, 8, 3, 240, 104, 187, 202, 176, 80, 82, 98, 66, 93, 87, 178, 55, 79, 108, 66, 222, 12, 68, 196, 69, 45, 235, 108, 102, 22, 132, 203];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {

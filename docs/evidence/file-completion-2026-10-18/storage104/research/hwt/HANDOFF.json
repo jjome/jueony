@@ -1,0 +1,46 @@
+{
+  "status": "PRIVATE_SUPPORTED_VERTICAL_PROOF_NOT_PRODUCTION_OR_GENERAL_HWT_COMPLETION",
+  "profile": "authored-plain-root-xs-string-clickhere-leaves-v1",
+  "finalNative": {
+    "engine": "source-3f07621d4728accf",
+    "passed": 11,
+    "failed": 0,
+    "ignored": 0,
+    "doctests": 0,
+    "log": "native-final110-metadata.log"
+  },
+  "finalWasm": {
+    "engine": "source-3f07621d4728accf",
+    "passed": 6,
+    "failed": 0,
+    "scope": "Existing public WASM field/snapshot/HWP-save/extractor primitives only; private Session is not exposed to JS or UI"
+  },
+  "independentReader": {
+    "files": 3,
+    "rawFieldsEach": 2,
+    "allXMLTemplate3AndOpaqueBytesExact": true,
+    "ownSchemaAndOwnValueDocumentValid": true,
+    "fontProgramOrBinaryPayloadStreams": 0
+  },
+  "implementation": [
+    "closed XSD mapping and exact Name/CTRL_DATA/field_id/owner preflight",
+    "single field CAS(instance/revision/source SHA/original value), snapshot undo/redo and rollback",
+    "HWT FileHeader0x21, packed XMLTemplate3, opaque streams, DocInfo bytes, all Field/control metadata and raw shape/style reference IDs exact on save/reopen",
+    "entire published page control/text layout exact, no tolerance widening or projection"
+  ],
+  "unsupported": [
+    "Production UI/frame API integration",
+    "Safe OS source file write/permission/disk CAS",
+    "Application IDB recovery; artifact bytes can reopen, but this is not a production recovery integration test",
+    "Vendor HWT edits/native Hancom external layout oracle",
+    "Form objects, group wrappers, duplicated names or IDs, complex/ref/attribute schemas, hidden master stories, imported XML lineages",
+    "CFB directory timestamp/sector-byte identity; only HWP model and logical stream-byte preservation asserted"
+  ],
+  "productionChanged": false,
+  "vendorInputsThisTask": 0,
+  "preparationNotes": [
+    "9PASS1FAIL duplicate fixture changed IR name while raw CTRL_DATA still emitted old name; original failure log retained, fixed by generating two equal names with actual creation API then asserting both names",
+    "One independent-reader command used an out-of-scope typo path and refused before producing a result; corrected invocation used only the three own HWTs",
+    "11+11 baseline/final Native and6+6 WASM runs are repeated profiles, not22/12 independent new capabilities"
+  ]
+}

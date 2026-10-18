@@ -1,0 +1,295 @@
+--- a/src/renderer/composer.rs
++++ b/src/renderer/composer.rs
+@@ -756,6 +756,25 @@
+                         + i64::from(table.outer_margin_bottom)
+         })
+         .then_some(first)
++}
++
++/// The first table page item may be a floating sibling, not the table
++/// owning the host's first saved row. Only the actual inline control whose
++/// entire physical box owns that row can supply its stored frame basis.
++pub(crate) fn stored_table_column_line_vpos(para: &Paragraph, control_index: usize) -> Option<i32> {
++    let Control::Table(table)=para.controls.get(control_index)? else {return None;};
++    if !table.common.treat_as_char || table.caption.is_some()
++        || para.cell_format_vpos_dirty
++        || control_line_seg_index(para,control_index)!=Some(0)
++    {return None;}
++    let first=stored_first_tac_line(para)?;
++    if first.line_height<=0 || first.line_spacing<0 || first.vertical_pos<0
++        || i64::from(first.line_height)!=i64::from(table.common.height)
++            +i64::from(table.outer_margin_top)+i64::from(table.outer_margin_bottom)
++    {return None;}
++    first.vertical_pos.checked_add(first.line_height)?
++        .checked_add(first.line_spacing)?;
++    Some(first.vertical_pos)
+ }
+ 
+ /// Ordinary whitespace rows before an object in the same stored fragment.
+--- a/src/renderer/composer/tests.rs
++++ b/src/renderer/composer/tests.rs
+@@ -2435,3 +2435,36 @@
+     chars[10..14].fill('.');para.text=chars.into_iter().collect();
+     assert!(!super::line_breaking::owned_break_cell_row_overflows(&para,&frame,&styles));
+ }
++
++
++#[test]
++fn stored_table_column_owner101_requires_the_actual_inline_control() {
++    let mut p=Paragraph::default();
++    let mut floating=crate::model::table::Table::default();floating.common.height=6600;
++    let mut inline=crate::model::table::Table::default();inline.common.treat_as_char=true;
++    inline.common.height=3130;inline.outer_margin_top=140;inline.outer_margin_bottom=140;
++    p.controls.push(Control::Table(Box::new(floating)));
++    p.controls.push(Control::Table(Box::new(inline)));
++    p.line_segs.push(LineSeg{vertical_pos:23507,line_height:3410,line_spacing:660,..Default::default()});
++    assert_eq!(stored_table_column_line_vpos(&p,0),None,"floating sibling cannot borrow inline row");
++    assert_eq!(stored_table_column_line_vpos(&p,1),Some(23507));
++    if let Control::Table(table)=&mut p.controls[1]{table.common.height+=1;}
++    assert_eq!(stored_table_column_line_vpos(&p,1),None,"full box height must own saved row");
++}
++#[test]
++fn stored_table_column_owner101_rejects_stale_or_unowned_rows() {
++    let mut p=Paragraph::default();let mut inline=crate::model::table::Table::default();
++    inline.common.treat_as_char=true;inline.common.height=100;
++    p.controls.push(Control::Table(Box::new(inline)));
++    p.line_segs.push(LineSeg{vertical_pos:500,line_height:100,line_spacing:0,..Default::default()});
++    assert_eq!(stored_table_column_line_vpos(&p,0),Some(500));
++    let mut overflowing=p.clone();overflowing.line_segs[0].vertical_pos=i32::MAX;
++    assert_eq!(stored_table_column_line_vpos(&overflowing,0),None,"row end must not overflow");
++
++    for n in 0..6 {let mut changed=p.clone();match n {
++        0=>changed.stored_text_partition_dirty=true,1=>changed.cell_format_vpos_dirty=true,
++        2=>changed.line_segs[0].tag=LineSeg::TAG_IMPLEMENTATION_PROPERTY,
++        3=>changed.line_segs[0].vertical_pos=-1,4=>changed.text="가".into(),
++        5=>changed.line_segs[0].line_spacing=-1,_=>unreachable!(),
++    }assert_eq!(stored_table_column_line_vpos(&changed,0),None,"case {n}");}
++}
+--- a/src/renderer/typeset/state.rs
++++ b/src/renderer/typeset/state.rs
+@@ -534,16 +534,12 @@
+             // PartialTable에는 소비된 컷이 있고, 문단 시작의 들여쓰기·앞 간격은
+             // 별도 계약이므로 이 표 원점 조회에 섞지 않는다.
+             stored_table_column_base: self.data.current_items.first().and_then(|item| {
+-                let PageItem::Table { para_index, .. } = item else {
++                let PageItem::Table { para_index, control_index } = item else {
+                     return None;
+                 };
+-                paragraphs
+-                    .get(*para_index)
+-                    .and_then(|para| para.line_segs.first())
+-                    .filter(|seg| {
+-                        seg.tag & crate::model::paragraph::LineSeg::TAG_IMPLEMENTATION_PROPERTY == 0
+-                    })
+-                    .map(|seg| seg.vertical_pos)
++                crate::renderer::composer::stored_table_column_line_vpos(
++                    paragraphs.get(*para_index)?, *control_index,
++                )
+             }),
+         }
+     }
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -42,6 +42,86 @@
+     Alignment, BorderLine, BorderLineType, HeadType, Numbering, UnderlineType,
+ };
+ use crate::model::table::{TablePageBreak, VerticalAlign};
++
++/// A column-top floating row-break box and a later, separately owned inline
++/// row have distinct flow extents. The stored inline row cannot absorb the
++/// floating box's explicit outer-bottom margin.
++fn stored_column_top_coanchored_float_box(
++    para: &Paragraph, control_index: usize, paint_top: f64, column_top: f64,
++    visual_height: f64, dpi: f64,
++) -> bool {
++    if !dpi.is_finite() || dpi<=0.0 || !paint_top.is_finite() || !column_top.is_finite()
++        || !visual_height.is_finite() || (paint_top-column_top).abs()>dpi/7200.0
++        || para.cell_format_vpos_dirty || para.line_segs.len()!=1
++    {return false;}
++    let Some(line)=crate::renderer::composer::stored_first_tac_line(para) else{return false;};
++    if line.line_height<=0 || line.line_spacing<0 || line.vertical_pos<0
++        || line.vertical_pos.checked_add(line.line_height)
++            .and_then(|end|end.checked_add(line.line_spacing)).is_none()
++    {return false;}
++    // Page-band definitions have their own frame; their known table descendants
++    // do not become body boxes. Field memo text remains in the body context.
++    // Unknown controls, notes and body nested objects retain the general path.
++    fn known_paragraphs(paragraphs:&[Paragraph], page_band:bool, depth:usize,
++        budget:&mut usize)->bool {
++        if depth>32{return false;}
++        for p in paragraphs {
++            let Some(left)=budget.checked_sub(1) else{return false;};*budget=left;
++            for control in &p.controls {
++                let Some(left)=budget.checked_sub(1) else{return false;};*budget=left;
++                let known=match control {
++                    Control::AutoNumber(_)=>true,
++                    Control::Field(field)=>known_paragraphs(&field.memo_paragraphs,false,depth+1,budget),
++                    Control::Header(header)=>known_paragraphs(&header.paragraphs,true,depth+1,budget),
++                    Control::Footer(footer)=>known_paragraphs(&footer.paragraphs,true,depth+1,budget),
++                    Control::Table(table) if page_band=>table.cells.iter().all(|cell|
++                        known_paragraphs(&cell.paragraphs,true,depth+1,budget)),
++                    _=>false,
++                };
++                if !known{return false;}
++            }
++        }
++        true
++    }
++    let known_cell_controls = |table:&crate::model::table::Table| {
++        // This is an optimization eligibility budget, never a parser limit.
++        let mut budget=4096;
++        table.cells.iter().all(|cell|known_paragraphs(&cell.paragraphs,false,0,&mut budget))
++    };
++    let Some(Control::Table(table))=para.controls.get(control_index) else{return false;};
++    if !is_para_topbottom_float(&table.common) || table.common.allow_overlap
++        || table.common.vertical_offset!=0 || table.common.height>i32::MAX as u32
++        || table.common.height==0 || table.caption.is_some()
++        || !matches!(table.page_break,TablePageBreak::RowBreak)
++        || table.row_count!=1 || table.col_count!=1 || table.cells.len()!=1
++        || table.outer_margin_top!=0 || table.outer_margin_bottom<=0
++        || (visual_height-hwpunit_to_px(table.common.height as i32,dpi)).abs()>dpi/7200.0
++        || !known_cell_controls(table)
++    {return false;}
++    let mut inline_owner=None;
++    for (index,control) in para.controls.iter().enumerate() {
++        if index==control_index {continue;}
++        match control {
++            Control::SectionDef(_) | Control::ColumnDef(_) => {},
++            Control::Table(sibling) if index>control_index && sibling.common.treat_as_char
++                && sibling.caption.is_none() && !sibling.common.allow_overlap
++                && sibling.outer_margin_top>=0 && sibling.outer_margin_bottom>=0
++                && crate::renderer::layout::control_line_seg_index(para,index)==Some(0)
++                && i64::from(line.line_height)==i64::from(sibling.common.height)
++                    +i64::from(sibling.outer_margin_top)+i64::from(sibling.outer_margin_bottom)
++                && known_cell_controls(sibling) => {
++                    if inline_owner.replace(index).is_some(){return false;}
++                },
++            Control::Table(sibling) if index<control_index && !sibling.common.treat_as_char
++                && sibling.common.text_wrap==TextWrap::Square
++                && sibling.common.vert_rel_to==VertRelTo::Paper
++                && sibling.common.horz_rel_to==HorzRelTo::Paper
++                && !sibling.common.allow_overlap => {},
++            _=>return false,
++        }
++    }
++    inline_owner.is_some()
++}
+ 
+ /// 실제 부분 문단 컷이 원본 어울림 호스트의 물리 재시작을 소유한다.
+ /// 통째 호스트나 일반 표 앞 텍스트는 어울림 렌더 경로가 계속 소유한다.
+@@ -12939,7 +13019,12 @@
+                     // The resolved box has already consumed its outer top.
+                     // Its accepted bottom also owns the host's after-space.
+                     Some(end)
+-                } else if self.profile.get().hwp5_stored_pagination_layout()
++                } else if (self.profile.get().hwp5_stored_pagination_layout()
++                    || (self.profile.get().hwpx_stored_layout()
++                        && !self.profile.get().session_edited()
++                        && stored_column_top_coanchored_float_box(
++                            para,control_index,table_y_start,col_area.y,table_visual_height,self.dpi,
++                        )))
+                     && is_current_empty_para_float
+                     && !is_current_empty_square_sibling_float
+                     && is_para_topbottom_float(&t.common)
+@@ -17497,3 +17582,90 @@
+         assert!(failures.is_empty(),"{}",failures.join("; "));
+     }
+ }
++
++#[cfg(test)]
++mod coanchored_outer_bottom102_tests {
++    use super::*;
++    fn fixture()->Paragraph {
++        let mut p=Paragraph::default();
++        let mut square=crate::model::table::Table::default();
++        square.common.text_wrap=TextWrap::Square;square.common.vert_rel_to=VertRelTo::Paper;
++        square.common.horz_rel_to=HorzRelTo::Paper;
++        let mut float=crate::model::table::Table::default();float.row_count=1;float.col_count=1;
++        float.cells.push(Default::default());float.page_break=TablePageBreak::RowBreak;
++        float.common.text_wrap=TextWrap::TopAndBottom;float.common.vert_rel_to=VertRelTo::Para;
++        float.common.vert_align=VertAlign::Top;float.common.height=1000;float.outer_margin_bottom=30;
++        let mut inline=crate::model::table::Table::default();inline.common.treat_as_char=true;
++        inline.common.height=100;inline.outer_margin_top=10;inline.outer_margin_bottom=10;
++        p.controls=vec![Control::Table(Box::new(square)),Control::Table(Box::new(float)),Control::Table(Box::new(inline))];
++        p.line_segs.push(crate::model::paragraph::LineSeg{vertical_pos:500,line_height:120,line_spacing:20,..Default::default()});p
++    }
++    fn eligible(p:&Paragraph)->bool{stored_column_top_coanchored_float_box(p,1,50.0,50.0,1000.0/75.0,96.0)}
++    #[test]fn coanchored_outer_bottom102_requires_independent_exact_inline_row_and_float_box(){
++        let mut p=fixture();assert!(eligible(&p));
++        if let Control::Table(t)=&mut p.controls[1]{
++            let mut text=Paragraph::default();text.controls.push(Control::Field(Default::default()));
++            t.cells[0].paragraphs.push(text);
++        }
++        assert!(eligible(&p),"an inline field cannot erase the float's outer margin");
++        assert!(!stored_column_top_coanchored_float_box(&p,0,50.0,50.0,1000.0/75.0,96.0));
++        assert!(!stored_column_top_coanchored_float_box(&p,1,51.0,50.0,1000.0/75.0,96.0));
++        assert!(!stored_column_top_coanchored_float_box(&p,1,50.0,50.0,1001.1/75.0,96.0));
++    }
++    #[test]fn coanchored_outer_bottom103_checks_page_band_descendants_and_memo_context(){
++        fn carrier(control:Control)->Paragraph {
++            let mut p=Paragraph::default();p.controls.push(control);p
++        }
++        fn with_control(control:Control)->Paragraph {
++            let mut p=fixture();let Control::Table(t)=&mut p.controls[1] else{panic!()};
++            t.cells[0].paragraphs.push(carrier(control));p
++        }
++        let mut nested=crate::model::table::Table::default();
++        nested.cells.push(Default::default());
++        nested.cells[0].paragraphs.push(carrier(Control::Field(Default::default())));
++        let mut header=crate::model::header_footer::Header::default();
++        header.paragraphs.push(carrier(Control::Table(Box::new(nested.clone()))));
++        assert!(eligible(&with_control(Control::Header(Box::new(header.clone())))));
++        let mut memo=crate::model::control::Field::default();
++        memo.memo_paragraphs.push(carrier(Control::Table(Box::new(nested.clone()))));
++        assert!(!eligible(&with_control(Control::Field(memo))));
++        nested.cells[0].paragraphs[0].controls.push(Control::Footnote(Box::default()));
++        header.paragraphs=vec![carrier(Control::Table(Box::new(nested)))];
++        assert!(!eligible(&with_control(Control::Header(Box::new(header)))));
++        let mut control=Control::Header(Box::default());
++        for _ in 0..34 {
++            let mut h=crate::model::header_footer::Header::default();
++            h.paragraphs.push(carrier(control));control=Control::Header(Box::new(h));
++        }
++        assert!(!eligible(&with_control(control)),"deep page bands retain general path");
++        let mut h=crate::model::header_footer::Header::default();
++        h.paragraphs=vec![Paragraph::default();4097];
++        assert!(!eligible(&with_control(Control::Header(Box::new(h)))));
++    }
++    #[test]fn coanchored_outer_bottom102_rejects_unowned_changed_or_other_placement(){
++        for n in 0..20{let mut p=fixture();match n {
++            0=>p.stored_text_partition_dirty=true,1=>p.cell_format_vpos_dirty=true,
++            2=>p.line_segs[0].tag=crate::model::paragraph::LineSeg::TAG_IMPLEMENTATION_PROPERTY,
++            3=>p.text="가".into(),4=>{p.controls.pop();},
++            5=>if let Control::Table(t)=&mut p.controls[1]{t.common.vertical_offset=1;},
++            6=>if let Control::Table(t)=&mut p.controls[1]{t.outer_margin_top=1;},
++            7=>if let Control::Table(t)=&mut p.controls[1]{t.row_count=2;},
++            8=>if let Control::Table(t)=&mut p.controls[1]{t.common.allow_overlap=true;},
++            9=>if let Control::Table(t)=&mut p.controls[2]{t.common.height=101;},
++            10=>if let Control::Table(t)=&mut p.controls[0]{t.common.vert_rel_to=VertRelTo::Para;},
++            11=>p.controls.push(p.controls[2].clone()),
++            12=>p.line_segs[0].line_spacing=-1,
++            13=>p.line_segs[0].vertical_pos=i32::MAX,
++            14=>p.line_segs[0].vertical_pos=-1,
++            15 | 16=>if let Control::Table(t)=&mut p.controls[1]{
++                let mut text=Paragraph::default();text.controls.push(if n==15 {
++                    Control::Footnote(Box::default())
++                }else{Control::Table(Box::default())});t.cells[0].paragraphs.push(text);
++            },
++            17=>if let Control::Table(t)=&mut p.controls[1]{t.outer_margin_bottom=-1;},
++            18=>if let Control::Table(t)=&mut p.controls[2]{t.outer_margin_top=-1;t.common.height=111;},
++            19=>if let Control::Table(t)=&mut p.controls[2]{t.outer_margin_bottom=-1;t.common.height=111;},
++            _=>unreachable!(),
++        }assert!(!eligible(&p),"case {n}");}
++    }
++}
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[95, 182, 208, 39, 2, 38, 94, 234, 133, 143, 190, 208, 119, 12, 125, 116, 138, 169, 138, 101, 218, 105, 41, 134, 47, 158, 186, 211, 176, 95, 58, 162];
++pub(crate) const RESOURCE:[u8;32]=[91, 153, 115, 240, 44, 72, 70, 52, 208, 21, 220, 129, 28, 234, 170, 237, 233, 101, 245, 73, 106, 240, 231, 180, 192, 163, 142, 121, 175, 25, 110, 146];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {

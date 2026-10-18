@@ -24,6 +24,10 @@ const baseline = await loadReviewEngine(process.env.JUEONY_BASELINE_ENGINE_PACKA
 assert.equal(baseline.metadata.sourceId, '7c10dba04ed65742');
 assert.equal(baseline.metadata.wasmSha256, '5772f16df2f56b9378f0a9683f5c46b0a6901ffd68f099aa3e8c1c8c65f5e40f');
 const engine = await loadReviewEngine(process.env.JUEONY_ENGINE_PACKAGE);
+assert.ok(isAbsolute(process.env.JUEONY_FRAME_BASELINE_ENGINE_PACKAGE ?? ''), 'explicit independent frame baseline is required');
+const frameBaseline = await loadReviewEngine(process.env.JUEONY_FRAME_BASELINE_ENGINE_PACKAGE);
+assert.equal(frameBaseline.metadata.sourceId, '3f07621d4728accf');
+assert.equal(frameBaseline.metadata.wasmSha256, 'e432ad3c3d4e324b4ad57d989532bb851c0f72246709a356d458578ad0613698');
 const originalParts = new Map(readOwnedZip(source));
 const results = [], failures = [], observations = [];
 const guardPaths = ['src/adapters/rhwp/preservation.ts', 'src/adapters/rhwp/document-save-layout.ts', 'src/adapters/rhwp/overlap-save-layout.ts'];
@@ -62,7 +66,7 @@ function checked(doc, format) {
     return {bytes, record: {format, sha256: hash(bytes), losses: 0, geometry: 0, semantic: 0, guard: report.status}};
   } finally {artifact.free();}
 }
-let targetText;
+let targetText, independentFrameDelta;
 await scenario('independent saved Hancom target improves initially without edits', () => {
   const old = new baseline.HwpDocument(source), doc = new engine.HwpDocument(source), oracle = new engine.HwpDocument(oracleBytes);
   try {
@@ -75,6 +79,18 @@ await scenario('independent saved Hancom target improves initially without edits
     const oldDiff = compareSnapshots(before, reference), newDiff = compareSnapshots(after, reference);
     assert.equal(oldDiff.geometry.count, 731); assert.ok(newDiff.geometry.count <= 680);
     assert.equal(after.pages, reference.pages);
+    const frameDoc = new frameBaseline.HwpDocument(source);
+    try {
+      const frameBefore = snapshot(frameDoc);
+      independentFrameDelta = differences(frameBefore.layout, after.layout, 0.2);
+      assert.equal(independentFrameDelta.length, 90, 'separately observed physical frame correction');
+      assert.ok(independentFrameDelta.every(d => typeof d.before === 'number' && typeof d.after === 'number' && d.path.endsWith('["y"]')));
+      const targetPages = new Set([...targetRuns(frameBefore), ...targetRuns(after)].map(r => r.page));
+      assert.ok(independentFrameDelta.every(d => !targetPages.has(Number(/^\$\[(\d+)\]/.exec(d.path)?.[1]))), 'every changed frame field is disjoint from the target-cell pages');
+      assert.deepEqual(targetRuns(frameBefore), targetRuns(after), 'full target-cell geometry and content are unaffected by this independent frame correction');
+      observations.push({name: 'exact independent frame delta', frameBaseline: frameBaseline.metadata,
+        differences: independentFrameDelta, sha256: hash(JSON.stringify(independentFrameDelta)), targetPages: [...targetPages]});
+    } finally {frameDoc.free();}
     targetText = targetRuns(after).map(r => r.text).join(''); assert.equal([...targetText].length, 93);
     observations.push({name: 'initial oracle', before: compact(oldDiff), after: compact(newDiff), remainingAbsoluteTargetDelta: absoluteTargetDelta, completeHancomParity: newDiff.status === 'SAME_WITHIN_PUBLISHED_CONTRACT'});
     return {baselineDifferences: oldDiff.geometry.count, candidateDifferences: newDiff.geometry.count, affectedHorizontalAndLocalRowDifferences: 0, remainingAbsoluteTargetDelta: absoluteTargetDelta};
@@ -117,14 +133,16 @@ const policies = [
 for (const [name, path, mutate] of policies) await scenario(`${name} cannot acquire ordinary scalar correction`, () => {
   const parts = new Map(originalParts), before = decoder.decode(parts.get(path)), after = mutate(before);
   assert.notEqual(after, before, 'the negative input must actually change'); parts.set(path, encoder.encode(after));
-  const bytes = writeOwnedZip([...parts]), old = new baseline.HwpDocument(bytes), doc = new engine.HwpDocument(bytes);
+  const bytes = writeOwnedZip([...parts]), old = new baseline.HwpDocument(bytes), doc = new engine.HwpDocument(bytes), frame = new frameBaseline.HwpDocument(bytes);
   try {
     const beforeState = snapshot(old), afterState = snapshot(doc), c = compareSnapshots(beforeState, afterState);
-    assert.equal(c.geometry.count, 0, 'no new rendering ownership under an unsupported policy');
+    assert.equal(differences(beforeState.layout, snapshot(frame).layout, 0.2).length, 0, 'old and frame baselines agree under this unsupported cell policy');
+    assert.deepEqual(c.geometry.differences, independentFrameDelta, 'every whole-document delta must exactly equal the separately verified disjoint frame change');
+    assert.deepEqual(targetRuns(afterState), targetRuns(beforeState), 'unsupported target retains every published layout field');
     assert.equal(doc.getTextFileUnicode(), old.getTextFileUnicode());
     assert.deepEqual(targetStarts(afterState), targetStarts(beforeState));
-    return {inputSha256: hash(bytes), baselineStarts: targetStarts(beforeState), candidateStarts: targetStarts(afterState), geometry: 0};
-  } finally {old.free(); doc.free();}
+    return {inputSha256: hash(bytes), baselineStarts: targetStarts(beforeState), candidateStarts: targetStarts(afterState), wholeDocumentGeometryDifferences: c.geometry.count, targetRowChanges: 0, exactIndependentFrameDeltaMatched: true};
+  } finally {old.free(); doc.free(); frame.free();}
 });
 
 for (const atStart of [true, false]) await scenario(`${atStart ? 'prefix' : 'tail'} real edits, mixed codecs, history and caret`, () => {
@@ -166,7 +184,7 @@ await scenario('source files and existing strict guards remain immutable', async
 });
 const verifierSha256 = hash(await readFile(fileURLToPath(import.meta.url)));
 const report = {verifierSha256, sourceHashes: guardsBefore, engine: engine.metadata, baseline: baseline.metadata, source: {path: sourcePath, sha256: sourceSha256}, oracle: {path: oraclePath, sha256: oracleSha256},
-  scope: 'Owned integer GulimChe advances in ordinary horizontal BREAK cells, unchanged physical row allocation. Uses saved Hancom evidence; no Hancom/UI/COM invocation. No sample/font/document bytes written.',
+  scope: 'Owned integer GulimChe advances in ordinary horizontal BREAK cells, unchanged physical row allocation. Independent frame-only changes require a separately pinned baseline and exact whole-vector equality, disjoint from target pages. Uses saved Hancom evidence; no Hancom/UI/COM invocation. No sample/font/document bytes written.',
   completeHancomParity: false, geometryTolerance: 0.2, results, failures, observations, guardFingerprints: guardsBefore,
   limitations: ['Remaining original Python3 differences are reported; this is not a whole-document parity completion.', 'Original MCST missing-glyph and 15-versus-16-page initial parity remain separate work.', 'Manual/unsupported glyph, wrapping, grid and compression policies do not gain new row ownership.']};
 await writeFile(join(out, 'result.json'), JSON.stringify(report, null, 2) + '\n');

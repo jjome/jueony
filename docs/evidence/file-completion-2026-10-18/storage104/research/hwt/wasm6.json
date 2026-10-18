@@ -1,0 +1,38 @@
+{
+  "scope": "Existing WASM primitives on owned fixture; private guarded Session not publicly exported or UI integrated. No Hancom, desktop, browser, vendor documents, actual application IDB recovery or OS source-file write verified.",
+  "pkg": "C:/Users/jjome/Documents/work/jueony/build/rhwp-engine/source-3f07621d4728accf/pkg",
+  "engine": {
+    "wasmSha256": "e432ad3c3d4e324b4ad57d989532bb851c0f72246709a356d458578ad0613698",
+    "jsSha256": "5b10dbb379d8d609e466b816ccf25697d87a376f0e17481f63e4d9ef0156c57a"
+  },
+  "sourceSha256": "07febf7eb1077d6334c07774dd41c043e496c2ac0b186600b39e562aec2eced4",
+  "outputSha256": "c1fc0ca25cc9eae23a36b35b1ab7e68a1d791ad2aebee6b8b386ad005584acd2",
+  "pages": 1,
+  "cases": [
+    {
+      "name": "own real BodyText has two separately named ClickHere fields",
+      "passed": true
+    },
+    {
+      "name": "one field edit preserves complete unrelated field DTO and IDs",
+      "passed": true
+    },
+    {
+      "name": "real native snapshot Undo/Redo restores all field DTOs",
+      "passed": true
+    },
+    {
+      "name": "same HWT CFB export/reopen has zero content loss and exact entire published layout",
+      "passed": true
+    },
+    {
+      "name": "real strict extractor proves HWT flag and all three original packed XMLTemplate streams exact",
+      "passed": true
+    },
+    {
+      "name": "input bytes immutable and new output written under a fresh own artifact path",
+      "passed": true
+    }
+  ],
+  "failures": 0
+}

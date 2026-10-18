@@ -1,0 +1,155 @@
+{
+  "engine": {
+    "pkg": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-625990fd59af9440\\pkg",
+    "sourceId": "625990fd59af9440",
+    "wasmSha256": "f52bcba9f0a19be7a427de401d14f7f1920d32552293e9e95282e64d4805f2e8",
+    "jsSha256": "5b10dbb379d8d609e466b816ccf25697d87a376f0e17481f63e4d9ef0156c57a"
+  },
+  "fixtureManifestSha256": "f2688418d358f78e2932100296c7969871e6c4931c29151eedf650ffbc976f67",
+  "provider": "actual-WASM export; synthetic receipts only for explicit malformed-receipt negative guards",
+  "wasmSourceGuards": [
+    {
+      "name": "invalid-container",
+      "status": "REJECTED",
+      "sourceUnchanged": true
+    },
+    {
+      "name": "allocation-budget",
+      "status": "REJECTED",
+      "sourceUnchanged": true
+    },
+    {
+      "name": "missing-template-flag",
+      "status": "REJECTED",
+      "sourceUnchanged": true
+    },
+    {
+      "name": "encrypted",
+      "status": "REJECTED",
+      "sourceUnchanged": true
+    },
+    {
+      "name": "distribution",
+      "status": "REJECTED",
+      "sourceUnchanged": true
+    },
+    {
+      "name": "drm",
+      "status": "REJECTED",
+      "sourceUnchanged": true
+    },
+    {
+      "name": "public-key",
+      "status": "REJECTED",
+      "sourceUnchanged": true
+    }
+  ],
+  "wasmRequests": [
+    {
+      "sourceSha256": "1805d68ae0af16b140afc29c6767c21fb334c5317b6b491b90ad60daed9bdacb",
+      "bytes": 20480,
+      "status": "ACCEPTED"
+    },
+    {
+      "sourceSha256": "1805d68ae0af16b140afc29c6767c21fb334c5317b6b491b90ad60daed9bdacb",
+      "bytes": 20480,
+      "status": "ACCEPTED"
+    },
+    {
+      "sourceSha256": "1805d68ae0af16b140afc29c6767c21fb334c5317b6b491b90ad60daed9bdacb",
+      "bytes": 20480,
+      "status": "ACCEPTED"
+    },
+    {
+      "sourceSha256": "3ae625057387535132d920e50a5189921e6f527501f2b6ee7dddd4046bbfa40d",
+      "bytes": 19,
+      "status": "REJECTED",
+      "error": "HWT_CFB_INVALID"
+    }
+  ],
+  "optionalInstalled": {
+    "requested": false,
+    "count": 0,
+    "inputs": []
+  },
+  "results": [
+    {
+      "name": "actual WASM own CFB receipt resolves exact Name/SchemaXPath while exposing no body write capability",
+      "status": "PASS"
+    },
+    {
+      "name": "missing engine capability rejects rather than pretending ordinary XML support",
+      "status": "PASS"
+    },
+    {
+      "name": "source ownership, readOnly, version and fixed stream receipt defects all reject",
+      "status": "PASS"
+    },
+    {
+      "name": "mapping Name mismatch and XPath injection reject after real DOM namespace parsing",
+      "status": "PASS"
+    },
+    {
+      "name": "opaque CFB copies are byte exact, isolated from caller and every returned copy",
+      "status": "PASS"
+    },
+    {
+      "name": "malformed response, allocation limits, DTD and unsupported roots cannot become read success",
+      "status": "PASS"
+    },
+    {
+      "name": "actual XML UI opens independent HWT inspector and preserves dirty XML/history/recovery bytes",
+      "status": "PASS"
+    },
+    {
+      "name": "XML dialog without an engine HWT capability keeps the entry disabled and honest",
+      "status": "PASS"
+    },
+    {
+      "name": "owned source bytes remain unchanged with zero external requests or browser errors",
+      "status": "PASS"
+    }
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "scope": "Actual hash-verified WASM fixed-path extractor + production TS domain/adapter in isolated headless browser. Tracked own fixture and entire independent Native DTO compared without projection. Mandatory suite has no installed/Python/build-source dependency. Synthetic malformed receipts are separate adapter guards. Installed XML only transient memory; output is counts/filenames, no vendor XML. Own actual nested XML/HWT DOM dialog, dirty history/checkpoint and allocation preflight tested. Optional installed corpus is classified only when explicitly requested; the known21 cohort has a supported16/unsupported5 bounded mapping profile, with its original all21 failure preserved. WASM executes in the Node host through an exposed test bridge; no claim of production iframe integration until the parent combined profile is tested. No native UI/field edits/template save/XSL/general-XSD support claim.",
+  "sourceHashes": [
+    {
+      "path": "src/adapters/xml/hwt-template95.ts",
+      "sha256": "6f9d7b7a6e4c719d432378b87aafc6fec368c46aa82b62c4715e3a1232cc3360"
+    },
+    {
+      "path": "src/modules/xml-documents/public/hwt-template95.ts",
+      "sha256": "816388376425e4a0529d158ec34cd0e197fec6f223f2c49a0471acc4b4b4d169"
+    },
+    {
+      "path": "src/adapters/xml/browser-parser.ts",
+      "sha256": "d501b25f13660836bd10d0551040beccba28bd52a1b7a783966a628a87c37ab3"
+    },
+    {
+      "path": "src/ui/xml-document-dialog.ts",
+      "sha256": "b388ac11291857ea12a6a99fdaccb50967b40cd2fa5fc7fc58a1515d3fc2aed2"
+    },
+    {
+      "path": "src/adapters/storage/xml-recovery.ts",
+      "sha256": "26fa94ff799300a9271154f403794cbe4904596611aa5a657f5e7053dc4426b5"
+    },
+    {
+      "path": "src/modules/xml-documents/domain/hwt-mapping95.ts",
+      "sha256": "309cc604dd1d2a3aa35fac3fcce9413b9cd99c91fd3c9cfcf48b9d139045f354"
+    },
+    {
+      "path": "src/ui/hwt-template95-dialog.ts",
+      "sha256": "ef12d0ff8fea4ab14da588e8136ef440a6abbfbb06df9f502ff0f5b90033c122"
+    }
+  ],
+  "inputSha256": {
+    "ownHwt": "1805d68ae0af16b140afc29c6767c21fb334c5317b6b491b90ad60daed9bdacb",
+    "nativeOracle": "98602e972e2c190dd7c482257a5d26ebdfe93d1568acc425997113410500ea04",
+    "actualWasmReceipt": "b25935036025a6934b20b4b8b93d130417926b2f1c31e1ea570f233f75b22064"
+  },
+  "verifierSha256": "cdc1847cfe29c1e54f02a9db166c3d545bbca770df667c423207d172a74f2646",
+  "bundleSha256": "682bffaf0f7e2c286a45767a2487fe5cdd755e895f2f6f10987327567f0f88e7"
+}

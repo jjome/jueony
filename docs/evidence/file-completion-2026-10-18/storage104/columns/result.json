@@ -1,0 +1,4180 @@
+{
+  "createdAt": "2026-10-18T09:31:21.941Z",
+  "results": [
+    "historical Hancom pair: full comparison plus independent original OLE date differences",
+    "frozen historical Hancom layout remains the exact oracle",
+    "support/column2.hwp: strict hwp save/reopen twice; active document unchanged",
+    "support/column2.hwp: strict hwpx save/reopen twice; active document unchanged",
+    "hancom-current/column2.hwp: strict hwp save/reopen twice; active document unchanged",
+    "hancom-current/column2.hwp: strict hwpx save/reopen twice; active document unchanged",
+    "support/column2.hwp: actual insert, snapshot Undo/Redo, strict both-format repeated storage",
+    "hancom-current/column2.hwp: actual insert, snapshot Undo/Redo, strict both-format repeated storage",
+    "valid disk source layout unchanged and strict storage repaired: single_column",
+    "valid disk source layout unchanged and strict storage repaired: three_columns",
+    "valid disk source layout unchanged and strict storage repaired: rtl",
+    "valid disk source layout unchanged and strict storage repaired: distribute",
+    "valid disk source layout unchanged and strict storage repaired: unequal_columns",
+    "valid disk source layout unchanged and strict storage repaired: asymmetric_margin",
+    "existing fixed actual pair unchanged: caption-prepared.hwp",
+    "existing fixed actual pair unchanged: multiline-prepared.hwp",
+    "existing fixed actual pair unchanged: negative.hwp",
+    "existing fixed actual pair unchanged: offset.hwp",
+    "existing fixed actual pair unchanged: plain.hwp",
+    "existing fixed actual pair unchanged: positive-prepared.hwp",
+    "existing fixed actual pair unchanged: superscript.hwp",
+    "existing fixed actual pair unchanged: three.hwp",
+    "existing fixed actual pair unchanged: two.hwp",
+    "existing fixed actual pair unchanged: unicode.hwp"
+  ],
+  "failures": [],
+  "observations": [
+    {
+      "name": "actual-column2",
+      "classification": "INDEPENDENT_FILES_HAVE_DISTINCT_STORED_DATES",
+      "leftInputSha256": "ca9301227aa08d9ec57355989e5ec7a817399c2f9c5eee6c849a3942cae88de6",
+      "rightInputSha256": "18e6f0cb207077016119167a3ff6b17c4b6970ce201172b6e21615b8335461d8",
+      "independentLeft": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134167468730440000",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+            "rawFileTime100ns": "134167468730440000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134167468730440000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "independentRight": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "71ebad8bf87c8c4cda3f4a3f61675e89d6b3c512742223c720c1a119beed6ac9",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134366809623930000",
+            "utc": "2026-10-17T03:22:42.3930000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "c2e2138d90eb9f58f9420a114bf66d6cad870e3db0c1d344f1fb2b3db2a205dc",
+            "rawFileTime100ns": "134366809623930000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134366809623930000",
+            "state": "value",
+            "utc": "2026-10-17T03:22:42.3930000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "comparison": {
+        "status": "DIFFERENT_OR_UNREADABLE",
+        "formats": {
+          "before": "hwp",
+          "after": "hwp"
+        },
+        "pages": {
+          "before": 1,
+          "after": 1,
+          "equal": true
+        },
+        "semantic": {
+          "count": 2,
+          "differences": [
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"fileTime100ns\"]",
+              "before": "134167468730440000",
+              "after": "134366809623930000",
+              "kind": "value"
+            },
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"utc\"]",
+              "before": "2026-02-28T10:07:53.0440000Z",
+              "after": "2026-10-17T03:22:42.3930000Z",
+              "kind": "value"
+            }
+          ],
+          "readIssues": {
+            "before": [],
+            "after": []
+          }
+        },
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 0,
+          "differences": []
+        },
+        "unverified": [
+          "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+          "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+          "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+          "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+        ],
+        "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality."
+      }
+    },
+    {
+      "name": "support/column2.hwp",
+      "format": "hwp",
+      "round": 1,
+      "sha256": "ca9301227aa08d9ec57355989e5ec7a817399c2f9c5eee6c849a3942cae88de6",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "support/column2.hwp",
+      "format": "hwp",
+      "round": 2,
+      "sha256": "ca9301227aa08d9ec57355989e5ec7a817399c2f9c5eee6c849a3942cae88de6",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "support/column2.hwp",
+      "format": "hwpx",
+      "round": 1,
+      "sha256": "1f214dc6017ccc4ddd81fd794a5e9b74e2fe0c5aa82ffa409d039535c1f9ec36",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "support/column2.hwp",
+      "format": "hwpx",
+      "round": 2,
+      "sha256": "5147dd8b1bd21fed13696f1a80206927255d290de42e8db107985efe250529f1",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "hancom-current/column2.hwp",
+      "format": "hwp",
+      "round": 1,
+      "sha256": "bc799d3f831a139370ade3bad6e574d5b7e8f7770c6caf92a48279f9242edcba",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "hancom-current/column2.hwp",
+      "format": "hwp",
+      "round": 2,
+      "sha256": "bc799d3f831a139370ade3bad6e574d5b7e8f7770c6caf92a48279f9242edcba",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "hancom-current/column2.hwp",
+      "format": "hwpx",
+      "round": 1,
+      "sha256": "00bf4c3a852650165cfd04b90ebe7aca3c5f934b2a7c92f0fa5c7952fe9c830f",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "hancom-current/column2.hwp",
+      "format": "hwpx",
+      "round": 2,
+      "sha256": "273d14f8e6e4ba75e3859191f2da53d72c3f871bb408de2a51c89716b93a7c3a",
+      "semantic": 0,
+      "geometry": 0
+    },
+    {
+      "name": "same-source-older-engine:single_column",
+      "classification": "OLDER_ENGINE_CANNOT_OBSERVE_STORED_DATES",
+      "leftInputSha256": "9778d66926e3138ce4bb51fadfd16173ee3d439aeec0a02a8f0af34b7fac0f3b",
+      "rightInputSha256": "9778d66926e3138ce4bb51fadfd16173ee3d439aeec0a02a8f0af34b7fac0f3b",
+      "independentLeft": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134167468730440000",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+            "rawFileTime100ns": "134167468730440000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134167468730440000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "independentRight": null,
+      "comparison": {
+        "status": "DIFFERENT_OR_UNREADABLE",
+        "formats": {
+          "before": "hwp",
+          "after": "hwp"
+        },
+        "pages": {
+          "before": 1,
+          "after": 1,
+          "equal": true
+        },
+        "semantic": {
+          "count": 1,
+          "differences": [
+            {
+              "path": "$[\"stored-date-information\"]",
+              "before": {
+                "created": {
+                  "fileTime100ns": "134167468416830000",
+                  "state": "value",
+                  "utc": "2026-02-28T10:07:21.6830000Z"
+                },
+                "editingDuration": {
+                  "state": "absent"
+                },
+                "lastPrinted": {
+                  "fileTime100ns": "0",
+                  "state": "value",
+                  "utc": "1601-01-01T00:00:00.0000000Z"
+                },
+                "modified": {
+                  "fileTime100ns": "134167468730440000",
+                  "state": "value",
+                  "utc": "2026-02-28T10:07:53.0440000Z"
+                }
+              },
+              "kind": "removed"
+            }
+          ],
+          "readIssues": {
+            "before": [],
+            "after": []
+          }
+        },
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 0,
+          "differences": []
+        },
+        "unverified": [
+          "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+          "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+          "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+          "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다.",
+          "현재 엔진은 원본에 기록된 날짜·편집 시간의 보존 읽기 API를 제공하지 않습니다."
+        ],
+        "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality."
+      }
+    },
+    {
+      "name": "single_column",
+      "format": "hwp",
+      "repairedStorage": true,
+      "baselineGeometry": 0
+    },
+    {
+      "name": "single_column",
+      "format": "hwpx",
+      "repairedStorage": true,
+      "baselineGeometry": 0
+    },
+    {
+      "name": "same-source-older-engine:three_columns",
+      "classification": "OLDER_ENGINE_CANNOT_OBSERVE_STORED_DATES",
+      "leftInputSha256": "db5e90e7217912d928d26d87d0e2877bf2682e90d1812bdef274aee83972cb79",
+      "rightInputSha256": "db5e90e7217912d928d26d87d0e2877bf2682e90d1812bdef274aee83972cb79",
+      "independentLeft": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134167468730440000",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+            "rawFileTime100ns": "134167468730440000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134167468730440000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "independentRight": null,
+      "comparison": {
+        "status": "DIFFERENT_OR_UNREADABLE",
+        "formats": {
+          "before": "hwp",
+          "after": "hwp"
+        },
+        "pages": {
+          "before": 1,
+          "after": 1,
+          "equal": true
+        },
+        "semantic": {
+          "count": 1,
+          "differences": [
+            {
+              "path": "$[\"stored-date-information\"]",
+              "before": {
+                "created": {
+                  "fileTime100ns": "134167468416830000",
+                  "state": "value",
+                  "utc": "2026-02-28T10:07:21.6830000Z"
+                },
+                "editingDuration": {
+                  "state": "absent"
+                },
+                "lastPrinted": {
+                  "fileTime100ns": "0",
+                  "state": "value",
+                  "utc": "1601-01-01T00:00:00.0000000Z"
+                },
+                "modified": {
+                  "fileTime100ns": "134167468730440000",
+                  "state": "value",
+                  "utc": "2026-02-28T10:07:53.0440000Z"
+                }
+              },
+              "kind": "removed"
+            }
+          ],
+          "readIssues": {
+            "before": [],
+            "after": []
+          }
+        },
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 0,
+          "differences": []
+        },
+        "unverified": [
+          "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+          "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+          "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+          "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다.",
+          "현재 엔진은 원본에 기록된 날짜·편집 시간의 보존 읽기 API를 제공하지 않습니다."
+        ],
+        "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality."
+      }
+    },
+    {
+      "name": "three_columns",
+      "format": "hwp",
+      "repairedStorage": true,
+      "baselineGeometry": 0
+    },
+    {
+      "name": "three_columns",
+      "format": "hwpx",
+      "repairedStorage": true,
+      "baselineGeometry": 0
+    },
+    {
+      "name": "same-source-older-engine:rtl",
+      "classification": "OLDER_ENGINE_CANNOT_OBSERVE_STORED_DATES",
+      "leftInputSha256": "f48a715a8ea47cb8081b735f89512dbac9209a0e99ab5d68877396d030056742",
+      "rightInputSha256": "f48a715a8ea47cb8081b735f89512dbac9209a0e99ab5d68877396d030056742",
+      "independentLeft": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134167468730440000",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+            "rawFileTime100ns": "134167468730440000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134167468730440000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "independentRight": null,
+      "comparison": {
+        "status": "DIFFERENT_OR_UNREADABLE",
+        "formats": {
+          "before": "hwp",
+          "after": "hwp"
+        },
+        "pages": {
+          "before": 1,
+          "after": 1,
+          "equal": true
+        },
+        "semantic": {
+          "count": 1,
+          "differences": [
+            {
+              "path": "$[\"stored-date-information\"]",
+              "before": {
+                "created": {
+                  "fileTime100ns": "134167468416830000",
+                  "state": "value",
+                  "utc": "2026-02-28T10:07:21.6830000Z"
+                },
+                "editingDuration": {
+                  "state": "absent"
+                },
+                "lastPrinted": {
+                  "fileTime100ns": "0",
+                  "state": "value",
+                  "utc": "1601-01-01T00:00:00.0000000Z"
+                },
+                "modified": {
+                  "fileTime100ns": "134167468730440000",
+                  "state": "value",
+                  "utc": "2026-02-28T10:07:53.0440000Z"
+                }
+              },
+              "kind": "removed"
+            }
+          ],
+          "readIssues": {
+            "before": [],
+            "after": []
+          }
+        },
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 0,
+          "differences": []
+        },
+        "unverified": [
+          "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+          "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+          "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+          "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다.",
+          "현재 엔진은 원본에 기록된 날짜·편집 시간의 보존 읽기 API를 제공하지 않습니다."
+        ],
+        "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality."
+      }
+    },
+    {
+      "name": "rtl",
+      "format": "hwp",
+      "repairedStorage": true,
+      "baselineGeometry": 0
+    },
+    {
+      "name": "rtl",
+      "format": "hwpx",
+      "repairedStorage": true,
+      "baselineGeometry": 0
+    },
+    {
+      "name": "same-source-older-engine:distribute",
+      "classification": "OLDER_ENGINE_CANNOT_OBSERVE_STORED_DATES",
+      "leftInputSha256": "9b35480c316ee54c1d5ef0ecbe4a2d5223b7321143aded0dbab43b1d5f569452",
+      "rightInputSha256": "9b35480c316ee54c1d5ef0ecbe4a2d5223b7321143aded0dbab43b1d5f569452",
+      "independentLeft": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134167468730440000",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+            "rawFileTime100ns": "134167468730440000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134167468730440000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "independentRight": null,
+      "comparison": {
+        "status": "DIFFERENT_OR_UNREADABLE",
+        "formats": {
+          "before": "hwp",
+          "after": "hwp"
+        },
+        "pages": {
+          "before": 1,
+          "after": 1,
+          "equal": true
+        },
+        "semantic": {
+          "count": 1,
+          "differences": [
+            {
+              "path": "$[\"stored-date-information\"]",
+              "before": {
+                "created": {
+                  "fileTime100ns": "134167468416830000",
+                  "state": "value",
+                  "utc": "2026-02-28T10:07:21.6830000Z"
+                },
+                "editingDuration": {
+                  "state": "absent"
+                },
+                "lastPrinted": {
+                  "fileTime100ns": "0",
+                  "state": "value",
+                  "utc": "1601-01-01T00:00:00.0000000Z"
+                },
+                "modified": {
+                  "fileTime100ns": "134167468730440000",
+                  "state": "value",
+                  "utc": "2026-02-28T10:07:53.0440000Z"
+                }
+              },
+              "kind": "removed"
+            }
+          ],
+          "readIssues": {
+            "before": [],
+            "after": []
+          }
+        },
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 0,
+          "differences": []
+        },
+        "unverified": [
+          "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+          "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+          "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+          "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다.",
+          "현재 엔진은 원본에 기록된 날짜·편집 시간의 보존 읽기 API를 제공하지 않습니다."
+        ],
+        "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality."
+      }
+    },
+    {
+      "name": "distribute",
+      "format": "hwp",
+      "repairedStorage": true,
+      "baselineGeometry": 0
+    },
+    {
+      "name": "distribute",
+      "format": "hwpx",
+      "repairedStorage": true,
+      "baselineGeometry": 0
+    },
+    {
+      "name": "same-source-older-engine:unequal_columns",
+      "classification": "OLDER_ENGINE_CANNOT_OBSERVE_STORED_DATES",
+      "leftInputSha256": "2ee00d6ef1ea96b9c5fb7fd4f2a4a278b0d676dcb964afdae2dcb49b0ab4016e",
+      "rightInputSha256": "2ee00d6ef1ea96b9c5fb7fd4f2a4a278b0d676dcb964afdae2dcb49b0ab4016e",
+      "independentLeft": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134167468730440000",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+            "rawFileTime100ns": "134167468730440000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134167468730440000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "independentRight": null,
+      "comparison": {
+        "status": "DIFFERENT_OR_UNREADABLE",
+        "formats": {
+          "before": "hwp",
+          "after": "hwp"
+        },
+        "pages": {
+          "before": 1,
+          "after": 1,
+          "equal": true
+        },
+        "semantic": {
+          "count": 1,
+          "differences": [
+            {
+              "path": "$[\"stored-date-information\"]",
+              "before": {
+                "created": {
+                  "fileTime100ns": "134167468416830000",
+                  "state": "value",
+                  "utc": "2026-02-28T10:07:21.6830000Z"
+                },
+                "editingDuration": {
+                  "state": "absent"
+                },
+                "lastPrinted": {
+                  "fileTime100ns": "0",
+                  "state": "value",
+                  "utc": "1601-01-01T00:00:00.0000000Z"
+                },
+                "modified": {
+                  "fileTime100ns": "134167468730440000",
+                  "state": "value",
+                  "utc": "2026-02-28T10:07:53.0440000Z"
+                }
+              },
+              "kind": "removed"
+            }
+          ],
+          "readIssues": {
+            "before": [],
+            "after": []
+          }
+        },
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 0,
+          "differences": []
+        },
+        "unverified": [
+          "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+          "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+          "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+          "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다.",
+          "현재 엔진은 원본에 기록된 날짜·편집 시간의 보존 읽기 API를 제공하지 않습니다."
+        ],
+        "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality."
+      }
+    },
+    {
+      "name": "unequal_columns",
+      "format": "hwp",
+      "repairedStorage": true,
+      "baselineGeometry": 0
+    },
+    {
+      "name": "unequal_columns",
+      "format": "hwpx",
+      "repairedStorage": true,
+      "baselineGeometry": 0
+    },
+    {
+      "name": "same-source-older-engine:asymmetric_margin",
+      "classification": "OLDER_ENGINE_CANNOT_OBSERVE_STORED_DATES",
+      "leftInputSha256": "3ba817fe20afa035739168eddcd1eae6fa08e7bd28b4322db3ec7f6f1f85830e",
+      "rightInputSha256": "3ba817fe20afa035739168eddcd1eae6fa08e7bd28b4322db3ec7f6f1f85830e",
+      "independentLeft": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134167468730440000",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+            "rawFileTime100ns": "134167468730440000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134167468730440000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "independentRight": null,
+      "comparison": {
+        "status": "DIFFERENT_OR_UNREADABLE",
+        "formats": {
+          "before": "hwp",
+          "after": "hwp"
+        },
+        "pages": {
+          "before": 1,
+          "after": 1,
+          "equal": true
+        },
+        "semantic": {
+          "count": 1,
+          "differences": [
+            {
+              "path": "$[\"stored-date-information\"]",
+              "before": {
+                "created": {
+                  "fileTime100ns": "134167468416830000",
+                  "state": "value",
+                  "utc": "2026-02-28T10:07:21.6830000Z"
+                },
+                "editingDuration": {
+                  "state": "absent"
+                },
+                "lastPrinted": {
+                  "fileTime100ns": "0",
+                  "state": "value",
+                  "utc": "1601-01-01T00:00:00.0000000Z"
+                },
+                "modified": {
+                  "fileTime100ns": "134167468730440000",
+                  "state": "value",
+                  "utc": "2026-02-28T10:07:53.0440000Z"
+                }
+              },
+              "kind": "removed"
+            }
+          ],
+          "readIssues": {
+            "before": [],
+            "after": []
+          }
+        },
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 0,
+          "differences": []
+        },
+        "unverified": [
+          "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+          "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+          "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+          "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다.",
+          "현재 엔진은 원본에 기록된 날짜·편집 시간의 보존 읽기 API를 제공하지 않습니다."
+        ],
+        "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality."
+      }
+    },
+    {
+      "name": "asymmetric_margin",
+      "format": "hwp",
+      "repairedStorage": true,
+      "baselineGeometry": 0
+    },
+    {
+      "name": "asymmetric_margin",
+      "format": "hwpx",
+      "repairedStorage": true,
+      "baselineGeometry": 0
+    },
+    {
+      "name": "historical-pair:caption-prepared.hwp",
+      "classification": "INDEPENDENT_FILES_HAVE_DISTINCT_STORED_DATES",
+      "leftInputSha256": "5d13d39b186e1851383b044a783441fb77c43a6b95855c4a3b136c94a9b891c8",
+      "rightInputSha256": "cb54492b848fa13f5637f94e9f8ea5a379b8bd1bc460b291fa8c40369d190d3f",
+      "independentLeft": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134167468730440000",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+            "rawFileTime100ns": "134167468730440000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134167468730440000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "independentRight": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "d47e13842dc9c9f50b8d6f8d2ebfe1408ada8a5241a8dc9d0dc8599fdb19fa44",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134366807100220000",
+            "utc": "2026-10-17T03:18:30.0220000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "7d65578b9b4682123af93681593e90be5a4442e6e711ec0a29c01ceeccc36a09",
+            "rawFileTime100ns": "134366807100220000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134366807100220000",
+            "state": "value",
+            "utc": "2026-10-17T03:18:30.0220000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "comparison": {
+        "status": "DIFFERENT_OR_UNREADABLE",
+        "formats": {
+          "before": "hwp",
+          "after": "hwp"
+        },
+        "pages": {
+          "before": 1,
+          "after": 1,
+          "equal": true
+        },
+        "semantic": {
+          "count": 2,
+          "differences": [
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"fileTime100ns\"]",
+              "before": "134167468730440000",
+              "after": "134366807100220000",
+              "kind": "value"
+            },
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"utc\"]",
+              "before": "2026-02-28T10:07:53.0440000Z",
+              "after": "2026-10-17T03:18:30.0220000Z",
+              "kind": "value"
+            }
+          ],
+          "readIssues": {
+            "before": [],
+            "after": []
+          }
+        },
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 0,
+          "differences": []
+        },
+        "unverified": [
+          "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+          "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+          "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+          "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+        ],
+        "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality."
+      }
+    },
+    {
+      "name": "historical-pair:multiline-prepared.hwp",
+      "classification": "INDEPENDENT_FILES_HAVE_DISTINCT_STORED_DATES",
+      "leftInputSha256": "f1094b81038cbde1fa6797ba4f72a6f5d4c4005b63e87225c0125ebe40e5e8bf",
+      "rightInputSha256": "79f55c9258e3fb35e280a39c5793a1d3682336184d92069b52f110ea00e33fd1",
+      "independentLeft": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134167468730440000",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+            "rawFileTime100ns": "134167468730440000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134167468730440000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "independentRight": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "d5aec84bd652824bed1b2186683ca28df3783919199b55cde304372df10a0c00",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134366806194570000",
+            "utc": "2026-10-17T03:16:59.4570000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "b2fc61dc3d02435bd88bb3d54d0424a1193a0407cfb6a329055aee1bd560378e",
+            "rawFileTime100ns": "134366806194570000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134366806194570000",
+            "state": "value",
+            "utc": "2026-10-17T03:16:59.4570000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "comparison": {
+        "status": "DIFFERENT_OR_UNREADABLE",
+        "formats": {
+          "before": "hwp",
+          "after": "hwp"
+        },
+        "pages": {
+          "before": 1,
+          "after": 1,
+          "equal": true
+        },
+        "semantic": {
+          "count": 2,
+          "differences": [
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"fileTime100ns\"]",
+              "before": "134167468730440000",
+              "after": "134366806194570000",
+              "kind": "value"
+            },
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"utc\"]",
+              "before": "2026-02-28T10:07:53.0440000Z",
+              "after": "2026-10-17T03:16:59.4570000Z",
+              "kind": "value"
+            }
+          ],
+          "readIssues": {
+            "before": [],
+            "after": []
+          }
+        },
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 0,
+          "differences": []
+        },
+        "unverified": [
+          "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+          "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+          "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+          "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+        ],
+        "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality."
+      }
+    },
+    {
+      "name": "historical-pair:negative.hwp",
+      "classification": "INDEPENDENT_FILES_HAVE_DISTINCT_STORED_DATES",
+      "leftInputSha256": "a5c62e0b6cff7a9ba3445517bfc2f47494f841d75694f45400911fb115c3eec8",
+      "rightInputSha256": "dc461180cab9f4a89c21f89eb1d8b3ba44f0fdde78d57e767d9af4553230b7f9",
+      "independentLeft": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134167468730440000",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+            "rawFileTime100ns": "134167468730440000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134167468730440000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "independentRight": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "c6d476fc59baeac72985b7705a1dd9cc57b7b78effd3051d465d906b273c30a6",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134366808925860000",
+            "utc": "2026-10-17T03:21:32.5860000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "84774070cedcac3f1a3c6761692f87d068cd7dea48b109151a11db00b70974bd",
+            "rawFileTime100ns": "134366808925860000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134366808925860000",
+            "state": "value",
+            "utc": "2026-10-17T03:21:32.5860000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "comparison": {
+        "status": "DIFFERENT_OR_UNREADABLE",
+        "formats": {
+          "before": "hwp",
+          "after": "hwp"
+        },
+        "pages": {
+          "before": 1,
+          "after": 1,
+          "equal": true
+        },
+        "semantic": {
+          "count": 2,
+          "differences": [
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"fileTime100ns\"]",
+              "before": "134167468730440000",
+              "after": "134366808925860000",
+              "kind": "value"
+            },
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"utc\"]",
+              "before": "2026-02-28T10:07:53.0440000Z",
+              "after": "2026-10-17T03:21:32.5860000Z",
+              "kind": "value"
+            }
+          ],
+          "readIssues": {
+            "before": [],
+            "after": []
+          }
+        },
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 0,
+          "differences": []
+        },
+        "unverified": [
+          "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+          "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+          "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+          "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+        ],
+        "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality."
+      }
+    },
+    {
+      "name": "historical-pair:offset.hwp",
+      "classification": "INDEPENDENT_FILES_HAVE_DISTINCT_STORED_DATES",
+      "leftInputSha256": "9934d639cff4127a630007137d816a5d404e8375ac2d34105a174e2f894f2c8d",
+      "rightInputSha256": "592741e04a853fb4942992d300b4addc99d9bfc532e00bb197532e80086cfd02",
+      "independentLeft": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134167468730440000",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+            "rawFileTime100ns": "134167468730440000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134167468730440000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "independentRight": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "cac6c980f4186014a0f05591b4a368e12df1926e2cff127d9aa0c5462f52fb9c",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134366803658780000",
+            "utc": "2026-10-17T03:12:45.8780000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "bd367f3e2eb8800af00cd11f25c0305bc3f2df0844851baf85efbf9ae2c05384",
+            "rawFileTime100ns": "134366803658780000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134366803658780000",
+            "state": "value",
+            "utc": "2026-10-17T03:12:45.8780000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "comparison": {
+        "status": "DIFFERENT_OR_UNREADABLE",
+        "formats": {
+          "before": "hwp",
+          "after": "hwp"
+        },
+        "pages": {
+          "before": 1,
+          "after": 1,
+          "equal": true
+        },
+        "semantic": {
+          "count": 2,
+          "differences": [
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"fileTime100ns\"]",
+              "before": "134167468730440000",
+              "after": "134366803658780000",
+              "kind": "value"
+            },
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"utc\"]",
+              "before": "2026-02-28T10:07:53.0440000Z",
+              "after": "2026-10-17T03:12:45.8780000Z",
+              "kind": "value"
+            }
+          ],
+          "readIssues": {
+            "before": [],
+            "after": []
+          }
+        },
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 0,
+          "differences": []
+        },
+        "unverified": [
+          "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+          "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+          "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+          "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+        ],
+        "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality."
+      }
+    },
+    {
+      "name": "historical-pair:plain.hwp",
+      "classification": "INDEPENDENT_FILES_HAVE_DISTINCT_STORED_DATES",
+      "leftInputSha256": "a55d3e1f59e2d249f1d63214731dbb026d3f8101f217f3a385cee9002bc476e4",
+      "rightInputSha256": "822891383045c0614203624d918a8150bd2c122f6863d86cdaebe69df9d9f80b",
+      "independentLeft": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134167468730440000",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+            "rawFileTime100ns": "134167468730440000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134167468730440000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "independentRight": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "082d0c6e3cde64c05953f4991cf40f76262498337ee779fc450f9a8c82c2b2d2",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134366804188780000",
+            "utc": "2026-10-17T03:13:38.8780000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "119218edede3b3c4f9a793d526d8707cbad0a79707bc9a4657fd72387493f327",
+            "rawFileTime100ns": "134366804188780000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134366804188780000",
+            "state": "value",
+            "utc": "2026-10-17T03:13:38.8780000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "comparison": {
+        "status": "DIFFERENT_OR_UNREADABLE",
+        "formats": {
+          "before": "hwp",
+          "after": "hwp"
+        },
+        "pages": {
+          "before": 1,
+          "after": 1,
+          "equal": true
+        },
+        "semantic": {
+          "count": 2,
+          "differences": [
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"fileTime100ns\"]",
+              "before": "134167468730440000",
+              "after": "134366804188780000",
+              "kind": "value"
+            },
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"utc\"]",
+              "before": "2026-02-28T10:07:53.0440000Z",
+              "after": "2026-10-17T03:13:38.8780000Z",
+              "kind": "value"
+            }
+          ],
+          "readIssues": {
+            "before": [],
+            "after": []
+          }
+        },
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 0,
+          "differences": []
+        },
+        "unverified": [
+          "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+          "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+          "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+          "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+        ],
+        "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality."
+      }
+    },
+    {
+      "name": "historical-pair:positive-prepared.hwp",
+      "classification": "INDEPENDENT_FILES_HAVE_DISTINCT_STORED_DATES",
+      "leftInputSha256": "c17099d199c20bb42ca6e546f8ac392bd150466d089a7188fae60690ca9ab526",
+      "rightInputSha256": "0e62fcc37b7bc2e0c915a4bd789f04ac008afa55ee949561aef7d7e87fad855f",
+      "independentLeft": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134167468730440000",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+            "rawFileTime100ns": "134167468730440000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134167468730440000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "independentRight": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "84622375ae31d03d39924adb42667a90678f31133e39840b3be7df29c6244927",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134366808023700000",
+            "utc": "2026-10-17T03:20:02.3700000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "53785c6a12140823e8e4802cc887842a478bd925337a0099e438b718296bc0ab",
+            "rawFileTime100ns": "134366808023700000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134366808023700000",
+            "state": "value",
+            "utc": "2026-10-17T03:20:02.3700000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "comparison": {
+        "status": "DIFFERENT_OR_UNREADABLE",
+        "formats": {
+          "before": "hwp",
+          "after": "hwp"
+        },
+        "pages": {
+          "before": 1,
+          "after": 1,
+          "equal": true
+        },
+        "semantic": {
+          "count": 2,
+          "differences": [
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"fileTime100ns\"]",
+              "before": "134167468730440000",
+              "after": "134366808023700000",
+              "kind": "value"
+            },
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"utc\"]",
+              "before": "2026-02-28T10:07:53.0440000Z",
+              "after": "2026-10-17T03:20:02.3700000Z",
+              "kind": "value"
+            }
+          ],
+          "readIssues": {
+            "before": [],
+            "after": []
+          }
+        },
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 0,
+          "differences": []
+        },
+        "unverified": [
+          "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+          "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+          "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+          "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+        ],
+        "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality."
+      }
+    },
+    {
+      "name": "historical-pair:superscript.hwp",
+      "classification": "INDEPENDENT_FILES_HAVE_DISTINCT_STORED_DATES",
+      "leftInputSha256": "341edb377d7deaacc85e20138e27dfedfd33356b54eee14395ffe418f6d485bc",
+      "rightInputSha256": "6514105fcfa00b80445d49e443f134dabdef752301d700299afd05f5eb099d1b",
+      "independentLeft": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134167468730440000",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+            "rawFileTime100ns": "134167468730440000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134167468730440000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "independentRight": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "6f16174a2c6289335de281c8cb902c0ca0e757caf7a4973e06632e29f7ea2c4f",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134366805393590000",
+            "utc": "2026-10-17T03:15:39.3590000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "4802b6b35d63fde9476545f5d40076ebe978d4485d4e5a3e430861b65c98a71b",
+            "rawFileTime100ns": "134366805393590000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134366805393590000",
+            "state": "value",
+            "utc": "2026-10-17T03:15:39.3590000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "comparison": {
+        "status": "DIFFERENT_OR_UNREADABLE",
+        "formats": {
+          "before": "hwp",
+          "after": "hwp"
+        },
+        "pages": {
+          "before": 1,
+          "after": 1,
+          "equal": true
+        },
+        "semantic": {
+          "count": 2,
+          "differences": [
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"fileTime100ns\"]",
+              "before": "134167468730440000",
+              "after": "134366805393590000",
+              "kind": "value"
+            },
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"utc\"]",
+              "before": "2026-02-28T10:07:53.0440000Z",
+              "after": "2026-10-17T03:15:39.3590000Z",
+              "kind": "value"
+            }
+          ],
+          "readIssues": {
+            "before": [],
+            "after": []
+          }
+        },
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 0,
+          "differences": []
+        },
+        "unverified": [
+          "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+          "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+          "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+          "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+        ],
+        "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality."
+      }
+    },
+    {
+      "name": "historical-pair:three.hwp",
+      "classification": "INDEPENDENT_FILES_HAVE_DISTINCT_STORED_DATES",
+      "leftInputSha256": "5def8e265d9c9c1a6658656288d74d3db4163ad52d5f2a25960aea8036b3cebf",
+      "rightInputSha256": "1bf78dd66298d83e357a542dcab315e26f533da95535e66cb0a96ffbe52627a5",
+      "independentLeft": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134167468730440000",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+            "rawFileTime100ns": "134167468730440000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134167468730440000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "independentRight": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "5d51c14f8d40940efeda86219e96baa3b33606bce4e9521b77ff43cd7d21625f",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134366803102870000",
+            "utc": "2026-10-17T03:11:50.2870000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "e6b9b560c06064a415ca11de781456f106445ce47dbae186ac727ea3b56c3ff8",
+            "rawFileTime100ns": "134366803102870000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134366803102870000",
+            "state": "value",
+            "utc": "2026-10-17T03:11:50.2870000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "comparison": {
+        "status": "DIFFERENT_OR_UNREADABLE",
+        "formats": {
+          "before": "hwp",
+          "after": "hwp"
+        },
+        "pages": {
+          "before": 1,
+          "after": 1,
+          "equal": true
+        },
+        "semantic": {
+          "count": 2,
+          "differences": [
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"fileTime100ns\"]",
+              "before": "134167468730440000",
+              "after": "134366803102870000",
+              "kind": "value"
+            },
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"utc\"]",
+              "before": "2026-02-28T10:07:53.0440000Z",
+              "after": "2026-10-17T03:11:50.2870000Z",
+              "kind": "value"
+            }
+          ],
+          "readIssues": {
+            "before": [],
+            "after": []
+          }
+        },
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 0,
+          "differences": []
+        },
+        "unverified": [
+          "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+          "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+          "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+          "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+        ],
+        "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality."
+      }
+    },
+    {
+      "name": "historical-pair:two.hwp",
+      "classification": "INDEPENDENT_FILES_HAVE_DISTINCT_STORED_DATES",
+      "leftInputSha256": "81c425b627ce2b23d456fd95ac6772a657bf2bb153e782e4d7a81180f47261c9",
+      "rightInputSha256": "4462b8950f4d5602eb8d13392f870aa6e632f9b2ab968514e58972ecb429ee84",
+      "independentLeft": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134167468730440000",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+            "rawFileTime100ns": "134167468730440000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134167468730440000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "independentRight": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "3250700d4a55e9c55f03268a71863be8d210c909d4ea07f3b9f288ef7a653ab8",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134366802542040000",
+            "utc": "2026-10-17T03:10:54.2040000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "07dec8861acb9800def6635340957979a5cd1a532b645701fe77b107a2133b9b",
+            "rawFileTime100ns": "134366802542040000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134366802542040000",
+            "state": "value",
+            "utc": "2026-10-17T03:10:54.2040000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "comparison": {
+        "status": "DIFFERENT_OR_UNREADABLE",
+        "formats": {
+          "before": "hwp",
+          "after": "hwp"
+        },
+        "pages": {
+          "before": 1,
+          "after": 1,
+          "equal": true
+        },
+        "semantic": {
+          "count": 2,
+          "differences": [
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"fileTime100ns\"]",
+              "before": "134167468730440000",
+              "after": "134366802542040000",
+              "kind": "value"
+            },
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"utc\"]",
+              "before": "2026-02-28T10:07:53.0440000Z",
+              "after": "2026-10-17T03:10:54.2040000Z",
+              "kind": "value"
+            }
+          ],
+          "readIssues": {
+            "before": [],
+            "after": []
+          }
+        },
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 0,
+          "differences": []
+        },
+        "unverified": [
+          "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+          "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+          "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+          "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+        ],
+        "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality."
+      }
+    },
+    {
+      "name": "historical-pair:unicode.hwp",
+      "classification": "INDEPENDENT_FILES_HAVE_DISTINCT_STORED_DATES",
+      "leftInputSha256": "afe3853b0e33a30a225470007f103edda4b516e289b86a549986f33f943f4bee",
+      "rightInputSha256": "c6154b3b868d126f6936f0da0eb816d3538e2ca29616fb319cf61c42d949db40",
+      "independentLeft": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "8c7b0fb08eb91b575294d6bd145765f0f8695562ee08646a9cdfe22c10791929",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134167468730440000",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "db17d3c5d3730c888f20f696e2bf894da4a79af833468c6a5b313ddd0b1913f9",
+            "rawFileTime100ns": "134167468730440000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134167468730440000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:53.0440000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "independentRight": {
+        "summaryPath": "\u0005HwpSummaryInformation",
+        "summarySha256": "59f1bf774d9697dd1ad683313ca24c906301297ac18a1032c71dd35d95203dad",
+        "value": {
+          "created": {
+            "state": "value",
+            "fileTime100ns": "134167468416830000",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "state": "value",
+            "fileTime100ns": "134366804842370000",
+            "utc": "2026-10-17T03:14:44.2370000Z"
+          },
+          "lastPrinted": {
+            "state": "value",
+            "fileTime100ns": "0",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        },
+        "records": [
+          {
+            "key": "created",
+            "pid": 12,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "76902d4bdc1620d93a092dfe907e0936b5f413c4e5e8341a48d638907e7bed09",
+            "rawFileTime100ns": "134167468416830000",
+            "state": "value"
+          },
+          {
+            "key": "modified",
+            "pid": 13,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "e1b0afb75c20788422b90ca9944d7b2abca36c5a5e98d46357dcb3f2492c4719",
+            "rawFileTime100ns": "134366804842370000",
+            "state": "value"
+          },
+          {
+            "key": "lastPrinted",
+            "pid": 11,
+            "type": 64,
+            "rawBytes": 12,
+            "rawSha256": "85cf635cd7cd5fa08663a65dafc102a262844c362971189af855031e0a2c09f9",
+            "rawFileTime100ns": "0",
+            "state": "value"
+          },
+          {
+            "key": "editingDuration",
+            "pid": 10,
+            "state": "absent"
+          }
+        ],
+        "api": {
+          "created": {
+            "fileTime100ns": "134167468416830000",
+            "state": "value",
+            "utc": "2026-02-28T10:07:21.6830000Z"
+          },
+          "modified": {
+            "fileTime100ns": "134366804842370000",
+            "state": "value",
+            "utc": "2026-10-17T03:14:44.2370000Z"
+          },
+          "lastPrinted": {
+            "fileTime100ns": "0",
+            "state": "value",
+            "utc": "1601-01-01T00:00:00.0000000Z"
+          },
+          "editingDuration": {
+            "state": "absent"
+          }
+        }
+      },
+      "comparison": {
+        "status": "DIFFERENT_OR_UNREADABLE",
+        "formats": {
+          "before": "hwp",
+          "after": "hwp"
+        },
+        "pages": {
+          "before": 1,
+          "after": 1,
+          "equal": true
+        },
+        "semantic": {
+          "count": 2,
+          "differences": [
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"fileTime100ns\"]",
+              "before": "134167468730440000",
+              "after": "134366804842370000",
+              "kind": "value"
+            },
+            {
+              "path": "$[\"stored-date-information\"][\"modified\"][\"utc\"]",
+              "before": "2026-02-28T10:07:53.0440000Z",
+              "after": "2026-10-17T03:14:44.2370000Z",
+              "kind": "value"
+            }
+          ],
+          "readIssues": {
+            "before": [],
+            "after": []
+          }
+        },
+        "geometry": {
+          "tolerance": 0.2,
+          "count": 0,
+          "differences": []
+        },
+        "unverified": [
+          "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+          "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+          "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+          "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+        ],
+        "note": "Semantic values use the unchanged production preservation reader. Geometry compares every published control/text layout field with 0.2 numeric tolerance, no projection. Hancom provides no serializer loss report; none is fabricated. This compares both files through this engine and does not by itself prove native Hancom screen or print equality."
+      }
+    }
+  ],
+  "candidate": {
+    "builtAt": "2026-10-18T09:28:43.5715905Z",
+    "jsSha256": "5b10dbb379d8d609e466b816ccf25697d87a376f0e17481f63e4d9ef0156c57a",
+    "optimized": false,
+    "sourceId": "625990fd59af9440",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "buildMode": "wsl-review-no-opt",
+    "patches": [
+      {
+        "name": "border-fill-identity.patch",
+        "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c"
+      },
+      {
+        "name": "default-tabs.patch",
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+      },
+      {
+        "name": "document-insertion.patch",
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+      },
+      {
+        "name": "master-page-editing.patch",
+        "sha256": "b04c7d682e105e3f37f72a18c1b4bb01cbf085424e3219f3919fd8c891dc26c2"
+      },
+      {
+        "name": "merged-table-transpose.patch",
+        "sha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768"
+      },
+      {
+        "name": "note-query-json.patch",
+        "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562"
+      },
+      {
+        "name": "page-border-entries.patch",
+        "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f"
+      },
+      {
+        "name": "page-border-inclusion.patch",
+        "sha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e"
+      },
+      {
+        "name": "page-border-region.patch",
+        "sha256": "ea98aed9ad8568699b802c5f46e4964fe524ba7634bc978d71fe10f44e1d7412"
+      },
+      {
+        "name": "page-border-z-image.patch",
+        "sha256": "97ccd3c9eac24c42b0844fc65e5804b232d3bef9929a6fd5de329cdd007b173b"
+      },
+      {
+        "name": "section-split.patch",
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+      },
+      {
+        "name": "style-reference-deletion.patch",
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+      },
+      {
+        "name": "style-reference-order.patch",
+        "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce"
+      },
+      {
+        "name": "style-shape-stories.patch",
+        "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af"
+      },
+      {
+        "name": "table-creation-consistency.patch",
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+      },
+      {
+        "name": "zz-line-number-settings.patch",
+        "sha256": "4cb8ce4a8d49864f53c3ff95fdfc8ef3e0342b09f86cd525dfb9aa102e2dee72"
+      },
+      {
+        "name": "zzz-page-body-delete.patch",
+        "sha256": "54bf1697627ec92c4379fb8ca314f9bf9d99c2207bf9e90859d35c7324be2e83"
+      },
+      {
+        "name": "zzzz-page-body-copy.patch",
+        "sha256": "45f3331d992f3799dad1f076bfd6d237d8c989541ea510d888e4afb5407749db"
+      },
+      {
+        "name": "zzzzz-page-body-paper-paste.patch",
+        "sha256": "4df977f851378597848aa60581957c123e6565ebf04f9412052dbfdabb2c43a0"
+      },
+      {
+        "name": "zzzzzz-page-body-style-paste.patch",
+        "sha256": "168c4c158bc0db3e71230903eae0b1ae71092a1a139f2ad5747712f95127bd75"
+      },
+      {
+        "name": "zzzzzzz-page-body-image-paste.patch",
+        "sha256": "ac08a167a376bae3e1e890f8109f2f9552ce952abe7882712f813183597ce57a"
+      },
+      {
+        "name": "zzzzzzzz-empty-section-remove.patch",
+        "sha256": "d49d3acc5bc0b3049415e17233a7f7a7249792f6500d475ce6cd39d3ad14d590"
+      },
+      {
+        "name": "zzzzzzzzz-hwpx-body-caret.patch",
+        "sha256": "c073ab44d5460f92915ea6493a791d2cbf24bb60ad66eca5033be0fc9835ac56"
+      },
+      {
+        "name": "zzzzzzzzzz-agent-page-background.patch",
+        "sha256": "74104eca6a40a3a7f06ad6d20ed8f44f816f0c153a2be40fdf584b61fc9ba907"
+      },
+      {
+        "name": "zzzzzzzzzzz-agent-header-footer.patch",
+        "sha256": "415fa55bc5fe0c4f49a7dce025723067022d7bdef076a9fb48b7f456c30cb91a"
+      },
+      {
+        "name": "zzzzzzzzzzzz-agent-paragraph-tabs.patch",
+        "sha256": "d15949747520d51020433aca32539f79c5a8cc0dfdad9de95db221dae651b311"
+      },
+      {
+        "name": "zzzzzzzzzzzzz-agent-paragraph-decoration.patch",
+        "sha256": "2adf2bba46d11a6ca97ce838da1d329c627c8532812674b7329aaef3cdb544fb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzz-agent-paragraph-lists.patch",
+        "sha256": "06e1af9e90e0c54da772a533f9c2ac5279db059c37fb3612c189e0d7e1c7692d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzz-agent-basic-bullets.patch",
+        "sha256": "03138686d9faa51fcf335f1b6299a294248031d36ca079da5346e52d0b531a35"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzz-agent-numbering-clone.patch",
+        "sha256": "a79207f328ca0521515344c018554ccc20092142dabaa5ba413ff162408fa567"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzz-agent-basic-numbering.patch",
+        "sha256": "66ac344e90a16b3e447e97bd6a593edbc7b9e024313cc40f81f2611838f3b102"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzz-agent-paragraph-outline.patch",
+        "sha256": "dfe19d3083f6a4222440ce558b5451f2568cf57b211bcc19babb508c1db2022e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzz-agent-style-metadata.patch",
+        "sha256": "53c6a573df6e8f1d0af4f388dad4e624a700006ad38f7a1de820eabc1d6d44cb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzz-whole-table-edited-host.patch",
+        "sha256": "f90714f601227bba000d63be77e5ac9f3985d192e613990984544b2f70b0f603"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzz-table-default-padding-reflow.patch",
+        "sha256": "903260c4c371a2a1d4b0afa72f8f0e1f191db936bd6e055a974a0a4295badf0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzz-hidden-paragraph-page-owner.patch",
+        "sha256": "13df5f1c5493ef4560866f3806be6a3bd2c748e50a1fc531dac686994e310b6b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-following-table-flow-owner.patch",
+        "sha256": "251cb5ee2d06a1a78732d7c01839bf4bf596a5376ce5af8637b50d8c0633f897"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-memo-tail-owner.patch",
+        "sha256": "5f4eafa802c6dd9dde96a1def6e187ef1be5b3f7e9a99cf8d4569458d0d0bca0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzz-table-outer-margin-owner.patch",
+        "sha256": "6132e26aa3a5b14f506f425d79930882a5c48092eac8e96bc4c8735cc8d42db3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-table-tail-snapshot.patch",
+        "sha256": "11a853d99a9278fd94e2c573d384f3826c53b00a433bcb6b9fa04fb24e344f0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzz-conversion-semantic-storage.patch",
+        "sha256": "65f3e6e87bb1030f2e565cfd96d36b85dc4065de8fb3615a2db24a9d4121a092"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-zone-observation.patch",
+        "sha256": "9dc3ffd29ada303898ab21268fb72e23b1b56bcf7c589a11687716848e80bb70"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-textbox-alignment-storage.patch",
+        "sha256": "b9d8791a5e9b7b5e6b5d1bd794f3a7ebe9012c7bc8403c49333217cfef434122"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-footnote-style-identity.patch",
+        "sha256": "867d4ac34306a4edfb4360b2d9d51d5bb5bc43dedf5abd6919cedeba427894e6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-merged-row-height.patch",
+        "sha256": "6364cba702decf8160fea341932f5b0df6481c51fe135c2d77b6cae1c52192a3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-session-story-evidence.patch",
+        "sha256": "4f59265ba0740ad570a7dcbdd964a06a1d99075052713e70d9c1b755b83caab8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-visible-tail-snapshot.patch",
+        "sha256": "10dbdd14e2603200bec9ebcf34417c224d4f77624fc83ddf76a3c0cb28e8931e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-root-line-snapshot.patch",
+        "sha256": "509a2d497b5fe4c651b26954b6874e1a95ac4a2655391f88446f70f6735c4ef0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-overlap-origin.patch",
+        "sha256": "35f34ab3553354c4920e3ba51810770a997561fc896b40c73fb012f371dcfd96"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-reflow-markers.patch",
+        "sha256": "21e7d77e4f93072efc71718c2ea9e1ce15ff26a0fe343378b474a16a136856c8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-whole-table-flow.patch",
+        "sha256": "4f376b5c88ae4d26c9ec890ebefd352ac004e94b292afbc36ffdbf95525f514a"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-typeset-advance-grid.patch",
+        "sha256": "4b55713647b5567ec88b39853b8a28efe4811bd08025ccf9c1f20c4554732638"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-width.patch",
+        "sha256": "1cc54a1f9c37f31d034f66f8b0fbc4dedd3bffff7fb7094b824ebb88ae187183"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-marker-whole-flow.patch",
+        "sha256": "9b954250e8ddbc67cbfd9eda3898deb1f892de63483e3d9ae8eed2d9b4c574d7"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-origin-hwpx-query.patch",
+        "sha256": "e419b33ca35e25c63b2ec40ba99cec33a7dee2690d3035e070cca2c9efa23581"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-nonflow-prefix-band-origin.patch",
+        "sha256": "7b9f054bb6bf0af8094451cf85797adb6ab9fe06fcfa6641453111bd3561bdf6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-line-cache.patch",
+        "sha256": "2629f5073faed3d9b4f121cb71116143879085396b3ef3421e26a6c4adff64a0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-wrap-separator-spacing.patch",
+        "sha256": "54f38a977dc703e75cc42f3383705182b546efb30f1b3e2fd9669c6c70296aa3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-textbox-storage-flag.patch",
+        "sha256": "6ed35f5dfc24f0f47146b7fa7d1cb24fe3a56bc14f365eb0e7063dd7d85bdaf6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-paragraph-2016-heading-case.patch",
+        "sha256": "ed6f58a7201a4d8514d459b74d90dee6d880d33746e37509d14ba0475e3bfcb3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp-tab-placeholder-line-cache.patch",
+        "sha256": "68ad036c239042df4ae77d6750d1c69323bf1fa499193fc6d47bd2f0ef2b37ce"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-width-declared-height-preservation.patch",
+        "sha256": "5d4bb9a8907fe988741163510618d410b778cb24bfc45b51392780fc1ccc7fd8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-explicit-none-shadow-storage.patch",
+        "sha256": "38c3ddba6b4844f82ac8a3f752dabbabb55c74d31cc3d150c1142d57f57e00e9"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-table-content-height-sync.patch",
+        "sha256": "368dd198802b630da92549f7bc4ddbcb2e6bf7a0822090519ec07a1134a9fe0b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-closed-whole-stack-lineage.patch",
+        "sha256": "5e9b4dce4da46d62427105ce3a70362050f17392388aa507ad54d7894df31bd2"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-single-table-outer-origin.patch",
+        "sha256": "12acf5353ab12f366e04496d2d7c59093d80a7bc60293257d8fa603910de0a05"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-document-summary-metadata.patch",
+        "sha256": "69b458e6f48c0145df400b19981658575d08f88a183ae6975dd67bcf0b146f06"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-live-table-outer-origin.patch",
+        "sha256": "9b896b2d541e1dd002bd240742d707b0274f95d436bbb0d321600bd63a350845"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-offset-visible-edge.patch",
+        "sha256": "0232256c9982e2e20c0d3149abf67b1d0cbf30f9a4b03150086ded05202da0d3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwpx-native-font-descriptors.patch",
+        "sha256": "bdc2692b6fd6e60c70dd8c5880aa4357f67521e6fbef6d7253fe9fc332c0ab3b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stored-numbering-extension-codec.patch",
+        "sha256": "5b01b627c57b3772b93b41269d3a5e644d6003775c6b7c4ab5efd187a43f7ea1"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-table-fullwidth-source-owner.patch",
+        "sha256": "ef63e25bb950f0a8ceb4c70b1987c6b3dca739a4465acdca3a217d41d18f9d54"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-numbering-observed-disk-canonical.patch",
+        "sha256": "88aa2f62cf5601168d46c2ce0e73083f31f845ca9f125f146f3d114465bfb134"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-negative-table-frame-source-owner.patch",
+        "sha256": "2b8d16e911e3af30b9abfb93da33717de6e007b8e971046d5f6ca45a27c44d8d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-unknown-hwpx-control-loss-report.patch",
+        "sha256": "f2004c1fe26b90b03d2e407380536a3d8eebf9529d8bc67c083c75a9b1f4ceec"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-column-stack-source-owner.patch",
+        "sha256": "8ccf80a00cb0aae3c0a71619fb0ad6b55a537ac11c785ece4a4ad568c74efa7d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-reconstructed-body-shared-spacing-origin.patch",
+        "sha256": "1e828ab70011758f833ea59644383f6af9fa3d30400d2d220d9fd410f11f6af5"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-caption-lifecycle-and-partial-properties.patch",
+        "sha256": "0b8c8820f1c3444af15a7336034c3dc952461de6f5c758bb75992660b58b35af"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-transpose-row-measurement-owner.patch",
+        "sha256": "9d13fa135315a0fc550a2b7de3bff62d765816c217f66a4e9143e8283704b51b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-spacing-semantic-boundary.patch",
+        "sha256": "b9e980825c6e772149c9170203da78f183d762537d784f8f6757f253de911da6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-breakable-table-frame.patch",
+        "sha256": "2b9ec8c1ba628c5a3eeb51b15685c47cb8fc69973aac5a060e14ea12b10ea132"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-created-table-neighbor-line-provenance.patch",
+        "sha256": "a72b92a073a39731ea61ac07957d2176a0c5fd2bab6b331bfdcefbdbea229653"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-shape-insertion-wrap-owner.patch",
+        "sha256": "51cff004ad5b68a5fa2724dc200fc8c2b4e7059574e27df390eee0c75a3f8666"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-declared-ttf-substitute-font-roundtrip.patch",
+        "sha256": "51f8f19453df44f9ed01f4345e168f7fc7a48fc3acc104b79f8ab91c29a4dc56"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-explicit-hwp5-origin-return-contract.patch",
+        "sha256": "d79998f948f265811568404926e71f71462b123544b3f0fda9f567a826140bfd"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-versioned-xml-cache-storage-roundtrip.patch",
+        "sha256": "e6c14fa951415784b31a3c4a2720916fe1fe5afaa13b9300f6273c0c6a2e636c"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-verified-gulimche-integral-advance.patch",
+        "sha256": "1b7673af7d20093b9a43e9b157670926f2042c9b7b7156f87a9afecc2099d67b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-note-shape-i32-wire-contract.patch",
+        "sha256": "a36d4572ea1f4527e8e5dda7c5211983776f3ee8f8c45cdf8b76f69e3d77bbfe"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-summary-standard-property-stream.patch",
+        "sha256": "ae4ee5b45c06032203b114ace797bf3ead878b476ea490b7aeb3854fb06bf8cd"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-reconstruction-page-basis-and-edit-lifetime.patch",
+        "sha256": "1db1c17717df23c546c32410efe14492aaf6db0b3bfe2243627a30891411a242"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-text-direction-preservation-and-loss-report.patch",
+        "sha256": "24c68a269cc0bd6e4d0dd8d7c3709a37d42fc4b766dbcde97e422ffe251dd113"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-raw-resource-namespace-ownership.patch",
+        "sha256": "173fef15aa86447c81aa9d7d5b124363fa3256e033a4478636bf1cf3386e7955"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-font-source-type-authority-and-loss.patch",
+        "sha256": "fce0993013db18c8baba21c08b04dd1f4ce5943b02191d42f1ab200c81edfa06"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-three-column-frame-ownership.patch",
+        "sha256": "df1739fea178622af38a6231ab089c3505aeeb104e03f46e5a44b898e272eb58"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stable-session-story-font-provenance.patch",
+        "sha256": "9613f523b63dc89e0aa23914055c5b0b7674a2515f2c076ecef0c178894bdd59"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-package-metadata-script-preservation.patch",
+        "sha256": "c1fb2a2434fd8be8ad8dcbb65dc75641ef141527f7518c7c89db256b1fb42944"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-fragment-namespace-budget.patch",
+        "sha256": "cf00cf74b97a358c8d484a1b840bc41e7ff51de0724bb4b1a1cca42979f6ee5b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-metadata-namespace-read-write.patch",
+        "sha256": "7ece8bcc570b5c83994efcad39661fd57a327a49fa06cb756d022abca8bd58ee"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-source-synthetic-rows.patch",
+        "sha256": "eedb6ac4c47befebfdeb727099222b83a5b7b6550d55b98546a050366b9b5f4c"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-proportional-column-persistence.patch",
+        "sha256": "43bf22538170222f634321eae536026c969af85d956cc3ebb8d2b9901a6b7e12"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-lazy-native-row-render-context.patch",
+        "sha256": "0dc75bc3af81aa8c3383b7310a6d21fb3e326112b4bb279328d59956bd115b59"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-native-row-storage.patch",
+        "sha256": "fe5a4e24a75dde2b3a04ac76be2faad4ab2ab4be42cc01b546f9e0edd9be6af2"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stored-timestamp-preservation.patch",
+        "sha256": "cb15394d9b2d1a47993a7ffb532ab88aa0068c36ffd379584cc143d268e8c3be"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-ambiguous-xml-date-passthrough.patch",
+        "sha256": "fda0e900c01341e6c62125357fe511d6bdede536085c40619f8c6979e86a8dfd"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwt-readonly-template.patch",
+        "sha256": "4d2433093d62f249c7ff80281fb8744786dda1095b13734b585f056ff6d31b99"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-native-cell-layout.patch",
+        "sha256": "5954884f693ae5b9dcdd1cbed05a2b612e553ff3be6bebf55f08aa6a89240eb0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-canonical-story-information.patch",
+        "sha256": "29e9d6685c43cb94b07402afe284c3ec23a93b8c7f52e88ec29cd1a2f3a2802a"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-authored-floating-host-gap.patch",
+        "sha256": "27f01c6f3db3894c3d37851e1f0418c815fbecd8d629fdccd04c3132650b4ffc"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-mixed-axis-floating-host-gap.patch",
+        "sha256": "c257180759f7016a212b2948c403a3d792bb0ea6374a38c45c5e6a4c49fc5d71"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-floating-host-row-end-bounds.patch",
+        "sha256": "23c31ad5aaf055f1f1f8d04b65249d4143ecd1f54571a5d68b55584dc35b7091"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-column-table-frame.patch",
+        "sha256": "7fca6e23ad10b90935c4f782dfe521a092dcd7d7ec7f126b67bb8d2de080ac23"
+      }
+    ],
+    "wasmSha256": "f52bcba9f0a19be7a427de401d14f7f1920d32552293e9e95282e64d4805f2e8"
+  },
+  "baseline": {
+    "jsSha256": "72828c03b5b92948e0acd45bcd3de0263c8570bfbfaeab283eb5998e1b72b22d",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "wasmSha256": "5772f16df2f56b9378f0a9683f5c46b0a6901ffd68f099aa3e8c1c8c65f5e40f",
+    "buildMode": "wsl-review-no-opt",
+    "patches": [
+      {
+        "name": "border-fill-identity.patch",
+        "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c"
+      },
+      {
+        "name": "default-tabs.patch",
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+      },
+      {
+        "name": "document-insertion.patch",
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+      },
+      {
+        "name": "master-page-editing.patch",
+        "sha256": "b04c7d682e105e3f37f72a18c1b4bb01cbf085424e3219f3919fd8c891dc26c2"
+      },
+      {
+        "name": "merged-table-transpose.patch",
+        "sha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768"
+      },
+      {
+        "name": "note-query-json.patch",
+        "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562"
+      },
+      {
+        "name": "page-border-entries.patch",
+        "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f"
+      },
+      {
+        "name": "page-border-inclusion.patch",
+        "sha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e"
+      },
+      {
+        "name": "page-border-region.patch",
+        "sha256": "ea98aed9ad8568699b802c5f46e4964fe524ba7634bc978d71fe10f44e1d7412"
+      },
+      {
+        "name": "page-border-z-image.patch",
+        "sha256": "97ccd3c9eac24c42b0844fc65e5804b232d3bef9929a6fd5de329cdd007b173b"
+      },
+      {
+        "name": "section-split.patch",
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+      },
+      {
+        "name": "style-reference-deletion.patch",
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+      },
+      {
+        "name": "style-reference-order.patch",
+        "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce"
+      },
+      {
+        "name": "style-shape-stories.patch",
+        "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af"
+      },
+      {
+        "name": "table-creation-consistency.patch",
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+      },
+      {
+        "name": "zz-line-number-settings.patch",
+        "sha256": "4cb8ce4a8d49864f53c3ff95fdfc8ef3e0342b09f86cd525dfb9aa102e2dee72"
+      },
+      {
+        "name": "zzz-page-body-delete.patch",
+        "sha256": "54bf1697627ec92c4379fb8ca314f9bf9d99c2207bf9e90859d35c7324be2e83"
+      },
+      {
+        "name": "zzzz-page-body-copy.patch",
+        "sha256": "45f3331d992f3799dad1f076bfd6d237d8c989541ea510d888e4afb5407749db"
+      },
+      {
+        "name": "zzzzz-page-body-paper-paste.patch",
+        "sha256": "4df977f851378597848aa60581957c123e6565ebf04f9412052dbfdabb2c43a0"
+      },
+      {
+        "name": "zzzzzz-page-body-style-paste.patch",
+        "sha256": "168c4c158bc0db3e71230903eae0b1ae71092a1a139f2ad5747712f95127bd75"
+      },
+      {
+        "name": "zzzzzzz-page-body-image-paste.patch",
+        "sha256": "ac08a167a376bae3e1e890f8109f2f9552ce952abe7882712f813183597ce57a"
+      },
+      {
+        "name": "zzzzzzzz-empty-section-remove.patch",
+        "sha256": "d49d3acc5bc0b3049415e17233a7f7a7249792f6500d475ce6cd39d3ad14d590"
+      },
+      {
+        "name": "zzzzzzzzz-hwpx-body-caret.patch",
+        "sha256": "c073ab44d5460f92915ea6493a791d2cbf24bb60ad66eca5033be0fc9835ac56"
+      },
+      {
+        "name": "zzzzzzzzzz-agent-page-background.patch",
+        "sha256": "74104eca6a40a3a7f06ad6d20ed8f44f816f0c153a2be40fdf584b61fc9ba907"
+      },
+      {
+        "name": "zzzzzzzzzzz-agent-header-footer.patch",
+        "sha256": "415fa55bc5fe0c4f49a7dce025723067022d7bdef076a9fb48b7f456c30cb91a"
+      },
+      {
+        "name": "zzzzzzzzzzzz-agent-paragraph-tabs.patch",
+        "sha256": "d15949747520d51020433aca32539f79c5a8cc0dfdad9de95db221dae651b311"
+      },
+      {
+        "name": "zzzzzzzzzzzzz-agent-paragraph-decoration.patch",
+        "sha256": "2adf2bba46d11a6ca97ce838da1d329c627c8532812674b7329aaef3cdb544fb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzz-agent-paragraph-lists.patch",
+        "sha256": "06e1af9e90e0c54da772a533f9c2ac5279db059c37fb3612c189e0d7e1c7692d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzz-agent-basic-bullets.patch",
+        "sha256": "03138686d9faa51fcf335f1b6299a294248031d36ca079da5346e52d0b531a35"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzz-agent-numbering-clone.patch",
+        "sha256": "a79207f328ca0521515344c018554ccc20092142dabaa5ba413ff162408fa567"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzz-agent-basic-numbering.patch",
+        "sha256": "66ac344e90a16b3e447e97bd6a593edbc7b9e024313cc40f81f2611838f3b102"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzz-agent-paragraph-outline.patch",
+        "sha256": "dfe19d3083f6a4222440ce558b5451f2568cf57b211bcc19babb508c1db2022e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzz-agent-style-metadata.patch",
+        "sha256": "53c6a573df6e8f1d0af4f388dad4e624a700006ad38f7a1de820eabc1d6d44cb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzz-whole-table-edited-host.patch",
+        "sha256": "f90714f601227bba000d63be77e5ac9f3985d192e613990984544b2f70b0f603"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzz-table-default-padding-reflow.patch",
+        "sha256": "903260c4c371a2a1d4b0afa72f8f0e1f191db936bd6e055a974a0a4295badf0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzz-hidden-paragraph-page-owner.patch",
+        "sha256": "13df5f1c5493ef4560866f3806be6a3bd2c748e50a1fc531dac686994e310b6b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-following-table-flow-owner.patch",
+        "sha256": "251cb5ee2d06a1a78732d7c01839bf4bf596a5376ce5af8637b50d8c0633f897"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-memo-tail-owner.patch",
+        "sha256": "5f4eafa802c6dd9dde96a1def6e187ef1be5b3f7e9a99cf8d4569458d0d0bca0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzz-table-outer-margin-owner.patch",
+        "sha256": "6132e26aa3a5b14f506f425d79930882a5c48092eac8e96bc4c8735cc8d42db3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-table-tail-snapshot.patch",
+        "sha256": "11a853d99a9278fd94e2c573d384f3826c53b00a433bcb6b9fa04fb24e344f0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzz-conversion-semantic-storage.patch",
+        "sha256": "65f3e6e87bb1030f2e565cfd96d36b85dc4065de8fb3615a2db24a9d4121a092"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-zone-observation.patch",
+        "sha256": "9dc3ffd29ada303898ab21268fb72e23b1b56bcf7c589a11687716848e80bb70"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-textbox-alignment-storage.patch",
+        "sha256": "b9d8791a5e9b7b5e6b5d1bd794f3a7ebe9012c7bc8403c49333217cfef434122"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-footnote-style-identity.patch",
+        "sha256": "867d4ac34306a4edfb4360b2d9d51d5bb5bc43dedf5abd6919cedeba427894e6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-merged-row-height.patch",
+        "sha256": "6364cba702decf8160fea341932f5b0df6481c51fe135c2d77b6cae1c52192a3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-session-story-evidence.patch",
+        "sha256": "4f59265ba0740ad570a7dcbdd964a06a1d99075052713e70d9c1b755b83caab8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-visible-tail-snapshot.patch",
+        "sha256": "10dbdd14e2603200bec9ebcf34417c224d4f77624fc83ddf76a3c0cb28e8931e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-root-line-snapshot.patch",
+        "sha256": "509a2d497b5fe4c651b26954b6874e1a95ac4a2655391f88446f70f6735c4ef0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-overlap-origin.patch",
+        "sha256": "35f34ab3553354c4920e3ba51810770a997561fc896b40c73fb012f371dcfd96"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-reflow-markers.patch",
+        "sha256": "21e7d77e4f93072efc71718c2ea9e1ce15ff26a0fe343378b474a16a136856c8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-whole-table-flow.patch",
+        "sha256": "4f376b5c88ae4d26c9ec890ebefd352ac004e94b292afbc36ffdbf95525f514a"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-typeset-advance-grid.patch",
+        "sha256": "4b55713647b5567ec88b39853b8a28efe4811bd08025ccf9c1f20c4554732638"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-width.patch",
+        "sha256": "1cc54a1f9c37f31d034f66f8b0fbc4dedd3bffff7fb7094b824ebb88ae187183"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-marker-whole-flow.patch",
+        "sha256": "9b954250e8ddbc67cbfd9eda3898deb1f892de63483e3d9ae8eed2d9b4c574d7"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-origin-hwpx-query.patch",
+        "sha256": "e419b33ca35e25c63b2ec40ba99cec33a7dee2690d3035e070cca2c9efa23581"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-nonflow-prefix-band-origin.patch",
+        "sha256": "7b9f054bb6bf0af8094451cf85797adb6ab9fe06fcfa6641453111bd3561bdf6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-line-cache.patch",
+        "sha256": "2629f5073faed3d9b4f121cb71116143879085396b3ef3421e26a6c4adff64a0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-wrap-separator-spacing.patch",
+        "sha256": "54f38a977dc703e75cc42f3383705182b546efb30f1b3e2fd9669c6c70296aa3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-textbox-storage-flag.patch",
+        "sha256": "6ed35f5dfc24f0f47146b7fa7d1cb24fe3a56bc14f365eb0e7063dd7d85bdaf6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-paragraph-2016-heading-case.patch",
+        "sha256": "ed6f58a7201a4d8514d459b74d90dee6d880d33746e37509d14ba0475e3bfcb3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp-tab-placeholder-line-cache.patch",
+        "sha256": "68ad036c239042df4ae77d6750d1c69323bf1fa499193fc6d47bd2f0ef2b37ce"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-width-declared-height-preservation.patch",
+        "sha256": "5d4bb9a8907fe988741163510618d410b778cb24bfc45b51392780fc1ccc7fd8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-explicit-none-shadow-storage.patch",
+        "sha256": "38c3ddba6b4844f82ac8a3f752dabbabb55c74d31cc3d150c1142d57f57e00e9"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-table-content-height-sync.patch",
+        "sha256": "368dd198802b630da92549f7bc4ddbcb2e6bf7a0822090519ec07a1134a9fe0b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-closed-whole-stack-lineage.patch",
+        "sha256": "5e9b4dce4da46d62427105ce3a70362050f17392388aa507ad54d7894df31bd2"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-single-table-outer-origin.patch",
+        "sha256": "12acf5353ab12f366e04496d2d7c59093d80a7bc60293257d8fa603910de0a05"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-document-summary-metadata.patch",
+        "sha256": "69b458e6f48c0145df400b19981658575d08f88a183ae6975dd67bcf0b146f06"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-live-table-outer-origin.patch",
+        "sha256": "9b896b2d541e1dd002bd240742d707b0274f95d436bbb0d321600bd63a350845"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-offset-visible-edge.patch",
+        "sha256": "0232256c9982e2e20c0d3149abf67b1d0cbf30f9a4b03150086ded05202da0d3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwpx-native-font-descriptors.patch",
+        "sha256": "bdc2692b6fd6e60c70dd8c5880aa4357f67521e6fbef6d7253fe9fc332c0ab3b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stored-numbering-extension-codec.patch",
+        "sha256": "5b01b627c57b3772b93b41269d3a5e644d6003775c6b7c4ab5efd187a43f7ea1"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-table-fullwidth-source-owner.patch",
+        "sha256": "ef63e25bb950f0a8ceb4c70b1987c6b3dca739a4465acdca3a217d41d18f9d54"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-numbering-observed-disk-canonical.patch",
+        "sha256": "88aa2f62cf5601168d46c2ce0e73083f31f845ca9f125f146f3d114465bfb134"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-negative-table-frame-source-owner.patch",
+        "sha256": "2b8d16e911e3af30b9abfb93da33717de6e007b8e971046d5f6ca45a27c44d8d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-unknown-hwpx-control-loss-report.patch",
+        "sha256": "f2004c1fe26b90b03d2e407380536a3d8eebf9529d8bc67c083c75a9b1f4ceec"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-column-stack-source-owner.patch",
+        "sha256": "8ccf80a00cb0aae3c0a71619fb0ad6b55a537ac11c785ece4a4ad568c74efa7d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-reconstructed-body-shared-spacing-origin.patch",
+        "sha256": "1e828ab70011758f833ea59644383f6af9fa3d30400d2d220d9fd410f11f6af5"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-caption-lifecycle-and-partial-properties.patch",
+        "sha256": "0b8c8820f1c3444af15a7336034c3dc952461de6f5c758bb75992660b58b35af"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-transpose-row-measurement-owner.patch",
+        "sha256": "9d13fa135315a0fc550a2b7de3bff62d765816c217f66a4e9143e8283704b51b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-spacing-semantic-boundary.patch",
+        "sha256": "b9e980825c6e772149c9170203da78f183d762537d784f8f6757f253de911da6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-breakable-table-frame.patch",
+        "sha256": "2b9ec8c1ba628c5a3eeb51b15685c47cb8fc69973aac5a060e14ea12b10ea132"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-created-table-neighbor-line-provenance.patch",
+        "sha256": "a72b92a073a39731ea61ac07957d2176a0c5fd2bab6b331bfdcefbdbea229653"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-shape-insertion-wrap-owner.patch",
+        "sha256": "51cff004ad5b68a5fa2724dc200fc8c2b4e7059574e27df390eee0c75a3f8666"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-declared-ttf-substitute-font-roundtrip.patch",
+        "sha256": "51f8f19453df44f9ed01f4345e168f7fc7a48fc3acc104b79f8ab91c29a4dc56"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-explicit-hwp5-origin-return-contract.patch",
+        "sha256": "d79998f948f265811568404926e71f71462b123544b3f0fda9f567a826140bfd"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-versioned-xml-cache-storage-roundtrip.patch",
+        "sha256": "e6c14fa951415784b31a3c4a2720916fe1fe5afaa13b9300f6273c0c6a2e636c"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-verified-gulimche-integral-advance.patch",
+        "sha256": "1b7673af7d20093b9a43e9b157670926f2042c9b7b7156f87a9afecc2099d67b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-note-shape-i32-wire-contract.patch",
+        "sha256": "a36d4572ea1f4527e8e5dda7c5211983776f3ee8f8c45cdf8b76f69e3d77bbfe"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-summary-standard-property-stream.patch",
+        "sha256": "ae4ee5b45c06032203b114ace797bf3ead878b476ea490b7aeb3854fb06bf8cd"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-reconstruction-page-basis-and-edit-lifetime.patch",
+        "sha256": "1db1c17717df23c546c32410efe14492aaf6db0b3bfe2243627a30891411a242"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-text-direction-preservation-and-loss-report.patch",
+        "sha256": "24c68a269cc0bd6e4d0dd8d7c3709a37d42fc4b766dbcde97e422ffe251dd113"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-raw-resource-namespace-ownership.patch",
+        "sha256": "173fef15aa86447c81aa9d7d5b124363fa3256e033a4478636bf1cf3386e7955"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-font-source-type-authority-and-loss.patch",
+        "sha256": "fce0993013db18c8baba21c08b04dd1f4ce5943b02191d42f1ab200c81edfa06"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-three-column-frame-ownership.patch",
+        "sha256": "df1739fea178622af38a6231ab089c3505aeeb104e03f46e5a44b898e272eb58"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stable-session-story-font-provenance.patch",
+        "sha256": "9613f523b63dc89e0aa23914055c5b0b7674a2515f2c076ecef0c178894bdd59"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-package-metadata-script-preservation.patch",
+        "sha256": "c1fb2a2434fd8be8ad8dcbb65dc75641ef141527f7518c7c89db256b1fb42944"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-fragment-namespace-budget.patch",
+        "sha256": "cf00cf74b97a358c8d484a1b840bc41e7ff51de0724bb4b1a1cca42979f6ee5b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-metadata-namespace-read-write.patch",
+        "sha256": "7ece8bcc570b5c83994efcad39661fd57a327a49fa06cb756d022abca8bd58ee"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-source-synthetic-rows.patch",
+        "sha256": "eedb6ac4c47befebfdeb727099222b83a5b7b6550d55b98546a050366b9b5f4c"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-proportional-column-persistence.patch",
+        "sha256": "43bf22538170222f634321eae536026c969af85d956cc3ebb8d2b9901a6b7e12"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-lazy-native-row-render-context.patch",
+        "sha256": "0dc75bc3af81aa8c3383b7310a6d21fb3e326112b4bb279328d59956bd115b59"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-native-row-storage.patch",
+        "sha256": "fe5a4e24a75dde2b3a04ac76be2faad4ab2ab4be42cc01b546f9e0edd9be6af2"
+      }
+    ],
+    "builtAt": "2026-10-18T06:35:24.7938654Z",
+    "optimized": false,
+    "sourceId": "7c10dba04ed65742"
+  },
+  "independentDateReaderSha256": "5ff86e18fa5a73811b9bb8eaf826c032620f58e094b0dfdc564ffb512e214438",
+  "verifierSha256": "1f2a0fbf5273e19db1a8a2a46a95f5f98af5869b9d67e85deed219322b583331",
+  "scope": "Owned synthetic column2 actual oracle and strict unchanged production preservation reader, all semantic fields and every published control/text geometry field with 0.2 numeric tolerance. Native fixtures assert real serialized column/margin properties. No raw cache, source, guard, comparator or oracle normalization. Full historical comparisons retain actual source/oracle modified-date differences, exactly matched against independently read original OLE bytes; the older engine has no date API and its one missing observation is explicitly recorded. Strict candidate save/reopen still requires every semantic/date field to match with zero exceptions. Historical date classification is not a claim that those separate files have equal metadata. Hancom GUI not run here."
+}

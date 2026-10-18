@@ -1,0 +1,51 @@
+{
+  "candidateOnly": true,
+  "frozenHandoffUnchanged": true,
+  "causalNegativeMeaning": {
+    "wholeDocumentGeometryDifferences": 90,
+    "targetRowChanges": 0,
+    "exactIndependentFrameDeltaMatched": true,
+    "oldProductionComparatorUnmodified": true,
+    "noClaimOfWholeGeometryZero": true
+  },
+  "residualAudit": {
+    "groups": {
+      "stored-style-id-reference": 319,
+      "numeric-geometry": 232,
+      "charX-partition-structure": 6,
+      "charX-coordinate": 30,
+      "run-text-partition": 2,
+      "run-character-start": 1
+    },
+    "storedStyleIdReferenceFields": 319,
+    "publishedResolvedCharacterStyleWitnessesEqual": 319,
+    "notProofOfFullStyleDefinitionEquivalence": true,
+    "nonIdFields": 271,
+    "numericCoordinates": 262,
+    "partitionStructuralFields": 6,
+    "renderRunTextPartitionFields": 2,
+    "charStartFields": 1,
+    "semanticEvidenceDifferences": 6,
+    "semanticNotes": [
+      "four summary metadata fields already differ between independently saved original/oracle",
+      "two numbering char_shape_id references differ; no relaxed comparison applied"
+    ],
+    "remainingPartitionLocation": {
+      "section": 0,
+      "parentParagraph": 100,
+      "control": 0,
+      "cell": 0,
+      "cellParagraph": 1,
+      "sourceCharStarts": [
+        1,
+        33
+      ],
+      "oracleCharStarts": [
+        1,
+        31
+      ],
+      "combinedRenderedTextEqual": "checked separately by complete semantic snapshots except the six listed fields"
+    },
+    "scope": "Read-only classification; no new engine code, comparator changes or tolerance changes"
+  }
+}

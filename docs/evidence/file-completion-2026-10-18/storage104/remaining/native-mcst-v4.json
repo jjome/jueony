@@ -1,0 +1,816 @@
+{
+  "engine": {
+    "sourceId": "private-native-margin-v4-c5b229edf741158b",
+    "baseSourceId": "3f07621d4728accf",
+    "wasmSha256": "72410dcea70f6de1487e9dc2bf8cd5aa7e961ba69c1c1a9ac8b9ec7730ceadd2",
+    "jsSha256": "5b10dbb379d8d609e466b816ccf25697d87a376f0e17481f63e4d9ef0156c57a",
+    "privateCandidate": true
+  },
+  "sourceSha256": "c61a13b249183a675d38d5badfa3af610edcf99a403622440fc81b7f52b348f2",
+  "initial": {
+    "geometry": 0,
+    "comparison": {
+      "pages": {
+        "before": 15,
+        "after": 15,
+        "equal": true
+      },
+      "semantic": 0,
+      "geometry": 0,
+      "readIssues": {
+        "before": [],
+        "after": []
+      },
+      "firstGeometry": []
+    }
+  },
+  "cases": [
+    {
+      "name": "p43-start-insert-delete",
+      "p": 43,
+      "at": "start",
+      "mode": "insert-delete",
+      "cycles": [],
+      "status": "FAIL",
+      "length": 13,
+      "offset": 0,
+      "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/8/text/runs/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+      "productionIssues": [
+        {
+          "code": "changed",
+          "path": "whole-document-published-layout/pages/8/text/runs/length",
+          "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다."
+        }
+      ],
+      "guard": "blocked",
+      "dependentCyclesNotRun": 3,
+      "undo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "redo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "historyStatus": "PASS"
+    },
+    {
+      "name": "p43-start-retained-insert",
+      "p": 43,
+      "at": "start",
+      "mode": "retained-insert",
+      "cycles": [],
+      "status": "FAIL",
+      "length": 13,
+      "offset": 0,
+      "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/8/text/runs/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+      "productionIssues": [
+        {
+          "code": "changed",
+          "path": "whole-document-published-layout/pages/8/text/runs/length",
+          "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다."
+        }
+      ],
+      "guard": "blocked",
+      "dependentCyclesNotRun": 3,
+      "undo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "redo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "historyStatus": "PASS"
+    },
+    {
+      "name": "p43-end-insert-delete",
+      "p": 43,
+      "at": "end",
+      "mode": "insert-delete",
+      "cycles": [],
+      "status": "FAIL",
+      "length": 13,
+      "offset": 13,
+      "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/8/text/runs/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+      "productionIssues": [
+        {
+          "code": "changed",
+          "path": "whole-document-published-layout/pages/8/text/runs/length",
+          "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다."
+        }
+      ],
+      "guard": "blocked",
+      "dependentCyclesNotRun": 3,
+      "undo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "redo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "historyStatus": "PASS"
+    },
+    {
+      "name": "p43-end-retained-insert",
+      "p": 43,
+      "at": "end",
+      "mode": "retained-insert",
+      "cycles": [],
+      "status": "FAIL",
+      "length": 13,
+      "offset": 13,
+      "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/8/text/runs/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+      "productionIssues": [
+        {
+          "code": "changed",
+          "path": "whole-document-published-layout/pages/8/text/runs/length",
+          "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다."
+        }
+      ],
+      "guard": "blocked",
+      "dependentCyclesNotRun": 3,
+      "undo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "redo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "historyStatus": "PASS"
+    },
+    {
+      "name": "p44-start-insert-delete",
+      "p": 44,
+      "at": "start",
+      "mode": "insert-delete",
+      "cycles": [],
+      "status": "FAIL",
+      "length": 1,
+      "offset": 0,
+      "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/8/text/runs/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+      "productionIssues": [
+        {
+          "code": "changed",
+          "path": "whole-document-published-layout/pages/8/text/runs/length",
+          "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다."
+        }
+      ],
+      "guard": "blocked",
+      "dependentCyclesNotRun": 3,
+      "undo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "redo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "historyStatus": "PASS"
+    },
+    {
+      "name": "p44-start-retained-insert",
+      "p": 44,
+      "at": "start",
+      "mode": "retained-insert",
+      "cycles": [],
+      "status": "FAIL",
+      "length": 1,
+      "offset": 0,
+      "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/3/controls/controls/0/y: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/3/controls/controls/0/y). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+      "productionIssues": [
+        {
+          "code": "changed",
+          "path": "whole-document-published-layout/pages/3/controls/controls/0/y",
+          "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/3/controls/controls/0/y). 원본 파일은 쓰지 않습니다."
+        }
+      ],
+      "guard": "blocked",
+      "dependentCyclesNotRun": 3,
+      "undo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "redo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "historyStatus": "PASS"
+    },
+    {
+      "name": "p44-end-insert-delete",
+      "p": 44,
+      "at": "end",
+      "mode": "insert-delete",
+      "cycles": [],
+      "status": "FAIL",
+      "length": 1,
+      "offset": 1,
+      "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/8/text/runs/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+      "productionIssues": [
+        {
+          "code": "changed",
+          "path": "whole-document-published-layout/pages/8/text/runs/length",
+          "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다."
+        }
+      ],
+      "guard": "blocked",
+      "dependentCyclesNotRun": 3,
+      "undo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "redo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "historyStatus": "PASS"
+    },
+    {
+      "name": "p44-end-retained-insert",
+      "p": 44,
+      "at": "end",
+      "mode": "retained-insert",
+      "cycles": [],
+      "status": "FAIL",
+      "length": 1,
+      "offset": 1,
+      "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/3/controls/controls/0/y: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/3/controls/controls/0/y). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+      "productionIssues": [
+        {
+          "code": "changed",
+          "path": "whole-document-published-layout/pages/3/controls/controls/0/y",
+          "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/3/controls/controls/0/y). 원본 파일은 쓰지 않습니다."
+        }
+      ],
+      "guard": "blocked",
+      "dependentCyclesNotRun": 3,
+      "undo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "redo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "historyStatus": "PASS"
+    },
+    {
+      "name": "p47-start-insert-delete",
+      "p": 47,
+      "at": "start",
+      "mode": "insert-delete",
+      "cycles": [],
+      "status": "FAIL",
+      "length": 105,
+      "offset": 0,
+      "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/8/text/runs/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+      "productionIssues": [
+        {
+          "code": "changed",
+          "path": "whole-document-published-layout/pages/8/text/runs/length",
+          "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다."
+        }
+      ],
+      "guard": "blocked",
+      "dependentCyclesNotRun": 3,
+      "undo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "redo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "historyStatus": "PASS"
+    },
+    {
+      "name": "p47-start-retained-insert",
+      "p": 47,
+      "at": "start",
+      "mode": "retained-insert",
+      "cycles": [],
+      "status": "FAIL",
+      "length": 105,
+      "offset": 0,
+      "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/8/text/runs/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+      "productionIssues": [
+        {
+          "code": "changed",
+          "path": "whole-document-published-layout/pages/8/text/runs/length",
+          "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다."
+        }
+      ],
+      "guard": "blocked",
+      "dependentCyclesNotRun": 3,
+      "undo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "redo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "historyStatus": "PASS"
+    },
+    {
+      "name": "p47-end-insert-delete",
+      "p": 47,
+      "at": "end",
+      "mode": "insert-delete",
+      "cycles": [],
+      "status": "FAIL",
+      "length": 105,
+      "offset": 105,
+      "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/8/text/runs/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+      "productionIssues": [
+        {
+          "code": "changed",
+          "path": "whole-document-published-layout/pages/8/text/runs/length",
+          "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다."
+        }
+      ],
+      "guard": "blocked",
+      "dependentCyclesNotRun": 3,
+      "undo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "redo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "historyStatus": "PASS"
+    },
+    {
+      "name": "p47-end-retained-insert",
+      "p": 47,
+      "at": "end",
+      "mode": "retained-insert",
+      "cycles": [],
+      "status": "FAIL",
+      "length": 105,
+      "offset": 105,
+      "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/8/text/runs/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+      "productionIssues": [
+        {
+          "code": "changed",
+          "path": "whole-document-published-layout/pages/8/text/runs/length",
+          "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다."
+        }
+      ],
+      "guard": "blocked",
+      "dependentCyclesNotRun": 3,
+      "undo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "redo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "historyStatus": "PASS"
+    },
+    {
+      "name": "p48-start-insert-delete",
+      "p": 48,
+      "at": "start",
+      "mode": "insert-delete",
+      "cycles": [],
+      "status": "FAIL",
+      "length": 134,
+      "offset": 0,
+      "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/8/text/runs/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+      "productionIssues": [
+        {
+          "code": "changed",
+          "path": "whole-document-published-layout/pages/8/text/runs/length",
+          "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다."
+        }
+      ],
+      "guard": "blocked",
+      "dependentCyclesNotRun": 3,
+      "undo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "redo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "historyStatus": "PASS"
+    },
+    {
+      "name": "p48-start-retained-insert",
+      "p": 48,
+      "at": "start",
+      "mode": "retained-insert",
+      "cycles": [],
+      "status": "FAIL",
+      "length": 134,
+      "offset": 0,
+      "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/8/text/runs/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+      "productionIssues": [
+        {
+          "code": "changed",
+          "path": "whole-document-published-layout/pages/8/text/runs/length",
+          "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다."
+        }
+      ],
+      "guard": "blocked",
+      "dependentCyclesNotRun": 3,
+      "undo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "redo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "historyStatus": "PASS"
+    },
+    {
+      "name": "p48-end-insert-delete",
+      "p": 48,
+      "at": "end",
+      "mode": "insert-delete",
+      "cycles": [],
+      "status": "FAIL",
+      "length": 134,
+      "offset": 134,
+      "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/8/text/runs/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+      "productionIssues": [
+        {
+          "code": "changed",
+          "path": "whole-document-published-layout/pages/8/text/runs/length",
+          "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다."
+        }
+      ],
+      "guard": "blocked",
+      "dependentCyclesNotRun": 3,
+      "undo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "redo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "historyStatus": "PASS"
+    },
+    {
+      "name": "p48-end-retained-insert",
+      "p": 48,
+      "at": "end",
+      "mode": "retained-insert",
+      "cycles": [],
+      "status": "FAIL",
+      "length": 134,
+      "offset": 134,
+      "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/8/text/runs/length: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+      "productionIssues": [
+        {
+          "code": "changed",
+          "path": "whole-document-published-layout/pages/8/text/runs/length",
+          "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/8/text/runs/length). 원본 파일은 쓰지 않습니다."
+        }
+      ],
+      "guard": "blocked",
+      "dependentCyclesNotRun": 3,
+      "undo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "redo": {
+        "pages": {
+          "before": 15,
+          "after": 15,
+          "equal": true
+        },
+        "semantic": 0,
+        "geometry": 0,
+        "readIssues": {
+          "before": [],
+          "after": []
+        },
+        "firstGeometry": []
+      },
+      "historyStatus": "PASS"
+    }
+  ],
+  "pass": 0,
+  "fail": 16,
+  "scope": "Native HWP exact initial geometry, actual private HWPX disk bytes, unchanged whole-document production preservation guard, three save/reopen cycles per case and original-instance undo/redo. No GUI/COM/Hancom comparison claim."
+}

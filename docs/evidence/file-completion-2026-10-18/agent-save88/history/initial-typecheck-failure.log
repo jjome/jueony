@@ -1,0 +1,5 @@
+apps/editor/.build/studio-file-agent-save88/src/command/commands/file.ts(938,34): error TS2322: Type 'BoundSaveHandle' is not assignable to type 'FileSystemFileHandleLike | null'.
+  Type 'BoundSaveHandle' is not assignable to type 'FileSystemFileHandleLike'.
+    The types returned by 'getFile()' are incompatible between these types.
+      Type 'Promise<Blob>' is not assignable to type 'Promise<File>'.
+        Type 'Blob' is missing the following properties from type 'File': lastModified, name, webkitRelativePath

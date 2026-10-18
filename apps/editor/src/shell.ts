@@ -16,6 +16,7 @@ import {createAutomationFacade} from './modules/automation/public/index.ts';
 import type {CommandTemplate,CommandMacro} from './modules/automation/public/index.ts';
 import {installDocumentDefaultsPanel} from './ui/document-defaults-panel.ts';
 import {agent} from './composition/agent.ts';
+import {classifyAgentFailure} from './modules/agent/public/index.ts';
 import {createRecoveryCoordinator,normalizeRecoverySettings,createDocumentViewJournal} from './modules/preferences/public/index.ts';
 import {readRecoverySettings,watchRecoverySettings,browserRecoveryClock} from './adapters/browser/recovery-settings.ts';
 
@@ -279,11 +280,28 @@ async function commitClosedTab(tab:Tab,authority?:symbol,expected?:ReturnType<ty
  tab.recovery?.dispose();tab.disposeTabCycle?.();tabs.splice(tabs.indexOf(tab),1);const nextId=session.closed(tab);tab.frame.remove();tab.wrapper.remove();
  const next=tabs.find(t=>t.id===nextId);if(next)selectTab(next,authority);else await newTab(work().id,undefined,false,authority);
 }
-const agentFilePort=createAgentFilePort({read:()=>({workspaceId:state?.activeWorkspaceId??'',activeTabId:activeTab?.id??'',blocked:!state||closing||restoring||nativeExitPending||Boolean(document.querySelector('dialog[open]')),tabs:tabs.filter(tab=>!tab.closed).map(tab=>({id:tab.id,workspaceId:tab.workspaceId,name:tab.api?.state().name??'',dirty:tab.api?.state().dirty??true,revision:tab.api?.revision()??'',instance:tab.api?.documentInstance()??'',busy:tab.api?.busy()??true,initialized:tab.initialized}))}),
+const agentFilePort=createAgentFilePort({read:()=>({workspaceId:state?.activeWorkspaceId??'',activeTabId:activeTab?.id??'',blocked:!state||closing||restoring||nativeExitPending||Boolean(document.querySelector('dialog[open]')),tabs:tabs.filter(tab=>!tab.closed).map(tab=>({id:tab.id,workspaceId:tab.workspaceId,name:tab.api?.state().name??'',dirty:tab.api?.state().dirty??true,revision:tab.api?.revision()??'',instance:tab.api?.documentInstance()??'',busy:tab.api?.busy()??true,initialized:tab.initialized,...(()=>{const bound=tab.api?.boundSaveConnection();return{connection:bound?.connection,boundSave:bound?.eligible===true};})()}))}),
  freeze:()=>{if(agentFilePending||nativeExitPending||closing||restoring)throw Error('다른 문서 작업 중입니다.');const leases:(()=>void)[]=[];try{for(const tab of tabs.filter(tab=>!tab.closed))if(tab.api)leases.push(tab.api.acquireHostMutationLock());}catch(error){for(const release of leases.reverse())release();throw error;}agentFilePending=true;const elements=Array.from(document.body.children).filter((e):e is HTMLElement=>e instanceof HTMLElement),previous=elements.map(e=>e.inert);elements.forEach(e=>e.inert=true);return()=>{elements.forEach((e,i)=>e.inert=previous[i]);for(const release of leases.reverse())release();agentFilePending=false;};},
  newTab:async()=>{await newTab(work().id,undefined,false,agentFileAuthority);},
  activate:async id=>{const tab=tabs.find(tab=>tab.id===id&&tab.workspaceId===work().id);if(!tab)throw Error('현재 업무의 탭이 아닙니다.');selectTab(tab,agentFileAuthority);await persist();},
  closeClean:async id=>{const tab=tabs.find(tab=>tab.id===id&&tab.workspaceId===work().id);if(!tab?.api||tab.api.state().dirty)throw Error('수정한 문서는 사용자 확인으로 닫아 주세요.');await commitClosedTab(tab,agentFileAuthority,closeVersion(tab));await persist();},
+ saveActive:async(expected,signal)=>{
+  const tab=tabs.find(tab=>tab.id===expected.tabId&&tab.workspaceId===expected.workspaceId),api=tab?.api;
+  if(!tab||!api)throw Error('현재 업무의 활성 문서만 원본에 저장할 수 있습니다.');
+  const handle=api.fileHandle();
+  const assertOwner=()=>{
+   signal.throwIfAborted();
+   if(!agentFilePending||nativeExitPending||closing||restoring||tab.closed||!tabs.includes(tab)||activeTab!==tab||work().id!==expected.workspaceId||tab.workspaceId!==expected.workspaceId||tab.api!==api||api.documentInstance()!==expected.instance||api.fileHandle()!==handle)throw Error('저장 중 활성 문서의 소유 정보가 바뀌었습니다.');
+  };
+  assertOwner();
+  const result=await api.saveBoundDocument(expected,signal,assertOwner);
+  assertOwner();
+  if(api.state().dirty||api.revision()!==result.afterRevision)throw Error('원본 기록 후 문서 상태를 확인하지 못했습니다.');
+  if(!await persistTab(tab))throw Error('원본 저장 후 로컬 복구 상태를 기록하지 못했습니다.');
+  assertOwner();
+  if(api.state().dirty||api.revision()!==result.afterRevision)throw Error('저장 후 로컬 상태를 기록하는 동안 문서가 바뀌었습니다.');
+  return result;
+ },
 });
 async function switchWorkspace(id:string){
  if(restoring||closing||!cancelNavigation()){render();return;}restoring=true;
@@ -293,7 +311,7 @@ async function switchWorkspace(id:string){
   const tab=tabs.find(t=>t.id===session.preferred(id,previousDocumentId))??await newTab(id);selectTab(tab);render();await renderFolders();await persist();
  }finally{restoring=false;}
 }
-function updateRun(){const busy=Boolean(running);$<HTMLButtonElement>('send-request').disabled=busy;$<HTMLButtonElement>('cancel-run').disabled=!busy||running?.run.status==='applying';$('run-status').textContent=running?runLabels[running.run.status]:'지원: 본문 · 서식 · 표 · 문서 요약 · 현재 업무의 탭 조회/생성/선택/수정하지 않은 탭 닫기';}
+function updateRun(){const busy=Boolean(running);$<HTMLButtonElement>('send-request').disabled=busy;$<HTMLButtonElement>('cancel-run').disabled=!busy||running?.run.status==='applying';$('run-status').textContent=running?runLabels[running.run.status]:'지원: 본문 · 서식 · 표 · 문서 요약 · 현재 업무 탭 · 기존 승인된 원본에 저장';}
 async function send(){
  const input=$<HTMLTextAreaElement>('request-input');const request=input.value.trim();if(!request)return;
  $('request-error').hidden=true;
@@ -325,7 +343,7 @@ async function send(){
   const tab=tabs.find(t=>t.id===run.documentId);
   try{if(tab)await persistTab(tab);status('AI 요청이 완료되었습니다.');}catch(e){persistError=true;run.error='문서 변경은 적용됐지만 로컬 복구본 저장에 실패했습니다. 문서를 파일로 저장해 주세요.';workspace.appendMessage(workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:run.error});status(run.error);}
  }catch(e){
-  const failure=readDocumentFailure(e),name=failure.name;run.status=controller.signal.aborted||name==='AbortError'?'cancelled':name==='ConflictError'?'conflict':name==='PartialApplyError'?'failed_partial':name==='RolledBackError'?'failed_rolled_back':'failed_no_change';run.error=run.status==='cancelled'?'요청을 취소했습니다. 이 요청의 변경을 적용하지 않았습니다.':failure.message;
+  const failure=classifyAgentFailure(readDocumentFailure(e),controller.signal.aborted);run.status=failure.status;run.error=failure.message;
   workspace.appendMessage(workspaceId,chatId,{id:uid(),role:'assistant',runId:run.id,text:run.error});requestError(run.error);
  }finally{running=undefined;await persist().catch(error);renderMessages();updateRun();}
 }

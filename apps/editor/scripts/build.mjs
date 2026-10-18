@@ -1,5 +1,6 @@
 import {patchExportMetadataLoss} from './integration/export-metadata-loss-patches.mjs';
 import {applyStudioPatches} from './integration/studio-patches.mjs';
+import {applyAgentBoundSavePatches} from './integration/agent-bound-save-patches.mjs';
 import {applyManualFeaturePatches} from './integration/manual-feature-patches.mjs';
 import {applyRecoveryPatches} from './integration/recovery-patches.mjs';
 import {applyTabFeaturePatches} from './integration/tab-feature-patches.mjs';
@@ -81,6 +82,7 @@ for (const [name, file] of [['canvaskit-wasm', 'LICENSE'], ['@noble/hashes', 'LI
 }
 
 await applyStudioPatches({root,upstream,app});
+await applyAgentBoundSavePatches({root});
 await writeFile(join(root,'src/core/export-content-loss.ts'),patchExportMetadataLoss(await readFile(join(root,'src/core/export-content-loss.ts'),'utf8')));
 await applyManualFeaturePatches({root});
 await applyPageBorderPatches({root});
@@ -126,6 +128,7 @@ const evidence = {
   engineBuild: engineEvidence ?? null,
   buildScriptSha256: sha256(await readFile(fileURLToPath(import.meta.url))),
   studioPatchSha256: sha256(await readFile(join(app,'scripts/integration/studio-patches.mjs'))),
+  agentBoundSavePatchSha256: sha256(await readFile(join(app,'scripts/integration/agent-bound-save-patches.mjs'))),
   featurePatchSha256: sha256(await readFile(join(app,'scripts/integration/manual-feature-patches.mjs'))),
   recoveryPatchSha256: sha256(await readFile(join(app,'scripts/integration/recovery-patches.mjs'))),
   tabFeaturePatchSha256: sha256(await readFile(join(app,'scripts/integration/tab-feature-patches.mjs'))),

@@ -1,4 +1,5 @@
 export type {Generation,RunStatus,AgentEvent,ExecutionSummary} from './contracts.ts';
+export {classifyAgentFailure} from '../application/failure-result.ts';
 export type {EditorTool,RunOptions} from '../application/run-once.ts';
 export type {BoundedRunOptions} from '../application/run-bounded.ts';
 export {validateGeneration} from '../domain/generation.ts';

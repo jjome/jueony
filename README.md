@@ -1,6 +1,6 @@
 # Jueony — 공무원용 AI 문서 편집기
 
-[파일·저장·복구 최신 구현 현황](docs/112-file-recovery-implementation.md) — XML 지속 복구·저장 취소 경합·최근 문서 목록 보호. 한글 비교는 사용자 요청으로 보류합니다.
+[파일·저장·복구 최신 구현 현황](docs/112-file-recovery-implementation.md) — XML 지속 복구·저장 취소 경합·최근 목록 보호·Agent 기존 원본 저장. 단위970·파일/복구149사례. 한글 비교는 보류합니다.
 
 ## [전체 진행 현황 · 기능별 작업 문서 바로가기](docs/jueony-progress.md)
 
@@ -50,7 +50,7 @@
 
 ## 바로 실행
 
-최신 파일·저장 검수본은 **[Start-Review.cmd](build/jueony-file-preservation-20261017/Start-Review.cmd)** (4328)다. 다운로드 승인·닫기 실패·Windows 파일 보호와 여러 줄/캡션/양수 간격의 HWP 보존을 보강했다. [108번 완료 범위·검증·제한](docs/108-file-preservation-completion.md)을 따른다. 한글 직접 비교와 미지원 복잡 원본은 남아 있다.
+현재 파일·저장 실행본은 **[Start-Jueony-FileReview.cmd](Start-Jueony-FileReview.cmd)** (4357)다. XML 지속 복구·저장 취소 경합·최근 목록 보호와 Agent의 기존 HWP/HWPX 원본 저장을 포함한다. [현재 구현·실행·남은 범위](docs/112-file-recovery-implementation.md)를 따른다. 한글 직접 비교는 보류하며 기존 포트의 업무를 자동 이관하지 않는다.
 
 직전 복구 무결성 검수본은 **[Start-Review.cmd](build/jueony-recovery-integrity-20261016/Start-Review.cmd)**(4327)다. 복구본 손상 격리와 별도 Edge 강제 종료 뒤 HWP/HWPX 복원을 검사했다. [106번 결과와 제한](docs/106-recovery-integrity.md)을 따른다. 아래는 직전 저장 보강 이력이다.
 

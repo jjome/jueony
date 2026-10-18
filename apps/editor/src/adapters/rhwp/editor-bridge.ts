@@ -82,9 +82,10 @@ export function installAgentBridge(d:Deps){
    return model;
   },
   focusEditor:()=>d.input()?.focus(),
-  async prepareFileSave(format:string){
+  isBoundSaveEligible:()=>!applying&&!damaged&&!composing&&!document.querySelector('dialog[open],.modal-overlay')&&d.automation.getContext().isEditable===true&&!d.automation.getContext().isFormMode&&!d.wasm.requiresPasswordForSave,
+  async prepareFileSave(format:string,authority?:unknown){
    if(format!=='hwp'&&format!=='hwpx')return {changedTables:0};
-   if(applying||damaged||(api.busy()||api.hostMutationLocked())||composing)throw new Error('문서 작업 또는 한글 조합이 끝난 뒤 저장해 주세요.');
+   if(applying||damaged||api.busy()||(api.hostMutationLocked()&&api.ownsBoundSaveAuthority?.(authority)!==true)||composing)throw new Error('문서 작업 또는 한글 조합이 끝난 뒤 저장해 주세요.');
    d.input()?.flushDeferredPaginationIfNeeded('jueony-save-layout');
    const beforeRevision=revision(),plans=planSaveTableFrames(d.wasm);
    assertRevision(beforeRevision,revision());

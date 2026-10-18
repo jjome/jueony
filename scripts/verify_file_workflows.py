@@ -8,7 +8,7 @@ APP=ROOT/'apps/editor'
 CASES=[('native-shell',11),('native-recents',9),('document-lifecycle',10),
        ('document-windows',8),('recovery-integrity',10),('download-connection',10),
        ('close-recovery',4),('save-recovery',29),('document-metadata',10),
-       ('agent-files',12),('xml-documents-integrated',7),('xml-documents',13)]
+       ('agent-files',15),('xml-documents-integrated',7),('xml-documents',13),('xml-recovery',13)]
 sha=lambda b:hashlib.sha256(b).hexdigest()
 
 def main():
@@ -34,7 +34,8 @@ def main():
             for key in ['pageErrors','consoleErrors','externalRequests']:assert r[key]==[],(name,key)
             for item in r['results']:
                 if isinstance(item,dict):assert item['status']=='PASS',(name,item)
-            if name!='xml-documents':
+            independent=name in ['xml-documents','xml-recovery']
+            if not independent:
                 assert r['engine']['wasmSha256']==meta['wasmSha256'] and r['engine']['jsSha256']==meta['jsSha256']
                 assert r['build']['engineBuild']['sourceId']==meta['sourceId']
                 assert r['build']['customSourceSha256']==build['customSourceSha256']
@@ -42,12 +43,12 @@ def main():
                 # XML has no HWP engine. Attest its exact source separately.
                 for source in r['sourceHashes']:
                     assert sha((APP/source['path']).read_bytes())==source['sha256']
-            row.update(status='PASS',passed=count,resultSHA256=sha(raw),engineUsed=name!='xml-documents')
+            row.update(status='PASS',passed=count,resultSHA256=sha(raw),engineUsed=not independent)
         except Exception as e:row.update(status='FAIL',error=str(e))
         print(name,row['status'],flush=True);return row
     with ThreadPoolExecutor(max_workers=a.workers)as pool:rows=list(pool.map(run,CASES))
     failed=[x for x in rows if x['status']!='PASS']
-    result={'engine':meta,'build':build,'suites':rows,'failures':failed,'passedCases':sum(x.get('passed',0)for x in rows),'totalCases':133,'scope':'Existing production file/recovery UI exercised through isolated real Edge profiles and native IPC seams, not actual OS dialog/Hancom screen certification. Standalone XML13 attested separately without HWP engine.'}
+    result={'engine':meta,'build':build,'suites':rows,'failures':failed,'passedCases':sum(x.get('passed',0)for x in rows),'totalCases':sum(count for _,count in CASES),'scope':'Production file/recovery UI exercised through isolated headless Edge profiles and native IPC seams, not actual OS dialog/Hancom screen certification. Standalone XML and XML-recovery suites attested separately without HWP engine. The expanded Agent suite includes explicit bound save and stale generation refusal.'}
     (out/'result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     return int(bool(failed))
 

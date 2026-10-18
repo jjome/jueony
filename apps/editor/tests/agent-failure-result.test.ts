@@ -1,0 +1,5 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {classifyAgentFailure} from '../src/modules/agent/public/index.ts';
+test('late cancellation preserves partial write, rollback and conflict evidence',()=>{for(const aborted of[false,true])for(const[name,status]of[['PartialApplyError','failed_partial'],['RolledBackError','failed_rolled_back'],['ConflictError','conflict']]){const result=classifyAgentFailure({name,message:'actual failure evidence'},aborted);assert.equal(result.status,status);assert.equal(result.message,'actual failure evidence');}});
+test('only cancellation without stronger mutation evidence reports no applied change',()=>{for(const[name,aborted,status]of[['Error',true,'cancelled'],['AbortError',false,'cancelled'],['BoundSaveRejectedError',false,'failed_no_change']]as const){const result=classifyAgentFailure({name,message:'rejected'},aborted);assert.equal(result.status,status);assert.equal(result.message,status==='cancelled'?'요청을 취소했습니다. 이 요청의 변경을 적용하지 않았습니다.':'rejected');}});

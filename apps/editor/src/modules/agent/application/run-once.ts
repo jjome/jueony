@@ -31,6 +31,7 @@ export async function commitGeneration(options:RunOptions,result:Generation):Pro
   const expected=options.context.document.fileContext,operation=validateAgentFileOperation(result.operations[0],expected);options.state('applying');
   const fileReceipt=await options.filePort.execute(options.runId,operation,expected,options.signal);
   if(!fileReceipt||fileReceipt.runId!==options.runId||fileReceipt.kind!==operation.kind||fileReceipt.status!=='completed'||fileReceipt.beforeStamp!==expected.stamp||fileReceipt.operationCount!==1||fileReceipt.documentMutations!==0){const error=Error('파일 명령의 실제 완료 증거가 일치하지 않습니다. 현재 탭 상태를 확인하세요.');if(operation.kind!=='list_document_tabs')error.name='PartialApplyError';throw error;}
+  if(operation.kind==='save_active_document'&&(!fileReceipt.save||fileReceipt.save.status!=='saved'||fileReceipt.save.tabId!==expected.activeTabId||fileReceipt.save.beforeRevision!==options.context.document.revision||fileReceipt.save.afterRevision!==options.editor.snapshot().revision)){const error=Error('활성 문서의 실제 저장 완료 증거가 일치하지 않습니다.');error.name='PartialApplyError';throw error;}
   return{message:result.message,sourceIds:result.sourceIds,receipt:undefined,fileReceipt,generation:result};
  }
  if(!result.operations.length)return {message:result.message,sourceIds:result.sourceIds,receipt:undefined,generation:result};

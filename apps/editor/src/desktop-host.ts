@@ -1,9 +1,11 @@
 import {installNativeFilePickers,installNativeExitProtection} from './adapters/desktop/native-host.ts';
+import type {createBoundDocumentSave,BoundSaveExpected} from './adapters/files/bound-save.ts';
 
-type Host = { wasm: any; eventBus: any; documentState: any; ready: Promise<unknown>; save: () => Promise<string>; discard: () => Promise<void> };
+type Host = { wasm: any; eventBus: any; documentState: any; ready: Promise<unknown>; save: () => Promise<string>; discard: () => Promise<void>;createBoundSave?:()=>ReturnType<typeof createBoundDocumentSave> };
 
-export function installDesktopHost({ wasm, eventBus, documentState, ready, save, discard }: Host) {
+export function installDesktopHost({ wasm, eventBus, documentState, ready, save, discard,createBoundSave }: Host) {
   let sequence = 0, hostMutationLocks = 0;
+  let boundSave:ReturnType<typeof createBoundDocumentSave>|undefined;
   const assertHostMutationAllowed = () => { if (hostMutationLocks) throw new Error('문서 탭 명령이 끝난 뒤 편집해 주세요.'); };
   const acquireHostMutationLock = () => { hostMutationLocks++; let released = false; return () => { if (!released) { released = true; hostMutationLocks--; } }; };
   eventBus.on('document-mutated', () => sequence++);
@@ -14,12 +16,19 @@ export function installDesktopHost({ wasm, eventBus, documentState, ready, save,
     ready, revision,
     acquireHostMutationLock, hostMutationLocked: () => hostMutationLocks > 0,
     save: async () => { assertHostMutationAllowed(); return save(); },
+    boundSaveConnection:()=>boundSave?.binding(),
+    ownsBoundSaveAuthority:(value:unknown)=>boundSave?.acceptsAuthority(value)===true,
+    saveBoundDocument:async(expected:BoundSaveExpected,signal:AbortSignal,assertOwner:()=>void)=>{
+      if(!boundSave||hostMutationLocks===0||typeof assertOwner!=='function'||(window as any).jueonyEditor.busy())throw Error('현재 문서는 Agent 원본 저장이 연결되지 않았거나 작업 중입니다.');
+      return boundSave.save(expected,signal,assertOwner);
+    },
     discard: async () => { assertHostMutationAllowed(); return discard(); },
     fileHandle: () => wasm.currentFileHandle,
     // A dialog may validate its own synchronous commit without opening the document to other callers.
     busy: (ownedDialog?: HTMLDialogElement) => Boolean(document.getElementById('jueony-busy') || document.getElementById('jueony-download-confirm') || [...document.querySelectorAll('.jueony-page-dialog[open]')].some(dialog => dialog !== ownedDialog)) || document.documentElement.classList.contains('rhwp-busy'),
     state: () => ({ name: wasm.fileName, pageCount: wasm.pageCount, dirty: documentState.isDirty(), revision: revision() }),
   };
+  boundSave=createBoundSave?.();
   // 이름 변경 전에 열린 부모 탭도 새 문서의 dirty/save 상태를 읽을 수 있어야 한다.
   // 기존 창을 닫기 전까지 유지하는 이전 호스트 프로토콜의 호환 별칭이다.
   (window as any).joouniEditor = (window as any).jueonyEditor;

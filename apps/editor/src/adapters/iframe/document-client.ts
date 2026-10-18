@@ -1,6 +1,7 @@
 import type {Snapshot,DocumentEditFacade,DocumentInteractionFacade,DocumentFacades} from '../../modules/document/public/index.ts';
 import type {DocumentViewState,ViewRestoreResult} from '../../modules/preferences/public/index.ts';
 import type {StoredFileConnection,FileConnectionResult} from '../files/file-connection.ts';
+import type {BoundSaveExpected,BoundSaveResult} from '../files/bound-save.ts';
 /** Same-origin browser integration only. File handles never enter domain contracts. */
 export interface DocumentFrameClient extends DocumentEditFacade,DocumentInteractionFacade {
  bridgeVersion:1;
@@ -25,9 +26,11 @@ export interface DocumentFrameClient extends DocumentEditFacade,DocumentInteract
  suspendDocumentView():void;
  restoreDocumentView(value:unknown):Promise<ViewRestoreResult>;
  save():Promise<string>;
+ boundSaveConnection():{connection:string;eligible:boolean}|undefined;
+ saveBoundDocument(expected:BoundSaveExpected,signal:AbortSignal,assertOwner:()=>void):Promise<BoundSaveResult>;
  discard():Promise<void>;
 }
-const required=['snapshot','state','busy','acquireHostMutationLock','hostMutationLocked','revision','documentIdentity','documentInstance','fileHandle','open','readReference','recovery','restoreFileConnection','captureDocumentView','suspendDocumentView','restoreDocumentView','save','discard','commands','menus','executeCommand','focusEditor','preflight','apply','undoRequest'];
+const required=['snapshot','state','busy','acquireHostMutationLock','hostMutationLocked','revision','documentIdentity','documentInstance','fileHandle','open','readReference','recovery','restoreFileConnection','captureDocumentView','suspendDocumentView','restoreDocumentView','save','boundSaveConnection','saveBoundDocument','discard','commands','menus','executeCommand','focusEditor','preflight','apply','undoRequest'];
 export function assertDocumentFrameClient(value:unknown):asserts value is DocumentFrameClient {
  const api=value as Record<string,unknown>|null;
  if(!api||api.bridgeVersion!==1||required.some(name=>typeof api[name]!=='function'))throw new Error('편집기 연결 계약이 일치하지 않습니다. 같은 버전의 Jueony 화면과 편집기를 실행해 주세요.');

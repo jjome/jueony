@@ -1,0 +1,40 @@
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -74,7 +74,11 @@
+     if para.line_segs.is_empty() || para.line_segs.iter().any(|line|
+         line.tag & LineSeg::TAG_IMPLEMENTATION_PROPERTY != 0 || line.line_height <= 0
+             || line.line_spacing < 0 || line.vertical_pos < raw_first || line.vertical_pos > raw_end
+-            || line.vertical_pos.checked_sub(shift).is_none_or(|v|v<first || v>end))
++            || line.vertical_pos.checked_sub(shift).is_none_or(|v|v<first || v>end)
++            || line.vertical_pos.checked_add(line.line_height)
++                .and_then(|v|v.checked_add(line.line_spacing))
++                .is_none_or(|row_end| row_end>raw_end
++                    || row_end.checked_sub(shift).is_none_or(|v|v<first || v>end || v>body_height)))
+         || para.line_segs.windows(2).any(|pair| pair[0].vertical_pos > pair[1].vertical_pos)
+         || para.line_segs.first().map(|line| line.vertical_pos) != Some(raw_first)
+         || para.line_segs.last().and_then(|line| line.vertical_pos.checked_add(line.line_height)
+@@ -4773,6 +4777,13 @@
+             assert_eq!(stored_visible_float_source_span(&p,Some((1510,1560)),prev,anchor,running,plain,before,body,reflow),None,"case {n}");
+         }
+     }
++    #[test]fn visible_float_gap99_rejects_intermediate_row_end_overflow_or_escape(){
++        for height in [i32::MAX,100] {
++            let mut p=fixture(1510);p.line_segs[0].line_height=height;
++            p.line_segs.push(LineSeg{vertical_pos:1550,line_height:10,line_spacing:0,..Default::default()});
++            assert_eq!(owned(&p),None,"an intermediate row must end inside the owned span: {height}");
++        }
++    }
+     #[test]fn visible_float_gap99_rejects_dirty_unknown_or_separate_frames(){
+         for n in 0..17{let mut p=fixture(1510);match n{
+             0=>p.stored_text_partition_dirty=true,1=>p.cell_format_vpos_dirty=true,2=>p.hwpx_axis_shift=1,
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[50, 110, 217, 195, 180, 120, 148, 55, 191, 12, 1, 230, 51, 185, 186, 240, 73, 207, 52, 182, 236, 43, 24, 130, 113, 205, 15, 1, 205, 162, 194, 215];
++pub(crate) const RESOURCE:[u8;32]=[95, 182, 208, 39, 2, 38, 94, 234, 133, 143, 190, 208, 119, 12, 125, 116, 138, 169, 138, 101, 218, 105, 41, 134, 47, 158, 186, 211, 176, 95, 58, 162];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {

@@ -1,0 +1,49 @@
+{
+  "scope": "v3 exact mixed source span plus all intermediate row end bounds; not full file-part completion",
+  "source": "build\\initial-mixed99-v4\\source",
+  "package": "build\\initial-mixed99-v4\\pkg-final-frozen",
+  "nativeGuardTests": 4,
+  "nativeResourceTests": 1,
+  "actualSuitePass": 14,
+  "failures": 0,
+  "allStatusesPass": true,
+  "verifierSha256": "e0c6ec0a40c281219a0fb0c1ef11d28f4165bde51e3175311d4b75455e8e8988",
+  "wasmSha256": "271af30def1fcf3e57f9a2868668568c87f7bba52506ea021a0acc478aa56955",
+  "files": [
+    {
+      "path": "mixed-floating-host-row-end99-v4.patch",
+      "sha256": "23c31ad5aaf055f1f1f8d04b65249d4143ecd1f54571a5d68b55584dc35b7091",
+      "bytes": 2818
+    },
+    {
+      "path": "candidate-source-proof.json",
+      "sha256": "7331ca6de06a46b56856a89c38f6e6b0a34808db455c18e89f90c857f69cd072",
+      "bytes": 1556
+    },
+    {
+      "path": "portable-resource-generation.json",
+      "sha256": "f124625d1a542681c93fc2c5880ce4f84d840c30e700cda1ebd02cd1deb95f2e",
+      "bytes": 68996
+    },
+    {
+      "path": "native-final.log",
+      "sha256": "798b501f86ab40e3871d478864b37fcbc5544418f2d3de91ae4cccc27b0d456d",
+      "bytes": 1527
+    },
+    {
+      "path": "wasm-final.log",
+      "sha256": "c4a26e4cea3b5d7a59b223cbe46f9f591fdb868d8b67eb39ad9d0d93b367ff9b",
+      "bytes": 319
+    },
+    {
+      "path": "production-verifier-final.log",
+      "sha256": "d287ad65b7ec0bd83e70b699d633af02e13cace90d7fd9c556fc0e8c1e64512e",
+      "bytes": 844
+    },
+    {
+      "path": "production-verifier-final/result.json",
+      "sha256": "4bcb154509895c74337d389c98a2f8410168a23369b215adca75ee46c900635a",
+      "bytes": 50331
+    }
+  ]
+}

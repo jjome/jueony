@@ -1,0 +1,8 @@
+{
+  "scope": "Exact helper source extracted from official109 candidate, minimal field-compatible Rust types. The downstream arithmetic loop is transcribed verbatim; this is NOT a whole-app or file-open test.",
+  "source": "build\\rhwp-engine\\source-b90694c173b1a83b\\src\\document_core\\commands\\document.rs",
+  "sourceSha256": "430ad23771f7cab3119882f011c3f7f24780f0658359a97eea0847570d1816a8",
+  "helperSha256": "e2164bd87fece224e37d5b24b731909e3140f72e099541b86d71339376640087",
+  "counterexample": "first row vpos110 height2147482144 spacing0; final row vpos120 height1 spacing0; declared span110..121. Candidate returns Some; intermediate physical row extent is not body-bounded.",
+  "proposedFix": "Before granting source-gap ownership, validate each row end using checked_add(height)+checked_add(spacing), not only the final row end. Reject any intermediate end outside raw bounded span and its shifted end outside normalized bounded span. Check text_height/baseline source constraints separately if required by existing parser contract; do not relax any caller guard."
+}

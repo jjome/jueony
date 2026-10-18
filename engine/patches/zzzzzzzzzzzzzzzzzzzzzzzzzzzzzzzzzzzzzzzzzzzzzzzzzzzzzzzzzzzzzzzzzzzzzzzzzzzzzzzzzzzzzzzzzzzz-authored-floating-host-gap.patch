@@ -1,0 +1,150 @@
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -20,6 +20,49 @@
+ use serde::Deserialize;
+ use std::cell::RefCell;
+ use std::collections::HashMap;
++
++/// Preserve an authored positive paragraph-before gap through a visible,
++/// single floating table host. This is a source-axis fact, not a new float
++/// placement or permission to reuse computed rows after edits.
++fn stored_visible_float_source_gap(
++    para: &Paragraph, original: Option<(i32, i32)>, previous: Option<(i32, i32)>,
++    anchor: Option<(i32, i32)>, before: i32, body_height: i32, reflowed: bool,
++) -> bool {
++    use crate::model::paragraph::ColumnBreakType;
++    use crate::model::shape::{TextWrap, VertRelTo, VertAlign};
++    if reflowed || para.stored_text_partition_dirty || para.cell_format_vpos_dirty
++        || para.hwpx_axis_shift != 0 || para.column_type != ColumnBreakType::None
++        || before <= 0 || body_height <= 0 || para.controls.len() != 1
++        || !para.range_tags.is_empty() || !para.field_ranges.is_empty()
++        || !para.orphan_field_ends.is_empty()
++        || !para.text.chars().any(|c| !c.is_whitespace() && !c.is_control() && c != '\u{FFFC}')
++    { return false; }
++    let Control::Table(table) = &para.controls[0] else { return false; };
++    if table.common.treat_as_char || table.common.text_wrap != TextWrap::TopAndBottom
++        || table.common.vert_rel_to != VertRelTo::Para || table.common.vert_align != VertAlign::Top
++        || table.common.allow_overlap || table.caption.is_some()
++        || table.row_count != 1 || table.col_count != 1 || table.cells.len() != 1
++    { return false; }
++    // flow_with_text is the object's page-area restriction, not paragraph
++    // spacing ownership. Both values leave this exact authored text gap intact.
++    let (Some((first, end)), Some((_, previous_end)), Some((anchor_end, rebuilt_end))) =
++        (original, previous, anchor) else { return false; };
++    if previous_end <= 0 || anchor_end != previous_end || rebuilt_end < 0
++        || first <= 0 || first > body_height || end < first || end > body_height
++        || previous_end.checked_add(before) != Some(first)
++    { return false; }
++    if para.line_segs.is_empty() || para.line_segs.iter().any(|line|
++        line.tag & LineSeg::TAG_IMPLEMENTATION_PROPERTY != 0 || line.line_height <= 0
++            || line.line_spacing < 0 || line.vertical_pos < first || line.vertical_pos > end)
++        || para.line_segs.windows(2).any(|pair| pair[0].vertical_pos > pair[1].vertical_pos)
++        || para.line_segs.first().map(|line| line.vertical_pos) != Some(first)
++        || para.line_segs.last().and_then(|line| line.vertical_pos.checked_add(line.line_height)
++            .and_then(|value| value.checked_add(line.line_spacing))) != Some(end)
++    { return false; }
++    para.source_line_seg_vertical_pos.as_ref().is_none_or(|source|
++        source.len() == para.line_segs.len()
++            && source.iter().zip(&para.line_segs).all(|(value,line)| *value == line.vertical_pos))
++}
+ 
+ /// HWP 내보내기 + 자기 재로드 검증 결과 (#178 Stage 6).
+ ///
+@@ -829,7 +872,15 @@
+                                     && first <= body_height_hu
+                                     && first == prev_end.saturating_add(before)
+                             });
+-                    if !text_only_controls && !inline_reflowed_picture && !inline_saved_table {
++                    let visible_float_saved_gap = stored_visible_float_source_gap(
++                        para, orig_span[pi], pi.checked_sub(1).and_then(|previous| orig_span[previous]),
++                        source_anchor_end,
++                        styles.para_styles.get(para.para_shape_id as usize)
++                            .map_or(0, |shape| (shape.spacing_before * 7200.0 / dpi).round() as i32),
++                        body_height_hu, was_reflowed,
++                    );
++                    if !text_only_controls && !inline_reflowed_picture && !inline_saved_table
++                        && !visible_float_saved_gap {
+                         source_anchor_end = None;
+                     }
+                     let hosts_bottom_fixed_frame = para.controls.iter().any(|c| {
+@@ -1127,7 +1178,7 @@
+                     running_vpos = inner_vpos;
+                     if let Some((_, original_end)) = orig_span[pi].filter(|_| text_only_controls) {
+                         source_anchor_end = Some((original_end, running_vpos));
+-                    } else if inline_saved_table {
++                    } else if inline_saved_table || visible_float_saved_gap {
+                         // 표 높이는 다음 일반 글줄의 저장 간격으로 재가산하지 않는다.
+                         source_anchor_end = None;
+                     }
+@@ -4657,3 +4708,53 @@
+         );
+     }
+ }
++
++#[cfg(test)]
++mod authored_visible_float_gap97_tests {
++    use super::*;
++    fn fixture() -> Paragraph {
++        let mut table = crate::model::table::Table::default();
++        table.row_count=1;table.col_count=1;
++        table.cells.push(crate::model::table::Cell::default());
++        table.common.flow_with_text=true;
++        table.common.text_wrap=crate::model::shape::TextWrap::TopAndBottom;
++        table.common.vert_rel_to=crate::model::shape::VertRelTo::Para;
++        table.common.vert_align=crate::model::shape::VertAlign::Top;
++        let mut para=Paragraph::default();para.text="가나".into();
++        para.controls.push(Control::Table(Box::new(table)));
++        para.line_segs.push(LineSeg{vertical_pos:110,line_height:40,line_spacing:10,..Default::default()});
++        para
++    }
++    fn eligible(para:&Paragraph)->bool {
++        stored_visible_float_source_gap(para,Some((110,160)),Some((50,100)),Some((100,150)),10,1000,false)
++    }
++    #[test] fn authored_visible_float_gap97_owns_only_exact_source_gap() {
++        let mut p=fixture();assert!(eligible(&p));
++        if let Control::Table(t)=&mut p.controls[0]{t.common.flow_with_text=false;}
++        assert!(eligible(&p),"page-area restriction does not erase authored paragraph-before gap");
++        p.source_line_seg_vertical_pos=Some(vec![110]);assert!(eligible(&p));
++        assert!(!stored_visible_float_source_gap(&p,Some((110,160)),Some((50,100)),Some((100,150)),9,1000,false));
++        assert!(!stored_visible_float_source_gap(&p,Some((110,160)),Some((50,100)),Some((99,150)),10,1000,false));
++        assert!(!stored_visible_float_source_gap(&p,Some((110,160)),Some((50,100)),None,10,1000,false));
++        assert!(!stored_visible_float_source_gap(&p,Some((110,160)),Some((50,100)),Some((100,150)),10,150,false));
++        assert!(!stored_visible_float_source_gap(&p,Some((110,160)),Some((50,100)),Some((100,150)),10,1000,true));
++    }
++    #[test] fn authored_visible_float_gap97_rejects_changed_unknown_or_separate_frames() {
++        for which in 0..13 {let mut p=fixture();match which {
++            0=>p.stored_text_partition_dirty=true,
++            1=>p.cell_format_vpos_dirty=true,
++            2=>p.hwpx_axis_shift=1,
++            3=>p.column_type=crate::model::paragraph::ColumnBreakType::Page,
++            4=>p.column_type=crate::model::paragraph::ColumnBreakType::Column,
++            5=>p.column_type=crate::model::paragraph::ColumnBreakType::Section,
++            6=>p.line_segs[0].tag=LineSeg::TAG_IMPLEMENTATION_PROPERTY,
++            7=>p.source_line_seg_vertical_pos=Some(vec![]),
++            8=>p.source_line_seg_vertical_pos=Some(vec![111]),
++            9=>p.text=" ".into(),
++            10=>p.controls.push(p.controls[0].clone()),
++            11=>if let Control::Table(t)=&mut p.controls[0]{t.common.treat_as_char=true;},
++            12=>if let Control::Table(t)=&mut p.controls[0]{t.common.text_wrap=crate::model::shape::TextWrap::Square;},
++            _=>unreachable!(),
++        }assert!(!eligible(&p),"case {which}");}
++    }
++}
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,13 +1,14 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[176, 104, 136, 42, 170, 68, 5, 144, 199, 245, 87, 134, 222, 37, 39, 149, 216, 116, 34, 117, 3, 130, 91, 77, 216, 64, 154, 25, 190, 7, 107, 74];
++pub(crate) const RESOURCE:[u8;32]=[209, 127, 109, 234, 52, 185, 191, 218, 234, 16, 142, 226, 73, 197, 25, 230, 176, 175, 63, 29, 113, 171, 151, 136, 170, 165, 42, 133, 203, 78, 59, 238];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+         let inputs:&[(&str,&[u8])]=&[
+             ("Cargo.lock",include_bytes!("../../Cargo.lock").as_slice()),
+             ("Cargo.toml",include_bytes!("../../Cargo.toml").as_slice()),
++            ("src/document_core/commands/document.rs",include_bytes!("../document_core/commands/document.rs").as_slice()),
+             ("src/document_core/native_computed_rows.rs",include_bytes!("../document_core/native_computed_rows.rs").as_slice()),
+             ("src/model/native_computed_rows.rs",include_bytes!("native_computed_rows.rs").as_slice()),
+             ("src/renderer/canvas.rs",include_bytes!("../renderer/canvas.rs").as_slice()),

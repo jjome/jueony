@@ -1,0 +1,30 @@
+{
+  "parentCommit": "0acc88b",
+  "files": [
+    {
+      "path": "apps/editor/scripts/verify-authored-floating-gap-layout.mjs",
+      "sha256": "c1723adbfef0d0eece712c4f24dda1e3b4214394f7893ae53c3c0747564442ba"
+    },
+    {
+      "path": "scripts/verify_file_workflows.py",
+      "sha256": "c309fac9ede0c1023332e43b82ed105a9f6421535c704889561942c4fee49dec"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "sha256": "752e8fa32843b271a60524a1fb0e638a8e003be787640593f89622a2184469bc"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-save-layout.ts",
+      "sha256": "6c1d119f4723698e9e3769d4fb45c7b38469b6f0bca6f4c575688f3b38638434"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/overlap-save-layout.ts",
+      "sha256": "81292a0acd43934682abea16fa510b6fdedbd820d9f1822bac511de3919d1495"
+    },
+    {
+      "path": "apps/editor/src-tauri/src/storage.rs",
+      "sha256": "26b9727428c1d53b7ef054e07264e7fb9dc9ad6afd117434c52bff5772ae854e"
+    }
+  ],
+  "scope": "Official110 same-build new regression; original/vendor documents, browser profiles, fonts and compiled executables excluded. Saved artifacts remain in build/file-storage101-workflows. Existing protection comparisons unchanged."
+}

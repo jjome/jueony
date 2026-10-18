@@ -1,0 +1,43 @@
+{
+  "results": [
+    {
+      "name": "split-before143",
+      "source": "aee538b35ed7649d",
+      "total": 8,
+      "failed": 8,
+      "actualExit": 1,
+      "scriptSha256": "5857dfce37b960af2a8c06f976008ad369a9bab91f3c22afce81b61b200a5415",
+      "status": "EXPECTED_BASELINE_FAILURE"
+    },
+    {
+      "name": "split-final151",
+      "source": "9df387f1a8b85d06",
+      "total": 8,
+      "failed": 0,
+      "actualExit": 0,
+      "scriptSha256": "5857dfce37b960af2a8c06f976008ad369a9bab91f3c22afce81b61b200a5415",
+      "status": "PASS"
+    },
+    {
+      "name": "profile-before146",
+      "source": "71d8247a5752c0cd",
+      "total": 12,
+      "failed": 12,
+      "actualExit": 1,
+      "scriptSha256": "e3e6f60e7b163b42a9a951f80095397d61fdace06945dae115edc9ae24c5181b",
+      "status": "EXPECTED_BASELINE_FAILURE"
+    },
+    {
+      "name": "profile-final151",
+      "source": "9df387f1a8b85d06",
+      "total": 12,
+      "failed": 0,
+      "actualExit": 0,
+      "scriptSha256": "e3e6f60e7b163b42a9a951f80095397d61fdace06945dae115edc9ae24c5181b",
+      "status": "PASS"
+    }
+  ],
+  "sameVerifierPerPair": true,
+  "cleanBoundary": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\n001-review132-clean\\apps\\editor",
+  "runtimeChanged": false
+}

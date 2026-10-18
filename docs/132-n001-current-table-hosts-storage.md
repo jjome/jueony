@@ -60,3 +60,7 @@
 루트 `Start-Jueony-FileReview.cmd`는 `build/n001-review132-clean/build/jueony-n001-review151/Start-Jueony.cmd`를 연다. 검수 포트4437이다. 공식 엔진은 `9df387f1a8b85d06`, 패치144개·자원 지문 입력272개다. Python/JavaScript는 빌드·검수 도구이며 이번 실행 엔진 수정은 Rust다.
 
 `python docs/evidence/n001-2026-10-19/general151/verify.py`로 증거 바이트를 검증한다. 이전146 증거도 그대로 유지한다.
+
+## 유지할 회귀 검사
+
+이번 두 검수기를 `apps/editor/scripts/verify-split-frame-storage151.mjs`와 `verify-cross-section-storage151.mjs`로 옮겼다. 동일 검수기로 이전 엔진의 8건·12건 실패와 현재151의 20건 통과를 다시 확인했다. 이 20건은 기존501건과 별도다. [검수기 전후 실행 증거](evidence/n001-2026-10-19/general151-regressions/README.md).

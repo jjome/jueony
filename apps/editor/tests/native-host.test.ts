@@ -24,6 +24,31 @@ test('picker cancellation, abort and rejected native write preserve original byt
  cancelled=false;const [handle]=await pickers.showOpenFilePicker(),aborted=await handle.createWritable();await aborted.write(new Blob(['discard']));await aborted.abort();await assert.rejects(aborted.close());assert.equal(writes,0);
  const writer=await handle.createWritable();await writer.write(new Blob(['changed']));await assert.rejects(writer.close(),/external file changed/);assert.equal(writes,1);
 });
+test('native abort acknowledged during Blob preparation prevents the later disk commit',async()=>{
+ let release!:(bytes:ArrayBuffer)=>void,writes=0;const original=new Uint8Array([7,8]);let disk=original;
+ const pickers=createNativeFilePickers(async(command,args)=>{if(command==='pick_document')return{token:'t',name:'own.hwp'}as any;if(command==='write_document'){writes++;disk=new Uint8Array(args!.bytes as number[]);}return undefined as any;});
+ const[handle]=await pickers.showOpenFilePicker(),writer=await handle.createWritable();
+ await writer.write({arrayBuffer:()=>new Promise<ArrayBuffer>(resolve=>release=resolve)}as Blob);
+ const closing=writer.close();assert.equal(typeof release,'function');await writer.abort();
+ release(new Uint8Array([1,2,3]).buffer);await assert.rejects(closing,{name:'AbortError'});
+ assert.equal(writes,0);assert.deepEqual(disk,original);await assert.rejects(writer.close());
+});
+test('native closing writer refuses another close or payload while preparing exactly one commit',async()=>{
+ let release!:(bytes:ArrayBuffer)=>void;const committed:number[][]=[];
+ const pickers=createNativeFilePickers(async(command,args)=>{if(command==='pick_document')return{token:'t',name:'own.hwpx'}as any;if(command==='write_document')committed.push(args!.bytes as number[]);return undefined as any;});
+ const[handle]=await pickers.showOpenFilePicker(),writer=await handle.createWritable();
+ await writer.write({arrayBuffer:()=>new Promise<ArrayBuffer>(resolve=>release=resolve)}as Blob);
+ const closing=writer.close();await assert.rejects(writer.close(),{name:'InvalidStateError'});await assert.rejects(writer.write(new Blob(['other'])),{name:'InvalidStateError'});
+ release(new Uint8Array([3,4]).buffer);await closing;assert.deepEqual(committed,[[3,4]]);
+});
+test('native abort cannot claim cancellation after dispatch; failed commit still allows cleanup',async()=>{
+ let resolve!:(value:unknown)=>void,reject!:(reason:unknown)=>void,writes=0;
+ const pickers=createNativeFilePickers(async(command)=>{if(command==='pick_document')return{token:'t',name:'own.hwp'}as any;if(command==='write_document'){writes++;return await new Promise((yes,no)=>{resolve=yes;reject=no;});}return undefined as any;});
+ const[handle]=await pickers.showOpenFilePicker(),writer=await handle.createWritable();
+ await writer.write(new Blob(['own']));const closing=writer.close();await new Promise(r=>setImmediate(r));assert.equal(writes,1);
+ await assert.rejects(writer.abort(),{name:'InvalidStateError'});resolve(undefined);await closing;assert.equal(writes,1);
+ const failed=await handle.createWritable();await failed.write(new Blob(['retry']));const failure=failed.close();await new Promise(r=>setImmediate(r));assert.equal(writes,2);reject(Error('native refusal'));await assert.rejects(failure,/native refusal/);await failed.abort();await assert.rejects(failed.close());assert.equal(writes,2);
+});
 test('pending native picker rejects every concurrent open/save without invoking or queueing another dialog',async()=>{
  for(const firstKind of ['open','save']){
   let resolve!:(value:any)=>void,calls=0;const pickers=createNativeFilePickers(async()=>{calls++;return await new Promise(r=>resolve=r);});

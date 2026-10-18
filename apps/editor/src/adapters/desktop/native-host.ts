@@ -46,19 +46,36 @@ export function createNativeFilePickers(invoke: NativeInvoke) {
       },
       getFile: async () => new File([new Uint8Array(await invoke<number[]>(bound?'read_bound_document':'read_document', { token: info.token }))], info.name),
       createWritable: async () => {
-        let pending: Blob | null = null, finished = false;
+        let pending: Blob | null = null, finished = false, closing = false, committing = false;
         return {
           write: async (blob: Blob) => {
             if (finished) throw new Error('이미 끝난 저장 요청입니다.');
+            if (closing) throw new DOMException('저장이 진행 중입니다.', 'InvalidStateError');
             pending = blob;
           },
           close: async () => {
+            if (closing) throw new DOMException('저장이 진행 중입니다.', 'InvalidStateError');
             if (finished || !pending) throw new Error('저장할 내용이 없습니다.');
-            const bytes = Array.from(new Uint8Array(await pending.arrayBuffer()));
-            await invoke('write_document', { token: info.token, bytes });
+            closing = true;
+            try {
+              const buffer = await pending.arrayBuffer();
+              // Abort can finish while the Blob is being read. Never dispatch
+              // a native commit after that cancellation has been acknowledged.
+              if (finished) throw new DOMException('저장이 취소되었습니다.', 'AbortError');
+              const bytes = Array.from(new Uint8Array(buffer));
+              committing = true;
+              await invoke('write_document', { token: info.token, bytes });
+              pending = null; finished = true;
+            } finally {
+              committing = false; closing = false;
+            }
+          },
+          abort: async () => {
+            // Once IPC has been sent its disk commit cannot be recalled. Do
+            // not claim that an in-flight native write was successfully aborted.
+            if (committing) throw new DOMException('이미 요청한 파일 저장 결과를 기다려 주세요.', 'InvalidStateError');
             pending = null; finished = true;
           },
-          abort: async () => { pending = null; finished = true; },
         };
       },
     } as unknown as FileSystemFileHandle;

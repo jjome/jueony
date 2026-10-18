@@ -1,4 +1,5 @@
 *.sh text eol=lf
+docs/evidence/file-completion-2026-10-18/recovery87/native/** whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
 # Unified diff context uses a single space for empty source lines. The build
 # additionally runs git apply --whitespace=error-all on the patched Rust.
 engine/patches/*.patch text eol=lf whitespace=-blank-at-eol,-blank-at-eof
@@ -78,3 +79,4 @@ docs/evidence/file-completion-2026-10-18/engine81/** -text whitespace=cr-at-eol,
 docs/evidence/file-completion-2026-10-18/engine82/** -text whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
 docs/evidence/file-completion-2026-10-18/engine83/** -text whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
 docs/evidence/file-completion-2026-10-18/engine86/** -text whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+docs/evidence/file-completion-2026-10-18/recovery87/native/** whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof

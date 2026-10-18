@@ -1,0 +1,18 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.58s
+     Running unittests src\lib.rs (apps/editor/src-tauri/target\debug\deps\jueony_editor-3833ffeae4b6ae97.exe)
+
+running 1 test
+
+thread 'native_recents::tests::oversized_registry_is_refused_before_replacing_the_readable_catalog' (40672) panicked at src\native_recents.rs:126:9:
+writer must honor the reader's size contract
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test native_recents::tests::oversized_registry_is_refused_before_replacing_the_readable_catalog ... FAILED
+
+failures:
+
+failures:
+    native_recents::tests::oversized_registry_is_refused_before_replacing_the_readable_catalog
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 31 filtered out; finished in 0.05s
+
+error: test failed, to rerun pass `--lib`

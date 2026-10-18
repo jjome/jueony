@@ -41,8 +41,11 @@ impl RecentStore {
     fn write(&self, registry:&Registry)->io::Result<()> {
         let parent=self.file.parent().ok_or_else(||invalid("최근 문서 저장소가 없습니다."))?;
         fs::create_dir_all(parent)?;
-        let mut staged=tempfile::NamedTempFile::new_in(parent)?;
         let bytes=serde_json::to_vec(registry).map_err(|_|invalid("최근 문서 목록을 만들 수 없습니다."))?;
+        // Never commit a catalog which the matching reader must reject. Keep
+        // the previous readable registry intact when many workspaces fill it.
+        if bytes.len()>1024*1024 {return Err(invalid("최근 문서 목록이 너무 큽니다. 기존 목록은 유지했습니다."));}
+        let mut staged=tempfile::NamedTempFile::new_in(parent)?;
         staged.write_all(&bytes)?;staged.as_file().sync_all()?;
         staged.persist(&self.file).map_err(|e|io::Error::new(e.error.kind(),format!("최근 문서 목록 교체 실패: {}",e.error)))?;
         if fs::read(&self.file)?!=bytes {return Err(invalid("최근 문서 목록의 저장 결과를 확인하지 못했습니다."));} Ok(())
@@ -100,4 +103,43 @@ impl RecentStore {
     #[test]fn directory_substitution_cannot_be_reopened_or_drop_the_record(){let(_dir,store,path)=setup();store.remember("a",&DocumentFile::open(path.clone()).unwrap()).unwrap();let id=store.list("a").unwrap()[0].id.clone();fs::remove_file(&path).unwrap();fs::create_dir(&path).unwrap();assert_eq!(store.inspect("a",&id).unwrap().status,"unavailable");assert!(store.reopen("a",&id,&digest(b"original")).is_err());assert_eq!(store.list("a").unwrap().len(),1);assert!(path.is_dir());}
     #[cfg(windows)]
     #[test]fn windows_locked_source_is_unavailable_and_retry_keeps_original_identity(){use std::os::windows::fs::OpenOptionsExt;let(_dir,store,path)=setup();store.remember("a",&DocumentFile::open(path.clone()).unwrap()).unwrap();let id=store.list("a").unwrap()[0].id.clone();let lock=fs::OpenOptions::new().read(true).write(true).share_mode(0).open(&path).unwrap();assert_eq!(store.inspect("a",&id).unwrap().status,"unavailable");assert!(store.reopen("a",&id,&digest(b"original")).is_err());assert_eq!(store.list("a").unwrap()[0].id,id);drop(lock);assert_eq!(store.inspect("a",&id).unwrap().status,"unchanged");assert_eq!(fs::read(path).unwrap(),b"original");}
+
+    fn path_registry(dir: &std::path::Path, count: usize) -> Registry {
+        // Historical missing files are valid records. Each component stays
+        // below the Windows filename limit and the absolute paths below 32K.
+        let mut parent = dir.to_path_buf();
+        for _ in 0..12 { parent.push("r".repeat(100)); }
+        Registry { version: 1, entries: (0..count).map(|i| {
+            let name = format!("archived-{i}.hwpx");
+            Entry { id: uuid::Uuid::new_v4().to_string(),
+                workspace: format!("archive-{i}"), path: parent.join(&name),
+                name, fingerprint: digest(b"original"), opened_at: i as u64 }
+        }).collect() }
+    }
+
+    #[test]
+    fn oversized_registry_is_refused_before_replacing_the_readable_catalog() {
+        let (dir, store, path) = setup();
+        store.remember("a", &DocumentFile::open(path.clone()).unwrap()).unwrap();
+        let catalog = dir.path().join("app/recent.json");
+        let before = fs::read(&catalog).unwrap();
+        let large = path_registry(dir.path(), 800);
+        assert!(large.entries.len() < 1000);
+        assert!(serde_json::to_vec(&large).unwrap().len() > 1024 * 1024);
+        assert!(store.write(&large).is_err(), "writer must honor the reader's size contract");
+        assert_eq!(fs::read(&catalog).unwrap(), before);
+        assert_eq!(store.list("a").unwrap().len(), 1);
+        assert_eq!(fs::read(path).unwrap(), b"original");
+        assert_eq!(fs::read_dir(catalog.parent().unwrap()).unwrap().count(), 1);
+    }
+
+    #[test]
+    fn large_valid_registry_below_the_read_limit_still_roundtrips() {
+        let (dir, store, _) = setup();
+        let valid = path_registry(dir.path(), 600);
+        assert!(serde_json::to_vec(&valid).unwrap().len() < 1024 * 1024);
+        store.write(&valid).unwrap();
+        assert_eq!(store.read().unwrap().entries.len(), 600);
+        assert_eq!(store.list("archive-599").unwrap().len(), 1);
+    }
 }

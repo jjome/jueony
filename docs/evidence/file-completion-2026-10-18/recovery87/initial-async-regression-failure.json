@@ -1,0 +1,241 @@
+{
+  "results": [
+    {
+      "name": "real XML/XSD file inputs compile namespace-aware sequence profile and show structure",
+      "status": "PASS"
+    },
+    {
+      "name": "real field edit escapes markup and preserves emoji, comments and other fields",
+      "status": "PASS"
+    },
+    {
+      "name": "invalid integer edit is transactional and adds no history",
+      "status": "PASS"
+    },
+    {
+      "name": "repeat max and delete min are enforced with unchanged rejected state",
+      "status": "PASS"
+    },
+    {
+      "name": "UI undo/redo restores exact field values and repeat history",
+      "status": "PASS"
+    },
+    {
+      "name": "actual XML and XSD downloads reparse, validate and preserve non-field comments/source schema",
+      "status": "PASS"
+    },
+    {
+      "name": "malformed XML/DTD/PI/invalid encoding and unsupported XSD are rejected, never fetched",
+      "status": "PASS"
+    },
+    {
+      "name": "failed file open preserves existing dirty XML, undo and export content",
+      "status": "PASS"
+    },
+    {
+      "name": "oversized XML and XSD refuse before either file arrayBuffer allocation and preserve current workspace",
+      "status": "FAIL"
+    },
+    {
+      "name": "cancelled replacement and dirty close preserve current XML workspace",
+      "status": "PASS"
+    },
+    {
+      "name": "DOM codec rejects destructive complex edits, illegal Unicode and stale requests",
+      "status": "PASS"
+    },
+    {
+      "name": "UTF-8 XML download reopens through actual file UI with no original source writes",
+      "status": "PASS"
+    },
+    {
+      "name": "no external requests, console errors or page errors",
+      "status": "PASS"
+    }
+  ],
+  "failures": [
+    {
+      "name": "oversized XML and XSD refuse before either file arrayBuffer allocation and preserve current workspace",
+      "error": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /2MB/. Input:\n\n''\n",
+      "stack": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /2MB/. Input:\n\n''\n\n    at file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-xml-documents.mjs:29:819\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-xml-documents.mjs:12:39)\n    at async file:///C:/Users/jjome/Documents/work/jueony/apps/editor/scripts/verify-xml-documents.mjs:29:2"
+    }
+  ],
+  "observations": [
+    {
+      "errors": [
+        {
+          "name": "malformed",
+          "rejected": true
+        },
+        {
+          "name": "doctype",
+          "rejected": true
+        },
+        {
+          "name": "entity",
+          "rejected": true
+        },
+        {
+          "name": "stylesheet",
+          "rejected": true
+        },
+        {
+          "name": "bad-type",
+          "rejected": true
+        },
+        {
+          "name": "include",
+          "rejected": true
+        },
+        {
+          "name": "mixed",
+          "rejected": true
+        },
+        {
+          "name": "unknown-attribute",
+          "rejected": true
+        },
+        {
+          "name": "wrong-namespace",
+          "rejected": true
+        }
+      ],
+      "encoding": true
+    }
+  ],
+  "downloadEvents": [
+    {
+      "frameId": "2C2C10CA5767A3E6DF04877B5E3817BE",
+      "guid": "947551a1-98ae-4c60-9ace-1595670bd54d",
+      "url": "blob:http://127.0.0.1:4484/eb6ad2e5-56a8-4dc5-b409-634837ead345",
+      "suggestedFilename": "own-report.xml"
+    },
+    {
+      "guid": "947551a1-98ae-4c60-9ace-1595670bd54d",
+      "totalBytes": 153,
+      "receivedBytes": 0,
+      "state": "inProgress"
+    },
+    {
+      "guid": "947551a1-98ae-4c60-9ace-1595670bd54d",
+      "totalBytes": 153,
+      "receivedBytes": 153,
+      "state": "inProgress"
+    },
+    {
+      "guid": "947551a1-98ae-4c60-9ace-1595670bd54d",
+      "totalBytes": 153,
+      "receivedBytes": 153,
+      "state": "inProgress"
+    },
+    {
+      "guid": "947551a1-98ae-4c60-9ace-1595670bd54d",
+      "totalBytes": 153,
+      "receivedBytes": 153,
+      "state": "inProgress"
+    },
+    {
+      "guid": "947551a1-98ae-4c60-9ace-1595670bd54d",
+      "totalBytes": 153,
+      "receivedBytes": 153,
+      "state": "inProgress"
+    },
+    {
+      "guid": "947551a1-98ae-4c60-9ace-1595670bd54d",
+      "totalBytes": 153,
+      "receivedBytes": 153,
+      "state": "inProgress"
+    },
+    {
+      "frameId": "2C2C10CA5767A3E6DF04877B5E3817BE",
+      "guid": "7b86cb71-b256-44e3-a96e-0cdcbc9b070a",
+      "url": "blob:http://127.0.0.1:4484/41f4de3e-2548-447c-a8ad-2b5ca5ebc5c4",
+      "suggestedFilename": "own-report.xsd"
+    },
+    {
+      "guid": "947551a1-98ae-4c60-9ace-1595670bd54d",
+      "totalBytes": 153,
+      "receivedBytes": 153,
+      "state": "completed",
+      "filePath": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-recovery87-regression\\downloads\\own-report.xml"
+    },
+    {
+      "guid": "7b86cb71-b256-44e3-a96e-0cdcbc9b070a",
+      "totalBytes": 280,
+      "receivedBytes": 0,
+      "state": "inProgress"
+    },
+    {
+      "guid": "7b86cb71-b256-44e3-a96e-0cdcbc9b070a",
+      "totalBytes": 280,
+      "receivedBytes": 280,
+      "state": "inProgress"
+    },
+    {
+      "guid": "7b86cb71-b256-44e3-a96e-0cdcbc9b070a",
+      "totalBytes": 280,
+      "receivedBytes": 280,
+      "state": "inProgress"
+    },
+    {
+      "guid": "7b86cb71-b256-44e3-a96e-0cdcbc9b070a",
+      "totalBytes": 280,
+      "receivedBytes": 280,
+      "state": "inProgress"
+    },
+    {
+      "guid": "7b86cb71-b256-44e3-a96e-0cdcbc9b070a",
+      "totalBytes": 280,
+      "receivedBytes": 280,
+      "state": "inProgress"
+    },
+    {
+      "guid": "7b86cb71-b256-44e3-a96e-0cdcbc9b070a",
+      "totalBytes": 280,
+      "receivedBytes": 280,
+      "state": "inProgress"
+    },
+    {
+      "guid": "7b86cb71-b256-44e3-a96e-0cdcbc9b070a",
+      "totalBytes": 280,
+      "receivedBytes": 280,
+      "state": "completed",
+      "filePath": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\xml-recovery87-regression\\downloads\\own-report.xsd"
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "sourceHashes": [
+    {
+      "path": "src/modules/xml-documents/public/contracts.ts",
+      "sha256": "303f1e46a292bb9f13af458fa0691007b526218acacdedefa11d81d49c500c5a"
+    },
+    {
+      "path": "src/modules/xml-documents/public/index.ts",
+      "sha256": "f78694507e366f5efbf8b7707544ae45e57b082e88b5bb0cf262f41b8c8c16ab"
+    },
+    {
+      "path": "src/modules/xml-documents/domain/schema.ts",
+      "sha256": "bd6d2224c492ac152cec38ebd11e626d49870492fdbb8c84afc2e527cd1d5910"
+    },
+    {
+      "path": "src/modules/xml-documents/ports/xml-codec.ts",
+      "sha256": "3d8427090956763055991fdc7a323860a8cdacbc4c861123cbfe7b2152cc032b"
+    },
+    {
+      "path": "src/modules/xml-documents/application/workspace.ts",
+      "sha256": "f67a763b083d784f23736240c9a1207ccf72ea347ad4e68d5c39f04a384742f9"
+    },
+    {
+      "path": "src/adapters/xml/browser-parser.ts",
+      "sha256": "d501b25f13660836bd10d0551040beccba28bd52a1b7a783966a628a87c37ab3"
+    },
+    {
+      "path": "src/ui/xml-document-dialog.ts",
+      "sha256": "3e7b0627095a103407bb67904c2bfa1176fac983c4c4b5692ffea903e48bc8ab"
+    }
+  ],
+  "verifierSha256": "c467771728a1d1989c3a519ae33a3f77082494f29ee60cca8d205d4bb801f974",
+  "scope": "Real isolated Edge and actual compiled production XML module/dialog/file inputs/download/reopen. No HWP editor, HML/HWT or XSL rendering support claimed. Root app menu integration and actual Hancom review are separate. Own fixtures only; no native handles, user files, font bytes or external resource loads."
+}

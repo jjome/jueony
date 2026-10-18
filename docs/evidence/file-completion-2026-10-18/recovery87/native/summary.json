@@ -1,0 +1,69 @@
+{
+  "status": "FROZEN_TWO_NATIVE_FILE_LIFECYCLE_DEFECTS_FIXED_HEADLESS_VERIFIED",
+  "baseHead": "f3a498f5",
+  "changedProductionAndTestFiles": {
+    "apps/editor/src-tauri/src/native_recents.rs": "e80a49d02e09a58fe3fc66ae1d7d5f29e9d54632850276815dce76ba26e4765f",
+    "apps/editor/src/adapters/desktop/native-host.ts": "08792c8b74fa7ac7d2872c5c706726fe33f018a44c5a635034137a02c695244a",
+    "apps/editor/tests/native-host.test.ts": "9f7b2c109140fe8a27c67e5061cfe5df1085a3717e9ab8b3b158316ade1f6935"
+  },
+  "defects": [
+    {
+      "file": "apps/editor/src-tauri/src/native_recents.rs",
+      "cause": "RecentStore.read rejects catalogs over1MiB but write could atomically replace the readable catalog with a larger one.",
+      "before": "A structurally valid800-entry absolute-path catalog (<1000 record limit) incorrectly committed; the refusal assertion failed. Baseline original preserved.",
+      "after": "Serialized byte size checked before creating the staging file or replacing the catalog; existing readable bytes and original document preserved. A600-entry below-limit catalog still roundtrips."
+    },
+    {
+      "file": "apps/editor/src/adapters/desktop/native-host.ts",
+      "cause": "abort completed while close awaited Blob.arrayBuffer, but close later dispatched write_document anyway.",
+      "before": {
+        "writeIPCsAfterAcknowledgedAbort": 1,
+        "actualOSWrite": false
+      },
+      "after": {
+        "writeIPCsAfterAcknowledgedAbort": 0,
+        "closeError": "AbortError",
+        "duplicateCloseAndPayloadMutation": "InvalidStateError",
+        "abortAfterIPC": "InvalidStateError; cannot truthfully cancel an already dispatched native commit",
+        "failedNativeCommitCleanup": "abort allowed after rejection"
+      },
+      "unchangedScope": "Picker owner authority and native exit/recovery coordinator unchanged."
+    }
+  ],
+  "verification": {
+    "windowsNativeLibraryTests": {
+      "passed": 32,
+      "failed": 0,
+      "skipped": 0,
+      "includes": "29 existing storage/lock/read-only/replacement/window/ownership tests +2 new registry boundaries +1 compiled-source witness"
+    },
+    "nodeNativeHostAndRecents": {
+      "passed": 33,
+      "failed": 0,
+      "skipped": 0
+    },
+    "typecheck": {
+      "status": "PASS",
+      "command": "Node22 typescript/bin/tsc --project apps/editor/.build/studio/tsconfig.json --pretty false --noEmit"
+    },
+    "diffCheck": "PASS",
+    "engineBuildUsed": false
+  },
+  "sourceWitness": "Library compile-time include_bytes matched all4 actual copied Rust modules; candidate source hashes are in candidate-source-proof.json and candidate-all-native.log.",
+  "preparationFailure": "First baseline run used system TEMP and failed before exercising the case with Windows access-denied. Kept separately; only the workspace-TEMP run is the genuine baseline refusal failure.",
+  "limitations": [
+    "Headless library tests and mocked IPC only; no app main/build.rs execution, GUI, OS dialog, server or user document was opened.",
+    "Existing damaged/oversized catalogs are preserved and not silently truncated; this prevents new unreadable commits.",
+    "Earlier86 executable and native GUI evidence predate these changes and are not relabeled as current validation.",
+    "No power-loss or whole-filesystem transactional guarantee is claimed."
+  ],
+  "scope": {
+    "xmlChanged": false,
+    "documentationChanged": false,
+    "gitMutated": false,
+    "sharedEngineBuilt": false,
+    "appsOrServersLaunched": false,
+    "GUIUsed": false,
+    "binaryOrPublicDocumentIncluded": false
+  }
+}

@@ -1,0 +1,47 @@
+   Compiling jueony-editor v0.0.1 (C:\Users\jjome\Documents\work\jueony\build\native-storage-audit-f3a498f5\candidate-source)
+warning: hard linking files in the incremental compilation cache failed. copying files instead. consider moving the cache directory to a file system which supports hard linking in session dir `\\?\C:\Users\jjome\Documents\work\jueony\apps\editor\src-tauri\target\debug\incremental\jueony_editor-2vs8epq619y2w\s-hnbayri34l-13zb1ko-working`
+
+warning: `jueony-editor` (lib test) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.95s
+     Running unittests src\lib.rs (apps/editor/src-tauri/target\debug\deps\jueony_editor-3833ffeae4b6ae97.exe)
+
+running 32 tests
+test document_windows::tests::context_requires_registered_label_and_exact_local_scope ... ok
+test document_windows::tests::corrupt_registry_is_preserved ... ok
+test document_windows::tests::failed_creation_and_failed_destroy_are_explicit_and_reversible ... ok
+test document_windows::tests::focusing_an_opening_window_does_not_forge_readiness ... ok
+test document_windows::tests::limit_failure_is_a_replayable_receipt_without_new_context ... ok
+test document_windows::tests::restart_and_closed_window_reuse_exact_namespace ... ok
+test document_windows::tests::same_request_is_idempotent_and_owner_bound ... ok
+test document_windows::tests::stale_ready_receipt_needs_a_new_readiness_proof ... ok
+test document_windows::tests::unknown_restore_and_malformed_request_never_create_context ... ok
+test file_bindings::tests::cross_window_read_write_and_comparison_are_refused ... ok
+test file_bindings::tests::two_owned_handles_compare_but_close_revokes_only_its_owner ... ok
+test headless_source_proof::compiled_native_modules_match_the_tested_copy ... COMPILED_SOURCE storage.rs 26b9727428c1d53b7ef054e07264e7fb9dc9ad6afd117434c52bff5772ae854e
+COMPILED_SOURCE native_recents.rs e80a49d02e09a58fe3fc66ae1d7d5f29e9d54632850276815dce76ba26e4765f
+COMPILED_SOURCE file_bindings.rs 68e85ae216b9887a56bc50a3e2cb774b88eaac9fed6682f150b8f7bb3f13fe11
+COMPILED_SOURCE document_windows.rs 4c66178486d365bba70881b3f467cb96d462574635768a7316ccfa8c22f75359
+ok
+test native_recents::tests::changed_and_second_change_never_adopt_unapproved_bytes ... ok
+test native_recents::tests::corrupt_registry_fails_without_overwrite ... ok
+test native_recents::tests::directory_substitution_cannot_be_reopened_or_drop_the_record ... ok
+test native_recents::tests::large_valid_registry_below_the_read_limit_still_roundtrips ... ok
+test native_recents::tests::missing_original_is_not_recreated_and_record_survives ... ok
+test native_recents::tests::oversized_registry_is_refused_before_replacing_the_readable_catalog ... ok
+test native_recents::tests::restart_reopens_exact_original_with_new_bound_file ... ok
+test native_recents::tests::same_names_are_distinct_and_repeat_keeps_identity ... ok
+test native_recents::tests::saved_revision_updates_registry_but_later_external_change_blocks_writes ... ok
+test native_recents::tests::windows_locked_source_is_unavailable_and_retry_keeps_original_identity ... ok
+test native_recents::tests::workspace_ids_cannot_cross_and_clear_is_scoped ... ok
+test storage::tests::competing_creation_and_invalid_input_do_not_overwrite ... ok
+test storage::tests::oversized_and_non_file_sources_are_rejected_before_reading ... ok
+test storage::tests::read_cannot_adopt_a_competing_new_file ... ok
+test storage::tests::reading_an_external_edit_does_not_adopt_it_as_the_write_baseline ... ok
+test storage::tests::removed_existing_file_is_not_silently_recreated ... ok
+test storage::tests::save_and_external_change_guard ... ok
+test storage::tests::windows_exclusive_share_lock_refuses_read_and_write_without_temp_leaks ... ok
+test storage::tests::windows_read_only_target_stays_unchanged_and_retry_after_unlock_succeeds ... ok
+test storage::tests::windows_replace_denial_preserves_original_and_removes_staging_file ... ok
+
+test result: ok. 32 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+

@@ -1,0 +1,142 @@
+diff --git a/apps/editor/src-tauri/src/native_recents.rs b/apps/editor/src-tauri/src/native_recents.rs
+index d040222..62d15a0 100644
+--- a/apps/editor/src-tauri/src/native_recents.rs
++++ b/apps/editor/src-tauri/src/native_recents.rs
+@@ -41,8 +41,11 @@ impl RecentStore {
+     fn write(&self, registry:&Registry)->io::Result<()> {
+         let parent=self.file.parent().ok_or_else(||invalid("최근 문서 저장소가 없습니다."))?;
+         fs::create_dir_all(parent)?;
+-        let mut staged=tempfile::NamedTempFile::new_in(parent)?;
+         let bytes=serde_json::to_vec(registry).map_err(|_|invalid("최근 문서 목록을 만들 수 없습니다."))?;
++        // Never commit a catalog which the matching reader must reject. Keep
++        // the previous readable registry intact when many workspaces fill it.
++        if bytes.len()>1024*1024 {return Err(invalid("최근 문서 목록이 너무 큽니다. 기존 목록은 유지했습니다."));}
++        let mut staged=tempfile::NamedTempFile::new_in(parent)?;
+         staged.write_all(&bytes)?;staged.as_file().sync_all()?;
+         staged.persist(&self.file).map_err(|e|io::Error::new(e.error.kind(),format!("최근 문서 목록 교체 실패: {}",e.error)))?;
+         if fs::read(&self.file)?!=bytes {return Err(invalid("최근 문서 목록의 저장 결과를 확인하지 못했습니다."));} Ok(())
+@@ -100,4 +103,43 @@ impl RecentStore {
+     #[test]fn directory_substitution_cannot_be_reopened_or_drop_the_record(){let(_dir,store,path)=setup();store.remember("a",&DocumentFile::open(path.clone()).unwrap()).unwrap();let id=store.list("a").unwrap()[0].id.clone();fs::remove_file(&path).unwrap();fs::create_dir(&path).unwrap();assert_eq!(store.inspect("a",&id).unwrap().status,"unavailable");assert!(store.reopen("a",&id,&digest(b"original")).is_err());assert_eq!(store.list("a").unwrap().len(),1);assert!(path.is_dir());}
+     #[cfg(windows)]
+     #[test]fn windows_locked_source_is_unavailable_and_retry_keeps_original_identity(){use std::os::windows::fs::OpenOptionsExt;let(_dir,store,path)=setup();store.remember("a",&DocumentFile::open(path.clone()).unwrap()).unwrap();let id=store.list("a").unwrap()[0].id.clone();let lock=fs::OpenOptions::new().read(true).write(true).share_mode(0).open(&path).unwrap();assert_eq!(store.inspect("a",&id).unwrap().status,"unavailable");assert!(store.reopen("a",&id,&digest(b"original")).is_err());assert_eq!(store.list("a").unwrap()[0].id,id);drop(lock);assert_eq!(store.inspect("a",&id).unwrap().status,"unchanged");assert_eq!(fs::read(path).unwrap(),b"original");}
++
++    fn path_registry(dir: &std::path::Path, count: usize) -> Registry {
++        // Historical missing files are valid records. Each component stays
++        // below the Windows filename limit and the absolute paths below 32K.
++        let mut parent = dir.to_path_buf();
++        for _ in 0..12 { parent.push("r".repeat(100)); }
++        Registry { version: 1, entries: (0..count).map(|i| {
++            let name = format!("archived-{i}.hwpx");
++            Entry { id: uuid::Uuid::new_v4().to_string(),
++                workspace: format!("archive-{i}"), path: parent.join(&name),
++                name, fingerprint: digest(b"original"), opened_at: i as u64 }
++        }).collect() }
++    }
++
++    #[test]
++    fn oversized_registry_is_refused_before_replacing_the_readable_catalog() {
++        let (dir, store, path) = setup();
++        store.remember("a", &DocumentFile::open(path.clone()).unwrap()).unwrap();
++        let catalog = dir.path().join("app/recent.json");
++        let before = fs::read(&catalog).unwrap();
++        let large = path_registry(dir.path(), 800);
++        assert!(large.entries.len() < 1000);
++        assert!(serde_json::to_vec(&large).unwrap().len() > 1024 * 1024);
++        assert!(store.write(&large).is_err(), "writer must honor the reader's size contract");
++        assert_eq!(fs::read(&catalog).unwrap(), before);
++        assert_eq!(store.list("a").unwrap().len(), 1);
++        assert_eq!(fs::read(path).unwrap(), b"original");
++        assert_eq!(fs::read_dir(catalog.parent().unwrap()).unwrap().count(), 1);
++    }
++
++    #[test]
++    fn large_valid_registry_below_the_read_limit_still_roundtrips() {
++        let (dir, store, _) = setup();
++        let valid = path_registry(dir.path(), 600);
++        assert!(serde_json::to_vec(&valid).unwrap().len() < 1024 * 1024);
++        store.write(&valid).unwrap();
++        assert_eq!(store.read().unwrap().entries.len(), 600);
++        assert_eq!(store.list("archive-599").unwrap().len(), 1);
++    }
+ }
+diff --git a/apps/editor/src/adapters/desktop/native-host.ts b/apps/editor/src/adapters/desktop/native-host.ts
+index 951a8a8..5763b88 100644
+--- a/apps/editor/src/adapters/desktop/native-host.ts
++++ b/apps/editor/src/adapters/desktop/native-host.ts
+@@ -46,19 +46,36 @@ export function createNativeFilePickers(invoke: NativeInvoke) {
+       },
+       getFile: async () => new File([new Uint8Array(await invoke<number[]>(bound?'read_bound_document':'read_document', { token: info.token }))], info.name),
+       createWritable: async () => {
+-        let pending: Blob | null = null, finished = false;
++        let pending: Blob | null = null, finished = false, closing = false, committing = false;
+         return {
+           write: async (blob: Blob) => {
+             if (finished) throw new Error('이미 끝난 저장 요청입니다.');
++            if (closing) throw new DOMException('저장이 진행 중입니다.', 'InvalidStateError');
+             pending = blob;
+           },
+           close: async () => {
++            if (closing) throw new DOMException('저장이 진행 중입니다.', 'InvalidStateError');
+             if (finished || !pending) throw new Error('저장할 내용이 없습니다.');
+-            const bytes = Array.from(new Uint8Array(await pending.arrayBuffer()));
+-            await invoke('write_document', { token: info.token, bytes });
++            closing = true;
++            try {
++              const buffer = await pending.arrayBuffer();
++              // Abort can finish while the Blob is being read. Never dispatch
++              // a native commit after that cancellation has been acknowledged.
++              if (finished) throw new DOMException('저장이 취소되었습니다.', 'AbortError');
++              const bytes = Array.from(new Uint8Array(buffer));
++              committing = true;
++              await invoke('write_document', { token: info.token, bytes });
++              pending = null; finished = true;
++            } finally {
++              committing = false; closing = false;
++            }
++          },
++          abort: async () => {
++            // Once IPC has been sent its disk commit cannot be recalled. Do
++            // not claim that an in-flight native write was successfully aborted.
++            if (committing) throw new DOMException('이미 요청한 파일 저장 결과를 기다려 주세요.', 'InvalidStateError');
+             pending = null; finished = true;
+           },
+-          abort: async () => { pending = null; finished = true; },
+         };
+       },
+     } as unknown as FileSystemFileHandle;
+diff --git a/apps/editor/tests/native-host.test.ts b/apps/editor/tests/native-host.test.ts
+index 77e9486..9267ba2 100644
+--- a/apps/editor/tests/native-host.test.ts
++++ b/apps/editor/tests/native-host.test.ts
+@@ -24,6 +24,31 @@ test('picker cancellation, abort and rejected native write preserve original byt
+  cancelled=false;const [handle]=await pickers.showOpenFilePicker(),aborted=await handle.createWritable();await aborted.write(new Blob(['discard']));await aborted.abort();await assert.rejects(aborted.close());assert.equal(writes,0);
+  const writer=await handle.createWritable();await writer.write(new Blob(['changed']));await assert.rejects(writer.close(),/external file changed/);assert.equal(writes,1);
+ });
++test('native abort acknowledged during Blob preparation prevents the later disk commit',async()=>{
++ let release!:(bytes:ArrayBuffer)=>void,writes=0;const original=new Uint8Array([7,8]);let disk=original;
++ const pickers=createNativeFilePickers(async(command,args)=>{if(command==='pick_document')return{token:'t',name:'own.hwp'}as any;if(command==='write_document'){writes++;disk=new Uint8Array(args!.bytes as number[]);}return undefined as any;});
++ const[handle]=await pickers.showOpenFilePicker(),writer=await handle.createWritable();
++ await writer.write({arrayBuffer:()=>new Promise<ArrayBuffer>(resolve=>release=resolve)}as Blob);
++ const closing=writer.close();assert.equal(typeof release,'function');await writer.abort();
++ release(new Uint8Array([1,2,3]).buffer);await assert.rejects(closing,{name:'AbortError'});
++ assert.equal(writes,0);assert.deepEqual(disk,original);await assert.rejects(writer.close());
++});
++test('native closing writer refuses another close or payload while preparing exactly one commit',async()=>{
++ let release!:(bytes:ArrayBuffer)=>void;const committed:number[][]=[];
++ const pickers=createNativeFilePickers(async(command,args)=>{if(command==='pick_document')return{token:'t',name:'own.hwpx'}as any;if(command==='write_document')committed.push(args!.bytes as number[]);return undefined as any;});
++ const[handle]=await pickers.showOpenFilePicker(),writer=await handle.createWritable();
++ await writer.write({arrayBuffer:()=>new Promise<ArrayBuffer>(resolve=>release=resolve)}as Blob);
++ const closing=writer.close();await assert.rejects(writer.close(),{name:'InvalidStateError'});await assert.rejects(writer.write(new Blob(['other'])),{name:'InvalidStateError'});
++ release(new Uint8Array([3,4]).buffer);await closing;assert.deepEqual(committed,[[3,4]]);
++});
++test('native abort cannot claim cancellation after dispatch; failed commit still allows cleanup',async()=>{
++ let resolve!:(value:unknown)=>void,reject!:(reason:unknown)=>void,writes=0;
++ const pickers=createNativeFilePickers(async(command)=>{if(command==='pick_document')return{token:'t',name:'own.hwp'}as any;if(command==='write_document'){writes++;return await new Promise((yes,no)=>{resolve=yes;reject=no;});}return undefined as any;});
++ const[handle]=await pickers.showOpenFilePicker(),writer=await handle.createWritable();
++ await writer.write(new Blob(['own']));const closing=writer.close();await new Promise(r=>setImmediate(r));assert.equal(writes,1);
++ await assert.rejects(writer.abort(),{name:'InvalidStateError'});resolve(undefined);await closing;assert.equal(writes,1);
++ const failed=await handle.createWritable();await failed.write(new Blob(['retry']));const failure=failed.close();await new Promise(r=>setImmediate(r));assert.equal(writes,2);reject(Error('native refusal'));await assert.rejects(failure,/native refusal/);await failed.abort();await assert.rejects(failed.close());assert.equal(writes,2);
++});
+ test('pending native picker rejects every concurrent open/save without invoking or queueing another dialog',async()=>{
+  for(const firstKind of ['open','save']){
+   let resolve!:(value:any)=>void,calls=0;const pickers=createNativeFilePickers(async()=>{calls++;return await new Promise(r=>resolve=r);});

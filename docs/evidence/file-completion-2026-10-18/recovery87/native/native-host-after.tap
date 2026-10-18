@@ -1,0 +1,208 @@
+TAP version 13
+# Subtest: native parent picker keeps an opaque original handle through exact read/write and save-as
+ok 1 - native parent picker keeps an opaque original handle through exact read/write and save-as
+  ---
+  duration_ms: 2.6763
+  type: 'test'
+  ...
+# Subtest: picker cancellation, abort and rejected native write preserve original bytes and surface failure
+ok 2 - picker cancellation, abort and rejected native write preserve original bytes and surface failure
+  ---
+  duration_ms: 0.6859
+  type: 'test'
+  ...
+# Subtest: native abort acknowledged during Blob preparation prevents the later disk commit
+ok 3 - native abort acknowledged during Blob preparation prevents the later disk commit
+  ---
+  duration_ms: 0.1768
+  type: 'test'
+  ...
+# Subtest: native closing writer refuses another close or payload while preparing exactly one commit
+ok 4 - native closing writer refuses another close or payload while preparing exactly one commit
+  ---
+  duration_ms: 0.217
+  type: 'test'
+  ...
+# Subtest: native abort cannot claim cancellation after dispatch; failed commit still allows cleanup
+ok 5 - native abort cannot claim cancellation after dispatch; failed commit still allows cleanup
+  ---
+  duration_ms: 2.9517
+  type: 'test'
+  ...
+# Subtest: pending native picker rejects every concurrent open/save without invoking or queueing another dialog
+ok 6 - pending native picker rejects every concurrent open/save without invoking or queueing another dialog
+  ---
+  duration_ms: 0.3368
+  type: 'test'
+  ...
+# Subtest: native picker rejection releases its guard for a later explicit request
+ok 7 - native picker rejection releases its guard for a later explicit request
+  ---
+  duration_ms: 0.1635
+  type: 'test'
+  ...
+# Subtest: shell and same-origin child install native picker without granting cross-origin authority
+ok 8 - shell and same-origin child install native picker without granting cross-origin authority
+  ---
+  duration_ms: 0.2094
+  type: 'test'
+  ...
+# Subtest: shell and editor realms share one native-window picker guard, even when child has its own Tauri object
+ok 9 - shell and editor realms share one native-window picker guard, even when child has its own Tauri object
+  ---
+  duration_ms: 0.3583
+  type: 'test'
+  ...
+# Subtest: native process handles cannot be persisted as original-file authority
+ok 10 - native process handles cannot be persisted as original-file authority
+  ---
+  duration_ms: 3.2722
+  type: 'test'
+  ...
+# Subtest: every native close event is vetoed; only verified unchanged state approves explicit destroy
+ok 11 - every native close event is vetoed; only verified unchanged state approves explicit destroy
+  ---
+  duration_ms: 0.386
+  type: 'test'
+  ...
+# Subtest: native exit cancellation never writes recovery or invokes close, and restores editing
+ok 12 - native exit cancellation never writes recovery or invokes close, and restores editing
+  ---
+  duration_ms: 0.0916
+  type: 'test'
+  ...
+# Subtest: busy native window refuses close without prompting or writing checkpoint
+ok 13 - busy native window refuses close without prompting or writing checkpoint
+  ---
+  duration_ms: 0.0678
+  type: 'test'
+  ...
+# Subtest: checkpoint failure and protected export failure keep native window open and dirty state intact
+ok 14 - checkpoint failure and protected export failure keep native window open and dirty state intact
+  ---
+  duration_ms: 0.1747
+  type: 'test'
+  ...
+# Subtest: revision change during async checkpoint or new busy state cannot close with stale approval
+ok 15 - revision change during async checkpoint or new busy state cannot close with stale approval
+  ---
+  duration_ms: 0.0966
+  type: 'test'
+  ...
+# Subtest: repeated close events while user consent is pending do not duplicate prompts or commits
+ok 16 - repeated close events while user consent is pending do not duplicate prompts or commits
+  ---
+  duration_ms: 0.1597
+  type: 'test'
+  ...
+# Subtest: close invocation rejection revokes approval, restores controls, and allows a safe retry
+ok 17 - close invocation rejection revokes approval, restores controls, and allows a safe retry
+  ---
+  duration_ms: 0.11
+  type: 'test'
+  ...
+# Subtest: clean native close still awaits checkpoint and never prompts unnecessarily
+ok 18 - clean native close still awaits checkpoint and never prompts unnecessarily
+  ---
+  duration_ms: 0.0645
+  type: 'test'
+  ...
+# Subtest: native event installation wires the actual window facade and exposes registration failure
+ok 19 - native event installation wires the actual window facade and exposes registration failure
+  ---
+  duration_ms: 0.1531
+  type: 'test'
+  ...
+# Subtest: native close capability includes main-window destroy used after verified recovery commit
+ok 20 - native close capability includes main-window destroy used after verified recovery commit
+  ---
+  duration_ms: 0.4631
+  type: 'test'
+  ...
+# Subtest: fresh native recent ID inspects and reopens exact disk proof through a new process handle
+ok 21 - fresh native recent ID inspects and reopens exact disk proof through a new process handle
+  ---
+  duration_ms: 1.3062
+  type: 'test'
+  ...
+# Subtest: changed source requires confirmation; cancellation never binds, opens or writes
+ok 22 - changed source requires confirmation; cancellation never binds, opens or writes
+  ---
+  duration_ms: 0.3567
+  type: 'test'
+  ...
+# Subtest: missing and inaccessible original stay listed and leave current document untouched
+ok 23 - missing and inaccessible original stay listed and leave current document untouched
+  ---
+  duration_ms: 0.1723
+  type: 'test'
+  ...
+# Subtest: stale workspace menu ID refuses before native file access
+ok 24 - stale workspace menu ID refuses before native file access
+  ---
+  duration_ms: 0.7824
+  type: 'test'
+  ...
+# Subtest: workspace switch during changed-file consent never reopens into the new workspace
+ok 25 - workspace switch during changed-file consent never reopens into the new workspace
+  ---
+  duration_ms: 0.2047
+  type: 'test'
+  ...
+# Subtest: second disk change and permission failure from Rust do not mutate opened document
+ok 26 - second disk change and permission failure from Rust do not mutate opened document
+  ---
+  duration_ms: 0.2246
+  type: 'test'
+  ...
+# Subtest: foreign list IDs, bad proofs and blocked navigation never reopen
+ok 27 - foreign list IDs, bad proofs and blocked navigation never reopen
+  ---
+  duration_ms: 0.1378
+  type: 'test'
+  ...
+# Subtest: duplicate selection is rejected while consent remains pending
+ok 28 - duplicate selection is rejected while consent remains pending
+  ---
+  duration_ms: 2.8156
+  type: 'test'
+  ...
+# Subtest: clear is explicit and current-workspace-only; cancelled clear writes nothing
+ok 29 - clear is explicit and current-workspace-only; cancelled clear writes nothing
+  ---
+  duration_ms: 0.303
+  type: 'test'
+  ...
+# Subtest: successful open/save record is keyed to original tab workspace and clean revision
+ok 30 - successful open/save record is keyed to original tab workspace and clean revision
+  ---
+  duration_ms: 0.3846
+  type: 'test'
+  ...
+# Subtest: menu wrapper keeps stable identity, strips global browser recents and exposes only active workspace IDs
+ok 31 - menu wrapper keeps stable identity, strips global browser recents and exposes only active workspace IDs
+  ---
+  duration_ms: 0.3163
+  type: 'test'
+  ...
+# Subtest: native handle identity crosses fresh process tokens only through backend validated same-file comparison
+ok 32 - native handle identity crosses fresh process tokens only through backend validated same-file comparison
+  ---
+  duration_ms: 0.6194
+  type: 'test'
+  ...
+# Subtest: recent handles revalidate the approved bytes on actual read without changing ordinary picker reads
+ok 33 - recent handles revalidate the approved bytes on actual read without changing ordinary picker reads
+  ---
+  duration_ms: 0.3888
+  type: 'test'
+  ...
+1..33
+# tests 33
+# suites 0
+# pass 33
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 110.1003

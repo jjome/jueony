@@ -4,7 +4,7 @@
 
 열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.
 
-**최종86 검수:** XML namespace·표 원점/편집 수명·새3단·폰트 유형·v1 커서 보존을 수정했다. 같은 빌드에서 unit933(skip0)·직접WASM27군·실제Edge17군·파일/복구133사례가 통과했다. 공개 변환은7조합 지원/3조합 명시 글 방향 미지원 차단으로 구별한다. 원형 필수 저장군의 HWP 변환 실패와 원MCST/Python3 초기 조판 차이, 최신 실제 Windows/한글 검수는 남아 있다. **이 파트 전체 완료는 아니다.** [최신 판정·실행](../111-file-storage-final-review.md) · [검수 근거](../evidence/file-completion-2026-10-18/engine86/README.md).
+**구현87 보강:** XML 원문/XSD/Undo·Redo 지속 복구와 업무·독립 창 격리, 최근 목록 크기 보호, 취소 후 Native 저장 경합을 수정했다. 전체 단위945·복구 headless13·기존XML13·Windows library32 통과. 사용자 요청으로 한글 직접 비교는 보류한다. 엔진86의 명시 글 방향 변환·초기 fallback 조판 및 HWT/XSL 등 미지원은 남아 있다. [현재 구현·남은 범위](../112-file-recovery-implementation.md) · [기존 엔진 검수](../111-file-storage-final-review.md).
 
 ## 진행 요약
 
@@ -190,7 +190,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 최근 원본 재연결 구현: 업무별 native app-data 목록·opaque ID·재시작 새 token·변경 동의/재변경 거절·중복 탭 방지. TS30/Windows Rust18/실제 Edge+합성 native IPC9 통과. 실제 Windows 픽커/프로세스 재시작 UI·한글 동작 대조·Agent 파일 명령은 남음.
+- 다음 작업: 최근 원본 재연결 구현: 업무별 native app-data 목록·opaque ID·재시작 새 token·변경 동의/재변경 거절·중복 탭 방지. TS30/Windows Rust18/실제 Edge+합성 native IPC9 통과. 실제 Windows 픽커/프로세스 재시작 UI·한글 동작 대조·Agent 파일 명령은 남음. 최근 목록1MiB 쓰기 선검사 추가: 기존 읽을 수 있는 목록 보존과 아래 상한 저장을 Windows library에서 확인(112번).
 - UI 명령: `file:open-recent`
 - 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [native-recents-completion.json](<../evidence/file-completion-2026-10-17/engine65/application/native-recents-completion.json>)
 - 원래 기록: `SCOPED_NATIVE_RECENTS_IMPLEMENTED;FULL_NATIVE_GUI_AND_AGENT_PENDING_2026_10_17`
@@ -204,10 +204,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 별도 XML/XSD 로컬 작업 영역에서 지원 sequence 프로필 검사·필드/반복/삭제·Undo/Redo·실제 사본 내보내기·재열기를 구현했다. HWT CFB XMLTemplate·한글 필드 매핑·XSL 지면·설치 기본 XSD 전체 문법·지속 복구·Agent는 미지원. 독립 Edge13/통합 Edge7과 원본HWP 불변·모달 중 native종료 거절을 확인했다.
+- 다음 작업: XML/XSD sequence 필드·반복·삭제·Undo/Redo·내보내기·재열기에 업무/독립 창별 지속 복구를 추가했다. 원문·스키마·전체 기록 검증, 원자 CAS·무결성·충돌/실패 후 편집 유지와 재저장 구현. 단위9·headless 실제IndexedDB13·기존XML13 통과. HWT CFB XMLTemplate·한글 필드 매핑·XSL·일반 XSD·Agent는 남음. 한글 직접 비교는 사용자 요청으로 보류.
 - UI 명령: `file:xml-workspace`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [110-file-preservation-integration.md](<../110-file-preservation-integration.md>) · [handoff-summary.json](<../evidence/file-completion-2026-10-18/xml76b/handoff-summary.json>)
-- 원래 기록: `MISSING;NOT_RUN;SCOPED_NATIVE_WINDOWS_AND_AGENT_FILE_PORT_REVIEWED_2026_10_18;SCOPED_XML_SEQUENCE_WORKSPACE_EDGE20_PASS_HWT_XSL_AND_AGENT_UNSUPPORTED_2026_10_18`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [110-file-preservation-integration.md](<../110-file-preservation-integration.md>) · [handoff-summary.json](<../evidence/file-completion-2026-10-18/xml76b/handoff-summary.json>) · [112-file-recovery-implementation.md](<../112-file-recovery-implementation.md>)
+- 원래 기록: `MISSING;NOT_RUN;SCOPED_NATIVE_WINDOWS_AND_AGENT_FILE_PORT_REVIEWED_2026_10_18;SCOPED_XML_SEQUENCE_WORKSPACE_EDGE20_PASS_HWT_XSL_AND_AGENT_UNSUPPORTED_2026_10_18;XML_WORKSPACE_PERSISTENT_RECOVERY_IMPLEMENTED_HEADLESS_VERIFIED_2026_10_18`
 
 </details>
 
@@ -537,7 +537,7 @@
 - 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
 - 완료 범위: 파일 읽기가 외부 수정/선점 파일을 새 기준으로 채택하지 않고, 교체 후 실제 바이트 검증 뒤에만 기준 갱신. 실제 Windows 읽기 전용·독점/교체 잠금·실제 엔진 두 형식 신규/교체·실패 복구 10개 및 Tauri 전체 컴파일 검사.
-- 다음 작업: Windows picker GUI·전체 ACL·디스크/전원 장애는 별도. 외부 쓰기를 원자적 CAS로 직렬화하는 보장은 없음.
+- 다음 작업: Windows picker GUI·전체 ACL·디스크/전원 장애는 별도. 외부 쓰기를 원자적 CAS로 직렬화하는 보장은 없음. 추가로 Native Blob 준비 중 abort 완료 뒤 IPC 쓰기가 진행되는 경합을 수정. 전송 전 쓰기0·전송 후 거짓 취소 거절 확인(112번).
 - 상위 항목: [B010](<05-files-storage-recovery.md#b010>) 저장
 - 근거: [108-file-preservation-completion.md](<../108-file-preservation-completion.md>) · [verification-summary.json](<../evidence/file-preservation-2026-10-17/verification-summary.json>)
 - 원래 기록: `SCOPED_IMPLEMENTED;FINAL_ENGINE_BROWSER_VERIFIED_2026_10_17`

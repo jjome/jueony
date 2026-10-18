@@ -1,6 +1,6 @@
 # Jueony — 공무원용 AI 문서 편집기
 
-[파일·저장·복구 최신 검수와 실행 방법](docs/111-file-storage-final-review.md) — 수정한 결함과 남은 완료 조건을 구분합니다.
+[파일·저장·복구 최신 구현 현황](docs/112-file-recovery-implementation.md) — XML 지속 복구·저장 취소 경합·최근 문서 목록 보호. 한글 비교는 사용자 요청으로 보류합니다.
 
 ## [전체 진행 현황 · 기능별 작업 문서 바로가기](docs/jueony-progress.md)
 

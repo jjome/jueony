@@ -1,0 +1,19 @@
+   Compiling jueony-editor v0.0.1 (C:\Users\jjome\Documents\work\jueony\build\native-storage-audit-f3a498f5\baseline-source)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.14s
+     Running unittests src\lib.rs (apps/editor/src-tauri/target\debug\deps\jueony_editor-3833ffeae4b6ae97.exe)
+
+running 1 test
+
+thread 'native_recents::tests::oversized_registry_is_refused_before_replacing_the_readable_catalog' (36244) panicked at src\native_recents.rs:120:73:
+called `Result::unwrap()` on an `Err` value: Custom { kind: PermissionDenied, error: "최근 문서 목록 교체 실패: 액세스가 거부되었습니다. (os error 5)" }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test native_recents::tests::oversized_registry_is_refused_before_replacing_the_readable_catalog ... FAILED
+
+failures:
+
+failures:
+    native_recents::tests::oversized_registry_is_refused_before_replacing_the_readable_catalog
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 31 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `--lib`

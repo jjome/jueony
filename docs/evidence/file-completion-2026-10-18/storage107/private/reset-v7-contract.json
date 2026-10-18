@@ -1,0 +1,63 @@
+{
+  "status": "PRIVATE_NATIVE_AND_WASM_SCOPED_CHECKS_PASS_OFFICIAL_INTEGRATION_PENDING",
+  "purpose": "Detect changes to inputs of an existing stored TAC reset; no source/raw/row/axis/serializer authority",
+  "issuance": [
+    {
+      "caller": "src/parser/mod.rs:parse_document_inner -> Document::seal_body_raw_provenance",
+      "stage": "actual parsed source after parser load fixups"
+    },
+    {
+      "caller": "src/document_core/commands/document.rs:DocumentCore::from_bytes -> Document::seal_body_raw_provenance",
+      "stage": "actual load after first recompose/paginate materialization"
+    }
+  ],
+  "noIssuance": [
+    "synthetic_context Some walker",
+    "edit",
+    "lazy query",
+    "export",
+    "new empty/split paragraph"
+  ],
+  "paragraphInput": "Tuple(body paragraph index, full Paragraph serde serialization), including nested serialized controls/text, raw input payloads, IDs, rows, widths, offsets and serialized HWPX Cell.dirty_flag. Child paragraphs are not separately observed.",
+  "excludedParagraphFields": [
+    "reset_flow_observation",
+    "layout_space_metrics",
+    "source_line_seg_vertical_pos",
+    "native_source_synthetic_seal",
+    "native_source_synthetic_context",
+    "completed_native_rows",
+    "native_frame_observation",
+    "stored_text_partition_dirty",
+    "cell_format_vpos_dirty",
+    "cell_vpos_reset",
+    "numbering_marker"
+  ],
+  "excludedControlFields": [
+    "existing Table/Equation raw_ctrl_seal and other model serde-skipped raw/cache/permission witnesses"
+  ],
+  "contextInput": [
+    "compiled portable RESOURCE",
+    "actual DocInfo definition payloads including unknown extra_records (not body text)",
+    "section index",
+    "full SectionDef including page geometry and master-page inputs",
+    "body positions/control indices and complete structural ColumnDef definitions"
+  ],
+  "contextExclusions": [
+    "DocInfo raw_stream/raw_stream_dirty/raw_provenance",
+    "actual DocProperties/caret",
+    "body/cell paragraph text outside local owner",
+    "current rendering result/page/column allocation",
+    "global session_edited"
+  ],
+  "conservativeLimits": [
+    "unused DocInfo definition addition invalidates equality",
+    "dynamic supplemental/exact-font/shaping contexts use existing override",
+    "missing/oversized/deep input uses existing override"
+  ],
+  "performance": "Hash/serialization byte and depth limits are not a total CPU execution limit: structural controls are scanned once per context pass, and serde may scan string escapes before writing. Current local hashes are computed once per edited native run_section and consumed via a bool vector. Current contexts refresh in actual full/deferred pagination transactions; query-only styles reuse the last transaction vector.",
+  "openReview": [
+    "official full source inventory must add every newly changed observation issuer/consumer file before final RESOURCE generation",
+    "combined firstTAC+p67+observer official30 verification pending"
+  ],
+  "privateResourceInventoryLimit": "Private compiled RESOURCE and its unit cover the existing224 inventory, not all newly changed observer files. Per-file source byte witness is supplied separately. Final official integration must expand inventory and regenerate RESOURCE."
+}

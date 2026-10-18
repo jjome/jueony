@@ -1,0 +1,43 @@
+{
+  "scope": "actual changed prefix/host keeps prior reset override; no broad cache authorization",
+  "results": [
+    {
+      "where": "prefix-body5",
+      "status": "PASS",
+      "geometry": 0,
+      "semantic": 0
+    },
+    {
+      "where": "host-cell12",
+      "status": "FAIL",
+      "geometry": 175,
+      "semantic": 0,
+      "first": [
+        {
+          "path": "$[0][\"controls\"][\"controls\"][8][\"cells\"][0][\"x\"]",
+          "before": 64.2,
+          "after": 495.1,
+          "delta": 430.90000000000003
+        },
+        {
+          "path": "$[0][\"controls\"][\"controls\"][8][\"cells\"][0][\"y\"]",
+          "before": 1285.2,
+          "after": 136.1,
+          "delta": -1149.1000000000001
+        }
+      ]
+    },
+    {
+      "where": "prefix-geometry0",
+      "status": "PASS",
+      "geometry": 0,
+      "semantic": 0
+    }
+  ],
+  "failures": [
+    {
+      "where": "host-cell12",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n175 !== 0\n"
+    }
+  ]
+}

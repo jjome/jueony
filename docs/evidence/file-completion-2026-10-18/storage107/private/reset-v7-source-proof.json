@@ -1,0 +1,85 @@
+{
+  "candidateOnly": true,
+  "source": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\native-empty-trailing105-v7\\source",
+  "resource": "7de1880fd2877eb3d669e670e37be6d607b7eae47c30edc648f21a96e5afdb87",
+  "wasm": "2d521f6c813456b63c8e2dde5b73266b9531898744421765e12058147ed3df66",
+  "js": "5b10dbb379d8d609e466b816ccf25697d87a376f0e17481f63e4d9ef0156c57a",
+  "changedSourcesFromV3": [
+    {
+      "path": "src/diagnostics/ir_field_sweep.rs",
+      "sourceRawSha256": "6963fa5339aaaa5061a8f5fbc0ff8a8f5931c9e47c29aa86eb5748c862e969ae",
+      "sourceCanonicalSha256": "6963fa5339aaaa5061a8f5fbc0ff8a8f5931c9e47c29aa86eb5748c862e969ae",
+      "baselineCanonicalSha256": "db65fb2b52a5cc9f82481f5be211f20b9e55c8017301fea329ec82c47517e78e"
+    },
+    {
+      "path": "src/document_core/mod.rs",
+      "sourceRawSha256": "22d9915c36c242e5844f9f016e88ec394abce214ca79aa1fb85eca940dc16263",
+      "sourceCanonicalSha256": "22d9915c36c242e5844f9f016e88ec394abce214ca79aa1fb85eca940dc16263",
+      "baselineCanonicalSha256": "d42139a3af3f99e7c7639dcf2162c761c8af4c14b587ae283f889073e71b7cec"
+    },
+    {
+      "path": "src/document_core/queries/rendering.rs",
+      "sourceRawSha256": "07783f5365cfe39ff3b26bd8c52540fa786fbdf7a66b4f2528d9014db4adce53",
+      "sourceCanonicalSha256": "07783f5365cfe39ff3b26bd8c52540fa786fbdf7a66b4f2528d9014db4adce53",
+      "baselineCanonicalSha256": "0e975d8d29176c07194fda4db3ff85592096f6a420c80c54dd1b6e492bb3bb6c"
+    },
+    {
+      "path": "src/model/native_computed_resource.rs",
+      "sourceRawSha256": "eb34858444b5deddd1f4d04dd27a4ae98b3b6035b6ca498e6a614ad248bffb06",
+      "sourceCanonicalSha256": "57cb0ef0e4a41cd822c636e357e59cd990b80b63cbe296547cbf0b3bc056401a",
+      "baselineCanonicalSha256": "8333619b3d087ad2f8208cd435d214da0c14cbe75b571dcb77c74d8dcb42d36e"
+    },
+    {
+      "path": "src/model/paragraph.rs",
+      "sourceRawSha256": "6f123d621da6af12ae7017393b94c20d4508c8b3ff9122bce0e52813929fccf8",
+      "sourceCanonicalSha256": "6f123d621da6af12ae7017393b94c20d4508c8b3ff9122bce0e52813929fccf8",
+      "baselineCanonicalSha256": "308c4298c6ae8b4423e0f12db9ec156a2b08e57e0aaf35a17fad26e0b988437a"
+    },
+    {
+      "path": "src/model/raw_provenance.rs",
+      "sourceRawSha256": "961d964bf9ea2d160ffe5ac876875f9532f1f5b0fb6bffae7486c14ab5a2df4d",
+      "sourceCanonicalSha256": "961d964bf9ea2d160ffe5ac876875f9532f1f5b0fb6bffae7486c14ab5a2df4d",
+      "baselineCanonicalSha256": "8364f910dada653b2e5af52eeffe1f61b6ac14326a5bae0e8f7f43fc5c875ab3"
+    },
+    {
+      "path": "src/renderer/layout/integration_tests.rs",
+      "sourceRawSha256": "17b3019e15461a2d268fe35fdd483eaa7fc62160554b4a4068a7ab1974b8f8e3",
+      "sourceCanonicalSha256": "17b3019e15461a2d268fe35fdd483eaa7fc62160554b4a4068a7ab1974b8f8e3",
+      "baselineCanonicalSha256": "f939fe568c1d721e6c5f90aa67c893242bf29e77b0180d49c4b9152b22bcb6bc"
+    },
+    {
+      "path": "src/renderer/layout/paragraph_layout/issue_2439_lineseg_indent_tests.rs",
+      "sourceRawSha256": "756de40ce62556d57bd716b313df91acc6da3c840ce75bda8d894000d14c787e",
+      "sourceCanonicalSha256": "756de40ce62556d57bd716b313df91acc6da3c840ce75bda8d894000d14c787e",
+      "baselineCanonicalSha256": "5faf4f54bafe45f899cf8931b6c6f35b1894b26439a29f9ecfc571d6e78ab25e"
+    },
+    {
+      "path": "src/renderer/layout/tests.rs",
+      "sourceRawSha256": "5e76fc5a49a2bbc64541685541c86a778c7028adde180e2a1f6f8f02bf3d2302",
+      "sourceCanonicalSha256": "5e76fc5a49a2bbc64541685541c86a778c7028adde180e2a1f6f8f02bf3d2302",
+      "baselineCanonicalSha256": "dc4e2737e3165944115351368f0075d787f4caebf5259034389b2873a810feef"
+    },
+    {
+      "path": "src/renderer/style_resolver.rs",
+      "sourceRawSha256": "ebd78953244f71d8297520c9f75b2a1f2c920b7cecab5eab4003777531109b85",
+      "sourceCanonicalSha256": "ebd78953244f71d8297520c9f75b2a1f2c920b7cecab5eab4003777531109b85",
+      "baselineCanonicalSha256": "1975ca44ba3b32c384589333f6c11e86b9b75d1fd601ec7157044ead97ee93a6"
+    },
+    {
+      "path": "src/renderer/typeset/section/stored_reset.rs",
+      "sourceRawSha256": "198250726d1ba8166ea24a62568947ce7a8f9af7b768abb65ccc4c920985c2d9",
+      "sourceCanonicalSha256": "198250726d1ba8166ea24a62568947ce7a8f9af7b768abb65ccc4c920985c2d9",
+      "baselineCanonicalSha256": "69f49744db78c2c01b0e5ab6095173859346ca4fb56a3376d59a759d10da9244"
+    },
+    {
+      "path": "src/renderer/typeset/section.rs",
+      "sourceRawSha256": "e83413329d33e436621916956962a218c66f9ef1c5b8ecdc0a38cd50e80acab8",
+      "sourceCanonicalSha256": "e83413329d33e436621916956962a218c66f9ef1c5b8ecdc0a38cd50e80acab8",
+      "baselineCanonicalSha256": "a912c047cf4148efc5c735d5ee7dd21c7abf438bfdf86d5f45b32ef5e6981293"
+    }
+  ],
+  "runtimePatchSha256": "9e3dd07450c189851ae740c09bcd6eb28ec16ba52dc5ca699bd427af286408c6",
+  "nativeLogSha256": "e259a0553a3e205cad7d6f4bcd2331e2683ed633015dee0d03c623930497a81a",
+  "wasmLogSha256": "a7f7344f759376cdc3426abf7a7c031655f5bdd359dab05903b6cc8ebd3966de",
+  "privateResourceInventoryLimit": "The existing224 compiled resource input inventory omits some new observer issuer/consumer files. All changed source hashes are recorded here separately. Official integration must include every newly changed runtime file and regenerate RESOURCE."
+}

@@ -1,0 +1,1022 @@
+{
+  "results": [
+    {
+      "name": "official76 file menu opens actual XML workspace with honest limits and no editor mutation",
+      "status": "PASS"
+    },
+    {
+      "name": "integrated XML edit/repeat/minmax and undo/redo are independent of HWP bytes, dirty and history",
+      "status": "PASS"
+    },
+    {
+      "name": "native OS close is prevented while dirty XML dialog remains, with no freeze/discard/destroy",
+      "status": "PASS"
+    },
+    {
+      "name": "integrated failed XSD read and oversized files preserve all XML and HWP state",
+      "status": "PASS"
+    },
+    {
+      "name": "integrated export creates actual XML/XSD files and reopens through same file menu",
+      "status": "PASS"
+    },
+    {
+      "name": "cancelled XML dirty close preserves the single XML workspace and original HWP",
+      "status": "PASS"
+    },
+    {
+      "name": "no OS picker/write IPC or unexpected browser errors or external requests",
+      "status": "PASS"
+    }
+  ],
+  "failures": [],
+  "observations": [
+    {
+      "prevented": 1,
+      "destroy": 0,
+      "inert": false,
+      "status": "종료하지 않았습니다. 문서 작업과 대화상자를 마친 뒤 종료해 주세요."
+    },
+    {
+      "nativeCalls": [
+        "document_window_context",
+        "list_recent_documents",
+        "list_document_windows",
+        "list_recent_documents",
+        "list_document_windows",
+        "list_recent_documents",
+        "list_document_windows"
+      ]
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@jueony/rhwp-engine-review@0.8.7",
+    "builtAt": "2026-10-18T11:08:41.575Z",
+    "engineWasmSha256": "3aa61f165b8b570697b16f4f81f5b72b74ba29729e01708b827b49deeefe0e40",
+    "engineBuild": {
+      "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+      "jsSha256": "5b10dbb379d8d609e466b816ccf25697d87a376f0e17481f63e4d9ef0156c57a",
+      "sourceId": "4f37a374a34409e1",
+      "wasmSha256": "3aa61f165b8b570697b16f4f81f5b72b74ba29729e01708b827b49deeefe0e40",
+      "patches": [
+        {
+          "name": "border-fill-identity.patch",
+          "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c"
+        },
+        {
+          "name": "default-tabs.patch",
+          "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+        },
+        {
+          "name": "document-insertion.patch",
+          "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+        },
+        {
+          "name": "master-page-editing.patch",
+          "sha256": "b04c7d682e105e3f37f72a18c1b4bb01cbf085424e3219f3919fd8c891dc26c2"
+        },
+        {
+          "name": "merged-table-transpose.patch",
+          "sha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768"
+        },
+        {
+          "name": "note-query-json.patch",
+          "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562"
+        },
+        {
+          "name": "page-border-entries.patch",
+          "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f"
+        },
+        {
+          "name": "page-border-inclusion.patch",
+          "sha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e"
+        },
+        {
+          "name": "page-border-region.patch",
+          "sha256": "ea98aed9ad8568699b802c5f46e4964fe524ba7634bc978d71fe10f44e1d7412"
+        },
+        {
+          "name": "page-border-z-image.patch",
+          "sha256": "97ccd3c9eac24c42b0844fc65e5804b232d3bef9929a6fd5de329cdd007b173b"
+        },
+        {
+          "name": "section-split.patch",
+          "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+        },
+        {
+          "name": "style-reference-deletion.patch",
+          "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+        },
+        {
+          "name": "style-reference-order.patch",
+          "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce"
+        },
+        {
+          "name": "style-shape-stories.patch",
+          "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af"
+        },
+        {
+          "name": "table-creation-consistency.patch",
+          "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+        },
+        {
+          "name": "zz-line-number-settings.patch",
+          "sha256": "4cb8ce4a8d49864f53c3ff95fdfc8ef3e0342b09f86cd525dfb9aa102e2dee72"
+        },
+        {
+          "name": "zzz-page-body-delete.patch",
+          "sha256": "54bf1697627ec92c4379fb8ca314f9bf9d99c2207bf9e90859d35c7324be2e83"
+        },
+        {
+          "name": "zzzz-page-body-copy.patch",
+          "sha256": "45f3331d992f3799dad1f076bfd6d237d8c989541ea510d888e4afb5407749db"
+        },
+        {
+          "name": "zzzzz-page-body-paper-paste.patch",
+          "sha256": "4df977f851378597848aa60581957c123e6565ebf04f9412052dbfdabb2c43a0"
+        },
+        {
+          "name": "zzzzzz-page-body-style-paste.patch",
+          "sha256": "168c4c158bc0db3e71230903eae0b1ae71092a1a139f2ad5747712f95127bd75"
+        },
+        {
+          "name": "zzzzzzz-page-body-image-paste.patch",
+          "sha256": "ac08a167a376bae3e1e890f8109f2f9552ce952abe7882712f813183597ce57a"
+        },
+        {
+          "name": "zzzzzzzz-empty-section-remove.patch",
+          "sha256": "d49d3acc5bc0b3049415e17233a7f7a7249792f6500d475ce6cd39d3ad14d590"
+        },
+        {
+          "name": "zzzzzzzzz-hwpx-body-caret.patch",
+          "sha256": "c073ab44d5460f92915ea6493a791d2cbf24bb60ad66eca5033be0fc9835ac56"
+        },
+        {
+          "name": "zzzzzzzzzz-agent-page-background.patch",
+          "sha256": "74104eca6a40a3a7f06ad6d20ed8f44f816f0c153a2be40fdf584b61fc9ba907"
+        },
+        {
+          "name": "zzzzzzzzzzz-agent-header-footer.patch",
+          "sha256": "415fa55bc5fe0c4f49a7dce025723067022d7bdef076a9fb48b7f456c30cb91a"
+        },
+        {
+          "name": "zzzzzzzzzzzz-agent-paragraph-tabs.patch",
+          "sha256": "d15949747520d51020433aca32539f79c5a8cc0dfdad9de95db221dae651b311"
+        },
+        {
+          "name": "zzzzzzzzzzzzz-agent-paragraph-decoration.patch",
+          "sha256": "2adf2bba46d11a6ca97ce838da1d329c627c8532812674b7329aaef3cdb544fb"
+        },
+        {
+          "name": "zzzzzzzzzzzzzz-agent-paragraph-lists.patch",
+          "sha256": "06e1af9e90e0c54da772a533f9c2ac5279db059c37fb3612c189e0d7e1c7692d"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzz-agent-basic-bullets.patch",
+          "sha256": "03138686d9faa51fcf335f1b6299a294248031d36ca079da5346e52d0b531a35"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzz-agent-numbering-clone.patch",
+          "sha256": "a79207f328ca0521515344c018554ccc20092142dabaa5ba413ff162408fa567"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzz-agent-basic-numbering.patch",
+          "sha256": "66ac344e90a16b3e447e97bd6a593edbc7b9e024313cc40f81f2611838f3b102"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzz-agent-paragraph-outline.patch",
+          "sha256": "dfe19d3083f6a4222440ce558b5451f2568cf57b211bcc19babb508c1db2022e"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzz-agent-style-metadata.patch",
+          "sha256": "53c6a573df6e8f1d0af4f388dad4e624a700006ad38f7a1de820eabc1d6d44cb"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzz-whole-table-edited-host.patch",
+          "sha256": "f90714f601227bba000d63be77e5ac9f3985d192e613990984544b2f70b0f603"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzz-table-default-padding-reflow.patch",
+          "sha256": "903260c4c371a2a1d4b0afa72f8f0e1f191db936bd6e055a974a0a4295badf0e"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzz-hidden-paragraph-page-owner.patch",
+          "sha256": "13df5f1c5493ef4560866f3806be6a3bd2c748e50a1fc531dac686994e310b6b"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzz-following-table-flow-owner.patch",
+          "sha256": "251cb5ee2d06a1a78732d7c01839bf4bf596a5376ce5af8637b50d8c0633f897"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzz-memo-tail-owner.patch",
+          "sha256": "5f4eafa802c6dd9dde96a1def6e187ef1be5b3f7e9a99cf8d4569458d0d0bca0"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzz-table-outer-margin-owner.patch",
+          "sha256": "6132e26aa3a5b14f506f425d79930882a5c48092eac8e96bc4c8735cc8d42db3"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-table-tail-snapshot.patch",
+          "sha256": "11a853d99a9278fd94e2c573d384f3826c53b00a433bcb6b9fa04fb24e344f0e"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzz-conversion-semantic-storage.patch",
+          "sha256": "65f3e6e87bb1030f2e565cfd96d36b85dc4065de8fb3615a2db24a9d4121a092"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-zone-observation.patch",
+          "sha256": "9dc3ffd29ada303898ab21268fb72e23b1b56bcf7c589a11687716848e80bb70"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-textbox-alignment-storage.patch",
+          "sha256": "b9d8791a5e9b7b5e6b5d1bd794f3a7ebe9012c7bc8403c49333217cfef434122"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-footnote-style-identity.patch",
+          "sha256": "867d4ac34306a4edfb4360b2d9d51d5bb5bc43dedf5abd6919cedeba427894e6"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-merged-row-height.patch",
+          "sha256": "6364cba702decf8160fea341932f5b0df6481c51fe135c2d77b6cae1c52192a3"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-session-story-evidence.patch",
+          "sha256": "4f59265ba0740ad570a7dcbdd964a06a1d99075052713e70d9c1b755b83caab8"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-visible-tail-snapshot.patch",
+          "sha256": "10dbdd14e2603200bec9ebcf34417c224d4f77624fc83ddf76a3c0cb28e8931e"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-root-line-snapshot.patch",
+          "sha256": "509a2d497b5fe4c651b26954b6874e1a95ac4a2655391f88446f70f6735c4ef0"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-overlap-origin.patch",
+          "sha256": "35f34ab3553354c4920e3ba51810770a997561fc896b40c73fb012f371dcfd96"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-reflow-markers.patch",
+          "sha256": "21e7d77e4f93072efc71718c2ea9e1ce15ff26a0fe343378b474a16a136856c8"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-whole-table-flow.patch",
+          "sha256": "4f376b5c88ae4d26c9ec890ebefd352ac004e94b292afbc36ffdbf95525f514a"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-typeset-advance-grid.patch",
+          "sha256": "4b55713647b5567ec88b39853b8a28efe4811bd08025ccf9c1f20c4554732638"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-width.patch",
+          "sha256": "1cc54a1f9c37f31d034f66f8b0fbc4dedd3bffff7fb7094b824ebb88ae187183"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-marker-whole-flow.patch",
+          "sha256": "9b954250e8ddbc67cbfd9eda3898deb1f892de63483e3d9ae8eed2d9b4c574d7"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-origin-hwpx-query.patch",
+          "sha256": "e419b33ca35e25c63b2ec40ba99cec33a7dee2690d3035e070cca2c9efa23581"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-nonflow-prefix-band-origin.patch",
+          "sha256": "7b9f054bb6bf0af8094451cf85797adb6ab9fe06fcfa6641453111bd3561bdf6"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-line-cache.patch",
+          "sha256": "2629f5073faed3d9b4f121cb71116143879085396b3ef3421e26a6c4adff64a0"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-wrap-separator-spacing.patch",
+          "sha256": "54f38a977dc703e75cc42f3383705182b546efb30f1b3e2fd9669c6c70296aa3"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-textbox-storage-flag.patch",
+          "sha256": "6ed35f5dfc24f0f47146b7fa7d1cb24fe3a56bc14f365eb0e7063dd7d85bdaf6"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-paragraph-2016-heading-case.patch",
+          "sha256": "ed6f58a7201a4d8514d459b74d90dee6d880d33746e37509d14ba0475e3bfcb3"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp-tab-placeholder-line-cache.patch",
+          "sha256": "68ad036c239042df4ae77d6750d1c69323bf1fa499193fc6d47bd2f0ef2b37ce"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-width-declared-height-preservation.patch",
+          "sha256": "5d4bb9a8907fe988741163510618d410b778cb24bfc45b51392780fc1ccc7fd8"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-explicit-none-shadow-storage.patch",
+          "sha256": "38c3ddba6b4844f82ac8a3f752dabbabb55c74d31cc3d150c1142d57f57e00e9"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-table-content-height-sync.patch",
+          "sha256": "368dd198802b630da92549f7bc4ddbcb2e6bf7a0822090519ec07a1134a9fe0b"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-closed-whole-stack-lineage.patch",
+          "sha256": "5e9b4dce4da46d62427105ce3a70362050f17392388aa507ad54d7894df31bd2"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-single-table-outer-origin.patch",
+          "sha256": "12acf5353ab12f366e04496d2d7c59093d80a7bc60293257d8fa603910de0a05"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-document-summary-metadata.patch",
+          "sha256": "69b458e6f48c0145df400b19981658575d08f88a183ae6975dd67bcf0b146f06"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-live-table-outer-origin.patch",
+          "sha256": "9b896b2d541e1dd002bd240742d707b0274f95d436bbb0d321600bd63a350845"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-offset-visible-edge.patch",
+          "sha256": "0232256c9982e2e20c0d3149abf67b1d0cbf30f9a4b03150086ded05202da0d3"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwpx-native-font-descriptors.patch",
+          "sha256": "bdc2692b6fd6e60c70dd8c5880aa4357f67521e6fbef6d7253fe9fc332c0ab3b"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stored-numbering-extension-codec.patch",
+          "sha256": "5b01b627c57b3772b93b41269d3a5e644d6003775c6b7c4ab5efd187a43f7ea1"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-table-fullwidth-source-owner.patch",
+          "sha256": "ef63e25bb950f0a8ceb4c70b1987c6b3dca739a4465acdca3a217d41d18f9d54"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-numbering-observed-disk-canonical.patch",
+          "sha256": "88aa2f62cf5601168d46c2ce0e73083f31f845ca9f125f146f3d114465bfb134"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-negative-table-frame-source-owner.patch",
+          "sha256": "2b8d16e911e3af30b9abfb93da33717de6e007b8e971046d5f6ca45a27c44d8d"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-unknown-hwpx-control-loss-report.patch",
+          "sha256": "f2004c1fe26b90b03d2e407380536a3d8eebf9529d8bc67c083c75a9b1f4ceec"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-column-stack-source-owner.patch",
+          "sha256": "8ccf80a00cb0aae3c0a71619fb0ad6b55a537ac11c785ece4a4ad568c74efa7d"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-reconstructed-body-shared-spacing-origin.patch",
+          "sha256": "1e828ab70011758f833ea59644383f6af9fa3d30400d2d220d9fd410f11f6af5"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-caption-lifecycle-and-partial-properties.patch",
+          "sha256": "0b8c8820f1c3444af15a7336034c3dc952461de6f5c758bb75992660b58b35af"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-transpose-row-measurement-owner.patch",
+          "sha256": "9d13fa135315a0fc550a2b7de3bff62d765816c217f66a4e9143e8283704b51b"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-spacing-semantic-boundary.patch",
+          "sha256": "b9e980825c6e772149c9170203da78f183d762537d784f8f6757f253de911da6"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-breakable-table-frame.patch",
+          "sha256": "2b9ec8c1ba628c5a3eeb51b15685c47cb8fc69973aac5a060e14ea12b10ea132"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-created-table-neighbor-line-provenance.patch",
+          "sha256": "a72b92a073a39731ea61ac07957d2176a0c5fd2bab6b331bfdcefbdbea229653"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-shape-insertion-wrap-owner.patch",
+          "sha256": "51cff004ad5b68a5fa2724dc200fc8c2b4e7059574e27df390eee0c75a3f8666"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-declared-ttf-substitute-font-roundtrip.patch",
+          "sha256": "51f8f19453df44f9ed01f4345e168f7fc7a48fc3acc104b79f8ab91c29a4dc56"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-explicit-hwp5-origin-return-contract.patch",
+          "sha256": "d79998f948f265811568404926e71f71462b123544b3f0fda9f567a826140bfd"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-versioned-xml-cache-storage-roundtrip.patch",
+          "sha256": "e6c14fa951415784b31a3c4a2720916fe1fe5afaa13b9300f6273c0c6a2e636c"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-verified-gulimche-integral-advance.patch",
+          "sha256": "1b7673af7d20093b9a43e9b157670926f2042c9b7b7156f87a9afecc2099d67b"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-note-shape-i32-wire-contract.patch",
+          "sha256": "a36d4572ea1f4527e8e5dda7c5211983776f3ee8f8c45cdf8b76f69e3d77bbfe"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-summary-standard-property-stream.patch",
+          "sha256": "ae4ee5b45c06032203b114ace797bf3ead878b476ea490b7aeb3854fb06bf8cd"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-reconstruction-page-basis-and-edit-lifetime.patch",
+          "sha256": "1db1c17717df23c546c32410efe14492aaf6db0b3bfe2243627a30891411a242"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-text-direction-preservation-and-loss-report.patch",
+          "sha256": "24c68a269cc0bd6e4d0dd8d7c3709a37d42fc4b766dbcde97e422ffe251dd113"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-raw-resource-namespace-ownership.patch",
+          "sha256": "173fef15aa86447c81aa9d7d5b124363fa3256e033a4478636bf1cf3386e7955"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-font-source-type-authority-and-loss.patch",
+          "sha256": "fce0993013db18c8baba21c08b04dd1f4ce5943b02191d42f1ab200c81edfa06"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-three-column-frame-ownership.patch",
+          "sha256": "df1739fea178622af38a6231ab089c3505aeeb104e03f46e5a44b898e272eb58"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stable-session-story-font-provenance.patch",
+          "sha256": "9613f523b63dc89e0aa23914055c5b0b7674a2515f2c076ecef0c178894bdd59"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-package-metadata-script-preservation.patch",
+          "sha256": "c1fb2a2434fd8be8ad8dcbb65dc75641ef141527f7518c7c89db256b1fb42944"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-fragment-namespace-budget.patch",
+          "sha256": "cf00cf74b97a358c8d484a1b840bc41e7ff51de0724bb4b1a1cca42979f6ee5b"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-metadata-namespace-read-write.patch",
+          "sha256": "7ece8bcc570b5c83994efcad39661fd57a327a49fa06cb756d022abca8bd58ee"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-source-synthetic-rows.patch",
+          "sha256": "eedb6ac4c47befebfdeb727099222b83a5b7b6550d55b98546a050366b9b5f4c"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-proportional-column-persistence.patch",
+          "sha256": "43bf22538170222f634321eae536026c969af85d956cc3ebb8d2b9901a6b7e12"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-lazy-native-row-render-context.patch",
+          "sha256": "0dc75bc3af81aa8c3383b7310a6d21fb3e326112b4bb279328d59956bd115b59"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-native-row-storage.patch",
+          "sha256": "fe5a4e24a75dde2b3a04ac76be2faad4ab2ab4be42cc01b546f9e0edd9be6af2"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stored-timestamp-preservation.patch",
+          "sha256": "cb15394d9b2d1a47993a7ffb532ab88aa0068c36ffd379584cc143d268e8c3be"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-ambiguous-xml-date-passthrough.patch",
+          "sha256": "fda0e900c01341e6c62125357fe511d6bdede536085c40619f8c6979e86a8dfd"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwt-readonly-template.patch",
+          "sha256": "4d2433093d62f249c7ff80281fb8744786dda1095b13734b585f056ff6d31b99"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-native-cell-layout.patch",
+          "sha256": "5954884f693ae5b9dcdd1cbed05a2b612e553ff3be6bebf55f08aa6a89240eb0"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-canonical-story-information.patch",
+          "sha256": "29e9d6685c43cb94b07402afe284c3ec23a93b8c7f52e88ec29cd1a2f3a2802a"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-authored-floating-host-gap.patch",
+          "sha256": "27f01c6f3db3894c3d37851e1f0418c815fbecd8d629fdccd04c3132650b4ffc"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-mixed-axis-floating-host-gap.patch",
+          "sha256": "c257180759f7016a212b2948c403a3d792bb0ea6374a38c45c5e6a4c49fc5d71"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-floating-host-row-end-bounds.patch",
+          "sha256": "23c31ad5aaf055f1f1f8d04b65249d4143ecd1f54571a5d68b55584dc35b7091"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-column-table-frame.patch",
+          "sha256": "7fca6e23ad10b90935c4f782dfe521a092dcd7d7ec7f126b67bb8d2de080ac23"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-current-flow-storage.patch",
+          "sha256": "eb09e2a57f61e1a87f687a54bbc6b42867e88b27224a0d99da5bc2eceba7e281"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-block-and-cell-frame-storage.patch",
+          "sha256": "c1f6cf078cb6d14c5570137e4dd3570e9f00059dec7f61e24052980b8c2359a6"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-local-reset-and-body-flow-storage.patch",
+          "sha256": "d97608b25c56362322697e308993f3b1095e935b29224b812d0d1f25b258aaf1"
+        }
+      ],
+      "optimized": false,
+      "builtAt": "2026-10-18T11:07:58.7622941Z",
+      "buildMode": "wsl-review-no-opt"
+    },
+    "buildScriptSha256": "32df766c52c856d675ac07fe1e07d2bf2d69faf5efad65283d867697a5cb3bb3",
+    "studioPatchSha256": "9f7c9cc78a991f37f48f33686612ab3283bf01d363fada6153e7061e2d47af7c",
+    "agentBoundSavePatchSha256": "ccf82573b1a7ef565f04a45d3a411f971c4af76fe80635f879ef56aceb0c7a52",
+    "featurePatchSha256": "543423c226b7c9603873ed486338f1dea9b82f3a088e8152ff751083eb9cf43d",
+    "recoveryPatchSha256": "12dfbb56ca02e1642bb495a44e18cf0823da84864386211eeb8811916552f864",
+    "tabFeaturePatchSha256": "da0d7d0b9a0c529af8a4a9733bf239a1c4f6afcd99b8803f1237f1c57a90ceec",
+    "sectionBoundaryPatchSha256": "e2a5cee3330b67015a3ac8cc738cafe36966950d7a12fc48e1d0a7ffc2392b13",
+    "documentInsertionPatchSha256": "2941b880fe250f779c95ce7bbd9d54384b10dda5f1596f7c0343d44e0297d4ff",
+    "styleManagementPatchSha256": "792ad2629ba0d657fe0bc504fa0f3c55075c6b2c69ea0cb570954dad294ed55c",
+    "styleFlowPatchSha256": "11010768f738466f36731a71b6d596ecae4ba60c74132fd3ea088e4816a98974",
+    "tableConversionPatchSha256": "77b1afbf52aa073f5617feacbf84781b5976fdfe549f25e10dc1116603333fe9",
+    "pageBorderPatchSha256": "70bf19d6d91304856bd7e4c75d3e6fdf43403eea9d9e06e90b2321f8117d20bb",
+    "selectedObjectPropertiesPatchSha256": "3ff0eab7f38eece3ce098c33759d0e2bdce12fb3f44c8da417c81a1e02799279",
+    "formattingToolbarPatchSha256": "d75122ccc9459cf9fa46d065777231c5b83144393a1af93d20cffee8594c600f",
+    "documentTabCyclePatchSha256": "1c907daa1e91202f24c77827629ce66c9959cf12a6d1656d64f8942d106c79f8",
+    "keyboardContextPatchSha256": "0f85ceeaa4c2998908068ad2ba0aadf3bcf137749c6d49765bb293938a4cdd1f",
+    "documentSwapStatePatchSha256": "d4ae8194a8ff2446cfd2483b53356226197c7610cae6bebea38da1af670fb212",
+    "documentHistoryPatchSha256": "2625f2c9c4c1ed24651a2e949cd586b0eae267033f2a8077eee4ed50a80a1d1c",
+    "exportMetadataLossPatchSha256": "b7a30c5f36f960f9860ae19fc6b427040f253b019c30b0362efb269613e38fc2",
+    "customSourceSha256": "5643930c68c95f56a408bb309219319f04eada37f784741c389d65827ab221cb",
+    "applicationSourceCommit": "fb10861160bcf76a68a3ddd57798da67d911d4d6",
+    "applicationSourceDirty": true,
+    "sourceBuild": true,
+    "note": "고정 rhwp 소스와 추적 패치를 직접 빌드한 검수용 WASM. 최적화 및 한컴 출력 비교 상태는 engineBuild와 검증 보고서 참조."
+  },
+  "engine": {
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "jsSha256": "5b10dbb379d8d609e466b816ccf25697d87a376f0e17481f63e4d9ef0156c57a",
+    "sourceId": "4f37a374a34409e1",
+    "wasmSha256": "3aa61f165b8b570697b16f4f81f5b72b74ba29729e01708b827b49deeefe0e40",
+    "patches": [
+      {
+        "name": "border-fill-identity.patch",
+        "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c"
+      },
+      {
+        "name": "default-tabs.patch",
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+      },
+      {
+        "name": "document-insertion.patch",
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+      },
+      {
+        "name": "master-page-editing.patch",
+        "sha256": "b04c7d682e105e3f37f72a18c1b4bb01cbf085424e3219f3919fd8c891dc26c2"
+      },
+      {
+        "name": "merged-table-transpose.patch",
+        "sha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768"
+      },
+      {
+        "name": "note-query-json.patch",
+        "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562"
+      },
+      {
+        "name": "page-border-entries.patch",
+        "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f"
+      },
+      {
+        "name": "page-border-inclusion.patch",
+        "sha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e"
+      },
+      {
+        "name": "page-border-region.patch",
+        "sha256": "ea98aed9ad8568699b802c5f46e4964fe524ba7634bc978d71fe10f44e1d7412"
+      },
+      {
+        "name": "page-border-z-image.patch",
+        "sha256": "97ccd3c9eac24c42b0844fc65e5804b232d3bef9929a6fd5de329cdd007b173b"
+      },
+      {
+        "name": "section-split.patch",
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+      },
+      {
+        "name": "style-reference-deletion.patch",
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+      },
+      {
+        "name": "style-reference-order.patch",
+        "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce"
+      },
+      {
+        "name": "style-shape-stories.patch",
+        "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af"
+      },
+      {
+        "name": "table-creation-consistency.patch",
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+      },
+      {
+        "name": "zz-line-number-settings.patch",
+        "sha256": "4cb8ce4a8d49864f53c3ff95fdfc8ef3e0342b09f86cd525dfb9aa102e2dee72"
+      },
+      {
+        "name": "zzz-page-body-delete.patch",
+        "sha256": "54bf1697627ec92c4379fb8ca314f9bf9d99c2207bf9e90859d35c7324be2e83"
+      },
+      {
+        "name": "zzzz-page-body-copy.patch",
+        "sha256": "45f3331d992f3799dad1f076bfd6d237d8c989541ea510d888e4afb5407749db"
+      },
+      {
+        "name": "zzzzz-page-body-paper-paste.patch",
+        "sha256": "4df977f851378597848aa60581957c123e6565ebf04f9412052dbfdabb2c43a0"
+      },
+      {
+        "name": "zzzzzz-page-body-style-paste.patch",
+        "sha256": "168c4c158bc0db3e71230903eae0b1ae71092a1a139f2ad5747712f95127bd75"
+      },
+      {
+        "name": "zzzzzzz-page-body-image-paste.patch",
+        "sha256": "ac08a167a376bae3e1e890f8109f2f9552ce952abe7882712f813183597ce57a"
+      },
+      {
+        "name": "zzzzzzzz-empty-section-remove.patch",
+        "sha256": "d49d3acc5bc0b3049415e17233a7f7a7249792f6500d475ce6cd39d3ad14d590"
+      },
+      {
+        "name": "zzzzzzzzz-hwpx-body-caret.patch",
+        "sha256": "c073ab44d5460f92915ea6493a791d2cbf24bb60ad66eca5033be0fc9835ac56"
+      },
+      {
+        "name": "zzzzzzzzzz-agent-page-background.patch",
+        "sha256": "74104eca6a40a3a7f06ad6d20ed8f44f816f0c153a2be40fdf584b61fc9ba907"
+      },
+      {
+        "name": "zzzzzzzzzzz-agent-header-footer.patch",
+        "sha256": "415fa55bc5fe0c4f49a7dce025723067022d7bdef076a9fb48b7f456c30cb91a"
+      },
+      {
+        "name": "zzzzzzzzzzzz-agent-paragraph-tabs.patch",
+        "sha256": "d15949747520d51020433aca32539f79c5a8cc0dfdad9de95db221dae651b311"
+      },
+      {
+        "name": "zzzzzzzzzzzzz-agent-paragraph-decoration.patch",
+        "sha256": "2adf2bba46d11a6ca97ce838da1d329c627c8532812674b7329aaef3cdb544fb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzz-agent-paragraph-lists.patch",
+        "sha256": "06e1af9e90e0c54da772a533f9c2ac5279db059c37fb3612c189e0d7e1c7692d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzz-agent-basic-bullets.patch",
+        "sha256": "03138686d9faa51fcf335f1b6299a294248031d36ca079da5346e52d0b531a35"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzz-agent-numbering-clone.patch",
+        "sha256": "a79207f328ca0521515344c018554ccc20092142dabaa5ba413ff162408fa567"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzz-agent-basic-numbering.patch",
+        "sha256": "66ac344e90a16b3e447e97bd6a593edbc7b9e024313cc40f81f2611838f3b102"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzz-agent-paragraph-outline.patch",
+        "sha256": "dfe19d3083f6a4222440ce558b5451f2568cf57b211bcc19babb508c1db2022e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzz-agent-style-metadata.patch",
+        "sha256": "53c6a573df6e8f1d0af4f388dad4e624a700006ad38f7a1de820eabc1d6d44cb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzz-whole-table-edited-host.patch",
+        "sha256": "f90714f601227bba000d63be77e5ac9f3985d192e613990984544b2f70b0f603"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzz-table-default-padding-reflow.patch",
+        "sha256": "903260c4c371a2a1d4b0afa72f8f0e1f191db936bd6e055a974a0a4295badf0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzz-hidden-paragraph-page-owner.patch",
+        "sha256": "13df5f1c5493ef4560866f3806be6a3bd2c748e50a1fc531dac686994e310b6b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-following-table-flow-owner.patch",
+        "sha256": "251cb5ee2d06a1a78732d7c01839bf4bf596a5376ce5af8637b50d8c0633f897"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-memo-tail-owner.patch",
+        "sha256": "5f4eafa802c6dd9dde96a1def6e187ef1be5b3f7e9a99cf8d4569458d0d0bca0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzz-table-outer-margin-owner.patch",
+        "sha256": "6132e26aa3a5b14f506f425d79930882a5c48092eac8e96bc4c8735cc8d42db3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-table-tail-snapshot.patch",
+        "sha256": "11a853d99a9278fd94e2c573d384f3826c53b00a433bcb6b9fa04fb24e344f0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzz-conversion-semantic-storage.patch",
+        "sha256": "65f3e6e87bb1030f2e565cfd96d36b85dc4065de8fb3615a2db24a9d4121a092"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-zone-observation.patch",
+        "sha256": "9dc3ffd29ada303898ab21268fb72e23b1b56bcf7c589a11687716848e80bb70"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-textbox-alignment-storage.patch",
+        "sha256": "b9d8791a5e9b7b5e6b5d1bd794f3a7ebe9012c7bc8403c49333217cfef434122"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-footnote-style-identity.patch",
+        "sha256": "867d4ac34306a4edfb4360b2d9d51d5bb5bc43dedf5abd6919cedeba427894e6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-merged-row-height.patch",
+        "sha256": "6364cba702decf8160fea341932f5b0df6481c51fe135c2d77b6cae1c52192a3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-session-story-evidence.patch",
+        "sha256": "4f59265ba0740ad570a7dcbdd964a06a1d99075052713e70d9c1b755b83caab8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-visible-tail-snapshot.patch",
+        "sha256": "10dbdd14e2603200bec9ebcf34417c224d4f77624fc83ddf76a3c0cb28e8931e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-root-line-snapshot.patch",
+        "sha256": "509a2d497b5fe4c651b26954b6874e1a95ac4a2655391f88446f70f6735c4ef0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-overlap-origin.patch",
+        "sha256": "35f34ab3553354c4920e3ba51810770a997561fc896b40c73fb012f371dcfd96"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-reflow-markers.patch",
+        "sha256": "21e7d77e4f93072efc71718c2ea9e1ce15ff26a0fe343378b474a16a136856c8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-whole-table-flow.patch",
+        "sha256": "4f376b5c88ae4d26c9ec890ebefd352ac004e94b292afbc36ffdbf95525f514a"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-typeset-advance-grid.patch",
+        "sha256": "4b55713647b5567ec88b39853b8a28efe4811bd08025ccf9c1f20c4554732638"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-width.patch",
+        "sha256": "1cc54a1f9c37f31d034f66f8b0fbc4dedd3bffff7fb7094b824ebb88ae187183"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-marker-whole-flow.patch",
+        "sha256": "9b954250e8ddbc67cbfd9eda3898deb1f892de63483e3d9ae8eed2d9b4c574d7"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-origin-hwpx-query.patch",
+        "sha256": "e419b33ca35e25c63b2ec40ba99cec33a7dee2690d3035e070cca2c9efa23581"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-nonflow-prefix-band-origin.patch",
+        "sha256": "7b9f054bb6bf0af8094451cf85797adb6ab9fe06fcfa6641453111bd3561bdf6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-line-cache.patch",
+        "sha256": "2629f5073faed3d9b4f121cb71116143879085396b3ef3421e26a6c4adff64a0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-wrap-separator-spacing.patch",
+        "sha256": "54f38a977dc703e75cc42f3383705182b546efb30f1b3e2fd9669c6c70296aa3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-textbox-storage-flag.patch",
+        "sha256": "6ed35f5dfc24f0f47146b7fa7d1cb24fe3a56bc14f365eb0e7063dd7d85bdaf6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-paragraph-2016-heading-case.patch",
+        "sha256": "ed6f58a7201a4d8514d459b74d90dee6d880d33746e37509d14ba0475e3bfcb3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp-tab-placeholder-line-cache.patch",
+        "sha256": "68ad036c239042df4ae77d6750d1c69323bf1fa499193fc6d47bd2f0ef2b37ce"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-width-declared-height-preservation.patch",
+        "sha256": "5d4bb9a8907fe988741163510618d410b778cb24bfc45b51392780fc1ccc7fd8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-explicit-none-shadow-storage.patch",
+        "sha256": "38c3ddba6b4844f82ac8a3f752dabbabb55c74d31cc3d150c1142d57f57e00e9"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-table-content-height-sync.patch",
+        "sha256": "368dd198802b630da92549f7bc4ddbcb2e6bf7a0822090519ec07a1134a9fe0b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-closed-whole-stack-lineage.patch",
+        "sha256": "5e9b4dce4da46d62427105ce3a70362050f17392388aa507ad54d7894df31bd2"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-single-table-outer-origin.patch",
+        "sha256": "12acf5353ab12f366e04496d2d7c59093d80a7bc60293257d8fa603910de0a05"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-document-summary-metadata.patch",
+        "sha256": "69b458e6f48c0145df400b19981658575d08f88a183ae6975dd67bcf0b146f06"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-live-table-outer-origin.patch",
+        "sha256": "9b896b2d541e1dd002bd240742d707b0274f95d436bbb0d321600bd63a350845"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-offset-visible-edge.patch",
+        "sha256": "0232256c9982e2e20c0d3149abf67b1d0cbf30f9a4b03150086ded05202da0d3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwpx-native-font-descriptors.patch",
+        "sha256": "bdc2692b6fd6e60c70dd8c5880aa4357f67521e6fbef6d7253fe9fc332c0ab3b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stored-numbering-extension-codec.patch",
+        "sha256": "5b01b627c57b3772b93b41269d3a5e644d6003775c6b7c4ab5efd187a43f7ea1"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-table-fullwidth-source-owner.patch",
+        "sha256": "ef63e25bb950f0a8ceb4c70b1987c6b3dca739a4465acdca3a217d41d18f9d54"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-numbering-observed-disk-canonical.patch",
+        "sha256": "88aa2f62cf5601168d46c2ce0e73083f31f845ca9f125f146f3d114465bfb134"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-negative-table-frame-source-owner.patch",
+        "sha256": "2b8d16e911e3af30b9abfb93da33717de6e007b8e971046d5f6ca45a27c44d8d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-unknown-hwpx-control-loss-report.patch",
+        "sha256": "f2004c1fe26b90b03d2e407380536a3d8eebf9529d8bc67c083c75a9b1f4ceec"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-column-stack-source-owner.patch",
+        "sha256": "8ccf80a00cb0aae3c0a71619fb0ad6b55a537ac11c785ece4a4ad568c74efa7d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-reconstructed-body-shared-spacing-origin.patch",
+        "sha256": "1e828ab70011758f833ea59644383f6af9fa3d30400d2d220d9fd410f11f6af5"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-caption-lifecycle-and-partial-properties.patch",
+        "sha256": "0b8c8820f1c3444af15a7336034c3dc952461de6f5c758bb75992660b58b35af"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-transpose-row-measurement-owner.patch",
+        "sha256": "9d13fa135315a0fc550a2b7de3bff62d765816c217f66a4e9143e8283704b51b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-spacing-semantic-boundary.patch",
+        "sha256": "b9e980825c6e772149c9170203da78f183d762537d784f8f6757f253de911da6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-breakable-table-frame.patch",
+        "sha256": "2b9ec8c1ba628c5a3eeb51b15685c47cb8fc69973aac5a060e14ea12b10ea132"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-created-table-neighbor-line-provenance.patch",
+        "sha256": "a72b92a073a39731ea61ac07957d2176a0c5fd2bab6b331bfdcefbdbea229653"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-shape-insertion-wrap-owner.patch",
+        "sha256": "51cff004ad5b68a5fa2724dc200fc8c2b4e7059574e27df390eee0c75a3f8666"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-declared-ttf-substitute-font-roundtrip.patch",
+        "sha256": "51f8f19453df44f9ed01f4345e168f7fc7a48fc3acc104b79f8ab91c29a4dc56"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-explicit-hwp5-origin-return-contract.patch",
+        "sha256": "d79998f948f265811568404926e71f71462b123544b3f0fda9f567a826140bfd"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-versioned-xml-cache-storage-roundtrip.patch",
+        "sha256": "e6c14fa951415784b31a3c4a2720916fe1fe5afaa13b9300f6273c0c6a2e636c"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-verified-gulimche-integral-advance.patch",
+        "sha256": "1b7673af7d20093b9a43e9b157670926f2042c9b7b7156f87a9afecc2099d67b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-note-shape-i32-wire-contract.patch",
+        "sha256": "a36d4572ea1f4527e8e5dda7c5211983776f3ee8f8c45cdf8b76f69e3d77bbfe"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-summary-standard-property-stream.patch",
+        "sha256": "ae4ee5b45c06032203b114ace797bf3ead878b476ea490b7aeb3854fb06bf8cd"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-reconstruction-page-basis-and-edit-lifetime.patch",
+        "sha256": "1db1c17717df23c546c32410efe14492aaf6db0b3bfe2243627a30891411a242"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-text-direction-preservation-and-loss-report.patch",
+        "sha256": "24c68a269cc0bd6e4d0dd8d7c3709a37d42fc4b766dbcde97e422ffe251dd113"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-raw-resource-namespace-ownership.patch",
+        "sha256": "173fef15aa86447c81aa9d7d5b124363fa3256e033a4478636bf1cf3386e7955"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-font-source-type-authority-and-loss.patch",
+        "sha256": "fce0993013db18c8baba21c08b04dd1f4ce5943b02191d42f1ab200c81edfa06"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-three-column-frame-ownership.patch",
+        "sha256": "df1739fea178622af38a6231ab089c3505aeeb104e03f46e5a44b898e272eb58"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stable-session-story-font-provenance.patch",
+        "sha256": "9613f523b63dc89e0aa23914055c5b0b7674a2515f2c076ecef0c178894bdd59"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-package-metadata-script-preservation.patch",
+        "sha256": "c1fb2a2434fd8be8ad8dcbb65dc75641ef141527f7518c7c89db256b1fb42944"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-fragment-namespace-budget.patch",
+        "sha256": "cf00cf74b97a358c8d484a1b840bc41e7ff51de0724bb4b1a1cca42979f6ee5b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-metadata-namespace-read-write.patch",
+        "sha256": "7ece8bcc570b5c83994efcad39661fd57a327a49fa06cb756d022abca8bd58ee"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-source-synthetic-rows.patch",
+        "sha256": "eedb6ac4c47befebfdeb727099222b83a5b7b6550d55b98546a050366b9b5f4c"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-proportional-column-persistence.patch",
+        "sha256": "43bf22538170222f634321eae536026c969af85d956cc3ebb8d2b9901a6b7e12"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-lazy-native-row-render-context.patch",
+        "sha256": "0dc75bc3af81aa8c3383b7310a6d21fb3e326112b4bb279328d59956bd115b59"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-native-row-storage.patch",
+        "sha256": "fe5a4e24a75dde2b3a04ac76be2faad4ab2ab4be42cc01b546f9e0edd9be6af2"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stored-timestamp-preservation.patch",
+        "sha256": "cb15394d9b2d1a47993a7ffb532ab88aa0068c36ffd379584cc143d268e8c3be"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-ambiguous-xml-date-passthrough.patch",
+        "sha256": "fda0e900c01341e6c62125357fe511d6bdede536085c40619f8c6979e86a8dfd"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwt-readonly-template.patch",
+        "sha256": "4d2433093d62f249c7ff80281fb8744786dda1095b13734b585f056ff6d31b99"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-native-cell-layout.patch",
+        "sha256": "5954884f693ae5b9dcdd1cbed05a2b612e553ff3be6bebf55f08aa6a89240eb0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-canonical-story-information.patch",
+        "sha256": "29e9d6685c43cb94b07402afe284c3ec23a93b8c7f52e88ec29cd1a2f3a2802a"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-authored-floating-host-gap.patch",
+        "sha256": "27f01c6f3db3894c3d37851e1f0418c815fbecd8d629fdccd04c3132650b4ffc"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-mixed-axis-floating-host-gap.patch",
+        "sha256": "c257180759f7016a212b2948c403a3d792bb0ea6374a38c45c5e6a4c49fc5d71"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-floating-host-row-end-bounds.patch",
+        "sha256": "23c31ad5aaf055f1f1f8d04b65249d4143ecd1f54571a5d68b55584dc35b7091"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-column-table-frame.patch",
+        "sha256": "7fca6e23ad10b90935c4f782dfe521a092dcd7d7ec7f126b67bb8d2de080ac23"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-current-flow-storage.patch",
+        "sha256": "eb09e2a57f61e1a87f687a54bbc6b42867e88b27224a0d99da5bc2eceba7e281"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-block-and-cell-frame-storage.patch",
+        "sha256": "c1f6cf078cb6d14c5570137e4dd3570e9f00059dec7f61e24052980b8c2359a6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-local-reset-and-body-flow-storage.patch",
+        "sha256": "d97608b25c56362322697e308993f3b1095e935b29224b812d0d1f25b258aaf1"
+      }
+    ],
+    "optimized": false,
+    "builtAt": "2026-10-18T11:07:58.7622941Z",
+    "buildMode": "wsl-review-no-opt"
+  },
+  "verifierSha256": "29202056a097e1cd5c0d0cfe150cf0049c3f683158e93a59ea9123f79915bc82",
+  "scope": "Current integrated production shell/menu/XML UI, explicit recovery/confirmed discard and actual downloads/reopen. Real HWP core is queried before/after for byte+state+snapshot+history equality. Native close IPC is synthetic and actual shell native coordinator is executed; actual Windows close remains separate. Checkpoint timers disabled through stored preference to isolate XML edits. No HWT mapping/HML conversion/XSL rendering/Agent XML capability claimed."
+}

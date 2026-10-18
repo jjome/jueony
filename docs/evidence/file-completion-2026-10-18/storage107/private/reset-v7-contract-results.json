@@ -1,0 +1,61 @@
+{
+  "candidateOnly": true,
+  "results": [
+    {
+      "name": "native-input-observation-and-physical-reset-units",
+      "status": "PASS",
+      "cases": 12,
+      "ignored": 0
+    },
+    {
+      "name": "compiled-portable-resource-witness",
+      "status": "PASS",
+      "cases": 1
+    },
+    {
+      "name": "actual-prefix-host-change-negative",
+      "status": "PASS",
+      "cases": 3
+    },
+    {
+      "name": "actual-local-reset-lifecycle",
+      "status": "PASS",
+      "cases": 3,
+      "initialImprovementFields": 92,
+      "remainingFirstTacFields": 90,
+      "correctedResetFieldsAfterEdit": 175,
+      "fullClosure": false
+    },
+    {
+      "name": "official113-three-xml-readback-and-v7-followup-edit-history",
+      "status": "PASS",
+      "cycles": 3,
+      "editCases": 2
+    },
+    {
+      "name": "all-four-pinned-initial-read-paths-unchanged",
+      "status": "PASS",
+      "cases": 4,
+      "geometry": 0,
+      "semantic": 0,
+      "sourceShaUnchanged": true
+    }
+  ],
+  "failures": [],
+  "remaining": [
+    "90 first-TAC body-flow clamp fields require independent peer two-arm fix",
+    "Native HWP\u2192own XML1839 is baseline111 p67 issue, peer fix in official113, not part of this private source",
+    "dynamic supplemental/exact-font/shaping context not supported by this portable reset observation",
+    "unused DocInfo definition additions conservatively retain prior override"
+  ],
+  "proofHashes": {
+    "native-final.log": "e259a0553a3e205cad7d6f4bcd2331e2683ed633015dee0d03c623930497a81a",
+    "wasm-final.log": "a7f7344f759376cdc3426abf7a7c031655f5bdd359dab05903b6cc8ebd3966de",
+    "source-proof.json": "278d5fe8464612934c2d22ab1565bbb4e3e327c2920d386f2a5bfc3529b51650",
+    "observed-local-reset-inputs105-v7-runtime.patch": "9e3dd07450c189851ae740c09bcd6eb28ec16ba52dc5ca699bd427af286408c6",
+    "prefix-change-negatives.json": "d0ec22cfb458b24e8e41718a6ba0acba8963d1f73de288a185638fc914a63502",
+    "lifecycle-actual-result.json": "2c6678fb457c8ee11ebd5dc51917d046eb557cd82be6a4de92e901a1511b39ec",
+    "xml-reopen-probe/result.json": "816edf94690309151f962c7b43d015aaf2d3ab45d5694ef8c9a4ddc94cf53d6b",
+    "initial-invariance.json": "909b07e76ac32d7d028feeff74a81808c4a483c138d49f5331710420fab2e360"
+  }
+}

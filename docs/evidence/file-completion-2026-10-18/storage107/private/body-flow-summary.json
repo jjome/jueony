@@ -1,0 +1,81 @@
+{
+  "status": "first TAC producer fixed in private candidate; overall native Python edit/storage still NOT complete",
+  "baseOfficial111": "625990fd59af9440",
+  "inputSHA": "51e89075e288e36511df470ffc0fc63fa5ec38df350e606ff623b5e965704d52",
+  "patchSha256": "d0aaa13e95d6a3d8873c63e93ce6c71453a1ce7d625afccb1552042b73055e48",
+  "runtimeFiles": [
+    "src/renderer/layout.rs"
+  ],
+  "cause": {
+    "helper": "painted_flow_text_bottom",
+    "incorrectOwner": "p0/Table control2/Cell17/CellParagraph1",
+    "actualInkEndPx": 215.33333333333334,
+    "initialBodyFlowPx": 186.53333333333336,
+    "editedBodyFlowPx": 215.33333333333334,
+    "differencePx": 28.8,
+    "firstTACInitialY": 409.1,
+    "firstTACOldEditedY": 437.9,
+    "firstTACFixedEditedY": 409.1,
+    "mechanism": "cell text was counted as body negative-spacing floor; inflated cursor passed through next float lane reserved flow, despite sibling table paint being unchanged"
+  },
+  "fix": "Skip Table/TableCell owned subtrees exactly as other non-body object subtrees; ordinary body TextLine/TextRun ink remains authoritative. No source row/style/profile/tolerance changes.",
+  "native": {
+    "finalTests": 2,
+    "pass": 2,
+    "fail": 0,
+    "ignored": 0,
+    "actualEditCases": 2,
+    "pureOwnerConditions": 8,
+    "target": "fragment105-conversion",
+    "privateExactResource": "d475495a7a743fe9ec6ca5adfaaf80816cc0730750813f24b0d38e6ed78a00ee"
+  },
+  "wasm": {
+    "scenarioCount": 5,
+    "pass": 5,
+    "fail": 0,
+    "wasmSHA": "ad5e3ab9ab18799becf300de9e54dcac5ddd93e071177fbb25c29268e0322f11",
+    "target": "first-tac106-wasm",
+    "release": "4m46s",
+    "initialFullSemanticAndGeometryDifferences": 0,
+    "editLifecycleWholeGeometry": {
+      "baseline": 265,
+      "candidate": 175
+    },
+    "firstTACCompleteControlCellsDifference": 0,
+    "undoRedoWholeDifference": 0,
+    "formatReopens": [
+      {
+        "format": "hwpx",
+        "wholeGeometryDifferences": 2014,
+        "semanticDifferences": 0,
+        "firstTACDifferences": 0,
+        "productionLayoutGuard": "blocked",
+        "independentXmlParse": "all xml/hpf pass"
+      },
+      {
+        "format": "hwp",
+        "wholeGeometryDifferences": 175,
+        "semanticDifferences": 0,
+        "firstTACDifferences": 0,
+        "productionLayoutGuard": "blocked"
+      }
+    ]
+  },
+  "preservedFailures": [
+    "Native baseline firstTAC invariant 0/1 FAIL in trace1 and trace2",
+    "p12 reset producer remains unresolved in this one-fix fork; 175 edit and 2014/175 save geometry differences retain strict failure classification"
+  ],
+  "notClaimed": [
+    "Overall Python native edit/save compatibility",
+    "Other public document/Hancom equivalence",
+    "Official engine integration/official RESOURCE regeneration",
+    "OS/nativeGUI/Hancom/Canvas or disk export writes"
+  ],
+  "excluded": [
+    "public/vendor input or derivative bytes",
+    "whole public text/layout snapshots",
+    "fonts",
+    "WASM/exe files"
+  ],
+  "privateSourceProofLimit": "Exact source file hashes and isolated target build logs plus actual behavior; no embedded source witness getter added for this tiny runtime patch. Private read-only wrapper/modules omitted from production delta."
+}

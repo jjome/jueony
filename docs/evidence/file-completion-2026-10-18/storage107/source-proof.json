@@ -1,0 +1,34 @@
+{
+  "parentCommit": "fb10861",
+  "files": [
+    {
+      "path": "apps/editor/scripts/verify-python-edit-storage.mjs",
+      "sha256": "5fd414962ad72732a79dcbc53259ffd41adb5d30ea89252e06f6963bc09a6b2b"
+    },
+    {
+      "path": "apps/editor/scripts/verify-python-edit-ui.mjs",
+      "sha256": "7bd104a88513ee1a2476ee160267a95db74de2a8ed690a954df25bc29fe2cce0"
+    },
+    {
+      "path": "scripts/verify_file_workflows.py",
+      "sha256": "9558ac5c978ddf81b893281b5ed752ccea56785412556bac0d661ef61bf26ca1"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/preservation.ts",
+      "sha256": "752e8fa32843b271a60524a1fb0e638a8e003be787640593f89622a2184469bc"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/document-save-layout.ts",
+      "sha256": "6c1d119f4723698e9e3769d4fb45c7b38469b6f0bca6f4c575688f3b38638434"
+    },
+    {
+      "path": "apps/editor/src/adapters/rhwp/overlap-save-layout.ts",
+      "sha256": "81292a0acd43934682abea16fa510b6fdedbd820d9f1822bac511de3919d1495"
+    },
+    {
+      "path": "apps/editor/src-tauri/src/storage.rs",
+      "sha256": "26b9727428c1d53b7ef054e07264e7fb9dc9ad6afd117434c52bff5772ae854e"
+    }
+  ],
+  "scope": "Official114 fixed product cohort; later HWT development is separate. Complete current file-part or Hancom GUI parity is not claimed."
+}

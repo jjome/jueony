@@ -1,0 +1,23 @@
+{
+  "sourceId": "4f37a374a34409e1",
+  "wasmSha256": "3aa61f165b8b570697b16f4f81f5b72b74ba29729e01708b827b49deeefe0e40",
+  "frontendSourceSha256": "5643930c68c95f56a408bb309219319f04eada37f784741c389d65827ab221cb",
+  "workflowCases": 387,
+  "additionalSuites": [
+    {
+      "name": "python-edit-storage",
+      "cases": 30,
+      "resultSha256": "b369f5bc5182046d8ce7a1a164330de0102e7391f89755f1823f0bedcf468620",
+      "verifierSha256": "5fd414962ad72732a79dcbc53259ffd41adb5d30ea89252e06f6963bc09a6b2b"
+    },
+    {
+      "name": "python-edit-ui",
+      "cases": 7,
+      "resultSha256": "f738cd881cb886a723427fb7e02310b310c9563f5777f5ce0d6b2662f420e1c7",
+      "verifierSha256": "7bd104a88513ee1a2476ee160267a95db74de2a8ed690a954df25bc29fe2cce0"
+    }
+  ],
+  "totalCases": 424,
+  "failed": 0,
+  "scope": "One full387 workflow run plus separate30-engine/7-browser regressions on exact same engine and frontend cohort. Not represented as one424 invocation. Original failures preserved separately; legacy-resource compatibility remains open."
+}

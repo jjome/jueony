@@ -1,5 +1,7 @@
 # 앞 문단 편집 후 저장: 합본106
 
+[최신 합본107: 뒤쪽 편집 저장 수정·남은 구버전 호환성](121-local-edit-storage.md).
+
 2026-10-18. [파일 작업표](features/05-files-storage-recovery.md) · [이전 합본104](119-source-table-frame-storage.md) · [고정 검수 근거](evidence/file-completion-2026-10-18/storage106/README.md).
 
 **원본 MCST의 앞 문단을 편집한 뒤 HWPX 저장이 막히던 결함은 해결했다.** 같은 공식113 엔진과 프런트106에서 파일·복구 387개, 단위1008개가 통과했다. 다른 Python 예제의 편집 후 배치 변동은 아직 수정 중이므로 파일 파트 전체 완료로 표시하지 않는다.

@@ -1,0 +1,861 @@
+--- a/src/diagnostics/ir_field_sweep.rs
++++ b/src/diagnostics/ir_field_sweep.rs
+@@ -668,6 +668,7 @@
+         native_source_synthetic_context: _,
+         completed_native_rows: _,
+         native_frame_observation: _,
++        reset_flow_observation: _,
+     } = a;
+ 
+     macro_rules! f {
+--- a/src/document_core/mod.rs
++++ b/src/document_core/mod.rs
+@@ -470,11 +470,15 @@
+     /// normalization. Layout provenance remains in `Document::layout_profile`
+     /// and is passed separately to cache-admission consumers.
+     pub(crate) fn resolve_render_styles(&self) -> ResolvedStyleSet {
+-        crate::renderer::style_resolver::resolve_styles_with_environment(
++        let mut styles = crate::renderer::style_resolver::resolve_styles_with_environment(
+             &self.document,
+             self.dpi,
+             self.font_environment.as_ref(),
+-        )
++        );
++        // Updated once by the actual pagination transaction. Query-only style
++        // resolution must not rescan every paragraph for every page/cell.
++        styles.reset_flow_contexts = self.styles.reset_flow_contexts.clone();
++        styles
+     }
+ 
+     pub(crate) fn resolve_render_styles_for_section(&self, section_idx: usize) -> ResolvedStyleSet {
+--- a/src/document_core/queries/rendering.rs
++++ b/src/document_core/queries/rendering.rs
+@@ -4757,6 +4757,7 @@
+             };
+         }
+ 
++        self.styles.reset_flow_contexts = self.document.reset_flow_contexts();
+         self.compute_render_normalized();
+         let section_index = descriptor.section_index;
+         let Some(section) = self.document.sections.get(section_index) else {
+@@ -5107,6 +5108,9 @@
+     }
+ 
+     fn paginate_pass(&mut self, force_breaks: &[std::collections::HashSet<usize>]) {
++        // Recheck current definitions/page/column inputs once, even when the
++        // style aggregate itself did not need to be rebuilt by this edit.
++        self.styles.reset_flow_contexts = self.document.reset_flow_contexts();
+         // [#4968 R4C-3] 이번 pass의 모든 fresh-layout 경로가 동일한 exact-source
+         // generation을 읽는다. 등록 source가 없으면 None으로 K0 fast path를 고정한다.
+         self.ensure_exact_font_measurement_contexts();
+--- a/src/model/paragraph.rs
++++ b/src/model/paragraph.rs
+@@ -98,6 +98,10 @@
+     pub(crate) completed_native_rows: Option<super::native_computed_rows::CompletedRows>,
+     #[serde(skip_serializing)]
+     pub(crate) native_frame_observation: super::native_computed_rows::FrameObservation,
++    /// Read-only load observation for detecting changed local reset inputs.
++    /// Not a raw-byte, source-row, coordinate-axis or serialization authority.
++    #[serde(skip_serializing)]
++    pub(crate) reset_flow_observation: Option<super::raw_provenance::ResetFlowObservation>,
+     /// 영역 태그 정보
+     pub range_tags: Vec<RangeTag>,
+     /// 필드 텍스트 범위 (0x03~0x04 사이 텍스트 인덱스 + 컨트롤 인덱스)
+@@ -1826,6 +1830,7 @@
+             native_source_synthetic_context: None,
+             completed_native_rows: None,
+             native_frame_observation: Default::default(),
++            reset_flow_observation: None,
+             // 새로 계산된 줄은 `char_offsets` 와 같은 HWP5 축에서 나오므로 보정이 없다 (#5961).
+             hwpx_axis_shift: 0,
+             range_tags: new_range_tags,
+--- a/src/model/raw_provenance.rs
++++ b/src/model/raw_provenance.rs
+@@ -492,11 +492,16 @@
+     /// 시점에 호출. 컨트롤 봉인을 먼저 세우고(봉인 필드는 `#[serde(skip)]` 이라
+     /// Section 다이제스트에 실리지 않는다) Section 봉인을 계산한다.
+     pub fn seal_body_raw_provenance(&mut self) {
+-        for section in &mut self.sections {
++        let reset_contexts = self.reset_flow_contexts();
++        for (index, section) in self.sections.iter_mut().enumerate() {
+             seal_raw_bearing_controls(&mut section.paragraphs);
+             for master_page in &mut section.section_def.master_pages {
+                 seal_raw_bearing_controls(&mut master_page.paragraphs);
+             }
++            // These are only the two actual parser/load call sites. The Some
++            // synthetic-owner walker above never observes reset inputs.
++            observe_loaded_reset_inputs(&mut section.paragraphs,
++                reset_contexts.get(index).copied().flatten());
+             section.seal_raw_provenance();
+         }
+     }
+@@ -707,3 +712,213 @@
+         assert!(!owns(&doc), "numbering remains a layout input");
+     }
+ }
++
++
++/// An observation of input equality, not permission to reuse raw bytes or rows.
++/// Never serialized. Only the actual read/load boundary records it, and only
++/// the stale-reset override consumes it. In particular raw_ctrl_seal is unchanged.
++#[derive(Debug, Clone, Copy)]
++pub(crate) struct ResetFlowObservation {
++    input: [u8; 32],
++    context: [u8; 32],
++}
++
++const RESET_INPUT_MAX_BYTES: usize = 2 * 1024 * 1024;
++const RESET_INPUT_PASS_BYTES: usize = 16 * 1024 * 1024;
++const RESET_INPUT_MAX_DEPTH: usize = 64;
++
++/// Streaming and bounded: no whole JSON allocation or recursive Value walk.
++/// JSON delimiters inside quoted/escaped text do not count toward the depth.
++struct ResetInputDigest {
++    hash: blake3::Hasher,
++    remaining: usize,
++    bytes: usize,
++    depth: usize,
++    quoted: bool,
++    escaped: bool,
++}
++impl std::io::Write for ResetInputDigest {
++    fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
++        if bytes.len() > self.remaining {
++            return Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "reset observation byte budget"));
++        }
++        for &byte in bytes {
++            if self.quoted {
++                if self.escaped { self.escaped = false; }
++                else if byte == b'\\' { self.escaped = true; }
++                else if byte == b'"' { self.quoted = false; }
++            } else {
++                match byte {
++                    b'"' => self.quoted = true,
++                    b'{' | b'[' => {
++                        self.depth += 1;
++                        if self.depth > RESET_INPUT_MAX_DEPTH {
++                            return Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "reset observation depth budget"));
++                        }
++                    }
++                    b'}' | b']' => self.depth = self.depth.checked_sub(1).ok_or_else(||
++                        std::io::Error::new(std::io::ErrorKind::InvalidData, "reset observation delimiter"))?,
++                    _ => {}
++                }
++            }
++        }
++        self.remaining -= bytes.len(); self.bytes += bytes.len();
++        self.hash.update(bytes);
++        Ok(bytes.len())
++    }
++    fn flush(&mut self) -> std::io::Result<()> { Ok(()) }
++}
++fn bounded_reset_digest<T: Serialize>(value: &T, budget: &mut usize) -> Option<[u8; 32]> {
++    let mut writer = ResetInputDigest { hash: blake3::Hasher::new(),
++        remaining: (*budget).min(RESET_INPUT_MAX_BYTES), bytes: 0,
++        depth: 0, quoted: false, escaped: false };
++    let success = serde_json::to_writer(&mut writer, value).is_ok();
++    *budget = budget.saturating_sub(writer.bytes);
++    (success && writer.depth == 0 && !writer.quoted)
++        .then(|| *writer.hash.finalize().as_bytes())
++}
++
++impl crate::model::document::Document {
++    /// One current context calculation per pass. No body/cell text participates:
++    /// editing a later paragraph is not evidence that a preceding reset is stale.
++    /// Bind actual definitions (not just IDs), unknown DocInfo records, the whole
++    /// SectionDef and the positions/definitions of structural ColumnDef controls.
++    /// A newly appended unused definition conservatively invalidates equality.
++    pub(crate) fn reset_flow_contexts(&self) -> Vec<Option<[u8; 32]>> {
++        // This projection intentionally excludes body content, raw stream
++        // caches, seals and the derived print_method. Unknown definition bytes
++        // remain bound. Exhaustive destructuring makes additions reviewable.
++        let DocInfo { bin_data_list, font_faces, border_fills, char_shapes,
++            tab_defs, numberings, bullets, para_shapes, styles, extra_records,
++            print_method: _, raw_stream: _, bullet_count, memo_shape_count,
++            memo_properties_xml, distribute_doc_data_removed: _, raw_stream_dirty: _,
++            hwpx_head_tail, hwpml_version, raw_provenance: _ } = &self.doc_info;
++        let mut budget = RESET_INPUT_PASS_BYTES;
++        let Some(definitions) = bounded_reset_digest(&(
++            bin_data_list, font_faces, border_fills, char_shapes, tab_defs,
++            numberings, bullets, para_shapes, styles, extra_records, bullet_count,
++            memo_shape_count, memo_properties_xml, hwpx_head_tail, hwpml_version,
++        ), &mut budget) else { return vec![None; self.sections.len()]; };
++        self.sections.iter().enumerate().map(|(section_index, section)| {
++            let mut columns = Vec::new();
++            for (pi, paragraph) in section.paragraphs.iter().enumerate() {
++                for (ci, control) in paragraph.controls.iter().enumerate() {
++                    if let crate::model::control::Control::ColumnDef(column) = control {
++                        if columns.len() >= 4096 { return None; }
++                        columns.push((pi, ci, column));
++                    }
++                }
++            }
++            bounded_reset_digest(&(
++                "rhwp-reset-input-observation-1", super::native_computed_resource::RESOURCE,
++                definitions, section_index, &section.section_def, columns,
++            ), &mut budget)
++        }).collect()
++    }
++}
++
++fn observe_loaded_reset_inputs(paragraphs: &mut [crate::model::paragraph::Paragraph], context: Option<[u8; 32]>) {
++    let mut budget = RESET_INPUT_PASS_BYTES;
++    for (index, paragraph) in paragraphs.iter_mut().enumerate() {
++        paragraph.reset_flow_observation = context.and_then(|context|
++            bounded_reset_digest(&(index, &*paragraph), &mut budget)
++                .map(|input| ResetFlowObservation { input, context }));
++    }
++}
++
++/// Compute once at section entry, not once per reset or nested paragraph. The
++/// existing dirty/raw/physical checks remain separate requirements. Dynamically
++/// supplied measurement resources are outside this portable observation scope.
++pub(crate) fn unchanged_reset_inputs(
++    paragraphs: &[crate::model::paragraph::Paragraph], context: Option<[u8; 32]>,
++    portable_resources: bool,
++) -> Vec<bool> {
++    let mut budget = RESET_INPUT_PASS_BYTES;
++    paragraphs.iter().enumerate().map(|(index, paragraph)| {
++        if !portable_resources { return false; }
++        let (Some(context), Some(observed)) = (context, paragraph.reset_flow_observation) else { return false; };
++        observed.context == context && bounded_reset_digest(&(index, paragraph), &mut budget) == Some(observed.input)
++    }).collect()
++}
++
++
++#[cfg(test)]
++mod reset_flow_observation105_tests {
++    use super::*;
++    use crate::model::{document::{Document, Section}, paragraph::{Paragraph, LineSeg},
++        control::Control, table::{Table, Cell}, page::ColumnDef, style::CharShape};
++    fn fixture() -> Document {
++        let mut document=Document::default();
++        let child=Paragraph{text:"source".into(),line_segs:vec![LineSeg{line_height:100,..Default::default()}],..Default::default()};
++        let table=Table{cells:vec![Cell{paragraphs:vec![child],..Default::default()}],..Default::default()};
++        let host=Paragraph{controls:vec![Control::ColumnDef(ColumnDef::default()),Control::Table(Box::new(table))],..Default::default()};
++        document.sections.push(Section{paragraphs:vec![host,Paragraph{text:"tail".into(),..Default::default()}],..Default::default()});
++        document.doc_info.char_shapes.push(CharShape::default());
++        document.seal_body_raw_provenance(); document
++    }
++    fn current(document:&Document)->Vec<bool> {
++        unchanged_reset_inputs(&document.sections[0].paragraphs,
++            document.reset_flow_contexts()[0],true)
++    }
++    #[test] fn native_empty_trailing105_observation_is_local_and_catches_retained_clean_host_text(){
++        let mut doc=fixture(); assert_eq!(current(&doc),vec![true,true]);
++        doc.sections[0].paragraphs[1].text.push('X');
++        assert_eq!(current(&doc),vec![true,false]);
++        let Control::Table(t)=&mut doc.sections[0].paragraphs[0].controls[1] else{panic!()};
++        t.cells[0].paragraphs[0].text.push('X');
++        t.cells[0].paragraphs[0].stored_text_partition_dirty=false;t.cells[0].dirty_flag=false;
++        assert_eq!(current(&doc),vec![false,false]);
++    }
++    #[test] fn native_empty_trailing105_shared_definition_frame_unknown_raw_and_move_changes_deny_equality(){
++        for case in 0..7 {
++            let mut doc=fixture();match case {
++                0=>doc.doc_info.char_shapes[0].base_size+=1,
++                1=>doc.sections[0].section_def.page_def.width+=1,
++                2=>if let Control::ColumnDef(c)=&mut doc.sections[0].paragraphs[0].controls[0]{c.spacing+=1;},
++                3=>if let Control::Table(t)=&mut doc.sections[0].paragraphs[0].controls[1]{t.raw_table_record_extra.push(123);},
++                4=>doc.sections[0].paragraphs.swap(0,1),
++                5=>doc.sections[0].paragraphs[0].reset_flow_observation=None,
++                _=>doc.doc_info.extra_records.push(Default::default()),
++            }
++            assert!(!current(&doc)[0],"case {case}");
++        }
++    }
++    #[test] fn native_empty_trailing105_observation_never_creates_raw_rows_or_synthetic_owner(){
++        let mut doc=fixture();let input=serde_json::to_vec(&doc.sections[0].paragraphs[0]).unwrap();
++        let observation=doc.sections[0].paragraphs[0].reset_flow_observation.unwrap();
++        let Control::Table(t)=&doc.sections[0].paragraphs[0].controls[1] else{panic!()};
++        assert!(t.raw_ctrl_seal.is_none());
++        assert!(doc.sections[0].paragraphs[0].native_source_synthetic_seal.is_none());
++        doc.sections[0].paragraphs[0].reset_flow_observation=None;
++        doc.bind_native_source_synthetic_context();
++        assert!(doc.sections[0].paragraphs[0].reset_flow_observation.is_none());
++        assert_eq!(input,serde_json::to_vec(&doc.sections[0].paragraphs[0]).unwrap());
++        doc.sections[0].paragraphs[0].reset_flow_observation=Some(observation);
++        let new=Paragraph::new_empty_like(&doc.sections[0].paragraphs[0]);
++        assert!(new.reset_flow_observation.is_none());
++        assert_eq!(unchanged_reset_inputs(&doc.sections[0].paragraphs,doc.reset_flow_contexts()[0],false),vec![false,false]);
++    }
++    #[test] fn native_empty_trailing105_columnless_move_and_context_budget_are_not_certified(){
++        let mut doc=fixture();doc.sections[0].paragraphs[0].controls.remove(0);
++        doc.seal_body_raw_provenance();assert_eq!(current(&doc),vec![true,true]);
++        doc.sections[0].paragraphs.swap(0,1);assert_eq!(current(&doc),vec![false,false]);
++        let mut doc=fixture();doc.doc_info.extra_records.push(crate::model::document::RawRecord{
++            data:vec![0;RESET_INPUT_MAX_BYTES],..Default::default()});
++        assert_eq!(doc.reset_flow_contexts(),vec![None]);
++        let mut doc=fixture();doc.sections[0].paragraphs[0].controls.extend(
++            (0..4096).map(|_|Control::ColumnDef(ColumnDef::default())));
++        assert_eq!(doc.reset_flow_contexts(),vec![None]);
++    }
++    #[test] fn native_empty_trailing105_observation_depth_bytes_and_quoted_delimiters_are_bounded(){
++        let mut budget=1024;assert!(bounded_reset_digest(&"\"[{}]\\",&mut budget).is_some());
++        let mut budget=5;assert!(bounded_reset_digest(&"123456",&mut budget).is_none());
++        let oversized="x".repeat(RESET_INPUT_MAX_BYTES+1);let mut budget=RESET_INPUT_PASS_BYTES;
++        assert!(bounded_reset_digest(&oversized,&mut budget).is_none());
++        let mut value=serde_json::Value::Null;
++        for _ in 0..RESET_INPUT_MAX_DEPTH+1 {value=serde_json::Value::Array(vec![value]);}
++        let mut budget=RESET_INPUT_MAX_BYTES;assert!(bounded_reset_digest(&value,&mut budget).is_none());
++        let mut doc=fixture();let p=doc.sections[0].paragraphs[0].clone();
++        doc.sections[0].paragraphs[0]=Paragraph{reset_flow_observation:p.reset_flow_observation,text:oversized,..p};
++        assert!(!current(&doc)[0]);
++    }
++}
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -2000,7 +2000,11 @@
+             | RenderNodeType::Ellipse(_)
+             | RenderNodeType::Path(_)
+             | RenderNodeType::Group(_)
+-            | RenderNodeType::TextBox => return,
++            | RenderNodeType::TextBox
++            // A table/cell owns its own measured flow. Its text is not a
++            // preceding body paragraph, even when it paints beyond the box.
++            | RenderNodeType::Table(_)
++            | RenderNodeType::TableCell(_) => return,
+             RenderNodeType::TextRun(_) => {
+                 *out = out.max(node.bbox.y + node.bbox.height);
+             }
+@@ -2014,6 +2018,166 @@
+     walk(node, &mut bottom);
+     bottom.is_finite().then_some(bottom)
+ }
++
++#[cfg(test)]
++mod painted_flow_text_bottom_owner106_tests {
++    use super::{painted_flow_text_bottom, CellContext, CellPathEntry};
++    use crate::renderer::{
++        render_tree::{
++            BoundingBox, CaptionControlKind, CaptionOwner, FieldMarkerType, RenderNode,
++            RenderNodeType, TableCellNode, TableNode, TextLineNode, TextRunNode,
++        },
++        TextStyle,
++    };
++
++    fn ink(y: f64, height: f64) -> RenderNode {
++        RenderNode::new(
++            2,
++            RenderNodeType::TextRun(TextRunNode {
++                text: "OWN".into(),
++                style: TextStyle::default(),
++                char_shape_id: Some(0),
++                para_shape_id: Some(0),
++                section_index: Some(0),
++                para_index: Some(0),
++                char_start: Some(0),
++                cell_context: None,
++                is_para_end: true,
++                is_line_break_end: false,
++                rotation: 0.0,
++                is_vertical: false,
++                char_overlap: None,
++                border_fill_id: 0,
++                baseline: height,
++                field_marker: FieldMarkerType::None,
++                layout_positions: None,
++                display_text: None,
++            }),
++            BoundingBox::new(0.0, y, 5.0, height),
++        )
++    }
++
++    fn owner(kind: RenderNodeType, child: RenderNode) -> RenderNode {
++        let mut node = RenderNode::new(1, kind, BoundingBox::new(0.0, 0.0, 5.0, 5.0));
++        node.children.push(child);
++        node
++    }
++
++    fn body(child: RenderNode) -> RenderNode {
++        owner(RenderNodeType::Column(0), child)
++    }
++
++    fn table(child: RenderNode) -> RenderNode {
++        owner(
++            RenderNodeType::Table(TableNode {
++                row_count: 1,
++                col_count: 1,
++                border_fill_id: 0,
++                section_index: Some(0),
++                para_index: Some(0),
++                control_index: Some(0),
++                cell_context: None,
++            }),
++            child,
++        )
++    }
++
++    fn cell(child: RenderNode) -> RenderNode {
++        owner(
++            RenderNodeType::TableCell(TableCellNode {
++                col: 0,
++                row: 0,
++                col_span: 1,
++                row_span: 1,
++                border_fill_id: 0,
++                text_direction: 0,
++                clip: false,
++                page_fragment: false,
++                model_cell_index: Some(0),
++            }),
++            child,
++        )
++    }
++
++    #[test]
++    fn negative_spacing_body_ink_remains_the_flow_floor() {
++        // A narrow line box must not hide glyph ink from a following table.
++        let tree = body(owner(
++            RenderNodeType::TextLine(TextLineNode::new(5.0, 4.0)),
++            ink(0.0, 20.0),
++        ));
++        assert_eq!(painted_flow_text_bottom(&tree), Some(20.0));
++    }
++
++    #[test]
++    fn table_cell_text_is_not_body_flow() {
++        let tree = body(table(cell(ink(200.0, 20.0))));
++        assert_eq!(painted_flow_text_bottom(&tree), None);
++    }
++
++    #[test]
++    fn standalone_cell_text_is_not_body_flow() {
++        let tree = body(cell(ink(200.0, 20.0)));
++        assert_eq!(painted_flow_text_bottom(&tree), None);
++    }
++
++    #[test]
++    fn nested_table_cell_text_is_not_body_flow() {
++        let tree = body(table(cell(table(cell(ink(200.0, 20.0))))));
++        assert_eq!(painted_flow_text_bottom(&tree), None);
++    }
++
++    #[test]
++    fn sibling_caption_keeps_its_existing_flow_floor_behavior() {
++        // layout_table emits the Table and caption TextLine as Column siblings.
++        // The two subtree exclusions deliberately do not change caption handling.
++        let mut line = TextLineNode::new(5.0, 4.0);
++        line.caption_owner = CaptionOwner::new(
++            Some(0),
++            Some(0),
++            Some(0),
++            CaptionControlKind::Table,
++        );
++        let mut caption_ink = ink(200.0, 20.0);
++        if let RenderNodeType::TextRun(run) = &mut caption_ink.node_type {
++            run.cell_context = Some(CellContext {
++                in_textbox: false,
++                parent_para_index: 0,
++                path: vec![CellPathEntry {
++                    control_index: 0,
++                    cell_index: 65534,
++                    cell_para_index: 0,
++                    text_direction: 0,
++                }],
++            });
++        }
++        let mut tree = body(table(cell(ink(2000.0, 500.0))));
++        tree.children
++            .push(owner(RenderNodeType::TextLine(line), caption_ink));
++        assert_eq!(painted_flow_text_bottom(&tree), Some(220.0));
++    }
++
++    #[test]
++    fn textbox_exclusion_is_preserved() {
++        let tree = body(owner(RenderNodeType::TextBox, ink(200.0, 20.0)));
++        assert_eq!(painted_flow_text_bottom(&tree), None);
++    }
++
++    #[test]
++    fn overflowing_cell_does_not_replace_preceding_body_ink() {
++        let mut tree = body(ink(10.0, 20.0));
++        tree.children.push(table(cell(ink(2000.0, 500.0))));
++        assert_eq!(painted_flow_text_bottom(&tree), Some(30.0));
++    }
++
++    #[test]
++    fn body_after_table_still_owns_its_ink() {
++        let mut tree = body(table(cell(ink(2000.0, 500.0))));
++        tree.children.push(ink(60.0, 20.0));
++        assert_eq!(painted_flow_text_bottom(&tree), Some(80.0));
++    }
++}
++
+ 
+ /// 빈 host 문단에 Para-relative Square 표 두 개가 함께 저장된 경우는 세로 block
+ /// 두 개가 아니라 동일한 HWP 페이지 좌표의 가로 lane이다. 이 형상은 HWP5의
+--- a/src/renderer/layout/integration_tests.rs
++++ b/src/renderer/layout/integration_tests.rs
+@@ -79,6 +79,8 @@
+ 
+         let styles = ResolvedStyleSet {
+             section_tab_widths: Vec::new(),
++        reset_flow_contexts: Vec::new(),
++        reset_flow_context: None,
+             page_number_char_style_id: None,
+             hwp3_variant: false,
+             hft_ascii_halfwidth: false,
+--- a/src/renderer/layout/paragraph_layout/issue_2439_lineseg_indent_tests.rs
++++ b/src/renderer/layout/paragraph_layout/issue_2439_lineseg_indent_tests.rs
+@@ -85,6 +85,8 @@
+     let composed: Vec<_> = paragraphs.iter().map(compose_paragraph).collect();
+     let styles = ResolvedStyleSet {
+         section_tab_widths: Vec::new(),
++        reset_flow_contexts: Vec::new(),
++        reset_flow_context: None,
+         page_number_char_style_id: None,
+         hwp3_variant: false,
+         hft_ascii_halfwidth: false,
+--- a/src/renderer/layout/tests.rs
++++ b/src/renderer/layout/tests.rs
+@@ -744,6 +744,8 @@
+ 
+     let styles = ResolvedStyleSet {
+         section_tab_widths: Vec::new(),
++        reset_flow_contexts: Vec::new(),
++        reset_flow_context: None,
+         page_number_char_style_id: None,
+         hwp3_variant: false,
+         hft_ascii_halfwidth: false,
+@@ -889,6 +891,8 @@
+     let composed: Vec<_> = paragraphs.iter().map(|p| compose_paragraph(p)).collect();
+     let styles = ResolvedStyleSet {
+         section_tab_widths: Vec::new(),
++        reset_flow_contexts: Vec::new(),
++        reset_flow_context: None,
+         page_number_char_style_id: None,
+         hwp3_variant: false,
+         hft_ascii_halfwidth: false,
+@@ -984,6 +988,8 @@
+ 
+     let styles = ResolvedStyleSet {
+         section_tab_widths: Vec::new(),
++        reset_flow_contexts: Vec::new(),
++        reset_flow_context: None,
+         page_number_char_style_id: None,
+         hwp3_variant: false,
+         hft_ascii_halfwidth: false,
+@@ -1023,6 +1029,8 @@
+ 
+     let styles = ResolvedStyleSet {
+         section_tab_widths: Vec::new(),
++        reset_flow_contexts: Vec::new(),
++        reset_flow_context: None,
+         page_number_char_style_id: None,
+         hwp3_variant: false,
+         hft_ascii_halfwidth: false,
+@@ -1299,6 +1307,8 @@
+     // border_fill_id=1은 styles.border_styles[0]을 참조 (1-indexed)
+     let styles = ResolvedStyleSet {
+         section_tab_widths: Vec::new(),
++        reset_flow_contexts: Vec::new(),
++        reset_flow_context: None,
+         page_number_char_style_id: None,
+         hwp3_variant: false,
+         hft_ascii_halfwidth: false,
+@@ -2044,6 +2054,8 @@
+     };
+     let styles = ResolvedStyleSet {
+         section_tab_widths: Vec::new(),
++        reset_flow_contexts: Vec::new(),
++        reset_flow_context: None,
+         page_number_char_style_id: None,
+         hwp3_variant: false,
+         hft_ascii_halfwidth: false,
+@@ -2143,6 +2155,8 @@
+     };
+     let styles = ResolvedStyleSet {
+         section_tab_widths: Vec::new(),
++        reset_flow_contexts: Vec::new(),
++        reset_flow_context: None,
+         page_number_char_style_id: None,
+         hwp3_variant: false,
+         hft_ascii_halfwidth: false,
+@@ -2849,6 +2863,8 @@
+ 
+     let styles = ResolvedStyleSet {
+         section_tab_widths: Vec::new(),
++        reset_flow_contexts: Vec::new(),
++        reset_flow_context: None,
+         page_number_char_style_id: None,
+         hwp3_variant: false,
+         hft_ascii_halfwidth: false,
+--- a/src/renderer/style_resolver.rs
++++ b/src/renderer/style_resolver.rs
+@@ -442,6 +442,9 @@
+     pub para_styles: Vec<ResolvedParaStyle>,
+     /// SectionDef tabStop uses twice the effective HWPUNIT distance.
+     pub(crate) section_tab_widths: Vec<f64>,
++    /// Current read-only reset inputs; never grant row/raw cache permissions.
++    pub(crate) reset_flow_contexts: Vec<Option<[u8; 32]>>,
++    pub(crate) reset_flow_context: Option<[u8; 32]>,
+     /// 테두리/배경 스타일 목록 (border_fills[id]에 대응)
+     pub border_styles: Vec<ResolvedBorderStyle>,
+     /// 문단 번호 정의 목록 (numberings[id]에 대응)
+@@ -472,6 +475,7 @@
+     /// Explicit TabDef stops remain unchanged and retain priority in tab-stop resolution.
+     pub(crate) fn for_section(&self, section_index: usize) -> Self {
+         let mut styles = self.clone();
++        styles.reset_flow_context = self.reset_flow_contexts.get(section_index).copied().flatten();
+         let width = self
+             .section_tab_widths
+             .get(section_index)
+@@ -657,6 +661,8 @@
+         char_styles,
+         para_styles,
+         section_tab_widths: Vec::new(),
++        reset_flow_contexts: Vec::new(),
++        reset_flow_context: None,
+         border_styles,
+         numberings,
+         bullets,
+--- a/src/renderer/typeset/section.rs
++++ b/src/renderer/typeset/section.rs
+@@ -47,6 +47,14 @@
+         let mut issue2424_prof = Issue2424TypesetProfile::default();
+ 
+         let layout = PageLayoutInfo::from_page_def(page_def, column_def, self.dpi);
++        let reset_inputs = if profile.session_edited() && profile.hwp5_stored_pagination_layout() {
++            crate::model::raw_provenance::unchanged_reset_inputs(
++                paragraphs, styles.reset_flow_context,
++                styles.supplemental_metrics.is_none()
++                    && styles.kerning_measurement_context.is_none()
++                    && styles.horizontal_shaping_context.is_none(),
++            )
++        } else { Vec::new() };
+         // [#2403] 소스분기 프로파일 — 엔진(Cell)과 state 에 한 번에 배선.
+         self.profile.set(profile);
+         // [#5854] 통짜 합성 LINE_SEG 사다리 판정 — 구역당 한 번.
+@@ -305,6 +313,7 @@
+                 body_height_hu_for_variant,
+                 measured_tables,
+                 &boundary,
++                &reset_inputs,
+             );
+ 
+             if self.absorb_section_tail(
+--- a/src/renderer/typeset/section/stored_reset.rs
++++ b/src/renderer/typeset/section/stored_reset.rs
+@@ -21,6 +21,7 @@
+         body_height_hu_for_variant: i32,
+         measured_tables: &[MeasuredTable],
+         boundary: &super::entry::ParagraphBoundary<'_>,
++        reset_inputs: &[bool],
+     ) {
+         let para_style = boundary.para_style;
+         let overlay_columndef_separator_break = boundary.overlay_columndef_separator_break;
+@@ -297,7 +298,12 @@
+                 // 표 host 문단은 잔여에 표 머리(첫 두 행)가 실제로 들어갈
+                 // 때만 낡은 경계를 무시하고 fresh fit 에 맡긴다.
+                 let session_stale_reset_override =
+-                    self.profile.get().session_edited() && !st.current_items.is_empty() && {
++                    self.profile.get().session_edited() && !st.current_items.is_empty() && trigger
++                        && !native_closed_tac_reset_is_current(
++                            st.profile.hwp5_stored_pagination_layout(), st.col_count,
++                            para_idx, paragraphs, &st.current_items, measured_tables,
++                            styles, st.available_height(), self.dpi, reset_inputs,
++                        ) && {
+                         let first_table_head_px =
+                             para.controls
+                                 .iter()
+@@ -357,3 +363,176 @@
+         }
+     }
+ }
++
++
++/// A global edit flag is not evidence that an unchanged whole TAC's stored
++/// column boundary became stale. Keep that existing boundary when its empty
++/// carrier, adjacent empty rows, actual measured box and preceding local flow
++/// are still closed. This only vetoes the stale-reset *override*: it neither
++/// invents a boundary nor authenticates a new coordinate axis or source row.
++fn native_closed_tac_reset_is_current(
++    native:bool, columns:u16, index:usize, paragraphs:&[Paragraph],
++    items:&[crate::renderer::pagination::PageItem], measured:&[MeasuredTable],
++    styles:&ResolvedStyleSet, body_height:f64, dpi:f64, reset_inputs:&[bool],
++)->bool {
++    use crate::model::paragraph::{LineSeg,ColumnBreakType};
++    use crate::renderer::pagination::PageItem;
++    if !native || columns<2 || index==0 || !dpi.is_finite() || dpi<=0.0
++        || !body_height.is_finite() || body_height<=0.0 || items.is_empty() {return false;}
++    let (Some(prev),Some(current),Some(next))=(paragraphs.get(index-1),paragraphs.get(index),paragraphs.get(index+1)) else{return false;};
++    if ![index-1,index,index+1].iter().all(|i|reset_inputs.get(*i)==Some(&true)) {return false;}
++    let clean=|p:&Paragraph|!p.stored_text_partition_is_dirty() && !p.cell_format_vpos_dirty
++        && p.layout_only_fill_lines==0 && p.source_line_seg_vertical_pos.is_none()
++        && p.hwpx_axis_shift==0
++        && p.line_segs.iter().all(|s|s.tag&LineSeg::TAG_IMPLEMENTATION_PROPERTY==0);
++    let table_clean=|t:&crate::model::table::Table|t.raw_ctrl_seal
++        ==Some(crate::model::raw_provenance::record_digest(&t.common))
++        && t.cells.iter().all(|c|!c.dirty_flag && c.paragraphs.iter().all(|p|clean(p)&&p.controls.is_empty()));
++    // Read actual current-vs-initial measurement evidence. This is a reason
++    // to invalidate the existing reset, not an authorization of child layout.
++    fn changed(p:&Paragraph, depth:usize, budget:&mut usize)->bool {
++        if depth>32 || *budget==0 {return true;} *budget-=1;
++        if p.stored_text_partition_is_dirty() || p.cell_format_vpos_dirty
++            || p.layout_only_fill_lines!=0 || p.hwpx_axis_shift!=0
++            || p.source_line_seg_vertical_pos.is_some()
++            || p.line_segs.iter().any(|s|s.tag&LineSeg::TAG_IMPLEMENTATION_PROPERTY!=0) {return true;}
++        for control in &p.controls {
++            if *budget==0{return true;}*budget-=1;
++            let is_changed=match control {
++                Control::Table(t)=>t.raw_ctrl_seal!=Some(crate::model::raw_provenance::record_digest(&t.common))
++                    || t.cells.iter().any(|c|c.dirty_flag||c.paragraphs.iter().any(|p|changed(p,depth+1,budget)))
++                    || t.caption.as_ref().is_some_and(|c|c.paragraphs.iter().any(|p|changed(p,depth+1,budget))),
++                Control::Field(f)=>f.memo_paragraphs.iter().any(|p|changed(p,depth+1,budget)),
++                Control::Header(h)=>h.paragraphs.iter().any(|p|changed(p,depth+1,budget)),
++                Control::Footer(f)=>f.paragraphs.iter().any(|p|changed(p,depth+1,budget)),
++                // Current enclosing-table measurements below own the flow box.
++                // A picture is still painted by its ordinary object path; no
++                // original row, position or new source lease is granted here.
++                Control::Picture(p)=>p.caption.as_ref().is_some_and(|c|c.paragraphs.iter().any(|p|changed(p,depth+1,budget))),
++                Control::AutoNumber(_)|Control::SectionDef(_)|Control::ColumnDef(_)=>false,
++                _=>true,
++            };
++            if is_changed{return true;}
++        }
++        false
++    }
++    let mut budget=4096;
++    let mut visited=std::collections::BTreeSet::new();
++    for item in items {
++        let (pi,table_index)=match item {
++            PageItem::FullParagraph{para_index}=>(*para_index,None),
++            PageItem::Table{para_index,control_index}=>(*para_index,Some(*control_index)),
++            _=>return false,
++        };
++        let Some(p)=paragraphs.get(pi) else{return false;};
++        if pi>=index || reset_inputs.get(pi)!=Some(&true)
++            || (visited.insert(pi)&&changed(p,0,&mut budget)) {return false;}
++        if let Some(ci)=table_index {
++            let Some(m)=measured.iter().find(|m|m.para_index==pi&&m.control_index==ci) else{return false;};
++            if let Some(baseline)=m.baseline_row_heights.as_ref() {
++                if m.row_heights.len()!=baseline.len() || m.row_heights.is_empty()
++                    || m.row_heights.iter().zip(baseline).any(|(a,b)|!a.is_finite()||!b.is_finite()||(a-b).abs()>dpi/7200.0)
++                {return false;}
++            } else {
++                // None is the original, clean measurement's self-baseline.
++                // Selective measurement keeps it for untouched table owners.
++                // Still require that current measured whole box exactly closes
++                // the source common object's declared body height.
++                let Some(Control::Table(t))=p.controls.get(ci) else{return false;};
++                if t.caption.is_some() || t.common.height==0 || t.common.height>i32::MAX as u32
++                    || m.caption_height!=0.0 || !m.total_height.is_finite()
++                    || (m.total_height-hwpunit_to_px(t.common.height as i32,dpi)).abs()>dpi/7200.0
++                    || m.row_heights.is_empty() || m.row_heights.iter().any(|h|!h.is_finite()||*h<=0.0)
++                {return false;}
++            }
++        }
++    }
++    if ![prev,current,next].iter().all(|p|clean(p) && p.column_type==ColumnBreakType::None && p.text.is_empty()
++        && p.line_segs.len()==1 && p.range_tags.is_empty() && p.field_ranges.is_empty()
++        && p.orphan_field_ends.is_empty() && p.tab_extended.is_empty()
++        && p.ctrl_data_records.iter().all(Option::is_none)
++        && styles.para_styles.get(p.para_shape_id as usize).is_some_and(|s|
++            s.spacing_before==0.0 && s.spacing_after==0.0 && !s.page_break_before))
++        || !prev.controls.is_empty() || !next.controls.is_empty() {return false;}
++    let [Control::Table(table)]=current.controls.as_slice() else{return false;};
++    if !table_clean(table) || !table.common.treat_as_char || table.caption.is_some()
++        || table.outer_margin_top<0 || table.outer_margin_bottom<0
++        || table.common.height==0 || table.common.height>i32::MAX as u32 {return false;}
++    let (a,b,c)=(&prev.line_segs[0],&current.line_segs[0],&next.line_segs[0]);
++    let valid=|s:&LineSeg|s.text_start==0 && s.vertical_pos>=0 && s.line_height>0
++        && s.text_height==s.line_height && s.line_spacing>=0
++        && s.column_start==0 && s.segment_width>0;
++    if ![a,b,c].iter().all(|s|valid(s)) || a.segment_width!=b.segment_width
++        || b.segment_width!=c.segment_width || b.vertical_pos>=a.vertical_pos {return false;}
++    let Some(prev_end)=a.vertical_pos.checked_add(a.line_height) else{return false;};
++    let Some(box_end)=b.vertical_pos.checked_add(b.line_height)
++        .and_then(|v|v.checked_add(b.line_spacing)) else{return false;};
++    let Some(next_end)=c.vertical_pos.checked_add(c.line_height) else{return false;};
++    let Some(height)=(table.common.height as i32).checked_add(i32::from(table.outer_margin_top))
++        .and_then(|v|v.checked_add(i32::from(table.outer_margin_bottom))) else{return false;};
++    if box_end!=c.vertical_pos || b.line_height!=height
++        || hwpunit_to_px(prev_end,dpi)>body_height || hwpunit_to_px(next_end,dpi)>body_height {return false;}
++    measured.iter().filter(|m|m.para_index==index&&m.control_index==0).count()==1
++        && measured.iter().find(|m|m.para_index==index&&m.control_index==0).is_some_and(|m|
++            m.total_height.is_finite() && m.caption_height==0.0
++                && (m.total_height-hwpunit_to_px(table.common.height as i32,dpi)).abs()<=dpi/7200.0)
++}
++
++#[cfg(test)]
++mod native_closed_tac_reset105_tests {
++ use super::*;
++ use crate::model::{paragraph::LineSeg,table::{Table,Cell},raw_provenance::record_digest};
++ use crate::renderer::{pagination::PageItem,style_resolver::ResolvedParaStyle};
++ fn fixture()->(Vec<Paragraph>,Vec<PageItem>,Vec<MeasuredTable>,ResolvedStyleSet) {
++  let p=|v,h,sp|Paragraph{line_segs:vec![LineSeg{vertical_pos:v,line_height:h,text_height:h,line_spacing:sp,segment_width:3000,..Default::default()}],..Default::default()};
++  let mut ps=vec![p(8000,1000,500),p(400,1100,500),p(2000,1000,0)];
++  let mut t=Table{row_count:1,col_count:1,cells:vec![Cell::default()],outer_margin_top:100,outer_margin_bottom:100,..Default::default()};
++  t.common.treat_as_char=true;t.common.height=900;t.raw_ctrl_seal=Some(record_digest(&t.common));ps[1].controls.push(Control::Table(Box::new(t)));
++  let m=MeasuredTable{para_index:1,control_index:0,total_height:12.0,row_heights:vec![12.0],baseline_row_heights:None,caption_height:0.0,cell_spacing:0.0,cumulative_heights:vec![0.0,12.0],repeat_header:false,has_header_cells:false,cells:vec![],page_break:Default::default(),row_block_start:vec![0],row_block_end:vec![1]};
++  (ps,vec![PageItem::FullParagraph{para_index:0}],vec![m],ResolvedStyleSet{para_styles:vec![ResolvedParaStyle::default()],..Default::default()})
++ }
++ #[test]fn native_empty_trailing105_current_whole_box_keeps_existing_reset(){
++  let (p,i,m,s)=fixture();assert!(native_closed_tac_reset_is_current(true,2,1,&p,&i,&m,&s,160.0,96.0,&vec![true;p.len()]));
++ }
++ #[test]fn native_empty_trailing105_changed_partial_unknown_or_unmeasured_reset_stays_general(){
++  for case in 0..17 {
++   let (mut p,mut i,mut m,mut s)=fixture();let mut native=true;let mut columns=2;let mut body=160.0;
++   match case {
++    0=>native=false,1=>columns=1,2=>p[0].stored_text_partition_dirty=true,
++    3=>p[1].cell_format_vpos_dirty=true,4=>p[2].hwpx_axis_shift=1,
++    5=>p[0].line_segs[0].tag|=LineSeg::TAG_IMPLEMENTATION_PROPERTY,
++    6=>p[1].source_line_seg_vertical_pos=Some(vec![400]),
++    7=>p[1].line_segs[0].line_height=i32::MAX,
++    8=>p[2].line_segs[0].vertical_pos+=1,
++    9=>m[0].total_height+=1.0,10=>m.clear(),
++    11=>s.para_styles[0].spacing_before=1.0,
++    12=>i=vec![PageItem::PartialParagraph{para_index:0,start_line:0,end_line:1}],
++    13=>if let Control::Table(t)=&mut p[1].controls[0]{t.common.width=1;},
++    14=>if let Control::Table(t)=&mut p[1].controls[0]{t.cells[0].dirty_flag=true;},
++    15=>body=100.0,_=>p[0].controls.push(Control::Unknown(Default::default())),
++   }
++   assert!(!native_closed_tac_reset_is_current(native,columns,1,&p,&i,&m,&s,body,96.0,&vec![true;p.len()]),"case {case}");
++  }
++ }
++ #[test]fn native_empty_trailing105_missing_or_changed_input_observation_keeps_legacy_override(){
++  let (p,i,m,s)=fixture();
++  for index in 0..p.len(){let mut observed=vec![true;p.len()];observed[index]=false;
++   assert!(!native_closed_tac_reset_is_current(true,2,1,&p,&i,&m,&s,160.0,96.0,&observed));}
++ }
++ #[test]fn native_empty_trailing105_requires_unchanged_enclosing_measurement_for_prefix_tables(){
++  for case in 0..5 {
++   let (mut p,_,mut m,s)=fixture();let mut prefix=p[0].clone();prefix.controls=p[1].controls.clone();
++   p.insert(0,prefix);m[0].para_index=2;let mut before=m[0].clone();before.para_index=0;m.push(before);
++   match case {
++    1=>m[1].baseline_row_heights=Some(vec![12.0]),
++    2=>m[1].baseline_row_heights=Some(vec![11.0]),
++    3=>m[1].total_height=13.0,
++    4=>p[0].stored_text_partition_dirty=true,
++    _=>{},
++   }
++   let items=vec![PageItem::Table{para_index:0,control_index:0},PageItem::FullParagraph{para_index:1}];
++   assert_eq!(native_closed_tac_reset_is_current(true,2,2,&p,&items,&m,&s,160.0,96.0,&vec![true;p.len()]),case<2,"case {case}");
++  }
++ }
++
++}
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[242, 201, 37, 170, 53, 249, 5, 213, 20, 84, 50, 161, 117, 171, 19, 115, 13, 6, 38, 177, 104, 106, 47, 153, 109, 238, 92, 224, 26, 31, 154, 212];
++pub(crate) const RESOURCE:[u8;32]=[161, 112, 188, 148, 111, 14, 223, 255, 10, 209, 18, 211, 181, 27, 194, 94, 205, 242, 128, 56, 72, 245, 101, 166, 210, 70, 77, 243, 195, 51, 41, 85];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -231,6 +231,11 @@
+             ("src/renderer/typeset/table/scan/source_tail/extension.rs",include_bytes!("../renderer/typeset/table/scan/source_tail/extension.rs").as_slice()),
+             ("src/renderer/typeset/table/scan/types.rs",include_bytes!("../renderer/typeset/table/scan/types.rs").as_slice()),
+             ("src/renderer/web_canvas.rs",include_bytes!("../renderer/web_canvas.rs").as_slice()),
++            ("src/diagnostics/ir_field_sweep.rs",include_bytes!("../diagnostics/ir_field_sweep.rs").as_slice()),
++            ("src/document_core/mod.rs",include_bytes!("../document_core/mod.rs").as_slice()),
++            ("src/document_core/queries/rendering.rs",include_bytes!("../document_core/queries/rendering.rs").as_slice()),
++            ("src/model/paragraph.rs",include_bytes!("../model/paragraph.rs").as_slice()),
++            ("src/model/raw_provenance.rs",include_bytes!("../model/raw_provenance.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {

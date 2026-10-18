@@ -1,0 +1,311 @@
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[74, 81, 174, 73, 86, 33, 82, 70, 1, 230, 147, 180, 131, 242, 132, 55, 68, 55, 232, 65, 211, 141, 98, 94, 53, 198, 50, 156, 81, 231, 91, 167];
++pub(crate) const RESOURCE:[u8;32]=[114, 211, 127, 154, 204, 161, 67, 248, 17, 25, 196, 88, 78, 22, 121, 206, 134, 145, 68, 169, 239, 153, 253, 138, 191, 166, 248, 240, 196, 207, 120, 168];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -263,6 +263,7 @@
+             ("src/renderer/current_accepted_composition.rs",include_bytes!("../renderer/current_accepted_composition.rs").as_slice()),
+             ("src/model/object_anchor.rs",include_bytes!("object_anchor.rs").as_slice()),
+             ("src/document_core/commands/object_ops/table.rs",include_bytes!("../document_core/commands/object_ops/table.rs").as_slice()),
++            ("src/renderer/current_offset_frame.rs",include_bytes!("../renderer/current_offset_frame.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- a/src/renderer/current_frame_rows_plan.rs
++++ b/src/renderer/current_frame_rows_plan.rs
+@@ -102,17 +102,18 @@
+ /// Candidate from this completed allocator pass, before any paint receipt.
+ /// Neither this type nor its paint facade is a serialized cache/row authority.
+ struct CandidateBody { paragraph:usize,physical_y:f64,fresh:FreshBodyRows,allow_empty_unused_width:bool }
+-#[derive(Debug,Clone)]struct CandidateTable {paragraph:usize,control:usize,top:f64,before:f64,body:f64,after:f64,object_anchor:Option<(f64,f64,f64)>}
++#[derive(Debug,Clone)]struct CandidateTable {paragraph:usize,control:usize,incoming:f64,top:f64,before:f64,body:f64,after:f64,object_anchor:Option<(f64,f64,f64)>}
++#[derive(Clone,Copy,Debug)]pub(crate) struct CurrentFrameTablePaint{pub(crate) paragraph_y:f64,pub(crate) table_top:f64}
+ #[derive(Debug,Clone)]pub(crate) struct CurrentFramePaintPlan { source_paragraphs:usize,generation:[u8;32],section:usize,page:u32,column:u16,
+  rect:super::page_layout::LayoutRect,tables:Vec<CandidateTable> }
+ impl CurrentFramePaintPlan {
+  pub(crate) fn receipt_binding(&self)->(usize,[u8;32]){(self.source_paragraphs,self.generation)}
+  pub(crate) fn table_top(&self,paragraphs:&[crate::model::paragraph::Paragraph],section:usize,page:u32,column:u16,
+- rect:&super::page_layout::LayoutRect,paragraph:usize,control:usize,flow:f64)->Option<f64>{
++ rect:&super::page_layout::LayoutRect,paragraph:usize,control:usize,flow:f64)->Option<CurrentFrameTablePaint>{
+   if paragraphs.as_ptr() as usize!=self.source_paragraphs || section!=self.section || page!=self.page || column!=self.column
+    || self.rect.x!=rect.x || self.rect.y!=rect.y || self.rect.width!=rect.width || self.rect.height!=rect.height {return None;}
+   let host=self.tables.iter().find(|h|h.paragraph==paragraph&&h.control==control&&h.object_anchor.is_none())?;
+-  arithmetic_equal(flow,host.top).then_some(host.top)
++  arithmetic_equal(flow,host.incoming).then_some(CurrentFrameTablePaint{paragraph_y:host.incoming,table_top:host.top})
+  }
+ }
+ pub(crate) struct CurrentFrameCandidate<'doc> {source:&'doc Document,paint:CurrentFramePaintPlan,
+@@ -205,9 +206,13 @@
+   if *pi!=slot||*ci!=0{return None;}let p=ps.get(*pi)?;let [Control::Table(table)]=p.controls.as_slice()else{return None;};
+   if !p.text.is_empty()||p.char_count!=9||!p.char_offsets.is_empty()||p.column_type!=ColumnBreakType::None
+   ||p.completed_native_rows.is_some()||p.stored_text_partition_is_dirty()||p.cell_format_vpos_dirty||!p.field_ranges.is_empty()||!p.range_tags.is_empty()
+-  ||!p.tab_extended.is_empty()||p.layout_only_fill_lines!=0||!crate::renderer::generated_column_stack::plain_table(table,|q|q.controls.is_empty()&&q.field_ranges.is_empty()&&q.range_tags.is_empty()&&q.tab_extended.is_empty())
++  ||!p.tab_extended.is_empty()||p.layout_only_fill_lines!=0
+   ||!table.common.raw_extra.is_empty()||table.raw_table_record_extra.iter().any(|b|*b!=0)
+  ||i32::try_from(table.common.width).ok()?.checked_add(i32::from(table.outer_margin_left))?.checked_add(i32::from(table.outer_margin_right))?!=integer_hu(rect.width,dpi)?{return None;}
++  let plain_cell=|q:&crate::model::paragraph::Paragraph|q.controls.is_empty()&&q.field_ranges.is_empty()&&q.range_tags.is_empty()&&q.tab_extended.is_empty();
++  let offset=if table.common.vertical_offset!=0{
++   Some(super::current_offset_frame::CurrentOffsetTableShape::from_current(table,plain_cell)?)
++  }else{if !crate::renderer::generated_column_stack::plain_table(table,plain_cell){return None;}None};
+   match format{crate::parser::FileFormat::Hwp=>if !native_table_common_exact(table){return None;},crate::parser::FileFormat::Hwpx=>if !table.raw_ctrl_data.is_empty(){return None;},_=>return None}
+   let mut ms=measured.iter().filter(|m|m.para_index==*pi&&m.control_index==0);let m=ms.next()?;if ms.next().is_some()||m.caption_height!=0.0||m.total_height<=0.0||!m.total_height.is_finite()
+   ||integer_hu(m.total_height,dpi)?!=i32::try_from(table.common.height).ok()?{return None;}
+@@ -216,8 +221,9 @@
+   ||t.pre_text_height!=0.0||t.pre_text_end!=0||!arithmetic_equal(t.flow_before,flow)||t.before<0.0||t.after_for_fit<0.0
+   ||t.body_height!=m.total_height||!arithmetic_equal(t.table_total_height,t.before+t.body_height+t.after_for_fit)
+   ||t.flow_after>rect.height
+-  ||integer_hu(t.before,dpi)?!=i32::from(table.outer_margin_top)||table.common.vertical_offset!=0{return None;}
++  ||integer_hu(t.before,dpi)?!=i32::from(table.outer_margin_top){return None;}
+   let object_anchor=if let Some(placement)=t.resolved.as_ref(){
++   if offset.is_some(){return None;}
+    let current=col.paragraph_float_placements.get(&(*pi,0))?;
+    if placement.flow!="Exclusion"||placement.next_flow_y.is_some()||placement.stored_host_origin.is_some()
+     ||placement.stored_successor_origin.is_some()||placement.table_left.is_some()
+@@ -230,7 +236,8 @@
+     ||!arithmetic_equal(t.flow_after,placement.occupied_bottom){return None;}
+    Some((placement.anchor_y,placement.occupied_bottom,rect.y+t.flow_before-unpainted))
+   }else{if col.paragraph_float_placements.contains_key(&(*pi,0))||!arithmetic_equal(t.flow_after,t.flow_before+t.table_total_height){return None;}None};
+-  let top=if object_anchor.is_some(){rect.y+t.flow_before+t.before}else{rect.y+t.flow_before-unpainted};
++  let incoming=rect.y+t.flow_before-unpainted;
++  let top=if object_anchor.is_some(){rect.y+t.flow_before+t.before}else{match offset{Some(current)=>current.paint_edge(incoming,dpi)?,None=>incoming}};
+   if top<rect.y||top+t.body_height>rect.y+rect.height{return None;}
+   // The structural object row owns no text ink, but its paragraph/font style
+   // context must remain within the same explicit plain frame contract.
+@@ -251,14 +258,14 @@
+    ||generated.line_height<=0||generated.text_height!=generated.line_height||generated.line_spacing<0
+    ||generated.baseline_distance<0||generated.baseline_distance>generated.line_height||generated.column_start!=0
+    ||generated.segment_width!=if object_anchor.is_some(){0}else{integer_hu(rect.width,dpi)?}{return None;}
+-  host.line_segs[0].vertical_pos=integer_hu(object_anchor.map_or(top-rect.y-t.before,|v|v.0),dpi)?;
++  host.line_segs[0].vertical_pos=integer_hu(object_anchor.map_or(incoming-rect.y-t.before,|v|v.0),dpi)?;
+   if host.line_segs[0].vertical_pos<0{return None;}
+-  rows.push(CurrentFrameParagraphRows{kind:if object_anchor.is_some(){CurrentFrameRowKind::StructuralObjectAnchor}else{CurrentFrameRowKind::FreshBody},section:0,paragraph:*pi,rows:host.line_segs});tables.push(CandidateTable{paragraph:*pi,control:0,top,before:t.before,body:t.body_height,after:t.after_for_fit,object_anchor});
++  rows.push(CurrentFrameParagraphRows{kind:if object_anchor.is_some(){CurrentFrameRowKind::StructuralObjectAnchor}else{CurrentFrameRowKind::FreshBody},section:0,paragraph:*pi,rows:host.line_segs});tables.push(CandidateTable{paragraph:*pi,control:0,incoming,top,before:t.before,body:t.body_height,after:t.after_for_fit,object_anchor});
+   if object_anchor.is_some(){unpainted=0.0;}else{unpainted+=t.before;}flow=t.flow_after;
+  },_=>return None}}
+  if tables.is_empty()||measured.len()!=tables.len()||col.paragraph_float_placements.len()!=tables.iter().filter(|t|t.object_anchor.is_some()).count()||!arithmetic_equal(flow,col.used_height){return None;}
+  let mut h=blake3::Hasher::new();h.update(b"current-whole-frame-proof-1\0");h.update(&trace.resource());h.update(&trace.generation().to_le_bytes());
+- for t in &tables{h.update(&(t.paragraph as u64).to_le_bytes());for v in[t.top,t.before,t.body,t.after]{h.update(&v.to_bits().to_le_bytes());}match t.object_anchor{Some((a,b,c))=>{h.update(&[1]);h.update(&a.to_bits().to_le_bytes());h.update(&b.to_bits().to_le_bytes());h.update(&c.to_bits().to_le_bytes());},None=>{h.update(&[0]);}}}
++ for t in &tables{h.update(&(t.paragraph as u64).to_le_bytes());for v in[t.incoming,t.top,t.before,t.body,t.after]{h.update(&v.to_bits().to_le_bytes());}match t.object_anchor{Some((a,b,c))=>{h.update(&[1]);h.update(&a.to_bits().to_le_bytes());h.update(&b.to_bits().to_le_bytes());h.update(&c.to_bits().to_le_bytes());},None=>{h.update(&[0]);}}}
+  let generation=*h.finalize().as_bytes();let paint=CurrentFramePaintPlan{source_paragraphs:ps.as_ptr()as usize,generation,section:0,page:0,column:0,rect,tables:tables.clone()};
+  Some(Self{source,paint,bodies,tables,rows,generation})
+  }
+@@ -280,8 +287,9 @@
+    }}
+   for table in &self.tables{let mut actual=actual_tables.iter().filter(|t|t.paragraph==table.paragraph&&t.control==table.control);let t=actual.next()?;
+    if actual.next().is_some()||t.node!=frame.node||t.typed_float!=table.object_anchor.is_some()||t.inline||t.treat_as_char||t.selected_outer_inset!=0.0
+-   ||!arithmetic_equal(t.selected_y,table.top)||t.visual_height!=table.body||!arithmetic_equal(t.visual_end,table.top+table.body)
++   ||!arithmetic_equal(t.incoming_y,table.incoming)||!arithmetic_equal(t.selected_y,table.top)||t.visual_height!=table.body||!arithmetic_equal(t.visual_end,table.top+table.body)
+    ||!arithmetic_equal(t.flow_end,table.top+table.body){return None;}
++   if table.object_anchor.is_none()&&!arithmetic_equal(t.paragraph_y,table.incoming){return None;}
+    if let Some((anchor,_,incoming))=table.object_anchor{
+     if !arithmetic_equal(t.incoming_y,incoming)||!arithmetic_equal(t.paragraph_y,frame.rect.y+anchor){return None;}}}
+   Some(CurrentFrameRowsPlan{source:self.source,resource:crate::model::native_computed_resource::RESOURCE,allocation_generation:self.generation,paragraphs:self.rows})
+--- a/src/renderer/current_frame_rows_plan_tests.rs
++++ b/src/renderer/current_frame_rows_plan_tests.rs
+@@ -27,8 +27,10 @@
+     for (row,paint) in rows.iter().zip(painted){let v:i32=row.attribute("vertpos").unwrap().parse().unwrap();let y=frame.rect.y+f64::from(v)/75.0;
+      assert!(arithmetic_equal(y,paint.frame.physical_text_y));checks.push(json!({"paragraph":pi,"kind":"body","xmlVerticalHu":v,"physicalY":y}));}
+    }else{assert_eq!(rows.len(),1);assert_eq!(tables.len(),1);let crate::model::control::Control::Table(t)=&core.document().sections[0].paragraphs[pi].controls[0]else{panic!("table host")};
+-    let v:i32=rows[0].attribute("vertpos").unwrap().parse().unwrap();let y=frame.rect.y+f64::from(v+i32::from(t.outer_margin_top))/75.0;
+-    assert!(arithmetic_equal(y,tables[0].selected_y));checks.push(json!({"paragraph":pi,"kind":"table","xmlVerticalHu":v,"outerTopHu":t.outer_margin_top,"physicalY":y}));
++    let v:i32=rows[0].attribute("vertpos").unwrap().parse().unwrap();let xml_table=p.descendants().find(|n|n.has_tag_name((ns,"tbl"))).unwrap();let margin=xml_table.children().find(|n|n.has_tag_name((ns,"outMargin"))).unwrap();let outer_top:i32=margin.attribute("top").unwrap().parse().unwrap();assert_eq!(outer_top,i32::from(t.outer_margin_top));
++    let pos=xml_table.children().find(|n|n.has_tag_name((ns,"pos"))).unwrap();let raw_offset:u32=pos.attribute("vertOffset").unwrap().parse().unwrap();assert_eq!(raw_offset,t.common.vertical_offset);let signed_offset=raw_offset as i32;
++    let anchor=frame.rect.y+f64::from(v+outer_top)/75.0;let y=(anchor+f64::from(signed_offset)/75.0).max(anchor);
++    assert!(arithmetic_equal(y,tables[0].selected_y));checks.push(json!({"paragraph":pi,"kind":"table","xmlVerticalHu":v,"outerTopHu":outer_top,"offsetSignedHu":signed_offset,"physicalY":y}));
+    }
+   }
+   json!({"assertions":checks.len(),"coordinates":checks,"basis":"actual ZIP XML integer vertpos plus declared outerTop and actual body frame; no reopened reader"})
+@@ -45,7 +47,7 @@
+  }
+ 
+  #[test]fn actual_public_interleave_export_never_uses_diagnostic_projection(){
+-  let out=std::env::var("N001_ROOT").map(std::path::PathBuf::from).map(|p|p.join("build/n001-object-anchor132/interleave-control"))
++  let out=std::env::var("N001_ROOT").map(std::path::PathBuf::from).map(|p|p.join("build/n001-offset133/control132/interleave-control"))
+     .unwrap_or_else(|_|std::env::temp_dir().join(format!("jueony-current-frame129-own-{}",std::process::id())));std::fs::create_dir_all(&out).unwrap();
+   let mut input=Vec::new();flate2::read::GzDecoder::new(OWN_FIXTURE_GZIP).read_to_end(&mut input).unwrap();
+   assert_eq!(input.len(),13312);assert_eq!(<sha2::Sha256 as sha2::Digest>::digest(&input).iter().map(|b|format!("{b:02x}")).collect::<String>(),"9778d66926e3138ce4bb51fadfd16173ee3d439aeec0a02a8f0af34b7fac0f3b");let mut core=crate::DocumentCore::from_bytes(&input).unwrap();
+@@ -65,7 +67,7 @@
+  }
+ 
+  #[test]fn current_object_anchor_actual_inputs_are_observed_without_authority(){
+-  let out=std::env::var("N001_ROOT").map(std::path::PathBuf::from).map(|p|p.join("build/n001-object-anchor132/diagnostic"))
++  let out=std::env::var("N001_ROOT").map(std::path::PathBuf::from).map(|p|p.join("build/n001-offset133/control132/diagnostic"))
+    .unwrap_or_else(|_|std::env::temp_dir().join(format!("jueony-object132-own-{}",std::process::id())));std::fs::create_dir_all(&out).unwrap();
+   let mut input=vec![];flate2::read::GzDecoder::new(OWN_FIXTURE_GZIP).read_to_end(&mut input).unwrap();let mut core=crate::DocumentCore::from_bytes(&input).unwrap();
+   let tail=core.document().sections[0].paragraphs.len()-1;core.create_table_ex_native(0,tail,0,2,2,false,None,None).unwrap();
+@@ -79,7 +81,7 @@
+  }
+ 
+  #[test]fn actual_public_new_object_anchor_export_retains_current_frame(){
+-  let out=std::env::var("N001_ROOT").map(std::path::PathBuf::from).map(|p|p.join("build/n001-object-anchor132/public-new-table"))
++  let out=std::env::var("N001_ROOT").map(std::path::PathBuf::from).map(|p|p.join("build/n001-offset133/control132/public-new-table"))
+    .unwrap_or_else(|_|std::env::temp_dir().join(format!("jueony-object132-public-{}",std::process::id())));std::fs::create_dir_all(&out).unwrap();
+   let mut results=vec![];
+   for added in 1..=2 {let mut input=vec![];flate2::read::GzDecoder::new(OWN_FIXTURE_GZIP).read_to_end(&mut input).unwrap();let mut core=crate::DocumentCore::from_bytes(&input).unwrap();
+@@ -124,3 +126,38 @@
+   core.pagination[0].pages[0].column_contents[0].paragraph_float_placements.get_mut(&(5,0)).unwrap().table_top=original_top;
+   let mut changed=styles.clone();changed.char_styles[0].font_size+=1.0;assert!(CurrentFrameCandidate::from_current(core.document(),core.source_format,&core.pagination[0],&changed,&measured,profile,core.dpi).is_none());
+  }
++
++ #[test]fn read_only_current_offsets_are_diagnosed_without_permission_changes(){
++  let out=std::env::var("N001_ROOT").map(std::path::PathBuf::from).map(|p|p.join("build/n001-offset133/diagnostic"))
++   .unwrap_or_else(|_|std::env::temp_dir().join(format!("jueony-offset133-own-{}",std::process::id())));std::fs::create_dir_all(&out).unwrap();let mut reports=vec![];
++  for offset in [-300,450]{let mut input=vec![];flate2::read::GzDecoder::new(OWN_FIXTURE_GZIP).read_to_end(&mut input).unwrap();let mut core=crate::DocumentCore::from_bytes(&input).unwrap();core.set_table_properties_native(0,2,0,&format!("{{\"vertOffset\":{offset},\"allowOverlap\":true}}")).unwrap();let n=core.document().sections[0].paragraphs[0].text.chars().count();core.insert_text_native(0,0,n,&"현재 문맥으로 복합 배치를 다시 조판하는 자체 시험 문장입니다. ".repeat(8)).unwrap();
++   let source=format!("{:?}",core.document());let events=core.serialize_event_log();let before=snapshot(&core);let tree=core.build_page_tree_with_current_selections(0).unwrap();let physical=&tree.frame.current_physical_selections;let trace=core.pagination[0].selected_composition_trace.as_ref().unwrap();let p=&core.document().sections[0].paragraphs[2];let crate::model::control::Control::Table(t)=&p.controls[0]else{panic!("table")};
++   let mut artifacts=vec![];for format in ["hwp","hwpx"]{let a=if format=="hwp"{core.export_hwp_with_adapter_snapshot_with_report()}else{core.export_hwpx_native_with_report()}.unwrap();let path=out.join(format!("offset{offset}.{format}"));std::fs::write(&path,a.bytes()).unwrap();let next=crate::DocumentCore::from_bytes(&std::fs::read(path).unwrap()).unwrap();let mut diff=vec![];differences(&before,&snapshot(&next),"$",&mut diff);artifacts.push(json!({"format":format,"geometry":diff.len(),"differences":diff,"loss":a.content_loss().len()}));}
++   reports.push(json!({"offset":offset,"wholeTables":trace.whole_tables(),"commits":trace.commits(),"rawCommonExact":native_table_common_exact(t),"rawCommon":t.raw_ctrl_data,"common":t.common,"hostRows":p.line_segs,"hostSourceVpos":p.source_line_seg_vertical_pos,"hostDirty":p.stored_text_partition_is_dirty(),"hostVposDirty":p.cell_format_vpos_dirty,"physicalTables":physical.tables().unwrap().iter().map(|t|json!({"paragraph":t.paragraph,"incomingY":t.incoming_y,"paragraphY":t.paragraph_y,"selectedY":t.selected_y,"body":t.visual_height,"visualEnd":t.visual_end,"flowEnd":t.flow_end,"typed":t.typed_float})).collect::<Vec<_>>(),"artifacts":artifacts}));assert_eq!(source,format!("{:?}",core.document()));assert_eq!(events,core.serialize_event_log());
++  }
++  std::fs::write(out.join("result.json"),serde_json::to_vec_pretty(&json!({"diagnosticOnly":true,"permissionChanges":false,"reports":reports})).unwrap()).unwrap();
++ }
++
++ #[test]fn actual_public_current_offset_preserves_none_pen_and_painted_edge(){
++  let out=std::env::var("N001_ROOT").map(std::path::PathBuf::from).map(|p|p.join("build/n001-offset133/public-offset"))
++   .unwrap_or_else(|_|std::env::temp_dir().join(format!("jueony-offset133-public-{}",std::process::id())));std::fs::create_dir_all(&out).unwrap();let mut results=vec![];
++  for offset in [-300,450]{let mut input=vec![];flate2::read::GzDecoder::new(OWN_FIXTURE_GZIP).read_to_end(&mut input).unwrap();let mut core=crate::DocumentCore::from_bytes(&input).unwrap();core.set_table_properties_native(0,2,0,&format!("{{\"vertOffset\":{offset},\"allowOverlap\":true}}")).unwrap();let n=core.document().sections[0].paragraphs[0].text.chars().count();core.insert_text_native(0,0,n,&"현재 문맥으로 복합 배치를 다시 조판하는 자체 시험 문장입니다. ".repeat(8)).unwrap();let before=snapshot(&core);std::fs::write(out.join(format!("offset{offset}-original.json")),serde_json::to_vec_pretty(&before).unwrap()).unwrap();let story=core.text_file_unicode_json();
++   for api in 0..4{let source=format!("{:?}",core.document());let events=core.serialize_event_log();let bytes=match api{0=>core.export_hwpx_native().unwrap(),1=>{let a=core.export_hwpx_native_with_report().unwrap();assert!(a.content_loss().is_empty());a.into_bytes()},2=>core.export_hwpx_native_with_password(b"Own-offset-133!").unwrap(),_=>{let a=core.export_hwpx_native_with_password_and_report(b"Own-offset-133!").unwrap();assert!(a.content_loss().is_empty());a.into_bytes()}};let path=out.join(format!("offset{offset}-api{api}.hwpx"));std::fs::write(&path,&bytes).unwrap();let disk=std::fs::read(path).unwrap();assert_eq!(disk,bytes);let next=if api<2{crate::DocumentCore::from_bytes(&disk)}else{crate::DocumentCore::from_bytes_with_password(&disk,b"Own-offset-133!")}.unwrap();let mut diff=vec![];differences(&before,&snapshot(&next),"$",&mut diff);assert_eq!(story,next.text_file_unicode_json());assert_eq!(source,format!("{:?}",core.document()));assert_eq!(events,core.serialize_event_log());
++    if api==0{let coords=assert_actual_xml_coordinates(&core,&bytes);std::fs::write(out.join(format!("offset{offset}-zip-coordinates.json")),serde_json::to_vec_pretty(&coords).unwrap()).unwrap();}results.push(json!({"offset":offset,"api":api,"geometry":diff.len(),"differences":diff}));
++   }
++   let before_id=core.save_snapshot_native();let tail=core.document().sections[0].paragraphs.len()-1;core.insert_text_native(0,tail,0,"계속 유지하는 오프셋 뒤 본문 ").unwrap();let retained=snapshot(&core);let retained_story=core.text_file_unicode_json();let after_id=core.save_snapshot_native();
++   for (name,id,want) in [("undo",before_id,&before),("redo",after_id,&retained)]{core.restore_snapshot_native(id).unwrap();let mut diff=vec![];differences(want,&snapshot(&core),"$",&mut diff);results.push(json!({"offset":offset,"history":name,"geometry":diff.len(),"differences":diff}));}
++   for cycle in 0..3{let before=snapshot(&core);let source=format!("{:?}",core.document());let xml=core.export_hwpx_native_with_report().unwrap();assert!(xml.content_loss().is_empty());let path=out.join(format!("offset{offset}-cycle{cycle}.hwpx"));std::fs::write(&path,xml.bytes()).unwrap();let disk=std::fs::read(path).unwrap();assert_eq!(disk,xml.bytes());let next=crate::DocumentCore::from_bytes(&disk).unwrap();let mut diff=vec![];differences(&before,&snapshot(&next),"$",&mut diff);assert_eq!(source,format!("{:?}",core.document()));assert_eq!(retained_story,next.text_file_unicode_json());results.push(json!({"offset":offset,"cycle":cycle,"format":"hwpx","geometry":diff.len(),"differences":diff}));
++    let source=format!("{:?}",next.document());let native=next.export_hwp_with_adapter_snapshot_with_report().unwrap();assert!(native.content_loss().is_empty());let path=out.join(format!("offset{offset}-cycle{cycle}.hwp"));std::fs::write(&path,native.bytes()).unwrap();let disk=std::fs::read(path).unwrap();assert_eq!(disk,native.bytes());let after=crate::DocumentCore::from_bytes(&disk).unwrap();let mut diff=vec![];differences(&snapshot(&next),&snapshot(&after),"$",&mut diff);assert_eq!(source,format!("{:?}",next.document()));assert_eq!(retained_story,after.text_file_unicode_json());results.push(json!({"offset":offset,"cycle":cycle,"format":"hwp-followup","geometry":diff.len(),"differences":diff}));core=after;
++   }
++  }
++  let failures=results.iter().filter(|r|r["geometry"]!=0).cloned().collect::<Vec<_>>();std::fs::write(out.join("result.json"),serde_json::to_vec_pretty(&json!({"results":results,"failures":failures})).unwrap()).unwrap();assert!(failures.is_empty());
++ }
++
++ #[test]fn current_offset_box_refuses_unknown_shape_fields_and_separates_reserved_pen(){
++  use crate::renderer::current_offset_frame::CurrentOffsetTableShape;
++  let mut input=vec![];flate2::read::GzDecoder::new(OWN_FIXTURE_GZIP).read_to_end(&mut input).unwrap();let mut core=crate::DocumentCore::from_bytes(&input).unwrap();core.set_table_properties_native(0,2,0,"{\"vertOffset\":450,\"allowOverlap\":true}").unwrap();let crate::model::control::Control::Table(t)=&core.document().sections[0].paragraphs[2].controls[0]else{panic!("table")};
++  let shape=CurrentOffsetTableShape::from_current(t,|p|p.controls.is_empty()).unwrap();assert_eq!(shape.paint_edge(100.0,96.0),Some(106.0));assert!(shape.paint_edge(f64::NAN,96.0).is_none());assert!(shape.paint_edge(100.0,0.0).is_none());assert!(shape.paint_edge(100.0,f64::NAN).is_none());
++  for field in 0..9{let mut bad=t.clone();match field{0=>bad.common.horizontal_offset=1,1=>bad.common.allow_overlap=false,2=>bad.common.locked=true,3=>bad.common.vertical_offset=0,4=>bad.cells[0].row_span=2,5=>bad.cells[0].text_direction=1,6=>bad.common.raw_extra.push(1),7=>bad.page_break=crate::model::table::TablePageBreak::RowBreak,_=>bad.cells[0].paragraphs[0].controls.push(crate::model::control::Control::Unknown(Default::default()))};assert!(CurrentOffsetTableShape::from_current(&bad,|p|p.controls.is_empty()).is_none());}
++  let mut negative=t.clone();negative.common.vertical_offset=(-300i32)as u32;let shape=CurrentOffsetTableShape::from_current(&negative,|p|p.controls.is_empty()).unwrap();assert_eq!(shape.paint_edge(100.0,96.0),Some(100.0));
++ }
+--- /dev/null
++++ b/src/renderer/current_offset_frame.rs
+@@ -0,0 +1,80 @@
++//! Current None-placement offset box. This does not validate/reuse source rows.
++//! Its reserved pen is allocator-owned and separate from this painted edge.
++use crate::model::{table::{Table,TablePageBreak},paragraph::Paragraph,shape::{VertRelTo,VertAlign,HorzRelTo,HorzAlign,SizeCriterion}};
++#[derive(Clone,Copy,Debug)]pub(crate) struct CurrentOffsetTableShape {offset_hu:i32}
++impl CurrentOffsetTableShape {
++ pub(crate) fn from_current(t:&Table,plain:impl Fn(&Paragraph)->bool)->Option<Self>{
++  let offset_hu=t.common.vertical_offset as i32;
++  (offset_hu!=0 && t.common.allow_overlap && known_current_offset_shape(t,plain)).then_some(Self{offset_hu})
++ }
++ pub(crate) fn paint_edge(&self,paragraph_y:f64,dpi:f64)->Option<f64>{
++  let offset=super::hwpunit_to_px(self.offset_hu,dpi);
++  if !paragraph_y.is_finite()||!dpi.is_finite()||dpi<=0.0||!offset.is_finite(){return None;}
++  let edge=super::layout::empty_host_float_raw_top(paragraph_y,offset,0.0);
++  edge.is_finite().then_some(edge)
++ }
++}
++fn known_current_offset_shape(t: &Table, plain: impl Fn(&Paragraph) -> bool) -> bool {
++    if t.common.treat_as_char
++        || !super::float_placement::is_para_topbottom_float(&t.common)
++        || t.common.vert_rel_to != VertRelTo::Para
++        || t.common.vert_align != VertAlign::Top
++        || t.common.horz_rel_to != HorzRelTo::Para
++        || t.common.horz_align != HorzAlign::Left
++        || t.common.horizontal_offset != 0
++        || t.common.locked
++        || t.common.size_protect
++        || t.attr & (1 << 30) != 0
++        || t.raw_table_record_attr & 8 != 0
++        || t.common.height_criterion != SizeCriterion::Absolute
++        || t.common.width_criterion != SizeCriterion::Absolute
++        || !t.common.description.is_empty()
++        || t.common.raw_extra.iter().any(|b| *b != 0)
++        || t.common.width == 0
++        || t.common.width >= 0x8000_0000
++        || t.common.height == 0
++        || t.common.height >= 0x8000_0000
++        || t.page_break != TablePageBreak::None
++        || t.repeat_header
++        || t.caption.is_some()
++        || !t.zones.is_empty()
++        || t.cell_spacing != 0
++        || t.outer_margin_top <= 0
++        || [
++            t.outer_margin_left,
++            t.outer_margin_right,
++            t.outer_margin_bottom,
++        ]
++        .iter()
++        .any(|v| *v != t.outer_margin_top)
++        || t.row_count == 0
++        || t.row_count > 128
++        || t.col_count > 64
++        || t.cells.len() > 4096
++        || i64::from(t.common.height) + 2 * i64::from(t.outer_margin_top) > i64::from(i32::MAX)
++        || t.col_count == 0
++        || t.cells.len() != usize::from(t.row_count) * usize::from(t.col_count)
++    {
++        return false;
++    }
++    t.cells.iter().enumerate().all(|(i, c)| {
++        c.row_span == 1
++            && c.col_span == 1
++            && usize::from(c.row) == i / usize::from(t.col_count)
++            && usize::from(c.col) == i % usize::from(t.col_count)
++            && c.width > 0
++            && c.width < 0x8000_0000
++            && c.height > 0
++            && c.height < 0x8000_0000
++            && !c.cell_protect()
++            && c.field_name.is_none()
++            && c.text_direction == 0
++            && c.line_wrap == 0
++            && !c.paragraphs.is_empty()
++            && c.paragraphs.iter().all(|p| {
++                p.controls.is_empty()
++                    && plain(p)
++                    && p.column_type == crate::model::paragraph::ColumnBreakType::None
++            })
++    })
++}
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -1805,7 +1805,7 @@
+ /// same top coordinate that `layout_partial_table` uses for its first fragment.  The ordinary
+ /// float lane intentionally omits outer margins (#2097); only callers that already proved the
+ /// narrow #2439 structural contract pass a non-zero `fragment_outer_top_px` here.
+-fn empty_host_float_raw_top(
++pub(crate) fn empty_host_float_raw_top(
+     para_y: f64,
+     vertical_offset_px: f64,
+     fragment_outer_top_px: f64,
+@@ -12160,7 +12160,7 @@
+             let current_frame_top=if current_stack.is_none(){tree.current_frame_paint_plan.as_ref().and_then(|plan|
+                 plan.table_top(paragraphs,page_content.section_index,page_content.page_index,
+                     page_content.column_contents.first()?.column_index,col_area,para_index,control_index,y_offset))}else{None};
+-            if let Some(top)=current_frame_top {para_y_for_table=top;}
++            if let Some(plan)=current_frame_top {para_y_for_table=plan.paragraph_y;}
+ 
+             if self.owns_completed_native_frame(para,control_index,page_content,col_area,layout,y_offset) {
+                 para_y_for_table=y_offset;
+@@ -12720,8 +12720,8 @@
+                     });
+                     let raw_top = if let Some(plan) = current_stack {
+                         plan.table_top
+-                    } else if let Some(top)=current_frame_top {
+-                        top
++                    } else if let Some(plan)=current_frame_top {
++                        plan.table_top
+                     } else if let Some(placement) = ctx
+                         .paragraph_float_placements
+                         .get(&(para_index, control_index))
+--- a/src/renderer/mod.rs
++++ b/src/renderer/mod.rs
+@@ -3981,3 +3981,5 @@
+ pub mod selected_composition_observer127;
+ 
+ pub(crate) mod current_accepted_composition;
++
++pub(crate) mod current_offset_frame;

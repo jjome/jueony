@@ -1,0 +1,87 @@
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[14, 215, 140, 173, 34, 92, 129, 210, 32, 249, 244, 19, 154, 204, 53, 6, 128, 7, 241, 116, 59, 241, 250, 203, 238, 197, 192, 178, 171, 88, 247, 120];
++pub(crate) const RESOURCE:[u8;32]=[29, 33, 222, 255, 221, 101, 124, 34, 21, 74, 119, 188, 25, 6, 147, 13, 158, 224, 22, 118, 11, 207, 60, 201, 54, 197, 59, 52, 84, 62, 83, 210];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+--- a/src/renderer/current_frame_rows_plan.rs
++++ b/src/renderer/current_frame_rows_plan.rs
+@@ -88,6 +88,22 @@
+   || !composition.tab_extended.is_empty() || composition.horizontal_shaping.is_some(){return None;}
+  Some(FreshBodyRows{rows:fresh.line_segs,composition})
+ }
++
++/// An already exact ordinary standard cache keeps its existing serialization.
++/// This is an omission from the new projection, never a source-row capability:
++/// full fresh allocation and physical closure still run for this paragraph.
++/// Generated implementation-property rows are never retagged or masked.
++fn retains_ordinary_standard_body(p:&crate::model::paragraph::Paragraph,rows:&[LineSeg])->bool{
++ if p.text.is_empty()||p.stored_text_partition_is_dirty()||p.layout_only_fill_lines!=0
++  ||p.cell_format_vpos_dirty||p.completed_native_rows.is_some()||p.line_segs.len()!=rows.len()||rows.is_empty(){return false;}
++ if let Some(v)=p.source_line_seg_vertical_pos.as_ref(){
++  if v.len()==rows.len()&&!v.iter().zip(rows).all(|(y,r)|*y==r.vertical_pos){return false;}}
++ p.line_segs.iter().zip(rows).all(|(a,b)|a.tag==LineSeg::TAG_SINGLE_SEGMENT_LINE
++  &&b.tag==(LineSeg::TAG_SINGLE_SEGMENT_LINE|LineSeg::TAG_IMPLEMENTATION_PROPERTY)
++  &&a.text_start==b.text_start&&a.vertical_pos==b.vertical_pos&&a.line_height==b.line_height
++  &&a.text_height==b.text_height&&a.baseline_distance==b.baseline_distance&&a.line_spacing==b.line_spacing
++  &&a.column_start==b.column_start&&a.segment_width==b.segment_width)
++}
+ fn same_selected_line(a:&super::composer::ComposedLine,b:&super::composer::ComposedLine)->bool{
+  a.char_start==b.char_start && a.line_height==b.line_height && a.baseline_distance==b.baseline_distance
+  && a.segment_width==b.segment_width && a.column_start==b.column_start && a.line_spacing==b.line_spacing
+@@ -201,7 +217,7 @@
+   if !arithmetic_equal(c.advance,total)||!arithmetic_equal(c.flow_after,c.flow_before+total)||c.flow_after>rect.height{return None;}
+   let y=rect.y+c.flow_before-unpainted;let mut projected=fresh.rows.clone();let mut offset=0.0;
+   for row in &mut projected{row.vertical_pos=integer_hu(y-rect.y+offset,dpi)?;offset+=super::hwpunit_to_px(row.line_height+row.line_spacing,dpi);}
+-  rows.push(CurrentFrameParagraphRows{kind:CurrentFrameRowKind::FreshBody,section:0,paragraph:*pi,rows:projected});bodies.push(CandidateBody{paragraph:*pi,physical_y:y,fresh,allow_empty_unused_width:empty});flow=c.flow_after;
++  if !retains_ordinary_standard_body(p,&projected){rows.push(CurrentFrameParagraphRows{kind:CurrentFrameRowKind::FreshBody,section:0,paragraph:*pi,rows:projected});}bodies.push(CandidateBody{paragraph:*pi,physical_y:y,fresh,allow_empty_unused_width:empty});flow=c.flow_after;
+  },PageItem::Table{para_index:pi,control_index:ci}=>{
+   if *pi!=slot||*ci!=0{return None;}let p=ps.get(*pi)?;let [Control::Table(table)]=p.controls.as_slice()else{return None;};
+   if !p.text.is_empty()||p.char_count!=9||!p.char_offsets.is_empty()||p.column_type!=ColumnBreakType::None
+@@ -347,6 +363,7 @@
+    offset+=super::hwpunit_to_px(standard.line_height.checked_add(standard.line_spacing)?,super::DEFAULT_DPI);
+   }
+   if !arithmetic_equal(offset,self.prefix.flow_after()){return None;}
++  if retains_ordinary_standard_body(&self.prefix.source().sections[0].paragraphs[0],fresh){return None;}
+   let rows=fresh.to_vec();Some(CurrentFrameRowsPlan{source:self.prefix.source(),resource:crate::model::native_computed_resource::RESOURCE,
+    allocation_generation:self.paint.generation,paragraphs:vec![CurrentFrameParagraphRows{kind:CurrentFrameRowKind::FreshBody,section:0,paragraph:0,rows}]})
+  }
+--- a/src/renderer/current_frame_rows_plan_tests.rs
++++ b/src/renderer/current_frame_rows_plan_tests.rs
+@@ -164,3 +164,20 @@
+ 
+ #[path="current_multiframe135_tests.rs"]
+ mod current_multi;
++
++ #[test]fn existing_exact_standard_body_is_left_with_ordinary_writer_without_retagging(){
++  let mut input=vec![];flate2::read::GzDecoder::new(OWN_FIXTURE_GZIP).read_to_end(&mut input).unwrap();
++  let core=crate::DocumentCore::from_bytes(&input).unwrap();let mut p=core.document().sections[0].paragraphs[0].clone();
++  assert!(!p.text.is_empty());p.stored_text_partition_dirty=false;p.completed_native_rows=None;p.cell_format_vpos_dirty=false;p.layout_only_fill_lines=0;
++  let styles=core.resolve_render_styles_for_section(0);let fresh=fresh_body_rows(&p,&styles,core.pagination[0].pages[0].layout.body_area.width,core.dpi).unwrap().rows;
++  p.line_segs=fresh.clone();for r in &mut p.line_segs{r.tag=LineSeg::TAG_SINGLE_SEGMENT_LINE;}
++  p.source_line_seg_vertical_pos=None;assert!(retains_ordinary_standard_body(&p,&fresh));
++  assert!(fresh.iter().all(|r|r.tag==(LineSeg::TAG_SINGLE_SEGMENT_LINE|LineSeg::TAG_IMPLEMENTATION_PROPERTY)));
++  for field in 0..14{let mut bad=p.clone();match field{
++   0=>bad.line_segs[0].text_start+=1,1=>bad.line_segs[0].vertical_pos+=1,2=>bad.line_segs[0].line_height+=1,
++   3=>bad.line_segs[0].text_height+=1,4=>bad.line_segs[0].baseline_distance+=1,5=>bad.line_segs[0].line_spacing+=1,
++   6=>bad.line_segs[0].column_start+=1,7=>bad.line_segs[0].segment_width+=1,8=>bad.line_segs[0].tag|=1,
++   9=>bad.line_segs[0].tag|=LineSeg::TAG_IMPLEMENTATION_PROPERTY,10=>bad.cell_format_vpos_dirty=true,
++   11=>bad.layout_only_fill_lines=1,12=>bad.invalidate_layout_inputs(),_=>bad.source_line_seg_vertical_pos=Some(fresh.iter().map(|r|r.vertical_pos+1).collect())}
++   assert!(!retains_ordinary_standard_body(&bad,&fresh),"field {field}");}
++ }
+--- a/src/renderer/current_page_frames135.rs
++++ b/src/renderer/current_page_frames135.rs
+@@ -76,7 +76,7 @@
+   if !arithmetic_equal(c.advance,total)||!arithmetic_equal(c.flow_after,c.flow_before+total)||c.flow_after>rect.height{return None;}
+   let y=rect.y+c.flow_before-unpainted;let mut projected=fresh.rows.clone();let mut offset=0.0;
+   for row in &mut projected{row.vertical_pos=integer_hu(y-rect.y+offset,dpi)?;offset+=super::super::hwpunit_to_px(row.line_height+row.line_spacing,dpi);}
+-  rows.push(CurrentFrameParagraphRows{kind:CurrentFrameRowKind::FreshBody,section:section_index,paragraph:*pi,rows:projected});bodies.push(CandidateBody{paragraph:*pi,physical_y:y,fresh,allow_empty_unused_width:empty});flow=c.flow_after;
++  if !retains_ordinary_standard_body(p,&projected){rows.push(CurrentFrameParagraphRows{kind:CurrentFrameRowKind::FreshBody,section:section_index,paragraph:*pi,rows:projected});}bodies.push(CandidateBody{paragraph:*pi,physical_y:y,fresh,allow_empty_unused_width:empty});flow=c.flow_after;
+  },PageItem::Table{para_index:pi,control_index:ci}=>{
+   if *pi!=start.checked_add(slot)?||*ci!=0{return None;}let p=ps.get(*pi)?;let [Control::Table(table)]=p.controls.as_slice()else{return None;};
+   if !p.text.is_empty()||p.char_count!=9||!p.char_offsets.is_empty()||(if slot==0&&page_index>0 {p.column_type!=ColumnBreakType::Page}else{p.column_type!=ColumnBreakType::None})

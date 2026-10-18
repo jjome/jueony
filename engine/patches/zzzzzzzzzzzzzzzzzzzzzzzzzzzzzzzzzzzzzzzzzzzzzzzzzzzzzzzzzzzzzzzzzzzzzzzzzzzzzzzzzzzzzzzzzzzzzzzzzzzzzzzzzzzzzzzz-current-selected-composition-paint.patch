@@ -1,0 +1,263 @@
+--- a/src/document_core/queries/rendering.rs
++++ b/src/document_core/queries/rendering.rs
+@@ -7970,6 +7970,8 @@
+             wrap_around_paras,
+             collect_current_selections,
+             current_frame_candidate.as_ref().map(|p|p.paint_plan()),
++            self.pagination.get(sec_idx).and_then(|result|crate::renderer::current_accepted_composition::CurrentAcceptedCompositionView::from_current(
++                result,render_paragraphs,&default_tab_styles,self.effective_layout_profile(),self.dpi)),
+         );
+         // 확장 바탕쪽 추가 렌더링
+         for ext_mp in &extra_mps {
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[65, 247, 180, 161, 20, 58, 214, 24, 106, 131, 118, 88, 220, 23, 75, 198, 141, 205, 29, 161, 28, 171, 155, 77, 53, 63, 119, 199, 154, 138, 13, 249];
++pub(crate) const RESOURCE:[u8;32]=[35, 93, 94, 150, 20, 154, 28, 30, 12, 120, 82, 23, 94, 97, 35, 193, 134, 100, 72, 229, 227, 115, 94, 138, 98, 98, 196, 151, 74, 13, 167, 37];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -260,6 +260,7 @@
+             ("src/renderer/current_physical_selections.rs",include_bytes!("../renderer/current_physical_selections.rs").as_slice()),
+             ("src/renderer/selected_composition_observer127.rs",include_bytes!("../renderer/selected_composition_observer127.rs").as_slice()),
+             ("src/serializer/hwpx/current_frame_rows.rs",include_bytes!("../serializer/hwpx/current_frame_rows.rs").as_slice()),
++            ("src/renderer/current_accepted_composition.rs",include_bytes!("../renderer/current_accepted_composition.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- /dev/null
++++ b/src/renderer/current_accepted_composition.rs
+@@ -0,0 +1,74 @@
++//! Consume the exact plain-body composition accepted by the current allocator.
++//! No source/cache rows are reconstructed and no lease/export authority is issued.
++use std::sync::Arc;
++use crate::model::{paragraph::Paragraph,provenance::LayoutCompatibilityProfile,control::Control};
++use super::{composer::ComposedParagraph,pagination::PaginationResult,selected_composition_observer127::FinalizedSelectedCompositionTrace,
++ style_resolver::ResolvedStyleSet};
++#[derive(Debug,Clone)]
++pub(crate) struct CurrentAcceptedCompositionView {trace:Arc<FinalizedSelectedCompositionTrace>}
++pub(crate) struct AcceptedPlainPaint {pub composition:Arc<ComposedParagraph>,pub line_box_width:f64}
++impl CurrentAcceptedCompositionView {
++ pub(crate) fn from_current(result:&PaginationResult,paras:&[Paragraph],styles:&ResolvedStyleSet,profile:LayoutCompatibilityProfile,dpi:f64)->Option<Self>{
++  if dpi!=super::DEFAULT_DPI||styles.supplemental_metrics.is_some()||styles.kerning_measurement_context.is_some()||styles.horizontal_shaping_context.is_some(){return None;}
++  let trace=result.selected_composition_trace.as_ref()?;
++  if !trace.matches_source(paras,styles.reset_flow_context,profile,dpi)||!trace.matches_finalized_result(result){return None;}
++  Some(Self{trace:Arc::clone(trace)})
++ }
++ pub(crate) fn plain_paint(&self,para:&Paragraph,section:usize,page:u32,column:u16,start:usize,end:usize,physical_width:f64,styles:&ResolvedStyleSet,dpi:f64)->Option<AcceptedPlainPaint>{
++  if section!=self.trace.section()||!physical_width.is_finite()||physical_width<=0.0||dpi!=super::DEFAULT_DPI
++   ||!para.field_ranges.is_empty()||!para.range_tags.is_empty()||!para.orphan_field_ends.is_empty()||!para.tab_extended.is_empty()
++   ||para.numbering_restart.is_some()||!para.title_marks.is_empty()||!para.markpen_marks.is_empty()
++   ||para.text.contains(['\t','\n','\r','\u{fffc}'])||para.controls.iter().any(|c|!matches!(c,Control::SectionDef(_)|Control::ColumnDef(_))){return None;}
++  // Source char_offsets are HWP UTF16 units, while ComposedLine.char_start and
++  // published charStart are Unicode scalar indices. Structural controls occupy
++  // their own 16-unit prefix and must never be counted as source characters.
++  let mut source_offset=match para.controls.as_slice(){[]=>0u32,[Control::SectionDef(_),Control::ColumnDef(_)]=>16u32,_=>return None};
++  if para.char_offsets.len()!=para.text.chars().count(){return None;}
++  for (ch,at) in para.text.chars().zip(&para.char_offsets){if *at!=source_offset{return None;}source_offset=source_offset.checked_add(ch.len_utf16() as u32)?;}
++  if para.char_count!=source_offset.checked_add(1)?{return None;}
++  let token=para as *const Paragraph as usize;
++  let mut candidates=self.trace.commits().iter().filter(|c|c.section==section&&c.page==Some(page)&&c.column==column&&c.row_start==start&&c.row_end==end&&c.paragraph_token_matches);
++  let commit=candidates.find(|c|self.trace.format(c.format_id).is_some_and(|f|f.paragraph_token==token))?;
++  if candidates.any(|c|self.trace.format(c.format_id).is_some_and(|f|f.paragraph_token==token)){return None;}
++  let format=self.trace.format(commit.format_id)?;
++  if format.source_text!=para.text||format.source_char_offsets!=para.char_offsets{return None;}
++  if format.has_numbering||format.has_horizontal_shaping||format.known_square_band
++   ||format.before!=0.0||format.after!=0.0||format.lines.is_empty()||format.lines.len()>4096
++   ||start>=end||end>format.lines.len(){return None;}
++  let style=styles.para_styles.get(usize::from(para.para_shape_id))?;
++  if style.margin_left!=0.0||style.margin_right!=0.0||style.indent!=0.0||style.spacing_before!=0.0||style.spacing_after!=0.0
++   ||!matches!(style.head_type,crate::model::style::HeadType::None){return None;}
++  let input_width=format.actual_input_width_px?;if !input_width.is_finite()||input_width<=0.0{return None;}
++  // Both global-current reuse and local recomposition are actual formatter
++  // selections. This does not relabel either selection as freshly recomposed.
++  // This corrects only actual reuse across different physical column widths.
++  // A narrow row remains the exact accepted row in a wider frame. It is NOT a
++  // claim that this composition was recomputed at that later physical width.
++  let commits=self.trace.commits().iter().filter(|c|c.paragraph==commit.paragraph).collect::<Vec<_>>();
++  if commits.len()<2||!commits.iter().any(|c|c.actual_column_width_px!=input_width){return None;}
++  let mut next=0usize;
++  for c in &commits{
++   if c.format_id!=commit.format_id||c.row_start!=next||c.row_end<=next||c.final_membership!=Some(true)
++    ||!c.metrics_still_match_selected_format||!c.range_inside_selected_composition{return None;}
++   next=c.row_end;
++  }
++  if next!=format.lines.len(){return None;}
++  if format.actual_heights.len()!=format.lines.len()||format.actual_spacings.len()!=format.lines.len()
++   ||format.lines.iter().enumerate().any(|(i,l)|format.actual_heights[i]!=super::hwpunit_to_px(l.height_hu,dpi)
++    ||format.actual_spacings[i]!=super::hwpunit_to_px(l.spacing_hu,dpi)){return None;}
++  let mut scalar=0usize;let mut utf16=0u32;
++  for line in &format.lines{
++   if line.scalar_start!=scalar||line.unicode_utf16_start!=Some(utf16)||!line.exact_source_text_span||line.has_line_break||line.height_hu<=0||line.spacing_hu<0
++    ||line.baseline_hu<0||line.baseline_hu>line.height_hu||line.column_start_hu!=0{return None;}
++   let next=line.scalar_end?;
++   for run in &line.runs{utf16=utf16.checked_add(u32::try_from(run.utf16_units).ok()?)?;}
++   if line.unicode_utf16_end!=Some(utf16)||line.original_hwp_char_offset!=para.char_offsets.get(scalar).copied(){return None;}
++   scalar=next;
++  }
++  if scalar!=para.text.chars().count(){return None;}
++  let line_box_width=input_width.min(physical_width);let bound=super::px_to_hwpunit(line_box_width,dpi);
++  if bound<=0||format.lines[start..end].iter().any(|l|l.width_hu<=0||l.width_hu>bound){return None;}
++  let composition=self.trace.selected_composition(commit.format_id)?;
++  Some(AcceptedPlainPaint{composition,line_box_width})
++ }
++}
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -5119,7 +5119,7 @@
+         outline_numbering_id: u16,
+         wrap_around_paras: &[super::pagination::WrapAroundPara],
+     ) -> PageRenderTree {
+-        self.build_render_tree_with_current_selections(page_content,paragraphs,header_paragraphs,footer_paragraphs,composed,styles,footnote_shape,bin_data_content,active_master_page,measured_tables,page_border_fill,outline_numbering_id,wrap_around_paras,false,None)
++        self.build_render_tree_with_current_selections(page_content,paragraphs,header_paragraphs,footer_paragraphs,composed,styles,footnote_shape,bin_data_content,active_master_page,measured_tables,page_border_fill,outline_numbering_id,wrap_around_paras,false,None,None)
+     }
+ 
+     pub(crate) fn build_render_tree_with_current_selections(
+@@ -5139,6 +5139,7 @@
+         wrap_around_paras: &[super::pagination::WrapAroundPara],
+         collect_current_selections:bool,
+         current_frame_paint_plan:Option<super::current_frame_rows_plan::CurrentFramePaintPlan>,
++        accepted:Option<super::current_accepted_composition::CurrentAcceptedCompositionView>,
+     ) -> PageRenderTree {
+         let layout = &page_content.layout;
+         // [#6175] 본문 저장 행 admission의 외부-기하 증거 - 조판이 구역당 한 번
+@@ -5156,6 +5157,7 @@
+         }}
+         tree.frame_mut().current_frame_paint_plan=current_frame_paint_plan;
+ 
++        tree.frame_mut().current_accepted_composition=accepted;
+         // 페이지 배경. hide_fill(쪽 배경 감추기) 시 커스텀 채우기(색/그라데이션/이미지)만
+         // 숨기고 흰 종이 바탕 pageBackground 는 유지한다. 통째로 스킵하면 raster 기본 투명
+         // clear 상태로 남아 export-png 가 RGB flatten 시 페이지 전체가 검게 나온다 (#2083).
+@@ -5444,6 +5446,7 @@
+ 
+         // A current plan is a render-call input, never a cached page permission.
+         tree.frame_mut().current_frame_paint_plan=None;
++        tree.frame_mut().current_accepted_composition=None;
+         tree
+     }
+ 
+--- a/src/renderer/layout/paragraph_layout.rs
++++ b/src/renderer/layout/paragraph_layout.rs
+@@ -4008,6 +4008,20 @@
+         bin_data_content: Option<&[BinDataContent]>,
+         wrap_anchor: Option<&crate::renderer::pagination::WrapAnchorRef>,
+     ) -> f64 {
++        // The allocator selected this precise line partition. Rebuilding the
++        // whole paragraph at a later, unequal column width and then applying
++        // the old line indices would silently drop/duplicate source characters.
++        if multi_col_width_hu.is_none()&&wrap_anchor.is_none(){
++            if let RenderNodeType::Column(column)=col_node.node_type{
++                let accepted=tree.current_accepted_composition.as_ref().and_then(|view|
++                    view.plain_paint(para,section_index,tree.page_index(),column,start_line,end_line,col_area.width,styles,self.dpi));
++                if let Some(accepted)=accepted{
++                    let mut line_box=*col_area;line_box.width=accepted.line_box_width;
++                    return self.layout_composed_paragraph(tree,col_node,&accepted.composition,styles,&line_box,y_start,start_line,end_line,
++                        section_index,para_index,None,true,false,0.0,None,Some(para),bin_data_content,None);
++                }
++            }
++        }
+         if let Some(comp) = composed {
+             // [Task #1042 Stage 6b] 본문 paragraph 의 line_segs.empty case 의 wrap 정합 —
+             // compose_lines fallback (CHARS_PER_LINE=45 heuristic) 결과를 column inner width
+--- a/src/renderer/mod.rs
++++ b/src/renderer/mod.rs
+@@ -3979,3 +3979,5 @@
+ 
+ // Current allocator facts only; no export or row permission.
+ pub mod selected_composition_observer127;
++
++pub(crate) mod current_accepted_composition;
+--- a/src/renderer/render_tree.rs
++++ b/src/renderer/render_tree.rs
+@@ -1803,6 +1803,7 @@
+ pub struct PageLayoutContext {
+     pub(crate) current_physical_selections: super::current_physical_selections::CurrentPhysicalSelections,
+     pub(crate) current_frame_paint_plan: Option<super::current_frame_rows_plan::CurrentFramePaintPlan>,
++    pub(crate) current_accepted_composition: Option<super::current_accepted_composition::CurrentAcceptedCompositionView>,
+     /// 다음 노드 ID 카운터
+     next_id: NodeId,
+     /// 인라인 Shape 좌표 맵: (section, para, control, cell_path) → (x, y)
+@@ -1821,6 +1822,7 @@
+     /// 새 흐름 상태. id 는 root(0) 다음부터 발급한다.
+     pub fn new(page_index: u32, width: f64, height: f64) -> Self {
+         Self {
++            current_accepted_composition: None,
+             next_id: 1,
+             inline_shape_positions: std::collections::HashMap::new(),
+             page_index,
+--- a/src/renderer/selected_composition_observer127.rs
++++ b/src/renderer/selected_composition_observer127.rs
+@@ -85,7 +85,7 @@
+  pub overflowed:bool,pub unsupported_observed:bool,pub nested_rejected:bool,
+  pub not_an_export_permission:bool,
+ }
+-struct Active {scope:u64,report:SelectedCompositionReport}
++struct Active {scope:u64,report:SelectedCompositionReport,compositions:Vec<Option<std::sync::Arc<ComposedParagraph>>>}
+ thread_local! {
+  static ACTIVE:RefCell<Option<Active>>=const {RefCell::new(None)};
+  static NEXT_SCOPE:Cell<u64>=const {Cell::new(0)};
+@@ -98,7 +98,7 @@
+  let scope=NEXT_SCOPE.with(|n|n.get().checked_add(1).map(|v|{n.set(v);v})).ok_or("scope sequence exhausted")?;
+  let started=ACTIVE.with(|a|{let Ok(mut a)=a.try_borrow_mut()else{return false;};
+   if let Some(a)=a.as_mut(){a.report.nested_rejected=true;return false;}
+-  *a=Some(Active{scope,report:SelectedCompositionReport{cookie,formats:vec![],commits:vec![],tables:vec![],whole_tables:vec![],finalizations:vec![],encoded_bytes:0,
++  *a=Some(Active{scope,compositions:vec![],report:SelectedCompositionReport{cookie,formats:vec![],commits:vec![],tables:vec![],whole_tables:vec![],finalizations:vec![],encoded_bytes:0,
+    overflowed:false,unsupported_observed:false,nested_rejected:false,not_an_export_permission:true}});true});
+  if !started{return Err("nested or reentrant observation");}
+  let guard=Scope;let result=run();
+@@ -156,7 +156,14 @@
+    tac_controls:composition.tac_controls.clone(),footnote_positions:composition.footnote_positions.clone(),tab_extended:composition.tab_extended.clone(),
+    has_numbering:composition.numbering_text.is_some(),has_horizontal_shaping:composition.horizontal_shaping.is_some(),known_square_band:square,
+    observed_not_fresh_or_authorized:true};
+-  if !charge(r,&fact){return None;}r.formats.push(fact);Some(SelectedObservationHandle{scope:active.scope,index:id})
++  if !charge(r,&fact){return None;}
++  // Keep the exact selected object for ordinary plain-body paint. This is not
++  // deserialized/rebuilt from report fields and does not issue any row lease.
++  let plain=composition.inline_controls.iter().all(|c|matches!(c.control_type,super::composer::InlineControlType::Other)
++   &&para.controls.get(c.control_index).is_some_and(|v|matches!(v,crate::model::control::Control::SectionDef(_)|crate::model::control::Control::ColumnDef(_))))&&composition.tac_controls.is_empty()&&composition.footnote_positions.is_empty()
++   &&composition.tab_extended.is_empty()&&composition.numbering_text.is_none()&&composition.horizontal_shaping.is_none();
++  active.compositions.push(plain.then(||std::sync::Arc::new(composition.clone())));
++  r.formats.push(fact);Some(SelectedObservationHandle{scope:active.scope,index:id})
+  })
+ }
+ #[allow(clippy::too_many_arguments)]
+@@ -250,6 +257,7 @@
+  generation:u64,section:usize,resource:[u8;32],source:[u8;32],final_frame:[u8;32],
+  formats:Vec<SelectedFormatFact>,commits:Vec<CommitFact>,
+  tables:Vec<TableAcceptedFact>,whole_tables:Vec<WholeTableAcceptedFact>,
++ compositions:Vec<Option<std::sync::Arc<ComposedParagraph>>>,
+ }
+ impl FinalizedSelectedCompositionTrace {
+  pub(crate) fn generation(&self)->u64{self.generation}
+@@ -259,6 +267,9 @@
+  pub(crate) fn commits(&self)->&[CommitFact]{&self.commits}
+  pub(crate) fn tables(&self)->&[TableAcceptedFact]{&self.tables}
+  pub(crate) fn whole_tables(&self)->&[WholeTableAcceptedFact]{&self.whole_tables}
++ pub(crate) fn selected_composition(&self,id:usize)->Option<std::sync::Arc<ComposedParagraph>>{
++  self.compositions.get(id)?.as_ref().map(std::sync::Arc::clone)
++ }
+  pub(crate) fn format(&self,id:usize)->Option<&SelectedFormatFact>{self.formats.iter().find(|f|f.observation_id==id)}
+  pub(crate) fn matches_source(&self,paragraphs:&[Paragraph],context:Option<[u8;32]>,profile:LayoutCompatibilityProfile,dpi:f64)->bool{
+   self.resource==crate::model::native_computed_resource::RESOURCE
+@@ -384,7 +395,7 @@
+   if previous_depth!=0{if let Some(active)=a.as_mut(){active.report.nested_rejected=true;active.report.unsupported_observed=true;}return(None,false);}
+   let scope=NEXT_SCOPE.with(|n|n.get().checked_add(1).map(|v|{n.set(v);v}));let Some(scope)=scope else{return(None,false);};
+   let saved=a.take();
+-  *a=Some(Active{scope,report:SelectedCompositionReport{cookie:[0;32],formats:vec![],commits:vec![],tables:vec![],whole_tables:vec![],finalizations:vec![],encoded_bytes:0,
++  *a=Some(Active{scope,compositions:vec![],report:SelectedCompositionReport{cookie:[0;32],formats:vec![],commits:vec![],tables:vec![],whole_tables:vec![],finalizations:vec![],encoded_bytes:0,
+    overflowed:false,unsupported_observed:source.is_none(),nested_rejected:false,not_an_export_permission:true}});
+   (saved,true)
+  });
+@@ -408,7 +419,7 @@
+    if commits.iter().any(|c|!c.paragraph_token_matches||!c.metrics_still_match_selected_format||!c.range_inside_selected_composition||c.final_membership!=Some(true)){return None;}
+    if tables.iter().any(|c|c.final_membership!=Some(true))||whole_tables.iter().any(|c|c.final_membership!=Some(true)){return None;}
+    Some(std::sync::Arc::new(FinalizedSelectedCompositionTrace{generation,section:self.section,
+-    resource:crate::model::native_computed_resource::RESOURCE,source,final_frame,formats,commits,tables,whole_tables}))
++    resource:crate::model::native_computed_resource::RESOURCE,source,final_frame,formats,commits,tables,whole_tables,compositions:active.compositions.clone()}))
+   })
+  }
+ }

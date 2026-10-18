@@ -1,0 +1,1699 @@
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -2826,10 +2826,34 @@
+         crate::serializer::hwpx::standard_rows::CurrentStandardRowsProjection::from_current_stack(&document,&plan,&styles,page.layout.body_area.width,self.dpi,representation)
+     }
+ 
++
++    fn current_frame_rows_for_export_document<'doc>(&self,document:&'doc Document)
++        ->Result<Option<crate::serializer::hwpx::current_frame_rows::CurrentFrameRowsProjection<'doc>>,HwpError>{
++        use crate::renderer::current_frame_rows_plan::CurrentFrameCandidate;
++        use crate::serializer::hwpx::current_frame_rows::{CurrentFrameRowsProjection,CurrentFrameExportRepresentation};
++        if !std::ptr::eq(document,&self.document)||self.batch_mode||self.pending_pagination_job.is_some()||self.deferred_pagination_descriptor.is_some()
++            ||self.dirty_sections.iter().any(|d|*d)||self.page_count()!=1||self.pagination.len()!=1
++            ||!self.computed_row_resources_supported(){return Ok(None);}
++        let styles=self.resolve_render_styles_for_section(0);
++        let Some(candidate)=self.pagination.first().zip(self.measured_tables.first()).and_then(|(result,measured)|
++            CurrentFrameCandidate::from_current(document,self.source_format,result,&styles,measured,self.effective_layout_profile(),self.dpi))else{return Ok(None);};
++        let physical=self.build_page_tree_with_current_selections(0)?;
++        let Some(plan)=candidate.finalize(&physical.frame.current_physical_selections)else{return Ok(None);};
++        let representation=if matches!(self.source_format,crate::parser::FileFormat::Hwp)
++            &&!Self::owns_versioned_xml_cache_origin(document,self.source_format){CurrentFrameExportRepresentation::NativeHwp5Lowering}
++            else{CurrentFrameExportRepresentation::Original};
++        // A completed new plan cannot silently fall back when its exact output
++        // binding fails. Unknown lowering or budgets produce an explicit error.
++        let projection=CurrentFrameRowsProjection::from_current_frame(document,&plan,representation)
++            .ok_or_else(||HwpError::RenderError("CURRENT_FRAME_EXPORT_BINDING_UNSUPPORTED".into()))?;
++        Ok(Some(projection))
++    }
++
+     /// Document IR을 HWPX(ZIP+XML)로 직렬화 (네이티브 에러 타입)
+     pub fn export_hwpx_native(&self) -> Result<Vec<u8>, HwpError> {
+         let projection=self.current_standard_rows_for_export();
+-        let result=self.hwpx_document_for_export(|document| crate::serializer::hwpx::serialize_hwpx_with_current_rows(document,projection.as_ref()))?;
++        let current_frame=if projection.is_none(){self.current_frame_rows_for_export_document(&self.document)?}else{None};
++        let result=self.hwpx_document_for_export(|document| match current_frame.as_ref(){Some(frame)=>crate::serializer::hwpx::serialize_hwpx_with_frame_rows(document,frame),None=>crate::serializer::hwpx::serialize_hwpx_with_current_rows(document,projection.as_ref())})?;
+         result.content_loss().write_warnings_to_stderr();
+         Ok(result.into_bytes())
+     }
+@@ -2839,14 +2863,16 @@
+         &self,
+     ) -> Result<crate::serializer::SerializedDocument, HwpError> {
+         let projection=self.current_standard_rows_for_export();
+-        self.hwpx_document_for_export(|document|crate::serializer::hwpx::serialize_hwpx_with_current_rows(document,projection.as_ref()))
++        let current_frame=if projection.is_none(){self.current_frame_rows_for_export_document(&self.document)?}else{None};
++        self.hwpx_document_for_export(|document|match current_frame.as_ref(){Some(frame)=>crate::serializer::hwpx::serialize_hwpx_with_frame_rows(document,frame),None=>crate::serializer::hwpx::serialize_hwpx_with_current_rows(document,projection.as_ref())})
+     }
+ 
+     /// Document IR을 ODF AES-256-CBC 비밀번호 보호 HWPX로 직렬화한다.
+     pub fn export_hwpx_native_with_password(&self, password: &[u8]) -> Result<Vec<u8>, HwpError> {
+         let projection=self.current_standard_rows_for_export();
++        let current_frame=if projection.is_none(){self.current_frame_rows_for_export_document(&self.document)?}else{None};
+         let result=self.hwpx_document_for_export(|document| {
+-            crate::serializer::hwpx::serialize_hwpx_with_current_rows_and_password(document,projection.as_ref(),password)
++            match current_frame.as_ref(){Some(frame)=>crate::serializer::hwpx::serialize_hwpx_with_frame_rows_and_password(document,frame,password),None=>crate::serializer::hwpx::serialize_hwpx_with_current_rows_and_password(document,projection.as_ref(),password)}
+         })?;
+         result.content_loss().write_warnings_to_stderr();
+         Ok(result.into_bytes())
+@@ -2858,8 +2884,9 @@
+         password: &[u8],
+     ) -> Result<crate::serializer::SerializedDocument, HwpError> {
+         let projection=self.current_standard_rows_for_export();
++        let current_frame=if projection.is_none(){self.current_frame_rows_for_export_document(&self.document)?}else{None};
+         self.hwpx_document_for_export(|document| {
+-            crate::serializer::hwpx::serialize_hwpx_with_current_rows_and_password(document,projection.as_ref(),password)
++            match current_frame.as_ref(){Some(frame)=>crate::serializer::hwpx::serialize_hwpx_with_frame_rows_and_password(document,frame,password),None=>crate::serializer::hwpx::serialize_hwpx_with_current_rows_and_password(document,projection.as_ref(),password)}
+         })
+     }
+ 
+@@ -2957,10 +2984,11 @@
+             result.map_err(|e| HwpError::RenderError(e.to_string()))
+         } else {
+             let projection = self.current_standard_rows_for_export_document(&document);
++            let current_frame=if projection.is_none(){self.current_frame_rows_for_export_document(&document)?}else{None};
+             self.hwpx_document_for_export_document(&document, |lowered| {
+                 if let Some(password) = password {
+-                    crate::serializer::hwpx::serialize_hwpx_with_current_rows_and_password(lowered, projection.as_ref(), password)
+-                } else { crate::serializer::hwpx::serialize_hwpx_with_current_rows(lowered, projection.as_ref()) }
++                    match current_frame.as_ref(){Some(frame)=>crate::serializer::hwpx::serialize_hwpx_with_frame_rows_and_password(lowered,frame,password),None=>crate::serializer::hwpx::serialize_hwpx_with_current_rows_and_password(lowered, projection.as_ref(), password)}
++                } else {match current_frame.as_ref(){Some(frame)=>crate::serializer::hwpx::serialize_hwpx_with_frame_rows(lowered,frame),None=>crate::serializer::hwpx::serialize_hwpx_with_current_rows(lowered, projection.as_ref())}}
+             })
+         }
+     }
+@@ -3070,7 +3098,7 @@
+ 
+     /// HWP5 원본에서 LineSeg가 없던 문단을 HWPX 재파스에서도 일반 HWPX 누락 문단으로
+     /// reflow하지 않도록 명시 LineSeg marker로 materialize한다.
+-    fn materialize_hwp5_missing_linesegs_for_hwpx_export(document: &mut Document) {
++    pub(crate) fn materialize_hwp5_missing_linesegs_for_hwpx_export(document: &mut Document) {
+         for section in &mut document.sections {
+             for para in &mut section.paragraphs {
+                 Self::materialize_missing_lineseg_paragraph(para);
+--- a/src/document_core/queries/rendering.rs
++++ b/src/document_core/queries/rendering.rs
+@@ -4990,6 +4990,7 @@
+         if self.pagination.len() <= section_index {
+             self.pagination
+                 .resize_with(section_index + 1, || PaginationResult {
++                selected_composition_trace: None,
+                     pages: Vec::new(),
+                     wrap_around_paras: Vec::new(),
+                     hidden_empty_paras: std::collections::HashSet::new(),
+@@ -5194,6 +5195,7 @@
+         let sec_count = self.document.sections.len();
+         while self.pagination.len() < sec_count {
+             self.pagination.push(PaginationResult {
++                selected_composition_trace: None,
+                 pages: Vec::new(),
+                 wrap_around_paras: Vec::new(),
+                 hidden_empty_paras: std::collections::HashSet::new(),
+@@ -7667,6 +7669,16 @@
+         page_num: u32,
+         header_footer_override: Option<(usize, bool, u8)>,
+     ) -> Result<PageRenderTree, HwpError> {
++        self.build_page_tree_with_physical_capture(page_num,header_footer_override,false)
++    }
++
++    pub(crate) fn build_page_tree_with_current_selections(&self,page_num:u32)->Result<PageRenderTree,HwpError>{
++        self.build_page_tree_with_physical_capture(page_num,None,true)
++    }
++
++    fn build_page_tree_with_physical_capture(
++        &self,page_num:u32,header_footer_override:Option<(usize,bool,u8)>,collect_current_selections:bool,
++    )->Result<PageRenderTree,HwpError>{
+         use crate::model::style::HeadType;
+         use crate::renderer::layout::resolve_numbering_id;
+         use crate::renderer::pagination::PageItem;
+@@ -7937,7 +7949,12 @@
+             hidden.hide_fill |= section_hidden.hide_fill;
+             &first_content
+         } else {page_content};
+-        let mut tree = self.layout_engine.build_render_tree(
++        let current_frame_candidate=if self.computed_row_resources_supported(){
++            self.pagination.get(sec_idx).and_then(|result|crate::renderer::current_frame_rows_plan::CurrentFrameCandidate::from_current(
++                &self.document,self.source_format,result,&default_tab_styles,
++                sec_measured,self.effective_layout_profile(),self.dpi))
++        }else{None};
++        let mut tree = self.layout_engine.build_render_tree_with_current_selections(
+             render_content,
+             render_paragraphs,
+             header_paragraphs,
+@@ -7951,6 +7968,8 @@
+             page_border_fill,
+             outline_num_id,
+             wrap_around_paras,
++            collect_current_selections,
++            current_frame_candidate.as_ref().map(|p|p.paint_plan()),
+         );
+         // 확장 바탕쪽 추가 렌더링
+         for ext_mp in &extra_mps {
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[151, 62, 124, 193, 92, 236, 20, 38, 144, 244, 62, 166, 8, 235, 41, 211, 150, 195, 70, 215, 224, 191, 160, 5, 41, 96, 113, 218, 1, 20, 113, 119];
++pub(crate) const RESOURCE:[u8;32]=[65, 247, 180, 161, 20, 58, 214, 24, 106, 131, 118, 88, 220, 23, 75, 198, 141, 205, 29, 161, 28, 171, 155, 77, 53, 63, 119, 199, 154, 138, 13, 249];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -256,6 +256,10 @@
+             ("src/parser/hwpx/raw_zip_authority.rs",include_bytes!("../parser/hwpx/raw_zip_authority.rs").as_slice()),
+             ("src/renderer/composer/unchanged_native_tac.rs",include_bytes!("../renderer/composer/unchanged_native_tac.rs").as_slice()),
+             ("src/model/native_tac_spacing_input126.rs",include_bytes!("native_tac_spacing_input126.rs").as_slice()),
++            ("src/renderer/current_frame_rows_plan.rs",include_bytes!("../renderer/current_frame_rows_plan.rs").as_slice()),
++            ("src/renderer/current_physical_selections.rs",include_bytes!("../renderer/current_physical_selections.rs").as_slice()),
++            ("src/renderer/selected_composition_observer127.rs",include_bytes!("../renderer/selected_composition_observer127.rs").as_slice()),
++            ("src/serializer/hwpx/current_frame_rows.rs",include_bytes!("../serializer/hwpx/current_frame_rows.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- /dev/null
++++ b/src/renderer/current_frame_rows_plan.rs
+@@ -0,0 +1,270 @@
++//! Private general current-frame export plan. Construction is owned by this
++//! module's current fresh-composition/allocation/physical-frame proof, never by
++//! a file descriptor, external JSON, old row lease, or arbitrary caller rows.
++//! The producer is limited to exact current single-column whole body/table frames.
++use crate::model::{document::Document,paragraph::LineSeg};
++pub(crate) struct CurrentFrameRowsPlan<'doc>{
++ source:&'doc Document,
++ resource:[u8;32],
++ allocation_generation:[u8;32],
++ paragraphs:Vec<CurrentFrameParagraphRows>,
++}
++pub(crate) struct CurrentFrameParagraphRows{
++ section:usize,
++ paragraph:usize,
++ rows:Vec<LineSeg>,
++}
++impl CurrentFrameRowsPlan<'_>{
++ pub(crate) fn owns_document(&self,source:&Document)->bool{std::ptr::eq(self.source,source)}
++ pub(crate) fn resource(&self)->[u8;32]{self.resource}
++ pub(crate) fn allocation_generation(&self)->[u8;32]{self.allocation_generation}
++ pub(crate) fn paragraph_rows(&self)->&[CurrentFrameParagraphRows]{&self.paragraphs}
++}
++impl CurrentFrameParagraphRows{
++ pub(crate) fn section_index(&self)->usize{self.section}
++ pub(crate) fn paragraph_index(&self)->usize{self.paragraph}
++ pub(crate) fn rows(&self)->&[LineSeg]{&self.rows}
++}
++
++
++/// Generic fresh standard rows for one actual body frame. This helper is not a
++/// plan constructor: accepted allocator and complete physical closure remain
++/// mandatory at the caller. It never reads a source row as output geometry.
++struct FreshBodyRows { rows:Vec<LineSeg>, composition:super::composer::ComposedParagraph }
++fn fresh_body_rows(p:&crate::model::paragraph::Paragraph,styles:&super::style_resolver::ResolvedStyleSet,
++ width:f64,dpi:f64)->Option<FreshBodyRows>{
++ use crate::model::control::Control;
++ use super::composer::{compose_paragraph_in_context,reflow_line_segs,ParagraphBox};
++ if p.text.len()>64*1024 || p.char_shapes.is_empty() || p.char_shapes.len()>128
++  || p.char_shapes.windows(2).any(|s|s[0].start_pos>=s[1].start_pos)
++  || p.char_shapes.iter().any(|s|s.char_shape_id as usize>=styles.char_styles.len()) || p.char_offsets.len()>64*1024
++  || p.text.contains(['\t','\n','\r','\u{fffc}']) || !width.is_finite() || width<=0.0
++  || dpi!=super::DEFAULT_DPI || !p.field_ranges.is_empty() || !p.range_tags.is_empty()
++  || !p.orphan_field_ends.is_empty() || !p.tab_extended.is_empty() || p.numbering_restart.is_some()
++  || p.layout_only_fill_lines!=0 || p.cell_format_vpos_dirty
++  || !p.markpen_marks.is_empty() || !p.title_marks.is_empty()
++  || p.controls.iter().any(|c|!matches!(c,Control::SectionDef(_)|Control::ColumnDef(_)))
++  || p.ctrl_data_records.iter().any(Option::is_some) {return None;}
++ let start=match p.controls.as_slice(){[]=>0u32,[Control::SectionDef(_),Control::ColumnDef(_)]=>16u32,_=>return None};
++ let mut offset=start;
++ if p.char_offsets.len()!=p.text.chars().count(){return None;}
++ for (ch,at) in p.text.chars().zip(&p.char_offsets){if *at!=offset{return None;}offset=offset.checked_add(ch.len_utf16() as u32)?;}
++ if p.char_count!=offset.checked_add(1)? {return None;}
++ let style=styles.para_styles.get(usize::from(p.para_shape_id))?;
++ if style.margin_left!=0.0 || style.margin_right!=0.0 || style.indent!=0.0 || style.spacing_before!=0.0
++  || style.spacing_after!=0.0 || style.keep_lines || style.keep_with_next || style.page_break_before
++  || !matches!(style.head_type,crate::model::style::HeadType::None)
++  || style.border_connect || style.border_spacing.iter().any(|v|*v!=0.0) {return None;}
++ if style.border_fill_id!=0 {let border=styles.border_styles.get(usize::from(style.border_fill_id.checked_sub(1)?))?;
++  if border.borders.iter().any(|b|!matches!(b.line_type,crate::model::style::BorderLineType::None))
++   || border.fill_color.is_some() || border.pattern.is_some() || border.gradient.is_some() || border.image_fill.is_some()
++   || border.diagonal_attr!=0 || !matches!(border.center_line,crate::model::style::CenterLine::None){return None;}}
++ if styles.supplemental_metrics.is_some() || styles.kerning_measurement_context.is_some()
++  || styles.horizontal_shaping_context.is_some(){return None;}
++ // Prove the existing generic breaker's i32 metric arithmetic cannot overflow
++ // before invoking it; this is not a layout tolerance or a font substitution.
++ if !style.line_spacing.is_finite()||style.line_spacing<0.0{return None;}
++ for shape in &p.char_shapes {let cs=styles.char_styles.get(shape.char_shape_id as usize)?;
++  let hu=cs.font_size*7200.0/dpi;
++  let upper=hu*(2.0+style.line_spacing.abs())+style.line_spacing.abs()*7200.0/dpi;
++  if !hu.is_finite()||hu<=0.0||!upper.is_finite()||upper>f64::from(i32::MAX)/8.0{return None;}}
++ let mut fresh=p.clone();fresh.line_segs.clear();fresh.layout_space_metrics.clear();
++ fresh.source_line_seg_vertical_pos=None;fresh.hwpx_axis_shift=0;
++ fresh.native_source_synthetic_seal=None;fresh.native_source_synthetic_context=None;
++ fresh.completed_native_rows=None;fresh.native_frame_observation.set(None);
++ let frame=ParagraphBox::content_for_style(width,Some(style),dpi);
++ reflow_line_segs(&mut fresh,frame,styles,dpi);
++ if fresh.line_segs.is_empty() || fresh.line_segs.len()>4096{return None;}
++ let mut end=0i32;
++ for row in &fresh.line_segs {if row.vertical_pos!=end || row.line_height<=0 || row.text_height!=row.line_height
++  || row.line_spacing<0 || row.baseline_distance<0 || row.baseline_distance>row.line_height
++  || row.column_start!=0 || row.tag!=(LineSeg::TAG_SINGLE_SEGMENT_LINE|LineSeg::TAG_IMPLEMENTATION_PROPERTY) {return None;}
++  end=end.checked_add(row.line_height)?.checked_add(row.line_spacing)?;}
++ let composition=compose_paragraph_in_context(&fresh,styles);
++ if composition.numbering_text.is_some() || !composition.tac_controls.is_empty() || !composition.footnote_positions.is_empty()
++  || !composition.tab_extended.is_empty() || composition.horizontal_shaping.is_some(){return None;}
++ Some(FreshBodyRows{rows:fresh.line_segs,composition})
++}
++fn same_selected_line(a:&super::composer::ComposedLine,b:&super::composer::ComposedLine)->bool{
++ a.char_start==b.char_start && a.line_height==b.line_height && a.baseline_distance==b.baseline_distance
++ && a.segment_width==b.segment_width && a.column_start==b.column_start && a.line_spacing==b.line_spacing
++ && !a.has_line_break && !b.has_line_break && a.runs.len()==b.runs.len()
++ && a.runs.iter().zip(&b.runs).all(|(a,b)|a.text==b.text && a.char_style_id==b.char_style_id
++  && a.lang_index==b.lang_index && a.char_overlap.is_none() && b.char_overlap.is_none()
++  && a.footnote_marker.is_none() && b.footnote_marker.is_none() && a.display_text.is_none() && b.display_text.is_none()
++  && a.supplemental_metrics_blocked==b.supplemental_metrics_blocked && !a.inserted_control_text && !b.inserted_control_text
++  && a.space_metric==b.space_metric)
++}
++
++/// Candidate from this completed allocator pass, before any paint receipt.
++/// Neither this type nor its paint facade is a serialized cache/row authority.
++struct CandidateBody { paragraph:usize,physical_y:f64,fresh:FreshBodyRows,allow_empty_unused_width:bool }
++#[derive(Debug,Clone)]struct CandidateTable {paragraph:usize,control:usize,top:f64,before:f64,body:f64,after:f64}
++#[derive(Debug,Clone)]pub(crate) struct CurrentFramePaintPlan { source_paragraphs:usize,generation:[u8;32],section:usize,page:u32,column:u16,
++ rect:super::page_layout::LayoutRect,tables:Vec<CandidateTable> }
++impl CurrentFramePaintPlan {
++ pub(crate) fn receipt_binding(&self)->(usize,[u8;32]){(self.source_paragraphs,self.generation)}
++ pub(crate) fn table_top(&self,paragraphs:&[crate::model::paragraph::Paragraph],section:usize,page:u32,column:u16,
++ rect:&super::page_layout::LayoutRect,paragraph:usize,control:usize,flow:f64)->Option<f64>{
++  if paragraphs.as_ptr() as usize!=self.source_paragraphs || section!=self.section || page!=self.page || column!=self.column
++   || self.rect.x!=rect.x || self.rect.y!=rect.y || self.rect.width!=rect.width || self.rect.height!=rect.height {return None;}
++  let host=self.tables.iter().find(|h|h.paragraph==paragraph&&h.control==control)?;
++  arithmetic_equal(flow,host.top).then_some(host.top)
++ }
++}
++pub(crate) struct CurrentFrameCandidate<'doc> {source:&'doc Document,paint:CurrentFramePaintPlan,
++ bodies:Vec<CandidateBody>,tables:Vec<CandidateTable>,rows:Vec<CurrentFrameParagraphRows>,generation:[u8;32]}
++fn arithmetic_equal(a:f64,b:f64)->bool{a.is_finite()&&b.is_finite()&&(a-b).abs()<=f64::EPSILON*a.abs().max(b.abs()).max(1.0)*16.0}
++fn integer_hu(px:f64,dpi:f64)->Option<i32>{if !px.is_finite()||!dpi.is_finite()||dpi<=0.0{return None;}let v=px*7200.0/dpi;
++ let n=v.round();if n<i32::MIN as f64||n>i32::MAX as f64||!arithmetic_equal(v,n){return None;}Some(n as i32)}
++fn same_empty_line_ignoring_unused_width(a:&super::composer::ComposedLine,b:&super::composer::ComposedLine)->bool{
++ a.runs.iter().all(|r|r.text.is_empty()&&r.display_text.is_none()&&!r.inserted_control_text)
++ && b.runs.iter().all(|r|r.text.is_empty()&&r.display_text.is_none()&&!r.inserted_control_text)
++ && a.char_start==b.char_start && a.line_height==b.line_height && a.baseline_distance==b.baseline_distance
++ && a.column_start==b.column_start && a.line_spacing==b.line_spacing && !a.has_line_break && !b.has_line_break
++ && a.runs.len()==b.runs.len() && a.runs.iter().zip(&b.runs).all(|(a,b)|a.char_style_id==b.char_style_id&&a.lang_index==b.lang_index
++ &&a.space_metric==b.space_metric&&a.supplemental_metrics_blocked==b.supplemental_metrics_blocked
++ &&a.char_overlap.is_none()&&b.char_overlap.is_none()&&a.footnote_marker.is_none()&&b.footnote_marker.is_none())
++}
++fn fact_line_matches(f:&super::selected_composition_observer127::LineFact,l:&super::composer::ComposedLine,empty_width:bool)->bool{
++ use super::composer::SpaceMetric;
++ f.exact_source_text_span && f.scalar_start==l.char_start && f.height_hu==l.line_height && f.baseline_hu==l.baseline_distance
++ && (f.width_hu==l.segment_width||empty_width) && f.column_start_hu==l.column_start && f.spacing_hu==l.line_spacing
++ && !f.has_line_break && !l.has_line_break && f.runs.len()==l.runs.len()
++ && f.runs.iter().zip(&l.runs).all(|(a,b)|a.text==b.text&&a.display_text.is_none()&&b.display_text.is_none()
++  &&a.char_style_id==b.char_style_id&&a.language==b.lang_index&&a.overlap.is_none()&&b.char_overlap.is_none()
++  &&a.footnote_marker.is_none()&&b.footnote_marker.is_none()&&a.supplemental_metrics_blocked==b.supplemental_metrics_blocked
++  &&!a.inserted_control_text&&!b.inserted_control_text&&a.space_metric==match b.space_metric{SpaceMetric::Stored=>"Stored",
++   SpaceMetric::HancomRegenerated=>"HancomRegenerated",SpaceMetric::HalfCell=>"HalfCell",SpaceMetric::KoPubJustified=>"KoPubJustified"})
++}
++fn clear_fresh_input(p:&mut crate::model::paragraph::Paragraph){p.line_segs.clear();p.layout_space_metrics.clear();p.source_line_seg_vertical_pos=None;
++ p.hwpx_axis_shift=0;p.native_source_synthetic_seal=None;p.native_source_synthetic_context=None;p.completed_native_rows=None;p.native_frame_observation.set(None);}
++fn native_table_common_exact(table:&crate::model::table::Table)->bool{
++ let c=&table.common;if !matches!(table.raw_ctrl_data.len(),38|42)||!c.description.is_empty()||!c.raw_extra.is_empty()
++ ||c.attr!=crate::serializer::control::pack_common_attr_bits(c)||c.ctrl_id!=0||c.z_order!=0||c.prevent_page_break!=0
++ ||!matches!(c.numbering_type,crate::model::shape::ObjectNumberingType::None)||!matches!(c.drop_cap_style,crate::model::shape::DropCapStyle::None)
++ ||c.margin.left!=table.outer_margin_left||c.margin.right!=table.outer_margin_right||c.margin.top!=table.outer_margin_top||c.margin.bottom!=table.outer_margin_bottom{return false;}
++ let mut bytes=Vec::with_capacity(42);for v in[c.attr,c.vertical_offset,c.horizontal_offset,c.width,c.height]{bytes.extend(v.to_le_bytes());}
++ bytes.extend(c.z_order.to_le_bytes());for v in[c.margin.left,c.margin.right,c.margin.top,c.margin.bottom]{bytes.extend(v.to_le_bytes());}
++ bytes.extend(c.instance_id.to_le_bytes());if table.raw_ctrl_data.len()==42{bytes.extend(c.prevent_page_break.to_le_bytes());}bytes.extend(0u16.to_le_bytes());bytes==table.raw_ctrl_data
++}
++impl<'doc> CurrentFrameCandidate<'doc>{
++ pub(crate) fn from_current(source:&'doc Document,format:crate::parser::FileFormat,result:&super::pagination::PaginationResult,
++ styles:&super::style_resolver::ResolvedStyleSet,measured:&[super::height_measurer::MeasuredTable],
++ profile:crate::model::provenance::LayoutCompatibilityProfile,dpi:f64)->Option<Self>{
++ use super::pagination::PageItem;use crate::model::{control::Control,paragraph::ColumnBreakType};
++ if source.sections.len()!=1||source.provenance.hwp3_lineage||!source.bin_data_content.is_empty()||result.pages.len()!=1
++ ||!result.hidden_empty_paras.is_empty()||!result.pre_emitted_host_paras.is_empty()||!result.wrap_around_paras.is_empty()
++ ||!result.endnotes.is_empty()||!result.endnote_paragraphs.is_empty()||dpi!=super::DEFAULT_DPI{return None;}
++ match format{crate::parser::FileFormat::Hwp if profile.native_hwp5_layout()=>{},crate::parser::FileFormat::Hwpx if profile.hwp5_origin_hwpx()=>{},_=>return None}
++ let section=&source.sections[0].section_def;
++ if section.line_grid!=0||section.char_grid!=0||section.text_direction!=0||!section.master_pages.is_empty()||!section.extra_child_records.is_empty(){return None;}
++ let ps=&source.sections[0].paragraphs;if ps.is_empty()||ps.len()>128||ps.iter().any(|p|p.completed_native_rows.is_some()){return None;}
++ let [Control::SectionDef(_),Control::ColumnDef(columns)]=ps.first()?.controls.as_slice()else{return None;};
++ if columns.column_count!=1||!columns.same_width||!columns.widths.is_empty()||!columns.gaps.is_empty()
++ ||columns.column_type!=crate::model::page::ColumnType::Normal||columns.direction!=crate::model::page::ColumnDirection::LeftToRight{return None;}
++ match format{crate::parser::FileFormat::Hwp=>if columns.raw_attr!=0x1004{return None;},crate::parser::FileFormat::Hwpx=>if columns.raw_attr!=0{return None;},_=>return None}
++ let definition_context=source.reset_flow_contexts().first().copied().flatten()?;
++ if styles.reset_flow_contexts.first().copied().flatten()!=Some(definition_context){return None;}
++ let trace=result.selected_composition_trace.as_ref()?;
++ if trace.section()!=0||trace.resource()!=crate::model::native_computed_resource::RESOURCE
++ ||!trace.matches_source(ps,Some(definition_context),profile,dpi)||!trace.matches_finalized_result(result){return None;}
++ let page=&result.pages[0];if page.page_index!=0||page.section_index!=0||page.column_contents.len()!=1||page.layout.column_areas.len()!=1
++ ||!page.footnotes.is_empty()||page.active_header.is_some()||page.active_footer.is_some()||page.active_master_page.is_some()||!page.extra_master_pages.is_empty(){return None;}
++ let col=&page.column_contents[0];let rect=page.layout.column_areas[0];
++ if rect.width!=page.layout.body_area.width||col.column_index!=0||col.start_height!=0.0||col.endnote_flow||col.zone_layout.is_some()||col.zone_y_offset!=0.0
++ ||!col.wrap_anchors.is_empty()||!col.wrap_around_paras.is_empty()||!col.inline_placements.is_empty()||!col.inline_flow_plans.is_empty()
++ ||!col.paragraph_float_placements.is_empty()||!col.overlay_continuations.is_empty()||!col.overlay_cuts.is_empty()||col.items.len()!=ps.len()
++ ||trace.commits().len()+trace.whole_tables().len()!=col.items.len()||!trace.tables().is_empty(){return None;}
++ let mut flow=0.0;let mut unpainted=0.0;let mut bodies=vec![];let mut tables=vec![];let mut rows=vec![];
++ for (slot,item) in col.items.iter().enumerate(){match item{
++ PageItem::FullParagraph{para_index:pi}=>{
++  if *pi!=slot{return None;}let p=ps.get(*pi)?;let fresh=fresh_body_rows(p,styles,rect.width,dpi)?;
++  if *pi==0 {if p.column_type!=ColumnBreakType::Section{return None;}}else if p.column_type!=ColumnBreakType::None||!p.controls.is_empty(){return None;}
++  let mut cs=trace.commits().iter().filter(|c|c.paragraph==*pi);let c=cs.next()?;if cs.next().is_some(){return None;}
++  let f=trace.format(c.format_id)?;let empty=p.text.is_empty()&&p.controls.is_empty()&&fresh.composition.lines.len()==1;
++  if c.page!=Some(0)||c.column!=0||c.committed_item_index!=Some(slot)||c.final_membership!=Some(true)||c.row_start!=0||c.row_end!=fresh.rows.len()
++  ||c.reused_multicolumn_format||c.same_format_reused_after_slot_change||c.trimmed_before!=0.0||c.actual_column_width_px!=rect.width
++  ||!arithmetic_equal(c.flow_before,flow)||!c.metrics_still_match_selected_format||!c.range_inside_selected_composition
++  ||f.source_text!=p.text||f.source_char_offsets!=p.char_offsets||f.paragraph_style!=fresh.composition.para_style_id
++  ||(!empty&&f.actual_input_width_px!=Some(rect.width))||f.known_square_band||f.has_numbering||f.has_horizontal_shaping
++  ||!f.tac_controls.is_empty()||!f.footnote_positions.is_empty()||!f.tab_extended.is_empty()
++  ||f.inline_controls.len()!=fresh.composition.inline_controls.len()
++  ||!f.inline_controls.iter().zip(&fresh.composition.inline_controls).all(|((line,index,kind),c)|*line==c.line_index&&*index==c.control_index&&*kind==format!("{:?}",c.control_type))
++  ||f.before!=0.0||f.after!=0.0||f.lines.len()!=fresh.composition.lines.len()
++  ||!f.lines.iter().zip(&fresh.composition.lines).all(|(a,b)|fact_line_matches(a,b,empty)){return None;}
++  let total:f64=fresh.rows.iter().map(|r|super::hwpunit_to_px(r.line_height+r.line_spacing,dpi)).sum();
++  if !arithmetic_equal(c.advance,total)||!arithmetic_equal(c.flow_after,c.flow_before+total)||c.flow_after>rect.height{return None;}
++  let y=rect.y+c.flow_before-unpainted;let mut projected=fresh.rows.clone();let mut offset=0.0;
++  for row in &mut projected{row.vertical_pos=integer_hu(y-rect.y+offset,dpi)?;offset+=super::hwpunit_to_px(row.line_height+row.line_spacing,dpi);}
++  rows.push(CurrentFrameParagraphRows{section:0,paragraph:*pi,rows:projected});bodies.push(CandidateBody{paragraph:*pi,physical_y:y,fresh,allow_empty_unused_width:empty});flow=c.flow_after;
++ },PageItem::Table{para_index:pi,control_index:ci}=>{
++  if *pi!=slot||*ci!=0{return None;}let p=ps.get(*pi)?;let [Control::Table(table)]=p.controls.as_slice()else{return None;};
++  if !p.text.is_empty()||p.char_count!=9||!p.char_offsets.is_empty()||p.column_type!=ColumnBreakType::None
++  ||p.completed_native_rows.is_some()||p.stored_text_partition_is_dirty()||p.cell_format_vpos_dirty||!p.field_ranges.is_empty()||!p.range_tags.is_empty()
++  ||!p.tab_extended.is_empty()||p.layout_only_fill_lines!=0||!crate::renderer::generated_column_stack::plain_table(table,|q|q.controls.is_empty()&&q.field_ranges.is_empty()&&q.range_tags.is_empty()&&q.tab_extended.is_empty())
++  ||!table.common.raw_extra.is_empty()||table.raw_table_record_extra.iter().any(|b|*b!=0)
++ ||i32::try_from(table.common.width).ok()?.checked_add(i32::from(table.outer_margin_left))?.checked_add(i32::from(table.outer_margin_right))?!=integer_hu(rect.width,dpi)?{return None;}
++  match format{crate::parser::FileFormat::Hwp=>if !native_table_common_exact(table){return None;},crate::parser::FileFormat::Hwpx=>if !table.raw_ctrl_data.is_empty(){return None;},_=>return None}
++  let mut ms=measured.iter().filter(|m|m.para_index==*pi&&m.control_index==0);let m=ms.next()?;if ms.next().is_some()||m.caption_height!=0.0||m.total_height<=0.0||!m.total_height.is_finite()
++  ||integer_hu(m.total_height,dpi)?!=i32::try_from(table.common.height).ok()?{return None;}
++  let mut ts=trace.whole_tables().iter().filter(|t|t.paragraph==*pi&&t.control==0);let t=ts.next()?;if ts.next().is_some(){return None;}
++  if t.page!=Some(0)||t.column!=0||t.post_page!=Some(0)||t.post_column!=0||t.committed_item_index!=slot||t.final_membership!=Some(true)||t.resolved.is_some()
++  ||t.pre_text_height!=0.0||t.pre_text_end!=0||!arithmetic_equal(t.flow_before,flow)||t.before<0.0||t.after_for_fit<0.0
++  ||t.body_height!=m.total_height||!arithmetic_equal(t.table_total_height,t.before+t.body_height+t.after_for_fit)
++  ||!arithmetic_equal(t.flow_after,t.flow_before+t.table_total_height)||t.flow_after>rect.height
++  ||integer_hu(t.before,dpi)?!=i32::from(table.outer_margin_top)||table.common.vertical_offset!=0{return None;}
++  let top=rect.y+t.flow_before-unpainted;if top<rect.y||top+t.body_height>rect.y+rect.height{return None;}
++  let mut host=p.clone();clear_fresh_input(&mut host);super::composer::reflow_line_segs(&mut host,super::composer::ParagraphBox::content_for_style(rect.width,styles.para_styles.get(usize::from(p.para_shape_id)),dpi),styles,dpi);
++  if host.line_segs.len()!=1{return None;}
++  let selected=trace.format(t.selected_format_id?)?;let fresh_host=super::composer::compose_paragraph_in_context(&host,styles);
++  if selected.source_text!=p.text||selected.source_char_offsets!=p.char_offsets||selected.paragraph_style!=fresh_host.para_style_id
++   ||selected.has_numbering||selected.has_horizontal_shaping||selected.known_square_band
++   ||!selected.tac_controls.is_empty()||!selected.footnote_positions.is_empty()||!selected.tab_extended.is_empty()
++   ||selected.lines.len()!=1||fresh_host.lines.len()!=1||t.selected_line_count!=1
++   ||!fact_line_matches(&selected.lines[0],&fresh_host.lines[0],true)
++   ||selected.inline_controls.len()!=fresh_host.inline_controls.len()
++   ||!selected.inline_controls.iter().zip(&fresh_host.inline_controls).all(|((line,index,kind),c)|*line==c.line_index&&*index==c.control_index&&*kind==format!("{:?}",c.control_type)){return None;}
++  let generated=&host.line_segs[0];if generated.tag!=0x80060000||generated.vertical_pos!=0||generated.text_start!=0
++   ||generated.line_height<=0||generated.text_height!=generated.line_height||generated.line_spacing<0
++   ||generated.baseline_distance<0||generated.baseline_distance>generated.line_height||generated.column_start!=0
++   ||generated.segment_width!=integer_hu(rect.width,dpi)?{return None;}
++  host.line_segs[0].vertical_pos=integer_hu(top-rect.y-t.before,dpi)?;
++  if host.line_segs[0].vertical_pos<0{return None;}
++  rows.push(CurrentFrameParagraphRows{section:0,paragraph:*pi,rows:host.line_segs});tables.push(CandidateTable{paragraph:*pi,control:0,top,before:t.before,body:t.body_height,after:t.after_for_fit});
++  unpainted+=t.before;flow=t.flow_after;
++ },_=>return None}}
++ if tables.is_empty()||measured.len()!=tables.len()||!arithmetic_equal(flow,col.used_height){return None;}
++ let mut h=blake3::Hasher::new();h.update(b"current-whole-frame-proof-1\0");h.update(&trace.resource());h.update(&trace.generation().to_le_bytes());
++ for t in &tables{h.update(&(t.paragraph as u64).to_le_bytes());for v in[t.top,t.before,t.body,t.after]{h.update(&v.to_bits().to_le_bytes());}}
++ let generation=*h.finalize().as_bytes();let paint=CurrentFramePaintPlan{source_paragraphs:ps.as_ptr()as usize,generation,section:0,page:0,column:0,rect,tables:tables.clone()};
++ Some(Self{source,paint,bodies,tables,rows,generation})
++ }
++ pub(crate) fn paint_plan(&self)->CurrentFramePaintPlan{self.paint.clone()}
++ pub(crate) fn finalize(self,physical:&super::current_physical_selections::CurrentPhysicalSelections)->Option<CurrentFrameRowsPlan<'doc>>{
++  if !physical.matches_current_plan(&self.paint){return None;}
++  let frames=physical.frames()?;let [frame]=frames else{return None;};if frame.section!=0||frame.page!=0||frame.column!=0||frame.column_ordinal!=0||frame.has_zone||frame.zone_y!=0.0
++  ||frame.rect.x!=self.paint.rect.x||frame.rect.y!=self.paint.rect.y||frame.rect.width!=self.paint.rect.width||frame.rect.height!=self.paint.rect.height{return None;}
++  let painted=physical.rows()?;let actual_tables=physical.tables()?;if actual_tables.len()!=self.tables.len(){return None;}
++  let expected_count:usize=self.bodies.iter().map(|b|b.fresh.rows.len()).sum();if painted.len()!=expected_count{return None;}
++  for body in &self.bodies{let selected=painted.iter().filter(|r|r.frame.paragraph==body.paragraph).collect::<Vec<_>>();if selected.len()!=body.fresh.rows.len(){return None;}
++   let mut offset=0.0;for (i,(fresh,row))in body.fresh.composition.lines.iter().zip(selected).enumerate(){
++    let f=&row.frame;if f.node!=frame.node||f.line!=i||f.equation_adjusted||f.has_wrap_anchor||f.physical_frame_rows||f.stored_horizontal_span_used
++    ||f.effective_column_x!=frame.rect.x||f.effective_column_width!=frame.rect.width||f.available_width!=frame.rect.width
++    ||f.margin_left!=0.0||f.margin_right!=0.0||f.inline_offset!=0.0||f.numbering_offset!=0.0
++    ||!arithmetic_equal(f.physical_text_y,body.physical_y+offset)||f.final_line_box_height!=super::hwpunit_to_px(fresh.line_height,super::DEFAULT_DPI)
++    ||(!same_selected_line(fresh,&row.selected)&&!(body.allow_empty_unused_width&&same_empty_line_ignoring_unused_width(fresh,&row.selected))){return None;}
++    offset+=super::hwpunit_to_px(fresh.line_height+fresh.line_spacing,super::DEFAULT_DPI);
++   }}
++  for table in &self.tables{let mut actual=actual_tables.iter().filter(|t|t.paragraph==table.paragraph&&t.control==table.control);let t=actual.next()?;
++   if actual.next().is_some()||t.node!=frame.node||t.typed_float||t.inline||t.treat_as_char||t.selected_outer_inset!=0.0
++   ||!arithmetic_equal(t.selected_y,table.top)||t.visual_height!=table.body||!arithmetic_equal(t.visual_end,table.top+table.body)
++   ||!arithmetic_equal(t.flow_end,table.top+table.body){return None;}}
++  Some(CurrentFrameRowsPlan{source:self.source,resource:crate::model::native_computed_resource::RESOURCE,allocation_generation:self.generation,paragraphs:self.rows})
++ }
++}
++
++
++#[cfg(test)]
++#[path="current_frame_rows_plan_tests.rs"]
++mod tests;
+--- /dev/null
++++ b/src/renderer/current_frame_rows_plan_tests.rs
+@@ -0,0 +1,65 @@
++// Own generated single-column HWP fixture from engine76/column2-candidate74.
++// Source SHA256 9778d66926e3138ce4bb51fadfd16173ee3d439aeec0a02a8f0af34b7fac0f3b.
++// Compressed only to keep this portable test independent of workspace files.
++const OWN_FIXTURE_GZIP:&[u8]=&[31,139,8,0,0,0,0,0,2,255,237,91,9,60,212,91,251,63,51,99,103,138,34,76,100,138,234,18,146,53,165,34,138,41,178,147,45,100,41,131,177,37,220,44,169,161,75,221,184,133,162,75,87,74,150,48,178,68,150,152,138,232,102,121,133,148,109,82,180,168,25,210,102,105,222,243,27,211,189,238,253,255,223,251,137,247,253,188,159,255,251,127,231,249,125,158,223,57,115,206,247,156,231,44,207,121,126,179,124,167,173,85,100,48,179,24,71,3,127,146,173,0,3,190,48,249,1,207,156,50,212,92,128,48,0,226,236,178,47,76,38,19,41,146,128,202,228,200,127,148,88,0,63,120,29,2,120,176,3,144,96,26,8,194,192,124,100,25,224,70,125,237,139,251,31,195,142,158,220,247,24,245,53,93,12,51,186,139,103,43,118,2,47,224,3,60,128,17,84,87,224,14,239,129,243,180,143,70,9,192,84,136,237,123,223,220,144,237,204,6,112,246,110,128,0,231,238,9,115,243,23,97,128,254,131,207,127,75,27,46,228,198,59,155,223,14,173,186,195,53,183,130,51,15,133,235,63,95,89,2,80,191,173,63,215,55,174,255,220,10,75,104,215,13,218,245,130,227,32,1,149,5,216,71,163,230,59,127,60,84,12,122,54,111,6,247,251,48,92,127,95,184,251,7,224,88,22,98,159,151,189,157,243,89,127,30,209,185,246,23,186,250,172,253,71,161,231,196,189,111,105,35,15,85,238,183,245,119,131,35,240,2,254,208,122,208,130,236,163,80,72,140,198,64,229,95,192,254,27,192,153,123,194,181,15,134,167,240,16,216,245,135,241,124,139,172,88,128,255,43,204,62,62,88,242,71,139,54,172,243,31,196,246,198,111,180,143,226,155,231,250,175,131,138,5,115,207,191,41,203,250,172,213,160,121,198,159,223,207,159,224,2,214,223,25,24,67,187,36,224,205,30,201,191,227,252,41,34,241,146,125,254,184,97,228,13,129,179,183,132,30,224,203,58,133,200,19,224,107,60,12,100,149,28,250,139,253,80,94,128,125,13,168,77,40,240,47,147,249,218,255,87,203,127,178,253,56,179,61,134,88,1,28,242,8,197,18,140,12,44,0,64,63,68,34,36,31,18,84,234,45,90,222,33,177,53,200,194,112,59,40,108,145,122,137,4,207,3,122,38,122,0,20,39,8,78,187,34,15,124,126,127,35,59,120,100,22,221,70,20,213,232,151,227,14,192,210,11,4,3,61,171,208,125,111,186,50,69,0,94,168,174,238,237,45,245,79,10,167,31,69,165,242,171,194,96,253,73,115,51,108,72,23,130,126,192,21,139,131,22,245,225,105,140,206,228,1,71,235,204,48,64,215,37,7,5,240,42,112,20,194,18,68,0,248,56,48,14,140,3,227,192,56,48,14,140,3,227,192,56,48,14,140,3,227,192,56,48,14,140,3,227,192,56,48,14,140,3,251,102,88,69,194,128,187,142,202,217,215,86,200,183,127,132,29,123,12,10,183,187,28,3,28,249,47,21,35,91,51,188,129,159,91,176,175,7,233,16,126,167,151,143,199,255,248,153,20,197,141,154,251,187,229,255,51,121,115,222,201,56,201,22,215,200,124,167,195,59,140,202,142,47,146,85,56,185,49,223,71,220,66,252,179,68,109,158,55,175,217,125,110,239,166,6,65,229,83,209,88,131,52,124,98,236,154,190,59,39,9,67,49,226,251,66,245,236,9,190,210,55,228,238,147,140,244,29,53,51,227,149,237,229,12,26,227,149,250,38,168,62,143,238,20,30,234,108,198,189,79,84,212,246,25,14,62,191,248,128,89,187,103,209,247,107,232,97,173,63,191,155,218,54,50,20,209,18,212,159,106,204,37,181,232,78,228,50,203,53,71,173,25,249,102,169,25,129,218,240,119,44,158,85,68,173,163,138,119,174,118,18,19,211,44,219,62,252,232,232,43,83,59,126,174,61,160,217,200,218,159,108,129,123,101,118,114,128,122,60,253,133,129,86,255,93,189,107,54,103,205,123,183,140,63,144,27,91,149,177,162,222,187,237,20,73,61,11,195,27,121,157,217,49,89,157,196,172,72,222,246,172,101,247,229,23,181,148,25,7,13,70,201,35,179,90,10,133,210,246,228,137,247,192,109,170,217,218,69,23,140,206,172,125,41,71,84,220,154,112,184,140,113,251,226,208,148,243,245,179,151,213,226,92,199,174,161,86,63,186,107,49,138,19,51,27,11,184,242,60,64,224,70,99,212,5,254,34,207,239,39,47,109,45,221,127,213,244,98,185,236,175,110,222,99,65,211,76,187,205,211,82,93,25,81,217,39,156,15,249,48,35,126,142,148,243,38,220,250,108,33,94,32,118,152,249,254,74,65,103,190,76,80,31,79,231,80,135,167,188,183,93,179,140,164,117,206,232,15,242,235,73,175,203,242,188,98,238,43,39,63,34,54,68,138,102,9,43,27,134,59,17,114,222,242,23,138,114,243,255,172,101,37,126,91,254,153,219,182,230,12,188,76,119,74,22,112,216,191,151,26,105,69,14,121,96,209,189,204,80,199,57,110,242,60,238,151,45,13,251,170,3,107,4,40,219,34,245,119,90,224,195,175,174,118,88,214,121,91,114,253,53,101,134,155,234,196,254,68,114,128,78,66,26,122,221,185,252,211,191,86,213,21,221,236,82,182,53,49,15,206,243,27,10,236,148,178,222,61,188,254,92,190,141,121,240,228,33,90,96,167,188,121,153,55,37,188,242,213,67,202,100,28,67,154,32,67,166,151,186,223,63,91,171,249,65,37,188,11,21,26,69,120,63,181,129,88,102,48,208,154,171,252,131,159,247,46,12,238,101,88,132,146,221,0,253,138,65,196,211,158,87,67,227,170,175,46,89,175,207,251,176,121,186,48,182,47,46,43,106,178,122,245,206,55,61,37,142,193,246,167,30,223,114,171,36,142,88,174,178,124,49,26,86,94,228,177,78,88,118,66,243,68,171,69,49,111,122,40,47,111,187,143,225,246,117,225,253,238,249,71,143,171,104,89,132,217,100,242,164,31,172,167,163,78,136,69,182,245,52,155,10,104,99,182,12,173,16,149,197,250,209,156,14,101,73,251,101,97,10,248,58,163,21,119,240,251,16,150,148,115,185,236,14,64,59,164,145,149,184,147,174,88,161,95,155,80,191,143,22,221,125,69,142,226,65,120,164,138,239,180,200,229,247,9,91,82,46,229,111,223,156,90,103,35,231,186,14,20,39,201,81,146,9,143,118,225,31,88,216,160,29,146,201,5,232,191,41,37,75,122,26,202,175,30,87,140,79,204,120,230,37,138,146,76,177,23,163,137,181,56,125,24,188,103,244,124,64,173,237,168,167,20,165,114,203,135,117,76,122,91,124,200,32,101,75,189,200,88,74,179,26,230,162,105,100,70,252,166,210,75,146,74,154,199,109,21,147,61,167,236,202,199,133,235,55,168,108,91,249,232,199,61,83,35,250,39,210,111,160,215,41,38,147,26,63,36,174,166,246,246,124,230,95,123,56,19,163,100,238,233,145,196,255,185,175,95,109,230,128,104,228,113,27,41,131,181,137,94,185,66,155,107,15,228,123,237,210,139,108,211,26,213,107,185,115,177,197,221,101,125,255,118,37,157,159,2,98,134,195,193,94,15,249,115,210,29,250,17,121,148,75,18,242,34,181,18,20,197,247,241,210,149,110,169,103,36,178,185,246,250,230,138,241,27,123,9,89,10,84,40,149,169,82,133,247,68,244,132,214,199,217,171,103,9,246,133,46,79,127,1,186,246,18,203,106,38,167,172,159,74,254,36,120,49,98,32,39,156,224,86,97,248,57,34,249,240,75,145,136,169,4,67,117,205,153,31,250,167,70,100,243,126,253,219,195,244,43,47,247,166,100,231,150,165,77,118,123,53,219,21,201,71,213,100,223,238,73,219,89,162,97,61,124,48,208,183,205,234,150,158,229,16,143,73,61,54,13,93,153,150,29,164,209,215,212,249,176,212,252,108,119,86,238,147,172,38,122,251,68,93,86,238,219,145,180,87,90,94,196,222,203,242,21,4,75,151,146,53,33,25,107,76,51,178,11,157,15,218,127,204,203,110,183,213,192,62,243,38,42,180,137,86,231,18,106,59,146,62,166,103,151,71,121,61,142,220,221,49,168,100,34,123,67,189,96,106,95,71,63,93,131,155,89,32,239,239,208,49,225,107,18,66,242,38,222,204,106,58,98,107,249,209,201,228,75,85,218,138,222,78,245,177,227,107,42,175,54,69,152,118,252,116,36,141,212,219,161,190,37,255,101,203,181,236,108,230,193,241,254,238,135,81,206,29,109,17,38,227,102,29,247,244,77,244,36,112,46,250,133,5,177,175,202,113,196,30,98,206,173,123,109,153,251,245,75,238,198,14,159,196,62,72,150,72,83,208,146,19,139,29,86,16,226,206,23,122,126,139,148,227,81,149,153,241,38,54,182,124,57,145,89,182,114,96,145,254,23,233,216,211,111,85,200,90,66,38,53,174,247,222,168,61,27,147,124,53,38,73,204,215,124,232,236,123,48,231,177,89,228,143,153,250,26,177,211,101,177,167,187,112,121,3,94,247,74,238,155,181,42,235,71,59,197,246,86,97,31,140,106,150,210,77,244,125,253,112,175,30,11,189,125,34,244,182,9,67,63,130,213,153,198,125,170,47,170,11,139,25,76,143,25,204,220,207,248,105,9,195,128,63,52,143,203,209,86,160,101,236,216,199,176,122,223,125,12,236,122,149,189,60,25,74,152,214,115,209,85,205,245,110,207,7,227,4,24,86,220,21,87,151,244,218,112,215,154,115,103,228,162,233,71,164,29,75,177,189,55,176,58,21,216,94,15,237,71,53,13,245,134,81,195,238,207,54,86,126,215,216,164,175,189,39,227,126,192,248,3,236,30,210,253,224,113,151,194,179,106,90,155,180,7,214,134,83,215,74,77,240,107,89,9,78,229,199,92,205,143,113,32,146,121,137,100,167,50,170,154,12,223,72,196,119,163,83,102,159,24,1,180,134,125,52,151,34,198,141,26,106,127,2,185,106,235,146,12,237,149,58,227,197,140,233,70,234,120,28,35,211,148,188,124,143,128,204,102,249,240,167,151,253,61,117,63,121,234,110,164,39,249,183,203,211,106,45,169,65,87,201,35,76,188,226,69,1,153,73,171,138,76,211,208,107,166,161,215,77,43,102,18,168,25,145,180,84,53,234,219,18,234,187,3,49,85,59,201,24,89,106,234,8,57,98,132,60,51,66,238,12,163,77,190,163,54,182,10,182,102,136,183,124,190,64,193,137,245,107,41,244,106,41,140,214,226,171,223,29,99,208,4,169,129,230,21,111,47,49,138,79,82,213,196,99,250,156,249,90,163,86,86,135,24,87,68,24,127,106,56,79,121,125,198,127,102,53,173,105,55,53,108,136,26,60,68,141,14,160,13,86,248,119,120,208,104,247,169,97,182,228,35,133,124,9,78,34,54,122,52,89,61,90,207,47,254,183,173,105,95,242,169,150,182,49,134,181,162,135,157,151,246,7,154,124,186,163,65,27,212,112,237,190,204,40,38,184,118,7,211,46,189,166,26,22,10,46,118,18,223,58,150,204,56,94,68,118,114,22,148,153,180,95,197,60,59,189,184,38,101,139,145,172,158,104,35,211,207,243,210,242,165,43,99,226,207,83,197,184,218,135,213,21,138,69,228,204,167,111,138,102,95,95,162,189,133,34,172,212,242,180,185,172,99,85,250,149,29,186,203,235,169,212,93,74,165,124,123,227,175,88,83,174,91,81,204,54,158,250,213,88,179,103,203,210,250,166,167,14,158,169,17,106,239,134,63,246,87,71,84,201,111,124,184,72,87,151,127,45,32,63,169,97,72,38,46,11,107,160,220,28,159,74,88,193,37,33,97,211,173,101,155,215,186,155,123,249,122,113,183,145,130,243,162,167,243,27,146,206,187,144,152,209,175,83,158,215,237,183,123,82,137,167,155,180,148,134,186,23,206,96,99,84,218,149,62,50,13,60,149,78,188,209,1,33,106,228,226,21,57,93,79,80,163,141,121,15,146,181,95,95,223,159,47,67,182,200,181,106,30,151,59,185,212,188,96,236,156,204,142,123,1,186,9,173,14,59,28,107,190,96,233,177,19,59,118,149,72,199,125,252,172,17,24,104,173,166,164,171,106,180,106,77,95,215,153,99,250,174,61,197,19,37,139,74,82,74,41,242,232,35,51,221,41,155,55,163,59,252,151,165,150,46,29,194,36,151,125,228,173,11,189,240,182,145,224,220,9,14,52,139,12,38,102,247,191,248,49,240,94,174,155,103,34,67,173,75,246,236,82,159,196,77,43,208,52,47,212,139,85,248,166,235,58,123,150,31,91,103,178,195,34,69,127,229,47,219,233,65,26,105,134,153,42,129,36,55,179,155,18,239,43,36,102,122,239,150,93,108,222,33,35,220,137,18,72,5,88,13,33,185,129,149,227,168,202,49,31,85,212,174,208,163,105,76,204,38,145,155,51,67,117,38,118,83,63,127,230,51,8,62,74,230,111,99,136,203,90,9,26,165,156,178,215,221,169,173,190,4,192,150,68,77,20,78,131,107,178,240,85,98,119,231,202,55,69,139,46,221,117,150,158,184,126,42,217,150,111,84,223,131,209,205,61,243,156,111,212,152,23,163,221,1,162,99,209,77,223,11,44,250,78,196,136,140,230,194,145,240,175,101,51,250,166,237,110,25,159,184,58,217,77,141,221,184,117,83,249,88,120,113,176,111,202,231,192,181,116,211,152,144,171,60,163,157,167,78,198,213,132,252,83,239,159,246,221,197,131,79,213,27,171,176,64,0,92,46,157,205,227,1,215,181,220,107,120,48,81,125,232,30,82,254,87,226,230,162,203,205,140,6,128,84,69,106,23,93,128,125,55,247,163,0,124,28,248,33,151,111,161,51,216,4,28,129,53,100,253,204,50,143,28,33,7,199,21,236,135,57,63,152,215,131,204,24,127,200,204,65,56,48,174,240,181,49,139,163,227,10,185,82,142,44,206,152,47,172,117,132,138,112,200,84,216,151,58,68,168,194,84,3,170,39,236,73,25,214,147,32,183,141,35,255,78,177,106,166,131,233,251,116,22,47,176,92,234,140,251,87,110,140,113,13,157,165,205,27,72,238,40,54,110,88,149,228,190,80,59,95,96,175,60,104,52,112,41,191,116,209,85,248,161,72,105,3,112,57,87,151,126,10,233,251,207,101,8,187,50,21,86,44,130,41,66,191,10,101,243,246,200,236,207,86,137,80,145,51,112,153,197,203,2,224,25,194,83,132,202,128,138,184,247,52,155,227,39,140,154,229,187,238,69,205,242,216,144,137,32,220,51,127,118,223,225,48,21,67,250,101,127,112,67,6,35,51,135,191,253,231,60,98,227,119,175,159,45,147,130,138,120,177,42,208,4,6,197,120,152,62,108,64,238,27,65,120,35,30,252,210,158,212,128,164,114,13,119,186,240,64,11,158,33,21,214,93,21,108,0,243,183,133,240,65,55,192,75,17,230,84,230,220,145,222,84,129,54,204,217,66,70,218,30,160,6,95,25,67,158,178,45,139,49,231,14,219,135,192,94,156,225,152,32,159,24,170,138,128,39,111,90,78,47,10,201,235,218,137,227,190,230,191,10,230,79,41,234,127,227,181,255,151,9,138,237,139,24,54,143,159,155,189,71,188,108,159,67,252,13,137,224,130,108,142,53,226,111,136,143,45,102,115,56,69,88,28,68,72,249,98,251,174,24,139,19,57,251,223,0,228,255,0,146,80,225,55,81,96,57,219,167,164,89,156,205,217,125,71,236,173,132,233,42,168,178,108,78,236,106,168,107,160,174,133,250,29,27,51,87,149,88,156,67,0,214,35,251,205,242,27,196,79,1,244,13,0,35,239,44,94,19,166,90,80,17,191,208,102,69,120,0,16,198,153,14,187,158,35,191,203,66,247,31,193,254,213,254,127,221,175,25,206,18,255,159,150,191,3,48,144,25,48,0,52,0,0];
++
++use super::*;
++use serde_json::{json,Value};
++use std::io::Read;
++ fn snapshot(d:&crate::DocumentCore)->Value{json!({"pages":d.page_count(),"layout":(0..d.page_count()).map(|p|json!({"text":serde_json::from_str::<Value>(&d.get_page_text_layout_native(p).unwrap()).unwrap(),"controls":serde_json::from_str::<Value>(&d.get_page_control_layout_native(p).unwrap()).unwrap()})).collect::<Vec<_>>()})}
++ fn differences(a:&Value,b:&Value,p:&str,out:&mut Vec<Value>){match(a,b){
++  (Value::Object(a),Value::Object(b))=>{for k in a.keys().chain(b.keys()).collect::<std::collections::BTreeSet<_>>(){match(a.get(k),b.get(k)){(Some(a),Some(b))=>differences(a,b,&format!("{p}/{k}"),out),_=>out.push(json!({"path":p,"missing":k}))}}},
++  (Value::Array(a),Value::Array(b))=>{if a.len()!=b.len(){out.push(json!({"path":p,"lengths":[a.len(),b.len()]}));}for(i,(a,b))in a.iter().zip(b).enumerate(){differences(a,b,&format!("{p}/{i}"),out)}},
++  (Value::Number(a),Value::Number(b))=>if(a.as_f64().unwrap()-b.as_f64().unwrap()).abs()>0.2{out.push(json!({"path":p,"a":a,"b":b}));},_=>if a!=b{out.push(json!({"path":p,"a":a,"b":b}));}}}
++
++
++ fn assert_actual_xml_coordinates(core:&crate::DocumentCore,bytes:&[u8])->Value{
++  let mut z=zip::ZipArchive::new(std::io::Cursor::new(bytes)).unwrap();let mut xml=String::new();z.by_name("Contents/section0.xml").unwrap().read_to_string(&mut xml).unwrap();
++  let doc=roxmltree::Document::parse(&xml).unwrap();let ns="http://www.hancom.co.kr/hwpml/2011/paragraph";
++  let paragraphs=doc.root_element().children().filter(|n|n.has_tag_name((ns,"p"))).collect::<Vec<_>>();
++  assert_eq!(paragraphs.len(),core.document().sections[0].paragraphs.len());
++  let tree=core.build_page_tree_with_current_selections(0).unwrap();let actual=&tree.frame.current_physical_selections;
++  let frames=actual.frames().unwrap();assert_eq!(frames.len(),1);let frame=&frames[0];let mut checks=vec![];
++  for (pi,p) in paragraphs.iter().enumerate(){let array=p.children().find(|n|n.has_tag_name((ns,"linesegarray"))).unwrap();
++   let rows=array.children().filter(|n|n.has_tag_name((ns,"lineseg"))).collect::<Vec<_>>();
++   let tables=actual.tables().unwrap().iter().filter(|t|t.paragraph==pi).collect::<Vec<_>>();
++   if tables.is_empty(){let painted=actual.rows().unwrap().iter().filter(|r|r.frame.paragraph==pi).collect::<Vec<_>>();assert_eq!(rows.len(),painted.len());
++    for (row,paint) in rows.iter().zip(painted){let v:i32=row.attribute("vertpos").unwrap().parse().unwrap();let y=frame.rect.y+f64::from(v)/75.0;
++     assert!(arithmetic_equal(y,paint.frame.physical_text_y));checks.push(json!({"paragraph":pi,"kind":"body","xmlVerticalHu":v,"physicalY":y}));}
++   }else{assert_eq!(rows.len(),1);assert_eq!(tables.len(),1);let crate::model::control::Control::Table(t)=&core.document().sections[0].paragraphs[pi].controls[0]else{panic!("table host")};
++    let v:i32=rows[0].attribute("vertpos").unwrap().parse().unwrap();let y=frame.rect.y+f64::from(v+i32::from(t.outer_margin_top))/75.0;
++    assert!(arithmetic_equal(y,tables[0].selected_y));checks.push(json!({"paragraph":pi,"kind":"table","xmlVerticalHu":v,"outerTopHu":t.outer_margin_top,"physicalY":y}));
++   }
++  }
++  json!({"assertions":checks.len(),"coordinates":checks,"basis":"actual ZIP XML integer vertpos plus declared outerTop and actual body frame; no reopened reader"})
++ }
++ #[test]fn physical_receipts_require_exact_source_and_allocation_generation(){
++  use crate::renderer::current_physical_selections::CurrentPhysicalSelections;
++  let plan=CurrentFramePaintPlan{source_paragraphs:1,generation:[1;32],section:0,page:0,column:0,
++   rect:crate::renderer::page_layout::LayoutRect{x:0.0,y:0.0,width:100.0,height:100.0},tables:vec![]};
++  let mut receipt=CurrentPhysicalSelections::default();receipt.enable_new_page_capture();assert!(!receipt.matches_current_plan(&plan));
++  receipt.bind_current_plan(&plan);assert!(receipt.matches_current_plan(&plan));
++  let mut other=plan.clone();other.source_paragraphs=2;assert!(!receipt.matches_current_plan(&other));
++  other=plan.clone();other.generation[31]^=1;assert!(!receipt.matches_current_plan(&other));
++  receipt.bind_current_plan(&plan);assert!(!receipt.matches_current_plan(&plan));
++ }
++
++ #[test]fn actual_public_interleave_export_never_uses_diagnostic_projection(){
++  let out=std::env::var("N001_ROOT").map(std::path::PathBuf::from).map(|p|p.join("build/n001-physical129/actual-public-export"))
++    .unwrap_or_else(|_|std::env::temp_dir().join(format!("jueony-current-frame129-own-{}",std::process::id())));std::fs::create_dir_all(&out).unwrap();
++  let mut input=Vec::new();flate2::read::GzDecoder::new(OWN_FIXTURE_GZIP).read_to_end(&mut input).unwrap();
++  assert_eq!(input.len(),13312);assert_eq!(<sha2::Sha256 as sha2::Digest>::digest(&input).iter().map(|b|format!("{b:02x}")).collect::<String>(),"9778d66926e3138ce4bb51fadfd16173ee3d439aeec0a02a8f0af34b7fac0f3b");let mut core=crate::DocumentCore::from_bytes(&input).unwrap();
++  core.insert_paragraph_native(0,2).unwrap();core.insert_text_native(0,2,0,"표 사이의 본문을 그대로 유지합니다. ").unwrap();let n=core.document().sections[0].paragraphs[0].text.chars().count();core.insert_text_native(0,0,n,&"현재 문맥으로 복합 배치를 다시 조판하는 자체 시험 문장입니다. ".repeat(25)).unwrap();
++  let expected=snapshot(&core);std::fs::write(out.join("original-current-layout.json"),serde_json::to_vec_pretty(&expected).unwrap()).unwrap();let text=core.text_file_unicode_json();let mut results=vec![];
++  for api in 0..4 {let source=format!("{:?}",core.document());let events=core.serialize_event_log();
++   let bytes=match api{0=>core.export_hwpx_native().unwrap(),1=>core.export_hwpx_native_with_report().unwrap().into_bytes(),2=>core.export_hwpx_native_with_password(b"Own-129-test!").unwrap(),_=>core.export_hwpx_native_with_password_and_report(b"Own-129-test!").unwrap().into_bytes()};
++   if api==0 {let coords=assert_actual_xml_coordinates(&core,&bytes);std::fs::write(out.join("independent-xml-coordinates.json"),serde_json::to_vec_pretty(&coords).unwrap()).unwrap();}
++   let path=out.join(format!("api{api}.hwpx"));std::fs::write(&path,&bytes).unwrap();let disk=std::fs::read(path).unwrap();assert_eq!(disk,bytes);
++   let next=if api<2{crate::DocumentCore::from_bytes(&disk)}else{crate::DocumentCore::from_bytes_with_password(&disk,b"Own-129-test!")}.unwrap();let mut diff=vec![];differences(&expected,&snapshot(&next),"$",&mut diff);
++   assert_eq!(source,format!("{:?}",core.document()));assert_eq!(events,core.serialize_event_log());assert_eq!(text,next.text_file_unicode_json());results.push(json!({"api":api,"differences":diff,"geometry":diff.len(),"sourceUnchanged":true,"diskExact":true}));
++  }
++  let mut current=core;for cycle in 0..3 {let before=snapshot(&current);let source=format!("{:?}",current.document());let artifact=current.export_hwpx_native_with_report().unwrap();let loss=artifact.content_loss().len();std::fs::write(out.join(format!("cycle{cycle}.hwpx")),artifact.bytes()).unwrap();let next=crate::DocumentCore::from_bytes(&std::fs::read(out.join(format!("cycle{cycle}.hwpx"))).unwrap()).unwrap();let mut diff=vec![];differences(&before,&snapshot(&next),"$",&mut diff);assert_eq!(source,format!("{:?}",current.document()));results.push(json!({"cycle":cycle,"format":"hwpx","geometry":diff.len(),"differences":diff,"loss":loss,"sourceUnchanged":true}));
++   let hwp=next.export_hwp_with_adapter_snapshot_with_report().unwrap();let hwp_next=crate::DocumentCore::from_bytes(hwp.bytes()).unwrap();let mut hwp_diff=vec![];differences(&snapshot(&next),&snapshot(&hwp_next),"$",&mut hwp_diff);results.push(json!({"cycle":cycle,"format":"hwp-followup","geometry":hwp_diff.len(),"differences":hwp_diff,"loss":hwp.content_loss().len()}));current=next;
++  }
++  let failures=results.iter().filter(|r|r["geometry"]!=0).cloned().collect::<Vec<_>>();std::fs::write(out.join("result.json"),serde_json::to_vec_pretty(&json!({"results":results,"failures":failures,"scope":"actual ordinary public API plus real opaque producer/binder/writer, no diagnostic row factory"})).unwrap()).unwrap();assert!(failures.is_empty(),"actual public export failures captured");
++ }
+--- /dev/null
++++ b/src/renderer/current_physical_selections.rs
+@@ -0,0 +1,107 @@
++//! Current renderer-selected inputs, owned by one nonserialized page frame.
++//! This is not a source-row lease, descriptor or export permission. A consumer
++//! must separately prove fresh composition, final allocator ownership, immutable
++//! dependent input, current resources, and the actual output representation.
++use crate::renderer::{composer::ComposedLine, page_layout::LayoutRect, pagination::{PageContent,ColumnContent,PageItem},render_tree::NodeId};
++#[derive(Debug,Clone)]
++pub(crate) struct BodyFrameSelection {
++ pub(crate) node:NodeId,pub(crate) section:usize,pub(crate) page:u32,pub(crate) column_ordinal:usize,
++ pub(crate) column:u16,pub(crate) rect:LayoutRect,pub(crate) zone_y:f64,pub(crate) has_zone:bool,
++ pub(crate) items:Vec<PageItem>,pub(crate) complete:bool,
++}
++#[derive(Debug,Clone)]
++pub(crate) struct BodyRowFrame {
++ pub(crate) node:NodeId,pub(crate) paragraph:usize,pub(crate) line:usize,
++ pub(crate) effective_column_x:f64,pub(crate) effective_column_width:f64,
++ pub(crate) available_width:f64,pub(crate) margin_left:f64,pub(crate) margin_right:f64,
++ pub(crate) inline_offset:f64,pub(crate) numbering_offset:f64,pub(crate) physical_text_y:f64,
++ pub(crate) final_line_box_height:f64,pub(crate) baseline:f64,pub(crate) physical_frame_rows:bool,
++ pub(crate) stored_horizontal_span_used:bool,pub(crate) has_wrap_anchor:bool,pub(crate) equation_adjusted:bool,
++}
++#[derive(Debug,Clone)]
++pub(crate) struct BodyRowSelection {pub(crate) frame:BodyRowFrame,pub(crate) selected:ComposedLine}
++#[derive(Debug,Clone)]
++pub(crate) struct WholeTableSelection {
++ pub(crate) node:NodeId,pub(crate) paragraph:usize,pub(crate) control:usize,
++ pub(crate) incoming_y:f64,pub(crate) paragraph_y:f64,pub(crate) selected_y:f64,
++ pub(crate) selected_outer_inset:f64,pub(crate) visual_height:f64,pub(crate) visual_end:f64,
++ pub(crate) flow_end:f64,pub(crate) lane_input:Option<[f64;6]>,pub(crate) typed_float:bool,
++ pub(crate) inline:bool,pub(crate) treat_as_char:bool,
++}
++#[derive(Debug,Clone,Default)]
++pub(crate) struct CurrentPhysicalSelections {
++ frames:Vec<BodyFrameSelection>,rows:Vec<BodyRowSelection>,tables:Vec<WholeTableSelection>,
++ text_bytes:usize,item_count:usize,invalid:bool,enabled:bool,
++ source_frame_binding:Option<(usize,[u8;32])>,
++}
++impl CurrentPhysicalSelections {
++ pub(crate) fn enable_new_page_capture(&mut self){if self.frames.is_empty() && self.rows.is_empty() && self.tables.is_empty() && !self.invalid {self.enabled=true;}}
++ pub(crate) fn bind_current_plan(&mut self,plan:&super::current_frame_rows_plan::CurrentFramePaintPlan){
++  if !self.enabled || self.invalid || self.source_frame_binding.is_some() || !self.frames.is_empty() {self.invalid=true;return;}
++  self.source_frame_binding=Some(plan.receipt_binding());
++ }
++ pub(crate) fn matches_current_plan(&self,plan:&super::current_frame_rows_plan::CurrentFramePaintPlan)->bool{
++  self.enabled && !self.invalid && self.source_frame_binding==Some(plan.receipt_binding())
++ }
++ pub(crate) fn frames(&self)->Option<&[BodyFrameSelection]>{(self.enabled && !self.invalid && self.frames.iter().all(|f|f.complete)).then_some(&self.frames)}
++ pub(crate) fn rows(&self)->Option<&[BodyRowSelection]>{self.frames()?;Some(&self.rows)}
++ pub(crate) fn tables(&self)->Option<&[WholeTableSelection]>{self.frames()?;Some(&self.tables)}
++ pub(crate) fn register_frame(&mut self,node:NodeId,page:&PageContent,column:&ColumnContent,rect:&LayoutRect){
++  if !self.enabled || self.invalid{return;}let Some(ordinal)=page.column_contents.iter().position(|c|std::ptr::eq(c,column))else{self.invalid=true;return;};
++  if self.frames.len()>=128 || column.items.len()>4096-self.item_count || self.frames.iter().any(|f|f.node==node)
++   || [rect.x,rect.y,rect.width,rect.height,column.zone_y_offset].iter().any(|v|!v.is_finite())
++   || rect.width<=0.0 || rect.height<=0.0 || column.items.iter().any(|i|matches!(i,PageItem::PartialTable{start_cut,end_cut,..} if start_cut.len()>64 || end_cut.len()>64)){
++   self.invalid=true;return;
++  }
++  self.item_count+=column.items.len();
++  self.frames.push(BodyFrameSelection{node,section:page.section_index,page:page.page_index,column_ordinal:ordinal,column:column.column_index,
++   rect:*rect,zone_y:column.zone_y_offset,has_zone:column.zone_layout.is_some(),items:column.items.clone(),complete:false});
++ }
++ pub(crate) fn finish_frame(&mut self,node:NodeId){if let Some(frame)=self.frames.iter_mut().find(|f|f.node==node){frame.complete=true;}}
++ pub(crate) fn record_row(&mut self,row:BodyRowFrame,selected:&ComposedLine){
++  if !self.enabled || self.invalid || !self.frames.iter().any(|f|f.node==row.node){return;}
++  let Some(bytes)=selected.runs.iter().try_fold(0usize,|sum,r|sum.checked_add(r.text.len())?.checked_add(r.display_text.as_ref().map_or(0,String::len)))else{self.invalid=true;return;};
++  if self.rows.len()>=4096 || selected.runs.len()>256 || bytes>2*1024*1024-self.text_bytes
++   || [row.effective_column_x,row.effective_column_width,row.available_width,row.margin_left,row.margin_right,row.inline_offset,row.numbering_offset,row.physical_text_y,row.final_line_box_height,row.baseline].iter().any(|v|!v.is_finite()){
++   self.invalid=true;return;
++  }
++  self.text_bytes+=bytes;self.rows.push(BodyRowSelection{frame:row,selected:selected.clone()});
++ }
++ pub(crate) fn record_table(&mut self,table:WholeTableSelection){
++  if !self.enabled || self.invalid || !self.frames.iter().any(|f|f.node==table.node){return;}
++  if self.tables.len()>=1024 || [table.incoming_y,table.paragraph_y,table.selected_y,table.selected_outer_inset,table.visual_height,table.visual_end,table.flow_end].iter().any(|v|!v.is_finite())
++   || table.lane_input.as_ref().is_some_and(|v|v.iter().any(|v|!v.is_finite())){self.invalid=true;return;}
++  self.tables.push(table);
++ }
++}
++
++#[cfg(test)] mod tests {
++ use super::*;
++ #[test] fn explicit_page_capture_preserves_tree_source_events_and_keeps_disabled_empty(){
++  let mut core=crate::DocumentCore::new_empty();core.create_blank_document_native().unwrap();
++  core.insert_text_native(0,0,0,&"Current physical body frame. ".repeat(20)).unwrap();
++  for _ in 0..3 {let tail=core.document().sections[0].paragraphs.len()-1;
++   core.create_table_ex_native(0,tail,0,2,2,false,None,None).unwrap();}
++  let source=format!("{:?}",core.document());let events=core.serialize_event_log();
++  for page in 0..core.page_count(){let normal=core.build_page_tree(page).unwrap();
++   assert!(normal.frame.current_physical_selections.frames().is_none());
++   let captured=core.build_page_tree_with_current_selections(page).unwrap();
++   assert_eq!(serde_json::to_value(&normal).unwrap(),serde_json::to_value(&captured).unwrap());
++   let facts=&captured.frame.current_physical_selections;
++   let frames=facts.frames().expect("all current body frames completed");assert!(!frames.is_empty());
++   let rows=facts.rows().unwrap();assert!(!rows.is_empty());
++   for row in rows {let frame=frames.iter().find(|f|f.node==row.frame.node).unwrap();
++    assert_eq!(frame.page,page);assert_eq!(frame.section,0);assert!(row.frame.available_width.is_finite());
++    assert!(row.frame.physical_text_y.is_finite());assert!(row.selected.runs.len()<=256);}
++   for table in facts.tables().unwrap(){assert!(frames.iter().any(|f|f.node==table.node));assert!(table.selected_y.is_finite());}
++  }
++  assert_eq!(source,format!("{:?}",core.document()));assert_eq!(events,core.serialize_event_log());
++ }
++ #[test] fn observations_are_never_usable_before_completed_frame(){
++  let mut data=CurrentPhysicalSelections::default();assert!(data.frames().is_none());
++  data.enable_new_page_capture();data.frames.push(BodyFrameSelection{node:1,section:0,page:0,column_ordinal:0,column:0,
++   rect:LayoutRect{x:0.0,y:0.0,width:100.0,height:100.0},zone_y:0.0,has_zone:false,items:vec![],complete:false});
++  assert!(data.rows().is_none());data.finish_frame(1);assert_eq!(data.frames().unwrap().len(),1);
++  data.invalid=true;assert!(data.frames().is_none());assert!(data.rows().is_none());assert!(data.tables().is_none());
++ }
++}
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -5119,6 +5119,27 @@
+         outline_numbering_id: u16,
+         wrap_around_paras: &[super::pagination::WrapAroundPara],
+     ) -> PageRenderTree {
++        self.build_render_tree_with_current_selections(page_content,paragraphs,header_paragraphs,footer_paragraphs,composed,styles,footnote_shape,bin_data_content,active_master_page,measured_tables,page_border_fill,outline_numbering_id,wrap_around_paras,false,None)
++    }
++
++    pub(crate) fn build_render_tree_with_current_selections(
++        &self,
++        page_content: &PageContent,
++        paragraphs: &[Paragraph],
++        header_paragraphs: &[Paragraph],
++        footer_paragraphs: &[Paragraph],
++        composed: &[ComposedParagraph],
++        styles: &ResolvedStyleSet,
++        footnote_shape: &FootnoteShape,
++        bin_data_content: &[BinDataContent],
++        active_master_page: Option<&MasterPage>,
++        measured_tables: &[MeasuredTable],
++        page_border_fill: Option<&PageBorderFill>,
++        outline_numbering_id: u16,
++        wrap_around_paras: &[super::pagination::WrapAroundPara],
++        collect_current_selections:bool,
++        current_frame_paint_plan:Option<super::current_frame_rows_plan::CurrentFramePaintPlan>,
++    ) -> PageRenderTree {
+         let layout = &page_content.layout;
+         // [#6175] 본문 저장 행 admission의 외부-기하 증거 - 조판이 구역당 한 번
+         // 계산하는 것과 **같은 함수·같은 입력**이라 두 경로가 갈리지 않는다.
+@@ -5129,6 +5150,11 @@
+             layout.page_width,
+             layout.page_height,
+         );
++        if collect_current_selections {tree.frame_mut().current_physical_selections.enable_new_page_capture();}
++        if collect_current_selections {if let Some(plan)=current_frame_paint_plan.as_ref(){
++            tree.frame_mut().current_physical_selections.bind_current_plan(plan);
++        }}
++        tree.frame_mut().current_frame_paint_plan=current_frame_paint_plan;
+ 
+         // 페이지 배경. hide_fill(쪽 배경 감추기) 시 커스텀 채우기(색/그라데이션/이미지)만
+         // 숨기고 흰 종이 바탕 pageBackground 는 유지한다. 통째로 스킵하면 raster 기본 투명
+@@ -5416,6 +5442,8 @@
+             });
+         }
+ 
++        // A current plan is a render-call input, never a cached page permission.
++        tree.frame_mut().current_frame_paint_plan=None;
+         tree
+     }
+ 
+@@ -8247,6 +8275,7 @@
+         body_wide_reserved: &[(usize, f64)],
+     ) -> (RenderNode, f64) {
+         let col_node_id = tree.next_id();
++        tree.current_physical_selections.register_frame(col_node_id,page_content,col_content,col_area);
+         let mut col_node = RenderNode::new(
+             col_node_id,
+             RenderNodeType::Column(col_content.column_index),
+@@ -10808,6 +10837,7 @@
+         // 문단 테두리/배경 연속 그룹 병합 렌더링 — #2120 추출
+         self.render_para_border_groups(tree, composed, &mut col_node, styles, col_area);
+ 
++        tree.current_physical_selections.finish_frame(col_node.id);
+         (col_node, y_offset)
+     }
+ 
+@@ -12122,6 +12152,13 @@
+                 && font_slots==0 && font_sources==0).then(||
+                 current_body_stack::current_table_top(ctx, para_index, control_index, y_offset, self.dpi)).flatten();
+             if let Some(plan) = current_stack { para_y_for_table = plan.table_top; }
++            // Independent current-allocation candidate. The existing source,
++            // completed-row and narrow stack paths retain their own contracts.
++            let current_frame_top=if current_stack.is_none(){tree.current_frame_paint_plan.as_ref().and_then(|plan|
++                plan.table_top(paragraphs,page_content.section_index,page_content.page_index,
++                    page_content.column_contents.first()?.column_index,col_area,para_index,control_index,y_offset))}else{None};
++            if let Some(top)=current_frame_top {para_y_for_table=top;}
++
+             if self.owns_completed_native_frame(para,control_index,page_content,col_area,layout,y_offset) {
+                 para_y_for_table=y_offset;
+             }
+@@ -12680,6 +12717,8 @@
+                     });
+                     let raw_top = if let Some(plan) = current_stack {
+                         plan.table_top
++                    } else if let Some(top)=current_frame_top {
++                        top
+                     } else if let Some(placement) = ctx
+                         .paragraph_float_placements
+                         .get(&(para_index, control_index))
+@@ -13233,6 +13272,12 @@
+                     } else {
+                         column_top_outer_box_inset_y
+                     };
++                tree.current_physical_selections.record_table(super::current_physical_selections::WholeTableSelection{
++                    node:col_node.id,paragraph:para_index,control:control_index,incoming_y:table_y_before,paragraph_y:para_y_for_table,
++                    selected_y:table_y_start,selected_outer_inset:if physical_outer_box_paint_inset{physical_outer_box_paint_inset_y}else{column_top_outer_box_inset_y},
++                    visual_height:table_visual_height,visual_end:table_visual_end,flow_end:table_flow_end,
++                    lane_input:para_float_lane_info.map(|(a,b,c,d,e,f)|[a,b,c,d,e,f.unwrap_or(0.0)]),
++                    typed_float:ctx.paragraph_float_placements.contains_key(&(para_index,control_index)),inline:inline_pos.is_some(),treat_as_char:is_tac});
+                 if is_tac {
+                     let marker_x = tbl_inline_x.unwrap_or(col_area.x + effective_margin);
+                     tree.set_inline_shape_position(
+--- a/src/renderer/layout/paragraph_layout.rs
++++ b/src/renderer/layout/paragraph_layout.rs
+@@ -6174,6 +6174,15 @@
+                 }
+             }
+ 
++            if cell_ctx.is_none() && matches!(&col_node.node_type,RenderNodeType::Column(_)) {
++                tree.current_physical_selections.record_row(crate::renderer::current_physical_selections::BodyRowFrame{
++                    node:col_node.id,paragraph:para_index,line:line_idx,
++                    effective_column_x:effective_col_x,effective_column_width:effective_col_w,available_width,
++                    margin_left:effective_margin_left,margin_right:effective_margin_right,inline_offset,numbering_offset:num_offset,
++                    physical_text_y:text_y,final_line_box_height:line_node.bbox.height,baseline,
++                    physical_frame_rows,stored_horizontal_span_used:uses_stored_segment_geometry,has_wrap_anchor:wrap_anchor.is_some(),
++                    equation_adjusted:equation_tac_extra_rows>0},comp_line);
++            }
+             // 텍스트 정렬을 위한 전체 줄 폭 계산 (자연 폭, 추가 간격 미포함)
+             // treat_as_char 이미지 폭도 포함하여 정확한 폭 산출
+             // [Task #604 Stage 2] wrap_anchor 가 있는 줄: line_cs_offset 을 est_x 기준점에
+--- a/src/renderer/mod.rs
++++ b/src/renderer/mod.rs
+@@ -3972,3 +3972,10 @@
+         assert_eq!(format_number(12, NumberFormat::HangulNumber), "십이");
+     }
+ }
++
++pub(crate) mod current_physical_selections;
++
++pub(crate) mod current_frame_rows_plan;
++
++// Current allocator facts only; no export or row permission.
++pub mod selected_composition_observer127;
+--- a/src/renderer/pagination.rs
++++ b/src/renderer/pagination.rs
+@@ -148,6 +148,8 @@
+ /// 페이지 분할 결과: 페이지별 콘텐츠 참조
+ #[derive(Debug)]
+ pub struct PaginationResult {
++    /// Actual selected-composition facts from this allocator pass; no export permission.
++    pub(crate) selected_composition_trace: Option<std::sync::Arc<super::selected_composition_observer127::FinalizedSelectedCompositionTrace>>,
+     /// 페이지별 콘텐츠 목록
+     pub pages: Vec<PageContent>,
+     /// 어울림 배치 표와 나란히 배치되는 빈 리턴 문단 목록 (전체)
+--- a/src/renderer/pagination/engine.rs
++++ b/src/renderer/pagination/engine.rs
+@@ -1156,6 +1156,7 @@
+         Self::finalize_pages(&mut st.pages, &hf_entries, &page_number_pos, paragraphs);
+ 
+         PaginationResult {
++            selected_composition_trace: None,
+             pages: st.pages,
+             wrap_around_paras: all_wrap_around_paras,
+             hidden_empty_paras,
+--- a/src/renderer/render_tree.rs
++++ b/src/renderer/render_tree.rs
+@@ -1801,6 +1801,8 @@
+ /// 기하 없이는 생성될 수 없다는 이 구성 불변식으로 대체됐다.
+ #[derive(Debug, Clone)]
+ pub struct PageLayoutContext {
++    pub(crate) current_physical_selections: super::current_physical_selections::CurrentPhysicalSelections,
++    pub(crate) current_frame_paint_plan: Option<super::current_frame_rows_plan::CurrentFramePaintPlan>,
+     /// 다음 노드 ID 카운터
+     next_id: NodeId,
+     /// 인라인 Shape 좌표 맵: (section, para, control, cell_path) → (x, y)
+@@ -1823,6 +1825,8 @@
+             inline_shape_positions: std::collections::HashMap::new(),
+             page_index,
+             page_bbox: BoundingBox::new(0.0, 0.0, width, height),
++            current_physical_selections: super::current_physical_selections::CurrentPhysicalSelections::default(),
++            current_frame_paint_plan: None,
+             horizontal_shaping_sidecars: HorizontalShapingPageSidecars::default(),
+             vertical_shaping_sidecars: VerticalShapingPageSidecars::default(),
+         }
+--- /dev/null
++++ b/src/renderer/selected_composition_observer127.rs
+@@ -0,0 +1,414 @@
++//! Actual selected formatter inputs and accepted allocator facts.
++//! These facts alone are NOT freshness, source/row/frame ownership, or export permits.
++//! A diagnostic capture only copies finished facts and cannot populate the runtime arena.
++use std::cell::{Cell,RefCell};
++use serde::Serialize;
++use crate::model::{paragraph::Paragraph,provenance::LayoutCompatibilityProfile};
++use super::{composer::{ComposedParagraph,ComposedTextRun},pagination::{PageItem,PaginationResult}};
++
++const MAX_FORMATS:usize=4096;
++const MAX_COMMITS:usize=16384;
++const MAX_BYTES:usize=16*1024*1024;
++const MAX_TEXT:usize=2*1024*1024;
++#[derive(Debug,Clone,Copy)]
++pub(crate) struct SelectedObservationHandle { scope:u64,index:usize }
++#[derive(Debug,Clone,Serialize)]
++pub struct RunFact {
++ pub text:String,pub display_text:Option<String>,pub char_style_id:u32,pub language:usize,
++ pub overlap:Option<(u8,i8)>,pub footnote_marker:Option<u16>,
++ pub supplemental_metrics_blocked:bool,pub inserted_control_text:bool,pub space_metric:&'static str,
++ pub scalars:usize,pub utf16_units:usize,
++}
++#[derive(Debug,Clone,Serialize)]
++pub struct LineFact {
++ pub scalar_start:usize,pub scalar_end:Option<usize>,
++ pub unicode_utf16_start:Option<u32>,pub unicode_utf16_end:Option<u32>,
++ pub original_hwp_char_offset:Option<u32>,pub exact_source_text_span:bool,
++ pub height_hu:i32,pub baseline_hu:i32,pub width_hu:i32,pub column_start_hu:i32,
++ pub spacing_hu:i32,pub has_line_break:bool,pub runs:Vec<RunFact>,
++}
++#[derive(Debug,Clone,Serialize)]
++pub struct SelectedFormatFact {
++ pub observation_id:usize,pub paragraph_token:usize,pub actual_input_width_px:Option<f64>,pub dpi:f64,
++ pub selected_recomposition:bool,pub definition_context:Option<[u8;32]>,pub profile:String,
++ pub source_text:String,pub source_char_offsets:Vec<u32>,pub source_row_count:usize,
++ pub paragraph_style:u16,pub lines:Vec<LineFact>,pub actual_heights:Vec<f64>,pub actual_spacings:Vec<f64>,
++ pub before:f64,pub after:f64,pub total:f64,pub fit_height:f64,
++ pub inline_controls:Vec<(usize,usize,String)>,pub tac_controls:Vec<(usize,i32,usize)>,
++ pub footnote_positions:Vec<(usize,u16,usize)>,pub tab_extended:Vec<[u16;7]>,
++ pub has_numbering:bool,pub has_horizontal_shaping:bool,pub known_square_band:bool,
++ pub observed_not_fresh_or_authorized:bool,
++}
++#[derive(Debug,Clone,Serialize)]
++pub struct CommitFact {
++ pub format_id:usize,pub section:usize,pub page:Option<u32>,pub column:u16,pub paragraph:usize,
++ pub paragraph_token_matches:bool,pub row_start:usize,pub row_end:usize,
++ pub flow_before:f64,pub flow_after:f64,pub advance:f64,
++ pub available_for_rows:Option<f64>,pub cumulative_fit:Option<f64>,pub trimmed_before:f64,
++ pub actual_column_width_px:f64,pub reused_multicolumn_format:bool,
++ pub same_format_reused_after_slot_change:bool,
++ pub metrics_still_match_selected_format:bool,pub range_inside_selected_composition:bool,
++ pub committed_item_index:Option<usize>,pub final_membership:Option<bool>,
++ pub finalization_index:Option<usize>,pub not_physical_y:bool,
++}
++#[derive(Debug,Clone,Serialize)]
++pub struct FinalizationFact {pub section:usize,pub pages:usize,pub commits_checked:usize,pub all_membership_exact:bool}
++#[derive(Debug,Clone,Serialize)]
++pub struct ResolvedFloatFact {pub flow:String,pub next_flow_y:Option<f64>,pub anchor_y:f64,
++ pub stored_host_origin:Option<f64>,pub stored_successor_origin:Option<f64>,pub table_left:Option<f64>,pub table_top:f64,pub occupied_bottom:f64}
++#[derive(Debug,Clone,Serialize)]
++pub struct TableAcceptedFact {
++ pub section:usize,pub page:Option<u32>,pub column:u16,pub paragraph:usize,pub control:usize,pub paragraph_token:usize,
++ pub before:f64,pub body_height:f64,pub after_for_fit:f64,pub raw_top:f64,pub reserved_height:f64,
++ pub x_start:f64,pub x_end:f64,pub lane_pushed_top:f64,pub paragraph_start:f64,
++ pub flow_before:f64,pub flow_after:f64,pub actually_queried_available:Option<f64>,pub resolved:Option<ResolvedFloatFact>,
++ pub committed_item_index:Option<usize>,pub final_membership:Option<bool>,pub finalization_index:Option<usize>,
++ pub not_a_source_frame_lease:bool,
++}
++/// The whole block-table path has no empty-float lane/raw-top query. Keep its
++/// actual inputs distinct rather than deriving fictitious placement values.
++#[derive(Debug,Clone,Serialize)]
++pub struct WholeTableAcceptedFact {
++ pub section:usize,pub page:Option<u32>,pub column:u16,pub paragraph:usize,pub control:usize,pub paragraph_token:usize,
++ pub selected_format_id:Option<usize>,pub table_total_height:f64,pub before:f64,pub body_height:f64,pub after_for_fit:f64,
++ pub paragraph_start:f64,pub flow_before:f64,pub flow_after:f64,pub post_page:Option<u32>,pub post_column:u16,
++ pub pre_text_height:f64,pub pre_text_end:usize,pub selected_line_count:usize,pub is_first:bool,pub is_last:bool,
++ pub strict_following_plain_text_fit:bool,pub resolved:Option<ResolvedFloatFact>,
++ pub committed_item_index:usize,pub final_membership:Option<bool>,pub finalization_index:Option<usize>,
++ pub not_a_source_frame_lease:bool,
++}
++#[derive(Debug,Clone,Serialize)]
++pub struct SelectedCompositionReport {
++ pub cookie:[u8;32],pub formats:Vec<SelectedFormatFact>,pub commits:Vec<CommitFact>,
++ pub tables:Vec<TableAcceptedFact>,pub whole_tables:Vec<WholeTableAcceptedFact>,
++ pub finalizations:Vec<FinalizationFact>,pub encoded_bytes:usize,
++ pub overflowed:bool,pub unsupported_observed:bool,pub nested_rejected:bool,
++ pub not_an_export_permission:bool,
++}
++struct Active {scope:u64,report:SelectedCompositionReport}
++thread_local! {
++ static ACTIVE:RefCell<Option<Active>>=const {RefCell::new(None)};
++ static NEXT_SCOPE:Cell<u64>=const {Cell::new(0)};
++ static NEXT_PASS:Cell<u64>=const {Cell::new(0)};
++ static RUNTIME_DEPTH:Cell<usize>=const {Cell::new(0)};
++}
++struct Scope;
++impl Drop for Scope {fn drop(&mut self){ACTIVE.with(|a|{if let Ok(mut a)=a.try_borrow_mut(){*a=None;}})}}
++pub fn capture_diagnostic_only<T>(cookie:[u8;32],run:impl FnOnce()->T)->Result<(T,SelectedCompositionReport),&'static str>{
++ let scope=NEXT_SCOPE.with(|n|n.get().checked_add(1).map(|v|{n.set(v);v})).ok_or("scope sequence exhausted")?;
++ let started=ACTIVE.with(|a|{let Ok(mut a)=a.try_borrow_mut()else{return false;};
++  if let Some(a)=a.as_mut(){a.report.nested_rejected=true;return false;}
++  *a=Some(Active{scope,report:SelectedCompositionReport{cookie,formats:vec![],commits:vec![],tables:vec![],whole_tables:vec![],finalizations:vec![],encoded_bytes:0,
++   overflowed:false,unsupported_observed:false,nested_rejected:false,not_an_export_permission:true}});true});
++ if !started{return Err("nested or reentrant observation");}
++ let guard=Scope;let result=run();
++ let report=ACTIVE.with(|a|a.try_borrow_mut().ok().and_then(|mut a|a.take())).ok_or("observation scope lost")?.report;
++ drop(guard);Ok((result,report))
++}
++fn charge<T:Serialize>(r:&mut SelectedCompositionReport,value:&T)->bool{
++ let Ok(bytes)=serde_json::to_vec(value)else{r.unsupported_observed=true;return false;};
++ if bytes.len()>MAX_BYTES.saturating_sub(r.encoded_bytes){r.overflowed=true;return false;}
++ r.encoded_bytes+=bytes.len();true
++}
++fn run_fact(run:&ComposedTextRun)->RunFact{
++ let ComposedTextRun{text,char_style_id,lang_index,char_overlap,footnote_marker,display_text,
++  supplemental_metrics_blocked,inserted_control_text,space_metric}=run;
++ RunFact{text:text.clone(),display_text:display_text.clone(),char_style_id:*char_style_id,language:*lang_index,
++  overlap:char_overlap.as_ref().map(|v|(v.border_type,v.inner_char_size)),footnote_marker:*footnote_marker,
++  supplemental_metrics_blocked:*supplemental_metrics_blocked,inserted_control_text:*inserted_control_text,
++  space_metric:match space_metric{super::composer::SpaceMetric::Stored=>"Stored",super::composer::SpaceMetric::HancomRegenerated=>"HancomRegenerated",
++   super::composer::SpaceMetric::HalfCell=>"HalfCell",super::composer::SpaceMetric::KoPubJustified=>"KoPubJustified"},
++  scalars:text.chars().count(),utf16_units:text.encode_utf16().count()}
++}
++#[allow(clippy::too_many_arguments)]
++pub(crate) fn selected(para:&Paragraph,composition:Option<&ComposedParagraph>,width:Option<f64>,dpi:f64,
++ recomposed:bool,context:Option<[u8;32]>,profile:LayoutCompatibilityProfile,heights:&[f64],spacings:&[f64],
++ before:f64,after:f64,total:f64,fit:f64,square:bool)->Option<SelectedObservationHandle>{
++ if RUNTIME_DEPTH.with(|d|d.get())!=1{return None;}
++ ACTIVE.with(|a|{let Ok(mut a)=a.try_borrow_mut()else{return None;};let active=a.as_mut()?;let r=&mut active.report;
++  if r.overflowed||r.unsupported_observed{return None;}if r.formats.len()>=MAX_FORMATS{r.overflowed=true;return None;}
++  let composition=composition?;
++  if para.text.len()>MAX_TEXT || para.char_offsets.len()>MAX_TEXT || composition.lines.len()>4096 || heights.len()>4096 || spacings.len()>4096
++   || composition.inline_controls.len()>4096 || composition.tac_controls.len()>4096 || composition.footnote_positions.len()>4096 || composition.tab_extended.len()>4096
++   || !dpi.is_finite() || width.is_some_and(|w|!w.is_finite()) || [before,after,total,fit].iter().chain(heights).chain(spacings).any(|v|!v.is_finite()){
++   r.unsupported_observed=true;return None;}
++  let mut text_budget=MAX_TEXT;let mut run_budget=16384usize;
++  for line in &composition.lines {let Some(left)=run_budget.checked_sub(line.runs.len())else{r.overflowed=true;return None;};run_budget=left;if line.runs.len()>256{r.unsupported_observed=true;return None;}
++   for run in &line.runs {for text in [Some(&run.text),run.display_text.as_ref()].into_iter().flatten(){
++    let Some(next)=text_budget.checked_sub(text.len())else{r.overflowed=true;return None;};text_budget=next;}}}
++  let source_chars=para.text.chars().collect::<Vec<_>>();let mut utf16=Vec::with_capacity(source_chars.len()+1);utf16.push(0u32);
++  for c in &source_chars {utf16.push(utf16.last().copied()?.checked_add(c.len_utf16() as u32)?);}
++  let mut lines=vec![];
++  for line in &composition.lines {
++   let runs=line.runs.iter().map(run_fact).collect::<Vec<_>>();let count=runs.iter().try_fold(0usize,|n,r|n.checked_add(r.scalars));
++   let end=count.and_then(|n|line.char_start.checked_add(n));
++   let source_match=end.is_some_and(|end|end<=source_chars.len() && line.runs.iter().all(|r|!r.inserted_control_text)
++    && line.runs.iter().flat_map(|r|r.text.chars()).eq(source_chars.get(line.char_start..end).unwrap_or(&[]).iter().copied()));
++   lines.push(LineFact{scalar_start:line.char_start,scalar_end:end,unicode_utf16_start:utf16.get(line.char_start).copied(),
++    unicode_utf16_end:end.and_then(|i|utf16.get(i).copied()),original_hwp_char_offset:para.char_offsets.get(line.char_start).copied(),
++    exact_source_text_span:source_match,height_hu:line.line_height,baseline_hu:line.baseline_distance,width_hu:line.segment_width,
++    column_start_hu:line.column_start,spacing_hu:line.line_spacing,has_line_break:line.has_line_break,runs});
++  }
++  let id=r.formats.len();let fact=SelectedFormatFact{observation_id:id,paragraph_token:para as *const Paragraph as usize,actual_input_width_px:width,dpi,
++   selected_recomposition:recomposed,definition_context:context,profile:format!("{profile:?}"),source_text:para.text.clone(),source_char_offsets:para.char_offsets.clone(),
++   source_row_count:para.line_segs.len(),paragraph_style:composition.para_style_id,lines,actual_heights:heights.to_vec(),actual_spacings:spacings.to_vec(),
++   before,after,total,fit_height:fit,inline_controls:composition.inline_controls.iter().map(|c|(c.line_index,c.control_index,format!("{:?}",c.control_type))).collect(),
++   tac_controls:composition.tac_controls.clone(),footnote_positions:composition.footnote_positions.clone(),tab_extended:composition.tab_extended.clone(),
++   has_numbering:composition.numbering_text.is_some(),has_horizontal_shaping:composition.horizontal_shaping.is_some(),known_square_band:square,
++   observed_not_fresh_or_authorized:true};
++  if !charge(r,&fact){return None;}r.formats.push(fact);Some(SelectedObservationHandle{scope:active.scope,index:id})
++ })
++}
++#[allow(clippy::too_many_arguments)]
++pub(crate) fn commit(handle:Option<SelectedObservationHandle>,para:&Paragraph,section:usize,page:Option<u32>,column:u16,index:usize,
++ start:usize,end:usize,flow_before:f64,flow_after:f64,advance:f64,available:Option<f64>,cumulative:Option<f64>,trimmed:f64,
++ width:f64,multicol:bool,heights:&[f64],spacings:&[f64],before:f64,after:f64,total:f64,fit:f64,items:&[PageItem]){
++ if RUNTIME_DEPTH.with(|d|d.get())!=1{return;}
++ let Some(handle)=handle else{return;};ACTIVE.with(|a|{let Ok(mut a)=a.try_borrow_mut()else{return;};let Some(a)=a.as_mut()else{return;};
++  if a.scope!=handle.scope{return;}let r=&mut a.report;if r.overflowed{return;}
++  if r.commits.len()>=MAX_COMMITS{r.overflowed=true;return;}
++  let Some(format)=r.formats.get(handle.index)else{r.unsupported_observed=true;return;};
++  let indices=items.iter().enumerate().filter_map(|(i,item)|match item{
++   PageItem::FullParagraph{para_index}if *para_index==index&&start==0=>Some(i),
++   PageItem::PartialParagraph{para_index,start_line,end_line}if *para_index==index&&*start_line==start&&*end_line==end=>Some(i),_=>None}).collect::<Vec<_>>();
++  let fact=CommitFact{format_id:handle.index,section,page,column,paragraph:index,paragraph_token_matches:format.paragraph_token==para as *const Paragraph as usize,
++   row_start:start,row_end:end,flow_before,flow_after,advance,available_for_rows:available,cumulative_fit:cumulative,trimmed_before:trimmed,
++   actual_column_width_px:width,reused_multicolumn_format:multicol,
++   same_format_reused_after_slot_change:r.commits.iter().any(|c|c.format_id==handle.index&&(c.page!=page||c.column!=column)),
++   metrics_still_match_selected_format:format.actual_heights==heights&&format.actual_spacings==spacings
++    &&format.before==before&&format.after==after&&format.total==total&&format.fit_height==fit,
++   range_inside_selected_composition:start<end&&end<=format.lines.len(),committed_item_index:(indices.len()==1).then(||indices[0]),
++   final_membership:None,finalization_index:None,not_physical_y:true};
++  if [flow_before,flow_after,advance,trimmed,width].iter().any(|x|!x.is_finite()) || available.is_some_and(|x|!x.is_finite()) || cumulative.is_some_and(|x|!x.is_finite()){
++   r.unsupported_observed=true;return;}
++  if charge(r,&fact){r.commits.push(fact);}
++ });
++}
++pub(crate) fn finalize(section:usize,result:&PaginationResult){ACTIVE.with(|a|{
++ let Ok(mut a)=a.try_borrow_mut()else{return;};let Some(a)=a.as_mut()else{return;};let r=&mut a.report;if r.overflowed{return;}
++ if r.finalizations.len()>=4096{r.overflowed=true;return;}
++ let finalization=r.finalizations.len();let mut checked=0usize;let mut exact=true;
++ for c in r.commits.iter_mut().filter(|c|c.section==section&&c.finalization_index.is_none()){
++  let item=c.page.and_then(|p|result.pages.iter().find(|page|page.page_index==p)).and_then(|page|page.column_contents.iter().find(|cc|cc.column_index==c.column))
++   .and_then(|cc|c.committed_item_index.and_then(|i|cc.items.get(i)));
++  let matched=item.is_some_and(|item|match item{
++   PageItem::FullParagraph{para_index}=>*para_index==c.paragraph&&c.row_start==0,
++   PageItem::PartialParagraph{para_index,start_line,end_line}=>*para_index==c.paragraph&&*start_line==c.row_start&&*end_line==c.row_end,_=>false});
++  c.final_membership=Some(matched);c.finalization_index=Some(finalization);checked+=1;exact&=matched;
++ }
++ for c in r.tables.iter_mut().filter(|c|c.section==section&&c.finalization_index.is_none()){
++  let item=c.page.and_then(|p|result.pages.iter().find(|page|page.page_index==p)).and_then(|page|page.column_contents.iter().find(|cc|cc.column_index==c.column))
++   .and_then(|cc|c.committed_item_index.and_then(|i|cc.items.get(i)));
++  let matched=matches!(item,Some(PageItem::Table{para_index,control_index})if *para_index==c.paragraph&&*control_index==c.control);
++  c.final_membership=Some(matched);c.finalization_index=Some(finalization);checked+=1;exact&=matched;
++ }
++ for c in r.whole_tables.iter_mut().filter(|c|c.section==section&&c.finalization_index.is_none()){
++  let item=c.page.and_then(|p|result.pages.iter().find(|page|page.page_index==p)).and_then(|page|page.column_contents.iter().find(|cc|cc.column_index==c.column))
++   .and_then(|cc|cc.items.get(c.committed_item_index));
++  let matched=matches!(item,Some(PageItem::Table{para_index,control_index})if *para_index==c.paragraph&&*control_index==c.control);
++  c.final_membership=Some(matched);c.finalization_index=Some(finalization);checked+=1;exact&=matched;
++ }
++ let fact=FinalizationFact{section,pages:result.pages.len(),commits_checked:checked,all_membership_exact:exact};
++ if charge(r,&fact){r.finalizations.push(fact);}
++ });}
++
++pub(crate) fn table_commit(mut fact:TableAcceptedFact,items:&[PageItem]){
++ if RUNTIME_DEPTH.with(|d|d.get())!=1{return;}
++ ACTIVE.with(|a|{let Ok(mut a)=a.try_borrow_mut()else{return;};let Some(a)=a.as_mut()else{return;};let r=&mut a.report;
++  if r.overflowed{return;}if r.tables.len()>=MAX_COMMITS{r.overflowed=true;return;}
++  let finite=[fact.before,fact.body_height,fact.after_for_fit,fact.raw_top,fact.reserved_height,fact.x_start,fact.x_end,
++   fact.lane_pushed_top,fact.paragraph_start,fact.flow_before,fact.flow_after].iter().all(|v|v.is_finite())
++   &&fact.actually_queried_available.is_none_or(|v|v.is_finite())
++   &&fact.resolved.as_ref().is_none_or(|p|[p.anchor_y,p.table_top,p.occupied_bottom].iter().all(|v|v.is_finite())
++    &&[p.next_flow_y,p.stored_host_origin,p.stored_successor_origin,p.table_left].iter().all(|v|v.is_none_or(|v|v.is_finite())));
++  if !finite{r.unsupported_observed=true;return;}
++  let indices=items.iter().enumerate().filter_map(|(i,item)|matches!(item,PageItem::Table{para_index,control_index}
++   if *para_index==fact.paragraph&&*control_index==fact.control).then_some(i)).collect::<Vec<_>>();
++  fact.committed_item_index=(indices.len()==1).then(||indices[0]);
++  if charge(r,&fact){r.tables.push(fact);}
++ });
++}
++
++pub(crate) fn whole_table_commit(handle:Option<SelectedObservationHandle>,mut fact:WholeTableAcceptedFact){
++ if RUNTIME_DEPTH.with(|d|d.get())!=1{return;}
++ ACTIVE.with(|a|{let Ok(mut a)=a.try_borrow_mut()else{return;};let Some(active)=a.as_mut()else{return;};let r=&mut active.report;
++  if r.overflowed{return;}if r.whole_tables.len()>=MAX_COMMITS{r.overflowed=true;return;}
++  if [fact.table_total_height,fact.before,fact.body_height,fact.after_for_fit,fact.paragraph_start,fact.flow_before,fact.flow_after,fact.pre_text_height].iter().any(|v|!v.is_finite())
++   ||fact.resolved.as_ref().is_some_and(|p|[p.anchor_y,p.table_top,p.occupied_bottom].iter().any(|v|!v.is_finite())
++    ||[p.next_flow_y,p.stored_host_origin,p.stored_successor_origin,p.table_left].iter().any(|v|v.is_some_and(|v|!v.is_finite()))){
++   r.unsupported_observed=true;return;}
++  fact.selected_format_id=handle.filter(|h|h.scope==active.scope).and_then(|h|r.formats.get(h.index).filter(|f|f.paragraph_token==fact.paragraph_token).map(|_|h.index));
++  if charge(r,&fact){r.whole_tables.push(fact);}
++ });
++}
++
++/// Immutable facts produced by one actual allocator pass. No deserializer or
++/// public constructor exists. This is not a row lease or export permission:
++/// consumers must still prove actual paint, UTF16, metrics and physical frames.
++#[derive(Debug)]
++pub(crate) struct FinalizedSelectedCompositionTrace {
++ generation:u64,section:usize,resource:[u8;32],source:[u8;32],final_frame:[u8;32],
++ formats:Vec<SelectedFormatFact>,commits:Vec<CommitFact>,
++ tables:Vec<TableAcceptedFact>,whole_tables:Vec<WholeTableAcceptedFact>,
++}
++impl FinalizedSelectedCompositionTrace {
++ pub(crate) fn generation(&self)->u64{self.generation}
++ pub(crate) fn section(&self)->usize{self.section}
++ pub(crate) fn resource(&self)->[u8;32]{self.resource}
++ pub(crate) fn formats(&self)->&[SelectedFormatFact]{&self.formats}
++ pub(crate) fn commits(&self)->&[CommitFact]{&self.commits}
++ pub(crate) fn tables(&self)->&[TableAcceptedFact]{&self.tables}
++ pub(crate) fn whole_tables(&self)->&[WholeTableAcceptedFact]{&self.whole_tables}
++ pub(crate) fn format(&self,id:usize)->Option<&SelectedFormatFact>{self.formats.iter().find(|f|f.observation_id==id)}
++ pub(crate) fn matches_source(&self,paragraphs:&[Paragraph],context:Option<[u8;32]>,profile:LayoutCompatibilityProfile,dpi:f64)->bool{
++  self.resource==crate::model::native_computed_resource::RESOURCE
++   && source_key(self.section,paragraphs,context,profile,dpi)==Some(self.source)
++ }
++ pub(crate) fn matches_finalized_result(&self,result:&PaginationResult)->bool{frame_key(result)==Some(self.final_frame)}
++}
++struct BoundedHash {hash:blake3::Hasher,remaining:usize,depth:usize,quoted:bool,escaped:bool}
++impl BoundedHash {fn new()->Self{Self{hash:blake3::Hasher::new(),remaining:MAX_BYTES,depth:0,quoted:false,escaped:false}}}
++impl std::io::Write for BoundedHash {
++ fn write(&mut self,bytes:&[u8])->std::io::Result<usize>{
++  if bytes.len()>self.remaining{return Err(std::io::ErrorKind::InvalidData.into());}
++  for &b in bytes {if self.quoted{if self.escaped{self.escaped=false;}else if b==b'\\'{self.escaped=true;}else if b==b'"'{self.quoted=false;}}
++   else{match b{b'"'=>self.quoted=true,b'{'|b'['=>{self.depth+=1;if self.depth>64{return Err(std::io::ErrorKind::InvalidData.into());}},b'}'|b']'=>self.depth=self.depth.checked_sub(1).ok_or(std::io::ErrorKind::InvalidData)?,_=>{}}}}
++  self.remaining-=bytes.len();self.hash.update(bytes);Ok(bytes.len())
++ }
++ fn flush(&mut self)->std::io::Result<()>{Ok(())}
++}
++impl std::fmt::Write for BoundedHash {
++ fn write_str(&mut self,s:&str)->std::fmt::Result{
++  if s.len()>self.remaining{return Err(std::fmt::Error);}self.remaining-=s.len();self.hash.update(s.as_bytes());Ok(())
++ }
++}
++fn source_key(section:usize,paragraphs:&[Paragraph],context:Option<[u8;32]>,profile:LayoutCompatibilityProfile,dpi:f64)->Option<[u8;32]>{
++ let context=context?;if !dpi.is_finite()||dpi<=0.0||paragraphs.len()>4096{return None;}
++ let mut h=BoundedHash::new();
++ serde_json::to_writer(&mut h,&("actual-selected-composition-input127-1",crate::model::native_computed_resource::RESOURCE,
++  section,context,format!("{profile:?}"),dpi,paragraphs)).ok()?;
++ source_layout_supplement(paragraphs,&mut h)?;
++ (h.depth==0&&!h.quoted).then(||*h.hash.finalize().as_bytes())
++}
++/// Serde intentionally skips current layout inputs. Bind those explicitly.
++/// This narrowly supports body/table-cell stories; other nested story owners
++/// require their own complete input traversal and are refused, never guessed.
++fn source_layout_supplement(paragraphs:&[Paragraph],h:&mut BoundedHash)->Option<()>{
++ use crate::model::{control::Control,paragraph::{NumberingMarker,MarkerHead}};
++ use std::fmt::Write;
++ let mut pending:Vec<&Paragraph>=paragraphs.iter().rev().collect();let mut count=0usize;
++ while let Some(p)=pending.pop(){count=count.checked_add(1)?;if count>4096{return None;}
++  // Exhaustive binding ensures new Paragraph fields require an explicit decision.
++  let Paragraph{char_count:_,control_mask:_,para_shape_id:_,style_id:_,column_type:_,raw_break_type:_,page_break_synthesized:_,
++   text:_,char_offsets:_,char_shapes:_,line_segs:_,layout_space_metrics,hwpx_axis_shift:_,layout_only_fill_lines:_,
++   source_line_seg_vertical_pos,native_source_synthetic_seal,native_source_synthetic_context,completed_native_rows,
++   native_frame_observation:_,reset_flow_observation,range_tags:_,field_ranges:_,orphan_field_ends:_,controls,
++   ctrl_data_records:_,char_count_msb:_,raw_header_extra:_,has_para_text:_,tab_extended:_,title_marks:_,markpen_marks:_,
++   numbering_restart:_,stored_text_partition_dirty,cell_format_vpos_dirty,cell_vpos_reset,numbering_marker}=p;
++  // native_frame_observation is an allocator OUTPUT, not a formatting input.
++  // It is changed by the very pass being observed. It confers no authority here.
++  write!(h,"supplement-paragraph:{count}:{layout_space_metrics:?}:{source_line_seg_vertical_pos:?}:{native_source_synthetic_seal:?}:{native_source_synthetic_context:?}:{completed_native_rows:?}:{reset_flow_observation:?}:{stored_text_partition_dirty:?}:{cell_format_vpos_dirty:?}:{cell_vpos_reset:?}").ok()?;
++  match numbering_marker{
++   NumberingMarker::Unresolved=>write!(h,"marker-unresolved;").ok()?,
++   NumberingMarker::Absent=>write!(h,"marker-absent;").ok()?,
++   NumberingMarker::Text(text,head)=>{let MarkerHead{attr,width_adjust,text_distance,char_shape_id}=head;
++    serde_json::to_writer(&mut *h,&("marker-text",text,attr,width_adjust,text_distance,char_shape_id)).ok()?;}
++  }
++  if controls.len()>4096{return None;}
++  for c in controls.iter().rev(){match c{
++   Control::Table(t)=>{
++    write!(h,"table-raw-seal:{:?};",t.raw_ctrl_seal).ok()?;
++    if t.caption.as_ref().is_some_and(|c|!c.paragraphs.is_empty()){return None;}
++    for cell in t.cells.iter().rev(){if cell.paragraphs.len()>4096usize.saturating_sub(pending.len()){return None;}
++     pending.extend(cell.paragraphs.iter().rev());}
++   },
++   Control::SectionDef(d)=>if !d.master_pages.is_empty(){return None;},
++   Control::Shape(_)|Control::Picture(_)|Control::Header(_)|Control::Footer(_)|Control::Footnote(_)|Control::Endnote(_)|Control::HiddenComment(_)=>return None,
++   Control::Field(f)=>{if !f.memo_paragraphs.is_empty(){return None;}write!(h,"field-layout:{f:?}").ok()?;},
++   // These variants contain no nested Paragraph. Debug is derived and retains
++   // their Serde-skipped raw seals. NumberingMarker's custom Debug is never used.
++   Control::ColumnDef(_)|Control::AutoNumber(_)|Control::NewNumber(_)|Control::PageNumberPos(_)|Control::Bookmark(_)|Control::IndexMark(_)
++   |Control::PageNumCtrl(_)|Control::Hyperlink(_)|Control::Ruby(_)|Control::CharOverlap(_)|Control::PageHide(_)|Control::Equation(_)|Control::Form(_)|Control::Unknown(_)=>write!(h,"leaf-control:{c:?}").ok()?,
++  }}
++ }
++ Some(())
++}
++fn frame_key(result:&PaginationResult)->Option<[u8;32]>{
++ // The initial body/table proof does not own inherited or deferred stories.
++ // In particular Paragraph's custom NumberingMarker Debug intentionally hides
++ // its value, so an endnote aggregate must not enter this exact frame hash.
++ if result.pages.len()>256 || !result.endnotes.is_empty() || !result.endnote_paragraphs.is_empty() || !result.endnote_para_sources.is_empty()
++  || result.pages.iter().any(|p|p.active_header.is_some()||p.active_footer.is_some()||p.active_master_page.is_some()
++   ||!p.extra_master_pages.is_empty()||!p.footnotes.is_empty()){return None;}
++ let mut h=BoundedHash::new();use std::fmt::Write;
++ // A bounded exact in-process frame snapshot, not a portable serialization.
++ // Includes final column items, zones, reservations and page/column geometry.
++ // The trace itself is deliberately excluded to avoid recursive self-binding.
++ let PaginationResult{selected_composition_trace:_,pages,wrap_around_paras,hidden_empty_paras,pre_emitted_host_paras,
++  pre_emitted_host_heights,pre_emitted_host_content_heights,endnotes,endnote_paragraphs,endnote_para_sources,
++  endnote_between_notes_hu,endnote_separator_above_hu,endnote_separator_below_hu}=result;
++ write!(&mut h,"actual-final-allocation127-1:{:?}",(pages,wrap_around_paras,hidden_empty_paras,pre_emitted_host_paras,
++  pre_emitted_host_heights,pre_emitted_host_content_heights,endnotes,endnote_paragraphs,endnote_para_sources,
++  endnote_between_notes_hu,endnote_separator_above_hu,endnote_separator_below_hu)).ok()?;
++ Some(*h.hash.finalize().as_bytes())
++}
++pub(crate) struct RuntimePassGuard {
++ previous_depth:usize,saved_active:Option<Active>,owns_arena:bool,enabled:bool,generation:Option<u64>,
++ section:usize,source:Option<[u8;32]>,first_format:usize,first_commit:usize,
++ first_table:usize,
++}
++impl Drop for RuntimePassGuard {fn drop(&mut self){
++ RUNTIME_DEPTH.with(|d|d.set(self.previous_depth));
++ if !self.owns_arena{return;}
++ ACTIVE.with(|a|{let Ok(mut slot)=a.try_borrow_mut()else{return;};let completed=slot.take();
++  // Diagnostics receive copies only after the actual pass has finished. Their
++  // prior overflow, cookie and records never participate in runtime admission.
++  if let (Some(saved),Some(completed))=(self.saved_active.as_mut(),completed){
++   let dst=&mut saved.report;let src=completed.report;
++   let format_base=dst.formats.len();let final_base=dst.finalizations.len();
++   for mut fact in src.formats{fact.observation_id+=format_base;if charge(dst,&fact){dst.formats.push(fact);}}
++   for mut fact in src.commits{fact.format_id+=format_base;fact.finalization_index=fact.finalization_index.map(|i|i+final_base);if charge(dst,&fact){dst.commits.push(fact);}}
++   for mut fact in src.tables{fact.finalization_index=fact.finalization_index.map(|i|i+final_base);if charge(dst,&fact){dst.tables.push(fact);}}
++   for mut fact in src.whole_tables{fact.selected_format_id=fact.selected_format_id.map(|i|i+format_base);fact.finalization_index=fact.finalization_index.map(|i|i+final_base);if charge(dst,&fact){dst.whole_tables.push(fact);}}
++   for fact in src.finalizations{if charge(dst,&fact){dst.finalizations.push(fact);}}
++   dst.overflowed|=src.overflowed;dst.unsupported_observed|=src.unsupported_observed;dst.nested_rejected|=src.nested_rejected;
++  }
++  *slot=self.saved_active.take();
++ });
++}}
++pub(crate) fn begin_runtime_section(section:usize,paragraphs:&[Paragraph],context:Option<[u8;32]>,profile:LayoutCompatibilityProfile,dpi:f64)->RuntimePassGuard{
++ let previous_depth=RUNTIME_DEPTH.with(|d|{let n=d.get();d.set(n.saturating_add(1));n});
++ let generation=NEXT_PASS.with(|n|n.get().checked_add(1).map(|v|{n.set(v);v}));
++ let source=(previous_depth==0).then(||source_key(section,paragraphs,context,profile,dpi)).flatten();
++ let (saved_active,owns_arena)=ACTIVE.with(|a|{let Ok(mut a)=a.try_borrow_mut()else{return(None,false);};
++  if previous_depth!=0{if let Some(active)=a.as_mut(){active.report.nested_rejected=true;active.report.unsupported_observed=true;}return(None,false);}
++  let scope=NEXT_SCOPE.with(|n|n.get().checked_add(1).map(|v|{n.set(v);v}));let Some(scope)=scope else{return(None,false);};
++  let saved=a.take();
++  *a=Some(Active{scope,report:SelectedCompositionReport{cookie:[0;32],formats:vec![],commits:vec![],tables:vec![],whole_tables:vec![],finalizations:vec![],encoded_bytes:0,
++   overflowed:false,unsupported_observed:source.is_none(),nested_rejected:false,not_an_export_permission:true}});
++  (saved,true)
++ });
++ RuntimePassGuard{previous_depth,saved_active,owns_arena,enabled:previous_depth==0&&owns_arena,generation,section,source,first_format:0,first_commit:0,first_table:0}
++}
++impl RuntimePassGuard {
++ pub(crate) fn finish(self,result:&PaginationResult,paragraphs:&[Paragraph],context:Option<[u8;32]>,profile:LayoutCompatibilityProfile,dpi:f64)
++  ->Option<std::sync::Arc<FinalizedSelectedCompositionTrace>>{
++  if !self.enabled{return None;}finalize(self.section,result);
++  let source=self.source?;if source_key(self.section,paragraphs,context,profile,dpi)!=Some(source){return None;}
++  // Repeated page/column labels (for example zones) require their own physical
++  // ordinal proof; do not guess an item owner from the first matching label.
++  let mut pages=std::collections::HashSet::new();
++  for page in &result.pages{if !pages.insert(page.page_index){return None;}let mut columns=std::collections::HashSet::new();
++   for column in &page.column_contents{if !columns.insert(column.column_index){return None;}}}
++  let final_frame=frame_key(result)?;let generation=self.generation?;
++  ACTIVE.with(|a|{let Ok(a)=a.try_borrow()else{return None;};let active=a.as_ref()?;let r=&active.report;
++   if r.overflowed||r.unsupported_observed||r.nested_rejected{return None;}
++   let formats=r.formats.get(self.first_format..)?.to_vec();let commits=r.commits.get(self.first_commit..)?.to_vec();
++   let tables=r.tables.get(self.first_table..)?.to_vec();let whole_tables=r.whole_tables.clone();
++   if commits.iter().any(|c|!c.paragraph_token_matches||!c.metrics_still_match_selected_format||!c.range_inside_selected_composition||c.final_membership!=Some(true)){return None;}
++   if tables.iter().any(|c|c.final_membership!=Some(true))||whole_tables.iter().any(|c|c.final_membership!=Some(true)){return None;}
++   Some(std::sync::Arc::new(FinalizedSelectedCompositionTrace{generation,section:self.section,
++    resource:crate::model::native_computed_resource::RESOURCE,source,final_frame,formats,commits,tables,whole_tables}))
++  })
++ }
++}
+--- a/src/renderer/typeset.rs
++++ b/src/renderer/typeset.rs
+@@ -4839,6 +4839,7 @@
+         } else {
+             None
+         };
++        let observed_whole_slot127=(st.pages.last().map(|p|p.page_index),st.current_column,st.current_items.len());
+         st.append_item(PageItem::Table {
+             para_index: para_idx,
+             control_index: ctrl_idx,
+@@ -5373,6 +5374,22 @@
+         if strict_following_plain_text_fit && is_last_placed {
+             st.require_strict_following_text_fit();
+         }
++        let observed_resolved127=st.paragraph_float_placements.get(&(para_idx,ctrl_idx)).map(|r|{
++            use crate::renderer::float_placement::ParagraphFloatFlow;
++            let (flow,next_flow_y)=match r.flow{ParagraphFloatFlow::Exclusion=>("Exclusion",None),ParagraphFloatFlow::NextLine=>("NextLine",None),
++                ParagraphFloatFlow::StoredPicture{next_flow_y}=>("StoredPicture",Some(next_flow_y))};
++            crate::renderer::selected_composition_observer127::ResolvedFloatFact{flow:flow.into(),next_flow_y,anchor_y:r.anchor_y,
++                stored_host_origin:r.stored_host_origin,stored_successor_origin:r.stored_successor_line_origin,
++                table_left:r.table_left,table_top:r.table_top,occupied_bottom:r.occupied_bottom}
++        });
++        crate::renderer::selected_composition_observer127::whole_table_commit(fmt.selected_observation127,
++            crate::renderer::selected_composition_observer127::WholeTableAcceptedFact{
++                section:st.section_index,page:observed_whole_slot127.0,column:observed_whole_slot127.1,paragraph:para_idx,control:ctrl_idx,
++                paragraph_token:para as *const Paragraph as usize,selected_format_id:None,table_total_height,before:native_before,body_height:native_body_height,
++                after_for_fit:native_after,paragraph_start:para_start_height,flow_before:native_frame_flow_before,flow_after:st.current_height,
++                post_page:st.pages.last().map(|p|p.page_index),post_column:st.current_column,pre_text_height:pre_height,pre_text_end:pre_table_end_line,
++                selected_line_count:total_lines,is_first:is_first_placed,is_last:is_last_placed,strict_following_plain_text_fit,resolved:observed_resolved127,
++                committed_item_index:observed_whole_slot127.2,final_membership:None,finalization_index:None,not_a_source_frame_lease:true});
+     }
+ 
+     fn tac_flow_query(&self) -> controls::tac_flow::TacFlowQuery<'_> {
+@@ -5814,6 +5831,7 @@
+ 
+     fn fp(lines: usize) -> FormattedParagraph {
+         FormattedParagraph {
++            selected_observation127: None,
+             source_rows_match_current_format: false, source_mixed_tac_row: None,
+             tail_line_remaining_width: None,
+             computed_host_lines: None,
+--- a/src/renderer/typeset/controls.rs
++++ b/src/renderer/typeset/controls.rs
+@@ -345,6 +345,7 @@
+     table_reflowed: bool,
+     dpi: f64,
+ ) -> bool {
++    let observed_available127=std::cell::Cell::new(None::<f64>);
+     let Some(placement) = empty_float::prepare(
+         para_idx,
+         ctrl_idx,
+@@ -358,7 +359,8 @@
+         lanes,
+         st.empty_float_page(),
+         table_reflowed,
+-        || st.empty_float_available_height(ft.table_footnote_height, ft.table_footnote_count),
++        || {let value=st.empty_float_available_height(ft.table_footnote_height, ft.table_footnote_count);
++            observed_available127.set(Some(value));value},
+         dpi,
+     ) else {
+         return false;
+@@ -377,7 +379,24 @@
+             source_row_vpos:para.line_segs[0].vertical_pos,
+         }));
+     }
++    let observed_resolved127=placement.resolved.map(|r|{
++        use crate::renderer::float_placement::ParagraphFloatFlow;
++        let (flow,next_flow_y)=match r.flow{ParagraphFloatFlow::Exclusion=>("Exclusion",None),ParagraphFloatFlow::NextLine=>("NextLine",None),
++            ParagraphFloatFlow::StoredPicture{next_flow_y}=>("StoredPicture",Some(next_flow_y))};
++        crate::renderer::selected_composition_observer127::ResolvedFloatFact{flow:flow.into(),next_flow_y,anchor_y:r.anchor_y,
++            stored_host_origin:r.stored_host_origin,stored_successor_origin:r.stored_successor_line_origin,
++            table_left:r.table_left,table_top:r.table_top,occupied_bottom:r.occupied_bottom}
++    });
++    let mut observed_table127=crate::renderer::selected_composition_observer127::TableAcceptedFact{
++        section:st.section_index,page:st.pages.last().map(|p|p.page_index),column:st.current_column,paragraph:para_idx,control:ctrl_idx,
++        paragraph_token:para as *const Paragraph as usize,before:ft.host_spacing.before,body_height:ft.effective_height,
++        after_for_fit:ft.host_spacing.after_for_fit,raw_top:placement.raw_top,reserved_height:placement.reserved_height,
++        x_start:placement.x_start,x_end:placement.x_end,lane_pushed_top:lanes.pushed_top(placement.x_start,placement.x_end,placement.raw_top),
++        paragraph_start:para_start_height,flow_before:st.current_height,flow_after:0.0,actually_queried_available:observed_available127.get(),
++        resolved:observed_resolved127,committed_item_index:None,final_membership:None,finalization_index:None,not_a_source_frame_lease:true};
+     st.commit_empty_float_table(para_idx, ctrl_idx, placement, lanes);
++    observed_table127.flow_after=st.current_height;
++    crate::renderer::selected_composition_observer127::table_commit(observed_table127,&st.current_items);
+     true
+ }
+ 
+--- a/src/renderer/typeset/paragraph.rs
++++ b/src/renderer/typeset/paragraph.rs
+@@ -158,7 +158,12 @@
+             on_entry_page = false;
+             continue;
+         };
++        let observed_flow_before=st.current_height;
++        let observed_advance=fragment.height;
+         st.commit_split_paragraph_fragment(fragment);
++        observe_selected_commit127(st,para_idx,para,fmt,cursor_line,end_line,observed_flow_before,observed_advance,
++            Some(avail_for_lines),Some(cumulative),0.0,false);
++
+ 
+         if end_line >= line_count {
+             break;
+@@ -312,12 +317,14 @@
+             (fmt.height_for_fit - fmt.spacing_after - trimmed_spacing_before).max(0.0),
+         );
+     }
++    let observed_flow_before=st.current_height;
+     st.apply_full_paragraph_flow(
+         advance,
+         fmt.total_height,
+         trimmed_spacing_before,
+         body_bottom_vpos,
+     );
++    observe_selected_commit127(st,para_idx,para,fmt,0,fmt.line_count(),observed_flow_before,advance,None,None,trimmed_spacing_before,false);
+     // 위의 KoPub 양쪽 정렬 재조판만 의도적으로 저장 줄 위치 관계를 무효화한다.
+     // HWP3에서 변환한 HWPX를 포함한 다른 문서는 별도 이유로 조판 줄 수가 줄 수 있다.
+     // 그 저장 높이를 모든 뒤 vpos에서 빼면
+@@ -974,7 +981,11 @@
+         else {
+             break;
+         };
++        let observed_flow_before=st.current_height;
++        let observed_advance=fragment.height;
+         st.commit_multicolumn_paragraph_fragment(fragment);
++        observe_selected_commit127(st,para_idx,para,fmt,break_start,break_end,observed_flow_before,observed_advance,None,None,0.0,true);
++
+         // 마지막 조각이 아니면 다음 단으로 진행.
+         if bi + 1 < col_breaks.len() {
+             st.advance_after_multicolumn_fragment();
+@@ -1169,3 +1180,14 @@
+ #[test]fn actual_format_8(){check(composed_cases(),8);}
+ #[test]fn visible_prefix_6(){check(prefix_cases(),6);}
+ }
++
++/// Diagnostic connection of an actual selected format to an actually committed
++/// body item. It neither recomposes the paragraph nor grants export permission.
++#[allow(clippy::too_many_arguments)]
++fn observe_selected_commit127(st:&TypesetState,index:usize,para:&Paragraph,fmt:&FormattedParagraph,start:usize,end:usize,
++ before:f64,advance:f64,available:Option<f64>,cumulative:Option<f64>,trimmed:f64,multicol:bool){
++ crate::renderer::selected_composition_observer127::commit(fmt.selected_observation127,para,st.section_index,
++  st.pages.last().map(|p|p.page_index),st.current_column,index,start,end,before,st.current_height,advance,
++  available,cumulative,trimmed,st.following_wrap_column_width(),multicol,&fmt.line_heights,&fmt.line_spacings,
++  fmt.spacing_before,fmt.spacing_after,fmt.total_height,fmt.height_for_fit,&st.current_items);
++}
+--- a/src/renderer/typeset/paragraph/format.rs
++++ b/src/renderer/typeset/paragraph/format.rs
+@@ -187,7 +187,11 @@
+         let remaining = available - text_width - inline_width;
+         (available.is_finite() && available > 0.0 && remaining.is_finite()).then_some(remaining)
+     })();
++    let selected_observation127=crate::renderer::selected_composition_observer127::selected(
++        para,composed,column_width_px,ctx.dpi(),recomposed.is_some(),styles.reset_flow_context,ctx.profile(),
++        &line_heights,&line_spacings,spacing_before,spacing_after,total_height,height_for_fit,known_square_band);
+     FormattedParagraph {
++        selected_observation127,
+         source_rows_match_current_format: ctx.profile().hwp5_stored_pagination_layout()
+             && ctx.profile().session_edited()
+             && super::actual_composition_matches_saved(para,composed),
+--- a/src/renderer/typeset/paragraph/metrics.rs
++++ b/src/renderer/typeset/paragraph/metrics.rs
+@@ -10,6 +10,8 @@
+ /// 문단 format() 결과: 문단의 실제 렌더링 높이 정보
+ #[derive(Debug, Clone)]
+ pub(in crate::renderer::typeset) struct FormattedParagraph {
++    /// Diagnostic handle to the actual selected composition, never freshness/row authority.
++    pub(in crate::renderer::typeset) selected_observation127: Option<crate::renderer::selected_composition_observer127::SelectedObservationHandle>,
+     /// The selected current composition exactly matches the plain source rows,
+     /// including character partition, physical box, baseline and effective IDs.
+     pub(in crate::renderer::typeset) source_rows_match_current_format: bool,
+@@ -46,6 +48,7 @@
+         plan: crate::renderer::inline_flow::InlineFlowPlan,
+         dpi: f64,
+     ) {
++        self.selected_observation127 = None;
+         self.source_rows_match_current_format = false;
+         self.source_mixed_tac_row = None;
+         let Some(rows) = plan.text_rows.as_ref() else {
+--- a/src/renderer/typeset/section.rs
++++ b/src/renderer/typeset/section.rs
+@@ -37,6 +37,8 @@
+         force_break_before: &std::collections::HashSet<usize>,
+         endnote_deferral: EndnoteDeferral<'_>,
+     ) -> PaginationResult {
++        let selected_pass127=crate::renderer::selected_composition_observer127::begin_runtime_section(
++            section_index,paragraphs,styles.reset_flow_context,profile,self.dpi);
+         // [#2424 프로파일] paginate_pass 와 같은 env var 로 하위 단계 게이트.
+         #[cfg(not(target_arch = "wasm32"))]
+         let issue2424_ts_enabled =
+@@ -501,6 +503,8 @@
+             );
+         }
+ 
+-        st.into_result()
++        let mut result=st.into_result();
++        result.selected_composition_trace=selected_pass127.finish(&result,paragraphs,styles.reset_flow_context,profile,self.dpi);
++        result
+     }
+ }
+--- a/src/renderer/typeset/state/commands.rs
++++ b/src/renderer/typeset/state/commands.rs
+@@ -429,6 +429,7 @@
+         self,
+     ) -> crate::renderer::pagination::PaginationResult {
+         PaginationResult {
++            selected_composition_trace: None,
+             pages: self.data.pages,
+             wrap_around_paras: Vec::new(),
+             hidden_empty_paras: self.data.hidden_empty_paras,
+--- /dev/null
++++ b/src/serializer/hwpx/current_frame_rows.rs
+@@ -0,0 +1,187 @@
++//! Exact serialization-clone binding for an opaque, current physical/fresh plan.
++//! No imported descriptor, arbitrary row list, source lease or diagnostic report
++//! can construct this projection. It never changes source model/cache state.
++use std::collections::{HashMap,HashSet};
++use serde::Serialize;
++use crate::model::{document::{Document,DocInfo,Section,FileHeader,HwpVersion,Preview,PreviewImage,PreviewImageFormat},paragraph::{Paragraph,LineSeg,SpaceMetric,NumberingMarker}};
++use crate::renderer::current_frame_rows_plan::CurrentFrameRowsPlan;
++#[derive(Clone,Copy)]
++pub(crate) enum CurrentFrameExportRepresentation{Original,NativeHwp5Lowering}
++
++const MAX_BYTES:usize=16*1024*1024;
++const MAX_ROWS:usize=65536;
++const MAX_PARAGRAPHS:usize=4096;
++struct BoundedDigest{hash:blake3::Hasher,bytes:usize,limit:usize,depth:usize,quoted:bool,escaped:bool}
++impl std::io::Write for BoundedDigest{
++ fn write(&mut self,bytes:&[u8])->std::io::Result<usize>{
++  if bytes.len()>self.limit-self.bytes{return Err(std::io::ErrorKind::InvalidData.into());}
++  for &b in bytes {if self.quoted {if self.escaped{self.escaped=false;}else if b==b'\\'{self.escaped=true;}else if b==b'"'{self.quoted=false;}}
++   else{match b{b'"'=>self.quoted=true,b'{'|b'['=>{self.depth+=1;if self.depth>64{return Err(std::io::ErrorKind::InvalidData.into());}},b'}'|b']'=>self.depth=self.depth.checked_sub(1).ok_or(std::io::ErrorKind::InvalidData)?,_=>{}}}}
++  self.bytes+=bytes.len();self.hash.update(bytes);Ok(bytes.len())
++ }
++ fn flush(&mut self)->std::io::Result<()>{Ok(())}
++}
++fn digest_with_limit<T:Serialize>(value:&T,limit:usize)->Option<([u8;32],usize)>{
++ let mut writer=BoundedDigest{hash:blake3::Hasher::new(),bytes:0,limit,depth:0,quoted:false,escaped:false};
++ serde_json::to_writer(&mut writer,value).ok()?;(writer.depth==0&&!writer.quoted).then(||(*writer.hash.finalize().as_bytes(),writer.bytes))
++}
++fn digest<T:Serialize>(value:&T)->Option<[u8;32]>{Some(digest_with_limit(value,MAX_BYTES)?.0)}
++fn image_format(format:&PreviewImageFormat)->u8{match format{PreviewImageFormat::Png=>0,PreviewImageFormat::Bmp=>1,PreviewImageFormat::Gif=>2,PreviewImageFormat::Unknown=>3}}
++// Paragraph::Serialize intentionally excludes serializer-driving runtime input.
++// Bind those values separately; never treat an opaque observation as permission.
++// Initial proof only supports plain/structural/table stories, no completed-row
++// package emission, captions, lazy binary, or unhandled nested story kinds.
++fn paragraph_supplements(p:&Paragraph,depth:usize,budget:&mut usize,out:&mut Vec<[u8;32]>)->Option<()>{
++ if depth>32||out.len()>=MAX_ROWS{return None;}
++ let Paragraph{char_count:_,control_mask:_,para_shape_id:_,style_id:_,column_type:_,raw_break_type:_,page_break_synthesized:_,
++  text:_,char_offsets:_,char_shapes:_,line_segs:_,layout_space_metrics,hwpx_axis_shift:_,layout_only_fill_lines:_,
++  source_line_seg_vertical_pos,native_source_synthetic_seal,native_source_synthetic_context,completed_native_rows,
++  native_frame_observation,reset_flow_observation:_,range_tags:_,field_ranges:_,orphan_field_ends:_,controls,ctrl_data_records:_,
++  char_count_msb:_,raw_header_extra:_,has_para_text:_,tab_extended:_,title_marks:_,markpen_marks:_,numbering_restart:_,
++  stored_text_partition_dirty,cell_format_vpos_dirty,cell_vpos_reset,numbering_marker}=p;
++ if controls.len()>4096||completed_native_rows.is_some()||layout_space_metrics.len()>MAX_ROWS
++  ||source_line_seg_vertical_pos.as_ref().is_some_and(|v|v.len()>MAX_ROWS){return None;}
++ let metrics:Vec<_>=layout_space_metrics.iter().map(|(start,metric)|(*start,match metric{
++  SpaceMetric::Stored=>0u8,SpaceMetric::HancomRegenerated=>1,SpaceMetric::HalfCell=>2,SpaceMetric::KoPubJustified=>3})).collect();
++ let marker=match numbering_marker{NumberingMarker::Unresolved=>(0u8,None),NumberingMarker::Absent=>(1,None),
++  NumberingMarker::Text(text,head)=>(2,Some((text,(head.attr,head.width_adjust,head.text_distance,head.char_shape_id))))};
++ let frame=native_frame_observation.get();
++ if frame.is_some_and(|f|![f.raw_top,f.reserved_bottom,f.before,f.body_height,f.after].iter().all(|v|v.is_finite())){return None;}
++ let table_seals:Vec<_>=controls.iter().filter_map(|c|match c{crate::model::control::Control::Table(t)=>Some(t.raw_ctrl_seal),_=>None}).collect();
++ let (hash,used)=digest_with_limit(&(source_line_seg_vertical_pos,metrics,native_source_synthetic_seal,native_source_synthetic_context,
++  stored_text_partition_dirty,cell_format_vpos_dirty,cell_vpos_reset,marker,frame,table_seals),*budget)?;
++ *budget=budget.checked_sub(used)?;out.push(hash);
++ for c in controls{match c{
++  crate::model::control::Control::SectionDef(s)=>{if !s.master_pages.is_empty(){return None;}},
++  crate::model::control::Control::ColumnDef(_)=>{},
++  crate::model::control::Control::Table(t)=>{if t.caption.is_some(){return None;}for cell in &t.cells{for p in &cell.paragraphs{paragraph_supplements(p,depth+1,budget,out)?;}}},
++  _=>return None,
++ }}
++ Some(())
++}
++/// Exhaustive original and target content binding, including unknown raw data.
++/// Runtime seals/observers are deliberately not transformed into raw authority.
++/// Initial frame proof does not load opaque/lazy binary resources: they refuse.
++fn document_digest(doc:&Document,resource:[u8;32],generation:[u8;32])->Option<[u8;32]>{
++ let Document{header,doc_properties,doc_info,sections,preview,bin_data_content,extra_streams,hwpx_aux_entries,
++  is_hwp3_variant,is_hwpx_variant,provenance}=doc;
++ if !bin_data_content.is_empty()||sections.is_empty()||sections.len()>256{return None;}
++ let mut supplements=Vec::new();let mut supplement_budget=MAX_BYTES;
++ for section in sections{
++  if !section.section_def.master_pages.is_empty(){return None;}
++  for p in &section.paragraphs{paragraph_supplements(p,0,&mut supplement_budget,&mut supplements)?;}
++ }
++ let FileHeader{version,flags,compressed,encrypted,distribution,raw_data}=header;
++ let HwpVersion{major,minor,build,revision}=version;
++ let DocInfo{bin_data_list,font_faces,border_fills,char_shapes,tab_defs,numberings,bullets,para_shapes,styles,
++  extra_records,print_method,raw_stream,bullet_count,memo_shape_count,memo_properties_xml,
++  distribute_doc_data_removed,raw_stream_dirty,hwpx_head_tail,hwpml_version,raw_provenance:_}=doc_info;
++ let sections:Vec<_>=sections.iter().map(|Section{section_def,paragraphs,raw_stream,raw_provenance:_}|
++  (section_def,paragraphs,raw_stream)).collect();
++ let preview=preview.as_ref().map(|Preview{image,text}|(text,image.as_ref().map(|PreviewImage{format,data}|(image_format(format),data))));
++ let crate::model::provenance::SourceProvenance{format,hwp3_lineage,hwpx_lineage,hft_ascii_halfwidth_witnessed}=provenance;
++ let format=match format{crate::model::provenance::SourceFormat::Hwp5=>0u8,crate::model::provenance::SourceFormat::Hwpx=>1,
++  crate::model::provenance::SourceFormat::Hwp3=>2,crate::model::provenance::SourceFormat::Hml=>3};
++ digest(&(("current-frame-standard-rows-130",resource,generation),
++  ((major,minor,build,revision),flags,compressed,encrypted,distribution,raw_data),doc_properties,
++  ((bin_data_list,font_faces,border_fills,char_shapes,tab_defs,numberings,bullets,para_shapes,styles,extra_records),
++   (print_method,raw_stream,bullet_count,memo_shape_count,memo_properties_xml,distribute_doc_data_removed,raw_stream_dirty,hwpx_head_tail,hwpml_version)),
++  (sections,preview,extra_streams,hwpx_aux_entries,supplements),(is_hwp3_variant,is_hwpx_variant,format,hwp3_lineage,hwpx_lineage,hft_ascii_halfwidth_witnessed)))
++}
++
++struct ParagraphRows{section:usize,paragraph:usize,rows:Vec<LineSeg>}
++fn expected_target_digest(source:&Document,representation:CurrentFrameExportRepresentation,resource:[u8;32],generation:[u8;32])->Option<[u8;32]>{
++ match representation{
++  CurrentFrameExportRepresentation::Original=>document_digest(source,resource,generation),
++  CurrentFrameExportRepresentation::NativeHwp5Lowering=>{
++   if source.is_hwp3_variant||source.provenance.hwp3_lineage
++    ||matches!(source.provenance.format,crate::model::provenance::SourceFormat::Hwp3){return None;}
++   // Bound the source before cloning or traversing the production lowerer.
++   document_digest(source,resource,generation)?;
++   let mut target=source.clone();let path=crate::model::document::HWP5_ORIGIN_HWPX_MARKER_PATH;
++   if target.hwpx_aux_entries.iter().filter(|(p,_)|p==path).count()>1{return None;}
++   let value=crate::model::document::HWP5_ORIGIN_HWPX_PARAGRAPH_AXIS.to_vec();
++   if let Some((_,v))=target.hwpx_aux_entries.iter_mut().find(|(p,_)|p==path){*v=value;}
++   else{target.hwpx_aux_entries.push((path.to_owned(),value));}
++   crate::document_core::DocumentCore::materialize_hwp5_missing_linesegs_for_hwpx_export(&mut target);
++   document_digest(&target,resource,generation)
++  }
++ }
++}
++pub(crate) struct CurrentFrameRowsProjection<'doc>{
++ source:&'doc Document,
++ source_digest:[u8;32],
++ target_digest:[u8;32],
++ resource:[u8;32],
++ generation:[u8;32],
++ paragraphs:Vec<ParagraphRows>,
++}
++impl<'doc> CurrentFrameRowsProjection<'doc>{
++ pub(crate) fn from_current_frame(source:&'doc Document,plan:&CurrentFrameRowsPlan<'doc>,
++  representation:CurrentFrameExportRepresentation)->Option<Self>{
++  let resource=crate::model::native_computed_resource::RESOURCE;
++  if !plan.owns_document(source)||plan.resource()!=resource{return None;}
++  let generation=plan.allocation_generation();
++  let source_digest=document_digest(source,resource,generation)?;
++  let planned=plan.paragraph_rows();
++  if planned.is_empty()||planned.len()>MAX_PARAGRAPHS{return None;}
++  let mut seen=HashSet::new();let mut total_rows=0usize;let mut paragraphs=Vec::with_capacity(planned.len());
++  for item in planned{
++   let section=item.section_index();let paragraph=item.paragraph_index();
++   if !seen.insert((section,paragraph)){return None;}
++   let source_paragraph=source.sections.get(section)?.paragraphs.get(paragraph)?;
++   if source_paragraph.stored_text_partition_is_dirty()||source_paragraph.cell_format_vpos_dirty
++    ||source_paragraph.layout_only_fill_lines!=0{return None;}
++   // Keep the actual generic reflow tag unchanged. Freshness comes from
++   // the opaque current allocator/formatter plan, never from a tag bit.
++   let rows=item.rows();total_rows=total_rows.checked_add(rows.len())?;
++   if rows.is_empty()||total_rows>MAX_ROWS||rows.iter().any(|r|r.tag!=0x8006_0000)
++    ||rows.windows(2).any(|r|r[0].text_start>r[1].text_start){return None;}
++   paragraphs.push(ParagraphRows{section,paragraph,rows:rows.to_vec()});
++  }
++  // One selected representation, generated from the original, never an OR of
++  // caller-provided candidate clones. Reuse the actual production lowerer.
++  let target_digest=expected_target_digest(source,representation,resource,generation)?;
++  Some(Self{source,source_digest,target_digest,resource,generation,paragraphs})
++ }
++ pub(crate) fn bind_for_export(&self,target:&Document)->Option<HashMap<usize,Vec<LineSeg>>>{
++  if self.resource!=crate::model::native_computed_resource::RESOURCE
++   ||document_digest(self.source,self.resource,self.generation)?!=self.source_digest
++   ||document_digest(target,self.resource,self.generation)?!=self.target_digest
++   ||self.paragraphs.is_empty()||self.paragraphs.len()>MAX_PARAGRAPHS{return None;}
++  let mut bound=HashMap::new();let mut total=0usize;
++  for item in &self.paragraphs{
++   let p=target.sections.get(item.section)?.paragraphs.get(item.paragraph)?;
++   total=total.checked_add(item.rows.len())?;
++   if item.rows.is_empty()||total>MAX_ROWS{return None;}
++   if bound.insert(p as *const _ as usize,item.rows.clone()).is_some(){return None;}
++  }
++  Some(bound)
++ }
++}
++
++#[cfg(test)]mod tests{
++ use super::*;
++ fn source()->Document{let mut d=Document::default();d.sections.push(Default::default());d.sections[0].paragraphs=(0..3).map(|i|{let mut p=crate::model::paragraph::Paragraph::default();p.text=format!("own input {i}");p}).collect();d}
++ fn projection(d:&Document)->CurrentFrameRowsProjection<'_>{let resource=crate::model::native_computed_resource::RESOURCE;let generation=[7;32];let input=document_digest(d,resource,generation).unwrap();CurrentFrameRowsProjection{source:d,source_digest:input,target_digest:input,resource,generation,paragraphs:vec![ParagraphRows{section:0,paragraph:0,rows:vec![LineSeg::default()]}]}}
++ #[test]fn exact_whole_source_and_clone_binding(){let d=source();let p=projection(&d);let clone=d.clone();let map=p.bind_for_export(&clone).unwrap();assert!(map.contains_key(&(&clone.sections[0].paragraphs[0]as*const _ as usize)));assert!(!map.contains_key(&(&d.sections[0].paragraphs[0]as*const _ as usize)));}
++ #[test]fn unprojected_unknown_context_or_order_change_rejects(){let d=source();let p=projection(&d);for case in 0..8{let mut c=d.clone();match case{
++  0=>c.sections[0].paragraphs[2].text.push('x'),1=>c.sections[0].paragraphs[2].raw_header_extra.push(1),2=>c.sections[0].paragraphs.swap(1,2),
++  3=>c.sections[0].section_def.raw_ctrl_extra.push(7),4=>c.doc_info.font_faces.push(vec![]),5=>c.extra_streams.push(("unknown".into(),vec![1,2])),
++  6=>c.hwpx_aux_entries.push(("unknown".into(),vec![2,3])),7=>c.header.raw_data=Some(vec![9]),_=>unreachable!()};assert!(p.bind_for_export(&c).is_none(),"case {case}");}}
++ #[test]fn other_section_context_and_membership_are_bound(){let mut d=source();d.sections.push(Default::default());d.sections[1].paragraphs.push(Default::default());let p=projection(&d);let mut c=d.clone();c.sections[1].paragraphs[0].text.push('x');assert!(p.bind_for_export(&c).is_none());let mut c=d.clone();c.sections.swap(0,1);assert!(p.bind_for_export(&c).is_none());}
++ #[test]fn target_duplicate_or_outside_body_pointer_is_rejected(){let d=source();let mut p=projection(&d);p.paragraphs.push(ParagraphRows{section:0,paragraph:0,rows:vec![Default::default()]});assert!(p.bind_for_export(&d).is_none());p.paragraphs.pop();p.paragraphs[0].paragraph=3;assert!(p.bind_for_export(&d).is_none());p.paragraphs[0].paragraph=0;p.paragraphs[0].section=1;assert!(p.bind_for_export(&d).is_none());}
++ #[test]fn resource_and_generation_mismatch_rejects(){let d=source();let mut p=projection(&d);p.resource[0]^=1;assert!(p.bind_for_export(&d).is_none());let mut p=projection(&d);p.generation[0]^=1;assert!(p.bind_for_export(&d).is_none());}
++ #[test]fn bounded_streaming_digest_and_depth_refuse_large_input(){assert!(digest(&"escaped \\\"[]{} é 한글").is_some());assert!(digest(&"x".repeat(MAX_BYTES)).is_none());let mut v=serde_json::Value::Null;for _ in 0..65{v=serde_json::json!([v]);}assert!(digest(&v).is_none());}
++ #[test]fn unprojected_output_driving_runtime_changes_cannot_bind(){let d=source();let p=projection(&d);for case in 0..7{let mut c=d.clone();let tail=&mut c.sections[0].paragraphs[2];match case{
++  0=>tail.source_line_seg_vertical_pos=Some(vec![5000]),1=>tail.layout_space_metrics.push((0,SpaceMetric::HalfCell)),
++  2=>tail.stored_text_partition_dirty=true,3=>tail.cell_format_vpos_dirty=true,4=>tail.cell_vpos_reset=Some(true),
++  5=>tail.native_source_synthetic_context=Some([1;32]),6=>tail.numbering_marker=NumberingMarker::Absent,_=>unreachable!()};assert!(p.bind_for_export(&c).is_none(),"output metadata {case}");}}
++ #[test]fn nested_cell_output_driving_runtime_and_raw_seal_changes_cannot_bind(){let mut d=source();let mut t=crate::model::table::Table::default();let mut cell=crate::model::table::Cell::default();cell.paragraphs.push(Default::default());t.cells.push(cell);d.sections[0].paragraphs[2].controls.push(crate::model::control::Control::Table(Box::new(t)));let p=projection(&d);let mut c=d.clone();let crate::model::control::Control::Table(t)=&mut c.sections[0].paragraphs[2].controls[0]else{unreachable!()};t.cells[0].paragraphs[0].source_line_seg_vertical_pos=Some(vec![5000]);assert!(p.bind_for_export(&c).is_none());let mut c=d.clone();let crate::model::control::Control::Table(t)=&mut c.sections[0].paragraphs[2].controls[0]else{unreachable!()};t.raw_ctrl_seal=Some([2;32]);assert!(p.bind_for_export(&c).is_none());}
++ #[test]fn representation_selects_only_exact_actual_native_lowering(){let d=source();let mut p=projection(&d);p.target_digest=expected_target_digest(&d,CurrentFrameExportRepresentation::NativeHwp5Lowering,p.resource,p.generation).unwrap();let mut target=d.clone();target.hwpx_aux_entries.push((crate::model::document::HWP5_ORIGIN_HWPX_MARKER_PATH.into(),b"2:paragraph-utf16".to_vec()));crate::document_core::DocumentCore::materialize_hwp5_missing_linesegs_for_hwpx_export(&mut target);assert!(p.bind_for_export(&target).is_some());assert!(p.bind_for_export(&d).is_none());assert!(projection(&d).bind_for_export(&target).is_none());target.sections[0].paragraphs[2].line_segs[0].tag^=1;assert!(p.bind_for_export(&target).is_none());}
++ #[test]fn initial_scope_refuses_unhandled_story_and_completed_row_authority(){let d=source();let mut c=d.clone();c.sections[0].paragraphs[1].controls.push(crate::model::control::Control::Unknown(Default::default()));assert!(document_digest(&c,[0;32],[1;32]).is_none());let mut c=d.clone();c.sections[0].paragraphs[1].completed_native_rows=Some(crate::model::native_computed_rows::CompletedRows{local:[0;32],plan:[0;32],frame:[0;32],resource:[0;32],bases:vec![],native_frame:None,export_authorized:false});assert!(document_digest(&c,[0;32],[1;32]).is_none());}
++}
++
++#[cfg(test)]
++#[path="current_frame_rows_writer_tests131.rs"]
++mod writer_facade_tests;
+--- /dev/null
++++ b/src/serializer/hwpx/current_frame_rows_writer_tests131.rs
+@@ -0,0 +1,31 @@
++//! Facade wiring tests only; an actual producer integration is still required.
++use super::*;
++fn sample()->Document{
++ let mut d=Document::default();d.sections.push(Default::default());
++ d.doc_info.font_faces=vec![vec![Default::default()];7];
++ d.doc_info.char_shapes.push(Default::default());d.doc_info.para_shapes.push(Default::default());
++ d.doc_info.styles.push(Default::default());
++ let mut p=Paragraph::default();p.text="own body".into();p.char_count=9;p.char_offsets=(0..8).collect();
++ p.char_shapes.push(crate::model::paragraph::CharShapeRef{start_pos:0,char_shape_id:0});
++ d.sections[0].paragraphs.push(p);d
++}
++fn projection(d:&Document)->CurrentFrameRowsProjection<'_>{
++ let resource=crate::model::native_computed_resource::RESOURCE;let generation=[9;32];let input=document_digest(d,resource,generation).unwrap();
++ CurrentFrameRowsProjection{source:d,source_digest:input,target_digest:input,resource,generation,
++  paragraphs:vec![ParagraphRows{section:0,paragraph:0,rows:vec![LineSeg{text_start:0,vertical_pos:1234,line_height:1000,text_height:1000,baseline_distance:800,line_spacing:600,column_start:0,segment_width:7200,tag:0x60000}]}]}
++}
++#[test]fn invalid_current_binding_is_error_for_both_writer_facades(){
++ let d=sample();let p=projection(&d);let mut changed=d.clone();changed.sections[0].paragraphs[0].text.push('x');
++ let a=crate::serializer::hwpx::serialize_hwpx_with_frame_rows(&changed,&p);
++ assert!(matches!(a,Err(crate::serializer::SerializeError::UnsupportedInput(s))if s=="CURRENT_FRAME_EXPORT_INPUT_CHANGED"));
++ let b=crate::serializer::hwpx::serialize_hwpx_with_frame_rows_and_password(&changed,&p,b"own-test-password");
++ assert!(matches!(b,Err(crate::serializer::SerializeError::UnsupportedInput(s))if s=="CURRENT_FRAME_EXPORT_INPUT_CHANGED"));
++}
++#[test]fn actual_xml_writer_consumes_bound_current_rows_without_source_changes(){
++ let d=sample();let p=projection(&d);let before=document_digest(&d,p.resource,p.generation).unwrap();
++ let serialized=crate::serializer::hwpx::serialize_hwpx_with_frame_rows(&d,&p).unwrap();
++ let mut zip=zip::ZipArchive::new(std::io::Cursor::new(serialized.into_bytes())).unwrap();let mut xml=String::new();
++ use std::io::Read;zip.by_name("Contents/section0.xml").unwrap().read_to_string(&mut xml).unwrap();
++ assert!(xml.contains("vertpos=\"1234\""),"actual XML must use the bound physical row");
++ assert_eq!(document_digest(&d,p.resource,p.generation),Some(before));
++}
+--- a/src/serializer/hwpx/mod.rs
++++ b/src/serializer/hwpx/mod.rs
+@@ -58,6 +58,19 @@
+ }
+ 
+ pub(crate) fn serialize_hwpx_with_current_rows(doc:&Document,projection:Option<&standard_rows::CurrentStandardRowsProjection>)->Result<SerializedDocument,SerializeError>{
++    serialize_hwpx_with_projection(doc,RowProjection::Legacy(projection))
++}
++
++enum RowProjection<'plan,'doc>{
++    Legacy(Option<&'plan standard_rows::CurrentStandardRowsProjection>),
++    Current(&'plan current_frame_rows::CurrentFrameRowsProjection<'doc>),
++}
++
++pub(crate) fn serialize_hwpx_with_frame_rows(doc:&Document,projection:&current_frame_rows::CurrentFrameRowsProjection<'_>)->Result<SerializedDocument,SerializeError>{
++    serialize_hwpx_with_projection(doc,RowProjection::Current(projection))
++}
++
++fn serialize_hwpx_with_projection(doc:&Document,projection:RowProjection<'_,'_>)->Result<SerializedDocument,SerializeError>{
+     use static_assets::*;
+     // Malformed native preview bytes have an opaque HWP owner, not XML text.
+     if doc.extra_streams.iter().any(|(path,raw)|path=="/PrvText"&&crate::parser::cfb_reader::decode_preview_utf16(raw).is_none()) {
+@@ -69,7 +82,11 @@
+         .map_err(SerializeError::CfbError)?;
+     // 1-pass: ID 풀 구성
+     let mut ctx = SerializeContext::collect_from_document(doc);
+-    ctx.current_standard_rows=projection.and_then(|p|p.bind_for_export(doc)).unwrap_or_default();
++    ctx.current_standard_rows=match projection{
++        RowProjection::Legacy(projection)=>projection.and_then(|p|p.bind_for_export(doc)).unwrap_or_default(),
++        RowProjection::Current(projection)=>projection.bind_for_export(doc)
++            .ok_or_else(||SerializeError::UnsupportedInput("CURRENT_FRAME_EXPORT_INPUT_CHANGED".into()))?,
++    };
+     super::paragraph_metadata_loss::record(doc,&mut ctx.content_loss);
+     super::numbering_extension_loss::record(doc, &mut ctx.content_loss);
+ 
+@@ -351,6 +368,12 @@
+     Ok(SerializedDocument::new(encrypt_hwpx_bytes(&plain,password)?,loss))
+ }
+ 
++pub(crate) fn serialize_hwpx_with_frame_rows_and_password(doc:&Document,projection:&current_frame_rows::CurrentFrameRowsProjection<'_>,password:&[u8])->Result<SerializedDocument,SerializeError>{
++    let serialized=serialize_hwpx_with_frame_rows(doc,projection)?;
++    let (plain,loss)=serialized.into_parts();
++    Ok(SerializedDocument::new(encrypt_hwpx_bytes(&plain,password)?,loss))
++}
++
+ fn encrypt_hwpx_bytes(plain: &[u8], password: &[u8]) -> Result<Vec<u8>, SerializeError> {
+     crate::password_crypto::encrypt_hwpx_package(plain, password)
+         .map_err(|error| SerializeError::CryptoError(error.to_string()))
+@@ -2220,3 +2243,5 @@
+         assert!(pic_count > 0, "sample must contain Picture controls");
+     }
+ }
++
++pub(crate) mod current_frame_rows;

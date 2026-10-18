@@ -1,0 +1,40 @@
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -2834,6 +2834,10 @@
+         if !std::ptr::eq(document,&self.document)||self.batch_mode||self.pending_pagination_job.is_some()||self.deferred_pagination_descriptor.is_some()
+             ||self.dirty_sections.iter().any(|d|*d)||self.page_count()!=1||self.pagination.len()!=1
+             ||!self.computed_row_resources_supported(){return Ok(None);}
++        // Local prefix freshness cannot expand the output binder's whole-source
++        // support. Reject this lane before constructing any candidate; the
++        // ordinary exporter and its original preservation guards remain intact.
++        if !crate::serializer::hwpx::current_frame_rows::current_source_is_admissible(document){return Ok(None);}
+         let styles=self.resolve_render_styles_for_section(0);
+         let plan=if let Some(candidate)=self.pagination.first().zip(self.measured_tables.first()).and_then(|(result,measured)|
+             CurrentFrameCandidate::from_current(document,self.source_format,result,&styles,measured,self.effective_layout_profile(),self.dpi)){
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[172, 79, 63, 173, 3, 211, 73, 171, 98, 39, 40, 1, 250, 207, 159, 217, 117, 227, 2, 85, 122, 151, 205, 194, 46, 52, 9, 178, 94, 137, 137, 145];
++pub(crate) const RESOURCE:[u8;32]=[91, 1, 2, 70, 42, 183, 224, 204, 70, 223, 165, 21, 13, 35, 175, 232, 115, 65, 10, 58, 57, 217, 238, 115, 61, 20, 78, 10, 68, 138, 249, 37];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+--- a/src/serializer/hwpx/current_frame_rows.rs
++++ b/src/serializer/hwpx/current_frame_rows.rs
+@@ -87,6 +87,13 @@
+   ((bin_data_list,font_faces,border_fills,char_shapes,tab_defs,numberings,bullets,para_shapes,styles,extra_records),
+    (print_method,raw_stream,bullet_count,memo_shape_count,memo_properties_xml,distribute_doc_data_removed,raw_stream_dirty,hwpx_head_tail,hwpml_version)),
+   (sections,preview,extra_streams,hwpx_aux_entries,supplements),(is_hwp3_variant,is_hwpx_variant,format,hwp3_lineage,hwpx_lineage,hft_ascii_halfwidth_witnessed)))
++}
++
++/// Candidate admission uses exactly the binder's whole-source support and
++/// bounded digest. This issues no plan, rows, lease, or target binding. The
++/// completed plan still requires the unchanged full source/target binder.
++pub(crate) fn current_source_is_admissible(source:&Document)->bool{
++ document_digest(source,crate::model::native_computed_resource::RESOURCE,[0;32]).is_some()
+ }
+ 
+ struct ParagraphRows{section:usize,paragraph:usize,rows:Vec<LineSeg>}

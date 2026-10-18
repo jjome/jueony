@@ -1,0 +1,271 @@
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -2848,6 +2848,9 @@
+             let Some(plan)=candidate.finalize(&physical)else{return Ok(None);};plan
+         }else if let Some(candidate)=crate::renderer::current_frame_rows_plan::CurrentExplicitColumnCandidate::from_core(self,document){
+             let physical=self.build_page_tree_with_current_selections(0)?;let Some(plan)=candidate.finalize(&physical.frame.current_physical_selections)else{return Ok(None);};plan
++        }else if let Some(candidate)=crate::renderer::current_frame_rows_plan::CurrentVisibleHostCandidate::from_core(self,document){
++            let mut physical=Vec::new();for page in 0..self.page_count(){physical.push(self.build_page_tree_with_current_selections(page)?.frame.current_physical_selections.clone());}
++            let Some(plan)=candidate.finalize(&physical)else{return Ok(None);};plan
+         }else if let Some(candidate)={
+             self.pagination.first().zip(self.measured_tables.first()).and_then(|(result,measured)|crate::renderer::current_frame_rows_plan::CurrentEqualColumnStackCandidate::from_current(document,self.source_format,result,&styles,measured,self.effective_layout_profile(),self.dpi))
+         }{
+--- a/src/document_core/queries/rendering.rs
++++ b/src/document_core/queries/rendering.rs
+@@ -7990,6 +7990,7 @@
+                 .and_then(|candidate|candidate.paint_plan(sec_idx,page_content.page_index as usize))
+         }else{None};
+         let explicit_column_paint=if current_frame_candidate.is_none()&&page_frames_paint.is_none()&&self.computed_row_resources_supported(){crate::renderer::current_frame_rows_plan::CurrentExplicitColumnCandidate::from_core(self,&self.document).map(|p|p.paint_plan())}else{None};
++        let visible_host_paint=if current_frame_candidate.is_none()&&page_frames_paint.is_none()&&explicit_column_paint.is_none()&&self.computed_row_resources_supported(){crate::renderer::current_frame_rows_plan::CurrentVisibleHostCandidate::from_core(self,&self.document).and_then(|p|p.paint_plan(sec_idx,page_content.page_index as usize))}else{None};
+         let mut tree = self.layout_engine.build_render_tree_with_current_selections(
+             render_content,
+             render_paragraphs,
+@@ -8005,7 +8006,7 @@
+             outline_num_id,
+             wrap_around_paras,
+             collect_current_selections,
+-            prefix_capture_plan.or_else(||current_frame_candidate.as_ref().map(|p|p.paint_plan())).or(page_frames_paint).or(explicit_column_paint).or_else(||{
++            prefix_capture_plan.or_else(||current_frame_candidate.as_ref().map(|p|p.paint_plan())).or(page_frames_paint).or(explicit_column_paint).or(visible_host_paint).or_else(||{
+                 if !self.computed_row_resources_supported()||self.batch_mode||self.pending_pagination_job.is_some()
+                     ||self.deferred_pagination_descriptor.is_some()||self.dirty_sections.iter().any(|v|*v){return None;}
+                 self.pagination.get(sec_idx).zip(self.measured_tables.get(sec_idx)).and_then(|(result,measured)|crate::renderer::current_frame_rows_plan::CurrentEqualColumnStackCandidate::from_current(&self.document,self.source_format,result,&default_tab_styles,measured,self.effective_layout_profile(),self.dpi)).map(|p|p.paint_plan())
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[162, 230, 233, 157, 166, 189, 108, 195, 148, 131, 174, 128, 39, 118, 78, 82, 138, 249, 74, 194, 115, 227, 88, 200, 122, 199, 255, 54, 246, 8, 187, 47];
++pub(crate) const RESOURCE:[u8;32]=[7, 161, 202, 9, 42, 131, 21, 134, 33, 221, 215, 5, 55, 35, 176, 171, 141, 251, 251, 30, 230, 7, 75, 15, 248, 226, 109, 23, 145, 234, 37, 22];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -271,6 +271,7 @@
+             ("src/renderer/current_explicit_column138.rs",include_bytes!("../renderer/current_explicit_column138.rs").as_slice()),
+             ("src/renderer/current_empty_body143.rs",include_bytes!("../renderer/current_empty_body143.rs").as_slice()),
+             ("src/renderer/current_unequal_column_prefix139.rs",include_bytes!("../renderer/current_unequal_column_prefix139.rs").as_slice()),
++            ("src/renderer/current_visible_host142.rs",include_bytes!("../renderer/current_visible_host142.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- a/src/renderer/current_frame_rows_plan.rs
++++ b/src/renderer/current_frame_rows_plan.rs
+@@ -429,3 +429,7 @@
+    allocation_generation:self.paint.generation,paragraphs:vec![CurrentFrameParagraphRows{kind:CurrentFrameRowKind::FreshBody,section:0,paragraph:0,rows}]})
+  }
+ }
++
++#[path="current_visible_host142.rs"]
++mod visible_host;
++pub(crate) use visible_host::CurrentVisibleHostCandidate;
+--- a/src/renderer/current_multiframe135_tests.rs
++++ b/src/renderer/current_multiframe135_tests.rs
+@@ -106,3 +106,6 @@
+  let physical=core.build_page_tree_with_current_selections(0).unwrap().frame.current_physical_selections.clone();assert!(CurrentExplicitColumnCandidate::from_core(&core,core.document()).unwrap().finalize(&physical).is_some());
+  let candidate=CurrentExplicitColumnCandidate::from_core(&core,core.document()).unwrap();let mut wrong=candidate.paint_plan();wrong.source_paragraphs^=1;let mut physical=physical;physical.bind_current_plan(&wrong);assert!(candidate.finalize(&physical).is_none());
+ }
++
++#[path="current_visible_host142_tests.rs"]
++mod visible142;
+--- /dev/null
++++ b/src/renderer/current_visible_host142.rs
+@@ -0,0 +1,151 @@
++//! Export-only current HWPX visible T&B host proof. Its paint plan is receipt-only:
++//! no table origin or body layout is overridden in the source or reopened file.
++use super::*;
++use crate::model::{control::Control,paragraph::{ColumnBreakType,Paragraph}};
++use super::super::{pagination::PageItem,current_physical_selections::CurrentPhysicalSelections};
++struct VisibleTable{paragraph:usize,incoming:f64,border:f64,left:f64,width:f64,body:f64,before:f64,visible:bool}
++struct VisibleFrame<'doc>{source:&'doc Document,paint:CurrentFramePaintPlan,bodies:Vec<CandidateBody>,tables:Vec<VisibleTable>,rows:Vec<CurrentFrameParagraphRows>}
++pub(crate) struct CurrentVisibleHostCandidate<'doc>{frames:Vec<VisibleFrame<'doc>>}
++fn visible_fresh(p:&Paragraph,styles:&super::super::style_resolver::ResolvedStyleSet,width:f64,dpi:f64)->Option<FreshBodyRows>{
++ if p.text.is_empty()||!p.text.chars().any(|c|!c.is_whitespace())||!matches!(p.controls.as_slice(),[Control::Table(_)])
++  ||p.ctrl_data_records.iter().any(Option::is_some){return None;}
++ let mut text=p.clone();text.controls.clear();text.ctrl_data_records.clear();text.char_count=text.char_count.checked_sub(8)?;
++ let fresh=fresh_body_rows(&text,styles,width,dpi)?;
++ // The table's sole eight-unit control follows the actual scalar/UTF16 text.
++ // Keep it in the independent generic reflow; stripping it was validation only.
++ let mut whole=p.clone();clear_fresh_input(&mut whole);
++ super::super::composer::reflow_line_segs(&mut whole,super::super::composer::ParagraphBox::body_for_style(width,styles.para_styles.get(usize::from(p.para_shape_id)),dpi),styles,dpi);
++ let actual=super::super::composer::compose_paragraph_in_context(&whole,styles);
++ if whole.line_segs.len()!=fresh.rows.len()||actual.lines.len()!=fresh.composition.lines.len()
++  ||!actual.inline_controls.is_empty()||!actual.tac_controls.is_empty()||!actual.footnote_positions.is_empty()
++  ||actual.numbering_text.is_some()||actual.horizontal_shaping.is_some()||!actual.tab_extended.is_empty()
++  ||!actual.lines.iter().zip(&fresh.composition.lines).all(|(a,b)|same_selected_line(a,b))
++  ||!whole.line_segs.iter().zip(&fresh.rows).all(|(a,b)|a.text_start==b.text_start&&a.vertical_pos==b.vertical_pos&&a.line_height==b.line_height
++   &&a.text_height==b.text_height&&a.baseline_distance==b.baseline_distance&&a.line_spacing==b.line_spacing&&a.column_start==b.column_start&&a.segment_width==b.segment_width&&a.tag==b.tag){return None;}
++ Some(fresh)
++}
++impl<'doc> CurrentVisibleHostCandidate<'doc>{
++ pub(crate) fn from_core(core:&crate::DocumentCore,source:&'doc Document)->Option<Self>{
++  if !std::ptr::eq(source,core.document())||!core.computed_row_resources_supported()||core.batch_mode||core.pending_pagination_job.is_some()
++   ||core.deferred_pagination_descriptor.is_some()||core.dirty_sections.iter().any(|d|*d)||source.sections.is_empty()||source.sections.len()>16||source.sections.len()!=core.pagination.len()
++   ||source.sections.len()!=core.measured_tables.len()||source.provenance.hwp3_lineage||!source.bin_data_content.is_empty()
++   ||core.dpi!=super::super::DEFAULT_DPI{return None;}
++  match core.source_format{crate::parser::FileFormat::Hwpx if core.effective_layout_profile().hwp5_origin_hwpx()=>{},_=>return None}
++  let contexts=source.reset_flow_contexts();let mut frames=vec![];let mut carry=0u32;let mut count=0usize;let mut cells=0usize;let mut text_bytes=0usize;let mut output_rows=0usize;let mut visible_count=0usize;
++  for(si,section)in source.sections.iter().enumerate(){let result=&core.pagination[si];let ps=&section.paragraphs;count=count.checked_add(ps.len())?;if count>128||ps.is_empty(){return None;}
++   if result.pages.len()!=1||!result.hidden_empty_paras.is_empty()||!result.pre_emitted_host_paras.is_empty()||!result.wrap_around_paras.is_empty()
++    ||!result.endnotes.is_empty()||!result.endnote_paragraphs.is_empty()||section.section_def.line_grid!=0||section.section_def.char_grid!=0
++    ||section.section_def.text_direction!=0||!section.section_def.master_pages.is_empty()||!section.section_def.extra_child_records.is_empty(){return None;}
++   let [Control::SectionDef(_),Control::ColumnDef(columns)]=ps.first()?.controls.as_slice()else{return None;};
++   if columns.column_count!=1||!columns.same_width||!columns.widths.is_empty()||!columns.gaps.is_empty()||columns.column_type!=crate::model::page::ColumnType::Normal
++    ||columns.direction!=crate::model::page::ColumnDirection::LeftToRight||columns.raw_attr!=0{return None;}
++   let context=*contexts.get(si)?.as_ref()?;let styles=core.resolve_render_styles_for_section(si);
++   if styles.reset_flow_contexts.get(si).copied().flatten()!=Some(context){return None;}
++   let trace=result.selected_composition_trace.as_ref()?;if trace.section()!=si||trace.resource()!=crate::model::native_computed_resource::RESOURCE
++    ||!trace.matches_source(ps,Some(context),core.effective_layout_profile(),core.dpi)
++    ||!(trace.matches_finalized_result(result)||(carry>0&&trace.matches_finalized_after_page_number_carry(result,carry)))||!trace.tables().is_empty(){return None;}
++   let page=&result.pages[0];if page.page_index!=0||page.section_index!=si||page.column_contents.len()!=1||page.layout.column_areas.len()!=1||!page.footnotes.is_empty()
++    ||page.active_header.is_some()||page.active_footer.is_some()||page.active_master_page.is_some()||!page.extra_master_pages.is_empty(){return None;}
++   carry=page.page_number;let col=&page.column_contents[0];let rect=page.layout.column_areas[0];
++   if col.column_index!=0||col.start_height!=0.0||col.endnote_flow||col.zone_layout.is_some()||col.zone_y_offset!=0.0||rect.width!=page.layout.body_area.width
++    ||!col.wrap_anchors.is_empty()||!col.wrap_around_paras.is_empty()||!col.inline_placements.is_empty()||!col.inline_flow_plans.is_empty()
++    ||!col.overlay_continuations.is_empty()||!col.overlay_cuts.is_empty()||!col.paragraph_float_placements.is_empty(){return None;}
++   let mut slot=0usize;let mut flow=0.0;let mut unpainted=0.0;let mut bodies=vec![];let mut tables=vec![];let mut rows=vec![];
++   for(pi,p)in ps.iter().enumerate(){text_bytes=text_bytes.checked_add(p.text.len())?;if text_bytes>2*1024*1024||p.completed_native_rows.is_some(){return None;}
++    if p.column_type!=if pi==0{ColumnBreakType::Section}else{ColumnBreakType::None}{return None;}
++    if let [Control::Table(table)]=p.controls.as_slice(){
++     if !matches!(col.items.get(slot),Some(PageItem::Table{para_index,control_index:0})if *para_index==pi)
++      ||p.stored_text_partition_is_dirty()||p.cell_format_vpos_dirty||!p.field_ranges.is_empty()||!p.range_tags.is_empty()||!p.tab_extended.is_empty()
++      ||!crate::renderer::generated_column_stack::plain_table(table,|q|q.controls.is_empty()&&q.field_ranges.is_empty()&&q.range_tags.is_empty()&&q.tab_extended.is_empty())
++      ||!table.common.raw_extra.is_empty()||table.raw_table_record_extra.iter().any(|b|*b!=0)
++      ||i32::try_from(table.common.width).ok()?.checked_add(i32::from(table.outer_margin_left))?.checked_add(i32::from(table.outer_margin_right))?!=integer_hu(rect.width,core.dpi)?{return None;}
++     if !table.raw_ctrl_data.is_empty(){return None;}
++     cells=cells.checked_add(table.cells.len())?;if cells>4096{return None;}for cell in &table.cells{cells=cells.checked_add(cell.paragraphs.len())?;if cells>4096{return None;}for q in &cell.paragraphs{text_bytes=text_bytes.checked_add(q.text.len())?;if text_bytes>2*1024*1024{return None;}}}
++     if cells>4096||text_bytes>2*1024*1024{return None;}
++     let mut ms=core.measured_tables[si].iter().filter(|m|m.para_index==pi&&m.control_index==0);let m=ms.next()?;
++     if ms.next().is_some()||m.caption_height!=0.0||m.total_height<=0.0||integer_hu(m.total_height,core.dpi)?!=i32::try_from(table.common.height).ok()?{return None;}
++     let mut facts=trace.whole_tables().iter().filter(|t|t.paragraph==pi&&t.control==0);let t=facts.next()?;let visible=!p.text.is_empty();
++     if facts.next().is_some()||t.page!=Some(0)||t.column!=0||t.post_page!=Some(0)||t.post_column!=0||t.committed_item_index!=slot||t.final_membership!=Some(true)
++      ||t.pre_text_height!=0.0||t.pre_text_end!=0||!t.is_first||!t.is_last||t.resolved.is_some()||!arithmetic_equal(t.paragraph_start,flow)||!arithmetic_equal(t.flow_before,flow)
++      ||t.body_height!=m.total_height||integer_hu(t.before,core.dpi)?!=i32::from(table.outer_margin_top)||t.full_after<0.0||t.after_for_fit<0.0{return None;}
++     let selected=trace.format(t.selected_format_id?)?;let incoming=rect.y+flow-unpainted;let border=incoming+t.before;
++     if border<rect.y||border+t.body_height>rect.y+rect.height{return None;}
++     if visible{
++      // This vertical slice closes the complete final visible host: there is no
++      // unobserved successor whose keep/float/frame placement could be affected.
++      if pi+1!=ps.len(){return None;}let fresh=visible_fresh(p,&styles,rect.width,core.dpi)?;
++      if !matches!(col.items.get(slot+1),Some(PageItem::PartialParagraph{para_index,start_line:0,end_line})if *para_index==pi&&*end_line==fresh.rows.len())
++       ||selected.actual_input_width_px!=Some(rect.width)||selected.source_text!=p.text||selected.source_char_offsets!=p.char_offsets
++       ||selected.paragraph_style!=fresh.composition.para_style_id||selected.known_square_band||selected.has_numbering||selected.has_horizontal_shaping
++       ||!selected.inline_controls.is_empty()||!selected.tac_controls.is_empty()||!selected.footnote_positions.is_empty()||!selected.tab_extended.is_empty()
++       ||selected.lines.len()!=fresh.rows.len()||t.selected_line_count!=fresh.rows.len()||selected.before!=0.0||selected.after!=0.0
++       ||!selected.lines.iter().zip(&fresh.composition.lines).all(|(a,b)|fact_line_matches(a,b,false))||t.table_total_height!=t.body_height{return None;}
++      let advance:f64=fresh.rows.iter().map(|r|super::super::hwpunit_to_px(r.line_height+r.line_spacing,core.dpi)).sum();
++      let bottom=super::super::hwpunit_to_px(i32::from(table.outer_margin_bottom),core.dpi);
++      let spacing=super::super::hwpunit_to_px(fresh.rows.last()?.line_spacing,core.dpi);
++      if !arithmetic_equal(t.full_after,bottom+spacing)||!arithmetic_equal(t.after_for_fit,t.full_after)
++       ||!arithmetic_equal(t.flow_after,flow+t.before+t.body_height+bottom+advance){return None;}
++      let y=border+t.body_height+bottom;let mut projected=fresh.rows.clone();let mut offset=0.0;
++      for row in &mut projected{row.vertical_pos=integer_hu(y-rect.y+offset,core.dpi)?;offset+=super::super::hwpunit_to_px(row.line_height+row.line_spacing,core.dpi);}
++      rows.push(CurrentFrameParagraphRows{kind:CurrentFrameRowKind::FreshBody,section:si,paragraph:pi,rows:projected});bodies.push(CandidateBody{paragraph:pi,physical_y:y,fresh,allow_empty_unused_width:false});visible_count+=1;slot+=2;
++     }else{
++      if p.char_count!=9||!p.char_offsets.is_empty()||!arithmetic_equal(t.table_total_height,t.before+t.body_height+t.after_for_fit)
++       ||!arithmetic_equal(t.flow_after,flow+t.table_total_height)||integer_hu(t.full_after-t.after_for_fit,core.dpi)?!=i32::from(table.outer_margin_bottom){return None;}
++      let mut plain=p.clone();plain.controls.clear();plain.char_count=1;fresh_body_rows(&plain,&styles,rect.width,core.dpi)?;
++      let mut host=p.clone();clear_fresh_input(&mut host);super::super::composer::reflow_line_segs(&mut host,super::super::composer::ParagraphBox::body_for_style(rect.width,styles.para_styles.get(usize::from(p.para_shape_id)),core.dpi),&styles,core.dpi);
++      let composition=super::super::composer::compose_paragraph_in_context(&host,&styles);if host.line_segs.len()!=1||composition.lines.len()!=1||selected.lines.len()!=1
++       ||selected.source_text!=p.text||selected.source_char_offsets!=p.char_offsets||selected.paragraph_style!=composition.para_style_id||selected.known_square_band||selected.has_numbering||selected.has_horizontal_shaping
++       ||!selected.inline_controls.is_empty()||!selected.tac_controls.is_empty()||!selected.footnote_positions.is_empty()||!selected.tab_extended.is_empty()
++       ||!fact_line_matches(&selected.lines[0],&composition.lines[0],true){return None;}
++      host.line_segs[0].vertical_pos=integer_hu(border-rect.y-t.before,core.dpi)?;
++      rows.push(CurrentFrameParagraphRows{kind:CurrentFrameRowKind::FreshBody,section:si,paragraph:pi,rows:host.line_segs});unpainted+=t.before;slot+=1;
++     }
++     tables.push(VisibleTable{paragraph:pi,incoming,border,left:rect.x+super::super::hwpunit_to_px(i32::from(table.outer_margin_left),core.dpi),width:super::super::hwpunit_to_px(i32::try_from(table.common.width).ok()?,core.dpi),body:t.body_height,before:t.before,visible});flow=t.flow_after;
++    }else{
++     if !matches!(col.items.get(slot),Some(PageItem::FullParagraph{para_index})if *para_index==pi){return None;}let fresh=fresh_body_rows(p,&styles,rect.width,core.dpi)?;
++     let mut cs=trace.commits().iter().filter(|c|c.paragraph==pi);let c=cs.next()?;let f=trace.format(c.format_id)?;let empty=p.text.is_empty()&&p.controls.is_empty();
++     if cs.next().is_some()||c.page!=Some(0)||c.column!=0||c.committed_item_index!=Some(slot)||c.final_membership!=Some(true)||c.row_start!=0||c.row_end!=fresh.rows.len()
++      ||c.reused_multicolumn_format||c.same_format_reused_after_slot_change||c.trimmed_before!=0.0||c.actual_column_width_px!=rect.width||!c.metrics_still_match_selected_format||!c.range_inside_selected_composition
++      ||!arithmetic_equal(c.flow_before,flow)||f.source_text!=p.text||f.source_char_offsets!=p.char_offsets||f.paragraph_style!=fresh.composition.para_style_id
++      ||(!empty&&f.actual_input_width_px!=Some(rect.width))||f.known_square_band||f.has_numbering||f.has_horizontal_shaping||!f.tac_controls.is_empty()||!f.footnote_positions.is_empty()||!f.tab_extended.is_empty()
++      ||f.inline_controls.len()!=fresh.composition.inline_controls.len()||!f.inline_controls.iter().zip(&fresh.composition.inline_controls).all(|((line,index,kind),c)|*line==c.line_index&&*index==c.control_index&&*kind==format!("{:?}",c.control_type))
++      ||f.before!=0.0||f.after!=0.0||f.lines.len()!=fresh.rows.len()||!f.lines.iter().zip(&fresh.composition.lines).all(|(a,b)|fact_line_matches(a,b,empty)){return None;}
++     let total:f64=fresh.rows.iter().map(|r|super::super::hwpunit_to_px(r.line_height+r.line_spacing,core.dpi)).sum();if !arithmetic_equal(c.advance,total)||!arithmetic_equal(c.flow_after,flow+total){return None;}
++     let y=rect.y+flow-unpainted;let mut projected=fresh.rows.clone();let mut offset=0.0;for row in &mut projected{row.vertical_pos=integer_hu(y-rect.y+offset,core.dpi)?;offset+=super::super::hwpunit_to_px(row.line_height+row.line_spacing,core.dpi);}
++     rows.push(CurrentFrameParagraphRows{kind:CurrentFrameRowKind::FreshBody,section:si,paragraph:pi,rows:projected});bodies.push(CandidateBody{paragraph:pi,physical_y:y,fresh,allow_empty_unused_width:empty});flow=c.flow_after;slot+=1;
++    }
++    if flow>rect.height{return None;}
++   }
++   if slot!=col.items.len()||!arithmetic_equal(flow,col.used_height)||trace.commits().len()+trace.whole_tables().len()!=ps.len()||core.measured_tables[si].len()!=tables.len(){return None;}
++   for p in &rows{output_rows=output_rows.checked_add(p.rows.len())?;}if output_rows>4096{return None;}
++   let mut h=blake3::Hasher::new();h.update(b"current-visible-host-receipt-only142-1\0");h.update(&trace.resource());h.update(&trace.generation().to_le_bytes());h.update(&context);h.update(&(si as u64).to_le_bytes());
++   let paint=CurrentFramePaintPlan{source_paragraphs:ps.as_ptr()as usize,generation:*h.finalize().as_bytes(),section:si,page:0,column:0,rect,tables:Vec::new(),additional_frames:Vec::new()};
++   frames.push(VisibleFrame{source,paint,bodies,tables,rows});
++  }
++  if visible_count==0{return None;}Some(Self{frames})
++ }
++ pub(crate) fn paint_plan(&self,section:usize,page:usize)->Option<CurrentFramePaintPlan>{if page!=0{return None;}Some(self.frames.get(section)?.paint.clone())}
++ pub(crate) fn finalize(self,physical:&[CurrentPhysicalSelections])->Option<CurrentFrameRowsPlan<'doc>>{
++  if self.frames.len()!=physical.len(){return None;}let source=self.frames.first()?.source;let mut rows=vec![];let mut generation=blake3::Hasher::new();generation.update(b"current-visible-host-final142-1\0");
++  for(capture,frame)in physical.iter().zip(self.frames){
++   if !capture.matches_current_plan(&frame.paint){return None;}let [owner]=capture.frames()? else{return None;};
++   if owner.section!=frame.paint.section||owner.page!=0||owner.column!=0||owner.column_ordinal!=0||owner.has_zone||owner.zone_y!=0.0
++    ||owner.rect.x!=frame.paint.rect.x||owner.rect.y!=frame.paint.rect.y||owner.rect.width!=frame.paint.rect.width||owner.rect.height!=frame.paint.rect.height{return None;}
++   let selected=capture.rows()?;let tables=capture.tables()?;if selected.len()!=frame.bodies.iter().map(|b|b.fresh.rows.len()).sum::<usize>()||tables.len()!=frame.tables.len(){return None;}
++   for body in &frame.bodies{let actual=selected.iter().filter(|r|r.frame.paragraph==body.paragraph).collect::<Vec<_>>();
++    if actual.len()!=body.fresh.rows.len(){return None;}let mut offset=0.0;
++    for(i,(fresh,row))in body.fresh.composition.lines.iter().zip(actual).enumerate(){let f=&row.frame;if f.node!=owner.node||f.line!=i||f.equation_adjusted||f.has_wrap_anchor||f.physical_frame_rows||f.stored_horizontal_span_used
++     ||f.effective_column_x!=owner.rect.x||f.effective_column_width!=owner.rect.width||f.available_width!=owner.rect.width||f.margin_left!=0.0||f.margin_right!=0.0||f.inline_offset!=0.0||f.numbering_offset!=0.0
++     ||!arithmetic_equal(f.physical_text_y,body.physical_y+offset)||f.final_line_box_height!=super::super::hwpunit_to_px(fresh.line_height,super::super::DEFAULT_DPI)
++     ||(!same_selected_line(fresh,&row.selected)&&!(body.allow_empty_unused_width&&same_empty_line_ignoring_unused_width(fresh,&row.selected))){return None;}offset+=super::super::hwpunit_to_px(fresh.line_height+fresh.line_spacing,super::super::DEFAULT_DPI);}}
++   for t in &frame.tables{let mut matches=tables.iter().filter(|a|a.paragraph==t.paragraph&&a.control==0);let a=matches.next()?;let border=a.emitted_border?;
++    if matches.next().is_some()||a.node!=owner.node||a.typed_float||a.inline||a.treat_as_char||a.selected_outer_inset!=0.0||!arithmetic_equal(a.incoming_y,t.incoming)||!arithmetic_equal(a.paragraph_y,t.incoming)
++     ||a.visual_height!=t.body||!arithmetic_equal(border[0],t.left)||!arithmetic_equal(border[1],t.border)||border[2]!=t.width||border[3]!=t.body{return None;}
++    let selected_top=if t.visible{if a.lane_input.is_some(){return None;}t.incoming}else{let lane=a.lane_input?;if !arithmetic_equal(lane[2],t.border)||!arithmetic_equal(lane[3],t.border)||!arithmetic_equal(lane[4],t.incoming)||lane[5]!=0.0{return None;}t.border};
++    if !arithmetic_equal(a.selected_y,selected_top)||!arithmetic_equal(a.visual_end,t.border+t.body)||!arithmetic_equal(a.flow_end,t.border+t.body)||!arithmetic_equal(t.border,t.incoming+t.before){return None;}
++   }
++   generation.update(&frame.paint.generation);rows.extend(frame.rows);
++  }
++  Some(CurrentFrameRowsPlan{source,resource:crate::model::native_computed_resource::RESOURCE,allocation_generation:*generation.finalize().as_bytes(),paragraphs:rows})
++ }
++}
+--- /dev/null
++++ b/src/renderer/current_visible_host142_tests.rs
+@@ -0,0 +1,45 @@
++use super::*;
++fn output()->std::path::PathBuf{let p=std::env::var("N001_ROOT").map(std::path::PathBuf::from).map(|p|p.join("build/n001-visible-host142")).unwrap_or_else(|_|std::env::temp_dir().join(format!("jueony-visible142-{}",std::process::id())));std::fs::create_dir_all(&p).unwrap();p}
++fn input(origin:&str)->crate::DocumentCore{let core=actual_boundary_core("sections");if origin=="native"{core}else{let a=core.export_hwpx_native_with_report().unwrap();assert!(a.content_loss().is_empty());crate::DocumentCore::from_bytes(a.bytes()).unwrap()}}
++fn physical(core:&crate::DocumentCore)->Vec<crate::renderer::current_physical_selections::CurrentPhysicalSelections>{(0..core.page_count()).map(|p|core.build_page_tree_with_current_selections(p).unwrap().frame.current_physical_selections.clone()).collect()}
++fn xml_coordinates(core:&crate::DocumentCore,bytes:&[u8])->usize{
++ let captures=physical(core);let mut zip=zip::ZipArchive::new(std::io::Cursor::new(bytes)).unwrap();assert!(zip.by_name(crate::model::native_computed_rows::PATH).is_err());let mut count=0;
++ for(si,section)in core.document.sections.iter().enumerate(){let mut xml=String::new();zip.by_name(&format!("Contents/section{si}.xml")).unwrap().read_to_string(&mut xml).unwrap();let xml=roxmltree::Document::parse(&xml).unwrap();let ns="http://www.hancom.co.kr/hwpml/2011/paragraph";let ps=xml.root_element().children().filter(|n|n.has_tag_name((ns,"p"))).collect::<Vec<_>>();assert_eq!(ps.len(),section.paragraphs.len());
++  for(pi,p)in ps.iter().enumerate(){let array=p.children().find(|n|n.has_tag_name((ns,"linesegarray"))).unwrap();let rows=array.children().filter(|n|n.has_tag_name((ns,"lineseg"))).collect::<Vec<_>>();let(capture,frame)=captures.iter().flat_map(|c|c.frames().unwrap().iter().map(move|f|(c,f))).find(|(_,f)|f.section==si).unwrap();let source=&section.paragraphs[pi];
++   if source.text.is_empty()&&matches!(source.controls.as_slice(),[crate::model::control::Control::Table(_)]){let crate::model::control::Control::Table(t)=&source.controls[0]else{unreachable!()};let table=capture.tables().unwrap().iter().find(|t|t.paragraph==pi).unwrap();assert_eq!(rows.len(),1);let v:i32=rows[0].attribute("vertpos").unwrap().parse().unwrap();assert!(arithmetic_equal(frame.rect.y+f64::from(v+i32::from(t.outer_margin_top))/75.0,table.emitted_border.unwrap()[1]));count+=1;
++   }else{let selected=capture.rows().unwrap().iter().filter(|r|r.frame.paragraph==pi).collect::<Vec<_>>();assert_eq!(rows.len(),selected.len());for(row,selected)in rows.iter().zip(selected){let v:i32=row.attribute("vertpos").unwrap().parse().unwrap();assert!(arithmetic_equal(frame.rect.y+f64::from(v)/75.0,selected.frame.physical_text_y));count+=1;}}
++  }
++ }count
++}
++fn run_case(origin:&str,name:&str,payload:&str)->Value{
++ let dir=output().join(format!("xml-only-{origin}-{name}"));std::fs::create_dir_all(&dir).unwrap();let mut core=input(origin);let undo=core.save_snapshot_native();let initial=snapshot(&core);let target=core.document.sections[0].paragraphs.len()-1;
++ core.insert_text_native(0,target,0,payload).unwrap();let before=snapshot(&core);let story=core.text_file_unicode_json();let redo=core.save_snapshot_native();let mut results=vec![];let mut coordinates=0;
++ let candidate=CurrentVisibleHostCandidate::from_core(&core,core.document());let eligible=candidate.is_some();let closed=candidate.and_then(|p|p.finalize(&physical(&core))).is_some();
++ if !eligible||!closed{let r=json!({"origin":origin,"case":name,"eligible":eligible,"closed":closed,"failures":[{"stage":"candidate","eligible":eligible,"closed":closed}],"results":[]});std::fs::write(dir.join("result.json"),serde_json::to_vec_pretty(&r).unwrap()).unwrap();return r;}
++ for api in 0..4{let source=format!("{:?}",core.document());let events=core.serialize_event_log();let bytes=match api{0=>core.export_hwpx_native().unwrap(),1=>{let a=core.export_hwpx_native_with_report().unwrap();assert!(a.content_loss().is_empty());a.into_bytes()},2=>core.export_hwpx_native_with_password(b"Visible142!Own").unwrap(),_=>{let a=core.export_hwpx_native_with_password_and_report(b"Visible142!Own").unwrap();assert!(a.content_loss().is_empty());a.into_bytes()}};
++  if api==0{coordinates=xml_coordinates(&core,&bytes);std::fs::write(dir.join("original-current-layout.json"),serde_json::to_vec_pretty(&before).unwrap()).unwrap();}
++  let path=dir.join(format!("api{api}.hwpx"));std::fs::write(&path,&bytes).unwrap();let disk=std::fs::read(path).unwrap();assert_eq!(disk,bytes);let next=if api<2{crate::DocumentCore::from_bytes(&disk)}else{crate::DocumentCore::from_bytes_with_password(&disk,b"Visible142!Own")}.unwrap();let mut differences=vec![];super::differences(&before,&snapshot(&next),"$",&mut differences);assert_eq!(story,next.text_file_unicode_json());assert_eq!(source,format!("{:?}",core.document()));assert_eq!(events,core.serialize_event_log());results.push(json!({"api":api,"geometry":differences.len(),"differences":differences,"sourceUnchanged":true,"eventLogUnchanged":true,"diskExact":true}));
++ }
++ for(name,id,expected)in[("undo",undo,&initial),("redo",redo,&before)]{core.restore_snapshot_native(id).unwrap();let mut differences=vec![];super::differences(expected,&snapshot(&core),"$",&mut differences);results.push(json!({"history":name,"geometry":differences.len(),"differences":differences}));}assert_eq!(story,core.text_file_unicode_json());
++ for cycle in 0..3{let source=format!("{:?}",core.document());let events=core.serialize_event_log();let expected=snapshot(&core);let a=core.export_hwpx_native_with_report().unwrap();assert!(a.content_loss().is_empty());let path=dir.join(format!("cycle{cycle}.hwpx"));std::fs::write(&path,a.bytes()).unwrap();let disk=std::fs::read(path).unwrap();assert_eq!(disk,a.bytes());let next=crate::DocumentCore::from_bytes(&disk).unwrap();let mut differences=vec![];super::differences(&expected,&snapshot(&next),"$",&mut differences);assert_eq!(story,next.text_file_unicode_json());assert_eq!(source,format!("{:?}",core.document()));assert_eq!(events,core.serialize_event_log());results.push(json!({"cycle":cycle,"format":"hwpx","geometry":differences.len(),"differences":differences,"sourceUnchanged":true,"eventLogUnchanged":true,"diskExact":true}));
++  core=next;
++ }
++ let section=core.document.sections.len()-1;let paragraph=core.document.sections[section].paragraphs.len()-1;core.insert_text_native(section,paragraph,0,"다시 열어 남기는 뒤 본문 ").unwrap();let expected=snapshot(&core);let final_story=core.text_file_unicode_json();
++ for hwpx in [true]{let source=format!("{:?}",core.document());let events=core.serialize_event_log();let a=if hwpx{core.export_hwpx_native_with_report()}else{core.export_hwp_with_adapter_snapshot_with_report()}.unwrap();assert!(a.content_loss().is_empty());let path=dir.join(if hwpx{"final-followup.hwpx"}else{"final-followup.hwp"});std::fs::write(&path,a.bytes()).unwrap();let disk=std::fs::read(path).unwrap();assert_eq!(disk,a.bytes());let next=crate::DocumentCore::from_bytes(&disk).unwrap();let mut differences=vec![];super::differences(&expected,&snapshot(&next),"$",&mut differences);assert_eq!(final_story,next.text_file_unicode_json());assert_eq!(source,format!("{:?}",core.document()));assert_eq!(events,core.serialize_event_log());results.push(json!({"followup":true,"format":if hwpx{"hwpx"}else{"hwp"},"geometry":differences.len(),"differences":differences,"sourceUnchanged":true,"eventLogUnchanged":true,"diskExact":true}));}
++ let failures=results.iter().filter(|r|r["geometry"]!=0).cloned().collect::<Vec<_>>();assert_eq!(results.len(),10);let r=json!({"origin":origin,"case":name,"eligible":eligible,"closed":closed,"results":results,"failures":failures,"rawZipCoordinateAssertions":coordinates});std::fs::write(dir.join("result.json"),serde_json::to_vec_pretty(&r).unwrap()).unwrap();r
++}
++#[test]fn actual_visible_hosts_xml_only_storage_history_and_reopens(){
++ let mut reports=vec![];for origin in ["xml"]{for(name,payload)in[("short","후속 편집 ".to_owned()),("astral","계속 남는 🙂 𠮷 추가 본문 ".to_owned()),("wrapped","여러 줄에 걸쳐 실제로 남는 표 호스트 본문입니다. ".repeat(10))]{reports.push(run_case(origin,name,&payload));}}
++ let failures=reports.iter().filter(|r|!r["failures"].as_array().unwrap().is_empty()).cloned().collect::<Vec<_>>();let observations=reports.iter().map(|r|r["results"].as_array().unwrap().len()).sum::<usize>();let zip=reports.iter().filter_map(|r|r["rawZipCoordinateAssertions"].as_u64()).sum::<u64>();let result=json!({"reports":reports,"observations":observations,"failures":failures,"rawZipCoordinateAssertions":zip});std::fs::write(output().join("xml-only-storage-results.json"),serde_json::to_vec_pretty(&result).unwrap()).unwrap();assert!(failures.is_empty());assert_eq!(observations,30);
++}
++#[test]fn actual_visible_host_refuses_stale_source_membership_and_physical_fields(){
++ let mut core=input("xml");let target=core.document.sections[0].paragraphs.len()-1;core.insert_text_native(0,target,0,"후속 편집 ").unwrap();assert!(CurrentVisibleHostCandidate::from_core(&core,core.document()).is_some());let mut native=input("native");native.insert_text_native(0,target,0,"후속 편집 ").unwrap();assert!(CurrentVisibleHostCandidate::from_core(&native,native.document()).is_none());let clone=core.document.clone();assert!(CurrentVisibleHostCandidate::from_core(&core,&clone).is_none());
++ core.dirty_sections[0]=true;assert!(CurrentVisibleHostCandidate::from_core(&core,core.document()).is_none());core.dirty_sections[0]=false;
++ let old=core.measured_tables[0][1].total_height;core.measured_tables[0][1].total_height+=1.0;assert!(CurrentVisibleHostCandidate::from_core(&core,core.document()).is_none());core.measured_tables[0][1].total_height=old;
++ core.document.sections[0].paragraphs[target].char_count+=1;assert!(CurrentVisibleHostCandidate::from_core(&core,core.document()).is_none());core.document.sections[0].paragraphs[target].char_count-=1;
++ let old=core.document.sections[0].paragraphs[target].column_type;core.document.sections[0].paragraphs[target].column_type=crate::model::paragraph::ColumnBreakType::Page;assert!(CurrentVisibleHostCandidate::from_core(&core,core.document()).is_none());core.document.sections[0].paragraphs[target].column_type=old;
++ let physical=physical(&core);assert!(CurrentVisibleHostCandidate::from_core(&core,core.document()).unwrap().finalize(&physical).is_some());
++ for field in 0..9{let candidate=CurrentVisibleHostCandidate::from_core(&core,core.document()).unwrap();let original=&physical[0];let frame=&original.frames().unwrap()[0];let mut poison=crate::renderer::current_physical_selections::CurrentPhysicalSelections::default();poison.enable_new_page_capture();poison.bind_current_plan(&candidate.paint_plan(0,0).unwrap());poison.register_frame(frame.node,&core.pagination[0].pages[0],&core.pagination[0].pages[0].column_contents[0],&frame.rect);
++  for row in original.rows().unwrap(){poison.record_row(row.frame.clone(),&row.selected);}for table in original.tables().unwrap(){let mut table=table.clone();if table.paragraph==target{match field{0=>table.incoming_y+=1.0,1=>table.paragraph_y+=1.0,2=>table.selected_y+=1.0,3=>table.visual_end+=1.0,4=>table.flow_end+=1.0,5=>table.emitted_border.as_mut().unwrap()[0]+=1.0,6=>table.emitted_border.as_mut().unwrap()[1]+=1.0,7=>table.emitted_border.as_mut().unwrap()[2]+=1.0,_=>table.emitted_border.as_mut().unwrap()[3]+=1.0};}poison.record_table(table);}poison.finish_frame(frame.node);let mut captures=physical.clone();captures[0]=poison;assert!(candidate.finalize(&captures).is_none(),"field {field}");
++ }
++}

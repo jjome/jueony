@@ -1,0 +1,23 @@
+{
+  "status": "PASS_AUTOMATED_SCOPED_REFLOW_STORAGE_FIX_NOT_ENTIRE_FILE_PART_PARITY",
+  "engineSourceId": "7c10dba04ed65742",
+  "wasmSha256": "5772f16df2f56b9378f0a9683f5c46b0a6901ffd68f099aa3e8c1c8c65f5e40f",
+  "sameBuildCases": 242,
+  "suites": 19,
+  "unitCases": 970,
+  "unitSkipped": 0,
+  "columnCases": 24,
+  "realWindowsStorageCases": 10,
+  "bundleCases": 7,
+  "featureDocumentTests": 12,
+  "savedSamples": 24,
+  "nativeSelectedContractCases": 17,
+  "nativeAdapterCases": 10,
+  "hancomDirectComparison": "DEFERRED_BY_USER",
+  "remaining": [
+    "Original MCST/Python3 initial font/line/page layout parity",
+    "Explicit textDir HWP5 serialization mapping",
+    "Broader HWT/XML/XSL/XSD and all-file-menu/OS-dialog scope"
+  ],
+  "scope": "Exact named reflow/storage defects and consistency boundaries corrected; preserves independent published comparison and original refusal for unsupported loss. No product-wide completion percentage."
+}

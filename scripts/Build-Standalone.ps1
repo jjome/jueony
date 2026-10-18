@@ -238,7 +238,7 @@ foreach ($evidenceName in @('pre-agent-2026-10-13','page-border-2026-10-13','ses
     }
 }
 # Include current generated feature documents and only this bundle's synthetic evidence.
-foreach ($guide in @('106-recovery-integrity.md','107-native-file-storage.md','108-file-preservation-completion.md')) {
+foreach ($guide in @('106-recovery-integrity.md','107-native-file-storage.md','108-file-preservation-completion.md','109-file-preservation-hancom-followup.md','110-file-preservation-integration.md','111-file-storage-final-review.md','112-file-recovery-implementation.md','113-file-format-preservation.md','114-native-row-storage.md','115-column-width-storage.md','116-reflowed-native-storage.md')) {
     if (Test-Path -LiteralPath (Join-Path $projectRoot ('docs/' + $guide))) {
         Copy-Item -LiteralPath (Join-Path $projectRoot ('docs/' + $guide)) -Destination $output -Force
     }

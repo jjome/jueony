@@ -187,6 +187,8 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
                 return ("상위 " if not tasks else "") + f"{states[done]}/{total}" + (f" · 부분 {states['PARTIAL']}" if states["PARTIAL"] else "")
             pending = priority_tasks(items, complete)[:1]
             next_work = (f"{next_axis(pending[0])} " + task_link(pending[0], current) + " " + escaped(pending[0]["task"])) if pending else "상세 작업 분해 필요" if not tasks else "기록된 작업 완료"
+            if group.get("update"):
+                next_work = escaped(group["update"]) + " · " + next_work
             if group.get("working"):
                 next_work = "**통합 검증 중** · " + next_work
             rollups = [r for r in items if r["kind"] != "TASK"]

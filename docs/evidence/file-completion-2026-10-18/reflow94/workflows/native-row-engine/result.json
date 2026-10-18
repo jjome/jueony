@@ -1,0 +1,1231 @@
+{
+  "engine": {
+    "jsSha256": "72828c03b5b92948e0acd45bcd3de0263c8570bfbfaeab283eb5998e1b72b22d",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "wasmSha256": "5772f16df2f56b9378f0a9683f5c46b0a6901ffd68f099aa3e8c1c8c65f5e40f",
+    "buildMode": "wsl-review-no-opt",
+    "patches": [
+      {
+        "name": "border-fill-identity.patch",
+        "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c"
+      },
+      {
+        "name": "default-tabs.patch",
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+      },
+      {
+        "name": "document-insertion.patch",
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+      },
+      {
+        "name": "master-page-editing.patch",
+        "sha256": "b04c7d682e105e3f37f72a18c1b4bb01cbf085424e3219f3919fd8c891dc26c2"
+      },
+      {
+        "name": "merged-table-transpose.patch",
+        "sha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768"
+      },
+      {
+        "name": "note-query-json.patch",
+        "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562"
+      },
+      {
+        "name": "page-border-entries.patch",
+        "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f"
+      },
+      {
+        "name": "page-border-inclusion.patch",
+        "sha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e"
+      },
+      {
+        "name": "page-border-region.patch",
+        "sha256": "ea98aed9ad8568699b802c5f46e4964fe524ba7634bc978d71fe10f44e1d7412"
+      },
+      {
+        "name": "page-border-z-image.patch",
+        "sha256": "97ccd3c9eac24c42b0844fc65e5804b232d3bef9929a6fd5de329cdd007b173b"
+      },
+      {
+        "name": "section-split.patch",
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+      },
+      {
+        "name": "style-reference-deletion.patch",
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+      },
+      {
+        "name": "style-reference-order.patch",
+        "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce"
+      },
+      {
+        "name": "style-shape-stories.patch",
+        "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af"
+      },
+      {
+        "name": "table-creation-consistency.patch",
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+      },
+      {
+        "name": "zz-line-number-settings.patch",
+        "sha256": "4cb8ce4a8d49864f53c3ff95fdfc8ef3e0342b09f86cd525dfb9aa102e2dee72"
+      },
+      {
+        "name": "zzz-page-body-delete.patch",
+        "sha256": "54bf1697627ec92c4379fb8ca314f9bf9d99c2207bf9e90859d35c7324be2e83"
+      },
+      {
+        "name": "zzzz-page-body-copy.patch",
+        "sha256": "45f3331d992f3799dad1f076bfd6d237d8c989541ea510d888e4afb5407749db"
+      },
+      {
+        "name": "zzzzz-page-body-paper-paste.patch",
+        "sha256": "4df977f851378597848aa60581957c123e6565ebf04f9412052dbfdabb2c43a0"
+      },
+      {
+        "name": "zzzzzz-page-body-style-paste.patch",
+        "sha256": "168c4c158bc0db3e71230903eae0b1ae71092a1a139f2ad5747712f95127bd75"
+      },
+      {
+        "name": "zzzzzzz-page-body-image-paste.patch",
+        "sha256": "ac08a167a376bae3e1e890f8109f2f9552ce952abe7882712f813183597ce57a"
+      },
+      {
+        "name": "zzzzzzzz-empty-section-remove.patch",
+        "sha256": "d49d3acc5bc0b3049415e17233a7f7a7249792f6500d475ce6cd39d3ad14d590"
+      },
+      {
+        "name": "zzzzzzzzz-hwpx-body-caret.patch",
+        "sha256": "c073ab44d5460f92915ea6493a791d2cbf24bb60ad66eca5033be0fc9835ac56"
+      },
+      {
+        "name": "zzzzzzzzzz-agent-page-background.patch",
+        "sha256": "74104eca6a40a3a7f06ad6d20ed8f44f816f0c153a2be40fdf584b61fc9ba907"
+      },
+      {
+        "name": "zzzzzzzzzzz-agent-header-footer.patch",
+        "sha256": "415fa55bc5fe0c4f49a7dce025723067022d7bdef076a9fb48b7f456c30cb91a"
+      },
+      {
+        "name": "zzzzzzzzzzzz-agent-paragraph-tabs.patch",
+        "sha256": "d15949747520d51020433aca32539f79c5a8cc0dfdad9de95db221dae651b311"
+      },
+      {
+        "name": "zzzzzzzzzzzzz-agent-paragraph-decoration.patch",
+        "sha256": "2adf2bba46d11a6ca97ce838da1d329c627c8532812674b7329aaef3cdb544fb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzz-agent-paragraph-lists.patch",
+        "sha256": "06e1af9e90e0c54da772a533f9c2ac5279db059c37fb3612c189e0d7e1c7692d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzz-agent-basic-bullets.patch",
+        "sha256": "03138686d9faa51fcf335f1b6299a294248031d36ca079da5346e52d0b531a35"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzz-agent-numbering-clone.patch",
+        "sha256": "a79207f328ca0521515344c018554ccc20092142dabaa5ba413ff162408fa567"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzz-agent-basic-numbering.patch",
+        "sha256": "66ac344e90a16b3e447e97bd6a593edbc7b9e024313cc40f81f2611838f3b102"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzz-agent-paragraph-outline.patch",
+        "sha256": "dfe19d3083f6a4222440ce558b5451f2568cf57b211bcc19babb508c1db2022e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzz-agent-style-metadata.patch",
+        "sha256": "53c6a573df6e8f1d0af4f388dad4e624a700006ad38f7a1de820eabc1d6d44cb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzz-whole-table-edited-host.patch",
+        "sha256": "f90714f601227bba000d63be77e5ac9f3985d192e613990984544b2f70b0f603"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzz-table-default-padding-reflow.patch",
+        "sha256": "903260c4c371a2a1d4b0afa72f8f0e1f191db936bd6e055a974a0a4295badf0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzz-hidden-paragraph-page-owner.patch",
+        "sha256": "13df5f1c5493ef4560866f3806be6a3bd2c748e50a1fc531dac686994e310b6b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-following-table-flow-owner.patch",
+        "sha256": "251cb5ee2d06a1a78732d7c01839bf4bf596a5376ce5af8637b50d8c0633f897"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-memo-tail-owner.patch",
+        "sha256": "5f4eafa802c6dd9dde96a1def6e187ef1be5b3f7e9a99cf8d4569458d0d0bca0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzz-table-outer-margin-owner.patch",
+        "sha256": "6132e26aa3a5b14f506f425d79930882a5c48092eac8e96bc4c8735cc8d42db3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-table-tail-snapshot.patch",
+        "sha256": "11a853d99a9278fd94e2c573d384f3826c53b00a433bcb6b9fa04fb24e344f0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzz-conversion-semantic-storage.patch",
+        "sha256": "65f3e6e87bb1030f2e565cfd96d36b85dc4065de8fb3615a2db24a9d4121a092"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-zone-observation.patch",
+        "sha256": "9dc3ffd29ada303898ab21268fb72e23b1b56bcf7c589a11687716848e80bb70"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-textbox-alignment-storage.patch",
+        "sha256": "b9d8791a5e9b7b5e6b5d1bd794f3a7ebe9012c7bc8403c49333217cfef434122"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-footnote-style-identity.patch",
+        "sha256": "867d4ac34306a4edfb4360b2d9d51d5bb5bc43dedf5abd6919cedeba427894e6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-merged-row-height.patch",
+        "sha256": "6364cba702decf8160fea341932f5b0df6481c51fe135c2d77b6cae1c52192a3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-session-story-evidence.patch",
+        "sha256": "4f59265ba0740ad570a7dcbdd964a06a1d99075052713e70d9c1b755b83caab8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-visible-tail-snapshot.patch",
+        "sha256": "10dbdd14e2603200bec9ebcf34417c224d4f77624fc83ddf76a3c0cb28e8931e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-root-line-snapshot.patch",
+        "sha256": "509a2d497b5fe4c651b26954b6874e1a95ac4a2655391f88446f70f6735c4ef0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-overlap-origin.patch",
+        "sha256": "35f34ab3553354c4920e3ba51810770a997561fc896b40c73fb012f371dcfd96"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-reflow-markers.patch",
+        "sha256": "21e7d77e4f93072efc71718c2ea9e1ce15ff26a0fe343378b474a16a136856c8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-whole-table-flow.patch",
+        "sha256": "4f376b5c88ae4d26c9ec890ebefd352ac004e94b292afbc36ffdbf95525f514a"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-typeset-advance-grid.patch",
+        "sha256": "4b55713647b5567ec88b39853b8a28efe4811bd08025ccf9c1f20c4554732638"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-width.patch",
+        "sha256": "1cc54a1f9c37f31d034f66f8b0fbc4dedd3bffff7fb7094b824ebb88ae187183"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-marker-whole-flow.patch",
+        "sha256": "9b954250e8ddbc67cbfd9eda3898deb1f892de63483e3d9ae8eed2d9b4c574d7"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-origin-hwpx-query.patch",
+        "sha256": "e419b33ca35e25c63b2ec40ba99cec33a7dee2690d3035e070cca2c9efa23581"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-nonflow-prefix-band-origin.patch",
+        "sha256": "7b9f054bb6bf0af8094451cf85797adb6ab9fe06fcfa6641453111bd3561bdf6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-line-cache.patch",
+        "sha256": "2629f5073faed3d9b4f121cb71116143879085396b3ef3421e26a6c4adff64a0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-wrap-separator-spacing.patch",
+        "sha256": "54f38a977dc703e75cc42f3383705182b546efb30f1b3e2fd9669c6c70296aa3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-textbox-storage-flag.patch",
+        "sha256": "6ed35f5dfc24f0f47146b7fa7d1cb24fe3a56bc14f365eb0e7063dd7d85bdaf6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-paragraph-2016-heading-case.patch",
+        "sha256": "ed6f58a7201a4d8514d459b74d90dee6d880d33746e37509d14ba0475e3bfcb3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp-tab-placeholder-line-cache.patch",
+        "sha256": "68ad036c239042df4ae77d6750d1c69323bf1fa499193fc6d47bd2f0ef2b37ce"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-width-declared-height-preservation.patch",
+        "sha256": "5d4bb9a8907fe988741163510618d410b778cb24bfc45b51392780fc1ccc7fd8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-explicit-none-shadow-storage.patch",
+        "sha256": "38c3ddba6b4844f82ac8a3f752dabbabb55c74d31cc3d150c1142d57f57e00e9"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-table-content-height-sync.patch",
+        "sha256": "368dd198802b630da92549f7bc4ddbcb2e6bf7a0822090519ec07a1134a9fe0b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-closed-whole-stack-lineage.patch",
+        "sha256": "5e9b4dce4da46d62427105ce3a70362050f17392388aa507ad54d7894df31bd2"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-single-table-outer-origin.patch",
+        "sha256": "12acf5353ab12f366e04496d2d7c59093d80a7bc60293257d8fa603910de0a05"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-document-summary-metadata.patch",
+        "sha256": "69b458e6f48c0145df400b19981658575d08f88a183ae6975dd67bcf0b146f06"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-live-table-outer-origin.patch",
+        "sha256": "9b896b2d541e1dd002bd240742d707b0274f95d436bbb0d321600bd63a350845"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-offset-visible-edge.patch",
+        "sha256": "0232256c9982e2e20c0d3149abf67b1d0cbf30f9a4b03150086ded05202da0d3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwpx-native-font-descriptors.patch",
+        "sha256": "bdc2692b6fd6e60c70dd8c5880aa4357f67521e6fbef6d7253fe9fc332c0ab3b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stored-numbering-extension-codec.patch",
+        "sha256": "5b01b627c57b3772b93b41269d3a5e644d6003775c6b7c4ab5efd187a43f7ea1"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-table-fullwidth-source-owner.patch",
+        "sha256": "ef63e25bb950f0a8ceb4c70b1987c6b3dca739a4465acdca3a217d41d18f9d54"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-numbering-observed-disk-canonical.patch",
+        "sha256": "88aa2f62cf5601168d46c2ce0e73083f31f845ca9f125f146f3d114465bfb134"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-negative-table-frame-source-owner.patch",
+        "sha256": "2b8d16e911e3af30b9abfb93da33717de6e007b8e971046d5f6ca45a27c44d8d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-unknown-hwpx-control-loss-report.patch",
+        "sha256": "f2004c1fe26b90b03d2e407380536a3d8eebf9529d8bc67c083c75a9b1f4ceec"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-column-stack-source-owner.patch",
+        "sha256": "8ccf80a00cb0aae3c0a71619fb0ad6b55a537ac11c785ece4a4ad568c74efa7d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-reconstructed-body-shared-spacing-origin.patch",
+        "sha256": "1e828ab70011758f833ea59644383f6af9fa3d30400d2d220d9fd410f11f6af5"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-caption-lifecycle-and-partial-properties.patch",
+        "sha256": "0b8c8820f1c3444af15a7336034c3dc952461de6f5c758bb75992660b58b35af"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-transpose-row-measurement-owner.patch",
+        "sha256": "9d13fa135315a0fc550a2b7de3bff62d765816c217f66a4e9143e8283704b51b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-spacing-semantic-boundary.patch",
+        "sha256": "b9e980825c6e772149c9170203da78f183d762537d784f8f6757f253de911da6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-breakable-table-frame.patch",
+        "sha256": "2b9ec8c1ba628c5a3eeb51b15685c47cb8fc69973aac5a060e14ea12b10ea132"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-created-table-neighbor-line-provenance.patch",
+        "sha256": "a72b92a073a39731ea61ac07957d2176a0c5fd2bab6b331bfdcefbdbea229653"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-shape-insertion-wrap-owner.patch",
+        "sha256": "51cff004ad5b68a5fa2724dc200fc8c2b4e7059574e27df390eee0c75a3f8666"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-declared-ttf-substitute-font-roundtrip.patch",
+        "sha256": "51f8f19453df44f9ed01f4345e168f7fc7a48fc3acc104b79f8ab91c29a4dc56"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-explicit-hwp5-origin-return-contract.patch",
+        "sha256": "d79998f948f265811568404926e71f71462b123544b3f0fda9f567a826140bfd"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-versioned-xml-cache-storage-roundtrip.patch",
+        "sha256": "e6c14fa951415784b31a3c4a2720916fe1fe5afaa13b9300f6273c0c6a2e636c"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-verified-gulimche-integral-advance.patch",
+        "sha256": "1b7673af7d20093b9a43e9b157670926f2042c9b7b7156f87a9afecc2099d67b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-note-shape-i32-wire-contract.patch",
+        "sha256": "a36d4572ea1f4527e8e5dda7c5211983776f3ee8f8c45cdf8b76f69e3d77bbfe"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-summary-standard-property-stream.patch",
+        "sha256": "ae4ee5b45c06032203b114ace797bf3ead878b476ea490b7aeb3854fb06bf8cd"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-reconstruction-page-basis-and-edit-lifetime.patch",
+        "sha256": "1db1c17717df23c546c32410efe14492aaf6db0b3bfe2243627a30891411a242"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-text-direction-preservation-and-loss-report.patch",
+        "sha256": "24c68a269cc0bd6e4d0dd8d7c3709a37d42fc4b766dbcde97e422ffe251dd113"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-raw-resource-namespace-ownership.patch",
+        "sha256": "173fef15aa86447c81aa9d7d5b124363fa3256e033a4478636bf1cf3386e7955"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-font-source-type-authority-and-loss.patch",
+        "sha256": "fce0993013db18c8baba21c08b04dd1f4ce5943b02191d42f1ab200c81edfa06"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-three-column-frame-ownership.patch",
+        "sha256": "df1739fea178622af38a6231ab089c3505aeeb104e03f46e5a44b898e272eb58"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stable-session-story-font-provenance.patch",
+        "sha256": "9613f523b63dc89e0aa23914055c5b0b7674a2515f2c076ecef0c178894bdd59"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-package-metadata-script-preservation.patch",
+        "sha256": "c1fb2a2434fd8be8ad8dcbb65dc75641ef141527f7518c7c89db256b1fb42944"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-fragment-namespace-budget.patch",
+        "sha256": "cf00cf74b97a358c8d484a1b840bc41e7ff51de0724bb4b1a1cca42979f6ee5b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-metadata-namespace-read-write.patch",
+        "sha256": "7ece8bcc570b5c83994efcad39661fd57a327a49fa06cb756d022abca8bd58ee"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-source-synthetic-rows.patch",
+        "sha256": "eedb6ac4c47befebfdeb727099222b83a5b7b6550d55b98546a050366b9b5f4c"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-proportional-column-persistence.patch",
+        "sha256": "43bf22538170222f634321eae536026c969af85d956cc3ebb8d2b9901a6b7e12"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-lazy-native-row-render-context.patch",
+        "sha256": "0dc75bc3af81aa8c3383b7310a6d21fb3e326112b4bb279328d59956bd115b59"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-native-row-storage.patch",
+        "sha256": "fe5a4e24a75dde2b3a04ac76be2faad4ab2ab4be42cc01b546f9e0edd9be6af2"
+      }
+    ],
+    "builtAt": "2026-10-18T06:35:24.7938654Z",
+    "optimized": false,
+    "sourceId": "7c10dba04ed65742"
+  },
+  "results": [
+    {
+      "name": "single_column mixed HWPX/HWP/HWPX storage preserves every published field",
+      "status": "PASS"
+    },
+    {
+      "name": "single_column native body edit, both formats and exact snapshot history",
+      "status": "PASS"
+    },
+    {
+      "name": "single_column prefix wrap/page reflow never bypasses preservation and history",
+      "status": "PASS"
+    },
+    {
+      "name": "three_columns mixed HWPX/HWP/HWPX storage preserves every published field",
+      "status": "PASS"
+    },
+    {
+      "name": "three_columns native body edit, both formats and exact snapshot history",
+      "status": "PASS"
+    },
+    {
+      "name": "three_columns prefix wrap/page reflow never bypasses preservation and history",
+      "status": "PASS"
+    },
+    {
+      "name": "rtl mixed HWPX/HWP/HWPX storage preserves every published field",
+      "status": "PASS"
+    },
+    {
+      "name": "rtl native body edit, both formats and exact snapshot history",
+      "status": "PASS"
+    },
+    {
+      "name": "rtl prefix wrap/page reflow never bypasses preservation and history",
+      "status": "PASS"
+    },
+    {
+      "name": "distribute mixed HWPX/HWP/HWPX storage preserves every published field",
+      "status": "PASS"
+    },
+    {
+      "name": "distribute native body edit, both formats and exact snapshot history",
+      "status": "PASS"
+    },
+    {
+      "name": "distribute prefix wrap/page reflow never bypasses preservation and history",
+      "status": "PASS"
+    },
+    {
+      "name": "unequal_columns mixed HWPX/HWP/HWPX storage preserves every published field",
+      "status": "PASS"
+    },
+    {
+      "name": "unequal_columns native body edit, both formats and exact snapshot history",
+      "status": "PASS"
+    },
+    {
+      "name": "unequal_columns prefix wrap/page reflow never bypasses preservation and history",
+      "status": "PASS"
+    },
+    {
+      "name": "asymmetric_margin mixed HWPX/HWP/HWPX storage preserves every published field",
+      "status": "PASS"
+    },
+    {
+      "name": "asymmetric_margin native body edit, both formats and exact snapshot history",
+      "status": "PASS"
+    },
+    {
+      "name": "asymmetric_margin prefix wrap/page reflow never bypasses preservation and history",
+      "status": "PASS"
+    },
+    {
+      "name": "native unequal column weights become actual HWPX units in independent XML",
+      "status": "PASS"
+    }
+  ],
+  "failures": [],
+  "observations": [
+    {
+      "name": "single_column",
+      "phase": "mixed",
+      "exports": [
+        {
+          "format": "hwpx",
+          "sha256": "2616f4ccd7030caea581a338f3323c7c9e2f83ca20a150e480dc55988256b6af",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        },
+        {
+          "format": "hwp",
+          "sha256": "79fb12cfa50273f61955654ab328579836065c2c24d08a47f52b5c31ca867c54",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        },
+        {
+          "format": "hwpx",
+          "sha256": "41f0500138644eae7362c340fe277f543f1e2f22de8e1edcc4bf3c0ef109554e",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        }
+      ]
+    },
+    {
+      "name": "single_column",
+      "phase": "native-tail",
+      "exports": [
+        {
+          "format": "hwp",
+          "sha256": "7f988ad937323c419fb40ecfd2cfe38fbde7ee78e59de3fa843c78d148c3fe8e",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        },
+        {
+          "format": "hwpx",
+          "sha256": "021890909ba12b6f6d4bfbd41c43791f3de5251adec5f5550c7473f5483d8452",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        }
+      ],
+      "undoRedoExact": true
+    },
+    {
+      "name": "single_column",
+      "phase": "prefix-safety",
+      "stress": [
+        {
+          "kind": "wrap",
+          "exports": [
+            {
+              "format": "hwp",
+              "sha256": "d6f783f44a9901ffc1111b0e31f3f6306e4c05840777432f66f587a810b9d28b",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            },
+            {
+              "format": "hwpx",
+              "sha256": "fd3cd76936ca1a3f2ca498d04da009ad0333320ba65124c0be1f2bb6d8dd4a92",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            }
+          ],
+          "undoRedoExact": true
+        },
+        {
+          "kind": "page",
+          "exports": [
+            {
+              "format": "hwp",
+              "sha256": "d41f44550f3620e314f0553a0964d8ae64fbb6ba90f521c6c69f596743a9f406",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            },
+            {
+              "format": "hwpx",
+              "sha256": "17cbf454b7ff240f553cf4507aeb20c1bedcb80e9248139ab03bcf35e15242d2",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            }
+          ],
+          "undoRedoExact": true
+        }
+      ],
+      "sourceUnchanged": true
+    },
+    {
+      "name": "three_columns",
+      "phase": "mixed",
+      "exports": [
+        {
+          "format": "hwpx",
+          "sha256": "41a5d7dd757c61f4cba83c806515c55bfeec195c681279166f7794972c781136",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        },
+        {
+          "format": "hwp",
+          "sha256": "c3b1c11cc4ca8e2385436c38714d3039340b60e501da8ba59675aa8419e1429f",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        },
+        {
+          "format": "hwpx",
+          "sha256": "8867deb30439350b1e9fe35a1299582ffea284f3e6a86cb8324643f495d2e223",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        }
+      ]
+    },
+    {
+      "name": "three_columns",
+      "phase": "native-tail",
+      "exports": [
+        {
+          "format": "hwp",
+          "sha256": "4bef92bc5976b35ae4a099a881caddb43ae81f50719f600231f7f1f43091a571",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        },
+        {
+          "format": "hwpx",
+          "sha256": "78dddbb564baeeb23e77f995811e06335355722e6a90a982b2f04d0cc3ebf2e6",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        }
+      ],
+      "undoRedoExact": true
+    },
+    {
+      "name": "three_columns",
+      "phase": "prefix-safety",
+      "stress": [
+        {
+          "kind": "wrap",
+          "exports": [
+            {
+              "format": "hwp",
+              "sha256": "5654793169a4cac6b960f40992762a2a624528c3d7cd60d62dd9a66d6aa33b73",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            },
+            {
+              "format": "hwpx",
+              "sha256": "0faf4f9b901191724dbf4858eb1b502b5a652974d59337f799d9a3bda036a30d",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            }
+          ],
+          "undoRedoExact": true
+        },
+        {
+          "kind": "page",
+          "exports": [
+            {
+              "format": "hwp",
+              "sha256": "a3baf5f6068a4db8fbebecdf687aa566fc81729544463cafa845e95f21dd68c8",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            },
+            {
+              "format": "hwpx",
+              "sha256": "d9df6ec39669a725a8dfae93605dea74b0e827aadff3ad3b9340085ce1295ea6",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            }
+          ],
+          "undoRedoExact": true
+        }
+      ],
+      "sourceUnchanged": true
+    },
+    {
+      "name": "rtl",
+      "phase": "mixed",
+      "exports": [
+        {
+          "format": "hwpx",
+          "sha256": "ce3f2675dd8a2386cf00202386a909cb17cd9629b1acdb4808284a3cc2b03c7a",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        },
+        {
+          "format": "hwp",
+          "sha256": "a25d829191db921207782da6c11f3798af2c97efd203c0e71e2cec9c7416d6fb",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        },
+        {
+          "format": "hwpx",
+          "sha256": "fd9b3fae0ce5b9619ae8aa7542a65d0c9baeb1575d86bd638023cf9d2f543c17",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        }
+      ]
+    },
+    {
+      "name": "rtl",
+      "phase": "native-tail",
+      "exports": [
+        {
+          "format": "hwp",
+          "sha256": "63ed369319c441df1484b6a8494ebc55db06ce1d5513eb42b6a4302f1aec69c5",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        },
+        {
+          "format": "hwpx",
+          "sha256": "417e5c0bc4417630c6b7876285c07e44faaacb4e3bee2a9694773bb4b072b4fc",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        }
+      ],
+      "undoRedoExact": true
+    },
+    {
+      "name": "rtl",
+      "phase": "prefix-safety",
+      "stress": [
+        {
+          "kind": "wrap",
+          "exports": [
+            {
+              "format": "hwp",
+              "sha256": "9558b5a3a0c059e6f95462767332c7acc3bc03d350069784b46d2642b365749d",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            },
+            {
+              "format": "hwpx",
+              "sha256": "9948c660eedfc9c0ff3ffeee10344f634ac53bf3925c8ee12ce09faad7453fae",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            }
+          ],
+          "undoRedoExact": true
+        },
+        {
+          "kind": "page",
+          "exports": [
+            {
+              "format": "hwp",
+              "sha256": "c87caf6eb2a9398cb49cd6b86726b50d16b1d2880e90c0081352d011facc8905",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            },
+            {
+              "format": "hwpx",
+              "sha256": "864f685f6cab46348158eccbf484c67e9752a290a907282d4d6004bd2299539b",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            }
+          ],
+          "undoRedoExact": true
+        }
+      ],
+      "sourceUnchanged": true
+    },
+    {
+      "name": "distribute",
+      "phase": "mixed",
+      "exports": [
+        {
+          "format": "hwpx",
+          "sha256": "42b6ea4f4529e99d27ca36f76d03bcd256a3edecdefca6cb1d6a60d22b4c55ca",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        },
+        {
+          "format": "hwp",
+          "sha256": "de3d73b82604cd18d7a320d5692de917557ccb465b416658969a58955ac2e19f",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        },
+        {
+          "format": "hwpx",
+          "sha256": "592c67aa70ef5946cf579798555b9d433072f035ccfb6f770ecefaedc84ee331",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        }
+      ]
+    },
+    {
+      "name": "distribute",
+      "phase": "native-tail",
+      "exports": [
+        {
+          "format": "hwp",
+          "sha256": "3950ce9d838c2e4c9c692860825b63b70d9f7ea7812aadbadef9326ee65d931c",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        },
+        {
+          "format": "hwpx",
+          "sha256": "e04c4ed1410bc59a3afe72fca9bc44deb268e61a1bbd0d84ec761ae3a8407d7a",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        }
+      ],
+      "undoRedoExact": true
+    },
+    {
+      "name": "distribute",
+      "phase": "prefix-safety",
+      "stress": [
+        {
+          "kind": "wrap",
+          "exports": [
+            {
+              "format": "hwp",
+              "sha256": "81703584e4104fc356df9f02c596af47e7e4925fbf403e2adc6bab3f4d417b48",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            },
+            {
+              "format": "hwpx",
+              "sha256": "ed27091cc5562f85f65c3f36769825f744d0e19d70350b9d808071f9c048b800",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            }
+          ],
+          "undoRedoExact": true
+        },
+        {
+          "kind": "page",
+          "exports": [
+            {
+              "format": "hwp",
+              "sha256": "2002c579018560a18768f97a5f8d26a4f770bbe5ca026eac77e712669b0a6111",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            },
+            {
+              "format": "hwpx",
+              "sha256": "dd5ee040bb949a5a659f32c8e3dac99fef2c9023837ccc2cfc47320aa704f44f",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            }
+          ],
+          "undoRedoExact": true
+        }
+      ],
+      "sourceUnchanged": true
+    },
+    {
+      "name": "unequal_columns",
+      "phase": "mixed",
+      "exports": [
+        {
+          "format": "hwpx",
+          "sha256": "f6ede76794baed140e278e2ce3ecb7f0fe2c53d1883ab376e5aa93654b700ffe",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        },
+        {
+          "format": "hwp",
+          "sha256": "af1b16a8d23d44aff7872b1b142e4fd3ce57b3a05920582c2a0ac3b43f77c02c",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        },
+        {
+          "format": "hwpx",
+          "sha256": "97e6efbd146194a18a1197e926f16d71430fd8c7375b22ad1eb394c45c566b55",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        }
+      ]
+    },
+    {
+      "name": "unequal_columns",
+      "phase": "native-tail",
+      "exports": [
+        {
+          "format": "hwp",
+          "sha256": "1c20ce2ce2559491fa73e6d148a7c2c0d549770c466dacdb61389378a0981db0",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        },
+        {
+          "format": "hwpx",
+          "sha256": "d55f52d6158e403dc81ae577703a2499dfa75bfaeacf1d971d2ead3c49877c83",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        }
+      ],
+      "undoRedoExact": true
+    },
+    {
+      "name": "unequal_columns",
+      "phase": "prefix-safety",
+      "stress": [
+        {
+          "kind": "wrap",
+          "exports": [
+            {
+              "format": "hwp",
+              "sha256": "d9cf5bacdf9ac9ccc9a0cf92baf4c3ca09933747d05bc3ff14a24a60a3a47e13",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            },
+            {
+              "format": "hwpx",
+              "sha256": "d565a8f641c0d268022cb2061e5cae681b87ab524ec5bad3d2846acce3c18090",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            }
+          ],
+          "undoRedoExact": true
+        },
+        {
+          "kind": "page",
+          "exports": [
+            {
+              "format": "hwp",
+              "sha256": "07423f4987757bc1f3a86db93b7948971e74003a167fc0c7b5d701ff38e25a22",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            },
+            {
+              "format": "hwpx",
+              "sha256": "b3f345cba8b2b6b6e08b2067617689fe9dc465af4b0c00903ad04834cdc21944",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            }
+          ],
+          "undoRedoExact": true
+        }
+      ],
+      "sourceUnchanged": true
+    },
+    {
+      "name": "asymmetric_margin",
+      "phase": "mixed",
+      "exports": [
+        {
+          "format": "hwpx",
+          "sha256": "29d77b53b2f591343b29bc2ec4f04df0010d2a8002f6c9dcbfa3202cade33620",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        },
+        {
+          "format": "hwp",
+          "sha256": "651e15db6a868b27c9eb2742eef903257559b0958b5c5897a4498fb1900b818b",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        },
+        {
+          "format": "hwpx",
+          "sha256": "cf5bbd5e47c34ea4a461b288430d81a6425b7eb55fae84d9f55650cdcbb7a004",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        }
+      ]
+    },
+    {
+      "name": "asymmetric_margin",
+      "phase": "native-tail",
+      "exports": [
+        {
+          "format": "hwp",
+          "sha256": "5cea48fdaa3859a4b42f4001b1e12b939544ab17cd082e6adcb4f90a6aa018c5",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        },
+        {
+          "format": "hwpx",
+          "sha256": "e31027040986d163af956b79ff4348fd9563ff5da15a484abbb970d524b19909",
+          "status": "checked",
+          "semantic": 0,
+          "geometry": 0,
+          "pagesEqual": true,
+          "loss": 0
+        }
+      ],
+      "undoRedoExact": true
+    },
+    {
+      "name": "asymmetric_margin",
+      "phase": "prefix-safety",
+      "stress": [
+        {
+          "kind": "wrap",
+          "exports": [
+            {
+              "format": "hwp",
+              "sha256": "0e0af6bb2f4ae130fa7f270e6a8e93bf5b49c4b669399ec2be4be8c1ab6f9ed6",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            },
+            {
+              "format": "hwpx",
+              "sha256": "e081e062067f20ef18e31a8472dc415458d8bf1200b76d211dd959a9a629b49b",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            }
+          ],
+          "undoRedoExact": true
+        },
+        {
+          "kind": "page",
+          "exports": [
+            {
+              "format": "hwp",
+              "sha256": "e56f089e7bfdcc5a8d0d82511fd5417eb26a67d845695fbebba325fb2933db09",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            },
+            {
+              "format": "hwpx",
+              "sha256": "b55db5fa987b382d98f537155cc63633dee077df46f780ed89d1bc3e24d4ec88",
+              "status": "checked",
+              "semantic": 0,
+              "geometry": 0,
+              "pagesEqual": true,
+              "loss": 0
+            }
+          ],
+          "undoRedoExact": true
+        }
+      ],
+      "sourceUnchanged": true
+    },
+    {
+      "phase": "independent-column-XML",
+      "sourceSha256": "2ee00d6ef1ea96b9c5fb7fd4f2a4a278b0d676dcb964afdae2dcb49b0ab4016e",
+      "columnSizes": [
+        [
+          15110,
+          1259
+        ],
+        [
+          26150,
+          0
+        ]
+      ],
+      "export": {
+        "format": "hwpx",
+        "sha256": "f6ede76794baed140e278e2ce3ecb7f0fe2c53d1883ab376e5aa93654b700ffe",
+        "status": "checked",
+        "semantic": 0,
+        "geometry": 0,
+        "pagesEqual": true,
+        "loss": 0
+      }
+    }
+  ],
+  "fixtureHashes": {
+    "single_column": "9778d66926e3138ce4bb51fadfd16173ee3d439aeec0a02a8f0af34b7fac0f3b",
+    "three_columns": "db5e90e7217912d928d26d87d0e2877bf2682e90d1812bdef274aee83972cb79",
+    "rtl": "f48a715a8ea47cb8081b735f89512dbac9209a0e99ab5d68877396d030056742",
+    "distribute": "9b35480c316ee54c1d5ef0ecbe4a2d5223b7321143aded0dbab43b1d5f569452",
+    "unequal_columns": "2ee00d6ef1ea96b9c5fb7fd4f2a4a278b0d676dcb964afdae2dcb49b0ab4016e",
+    "asymmetric_margin": "3ba817fe20afa035739168eddcd1eae6fa08e7bd28b4322db3ec7f6f1f85830e"
+  },
+  "verifierSha256": "7bcb14d2a0755a6140c45de569b8d7650b60e31284d58b5433cbfac127e828bb",
+  "sourceHashes": [
+    {
+      "path": "scripts/lib/hancom-review.mjs",
+      "sha256": "bf8e4d30b7b232ce4abcc348165e97ebed214cb7bf60a5e14ccf8759413d88bd"
+    },
+    {
+      "path": "src/adapters/rhwp/preservation.ts",
+      "sha256": "14e396848f1689d3d1c618d9300e356165e0a74d188d92cf04d7e54337299904"
+    },
+    {
+      "path": "src/adapters/rhwp/document-save-layout.ts",
+      "sha256": "6c1d119f4723698e9e3769d4fb45c7b38469b6f0bca6f4c575688f3b38638434"
+    },
+    {
+      "path": "src/adapters/rhwp/overlap-save-layout.ts",
+      "sha256": "81292a0acd43934682abea16fa510b6fdedbd820d9f1822bac511de3919d1495"
+    }
+  ],
+  "scope": "Actual WASM mixed storage and native text/history regression on six pinned owned HWP fixtures. Every published semantic/control/text field; unchanged production preservation guard. Prefix safety may PASS by refusing an independently detected mismatch, which does NOT mean the unsupported export is implemented. No OS/Hancom UI, user files, font resources or real API calls."
+}

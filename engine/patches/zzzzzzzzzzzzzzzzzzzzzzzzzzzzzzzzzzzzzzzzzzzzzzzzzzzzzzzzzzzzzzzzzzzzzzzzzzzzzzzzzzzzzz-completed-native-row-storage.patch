@@ -1,0 +1,1579 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -289,7 +289,7 @@
+ image = { version = "0.25", default-features = false, features = ["bmp", "jpeg", "png", "tiff"] }
+ pcx = "0.2"
+ serde = { version = "1", features = ["derive"] }
+-serde_json = "1"
++serde_json = { version = "1", features = ["float_roundtrip"] }
+ ttf-parser = "0.25"
+ rustybuzz = "0.20"
+ 
+--- a/src/diagnostics/ir_field_sweep.rs
++++ b/src/diagnostics/ir_field_sweep.rs
+@@ -666,6 +666,8 @@
+         numbering_marker: _,
+         native_source_synthetic_seal: _,
+         native_source_synthetic_context: _,
++        completed_native_rows: _,
++        native_frame_observation: _,
+     } = a;
+ 
+     macro_rules! f {
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -1993,13 +1993,17 @@
+         // 저장하면 «저장본을 다시 열면 배치가 달라진다» 가 경로마다 갈린다.
+         // 재래핑된 표가 없으면 복제 없이 live IR 을 그대로 쓴다.
+         if self.render_normalization.text_reflowed_tables.is_empty()
+-            && !self.effective_layout_profile().session_edited() {
++            && !self.effective_layout_profile().session_edited()
++            && !self.document.sections.iter().any(|s|s.paragraphs.iter().any(|p|p.completed_native_rows.is_some())) {
+             return crate::serializer::serialize_document(&self.document)
+                 .map_err(|e| HwpError::RenderError(e.to_string()));
+         }
+         let mut snapshot = self.document.clone();
+         self.writeback_reflowed_table_frames(&mut snapshot);
+         self.writeback_edited_overlap_table_tail(&mut snapshot);
++        // Imported completed rows need the same current-input authorization on
++        // this legacy entry point as the adapter snapshot. Never mutate live IR.
++        self.authorize_completed_native_export(&mut snapshot);
+         crate::serializer::serialize_document(&snapshot)
+             .map_err(|e| HwpError::RenderError(e.to_string()))
+     }
+@@ -2559,6 +2563,7 @@
+         self.omit_generated_xml_body_caches(&mut snapshot);
+         let marker = crate::model::document::HWPX_ORIGIN_STREAM_PATH;
+         let new_xml_contract = self.can_create_xml_cache_origin();
++        let completed_before_lowering=snapshot.sections.iter().any(|s|s.paragraphs.iter().any(|p|p.completed_native_rows.is_some())).then(||snapshot.clone());
+         let _report = convert_if_hwpx_source(&mut snapshot, self.source_format);
+         if new_xml_contract {
+             if let Some((_, value)) = snapshot.extra_streams.iter_mut()
+@@ -2582,6 +2587,8 @@
+             false,
+         );
+         Self::refresh_doc_info_raw_cache(&mut snapshot);
++        self.authorize_completed_native_export(&mut snapshot);
++        if let Some(before)=&completed_before_lowering {self.authorize_completed_native_hwp_lowering(before,&mut snapshot);}
+         HwpExportSnapshot { document: snapshot }
+     }
+     /// HWPX 출처 IR 을 HWP 호환 형태로 변환 후 HWP 5.0 CFB 바이너리로 직렬화한다 (#178).
+@@ -2743,6 +2750,7 @@
+             // instead of manufacturing an incompatible HWP5-origin ZIP marker.
+             let mut doc=self.document.clone();
+             lower_markers(&mut doc);
++            self.authorize_completed_native_export(&mut doc);
+             serialize(&doc)
+         } else if matches!(self.source_format, crate::parser::FileFormat::Hwp) {
+             let mut doc = self.document.clone();
+@@ -2764,6 +2772,7 @@
+             }
+             Self::materialize_hwp5_missing_linesegs_for_hwpx_export(&mut doc);
+             lower_markers(&mut doc);
++            self.authorize_completed_native_export(&mut doc);
+             serialize(&doc)
+         } else if hwp3_origin
+             || self
+@@ -2784,6 +2793,7 @@
+                 Self::push_hwp3_origin_marker(&mut doc);
+             }
+             lower_markers(&mut doc);
++            self.authorize_completed_native_export(&mut doc);
+             serialize(&doc)
+         } else {
+             serialize(&self.document)
+--- a/src/document_core/commands/text_editing.rs
++++ b/src/document_core/commands/text_editing.rs
+@@ -1456,6 +1456,7 @@
+             )));
+         }
+ 
++        let completed_native_edit=self.begin_completed_native_edit(section_idx,para_idx);
+         // 텍스트 삽입
+         let new_chars_count = text.chars().count();
+         let active_field = self.active_field.clone();
+@@ -1549,6 +1550,7 @@
+             }
+         }
+ 
++        self.finish_completed_native_edit(section_idx,completed_native_edit);
+         let new_offset = char_offset + new_chars_count;
+ 
+         // 캐럿 위치 갱신 (DocProperties)
+@@ -1606,6 +1608,7 @@
+             )));
+         }
+ 
++        let completed_native_edit=self.begin_completed_native_edit(section_idx,para_idx);
+         // 텍스트 삭제
+         let apply_delete = |para: &mut Paragraph| {
+             para.delete_text_at(char_offset, count);
+@@ -1688,6 +1691,7 @@
+         } else {
+             (para.controls.len() as u32) * 8
+         };
++        self.finish_completed_native_edit(section_idx,completed_native_edit);
+         self.stamp_caret(section_idx as u32, para_idx as u32, caret_utf16_pos);
+ 
+         self.event_log.push(DocumentEvent::TextDeleted {
+--- a/src/document_core/mod.rs
++++ b/src/document_core/mod.rs
+@@ -10,6 +10,7 @@
+ pub mod builders;
+ mod canvas_metric_requests;
+ mod canvas_metrics;
++mod native_computed_rows;
+ mod font_environment;
+ pub use canvas_metric_requests::{CanvasMetricBatch, CanvasMetricReply, CanvasMetricRequest};
+ mod commands;
+--- /dev/null
++++ b/src/document_core/native_computed_rows.rs
+@@ -0,0 +1,250 @@
++//! Completion boundary for portable, ordinary native body edits.
++use super::DocumentCore;
++use crate::model::native_computed_rows::{self as contract,CompletedRows,RowBasis};
++use crate::renderer::pagination::PageItem;
++impl DocumentCore {
++    pub(crate) fn computed_row_resources_supported(&self)->bool {
++        let (slots,sources,_,_)=self.layout_engine.exact_font_source_registry_counts();
++        !self.canvas_metrics_active() && self.font_environment.is_none() && slots==0 && sources==0
++            && self.dpi==crate::renderer::DEFAULT_DPI && !self.hangul2024_compat
++            && self.fallback_font==super::DEFAULT_FALLBACK_FONT
++    }
++    pub(crate) fn begin_completed_native_edit(&self,section:usize,paragraph:usize)->Option<Vec<bool>> {
++        if !self.computed_row_resources_supported() || self.batch_mode
++            || self.pending_pagination_job.is_some() || self.deferred_pagination_descriptor.is_some()
++            || !matches!(self.source_format,crate::parser::FileFormat::Hwp|crate::parser::FileFormat::Hwpx)
++            || self.document.provenance.hwp3_lineage {return None;}
++        let s=self.document.sections.get(section)?;
++        if s.paragraphs.len()>4096 || s.paragraphs.iter().map(|p|p.line_segs.len()).sum::<usize>()>contract::MAX_ROWS {return None;}
++        let p=s.paragraphs.get(paragraph)?;
++        if !p.tab_extended.is_empty() || p.text.contains(['\t','\n','\r'])
++            || p.controls.iter().any(|c| !matches!(c,crate::model::control::Control::SectionDef(_)|crate::model::control::Control::ColumnDef(_)))
++            || !p.field_ranges.is_empty() || !p.range_tags.is_empty() {return None;}
++        let source=self.document.native_source_synthetic_context_digest();
++        let frame=contract::context(&self.document);
++        let owned=s.paragraphs.iter().map(|p|p.owns_native_source_synthetic_rows(source)
++            || p.owns_completed_native_rows(frame)).collect::<Vec<_>>();
++        if !owned.get(paragraph).copied().unwrap_or(false) {return None;}
++        for p in &s.paragraphs {p.native_frame_observation.set(None);}
++        Some(owned)
++    }
++    pub(crate) fn finish_completed_native_edit(&mut self,section:usize,eligible:Option<Vec<bool>>) {
++        let Some(eligible)=eligible else{return;};
++        if !self.computed_row_resources_supported() || self.batch_mode
++            || self.pending_pagination_job.is_some() || self.deferred_pagination_descriptor.is_some()
++            || self.dirty_sections.iter().any(|dirty|*dirty) {return;}
++        // An edit completion owns a fresh full allocation pass. Incremental
++        // convergence must not carry an unobserved table origin from a former
++        // revision merely because this edit happened after that table.
++        self.mark_section_dirty(section);
++        if let Some(dirty)=self.dirty_paragraphs.get_mut(section) {*dirty=None;}
++        self.paginate_if_needed();
++        if self.dirty_sections.iter().any(|dirty|*dirty) {return;}
++        let Some(pagination)=self.pagination.get(section) else{return;};
++        let Some(s)=self.document.sections.get(section) else{return;};
++        if s.paragraphs.len()!=eligible.len() {return;}
++        let mut bases=s.paragraphs.iter().map(|p|vec![None;p.line_segs.len()]).collect::<Vec<Vec<Option<RowBasis>>>>();
++        for page in &pagination.pages { for column in &page.column_contents {
++            if column.zone_layout.is_some() || column.zone_y_offset!=0.0 {return;}
++            let first=column.items.iter().find_map(|item| match item {
++                PageItem::FullParagraph{para_index}|PageItem::Table{para_index,..}=>s.paragraphs.get(*para_index)?.line_segs.first(),
++                PageItem::PartialParagraph{para_index,start_line,..}=>s.paragraphs.get(*para_index)?.line_segs.get(*start_line),_=>None});
++            let Some(first)=first else{continue;};
++            let physical_start=crate::renderer::px_to_hwpunit(column.start_height,self.dpi);
++            let Some(offset)=first.vertical_pos.checked_sub(physical_start) else{return;};
++            for item in &column.items {
++                let (pi,start,end)=match item {
++                    PageItem::FullParagraph{para_index}|PageItem::Table{para_index,..}=>
++                        (*para_index,0,s.paragraphs.get(*para_index).map_or(0,|p|p.line_segs.len())),
++                    PageItem::PartialParagraph{para_index,start_line,end_line}=>(*para_index,*start_line,*end_line),
++                    _=>continue,
++                };
++                let Some(p)=s.paragraphs.get(pi) else{return;};
++                if !eligible[pi] {continue;}
++                for i in start..end {
++                    let Some(r)=p.line_segs.get(i) else{return;};
++                    let Some(v)=r.vertical_pos.checked_sub(offset) else{return;};
++                    // Standard XML cache coordinates never carry a section-cumulative ladder.
++                    if v<0 || crate::renderer::hwpunit_to_px(v,self.dpi)>page.layout.body_area.height+1.0
++                        || r.tag!=0x80060000 || r.line_height<=0 || r.text_height<=0 || r.line_spacing<0
++                        || bases[pi][i].is_some() {return;}
++                    bases[pi][i]=Some(RowBasis{page:page.page_index,column:column.column_index,offset});
++                }
++            }
++        }}
++        // Share the renderer's existing body-wide reservation query. This is a
++        // native allocation-to-physical-frame transform, not a sampled paint box.
++        let mut native_frames=vec![None;s.paragraphs.len()];
++        for page in &pagination.pages {
++            self.layout_engine.prime_column_layout_env(&page.layout);
++            let reserved=if page.column_contents.len()>1 {
++                self.layout_engine.calculate_body_wide_shape_reserved(&s.paragraphs,&page.column_contents,&page.layout.body_area)
++                    .iter().map(|(_,bottom)|(bottom-page.layout.body_area.y).max(0.0)).fold(0.0,f64::max)
++            } else {0.0};
++            for column in &page.column_contents {
++                let shift=(reserved-column.start_height.max(0.0)).max(0.0);
++                let mut unpainted_before=0.0;
++                for item in &column.items {
++                    let PageItem::Table{para_index:pi,control_index:ci}=item else{continue;};
++                    let p=&s.paragraphs[*pi];
++                    if let Some(mut f)=p.native_frame_observation.get().filter(|f|f.page==page.page_index && f.column==column.column_index && f.control==*ci) {
++                        // Native reservations include host before; the empty float
++                        // paint frame selected inset0. Carry that named difference
++                        // to the next native host in the same physical column.
++                        f.raw_top+=shift-unpainted_before;
++                        f.reserved_bottom+=shift-unpainted_before-f.before;
++                        if (f.reserved_bottom-f.raw_top-f.body_height-f.after).abs()<=self.dpi/7200.0 {
++                            native_frames[*pi]=Some(f);
++                        }
++                        unpainted_before+=f.before;
++                    } else {break;}
++                }
++            }
++        }
++        let frame=contract::context(&self.document);
++        let s=&mut self.document.sections[section];
++        for (pi,p) in s.paragraphs.iter_mut().enumerate() {
++            if !eligible[pi] || bases[pi].is_empty() || bases[pi].iter().any(Option::is_none)
++                || p.stored_text_partition_is_dirty() || p.layout_only_fill_lines!=0 || p.cell_format_vpos_dirty {continue;}
++            let native_frame=native_frames[pi].filter(|f|
++                bases[pi][0].as_ref().is_some_and(|b|b.page==f.page && b.column==f.column)
++                    && contract::valid_native_empty_host(p,f.control,f.outer_top));
++            // A table origin needs the actual successful native allocation observation.
++            if p.controls.iter().any(|c|matches!(c,crate::model::control::Control::Table(_))) && native_frame.is_none() {continue;}
++            p.completed_native_rows=Some(CompletedRows {local:contract::local(p),plan:contract::plan(&bases[pi].iter().map(|b|b.clone().unwrap()).collect::<Vec<_>>(),native_frame),frame,resource:contract::RESOURCE,
++                bases:bases[pi].iter().map(|b|b.clone().unwrap()).collect(),native_frame,export_authorized:false});
++        }
++    }
++    pub(crate) fn authorize_completed_native_export(&self,doc:&mut crate::model::document::Document) {
++        let frame=contract::context(&self.document);
++        let supported=self.computed_row_resources_supported() && frame==contract::context(doc);
++        for s in &mut doc.sections {for p in &mut s.paragraphs {
++            let ok=supported && p.owns_completed_native_rows(frame);
++            if let Some(o)=&mut p.completed_native_rows {o.export_authorized=ok;}
++        }}
++    }
++}
++
++
++// A serialization-only inverse projection. It cannot grant a new runtime row
++// lease: every accepted byte must be produced by the current HWP lowerer from
++// the same input, and the projected complete frame must still equal that input.
++fn inverse_known_hwp_storage(source:&serde_json::Value,target:&serde_json::Value,expected:&serde_json::Value,path:&str)->Option<serde_json::Value> {
++    use serde_json::Value;
++    if source==target {return Some(source.clone());}
++    if target==expected {
++        let empty=source.is_null() || source.as_array().is_some_and(Vec::is_empty);
++        let generated_bytes=target.as_array().is_some_and(|a|!a.is_empty() && a.iter().all(|v|v.as_u64().is_some_and(|n|n<=255)));
++        let known_empty_field=(path.ends_with("/SectionDef/raw_ctrl_extra") || path=="sectionDef/raw_ctrl_extra"
++            || path.ends_with("/Table/raw_ctrl_data")
++            || (path.contains("/Table/cells/") && path.ends_with("/raw_list_extra"))) && empty && generated_bytes;
++        let known_header=path.ends_with("/raw_header_extra") && source.as_array().zip(target.as_array()).is_some_and(|(a,b)|
++            a.len()==10 && b.len()==12 && b[..10]==a[..] && b[10..].iter().all(|v|v.as_u64()==Some(0)));
++        let known_table_attr=path.ends_with("/Table/attr") && source.as_u64()==Some(0) && target.as_u64().is_some_and(|n|n!=0);
++        // The lowerer aligns absent optional CTRL_DATA slots with controls.
++        // None padding contains no raw record; any Some/unknown byte is denied.
++        let known_empty_slots=path.ends_with("/ctrl_data_records") && source.as_array().is_some_and(Vec::is_empty)
++            && target.as_array().is_some_and(|v|!v.is_empty() && v.iter().all(serde_json::Value::is_null));
++        if known_empty_field || known_header || known_table_attr || known_empty_slots {return Some(source.clone());}
++    }
++    match(source,target,expected) {
++        (Value::Array(a),Value::Array(b),Value::Array(e)) if a.len()==b.len() && a.len()==e.len()=>
++            Some(Value::Array(a.iter().zip(b).zip(e).enumerate().map(|(i,((a,b),e))|
++                inverse_known_hwp_storage(a,b,e,&format!("{path}/{i}"))).collect::<Option<Vec<_>>>()?)),
++        (Value::Object(a),Value::Object(b),Value::Object(e)) if a.len()==b.len() && a.len()==e.len()=> {
++            let mut out=serde_json::Map::new();for(k,a)in a {
++                out.insert(k.clone(),inverse_known_hwp_storage(a,b.get(k)?,e.get(k)?,&format!("{path}/{k}"))?);
++            }Some(Value::Object(out))
++        }
++        _=>None,
++    }
++}
++
++fn reverse_known_hwp_paragraph_storage(a:&crate::model::paragraph::Paragraph,b:&mut crate::model::paragraph::Paragraph)->bool {
++    use crate::model::control::Control;
++    // Render-state omitted from JSON is compared directly. Neither this state
++    // nor any unknown raw/model field is copied from the source to the output.
++    if a.layout_space_metrics!=b.layout_space_metrics || a.source_line_seg_vertical_pos!=b.source_line_seg_vertical_pos
++        || a.stored_text_partition_dirty!=b.stored_text_partition_dirty || a.cell_format_vpos_dirty!=b.cell_format_vpos_dirty
++        || a.cell_vpos_reset!=b.cell_vpos_reset || a.numbering_marker!=b.numbering_marker || a.controls.len()!=b.controls.len() {return false;}
++    b.raw_header_extra=a.raw_header_extra.clone();
++    b.ctrl_data_records=a.ctrl_data_records.clone();
++    for (a,b) in a.controls.iter().zip(&mut b.controls) {match(a,b) {
++        (Control::ColumnDef(_),Control::ColumnDef(_))=>{},
++        (Control::SectionDef(a),Control::SectionDef(b)) if a.master_pages.is_empty() && b.master_pages.is_empty()=>b.raw_ctrl_extra=a.raw_ctrl_extra.clone(),
++        (Control::Table(a),Control::Table(b)) if a.caption.is_none() && b.caption.is_none() && a.cells.len()==b.cells.len()=> {
++            b.attr=a.attr;b.raw_ctrl_data=a.raw_ctrl_data.clone();
++            for (a,b) in a.cells.iter().zip(&mut b.cells) {
++                if a.paragraphs.len()!=b.paragraphs.len() {return false;}
++                b.raw_list_extra=a.raw_list_extra.clone();
++                for (a,b) in a.paragraphs.iter().zip(&mut b.paragraphs) {
++                    if !reverse_known_hwp_paragraph_storage(a,b) {return false;}
++                }
++            }
++        },
++        _=>return false, // Other trees have no approved storage projection.
++    }}true
++}
++
++impl super::DocumentCore {
++    pub(crate) fn authorize_completed_native_hwp_lowering(&self,before:&crate::model::document::Document,target:&mut crate::model::document::Document) {
++        use crate::document_core::converters::hwpx_to_hwp::convert_if_hwpx_source;
++        if !matches!(self.source_format,crate::parser::FileFormat::Hwpx) || !self.computed_row_resources_supported() {return;}
++        let frame=contract::context(&self.document);
++        if contract::context(before)!=frame || before.sections.len()!=target.sections.len() {return;}
++        let mut expected=before.clone();convert_if_hwpx_source(&mut expected,self.source_format);
++        let mut projected=target.clone();
++        for ((a,b),e) in before.sections.iter().zip(&mut projected.sections).zip(&expected.sections) {
++            let values=serde_json::to_value(&a.section_def).ok().zip(serde_json::to_value(&b.section_def).ok()).zip(serde_json::to_value(&e.section_def).ok());
++            let Some(((a_value,b_value),e_value))=values else{return;};
++            let Some(value)=inverse_known_hwp_storage(&a_value,&b_value,&e_value,"sectionDef") else{return;};
++            if value!=a_value || !a.section_def.master_pages.is_empty() || !b.section_def.master_pages.is_empty() {return;}
++            b.section_def.raw_ctrl_extra=a.section_def.raw_ctrl_extra.clone();
++            if a.paragraphs.len()!=b.paragraphs.len() || a.paragraphs.len()!=e.paragraphs.len() {return;}
++            for ((a,b),e) in a.paragraphs.iter().zip(&mut b.paragraphs).zip(&e.paragraphs) {
++                let values=serde_json::to_value(a).ok().zip(serde_json::to_value(&*b).ok()).zip(serde_json::to_value(e).ok());
++                let Some(((a_value,b_value),e_value))=values else{return;};
++                let Some(value)=inverse_known_hwp_storage(&a_value,&b_value,&e_value,"paragraph") else{return;};
++                if value!=a_value || !reverse_known_hwp_paragraph_storage(a,b) {return;}
++            }
++        }
++        if contract::context(&projected)!=frame {return;}
++        for (source,output) in self.document.sections.iter().zip(&mut target.sections) {
++            for (source,output) in source.paragraphs.iter().zip(&mut output.paragraphs) {
++                // The global inverse projection is proved above. The local rows,
++                // plan, metric choices and resource must remain the original lease.
++                let ok=source.owns_completed_native_rows(frame) && output.owns_completed_native_rows(frame);
++                if let Some(owner)=&mut output.completed_native_rows {owner.export_authorized=ok;}
++            }
++        }
++    }
++}
++
++#[cfg(test)]
++mod export_lowering_tests {
++    use super::inverse_known_hwp_storage as inverse;
++    use serde_json::json;
++    #[test] fn native_computed_export_lowering_accepts_only_exact_current_generated_storage() {
++        let a=json!({"Table":{"attr":0,"raw_ctrl_data":null,"cells":[{"raw_list_extra":null}]}});
++        let b=json!({"Table":{"attr":2753296,"raw_ctrl_data":[1,2],"cells":[{"raw_list_extra":[3,4]}]}});
++        assert_eq!(inverse(&a,&b,&b,"paragraph/controls/0"),Some(a.clone()));
++        let mut changed=b.clone();changed["Table"]["raw_ctrl_data"]=json!([1,3]);assert!(inverse(&a,&changed,&b,"paragraph/controls/0").is_none());
++        let mut known=a.clone();known["Table"]["attr"]=json!(8);assert!(inverse(&known,&b,&b,"paragraph/controls/0").is_none());
++        let mut opaque=a.clone();opaque["Table"]["raw_ctrl_data"]=json!([9]);assert!(inverse(&opaque,&b,&b,"paragraph/controls/0").is_none());
++        let mut geometry=a.clone();geometry["Table"]["width"]=json!(100);let mut moved=b.clone();moved["Table"]["width"]=json!(101);
++        assert!(inverse(&geometry,&moved,&moved,"paragraph/controls/0").is_none());
++    }
++    #[test] fn native_computed_export_lowering_preserves_header_prefix_unknown_bytes_and_order() {
++        let a=json!({"raw_header_extra":[1,2,3,4,5,6,7,8,9,10]});let b=json!({"raw_header_extra":[1,2,3,4,5,6,7,8,9,10,0,0]});
++        assert_eq!(inverse(&a,&b,&b,"paragraph"),Some(a.clone()));
++        let mut bad=b.clone();bad["raw_header_extra"][9]=json!(11);assert!(inverse(&a,&bad,&bad,"paragraph").is_none());
++        let a=json!({"SectionDef":{"raw_ctrl_extra":[]}});let b=json!({"SectionDef":{"raw_ctrl_extra":[0,0]}});
++        assert_eq!(inverse(&a,&b,&b,"paragraph/controls/0"),Some(a.clone()));
++        assert!(inverse(&json!({"SectionDef":{"raw_ctrl_extra":[1]}}),&b,&b,"paragraph/controls/0").is_none());
++        assert!(inverse(&json!([1,2]),&json!([2,1]),&json!([2,1]),"paragraph/controls").is_none());
++        let a=json!({"ctrl_data_records":[]});let b=json!({"ctrl_data_records":[null,null]});
++        assert_eq!(inverse(&a,&b,&b,"paragraph"),Some(a));
++        assert!(inverse(&json!({"ctrl_data_records":[]}),&json!({"ctrl_data_records":[{"data":[1]}]}),&json!({"ctrl_data_records":[{"data":[1]}]}),"paragraph").is_none());
++        assert!(inverse(&json!({"ctrl_data_records":[null]}),&b,&b,"paragraph").is_none());
++    }
++}
+--- a/src/document_core/queries/rendering.rs
++++ b/src/document_core/queries/rendering.rs
+@@ -7682,6 +7682,10 @@
+             .set_layout_profile(self.effective_layout_profile());
+         self.layout_engine.set_native_source_synthetic_context(
+             self.native_source_row_render_context());
++        self.layout_engine.set_completed_native_context(
++            (self.computed_row_resources_supported() && self.document.sections.iter().any(|s|s.paragraphs.iter().any(|p|p.completed_native_rows.is_some())))
++                .then(||crate::model::native_computed_rows::context(&self.document)));
++
+         self.layout_engine.set_hwp3_origin_flow_spacing_before(
+             uses_hwp3_origin_flow_spacing_before(&self.document),
+         );
+--- a/src/model/mod.rs
++++ b/src/model/mod.rs
+@@ -95,3 +95,7 @@
+         assert_eq!((red >> 16) & 0xFF, 0x00); // B
+     }
+ }
++
++pub(crate) mod native_computed_rows;
++
++pub(crate) mod native_computed_resource;
+--- /dev/null
++++ b/src/model/native_computed_resource.rs
+@@ -0,0 +1,241 @@
++//! Exact compiled portable metrics and frame-planning generation.
++//! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
++//! Source bytes are included in tests only; the release binary stores one digest.
++pub(crate) const RESOURCE:[u8;32]=[192, 47, 90, 146, 215, 230, 232, 31, 231, 8, 151, 61, 45, 153, 217, 120, 44, 123, 249, 54, 43, 201, 122, 37, 105, 236, 247, 137, 65, 69, 158, 44];
++#[cfg(test)] mod tests {
++    use sha2::{Digest,Sha256};
++    #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
++        let inputs:&[(&str,&[u8])]=&[
++            ("Cargo.lock",include_bytes!("../../Cargo.lock").as_slice()),
++            ("Cargo.toml",include_bytes!("../../Cargo.toml").as_slice()),
++            ("src/document_core/native_computed_rows.rs",include_bytes!("../document_core/native_computed_rows.rs").as_slice()),
++            ("src/model/native_computed_rows.rs",include_bytes!("native_computed_rows.rs").as_slice()),
++            ("src/renderer/canvas.rs",include_bytes!("../renderer/canvas.rs").as_slice()),
++            ("src/renderer/canvas_text_font.rs",include_bytes!("../renderer/canvas_text_font.rs").as_slice()),
++            ("src/renderer/canvaskit_m07_pack_contract.rs",include_bytes!("../renderer/canvaskit_m07_pack_contract.rs").as_slice()),
++            ("src/renderer/canvaskit_policy.rs",include_bytes!("../renderer/canvaskit_policy.rs").as_slice()),
++            ("src/renderer/composer.rs",include_bytes!("../renderer/composer.rs").as_slice()),
++            ("src/renderer/composer/line_breaking.rs",include_bytes!("../renderer/composer/line_breaking.rs").as_slice()),
++            ("src/renderer/composer/lineseg_compare.rs",include_bytes!("../renderer/composer/lineseg_compare.rs").as_slice()),
++            ("src/renderer/composer/lineseg_compare_tests.rs",include_bytes!("../renderer/composer/lineseg_compare_tests.rs").as_slice()),
++            ("src/renderer/composer/re_sample_gen.rs",include_bytes!("../renderer/composer/re_sample_gen.rs").as_slice()),
++            ("src/renderer/composer/supplemental_clusters.rs",include_bytes!("../renderer/composer/supplemental_clusters.rs").as_slice()),
++            ("src/renderer/composer/tests.rs",include_bytes!("../renderer/composer/tests.rs").as_slice()),
++            ("src/renderer/equation/ast.rs",include_bytes!("../renderer/equation/ast.rs").as_slice()),
++            ("src/renderer/equation/canvas_render.rs",include_bytes!("../renderer/equation/canvas_render.rs").as_slice()),
++            ("src/renderer/equation/dispatch.rs",include_bytes!("../renderer/equation/dispatch.rs").as_slice()),
++            ("src/renderer/equation/layout.rs",include_bytes!("../renderer/equation/layout.rs").as_slice()),
++            ("src/renderer/equation/legacy_hwpeq.rs",include_bytes!("../renderer/equation/legacy_hwpeq.rs").as_slice()),
++            ("src/renderer/equation/mod.rs",include_bytes!("../renderer/equation/mod.rs").as_slice()),
++            ("src/renderer/equation/parser.rs",include_bytes!("../renderer/equation/parser.rs").as_slice()),
++            ("src/renderer/equation/svg_render.rs",include_bytes!("../renderer/equation/svg_render.rs").as_slice()),
++            ("src/renderer/equation/symbols.rs",include_bytes!("../renderer/equation/symbols.rs").as_slice()),
++            ("src/renderer/equation/tokenizer.rs",include_bytes!("../renderer/equation/tokenizer.rs").as_slice()),
++            ("src/renderer/equation_tac_flow.rs",include_bytes!("../renderer/equation_tac_flow.rs").as_slice()),
++            ("src/renderer/float_placement.rs",include_bytes!("../renderer/float_placement.rs").as_slice()),
++            ("src/renderer/font_decision.rs",include_bytes!("../renderer/font_decision.rs").as_slice()),
++            ("src/renderer/font_environment.rs",include_bytes!("../renderer/font_environment.rs").as_slice()),
++            ("src/renderer/font_metrics_data.rs",include_bytes!("../renderer/font_metrics_data.rs").as_slice()),
++            ("src/renderer/font_metrics_generated.rs",include_bytes!("../renderer/font_metrics_generated.rs").as_slice()),
++            ("src/renderer/font_metrics_overlays.rs",include_bytes!("../renderer/font_metrics_overlays.rs").as_slice()),
++            ("src/renderer/font_paths.rs",include_bytes!("../renderer/font_paths.rs").as_slice()),
++            ("src/renderer/font_rule_projections/layout_metric.rs",include_bytes!("../renderer/font_rule_projections/layout_metric.rs").as_slice()),
++            ("src/renderer/font_rule_projections/layout_name.rs",include_bytes!("../renderer/font_rule_projections/layout_name.rs").as_slice()),
++            ("src/renderer/form_appearance.rs",include_bytes!("../renderer/form_appearance.rs").as_slice()),
++            ("src/renderer/form_caption.rs",include_bytes!("../renderer/form_caption.rs").as_slice()),
++            ("src/renderer/generated_column_stack.rs",include_bytes!("../renderer/generated_column_stack.rs").as_slice()),
++            ("src/renderer/gpu.rs",include_bytes!("../renderer/gpu.rs").as_slice()),
++            ("src/renderer/hancom_pua.rs",include_bytes!("../renderer/hancom_pua.rs").as_slice()),
++            ("src/renderer/height_cursor.rs",include_bytes!("../renderer/height_cursor.rs").as_slice()),
++            ("src/renderer/height_cursor_lazy_base.rs",include_bytes!("../renderer/height_cursor_lazy_base.rs").as_slice()),
++            ("src/renderer/height_measurer.rs",include_bytes!("../renderer/height_measurer.rs").as_slice()),
++            ("src/renderer/hft_ascii_evidence.rs",include_bytes!("../renderer/hft_ascii_evidence.rs").as_slice()),
++            ("src/renderer/html.rs",include_bytes!("../renderer/html.rs").as_slice()),
++            ("src/renderer/hyperlinks.rs",include_bytes!("../renderer/hyperlinks.rs").as_slice()),
++            ("src/renderer/image_header.rs",include_bytes!("../renderer/image_header.rs").as_slice()),
++            ("src/renderer/image_resolver.rs",include_bytes!("../renderer/image_resolver.rs").as_slice()),
++            ("src/renderer/inline_flow.rs",include_bytes!("../renderer/inline_flow.rs").as_slice()),
++            ("src/renderer/kerning.rs",include_bytes!("../renderer/kerning.rs").as_slice()),
++            ("src/renderer/layer_renderer.rs",include_bytes!("../renderer/layer_renderer.rs").as_slice()),
++            ("src/renderer/layout.rs",include_bytes!("../renderer/layout.rs").as_slice()),
++            ("src/renderer/layout/anchor_box_flow.rs",include_bytes!("../renderer/layout/anchor_box_flow.rs").as_slice()),
++            ("src/renderer/layout/border_rendering.rs",include_bytes!("../renderer/layout/border_rendering.rs").as_slice()),
++            ("src/renderer/layout/fixed_textbox_flow.rs",include_bytes!("../renderer/layout/fixed_textbox_flow.rs").as_slice()),
++            ("src/renderer/layout/integration_tests.rs",include_bytes!("../renderer/layout/integration_tests.rs").as_slice()),
++            ("src/renderer/layout/paragraph_layout.rs",include_bytes!("../renderer/layout/paragraph_layout.rs").as_slice()),
++            ("src/renderer/layout/paragraph_layout/issue_2439_lineseg_indent_tests.rs",include_bytes!("../renderer/layout/paragraph_layout/issue_2439_lineseg_indent_tests.rs").as_slice()),
++            ("src/renderer/layout/picture_footnote.rs",include_bytes!("../renderer/layout/picture_footnote.rs").as_slice()),
++            ("src/renderer/layout/shape_layout.rs",include_bytes!("../renderer/layout/shape_layout.rs").as_slice()),
++            ("src/renderer/layout/table_cell_content.rs",include_bytes!("../renderer/layout/table_cell_content.rs").as_slice()),
++            ("src/renderer/layout/table_layout.rs",include_bytes!("../renderer/layout/table_layout.rs").as_slice()),
++            ("src/renderer/layout/table_partial.rs",include_bytes!("../renderer/layout/table_partial.rs").as_slice()),
++            ("src/renderer/layout/tests.rs",include_bytes!("../renderer/layout/tests.rs").as_slice()),
++            ("src/renderer/layout/text_measurement.rs",include_bytes!("../renderer/layout/text_measurement.rs").as_slice()),
++            ("src/renderer/layout/utils.rs",include_bytes!("../renderer/layout/utils.rs").as_slice()),
++            ("src/renderer/layout_frame.rs",include_bytes!("../renderer/layout_frame.rs").as_slice()),
++            ("src/renderer/mod.rs",include_bytes!("../renderer/mod.rs").as_slice()),
++            ("src/renderer/page_layout.rs",include_bytes!("../renderer/page_layout.rs").as_slice()),
++            ("src/renderer/page_number.rs",include_bytes!("../renderer/page_number.rs").as_slice()),
++            ("src/renderer/pagination.rs",include_bytes!("../renderer/pagination.rs").as_slice()),
++            ("src/renderer/pagination/engine.rs",include_bytes!("../renderer/pagination/engine.rs").as_slice()),
++            ("src/renderer/pagination/state.rs",include_bytes!("../renderer/pagination/state.rs").as_slice()),
++            ("src/renderer/pagination/tests.rs",include_bytes!("../renderer/pagination/tests.rs").as_slice()),
++            ("src/renderer/partial_replay.rs",include_bytes!("../renderer/partial_replay.rs").as_slice()),
++            ("src/renderer/pdf.rs",include_bytes!("../renderer/pdf.rs").as_slice()),
++            ("src/renderer/pdf_raster_fidelity/catalog.rs",include_bytes!("../renderer/pdf_raster_fidelity/catalog.rs").as_slice()),
++            ("src/renderer/pdf_raster_fidelity/classify.rs",include_bytes!("../renderer/pdf_raster_fidelity/classify.rs").as_slice()),
++            ("src/renderer/pdf_raster_fidelity/contract.rs",include_bytes!("../renderer/pdf_raster_fidelity/contract.rs").as_slice()),
++            ("src/renderer/pdf_raster_fidelity/fingerprint.rs",include_bytes!("../renderer/pdf_raster_fidelity/fingerprint.rs").as_slice()),
++            ("src/renderer/pdf_raster_fidelity/isolate.rs",include_bytes!("../renderer/pdf_raster_fidelity/isolate.rs").as_slice()),
++            ("src/renderer/pdf_raster_fidelity/mod.rs",include_bytes!("../renderer/pdf_raster_fidelity/mod.rs").as_slice()),
++            ("src/renderer/pdf_raster_fidelity/pdf_page.rs",include_bytes!("../renderer/pdf_raster_fidelity/pdf_page.rs").as_slice()),
++            ("src/renderer/pdf_raster_fidelity/report.rs",include_bytes!("../renderer/pdf_raster_fidelity/report.rs").as_slice()),
++            ("src/renderer/pdf_raster_fidelity/wrap.rs",include_bytes!("../renderer/pdf_raster_fidelity/wrap.rs").as_slice()),
++            ("src/renderer/pdf_synthetic_bold.rs",include_bytes!("../renderer/pdf_synthetic_bold.rs").as_slice()),
++            ("src/renderer/pdf_synthetic_italic.rs",include_bytes!("../renderer/pdf_synthetic_italic.rs").as_slice()),
++            ("src/renderer/pua_oldhangul.rs",include_bytes!("../renderer/pua_oldhangul.rs").as_slice()),
++            ("src/renderer/render_normalization.rs",include_bytes!("../renderer/render_normalization.rs").as_slice()),
++            ("src/renderer/render_tree.rs",include_bytes!("../renderer/render_tree.rs").as_slice()),
++            ("src/renderer/scheduler.rs",include_bytes!("../renderer/scheduler.rs").as_slice()),
++            ("src/renderer/shaping.rs",include_bytes!("../renderer/shaping.rs").as_slice()),
++            ("src/renderer/shaping_composition.rs",include_bytes!("../renderer/shaping_composition.rs").as_slice()),
++            ("src/renderer/shaping_context.rs",include_bytes!("../renderer/shaping_context.rs").as_slice()),
++            ("src/renderer/shaping_paragraph.rs",include_bytes!("../renderer/shaping_paragraph.rs").as_slice()),
++            ("src/renderer/shaping_publication.rs",include_bytes!("../renderer/shaping_publication.rs").as_slice()),
++            ("src/renderer/shaping_vertical.rs",include_bytes!("../renderer/shaping_vertical.rs").as_slice()),
++            ("src/renderer/skia/equation_conv.rs",include_bytes!("../renderer/skia/equation_conv.rs").as_slice()),
++            ("src/renderer/skia/font_lookup.rs",include_bytes!("../renderer/skia/font_lookup.rs").as_slice()),
++            ("src/renderer/skia/glyph_replay.rs",include_bytes!("../renderer/skia/glyph_replay.rs").as_slice()),
++            ("src/renderer/skia/image_conv.rs",include_bytes!("../renderer/skia/image_conv.rs").as_slice()),
++            ("src/renderer/skia/mod.rs",include_bytes!("../renderer/skia/mod.rs").as_slice()),
++            ("src/renderer/skia/renderer.rs",include_bytes!("../renderer/skia/renderer.rs").as_slice()),
++            ("src/renderer/skia/text_replay.rs",include_bytes!("../renderer/skia/text_replay.rs").as_slice()),
++            ("src/renderer/static_svg.rs",include_bytes!("../renderer/static_svg.rs").as_slice()),
++            ("src/renderer/stored_float_anchor.rs",include_bytes!("../renderer/stored_float_anchor.rs").as_slice()),
++            ("src/renderer/style_resolver.rs",include_bytes!("../renderer/style_resolver.rs").as_slice()),
++            ("src/renderer/supplemental_metrics.rs",include_bytes!("../renderer/supplemental_metrics.rs").as_slice()),
++            ("src/renderer/svg.rs",include_bytes!("../renderer/svg.rs").as_slice()),
++            ("src/renderer/svg/tests.rs",include_bytes!("../renderer/svg/tests.rs").as_slice()),
++            ("src/renderer/svg_fragment.rs",include_bytes!("../renderer/svg_fragment.rs").as_slice()),
++            ("src/renderer/svg_layer.rs",include_bytes!("../renderer/svg_layer.rs").as_slice()),
++            ("src/renderer/text_decoration.rs",include_bytes!("../renderer/text_decoration.rs").as_slice()),
++            ("src/renderer/typeset.rs",include_bytes!("../renderer/typeset.rs").as_slice()),
++            ("src/renderer/typeset/controls.rs",include_bytes!("../renderer/typeset/controls.rs").as_slice()),
++            ("src/renderer/typeset/controls/decoration_host.rs",include_bytes!("../renderer/typeset/controls/decoration_host.rs").as_slice()),
++            ("src/renderer/typeset/controls/decoration_table.rs",include_bytes!("../renderer/typeset/controls/decoration_table.rs").as_slice()),
++            ("src/renderer/typeset/controls/deferred.rs",include_bytes!("../renderer/typeset/controls/deferred.rs").as_slice()),
++            ("src/renderer/typeset/controls/deferred_picture.rs",include_bytes!("../renderer/typeset/controls/deferred_picture.rs").as_slice()),
++            ("src/renderer/typeset/controls/deferred_placement.rs",include_bytes!("../renderer/typeset/controls/deferred_placement.rs").as_slice()),
++            ("src/renderer/typeset/controls/empty_float.rs",include_bytes!("../renderer/typeset/controls/empty_float.rs").as_slice()),
++            ("src/renderer/typeset/controls/flow_table.rs",include_bytes!("../renderer/typeset/controls/flow_table.rs").as_slice()),
++            ("src/renderer/typeset/controls/host_wrap.rs",include_bytes!("../renderer/typeset/controls/host_wrap.rs").as_slice()),
++            ("src/renderer/typeset/controls/order.rs",include_bytes!("../renderer/typeset/controls/order.rs").as_slice()),
++            ("src/renderer/typeset/controls/paragraph_flow.rs",include_bytes!("../renderer/typeset/controls/paragraph_flow.rs").as_slice()),
++            ("src/renderer/typeset/controls/shape_flow.rs",include_bytes!("../renderer/typeset/controls/shape_flow.rs").as_slice()),
++            ("src/renderer/typeset/controls/stored_tac.rs",include_bytes!("../renderer/typeset/controls/stored_tac.rs").as_slice()),
++            ("src/renderer/typeset/controls/table_entry.rs",include_bytes!("../renderer/typeset/controls/table_entry.rs").as_slice()),
++            ("src/renderer/typeset/controls/tac_fit.rs",include_bytes!("../renderer/typeset/controls/tac_fit.rs").as_slice()),
++            ("src/renderer/typeset/controls/tac_flow.rs",include_bytes!("../renderer/typeset/controls/tac_flow.rs").as_slice()),
++            ("src/renderer/typeset/controls/tac_reconcile.rs",include_bytes!("../renderer/typeset/controls/tac_reconcile.rs").as_slice()),
++            ("src/renderer/typeset/controls/wrap_absorption.rs",include_bytes!("../renderer/typeset/controls/wrap_absorption.rs").as_slice()),
++            ("src/renderer/typeset/controls/wrap_flow.rs",include_bytes!("../renderer/typeset/controls/wrap_flow.rs").as_slice()),
++            ("src/renderer/typeset/controls/wrap_match.rs",include_bytes!("../renderer/typeset/controls/wrap_match.rs").as_slice()),
++            ("src/renderer/typeset/controls/wrap_tail.rs",include_bytes!("../renderer/typeset/controls/wrap_tail.rs").as_slice()),
++            ("src/renderer/typeset/inline_flow.rs",include_bytes!("../renderer/typeset/inline_flow.rs").as_slice()),
++            ("src/renderer/typeset/inline_flow/plan.rs",include_bytes!("../renderer/typeset/inline_flow/plan.rs").as_slice()),
++            ("src/renderer/typeset/notes.rs",include_bytes!("../renderer/typeset/notes.rs").as_slice()),
++            ("src/renderer/typeset/notes/endnotes.rs",include_bytes!("../renderer/typeset/notes/endnotes.rs").as_slice()),
++            ("src/renderer/typeset/notes/endnotes/content.rs",include_bytes!("../renderer/typeset/notes/endnotes/content.rs").as_slice()),
++            ("src/renderer/typeset/notes/endnotes/debug.rs",include_bytes!("../renderer/typeset/notes/endnotes/debug.rs").as_slice()),
++            ("src/renderer/typeset/notes/endnotes/emit.rs",include_bytes!("../renderer/typeset/notes/endnotes/emit.rs").as_slice()),
++            ("src/renderer/typeset/notes/endnotes/fit.rs",include_bytes!("../renderer/typeset/notes/endnotes/fit.rs").as_slice()),
++            ("src/renderer/typeset/notes/endnotes/format.rs",include_bytes!("../renderer/typeset/notes/endnotes/format.rs").as_slice()),
++            ("src/renderer/typeset/notes/endnotes/measure.rs",include_bytes!("../renderer/typeset/notes/endnotes/measure.rs").as_slice()),
++            ("src/renderer/typeset/notes/endnotes/metrics.rs",include_bytes!("../renderer/typeset/notes/endnotes/metrics.rs").as_slice()),
++            ("src/renderer/typeset/notes/endnotes/paragraph.rs",include_bytes!("../renderer/typeset/notes/endnotes/paragraph.rs").as_slice()),
++            ("src/renderer/typeset/notes/endnotes/paragraph/initial_fit.rs",include_bytes!("../renderer/typeset/notes/endnotes/paragraph/initial_fit.rs").as_slice()),
++            ("src/renderer/typeset/notes/endnotes/paragraph/new_note_fit.rs",include_bytes!("../renderer/typeset/notes/endnotes/paragraph/new_note_fit.rs").as_slice()),
++            ("src/renderer/typeset/notes/endnotes/paragraph/rewind_tail.rs",include_bytes!("../renderer/typeset/notes/endnotes/paragraph/rewind_tail.rs").as_slice()),
++            ("src/renderer/typeset/notes/endnotes/paragraph/tail_fit.rs",include_bytes!("../renderer/typeset/notes/endnotes/paragraph/tail_fit.rs").as_slice()),
++            ("src/renderer/typeset/notes/endnotes/prepare.rs",include_bytes!("../renderer/typeset/notes/endnotes/prepare.rs").as_slice()),
++            ("src/renderer/typeset/notes/endnotes/profile.rs",include_bytes!("../renderer/typeset/notes/endnotes/profile.rs").as_slice()),
++            ("src/renderer/typeset/notes/endnotes/types.rs",include_bytes!("../renderer/typeset/notes/endnotes/types.rs").as_slice()),
++            ("src/renderer/typeset/notes/footnotes.rs",include_bytes!("../renderer/typeset/notes/footnotes.rs").as_slice()),
++            ("src/renderer/typeset/notes/footnotes/body.rs",include_bytes!("../renderer/typeset/notes/footnotes/body.rs").as_slice()),
++            ("src/renderer/typeset/notes/footnotes/boundary.rs",include_bytes!("../renderer/typeset/notes/footnotes/boundary.rs").as_slice()),
++            ("src/renderer/typeset/notes/footnotes/measure.rs",include_bytes!("../renderer/typeset/notes/footnotes/measure.rs").as_slice()),
++            ("src/renderer/typeset/paragraph.rs",include_bytes!("../renderer/typeset/paragraph.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/boundary.rs",include_bytes!("../renderer/typeset/paragraph/boundary.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/columns.rs",include_bytes!("../renderer/typeset/paragraph/columns.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/context.rs",include_bytes!("../renderer/typeset/paragraph/context.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/empty.rs",include_bytes!("../renderer/typeset/paragraph/empty.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/entry.rs",include_bytes!("../renderer/typeset/paragraph/entry.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/fit.rs",include_bytes!("../renderer/typeset/paragraph/fit.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/flow.rs",include_bytes!("../renderer/typeset/paragraph/flow.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/format.rs",include_bytes!("../renderer/typeset/paragraph/format.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/line_queries.rs",include_bytes!("../renderer/typeset/paragraph/line_queries.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/metrics.rs",include_bytes!("../renderer/typeset/paragraph/metrics.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/overflow.rs",include_bytes!("../renderer/typeset/paragraph/overflow.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/placement.rs",include_bytes!("../renderer/typeset/paragraph/placement.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/scan.rs",include_bytes!("../renderer/typeset/paragraph/scan.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/split.rs",include_bytes!("../renderer/typeset/paragraph/split.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/split_entry.rs",include_bytes!("../renderer/typeset/paragraph/split_entry.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/stored_lines.rs",include_bytes!("../renderer/typeset/paragraph/stored_lines.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/whole_fit.rs",include_bytes!("../renderer/typeset/paragraph/whole_fit.rs").as_slice()),
++            ("src/renderer/typeset/section.rs",include_bytes!("../renderer/typeset/section.rs").as_slice()),
++            ("src/renderer/typeset/section/boundary.rs",include_bytes!("../renderer/typeset/section/boundary.rs").as_slice()),
++            ("src/renderer/typeset/section/columns.rs",include_bytes!("../renderer/typeset/section/columns.rs").as_slice()),
++            ("src/renderer/typeset/section/controls.rs",include_bytes!("../renderer/typeset/section/controls.rs").as_slice()),
++            ("src/renderer/typeset/section/entry.rs",include_bytes!("../renderer/typeset/section/entry.rs").as_slice()),
++            ("src/renderer/typeset/section/finalize.rs",include_bytes!("../renderer/typeset/section/finalize.rs").as_slice()),
++            ("src/renderer/typeset/section/flow.rs",include_bytes!("../renderer/typeset/section/flow.rs").as_slice()),
++            ("src/renderer/typeset/section/heading.rs",include_bytes!("../renderer/typeset/section/heading.rs").as_slice()),
++            ("src/renderer/typeset/section/post_flow.rs",include_bytes!("../renderer/typeset/section/post_flow.rs").as_slice()),
++            ("src/renderer/typeset/section/stored_reset.rs",include_bytes!("../renderer/typeset/section/stored_reset.rs").as_slice()),
++            ("src/renderer/typeset/section/tail.rs",include_bytes!("../renderer/typeset/section/tail.rs").as_slice()),
++            ("src/renderer/typeset/section/vpos.rs",include_bytes!("../renderer/typeset/section/vpos.rs").as_slice()),
++            ("src/renderer/typeset/state.rs",include_bytes!("../renderer/typeset/state.rs").as_slice()),
++            ("src/renderer/typeset/state/commands.rs",include_bytes!("../renderer/typeset/state/commands.rs").as_slice()),
++            ("src/renderer/typeset/state/data.rs",include_bytes!("../renderer/typeset/state/data.rs").as_slice()),
++            ("src/renderer/typeset/state/finalize.rs",include_bytes!("../renderer/typeset/state/finalize.rs").as_slice()),
++            ("src/renderer/typeset/state/notes.rs",include_bytes!("../renderer/typeset/state/notes.rs").as_slice()),
++            ("src/renderer/typeset/state/transition.rs",include_bytes!("../renderer/typeset/state/transition.rs").as_slice()),
++            ("src/renderer/typeset/table.rs",include_bytes!("../renderer/typeset/table.rs").as_slice()),
++            ("src/renderer/typeset/table/block.rs",include_bytes!("../renderer/typeset/table/block.rs").as_slice()),
++            ("src/renderer/typeset/table/block/entry.rs",include_bytes!("../renderer/typeset/table/block/entry.rs").as_slice()),
++            ("src/renderer/typeset/table/block/host_placement.rs",include_bytes!("../renderer/typeset/table/block/host_placement.rs").as_slice()),
++            ("src/renderer/typeset/table/block/prepare.rs",include_bytes!("../renderer/typeset/table/block/prepare.rs").as_slice()),
++            ("src/renderer/typeset/table/block/whole_fit.rs",include_bytes!("../renderer/typeset/table/block/whole_fit.rs").as_slice()),
++            ("src/renderer/typeset/table/continuation.rs",include_bytes!("../renderer/typeset/table/continuation.rs").as_slice()),
++            ("src/renderer/typeset/table/continuation/fragment.rs",include_bytes!("../renderer/typeset/table/continuation/fragment.rs").as_slice()),
++            ("src/renderer/typeset/table/continuation/fragment/budget.rs",include_bytes!("../renderer/typeset/table/continuation/fragment/budget.rs").as_slice()),
++            ("src/renderer/typeset/table/continuation/fragment/emit.rs",include_bytes!("../renderer/typeset/table/continuation/fragment/emit.rs").as_slice()),
++            ("src/renderer/typeset/table/continuation/fragment/scan.rs",include_bytes!("../renderer/typeset/table/continuation/fragment/scan.rs").as_slice()),
++            ("src/renderer/typeset/table/continuation/job.rs",include_bytes!("../renderer/typeset/table/continuation/job.rs").as_slice()),
++            ("src/renderer/typeset/table/continuation/step.rs",include_bytes!("../renderer/typeset/table/continuation/step.rs").as_slice()),
++            ("src/renderer/typeset/table/footnotes.rs",include_bytes!("../renderer/typeset/table/footnotes.rs").as_slice()),
++            ("src/renderer/typeset/table/host_spacing.rs",include_bytes!("../renderer/typeset/table/host_spacing.rs").as_slice()),
++            ("src/renderer/typeset/table/scan.rs",include_bytes!("../renderer/typeset/table/scan.rs").as_slice()),
++            ("src/renderer/typeset/table/scan/block_fit.rs",include_bytes!("../renderer/typeset/table/scan/block_fit.rs").as_slice()),
++            ("src/renderer/typeset/table/scan/block_fragment.rs",include_bytes!("../renderer/typeset/table/scan/block_fragment.rs").as_slice()),
++            ("src/renderer/typeset/table/scan/landscape.rs",include_bytes!("../renderer/typeset/table/scan/landscape.rs").as_slice()),
++            ("src/renderer/typeset/table/scan/row.rs",include_bytes!("../renderer/typeset/table/scan/row.rs").as_slice()),
++            ("src/renderer/typeset/table/scan/row_entry.rs",include_bytes!("../renderer/typeset/table/scan/row_entry.rs").as_slice()),
++            ("src/renderer/typeset/table/scan/runner.rs",include_bytes!("../renderer/typeset/table/scan/runner.rs").as_slice()),
++            ("src/renderer/typeset/table/scan/runner/block_step.rs",include_bytes!("../renderer/typeset/table/scan/runner/block_step.rs").as_slice()),
++            ("src/renderer/typeset/table/scan/runner/row_step.rs",include_bytes!("../renderer/typeset/table/scan/runner/row_step.rs").as_slice()),
++            ("src/renderer/typeset/table/scan/source_frame.rs",include_bytes!("../renderer/typeset/table/scan/source_frame.rs").as_slice()),
++            ("src/renderer/typeset/table/scan/source_tail.rs",include_bytes!("../renderer/typeset/table/scan/source_tail.rs").as_slice()),
++            ("src/renderer/typeset/table/scan/source_tail/extension.rs",include_bytes!("../renderer/typeset/table/scan/source_tail/extension.rs").as_slice()),
++            ("src/renderer/typeset/table/scan/types.rs",include_bytes!("../renderer/typeset/table/scan/types.rs").as_slice()),
++            ("src/renderer/web_canvas.rs",include_bytes!("../renderer/web_canvas.rs").as_slice()),
++        ];
++        let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
++        for (path,bytes) in inputs {
++            let canonical:Vec<u8>=bytes.iter().enumerate().filter_map(|(i,b)|
++                if *b==b'\r' && bytes.get(i+1)==Some(&b'\n') {None} else {Some(*b)}).collect();
++            h.update(path.as_bytes());h.update([0]);h.update((canonical.len() as u64).to_le_bytes());h.update(&canonical);
++        }
++        let actual:[u8;32]=h.finalize().into();assert_eq!(actual,super::RESOURCE);
++    }
++}
+--- /dev/null
++++ b/src/model/native_computed_rows.rs
+@@ -0,0 +1,288 @@
++//! A completed native text-edit row partition, distinct from an imported source cache.
++//! The package contract contains row coordinate bases and space-metric choices only.
++//! It never restores fonts, tables, paragraph text, styles or document geometry.
++use serde::{Deserialize, Serialize};
++use sha2::{Digest, Sha256};
++use super::{document::Document, paragraph::{Paragraph, SpaceMetric}};
++
++pub(crate) const PATH: &str = "META-INF/rhwp-computed-native-rows-v1.json";
++pub(crate) const MAX_BYTES: usize = 2 * 1024 * 1024;
++pub(crate) const MAX_ROWS: usize = 65536;
++pub(crate) const PIPELINE: &str = "rhwp-portable-native-text-edit-frame-1";
++pub(crate) const RESOURCE: [u8;32] = super::native_computed_resource::RESOURCE;
++
++#[derive(Debug,Clone,Copy,Serialize,Deserialize,PartialEq)]
++#[serde(deny_unknown_fields)]
++pub(crate) struct NativeParagraphFrame {
++    pub control: usize,
++    pub page: u32,
++    pub column: u16,
++    pub raw_top: f64,
++    pub reserved_bottom: f64,
++    pub before: f64,
++    pub body_height: f64,
++    pub after: f64,
++    pub selected_inset_hu: i32,
++    pub outer_top: i16,
++    pub source_row_vpos: i32,
++}
++
++#[derive(Debug,Default)]
++pub(crate) struct FrameObservation(std::sync::Mutex<Option<NativeParagraphFrame>>);
++impl Clone for FrameObservation {fn clone(&self)->Self {Self(std::sync::Mutex::new(self.get()))}}
++impl FrameObservation {
++    pub fn get(&self)->Option<NativeParagraphFrame> {self.0.lock().ok().and_then(|v|*v)}
++    pub fn set(&self,value:Option<NativeParagraphFrame>) {if let Ok(mut v)=self.0.lock(){*v=value;}}
++}
++
++#[derive(Debug,Clone,Serialize,Deserialize)]
++#[serde(deny_unknown_fields)]
++pub(crate) struct RowBasis {
++    pub page: u32,
++    pub column: u16,
++    pub offset: i32,
++}
++
++#[derive(Debug,Clone)]
++pub(crate) struct CompletedRows {
++    pub local: [u8;32],
++    pub plan: [u8;32],
++    pub frame: [u8;32],
++    pub resource: [u8;32],
++    pub bases: Vec<RowBasis>,
++    pub native_frame: Option<NativeParagraphFrame>,
++    pub export_authorized: bool,
++}
++
++pub(crate) fn sha(bytes: &[u8]) -> [u8;32] { Sha256::digest(bytes).into() }
++pub(crate) fn plan(bases:&[RowBasis],frame:Option<NativeParagraphFrame>)->[u8;32] {
++    sha(&serde_json::to_vec(&(PIPELINE,RESOURCE,bases,frame)).unwrap_or_default())
++}
++pub(crate) fn local(p: &Paragraph) -> [u8;32] {
++    sha(&serde_json::to_vec(&(&p.text,p.char_count,&p.char_offsets,&p.char_shapes,
++        &p.line_segs,p.para_shape_id,p.style_id,p.column_type as u8,p.raw_break_type,
++        &p.tab_extended,p.hwpx_axis_shift,p.layout_only_fill_lines,&p.layout_space_metrics.iter()
++            .map(|(start,metric)|(*start,metric_id(*metric))).collect::<Vec<_>>())).unwrap_or_default())
++}
++pub(crate) fn context(doc: &Document) -> [u8;32] {
++    let mut h=Sha256::new();
++    h.update(doc.native_source_synthetic_context_digest());
++    for section in &doc.sections {
++        h.update((section.paragraphs.len() as u64).to_le_bytes());
++        for p in &section.paragraphs { h.update(local(p)); }
++    }
++    h.finalize().into()
++}
++fn metric_id(m: SpaceMetric) -> u8 { match m { SpaceMetric::Stored=>0,SpaceMetric::HancomRegenerated=>1,
++    SpaceMetric::HalfCell=>2,SpaceMetric::KoPubJustified=>3 } }
++fn metric(id: u8) -> Option<SpaceMetric> { Some(match id {0=>SpaceMetric::Stored,1=>SpaceMetric::HancomRegenerated,
++    2=>SpaceMetric::HalfCell,3=>SpaceMetric::KoPubJustified,_=>return None}) }
++
++impl Paragraph {
++    pub(crate) fn owns_completed_native_rows(&self, frame: [u8;32]) -> bool {
++        !self.stored_text_partition_is_dirty() && !self.cell_format_vpos_dirty
++            && self.layout_only_fill_lines==0 && self.completed_native_rows.as_ref().is_some_and(|o|
++                o.local==local(self) && o.frame==frame && o.resource==RESOURCE
++                && o.plan==plan(&o.bases,o.native_frame)
++                && o.bases.len()==self.line_segs.len())
++    }
++    pub(crate) fn exports_completed_native_rows(&self) -> bool {
++        self.completed_native_rows.as_ref().is_some_and(|o|o.export_authorized
++            && o.local==local(self) && o.resource==RESOURCE && o.plan==plan(&o.bases,o.native_frame))
++    }
++    pub(crate) fn owns_completed_native_frame_at(&self,context:[u8;32],page:u32,column:u16,control:usize,current_flow:f64,unit:f64)->bool {
++        if !self.owns_completed_native_rows(context) || !current_flow.is_finite() || !unit.is_finite() || unit<=0.0 {return false;}
++        let Some(f)=self.completed_native_rows.as_ref().and_then(|o|o.native_frame) else{return false;};
++        f.control==control && f.page==page && f.column==column
++            && f.source_row_vpos==self.line_segs[0].vertical_pos && f.selected_inset_hu==0
++            && (f.raw_top-current_flow).abs()<=unit
++            && [f.before,f.body_height,f.after].iter().all(|v|v.is_finite() && *v>=0.0)
++            && (f.reserved_bottom-f.raw_top-f.body_height-f.after).abs()<=unit
++            && valid_native_empty_host(self,control,f.outer_top)
++    }
++    pub(crate) fn completed_xml_vpos(&self) -> Option<Vec<i32>> {
++        if !self.exports_completed_native_rows() {return None;}
++        let owner=self.completed_native_rows.as_ref()?;
++        self.line_segs.iter().zip(&owner.bases).map(|(r,b)|r.vertical_pos.checked_sub(b.offset)).collect()
++    }
++}
++
++#[derive(Debug,Serialize,Deserialize)]
++#[serde(deny_unknown_fields)]
++struct Entry { section:usize, paragraph:usize, bases:Vec<RowBasis>, plan:[u8;32],
++    spaces:Vec<(u32,u8)>, native_frame:Option<NativeParagraphFrame> }
++#[derive(Debug,Serialize,Deserialize)]
++#[serde(deny_unknown_fields)]
++struct Package { version:u8, representation:String, pipeline:String, resource:[u8;32], header:[u8;32], sections:Vec<[u8;32]>, entries:Vec<Entry> }
++
++pub(crate) fn encode(doc:&Document,header:&[u8],sections:&[[u8;32]]) -> Option<Vec<u8>> {
++    encode_representation(doc,header,sections,true)
++}
++pub(crate) fn encode_representation(doc:&Document,header:&[u8],sections:&[[u8;32]],lowered_xml:bool) -> Option<Vec<u8>> {
++    let mut entries=Vec::new();let mut rows=0usize;
++    for (si,s) in doc.sections.iter().enumerate() {for (pi,p) in s.paragraphs.iter().enumerate() {
++        if !p.exports_completed_native_rows() {continue;}
++        let o=p.completed_native_rows.as_ref()?;rows=rows.checked_add(o.bases.len())?;
++        if rows>MAX_ROWS || entries.len()>=4096 {return None;}
++        entries.push(Entry {section:si,paragraph:pi,bases:o.bases.clone(),plan:o.plan,
++            spaces:p.layout_space_metrics.iter().map(|(x,m)|(*x,metric_id(*m))).collect(),native_frame:o.native_frame});
++    }}
++    if entries.is_empty() {return None;}
++    let bytes=serde_json::to_vec(&Package {version:1,representation:if lowered_xml{"hwpx-relative-v1"}else{"hwp-flow-v1"}.into(),pipeline:PIPELINE.into(),resource:RESOURCE,
++        header:sha(header),sections:sections.to_vec(),entries}).ok()?;
++    (bytes.len()<=MAX_BYTES).then_some(bytes)
++}
++
++/// The reader calls this only after hashing the *actual* header/section entry bytes.
++/// Invalid metadata restores no rows or origin permissions (including valid prefixes).
++pub(crate) fn decode(doc:&mut Document,bytes:&[u8],header:&[u8],sections:&[[u8;32]]) -> bool {
++    decode_representation(doc,bytes,header,sections,true)
++}
++pub(crate) fn decode_representation(doc:&mut Document,bytes:&[u8],header:&[u8],sections:&[[u8;32]],lowered_xml:bool)->bool {
++    if bytes.len()>MAX_BYTES {return false;}
++    let Ok(p)=serde_json::from_slice::<Package>(bytes) else{return false;};
++    if p.representation!=if lowered_xml{"hwpx-relative-v1"}else{"hwp-flow-v1"} || p.version!=1 || p.pipeline!=PIPELINE || p.resource!=RESOURCE || p.header!=sha(header)
++        || p.sections!=sections || p.entries.is_empty() || p.entries.len()>4096 {return false;}
++    let mut rows=0usize;let mut seen=std::collections::HashSet::new();
++    for e in &p.entries {
++        let Some(para)=doc.sections.get(e.section).and_then(|s|s.paragraphs.get(e.paragraph)) else{return false;};
++        if e.plan!=plan(&e.bases,e.native_frame) || !seen.insert((e.section,e.paragraph)) || e.bases.len()!=para.line_segs.len()
++            || e.bases.is_empty() || para.stored_text_partition_is_dirty() || para.layout_only_fill_lines!=0 {return false;}
++        rows=match rows.checked_add(e.bases.len()) {Some(n) if n<=MAX_ROWS=>n,_=>return false};
++        if e.spaces.len()>e.bases.len() || e.spaces.iter().enumerate().any(|(i,(start,id))|
++            para.line_segs.get(i).is_none_or(|r|r.text_start!=*start) || metric(*id).is_none()) {return false;}
++        if para.line_segs.iter().zip(&e.bases).any(|(r,b)| b.page>100000 || b.column>255
++            || r.vertical_pos<0 || (lowered_xml && r.vertical_pos.checked_add(b.offset).is_none()) || b.offset<0
++            || r.line_height<=0 || r.text_height<=0 || r.line_spacing<0
++            || r.tag!=0x80060000) {return false;}
++        if let Some(f)=e.native_frame {
++            if !f.raw_top.is_finite() || f.raw_top<0.0 || f.raw_top>1000000.0
++                || !f.reserved_bottom.is_finite() || f.reserved_bottom<f.raw_top || f.selected_inset_hu!=0
++                || ![f.before,f.body_height,f.after].iter().all(|v|v.is_finite() && *v>=0.0)
++                || (f.reserved_bottom-f.raw_top-f.body_height-f.after).abs()>1.0/75.0
++                || e.bases.len()!=1 || f.source_row_vpos!=if lowered_xml{para.line_segs[0].vertical_pos.checked_add(e.bases[0].offset).unwrap()}else{para.line_segs[0].vertical_pos}
++                || f.page!=e.bases[0].page || f.column!=e.bases[0].column
++                || !valid_native_empty_host(para,f.control,f.outer_top) {return false;}
++        }
++    }
++    for e in p.entries {
++        let para=&mut doc.sections[e.section].paragraphs[e.paragraph];
++        if lowered_xml {for (r,b) in para.line_segs.iter_mut().zip(&e.bases) {r.vertical_pos+=b.offset;}}
++        para.source_line_seg_vertical_pos=None;
++        para.layout_space_metrics=e.spaces.iter().map(|(x,id)|(*x,metric(*id).unwrap())).collect();
++        para.completed_native_rows=Some(CompletedRows {local:local(para),plan:e.plan,frame:[0;32],resource:RESOURCE,
++            bases:e.bases,native_frame:e.native_frame,export_authorized:false});
++    }
++    let frame=context(doc);
++    for s in &mut doc.sections {for para in &mut s.paragraphs {
++        if let Some(o)=&mut para.completed_native_rows {o.frame=frame;}
++    }}
++    true
++}
++
++pub(crate) fn valid_native_empty_host(p:&Paragraph,control:usize,outer:i16)->bool {
++    use super::{control::Control,shape::{VertRelTo,TextWrap},table::TablePageBreak};
++    p.text.is_empty() && p.controls.len()==1 && control==0 && p.line_segs.len()==1
++        && p.line_segs[0].tag==0x80060000 && !p.stored_text_partition_is_dirty()
++        && !p.cell_format_vpos_dirty && p.layout_only_fill_lines==0 && matches!(&p.controls[0],Control::Table(t)
++            if !t.common.treat_as_char && t.common.vert_rel_to==VertRelTo::Para
++            && t.common.text_wrap==TextWrap::TopAndBottom && t.page_break==TablePageBreak::None
++            && t.outer_margin_top==outer && t.caption.is_none())
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    use crate::model::{control::Control,document::Section,paragraph::LineSeg,shape::{TextWrap,VertRelTo},table::{Table,TablePageBreak}};
++    fn owned()->Document {
++        let mut table=Table::default();table.common.treat_as_char=false;table.common.text_wrap=TextWrap::TopAndBottom;
++        table.common.vert_rel_to=VertRelTo::Para;table.outer_margin_top=283;table.page_break=TablePageBreak::None;
++        let mut p=Paragraph::default();p.char_count=1;
++        p.line_segs=vec![LineSeg {text_start:0,vertical_pos:0,line_height:1000,text_height:1000,
++            baseline_distance:850,line_spacing:600,column_start:0,segment_width:2000,tag:0x80060000}];
++        p.controls=vec![Control::Table(Box::new(table))];
++        let mut doc=Document::default();doc.sections=vec![Section{paragraphs:vec![p],..Default::default()}];
++        let frame=context(&doc);let p=&mut doc.sections[0].paragraphs[0];
++        let native_frame=Some(NativeParagraphFrame {control:0,page:0,column:0,raw_top:20.0,reserved_bottom:33.0,
++            before:2.0,body_height:10.0,after:3.0,selected_inset_hu:0,outer_top:283,source_row_vpos:0});
++        let bases=vec![RowBasis{page:0,column:0,offset:0}];
++        p.completed_native_rows=Some(CompletedRows{local:local(p),plan:plan(&bases,native_frame),frame,resource:RESOURCE,
++            bases,native_frame,export_authorized:true});doc
++    }
++    fn matches(doc:&Document,page:u32,column:u16,flow:f64)->bool {
++        doc.sections[0].paragraphs[0].owns_completed_native_frame_at(context(doc),page,column,0,flow,1.0/75.0)
++    }
++    #[test] fn native_computed_physical_frame_preserves_every_f64_bit_and_plan_digest() {
++        // These actual allocation values exposed a one-ULP JSON reader loss.
++        // Keep the exact values: the package plan hash must never use rounding.
++        let mut f=owned().sections[0].paragraphs[0].completed_native_rows.as_ref().unwrap().native_frame.unwrap();
++        f.raw_top=234.66666666666674;f.reserved_bottom=311.7466666666668;
++        f.before=3.7733333333333334;f.body_height=69.07999999999998;f.after=8.0;
++        let bases=vec![RowBasis {page:0,column:0,offset:0}];
++        let bytes=serde_json::to_vec(&f).unwrap();
++        let restored:NativeParagraphFrame=serde_json::from_slice(&bytes).unwrap();
++        for (a,b) in [f.raw_top,f.reserved_bottom,f.before,f.body_height,f.after].into_iter()
++            .zip([restored.raw_top,restored.reserved_bottom,restored.before,restored.body_height,restored.after]) {
++            assert_eq!(a.to_bits(),b.to_bits());
++        }
++        assert_eq!(plan(&bases,Some(f)),plan(&bases,Some(restored)));
++        let mut value:serde_json::Value=serde_json::from_slice(&bytes).unwrap();
++        value["raw_top"]=serde_json::json!(f64::from_bits(f.raw_top.to_bits()+1));
++        let changed:NativeParagraphFrame=serde_json::from_value(value).unwrap();
++        assert_ne!(plan(&bases,Some(f)),plan(&bases,Some(changed)));
++    }
++    #[test] fn native_computed_frame_requires_the_exact_physical_query() {
++        let doc=owned();assert!(matches(&doc,0,0,20.0));
++        assert!(!matches(&doc,1,0,20.0));assert!(!matches(&doc,0,1,20.0));
++        assert!(!matches(&doc,0,0,20.1));assert!(!matches(&doc,0,0,f64::NAN));
++    }
++    #[test] fn native_computed_frame_field_tampering_never_grants_ownership() {
++        for change in 0..7 {
++            let mut doc=owned();let p=&mut doc.sections[0].paragraphs[0];
++            let f=p.completed_native_rows.as_mut().unwrap().native_frame.as_mut().unwrap();
++            match change {0=>f.raw_top+=1.0,1=>f.reserved_bottom+=1.0,2=>f.selected_inset_hu=1,
++                3=>f.source_row_vpos+=1,4=>f.before+=1.0,5=>f.body_height+=1.0,_=>f.after+=1.0}
++            assert!(!matches(&doc,0,0,20.0),"tampered field {change}");
++        }
++    }
++    #[test] fn native_computed_rows_are_invalidated_by_text_rows_styles_or_frame_changes() {
++        for change in 0..5 {
++            let mut doc=owned();let old=context(&doc);let p=&mut doc.sections[0].paragraphs[0];
++            match change {0=>p.text.push('x'),1=>p.line_segs[0].segment_width+=1,2=>p.para_shape_id+=1,
++                3=>p.layout_only_fill_lines=1,_=>p.cell_format_vpos_dirty=true}
++            assert!(!p.owns_completed_native_rows(old));
++        }
++        let mut doc=owned();let original=context(&doc);doc.sections[0].section_def.page_def.width+=100;
++        assert_ne!(context(&doc),original);assert!(!matches(&doc,0,0,20.0));
++    }
++    #[test] fn native_computed_lease_does_not_survive_generic_row_replacement() {
++        let mut doc=owned();let p=&mut doc.sections[0].paragraphs[0];
++        p.replace_line_segs(p.line_segs.clone());assert!(p.completed_native_rows.is_none());
++        assert!(!matches(&doc,0,0,20.0));
++    }
++    #[test] fn native_computed_snapshots_clone_observations_without_sharing_mutation() {
++        let doc=owned();let f=doc.sections[0].paragraphs[0].completed_native_rows.as_ref().unwrap().native_frame;
++        doc.sections[0].paragraphs[0].native_frame_observation.set(f);let clone=doc.clone();
++        doc.sections[0].paragraphs[0].native_frame_observation.set(None);
++        assert_eq!(clone.sections[0].paragraphs[0].native_frame_observation.get(),f);assert!(matches(&clone,0,0,20.0));
++    }
++    #[test] fn native_computed_descriptor_is_all_or_none_and_tampering_is_rejected() {
++        let doc=owned();let sections=vec![sha(b"section")];let bytes=encode(&doc,b"header",&sections).unwrap();
++        let mut parsed=doc.clone();parsed.sections[0].paragraphs[0].completed_native_rows=None;
++        assert!(decode(&mut parsed,&bytes,b"header",&sections));assert!(matches(&parsed,0,0,20.0));
++        for key in ["raw_top","reserved_bottom","before","body_height","after","selected_inset_hu","source_row_vpos"] {
++            let mut value:serde_json::Value=serde_json::from_slice(&bytes).unwrap();
++            let f=&mut value["entries"][0]["native_frame"];f[key]=serde_json::json!(f[key].as_f64().unwrap()+1.0);
++            let mut parsed=doc.clone();parsed.sections[0].paragraphs[0].completed_native_rows=None;
++            assert!(!decode(&mut parsed,&serde_json::to_vec(&value).unwrap(),b"header",&sections),"{key}");
++            assert!(parsed.sections[0].paragraphs[0].completed_native_rows.is_none());
++        }
++    }
++    #[test] fn native_computed_descriptor_binds_representation_resources_and_budget() {
++        let doc=owned();let sections=vec![sha(b"section")];let bytes=encode_representation(&doc,b"header",&sections,false).unwrap();
++        let mut parsed=doc.clone();assert!(decode_representation(&mut parsed,&bytes,b"header",&sections,false));
++        assert!(!decode(&mut parsed,&bytes,b"header",&sections));
++        assert!(!decode_representation(&mut parsed,&bytes,b"changed",&sections,false));
++        assert!(!decode(&mut parsed,&vec![b' ';MAX_BYTES+1],b"header",&sections));
++    }
++}
+--- a/src/model/paragraph.rs
++++ b/src/model/paragraph.rs
+@@ -94,6 +94,10 @@
+     pub(crate) native_source_synthetic_seal: Option<[u8; 32]>,
+     #[serde(skip_serializing)]
+     pub(crate) native_source_synthetic_context: Option<[u8; 32]>,
++    #[serde(skip_serializing)]
++    pub(crate) completed_native_rows: Option<super::native_computed_rows::CompletedRows>,
++    #[serde(skip_serializing)]
++    pub(crate) native_frame_observation: super::native_computed_rows::FrameObservation,
+     /// 영역 태그 정보
+     pub range_tags: Vec<RangeTag>,
+     /// 필드 텍스트 범위 (0x03~0x04 사이 텍스트 인덱스 + 컨트롤 인덱스)
+@@ -864,6 +868,8 @@
+     /// admitted or serialized as the current text partition.
+     #[inline]
+     pub fn invalidate_layout_inputs(&mut self) {
++        self.completed_native_rows = None;
++        self.native_frame_observation.set(None);
+         self.native_source_synthetic_seal = None;
+         self.native_source_synthetic_context = None;
+         self.stored_text_partition_dirty = true;
+@@ -876,6 +882,8 @@
+ 
+     /// Replace stored rows and their validity state at one owner boundary.
+     pub(crate) fn replace_line_segs(&mut self, line_segs: Vec<LineSeg>) {
++        self.completed_native_rows = None;
++        self.native_frame_observation.set(None);
+         self.native_source_synthetic_seal = None;
+         self.native_source_synthetic_context = None;
+         self.line_segs = line_segs;
+@@ -1816,6 +1824,8 @@
+             source_line_seg_vertical_pos: None,
+             native_source_synthetic_seal: None,
+             native_source_synthetic_context: None,
++            completed_native_rows: None,
++            native_frame_observation: Default::default(),
+             // 새로 계산된 줄은 `char_offsets` 와 같은 HWP5 축에서 나오므로 보정이 없다 (#5961).
+             hwpx_axis_shift: 0,
+             range_tags: new_range_tags,
+--- a/src/parser/hwpx/mod.rs
++++ b/src/parser/hwpx/mod.rs
+@@ -12,6 +12,7 @@
+ 
+ pub mod content;
+ mod contract_streams;
++mod raw_zip_authority;
+ mod crypto;
+ pub mod header;
+ pub(crate) mod raw_namespace;
+@@ -457,7 +458,7 @@
+     let package_info = content::parse_content_hpf(&content_xml)?;
+ 
+     // 3. header.xml → DocInfo, DocProperties
+-    let header_xml = reader.read_file("Contents/header.xml")?;
++    let (header_xml,mut computed_entries_exact_utf8) = reader.read_file_with_utf8_status("Contents/header.xml")?;
+     // 평문 여백의 단위 전환은 header.xml이 아닌 패키지 xmlVersion에 따른다.
+     let physical_plain_margin = hwpx_aux_entries
+         .iter()
+@@ -530,8 +531,13 @@
+     let _hwp3_origin_guard =
+         section::Hwp3OriginSourceGuard::set(has_hwp3_origin && !has_hwp5_origin);
+     let mut sections = Vec::new();
++    let mut computed_section_hashes=Vec::new();
+     for (section_idx, section_href) in package_info.section_files.iter().enumerate() {
+-        let section_xml = reader.read_file(section_href)?;
++        let (section_xml,exact_utf8) = reader.read_file_with_utf8_status(section_href)?;
++        computed_entries_exact_utf8 &= exact_utf8;
++        // A valid UTF-8 String preserves every original byte. Lossy entries
++        // continue through ordinary XML parsing but never gain private authority.
++        computed_section_hashes.push(crate::model::native_computed_rows::sha(section_xml.as_bytes()));
+         let section_xml = canonicalize_bin_item_refs(&section_xml, &package_info.bin_data_items);
+         let master_page_refs = match section::collect_hwpx_section_master_page_refs(&section_xml) {
+             Ok(refs) => refs,
+@@ -717,6 +723,17 @@
+     {
+         crate::model::hyperlink_format::decode(&mut doc, &bytes);
+     }
++    if paragraph_axis && computed_entries_exact_utf8
++        && raw_zip_authority::unique_private_entry(data,crate::model::native_computed_rows::PATH)
++        && reader.has_unique_exact_entry(crate::model::native_computed_rows::PATH)
++        && raw_zip_authority::unique_private_entry(data,"Contents/header.xml")
++        && reader.has_unique_exact_entry("Contents/header.xml")
++        && package_info.section_files.iter().all(|path|
++            raw_zip_authority::unique_private_entry(data,path) && reader.has_unique_exact_entry(path)) {
++        if let Ok(bytes)=reader.read_file_bytes_limited(crate::model::native_computed_rows::PATH,crate::model::native_computed_rows::MAX_BYTES) {
++            crate::model::native_computed_rows::decode(&mut doc,&bytes,header_xml.as_bytes(),&computed_section_hashes);
++        }
++    }
+     caret::restore(&mut doc);
+     Ok(doc)
+ }
+--- /dev/null
++++ b/src/parser/hwpx/raw_zip_authority.rs
+@@ -0,0 +1,55 @@
++//! Raw central-directory authority gate. This is not a replacement ZIP parser.
++//! ZipArchive's name index can collapse duplicate directory entries before by_index.
++//! Unknown/ZIP64/name-remapping layouts grant no private cache permission.
++fn u16_at(b:&[u8],p:usize)->Option<usize>{Some(u16::from_le_bytes(b.get(p..p.checked_add(2)?)?.try_into().ok()?) as usize)}
++fn u32_at(b:&[u8],p:usize)->Option<usize>{Some(u32::from_le_bytes(b.get(p..p.checked_add(4)?)?.try_into().ok()?) as usize)}
++fn alias(name:&[u8],expected:&str)->bool{
++    let Ok(name)=std::str::from_utf8(name) else{return false;};
++    let slash=name.replace('\\',"/");let mut segments=Vec::new();
++    for part in slash.split('/') {match part {""|"."=>{},".."=>{segments.pop();},part=>segments.push(part)}}
++    segments.join("/").eq_ignore_ascii_case(expected)
++}
++fn unique_inner(bytes:&[u8],expected:&str)->Option<bool>{
++    if bytes.len()<22{return None;}
++    let eocd=(bytes.len().saturating_sub(65557)..=bytes.len()-22).rev().find(|p|
++        bytes.get(*p..*p+4)==Some(&[0x50,0x4b,0x05,0x06])
++            && u16_at(bytes,*p+20).and_then(|n|p.checked_add(22+n))==Some(bytes.len()))?;
++    if u16_at(bytes,eocd+4)?!=0 || u16_at(bytes,eocd+6)?!=0{return None;}
++    let count=u16_at(bytes,eocd+10)?;
++    if count==0xffff || count!=u16_at(bytes,eocd+8)?{return None;}
++    let mut p=u32_at(bytes,eocd+16)?;let size=u32_at(bytes,eocd+12)?;
++    if size>64*1024*1024 || p.checked_add(size)?!=eocd{return None;}
++    let mut found=0usize;
++    for _ in 0..count{
++        let fixed=bytes.get(p..p.checked_add(46)?)?;
++        if fixed.get(..4)!=Some(&[0x50,0x4b,0x01,0x02]){return None;}
++        let name_len=u16_at(fixed,28)?;let extra_len=u16_at(fixed,30)?;let comment_len=u16_at(fixed,32)?;
++        let start=p.checked_add(46)?;let extra=start.checked_add(name_len)?;let comment=extra.checked_add(extra_len)?;let end=comment.checked_add(comment_len)?;
++        if end>eocd{return None;}
++        let name=bytes.get(start..extra)?;if name.contains(&0){return None;}
++        // Unicode-path extras can replace the index key; ZIP64 changes offsets.
++        let mut q=extra;while q<comment{
++            let id=u16_at(bytes,q)?;let length=u16_at(bytes,q.checked_add(2)?)?;q=q.checked_add(4)?.checked_add(length)?;
++            if q>comment || id==0x7075 || id==0x0001{return None;}
++        }
++        if alias(name,expected){
++            found+=1;if found>1 || name!=expected.as_bytes(){return Some(false);}
++        }
++        p=end;
++    }
++    Some(p==eocd && found==1)
++}
++pub(crate) fn unique_private_entry(bytes:&[u8],expected:&str)->bool{unique_inner(bytes,expected)==Some(true)}
++
++#[cfg(test)] mod tests{
++ use super::*;
++ const PATH:&str="META-INF/rhwp-computed-native-rows-v1.json";
++ fn package(names:&[&str])->Vec<u8>{
++  let mut b=Vec::new();for name in names{let mut h=[0u8;46];h[..4].copy_from_slice(&[0x50,0x4b,0x01,0x02]);h[28..30].copy_from_slice(&(name.len()as u16).to_le_bytes());b.extend(h);b.extend(name.as_bytes());}
++  let size=b.len()as u32;let mut end=[0u8;22];end[..4].copy_from_slice(&[0x50,0x4b,0x05,0x06]);end[8..10].copy_from_slice(&(names.len()as u16).to_le_bytes());end[10..12].copy_from_slice(&(names.len()as u16).to_le_bytes());end[12..16].copy_from_slice(&size.to_le_bytes());b.extend(end);b
++ }
++ #[test]fn raw_directory_unique_owned_entry(){assert!(unique_private_entry(&package(&["mimetype",PATH]),PATH));assert!(!unique_private_entry(&package(&["mimetype"]),PATH));}
++ #[test]fn raw_directory_duplicate_and_aliases_never_authorize(){for other in [PATH,"meta-inf/rhwp-computed-native-rows-v1.json","/META-INF/rhwp-computed-native-rows-v1.json","META-INF/./rhwp-computed-native-rows-v1.json","META-INF\\rhwp-computed-native-rows-v1.json"]{assert!(!unique_private_entry(&package(&[PATH,other]),PATH));assert_eq!(unique_private_entry(&package(&[other]),PATH),other==PATH);}}
++ #[test]fn raw_directory_malformed_count_size_and_zip64_never_authorize(){let b=package(&[PATH]);for n in 0..b.len(){assert!(!unique_private_entry(&b[..n],PATH));}for offset in [4,6,8,10,12,16]{let mut x=b.clone();let p=x.len()-22+offset;x[p]^=1;assert!(!unique_private_entry(&x,PATH));}let mut z=b;let p=z.len()-22;z[p+10..p+12].copy_from_slice(&0xffffu16.to_le_bytes());assert!(!unique_private_entry(&z,PATH));}
++ #[test]fn raw_directory_unicode_extra_and_null_never_authorize(){let mut b=package(&[PATH]);let at=46+PATH.len();b[30..32].copy_from_slice(&4u16.to_le_bytes());b.splice(at..at,[0x75,0x70,0,0]);let end=b.len()-22;let size=end as u32;b[end+12..end+16].copy_from_slice(&size.to_le_bytes());assert!(!unique_private_entry(&b,PATH));assert!(!unique_private_entry(&package(&[PATH,"x\0"]),PATH));}
++}
+--- a/src/parser/hwpx/reader.rs
++++ b/src/parser/hwpx/reader.rs
+@@ -113,16 +113,23 @@
+     /// 실패 시 관용(lossy) 디코딩으로 폴백한다 (손상 바이트는 U+FFFD 치환,
+     /// 경고 로그). 문서 전체를 버리는 종전 동작은 한글 대비 과잉 거부였다.
+     pub fn read_file(&mut self, path: &str) -> Result<String, HwpxError> {
++        self.read_file_with_utf8_status(path).map(|(text,_)|text)
++    }
++
++    /// Preserve the generic lossy XML fallback while reporting whether text
++    /// bytes are the exact original entry bytes. Private cache authority must
++    /// reject lossy text, even when it collides with a valid U+FFFD document.
++    pub(super) fn read_file_with_utf8_status(&mut self, path: &str) -> Result<(String,bool), HwpxError> {
+         let bytes = self.read_xml_bytes_limited(path, MAX_XML_SIZE)?;
+         match String::from_utf8(bytes) {
+-            Ok(s) => Ok(s),
++            Ok(s) => Ok((s,true)),
+             Err(e) => {
+                 eprintln!(
+                     "경고: {} UTF-8 손상({}) — 관용(lossy) 디코딩 적용 (U+FFFD 치환)",
+                     path,
+                     e.utf8_error()
+                 );
+-                Ok(String::from_utf8_lossy(e.as_bytes()).into_owned())
++                Ok((String::from_utf8_lossy(e.as_bytes()).into_owned(),false))
+             }
+         }
+     }
+@@ -227,6 +234,18 @@
+         Ok(size)
+     }
+ 
++    pub(crate) fn has_unique_exact_entry(&mut self,path:&str)->bool {
++        let mut matches=0usize;
++        for i in 0..self.archive.len() {
++            let Ok(entry)=self.archive.by_index(i) else{return false;};
++            if entry.name().eq_ignore_ascii_case(path) {
++                if entry.name()!=path {return false;}
++                matches+=1;
++            }
++        }
++        matches==1
++    }
++
+     /// 아카이브 내 파일 목록을 반환한다.
+     pub fn file_names(&self) -> Vec<String> {
+         self.archive.file_names().map(|s| s.to_string()).collect()
+@@ -393,6 +412,21 @@
+         assert!(s.ends_with("</hwpml>"));
+     }
+ 
++    #[test]
++    fn test_private_cache_utf8_status_distinguishes_replacement_from_damage() {
++        use std::io::Write;
++        use zip::{write::SimpleFileOptions,ZipWriter};
++        fn read(payload:&[u8])->(String,bool) {
++            let mut bytes=Cursor::new(Vec::new());
++            {let mut zip=ZipWriter::new(&mut bytes);zip.start_file("Contents/header.xml",SimpleFileOptions::default()).unwrap();
++                zip.write_all(payload).unwrap();zip.finish().unwrap();}
++            HwpxReader::open(&bytes.into_inner()).unwrap().read_file_with_utf8_status("Contents/header.xml").unwrap()
++        }
++        let valid=read(b"<head>\xef\xbf\xbd</head>");let damaged=read(b"<head>\xff</head>");
++        assert_eq!(valid.0,damaged.0);assert!(valid.1);assert!(!damaged.1);
++        assert_eq!(valid.0.as_bytes(),b"<head>\xef\xbf\xbd</head>");
++    }
++
+     /// 해제 시 상한을 넘는 엔트리가 포함된 ZIP은 `ZipError`로 거부되어야 한다.
+     ///
+     /// 실제 "zip bomb"을 흉내내기 위해 고압축 가능한(반복 패턴) 데이터
+--- a/src/parser/mod.rs
++++ b/src/parser/mod.rs
+@@ -26,6 +26,7 @@
+ pub mod hml;
+ pub mod hwp3;
+ pub mod hwp_summary;
++pub(crate) mod native_computed_rows;
+ pub mod hwpx;
+ pub mod ingest;
+ pub mod ole_container;
+@@ -420,6 +421,8 @@
+     if encrypted && password.is_none() {
+         return Err(ParseError::EncryptedDocument);
+     }
++
++    native_computed_rows::check_stream_budget(&mut cfb).map_err(ParseError::CfbError)?;
+ 
+     let compressed = file_header.flags.compressed;
+     let distribution = file_header.flags.distribution;
+@@ -605,6 +608,7 @@
+             crate::model::hyperlink_format::decode(&mut doc, &bytes);
+         }
+     }
++    native_computed_rows::restore(&mut doc);
+     Ok(doc)
+ }
+ 
+--- /dev/null
++++ b/src/parser/native_computed_rows.rs
+@@ -0,0 +1,63 @@
++//! CFB adapter for a completed native row partition. The binary LINE_SEG rows
++//! already use native flow coordinates: this reader never adds XML offsets.
++use super::cfb_reader::{CfbError, CfbReader};
++use crate::model::{document::Document, native_computed_rows as contract};
++
++pub(crate) const STREAM: &str = "/RhwpComputedNativeRowsV1";
++
++pub(crate) fn conflicting_path(path: &str) -> bool {
++    // CFB stream identity is case-insensitive. Noncanonical spellings are opaque
++    // collisions, not permission to replace or reinterpret the original bytes.
++    let actual=path.to_uppercase();let target=STREAM.to_uppercase();
++    actual==target || actual.strip_prefix(&target).is_some_and(|suffix|suffix.starts_with('/'))
++}
++
++/// Frame-header binding for the exact actual binary output. Length prefixes and
++/// individual hashes bind both streams without another DocInfo-sized allocation.
++pub(crate) fn binding_header(header: &[u8], doc_info: &[u8]) -> Vec<u8> {
++    let mut out = b"rhwp-computed-native-rows:hwp-flow-v1\0".to_vec();
++    out.extend_from_slice(&(header.len() as u64).to_le_bytes());
++    out.extend_from_slice(&contract::sha(header));
++    out.extend_from_slice(&(doc_info.len() as u64).to_le_bytes());
++    out.extend_from_slice(&contract::sha(doc_info));
++    out
++}
++
++/// Reject an oversized colliding stream before generic opaque-stream loading.
++/// Do not silently drop its bytes, and do not grant authority from a prefix.
++pub(crate) fn check_stream_budget(cfb: &mut CfbReader) -> Result<(), CfbError> {
++    for path in cfb.list_streams().into_iter().filter(|p|p.to_uppercase()==STREAM.to_uppercase()) {
++        cfb.read_stream_raw_limited(&path, contract::MAX_BYTES)?;
++    }
++    Ok(())
++}
++
++pub(crate) fn eligible(doc: &Document) -> bool {
++    !doc.header.encrypted && !doc.header.distribution && !doc.is_hwp3_variant
++        && !doc.provenance.hwp3_lineage
++        && !doc.extra_streams.iter().any(|(path, _)|
++            path.to_uppercase() == crate::model::document::HWP3_ORIGIN_STREAM_PATH.to_uppercase())
++}
++
++/// Only a unique exact stream with a fully validated binding becomes modeled
++/// completed rows. Invalid/unknown/stale streams remain opaque and unchanged.
++/// Consuming an owned stream avoids treating its later legitimate regeneration
++/// as permission to overwrite an unrelated raw-stream collision.
++pub(crate) fn restore(doc: &mut Document) -> bool {
++    if !eligible(doc) { return false; }
++    let matches = doc.extra_streams.iter().enumerate()
++        .filter(|(_, (path, _))| conflicting_path(path)).collect::<Vec<_>>();
++    if matches.len() != 1 || matches[0].1.0 != STREAM { return false; }
++    let index = matches[0].0;
++    let bytes = matches[0].1.1.clone();
++    if bytes.len() > contract::MAX_BYTES { return false; }
++    let Some(header) = doc.header.raw_data.as_deref() else { return false; };
++    let Some(info) = doc.doc_info.raw_stream.as_deref() else { return false; };
++    let binding = binding_header(header, info);
++    let Some(sections) = doc.sections.iter().map(|section|
++        section.raw_stream.as_deref().map(contract::sha)).collect::<Option<Vec<_>>>()
++        else { return false; };
++    if !contract::decode_representation(doc, &bytes, &binding, &sections, false) { return false; }
++    doc.extra_streams.remove(index);
++    true
++}
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -3882,6 +3882,7 @@
+     /// hwpx_source Cell 2개 통합).
+     profile: std::cell::Cell<crate::model::provenance::LayoutCompatibilityProfile>,
+     native_source_synthetic_context: std::cell::Cell<Option<[u8; 32]>>,
++    completed_native_context: std::cell::Cell<Option<[u8;32]>>,
+     /// HWP3 원본 및 HWP3-origin HWP5 변환본의 본문 흐름 spacing_before 보정 여부.
+     use_hwp3_origin_flow_spacing_before: std::cell::Cell<bool>,
+     /// [#2308] Source IR로부터 재생성되는 render-only width/TAC projection.
+@@ -4049,6 +4050,7 @@
+             overflow_cell_lines: std::cell::Cell::new(0),
+             profile: std::cell::Cell::new(Default::default()),
+             native_source_synthetic_context: std::cell::Cell::new(None),
++            completed_native_context: std::cell::Cell::new(None),
+             use_hwp3_origin_flow_spacing_before: std::cell::Cell::new(false),
+             render_normalization: std::cell::RefCell::new(std::sync::Arc::new(
+                 crate::renderer::render_normalization::RenderNormalizationOverlay::default(),
+@@ -4635,6 +4637,18 @@
+             .set(profile.hwp3_layout());
+     }
+ 
++    pub(crate) fn set_completed_native_context(&self,context:Option<[u8;32]>) {
++        self.completed_native_context.set(context);
++    }
++    fn owns_completed_native_frame(&self,para:&Paragraph,control:usize,page:&PageContent,col:&LayoutRect,layout:&PageLayoutInfo,current_flow:f64)->bool {
++        let Some(context)=self.completed_native_context.get() else{return false;};
++        if !para.owns_completed_native_rows(context) {return false;}
++        let Some(f)=para.completed_native_rows.as_ref().and_then(|o|o.native_frame) else{return false;};
++        layout.column_areas.get(f.column as usize).is_some_and(|owned|
++            (owned.x-col.x).abs()<0.01 && (owned.width-col.width).abs()<0.01)
++            && para.owns_completed_native_frame_at(context,page.page_index,f.column,control,current_flow-col.y,self.dpi/7200.0)
++
++    }
+     pub(crate) fn set_native_source_synthetic_context(&self, context: Option<[u8; 32]>) {
+         self.native_source_synthetic_context.set(context);
+     }
+@@ -11725,7 +11739,7 @@
+         } = ctx;
+         let TableControlVars {
+             mut y_offset,
+-            para_y_for_table,
++            mut para_y_for_table,
+             mut tac_table_y_before,
+             is_tac,
+             is_current_empty_para_float,
+@@ -11743,6 +11757,9 @@
+         let mut tac_seg_applied = false;
+         let mut para_float_lane_info: Option<(f64, f64, f64, f64, f64, Option<f64>)> = None;
+         if let Some(Control::Table(t)) = para.controls.get(control_index) {
++            if self.owns_completed_native_frame(para,control_index,page_content,col_area,layout,y_offset) {
++                para_y_for_table=y_offset;
++            }
+             if let Some(placement) = flow_placement {
+                 // metadata는 여백 포함 줄의 pen이다. inline_x_override가 있는 표 paint는
+                 // 호출자가 여백을 소비한 테두리 좌표를 받으므로 여기서 한 번 변환한다.
+@@ -12255,6 +12272,7 @@
+                             // This explicit native row already owns the same
+                             // pre-inset frame used before HWP -> XML storage.
+                             // Do not add its outer margin again at paint time.
++                            && !self.owns_completed_native_frame(para,control_index,page_content,col_area,layout,y_offset)
+                             && !self.native_source_synthetic_context.get()
+                                 .is_some_and(|context| para.owns_native_source_synthetic_rows(context))
+                             && !(layout.column_areas.len()==1
+--- a/src/renderer/typeset.rs
++++ b/src/renderer/typeset.rs
+@@ -4567,6 +4567,7 @@
+             ft.strict_following_plain_text_fit
+                 || hwpx_rowbreak_tac_missing_owned_line
+                 || unstored_cell_band,
++            ft.host_spacing.before,ft.effective_height,ft.host_spacing.after_for_fit,
+             styles,
+         );
+         // [#5699 H1] 교정 계상으로 확보한 표 밴드 하단을 흐름 바닥으로 고정 —
+@@ -4624,8 +4625,10 @@
+         is_first_placed: bool,
+         is_last_placed: bool,
+         strict_following_plain_text_fit: bool,
++        native_before:f64,native_body_height:f64,native_after:f64,
+         styles: &ResolvedStyleSet,
+     ) {
++        let native_frame_flow_before=st.current_height;
+         // [#2279 footer-오염] PAGE-앵커 Top 절대배치 표 기록 — 같은 쪽 후속
+         // footer 의 저장 vpos 동기화 차단용. 이 표들의 저장 누적은 절대 위치
+         // 산물이라 본문 흐름 좌표가 아니다(36496000 pi3 실측).
+@@ -5163,6 +5166,17 @@
+                 st.advance_flow_by(pre_height + table_total_height);
+             }
+         }
++        if (st.profile.native_hwp5_layout() || st.profile.hwp5_origin_hwpx())
++            && !st.paragraph_float_placements.contains_key(&(para_idx,ctrl_idx))
++            && crate::model::native_computed_rows::valid_native_empty_host(para,ctrl_idx,table.outer_margin_top)
++        {
++            para.native_frame_observation.set(Some(crate::model::native_computed_rows::NativeParagraphFrame {
++                control:ctrl_idx,page:st.pages.last().map_or(0,|p|p.page_index),column:st.current_column,
++                raw_top:native_frame_flow_before,reserved_bottom:st.current_height,selected_inset_hu:0,
++                before:native_before,body_height:native_body_height,after:native_after,
++                outer_top:table.outer_margin_top,source_row_vpos:para.line_segs[0].vertical_pos,
++            }));
++        }
+         // [#2243 진단] TAC 표 라인 회계 분해 — 동작 불변.
+         if std::env::var("RHWP_DIAG_TAC").is_ok() {
+             eprintln!(
+--- a/src/renderer/typeset/controls.rs
++++ b/src/renderer/typeset/controls.rs
+@@ -361,6 +361,20 @@
+     ) else {
+         return false;
+     };
++    // Observation only: the edit command may bind it after final pagination.
++    // A lazy layout query cannot mint a completed-row lease.
++    if (st.profile.native_hwp5_layout() || st.profile.hwp5_origin_hwpx())
++        && placement.resolved.is_none()
++        && crate::model::native_computed_rows::valid_native_empty_host(para,ctrl_idx,table.outer_margin_top)
++    {
++        para.native_frame_observation.set(Some(crate::model::native_computed_rows::NativeParagraphFrame {
++            control:ctrl_idx,page:st.pages.last().map_or(0,|p|p.page_index),column:st.current_column,
++            raw_top:placement.raw_top,
++            reserved_bottom:lanes.pushed_top(placement.x_start,placement.x_end,placement.raw_top)+placement.reserved_height,
++            selected_inset_hu:0,before:ft.host_spacing.before,body_height:ft.effective_height,after:ft.host_spacing.after_for_fit,outer_top:table.outer_margin_top,
++            source_row_vpos:para.line_segs[0].vertical_pos,
++        }));
++    }
+     st.commit_empty_float_table(para_idx, ctrl_idx, placement, lanes);
+     true
+ }
+--- a/src/renderer/typeset/table/block/entry.rs
++++ b/src/renderer/typeset/table/block/entry.rs
+@@ -440,6 +440,7 @@
+                         is_first_placed,
+                         is_last_placed,
+                         ft.strict_following_plain_text_fit,
++                        ft.host_spacing.before,ft.effective_height,ft.host_spacing.after_for_fit,
+                         styles,
+                     );
+                     if let Some(end) = saved_host_line_end {
+@@ -668,6 +669,7 @@
+                     is_first_placed,
+                     is_last_placed,
+                     ft.strict_following_plain_text_fit,
++                    ft.host_spacing.before,ft.effective_height,ft.host_spacing.after_for_fit,
+                     styles,
+                 );
+                 // 저장 사다리에서 뺄 몫도 절대배치 본체만이다. 호스트 글줄의
+@@ -2018,6 +2020,7 @@
+                 is_first_placed,
+                 is_last_placed,
+                 ft.strict_following_plain_text_fit,
++                ft.host_spacing.before,ft.effective_height,ft.host_spacing.after_for_fit,
+                 styles,
+             );
+             return None;
+@@ -2048,6 +2051,7 @@
+                 is_first_placed,
+                 is_last_placed,
+                 ft.strict_following_plain_text_fit,
++                ft.host_spacing.before,ft.effective_height,ft.host_spacing.after_for_fit,
+                 styles,
+             );
+             return None;
+@@ -2134,6 +2138,7 @@
+                 is_first_placed,
+                 is_last_placed,
+                 ft.strict_following_plain_text_fit,
++                ft.host_spacing.before,ft.effective_height,ft.host_spacing.after_for_fit,
+                 styles,
+             );
+             return None;
+@@ -2170,6 +2175,7 @@
+                 is_first_placed,
+                 is_last_placed,
+                 ft.strict_following_plain_text_fit,
++                ft.host_spacing.before,ft.effective_height,ft.host_spacing.after_for_fit,
+                 styles,
+             );
+             return None;
+--- a/src/renderer/typeset/table/continuation/fragment/emit.rs
++++ b/src/renderer/typeset/table/continuation/fragment/emit.rs
+@@ -708,11 +708,25 @@
+                 // 통째 표로 되돌리면 원래 행 높이가 복원되어 예약 하단을 넘는다.
+                 && end_row_height_override.is_none()
+             {
++                let native_flow_before=st.current_height;
+                 st.append_item(PageItem::Table {
+                     para_index: para_idx,
+                     control_index: ctrl_idx,
+                 });
+                 st.advance_flow_by(partial_height + host_spacing_total);
++                let host=input.source.paragraph;
++                if (st.profile.native_hwp5_layout() || st.profile.hwp5_origin_hwpx())
++                    && !st.paragraph_float_placements.contains_key(&(para_idx,ctrl_idx))
++                    && crate::model::native_computed_rows::valid_native_empty_host(host,ctrl_idx,table.outer_margin_top)
++                {
++                    host.native_frame_observation.set(Some(crate::model::native_computed_rows::NativeParagraphFrame {
++                        control:ctrl_idx,page:st.pages.last().map_or(0,|p|p.page_index),column:st.current_column,
++                        raw_top:native_flow_before,reserved_bottom:st.current_height,selected_inset_hu:0,
++                        before:host_spacing_total-host_spacing_after_only,body_height:partial_height,after:host_spacing_after_only,
++                        outer_top:table.outer_margin_top,source_row_vpos:host.line_segs[0].vertical_pos,
++                    }));
++                }
++
+             } else {
+                 st.append_item(PageItem::PartialTable {
+                     para_index: para_idx,
+--- a/src/serializer/cfb_writer.rs
++++ b/src/serializer/cfb_writer.rs
+@@ -224,6 +224,7 @@
+     if let Some(bytes) = crate::model::hyperlink_format::encode(doc) {
+         extra_streams.push((crate::model::hyperlink_format::HWP_STREAM.into(), bytes));
+     }
++    super::native_computed_rows::append(doc, &header_bytes, &doc_info_bytes, &section_bytes_list, password.is_some(), &mut extra_streams, &mut content_loss);
+     let bytes = write_hwp_cfb(
+         &header_bytes,
+         &doc_info_bytes,
+--- a/src/serializer/hwpx/mod.rs
++++ b/src/serializer/hwpx/mod.rs
+@@ -82,11 +82,21 @@
+     let section_hrefs: Vec<String> = (0..doc.sections.len())
+         .map(|i| format!("Contents/section{}.xml", i))
+         .collect();
++    let mut computed_section_hashes=Vec::new();
+     for (i, sec) in doc.sections.iter().enumerate() {
+         let xml = section::write_section(sec, doc, i, &mut ctx)?;
++        computed_section_hashes.push(crate::model::native_computed_rows::sha(&xml));
+         z.write_deflated(&section_hrefs[i], &xml)?;
+     }
+ 
++    if let Some(bytes)=crate::model::native_computed_rows::encode(doc,&header_xml,&computed_section_hashes) {
++        z.write_deflated(crate::model::native_computed_rows::PATH,&bytes)?;
++    } else if doc.sections.iter().any(|s|s.paragraphs.iter().any(|p|p.exports_completed_native_rows())) {
++        use crate::serializer::content_loss::{ContentLossCode,ContentLossSubject};
++        ctx.content_loss.record(ContentLoss {code:ContentLossCode::MetadataReduced,
++            subject:ContentLossSubject::ParagraphProperties,path:crate::model::native_computed_rows::PATH.into(),
++            reason:ContentLossReason::ResourceReadFailedOrLimitExceeded,resource_id:None});
++    }
+     // 4b. Contents/masterpage{N}.xml — 바탕쪽 (전 섹션 누적 전역 인덱스).
+     //     id/href 의 인덱스는 section.rs 의 idRef 인덱스와 동일 규칙(전역 누적)이라
+     //     별도 공유 상태 없이 정합한다.
+--- a/src/serializer/hwpx/section.rs
++++ b/src/serializer/hwpx/section.rs
+@@ -944,7 +944,7 @@
+         && ctx.native_source_synthetic_context
+             .is_some_and(|context| para.owns_native_source_synthetic_rows(context));
+     if !axis_line_segs.is_empty() && position_axis_intact
+-        && (!all_synthetic || authored_native_synthetic) {
++        && (!all_synthetic || authored_native_synthetic || para.exports_completed_native_rows()) {
+         // IR 기반 출력 — 원본 lineseg 값 보존 (#177)
+         //
+         // [#5847] reflow 의 구역 단위 vpos 재계산이 원본 캐시 보유 문단의
+@@ -952,11 +952,12 @@
+         // 쪽-상대 좌표로 되돌려 낸다 — 누적 좌표가 파일로 나가면 한글 2022 가
+         // 캐시를 신뢰해 조판을 폐기한다(08818: 81쪽 → 5쪽). axis 절단은 앞
+         // 접두 슬라이스라 인덱스가 그대로 대응한다.
+-        let source_vpos = para
++        let completed_vpos=para.completed_xml_vpos();
++        let source_vpos = completed_vpos.as_deref().or_else(|| para
+             .source_line_seg_vertical_pos
+             .as_deref()
+             .filter(|v| v.len() == para.line_segs.len())
+-            .map(|v| &v[..axis_line_segs.len()]);
++            .map(|v| &v[..axis_line_segs.len()]));
+         let linesegs = format!(
+             "{}{}{}",
+             LINESEG_SLOT_OPEN,
+--- a/src/serializer/mod.rs
++++ b/src/serializer/mod.rs
+@@ -12,6 +12,7 @@
+ pub mod doc_info;
+ mod form_identity;
+ mod paragraph_metadata_loss;
++mod native_computed_rows;
+ pub mod header;
+ pub mod hml;
+ pub mod hwpx;
+--- /dev/null
++++ b/src/serializer/native_computed_rows.rs
+@@ -0,0 +1,51 @@
++//! Bind a completed row contract to the actual uncompressed HWP streams.
++//! No paragraph/body/font/IR shadow is written. All standard LINE_SEG records
++//! remain the serializer's native actual rows, with no XML lowering offset.
++use crate::model::{document::Document, native_computed_rows as contract};
++use crate::parser::native_computed_rows::{self as adapter, STREAM};
++use super::content_loss::{ContentLoss, ContentLossCode, ContentLossReason,
++    ContentLossReport, ContentLossSubject};
++
++fn lost(report: &mut ContentLossReport) {
++    report.record(ContentLoss { code: ContentLossCode::MetadataReduced,
++        subject: ContentLossSubject::ParagraphProperties, path: STREAM.into(),
++        reason: ContentLossReason::SerializerNotImplemented, resource_id: None });
++}
++
++/// A producer must not attach a current model seal to old raw rows or to a
++/// section split/reindexing that its completed owner did not observe.
++fn emitted_rows_match(doc: &Document, sections: &[Vec<u8>]) -> bool {
++    if sections.len() != doc.sections.len() { return false; }
++    for (source, bytes) in doc.sections.iter().zip(sections) {
++        if !source.paragraphs.iter().any(|p| p.exports_completed_native_rows()) { continue; }
++        let Ok(parsed) = crate::parser::body_text::parse_body_text_section(bytes) else { return false; };
++        if parsed.paragraphs.len() != source.paragraphs.len() { return false; }
++        for (expected, actual) in source.paragraphs.iter().zip(&parsed.paragraphs) {
++            if !expected.exports_completed_native_rows() { continue; }
++            if actual.line_segs != expected.line_segs || actual.text != expected.text
++                || actual.para_shape_id != expected.para_shape_id || actual.style_id != expected.style_id
++                || actual.char_shapes.iter().map(|r|(r.start_pos,r.char_shape_id))
++                    .ne(expected.char_shapes.iter().map(|r|(r.start_pos,r.char_shape_id))) { return false; }
++        }
++    }
++    true
++}
++
++pub(crate) fn append(doc: &Document, header: &[u8], doc_info: &[u8],
++    sections: &[Vec<u8>], password: bool, extra: &mut Vec<(String, Vec<u8>)>,
++    report: &mut ContentLossReport) {
++    let needed = doc.sections.iter().any(|s|
++        s.paragraphs.iter().any(|p|p.exports_completed_native_rows()));
++    if !needed { return; } // Absent/revoked authority can never mint a stream.
++    if password || !adapter::eligible(doc)
++        || extra.iter().any(|(path,_)|adapter::conflicting_path(path))
++        || !emitted_rows_match(doc, sections) {
++        lost(report); return;
++    }
++    let binding = adapter::binding_header(header, doc_info);
++    let hashes = sections.iter().map(|bytes|contract::sha(bytes)).collect::<Vec<_>>();
++    match contract::encode_representation(doc, &binding, &hashes, false) {
++        Some(bytes) => extra.push((STREAM.into(), bytes)),
++        None => lost(report),
++    }
++}

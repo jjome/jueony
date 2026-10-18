@@ -1,6 +1,6 @@
 # Jueony — 공무원용 AI 문서 편집기
 
-[파일·저장·복구 최신 구현 현황](docs/115-column-width-storage.md) — 원본행·표 위치·비례 단 너비 보존 수정. 합본195·단위970·기존단표24·Windows저장10 통과. 앞 문단 재조판 저장 차단은 남으며 한글 직접 비교는 보류합니다.
+[파일·저장·복구 최신 구현 현황](docs/116-reflowed-native-storage.md) — **앞 문단 재조판 뒤 HWPX 저장 차단 수정.** 실제 저장12·UI13·ZIP22를 포함한 합본242/242, 단위970·기존단표24·Windows저장10 통과. 원MCST/Python3 최초 조판·글 방향 등 잔여는 문서에 구분했고 한글 직접 비교는 보류합니다.
 
 ## [전체 진행 현황 · 기능별 작업 문서 바로가기](docs/jueony-progress.md)
 
@@ -14,7 +14,7 @@
 | [AI 연결·Agent 실행](<docs/features/02-agent-and-models.md>) | — | 14/20 · 부분 2 | 9/20 · 부분 3 | 13/19 | 구현 [N024](<docs/features/02-agent-and-models.md#n024>) 브라우저 인증 링크 기반 계정 연결 |
 | [참고 자료·검색·RAG](<docs/features/03-references-and-rag.md>) | — | 5/10 · 부분 2 | 4/10 · 부분 1 | 1/6 | 구현 [N033](<docs/features/03-references-and-rag.md#n033>) 검색 순위·구본 우선 문제와 무답 판별 |
 | [반복 작업·공무원 업무 양식](<docs/features/04-macros-and-business.md>) | 0/5 | 3/6 · 부분 1 | 3/6 | 3/6 | 구현 [N038](<docs/features/04-macros-and-business.md#n038>) 반복 작업의 표·개체 명령 확장 |
-| [파일·저장·복구·형식 보존](<docs/features/05-files-storage-recovery.md>) | 0/10 | 23/24 · 부분 1 | 22/24 · 부분 2 | 6/6 | 구현 [N001](<docs/features/05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존 |
+| [파일·저장·복구·형식 보존](<docs/features/05-files-storage-recovery.md>) | 0/10 | 23/24 · 부분 1 | 22/24 · 부분 2 | 6/6 | 재조판 저장 차단 수정 · 자동242/242 통과 · 잔여 범위 유지 · 구현 [N001](<docs/features/05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존 |
 | [본문 편집·입력·선택·찾기](<docs/features/06-editing-and-selection.md>) | 0/20 | 7/7 | 0/7 · 부분 7 | 4/4 | 검증 [A001](<docs/features/06-editing-and-selection.md#a001>) 새 본문 문서 작성 |
 | [글자·문단·스타일·번호](<docs/features/07-formatting-and-styles.md>) | 0/18 | 19/23 · 부분 2 | 0/23 · 부분 19 | 13/16 | 구현 [N011](<docs/features/07-formatting-and-styles.md#n011>) 스타일 가져오기·내보내기 |
 | [표·셀·크기·계산](<docs/features/08-tables.md>) | 0/24 | 32/38 · 부분 2 | 3/38 · 부분 31 | 26/33 · 부분 3 | 구현 [N004](<docs/features/08-tables.md#n004>) 기존 병합 원본의 후속 Agent 셀 편집 |

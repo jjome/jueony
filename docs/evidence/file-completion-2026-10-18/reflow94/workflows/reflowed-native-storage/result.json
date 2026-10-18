@@ -1,0 +1,2038 @@
+{
+  "engine": {
+    "jsSha256": "72828c03b5b92948e0acd45bcd3de0263c8570bfbfaeab283eb5998e1b72b22d",
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "wasmSha256": "5772f16df2f56b9378f0a9683f5c46b0a6901ffd68f099aa3e8c1c8c65f5e40f",
+    "buildMode": "wsl-review-no-opt",
+    "patches": [
+      {
+        "name": "border-fill-identity.patch",
+        "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c"
+      },
+      {
+        "name": "default-tabs.patch",
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+      },
+      {
+        "name": "document-insertion.patch",
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+      },
+      {
+        "name": "master-page-editing.patch",
+        "sha256": "b04c7d682e105e3f37f72a18c1b4bb01cbf085424e3219f3919fd8c891dc26c2"
+      },
+      {
+        "name": "merged-table-transpose.patch",
+        "sha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768"
+      },
+      {
+        "name": "note-query-json.patch",
+        "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562"
+      },
+      {
+        "name": "page-border-entries.patch",
+        "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f"
+      },
+      {
+        "name": "page-border-inclusion.patch",
+        "sha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e"
+      },
+      {
+        "name": "page-border-region.patch",
+        "sha256": "ea98aed9ad8568699b802c5f46e4964fe524ba7634bc978d71fe10f44e1d7412"
+      },
+      {
+        "name": "page-border-z-image.patch",
+        "sha256": "97ccd3c9eac24c42b0844fc65e5804b232d3bef9929a6fd5de329cdd007b173b"
+      },
+      {
+        "name": "section-split.patch",
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+      },
+      {
+        "name": "style-reference-deletion.patch",
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+      },
+      {
+        "name": "style-reference-order.patch",
+        "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce"
+      },
+      {
+        "name": "style-shape-stories.patch",
+        "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af"
+      },
+      {
+        "name": "table-creation-consistency.patch",
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+      },
+      {
+        "name": "zz-line-number-settings.patch",
+        "sha256": "4cb8ce4a8d49864f53c3ff95fdfc8ef3e0342b09f86cd525dfb9aa102e2dee72"
+      },
+      {
+        "name": "zzz-page-body-delete.patch",
+        "sha256": "54bf1697627ec92c4379fb8ca314f9bf9d99c2207bf9e90859d35c7324be2e83"
+      },
+      {
+        "name": "zzzz-page-body-copy.patch",
+        "sha256": "45f3331d992f3799dad1f076bfd6d237d8c989541ea510d888e4afb5407749db"
+      },
+      {
+        "name": "zzzzz-page-body-paper-paste.patch",
+        "sha256": "4df977f851378597848aa60581957c123e6565ebf04f9412052dbfdabb2c43a0"
+      },
+      {
+        "name": "zzzzzz-page-body-style-paste.patch",
+        "sha256": "168c4c158bc0db3e71230903eae0b1ae71092a1a139f2ad5747712f95127bd75"
+      },
+      {
+        "name": "zzzzzzz-page-body-image-paste.patch",
+        "sha256": "ac08a167a376bae3e1e890f8109f2f9552ce952abe7882712f813183597ce57a"
+      },
+      {
+        "name": "zzzzzzzz-empty-section-remove.patch",
+        "sha256": "d49d3acc5bc0b3049415e17233a7f7a7249792f6500d475ce6cd39d3ad14d590"
+      },
+      {
+        "name": "zzzzzzzzz-hwpx-body-caret.patch",
+        "sha256": "c073ab44d5460f92915ea6493a791d2cbf24bb60ad66eca5033be0fc9835ac56"
+      },
+      {
+        "name": "zzzzzzzzzz-agent-page-background.patch",
+        "sha256": "74104eca6a40a3a7f06ad6d20ed8f44f816f0c153a2be40fdf584b61fc9ba907"
+      },
+      {
+        "name": "zzzzzzzzzzz-agent-header-footer.patch",
+        "sha256": "415fa55bc5fe0c4f49a7dce025723067022d7bdef076a9fb48b7f456c30cb91a"
+      },
+      {
+        "name": "zzzzzzzzzzzz-agent-paragraph-tabs.patch",
+        "sha256": "d15949747520d51020433aca32539f79c5a8cc0dfdad9de95db221dae651b311"
+      },
+      {
+        "name": "zzzzzzzzzzzzz-agent-paragraph-decoration.patch",
+        "sha256": "2adf2bba46d11a6ca97ce838da1d329c627c8532812674b7329aaef3cdb544fb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzz-agent-paragraph-lists.patch",
+        "sha256": "06e1af9e90e0c54da772a533f9c2ac5279db059c37fb3612c189e0d7e1c7692d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzz-agent-basic-bullets.patch",
+        "sha256": "03138686d9faa51fcf335f1b6299a294248031d36ca079da5346e52d0b531a35"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzz-agent-numbering-clone.patch",
+        "sha256": "a79207f328ca0521515344c018554ccc20092142dabaa5ba413ff162408fa567"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzz-agent-basic-numbering.patch",
+        "sha256": "66ac344e90a16b3e447e97bd6a593edbc7b9e024313cc40f81f2611838f3b102"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzz-agent-paragraph-outline.patch",
+        "sha256": "dfe19d3083f6a4222440ce558b5451f2568cf57b211bcc19babb508c1db2022e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzz-agent-style-metadata.patch",
+        "sha256": "53c6a573df6e8f1d0af4f388dad4e624a700006ad38f7a1de820eabc1d6d44cb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzz-whole-table-edited-host.patch",
+        "sha256": "f90714f601227bba000d63be77e5ac9f3985d192e613990984544b2f70b0f603"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzz-table-default-padding-reflow.patch",
+        "sha256": "903260c4c371a2a1d4b0afa72f8f0e1f191db936bd6e055a974a0a4295badf0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzz-hidden-paragraph-page-owner.patch",
+        "sha256": "13df5f1c5493ef4560866f3806be6a3bd2c748e50a1fc531dac686994e310b6b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-following-table-flow-owner.patch",
+        "sha256": "251cb5ee2d06a1a78732d7c01839bf4bf596a5376ce5af8637b50d8c0633f897"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-memo-tail-owner.patch",
+        "sha256": "5f4eafa802c6dd9dde96a1def6e187ef1be5b3f7e9a99cf8d4569458d0d0bca0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzz-table-outer-margin-owner.patch",
+        "sha256": "6132e26aa3a5b14f506f425d79930882a5c48092eac8e96bc4c8735cc8d42db3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-table-tail-snapshot.patch",
+        "sha256": "11a853d99a9278fd94e2c573d384f3826c53b00a433bcb6b9fa04fb24e344f0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzz-conversion-semantic-storage.patch",
+        "sha256": "65f3e6e87bb1030f2e565cfd96d36b85dc4065de8fb3615a2db24a9d4121a092"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-zone-observation.patch",
+        "sha256": "9dc3ffd29ada303898ab21268fb72e23b1b56bcf7c589a11687716848e80bb70"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-textbox-alignment-storage.patch",
+        "sha256": "b9d8791a5e9b7b5e6b5d1bd794f3a7ebe9012c7bc8403c49333217cfef434122"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-footnote-style-identity.patch",
+        "sha256": "867d4ac34306a4edfb4360b2d9d51d5bb5bc43dedf5abd6919cedeba427894e6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-merged-row-height.patch",
+        "sha256": "6364cba702decf8160fea341932f5b0df6481c51fe135c2d77b6cae1c52192a3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-session-story-evidence.patch",
+        "sha256": "4f59265ba0740ad570a7dcbdd964a06a1d99075052713e70d9c1b755b83caab8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-visible-tail-snapshot.patch",
+        "sha256": "10dbdd14e2603200bec9ebcf34417c224d4f77624fc83ddf76a3c0cb28e8931e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-root-line-snapshot.patch",
+        "sha256": "509a2d497b5fe4c651b26954b6874e1a95ac4a2655391f88446f70f6735c4ef0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-overlap-origin.patch",
+        "sha256": "35f34ab3553354c4920e3ba51810770a997561fc896b40c73fb012f371dcfd96"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-reflow-markers.patch",
+        "sha256": "21e7d77e4f93072efc71718c2ea9e1ce15ff26a0fe343378b474a16a136856c8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-whole-table-flow.patch",
+        "sha256": "4f376b5c88ae4d26c9ec890ebefd352ac004e94b292afbc36ffdbf95525f514a"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-typeset-advance-grid.patch",
+        "sha256": "4b55713647b5567ec88b39853b8a28efe4811bd08025ccf9c1f20c4554732638"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-width.patch",
+        "sha256": "1cc54a1f9c37f31d034f66f8b0fbc4dedd3bffff7fb7094b824ebb88ae187183"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-marker-whole-flow.patch",
+        "sha256": "9b954250e8ddbc67cbfd9eda3898deb1f892de63483e3d9ae8eed2d9b4c574d7"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-origin-hwpx-query.patch",
+        "sha256": "e419b33ca35e25c63b2ec40ba99cec33a7dee2690d3035e070cca2c9efa23581"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-nonflow-prefix-band-origin.patch",
+        "sha256": "7b9f054bb6bf0af8094451cf85797adb6ab9fe06fcfa6641453111bd3561bdf6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-line-cache.patch",
+        "sha256": "2629f5073faed3d9b4f121cb71116143879085396b3ef3421e26a6c4adff64a0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-wrap-separator-spacing.patch",
+        "sha256": "54f38a977dc703e75cc42f3383705182b546efb30f1b3e2fd9669c6c70296aa3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-textbox-storage-flag.patch",
+        "sha256": "6ed35f5dfc24f0f47146b7fa7d1cb24fe3a56bc14f365eb0e7063dd7d85bdaf6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-paragraph-2016-heading-case.patch",
+        "sha256": "ed6f58a7201a4d8514d459b74d90dee6d880d33746e37509d14ba0475e3bfcb3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp-tab-placeholder-line-cache.patch",
+        "sha256": "68ad036c239042df4ae77d6750d1c69323bf1fa499193fc6d47bd2f0ef2b37ce"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-width-declared-height-preservation.patch",
+        "sha256": "5d4bb9a8907fe988741163510618d410b778cb24bfc45b51392780fc1ccc7fd8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-explicit-none-shadow-storage.patch",
+        "sha256": "38c3ddba6b4844f82ac8a3f752dabbabb55c74d31cc3d150c1142d57f57e00e9"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-table-content-height-sync.patch",
+        "sha256": "368dd198802b630da92549f7bc4ddbcb2e6bf7a0822090519ec07a1134a9fe0b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-closed-whole-stack-lineage.patch",
+        "sha256": "5e9b4dce4da46d62427105ce3a70362050f17392388aa507ad54d7894df31bd2"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-single-table-outer-origin.patch",
+        "sha256": "12acf5353ab12f366e04496d2d7c59093d80a7bc60293257d8fa603910de0a05"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-document-summary-metadata.patch",
+        "sha256": "69b458e6f48c0145df400b19981658575d08f88a183ae6975dd67bcf0b146f06"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-live-table-outer-origin.patch",
+        "sha256": "9b896b2d541e1dd002bd240742d707b0274f95d436bbb0d321600bd63a350845"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-offset-visible-edge.patch",
+        "sha256": "0232256c9982e2e20c0d3149abf67b1d0cbf30f9a4b03150086ded05202da0d3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwpx-native-font-descriptors.patch",
+        "sha256": "bdc2692b6fd6e60c70dd8c5880aa4357f67521e6fbef6d7253fe9fc332c0ab3b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stored-numbering-extension-codec.patch",
+        "sha256": "5b01b627c57b3772b93b41269d3a5e644d6003775c6b7c4ab5efd187a43f7ea1"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-table-fullwidth-source-owner.patch",
+        "sha256": "ef63e25bb950f0a8ceb4c70b1987c6b3dca739a4465acdca3a217d41d18f9d54"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-numbering-observed-disk-canonical.patch",
+        "sha256": "88aa2f62cf5601168d46c2ce0e73083f31f845ca9f125f146f3d114465bfb134"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-negative-table-frame-source-owner.patch",
+        "sha256": "2b8d16e911e3af30b9abfb93da33717de6e007b8e971046d5f6ca45a27c44d8d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-unknown-hwpx-control-loss-report.patch",
+        "sha256": "f2004c1fe26b90b03d2e407380536a3d8eebf9529d8bc67c083c75a9b1f4ceec"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-column-stack-source-owner.patch",
+        "sha256": "8ccf80a00cb0aae3c0a71619fb0ad6b55a537ac11c785ece4a4ad568c74efa7d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-reconstructed-body-shared-spacing-origin.patch",
+        "sha256": "1e828ab70011758f833ea59644383f6af9fa3d30400d2d220d9fd410f11f6af5"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-caption-lifecycle-and-partial-properties.patch",
+        "sha256": "0b8c8820f1c3444af15a7336034c3dc952461de6f5c758bb75992660b58b35af"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-transpose-row-measurement-owner.patch",
+        "sha256": "9d13fa135315a0fc550a2b7de3bff62d765816c217f66a4e9143e8283704b51b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-spacing-semantic-boundary.patch",
+        "sha256": "b9e980825c6e772149c9170203da78f183d762537d784f8f6757f253de911da6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-breakable-table-frame.patch",
+        "sha256": "2b9ec8c1ba628c5a3eeb51b15685c47cb8fc69973aac5a060e14ea12b10ea132"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-created-table-neighbor-line-provenance.patch",
+        "sha256": "a72b92a073a39731ea61ac07957d2176a0c5fd2bab6b331bfdcefbdbea229653"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-shape-insertion-wrap-owner.patch",
+        "sha256": "51cff004ad5b68a5fa2724dc200fc8c2b4e7059574e27df390eee0c75a3f8666"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-declared-ttf-substitute-font-roundtrip.patch",
+        "sha256": "51f8f19453df44f9ed01f4345e168f7fc7a48fc3acc104b79f8ab91c29a4dc56"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-explicit-hwp5-origin-return-contract.patch",
+        "sha256": "d79998f948f265811568404926e71f71462b123544b3f0fda9f567a826140bfd"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-versioned-xml-cache-storage-roundtrip.patch",
+        "sha256": "e6c14fa951415784b31a3c4a2720916fe1fe5afaa13b9300f6273c0c6a2e636c"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-verified-gulimche-integral-advance.patch",
+        "sha256": "1b7673af7d20093b9a43e9b157670926f2042c9b7b7156f87a9afecc2099d67b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-note-shape-i32-wire-contract.patch",
+        "sha256": "a36d4572ea1f4527e8e5dda7c5211983776f3ee8f8c45cdf8b76f69e3d77bbfe"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-summary-standard-property-stream.patch",
+        "sha256": "ae4ee5b45c06032203b114ace797bf3ead878b476ea490b7aeb3854fb06bf8cd"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-reconstruction-page-basis-and-edit-lifetime.patch",
+        "sha256": "1db1c17717df23c546c32410efe14492aaf6db0b3bfe2243627a30891411a242"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-text-direction-preservation-and-loss-report.patch",
+        "sha256": "24c68a269cc0bd6e4d0dd8d7c3709a37d42fc4b766dbcde97e422ffe251dd113"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-raw-resource-namespace-ownership.patch",
+        "sha256": "173fef15aa86447c81aa9d7d5b124363fa3256e033a4478636bf1cf3386e7955"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-font-source-type-authority-and-loss.patch",
+        "sha256": "fce0993013db18c8baba21c08b04dd1f4ce5943b02191d42f1ab200c81edfa06"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-three-column-frame-ownership.patch",
+        "sha256": "df1739fea178622af38a6231ab089c3505aeeb104e03f46e5a44b898e272eb58"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stable-session-story-font-provenance.patch",
+        "sha256": "9613f523b63dc89e0aa23914055c5b0b7674a2515f2c076ecef0c178894bdd59"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-package-metadata-script-preservation.patch",
+        "sha256": "c1fb2a2434fd8be8ad8dcbb65dc75641ef141527f7518c7c89db256b1fb42944"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-fragment-namespace-budget.patch",
+        "sha256": "cf00cf74b97a358c8d484a1b840bc41e7ff51de0724bb4b1a1cca42979f6ee5b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-metadata-namespace-read-write.patch",
+        "sha256": "7ece8bcc570b5c83994efcad39661fd57a327a49fa06cb756d022abca8bd58ee"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-source-synthetic-rows.patch",
+        "sha256": "eedb6ac4c47befebfdeb727099222b83a5b7b6550d55b98546a050366b9b5f4c"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-proportional-column-persistence.patch",
+        "sha256": "43bf22538170222f634321eae536026c969af85d956cc3ebb8d2b9901a6b7e12"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-lazy-native-row-render-context.patch",
+        "sha256": "0dc75bc3af81aa8c3383b7310a6d21fb3e326112b4bb279328d59956bd115b59"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-native-row-storage.patch",
+        "sha256": "fe5a4e24a75dde2b3a04ac76be2faad4ab2ab4be42cc01b546f9e0edd9be6af2"
+      }
+    ],
+    "builtAt": "2026-10-18T06:35:24.7938654Z",
+    "optimized": false,
+    "sourceId": "7c10dba04ed65742"
+  },
+  "results": [
+    {
+      "name": "single_column wrap: actual prefix edit, both formats, reopen, history and follow-up",
+      "status": "PASS"
+    },
+    {
+      "name": "single_column page: actual prefix edit, both formats, reopen, history and follow-up",
+      "status": "PASS"
+    },
+    {
+      "name": "three_columns wrap: actual prefix edit, both formats, reopen, history and follow-up",
+      "status": "PASS"
+    },
+    {
+      "name": "three_columns page: actual prefix edit, both formats, reopen, history and follow-up",
+      "status": "PASS"
+    },
+    {
+      "name": "rtl wrap: actual prefix edit, both formats, reopen, history and follow-up",
+      "status": "PASS"
+    },
+    {
+      "name": "rtl page: actual prefix edit, both formats, reopen, history and follow-up",
+      "status": "PASS"
+    },
+    {
+      "name": "distribute wrap: actual prefix edit, both formats, reopen, history and follow-up",
+      "status": "PASS"
+    },
+    {
+      "name": "distribute page: actual prefix edit, both formats, reopen, history and follow-up",
+      "status": "PASS"
+    },
+    {
+      "name": "unequal_columns wrap: actual prefix edit, both formats, reopen, history and follow-up",
+      "status": "PASS"
+    },
+    {
+      "name": "unequal_columns page: actual prefix edit, both formats, reopen, history and follow-up",
+      "status": "PASS"
+    },
+    {
+      "name": "asymmetric_margin wrap: actual prefix edit, both formats, reopen, history and follow-up",
+      "status": "PASS"
+    },
+    {
+      "name": "asymmetric_margin page: actual prefix edit, both formats, reopen, history and follow-up",
+      "status": "PASS"
+    }
+  ],
+  "failures": [],
+  "observations": [
+    {
+      "name": "single_column",
+      "kind": "wrap",
+      "sourceSha256": "9778d66926e3138ce4bb51fadfd16173ee3d439aeec0a02a8f0af34b7fac0f3b",
+      "textLength": 550,
+      "pages": 1,
+      "exports": [
+        {
+          "format": "hwp",
+          "sha256": "d6f783f44a9901ffc1111b0e31f3f6306e4c05840777432f66f587a810b9d28b",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwp",
+          "sha256": "d6f783f44a9901ffc1111b0e31f3f6306e4c05840777432f66f587a810b9d28b",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "f66cdee04992345706b7515f5efcd1cb798edd744de9720390a297bdbe79b112",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "c33e18bcdf4480853bc3de45d3b8cf013dd2bc3d065b142c6bfc536fd6c7ad2c",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "c33e18bcdf4480853bc3de45d3b8cf013dd2bc3d065b142c6bfc536fd6c7ad2c",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwp",
+          "sha256": "c6269454aac8592e82a1b06324e31d0beb9e8c6f7fd57418e1f327d2aeef2ec4",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "fd3cd76936ca1a3f2ca498d04da009ad0333320ba65124c0be1f2bb6d8dd4a92",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "5cf7a4647bc721ce95fcda435f3b431ec8aacee3eb315cdbc94a17eae8bd4a68",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "c524348c4b77409421dab22395c6bd6cbe5b42a4076e77efb61852a453260487",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "66e4a562b5852d8d33e7f873984a3924d51341473f149cfbe4bf7e08c22b1014",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "049c687ea157d64dc46dce438eef8bdbd83aab78293c31d8578bfe5f30b05371",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwp",
+          "sha256": "c6269454aac8592e82a1b06324e31d0beb9e8c6f7fd57418e1f327d2aeef2ec4",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "fd3cd76936ca1a3f2ca498d04da009ad0333320ba65124c0be1f2bb6d8dd4a92",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "after-redo"
+        }
+      ],
+      "sourceUnchanged": true,
+      "undoRedoExact": true
+    },
+    {
+      "name": "single_column",
+      "kind": "page",
+      "sourceSha256": "9778d66926e3138ce4bb51fadfd16173ee3d439aeec0a02a8f0af34b7fac0f3b",
+      "textLength": 12000,
+      "pages": 6,
+      "exports": [
+        {
+          "format": "hwp",
+          "sha256": "d41f44550f3620e314f0553a0964d8ae64fbb6ba90f521c6c69f596743a9f406",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwp",
+          "sha256": "d41f44550f3620e314f0553a0964d8ae64fbb6ba90f521c6c69f596743a9f406",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "0b8bc210af9fd5f24ff62bc8f20b5adc610fd30f5483ef77547252f710cf018f",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "35143b689b679ede91f28249cd16d6e9d724cf04c917a978f9f7d182df44ccc4",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "35143b689b679ede91f28249cd16d6e9d724cf04c917a978f9f7d182df44ccc4",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwp",
+          "sha256": "607ba978d289e946444c30e6ccd9d0170f21abd0a83610a801f561037926b302",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "17cbf454b7ff240f553cf4507aeb20c1bedcb80e9248139ab03bcf35e15242d2",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "ede3f5ffaf430931cbf8167a069250e51689257c501f4f957932a3e0809b5629",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "491c4cdad23a764f2cb235f1b7fca88043692a1fbf06d2a1671aa1b677fa7dc4",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "0a60f544e02f5c35afed63328a4f7aaa48cf73d04f182643d769887686eb087e",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "1db326ff8233edfd534cbca2e7574e7ba5e9f9733e481f90424aa4aeb50c0339",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwp",
+          "sha256": "607ba978d289e946444c30e6ccd9d0170f21abd0a83610a801f561037926b302",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "17cbf454b7ff240f553cf4507aeb20c1bedcb80e9248139ab03bcf35e15242d2",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "after-redo"
+        }
+      ],
+      "sourceUnchanged": true,
+      "undoRedoExact": true
+    },
+    {
+      "name": "three_columns",
+      "kind": "wrap",
+      "sourceSha256": "db5e90e7217912d928d26d87d0e2877bf2682e90d1812bdef274aee83972cb79",
+      "textLength": 550,
+      "pages": 1,
+      "exports": [
+        {
+          "format": "hwp",
+          "sha256": "5654793169a4cac6b960f40992762a2a624528c3d7cd60d62dd9a66d6aa33b73",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwp",
+          "sha256": "5654793169a4cac6b960f40992762a2a624528c3d7cd60d62dd9a66d6aa33b73",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "5fc7a7a87acd974eb24fda95d38c2601b3c1c348b7dafef9c03136618d2d2651",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "23c13bd64aa7ddc1bfdde6ee297002f27595f1c7242b1398e8c5735005b1ce68",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "23c13bd64aa7ddc1bfdde6ee297002f27595f1c7242b1398e8c5735005b1ce68",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwp",
+          "sha256": "c9dfbcc7492cb4b19af975156505115175ca096e956fbf43f13e19ff65392791",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "0faf4f9b901191724dbf4858eb1b502b5a652974d59337f799d9a3bda036a30d",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "a57765205453109119d3f382f481a0b54978533132586a7f1bb444d731d18604",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "ca596777aa2f8e522c78a401e0caf99b015ec5fae16bd68af636517f901e27b0",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "4a672e4d5ddac871c1076b5bad14febe4a4244523c8c08889709e216c80f83e0",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "4ea4c4c83ae4bf198c13e8d0aacc07c2417343c74c5e90d38a15e86734f106eb",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwp",
+          "sha256": "c9dfbcc7492cb4b19af975156505115175ca096e956fbf43f13e19ff65392791",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "0faf4f9b901191724dbf4858eb1b502b5a652974d59337f799d9a3bda036a30d",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "after-redo"
+        }
+      ],
+      "sourceUnchanged": true,
+      "undoRedoExact": true
+    },
+    {
+      "name": "three_columns",
+      "kind": "page",
+      "sourceSha256": "db5e90e7217912d928d26d87d0e2877bf2682e90d1812bdef274aee83972cb79",
+      "textLength": 12000,
+      "pages": 7,
+      "exports": [
+        {
+          "format": "hwp",
+          "sha256": "a3baf5f6068a4db8fbebecdf687aa566fc81729544463cafa845e95f21dd68c8",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwp",
+          "sha256": "a3baf5f6068a4db8fbebecdf687aa566fc81729544463cafa845e95f21dd68c8",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "783b75289034976f1753134ef5ff5ade033fe9c18ebdd08e8be952ed60673df3",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "6a400163b2e0437ae6ee767baf4373ee04cb5a588f641749e2ca0f0d85041ba2",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "6a400163b2e0437ae6ee767baf4373ee04cb5a588f641749e2ca0f0d85041ba2",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwp",
+          "sha256": "6e9c1bb4087c03951f320def2f2825385dee1d30f351ac7255123f642f824c2b",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "d9df6ec39669a725a8dfae93605dea74b0e827aadff3ad3b9340085ce1295ea6",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "4cc773939dd3b22fa793578d5bc8620c4c17d77eaaaa3fabf0b5c261415e5c11",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "1c43ede0af7caf8ec97632840084d70461349de9b3b4e704327d2584ced02e14",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "264ac1105f5fdcaaeabd8694fc119e838a6132aa7a586ebfca038e088e2c1bef",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "fa3387458b58c03fd07ad0648d7ee257b01a54d99831dc1081601d08bb90b202",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwp",
+          "sha256": "6e9c1bb4087c03951f320def2f2825385dee1d30f351ac7255123f642f824c2b",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "d9df6ec39669a725a8dfae93605dea74b0e827aadff3ad3b9340085ce1295ea6",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "after-redo"
+        }
+      ],
+      "sourceUnchanged": true,
+      "undoRedoExact": true
+    },
+    {
+      "name": "rtl",
+      "kind": "wrap",
+      "sourceSha256": "f48a715a8ea47cb8081b735f89512dbac9209a0e99ab5d68877396d030056742",
+      "textLength": 550,
+      "pages": 1,
+      "exports": [
+        {
+          "format": "hwp",
+          "sha256": "9558b5a3a0c059e6f95462767332c7acc3bc03d350069784b46d2642b365749d",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwp",
+          "sha256": "9558b5a3a0c059e6f95462767332c7acc3bc03d350069784b46d2642b365749d",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "68c67bd11035c80953aa7e87e1a4b06ab5922779919898828a0fa6d0927419fd",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "4cbbe318bc7d4f2b74d13d80874bae79829bd404e83dfb6a6acbf9bae31f1b05",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "4cbbe318bc7d4f2b74d13d80874bae79829bd404e83dfb6a6acbf9bae31f1b05",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwp",
+          "sha256": "70f0fd47a4d4469bc8aa2a9ff6426d7bfbc5c7a8e7873ffb75640e14cafc1fca",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "9948c660eedfc9c0ff3ffeee10344f634ac53bf3925c8ee12ce09faad7453fae",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "00e032896cf2652be69420a0d212206517bf62527c6297a388d3e3d238085506",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "cfff7a0bd8f785c5a54b4c6708a19a20d258d5e60fbb2097df2dcf9c9b686f33",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "c9853d72af7372e9c2ce8cb1154ba4db2ff72596711d56c6285f947468ad2091",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "2ecc3dcd18c1276e5716cca7cdbc9ef05476780bbe861e6e94815dd5f7f4a6ea",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwp",
+          "sha256": "70f0fd47a4d4469bc8aa2a9ff6426d7bfbc5c7a8e7873ffb75640e14cafc1fca",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "9948c660eedfc9c0ff3ffeee10344f634ac53bf3925c8ee12ce09faad7453fae",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "after-redo"
+        }
+      ],
+      "sourceUnchanged": true,
+      "undoRedoExact": true
+    },
+    {
+      "name": "rtl",
+      "kind": "page",
+      "sourceSha256": "f48a715a8ea47cb8081b735f89512dbac9209a0e99ab5d68877396d030056742",
+      "textLength": 12000,
+      "pages": 7,
+      "exports": [
+        {
+          "format": "hwp",
+          "sha256": "c87caf6eb2a9398cb49cd6b86726b50d16b1d2880e90c0081352d011facc8905",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwp",
+          "sha256": "c87caf6eb2a9398cb49cd6b86726b50d16b1d2880e90c0081352d011facc8905",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "a97b26dc3ef9658c4b817251b7d1cebb738bc43a6bd7efef3487945125ff0df6",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "277525bd8e2cccd7dfdabe01d352a588b25e901195acda79c63051c257e0390e",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "277525bd8e2cccd7dfdabe01d352a588b25e901195acda79c63051c257e0390e",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwp",
+          "sha256": "78e482ff3cceddcf2c934339499f6d88ae4030a3972e494cd385a47e02c364f9",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "864f685f6cab46348158eccbf484c67e9752a290a907282d4d6004bd2299539b",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "82d8818d6381c655f23b676d8cf636590622e3f0c58c2965f124e8aeec7c56fe",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "af51d5530c4fb928d6593ec7dec869d4268a8d6de8b9c7610850d85de70d5a41",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "a433bc96de5e5a00803f1bd984a0a9adbe2bcee596c3b98478ab7e9e6a44b6b3",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "c0f8922b106117ea181b9c4de67cdd434bc7dc95310dd88cf628675a2c77072c",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwp",
+          "sha256": "78e482ff3cceddcf2c934339499f6d88ae4030a3972e494cd385a47e02c364f9",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "864f685f6cab46348158eccbf484c67e9752a290a907282d4d6004bd2299539b",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "after-redo"
+        }
+      ],
+      "sourceUnchanged": true,
+      "undoRedoExact": true
+    },
+    {
+      "name": "distribute",
+      "kind": "wrap",
+      "sourceSha256": "9b35480c316ee54c1d5ef0ecbe4a2d5223b7321143aded0dbab43b1d5f569452",
+      "textLength": 550,
+      "pages": 1,
+      "exports": [
+        {
+          "format": "hwp",
+          "sha256": "81703584e4104fc356df9f02c596af47e7e4925fbf403e2adc6bab3f4d417b48",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwp",
+          "sha256": "81703584e4104fc356df9f02c596af47e7e4925fbf403e2adc6bab3f4d417b48",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "565e31fecf12bb3af4049cee7ca168f0be35b35b30a76e12a33728c0095c8e3e",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "f6514a1371673c64d891e7ec5cfdc29e0cbca8aaa0c5fc899d6b86ecdfa183f5",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "f6514a1371673c64d891e7ec5cfdc29e0cbca8aaa0c5fc899d6b86ecdfa183f5",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwp",
+          "sha256": "d7496d670ebd4b9d4e9a671fd04eca76fb9f71b99e37be99525c33e3a760c1eb",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "ed27091cc5562f85f65c3f36769825f744d0e19d70350b9d808071f9c048b800",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "ea030f4758fd5b27d049d14bc3323f16b15c43b84005594798cb8c50250f6b0e",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "ff090a2b4366a6dc50fb551a66bc39cbe84727ee6b1e09502353f7ab7fd8da6b",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "bd092a23f5306a220b18c4bda228625d69292e63021b8763efdebf2dfc6dc506",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "1fbaf60107316dbdc5f13943bb595190e36f71f2868dd389acc66da3aaeb7049",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwp",
+          "sha256": "d7496d670ebd4b9d4e9a671fd04eca76fb9f71b99e37be99525c33e3a760c1eb",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "ed27091cc5562f85f65c3f36769825f744d0e19d70350b9d808071f9c048b800",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "after-redo"
+        }
+      ],
+      "sourceUnchanged": true,
+      "undoRedoExact": true
+    },
+    {
+      "name": "distribute",
+      "kind": "page",
+      "sourceSha256": "9b35480c316ee54c1d5ef0ecbe4a2d5223b7321143aded0dbab43b1d5f569452",
+      "textLength": 12000,
+      "pages": 7,
+      "exports": [
+        {
+          "format": "hwp",
+          "sha256": "2002c579018560a18768f97a5f8d26a4f770bbe5ca026eac77e712669b0a6111",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwp",
+          "sha256": "2002c579018560a18768f97a5f8d26a4f770bbe5ca026eac77e712669b0a6111",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "1ee03f101e92d1497ca72a69e62410e8af92c46248891d1060bae74f9faa76de",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "9048e6301366cddfc9f030ce0cb1b0485aa0cb524dafd737a7ed3e199d6c86fd",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "9048e6301366cddfc9f030ce0cb1b0485aa0cb524dafd737a7ed3e199d6c86fd",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwp",
+          "sha256": "a3742ce5b61d3a83ad0d159f00782f7d0a83f82c3fc41e48a9ee32221b4716fb",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "dd5ee040bb949a5a659f32c8e3dac99fef2c9023837ccc2cfc47320aa704f44f",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "82b2a2740dd9e5311fd263af134a074c08371ba05e98cf28ff04f87b3723150d",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "114f99bc0864eed086ab932d541e33d3ab2a6c969b4250f246caae2b1a93ef0c",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "925d5919ccd0804d60e74dc5a0a15377d0bd6b6ff15f6dd1b376620572c3d708",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "0701edff272c513e20e430360dcf210675cd3331a00edb270417ba57a9fda966",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwp",
+          "sha256": "a3742ce5b61d3a83ad0d159f00782f7d0a83f82c3fc41e48a9ee32221b4716fb",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "dd5ee040bb949a5a659f32c8e3dac99fef2c9023837ccc2cfc47320aa704f44f",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "after-redo"
+        }
+      ],
+      "sourceUnchanged": true,
+      "undoRedoExact": true
+    },
+    {
+      "name": "unequal_columns",
+      "kind": "wrap",
+      "sourceSha256": "2ee00d6ef1ea96b9c5fb7fd4f2a4a278b0d676dcb964afdae2dcb49b0ab4016e",
+      "textLength": 550,
+      "pages": 1,
+      "exports": [
+        {
+          "format": "hwp",
+          "sha256": "d9cf5bacdf9ac9ccc9a0cf92baf4c3ca09933747d05bc3ff14a24a60a3a47e13",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwp",
+          "sha256": "d9cf5bacdf9ac9ccc9a0cf92baf4c3ca09933747d05bc3ff14a24a60a3a47e13",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "bef6e66dbea823419a64d5021866a80e2f887749737292f240dc870661b67286",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "5cbaedb8c7f1fdb757c7bd7537cbc0c2050090d741c10876c7c320476dd6ada5",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "5cbaedb8c7f1fdb757c7bd7537cbc0c2050090d741c10876c7c320476dd6ada5",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwp",
+          "sha256": "bab3668fa7a0b73d9ba702e5e9cf2dcf2a60abfbc003ed82c6cf960a701c4c93",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "d565a8f641c0d268022cb2061e5cae681b87ab524ec5bad3d2846acce3c18090",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "29bd2c97858c37be3fdae29644bddbc1dfb0701fb0563c19dccbbdf08fe0ddf2",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "b7a8e080fb55b5d572d6bcf749ff10a20cdb43a37e5d9286eb7554263f0cc44d",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "573439c7e6f9f78c1d0096a84562b40e543cec0f3a9917bd633ba7b10a9aff31",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "0d8a70e9ceb246fc0d52f5bb851e2555b683662e8e8ad47329c45ba034daada5",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwp",
+          "sha256": "bab3668fa7a0b73d9ba702e5e9cf2dcf2a60abfbc003ed82c6cf960a701c4c93",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "d565a8f641c0d268022cb2061e5cae681b87ab524ec5bad3d2846acce3c18090",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "after-redo"
+        }
+      ],
+      "sourceUnchanged": true,
+      "undoRedoExact": true
+    },
+    {
+      "name": "unequal_columns",
+      "kind": "page",
+      "sourceSha256": "2ee00d6ef1ea96b9c5fb7fd4f2a4a278b0d676dcb964afdae2dcb49b0ab4016e",
+      "textLength": 12000,
+      "pages": 9,
+      "exports": [
+        {
+          "format": "hwp",
+          "sha256": "07423f4987757bc1f3a86db93b7948971e74003a167fc0c7b5d701ff38e25a22",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwp",
+          "sha256": "07423f4987757bc1f3a86db93b7948971e74003a167fc0c7b5d701ff38e25a22",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "8080db496db9dba0925b77b15b26bbe04cc699762776f2e62e9c18319ecf4d0f",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "e2264f3b0e9223cb5408c6050be503c4c711098b9d98019a30d294b677ad16af",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "e2264f3b0e9223cb5408c6050be503c4c711098b9d98019a30d294b677ad16af",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwp",
+          "sha256": "ec3e0e68db97dc40b3e09a7def8cc1bc0d32a341c8b53fc49db9c04b62939d85",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "b3f345cba8b2b6b6e08b2067617689fe9dc465af4b0c00903ad04834cdc21944",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "510c3ebed5f05c68df212e961f42ab8b0fbc0fb748ce1ae8d0603bdbbe98860b",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "fd760488256793db5fcca2ec5c1c329e4743105ad3dd547526bf484751385455",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "631ff3919dbfae5bde7a77dd1455becf507a9ae344afb5540e4097fe1a41b3da",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "b2972dd3740e226454b27458b5c9dfff28d0bf7a71dbe928087adfd86c5b55a4",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwp",
+          "sha256": "ec3e0e68db97dc40b3e09a7def8cc1bc0d32a341c8b53fc49db9c04b62939d85",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "b3f345cba8b2b6b6e08b2067617689fe9dc465af4b0c00903ad04834cdc21944",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "after-redo"
+        }
+      ],
+      "sourceUnchanged": true,
+      "undoRedoExact": true
+    },
+    {
+      "name": "asymmetric_margin",
+      "kind": "wrap",
+      "sourceSha256": "3ba817fe20afa035739168eddcd1eae6fa08e7bd28b4322db3ec7f6f1f85830e",
+      "textLength": 550,
+      "pages": 1,
+      "exports": [
+        {
+          "format": "hwp",
+          "sha256": "0e0af6bb2f4ae130fa7f270e6a8e93bf5b49c4b669399ec2be4be8c1ab6f9ed6",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwp",
+          "sha256": "0e0af6bb2f4ae130fa7f270e6a8e93bf5b49c4b669399ec2be4be8c1ab6f9ed6",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "94f5570ea4b9cb0b5b0c06f00dd684c8ffcedc8ef09723f47ca942cf7ad9f9ae",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "31cf19898dc022a3f7dcbf37cb5d51333fac9b8a09443dae73ec2c9fa39f33b3",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "31cf19898dc022a3f7dcbf37cb5d51333fac9b8a09443dae73ec2c9fa39f33b3",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwp",
+          "sha256": "1ce83a96448b9ca7428ea119f5b27cf14ac250269aa437b7d8709e87215f16c3",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "e081e062067f20ef18e31a8472dc415458d8bf1200b76d211dd959a9a629b49b",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "9b4335ed64f83d112e31affe69a2bda63e108ff32edd730f974bea4a0752c862",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "7eb4cb86c401096c99214a68e1186e157c553d4bcae5ac206727da18ab9b7359",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "881ade38eb4845ffbec3ffb3430653f87cc98a0bd5b171a0de017b28e95a1477",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "26260ab1a91adf9c9b1709d0a1ad58b82cfb7a465d97ebdde08e82cf20fdb53f",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwp",
+          "sha256": "1ce83a96448b9ca7428ea119f5b27cf14ac250269aa437b7d8709e87215f16c3",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "e081e062067f20ef18e31a8472dc415458d8bf1200b76d211dd959a9a629b49b",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "after-redo"
+        }
+      ],
+      "sourceUnchanged": true,
+      "undoRedoExact": true
+    },
+    {
+      "name": "asymmetric_margin",
+      "kind": "page",
+      "sourceSha256": "3ba817fe20afa035739168eddcd1eae6fa08e7bd28b4322db3ec7f6f1f85830e",
+      "textLength": 12000,
+      "pages": 7,
+      "exports": [
+        {
+          "format": "hwp",
+          "sha256": "e56f089e7bfdcc5a8d0d82511fd5417eb26a67d845695fbebba325fb2933db09",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwp",
+          "sha256": "e56f089e7bfdcc5a8d0d82511fd5417eb26a67d845695fbebba325fb2933db09",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "aecb43283393c06c0c7ce1013f21d2fbf6df0d8b52117565cb27678ce6034430",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "5be64899c7ee5eab068e7925373ec0ec25d0e947beef925a54b5e72be22a320c",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "5be64899c7ee5eab068e7925373ec0ec25d0e947beef925a54b5e72be22a320c",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwp"
+        },
+        {
+          "format": "hwp",
+          "sha256": "faff67fc6b1d47f27fc53a911f378d6ca89a76493a82e74d6f0660a3bc257c77",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwp-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "b55db5fa987b382d98f537155cc63633dee077df46f780ed89d1bc3e24d4ec88",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "edited"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "15b30dcfaba06149646af15cb81648bac2b9ddbdaa8b0217ff9d6e3c3a27fee0",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "repeat-after-reopen"
+        },
+        {
+          "format": "hwp",
+          "sha256": "3c3131b6e47890194716416405072838d43e7c55a695977cd89563c43ea47ec9",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "a0a8178673df4ae04af506858285c7300d0ab7082d2f3fe86679eccb8337e91f",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwp"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "6ad9e670271e64051094a20bbc09d62a70e04404375f3ac476356ff868f5ddd2",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "follow-up-from-hwpx"
+        },
+        {
+          "format": "hwp",
+          "sha256": "faff67fc6b1d47f27fc53a911f378d6ca89a76493a82e74d6f0660a3bc257c77",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "cross-again-from-hwpx-hwpx"
+        },
+        {
+          "format": "hwpx",
+          "sha256": "b55db5fa987b382d98f537155cc63633dee077df46f780ed89d1bc3e24d4ec88",
+          "semantic": 0,
+          "geometry": 0,
+          "losses": 0,
+          "guard": "checked",
+          "phase": "after-redo"
+        }
+      ],
+      "sourceUnchanged": true,
+      "undoRedoExact": true
+    }
+  ],
+  "fixtureHashes": {
+    "single_column": "9778d66926e3138ce4bb51fadfd16173ee3d439aeec0a02a8f0af34b7fac0f3b",
+    "three_columns": "db5e90e7217912d928d26d87d0e2877bf2682e90d1812bdef274aee83972cb79",
+    "rtl": "f48a715a8ea47cb8081b735f89512dbac9209a0e99ab5d68877396d030056742",
+    "distribute": "9b35480c316ee54c1d5ef0ecbe4a2d5223b7321143aded0dbab43b1d5f569452",
+    "unequal_columns": "2ee00d6ef1ea96b9c5fb7fd4f2a4a278b0d676dcb964afdae2dcb49b0ab4016e",
+    "asymmetric_margin": "3ba817fe20afa035739168eddcd1eae6fa08e7bd28b4322db3ec7f6f1f85830e"
+  },
+  "sourceHashes": [
+    {
+      "path": "scripts/lib/hancom-review.mjs",
+      "sha256": "bf8e4d30b7b232ce4abcc348165e97ebed214cb7bf60a5e14ccf8759413d88bd"
+    },
+    {
+      "path": "src/adapters/rhwp/preservation.ts",
+      "sha256": "14e396848f1689d3d1c618d9300e356165e0a74d188d92cf04d7e54337299904"
+    },
+    {
+      "path": "src/adapters/rhwp/document-save-layout.ts",
+      "sha256": "6c1d119f4723698e9e3769d4fb45c7b38469b6f0bca6f4c575688f3b38638434"
+    },
+    {
+      "path": "src/adapters/rhwp/overlap-save-layout.ts",
+      "sha256": "81292a0acd43934682abea16fa510b6fdedbd820d9f1822bac511de3919d1495"
+    }
+  ],
+  "verifierSha256": "b60fc9cc8fe65836397f69b9df98251215b12502da09680bf7fb04342a707649",
+  "scope": "Twelve successful prefix wrap/page-storage regressions required on actual WASM; unchanged strict production guard, independent full semantic/published geometry comparison, both formats, repeated reopening, follow-up edits and exact snapshot history. A refused conversion FAILS. Own pinned files only; no user/OS/Hancom UI."
+}

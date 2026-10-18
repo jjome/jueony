@@ -64,3 +64,5 @@
 ## 유지할 회귀 검사
 
 이번 두 검수기를 `apps/editor/scripts/verify-split-frame-storage151.mjs`와 `verify-cross-section-storage151.mjs`로 옮겼다. 동일 검수기로 이전 엔진의 8건·12건 실패와 현재151의 20건 통과를 다시 확인했다. 이 20건은 기존501건과 별도다. [검수기 전후 실행 증거](evidence/n001-2026-10-19/general151-regressions/README.md).
+
+남은 불균등3단 위치 지정 표에는 `verify-offset-three-storage154.mjs`를 추가했다. 고정 Native/XML 입력에서 초기·ASCII7·ASCII15·보조평면 문자, 일반/암호를 조합한16건이며, 실제 본문 변경·전문 문자 소유·연속 혼합 저장5회·후속 편집 양형식 저장·Undo/Redo를 요구한다. 현재151은16건 모두 실패하며 이 결과를 [실패 원형과 읽기 감사](evidence/n001-2026-10-19/offset154-baseline/README.md)에 고정했다. 수정본은 같은 검수기·clean 앱 보호 코드로16건·실제 디스크 재열기112회·이력32쌍·잘못된 암호 거절56회를 통과해야 한다. 이 검사를 추가한 것만으로 구현이나 검증 상태를 완료로 바꾸지 않았다.

@@ -1,0 +1,37 @@
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[135, 212, 6, 4, 60, 168, 63, 164, 246, 89, 76, 188, 194, 76, 54, 225, 111, 13, 75, 215, 42, 235, 69, 201, 59, 38, 82, 52, 37, 113, 162, 215];
++pub(crate) const RESOURCE:[u8;32]=[63, 201, 103, 247, 24, 35, 107, 129, 142, 179, 170, 150, 70, 128, 141, 171, 229, 240, 247, 80, 16, 169, 67, 88, 64, 56, 232, 11, 216, 128, 178, 156];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+--- a/src/renderer/typeset/controls/current_synthetic_tac145.rs
++++ b/src/renderer/typeset/controls/current_synthetic_tac145.rs
+@@ -39,15 +39,16 @@
+ 
+ #[cfg(test)]mod tests{
+  use super::*;
+- fn fixture()->crate::document_core::DocumentCore{
+-  let mut c=crate::DocumentCore::new_empty();c.create_blank_document_native().unwrap();c.insert_text_native(0,0,0,"Own TAC test prefix.").unwrap();c.create_table_native(0,0,20,2,1).unwrap();
+-  let pi=c.document.sections[0].paragraphs.iter().position(|p|p.controls.iter().any(|c|matches!(c,Control::Table(_)))).unwrap();
+-  c.insert_text_in_cell_native(0,pi,0,0,0,0,"Own first cell.").unwrap();c.insert_text_in_cell_native(0,pi,0,1,0,0,"Own second cell.").unwrap();
+-  let mut d=c.document.clone();let Control::Table(t)=&mut d.sections[0].paragraphs[pi].controls[0]else{unreachable!()};t.common.treat_as_char=true;t.raw_ctrl_data.clear();t.raw_ctrl_seal=None;for s in &mut d.sections{s.raw_stream=None;}
+-  let bytes=crate::serializer::serialize_hwp_with_report(&d).unwrap();crate::DocumentCore::from_bytes(bytes.bytes()).unwrap()
++ fn fixture()->crate::DocumentCore{
++  let mut c=crate::DocumentCore::new_empty();c.create_blank_document_native().unwrap();c.insert_text_native(0,0,0,&"Own general-layout prefix. ".repeat(4)).unwrap();
++  for n in 0..3{let last=c.document.sections[0].paragraphs.len()-1;let end=c.document.sections[0].paragraphs[last].text.chars().count();c.create_table_native(0,last,end,2,1).unwrap();let pi=c.document.sections[0].paragraphs.iter().rposition(|p|matches!(p.controls.as_slice(),[Control::Table(_)])).unwrap();c.insert_text_in_cell_native(0,pi,0,0,0,0,&format!("Own table {n} first cell. ")).unwrap();c.insert_text_in_cell_native(0,pi,0,1,0,0,&format!("Own table {n} second cell. ")).unwrap();let tail=c.document.sections[0].paragraphs.len()-1;c.insert_text_native(0,tail,0,&format!("Interleaved body {n}. ")).unwrap();}
++  let tail=c.document.sections[0].paragraphs.len()-1;let end=c.document.sections[0].paragraphs[tail].text.chars().count();c.insert_text_native(0,tail,end,&"Own trailing paragraph. ".repeat(18)).unwrap();c.set_column_def_native(0,2,0,true,720).unwrap();
++  let mut d=c.document.clone();let page=&mut d.sections[0].section_def.page_def;page.height=23000;page.margin_header=1000;page.margin_top=1000;page.margin_bottom=1000;page.margin_footer=1000;
++  for p in &mut d.sections[0].paragraphs{for ctrl in &mut p.controls{match ctrl{Control::Table(t)=>{t.common.treat_as_char=true;t.raw_ctrl_data.clear();t.raw_ctrl_seal=None;},Control::SectionDef(s)=>{let page=&mut s.page_def;page.height=23000;page.margin_header=1000;page.margin_top=1000;page.margin_bottom=1000;page.margin_footer=1000;},_=>{}}}}for s in &mut d.sections{s.raw_stream=None;}
++  let bytes=crate::serializer::serialize_hwp_with_report(&d).unwrap();let mut c=crate::DocumentCore::from_bytes(bytes.bytes()).unwrap();let end=c.document.sections[0].paragraphs[0].text.chars().count();c.insert_text_native(0,0,end,&"Retained current prefix editing causes line reflow. ".repeat(15)).unwrap();c
+  }
+  #[test]fn current_measured_band_positive_and_negative_scope145(){
+-  let c=fixture();let index=c.document.sections[0].paragraphs.iter().position(|p|matches!(p.controls.as_slice(),[Control::Table(_)])).unwrap();let p=&c.document.sections[0].paragraphs[index];let styles=c.resolve_render_styles_for_section(0);
++  let c=fixture();let index=c.document.sections[0].paragraphs.iter().rposition(|p|matches!(p.controls.as_slice(),[Control::Table(_)])).unwrap();let p=&c.document.sections[0].paragraphs[index];let styles=c.resolve_render_styles_for_section(0);
+   let e=super::super::super::TypesetEngine::new(c.dpi);e.profile.set(c.effective_layout_profile());let fmt=e.format_paragraph(p,c.composed[0].get(index),&styles,Some(c.pagination[0].pages[0].layout.column_areas[0].width));let m=&c.measured_tables[0];
+   assert!(measured_band(index,p,&fmt,m,&styles,c.dpi).is_some(),"known empty measured base");
+   for case in 0..23{let mut q=p.clone();match case{

@@ -1,0 +1,480 @@
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -2861,11 +2861,15 @@
+                 document,result,&styles,self.effective_layout_profile(),self.dpi)){
+             let physical=self.build_page_tree_with_prefix_capture(0,&candidate)?;
+             let Some(plan)=candidate.finalize(&physical.frame.current_physical_selections)else{return Ok(None);};plan
++            }else if let Some(candidate)=self.pagination.first().and_then(|result|crate::renderer::current_frame_rows_plan::CurrentUnequalPrefixFrameCandidate::from_current(
++                document,result,&styles,self.effective_layout_profile(),self.dpi)){
++             let physical=self.build_page_tree_with_unequal_prefix_capture(0,&candidate)?;
++             let Some(plan)=candidate.finalize(&physical.frame.current_physical_selections)else{return Ok(None);};plan
+             }else{
+-            let Some(candidate)=self.pagination.first().and_then(|result|crate::renderer::current_frame_rows_plan::CurrentUnequalPrefixFrameCandidate::from_current(
+-                document,result,&styles,self.effective_layout_profile(),self.dpi))else{return Ok(None);};
+-            let physical=self.build_page_tree_with_unequal_prefix_capture(0,&candidate)?;
+-            let Some(plan)=candidate.finalize(&physical.frame.current_physical_selections)else{return Ok(None);};plan
++             let Some(candidate)=self.pagination.first().and_then(|result|crate::renderer::current_frame_rows_plan::CurrentSplitPrefixFrameCandidate::from_current(
++              document,result,&styles,self.effective_layout_profile(),self.dpi))else{return Ok(None);};
++             let mut physical=Vec::new();for page in 0..candidate.pages(){physical.push(self.build_page_tree_with_split_prefix_capture(page as u32,&candidate)?.frame.current_physical_selections.clone());}
++             let Some(plan)=candidate.finalize(&physical)else{return Ok(None);};plan
+             }
+         };
+ 
+--- a/src/document_core/queries/rendering.rs
++++ b/src/document_core/queries/rendering.rs
+@@ -7696,6 +7696,16 @@
+         self.build_page_tree_with_physical_capture(page_num,None,true,Some(candidate.paint_plan()))
+     }
+ 
++    pub(crate) fn build_page_tree_with_split_prefix_capture(&self,page_num:u32,candidate:&crate::renderer::current_frame_rows_plan::CurrentSplitPrefixFrameCandidate<'_>)->Result<PageRenderTree,HwpError>{
++        let styles=self.resolve_render_styles_for_section(0);
++        if page_num as usize>=candidate.pages()||!self.computed_row_resources_supported()||self.batch_mode||self.pending_pagination_job.is_some()
++            ||self.deferred_pagination_descriptor.is_some()||self.dirty_sections.iter().any(|d|*d)
++            ||!self.pagination.first().is_some_and(|result|candidate.matches_current(&self.document,result,&styles,self.effective_layout_profile(),self.dpi)){
++            return Err(HwpError::RenderError("CURRENT_SPLIT_PREFIX_CAPTURE_OWNER_MISMATCH".into()));
++        }
++        self.build_page_tree_with_physical_capture(page_num,None,true,Some(candidate.paint_plan()))
++    }
++
+     pub(crate) fn build_page_tree_with_equal_stack_capture(&self,page_num:u32,candidate:&crate::renderer::current_frame_rows_plan::CurrentEqualColumnStackCandidate<'_>)->Result<PageRenderTree,HwpError>{
+         let styles=self.resolve_render_styles_for_section(0);
+         if page_num!=0||!self.computed_row_resources_supported()||self.batch_mode||self.pending_pagination_job.is_some()
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[177, 132, 3, 16, 156, 153, 79, 101, 162, 130, 161, 90, 211, 56, 148, 4, 13, 43, 131, 215, 86, 120, 226, 246, 115, 167, 37, 113, 32, 16, 15, 136];
++pub(crate) const RESOURCE:[u8;32]=[48, 141, 145, 43, 88, 38, 6, 112, 254, 76, 40, 109, 226, 193, 193, 60, 211, 26, 11, 95, 55, 92, 149, 29, 253, 100, 95, 240, 64, 227, 225, 251];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -274,6 +274,9 @@
+             ("src/renderer/current_visible_host142.rs",include_bytes!("../renderer/current_visible_host142.rs").as_slice()),
+             ("src/model/native_origin_paint139.rs",include_bytes!("native_origin_paint139.rs").as_slice()),
+             ("src/document_core/commands/text_editing.rs",include_bytes!("../document_core/commands/text_editing.rs").as_slice()),
++            ("src/renderer/composer/current_frame_rows145.rs",include_bytes!("../renderer/composer/current_frame_rows145.rs").as_slice()),
++            ("src/renderer/typeset/controls/current_synthetic_tac145.rs",include_bytes!("../renderer/typeset/controls/current_synthetic_tac145.rs").as_slice()),
++            ("src/renderer/current_split_prefix145.rs",include_bytes!("../renderer/current_split_prefix145.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- a/src/renderer/composer.rs
++++ b/src/renderer/composer.rs
+@@ -4658,3 +4658,6 @@
+         && line_breaking::supports_cached_body_frame_controls(para)
+         && !para.stored_text_partition_is_dirty()
+ }
++
++mod current_frame_rows145;
++pub(crate) use current_frame_rows145::{PlainFramePartition,encode_current_plain_frame_rows};
+--- /dev/null
++++ b/src/renderer/composer/current_frame_rows145.rs
+@@ -0,0 +1,36 @@
++//! Standard frame-local row encoding for a current ordinary plain paragraph.
++//! Pure output representation, not row freshness or a source/lease authority.
++use crate::model::paragraph::LineSeg;
++#[derive(Clone,Copy,Debug)]
++pub(crate) struct PlainFramePartition{pub(crate) page:u32,pub(crate) column:u16,pub(crate) start:usize,pub(crate) end:usize}
++pub(crate) fn encode_current_plain_frame_rows(canonical:&[LineSeg],frames:&[PlainFramePartition])->Option<Vec<LineSeg>>{
++ if canonical.len()<2||canonical.len()>4096||frames.len()<2||frames.len()>48{return None;}
++ let mut pen=0i32;let mut prior_text=0;
++ for (i,row)in canonical.iter().enumerate(){
++  if row.tag!=(LineSeg::TAG_SINGLE_SEGMENT_LINE|LineSeg::TAG_IMPLEMENTATION_PROPERTY)||row.vertical_pos!=pen||row.line_height<=0
++   ||row.text_height!=row.line_height||row.line_spacing<0||row.segment_width<=0||row.column_start!=0
++   ||row.baseline_distance<0||row.baseline_distance>row.line_height||(i>0&&row.text_start<=prior_text)||(i==0&&row.text_start!=0){return None;}
++  pen=pen.checked_add(row.line_height)?.checked_add(row.line_spacing)?;prior_text=row.text_start;
++ }
++ let mut output=canonical.to_vec();let mut consumed=0usize;let mut previous:Option<(u32,u16)>=None;
++ for frame in frames {
++  if frame.start!=consumed||frame.end<=frame.start||frame.end>canonical.len(){return None;}
++  if let Some((page,column))=previous{
++   if !((frame.page==page&&Some(frame.column)==column.checked_add(1))||(Some(frame.page)==page.checked_add(1)&&frame.column==0)){return None;}
++  }else if frame.page!=0||frame.column!=0{return None;}
++  let base=canonical[frame.start].vertical_pos;
++  for row in &mut output[frame.start..frame.end]{row.vertical_pos=row.vertical_pos.checked_sub(base)?;}
++  if let Some((page,_))=previous{let first=&mut output[frame.start];first.tag|=LineSeg::TAG_FIRST_LINE_OF_COLUMN;if frame.page!=page{first.tag|=LineSeg::TAG_FIRST_LINE_OF_PAGE;}}
++  consumed=frame.end;previous=Some((frame.page,frame.column));
++ }
++ (consumed==canonical.len()).then_some(output)
++}
++
++#[cfg(test)]mod tests{
++ use super::*;
++ fn rows()->Vec<LineSeg>{(0..4).map(|i|LineSeg{text_start:[0,1,3,4][i],vertical_pos:i as i32*160,line_height:100,text_height:100,baseline_distance:80,line_spacing:60,column_start:0,segment_width:1000,tag:0x80060000}).collect()}
++ #[test]fn plain_current_standard_frame_encoder145(){let r=rows();let f=[PlainFramePartition{page:0,column:0,start:0,end:2},PlainFramePartition{page:0,column:1,start:2,end:3},PlainFramePartition{page:1,column:0,start:3,end:4}];let q=encode_current_plain_frame_rows(&r,&f).unwrap();assert_eq!(q.iter().map(|r|r.text_start).collect::<Vec<_>>(),vec![0,1,3,4]);assert_eq!(q.iter().map(|r|r.vertical_pos).collect::<Vec<_>>(),vec![0,160,0,0]);assert_eq!(q.iter().map(|r|r.tag).collect::<Vec<_>>(),vec![0x80060000,0x80060000,0x80060002,0x80060003]);assert_eq!(r,rows());
++ for case in 0..9{let mut bad=f;match case{0=>bad[0].page=1,1=>bad[0].column=1,2=>bad[1].start=1,3=>bad[1].end=5,4=>bad[2].end=3,5=>bad[1].column=2,6=>bad[2].page=2,7=>bad[2].column=1,_=>bad[2].end=3}assert!(encode_current_plain_frame_rows(&r,&bad).is_none(),"partition {case}");}
++ for case in 0..5{let mut bad=r.clone();match case{0=>bad[0].tag=0x60000,1=>bad[2].vertical_pos+=1,2=>bad[0].line_height=i32::MAX,3=>bad[1].text_start=0, _=>bad[0].line_spacing=-1}if case==3{bad[2].text_start=0;}assert!(encode_current_plain_frame_rows(&bad,&f).is_none(),"row {case}");}
++ }
++}
+--- a/src/renderer/current_frame_rows_plan.rs
++++ b/src/renderer/current_frame_rows_plan.rs
+@@ -9,7 +9,7 @@
+  allocation_generation:[u8;32],
+  paragraphs:Vec<CurrentFrameParagraphRows>,
+ }
+-#[derive(Clone,Copy,Debug,PartialEq,Eq)]pub(crate) enum CurrentFrameRowKind{FreshBody,StructuralObjectAnchor}
++#[derive(Clone,Copy,Debug,PartialEq,Eq)]pub(crate) enum CurrentFrameRowKind{FreshBody,FreshSplitBody,StructuralObjectAnchor}
+ pub(crate) struct CurrentFrameParagraphRows{
+  kind:CurrentFrameRowKind,
+  section:usize,
+@@ -433,3 +433,62 @@
+ #[path="current_visible_host142.rs"]
+ mod visible_host;
+ pub(crate) use visible_host::CurrentVisibleHostCandidate;
++
++/// This candidate captures the actual accepted split prefix without changing
++/// table paint or renewing source/completed-row authority. Every used frame is
++/// recorded by the ordinary renderer before fresh standard rows can be exposed.
++pub(crate) struct CurrentSplitPrefixFrameCandidate<'doc>{
++ prefix:super::current_split_prefix145::CurrentSplitPrefixCandidate<'doc>,
++ paint:CurrentFramePaintPlan,frames:Vec<(u32,usize,u16,super::page_layout::LayoutRect)>,pages:usize,
++}
++impl<'doc> CurrentSplitPrefixFrameCandidate<'doc>{
++ pub(crate) fn from_current(source:&'doc Document,result:&super::pagination::PaginationResult,styles:&super::style_resolver::ResolvedStyleSet,
++  profile:crate::model::provenance::LayoutCompatibilityProfile,dpi:f64)->Option<Self>{
++  let prefix=super::current_split_prefix145::CurrentSplitPrefixCandidate::from_current(source,result,styles,profile,dpi)?;
++  let mut h=blake3::Hasher::new();h.update(b"current-split-prefix-capture-1\0");h.update(&crate::model::native_computed_resource::RESOURCE);h.update(&prefix.generation().to_le_bytes());
++  let mut frames=Vec::new();
++  for page in &result.pages{for(ordinal,c)in page.column_contents.iter().enumerate(){let rect=page.layout.column_areas[usize::from(c.column_index)];
++   h.update(&page.page_index.to_le_bytes());h.update(&c.column_index.to_le_bytes());for v in[rect.x,rect.y,rect.width,rect.height]{h.update(&v.to_bits().to_le_bytes());}
++   frames.push((page.page_index,ordinal,c.column_index,rect));}}
++  let generation=*h.finalize().as_bytes();let source_paragraphs=source.sections[0].paragraphs.as_ptr()as usize;
++  let mut plans=frames.iter().map(|(page,_,column,rect)|CurrentFramePaintPlan{source_paragraphs,generation,section:0,page:*page,column:*column,rect:*rect,tables:Vec::new(),additional_frames:Vec::new()}).collect::<Vec<_>>();
++  if plans.is_empty(){return None;}let mut paint=plans.remove(0);paint.additional_frames=plans;
++  Some(Self{prefix,paint,frames,pages:result.pages.len()})
++ }
++ pub(crate) fn pages(&self)->usize{self.pages}
++ pub(crate) fn matches_current(&self,source:&Document,result:&super::pagination::PaginationResult,styles:&super::style_resolver::ResolvedStyleSet,
++  profile:crate::model::provenance::LayoutCompatibilityProfile,dpi:f64)->bool{self.prefix.matches_current(source,result,styles,profile,dpi)}
++ pub(crate) fn paint_plan(&self)->CurrentFramePaintPlan{self.paint.clone()}
++ pub(crate) fn finalize(self,physical:&[super::current_physical_selections::CurrentPhysicalSelections])->Option<CurrentFrameRowsPlan<'doc>>{
++  if physical.len()!=self.pages||physical.iter().any(|p|!p.matches_current_plan(&self.paint)){return None;}
++  let mut all_frames=Vec::new();for p in physical{all_frames.extend(p.frames()?);}
++  if all_frames.len()!=self.frames.len(){return None;}
++  for(f,(page,ordinal,column,rect))in all_frames.iter().zip(&self.frames){
++   if f.section!=0||f.page!=*page||f.column_ordinal!=*ordinal||f.column!=*column||f.has_zone||f.zone_y!=0.0
++    ||f.rect.x!=rect.x||f.rect.y!=rect.y||f.rect.width!=rect.width||f.rect.height!=rect.height{return None;}}
++  let mut actual=Vec::new();for p in physical{actual.extend(p.rows()?.iter().filter(|r|r.frame.paragraph==0));}
++  let fresh=self.prefix.fresh_rows();if actual.len()!=fresh.len()||!self.prefix.matches_standard_rows(fresh){return None;}
++  let mut index=0;
++  for fragment in self.prefix.fragments(){
++   let frame=all_frames.iter().find(|f|f.page==fragment.page&&f.column==fragment.column)?;
++   if !matches!(frame.items.get(fragment.item),Some(super::pagination::PageItem::PartialParagraph{para_index:0,start_line,end_line})if *start_line==fragment.start&&*end_line==fragment.end){return None;}
++   let mut offset=0.0;
++   for line in fragment.start..fragment.end{let row=*actual.get(index)?;let standard=fresh.get(line)?;let f=&row.frame;
++    let effective_width=if f.stored_horizontal_span_used{super::hwpunit_to_px(standard.segment_width,super::DEFAULT_DPI)}else{frame.rect.width};
++    if f.node!=frame.node||f.line!=line||f.equation_adjusted||f.has_wrap_anchor||f.effective_column_x!=frame.rect.x
++     ||f.effective_column_width!=effective_width||f.available_width!=effective_width||f.margin_left!=0.0||f.margin_right!=0.0
++     ||f.inline_offset!=0.0||f.numbering_offset!=0.0||!arithmetic_equal(f.physical_text_y,frame.rect.y+offset)
++     ||f.final_line_box_height!=super::hwpunit_to_px(standard.line_height,super::DEFAULT_DPI)
++     ||f.baseline!=super::hwpunit_to_px(standard.baseline_distance,super::DEFAULT_DPI)||!self.prefix.matches_selected_line(line,&row.selected){return None;}
++    // The visible line must fit the actual column. Positive trailing spacing is
++    // flow data and is checked separately against the accepted fragment end.
++    if offset+f.final_line_box_height>frame.rect.height{return None;}
++    offset+=super::hwpunit_to_px(standard.line_height.checked_add(standard.line_spacing)?,super::DEFAULT_DPI);index+=1;
++   }
++   if !arithmetic_equal(offset,fragment.flow_after){return None;}
++  }
++  if index!=fresh.len(){return None;}
++  Some(CurrentFrameRowsPlan{source:self.prefix.source(),resource:crate::model::native_computed_resource::RESOURCE,allocation_generation:self.paint.generation,
++   paragraphs:vec![CurrentFrameParagraphRows{kind:CurrentFrameRowKind::FreshSplitBody,section:0,paragraph:0,rows:fresh.to_vec()}]})
++ }
++}
+--- /dev/null
++++ b/src/renderer/current_split_prefix145.rs
+@@ -0,0 +1,136 @@
++//! Fresh standard prefix rows from the actual current accepted split formatter.
++//! This provisional candidate is NOT an export plan or a physical paint receipt.
++//! Only a consumer that independently closes the real captured prefix paint may
++//! turn these rows into the existing source-bound output representation.
++use std::sync::Arc;
++use crate::model::{document::Document,paragraph::LineSeg,control::Control,provenance::LayoutCompatibilityProfile};
++use super::{composer::{ComposedParagraph,ComposedLine,ComposedTextRun,ParagraphBox,compose_paragraph_in_context,reflow_line_segs},
++ pagination::{PaginationResult,PageItem},style_resolver::ResolvedStyleSet,selected_composition_observer127::FinalizedSelectedCompositionTrace,page_layout::LayoutRect};
++#[derive(Clone)]
++pub(crate) struct PrefixFragment {pub(crate) page:u32,pub(crate) column:u16,pub(crate) item:usize,pub(crate) start:usize,pub(crate) end:usize,pub(crate) rect:LayoutRect,pub(crate) flow_after:f64}
++pub(crate) struct CurrentSplitPrefixCandidate<'doc>{
++ source:&'doc Document, trace:Arc<FinalizedSelectedCompositionTrace>, rect:LayoutRect,
++ composition:ComposedParagraph, canonical:Vec<LineSeg>, rows:Vec<LineSeg>, fragments:Vec<PrefixFragment>,
++}
++impl<'doc> CurrentSplitPrefixCandidate<'doc>{
++ pub(crate) fn from_current(source:&'doc Document,result:&PaginationResult,styles:&ResolvedStyleSet,profile:LayoutCompatibilityProfile,dpi:f64)->Option<Self>{
++  if source.sections.len()!=1||dpi!=super::DEFAULT_DPI||result.pages.len()<2||result.pages.len()>16
++   ||styles.supplemental_metrics.is_some()||styles.kerning_measurement_context.is_some()||styles.horizontal_shaping_context.is_some(){return None;}
++  let paragraphs=&source.sections[0].paragraphs;let p=paragraphs.first()?;
++  let [Control::SectionDef(_),Control::ColumnDef(columns)]=p.controls.as_slice() else{return None;};
++  if !matches!(columns.column_count,2|3)||!columns.same_width||columns.proportional_widths
++   ||!columns.widths.is_empty()||!columns.gaps.is_empty()||!matches!(columns.column_type,crate::model::page::ColumnType::Normal)
++   ||!matches!(columns.direction,crate::model::page::ColumnDirection::LeftToRight){return None;}
++  if p.text.is_empty()||p.text.len()>64*1024||p.char_shapes.is_empty()||p.char_shapes.len()>128
++   ||p.char_shapes.windows(2).any(|w|w[0].start_pos>=w[1].start_pos)
++   ||p.text.contains(['\t','\n','\r','\u{fffc}'])||!p.field_ranges.is_empty()||!p.range_tags.is_empty()
++   ||!p.orphan_field_ends.is_empty()||!p.tab_extended.is_empty()||p.numbering_restart.is_some()
++   ||!p.title_marks.is_empty()||!p.markpen_marks.is_empty()||p.cell_format_vpos_dirty||p.layout_only_fill_lines!=0
++   ||p.ctrl_data_records.iter().any(Option::is_some){return None;}
++  let mut utf16=16u32;if p.char_offsets.len()!=p.text.chars().count(){return None;}
++  for(ch,offset)in p.text.chars().zip(&p.char_offsets){if *offset!=utf16{return None;}utf16=utf16.checked_add(ch.len_utf16() as u32)?;}
++  if p.char_count!=utf16.checked_add(1)?{return None;}
++  let trace=result.selected_composition_trace.as_ref()?;
++  if !trace.matches_source(paragraphs,styles.reset_flow_context,profile,dpi)||!trace.matches_finalized_result(result){return None;}
++  let page=&result.pages[0];let count=usize::from(columns.column_count);let rect=*page.layout.column_areas.first()?;
++  if [rect.x,rect.y,rect.width,rect.height].iter().any(|v|!v.is_finite())||rect.width<=0.0||rect.height<=0.0{return None;}
++  for(pi,page)in result.pages.iter().enumerate(){
++   if page.page_index as usize!=pi||page.section_index!=0||page.column_contents.is_empty()||page.column_contents.len()>count||page.layout.column_areas.len()!=count{return None;}
++   if page.layout.column_areas.iter().zip(&result.pages[0].layout.column_areas).any(|(a,b)|a.x!=b.x||a.y!=b.y||a.width!=b.width||a.height!=b.height){return None;}
++   for(i,column)in page.column_contents.iter().enumerate(){let area=page.layout.column_areas[i];
++    if usize::from(column.column_index)!=i||column.endnote_flow||column.zone_layout.is_some()||column.zone_y_offset!=0.0
++     ||column.start_height!=0.0||!column.wrap_anchors.is_empty()||!column.wrap_around_paras.is_empty()
++     ||area.width!=rect.width||area.height!=rect.height||area.y!=rect.y{return None;}}
++  }
++  let commits=trace.commits().iter().filter(|c|c.paragraph==0).collect::<Vec<_>>();if commits.len()<2||commits.len()>48{return None;}
++  let first=commits[0];let fact=trace.format(first.format_id)?;let selected=trace.selected_composition(first.format_id)?;
++  if fact.paragraph_token!=p as *const _ as usize||fact.source_text!=p.text||fact.source_char_offsets!=p.char_offsets
++   ||fact.actual_input_width_px!=Some(rect.width)||fact.before!=0.0||fact.after!=0.0||fact.has_numbering||fact.has_horizontal_shaping||fact.known_square_band{return None;}
++  let mut fragments=Vec::new();let mut end=0;let mut expected_slot=0;
++  for c in commits {
++   let page_index=usize::try_from(c.page?).ok()?;let pg=result.pages.get(page_index)?;let column=pg.column_contents.get(usize::from(c.column))?;
++   let item=c.committed_item_index?;let area=pg.layout.column_areas[usize::from(c.column)];
++   if c.section!=0||c.format_id!=first.format_id||page_index*count+usize::from(c.column)!=expected_slot||item!=0
++    ||c.row_start!=end||c.row_end<=end||c.row_end>selected.lines.len()||c.final_membership!=Some(true)||!c.paragraph_token_matches
++    ||!c.metrics_still_match_selected_format||!c.range_inside_selected_composition||c.flow_before!=0.0||c.trimmed_before!=0.0
++    ||c.actual_column_width_px!=area.width||!matches!(column.items.get(item),Some(PageItem::PartialParagraph{para_index:0,start_line,end_line})if *start_line==c.row_start&&*end_line==c.row_end){return None;}
++   fragments.push(PrefixFragment{page:page_index as u32,column:c.column,item,start:c.row_start,end:c.row_end,rect:area,flow_after:c.flow_after});end=c.row_end;expected_slot+=1;
++  }
++  if end!=selected.lines.len(){return None;}
++  let actual_p0_items=result.pages.iter().flat_map(|p|&p.column_contents).flat_map(|c|&c.items).filter(|i|matches!(i,PageItem::FullParagraph{para_index:0}|PageItem::PartialParagraph{para_index:0,..})).count();
++  if actual_p0_items!=fragments.len(){return None;}
++  let style=styles.para_styles.get(usize::from(p.para_shape_id))?;
++  if style.margin_left!=0.0||style.margin_right!=0.0||style.indent!=0.0||style.spacing_before!=0.0||style.spacing_after!=0.0
++   ||style.keep_lines||style.keep_with_next||style.page_break_before||!matches!(style.head_type,crate::model::style::HeadType::None)
++   ||style.border_connect||style.border_spacing.iter().any(|v|*v!=0.0)
++   ||!style.line_spacing.is_finite()||style.line_spacing<0.0{return None;}
++  // A referenced empty border definition does not add paint or reservations.
++  // Check its actual resolved fields; its numeric ID alone is not geometry.
++  if style.border_fill_id!=0{let border=styles.border_styles.get(usize::from(style.border_fill_id.checked_sub(1)?))?;
++   if border.borders.iter().any(|b|!matches!(b.line_type,crate::model::style::BorderLineType::None))
++    ||border.fill_color.is_some()||border.pattern.is_some()||border.gradient.is_some()||border.image_fill.is_some()
++    ||border.diagonal_attr!=0||!matches!(border.center_line,crate::model::style::CenterLine::None){return None;}}
++  // Bound the existing generic breaker's integer metric arithmetic before use.
++  for shape in &p.char_shapes{let cs=styles.char_styles.get(shape.char_shape_id as usize)?;let hu=cs.font_size*7200.0/dpi;
++   let upper=hu*(2.0+style.line_spacing.abs())+style.line_spacing.abs()*7200.0/dpi;
++   if !hu.is_finite()||hu<=0.0||!upper.is_finite()||upper*utf16.max(1) as f64>f64::from(i32::MAX)/4.0{return None;}}
++  let mut fresh=p.clone();fresh.line_segs.clear();fresh.layout_space_metrics.clear();fresh.source_line_seg_vertical_pos=None;
++  fresh.hwpx_axis_shift=0;fresh.native_source_synthetic_seal=None;fresh.native_source_synthetic_context=None;
++  fresh.completed_native_rows=None;fresh.native_frame_observation.set(None);
++  // Exactly the formatter's existing body box, including its column solver's
++  // established quantization. Do not substitute a content box or alter width.
++  reflow_line_segs(&mut fresh,ParagraphBox::body_for_style(rect.width,Some(style),dpi),styles,dpi);
++  let composition=compose_paragraph_in_context(&fresh,styles);
++  if !same_composition(&composition,&selected)||fresh.line_segs.is_empty()||fresh.line_segs.len()>4096{return None;}
++  let mut end=0i32;let mut scalar=0usize;let chars=p.text.chars().collect::<Vec<_>>();
++  for(row,line)in fresh.line_segs.iter().zip(&composition.lines){
++   if row.vertical_pos!=end||row.line_height<=0||row.text_height!=row.line_height||row.line_spacing<0
++    ||row.baseline_distance<0||row.baseline_distance>row.line_height||row.column_start!=0||row.segment_width<=0
++    ||row.tag!=(LineSeg::TAG_SINGLE_SEGMENT_LINE|LineSeg::TAG_IMPLEMENTATION_PROPERTY)||line.char_start!=scalar{return None;}
++   for run in &line.runs{for ch in run.text.chars(){if chars.get(scalar)!=Some(&ch){return None;}scalar+=1;}}
++   end=end.checked_add(row.line_height)?.checked_add(row.line_spacing)?;
++  }
++  if scalar!=chars.len()||fact.actual_heights.len()!=composition.lines.len()||fact.actual_spacings.len()!=composition.lines.len()
++   ||composition.lines.iter().enumerate().any(|(i,l)|fact.actual_heights[i]!=super::hwpunit_to_px(l.line_height,dpi)||fact.actual_spacings[i]!=super::hwpunit_to_px(l.line_spacing,dpi)){return None;}
++  let partitions=fragments.iter().map(|f|super::composer::PlainFramePartition{page:f.page,column:f.column,start:f.start,end:f.end}).collect::<Vec<_>>();
++  let rows=super::composer::encode_current_plain_frame_rows(&fresh.line_segs,&partitions)?;
++  for fragment in &fragments{let mut end=0i32;for row in &rows[fragment.start..fragment.end]{if row.vertical_pos!=end{return None;}end=end.checked_add(row.line_height)?.checked_add(row.line_spacing)?;}
++   if !arithmetic_equal(super::hwpunit_to_px(end,dpi),fragment.flow_after)||fragment.flow_after>fragment.rect.height{return None;}}
++  Some(Self{source,trace:Arc::clone(trace),rect,composition,canonical:fresh.line_segs,rows,fragments})
++ }
++ pub(crate) fn matches_current(&self,source:&Document,result:&PaginationResult,styles:&ResolvedStyleSet,profile:LayoutCompatibilityProfile,dpi:f64)->bool{
++  std::ptr::eq(source,self.source)&&dpi==super::DEFAULT_DPI
++   &&result.selected_composition_trace.as_ref().is_some_and(|trace|Arc::ptr_eq(trace,&self.trace))
++   &&self.trace.resource()==crate::model::native_computed_resource::RESOURCE
++   &&self.trace.matches_source(&source.sections[0].paragraphs,styles.reset_flow_context,profile,dpi)
++   &&self.trace.matches_finalized_result(result)
++ }
++ pub(crate) fn source(&self)->&'doc Document{self.source}
++ pub(crate) fn generation(&self)->u64{self.trace.generation()}
++ pub(crate) fn frame(&self)->LayoutRect{self.rect}
++ pub(crate) fn fragments(&self)->&[PrefixFragment]{&self.fragments}
++ pub(crate) fn fresh_rows(&self)->&[LineSeg]{&self.rows}
++ pub(crate) fn matches_standard_rows(&self,rows:&[LineSeg])->bool{
++  let partitions=self.fragments.iter().map(|f|super::composer::PlainFramePartition{page:f.page,column:f.column,start:f.start,end:f.end}).collect::<Vec<_>>();
++  super::composer::encode_current_plain_frame_rows(&self.canonical,&partitions).is_some_and(|expected|expected==rows)
++ }
++ pub(crate) fn matches_selected_line(&self,index:usize,line:&ComposedLine)->bool{self.composition.lines.get(index).is_some_and(|l|same_line(l,line))}
++}
++fn arithmetic_equal(a:f64,b:f64)->bool{a.is_finite()&&b.is_finite()&&(a-b).abs()<=f64::EPSILON*a.abs().max(b.abs()).max(1.0)*16.0}
++fn same_composition(a:&ComposedParagraph,b:&ComposedParagraph)->bool{
++ let ComposedParagraph{lines:al,para_style_id:ap,inline_controls:ai,numbering_text:an,tac_controls:at,footnote_positions:af,tab_extended:ae,horizontal_shaping:ah}=a;
++ let ComposedParagraph{lines:bl,para_style_id:bp,inline_controls:bi,numbering_text:bn,tac_controls:bt,footnote_positions:bf,tab_extended:be,horizontal_shaping:bh}=b;
++ ap==bp&&an.is_none()&&bn.is_none()&&at.is_empty()&&bt.is_empty()&&af.is_empty()&&bf.is_empty()&&ae.is_empty()&&be.is_empty()&&ah.is_none()&&bh.is_none()
++ &&ai.len()==bi.len()&&ai.iter().zip(bi).all(|(a,b)|a.line_index==b.line_index&&a.control_index==b.control_index&&a.control_type==b.control_type)
++ &&al.len()==bl.len()&&al.iter().zip(bl).all(|(a,b)|same_line(a,b))
++}
++fn same_line(a:&ComposedLine,b:&ComposedLine)->bool{
++ let ComposedLine{runs:ar,line_height:ah,baseline_distance:ab,segment_width:aw,column_start:ac,line_spacing:aspace,has_line_break:abr,char_start:astart}=a;
++ let ComposedLine{runs:br,line_height:bh,baseline_distance:bb,segment_width:bw,column_start:bc,line_spacing:bspace,has_line_break:bbr,char_start:bstart}=b;
++ ah==bh&&ab==bb&&aw==bw&&ac==bc&&aspace==bspace&&!*abr&&!*bbr&&astart==bstart&&ar.len()==br.len()&&ar.iter().zip(br).all(|(a,b)|same_run(a,b))
++}
++fn same_run(a:&ComposedTextRun,b:&ComposedTextRun)->bool{
++ let ComposedTextRun{text:at,char_style_id:as_,lang_index:al,char_overlap:ao,footnote_marker:af,display_text:ad,supplemental_metrics_blocked:ab,inserted_control_text:ai,space_metric:asp}=a;
++ let ComposedTextRun{text:bt,char_style_id:bs,lang_index:bl,char_overlap:bo,footnote_marker:bf,display_text:bd,supplemental_metrics_blocked:bb,inserted_control_text:bi,space_metric:bsp}=b;
++ at==bt&&as_==bs&&al==bl&&ao.is_none()&&bo.is_none()&&af.is_none()&&bf.is_none()&&ad.is_none()&&bd.is_none()&&ab==bb&&!*ai&&!*bi&&asp==bsp
++}
+--- a/src/renderer/mod.rs
++++ b/src/renderer/mod.rs
+@@ -3989,3 +3989,5 @@
+ pub(crate) mod current_empty_body143;
+ 
+ pub(crate) mod current_unequal_column_prefix139;
++
++pub(crate) mod current_split_prefix145;
+--- a/src/renderer/typeset.rs
++++ b/src/renderer/typeset.rs
+@@ -4081,6 +4081,7 @@
+         is_first_placed: bool,
+         is_last_placed: bool,
+         styles: &ResolvedStyleSet,
++        current_synthetic_band: bool,
+         // [#3837] 값이 있는 가장 가까운 앞 문단의 마지막 저장 vpos.
+         prev_stored_vpos: Option<i32>,
+     ) {
+@@ -4273,7 +4274,7 @@
+         // 858px 표의 높이로 채택한다 — 서식 문서 과소분할(−1쪽 계열 26건, r15
+         // 재검증). 측정 높이보다 작으면 측정 높이로 보정한다. 저장 lineseg 보유
+         // 문서는 불변 (#2237 측정-저장 발산 축과 격리).
+-        let table_height = if para.line_segs.is_empty() && table_height + 0.5 < ft.total_height {
++        let table_height = if (para.line_segs.is_empty() || current_synthetic_band) && table_height + 0.5 < ft.total_height {
+             ft.total_height
+         } else {
+             table_height
+--- a/src/renderer/typeset/controls.rs
++++ b/src/renderer/typeset/controls.rs
+@@ -526,3 +526,5 @@
+     }
+     true
+ }
++
++pub(super) mod current_synthetic_tac145;
+--- /dev/null
++++ b/src/renderer/typeset/controls/current_synthetic_tac145.rs
+@@ -0,0 +1,63 @@
++//! Current measured lower bound for a known empty synthetic TAC host.
++//! This reserves actual current body ink only. It grants no stored row, source
++//! origin, reset, serialization or completed-row authority.
++use crate::model::{control::Control,paragraph::{Paragraph,LineSeg},table::TablePageBreak};
++use crate::renderer::{height_measurer::MeasuredTable,style_resolver::ResolvedStyleSet,hwpunit_to_px};
++use super::super::paragraph::metrics::FormattedParagraph;
++pub(in crate::renderer::typeset) fn measured_band(index:usize,para:&Paragraph,fmt:&FormattedParagraph,measurements:&[MeasuredTable],styles:&ResolvedStyleSet,dpi:f64)->Option<f64>{
++ if dpi!=crate::renderer::DEFAULT_DPI||!para.text.is_empty()||para.char_count!=9||!para.char_offsets.is_empty()
++  ||!para.field_ranges.is_empty()||!para.range_tags.is_empty()||!para.orphan_field_ends.is_empty()||!para.tab_extended.is_empty()
++  ||!para.title_marks.is_empty()||!para.markpen_marks.is_empty()||para.numbering_restart.is_some()||!matches!(para.numbering_marker,crate::model::paragraph::NumberingMarker::Absent|crate::model::paragraph::NumberingMarker::Unresolved)
++  ||para.layout_only_fill_lines!=0||para.hwpx_axis_shift!=0||para.source_line_seg_vertical_pos.is_some()
++  ||para.cell_format_vpos_dirty||para.stored_text_partition_is_dirty()||para.ctrl_data_records.iter().any(Option::is_some)
++  ||styles.supplemental_metrics.is_some()||styles.kerning_measurement_context.is_some()||styles.horizontal_shaping_context.is_some()
++  ||fmt.square_host_plan.is_some()||fmt.computed_host_lines.is_some()||fmt.source_mixed_tac_row.is_some()
++  ||fmt.line_heights.len()!=1||fmt.line_spacings.len()!=1{return None;}
++ let style=styles.para_styles.get(usize::from(para.para_shape_id))?;if !matches!(style.head_type,crate::model::style::HeadType::None)||style.spacing_before!=0.0||style.spacing_after!=0.0{return None;}
++ let [row]=para.line_segs.as_slice()else{return None;};
++ if row.tag!=(LineSeg::TAG_SINGLE_SEGMENT_LINE|LineSeg::TAG_IMPLEMENTATION_PROPERTY)||row.text_start!=0||row.column_start!=0||row.segment_width<=0
++  ||row.vertical_pos<0||row.line_height<=0||row.text_height!=row.line_height||row.line_spacing<0||row.baseline_distance<0||row.baseline_distance>row.line_height{return None;}
++ row.vertical_pos.checked_add(row.line_height)?.checked_add(row.line_spacing)?;
++ let [Control::Table(t)]=para.controls.as_slice()else{return None;};
++ if !t.common.treat_as_char||t.common.allow_overlap||t.common.vertical_offset!=0||t.common.horizontal_offset!=0
++  ||t.common.width==0||t.common.width>=0x80000000||t.common.height==0||t.common.height>=0x80000000
++  ||t.caption.is_some()||t.repeat_header||t.page_break!=TablePageBreak::None||!t.zones.is_empty()||t.cell_spacing!=0
++  ||t.row_count==0||t.row_count>128||t.col_count==0||t.col_count>32||t.cells.len()!=usize::from(t.row_count)*usize::from(t.col_count)
++  ||t.cells.iter().enumerate().any(|(i,c)|c.row_span!=1||c.col_span!=1||usize::from(c.row)!=i/usize::from(t.col_count)||usize::from(c.col)!=i%usize::from(t.col_count)
++   ||c.width==0||c.height==0||c.field_name.is_some()||c.text_direction!=0||c.line_wrap!=0||c.paragraphs.is_empty()||c.paragraphs.len()>128
++   ||c.paragraphs.iter().any(|p|!p.controls.is_empty()||!p.field_ranges.is_empty()||!p.range_tags.is_empty()||!p.orphan_field_ends.is_empty()||!p.tab_extended.is_empty())){return None;}
++ let mut owners=measurements.iter().filter(|m|m.para_index==index&&m.control_index==0);let mt=owners.next()?;if owners.next().is_some(){return None;}
++ if mt.caption_height!=0.0||mt.row_heights.len()!=usize::from(t.row_count)||mt.cumulative_heights.len()!=mt.row_heights.len()+1
++  ||mt.cumulative_heights.first()!=Some(&0.0)||mt.cell_spacing!=0.0||!mt.total_height.is_finite()||mt.total_height<=0.0
++  ||!exact(mt.total_height,hwpunit_to_px(t.common.height as i32,dpi)){return None;}
++ let mut end=0.0;for(i,h)in mt.row_heights.iter().enumerate(){if !h.is_finite()||*h<=0.0{return None;}end+=*h;if !end.is_finite()||!exact(mt.cumulative_heights[i+1],end){return None;}}
++ if !exact(end,mt.total_height)||fmt.line_heights[0]!=hwpunit_to_px(row.line_height,dpi)||fmt.line_spacings[0]!=hwpunit_to_px(row.line_spacing,dpi)
++  ||!fmt.total_height.is_finite()||!fmt.height_for_fit.is_finite()||fmt.height_for_fit<=0.0||fmt.height_for_fit>=mt.total_height{return None;}
++ Some(mt.total_height)
++}
++fn exact(a:f64,b:f64)->bool{a.is_finite()&&b.is_finite()&&(a-b).abs()<=f64::EPSILON*a.abs().max(b.abs()).max(1.0)*8.0}
++
++#[cfg(test)]mod tests{
++ use super::*;
++ fn fixture()->crate::document_core::DocumentCore{
++  let mut c=crate::DocumentCore::new_empty();c.create_blank_document_native().unwrap();c.insert_text_native(0,0,0,"Own TAC test prefix.").unwrap();c.create_table_native(0,0,20,2,1).unwrap();
++  let pi=c.document.sections[0].paragraphs.iter().position(|p|p.controls.iter().any(|c|matches!(c,Control::Table(_)))).unwrap();
++  c.insert_text_in_cell_native(0,pi,0,0,0,0,"Own first cell.").unwrap();c.insert_text_in_cell_native(0,pi,0,1,0,0,"Own second cell.").unwrap();
++  let mut d=c.document.clone();let Control::Table(t)=&mut d.sections[0].paragraphs[pi].controls[0]else{unreachable!()};t.common.treat_as_char=true;t.raw_ctrl_data.clear();t.raw_ctrl_seal=None;for s in &mut d.sections{s.raw_stream=None;}
++  let bytes=crate::serializer::serialize_hwp_with_report(&d).unwrap();crate::DocumentCore::from_bytes(bytes.bytes()).unwrap()
++ }
++ #[test]fn current_measured_band_positive_and_negative_scope145(){
++  let c=fixture();let index=c.document.sections[0].paragraphs.iter().position(|p|matches!(p.controls.as_slice(),[Control::Table(_)])).unwrap();let p=&c.document.sections[0].paragraphs[index];let styles=c.resolve_render_styles_for_section(0);
++  let e=super::super::super::TypesetEngine::new(c.dpi);e.profile.set(c.effective_layout_profile());let fmt=e.format_paragraph(p,c.composed[0].get(index),&styles,Some(c.pagination[0].pages[0].layout.column_areas[0].width));let m=&c.measured_tables[0];
++  assert!(measured_band(index,p,&fmt,m,&styles,c.dpi).is_some(),"known empty measured base");
++  for case in 0..23{let mut q=p.clone();match case{
++   0=>q.line_segs[0].tag&=!LineSeg::TAG_IMPLEMENTATION_PROPERTY,1=>q.line_segs[0].tag|=4,2=>q.line_segs[0].vertical_pos=-1,3=>q.line_segs[0].vertical_pos=i32::MAX,
++   4=>q.text.push('x'),5=>q.char_count=8,6=>q.stored_text_partition_dirty=true,7=>q.cell_format_vpos_dirty=true,8=>q.hwpx_axis_shift=1,9=>q.source_line_seg_vertical_pos=Some(vec![0]),
++   10=>q.field_ranges.push(Default::default()),11=>q.range_tags.push(Default::default()),12=>q.tab_extended.push([0;7]),13=>q.controls.push(Control::Unknown(Default::default())),
++   14=>q.line_segs[0].line_spacing=-1,15=>q.line_segs[0].text_height+=1,
++   n=>{let Control::Table(t)=&mut q.controls[0]else{unreachable!()};match n{16=>t.common.treat_as_char=false,17=>t.common.allow_overlap=true,18=>t.common.vertical_offset=1,19=>t.common.horizontal_offset=1,20=>t.repeat_header=true,21=>t.row_count=129,_=>t.cells[0].paragraphs[0].controls.push(Control::Unknown(Default::default()))}}}
++   assert!(measured_band(index,&q,&fmt,m,&styles,c.dpi).is_none(),"source case {case}");
++  }
++  let owner=m.iter().find(|m|m.para_index==index&&m.control_index==0).unwrap();for case in 0..6{let mut bad=m.clone();match case{0=>bad.push(owner.clone()),1=>bad.retain(|m|m.para_index!=index||m.control_index!=0),n=>{let o=bad.iter_mut().find(|m|m.para_index==index&&m.control_index==0).unwrap();match n{2=>o.total_height=f64::NAN,3=>o.cumulative_heights[0]=1.0,4=>o.cumulative_heights[1]+=1.0,_=>o.row_heights[0]=0.0}}}assert!(measured_band(index,p,&fmt,&bad,&styles,c.dpi).is_none(),"measure case {case}");}
++ }
++}
+--- a/src/renderer/typeset/controls/flow_table.rs
++++ b/src/renderer/typeset/controls/flow_table.rs
+@@ -233,6 +233,7 @@
+                 return false;
+             }
+         }
++        let current_synthetic_band=super::current_synthetic_tac145::measured_band(para_idx,para,fmt,measured_tables,styles,engine.dpi).is_some_and(|h| h==ft.effective_height);
+         engine.typeset_tac_table(
+             st,
+             para_idx,
+@@ -245,6 +246,7 @@
+             is_first_placed,
+             is_last_placed,
+             styles,
++            current_synthetic_band,
+             preceding_stored_vpos(paragraphs_all, para_idx),
+         );
+     } else if engine.try_typeset_empty_para_float_table(
+--- a/src/renderer/typeset/controls/paragraph_flow.rs
++++ b/src/renderer/typeset/controls/paragraph_flow.rs
+@@ -274,6 +274,7 @@
+     if has_tac
+         && fmt.total_height > 0.0
+         && !para.line_segs.is_empty()
++        && controls::current_synthetic_tac145::measured_band(para_idx,para,&fmt,measured_tables,styles,engine.dpi).is_none()
+         && st.flow_table_page_count() == page_count_before
+     {
+         controls::reconcile_tac_height(
+--- a/src/serializer/hwpx/current_frame_rows.rs
++++ b/src/serializer/hwpx/current_frame_rows.rs
+@@ -144,6 +144,7 @@
+    let rows=item.rows();total_rows=total_rows.checked_add(rows.len())?;
+    if rows.is_empty()||total_rows>MAX_ROWS||match item.row_kind(){
+     crate::renderer::current_frame_rows_plan::CurrentFrameRowKind::FreshBody=>rows.iter().any(|r|r.tag!=0x8006_0000),
++    crate::renderer::current_frame_rows_plan::CurrentFrameRowKind::FreshSplitBody=>!valid_fresh_split_rows(rows),
+     crate::renderer::current_frame_rows_plan::CurrentFrameRowKind::StructuralObjectAnchor=>rows.len()!=1||!crate::model::object_anchor::is_canonical_structural_table_anchor(&rows[0]),
+    }
+     ||rows.windows(2).any(|r|r[0].text_start>r[1].text_start){return None;}
+@@ -195,3 +196,17 @@
+ #[cfg(test)]
+ #[path="current_frame_rows_writer_tests131.rs"]
+ mod writer_facade_tests;
++
++// A distinct output schema for exact current allocator/paint frame boundaries.
++// Ordinary FreshBody remains unchanged. These bits do not authorize input rows.
++fn valid_fresh_split_rows(rows:&[LineSeg])->bool{
++ if rows.len()<2||rows[0].tag!=0x8006_0000||rows[0].vertical_pos!=0{return false;}
++ let mut end=0i32;let mut boundaries=0;
++ for(i,row)in rows.iter().enumerate(){
++  if !matches!(row.tag,0x8006_0000|0x8006_0002|0x8006_0003)||row.line_height<=0||row.text_height!=row.line_height||row.line_spacing<0
++   ||row.vertical_pos<0||row.column_start!=0||row.segment_width<=0||row.baseline_distance<0||row.baseline_distance>row.line_height{return false;}
++  if row.tag!=0x8006_0000{if i==0||row.vertical_pos!=0{return false;}boundaries+=1;end=0;}
++  if row.vertical_pos!=end{return false;}let Some(next)=end.checked_add(row.line_height).and_then(|n|n.checked_add(row.line_spacing))else{return false;};end=next;
++ }
++ boundaries>0
++}

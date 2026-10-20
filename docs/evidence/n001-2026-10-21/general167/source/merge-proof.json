@@ -1,0 +1,44 @@
+{
+  "base": "source-e6c519f6fbd0c95a",
+  "records": [
+    {
+      "group": "signed",
+      "path": "src/renderer/current_signed_bounded161.rs",
+      "base": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "current": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "incoming": "2b94c50b9ecad08711a99d00d01d826e2383a7de337caf9fb29cec75b570148e",
+      "merged": "2b94c50b9ecad08711a99d00d01d826e2383a7de337caf9fb29cec75b570148e",
+      "method": "exact-base"
+    },
+    {
+      "group": "signed",
+      "path": "src/renderer/current_frame_rows_plan.rs",
+      "base": "04c4f8235fd07dd031551f44592fad416b0f86c40c6be4545aa0901a1e1d6512",
+      "current": "00384b6f076871b36679a51a44000529ae1b353b54905ae53d72470fd3b6de36",
+      "incoming": "9e84a1b1425a78c1009b58319b2bdb4b71fcdb3ba44c78f8ea0adcfc77227fcd",
+      "merged": "a9f3cbf31b53ad74af6f1f62907ebfee7f4b6b26df14379167e72d0a21c91b91",
+      "method": "strict-three-way"
+    },
+    {
+      "group": "signed",
+      "path": "src/document_core/commands/document.rs",
+      "base": "4f3aa755b95d80c22a715d47f9e4499d98d60072b03f76156cdf64687c37f532",
+      "current": "64f3fcd310e3f155be49bf274dbb5e2523f35f52f368f0e876a252d4bc342bba",
+      "incoming": "5c6413a33fe8c00b7a58d2e82f8d8ebff2f3b52ec8ff10c9fa244938e0a94461",
+      "merged": "df4c09d366e86151e7a81ecaed40be43fc67dd4484cfcc324badf13575913eae",
+      "method": "strict-three-way"
+    },
+    {
+      "group": "signed",
+      "path": "src/document_core/queries/rendering.rs",
+      "base": "c270445d56d8eea9d173a7579ee4d8f0e6adcb0e00c32173d41231598ebba633",
+      "current": "c270445d56d8eea9d173a7579ee4d8f0e6adcb0e00c32173d41231598ebba633",
+      "incoming": "593845029c133cfc1afff0b0211b821a974d9ac9e6aaeb192d99af96691752ad",
+      "merged": "593845029c133cfc1afff0b0211b821a974d9ac9e6aaeb192d99af96691752ad",
+      "method": "exact-base"
+    }
+  ],
+  "resourceCount": 303,
+  "resourceSha256": "3724a2441bd65d5ebcee933cc838920e5009788e1131b2d66189aed6d1691a7e",
+  "patchSha256": "1d99efc1a59be529c828bce9e8632b2f9cb3727a2ed17b07f17335c8cd6953dc"
+}

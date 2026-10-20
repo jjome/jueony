@@ -1,0 +1,496 @@
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -2646,6 +2646,39 @@
+         self.prepare_hwp_export_snapshot_document(self.document.clone())
+     }
+ 
++    // Current bounded standard rows are a new export-only capability. The old
++    // infallible preparation API remains byte-for-byte unchanged for its callers.
++    fn prepare_hwp_export_with_signed_bounded161(&self) -> Result<HwpExportSnapshot,HwpError> {
++        use crate::serializer::hwpx::current_frame_rows::{CurrentFrameRowsProjection,CurrentFrameExportRepresentation};
++        if self.batch_mode||self.pending_pagination_job.is_some()||self.deferred_pagination_descriptor.is_some()
++            ||self.dirty_sections.iter().any(|v|*v)||!self.computed_row_resources_supported()
++            ||!crate::serializer::hwpx::current_frame_rows::current_source_is_admissible(&self.document){return Ok(self.prepare_hwp_export_snapshot());}
++        let styles=self.resolve_render_styles_for_section(0);
++        let Some((result,measured))=self.pagination.first().zip(self.measured_tables.first())else{return Ok(self.prepare_hwp_export_snapshot());};
++        let Some(candidate)=crate::renderer::current_frame_rows_plan::CurrentSignedBounded161::from_current(
++            &self.document,self.source_format,result,&styles,measured,self.effective_layout_profile(),self.dpi)
++            else{return Ok(self.prepare_hwp_export_snapshot());};
++        let physical=self.build_page_tree_with_signed_bounded161_capture(0,&candidate)?;
++        let plan=candidate.finalize(&physical.frame.current_physical_selections)
++            .ok_or_else(||HwpError::RenderError("SIGNED_BOUNDED_NATIVE_PHYSICAL_BINDING".into()))?;
++        let projection=CurrentFrameRowsProjection::from_current_frame(&self.document,&plan,CurrentFrameExportRepresentation::Original)
++            .ok_or_else(||HwpError::RenderError("SIGNED_BOUNDED_NATIVE_SOURCE_BINDING".into()))?;
++        let mut clone=self.document.clone();
++        let mut rows=projection.bind_for_export(&clone)
++            .ok_or_else(||HwpError::RenderError("SIGNED_BOUNDED_NATIVE_CLONE_BINDING".into()))?;
++        for section in &mut clone.sections{for p in &mut section.paragraphs{
++            let key=p as *const Paragraph as usize;
++            if let Some(fresh)=rows.remove(&key){
++                p.line_segs=fresh;
++                // A newly computed standard axis on this clone must not borrow
++                // the old source-axis snapshot, cached seal or completed lease.
++                p.source_line_seg_vertical_pos=None;
++            }
++        }}
++        if !rows.is_empty(){return Err(HwpError::RenderError("SIGNED_BOUNDED_NATIVE_ROW_OWNER".into()));}
++        Ok(self.prepare_hwp_export_snapshot_document(clone))
++    }
++
+     // Both callers supply a literal clone of this exact source; stamped export
+     // may replace only validated summary/time owners before ordinary lowering.
+     fn prepare_hwp_export_snapshot_document(&self, mut snapshot: Document) -> HwpExportSnapshot {
+@@ -2692,7 +2725,7 @@
+     /// HWPX 원본의 단일 BOTH pageBorderFill은 HWP 저장에는 세 record로 materialize하고,
+     /// live IR에는 반영하지 않는다.
+     pub fn export_hwp_with_adapter(&self) -> Result<Vec<u8>, HwpError> {
+-        self.prepare_hwp_export_snapshot().serialize()
++        self.prepare_hwp_export_with_signed_bounded161()?.serialize()
+     }
+ 
+     /// [#4432] DocInfo raw 캐시 재밀봉 — dirty(또는 봉인 불일치) 상태로 저장에
+@@ -2727,7 +2760,7 @@
+     ///
+     /// 모든 HWP lowering entrypoint가 같은 snapshot helper로 수렴한다.
+     pub fn export_hwp_with_adapter_snapshot(&self) -> Result<Vec<u8>, HwpError> {
+-        self.prepare_hwp_export_snapshot().serialize()
++        self.prepare_hwp_export_with_signed_bounded161()?.serialize()
+     }
+ 
+     /// 스냅숏 HWP 저장 바이트와 바로 그 산출물의 내용 손실을 함께 반환한다 (#4430).
+@@ -2738,7 +2771,7 @@
+     pub fn export_hwp_with_adapter_snapshot_with_report(
+         &self,
+     ) -> Result<crate::serializer::SerializedDocument, HwpError> {
+-        self.prepare_hwp_export_snapshot()
++        self.prepare_hwp_export_with_signed_bounded161()?
+             .serialize_with(crate::serializer::serialize_document_with_report)
+     }
+ 
+@@ -2747,7 +2780,7 @@
+         &self,
+         password: &[u8],
+     ) -> Result<crate::serializer::SerializedDocument, HwpError> {
+-        self.prepare_hwp_export_snapshot()
++        self.prepare_hwp_export_with_signed_bounded161()?
+             .serialize_with(|document| {
+                 crate::serializer::serialize_hwp_with_password_and_report(document, password)
+             })
+@@ -2761,7 +2794,7 @@
+         &self,
+         password: &[u8],
+     ) -> Result<Vec<u8>, HwpError> {
+-        self.prepare_hwp_export_snapshot()
++        self.prepare_hwp_export_with_signed_bounded161()?
+             .serialize_with_password(password)
+     }
+ 
+@@ -2853,6 +2886,8 @@
+         }else if let Some(candidate)=crate::renderer::current_frame_rows_plan::CurrentVisibleHostCandidate::from_core(self,document){
+             let mut physical=Vec::new();for page in 0..self.page_count(){physical.push(self.build_page_tree_with_current_selections(page)?.frame.current_physical_selections.clone());}
+             let Some(plan)=candidate.finalize(&physical)else{return Ok(None);};plan
++        }else if let Some(candidate)=crate::renderer::current_frame_rows_plan::CurrentSignedBounded161::from_current(document,self.source_format,result,&styles,measured,self.effective_layout_profile(),self.dpi){
++            let physical=self.build_page_tree_with_signed_bounded161_capture(0,&candidate)?;let Some(plan)=candidate.finalize(&physical.frame.current_physical_selections)else{return Ok(None);};plan
+         }else if let Some(candidate)=crate::renderer::current_frame_rows_plan::CurrentSignedFrames160::from_current(document,self.source_format,result,&styles,measured,self.effective_layout_profile(),self.dpi){
+             let physical=self.build_page_tree_with_signed_frames160_capture(0,&candidate)?;let Some(plan)=candidate.finalize(&physical.frame.current_physical_selections)else{return Ok(None);};plan
+         }else if let Some(candidate)=crate::renderer::current_frame_rows_plan::CurrentSignedColumnStack157::from_current(document,self.source_format,result,&styles,measured,self.effective_layout_profile(),self.dpi){
+--- a/src/document_core/queries/rendering.rs
++++ b/src/document_core/queries/rendering.rs
+@@ -7747,6 +7747,16 @@
+         self.build_page_tree_with_physical_capture(page_num,None,true,Some(candidate.paint_plan()))
+     }
+ 
++    pub(crate) fn build_page_tree_with_signed_bounded161_capture(&self,page_num:u32,candidate:&crate::renderer::current_frame_rows_plan::CurrentSignedBounded161<'_>)->Result<PageRenderTree,HwpError>{
++        let styles=self.resolve_render_styles_for_section(0);
++        if page_num!=0||!self.computed_row_resources_supported()||self.batch_mode||self.pending_pagination_job.is_some()
++            ||self.deferred_pagination_descriptor.is_some()||self.dirty_sections.iter().any(|d|*d)
++            ||!self.pagination.first().is_some_and(|result|candidate.matches_current(&self.document,result,&styles,self.effective_layout_profile(),self.dpi)){
++            return Err(HwpError::RenderError("CURRENT_SIGNED_BOUNDED161_CAPTURE_OWNER_MISMATCH".into()));
++        }
++        self.build_page_tree_with_physical_capture(page_num,None,true,Some(candidate.paint_plan()))
++    }
++
+     pub(crate) fn build_page_tree_with_signed_frames160_capture(&self,page_num:u32,candidate:&crate::renderer::current_frame_rows_plan::CurrentSignedFrames160<'_>)->Result<PageRenderTree,HwpError>{
+         let styles=self.resolve_render_styles_for_section(0);
+         if page_num!=0||!self.computed_row_resources_supported()||self.batch_mode||self.pending_pagination_job.is_some()
+@@ -8068,6 +8078,9 @@
+             }).or_else(||{
+                 if !self.computed_row_resources_supported()||self.batch_mode||self.pending_pagination_job.is_some()||self.deferred_pagination_descriptor.is_some()||self.dirty_sections.iter().any(|v|*v){return None;}
+                 self.pagination.get(sec_idx).zip(self.measured_tables.get(sec_idx)).and_then(|(result,measured)|crate::renderer::current_frame_rows_plan::CurrentSignedFrames160::from_current(&self.document,self.source_format,result,&default_tab_styles,measured,self.effective_layout_profile(),self.dpi)).map(|p|p.paint_plan())
++            }).or_else(||{
++                if !self.computed_row_resources_supported()||self.batch_mode||self.pending_pagination_job.is_some()||self.deferred_pagination_descriptor.is_some()||self.dirty_sections.iter().any(|v|*v){return None;}
++                self.pagination.get(sec_idx).zip(self.measured_tables.get(sec_idx)).and_then(|(result,measured)|crate::renderer::current_frame_rows_plan::CurrentSignedBounded161::from_current(&self.document,self.source_format,result,&default_tab_styles,measured,self.effective_layout_profile(),self.dpi)).map(|p|p.paint_plan())
+             }).or_else(||crate::renderer::current_frame_rows_plan::current_declared_bodywide_middle_paint155(self,&self.document,&default_tab_styles,page_content.page_index)),
+             if let Some(result)=self.pagination.get(sec_idx){
+                 let ordinary=crate::renderer::current_accepted_composition::CurrentAcceptedCompositionView::from_current(
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[126,255,252,141,185,91,141,96,55,51,6,93,129,203,201,216,18,246,107,178,59,205,252,30,153,122,25,117,25,52,117,106];
++pub(crate) const RESOURCE:[u8;32]=[55,36,162,68,27,214,93,94,188,238,147,60,200,56,146,14,80,9,120,142,17,49,178,214,97,137,174,214,209,105,26,126];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -308,6 +308,7 @@
+             ("src/renderer/current_signed_declared_fit160.rs",include_bytes!("../renderer/current_signed_declared_fit160.rs").as_slice()),
+             ("src/renderer/current_signed_frames160.rs",include_bytes!("../renderer/current_signed_frames160.rs").as_slice()),
+             ("src/renderer/typeset/table/block/current_plain_row_footprint160.rs",include_bytes!("../renderer/typeset/table/block/current_plain_row_footprint160.rs").as_slice()),
++            ("src/renderer/current_signed_bounded161.rs",include_bytes!("../renderer/current_signed_bounded161.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- a/src/renderer/current_frame_rows_plan.rs
++++ b/src/renderer/current_frame_rows_plan.rs
+@@ -525,3 +525,6 @@
+ 
+ #[path="current_signed_declared_fit160.rs"]mod current_signed_declared_fit160;
+ pub(crate) use current_signed_declared_fit160::{CurrentSignedOverflowFrame160,current_signed_declared_overflow160};
++
++#[path="current_signed_bounded161.rs"]mod current_signed_bounded161;
++pub(crate) use current_signed_bounded161::CurrentSignedBounded161;
+--- /dev/null
++++ b/src/renderer/current_signed_bounded161.rs
+@@ -0,0 +1,340 @@
++//! Separate SignedNegative current-frame standard-row proof.
++//! One actual bounded body column are bound through the
++//! production page solver; this first contract consumes one actual col0 frame.
++//! Every declared negative is retained. Its current no-upward box policy is
++//! derived by the real empty-host function, never by reusing an imported row.
++//! All current formatter/allocation/paint and whole-source writer checks remain
++//! mandatory. Unsupported subsequent frames keep the existing guarded path.
++use super::*;
++pub(crate) struct CurrentSignedBounded161<'doc>{source:&'doc Document,paint:CurrentFramePaintPlan,bodies:Vec<CandidateBody>,retained:Vec<CurrentRetainedStandardBody161>,tables:Vec<CandidateTable>,rows:Vec<CurrentFrameParagraphRows>,generation:[u8;32],trace:std::sync::Arc<super::super::selected_composition_observer127::FinalizedSelectedCompositionTrace>}
++// An omitted ordinary standard body keeps the writer's existing policy. Its
++// current source composition is never renamed fresh or emitted by this plan.
++struct CurrentRetainedStandardBody161{paragraph:usize,physical_y:f64,composition:super::super::composer::ComposedParagraph}
++enum CurrentBoundedHostInput161{StructuralObject,GeneratedText}
++// Native standard declaration is independently derived from this exact current
++// fresh/MT/whole/frame; a source tag alone never selects a paint policy.
++#[derive(Clone,Copy)]
++enum CurrentBoundedOrigin161{Existing(SignedNegativeOrigin157),NativeDeclaredOuter}
++impl CurrentBoundedOrigin161{
++ fn top(self,incoming:f64,before:f64)->Option<f64>{match self{Self::Existing(v)=>v.top(incoming,before),Self::NativeDeclaredOuter=>{if !incoming.is_finite()||!before.is_finite()||before<=0.0{return None;}let y=incoming+before;y.is_finite().then_some(y)}}}
++ fn paragraph_anchor(self,incoming:f64,before:f64)->Option<Option<f64>>{self.top(incoming,before)?;match self{Self::Existing(v)=>v.paragraph_anchor(incoming,before),Self::NativeDeclaredOuter=>Some(Some(incoming))}}
++}
++
++fn bounded_host_input161(p:&crate::model::paragraph::Paragraph)->Option<CurrentBoundedHostInput161>{
++ let [row]=p.line_segs.as_slice()else{return None;};
++ if crate::model::object_anchor::is_canonical_structural_table_anchor(row){Some(CurrentBoundedHostInput161::StructuralObject)}
++ else if row.tag==0x80060000{Some(CurrentBoundedHostInput161::GeneratedText)}else{None}
++}
++// Equality to an independently generated current declaration is a constraint,
++// never the generator or a fit bound. Axis snapshot mismatch cannot be hidden.
++fn current_standard_declaration161(p:&crate::model::paragraph::Paragraph,derived:&[crate::model::paragraph::LineSeg])->bool{
++ p.hwpx_axis_shift==0&&p.line_segs==derived&&p.source_line_seg_vertical_pos.as_ref().is_none_or(|v|v.len()==derived.len()&&v.iter().zip(derived).all(|(a,b)|*a==b.vertical_pos))
++}
++pub(super) fn fresh_signed_body_rows(p:&crate::model::paragraph::Paragraph,styles:&super::super::style_resolver::ResolvedStyleSet,width:f64,dpi:f64)->Option<FreshBodyRows>{
++ // Bound every text story before either generic breaker's i32 accumulation.
++ let ps=styles.para_styles.get(usize::from(p.para_shape_id))?;
++ if !ps.line_spacing.is_finite()||ps.line_spacing<0.0{return None;}
++ for shape in &p.char_shapes{let cs=styles.char_styles.get(shape.char_shape_id as usize)?;let hu=cs.font_size*7200.0/dpi;
++  let upper=hu*(2.0+ps.line_spacing.abs())+ps.line_spacing.abs()*7200.0/dpi;
++  if !hu.is_finite()||hu<=0.0||!upper.is_finite()||upper*f64::from(p.char_count.max(1))>f64::from(i32::MAX)/4.0{return None;}}
++ let _validated=fresh_body_rows(p,styles,width,dpi)?;let mut q=p.clone();clear_fresh_input(&mut q);
++ super::super::composer::reflow_line_segs(&mut q,super::super::composer::ParagraphBox::body_for_style(width,styles.para_styles.get(usize::from(p.para_shape_id)),dpi),styles,dpi);
++ if q.line_segs.is_empty()||q.line_segs.len()>4096{return None;}let mut end=0i32;
++ for row in &q.line_segs{if row.vertical_pos!=end||row.line_height<=0||row.text_height!=row.line_height||row.line_spacing<0||row.baseline_distance<0||row.baseline_distance>row.line_height||row.column_start!=0||row.tag!=0x80060000{return None;}end=end.checked_add(row.line_height)?.checked_add(row.line_spacing)?;}
++ let composition=super::super::composer::compose_paragraph_in_context(&q,styles);Some(FreshBodyRows{rows:q.line_segs,composition})
++}
++impl<'doc> CurrentSignedBounded161<'doc>{
++ pub(crate) fn from_current(source:&'doc Document,format:crate::parser::FileFormat,result:&super::super::pagination::PaginationResult,
++ styles:&super::super::style_resolver::ResolvedStyleSet,measured:&[super::super::height_measurer::MeasuredTable],
++ profile:crate::model::provenance::LayoutCompatibilityProfile,dpi:f64)->Option<Self>{
++ use super::super::pagination::PageItem;use crate::model::{control::Control,paragraph::ColumnBreakType};
++ if source.sections.len()!=1||source.provenance.hwp3_lineage||!source.bin_data_content.is_empty()||result.pages.len()!=1
++ ||!result.hidden_empty_paras.is_empty()||!result.pre_emitted_host_paras.is_empty()||!result.wrap_around_paras.is_empty()
++ ||!result.endnotes.is_empty()||!result.endnote_paragraphs.is_empty()||dpi!=super::super::DEFAULT_DPI{return None;}
++ match format{crate::parser::FileFormat::Hwp if profile.native_hwp5_layout()=>{},crate::parser::FileFormat::Hwpx if profile.hwp5_origin_hwpx()=>{},_=>return None}
++
++ let section=&source.sections[0].section_def;
++ if section.line_grid!=0||section.char_grid!=0||section.text_direction!=0||!section.master_pages.is_empty()||!section.extra_child_records.is_empty(){return None;}
++ let ps=&source.sections[0].paragraphs;if ps.is_empty()||ps.len()>128||ps.iter().any(|p|p.completed_native_rows.is_some()){return None;}
++ let [Control::SectionDef(_),Control::ColumnDef(columns)]=ps.first()?.controls.as_slice()else{return None;};
++ if columns.column_count!=1||!valid_columns157(columns,format){return None;}
++ let definition_context=source.reset_flow_contexts().first().copied().flatten()?;
++ if styles.reset_flow_contexts.first().copied().flatten()!=Some(definition_context){return None;}
++ let trace=result.selected_composition_trace.as_ref()?;
++ if trace.section()!=0||trace.resource()!=crate::model::native_computed_resource::RESOURCE
++ ||!trace.matches_source(ps,Some(definition_context),profile,dpi)||!trace.matches_finalized_result(result){return None;}
++ // Reuse the actual current paint-policy verifier, not the mere presence of
++ // an imported observation. This supplies no output rows or lease: all rows
++ // below still come from source-free current reflow and final paint closure.
++ let current_origin_context=source.native_source_synthetic_context_digest();
++ let current_origin_view=super::super::current_accepted_composition::CurrentAcceptedCompositionView::from_current(result,ps,styles,profile,dpi)?.bind_origin_measurements(measured);
++ let page=&result.pages[0];if page.page_index!=0||page.section_index!=0||page.column_contents.len()!=1||page.layout.column_areas.len()!=usize::from(columns.column_count)
++ ||!page.footnotes.is_empty()||page.active_header.is_some()||page.active_footer.is_some()||page.active_master_page.is_some()||!page.extra_master_pages.is_empty(){return None;}
++ let col=&page.column_contents[0];let rect=page.layout.column_areas[0];
++ let solved=super::super::page_layout::PageLayoutInfo::from_page_def_for_page(&source.sections[0].section_def.page_def,columns,dpi,page.page_number);
++ if solved.page_width!=page.layout.page_width||solved.page_height!=page.layout.page_height
++  ||[solved.body_area.x,solved.body_area.y,solved.body_area.width,solved.body_area.height]!=[page.layout.body_area.x,page.layout.body_area.y,page.layout.body_area.width,page.layout.body_area.height]
++  ||solved.column_areas.len()!=page.layout.column_areas.len()
++  ||solved.column_areas.iter().zip(&page.layout.column_areas).any(|(a,b)|[a.x,a.y,a.width,a.height]!=[b.x,b.y,b.width,b.height]){return None;}
++ if rect.width>page.layout.body_area.width||rect.x!=page.layout.body_area.x||rect.y!=page.layout.body_area.y||rect.height!=page.layout.body_area.height
++ ||page.layout.column_areas.iter().any(|a|a.width<rect.width||!a.width.is_finite()||a.height!=rect.height||a.y!=rect.y||!a.x.is_finite())||col.column_index!=0||col.start_height!=0.0||col.endnote_flow||col.zone_layout.is_some()||col.zone_y_offset!=0.0
++ ||!col.wrap_anchors.is_empty()||!col.wrap_around_paras.is_empty()||!col.inline_placements.is_empty()||!col.inline_flow_plans.is_empty()
++ ||!col.overlay_continuations.is_empty()||!col.overlay_cuts.is_empty()||col.items.len()!=ps.len()
++ ||trace.commits().len()+trace.whole_tables().len()!=col.items.len()||!trace.tables().is_empty(){return None;}
++ let mut flow=0.0;let mut unpainted=0.0;let mut bodies=vec![];let mut retained=vec![];let mut tables=vec![];let mut rows=vec![];let mut prefix_width=None;
++ for (slot,item) in col.items.iter().enumerate(){match item{
++ PageItem::FullParagraph{para_index:pi}=>{
++  if *pi!=slot{return None;}let p=ps.get(*pi)?;let fresh=fresh_signed_body_rows(p,styles,rect.width,dpi)?;
++  if *pi==0 {if p.column_type!=ColumnBreakType::Section{return None;}prefix_width=Some(fresh.rows.first()?.segment_width);}else if p.column_type!=ColumnBreakType::None||!p.controls.is_empty(){return None;}
++  let mut cs=trace.commits().iter().filter(|c|c.paragraph==*pi);let c=cs.next()?;if cs.next().is_some(){return None;}
++  let f=trace.format(c.format_id)?;let empty=p.text.is_empty()&&p.controls.is_empty()&&fresh.composition.lines.len()==1;
++  let retain_ordinary=!f.selected_recomposition&&!p.line_segs.is_empty()&&p.line_segs.iter().all(|r|r.tag==0x60000);
++  let retained_composition=if retain_ordinary{
++   if p.stored_text_partition_is_dirty()||p.hwpx_axis_shift!=0||p.cell_format_vpos_dirty||p.completed_native_rows.is_some()||p.line_segs.len()!=fresh.rows.len()
++    ||p.line_segs.iter().zip(&fresh.rows).any(|(a,b)|a.text_start!=b.text_start||a.line_height!=b.line_height||a.text_height!=b.text_height||a.baseline_distance!=b.baseline_distance||a.line_spacing!=b.line_spacing||a.column_start!=b.column_start||a.segment_width!=b.segment_width){return None;}
++   Some(super::super::composer::compose_paragraph_in_context(p,styles))
++  }else{None};
++  let selected_reference=retained_composition.as_ref().unwrap_or(&fresh.composition);
++
++  if c.page!=Some(0)||c.column!=0||c.committed_item_index!=Some(slot)||c.final_membership!=Some(true)||c.row_start!=0||c.row_end!=fresh.rows.len()
++  ||c.reused_multicolumn_format||c.same_format_reused_after_slot_change||c.trimmed_before!=0.0||c.actual_column_width_px!=rect.width
++  ||!arithmetic_equal(c.flow_before,flow)||!c.metrics_still_match_selected_format||!c.range_inside_selected_composition
++  ||f.source_text!=p.text||f.source_char_offsets!=p.char_offsets||f.paragraph_style!=selected_reference.para_style_id
++  ||(!empty&&f.actual_input_width_px!=Some(rect.width))||f.known_square_band||f.has_numbering||f.has_horizontal_shaping
++  ||!f.tac_controls.is_empty()||!f.footnote_positions.is_empty()||!f.tab_extended.is_empty()
++  ||f.inline_controls.len()!=selected_reference.inline_controls.len()
++  ||!f.inline_controls.iter().zip(&selected_reference.inline_controls).all(|((line,index,kind),c)|*line==c.line_index&&*index==c.control_index&&*kind==format!("{:?}",c.control_type))
++  ||f.before!=0.0||f.after!=0.0||f.lines.len()!=selected_reference.lines.len()
++  ||!f.lines.iter().zip(&selected_reference.lines).all(|(a,b)|fact_line_matches(a,b,empty)){return None;}
++  let total:f64=fresh.rows.iter().map(|r|super::super::hwpunit_to_px(r.line_height+r.line_spacing,dpi)).sum();
++  if !arithmetic_equal(c.advance,total)||!arithmetic_equal(c.flow_after,c.flow_before+total)||c.flow_after>rect.height{return None;}
++  let y=rect.y+c.flow_before-unpainted;let mut projected=fresh.rows.clone();let mut offset=0.0;
++  for row in &mut projected{row.vertical_pos=integer_hu(y-rect.y+offset,dpi)?;offset+=super::super::hwpunit_to_px(row.line_height+row.line_spacing,dpi);}
++  if let Some(composition)=retained_composition{
++   retained.push(CurrentRetainedStandardBody161{paragraph:*pi,physical_y:y,composition});
++  }else{rows.push(CurrentFrameParagraphRows{kind:CurrentFrameRowKind::FreshBody,section:0,paragraph:*pi,rows:projected});bodies.push(CandidateBody{paragraph:*pi,physical_y:y,fresh,allow_empty_unused_width:empty});}flow=c.flow_after;
++ },PageItem::Table{para_index:pi,control_index:ci}=>{
++  if *pi!=slot||*ci!=0{return None;}let p=ps.get(*pi)?;let [Control::Table(table)]=p.controls.as_slice()else{return None;};
++  // Exclude the ordinary stored-anchor/rewind branches this new physical
++  // contract does not model. Source rows grant no output metrics: all output
++  // rows are independently generated and every current physical box closes.
++  let _input_kind=bounded_host_input161(p)?;
++  if !p.text.is_empty()||p.char_count!=9||!p.char_offsets.is_empty()||p.column_type!=ColumnBreakType::None
++  ||p.completed_native_rows.is_some()||p.stored_text_partition_is_dirty()||p.cell_format_vpos_dirty||!p.field_ranges.is_empty()||!p.range_tags.is_empty()
++  ||!p.tab_extended.is_empty()||p.layout_only_fill_lines!=0
++  ||!table.common.raw_extra.is_empty()||table.raw_table_record_extra.iter().any(|b|*b!=0)
++ ||i32::try_from(table.common.width).ok()?.checked_add(i32::from(table.outer_margin_left))?.checked_add(i32::from(table.outer_margin_right))?!=integer_hu(page.layout.body_area.width,dpi)?
++ ||super::super::hwpunit_to_px(i32::try_from(table.common.width).ok()?,dpi)>rect.width{return None;}
++  let plain_cell=|q:&crate::model::paragraph::Paragraph|q.controls.is_empty()&&q.field_ranges.is_empty()&&q.range_tags.is_empty()&&q.tab_extended.is_empty();
++  if !signed_shape157(table,plain_cell){return None;}
++  // The sign does not grant placement. Require the real current None-policy
++  // to be finite and identical to its accepted incoming pen below.
++
++  match format{crate::parser::FileFormat::Hwp=>if !native_table_common_exact(table){return None;},crate::parser::FileFormat::Hwpx=>if !table.raw_ctrl_data.is_empty(){return None;},_=>return None}
++  let mut ms=measured.iter().filter(|m|m.para_index==*pi&&m.control_index==0);let m=ms.next()?;if ms.next().is_some()||m.caption_height!=0.0||m.total_height<=0.0||!m.total_height.is_finite()
++  ||integer_hu(m.total_height,dpi)?!=i32::try_from(table.common.height).ok()?{return None;}
++  // Recompute this bounded current source's ordinary measurement with the
++  // exact effective profile, then compare EVERY typed table/cell field. This
++  // does not trust a changed cache merely because total_height is unchanged.
++  let mut cell_bytes=0usize;let mut cell_paras=0usize;let mut cell_rows=0usize;
++  for cell in &table.cells{for q in &cell.paragraphs{
++   cell_bytes=cell_bytes.checked_add(q.text.len())?;cell_paras=cell_paras.checked_add(1)?;cell_rows=cell_rows.checked_add(q.line_segs.len())?;
++   if cell_bytes>2*1024*1024||cell_paras>4096||cell_rows>16384||q.text.len()>64*1024||q.char_count>65536{return None;}
++   let width=i64::from(cell.width)-i64::from(cell.effective_padding(&table.padding).left)-i64::from(cell.effective_padding(&table.padding).right);
++   if width<=0||width>i64::from(i32::MAX){return None;}
++   fresh_signed_body_rows(q,styles,super::super::hwpunit_to_px(width as i32,dpi),dpi)?;
++  }}
++  let fresh_measurement=super::super::height_measurer::HeightMeasurer::new(dpi)
++   .with_hwp3_variant(profile.hwp3_layout()).with_legacy_hwp3_stored_geometry(profile.legacy_hwp3_stored_geometry())
++   .with_native_hwp5(profile.native_hwp5_layout()).with_hwpx_stored_layout(profile.hwpx_stored_layout())
++   .with_session_edited(profile.session_edited()).with_hwp3_origin_flow_spacing_before(false)
++   .measure_table(table,*pi,0,styles);
++  if !exact_current_measurement157(&fresh_measurement,m){return None;}
++  let mut ts=trace.whole_tables().iter().filter(|t|t.paragraph==*pi&&t.control==0);let t=ts.next()?;if ts.next().is_some(){return None;}
++  if t.page!=Some(0)||t.column!=0||t.post_page!=Some(0)||t.post_column!=0||t.committed_item_index!=slot||t.final_membership!=Some(true)
++  ||t.pre_text_height!=0.0||t.pre_text_end!=0||!arithmetic_equal(t.flow_before,flow)||t.before<0.0||t.after_for_fit<0.0
++  ||t.body_height!=m.total_height||!arithmetic_equal(t.table_total_height,t.before+t.body_height+t.after_for_fit)
++  ||t.flow_after>rect.height
++  ||integer_hu(t.before,dpi)?!=i32::from(table.outer_margin_top){return None;}
++  if t.resolved.is_some()||col.paragraph_float_placements.contains_key(&(*pi,0))||!arithmetic_equal(t.flow_after,t.flow_before+t.table_total_height){return None;}
++  let object_anchor=None;
++  let incoming=rect.y+t.flow_before-unpainted;
++  let base_top=super::super::layout::empty_host_float_raw_top(incoming,super::super::hwpunit_to_px(table.common.vertical_offset as i32,dpi),0.0);
++  if !arithmetic_equal(base_top,incoming)||p.hwpx_axis_shift!=0{return None;}
++  // The structural object row owns no text ink, but its paragraph/font style
++  // context must remain within the same explicit plain frame contract.
++  let mut style_probe=p.clone();style_probe.controls.clear();style_probe.char_count=1;
++  fresh_signed_body_rows(&style_probe,styles,rect.width,dpi)?;
++  let mut host=p.clone();clear_fresh_input(&mut host);
++  super::super::composer::reflow_line_segs(&mut host,super::super::composer::ParagraphBox::body_for_style(rect.width,styles.para_styles.get(usize::from(p.para_shape_id)),dpi),styles,dpi);
++  if host.line_segs.len()!=1{return None;}
++  let selected=trace.format(t.selected_format_id?)?;let fresh_host=super::super::composer::compose_paragraph_in_context(&host,styles);
++  if selected.source_text!=p.text||selected.source_char_offsets!=p.char_offsets||selected.paragraph_style!=fresh_host.para_style_id
++   ||selected.has_numbering||selected.has_horizontal_shaping||selected.known_square_band
++   ||!selected.tac_controls.is_empty()||!selected.footnote_positions.is_empty()||!selected.tab_extended.is_empty()
++   ||selected.lines.len()!=1||fresh_host.lines.len()!=1||t.selected_line_count!=1
++   ||!fact_line_matches(&selected.lines[0],&fresh_host.lines[0],true)
++   ||selected.inline_controls.len()!=fresh_host.inline_controls.len()
++   ||!selected.inline_controls.iter().zip(&fresh_host.inline_controls).all(|((line,index,kind),c)|*line==c.line_index&&*index==c.control_index&&*kind==format!("{:?}",c.control_type)){return None;}
++  let generated=&host.line_segs[0];if generated.tag!=0x80060000||generated.vertical_pos!=0||generated.text_start!=0
++   ||generated.line_height<=0||generated.text_height!=generated.line_height||generated.line_spacing<0
++   ||generated.baseline_distance<0||generated.baseline_distance>generated.line_height||generated.column_start!=0
++   ||Some(generated.segment_width)!=prefix_width{return None;}
++  // These are two current physical origins, not interchangeable source-row
++  // grants. Native's negative-offset clamp has no inset. Existing HWP5-origin
++  // XML consumes the measured outer top unless its complete current-derived
++  // standard declaration already expresses the pre-inset box. Every choice
++  // is checked against the actual incoming pen/selected border in finalize.
++  let lower_anchor=integer_hu(incoming-rect.y-t.before,dpi)?;
++  if lower_anchor<0{return None;}
++  let mut lower=host.line_segs.clone();lower[0].vertical_pos=lower_anchor;
++  let exact_lower=current_standard_declaration161(p,&lower);
++  let mut native_outer=host.line_segs.clone();let native_outer_y=integer_hu(incoming-rect.y,dpi)?;native_outer[0].vertical_pos=native_outer_y;
++  let exact_native_outer=current_standard_declaration161(p,&native_outer);
++  let origin=match format{
++   crate::parser::FileFormat::Hwp if exact_native_outer&&!exact_lower=>CurrentBoundedOrigin161::NativeDeclaredOuter,
++   crate::parser::FileFormat::Hwp=>CurrentBoundedOrigin161::Existing(SignedNegativeOrigin157::NativeCurrent),
++   crate::parser::FileFormat::Hwpx if p.native_origin_paint_input.as_ref().is_some_and(|input|input.matches_current_inputs(p,current_origin_context))=>{
++    if !current_origin_view.known_native_preinset(p,0,0,0,*pi,0,m,[rect.x,rect.y,rect.width,rect.height],item as *const _ as usize,current_origin_context,dpi){return None;}
++    CurrentBoundedOrigin161::Existing(SignedNegativeOrigin157::CurrentPolicyPreInset)
++   },
++   crate::parser::FileFormat::Hwpx if exact_lower=>CurrentBoundedOrigin161::Existing(SignedNegativeOrigin157::StandardPreInset),
++   crate::parser::FileFormat::Hwpx=>{
++    // A merely retained invalid seal is not an active renderer policy. Refuse
++    // the fallback only when the original local source predicate could still
++    // admit it, or the separate native paint policy needs its own consumer.
++    // No existing seal/context is modified, rebound or issued here.
++    if p.owns_native_source_synthetic_rows(current_origin_context){return None;}
++    CurrentBoundedOrigin161::Existing(SignedNegativeOrigin157::XmlCurrentOuter)
++   },
++   _=>return None,
++  };
++  let top=origin.top(incoming,t.before)?;
++  if top<rect.y||top+t.body_height>rect.y+rect.height{return None;}
++  host.line_segs[0].vertical_pos=integer_hu(top-rect.y-t.before,dpi)?;
++  let standard_anchor=origin.paragraph_anchor(incoming,t.before)?;
++
++  rows.push(CurrentFrameParagraphRows{kind:CurrentFrameRowKind::FreshBody,section:0,paragraph:*pi,rows:host.line_segs});tables.push(CandidateTable{paragraph:*pi,control:0,incoming,top,before:t.before,body:t.body_height,after:t.after_for_fit,object_anchor,standard_anchor,declared_border_origin:None});
++  unpainted+=t.before;flow=t.flow_after;
++ },_=>return None}}
++ if tables.is_empty()||measured.len()!=tables.len()||col.paragraph_float_placements.len()!=tables.iter().filter(|t|t.object_anchor.is_some()).count()||!arithmetic_equal(flow,col.used_height){return None;}
++ let mut h=blake3::Hasher::new();h.update(b"current-signed-within-body161-proof-1\0");h.update(&trace.resource());h.update(&trace.generation().to_le_bytes());
++ for t in &tables{h.update(&(t.paragraph as u64).to_le_bytes());for v in[t.incoming,t.top,t.before,t.body,t.after,t.standard_anchor.unwrap_or(t.incoming)]{h.update(&v.to_bits().to_le_bytes());}match t.object_anchor{Some((a,b,c))=>{h.update(&[1]);h.update(&a.to_bits().to_le_bytes());h.update(&b.to_bits().to_le_bytes());h.update(&c.to_bits().to_le_bytes());},None=>{h.update(&[0]);}}}
++ let generation=*h.finalize().as_bytes();let paint=CurrentFramePaintPlan{source_paragraphs:ps.as_ptr()as usize,generation,section:0,page:0,column:0,rect,tables:tables.clone(),additional_frames:Vec::new()};
++ let candidate=Self{source,paint,bodies,retained,tables,rows,generation,trace:std::sync::Arc::clone(trace)};
++ Some(candidate)
++ }
++ pub(crate) fn paint_plan(&self)->CurrentFramePaintPlan{self.paint.clone()}
++ fn closes_physical(&self,physical:&super::super::current_physical_selections::CurrentPhysicalSelections,bound:bool)->Option<()>{
++  if bound&&!physical.matches_current_plan(&self.paint){return None;}
++  let frames=physical.frames()?;let [frame]=frames else{return None;};if frame.section!=0||frame.page!=0||frame.column!=0||frame.column_ordinal!=0||frame.has_zone||frame.zone_y!=0.0
++  ||frame.rect.x!=self.paint.rect.x||frame.rect.y!=self.paint.rect.y||frame.rect.width!=self.paint.rect.width||frame.rect.height!=self.paint.rect.height{return None;}
++  let painted=physical.rows()?;let actual_tables=physical.tables()?;if actual_tables.len()!=self.tables.len(){return None;}
++  let expected_count:usize=self.bodies.iter().map(|b|b.fresh.rows.len()).sum::<usize>()+self.retained.iter().map(|b|b.composition.lines.len()).sum::<usize>();if painted.len()!=expected_count{return None;}
++  let views=self.bodies.iter().map(|b|(b.paragraph,b.physical_y,&b.fresh.composition,b.allow_empty_unused_width)).chain(self.retained.iter().map(|b|(b.paragraph,b.physical_y,&b.composition,false)));
++  for (paragraph,physical_y,composition,allow_empty_unused_width)in views{let selected=painted.iter().filter(|r|r.frame.paragraph==paragraph).collect::<Vec<_>>();if selected.len()!=composition.lines.len(){return None;}
++   let mut offset=0.0;for (i,(fresh,row))in composition.lines.iter().zip(selected).enumerate(){
++    let f=&row.frame;let effective=if f.stored_horizontal_span_used{super::super::hwpunit_to_px(fresh.segment_width,super::super::DEFAULT_DPI)}else{frame.rect.width};
++    if f.node!=frame.node||f.line!=i||f.equation_adjusted||f.has_wrap_anchor
++    ||f.effective_column_x!=frame.rect.x||f.effective_column_width!=effective||f.available_width!=effective
++    ||f.margin_left!=0.0||f.margin_right!=0.0||f.inline_offset!=0.0||f.numbering_offset!=0.0
++    ||!arithmetic_equal(f.physical_text_y,physical_y+offset)||f.final_line_box_height!=super::super::hwpunit_to_px(fresh.line_height,super::super::DEFAULT_DPI)
++    ||f.baseline!=super::super::hwpunit_to_px(fresh.baseline_distance,super::super::DEFAULT_DPI)
++    ||(!same_selected_line(fresh,&row.selected)&&!(allow_empty_unused_width&&same_empty_line_ignoring_unused_width(fresh,&row.selected))){return None;}
++    offset+=super::super::hwpunit_to_px(fresh.line_height+fresh.line_spacing,super::super::DEFAULT_DPI);
++   }}
++  for table in &self.tables{let mut actual=actual_tables.iter().filter(|t|t.paragraph==table.paragraph&&t.control==table.control);let t=actual.next()?;
++   let bbox=t.selected_border_box?;
++   let model=match &self.source.sections[0].paragraphs[table.paragraph].controls[table.control]{crate::model::control::Control::Table(v)=>v,_=>return None};
++   if !arithmetic_equal(bbox[0],frame.rect.x+super::super::hwpunit_to_px(i32::from(model.outer_margin_left),super::super::DEFAULT_DPI))
++    ||!arithmetic_equal(bbox[1],table.top)||!arithmetic_equal(bbox[2],super::super::hwpunit_to_px(i32::try_from(model.common.width).ok()?,super::super::DEFAULT_DPI))
++    ||!arithmetic_equal(bbox[3],table.body){return None;}
++   if actual.next().is_some()||t.node!=frame.node||t.typed_float!=table.object_anchor.is_some()||t.inline||t.treat_as_char||t.selected_outer_inset!=0.0
++   ||!arithmetic_equal(t.incoming_y,table.incoming)||!arithmetic_equal(t.selected_y,table.top)||t.visual_height!=table.body||!arithmetic_equal(t.visual_end,table.top+table.body)
++   ||!arithmetic_equal(t.flow_end,table.top+table.body){return None;}
++   if table.object_anchor.is_none()&&!arithmetic_equal(t.paragraph_y,table.standard_anchor.unwrap_or(table.incoming)){return None;}
++   if let Some((anchor,_,incoming))=table.object_anchor{
++    if !arithmetic_equal(t.incoming_y,incoming)||!arithmetic_equal(t.paragraph_y,frame.rect.y+anchor){return None;}}}
++  Some(())
++ }
++ pub(crate) fn matches_current(&self,source:&Document,result:&super::super::pagination::PaginationResult,styles:&super::super::style_resolver::ResolvedStyleSet,profile:crate::model::provenance::LayoutCompatibilityProfile,dpi:f64)->bool{
++  std::ptr::eq(source,self.source)&&dpi==super::super::DEFAULT_DPI&&result.selected_composition_trace.as_ref().is_some_and(|t|std::sync::Arc::ptr_eq(t,&self.trace))
++   &&self.trace.resource()==crate::model::native_computed_resource::RESOURCE&&self.trace.matches_source(&source.sections[0].paragraphs,styles.reset_flow_context,profile,dpi)&&self.trace.matches_finalized_result(result)
++ }
++ pub(crate) fn finalize(self,physical:&super::super::current_physical_selections::CurrentPhysicalSelections)->Option<CurrentFrameRowsPlan<'doc>>{self.closes_physical(physical,true)?;Some(CurrentFrameRowsPlan{source:self.source,resource:crate::model::native_computed_resource::RESOURCE,allocation_generation:self.generation,paragraphs:self.rows})}
++
++}
++
++/// Known signed declaration domain; no positive lane is broadened.
++pub(super) fn signed_shape157(t:&crate::model::table::Table,plain:impl Fn(&crate::model::paragraph::Paragraph)->bool)->bool{
++ (t.common.vertical_offset as i32)<0 && crate::renderer::current_offset_frame::known_current_offset_shape(t,plain)
++}
++pub(super) fn valid_columns157(c:&crate::model::page::ColumnDef,format:crate::parser::FileFormat)->bool{
++ use crate::model::page::{ColumnType,ColumnDirection};
++ if !matches!(c.column_count,1|2|3)||c.column_type!=ColumnType::Normal||c.direction!=ColumnDirection::LeftToRight
++  ||c.separator_type!=0||c.separator_width!=0||c.separator_color!=0{return false;}
++ let native=matches!(format,crate::parser::FileFormat::Hwp);
++ if c.same_width{
++  c.widths.is_empty()&&c.gaps.is_empty()&&!c.proportional_widths
++   &&if native{c.raw_attr==0||c.raw_attr==(0x1000|(c.column_count<<2))}else{c.raw_attr==0}
++ }else{
++  matches!(c.column_count,2|3)&&c.spacing==0&&c.widths.len()==usize::from(c.column_count)
++   &&c.gaps.len()==usize::from(c.column_count)&&c.widths.iter().all(|w|*w>0)
++   &&c.widths.windows(2).all(|w|w[0]<w[1])&&c.gaps.last()==Some(&0)
++   &&c.proportional_widths==native&&c.raw_attr==if native{c.column_count<<2}else{0}
++ }
++}
++
++#[derive(Clone,Copy,Debug)]
++pub(super) enum SignedNegativeOrigin157{NativeCurrent,CurrentPolicyPreInset,StandardPreInset,XmlCurrentOuter}
++impl SignedNegativeOrigin157{
++ pub(super) fn top(self,incoming:f64,before:f64)->Option<f64>{
++  if !incoming.is_finite()||!before.is_finite()||before<=0.0{return None;}
++  let top=match self{Self::NativeCurrent|Self::CurrentPolicyPreInset|Self::StandardPreInset=>incoming,Self::XmlCurrentOuter=>incoming+before};
++  top.is_finite().then_some(top)
++ }
++ pub(super) fn paragraph_anchor(self,incoming:f64,before:f64)->Option<Option<f64>>{
++  self.top(incoming,before)?;
++  Some(match self{Self::NativeCurrent|Self::CurrentPolicyPreInset=>None,Self::StandardPreInset=>Some(incoming-before),Self::XmlCurrentOuter=>Some(incoming)})
++ }
++}
++
++/// The production edited measurement's floor_rows_to_prev records the loaded
++/// baseline even when no row is changed. This known no-growth representation
++/// is permitted only if every baseline row equals the independently measured
++/// current row exactly. No field is removed from the final typed digest.
++pub(super) fn exact_current_measurement157(fresh:&super::super::height_measurer::MeasuredTable,current:&super::super::height_measurer::MeasuredTable)->bool{
++ let mut expected=fresh.clone();
++ if let Some(baseline)=&current.baseline_row_heights{
++  if fresh.baseline_row_heights.is_some()||baseline!=&fresh.row_heights{return false;}
++  expected.baseline_row_heights=Some(fresh.row_heights.clone());
++ }
++ let key=super::super::selected_composition_observer127::full_fragment_measurement_key148(&expected);
++ key.is_some()&&key==super::super::selected_composition_observer127::full_fragment_measurement_key148(current)
++}
++
++#[cfg(test)]
++mod tests161{
++ use super::*;
++ #[test]fn current_bounded161_declaration_is_exact_all_fields_and_axis(){
++  let row=crate::model::paragraph::LineSeg{text_start:0,vertical_pos:1200,line_height:1000,text_height:1000,baseline_distance:850,line_spacing:600,column_start:0,segment_width:42520,tag:0x80060000};
++  let mut p=crate::model::paragraph::Paragraph::default();p.line_segs=vec![row.clone()];
++  assert!(current_standard_declaration161(&p,std::slice::from_ref(&row)));
++  p.source_line_seg_vertical_pos=Some(vec![1200]);assert!(current_standard_declaration161(&p,std::slice::from_ref(&row)));
++  for field in 0..12{let mut bad=p.clone();match field{
++   0=>bad.line_segs[0].text_start+=1,1=>bad.line_segs[0].vertical_pos+=1,2=>bad.line_segs[0].line_height+=1,
++   3=>bad.line_segs[0].text_height+=1,4=>bad.line_segs[0].baseline_distance+=1,5=>bad.line_segs[0].line_spacing+=1,
++   6=>bad.line_segs[0].column_start+=1,7=>bad.line_segs[0].segment_width+=1,8=>bad.line_segs[0].tag^=1,
++   9=>bad.source_line_seg_vertical_pos=Some(vec![1201]),10=>bad.source_line_seg_vertical_pos=Some(vec![]),_=>bad.hwpx_axis_shift=1};
++   assert!(!current_standard_declaration161(&bad,std::slice::from_ref(&row)),"field{field}");
++  }
++ }
++ #[test]fn current_bounded161_native_outer_is_distinct_from_original(){
++  let original=CurrentBoundedOrigin161::Existing(SignedNegativeOrigin157::NativeCurrent);
++  let declared=CurrentBoundedOrigin161::NativeDeclaredOuter;
++  assert_eq!(original.top(120.0,4.0),Some(120.0));assert_eq!(original.paragraph_anchor(120.0,4.0),Some(None));
++  assert_eq!(declared.top(120.0,4.0),Some(124.0));assert_eq!(declared.paragraph_anchor(120.0,4.0),Some(Some(120.0)));
++  for v in [f64::NAN,f64::INFINITY,f64::NEG_INFINITY]{assert!(declared.top(v,4.0).is_none());assert!(declared.top(120.0,v).is_none());}
++  for v in [0.0,-1.0]{assert!(declared.top(120.0,v).is_none());}
++ }
++}

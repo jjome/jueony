@@ -1,0 +1,91 @@
+{
+  "scope": "Own authored captioned table fixtures; public edits only after ordinary native serialization/reopen. No imported source-row descriptor or private lease authoring. Native and XML source origins are distinct fixed inputs.",
+  "baseSourceId": "a6806ebbe0664efe",
+  "sourceFilesProof": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\n001-caption157\\baseline-source-proof.json",
+  "fixtures": [
+    {
+      "file": "1-bottom-float.hwp",
+      "sha256": "d765b4e1daa0fda855829d9e1e0b90af27375cb0ce4e82d367241c3cc879e6ce",
+      "xmlFile": "1-bottom-float.hwpx",
+      "xmlSha256": "f116e67d245134b4bb39349f2958f13ffbe7f91d7b31619727f3050577c331d2"
+    },
+    {
+      "file": "1-bottom-tac.hwp",
+      "sha256": "12633c2a3bccf0994b31c43d9dfce8fdc2053533072222d1a4329d58c9ab958b",
+      "xmlFile": "1-bottom-tac.hwpx",
+      "xmlSha256": "a898ac0634bff5fe31ad087545f2862e706c85845e0eb2facbd0fc869f09b31a"
+    },
+    {
+      "file": "1-top-float.hwp",
+      "sha256": "d478961377f0e831cdc8ccfbb7ca37c5966ba04b5b67baa25fd894f37917176e",
+      "xmlFile": "1-top-float.hwpx",
+      "xmlSha256": "fcf1accfca037ca00c3577ea00a2c0c05d400580775f1e18905ec7ba8655f6de"
+    },
+    {
+      "file": "1-top-tac.hwp",
+      "sha256": "209b692cb93de8ce366f466132a1e8dd6beee6192339942aad03a491fb4ae2c8",
+      "xmlFile": "1-top-tac.hwpx",
+      "xmlSha256": "171b316978e54f6d6af70d45c0a85316b2a79bf2a59f7862c97158c082656e5f"
+    },
+    {
+      "file": "2-bottom-float.hwp",
+      "sha256": "d5f976017b772ff32d5250960b7283fc22234c74c125c831647af65253dc0f43",
+      "xmlFile": "2-bottom-float.hwpx",
+      "xmlSha256": "82cf0de5130b047a0fa43f0a57594e4a46bd77d2dea00696aab5a2fc081867b2"
+    },
+    {
+      "file": "2-bottom-tac.hwp",
+      "sha256": "fbf0ca314a663e30e6f494d698b39fd1ff074b4405ab3cc00fec7bb308693200",
+      "xmlFile": "2-bottom-tac.hwpx",
+      "xmlSha256": "77196ce87eb732945eac787da36033152a65ef04b86875e3ec52f4084ae8f312"
+    },
+    {
+      "file": "2-top-float.hwp",
+      "sha256": "3f5cbf0b2d0d1b9c076674c5c767c107d96ab316399b0903fca4bcb2d0b05b09",
+      "xmlFile": "2-top-float.hwpx",
+      "xmlSha256": "eb65fa62346ef6417f375ab0abc5331b23d1f7b02b3136cbaf0c7d57cc1481ed"
+    },
+    {
+      "file": "2-top-tac.hwp",
+      "sha256": "f2ef456f025ab0e99c4be2c434549acb7ac7c872c51aa94ffb8fae459d3bc255",
+      "xmlFile": "2-top-tac.hwpx",
+      "xmlSha256": "d4e7706c88fa7fcb377e61c639ef12170a548a95228f1e420d067c9328c73026"
+    },
+    {
+      "file": "3-bottom-float.hwp",
+      "sha256": "d61a024ba05b3b2ef8f1b08fa1bbeb9f24418be7a62c4cbc8d3439d83c8b679f",
+      "xmlFile": "3-bottom-float.hwpx",
+      "xmlSha256": "efadcd6f1265f7aee0f57fd1049c439a371025824153b7305cad0ec98feee656"
+    },
+    {
+      "file": "3-bottom-tac.hwp",
+      "sha256": "dbe50d27657a64049bd1efa9a86600db0c324072747f871a1cfad3d44ead4590",
+      "xmlFile": "3-bottom-tac.hwpx",
+      "xmlSha256": "d02bd03e6e07268934685d8e0772a92c65eff6376abf6301fb8efc65cfd2929e"
+    },
+    {
+      "file": "3-top-float.hwp",
+      "sha256": "3e60bc7f41e9dc204cb2215e754cfe131a596b6b195f332b9191bb6a1bd09e39",
+      "xmlFile": "3-top-float.hwpx",
+      "xmlSha256": "164e16ca898f66d6dffc7e47180ed002e095f83c1d3f1ae24f7a149ea409b4f4"
+    },
+    {
+      "file": "3-top-tac.hwp",
+      "sha256": "8ec4b4875d69b57fe408a2b5b0dad690973ad7ad1ed82714028366e75e023372",
+      "xmlFile": "3-top-tac.hwpx",
+      "xmlSha256": "58c0e39472408c3c5b52d4c83474cef9832f562ef8b3e099eed3aea8e5c9c4ac"
+    }
+  ],
+  "initialObservations": {
+    "count": 96,
+    "pass": 36,
+    "fail": 60,
+    "resultSha256": "192bb25e74b91d7fea3625b6266c4ae2b360e37edd9013e0d9fd1dc6066feae0"
+  },
+  "sourceWitnessLimit": "Native harness Debug+event equality only; full private-source binding is validated by the typed output binder, not claimed from Debug.",
+  "preparationFailures": [
+    "first WSL PATH lacked cargo (no engine test ran)",
+    "external harness tried Serialize on Document (E0277, corrected to named Debug witness)"
+  ],
+  "harnessSha256": "bebcfcb204635e56e028cc6784505fe7b9972615fe62ebbac89bbc1dafad8f5d"
+}

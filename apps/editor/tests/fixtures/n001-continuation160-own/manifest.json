@@ -1,0 +1,80 @@
+{
+  "authoredBy": "public blank/page/column/table/width/cell/body APIs; ordinary HWP serialize/read then ordinary HWPX export; no model/raw/cache edits",
+  "fixtures": [
+    {
+      "authoringToNativeGeometry": 170,
+      "columns": 1,
+      "generatorLoss": 0,
+      "name": "row-1col",
+      "nativeSha256": "cc18e7c08c41e4b9b9f2ad303ce4d961d127b7e42e1fb7794ad953324cdbefd0",
+      "pageBreak": "row",
+      "xmlSha256": "4d08961da15e9f5bd8441f7b000c15ec4fe6a6fa9111e083efc4128c238689c5"
+    },
+    {
+      "authoringToNativeGeometry": 273,
+      "columns": 2,
+      "generatorLoss": 0,
+      "name": "row-2col",
+      "nativeSha256": "0e530ef7320fb0962b23f12f0e1f7eefca6578a2694c6fbf70a43cfdfeee84d7",
+      "pageBreak": "row",
+      "xmlSha256": "9a409efdc0ecc8a2bf41c5cca03ba1b6263ff7ec81bc5785581c2e502d662c07"
+    },
+    {
+      "authoringToNativeGeometry": 0,
+      "columns": 1,
+      "generatorLoss": 0,
+      "name": "cell-1col",
+      "nativeSha256": "76d244b206df608785d87d4ae40252e7be38fcea1b3a6c7aa125e10c593a8ec4",
+      "pageBreak": "cell",
+      "xmlSha256": "12af464ff2f4633c5f9ebf6d90a0bf159593aaaf405fb362d9248153401f2d5e"
+    },
+    {
+      "authoringToNativeGeometry": 0,
+      "columns": 2,
+      "generatorLoss": 0,
+      "name": "cell-2col",
+      "nativeSha256": "6688ef094806fd0c598b0e63b5f34a7d17b373096310c084c81179d7f8014534",
+      "pageBreak": "cell",
+      "xmlSha256": "64e255925307791202c913797f547112a235c33ba9580a9573e4f8c16e13798a"
+    }
+  ],
+  "source": "official159/source-c95d08a807583f1e",
+  "license": "Authored for this repository through public engine APIs; no external document or commercial payload.",
+  "scope": "Actual RowBreak12 rows / CellBreak one long cell; flat 1-cell-wide tables; 1/2 body columns. Merged cells, nested tables, captions and special controls are not covered.",
+  "baseline": "Engine159 authored -> ordinary HWP -> ordinary HWPX. Baseline first-authoring RowBreak differences preserved in build/n001-table-continuation160; no desired geometry encoded as fixture rows.",
+  "generator": "generate.rs",
+  "files": [
+    {
+      "path": "apps/editor/tests/fixtures/n001-continuation160-own/row-1col.hwp",
+      "sha256": "cc18e7c08c41e4b9b9f2ad303ce4d961d127b7e42e1fb7794ad953324cdbefd0"
+    },
+    {
+      "path": "apps/editor/tests/fixtures/n001-continuation160-own/row-1col.hwpx",
+      "sha256": "4d08961da15e9f5bd8441f7b000c15ec4fe6a6fa9111e083efc4128c238689c5"
+    },
+    {
+      "path": "apps/editor/tests/fixtures/n001-continuation160-own/row-2col.hwp",
+      "sha256": "0e530ef7320fb0962b23f12f0e1f7eefca6578a2694c6fbf70a43cfdfeee84d7"
+    },
+    {
+      "path": "apps/editor/tests/fixtures/n001-continuation160-own/row-2col.hwpx",
+      "sha256": "9a409efdc0ecc8a2bf41c5cca03ba1b6263ff7ec81bc5785581c2e502d662c07"
+    },
+    {
+      "path": "apps/editor/tests/fixtures/n001-continuation160-own/cell-1col.hwp",
+      "sha256": "76d244b206df608785d87d4ae40252e7be38fcea1b3a6c7aa125e10c593a8ec4"
+    },
+    {
+      "path": "apps/editor/tests/fixtures/n001-continuation160-own/cell-1col.hwpx",
+      "sha256": "12af464ff2f4633c5f9ebf6d90a0bf159593aaaf405fb362d9248153401f2d5e"
+    },
+    {
+      "path": "apps/editor/tests/fixtures/n001-continuation160-own/cell-2col.hwp",
+      "sha256": "6688ef094806fd0c598b0e63b5f34a7d17b373096310c084c81179d7f8014534"
+    },
+    {
+      "path": "apps/editor/tests/fixtures/n001-continuation160-own/cell-2col.hwpx",
+      "sha256": "64e255925307791202c913797f547112a235c33ba9580a9573e4f8c16e13798a"
+    }
+  ]
+}

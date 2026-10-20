@@ -117,3 +117,6 @@ apps/editor/scripts/verify-signed-current-storage157.mjs -text whitespace=cr-at-
 apps/editor/scripts/verify-caption-current-storage164.mjs -text whitespace=cr-at-eol
 apps/editor/tests/fixtures/n001-caption157-own/** -text
 apps/editor/scripts/verify-caption-current-storage165.mjs -text whitespace=cr-at-eol
+apps/editor/scripts/verify-signed-used-frames160.mjs -text whitespace=cr-at-eol
+apps/editor/scripts/verify-table-continuation160.mjs -text whitespace=cr-at-eol
+apps/editor/tests/fixtures/n001-continuation160-own/** -text whitespace=cr-at-eol

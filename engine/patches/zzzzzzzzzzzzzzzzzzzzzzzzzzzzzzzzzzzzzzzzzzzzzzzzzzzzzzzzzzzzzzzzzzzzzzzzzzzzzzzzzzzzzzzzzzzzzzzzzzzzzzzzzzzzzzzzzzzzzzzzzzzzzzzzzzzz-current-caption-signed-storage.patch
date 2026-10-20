@@ -1,0 +1,844 @@
+--- /dev/null
++++ b/src/document_core/commands/caption_export157.rs
+@@ -0,0 +1,15 @@
++use crate::{DocumentCore,error::HwpError};
++impl DocumentCore{
++ pub(super) fn current_caption_rows_for_export157(&self)->Result<Option<crate::serializer::hwpx::current_caption_rows157::CurrentCaptionRowsProjection157<'_>>,HwpError>{
++  if self.batch_mode||self.pending_pagination_job.is_some()||self.deferred_pagination_descriptor.is_some()
++   ||self.dirty_sections.iter().any(|d|*d)||self.pagination.len()!=1||self.page_count()!=1||!self.computed_row_resources_supported(){return Ok(None);}
++  let source=&self.document;if !source.sections.iter().any(|s|s.paragraphs.iter().any(|p|p.controls.iter().any(|c|matches!(c,crate::model::control::Control::Table(t)if t.caption.is_some())))){return Ok(None);}
++  if !crate::serializer::hwpx::current_caption_rows157::source_is_admissible157(source){return Ok(None);}
++  let styles=self.resolve_render_styles_for_section(0);let physical=self.build_page_tree_with_current_selections(0)?;
++  let Some(plan)=crate::renderer::current_frame_rows_plan::caption157::CurrentCaptionRowsPlan157::from_current(source,&self.pagination[0],&styles,
++   self.measured_tables.first().map_or(&[],Vec::as_slice),&physical.frame.current_physical_selections,self.effective_layout_profile(),self.dpi)else{return Ok(None);};
++  let projection=crate::serializer::hwpx::current_caption_rows157::CurrentCaptionRowsProjection157::new(source,&plan,self)
++   .ok_or_else(||HwpError::RenderError("CURRENT_CAPTION_EXPORT_BINDING_UNSUPPORTED".into()))?;
++  Ok(Some(projection))
++ }
++}
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -1,4 +1,6 @@
+ //! 문서 생성/로딩/저장/설정 관련 native 메서드
++#[path="caption_export157.rs"]
++mod caption_export157;
+ 
+ use crate::document_core::validation::{
+     CellPath, ValidationReport, ValidationWarning, WarningKind,
+@@ -2851,6 +2853,9 @@
+         }else if let Some(candidate)=crate::renderer::current_frame_rows_plan::CurrentVisibleHostCandidate::from_core(self,document){
+             let mut physical=Vec::new();for page in 0..self.page_count(){physical.push(self.build_page_tree_with_current_selections(page)?.frame.current_physical_selections.clone());}
+             let Some(plan)=candidate.finalize(&physical)else{return Ok(None);};plan
++        }else if let Some(candidate)=crate::renderer::current_frame_rows_plan::CurrentSignedColumnStack157::from_current(document,self.source_format,result,&styles,measured,self.effective_layout_profile(),self.dpi){
++            let physical=self.build_page_tree_with_signed_stack157_capture(0,&candidate)?;
++            let Some(plan)=candidate.finalize(&physical.frame.current_physical_selections)else{return Ok(None);};plan
+         }else if let Some(candidate)={
+             self.pagination.first().zip(self.measured_tables.first()).and_then(|(result,measured)|crate::renderer::current_frame_rows_plan::CurrentEqualColumnStackCandidate::from_current(document,self.source_format,result,&styles,measured,self.effective_layout_profile(),self.dpi))
+         }{
+@@ -2892,7 +2897,8 @@
+     pub fn export_hwpx_native(&self) -> Result<Vec<u8>, HwpError> {
+         let projection=self.current_standard_rows_for_export();
+         let current_frame=if projection.is_none(){self.current_frame_rows_for_export_document(&self.document)?}else{None};
+-        let result=self.hwpx_document_for_export(|document| match current_frame.as_ref(){Some(frame)=>crate::serializer::hwpx::serialize_hwpx_with_frame_rows(document,frame),None=>crate::serializer::hwpx::serialize_hwpx_with_current_rows(document,projection.as_ref())})?;
++        let caption157=if projection.is_none()&&current_frame.is_none(){self.current_caption_rows_for_export157()?}else{None};
++        let result=self.hwpx_document_for_export(|document| match current_frame.as_ref(){Some(frame)=>crate::serializer::hwpx::serialize_hwpx_with_frame_rows(document,frame),None=>match caption157.as_ref(){Some(c)=>crate::serializer::hwpx::serialize_hwpx_with_caption_rows157(document,c),None=>crate::serializer::hwpx::serialize_hwpx_with_current_rows(document,projection.as_ref())}})?;
+         result.content_loss().write_warnings_to_stderr();
+         Ok(result.into_bytes())
+     }
+@@ -2903,15 +2909,17 @@
+     ) -> Result<crate::serializer::SerializedDocument, HwpError> {
+         let projection=self.current_standard_rows_for_export();
+         let current_frame=if projection.is_none(){self.current_frame_rows_for_export_document(&self.document)?}else{None};
+-        self.hwpx_document_for_export(|document|match current_frame.as_ref(){Some(frame)=>crate::serializer::hwpx::serialize_hwpx_with_frame_rows(document,frame),None=>crate::serializer::hwpx::serialize_hwpx_with_current_rows(document,projection.as_ref())})
++        let caption157=if projection.is_none()&&current_frame.is_none(){self.current_caption_rows_for_export157()?}else{None};
++        self.hwpx_document_for_export(|document|match current_frame.as_ref(){Some(frame)=>crate::serializer::hwpx::serialize_hwpx_with_frame_rows(document,frame),None=>match caption157.as_ref(){Some(c)=>crate::serializer::hwpx::serialize_hwpx_with_caption_rows157(document,c),None=>crate::serializer::hwpx::serialize_hwpx_with_current_rows(document,projection.as_ref())}})
+     }
+ 
+     /// Document IR을 ODF AES-256-CBC 비밀번호 보호 HWPX로 직렬화한다.
+     pub fn export_hwpx_native_with_password(&self, password: &[u8]) -> Result<Vec<u8>, HwpError> {
+         let projection=self.current_standard_rows_for_export();
+         let current_frame=if projection.is_none(){self.current_frame_rows_for_export_document(&self.document)?}else{None};
++        let caption157=if projection.is_none()&&current_frame.is_none(){self.current_caption_rows_for_export157()?}else{None};
+         let result=self.hwpx_document_for_export(|document| {
+-            match current_frame.as_ref(){Some(frame)=>crate::serializer::hwpx::serialize_hwpx_with_frame_rows_and_password(document,frame,password),None=>crate::serializer::hwpx::serialize_hwpx_with_current_rows_and_password(document,projection.as_ref(),password)}
++            match current_frame.as_ref(){Some(frame)=>crate::serializer::hwpx::serialize_hwpx_with_frame_rows_and_password(document,frame,password),None=>match caption157.as_ref(){Some(c)=>crate::serializer::hwpx::serialize_hwpx_with_caption_rows157_and_password(document,c,password),None=>crate::serializer::hwpx::serialize_hwpx_with_current_rows_and_password(document,projection.as_ref(),password)}}
+         })?;
+         result.content_loss().write_warnings_to_stderr();
+         Ok(result.into_bytes())
+@@ -2924,8 +2932,9 @@
+     ) -> Result<crate::serializer::SerializedDocument, HwpError> {
+         let projection=self.current_standard_rows_for_export();
+         let current_frame=if projection.is_none(){self.current_frame_rows_for_export_document(&self.document)?}else{None};
++        let caption157=if projection.is_none()&&current_frame.is_none(){self.current_caption_rows_for_export157()?}else{None};
+         self.hwpx_document_for_export(|document| {
+-            match current_frame.as_ref(){Some(frame)=>crate::serializer::hwpx::serialize_hwpx_with_frame_rows_and_password(document,frame,password),None=>crate::serializer::hwpx::serialize_hwpx_with_current_rows_and_password(document,projection.as_ref(),password)}
++            match current_frame.as_ref(){Some(frame)=>crate::serializer::hwpx::serialize_hwpx_with_frame_rows_and_password(document,frame,password),None=>match caption157.as_ref(){Some(c)=>crate::serializer::hwpx::serialize_hwpx_with_caption_rows157_and_password(document,c,password),None=>crate::serializer::hwpx::serialize_hwpx_with_current_rows_and_password(document,projection.as_ref(),password)}}
+         })
+     }
+ 
+--- a/src/document_core/queries/rendering.rs
++++ b/src/document_core/queries/rendering.rs
+@@ -7737,6 +7737,15 @@
+         }
+         self.build_page_tree_with_physical_capture(page_num,None,true,Some(candidate.paint_plan()))
+     }
++    pub(crate) fn build_page_tree_with_signed_stack157_capture(&self,page_num:u32,candidate:&crate::renderer::current_frame_rows_plan::CurrentSignedColumnStack157<'_>)->Result<PageRenderTree,HwpError>{
++        let styles=self.resolve_render_styles_for_section(0);
++        if page_num!=0||!self.computed_row_resources_supported()||self.batch_mode||self.pending_pagination_job.is_some()
++            ||self.deferred_pagination_descriptor.is_some()||self.dirty_sections.iter().any(|d|*d)
++            ||!self.pagination.first().is_some_and(|result|candidate.matches_current(&self.document,result,&styles,self.effective_layout_profile(),self.dpi)){
++            return Err(HwpError::RenderError("CURRENT_SIGNED_STACK157_CAPTURE_OWNER_MISMATCH".into()));
++        }
++        self.build_page_tree_with_physical_capture(page_num,None,true,Some(candidate.paint_plan()))
++    }
+ 
+     fn build_page_tree_with_physical_capture(
+         &self,page_num:u32,header_footer_override:Option<(usize,bool,u8)>,collect_current_selections:bool,
+@@ -8042,6 +8051,10 @@
+                 if !self.computed_row_resources_supported()||self.batch_mode||self.pending_pagination_job.is_some()
+                     ||self.deferred_pagination_descriptor.is_some()||self.dirty_sections.iter().any(|v|*v){return None;}
+                 self.pagination.get(sec_idx).zip(self.measured_tables.get(sec_idx)).and_then(|(result,measured)|crate::renderer::current_frame_rows_plan::CurrentEqualColumnStackCandidate::from_current(&self.document,self.source_format,result,&default_tab_styles,measured,self.effective_layout_profile(),self.dpi)).map(|p|p.paint_plan())
++            }).or_else(||{
++                if !self.computed_row_resources_supported()||self.batch_mode||self.pending_pagination_job.is_some()
++                    ||self.deferred_pagination_descriptor.is_some()||self.dirty_sections.iter().any(|v|*v){return None;}
++                self.pagination.get(sec_idx).zip(self.measured_tables.get(sec_idx)).and_then(|(result,measured)|crate::renderer::current_frame_rows_plan::CurrentSignedColumnStack157::from_current(&self.document,self.source_format,result,&default_tab_styles,measured,self.effective_layout_profile(),self.dpi)).map(|p|p.paint_plan())
+             }).or_else(||crate::renderer::current_frame_rows_plan::current_declared_bodywide_middle_paint155(self,&self.document,&default_tab_styles,page_content.page_index)),
+             if let Some(result)=self.pagination.get(sec_idx){
+                 let ordinary=crate::renderer::current_accepted_composition::CurrentAcceptedCompositionView::from_current(
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[126, 6, 138, 167, 93, 154, 68, 103, 187, 235, 6, 252, 248, 231, 38, 244, 82, 154, 166, 102, 125, 113, 89, 21, 250, 124, 244, 209, 146, 75, 254, 167];
++pub(crate) const RESOURCE:[u8;32]=[12,33,16,63,159,224,233,6,123,103,218,133,92,105,172,73,103,224,115,144,255,196,66,52,215,86,109,227,92,165,99,187];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -299,6 +299,11 @@
+             ("src/renderer/current_whole_section_wrap153.rs",include_bytes!("../renderer/current_whole_section_wrap153.rs").as_slice()),
+             ("src/renderer/typeset/paragraph/actual_suffix148.rs",include_bytes!("../renderer/typeset/paragraph/actual_suffix148.rs").as_slice()),
+             ("src/renderer/current_multiframe135_tests.rs",include_bytes!("../renderer/current_multiframe135_tests.rs").as_slice()),
++            ("src/document_core/commands/caption_export157.rs",include_bytes!("../document_core/commands/caption_export157.rs").as_slice()),
++            ("src/renderer/current_caption_rows157.rs",include_bytes!("../renderer/current_caption_rows157.rs").as_slice()),
++            ("src/renderer/current_caption_rows157_tests.rs",include_bytes!("../renderer/current_caption_rows157_tests.rs").as_slice()),
++            ("src/renderer/current_signed_column157.rs",include_bytes!("../renderer/current_signed_column157.rs").as_slice()),
++            ("src/serializer/hwpx/current_caption_rows157.rs",include_bytes!("../serializer/hwpx/current_caption_rows157.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- /dev/null
++++ b/src/renderer/current_caption_rows157.rs
+@@ -0,0 +1,123 @@
++//! Current table-caption output only. These observations confer no body-row,
++//! native-cache, table-origin, or allocator authority. The caption's own fresh
++//! composition and actual emitted story/frame are mandatory before output.
++use super::*;
++use crate::renderer::{composer::{ComposedParagraph,ComposedLine},render_tree::{CaptionOwner,CaptionControlKind,TextLineNode,TextRunNode},current_physical_selections::CurrentPhysicalSelections};
++#[derive(Debug,Clone)]
++pub(crate) struct CaptionSelection157{
++ pub(crate) node:u32,pub(crate) owner:CaptionOwner,pub(crate) paragraph:usize,
++ pub(crate) x:f64,pub(crate) width:f64,pub(crate) y:f64,pub(crate) end:f64,
++ pub(crate) input157:Option<[u8;32]>,pub(crate) composition:ComposedParagraph,
++ pub(crate) lines:Vec<(TextLineNode,[f64;4],Vec<(TextRunNode,[f64;4],f64)>)>,
++}
++pub(crate) struct CaptionParagraphRows157{pub(crate) section:usize,pub(crate) parent:usize,pub(crate) control:usize,pub(crate) paragraph:usize,pub(crate) rows:Vec<crate::model::paragraph::LineSeg>}
++pub(crate) struct CurrentCaptionRowsPlan157<'doc>{source:&'doc Document,resource:[u8;32],generation:[u8;32],rows:Vec<CaptionParagraphRows157>}
++impl CurrentCaptionRowsPlan157<'_>{
++ pub(crate) fn source(&self)->&Document{self.source}
++ pub(crate) fn resource(&self)->[u8;32]{self.resource}
++ pub(crate) fn generation(&self)->[u8;32]{self.generation}
++ pub(crate) fn rows(&self)->&[CaptionParagraphRows157]{&self.rows}
++}
++fn same_composition(a:&ComposedParagraph,b:&ComposedParagraph)->bool{
++ a.para_style_id==b.para_style_id&&a.lines.len()==b.lines.len()&&a.lines.iter().zip(&b.lines).all(|(a,b)|same_selected_line(a,b))
++ &&a.inline_controls.is_empty()&&b.inline_controls.is_empty()&&a.tac_controls.is_empty()&&b.tac_controls.is_empty()
++ &&a.numbering_text.is_none()&&b.numbering_text.is_none()&&a.footnote_positions.is_empty()&&b.footnote_positions.is_empty()
++ &&a.tab_extended.is_empty()&&b.tab_extended.is_empty()&&a.horizontal_shaping.is_none()&&b.horizontal_shaping.is_none()
++}
++fn actual_line_matches(l:&ComposedLine,actual:&(TextLineNode,[f64;4],Vec<(TextRunNode,[f64;4],f64)>),owner:CaptionOwner,x:f64,y:f64,width:f64,dpi:f64,index:usize)->bool{
++ let (line,bbox,runs)=actual;
++ if line.caption_owner!=Some(owner)||line.line_index!=Some(index as u32)
++  ||line.line_height!=crate::renderer::hwpunit_to_px(l.line_height,dpi)||line.baseline!=crate::renderer::hwpunit_to_px(l.baseline_distance,dpi)
++  ||!arithmetic_equal(bbox[0],x)||!arithmetic_equal(bbox[1],y)||!arithmetic_equal(bbox[3],line.line_height)
++  ||bbox.iter().any(|v|!v.is_finite())||bbox[2]<0.0||(bbox[2]>width&&!arithmetic_equal(bbox[2],width))
++  ||runs.len()!=l.runs.len(){return false;}
++ let mut scalar=l.char_start;
++ for ((run,box157,expected_width),selected) in runs.iter().zip(&l.runs){
++  if !expected_width.is_finite()||!arithmetic_equal(box157[2],*expected_width){return false;}
++  if box157.iter().any(|n|!n.is_finite())||box157[2]<0.0||box157[3]<0.0
++   ||(box157[0]<x&&!arithmetic_equal(box157[0],x))||(box157[0]+box157[2]>x+width&&!arithmetic_equal(box157[0]+box157[2],x+width))
++   ||(box157[1]<y&&!arithmetic_equal(box157[1],y))||(box157[1]+box157[3]>y+line.line_height&&!arithmetic_equal(box157[1]+box157[3],y+line.line_height)){return false;}
++  if run.text!=selected.text||run.display_text.is_some()||run.char_start!=Some(scalar)||run.char_shape_id!=Some(selected.char_style_id)
++   ||run.rotation!=0.0||run.is_vertical||run.char_overlap.is_some()||run.baseline!=line.baseline{return false;}
++  let Some(ctx)=run.cell_context.as_ref()else{return false;};let [path]=ctx.path.as_slice()else{return false;};
++  if ctx.in_textbox||ctx.parent_para_index!=owner.para_idx||path.control_index!=owner.control_idx
++   ||path.cell_index!=65534||path.cell_para_index!=owner.caption_ordinal||path.text_direction!=0{return false;}
++  scalar+=selected.text.chars().count();
++ }
++ true
++}
++impl<'doc> CurrentCaptionRowsPlan157<'doc>{
++ /// Actual DocCore capture is supplied only by the synchronous read-only
++ /// export seam. No public/deserializing constructor accepts rows or receipts.
++ pub(crate) fn from_current(source:&'doc Document,result:&crate::renderer::pagination::PaginationResult,
++  styles:&crate::renderer::style_resolver::ResolvedStyleSet,measured:&[crate::renderer::height_measurer::MeasuredTable],
++  physical:&CurrentPhysicalSelections,profile:crate::model::provenance::LayoutCompatibilityProfile,dpi:f64)->Option<Self>{
++  use crate::model::{control::Control,shape::CaptionDirection};
++  use crate::renderer::pagination::PageItem;
++  if dpi!=crate::renderer::DEFAULT_DPI||source.sections.len()!=1||result.pages.len()!=1||source.bin_data_content.len()!=0
++   ||!result.hidden_empty_paras.is_empty()||!result.wrap_around_paras.is_empty()||!result.pre_emitted_host_paras.is_empty(){return None;}
++  let ps=&source.sections[0].paragraphs;if ps.len()>128||measured.len()>4096{return None;}
++  let [Control::SectionDef(_),Control::ColumnDef(columns)]=ps.first()?.controls.as_slice()else{return None;};
++  if !matches!(columns.column_count,2|3)||!columns.same_width||!columns.widths.is_empty()||!columns.gaps.is_empty()
++   ||columns.column_type!=crate::model::page::ColumnType::Normal||columns.direction!=crate::model::page::ColumnDirection::LeftToRight{return None;}
++  let frames=physical.frames()?;let [frame]=frames else{return None;};let page=&result.pages[0];let [col]=page.column_contents.as_slice()else{return None;};
++  if frame.section!=0||frame.page!=0||frame.column!=0||frame.column_ordinal!=0||frame.has_zone||frame.zone_y!=0.0||!frame.complete
++   ||frame.items.len()!=col.items.len()||!frame.items.iter().zip(&col.items).all(|(a,b)|match(a,b){(PageItem::FullParagraph{para_index:a},PageItem::FullParagraph{para_index:b})=>a==b,(PageItem::Table{para_index:a,control_index:c},PageItem::Table{para_index:b,control_index:d})=>a==b&&c==d,_=>false})||col.column_index!=0||col.start_height!=0.0||col.zone_layout.is_some()
++   ||!page.footnotes.is_empty()||page.active_header.is_some()||page.active_footer.is_some()||page.active_master_page.is_some()
++   ||!col.wrap_anchors.is_empty()||!col.wrap_around_paras.is_empty()||col.endnote_flow{return None;}
++  let rect=page.layout.column_areas.first()?;
++  if frame.rect.x!=rect.x||frame.rect.y!=rect.y||frame.rect.width!=rect.width||frame.rect.height!=rect.height{return None;}
++  let captured=physical.captions157()?;if captured.is_empty()||captured.len()>64{return None;}
++  let table_paints=physical.tables()?;let mut rows=vec![];let mut count=0usize;let mut total=0usize;
++  let mut generation=blake3::Hasher::new();generation.update(b"current-caption-output157\0");generation.update(&crate::model::native_computed_resource::RESOURCE);
++  for (pi,p) in ps.iter().enumerate(){for(ci,control)in p.controls.iter().enumerate(){let Control::Table(t)=control else{continue;};let Some(caption)=t.caption.as_ref()else{continue;};
++   count+=caption.paragraphs.len();if count>64||caption.paragraphs.is_empty()||!matches!(caption.direction,CaptionDirection::Top|CaptionDirection::Bottom)
++    ||!t.common.treat_as_char||t.common.vertical_offset!=0||t.common.horizontal_offset!=0||t.caption.as_ref()?.spacing<0
++    ||t.page_break!=crate::model::table::TablePageBreak::None||t.repeat_header||t.cells.iter().any(|c|c.row_span!=1||c.col_span!=1||c.paragraphs.iter().any(|p|!p.controls.is_empty()))
++    ||p.controls.len()!=1||!p.text.is_empty()||p.char_count!=9||!p.field_ranges.is_empty()||!p.range_tags.is_empty(){return None;}
++   let mut mts=measured.iter().filter(|m|m.para_index==pi&&m.control_index==ci);let m=mts.next()?;if mts.next().is_some()||m.page_break!=crate::model::table::TablePageBreak::None
++    ||m.row_heights.len()>4096||m.cells.len()>4096||m.row_heights.len()!=usize::from(t.row_count)||m.cumulative_heights.len()!=m.row_heights.len()+1||m.cumulative_heights[0]!=0.0
++    ||m.caption_height<=0.0||!m.caption_height.is_finite()||!m.total_height.is_finite()||m.cell_spacing<0.0||!m.cell_spacing.is_finite(){return None;}
++   let mut body=0.0;for(i,h)in m.row_heights.iter().enumerate(){if !h.is_finite()||*h<=0.0{return None;}body+=h+if i>0{m.cell_spacing}else{0.0};if !arithmetic_equal(m.cumulative_heights[i+1],body){return None;}}
++   let spacing=crate::renderer::hwpunit_to_px(i32::from(caption.spacing),dpi);
++   if !arithmetic_equal(m.total_height,body+m.caption_height+spacing){return None;}
++   let mut paints=table_paints.iter().filter(|t|t.node==frame.node&&t.paragraph==pi&&t.control==ci);let paint=paints.next()?;if paints.next().is_some()||!paint.treat_as_char{return None;}
++   let border=paint.emitted_border?;
++   if border.iter().any(|v|!v.is_finite())||border[2]<=0.0||border[2]>rect.width||!arithmetic_equal(border[3],body)
++    ||border[0]<rect.x||border[0]+border[2]>rect.x+rect.width||border[1]<rect.y||border[1]+border[3]>rect.y+rect.height{return None;}
++   // A table must be present once in this finalized current allocation. The
++   // exact source control and current measured owner are checked independently.
++   if col.items.iter().filter(|i|matches!(i,PageItem::Table{para_index,control_index}if *para_index==pi&&*control_index==ci)).count()!=1{return None;}
++   let mut expected_y=match caption.direction{CaptionDirection::Top=>border[1]-spacing-m.caption_height,CaptionDirection::Bottom=>border[1]+body+spacing,_=>return None};
++   let caption_start=expected_y;let mut extent=0.0;
++   for (ordinal,paragraph)in caption.paragraphs.iter().enumerate(){
++    let mut actuals=captured.iter().filter(|c|c.owner.sec_idx==0&&c.owner.para_idx==pi&&c.owner.control_idx==ci&&c.owner.caption_ordinal==ordinal&&c.owner.control_kind==CaptionControlKind::Table);
++    let actual=actuals.next()?;
++    if actuals.next().is_some()||actual.node!=frame.node||actual.paragraph!=paragraph as*const _ as usize
++     ||actual.input157.is_none()||actual.input157!=crate::renderer::selected_composition_observer127::current_paragraph_consume_key152(paragraph,styles.reset_flow_contexts.first().copied().flatten(),profile,dpi)
++     ||!arithmetic_equal(actual.x,border[0])||integer_hu(actual.width,dpi)?!=integer_hu(border[2],dpi)?||integer_hu(actual.width,dpi)?!=i32::try_from(t.common.width).ok()?||!arithmetic_equal(actual.y,expected_y){return None;}
++    let fresh=fresh_body_rows(paragraph,styles,actual.width,dpi)?;
++    if paragraph.line_segs.len()!=fresh.rows.len()||!paragraph.line_segs.iter().zip(&fresh.rows).all(|(a,b)|a.text_start==b.text_start&&a.vertical_pos==b.vertical_pos&&a.line_height==b.line_height&&a.text_height==b.text_height&&a.baseline_distance==b.baseline_distance&&a.line_spacing==b.line_spacing&&a.column_start==b.column_start&&a.segment_width==b.segment_width&&a.tag==b.tag){return None;}
++    if !same_composition(&fresh.composition,&actual.composition)||actual.lines.len()!=fresh.rows.len(){return None;}
++    let mut row_y=actual.y;let mut advance=0.0;
++    for (index,((row,line),physical))in fresh.rows.iter().zip(&fresh.composition.lines).zip(&actual.lines).enumerate(){
++     if !actual_line_matches(line,physical,actual.owner,actual.x,row_y,actual.width,dpi,index){return None;}
++     extent=(row_y-caption_start)+crate::renderer::hwpunit_to_px(row.line_height,dpi);
++     if row_y<rect.y||row_y+crate::renderer::hwpunit_to_px(row.line_height,dpi)>rect.y+rect.height{return None;}
++     let amount=crate::renderer::hwpunit_to_px(row.line_height.checked_add(row.line_spacing)?,dpi);advance+=amount;row_y+=amount;
++    }
++    if !arithmetic_equal(actual.end,actual.y+advance){return None;}
++    total=total.checked_add(fresh.rows.len())?;if total>4096{return None;}
++    generation.update(&(pi as u64).to_le_bytes());generation.update(&(ci as u64).to_le_bytes());generation.update(&(ordinal as u64).to_le_bytes());
++    for v in[actual.x,actual.width,actual.y,actual.end]{generation.update(&v.to_bits().to_le_bytes());}
++    rows.push(CaptionParagraphRows157{section:0,parent:pi,control:ci,paragraph:ordinal,rows:fresh.rows});expected_y=actual.end;
++   }
++   if !arithmetic_equal(extent,m.caption_height){return None;}
++  }}
++  if count!=captured.len()||rows.is_empty(){return None;}
++  Some(Self{source,resource:crate::model::native_computed_resource::RESOURCE,generation:*generation.finalize().as_bytes(),rows})
++ }
++}
++#[cfg(test)]
++#[path="current_caption_rows157_tests.rs"]
++mod tests;
+--- /dev/null
++++ b/src/renderer/current_caption_rows157_tests.rs
+@@ -0,0 +1,46 @@
++use super::*;
++use crate::DocumentCore;
++use crate::model::control::Control;
++fn ready()->DocumentCore{
++ let mut d=DocumentCore::from_bytes(include_bytes!("../../tests/fixtures/caption157-two-bottom.hwp")).unwrap();
++ d.insert_text_native(0,0,0,&"Public prefix wrap 🪶. ".repeat(12)).unwrap();
++ d.insert_text_in_cell_native(0,1,0,65534,0,0,"Edited caption 🪶. ").unwrap();d
++}
++fn make<'a>(d:&'a DocumentCore,physical:&CurrentPhysicalSelections,measured:&[crate::renderer::height_measurer::MeasuredTable])->Option<CurrentCaptionRowsPlan157<'a>>{
++ CurrentCaptionRowsPlan157::from_current(d.document(),&d.pagination[0],&d.resolve_render_styles_for_section(0),measured,physical,d.effective_layout_profile(),d.dpi)
++}
++#[test]fn caption157_current_owner_and_measurement_negatives(){
++ let d=ready();let physical=d.build_page_tree_with_current_selections(0).unwrap().frame.current_physical_selections;
++ assert!(make(&d,&physical,&d.measured_tables[0]).is_some());
++ for case in 0..13{let mut p=physical.clone();p.mutate_caption157_for_test(case);assert!(make(&d,&p,&d.measured_tables[0]).is_none(),"physical case {case}");}
++ for case in 0..8{let mut m=d.measured_tables[0].clone();match case{
++  0=>{let same=m[0].clone();m.push(same);},1=>m[0].caption_height+=1.0,2=>m[0].total_height+=1.0,3=>m[0].row_heights[0]+=1.0,
++  4=>m[0].cumulative_heights[1]+=1.0,5=>m[0].row_heights[0]=f64::INFINITY,6=>m[0].control_index+=1,7=>m[0].para_index+=1,_=>unreachable!()};
++  assert!(make(&d,&physical,&m).is_none(),"measurement case {case}");
++ }
++}
++#[test]fn caption157_exact_clone_binding_and_no_body_row_authority(){
++ let d=ready();let physical=d.build_page_tree_with_current_selections(0).unwrap().frame.current_physical_selections;
++ let plan=make(&d,&physical,&d.measured_tables[0]).unwrap();
++ assert!(!crate::serializer::hwpx::current_frame_rows::current_source_is_admissible(d.document()),"ordinary captionless source scope remains closed");
++ let p=crate::serializer::hwpx::current_caption_rows157::CurrentCaptionRowsProjection157::new(d.document(),&plan,&d).unwrap();
++ let other=d.document().clone();assert!(crate::serializer::hwpx::current_caption_rows157::CurrentCaptionRowsProjection157::new(&other,&plan,&d).is_none());
++ d.hwpx_document_for_export(|target|{
++  let bound=p.bind_for_export(target).unwrap();assert_eq!(bound.len(),1);
++  let Control::Table(t)=&target.sections[0].paragraphs[1].controls[0]else{panic!()};
++  assert!(bound.contains_key(&(&t.caption.as_ref().unwrap().paragraphs[0]as*const _ as usize)));
++  for body in &target.sections[0].paragraphs{assert!(!bound.contains_key(&(body as*const _ as usize)));}
++  for case in 0..12{let mut changed=target.clone();match case{
++   0=>changed.sections[0].paragraphs[0].text.push('x'),1=>changed.doc_info.para_shapes[0].margin_left+=1,
++   2=>changed.sections[0].paragraphs[2].raw_header_extra.push(7),3=>changed.sections[0].paragraphs.swap(2,3),
++   4=>changed.sections[0].paragraphs[0].completed_native_rows.as_mut().unwrap().resource[0]^=1,
++   5=>changed.sections[0].paragraphs[0].completed_native_rows.as_mut().unwrap().export_authorized^=true,
++   6=>changed.sections[0].paragraphs[0].completed_native_rows.as_mut().unwrap().bases[0].offset+=1,
++   7=>changed.hwpx_aux_entries.push(("unknown-own".into(),vec![8])),
++   _=>{let Control::Table(t)=&mut changed.sections[0].paragraphs[1].controls[0]else{panic!()};let c=t.caption.as_mut().unwrap();match case{
++    8=>c.paragraphs[0].text.push('x'),9=>c.paragraphs[0].source_line_seg_vertical_pos=Some(vec![55]),
++    10=>c.paragraphs[0].cell_vpos_reset=Some(true),11=>c.spacing+=1,_=>unreachable!()}}
++   }assert!(p.bind_for_export(&changed).is_none(),"target case {case}");}
++  Ok(())
++ }).unwrap();
++}
+--- a/src/renderer/current_frame_rows_plan.rs
++++ b/src/renderer/current_frame_rows_plan.rs
+@@ -3,6 +3,8 @@
+ //! a file descriptor, external JSON, old row lease, or arbitrary caller rows.
+ //! The producer is limited to exact current single-column whole body/table frames.
+ use crate::model::{document::Document,paragraph::LineSeg};
++#[path="current_caption_rows157.rs"]
++pub(crate) mod caption157;
+ pub(crate) struct CurrentFrameRowsPlan<'doc>{
+  source:&'doc Document,
+  resource:[u8;32],
+@@ -387,6 +389,9 @@
+ 
+ #[path="current_equal_column_stack137.rs"]
+ mod current_equal_column_stack137;
++#[path="current_signed_column157.rs"]
++mod current_signed_column157;
++pub(crate) use current_signed_column157::CurrentSignedColumnStack157;
+ pub(crate) use current_equal_column_stack137::CurrentEqualColumnStackCandidate;
+ 
+ #[path="current_explicit_column138.rs"]
+--- a/src/renderer/current_offset_frame.rs
++++ b/src/renderer/current_offset_frame.rs
+@@ -14,7 +14,7 @@
+   edge.is_finite().then_some(edge)
+  }
+ }
+-fn known_current_offset_shape(t: &Table, plain: impl Fn(&Paragraph) -> bool) -> bool {
++pub(crate) fn known_current_offset_shape(t: &Table, plain: impl Fn(&Paragraph) -> bool) -> bool {
+     if t.common.treat_as_char
+         || !super::float_placement::is_para_topbottom_float(&t.common)
+         || t.common.vert_rel_to != VertRelTo::Para
+--- a/src/renderer/current_physical_selections.rs
++++ b/src/renderer/current_physical_selections.rs
+@@ -35,6 +35,7 @@
+ #[derive(Debug,Clone,Default)]
+ pub(crate) struct CurrentPhysicalSelections {
+  frames:Vec<BodyFrameSelection>,rows:Vec<BodyRowSelection>,tables:Vec<WholeTableSelection>,
++ captions157:Vec<super::current_frame_rows_plan::caption157::CaptionSelection157>,
+  text_bytes:usize,item_count:usize,invalid:bool,enabled:bool,
+  source_frame_binding:Option<(usize,[u8;32])>,
+ }
+@@ -50,6 +51,32 @@
+  pub(crate) fn frames(&self)->Option<&[BodyFrameSelection]>{(self.enabled && !self.invalid && self.frames.iter().all(|f|f.complete)).then_some(&self.frames)}
+  pub(crate) fn rows(&self)->Option<&[BodyRowSelection]>{self.frames()?;Some(&self.rows)}
+  pub(crate) fn tables(&self)->Option<&[WholeTableSelection]>{self.frames()?;Some(&self.tables)}
++ pub(crate) fn begin_caption_capture157(&mut self,node:NodeId,c:&crate::renderer::composer::ComposedParagraph)->bool{
++  if !self.enabled||self.invalid||!self.frames.iter().any(|f|f.node==node){return false;}
++  let bytes=c.lines.iter().try_fold(0usize,|n,l|l.runs.iter().try_fold(n,|n,r|n.checked_add(r.text.len())?.checked_add(r.display_text.as_ref().map_or(0,String::len))));
++  if c.lines.len()>4096||c.lines.iter().any(|l|l.runs.len()>256)||self.captions157.len()>=1024
++   ||bytes.is_none_or(|b|b>2*1024*1024-self.text_bytes){self.invalid=true;return false;}
++  true
++ }
++ pub(crate) fn captions157(&self)->Option<&[super::current_frame_rows_plan::caption157::CaptionSelection157]>{self.frames()?;Some(&self.captions157)}
++ pub(crate) fn record_caption157(&mut self,caption:super::current_frame_rows_plan::caption157::CaptionSelection157){
++  if !self.enabled||self.invalid||!self.frames.iter().any(|f|f.node==caption.node){return;}
++  let bytes=caption.composition.lines.iter().try_fold(0usize,|n,l|l.runs.iter().try_fold(n,|n,r|n.checked_add(r.text.len())));
++  let Some(bytes)=bytes else{self.invalid=true;return;};
++  if self.captions157.len()>=1024||caption.composition.lines.len()>4096||bytes>2*1024*1024-self.text_bytes{
++   self.invalid=true;return;
++  }
++  self.text_bytes+=bytes;self.captions157.push(caption);
++ }
++ #[cfg(test)] pub(crate) fn mutate_caption157_for_test(&mut self,case:usize){
++  let c=&mut self.captions157[0];match case{
++   0=>c.owner.control_idx+=1,1=>c.input157.as_mut().unwrap()[0]^=1,2=>c.paragraph^=1,
++   3=>c.composition.lines[0].runs[0].text.push('x'),4=>c.lines[0].0.baseline+=1.0,
++   5=>c.lines[0].2[0].1[2]+=1.0,6=>c.lines[0].2[0].0.char_start=Some(999),7=>c.width+=1.0,
++   8=>{let c=c.clone();self.captions157.push(c);},9=>self.frames[0].complete=false,
++   10=>self.frames[0].items.swap(0,1),11=>self.tables[0].emitted_border.as_mut().unwrap()[2]+=1.0,
++   12=>self.tables[0].treat_as_char=false,_=>unreachable!()}
++ }
+  pub(crate) fn register_frame(&mut self,node:NodeId,page:&PageContent,column:&ColumnContent,rect:&LayoutRect){
+   if !self.enabled || self.invalid{return;}let Some(ordinal)=page.column_contents.iter().position(|c|std::ptr::eq(c,column))else{self.invalid=true;return;};
+   if self.frames.len()>=128 || column.items.len()>4096-self.item_count || self.frames.iter().any(|f|f.node==node)
+--- /dev/null
++++ b/src/renderer/current_signed_column157.rs
+@@ -0,0 +1,277 @@
++//! Separate SignedNegative current-frame standard-row proof.
++//! Configured one/two/three equal or unequal columns are bound through the
++//! production page solver; this first contract consumes one actual col0 frame.
++//! Every declared negative is retained. Its current no-upward box policy is
++//! derived by the real empty-host function, never by reusing an imported row.
++//! All current formatter/allocation/paint and whole-source writer checks remain
++//! mandatory. Unsupported subsequent frames keep the existing guarded path.
++use super::*;
++pub(crate) struct CurrentSignedColumnStack157<'doc>{source:&'doc Document,paint:CurrentFramePaintPlan,bodies:Vec<CandidateBody>,tables:Vec<CandidateTable>,rows:Vec<CurrentFrameParagraphRows>,generation:[u8;32],trace:std::sync::Arc<super::super::selected_composition_observer127::FinalizedSelectedCompositionTrace>}
++fn fresh_signed_body_rows(p:&crate::model::paragraph::Paragraph,styles:&super::super::style_resolver::ResolvedStyleSet,width:f64,dpi:f64)->Option<FreshBodyRows>{
++ // Bound every text story before either generic breaker's i32 accumulation.
++ let ps=styles.para_styles.get(usize::from(p.para_shape_id))?;
++ if !ps.line_spacing.is_finite()||ps.line_spacing<0.0{return None;}
++ for shape in &p.char_shapes{let cs=styles.char_styles.get(shape.char_shape_id as usize)?;let hu=cs.font_size*7200.0/dpi;
++  let upper=hu*(2.0+ps.line_spacing.abs())+ps.line_spacing.abs()*7200.0/dpi;
++  if !hu.is_finite()||hu<=0.0||!upper.is_finite()||upper*f64::from(p.char_count.max(1))>f64::from(i32::MAX)/4.0{return None;}}
++ let _validated=fresh_body_rows(p,styles,width,dpi)?;let mut q=p.clone();clear_fresh_input(&mut q);
++ super::super::composer::reflow_line_segs(&mut q,super::super::composer::ParagraphBox::body_for_style(width,styles.para_styles.get(usize::from(p.para_shape_id)),dpi),styles,dpi);
++ if q.line_segs.is_empty()||q.line_segs.len()>4096{return None;}let mut end=0i32;
++ for row in &q.line_segs{if row.vertical_pos!=end||row.line_height<=0||row.text_height!=row.line_height||row.line_spacing<0||row.baseline_distance<0||row.baseline_distance>row.line_height||row.column_start!=0||row.tag!=0x80060000{return None;}end=end.checked_add(row.line_height)?.checked_add(row.line_spacing)?;}
++ let composition=super::super::composer::compose_paragraph_in_context(&q,styles);Some(FreshBodyRows{rows:q.line_segs,composition})
++}
++impl<'doc> CurrentSignedColumnStack157<'doc>{
++ pub(crate) fn from_current(source:&'doc Document,format:crate::parser::FileFormat,result:&super::super::pagination::PaginationResult,
++ styles:&super::super::style_resolver::ResolvedStyleSet,measured:&[super::super::height_measurer::MeasuredTable],
++ profile:crate::model::provenance::LayoutCompatibilityProfile,dpi:f64)->Option<Self>{
++ use super::super::pagination::PageItem;use crate::model::{control::Control,paragraph::ColumnBreakType};
++ if source.sections.len()!=1||source.provenance.hwp3_lineage||!source.bin_data_content.is_empty()||result.pages.len()!=1
++ ||!result.hidden_empty_paras.is_empty()||!result.pre_emitted_host_paras.is_empty()||!result.wrap_around_paras.is_empty()
++ ||!result.endnotes.is_empty()||!result.endnote_paragraphs.is_empty()||dpi!=super::super::DEFAULT_DPI{return None;}
++ match format{crate::parser::FileFormat::Hwp if profile.native_hwp5_layout()=>{},crate::parser::FileFormat::Hwpx if profile.hwp5_origin_hwpx()=>{},_=>return None}
++
++ let section=&source.sections[0].section_def;
++ if section.line_grid!=0||section.char_grid!=0||section.text_direction!=0||!section.master_pages.is_empty()||!section.extra_child_records.is_empty(){return None;}
++ let ps=&source.sections[0].paragraphs;if ps.is_empty()||ps.len()>128||ps.iter().any(|p|p.completed_native_rows.is_some()){return None;}
++ let [Control::SectionDef(_),Control::ColumnDef(columns)]=ps.first()?.controls.as_slice()else{return None;};
++ if !valid_columns157(columns,format){return None;}
++ let definition_context=source.reset_flow_contexts().first().copied().flatten()?;
++ if styles.reset_flow_contexts.first().copied().flatten()!=Some(definition_context){return None;}
++ let trace=result.selected_composition_trace.as_ref()?;
++ if trace.section()!=0||trace.resource()!=crate::model::native_computed_resource::RESOURCE
++ ||!trace.matches_source(ps,Some(definition_context),profile,dpi)||!trace.matches_finalized_result(result){return None;}
++ // Reuse the actual current paint-policy verifier, not the mere presence of
++ // an imported observation. This supplies no output rows or lease: all rows
++ // below still come from source-free current reflow and final paint closure.
++ let current_origin_context=source.native_source_synthetic_context_digest();
++ let current_origin_view=super::super::current_accepted_composition::CurrentAcceptedCompositionView::from_current(result,ps,styles,profile,dpi)?.bind_origin_measurements(measured);
++ let page=&result.pages[0];if page.page_index!=0||page.section_index!=0||page.column_contents.len()!=1||page.layout.column_areas.len()!=usize::from(columns.column_count)
++ ||!page.footnotes.is_empty()||page.active_header.is_some()||page.active_footer.is_some()||page.active_master_page.is_some()||!page.extra_master_pages.is_empty(){return None;}
++ let col=&page.column_contents[0];let rect=page.layout.column_areas[0];
++ let solved=super::super::page_layout::PageLayoutInfo::from_page_def_for_page(&source.sections[0].section_def.page_def,columns,dpi,page.page_number);
++ if solved.page_width!=page.layout.page_width||solved.page_height!=page.layout.page_height
++  ||[solved.body_area.x,solved.body_area.y,solved.body_area.width,solved.body_area.height]!=[page.layout.body_area.x,page.layout.body_area.y,page.layout.body_area.width,page.layout.body_area.height]
++  ||solved.column_areas.len()!=page.layout.column_areas.len()
++  ||solved.column_areas.iter().zip(&page.layout.column_areas).any(|(a,b)|[a.x,a.y,a.width,a.height]!=[b.x,b.y,b.width,b.height]){return None;}
++ if rect.width>page.layout.body_area.width||rect.x!=page.layout.body_area.x||rect.y!=page.layout.body_area.y||rect.height!=page.layout.body_area.height
++ ||page.layout.column_areas.iter().any(|a|a.width<rect.width||!a.width.is_finite()||a.height!=rect.height||a.y!=rect.y||!a.x.is_finite())||col.column_index!=0||col.start_height!=0.0||col.endnote_flow||col.zone_layout.is_some()||col.zone_y_offset!=0.0
++ ||!col.wrap_anchors.is_empty()||!col.wrap_around_paras.is_empty()||!col.inline_placements.is_empty()||!col.inline_flow_plans.is_empty()
++ ||!col.overlay_continuations.is_empty()||!col.overlay_cuts.is_empty()||col.items.len()!=ps.len()
++ ||trace.commits().len()+trace.whole_tables().len()!=col.items.len()||!trace.tables().is_empty(){return None;}
++ let mut flow=0.0;let mut unpainted=0.0;let mut bodies=vec![];let mut tables=vec![];let mut rows=vec![];let mut prefix_width=None;
++ for (slot,item) in col.items.iter().enumerate(){match item{
++ PageItem::FullParagraph{para_index:pi}=>{
++  if *pi!=slot{return None;}let p=ps.get(*pi)?;let fresh=fresh_signed_body_rows(p,styles,rect.width,dpi)?;
++  if *pi==0 {if p.column_type!=ColumnBreakType::Section{return None;}prefix_width=Some(fresh.rows.first()?.segment_width);}else if p.column_type!=ColumnBreakType::None||!p.controls.is_empty(){return None;}
++  let mut cs=trace.commits().iter().filter(|c|c.paragraph==*pi);let c=cs.next()?;if cs.next().is_some(){return None;}
++  let f=trace.format(c.format_id)?;let empty=p.text.is_empty()&&p.controls.is_empty()&&fresh.composition.lines.len()==1;
++  if c.page!=Some(0)||c.column!=0||c.committed_item_index!=Some(slot)||c.final_membership!=Some(true)||c.row_start!=0||c.row_end!=fresh.rows.len()
++  ||c.reused_multicolumn_format||c.same_format_reused_after_slot_change||c.trimmed_before!=0.0||c.actual_column_width_px!=rect.width
++  ||!arithmetic_equal(c.flow_before,flow)||!c.metrics_still_match_selected_format||!c.range_inside_selected_composition
++  ||f.source_text!=p.text||f.source_char_offsets!=p.char_offsets||f.paragraph_style!=fresh.composition.para_style_id
++  ||(!empty&&f.actual_input_width_px!=Some(rect.width))||f.known_square_band||f.has_numbering||f.has_horizontal_shaping
++  ||!f.tac_controls.is_empty()||!f.footnote_positions.is_empty()||!f.tab_extended.is_empty()
++  ||f.inline_controls.len()!=fresh.composition.inline_controls.len()
++  ||!f.inline_controls.iter().zip(&fresh.composition.inline_controls).all(|((line,index,kind),c)|*line==c.line_index&&*index==c.control_index&&*kind==format!("{:?}",c.control_type))
++  ||f.before!=0.0||f.after!=0.0||f.lines.len()!=fresh.composition.lines.len()
++  ||!f.lines.iter().zip(&fresh.composition.lines).all(|(a,b)|fact_line_matches(a,b,empty)){return None;}
++  let total:f64=fresh.rows.iter().map(|r|super::super::hwpunit_to_px(r.line_height+r.line_spacing,dpi)).sum();
++  if !arithmetic_equal(c.advance,total)||!arithmetic_equal(c.flow_after,c.flow_before+total)||c.flow_after>rect.height{return None;}
++  let y=rect.y+c.flow_before-unpainted;let mut projected=fresh.rows.clone();let mut offset=0.0;
++  for row in &mut projected{row.vertical_pos=integer_hu(y-rect.y+offset,dpi)?;offset+=super::super::hwpunit_to_px(row.line_height+row.line_spacing,dpi);}
++  rows.push(CurrentFrameParagraphRows{kind:CurrentFrameRowKind::FreshBody,section:0,paragraph:*pi,rows:projected});bodies.push(CandidateBody{paragraph:*pi,physical_y:y,fresh,allow_empty_unused_width:empty});flow=c.flow_after;
++ },PageItem::Table{para_index:pi,control_index:ci}=>{
++  if *pi!=slot||*ci!=0{return None;}let p=ps.get(*pi)?;let [Control::Table(table)]=p.controls.as_slice()else{return None;};
++  // Exclude the ordinary stored-anchor/rewind branches this new physical
++  // contract does not model. Source rows grant no output metrics: all output
++  // rows are independently generated and every current physical box closes.
++  if p.line_segs.len()>1||p.line_segs.iter().any(|r|r.tag!=0x80060000){return None;}
++  if !p.text.is_empty()||p.char_count!=9||!p.char_offsets.is_empty()||p.column_type!=ColumnBreakType::None
++  ||p.completed_native_rows.is_some()||p.stored_text_partition_is_dirty()||p.cell_format_vpos_dirty||!p.field_ranges.is_empty()||!p.range_tags.is_empty()
++  ||!p.tab_extended.is_empty()||p.layout_only_fill_lines!=0
++  ||!table.common.raw_extra.is_empty()||table.raw_table_record_extra.iter().any(|b|*b!=0)
++ ||i32::try_from(table.common.width).ok()?.checked_add(i32::from(table.outer_margin_left))?.checked_add(i32::from(table.outer_margin_right))?!=integer_hu(page.layout.body_area.width,dpi)?
++ ||super::super::hwpunit_to_px(i32::try_from(table.common.width).ok()?,dpi)<=rect.width{return None;}
++  let plain_cell=|q:&crate::model::paragraph::Paragraph|q.controls.is_empty()&&q.field_ranges.is_empty()&&q.range_tags.is_empty()&&q.tab_extended.is_empty();
++  if !signed_shape157(table,plain_cell){return None;}
++  // The sign does not grant placement. Require the real current None-policy
++  // to be finite and identical to its accepted incoming pen below.
++
++  match format{crate::parser::FileFormat::Hwp=>if !native_table_common_exact(table){return None;},crate::parser::FileFormat::Hwpx=>if !table.raw_ctrl_data.is_empty(){return None;},_=>return None}
++  let mut ms=measured.iter().filter(|m|m.para_index==*pi&&m.control_index==0);let m=ms.next()?;if ms.next().is_some()||m.caption_height!=0.0||m.total_height<=0.0||!m.total_height.is_finite()
++  ||integer_hu(m.total_height,dpi)?!=i32::try_from(table.common.height).ok()?{return None;}
++  // Recompute this bounded current source's ordinary measurement with the
++  // exact effective profile, then compare EVERY typed table/cell field. This
++  // does not trust a changed cache merely because total_height is unchanged.
++  let mut cell_bytes=0usize;let mut cell_paras=0usize;let mut cell_rows=0usize;
++  for cell in &table.cells{for q in &cell.paragraphs{
++   cell_bytes=cell_bytes.checked_add(q.text.len())?;cell_paras=cell_paras.checked_add(1)?;cell_rows=cell_rows.checked_add(q.line_segs.len())?;
++   if cell_bytes>2*1024*1024||cell_paras>4096||cell_rows>16384||q.text.len()>64*1024||q.char_count>65536{return None;}
++   let width=i64::from(cell.width)-i64::from(cell.effective_padding(&table.padding).left)-i64::from(cell.effective_padding(&table.padding).right);
++   if width<=0||width>i64::from(i32::MAX){return None;}
++   fresh_signed_body_rows(q,styles,super::super::hwpunit_to_px(width as i32,dpi),dpi)?;
++  }}
++  let fresh_measurement=super::super::height_measurer::HeightMeasurer::new(dpi)
++   .with_hwp3_variant(profile.hwp3_layout()).with_legacy_hwp3_stored_geometry(profile.legacy_hwp3_stored_geometry())
++   .with_native_hwp5(profile.native_hwp5_layout()).with_hwpx_stored_layout(profile.hwpx_stored_layout())
++   .with_session_edited(profile.session_edited()).with_hwp3_origin_flow_spacing_before(false)
++   .measure_table(table,*pi,0,styles);
++  if !exact_current_measurement157(&fresh_measurement,m){return None;}
++  let mut ts=trace.whole_tables().iter().filter(|t|t.paragraph==*pi&&t.control==0);let t=ts.next()?;if ts.next().is_some(){return None;}
++  if t.page!=Some(0)||t.column!=0||t.post_page!=Some(0)||t.post_column!=0||t.committed_item_index!=slot||t.final_membership!=Some(true)
++  ||t.pre_text_height!=0.0||t.pre_text_end!=0||!arithmetic_equal(t.flow_before,flow)||t.before<0.0||t.after_for_fit<0.0
++  ||t.body_height!=m.total_height||!arithmetic_equal(t.table_total_height,t.before+t.body_height+t.after_for_fit)
++  ||t.flow_after>rect.height
++  ||integer_hu(t.before,dpi)?!=i32::from(table.outer_margin_top){return None;}
++  if t.resolved.is_some()||col.paragraph_float_placements.contains_key(&(*pi,0))||!arithmetic_equal(t.flow_after,t.flow_before+t.table_total_height){return None;}
++  let object_anchor=None;
++  let incoming=rect.y+t.flow_before-unpainted;
++  let base_top=super::super::layout::empty_host_float_raw_top(incoming,super::super::hwpunit_to_px(table.common.vertical_offset as i32,dpi),0.0);
++  if !arithmetic_equal(base_top,incoming)||p.hwpx_axis_shift!=0{return None;}
++  // The structural object row owns no text ink, but its paragraph/font style
++  // context must remain within the same explicit plain frame contract.
++  let mut style_probe=p.clone();style_probe.controls.clear();style_probe.char_count=1;
++  fresh_signed_body_rows(&style_probe,styles,rect.width,dpi)?;
++  let mut host=p.clone();clear_fresh_input(&mut host);
++  super::super::composer::reflow_line_segs(&mut host,super::super::composer::ParagraphBox::body_for_style(rect.width,styles.para_styles.get(usize::from(p.para_shape_id)),dpi),styles,dpi);
++  if host.line_segs.len()!=1{return None;}
++  let selected=trace.format(t.selected_format_id?)?;let fresh_host=super::super::composer::compose_paragraph_in_context(&host,styles);
++  if selected.source_text!=p.text||selected.source_char_offsets!=p.char_offsets||selected.paragraph_style!=fresh_host.para_style_id
++   ||selected.has_numbering||selected.has_horizontal_shaping||selected.known_square_band
++   ||!selected.tac_controls.is_empty()||!selected.footnote_positions.is_empty()||!selected.tab_extended.is_empty()
++   ||selected.lines.len()!=1||fresh_host.lines.len()!=1||t.selected_line_count!=1
++   ||!fact_line_matches(&selected.lines[0],&fresh_host.lines[0],true)
++   ||selected.inline_controls.len()!=fresh_host.inline_controls.len()
++   ||!selected.inline_controls.iter().zip(&fresh_host.inline_controls).all(|((line,index,kind),c)|*line==c.line_index&&*index==c.control_index&&*kind==format!("{:?}",c.control_type)){return None;}
++  let generated=&host.line_segs[0];if generated.tag!=0x80060000||generated.vertical_pos!=0||generated.text_start!=0
++   ||generated.line_height<=0||generated.text_height!=generated.line_height||generated.line_spacing<0
++   ||generated.baseline_distance<0||generated.baseline_distance>generated.line_height||generated.column_start!=0
++   ||Some(generated.segment_width)!=prefix_width{return None;}
++  // These are two current physical origins, not interchangeable source-row
++  // grants. Native's negative-offset clamp has no inset. Existing HWP5-origin
++  // XML consumes the measured outer top unless its complete current-derived
++  // standard declaration already expresses the pre-inset box. Every choice
++  // is checked against the actual incoming pen/selected border in finalize.
++  let lower_anchor=integer_hu(incoming-rect.y-t.before,dpi)?;
++  if lower_anchor<0{return None;}
++  let mut lower=host.line_segs.clone();lower[0].vertical_pos=lower_anchor;
++  let exact_lower=p.line_segs==lower&&p.source_line_seg_vertical_pos.as_ref().is_none_or(|v|v.as_slice()==[lower_anchor]);
++  let origin=match format{
++   crate::parser::FileFormat::Hwp=>SignedNegativeOrigin157::NativeCurrent,
++   crate::parser::FileFormat::Hwpx if p.native_origin_paint_input.as_ref().is_some_and(|input|input.matches_current_inputs(p,current_origin_context))=>{
++    if !current_origin_view.known_native_preinset(p,0,0,0,*pi,0,m,[rect.x,rect.y,rect.width,rect.height],item as *const _ as usize,current_origin_context,dpi){return None;}
++    SignedNegativeOrigin157::CurrentPolicyPreInset
++   },
++   crate::parser::FileFormat::Hwpx if exact_lower=>SignedNegativeOrigin157::StandardPreInset,
++   crate::parser::FileFormat::Hwpx=>{
++    // A merely retained invalid seal is not an active renderer policy. Refuse
++    // the fallback only when the original local source predicate could still
++    // admit it, or the separate native paint policy needs its own consumer.
++    // No existing seal/context is modified, rebound or issued here.
++    if p.owns_native_source_synthetic_rows(current_origin_context){return None;}
++    SignedNegativeOrigin157::XmlCurrentOuter
++   },
++   _=>return None,
++  };
++  let top=origin.top(incoming,t.before)?;
++  if top<rect.y||top+t.body_height>rect.y+rect.height{return None;}
++  host.line_segs[0].vertical_pos=integer_hu(top-rect.y-t.before,dpi)?;
++  let standard_anchor=origin.paragraph_anchor(incoming,t.before)?;
++
++  rows.push(CurrentFrameParagraphRows{kind:CurrentFrameRowKind::FreshBody,section:0,paragraph:*pi,rows:host.line_segs});tables.push(CandidateTable{paragraph:*pi,control:0,incoming,top,before:t.before,body:t.body_height,after:t.after_for_fit,object_anchor,standard_anchor,declared_border_origin:None});
++  unpainted+=t.before;flow=t.flow_after;
++ },_=>return None}}
++ if tables.is_empty()||measured.len()!=tables.len()||col.paragraph_float_placements.len()!=tables.iter().filter(|t|t.object_anchor.is_some()).count()||!arithmetic_equal(flow,col.used_height){return None;}
++ let mut h=blake3::Hasher::new();h.update(b"current-signed-negative-stack157-proof-1\0");h.update(&trace.resource());h.update(&trace.generation().to_le_bytes());
++ for t in &tables{h.update(&(t.paragraph as u64).to_le_bytes());for v in[t.incoming,t.top,t.before,t.body,t.after,t.standard_anchor.unwrap_or(t.incoming)]{h.update(&v.to_bits().to_le_bytes());}match t.object_anchor{Some((a,b,c))=>{h.update(&[1]);h.update(&a.to_bits().to_le_bytes());h.update(&b.to_bits().to_le_bytes());h.update(&c.to_bits().to_le_bytes());},None=>{h.update(&[0]);}}}
++ let generation=*h.finalize().as_bytes();let paint=CurrentFramePaintPlan{source_paragraphs:ps.as_ptr()as usize,generation,section:0,page:0,column:0,rect,tables:tables.clone(),additional_frames:Vec::new()};
++ let candidate=Self{source,paint,bodies,tables,rows,generation,trace:std::sync::Arc::clone(trace)};
++ Some(candidate)
++ }
++ pub(crate) fn paint_plan(&self)->CurrentFramePaintPlan{self.paint.clone()}
++ fn closes_physical(&self,physical:&super::super::current_physical_selections::CurrentPhysicalSelections,bound:bool)->Option<()>{
++  if bound&&!physical.matches_current_plan(&self.paint){return None;}
++  let frames=physical.frames()?;let [frame]=frames else{return None;};if frame.section!=0||frame.page!=0||frame.column!=0||frame.column_ordinal!=0||frame.has_zone||frame.zone_y!=0.0
++  ||frame.rect.x!=self.paint.rect.x||frame.rect.y!=self.paint.rect.y||frame.rect.width!=self.paint.rect.width||frame.rect.height!=self.paint.rect.height{return None;}
++  let painted=physical.rows()?;let actual_tables=physical.tables()?;if actual_tables.len()!=self.tables.len(){return None;}
++  let expected_count:usize=self.bodies.iter().map(|b|b.fresh.rows.len()).sum();if painted.len()!=expected_count{return None;}
++  for body in &self.bodies{let selected=painted.iter().filter(|r|r.frame.paragraph==body.paragraph).collect::<Vec<_>>();if selected.len()!=body.fresh.rows.len(){return None;}
++   let mut offset=0.0;for (i,(fresh,row))in body.fresh.composition.lines.iter().zip(selected).enumerate(){
++    let f=&row.frame;let effective=if f.stored_horizontal_span_used{super::super::hwpunit_to_px(fresh.segment_width,super::super::DEFAULT_DPI)}else{frame.rect.width};
++    if f.node!=frame.node||f.line!=i||f.equation_adjusted||f.has_wrap_anchor
++    ||f.effective_column_x!=frame.rect.x||f.effective_column_width!=effective||f.available_width!=effective
++    ||f.margin_left!=0.0||f.margin_right!=0.0||f.inline_offset!=0.0||f.numbering_offset!=0.0
++    ||!arithmetic_equal(f.physical_text_y,body.physical_y+offset)||f.final_line_box_height!=super::super::hwpunit_to_px(fresh.line_height,super::super::DEFAULT_DPI)
++    ||f.baseline!=super::super::hwpunit_to_px(fresh.baseline_distance,super::super::DEFAULT_DPI)
++    ||(!same_selected_line(fresh,&row.selected)&&!(body.allow_empty_unused_width&&same_empty_line_ignoring_unused_width(fresh,&row.selected))){return None;}
++    offset+=super::super::hwpunit_to_px(fresh.line_height+fresh.line_spacing,super::super::DEFAULT_DPI);
++   }}
++  for table in &self.tables{let mut actual=actual_tables.iter().filter(|t|t.paragraph==table.paragraph&&t.control==table.control);let t=actual.next()?;
++   let bbox=t.selected_border_box?;
++   let model=match &self.source.sections[0].paragraphs[table.paragraph].controls[table.control]{crate::model::control::Control::Table(v)=>v,_=>return None};
++   if !arithmetic_equal(bbox[0],frame.rect.x+super::super::hwpunit_to_px(i32::from(model.outer_margin_left),super::super::DEFAULT_DPI))
++    ||!arithmetic_equal(bbox[1],table.top)||!arithmetic_equal(bbox[2],super::super::hwpunit_to_px(i32::try_from(model.common.width).ok()?,super::super::DEFAULT_DPI))
++    ||!arithmetic_equal(bbox[3],table.body){return None;}
++   if actual.next().is_some()||t.node!=frame.node||t.typed_float!=table.object_anchor.is_some()||t.inline||t.treat_as_char||t.selected_outer_inset!=0.0
++   ||!arithmetic_equal(t.incoming_y,table.incoming)||!arithmetic_equal(t.selected_y,table.top)||t.visual_height!=table.body||!arithmetic_equal(t.visual_end,table.top+table.body)
++   ||!arithmetic_equal(t.flow_end,table.top+table.body){return None;}
++   if table.object_anchor.is_none()&&!arithmetic_equal(t.paragraph_y,table.standard_anchor.unwrap_or(table.incoming)){return None;}
++   if let Some((anchor,_,incoming))=table.object_anchor{
++    if !arithmetic_equal(t.incoming_y,incoming)||!arithmetic_equal(t.paragraph_y,frame.rect.y+anchor){return None;}}}
++  Some(())
++ }
++ pub(crate) fn matches_current(&self,source:&Document,result:&super::super::pagination::PaginationResult,styles:&super::super::style_resolver::ResolvedStyleSet,profile:crate::model::provenance::LayoutCompatibilityProfile,dpi:f64)->bool{
++  std::ptr::eq(source,self.source)&&dpi==super::super::DEFAULT_DPI&&result.selected_composition_trace.as_ref().is_some_and(|t|std::sync::Arc::ptr_eq(t,&self.trace))
++   &&self.trace.resource()==crate::model::native_computed_resource::RESOURCE&&self.trace.matches_source(&source.sections[0].paragraphs,styles.reset_flow_context,profile,dpi)&&self.trace.matches_finalized_result(result)
++ }
++ pub(crate) fn finalize(self,physical:&super::super::current_physical_selections::CurrentPhysicalSelections)->Option<CurrentFrameRowsPlan<'doc>>{self.closes_physical(physical,true)?;Some(CurrentFrameRowsPlan{source:self.source,resource:crate::model::native_computed_resource::RESOURCE,allocation_generation:self.generation,paragraphs:self.rows})}
++
++}
++
++/// Known signed declaration domain; no positive lane is broadened.
++fn signed_shape157(t:&crate::model::table::Table,plain:impl Fn(&crate::model::paragraph::Paragraph)->bool)->bool{
++ (t.common.vertical_offset as i32)<0 && crate::renderer::current_offset_frame::known_current_offset_shape(t,plain)
++}
++fn valid_columns157(c:&crate::model::page::ColumnDef,format:crate::parser::FileFormat)->bool{
++ use crate::model::page::{ColumnType,ColumnDirection};
++ if !matches!(c.column_count,1|2|3)||c.column_type!=ColumnType::Normal||c.direction!=ColumnDirection::LeftToRight
++  ||c.separator_type!=0||c.separator_width!=0||c.separator_color!=0{return false;}
++ let native=matches!(format,crate::parser::FileFormat::Hwp);
++ if c.same_width{
++  c.widths.is_empty()&&c.gaps.is_empty()&&!c.proportional_widths
++   &&if native{c.raw_attr==0||c.raw_attr==(0x1000|(c.column_count<<2))}else{c.raw_attr==0}
++ }else{
++  matches!(c.column_count,2|3)&&c.spacing==0&&c.widths.len()==usize::from(c.column_count)
++   &&c.gaps.len()==usize::from(c.column_count)&&c.widths.iter().all(|w|*w>0)
++   &&c.widths.windows(2).all(|w|w[0]<w[1])&&c.gaps.last()==Some(&0)
++   &&c.proportional_widths==native&&c.raw_attr==if native{c.column_count<<2}else{0}
++ }
++}
++
++#[derive(Clone,Copy,Debug)]
++enum SignedNegativeOrigin157{NativeCurrent,CurrentPolicyPreInset,StandardPreInset,XmlCurrentOuter}
++impl SignedNegativeOrigin157{
++ fn top(self,incoming:f64,before:f64)->Option<f64>{
++  if !incoming.is_finite()||!before.is_finite()||before<=0.0{return None;}
++  let top=match self{Self::NativeCurrent|Self::CurrentPolicyPreInset|Self::StandardPreInset=>incoming,Self::XmlCurrentOuter=>incoming+before};
++  top.is_finite().then_some(top)
++ }
++ fn paragraph_anchor(self,incoming:f64,before:f64)->Option<Option<f64>>{
++  self.top(incoming,before)?;
++  Some(match self{Self::NativeCurrent|Self::CurrentPolicyPreInset=>None,Self::StandardPreInset=>Some(incoming-before),Self::XmlCurrentOuter=>Some(incoming)})
++ }
++}
++
++/// The production edited measurement's floor_rows_to_prev records the loaded
++/// baseline even when no row is changed. This known no-growth representation
++/// is permitted only if every baseline row equals the independently measured
++/// current row exactly. No field is removed from the final typed digest.
++fn exact_current_measurement157(fresh:&super::super::height_measurer::MeasuredTable,current:&super::super::height_measurer::MeasuredTable)->bool{
++ let mut expected=fresh.clone();
++ if let Some(baseline)=&current.baseline_row_heights{
++  if fresh.baseline_row_heights.is_some()||baseline!=&fresh.row_heights{return false;}
++  expected.baseline_row_heights=Some(fresh.row_heights.clone());
++ }
++ let key=super::super::selected_composition_observer127::full_fragment_measurement_key148(&expected);
++ key.is_some()&&key==super::super::selected_composition_observer127::full_fragment_measurement_key148(current)
++}
+--- a/src/renderer/layout/picture_footnote.rs
++++ b/src/renderer/layout/picture_footnote.rs
+@@ -10,7 +10,7 @@
+     TextStyle,
+ };
+ use super::border_rendering::border_width_to_px;
+-use super::text_measurement::{estimate_text_width, resolved_to_text_style};
++use super::text_measurement::{estimate_text_width, estimate_text_width_exact, resolved_to_text_style};
+ use super::utils::{
+     extract_shape_transform, find_bin_data_bytes, picture_data_is_unusable, picture_display_size_hu,
+ };
+@@ -1071,6 +1071,14 @@
+                 }
+             }
+ 
++            if let Some(owner)=caption_owner.filter(|_|tree.current_physical_selections.begin_caption_capture157(parent_node.id,&composed)) {
++                let lines=parent_node.children[first_caption_node..].iter().filter_map(|n|match &n.node_type{
++                    RenderNodeType::TextLine(l)=>Some((l.clone(),[n.bbox.x,n.bbox.y,n.bbox.width,n.bbox.height],n.children.iter().filter_map(|n|match &n.node_type{RenderNodeType::TextRun(r)=>Some((r.clone(),[n.bbox.x,n.bbox.y,n.bbox.width,n.bbox.height],estimate_text_width_exact(r.display_or_text(),&r.style))),_=>None}).collect())),_=>None}).collect();
++                tree.current_physical_selections.record_caption157(super::super::current_frame_rows_plan::caption157::CaptionSelection157{
++                    node:parent_node.id,owner:CaptionOwner{caption_ordinal:pi,..owner},paragraph:para as*const _ as usize,
++                    x:content_x,width:content_width,y:para_y_before_layout,end:para_y,
++                    input157:crate::renderer::selected_composition_observer127::current_paragraph_consume_key152(para,styles.reset_flow_contexts.get(owner.sec_idx).copied().flatten(),self.profile.get(),self.dpi),composition:composed.clone(),lines});
++            }
+             self.layout_caption_topbottom_pictures(
+                 tree,
+                 parent_node,
+--- a/src/serializer/hwpx/context.rs
++++ b/src/serializer/hwpx/context.rs
+@@ -96,6 +96,7 @@
+ pub struct SerializeContext {
+     /// Pointer keys belong only to the currently borrowed export document.
+     pub(crate) current_standard_rows: HashMap<usize,Vec<crate::model::paragraph::LineSeg>>,
++    pub(crate) current_caption_rows157: HashMap<usize,Vec<crate::model::paragraph::LineSeg>>,
+     pub char_shape_ids: IdPool<u32>,
+     pub para_shape_ids: IdPool<u16>,
+     pub border_fill_ids: IdPool<u16>,
+@@ -180,6 +181,7 @@
+         Self {
+             char_shape_ids: IdPool::default(),
+             current_standard_rows: HashMap::new(),
++            current_caption_rows157: HashMap::new(),
+             line_segs_on_hwpx_axis: false,
+             line_segs_on_paragraph_axis: false,
+             preserve_native_source_synthetic_rows: false,
+--- /dev/null
++++ b/src/serializer/hwpx/current_caption_rows157.rs
+@@ -0,0 +1,34 @@
++//! A separate caption-only serialization clone binding. No source row/cache
++//! or body/table position is modified or authorized by this projection.
++use crate::model::{document::Document,paragraph::LineSeg,control::Control};
++use crate::renderer::current_frame_rows_plan::caption157::CurrentCaptionRowsPlan157;
++use std::collections::{HashMap,HashSet};
++struct Entry{section:usize,parent:usize,control:usize,paragraph:usize,rows:Vec<LineSeg>}
++pub(crate) struct CurrentCaptionRowsProjection157<'a>{source:&'a Document,resource:[u8;32],generation:[u8;32],source_key:[u8;32],target_key:[u8;32],entries:Vec<Entry>}
++fn digest(d:&Document,resource:[u8;32],generation:[u8;32])->Option<[u8;32]>{super::current_frame_rows::document_digest157(d,resource,generation,true)}
++pub(crate) fn source_is_admissible157(source:&Document)->bool{digest(source,crate::model::native_computed_resource::RESOURCE,[0;32]).is_some()}
++impl<'a> CurrentCaptionRowsProjection157<'a>{
++ pub(crate) fn new(source:&'a Document,plan:&CurrentCaptionRowsPlan157<'a>,core:&crate::DocumentCore)->Option<Self>{
++  let resource=crate::model::native_computed_resource::RESOURCE;
++  if !std::ptr::eq(source,plan.source())||resource!=plan.resource(){return None;}
++  let generation=plan.generation();let source_key=digest(source,resource,generation)?;
++  // The actual ordinary Core clone/authorization callback is the sole target
++  // producer. A caller cannot supply a target document, hash, rows, or flags.
++  if !std::ptr::eq(source,core.document()){return None;}
++  let target_key=core.hwpx_document_for_export(|target|digest(target,resource,generation)
++   .ok_or_else(||crate::serializer::SerializeError::UnsupportedInput("CURRENT_CAPTION_TARGET_BINDING_UNSUPPORTED".into()))).ok()?;
++  let mut entries=vec![];let mut seen=HashSet::new();let mut count=0usize;
++  for e in plan.rows(){if !seen.insert((e.section,e.parent,e.control,e.paragraph)){return None;}
++   count=count.checked_add(e.rows.len())?;if e.rows.is_empty()||count>4096||e.rows.iter().any(|r|r.tag!=0x80060000){return None;}
++   entries.push(Entry{section:e.section,parent:e.parent,control:e.control,paragraph:e.paragraph,rows:e.rows.clone()});
++  }
++  (!entries.is_empty()).then_some(Self{source,resource,generation,source_key,target_key,entries})
++ }
++ pub(crate) fn bind_for_export(&self,target:&Document)->Option<HashMap<usize,Vec<LineSeg>>>{
++  if self.resource!=crate::model::native_computed_resource::RESOURCE||digest(self.source,self.resource,self.generation)?!=self.source_key
++   ||digest(target,self.resource,self.generation)?!=self.target_key{return None;}
++  let mut result=HashMap::new();for e in &self.entries{let Control::Table(t)=target.sections.get(e.section)?.paragraphs.get(e.parent)?.controls.get(e.control)?else{return None;};
++   let p=t.caption.as_ref()?.paragraphs.get(e.paragraph)?;if result.insert(p as*const _ as usize,e.rows.clone()).is_some(){return None;}}
++  Some(result)
++ }
++}
+--- a/src/serializer/hwpx/current_frame_rows.rs
++++ b/src/serializer/hwpx/current_frame_rows.rs
+@@ -31,7 +31,7 @@
+ // Bind those values separately; never treat an opaque observation as permission.
+ // Initial proof only supports plain/structural/table stories, no completed-row
+ // package emission, captions, lazy binary, or unhandled nested story kinds.
+-fn paragraph_supplements(p:&Paragraph,depth:usize,budget:&mut usize,out:&mut Vec<[u8;32]>)->Option<()>{
++fn paragraph_supplements(p:&Paragraph,depth:usize,budget:&mut usize,out:&mut Vec<[u8;32]>,captions:bool)->Option<()>{
+  if depth>32||out.len()>=MAX_ROWS{return None;}
+  let Paragraph{char_count:_,control_mask:_,para_shape_id:_,style_id:_,column_type:_,raw_break_type:_,page_break_synthesized:_,
+   text:_,char_offsets:_,char_shapes:_,line_segs:_,layout_space_metrics,hwpx_axis_shift:_,layout_only_fill_lines:_,
+@@ -39,8 +39,16 @@
+   native_frame_observation,reset_flow_observation:_,range_tags:_,field_ranges:_,orphan_field_ends:_,controls,ctrl_data_records:_,
+   char_count_msb:_,raw_header_extra:_,has_para_text:_,tab_extended:_,title_marks:_,markpen_marks:_,numbering_restart:_,
+   stored_text_partition_dirty,cell_format_vpos_dirty,cell_vpos_reset,numbering_marker}=p;
+- if controls.len()>4096||completed_native_rows.is_some()||layout_space_metrics.len()>MAX_ROWS
++ if controls.len()>4096||(!captions&&completed_native_rows.is_some())||layout_space_metrics.len()>MAX_ROWS
+   ||source_line_seg_vertical_pos.as_ref().is_some_and(|v|v.len()>MAX_ROWS){return None;}
++ // Caption-only output binds existing body row owners as immutable inputs.
++ // It never promotes, renews, or writes one; ordinary Core lowering owns its
++ // existing export-authorization transition in a separately sealed target.
++ if captions{
++  let completed=completed_native_rows.as_ref().map(|crate::model::native_computed_rows::CompletedRows{local,plan,frame,resource,bases,native_frame,export_authorized}|(local,plan,frame,resource,bases,native_frame,export_authorized));
++  if completed_native_rows.as_ref().is_some_and(|c|c.bases.len()>MAX_ROWS||c.native_frame.is_some_and(|f|[f.raw_top,f.reserved_bottom,f.before,f.body_height,f.after].iter().any(|v|!v.is_finite()))){return None;}
++  let (hash,used)=digest_with_limit(&completed,*budget)?;*budget=budget.checked_sub(used)?;out.push(hash);
++ }
+  let metrics:Vec<_>=layout_space_metrics.iter().map(|(start,metric)|(*start,match metric{
+   SpaceMetric::Stored=>0u8,SpaceMetric::HancomRegenerated=>1,SpaceMetric::HalfCell=>2,SpaceMetric::KoPubJustified=>3})).collect();
+  let marker=match numbering_marker{NumberingMarker::Unresolved=>(0u8,None),NumberingMarker::Absent=>(1,None),
+@@ -54,7 +62,7 @@
+  for c in controls{match c{
+   crate::model::control::Control::SectionDef(s)=>{if !s.master_pages.is_empty(){return None;}},
+   crate::model::control::Control::ColumnDef(_)=>{},
+-  crate::model::control::Control::Table(t)=>{if t.caption.is_some(){return None;}for cell in &t.cells{for p in &cell.paragraphs{paragraph_supplements(p,depth+1,budget,out)?;}}},
++  crate::model::control::Control::Table(t)=>{if let Some(c)=t.caption.as_ref(){if !captions{return None;}for p in &c.paragraphs{paragraph_supplements(p,depth+1,budget,out,captions)?;}}for cell in &t.cells{for p in &cell.paragraphs{paragraph_supplements(p,depth+1,budget,out,captions)?;}}},
+   _=>return None,
+  }}
+  Some(())
+@@ -62,14 +70,15 @@
+ /// Exhaustive original and target content binding, including unknown raw data.
+ /// Runtime seals/observers are deliberately not transformed into raw authority.
+ /// Initial frame proof does not load opaque/lazy binary resources: they refuse.
+-fn document_digest(doc:&Document,resource:[u8;32],generation:[u8;32])->Option<[u8;32]>{
++fn document_digest(doc:&Document,resource:[u8;32],generation:[u8;32])->Option<[u8;32]>{document_digest157(doc,resource,generation,false)}
++pub(super) fn document_digest157(doc:&Document,resource:[u8;32],generation:[u8;32],captions:bool)->Option<[u8;32]>{
+  let Document{header,doc_properties,doc_info,sections,preview,bin_data_content,extra_streams,hwpx_aux_entries,
+   is_hwp3_variant,is_hwpx_variant,provenance}=doc;
+  if !bin_data_content.is_empty()||sections.is_empty()||sections.len()>256{return None;}
+  let mut supplements=Vec::new();let mut supplement_budget=MAX_BYTES;
+  for section in sections{
+   if !section.section_def.master_pages.is_empty(){return None;}
+-  for p in &section.paragraphs{paragraph_supplements(p,0,&mut supplement_budget,&mut supplements)?;}
++  for p in &section.paragraphs{paragraph_supplements(p,0,&mut supplement_budget,&mut supplements,captions)?;}
+  }
+  let FileHeader{version,flags,compressed,encrypted,distribution,raw_data}=header;
+  let HwpVersion{major,minor,build,revision}=version;
+--- a/src/serializer/hwpx/mod.rs
++++ b/src/serializer/hwpx/mod.rs
+@@ -64,12 +64,18 @@
+ enum RowProjection<'plan,'doc>{
+     Legacy(Option<&'plan standard_rows::CurrentStandardRowsProjection>),
+     Current(&'plan current_frame_rows::CurrentFrameRowsProjection<'doc>),
++    Caption157(&'plan current_caption_rows157::CurrentCaptionRowsProjection157<'doc>),
+ }
+ 
+ pub(crate) fn serialize_hwpx_with_frame_rows(doc:&Document,projection:&current_frame_rows::CurrentFrameRowsProjection<'_>)->Result<SerializedDocument,SerializeError>{
+     serialize_hwpx_with_projection(doc,RowProjection::Current(projection))
+ }
+ 
++pub(crate) fn serialize_hwpx_with_caption_rows157(doc:&Document,p:&current_caption_rows157::CurrentCaptionRowsProjection157<'_>)->Result<SerializedDocument,SerializeError>{serialize_hwpx_with_projection(doc,RowProjection::Caption157(p))}
++pub(crate) fn serialize_hwpx_with_caption_rows157_and_password(doc:&Document,p:&current_caption_rows157::CurrentCaptionRowsProjection157<'_>,password:&[u8])->Result<SerializedDocument,SerializeError>{
++ let serialized=serialize_hwpx_with_caption_rows157(doc,p)?;
++ let (plain,loss)=serialized.into_parts();Ok(SerializedDocument::new(encrypt_hwpx_bytes(&plain,password)?,loss))
++}
+ fn serialize_hwpx_with_projection(doc:&Document,projection:RowProjection<'_,'_>)->Result<SerializedDocument,SerializeError>{
+     use static_assets::*;
+     // Malformed native preview bytes have an opaque HWP owner, not XML text.
+@@ -84,6 +90,8 @@
+     let mut ctx = SerializeContext::collect_from_document(doc);
+     ctx.current_standard_rows=match projection{
+         RowProjection::Legacy(projection)=>projection.and_then(|p|p.bind_for_export(doc)).unwrap_or_default(),
++        RowProjection::Caption157(projection)=>{ctx.current_caption_rows157=projection.bind_for_export(doc)
++            .ok_or_else(||SerializeError::UnsupportedInput("CURRENT_CAPTION_EXPORT_INPUT_CHANGED".into()))?;Default::default()},
+         RowProjection::Current(projection)=>projection.bind_for_export(doc)
+             .ok_or_else(||SerializeError::UnsupportedInput("CURRENT_FRAME_EXPORT_INPUT_CHANGED".into()))?,
+     };
+@@ -2245,3 +2253,4 @@
+ }
+ 
+ pub(crate) mod current_frame_rows;
++pub(crate) mod current_caption_rows157;
+--- a/src/serializer/hwpx/section.rs
++++ b/src/serializer/hwpx/section.rs
+@@ -868,7 +868,8 @@
+     // A current export projection is a separate input, never a replacement of
+     // source LINE_SEG, its source-vpos snapshot, or any model ownership field.
+     let projected = (ctx.sub_list_depth==0).then(||ctx.current_standard_rows
+-        .get(&(para as *const Paragraph as usize)).cloned()).flatten();
++        .get(&(para as *const Paragraph as usize)).cloned()).flatten()
++        .or_else(||ctx.current_caption_rows157.get(&(para as *const Paragraph as usize)).cloned());
+     let fresh_projection=projected.is_some();
+     let serializable_line_segs = projected.as_deref().unwrap_or_else(||para.serializable_line_segs());
+     let rebased_line_segs: Option<Vec<LineSeg>> = ((!hwp5_only_slot_positions.is_empty()

@@ -1,0 +1,162 @@
+{
+  "base": "source-c95d08a807583f1e",
+  "records": [
+    {
+      "peer": "n001-negative157/handoff-final",
+      "path": "src/document_core/commands/document.rs",
+      "base": "7fb0bb8d8af0f286969168f1e80c9135ad937aa5aee6ce09f086b151d6cbfb1a",
+      "current": "7fb0bb8d8af0f286969168f1e80c9135ad937aa5aee6ce09f086b151d6cbfb1a",
+      "incoming": "8db924d998a25b235a5470c1678d1e298c5f24714eb835dc61ba8ac13d31d3c1",
+      "merged": "8db924d998a25b235a5470c1678d1e298c5f24714eb835dc61ba8ac13d31d3c1",
+      "method": "exact-parent"
+    },
+    {
+      "peer": "n001-negative157/handoff-final",
+      "path": "src/document_core/queries/rendering.rs",
+      "base": "29f16336a93c6bd339838449322321fc861221e3adba93a579a6b4404f1d9dc0",
+      "current": "29f16336a93c6bd339838449322321fc861221e3adba93a579a6b4404f1d9dc0",
+      "incoming": "ea0929c25c63d80b82b064992eb5afa876803c0dc8de4362b1bc0295d9ba7573",
+      "merged": "ea0929c25c63d80b82b064992eb5afa876803c0dc8de4362b1bc0295d9ba7573",
+      "method": "exact-parent"
+    },
+    {
+      "peer": "n001-negative157/handoff-final",
+      "path": "src/renderer/current_frame_rows_plan.rs",
+      "base": "b80f386e96f4dd3cde3986b7368d1c996bbca8bf0df6669f33989aa1e49dee91",
+      "current": "b80f386e96f4dd3cde3986b7368d1c996bbca8bf0df6669f33989aa1e49dee91",
+      "incoming": "e6c18b49f66b11467f2e8b8afde96d97b647e30ce14475eddd95aad09da7e5fe",
+      "merged": "e6c18b49f66b11467f2e8b8afde96d97b647e30ce14475eddd95aad09da7e5fe",
+      "method": "exact-parent"
+    },
+    {
+      "peer": "n001-negative157/handoff-final",
+      "path": "src/renderer/current_offset_frame.rs",
+      "base": "20ac39811ecc3fadda10d469d0018213e7d084b01fa718d4b336c02fb90c1737",
+      "current": "20ac39811ecc3fadda10d469d0018213e7d084b01fa718d4b336c02fb90c1737",
+      "incoming": "69fd1eb72be2d738a9011c6ee9d9ae0fd0e5ba658dbc68106c06cf6094ed5136",
+      "merged": "69fd1eb72be2d738a9011c6ee9d9ae0fd0e5ba658dbc68106c06cf6094ed5136",
+      "method": "exact-parent"
+    },
+    {
+      "peer": "n001-negative157/handoff-final",
+      "path": "src/renderer/current_signed_column157.rs",
+      "base": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "current": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "incoming": "c4460643cfcf41ca1b1d461ba22abb1aed0f4ccf245e81027d888fa6aed40637",
+      "merged": "c4460643cfcf41ca1b1d461ba22abb1aed0f4ccf245e81027d888fa6aed40637",
+      "method": "exact-parent"
+    },
+    {
+      "peer": "n001-caption157/handoff-tac32-final",
+      "path": "src/document_core/commands/caption_export157.rs",
+      "base": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "current": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "incoming": "1dd0308ed2a2e011a638e4282b41e9f6804429f05f8658050d701769d9528c41",
+      "merged": "1dd0308ed2a2e011a638e4282b41e9f6804429f05f8658050d701769d9528c41",
+      "method": "exact-parent"
+    },
+    {
+      "peer": "n001-caption157/handoff-tac32-final",
+      "path": "src/document_core/commands/document.rs",
+      "base": "7fb0bb8d8af0f286969168f1e80c9135ad937aa5aee6ce09f086b151d6cbfb1a",
+      "current": "8db924d998a25b235a5470c1678d1e298c5f24714eb835dc61ba8ac13d31d3c1",
+      "incoming": "b7e9d4823b9da92ed016c5ef82936c729813c2e941856a4146927de2109746b7",
+      "merged": "d977f840d7d33aef3ac9c70af500e8084594b18cbe4a3ce9439bacc7f8b280a1",
+      "method": "three-way-no-conflicts"
+    },
+    {
+      "peer": "n001-caption157/handoff-tac32-final",
+      "path": "src/renderer/current_caption_rows157.rs",
+      "base": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "current": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "incoming": "98f1c113cbdd0eeb318922d2995bf615cb30d077636f7b6988b6815a167056e2",
+      "merged": "98f1c113cbdd0eeb318922d2995bf615cb30d077636f7b6988b6815a167056e2",
+      "method": "exact-parent"
+    },
+    {
+      "peer": "n001-caption157/handoff-tac32-final",
+      "path": "src/renderer/current_caption_rows157_tests.rs",
+      "base": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "current": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "incoming": "4ba09315dda2d97537255c4198c6a76e81fd7c9ca67a924470ef495644cfefc8",
+      "merged": "4ba09315dda2d97537255c4198c6a76e81fd7c9ca67a924470ef495644cfefc8",
+      "method": "exact-parent"
+    },
+    {
+      "peer": "n001-caption157/handoff-tac32-final",
+      "path": "src/renderer/current_frame_rows_plan.rs",
+      "base": "b80f386e96f4dd3cde3986b7368d1c996bbca8bf0df6669f33989aa1e49dee91",
+      "current": "e6c18b49f66b11467f2e8b8afde96d97b647e30ce14475eddd95aad09da7e5fe",
+      "incoming": "9ee7e8c58804d36afa2348598205a9ec4425c7a333719ae7d402dfd048912d4e",
+      "merged": "29abf41592b7312b8bf1811bf209faabdc521b8c815c43bffc11ba18807eb7e0",
+      "method": "three-way-no-conflicts"
+    },
+    {
+      "peer": "n001-caption157/handoff-tac32-final",
+      "path": "src/renderer/current_physical_selections.rs",
+      "base": "73a67eee9867fff6424c37f69d4b18c0488e07a8f920ab2400dd5585e744b2ef",
+      "current": "73a67eee9867fff6424c37f69d4b18c0488e07a8f920ab2400dd5585e744b2ef",
+      "incoming": "5fb85a67c2ad60b8870208ca7602852c7d55e16def072f1002cde22caf729791",
+      "merged": "5fb85a67c2ad60b8870208ca7602852c7d55e16def072f1002cde22caf729791",
+      "method": "exact-parent"
+    },
+    {
+      "peer": "n001-caption157/handoff-tac32-final",
+      "path": "src/renderer/layout/picture_footnote.rs",
+      "base": "4ad50e689fd56b10041cd330313383cdd92a175714e0de295186194bf7461884",
+      "current": "4ad50e689fd56b10041cd330313383cdd92a175714e0de295186194bf7461884",
+      "incoming": "c1fb79ae7480fc8a3faca5a2c3807e89560001d823d31991b88f8656ef941cbe",
+      "merged": "c1fb79ae7480fc8a3faca5a2c3807e89560001d823d31991b88f8656ef941cbe",
+      "method": "exact-parent"
+    },
+    {
+      "peer": "n001-caption157/handoff-tac32-final",
+      "path": "src/serializer/hwpx/context.rs",
+      "base": "53ea1bfcbb559727747dfb9a0eaa3f2cfbd7adeffb774266c5ba234795d2918e",
+      "current": "53ea1bfcbb559727747dfb9a0eaa3f2cfbd7adeffb774266c5ba234795d2918e",
+      "incoming": "37ff58298bcf33eeb9d51c35349fe5d4ab492ccf1bd6654db68230fca492f5c2",
+      "merged": "37ff58298bcf33eeb9d51c35349fe5d4ab492ccf1bd6654db68230fca492f5c2",
+      "method": "exact-parent"
+    },
+    {
+      "peer": "n001-caption157/handoff-tac32-final",
+      "path": "src/serializer/hwpx/current_caption_rows157.rs",
+      "base": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "current": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "incoming": "5e8f3140d45ae2d735d39950a30aef11acdc46ae9c9582654cb5623638254221",
+      "merged": "5e8f3140d45ae2d735d39950a30aef11acdc46ae9c9582654cb5623638254221",
+      "method": "exact-parent"
+    },
+    {
+      "peer": "n001-caption157/handoff-tac32-final",
+      "path": "src/serializer/hwpx/current_frame_rows.rs",
+      "base": "49a0b0624bd11e20e85f05d6fbd879073559d37c894dddf333af949e94037a44",
+      "current": "49a0b0624bd11e20e85f05d6fbd879073559d37c894dddf333af949e94037a44",
+      "incoming": "d3e7a8b8744b6fb517533d682e5b9dcccef2e3428c5480ccfb1583d950e0900f",
+      "merged": "d3e7a8b8744b6fb517533d682e5b9dcccef2e3428c5480ccfb1583d950e0900f",
+      "method": "exact-parent"
+    },
+    {
+      "peer": "n001-caption157/handoff-tac32-final",
+      "path": "src/serializer/hwpx/mod.rs",
+      "base": "f2605df485b01baca6bb8009ead84a75d687683280122aa3c42936b7fc6ad40b",
+      "current": "f2605df485b01baca6bb8009ead84a75d687683280122aa3c42936b7fc6ad40b",
+      "incoming": "fb42687e1f78452845bf041707d5c6a229d98c0683603ffd4f3f4f923a406cd6",
+      "merged": "fb42687e1f78452845bf041707d5c6a229d98c0683603ffd4f3f4f923a406cd6",
+      "method": "exact-parent"
+    },
+    {
+      "peer": "n001-caption157/handoff-tac32-final",
+      "path": "src/serializer/hwpx/section.rs",
+      "base": "96f93042c5c971556494655dcf782ad2b2d1029a34e60f71448deb734f0bf716",
+      "current": "96f93042c5c971556494655dcf782ad2b2d1029a34e60f71448deb734f0bf716",
+      "incoming": "2cb64551a320d5c88ce89f6e69f361a2bd6f69f5c843af258c0eab43f30a6d27",
+      "merged": "2cb64551a320d5c88ce89f6e69f361a2bd6f69f5c843af258c0eab43f30a6d27",
+      "method": "exact-parent"
+    }
+  ],
+  "resourceCount": 298,
+  "resourceSha256": "0c21103f9fe0e9067b67da855c69ac4967e07390ffc44234d7566de35ca563bb",
+  "patchSha256": "3dbaeb97a02c15d1c1b982ec73fb5052d74afced6c586afa0cfba28dd85172b1",
+  "runtimeDiagnosticLibIncluded": false
+}

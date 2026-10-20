@@ -1,0 +1,22 @@
+{
+  "baseSource": "build/rhwp-engine/source-1617ebf8dff38fe6",
+  "files": [
+    {
+      "path": "src/renderer/current_allocated_empty152.rs",
+      "baseCanonicalSha256": "af7ca6f5b23186e88afa99cd43a535fef3fbee5a4a1c875758754b61c8e1eea9",
+      "rawSha256": "1f30cad65f9d0b972fe1a9b7f05613c27094d9ba7b911805aa93f831bab55d58",
+      "canonicalSha256": "1f30cad65f9d0b972fe1a9b7f05613c27094d9ba7b911805aa93f831bab55d58"
+    }
+  ],
+  "excluded": [
+    {
+      "path": "src/lib.rs",
+      "rawSha256": "df251d93657506455af860d67b37eb0af9c1972cd5c6029a73aafc7176db826d",
+      "reason": "excluded Native-only wrappers"
+    }
+  ],
+  "newResourceInputs": [],
+  "resource": "existing292 inputs; changed existing current_allocated_empty152.rs content requires root recomputation",
+  "patchSha256": "a7002ad6f080b5977b4667e144f34ac9d44b47fd6dd046530ffedc5ac47a8d27",
+  "unchangedSourceFiles": 1126
+}

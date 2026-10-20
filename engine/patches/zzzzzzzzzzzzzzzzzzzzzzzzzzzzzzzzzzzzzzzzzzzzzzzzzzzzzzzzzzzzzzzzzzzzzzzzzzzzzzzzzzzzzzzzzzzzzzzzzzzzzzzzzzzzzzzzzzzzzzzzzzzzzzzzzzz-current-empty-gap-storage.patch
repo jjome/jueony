@@ -1,0 +1,78 @@
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[147, 251, 189, 87, 40, 106, 64, 73, 191, 216, 19, 41, 255, 67, 52, 209, 61, 111, 37, 21, 254, 84, 121, 95, 39, 127, 225, 22, 50, 69, 150, 88];
++pub(crate) const RESOURCE:[u8;32]=[126, 6, 138, 167, 93, 154, 68, 103, 187, 235, 6, 252, 248, 231, 38, 244, 82, 154, 166, 102, 125, 113, 89, 21, 250, 124, 244, 209, 146, 75, 254, 167];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+--- a/src/renderer/current_allocated_empty152.rs
++++ b/src/renderer/current_allocated_empty152.rs
+@@ -24,12 +24,19 @@
+  pub(crate) fn from_current(trace:&FinalizedSelectedCompositionTrace,result:&PaginationResult,ps:&[Paragraph],styles:&ResolvedStyleSet,profile:crate::model::provenance::LayoutCompatibilityProfile,dpi:f64)->Self {
+   let mut entries=vec![];
+   if dpi!=super::DEFAULT_DPI||styles.reset_flow_context.is_none()||!trace.matches_source(ps,styles.reset_flow_context,profile,dpi)||!trace.matches_finalized_result(result){return Self{entries,context:styles.reset_flow_context,dpi};}
++  // This refinement owns an allocated gap before downstream source content.
++  // Terminal imported empty paragraphs retain the ordinary legacy visibility;
++  // their stale width is not a reason to expose previously hidden empty runs.
++  // Only actual final body items count; declarations or unallocated stories do not.
++  let Some(last_content)=last_allocated_source_content(ps,result.pages.iter().flat_map(|p|p.column_contents.iter().flat_map(|c|c.items.iter())))else{
++   return Self{entries,context:styles.reset_flow_context,dpi};
++  };
+   // Index the bounded actual commit set once; do not rescan every commit for
+   // every empty paragraph in a large section. Duplicate owners remain absent.
+   let mut commits=std::collections::HashMap::new();
+   for c in trace.commits(){commits.entry(c.paragraph).and_modify(|v|*v=None).or_insert(Some(c));}
+   for (index,p) in ps.iter().enumerate(){
+-   if !p.text.is_empty()||!p.controls.is_empty(){continue;}
++   if index>=last_content||!p.text.is_empty()||!p.controls.is_empty(){continue;}
+    let Some(Some(c))=commits.get(&index)else{continue;};
+    if c.section!=trace.section()||c.row_start!=0||c.row_end!=1||c.final_membership!=Some(true)
+     ||!c.paragraph_token_matches||!c.metrics_still_match_selected_format||!c.range_inside_selected_composition||c.trimmed_before!=0.0{continue;}
+@@ -96,6 +103,22 @@
+   Some(Arc::clone(&e.composition))
+  }
+ }
++/// Scope only: current complete source and finalized membership were checked
++/// by from_current. This does not create placement, row or cache authority.
++fn last_allocated_source_content<'a>(ps:&[Paragraph],items:impl IntoIterator<Item=&'a PageItem>)->Option<usize>{
++ use crate::model::control::Control;
++ let mut last=None;
++ for item in items{let index=match item{
++  PageItem::FullParagraph{para_index}|PageItem::PartialParagraph{para_index,..}=>{
++   let Some(p)=ps.get(*para_index)else{continue;};
++   if p.text.is_empty()&&!p.controls.iter().any(|c|matches!(c,Control::Table(_))){continue;}*para_index
++  },
++  PageItem::Table{para_index,control_index}|PageItem::PartialTable{para_index,control_index,..}=>{
++   if !ps.get(*para_index).and_then(|p|p.controls.get(*control_index)).is_some_and(|c|matches!(c,Control::Table(_))){continue;}*para_index
++  },_=>continue,
++ };last=Some(last.map_or(index,|n:usize|n.max(index)));}
++ last
++}
+ fn same_empty(a:&ComposedParagraph,b:&ComposedParagraph)->bool{
+  let ComposedParagraph{lines,para_style_id,inline_controls,numbering_text,tac_controls,footnote_positions,tab_extended,horizontal_shaping}=b;
+  let [x]=a.lines.as_slice()else{return false;};let [y]=lines.as_slice()else{return false;};
+@@ -113,6 +136,20 @@
+ #[cfg(test)]
+ mod tests {
+  use super::*;
++ #[test]fn allocated_empty_gap_scope_does_not_expose_terminal_imported_empty_paragraphs(){
++  let mut ps=vec![Paragraph::default();5];ps[0].text="body".into();ps[2].text="downstream".into();ps[4].text="unallocated source text".into();
++  let items=vec![PageItem::FullParagraph{para_index:0},PageItem::FullParagraph{para_index:1},PageItem::FullParagraph{para_index:2},PageItem::FullParagraph{para_index:3}];
++  assert_eq!(last_allocated_source_content(&ps,&items),Some(2));
++  assert!(1<last_allocated_source_content(&ps,&items).unwrap());assert!(3>=last_allocated_source_content(&ps,&items).unwrap());
++  ps[2].text.clear();assert_eq!(last_allocated_source_content(&ps,&items),Some(0));
++  ps[0].text.clear();assert_eq!(last_allocated_source_content(&ps,&items),None);
++  ps[2].controls.push(crate::model::control::Control::ColumnDef(Default::default()));
++  assert_eq!(last_allocated_source_content(&ps,&items),None);
++  ps[2].controls.clear();ps[2].controls.push(crate::model::control::Control::Table(Default::default()));
++  assert_eq!(last_allocated_source_content(&ps,&items),Some(2));
++  let malformed=vec![PageItem::Table{para_index:4,control_index:0},PageItem::FullParagraph{para_index:99}];
++  assert_eq!(last_allocated_source_content(&ps,&malformed),None);
++ }
+  #[test]fn allocated_empty_vertical_and_physical_bounds(){
+   let v=|h,s,t,f,b,a,d,x,y,z|vertical_allocation(h,s,t,f,b,a,d,x,y,z);
+   assert!(v(10.0,6.0,16.0,10.0,0.0,0.0,16.0,20.0,36.0,100.0));

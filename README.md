@@ -1,6 +1,6 @@
 # Jueony — 공무원용 AI 문서 편집기
 
-[파일·저장·복구 최신 구현 현황](docs/132-n001-current-table-hosts-storage.md) — **Rust151: 실제 표 높이·분할 본문·혼합 형식 후속 저장 수정.** 합본501/501·단위1036·Native39·공개56·앱29·표호스트24·다른구역12 통과. 고정 문서86/88이며 불균등3단 위치 지정 표의 HWPX2 결함을 계속 수정합니다. 한글 직접 비교는 보류합니다.
+[파일·저장·복구 최신 구현 현황](docs/133-n001-complex-layout-completion.md) — **기록된 일반 복합 배치 저장 회귀 폐쇄.** Rust159 고정88/88·연속 저장16/16·디스크112회·이력32쌍·암호 거절56회·합본501·단위1036 통과. 세부 구현23/24, 종합 검증22/24이며 일반 전체 지원범위·한글 직접 비교는 별도입니다.
 
 ## [전체 진행 현황 · 기능별 작업 문서 바로가기](docs/jueony-progress.md)
 
@@ -14,7 +14,7 @@
 | [AI 연결·Agent 실행](<docs/features/02-agent-and-models.md>) | — | 14/20 · 부분 2 | 9/20 · 부분 3 | 13/19 | 구현 [N024](<docs/features/02-agent-and-models.md#n024>) 브라우저 인증 링크 기반 계정 연결 |
 | [참고 자료·검색·RAG](<docs/features/03-references-and-rag.md>) | — | 5/10 · 부분 2 | 4/10 · 부분 1 | 1/6 | 구현 [N033](<docs/features/03-references-and-rag.md#n033>) 검색 순위·구본 우선 문제와 무답 판별 |
 | [반복 작업·공무원 업무 양식](<docs/features/04-macros-and-business.md>) | 0/5 | 3/6 · 부분 1 | 3/6 | 3/6 | 구현 [N038](<docs/features/04-macros-and-business.md#n038>) 반복 작업의 표·개체 명령 확장 |
-| [파일·저장·복구·형식 보존](<docs/features/05-files-storage-recovery.md>) | 0/10 | 23/24 · 부분 1 | 22/24 · 부분 2 | 6/6 | N001 Rust151 · 고정86/88 · 공개56·앱29·혼합24 통과 · 불균등 오프셋 HWPX2 잔여 · 구현 [N001](<docs/features/05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존 |
+| [파일·저장·복구·형식 보존](<docs/features/05-files-storage-recovery.md>) | 0/10 | 23/24 · 부분 1 | 22/24 · 부분 2 | 6/6 | N001 기록 회귀 폐쇄 · 고정88/88·연속16/16 · 일반 전체 범위·한글 비교 별도 · 구현 [N001](<docs/features/05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존 |
 | [본문 편집·입력·선택·찾기](<docs/features/06-editing-and-selection.md>) | 0/20 | 7/7 | 0/7 · 부분 7 | 4/4 | 검증 [A001](<docs/features/06-editing-and-selection.md#a001>) 새 본문 문서 작성 |
 | [글자·문단·스타일·번호](<docs/features/07-formatting-and-styles.md>) | 0/18 | 19/23 · 부분 2 | 0/23 · 부분 19 | 13/16 | 구현 [N011](<docs/features/07-formatting-and-styles.md#n011>) 스타일 가져오기·내보내기 |
 | [표·셀·크기·계산](<docs/features/08-tables.md>) | 0/24 | 32/38 · 부분 2 | 3/38 · 부분 31 | 26/33 · 부분 3 | 구현 [N004](<docs/features/08-tables.md#n004>) 기존 병합 원본의 후속 Agent 셀 편집 |

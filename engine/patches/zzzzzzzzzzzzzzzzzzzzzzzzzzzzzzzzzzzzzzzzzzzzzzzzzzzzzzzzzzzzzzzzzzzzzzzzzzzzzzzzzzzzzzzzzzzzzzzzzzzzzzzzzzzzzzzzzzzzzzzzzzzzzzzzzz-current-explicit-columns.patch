@@ -1,0 +1,219 @@
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[166, 94, 79, 131, 55, 216, 60, 92, 49, 59, 164, 111, 177, 229, 115, 176, 129, 83, 108, 1, 229, 157, 51, 240, 183, 146, 211, 94, 81, 216, 186, 22];
++pub(crate) const RESOURCE:[u8;32]=[147, 251, 189, 87, 40, 106, 64, 73, 191, 216, 19, 41, 255, 67, 52, 209, 61, 111, 37, 21, 254, 84, 121, 95, 39, 127, 225, 22, 50, 69, 150, 88];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -298,6 +298,7 @@
+             ("src/renderer/current_unequal_tail_multi148.rs",include_bytes!("../renderer/current_unequal_tail_multi148.rs").as_slice()),
+             ("src/renderer/current_whole_section_wrap153.rs",include_bytes!("../renderer/current_whole_section_wrap153.rs").as_slice()),
+             ("src/renderer/typeset/paragraph/actual_suffix148.rs",include_bytes!("../renderer/typeset/paragraph/actual_suffix148.rs").as_slice()),
++            ("src/renderer/current_multiframe135_tests.rs",include_bytes!("../renderer/current_multiframe135_tests.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- a/src/renderer/current_explicit_column138.rs
++++ b/src/renderer/current_explicit_column138.rs
+@@ -14,7 +14,10 @@
+    }}
+   }}
+   let ps=&source.sections[0].paragraphs;let styles=core.resolve_render_styles_for_section(0);let context=source.reset_flow_contexts().first().copied().flatten()?;
+-  let reserved=core.layout_engine.calculate_body_wide_shape_reserved(ps,&page.column_contents,&page.layout.body_area);if reserved.is_empty(){return None;}
++  let reserved=core.layout_engine.calculate_body_wide_shape_reserved(ps,&page.column_contents,&page.layout.body_area);
++  let origin=if reserved.is_empty(){
++   ExplicitColumnOrigin158::Independent(IndependentParaColumns158::from_current(source,result)?)
++  }else{
+   let mut maximum=page.layout.body_area.y;
+   for(pi,bottom)in reserved{let p=ps.get(pi)?;let [crate::model::control::Control::Table(table)]=p.controls.as_slice()else{return None;};
+    let mut measured=core.measured_tables[0].iter().filter(|m|m.para_index==pi&&m.control_index==0);let m=measured.next()?;if measured.next().is_some(){return None;}
+@@ -22,7 +25,9 @@
+    maximum=maximum.max(bottom);
+   }
+   let reservation=maximum-page.layout.body_area.y;if reservation<=0.0||reservation>=page.layout.body_area.height{return None;}
+-  let mut frames=vec![];let mut start=0;for column in 0..page.column_contents.len(){let frame=Self::column(source,core.source_format,result,&styles,&core.measured_tables[0],core.effective_layout_profile(),core.dpi,column,start,reservation,context)?;start+=page.column_contents[column].items.len();frames.push(frame);}
++  ExplicitColumnOrigin158::AbsoluteReservation(reservation)
++  };
++  let mut frames=vec![];let mut start=0;for column in 0..page.column_contents.len(){let frame=Self::column(source,core.source_format,result,&styles,&core.measured_tables[0],core.effective_layout_profile(),core.dpi,column,start,origin,context)?;start+=page.column_contents[column].items.len();frames.push(frame);}
+   if start!=ps.len()||frames.iter().flat_map(|f|&f.rows).map(|p|p.rows.len()).sum::<usize>()>4096{return None;}
+   let mut h=blake3::Hasher::new();h.update(b"current-explicit-columns138-receipt-only-1\0");for frame in &frames{h.update(&frame.generation);}let generation=*h.finalize().as_bytes();
+   let paint=CurrentFramePaintPlan{source_paragraphs:ps.as_ptr()as usize,generation,section:0,page:0,column:0,rect:page.layout.column_areas[0],tables:Vec::new(),additional_frames:Vec::new()};
+@@ -46,7 +51,7 @@
+     }
+    }
+    for table in &candidate.tables{let mut actual=physical.tables()?.iter().filter(|t|t.node==frame.node&&t.paragraph==table.paragraph&&t.control==table.control);let t=actual.next()?;let border=t.emitted_border?;
+-    if actual.next().is_some()||t.inline||t.treat_as_char||t.typed_float||t.selected_outer_inset!=0.0||!arithmetic_equal(t.incoming_y,table.top)||!arithmetic_equal(t.paragraph_y,table.top)||!arithmetic_equal(t.selected_y,table.top)||!arithmetic_equal(border[1],table.top)||!arithmetic_equal(t.visual_height,table.body)||!arithmetic_equal(border[3],table.body)||!arithmetic_equal(t.visual_end,table.top+table.body)||!arithmetic_equal(t.flow_end,table.top+table.body){return None;}
++    if actual.next().is_some()||t.inline||t.treat_as_char||t.typed_float||t.selected_outer_inset!=0.0||!arithmetic_equal(t.incoming_y,table.top)||!arithmetic_equal(t.paragraph_y,table.standard_anchor.unwrap_or(table.top))||!arithmetic_equal(t.selected_y,table.top)||!arithmetic_equal(border[1],table.top)||!arithmetic_equal(t.visual_height,table.body)||!arithmetic_equal(border[3],table.body)||!arithmetic_equal(t.visual_end,table.top+table.body)||!arithmetic_equal(t.flow_end,table.top+table.body){return None;}
+    }
+    rows.extend(candidate.rows);
+   }
+@@ -54,8 +59,9 @@
+  }
+  fn column(source:&'doc Document,format:crate::parser::FileFormat,result:&super::super::pagination::PaginationResult,
+  styles:&super::super::style_resolver::ResolvedStyleSet,measured:&[super::super::height_measurer::MeasuredTable],
+- profile:crate::model::provenance::LayoutCompatibilityProfile,dpi:f64,column_index:usize,start:usize,reservation:f64,definition_context:[u8;32])->Option<CurrentFrameCandidate<'doc>>{
++ profile:crate::model::provenance::LayoutCompatibilityProfile,dpi:f64,column_index:usize,start:usize,origin:ExplicitColumnOrigin158,definition_context:[u8;32])->Option<CurrentFrameCandidate<'doc>>{
+  use super::super::pagination::PageItem;use crate::model::{control::Control,paragraph::ColumnBreakType};
++ let reservation=origin.reservation();
+  if source.sections.len()!=1||source.provenance.hwp3_lineage||!source.bin_data_content.is_empty()||result.pages.len()!=1
+  ||!result.hidden_empty_paras.is_empty()||!result.pre_emitted_host_paras.is_empty()||!result.wrap_around_paras.is_empty()
+  ||!result.endnotes.is_empty()||!result.endnote_paragraphs.is_empty()||dpi!=super::super::DEFAULT_DPI{return None;}
+@@ -98,7 +104,7 @@
+   ||!f.lines.iter().zip(&fresh.composition.lines).all(|(a,b)|fact_line_matches(a,b,empty)){return None;}
+   let total:f64=fresh.rows.iter().map(|r|super::super::hwpunit_to_px(r.line_height+r.line_spacing,dpi)).sum();
+   if !arithmetic_equal(c.advance,total)||!arithmetic_equal(c.flow_after,c.flow_before+total)||c.flow_after>rect.height{return None;}
+-  let y=rect.y+reservation+c.flow_before-col.start_height-unpainted;let mut projected=fresh.rows.clone();let mut offset=0.0;
++  let y=origin.physical_y(rect.y,c.flow_before,col.start_height,unpainted)?;let mut projected=fresh.rows.clone();let mut offset=0.0;
+   for row in &mut projected{row.vertical_pos=integer_hu(y-rect.y+offset,dpi)?;offset+=super::super::hwpunit_to_px(row.line_height+row.line_spacing,dpi);}
+   if !retains_ordinary_standard_body(p,&projected){rows.push(CurrentFrameParagraphRows{kind:CurrentFrameRowKind::FreshBody,section:0,paragraph:*pi,rows:projected});}bodies.push(CandidateBody{paragraph:*pi,physical_y:y,fresh,allow_empty_unused_width:empty});flow=c.flow_after;
+  },PageItem::Table{para_index:pi,control_index:ci}=>{
+@@ -120,7 +126,7 @@
+   ||integer_hu(t.before,dpi)?!=i32::from(table.outer_margin_top)||table.common.vertical_offset!=0{return None;}
+   if t.resolved.is_some()||!col.paragraph_float_placements.is_empty()||!arithmetic_equal(t.flow_after,t.flow_before+t.table_total_height){return None;}
+   let object_anchor=None;
+-  let top=rect.y+reservation+t.flow_before-col.start_height-unpainted;
++  let top=origin.physical_y(rect.y,t.flow_before,col.start_height,unpainted)?;
+   if top<rect.y||top+t.body_height>rect.y+rect.height{return None;}
+   // The structural object row owns no text ink, but its paragraph/font style
+   // context must remain within the same explicit plain frame contract.
+@@ -142,12 +148,19 @@
+    ||generated.baseline_distance<0||generated.baseline_distance>generated.line_height||generated.column_start!=0
+    ||generated.segment_width<=0||f64::from(generated.segment_width)>rect.width*7200.0/dpi{return None;}
+   host.line_segs[0].vertical_pos=integer_hu(top-rect.y-t.before,dpi)?;
+-  if host.line_segs[0].vertical_pos<0{return None;}
+-  rows.push(CurrentFrameParagraphRows{kind:if object_anchor.is_some(){CurrentFrameRowKind::StructuralObjectAnchor}else{CurrentFrameRowKind::FreshBody},section:0,paragraph:*pi,rows:host.line_segs});tables.push(CandidateTable{paragraph:*pi,control:0,incoming:top,standard_anchor:None,top,before:t.before,body:t.body_height,after:t.after_for_fit,object_anchor,declared_border_origin:None});
++  if host.line_segs[0].vertical_pos<0&&!origin.owns_column_start_outer_anchor(column_index,slot,p,t,top,rect.y,host.line_segs[0].vertical_pos,dpi){return None;}
++  // A standard outer-box declaration is consumed only when its complete fresh
++  // row already matches. It is not a source-row lease or an origin guess.
++  let standard_anchor=if matches!(origin,ExplicitColumnOrigin158::Independent(_))&&matches!(format,crate::parser::FileFormat::Hwpx){
++   if p.hwpx_axis_shift!=0||p.line_segs!=host.line_segs
++    ||p.source_line_seg_vertical_pos.as_ref().is_some_and(|v|v.as_slice()!=[host.line_segs[0].vertical_pos]){return None;}
++   Some(rect.y+super::super::hwpunit_to_px(host.line_segs[0].vertical_pos,dpi))
++  }else{None};
++  rows.push(CurrentFrameParagraphRows{kind:if object_anchor.is_some(){CurrentFrameRowKind::StructuralObjectAnchor}else{CurrentFrameRowKind::FreshBody},section:0,paragraph:*pi,rows:host.line_segs});tables.push(CandidateTable{paragraph:*pi,control:0,incoming:top,standard_anchor,top,before:t.before,body:t.body_height,after:t.after_for_fit,object_anchor,declared_border_origin:None});
+   if object_anchor.is_some(){unpainted=0.0;}else{unpainted+=t.before;}flow=t.flow_after;
+  },_=>return None}}
+  if measured.iter().filter(|m|col.items.iter().any(|i|matches!(i,PageItem::Table{para_index,control_index}if *para_index==m.para_index&&*control_index==m.control_index))).count()!=tables.len()||col.paragraph_float_placements.len()!=tables.iter().filter(|t|t.object_anchor.is_some()).count()||!arithmetic_equal(flow,col.used_height){return None;}
+- let mut h=blake3::Hasher::new();h.update(b"current-whole-frame-proof-1\0");h.update(&trace.resource());h.update(&trace.generation().to_le_bytes());h.update(&(column_index as u64).to_le_bytes());h.update(&reservation.to_bits().to_le_bytes());
++ let mut h=blake3::Hasher::new();h.update(b"current-whole-frame-proof-1\0");h.update(&trace.resource());h.update(&trace.generation().to_le_bytes());h.update(&(column_index as u64).to_le_bytes());origin.bind_generation(&mut h);h.update(&reservation.to_bits().to_le_bytes());
+  for t in &tables{h.update(&(t.paragraph as u64).to_le_bytes());for v in[t.top,t.before,t.body,t.after]{h.update(&v.to_bits().to_le_bytes());}match t.object_anchor{Some((a,b,c))=>{h.update(&[1]);h.update(&a.to_bits().to_le_bytes());h.update(&b.to_bits().to_le_bytes());h.update(&c.to_bits().to_le_bytes());},None=>{h.update(&[0]);}}}
+  let generation=*h.finalize().as_bytes();let paint=CurrentFramePaintPlan{source_paragraphs:ps.as_ptr()as usize,generation,section:0,page:0,column:u16::try_from(column_index).ok()?,rect,tables:Vec::new(),additional_frames:Vec::new()};
+  Some(CurrentFrameCandidate{source,paint,bodies,tables,rows,generation})
+@@ -208,3 +221,91 @@
+   || !composition.tab_extended.is_empty() || composition.horizontal_shaping.is_some(){return None;}
+  Some(FreshBodyRows{rows:fresh.line_segs,composition})
+ }
++
++/// The legacy absolute band and an independently accepted paragraph-relative
++/// column are different origins. An absent reservation never defaults to zero.
++#[derive(Clone,Copy)]
++enum ExplicitColumnOrigin158{AbsoluteReservation(f64),Independent(IndependentParaColumns158)}
++#[derive(Clone,Copy)]
++struct IndependentParaColumns158;
++impl IndependentParaColumns158{
++ fn from_current(source:&Document,result:&super::super::pagination::PaginationResult)->Option<Self>{
++  use crate::model::{control::Control,paragraph::ColumnBreakType,shape::{VertRelTo,TextWrap}};
++  use super::super::pagination::PageItem;
++  let [section]=source.sections.as_slice()else{return None;};let [page]=result.pages.as_slice()else{return None;};
++  let trace=result.selected_composition_trace.as_ref()?;
++  if !matches!(page.column_contents.len(),2|3)||page.column_contents.len()!=page.layout.column_areas.len(){return None;}
++  let mut tables=0usize;
++  for(i,p)in section.paragraphs.iter().enumerate(){match p.controls.as_slice(){
++   []=>{},[Control::SectionDef(_),Control::ColumnDef(_)]if i==0=>{},
++   [Control::Table(t)]=>{if t.common.vert_rel_to!=VertRelTo::Para||t.common.text_wrap!=TextWrap::TopAndBottom||t.common.treat_as_char||t.common.vertical_offset!=0{return None;}tables=tables.checked_add(1)?;},
++   _=>return None,
++  }}
++  if tables==0{return None;}
++  for(i,col)in page.column_contents.iter().enumerate(){
++   if col.column_index as usize!=i||col.start_height!=0.0||col.endnote_flow||col.zone_layout.is_some()||col.zone_y_offset!=0.0{return None;}
++   let first=col.items.first()?;let pi=match first{PageItem::FullParagraph{para_index}|PageItem::Table{para_index,..}=>*para_index,_=>return None};
++   let p=section.paragraphs.get(pi)?;
++   if (i==0&&p.column_type!=ColumnBreakType::Section)||(i>0&&p.column_type!=ColumnBreakType::Column){return None;}
++   let flow=match first{
++    PageItem::FullParagraph{..}=>{let mut c=trace.commits().iter().filter(|c|c.paragraph==pi);let f=c.next()?;if c.next().is_some()||f.page!=Some(page.page_index)||f.column as usize!=i||f.committed_item_index!=Some(0)||f.final_membership!=Some(true){return None;}f.flow_before},
++    PageItem::Table{control_index,..}=>{let mut c=trace.whole_tables().iter().filter(|c|c.paragraph==pi&&c.control==*control_index);let f=c.next()?;if c.next().is_some()||f.page!=Some(page.page_index)||f.column as usize!=i||f.committed_item_index!=0||f.final_membership!=Some(true){return None;}f.flow_before},
++    _=>return None,
++   };
++   if flow!=0.0{return None;}
++  }
++  // Full source/style/resource/final-frame, each actual MT and every slot are
++  // mandatory in column(); every actual body/table box is closed in finalize().
++  Some(Self)
++ }
++}
++impl ExplicitColumnOrigin158{
++ fn reservation(self)->f64{match self{Self::AbsoluteReservation(h)=>h,Self::Independent(_)=>0.0}}
++ fn physical_y(self,body:f64,flow:f64,start:f64,unpainted:f64)->Option<f64>{
++  if ![body,flow,start,unpainted].iter().all(|v|v.is_finite())||flow<0.0||unpainted<0.0{return None;}
++  let y=match self{Self::AbsoluteReservation(h)=>body+h+flow-start-unpainted,Self::Independent(_)=>{if start!=0.0{return None;}body+flow-unpainted}};
++  y.is_finite().then_some(y)
++ }
++ fn owns_column_start_outer_anchor(self,column:usize,slot:usize,p:&crate::model::paragraph::Paragraph,t:&super::super::selected_composition_observer127::WholeTableAcceptedFact,top:f64,body:f64,anchor:i32,dpi:f64)->bool{
++  matches!(self,Self::Independent(_))&&column>0&&slot==0&&p.column_type==crate::model::paragraph::ColumnBreakType::Column
++   &&t.flow_before==0.0&&t.pre_text_height==0.0&&t.pre_text_end==0&&t.selected_line_count==1&&t.is_first&&t.is_last
++   &&arithmetic_equal(top,body)&&anchor<0&&integer_hu(t.before,dpi).is_some_and(|before|before>0&&anchor.checked_add(before)==Some(0))
++ }
++ fn bind_generation(self,h:&mut blake3::Hasher){h.update(match self{Self::AbsoluteReservation(_)=>b"absolute-reservation-138".as_slice(),Self::Independent(_)=>b"independent-para-columns-158".as_slice()});}
++}
++
++
++#[cfg(test)]
++mod explicit_origin158_tests {
++ use super::*;
++ use crate::model::paragraph::{Paragraph,ColumnBreakType};
++ use super::super::super::selected_composition_observer127::WholeTableAcceptedFact;
++ fn whole()->WholeTableAcceptedFact{WholeTableAcceptedFact{
++  section:0,page:Some(0),column:1,paragraph:3,control:0,paragraph_token:1,
++  selected_format_id:Some(0),table_total_height:40.0,before:283.0/75.0,body_height:30.0,after_for_fit:0.0,full_after:283.0/75.0,
++  paragraph_start:0.0,flow_before:0.0,flow_after:40.0,post_page:Some(0),post_column:1,
++  pre_text_height:0.0,pre_text_end:0,selected_line_count:1,is_first:true,is_last:true,
++  strict_following_plain_text_fit:false,resolved:None,committed_item_index:0,final_membership:Some(true),finalization_index:Some(0),not_a_source_frame_lease:true,
++ }}
++ #[test]fn explicit_origin158_signed_outer_anchor_is_only_proven_column_start(){
++  let origin=ExplicitColumnOrigin158::Independent(IndependentParaColumns158);
++  let mut p=Paragraph::default();p.column_type=ColumnBreakType::Column;let t=whole();
++  let owns=|c,s,p:&Paragraph,t:&WholeTableAcceptedFact,top,anchor|origin.owns_column_start_outer_anchor(c,s,p,t,top,100.0,anchor,96.0);
++  assert!(owns(1,0,&p,&t,100.0,-283));
++  assert!(!owns(0,0,&p,&t,100.0,-283));assert!(!owns(1,1,&p,&t,100.0,-283));
++  p.column_type=ColumnBreakType::None;assert!(!owns(1,0,&p,&t,100.0,-283));p.column_type=ColumnBreakType::Column;
++  for anchor in [-284,-282,0,i32::MIN,i32::MAX]{assert!(!owns(1,0,&p,&t,100.0,anchor));}
++  for top in [101.0,f64::NAN,f64::INFINITY]{assert!(!owns(1,0,&p,&t,top,-283));}
++  for n in 0..7{let mut bad=t.clone();match n{0=>bad.flow_before=1.0,1=>bad.pre_text_height=1.0,2=>bad.pre_text_end=1,3=>bad.selected_line_count=2,4=>bad.is_first=false,5=>bad.is_last=false,_=>bad.before=f64::NAN};assert!(!owns(1,0,&p,&bad,100.0,-283));}
++  assert!(!ExplicitColumnOrigin158::AbsoluteReservation(40.0).owns_column_start_outer_anchor(1,0,&p,&t,100.0,100.0,-283,96.0));
++ }
++ #[test]fn explicit_origin158_independent_coordinates_do_not_default_invalid_reservation(){
++  let origin=ExplicitColumnOrigin158::Independent(IndependentParaColumns158);
++  assert_eq!(origin.physical_y(100.0,30.0,0.0,4.0),Some(126.0));
++  assert!(origin.physical_y(100.0,30.0,1.0,4.0).is_none());
++  assert!(origin.physical_y(100.0,-1.0,0.0,4.0).is_none());
++  assert!(origin.physical_y(100.0,30.0,0.0,-1.0).is_none());
++  for n in 0..4{let mut v=[100.0,30.0,0.0,4.0];v[n]=f64::NAN;assert!(origin.physical_y(v[0],v[1],v[2],v[3]).is_none());}
++  for(start,reserve)in[(0.0,40.0),(40.0,40.0)]{let old=100.0+reserve+30.0-start-4.0;assert_eq!(ExplicitColumnOrigin158::AbsoluteReservation(reserve).physical_y(100.0,30.0,start,4.0),Some(old));}
++ }
++}
+--- a/src/renderer/current_multiframe135_tests.rs
++++ b/src/renderer/current_multiframe135_tests.rs
+@@ -112,3 +112,19 @@
+ 
+ #[path="current_visible_host145_matrix_tests.rs"]
+ mod visible145_matrix;
++
++
++#[test]fn actual_explicit_origin158_requires_current_break_slot_flow_and_declaration(){
++ let mut core=actual_boundary_core("column2");
++ assert!(CurrentExplicitColumnCandidate::from_core(&core,core.document()).is_some());
++ let reserved=core.layout_engine.calculate_body_wide_shape_reserved(&core.document.sections[0].paragraphs,&core.pagination[0].pages[0].column_contents,&core.pagination[0].pages[0].layout.body_area);assert!(reserved.is_empty());
++ let old=core.document.sections[0].paragraphs[3].column_type;core.document.sections[0].paragraphs[3].column_type=crate::model::paragraph::ColumnBreakType::None;
++ assert!(CurrentExplicitColumnCandidate::from_core(&core,core.document()).is_none());core.document.sections[0].paragraphs[3].column_type=old;
++ core.pagination[0].pages[0].column_contents[1].items.swap(0,1);assert!(CurrentExplicitColumnCandidate::from_core(&core,core.document()).is_none());core.pagination[0].pages[0].column_contents[1].items.swap(0,1);
++ for value in [1.0,-1.0,f64::NAN,f64::INFINITY]{let old=core.pagination[0].pages[0].column_contents[1].start_height;core.pagination[0].pages[0].column_contents[1].start_height=value;assert!(CurrentExplicitColumnCandidate::from_core(&core,core.document()).is_none());core.pagination[0].pages[0].column_contents[1].start_height=old;}
++ let old=core.pagination[0].pages[0].column_contents[1].used_height;core.pagination[0].pages[0].column_contents[1].used_height+=1.0;assert!(CurrentExplicitColumnCandidate::from_core(&core,core.document()).is_none());core.pagination[0].pages[0].column_contents[1].used_height=old;
++ let bytes=core.export_hwpx_native().unwrap();let mut next=crate::DocumentCore::from_bytes(&bytes).unwrap();assert!(CurrentExplicitColumnCandidate::from_core(&next,next.document()).is_some());
++ assert!(next.document.sections[0].paragraphs[3].line_segs[0].vertical_pos<0);
++ for field in 0..9{let old=next.document.sections[0].paragraphs[3].line_segs[0].clone();let row=&mut next.document.sections[0].paragraphs[3].line_segs[0];match field{0=>row.text_start+=1,1=>row.vertical_pos+=1,2=>row.line_height+=1,3=>row.text_height+=1,4=>row.baseline_distance+=1,5=>row.line_spacing+=1,6=>row.column_start+=1,7=>row.segment_width+=1,_=>row.tag^=1};assert!(CurrentExplicitColumnCandidate::from_core(&next,next.document()).is_none());next.document.sections[0].paragraphs[3].line_segs[0]=old;}
++ let physical=next.build_page_tree_with_current_selections(0).unwrap().frame.current_physical_selections.clone();assert!(CurrentExplicitColumnCandidate::from_core(&next,next.document()).unwrap().finalize(&physical).is_some());
++}

@@ -1,0 +1,993 @@
+{
+  "schemaVersion": 1,
+  "status": "READ_ONLY_ACCEPTANCE_MAPPING_DRAFT_NOT_A_DONE_CHANGE",
+  "scope": "N001 original row and docs97 completion rules mapped to actual finite source families and unmet positive proof, not a new feature specification or production change.",
+  "canonicalAuthority": {
+    "path": "docs/jueony-work-checklist.csv",
+    "sha256": "1e35cc9ba8ca23585c52dec50bd99cde857f340af8b6fa6ab94a9900592f2f30",
+    "note": "docs97 explicitly identifies this CSV as status/scope authority. hangul-2024-feature-audit.csv is preserved comparison inventory, not N001 task-state CSV."
+  },
+  "originalRowsUnmodified": {
+    "N001": {
+      "id": "N001",
+      "kind": "TASK",
+      "area": "저장·호환성",
+      "task": "HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존",
+      "implementation": "PARTIAL",
+      "verification": "PARTIAL",
+      "agent": "NA",
+      "auto_check": "PARTIAL",
+      "hancom_check": "PARTIAL",
+      "priority": "P0",
+      "parent": "B153",
+      "depends_on": "",
+      "scope": "확인한 단일 단 HWP 겹침 표·직접 본문 줄·혼합 서식·읽기 전용 책갈피/필드 표시의 흐름·저장 소유를 보강했다. bare LINE_SEG 캐시와 실제 여백/offset을 구분한다. 다단·복합/불명확 원점의 지원 확대는 완료로 표시하지 않는다.",
+      "next_action": "Rust151 실제 표 높이·분할 본문·원점·다른 구역 profile 재조판 수정. 합본501/unit1036/Native39/공개56/앱29/표호스트24/다른구역12·디스크66/분할8·디스크56/불균등16·디스크64/묶음7 통과. 고정86/88: 불균등3단 위치 지정 표→HWPX2만 계속 수정;132참조. 한글 비교 보류.",
+      "ui_command": "",
+      "agent_command": "",
+      "evidence": "docs/100-storage-conversion-and-overlap.md; docs/evidence/overlap-table-tail-2026-10-15/verification-summary.json;docs/105-file-storage-preservation.md;docs/evidence/state-storage-2026-10-16/verification-summary.json;docs/108-file-preservation-completion.md;docs/evidence/file-preservation-2026-10-17/verification-summary.json;docs/109-file-preservation-hancom-followup.md;docs/evidence/file-completion-2026-10-17/engine51/summary.json;docs/evidence/file-completion-2026-10-17/hancom-current68/actual11-formal68.json;docs/110-file-preservation-integration.md;docs/evidence/file-completion-2026-10-18/engine75/summary.json;docs/evidence/file-completion-2026-10-18/engine76/summary.json;docs/evidence/file-completion-2026-10-18/engine80/README.md;docs/evidence/file-completion-2026-10-18/engine82/README.md;docs/evidence/file-completion-2026-10-18/engine83/README.md;docs/111-file-storage-final-review.md;docs/evidence/file-completion-2026-10-18/engine86/README.md;docs/112-file-recovery-implementation.md;docs/113-file-format-preservation.md;docs/evidence/file-completion-2026-10-18/package91/README.md;docs/114-native-row-storage.md;docs/evidence/file-completion-2026-10-18/native-rows92/README.md;docs/115-column-width-storage.md;docs/evidence/file-completion-2026-10-18/columns93/README.md;docs/116-reflowed-native-storage.md;docs/evidence/file-completion-2026-10-18/reflow94/README.md;docs/117-file-storage-closure.md;docs/118-authored-host-storage.md;docs/119-source-table-frame-storage.md;docs/120-native-prefix-storage.md;docs/121-local-edit-storage.md;docs/123-current-stack-and-preview-storage.md;docs/126-n001-encrypted-layout-storage.md;docs/evidence/n001-2026-10-18/encrypted120/README.md;docs/127-n001-legacy-layout-storage.md;docs/evidence/n001-2026-10-18/legacy124/README.md;docs/128-n001-general-layout-storage.md;docs/evidence/n001-2026-10-19/general126/README.md;apps/editor/tests/fixtures/n001-general125-own/README.md;docs/129-n001-current-frame-storage.md;docs/evidence/n001-2026-10-19/general141/README.md;docs/130-n001-column-suffix-storage.md;docs/evidence/n001-2026-10-19/general143/README.md;docs/131-n001-unequal-visible-host-storage.md;docs/evidence/n001-2026-10-19/general146/README.md;docs/132-n001-current-table-hosts-storage.md;docs/evidence/n001-2026-10-19/general151/README.md",
+      "source_status": "PARTIAL;INDEPENDENT_HANCOM_FAILURES_FOUND_AND_FOLLOWUP_2026_10_17;FORMAL80_SCOPED_REGRESSIONS_PASS_CROSS_FORMAT_AND_NATIVE_LINE_FIT_OPEN;FORMAL82_STRICT_ROUNDTRIP_PASS_NATIVE_INTEROP_FOLLOWUP_OPEN;FORMAL83_NOTE_SUMMARY_NATIVE_ROUNDTRIP_INITIAL_PARITY_OPEN;FORMAL86_SAFE_STORAGE_UNSUPPORTED_DIRECTIONS_BLOCKED_NATIVE_GUI_PENDING;COMPUTED_PREFIX94_AUTOMATED_CLOSURE_PASS_NATIVE_PARITY_OPEN;FILE_STORAGE98_CAS_HARDENED_COMBINED328_HISTORY20_UNIT1008_PASS_2026_10_18;AUTHORED_HOST101_OFFICIAL110_WORKFLOWS346_UNIT1008_COLUMNS24_WINDOWS10_BUNDLE7_PASS_NATIVE_EDIT_OPEN;TABLE_FRAME104_OFFICIAL111_WORKFLOWS351_UNIT1008_COLUMNS24_WINDOWS10_BUNDLE7_PASS_NATIVE_EDIT16_FAIL_OPEN;NATIVE_PREFIX106_OFFICIAL113_32_PATHS_160_EXPORTS_PASS_WORKFLOWS387_UNIT1008_PYTHON4_FAIL_OPEN;LOCAL_EDIT107_OFFICIAL114_PYTHON30_150_EXPORTS_UI7_WORKFLOWS387_UNIT1008_RUST35_PASS_LEGACY_RESOURCE_COMPAT_OPEN;STORAGE110_OFFICIAL117_461_AND_LEGACY14_PASS_2026_10_18;N001_ONLY_ENCRYPTED120_WASM7_APP3_PASS_LEGACY_38_AND_OPAQUE_PENDING;N001_ONLY_KNOWN_REFLOW_LEGACY_OPAQUE_ZIP_FIXES_RUST124_CLOSED492_ACROSS485_PLUS7_UNIT1036_NATIVE10_SELECTED8_PASS_ORIGINAL_BROAD_SCOPE_PARTIAL;N001_ONLY_RUST126_COUNT_TAC_EXACT_TAIL_FIX_MERGED501_PASS_UNIT1036_FIXED_CORPUS75_OF88_PUBLIC34_OF56_UI17_OF29_GENERAL_SCOPE_STILL_PARTIAL;N001_ONLY_RUST141_CURRENT_FRAME_OFFSET_EQUAL_STACK_MERGED501_UNIT1036_NATIVE28_WINDOWS11_BUNDLE7_PASS_FIXED79_OF88_PUBLIC52_OF56_APP26_OF29_REMAINING_FAILURES_RETAINED;N001_ONLY_RUST143_EXPLICIT_COLUMNS_SUFFIX_WHOLE_BODY14_DISK28_501_UNIT1036_NATIVE30_BUNDLE7_PUBLIC54_OF56_FIXED79_OF88_APP27_OF29_REMAINING_FAILURES_RETAINED;N001_ONLY_RUST146_UNEQUAL_EMPTY_VISIBLE_XML_HOST_501_UNIT1036_NATIVE32_NEGATIVE28_PUBLIC56_OF56_FIXED83_OF88_APP28_OF29_EXPANDED12_OF24_MIXED_FAILURES_RETAINED;N001_ONLY_RUST151_ACTUAL_TABLE_SPLIT_ROWS_ORIGIN_PROFILE_RECOMPOSE_501_UNIT1036_NATIVE39_PUBLIC56_FIXED86_OF88_APP29_VISIBLE24_PROFILE12_SPLIT8_UNEQUAL_OFFSET_HWPX2_RETAINED"
+    },
+    "G105": {
+      "id": "G105",
+      "kind": "TASK",
+      "area": "저장·호환성",
+      "task": "겹침 표 후속 여러 줄 본문·캡션 원점 보존",
+      "implementation": "DONE",
+      "verification": "DONE",
+      "agent": "NA",
+      "auto_check": "PASS",
+      "hancom_check": "DONE",
+      "priority": "P0",
+      "parent": "N001",
+      "depends_on": "",
+      "scope": "한쪽/한단·정확한 원시 호스트의 Native HWP5에서 직접 본문 줄의 index/vpos/Unicode·UTF16 시작/연속 원문 전체를 일대일 확인해 snapshot 줄 위치만 보정. 캡션 story 소유 분리, raw payload 차이·전체 배치·반복 저장·undo/재적용·실제 UI 저장/재열기 검증.",
+      "next_action": "정식68 최신 편집·저장 출력과 실제 한글 2024 별도 재저장본의 전체 의미·0.2 기준 지면 일치, 양형식 엄격 재저장·재열기까지 완료. 옛 캐시 줄 경계와 복잡 배치 전체는 N001에서 추적한다.",
+      "ui_command": "",
+      "agent_command": "",
+      "evidence": "docs/108-file-preservation-completion.md;docs/evidence/file-preservation-2026-10-17/verification-summary.json;docs/109-file-preservation-hancom-followup.md;docs/evidence/file-completion-2026-10-17/hancom/baseline-failures.json;docs/evidence/file-completion-2026-10-17/hancom-current68/actual11-formal68.json;docs/evidence/file-completion-2026-10-17/hancom-current68/SHA256-MANIFEST.json",
+      "source_status": "SCOPED_IMPLEMENTED;CURRENT_EDIT_SAVE_AND_ACTUAL_HANCOM_VERIFIED_2026_10_17;OLD_CACHE_N001_PARTIAL"
+    },
+    "G106": {
+      "id": "G106",
+      "kind": "TASK",
+      "area": "저장·호환성",
+      "task": "후속 통째 표의 의미 흐름과 실제 양수 offset 보존",
+      "implementation": "DONE",
+      "verification": "DONE",
+      "agent": "NA",
+      "auto_check": "PASS",
+      "hancom_check": "DONE",
+      "priority": "P0",
+      "parent": "N001",
+      "depends_on": "",
+      "scope": "실제 한글 재저장본에 따라 빈 표 host LINE_SEG의 양수 캐시를 사용자 간격으로 취급한 이전 기대를 정정. 확인한 Native 한 단 인접 통째 표의 현재 흐름을 사용하고 실제 문단 여백·명시 offset과 원시 바이트를 보존한다.",
+      "next_action": "확인한 한 단 양수 offset 원본과 실제 한글 사본: 정식73 의미·전체지면0 및 HWP/HWPX 엄격 재저장 통과. Native9쌍의72회 재열기와 실제 API 후속본문 history2 통과. 음수·두 단·불명확 원점은 N001에서 별도 추적.",
+      "ui_command": "",
+      "agent_command": "",
+      "evidence": "docs/108-file-preservation-completion.md;docs/evidence/file-preservation-2026-10-17/verification-summary.json;docs/109-file-preservation-hancom-followup.md;docs/evidence/file-completion-2026-10-17/hancom/baseline-failures.json;docs/evidence/file-completion-2026-10-17/hancom-current68/actual11-formal68.json;docs/110-file-preservation-integration.md;docs/evidence/file-completion-2026-10-18/engine73/summary.json",
+      "source_status": "SCOPED_POSITIVE_OFFSET_ACTUAL_HANCOM_AND_BOTH_FORMAT_RESAVE_PASS_2026_10_18"
+    },
+    "B153": {
+      "id": "B153",
+      "kind": "ROLLUP",
+      "area": "표",
+      "task": "셀 속성",
+      "implementation": "PARTIAL",
+      "verification": "PARTIAL",
+      "agent": "PARTIAL",
+      "auto_check": "PARTIAL",
+      "hancom_check": "NOT_RUN",
+      "priority": "P1",
+      "parent": "",
+      "depends_on": "",
+      "scope": "한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.",
+      "next_action": "2026-10-15: 표 바깥 여백의 HWP/HWPX 모델·저장 불일치 수정, 실제 속성 창 취소·적용·undo/redo·안전 저장·UI 재열기 검증. 모든 속성 조합과 한글 직접 동등성 검수는 남음.",
+      "ui_command": "table:cell-props",
+      "agent_command": "",
+      "evidence": "docs/evidence/hangul-comparison-2026-10-11/editor-code-audit.md; docs/evidence/hangul-comparison-2026-10-11/engine-code-audit.md; docs/evidence/save-table-controls-2026-10-14/verification-summary.json; docs/94-table-width-and-outer-margins.md;docs/105-file-storage-preservation.md;docs/evidence/state-storage-2026-10-16/verification-summary.json",
+      "source_status": "WIRED;BROWSER_TESTED_NATIVE_PENDING"
+    },
+    "N041": {
+      "id": "N041",
+      "kind": "TASK",
+      "area": "저장·호환성",
+      "task": "독립 한글에서 복합 코퍼스 일괄 검수",
+      "implementation": "MISSING",
+      "verification": "NOT_RUN",
+      "agent": "NA",
+      "auto_check": "NOT_RUN",
+      "hancom_check": "NA",
+      "priority": "P1",
+      "parent": "",
+      "depends_on": "",
+      "scope": "문서/쪽/표/그림/필드/폰트·저장/재열기·결함별 증거",
+      "next_action": "반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀",
+      "ui_command": "",
+      "agent_command": "",
+      "evidence": "docs/04-compatibility-validation.md",
+      "source_status": "EXPLICIT_REMAINING_OR_AUDIT"
+    },
+    "N042": {
+      "id": "N042",
+      "kind": "TASK",
+      "area": "저장·호환성",
+      "task": "한글·Jueony 인쇄/PDF 조판 비교",
+      "implementation": "MISSING",
+      "verification": "NOT_RUN",
+      "agent": "NA",
+      "auto_check": "NOT_RUN",
+      "hancom_check": "NOT_RUN",
+      "priority": "P1",
+      "parent": "B019",
+      "depends_on": "",
+      "scope": "같은 폰트/DPI/용지·쪽 수/줄바꿈/개체·차이 분류",
+      "next_action": "반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀",
+      "ui_command": "",
+      "agent_command": "",
+      "evidence": "docs/04-compatibility-validation.md",
+      "source_status": "EXPLICIT_REMAINING_OR_AUDIT"
+    }
+  },
+  "originalScopeStringExact": "확인한 단일 단 HWP 겹침 표·직접 본문 줄·혼합 서식·읽기 전용 책갈피/필드 표시의 흐름·저장 소유를 보강했다. bare LINE_SEG 캐시와 실제 여백/offset을 구분한다. 다단·복합/불명확 원점의 지원 확대는 완료로 표시하지 않는다.",
+  "doneRules": {
+    "implementation": "All source/context/storage/error conditions of the unchanged row implemented, not just safe refusal or observer.",
+    "verification": "Defined automatic and required actual model/Hancom checks done. User-deferred Hancom stays separate and unfinished; same-engine roundtrip is not Hancom parity.",
+    "agent": "N001 NA retained; adding an unrelated Agent command is not required.",
+    "noInfiniteExpansion": "Finite primitive/ownership acceptance plus fixed failures, not every arbitrary document/font/printing equivalence. N041/N042 corpus/Hancom/PDF remain their own rows. B153 rollup remains independent."
+  },
+  "sourceFamilies": {
+    "definition": "22 authored semantic configurations, each preserved as independent Native and XML source =44 sources. Each source x2 output formats =88 assertions, not88 distinct layouts.",
+    "manifest": {
+      "path": "apps/editor/tests/fixtures/n001-general125-own/manifest.json",
+      "sha256": "02bcc13dc1860e7ab8accf943a333eda54ae0878f9f9a9764085d9b8af2c6fa8"
+    },
+    "generator": {
+      "path": "apps/editor/tests/fixtures/n001-general125-own/generate-own.rs",
+      "sha256": "3fe9f18fea043b55b810854ee5533f2de573220dd2cfa5ce33622cc56a09fe54"
+    },
+    "families": [
+      {
+        "native": "one-float.hwp",
+        "nativeSha256": "62f6b0ddaa3906d2f519e7fbda0fb2554eefaf0237c6387cf8b0baa88de35e5f",
+        "xml": "one-float.hwpx",
+        "xmlSha256": "d02f3124121610fee3144236fec00f9a6c3dfcc8d59026aa8da981c9e8e70ec8",
+        "tableCount": 1,
+        "columns": 1,
+        "unequal": false,
+        "shortPage": false,
+        "offset": false,
+        "tac": false,
+        "interleave": false,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "two-float-control.hwp",
+        "nativeSha256": "a9cbceeb3cc4029ae064f2dff47511777229eded6c1b3ea430178feab4418c23",
+        "xml": "two-float-control.hwpx",
+        "xmlSha256": "d9206af6b43017075225c52580eada1d36c56042df6dee7b03e285b8f9fb2b26",
+        "tableCount": 2,
+        "columns": 1,
+        "unequal": false,
+        "shortPage": false,
+        "offset": false,
+        "tac": false,
+        "interleave": false,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "three-float.hwp",
+        "nativeSha256": "bd5a75b9e2ea30b9f3decddb190d4cead9f89c2b12f37cec157a92fcfdc37684",
+        "xml": "three-float.hwpx",
+        "xmlSha256": "d6834a8523b729959291d73a243cdc0e602f230f891471c5f7f5d4d95219e087",
+        "tableCount": 3,
+        "columns": 1,
+        "unequal": false,
+        "shortPage": false,
+        "offset": false,
+        "tac": false,
+        "interleave": false,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "four-float.hwp",
+        "nativeSha256": "847e176f74dc4854a49b10a7d88202fdf535625397c98f68466e72bc829c0644",
+        "xml": "four-float.hwpx",
+        "xmlSha256": "cf4ed947129270bd323acba9f105d71832686b4db3a4d3b4e6e1f18793b54fa1",
+        "tableCount": 4,
+        "columns": 1,
+        "unequal": false,
+        "shortPage": false,
+        "offset": false,
+        "tac": false,
+        "interleave": false,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "three-float-interleaved.hwp",
+        "nativeSha256": "23217d3406a66e43e64e299c25496fe5f0acfa80001b71ba4a0cdedf76b81c17",
+        "xml": "three-float-interleaved.hwpx",
+        "xmlSha256": "c8a38f4231c6747f771c18eaec98f69ca834c377162e8938a2d07a9d1970fc2e",
+        "tableCount": 3,
+        "columns": 1,
+        "unequal": false,
+        "shortPage": false,
+        "offset": false,
+        "tac": false,
+        "interleave": true,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "four-float-interleaved.hwp",
+        "nativeSha256": "806e91ef4c472a5adc13313639802367e35d9f99ad4a4c3f9a8e81cc16c17cc9",
+        "xml": "four-float-interleaved.hwpx",
+        "xmlSha256": "3a4c4f83c6550b83cb727f8e6eea2484719a115bb8f4e7e221d14be2c1080fde",
+        "tableCount": 4,
+        "columns": 1,
+        "unequal": false,
+        "shortPage": false,
+        "offset": false,
+        "tac": false,
+        "interleave": true,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "one-tac.hwp",
+        "nativeSha256": "d696873821b7af1624e912226c76492d95f03ab365a41f5fc043319a595e6672",
+        "xml": "one-tac.hwpx",
+        "xmlSha256": "97d4c56db65d1eaf263928a227a473d2ebf32c1e187633a5666f18fb9d25e42d",
+        "tableCount": 1,
+        "columns": 1,
+        "unequal": false,
+        "shortPage": false,
+        "offset": false,
+        "tac": true,
+        "interleave": false,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "two-tac-control.hwp",
+        "nativeSha256": "7b67582b5e1fd764f3b75451459ef7cc1890ac266c5b914fa6b47b9dc7c66288",
+        "xml": "two-tac-control.hwpx",
+        "xmlSha256": "48252bd6194b301f2256d80fab88e478a4c5d2f66b2835027f59abec8f11f53e",
+        "tableCount": 2,
+        "columns": 1,
+        "unequal": false,
+        "shortPage": false,
+        "offset": false,
+        "tac": true,
+        "interleave": false,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "three-tac.hwp",
+        "nativeSha256": "be82db716891fea49ebfaf93aa470cbd75eb420431cea4a45692d47408e42402",
+        "xml": "three-tac.hwpx",
+        "xmlSha256": "4b4d06993a3ab79119842916c5880a8b4ef9ed8f5007a9a5ae77dfcc118bc38b",
+        "tableCount": 3,
+        "columns": 1,
+        "unequal": false,
+        "shortPage": false,
+        "offset": false,
+        "tac": true,
+        "interleave": false,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "four-tac.hwp",
+        "nativeSha256": "36405c60a5b26d472cffa2595dfdc20e701e422d2ee424b9521e295a34ade4c7",
+        "xml": "four-tac.hwpx",
+        "xmlSha256": "76e53f9c7e4f25b07f357d472f14c368d9967fb159f7acec689ecde188e74c20",
+        "tableCount": 4,
+        "columns": 1,
+        "unequal": false,
+        "shortPage": false,
+        "offset": false,
+        "tac": true,
+        "interleave": false,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "three-interleaved.hwp",
+        "nativeSha256": "c1c52b71267da471ff2c6e18ff8d28231a839c0a65be252a980c00c45d286962",
+        "xml": "three-interleaved.hwpx",
+        "xmlSha256": "09a48f4a39a00dcfe9558ad89babe0bf4623e55bbccb57d38210df053ae90c79",
+        "tableCount": 3,
+        "columns": 1,
+        "unequal": false,
+        "shortPage": false,
+        "offset": false,
+        "tac": true,
+        "interleave": true,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "four-interleaved.hwp",
+        "nativeSha256": "5075ed1caad540a3b0113c197d3544330c65a9e3774ba99727376f31e8442c20",
+        "xml": "four-interleaved.hwpx",
+        "xmlSha256": "4457b50213af239ce2f89c6c10e067dcb05fdd5bda740bc27f843a6fb105cc19",
+        "tableCount": 4,
+        "columns": 1,
+        "unequal": false,
+        "shortPage": false,
+        "offset": false,
+        "tac": true,
+        "interleave": true,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "one-offset.hwp",
+        "nativeSha256": "81b63caabe49b12613f7011961d45e4705f2efb9a9056340e44fb4b18e893d47",
+        "xml": "one-offset.hwpx",
+        "xmlSha256": "d778ae37dc2470808e23afc71854598ee1e169f6cd0c9530daa311c41868cf28",
+        "tableCount": 1,
+        "columns": 1,
+        "unequal": false,
+        "shortPage": false,
+        "offset": true,
+        "tac": false,
+        "interleave": false,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "three-offset.hwp",
+        "nativeSha256": "25307ccab67160e11c96733aa24020da14e5a4be70e213c629afd54df00ae119",
+        "xml": "three-offset.hwpx",
+        "xmlSha256": "b45248c7e20f5c99adc51e9dbb3cd2a1c7a2afd35803a221f6fc499fca0cf756",
+        "tableCount": 3,
+        "columns": 1,
+        "unequal": false,
+        "shortPage": false,
+        "offset": true,
+        "tac": false,
+        "interleave": true,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "three-multipage.hwp",
+        "nativeSha256": "1e3ae17d747ee66ddf2112ac9a0f45fdd6d2fd32e9e721eda644fc42eab14f1b",
+        "xml": "three-multipage.hwpx",
+        "xmlSha256": "eb68f2ba6d1c8b62fa93ff0c39b8784434cdba166f400accfd359a34d19285ef",
+        "tableCount": 3,
+        "columns": 1,
+        "unequal": false,
+        "shortPage": true,
+        "offset": false,
+        "tac": true,
+        "interleave": true,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "four-multipage.hwp",
+        "nativeSha256": "6a8e3623757d5a920fd6d97faf99db5b4518cb6df968ca085108bc2a30d9ab45",
+        "xml": "four-multipage.hwpx",
+        "xmlSha256": "1a934a672d942f1b5947cb781a036ce646004e669ad184e631da30e213935eba",
+        "tableCount": 4,
+        "columns": 1,
+        "unequal": false,
+        "shortPage": true,
+        "offset": false,
+        "tac": true,
+        "interleave": true,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "two-columns.hwp",
+        "nativeSha256": "056c3b89ca3d27fdf68234289ff4ab2a181e8a004124a7c5cb29157b474490f8",
+        "xml": "two-columns.hwpx",
+        "xmlSha256": "6d3aa0ecf83f582cdbc139a7022a52e22d4058f12a00c46aabbad7ad5854d64c",
+        "tableCount": 3,
+        "columns": 2,
+        "unequal": false,
+        "shortPage": false,
+        "offset": false,
+        "tac": true,
+        "interleave": true,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "three-columns.hwp",
+        "nativeSha256": "fdf821350d29dedabdaa63821f7a4b4b22ece7f85541927df6973aadd7b1c95a",
+        "xml": "three-columns.hwpx",
+        "xmlSha256": "fa96b313dcd5a115228392a7a0b4dfdfe3c49bdc7d878e94039d664a2a6b0e4c",
+        "tableCount": 4,
+        "columns": 3,
+        "unequal": false,
+        "shortPage": false,
+        "offset": false,
+        "tac": true,
+        "interleave": true,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "unequal-two.hwp",
+        "nativeSha256": "253fcf87242c4156ceb0fe988707249a4aba96d143362005a9e39d3fba6bd9c0",
+        "xml": "unequal-two.hwpx",
+        "xmlSha256": "04e2c217bc5f4193c2330025fd2f1de237754c55b46be57a9b724583cd495e12",
+        "tableCount": 3,
+        "columns": 2,
+        "unequal": true,
+        "shortPage": false,
+        "offset": false,
+        "tac": true,
+        "interleave": true,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "unequal-three.hwp",
+        "nativeSha256": "544b347d4244ba624ca8410d3c3c98d22f52a055f365a83711d2410eeae6abf6",
+        "xml": "unequal-three.hwpx",
+        "xmlSha256": "5e36ebea0b4a09704639e8a50fc02c1dcbecdb169e6610d98974e0e20306fa55",
+        "tableCount": 4,
+        "columns": 3,
+        "unequal": true,
+        "shortPage": false,
+        "offset": false,
+        "tac": true,
+        "interleave": true,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "two-columns-multipage.hwp",
+        "nativeSha256": "f6ddcf861cf6d5c52cc7c46f6286e3f1a6e9fa74495757d69e265594b9cc9002",
+        "xml": "two-columns-multipage.hwpx",
+        "xmlSha256": "d171cbb444a423030d0b1f641a82f0cab86cabbca782ce3a1616f5e819e7e0fc",
+        "tableCount": 3,
+        "columns": 2,
+        "unequal": false,
+        "shortPage": true,
+        "offset": false,
+        "tac": true,
+        "interleave": true,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      },
+      {
+        "native": "unequal-three-offset.hwp",
+        "nativeSha256": "8c13b9dbbf1f603454dda6c5ac7cb1595c70a6aeaf9e16047911d349dbb9366d",
+        "xml": "unequal-three-offset.hwpx",
+        "xmlSha256": "ed8d8010a26f03153f3803c4774b8e422ed0acaabea87bbbd9106aa0b2461622",
+        "tableCount": 4,
+        "columns": 3,
+        "unequal": true,
+        "shortPage": true,
+        "offset": true,
+        "tac": false,
+        "interleave": true,
+        "outputAssertions": 2,
+        "commonAuthoringShape": "2row x 1col, unmerged, no caption, TablePageBreak::None; ordinary authoring/export/read, no descriptor repair",
+        "sourceOriginsIndependent": true
+      }
+    ],
+    "xmlOriginCaveat": "Original124 conversion discrepancies remain evidence; XML sources are not asserted initially identical to Native sources.",
+    "noncoverage": [
+      "caption",
+      "actual table RowBreak/CellBreak",
+      "merged grid",
+      "general signed-negative multicol",
+      "arbitrary unknown/absolute/wrap origin"
+    ]
+  },
+  "publicMutationFamilies": {
+    "count": 14,
+    "names": [
+      "two-table-reference",
+      "one-table-after-delete",
+      "three-tables-created",
+      "four-tables-created",
+      "interleaved-body",
+      "multiple-interleaved-body",
+      "two-column-current",
+      "three-column-current",
+      "multi-page-prefix",
+      "explicit-page-boundary",
+      "explicit-column-boundary",
+      "multiple-sections",
+      "negative-table-offset",
+      "positive-table-offset"
+    ],
+    "denominator": "14 x2formats x2password modes =56; UI14x2+error check =29; these overlap source shapes and are not summed into feature completeness."
+  },
+  "existingActualReports": [
+    {
+      "path": "build/n001-final156-corpus/result.json",
+      "sha256": "7c19c72191edf0703a73fc925bca82bad6e43d8dc6becc6d940681d6d655fcc4",
+      "results": 88,
+      "passed": 88,
+      "failed": 0,
+      "failures": [],
+      "observations": 88,
+      "provenance": "Existing actual report read and counters asserted independently; not re-executed by this read-only audit."
+    },
+    {
+      "path": "build/n001-final156-public/result.json",
+      "sha256": "5375c971bf8c8a1985f2f9dc6128ffbb4820a3bfcf71e9fe351ce291e705e315",
+      "results": 56,
+      "passed": 54,
+      "failed": 2,
+      "failures": [
+        {
+          "name": "explicit-column-boundary",
+          "format": "hwpx",
+          "mode": "plain",
+          "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/0/controls/controls/0/y: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/0/controls/controls/0/y). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+          "stack": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/0/controls/controls/0/y: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/0/controls/controls/0/y). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.\n    at verifyPreservedExport (file:///C:/Users/jjome/Documents/work/jueony/build/n001-review132-clean/apps/editor/src/adapters/rhwp/preservation.ts:264:9)\n    at file:///C:/Users/jjome/Documents/work/jueony/build/n001-review132-clean/apps/editor/scripts/verify-general-native-layout125.mjs:42:16",
+          "report": {
+            "schemaVersion": 1,
+            "status": "blocked",
+            "format": "hwpx",
+            "checked": [
+              "summary-metadata",
+              "stored-date-information",
+              "list-definitions",
+              "sections",
+              "section/0/page",
+              "section/0/definition",
+              "section/0/columns",
+              "section/0/outline-definition",
+              "section/0/page-border",
+              "section/0/page-border-entries",
+              "section/0/master-pages",
+              "section/0/line-numbers",
+              "section/0/paragraph-count",
+              "section/0/paragraph/0",
+              "section/0/paragraph/1",
+              "section/0/paragraph/2",
+              "section/0/paragraph/3",
+              "section/0/paragraph/4",
+              "section/0/paragraph/5",
+              "section/0/paragraph/6",
+              "section/0/header/0",
+              "section/0/header/1",
+              "section/0/header/2",
+              "section/0/footer/0",
+              "section/0/footer/1",
+              "section/0/footer/2",
+              "section/0/header/0/format",
+              "section/0/header/1/format",
+              "section/0/header/2/format",
+              "section/0/footer/0/format",
+              "section/0/footer/1/format",
+              "section/0/footer/2/format",
+              "text",
+              "fields",
+              "bookmarks",
+              "controls",
+              "styles",
+              "cells",
+              "objects",
+              "image-resources"
+            ],
+            "unverified": [
+              "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+              "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+              "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+              "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+            ],
+            "issues": [
+              {
+                "code": "changed",
+                "path": "whole-document-published-layout/pages/0/controls/controls/0/y",
+                "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/0/controls/controls/0/y). 원본 파일은 쓰지 않습니다."
+              }
+            ]
+          }
+        },
+        {
+          "name": "explicit-column-boundary",
+          "format": "hwpx",
+          "mode": "encrypted",
+          "error": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/0/controls/controls/0/y: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/0/controls/controls/0/y). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.",
+          "stack": "PreservationError: 저장 후 문서 보존 검사에 실패했습니다 (whole-document-published-layout/pages/0/controls/controls/0/y: 저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/0/controls/controls/0/y). 원본 파일은 쓰지 않습니다.). 원본과 기존 복구본은 유지됩니다.\n    at verifyPreservedExport (file:///C:/Users/jjome/Documents/work/jueony/build/n001-review132-clean/apps/editor/src/adapters/rhwp/preservation.ts:264:9)\n    at file:///C:/Users/jjome/Documents/work/jueony/build/n001-review132-clean/apps/editor/scripts/verify-general-native-layout125.mjs:42:16",
+          "report": {
+            "schemaVersion": 1,
+            "status": "blocked",
+            "format": "hwpx",
+            "checked": [
+              "summary-metadata",
+              "stored-date-information",
+              "list-definitions",
+              "sections",
+              "section/0/page",
+              "section/0/definition",
+              "section/0/columns",
+              "section/0/outline-definition",
+              "section/0/page-border",
+              "section/0/page-border-entries",
+              "section/0/master-pages",
+              "section/0/line-numbers",
+              "section/0/paragraph-count",
+              "section/0/paragraph/0",
+              "section/0/paragraph/1",
+              "section/0/paragraph/2",
+              "section/0/paragraph/3",
+              "section/0/paragraph/4",
+              "section/0/paragraph/5",
+              "section/0/paragraph/6",
+              "section/0/header/0",
+              "section/0/header/1",
+              "section/0/header/2",
+              "section/0/footer/0",
+              "section/0/footer/1",
+              "section/0/footer/2",
+              "section/0/header/0/format",
+              "section/0/header/1/format",
+              "section/0/header/2/format",
+              "section/0/footer/0/format",
+              "section/0/footer/1/format",
+              "section/0/footer/2/format",
+              "text",
+              "fields",
+              "bookmarks",
+              "controls",
+              "styles",
+              "cells",
+              "objects",
+              "image-resources"
+            ],
+            "unverified": [
+              "원본의 해석되지 않은 XML/바이너리 레코드, 바탕쪽 전체 속성, 전자서명과 변경 추적은 이 WASM 읽기 계약으로 검증하지 못합니다.",
+              "같은 엔진의 재열기 검사이며 실제 한글의 조판·출력 동일성 검사가 아닙니다.",
+              "머리말/꼬리말 문단 모양과 첫 글자 모양을 비교합니다. AI 지원 범위의 균일 글자 서식은 이를 사용하지만 복잡한 원본의 모든 혼합 run은 별도 검수가 필요합니다.",
+              "렌더에 사용되지 않는 바이너리 자산과 OLE 원본 payload는 검사 범위 밖입니다."
+            ],
+            "issues": [
+              {
+                "code": "changed",
+                "path": "whole-document-published-layout/pages/0/controls/controls/0/y",
+                "message": "저장 전후 문서 전체 배치를 확인하지 못했습니다 (pages/0/controls/controls/0/y). 원본 파일은 쓰지 않습니다."
+              }
+            ]
+          }
+        }
+      ],
+      "observations": 56,
+      "provenance": "Existing actual report read and counters asserted independently; not re-executed by this read-only audit."
+    },
+    {
+      "path": "build/n001-final156-offset16/result.json",
+      "sha256": "97db5fe967c083a2bf4b611fcab5d0a7bf37cd947f61f0d6f8da6f2ba4b23d16",
+      "results": 16,
+      "passed": 16,
+      "failed": 0,
+      "failures": [],
+      "observations": 112,
+      "provenance": "Existing actual report read and counters asserted independently; not re-executed by this read-only audit."
+    },
+    {
+      "path": "build/n001-final156-visible24/result.json",
+      "sha256": "d391b55ae339b3090b74fb23843d829a99cdf74e8cbe11f4ead7dfa70ed97a9a",
+      "results": 24,
+      "passed": 24,
+      "failed": 0,
+      "failures": [],
+      "observations": 72,
+      "provenance": "Existing actual report read and counters asserted independently; not re-executed by this read-only audit."
+    },
+    {
+      "path": "build/n001-final156-profile12/result.json",
+      "sha256": "da9c19e3a25cca3e201cd909fdc789781b44811ced72d9d28ebbf38a60b8d1f0",
+      "results": 12,
+      "passed": 12,
+      "failed": 0,
+      "failures": [],
+      "observations": 66,
+      "provenance": "Existing actual report read and counters asserted independently; not re-executed by this read-only audit."
+    },
+    {
+      "path": "build/n001-final156-split8/result.json",
+      "sha256": "2b45c205c918f0811ecdf508cb32a4c62472ec5935422130b4528eed3264d351",
+      "results": 8,
+      "passed": 8,
+      "failed": 0,
+      "failures": [],
+      "observations": 56,
+      "provenance": "Existing actual report read and counters asserted independently; not re-executed by this read-only audit."
+    }
+  ],
+  "environmentBoundary": {
+    "browser156": "Original broad browser result has setup environmental failures, not product positive evidence. Own escalated unchanged reference3 PASS only.",
+    "proof": {
+      "path": "build/n001-env158-review/result-manifest.json",
+      "sha256": "637af50419ee337b149c1dc89f67c29583f27c2629d23b9e04963fb8a17c9575"
+    },
+    "final158": "Await unchanged full pipeline actual reports; never promote previous empty result arrays or reuse old156 setup failures as final158 evidence."
+  },
+  "acceptanceMapping": [
+    {
+      "id": "A1",
+      "originalScope": "HWP overlap table subsequent body/current source ownership; bare LINE_SEG vs real margins/offset",
+      "acceptance": "Existing scoped G105/G106 plus current selected formatter, actual allocator, physical output, standard-row writer and same semantic/full geometry guard; source/events stable, history, actual disk followup.",
+      "evidence": "fixed44/88 + public14/56 + scoped legacy suites; final158 full run remains pending.",
+      "status": "IMPLEMENTED_FOR_EXPLICIT_CURRENT_PREDICATES_FINAL158_REGRESSION_PENDING"
+    },
+    {
+      "id": "A2",
+      "originalScope": "General table counts and interleaved body",
+      "acceptance": "1/2/3/4 own and publicly created 3/4, delete to1, interleaved body; no count/template-specific permission, full dependent source and final allocation binding.",
+      "evidence": "fixed manifest and public cases; representative counts test generalized algorithm, not claim every arbitrary control story.",
+      "status": "REPRESENTATIVE_POSITIVE_IMPLEMENTATION"
+    },
+    {
+      "id": "A3",
+      "originalScope": "Multiple frames/pages/sections; 2/3 equal and unequal columns",
+      "acceptance": "Accepted actual composition and both constraint/physical widths, scalar+UTF16 complete allocation, source-current generation, final paint and full tail closure; explicit boundaries and profile changes genuine repass.",
+      "evidence": "fixed44, public56, split8, profile12, visible24, unequal16; explicit-column2 current156 failures are required positives, not permitted refusals.",
+      "status": "MOST_REPRESENTATIVES_POSITIVE_EXPLICIT_COLUMN2_REPAIR_PENDING_FINAL158"
+    },
+    {
+      "id": "A4",
+      "originalScope": "Positive and signed negative declared offsets",
+      "acceptance": "Keep declared Native/Paragraph values, source-free current formatter + actual MT/commit/physical box; neither shift live layout nor mint old row/cache authority. Positive unequal/bodywide and singlecol signed paths distinct.",
+      "evidence": "G106, public negative/positive singlecol, fixed positive unequal and lifecycle16. Does not supply signed-negative+general multicol proof.",
+      "status": "POSITIVE_UNEQUAL_AND_SIGNED_SINGLECOL_IMPLEMENTED_GENERAL_SIGNED_MULTICOL_OPEN"
+    },
+    {
+      "id": "A5",
+      "originalScope": "Caption with table/body flow in general complex placement",
+      "acceptance": "Retain G105 exact singlecol caption ownership. General/multicol current table+caption/body story measurement, origin and reservation must have a representative public edit/save/reopen positive; preserve caption payload and all stories.",
+      "evidence": "G105 DONE is retained. Fixed44 lacks captions and new complex classifiers reject captionSome/measured caption. Rejection is not general caption implementation.",
+      "status": "SCOPED_LEGACY_POSITIVE_GENERAL_CURRENT_CONTRACT_AND_POSITIVE_EVIDENCE_OPEN"
+    },
+    {
+      "id": "A6",
+      "originalScope": "Actual table row/cell breaking, partial table continuation, mixed table/cell geometry",
+      "acceptance": "Representative real RowBreak and CellBreak spans, merged row/cell case crossing a frame and continuing with later body/table; actual selected MT rows/cuts/owner/continuation, no duplicate/lost cells/text, strict both-format save/reopen/history.",
+      "evidence": "Body PartialParagraph/prefix split and whole-table FullFragment are not PartialTable support. New complex lane requires pageBreakNone, spans1 and rejects PartialTable. Existing legacy split code must be tested, not assumed absent or counted DONE.",
+      "status": "REQUIRED_GENERAL_POSITIVE_AUDIT_AND_IF_FAILS_IMPLEMENTATION_OPEN"
+    },
+    {
+      "id": "A7",
+      "originalScope": "Unclear origin / known absolute or wrap origin variants",
+      "acceptance": "For a valid known Page/Paper/Para/wrap primitive, independently derive actual source+style+MT+allocation physical origin and preserve it through real save/reopen; representative absolute/known-wrap positive required where claimed. For genuinely unknown/inconsistent owners preserve opaque bytes or explicit loss/error with live state intact, no guessed placement or cache reapproval.",
+      "evidence": "Current narrow known Para/T&B rules and unknown rejection cannot prove all recognized absolute/wrap semantics. Unknown content is not required to be silently editable or convertible.",
+      "status": "KNOWN_UNCOVERED_ORIGIN_POSITIVE_AUDIT_OPEN_UNKNOWN_REFUSAL_IS_SAFETY_ONLY"
+    }
+  ],
+  "unknownSafeRefusal": {
+    "eligibleSafetyAssertions": [
+      "unknown raw bits/unsupported story/ambiguous ownership",
+      "one-field current source/style/MT/frame/generation mismatch",
+      "duplicate owners/budget overflow/nonfinite actual geometry",
+      "auth/lease/resource mismatch or invalid projected output binding"
+    ],
+    "mustPreserve": [
+      "source/input bytes",
+      "public live document/events/history",
+      "opaque unknown payload or explicit loss/error",
+      "existing same0.2 geometry and semantic guard"
+    ],
+    "neverPositiveSupport": [
+      "a valid caption table rejected solely because captionSome",
+      "a known valid RowBreak table rejected solely because PartialTable",
+      "a valid signed-negative multicol table rejected solely due to positive-only classifier",
+      "a known absolute anchor rejected without implementing its placement semantics"
+    ],
+    "noFallback": "A produced current plan with invalid binding must error; no old-plan/cache fallback."
+  },
+  "remainingFinitePositiveWork": [
+    {
+      "family": "SignedNegative multicol",
+      "whyRequired": "G106 explicitly delegates negative/two-column/unclear origins to N001.",
+      "finiteCases": "2/3 equal and unequal, in-bounds negative small/large, both origins, plain/password, retained followup/history and both output formats; one independently actual out-of-bounds refusal.",
+      "currentState": "Own12 authoring-only fixtures exist in build/n001-negative157/authored. No runtime implementation or verified positive matrix is claimed."
+    },
+    {
+      "family": "General caption",
+      "whyRequired": "General complex scope cannot remove caption story; G105 already proves a narrower primitive.",
+      "finiteCases": "One same-column and one frame-boundary/multicol caption-bearing table with before/after body, current style/content edit and both formats; retain singlecol G105 regression.",
+      "currentState": "Need run unchanged ordinary legacy path first. If all assertions already pass, record existing implementation; if not, fix actual caption allocation/measurement owner."
+    },
+    {
+      "family": "Actual table breaking/merges",
+      "whyRequired": "General complex table storage includes row/cell continuation; do not relabel full table fragment as partial table.",
+      "finiteCases": "True RowBreak + true CellBreak, a merged cell/row boundary and continuation with following body/table, repeated both-format disk saves/history.",
+      "currentState": "No newly verified general current-row output ownership here; existing split behavior requires representative positive audit before deciding code delta."
+    },
+    {
+      "family": "Known non-Para/current origin",
+      "whyRequired": "Do not treat recognized absolute/wrap origins as opaque unknown to close original unclear-origin support.",
+      "finiteCases": "One known absolute Page/Paper placement and one supported Square/wrap relation with actual source/physical fit, retained edit and both-format save. Preserve unknown-extra/contradictory origin refusal controls.",
+      "currentState": "Finite representative audit required; no claim every recognized origin currently fails."
+    }
+  ],
+  "decisionDraft": {
+    "fixedRegressionMilestone": "Can be recorded closed only after final158 all original matrices pass with exact denominator/verifier/source hashes.",
+    "broadN001Implementation": "Keep PARTIAL until required positive families above are validated/implemented; do not remove original scope or label refusal as support.",
+    "broadVerification": "Keep PARTIAL under current docs97/Hancom record; no fresh Hancom UI comparison is authorized in this task.",
+    "importantQualifier": "A new proof factory returningNone is not evidence all normal existing saves for that shape fail. Audit actual public paths before choosing an implementation delta."
+  },
+  "references": [
+    {
+      "id": "done-implementation",
+      "path": "docs/97-master-work-checklist.md",
+      "sha256": "0f325fd2a61820a5b4e960487e243ebbac9ff30d9916ea718b6fc8d7f1fb6545",
+      "matches": [
+        {
+          "line": 24,
+          "text": "| 구현 | `DONE` / ☑ | `PARTIAL`, `MISSING`, `STUB`, `AUDIT` | 이 행에 정의한 원본·문맥·저장·오류 조건을 실제 코드에 구현 |"
+        }
+      ]
+    },
+    {
+      "id": "done-verification",
+      "path": "docs/97-master-work-checklist.md",
+      "sha256": "0f325fd2a61820a5b4e960487e243ebbac9ff30d9916ea718b6fc8d7f1fb6545",
+      "matches": [
+        {
+          "line": 30,
+          "text": "검증에는 `auto_check`와 `hancom_check`를 따로 둔다. 실제 WASM·Edge·같은 엔진의 저장 재열기에서 성공해도 한글 2024의 동작·지면 비교가 남아 있으면 주 검증은 `PARTIAL`이다. 한글과 비교할 필요가 없는 격리·오류 원복·프로토콜·경계 검사 등은 정의한 자동 검사가 모두 통과하면 검증 완료로 체크할 수 있다."
+        }
+      ]
+    },
+    {
+      "id": "no-rollup-inference",
+      "path": "docs/97-master-work-checklist.md",
+      "sha256": "0f325fd2a61820a5b4e960487e243ebbac9ff30d9916ea718b6fc8d7f1fb6545",
+      "matches": [
+        {
+          "line": 16,
+          "text": "최초 기준선의 417행은 한글 상위 기능 `B001~B188` 188개, 상태 수명 `S001~S033` 33개, 실행 작업 196개로 구성된다. 실행 작업은 기존 리팩터링 `R00~R15` 16개, 현재 내부 Agent 명령 `A001~A046` 46개, 제한된 범위의 기구현 작업 `G001~G089` 89개, 명시적인 후속 작업 `N001~N045` 45개다. 상위 항목과 상세 작업은 범위가 겹친다. **417로 나눈 값을 한글 전체 완성률로 사용하지 않는다.** 상위 항목은 세부 작업을 만들었다고 완료되는 것이 아니다."
+        }
+      ]
+    },
+    {
+      "id": "finite-general-matrices",
+      "path": "docs/128-n001-general-layout-storage.md",
+      "sha256": "61329194390557d9fe85fe54006784860cf60e2b75b6f182f6032a7d6ff80e59",
+      "matches": [
+        {
+          "line": 58,
+          "text": "4. 위56·88·29행렬의 실패를 없앤 뒤 기존 저장·복구 합본을 다시 수행한다. 한글 직접 비교는 별도 일괄 검수로 남긴다."
+        }
+      ]
+    },
+    {
+      "id": "caption-scoped-existing",
+      "path": "docs/108-file-preservation-completion.md",
+      "sha256": "f2d27daeb908dd1523c7a9d2f1bd6968e509b56e8c2a30fe81b2d3dbfd738941",
+      "matches": [
+        {
+          "line": 39,
+          "text": "| 겹침 표의 캡션 | 본문 줄과 캡션/표 내부 story의 소유를 분리 | 캡션·중첩 control payload의 원시 차이 검사 |"
+        }
+      ]
+    },
+    {
+      "id": "negative-family-not-current",
+      "path": "build/rhwp-engine/source-a6806ebbe0664efe/src/renderer/current_unequal_offset_step148.rs",
+      "sha256": "9cb3c9037a15d0fc8f5f9527bc2ac732ab8fb12f5b974b73425ebf61a5cd3bb2",
+      "matches": [
+        {
+          "line": 8,
+          "text": "  if offset<=0||horizontal<0||t.common.allow_overlap||!known_prefix_offset_shape148(t,plain){return None;}"
+        }
+      ]
+    },
+    {
+      "id": "caption-current-rejected",
+      "path": "build/rhwp-engine/source-a6806ebbe0664efe/src/renderer/current_unequal_offset_step148.rs",
+      "sha256": "9cb3c9037a15d0fc8f5f9527bc2ac732ab8fb12f5b974b73425ebf61a5cd3bb2",
+      "matches": [
+        {
+          "line": 42,
+          "text": "        || t.caption.is_some()"
+        }
+      ]
+    },
+    {
+      "id": "break-current-rejected",
+      "path": "build/rhwp-engine/source-a6806ebbe0664efe/src/renderer/current_unequal_offset_step148.rs",
+      "sha256": "9cb3c9037a15d0fc8f5f9527bc2ac732ab8fb12f5b974b73425ebf61a5cd3bb2",
+      "matches": [
+        {
+          "line": 40,
+          "text": "        || t.page_break != TablePageBreak::None"
+        }
+      ]
+    },
+    {
+      "id": "unmerged-current",
+      "path": "build/rhwp-engine/source-a6806ebbe0664efe/src/renderer/current_unequal_offset_step148.rs",
+      "sha256": "9cb3c9037a15d0fc8f5f9527bc2ac732ab8fb12f5b974b73425ebf61a5cd3bb2",
+      "matches": [
+        {
+          "line": 64,
+          "text": "        c.row_span == 1"
+        }
+      ]
+    },
+    {
+      "id": "partial-current-rejected",
+      "path": "build/rhwp-engine/source-a6806ebbe0664efe/src/renderer/current_middle_offset_hosts155.rs",
+      "sha256": "a709118264ac14dd7ebea12e5f37c18e31b07f9bb30243da118709925ae713c3",
+      "matches": [
+        {
+          "line": 84,
+          "text": "   }else if matches!(value,PageItem::PartialTable{..}){return None;}}}}"
+        }
+      ]
+    },
+    {
+      "id": "whole-caption-measurement",
+      "path": "build/rhwp-engine/source-a6806ebbe0664efe/src/renderer/current_middle_offset_hosts155.rs",
+      "sha256": "a709118264ac14dd7ebea12e5f37c18e31b07f9bb30243da118709925ae713c3",
+      "matches": [
+        {
+          "line": 54,
+          "text": "    if mts.next().is_some()||m.caption_height!=0.0||m.cell_spacing!=0.0||m.repeat_header||m.has_header_cells"
+        }
+      ]
+    },
+    {
+      "id": "fixed-positive-offsets",
+      "path": "apps/editor/tests/fixtures/n001-general125-own/generate-own.rs",
+      "sha256": "3fe9f18fea043b55b810854ee5533f2de573220dd2cfa5ce33622cc56a09fe54",
+      "matches": [
+        {
+          "line": 17,
+          "text": "  Control::Table(t)=>{t.common.treat_as_char=c.tac;if c.offset {t.common.horizontal_offset=450;t.common.vertical_offset=300;}t.raw_ctrl_data.clear();t.raw_ctrl_seal=None;},"
+        }
+      ]
+    },
+    {
+      "id": "fixed-table-grid",
+      "path": "apps/editor/tests/fixtures/n001-general125-own/generate-own.rs",
+      "sha256": "3fe9f18fea043b55b810854ee5533f2de573220dd2cfa5ce33622cc56a09fe54",
+      "matches": [
+        {
+          "line": 9,
+          "text": " for n in 0..c.tables {let last=d.document().sections[0].paragraphs.len()-1;let end=d.document().sections[0].paragraphs[last].text.chars().count();d.create_table_native(0,last,end,2,1).unwrap();let host=d.document().sections[0].paragraphs.iter().rposition(|p|p.controls.iter().any(|c|matches!(c,Control::Table(_)))).unwrap();let ci=d.document().sections[0].paragraphs[host].controls.iter().position(|c|matches!(c,Control::Table(_))).unwrap();d.insert_text_in_cell_native(0,host,ci,0,0,0,&format!(\"Own table {n} first cell. \")).unwrap();d.insert_text_in_cell_native(0,host,ci,1,0,0,&format!(\"Own table {n} second cell. \")).unwrap();if c.interleave{let tail=d.document().sections[0].paragraphs.len()-1;d.insert_text_native(0,tail,0,&format!(\"Interleaved body {n}. \")).unwrap();}}"
+        }
+      ]
+    }
+  ],
+  "readOnly": {
+    "trackedFilesEdited": 0,
+    "runtimeChanges": 0,
+    "newEngineExecutions": 0,
+    "HancomOrUserGUI": false,
+    "canonicalRowsModified": false
+  }
+}

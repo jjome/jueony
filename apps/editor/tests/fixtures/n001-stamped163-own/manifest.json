@@ -1,0 +1,157 @@
+{
+  "scope": "Original 19 inputs copied byte-for-byte from fixed167 stamped matrix:9 signed,6 captions,4 actual Row/CellBreak. 304 no-op/modified,Native/XML,HWP/HWPX,plain/password combinations. Hancom comparison deferred.",
+  "fixtures": [
+    {
+      "id": "single-negative-control",
+      "kind": "signed",
+      "hwp": "signed-single-negative-control.hwp",
+      "hwpx": "signed-single-negative-control.hwpx",
+      "nativeSha256": "ba5cb38572b3c344d523c2aba6d5b1f16b91d5938e62a8cb3afdbb01b3e87eb9",
+      "xmlSha256": "a885f0472691f678dd447ea9bfe4d6071a24c60e76dcbc16ed86e233c9e78338"
+    },
+    {
+      "id": "equal2-minus1",
+      "kind": "signed",
+      "hwp": "signed-equal2-minus1.hwp",
+      "hwpx": "signed-equal2-minus1.hwpx",
+      "nativeSha256": "e8d633a55790e043d00ca52b9e4b492d06c73515ed3c819d7ca7a2f775ef5315",
+      "xmlSha256": "e32e9cef4218e9a06bb9e2a073da82d533f8441c6e66418b44ecc717fc4a33f3"
+    },
+    {
+      "id": "equal2-minus300-overlap",
+      "kind": "signed",
+      "hwp": "signed-equal2-minus300-overlap.hwp",
+      "hwpx": "signed-equal2-minus300-overlap.hwpx",
+      "nativeSha256": "9f11367c2ebd9746dcfe39d8c050ff7ea149bb022c41c397c1a2657af094afa6",
+      "xmlSha256": "b375073cce9b8d6dd08fb0f1f5005e240b09b3712a5663fb139032c1b470fe94"
+    },
+    {
+      "id": "equal3-minus300",
+      "kind": "signed",
+      "hwp": "signed-equal3-minus300.hwp",
+      "hwpx": "signed-equal3-minus300.hwpx",
+      "nativeSha256": "94720f5af7c25681251b898dae4f07fd3cf51d596f857ffd7278a076b943d9cb",
+      "xmlSha256": "7b243aa754ae62e714023447c909b595aaea554b03fb89dbd750a90981bc0b16"
+    },
+    {
+      "id": "equal3-minus1200-overlap",
+      "kind": "signed",
+      "hwp": "signed-equal3-minus1200-overlap.hwp",
+      "hwpx": "signed-equal3-minus1200-overlap.hwpx",
+      "nativeSha256": "d5e3e6e75f98fe604cdc73ab9e9bbfe7623d35d5915053da997f448dc7ad73ef",
+      "xmlSha256": "2939bf4dd80c2db4d3503be78c35fa6d71544718be3380c8839ec9779db5239c"
+    },
+    {
+      "id": "unequal2-minus1",
+      "kind": "signed",
+      "hwp": "signed-unequal2-minus1.hwp",
+      "hwpx": "signed-unequal2-minus1.hwpx",
+      "nativeSha256": "96703e3836da784b59b8d42268fa80340216fc236ec7e1e906648bbfcbd8f082",
+      "xmlSha256": "c433b8e42ac033f29fedb729d722e4ab0f7f1ae59673f7f48caba019d787a91f"
+    },
+    {
+      "id": "unequal2-minus300-overlap",
+      "kind": "signed",
+      "hwp": "signed-unequal2-minus300-overlap.hwp",
+      "hwpx": "signed-unequal2-minus300-overlap.hwpx",
+      "nativeSha256": "8fb559172111f031bfce77e91986535e281e2d7a0f06b9ad328d638543169a3f",
+      "xmlSha256": "2c93bbd3ed7912834072400e8d9e6c6e2b4c956fcc403759323952e4fd5b7788"
+    },
+    {
+      "id": "unequal3-minus300",
+      "kind": "signed",
+      "hwp": "signed-unequal3-minus300.hwp",
+      "hwpx": "signed-unequal3-minus300.hwpx",
+      "nativeSha256": "12ec2e6c7c18b66186882f8425417d264b21b826e471fdd7a793d6c74f5621ab",
+      "xmlSha256": "40199425e5cb3975d1385d3f4942cc9ef6c001ed21ffbfbb566e2702efa59371"
+    },
+    {
+      "id": "unequal3-minus1200-overlap",
+      "kind": "signed",
+      "hwp": "signed-unequal3-minus1200-overlap.hwp",
+      "hwpx": "signed-unequal3-minus1200-overlap.hwpx",
+      "nativeSha256": "5512695262a94771b2dbd3d2627ccefec98344b81e2d49fbc795de02432d3359",
+      "xmlSha256": "31b2f895aee102966f1b535681117b3c73906b23c5890e7bd6fb35da69fedee8"
+    },
+    {
+      "id": "1-bottom-tac",
+      "kind": "caption",
+      "hwp": "caption-1-bottom-tac.hwp",
+      "hwpx": "caption-1-bottom-tac.hwpx",
+      "nativeSha256": "12633c2a3bccf0994b31c43d9dfce8fdc2053533072222d1a4329d58c9ab958b",
+      "xmlSha256": "a898ac0634bff5fe31ad087545f2862e706c85845e0eb2facbd0fc869f09b31a"
+    },
+    {
+      "id": "1-top-tac",
+      "kind": "caption",
+      "hwp": "caption-1-top-tac.hwp",
+      "hwpx": "caption-1-top-tac.hwpx",
+      "nativeSha256": "209b692cb93de8ce366f466132a1e8dd6beee6192339942aad03a491fb4ae2c8",
+      "xmlSha256": "171b316978e54f6d6af70d45c0a85316b2a79bf2a59f7862c97158c082656e5f"
+    },
+    {
+      "id": "2-bottom-tac",
+      "kind": "caption",
+      "hwp": "caption-2-bottom-tac.hwp",
+      "hwpx": "caption-2-bottom-tac.hwpx",
+      "nativeSha256": "fbf0ca314a663e30e6f494d698b39fd1ff074b4405ab3cc00fec7bb308693200",
+      "xmlSha256": "77196ce87eb732945eac787da36033152a65ef04b86875e3ec52f4084ae8f312"
+    },
+    {
+      "id": "2-top-tac",
+      "kind": "caption",
+      "hwp": "caption-2-top-tac.hwp",
+      "hwpx": "caption-2-top-tac.hwpx",
+      "nativeSha256": "f2ef456f025ab0e99c4be2c434549acb7ac7c872c51aa94ffb8fae459d3bc255",
+      "xmlSha256": "d4e7706c88fa7fcb377e61c639ef12170a548a95228f1e420d067c9328c73026"
+    },
+    {
+      "id": "3-bottom-tac",
+      "kind": "caption",
+      "hwp": "caption-3-bottom-tac.hwp",
+      "hwpx": "caption-3-bottom-tac.hwpx",
+      "nativeSha256": "dbe50d27657a64049bd1efa9a86600db0c324072747f871a1cfad3d44ead4590",
+      "xmlSha256": "d02bd03e6e07268934685d8e0772a92c65eff6376abf6301fb8efc65cfd2929e"
+    },
+    {
+      "id": "3-top-tac",
+      "kind": "caption",
+      "hwp": "caption-3-top-tac.hwp",
+      "hwpx": "caption-3-top-tac.hwpx",
+      "nativeSha256": "8ec4b4875d69b57fe408a2b5b0dad690973ad7ad1ed82714028366e75e023372",
+      "xmlSha256": "58c0e39472408c3c5b52d4c83474cef9832f562ef8b3e099eed3aea8e5c9c4ac"
+    },
+    {
+      "id": "row-1col",
+      "kind": "continuation",
+      "hwp": "continuation-row-1col.hwp",
+      "hwpx": "continuation-row-1col.hwpx",
+      "nativeSha256": "cc18e7c08c41e4b9b9f2ad303ce4d961d127b7e42e1fb7794ad953324cdbefd0",
+      "xmlSha256": "4d08961da15e9f5bd8441f7b000c15ec4fe6a6fa9111e083efc4128c238689c5"
+    },
+    {
+      "id": "row-2col",
+      "kind": "continuation",
+      "hwp": "continuation-row-2col.hwp",
+      "hwpx": "continuation-row-2col.hwpx",
+      "nativeSha256": "0e530ef7320fb0962b23f12f0e1f7eefca6578a2694c6fbf70a43cfdfeee84d7",
+      "xmlSha256": "9a409efdc0ecc8a2bf41c5cca03ba1b6263ff7ec81bc5785581c2e502d662c07"
+    },
+    {
+      "id": "cell-1col",
+      "kind": "continuation",
+      "hwp": "continuation-cell-1col.hwp",
+      "hwpx": "continuation-cell-1col.hwpx",
+      "nativeSha256": "76d244b206df608785d87d4ae40252e7be38fcea1b3a6c7aa125e10c593a8ec4",
+      "xmlSha256": "12af464ff2f4633c5f9ebf6d90a0bf159593aaaf405fb362d9248153401f2d5e"
+    },
+    {
+      "id": "cell-2col",
+      "kind": "continuation",
+      "hwp": "continuation-cell-2col.hwp",
+      "hwpx": "continuation-cell-2col.hwpx",
+      "nativeSha256": "6688ef094806fd0c598b0e63b5f34a7d17b373096310c084c81179d7f8014534",
+      "xmlSha256": "64e255925307791202c913797f547112a235c33ba9580a9573e4f8c16e13798a"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+# N001 Rust177 checkpoint
+
+One exact combined Rust/WASM cohort; 501 workflows,1036 tests,105 distinct Native tests, fixed88/public56/actualApp29 and extras75 pass. Actual stored-time304/304; signed24/144 and used8/48; absolute48/336; floating caption96/768; TAC48/384; continuation32/96; horizontal2col12/60; rowspan12/72; offset16/112. Full production semantics/layout0.2, scalar/UTF16 ownership, source/events, history and disk checks retained. Initial sandbox launch failures are preserved; identical-source browser/workflows reruns pass with the required launch permissions. No user apps/files/credentials or Hancom GUI were accessed.
+
+This is an intermediate checkpoint, not final N001 completion. Three concrete families remain in summary.json. All original fixtures and failing intermediate outputs are retained. Only four disk samples per selected family are copied here; complete disk SHA/observations and deterministic verifiers retain the complete tested cohort. Native fixtures are genuine compile-only assets, recorded separately from exact official src. Run python verify.py to verify frozen bytes.

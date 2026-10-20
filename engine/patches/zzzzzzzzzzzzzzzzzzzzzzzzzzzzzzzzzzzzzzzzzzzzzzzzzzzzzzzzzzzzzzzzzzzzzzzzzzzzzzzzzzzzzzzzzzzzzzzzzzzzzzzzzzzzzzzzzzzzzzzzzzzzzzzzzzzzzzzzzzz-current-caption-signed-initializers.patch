@@ -1,0 +1,44 @@
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[25,192,214,24,45,116,38,232,153,84,183,121,204,58,113,28,221,21,35,92,253,37,234,25,249,206,83,123,155,74,233,146];
++pub(crate) const RESOURCE:[u8;32]=[225,202,167,67,201,112,113,59,178,45,167,227,1,192,151,83,172,165,227,39,54,108,223,99,111,184,122,252,216,113,141,84];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+--- a/src/renderer/current_signed_bounded161.rs
++++ b/src/renderer/current_signed_bounded161.rs
+@@ -220,7 +220,7 @@
+  if tables.is_empty()||measured.len()!=tables.len()||col.paragraph_float_placements.len()!=tables.iter().filter(|t|t.object_anchor.is_some()).count()||!arithmetic_equal(flow,col.used_height){return None;}
+  let mut h=blake3::Hasher::new();h.update(b"current-signed-within-body161-proof-1\0");h.update(&trace.resource());h.update(&trace.generation().to_le_bytes());
+  for t in &tables{h.update(&(t.paragraph as u64).to_le_bytes());for v in[t.incoming,t.top,t.before,t.body,t.after,t.standard_anchor.unwrap_or(t.incoming)]{h.update(&v.to_bits().to_le_bytes());}match t.object_anchor{Some((a,b,c))=>{h.update(&[1]);h.update(&a.to_bits().to_le_bytes());h.update(&b.to_bits().to_le_bytes());h.update(&c.to_bits().to_le_bytes());},None=>{h.update(&[0]);}}}
+- let generation=*h.finalize().as_bytes();let paint=CurrentFramePaintPlan{source_paragraphs:ps.as_ptr()as usize,generation,section:0,page:0,column:0,rect,tables:tables.clone(),additional_frames:Vec::new()};
++ let generation=*h.finalize().as_bytes();let paint=CurrentFramePaintPlan{caption_group_origin161:None,source_paragraphs:ps.as_ptr()as usize,generation,section:0,page:0,column:0,rect,tables:tables.clone(),additional_frames:Vec::new()};
+  let candidate=Self{source,paint,bodies,retained,tables,rows,generation,trace:std::sync::Arc::clone(trace)};
+  Some(candidate)
+  }
+--- a/src/renderer/current_signed_column157.rs
++++ b/src/renderer/current_signed_column157.rs
+@@ -184,7 +184,7 @@
+  if tables.is_empty()||measured.len()!=tables.len()||col.paragraph_float_placements.len()!=tables.iter().filter(|t|t.object_anchor.is_some()).count()||!arithmetic_equal(flow,col.used_height){return None;}
+  let mut h=blake3::Hasher::new();h.update(b"current-signed-negative-stack157-proof-1\0");h.update(&trace.resource());h.update(&trace.generation().to_le_bytes());
+  for t in &tables{h.update(&(t.paragraph as u64).to_le_bytes());for v in[t.incoming,t.top,t.before,t.body,t.after,t.standard_anchor.unwrap_or(t.incoming)]{h.update(&v.to_bits().to_le_bytes());}match t.object_anchor{Some((a,b,c))=>{h.update(&[1]);h.update(&a.to_bits().to_le_bytes());h.update(&b.to_bits().to_le_bytes());h.update(&c.to_bits().to_le_bytes());},None=>{h.update(&[0]);}}}
+- let generation=*h.finalize().as_bytes();let paint=CurrentFramePaintPlan{source_paragraphs:ps.as_ptr()as usize,generation,section:0,page:0,column:0,rect,tables:tables.clone(),additional_frames:Vec::new()};
++ let generation=*h.finalize().as_bytes();let paint=CurrentFramePaintPlan{caption_group_origin161:None,source_paragraphs:ps.as_ptr()as usize,generation,section:0,page:0,column:0,rect,tables:tables.clone(),additional_frames:Vec::new()};
+  let candidate=Self{source,paint,bodies,tables,rows,generation,trace:std::sync::Arc::clone(trace)};
+  Some(candidate)
+  }
+--- a/src/renderer/current_signed_frames160.rs
++++ b/src/renderer/current_signed_frames160.rs
+@@ -178,7 +178,7 @@
+  },_=>return None}}
+  if col.paragraph_float_placements.len()!=tables.iter().filter(|t|t.object_anchor.is_some()).count()||!arithmetic_equal(flow,col.used_height){return None;}
+ 
+- let paint=CurrentFramePaintPlan{source_paragraphs:ps.as_ptr()as usize,generation:[0;32],section:0,page:page.page_index,column:col.column_index,rect:*rect,tables:tables.clone(),additional_frames:vec![]};
++ let paint=CurrentFramePaintPlan{caption_group_origin161:None,source_paragraphs:ps.as_ptr()as usize,generation:[0;32],section:0,page:page.page_index,column:col.column_index,rect:*rect,tables:tables.clone(),additional_frames:vec![]};
+  frames.push(Frame160{paint,bodies,tables,body_bounds});all_rows.extend(rows);
+  }
+  if owner!=ps.len()||all_rows.len()!=ps.len()||measured.len()!=frames.iter().map(|f|f.tables.len()).sum::<usize>(){return None;}

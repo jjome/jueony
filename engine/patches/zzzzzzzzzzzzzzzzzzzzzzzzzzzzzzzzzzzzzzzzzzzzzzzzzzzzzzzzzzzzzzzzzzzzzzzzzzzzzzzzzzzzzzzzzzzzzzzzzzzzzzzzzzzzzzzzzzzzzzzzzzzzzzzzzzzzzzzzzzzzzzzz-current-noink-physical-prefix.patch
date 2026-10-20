@@ -1,0 +1,149 @@
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[102,59,70,149,146,151,240,3,36,119,20,213,230,51,85,102,115,252,102,134,149,14,122,138,71,255,173,215,249,149,252,36];
++pub(crate) const RESOURCE:[u8;32]=[144,47,159,246,230,217,169,1,194,133,158,20,171,59,56,0,130,245,159,1,72,158,60,113,197,161,222,246,120,193,3,187];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -319,6 +319,7 @@
+             ("src/serializer/hwpx/current_stamped_rows163.rs",include_bytes!("../serializer/hwpx/current_stamped_rows163.rs").as_slice()),
+             ("src/renderer/typeset/paragraph/current_plain_reflow_fit170.rs",include_bytes!("../renderer/typeset/paragraph/current_plain_reflow_fit170.rs").as_slice()),
+             ("src/renderer/typeset/table/block/current_merged_row_footprint171.rs",include_bytes!("../renderer/typeset/table/block/current_merged_row_footprint171.rs").as_slice()),
++            ("src/renderer/current_noink_fit_prefix175.rs",include_bytes!("../renderer/current_noink_fit_prefix175.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- a/src/renderer/current_frame_rows_plan.rs
++++ b/src/renderer/current_frame_rows_plan.rs
+@@ -539,3 +539,5 @@
+ #[path="current_caption_float_flow161.rs"]
+ mod caption_float_flow161;
+ pub(crate) use caption_float_flow161::current_caption_float_paint161;
++
++#[path="current_noink_fit_prefix175.rs"]pub(crate) mod noink_fit_prefix175;
+--- a/src/renderer/current_middle_full_fit156.rs
++++ b/src/renderer/current_middle_full_fit156.rs
+@@ -40,7 +40,10 @@
+    if *para_index>=paragraph||!seen.insert(*para_index){return None;}let q=ps.get(*para_index)?;
+    let mut cs=arena.commits().iter().filter(|c|c.paragraph==*para_index);let c=cs.next()?;if cs.next().is_some(){return None;}
+    unique_commit(&arena,*para_index,frame.page,frame.column,slot,0,c.row_end)?;
+-   let(fresh,f)=fresh_selected(&arena,c.format_id,q,styles,profile,dpi)?;
++   let(fresh,f)=if q.text.is_empty()&&q.controls.is_empty(){
++    crate::renderer::current_frame_rows_plan::noink_fit_prefix175::CurrentNoInkFitPrefix175::from_current(
++      &arena,c.format_id,q,frame.rect.width,styles,profile,dpi)?.into_parts()
++   }else{fresh_selected(&arena,c.format_id,q,styles,profile,dpi)?};
+    let has_ink=!q.text.is_empty();if has_ink&&f.actual_input_width_px!=Some(frame.rect.width){return None;}
+    if c.row_end!=fresh.lines.len()||!arithmetic_equal(c.flow_before,flow){return None;}
+    let mut advance=0.0;for line in &fresh.lines{
+--- /dev/null
++++ b/src/renderer/current_noink_fit_prefix175.rs
+@@ -0,0 +1,80 @@
++//! A committed empty predecessor owns vertical flow, not an ink width.
++//! This ephemeral kind independently recomposes the physical-width empty line
++//! and proves every vertical metric against the actual selected object/commit.
++//! It supplies no row, source-cache, allocation, or serializer permission.
++use super::*;
++use crate::renderer::{composer::ComposedParagraph, selected_composition_observer127::{CurrentFitPrefix156,SelectedFormatFact},
++    style_resolver::ResolvedStyleSet};
++use crate::model::{paragraph::Paragraph,provenance::LayoutCompatibilityProfile};
++
++pub(crate) struct CurrentNoInkFitPrefix175<'a>{composition:ComposedParagraph,format:&'a SelectedFormatFact}
++impl<'a> CurrentNoInkFitPrefix175<'a>{
++ pub(crate) fn from_current(arena:&'a CurrentFitPrefix156,id:usize,p:&Paragraph,width:f64,
++  styles:&ResolvedStyleSet,profile:LayoutCompatibilityProfile,dpi:f64)->Option<Self>{
++  let f=arena.formats().get(id)?;let actual=arena.composition(id)?;
++  if f.paragraph_token!=p as *const _ as usize||f.definition_context!=styles.reset_flow_context||f.dpi!=dpi
++   ||f.profile!=format!("{profile:?}")||f.source_text!=p.text||f.source_char_offsets!=p.char_offsets
++   ||f.actual_input_width_px.is_none_or(|w|!w.is_finite()||w<=0.0)
++   ||f.before!=0.0||f.after!=0.0||f.has_numbering||f.has_horizontal_shaping||f.known_square_band
++   ||f.actual_heights.len()!=1||f.actual_spacings.len()!=1||f.lines.len()!=1{return None;}
++  let composition=fresh_vertical(p,actual,width,styles,dpi)?;
++  let line=&composition.lines[0];let selected=&f.lines[0];
++  if selected.scalar_start!=0||selected.scalar_end!=Some(0)||selected.unicode_utf16_start!=Some(0)
++   ||selected.unicode_utf16_end!=Some(0)||!selected.exact_source_text_span||selected.has_line_break||!selected.runs.is_empty()
++   ||selected.height_hu!=line.line_height||selected.baseline_hu!=line.baseline_distance
++   ||selected.spacing_hu!=line.line_spacing||selected.column_start_hu!=line.column_start
++   ||selected.width_hu!=actual.lines[0].segment_width
++   ||f.actual_heights[0]!=crate::renderer::hwpunit_to_px(line.line_height,dpi)
++   ||f.actual_spacings[0]!=crate::renderer::hwpunit_to_px(line.line_spacing,dpi){return None;}
++  Some(Self{composition,format:f})
++ }
++ pub(crate) fn into_parts(self)->(ComposedParagraph,&'a SelectedFormatFact){(self.composition,self.format)}
++}
++fn fresh_vertical(p:&Paragraph,actual:&ComposedParagraph,width:f64,styles:&ResolvedStyleSet,dpi:f64)->Option<ComposedParagraph>{
++ if !p.text.is_empty()||!p.controls.is_empty()||p.char_count!=1||!p.char_offsets.is_empty(){return None;}
++ // Retain the existing bounded plain source/style validator. Only the actual
++ // unused width is excluded below, never source rows or visible text metrics.
++ super::fresh_body_rows(p,styles,width,dpi)?;
++ let mut fresh=p.clone();super::clear_fresh_input(&mut fresh);
++ crate::renderer::composer::reflow_line_segs(&mut fresh,
++  crate::renderer::composer::ParagraphBox::body_for_style(width,styles.para_styles.get(usize::from(p.para_shape_id)),dpi),styles,dpi);
++ let current=crate::renderer::composer::compose_paragraph_in_context(&fresh,styles);
++ if !same_empty_vertical(actual,&current){return None;}Some(current)
++}
++fn same_empty_vertical(a:&ComposedParagraph,b:&ComposedParagraph)->bool{
++ fn empty(c:&ComposedParagraph)->bool{c.lines.len()==1&&c.lines[0].runs.is_empty()&&c.lines[0].char_start==0
++  &&!c.lines[0].has_line_break&&c.lines[0].segment_width>0&&c.lines[0].column_start==0
++  &&c.numbering_text.is_none()&&c.inline_controls.is_empty()&&c.tac_controls.is_empty()
++  &&c.footnote_positions.is_empty()&&c.tab_extended.is_empty()&&c.horizontal_shaping.is_none()}
++ if !empty(a)||!empty(b)||a.para_style_id!=b.para_style_id{return false;}
++ let a=&a.lines[0];let b=&b.lines[0];
++ a.line_height>0&&a.line_spacing>=0&&a.baseline_distance>=0&&a.baseline_distance<=a.line_height
++  &&a.line_height==b.line_height&&a.line_spacing==b.line_spacing&&a.baseline_distance==b.baseline_distance
++}
++#[cfg(test)]mod tests{
++ use super::*;
++ use crate::model::paragraph::CharShapeRef;
++ use crate::renderer::{composer::{reflow_line_segs,compose_paragraph_in_context,ParagraphBox,ComposedTextRun},
++ style_resolver::{ResolvedCharStyle,ResolvedParaStyle}};
++ fn fixture()->(Paragraph,ComposedParagraph,ResolvedStyleSet){
++  let styles=ResolvedStyleSet{char_styles:vec![ResolvedCharStyle::default()],para_styles:vec![ResolvedParaStyle::default()],..Default::default()};
++  let mut p=Paragraph::default();p.char_count=1;p.char_shapes=vec![CharShapeRef::default()];
++  reflow_line_segs(&mut p,ParagraphBox::body_for_style(190.0,styles.para_styles.first(),96.0),&styles,96.0);
++  let c=compose_paragraph_in_context(&p,&styles);(p,c,styles)
++ }
++ #[test]fn current_noink_fit_prefix175_unused_width_has_only_vertical_ownership(){
++  let(p,c,s)=fixture();let fresh=fresh_vertical(&p,&c,121.0,&s,96.0).unwrap();
++  assert_ne!(c.lines[0].segment_width,fresh.lines[0].segment_width);assert!(same_empty_vertical(&c,&fresh));
++ }
++ #[test]fn current_noink_fit_prefix175_rejects_ink_and_changed_vertical_metrics(){
++  let(p,c,s)=fixture();for change in 0..7{let mut bad=c.clone();let l=&mut bad.lines[0];match change{
++   0=>l.line_height+=1,1=>l.line_spacing+=1,2=>l.baseline_distance+=1,3=>l.column_start=1,
++   4=>l.has_line_break=true,5=>l.char_start=1,_=>l.runs.push(ComposedTextRun{text:"x".into(),..Default::default()})}
++   assert!(fresh_vertical(&p,&bad,121.0,&s,96.0).is_none());}
++ }
++ #[test]fn current_noink_fit_prefix175_rejects_source_style_nonfinite_and_zero_width(){
++  let(mut p,c,mut s)=fixture();p.text="x".into();assert!(fresh_vertical(&p,&c,121.0,&s,96.0).is_none());p.text.clear();
++  for width in [f64::NAN,f64::INFINITY,0.0,-1.0]{assert!(fresh_vertical(&p,&c,width,&s,96.0).is_none());}
++  s.char_styles[0].font_size+=1.0;assert!(fresh_vertical(&p,&c,121.0,&s,96.0).is_none());
++ }
++}
+--- a/src/renderer/current_signed_declared_fit160.rs
++++ b/src/renderer/current_signed_declared_fit160.rs
+@@ -39,7 +39,10 @@
+    if *para_index>=paragraph||!seen.insert(*para_index){return None;}let q=ps.get(*para_index)?;
+    let mut cs=arena.commits().iter().filter(|c|c.paragraph==*para_index);let c=cs.next()?;if cs.next().is_some(){return None;}
+    unique_commit(&arena,*para_index,frame.page,frame.column,slot,0,c.row_end)?;
+-   let(fresh,f)=fresh_selected(&arena,c.format_id,q,styles,profile,dpi)?;
++   let(fresh,f)=if q.text.is_empty()&&q.controls.is_empty(){
++    crate::renderer::current_frame_rows_plan::noink_fit_prefix175::CurrentNoInkFitPrefix175::from_current(
++      &arena,c.format_id,q,frame.rect.width,styles,profile,dpi)?.into_parts()
++   }else{fresh_selected(&arena,c.format_id,q,styles,profile,dpi)?};
+    let has_ink=!q.text.is_empty();if has_ink&&f.actual_input_width_px!=Some(frame.rect.width){return None;}
+    if c.row_end!=fresh.lines.len()||!arithmetic_equal(c.flow_before,flow){return None;}
+    let mut advance=0.0;for line in &fresh.lines{
+--- a/src/renderer/typeset/paragraph/flow.rs
++++ b/src/renderer/typeset/paragraph/flow.rs
+@@ -180,7 +180,7 @@
+        crate::renderer::current_frame_rows_plan::current_signed_declared_overflow160(
+         crate::renderer::current_frame_rows_plan::CurrentSignedOverflowFrame160{
+          section:st.section_index,page:st.pages.last().map_or(0,|p|p.page_index),column:st.current_column,rect:*rect,body_width:st.layout.body_area.width,
+-         flow:st.current_height,available,paper_bottom:st.layout.page_height,items:&st.current_items,
++         flow:st.current_height,available:st.available_height(),paper_bottom:st.layout.page_height,items:&st.current_items,
+          ordinary:matches!(st.col_count,2|3)&&st.current_start_height==0.0&&!st.current_endnote_flow&&st.current_footnote_height==0.0
+           &&st.current_zone_y_offset==0.0&&st.current_zone_layout.is_none()&&st.visible_float_exclusions.is_empty()&&st.side_wrap_exclusions.is_empty()
+           &&st.inline_placements.is_empty()&&st.inline_flow_plans.is_empty()&&st.paragraph_float_placements.is_empty()

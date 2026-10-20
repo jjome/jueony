@@ -1,0 +1,1 @@
+N001 stamped storage regression fixtures. All38 original input hashes match the source matrices and fixed167 baseline. Inputs are generated own documents; no external user documents. The manifest pins each exact input and is used by verify-stamped-current-storage163.mjs.

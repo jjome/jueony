@@ -1,0 +1,159 @@
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[225,202,167,67,201,112,113,59,178,45,167,227,1,192,151,83,172,165,227,39,54,108,223,99,111,184,122,252,216,113,141,84];
++pub(crate) const RESOURCE:[u8;32]=[3,81,72,136,78,154,212,251,26,224,179,85,61,9,104,82,2,140,193,86,8,73,218,225,130,61,50,151,164,236,136,163];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -317,6 +317,7 @@
+             ("src/renderer/current_caption_float_top161.rs",include_bytes!("../renderer/current_caption_float_top161.rs").as_slice()),
+             ("src/renderer/current_frame_rows_plan_tests.rs",include_bytes!("../renderer/current_frame_rows_plan_tests.rs").as_slice()),
+             ("src/serializer/hwpx/current_stamped_rows163.rs",include_bytes!("../serializer/hwpx/current_stamped_rows163.rs").as_slice()),
++            ("src/renderer/typeset/paragraph/current_plain_reflow_fit170.rs",include_bytes!("../renderer/typeset/paragraph/current_plain_reflow_fit170.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- a/src/renderer/typeset/paragraph.rs
++++ b/src/renderer/typeset/paragraph.rs
+@@ -13,6 +13,7 @@
+ pub(super) mod boundary;
+ mod columns;
+ mod current_suffix;
++mod current_plain_reflow_fit170;
+ pub(super) mod context;
+ pub(super) mod empty;
+ mod entry;
+--- /dev/null
++++ b/src/renderer/typeset/paragraph/current_plain_reflow_fit170.rs
+@@ -0,0 +1,109 @@
++//! A fresh plain composition can outgrow its obsolete synthetic model ladder.
++//! In that case only an independently replayed current composition supplies the
++//! fit height. This grants no row, source-cache, frame, or export permission.
++use crate::model::paragraph::Paragraph;
++use crate::renderer::{composer::ComposedParagraph, current_fresh_wrap148::CurrentFreshWrapPolicy,
++    hwpunit_to_px, style_resolver::ResolvedStyleSet};
++
++pub(super) struct CurrentPlainReflowFit170<'a> {
++    paragraph: &'a Paragraph,
++    composition: &'a ComposedParagraph,
++    replay: CurrentFreshWrapPolicy,
++    height: f64,
++}
++impl<'a> CurrentPlainReflowFit170<'a> {
++    pub(super) fn from_actual(
++        p: &'a Paragraph, c: &'a ComposedParagraph, width: f64,
++        styles: &ResolvedStyleSet, dpi: f64, heights: &[f64], spacings: &[f64],
++        before: f64, after: f64, outer: f64, total: f64,
++    ) -> Option<Self> {
++        // The old saved-row fit remains unchanged. Only a shorter generated
++        // model ladder and an actual newly selected plain reflow qualify.
++        if !p.controls.is_empty() || p.line_segs.is_empty()
++            || c.lines.len() <= p.line_segs.len() || c.lines.len() > 4096
++            || before != 0.0 || after != 0.0 || outer != 0.0
++            || heights.len() != c.lines.len() || spacings.len() != c.lines.len()
++            || p.line_segs.iter().any(|r| r.tag != 0x8006_0000
++                || r.line_height <= 0 || r.line_spacing < 0 || r.baseline_distance < 0
++                || r.baseline_distance > r.line_height || r.segment_width <= 0
++                || p.char_offsets.binary_search(&r.text_start).is_err())
++            || p.char_shapes.iter().any(|s| p.char_offsets.binary_search(&s.start_pos).is_err()) {
++            return None;
++        }
++        let replay = CurrentFreshWrapPolicy::from_actual(p, c, width, styles, dpi)?;
++        let mut sum = 0.0;
++        for ((line, h), s) in c.lines.iter().zip(heights).zip(spacings) {
++            if line.line_height <= 0 || line.line_spacing < 0
++                || *h != hwpunit_to_px(line.line_height, dpi)
++                || *s != hwpunit_to_px(line.line_spacing, dpi) {
++                return None;
++            }
++            sum += h + s;
++        }
++        let height = sum - spacings.last()?;
++        if !sum.is_finite() || sum != total || !height.is_finite() || height <= 0.0 {
++            return None;
++        }
++        Some(Self { paragraph: p, composition: c, replay, height })
++    }
++    pub(super) fn height(&self) -> Option<f64> {
++        self.replay.matches(Some(self.paragraph), self.composition).then_some(self.height)
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    use crate::model::paragraph::CharShapeRef;
++    use crate::renderer::{composer::{compose_paragraph_in_context, reflow_line_segs, ParagraphBox},
++        style_resolver::{ResolvedCharStyle, ResolvedParaStyle}};
++    fn fixture() -> (Paragraph, ComposedParagraph, ResolvedStyleSet, Vec<f64>, Vec<f64>) {
++        let styles = ResolvedStyleSet { char_styles: vec![ResolvedCharStyle::default()],
++            para_styles: vec![ResolvedParaStyle::default()], ..Default::default() };
++        let mut p = Paragraph::default();
++        p.text = "현재 😀 fresh tail with ordinary spaces. ".repeat(6);
++        let mut units = 0;
++        p.char_offsets = p.text.chars().map(|ch| { let at=units;units+=ch.len_utf16() as u32;at }).collect();
++        p.char_count = units + 1;
++        p.char_shapes = vec![CharShapeRef::default()];
++        reflow_line_segs(&mut p, ParagraphBox::body_for_style(190.0, styles.para_styles.first(), 96.0), &styles, 96.0);
++        let c = compose_paragraph_in_context(&p, &styles);
++        assert!(c.lines.len() > 3);
++        let h=c.lines.iter().map(|l|hwpunit_to_px(l.line_height,96.0)).collect();
++        let s=c.lines.iter().map(|l|hwpunit_to_px(l.line_spacing,96.0)).collect();
++        p.line_segs.truncate(2);
++        (p,c,styles,h,s)
++    }
++    fn fit(p:&Paragraph,c:&ComposedParagraph,styles:&ResolvedStyleSet,h:&[f64],s:&[f64])->Option<f64>{
++        let total=h.iter().zip(s).map(|(h,s)|h+s).sum();
++        CurrentPlainReflowFit170::from_actual(p,c,190.0,styles,96.0,h,s,0.0,0.0,0.0,total)?.height()
++    }
++    #[test] fn current_plain_reflow_fit170_uses_full_fresh_height_not_short_generated_ladder(){
++        let(p,c,styles,h,s)=fixture();
++        assert_eq!(fit(&p,&c,&styles,&h,&s),Some(h.iter().zip(&s).map(|(h,s)|h+s).sum::<f64>()-s.last().unwrap()));
++    }
++    #[test] fn current_plain_reflow_fit170_keeps_stored_rows_and_unsupported_controls(){
++        let(mut p,c,styles,h,s)=fixture();p.line_segs[0].tag=0x0006_0000;
++        assert!(fit(&p,&c,&styles,&h,&s).is_none());p.line_segs[0].tag=0x8006_0000;
++        p.controls.push(crate::model::control::Control::ColumnDef(Default::default()));
++        assert!(fit(&p,&c,&styles,&h,&s).is_none());
++    }
++    #[test] fn current_plain_reflow_fit170_rejects_changed_actual_rows_and_metrics(){
++        let(p,mut c,styles,mut h,s)=fixture();h[0]+=1.0;assert!(fit(&p,&c,&styles,&h,&s).is_none());h[0]-=1.0;
++        c.lines[0].segment_width+=1;assert!(fit(&p,&c,&styles,&h,&s).is_none());
++    }
++    #[test] fn current_plain_reflow_fit170_rejects_surrogate_shape_and_wrong_source_partition(){
++        let(mut p,c,styles,h,s)=fixture();
++        let mid=p.char_offsets.iter().zip(p.text.chars()).find(|(_,ch)|ch.len_utf16()==2).unwrap().0+1;
++        p.char_shapes.push(CharShapeRef{start_pos:mid,char_shape_id:0});
++        assert!(fit(&p,&c,&styles,&h,&s).is_none());p.char_shapes.pop();p.char_offsets[1]+=1;
++        assert!(fit(&p,&c,&styles,&h,&s).is_none());
++    }
++    #[test] fn current_plain_reflow_fit170_rejects_nonfresh_width_style_and_budget(){
++        let(p,c,mut styles,h,s)=fixture();let total=h.iter().zip(&s).map(|(h,s)|h+s).sum();
++        assert!(CurrentPlainReflowFit170::from_actual(&p,&c,f64::NAN,&styles,96.0,&h,&s,0.0,0.0,0.0,total).is_none());
++        styles.para_styles[0].spacing_after=1.0;assert!(fit(&p,&c,&styles,&h,&s).is_none());
++        styles.para_styles[0].spacing_after=0.0;let mut too_large=p;too_large.text="x".repeat(65537);
++        assert!(fit(&too_large,&c,&styles,&h,&s).is_none());
++    }
++}
+--- a/src/renderer/typeset/paragraph/format.rs
++++ b/src/renderer/typeset/paragraph/format.rs
+@@ -129,7 +129,14 @@
+         } else {
+             None
+         };
+-        vpos_metric.map(|v| metric.min(v)).unwrap_or(metric)
++        let current_fit = recomposed.as_ref().and_then(|current| {
++            super::current_plain_reflow_fit170::CurrentPlainReflowFit170::from_actual(
++                para, current, column_width_px?, styles, ctx.dpi(),
++                &line_heights, &line_spacings, spacing_before, spacing_after,
++                tac_outer_margin_v_px, total_height,
++            )?.height()
++        });
++        current_fit.unwrap_or_else(|| vpos_metric.map(|v| metric.min(v)).unwrap_or(metric))
+     };
+ 
+     // 표 없는 일반 본문에는 배치용 줄 사본을 만들지 않는다.

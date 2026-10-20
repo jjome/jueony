@@ -1,0 +1,313 @@
+--- a/src/document_core/commands/document.rs
++++ b/src/document_core/commands/document.rs
+@@ -2830,7 +2830,7 @@
+         })
+     }
+ 
+-    fn current_standard_rows_for_export(&self)->Option<crate::serializer::hwpx::standard_rows::CurrentStandardRowsProjection>{
++    pub(crate) fn current_standard_rows_for_export(&self)->Option<crate::serializer::hwpx::standard_rows::CurrentStandardRowsProjection>{
+         self.current_standard_rows_for_export_document(&self.document)
+     }
+ 
+@@ -2988,7 +2988,7 @@
+         self.hwpx_document_for_export_document(&self.document, serialize)
+     }
+ 
+-    fn hwpx_document_for_export_document<T>(
++    pub(crate) fn hwpx_document_for_export_document<T>(
+         &self,
+         document: &Document,
+         serialize: impl FnOnce(
+@@ -3056,6 +3056,21 @@
+         serialized.map_err(|e| HwpError::RenderError(e.to_string()))
+     }
+ 
++    fn current_bounded_original_rows_for_stamping163(&self)->Result<Option<crate::serializer::hwpx::current_frame_rows::CurrentFrameRowsProjection<'_>>,HwpError>{
++        use crate::serializer::hwpx::current_frame_rows::{CurrentFrameRowsProjection,CurrentFrameExportRepresentation};
++        if self.batch_mode||self.pending_pagination_job.is_some()||self.deferred_pagination_descriptor.is_some()
++            ||self.dirty_sections.iter().any(|v|*v)||!self.computed_row_resources_supported()
++            ||!crate::serializer::hwpx::current_frame_rows::current_source_is_admissible(&self.document){return Ok(None);}
++        let styles=self.resolve_render_styles_for_section(0);
++        let Some((result,measured))=self.pagination.first().zip(self.measured_tables.first())else{return Ok(None);};
++        let Some(candidate)=crate::renderer::current_frame_rows_plan::CurrentSignedBounded161::from_current(
++            &self.document,self.source_format,result,&styles,measured,self.effective_layout_profile(),self.dpi)else{return Ok(None);};
++        let physical=self.build_page_tree_with_signed_bounded161_capture(0,&candidate)?;
++        let plan=candidate.finalize(&physical.frame.current_physical_selections).ok_or_else(||HwpError::RenderError("STAMPED_NATIVE_CURRENT_PHYSICAL_BINDING".into()))?;
++        CurrentFrameRowsProjection::from_current_frame(&self.document,&plan,CurrentFrameExportRepresentation::Original)
++            .map(Some).ok_or_else(||HwpError::RenderError("STAMPED_NATIVE_CURRENT_ORIGINAL_BINDING".into()))
++    }
++
+     pub(crate) fn export_with_stored_time_intent(
+         &self, format: &str, password: Option<&[u8]>,
+         intent: &crate::document_core::document_metadata::StoredTimeExportIntent<'_>,
+@@ -3063,21 +3078,35 @@
+         if !matches!(format, "hwp" | "hwpx") {
+             return Err(HwpError::RenderError("Unsupported stamped-export format".into()));
+         }
+-        let document = intent.stamped_source_document(&self.document)
++        let mut document = intent.stamped_source_document(&self.document)
+             .map_err(HwpError::RenderError)?;
+         if format == "hwp" {
++            if let Some(original)=self.current_bounded_original_rows_for_stamping163()?{
++                let stamped=crate::serializer::hwpx::current_stamped_rows163::CurrentStampedRowsProjection163::for_native_original(self,intent,&original).map_err(HwpError::RenderError)?;
++                stamped.apply_to_original_stamped_source(&mut document).map_err(HwpError::RenderError)?;
++            }
+             let snapshot = self.prepare_hwp_export_snapshot_document(document);
+             let result = if let Some(password) = password {
+                 crate::serializer::serialize_hwp_with_password_and_report(snapshot.document(), password)
+             } else { crate::serializer::serialize_document_with_report(snapshot.document()) };
+             result.map_err(|e| HwpError::RenderError(e.to_string()))
+         } else {
+-            let projection = self.current_standard_rows_for_export_document(&document);
+-            let current_frame=if projection.is_none(){self.current_frame_rows_for_export_document(&document)?}else{None};
++            use crate::serializer::hwpx::current_stamped_rows163::{CurrentStampedRowsProjection163,StampedRowSource163};
++            // Match ordinary projection precedence, but issue from the actual
++            // original source; a metadata clone is never relabeled as that source.
++            let original_standard=self.current_standard_rows_for_export();
++            let original_frame=if original_standard.is_none(){self.current_frame_rows_for_export_document(&self.document)?}else{None};
++            let original_caption=if original_standard.is_none()&&original_frame.is_none(){self.current_caption_rows_for_export157()?}else{None};
++            let source=match(original_standard.as_ref(),original_frame.as_ref(),original_caption.as_ref()){
++                (Some(_),None,None)=>Some(StampedRowSource163::Standard),(None,Some(p),None)=>Some(StampedRowSource163::Current(p)),(None,None,Some(p))=>Some(StampedRowSource163::Caption(p)),(None,None,None)=>None,_=>return Err(HwpError::RenderError("STAMPED_ROW_SOURCE_CONFLICT".into()))};
++            let stamped=source.map(|p|CurrentStampedRowsProjection163::for_hwpx(self,intent,p).map_err(HwpError::RenderError)).transpose()?;
+             self.hwpx_document_for_export_document(&document, |lowered| {
+-                if let Some(password) = password {
+-                    match current_frame.as_ref(){Some(frame)=>crate::serializer::hwpx::serialize_hwpx_with_frame_rows_and_password(lowered,frame,password),None=>crate::serializer::hwpx::serialize_hwpx_with_current_rows_and_password(lowered, projection.as_ref(), password)}
+-                } else {match current_frame.as_ref(){Some(frame)=>crate::serializer::hwpx::serialize_hwpx_with_frame_rows(lowered,frame),None=>crate::serializer::hwpx::serialize_hwpx_with_current_rows(lowered, projection.as_ref())}}
++                match(stamped.as_ref(),password){
++                    (Some(p),Some(password))=>crate::serializer::hwpx::serialize_hwpx_with_stamped_rows163_and_password(lowered,p,password),
++                    (Some(p),None)=>crate::serializer::hwpx::serialize_hwpx_with_stamped_rows163(lowered,p),
++                    (None,Some(password))=>crate::serializer::hwpx::serialize_hwpx_with_current_rows_and_password(lowered,None,password),
++                    (None,None)=>crate::serializer::hwpx::serialize_hwpx_with_current_rows(lowered,None),
++                }
+             })
+         }
+     }
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[67,131,216,118,196,159,120,215,180,60,207,213,161,162,225,44,10,203,142,148,223,20,138,55,156,241,195,243,169,7,66,109];
++pub(crate) const RESOURCE:[u8;32]=[25,192,214,24,45,116,38,232,153,84,183,121,204,58,113,28,221,21,35,92,253,37,234,25,249,206,83,123,155,74,233,146];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -316,6 +316,7 @@
+             ("src/renderer/current_caption_float_flow161.rs",include_bytes!("../renderer/current_caption_float_flow161.rs").as_slice()),
+             ("src/renderer/current_caption_float_top161.rs",include_bytes!("../renderer/current_caption_float_top161.rs").as_slice()),
+             ("src/renderer/current_frame_rows_plan_tests.rs",include_bytes!("../renderer/current_frame_rows_plan_tests.rs").as_slice()),
++            ("src/serializer/hwpx/current_stamped_rows163.rs",include_bytes!("../serializer/hwpx/current_stamped_rows163.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- a/src/serializer/hwpx/current_caption_rows157.rs
++++ b/src/serializer/hwpx/current_caption_rows157.rs
+@@ -8,6 +8,7 @@
+ fn digest(d:&Document,resource:[u8;32],generation:[u8;32])->Option<[u8;32]>{super::current_frame_rows::document_digest157(d,resource,generation,true)}
+ pub(crate) fn source_is_admissible157(source:&Document)->bool{digest(source,crate::model::native_computed_resource::RESOURCE,[0;32]).is_some()}
+ impl<'a> CurrentCaptionRowsProjection157<'a>{
++ pub(crate) fn owns_exact_source163(&self,source:&Document)->bool{std::ptr::eq(self.source,source)}
+  pub(crate) fn new(source:&'a Document,plan:&CurrentCaptionRowsPlan157<'a>,core:&crate::DocumentCore)->Option<Self>{
+   let resource=crate::model::native_computed_resource::RESOURCE;
+   if !std::ptr::eq(source,plan.source())||resource!=plan.resource(){return None;}
+--- a/src/serializer/hwpx/current_frame_rows.rs
++++ b/src/serializer/hwpx/current_frame_rows.rs
+@@ -133,6 +133,7 @@
+  paragraphs:Vec<ParagraphRows>,
+ }
+ impl<'doc> CurrentFrameRowsProjection<'doc>{
++ pub(crate) fn owns_exact_source163(&self,source:&Document)->bool{std::ptr::eq(self.source,source)}
+  pub(crate) fn from_current_frame(source:&'doc Document,plan:&CurrentFrameRowsPlan<'doc>,
+   representation:CurrentFrameExportRepresentation)->Option<Self>{
+   let resource=crate::model::native_computed_resource::RESOURCE;
+--- /dev/null
++++ b/src/serializer/hwpx/current_stamped_rows163.rs
+@@ -0,0 +1,155 @@
++//! Exact, one-shot row binding after a validated metadata-only export intent.
++//! Every row first passes its original opaque producer's original binder at the
++//! real Core lowering boundary. No arbitrary target/map/rows can construct this.
++use crate::{DocumentCore,model::{document::Document,paragraph::{Paragraph,LineSeg},control::Control}};
++use crate::document_core::document_metadata::StoredTimeExportIntent;
++use std::collections::HashMap;
++use super::{SerializeError,current_frame_rows::{CurrentFrameRowsProjection,document_digest157},standard_rows::CurrentStandardRowsProjection,current_caption_rows157::CurrentCaptionRowsProjection157};
++const MAX_ROWS:usize=65536;
++const MAX_OWNERS:usize=4096;
++// Legacy's historical projection has no borrowed source owner. Its marker
++// invokes the actual current Core producer here; no foreign legacy object can
++// be rebound merely because its old narrow definitions/body digest matches.
++pub(crate) enum StampedRowSource163<'a,'d>{Standard,Current(&'a CurrentFrameRowsProjection<'d>),Caption(&'a CurrentCaptionRowsProjection157<'d>)}
++enum BoundOriginalRows163<'a,'d>{Standard(&'a CurrentStandardRowsProjection),Current(&'a CurrentFrameRowsProjection<'d>),Caption(&'a CurrentCaptionRowsProjection157<'d>)}
++impl BoundOriginalRows163<'_,'_>{
++ fn bind(&self,target:&Document)->Option<HashMap<usize,Vec<LineSeg>>>{match self{Self::Standard(p)=>p.bind_for_export(target),Self::Current(p)=>p.bind_for_export(target),Self::Caption(p)=>p.bind_for_export(target)}}
++ fn has_caption(&self)->bool{matches!(self,Self::Caption(_))}
++ fn owns(&self,source:&Document)->bool{match self{Self::Standard(_)=>true,Self::Current(p)=>p.owns_exact_source163(source),Self::Caption(p)=>p.owns_exact_source163(source)}}
++}
++
++#[cfg(test)]
++mod stamped_rows163_tests {
++ use super::*;
++ fn source()->Document{let mut c=DocumentCore::new_empty();c.create_blank_document_native().unwrap();c.document().clone()}
++ // These units exercise the exact-binding boundary, not a synthetic positive
++ // factory. Production factory positives are the separate public304 matrix.
++ fn capsule<'a>(s:&'a Document,mode:Mode163)->CurrentStampedRowsProjection163<'a>{
++  let resource=crate::model::native_computed_resource::RESOURCE;let generation=[17;32];let key=digest(s,resource,generation,false).unwrap();
++  CurrentStampedRowsProjection163{source:s,resource,generation,source_key:key,target_key:key,allow_caption:false,mode,
++   entries:vec![Entry163{owner:Owner163::Body{section:0,paragraph:0},rows:vec![LineSeg{tag:0x80060000,..LineSeg::default()}]}]}
++ }
++ #[test]fn exact_stamped_target_rejects_each_changed_owner_field(){
++  let s=source();let p=capsule(&s,Mode163::Hwpx);assert!(p.bind_hwpx(&s.clone()).is_some());
++  let mutations:Vec<fn(&mut Document)>=vec![
++   |d|d.sections[0].paragraphs[0].text.push('x'),
++   |d|d.sections[0].paragraphs[0].raw_header_extra.push(1),
++   |d|d.sections[0].paragraphs[0].line_segs[0].vertical_pos+=1,
++   |d|d.sections[0].paragraphs[0].source_line_seg_vertical_pos=Some(vec![1]),
++   |d|d.sections[0].paragraphs[0].layout_space_metrics.push((0,crate::model::paragraph::SpaceMetric::HalfCell)),
++   |d|d.sections[0].paragraphs[0].cell_format_vpos_dirty=true,
++   |d|{use crate::model::paragraph::NumberingMarker;let p=&mut d.sections[0].paragraphs[0];p.numbering_marker=if matches!(p.numbering_marker,NumberingMarker::Absent){NumberingMarker::Unresolved}else{NumberingMarker::Absent};},
++   |d|d.sections[0].section_def.page_def.margin_top+=1,
++   |d|d.header.raw_data.get_or_insert_with(Vec::new).push(1),
++   |d|d.extra_streams.push(("/unknown-owner".into(),vec![1])),
++   |d|d.hwpx_aux_entries.push(("META-INF/unknown-owner".into(),vec![1])),
++   |d|d.preview=Some(crate::model::document::Preview{text:Some("changed".into()),image:None}),
++  ];
++  for (i,f) in mutations.into_iter().enumerate(){let mut t=s.clone();let before=digest(&t,p.resource,p.generation,false).unwrap();f(&mut t);
++   assert_ne!(digest(&t,p.resource,p.generation,false),Some(before),"mutation {i} must change bound input");assert!(p.bind_hwpx(&t).is_none(),"mutation {i}");}
++ }
++ #[test]fn stale_resource_source_generation_and_modes_refuse(){
++  let s=source();let mut p=capsule(&s,Mode163::Hwpx);p.source_key[0]^=1;assert!(p.bind_hwpx(&s).is_none());p.source_key[0]^=1;
++  p.generation[0]^=1;assert!(p.bind_hwpx(&s).is_none());p.generation[0]^=1;p.resource[0]^=1;assert!(p.bind_hwpx(&s).is_none());
++  let mut t=s.clone();assert!(p.apply_to_original_stamped_source(&mut t).is_err());
++  let p=capsule(&s,Mode163::NativeOriginal);assert!(p.bind_hwpx(&s).is_none());
++ }
++ #[test]fn invalid_binding_hard_errors_in_both_writer_facades(){
++  let s=source();let p=capsule(&s,Mode163::Hwpx);let mut t=s.clone();t.extra_streams.push(("/changed".into(),vec![7]));
++  let e=super::super::serialize_hwpx_with_stamped_rows163(&t,&p).unwrap_err().to_string();assert!(e.contains("STAMPED_CURRENT_ROW_INPUT_CHANGED"),"{e}");
++  let e=super::super::serialize_hwpx_with_stamped_rows163_and_password(&t,&p,b"stamp-password").unwrap_err().to_string();assert!(e.contains("STAMPED_CURRENT_ROW_INPUT_CHANGED"),"{e}");
++ }
++ #[test]fn owner_collection_refuses_foreign_empty_and_caption_relabel(){
++  let s=source();let key=&s.sections[0].paragraphs[0]as*const _ as usize;let row=LineSeg::default();
++  assert!(collect(&s,HashMap::from([(key,vec![row.clone()])]),false).is_some());
++  assert!(collect(&s,HashMap::from([(key,vec![row.clone()])]),true).is_none());
++  assert!(collect(&s,HashMap::from([(key,vec![])]),false).is_none());
++  let foreign=s.clone();let fk=&foreign.sections[0].paragraphs[0]as*const _ as usize;
++  assert!(collect(&s,HashMap::from([(fk,vec![row])]),false).is_none());
++ }
++ #[test]fn native_apply_changes_only_literal_export_rows(){
++  let s=source();let before=format!("{s:?}");let p=capsule(&s,Mode163::NativeOriginal);let mut target=s.clone();p.apply_to_original_stamped_source(&mut target).unwrap();
++  assert_eq!(target.sections[0].paragraphs[0].line_segs[0].tag,0x80060000);assert_eq!(format!("{s:?}"),before);
++  let mut stale=s.clone();stale.hwpx_aux_entries.push(("changed".into(),vec![1]));let original=format!("{stale:?}");assert!(p.apply_to_original_stamped_source(&mut stale).is_err());assert_eq!(format!("{stale:?}"),original);
++ }
++ #[test]fn ordinary_none_writer_is_byte_identical(){
++  let s=source();let ordinary=super::super::serialize_hwpx_with_report(&s).unwrap();let none=super::super::serialize_hwpx_with_current_rows(&s,None).unwrap();assert_eq!(ordinary.bytes(),none.bytes());assert_eq!(ordinary.content_loss().to_json(),none.content_loss().to_json());
++ }
++}
++#[derive(Clone,Copy)]enum Mode163{Hwpx,NativeOriginal}
++#[derive(Clone,Copy)]enum Owner163{Body{section:usize,paragraph:usize},Caption{section:usize,paragraph:usize,control:usize,caption:usize}}
++struct Entry163{owner:Owner163,rows:Vec<LineSeg>}
++pub(crate) struct CurrentStampedRowsProjection163<'d>{source:&'d Document,resource:[u8;32],generation:[u8;32],source_key:[u8;32],target_key:[u8;32],allow_caption:bool,mode:Mode163,entries:Vec<Entry163>}
++pub(super) struct BoundRows163{pub(super) body:HashMap<usize,Vec<LineSeg>>,pub(super) caption:HashMap<usize,Vec<LineSeg>>}
++fn digest(d:&Document,resource:[u8;32],generation:[u8;32],caption:bool)->Option<[u8;32]>{document_digest157(d,resource,generation,caption)}
++fn collect(target:&Document,mut rows:HashMap<usize,Vec<LineSeg>>,caption_only:bool)->Option<Vec<Entry163>>{
++ let mut entries=Vec::new();let mut total=0usize;
++ for(si,section)in target.sections.iter().enumerate(){for(pi,p)in section.paragraphs.iter().enumerate(){
++  if let Some(value)=rows.remove(&(p as*const _ as usize)){if caption_only{return None;}total=total.checked_add(value.len())?;entries.push(Entry163{owner:Owner163::Body{section:si,paragraph:pi},rows:value});}
++  for(ci,c)in p.controls.iter().enumerate(){if let Control::Table(t)=c{if let Some(caption)=&t.caption{for(qi,q)in caption.paragraphs.iter().enumerate(){
++   if let Some(value)=rows.remove(&(q as*const _ as usize)){if !caption_only{return None;}total=total.checked_add(value.len())?;entries.push(Entry163{owner:Owner163::Caption{section:si,paragraph:pi,control:ci,caption:qi},rows:value});}
++  }}}}
++  if total>MAX_ROWS||entries.len()>MAX_OWNERS{return None;}
++ }}
++ (!entries.is_empty()&&rows.is_empty()&&entries.iter().all(|e|!e.rows.is_empty())).then_some(entries)
++}
++fn generation(source:[u8;32],original_target:[u8;32],entries:&[Entry163])->[u8;32]{
++ let mut h=blake3::Hasher::new();h.update(b"validated-stamped-row-bind163-v1\0");h.update(&source);h.update(&original_target);
++ for e in entries{let fields=match e.owner{Owner163::Body{section,paragraph}=>[0,section,paragraph,0,0],Owner163::Caption{section,paragraph,control,caption}=>[1,section,paragraph,control,caption]};for v in fields{h.update(&(v as u64).to_le_bytes());}h.update(&(e.rows.len()as u64).to_le_bytes());
++  for row in &e.rows{let LineSeg{text_start,vertical_pos,line_height,text_height,baseline_distance,line_spacing,column_start,segment_width,tag}=row;
++   h.update(&text_start.to_le_bytes());for n in[vertical_pos,line_height,text_height,baseline_distance,line_spacing,column_start,segment_width]{h.update(&n.to_le_bytes());}h.update(&tag.to_le_bytes());}
++ }*h.finalize().as_bytes()
++}
++impl<'d> CurrentStampedRowsProjection163<'d>{
++ pub(crate) fn for_hwpx(core:&'d DocumentCore,intent:&StoredTimeExportIntent<'_>,original:StampedRowSource163<'_,'_>)->Result<Self,String>{
++  let legacy=if matches!(original,StampedRowSource163::Standard){Some(core.current_standard_rows_for_export().ok_or("Current legacy projection is no longer eligible")?)}else{None};
++  let original=match original{StampedRowSource163::Standard=>BoundOriginalRows163::Standard(legacy.as_ref().ok_or("Missing current legacy producer")?),StampedRowSource163::Current(p)=>BoundOriginalRows163::Current(p),StampedRowSource163::Caption(p)=>BoundOriginalRows163::Caption(p)};
++  let source=core.document();let resource=crate::model::native_computed_resource::RESOURCE;let allow_caption=original.has_caption();
++  if !original.owns(source){return Err("Stamped projection belongs to another original document".into());}
++  let original_source=digest(source,resource,[0;32],allow_caption).ok_or("Unsupported stamped source story/budget")?;
++  let (entries,original_target)=core.hwpx_document_for_export(|target|{
++   let key=digest(target,resource,[0;32],allow_caption).ok_or_else(||SerializeError::UnsupportedInput("STAMPED_ORIGINAL_TARGET_SCOPE".into()))?;
++   let bound=original.bind(target).ok_or_else(||SerializeError::UnsupportedInput("STAMPED_ORIGINAL_ROW_BINDING".into()))?;
++   let entries=collect(target,bound,allow_caption).ok_or_else(||SerializeError::UnsupportedInput("STAMPED_ORIGINAL_ROW_OWNER".into()))?;
++   Ok((entries,key))
++  }).map_err(|e|e.to_string())?;
++  let generation=generation(original_source,original_target,&entries);
++  let source_key=digest(source,resource,generation,allow_caption).ok_or("Unsupported original source")?;
++  // This is the only metadata target constructor. It checks original pointer,
++  // owner fingerprint and the exact prepared metadata owner, including unknown OLE.
++  let stamped=intent.stamped_source_document(source)?;
++  let target_key=core.hwpx_document_for_export_document(&stamped,|target|digest(target,resource,generation,allow_caption)
++   .ok_or_else(||SerializeError::UnsupportedInput("STAMPED_EXACT_TARGET_SCOPE".into()))).map_err(|e|e.to_string())?;
++  Ok(Self{source,resource,generation,source_key,target_key,allow_caption,mode:Mode163::Hwpx,entries})
++ }
++ pub(crate) fn for_native_original(core:&'d DocumentCore,intent:&StoredTimeExportIntent<'_>,original:&CurrentFrameRowsProjection<'_>)->Result<Self,String>{
++  let source=core.document();let resource=crate::model::native_computed_resource::RESOURCE;
++  if !original.owns_exact_source163(source){return Err("Stamped native rows belong to another original document".into());}
++  let source0=digest(source,resource,[0;32],false).ok_or("Unsupported stamped native source")?;
++  let literal=source.clone();let bound=original.bind_for_export(&literal).ok_or("Stamped native rows require Original literal clone binding")?;
++  let entries=collect(&literal,bound,false).ok_or("Unsupported native row owner")?;let generation=generation(source0,source0,&entries);
++  let source_key=digest(source,resource,generation,false).ok_or("Unsupported native source")?;
++  let stamped=intent.stamped_source_document(source)?;let target_key=digest(&stamped,resource,generation,false).ok_or("Unsupported stamped native target")?;
++  Ok(Self{source,resource,generation,source_key,target_key,allow_caption:false,mode:Mode163::NativeOriginal,entries})
++ }
++ fn bound(&self,target:&Document)->Option<BoundRows163>{
++  if self.resource!=crate::model::native_computed_resource::RESOURCE||digest(self.source,self.resource,self.generation,self.allow_caption)?!=self.source_key
++   ||digest(target,self.resource,self.generation,self.allow_caption)?!=self.target_key{return None;}
++  let mut result=BoundRows163{body:HashMap::new(),caption:HashMap::new()};
++  for e in &self.entries{let (p,output)=match e.owner{
++   Owner163::Body{section,paragraph}=>(target.sections.get(section)?.paragraphs.get(paragraph)?,&mut result.body),
++   Owner163::Caption{section,paragraph,control,caption}=>{let Control::Table(t)=target.sections.get(section)?.paragraphs.get(paragraph)?.controls.get(control)?else{return None;};(t.caption.as_ref()?.paragraphs.get(caption)?,&mut result.caption)}
++  };if output.insert(p as*const _ as usize,e.rows.clone()).is_some(){return None;}}
++  Some(result)
++ }
++ pub(super) fn bind_hwpx(&self,target:&Document)->Option<BoundRows163>{if !matches!(self.mode,Mode163::Hwpx){return None;}self.bound(target)}
++ pub(crate) fn apply_to_original_stamped_source(&self,target:&mut Document)->Result<(),String>{
++  if !matches!(self.mode,Mode163::NativeOriginal){return Err("Stamped row mode differs".into());}
++  let mut bound=self.bound(target).ok_or("Stamped native exact target changed")?;
++  if !bound.caption.is_empty(){return Err("Unsupported native caption-row projection".into());}
++  for section in &mut target.sections{for p in &mut section.paragraphs{let key=p as*const Paragraph as usize;
++   if let Some(rows)=bound.body.remove(&key){p.line_segs=rows;p.source_line_seg_vertical_pos=None;}
++  }}
++  if !bound.body.is_empty(){return Err("Stamped native row owner changed".into());}Ok(())
++ }
++}
+--- a/src/serializer/hwpx/mod.rs
++++ b/src/serializer/hwpx/mod.rs
+@@ -65,6 +65,7 @@
+     Legacy(Option<&'plan standard_rows::CurrentStandardRowsProjection>),
+     Current(&'plan current_frame_rows::CurrentFrameRowsProjection<'doc>),
+     Caption157(&'plan current_caption_rows157::CurrentCaptionRowsProjection157<'doc>),
++    Stamped163(&'plan current_stamped_rows163::CurrentStampedRowsProjection163<'doc>),
+ }
+ 
+ pub(crate) fn serialize_hwpx_with_frame_rows(doc:&Document,projection:&current_frame_rows::CurrentFrameRowsProjection<'_>)->Result<SerializedDocument,SerializeError>{
+@@ -76,6 +77,8 @@
+  let serialized=serialize_hwpx_with_caption_rows157(doc,p)?;
+  let (plain,loss)=serialized.into_parts();Ok(SerializedDocument::new(encrypt_hwpx_bytes(&plain,password)?,loss))
+ }
++pub(crate) fn serialize_hwpx_with_stamped_rows163(doc:&Document,p:&current_stamped_rows163::CurrentStampedRowsProjection163<'_>)->Result<SerializedDocument,SerializeError>{serialize_hwpx_with_projection(doc,RowProjection::Stamped163(p))}
++pub(crate) fn serialize_hwpx_with_stamped_rows163_and_password(doc:&Document,p:&current_stamped_rows163::CurrentStampedRowsProjection163<'_>,password:&[u8])->Result<SerializedDocument,SerializeError>{let serialized=serialize_hwpx_with_stamped_rows163(doc,p)?;let(plain,loss)=serialized.into_parts();Ok(SerializedDocument::new(encrypt_hwpx_bytes(&plain,password)?,loss))}
+ fn serialize_hwpx_with_projection(doc:&Document,projection:RowProjection<'_,'_>)->Result<SerializedDocument,SerializeError>{
+     use static_assets::*;
+     // Malformed native preview bytes have an opaque HWP owner, not XML text.
+@@ -92,6 +95,7 @@
+         RowProjection::Legacy(projection)=>projection.and_then(|p|p.bind_for_export(doc)).unwrap_or_default(),
+         RowProjection::Caption157(projection)=>{ctx.current_caption_rows157=projection.bind_for_export(doc)
+             .ok_or_else(||SerializeError::UnsupportedInput("CURRENT_CAPTION_EXPORT_INPUT_CHANGED".into()))?;Default::default()},
++        RowProjection::Stamped163(projection)=>{let bound=projection.bind_hwpx(doc).ok_or_else(||SerializeError::UnsupportedInput("STAMPED_CURRENT_ROW_INPUT_CHANGED".into()))?;ctx.current_caption_rows157=bound.caption;bound.body},
+         RowProjection::Current(projection)=>projection.bind_for_export(doc)
+             .ok_or_else(||SerializeError::UnsupportedInput("CURRENT_FRAME_EXPORT_INPUT_CHANGED".into()))?,
+     };
+@@ -2254,3 +2258,4 @@
+ 
+ pub(crate) mod current_frame_rows;
+ pub(crate) mod current_caption_rows157;
++pub(crate) mod current_stamped_rows163;

@@ -1,0 +1,26 @@
+{
+  "fixtures": [
+    {
+      "name": "caption-boundary",
+      "file": "caption-boundary.hwp",
+      "source": "build\\n001-representative178\\discovery176-r3\\caption-boundary.hwp",
+      "sha256": "7923073a94fe32d89c638cc30e0008cd1e30804be02e70f2aa998ffd2a12d763",
+      "authoring": "Public addcaption+captiontext to pinned own row1col; actual table two pages, caption bottom story on final page."
+    },
+    {
+      "name": "square-wrap",
+      "file": "square-wrap.hwp",
+      "source": "build\\n001-representative178\\discovery176-r3\\square-wrap.hwp",
+      "sha256": "582af7933d87a59b1885ee56ee907e4519e66defed699c2733eb6a8aaeb9a726",
+      "authoring": "Public blank/createTable/resize/setSquare Page relation/insert body. Known Square source and narrow current box; actual side-wrap exclusion not inferred."
+    },
+    {
+      "name": "nested-continuation",
+      "file": "nested-continuation.hwp",
+      "source": "build\\n001-representative178\\authored-nested-rowbreak.hwp",
+      "sha256": "8e1afa70c350224c1254e78602d69fde6cff3937207c9104172b21541e644261",
+      "authoring": "Public nested HTML and outerRowBreak, then before fixture freeze typed innerTable.page_break=RowBreak only; ordinaryHWP serialize/read. No source LS/tag/descriptor/cache repair; raw sectionstream dropped only during new fixture authoring."
+    }
+  ],
+  "scope": "Fixed own authored source bytes; no code/flags/row changes during baseline read/edit/export; discovery attempts preserved separately and not successes."
+}

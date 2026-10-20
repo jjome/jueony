@@ -1,0 +1,5 @@
+# N001 Rust182 implementation closure
+
+One exact final source: 501 workflows,1036 unit tests,126 distinct Native tests,fixed88/public56/actualApp29,extras75,bundle7. Original valid short8/48, generic merged24/120 and multiple-page complex36/216 pass including retained edits and passwords. Earlier failures are retained in history and parent general177. Deliberate oversized4 are preservation refusals and never counted as support. Production semantics/layout0.2 and scalar/UTF16/source/events/history/disk conditions are unchanged. User files, credentials and running apps were not modified.
+
+This closes the retained known implementation failures of N001, not general Hancom parity. Native Hancom comparison is deferred by the user; feature verification and N002 remain separately pending. Initial render differences and unproven side-wrap/arbitrary structures are disclosed in summary.json. Only four sample disk files per selected group are frozen here; complete output hashes and observations are in results. All fixtures and deterministic verifiers remain in the repository. Run python verify.py to check frozen bytes.

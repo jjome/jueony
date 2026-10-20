@@ -1,0 +1,673 @@
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[122,106,164,99,118,116,74,147,98,147,74,149,150,114,110,76,128,209,236,159,111,92,168,86,137,41,134,218,35,124,109,180];
++pub(crate) const RESOURCE:[u8;32]=[213,75,91,120,47,204,79,110,213,99,138,29,173,25,56,204,231,32,180,247,45,21,226,243,237,41,144,180,137,99,128,227];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -323,6 +323,8 @@
+             ("src/renderer/current_signed_body_fragments177.rs",include_bytes!("../renderer/current_signed_body_fragments177.rs").as_slice()),
+             ("src/renderer/current_signed_partial_frames177.rs",include_bytes!("../renderer/current_signed_partial_frames177.rs").as_slice()),
+             ("src/renderer/current_signed_tail_replay177.rs",include_bytes!("../renderer/current_signed_tail_replay177.rs").as_slice()),
++            ("src/renderer/current_horizontal_row176.rs",include_bytes!("../renderer/current_horizontal_row176.rs").as_slice()),
++            ("src/renderer/layout/table_layout/current_horizontal_cell176.rs",include_bytes!("../renderer/layout/table_layout/current_horizontal_cell176.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- /dev/null
++++ b/src/renderer/current_horizontal_row176.rs
+@@ -0,0 +1,408 @@
++//! Bounded current horizontal-grid RowBreak row reservation.
++//! Exact row tiling supports1..64 grid columns without assuming a fixture width or span.
++//! This is a height-only proof; it emits no source rows or export/cache authority.
++//! Fresh replay at the actual content width must prove the selected vertical
++//! partition (including full run/style membership), and its complete frame equals
++//! current whole-row paint and MeasuredTable. Partial content cuts stay separate.
++use crate::model::{
++    paragraph::{LineSeg, NumberingMarker},
++    table::{Table, TablePageBreak, VerticalAlign},
++};
++use crate::renderer::{
++    composer::{
++        cell_inner_text_width, compose_paragraph_in_context, reflow_line_segs, ComposedParagraph,
++        ParagraphBox,
++    },
++    layout::LayoutEngine,
++    style_resolver::ResolvedStyleSet,
++};
++
++pub(crate) fn current_fresh_horizontal_row_footprint(
++    engine: &LayoutEngine, t: &Table, row: usize, styles: &ResolvedStyleSet,
++    dpi: f64, painted: f64, mt: &crate::renderer::height_measurer::MeasuredTable,
++) -> Option<f64> {
++    if dpi != crate::renderer::DEFAULT_DPI || t.page_break != TablePageBreak::RowBreak
++        || (t.col_count == 0 || t.col_count > 64) || t.row_count == 0 || t.row_count > 256
++        || t.cells.len() > 512  || t.caption.is_some() || t.repeat_header || !t.zones.is_empty()
++        || mt.page_break != t.page_break || mt.repeat_header || mt.has_header_cells || mt.cells.len() != t.cells.len() || mt.row_heights.len() != usize::from(t.row_count)
++        || engine.render_table_width_scale(t) != 1.0
++        || !painted.is_finite() || painted <= 0.0 || *mt.row_heights.get(row)? != painted
++        || styles.supplemental_metrics.is_some() || styles.horizontal_shaping_context.is_some()
++        || styles.kerning_measurement_context.is_some()
++    { return None; }
++    // Cumulative current measurement must describe exactly this finite row band.
++    if !mt.cell_spacing.is_finite() || mt.cell_spacing < 0.0
++        || mt.cumulative_heights.len() != mt.row_heights.len() + 1
++        || mt.cumulative_heights.first().copied() != Some(0.0)
++    { return None; }
++    let mut end = 0.0;
++    for (i, h) in mt.row_heights.iter().enumerate() {
++        if !h.is_finite() || *h <= 0.0 { return None; }
++        end += h + if i > 0 { mt.cell_spacing } else { 0.0 };
++        if !end.is_finite() || mt.cumulative_heights[i + 1] != end { return None; }
++    }
++    if mt.caption_height != 0.0 || mt.total_height != end { return None; }
++    if (!mt.row_block_start.is_empty() &&
++        (mt.row_block_start.len() != mt.row_heights.len() || mt.row_block_start.iter().enumerate().any(|(i, b)| *b != i)))
++        || (!mt.row_block_end.is_empty() &&
++        (mt.row_block_end.len() != mt.row_heights.len() || mt.row_block_end.iter().enumerate().any(|(i, b)| *b != i + 1)))
++    { return None; }
++    let mut text_budget = 0usize;
++    for p in t.cells.iter().flat_map(|c| &c.paragraphs) {
++        text_budget = text_budget.checked_add(p.text.len())?;
++        if text_budget > 2 * 1024 * 1024 { return None; }
++    }
++    // One bounded occupancy grid validates the entire actual horizontal cover.
++    // No cell may overlap, leave a gap, run past the grid, or span another row.
++    let cols = usize::from(t.col_count);
++    let mut occupied = vec![false; usize::from(t.row_count).checked_mul(cols)?];
++    for c in &t.cells {
++        if c.row >= t.row_count || c.row_span != 1 || c.col_span == 0
++            || c.col_span > t.col_count { return None; }
++        let end = usize::from(c.col).checked_add(usize::from(c.col_span))?;
++        if end > cols { return None; }
++        let base = usize::from(c.row).checked_mul(cols)?;
++        for col in usize::from(c.col)..end {
++            let slot = occupied.get_mut(base.checked_add(col)?)?;
++            if *slot { return None; } *slot = true;
++        }
++    }
++    if occupied.iter().any(|v| !v) { return None; }
++    let row_cells: Vec<_> = t.cells.iter().filter(|c| usize::from(c.row) == row).collect();
++    let measured: Vec<_> = mt.cells.iter().filter(|c| c.row == row).collect();
++    if row_cells.is_empty() || measured.len() != row_cells.len() { return None; }
++    let mut max: f64 = 0.0;
++    let mut nonempty_max: Option<f64> = None;
++    for c in row_cells {
++        let mut owners = measured.iter().filter(|m| m.col == usize::from(c.col));
++        let m = *owners.next()?;
++        if owners.next().is_some() { return None; }
++        let contribution = current_cell(engine,t,c,m,styles,dpi,painted)?;
++        if !c.paragraphs[0].text.is_empty() { nonempty_max=Some(nonempty_max.unwrap_or(0.0).max(contribution)); }
++        max=max.max(contribution);
++    }
++    (max == painted && nonempty_max == Some(painted)).then_some(max)
++}
++fn current_cell(
++    engine: &LayoutEngine, t: &Table, c: &crate::model::table::Cell,
++    m: &crate::renderer::height_measurer::MeasuredCell, styles: &ResolvedStyleSet,
++    dpi: f64, painted: f64,
++) -> Option<f64> {
++    if c.width == 0 || c.width > i32::MAX as u32 || c.height > i32::MAX as u32
++        || c.text_direction != 0 || c.line_wrap != 0 || c.is_header || c.field_name.is_some()
++        || c.paragraphs.len() != 1 { return None; }
++    let p = c.paragraphs.first()?;
++    if p.text.len() > 64 * 1024
++        || p.text.contains(['\t', '\r', '\n', '\u{fffc}'])
++        || !p.controls.is_empty()
++        || p.char_shapes.is_empty()
++        || p.char_shapes.len() > 128
++        || p.char_shapes[0].start_pos != 0
++        || p.char_shapes
++            .windows(2)
++            .any(|s| s[0].start_pos >= s[1].start_pos)
++        || p.char_offsets.len() != p.text.chars().count()
++        || !p.field_ranges.is_empty()
++        || !p.range_tags.is_empty()
++        || !p.orphan_field_ends.is_empty()
++        || !p.tab_extended.is_empty()
++        || p.numbering_restart.is_some()
++        || !matches!(
++            p.numbering_marker,
++            NumberingMarker::Unresolved | NumberingMarker::Absent
++        )
++        || p.layout_only_fill_lines != 0
++        || !p.markpen_marks.is_empty()
++        || !p.title_marks.is_empty()
++        || p.ctrl_data_records.iter().any(Option::is_some)
++        || p.completed_native_rows.is_some()
++        || p.hwpx_axis_shift != 0
++        || p.line_segs.is_empty()
++        || p.line_segs.len() > 4096
++    {
++        return None;
++    }
++    let mut units = 0u32;
++    for (ch, offset) in p.text.chars().zip(&p.char_offsets) {
++        if *offset != units {
++            return None;
++        }
++        units = units.checked_add(ch.len_utf16() as u32)?;
++    }
++    if p.char_count != units.checked_add(1)?
++        || p.char_shapes.iter().any(|s| {
++            (if p.text.is_empty() { s.start_pos != 0 } else { p.char_offsets.binary_search(&s.start_pos).is_err() })
++                || s.char_shape_id as usize >= styles.char_styles.len()
++        })
++    {
++        return None;
++    }
++    let style = styles.para_styles.get(usize::from(p.para_shape_id))?;
++    if style.margin_left != 0.0
++        || style.margin_right != 0.0
++        || style.indent != 0.0
++        || style.spacing_before != 0.0
++        || style.spacing_after != 0.0
++        || style.keep_lines
++        || style.keep_with_next
++        || style.page_break_before
++        || !matches!(style.head_type, crate::model::style::HeadType::None)
++        || !style.line_spacing.is_finite()
++        || style.line_spacing < 0.0
++    {
++        return None;
++    }
++    for shape in &p.char_shapes {
++        let cs = styles.char_styles.get(shape.char_shape_id as usize)?;
++        let hu = cs.font_size * 7200.0 / dpi;
++        let bound = hu * (2.0 + style.line_spacing.abs()) + style.line_spacing.abs() * 7200.0 / dpi;
++        if !hu.is_finite()
++            || hu <= 0.0
++            || !bound.is_finite()
++            || bound * (p.char_offsets.len() as f64) > f64::from(i32::MAX) / 8.0
++        {
++            return None;
++        }
++    }
++    let (left, right, top, bottom) = engine.resolve_cell_padding_for_physical_height(c, t, painted);
++    if [left, right, top, bottom]
++        .iter()
++        .any(|v| !v.is_finite() || *v < 0.0)
++    {
++        return None;
++    }
++    let width = cell_inner_text_width(
++        crate::renderer::hwpunit_to_px(c.width as i32, dpi),
++        left,
++        right,
++        dpi,
++    );
++    if !width.is_finite() || width <= 0.0 {
++        return None;
++    }
++    let mut fresh = p.clone();
++    fresh.line_segs.clear();
++    fresh.layout_space_metrics.clear();
++    fresh.source_line_seg_vertical_pos = None;
++    fresh.native_source_synthetic_seal = None;
++    fresh.native_source_synthetic_context = None;
++    fresh.completed_native_rows = None;
++    fresh.native_frame_observation.set(None);
++    reflow_line_segs(
++        &mut fresh,
++        ParagraphBox::content_for_style(width, Some(style), dpi),
++        styles,
++        dpi,
++    );
++    if fresh.line_segs.len() != p.line_segs.len()
++        || fresh.line_segs.is_empty()
++        || fresh.line_segs.len() > 4096
++    {
++        return None;
++    }
++    let mut end = 0i32;
++    for b in &fresh.line_segs {
++        if b.vertical_pos != end || b.line_height <= 0 || b.line_spacing < 0 {
++            return None;
++        }
++        end = end
++            .checked_add(b.line_height)?
++            .checked_add(b.line_spacing)?;
++    }
++    let actual = compose_paragraph_in_context(p, styles);
++    let (unit_selected, paint_selected, units) = engine.current_horizontal_cell_selection176(c, t, styles, width, painted)?;
++    let generic = compose_paragraph_in_context(&fresh, styles);
++    let exact = p
++        .line_segs
++        .iter()
++        .zip(&fresh.line_segs)
++        .all(|(a, b)| fresh_row_matches(a, b))
++        && same_composition(&actual, &generic);
++    if !exact
++        && !physical_vertical_partition(
++            &p.line_segs,
++            &fresh.line_segs,
++            &actual,
++            &generic,
++            styles,
++            width,
++        )
++    {
++        return None;
++    }
++    // The allocator's actual CellUnit selection and the paint selector must both
++    // describe the same complete fresh vertical partition. This is not a text
++    // width/ink-fit proof: the normal breaker can retain a hanging terminal
++    // separator beyond its interval; diagnostic run-width sums are not fit bounds.
++    if !physical_vertical_partition(&p.line_segs, &fresh.line_segs, &unit_selected, &generic, styles, width)
++        || !same_composition(&unit_selected, &paint_selected)
++
++    { return None; }
++    if m.row_span != 1
++        || m.has_nested_table
++        || m.nested_split_row_count != 0
++        || m.para_line_counts != [fresh.line_segs.len()]
++        || m.line_heights.len() != fresh.line_segs.len()
++        || m.padding_top != top
++        || m.padding_bottom != bottom
++    {
++        return None;
++    }
++    let mut content_sum = 0.0;
++    for (i, (r, h)) in fresh.line_segs.iter().zip(&m.line_heights).enumerate() {
++        r.line_height
++            .checked_add(if i + 1 == fresh.line_segs.len() {
++                0
++            } else {
++                r.line_spacing
++            })?;
++        // Same independent line-height/spacing conversion as MeasuredCell, not a
++        // rounded conversion of the combined HU advance (a distinct f64 expression).
++        let advance = crate::renderer::hwpunit_to_px(r.line_height, dpi)
++            + if i + 1 == fresh.line_segs.len() {
++                0.0
++            } else {
++                crate::renderer::hwpunit_to_px(r.line_spacing, dpi)
++            };
++        if !h.is_finite() || *h != advance {
++            return None;
++        }
++        content_sum += h;
++    }
++    if !content_sum.is_finite() || m.total_content_height != content_sum
++        || !units.matches_fresh(p.text.is_empty(),&m.line_heights) {
++        return None;
++    }
++    let last = fresh.line_segs.last()?;
++    end.checked_sub(last.line_spacing)?;
++    let intrinsic = content_sum + (top + bottom);
++    // A fresh exact empty paragraph contributes its own measured height only.
++    // Its alignment paints no glyphs, and cannot enlarge the maximum supplied
++    // by an independently proved nonempty cell. No row/position is exported.
++    if !p.text.is_empty() && !closed_alignment(c.vertical_align, intrinsic, painted) {
++        return None;
++    }
++    let expected = intrinsic.max(crate::renderer::hwpunit_to_px(c.height as i32, dpi));
++    expected.is_finite().then_some(expected)
++}fn closed_alignment(align: VerticalAlign, intrinsic: f64, painted: f64) -> bool {
++    align == VerticalAlign::Top || intrinsic == painted
++}
++fn fresh_row_matches(a: &LineSeg, b: &LineSeg) -> bool {
++    (a.tag == LineSeg::TAG_SINGLE_SEGMENT_LINE
++        || a.tag == (LineSeg::TAG_SINGLE_SEGMENT_LINE | LineSeg::TAG_IMPLEMENTATION_PROPERTY))
++        && b.tag == (LineSeg::TAG_SINGLE_SEGMENT_LINE | LineSeg::TAG_IMPLEMENTATION_PROPERTY)
++        && a.text_start == b.text_start
++        && a.vertical_pos == b.vertical_pos
++        && a.line_height == b.line_height
++        && a.text_height == b.text_height
++        && a.baseline_distance == b.baseline_distance
++        && a.line_spacing == b.line_spacing
++        && a.column_start == b.column_start
++        && a.segment_width == b.segment_width
++}
++fn same_composition(a: &ComposedParagraph, b: &ComposedParagraph) -> bool {
++    a.numbering_text.is_none()
++        && b.numbering_text.is_none()
++        && a.tac_controls.is_empty()
++        && b.tac_controls.is_empty()
++        && a.footnote_positions.is_empty()
++        && b.footnote_positions.is_empty()
++        && a.tab_extended.is_empty()
++        && b.tab_extended.is_empty()
++        && a.horizontal_shaping.is_none()
++        && b.horizontal_shaping.is_none()
++        && a.lines.len() == b.lines.len()
++        && a.lines.iter().zip(&b.lines).all(|(a, b)| {
++            a.char_start == b.char_start
++                && a.line_height == b.line_height
++                && a.baseline_distance == b.baseline_distance
++                && a.segment_width == b.segment_width
++                && a.column_start == b.column_start
++                && a.line_spacing == b.line_spacing
++                && !a.has_line_break
++                && !b.has_line_break
++                && a.runs.len() == b.runs.len()
++                && a.runs.iter().zip(&b.runs).all(|(a, b)| {
++                    a.text == b.text
++                        && a.char_style_id == b.char_style_id
++                        && a.lang_index == b.lang_index
++                        && a.char_overlap == b.char_overlap
++                        && a.footnote_marker == b.footnote_marker
++                        && a.display_text == b.display_text
++                        && a.supplemental_metrics_blocked == b.supplemental_metrics_blocked
++                        && a.inserted_control_text == b.inserted_control_text
++                        && a.space_metric == b.space_metric
++                })
++        })
++}
++
++// A height-only equivalence. It emits no rows and never transfers horizontal
++// metrics, spacing policy or a lease. The source width is only a refusal bound;
++// fresh partition/metrics and current MeasuredCell remain independent owners.
++fn physical_vertical_partition(
++    source: &[LineSeg],
++    fresh: &[LineSeg],
++    a: &ComposedParagraph,
++    b: &ComposedParagraph,
++    styles: &ResolvedStyleSet,
++    width: f64,
++) -> bool {
++    if source.len() != fresh.len()
++        || !a.tac_controls.is_empty()
++        || !b.tac_controls.is_empty()
++        || a.numbering_text.is_some()
++        || b.numbering_text.is_some()
++        || !a.footnote_positions.is_empty()
++        || !b.footnote_positions.is_empty()
++        || !a.tab_extended.is_empty()
++        || !b.tab_extended.is_empty()
++        || a.horizontal_shaping.is_some()
++        || b.horizontal_shaping.is_some()
++        || a.lines.len() != b.lines.len()
++    {
++        return false;
++    }
++    if !source.iter().zip(fresh).all(|(a, b)| {
++        (a.tag == LineSeg::TAG_SINGLE_SEGMENT_LINE
++            || a.tag == (LineSeg::TAG_SINGLE_SEGMENT_LINE | LineSeg::TAG_IMPLEMENTATION_PROPERTY))
++            && b.tag == (LineSeg::TAG_SINGLE_SEGMENT_LINE | LineSeg::TAG_IMPLEMENTATION_PROPERTY)
++            && a.text_start == b.text_start
++            && a.vertical_pos == b.vertical_pos
++            && a.line_height == b.line_height
++            && a.text_height == b.text_height
++            && a.baseline_distance == b.baseline_distance
++            && a.line_spacing == b.line_spacing
++            && a.column_start == 0
++            && b.column_start == 0
++            && a.segment_width > 0
++            && a.segment_width <= b.segment_width
++    }) {
++        return false;
++    }
++    a.lines.iter().zip(&b.lines).all(|(a, b)| {
++        a.char_start == b.char_start
++            && a.line_height == b.line_height
++            && a.baseline_distance == b.baseline_distance
++            && a.line_spacing == b.line_spacing
++            && a.column_start == 0
++            && b.column_start == 0
++            && a.segment_width > 0
++            && a.segment_width <= b.segment_width
++            && !a.has_line_break
++            && !b.has_line_break
++            && a.runs.len() == b.runs.len()
++            && a.runs.iter().zip(&b.runs).all(|(a, b)| {
++                use crate::model::paragraph::SpaceMetric;
++                a.text == b.text
++                    && a.char_style_id == b.char_style_id
++                    && a.lang_index == b.lang_index
++                    && a.char_overlap == b.char_overlap
++                    && a.footnote_marker == b.footnote_marker
++                    && a.display_text == b.display_text
++                    && a.supplemental_metrics_blocked == b.supplemental_metrics_blocked
++                    && a.inserted_control_text == b.inserted_control_text
++                    && matches!(a.space_metric, SpaceMetric::Stored | SpaceMetric::HalfCell)
++                    && b.space_metric == SpaceMetric::Stored
++            })
++    })
++}
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -4278,6 +4278,9 @@
+     /// `DocumentCore` 는 `Send` 여야 한다(native 소비자가 스레드 경계 너머로 소유).
+     /// [#3386] 선언 행높이 신뢰를 켤지. 조각 렌더 경로에서만 잠시 끈다.
+     declared_trust_allowed: std::cell::Cell<bool>,
++    /// Synchronous borrowed scopes; only refutes a table-height/cell-height
++    /// domain mismatch. No persistent cache, row, origin or lease authority.
++    horizontal_refutations176: std::cell::RefCell<table_layout::current_horizontal_cell176::RefutationArena176>,
+     cell_units_cache: std::cell::RefCell<
+         std::collections::HashMap<usize, std::sync::Arc<Vec<table_layout::CellUnit>>>,
+     >,
+@@ -4412,6 +4415,7 @@
+             item_flow_snap_context: std::cell::Cell::new(None),
+             hwpx_page_preview: std::cell::RefCell::new(None),
+             declared_trust_allowed: std::cell::Cell::new(true),
++            horizontal_refutations176: Default::default(),
+             cell_units_cache: std::cell::RefCell::new(std::collections::HashMap::new()),
+             table_nested_text_flag_cache: std::cell::RefCell::new(std::collections::HashMap::new()),
+             cursor_probe_block_cache: std::cell::RefCell::new(std::collections::HashMap::new()),
+--- a/src/renderer/layout/table_layout.rs
++++ b/src/renderer/layout/table_layout.rs
+@@ -1,4 +1,5 @@
+ //! 표 레이아웃 (layout_table + 셀 높이/줄범위 계산)
++pub(super) mod current_horizontal_cell176;
+ 
+ use super::super::composer::{compose_paragraph, ComposedLine, ComposedParagraph};
+ use super::super::height_measurer::{
+@@ -14737,6 +14738,7 @@
+             end_cut,
+             units[..end_cut - 1].iter().map(|u| u.height).sum(),
+             units[end_cut - 1].height,
++            styles,
+         )
+     }
+ 
+@@ -14888,6 +14890,7 @@
+         end_cut: usize,
+         consumed_before_px: f64,
+         last_unit_height_px: f64,
++        styles: &ResolvedStyleSet,
+     ) -> f64 {
+         if !self.profile.get().hwp5_stored_pagination_layout()
+             || table.common.treat_as_char
+@@ -14965,6 +14968,11 @@
+                 return trim;
+             }
+         }
++
++        // A separately scoped current proof can refute only this table-global
++        // declaration's use as a cell-local opening cap. Reset/row/lease facts
++        // and the earlier genuine stored-frame branches stay unchanged.
++        if self.current_horizontal_declared_cap_refuted176(table,cell,styles) { return 0.0; }
+ 
+         // 문단 안 되감김은 **물리 쪽 프레임**일 수도, 공간이 남은 **로컬 재시작**일
+         // 수도 있다(기계 문서의 촘촘한 리셋 — `#1658` 낭비 쪽 회귀의 근거). 둘을
+--- /dev/null
++++ b/src/renderer/layout/table_layout/current_horizontal_cell176.rs
+@@ -0,0 +1,134 @@
++//! Read-only current selectors for bounded horizontal-grid row reservation.
++//! No row, origin, width, cache lease or export authority is returned.
++use super::*;
++/// Height-only current unit observation. Neither variant can issue rows or a lease.
++pub(crate) struct CurrentHorizontalCellUnits176(UnitRole176);
++enum UnitRole176 { Plain(Vec<f64>), KnownEmpty(f64) }
++impl CurrentHorizontalCellUnits176 {
++    pub(crate) fn matches_fresh(&self, zero_scalar: bool, heights: &[f64]) -> bool {
++        if heights.iter().any(|h| !h.is_finite() || *h <= 0.0) { return false; }
++        match &self.0 {
++            UnitRole176::Plain(actual) => !zero_scalar && actual == heights,
++            UnitRole176::KnownEmpty(actual) => zero_scalar && heights.len() == 1 && *actual == heights[0],
++        }
++    }
++}
++impl LayoutEngine {
++    pub(crate) fn current_horizontal_cell_selection176(
++        &self, cell: &crate::model::table::Cell, table: &crate::model::table::Table,
++        styles: &ResolvedStyleSet, width: f64, height: f64,
++    ) -> Option<(ComposedParagraph, ComposedParagraph, CurrentHorizontalCellUnits176)> {
++        if cell.paragraphs.len() != 1 || cell.text_direction != 0 || cell.line_wrap != 0
++            || cell.row_span != 1 || !width.is_finite() || width <= 0.0
++            || !height.is_finite() || height <= 0.0 { return None; }
++        let para = &cell.paragraphs[0];
++        if !para.controls.is_empty() { return None; }
++        let (l,r,t,b) = self.resolve_cell_padding_for_physical_height(cell,table,height);
++        let cell_w = hwpunit_to_px(i32::try_from(cell.width).ok()?,self.dpi);
++        if crate::renderer::composer::cell_inner_text_width(cell_w,l,r,self.dpi) != width { return None; }
++        let initial = crate::renderer::composer::compose_paragraph_in_context(para,styles);
++        // Whole-cell and split-cell paint may not silently choose a different
++        // inner interval. The supported current partition must need no shrink.
++        let shrunk = self.shrink_cell_padding_for_overflow(l,r,cell_w,(height-t-b).max(0.0),
++            std::slice::from_ref(&initial),&cell.paragraphs,styles,cell.apply_inner_margin,false);
++        if shrunk != (l,r) { return None; }
++        let unit = self.compose_cell_unit_paragraph(para,0,width,styles);
++        let mut paint = initial;
++        crate::renderer::composer::recompose_horizontal_cell_lines_for_width(&mut paint,para,width,
++            styles,self.dpi,self.profile.get().legacy_hwp3_stored_geometry(),self.profile.get().native_hwp5_layout(),
++            &self.single_line_overflow_cache,Some(0));
++        let selected = self.cell_units(cell,table,styles);
++        let rebuilt = self.cell_units_uncached(cell,table,styles);
++        if selected.len() != rebuilt.len() || selected.len() != unit.lines.len() { return None; }
++        let zero_scalar = para.text.is_empty() && para.char_offsets.is_empty() && para.char_count == 1;
++        let ordinary = |u: &CellUnit, i:usize| u.para_idx == 0 && u.vis_start == i && u.vis_end == i+1
++            && u.height.is_finite() && u.height > 0.0 && !u.hard_break_before && !u.stored_frame_break_before
++            && !u.page_frame_reset_before && !u.vpos_gap_before && u.nested_row.is_none()
++            && u.nested_table_fragment.is_none() && !u.mixed_nested_fragment && !u.mixed_nested_trailing
++            && u.mixed_nested_content_height == 0.0 && !u.mixed_nested_recursive && !u.mixed_nested_starts_after_table
++            && u.mixed_nested_source_para_idx.is_none() && matches!(u.recursive_block_prelude_role,RecursiveBlockPreludeRole::None)
++            && !u.top_and_bottom_flow && u.empty_spacer == zero_scalar && u.non_inline_control_range.is_none();
++        if selected.iter().zip(&rebuilt).enumerate().any(|(i,(a,b))| !ordinary(a,i) || !ordinary(b,i) || a.height != b.height) { return None; }
++        let role = if zero_scalar {
++            if selected.len() != 1 { return None; }
++            UnitRole176::KnownEmpty(selected[0].height)
++        } else { UnitRole176::Plain(selected.iter().map(|u|u.height).collect()) };
++        Some((unit,paint,CurrentHorizontalCellUnits176(role)))
++    }
++}
++
++
++#[derive(Default)]
++pub(in super::super) struct RefutationArena176 {
++    next: u64,
++    stack: Vec<(u64, Option<RefutedOpeningHeight176>)>,
++    suppressed: usize,
++}
++struct RefutedOpeningHeight176 {
++    table: usize, styles: usize, targets: std::ops::Range<usize>,
++    resource: [u8;32], context: Option<[u8;32]>,
++    profile: crate::model::provenance::LayoutCompatibilityProfile,
++    body: (f64,f64,f64,f64), paper: (f64,f64), uniform: bool,
++}
++/// Its immutable borrows prevent replacing source, definitions or actual MT
++/// while this synchronous scope is active. Private construction; no cloning,
++/// serialization, cross-thread transfer, or export capability.
++pub(crate) struct ScopedRefutedOpening176<'a> {
++    engine: &'a LayoutEngine,
++    _inputs: (&'a crate::model::table::Table, &'a ResolvedStyleSet, Option<&'a MeasuredTable>),
++    id: Option<u64>, suppressed: bool,
++}
++impl Drop for ScopedRefutedOpening176<'_> {
++    fn drop(&mut self) {
++        let mut arena=self.engine.horizontal_refutations176.borrow_mut();
++        if self.suppressed { arena.suppressed=arena.suppressed.saturating_sub(1); }
++        if let Some(id)=self.id { if let Some(i)=arena.stack.iter().position(|(n,_)|*n==id) {arena.stack.remove(i);} }
++    }
++}
++impl LayoutEngine {
++    pub(crate) fn scoped_refuted_opening176<'a>(&'a self,table:&'a crate::model::table::Table,
++        styles:&'a ResolvedStyleSet,mt:Option<&'a MeasuredTable>,owner:(usize,usize),targets:std::ops::Range<usize>) -> ScopedRefutedOpening176<'a> {
++        let plan=(|| {
++            let mt=mt?;
++            let declared=hwpunit_to_px(i32::try_from(table.common.height).ok()?,self.dpi);
++            let first=*mt.row_heights.first()?;
++            if owner!=(mt.para_index,mt.control_index) || !declared.is_finite() || declared<=0.0
++                || !first.is_finite() || first<=declared || targets.start>targets.end
++                || targets.end>usize::from(table.row_count) || styles.reset_flow_context.is_none()
++                || self.column_is_endnote_flow.get() {return None;}
++            let body=self.current_body_area.get();let paper=(self.current_paper_width.get(),self.current_page_height.get());
++            if [body.0,body.1,body.2,body.3,paper.0,paper.1].iter().any(|v|!v.is_finite())
++                || body.2<=0.0 || body.3<=0.0 || paper.0<=0.0 || paper.1<=0.0 {return None;}
++            // An independent current nonempty maximum owns this whole first row.
++            // It already exceeds the purported whole-table opening declaration.
++            let painted=self.resolve_row_heights_trusting_declared(table,usize::from(table.col_count),usize::from(table.row_count),Some(mt),styles,table.common.treat_as_char,false);
++            if painted.first().copied()!=Some(first)
++                || crate::renderer::current_horizontal_row176::current_fresh_horizontal_row_footprint(self,table,0,styles,self.dpi,first,mt)!=Some(first) {return None;}
++            let mut keys=std::collections::BTreeSet::new();
++            for m in &mt.cells { if !keys.insert((m.row,m.col))
++                || !table.cells.iter().any(|c|usize::from(c.row)==m.row&&usize::from(c.col)==m.col) {return None;} }
++            Some(RefutedOpeningHeight176{table:table as *const _ as usize,styles:styles as *const _ as usize,targets,
++                resource:crate::model::native_computed_resource::RESOURCE,context:styles.reset_flow_context,
++                profile:self.profile.get(),body,paper,uniform:self.uniform_filler_ladder.get()})
++        })();
++        let mut arena=self.horizontal_refutations176.borrow_mut();
++        let id=if arena.stack.len()<8 && arena.suppressed==0 {arena.next.checked_add(1)} else {None};
++        let suppressed=id.is_none();
++        if let Some(id)=id {arena.next=id;arena.stack.push((id,plan));}else{arena.suppressed=arena.suppressed.saturating_add(1);}
++        ScopedRefutedOpening176{engine:self,_inputs:(table,styles,mt),id,suppressed}
++    }
++    pub(super) fn current_horizontal_declared_cap_refuted176(&self,table:&crate::model::table::Table,
++        cell:&crate::model::table::Cell,styles:&ResolvedStyleSet) -> bool {
++        let arena=self.horizontal_refutations176.borrow();
++        if arena.suppressed!=0 {return false;}
++        let Some(plan)=arena.stack.last().and_then(|(_,p)|p.as_ref())else{return false;};
++        usize::from(cell.row)>0 && plan.targets.contains(&usize::from(cell.row))
++            && table.cells.iter().any(|c|std::ptr::eq(c,cell))
++            && plan.table==table as *const _ as usize && plan.styles==styles as *const _ as usize
++            && plan.context==styles.reset_flow_context && plan.profile==self.profile.get()
++            && plan.resource==crate::model::native_computed_resource::RESOURCE
++            && plan.body==self.current_body_area.get()
++            && plan.paper==(self.current_paper_width.get(),self.current_page_height.get())
++            && plan.uniform==self.uniform_filler_ladder.get()
++    }
++}
+--- a/src/renderer/layout/table_partial.rs
++++ b/src/renderer/layout/table_partial.rs
+@@ -4431,6 +4431,10 @@
+             return y_start;
+         }
+ 
++        let _refuted_opening176 = self.scoped_refuted_opening176(table,styles,
++            measured_table.filter(|_|!row_cursor_is_nested && enclosing_cell_ctx.is_none()),
++            (para_index,control_index),start_row..end_row);
++
+         // [#3820 Stage 120] A native-HWP5 empty-host 1x1 RowBreak table can store the
+         // physical first-fragment height in `common.height`, then restart its cell LINE_SEG
+         // ladder at zero for the successor page.  Keep this paint-only witness separate from
+--- a/src/renderer/mod.rs
++++ b/src/renderer/mod.rs
+@@ -4002,3 +4002,5 @@
+ pub(crate) mod current_suffix_wrap148;
+ 
+ pub(crate) mod current_absolute_noink168;
++
++pub(crate) mod current_horizontal_row176;
+--- a/src/renderer/typeset/table/block/prepare.rs
++++ b/src/renderer/typeset/table/block/prepare.rs
+@@ -216,6 +216,12 @@
+                 ).is_some() {
+                     // Separate current multi-cell row proof. No source row, cut,
+                     // stored metric, origin, or serializer policy is transferred.
++                    cut.max(*painted)
++                } else if crate::renderer::current_horizontal_row176::current_fresh_horizontal_row_footprint(
++                    &layout_engine, row_geometry_table, row, styles, self.dpi, *painted, mt,
++                ).is_some() {
++                    // General exact horizontal tiling, same current max-height
++                    // proof; no vertical span or stored row/export capability.
+                     cut.max(*painted)
+                 } else if declared_whole_table_matches_paint
+                     && padding_explains_drift
+--- a/src/renderer/typeset/table/continuation/fragment.rs
++++ b/src/renderer/typeset/table/continuation/fragment.rs
+@@ -91,6 +91,10 @@
+         let styles = input.source.styles;
+         let can_intra_split = input.prepared.can_intra_split;
+         let layout_engine = &input.prepared.layout_engine;
++        let _refuted_opening176 = layout_engine.scoped_refuted_opening176(row_geometry_table,styles,
++            (!row_cursor_is_nested).then_some(input.source.measured_table),
++            (input.source.para_index,input.source.control_index),input.start.cursor_row..input.prepared.row_count);
++
+         let cursor_row = input.start.cursor_row;
+         let start_cut_is_block = input.start.start_cut_is_block;
+         let start_row_height_override = input.start.start_row_height_override;

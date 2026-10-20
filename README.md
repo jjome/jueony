@@ -1,6 +1,6 @@
 # Jueony — 공무원용 AI 문서 편집기
 
-[파일·저장·복구 최신 구현 현황](docs/138-n001-storage-current-closure.md) — **N001의 남은 복합 배치 저장 결함을 수정 중입니다.** Rust177 시각304/304·절대336·float768·병합2열60·rowspan72회 통과. 합본501·단위1036·Native105·실제App29도 통과했습니다. 짧은 다쪽·3/4열 병합·다쪽 캡션을 계속 수정합니다. 한글 직접 비교는 보류합니다.
+[파일·저장·복구 최종 구현·자동검증](docs/138-n001-storage-current-closure.md) — **남은 N001 구현을 마감했습니다. 구현24/24.** Rust182 최종 합본: 유효 짧은 다쪽8/48·3/4열 병합24/120·다쪽 캡션/중첩36/216 완료. 합본501·unit1036·Native126·실제App29·추가75·실행묶음7 통과. 기존 보호 검사와 원본44·WIP45 유지. 한글 직접 비교는 사용자 요청으로 보류;138참조. 검수 실행: [Start-Jueony-FileReview.cmd](Start-Jueony-FileReview.cmd).
 
 ## [전체 진행 현황 · 기능별 작업 문서 바로가기](docs/jueony-progress.md)
 
@@ -14,7 +14,7 @@
 | [AI 연결·Agent 실행](<docs/features/02-agent-and-models.md>) | — | 14/20 · 부분 2 | 9/20 · 부분 3 | 13/19 | 구현 [N024](<docs/features/02-agent-and-models.md#n024>) 브라우저 인증 링크 기반 계정 연결 |
 | [참고 자료·검색·RAG](<docs/features/03-references-and-rag.md>) | — | 5/10 · 부분 2 | 4/10 · 부분 1 | 1/6 | 구현 [N033](<docs/features/03-references-and-rag.md#n033>) 검색 순위·구본 우선 문제와 무답 판별 |
 | [반복 작업·공무원 업무 양식](<docs/features/04-macros-and-business.md>) | 0/5 | 3/6 · 부분 1 | 3/6 | 3/6 | 구현 [N038](<docs/features/04-macros-and-business.md#n038>) 반복 작업의 표·개체 명령 확장 |
-| [파일·저장·복구·형식 보존](<docs/features/05-files-storage-recovery.md>) | 0/10 | 23/24 · 부분 1 | 22/24 · 부분 2 | 6/6 | N001 Rust177 · 시각304/304·절대336·float768·병합2열60·rowspan72 통과 · 짧은다쪽·3/4열·다쪽캡션 수정 중 · 구현 [N001](<docs/features/05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존 |
+| [파일·저장·복구·형식 보존](<docs/features/05-files-storage-recovery.md>) | 0/10 | 24/24 | 22/24 · 부분 2 | 6/6 | N001 구현 완료 · Rust182 · 다쪽48·병합120·복합216회 저장 통과 · 자동검증 PASS · 한글 직접 비교 보류 · 검증 [N001](<docs/features/05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존 |
 | [본문 편집·입력·선택·찾기](<docs/features/06-editing-and-selection.md>) | 0/20 | 7/7 | 0/7 · 부분 7 | 4/4 | 검증 [A001](<docs/features/06-editing-and-selection.md#a001>) 새 본문 문서 작성 |
 | [글자·문단·스타일·번호](<docs/features/07-formatting-and-styles.md>) | 0/18 | 19/23 · 부분 2 | 0/23 · 부분 19 | 13/16 | 구현 [N011](<docs/features/07-formatting-and-styles.md#n011>) 스타일 가져오기·내보내기 |
 | [표·셀·크기·계산](<docs/features/08-tables.md>) | 0/24 | 32/38 · 부분 2 | 3/38 · 부분 31 | 26/33 · 부분 3 | 구현 [N004](<docs/features/08-tables.md#n004>) 기존 병합 원본의 후속 Agent 셀 편집 |
@@ -26,7 +26,7 @@
 | [보안·개인정보·검토·메모](<docs/features/14-security-and-review.md>) | 0/11 | 상위 0/11 · 부분 3 | 상위 0/11 | 상위 0/11 | 상세 작업 분해 필요 |
 | [출력·변환·교정·외부 도구](<docs/features/15-output-and-tools.md>) | 0/23 | 상위 0/23 · 부분 3 | 상위 0/23 | 상위 0/23 | 상세 작업 분해 필요 |
 | [모듈·실행 기반·배포·최종 검수](<docs/features/16-architecture-and-validation.md>) | — | 7/25 · 부분 16 | 7/25 · 부분 13 | 해당 없음 | 구현 [N041](<docs/features/16-architecture-and-validation.md#n041>) 독립 한글에서 복합 코퍼스 일괄 검수 |
-| **전체 실행 작업** | — | **167/219** | **52/219** | **88/117** | 세 축 완료 **52개** |
+| **전체 실행 작업** | — | **168/219** | **52/219** | **88/117** | 세 축 완료 **52개** |
 
 ‘상위 완료’는 필요한 구현·검증·Agent 연결을 모두 충족한 상위 범위 수다. 나머지 숫자는 **완료·연결 / 해당 세부 실행 작업 수**다. ‘상위’는 상세 작업이 아직 없는 영역의 상위 범위 집계다. 다른 행의 세부 작업 수와 합산하지 않는다. 전체 기능 완성률이 아니며, 한글 직접 비교와 미검증 변경은 완료에 포함하지 않는다.
 

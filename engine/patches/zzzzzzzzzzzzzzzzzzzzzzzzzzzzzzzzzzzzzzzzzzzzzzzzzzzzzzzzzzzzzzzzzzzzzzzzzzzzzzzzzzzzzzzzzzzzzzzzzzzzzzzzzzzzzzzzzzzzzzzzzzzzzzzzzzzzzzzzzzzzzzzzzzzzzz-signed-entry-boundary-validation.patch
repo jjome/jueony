@@ -1,0 +1,190 @@
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[255,105,147,178,226,188,75,114,167,188,16,245,79,162,39,214,10,124,40,26,114,33,95,129,68,228,126,92,99,14,201,252];
++pub(crate) const RESOURCE:[u8;32]=[128,190,227,170,70,114,47,187,176,247,203,214,142,167,112,36,110,176,204,80,253,151,138,34,249,42,45,5,244,50,24,55];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+--- a/src/renderer/current_full_body_selection179.rs
++++ b/src/renderer/current_full_body_selection179.rs
+@@ -103,3 +103,19 @@
+  &&a.footnote_positions.is_empty()&&b.footnote_positions.is_empty()&&a.tab_extended.is_empty()&&b.tab_extended.is_empty()
+  &&a.lines.len()==b.lines.len()&&a.lines.iter().zip(&b.lines).all(|(a,b)|same_selected_line(a,b))
+ }
++
++#[cfg(test)]mod current_full_selection179_tests{
++ use super::*;
++ #[test]fn current_full_selection179_actual_arc_and_stale_consumers(){
++  let bytes=include_bytes!("../../../../../apps/editor/tests/fixtures/n001-signed-short177-own/fixtures/unequal3-minus300-short.hwp");
++  let mut d=crate::DocumentCore::from_bytes(bytes).unwrap();let end=d.document().sections[0].paragraphs[0].text.chars().count();d.insert_text_native(0,0,end,&"Signed negative current prefix reflows across columns. ".repeat(8)).unwrap();
++  let result=&d.pagination[0];let trace=result.selected_composition_trace.as_ref().unwrap();let styles=d.resolve_render_styles_for_section(0);let ps=&d.document().sections[0].paragraphs;
++  let view=CurrentFullBodySelections179::from_current(trace,result,ps,&styles,d.effective_layout_profile(),d.dpi);
++  let e=view.entries.iter().find(|e|e.composition.lines.len()>1&&trace.commits().iter().any(|c|c.format_id==e.format&&c.flow_before==0.0)).unwrap();let p=&ps[e.index];let before=format!("{:?}",d.document());
++  assert!(view.paint(trace,p,e.index,e.section,e.page,e.column,&e.rect,e.rect.y,&styles,d.dpi).is_some());
++  let foreign=p.clone();assert!(view.paint(trace,&foreign,e.index,e.section,e.page,e.column,&e.rect,e.rect.y,&styles,d.dpi).is_none());
++  let other=crate::DocumentCore::from_bytes(bytes).unwrap();let foreign_trace=other.pagination[0].selected_composition_trace.as_ref().unwrap();assert!(view.paint(foreign_trace,p,e.index,e.section,e.page,e.column,&e.rect,e.rect.y,&styles,d.dpi).is_none());
++  let mut rect=e.rect;rect.width+=1.0/75.0;assert!(view.paint(trace,p,e.index,e.section,e.page,e.column,&rect,e.rect.y,&styles,d.dpi).is_none());
++  let mut bad=styles.clone();bad.char_styles[0].font_size+=1.0;assert!(view.paint(trace,p,e.index,e.section,e.page,e.column,&e.rect,e.rect.y,&bad,d.dpi).is_none());assert_eq!(before,format!("{:?}",d.document()));
++ }
++}
+--- a/src/renderer/current_signed_partial_noink179.rs
++++ b/src/renderer/current_signed_partial_noink179.rs
+@@ -37,13 +37,14 @@
+  // source-free physical-column empty row and the independently replayed pen.
+  let mut declared=fresh_signed_body_rows(p,styles,frame.rect.width,dpi)?.rows;
+  if declared.len()!=1{return None;}declared[0].vertical_pos=integer_hu(flow-unpainted,dpi)?;
+- if p.line_segs!=declared||p.source_line_seg_vertical_pos.as_ref().is_some_and(|v|v.as_slice()!=[declared[0].vertical_pos]){return None;}
++ if !exact_noink_declaration179(p,&declared){return None;}
+  let mut advance=0.0;let mut physical_bottom=0.0;for line in &fresh.lines{
+   let h=crate::renderer::hwpunit_to_px(line.line_height,dpi);
+   if !relative_box_fits(frame.available,flow-unpainted+advance,h){return None;}
+   physical_bottom=flow-unpainted+advance+h;advance+=h+crate::renderer::hwpunit_to_px(line.line_spacing,dpi);
+  }
+  let logical_after=flow+advance;
++ #[cfg(test)]tests179::probe(&frame,paragraph,ps,styles,profile,dpi,handle,measurements);
+  (advance>0.0&&logical_after.is_finite()).then_some(CurrentSignedPartialNoInkFit179{_logical_after:logical_after,_physical_bottom:physical_bottom,_unpainted_before:unpainted})
+ }
+ struct PrefixReplay179{arena:CurrentFitPrefix156,flow:f64,unpainted:f64}
+@@ -128,16 +129,20 @@
+ /// This token only requests the ordinary allocator's next frame; source-reset
+ /// rows, source fields and the old multicolumn split planner are unchanged.
+ pub(crate) struct CurrentSignedFirstFragmentEntry179{_first_height:f64,_logical_available:f64}
+-pub(crate) fn current_signed_first_fragment_entry179(frame:CurrentSignedPartialNoInkFrame179<'_>,logical_available:f64,next_width:f64,
++pub(crate) fn current_signed_first_fragment_entry179(frame:CurrentSignedPartialNoInkFrame179<'_>,logical_available:f64,next_width:f64,next_height:f64,first_end:usize,first_advance:f64,
+  paragraph:usize,ps:&[crate::model::paragraph::Paragraph],styles:&ResolvedStyleSet,profile:LayoutCompatibilityProfile,dpi:f64,
+  handle:Option<SelectedObservationHandle>,measurements:&[MeasuredTable])->Option<CurrentSignedFirstFragmentEntry179>{
+  let p=ps.get(paragraph)?;
+  if p.text.is_empty()||!logical_available.is_finite()||logical_available<=0.0||logical_available>frame.available
+-  ||!next_width.is_finite()||next_width!=frame.rect.width{return None;}
++  ||!next_width.is_finite()||next_width!=frame.rect.width||!next_height.is_finite()||next_height!=frame.rect.height
++  ||frame.available!=frame.rect.height||!first_advance.is_finite()||first_advance<=0.0||first_advance>logical_available{return None;}
+  let PrefixReplay179{arena,flow,..}=prefix_replay179(&frame,paragraph,ps,styles,profile,dpi,handle,measurements)?;
+  let (_,f)=crate::renderer::selected_composition_observer127::current_for_flow(handle?,p)?;
+  let (fresh,f)=fresh_selected(&arena,f.observation_id,p,styles,profile,dpi)?;
+  if f.actual_input_width_px!=Some(frame.rect.width)||fresh.lines.len()<2{return None;}
++ if first_end==0||first_end>fresh.lines.len(){return None;}
++ let mut actual_advance=0.0;for line in &fresh.lines[..first_end]{actual_advance+=crate::renderer::hwpunit_to_px(line.line_height.checked_add(line.line_spacing)?,dpi);}
++ if !arithmetic_equal(actual_advance,first_advance){return None;}
+  let first=&fresh.lines[0];let height=crate::renderer::hwpunit_to_px(first.line_height,dpi);
+  if first.char_start!=0||first.runs.is_empty()||height<=0.0||!height.is_finite()||flow+height<=logical_available{return None;}
+  Some(CurrentSignedFirstFragmentEntry179{_first_height:height,_logical_available:logical_available})
+@@ -189,3 +194,30 @@
+   if !arithmetic_equal(total,m.cumulative_heights[i+1]){return false;}}
+  total.is_finite()&&arithmetic_equal(total,m.total_height)&&arithmetic_equal(m.total_height,crate::renderer::hwpunit_to_px(t.common.height as i32,dpi))
+ }
++
++fn exact_noink_declaration179(p:&crate::model::paragraph::Paragraph,declared:&[LineSeg])->bool{
++ declared.len()==1&&p.line_segs==declared&&p.source_line_seg_vertical_pos.as_ref().is_none_or(|v|v.as_slice()==[declared[0].vertical_pos])
++}
++#[cfg(test)]mod tests179{
++ use super::*;use std::cell::RefCell;
++ #[derive(Default)]struct Probe{enabled:bool,some:usize,foreign_mt:usize,context:usize,stale:usize,previous:std::collections::HashMap<usize,SelectedObservationHandle>}
++ thread_local!{static PROBE:RefCell<Probe>=RefCell::new(Probe::default());}
++ pub(super)fn probe(frame:&CurrentSignedPartialNoInkFrame179<'_>,paragraph:usize,ps:&[crate::model::paragraph::Paragraph],styles:&ResolvedStyleSet,profile:LayoutCompatibilityProfile,dpi:f64,handle:SelectedObservationHandle,measurements:&[MeasuredTable]){
++  if !PROBE.with(|p|p.borrow().enabled){return;}let p=&ps[paragraph];assert!(prefix_replay179(frame,paragraph,ps,styles,profile,dpi,Some(handle),measurements).is_some());
++  let mut foreign=measurements.to_vec();assert!(!foreign.is_empty());foreign[0].total_height+=1.0/75.0;assert!(prefix_replay179(frame,paragraph,ps,styles,profile,dpi,Some(handle),&foreign).is_none());
++  let mut bad=styles.clone();bad.reset_flow_context=Some([0x79;32]);assert!(prefix_replay179(frame,paragraph,ps,&bad,profile,dpi,Some(handle),measurements).is_none());
++  PROBE.with(|state|{let mut state=state.borrow_mut();state.some+=1;state.foreign_mt+=1;state.context+=1;if let Some(old)=state.previous.insert(p as*const _ as usize,handle){if crate::renderer::selected_composition_observer127::current_fit_prefix156(old,p).is_none(){state.stale+=1;}}});
++ }
++ #[test]fn current_signed_noink179_actual_prefix_rejects_foreign_mt_context_and_stale_handle(){
++  PROBE.with(|p|*p.borrow_mut()=Probe{enabled:true,..Default::default()});
++  let bytes=include_bytes!("../../../../../apps/editor/tests/fixtures/n001-signed-short177-own/fixtures/unequal3-minus300-short.hwp");let mut d=crate::DocumentCore::from_bytes(bytes).unwrap();let end=d.document().sections[0].paragraphs[0].text.chars().count();d.insert_text_native(0,0,end,&"Signed negative current prefix reflows across columns. ".repeat(8)).unwrap();
++  let artifact=d.export_hwpx_native_with_report().unwrap();let mut reopened=crate::DocumentCore::from_bytes(artifact.bytes()).unwrap();let last=reopened.document().sections[0].paragraphs.len()-1;let end=reopened.document().sections[0].paragraphs[last].text.chars().count();reopened.insert_text_native(0,last,end," short179 followup").unwrap();
++  PROBE.with(|p|{let p=p.borrow();assert!(p.some>0);assert_eq!(p.some,p.foreign_mt);assert_eq!(p.some,p.context);assert!(p.stale>0);});PROBE.with(|p|p.borrow_mut().enabled=false);
++ }
++ #[test]fn current_signed_noink179_declaration_rejects_every_row_field_and_duplicates(){
++  let row=LineSeg{text_start:0,vertical_pos:16328,line_height:1000,text_height:1000,baseline_distance:850,line_spacing:600,column_start:0,segment_width:9080,tag:0x80060000};let mut p=crate::model::paragraph::Paragraph::default();p.line_segs=vec![row.clone()];p.source_line_seg_vertical_pos=Some(vec![row.vertical_pos]);assert!(exact_noink_declaration179(&p,&[row.clone()]));
++  for n in 0..9{let mut bad=p.clone();let r=&mut bad.line_segs[0];match n{0=>r.text_start+=1,1=>r.vertical_pos+=1,2=>r.line_height+=1,3=>r.text_height+=1,4=>r.baseline_distance+=1,5=>r.line_spacing+=1,6=>r.column_start+=1,7=>r.segment_width+=1,_=>r.tag^=2};assert!(!exact_noink_declaration179(&bad,&[row.clone()]));}
++  p.source_line_seg_vertical_pos=Some(vec![row.vertical_pos+1]);assert!(!exact_noink_declaration179(&p,&[row.clone()]));p.source_line_seg_vertical_pos=None;p.line_segs.push(row.clone());assert!(!exact_noink_declaration179(&p,&[row]));
++ }
++ #[test]fn current_signed_noink179_physical_bounds_reject_nonfinite_and_one_hu_overflow(){assert!(relative_box_fits(253.33333333333334,217.70666666666668,1000.0/75.0));let height=1000.0/75.0;assert!(relative_box_fits(280.0,280.0-height,height));assert!(!relative_box_fits(280.0,280.0-height+1.0/75.0,height));for (a,y,h)in[(f64::NAN,0.0,1.0),(280.0,-1.0,1.0),(280.0,0.0,f64::INFINITY)]{assert!(!relative_box_fits(a,y,h));}}
++}
+--- a/src/renderer/typeset/paragraph/columns.rs
++++ b/src/renderer/typeset/paragraph/columns.rs
+@@ -101,3 +101,32 @@
+     }
+     breaks
+ }
++
++/// Validate the unchanged legacy planner on both sides of a possible transition.
++/// No state is advanced until both exact break vectors and every fragment close.
++pub(super) fn current_first_entry_partition179(para:&Paragraph,fmt:&FormattedParagraph,col_count:u16,current_column:u16,
++ current_endnote_flow:bool,body_height:f64,dpi:f64)->Option<(usize,f64)>{
++ if !matches!(col_count,2|3)||current_column>=col_count||current_endnote_flow||!body_height.is_finite()||body_height<=0.0{return None;}
++ let next=(current_column+1)%col_count;
++ let current=detect_breaks(para,col_count,current_column,false,body_height,dpi);
++ let future=detect_breaks(para,col_count,next,false,body_height,dpi);
++ if current.len()<2||current!=future||current.first()!=Some(&0)||current.windows(2).any(|w|w[0]>=w[1]){return None;}
++ let count=fmt.line_count();let mut covered=0usize;
++ for(i,start)in current.iter().copied().enumerate(){let end=current.get(i+1).copied().unwrap_or(count);
++  if start!=covered||start>=end||end>count{return None;}
++  let fragment=plan_fragment(0,fmt,start,end,count)?;
++  if !fragment.height.is_finite()||fragment.height<=0.0{return None;}
++  for n in start..end{if !fmt.line_heights[n].is_finite()||fmt.line_heights[n]<=0.0||!fmt.line_spacings[n].is_finite()||fmt.line_spacings[n]<0.0{return None;}}
++  covered=end;
++ }
++ (covered==count).then_some((current[1],fmt.line_advances_sum(0..current[1])))
++}
++
++#[cfg(test)]mod current_first_entry179_tests{
++ use super::*;use crate::model::paragraph::LineSeg;
++ fn fixture(v:&[i32],count:usize)->(Paragraph,FormattedParagraph){let mut p=Paragraph::default();p.line_segs=v.iter().enumerate().map(|(i,y)|LineSeg{text_start:i as u32,vertical_pos:*y,line_height:1000,text_height:1000,baseline_distance:850,line_spacing:600,column_start:0,segment_width:13692,tag:0x80060000}).collect();
++ let f=FormattedParagraph{selected_observation127:None,source_rows_match_current_format:false,source_mixed_tac_row:None,tail_line_remaining_width:None,computed_host_lines:None,square_host_plan:None,total_height:count as f64*1600.0/75.0,line_heights:vec![1000.0/75.0;count],line_spacings:vec![600.0/75.0;count],spacing_before:0.0,spacing_after:0.0,height_for_fit:count as f64*1600.0/75.0-8.0,tac_outer_margin_v_px:0.0};(p,f)}
++ #[test]fn current_first_entry179_partition_closes_both_frames(){let(p,f)=fixture(&[0,1600,0,1600],4);let(end,advance)=current_first_entry_partition179(&p,&f,3,2,false,253.33333333333334,96.0).unwrap();assert_eq!(end,2);assert_eq!(advance,2.0*(1000.0/75.0+600.0/75.0));}
++ #[test]fn current_first_entry179_rejects_changed_next_partition(){let(p,f)=fixture(&[0,20000,10000,11600],4);assert!(current_first_entry_partition179(&p,&f,3,0,false,253.33333333333334,96.0).is_none());}
++ #[test]fn current_first_entry179_rejects_invalid_ranges_and_metrics(){let(p,f)=fixture(&[0,1600,3200,4800,0],4);assert!(current_first_entry_partition179(&p,&f,3,2,false,253.33333333333334,96.0).is_none());let(p,mut f)=fixture(&[0,1600,0,1600],4);f.line_heights[2]=f64::NAN;assert!(current_first_entry_partition179(&p,&f,3,2,false,253.33333333333334,96.0).is_none());assert!(current_first_entry_partition179(&p,&f,3,2,true,253.33333333333334,96.0).is_none());}
++}
+--- a/src/renderer/typeset/paragraph/flow.rs
++++ b/src/renderer/typeset/paragraph/flow.rs
+@@ -70,19 +70,24 @@
+     // The legacy source-reset planner splits rows but does not fit its first
+     // fragment at the current pen. A separate exact-current fresh proof may
+     // select the ordinary next frame before that unchanged planner runs.
+-    let signed_first_entry179=if super::columns::detect_breaks(para,st.col_count,st.current_column,st.current_endnote_flow,st.layout.available_body_height(),dpi).len()>1{
++    let signed_first_entry179=if let Some((first_end,first_advance))=super::columns::current_first_entry_partition179(para,fmt,st.col_count,st.current_column,st.current_endnote_flow,st.layout.available_body_height(),dpi){
+         measured_tables156.and_then(|measured|st.layout.column_areas.get(usize::from(st.current_column)).and_then(|rect|{
+             let next=usize::from((st.current_column+1)%st.col_count);
+             crate::renderer::current_frame_rows_plan::current_signed_first_fragment_entry179(
+                 crate::renderer::current_frame_rows_plan::CurrentSignedPartialNoInkFrame179{
+                     section:st.section_index,page:st.pages.last().map_or(0,|p|p.page_index),column:st.current_column,rect:*rect,
+                     body_width:st.layout.body_area.width,flow:st.current_height,available:st.available_height(),items:&st.current_items,
+-                    ordinary:st.col_count>1&&st.current_start_height==0.0&&!st.current_endnote_flow&&st.current_footnote_height==0.0
++                    ordinary:st.pending_body_wide_top_reserve==0.0&&st.pending_overlay_continuations.is_empty()
++                        &&st.deferred_next_page_stored_frames.is_empty()&&st.deferred_next_page_square_pictures.is_empty()
++                        &&st.deferred_table_controls.is_empty()&&st.page_start_stored_frames.is_empty()&&st.page_start_square_pictures.is_empty()
++                        &&st.fragment_queued_table_footnotes.is_empty()&&!st.reset_vpos_after_queued_table_footnote_page
++                        &&!st.deferred_hwpx_note_body&&st.behind_pending_absorbs.is_empty()
++                        &&matches!(st.col_count,2|3)&&st.current_start_height==0.0&&!st.current_endnote_flow&&st.current_footnote_height==0.0
+                         &&st.current_zone_y_offset==0.0&&st.current_zone_layout.is_none()&&st.visible_float_exclusions.is_empty()
+                         &&st.side_wrap_exclusions.is_empty()&&st.inline_placements.is_empty()&&st.inline_flow_plans.is_empty()
+                         &&st.paragraph_float_placements.is_empty()&&st.current_column_overlay_continuations.is_empty()&&st.current_column_overlay_cuts.is_empty()
+                         &&st.current_column_wrap_around_paras.is_empty()&&st.current_column_wrap_anchors.is_empty(),
+-                },available,st.layout.column_areas.get(next)?.width,para_idx,paragraphs,styles,st.profile,dpi,fmt.selected_observation127,measured)
++                },available,st.layout.column_areas.get(next)?.width,st.layout.column_areas.get(next)?.height,first_end,first_advance,para_idx,paragraphs,styles,st.profile,dpi,fmt.selected_observation127,measured)
+         }))
+     }else{None};
+     if signed_first_entry179.is_some(){st.advance_column_or_new_page();}
+@@ -99,7 +104,7 @@
+                     // addbacks and tail allowance. This exact glyph/table replay
+                     // instead uses the current body boundary after real exclusions.
+                     body_width:st.layout.body_area.width,flow:st.current_height,available:st.available_height(),items:&st.current_items,
+-                    ordinary:st.col_count>1&&st.current_start_height==0.0&&!st.current_endnote_flow&&st.current_footnote_height==0.0
++                    ordinary:matches!(st.col_count,2|3)&&st.current_start_height==0.0&&!st.current_endnote_flow&&st.current_footnote_height==0.0
+                         &&st.current_zone_y_offset==0.0&&st.current_zone_layout.is_none()&&st.visible_float_exclusions.is_empty()
+                         &&st.side_wrap_exclusions.is_empty()&&st.inline_placements.is_empty()&&st.inline_flow_plans.is_empty()
+                         &&st.paragraph_float_placements.is_empty()&&st.current_column_overlay_continuations.is_empty()&&st.current_column_overlay_cuts.is_empty()
+--- a/src/renderer/typeset/section.rs
++++ b/src/renderer/typeset/section.rs
+@@ -334,7 +334,7 @@
+                         crate::renderer::current_frame_rows_plan::CurrentSignedPartialNoInkFrame179{
+                             section:st.section_index,page:st.pages.last().map_or(0,|p|p.page_index),column:st.current_column,rect:*rect,
+                             body_width:st.layout.body_area.width,flow:st.current_height,available:st.available_height(),items:&st.current_items,
+-                            ordinary:st.col_count>1&&st.current_start_height==0.0&&!st.current_endnote_flow&&st.current_footnote_height==0.0
++                            ordinary:matches!(st.col_count,2|3)&&st.current_start_height==0.0&&!st.current_endnote_flow&&st.current_footnote_height==0.0
+                                 &&st.current_zone_y_offset==0.0&&st.current_zone_layout.is_none()&&st.visible_float_exclusions.is_empty()
+                                 &&st.side_wrap_exclusions.is_empty()&&st.inline_placements.is_empty()&&st.inline_flow_plans.is_empty()
+                                 &&st.paragraph_float_placements.is_empty()&&st.current_column_overlay_continuations.is_empty()&&st.current_column_overlay_cuts.is_empty()

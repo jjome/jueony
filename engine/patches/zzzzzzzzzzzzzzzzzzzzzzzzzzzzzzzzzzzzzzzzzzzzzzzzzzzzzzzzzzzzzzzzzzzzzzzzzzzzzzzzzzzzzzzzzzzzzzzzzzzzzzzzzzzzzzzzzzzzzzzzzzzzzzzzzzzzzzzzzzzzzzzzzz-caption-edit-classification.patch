@@ -1,0 +1,112 @@
+--- a/src/document_core/commands/text_editing.rs
++++ b/src/document_core/commands/text_editing.rs
+@@ -1963,7 +1963,10 @@
+             cell_para_idx,
+             None,
+         );
+-        if matches!(
++        // A caption edit reflows its own story and remeasures/paginates the
++        // table, but it did not reflow any cell body. Keep an existing cell
++        // reflow registration; do not mint one from the caption sentinel.
++        if cell_idx != super::super::TABLE_CAPTION_CELL_SENTINEL && matches!(
+             self.document.sections[section_idx].paragraphs[parent_para_idx]
+                 .controls
+                 .get(control_idx),
+@@ -2297,7 +2300,10 @@
+             cell_para_idx,
+             None,
+         );
+-        if matches!(
++        // A caption edit reflows its own story and remeasures/paginates the
++        // table, but it did not reflow any cell body. Keep an existing cell
++        // reflow registration; do not mint one from the caption sentinel.
++        if cell_idx != super::super::TABLE_CAPTION_CELL_SENTINEL && matches!(
+             self.document.sections[section_idx].paragraphs[parent_para_idx]
+                 .controls
+                 .get(control_idx),
+@@ -8507,3 +8513,31 @@
+         );
+     }
+ }
++
++#[cfg(test)]
++mod caption_edit_story178 {
++    use crate::{DocumentCore, model::control::Control};
++    fn core()->DocumentCore { DocumentCore::from_bytes(include_bytes!("../../../tests/fixtures/caption-boundary178.hwp")).unwrap() }
++    fn table(d:&DocumentCore)->&crate::model::table::Table { let Control::Table(t)=&d.document.sections[0].paragraphs[1].controls[0]else{panic!()};t }
++    fn registered(d:&DocumentCore)->bool { d.render_normalization.text_reflowed_tables.contains(&crate::document_core::TableTextReflowKey::from_table(table(d))) }
++    #[test] fn caption178_edit_reflows_caption_and_remeasures_without_cell_reflow_permission(){
++        let mut d=core();let cells=format!("{:?}",table(&d).cells);let old=d.measured_tables[0][0].caption_height;
++        assert!(!registered(&d));let n=table(&d).caption.as_ref().unwrap().paragraphs[0].text.chars().count();
++        d.insert_text_in_cell_native(0,1,0,65534,0,n,"Actual cell 🪶 ").unwrap();
++        assert!(!registered(&d));assert_eq!(format!("{:?}",table(&d).cells),cells);
++        assert!(d.measured_tables[0][0].caption_height>old);assert_eq!(d.page_count(),2);
++        let p=&table(&d).caption.as_ref().unwrap().paragraphs[0];assert!(p.text.ends_with("Actual cell 🪶 "));assert_eq!(p.line_segs.len(),4);
++    }
++    #[test] fn caption178_delete_does_not_register_cell_reflow(){
++        let mut d=core();let cells=format!("{:?}",table(&d).cells);let p=&table(&d).caption.as_ref().unwrap().paragraphs[0];let n=p.text.chars().count();
++        d.delete_text_in_cell_native(0,1,0,65534,0,n-1,1).unwrap();
++        assert!(!registered(&d));assert_eq!(format!("{:?}",table(&d).cells),cells);
++    }
++    #[test] fn caption178_does_not_clear_preexisting_real_cell_reflow(){
++        let mut d=core();d.insert_text_in_cell_native(0,1,0,0,0,0,"Real cell edit ").unwrap();assert!(registered(&d));
++        let original=crate::document_core::TableTextReflowKey::from_table(table(&d));let n=table(&d).caption.as_ref().unwrap().paragraphs[0].text.chars().count();
++        d.insert_text_in_cell_native(0,1,0,65534,0,n,"Caption after real edit ").unwrap();
++        assert!(registered(&d));assert!(d.render_normalization.text_reflowed_tables.contains(&original));
++        d.delete_text_in_cell_native(0,1,0,65534,0,n,1).unwrap();assert!(registered(&d));
++    }
++}
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[31,243,112,42,125,216,146,93,84,28,207,187,61,86,70,91,76,190,31,30,146,98,16,43,154,17,123,216,149,26,186,161];
++pub(crate) const RESOURCE:[u8;32]=[122,106,164,99,118,116,74,147,98,147,74,149,150,114,110,76,128,209,236,159,111,92,168,86,137,41,134,218,35,124,109,180];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+--- a/src/renderer/current_signed_body_fragments177.rs
++++ b/src/renderer/current_signed_body_fragments177.rs
+@@ -94,3 +94,40 @@
+  &&a.inline_controls.iter().zip(&b.inline_controls).all(|(a,b)|a.line_index==b.line_index&&a.control_index==b.control_index&&a.control_type==b.control_type)
+  &&a.lines.len()==b.lines.len()&&a.lines.iter().zip(&b.lines).all(|(a,b)|same_selected_line(a,b))
+ }
++
++#[cfg(test)]
++mod signed_partial177_tests {
++ use super::*;
++ use crate::model::paragraph::{Paragraph,CharShapeRef};
++ use crate::renderer::style_resolver::{ResolvedCharStyle,ResolvedParaStyle};
++ fn ledger()->CurrentBodyFragments177{
++  let styles=ResolvedStyleSet{char_styles:vec![ResolvedCharStyle::default()],para_styles:vec![ResolvedParaStyle::default()],..Default::default()};
++  let mut p=Paragraph::default();p.text="A😀".into();p.char_count=4;p.char_offsets=vec![0,1];p.char_shapes=vec![CharShapeRef::default()];
++  let row=LineSeg{text_start:0,vertical_pos:0,line_height:1000,text_height:1000,baseline_distance:850,line_spacing:600,column_start:0,segment_width:7500,tag:0x80060000};
++  let mut second=row.clone();second.text_start=1;second.vertical_pos=1600;p.line_segs=vec![row,second];
++  let composition=crate::renderer::composer::compose_paragraph_in_context(&p,&styles);
++  assert_eq!(composition.lines.len(),2);
++  CurrentBodyFragments177{paragraph:7,canonical:p.line_segs,composition,source_lines:vec![35,36],
++   parts:vec![Part177{page:0,column:1,item:3,start:0,end:1,source_start:35,source_end:36,width:100.0,flow_before:10.0,flow_after:10.0+1600.0/75.0},
++   Part177{page:1,column:0,item:0,start:1,end:2,source_start:36,source_end:37,width:100.0,flow_before:0.0,flow_after:1600.0/75.0}],consumed:0,first_offset:None}
++ }
++ fn rect()->LayoutRect{LayoutRect{x:0.0,y:20.0,width:100.0,height:80.0}}
++ #[test]fn signed_partial177_actual_indices_stay_separate_from_output_and_utf16(){
++  let mut l=ledger();let a=l.consume(0,1,3,35,36,&rect(),10.0,0.0,96.0).unwrap();assert_eq!(a.source_lines,vec![35]);assert!(!a.last);
++  let b=l.consume(1,0,0,36,37,&rect(),0.0,0.0,96.0).unwrap();assert_eq!(b.source_lines,vec![36]);assert!(b.last);
++  assert_eq!(a.fresh.composition.lines[0].runs.iter().map(|r|r.text.as_str()).collect::<String>(),"A");
++  assert_eq!(b.fresh.composition.lines[0].runs.iter().map(|r|r.text.as_str()).collect::<String>(),"😀");
++  let rows=l.finish().unwrap();assert_eq!(rows.row_kind(),CurrentFrameRowKind::FreshOffsetSplitBody148);
++  assert_eq!(rows.rows().iter().map(|r|r.text_start).collect::<Vec<_>>(),vec![0,1]);
++  assert_eq!((rows.rows()[0].vertical_pos,rows.rows()[1].vertical_pos),(750,0));assert_eq!(rows.rows()[1].tag,0x80060003);
++ }
++ #[test]fn signed_partial177_wrong_actual_slot_range_flow_and_unconsumed_refuse(){
++  for c in 0..6{let mut l=ledger();let mut args=(0,1,3,35,36,10.0,0.0);match c{0=>args.0=1,1=>args.1=0,2=>args.2=4,3=>args.3=34,4=>args.4=37,_=>args.5+=1.0/75.0};
++   assert!(l.consume(args.0,args.1,args.2,args.3,args.4,&rect(),args.5,args.6,96.0).is_none());assert_eq!(l.consumed,0);}
++  assert!(ledger().finish().is_none());let mut l=ledger();l.consume(0,1,3,35,36,&rect(),10.0,0.0,96.0).unwrap();assert!(l.finish().is_none());
++ }
++ #[test]fn signed_partial177_physical_glyph_width_and_nonfinite_refuse(){
++  for c in 0..5{let mut l=ledger();let mut r=rect();let mut unpainted=0.0;match c{0=>r.width-=1.0/75.0,1=>r.height=10.0+1000.0/75.0-1.0/75.0,2=>r.y=f64::NAN,3=>r.width=0.0,_=>unpainted=f64::NAN};
++   assert!(l.consume(0,1,3,35,36,&r,10.0,unpainted,96.0).is_none(),"case {c}");}
++ }
++}

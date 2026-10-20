@@ -111,3 +111,8 @@ apps/editor/scripts/verify-cross-section-storage151.mjs -text whitespace=cr-at-e
 apps/editor/scripts/verify-split-frame-storage151.mjs -text whitespace=cr-at-eol
 apps/editor/scripts/verify-offset-three-storage154.mjs -text whitespace=cr-at-eol
 docs/evidence/n001-2026-10-19/** -text whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+# Frozen storage evidence and verifier identities must survive Git checkout.
+docs/evidence/n001-2026-10-21/** -text whitespace=cr-at-eol,-blank-at-eol,-blank-at-eof
+apps/editor/scripts/verify-signed-current-storage157.mjs -text whitespace=cr-at-eol
+apps/editor/scripts/verify-caption-current-storage164.mjs -text whitespace=cr-at-eol
+apps/editor/tests/fixtures/n001-caption157-own/** -text

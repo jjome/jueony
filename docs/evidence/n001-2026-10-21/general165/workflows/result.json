@@ -1,0 +1,1709 @@
+{
+  "engine": {
+    "optimized": false,
+    "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "patches": [
+      {
+        "name": "border-fill-identity.patch",
+        "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c"
+      },
+      {
+        "name": "default-tabs.patch",
+        "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+      },
+      {
+        "name": "document-insertion.patch",
+        "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+      },
+      {
+        "name": "master-page-editing.patch",
+        "sha256": "b04c7d682e105e3f37f72a18c1b4bb01cbf085424e3219f3919fd8c891dc26c2"
+      },
+      {
+        "name": "merged-table-transpose.patch",
+        "sha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768"
+      },
+      {
+        "name": "note-query-json.patch",
+        "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562"
+      },
+      {
+        "name": "page-border-entries.patch",
+        "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f"
+      },
+      {
+        "name": "page-border-inclusion.patch",
+        "sha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e"
+      },
+      {
+        "name": "page-border-region.patch",
+        "sha256": "ea98aed9ad8568699b802c5f46e4964fe524ba7634bc978d71fe10f44e1d7412"
+      },
+      {
+        "name": "page-border-z-image.patch",
+        "sha256": "97ccd3c9eac24c42b0844fc65e5804b232d3bef9929a6fd5de329cdd007b173b"
+      },
+      {
+        "name": "section-split.patch",
+        "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+      },
+      {
+        "name": "style-reference-deletion.patch",
+        "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+      },
+      {
+        "name": "style-reference-order.patch",
+        "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce"
+      },
+      {
+        "name": "style-shape-stories.patch",
+        "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af"
+      },
+      {
+        "name": "table-creation-consistency.patch",
+        "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+      },
+      {
+        "name": "zz-line-number-settings.patch",
+        "sha256": "4cb8ce4a8d49864f53c3ff95fdfc8ef3e0342b09f86cd525dfb9aa102e2dee72"
+      },
+      {
+        "name": "zzz-page-body-delete.patch",
+        "sha256": "54bf1697627ec92c4379fb8ca314f9bf9d99c2207bf9e90859d35c7324be2e83"
+      },
+      {
+        "name": "zzzz-page-body-copy.patch",
+        "sha256": "45f3331d992f3799dad1f076bfd6d237d8c989541ea510d888e4afb5407749db"
+      },
+      {
+        "name": "zzzzz-page-body-paper-paste.patch",
+        "sha256": "4df977f851378597848aa60581957c123e6565ebf04f9412052dbfdabb2c43a0"
+      },
+      {
+        "name": "zzzzzz-page-body-style-paste.patch",
+        "sha256": "168c4c158bc0db3e71230903eae0b1ae71092a1a139f2ad5747712f95127bd75"
+      },
+      {
+        "name": "zzzzzzz-page-body-image-paste.patch",
+        "sha256": "ac08a167a376bae3e1e890f8109f2f9552ce952abe7882712f813183597ce57a"
+      },
+      {
+        "name": "zzzzzzzz-empty-section-remove.patch",
+        "sha256": "d49d3acc5bc0b3049415e17233a7f7a7249792f6500d475ce6cd39d3ad14d590"
+      },
+      {
+        "name": "zzzzzzzzz-hwpx-body-caret.patch",
+        "sha256": "c073ab44d5460f92915ea6493a791d2cbf24bb60ad66eca5033be0fc9835ac56"
+      },
+      {
+        "name": "zzzzzzzzzz-agent-page-background.patch",
+        "sha256": "74104eca6a40a3a7f06ad6d20ed8f44f816f0c153a2be40fdf584b61fc9ba907"
+      },
+      {
+        "name": "zzzzzzzzzzz-agent-header-footer.patch",
+        "sha256": "415fa55bc5fe0c4f49a7dce025723067022d7bdef076a9fb48b7f456c30cb91a"
+      },
+      {
+        "name": "zzzzzzzzzzzz-agent-paragraph-tabs.patch",
+        "sha256": "d15949747520d51020433aca32539f79c5a8cc0dfdad9de95db221dae651b311"
+      },
+      {
+        "name": "zzzzzzzzzzzzz-agent-paragraph-decoration.patch",
+        "sha256": "2adf2bba46d11a6ca97ce838da1d329c627c8532812674b7329aaef3cdb544fb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzz-agent-paragraph-lists.patch",
+        "sha256": "06e1af9e90e0c54da772a533f9c2ac5279db059c37fb3612c189e0d7e1c7692d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzz-agent-basic-bullets.patch",
+        "sha256": "03138686d9faa51fcf335f1b6299a294248031d36ca079da5346e52d0b531a35"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzz-agent-numbering-clone.patch",
+        "sha256": "a79207f328ca0521515344c018554ccc20092142dabaa5ba413ff162408fa567"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzz-agent-basic-numbering.patch",
+        "sha256": "66ac344e90a16b3e447e97bd6a593edbc7b9e024313cc40f81f2611838f3b102"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzz-agent-paragraph-outline.patch",
+        "sha256": "dfe19d3083f6a4222440ce558b5451f2568cf57b211bcc19babb508c1db2022e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzz-agent-style-metadata.patch",
+        "sha256": "53c6a573df6e8f1d0af4f388dad4e624a700006ad38f7a1de820eabc1d6d44cb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzz-whole-table-edited-host.patch",
+        "sha256": "f90714f601227bba000d63be77e5ac9f3985d192e613990984544b2f70b0f603"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzz-table-default-padding-reflow.patch",
+        "sha256": "903260c4c371a2a1d4b0afa72f8f0e1f191db936bd6e055a974a0a4295badf0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzz-hidden-paragraph-page-owner.patch",
+        "sha256": "13df5f1c5493ef4560866f3806be6a3bd2c748e50a1fc531dac686994e310b6b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-following-table-flow-owner.patch",
+        "sha256": "251cb5ee2d06a1a78732d7c01839bf4bf596a5376ce5af8637b50d8c0633f897"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzz-memo-tail-owner.patch",
+        "sha256": "5f4eafa802c6dd9dde96a1def6e187ef1be5b3f7e9a99cf8d4569458d0d0bca0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzz-table-outer-margin-owner.patch",
+        "sha256": "6132e26aa3a5b14f506f425d79930882a5c48092eac8e96bc4c8735cc8d42db3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-table-tail-snapshot.patch",
+        "sha256": "11a853d99a9278fd94e2c573d384f3826c53b00a433bcb6b9fa04fb24e344f0e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzz-conversion-semantic-storage.patch",
+        "sha256": "65f3e6e87bb1030f2e565cfd96d36b85dc4065de8fb3615a2db24a9d4121a092"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-zone-observation.patch",
+        "sha256": "9dc3ffd29ada303898ab21268fb72e23b1b56bcf7c589a11687716848e80bb70"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-textbox-alignment-storage.patch",
+        "sha256": "b9d8791a5e9b7b5e6b5d1bd794f3a7ebe9012c7bc8403c49333217cfef434122"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-footnote-style-identity.patch",
+        "sha256": "867d4ac34306a4edfb4360b2d9d51d5bb5bc43dedf5abd6919cedeba427894e6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-merged-row-height.patch",
+        "sha256": "6364cba702decf8160fea341932f5b0df6481c51fe135c2d77b6cae1c52192a3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-session-story-evidence.patch",
+        "sha256": "4f59265ba0740ad570a7dcbdd964a06a1d99075052713e70d9c1b755b83caab8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-visible-tail-snapshot.patch",
+        "sha256": "10dbdd14e2603200bec9ebcf34417c224d4f77624fc83ddf76a3c0cb28e8931e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-root-line-snapshot.patch",
+        "sha256": "509a2d497b5fe4c651b26954b6874e1a95ac4a2655391f88446f70f6735c4ef0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-overlap-origin.patch",
+        "sha256": "35f34ab3553354c4920e3ba51810770a997561fc896b40c73fb012f371dcfd96"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-reflow-markers.patch",
+        "sha256": "21e7d77e4f93072efc71718c2ea9e1ce15ff26a0fe343378b474a16a136856c8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-whole-table-flow.patch",
+        "sha256": "4f376b5c88ae4d26c9ec890ebefd352ac004e94b292afbc36ffdbf95525f514a"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-typeset-advance-grid.patch",
+        "sha256": "4b55713647b5567ec88b39853b8a28efe4811bd08025ccf9c1f20c4554732638"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-width.patch",
+        "sha256": "1cc54a1f9c37f31d034f66f8b0fbc4dedd3bffff7fb7094b824ebb88ae187183"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-marker-whole-flow.patch",
+        "sha256": "9b954250e8ddbc67cbfd9eda3898deb1f892de63483e3d9ae8eed2d9b4c574d7"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-origin-hwpx-query.patch",
+        "sha256": "e419b33ca35e25c63b2ec40ba99cec33a7dee2690d3035e070cca2c9efa23581"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-nonflow-prefix-band-origin.patch",
+        "sha256": "7b9f054bb6bf0af8094451cf85797adb6ab9fe06fcfa6641453111bd3561bdf6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-line-cache.patch",
+        "sha256": "2629f5073faed3d9b4f121cb71116143879085396b3ef3421e26a6c4adff64a0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-wrap-separator-spacing.patch",
+        "sha256": "54f38a977dc703e75cc42f3383705182b546efb30f1b3e2fd9669c6c70296aa3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-textbox-storage-flag.patch",
+        "sha256": "6ed35f5dfc24f0f47146b7fa7d1cb24fe3a56bc14f365eb0e7063dd7d85bdaf6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-paragraph-2016-heading-case.patch",
+        "sha256": "ed6f58a7201a4d8514d459b74d90dee6d880d33746e37509d14ba0475e3bfcb3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp-tab-placeholder-line-cache.patch",
+        "sha256": "68ad036c239042df4ae77d6750d1c69323bf1fa499193fc6d47bd2f0ef2b37ce"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-width-declared-height-preservation.patch",
+        "sha256": "5d4bb9a8907fe988741163510618d410b778cb24bfc45b51392780fc1ccc7fd8"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-explicit-none-shadow-storage.patch",
+        "sha256": "38c3ddba6b4844f82ac8a3f752dabbabb55c74d31cc3d150c1142d57f57e00e9"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-table-content-height-sync.patch",
+        "sha256": "368dd198802b630da92549f7bc4ddbcb2e6bf7a0822090519ec07a1134a9fe0b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-closed-whole-stack-lineage.patch",
+        "sha256": "5e9b4dce4da46d62427105ce3a70362050f17392388aa507ad54d7894df31bd2"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-single-table-outer-origin.patch",
+        "sha256": "12acf5353ab12f366e04496d2d7c59093d80a7bc60293257d8fa603910de0a05"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-document-summary-metadata.patch",
+        "sha256": "69b458e6f48c0145df400b19981658575d08f88a183ae6975dd67bcf0b146f06"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-live-table-outer-origin.patch",
+        "sha256": "9b896b2d541e1dd002bd240742d707b0274f95d436bbb0d321600bd63a350845"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-offset-visible-edge.patch",
+        "sha256": "0232256c9982e2e20c0d3149abf67b1d0cbf30f9a4b03150086ded05202da0d3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwpx-native-font-descriptors.patch",
+        "sha256": "bdc2692b6fd6e60c70dd8c5880aa4357f67521e6fbef6d7253fe9fc332c0ab3b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stored-numbering-extension-codec.patch",
+        "sha256": "5b01b627c57b3772b93b41269d3a5e644d6003775c6b7c4ab5efd187a43f7ea1"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-table-fullwidth-source-owner.patch",
+        "sha256": "ef63e25bb950f0a8ceb4c70b1987c6b3dca739a4465acdca3a217d41d18f9d54"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-numbering-observed-disk-canonical.patch",
+        "sha256": "88aa2f62cf5601168d46c2ce0e73083f31f845ca9f125f146f3d114465bfb134"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-negative-table-frame-source-owner.patch",
+        "sha256": "2b8d16e911e3af30b9abfb93da33717de6e007b8e971046d5f6ca45a27c44d8d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-unknown-hwpx-control-loss-report.patch",
+        "sha256": "f2004c1fe26b90b03d2e407380536a3d8eebf9529d8bc67c083c75a9b1f4ceec"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-column-stack-source-owner.patch",
+        "sha256": "8ccf80a00cb0aae3c0a71619fb0ad6b55a537ac11c785ece4a4ad568c74efa7d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-reconstructed-body-shared-spacing-origin.patch",
+        "sha256": "1e828ab70011758f833ea59644383f6af9fa3d30400d2d220d9fd410f11f6af5"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-caption-lifecycle-and-partial-properties.patch",
+        "sha256": "0b8c8820f1c3444af15a7336034c3dc952461de6f5c758bb75992660b58b35af"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-transpose-row-measurement-owner.patch",
+        "sha256": "9d13fa135315a0fc550a2b7de3bff62d765816c217f66a4e9143e8283704b51b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-spacing-semantic-boundary.patch",
+        "sha256": "b9e980825c6e772149c9170203da78f183d762537d784f8f6757f253de911da6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-breakable-table-frame.patch",
+        "sha256": "2b9ec8c1ba628c5a3eeb51b15685c47cb8fc69973aac5a060e14ea12b10ea132"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-created-table-neighbor-line-provenance.patch",
+        "sha256": "a72b92a073a39731ea61ac07957d2176a0c5fd2bab6b331bfdcefbdbea229653"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-shape-insertion-wrap-owner.patch",
+        "sha256": "51cff004ad5b68a5fa2724dc200fc8c2b4e7059574e27df390eee0c75a3f8666"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-declared-ttf-substitute-font-roundtrip.patch",
+        "sha256": "51f8f19453df44f9ed01f4345e168f7fc7a48fc3acc104b79f8ab91c29a4dc56"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-explicit-hwp5-origin-return-contract.patch",
+        "sha256": "d79998f948f265811568404926e71f71462b123544b3f0fda9f567a826140bfd"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-versioned-xml-cache-storage-roundtrip.patch",
+        "sha256": "e6c14fa951415784b31a3c4a2720916fe1fe5afaa13b9300f6273c0c6a2e636c"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-verified-gulimche-integral-advance.patch",
+        "sha256": "1b7673af7d20093b9a43e9b157670926f2042c9b7b7156f87a9afecc2099d67b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-note-shape-i32-wire-contract.patch",
+        "sha256": "a36d4572ea1f4527e8e5dda7c5211983776f3ee8f8c45cdf8b76f69e3d77bbfe"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-summary-standard-property-stream.patch",
+        "sha256": "ae4ee5b45c06032203b114ace797bf3ead878b476ea490b7aeb3854fb06bf8cd"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-reconstruction-page-basis-and-edit-lifetime.patch",
+        "sha256": "1db1c17717df23c546c32410efe14492aaf6db0b3bfe2243627a30891411a242"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-text-direction-preservation-and-loss-report.patch",
+        "sha256": "24c68a269cc0bd6e4d0dd8d7c3709a37d42fc4b766dbcde97e422ffe251dd113"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-raw-resource-namespace-ownership.patch",
+        "sha256": "173fef15aa86447c81aa9d7d5b124363fa3256e033a4478636bf1cf3386e7955"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-font-source-type-authority-and-loss.patch",
+        "sha256": "fce0993013db18c8baba21c08b04dd1f4ce5943b02191d42f1ab200c81edfa06"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-three-column-frame-ownership.patch",
+        "sha256": "df1739fea178622af38a6231ab089c3505aeeb104e03f46e5a44b898e272eb58"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stable-session-story-font-provenance.patch",
+        "sha256": "9613f523b63dc89e0aa23914055c5b0b7674a2515f2c076ecef0c178894bdd59"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-package-metadata-script-preservation.patch",
+        "sha256": "c1fb2a2434fd8be8ad8dcbb65dc75641ef141527f7518c7c89db256b1fb42944"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-fragment-namespace-budget.patch",
+        "sha256": "cf00cf74b97a358c8d484a1b840bc41e7ff51de0724bb4b1a1cca42979f6ee5b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-metadata-namespace-read-write.patch",
+        "sha256": "7ece8bcc570b5c83994efcad39661fd57a327a49fa06cb756d022abca8bd58ee"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-source-synthetic-rows.patch",
+        "sha256": "eedb6ac4c47befebfdeb727099222b83a5b7b6550d55b98546a050366b9b5f4c"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-proportional-column-persistence.patch",
+        "sha256": "43bf22538170222f634321eae536026c969af85d956cc3ebb8d2b9901a6b7e12"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-lazy-native-row-render-context.patch",
+        "sha256": "0dc75bc3af81aa8c3383b7310a6d21fb3e326112b4bb279328d59956bd115b59"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-native-row-storage.patch",
+        "sha256": "fe5a4e24a75dde2b3a04ac76be2faad4ab2ab4be42cc01b546f9e0edd9be6af2"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stored-timestamp-preservation.patch",
+        "sha256": "cb15394d9b2d1a47993a7ffb532ab88aa0068c36ffd379584cc143d268e8c3be"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-ambiguous-xml-date-passthrough.patch",
+        "sha256": "fda0e900c01341e6c62125357fe511d6bdede536085c40619f8c6979e86a8dfd"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwt-readonly-template.patch",
+        "sha256": "4d2433093d62f249c7ff80281fb8744786dda1095b13734b585f056ff6d31b99"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-native-cell-layout.patch",
+        "sha256": "5954884f693ae5b9dcdd1cbed05a2b612e553ff3be6bebf55f08aa6a89240eb0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-canonical-story-information.patch",
+        "sha256": "29e9d6685c43cb94b07402afe284c3ec23a93b8c7f52e88ec29cd1a2f3a2802a"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-authored-floating-host-gap.patch",
+        "sha256": "27f01c6f3db3894c3d37851e1f0418c815fbecd8d629fdccd04c3132650b4ffc"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-mixed-axis-floating-host-gap.patch",
+        "sha256": "c257180759f7016a212b2948c403a3d792bb0ea6374a38c45c5e6a4c49fc5d71"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-floating-host-row-end-bounds.patch",
+        "sha256": "23c31ad5aaf055f1f1f8d04b65249d4143ecd1f54571a5d68b55584dc35b7091"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-column-table-frame.patch",
+        "sha256": "7fca6e23ad10b90935c4f782dfe521a092dcd7d7ec7f126b67bb8d2de080ac23"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-current-flow-storage.patch",
+        "sha256": "eb09e2a57f61e1a87f687a54bbc6b42867e88b27224a0d99da5bc2eceba7e281"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-block-and-cell-frame-storage.patch",
+        "sha256": "c1f6cf078cb6d14c5570137e4dd3570e9f00059dec7f61e24052980b8c2359a6"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-local-reset-and-body-flow-storage.patch",
+        "sha256": "d97608b25c56362322697e308993f3b1095e935b29224b812d0d1f25b258aaf1"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwt-ordinary-leaf-storage.patch",
+        "sha256": "7b470f0be5e568678e79752d1116be31e835c53e4edfa877796bc735ec018ee1"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwt-body-record-preservation.patch",
+        "sha256": "acb2e2ff05c497dc44a6cb200a8280a150bc6f34c0d308e7b5555bcb814f28c0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-standard-rows-and-preview-storage.patch",
+        "sha256": "94db05a258eb382bcb0aa763a8704cb3ca8d8b091682c216544dfc93205404ce"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stored-time-transaction.patch",
+        "sha256": "c50456efadc9ba58db364b7ed891803116bc5c3c0bbaaf6f7f4b6705cd80789a"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-never-swap-stamped-export.patch",
+        "sha256": "fb20db5329528a0591b3cfe1ac410ba8ae015c2f44e64355ccaabbf01d00f08e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-encrypted-owned-native-row-storage.patch",
+        "sha256": "db687106d3584c20a2e41d02d7bccc0cf0dac78e9d0ecb3df9e630b9e926a551"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-exact-native-common-optional-field.patch",
+        "sha256": "81c811b33e81d0d532b5875e9135c2f2687d4eda451082d8e2c8f55ba5be352b"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-passive-native-row-archive.patch",
+        "sha256": "49b47b16d2032800577a2eaa679d738fe4090f7d37f3e82049c5f7120ebbec05"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-strict-passive-row-zip-ownership.patch",
+        "sha256": "e4471a4f49d7baaa3b1ee9a9398528ff941cd4485343d257000f6c21e8865806"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-strict-passive-row-child-path.patch",
+        "sha256": "5b828dfa13b7ceeb4835c663bc3cb384f1cc39d4235533b5bf61769ed93be8c0"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-whole-stack-count.patch",
+        "sha256": "033d4421f9cf6c25b19100d3b2803d8d10bf1a2cbc1ec10af51440929a646a3d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-tail-and-tac-spacing.patch",
+        "sha256": "684679c6b3baea90a0d39e69a4d5bac9162761c31d5caf2007edcbb961c4e0e3"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-physical-frame-preservation.patch",
+        "sha256": "96b823eb2cfc2381f8b0d16f9b859b42519fa77d06c0a72f6765514e3af3bc50"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-selected-composition-paint.patch",
+        "sha256": "6c582ae34b892e41c0e64cb4f946087dd2ae505c3ac224046f38cc94959d1952"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-structural-object-anchor.patch",
+        "sha256": "4d635ec33a2eaf05c81e163100053c091dcd1b2d80a6fc27df2c07f2644432c7"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-offset-frame-preservation.patch",
+        "sha256": "a2348c20e47c41084a4502d7c04cf9805f9267d90cbbc2925b36040c381ccca2"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-equal-prefix-preservation.patch",
+        "sha256": "1b439eb820647766c77c5f11f261beebd20ee74c56077d1b7c6df946af241a82"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-row-current-pass.patch",
+        "sha256": "36d3b8bf1b4f0fc08d7631a3caf99693fdb30595a6119e04e126d4e7cf7f94ee"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-frame-source-admission.patch",
+        "sha256": "6137f01855dca5e19880711c188ebe60564833728388ca153ce1ba1db430fe41"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-page-section-frames.patch",
+        "sha256": "bbeacd9516e261bb172a89ca764a4a70f9356cf85951981d69f1b8bfc76afdbd"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-retain-exact-ordinary-body-rows.patch",
+        "sha256": "5733bf643e58510dd96fc5bc1c848d9e349b1f41b0f25d539f5a80dfa8a44326"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-bodywide-column-stack.patch",
+        "sha256": "16063d56a7ccfeb93ddf151427f5876fcdbb1c99447cdf430cf5fb5c33d0f034"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-suffix-required-paint.patch",
+        "sha256": "2ab308dad3dcf3bbc435d4162ca497164abbdbc96e98fa8f638455a5addc227a"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-explicit-column-frames.patch",
+        "sha256": "71ebe3e49165e79e312e465ff09debf09e97a125600aecb4ca69eff2771d9b1a"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-empty-unequal-column-paint.patch",
+        "sha256": "d004bef888a443066541bc9ef8802d9aeba7bc14cc54ce0f603e1d0754886c60"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-visible-table-host-xml.patch",
+        "sha256": "56fdaf1c261b9dc4058a94f41faceafe19ad6b6eb8ed55440754d1e10dbc4f4d"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-native-origin-paint-policy.patch",
+        "sha256": "b7baba62bdc6cb17234da8068fd4e424418fa320d9e24942536aeb5c7d48e931"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-measured-table-split-prefix.patch",
+        "sha256": "a3519d4ff9429aee595344a65a6ed812ac965251a81137fe41f5dbc1a4777b1e"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-host-origin-profile-lifetime.patch",
+        "sha256": "f22b1589d4b4ec87bb9a1761a74ef5c52c9365b23228567fc573c22f40bd3aea"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-table-host-public-reflow-unit.patch",
+        "sha256": "e60e6e832628af24c0428394d7de36cfe82fdf9bcba87d035b49c981ab2df1fb"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-unequal-storage.patch",
+        "sha256": "8d629f2c67eda064a4cefae6b2359ff4ee5a2650f3e2606a3f3d152d57093b2a"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-explicit-columns.patch",
+        "sha256": "6fbd554459a9ca8f81b925a90d0a697399f4472102f12fa24d4cc4fe93406c78"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-empty-gap-storage.patch",
+        "sha256": "365d7be290a2582785caf7126774a248de12369269bd7c791445d0d47687a085"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-caption-signed-storage.patch",
+        "sha256": "3dbaeb97a02c15d1c1b982ec73fb5052d74afced6c586afa0cfba28dd85172b1"
+      },
+      {
+        "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-single-column-caption.patch",
+        "sha256": "72c4e83a7d486a64a8d7fe9ef02935e819fdfa7be99f52a69fecc815ed22836c"
+      }
+    ],
+    "sourceId": "84b2bd635b3bef6c",
+    "buildMode": "wsl-review-no-opt",
+    "jsSha256": "0033f22069ac5e3139f68230b45b89761a421858db9d882e9975a4e1f7be40d8",
+    "builtAt": "2026-10-20T17:46:10.1654771Z",
+    "wasmSha256": "6169be6b539238dbef060ab5945512f6a1ffa15bac0f47b7caa95b58098480bc"
+  },
+  "build": {
+    "applicationId": "jueony-editor",
+    "sourceCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+    "enginePackage": "@jueony/rhwp-engine-review@0.8.7",
+    "builtAt": "2026-10-20T17:46:42.378Z",
+    "engineWasmSha256": "6169be6b539238dbef060ab5945512f6a1ffa15bac0f47b7caa95b58098480bc",
+    "engineBuild": {
+      "optimized": false,
+      "baseCommit": "1a76570e833917d15817415a53c09ad61ab3203f",
+      "patches": [
+        {
+          "name": "border-fill-identity.patch",
+          "sha256": "27258ab505e68b7eaa7acb2d526c7cfd7aa60886b4c26dae75121b780d09f62c"
+        },
+        {
+          "name": "default-tabs.patch",
+          "sha256": "480c26efa13c339191787e042674f2c1eef7ef87d44ee112a7e05143e99b46af"
+        },
+        {
+          "name": "document-insertion.patch",
+          "sha256": "93e121510840ce9cb14c5fef4058066ec85cb126c0549c9f59c8c9c0d0858a7f"
+        },
+        {
+          "name": "master-page-editing.patch",
+          "sha256": "b04c7d682e105e3f37f72a18c1b4bb01cbf085424e3219f3919fd8c891dc26c2"
+        },
+        {
+          "name": "merged-table-transpose.patch",
+          "sha256": "7c50755e61b070cb74cba51e618c4b08815047a5a395e1bb50175967ecd56768"
+        },
+        {
+          "name": "note-query-json.patch",
+          "sha256": "f7ee1badbfd5a80c0684db3e82262d0444c5b1a95263749ceaf600834cb00562"
+        },
+        {
+          "name": "page-border-entries.patch",
+          "sha256": "4cef6acb76994c730f74f747291ba7c149ebb2c1bcce8d1e07d72bd05826b61f"
+        },
+        {
+          "name": "page-border-inclusion.patch",
+          "sha256": "d5c1aa795edfe9dea4a49df45e3126b1f66d4a90158317a576ae27c56b54767e"
+        },
+        {
+          "name": "page-border-region.patch",
+          "sha256": "ea98aed9ad8568699b802c5f46e4964fe524ba7634bc978d71fe10f44e1d7412"
+        },
+        {
+          "name": "page-border-z-image.patch",
+          "sha256": "97ccd3c9eac24c42b0844fc65e5804b232d3bef9929a6fd5de329cdd007b173b"
+        },
+        {
+          "name": "section-split.patch",
+          "sha256": "f042d6eee0b0f7eecd0aaf0ee2fb733acc099c92f6b28b228d301b67915ed1c8"
+        },
+        {
+          "name": "style-reference-deletion.patch",
+          "sha256": "1f4da9ad5a12ef48062ad762087b4e7cb92913fd908b74006fe88520380fd9d6"
+        },
+        {
+          "name": "style-reference-order.patch",
+          "sha256": "87924e4c021d5b3cc04b8b13e577a752722e678888c64230991ed1d1da72c6ce"
+        },
+        {
+          "name": "style-shape-stories.patch",
+          "sha256": "73e2df599dccbdf31743a6ce4399258a578668762022e008cbfea9391fea36af"
+        },
+        {
+          "name": "table-creation-consistency.patch",
+          "sha256": "cb984265a16d94cffc5da1b7596422041993450a6dbf6902e8c85217d1a564ad"
+        },
+        {
+          "name": "zz-line-number-settings.patch",
+          "sha256": "4cb8ce4a8d49864f53c3ff95fdfc8ef3e0342b09f86cd525dfb9aa102e2dee72"
+        },
+        {
+          "name": "zzz-page-body-delete.patch",
+          "sha256": "54bf1697627ec92c4379fb8ca314f9bf9d99c2207bf9e90859d35c7324be2e83"
+        },
+        {
+          "name": "zzzz-page-body-copy.patch",
+          "sha256": "45f3331d992f3799dad1f076bfd6d237d8c989541ea510d888e4afb5407749db"
+        },
+        {
+          "name": "zzzzz-page-body-paper-paste.patch",
+          "sha256": "4df977f851378597848aa60581957c123e6565ebf04f9412052dbfdabb2c43a0"
+        },
+        {
+          "name": "zzzzzz-page-body-style-paste.patch",
+          "sha256": "168c4c158bc0db3e71230903eae0b1ae71092a1a139f2ad5747712f95127bd75"
+        },
+        {
+          "name": "zzzzzzz-page-body-image-paste.patch",
+          "sha256": "ac08a167a376bae3e1e890f8109f2f9552ce952abe7882712f813183597ce57a"
+        },
+        {
+          "name": "zzzzzzzz-empty-section-remove.patch",
+          "sha256": "d49d3acc5bc0b3049415e17233a7f7a7249792f6500d475ce6cd39d3ad14d590"
+        },
+        {
+          "name": "zzzzzzzzz-hwpx-body-caret.patch",
+          "sha256": "c073ab44d5460f92915ea6493a791d2cbf24bb60ad66eca5033be0fc9835ac56"
+        },
+        {
+          "name": "zzzzzzzzzz-agent-page-background.patch",
+          "sha256": "74104eca6a40a3a7f06ad6d20ed8f44f816f0c153a2be40fdf584b61fc9ba907"
+        },
+        {
+          "name": "zzzzzzzzzzz-agent-header-footer.patch",
+          "sha256": "415fa55bc5fe0c4f49a7dce025723067022d7bdef076a9fb48b7f456c30cb91a"
+        },
+        {
+          "name": "zzzzzzzzzzzz-agent-paragraph-tabs.patch",
+          "sha256": "d15949747520d51020433aca32539f79c5a8cc0dfdad9de95db221dae651b311"
+        },
+        {
+          "name": "zzzzzzzzzzzzz-agent-paragraph-decoration.patch",
+          "sha256": "2adf2bba46d11a6ca97ce838da1d329c627c8532812674b7329aaef3cdb544fb"
+        },
+        {
+          "name": "zzzzzzzzzzzzzz-agent-paragraph-lists.patch",
+          "sha256": "06e1af9e90e0c54da772a533f9c2ac5279db059c37fb3612c189e0d7e1c7692d"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzz-agent-basic-bullets.patch",
+          "sha256": "03138686d9faa51fcf335f1b6299a294248031d36ca079da5346e52d0b531a35"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzz-agent-numbering-clone.patch",
+          "sha256": "a79207f328ca0521515344c018554ccc20092142dabaa5ba413ff162408fa567"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzz-agent-basic-numbering.patch",
+          "sha256": "66ac344e90a16b3e447e97bd6a593edbc7b9e024313cc40f81f2611838f3b102"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzz-agent-paragraph-outline.patch",
+          "sha256": "dfe19d3083f6a4222440ce558b5451f2568cf57b211bcc19babb508c1db2022e"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzz-agent-style-metadata.patch",
+          "sha256": "53c6a573df6e8f1d0af4f388dad4e624a700006ad38f7a1de820eabc1d6d44cb"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzz-whole-table-edited-host.patch",
+          "sha256": "f90714f601227bba000d63be77e5ac9f3985d192e613990984544b2f70b0f603"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzz-table-default-padding-reflow.patch",
+          "sha256": "903260c4c371a2a1d4b0afa72f8f0e1f191db936bd6e055a974a0a4295badf0e"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzz-hidden-paragraph-page-owner.patch",
+          "sha256": "13df5f1c5493ef4560866f3806be6a3bd2c748e50a1fc531dac686994e310b6b"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzz-following-table-flow-owner.patch",
+          "sha256": "251cb5ee2d06a1a78732d7c01839bf4bf596a5376ce5af8637b50d8c0633f897"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzz-memo-tail-owner.patch",
+          "sha256": "5f4eafa802c6dd9dde96a1def6e187ef1be5b3f7e9a99cf8d4569458d0d0bca0"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzz-table-outer-margin-owner.patch",
+          "sha256": "6132e26aa3a5b14f506f425d79930882a5c48092eac8e96bc4c8735cc8d42db3"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-table-tail-snapshot.patch",
+          "sha256": "11a853d99a9278fd94e2c573d384f3826c53b00a433bcb6b9fa04fb24e344f0e"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzz-conversion-semantic-storage.patch",
+          "sha256": "65f3e6e87bb1030f2e565cfd96d36b85dc4065de8fb3615a2db24a9d4121a092"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-zone-observation.patch",
+          "sha256": "9dc3ffd29ada303898ab21268fb72e23b1b56bcf7c589a11687716848e80bb70"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzz-textbox-alignment-storage.patch",
+          "sha256": "b9d8791a5e9b7b5e6b5d1bd794f3a7ebe9012c7bc8403c49333217cfef434122"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-footnote-style-identity.patch",
+          "sha256": "867d4ac34306a4edfb4360b2d9d51d5bb5bc43dedf5abd6919cedeba427894e6"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-merged-row-height.patch",
+          "sha256": "6364cba702decf8160fea341932f5b0df6481c51fe135c2d77b6cae1c52192a3"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-session-story-evidence.patch",
+          "sha256": "4f59265ba0740ad570a7dcbdd964a06a1d99075052713e70d9c1b755b83caab8"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzz-visible-tail-snapshot.patch",
+          "sha256": "10dbdd14e2603200bec9ebcf34417c224d4f77624fc83ddf76a3c0cb28e8931e"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-root-line-snapshot.patch",
+          "sha256": "509a2d497b5fe4c651b26954b6874e1a95ac4a2655391f88446f70f6735c4ef0"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-overlap-origin.patch",
+          "sha256": "35f34ab3553354c4920e3ba51810770a997561fc896b40c73fb012f371dcfd96"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-overlap-reflow-markers.patch",
+          "sha256": "21e7d77e4f93072efc71718c2ea9e1ce15ff26a0fe343378b474a16a136856c8"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-whole-table-flow.patch",
+          "sha256": "4f376b5c88ae4d26c9ec890ebefd352ac004e94b292afbc36ffdbf95525f514a"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-typeset-advance-grid.patch",
+          "sha256": "4b55713647b5567ec88b39853b8a28efe4811bd08025ccf9c1f20c4554732638"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-width.patch",
+          "sha256": "1cc54a1f9c37f31d034f66f8b0fbc4dedd3bffff7fb7094b824ebb88ae187183"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-marker-whole-flow.patch",
+          "sha256": "9b954250e8ddbc67cbfd9eda3898deb1f892de63483e3d9ae8eed2d9b4c574d7"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp5-origin-hwpx-query.patch",
+          "sha256": "e419b33ca35e25c63b2ec40ba99cec33a7dee2690d3035e070cca2c9efa23581"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-nonflow-prefix-band-origin.patch",
+          "sha256": "7b9f054bb6bf0af8094451cf85797adb6ab9fe06fcfa6641453111bd3561bdf6"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-placeholder-line-cache.patch",
+          "sha256": "2629f5073faed3d9b4f121cb71116143879085396b3ef3421e26a6c4adff64a0"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-wrap-separator-spacing.patch",
+          "sha256": "54f38a977dc703e75cc42f3383705182b546efb30f1b3e2fd9669c6c70296aa3"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-textbox-storage-flag.patch",
+          "sha256": "6ed35f5dfc24f0f47146b7fa7d1cb24fe3a56bc14f365eb0e7063dd7d85bdaf6"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-paragraph-2016-heading-case.patch",
+          "sha256": "ed6f58a7201a4d8514d459b74d90dee6d880d33746e37509d14ba0475e3bfcb3"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwp-tab-placeholder-line-cache.patch",
+          "sha256": "68ad036c239042df4ae77d6750d1c69323bf1fa499193fc6d47bd2f0ef2b37ce"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-cell-width-declared-height-preservation.patch",
+          "sha256": "5d4bb9a8907fe988741163510618d410b778cb24bfc45b51392780fc1ccc7fd8"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-explicit-none-shadow-storage.patch",
+          "sha256": "38c3ddba6b4844f82ac8a3f752dabbabb55c74d31cc3d150c1142d57f57e00e9"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-table-content-height-sync.patch",
+          "sha256": "368dd198802b630da92549f7bc4ddbcb2e6bf7a0822090519ec07a1134a9fe0b"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-closed-whole-stack-lineage.patch",
+          "sha256": "5e9b4dce4da46d62427105ce3a70362050f17392388aa507ad54d7894df31bd2"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-single-table-outer-origin.patch",
+          "sha256": "12acf5353ab12f366e04496d2d7c59093d80a7bc60293257d8fa603910de0a05"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-document-summary-metadata.patch",
+          "sha256": "69b458e6f48c0145df400b19981658575d08f88a183ae6975dd67bcf0b146f06"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-live-table-outer-origin.patch",
+          "sha256": "9b896b2d541e1dd002bd240742d707b0274f95d436bbb0d321600bd63a350845"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-offset-visible-edge.patch",
+          "sha256": "0232256c9982e2e20c0d3149abf67b1d0cbf30f9a4b03150086ded05202da0d3"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwpx-native-font-descriptors.patch",
+          "sha256": "bdc2692b6fd6e60c70dd8c5880aa4357f67521e6fbef6d7253fe9fc332c0ab3b"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stored-numbering-extension-codec.patch",
+          "sha256": "5b01b627c57b3772b93b41269d3a5e644d6003775c6b7c4ab5efd187a43f7ea1"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-positive-table-fullwidth-source-owner.patch",
+          "sha256": "ef63e25bb950f0a8ceb4c70b1987c6b3dca739a4465acdca3a217d41d18f9d54"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-numbering-observed-disk-canonical.patch",
+          "sha256": "88aa2f62cf5601168d46c2ce0e73083f31f845ca9f125f146f3d114465bfb134"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-negative-table-frame-source-owner.patch",
+          "sha256": "2b8d16e911e3af30b9abfb93da33717de6e007b8e971046d5f6ca45a27c44d8d"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-unknown-hwpx-control-loss-report.patch",
+          "sha256": "f2004c1fe26b90b03d2e407380536a3d8eebf9529d8bc67c083c75a9b1f4ceec"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-column-stack-source-owner.patch",
+          "sha256": "8ccf80a00cb0aae3c0a71619fb0ad6b55a537ac11c785ece4a4ad568c74efa7d"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-reconstructed-body-shared-spacing-origin.patch",
+          "sha256": "1e828ab70011758f833ea59644383f6af9fa3d30400d2d220d9fd410f11f6af5"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-caption-lifecycle-and-partial-properties.patch",
+          "sha256": "0b8c8820f1c3444af15a7336034c3dc952461de6f5c758bb75992660b58b35af"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-transpose-row-measurement-owner.patch",
+          "sha256": "9d13fa135315a0fc550a2b7de3bff62d765816c217f66a4e9143e8283704b51b"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-tab-spacing-semantic-boundary.patch",
+          "sha256": "b9e980825c6e772149c9170203da78f183d762537d784f8f6757f253de911da6"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-breakable-table-frame.patch",
+          "sha256": "2b9ec8c1ba628c5a3eeb51b15685c47cb8fc69973aac5a060e14ea12b10ea132"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-created-table-neighbor-line-provenance.patch",
+          "sha256": "a72b92a073a39731ea61ac07957d2176a0c5fd2bab6b331bfdcefbdbea229653"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-shape-insertion-wrap-owner.patch",
+          "sha256": "51cff004ad5b68a5fa2724dc200fc8c2b4e7059574e27df390eee0c75a3f8666"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-declared-ttf-substitute-font-roundtrip.patch",
+          "sha256": "51f8f19453df44f9ed01f4345e168f7fc7a48fc3acc104b79f8ab91c29a4dc56"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-explicit-hwp5-origin-return-contract.patch",
+          "sha256": "d79998f948f265811568404926e71f71462b123544b3f0fda9f567a826140bfd"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-versioned-xml-cache-storage-roundtrip.patch",
+          "sha256": "e6c14fa951415784b31a3c4a2720916fe1fe5afaa13b9300f6273c0c6a2e636c"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-verified-gulimche-integral-advance.patch",
+          "sha256": "1b7673af7d20093b9a43e9b157670926f2042c9b7b7156f87a9afecc2099d67b"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-note-shape-i32-wire-contract.patch",
+          "sha256": "a36d4572ea1f4527e8e5dda7c5211983776f3ee8f8c45cdf8b76f69e3d77bbfe"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-summary-standard-property-stream.patch",
+          "sha256": "ae4ee5b45c06032203b114ace797bf3ead878b476ea490b7aeb3854fb06bf8cd"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-reconstruction-page-basis-and-edit-lifetime.patch",
+          "sha256": "1db1c17717df23c546c32410efe14492aaf6db0b3bfe2243627a30891411a242"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-xml-text-direction-preservation-and-loss-report.patch",
+          "sha256": "24c68a269cc0bd6e4d0dd8d7c3709a37d42fc4b766dbcde97e422ffe251dd113"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-raw-resource-namespace-ownership.patch",
+          "sha256": "173fef15aa86447c81aa9d7d5b124363fa3256e033a4478636bf1cf3386e7955"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-font-source-type-authority-and-loss.patch",
+          "sha256": "fce0993013db18c8baba21c08b04dd1f4ce5943b02191d42f1ab200c81edfa06"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-generated-three-column-frame-ownership.patch",
+          "sha256": "df1739fea178622af38a6231ab089c3505aeeb104e03f46e5a44b898e272eb58"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stable-session-story-font-provenance.patch",
+          "sha256": "9613f523b63dc89e0aa23914055c5b0b7674a2515f2c076ecef0c178894bdd59"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-package-metadata-script-preservation.patch",
+          "sha256": "c1fb2a2434fd8be8ad8dcbb65dc75641ef141527f7518c7c89db256b1fb42944"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-fragment-namespace-budget.patch",
+          "sha256": "cf00cf74b97a358c8d484a1b840bc41e7ff51de0724bb4b1a1cca42979f6ee5b"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-opf-metadata-namespace-read-write.patch",
+          "sha256": "7ece8bcc570b5c83994efcad39661fd57a327a49fa06cb756d022abca8bd58ee"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-source-synthetic-rows.patch",
+          "sha256": "eedb6ac4c47befebfdeb727099222b83a5b7b6550d55b98546a050366b9b5f4c"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-proportional-column-persistence.patch",
+          "sha256": "43bf22538170222f634321eae536026c969af85d956cc3ebb8d2b9901a6b7e12"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-lazy-native-row-render-context.patch",
+          "sha256": "0dc75bc3af81aa8c3383b7310a6d21fb3e326112b4bb279328d59956bd115b59"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-native-row-storage.patch",
+          "sha256": "fe5a4e24a75dde2b3a04ac76be2faad4ab2ab4be42cc01b546f9e0edd9be6af2"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stored-timestamp-preservation.patch",
+          "sha256": "cb15394d9b2d1a47993a7ffb532ab88aa0068c36ffd379584cc143d268e8c3be"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-ambiguous-xml-date-passthrough.patch",
+          "sha256": "fda0e900c01341e6c62125357fe511d6bdede536085c40619f8c6979e86a8dfd"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwt-readonly-template.patch",
+          "sha256": "4d2433093d62f249c7ff80281fb8744786dda1095b13734b585f056ff6d31b99"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-native-cell-layout.patch",
+          "sha256": "5954884f693ae5b9dcdd1cbed05a2b612e553ff3be6bebf55f08aa6a89240eb0"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-canonical-story-information.patch",
+          "sha256": "29e9d6685c43cb94b07402afe284c3ec23a93b8c7f52e88ec29cd1a2f3a2802a"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-authored-floating-host-gap.patch",
+          "sha256": "27f01c6f3db3894c3d37851e1f0418c815fbecd8d629fdccd04c3132650b4ffc"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-mixed-axis-floating-host-gap.patch",
+          "sha256": "c257180759f7016a212b2948c403a3d792bb0ea6374a38c45c5e6a4c49fc5d71"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-floating-host-row-end-bounds.patch",
+          "sha256": "23c31ad5aaf055f1f1f8d04b65249d4143ecd1f54571a5d68b55584dc35b7091"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-owned-column-table-frame.patch",
+          "sha256": "7fca6e23ad10b90935c4f782dfe521a092dcd7d7ec7f126b67bb8d2de080ac23"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-current-flow-storage.patch",
+          "sha256": "eb09e2a57f61e1a87f687a54bbc6b42867e88b27224a0d99da5bc2eceba7e281"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-block-and-cell-frame-storage.patch",
+          "sha256": "c1f6cf078cb6d14c5570137e4dd3570e9f00059dec7f61e24052980b8c2359a6"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-local-reset-and-body-flow-storage.patch",
+          "sha256": "d97608b25c56362322697e308993f3b1095e935b29224b812d0d1f25b258aaf1"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwt-ordinary-leaf-storage.patch",
+          "sha256": "7b470f0be5e568678e79752d1116be31e835c53e4edfa877796bc735ec018ee1"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-hwt-body-record-preservation.patch",
+          "sha256": "acb2e2ff05c497dc44a6cb200a8280a150bc6f34c0d308e7b5555bcb814f28c0"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-standard-rows-and-preview-storage.patch",
+          "sha256": "94db05a258eb382bcb0aa763a8704cb3ca8d8b091682c216544dfc93205404ce"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-stored-time-transaction.patch",
+          "sha256": "c50456efadc9ba58db364b7ed891803116bc5c3c0bbaaf6f7f4b6705cd80789a"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-never-swap-stamped-export.patch",
+          "sha256": "fb20db5329528a0591b3cfe1ac410ba8ae015c2f44e64355ccaabbf01d00f08e"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-encrypted-owned-native-row-storage.patch",
+          "sha256": "db687106d3584c20a2e41d02d7bccc0cf0dac78e9d0ecb3df9e630b9e926a551"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-exact-native-common-optional-field.patch",
+          "sha256": "81c811b33e81d0d532b5875e9135c2f2687d4eda451082d8e2c8f55ba5be352b"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-passive-native-row-archive.patch",
+          "sha256": "49b47b16d2032800577a2eaa679d738fe4090f7d37f3e82049c5f7120ebbec05"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-strict-passive-row-zip-ownership.patch",
+          "sha256": "e4471a4f49d7baaa3b1ee9a9398528ff941cd4485343d257000f6c21e8865806"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-strict-passive-row-child-path.patch",
+          "sha256": "5b828dfa13b7ceeb4835c663bc3cb384f1cc39d4235533b5bf61769ed93be8c0"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-whole-stack-count.patch",
+          "sha256": "033d4421f9cf6c25b19100d3b2803d8d10bf1a2cbc1ec10af51440929a646a3d"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-native-tail-and-tac-spacing.patch",
+          "sha256": "684679c6b3baea90a0d39e69a4d5bac9162761c31d5caf2007edcbb961c4e0e3"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-physical-frame-preservation.patch",
+          "sha256": "96b823eb2cfc2381f8b0d16f9b859b42519fa77d06c0a72f6765514e3af3bc50"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-selected-composition-paint.patch",
+          "sha256": "6c582ae34b892e41c0e64cb4f946087dd2ae505c3ac224046f38cc94959d1952"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-structural-object-anchor.patch",
+          "sha256": "4d635ec33a2eaf05c81e163100053c091dcd1b2d80a6fc27df2c07f2644432c7"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-offset-frame-preservation.patch",
+          "sha256": "a2348c20e47c41084a4502d7c04cf9805f9267d90cbbc2925b36040c381ccca2"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-equal-prefix-preservation.patch",
+          "sha256": "1b439eb820647766c77c5f11f261beebd20ee74c56077d1b7c6df946af241a82"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-completed-row-current-pass.patch",
+          "sha256": "36d3b8bf1b4f0fc08d7631a3caf99693fdb30595a6119e04e126d4e7cf7f94ee"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-frame-source-admission.patch",
+          "sha256": "6137f01855dca5e19880711c188ebe60564833728388ca153ce1ba1db430fe41"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-page-section-frames.patch",
+          "sha256": "bbeacd9516e261bb172a89ca764a4a70f9356cf85951981d69f1b8bfc76afdbd"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-retain-exact-ordinary-body-rows.patch",
+          "sha256": "5733bf643e58510dd96fc5bc1c848d9e349b1f41b0f25d539f5a80dfa8a44326"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-bodywide-column-stack.patch",
+          "sha256": "16063d56a7ccfeb93ddf151427f5876fcdbb1c99447cdf430cf5fb5c33d0f034"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-suffix-required-paint.patch",
+          "sha256": "2ab308dad3dcf3bbc435d4162ca497164abbdbc96e98fa8f638455a5addc227a"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-explicit-column-frames.patch",
+          "sha256": "71ebe3e49165e79e312e465ff09debf09e97a125600aecb4ca69eff2771d9b1a"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-empty-unequal-column-paint.patch",
+          "sha256": "d004bef888a443066541bc9ef8802d9aeba7bc14cc54ce0f603e1d0754886c60"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-visible-table-host-xml.patch",
+          "sha256": "56fdaf1c261b9dc4058a94f41faceafe19ad6b6eb8ed55440754d1e10dbc4f4d"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-native-origin-paint-policy.patch",
+          "sha256": "b7baba62bdc6cb17234da8068fd4e424418fa320d9e24942536aeb5c7d48e931"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-measured-table-split-prefix.patch",
+          "sha256": "a3519d4ff9429aee595344a65a6ed812ac965251a81137fe41f5dbc1a4777b1e"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-host-origin-profile-lifetime.patch",
+          "sha256": "f22b1589d4b4ec87bb9a1761a74ef5c52c9365b23228567fc573c22f40bd3aea"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-table-host-public-reflow-unit.patch",
+          "sha256": "e60e6e832628af24c0428394d7de36cfe82fdf9bcba87d035b49c981ab2df1fb"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-unequal-storage.patch",
+          "sha256": "8d629f2c67eda064a4cefae6b2359ff4ee5a2650f3e2606a3f3d152d57093b2a"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-explicit-columns.patch",
+          "sha256": "6fbd554459a9ca8f81b925a90d0a697399f4472102f12fa24d4cc4fe93406c78"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-empty-gap-storage.patch",
+          "sha256": "365d7be290a2582785caf7126774a248de12369269bd7c791445d0d47687a085"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-caption-signed-storage.patch",
+          "sha256": "3dbaeb97a02c15d1c1b982ec73fb5052d74afced6c586afa0cfba28dd85172b1"
+        },
+        {
+          "name": "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-current-single-column-caption.patch",
+          "sha256": "72c4e83a7d486a64a8d7fe9ef02935e819fdfa7be99f52a69fecc815ed22836c"
+        }
+      ],
+      "sourceId": "84b2bd635b3bef6c",
+      "buildMode": "wsl-review-no-opt",
+      "jsSha256": "0033f22069ac5e3139f68230b45b89761a421858db9d882e9975a4e1f7be40d8",
+      "builtAt": "2026-10-20T17:46:10.1654771Z",
+      "wasmSha256": "6169be6b539238dbef060ab5945512f6a1ffa15bac0f47b7caa95b58098480bc"
+    },
+    "buildScriptSha256": "afc460912f0be08ad4b901319db349b00ce54cb11090e5ec1d5f67b220b94b68",
+    "studioPatchSha256": "a88d40883733a4b1b4ff2da2363c6287f1da229d34192313a7ac418ab8d081ca",
+    "agentBoundSavePatchSha256": "53a223eb3de17839115de8a326463e0233b12d4386dc78ba53ef7a22157d8156",
+    "featurePatchSha256": "ed01522dda3caabd91a2468f3dae29e08f17ecfa4b36ead9093e11aefcb6d440",
+    "recoveryPatchSha256": "9b944815669658ce9c2e30bbacf6b3b6ef588f3e299aec1811cedefae18fbe5a",
+    "tabFeaturePatchSha256": "528654fa9b34bffef038aec8030cfb4f8a63aef8b7abefb2ebcd450241cdd2ec",
+    "sectionBoundaryPatchSha256": "ca345606b5eb9766cd45a86dfee519f28b238313342f3668c8a23f7f77741669",
+    "documentInsertionPatchSha256": "900c59c433a015170893e496d455bf591b0045b2b437e40a97e34e0f7f84281f",
+    "styleManagementPatchSha256": "2ec89f7565ad09ec46b92cc5dd34d6929e72c6b5ac159a033bd0e777430294fe",
+    "styleFlowPatchSha256": "38221e7d4963b5f3f7c4df87888e0617c9e642d345372bae95a50ce707d635ed",
+    "tableConversionPatchSha256": "56a7f828a8c1385388e671858c16fe40d9d6c401fe92566a00db527c8b24d155",
+    "pageBorderPatchSha256": "b4b45d63db11d5d805c360c6529cbdae99ab75068479a2baa331adbaf87b272f",
+    "selectedObjectPropertiesPatchSha256": "cf44046fbd489662da52f8e8994d53bb8926fe99e9583ebea0587d77cc8d1638",
+    "formattingToolbarPatchSha256": "03f40ebe53d94d9c78518d87715f45d6e3447518ff3402aa9e8c62c772ae6b65",
+    "documentTabCyclePatchSha256": "6e604d34496c8c07459c0bc93d9b9d69b32af6ba91ada5f80f490dd18033a26f",
+    "keyboardContextPatchSha256": "e28278ed94c3daf940f528bf97a671ca9458c536cdf134803b4ebb113db1f022",
+    "documentSwapStatePatchSha256": "c08760f3a250e6b362e349a07d8f475639cb58a27ee80ac8925f4950a51610a4",
+    "documentCreatedInformationPatchSha256": "66c141fa8d063f201eea5c50aca308cdafcb0afd1bbd4c5ffcf7e7c25e75c714",
+    "documentHistoryPatchSha256": "76975bf9d165c26f3ccaff3c749860289ae9a60e8432b92c408b6129b914d396",
+    "exportMetadataLossPatchSha256": "53936bc8e22103c42f624d11c842e4d82a3abf03a148772ffdedcd457b93d875",
+    "customSourceSha256": "03bd4c00bfeb7fcde988dd19b472e9e19b9eb44ec2f9f47b35ee1b8a7f9cb089",
+    "applicationSourceCommit": "faf016a5676103763c9437ef19da6afb0200ef53",
+    "applicationSourceDirty": false,
+    "sourceBuild": true,
+    "note": "고정 rhwp 소스와 추적 패치를 직접 빌드한 검수용 WASM. 최적화 및 한컴 출력 비교 상태는 engineBuild와 검증 보고서 참조."
+  },
+  "suites": [
+    {
+      "name": "native-shell",
+      "exitCode": 0,
+      "expectedCases": 11,
+      "verifierSHA256": "2ae3e4077ffbb3bcdca1358008e8b5ba15fed650c897dba9b2e05024c024be80",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 11,
+      "resultSHA256": "ca5263ae761e0050377af925f48aa33beb1f86fe6fa85f263fbacd5d518ad0c2",
+      "engineUsed": true
+    },
+    {
+      "name": "native-recents",
+      "exitCode": 0,
+      "expectedCases": 9,
+      "verifierSHA256": "4a3e58138b97a237383f34c060267adf046f0743c79b331721814fcba8750354",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 9,
+      "resultSHA256": "850d2f0e6d5712a6d3e37d4565ee3cee74bdb485dda760b86eb862c9f3eea6bb",
+      "engineUsed": true
+    },
+    {
+      "name": "document-lifecycle",
+      "exitCode": 0,
+      "expectedCases": 10,
+      "verifierSHA256": "01da3b9c01de5f196c451e1bd09efe1657f6a49c69c8d5aa9b070be49c172e53",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 10,
+      "resultSHA256": "e0bca83e9fde53138ae5bd7d853db22e4c896eea5c6148d588daf91e1caf342b",
+      "engineUsed": true
+    },
+    {
+      "name": "document-windows",
+      "exitCode": 0,
+      "expectedCases": 8,
+      "verifierSHA256": "a90e38ca8ed1a686e37418b8d188709fe036ff48453946bb89a7a012789daf49",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 8,
+      "resultSHA256": "6be55d4cbbf36c40dbfbd3eef621aa6bc3ee26bbf5cab4617674434e6ae12281",
+      "engineUsed": true
+    },
+    {
+      "name": "recovery-integrity",
+      "exitCode": 0,
+      "expectedCases": 10,
+      "verifierSHA256": "3c302af2e33fe773800b42adfba8016b4af0a2b6586385f492a2f607826ed300",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 10,
+      "resultSHA256": "e24e5e3b12d8564fd7e08d46f926481fdda4219d6299048d0d73a4b6e60e03d4",
+      "engineUsed": true
+    },
+    {
+      "name": "download-connection",
+      "exitCode": 0,
+      "expectedCases": 10,
+      "verifierSHA256": "691a5a18ce1c2a71ac79f665a9275d84954e563d4c9247e1ff2bd02538da3c3c",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 10,
+      "resultSHA256": "d48156a0dac2f02fc9477b5d284bd3edd4792e92e57d2b60c8a5871eed2ae95d",
+      "engineUsed": true
+    },
+    {
+      "name": "close-recovery",
+      "exitCode": 0,
+      "expectedCases": 4,
+      "verifierSHA256": "01f52cc12755f85c1d68665c2318519cc60dc5542b33796b2ae8e3aab758f6ad",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 4,
+      "resultSHA256": "ab65f421a1816274701fc65e5f55d1bcd189f0d71158cc3de012add260c874e8",
+      "engineUsed": true
+    },
+    {
+      "name": "save-recovery",
+      "exitCode": 0,
+      "expectedCases": 29,
+      "verifierSHA256": "d186fb6da61718094211db567b31a963415d8760ff630af0091122b8f47f9810",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 29,
+      "resultSHA256": "0953bbb785f21cbd6280588a5d64f6dbca241fdf87cef16dc55384495f7f3868",
+      "engineUsed": true
+    },
+    {
+      "name": "document-metadata",
+      "exitCode": 0,
+      "expectedCases": 10,
+      "verifierSHA256": "5e83edca6f2807ea0a0cdc119973b4ab97b0cf8e09a02f74f3a2c5c95353231f",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 10,
+      "resultSHA256": "64afd7d9766dfbff2a99907651755c4264052513280e0b9fed14344910b0aa19",
+      "engineUsed": true
+    },
+    {
+      "name": "agent-files",
+      "exitCode": 0,
+      "expectedCases": 15,
+      "verifierSHA256": "8eeaada31252ba1abb26850dabc5e8f1ce5dfc9a93a8f17e3bb6c30cedd2093a",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 15,
+      "resultSHA256": "883099d8e50b6bd76d0bea3981579004396ea64ccfcb2478f1c1e37dc39bc455",
+      "engineUsed": true
+    },
+    {
+      "name": "xml-documents-integrated",
+      "exitCode": 0,
+      "expectedCases": 7,
+      "verifierSHA256": "29202056a097e1cd5c0d0cfe150cf0049c3f683158e93a59ea9123f79915bc82",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 7,
+      "resultSHA256": "9db80775fb8bc99e401f7cc86e549d0ee7ed5b901f10447bb1ebf8e2d7af6034",
+      "engineUsed": true
+    },
+    {
+      "name": "xml-documents",
+      "exitCode": 0,
+      "expectedCases": 13,
+      "verifierSHA256": "c467771728a1d1989c3a519ae33a3f77082494f29ee60cca8d205d4bb801f974",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 13,
+      "resultSHA256": "76541406e3407df73d05cb527734235ca7862b770141f1b0f828288a6361ff1f",
+      "engineUsed": false
+    },
+    {
+      "name": "xml-recovery",
+      "exitCode": 0,
+      "expectedCases": 13,
+      "verifierSHA256": "e14547a9738d25a861f0055131efb0e4b1102213af712992b751d57aa0ab13bd",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 13,
+      "resultSHA256": "6f47aaf7abd83eefade8f7b961941244d8363472281f260d48461fa43d9cc46e",
+      "engineUsed": false
+    },
+    {
+      "name": "package-preservation",
+      "exitCode": 0,
+      "expectedCases": 14,
+      "verifierSHA256": "706fd431ba00e453323c77258ad8663d22482077c3de58fc0c6d4796bba767b4",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 14,
+      "resultSHA256": "ddb3a157df59b3c4b5a143814252c5c4c5caf4c52d2d546d3c602b6d919221e7",
+      "engineUsed": true
+    },
+    {
+      "name": "native-row-preservation",
+      "exitCode": 0,
+      "expectedCases": 13,
+      "verifierSHA256": "6309c38fe09353fb39814055293be883fdd54a5623695efcee911b0533283c9d",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 13,
+      "resultSHA256": "4406464f7833e0c0e92f625e12b3b2dd610f522034a7703e0bdff60df94c52fb",
+      "engineUsed": true
+    },
+    {
+      "name": "native-row-engine",
+      "exitCode": 0,
+      "expectedCases": 19,
+      "verifierSHA256": "9375c54adc983acd506e0c2a4617e0e5f07650f5838dbed282c148d0d0e76677",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 19,
+      "resultSHA256": "a86d8ca30cca0cd9145a7a521f91789ee88307e377a25546edbf63323f5893ff",
+      "engineUsed": true
+    },
+    {
+      "name": "reflowed-native-storage",
+      "exitCode": 0,
+      "expectedCases": 12,
+      "verifierSHA256": "0e186add820aa2b86ae95a47a518a73d04132983f65360afabe934be2bc37a5a",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 12,
+      "resultSHA256": "ae1b2c9c2e2066ec268298476ab41108838bfe8e0dfd9268b65fe4631bead1a9",
+      "engineUsed": true
+    },
+    {
+      "name": "reflowed-native-ui",
+      "exitCode": 0,
+      "expectedCases": 13,
+      "verifierSHA256": "7bbc1ec5450fd0aafe42b1dfda8e0073ae77d5a943bd39ab02cace85148bdefe",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 13,
+      "resultSHA256": "a9fff49c2ed9ad6961bb7ba5ffb1096e4078100088f4ddab2c8efc6c4cbd7218",
+      "engineUsed": true
+    },
+    {
+      "name": "computed-row-package",
+      "exitCode": 0,
+      "expectedCases": 22,
+      "verifierSHA256": "411520e1b932078fe3ce0a6a672394ff763d23108e01af9b6b12b42a77ec9de6",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 22,
+      "resultSHA256": "1ae229ed1b110445b8f965d665544ecdba6b112c7f35b8b5b364608df7fe4b9c",
+      "engineUsed": true
+    },
+    {
+      "name": "document-history95",
+      "exitCode": 0,
+      "expectedCases": 20,
+      "verifierSHA256": "ce1c4040ffbabdce15e269390f8706cc9d4fbe3ced389e345f50cf2a9d442ab5",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 20,
+      "resultSHA256": "388d67860b34dcf5e490d859893779584e4bc217536f5eb74442bee2d92346cf",
+      "engineUsed": false
+    },
+    {
+      "name": "history-ui95",
+      "exitCode": 0,
+      "expectedCases": 12,
+      "verifierSHA256": "5831cffd96cde13c99c4878b7d182f5d82be13ead3c5c6fd1540bb657317a06f",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 12,
+      "resultSHA256": "6c16fe60c6d91e13f7281d2c3d8de926ed83cac7def8a5b1957a370adef1d5a5",
+      "engineUsed": true
+    },
+    {
+      "name": "xml-simple-types95",
+      "exitCode": 0,
+      "expectedCases": 10,
+      "verifierSHA256": "779f31a97c02ec91702b3b5fa9ef61fb1bfa67e3a517a72bab673e60f88c086a",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 10,
+      "resultSHA256": "310351c9fd0a92b6c1080cffd063a8c08ef59db228890205a49f8fa5a2a15355",
+      "engineUsed": false
+    },
+    {
+      "name": "stored-information95",
+      "exitCode": 0,
+      "expectedCases": 17,
+      "verifierSHA256": "665e762ffe5e4845367e4ea4d5929bc9695e7cf8728f2edfac338227d8c9219f",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 17,
+      "resultSHA256": "c2df8e36e9c85383f0804e50a845fb6edfeed44bfc9cf164859b6432a55251de",
+      "engineUsed": true
+    },
+    {
+      "name": "hwt-template95",
+      "exitCode": 0,
+      "expectedCases": 9,
+      "verifierSHA256": "e62fb7d7681b4c7f58fbf76e8d56581397d90067808841f0617e5f78c804d442",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 9,
+      "resultSHA256": "dd47c71bda8ecbfeea96b8add374eab8ae3192ba66434c5c757cec94ffbf04b4",
+      "engineUsed": true
+    },
+    {
+      "name": "document-story-information96",
+      "exitCode": 0,
+      "expectedCases": 5,
+      "verifierSHA256": "bb9161f355b81545529bc06f3bea61fe360d0b2c1e9cb4b18127f2da851cf16d",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 5,
+      "resultSHA256": "57c79fd96a4815d0d5fef6437c97504d930eee2b827b144db88ba6aa87518fe5",
+      "engineUsed": true
+    },
+    {
+      "name": "owned-native-cell-layout",
+      "exitCode": 0,
+      "expectedCases": 13,
+      "verifierSHA256": "9f9d6c593105a6bad5739e712b7d59cf41d748dad8c83fcb3de2ce260b526487",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 13,
+      "resultSHA256": "e6ada3ebc5d0ee1dbe6d94a653daad12b28079324b72b8eeacce3ce455ab09be",
+      "engineUsed": true
+    },
+    {
+      "name": "owned-python-frame-layout",
+      "exitCode": 0,
+      "expectedCases": 6,
+      "verifierSHA256": "5fdae930487ee69e8144a16366d7af479b3f4bd319556f0052666b62b4489629",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 6,
+      "resultSHA256": "d927ec3c4ff2bd37090f5564bf639ec2bc78fc111abbe07721f88be9a7f8d161",
+      "engineUsed": true
+    },
+    {
+      "name": "authored-floating-gap-layout",
+      "exitCode": 0,
+      "expectedCases": 18,
+      "verifierSHA256": "e4e4bf686026001508558d383f968d42e7f050ffa44e752f890bbe2205668a44",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 18,
+      "resultSHA256": "6729a751c5b3bd7a90d8db614d8b5882dd97ef419cfcbd45cc560351165b5a6b",
+      "engineUsed": true
+    },
+    {
+      "name": "native-prefix-storage",
+      "exitCode": 0,
+      "expectedCases": 32,
+      "verifierSHA256": "7fc61b2dc14236ba3ec0aaf536d9835cd71be0778198c1b08e040f9c071f32a9",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 32,
+      "resultSHA256": "95e028753233abdffee1245d489054da24ebefcceae9933cd90e62944fe82e2f",
+      "engineUsed": true
+    },
+    {
+      "name": "native-prefix-ui",
+      "exitCode": 0,
+      "expectedCases": 3,
+      "verifierSHA256": "f0b24f5511454bfbf5540531b4cb435cc80f34d888b363aa1c08026f3ce38e95",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 3,
+      "resultSHA256": "76b9a0449263f45bdf2e43ca213ca60850f26c38f7cd8b63c05e44bf047fd8c4",
+      "engineUsed": true
+    },
+    {
+      "name": "python-edit-storage",
+      "exitCode": 0,
+      "expectedCases": 30,
+      "verifierSHA256": "fdefed762f53c8bc23609161aa46b37f2a4b17f103d3de43050a7b3a08e05730",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 30,
+      "resultSHA256": "299128d3d7c9b094c7d036d1fb988518af0852408ecbf0ce18527eb8641acd3c",
+      "engineUsed": true
+    },
+    {
+      "name": "python-edit-ui",
+      "exitCode": 0,
+      "expectedCases": 7,
+      "verifierSHA256": "511c26ec9a2fa15833c9f327aa3e9a1d60bebcc03d988f28f93a2561133a8ef3",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 7,
+      "resultSHA256": "17e83625f3c7bac45bc0ac9079f9bf34a096c6a96c32d1b3b4ec410481a254ff",
+      "engineUsed": true
+    },
+    {
+      "name": "hwt-leaf115",
+      "exitCode": 0,
+      "expectedCases": 13,
+      "verifierSHA256": "91f843fb11aa448ed07404681b67a89828e77a2afd8b93e31887c3a30a257905",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 13,
+      "resultSHA256": "0304e376b873f0a0cbad211d1a989b9bacac377cd8a181d3462a3eb300982939",
+      "engineUsed": true
+    },
+    {
+      "name": "hwt-leaf-integrated115",
+      "exitCode": 0,
+      "expectedCases": 7,
+      "verifierSHA256": "470526abcdac2bd88342c168e6253739966e71ae9b30de4a1a73063f684388a9",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 7,
+      "resultSHA256": "26ab194d2d217900f9d17f3da1c735c26c06b5967e7d4953ceba1f4760a0d5b0",
+      "engineUsed": true
+    },
+    {
+      "name": "hwt-leaf-native-ui115",
+      "exitCode": 0,
+      "expectedCases": 10,
+      "verifierSHA256": "fdf5c31e2cc01ff4adfb3584e7fc08d5eaa377409ce95b74a69b984d7cc1ce78",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 10,
+      "resultSHA256": "95d07360a94e0190af75ea26613f97c35fe6a30079a8581ae7592f8f6dd31f32",
+      "engineUsed": true
+    },
+    {
+      "name": "preview-utf16-storage117",
+      "exitCode": 0,
+      "expectedCases": 7,
+      "verifierSHA256": "d117afc3654527f1b2e902ad40f68b3a897a61bd2ff18a21c27eaf630199da18",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 7,
+      "resultSHA256": "f4702f49e7bb9753087f47a901847062929b9ebc24c487374d2996e11ffe6a79",
+      "engineUsed": true
+    },
+    {
+      "name": "encrypted-native-rows120",
+      "exitCode": 0,
+      "expectedCases": 7,
+      "verifierSHA256": "b139e9cbb1e2b51bf9f5342dffb8868d244feec02ce04a52f18d33a7d1e139be",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 7,
+      "resultSHA256": "e53bf620001e1e30e1af82296f132664abd5c0c817fcdd294e39f24494c77ea1",
+      "engineUsed": true
+    },
+    {
+      "name": "encrypted-native-rows-ui120",
+      "exitCode": 0,
+      "expectedCases": 3,
+      "verifierSHA256": "a98a9b46ef4d60e09b23e61f9564fcefed0cd7ba38c33be807a23341dc30dfcf",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 3,
+      "resultSHA256": "e1c2ec5e128918011235ff2a7163db51dfd6ba57ba6d22b45be64f6786d542bb",
+      "engineUsed": true
+    },
+    {
+      "name": "legacy-native-row-archive122",
+      "exitCode": 0,
+      "expectedCases": 16,
+      "verifierSHA256": "597ae2678c09f316cc17ded0503289ae2dc840d30eb04de7413964a6eb89c858",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 16,
+      "resultSHA256": "a3da7e805975c19cc41fb8a6ca5d6a2de76664380796f3f7945498ec6132003a",
+      "engineUsed": true
+    },
+    {
+      "name": "legacy-native-row-ui122",
+      "exitCode": 0,
+      "expectedCases": 5,
+      "verifierSHA256": "9a861b57c90a916bdca0ad88225b95a1af900c241af972d75dcd8b89aa7c43d8",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 5,
+      "resultSHA256": "6fa96133244ffabb2d13fad4bd6fddc1e69d5dc2c8348e3f682f17916a13e886",
+      "engineUsed": true
+    },
+    {
+      "name": "native-tac-spacing-ui126",
+      "exitCode": 0,
+      "expectedCases": 9,
+      "verifierSHA256": "dcd77cdf5655384c337788dfc361b6f58430425a50522c7c6d2413ed45e88b3b",
+      "scriptUnchanged": true,
+      "status": "PASS",
+      "passed": 9,
+      "resultSHA256": "f54a095322b98c34e71b6af42ed9f4f799ec97786a64088fb920960a6338b0b8",
+      "engineUsed": true
+    }
+  ],
+  "failures": [],
+  "passedCases": 501,
+  "totalCases": 501,
+  "externalNativeCellCorpusIncluded": true,
+  "externalFloatingHostCorpusIncluded": true,
+  "externalNativePrefixCorpusIncluded": true,
+  "externalPythonEditCorpusIncluded": true,
+  "scope": "Production file/recovery UI exercised through isolated headless Edge profiles and native IPC seams, not actual OS dialog/Hancom screen certification. Standalone XML and history IDB suites attest exact sources separately. HWT uses actual WASM and an explicit browser test bridge; history-ui also tests its actual production iframe facade and host menu. Optional native-cell/frame regressions require four explicit paths including their independent frame baseline; floating-host regressions require their three explicit paths and SHA-pinned source/oracle; native-prefix regressions require their pinned baseline and original Native file together; Python regressions require baseline, source HWPX and Native reference together. Absence adds no PASS or silent skipped case. Floating-host strict comparisons include stored metadata when both official engines expose it. The old native-row safety cases permit detected mismatch refusal; separate reflowed-native-storage/UI and native-prefix-storage/UI REQUIRE successful saves/reopens/follow-up edits. Computed-row-package independently checks ZIP authority. Agent suite includes actual approved-bound save and stale generation refusal."
+}

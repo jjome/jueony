@@ -1,0 +1,178 @@
+--- a/src/model/native_computed_resource.rs
++++ b/src/model/native_computed_resource.rs
+@@ -1,7 +1,7 @@
+ //! Exact compiled portable metrics and frame-planning generation.
+ //! Rust source text is canonicalized CRLF to LF; raw file hashes are separate build evidence.
+ //! Source bytes are included in tests only; the release binary stores one digest.
+-pub(crate) const RESOURCE:[u8;32]=[12,33,16,63,159,224,233,6,123,103,218,133,92,105,172,73,103,224,115,144,255,196,66,52,215,86,109,227,92,165,99,187];
++pub(crate) const RESOURCE:[u8;32]=[248,44,122,97,41,232,69,195,145,173,131,53,48,245,55,32,149,125,117,223,14,4,195,54,218,124,0,231,28,182,164,37];
+ #[cfg(test)] mod tests {
+     use sha2::{Digest,Sha256};
+     #[test] fn native_computed_resource_matches_the_actual_pipeline_sources() {
+@@ -304,6 +304,7 @@
+             ("src/renderer/current_caption_rows157_tests.rs",include_bytes!("../renderer/current_caption_rows157_tests.rs").as_slice()),
+             ("src/renderer/current_signed_column157.rs",include_bytes!("../renderer/current_signed_column157.rs").as_slice()),
+             ("src/serializer/hwpx/current_caption_rows157.rs",include_bytes!("../serializer/hwpx/current_caption_rows157.rs").as_slice()),
++            ("src/renderer/current_caption_spacing157.rs",include_bytes!("../renderer/current_caption_spacing157.rs").as_slice()),
+         ];
+         let mut h=Sha256::new();h.update(b"rhwp-portable-native-text-edit-frame-1;source-text-lf\0");
+         for (path,bytes) in inputs {
+--- a/src/renderer/current_caption_rows157.rs
++++ b/src/renderer/current_caption_rows157.rs
+@@ -58,7 +58,7 @@
+    ||!result.hidden_empty_paras.is_empty()||!result.wrap_around_paras.is_empty()||!result.pre_emitted_host_paras.is_empty(){return None;}
+   let ps=&source.sections[0].paragraphs;if ps.len()>128||measured.len()>4096{return None;}
+   let [Control::SectionDef(_),Control::ColumnDef(columns)]=ps.first()?.controls.as_slice()else{return None;};
+-  if !matches!(columns.column_count,2|3)||!columns.same_width||!columns.widths.is_empty()||!columns.gaps.is_empty()
++  if !matches!(columns.column_count,1|2|3)||!columns.same_width||!columns.widths.is_empty()||!columns.gaps.is_empty()
+    ||columns.column_type!=crate::model::page::ColumnType::Normal||columns.direction!=crate::model::page::ColumnDirection::LeftToRight{return None;}
+   let frames=physical.frames()?;let [frame]=frames else{return None;};let page=&result.pages[0];let [col]=page.column_contents.as_slice()else{return None;};
+   if frame.section!=0||frame.page!=0||frame.column!=0||frame.column_ordinal!=0||frame.has_zone||frame.zone_y!=0.0||!frame.complete
+@@ -121,3 +121,6 @@
+ #[cfg(test)]
+ #[path="current_caption_rows157_tests.rs"]
+ mod tests;
++
++#[path="current_caption_spacing157.rs"]
++pub(crate) mod spacing157;
+--- /dev/null
++++ b/src/renderer/current_caption_spacing157.rs
+@@ -0,0 +1,95 @@
++//! Current captioned Native TAC spacing policy only. This returns q/2, never
++//! an origin, physical fit, row, reset, source-cache or serialization capability.
++//! Native clean layout already selects this policy for the same canonical host.
++//! A current caption edit may invalidate its old input lease; no old lease is
++//! accepted here. The actual current plain caption is independently replayed.
++use super::*;
++pub(crate) fn half(index:usize,p:&crate::model::paragraph::Paragraph,next:Option<&crate::model::paragraph::Paragraph>,ci:usize,row:&LineSeg,
++ measured:&[crate::renderer::height_measurer::MeasuredTable],styles:&crate::renderer::style_resolver::ResolvedStyleSet,
++ profile:crate::model::provenance::LayoutCompatibilityProfile,dpi:f64)->Option<f64>{
++ use crate::model::{control::Control,shape::CaptionDirection,table::TablePageBreak};
++ if !profile.native_hwp5_layout()||!profile.hwp5_stored_pagination_layout()||dpi!=crate::renderer::DEFAULT_DPI
++  ||p.column_type!=crate::model::paragraph::ColumnBreakType::None||p.raw_break_type!=0||p.page_break_synthesized||p.layout_only_fill_lines!=0
++  ||!p.markpen_marks.is_empty()||!p.title_marks.is_empty()||p.numbering_restart.is_some()||matches!(p.numbering_marker,crate::model::paragraph::NumberingMarker::Text(_, _))
++  ||p.ctrl_data_records.iter().any(Option::is_some)||ci!=0||p.controls.len()!=1||!p.text.is_empty()||p.char_count!=9||!p.char_offsets.is_empty()||p.line_segs.len()!=1
++  ||!std::ptr::eq(row,p.line_segs.first()?)||row.text_start!=0||row.tag!=LineSeg::TAG_SINGLE_SEGMENT_LINE||row.line_spacing<=0
++  ||row.line_height<=0||row.text_height<=0||row.text_height>row.line_height||row.baseline_distance<0||row.baseline_distance>row.line_height
++  ||row.vertical_pos<0||row.vertical_pos.checked_add(row.line_height)?.checked_add(row.line_spacing).is_none()
++  ||p.stored_text_partition_is_dirty()||p.hwpx_axis_shift!=0||p.source_line_seg_vertical_pos.is_some()||p.cell_format_vpos_dirty
++  ||!p.field_ranges.is_empty()||!p.range_tags.is_empty()||!p.orphan_field_ends.is_empty()||!p.tab_extended.is_empty(){return None;}
++ // Existing full-spacing precedence reads next's first stored row. Both a
++ // missing first row and an implementation row make that branch false,
++ // independent of the next paragraph's text or its row's coordinates.
++ let next=next?;if next.line_segs.first().is_some_and(|r|r.tag&LineSeg::TAG_IMPLEMENTATION_PROPERTY==0){return None;}
++ let Control::Table(t)=&p.controls[0]else{return None;};let cap=t.caption.as_ref()?;
++ if !caption_common_exact(t)||!t.common.treat_as_char||t.common.allow_overlap||t.common.width==0||t.common.height==0
++  ||t.common.horizontal_offset!=0||t.common.vertical_offset!=0||t.common.height>=0x80000000
++  ||t.page_break!=TablePageBreak::None||t.repeat_header||t.row_count==0||t.row_count>128||t.col_count==0||t.col_count>32
++  ||!matches!(cap.direction,CaptionDirection::Top|CaptionDirection::Bottom)||cap.spacing<0||cap.paragraphs.len()!=1
++  ||cap.width!=t.common.width||cap.max_width!=t.common.width||cap.include_margin||!matches!(cap.vert_align,crate::model::shape::CaptionVertAlign::Top)
++  ||t.cells.len()>4096||t.cells.iter().any(|c|c.row_span!=1||c.col_span!=1||c.paragraphs.iter().any(|p|!p.controls.is_empty()||!p.field_ranges.is_empty())){return None;}
++ let margins=[t.outer_margin_left,t.outer_margin_right,t.outer_margin_top,t.outer_margin_bottom];if margins.iter().any(|m|*m<0){return None;}
++ let mut owners=measured.iter().filter(|m|m.para_index==index&&m.control_index==ci);let m=owners.next()?;
++ if owners.next().is_some()||m.row_heights.len()!=t.row_count as usize||m.cumulative_heights.len()!=m.row_heights.len()+1
++  ||m.cumulative_heights.first()!=Some(&0.0)||!m.cell_spacing.is_finite()||m.cell_spacing<0.0||!m.caption_height.is_finite()||m.caption_height<=0.0{return None;}
++ let mut body=0.0;for(i,h)in m.row_heights.iter().enumerate(){if !h.is_finite()||*h<=0.0{return None;}body+=h+if i>0{m.cell_spacing}else{0.0};if !arithmetic_equal(m.cumulative_heights[i+1],body){return None;}}
++ if !arithmetic_equal(body,crate::renderer::hwpunit_to_px(t.common.height as i32,dpi)){return None;}
++ let fresh=fresh_body_rows(&cap.paragraphs[0],styles,crate::renderer::hwpunit_to_px(t.common.width as i32,dpi),dpi)?;
++ if cap.paragraphs[0].line_segs.len()!=fresh.rows.len()||!cap.paragraphs[0].line_segs.iter().zip(&fresh.rows).all(|(a,b)|a==b){return None;}
++ let mut cap_height=0.0;for (i,r)in fresh.rows.iter().enumerate(){cap_height+=crate::renderer::hwpunit_to_px(r.line_height,dpi);if i+1<fresh.rows.len(){cap_height+=crate::renderer::hwpunit_to_px(r.line_spacing,dpi);}}
++ if !arithmetic_equal(cap_height,m.caption_height)||!arithmetic_equal(m.total_height,body+cap_height+crate::renderer::hwpunit_to_px(i32::from(cap.spacing),dpi)){return None;}
++ Some(crate::renderer::hwpunit_to_px(row.line_spacing,dpi)/2.0)
++}
++
++// Native's existing ordinary serializer explicitly sets bit29 from caption
++// presence (serializer/control.rs::apply_caption_attr_bit). Preserve and require
++// that exact declaration; generic captionless common equality lacks this bit.
++fn caption_common_exact(t:&crate::model::table::Table)->bool{
++ let c=&t.common;let attr=crate::serializer::control::pack_common_attr_bits(c)|(1u32<<29);
++ if t.caption.is_none()||c.attr!=attr||!matches!(t.raw_ctrl_data.len(),38|42)||!c.description.is_empty()||!c.raw_extra.is_empty()
++  ||c.ctrl_id!=0||c.z_order!=0||c.prevent_page_break!=0||!matches!(c.numbering_type,crate::model::shape::ObjectNumberingType::None)
++  ||!matches!(c.drop_cap_style,crate::model::shape::DropCapStyle::None)||c.margin.left!=t.outer_margin_left||c.margin.right!=t.outer_margin_right
++  ||c.margin.top!=t.outer_margin_top||c.margin.bottom!=t.outer_margin_bottom{return false;}
++ let mut bytes=Vec::with_capacity(42);for v in[c.attr,c.vertical_offset,c.horizontal_offset,c.width,c.height]{bytes.extend(v.to_le_bytes());}
++ bytes.extend(c.z_order.to_le_bytes());for v in[c.margin.left,c.margin.right,c.margin.top,c.margin.bottom]{bytes.extend(v.to_le_bytes());}
++ bytes.extend(c.instance_id.to_le_bytes());if t.raw_ctrl_data.len()==42{bytes.extend(c.prevent_page_break.to_le_bytes());}bytes.extend(0u16.to_le_bytes());bytes==t.raw_ctrl_data
++}
++#[cfg(test)]mod tests{
++use super::*;
++use crate::model::{control::Control,paragraph::{Paragraph,ColumnBreakType}};
++fn ready()->crate::DocumentCore{
++ let mut d=crate::DocumentCore::from_bytes(include_bytes!("../../tests/fixtures/caption157-one-bottom.hwp")).unwrap();
++ d.insert_text_native(0,0,0,&"Public prefix wrap 🪶. ".repeat(12)).unwrap();d.insert_text_in_cell_native(0,1,0,65534,0,0,"Edited caption 🪶. ").unwrap();d
++}
++#[test]fn caption157_current_spacing_positive_and_boundaries(){
++ let d=ready();let p=&d.document().sections[0].paragraphs[1];let n=d.document().sections[0].paragraphs.get(2).unwrap();let styles=d.resolve_render_styles_for_section(0);
++ let query=|p:&Paragraph,n:Option<&Paragraph>,m:&[crate::renderer::height_measurer::MeasuredTable]|half(1,p,n,0,&p.line_segs[0],m,&styles,d.effective_layout_profile(),d.dpi);
++ assert_eq!(query(p,Some(n),&d.measured_tables[0]),Some(4.0));
++ assert!(query(p,None,&d.measured_tables[0]).is_none());
++ let mut next=n.clone();next.line_segs.clear();assert_eq!(query(p,Some(&next),&d.measured_tables[0]),Some(4.0));
++ next=n.clone();next.text.push_str("Different next text is not an input of q/2");assert_eq!(query(p,Some(&next),&d.measured_tables[0]),Some(4.0));
++ next.line_segs[0].tag=LineSeg::TAG_SINGLE_SEGMENT_LINE;assert!(query(p,Some(&next),&d.measured_tables[0]).is_none());
++ let copy=p.line_segs[0].clone();assert!(half(1,p,Some(n),0,&copy,&d.measured_tables[0],&styles,d.effective_layout_profile(),d.dpi).is_none());
++ for case in 0..23{
++  let mut p=p.clone();match case{
++   0=>p.line_segs[0].tag|=LineSeg::TAG_IMPLEMENTATION_PROPERTY,1=>p.line_segs[0].text_start=1,
++   2=>p.line_segs[0].line_spacing=0,3=>p.line_segs[0].vertical_pos=-1,4=>p.line_segs[0].vertical_pos=i32::MAX,
++   5=>p.hwpx_axis_shift=1,6=>p.source_line_seg_vertical_pos=Some(vec![0]),7=>p.column_type=ColumnBreakType::Page,
++   8=>p.stored_text_partition_dirty=true,9=>p.cell_format_vpos_dirty=true,10=>p.text.push('x'),11=>p.char_count=1,
++   12=>p.layout_only_fill_lines=1,
++   _=>{let Control::Table(t)=&mut p.controls[0]else{panic!()};match case{
++    13=>t.common.attr^=1<<31,14=>t.raw_ctrl_data.push(0),15=>t.common.raw_extra.push(0),16=>t.common.width+=1,
++    17=>t.common.treat_as_char=false,
++    _=>{let c=t.caption.as_mut().unwrap();match case{18=>c.spacing=-1,19=>c.width+=1,20=>c.paragraphs[0].text.push('x'),
++     21=>c.paragraphs[0].text="x".repeat(65537),22=>c.direction=crate::model::shape::CaptionDirection::Left,_=>unreachable!()}}
++   }}
++  }assert!(query(&p,Some(n),&d.measured_tables[0]).is_none(),"current input {case}");
++ }
++ for case in 0..7{let mut m=d.measured_tables[0].clone();match case{
++  0=>{let a=m[0].clone();m.push(a)},1=>m[0].row_heights[0]=f64::NAN,2=>m[0].caption_height+=1.0,3=>m[0].cumulative_heights[1]+=1.0,
++  4=>m[0].total_height+=1.0,5=>m[0].para_index+=1,6=>m[0].cell_spacing=-1.0,_=>unreachable!()};
++  assert!(query(p,Some(n),&m).is_none(),"current measured owner {case}");}
++ // No new row/reset/lease authority was installed by this pure policy query.
++ let before=format!("{:?}",d.document());let events=d.serialize_event_log();let _=query(p,Some(n),&d.measured_tables[0]);assert_eq!(before,format!("{:?}",d.document()));assert_eq!(events,d.serialize_event_log());
++}
++}
+--- a/src/renderer/layout.rs
++++ b/src/renderer/layout.rs
+@@ -14934,14 +14934,16 @@
+                         ) {
+                             hwpunit_to_px(seg.line_spacing, self.dpi)
+                         } else {
+-                            crate::renderer::composer::tac_host_trailing_spacing(
++                            crate::renderer::current_frame_rows_plan::caption157::spacing157::half(
++                                para_index,para,paragraphs.get(para_index+1),control_index,seg,measured_tables,styles,self.profile.get(),self.dpi
++                            ).unwrap_or_else(||crate::renderer::composer::tac_host_trailing_spacing(
+                                 para,
+                                 control_index,
+                                 seg,
+                                 self.profile.get().hwpx_stored_layout(),
+                                 native_stored_layout,
+                                 self.dpi,
+-                            )
++                            ))
+                         };
+                     } else if seg.line_spacing < 0 {
+                         // 음수 ls (Fixed 줄간격 TAC 표): y를 문단 advance로 리셋 (Task #9)
+--- a/src/renderer/typeset/controls/tac_reconcile.rs
++++ b/src/renderer/typeset/controls/tac_reconcile.rs
+@@ -64,7 +64,9 @@
+                         .unwrap_or(0.0);
+                     let effective_h = crate::renderer::tac_table_effective_height(seg_lh, mt_h);
+                     let trailing = if seg.line_spacing > 0 {
+-                        crate::renderer::composer::tac_host_trailing_spacing(
++                        crate::renderer::current_frame_rows_plan::caption157::spacing157::half(
++                            para_idx,para,next_para,ci,seg,measured_tables,styles,profile,dpi
++                        ).unwrap_or_else(||crate::renderer::composer::tac_host_trailing_spacing(
+                             para,
+                             ci,
+                             seg,
+@@ -73,7 +75,7 @@
+                                 || (profile.native_hwp5_layout() && crate::renderer::composer::unchanged_native_tac_spacing(para_idx,para,next_para,ci,seg,
+                                     measured_tables,styles,dpi))),
+                             dpi,
+-                        )
++                        ))
+                     } else {
+                         // 음수 Fixed 간격의 기존 상한 계약은 별도 경로에서 유지한다.
+                         hwpunit_to_px(seg.line_spacing, dpi) / 2.0

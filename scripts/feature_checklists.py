@@ -67,7 +67,7 @@ def local_link(label, target, current):
     return f"[{escaped(label)}](<{relative}>)"
 
 
-def counter_text(rows, field, done, partial, excluded=False):
+def counter_text(rows, field, done, partial, excluded=False, format_count=None):
     values = collections.Counter(r[field] for r in rows)
     if not rows:
         return "— 상세 작업 없음"
@@ -75,7 +75,8 @@ def counter_text(rows, field, done, partial, excluded=False):
     if not applicable:
         return f"해당 없음 {values['NA']}"
     label = "연결" if field == "agent" else "완료"
-    text = f"{label} {values[done]}/{applicable} · 부분 {values[partial]}"
+    count = format_count(values[done], applicable) if format_count else f"{values[done]}/{applicable}"
+    text = f"{label} {count} · 부분 {values[partial]}"
     states = {"implementation": [("MISSING", "미구현"), ("STUB", "stub"), ("AUDIT", "재점검")],
               "verification": [("NOT_RUN", "미검증")], "agent": [("NOT_CONNECTED", "미연결")]}
     for status, name in states[field]:
@@ -172,6 +173,20 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
         href = Path(os.path.relpath(target, current.parent)).as_posix() + "#" + row["id"].lower()
         return f"[{row['id']}](<{href}>)"
 
+    def progress_count(done, total, current):
+        number = f"{done}/{total}"
+        if not total or done != total:
+            return number
+        # Markdown renderers can strip inline styles. A local SVG keeps the
+        # number green offline, with an accessible text fallback and no HTML.
+        path = docs / "progress-badges" / f"complete-{done}-of-{total}.svg"
+        width = 27 + len(number) * 8
+        outputs[path] = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="24" viewBox="0 0 {width} 24" role="img" aria-label="{number} 완료">'
+                         f'<title>{number} 완료</title><rect x="0.5" y="0.5" width="{width-1}" height="23" rx="5" fill="#e7f6ec" stroke="#9bc9ab"/>'
+                         '<path d="m7 12 3 3 5-6" fill="none" stroke="#17633b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+                         f'<text x="21" y="16.5" fill="#17633b" font-family="Arial, sans-serif" font-size="13" font-weight="700">{number}</text></svg>\n')
+        return "!" + local_link(number + " 완료", path, current)
+
     def dashboard(current):
         lines = ["| 기능 | 상위 완료 | 구현 완료 | 검증 완료 | Agent 연결 | 현재 상황 · 다음 작업 |",
                  "| --- | --- | --- | --- | --- | --- |"]
@@ -184,7 +199,7 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
                 total = len(scope) - states["NA"]
                 if not total:
                     return "해당 없음"
-                return ("상위 " if not tasks else "") + f"{states[done]}/{total}" + (f" · 부분 {states['PARTIAL']}" if states["PARTIAL"] else "")
+                return ("상위 " if not tasks else "") + progress_count(states[done], total, current) + (f" · 부분 {states['PARTIAL']}" if states["PARTIAL"] else "")
             pending = priority_tasks(items, complete)[:1]
             next_work = (f"{next_axis(pending[0])} " + task_link(pending[0], current) + " " + escaped(pending[0]["task"])) if pending else "상세 작업 분해 필요" if not tasks else "기록된 작업 완료"
             if group.get("update"):
@@ -192,7 +207,7 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
             if group.get("working"):
                 next_work = "**통합 검증 중** · " + next_work
             rollups = [r for r in items if r["kind"] != "TASK"]
-            upper = f"{sum(complete(r) for r in rollups)}/{len(rollups)}" if rollups else "—"
+            upper = progress_count(sum(complete(r) for r in rollups), len(rollups), current) if rollups else "—"
             lines.append(f"| {local_link(group['title'], paths[group['key']], current)} | {upper} | "
                          f"{value('implementation', 'DONE')} | {value('verification', 'DONE')} | "
                          f"{value('agent', 'CONNECTED')} | {next_work} |")
@@ -200,7 +215,7 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
                   f"**{counts['verification'].get('DONE', 0)}/{counts['taskRows']}** | "
                   f"**{counts['agent'].get('CONNECTED', 0)}/{counts['taskRows'] - counts['agent'].get('NA', 0)}** | "
                   f"세 축 완료 **{counts['completedTaskRows']}개** |", "",
-                  "‘상위 완료’는 필요한 구현·검증·Agent 연결을 모두 충족한 상위 범위 수다. 나머지 숫자는 **완료·연결 / 해당 세부 실행 작업 수**다. ‘상위’는 상세 작업이 아직 없는 영역의 상위 범위 집계다. "
+                  "초록색 숫자 배지는 해당 열의 N/N 완료만 뜻한다. 구현·검증·Agent 연결은 각각 별도로 표시한다. ‘상위 완료’는 필요한 구현·검증·Agent 연결을 모두 충족한 상위 범위 수다. 나머지 숫자는 **완료·연결 / 해당 세부 실행 작업 수**다. ‘상위’는 상세 작업이 아직 없는 영역의 상위 범위 집계다. "
                   "다른 행의 세부 작업 수와 합산하지 않는다. 전체 기능 완성률이 아니며, 한글 직접 비교와 미검증 변경은 완료에 포함하지 않는다.", ""]
         return lines
 
@@ -240,8 +255,8 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
                  "| 구분 | 실행 작업 | 상위 범위 |", "| --- | --- | --- |"]
         for field, label, done in [("implementation", "구현", "DONE"),
                                    ("verification", "검증", "DONE"), ("agent", "Agent 연결", "CONNECTED")]:
-            text.append(f"| {label} | {counter_text(tasks, field, done, 'PARTIAL', True)} | "
-                        f"{counter_text(rollups, field, done, 'PARTIAL', True) if rollups else '— 상위 범위 없음'} |")
+            text.append(f"| {label} | {counter_text(tasks, field, done, 'PARTIAL', True, lambda n, d: progress_count(n, d, overview))} | "
+                        f"{counter_text(rollups, field, done, 'PARTIAL', True, lambda n, d: progress_count(n, d, overview)) if rollups else '— 상위 범위 없음'} |")
         text += ["", f"실행 작업 {len(tasks)}개 · 상위 범위 {len(rollups)}개. "
                  f"세 축 완료: 실행 작업 {sum(complete(r) for r in tasks)}개 · 상위 범위 {sum(complete(r) for r in rollups)}개.", ""]
         pending = priority_tasks(items, complete)[:1]
@@ -291,8 +306,8 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
                  "| 구분 | 실행 작업 | 상위 범위 |", "| --- | --- | --- |"]
         for field, label, done in [("implementation", "구현", "DONE"),
                                    ("verification", "검증", "DONE"), ("agent", "Agent 연결", "CONNECTED")]:
-            lines.append(f"| {label} | {counter_text(tasks, field, done, 'PARTIAL', True)} | "
-                         f"{counter_text(rollups, field, done, 'PARTIAL', True) if rollups else '— 상위 범위 없음'} |")
+            lines.append(f"| {label} | {counter_text(tasks, field, done, 'PARTIAL', True, lambda n, d: progress_count(n, d, path))} | "
+                         f"{counter_text(rollups, field, done, 'PARTIAL', True, lambda n, d: progress_count(n, d, path)) if rollups else '— 상위 범위 없음'} |")
         lines += ["",
                  "☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. "
                  "검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.", ""]

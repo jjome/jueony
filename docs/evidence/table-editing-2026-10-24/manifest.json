@@ -1,0 +1,52 @@
+{
+  "baseline": "2a0a60fe",
+  "engine": "Rust183 source-c38631692287c07f",
+  "sourceFiles": {
+    "apps/editor/src/adapters/rhwp/table-auto-fill.ts": "a883a34e90864accb0a8065ea09cd8f22212d77c38d567002f1be3d389636b2e",
+    "apps/editor/src/adapters/rhwp/table-auto-fill-native.ts": "da512b7aeb2a3ed02d165352c1ae5136b485effa52eb69fa37fa966ed0e6660f",
+    "apps/editor/tests/table-auto-fill-transaction.test.ts": "6e3906453e1b09457f01e0716c36530537b3fba47b9b68e13b993a6f5740f539",
+    "apps/editor/src/editor-actions/table-formula-format.ts": "054262b2ea2d75206acb2a177b3c2ef46ef3f86dc1c00f107ea7d27a916c8e0c",
+    "apps/editor/scripts/integration/formula-format-patches.mjs": "f5b1c1203462e8dfb7d6e6e77c714ffee3df002d3898f889fa637f32ddc54dd8",
+    "apps/editor/tests/table-formula-format.test.ts": "402e48db3b0d1a8d6aee6f5c375c1fc8553e75088cb5e222594c0d673735ef29",
+    "apps/editor/scripts/integration/table-size-target-patches.mjs": "0a5832dd34082e4e229d0c770ce2dfb8cec47327b0adb1e7db60bee30e8e6955",
+    "apps/editor/scripts/build.mjs": "921e6a2626cc24e5b447ebb533ab6dcfb13490f983e6d2510bea08c3cfc9be65",
+    "apps/editor/scripts/verify-table-date-fill.mjs": "25d91731b3c673784e33ada20525933710b5cac439df5a29d741ba8764a39966",
+    "apps/editor/scripts/verify-table-formula-format.mjs": "73896974bf278063b1e19dd92a796543c60fe1649899f73f3de47dc267cd3241",
+    "apps/editor/scripts/verify-table-size-target.mjs": "62c047bd894317e28f8b9326ba24082054f7a1f327082427c01aa592a503d888"
+  },
+  "scenarioCounts": {
+    "verify-table-date-fill": 8,
+    "verify-table-formula-format": 10,
+    "verify-table-size-target": 6
+  },
+  "savedFiles": 16,
+  "nativeHancom": false,
+  "scope": "Date-fill refusal, formula numeric display/atomic commit and actual cell address, stale table/cell size forms. Not complete advanced tables or Agent support.",
+  "artifacts": {
+    "before-formula/result.json": "bd94eae73a62875868221fd746c2eb890a2e20344bd6ce3f5da3b3674bdd0575",
+    "before-table-size/result.json": "59787ad9b7564e7d6f2fe6f89d4351addf2c100c35c08a00c69f19dd5e332973",
+    "boundaries-result.json": "a00150d9962c02f70167b874be2fe0cc05dead9190d2210b5b7eeec0e5cfb950",
+    "typecheck-result.json": "a15740d2a93a23e36d59ff78680f49e99d74a36dc44ec05c1983fcb3c30ef807",
+    "unit-result.json": "bcda5f997e45a8666236f46d9b2c3adc3d84af8d45f472111f8d1608360393b9",
+    "unit-summary.txt": "6de5572b89011533acff2a97a87e98a1aea49b34447c4f6456860b69b919e14d",
+    "verify-table-date-fill/days.hwp": "11d678035577a53946800d4ab1b72d5f774a44d6b7e91029549085ace13fb50f",
+    "verify-table-date-fill/days.hwpx": "99f10180b50dcf5acb8869798b10e5ddee967d7fbfe1fa7570265dbb80822a27",
+    "verify-table-date-fill/months.hwp": "dca49650a7565a8e10583ef5c72a37978f15bd35db755299647eea17a8a89a3a",
+    "verify-table-date-fill/months.hwpx": "71353c9e7117e7baf7a8ff20bf625f0fcbc59cb70b1dc91568af3c748ca5b35b",
+    "verify-table-date-fill/result.json": "9d88eeb462300b3096b4b76619a737147439e693347c4d6e2b6183a6fba1c646",
+    "verify-table-date-fill/years.hwp": "99dca991a7cd37e090d1d26ae4bd9703a5c708f9c66b7449ab675d619cc9dace",
+    "verify-table-date-fill/years.hwpx": "de6e121a828d92388b49ea08bf609e81d1a4bd004373692c2e7f04b3cbc21e76",
+    "verify-table-formula-format/formula-decimal1-false.hwp": "b1a3f4209a30efc07391e3af159b3f5ce213a961cc93f6c56fcdfcb3af1b1027",
+    "verify-table-formula-format/formula-decimal1-false.hwpx": "9bd2546c21cf0fe9ff58082f06816a276c5c32c401613059779935db49d1a5d9",
+    "verify-table-formula-format/formula-decimal2-false.hwp": "9f59b941281c426fdaf348ee88c8b29196223a1275d123af4bccdb51d13a4199",
+    "verify-table-formula-format/formula-decimal2-false.hwpx": "80bcc01a056e9b4e029bf5eb47dff1483c994598a1392d42c85e85cbac77819e",
+    "verify-table-formula-format/formula-decimal2-true.hwp": "9d49cd94bb553418f3f1fad2caa962b3125f5e402609515c0816143eecc00c5f",
+    "verify-table-formula-format/formula-decimal2-true.hwpx": "7ea1e26cd2e4304f33a5c2d1835dd102ede28b8f1923a88300fa021f9795b729",
+    "verify-table-formula-format/formula-integer-false.hwp": "d955e09c65cf920cdaa9861449d9429a8213042be4acc3fbcf747a7a049a1d27",
+    "verify-table-formula-format/formula-integer-false.hwpx": "73fbca8142d24488bdc4d12cea614fce00d3937c9470bc622db0e0c20f9612d8",
+    "verify-table-formula-format/result.json": "9f34962a0ff179d5f729631c2f66698b70ee20085b8b1549316032861470f818",
+    "verify-table-size-target/result.json": "aa33e30ec5de485028fae0996c846b9472249d7a992982fa47c7d0c821d90390",
+    "verify-table-size-target/table-size.hwp": "ca8eb7e4208c30145ff85a1557345f91286f15b4dc0c5df33653a0dd4f94e053",
+    "verify-table-size-target/table-size.hwpx": "555de56fd34f386041e45cc80392010bc5581b6e7d5033dae4328a8aa0cebde1"
+  }
+}

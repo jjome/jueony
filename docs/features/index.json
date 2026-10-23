@@ -1,7 +1,7 @@
 {
   "organizedDate": "2026-10-16",
-  "rowCount": 454,
-  "taskCount": 233,
+  "rowCount": 457,
+  "taskCount": 236,
   "groups": [
     {
       "key": "workspaces",
@@ -378,24 +378,27 @@
         "A050",
         "A051",
         "G095",
-        "G098"
+        "G098",
+        "G121",
+        "G122",
+        "G123"
       ],
-      "taskCount": 38,
+      "taskCount": 41,
       "rollupCount": 24,
       "implementation": {
-        "DONE": 32,
-        "PARTIAL": 2,
-        "MISSING": 3,
+        "DONE": 35,
+        "PARTIAL": 3,
+        "MISSING": 2,
         "AUDIT": 1
       },
       "verification": {
-        "PARTIAL": 31,
+        "PARTIAL": 35,
         "DONE": 3,
-        "NOT_RUN": 4
+        "NOT_RUN": 3
       },
       "agent": {
         "CONNECTED": 26,
-        "NA": 5,
+        "NA": 8,
         "PARTIAL": 3,
         "NOT_CONNECTED": 4
       }

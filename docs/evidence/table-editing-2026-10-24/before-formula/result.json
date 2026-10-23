@@ -1,0 +1,56 @@
+{
+  "results": [
+    "insert-failure: original bytes, revision and history survive; dialog remains open",
+    "operation-refused: original bytes, revision and history survive; dialog remains open"
+  ],
+  "failures": [
+    {
+      "name": "hwp: integer, comma=false displayed precision, one undo/redo, safe save/reopen",
+      "error": "AssertionError [ERR_ASSERTION]: ⚠ 계산식 실행 실패: 렌더링 오류: 결과 셀을 찾을 수 없음: row=2, col=0\n+ actual - expected\n\n+ CdpElementHandle {\n+   [Symbol(_isElementHandle)]: true,\n+   handle: CdpJSHandle {},\n+   isolatedHandle: undefined\n+ }\n- null\n",
+      "stack": "AssertionError [ERR_ASSERTION]: ⚠ 계산식 실행 실패: 렌더링 오류: 결과 셀을 찾을 수 없음: row=2, col=0\n+ actual - expected\n\n+ CdpElementHandle {\n+   [Symbol(_isElementHandle)]: true,\n+   handle: CdpJSHandle {},\n+   isolatedHandle: undefined\n+ }\n- null\n\n    at file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:148:12\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:103:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:145:6"
+    },
+    {
+      "name": "hwp: decimal1, comma=false displayed precision, one undo/redo, safe save/reopen",
+      "error": "AssertionError [ERR_ASSERTION]: ⚠ 계산식 실행 실패: 렌더링 오류: 결과 셀을 찾을 수 없음: row=2, col=0\n+ actual - expected\n\n+ CdpElementHandle {\n+   [Symbol(_isElementHandle)]: true,\n+   handle: CdpJSHandle {},\n+   isolatedHandle: undefined\n+ }\n- null\n",
+      "stack": "AssertionError [ERR_ASSERTION]: ⚠ 계산식 실행 실패: 렌더링 오류: 결과 셀을 찾을 수 없음: row=2, col=0\n+ actual - expected\n\n+ CdpElementHandle {\n+   [Symbol(_isElementHandle)]: true,\n+   handle: CdpJSHandle {},\n+   isolatedHandle: undefined\n+ }\n- null\n\n    at file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:148:12\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:103:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:145:6"
+    },
+    {
+      "name": "hwp: decimal2, comma=false displayed precision, one undo/redo, safe save/reopen",
+      "error": "AssertionError [ERR_ASSERTION]: ⚠ 계산식 실행 실패: 렌더링 오류: 결과 셀을 찾을 수 없음: row=2, col=0\n+ actual - expected\n\n+ CdpElementHandle {\n+   [Symbol(_isElementHandle)]: true,\n+   handle: CdpJSHandle {},\n+   isolatedHandle: undefined\n+ }\n- null\n",
+      "stack": "AssertionError [ERR_ASSERTION]: ⚠ 계산식 실행 실패: 렌더링 오류: 결과 셀을 찾을 수 없음: row=2, col=0\n+ actual - expected\n\n+ CdpElementHandle {\n+   [Symbol(_isElementHandle)]: true,\n+   handle: CdpJSHandle {},\n+   isolatedHandle: undefined\n+ }\n- null\n\n    at file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:148:12\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:103:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:145:6"
+    },
+    {
+      "name": "hwp: decimal2, comma=true displayed precision, one undo/redo, safe save/reopen",
+      "error": "AssertionError [ERR_ASSERTION]: ⚠ 계산식 실행 실패: 렌더링 오류: 결과 셀을 찾을 수 없음: row=2, col=0\n+ actual - expected\n\n+ CdpElementHandle {\n+   [Symbol(_isElementHandle)]: true,\n+   handle: CdpJSHandle {},\n+   isolatedHandle: undefined\n+ }\n- null\n",
+      "stack": "AssertionError [ERR_ASSERTION]: ⚠ 계산식 실행 실패: 렌더링 오류: 결과 셀을 찾을 수 없음: row=2, col=0\n+ actual - expected\n\n+ CdpElementHandle {\n+   [Symbol(_isElementHandle)]: true,\n+   handle: CdpJSHandle {},\n+   isolatedHandle: undefined\n+ }\n- null\n\n    at file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:148:12\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:103:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:145:6"
+    },
+    {
+      "name": "hwpx: integer, comma=false displayed precision, one undo/redo, safe save/reopen",
+      "error": "AssertionError [ERR_ASSERTION]: ⚠ 계산식 실행 실패: 렌더링 오류: 결과 셀을 찾을 수 없음: row=2, col=0\n+ actual - expected\n\n+ CdpElementHandle {\n+   [Symbol(_isElementHandle)]: true,\n+   handle: CdpJSHandle {},\n+   isolatedHandle: undefined\n+ }\n- null\n",
+      "stack": "AssertionError [ERR_ASSERTION]: ⚠ 계산식 실행 실패: 렌더링 오류: 결과 셀을 찾을 수 없음: row=2, col=0\n+ actual - expected\n\n+ CdpElementHandle {\n+   [Symbol(_isElementHandle)]: true,\n+   handle: CdpJSHandle {},\n+   isolatedHandle: undefined\n+ }\n- null\n\n    at file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:148:12\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:103:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:145:6"
+    },
+    {
+      "name": "hwpx: decimal1, comma=false displayed precision, one undo/redo, safe save/reopen",
+      "error": "AssertionError [ERR_ASSERTION]: ⚠ 계산식 실행 실패: 렌더링 오류: 결과 셀을 찾을 수 없음: row=2, col=0\n+ actual - expected\n\n+ CdpElementHandle {\n+   [Symbol(_isElementHandle)]: true,\n+   handle: CdpJSHandle {},\n+   isolatedHandle: undefined\n+ }\n- null\n",
+      "stack": "AssertionError [ERR_ASSERTION]: ⚠ 계산식 실행 실패: 렌더링 오류: 결과 셀을 찾을 수 없음: row=2, col=0\n+ actual - expected\n\n+ CdpElementHandle {\n+   [Symbol(_isElementHandle)]: true,\n+   handle: CdpJSHandle {},\n+   isolatedHandle: undefined\n+ }\n- null\n\n    at file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:148:12\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:103:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:145:6"
+    },
+    {
+      "name": "hwpx: decimal2, comma=false displayed precision, one undo/redo, safe save/reopen",
+      "error": "AssertionError [ERR_ASSERTION]: ⚠ 계산식 실행 실패: 렌더링 오류: 결과 셀을 찾을 수 없음: row=2, col=0\n+ actual - expected\n\n+ CdpElementHandle {\n+   [Symbol(_isElementHandle)]: true,\n+   handle: CdpJSHandle {},\n+   isolatedHandle: undefined\n+ }\n- null\n",
+      "stack": "AssertionError [ERR_ASSERTION]: ⚠ 계산식 실행 실패: 렌더링 오류: 결과 셀을 찾을 수 없음: row=2, col=0\n+ actual - expected\n\n+ CdpElementHandle {\n+   [Symbol(_isElementHandle)]: true,\n+   handle: CdpJSHandle {},\n+   isolatedHandle: undefined\n+ }\n- null\n\n    at file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:148:12\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:103:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:145:6"
+    },
+    {
+      "name": "hwpx: decimal2, comma=true displayed precision, one undo/redo, safe save/reopen",
+      "error": "AssertionError [ERR_ASSERTION]: ⚠ 계산식 실행 실패: 렌더링 오류: 결과 셀을 찾을 수 없음: row=2, col=0\n+ actual - expected\n\n+ CdpElementHandle {\n+   [Symbol(_isElementHandle)]: true,\n+   handle: CdpJSHandle {},\n+   isolatedHandle: undefined\n+ }\n- null\n",
+      "stack": "AssertionError [ERR_ASSERTION]: ⚠ 계산식 실행 실패: 렌더링 오류: 결과 셀을 찾을 수 없음: row=2, col=0\n+ actual - expected\n\n+ CdpElementHandle {\n+   [Symbol(_isElementHandle)]: true,\n+   handle: CdpJSHandle {},\n+   isolatedHandle: undefined\n+ }\n- null\n\n    at file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:148:12\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:103:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-table-formula-format.mjs:145:6"
+    }
+  ],
+  "pageErrors": [],
+  "externalRequests": [],
+  "diagnostics": [],
+  "savedFiles": [],
+  "dist": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\basic-editor-20261024\\clean\\apps\\editor\\evidence\\dist-basic-editor-20261024",
+  "enginePackage": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-c38631692287c07f\\pkg",
+  "port": 4502,
+  "limitations": "Actual Edge formula dialog and Rust/WASM; displayed numeric precision, snapshot undo/redo and strict HWP/HWPX save/reopen. Failure injection checks rollback and refused operations. Static result text only: formula dependency graphs, automatic recalculation, Agent formula editing and direct Hancom parity remain unsupported/unverified."
+}

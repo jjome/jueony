@@ -53,6 +53,17 @@ export function executeAutoFill(value: any, plan: AutoFillPlan): void {
   });
 }
 
+/** A router refusal must not be reported as a completed fill or close its dialog. */
+export function executeAutoFillSnapshot(ih: any, plan: AutoFillPlan): void {
+  let applied = false;
+  ih.executeOperation({ kind: 'snapshot', operationType: 'jueonyTableAutoFill', operation: (wasm: any) => {
+    executeAutoFill(wasm, plan);
+    applied = true;
+    return ih.getCursorPosition();
+  } });
+  if (!applied) throw new Error('자동 채우기를 적용하지 못했습니다. 문서의 편집 상태와 셀 선택을 확인하세요.');
+}
+
 export function preflightAutoFill(wasm: any, plan: AutoFillPlan): void {
   const { HwpDocument } = wasm.getWasmModuleExports(), open = (bytes: Uint8Array) => new HwpDocument(bytes), format = /\.hwpx$/iu.test(wasm.fileName) ? 'hwpx' : 'hwp';
   const save = (doc: any) => {

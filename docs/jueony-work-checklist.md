@@ -4,7 +4,7 @@
 
 기준일: 2026-10-15. 원본은 [CSV](jueony-work-checklist.csv), 사용 규칙은 [97번 문서](97-master-work-checklist.md), 검색 화면은 [HTML](jueony-work-checklist.html)이다.
 
-총 454행: 실행 작업 233행과 상위 범위 항목 221행. 범위가 겹치므로 전체 완성률로 나누지 않는다.
+총 457행: 실행 작업 236행과 상위 범위 항목 221행. 범위가 겹치므로 전체 완성률로 나누지 않는다.
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증은 자동 검사와 한글 직접 비교를 구분한다. 각 완료 표시는 해당 행의 제한된 완료조건에만 적용한다.
 
@@ -484,7 +484,10 @@
 | N007 P1 | **병합 포함 행/열 추가·삭제 Agent** · span 교차·주 셀 제거·neighbor 영향·실패 원복 | ☐ 미구현 | ☐ 미검증 · 자동:NOT_RUN / 한글:NOT_RUN | ☐ 미연결 | 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀 · [96-agent-table-merge.md](../docs/96-agent-table-merge.md) · [105-file-storage-preservation.md](../docs/105-file-storage-preservation.md) · [verification-summary.json](../docs/evidence/state-storage-2026-10-16/verification-summary.json) |
 | N008 P1 | **표 나누기·붙이기 Agent** · HWPX 단일 쪽 평면 미병합 격자; 내부 행 경계 나누기와 호환 nextTarget 붙이기; 빈 host/gap·전체 문단/셀/구역·cursor·undo/redo·재시작·저장재열기 | ☑ 완료 | ◐ 부분 · 자동:PASS / 한글:NOT_RUN | ☑ 연결 · `split_table;attach_table` | 한글 직접 비교와 복합·병합·중첩 원본 확장; 유료 모델 품질은 별도 · [99-agent-table-structure.md](../docs/99-agent-table-structure.md) · [verification-summary.json](../docs/evidence/table-structure-2026-10-15/verification-summary.json) |
 | N009 P1 | **표 계산식 Agent 편집·갱신** · 수식 파싱·참조 변경·오류·재계산·저장 형식 | ? 재점검 | ☐ 미검증 · 자동:NOT_RUN / 한글:NOT_RUN | ☐ 미연결 | 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀 · [47-remaining-editor-implementation.md](../docs/47-remaining-editor-implementation.md) |
-| N010 P1 | **날짜·수식 자동 채우기** · 수열/참조 규칙·locale·중단·원복 | ☐ 미구현 | ☐ 미검증 · 자동:NOT_RUN / 한글:NOT_RUN | ☐ 미연결 | 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀 · [44-editor-stages-result.md](../docs/44-editor-stages-result.md) |
+| N010 P1 | **날짜·수식 자동 채우기** · 수열/참조 규칙·locale·중단·원복 | ◐ 부분 | ◐ 부분 · 자동:PARTIAL / 한글:NOT_RUN | ☐ 미연결 | 기존 일·월·년 날짜 자동채우기 및 실패 보존 자동 검증 완료. 수식 참조 자동채우기·Agent 연결·전체 locale/한글 비교는 남음. · [44-editor-stages-result.md](../docs/44-editor-stages-result.md) · [140-table-editing-followup.md](../docs/140-table-editing-followup.md) · [manifest.json](../docs/evidence/table-editing-2026-10-24/manifest.json) |
+| G121 P1 | **날짜 자동 채우기의 실행 거절·실패 보존** · 기존 일·월·년 수열을 재검증하고 명령 라우터 실행 거절을 성공으로 표시하지 않는다. HWP/HWPX 미리보기·undo/redo·서식·저장 재열기·부분 삽입 실패 롤백. | ☑ 완료 | ◐ 부분 · 자동:PASS / 한글:NOT_RUN | — 해당 없음 | 이 세부 수정의 자동 검증 완료. 한글 직접 비교와 상위 기능 전체 범위·Agent 연결은 별도. · [140-table-editing-followup.md](../docs/140-table-editing-followup.md) · [manifest.json](../docs/evidence/table-editing-2026-10-24/manifest.json) |
+| G122 P1 | **표 계산 결과 자릿수·실제 셀 주소·원자적 적용** · 정수·소수1/2자리와 쉼표 설정을 독립 적용하고 실제 셀 row/col을 사용한다. 계산·결과 대체 실패와 라우터 거절 시 성공으로 닫지 않으며 snapshot rollback. | ☑ 완료 | ◐ 부분 · 자동:PASS / 한글:NOT_RUN | — 해당 없음 | 이 세부 수정의 자동 검증 완료. 한글 직접 비교와 상위 기능 전체 범위·Agent 연결은 별도. · [140-table-editing-followup.md](../docs/140-table-editing-followup.md) · [manifest.json](../docs/evidence/table-editing-2026-10-24/manifest.json) |
+| G123 P1 | **표·셀 크기 대화상자의 오래된 대상 거절** · 문서·버전·선택이 바뀐 속성창은 원본에 쓰기 전 거절. 무변경/취소 정밀도 보존, 정상40mm 적용·undo/redo·HWP/HWPX 재열기. | ☑ 완료 | ◐ 부분 · 자동:PASS / 한글:NOT_RUN | — 해당 없음 | 이 세부 수정의 자동 검증 완료. 한글 직접 비교와 상위 기능 전체 범위·Agent 연결은 별도. · [140-table-editing-followup.md](../docs/140-table-editing-followup.md) · [manifest.json](../docs/evidence/table-editing-2026-10-24/manifest.json) |
 
 ## 저장·호환성 — 실행 작업
 

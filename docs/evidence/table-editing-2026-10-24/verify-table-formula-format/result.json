@@ -1,0 +1,32 @@
+{
+  "results": [
+    "hwp: integer, comma=false displayed precision, one undo/redo, safe save/reopen",
+    "hwp: decimal1, comma=false displayed precision, one undo/redo, safe save/reopen",
+    "hwp: decimal2, comma=false displayed precision, one undo/redo, safe save/reopen",
+    "hwp: decimal2, comma=true displayed precision, one undo/redo, safe save/reopen",
+    "hwpx: integer, comma=false displayed precision, one undo/redo, safe save/reopen",
+    "hwpx: decimal1, comma=false displayed precision, one undo/redo, safe save/reopen",
+    "hwpx: decimal2, comma=false displayed precision, one undo/redo, safe save/reopen",
+    "hwpx: decimal2, comma=true displayed precision, one undo/redo, safe save/reopen",
+    "insert-failure: original bytes, revision and history survive; dialog remains open",
+    "operation-refused: original bytes, revision and history survive; dialog remains open"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "externalRequests": [],
+  "diagnostics": [],
+  "savedFiles": [
+    "formula-integer-false.hwp",
+    "formula-decimal1-false.hwp",
+    "formula-decimal2-false.hwp",
+    "formula-decimal2-true.hwp",
+    "formula-integer-false.hwpx",
+    "formula-decimal1-false.hwpx",
+    "formula-decimal2-false.hwpx",
+    "formula-decimal2-true.hwpx"
+  ],
+  "dist": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\basic-editor-20261024\\clean\\apps\\editor\\evidence\\dist-basic-editor-20261024",
+  "enginePackage": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-c38631692287c07f\\pkg",
+  "port": 4502,
+  "limitations": "Actual Edge formula dialog and Rust/WASM; displayed numeric precision, snapshot undo/redo and strict HWP/HWPX save/reopen. Failure injection checks rollback and refused operations. Static result text only: formula dependency graphs, automatic recalculation, Agent formula editing and direct Hancom parity remain unsupported/unverified."
+}

@@ -6,13 +6,13 @@
 
 ## 진행 요약
 
-실행 작업 **38개**, 상위 범위 **24개**. CSV의 기록을 기능별로 표시한 문서다.
+실행 작업 **41개**, 상위 범위 **24개**. CSV의 기록을 기능별로 표시한 문서다.
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 32/38 · 부분 2 · 미구현 3 · 재점검 1 | 완료 0/24 · 부분 23 · 미구현 1 |
-| 검증 | 완료 3/38 · 부분 31 · 미검증 4 | 완료 0/24 · 부분 13 · 미검증 11 |
-| Agent 연결 | 연결 26/33 · 부분 3 · 미연결 4 · 해당 없음 5 | 연결 0/24 · 부분 9 · 미연결 15 |
+| 구현 | 완료 35/41 · 부분 3 · 미구현 2 · 재점검 1 | 완료 0/24 · 부분 23 · 미구현 1 |
+| 검증 | 완료 3/41 · 부분 35 · 미검증 3 | 완료 0/24 · 부분 13 · 미검증 11 |
+| Agent 연결 | 연결 26/33 · 부분 3 · 미연결 4 · 해당 없음 8 | 연결 0/24 · 부분 9 · 미연결 15 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
@@ -69,7 +69,8 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B084](<08-tables.md#b084>) · 범위 | 표 자동 채우기 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [N010](<08-tables.md#n010>) · 작업 | 날짜·수식 자동 채우기 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [N010](<08-tables.md#n010>) · 작업 | 날짜·수식 자동 채우기 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
+| [G121](<08-tables.md#g121>) · 작업 | 날짜 자동 채우기의 실행 거절·실패 보존 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-4"></a>
 
@@ -84,6 +85,7 @@
 | [A033](<08-tables.md#a033>) · 작업 | 단순 셀 서식·안 여백·열 너비·행 높이 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [N006](<08-tables.md#n006>) · 작업 | 중첩 표 Agent 조회·경로·편집 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [G095](<08-tables.md#g095>) · 작업 | 속성창 변경값만 적용해 원본 정밀도 유지 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+| [G123](<08-tables.md#g123>) · 작업 | 표·셀 크기 대화상자의 오래된 대상 거절 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-5"></a>
 
@@ -172,6 +174,7 @@
 | --- | --- | --- | --- | --- |
 | [B167](<08-tables.md#b167>) · 범위 | 계산식 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [N009](<08-tables.md#n009>) · 작업 | 표 계산식 Agent 편집·갱신 | ? 재점검 | ☐ 미검증 | ☐ 미연결 |
+| [G122](<08-tables.md#g122>) · 작업 | 표 계산 결과 자릿수·실제 셀 주소·원자적 적용 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-13"></a>
 
@@ -1024,13 +1027,13 @@
 <summary>N010 · 날짜·수식 자동 채우기</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 수열/참조 규칙·locale·중단·원복
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 다음 작업: 기존 일·월·년 날짜 자동채우기 및 실패 보존 자동 검증 완료. 수식 참조 자동채우기·Agent 연결·전체 locale/한글 비교는 남음.
 - 상위 항목: [B084](<08-tables.md#b084>) 표 자동 채우기
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [140-table-editing-followup.md](<../140-table-editing-followup.md>) · [manifest.json](<../evidence/table-editing-2026-10-24/manifest.json>)
+- 원래 기록: `EXISTING_DATE_SUPPORT_RECONCILED_PARTIAL_2026_10_24`
 
 </details>
 
@@ -1093,6 +1096,48 @@
 - UI 명령: `table:insert-row-above;table:insert-row-below;table:delete-row`
 - 근거: [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>)
 - 원래 기록: `SCOPED_IMPLEMENTED;ENGINE_BROWSER_VERIFIED_2026_10_16`
+
+</details>
+
+<details id="g121">
+<summary>G121 · 날짜 자동 채우기의 실행 거절·실패 보존</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 기존 일·월·년 수열을 재검증하고 명령 라우터 실행 거절을 성공으로 표시하지 않는다. HWP/HWPX 미리보기·undo/redo·서식·저장 재열기·부분 삽입 실패 롤백.
+- 다음 작업: 이 세부 수정의 자동 검증 완료. 한글 직접 비교와 상위 기능 전체 범위·Agent 연결은 별도.
+- 상위 항목: [B084](<08-tables.md#b084>) 표 자동 채우기
+- 근거: [140-table-editing-followup.md](<../140-table-editing-followup.md>) · [manifest.json](<../evidence/table-editing-2026-10-24/manifest.json>)
+- 원래 기록: `SCOPED_TABLE_FIX_AUTOMATED_2026_10_24`
+
+</details>
+
+<details id="g122">
+<summary>G122 · 표 계산 결과 자릿수·실제 셀 주소·원자적 적용</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 정수·소수1/2자리와 쉼표 설정을 독립 적용하고 실제 셀 row/col을 사용한다. 계산·결과 대체 실패와 라우터 거절 시 성공으로 닫지 않으며 snapshot rollback.
+- 다음 작업: 이 세부 수정의 자동 검증 완료. 한글 직접 비교와 상위 기능 전체 범위·Agent 연결은 별도.
+- 상위 항목: [B167](<08-tables.md#b167>) 계산식
+- 근거: [140-table-editing-followup.md](<../140-table-editing-followup.md>) · [manifest.json](<../evidence/table-editing-2026-10-24/manifest.json>)
+- 원래 기록: `SCOPED_TABLE_FIX_AUTOMATED_2026_10_24`
+
+</details>
+
+<details id="g123">
+<summary>G123 · 표·셀 크기 대화상자의 오래된 대상 거절</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 문서·버전·선택이 바뀐 속성창은 원본에 쓰기 전 거절. 무변경/취소 정밀도 보존, 정상40mm 적용·undo/redo·HWP/HWPX 재열기.
+- 다음 작업: 이 세부 수정의 자동 검증 완료. 한글 직접 비교와 상위 기능 전체 범위·Agent 연결은 별도.
+- 상위 항목: [B153](<08-tables.md#b153>) 셀 속성
+- 근거: [140-table-editing-followup.md](<../140-table-editing-followup.md>) · [manifest.json](<../evidence/table-editing-2026-10-24/manifest.json>)
+- 원래 기록: `SCOPED_TABLE_FIX_AUTOMATED_2026_10_24`
 
 </details>
 

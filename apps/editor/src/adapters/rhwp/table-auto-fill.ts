@@ -1,5 +1,5 @@
 import { TableAutoFillDialog } from '../browser/table-auto-fill-dialog.ts';
-import { readAutoFillPlan, executeAutoFill, preflightAutoFill } from './table-auto-fill-native.ts';
+import { readAutoFillPlan, executeAutoFillSnapshot, preflightAutoFill } from './table-auto-fill-native.ts';
 import type { DateFillUnit } from '../../modules/document/public/table-auto-fill.ts';
 export function installTableAutoFill(registry: any, input: () => any, eventBus: any): void {
   const safe = (context: any) => {
@@ -18,7 +18,7 @@ export function installTableAutoFill(registry: any, input: () => any, eventBus: 
         const selectedPlan = read(unit);
         if (selectedPlan.cells.slice(2).every((c, i) => c.text === selectedPlan.values[i + 2])) return;
         preflightAutoFill(input().wasm, selectedPlan); assertCurrent();
-        const ih = input(); ih.executeOperation({ kind: 'snapshot', operationType: 'jueonyTableAutoFill', operation: (wasm: any) => { executeAutoFill(wasm, selectedPlan); return ih.getCursorPosition(); } });
+        const ih = input(); executeAutoFillSnapshot(ih, selectedPlan);
         ih.cursor.restoreCellSelection(plan.block); ih.updateCellSelection(); ih.caret.hide(); eventBus.emit('command-state-changed');
       }).show();
     },

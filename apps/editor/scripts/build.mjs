@@ -19,6 +19,7 @@ import {applyDocumentCreatedInformationPatches} from './integration/document-cre
 import {applyDocumentHistoryPatches} from './integration/document-history-patches.mjs';
 import {applyBasicFindPatches} from './integration/basic-find-patches.mjs';
 import {applyFormatCopyTransactionPatches} from './integration/format-copy-transaction-patches.mjs';
+import {applySafeObjectCutPatches} from './integration/safe-object-cut-patches.mjs';
 import {auditRepository} from '../../../scripts/check-module-boundaries.mjs';
 import { cp, mkdir, readFile, writeFile, readdir } from 'node:fs/promises';
 import { resolve, dirname, join } from 'node:path';
@@ -106,6 +107,7 @@ await applyDocumentSwapStatePatches({root});
 await applyDocumentHistoryPatches({root});
 await applyBasicFindPatches({root});
 await applyFormatCopyTransactionPatches({root});
+await applySafeObjectCutPatches({root});
 await applyDocumentCreatedInformationPatches({root});
 await build({
   configFile: false, root, base: './', publicDir: join(root, 'public'),
@@ -155,6 +157,7 @@ const evidence = {
   documentHistoryPatchSha256: sha256(await readFile(join(app,'scripts/integration/document-history-patches.mjs'))),
   basicFindPatchSha256: sha256(await readFile(join(app,'scripts/integration/basic-find-patches.mjs'))),
   formatCopyTransactionPatchSha256: sha256(await readFile(join(app,'scripts/integration/format-copy-transaction-patches.mjs'))),
+  safeObjectCutPatchSha256: sha256(await readFile(join(app,'scripts/integration/safe-object-cut-patches.mjs'))),
   exportMetadataLossPatchSha256: sha256(await readFile(join(app,'scripts/integration/export-metadata-loss-patches.mjs'))),
   customSourceSha256: sha256(customSource.join('\n')),
   applicationSourceCommit: execFileSync('git', ['-C', app, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),

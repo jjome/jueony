@@ -1,0 +1,88 @@
+--- a/src/document_core/commands/formatting.rs
++++ b/src/document_core/commands/formatting.rs
+@@ -936,7 +936,11 @@
+         let new_font = crate::model::style::Font {
+             raw_data: None,
+             name: name.to_string(),
+-            alt_type: 0,
++            // A newly requested editing face is a TrueType-family declaration,
++            // like new-document fonts. This does not infer or repair the type
++            // of any imported resource: matching source faces returned above
++            // retain their raw data, XML provenance and unknown/HFT/REP type.
++            alt_type: 1,
+             is_embedded: false,
+             bin_item_id_ref: String::new(),
+             resolved_bin_data_id: None,
+@@ -987,7 +991,11 @@
+         let new_font = crate::model::style::Font {
+             raw_data: None,
+             name: name.to_string(),
+-            alt_type: 0,
++            // A newly requested editing face is a TrueType-family declaration,
++            // like new-document fonts. This does not infer or repair the type
++            // of any imported resource: matching source faces returned above
++            // retain their raw data, XML provenance and unknown/HFT/REP type.
++            alt_type: 1,
+             is_embedded: false,
+             bin_item_id_ref: String::new(),
+             resolved_bin_data_id: None,
+@@ -3202,3 +3210,59 @@
+         );
+     }
+ }
++
++#[cfg(test)]
++mod user_created_font_type_tests {
++    use super::DocumentCore;
++    use crate::model::style::{Font, FontTypeOrigin};
++
++    #[test]
++    fn new_editing_font_declares_truetype_in_all_language_resources() {
++        let mut core = DocumentCore::new_empty();
++        core.document.doc_info.font_faces = vec![Vec::new(); 7];
++        assert_eq!(core.find_or_create_font_id_native("User Selected Family"), 0);
++        for faces in &core.document.doc_info.font_faces {
++            assert_eq!(faces.len(), 1);
++            assert_eq!(faces[0].name, "User Selected Family");
++            assert_eq!(faces[0].alt_type, 1);
++            assert!(faces[0].hwpx_type_origin.is_none());
++            assert!(faces[0].raw_data.is_none());
++        }
++        assert_eq!(core.find_or_create_font_id_native("User Selected Family"), 0);
++        assert!(core.document.doc_info.font_faces.iter().all(|faces| faces.len() == 1));
++    }
++
++    #[test]
++    fn new_language_editing_font_declares_truetype_without_retyping_other_faces() {
++        let mut core = DocumentCore::new_empty();
++        let original = Font { name: "Original HFT".into(), alt_type: 2,
++            hwpx_type_origin: Some(FontTypeOrigin::HwpFont), ..Default::default() };
++        core.document.doc_info.font_faces = vec![vec![original.clone()]; 7];
++        let before = serde_json::to_string(&original).unwrap();
++        assert_eq!(core.find_or_create_font_id_for_lang(1, "New English Family"), 1);
++        for (lang, faces) in core.document.doc_info.font_faces.iter().enumerate() {
++            assert_eq!(serde_json::to_string(&faces[0]).unwrap(), before);
++            if lang == 1 {
++                assert_eq!(faces[1].name, "New English Family");
++                assert_eq!(faces[1].alt_type, 1);
++                assert!(faces[1].hwpx_type_origin.is_none());
++            } else { assert_eq!(serde_json::to_string(&faces[1]).unwrap(), before); }
++        }
++    }
++
++    #[test]
++    fn editing_font_lookup_never_retypes_imported_unknown_representative_or_hft() {
++        for (alt_type, origin) in [(0, None), (0, Some(FontTypeOrigin::Missing)),
++            (0, Some(FontTypeOrigin::Unrecognized("OTHER".into()))),
++            (0, Some(FontTypeOrigin::Representative)), (2, Some(FontTypeOrigin::HwpFont))] {
++            let mut core = DocumentCore::new_empty();
++            let original = Font { name: "Existing Source Face".into(), alt_type,
++                hwpx_type_origin: origin, raw_data: Some(vec![9, 8, 7]), ..Default::default() };
++            core.document.doc_info.font_faces = vec![vec![original]; 7];
++            let before = serde_json::to_string(&core.document.doc_info.font_faces).unwrap();
++            assert_eq!(core.find_or_create_font_id_native("Existing Source Face"), 0);
++            for lang in 0..7 { assert_eq!(core.find_or_create_font_id_for_lang(lang, "Existing Source Face"), 0); }
++            assert_eq!(serde_json::to_string(&core.document.doc_info.font_faces).unwrap(), before);
++        }
++    }
++}

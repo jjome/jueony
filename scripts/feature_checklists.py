@@ -180,16 +180,15 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
         # Markdown renderers can strip inline styles. A local SVG keeps the
         # number green offline, with an accessible text fallback and no HTML.
         path = docs / "progress-badges" / f"complete-{done}-of-{total}.svg"
-        width = 27 + len(number) * 8
-        outputs[path] = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="24" viewBox="0 0 {width} 24" role="img" aria-label="{number} 완료">'
-                         f'<title>{number} 완료</title><rect x="0.5" y="0.5" width="{width-1}" height="23" rx="5" fill="#e7f6ec" stroke="#9bc9ab"/>'
-                         '<path d="m7 12 3 3 5-6" fill="none" stroke="#17633b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
-                         f'<text x="21" y="16.5" fill="#17633b" font-family="Arial, sans-serif" font-size="13" font-weight="700">{number}</text></svg>\n')
-        return "!" + local_link(number + " 완료", path, current)
+        width = 14 + len(number) * 8
+        outputs[path] = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="20" viewBox="0 0 {width} 20" role="img" aria-label="{number}">'
+                         f'<title>{number}</title><rect x="0.5" y="0.5" width="{width-1}" height="19" rx="4" fill="#e7f6ec" stroke="#9bc9ab"/>'
+                         f'<text x="{width / 2:g}" y="14.5" text-anchor="middle" fill="#17633b" font-family="Arial, sans-serif" font-size="13" font-weight="700">{number}</text></svg>\n')
+        return "!" + local_link(number, path, current)
 
     def dashboard(current):
-        lines = ["| 기능 | 상위 완료 | 구현 완료 | 검증 완료 | Agent 연결 | 현재 상황 · 다음 작업 |",
-                 "| --- | --- | --- | --- | --- | --- |"]
+        lines = ["| 기능 | 전체 범위 완료 | 세부 구현 | 세부 검증 | Agent 연결 | 현재 상황 · 다음 작업 |",
+                 "| :--- | :---: | :---: | :---: | :---: | :--- |"]
         for group in groups:
             items = grouped[group["key"]]
             tasks = [r for r in items if r["kind"] == "TASK"]
@@ -215,7 +214,7 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
                   f"**{counts['verification'].get('DONE', 0)}/{counts['taskRows']}** | "
                   f"**{counts['agent'].get('CONNECTED', 0)}/{counts['taskRows'] - counts['agent'].get('NA', 0)}** | "
                   f"세 축 완료 **{counts['completedTaskRows']}개** |", "",
-                  "초록색 숫자 배지는 해당 열의 N/N 완료만 뜻한다. 구현·검증·Agent 연결은 각각 별도로 표시한다. ‘상위 완료’는 필요한 구현·검증·Agent 연결을 모두 충족한 상위 범위 수다. 나머지 숫자는 **완료·연결 / 해당 세부 실행 작업 수**다. ‘상위’는 상세 작업이 아직 없는 영역의 상위 범위 집계다. "
+                  "초록색 숫자는 **기록된 세부 작업**이 해당 열에서 N/N인 경우만 표시한다. 기능 전체 완료 표시는 아니다. 부분 상태는 완료 수에 포함하지 않는다. 구현·검증·Agent 연결은 각각 별도로 표시한다. ‘전체 범위 완료’는 필요한 구현·검증·Agent 연결을 모두 충족한 상위 범위 수다. 나머지 숫자는 **완료·연결 / 해당 세부 실행 작업 수**다. ‘상위’는 상세 작업이 아직 없는 영역의 상위 범위 집계다. "
                   "다른 행의 세부 작업 수와 합산하지 않는다. 전체 기능 완성률이 아니며, 한글 직접 비교와 미검증 변경은 완료에 포함하지 않는다.", ""]
         return lines
 
@@ -252,7 +251,7 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
         text += [f'<a id="feature-{group["key"]}"></a>', "",
                  f"### {group['title']}", "",
                  local_link("항목별 작업표 열기 →", paths[group["key"]], overview), "",
-                 "| 구분 | 실행 작업 | 상위 범위 |", "| --- | --- | --- |"]
+                 "| 구분 | 실행 작업 | 상위 범위 |", "| :--- | :---: | :---: |"]
         for field, label, done in [("implementation", "구현", "DONE"),
                                    ("verification", "검증", "DONE"), ("agent", "Agent 연결", "CONNECTED")]:
             text.append(f"| {label} | {counter_text(tasks, field, done, 'PARTIAL', True, lambda n, d: progress_count(n, d, overview))} | "
@@ -303,7 +302,7 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
                  group["description"], "", "## 진행 요약", "",
                  f"실행 작업 **{len(tasks)}개**, 상위 범위 **{len(items) - len(tasks)}개**. "
                  "CSV의 기록을 기능별로 표시한 문서다.", "",
-                 "| 구분 | 실행 작업 | 상위 범위 |", "| --- | --- | --- |"]
+                 "| 구분 | 실행 작업 | 상위 범위 |", "| :--- | :---: | :---: |"]
         for field, label, done in [("implementation", "구현", "DONE"),
                                    ("verification", "검증", "DONE"), ("agent", "Agent 연결", "CONNECTED")]:
             lines.append(f"| {label} | {counter_text(tasks, field, done, 'PARTIAL', True, lambda n, d: progress_count(n, d, path))} | "

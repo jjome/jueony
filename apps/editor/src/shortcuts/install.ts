@@ -17,6 +17,8 @@ import { installSettingsBackup } from '../adapters/browser/settings-backup-dialo
 import { installStylePackage } from '../adapters/rhwp/style-package.ts';
 import { installWorkTemplates } from '../adapters/rhwp/work-templates.ts';
 import { installSnippets } from '../adapters/rhwp/snippets.ts';
+import { deleteBodyByShortcut, isBodyNavigationContext, navigateBody } from './body-navigation.ts';
+import { installCharacterCycles } from './character-cycle.ts';
 
 export function installHangulKeys({ automation, registry, input, eventBus }: { automation: any; registry: any; input: () => any; eventBus: any }) {
   const resolver = new HangulKeyResolver();
@@ -34,6 +36,7 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
   installStylePackage(registry, input, eventBus);
   installWorkTemplates(registry, input, eventBus);
   installSnippets(registry, input, eventBus);
+  installCharacterCycles(registry, input, eventBus, automation);
   registry.register({ id: 'ext:jueony-context-menu', label: '빠른 메뉴', canExecute: (context: any) => context.hasDocument && !input()?.isComposing, execute: () => { if (!input()?.showKeyboardContextMenu?.()) throw new Error('현재 문맥의 빠른 메뉴를 열 수 없습니다.'); } });
   // The pinned Studio marked the entire caption submenu as a stub; child state is now registry-owned.
   document.querySelector('[data-cmd="insert:caption-top"]')?.closest('.md-sub')?.classList.remove('disabled');
@@ -65,34 +68,14 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
   register('ext:jueony-color', '글자색', (_s, p) => { if (!/^#[\da-f]{6}$/i.test(p?.textColor ?? '')) throw new Error('글자색 형식 오류'); eventBus.emit('format-char', { textColor: p.textColor }); });
   for (const [id, label, mode] of [['ext:jueony-delete-line', '한 줄 지우기', 'line'], ['ext:jueony-delete-line-end', '줄 뒤 지우기', 'end'], ['ext:jueony-delete-word', '한 단어 지우기', 'word']]) {
     register(id, label, () => {
-      const ih = input(), cursor = ih.cursor; ih.flushDeferredPaginationIfNeeded('hangul-shortcut');
-      cursor.clearSelection(); if (mode === 'line') cursor.moveToLineStart(); cursor.setAnchor();
-      if (mode === 'word') cursor.moveToWordBoundary(1); else cursor.moveToLineEnd();
-      if (mode === 'line') {
-        const pos = cursor.getPosition();
-        if (pos.charOffset === ih.wasm.getParagraphLength(pos.sectionIndex, pos.paragraphIndex)) cursor.moveHorizontal(1);
-      }
-      if (cursor.hasSelection()) ih.deleteSelection();
-      ih.updateCaret(); ih.focus();
+      deleteBodyByShortcut(input(), mode as 'line' | 'end' | 'word');
     }, true);
   }
-  register('ext:jueony-navigate', '한글 커서 이동', (_s, p) => {
-    const ih = input(), cursor = ih.cursor; ih.flushDeferredPaginationIfNeeded('hangul-navigation');
-    cursor.clearSelection();
-    if (p.edge === 'document-start') cursor.moveToDocumentStart();
-    else if (p.edge === 'document-end') cursor.moveToDocumentEnd();
-    else if (p.edge === 'paragraph-start' || p.edge === 'paragraph-end') {
-      const pos = cursor.getPosition(); cursor.moveTo({ ...pos, charOffset: p.edge === 'paragraph-start' ? 0 : ih.wasm.getParagraphLength(pos.sectionIndex, pos.paragraphIndex) });
-    } else {
-      const container = ih.container as HTMLElement, rect = container.getBoundingClientRect();
-      const x = rect.left + rect.width / 2, fromTop = p.edge === 'screen-start';
-      for (let offset = 8; offset < rect.height; offset += 8) {
-        const hit = ih.hitTestFromClientPoint(x, fromTop ? rect.top + offset : rect.bottom - offset);
-        if (hit && hit.parentParaIndex === undefined) { cursor.moveToHit(hit); if (fromTop) cursor.moveToLineStart(); else cursor.moveToLineEnd(); break; }
-      }
-    }
-    ih.updateCaret(); ih.focus();
-  }, true);
+  registry.register({ id: 'ext:jueony-navigate', label: '한글 커서 이동',
+    // Navigation also works in read-only documents; it does not edit the model.
+    canExecute: (context: any) => isBodyNavigationContext(context, input()),
+    execute: (_services: any, params: any) => { if (!navigateBody(input(), params?.edge, params?.extend ?? false)) throw new Error('현재 화면에서 이동할 본문 위치를 확인하지 못했습니다.'); },
+  });
   for (const [axis, label] of [['columns', '칸 전체 블록'], ['rows', '줄 전체 블록']] as const) {
     registry.register({
       id: 'ext:jueony-select-cell-' + axis, label,
@@ -124,6 +107,9 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
   window.addEventListener('keydown', (event: KeyboardEvent) => {
     const ih = input(), target = event.target instanceof HTMLElement ? event.target : null;
     if (document.querySelector('.modal-overlay, dialog[open], .context-menu') || target?.closest('#jueony-navigation-pane') || (target?.closest('input, textarea, select, [contenteditable=true], [role=textbox]') && target !== ih?.textarea)) { resolver.reset(); return; }
+    // AltGr can be delivered as Ctrl+Alt. Let its native text input proceed,
+    // without passing it to either our resolver or the upstream Ctrl fallback.
+    if (event.getModifierState?.('AltGraph')) { resolver.reset(); event.stopImmediatePropagation(); return; }
     const c = automation.getContext();
     // In tables Shift+Tab belongs to cell navigation; hanging indent uses Ctrl+Shift+Tab.
     if ((c.inTable || c.inCellSelectionMode) && event.key === 'Tab' && event.shiftKey && !event.ctrlKey && !event.altKey) { resolver.reset(); return; }

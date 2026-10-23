@@ -133,3 +133,46 @@ test('an exit capture during pending restoration records user position rather th
  const task=adapter.restore(saved());interaction++;f.viewport.setScrollTop(7);
  assert.equal(adapter.capture()!.scrollY,7);assert.equal(adapter.hasPending(),false);release();assert.equal(await task,'ignored');
 });
+
+test('newer restore queued during layout applies itself without requiring another resize', async () => {
+  const f = fixture(), releases: (() => void)[] = [];
+  f.settle(() => new Promise<void>(resolve => releases.push(resolve)));
+  const first = f.adapter.restore(saved({ zoom: 1.2, scrollY: 111 }));
+  const latest = f.adapter.restore(saved({ zoom: 1.7, scrollY: 777 }));
+  assert.deepEqual(f.calls, ['zoom:1.2']);
+  releases.shift()!(); assert.equal(await first, 'ignored');
+  assert.deepEqual(f.calls, ['zoom:1.2', 'zoom:1.7']);
+  releases.shift()!(); assert.equal(await latest, 'applied');
+  assert.equal(f.viewport.getScrollY(), 777); assert.equal(f.adapter.hasPending(), false);
+});
+
+test('three overlapping restores apply only the last snapshot after the first settles', async () => {
+  const f = fixture(), releases: (() => void)[] = [];
+  f.settle(() => new Promise<void>(resolve => releases.push(resolve)));
+  const first = f.adapter.restore(saved({ scrollY: 100 }));
+  const middle = f.adapter.restore(saved({ scrollY: 200 }));
+  const last = f.adapter.restore(saved({ scrollY: 300 }));
+  releases.shift()!(); assert.equal(await first, 'ignored'); assert.equal(await middle, 'ignored');
+  releases.shift()!(); assert.equal(await last, 'applied');
+  assert.equal(f.calls.includes('y:100'), false); assert.equal(f.calls.includes('y:200'), false);
+  assert.equal(f.viewport.getScrollY(), 300);
+});
+
+test('explicit clear cancels an overlapping request before it can restore scroll', async () => {
+  const f = fixture(); let release!: () => void;
+  f.settle(() => new Promise<void>(resolve => { release = resolve; }));
+  const first = f.adapter.restore(saved()), latest = f.adapter.restore(saved({ scrollY: 777 }));
+  f.adapter.clear(); release();
+  assert.equal(await first, 'ignored'); assert.equal(await latest, 'ignored');
+  assert.equal(f.calls.some(call => call.startsWith('y:')), false);
+});
+
+test('a failed superseded layout releases the newest request for a separate successful layout', async () => {
+  const f = fixture(); let reject!: (error: Error) => void;
+  f.settle(() => new Promise<void>((_resolve, fail) => { reject = fail; }));
+  const first = f.adapter.restore(saved()), failure = assert.rejects(first, /old layout failed/);
+  const latest = f.adapter.restore(saved({ scrollY: 777 }));
+  f.settle(async () => {}); reject(new Error('old layout failed'));
+  await failure; assert.equal(await latest, 'applied');
+  assert.equal(f.viewport.getScrollY(), 777); assert.equal(f.adapter.isRestoring(), false);
+});

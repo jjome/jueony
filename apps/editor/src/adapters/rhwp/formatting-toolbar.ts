@@ -1,5 +1,6 @@
 import {parseToolbarSize,validateToolbarFont,validateToolbarLanguage} from '../../modules/document/public/index.ts';
 import type {EditorFormattingState} from '../../modules/document/public/index.ts';
+import {rememberSuccessfulToolbarFont,observeRecentFonts} from '../browser/recent-fonts.ts';
 const composition=new WeakMap<Document,{active:boolean}>();
 function compositionState(){let state=composition.get(document);if(!state){state={active:false};composition.set(document,state);document.addEventListener('compositionstart',()=>state!.active=true,true);document.addEventListener('compositionend',()=>state!.active=false,true);}return state;}
 function supportsInput(input:any):boolean {
@@ -23,7 +24,7 @@ export const formattingToolbarCommands=[
    else name=validateToolbarFont(params.name);
    const wasm=services.wasm;let mods:any;
    if(families){mods={fontIds:families.map((name,index)=>wasm.findOrCreateFontIdForLang(index,name))};}
-   else if(language==='all'){mods={fontId:wasm.findOrCreateFontId(name)};}
+   else if(language==='all'){mods={fontIds:Array.from({length:7},(_,lang)=>wasm.findOrCreateFontIdForLang(lang,name))};}
    else {
     const current=input.getCharProperties(),existing=current.fontFamilies;
     if(!Array.isArray(existing)||existing.length!==7)throw new Error('현재 언어별 글꼴 정보를 읽지 못했습니다.');
@@ -55,12 +56,14 @@ function expected(toolbar:any){return toolbar.jueonyFormattingExpected??(window 
 function dispatch(toolbar:any,id:string,params:Record<string,unknown>){const result=toolbar.dispatcher.dispatchWithResult(id,{...params,expected:expected(toolbar)});if(!result.ok)throw new Error(result.message??'현재 문서에서 서식을 변경할 수 없습니다.');toolbar.jueonyFormattingExpected=undefined;toolbar.container.querySelector('[data-formatting-error]')?.remove();}
 export function commitToolbarFont(toolbar:any,value:string):void {
  try{const set=toolbar.findFontSetByName(value);if(set){const families=['korean','english','chinese','japanese','other','symbol','user'].map(key=>validateToolbarFont(set[key]));dispatch(toolbar,'format:set-font-family',{families,language:'all'});}
-  else dispatch(toolbar,'format:set-font-family',{name:validateToolbarFont(value),language:validateToolbarLanguage(toolbar.fontLang.value)});
+  else {const name=validateToolbarFont(value);dispatch(toolbar,'format:set-font-family',{name,language:validateToolbarLanguage(toolbar.fontLang.value)});rememberSuccessfulToolbarFont(name);}
  }catch(error){report(toolbar,error);}
 }
 export function commitToolbarSize(toolbar:any,value:unknown):void {try{const size=parseToolbarSize(value);dispatch(toolbar,'format:set-font-size',{sizePt:size/100});toolbar.fontSize.value=String(size/100);}catch(error){report(toolbar,error);}}
 export function installNativeFormattingBoundary(toolbar:any):void {
  compositionState();
+ const disposeRecent=observeRecentFonts(()=>{if(toolbar.fontMenu)toolbar.renderFontMenu(toolbar.fontMenu);});
+ window.addEventListener('pagehide',event=>{if(!(event as PageTransitionEvent).persisted)disposeRecent();});
  toolbar.eventBus.on('command-state-changed',()=>{if(!toolbar.container.contains(document.activeElement)&&!toolbar.fontMenu)toolbar.jueonyFormattingExpected=undefined;});
  toolbar.container.addEventListener('focusin',()=>{toolbar.jueonyFormattingExpected=(window as any).jueonyEditor?.formattingState?.();});
  toolbar.container.addEventListener('pointerdown',()=>{toolbar.jueonyFormattingExpected=(window as any).jueonyEditor?.formattingState?.();},true);

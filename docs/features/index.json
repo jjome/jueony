@@ -1,7 +1,7 @@
 {
   "organizedDate": "2026-10-16",
-  "rowCount": 442,
-  "taskCount": 221,
+  "rowCount": 447,
+  "taskCount": 226,
   "groups": [
     {
       "key": "workspaces",
@@ -223,19 +223,21 @@
         "G023",
         "G024",
         "G108",
-        "G109"
+        "G109",
+        "G110",
+        "G114"
       ],
-      "taskCount": 9,
+      "taskCount": 11,
       "rollupCount": 20,
       "implementation": {
-        "DONE": 9
+        "DONE": 11
       },
       "verification": {
-        "PARTIAL": 9
+        "PARTIAL": 11
       },
       "agent": {
         "CONNECTED": 4,
-        "NA": 5
+        "NA": 7
       }
     },
     {
@@ -283,22 +285,23 @@
         "N011",
         "N012",
         "N013",
-        "N022"
+        "N022",
+        "G113"
       ],
-      "taskCount": 23,
+      "taskCount": 24,
       "rollupCount": 18,
       "implementation": {
-        "DONE": 19,
+        "DONE": 20,
         "MISSING": 2,
         "PARTIAL": 2
       },
       "verification": {
-        "PARTIAL": 19,
+        "PARTIAL": 20,
         "NOT_RUN": 4
       },
       "agent": {
         "CONNECTED": 13,
-        "NA": 7,
+        "NA": 8,
         "NOT_CONNECTED": 3
       }
     },
@@ -646,22 +649,24 @@
         "N017",
         "N018",
         "G091",
-        "G099"
+        "G099",
+        "G111",
+        "G112"
       ],
-      "taskCount": 18,
+      "taskCount": 20,
       "rollupCount": 33,
       "implementation": {
-        "DONE": 13,
+        "DONE": 15,
         "PARTIAL": 1,
         "MISSING": 1,
         "AUDIT": 3
       },
       "verification": {
-        "PARTIAL": 14,
+        "PARTIAL": 16,
         "NOT_RUN": 4
       },
       "agent": {
-        "NA": 17,
+        "NA": 19,
         "CONNECTED": 1
       }
     },

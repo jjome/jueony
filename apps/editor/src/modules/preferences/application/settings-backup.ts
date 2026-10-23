@@ -2,8 +2,9 @@ import { parseSettingsBackup } from '../domain/settings-backup.ts';
 import { validateDocumentDefaults } from '../domain/document-defaults.ts';
 import type { PreferenceStorage } from '../ports/storage.ts';
 import { DOCUMENT_DEFAULTS_KEY } from './document-defaults.ts';
+import { EDITOR_CHROME_KEY, LEGACY_STYLE_PANEL_KEY, readEditorChromePreferences } from './editor-chrome.ts';
 export type BackupStorage = PreferenceStorage & { removeItem(key: string): void };
-export const SETTINGS_BACKUP_KEYS = ['rhwp-settings', DOCUMENT_DEFAULTS_KEY] as const;
+export const SETTINGS_BACKUP_KEYS = ['rhwp-settings', DOCUMENT_DEFAULTS_KEY, EDITOR_CHROME_KEY, LEGACY_STYLE_PANEL_KEY] as const;
 export function captureSettingsVersion(storage: BackupStorage): (string | null)[] { return SETTINGS_BACKUP_KEYS.map(key => storage.getItem(key)); }
 export function importSettingsBackup(storage: BackupStorage, text: string, expected: (string | null)[]): void {
   const backup = parseSettingsBackup(text), before = captureSettingsVersion(storage);
@@ -16,8 +17,15 @@ export function importSettingsBackup(storage: BackupStorage, text: string, expec
   let defaults: Record<string, any> = {};
   if (before[1] !== null) { try { defaults = JSON.parse(before[1]); validateDocumentDefaults(defaults); } catch { throw new Error('기존 새 문서 기본값이 손상되었습니다. 가져오기로 덮어쓰지 않았습니다.'); } }
   const nextDefaults = { ...defaults, ...backup.documentDefaults, page: { ...defaults.page, ...backup.documentDefaults.page }, font: { ...defaults.font, ...backup.documentDefaults.font } };
-  const values = [JSON.stringify(next), JSON.stringify(nextDefaults)], changed: number[] = [];
-  try { for (let i = 0; i < SETTINGS_BACKUP_KEYS.length; i++) { if (values[i] === before[i]) continue; storage.setItem(SETTINGS_BACKUP_KEYS[i], values[i]); changed.push(i); } }
+  // Old backups have no chrome section and leave the local ribbon/panel intact.
+  let nextChrome = before[2];
+  if (backup.editorChrome) {
+    readEditorChromePreferences(storage);
+    const localChrome = before[2] === null ? {} : JSON.parse(before[2]);
+    nextChrome = JSON.stringify({ ...localChrome, ...backup.editorChrome });
+  }
+  const values = [JSON.stringify(next), JSON.stringify(nextDefaults), nextChrome, before[3]], changed: number[] = [];
+  try { for (let i = 0; i < SETTINGS_BACKUP_KEYS.length; i++) { if (values[i] === before[i]) continue; if (values[i] === null) storage.removeItem(SETTINGS_BACKUP_KEYS[i]); else storage.setItem(SETTINGS_BACKUP_KEYS[i], values[i]!); changed.push(i); } }
   catch {
     let failed = false;
     for (const i of changed.reverse()) { try { if (before[i] === null) storage.removeItem(SETTINGS_BACKUP_KEYS[i]); else storage.setItem(SETTINGS_BACKUP_KEYS[i], before[i]!); } catch { failed = true; } }

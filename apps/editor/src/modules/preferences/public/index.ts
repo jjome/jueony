@@ -27,3 +27,9 @@ export { readSnippetLibrary, updateSnippetLibrary, SNIPPETS_KEY } from '../appli
 
 export type {TextBoxBookmark} from './contracts.ts';
 export {validateTextBoxBookmark} from '../domain/textbox-bookmark.ts';
+export type { EditorChromePreferences, EditorRibbonTab } from '../domain/editor-chrome.ts';
+export { EDITOR_RIBBON_TABS, isEditorRibbonTab, defaultEditorChromePreferences, validateEditorChromePreferences } from '../domain/editor-chrome.ts';
+export { EDITOR_CHROME_KEY, LEGACY_STYLE_PANEL_KEY, readEditorChromePreferences, createEditorChromePreferences } from '../application/editor-chrome.ts';
+export type { RecentFonts } from '../domain/recent-fonts.ts';
+export { RECENT_FONT_LIMIT, recentFontName, validateRecentFonts, visibleRecentFonts, prependRecentFont } from '../domain/recent-fonts.ts';
+export { RECENT_FONTS_KEY, readRecentFonts, rememberRecentFont } from '../application/recent-fonts.ts';

@@ -3,6 +3,8 @@ import type { WasmBridge } from '../core/wasm-bridge';
 import type { EventBus } from '../core/event-bus';
 import type { DocumentDirtyState } from '../core/document-dirty-state';
 import { fallbackIcon } from './icons';
+import { bindEditorChromePreferences } from './adapters/browser/editor-chrome-preferences.ts';
+import { isEditorRibbonTab } from './modules/preferences/public/index.ts';
 
 type Group = { label: string; commands: string[] };
 const tabs: Record<string, Group[]> = {
@@ -12,7 +14,7 @@ const tabs: Record<string, Group[]> = {
     { label: '찾기', commands: ['edit:find', 'edit:find-replace', 'edit:goto'] },
   ],
   view: [
-    { label: '작업 창', commands: ['ext:jueony-navigation-pane'] },
+    { label: '작업 창', commands: ['ext:jueony-navigation-pane', 'ext:jueony-style-panel'] },
     { label: '표시', commands: ['view:para-mark', 'view:ctrl-mark', 'view:toggle-grid'] },
     { label: '확대/축소', commands: ['view:zoom-dialog', 'view:zoom-fit-page', 'view:zoom-fit-width', 'view:zoom-100'] },
   ],
@@ -50,6 +52,7 @@ export function installHangulChrome({ wasm, eventBus, documentState, automation 
   document.getElementById('icon-toolbar')!.before(ribbon);
   document.getElementById('icon-toolbar')!.classList.add('jueony-original-toolbar');
   let currentTab = 'edit';
+  let chromePreferences: ReturnType<typeof bindEditorChromePreferences> | undefined;
   const tabButtons = new Map<string, HTMLButtonElement>();
   const run = (id: string) => {
     const result = automation.execute(id, undefined, { allowDialog: true });
@@ -102,7 +105,10 @@ export function installHangulChrome({ wasm, eventBus, documentState, automation 
     const button = document.createElement('button'); button.type = 'button';
     button.className = 'j-tab'; button.textContent = label; button.setAttribute('role', 'tab');
     button.addEventListener('mousedown', event => event.preventDefault());
-    button.addEventListener('click', () => { currentTab = id; renderRibbon(); });
+    button.addEventListener('click', () => {
+      if (isEditorRibbonTab(id)) chromePreferences?.setRibbonTab(id);
+      else { currentTab = id; renderRibbon(); }
+    });
     button.addEventListener('dblclick', () => document.getElementById('toolbox-basic-toggle')?.click());
     item.prepend(button); tabButtons.set(id, button);
   }
@@ -135,13 +141,12 @@ export function installHangulChrome({ wasm, eventBus, documentState, automation 
   const panelTitle = document.createElement('strong'); panelTitle.textContent = '스타일';
   const closePanel = document.createElement('button'); closePanel.type = 'button'; closePanel.textContent = '×'; closePanel.setAttribute('aria-label', '스타일 작업 창 닫기');
   const togglePanel = document.createElement('button'); togglePanel.type = 'button'; togglePanel.className = 'j-panel-toggle'; togglePanel.textContent = '스타일 창'; togglePanel.setAttribute('aria-controls', panel.id);
-  const setPanel = (open: boolean) => {
+  const showPanel = (open: boolean) => {
     panel.hidden = !open; togglePanel.setAttribute('aria-expanded', String(open));
-    try { localStorage.setItem('jueony-style-panel', String(open)); } catch { /* 개인 보기 설정 */ }
     window.dispatchEvent(new Event('resize'));
   };
-  closePanel.addEventListener('click', () => setPanel(false));
-  togglePanel.addEventListener('click', () => setPanel(panel.hidden !== false));
+  closePanel.addEventListener('click', () => chromePreferences?.setStylePanelOpen(false));
+  togglePanel.addEventListener('click', () => chromePreferences?.setStylePanelOpen(panel.hidden !== false));
   menu.append(togglePanel);
   panelHeader.append(panelTitle, closePanel);
   const styleList = document.createElement('div'); styleList.className = 'j-style-list'; styleList.setAttribute('role', 'listbox'); styleList.setAttribute('aria-label', '문서 스타일');
@@ -180,9 +185,6 @@ export function installHangulChrome({ wasm, eventBus, documentState, automation 
       button.setAttribute('aria-selected', String(button.dataset.styleValue === styleSelect.value));
     }
   }
-  let initiallyOpen = true;
-  try { initiallyOpen = localStorage.getItem('jueony-style-panel') !== 'false'; } catch { /* 기본 보기 */ }
-  setPanel(initiallyOpen);
   new MutationObserver(syncStyles).observe(styleSelect, { childList: true });
   eventBus.on('cursor-style-changed', (info) => {
     syncStyles();
@@ -207,10 +209,32 @@ export function installHangulChrome({ wasm, eventBus, documentState, automation 
     const context = automation.getContext();
     const tableItem = menu.querySelector<HTMLElement>('[data-menu="table"]');
     if (tableItem) tableItem.hidden = !context.inTable && !context.inTableObjectSelection;
+    if (currentTab === 'table' && tableItem?.hidden) {
+      currentTab = chromePreferences?.snapshot().ribbonTab ?? 'edit';
+      renderRibbon();
+      return;
+    }
     syncStyles();
   }
   eventBus.on('command-state-changed', refresh);
   eventBus.on('document-mutated', refresh);
   new MutationObserver(refresh).observe(document.querySelector('title')!, { childList: true });
+  chromePreferences = bindEditorChromePreferences({
+    storage: { getItem: key => localStorage.getItem(key), setItem: (key, value) => localStorage.setItem(key, value) },
+    events: window,
+    onChange: value => { currentTab = value.ribbonTab; showPanel(value.stylePanelOpen); renderRibbon(); },
+    onError: error => window.dispatchEvent(new CustomEvent('jueony:preferences-error', { detail: { message: error.message } })),
+  });
+  const initial = chromePreferences.snapshot();
+  automation.registerCommand({
+    id: 'ext:jueony-style-panel', label: '스타일 작업 창', canExecute: () => true,
+    execute: () => { if (!chromePreferences?.setStylePanelOpen(panel.hidden !== false)) throw new Error('스타일 작업 창 환경을 저장하지 못했습니다.'); },
+  });
+  automation.addMenuItem({ menuId: 'view', commandId: 'ext:jueony-style-panel' });
+  const stylePanelCommand = automation.listCommands().find(command => command.id === 'ext:jueony-style-panel');
+  if (stylePanelCommand) commands.set(stylePanelCommand.id, stylePanelCommand);
+  currentTab = initial.ribbonTab;
+  showPanel(initial.stylePanelOpen);
   renderRibbon();
+  window.addEventListener('pagehide', event => { if (!(event as PageTransitionEvent).persisted) chromePreferences?.dispose(); });
 }

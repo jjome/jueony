@@ -1,0 +1,229 @@
+{
+  "results": [
+    "hwp: Ctrl+T deletes a reversed scalar selection, undo/redo and actual save/reopen",
+    "hwp: held Ctrl+T repeats word deletion, undo preserves each actual edit",
+    "hwp: held font-size increments apply twice without repeating a toggle and persist",
+    "hwp: Ctrl+Alt+V opens text-only paste; selection, undo and save stay connected",
+    "hwp: Shift document and paragraph boundaries preserve and reverse an existing selection without modifying bytes",
+    "hwp: F3 block selection survives unmodified document boundary navigation",
+    "hwp: Ctrl+Alt+A cycles superscript/subscript/normal, preserves other effects and saves",
+    "hwp: Alt+Shift+F/G follow current local font order with repeat, undo and save",
+    "hwpx: Ctrl+T deletes a reversed scalar selection, undo/redo and actual save/reopen",
+    "hwpx: held Ctrl+T repeats word deletion, undo preserves each actual edit",
+    "hwpx: held font-size increments apply twice without repeating a toggle and persist",
+    "hwpx: Ctrl+Alt+V opens text-only paste; selection, undo and save stay connected",
+    "hwpx: Shift document and paragraph boundaries preserve and reverse an existing selection without modifying bytes",
+    "hwpx: F3 block selection survives unmodified document boundary navigation",
+    "hwpx: Ctrl+Alt+A cycles superscript/subscript/normal, preserves other effects and saves",
+    "font-cycle shortcut honors the selected language slot without rewriting other font families",
+    "caret script cycling changes pending typing properties and applies to subsequently typed text only",
+    "Ctrl+Shift+Home/End select the visible screen edge instead of jumping to document start/end",
+    "synthetic AltGraph and IME safeguards leave actual document, selection and dialogs unchanged"
+  ],
+  "failures": [
+    {
+      "name": "hwpx: Alt+Shift+F/G follow current local font order with repeat, undo and save",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'failed' !== 'saved'\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'failed' !== 'saved'\n\n    at saved (file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-shortcut-navigation.mjs:95:10)\n    at async file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-shortcut-navigation.mjs:180:7\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-shortcut-navigation.mjs:100:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-shortcut-navigation.mjs:171:5"
+    },
+    {
+      "name": "all-language font change resolves each distinct language catalog instead of reusing the Korean numeric ID",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    '함초롬돋움',\n+   '함초롬바탕',\n    '함초롬돋움',\n    '함초롬돋움',\n    '함초롬돋움',\n    '함초롬돋움',\n    '함초롬돋움',\n-   '함초롬돋움'\n  ]\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    '함초롬돋움',\n+   '함초롬바탕',\n    '함초롬돋움',\n    '함초롬돋움',\n    '함초롬돋움',\n    '함초롬돋움',\n    '함초롬돋움',\n-   '함초롬돋움'\n  ]\n\n    at file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-shortcut-navigation.mjs:205:12\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-shortcut-navigation.mjs:100:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-shortcut-navigation.mjs:192:3"
+    }
+  ],
+  "pageErrors": [],
+  "externalRequests": [],
+  "diagnostics": [
+    {
+      "console": "[file:save] 저장 실패: 내보내기 내용 손실 보고서 항목이 올바르지 않습니다"
+    },
+    {
+      "dialog": "파일 저장에 실패했습니다:\n내보내기 내용 손실 보고서 항목이 올바르지 않습니다"
+    },
+    {
+      "name": "cycle-font.hwpx",
+      "state": {
+        "name": "shortcut-basic.hwpx",
+        "pageCount": 1,
+        "dirty": true,
+        "revision": "17:56"
+      },
+      "font": {
+        "visible": true,
+        "enabled": true,
+        "fontEnabled": true,
+        "revision": "17:56",
+        "documentIdentity": "17:shortcut-basic.hwpx",
+        "selectionToken": "{\"position\":{\"sectionIndex\":0,\"paragraphIndex\":0,\"charOffset\":0},\"selection\":null,\"story\":{\"header\":\"none\",\"hfSection\":0,\"hfApply\":0,\"hfPara\":0,\"hfOffset\":0,\"hfSelection\":null,\"footnote\":0}}",
+        "styleId": 0,
+        "fontFamily": "맑은 고딕",
+        "sizePt": 10,
+        "language": "all",
+        "bold": false,
+        "italic": false,
+        "underline": false,
+        "alignment": "justify",
+        "fonts": [
+          "함초롬바탕",
+          "함초롬돋움",
+          "맑은 고딕",
+          "나눔고딕",
+          "바탕",
+          "돋움",
+          "궁서"
+        ]
+      },
+      "loss": {
+        "schemaVersion": 1,
+        "outputFormat": "hwpx",
+        "count": 7,
+        "losses": [
+          {
+            "code": "metadataReduced",
+            "subject": "fontProperties",
+            "path": "docInfo/font/0/2/type",
+            "reason": "serializerNotImplemented"
+          },
+          {
+            "code": "metadataReduced",
+            "subject": "fontProperties",
+            "path": "docInfo/font/1/2/type",
+            "reason": "serializerNotImplemented"
+          },
+          {
+            "code": "metadataReduced",
+            "subject": "fontProperties",
+            "path": "docInfo/font/2/2/type",
+            "reason": "serializerNotImplemented"
+          },
+          {
+            "code": "metadataReduced",
+            "subject": "fontProperties",
+            "path": "docInfo/font/3/2/type",
+            "reason": "serializerNotImplemented"
+          },
+          {
+            "code": "metadataReduced",
+            "subject": "fontProperties",
+            "path": "docInfo/font/4/2/type",
+            "reason": "serializerNotImplemented"
+          },
+          {
+            "code": "metadataReduced",
+            "subject": "fontProperties",
+            "path": "docInfo/font/5/2/type",
+            "reason": "serializerNotImplemented"
+          },
+          {
+            "code": "metadataReduced",
+            "subject": "fontProperties",
+            "path": "docInfo/font/6/2/type",
+            "reason": "serializerNotImplemented"
+          }
+        ]
+      },
+      "properties": {
+        "fontFamily": "맑은 고딕",
+        "fontSize": 1000,
+        "bold": false,
+        "italic": false,
+        "underline": false,
+        "underlineType": "None",
+        "underlineColor": "#000000",
+        "strikethrough": false,
+        "strikeColor": "#000000",
+        "textColor": "#000000",
+        "shadeColor": "#ffffff",
+        "shadowType": 0,
+        "shadowColor": "#b2b2b2",
+        "shadowOffsetX": 10,
+        "shadowOffsetY": 10,
+        "outlineType": 0,
+        "subscript": false,
+        "superscript": false,
+        "emboss": false,
+        "engrave": false,
+        "emphasisDot": 0,
+        "underlineShape": 0,
+        "strikeShape": 0,
+        "kerning": false,
+        "charShapeId": 7,
+        "fontFamilies": [
+          "맑은 고딕",
+          "맑은 고딕",
+          "맑은 고딕",
+          "맑은 고딕",
+          "맑은 고딕",
+          "맑은 고딕",
+          "맑은 고딕"
+        ],
+        "ratios": [
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100
+        ],
+        "spacings": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "relativeSizes": [
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100
+        ],
+        "charOffsets": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "borderFillId": 2,
+        "borderLeft": {
+          "type": 0,
+          "width": 0,
+          "color": "#000000"
+        },
+        "borderRight": {
+          "type": 0,
+          "width": 0,
+          "color": "#000000"
+        },
+        "borderTop": {
+          "type": 0,
+          "width": 0,
+          "color": "#000000"
+        },
+        "borderBottom": {
+          "type": 0,
+          "width": 0,
+          "color": "#000000"
+        },
+        "fillType": "none",
+        "fillColor": "#ffffff",
+        "patternColor": "#000000",
+        "patternType": 0
+      }
+    }
+  ],
+  "dist": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\basic-editor-20261024\\clean\\apps\\editor\\evidence\\dist-basic-editor-20261024",
+  "enginePackage": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-e6ec7e05e468b7f5\\pkg",
+  "port": 4502,
+  "limitations": "Isolated actual Edge and Rust/WASM engine, real keyboard dispatch and disk save/reopen. Synthetic AltGraph/IME guard checks are not physical Windows IME validation. Hancom direct comparison remains pending; Shift boundary selection is an app contract extension, not a separately confirmed Hancom gesture."
+}

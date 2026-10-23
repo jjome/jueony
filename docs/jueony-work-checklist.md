@@ -4,7 +4,7 @@
 
 기준일: 2026-10-15. 원본은 [CSV](jueony-work-checklist.csv), 사용 규칙은 [97번 문서](97-master-work-checklist.md), 검색 화면은 [HTML](jueony-work-checklist.html)이다.
 
-총 442행: 실행 작업 221행과 상위 범위 항목 221행. 범위가 겹치므로 전체 완성률로 나누지 않는다.
+총 447행: 실행 작업 226행과 상위 범위 항목 221행. 범위가 겹치므로 전체 완성률로 나누지 않는다.
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증은 자동 검사와 한글 직접 비교를 구분한다. 각 완료 표시는 해당 행의 제한된 완료조건에만 적용한다.
 
@@ -432,6 +432,8 @@
 | N018 P1 | **undo/redo 이력의 재실행 지속 정책** · 원본 bytes/revision과 atomic recipe 수명; 한글 기준 확인 | ? 재점검 | ☐ 미검증 · 자동:NOT_RUN / 한글:NA | — 해당 없음 | 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀 · [44-editor-stages-result.md](../docs/44-editor-stages-result.md) |
 | G091 P0 | **Rectangle 글상자 커서·선택·미저장 재시작 복원** · 단일 root Rectangle의 정체성/전체 story 텍스트·서식·문맥/Unicode 선택·실제 cursor rect; 탭/workspace/dirty 복원·채팅 focus 유지 | ☑ 완료 | ◐ 부분 · 자동:PASS / 한글:NOT_RUN | — 해당 없음 | 자체 예제로 최종 한글 2024 비교; 복합 원본은 별도 작업. · [103-textbox-state-and-storage.md](../docs/103-textbox-state-and-storage.md) · [verification-summary.json](../docs/evidence/parallel-editor-2026-10-15/verification-summary.json) |
 | G099 P1 | **머리말·본문 각주의 소유·서식 지문과 재시작 복원** · 일반 H/F 및 root body 각주의 Unicode/다문단/혼합 서식 커서·역방향 선택·실제 재시작·포커스·bytes/dirty/geometry 불변. 논리 문맥과 실제 owner ID는 검증하고 재생성 문단 ID는 typed provenance로 분리한다. | ☑ 완료 | ◐ 부분 · 자동:PASS / 한글:NOT_RUN | — 해당 없음 | 한글 직접 비교. 미주 UI locator·표/개체/필드/불명 payload·예약 비트·활성 목록은 readonly. N014 전체 상태는 부분 유지. · [105-file-storage-preservation.md](../docs/105-file-storage-preservation.md) · [verification-summary.json](../docs/evidence/state-storage-2026-10-16/verification-summary.json) |
+| G111 P1 | **리본·스타일 창 환경과 중첩 보기 복원** · 현재 지원 리본 탭·스타일 창 표시, 버전 검사·교차 탭·설정 백업/복원 및 겹친 보기 복원. 문서별 모든 상태 수명 제외 | ☑ 완료 | ◐ 부분 · 자동:PASS / 한글:NOT_RUN | — 해당 없음 | 한글 2024 직접 비교 보류. 세부 범위의 구현·자동 검사만 완료이며 상위 기능 전체 완료는 아님. · [139-basic-editor-parallel-plan.md](../docs/139-basic-editor-parallel-plan.md) · [manifest.json](../docs/evidence/basic-editor-2026-10-24/second/manifest.json) |
+| G112 P1 | **최근 글꼴 목록과 표시 옵션 저장** · 최근 실제 선택 글꼴 5개와 표시 여부·개수, 재실행·교차 문서·쓰기 실패·미래 버전 보호 | ☑ 완료 | ◐ 부분 · 자동:PASS / 한글:NOT_RUN | — 해당 없음 | 한글 2024 직접 비교 보류. 세부 범위의 구현·자동 검사만 완료이며 상위 기능 전체 완료는 아님. · [139-basic-editor-parallel-plan.md](../docs/139-basic-editor-parallel-plan.md) · [manifest.json](../docs/evidence/basic-editor-2026-10-24/second/manifest.json) |
 
 ## 서식·스타일 — 실행 작업
 
@@ -569,3 +571,11 @@
 | --- | --- | --- | --- | --- | --- |
 | G108 P1 | **본문 모양 복사 원자적 되돌리기** · 같은 구역 본문 선택의 글자·문단 서식 복사; 단일 undo/redo·역방향/F3 선택·실패 롤백·문서 전환·HWP/HWPX 저장 재열기 | ☑ 완료 | ◐ 부분 · 자동:PASS / 한글:NOT_RUN | — 해당 없음 | 한글 2024 직접 비교는 마지막 일괄 검수. 제한된 구현 범위 밖 특수 story/문맥은 상위 기능에서 관리. · [139-basic-editor-parallel-plan.md](../docs/139-basic-editor-parallel-plan.md) · [manifest.json](../docs/evidence/basic-editor-2026-10-24/first/manifest.json) |
 | G109 P1 | **본문·표·중첩 표 찾기와 안전한 바꾸기** · 지원 일반 본문 및 표 셀의 경로별 찾기/이전/다음/모두 바꾸기; 문서 버전·보호·IME 검증과 단일 undo/redo·저장 재열기 | ☑ 완료 | ◐ 부분 · 자동:PASS / 한글:NOT_RUN | — 해당 없음 | 한글 2024 직접 비교는 마지막 일괄 검수. 제한된 구현 범위 밖 특수 story/문맥은 상위 기능에서 관리. · [139-basic-editor-parallel-plan.md](../docs/139-basic-editor-parallel-plan.md) · [manifest.json](../docs/evidence/basic-editor-2026-10-24/first/manifest.json) |
+| G110 P1 | **본문 경계 선택과 기본 서식 단축키** · 본문 문서·문단·화면 경계 선택, Ctrl+T 선택삭제, 붙여넣기 대화상자, 글자 크기 반복, 위·아래 첨자 순환과 글꼴 이동. 전체 단축키 매트릭스 제외 | ☑ 완료 | ◐ 부분 · 자동:PASS / 한글:NOT_RUN | — 해당 없음 | 한글 2024 직접 비교 보류. 세부 범위의 구현·자동 검사만 완료이며 상위 기능 전체 완료는 아님. · [139-basic-editor-parallel-plan.md](../docs/139-basic-editor-parallel-plan.md) · [manifest.json](../docs/evidence/basic-editor-2026-10-24/second/manifest.json) |
+| G114 P1 | **선택한 표·그림·도형 잘라내기 실패 보호** · 현재 지원 본문 개체의 rich clipboard 쓰기 성공 후 삭제, 오래된 선택·문서 변경·중복 실행 거절, 중간 실패 롤백·undo/redo·저장 재열기. 실제 OS clipboard 최종 반영과 특수 story 제외 | ☑ 완료 | ◐ 부분 · 자동:PASS / 한글:NOT_RUN | — 해당 없음 | 한글 2024 직접 비교 보류. 세부 범위의 구현·자동 검사만 완료이며 상위 기능 전체 완료는 아님. · [139-basic-editor-parallel-plan.md](../docs/139-basic-editor-parallel-plan.md) · [manifest.json](../docs/evidence/basic-editor-2026-10-24/second/manifest.json) |
+
+## 글자·문단·스타일 — 실행 작업
+
+| ID | 작업·완료조건 | 구현 | 검증 | Agent 연결 | 다음 작업·근거 |
+| --- | --- | --- | --- | --- | --- |
+| G113 P1 | **새 글꼴 선언과 언어별 글꼴 참조 보존** · 사용자가 새로 추가한 TTF 글꼴의 HWP/HWPX 저장 및 언어별 font ID 대응. 기존 미지원 글꼴 종류 변환은 보호 차단 유지 | ☑ 완료 | ◐ 부분 · 자동:PASS / 한글:NOT_RUN | — 해당 없음 | 한글 2024 직접 비교 보류. 세부 범위의 구현·자동 검사만 완료이며 상위 기능 전체 완료는 아님. · [139-basic-editor-parallel-plan.md](../docs/139-basic-editor-parallel-plan.md) · [manifest.json](../docs/evidence/basic-editor-2026-10-24/second/manifest.json) |

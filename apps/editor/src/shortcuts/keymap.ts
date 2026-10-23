@@ -5,7 +5,13 @@
 import { defaultStyleNames } from './style-slots.ts';
 export type Scope = 'document' | 'table' | 'cells' | 'object';
 export type Binding = { keys: string; command: string; label: string; scope: Scope; params?: Record<string, unknown>; nativeClipboard?: boolean; repeatable?: boolean };
-const binding = (keys: string, command: string, label: string, scope: Scope = 'document', params?: Record<string, unknown>): Binding => ({ keys, command, label, scope, ...(params ? { params } : {}) });
+const repeatableCommands = new Set([
+  'ext:jueony-navigate', 'ext:jueony-delete-word', 'ext:jueony-delete-line', 'ext:jueony-delete-line-end',
+  'format:font-size-increase', 'format:font-size-decrease', 'format:char-spacing-increase', 'format:char-spacing-decrease',
+  'format:char-ratio-increase', 'format:char-ratio-decrease', 'format:line-spacing-increase', 'format:line-spacing-decrease',
+  'ext:jueony-cycle-font',
+]);
+const binding = (keys: string, command: string, label: string, scope: Scope = 'document', params?: Record<string, unknown>): Binding => ({ keys, command, label, scope, ...(params ? { params } : {}), ...(repeatableCommands.has(command) ? { repeatable: true } : {}) });
 export const hangulBindings: Binding[] = [
   ...[['Ctrl+C', 'edit:copy', '복사하기'], ['Ctrl+X', 'edit:cut', '오려 두기'], ['Ctrl+V', 'edit:paste', '붙이기'], ['Shift+Delete', 'edit:cut', '오려 두기'], ['Shift+Insert', 'edit:paste', '붙이기']].map(([keys, command, label]) => ({ ...binding(keys, command, label), nativeClipboard: true })),
   binding('Alt+N', 'file:new-doc', '새 문서'),
@@ -18,13 +24,17 @@ export const hangulBindings: Binding[] = [
   binding('Ctrl+O', 'ext:jueony-insert-document', '문서 끼워 넣기'),
   binding('Ctrl+K,D', 'ext:jueony-calendar-stamp', '날짜/시간 문자열'),
   ...(['PageUp', 'PageDown', 'Home', 'End'] as const).map((key, i) => binding('Ctrl+' + key, 'ext:jueony-navigate', ['문서 처음', '문서 끝', '화면 첫 줄', '화면 끝줄'][i], 'document', { edge: ['document-start', 'document-end', 'screen-start', 'screen-end'][i] })),
+  ...(['PageUp', 'PageDown', 'Home', 'End'] as const).map((key, i) => binding('Ctrl+Shift+' + key, 'ext:jueony-navigate', ['문서 처음까지 선택', '문서 끝까지 선택', '화면 첫 줄까지 선택', '화면 끝줄까지 선택'][i], 'document', { edge: ['document-start', 'document-end', 'screen-start', 'screen-end'][i], extend: true })),
   binding('Alt+Home', 'ext:jueony-navigate', '문단 처음', 'document', { edge: 'paragraph-start' }),
   binding('Alt+End', 'ext:jueony-navigate', '문단 끝', 'document', { edge: 'paragraph-end' }),
+  binding('Alt+Shift+Home', 'ext:jueony-navigate', '문단 처음까지 선택', 'document', { edge: 'paragraph-start', extend: true }),
+  binding('Alt+Shift+End', 'ext:jueony-navigate', '문단 끝까지 선택', 'document', { edge: 'paragraph-end', extend: true }),
   binding('Ctrl+Z', 'edit:undo', '되돌리기'), binding('Ctrl+Shift+Z', 'edit:redo', '다시 실행'),
   binding('Ctrl+Y', 'ext:jueony-delete-line', '한 줄 지우기'), binding('Alt+Y', 'ext:jueony-delete-line-end', '줄 뒤 지우기'),
   binding('Ctrl+T', 'ext:jueony-delete-word', '한 단어 지우기'),
   binding('Ctrl+A', 'edit:select-all', '모두 선택'), binding('Ctrl+E', 'edit:delete', '지우기'),
   binding('Alt+C', 'edit:format-copy', '모양 복사'),
+  binding('Ctrl+Alt+V', 'edit:paste-special', '골라 붙이기 (텍스트만)'),
   binding('Ctrl+Q,F', 'edit:find', '찾기'), binding('Ctrl+F', 'ext:jueony-navigation-pane', '탐색 작업 창'),
   binding('Ctrl+F2', 'edit:find-replace', '찾아 바꾸기'), binding('Ctrl+Q,A', 'edit:find-replace', '찾아 바꾸기'),
   binding('Ctrl+H', 'edit:find-replace', '찾아 바꾸기'), binding('Ctrl+L', 'edit:find-again', '다시 찾기'),
@@ -48,6 +58,9 @@ export const hangulBindings: Binding[] = [
   binding('Ctrl+I', 'format:italic', '기울임'), binding('Alt+Shift+I', 'format:italic', '기울임'),
   binding('Ctrl+U', 'format:underline', '밑줄'), binding('Alt+Shift+U', 'format:underline', '밑줄'),
   binding('Alt+Shift+P', 'format:superscript', '위 첨자'), binding('Alt+Shift+S', 'format:subscript', '아래 첨자'),
+  binding('Ctrl+Alt+A', 'ext:jueony-cycle-script', '위 첨자·아래 첨자·보통'),
+  binding('Alt+Shift+F', 'ext:jueony-cycle-font', '다음 글꼴', 'document', { direction: 1 }),
+  binding('Alt+Shift+G', 'ext:jueony-cycle-font', '이전 글꼴', 'document', { direction: -1 }),
   binding('Alt+Shift+C', 'ext:jueony-normal', '보통 모양'),
   binding('Alt+Shift+E', 'format:font-size-increase', '글씨 크게'), binding('Ctrl+]', 'format:font-size-increase', '글씨 크게'),
   binding('Alt+Shift+R', 'format:font-size-decrease', '글씨 작게'), binding('Ctrl+[', 'format:font-size-decrease', '글씨 작게'),
@@ -103,7 +116,7 @@ export const hangulBindings: Binding[] = [
   binding('Ctrl+=', 'ext:jueony-previous-cursor', '이전 커서 위치'), binding('Ctrl+Shift+=', 'ext:jueony-next-cursor', '다음 커서 위치'),
   binding('Ctrl+-', 'pending:clear-char-style', '글자 스타일 해제'),
 ];
-export type Key = Pick<KeyboardEvent, 'key' | 'code' | 'ctrlKey' | 'altKey' | 'shiftKey' | 'metaKey' | 'repeat' | 'isComposing'>;
+export type Key = Pick<KeyboardEvent, 'key' | 'code' | 'ctrlKey' | 'altKey' | 'shiftKey' | 'metaKey' | 'repeat' | 'isComposing'> & Partial<Pick<KeyboardEvent, 'getModifierState'>>;
 export type KeyContext = { table: boolean; cells: boolean; object: boolean };
 export function keyStroke(e: Key): string {
   const code = e.code ?? '';
@@ -114,7 +127,7 @@ export class HangulKeyResolver {
   private pending: { prefix: string; until: number } | null = null;
   reset() { this.pending = null; }
   resolve(e: Key, ctx: KeyContext, now: number = Date.now()): { handled: boolean; binding?: Binding; hint?: string } {
-    if (e.metaKey) { this.reset(); return { handled: false }; }
+    if (e.metaKey || e.getModifierState?.('AltGraph')) { this.reset(); return { handled: false }; }
     if (this.pending && now > this.pending.until) this.reset();
     if (['Control', 'Shift', 'Alt', 'Meta'].includes(e.key)) return { handled: false };
     if (this.pending && e.key === 'Escape') { this.reset(); return { handled: true, hint: '연속키 취소' }; }

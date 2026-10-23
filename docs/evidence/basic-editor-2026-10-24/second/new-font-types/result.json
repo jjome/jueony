@@ -1,0 +1,25 @@
+{
+  "results": [
+    "hwp: newly requested all font keeps TTF identity and passes actual HWP/HWPX preservation",
+    "hwp: newly requested english font keeps TTF identity and passes actual HWP/HWPX preservation",
+    "hwpx: newly requested all font keeps TTF identity and passes actual HWP/HWPX preservation",
+    "hwpx: newly requested english font keeps TTF identity and passes actual HWP/HWPX preservation",
+    "existing imported HFT font lookup preserves bytes and its original loss gate",
+    "existing imported REP font lookup preserves bytes and its original loss gate",
+    "existing imported OTHER font lookup preserves bytes and its original loss gate",
+    "existing imported missing font lookup preserves bytes and its original loss gate"
+  ],
+  "failures": [],
+  "savedFiles": [
+    "hwp-all.hwp",
+    "hwp-all.hwpx",
+    "hwp-english.hwp",
+    "hwp-english.hwpx",
+    "hwpx-all.hwp",
+    "hwpx-all.hwpx",
+    "hwpx-english.hwp",
+    "hwpx-english.hwpx"
+  ],
+  "enginePackage": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-c38631692287c07f\\pkg",
+  "scope": "New editing fonts are explicitly declared TrueType; imported resources are never retyped. Synthetic fixtures, actual Rust/WASM export, full production preservation and independent ZIP type assertions. Native Hancom rendering and font licensing/installability are not evaluated."
+}

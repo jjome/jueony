@@ -1,6 +1,8 @@
 import { validateDocumentDefaults } from './document-defaults.ts';
 import type { DocumentDefaults } from '../public/contracts.ts';
-export type SettingsBackup = { format: 'jueony-editor-preferences'; version: 1; settings: Record<string, any>; documentDefaults: DocumentDefaults };
+import { validateEditorChromePreferences } from './editor-chrome.ts';
+import type { EditorChromePreferences } from './editor-chrome.ts';
+export type SettingsBackup = { format: 'jueony-editor-preferences'; version: 1; settings: Record<string, any>; documentDefaults: DocumentDefaults; editorChrome?: EditorChromePreferences };
 const object = (value: unknown): Record<string, any> => { if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('환경 파일의 항목 형식이 올바르지 않습니다.'); return value as Record<string, any>; };
 const bool = (value: unknown) => { if (typeof value !== 'boolean') throw new Error('환경 파일의 켜짐/꺼짐 값을 확인하세요.'); return value; };
 const number = (value: unknown, min: number, max: number) => { if (!Number.isInteger(value) || (value as number) < min || (value as number) > max) throw new Error('환경 파일의 숫자가 허용 범위를 벗어났습니다.'); return value as number; };
@@ -31,12 +33,13 @@ export function projectEditorSettings(value: unknown): Record<string, any> {
     autosave: { recoveryEnabled: bool(autosave.recoveryEnabled), recoveryIntervalMinutes: number(autosave.recoveryIntervalMinutes, 1, 120), idleSaveEnabled: bool(autosave.idleSaveEnabled), idleDelaySeconds: number(autosave.idleDelaySeconds, 5, 600) },
   };
 }
-export function createSettingsBackup(settings: unknown, documentDefaults: unknown): SettingsBackup {
-  return { format: 'jueony-editor-preferences', version: 1, settings: projectEditorSettings(settings), documentDefaults: validateDocumentDefaults(documentDefaults) };
+export function createSettingsBackup(settings: unknown, documentDefaults: unknown, editorChrome?: unknown): SettingsBackup {
+  return { format: 'jueony-editor-preferences', version: 1, settings: projectEditorSettings(settings), documentDefaults: validateDocumentDefaults(documentDefaults),
+    ...(editorChrome === undefined ? {} : { editorChrome: validateEditorChromePreferences(editorChrome) }) };
 }
 export function parseSettingsBackup(text: string): SettingsBackup {
   if (text.length > 256_000) throw new Error('환경 파일은 256KB 이하여야 합니다.');
   let value: Record<string, any>; try { value = object(JSON.parse(text)); } catch { throw new Error('환경 파일의 JSON 형식을 확인하세요.'); }
   if (value.format !== 'jueony-editor-preferences' || value.version !== 1) throw new Error('지원하지 않는 환경 파일 또는 버전입니다.');
-  return createSettingsBackup(value.settings, value.documentDefaults);
+  return createSettingsBackup(value.settings, value.documentDefaults, value.editorChrome);
 }

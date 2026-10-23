@@ -5,6 +5,14 @@ const api=await import('data:text/javascript;base64,'+Buffer.from(stripTypeScrip
 const record={code:'metadataReduced',subject:'paragraphProperties',path:'section/0/body/paragraph/1/numberingRestart',reason:'serializerNotImplemented'};
 const report=(loss=record)=>({schemaVersion:1,outputFormat:'hwpx',count:1,losses:[loss]});
 test('new paragraph metadata loss is explicitly accepted and labels its real location',()=>{assert.deepEqual(api.parseContentLossReport(report()),report());assert.match(api.buildContentLossNotice(report()),/문단 속성: section\/0\/body\/paragraph\/1\/numberingRestart/);});
+
+test('known font metadata loss keeps the exact blocked resources instead of an invalid-schema error',()=>{
+ const font=report({...record,subject:'fontProperties',path:'docInfo/font/1/2/type'});
+ assert.deepEqual(api.parseContentLossReport(font),font);
+ assert.match(api.buildContentLossNotice(font),/글꼴 속성: docInfo\/font\/1\/2\/type/);
+ assert.equal(api.parseContentLossReport(font).count,1);
+ assert.throws(()=>api.parseContentLossReport(report({...record,subject:'fontProperties',reason:'ignore'})));
+});
 test('new known enum entries do not admit arbitrary subjects/reasons or bad counts',()=>{for(const patch of [{subject:'ignore'},{reason:'ignore'},{code:'success'},{path:1}])assert.throws(()=>api.parseContentLossReport(report({...record,...patch})));assert.throws(()=>api.parseContentLossReport({...report(),count:0}));});
 test('older binary loss records remain valid and unknown wire versions still fail',()=>{const old=report({code:'binaryContentEmptied',subject:'binaryData',path:'BinData/image1.png',reason:'rawPassthroughUnavailable',resourceId:1});assert.deepEqual(api.parseContentLossReport(old),old);assert.throws(()=>api.parseContentLossReport({...old,schemaVersion:2}));});
 test('pinned integration drift refuses to silently skip new validation',()=>{assert.throws(()=>patchExportMetadataLoss(source.replace('fieldParameters','renamed')),/기준 불일치/);});

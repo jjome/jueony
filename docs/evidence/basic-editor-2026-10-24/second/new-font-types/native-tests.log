@@ -1,0 +1,9 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 5.59s
+     Running unittests src/lib.rs (/tmp/jueony-n001-output130-target/debug/deps/rhwp-c2eed510537935c4)
+
+running 3 tests
+test document_core::commands::formatting::user_created_font_type_tests::new_editing_font_declares_truetype_in_all_language_resources ... ok
+test document_core::commands::formatting::user_created_font_type_tests::new_language_editing_font_declares_truetype_without_retyping_other_faces ... ok
+test document_core::commands::formatting::user_created_font_type_tests::editing_font_lookup_never_retypes_imported_unknown_representative_or_hft ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 4179 filtered out; finished in 0.00s

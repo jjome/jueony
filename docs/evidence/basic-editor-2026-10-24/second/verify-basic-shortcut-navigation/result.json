@@ -1,0 +1,57 @@
+{
+  "results": [
+    "hwp: Ctrl+T deletes a reversed scalar selection, undo/redo and actual save/reopen",
+    "hwp: held Ctrl+T repeats word deletion, undo preserves each actual edit",
+    "hwp: held font-size increments apply twice without repeating a toggle and persist",
+    "hwp: Ctrl+Alt+V opens text-only paste; selection, undo and save stay connected",
+    "hwp: Shift document and paragraph boundaries preserve and reverse an existing selection without modifying bytes",
+    "hwp: F3 block selection survives unmodified document boundary navigation",
+    "hwp: Ctrl+Alt+A cycles superscript/subscript/normal, preserves other effects and saves",
+    "hwp: Alt+Shift+F/G follow current local font order with repeat, undo and save",
+    "hwpx: Ctrl+T deletes a reversed scalar selection, undo/redo and actual save/reopen",
+    "hwpx: held Ctrl+T repeats word deletion, undo preserves each actual edit",
+    "hwpx: held font-size increments apply twice without repeating a toggle and persist",
+    "hwpx: Ctrl+Alt+V opens text-only paste; selection, undo and save stay connected",
+    "hwpx: Shift document and paragraph boundaries preserve and reverse an existing selection without modifying bytes",
+    "hwpx: F3 block selection survives unmodified document boundary navigation",
+    "hwpx: Ctrl+Alt+A cycles superscript/subscript/normal, preserves other effects and saves",
+    "hwpx: Alt+Shift+F/G follow current local font order with repeat, undo and save",
+    "font-cycle shortcut honors the selected language slot without rewriting other font families",
+    "all-language font change resolves each distinct language catalog instead of reusing the Korean numeric ID",
+    "caret script cycling changes pending typing properties and applies to subsequently typed text only",
+    "unknown imported font types remain blocked with a precise error and unchanged original file",
+    "Ctrl+Shift+Home/End select the visible screen edge instead of jumping to document start/end",
+    "synthetic AltGraph and IME safeguards leave actual document, selection and dialogs unchanged"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "externalRequests": [],
+  "diagnostics": [
+    {
+      "console": "[file:save] 저장 실패: 저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 14건의 손실을 보고했습니다. 원본 글꼴 유형을 안전하게 보존할 수 없어 저장을 중단했습니다). 원본과 기존 복구본은 유지됩니다."
+    },
+    {
+      "dialog": "파일 저장에 실패했습니다:\n저장 후 문서 보존 검사에 실패했습니다 (serializer-report: 직렬화기가 14건의 손실을 보고했습니다. 원본 글꼴 유형을 안전하게 보존할 수 없어 저장을 중단했습니다). 원본과 기존 복구본은 유지됩니다."
+    }
+  ],
+  "savedFiles": [
+    "selected-word.hwp",
+    "repeated-word.hwp",
+    "repeated-format.hwp",
+    "paste-shortcut.hwp",
+    "cycle-script.hwp",
+    "cycle-font.hwp",
+    "selected-word.hwpx",
+    "repeated-word.hwpx",
+    "repeated-format.hwpx",
+    "paste-shortcut.hwpx",
+    "cycle-script.hwpx",
+    "cycle-font.hwpx",
+    "different-font-catalogs.hwpx",
+    "pending-script.hwpx"
+  ],
+  "dist": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\basic-editor-20261024\\clean\\apps\\editor\\evidence\\dist-basic-editor-20261024",
+  "enginePackage": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-c38631692287c07f\\pkg",
+  "port": 4502,
+  "limitations": "Isolated actual Edge and Rust/WASM engine, real keyboard dispatch and disk save/reopen. Synthetic AltGraph/IME guard checks are not physical Windows IME validation. Hancom direct comparison remains pending; Shift boundary selection is an app contract extension, not a separately confirmed Hancom gesture."
+}

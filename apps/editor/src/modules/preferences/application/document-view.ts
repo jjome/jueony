@@ -6,6 +6,7 @@ import {validateSessionCursor} from '../domain/session-cursor.ts';
 export function createDocumentViewFacade(options: DocumentViewAdapterOptions) {
   type Pending = { identity: string; view: DocumentViewState; interaction?: number };
   let pending: Pending | undefined, last: Pending | undefined, applying = false;
+  let applyingFinished: Promise<void> | undefined;
   const copy = (view: DocumentViewState): DocumentViewState => ({ ...view, ...(view.caret ? { caret: { ...view.caret } } : {}), ...(view.cursor ? {cursor:validateSessionCursor(view.cursor)!} : {}) });
   function discardStale() {
     const identity = options.identity();
@@ -38,6 +39,8 @@ export function createDocumentViewFacade(options: DocumentViewAdapterOptions) {
     if (applying || !viewport || !options.visible()) return 'deferred';
     if (item.interaction !== options.cursorInteraction?.()) { pending = undefined; last = undefined; capture(); return 'ignored'; }
     applying = true;
+    let finishApplying!: () => void;
+    applyingFinished = new Promise<void>(resolve => { finishApplying = resolve; });
     try {
       const interaction = item.interaction;
       if (item.view.fitMode === 'none') viewport.setZoom(item.view.zoom, { x: 0, y: 0 }, 'none');
@@ -58,13 +61,21 @@ export function createDocumentViewFacade(options: DocumentViewAdapterOptions) {
       const current = validateDocumentView({ version: 1, zoom: viewport.getZoom(), fitMode: viewport.getZoomFitMode(), scrollX: viewport.getScrollX(), scrollY: viewport.getScrollY(), caret: validateBodyCaret(options.captureCaret?.()), cursor:options.captureCursor?.() });
       last = { identity: item.identity, view: current ?? copy(item.view) };
       return 'applied';
-    } finally { applying = false; }
+    } finally { applying = false; applyingFinished = undefined; finishApplying(); }
   }
   async function restore(value: unknown): Promise<ViewRestoreResult> {
     const view = validateDocumentView(value);
     if (!view) return value === undefined ? 'ignored' : 'invalid';
-    pending = { identity: options.identity(), view, interaction: options.cursorInteraction?.() };
+    const item: Pending = { identity: options.identity(), view, interaction: options.cursorInteraction?.() };
+    pending = item;
     last = undefined;
+    // Rapid tab/workspace changes can replace a restore while its layout is
+    // settling. The newest explicit request owns a retry; a resize event is
+    // not guaranteed to happen after the previous request finishes.
+    if (applyingFinished) {
+      await applyingFinished;
+      if (pending !== item) return 'ignored';
+    }
     return retry();
   }
   return {

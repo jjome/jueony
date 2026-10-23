@@ -4,7 +4,7 @@
 
 기준일: 2026-10-15. 원본은 [CSV](jueony-work-checklist.csv), 사용 규칙은 [97번 문서](97-master-work-checklist.md), 검색 화면은 [HTML](jueony-work-checklist.html)이다.
 
-총 440행: 실행 작업 219행과 상위 범위 항목 221행. 범위가 겹치므로 전체 완성률로 나누지 않는다.
+총 442행: 실행 작업 221행과 상위 범위 항목 221행. 범위가 겹치므로 전체 완성률로 나누지 않는다.
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증은 자동 검사와 한글 직접 비교를 구분한다. 각 완료 표시는 해당 행의 제한된 완료조건에만 적용한다.
 
@@ -562,3 +562,10 @@
 | N038 P1 | **반복 작업의 표·개체 명령 확장** · 범위/상태/ID/변수·dry-run·batch·한 번 undo·저장 검사 | ☐ 미구현 | ☐ 미검증 · 자동:NOT_RUN / 한글:NA | ☐ 미연결 | 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀 · [64-section-repeat-work.md](../docs/64-section-repeat-work.md) |
 | N039 P2 | **수동 편집 동작의 매크로 기록·재생** · 지원 동작만·민감 정보·중단·재실행/내보내기 | ☐ 미구현 | ☐ 미검증 · 자동:NOT_RUN / 한글:NOT_RUN | ☐ 미연결 | 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀 · [28-continuation-implementation.md](../docs/28-continuation-implementation.md) |
 | N040 P1 | **기관별 공식 양식·공문 업무 흐름** · 초안/결재/붙임/보존·기관 사실 입력·문서 유출 방지 | ◐ 부분 | ☐ 미검증 · 자동:NOT_RUN / 한글:NOT_RUN | ☐ 미연결 | 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀 · [28-continuation-implementation.md](../docs/28-continuation-implementation.md) |
+
+## 기본 편집 — 실행 작업
+
+| ID | 작업·완료조건 | 구현 | 검증 | Agent 연결 | 다음 작업·근거 |
+| --- | --- | --- | --- | --- | --- |
+| G108 P1 | **본문 모양 복사 원자적 되돌리기** · 같은 구역 본문 선택의 글자·문단 서식 복사; 단일 undo/redo·역방향/F3 선택·실패 롤백·문서 전환·HWP/HWPX 저장 재열기 | ☑ 완료 | ◐ 부분 · 자동:PASS / 한글:NOT_RUN | — 해당 없음 | 한글 2024 직접 비교는 마지막 일괄 검수. 제한된 구현 범위 밖 특수 story/문맥은 상위 기능에서 관리. · [139-basic-editor-parallel-plan.md](../docs/139-basic-editor-parallel-plan.md) · [manifest.json](../docs/evidence/basic-editor-2026-10-24/first/manifest.json) |
+| G109 P1 | **본문·표·중첩 표 찾기와 안전한 바꾸기** · 지원 일반 본문 및 표 셀의 경로별 찾기/이전/다음/모두 바꾸기; 문서 버전·보호·IME 검증과 단일 undo/redo·저장 재열기 | ☑ 완료 | ◐ 부분 · 자동:PASS / 한글:NOT_RUN | — 해당 없음 | 한글 2024 직접 비교는 마지막 일괄 검수. 제한된 구현 범위 밖 특수 story/문맥은 상위 기능에서 관리. · [139-basic-editor-parallel-plan.md](../docs/139-basic-editor-parallel-plan.md) · [manifest.json](../docs/evidence/basic-editor-2026-10-24/first/manifest.json) |

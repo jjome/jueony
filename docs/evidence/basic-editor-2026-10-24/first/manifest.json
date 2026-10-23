@@ -1,0 +1,41 @@
+{
+  "baseline": "f765f352",
+  "engine": "Rust182",
+  "scope": "Find/replace supported body/table/nested-table; atomic body format copy. Other parallel bundles excluded from this completion claim. Native Hancom comparison deferred.",
+  "sourceFiles": {
+    "src/editor-actions/basic-find.ts": "cdcfa419c4e0ec4552a54ad81b7ee9e04c80a698cab414d4394574f8eaee8b5c",
+    "src/editor-actions/navigation-pane.ts": "97abb1a1af8ab11930485f794964eb256d581aa0b9bfc10a1ce355d9a16b8cfd",
+    "src/editor-actions/search-model.ts": "9b5a060f1aebb21e1b722cb733db1563940f0f1c9ff1fca5e280cbae3be46422",
+    "scripts/integration/basic-find-patches.mjs": "0ba321cfc095d6248a1b94191b96940eb59b0a969f96c3532e046cc6308251d1",
+    "tests/basic-find.test.ts": "8bd026a66373d36e6449ab08e7ed51b6c6d09d0767b31939a127c6850602439f",
+    "tests/basic-find-integration.test.ts": "685522a9e8fe6783bbeb3e48be60353f2969a2bde328a86f84ac85b3f9e2f8b7",
+    "scripts/verify-basic-find.mjs": "cb019892ad0a1ab95cbca01d572528436e9a79c46df8befa5a90726688673289",
+    "src/adapters/rhwp/format-copy-transaction.ts": "958d2f3caf778626b273c3959a2f1ecd0e2b979a7f243f3d2b105732d5f82c0e",
+    "scripts/integration/format-copy-transaction-patches.mjs": "effd285e1cc6038a2f55ef3f42f3aaeeac3a3bc59978daf6fb0c99a68dfa3608",
+    "scripts/verify-format-copy-atomic.mjs": "5062182845665509f495070991663e3659b1da6357287c8c9b86b62b75f9ad21"
+  },
+  "artifacts": {
+    "boundaries-result.json": "9de9d1ad261f244bf49646fc5153a83a1082af7e2b9ad2e18bf130942b254531",
+    "format-copy-before.json": "1ed4e515ddd4e3e0cd1b0af3f2e06856a9339d4292c67b3a38f3dfc76ce99fd2",
+    "typecheck-result.json": "820d07ba9f6e98f8e7180aaed07fff829b3e0aeabd2ca2afc3ed32d02f4ab291",
+    "unit-result.json": "85224efc2325d9dc543ae8f198d256f16f1bb8541b2afabad7824312b2c6d7cd",
+    "unit-summary.txt": "7c8e9b4bf798a76a6870b0e74064a6342fef2041063357e23bc51272e7c0e97e",
+    "verify-basic-find/body-all.hwp": "4f65d6862d5e703246f464c8c6e8d079408b18a1582ab9804264a456525ba290",
+    "verify-basic-find/body-all.hwpx": "dac0ec333c6ca8d298a2afffd68899a2f4c2255d8dbf3a15fdae7f643595b175",
+    "verify-basic-find/body-replace.hwp": "7a70530aab832c2bf3bd0ece3516f8430192986f015c76123a8b299ed30a2445",
+    "verify-basic-find/body-replace.hwpx": "6a2ac6f8dc65c25b1d238ab1128dc8db51d47d5c11815e1a18e5f53534147823",
+    "verify-basic-find/cells-all.hwp": "185710bdaffe09db36eeef90afd60640af20ddffd98f0c37bb1564fd05d12fad",
+    "verify-basic-find/cells-all.hwpx": "870c2d5e36974e669e6cdc95ab1af9a756d6800f6a96d231a2755229a114465e",
+    "verify-basic-find/cells-replace.hwp": "d41a1e5911e7e4412cf277f79f5406901b2eab4becd1f641cbcfe6b99909d079",
+    "verify-basic-find/cells-replace.hwpx": "430db95c64c4dcb4b024fecf16bb3731a68d853bd4ce843ab3577f6cded08a5b",
+    "verify-basic-find/mixed-format.hwpx": "b914df06d4f2702e9242dd6ad75131f87c7a6d18ae915a0602e7fafe03d154dd",
+    "verify-basic-find/nested-all.hwp": "7a81beb470200588aa3c11286813f89f3391c98a143685c072ee4a1c6c27714b",
+    "verify-basic-find/nested-all.hwpx": "2b2bb083a856fd166e667f67cc58250609cfa92f20fca8da25bd80c5c3855637",
+    "verify-basic-find/nested-replace.hwp": "b1e3b8dcc5b842c750894c24e05bfe0df05017f519aa5b99edcff3e725a76986",
+    "verify-basic-find/nested-replace.hwpx": "6eaecb72749fe9a0c0c67d1d8bbc4ed6092499c7b737731349fa1e7c6e70284f",
+    "verify-basic-find/result.json": "936b4fb13f60d32e5600934e375f49c2309ac66f1a2055971d3498945ddca6f7",
+    "verify-format-copy-atomic/format-copy.hwp": "4b6c7d8d877188eaf9407ea396618354cb202be5d7cabe2885998eeb9a96e28e",
+    "verify-format-copy-atomic/format-copy.hwpx": "2ee997dce1b33f343f95c766daa0817d1b4967c45a7fa6fa0bab411c30f8dc51",
+    "verify-format-copy-atomic/result.json": "355e1e3648e7ec9a87698ef0d10c341dd8a54406a76820ad6813657ddc83a251"
+  }
+}

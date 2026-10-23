@@ -1,0 +1,17 @@
+{
+  "results": [],
+  "failures": [
+    {
+      "ext": "hwp",
+      "message": "AssertionError [ERR_ASSERTION]: one undo restores character format\n+ actual - expected\n... Skipped lines\n\n  {\n+   bold: true,\n-   bold: false,\n    borderBottom: {\n      color: '#000000',\n      type: 0,\n      width: 0\n    },\n...\n    ],\n+   charShapeId: 8,\n-   charShapeId: 0,\n    emboss: false,\n    emphasisDot: 0,\n    engrave: false,\n    fillColor: '#ffffff',\n    fillType: 'none',\n...\n    fontFamily: '함초롬바탕',\n+   fontSize: 1400,\n-   fontSize: 1000,\n    italic: false,\n    kerning: false,\n    outlineType: 0,\n    patternColor: '#999999',\n    patternType: -1,\n",
+      "stack": "AssertionError [ERR_ASSERTION]: one undo restores character format\n+ actual - expected\n... Skipped lines\n\n  {\n+   bold: true,\n-   bold: false,\n    borderBottom: {\n      color: '#000000',\n      type: 0,\n      width: 0\n    },\n...\n    ],\n+   charShapeId: 8,\n-   charShapeId: 0,\n    emboss: false,\n    emphasisDot: 0,\n    engrave: false,\n    fillColor: '#ffffff',\n    fillType: 'none',\n...\n    fontFamily: '함초롬바탕',\n+   fontSize: 1400,\n-   fontSize: 1000,\n    italic: false,\n    kerning: false,\n    outlineType: 0,\n    patternColor: '#999999',\n    patternType: -1,\n\n    at file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-format-copy-atomic.mjs:36:65"
+    },
+    {
+      "ext": "hwpx",
+      "message": "AssertionError [ERR_ASSERTION]: one undo restores character format\n+ actual - expected\n... Skipped lines\n\n  {\n+   bold: true,\n-   bold: false,\n    borderBottom: {\n      color: '#000000',\n      type: 0,\n      width: 0\n    },\n...\n    ],\n+   charShapeId: 8,\n-   charShapeId: 0,\n    emboss: false,\n    emphasisDot: 0,\n    engrave: false,\n    fillColor: '#ffffff',\n    fillType: 'none',\n...\n    fontFamily: '함초롬바탕',\n+   fontSize: 1400,\n-   fontSize: 1000,\n    italic: false,\n    kerning: false,\n    outlineType: 0,\n    patternColor: '#000000',\n    patternType: 0,\n",
+      "stack": "AssertionError [ERR_ASSERTION]: one undo restores character format\n+ actual - expected\n... Skipped lines\n\n  {\n+   bold: true,\n-   bold: false,\n    borderBottom: {\n      color: '#000000',\n      type: 0,\n      width: 0\n    },\n...\n    ],\n+   charShapeId: 8,\n-   charShapeId: 0,\n    emboss: false,\n    emphasisDot: 0,\n    engrave: false,\n    fillColor: '#ffffff',\n    fillType: 'none',\n...\n    fontFamily: '함초롬바탕',\n+   fontSize: 1400,\n-   fontSize: 1000,\n    italic: false,\n    kerning: false,\n    outlineType: 0,\n    patternColor: '#000000',\n    patternType: 0,\n\n    at file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-format-copy-atomic.mjs:36:65"
+    }
+  ],
+  "pageErrors": [],
+  "externalRequests": []
+}

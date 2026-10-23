@@ -1,5 +1,6 @@
 import { hitPosition, nextHitIndex, searchExcerpt } from './search-model.ts';
 import type { TextHit } from './search-model.ts';
+import { navigateFindHit, readFindHits } from './basic-find.ts';
 
 /** One docked pane per editor. Search reads the open WASM document, including unsaved
  * text. Query/results are memory-only and cleared when the document is swapped. */
@@ -23,11 +24,9 @@ export function installNavigationPane(registry: any, input: () => any, eventBus:
     const hit = hits[index], pos = hit && hitPosition(hit), ih = input();
     if (!pos || !ih) return;
     try {
-      ih.flushDeferredPaginationIfNeeded('navigation-search');
-      ih.cursor.exitCellSelectionMode(); ih.cursor.clearSelection();
-      ih.cursor.moveTo(pos); ih.cursor.setAnchor(); ih.cursor.moveTo({ ...pos, charOffset: pos.charOffset + hit.length });
-      ih.updateCaret(); active = index; render();
-    } catch { clear('문서 위치가 변경되었습니다. 다시 검색해 주세요.'); }
+      navigateFindHit(ih, { ...hit, found: true, totalMatchCount: hits.length });
+      active = index; render();
+    } catch (error) { clear(error instanceof Error ? error.message : '문서 위치가 변경되었습니다. 다시 검색해 주세요.'); }
   };
   const render = () => {
     list.replaceChildren(); previous.disabled = next.disabled = hits.length === 0;
@@ -36,7 +35,7 @@ export function installNavigationPane(registry: any, input: () => any, eventBus:
     for (let i = start; i < end; i++) {
       const hit = hits[i], row = button('', () => navigate(i, captured)); row.className = 'j-search-hit'; row.dataset.hitIndex = String(i);
       row.setAttribute('aria-current', String(i === active));
-      const where = document.createElement('small'); where.textContent = `${i + 1}. 구역 ${hit.sec + 1} · ${hit.cellContext ? '표 셀' : '본문'} · 문단 ${hit.para + 1}`;
+      const where = document.createElement('small'); where.textContent = `${i + 1}. 구역 ${hit.sec + 1} · ${hit.cellContext || hit.cellPath ? '표 셀' : '본문'} · 문단 ${hit.para + 1}`;
       const excerpt = document.createElement('span');
       try { excerpt.textContent = searchExcerpt(input().wasm, hit); } catch { excerpt.textContent = searched; }
       row.append(where, excerpt); list.append(row);
@@ -53,7 +52,7 @@ export function installNavigationPane(registry: any, input: () => any, eventBus:
     try {
       const ih = input(); if (!ih) return;
       ih.flushDeferredPaginationIfNeeded('navigation-search');
-      hits = (ih.wasm.searchAllText(text, caseSensitive.checked, true) as TextHit[]).filter(hit => hitPosition(hit) !== null);
+      hits = readFindHits(ih.wasm, text, caseSensitive.checked);
       searched = text; render();
     } catch { clear('검색하지 못했습니다. 문서를 확인한 뒤 다시 시도하세요.'); }
   };

@@ -23,6 +23,9 @@ import {applySafeObjectCutPatches} from './integration/safe-object-cut-patches.m
 import {applyFontSetPreferencesPatches} from './integration/font-set-preferences-patches.mjs';
 import {applyWordBoundaryPatches} from './integration/word-boundary-patches.mjs';
 import {applyClipboardEventPatches} from './integration/clipboard-event-patches.mjs';
+import {applyCellWordDeletionPatches} from './integration/cell-word-deletion-patches.mjs';
+import {applyPasteFailurePatches} from './integration/paste-failure-patches.mjs';
+import {applyFormatDialogTargetPatches} from './integration/format-dialog-target-patches.mjs';
 import {auditRepository} from '../../../scripts/check-module-boundaries.mjs';
 import { cp, mkdir, readFile, writeFile, readdir } from 'node:fs/promises';
 import { resolve, dirname, join } from 'node:path';
@@ -112,8 +115,11 @@ await applyBasicFindPatches({root});
 await applyFormatCopyTransactionPatches({root});
 await applySafeObjectCutPatches({root});
 await applyFontSetPreferencesPatches({root});
+await applyFormatDialogTargetPatches({root});
 await applyWordBoundaryPatches({root});
 await applyClipboardEventPatches({root});
+await applyCellWordDeletionPatches({root});
+await applyPasteFailurePatches({root});
 await applyDocumentCreatedInformationPatches({root});
 await build({
   configFile: false, root, base: './', publicDir: join(root, 'public'),
@@ -168,6 +174,9 @@ const evidence = {
   fontSetPreferencesPatchSha256: sha256(await readFile(join(app,'scripts/integration/font-set-preferences-patches.mjs'))),
   wordBoundaryPatchSha256: sha256(await readFile(join(app,'scripts/integration/word-boundary-patches.mjs'))),
   clipboardEventPatchSha256: sha256(await readFile(join(app,'scripts/integration/clipboard-event-patches.mjs'))),
+  cellWordDeletionPatchSha256: sha256(await readFile(join(app,'scripts/integration/cell-word-deletion-patches.mjs'))),
+  pasteFailurePatchSha256: sha256(await readFile(join(app,'scripts/integration/paste-failure-patches.mjs'))),
+  formatDialogTargetPatchSha256: sha256(await readFile(join(app,'scripts/integration/format-dialog-target-patches.mjs'))),
   customSourceSha256: sha256(customSource.join('\n')),
   applicationSourceCommit: execFileSync('git', ['-C', app, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
   applicationSourceDirty: Boolean(execFileSync('git', ['-C', app, 'status', '--porcelain', '--', '.'], { encoding: 'utf8' }).trim()),

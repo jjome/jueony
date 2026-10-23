@@ -6,13 +6,13 @@
 
 ## 진행 요약
 
-실행 작업 **24개**, 상위 범위 **18개**. CSV의 기록을 기능별로 표시한 문서다.
+실행 작업 **25개**, 상위 범위 **18개**. CSV의 기록을 기능별로 표시한 문서다.
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 20/24 · 부분 2 · 미구현 2 | 완료 0/18 · 부분 15 · 미구현 2 · stub 1 |
-| 검증 | 완료 0/24 · 부분 20 · 미검증 4 | 완료 0/18 · 부분 4 · 미검증 14 |
-| Agent 연결 | 연결 13/16 · 부분 0 · 미연결 3 · 해당 없음 8 | 연결 0/18 · 부분 10 · 미연결 8 |
+| 구현 | 완료 21/25 · 부분 2 · 미구현 2 | 완료 0/18 · 부분 15 · 미구현 2 · stub 1 |
+| 검증 | 완료 0/25 · 부분 21 · 미검증 4 | 완료 0/18 · 부분 6 · 미검증 12 |
+| Agent 연결 | 연결 13/16 · 부분 0 · 미연결 3 · 해당 없음 9 | 연결 0/18 · 부분 10 · 미연결 8 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
@@ -56,9 +56,10 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B096](<07-formatting-and-styles.md#b096>) · 범위 | 글자 모양 | ◐ 부분 | ☐ 미검증 | ◐ 부분 |
+| [B096](<07-formatting-and-styles.md#b096>) · 범위 | 글자 모양 | ◐ 부분 | ◐ 부분 | ◐ 부분 |
 | [A029](<07-formatting-and-styles.md#a029>) · 작업 | 본문 글꼴·글자 서식 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [G113](<07-formatting-and-styles.md#g113>) · 작업 | 새 글꼴 선언과 언어별 글꼴 참조 보존 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
+| [G120](<07-formatting-and-styles.md#g120>) · 작업 | 글자·문단 대화상자의 오래된 적용 대상 거절 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-3"></a>
 
@@ -66,7 +67,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B097](<07-formatting-and-styles.md#b097>) · 범위 | 문단 모양 | ◐ 부분 | ☐ 미검증 | ◐ 부분 |
+| [B097](<07-formatting-and-styles.md#b097>) · 범위 | 문단 모양 | ◐ 부분 | ◐ 부분 | ◐ 부분 |
 | [A016](<07-formatting-and-styles.md#a016>) · 작업 | 문단 기본 테두리·배경 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [A017](<07-formatting-and-styles.md#a017>) · 작업 | 문단 사용자·자동 탭 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [A030](<07-formatting-and-styles.md#a030>) · 작업 | 본문 문단 서식 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
@@ -196,12 +197,12 @@
 <summary>B096 · 글자 모양</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ◐ 부분.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 혼합 서식·취소·입력 대기 서식 검사
+- 다음 작업: 오래된 문서/선택 대상 거절·취소·정상 서식 undo/저장 자동 검사 완료. 혼합 서식·입력 대기 서식 등 전체 범위와 한글 비교 남음.
 - UI 명령: `format:char-shape`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [manifest.json](<../evidence/basic-editor-2026-10-24/fourth/manifest.json>)
 - 원래 기록: `WIRED;NOT_RUN`
 
 </details>
@@ -210,12 +211,12 @@
 <summary>B097 · 문단 모양</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ◐ 부분.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
+- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 기본 탭 간격 단위·구역별 조판·대화상자·snapshot undo 보강. 문단 모양 전체 항목과 한글 조판 비교는 남음.
+- 다음 작업: 일반 대화상자 대상 검증·취소 및 중첩 기본 탭 변경 자동 검사 완료. 문단 모양 전체 항목·구역 조판과 한글 비교 남음.
 - UI 명령: `format:para-shape`
-- 근거: [engine-result.json](<../evidence/sections-tabs-2026-10-12/engine-result.json>) · [parity-result.json](<../evidence/sections-tabs-2026-10-12/parity-result.json>) · [hancom-baseline.json](<../evidence/sections-tabs-2026-10-12/hancom-baseline.json>)
+- 근거: [engine-result.json](<../evidence/sections-tabs-2026-10-12/engine-result.json>) · [parity-result.json](<../evidence/sections-tabs-2026-10-12/parity-result.json>) · [hancom-baseline.json](<../evidence/sections-tabs-2026-10-12/hancom-baseline.json>) · [manifest.json](<../evidence/basic-editor-2026-10-24/fourth/manifest.json>)
 - 원래 기록: `PARTIAL;NOT_RUN`
 
 </details>
@@ -766,6 +767,20 @@
 - 다음 작업: 한글 2024 직접 비교 보류. 세부 범위의 구현·자동 검사만 완료이며 상위 기능 전체 완료는 아님.
 - 상위 항목: [B096](<07-formatting-and-styles.md#b096>) 글자 모양
 - 근거: [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>) · [manifest.json](<../evidence/basic-editor-2026-10-24/second/manifest.json>)
+- 원래 기록: `SCOPED_BASIC_EDITOR_IMPLEMENTED_AUTOMATED_2026_10_24`
+
+</details>
+
+<details id="g120">
+<summary>G120 · 글자·문단 대화상자의 오래된 적용 대상 거절</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 열린 일반 글자/문단 모양 창에서 문서·버전·선택·편집기 변경 감지. 입력값/취소 유지 및 문서/history 보존. 중첩 기본 탭 간격 자체 변경 뒤 부모 문단 적용은 허용.
+- 다음 작업: 기록된 세부 구현·자동 검사만 완료. 한글 직접 비교와 상위 기능 전체 문맥 검수는 남음.
+- 상위 항목: [B096](<07-formatting-and-styles.md#b096>) 글자 모양
+- 근거: [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>) · [manifest.json](<../evidence/basic-editor-2026-10-24/fourth/manifest.json>)
 - 원래 기록: `SCOPED_BASIC_EDITOR_IMPLEMENTED_AUTOMATED_2026_10_24`
 
 </details>

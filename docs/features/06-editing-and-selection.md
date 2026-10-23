@@ -6,13 +6,13 @@
 
 ## 진행 요약
 
-실행 작업 **13개**, 상위 범위 **20개**. CSV의 기록을 기능별로 표시한 문서다.
+실행 작업 **15개**, 상위 범위 **20개**. CSV의 기록을 기능별로 표시한 문서다.
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 🟢 **13/13** · 부분 0 | 완료 0/20 · 부분 19 · 미구현 1 |
-| 검증 | 완료 0/13 · 부분 13 | 완료 0/20 · 부분 6 · 미검증 14 |
-| Agent 연결 | 연결 🟢 **4/4** · 부분 0 · 해당 없음 9 | 연결 0/20 · 부분 2 · 미연결 18 |
+| 구현 | 완료 🟢 **15/15** · 부분 0 | 완료 0/20 · 부분 19 · 미구현 1 |
+| 검증 | 완료 0/15 · 부분 15 | 완료 0/20 · 부분 7 · 미검증 13 |
+| Agent 연결 | 연결 🟢 **4/4** · 부분 0 · 해당 없음 11 | 연결 0/20 · 부분 2 · 미연결 18 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
@@ -31,14 +31,15 @@
 - [편집 · 상위 기능 점검 (1)](<#work-1>)
 - [편집 · 상위 기능 점검 (2)](<#work-2>)
 - [잘라내기](<#work-3>)
-- [모양 복사](<#work-4>)
-- [선택 내용 지우기](<#work-5>)
-- [찾기](<#work-6>)
-- [입력 · 상위 기능 점검](<#work-7>)
-- [본문 블록 확대](<#work-8>)
-- [단축키 · 상위 기능 점검](<#work-9>)
-- [Agent 명령 · 독립 실행 작업](<#work-10>)
-- [입력·선택 · 독립 실행 작업](<#work-11>)
+- [붙이기](<#work-4>)
+- [모양 복사](<#work-5>)
+- [선택 내용 지우기](<#work-6>)
+- [찾기](<#work-7>)
+- [입력 · 상위 기능 점검](<#work-8>)
+- [본문 블록 확대](<#work-9>)
+- [단축키 · 상위 기능 점검](<#work-10>)
+- [Agent 명령 · 독립 실행 작업](<#work-11>)
+- [입력·선택 · 독립 실행 작업](<#work-12>)
 
 <a id="work-1"></a>
 
@@ -49,11 +50,11 @@
 | [B023](<06-editing-and-selection.md#b023>) · 범위 | 되돌리기 | ◐ 부분 | ☐ 미검증 | ◐ 부분 |
 | [B024](<06-editing-and-selection.md#b024>) · 범위 | 다시 실행 | ◐ 부분 | ☐ 미검증 | ◐ 부분 |
 | [B026](<06-editing-and-selection.md#b026>) · 범위 | 복사 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B027](<06-editing-and-selection.md#b027>) · 범위 | 붙이기 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B028](<06-editing-and-selection.md#b028>) · 범위 | 골라 붙이기 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B031](<06-editing-and-selection.md#b031>) · 범위 | 조판 부호 삭제 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B032](<06-editing-and-selection.md#b032>) · 범위 | 전체 선택 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B034](<06-editing-and-selection.md#b034>) · 범위 | 바꾸기 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B035](<06-editing-and-selection.md#b035>) · 범위 | 다음 검색 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 
 <a id="work-2"></a>
 
@@ -61,7 +62,6 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B035](<06-editing-and-selection.md#b035>) · 범위 | 다음 검색 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B036](<06-editing-and-selection.md#b036>) · 범위 | 이동 대화상자 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B037](<06-editing-and-selection.md#b037>) · 범위 | 글자 변환·정렬 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B039](<06-editing-and-selection.md#b039>) · 범위 | 이전·다음 커서 위치 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
@@ -79,6 +79,15 @@
 
 <a id="work-4"></a>
 
+### 붙이기
+
+| ID | 항목 | 구현 | 검증 | Agent 연결 |
+| --- | --- | --- | --- | --- |
+| [B027](<06-editing-and-selection.md#b027>) · 범위 | 붙이기 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
+| [G119](<06-editing-and-selection.md#g119>) · 작업 | 서식 있는 붙이기 실패 원문 보존 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
+
+<a id="work-5"></a>
+
 ### 모양 복사
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
@@ -86,7 +95,7 @@
 | [B029](<06-editing-and-selection.md#b029>) · 범위 | 모양 복사 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [G108](<06-editing-and-selection.md#g108>) · 작업 | 본문 모양 복사 원자적 되돌리기 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
-<a id="work-5"></a>
+<a id="work-6"></a>
 
 ### 선택 내용 지우기
 
@@ -96,7 +105,7 @@
 | [A003](<06-editing-and-selection.md#a003>) · 작업 | 본문 범위 교체 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [A004](<06-editing-and-selection.md#a004>) · 작업 | 본문 범위 삭제 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 
-<a id="work-6"></a>
+<a id="work-7"></a>
 
 ### 찾기
 
@@ -105,7 +114,7 @@
 | [B033](<06-editing-and-selection.md#b033>) · 범위 | 찾기 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [G109](<06-editing-and-selection.md#g109>) · 작업 | 본문·표·중첩 표 찾기와 안전한 바꾸기 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
-<a id="work-7"></a>
+<a id="work-8"></a>
 
 ### 입력 · 상위 기능 점검
 
@@ -113,7 +122,7 @@
 | --- | --- | --- | --- | --- |
 | [B090](<06-editing-and-selection.md#b090>) · 범위 | 문자표 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 
-<a id="work-8"></a>
+<a id="work-9"></a>
 
 ### 본문 블록 확대
 
@@ -122,8 +131,9 @@
 | [B170](<06-editing-and-selection.md#b170>) · 범위 | 본문 블록 확대 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [G110](<06-editing-and-selection.md#g110>) · 작업 | 본문 경계 선택과 기본 서식 단축키 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G115](<06-editing-and-selection.md#g115>) · 작업 | Unicode 단어 삭제와 블록 선택 경계 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
+| [G118](<06-editing-and-selection.md#g118>) · 작업 | 표 셀 경계의 자동 단어 삭제 보호 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
-<a id="work-9"></a>
+<a id="work-10"></a>
 
 ### 단축키 · 상위 기능 점검
 
@@ -131,7 +141,7 @@
 | --- | --- | --- | --- | --- |
 | [B182](<06-editing-and-selection.md#b182>) · 범위 | 특수 공백·하이픈 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
-<a id="work-10"></a>
+<a id="work-11"></a>
 
 ### Agent 명령 · 독립 실행 작업
 
@@ -140,7 +150,7 @@
 | [A001](<06-editing-and-selection.md#a001>) · 작업 | 새 본문 문서 작성 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [A002](<06-editing-and-selection.md#a002>) · 작업 | 여러 본문 문단 삽입 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 
-<a id="work-11"></a>
+<a id="work-12"></a>
 
 ### 입력·선택 · 독립 실행 작업
 
@@ -214,12 +224,12 @@
 <summary>B027 · 붙이기</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: HWP/HTML/이미지 서식 비교 필요
+- 다음 작업: HTML 실패 시 원문·undo 복원 자동 검사 완료. OS clipboard·RTF·내부 JSON·그림과 특수 문맥 및 한글 비교 남음.
 - UI 명령: `edit:paste`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [manifest.json](<../evidence/basic-editor-2026-10-24/fourth/manifest.json>)
 - 원래 기록: `WIRED;NOT_RUN`
 
 </details>
@@ -613,6 +623,34 @@
 - 다음 작업: 기록된 세부 구현과 자동 검사만 완료. 한글 직접 비교와 상위 기능 전체 범위는 남음.
 - 상위 항목: [B025](<06-editing-and-selection.md#b025>) 잘라내기
 - 근거: [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>) · [manifest.json](<../evidence/basic-editor-2026-10-24/third/manifest.json>)
+- 원래 기록: `SCOPED_BASIC_EDITOR_IMPLEMENTED_AUTOMATED_2026_10_24`
+
+</details>
+
+<details id="g118">
+<summary>G118 · 표 셀 경계의 자동 단어 삭제 보호</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: Ctrl+Delete 자동 선택은 동일 일반/중첩 셀 안에서만 삭제. 상위 셀 문단까지 식별하며 같은 셀 문단 합치기·본문 구역 합치기 유지. 명시 선택의 기존 보호 경로 유지.
+- 다음 작업: 기록된 세부 구현·자동 검사만 완료. 한글 직접 비교와 상위 기능 전체 문맥 검수는 남음.
+- 상위 항목: [B170](<06-editing-and-selection.md#b170>) 본문 블록 확대
+- 근거: [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>) · [manifest.json](<../evidence/basic-editor-2026-10-24/fourth/manifest.json>)
+- 원래 기록: `SCOPED_BASIC_EDITOR_IMPLEMENTED_AUTOMATED_2026_10_24`
+
+</details>
+
+<details id="g119">
+<summary>G119 · 서식 있는 붙이기 실패 원문 보존</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 외부 HTML 붙이기의 선택 삭제와 삽입을 snapshot 한 번으로 처리. 실패·부분 삽입 예외 시 원문·선택·커서·revision·history 복원. 메뉴 붙이기 거절 안내. RTF·내부 JSON·그림·특수 story 전체 검수 제외.
+- 다음 작업: 기록된 세부 구현·자동 검사만 완료. 한글 직접 비교와 상위 기능 전체 문맥 검수는 남음.
+- 상위 항목: [B027](<06-editing-and-selection.md#b027>) 붙이기
+- 근거: [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>) · [manifest.json](<../evidence/basic-editor-2026-10-24/fourth/manifest.json>)
 - 원래 기록: `SCOPED_BASIC_EDITOR_IMPLEMENTED_AUTOMATED_2026_10_24`
 
 </details>

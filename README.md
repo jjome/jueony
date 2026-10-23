@@ -14,9 +14,9 @@
 | [AI 연결·Agent 실행](<docs/features/02-agent-and-models.md>) | — | 14/20 · 부분 2 | 9/20 · 부분 3 | 13/19 | 구현 [N024](<docs/features/02-agent-and-models.md#n024>) 브라우저 인증 링크 기반 계정 연결 |
 | [참고 자료·검색·RAG](<docs/features/03-references-and-rag.md>) | — | 5/10 · 부분 2 | 4/10 · 부분 1 | 1/6 | 구현 [N033](<docs/features/03-references-and-rag.md#n033>) 검색 순위·구본 우선 문제와 무답 판별 |
 | [반복 작업·공무원 업무 양식](<docs/features/04-macros-and-business.md>) | 0/5 | 3/6 · 부분 1 | 3/6 | 3/6 | 구현 [N038](<docs/features/04-macros-and-business.md#n038>) 반복 작업의 표·개체 명령 확장 |
-| [파일·저장·복구·형식 보존](<docs/features/05-files-storage-recovery.md>) | 0/10 | 🟢 **24/24** | 22/24 · 부분 2 | 🟢 **6/6** | 검증 [N001](<docs/features/05-files-storage-recovery.md#n001>) HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존 |
-| [본문 편집·입력·선택·찾기](<docs/features/06-editing-and-selection.md>) | 0/20 | 🟢 **13/13** | 0/13 · 부분 13 | 🟢 **4/4** | 검증 [A001](<docs/features/06-editing-and-selection.md#a001>) 새 본문 문서 작성 |
-| [글자·문단·스타일·번호](<docs/features/07-formatting-and-styles.md>) | 0/18 | 20/24 · 부분 2 | 0/24 · 부분 20 | 13/16 | 구현 [N011](<docs/features/07-formatting-and-styles.md#n011>) 스타일 가져오기·내보내기 |
+| [파일·저장·복구·형식 보존](<docs/features/05-files-storage-recovery.md>) | 0/10 | 24/25 · 부분 1 | 22/25 · 부분 3 | 🟢 **6/6** | 구현 [N046](<docs/features/05-files-storage-recovery.md#n046>) HWPX 문단 textDir의 HWP5 형식 보존 |
+| [본문 편집·입력·선택·찾기](<docs/features/06-editing-and-selection.md>) | 0/20 | 🟢 **15/15** | 0/15 · 부분 15 | 🟢 **4/4** | 검증 [A001](<docs/features/06-editing-and-selection.md#a001>) 새 본문 문서 작성 |
+| [글자·문단·스타일·번호](<docs/features/07-formatting-and-styles.md>) | 0/18 | 21/25 · 부분 2 | 0/25 · 부분 21 | 13/16 | 구현 [N011](<docs/features/07-formatting-and-styles.md#n011>) 스타일 가져오기·내보내기 |
 | [표·셀·크기·계산](<docs/features/08-tables.md>) | 0/24 | 32/38 · 부분 2 | 3/38 · 부분 31 | 26/33 · 부분 3 | 구현 [N004](<docs/features/08-tables.md#n004>) 기존 병합 원본의 후속 Agent 셀 편집 |
 | [쪽·구역·용지·배경](<docs/features/09-pages-and-sections.md>) | 0/18 | 🟢 **23/23** | 0/23 · 부분 23 | 12/17 · 부분 5 | Agent 연결 [G053](<docs/features/09-pages-and-sections.md#g053>) 수동 쪽 테두리의 적용 범위/포함 정책 |
 | [머리말·각주·필드·책갈피](<docs/features/10-headers-notes-fields.md>) | 0/11 | 🟢 **9/9** | 0/9 · 부분 9 | 🟢 **8/8** | 검증 [A018](<docs/features/10-headers-notes-fields.md#a018>) 본문 점 책갈피 추가 |
@@ -26,7 +26,7 @@
 | [보안·개인정보·검토·메모](<docs/features/14-security-and-review.md>) | 0/11 | 상위 0/11 · 부분 3 | 상위 0/11 | 상위 0/11 | 상세 작업 분해 필요 |
 | [출력·변환·교정·외부 도구](<docs/features/15-output-and-tools.md>) | 0/23 | 상위 0/23 · 부분 3 | 상위 0/23 | 상위 0/23 | 상세 작업 분해 필요 |
 | [모듈·실행 기반·배포·최종 검수](<docs/features/16-architecture-and-validation.md>) | — | 7/25 · 부분 16 | 7/25 · 부분 13 | 해당 없음 | 구현 [N041](<docs/features/16-architecture-and-validation.md#n041>) 독립 한글에서 복합 코퍼스 일괄 검수 |
-| **전체 실행 작업** | — | **178/229** | **52/229** | **88/117** | 세 축 완료 **52개** |
+| **전체 실행 작업** | — | **181/233** | **52/233** | **88/117** | 세 축 완료 **52개** |
 
 🟢 표시는 **기록된 세부 작업**이 해당 열에서 N/N인 경우에만 붙인다. 기능 전체 완료 표시는 아니다. 부분 상태는 완료 수에 포함하지 않는다. 구현·검증·Agent 연결은 각각 별도로 표시한다. ‘전체 범위 완료’는 필요한 구현·검증·Agent 연결을 모두 충족한 상위 범위 수다. 나머지 숫자는 **완료·연결 / 해당 세부 실행 작업 수**다. ‘상위’는 상세 작업이 아직 없는 영역의 상위 범위 집계다. 다른 행의 세부 작업 수와 합산하지 않는다. 전체 기능 완성률이 아니며, 한글 직접 비교와 미검증 변경은 완료에 포함하지 않는다.
 

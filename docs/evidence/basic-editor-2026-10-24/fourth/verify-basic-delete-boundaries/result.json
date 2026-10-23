@@ -1,0 +1,38 @@
+{
+  "results": [
+    "hwp: cell 0 offset 2 Delete does not edit an adjacent cell/body",
+    "hwp: cell 0 offset 0 Backspace does not edit an adjacent cell/body",
+    "hwp: cell 3 offset 4 Delete does not edit an adjacent cell/body",
+    "hwp: cell 0 offset 2 Control+Delete does not edit an adjacent cell/body",
+    "hwp: cell 3 offset 4 Control+Delete does not edit an adjacent cell/body",
+    "hwpx: cell 0 offset 2 Delete does not edit an adjacent cell/body",
+    "hwpx: cell 0 offset 0 Backspace does not edit an adjacent cell/body",
+    "hwpx: cell 3 offset 4 Delete does not edit an adjacent cell/body",
+    "hwpx: cell 0 offset 2 Control+Delete does not edit an adjacent cell/body",
+    "hwpx: cell 3 offset 4 Control+Delete does not edit an adjacent cell/body",
+    "hwp: nested table end Ctrl+Delete preserves outer cells and sibling nested table",
+    "hwpx: nested table end Ctrl+Delete preserves outer cells and sibling nested table",
+    "hwp: Ctrl+Delete still joins paragraphs inside one cell and preserves its neighbours",
+    "hwpx: Ctrl+Delete still joins paragraphs inside one cell and preserves its neighbours",
+    "hwp: plain Delete merges a simple section boundary and one undo restores both sections",
+    "hwp: plain Backspace merges a simple section boundary and one undo restores both sections",
+    "hwpx: plain Delete merges a simple section boundary and one undo restores both sections",
+    "hwpx: plain Backspace merges a simple section boundary and one undo restores both sections"
+  ],
+  "failures": [],
+  "pageErrors": [],
+  "externalRequests": [],
+  "diagnostics": [],
+  "savedFiles": [
+    "cell-paragraph-hwp.hwp",
+    "cell-paragraph-hwpx.hwpx",
+    "section-Delete.hwp",
+    "section-Backspace.hwp",
+    "section-Delete.hwpx",
+    "section-Backspace.hwpx"
+  ],
+  "dist": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\basic-editor-20261024\\clean\\apps\\editor\\evidence\\dist-basic-editor-20261024",
+  "enginePackage": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-c38631692287c07f\\pkg",
+  "port": 4502,
+  "limitations": "Isolated actual Edge and Rust/WASM, real keyboard dispatch and production safe save/reopen. Existing character-class word grouping is preserved, not a claim of complete Unicode grapheme segmentation. Direct Hancom comparison, physical Windows IME and complete nested-cell/special-story matrices remain pending."
+}

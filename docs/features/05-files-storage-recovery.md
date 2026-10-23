@@ -4,17 +4,17 @@
 
 열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.
 
-**N001 구현 마감:** 구현24/24, 자동 검사 통과. 검증22/24·부분2는 실제 한글 합본 비교와 N002가 남아 유지한다. Rust182 최종 합본: 유효 짧은 다쪽8/48·3/4열 병합24/120·다쪽 캡션/중첩36/216 완료. 합본501·unit1036·Native126·실제App29·추가75·실행묶음7 통과. 기존 보호 검사와 원본44·WIP45 유지. 한글 직접 비교는 사용자 요청으로 보류;138참조. [최종 구현·검증 근거](../138-n001-storage-current-closure.md).
+**N001의 기록된 구현 범위 마감:** 기존 24개 세부 작업의 구현과 해당 자동 검사는 통과했다. 기능 전체 완료는 아니다. 설명에만 남아 있던 명시 `textDir` 변환 제한을 N046으로 별도 등록하여 현재 구현24/25·부분1, 검증22/25·부분3으로 표시한다. N001 직접 비교, N002 후속 비교와 N046 구현·검증이 남았다. Rust182 최종 합본: 유효 짧은 다쪽8/48·3/4열 병합24/120·다쪽 캡션/중첩36/216 완료. 합본501·unit1036·Native126·실제App29·추가75·실행묶음7 통과. 기존 보호 검사와 원본44·WIP45 유지. 한글 직접 비교는 사용자 요청으로 보류;138참조. [최종 구현·검증 근거](../138-n001-storage-current-closure.md).
 
 ## 진행 요약
 
-실행 작업 **24개**, 상위 범위 **10개**. CSV의 기록을 기능별로 표시한 문서다.
+실행 작업 **25개**, 상위 범위 **10개**. CSV의 기록을 기능별로 표시한 문서다.
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 🟢 **24/24** · 부분 0 | 완료 0/10 · 부분 10 |
-| 검증 | 완료 22/24 · 부분 2 | 완료 0/10 · 부분 10 |
-| Agent 연결 | 연결 🟢 **6/6** · 부분 0 · 해당 없음 18 | 연결 0/10 · 부분 5 · 미연결 5 |
+| 구현 | 완료 24/25 · 부분 1 | 완료 0/10 · 부분 10 |
+| 검증 | 완료 22/25 · 부분 3 | 완료 0/10 · 부분 10 |
+| Agent 연결 | 연결 🟢 **6/6** · 부분 0 · 해당 없음 19 | 연결 0/10 · 부분 5 · 미연결 5 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
@@ -22,6 +22,7 @@
 
 ## 먼저 할 일
 
+- **구현** [N046](<05-files-storage-recovery.md#n046>) **HWPX 문단 textDir의 HWP5 형식 보존** — 공식 명세/통제 저장쌍으로 HWP5 표현을 확인하고 지원 가능한 변환 구현·양 형식 왕복·실제 한글 비교. 보호 검사는 유지한다.
 - **검증** [N001](<05-files-storage-recovery.md#n001>) **HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존** — Rust182 최종 합본: 유효 짧은 다쪽8/48·3/4열 병합24/120·다쪽 캡션/중첩36/216 완료. 합본501·unit1036·Native126·실제App29·추가75·실행묶음7 통과. 기존 보호 검사와 원본44·WIP45 유지. 한글 직접 비교는 사용자 요청으로 보류;138참조. 남은 검수는 실제 한글 합본 비교이며 N002와 분리한다. 기준 구현 커밋 f2e19c5b, 커밋 아카이브 증거140개 해시 일치.
 - **검증** [N002](<05-files-storage-recovery.md#n002>) **공개 형식 변환의 필드 보존 차이 4건** — 107패치 합본에서 표준 날짜·정확 OLE summary 정보까지 보존 읽기/양형식 왕복·손상 거절 추가. 명시 textDir HWP5 매핑과 최초 조판 차이는 별도 잔여이며 손실 변환 차단 유지.117참조; 한글 직접 비교 보류.
 
@@ -72,6 +73,7 @@
 | [B011](<05-files-storage-recovery.md#b011>) · 범위 | 다른 이름 저장 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [G094](<05-files-storage-recovery.md#g094>) · 작업 | 다른 형식 저장 뒤 출력 형식 유지·취소·재저장 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 | [G103](<05-files-storage-recovery.md#g103>) · 작업 | 다운로드 최종 승인·출력 형식·원본 연결 수명 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
+| [N046](<05-files-storage-recovery.md#n046>) · 작업 | HWPX 문단 textDir의 HWP5 형식 보존 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-4"></a>
 
@@ -612,6 +614,20 @@
 - 상위 항목: [B022](<05-files-storage-recovery.md#b022>) 프로그램 종료
 - 근거: [109-file-preservation-hancom-followup.md](<../109-file-preservation-hancom-followup.md>) · [actual-validation.json](<../evidence/file-completion-2026-10-17/native/actual-picker/actual-validation.json>) · [native-picker-result.json](<../evidence/file-completion-2026-10-17/native/native-picker-result.json>)
 - 원래 기록: `SCOPED_IMPLEMENTED;REAL_WINDOWS_GUI_SAVE_EXIT_RESTART_VERIFIED_2026_10_17`
+
+</details>
+
+<details id="n046">
+<summary>N046 · HWPX 문단 textDir의 HWP5 형식 보존</summary>
+
+- 종류: 실행 작업 · 우선순위: P0.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
+- 완료 범위: HWPX 명시 문단 글 방향은 XML로 보존하고 HWP5 매핑 미확인 시 쓰기를 차단한다. 실제 binary 매핑 또는 표현 불가 범위 확정과 왕복 검증은 남았다. 기존 N002의 완료된 4개 필드 차이 수정과 별도 범위다.
+- 다음 작업: 공식 명세/통제 저장쌍으로 HWP5 표현을 확인하고 지원 가능한 변환 구현·양 형식 왕복·실제 한글 비교. 보호 검사는 유지한다.
+- 상위 항목: [B011](<05-files-storage-recovery.md#b011>) 다른 이름 저장
+- 근거: [116-reflowed-native-storage.md](<../116-reflowed-native-storage.md>) · [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>) · [verify-font-fallback-storage-engine.json](<../evidence/basic-editor-2026-10-24/second/existing-conversion-limitation/verify-font-fallback-storage-engine.json>) · [font-fallback-baseline182.json](<../evidence/basic-editor-2026-10-24/second/existing-conversion-limitation/font-fallback-baseline182.json>)
+- 원래 기록: `PREEXISTING_UNRESOLVED_DIRECTION_MAPPING_EXPLICITLY_COUNTED_2026_10_24`
 
 </details>
 

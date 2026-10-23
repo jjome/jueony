@@ -1,0 +1,38 @@
+{
+  "results": [],
+  "failures": [
+    {
+      "name": "Ctrl+Delete uses scalar offsets after an astral symbol",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   'ail'\n-   'tail'\n  ]\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   'ail'\n-   'tail'\n  ]\n\n    at file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-word-boundaries.mjs:115:12\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-word-boundaries.mjs:101:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-word-boundaries.mjs:113:3"
+    },
+    {
+      "name": "Ctrl+Backspace uses scalar offsets after an astral prefix",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   '😀alpha'\n-   '😀'\n  ]\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   '😀alpha'\n-   '😀'\n  ]\n\n    at file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-word-boundaries.mjs:119:12\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-word-boundaries.mjs:101:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-word-boundaries.mjs:117:3"
+    },
+    {
+      "name": "Ctrl+Delete reads a whole long word beyond the old 50-scalar window",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa tail'\n-   'tail'\n  ]\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa tail'\n-   'tail'\n  ]\n\n    at file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-word-boundaries.mjs:123:12\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-word-boundaries.mjs:101:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-word-boundaries.mjs:121:3"
+    },
+    {
+      "name": "Ctrl+Backspace reads a whole long word beyond the old 50-scalar window",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   'head 가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가'\n-   'head '\n  ]\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n+   'head 가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가가'\n-   'head '\n  ]\n\n    at file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-word-boundaries.mjs:127:12\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-word-boundaries.mjs:101:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-word-boundaries.mjs:125:3"
+    },
+    {
+      "name": "F3 line-edge navigation preserves its existing anchor",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ undefined\n- {\n-   charOffset: 4,\n-   paragraphIndex: 0,\n-   sectionIndex: 0\n- }\n",
+      "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ undefined\n- {\n-   charOffset: 4,\n-   paragraphIndex: 0,\n-   sectionIndex: 0\n- }\n\n    at file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-word-boundaries.mjs:132:12\n    at async scenario (file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-word-boundaries.mjs:101:9)\n    at async file:///C:/Users/jjome/Documents/work/jueony/build/basic-editor-20261024/clean/apps/editor/scripts/verify-basic-word-boundaries.mjs:129:3"
+    }
+  ],
+  "pageErrors": [],
+  "externalRequests": [],
+  "diagnostics": [],
+  "savedFiles": [],
+  "dist": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\basic-editor-20261024\\clean\\apps\\editor\\evidence\\dist-basic-editor-20261024",
+  "enginePackage": "C:\\Users\\jjome\\Documents\\work\\jueony\\build\\rhwp-engine\\source-c38631692287c07f\\pkg",
+  "port": 4502,
+  "limitations": "Isolated actual Edge and Rust/WASM engine, real keyboard dispatch and disk save/reopen. Synthetic AltGraph/IME guard checks are not physical Windows IME validation. Hancom direct comparison remains pending; Shift boundary selection is an app contract extension, not a separately confirmed Hancom gesture."
+}

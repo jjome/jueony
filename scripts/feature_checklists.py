@@ -177,17 +177,12 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
         number = f"{done}/{total}"
         if not total or done != total:
             return number
-        # Markdown renderers can strip inline styles. A local SVG keeps the
-        # number green offline, with an accessible text fallback and no HTML.
-        path = docs / "progress-badges" / f"complete-{done}-of-{total}.svg"
-        width = 14 + len(number) * 8
-        outputs[path] = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="20" viewBox="0 0 {width} 20" role="img" aria-label="{number}">'
-                         f'<title>{number}</title><rect x="0.5" y="0.5" width="{width-1}" height="19" rx="4" fill="#e7f6ec" stroke="#9bc9ab"/>'
-                         f'<text x="{width / 2:g}" y="14.5" text-anchor="middle" fill="#17633b" font-family="Arial, sans-serif" font-size="13" font-weight="700">{number}</text></svg>\n')
-        return "!" + local_link(number, path, current)
+        # Keep every table cell inline. Some Markdown viewers give image badges
+        # their own block layout, shifting the numeric columns and row height.
+        return f"🟢 **{number}**"
 
     def dashboard(current):
-        lines = ["| 기능 | 전체 범위 완료 | 세부 구현 | 세부 검증 | Agent 연결 | 현재 상황 · 다음 작업 |",
+        lines = ["| 기능 | 전체 범위 완료 | 세부 구현 | 세부 검증 | Agent 연결 | 다음 작업 |",
                  "| :--- | :---: | :---: | :---: | :---: | :--- |"]
         for group in groups:
             items = grouped[group["key"]]
@@ -201,8 +196,6 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
                 return ("상위 " if not tasks else "") + progress_count(states[done], total, current) + (f" · 부분 {states['PARTIAL']}" if states["PARTIAL"] else "")
             pending = priority_tasks(items, complete)[:1]
             next_work = (f"{next_axis(pending[0])} " + task_link(pending[0], current) + " " + escaped(pending[0]["task"])) if pending else "상세 작업 분해 필요" if not tasks else "기록된 작업 완료"
-            if group.get("update"):
-                next_work = escaped(group["update"]) + " · " + next_work
             if group.get("working"):
                 next_work = "**통합 검증 중** · " + next_work
             rollups = [r for r in items if r["kind"] != "TASK"]
@@ -214,7 +207,7 @@ def feature_outputs(rows, root, labels, kind_names, complete, counts):
                   f"**{counts['verification'].get('DONE', 0)}/{counts['taskRows']}** | "
                   f"**{counts['agent'].get('CONNECTED', 0)}/{counts['taskRows'] - counts['agent'].get('NA', 0)}** | "
                   f"세 축 완료 **{counts['completedTaskRows']}개** |", "",
-                  "초록색 숫자는 **기록된 세부 작업**이 해당 열에서 N/N인 경우만 표시한다. 기능 전체 완료 표시는 아니다. 부분 상태는 완료 수에 포함하지 않는다. 구현·검증·Agent 연결은 각각 별도로 표시한다. ‘전체 범위 완료’는 필요한 구현·검증·Agent 연결을 모두 충족한 상위 범위 수다. 나머지 숫자는 **완료·연결 / 해당 세부 실행 작업 수**다. ‘상위’는 상세 작업이 아직 없는 영역의 상위 범위 집계다. "
+                  "🟢 표시는 **기록된 세부 작업**이 해당 열에서 N/N인 경우에만 붙인다. 기능 전체 완료 표시는 아니다. 부분 상태는 완료 수에 포함하지 않는다. 구현·검증·Agent 연결은 각각 별도로 표시한다. ‘전체 범위 완료’는 필요한 구현·검증·Agent 연결을 모두 충족한 상위 범위 수다. 나머지 숫자는 **완료·연결 / 해당 세부 실행 작업 수**다. ‘상위’는 상세 작업이 아직 없는 영역의 상위 범위 집계다. "
                   "다른 행의 세부 작업 수와 합산하지 않는다. 전체 기능 완성률이 아니며, 한글 직접 비교와 미검증 변경은 완료에 포함하지 않는다.", ""]
         return lines
 

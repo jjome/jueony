@@ -47,14 +47,14 @@ export function navigateBody(input: any, edge: unknown, extend: unknown = false)
 }
 
 /** Ctrl+T has the same selection semantics as the engine's Ctrl+Delete. */
-export function deleteBodyByShortcut(input: any, mode: 'line' | 'end' | 'word'): void {
+export function deleteBodyByShortcut(input: any, mode: 'line' | 'end' | 'word' | 'previous-word'): void {
   input.flushDeferredPaginationIfNeeded('hangul-shortcut');
   const cursor = input.cursor;
-  if (mode !== 'word' || !cursor.hasSelection()) {
+  if (mode !== 'word' && mode !== 'previous-word' || !cursor.hasSelection()) {
     cursor.clearSelection();
     if (mode === 'line') cursor.moveToLineStart();
     cursor.setAnchor();
-    if (mode === 'word') cursor.moveToWordBoundary(1); else cursor.moveToLineEnd();
+    if (mode === 'word' || mode === 'previous-word') cursor.moveToWordBoundary(mode === 'word' ? 1 : -1); else cursor.moveToLineEnd();
     if (mode === 'line') {
       const position = cursor.getPosition();
       if (position.charOffset === input.wasm.getParagraphLength(position.sectionIndex, position.paragraphIndex)) cursor.moveHorizontal(1);

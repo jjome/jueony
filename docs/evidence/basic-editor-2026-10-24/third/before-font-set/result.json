@@ -1,0 +1,28 @@
+{
+  "results": [
+    {
+      "case": "empty font set name",
+      "dialogRetained": false
+    },
+    {
+      "case": "quota save failure",
+      "inlineError": null,
+      "dialogRetained": true
+    },
+    {
+      "case": "stored non-bundled family edit",
+      "values": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ]
+    }
+  ],
+  "errors": [
+    "zt: PreferenceStorageError: 환경 설정을 저장하지 못했습니다. 저장 공간과 권한을 확인한 뒤 다시 시도해 주세요."
+  ]
+}

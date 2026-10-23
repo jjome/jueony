@@ -6,7 +6,7 @@ import { defaultStyleNames } from './style-slots.ts';
 export type Scope = 'document' | 'table' | 'cells' | 'object';
 export type Binding = { keys: string; command: string; label: string; scope: Scope; params?: Record<string, unknown>; nativeClipboard?: boolean; repeatable?: boolean };
 const repeatableCommands = new Set([
-  'ext:jueony-navigate', 'ext:jueony-delete-word', 'ext:jueony-delete-line', 'ext:jueony-delete-line-end',
+  'ext:jueony-navigate', 'ext:jueony-delete-word', 'ext:jueony-delete-previous-word', 'ext:jueony-delete-line', 'ext:jueony-delete-line-end',
   'format:font-size-increase', 'format:font-size-decrease', 'format:char-spacing-increase', 'format:char-spacing-decrease',
   'format:char-ratio-increase', 'format:char-ratio-decrease', 'format:line-spacing-increase', 'format:line-spacing-decrease',
   'ext:jueony-cycle-font',
@@ -32,6 +32,7 @@ export const hangulBindings: Binding[] = [
   binding('Ctrl+Z', 'edit:undo', '되돌리기'), binding('Ctrl+Shift+Z', 'edit:redo', '다시 실행'),
   binding('Ctrl+Y', 'ext:jueony-delete-line', '한 줄 지우기'), binding('Alt+Y', 'ext:jueony-delete-line-end', '줄 뒤 지우기'),
   binding('Ctrl+T', 'ext:jueony-delete-word', '한 단어 지우기'),
+  binding('Ctrl+Backspace', 'ext:jueony-delete-previous-word', '앞 단어 지우기'),
   binding('Ctrl+A', 'edit:select-all', '모두 선택'), binding('Ctrl+E', 'edit:delete', '지우기'),
   binding('Alt+C', 'edit:format-copy', '모양 복사'),
   binding('Ctrl+Alt+V', 'edit:paste-special', '골라 붙이기 (텍스트만)'),

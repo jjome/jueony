@@ -6,13 +6,13 @@
 
 ## 진행 요약
 
-실행 작업 **20개**, 상위 범위 **33개**. CSV의 기록을 기능별로 표시한 문서다.
+실행 작업 **21개**, 상위 범위 **33개**. CSV의 기록을 기능별로 표시한 문서다.
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 15/20 · 부분 1 · 미구현 1 · 재점검 3 | 완료 4/33 · 부분 3 · 재점검 26 |
-| 검증 | 완료 0/20 · 부분 16 · 미검증 4 | 완료 0/33 · 부분 33 |
-| Agent 연결 | 연결 ![1/1](<../progress-badges/complete-1-of-1.svg>) · 부분 0 · 해당 없음 19 | 해당 없음 33 |
+| 구현 | 완료 16/21 · 부분 1 · 미구현 1 · 재점검 3 | 완료 4/33 · 부분 6 · 재점검 23 |
+| 검증 | 완료 0/21 · 부분 17 · 미검증 4 | 완료 0/33 · 부분 33 |
+| Agent 연결 | 연결 🟢 **1/1** · 부분 0 · 해당 없음 20 | 해당 없음 33 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
@@ -32,12 +32,13 @@
 - [상태 저장 · 상위 기능 점검 (2)](<#work-2>)
 - [상태 저장 · 상위 기능 점검 (3)](<#work-3>)
 - [상태 저장 · 상위 기능 점검 (4)](<#work-4>)
-- [최근 글꼴 표시 여부/개수](<#work-5>)
-- [스타일 작업 창 열림](<#work-6>)
-- [본문/표/개체 선택과 모드](<#work-7>)
-- [일반 undo/redo](<#work-8>)
-- [상태 저장 · 독립 실행 작업 (1)](<#work-9>)
-- [상태 저장 · 독립 실행 작업 (2)](<#work-10>)
+- [사용자 대표 글꼴 세트](<#work-5>)
+- [최근 글꼴 표시 여부/개수](<#work-6>)
+- [스타일 작업 창 열림](<#work-7>)
+- [본문/표/개체 선택과 모드](<#work-8>)
+- [일반 undo/redo](<#work-9>)
+- [상태 저장 · 독립 실행 작업 (1)](<#work-10>)
+- [상태 저장 · 독립 실행 작업 (2)](<#work-11>)
 
 <a id="work-1"></a>
 
@@ -50,9 +51,9 @@
 | [S003](<13-state-and-preferences.md#s003>) · 범위 | 표/개체/필드/자산 | ? 재점검 | ◐ 부분 | — 해당 없음 |
 | [S004](<13-state-and-preferences.md#s004>) · 범위 | 문서 속성/보호/양식 | ? 재점검 | ◐ 부분 | — 해당 없음 |
 | [S005](<13-state-and-preferences.md#s005>) · 범위 | 새 문서 편집용지/스타일/개요 기본값 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [S006](<13-state-and-preferences.md#s006>) · 범위 | 사용자 대표 글꼴 세트 | ? 재점검 | ◐ 부분 | — 해당 없음 |
 | [S008](<13-state-and-preferences.md#s008>) · 범위 | IME/자동교정/사전 | ? 재점검 | ◐ 부분 | — 해당 없음 |
 | [S009](<13-state-and-preferences.md#s009>) · 범위 | 테마/스킨 | ? 재점검 | ◐ 부분 | — 해당 없음 |
+| [S010](<13-state-and-preferences.md#s010>) · 범위 | 기본/서식 도구 상자 | ? 재점검 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-2"></a>
 
@@ -60,7 +61,6 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [S010](<13-state-and-preferences.md#s010>) · 범위 | 기본/서식 도구 상자 | ? 재점검 | ◐ 부분 | — 해당 없음 |
 | [S012](<13-state-and-preferences.md#s012>) · 범위 | 문단/조판 부호/짤림 보기 | ? 재점검 | ◐ 부분 | — 해당 없음 |
 | [S013](<13-state-and-preferences.md#s013>) · 범위 | 격자/안내선/보기색 | ? 재점검 | ◐ 부분 | — 해당 없음 |
 | [S014](<13-state-and-preferences.md#s014>) · 범위 | 쪽/폭 맞춤 모드 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
@@ -68,6 +68,7 @@
 | [S016](<13-state-and-preferences.md#s016>) · 범위 | 쪽 배열/이동 방향 | ? 재점검 | ◐ 부분 | — 해당 없음 |
 | [S017](<13-state-and-preferences.md#s017>) · 범위 | 커서/현재 쪽/스크롤 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 | [S019](<13-state-and-preferences.md#s019>) · 범위 | 사용자 단축키 프로필 | ? 재점검 | ◐ 부분 | — 해당 없음 |
+| [S020](<13-state-and-preferences.md#s020>) · 범위 | 그림 비율 유지/PDF 안내 | ? 재점검 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-3"></a>
 
@@ -75,7 +76,6 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [S020](<13-state-and-preferences.md#s020>) · 범위 | 그림 비율 유지/PDF 안내 | ? 재점검 | ◐ 부분 | — 해당 없음 |
 | [S021](<13-state-and-preferences.md#s021>) · 범위 | 대화상자 나머지 탭/값/단위 | ? 재점검 | ◐ 부분 | — 해당 없음 |
 | [S022](<13-state-and-preferences.md#s022>) · 범위 | 최근 문서/폴더/형식 | ? 재점검 | ◐ 부분 | — 해당 없음 |
 | [S023](<13-state-and-preferences.md#s023>) · 범위 | 열린 탭 순서/활성 문서 | ? 재점검 | ◐ 부분 | — 해당 없음 |
@@ -83,6 +83,7 @@
 | [S025](<13-state-and-preferences.md#s025>) · 범위 | 업무 패널 분할 크기 | ? 재점검 | ◐ 부분 | — 해당 없음 |
 | [S026](<13-state-and-preferences.md#s026>) · 범위 | 복구 enabled/interval/idle 설정 | ? 재점검 | ◐ 부분 | — 해당 없음 |
 | [S027](<13-state-and-preferences.md#s027>) · 범위 | 복구 bytes/dirty/updatedAt | ? 재점검 | ◐ 부분 | — 해당 없음 |
+| [S028](<13-state-and-preferences.md#s028>) · 범위 | 원본 handle/hash/revision | ? 재점검 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-4"></a>
 
@@ -90,7 +91,6 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [S028](<13-state-and-preferences.md#s028>) · 범위 | 원본 handle/hash/revision | ? 재점검 | ◐ 부분 | — 해당 없음 |
 | [S030](<13-state-and-preferences.md#s030>) · 범위 | AI 요청 receipt | ? 재점검 | ◐ 부분 | — 해당 없음 |
 | [S031](<13-state-and-preferences.md#s031>) · 범위 | 인쇄/PDF 옵션/장치 | ? 재점검 | ◐ 부분 | — 해당 없음 |
 | [S032](<13-state-and-preferences.md#s032>) · 범위 | workspace/chat/folders/models/runs/macros/agent options | ☑ 완료 | ◐ 부분 | — 해당 없음 |
@@ -98,23 +98,32 @@
 
 <a id="work-5"></a>
 
+### 사용자 대표 글꼴 세트
+
+| ID | 항목 | 구현 | 검증 | Agent 연결 |
+| --- | --- | --- | --- | --- |
+| [S006](<13-state-and-preferences.md#s006>) · 범위 | 사용자 대표 글꼴 세트 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [G116](<13-state-and-preferences.md#g116>) · 작업 | 대표 글꼴 설정 실패·동시 변경 보존 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
+
+<a id="work-6"></a>
+
 ### 최근 글꼴 표시 여부/개수
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [S007](<13-state-and-preferences.md#s007>) · 범위 | 최근 글꼴 표시 여부/개수 | ? 재점검 | ◐ 부분 | — 해당 없음 |
+| [S007](<13-state-and-preferences.md#s007>) · 범위 | 최근 글꼴 표시 여부/개수 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 | [G112](<13-state-and-preferences.md#g112>) · 작업 | 최근 글꼴 목록과 표시 옵션 저장 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
-<a id="work-6"></a>
+<a id="work-7"></a>
 
 ### 스타일 작업 창 열림
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [S011](<13-state-and-preferences.md#s011>) · 범위 | 스타일 작업 창 열림 | ? 재점검 | ◐ 부분 | — 해당 없음 |
+| [S011](<13-state-and-preferences.md#s011>) · 범위 | 스타일 작업 창 열림 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 | [G111](<13-state-and-preferences.md#g111>) · 작업 | 리본·스타일 창 환경과 중첩 보기 복원 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
-<a id="work-7"></a>
+<a id="work-8"></a>
 
 ### 본문/표/개체 선택과 모드
 
@@ -127,7 +136,7 @@
 | [G091](<13-state-and-preferences.md#g091>) · 작업 | Rectangle 글상자 커서·선택·미저장 재시작 복원 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G099](<13-state-and-preferences.md#g099>) · 작업 | 머리말·본문 각주의 소유·서식 지문과 재시작 복원 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
-<a id="work-8"></a>
+<a id="work-9"></a>
 
 ### 일반 undo/redo
 
@@ -136,7 +145,7 @@
 | [S029](<13-state-and-preferences.md#s029>) · 범위 | 일반 undo/redo | ? 재점검 | ◐ 부분 | — 해당 없음 |
 | [N018](<13-state-and-preferences.md#n018>) · 작업 | undo/redo 이력의 재실행 지속 정책 | ? 재점검 | ☐ 미검증 | — 해당 없음 |
 
-<a id="work-9"></a>
+<a id="work-10"></a>
 
 ### 상태 저장 · 독립 실행 작업 (1)
 
@@ -151,7 +160,7 @@
 | [G031](<13-state-and-preferences.md#g031>) · 작업 | 머리말/꼬리말 선택·본문 복귀 위치 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G032](<13-state-and-preferences.md#g032>) · 작업 | 본문 각주 선택 복원 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
-<a id="work-10"></a>
+<a id="work-11"></a>
 
 ### 상태 저장 · 독립 실행 작업 (2)
 
@@ -235,11 +244,11 @@
 <summary>S006 · 사용자 대표 글꼴 세트</summary>
 
 - 종류: 상태 수명 상위 항목 · 우선순위: P1.
-- 상태: 구현 ? 재점검 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 저장 범위: user profile; 소유: UserSettingsService; 한글과 같은 기본값/저장·복원/초기화 정책까지 확인.
-- 다음 작업: REF-OPTIONS;S-001;S-002
-- 근거: [editor-state-contract.csv](<../editor-state-contract.csv>) · [44-editor-stages-result.md](<../44-editor-stages-result.md>)
+- 다음 작업: 대표 글꼴 설정의 오류·재시도·충돌·재시작 및 문서 적용 자동 검사 완료. 한글 기본값·전체 수명 비교 남음.
+- 근거: [editor-state-contract.csv](<../editor-state-contract.csv>) · [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>)
 - 원래 기록: `S06;STATIC_AUDIT;BLOCKED_REFERENCE`
 
 </details>
@@ -248,11 +257,11 @@
 <summary>S007 · 최근 글꼴 표시 여부/개수</summary>
 
 - 종류: 상태 수명 상위 항목 · 우선순위: P1.
-- 상태: 구현 ? 재점검 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 저장 범위: user profile; 소유: UserSettingsService; 한글과 같은 기본값/저장·복원/초기화 정책까지 확인.
-- 다음 작업: 실제 최근 사용 목록 저장은 별도 조사
-- 근거: [editor-state-contract.csv](<../editor-state-contract.csv>) · [44-editor-stages-result.md](<../44-editor-stages-result.md>)
+- 다음 작업: 최근 사용 글꼴 목록·표시 개수·교차 문서·재시작·실패 보존 자동 검사 완료. 한글 기본값과 전체 문맥 비교 남음.
+- 근거: [editor-state-contract.csv](<../editor-state-contract.csv>) · [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>)
 - 원래 기록: `S06;STATIC_AUDIT;BLOCKED_REFERENCE`
 
 </details>
@@ -300,11 +309,11 @@
 <summary>S011 · 스타일 작업 창 열림</summary>
 
 - 종류: 상태 수명 상위 항목 · 우선순위: P1.
-- 상태: 구현 ? 재점검 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 저장 범위: user profile 가정;기준 관찰 필요; 소유: chrome-2024; 한글과 같은 기본값/저장·복원/초기화 정책까지 확인.
-- 다음 작업: 다른 열린 탭 즉시 동기화 미연결
-- 근거: [editor-state-contract.csv](<../editor-state-contract.csv>) · [44-editor-stages-result.md](<../44-editor-stages-result.md>)
+- 다음 작업: 패널·리본·교차 탭 동기화·설정 교환 자동 검사 완료. 한글 전체 작업 창 수명 비교 남음.
+- 근거: [editor-state-contract.csv](<../editor-state-contract.csv>) · [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>)
 - 원래 기록: `S08;STATIC_AUDIT;BLOCKED_REFERENCE`
 
 </details>
@@ -860,6 +869,20 @@
 - 다음 작업: 한글 2024 직접 비교 보류. 세부 범위의 구현·자동 검사만 완료이며 상위 기능 전체 완료는 아님.
 - 상위 항목: [S007](<13-state-and-preferences.md#s007>) 최근 글꼴 표시 여부/개수
 - 근거: [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>) · [manifest.json](<../evidence/basic-editor-2026-10-24/second/manifest.json>)
+- 원래 기록: `SCOPED_BASIC_EDITOR_IMPLEMENTED_AUTOMATED_2026_10_24`
+
+</details>
+
+<details id="g116">
+<summary>G116 · 대표 글꼴 설정 실패·동시 변경 보존</summary>
+
+- 종류: 실행 작업 · 우선순위: P1.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 7개 언어 글꼴 세트의 입력 검사·quota 실패·재시도·이름 충돌·오래된 선택·교차 창 변경 및 HWP/HWPX 적용·되돌리기·저장 재열기
+- 다음 작업: 기록된 세부 구현과 자동 검사만 완료. 한글 직접 비교와 상위 기능 전체 범위는 남음.
+- 상위 항목: [S006](<13-state-and-preferences.md#s006>) 사용자 대표 글꼴 세트
+- 근거: [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>) · [manifest.json](<../evidence/basic-editor-2026-10-24/third/manifest.json>)
 - 원래 기록: `SCOPED_BASIC_EDITOR_IMPLEMENTED_AUTOMATED_2026_10_24`
 
 </details>

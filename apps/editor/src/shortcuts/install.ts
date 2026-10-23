@@ -66,9 +66,9 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
     ih.applyStyle(styleId);
   }, true);
   register('ext:jueony-color', '글자색', (_s, p) => { if (!/^#[\da-f]{6}$/i.test(p?.textColor ?? '')) throw new Error('글자색 형식 오류'); eventBus.emit('format-char', { textColor: p.textColor }); });
-  for (const [id, label, mode] of [['ext:jueony-delete-line', '한 줄 지우기', 'line'], ['ext:jueony-delete-line-end', '줄 뒤 지우기', 'end'], ['ext:jueony-delete-word', '한 단어 지우기', 'word']]) {
+  for (const [id, label, mode] of [['ext:jueony-delete-line', '한 줄 지우기', 'line'], ['ext:jueony-delete-line-end', '줄 뒤 지우기', 'end'], ['ext:jueony-delete-word', '한 단어 지우기', 'word'], ['ext:jueony-delete-previous-word', '앞 단어 지우기', 'previous-word']]) {
     register(id, label, () => {
-      deleteBodyByShortcut(input(), mode as 'line' | 'end' | 'word');
+      deleteBodyByShortcut(input(), mode as 'line' | 'end' | 'word' | 'previous-word');
     }, true);
   }
   registry.register({ id: 'ext:jueony-navigate', label: '한글 커서 이동',

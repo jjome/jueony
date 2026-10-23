@@ -33,3 +33,6 @@ export { EDITOR_CHROME_KEY, LEGACY_STYLE_PANEL_KEY, readEditorChromePreferences,
 export type { RecentFonts } from '../domain/recent-fonts.ts';
 export { RECENT_FONT_LIMIT, recentFontName, validateRecentFonts, visibleRecentFonts, prependRecentFont } from '../domain/recent-fonts.ts';
 export { RECENT_FONTS_KEY, readRecentFonts, rememberRecentFont } from '../application/recent-fonts.ts';
+export type { FontSetDefinition, FontSetChange } from '../domain/font-sets.ts';
+export { FONT_SET_LANGUAGES, validateFontSet, validateFontSetLibrary, prepareFontSetChange } from '../domain/font-sets.ts';
+export { commitFontSetChange } from '../application/font-sets.ts';

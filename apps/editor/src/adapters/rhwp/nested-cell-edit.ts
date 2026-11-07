@@ -1,4 +1,5 @@
 import type {ControlOp,Snapshot} from '../../modules/document/public/types.ts';
+import {validateControlOperations} from '../../modules/document/public/engine-integration.ts';
 import {capturePreservationEvidence} from './preservation.ts';
 import {resourceFingerprint} from './cell-paragraph.ts';
 import {inspectNestedTables} from './nested-tables.ts';
@@ -36,6 +37,7 @@ function evidence(doc:any,listId:number) {
 
 /** Runs inside the regular scratch preflight and the editor's one undoable transaction. */
 export function executeNestedCellEdit(doc:any,base:Snapshot,op:CellEdit) {
+  validateControlOperations([op],base);
   const inspect=()=>inspectNestedTables(doc,parsed(doc.getControls()),parsed(doc.getCursorModel()).lists);
   const before=inspect(),table=before.tables.find(t=>t.id===op.target);
   const source=base.structure?.nestedTables?.find(t=>t.id===op.target);

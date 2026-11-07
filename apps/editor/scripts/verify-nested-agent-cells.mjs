@@ -23,6 +23,8 @@ try {
       assert.equal(table.ancestors[0].cellIndex,1); assert.equal(table.ancestors[0].cellParaIndex,1);
       assert.ok(describeStructure(base.structure).includes(table.id));
       const op={kind:'set_table_cell',target:table.id,row:cell.row,column:cell.column,originalText:cell.text,text:'신규😀'};
+      assert.throws(()=>executeDocumentOperations(doc,base,[{...op,text:'개행\n금지'}]),/제어문자/);
+      assert.throws(()=>executeDocumentOperations(doc,base,[{...op,text:'X'.repeat(4001)}]),/4,000/);
       const apply=(state,cmd)=>executeDocumentOperations(doc,state,validateEditOperations([cmd],state));
       const before=doc.saveSnapshot();apply(base,op);
       const after=doc.saveSnapshot();

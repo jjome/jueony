@@ -1,6 +1,7 @@
 /** Explicit native-adapter support contract; not a command execution bypass. */
 export {tableAxisKinds,controlKinds,charRules,tableAxisPlan,pageProperties,selectedCells,mm,validateControlOperations} from '../domain/control-operations.ts';
 export {projectTableAxis} from '../domain/table-axis-grid.ts';
+export {agentSeriesRange} from '../domain/agent-table-series.ts';
 export {agentTabSpacingRaw,agentLineNumberSettings} from '../domain/agent-section-settings.ts';
 export {agentMasterPagePayload,assertAgentMasterKinds} from '../domain/agent-master-pages.ts';
 

@@ -6,6 +6,9 @@ import {executeTableStructure} from './table-structure.ts';
 import {executeTableSplit} from './table-split.ts';
 import {executeTableMerge} from './table-merge.ts';
 import {executeNestedCellEdit} from './nested-cell-edit.ts';
+import {agentSeriesRange} from '../../modules/document/public/engine-integration.ts';
+import {readAutoFillPlan,executeAutoFill} from './table-auto-fill-native.ts';
+import {readStructure} from './structure.ts';
 import {executeAgentSectionMerge} from './agent-section-merge.ts';
 import {executeAgentEmptySection} from './agent-empty-section.ts';
 import type { EditOp, BodyOp, Snapshot } from '../../modules/document/public/index.ts';
@@ -19,6 +22,23 @@ import { nativeDocument } from './structure.ts';
 export function executeDocumentOperations(wasm: any, base: Snapshot, operations: EditOp[]) {
   if(operations.some(op=>(agentFileKinds as readonly string[]).includes(op.kind)))throw Error('문서 탭 명령은 업무 소유 façade에서만 실행합니다.');
   const snapshot = structuredClone(base), doc = nativeDocument(wasm);
+  if(operations.length===1 && operations[0].kind==='fill_table_series'){
+    const {table,block,unit,output}=agentSeriesRange(snapshot,operations[0]);
+    const live=readStructure(doc).tables.find(t=>t.id===table.id);
+    if(JSON.stringify(table.cells)!==JSON.stringify(live?.cells)) throw Error('표 원문이나 서식이 달라졌습니다. 표를 다시 조회하세요.');
+    const plan=readAutoFillPlan(doc,block,unit,output);
+    let total=0;
+    for(const value of plan.values.slice(plan.seedCount)){
+      const length=Array.from(value).length;
+      total+=length;
+      if(length>4000 || total>60000) throw Error('채우기 결과가 셀 4,000자 또는 요청 60,000자 한도를 넘습니다.');
+    }
+    if(plan.cells.slice(plan.seedCount).every((cell,i)=>cell.text===plan.values[i+plan.seedCount])) throw Error('지정한 범위가 이미 같은 값으로 채워져 있습니다.');
+    executeAutoFill(doc,plan);
+    const first=plan.cells[0];
+    return {sectionIndex:table.section,paragraphIndex:0,parentParaIndex:table.paragraph,controlIndex:table.control,
+      cellIndex:first.index,cellParaIndex:0,charOffset:0,cellPath:[{controlIndex:table.control,cellIndex:first.index,cellParaIndex:0}]};
+  }
   if (operations.some(op=>op.kind==='set_table_cell' && snapshot.structure?.nestedTables?.some(t=>t.id===op.target))) {
     if (operations.length!==1 || operations[0].kind!=='set_table_cell') throw Error('중첩 셀 편집은 단독 요청으로 실행하세요.');
     return executeNestedCellEdit(doc,snapshot,operations[0]);

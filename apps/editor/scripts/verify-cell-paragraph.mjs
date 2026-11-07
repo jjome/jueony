@@ -25,6 +25,7 @@ const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const
  const cell=input.document.cellParagraphSources?.[target]?.cells?.find(c=>c.rowSpan*c.columnSpan>1),paragraph=input.instruction.includes('first')?0:1;
  const fallback=input.document.structure.tables[0]?.cells?.[0]?.text?.split('\n')[paragraph]??'';
  const operations=[{kind:'replace_cell_paragraph',target,row:cell?.row??0,column:cell?.column??0,paragraph,originalText:cell?.paragraphs?.[paragraph]?.text??fallback,text:'Agent revised paragraph 😀'}];
+ if(input.instruction.includes('mixed-tail'))operations[0].text=operations[0].originalText.slice(0,-1)+'개정😀';
  if(input.instruction.includes('absorbed'))operations[0].column=1;
  if(input.instruction.includes('alias'))operations[0].kind='set_cell_paragraph';
  if(input.instruction.includes('overflow'))operations[0].paragraph=99;
@@ -65,7 +66,18 @@ try{
   await lastAction('변경 확인');await page.waitForFunction(()=>document.getElementById('change-dialog').open);await page.$eval('#change-dialog details',e=>e.open=true);await page.screenshot({path:resolve(out,'cell-paragraph-comparison-'+id+'.png')});await page.click('#change-dialog button');await undo();assert.deepEqual((await snap()).structure,before.structure);await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);await reopen(f,'cell-paragraph-ui-'+id);
  });
  await scenario('invalid original/coordinate, alias, missing target, overflow, no-op and batch never write',async()=>{for(const request of ['absorbed','alias','missing','overflow','no-op','batch']){await open('hwpx',body());const before=await state();await send(request);assert.equal(await page.$eval('#request-error',e=>e.hidden),false,request);assert.deepEqual(await state(),before);}});
- await scenario('HWP, protection, lock, mixed characters, field and bookmark remain readonly',async()=>{for(const mode of ['hwp','protect','locked','mixed','field','bookmark','zone']){const d=body();if(mode==='protect')d.setCellProperties(0,1,0,1,'{"cellProtect":true}');if(mode==='locked')d.setControlLock(1,0,true);if(mode==='zone')d.setCellZoneProperties(0,1,0,0,0,1,1,JSON.stringify({background:'#aabbcc'}));if(mode==='mixed')d.applyCharFormatInCell(0,1,0,0,1,0,1,'{"italic":true}');if(mode==='field')d.insertClickHereField(0,0,0,'field','','input',true);if(mode==='bookmark')d.addBookmark(0,0,0,'mark');await open(mode==='hwp'?'hwp':'hwpx',d);const before=await state();await send('paragraph revision');assert.equal(await page.$eval('#request-error',e=>e.hidden),false,mode);assert.deepEqual(await state(),before);}});
+ await scenario('mixed merged paragraph tail through chat retains both style boundaries on disk',async()=>{
+  const d=body();d.applyCharFormatInCell(0,1,0,0,1,3,4,'{"italic":true}');
+  const f=await open('hwpx',d),s=await snap(),p=s.cellParagraphSources[s.structure.tables[0].id].cells[0].paragraphs[1];
+  assert.equal(p.text,'업무 1');assert.deepEqual(p.formatSpans,[{start:0,end:3},{start:3,end:4}]);
+  await send('mixed-tail');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const after=await snap();assert.equal(after.cellParagraphSources[s.structure.tables[0].id].cells[0].paragraphs[1].text,'업무 개정😀');
+  await undo();assert.deepEqual((await snap()).structure.tables,s.structure.tables);
+  await execute('edit:redo');const x=await save(f,'mixed-tail','hwpx');
+  try{assert.equal(x.getTextInCell(0,1,0,0,1,0,6),'업무 개정😀');assert.equal(JSON.parse(x.getCellCharPropertiesAt(0,1,0,0,1,2)).italic,false);assert.equal(JSON.parse(x.getCellCharPropertiesAt(0,1,0,0,1,5)).italic,true);}
+  finally{x.free();}
+ });
+ await scenario('HWP, protection, lock, cross-style replacement, field and bookmark remain readonly',async()=>{for(const mode of ['hwp','protect','locked','mixed','field','bookmark','zone']){const d=body();if(mode==='protect')d.setCellProperties(0,1,0,1,'{"cellProtect":true}');if(mode==='locked')d.setControlLock(1,0,true);if(mode==='zone')d.setCellZoneProperties(0,1,0,0,0,1,1,JSON.stringify({background:'#aabbcc'}));if(mode==='mixed')d.applyCharFormatInCell(0,1,0,0,1,0,1,'{"italic":true}');if(mode==='field')d.insertClickHereField(0,0,0,'field','','input',true);if(mode==='bookmark')d.addBookmark(0,0,0,'mark');await open(mode==='hwp'?'hwp':'hwpx',d);const before=await state();await send('paragraph revision');assert.equal(await page.$eval('#request-error',e=>e.hidden),false,mode);assert.deepEqual(await state(),before);}});
  await scenario('actual live fault restores bytes/history/dirty/cursor without an extra undo entry',async()=>{for(const mode of ['throw','neighbor','resource','raw-id']){
   const d=body('hwpx',true);d.insertTextInCell(0,2,0,0,0,0,'원본');const f=await open('hwpx',d),before=await state(),op=paragraphOp(await snap()),position=await f.evaluate(()=>window.__pageServices.getInputHandler().getCursorPosition());
   await f.evaluate(mode=>{const d=window.__pageServices.wasm.borrowDocumentHandle(),insert=d.insertTextInCell.bind(d),shape=d.setCharShapeIdInCell.bind(d),chars=d.getCellCharPropertiesAt.bind(d);let armed=false;

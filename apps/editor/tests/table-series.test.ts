@@ -17,6 +17,16 @@ test('numbered labels keep literal Unicode prefix/suffix, zero padding and seed 
   assert.deepEqual(planTableSeries('2', '0', 4).values, ['2', '0', '-2', '-4']);
 });
 
+test('Korean dates retain the written markers, spacing, padding and end-of-month rule',()=>{
+  assert.deepEqual(planTableSeries('2024년 1월 31일','2024년 2월 29일',3,'months').values,
+    ['2024년 1월 31일','2024년 2월 29일','2024년 3월 31일']);
+  assert.deepEqual(planTableSeries('2026. 12. 31.','2027. 1. 1.',3).values,
+    ['2026. 12. 31.','2027. 1. 1.','2027. 1. 2.']);
+  assert.deepEqual(planTableSeries('2024년02월29일','2025년02월28일',5,'years').values.at(-1),'2028년02월29일');
+  assert.throws(()=>planTableSeries('2024년 2월 28일','2024년 02월 29일',3));
+  assert.throws(()=>planTableSeries('2024. 2. 28.','2024년 2월 29일',3));
+});
+
 test('explicit month/year fill uses the first day anchor without end-of-month or leap-year drift', () => {
   assert.deepEqual(planTableSeries('2026-01-31', '2026-02-28', 4, 'months').values, ['2026-01-31', '2026-02-28', '2026-03-31', '2026-04-30']);
   assert.deepEqual(planTableSeries('2024.03.31', '2024.02.29', 3, 'months').values, ['2024.03.31', '2024.02.29', '2024.01.31']);

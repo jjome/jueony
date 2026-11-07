@@ -48,7 +48,7 @@ function readPrivateSources(d:any,tables:Table[],name:string){
     const paragraphs=Array.from({length:count},(_,index)=>{
      const args=[t.section,t.paragraph,t.control,c.index,index],length=d.getCellParagraphLength(...args),text=d.getTextInCell(...args,0,length),path=JSON.stringify([{controlIndex:t.control,cellIndex:c.index,cellParaIndex:index}]),runs=parsed(d.getCharShapeRunsInCellByPath(t.section,t.paragraph,path,0,length)),characters=parsed(d.getCellCharPropertiesAt(...args,0)),paragraph=parsed(d.getCellParaPropertiesAt(...args)),style=parsed(d.getCellStyleAt(...args));
      paragraphBudget++;characterBudget+=Array.from(text).length;
-     if(paragraphBudget>200||characterBudget>40000||!plain(text)||Array.from(text).length!==length||new Set(runs.map((r:any)=>r.charShapeId)).size>1||!int(characters.charShapeId)||paragraph.headType!=='None')throw Error();
+     if(paragraphBudget>200||characterBudget>40000||!plain(text)||Array.from(text).length!==length||!Array.isArray(runs)||runs.some((r:any,i:number)=>!int(r.charShapeId)||!int(r.endOffset)||r.startOffset!==(i===0?0:runs[i-1].endOffset)||r.endOffset<=r.startOffset)||(runs.at(-1)?.endOffset??0)!==length||!int(characters.charShapeId)||paragraph.headType!=='None')throw Error();
      return {index,text,length,characters,paragraph,style,runs};
     });return {index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs};
    });
@@ -63,7 +63,7 @@ function readPrivateSources(d:any,tables:Table[],name:string){
 export function readCellParagraphSources(wasm:any,tables:Table[],name:string):Record<string,AgentCellParagraphSource>|undefined {
  const d=nativeDocument(wasm);if(typeof d.setCharShapeIdInCell!=='function'||typeof d.exportHwpx!=='function')return;
  const privateSources=readPrivateSources(d,tables,name).sources;
- return Object.fromEntries(tables.map(t=>{const source=privateSources[t.id];return [t.id,source?.editable===true?{editable:true,fingerprint:source.fingerprint,cells:source.cells.map((c:any)=>({index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs:c.paragraphs.map((p:any)=>({index:p.index,text:p.text}))}))}:{editable:false,reason:'AI 병합 셀 문단 교체는 HWPX 한 쪽 평면 비보호 표의 단순 문단만 지원합니다. 필드·개체·책갈피·중첩·혼합 글자·복합 배치와 쪽을 나누는 긴 결과는 제외합니다.'}];}));
+ return Object.fromEntries(tables.map(t=>{const source=privateSources[t.id];return [t.id,source?.editable===true?{editable:true,fingerprint:source.fingerprint,cells:source.cells.map((c:any)=>({index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs:c.paragraphs.map((p:any)=>({index:p.index,text:p.text,...(p.runs.length>1?{formatSpans:p.runs.map((r:any)=>({start:r.startOffset,end:r.endOffset}))}:{})}))}))}:{editable:false,reason:'AI 병합 셀 문단 교체는 HWPX 한 쪽 평면 비보호 표의 단순 문단만 지원합니다. 필드·개체·책갈피·중첩·복합 배치와 쪽을 나누는 긴 결과는 제외합니다. 혼합 서식은 한 서식 범위 안에서 위치가 명확한 수정만 가능합니다.'}];}));
 }
 /** Export bytes use portable metrics. Compare their layout with the same
  * temporary metric selection and restore the screen environment synchronously.
@@ -78,7 +78,7 @@ export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellPar
  const d=nativeDocument(wasm),proof=pending.get(d);if(!proof||proof.revision!==base.revision||!same(proof.operation,op))throw new Error('셀 문단 결과의 검증 근거가 없습니다.');
  const after=capturePreservationEvidence(d);if(after.issues.length||!same(topologySemantics(after.values),proof.expected)||!same(rootBodyTexts(d),proof.body)||!same(tableTextTree(readStructure(d).tables),proof.text)||resourceFingerprint(d.exportHwpx())!==proof.resources)throw new Error('병합 셀 문단 결과 또는 다른 문서 내용·자원이 변경되었습니다.');
  const source=readPrivateSources(d,[proof.table],base.name).sources[op.target];if(source?.editable!==true)throw new Error('교체 후 병합 셀 문단을 검증하지 못했습니다.');
- for(const cell of source.cells)for(const para of cell.paragraphs){const old=proof.cells.find((c:any)=>c.index===cell.index)?.paragraphs[para.index];if(!old||!same(para.characters,old.characters)||!same(para.paragraph,old.paragraph)||!same(para.style,old.style)||!same(para.runs.map((r:any)=>r.charShapeId),cell.index===proof.cellIndex&&para.index===op.paragraph?(op.text?[old.characters.charShapeId]:[]):old.runs.map((r:any)=>r.charShapeId)))throw new Error('선택 또는 다른 셀 문단의 원래 서식이 달라졌습니다.');}
+ for(const cell of source.cells)for(const para of cell.paragraphs){const old=proof.cells.find((c:any)=>c.index===cell.index)?.paragraphs[para.index];if(!old||!same(para.characters,old.characters)||!same(para.paragraph,old.paragraph)||!same(para.style,old.style)||!same(para.runs,cell.index===proof.cellIndex&&para.index===op.paragraph?proof.runs:old.runs))throw new Error('선택 또는 다른 셀 문단의 원래 서식이 달라졌습니다.');}
  portableLayout(d,()=>{const artifact=d.exportHwpxWithReport();let reopened:any;
  try{const loss=JSON.parse(artifact.contentLoss()),bytes=artifact.takeBytes();verifyPreservedExport(d,bytes,'hwpx',loss,b=>new d.constructor(b));reopened=new d.constructor(bytes);if(!sameTableLayout(tableLayoutEvidence(d,proof.table),tableLayoutEvidence(reopened,proof.table)))throw new Error('셀 문단 교체 후 실제 저장 재열기 배치가 다릅니다.');}finally{reopened?.free();artifact.free();}});
 }
@@ -87,10 +87,17 @@ export function executeCellParagraph(wasm:any,base:Snapshot,op:AgentCellParagrap
  if(!same(structure,base.structure)||cap?.editable!==true||!same(cap,base.cellParagraphSources?.[t.id]))throw new Error('병합 셀 또는 다른 내용·서식·문서 자원이 바뀌었습니다. 최신 문서로 다시 요청하세요.');
  assertNativeTableWritable(d,t);const source=readPrivateSources(d,[t],base.name).sources[t.id],c=source.cells.find((c:any)=>c.index===plan.cell.index),p=c.paragraphs[op.paragraph];
  const before=capturePreservationEvidence(d);if(before.issues.length)throw new Error('셀 문단 교체 전 전체 보존 정보를 읽지 못했습니다.');const expected=topologySemantics(before.values),target=expected.cells.find((c:any)=>c.list.hostListId===0&&c.list.sectionIndex===t.section&&c.list.hostPara===t.paragraph&&c.list.controlIndex===t.control&&c.list.cellIndex===plan.cell.index);
- if(!target)throw new Error('원래 셀 문단의 보존 정보가 없습니다.');target.paragraphs[op.paragraph].runs=op.text?[{start:0,end:Array.from(op.text).length,properties:normalize(p.characters)}]:[];
+ if(!target)throw new Error('원래 셀 문단의 보존 정보가 없습니다.');
+ const splice=plan.splice,inserted=Array.from(splice.insert).length,delta=inserted-splice.remove;
+ const mixed=p.runs.length>1,shape=mixed?p.runs[splice.run].charShapeId:p.characters.charShapeId;
+ const runs=mixed?p.runs.map((r:any,i:number)=>({...r,startOffset:r.startOffset+(i>splice.run?delta:0),endOffset:r.endOffset+(i>=splice.run?delta:0)})):
+   op.text?[{startOffset:0,endOffset:inserted,charShapeId:shape}]:[];
+ const paraEvidence=target.paragraphs[op.paragraph];
+ paraEvidence.runs=runs.map((r:any,i:number)=>({start:r.startOffset,end:r.endOffset,properties:mixed?paraEvidence.runs[i].properties:normalize(p.characters)}));
  const text=tableTextTree(structure.tables).map(table=>table.id===t.id?{...table,cells:table.cells.map(cell=>cell.index===c.index?{...cell,text:c.paragraphs.map((p:any)=>p.index===op.paragraph?op.text:p.text).join('\n')}:cell)}:table);
- const proof={revision:base.revision,operation:structuredClone(op),table:t,expected,body:rootBodyTexts(d),text,resources:resourceFingerprint(d.exportHwpx()),cells:source.cells,cellIndex:c.index},args=[t.section,t.paragraph,t.control,c.index,op.paragraph];
- if(p.length)checked(d.deleteTextInCell(...args,0,p.length));if(op.text){checked(d.insertTextInCell(...args,0,op.text));checked(d.setCharShapeIdInCell(...args,0,Array.from(op.text).length,p.characters.charShapeId));}
+ const proof={revision:base.revision,operation:structuredClone(op),table:t,expected,runs,body:rootBodyTexts(d),text,resources:resourceFingerprint(d.exportHwpx()),cells:source.cells,cellIndex:c.index},args=[t.section,t.paragraph,t.control,c.index,op.paragraph];
+ if(splice.remove)checked(d.deleteTextInCell(...args,splice.start,splice.remove));
+ if(splice.insert){checked(d.insertTextInCell(...args,splice.start,splice.insert));checked(d.setCharShapeIdInCell(...args,splice.start,splice.start+inserted,shape));}
  pending.set(d,proof);assertCellParagraphResult(d,base,op);
  return {sectionIndex:t.section,parentParaIndex:t.paragraph,paragraphIndex:op.paragraph,charOffset:0,controlIndex:t.control,cellIndex:c.index,cellParaIndex:op.paragraph,cellPath:[{controlIndex:t.control,cellIndex:c.index,cellParaIndex:op.paragraph}]};
 }

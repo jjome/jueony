@@ -16,6 +16,31 @@ const snap=(d,name='candidate.hwpx')=>{const structure=readStructure(d);return {
 function transactionalCandidate(d,s,ops,revision){if(revision!==s.revision)throw Error('Stale revision');const token=d.saveSnapshot();try{validateEditOperations(ops,s);return executeDocumentOperations(d,s,ops);}catch(e){d.restoreSnapshot(token);throw e;}finally{d.discardSnapshot(token);}}
 function resources(bytes){const b=Buffer.from(bytes),map={};let at=0;while(at+30<b.length&&b.readUInt32LE(at)===0x04034b50){const flags=b.readUInt16LE(at+6),method=b.readUInt16LE(at+8),size=b.readUInt32LE(at+18),nameLen=b.readUInt16LE(at+26),extra=b.readUInt16LE(at+28),name=b.subarray(at+30,at+30+nameLen).toString('utf8'),start=at+30+nameLen+extra;assert.equal(flags&8,0);if(name==='Contents/header.xml'||name.startsWith('BinData/'))map[name]=(method===0?b.subarray(start,start+size):inflateRawSync(b.subarray(start,start+size))).toString('base64');at=start+size;}assert.ok(map['Contents/header.xml']);return map;}
 const command=(s,p=1,text='New merged paragraph 😀')=>({kind:'replace_cell_paragraph',target:s.structure.tables[0].id,row:0,column:0,paragraph:p,originalText:s.cellParagraphSources[s.structure.tables[0].id]?.cells?.[0].paragraphs[p].text,text});
+await scenario('mixed merged paragraph preserves surrounding raw styles, Unicode offsets, definitions and persisted text',()=>{
+ const initial=fixture();
+ initial.applyCharFormatInCell(0,1,0,0,1,1,4,'{"italic":true}');
+ const d=new HwpDocument(initial.exportHwpx());initial.free();
+ try {
+  const base=snap(d),original=d.exportHwpx(),table=base.structure.tables[0];
+  const paragraph=base.cellParagraphSources[table.id].cells[0].paragraphs[1];
+  assert.equal(paragraph.text,'Cell 1');assert.deepEqual(paragraph.formatSpans,[{start:0,end:1},{start:1,end:4},{start:4,end:6}]);
+  for(const invalid of ['New text','C 1','C_ell 1','Cel 1']) {
+   assert.throws(()=>transactionalCandidate(d,base,[command(base,1,invalid)],'r1'),/서식/);
+   assert.deepEqual(d.exportHwpx(),original);
+  }
+  const args=[0,1,0,0,1],style=(doc,offset)=>json(doc.getCellCharPropertiesAt(...args,offset));
+  const old=[0,1,4].map(i=>style(d,i)),undo=d.saveSnapshot();
+  transactionalCandidate(d,base,[command(base,1,'C길어진😀 1')],'r1');
+  const saved=d.exportHwpx(),r=new HwpDocument(saved);
+  try {
+   assert.equal(r.getTextInCell(...args,0,7),'C길어진😀 1');
+   assert.deepEqual([0,1,5].map(i=>style(r,i)),old);
+   assert.deepEqual(resources(saved),resources(original));
+   assert.deepEqual(snap(r).cellParagraphSources[table.id].cells[0].paragraphs[1].formatSpans,[{start:0,end:1},{start:1,end:5},{start:5,end:7}]);
+  } finally {r.free();}
+  assert.equal(json(d.restoreSnapshot(undo)).ok,true);assert.deepEqual(d.exportHwpx(),original);d.discardSnapshot(undo);
+ } finally {d.free();}
+});
 await scenario('public caps expose only paragraph indexes/texts and coordinates, no private Native IDs',()=>{const d=fixture();try{const s=snap(d),cap=s.cellParagraphSources[s.structure.tables[0].id];assert.equal(cap.editable,true);assert.deepEqual(Object.keys(cap).sort(),['cells','editable','fingerprint']);assert.deepEqual(Object.keys(cap.cells[0].paragraphs[0]).sort(),['index','text']);assert.ok(!/charShapeId|properties|resources|runs|fontIds/.test(JSON.stringify(cap)));}finally{d.free();}});
 for(const [name,p,text] of [['second',1,'수정한 셀 문단 😀'],['first',0,'앞 문단 변경'],['clear',1,''],['wrapping',1,'보고서 내용 '.repeat(30)]])await scenario(name+': real merged paragraph edit, other state, strict save reopen and undo',async()=>{const d=fixture();try{const s=snap(d),before=d.exportHwpx(),saved=d.saveSnapshot();assert.equal(s.cellParagraphSources[s.structure.tables[0].id].editable,true);const cursor=transactionalCandidate(d,s,[command(s,p,text)],'r1');assert.equal(cursor.cellParaIndex,p);assert.equal(d.getTextInCell(0,1,0,0,p,0,d.getCellParagraphLength(0,1,0,0,p)),text);await writeFile(out+'/'+name+'.hwpx',d.exportHwpx());assert.deepEqual(resources(d.exportHwpx()),resources(before));const after=d.saveSnapshot();d.restoreSnapshot(saved);assert.deepEqual(d.exportHwpx(),before);d.restoreSnapshot(after);assert.equal(d.getTextInCell(0,1,0,0,p,0,d.getCellParagraphLength(0,1,0,0,p)),text);}finally{d.free();}});
 for(const mode of ['hwp','mixed','protect','locked','field','bookmark','stale-neighbor','stale-format','absorbed-coordinate','batch','no-op','alias','invalid-paragraph','control-text','zone','unread-zone'])await scenario(mode+': unsupported or stale request leaves bytes unchanged',()=>{const d=fixture();try{let s=snap(d),op=command(s);assert.equal(s.cellParagraphSources[s.structure.tables[0].id].editable,true);if(mode==='hwp')s.name='candidate.hwp';if(mode==='zone')d.setCellZoneProperties(0,1,0,0,0,1,1,JSON.stringify({background:'#aabbcc'}));if(mode==='unread-zone'){const get=d.getTableProperties.bind(d);d.getTableProperties=(...args)=>{const props=json(get(...args));delete props.cellZoneCount;return JSON.stringify(props);};}if(mode==='mixed')d.applyCharFormatInCell(0,1,0,0,1,0,1,'{"italic":true}');if(mode==='protect')d.setCellProperties(0,1,0,1,'{"cellProtect":true}');if(mode==='locked')d.setControlLock(1,0,true);if(mode==='field')d.insertClickHereField(0,0,0,'field','','input',true);if(mode==='bookmark')d.addBookmark(0,0,0,'mark');if(mode==='stale-neighbor')d.insertTextInCell(0,2,0,0,0,0,'changed');if(mode==='stale-format')d.applyCharFormatInCell(0,1,0,0,0,0,6,'{"italic":true}');if(mode==='absorbed-coordinate')op.column=1;if(mode==='no-op')op.text=op.originalText;if(mode==='alias')op.kind='set_cell_paragraph';if(mode==='invalid-paragraph')op.paragraph=999;if(mode==='control-text')op.text='bad\nnew';const bytes=d.exportHwpx();assert.throws(()=>transactionalCandidate(d,s,mode==='batch'?[op,op]:[op],'r1'));assert.deepEqual(d.exportHwpx(),bytes);}finally{d.free();}});

@@ -4,7 +4,7 @@
 
 열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.
 
-**N001의 기록된 구현 범위 마감:** 기존 24개 세부 작업의 구현과 해당 자동 검사는 통과했다. 기능 전체 완료는 아니다. 설명에만 남아 있던 명시 `textDir` 변환 제한을 N046으로 별도 등록하여 현재 구현24/25·부분1, 검증22/25·부분3으로 표시한다. N001 직접 비교, N002 후속 비교와 N046 구현·검증이 남았다. Rust182 최종 합본: 유효 짧은 다쪽8/48·3/4열 병합24/120·다쪽 캡션/중첩36/216 완료. 합본501·unit1036·Native126·실제App29·추가75·실행묶음7 통과. 기존 보호 검사와 원본44·WIP45 유지. 한글 직접 비교는 사용자 요청으로 보류;138참조. [최종 구현·검증 근거](../138-n001-storage-current-closure.md).
+**N001의 기록된 구현 범위 마감:** 기존 24개 세부 작업의 구현과 해당 자동 검사는 통과했다. 기능 전체 완료는 아니다. 설명에만 남아 있던 명시 `textDir` 변환 제한을 N046으로 별도 등록하여 현재 구현24/25·부분1, 검증22/25·부분3으로 표시한다. N001 직접 비교, N002 후속 비교와 N046 구현·검증이 남았다. Rust182 최종 합본: 유효 짧은 다쪽8/48·3/4열 병합24/120·다쪽 캡션/중첩36/216 완료. 합본501·unit1036·Native126·실제App29·추가75·실행묶음7 통과. 기존 보호 검사와 원본44·WIP45 유지. N046에서는 한글 2024의 세 HWP 저장·재열기를 확인했다. 다른 한글 직접 비교는 보류했다. [최종 구현·검증 근거](../138-n001-storage-current-closure.md).
 
 ## 진행 요약
 
@@ -22,7 +22,7 @@
 
 ## 먼저 할 일
 
-- **구현** [N046](<05-files-storage-recovery.md#n046>) **HWPX 문단 textDir의 HWP5 형식 보존** — HWPX 보존 사본 저장에서 원본과 같은 파일을 선택하면 쓰기 전에 차단한다. HWP5의 AUTO·LTR·RTL 대응값과 한글 직접 비교는 미확정.
+- **구현** [N046](<05-files-storage-recovery.md#n046>) **HWPX 문단 textDir의 HWP5 형식 보존** — 한글 저장본의 문단 모양 오프셋 42에서 확인한 LTR 0x08·RTL 0x04를 Rust 읽기·쓰기에 반영하고, AUTO 원본 보존 경로와 함께 검증한다.
 - **검증** [N001](<05-files-storage-recovery.md#n001>) **HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존** — Rust182 최종 합본: 유효 짧은 다쪽8/48·3/4열 병합24/120·다쪽 캡션/중첩36/216 완료. 합본501·unit1036·Native126·실제App29·추가75·실행묶음7 통과. 기존 보호 검사와 원본44·WIP45 유지. 한글 직접 비교는 사용자 요청으로 보류;138참조. 남은 검수는 실제 한글 합본 비교이며 N002와 분리한다. 기준 구현 커밋 f2e19c5b, 커밋 아카이브 증거140개 해시 일치.
 - **검증** [N002](<05-files-storage-recovery.md#n002>) **공개 형식 변환의 필드 보존 차이 4건** — 107패치 합본에서 표준 날짜·정확 OLE summary 정보까지 보존 읽기/양형식 왕복·손상 거절 추가. 명시 textDir HWP5 매핑과 최초 조판 차이는 별도 잔여이며 손실 변환 차단 유지.117참조; 한글 직접 비교 보류.
 
@@ -622,11 +622,11 @@
 
 - 종류: 실행 작업 · 우선순위: P0.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
-- 완료 범위: HWPX 명시 문단 글 방향은 XML로 보존하고 HWP5 매핑 미확인 시 쓰기를 차단한다. 실제 binary 매핑 또는 표현 불가 범위 확정과 왕복 검증은 남았다. 기존 N002의 완료된 4개 필드 차이 수정과 별도 범위다.
-- 다음 작업: HWPX 보존 사본 저장에서 원본과 같은 파일을 선택하면 쓰기 전에 차단한다. HWP5의 AUTO·LTR·RTL 대응값과 한글 직접 비교는 미확정.
+- 검증 구분: 자동 **PARTIAL** / 한글 **PARTIAL**.
+- 완료 범위: HWPX 사본은 명시 글 방향을 보존한다. 한글 2024에서 같은 혼합 문단의 실제 HWP 세 건을 저장·재열기했다. AUTO와 LTR은 LTR로, RTL은 RTL로 돌아왔다.
+- 다음 작업: 한글 저장본의 문단 모양 오프셋 42에서 확인한 LTR 0x08·RTL 0x04를 Rust 읽기·쓰기에 반영하고, AUTO 원본 보존 경로와 함께 검증한다.
 - 상위 항목: [B011](<05-files-storage-recovery.md#b011>) 다른 이름 저장
-- 근거: [116-reflowed-native-storage.md](<../116-reflowed-native-storage.md>) · [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>) · [verify-font-fallback-storage-engine.json](<../evidence/basic-editor-2026-10-24/second/existing-conversion-limitation/verify-font-fallback-storage-engine.json>) · [font-fallback-baseline182.json](<../evidence/basic-editor-2026-10-24/second/existing-conversion-limitation/font-fallback-baseline182.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>)
+- 근거: [116-reflowed-native-storage.md](<../116-reflowed-native-storage.md>) · [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>) · [verify-font-fallback-storage-engine.json](<../evidence/basic-editor-2026-10-24/second/existing-conversion-limitation/verify-font-fallback-storage-engine.json>) · [font-fallback-baseline182.json](<../evidence/basic-editor-2026-10-24/second/existing-conversion-limitation/font-fallback-baseline182.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [comparison.json](<../evidence/n046-hancom-2026-11-08/comparison.json>)
 - 원래 기록: `PREEXISTING_UNRESOLVED_DIRECTION_MAPPING_EXPLICITLY_COUNTED_2026_10_24`
 
 </details>

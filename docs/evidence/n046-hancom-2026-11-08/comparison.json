@@ -1,0 +1,44 @@
+{
+  "AUTO": {
+    "inputDirection": "AUTO",
+    "reopenedDirection": "LTR",
+    "paraShapeId": 0,
+    "paraShapeHex": "800100000000000000000000000000000000000000000000a000000000000000020000000000000000000800000000000000a000000000000000",
+    "byteAtOffset42": 8,
+    "inputSha256": "85f210fd5dd96821c5df6cf0410318f3829ec79049f8a2dc546220e43ec83f1a",
+    "hwpSha256": "40e5ea442ea56e2c919132b20218105ca98c1d8d0b1b47d77171f3b1740cb54d",
+    "reopenedHwpxSha256": "562ad24d1d3e6846a82f04794a3608ef4c9874d117a0880959360886f2afdc9b",
+    "previewSha256": "a7e004dd5dae9e846e659a06865bc81f3b77a48ce4fb8e7027a28ffbb05e2b24",
+    "streamsDifferingFromAuto": []
+  },
+  "LTR": {
+    "inputDirection": "LTR",
+    "reopenedDirection": "LTR",
+    "paraShapeId": 0,
+    "paraShapeHex": "800100000000000000000000000000000000000000000000a000000000000000020000000000000000000800000000000000a000000000000000",
+    "byteAtOffset42": 8,
+    "inputSha256": "63efd97383a659edc9d2bcecf5a015c8195eeb3002a460e7d9d712c62ff7b71d",
+    "hwpSha256": "9c74153ca8da1a034dffc8284e69632a7461bb5782343c874f75e32b761596b6",
+    "reopenedHwpxSha256": "a09d0604ee05570a85be729b11d09dae9d7b790e3dc3e4b751ecc09e45bc8654",
+    "previewSha256": "a7e004dd5dae9e846e659a06865bc81f3b77a48ce4fb8e7027a28ffbb05e2b24",
+    "streamsDifferingFromAuto": [
+      "\u0005HwpSummaryInformation"
+    ]
+  },
+  "RTL": {
+    "inputDirection": "RTL",
+    "reopenedDirection": "RTL",
+    "paraShapeId": 0,
+    "paraShapeHex": "800100000000000000000000000000000000000000000000a000000000000000020000000000000000000400000000000000a000000000000000",
+    "byteAtOffset42": 4,
+    "inputSha256": "f122385771c4d191802b3e9a154451ee789650391adc092290c929f200cfef7d",
+    "hwpSha256": "f2d12ca8bc42b474b8f85d675c07f0d569b4ea2554ad1339154bc86019e44667",
+    "reopenedHwpxSha256": "1ca467a6ccf951f03665264291f9e186d3c5be74549fd6aacf326e140d273d24",
+    "previewSha256": "1c66f6f89032b4ed3521e93aeb90248de0616773110898a52074e17d6a2b0c3d",
+    "streamsDifferingFromAuto": [
+      "\u0005HwpSummaryInformation",
+      "DocInfo",
+      "PrvImage"
+    ]
+  }
+}

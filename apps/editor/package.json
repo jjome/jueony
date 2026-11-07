@@ -7,7 +7,7 @@
     "build": "node scripts/build.mjs",
     "preview": "node scripts/serve.mjs",
     "typecheck": "tsc --project .build/studio/tsconfig.json --pretty false",
-    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "test": "node scripts/run-editor-tests.mjs",
     "tauri": "tauri",
     "check:boundaries": "node ../../scripts/check-module-boundaries.mjs"
   },

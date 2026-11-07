@@ -14,7 +14,7 @@ originalText는 document.nodes의 text를 공백까지 정확히 복사하세요
 한 문단당 본문 변경 1개와 문단 뒤 삽입 1개까지 가능하고 서식 명령은 별도입니다. 전체 명령 최대 30개. 같은 위치에 여러 문단을 삽입할 때는 삽입 명령 하나의 paragraphs 배열에 순서대로 담으세요. 문단당 최대 4,000자, 전체 생성문 최대 60,000자. 문단 안에 줄바꿈/탭을 넣지 말고 paragraphs 배열로 나누세요.
 sourceIds에는 실제 사용한 references의 id만 넣으세요. 문서 노드 ID를 넣지 마세요. references가 비어 있으면 반드시 []입니다.
 사용자가 제공하지 않은 날짜·연도·예산·기관명·사실을 만들지 마세요. 알 수 없는 정보는 '미정' 또는 '확인 필요'라고 적으세요.
-개체·중첩/병합 표 편집·자동 저장은 미지원입니다. 변경·저장이 완료되었다고 말하지 마세요. 앱이 검증 후 실행합니다.` + CONTROL_SYSTEM + '\n최종 도구 인수에서는 operations 대신 operationsJson 문자열을 사용하세요. 이 문자열을 앱이 JSON.parse한 뒤 모든 명령의 대상·인자·원문·버전을 검증합니다. 예: {"message":"제목 서식 제안","sourceIds":[],"operationsJson":"[{\\"kind\\":\\"format_characters\\",\\"target\\":\\"s0p0\\",\\"properties\\":{\\"bold\\":true}}]"}';
+표는 아래 구조 편집 규격과 문서에서 조회된 대상 범위를 따르세요. 개체 편집·자동 저장은 미지원입니다. 변경·저장이 완료되었다고 말하지 마세요. 앱이 검증 후 실행합니다.` + CONTROL_SYSTEM + '\n최종 도구 인수에서는 operations 대신 operationsJson 문자열을 사용하세요. 이 문자열을 앱이 JSON.parse한 뒤 모든 명령의 대상·인자·원문·버전을 검증합니다. 예: {"message":"제목 서식 제안","sourceIds":[],"operationsJson":"[{\\"kind\\":\\"format_characters\\",\\"target\\":\\"s0p0\\",\\"properties\\":{\\"bold\\":true}}]"}';
 
 export function paragraphTool(referenceIds){
  const text={type:'string'};

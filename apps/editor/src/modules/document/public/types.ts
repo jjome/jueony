@@ -6,7 +6,12 @@ export type AgentTableSubdivisionSource={editable:boolean;fingerprint?:string;ce
 /** Detached JSON data. No engine handles cross this boundary. */
 export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 export type DocumentProperties = { [key: string]: JsonValue | undefined };
-export type Cell = { index: number; row: number; column: number; rowSpan: number; columnSpan: number; text: string; editable: boolean; reason?:string; properties: DocumentProperties; characters?: DocumentProperties; paragraphProperties?: DocumentProperties };
+export type Cell = { index: number; row: number; column: number; rowSpan: number; columnSpan: number; text: string; editable: boolean; axisContentSafe?:boolean; reason?:string; properties: DocumentProperties; characters?: DocumentProperties; paragraphProperties?: DocumentProperties };
+export type TableCellPathStep = {controlIndex:number;cellIndex:number;cellParaIndex:number};
+export type NestedTable = {
+  id:string; section:number; paragraph:number; ancestors:TableCellPathStep[]; control:number; rows:number; columns:number;
+  cells:Array<Pick<Cell,'index'|'row'|'column'|'rowSpan'|'columnSpan'|'text'|'editable'>>;
+};
 export type TablePaginationMode='none'|'cell'|'row';
 export type AgentRowHeightSource=AgentCellPaddingSource&{tableHeight?:number;maxTableHeight?:number};
 export type AgentEqualColumnSource=AgentCellPaddingSource&{directWidth?:{maxTableWidth:number}};
@@ -55,7 +60,7 @@ export type AgentNumberingDefinitionSource={id:number;editable:boolean;startNumb
 export type AgentBasicBulletOp={kind:"set_basic_bullet";target:string;character:string};
 export type AgentParagraphListOp={kind:"set_paragraph_list";target:string;listKind:"none"|"number"|"bullet";definitionId:number;level:number};
 export type AgentListCatalog={numberings:{id:number;levelFormats:string[];startNumber:number}[];bullets:{id:number;char:string;rawCode:number}[]};
-export type Structure = { bookmarks?:AgentBookmarks; sectionMergeAvailable?:boolean; sectionSplitAvailable?:boolean; sections: { index: number; page: DocumentProperties; emptySectionRemoval?:AgentEmptySectionEligibility; headerFooters?:AgentHeaderFooter[]; columns?:DocumentProperties;defaultTabSpacingPt?:number;lineNumbers?:AgentLineNumbers;pageBackgrounds?:AgentPageBackground[];masterPages?:AgentMasterPages }[]; styleLinks?:{id:number;nextStyleId:number}[]; styles?:{id:number;name:string;type:JsonValue}[]; tables: Table[]; paragraphs: { id: string; characters: DocumentProperties; paragraph: DocumentProperties; style?:DocumentProperties;pageHide?:DocumentProperties;controls?:string[];pageIndex?:number }[]; unsupportedControls: string[] };
+export type Structure = { nestedTables?:NestedTable[]; nestedTableLimitation?:string; bookmarks?:AgentBookmarks; sectionMergeAvailable?:boolean; sectionSplitAvailable?:boolean; sections: { index: number; page: DocumentProperties; emptySectionRemoval?:AgentEmptySectionEligibility; headerFooters?:AgentHeaderFooter[]; columns?:DocumentProperties;defaultTabSpacingPt?:number;lineNumbers?:AgentLineNumbers;pageBackgrounds?:AgentPageBackground[];masterPages?:AgentMasterPages }[]; styleLinks?:{id:number;nextStyleId:number}[]; styles?:{id:number;name:string;type:JsonValue}[]; tables: Table[]; paragraphs: { id: string; characters: DocumentProperties; paragraph: DocumentProperties; style?:DocumentProperties;pageHide?:DocumentProperties;controls?:string[];pageIndex?:number }[]; unsupportedControls: string[] };
 export type BodyNode = { id: string; section: number; paragraph: number; text: string; editable: boolean; reason?: string };
 export type AgentTableMergeOp={kind:"merge_table_cells";target:string;startRow:number;startColumn:number;rowCount:number;columnCount:number};
 export type AgentTableMergeSource={editable:boolean;fingerprint?:string;reason?:string};

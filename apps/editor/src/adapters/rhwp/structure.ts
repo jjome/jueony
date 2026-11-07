@@ -4,6 +4,7 @@ import {readAgentHeaderFooters} from './agent-header-footer.ts';
 import {readAgentEmptySectionEligibility} from './agent-empty-section.ts';
 import {readLineNumberSettings} from './line-numbers.ts';
 import {readAgentMasterPages} from './agent-master-pages.ts';
+import {readNestedTables} from './nested-tables.ts';
 export type { Cell, Table, Structure } from '../../modules/document/public/types.ts';
 // All coordinates refer to the currently open WASM document, never its disk copy.
 export const parsed = (v: any): any => typeof v === 'string' ? JSON.parse(v) : v;
@@ -60,7 +61,11 @@ export function readStructure(wasm: any): Structure {
       const runs = count === 1 ? parsed(doc.getCharShapeRunsInCellByPath(section, paragraph, JSON.stringify([{ controlIndex: ci, cellIndex: i, cellParaIndex: 0 }]), 0, doc.getCellParagraphLength(section, paragraph, ci, i, 0))) : [];
       const simple = count === 1 && new Set(runs.map((r: any) => r.charShapeId)).size <= 1 && Array.from(texts[0]).length <= 4000 && list && !controls.some((c: any) => c.list === list.listId);
       const properties=parsed(doc.getCellProperties(section,paragraph,ci,i));
+      const axisContentSafe = !simple && count > 0 && count <= 50 && texts.join('').length <= 12000
+        && properties.cellProtect === false && control.props?.Lock === 0 && list
+        && !controls.some((c:any) => c.list === list.listId);
       cells.push({ index: i, row: info.row, column: info.col, rowSpan: info.rowSpan, columnSpan: info.colSpan, text: texts.join('\n'), editable: Boolean(simple)&&properties.cellProtect===false&&control.props?.Lock===0, ...(properties.cellProtect!==false?{reason:'보호 셀 또는 보호 상태를 확인할 수 없는 셀입니다.'}:control.props?.Lock!==0?{reason:'보호 표 또는 보호 상태를 확인할 수 없는 표입니다.'}:{}), properties, characters: parsed(doc.getCellCharPropertiesAt(section, paragraph, ci, i, 0, 0)), paragraphProperties: parsed(doc.getCellParaPropertiesAt(section, paragraph, ci, i, 0)) });
+      if (axisContentSafe) cells[i].axisContentSafe = true;
     }
     const tableProps=parsed(doc.getTableProperties(section,paragraph,ci)),mode=(['none','cell','row'] as const)[tableProps.pageBreak];
     let leading=0;while(leading<dimensions.rowCount&&cells.some(c=>c.row===leading)&&cells.filter(c=>c.row===leading).every(c=>c.properties.isHeader===true))leading++;
@@ -72,5 +77,5 @@ export function readStructure(wasm: any): Structure {
   if(sections.reduce((total,s)=>total+(s.masterPages?.pages.reduce((n,p)=>n+Array.from(p.text).length,0)??0),0)>120000)throw new Error('바탕쪽 문맥은 전체 120,000자 이하입니다. 원본 바탕쪽은 유지됩니다.');
   if(sections.reduce((total,s)=>total+(s.headerFooters?.reduce((n,h)=>n+Array.from(h.text).length,0)??0),0)>120000)throw new Error('머리말/꼬리말 문맥은 전체 120,000자 이하입니다.');
   const bookmarks=readAgentBookmarks(doc);
-  return {...(bookmarks?{bookmarks}:{}), sectionMergeAvailable:typeof doc.mergeSectionBoundary==='function', sectionSplitAvailable:typeof doc.insertSectionBreak==='function', sections, tables, paragraphs,styles,styleLinks, unsupportedControls: [...new Set(unsupportedControls)] };
+  return {...readNestedTables(doc,controls,lists), ...(bookmarks?{bookmarks}:{}), sectionMergeAvailable:typeof doc.mergeSectionBoundary==='function', sectionSplitAvailable:typeof doc.insertSectionBreak==='function', sections, tables, paragraphs,styles,styleLinks, unsupportedControls: [...new Set(unsupportedControls)] };
 }

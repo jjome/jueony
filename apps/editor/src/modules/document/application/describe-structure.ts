@@ -36,5 +36,10 @@ export function describeStructure(s?: Structure) {
    for(const c of t.cells)if(typeof c.properties.applyInnerMargin==='boolean')lines.push(`  ${c.row+1}행 ${c.column+1}열 안 여백: ${c.properties.applyInnerMargin?'직접 지정':'표 기본값 사용'} · 저장 좌/우/위/아래 ${['Left','Right','Top','Bottom'].map(side=>mm(c.properties['padding'+side])).join('/')}mm${c.properties.applyInnerMargin?'':' (개별 저장값은 비활성)'}`);
    for (const c of t.cells) lines.push(`  ${c.row + 1}행 ${c.column + 1}열: ${c.text} · 저장 너비 ${mm(c.properties.width)}mm · 저장 높이 ${mm(c.properties.height)}mm${c.editable?'':' · 읽기 전용: '+(c.reason??'복잡한 셀')} · 배경 ${c.properties.fillType === 'none' ? '없음' : c.properties.fillColor}${c.characters ? ' · ' + character(c.characters) : ''}${c.paragraphProperties ? ' · ' + paragraph(c.paragraphProperties) : ''}`);
  });
+ for (const table of s.nestedTables??[]) {
+   lines.push(`중첩 표 ${table.id} · ${table.rows}행 × ${table.columns}열`);
+   for (const cell of table.cells) lines.push(`  ${cell.row+1}행 ${cell.column+1}열 · ${cell.text}${cell.editable?'':' · 읽기 전용'}`);
+ }
+ if (s.nestedTableLimitation) lines.push(s.nestedTableLimitation);
  return lines.join('\n');
 }

@@ -1,4 +1,6 @@
 import {assertNativeTableNoCellZones} from './table-write-guard.ts';
+import {mergedAxisProof} from './merged-axis-evidence.ts';
+import {verifyPreservedExport} from './preservation.ts';
 import {executeRowHeights} from './row-heights.ts';
 import {executeEqualColumns} from './equal-columns.ts';
 import {executeCellPadding} from './cell-padding.ts';
@@ -87,18 +89,45 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
     assertNativeTableNoCellZones(doc,table);
     const expected=tableAxisPlan(table,axis),row=axis.kind.endsWith('_row'),insert=axis.kind.startsWith('insert_');
     const base=[table.section,table.paragraph,table.control],size=row?table.rows:table.columns;
-    const method=({insert_table_row:'insertTableRow',insert_table_column:'insertTableColumn',delete_table_row:'deleteTableRow',delete_table_column:'deleteTableColumn'} as any)[axis.kind];
-    if(insert)checked(doc[method](...base,Math.min(axis.index,size-1),axis.index===size));
-    else checked(doc[method](...base,axis.index));
     const read=()=>readStructure(doc).tables.find(t=>t.section===table.section&&t.paragraph===table.paragraph&&t.control===table.control);
-    let current=read();if(!current)fail('변경한 표를 확인하지 못했습니다.');
-    if(insert)for(const cell of current!.cells.filter(c=>(row?c.row:c.column)===axis.index)) {
-      const value=(axis as any).values[row?cell.column:cell.row];
-      replaceCellText(doc,base,cell.index,value);
-    }
-    current=read();
-    if(!current||current.rows!==expected.rows||current.columns!==expected.columns||current.cells.length!==expected.cells.length||expected.cells.some(c=>current!.cells.find(v=>v.row===c.row&&v.column===c.column)?.text!==c.text))fail('표의 행·열 변경 결과가 명령과 다릅니다.');
-    tables.set(axis.target,current!);return;
+    const live=read();
+    const merged=(t:Table)=>t.cells.some(c=>c.rowSpan>1||c.columnSpan>1);
+    if(!live)throw new Error('대상 표가 없어졌습니다.');
+    const checkMerged=merged(table)||merged(live);
+    if(checkMerged&&JSON.stringify(table.cells)!==JSON.stringify(live.cells))throw new Error('표의 병합 범위나 셀 내용이 바뀌었습니다. 다시 요청하세요.');
+    const proof=checkMerged?mergedAxisProof(doc,live,row,insert,axis.index,'values' in axis?axis.values:[]):undefined;
+    const undo=proof?doc.saveSnapshot():undefined;
+    try {
+      const method = {insert_table_row:'insertTableRow', insert_table_column:'insertTableColumn',
+        delete_table_row:'deleteTableRow', delete_table_column:'deleteTableColumn'}[axis.kind];
+      if (insert) checked(doc[method](...base, Math.min(axis.index, size-1), axis.index===size));
+      else checked(doc[method](...base, axis.index));
+      const updated = read();
+      if (!updated) throw new Error('변경한 표를 확인하지 못했습니다.');
+      proof?.(updated);
+      if ('values' in axis) for (const cell of updated.cells) {
+        if ((row ? cell.row : cell.column) !== axis.index) continue;
+        const value = axis.values[row ? cell.column : cell.row];
+        if (value) replaceCellText(doc, base, cell.index, value);
+      }
+      const current = read();
+      if (!current || current.rows!==expected.rows || current.columns!==expected.columns ||
+          current.cells.length!==expected.cells.length || expected.cells.some((c,i)=>
+            current.cells[i].row!==c.row || current.cells[i].column!==c.column || current.cells[i].text!==c.text))
+        throw new Error('표의 행·열 변경 결과가 명령과 다릅니다.');
+      if (proof) {
+        proof(current);
+        const format=/\.hwp$/i.test(snapshot.name)?'hwp':'hwpx';
+        const artifact=format==='hwp'?doc.exportHwpWithReport():doc.exportHwpxWithReport();
+        try { verifyPreservedExport(doc,artifact.takeBytes(),format,artifact.contentLoss(),bytes=>new doc.constructor(bytes)); }
+        finally { artifact.free(); }
+      }
+      tables.set(axis.target,current);
+      return;
+    } catch(error) {
+      if(undo!==undefined)doc.restoreSnapshot(undo);
+      throw error;
+    } finally { if(undo!==undefined)doc.discardSnapshot(undo); }
   }
   if (op.kind === 'format_characters' || op.kind === 'format_paragraph') {
     const n = snapshot.nodes.find(n => n.id === op.target)!;

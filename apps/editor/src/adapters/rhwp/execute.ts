@@ -5,6 +5,7 @@ import {executeTableSubdivision} from './table-subdivision.ts';
 import {executeTableStructure} from './table-structure.ts';
 import {executeTableSplit} from './table-split.ts';
 import {executeTableMerge} from './table-merge.ts';
+import {executeNestedCellEdit} from './nested-cell-edit.ts';
 import {executeAgentSectionMerge} from './agent-section-merge.ts';
 import {executeAgentEmptySection} from './agent-empty-section.ts';
 import type { EditOp, BodyOp, Snapshot } from '../../modules/document/public/index.ts';
@@ -18,6 +19,10 @@ import { nativeDocument } from './structure.ts';
 export function executeDocumentOperations(wasm: any, base: Snapshot, operations: EditOp[]) {
   if(operations.some(op=>(agentFileKinds as readonly string[]).includes(op.kind)))throw Error('문서 탭 명령은 업무 소유 façade에서만 실행합니다.');
   const snapshot = structuredClone(base), doc = nativeDocument(wasm);
+  if (operations.some(op=>op.kind==='set_table_cell' && snapshot.structure?.nestedTables?.some(t=>t.id===op.target))) {
+    if (operations.length!==1 || operations[0].kind!=='set_table_cell') throw Error('중첩 셀 편집은 단독 요청으로 실행하세요.');
+    return executeNestedCellEdit(doc,snapshot,operations[0]);
+  }
   if(operations.length===1&&operations[0].kind==='set_document_metadata'){executeAgentDocumentMetadata(doc,snapshot,operations[0]);return;}
   if(operations.length===1&&operations[0].kind==='remove_empty_section')return executeAgentEmptySection(doc,snapshot,operations[0]);
   if(operations.length===1&&operations[0].kind==='merge_sections')return executeAgentSectionMerge(doc,snapshot,operations[0]);

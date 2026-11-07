@@ -221,8 +221,15 @@ function readPrivateSources(d:any,tables:Table[],name:string){
      const lastAnchor=pictureParagraph?.anchors?.at(-1);
      // Keep the character immediately after the final picture. It separates the
      // editable suffix from the stored slot even after a deletion or insertion.
-     const editableFrom=lastAnchor===undefined?boundaries.get(t.id+'/'+c.index+'/'+index):lastAnchor+1;
-     return {index,text,length,characters,paragraph,style,runs,...(pictureParagraph&&lastAnchor===undefined?{pictureParagraph:true}:{}),...(editableFrom===undefined?{}:{editableFrom})};
+     const fieldBoundary=boundaries.get(t.id+'/'+c.index+'/'+index);
+     const editableFrom=lastAnchor===undefined?fieldBoundary:Math.max(lastAnchor+1,fieldBoundary??0);
+     const anchors=pictureParagraph?.anchors;
+     const formatOnlyRanges=anchors?.flatMap((anchor,i)=>{
+      const start=Math.max(fieldBoundary??0,i?anchors[i-1]+1:0),end=anchor-1;
+      return start<end?[{start,end}]:[];
+     });
+     return {index,text,length,characters,paragraph,style,runs,...(pictureParagraph&&lastAnchor===undefined?{pictureParagraph:true}:{}),
+      ...(editableFrom===undefined?{}:{editableFrom}),...(formatOnlyRanges?.length?{formatOnlyRanges}:{})};
     });
     let readOnly=(pictureParagraphs.length>0&&c.rowSpan*c.columnSpan===1)||paragraphs.every(p=>p.pictureParagraph===true);
     if(hasLocalFormula){
@@ -248,7 +255,7 @@ function readPrivateSources(d:any,tables:Table[],name:string){
 export function readCellParagraphSources(wasm:any,tables:Table[],name:string):Record<string,AgentCellParagraphSource>|undefined {
  const d=nativeDocument(wasm);if(typeof d.setCharShapeIdInCell!=='function'||typeof d.exportHwpx!=='function')return;
  const privateSources=readPrivateSources(d,tables,name).sources;
- return Object.fromEntries(tables.map(t=>{const source=privateSources[t.id];return [t.id,source?.editable===true?{editable:true,fingerprint:source.fingerprint,cells:source.cells.filter((c:any)=>!c.readOnly).map((c:any)=>({index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs:c.paragraphs.filter((p:any)=>!p.pictureParagraph).map((p:any)=>({index:p.index,text:p.text,...(p.editableFrom===undefined?{}:{editableFrom:p.editableFrom}),...(p.runs.length>1?{formatSpans:p.runs.map((r:any)=>({start:r.startOffset,end:r.endOffset}))}:{})}))}))}:{editable:false,reason:'병합 셀 문단 교체에는 셀마다 원래 행·열과 쪽을 확인할 수 있는 비보호 본문 표가 필요합니다. 경계를 확인할 수 없는 필드·개체·책갈피·중첩 표 또는 여러 쪽의 글줄을 원문과 대조할 수 없는 셀은 편집할 수 없습니다.'}];}));
+ return Object.fromEntries(tables.map(t=>{const source=privateSources[t.id];return [t.id,source?.editable===true?{editable:true,fingerprint:source.fingerprint,cells:source.cells.filter((c:any)=>!c.readOnly).map((c:any)=>({index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs:c.paragraphs.filter((p:any)=>!p.pictureParagraph).map((p:any)=>({index:p.index,text:p.text,...(p.editableFrom===undefined?{}:{editableFrom:p.editableFrom}),...(p.formatOnlyRanges?{formatOnlyRanges:p.formatOnlyRanges}:{}),...(p.runs.length>1?{formatSpans:p.runs.map((r:any)=>({start:r.startOffset,end:r.endOffset}))}:{})}))}))}:{editable:false,reason:'병합 셀 문단 교체에는 셀마다 원래 행·열과 쪽을 확인할 수 있는 비보호 본문 표가 필요합니다. 경계를 확인할 수 없는 필드·개체·책갈피·중첩 표 또는 여러 쪽의 글줄을 원문과 대조할 수 없는 셀은 편집할 수 없습니다.'}];}));
 }
 /** Export bytes use portable metrics. Compare their layout with the same
  * temporary metric selection and restore the screen environment synchronously.
@@ -257,6 +264,27 @@ function portableLayout<T>(d:any,read:()=>T):T {
  const restore=typeof d.canvasMetricsActive==='function'&&d.canvasMetricsActive()===true;
  if(restore)d.selectCanvasMetrics(false);
  try{return read();}finally{if(restore)d.selectCanvasMetrics(true);}
+}
+/** A style boundary can split a published run. Compare every character's
+ * original public offset and absolute box, plus all table and picture frames. */
+function pictureTextLayout(doc:any,t:Table,cell:number,paragraph:number,text:string){
+ const pages=[],glyphs=[];
+ for(let page=0;page<doc.pageCount();page++){
+  const controls=parsed(doc.getPageControlLayout(page)).controls.filter((v:any)=>v.type==='image'||v.type==='table');
+  pages.push(controls);
+  for(const r of parsed(doc.getPageTextLayout(page)).runs){
+   if(r.secIdx!==t.section || r.parentParaIdx!==t.paragraph || r.controlIdx!==t.control ||
+       r.cellIdx!==cell || r.cellParaIdx!==paragraph)continue;
+   const characters=Array.from<string>(r.text);
+   if(!int(r.charStart) || ![r.x,r.y,r.h].every(Number.isFinite) || r.h<=0 ||
+       !Array.isArray(r.charX) || r.charX.length!==characters.length+1 || !r.charX.every(Number.isFinite))
+    throw Error('그림 문단의 원래 글자 배치를 읽지 못했습니다.');
+   for(const [i,char] of characters.entries())
+    glyphs.push({page,char,offset:r.charStart+i,left:r.x+r.charX[i],right:r.x+r.charX[i+1],y:r.y,h:r.h});
+  }
+ }
+ if(glyphs.map(g=>g.char).join('')!==text)throw Error('그림 문단의 표시 글자와 원문이 다릅니다.');
+ return {pages,glyphs};
 }
 const pending=new WeakMap<object,any>();
 type CharacterRun={startOffset:number;endOffset:number;charShapeId:number};
@@ -307,6 +335,9 @@ export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellPar
  const after=capturePreservationEvidence(d);if(after.issues.length||!same(topologySemantics(after.values),proof.expected)||!same(rootBodyTexts(d),proof.body)||!same(tableTextTree(readStructure(d).tables),proof.text)||resourceFingerprint(d.exportHwpx())!==proof.resources)throw new Error('병합 셀 문단 결과 또는 다른 문서 내용·자원이 변경되었습니다.');
  const source=readPrivateSources(d,[proof.table],base.name).sources[op.target];if(source?.editable!==true)throw new Error(source?.reason||'교체 후 병합 셀 문단을 검증하지 못했습니다.');
  if(!samePictures(proof.pictures,source.pictures))throw Error('편집 후 셀 그림의 소유 위치, 자원 또는 배치가 달라졌습니다.');
+ const layout=(doc:any)=>pictureTextLayout(doc,proof.table,proof.cellIndex,op.paragraph,op.text);
+ if(proof.pictureText && !sameTableLayout(proof.pictureText.screen,layout(d)))
+  throw Error('서식 변경으로 그림 문단의 글자 또는 개체 위치가 달라졌습니다.');
  if(!same(source.fieldEvidence,proof.fieldEvidence))throw Error('문단 편집으로 책갈피, 누름틀 또는 계산식 결과가 달라졌습니다.');
  if(!same(source.pages,proof.pages))throw new Error('문단 편집으로 셀의 쪽 경계가 바뀌어 적용하지 않았습니다.');
  for(const cell of source.cells)for(const para of cell.paragraphs){
@@ -316,6 +347,9 @@ export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellPar
  }
  portableLayout(d,()=>{const format=/\.hwp$/iu.test(base.name)?'hwp':'hwpx';const artifact=format==='hwp'?d.exportHwpWithReport():d.exportHwpxWithReport();let reopened:any;
  try{const loss=JSON.parse(artifact.contentLoss()),bytes=artifact.takeBytes();verifyPreservedExport(d,bytes,format,loss,b=>new d.constructor(b));reopened=new d.constructor(bytes);
+  if(proof.pictureText && (!sameTableLayout(proof.pictureText.portable,layout(d)) ||
+      !sameTableLayout(proof.pictureText.portable,layout(reopened))))
+   throw Error('저장한 그림 문단의 글자 또는 개체 위치가 원본과 다릅니다.');
   if(!sameTableLayout(tableLayoutEvidence(d,proof.table),tableLayoutEvidence(reopened,proof.table)))throw new Error('셀 문단 교체 후 실제 저장 재열기 배치가 다릅니다.');
   if(proof.pictures.length){
    const nativePictures=(doc:any)=>pictureOwners(doc,readStructure(doc).tables,parsed(doc.getControls()),parsed(doc.getCursorModel()).lists);
@@ -372,7 +406,10 @@ export function executeCellParagraph(wasm:any,base:Snapshot,op:AgentCellParagrap
  const formatted=op.spanFormats?planCharacterFormats(d,base,op,runs,storedRuns,resources):undefined;
  paraEvidence.runs=formatted?.stored??storedRuns;
  const text=tableTextTree(structure.tables).map(table=>table.id===t.id?{...table,cells:table.cells.map(cell=>cell.index===c.index?{...cell,text:c.paragraphs.map((p:any)=>p.index===op.paragraph?op.text:p.text).join('\n')}:cell)}:table);
- const proof={revision:base.revision,operation:structuredClone(op),table:t,expected,runs:formatted?.runs??runs,firstCharacters:formatted?.firstCharacters??firstCharacters,
+ const beforePictures=op.spanFormats?.some(f=>f.start<(p.editableFrom??0));
+ const readLayout=()=>pictureTextLayout(d,t,c.index,op.paragraph,op.originalText);
+ const pictureText=beforePictures?{screen:readLayout(),portable:portableLayout(d,readLayout)}:undefined;
+ const proof={revision:base.revision,operation:structuredClone(op),table:t,expected,pictureText,runs:formatted?.runs??runs,firstCharacters:formatted?.firstCharacters??firstCharacters,
   pages:source.pages,pictures:source.pictures,fieldEvidence:source.fieldEvidence,body:rootBodyTexts(d),text,resources:formatted?.resources??resources,cells:source.cells,cellIndex:c.index};
  // Edit right to left so offsets always refer to the queried source.
  for(const edit of [...edits].reverse()){
@@ -383,8 +420,12 @@ export function executeCellParagraph(wasm:any,base:Snapshot,op:AgentCellParagrap
    checked(d.setCharShapeIdInCell(...args,edit.start,edit.start+Array.from(edit.insert).length,shape));
   }
  }
- for(const range of formatted?.applications??[])checked(d.applyCharFormatInCell(...args,range.start,range.end,range.properties));
- pending.set(d,proof);assertCellParagraphResult(d,base,op);
+ const token=pictureText?d.saveSnapshot():undefined;
+ try{
+  for(const range of formatted?.applications??[])checked(d.applyCharFormatInCell(...args,range.start,range.end,range.properties));
+  pending.set(d,proof);assertCellParagraphResult(d,base,op);
+ }catch(error){if(token!==undefined){pending.delete(d);d.restoreSnapshot(token);}throw error;}
+ finally{if(token!==undefined)d.discardSnapshot(token);}
  // Keep the caret in the editable suffix. Focusing a leading field activates it
  // and hides its guide, so the live layout would differ from the saved document.
  return {sectionIndex:t.section,parentParaIndex:t.paragraph,paragraphIndex:op.paragraph,charOffset:p.editableFrom??0,controlIndex:t.control,cellIndex:c.index,cellParaIndex:op.paragraph,cellPath:[{controlIndex:t.control,cellIndex:c.index,cellParaIndex:op.paragraph}]};

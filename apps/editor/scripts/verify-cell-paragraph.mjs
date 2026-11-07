@@ -1,4 +1,4 @@
-import {createAxisPictureFixture} from './lib/axis-picture-fixture.mjs';
+import {createAxisPictureFixture,inspectPictureAnchors} from './lib/axis-picture-fixture.mjs';
 import puppeteer from 'puppeteer-core';
 import {continuedMergedTable,fragmentedMergedCell} from './lib/continued-merged-table.mjs';
 import http from 'node:http';
@@ -30,6 +30,8 @@ const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const
  const operations=[{kind:'replace_cell_paragraph',target,row:cell?.row??0,column:cell?.column??0,paragraph,originalText:cell?.paragraphs?.find(p=>p.index===paragraph)?.text??fallback,text:'Agent revised paragraph 😀'}];
  if(input.instruction.includes('photo-owner'))operations[0].text='개정5';
  if(input.instruction.includes('picture-suffix'))operations[0].text=operations[0].originalText+'개정';
+ if(input.instruction.includes('picture prefix color'))Object.assign(operations[0],{text:operations[0].originalText,
+   spanFormats:[{start:0,end:1,color:'#246789'},{start:5,end:6,color:'#148061'}]});
  if(input.instruction.includes('mixed-tail'))operations[0].text=operations[0].originalText.slice(0,-1)+'개정😀';
  if(input.instruction.includes('split-owner'))operations[0].text=operations[0].originalText.slice(0,-6)+'Tail 2';
  if(input.instruction.includes('field-tail'))operations[0].text=Array.from(operations[0].originalText).slice(0,cell.paragraphs[paragraph].editableFrom).join('')+'수정😀';
@@ -120,6 +122,31 @@ try{
   await saveAndReopen(f,'photo-owner',format);
   const reopened=await snap();assert.deepEqual(paragraphs(reopened),paragraphs(after));
   assert.deepEqual(await pictures(),originals);
+ });
+ for(const format of ['hwp','hwpx'])await scenario(format+' picture prefix color before and between stored slots through chat, redo and bound save',async()=>{
+  await configure('openai-compatible');
+  const source=await createAxisPictureFixture(HwpDocument,out,{merged:true,grouped:true});
+  const owner=4,args=[0,1,0,owner,0];
+  source.insertTextInCell(...args,2,'한글문');source.insertTextInCell(...args,0,'가나');
+  for(const start of [0,5])source.applyCharFormatInCell(...args,start,start+1,'{"textColor":"#112233"}');
+  const beforeFile=resolve(out,'prefix-original.'+format);
+  await writeFile(beforeFile,format==='hwp'?source.exportHwp():source.exportHwpx());
+  const originalSlots=inspectPictureAnchors(beforeFile),f=await open(format,source);
+  const inspect=()=>f.evaluate((args,owner)=>{
+   const d=window.__pageServices.wasm.borrowDocumentHandle(),layout=JSON.parse(d.getPageTextLayout(0));
+   return {ink:layout.runs.filter(r=>r.parentParaIdx===1 && r.cellIdx===owner).map(({text,charStart,x,y,w,h,charX})=>({text,charStart,x,y,w,h,charX})),
+     images:JSON.parse(d.getPageControlLayout(0)).controls.filter(c=>c.type==='image'),
+     anchors:[...d.getCellPictureTextAnchors(...args)],
+     colors:[0,5].map(i=>JSON.parse(d.getCellCharPropertiesAt(...args,i)).textColor)};
+  },args,owner);
+  const original=await inspect();assert.deepEqual(original.anchors,[3,7,8]);assert.deepEqual(original.colors,['#112233','#112233']);
+  await send('first picture prefix color');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const expected={...original,colors:['#246789','#148061']};
+  assert.deepEqual(await inspect(),expected);
+  await undo();assert.deepEqual(await inspect(),original);
+  await execute('edit:redo');assert.deepEqual(await inspect(),expected);
+  await saveAndReopen(f,'picture-prefix',format);assert.deepEqual(await inspect(),expected);
+  assert.deepEqual(inspectPictureAnchors(resolve(out,'picture-prefix.'+format)),originalSlots);
  });
  for(const format of ['hwp','hwpx'])await scenario(format+' picture-suffix chat preserves all three anchors on undo, redo, save and reopen',async()=>{
   const f=await open(format,await createAxisPictureFixture(HwpDocument,out,{merged:true,grouped:true})),before=await snap();

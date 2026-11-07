@@ -36,10 +36,14 @@ export function cellParagraphPlan(op:AgentCellParagraphOp,s:Snapshot){
  if(op.spanFormats!==undefined){
   const length=Array.from(op.text).length;
   if(!Array.isArray(op.spanFormats)||!op.spanFormats.length||op.spanFormats.length>32)throw Error('새 글자 서식은 1~32개 구간으로 지정하세요.');
-  let previous=paragraph.editableFrom??0;
+  let previous=0;
   for(const format of op.spanFormats){
    if(!format||typeof format!=='object'||Array.isArray(format)||!Number.isSafeInteger(format.start)||!Number.isSafeInteger(format.end)||
       format.start<previous||format.end<=format.start||format.end>length)throw Error('교체 후 문단의 겹치지 않는 글자 위치를 순서대로 지정하세요.');
+   if(format.start<(paragraph.editableFrom??0) && !(op.originalText===op.text &&
+      paragraph.formatOnlyRanges?.some(r=>Number.isSafeInteger(r.start) && Number.isSafeInteger(r.end) &&
+       r.start>=0 && r.end<=paragraph.editableFrom! && r.start<=format.start && format.end<=r.end)))
+    throw Error('그림·필드 경계에서 떨어진 원래 글자 구간에만 서식을 지정하세요.');
    const keys=Object.keys(format).filter(k=>k!=='start'&&k!=='end');
    if(!keys.length||keys.some(k=>!['bold','italic','color','fontSizePt'].includes(k))||
       ('bold'in format&&typeof format.bold!=='boolean')||('italic'in format&&typeof format.italic!=='boolean')||

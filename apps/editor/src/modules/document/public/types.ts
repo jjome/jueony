@@ -1,7 +1,7 @@
 import type {DocumentMetadataValues} from '../domain/document-metadata-values.ts';
 export type CellCharacterFormat={start:number;end:number;bold?:boolean;italic?:boolean;color?:string;fontSizePt?:number};
 export type AgentCellParagraphOp={kind:"replace_cell_paragraph";target:string;row:number;column:number;paragraph:number;originalText:string;text:string;spanTexts?:string[];spanFormats?:CellCharacterFormat[]};
-export type CellParagraphText={index:number;text:string;formatSpans?:Array<{start:number;end:number}>;editableFrom?:number};
+export type CellParagraphText={index:number;text:string;formatSpans?:Array<{start:number;end:number}>;editableFrom?:number;formatOnlyRanges?:Array<{start:number;end:number}>};
 export type AgentCellParagraphSource={editable:boolean;fingerprint?:string;cells?:Array<{index:number;row:number;column:number;rowSpan:number;columnSpan:number;paragraphs:CellParagraphText[]}>;reason?:string};
 export type AgentTableSubdivisionOp={kind:"split_table_cell_into";target:string;row:number;column:number;rows:number;columns:number;distributeParagraphs?:boolean|null};
 export type AgentTableSubdivisionSource={editable:boolean;exactGrid?:boolean;frames?:NonNullable<AgentTableSubdivisionSource['frame']>[];fingerprint?:string;hwp5Grid?:{widths:number[];heights:number[]};paragraphFormats?:string[];cells?:Array<{row:number;column:number;minimumWidth:number;minimumHeight:number;paragraphFormats?:string[]}>;frame?:{page:number;x:number;y:number;w:number;h:number;cells:Array<{index:number;row:number;column:number;x:number;y:number;w:number;h:number;lineSignature?:string}>};reason?:string};

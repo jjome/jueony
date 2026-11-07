@@ -12,6 +12,8 @@
 
 ## 11월 8일 추가 검수
 
+최종 코드 `0fb7daef`의 격리 체크아웃과 Rust/WASM `2b48445c764249f6`에서 TypeScript 검사, 편집기 테스트 1,218/1,218, 숫자 셀 입력 Edge 검사 8/8, 글 방향 사본 저장 Edge 검사 12/12를 통과했다. 아래 실행 명령으로 이 합본을 열 수 있다.
+
 - HWP와 HWPX에서 참조하는 일반 셀에 숫자를 입력해 수식 두 단계가 갱신되는지 확인했다. 키 입력과 Agent 요청으로 저장한 파일 4개에서 수식과 표시값을 읽어 대조했다. 보호된 간접 참조나 유효하지 않은 입력은 원복했다. 해당 Edge 검사 8건을 통과했다. [숫자 입력 검수](../apps/editor/scripts/verify-table-formula-input.mjs)
 - 원본과 같은 HWPX를 별도 파일 핸들로 다시 선택하면 대체 저장이 원본 쓰기 스트림을 여는 결함을 재현했다. 수정 후 같은 파일, 핸들 없는 원본, 파일 선택 도중 문서 전환에서 원본 쓰기는 0회였다. Edge 검사 12건을 통과했다. 한컴 공개 API는 AUTO=0, RTL=1, LTR=2를 정의하나 HWP5 문단 레코드의 대응 위치는 확인되지 않았다. [원본 보호 및 글 방향 근거](139-basic-editor-parallel-plan.md)
 - 병합 셀은 Rust/WASM 검사 46건과 Edge 17건을 통과했다. 3쪽 표의 둘째 쪽에서 첫 서식 구간을 삭제한 뒤 한 번 되돌리고 다시 적용했다. HWP·HWPX 재열기 결과에서 수정한 셀과 첫 쪽의 같은 화면 번호를 가진 다른 셀을 각각 확인했다. [엔진 검사](../apps/editor/scripts/verify-cell-paragraph-engine.mjs) · [Edge 검사](../apps/editor/scripts/verify-cell-paragraph.mjs)

@@ -4,6 +4,7 @@ import type {HistoryScope} from '../../modules/document-files/public/index.ts';
 import {readDocumentMetadata,DOCUMENT_METADATA_KEYS} from './document-metadata.ts';
 import {readCellParagraphSources,assertCellParagraphResult} from './cell-paragraph.ts';
 import {readTableSubdivisionSources,assertTableSubdivisionResult} from './table-subdivision.ts';
+import {subdivisionCopyMetrics} from './subdivision-canvas-metrics.ts';
 import {readTableStructureSources,assertTableStructureResult} from './table-structure.ts';
 import {readTableSplitSources,assertTableSplitResult} from './table-split.ts';
 import {readTableMergeSources,assertTableMergeResult} from './table-merge.ts';
@@ -146,7 +147,9 @@ export function installAgentBridge(d:Deps){
      const text:string[]=[];for(let s=0;s<copy.getSectionCount();s++)for(let p=0;p<copy.getParagraphCount(s);p++)text.push(copy.getTextRange(s,p,0,copy.getParagraphLength(s,p)));
      if(text.join('\n')!==plainSnapshot(base))throw new Error('사전 검사용 사본이 원문과 다릅니다. 문서에 적용하지 않았습니다.');
     }
-    executeDocumentOperations(copy,base,validated.operations);
+    const copyMetrics=subdivisionCopyMetrics(d.wasm,base,validated.operations);
+    copyMetrics?.(copy);
+    executeDocumentOperations(copy,base,validated.operations,copyMetrics);
     const artifact=d.wasm.fileName.toLowerCase().endsWith('.hwpx')?copy.exportHwpxWithReport():copy.exportHwpWithReport();
     try{
      const loss=JSON.parse(artifact.contentLoss());if(loss.count!==0)throw new Error('편집 결과 저장 시 내용 손실이 보고되어 문서에 적용하지 않았습니다.');
@@ -202,6 +205,7 @@ export function installAgentBridge(d:Deps){
    if(!validated.operations.length)throw new Error('적용할 명령이 없습니다.');
    await api.preflight(base,validated);assertRevision(base.revision,revision());
    if(applying||damaged||(api.busy()||api.hostMutationLocked())||composing)throw new Error('검사 중 다른 문서 작업이 시작되어 적용하지 않았습니다.');
+   const copyMetrics=subdivisionCopyMetrics(d.wasm,base,validated.operations);
    const before=plainSnapshot(base),beforeBytes=recoveryBytes(d.wasm,d.wasm.fileName);let executed=false;
    applying=true;const root=document.getElementById('studio-root')!;const inert=root.inert;root.inert=true;
    const overlay=Object.assign(document.createElement('div'),{id:'jueony-busy',textContent:'AI 변경을 문서에 적용하고 있습니다…'});document.body.append(overlay);
@@ -210,7 +214,7 @@ export function installAgentBridge(d:Deps){
     let afterStructure:Snapshot['structure'],formulaField:Receipt['formulaField'],renderAttempt=0;
     await input.executeDocumentAgentOperation({kind:'snapshot',operationType:'jueony:'+runId,operation:(wasm:any)=>{
      assertRevision(base.revision,revision());executed=true;
-     const cursor=executeDocumentOperations(wasm,base,validated.operations);
+     const cursor=executeDocumentOperations(wasm,base,validated.operations,copyMetrics);
      if(validated.operations[0]?.kind==='insert_table_formula_field')formulaField=insertedTableFormulaReceipt(wasm,base,validated.operations[0]);
      if(validated.operations[0]?.kind==='update_table_formula_field')formulaField=tableFormulaReceipt(wasm,base,validated.operations[0]);
      return cursor??(validated.operations.length===1&&(['set_document_metadata','create_paragraph_style','rename_paragraph_style','set_next_paragraph_style','set_table_pagination','set_table_header'].includes(validated.operations[0].kind)||(validated.operations[0].kind==='format_table_cells'&&(Object.hasOwn(validated.operations[0].properties,'equalizeColumns')||Object.hasOwn(validated.operations[0].properties,'columnWidthMm')||Object.hasOwn(validated.operations[0].properties,'equalizeRows')||Object.hasOwn(validated.operations[0].properties,'rowHeightMm'))))?input.getCursorPosition():{sectionIndex:0,paragraphIndex:0,charOffset:0});
@@ -221,7 +225,7 @@ export function installAgentBridge(d:Deps){
      if(validated.operations[0]?.kind==='insert_table_formula_field' && JSON.stringify(formulaField)!==JSON.stringify(insertedTableFormulaReceipt(d.wasm,base,validated.operations[0])))throw Error('조판 후 삽입한 계산식이 달라졌습니다.');
      if(validated.operations[0]?.kind==='update_table_formula_field' && JSON.stringify(formulaField)!==JSON.stringify(tableFormulaReceipt(d.wasm,base,validated.operations[0])))
       throw Error('조판 후 계산식 원문 또는 연관 셀의 결과가 달라졌습니다.');
-     afterStructure=readStructure(d.wasm);for(const op of validated.operations){if(op.kind==='set_document_metadata')assertAgentDocumentMetadata(d.wasm,op);if(op.kind==='replace_cell_paragraph')assertCellParagraphResult(d.wasm,base,op);if(op.kind==='split_table_cell_into')assertTableSubdivisionResult(d.wasm,base,op);if(op.kind==='split_table'||op.kind==='attach_table')assertTableStructureResult(d.wasm,base,op);if(op.kind==='split_table_cell')assertTableSplitResult(d.wasm,base,op);if(op.kind==='merge_table_cells')assertTableMergeResult(d.wasm,base,op);if(op.kind==='format_table_cells'&&(Object.hasOwn(op.properties,'equalizeRows')||Object.hasOwn(op.properties,'rowHeightMm')))assertRowHeightResult(d.wasm,base,op);}});
+     afterStructure=readStructure(d.wasm);for(const op of validated.operations){if(op.kind==='set_document_metadata')assertAgentDocumentMetadata(d.wasm,op);if(op.kind==='replace_cell_paragraph')assertCellParagraphResult(d.wasm,base,op);if(op.kind==='split_table_cell_into')assertTableSubdivisionResult(d.wasm,base,op,copyMetrics);if(op.kind==='split_table'||op.kind==='attach_table')assertTableStructureResult(d.wasm,base,op);if(op.kind==='split_table_cell')assertTableSplitResult(d.wasm,base,op);if(op.kind==='merge_table_cells')assertTableMergeResult(d.wasm,base,op);if(op.kind==='format_table_cells'&&(Object.hasOwn(op.properties,'equalizeRows')||Object.hasOwn(op.properties,'rowHeightMm')))assertRowHeightResult(d.wasm,base,op);}});
     const afterRevision=revision();applying=false;
     // snapshot requires the busy gate to be removed; read the body directly while still gated.
     const after:string[]=[];for(let s=0;s<d.wasm.getSectionCount();s++)for(let p=0;p<d.wasm.getParagraphCount(s);p++)after.push(d.wasm.getTextRange(s,p,0,d.wasm.getParagraphLength(s,p)));

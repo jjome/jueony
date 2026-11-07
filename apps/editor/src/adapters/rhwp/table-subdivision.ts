@@ -10,6 +10,7 @@ import { topologySemantics, rootBodyTexts, tableTextTree } from './table-topolog
 import { tableLayoutEvidence, sameTableLayout } from './table-layout-evidence.ts';
 import {subdivisionFrames,compareSubdivisionFrames,compareDividedPieces} from './subdivision-frames.ts';
 import {hwpSubdivisionSource,verifiedSubdivisionHwp} from './hwp-table-subdivision.ts';
+import type {SubdivisionCopyMetrics} from './subdivision-canvas-metrics.ts';
 const canonical = (v:any):any => Array.isArray(v) ? v.map(canonical) : v && typeof v === 'object' ? Object.fromEntries(Object.keys(v).sort().map(k => [k, canonical(v[k])])) : v;
 const same = (a:any, b:any) => JSON.stringify(canonical(a)) === JSON.stringify(canonical(b));
 const hash = (v:any) => Array.from(sha256(new TextEncoder().encode(JSON.stringify(canonical(v)))),n=>n.toString(16).padStart(2,'0')).join('');
@@ -60,7 +61,7 @@ export function readTableSubdivisionSources(wasm:any, tables:Table[], name:strin
     return [t.id, { editable: true, fingerprint: hash({ merge: authority, table: t, properties: p, preservation: preservation.values }), cells, frame, ...(frames.length>1 ? {frames} : {}), ...(exactGrid ? {exactGrid:true} : {}), ...(binary ? {hwp5Grid:{widths,heights}} : {}), ...(paragraphFormats ? {paragraphFormats} : {}) }];
   } catch { return [t.id, { editable: false, reason: '원본 격자와 쪽별 셀·글줄을 확인한 본문 표를 분할할 수 있습니다. HWP5는 본문 표 한 개와 원본 형식의 저장·재열기 검사를 추가로 요구합니다. 보호·제목·중첩·복합 배치는 제외합니다.' }]; } }));
 }
-export function assertTableSubdivisionResult(wasm:any, base:Snapshot, op:AgentTableSubdivisionOp):void {
+export function assertTableSubdivisionResult(wasm:any, base:Snapshot, op:AgentTableSubdivisionOp,copyMetrics?:SubdivisionCopyMetrics):void {
   const d = nativeDocument(wasm), plan = tableSubdivisionPlan(op, base), t = plan.table, actual = readStructure(d).tables.find(v => v.id === t.id);
   const view = (c:any) => ({ index: c.index, row: c.row, column: c.column, rowSpan: c.rowSpan, columnSpan: c.columnSpan, text: c.text, properties: c.properties, characters: c.characters, paragraphProperties: c.paragraphProperties });
   const slots = plan.cells.filter(c => c.originIndex === null || c.originIndex === plan.primary.index);
@@ -86,6 +87,12 @@ export function assertTableSubdivisionResult(wasm:any, base:Snapshot, op:AgentTa
   const fromFragmentedOwner=primarySpansPages ? new Set(divided.map(c=>c.index)) : undefined;
   const frames=subdivisionFrames(d,actual,parsed(d.getTableProperties(t.section,t.paragraph,t.control)),fragmented,fromFragmentedOwner);
   const {original,current}=compareSubdivisionFrames(originalFrames,frames,plan.cells,plan.primary.index);
+  if(primarySpansPages && !op.distributeParagraphs) {
+    const retained=divided.find(c=>c.originIndex===plan.primary.index)!;
+    const lines=(pieces:typeof original)=>pieces.filter(p=>p.lineSignature!==hash([])).map(p=>[p.page,p.lineSignature]);
+    if(!same(lines(original),lines(current.get(retained.index)??[])))
+      throw Error('분할 뒤 원래 셀의 쪽별 글줄 위치가 달라졌습니다.');
+  }
   const columns = [...new Set(divided.map(c=>c.column))], rows = [...new Set(divided.map(c=>c.row))];
   for(const c of divided) compareDividedPieces(original,current.get(c.index),plan.widths,plan.heights,columns.indexOf(c.column),rows.indexOf(c.row));
   let copy:any; try { const binary=!!plan.source.hwp5Grid;
@@ -99,21 +106,22 @@ export function assertTableSubdivisionResult(wasm:any, base:Snapshot, op:AgentTa
       } finally { artifact.free(); }
     } else bytes=d.exportHwpx();
     copy = new d.constructor(bytes);
+    copyMetrics?.(copy);
     if (binary || op.distributeParagraphs || plan.source.exactGrid) checkCells(copy, readStructure(copy).tables.find(v => v.id === t.id));
     if (fragmented && !sameTableLayout(frames,subdivisionFrames(copy,actual,parsed(copy.getTableProperties(t.section,t.paragraph,t.control)),true,fromFragmentedOwner)))
       throw Error('저장한 셀의 쪽별 원본 범위나 글줄이 달라졌습니다.');
     if (!sameTableLayout(after, tableLayoutEvidence(copy, actual))) throw new Error('임의 분할 뒤 저장 재열기의 셀·글줄 배치가 다릅니다.'); } finally { copy?.free(); }
 }
-export function executeTableSubdivision(wasm:any, base:Snapshot, op:AgentTableSubdivisionOp) {
+export function executeTableSubdivision(wasm:any, base:Snapshot, op:AgentTableSubdivisionOp,copyMetrics?:SubdivisionCopyMetrics) {
   const source=base.tableSubdivisionSources?.[op.target];
   if (!source?.frames?.some(f=>f.cells.some(c=>c.lineSignature))) return applySubdivision(wasm,base,op);
   const d=nativeDocument(wasm), token=d.saveSnapshot();
-  try { return applySubdivision(wasm,base,op); }
+  try { return applySubdivision(wasm,base,op,copyMetrics); }
   catch (error) {d.restoreSnapshot(token);throw error;}
   finally {d.discardSnapshot(token);}
 }
 
-function applySubdivision(wasm:any, base:Snapshot, op:AgentTableSubdivisionOp) {
+function applySubdivision(wasm:any, base:Snapshot, op:AgentTableSubdivisionOp,copyMetrics?:SubdivisionCopyMetrics) {
   const d = nativeDocument(wasm), plan = tableSubdivisionPlan(op, base), t = plan.table, structure = readStructure(d), cap = readTableSubdivisionSources(d, structure.tables, base.name)?.[t.id];
   const comparable=(c:any)=>{const {frame,...model}=c??{};return model;};
   if (!same(structure.tables.find(v => v.id === t.id), t) || cap?.editable !== true || !same(comparable(cap),comparable(base.tableSubdivisionSources?.[t.id]))||!sameTableLayout(cap.frame,base.tableSubdivisionSources?.[t.id]?.frame)) throw new Error('문서·표 내용·서식·배치가 바뀌었습니다. 최신 상태로 다시 요청하세요.');
@@ -145,7 +153,7 @@ function applySubdivision(wasm:any, base:Snapshot, op:AgentTableSubdivisionOp) {
   if (result?.ok !== true) throw new Error('셀 임의 분할을 실행하지 못했습니다.');
   const after = capturePreservationEvidence(d);
   if (after.issues.length || !same(topologySemantics(after.values), expected) || !same(rootBodyTexts(d), body) || !same(tableTextTree(readStructure(d).tables), expectedText)) throw new Error('분할 뒤 다른 셀·본문·서식·필드·자원 보존이 계획과 다릅니다.');
-  assertTableSubdivisionResult(d, base, op);
+  assertTableSubdivisionResult(d, base, op,copyMetrics);
   const first = plan.cells.find(c => c.originIndex === plan.primary.index)!;
   return { sectionIndex: t.section, parentParaIndex: t.paragraph, paragraphIndex: 0, charOffset: 0, controlIndex: t.control, cellIndex: first.index, cellParaIndex: 0, cellPath: [{ controlIndex: t.control, cellIndex: first.index, cellParaIndex: 0 }] };
 }

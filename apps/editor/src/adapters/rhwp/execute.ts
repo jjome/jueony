@@ -3,6 +3,7 @@ import {agentFileKinds} from '../../modules/document/public/index.ts';
 import {executeAgentDocumentMetadata} from './agent-document-information.ts';
 import {executeCellParagraph} from './cell-paragraph.ts';
 import {executeTableSubdivision} from './table-subdivision.ts';
+import type {SubdivisionCopyMetrics} from './subdivision-canvas-metrics.ts';
 import {executeTableStructure} from './table-structure.ts';
 import {executeTableSplit} from './table-split.ts';
 import {executeTableMerge} from './table-merge.ts';
@@ -24,7 +25,7 @@ import { nativeDocument } from './structure.ts';
 
 // Called inside the editor's single SnapshotCommand. IDs retain their meaning
 // while structural insertions move native paragraph indices within this batch.
-export function executeDocumentOperations(wasm: any, base: Snapshot, operations: EditOp[]) {
+export function executeDocumentOperations(wasm: any, base: Snapshot, operations: EditOp[], copyMetrics?:SubdivisionCopyMetrics) {
   if(operations.some(op=>(agentFileKinds as readonly string[]).includes(op.kind)))throw Error('문서 탭 명령은 업무 소유 façade에서만 실행합니다.');
   const snapshot = structuredClone(base), doc = nativeDocument(wasm);
   const nestedAxis=operations.find(op=>'index' in op && 'target' in op && /^(insert|delete)_table_(row|column)$/u.test(op.kind) &&
@@ -76,7 +77,7 @@ export function executeDocumentOperations(wasm: any, base: Snapshot, operations:
   if(operations.length===1&&operations[0].kind==='merge_table_cells')return executeTableMerge(doc,snapshot,operations[0]);
   if(operations.length===1&&(operations[0].kind==='split_table'||operations[0].kind==='attach_table'))return executeTableStructure(doc,snapshot,operations[0]);
   if(operations.length===1&&operations[0].kind==='replace_cell_paragraph')return executeCellParagraph(doc,snapshot,operations[0]);
-  if(operations.length===1&&operations[0].kind==='split_table_cell_into')return executeTableSubdivision(doc,snapshot,operations[0]);
+  if(operations.length===1&&operations[0].kind==='split_table_cell_into')return executeTableSubdivision(doc,snapshot,operations[0],copyMetrics);
   if(operations.length===1&&operations[0].kind==='split_table_cell')return executeTableSplit(doc,snapshot,operations[0]);
   const tables = new Map((snapshot.structure?.tables ?? []).map(t => [t.id, t]));
   for (const op of operations) {

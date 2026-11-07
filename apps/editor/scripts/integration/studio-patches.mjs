@@ -6,6 +6,13 @@ function replaceOnce(text, before, after, label) {
   if (text.split(before).length !== 2) throw new Error(`소스 패치 기준 불일치: ${label}`);
   return text.replace(before, after);
 }
+const metricPath=join(root,'src/core/canvas-metric-session.ts');
+let metrics=(await readFile(metricPath,'utf8')).replace(/\r\n/g,'\n');
+metrics="import { recordPublishedCanvasMetrics } from '../jueony/adapters/rhwp/subdivision-canvas-metrics.ts';\n"+metrics;
+metrics=replaceOnce(metrics,'      const registered = doc.registerCanvasMetricReplies(generation.document, generation.fonts, batch.revision, JSON.stringify(replies));',
+  '      const json = JSON.stringify(replies);\n      const registered = doc.registerCanvasMetricReplies(generation.document, generation.fonts, batch.revision, json);','Canvas metric batch');
+metrics=replaceOnce(metrics,'      this.lastError = null;', '      if (doc.canvasMetricsActive()) recordPublishedCanvasMetrics(doc, generation, json);\n      this.lastError = null;', 'published Canvas metric batch');
+await writeFile(metricPath,metrics);
 let html = await readFile(join(upstream, 'rhwp-studio/index.html'), 'utf8');
 html = replaceOnce(html, '<script src="/theme-init.js"></script>', '<script src="/jueony-boot.js"></script>\n  <script src="/theme-init.js"></script>', 'boot');
 html = replaceOnce(html, '<title>rhwp-studio</title>', '<title>Jueony 문서 편집기 · 개발판</title>', 'title');

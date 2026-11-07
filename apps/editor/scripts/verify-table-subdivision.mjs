@@ -103,25 +103,34 @@ try{
    await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);
    await reopen(f,'fragmented-split-'+ext,ext);assert.deepEqual((await snap()).structure,after.structure);
  });
- await scenario('fragmented subdivision - compare live and reopened emoji glyph width before editing',async()=>{
+ for(const ext of ['hwpx','hwp']) await scenario('fragmented subdivision - measured emoji keeps three page fragments in '+ext,async()=>{
    await configure('openai-compatible');
-   const f=await open('hwpx',fragmentedSubdivisionTable(HwpDocument)),before=await state();
+   const f=await open(ext,fragmentedSubdivisionTable(HwpDocument)),before=await snap();
    const widths=await f.evaluate(()=>{
      const wasm=window.__pageServices.wasm,live=wasm.borrowDocumentHandle();
      const copy=new (wasm.getWasmModuleExports().HwpDocument)(live.exportHwpx());
      const width=d=>JSON.parse(d.getPageTextLayout(0)).runs.find(r=>r.text==='😀').w;
-     try {return [width(live),width(copy)];} finally {copy.free();}
+     try {return {active:live.canvasMetricsActive(),live:width(live),portable:width(copy)};} finally {copy.free();}
    });
-   await writeFile(resolve(out,'live-reopened-emoji-width.json'),JSON.stringify(widths));
+   assert.ok(widths.active && Math.abs(widths.live-widths.portable)>0.2);
+   await writeFile(resolve(out,'live-reopened-emoji-width-'+ext+'.json'),JSON.stringify(widths));
    await send('세 쪽에 걸친 셀을 세 칸으로 나눠줘');
-   if(Math.abs(widths[0]-widths[1])>0.2) {await error(true);assert.deepEqual(await state(),before);}
-   else {await error(false);await reopen(f,'fragmented-same-glyph-width');}
+   await error(false);
+   const after=await snap(),t=before.structure.tables[0],parts=after.structure.tables[0].cells;
+   assert.deepEqual(parts.slice(0,3).map(c=>c.text),[t.cells[0].text,'','']);
+   const frames=s=>s.tableSubdivisionSources[t.id].frames.map(f=>[f.page,f.cells.find(c=>c.index===0).lineSignature]);
+   assert.ok(frames(before).length>1);
+   assert.deepEqual(frames(after),frames(before));
+   await undo();assert.deepEqual((await snap()).structure,before.structure);
+   await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);
+   await reopen(f,'fragmented-measured-emoji-'+ext,ext);assert.deepEqual(frames(await snap()),frames(after));
  });
  await scenario('fragmented subdivision - changed page breaks preserve bytes and undo history',async()=>{
    await configure('openai-compatible');
    await open('hwpx',fragmentedSubdivisionTable(HwpDocument,{wrapped:true}));
    const before=await state();
    await send('세 쪽에 걸친 셀을 세 칸으로 나눠줘');await error(true);
+   assert.match(await page.$eval('#request-error',e=>e.textContent),/표 외형이나 쪽|이웃 셀의 쪽|쪽별 실제 크기|원래 높이/);
    assert.deepEqual(await state(),before);
  });
  await scenario('staggered grid - second page split across new lines with formatted paragraphs',async()=>{

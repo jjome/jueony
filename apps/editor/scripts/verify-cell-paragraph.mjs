@@ -119,6 +119,30 @@ try{
    for(const i of [1,2])assert.deepEqual([shape(i).bold,shape(i).italic,shape(i).textColor,shape(i).fontSize],[false,true,'#13579b',1450]);
   }finally{saved.free();}
  });
+ for(const format of ['hwp','hwpx'])await scenario(format+' neighbor FORMULA preserved through chat, undo/redo and editor reopen',async()=>{
+  const d=body(format,true),name='neighbor-formula',revised='Agent revised paragraph 😀';
+  d.deleteTextInCell(0,1,0,2,0,0,4);d.insertTextInCell(0,1,0,2,0,0,'3');
+  assert.equal(JSON.parse(d.insertTableFormulaField(0,1,0,4,'업무 5','=A2*2','%g')).value,'6');
+  d.mergeTableCells(0,2,0,1,0,1,1);
+  assert.equal(JSON.parse(d.insertTableFormulaField(0,2,0,1,'','=2+3','%g')).value,'5');
+  const f=await open(format,d),before=await snap(),table=before.structure.tables[0];
+  const fields=()=>f.evaluate(()=>JSON.parse(window.__pageServices.wasm.borrowDocumentHandle().getFieldList()));
+  const originalFields=await fields();assert.equal(originalFields.length,2);
+  await send('계산식을 보존하고 병합 셀 문단을 수정해 주세요.');
+  assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const cap=calls.at(-1).input.document.cellParagraphSources[table.id];
+  assert.equal(cap.editable,true);assert.ok(!cap.cells.some(c=>c.index===2||c.index===4));
+  assert.equal((await snap()).cellParagraphSources[table.id].cells[0].paragraphs[1].text,revised);
+  await undo();assert.deepEqual((await snap()).structure.tables,before.structure.tables);
+  await execute('edit:redo');const saved=await save(f,name,format);
+  try{assert.deepEqual(JSON.parse(saved.getFieldList()),originalFields);}finally{saved.free();}
+  await f.evaluate(async()=>{
+   const api=window.jueonyEditor,handle=api.fileHandle(),file=await handle.getFile();
+   await api.open(new Uint8Array(await file.arrayBuffer()),file.name,handle,false);
+  });
+  assert.deepEqual(await fields(),originalFields);
+  assert.equal((await snap()).cellParagraphSources[table.id].cells[0].paragraphs[1].text,revised);
+ });
  for(const format of ['hwp','hwpx'])for(const mode of ['split-owner','field-tail','two-field-tail'])await scenario(format+' '+mode+' through chat, undo/redo and bound file reopen',async()=>{
   const split=mode==='split-owner',d=split?fragmentedMergedCell(HwpDocument):body(format);
   if(mode==='two-field-tail'){

@@ -160,6 +160,72 @@ test('undetermined internal column has no fallback width for an Agent axis edit'
   } finally {d.free();}
 });
 
+for(const format of ['hwp','hwpx']) for(const row of [true,false]){
+ test(format+' '+(row?'row':'column')+' refuses inserted cell sizes at a hidden grid boundary',()=>{
+  const seed=HwpDocument.createEmpty();
+  try{
+   seed.createBlankDocument();seed.insertText(0,0,0,'표');seed.splitParagraph(0,0,1);seed.createTable(...at,3,3);
+   // Each missing width/height would happen to match the native default
+   // (1800/400), but only the sum of the two hidden tracks survives in the file.
+   for(let i=0;i<9;i++)seed.setCellProperties(...at,i,'{"width":1800,"height":400}');
+   for(let i=0;i<3;i++){
+    if(row)seed.mergeTableCells(...at,i,0,i,1);
+    else seed.mergeTableCells(...at,0,i,1,i);
+   }
+   const doc=new HwpDocument(serialize(seed,format));
+   try{
+    const s=snapshot(doc,format),before=serialize(doc,format);
+    const op:EditOp={kind:row?'insert_table_row':'insert_table_column',target,index:3,values:['','','']};
+    assert.throws(()=>executeDocumentOperations(doc,s,validateEditOperations([op],s)),/행 높이 또는 열 너비/);
+    assert.deepEqual(readStructure(doc),s.structure);assert.deepEqual(serialize(doc,format),before);
+   }finally{doc.free();}
+  }finally{seed.free();}
+ });
+ test(format+' '+(row?'row':'column')+' verifies inserted cell sizes resolved from staggered neighbors',()=>{
+  const doc=staggered(format,!row);
+  try{
+   const s=snapshot(doc,format),end=3;
+   const op:EditOp={kind:row?'insert_table_row':'insert_table_column',target,index:end,values:['가','나','다']};
+   const method=row?'insertTableRow':'insertTableColumn', insert=doc[method].bind(doc);
+   doc[method]=(...args:any[])=>{
+    const reply=insert(...args);
+    const created=readStructure(doc).tables[0].cells.find(c=>(row?c.row:c.column)===end)!;
+    doc.setCellProperties(...at,created.index,JSON.stringify(row?{width:1800}:{height:400}));
+    return reply;
+   };
+   const original=serialize(doc,format);
+   assert.throws(()=>executeDocumentOperations(doc,s,validateEditOperations([op],s)),/추가한 셀의 행 높이 또는 열 너비/);
+   assert.deepEqual(serialize(doc,format),original);
+   doc[method]=insert;
+   roundtrip(doc,format,()=>{
+    executeDocumentOperations(doc,s,validateEditOperations([op],s));
+    const created=readStructure(doc).tables[0].cells.filter(c=>(row?c.row:c.column)===end);
+    assert.deepEqual(created.map(c=>[c.properties.width,c.properties.height]),row?
+     [[5000,12000],[7000,12000],[9000,12000]]:[[9000,6000],[9000,9000],[9000,12000]]);
+   });
+  }finally{doc.free();}
+ });
+}
+
+for(const format of ['hwp','hwpx'])test(format+' retains the cross-axis size when deleting its last width witness',()=>{
+ const seed=HwpDocument.createEmpty();
+ try{
+  seed.createBlankDocument();seed.insertText(0,0,0,'표');seed.splitParagraph(0,0,1);seed.createTable(...at,2,3);
+  for(let i=0;i<6;i++)seed.setCellProperties(...at,i,JSON.stringify({width:[5000,7000,9000][i%3],height:4000}));
+  seed.mergeTableCells(...at,1,0,1,1);
+  const doc=new HwpDocument(serialize(seed,format));
+  try{
+   const s=snapshot(doc,format),before=serialize(doc,format);
+   const op:EditOp={kind:'delete_table_row',target,index:0};
+   // Only the first row stores 5000 and 7000 separately. After removing it,
+   // the native operation can shrink the outer width from 21000 to 12600.
+   assert.throws(()=>executeDocumentOperations(doc,s,validateEditOperations([op],s)),/표 외곽 치수/);
+   assert.equal(JSON.parse(doc.getTableProperties(...at)).tableWidth,21000);
+   assert.deepEqual(readStructure(doc),s.structure);assert.deepEqual(serialize(doc,format),before);
+  }finally{doc.free();}
+ }finally{seed.free();}
+});
+
 test('a post-edit field value change rolls the whole axis edit back',()=>{
   const doc=staggered('hwpx',false);
   try {

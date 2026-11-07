@@ -165,6 +165,7 @@ for(const format of ['hwp','hwpx']){
   const template=fixture(),save=d=>format==='hwp'?d.exportHwp():d.exportHwpx();
   const body=json(template.insertClickHereField(0,0,4,'담당자','','작성자',true));
   assert.equal(json(template.setFieldValue(body.fieldId,'김😀')).ok,true);
+  assert.equal(json(template.insertClickHereField(0,0,9,'일자','','작성일',true)).ok,true);
   assert.equal(json(template.addBookmark(0,0,2,'기안 위치')).ok,true);
   template.insertClickHereFieldInCell(0,1,0,0,1,1,false,'제목','','업무명',true);
   const doc=new HwpDocument(save(template));template.free();
@@ -183,6 +184,10 @@ for(const format of ['hwp','hwpx']){
    const reopened=new HwpDocument(save(doc));
    try{assert.deepEqual(records(reopened),before);assert.equal(reopened.getTextInCell(0,1,0,0,1,0,5),op.text);}
    finally{reopened.free();}
+   const positions=doc.getControlTextPositions.bind(doc);
+   doc.getControlTextPositions=()=>JSON.stringify(Array(10).fill(4));
+   assert.equal(snap(doc,'form.'+format).cellParagraphSources[state.structure.tables[0].id].editable,false);
+   doc.getControlTextPositions=positions;
    const detail=doc.getFieldInfoAt.bind(doc);
    doc.getFieldInfoAt=(...args)=>JSON.stringify({...json(detail(...args)),fieldId:0});
    assert.equal(snap(doc,'form.'+format).cellParagraphSources[state.structure.tables[0].id].editable,false);

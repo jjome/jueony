@@ -165,6 +165,7 @@ try{
   const d=body(format);
   const field=JSON.parse(d.insertClickHereField(0,0,2,'담당자','','작성자',true));
   assert.equal(JSON.parse(d.setFieldValue(field.fieldId,'김😀')).ok,true);
+  assert.equal(JSON.parse(d.insertClickHereField(0,0,7,'일자','','작성일',true)).ok,true);
   assert.equal(JSON.parse(d.addBookmark(0,0,1,'기안 위치')).ok,true);
   d.insertClickHereFieldInCell(0,1,0,0,1,1,false,'제목','','업무명',true);
   const f=await open(format,d),original=await snap(),table=original.structure.tables[0];

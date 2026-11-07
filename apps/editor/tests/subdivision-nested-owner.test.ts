@@ -8,7 +8,7 @@ import {readTableSubdivisionSources} from '../src/adapters/rhwp/table-subdivisio
 import {nestedSubdivisionEvidence,subdivisionNestedOwner} from '../src/adapters/rhwp/subdivision-nested-owner.ts';
 import {executeDocumentOperations} from '../src/adapters/rhwp/execute.ts';
 import {validateEditOperations,type Snapshot} from '../src/modules/document/public/index.ts';
-import {subdivisionNestedTable} from '../scripts/lib/subdivision-nested-table.mjs';
+import {labeledSubdivisionNestedTable,subdivisionNestedTable} from '../scripts/lib/subdivision-nested-table.mjs';
 const pkg=process.env.JUEONY_ENGINE_PACKAGE ?? fileURLToPath(new URL('../node_modules/@rhwp/core/',import.meta.url));
 const {default:init,HwpDocument}=await import(pathToFileURL(resolve(pkg,'rhwp.js')).href);
 await init({module_or_path:await readFile(resolve(pkg,'rhwp_bg.wasm'))});
@@ -117,5 +117,74 @@ test('a duplicate inner table frame on an earlier page refuses subdivision',()=>
       return JSON.stringify(layout);
     };
     assert.throws(()=>nestedSubdivisionEvidence(d,table,owner),/중첩 표/);
+  }finally{d.free();}
+});
+
+for(const ext of ['hwp','hwpx'])test(ext+' retains the titled nested form and its formatted explanation on page two',()=>{
+  const src=labeledSubdivisionNestedTable(HwpDocument);src.insertPageBreak(0,0,2);
+  const d=new HwpDocument(bytes(src,ext));src.free();
+  try{
+    const s=snapshot(d,ext),table=s.structure!.tables[0],operation={...op,target:table.id};
+    const inspect=(doc:any)=>{
+      const t=readStructure(doc).tables[0],owner=subdivisionNestedOwner(doc,t)!;
+      assert.equal(owner.paragraph,1);
+      return nestedSubdivisionEvidence(doc,t,owner);
+    };
+    const original=inspect(d),old=bytes(d,ext),firstPage=d.getPageTextLayout(0),undo=d.saveSnapshot();
+    try{
+      assert.deepEqual([original.page,original.pageCount],[1,2]);
+      assert.deepEqual(original.ownerLines.filter(r=>r.text).map(r=>[r.text,r.bold,r.italic]),[['접수 제목',true,false],['설명',false,true]]);
+      assert.deepEqual(original.lines.map(r=>r.text),['X','Y']);
+      assert.throws(()=>validateEditOperations([{...operation,distributeParagraphs:true}],s),/중첩/);
+      executeDocumentOperations(d,s,validateEditOperations([operation],s));
+      const copy=new HwpDocument(bytes(d,ext));
+      try{for(const result of [d,copy]){
+        assert.equal(result.getPageTextLayout(0),firstPage);
+        assert.deepEqual(inspect(result),original);
+        const t=readStructure(result).tables[0];
+        assert.deepEqual(t.cells.map(c=>c.text),['접수 제목\n\n설명','','',...table.cells.slice(1).map(c=>c.text)]);
+      }}finally{copy.free();}
+      d.restoreSnapshot(undo);assert.deepEqual(bytes(d,ext),old);
+    }finally{d.discardSnapshot(undo);}
+  }finally{d.free();}
+});
+
+test('a title extending beyond the first piece refuses the split and restores the original file',()=>{
+  const src=labeledSubdivisionNestedTable(HwpDocument,'접수 제목과 추가 신청자 정보'),d=new HwpDocument(src.exportHwpx());src.free();
+  try{
+    const s=snapshot(d,'hwpx'),table=s.structure!.tables[0],old=d.exportHwpx(),layout=d.getPageTextLayout(0);
+    assert.equal(s.tableSubdivisionSources![table.id].editable,true);
+    assert.throws(()=>executeDocumentOperations(d,s,validateEditOperations([op],s)),/중첩 표|안쪽 표/);
+    assert.deepEqual(d.exportHwpx(),old);assert.equal(d.getPageTextLayout(0),layout);
+  }finally{d.free();}
+});
+
+test('a stray title run on the first page makes a second-page nested owner ineligible',()=>{
+  const d=labeledSubdivisionNestedTable(HwpDocument);
+  try{
+    d.insertPageBreak(0,0,2);
+    const table=readStructure(d).tables[0],owner=subdivisionNestedOwner(d,table)!,read=d.getPageTextLayout.bind(d);
+    const title=JSON.parse(read(1)).runs.find((r:any)=>r.text==='접수 제목');
+    assert.ok(title);
+    d.getPageTextLayout=(page:number)=>{
+      const result=JSON.parse(read(page));
+      if(page===0)result.runs.push(title);
+      return JSON.stringify(result);
+    };
+    assert.throws(()=>nestedSubdivisionEvidence(d,table,owner),/중첩 표/);
+  }finally{d.free();}
+});
+
+test('a field inside the explanation blocks both native and chat subdivision without changing the file',()=>{
+  const src=labeledSubdivisionNestedTable(HwpDocument);
+  src.insertClickHereFieldInCell(0,1,0,0,2,2,false,'이름 입력','','신청자',true);
+  const d=new HwpDocument(src.exportHwpx());src.free();
+  try{
+    const s=snapshot(d,'hwpx'),old=d.exportHwpx(),fields=JSON.parse(d.getFieldList());
+    assert.equal(fields.some((f:any)=>f.name==='신청자'),true);
+    assert.equal(s.tableSubdivisionSources![op.target].editable,false);
+    assert.throws(()=>validateEditOperations([op],s));
+    assert.throws(()=>d.splitCellOnGrid(0,1,0,0,0,1,3,false));
+    assert.deepEqual(d.exportHwpx(),old);assert.deepEqual(JSON.parse(d.getFieldList()),fields);
   }finally{d.free();}
 });

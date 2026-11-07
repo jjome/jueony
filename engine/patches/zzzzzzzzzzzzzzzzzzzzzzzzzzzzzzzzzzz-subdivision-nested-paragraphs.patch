@@ -1,0 +1,21 @@
+--- a/src/document_core/commands/table_ops/subdivision_grid.rs
++++ b/src/document_core/commands/table_ops/subdivision_grid.rs
+@@ -28,10 +28,15 @@
+     true
+ }
+ 
+-// This dedicated owner has no text to reflow. Its inline table and the
+-// original anchor paragraph must be retained together in the first piece.
++// The original owner and all its paragraphs stay in the first piece. The
++// inline table needs a dedicated anchor, with only plain paragraphs around it.
+ fn retained_nested_table(c: &Cell) -> Option<&Table> {
+-    let [p] = c.paragraphs.as_slice() else { return None; };
++    let mut anchors = c.paragraphs.iter().filter(|p| !p.controls.is_empty());
++    let p = anchors.next()?;
++    if anchors.next().is_some() || c.paragraphs.iter().any(|other|
++        other.controls.is_empty() && !subdivision_paragraph_allowed(other, false)) {
++        return None;
++    }
+     let [Control::Table(inner)] = p.controls.as_slice() else { return None; };
+     if !p.text.is_empty() || !p.field_ranges.is_empty() || !p.orphan_field_ends.is_empty()
+         || !p.range_tags.is_empty() || !p.title_marks.is_empty() || !p.markpen_marks.is_empty()

@@ -2,7 +2,7 @@ import {readOwnedZip,writeOwnedZip} from './owned-zip.mjs';
 
 /** A fixed-size inline form fits the first of three new columns. HTML import
  * sizes an inner table to the page, so set its actual stored dimensions. */
-export function subdivisionNestedTable(HwpDocument,width=5200) {
+export function subdivisionNestedTable(HwpDocument,width=5200,labels) {
   const d=HwpDocument.createEmpty();
   try{
     d.createBlankDocument();d.insertText(0,0,0,'서식');d.splitParagraph(0,0,2);
@@ -16,7 +16,25 @@ export function subdivisionNestedTable(HwpDocument,width=5200) {
     const inner=xml.slice(start,end).replace(/<hp:sz width="\d+"/,'<hp:sz width="'+width+'"')
       .replace(/height="1000" heightRelTo/,'height="2100" heightRelTo')
       .replace(/<hp:cellSz width="\d+" height="\d+"/g,'<hp:cellSz width="'+width/2+'" height="2100"');
-    section[1]=Buffer.from(xml.slice(0,start)+inner+xml.slice(end));
+    let composed=xml.slice(0,start)+inner+xml.slice(end);
+    if(labels){
+      // Reuse a normal paragraph produced by the importer, including its measured line.
+      const sample=composed.match(/<hp:p [^>]*><hp:run [^>]*><hp:t>옆<\/hp:t><\/hp:run>[\s\S]*?<\/hp:p>/)?.[0];
+      if(!sample)throw Error('Missing ordinary cell paragraph fixture');
+      const paragraph=(id,text)=>sample.replace(/id="\d+"/,'id="'+id+'"').replace('>옆<',()=>'>'+
+        text.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')+'<');
+      const anchorStart=composed.lastIndexOf('<hp:p ',start),anchorEnd=composed.indexOf('</hp:p>',start+inner.length)+7;
+      composed=composed.slice(0,anchorStart)+paragraph(301,labels[0])+composed.slice(anchorStart,anchorEnd)+
+        paragraph(302,labels[1])+composed.slice(anchorEnd);
+    }
+    section[1]=Buffer.from(composed);
     return new HwpDocument(writeOwnedZip(parts));
   }finally{d.free();}
+}
+
+export function labeledSubdivisionNestedTable(HwpDocument,title='접수 제목') {
+  const doc=subdivisionNestedTable(HwpDocument,5200,[title,'설명']);
+  doc.applyCharFormatInCell(0,1,0,0,0,0,Array.from(title).length,'{"bold":true}');
+  doc.applyCharFormatInCell(0,1,0,0,2,0,2,'{"italic":true}');
+  return doc;
 }

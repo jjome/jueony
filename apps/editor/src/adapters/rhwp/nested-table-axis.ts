@@ -3,6 +3,7 @@ import {projectTableAxis,validateControlOperations,witnessedTrackEdges} from '..
 import {capturePreservationEvidence,verifyPreservedExport} from './preservation.ts';
 import {resourceFingerprint} from './cell-paragraph.ts';
 import {rootBodyTexts} from './table-topology-evidence.ts';
+import {readNestedAxisCaptions,sameNestedCaptionPlacement} from './nested-axis-captions.ts';
 import {readNestedCellFields} from './nested-cell-fields.ts';
 import {parsed,readStructure} from './structure.ts';
 
@@ -13,7 +14,7 @@ const path=(table:NestedTable,index:number,paragraph=0)=>[...table.ancestors,{co
 
 /** Native cursor list slots can be renumbered for an unaffected sibling. Bind
  * cell contents and table controls to their full parent addresses instead. */
-function evidence(doc:any,table:NestedTable){
+function evidence(doc:any,table:NestedTable,structure:ReturnType<typeof readStructure>){
  const captured=capturePreservationEvidence(doc);
  if(captured.issues.length)throw Error('중첩 표의 원래 문서 속성을 모두 읽지 못했습니다.');
  const {cells,controls,text,fields,...document}=captured.values as any;
@@ -42,7 +43,7 @@ function evidence(doc:any,table:NestedTable){
   return {...control,list:parent};
  });
  if(!extent||target.length!==table.cells.length)throw Error('중첩 표 크기와 셀을 모두 확인하지 못했습니다.');
- return {document:{...document,fields:fields.filter((f:any)=>f.listId===0),body:rootBodyTexts(doc)},fieldCount:fields.filter((f:any)=>f.listId!==0).length,others,anchoredControls,target,extent,resources:resourceFingerprint(doc.exportHwpx())};
+ return {captions:readNestedAxisCaptions(doc,structure,table),document:{...document,fields:fields.filter((f:any)=>f.listId===0),body:rootBodyTexts(doc)},fieldCount:fields.filter((f:any)=>f.listId!==0).length,others,anchoredControls,target,extent,resources:resourceFingerprint(doc.exportHwpx())};
 }
 
 export function executeNestedTableAxis(doc:any,base:Snapshot,op:AxisOp){
@@ -51,7 +52,7 @@ export function executeNestedTableAxis(doc:any,base:Snapshot,op:AxisOp){
  if(!table?.axisEditable||!same(base.structure,original))throw Error('중첩 표의 경로·내용 또는 보호 상태가 달라졌습니다.');
  const row=op.kind.endsWith('_row'),insert=op.kind.startsWith('insert_'),size=row?table.rows:table.columns;
  const values='values' in op?op.values:[];
- const before=evidence(doc,table),track=row?'height':'width',otherTrack=row?'width':'height';
+ const before=evidence(doc,table,original),track=row?'height':'width',otherTrack=row?'width':'height';
  const logical={...table,cells:table.cells.map((c,i)=>({...c,properties:before.target[i].properties}))};
  const projected=projectTableAxis(logical,row,insert,op.index,values);
  const templateAt=Math.min(op.index,size-1);
@@ -81,7 +82,8 @@ export function executeNestedTableAxis(doc:any,base:Snapshot,op:AxisOp){
      updated.columns!==table.columns+(row?0:(insert?1:-1))||updated.cells.length!==projected.length)
    throw Error('중첩 표 행·열 변경 결과가 계획과 다릅니다.');
   const withoutTarget=(s:typeof original)=>({...s,nestedTables:s.nestedTables?.filter(t=>t.id!==table.id)});
-  const after=evidence(doc,updated);
+  const after=evidence(doc,updated,result);
+  if(!sameNestedCaptionPlacement(before.captions,after.captions))throw Error('중첩 표의 캡션 또는 형제 표의 배치가 달라졌습니다.');
   if(!same(withoutTarget(original),withoutTarget(result))||!same(before.document,after.document)||before.fieldCount!==after.fieldCount||!same(before.others,after.others)||
      !same(before.anchoredControls,after.anchoredControls)||before.resources!==after.resources||
      after.extent[track]!==before.extent[track]+(insert?delta:-delta)||after.extent[otherTrack]!==before.extent[otherTrack])
@@ -101,7 +103,7 @@ export function executeNestedTableAxis(doc:any,base:Snapshot,op:AxisOp){
        !same(p.paragraph,source.paragraphs[0].paragraph))throw Error('삽입한 중첩 셀에 원래 행·열의 서식을 적용하지 못했습니다.');
    }
   }
-  if(merged||before.fieldCount){
+  if(merged||before.fieldCount||before.captions.stored.length){
    const format=doc.getSourceFormat();
    if(!['hwp','hwpx'].includes(format)||!base.name.toLowerCase().endsWith('.'+format))throw Error('중첩 병합 표의 원래 저장 형식을 확인할 수 없습니다.');
    const artifact=format==='hwp'?doc.exportHwpWithReport():doc.exportHwpxWithReport();
@@ -111,7 +113,7 @@ export function executeNestedTableAxis(doc:any,base:Snapshot,op:AxisOp){
     verifyPreservedExport(doc,bytes,format,artifact.contentLoss(),b=>new doc.constructor(b));
     reopened=new doc.constructor(bytes);
     const stored=readStructure(reopened),child=stored.nestedTables?.find(t=>t.id===table.id);
-    if(!child||!same(stored,result)||!same(evidence(reopened,child),after))throw Error('중첩 병합 표 또는 이웃 내용이 저장 후 달라졌습니다.');
+    if(!child||!same(stored,result)||!same(evidence(reopened,child,stored),after))throw Error('중첩 병합 표 또는 이웃 내용이 저장 후 달라졌습니다.');
    }finally{reopened?.free();artifact.free();}
   }
   const focus=Math.min(op.index,(row?updated.rows:updated.columns)-1);

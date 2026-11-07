@@ -1,0 +1,71 @@
+--- a/src/document_core/commands/table_ops.rs
++++ b/src/document_core/commands/table_ops.rs
+@@ -2444,6 +2444,41 @@
+         spans.windows(2).all(|w| w[1].0 > w[0].1.saturating_add(1))
+     }
+ 
++    fn simple_nested_axis_caption(caption: &crate::model::shape::Caption) -> bool {
++        use crate::model::shape::CaptionDirection;
++        let [p] = caption.paragraphs.as_slice() else { return false; };
++        if !matches!(caption.direction, CaptionDirection::Top | CaptionDirection::Bottom)
++            || p.text.is_empty() || p.text.len() > 16_000 || p.text.chars().any(char::is_control)
++            || !p.controls.is_empty() || !p.field_ranges.is_empty() || !p.orphan_field_ends.is_empty()
++            || !p.range_tags.is_empty() || !p.markpen_marks.is_empty() || !p.title_marks.is_empty()
++            || !p.tab_extended.is_empty() || p.numbering_restart.is_some() || p.raw_break_type != 0
++            || p.char_shapes.len() > 128 || p.char_shapes.first().map(|s| s.start_pos) != Some(0)
++        {
++            return false;
++        }
++        let len = p.text.encode_utf16().count() as u32;
++        p.char_shapes.iter().all(|s| s.start_pos < len && p.char_offsets.contains(&s.start_pos))
++            && p.char_shapes.windows(2).all(|w| w[0].start_pos < w[1].start_pos)
++    }
++
++    pub(crate) fn table_axis_caption_evidence(
++        &self, section: usize, para: usize, path: &[(usize, usize, usize)],
++    ) -> Result<String, HwpError> {
++        let table = self.resolve_table_by_path(section, para, path)?;
++        let Some(c) = &table.caption else { return Ok("null".into()); };
++        if !Self::simple_nested_axis_caption(c) {
++            // Bind an untouched complex sibling to its full model. It can never
++            // become the target of a nested axis edit under this proof.
++            return Ok(serde_json::json!({"kind":"complex",
++                "digest":crate::model::raw_provenance::record_digest(c)}).to_string());
++        }
++        let p = &c.paragraphs[0];
++        Ok(serde_json::json!({"kind":"plain","direction":c.direction,"align":c.vert_align,
++            "width":c.width,"maxWidth":c.max_width,"spacing":c.spacing,"includeMargin":c.include_margin,
++            "text":p.text,"paragraphShape":p.para_shape_id,"style":p.style_id,"runs":p.char_shapes,
++            "lines":p.serializable_line_segs()}).to_string())
++    }
++
+     /// A structural edit must resolve every ancestor as a writable table cell.
+     /// Do not allow the generic cell path resolver to traverse a text box.
+     pub(crate) fn nested_axis_table(
+@@ -2462,7 +2497,8 @@
+                 let cols = usize::from(table.col_count);
+                 if cell_index != 0 || para_index != 0 || rows == 0 || rows > 50 || cols == 0
+                     || cols > 20 || rows * cols > 200 || table.cells.len() > rows * cols
+-                    || !table.zones.is_empty() || table.caption.is_some() || table.repeat_header {
++                    || !table.zones.is_empty() || table.repeat_header
++                    || table.caption.as_ref().is_some_and(|c| !Self::simple_nested_axis_caption(c)) {
+                     return None;
+                 }
+                 let mut owners = vec![None; rows * cols];
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -3692,6 +3692,14 @@
+     ///
+     /// `cell_path_json`: `[{"controlIndex":0,"cellIndex":0,"cellParaIndex":9},...]`
+     /// 마지막 항목이 조절할 표를 가리킨다. 깊이 1 이면 평면 API 와 같은 경로로 처리한다.
++    #[wasm_bindgen(js_name = getTableAxisCaptionEvidenceByPath)]
++    pub fn get_table_axis_caption_evidence_by_path(
++        &self, section: u32, para: u32, path_json: &str,
++    ) -> Result<String, JsValue> {
++        let path = parse_cell_path_arg(path_json)?;
++        self.table_axis_caption_evidence(section as usize, para as usize, &path).map_err(Into::into)
++    }
++
+     #[wasm_bindgen(js_name = canEditNestedTableAxis)]
+     pub fn can_edit_nested_table_axis(&self, section: u32, para: u32, path_json: &str) -> bool {
+         parse_cell_path_arg(path_json).ok().is_some_and(|path|

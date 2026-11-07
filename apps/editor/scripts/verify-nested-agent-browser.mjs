@@ -5,6 +5,7 @@ import http from 'node:http';
 import {resolve} from 'node:path';
 import puppeteer from 'puppeteer-core';
 import {loadReviewEngine} from './lib/hancom-review.mjs';
+import {nestedCaptionFixture} from './lib/nested-caption-fixture.mjs';
 import {nestedNamedCellFixture} from './lib/nested-named-cell-fixture.mjs';
 import {nestedClickHereFixture,rightSiblingLayout} from './lib/nested-click-here-fixture.mjs';
 import {readStructure} from '../src/adapters/rhwp/structure.ts';
@@ -19,7 +20,8 @@ const namedAxis=process.env.JUEONY_NESTED_AXIS_ONLY==='named';
 const leftDelete=process.env.JUEONY_NESTED_AXIS_ONLY==='left-delete';
 const storedAxis=leftDelete||process.env.JUEONY_NESTED_AXIS_ONLY==='click-here';
 const fieldAxis=namedAxis||storedAxis;
-const axisOnly=bodyMarkers||mergedAxis||fieldAxis||process.env.JUEONY_NESTED_AXIS_ONLY==='1';
+const captionAxis=process.env.JUEONY_NESTED_AXIS_ONLY==='caption';
+const axisOnly=captionAxis||bodyMarkers||mergedAxis||fieldAxis||process.env.JUEONY_NESTED_AXIS_ONLY==='1';
 const provider=http.createServer(async(req,res)=>{
   try {
     let raw=''; for await(const part of req) raw+=part;
@@ -28,7 +30,7 @@ const provider=http.createServer(async(req,res)=>{
     assert.equal(tables.length,2);
     const table=tables[leftDelete?0:1],cell=table.cells[1],mixed=input.instruction.includes('둘째 문단');
     const target=mixed?cell.paragraphs.find(p=>p.index===1):cell;
-    assert.equal(target.text,leftDelete?'A좌😀lpha':storedAxis?'B우😀eta\n둘째😀':namedAxis?'Beta\n둘째😀':'동일😀');
+    assert.equal(target.text,captionAxis?'나':leftDelete?'A좌😀lpha':storedAxis?'B우😀eta\n둘째😀':namedAxis?'Beta\n둘째😀':'동일😀');
     if(mixed)assert.deepEqual(target.formatSpans,[{start:0,end:1},{start:1,end:3}]);
     else if(namedAxis){assert.equal(cell.fieldName,'공통 이름');assert.equal(cell.editable,false);}
     else if(storedAxis){assert.equal(cell.clickHereFieldIds.length,2);assert.equal(cell.editable,false);}
@@ -65,18 +67,18 @@ try {
   await fill('config-model','nested-fixture');await fill('config-key','synthetic-local-fixture');
   await page.$eval('#config-remember',e=>e.checked=false);await page.click('#model-form button[type=submit]');
   await page.waitForFunction(()=>!document.getElementById('model-dialog').open);
-  for (const format of ['hwp','hwpx']) for(const mode of (leftDelete?['delete-left-row']:bodyMarkers||mergedAxis||fieldAxis?['insert-row']:axisOnly?['insert-row','delete-column']:['plain','mixed'])){
+  for (const format of ['hwp','hwpx']) for(const mode of (leftDelete?['delete-left-row']:bodyMarkers||mergedAxis||fieldAxis||captionAxis?['insert-row']:axisOnly?['insert-row','delete-column']:['plain','mixed'])){
     const mixed=mode==='mixed';
     const frame=await (await page.$('.editor-frame:not([hidden])')).contentFrame();
-    const doc=storedAxis?nestedClickHereFixture(HwpDocument):namedAxis?nestedNamedCellFixture(HwpDocument):HwpDocument.createEmpty();
-    if(!fieldAxis)doc.createBlankDocument();
+    const doc=captionAxis?nestedCaptionFixture(HwpDocument):storedAxis?nestedClickHereFixture(HwpDocument):namedAxis?nestedNamedCellFixture(HwpDocument):HwpDocument.createEmpty();
+    if(!fieldAxis&&!captionAxis)doc.createBlankDocument();
     const inner='<table><tr><td>동일😀</td><td>동일😀</td></tr></table>';
     if(bodyMarkers){
       doc.insertText(0,0,0,'작성자: 이름 / 업무');
       doc.splitParagraph(0,0,doc.getParagraphLength(0,0));
     }
     const right=mergedAxis?'<table><tr><td rowspan="2">동일😀</td><td>동일😀</td></tr><tr><td>끝</td></tr></table>':inner;
-    if(!fieldAxis)doc.pasteHtml(0,bodyMarkers?1:0,0,`<table><tr><td>왼쪽${inner}</td><td>오른쪽${right}</td></tr></table>`);
+    if(!fieldAxis&&!captionAxis)doc.pasteHtml(0,bodyMarkers?1:0,0,`<table><tr><td>왼쪽${inner}</td><td>오른쪽${right}</td></tr></table>`);
     if(bodyMarkers){
       doc.insertClickHereField(0,0,5,'이름','담당 부서','작성자',true);
       doc.addBookmark(0,0,9,'업무 위치');
@@ -89,20 +91,23 @@ try {
       doc.insertTextInCellByPath(...args,path(0),0,'첫 문단');
       doc.applyCharFormatInCellByPath(...args,path(1),1,3,'{"bold":true}');
     }
-    const sourceTexts=fieldAxis?readStructure(doc).nestedTables.map(t=>t.cells.map(c=>c.text)):undefined;
+    const sourceTexts=fieldAxis||captionAxis?readStructure(doc).nestedTables.map(t=>t.cells.map(c=>c.text)):undefined;
     const originalFields=storedAxis?JSON.parse(doc.getFieldList()):undefined;
     const bytes=Array.from(format==='hwpx'?doc.exportHwpx():doc.exportHwp());doc.free();
     const records=d=>[JSON.parse(d.getFieldList()),JSON.parse(d.getBookmarks())];
-    let originalMarkers,originalRightLayout;
-    if(bodyMarkers||leftDelete){
+    let originalMarkers,originalRightLayout,originalCaption,originalSibling;
+    if(bodyMarkers||leftDelete||captionAxis){
       const source=new HwpDocument(new Uint8Array(bytes));
-      try{if(bodyMarkers)originalMarkers=records(source);if(leftDelete)originalRightLayout=rightSiblingLayout(source);}finally{source.free();}
+      try{if(bodyMarkers)originalMarkers=records(source);if(leftDelete)originalRightLayout=rightSiblingLayout(source);
+       if(captionAxis){const t=readStructure(source).nestedTables[1],p=JSON.stringify([...t.ancestors,{controlIndex:t.control,cellIndex:0,cellParaIndex:0}]);
+        originalCaption=JSON.parse(source.getTableAxisCaptionEvidenceByPath(t.section,t.paragraph,p));
+        originalSibling=JSON.parse(source.getPageControlLayout(0)).controls[1];}}finally{source.free();}
     }
     await frame.evaluate(async(bytes,name)=>{
       const root=await navigator.storage.getDirectory(),h=await root.getFileHandle(name,{create:true}),writer=await h.createWritable();
       await writer.write(new Uint8Array(bytes));await writer.close();await window.jueonyEditor.open(new Uint8Array(bytes),name,h,false);
     },bytes,'nested-review.'+format);
-    const request=leftDelete?'왼쪽 안쪽 표의 첫 행 삭제':fieldAxis?'오른쪽 안쪽 표의 필드 셀 위에 행 추가':mergedAxis?'오른쪽 안쪽 표의 세로 병합 사이에 행 추가':axisOnly?(mode==='insert-row'?'오른쪽 안쪽 표 마지막에 행 추가':'오른쪽 안쪽 표의 둘째 열 삭제'):
+    const request=captionAxis?'아래 캡션을 유지하고 오른쪽 안쪽 표의 두 행 사이에 행 추가':leftDelete?'왼쪽 안쪽 표의 첫 행 삭제':fieldAxis?'오른쪽 안쪽 표의 필드 셀 위에 행 추가':mergedAxis?'오른쪽 안쪽 표의 세로 병합 사이에 행 추가':axisOnly?(mode==='insert-row'?'오른쪽 안쪽 표 마지막에 행 추가':'오른쪽 안쪽 표의 둘째 열 삭제'):
       mixed?'오른쪽 안쪽 표의 두 번째 셀 둘째 문단을 변경해줘':'오른쪽 안쪽 표의 두 번째 셀을 변경해줘';
     await fill('request-input',request);
     const sent=page.waitForResponse(r=>r.url()===origin+'/api/generate');
@@ -114,6 +119,9 @@ try {
     if(mixed){original[1][1]='첫 문단\n동일😀';edited[1][1]='첫 문단\n변경😀';}
     if(axisOnly)edited[1]=mode==='insert-row'?[...original[1],'새 행😀','']:[original[1][0]];
     if(mergedAxis){original[1].push('끝');edited[1]=['동일😀','동일😀','새 행😀','끝'];}
+    if(captionAxis){
+      [original[0],original[1]]=sourceTexts;edited[0]=original[0];edited[1]=[...original[1].slice(0,2),'새 행😀','',...original[1].slice(2)];
+    }
     if(fieldAxis){
       [original[0],original[1]]=sourceTexts;
       if(leftDelete){edited[0]=[original[0][2],original[0][1],...original[0].slice(3)];edited[1]=original[1];}
@@ -135,6 +143,12 @@ try {
     try {
       const tables=readStructure(reopened).nestedTables;
       assert.deepEqual(tables.map(t=>t.cells.map(c=>c.text)),edited);
+      if(captionAxis){
+        const t=tables[1],p=JSON.stringify([...t.ancestors,{controlIndex:t.control,cellIndex:0,cellParaIndex:0}]);
+        assert.deepEqual(JSON.parse(reopened.getTableAxisCaptionEvidenceByPath(t.section,t.paragraph,p)),originalCaption);
+        assert.deepEqual(JSON.parse(reopened.getPageControlLayout(0)).controls[1],originalSibling);
+        assert.deepEqual(JSON.parse(reopened.getPageTextLayout(0)).runs.filter(r=>r.cellIdx===65534).map(r=>[r.text,r.bold]),[['캡션 ',false],['제목',true]]);
+      }
       if(mergedAxis)assert.deepEqual([tables[1].rows,tables[1].cells[0].rowSpan],[3,3]);
       if(storedAxis){
         if(leftDelete)assert.deepEqual(rightSiblingLayout(reopened),originalRightLayout);
@@ -168,5 +182,5 @@ try {
     } finally {reopened.free();}
     console.log('PASS',format,mode,'UI chat → loopback provider → Agent application → undo/redo → bound file save and native reopen');
   }
-  assert.equal(calls.length,bodyMarkers||mergedAxis||fieldAxis?2:4);assert.deepEqual(errors,[]);
+  assert.equal(calls.length,bodyMarkers||mergedAxis||fieldAxis||captionAxis?2:4);assert.deepEqual(errors,[]);
 } finally {await browser?.close();launcher.kill();await new Promise(r=>provider.close(r));}

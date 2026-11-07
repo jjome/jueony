@@ -1,0 +1,269 @@
+--- a/src/document_core/queries/table_formula_field.rs
++++ b/src/document_core/queries/table_formula_field.rs
+@@ -176,6 +176,34 @@
+     Ok(Some(n))
+ }
+ 
++// Check the physical owner of every logical slot before using the cached grid.
++fn validate_formula_grid(table: &Table) -> Result<(), HwpError> {
++    let rows = usize::from(table.row_count);
++    let columns = usize::from(table.col_count);
++    let slots = rows * columns;
++    let invalid = || err("계산식은 주 셀이 확인된 200칸 이하의 표에서 지원합니다.");
++    if !(1..=200).contains(&slots) || table.cell_grid.len() != slots
++        || table.cell_grid.iter().any(Option::is_none) {
++        return Err(invalid());
++    }
++    let mut covered = 0;
++    for (i, cell) in table.cells.iter().enumerate() {
++        let (row, col) = (usize::from(cell.row), usize::from(cell.col));
++        let (height, width) = (usize::from(cell.row_span), usize::from(cell.col_span));
++        if height == 0 || width == 0 || row + height > rows || col + width > columns {
++            return Err(invalid());
++        }
++        for r in row..row + height {
++            for c in col..col + width {
++                if table.cell_grid[r * columns + c] != Some(i) { return Err(invalid()); }
++            }
++        }
++        covered += width * height;
++    }
++    if covered != slots { return Err(invalid()); }
++    Ok(())
++}
++
+ struct Calculation<'a> {
+     table: &'a Table,
+     root: usize,
+@@ -214,11 +242,12 @@
+             current_row: cell.row as usize,
+             current_col: cell.col as usize,
+         };
+-        let result = evaluate_stored_formula(expr, &ctx, &|col, row| {
++        let result = evaluate_stored_formula(expr, &ctx, &self.table.cell_grid, &|col, row| {
+             if failure.borrow().is_some() {
+                 return None;
+             }
+-            match self.value(row * ctx.col_count + col) {
++            let owner = self.table.cell_grid[row * ctx.col_count + col]?;
++            match self.value(owner) {
+                 Ok(v) => v,
+                 Err(error) => {
+                     *failure.borrow_mut() = Some(error);
+@@ -253,7 +282,7 @@
+                 current_row: cell.row.into(), current_col: cell.col.into(),
+             };
+             let (formula, _) = field.command.rsplit_once("??").unwrap();
+-            for referenced in stored_formula_references(formula, &ctx).map_err(|e| err(&e))? {
++            for referenced in stored_formula_references(formula, &ctx, &table.cell_grid).map_err(|e| err(&e))? {
+                 users[referenced].push(index);
+             }
+         }
+@@ -311,22 +340,8 @@
+         else {
+             return Err(err("본문 표 위치가 변경되었습니다."));
+         };
+-        let columns = usize::from(table.col_count);
+-        if table.common.locked
+-            || columns == 0
+-            || table.cells.len() != columns * usize::from(table.row_count)
+-            || table.cells.len() > 200
+-            || table.cells.iter().enumerate().any(|(i, c)| {
+-                c.row_span != 1
+-                    || c.col_span != 1
+-                    || usize::from(c.row) != i / columns
+-                    || usize::from(c.col) != i % columns
+-            })
+-        {
+-            return Err(err(
+-                "잠금·병합 없는 본문 표 200셀 이하에서 계산식을 지원합니다.",
+-            ));
+-        }
++        if table.common.locked { return Err(err("보호된 표의 계산식은 편집할 수 없습니다.")); }
++        validate_formula_grid(table)?;
+         let cell = table
+             .cells
+             .get(index)
+--- a/src/document_core/queries/table_formula_input.rs
++++ b/src/document_core/queries/table_formula_input.rs
+@@ -9,12 +9,7 @@
+         let has_formula = table.cells.iter().flat_map(|cell| &cell.paragraphs).flat_map(|para| &para.controls)
+             .any(|ctrl| matches!(ctrl, Control::Field(field) if field.field_type == FieldType::Formula));
+         if !has_formula { return Ok((table, BTreeSet::new())); }
+-        let columns = usize::from(table.col_count);
+-        if columns == 0 || table.cells.len() != columns * usize::from(table.row_count)
+-            || table.cells.len() > 200 || table.cells.iter().enumerate().any(|(n, c)|
+-                c.col_span != 1 || c.row_span != 1 || usize::from(c.row) != n / columns || usize::from(c.col) != n % columns) {
+-            return Err(err("이 표 배치에서는 계산식 참조를 안전하게 갱신할 수 없습니다."));
+-        }
++        validate_formula_grid(table)?;
+         let cell = table.cells.get(i).ok_or_else(|| err("참조할 셀 위치가 변경되었습니다."))?;
+         if cell.paragraphs.iter().flat_map(|p| &p.controls).any(|ctrl|
+             matches!(ctrl, Control::Field(f) if f.field_type == FieldType::Formula)) {
+--- a/src/document_core/table_calc/evaluator.rs
++++ b/src/document_core/table_calc/evaluator.rs
+@@ -6,6 +6,11 @@
+ /// 셀 값 조회 함수 타입
+ /// (col_index: 0-based, row_index: 0-based) → Option<f64>
+ pub type CellValueFn<'a> = &'a dyn Fn(usize, usize) -> Option<f64>;
++
++struct CellLookup<'a> {
++    value: CellValueFn<'a>,
++    owners: Option<&'a [Option<usize>]>,
++}
+ 
+ /// 표 정보
+ pub struct TableContext {
+@@ -30,13 +35,13 @@
+     get_cell: CellValueFn,
+ ) -> Result<f64, String> {
+     let ast = parse_formula(formula).ok_or_else(|| "수식 파싱 실패".to_string())?;
+-    eval_node(&ast, ctx, get_cell)
++    eval_node(&ast, ctx, &CellLookup { value: get_cell, owners: None })
+ }
+ 
+ /// Validate every reference before enumerating a range from untrusted input.
+-pub(crate) fn evaluate_stored_formula(formula: &str, ctx: &TableContext, get_cell: CellValueFn) -> Result<f64, String> {
++pub(crate) fn evaluate_stored_formula(formula: &str, ctx: &TableContext, owners: &[Option<usize>], get_cell: CellValueFn) -> Result<f64, String> {
+     let ast = checked_stored_expression(formula, ctx)?;
+-    let result = eval_node(&ast, ctx, get_cell)?;
++    let result = eval_node(&ast, ctx, &CellLookup { value: get_cell, owners: Some(owners) })?;
+     if result.is_finite() { Ok(result) } else { Err("계산 결과가 유한한 숫자가 아닙니다.".into()) }
+ }
+ 
+@@ -54,8 +59,17 @@
+             }
+             FormulaNode::Negate(inner) => pending.push(inner),
+             FormulaNode::FuncCall { name, args } => {
+-                if args.is_empty() || !matches!(name.as_str(), "SUM" | "AVG" | "AVERAGE" | "PRODUCT" | "COUNT" | "MIN" | "MAX") {
+-                    return Err("지원하지 않는 계산식 함수 또는 빈 인수입니다.".into());
++                let arity_ok = match name.as_str() {
++                    "SUM" | "AVG" | "AVERAGE" | "PRODUCT" | "COUNT" | "MIN" | "MAX" => !args.is_empty(),
++                    "ABS" | "SQRT" | "EXP" | "LOG" | "LOG10" | "SIN" | "COS" | "TAN" |
++                    "ASIN" | "ACOS" | "ATAN" | "RADIAN" | "SIGN" | "INT" | "CEILING" |
++                    "FLOOR" | "ROUND" | "TRUNC" => args.len() == 1,
++                    "MOD" => args.len() == 2,
++                    "IF" => args.len() == 3,
++                    _ => false,
++                };
++                if !arity_ok {
++                    return Err("지원하지 않는 계산식 함수이거나 함수 인수 개수가 다릅니다.".into());
+                 }
+                 pending.extend(args);
+             }
+@@ -67,15 +81,15 @@
+ }
+ 
+ /// Extract addresses without evaluating with dummy values (a legal expression may divide by them).
+-pub(crate) fn stored_formula_references(formula: &str, ctx: &TableContext) -> Result<std::collections::BTreeSet<usize>, String> {
++pub(crate) fn stored_formula_references(formula: &str, ctx: &TableContext, owners: &[Option<usize>]) -> Result<std::collections::BTreeSet<usize>, String> {
+     let ast = checked_stored_expression(formula, ctx)?;
+     let mut nodes = vec![&ast];
+     let mut refs = std::collections::BTreeSet::new();
+     while let Some(node) = nodes.pop() {
+         match node {
+             FormulaNode::Range { .. } | FormulaNode::Direction(_) | FormulaNode::CellRef { .. } => {
+-                for (col, row) in collect_cells(node, ctx)? {
+-                    refs.insert(row * ctx.col_count + col);
++                for (col, row) in collect_cells(node, ctx, Some(owners))? {
++                    refs.insert(owners[row * ctx.col_count + col].ok_or("주 셀이 없는 계산식 주소입니다.")?);
+                 }
+             }
+             FormulaNode::BinOp { left, right, .. } => { nodes.push(left); nodes.push(right); }
+@@ -87,13 +101,13 @@
+     Ok(refs)
+ }
+ 
+-fn eval_node(node: &FormulaNode, ctx: &TableContext, get_cell: CellValueFn) -> Result<f64, String> {
+-    match node {
++fn eval_node(node: &FormulaNode, ctx: &TableContext, get_cell: &CellLookup) -> Result<f64, String> {
++    let result = match node {
+         FormulaNode::Number(n) => Ok(*n),
+ 
+         FormulaNode::CellRef { col, row } => {
+             let (c, r) = resolve_cell_ref(col, *row, ctx)?;
+-            Ok(get_cell(c, r).unwrap_or(0.0))
++            Ok((get_cell.value)(c, r).unwrap_or(0.0))
+         }
+ 
+         FormulaNode::Negate(inner) => Ok(-eval_node(inner, ctx, get_cell)?),
+@@ -120,7 +134,11 @@
+         FormulaNode::Direction(_) => Err("방향 지정자는 함수 인수로만 사용 가능".into()),
+ 
+         FormulaNode::FuncCall { name, args } => eval_function(name, args, ctx, get_cell),
+-    }
++    }?;
++    if get_cell.owners.is_some() && !result.is_finite() {
++        return Err("계산 결과가 유한한 숫자가 아닙니다.".into());
++    }
++    Ok(result)
+ }
+ 
+ /// 셀 참조를 (col_index, row_index) 0-based로 변환
+@@ -150,7 +168,20 @@
+ }
+ 
+ /// 범위/방향에서 셀 좌표 목록을 수집
+-fn collect_cells(arg: &FormulaNode, ctx: &TableContext) -> Result<Vec<(usize, usize)>, String> {
++fn collect_cells(arg: &FormulaNode, ctx: &TableContext, owners: Option<&[Option<usize>]>) -> Result<Vec<(usize, usize)>, String> {
++    let mut cells = collect_coordinates(arg, ctx)?;
++    if let Some(grid) = owners {
++        let mut seen = std::collections::BTreeSet::new();
++        if matches!(arg, FormulaNode::Direction(_)) {
++            // LEFT/RIGHT/ABOVE/BELOW exclude the complete formula cell.
++            seen.insert(grid[ctx.current_row * ctx.col_count + ctx.current_col]);
++        }
++        cells.retain(|&(col, row)| seen.insert(grid[row * ctx.col_count + col]));
++    }
++    Ok(cells)
++}
++
++fn collect_coordinates(arg: &FormulaNode, ctx: &TableContext) -> Result<Vec<(usize, usize)>, String> {
+     match arg {
+         FormulaNode::Range { start, end } => {
+             if let (
+@@ -211,22 +242,22 @@
+ fn collect_values(
+     args: &[FormulaNode],
+     ctx: &TableContext,
+-    get_cell: CellValueFn,
++    get_cell: &CellLookup,
+ ) -> Result<Vec<f64>, String> {
+     let mut values = Vec::new();
+     for arg in args {
+         match arg {
+             FormulaNode::Range { .. } | FormulaNode::Direction(_) => {
+-                let cells = collect_cells(arg, ctx)?;
++                let cells = collect_cells(arg, ctx, get_cell.owners)?;
+                 for (c, r) in cells {
+-                    if let Some(v) = get_cell(c, r) {
++                    if let Some(v) = (get_cell.value)(c, r) {
+                         values.push(v);
+                     }
+                 }
+             }
+             FormulaNode::CellRef { col, row } => {
+                 let (c, r) = resolve_cell_ref(col, *row, ctx)?;
+-                if let Some(v) = get_cell(c, r) {
++                if let Some(v) = (get_cell.value)(c, r) {
+                     values.push(v);
+                 }
+             }
+@@ -243,7 +274,7 @@
+     name: &str,
+     args: &[FormulaNode],
+     ctx: &TableContext,
+-    get_cell: CellValueFn,
++    get_cell: &CellLookup,
+ ) -> Result<f64, String> {
+     match name {
+         "SUM" => {
+@@ -330,7 +361,7 @@
+ fn unary_fn(
+     args: &[FormulaNode],
+     ctx: &TableContext,
+-    get_cell: CellValueFn,
++    get_cell: &CellLookup,
+     f: impl Fn(f64) -> f64,
+ ) -> Result<f64, String> {
+     if args.is_empty() {

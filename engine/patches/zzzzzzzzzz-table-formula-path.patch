@@ -1,0 +1,245 @@
+--- a/src/document_core/queries/table_formula_field.rs
++++ b/src/document_core/queries/table_formula_field.rs
+@@ -311,13 +311,47 @@
+     response: String,
+ }
+ 
++type FormulaPath = [(usize, usize, usize)];
++
++fn formula_location(section: usize, paragraph: usize, path: &FormulaPath, cell: usize) -> FieldLocation {
++    let mut nested_path: Vec<_> = path.iter().map(|&(control_index, cell_index, para_index)| {
++        NestedEntry::TableCell { control_index, cell_index, para_index }
++    }).collect();
++    if let Some(NestedEntry::TableCell { cell_index, para_index, .. }) = nested_path.last_mut() {
++        *cell_index = cell;
++        *para_index = 0;
++    }
++    FieldLocation { section_index: section, para_index: paragraph, nested_path }
++}
++
+ impl DocumentCore {
++    fn formula_table_at_path(&self, section: usize, paragraph: usize, path: &FormulaPath)
++        -> Result<(&Table, usize, bool), HwpError> {
++        if path.is_empty() || path.len() > 8 { return Err(err("계산식 셀 경로 길이를 확인하세요.")); }
++        let mut para = self.document.sections.get(section).and_then(|s| s.paragraphs.get(paragraph))
++            .ok_or_else(|| err("계산식의 본문 문단 위치가 변경되었습니다."))?;
++        let mut writable = true;
++        for (depth, &(control, index, inner_para)) in path.iter().enumerate() {
++            let Some(Control::Table(table)) = para.controls.get(control) else {
++                return Err(err("계산식의 표 경로가 변경되었습니다."));
++            };
++            let cell = table.cells.get(index).ok_or_else(|| err("계산식 셀 위치가 변경되었습니다."))?;
++            writable &= !table.common.locked;
++            if depth + 1 == path.len() {
++                if inner_para != 0 { return Err(err("계산식은 셀의 첫 문단을 지정하세요.")); }
++                return Ok((table, index, writable));
++            }
++            writable &= !cell.cell_protect() && cell.field_name.as_deref().unwrap_or("").is_empty();
++            para = cell.paragraphs.get(inner_para).ok_or_else(|| err("계산식의 부모 셀 문단이 변경되었습니다."))?;
++        }
++        Err(err("계산식 셀 경로가 비어 있습니다."))
++    }
++
+     fn plan_table_formula_field(
+         &self,
+         section: usize,
+         paragraph: usize,
+-        control: usize,
+-        index: usize,
++        path: &FormulaPath,
+         field_id: u32,
+         expected: &str,
+         formula: &str,
+@@ -331,16 +365,8 @@
+                 "보호되었거나 변환된 문서의 계산식은 편집할 수 없습니다.",
+             ));
+         }
+-        let Some(Control::Table(table)) = self
+-            .document
+-            .sections
+-            .get(section)
+-            .and_then(|s| s.paragraphs.get(paragraph))
+-            .and_then(|p| p.controls.get(control))
+-        else {
+-            return Err(err("본문 표 위치가 변경되었습니다."));
+-        };
+-        if table.common.locked { return Err(err("보호된 표의 계산식은 편집할 수 없습니다.")); }
++        let (table, index, writable) = self.formula_table_at_path(section, paragraph, path)?;
++        if !writable { return Err(err("보호된 표의 계산식은 편집할 수 없습니다.")); }
+         validate_formula_grid(table)?;
+         let cell = table
+             .cells
+@@ -384,8 +410,7 @@
+                     "previousCommand":field.command,"previousValue":p.text,"command":next_command,"value":next}));
+             }
+             changes.push(FieldChange {
+-                location: FieldLocation { section_index: section, para_index: paragraph,
+-                    nested_path: vec![NestedEntry::TableCell {control_index:control, cell_index:i, para_index:0}] },
++                location: formula_location(section, paragraph, path, i),
+                 previous_command:field.command.clone(), command:next_command, formula:expr.to_owned(), format:fmt.to_owned(), value:next,
+             });
+         }
+@@ -404,9 +429,12 @@
+         formula: &str,
+         format: &str,
+     ) -> Result<String, HwpError> {
+-        Ok(self
+-            .plan_table_formula_field(s, p, t, i, id, expected, formula, format)?
+-            .response)
++        self.preview_table_formula_field_by_path(s, p, &[(t, i, 0)], id, expected, formula, format)
++    }
++
++    pub fn preview_table_formula_field_by_path(&self, s: usize, p: usize, path: &FormulaPath,
++        id: u32, expected: &str, formula: &str, format: &str) -> Result<String, HwpError> {
++        Ok(self.plan_table_formula_field(s, p, path, id, expected, formula, format)?.response)
+     }
+ 
+     pub fn update_table_formula_field(
+@@ -420,7 +448,12 @@
+         formula: &str,
+         format: &str,
+     ) -> Result<String, HwpError> {
+-        let plan = self.plan_table_formula_field(s, p, t, i, id, expected, formula, format)?;
++        self.update_table_formula_field_by_path(s, p, &[(t, i, 0)], id, expected, formula, format)
++    }
++
++    pub fn update_table_formula_field_by_path(&mut self, s: usize, p: usize, path: &FormulaPath,
++        id: u32, expected: &str, formula: &str, format: &str) -> Result<String, HwpError> {
++        let plan = self.plan_table_formula_field(s, p, path, id, expected, formula, format)?;
+         self.commit_formula_plan(s, plan)
+     }
+ 
+--- a/src/document_core/queries/table_formula_insert.rs
++++ b/src/document_core/queries/table_formula_insert.rs
+@@ -1,5 +1,5 @@
+ use super::super::collect_max_field_id;
+-use super::{err, Control, DocumentCore, Field, FieldLocation, FieldType, HwpError, NestedEntry, Paragraph};
++use super::{err, Control, DocumentCore, Field, formula_location, FormulaPath, FieldType, HwpError, Paragraph};
+ use crate::model::paragraph::FieldRange;
+ use crate::parser::tags::FIELD_FORMULA;
+ 
+@@ -53,8 +53,14 @@
+ impl DocumentCore {
+     pub fn insert_table_formula_field(&mut self, section: usize, paragraph: usize, control: usize,
+         cell: usize, expected: &str, formula: &str, format: &str) -> Result<String, HwpError> {
+-        let location = FieldLocation { section_index: section, para_index: paragraph,
+-            nested_path: vec![NestedEntry::TableCell { control_index: control, cell_index: cell, para_index: 0 }] };
++        self.insert_table_formula_field_by_path(section, paragraph, &[(control, cell, 0)], expected, formula, format)
++    }
++
++    pub fn insert_table_formula_field_by_path(&mut self, section: usize, paragraph: usize, path: &FormulaPath,
++        expected: &str, formula: &str, format: &str) -> Result<String, HwpError> {
++        let (_, cell, writable) = self.formula_table_at_path(section, paragraph, path)?;
++        if !writable { return Err(err("보호된 표에는 계산식을 넣을 수 없습니다.")); }
++        let location = formula_location(section, paragraph, path, cell);
+         self.validate_field_reflow_location(&location)?;
+         // Reserve IDs over the entire document, including captions and master
+         // pages. Overflow must never silently reuse an existing field ID.
+@@ -71,7 +77,7 @@
+         let original = std::mem::replace(target, wrapped);
+         // The same planner validates protection, formula, dependency graph
+         // and format, and recomposes every affected cell atomically.
+-        match self.update_table_formula_field(section, paragraph, control, cell, id, seed, formula, format) {
++        match self.update_table_formula_field_by_path(section, paragraph, path, id, seed, formula, format) {
+             Ok(result) => Ok(result),
+             Err(error) => {
+                 *self.get_para_mut_at_location(&location)? = original;
+--- a/src/document_core/queries/table_formula_input.rs
++++ b/src/document_core/queries/table_formula_input.rs
+@@ -1,11 +1,9 @@
+ use super::*;
+ 
+ impl DocumentCore {
+-    fn input_formula_cells(&self, s: usize, p: usize, t: usize, i: usize)
++    fn input_formula_cells(&self, s: usize, p: usize, path: &FormulaPath)
+         -> Result<(&Table, BTreeSet<usize>), HwpError> {
+-        let Some(Control::Table(table)) = self.document.sections.get(s)
+-            .and_then(|section| section.paragraphs.get(p))
+-            .and_then(|para| para.controls.get(t)) else { return Err(err("본문 표 위치가 변경되었습니다.")); };
++        let (table, i, writable) = self.formula_table_at_path(s, p, path)?;
+         let has_formula = table.cells.iter().flat_map(|cell| &cell.paragraphs).flat_map(|para| &para.controls)
+             .any(|ctrl| matches!(ctrl, Control::Field(field) if field.field_type == FieldType::Formula));
+         if !has_formula { return Ok((table, BTreeSet::new())); }
+@@ -18,7 +16,7 @@
+         let mut affected = affected_formula_cells(table, i)?;
+         affected.remove(&i);
+         if !affected.is_empty() {
+-            if table.common.locked || cell.cell_protect() || self.document.header.distribution
++            if !writable || cell.cell_protect() || self.document.header.distribution
+                 || self.document.header.encrypted || self.document.provenance.hwp3_lineage {
+                 return Err(err("보호된 계산식 참조 셀을 변경할 수 없습니다."));
+             }
+@@ -31,11 +29,19 @@
+     }
+ 
+     pub fn table_formula_input_has_dependents(&self, s: usize, p: usize, t: usize, i: usize) -> Result<bool, HwpError> {
+-        Ok(!self.input_formula_cells(s, p, t, i)?.1.is_empty())
++        self.table_formula_input_has_dependents_by_path(s, p, &[(t, i, 0)])
++    }
++
++    pub fn table_formula_input_has_dependents_by_path(&self, s: usize, p: usize, path: &FormulaPath) -> Result<bool, HwpError> {
++        Ok(!self.input_formula_cells(s, p, path)?.1.is_empty())
+     }
+ 
+     pub fn refresh_table_formula_input(&mut self, s: usize, p: usize, t: usize, i: usize) -> Result<String, HwpError> {
+-        let (table, affected) = self.input_formula_cells(s, p, t, i)?;
++        self.refresh_table_formula_input_by_path(s, p, &[(t, i, 0)])
++    }
++
++    pub fn refresh_table_formula_input_by_path(&mut self, s: usize, p: usize, path: &FormulaPath) -> Result<String, HwpError> {
++        let (table, affected) = self.input_formula_cells(s, p, path)?;
+         // Every expression comes from its stored field. No formula override is applied to the source number.
+         let calc = Calculation { table, root: usize::MAX, formula: "", memo: RefCell::default(), stack: RefCell::default() };
+         let mut changes = Vec::new();
+@@ -53,8 +59,7 @@
+             let command = format!("{expr}??{fmt};;{value}");
+             if command == field.command { continue; }
+             if cell.cell_protect() { return Err(err("연쇄 갱신 대상에 보호된 셀이 있습니다.")); }
+-            changes.push(FieldChange { location: FieldLocation { section_index:s, para_index:p,
+-                nested_path:vec![NestedEntry::TableCell {control_index:t, cell_index:index, para_index:0}] },
++            changes.push(FieldChange { location: formula_location(s, p, path, index),
+                 previous_command:field.command.clone(), command, formula:expr.to_owned(), format:fmt.to_owned(), value });
+         }
+         let response = serde_json::json!({"ok":true,"changed":changes.len()}).to_string();
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -8125,6 +8125,39 @@
+             .map_err(|e| e.into())
+     }
+ 
++    #[wasm_bindgen(js_name = tableFormulaInputHasDependentsByPath)]
++    pub fn table_formula_input_has_dependents_by_path(&self, section: usize, paragraph: usize, path_json: &str) -> Result<bool, JsValue> {
++        let path = DocumentCore::parse_cell_path(path_json)?;
++        self.core.table_formula_input_has_dependents_by_path(section, paragraph, &path).map_err(Into::into)
++    }
++
++    #[wasm_bindgen(js_name = refreshTableFormulaInputByPath)]
++    pub fn refresh_table_formula_input_by_path(&mut self, section: usize, paragraph: usize, path_json: &str) -> Result<String, JsValue> {
++        let path = DocumentCore::parse_cell_path(path_json)?;
++        self.core.refresh_table_formula_input_by_path(section, paragraph, &path).map_err(Into::into)
++    }
++
++    #[wasm_bindgen(js_name = insertTableFormulaFieldByPath)]
++    pub fn insert_table_formula_field_by_path(&mut self, section: usize, paragraph: usize, path_json: &str,
++        expected: &str, formula: &str, format: &str) -> Result<String, JsValue> {
++        let path = DocumentCore::parse_cell_path(path_json)?;
++        self.core.insert_table_formula_field_by_path(section, paragraph, &path, expected, formula, format).map_err(Into::into)
++    }
++
++    #[wasm_bindgen(js_name = previewTableFormulaFieldByPath)]
++    pub fn preview_table_formula_field_by_path(&self, section: usize, paragraph: usize, path_json: &str,
++        id: u32, expected: &str, formula: &str, format: &str) -> Result<String, JsValue> {
++        let path = DocumentCore::parse_cell_path(path_json)?;
++        self.core.preview_table_formula_field_by_path(section, paragraph, &path, id, expected, formula, format).map_err(Into::into)
++    }
++
++    #[wasm_bindgen(js_name = updateTableFormulaFieldByPath)]
++    pub fn update_table_formula_field_by_path(&mut self, section: usize, paragraph: usize, path_json: &str,
++        id: u32, expected: &str, formula: &str, format: &str) -> Result<String, JsValue> {
++        let path = DocumentCore::parse_cell_path(path_json)?;
++        self.core.update_table_formula_field_by_path(section, paragraph, &path, id, expected, formula, format).map_err(Into::into)
++    }
++
+     #[wasm_bindgen(js_name = tableFormulaInputHasDependents)]
+     pub fn table_formula_input_has_dependents(&self, section: usize, paragraph: usize, control: usize,
+         cell: usize) -> Result<bool, JsValue> {

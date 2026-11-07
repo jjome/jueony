@@ -1,3 +1,4 @@
+import {tableFormulaCall} from './table-formula-location.ts';
 import type {AgentTableFormulaFields,TableCellPathStep} from '../../modules/document/public/types.ts';
 import {nativeDocument,parsed} from './structure.ts';
 
@@ -8,6 +9,8 @@ const index=(v:unknown):v is number=>typeof v==='number' && Number.isSafeInteger
 export function readTableFormulaFields(wasm:any,allowEdits=false,hasPlainCells=false):AgentTableFormulaFields|undefined {
  const d=nativeDocument(wasm);
  if (typeof d.getFieldList!=='function') return undefined;
+ const canUseCellPaths=['previewTableFormulaFieldByPath','updateTableFormulaFieldByPath','insertTableFormulaFieldByPath']
+   .every(name=>typeof d[name]==='function');
  const fields:AgentTableFormulaFields['fields']=[];
  let unresolved=0,characters=0,canRefreshDependents=false;
  try {
@@ -28,9 +31,9 @@ export function readTableFormulaFields(wasm:any,allowEdits=false,hasPlainCells=f
     const tableId='s'+section+'p'+paragraph+parents.map(p=>'t'+p.controlIndex+'c'+p.cellIndex+'p'+p.cellParaIndex).join('')+'t'+last.controlIndex;
     const parts=/^(=[^\r\n]+)\?\?(%(?:g|\.[012]f),?);;([^\r\n]*)$/u.exec(field.command);
     let editable=false;
-    if (allowEdits && path.length===1 && parts && typeof d.previewTableFormulaField==='function' && typeof d.updateTableFormulaField==='function') {
+    if (allowEdits && (path.length===1 || canUseCellPaths) && parts && typeof d.previewTableFormulaField==='function' && typeof d.updateTableFormulaField==='function') {
      try {
-      const probe=parsed(d.previewTableFormulaField(section,paragraph,last.controlIndex,last.cellIndex,field.fieldId,field.command,parts[1],parts[2]));
+      const probe=parsed(tableFormulaCall(d,'previewTableFormulaField',section,paragraph,path,field.fieldId,field.command,parts[1],parts[2]));
       editable=probe?.ok===true && probe.fieldId===field.fieldId && probe.formula===parts[1];
       if(editable && Array.isArray(probe.dependentChanges))canRefreshDependents=true;
      } catch { /* Unsupported protection, formula grammar or dependency graph. */ }
@@ -43,7 +46,7 @@ export function readTableFormulaFields(wasm:any,allowEdits=false,hasPlainCells=f
   const canInsert=allowEdits && hasPlainCells && unresolved===0 && fields.length<200 && typeof d.insertTableFormulaField==='function';
   if (!fields.length&&!unresolved&&!canInsert) return undefined;
   const canEdit=fields.some(f=>f.editable);
-  return {fields,unresolved,canEdit,canRefreshDependents,...(canInsert?{canInsert}:{}),canFill:canEdit && typeof d.insertTableFormulaField==='function'};
+  return {fields,unresolved,canEdit,canRefreshDependents,...(canUseCellPaths?{canUseCellPaths}:{}),...(canInsert?{canInsert}:{}),canFill:canEdit && typeof d.insertTableFormulaField==='function'};
  } catch {
   return {fields:[],unresolved:null,canEdit:false,canRefreshDependents:false};
  }

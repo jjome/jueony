@@ -2,7 +2,7 @@ import type { Cell, Table } from '../public/types.ts';
 
 /** A physical cell may cover several logical positions. Reject gaps and
  * overlaps before mapping any of the document's physical cell indices. */
-function assertCoverage(table: Table) {
+export function assertCoverage(table: Table) {
   const { rows, columns, cells } = table;
   if (![rows, columns].every(n => Number.isSafeInteger(n) && n > 0) || rows * columns > 1000)
     throw new Error('표의 행·열 범위를 확인하지 못했습니다.');

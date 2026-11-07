@@ -3,21 +3,25 @@ import { planIntegerSeries } from './table-auto-fill.ts';
 export type TableSeries = { kind: 'integer' | 'date' | 'numbered-text'; step: number; values: string[]; description: string };
 export type DateFillUnit = 'days' | 'months' | 'years';
 const dayMs = 86_400_000;
-const numericDate = /^(\d{4})([-./])(\d{2})\2(\d{2})$/u;
+const numericDate = /^(\d{4})([-./])(\d{1,2})\2(\d{1,2})$/u;
 const koreanDate = /^(\d{4})(년 *)(\d{1,2})(월 *)(\d{1,2})(일)$/u;
 const dottedDate = /^(\d{4})(\. *)(\d{1,2})(\. *)(\d{1,2})(\.)$/u;
 
 function dateSeed(value: string) {
-  const numeric = numericDate.exec(value);
-  const match = numeric ? [value,numeric[1],numeric[2],numeric[3],numeric[2],numeric[4],''] :
-    koreanDate.exec(value) ?? dottedDate.exec(value);
+  const weekday = /( *)\(([일월화수목금토])(요일)?\)$/u.exec(value);
+  const dateText = weekday ? value.slice(0,weekday.index) : value;
+  const numeric = numericDate.exec(dateText);
+  const match = numeric ? [dateText,numeric[1],numeric[2],numeric[3],numeric[2],numeric[4],''] :
+    koreanDate.exec(dateText) ?? dottedDate.exec(dateText);
   if (!match) return;
   const [, y, afterYear, m, afterMonth, d, suffix] = match, year = Number(y), month = Number(m), date = Number(d);
   if (year < 1000 || year > 9999) throw new Error('날짜의 연도는 1000~9999여야 합니다.');
   const time = Date.UTC(year, month - 1, date), parsed = new Date(time);
   if (parsed.getUTCFullYear() !== year || parsed.getUTCMonth() + 1 !== month || parsed.getUTCDate() !== date) throw new Error('첫 두 셀에 실제로 존재하는 날짜를 입력하세요.');
-  return { day: time / dayMs, afterYear, afterMonth, suffix, year, month, date,
-    padMonth: Boolean(numeric) || m.startsWith('0'), padDay: Boolean(numeric) || d.startsWith('0') };
+  if (weekday && '일월화수목금토'[parsed.getUTCDay()] !== weekday[2]) throw Error('날짜와 괄호 안의 요일이 일치하지 않습니다.');
+  return { day: time / dayMs, afterYear, afterMonth, suffix, year, month, date, numeric:Boolean(numeric),
+    weekdaySpace:weekday?.[1], weekdaySuffix:weekday?.[3],monthWidth:m.length,dayWidth:d.length,
+    padMonth: m.startsWith('0'), padDay: d.startsWith('0') };
 }
 
 /** Two explicit seeds only; never interpret formulas or infer arbitrary natural language. */
@@ -30,10 +34,11 @@ export function planTableSeries(first: string, second: string, count: number, un
   }
   const a = dateSeed(first), b = dateSeed(second);
   if (a || b) {
-    if (!a || !b || a.afterYear !== b.afterYear || a.afterMonth !== b.afterMonth || a.suffix !== b.suffix)
+    if (!a || !b || a.afterYear !== b.afterYear || a.afterMonth !== b.afterMonth || a.suffix !== b.suffix ||
+      a.weekdaySpace !== b.weekdaySpace || a.weekdaySuffix !== b.weekdaySuffix)
       throw new Error('두 날짜의 연월일 표기, 구분 기호와 공백을 통일하세요.');
-    const monthWidth = a.padMonth || b.padMonth ? 2 : 1;
-    const dayWidth = a.padDay || b.padDay ? 2 : 1;
+    const monthWidth = a.padMonth || b.padMonth || (a.numeric && a.monthWidth===2 && b.monthWidth===2) ? 2 : 1;
+    const dayWidth = a.padDay || b.padDay || (a.numeric && a.dayWidth===2 && b.dayWidth===2) ? 2 : 1;
     const step = unit === 'days' ? b.day - a.day : unit === 'months' ? (b.year - a.year) * 12 + b.month - a.month : b.year - a.year;
     const values = Array.from({ length: count }, (_, i) => {
       let date: Date;
@@ -48,7 +53,8 @@ export function planTableSeries(first: string, second: string, count: number, un
       const year = date.getUTCFullYear();
       if (!Number.isSafeInteger(year) || year < 1000 || year > 9999) throw new Error('생성할 날짜가 지원 연도 범위를 넘습니다.');
       return year+a.afterYear+String(date.getUTCMonth()+1).padStart(monthWidth,'0')+a.afterMonth+
-        String(date.getUTCDate()).padStart(dayWidth,'0')+a.suffix;
+        String(date.getUTCDate()).padStart(dayWidth,'0')+a.suffix+
+        (a.weekdaySpace===undefined?'':a.weekdaySpace+'('+'일월화수목금토'[date.getUTCDay()]+(a.weekdaySuffix??'')+')');
     });
     if (values[0] !== first || values[1] !== second) throw new Error('두 날짜의 자릿수 또는 선택한 일·월·년 간격이 맞지 않습니다.');
     return { kind: 'date', step, values, description: `날짜 간격 (${unit === 'days' ? '일' : unit === 'months' ? '월' : '년'})` };

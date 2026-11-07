@@ -198,7 +198,7 @@ try {
     await frame.waitForSelector('.formula-input');
     assert.equal(await frame.$eval('.formula-input', el => el.value), '=AVG(ABOVE)');
     assert.equal(await frame.$$eval('.formula-select', els => els[2].value), 'decimal2');
-    assert.equal(await frame.$$eval('.formula-select', els => Boolean(els[0].querySelector('option[value=ROUND]'))), false);
+    assert.equal(await frame.$$eval('.formula-select', els => Boolean(els[0].querySelector('option[value=ROUND]'))), true);
     await frame.$eval('.formula-input', el => { el.value = '=SUM(A1:B2)'; });
     await frame.click('.modal-overlay .dialog-btn-primary');
     assert.equal(await frame.$('.formula-input'), null, await frame.$eval('.formula-error', el => el.textContent).catch(() => ''));

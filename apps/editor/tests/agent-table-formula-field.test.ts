@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {validateEditOperations} from '../src/modules/document/public/index.ts';
+import {translateStoredTableFormula} from '../src/modules/document/domain/table-formula-plan.ts';
 
 const scope=()=>({
  name:'fixture.hwpx',revision:'1',limitations:[],nodes:[],
@@ -52,4 +53,15 @@ test('inserting a persistent field needs an identified, unprotected ordinary cel
   const untrusted=source();change(untrusted);assert.throws(()=>validateEditOperations([insert],untrusted));
  }
  assert.throws(()=>validateEditOperations([insert],{...doc,tableFormulaFields:{...doc.tableFormulaFields,fields:scope().tableFormulaFields.fields}}));
+});
+
+test('stored fields use logical owner coordinates and keep digit-bearing function names during fill',()=>{
+ const doc=scope(),table=doc.structure.tables[0];
+ Object.assign(doc.tableFormulaFields,{canInsert:true,fields:[]});
+ table.columns=2;
+ Object.assign(table.cells[0],{editable:true,columnSpan:2});
+ const insert={kind:'insert_table_formula_field',target:table.id,row:0,column:0,originalText:'10',formula:'=LOG10(100)',resultFormat:'%g'};
+ assert.deepEqual(validateEditOperations([insert],doc),[insert]);
+ assert.throws(()=>validateEditOperations([{...insert,column:1}],doc));
+ assert.equal(translateStoredTableFormula('=LOG10(A1)+C1',1,0,{rows:2,columns:3}),'=LOG10(A2)+C2');
 });

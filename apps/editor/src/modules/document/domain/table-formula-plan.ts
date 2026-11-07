@@ -101,7 +101,7 @@ function tokenize(formula: string, shape: Shape): Token[] {
     const char = formula[at];
     if (char === ' ' || char === '\t') {at++; continue;}
     const tail = formula.slice(at);
-    const reference = /^\$?[A-Za-z]+\$?[1-9]\d*/u.exec(tail)?.[0];
+    const reference = /^[A-Za-z_][A-Za-z_0-9]*\s*\(/u.test(tail) ? undefined : /^\$?[A-Za-z]+\$?[1-9]\d*/u.exec(tail)?.[0];
     const number = /^(?:\d+(?:\.\d+)?|\.\d+)(?:[eE][+-]?\d+)?/u.exec(tail)?.[0];
     const name = /^[A-Za-z_][A-Za-z_0-9]*/u.exec(tail)?.[0];
     let token: Token;
@@ -277,10 +277,11 @@ function shiftReferences(formula:string,references:readonly Reference[],rowDelta
   return result + formula.slice(end);
 }
 
-type Grid = Readonly<{shape: Shape; owners: readonly (readonly number[])[]; cells: readonly Cell[]}>;
+type GridCell = Pick<Cell,'index'|'row'|'column'|'rowSpan'|'columnSpan'>;
+type Grid<C extends GridCell = Cell> = Readonly<{shape: Shape; owners: readonly (readonly number[])[]; cells: readonly C[]}>;
 
 /** Complete detached occupancy check; source cell indexes must be stable. */
-function gridOf(table: Table): Grid {
+export function formulaGrid<C extends GridCell>(table: Shape & {cells: readonly C[]}): Grid<C> {
   const shape = shapeOf(table);
   if (!Array.isArray(table.cells) || !table.cells.length || table.cells.length > shape.rows * shape.columns) {
     throw new Error('원본 표의 주 셀 개수가 유효하지 않습니다.');
@@ -310,8 +311,8 @@ function cellAt(grid: Grid, point: FormulaCoordinate, operation: 'read' | 'write
   const {row, column} = coordinate(point, grid.shape);
   const index = grid.owners[row][column];
   const cell = grid.cells[index];
-  if (cell.row !== row || cell.column !== column || cell.rowSpan !== 1 || cell.columnSpan !== 1) {
-    throw new Error('병합 주 셀 또는 흡수된 셀의 수식 참조·복사는 지원하지 않습니다.');
+  if (operation === 'write' && (cell.row !== row || cell.column !== column)) {
+    throw new Error('병합 셀에 쓰려면 주 셀의 시작 좌표를 지정하세요.');
   }
   if (operation === 'write' && (cell.editable !== true || cell.properties?.cellProtect !== false)) {
     throw new Error('보호되었거나 편집할 수 없는 셀을 변경할 수 없습니다.');
@@ -323,15 +324,15 @@ function cellAt(grid: Grid, point: FormulaCoordinate, operation: 'read' | 'write
 export function planTableFormulaCopy(table: Table, source: FormulaCoordinate,
   targets: readonly FormulaCoordinate[], options: FormulaPlanOptions = {}): FormulaCopyPlan | null {
   if (options.cancelled === true) return null;
-  const grid = gridOf(table);
+  const grid = formulaGrid(table);
   if (table.editable === false) throw new Error('읽기 전용 표에는 수식 자동 채우기를 적용할 수 없습니다.');
   const origin = coordinate(source, grid.shape);
   const {cell: seed} = cellAt(grid, origin, 'read');
+  if (seed.row!==origin.row || seed.column!==origin.column)throw Error('병합 수식 원본은 주 셀의 시작 좌표를 지정하세요.');
   if (typeof seed.text !== 'string' || !seed.text.startsWith('=')) {
     throw new Error('원본 셀에는 =로 시작하는 수식이 필요합니다.');
   }
-  // Source references must already be safe, including references that hit a
-  // covered coordinate instead of its merged primary cell.
+  // Reads through covered coordinates resolve to the physical owner.
   for (const ref of parse(seed.text, grid.shape).references) cellAt(grid, ref, 'read');
   if (!Array.isArray(targets) || targets.length < 1 || targets.length > MAX_SLOTS) {
     throw new Error('수식 복사 대상은 1~200개 셀입니다.');
@@ -358,13 +359,13 @@ export function planTableFormulaCopy(table: Table, source: FormulaCoordinate,
  * SUM/AVERAGE/MIN/MAX/COUNT, numbers, basic arithmetic, parentheses, and in-table A1
  * references are supported. Blank referenced cells contribute zero to scalar
  * arithmetic but are skipped by aggregate counting. Circular dependencies,
- * text-as-number coercion, non-finite results and merged references fail.
+ * text-as-number coercion and non-finite results fail.
  * The caller owns document snapshot, commit/undo, number formatting and save.
  */
 export function planTableFormulaRecalculation(table: Table,
   proposed: readonly FormulaCellChange[] = [], options: FormulaPlanOptions = {}): FormulaRecalculationPlan | null {
   if (options.cancelled === true) return null;
-  const grid = gridOf(table);
+  const grid = formulaGrid(table);
   if (!Array.isArray(proposed) || proposed.length > MAX_SLOTS) {
     throw new Error('수식 갱신은 최대 200개 셀을 지원합니다.');
   }
@@ -421,8 +422,12 @@ export function planTableFormulaRecalculation(table: Table,
         const values: number[] = [];
         for (const arg of expression.arguments) {
           if (arg.kind === 'range') {
+            const seen=new Set<number>();
             for (let row = arg.first.row; row <= arg.last.row; row++) {
               for (let column = arg.first.column; column <= arg.last.column; column++) {
+                const owner=grid.owners[row][column];
+                if(seen.has(owner))continue;
+                seen.add(owner);
                 const value = getValue({row, column});
                 if (value !== null) values.push(value);
               }

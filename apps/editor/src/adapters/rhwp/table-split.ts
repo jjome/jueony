@@ -1,6 +1,6 @@
 import {sha256} from '@noble/hashes/sha2.js';
 import type {Snapshot,Table,AgentTableSplitOp,AgentTableSplitSource} from '../../modules/document/public/index.ts';
-import {tableSplitPlan,witnessedSplitPlan} from '../../modules/document/public/engine-integration.ts';
+import {tableSplitPlan,witnessedSplitPlan,assertCoverage,witnessedTrackEdges} from '../../modules/document/public/engine-integration.ts';
 import {nativeDocument,parsed,readStructure} from './structure.ts';
 import {capturePreservationEvidence} from './preservation.ts';
 import {assertNativeTableWritable} from './table-write-guard.ts';
@@ -13,17 +13,23 @@ export function readTableSplitSources(wasm:any,tables:Table[],name:string):Recor
  const d=nativeDocument(wasm);if(typeof d.splitTableCell!=='function')return;
  return Object.fromEntries(tables.map(t=>[t.id,/\.hwpx$/iu.test(name) ? readMergedSplitGrid(d,t) : {editable:false,reason:'기본 병합 해제는 HWPX에서 지원합니다. HWP5는 원래 격자가 확인된 표에서 지정 행·열 분할을 사용할 수 있습니다.'}]));
 }
-export function readMergedSplitGrid(d:any,t:Table):AgentTableSplitSource {
+export function readMergedSplitGrid(d:any,t:Table,subdivision=false):AgentTableSplitSource {
  try {
   const p=parsed(d.getTableProperties(t.section,t.paragraph,t.control)),cols=parsed(d.getColumnDef(t.section)),controls=parsed(d.getControls()),lists=parsed(d.getCursorModel()).lists;
   const merged=t.cells.filter(c=>c.rowSpan*c.columnSpan>1),flat=t.paragraph+Array.from({length:t.section},(_,s)=>d.getParagraphCount(s)).reduce((a:number,b:number)=>a+b,0),control=controls.find((c:any)=>c.ctrlId==='tbl'&&c.list===0&&c.para===flat&&c.controlIndex===t.control);
-  if(merged.length!==1||t.rows*t.columns>200||controls.some((c:any)=>c.list!==0||!['secd','cold','tbl'].includes(c.ctrlId))||lists.some((l:any)=>!l.isCell||l.hostListId!==0)||parsed(d.getFieldList()).length||parsed(d.getBookmarks()).length||control?.props?.Lock!==0||cols.columnCount!==1||p.cellZoneCount!==0||p.hasCaption||p.treatAsChar||p.allowOverlap||p.repeatHeader||p.cellSpacing!==0||p.textWrap!=='TopAndBottom'||p.vertRelTo!=='Para'||p.vertAlign!=='Top'||!['Para','Column'].includes(p.horzRelTo)||p.horzAlign!=='Left')throw new Error('unsupported');
+  if((subdivision ? !merged.length : merged.length!==1)||t.rows*t.columns>200||controls.some((c:any)=>c.list!==0||!['secd','cold','tbl'].includes(c.ctrlId))||lists.some((l:any)=>!l.isCell||l.hostListId!==0)||parsed(d.getFieldList()).length||parsed(d.getBookmarks()).length||control?.props?.Lock!==0||cols.columnCount!==1||p.cellZoneCount!==0||p.hasCaption||p.treatAsChar||p.allowOverlap||p.repeatHeader||p.cellSpacing!==0||p.textWrap!=='TopAndBottom'||p.vertRelTo!=='Para'||p.vertAlign!=='Top'||!['Para','Column'].includes(p.horzRelTo)||p.horzAlign!=='Left')throw new Error('unsupported');
   const primary=merged[0];assertNativeTableWritable(d,t);
-  for(const c of t.cells){if(c.properties.textDirection!==0||c!==primary&&!c.editable)throw new Error('unsupported');const count=d.getCellParagraphCount(t.section,t.paragraph,t.control,c.index);if(count<1||count>50)throw new Error('unsupported');for(let para=0;para<count;para++){const length=d.getCellParagraphLength(t.section,t.paragraph,t.control,c.index,para),path=JSON.stringify([{controlIndex:t.control,cellIndex:c.index,cellParaIndex:para}]),runs=parsed(d.getCharShapeRunsInCellByPath(t.section,t.paragraph,path,0,length));if(length>4000||new Set(runs.map((r:any)=>r.charShapeId)).size>1)throw new Error('unsupported');}}
-  const frames=Array.from({length:d.pageCount()},(_,page)=>parsed(d.getPageControlLayout(page)).controls.filter((c:any)=>c.type==='table'&&c.secIdx===t.section&&c.paraIdx===t.paragraph&&c.controlIdx===t.control)).flat();if(frames.length!==1||frames[0].cells?.length!==t.cells.length)throw new Error('unsupported');
+  for(const c of t.cells){if(c.properties.textDirection!==0||!c.editable&&(subdivision ? !c.axisContentSafe : c!==primary))throw new Error('unsupported');const count=d.getCellParagraphCount(t.section,t.paragraph,t.control,c.index);if(count<1||count>50)throw new Error('unsupported');for(let para=0;para<count;para++){const length=d.getCellParagraphLength(t.section,t.paragraph,t.control,c.index,para),path=JSON.stringify([{controlIndex:t.control,cellIndex:c.index,cellParaIndex:para}]),runs=parsed(d.getCharShapeRunsInCellByPath(t.section,t.paragraph,path,0,length));if(length>4000||new Set(runs.map((r:any)=>r.charShapeId)).size>1)throw new Error('unsupported');}}
+  const frames=Array.from({length:d.pageCount()},(_,page)=>parsed(d.getPageControlLayout(page)).controls.filter((c:any)=>c.type==='table'&&c.secIdx===t.section&&c.paraIdx===t.paragraph&&c.controlIdx===t.control)).flat();if(subdivision ? !frames.length : frames.length!==1||frames[0].cells?.length!==t.cells.length)throw new Error('unsupported');
   const infer=(n:number,row:boolean)=>Array.from({length:n},(_,i)=>{const witnesses=t.cells.filter(c=>row?c.row===i&&c.rowSpan===1:c.column===i&&c.columnSpan===1),values=new Set(witnesses.map(c=>Number(c.properties[row?'height':'width'])));if(values.size!==1)throw new Error('missing grid witness');const value=[...values][0];if(!Number.isSafeInteger(value)||value<200)throw new Error('unsupported');return value;});
-  const widths=infer(t.columns,false),heights=infer(t.rows,true),e=capturePreservationEvidence(d);if(e.issues.length)throw new Error('unsupported');const source={editable:true,fingerprint:hash({table:t,properties:p,columns:cols,page:parsed(d.getPageDef(t.section)),preservation:e.values}),widths,heights};
-  witnessedSplitPlan({kind:'split_table_cell',target:t.id,row:primary.row,column:primary.column},t,source);
+  const tracks=(row:boolean)=>{
+    if (!subdivision) return infer(row?t.rows:t.columns,row);
+    const edges=witnessedTrackEdges(t,row);
+    return edges.slice(1).map((end,i)=>end-edges[i]);
+  };
+  const widths=tracks(false),heights=tracks(true),e=capturePreservationEvidence(d);if(e.issues.length)throw new Error('unsupported');const source={editable:true,fingerprint:hash({table:t,properties:p,columns:cols,page:parsed(d.getPageDef(t.section)),preservation:e.values}),widths,heights};
+  if (subdivision) assertCoverage(t);
+  else witnessedSplitPlan({kind:'split_table_cell',target:t.id,row:primary.row,column:primary.column},t,source);
   return source;
  } catch { return {editable:false,reason:'한 쪽 평면 표의 병합 주 셀 하나와 일치하는 주변 격자가 필요합니다. 보호·필드·중첩·복합 표는 제외합니다.'}; }
 }

@@ -1,3 +1,4 @@
+import {formulaGrid} from './table-formula-plan.ts';
 import type {AgentTableFormulaOp,AgentInsertTableFormulaOp,Snapshot} from '../public/types.ts';
 
 function validateFormula(op:AgentTableFormulaOp|AgentInsertTableFormulaOp,keys:string[]) {
@@ -7,18 +8,29 @@ function validateFormula(op:AgentTableFormulaOp|AgentInsertTableFormulaOp,keys:s
    throw Error('계산식 필드에는 유효한 셀 위치·수식·숫자 서식이 필요합니다.');
 }
 
+function locate(base:Snapshot, target:string, row:number, column:number) {
+ const matches=[...(base.structure?.tables??[]),...(base.structure?.nestedTables??[])].filter(t=>t.id===target);
+ const table=matches[0];
+ if(matches.length!==1 || ('ancestors' in table ? !base.tableFormulaFields?.canUseCellPaths : !table.editable))
+  throw Error('조회된 편집 가능한 표의 경로를 확인하세요.');
+ const cells=table.cells.filter(c=>c.row===row&&c.column===column),cell=cells[0];
+ if(cells.length!==1 || !('ancestors' in table) && (!('properties' in cell) || cell.properties?.cellProtect!==false))
+  throw Error('조회된 비보호 주 셀의 시작 위치를 확인하세요.');
+ const path=[...('ancestors' in table?table.ancestors:[]),{controlIndex:table.control,cellIndex:cell.index,cellParaIndex:0}];
+ formulaGrid(table);
+ return {table,cell,path};
+}
+
 export function agentFormulaInsertTarget(op:AgentInsertTableFormulaOp,base:Snapshot) {
  validateFormula(op,['kind','target','row','column','originalText','formula','resultFormat']);
  const caps=base.tableFormulaFields;
- const matches=base.structure?.tables.filter(t=>t.id===op.target)??[],table=matches[0];
- const cells=table?.cells.filter(c=>c.row===op.row&&c.column===op.column)??[],cell=cells[0];
+ const result=locate(base,op.target,op.row,op.column),{cell}=result;
  if(!/\.hwpx?$/iu.test(base.name) || !caps?.canInsert || caps.unresolved!==0 || caps.fields.length>=200 ||
-    matches.length!==1 || !table.editable || table.cells.length!==table.rows*table.columns || table.cells.length>200 ||
-    table.cells.some(c=>c.rowSpan!==1||c.columnSpan!==1) || cells.length!==1 || !cell.editable || cell.properties.cellProtect!==false ||
+    !cell.editable ||
     typeof op.originalText!=='string' || Array.from(op.originalText).length>4000 || op.originalText!==cell.text ||
     caps.fields.some(f=>f.tableId===op.target&&f.row===op.row&&f.column===op.column))
   throw Error('현재 조회한 일반 셀의 위치·원문·보호 상태를 확인하세요.');
- return {cell,table};
+ return result;
 }
 
 export function agentTableFormulaTarget(op:AgentTableFormulaOp,base:Snapshot) {
@@ -26,10 +38,9 @@ export function agentTableFormulaTarget(op:AgentTableFormulaOp,base:Snapshot) {
  if(!Number.isSafeInteger(op.fieldId)||op.fieldId<0)throw Error('유효한 계산식 필드 ID가 필요합니다.');
  const caps=base.tableFormulaFields;
  const candidates=caps?.fields.filter(f=>f.tableId===op.target&&f.row===op.row&&f.column===op.column&&f.fieldId===op.fieldId);
- const field=candidates?.[0],table=base.structure?.tables.find(t=>t.id===op.target);
- if(!/\.hwpx?$/iu.test(base.name) || !caps?.canEdit || candidates?.length!==1 || !field?.editable || field.path.length!==1 || field.storedCommand!==op.originalCommand ||
-    !table?.editable || table.section!==field.section || table.paragraph!==field.paragraph || table.control!==field.path[0].controlIndex ||
-    !table.cells.some(c=>c.row===op.row&&c.column===op.column&&c.index===field.path[0].cellIndex&&c.properties.cellProtect===false))
+ const field=candidates?.[0],{table,path}=locate(base,op.target,op.row,op.column);
+ if(!/\.hwpx?$/iu.test(base.name) || !caps?.canEdit || candidates?.length!==1 || !field?.editable || field.storedCommand!==op.originalCommand ||
+    table.section!==field.section || table.paragraph!==field.paragraph || JSON.stringify(field.path)!==JSON.stringify(path))
    throw Error('조회된 편집 가능 계산식 필드의 위치·원문·보호 상태가 다릅니다.');
  return {field,table};
 }

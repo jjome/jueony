@@ -1,7 +1,7 @@
 import {agentFileKinds,validateAgentFileOperation} from './agent-file-operations.ts';
 import {validateAgentDocumentMetadata} from './agent-document-information.ts';
 import {agentTableFormulaTarget,agentFormulaInsertTarget} from './agent-table-formula.ts';
-import {cellParagraphPlan} from './cell-paragraph.ts';
+import {cellParagraphPlan,paragraphEdits} from './cell-paragraph.ts';
 import {tableSubdivisionPlan} from './table-subdivision.ts';
 import {projectTableAxis} from './table-axis-grid.ts';
 import {agentSeriesRange} from './agent-table-series.ts';
@@ -63,7 +63,7 @@ export function tableAxisPlan(table:Table,op:AxisOperation):Table {
  const row=op.kind.endsWith('_row'),insert=op.kind.startsWith('insert_');
  only(op,insert?['kind','target','index','values']:['kind','target','index']);
  const merged=table.cells.some(c=>c.rowSpan>1||c.columnSpan>1);
- if(table.cells.some(c=>!c.editable&&!(merged&&c.axisContentSafe===true)))fail('중첩 개체·필드 또는 보존 상태를 확인할 수 없는 셀이 있는 표입니다.');
+ if(table.cells.some(c=>!c.editable&&!(merged&&(c.axisContentSafe===true||c.axisFieldSignature))))fail('중첩 개체·필드 또는 보존 상태를 확인할 수 없는 셀이 있는 표입니다.');
  const size=row?table.rows:table.columns,other=row?table.columns:table.rows;
  integer(op.index,0,insert?size:size-1);
  if(!insert&&size===1)fail('표의 마지막 행 또는 열은 삭제할 수 없습니다.');
@@ -71,7 +71,10 @@ export function tableAxisPlan(table:Table,op:AxisOperation):Table {
  if(insert)values.forEach(text);
  const rows=table.rows+(row?(insert?1:-1):0),columns=table.columns+(!row?(insert?1:-1):0);
  if(rows>50||columns>20||rows*columns>200)fail('행·열 편집 결과는 50행·20열·200셀 이내여야 합니다.');
- const cells=projectTableAxis(table,row,insert,op.index,values).map(({cell})=>cell);
+ const projected=projectTableAxis(table,row,insert,op.index,values);
+ if(merged && table.cells.some(c=>c.axisFieldSignature && !projected.some(v=>v.sourceIndex===c.index)))
+   fail('필드를 포함한 셀이 없어지는 행·열은 삭제할 수 없습니다.');
+ const cells=projected.map(({cell})=>cell);
  return {...table,rows,columns,cells};
 }
 export function pageProperties(current: DocumentProperties | undefined, props: Record<string, unknown>) {
@@ -131,7 +134,7 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
       if(operations.length!==1)fail('표 자동 채우기는 한 요청에 한 범위만 지정하세요.');
       agentSeriesRange(snapshot,op); continue;
     }
-    if(op.kind==='replace_cell_paragraph'){only(op,['kind','target','row','column','paragraph','originalText','text','spanTexts']);if(operations.length!==1)fail('셀 문단 교체는 단독 요청으로 실행하세요.');cellParagraphPlan(op,snapshot);continue;}
+    if(op.kind==='replace_cell_paragraph'){only(op,['kind','target','row','column','paragraph','originalText','text','spanTexts','spanFormats']);if(operations.length!==1)fail('셀 문단 교체는 단독 요청으로 실행하세요.');cellParagraphPlan(op,snapshot);continue;}
     if(op.kind==='split_table_cell_into'){only(op,['kind','target','row','column','rows','columns','distributeParagraphs']);if(operations.length!==1)fail('임의 셀 분할은 단독 요청으로 실행하세요.');tableSubdivisionPlan(op,snapshot);continue;}
     if(op.kind==='split_table'||op.kind==='attach_table'){only(op,op.kind==='split_table'?['kind','target','atRow']:['kind','target','nextTarget']);if(operations.length!==1)fail('표 나누기·붙이기는 단독 요청으로 실행하세요.');tableStructurePlan(op,snapshot);continue;}
     if(op.kind==='split_table_cell'){only(op,['kind','target','row','column']);if(operations.length!==1)fail('셀 기본 분할은 단독 요청으로 실행하세요.');tableSplitPlan(op,snapshot);continue;}
@@ -226,10 +229,17 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
     } else if (op.kind === 'set_table_cell' || op.kind === 'format_table_cells') {
       const nested = snapshot.structure?.nestedTables?.find(t => t.id===op.target);
       if (nested && op.kind==='set_table_cell') {
-        only(op,['kind','target','row','column','originalText','text']);
+        only(op,['kind','target','row','column','originalText','text','paragraph','spanTexts']);
         if (operations.length!==1) fail('중첩 셀 편집은 단독 요청으로 실행하세요.');
         const cell=nested.cells.find(c=>c.row===op.row && c.column===op.column);
-        if (!cell?.editable || cell.rowSpan!==1 || cell.columnSpan!==1 || cell.text!==op.originalText) fail('중첩 셀이 보호되어 있거나 위치·원문이 다릅니다.');
+        if(op.paragraph===undefined){
+          if(!cell?.editable||cell.text!==op.originalText||op.spanTexts!==undefined)fail('중첩 셀이 보호되어 있거나 위치·원문이 다릅니다.');
+        }else{
+          const paragraph=cell?.paragraphs?.find(p=>p.index===op.paragraph);
+          if(!paragraph||paragraph.text!==op.originalText)throw Error('중첩 셀 문단이 보호되어 있거나 위치·원문이 다릅니다.');
+          text(op.text);
+          paragraphEdits(op,paragraph);
+        }
         generated+=text(op.text).length;
         continue;
       }

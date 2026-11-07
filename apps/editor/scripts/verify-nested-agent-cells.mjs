@@ -58,3 +58,46 @@ try {
     } finally {doc.free();}
   }
 } finally {blank.free();}
+
+for(const format of ['hwp','hwpx']){
+  const template=HwpDocument.createEmpty();template.createBlankDocument();
+  const inner='<table><tr><td colspan="2">KEEP first</td></tr><tr><td>x</td><td>y</td></tr></table>';
+  template.pasteHtml(0,0,0,'<table><tr><td>outer'+inner+'</td></tr></table>');
+  const table=readStructure(template).nestedTables[0];
+  const path=p=>JSON.stringify([...table.ancestors,{controlIndex:table.control,cellIndex:0,cellParaIndex:p}]);
+  const args=[table.section,table.paragraph];
+  template.splitParagraphInCellByPath(...args,path(0),5);
+  template.applyCharFormatInCellByPath(...args,path(1),1,4,'{"bold":true}');
+  const doc=new HwpDocument(take(template,format)),name='mixed-nested.'+format;template.free();
+  try{
+    const base=snapshot(doc,name),cell=base.structure.nestedTables[0].cells[0],bytes=take(doc,format);
+    assert.equal(cell.columnSpan,2);assert.equal(cell.editable,false);
+    assert.deepEqual(cell.paragraphs[1].formatSpans,[{start:0,end:1},{start:1,end:4},{start:4,end:5}]);
+    const op={kind:'set_table_cell',target:table.id,row:0,column:0,paragraph:1,originalText:'first',text:'수정😀t',spanTexts:['','수정😀','t']};
+    const apply=(s,o)=>executeDocumentOperations(doc,s,validateEditOperations([o],s));
+    for(const bad of [{...op,paragraph:0},{...op,column:1},{...op,spanTexts:['bad']},{...op,paragraph:undefined}]){
+      assert.throws(()=>apply(base,bad));assert.deepEqual(take(doc,format),bytes);
+    }
+    const undo=doc.saveSnapshot(),cursor=apply(base,op);
+    assert.equal(cursor.cellPath.at(-1).cellParaIndex,1);
+    const artifact=format==='hwp'?doc.exportHwpWithReport():doc.exportHwpxWithReport();
+    try{
+      const loss=JSON.parse(artifact.contentLoss()),edited=artifact.takeBytes();
+      verifyPreservedExport(doc,edited,format,loss,b=>new HwpDocument(b));
+      const reopened=new HwpDocument(edited);
+      try{
+        assert.deepEqual(readStructure(reopened).nestedTables[0].cells.map(c=>c.text),['KEEP \n수정😀t','x','y']);
+        assert.equal(JSON.parse(reopened.getCellCharPropertiesAtByPath(...args,path(1),2)).bold,true);
+        assert.equal(JSON.parse(reopened.getCellCharPropertiesAtByPath(...args,path(1),3)).bold,false);
+      }finally{reopened.free();}
+      const redo=doc.saveSnapshot();doc.restoreSnapshot(undo);assert.deepEqual(take(doc,format),bytes);
+      doc.restoreSnapshot(redo);assert.deepEqual(take(doc,format),edited);
+      doc.discardSnapshot(undo);doc.discardSnapshot(redo);
+    }finally{artifact.free();}
+    const [parent]=table.ancestors;
+    const state=snapshot(doc,name),next={...op,originalText:op.text,text:'차단',spanTexts:['차단','']};
+    doc.setCellProperties(...args,parent.controlIndex,parent.cellIndex,'{"cellProtect":true}');
+    assert.throws(()=>apply(state,next));assert.equal(snapshot(doc,name).structure.nestedTables[0].cells[0].paragraphs,undefined);
+    console.log('PASS',format,'merged owner with multiple paragraphs and character runs, stale/protected refusal, undo/redo, saved reopen');
+  }finally{doc.free();}
+}

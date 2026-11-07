@@ -32,7 +32,8 @@ export function resourceFingerprint(bytes:Uint8Array){
 /** Rendered cell indices restart on each continuation page. The document
  * model supplies the stable row and column of each merged-cell owner. */
 function paragraphPageOwners(d:any,t:Table) {
- const remaining=new Map(t.cells.map(cell=>[`${cell.row},${cell.column}`,cell]));
+ const byAddress=new Map(t.cells.map(cell=>[`${cell.row},${cell.column}`,cell]));
+ const lastPage=new Map<number,number>(),continued=new Set<number>();
  const pages:Array<{page:number;owners:number[]}>=[];
  for(let page=0;page<d.pageCount();page++){
   const frames=parsed(d.getPageControlLayout(page)).controls.filter((frame:any)=>
@@ -40,15 +41,64 @@ function paragraphPageOwners(d:any,t:Table) {
   if(!frames.length)continue;
   if(frames.length!==1||!frames[0].cells.length)throw Error('표의 쪽 경계를 확인하지 못했습니다.');
   const owners=frames[0].cells.map((frame:any)=>{
-   const address=`${frame.row},${frame.col}`,cell=remaining.get(address);
-   if(!cell||cell.rowSpan!==frame.rowSpan||cell.columnSpan!==frame.colSpan)throw Error('한 셀이 여러 부분으로 나뉘었거나 표의 격자가 달라졌습니다.');
-   remaining.delete(address);
+   const cell=byAddress.get(`${frame.row},${frame.col}`);
+   if(!cell||cell.rowSpan!==frame.rowSpan||cell.columnSpan!==frame.colSpan)throw Error('표의 원래 격자가 달라졌습니다.');
+   const previous=lastPage.get(cell.index);
+   if(previous!==undefined){
+    if(previous!==page-1)throw Error('셀의 쪽 경계가 연속되지 않습니다.');
+    continued.add(cell.index);
+   }
+   lastPage.set(cell.index,page);
    return cell.index;
   });
   pages.push({page,owners});
  }
- if(!pages.length||remaining.size)throw Error('화면의 표에서 모든 셀을 확인하지 못했습니다.');
+ if(!pages.length||lastPage.size!==t.cells.length)throw Error('화면의 표에서 모든 셀을 확인하지 못했습니다.');
+ // A repeated frame alone cannot distinguish a continuation from duplicated
+ // content. Reassemble each split owner's rendered runs at native text offsets.
+ if(continued.size){
+  const offsets=new Map<string,number>();
+  for(const {page,owners} of pages){
+   const runs=parsed(d.getPageTextLayout(page)).runs;
+   for(const r of runs){
+    if(r.secIdx!==t.section||r.parentParaIdx!==t.paragraph||r.controlIdx!==t.control||!continued.has(r.cellIdx))continue;
+    const key=r.cellIdx+'/'+r.cellParaIdx,start=offsets.get(key)??0;
+    const args=[t.section,t.paragraph,t.control,r.cellIdx,r.cellParaIdx],length=Array.from(r.text as string).length;
+    if(!owners.includes(r.cellIdx)||!int(r.cellParaIdx)||r.cellParaIdx>=d.getCellParagraphCount(...args.slice(0,4))||
+       start!==r.charStart||d.getTextInCell(...args,start,length)!==r.text)throw Error('여러 쪽에 걸친 셀의 글줄과 원문이 다릅니다.');
+    offsets.set(key,start+length);
+   }
+  }
+  for(const index of continued){
+   const args=[t.section,t.paragraph,t.control,index];
+   for(let p=0;p<d.getCellParagraphCount(...args);p++)
+    if((offsets.get(index+'/'+p)??0)!==d.getCellParagraphLength(...args,p))throw Error('여러 쪽에 걸친 셀의 글줄을 모두 확인하지 못했습니다.');
+  }
+ }
  return pages;
+}
+/** An empty ctrlId alone cannot identify the native control. Match each one
+ * to its click-here field by both cursor list and native field-at-position. */
+function cellFieldBoundaries(d:any,t:Table,controls:any[],lists:any[]){
+ const nested=controls.filter(c=>c.list!==0),fields=parsed(d.getFieldList());
+ const boundaries=new Map<string,number>();
+ if(!Array.isArray(fields)||fields.length!==nested.length)throw Error();
+ for(const field of fields){
+  const loc=field.location,step=loc?.path?.[0];
+  if(field.fieldType!=='clickhere'||field.cellField!==false||loc?.sectionIndex!==t.section||loc.paraIndex!==t.paragraph||
+     loc.path?.length!==1||step.type!=='cell'||step.controlIndex!==t.control||!int(step.cellIndex)||!int(step.paraIndex)||
+     !int(field.startCharIdx)||!int(field.endCharIdx)||field.endCharIdx<field.startCharIdx||field.paraInList!==step.paraIndex)throw Error();
+  const list=lists.find(l=>l.hostListId===0&&l.isCell&&l.sectionIndex===t.section&&l.hostPara===t.paragraph&&
+   l.controlIndex===t.control&&l.cellIndex===step.cellIndex&&l.listId===field.listId);
+  const matches=nested.filter(c=>c.list===list?.listId&&c.para===step.paraIndex);
+  if(!list||matches.length!==1||matches[0].ctrlId!==''||matches[0].ctrlCh!==0)throw Error();
+  const info=parsed(d.getFieldInfoAtInCell(t.section,t.paragraph,t.control,step.cellIndex,step.paraIndex,field.startCharIdx,false));
+  const key=step.cellIndex+'/'+step.paraIndex;
+  if(!info.inField||info.fieldId!==field.fieldId||info.fieldType!==field.fieldType||info.startCharIdx!==field.startCharIdx||
+     info.endCharIdx!==field.endCharIdx||boundaries.has(key))throw Error();
+  boundaries.set(key,field.endCharIdx+1);
+ }
+ return boundaries;
 }
 function readPrivateSources(d:any,tables:Table[],name:string){
  const structure=readStructure(d),sources:Record<string,any>={};
@@ -58,7 +108,8 @@ function readPrivateSources(d:any,tables:Table[],name:string){
    if(!/\.hwpx?$/iu.test(name)||d.getSourceFormat()!==(/\.hwp$/iu.test(name)?'hwp':'hwpx')||t.rows*t.columns>200||!t.cells.some(c=>c.rowSpan*c.columnSpan>1)||t.editable!==true)throw Error();
    assertNativeTableWritable(d,t);
    const controls=parsed(d.getControls()),lists=parsed(d.getCursorModel()).lists;
-   if(parsed(d.getFieldList()).length||parsed(d.getBookmarks()).length||controls.some((c:any)=>c.list!==0||!['tbl','secd','cold'].includes(c.ctrlId))||lists.some((l:any)=>!l.isCell||l.hostListId!==0))throw Error();
+   if(parsed(d.getBookmarks()).length||controls.some((c:any)=>c.list===0&&!['tbl','secd','cold'].includes(c.ctrlId))||lists.some((l:any)=>!l.isCell||l.hostListId!==0))throw Error();
+   const fieldBoundaries=cellFieldBoundaries(d,t,controls,lists);
    const p=parsed(d.getTableProperties(t.section,t.paragraph,t.control)),col=parsed(d.getColumnDef(t.section));
    if(p.cellZoneCount!==0||p.hasCaption||p.cellSpacing!==0||p.treatAsChar||p.allowOverlap||p.repeatHeader||p.textWrap!=='TopAndBottom'||p.vertRelTo!=='Para'||p.vertAlign!=='Top'||p.horzRelTo!=='Para'&&p.horzRelTo!=='Column'||p.horzAlign!=='Left'||col.columnCount!==1)throw Error();
    const pages=paragraphPageOwners(d,t);
@@ -69,7 +120,8 @@ function readPrivateSources(d:any,tables:Table[],name:string){
      const args=[t.section,t.paragraph,t.control,c.index,index],length=d.getCellParagraphLength(...args),text=d.getTextInCell(...args,0,length),path=JSON.stringify([{controlIndex:t.control,cellIndex:c.index,cellParaIndex:index}]),runs=parsed(d.getCharShapeRunsInCellByPath(t.section,t.paragraph,path,0,length)),characters=parsed(d.getCellCharPropertiesAt(...args,0)),paragraph=parsed(d.getCellParaPropertiesAt(...args)),style=parsed(d.getCellStyleAt(...args));
      paragraphBudget++;characterBudget+=Array.from(text).length;
      if(paragraphBudget>200||characterBudget>40000||!plain(text)||Array.from(text).length!==length||!Array.isArray(runs)||runs.some((r:any,i:number)=>!int(r.charShapeId)||!int(r.endOffset)||r.startOffset!==(i===0?0:runs[i-1].endOffset)||r.endOffset<=r.startOffset)||(runs.at(-1)?.endOffset??0)!==length||!int(characters.charShapeId)||paragraph.headType!=='None')throw Error();
-     return {index,text,length,characters,paragraph,style,runs};
+     const editableFrom=fieldBoundaries.get(c.index+'/'+index);
+     return {index,text,length,characters,paragraph,style,runs,...(editableFrom===undefined?{}:{editableFrom})};
     });return {index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs};
    });
    const evidence=capturePreservationEvidence(d);if(evidence.issues.length)throw Error();
@@ -83,7 +135,7 @@ function readPrivateSources(d:any,tables:Table[],name:string){
 export function readCellParagraphSources(wasm:any,tables:Table[],name:string):Record<string,AgentCellParagraphSource>|undefined {
  const d=nativeDocument(wasm);if(typeof d.setCharShapeIdInCell!=='function'||typeof d.exportHwpx!=='function')return;
  const privateSources=readPrivateSources(d,tables,name).sources;
- return Object.fromEntries(tables.map(t=>{const source=privateSources[t.id];return [t.id,source?.editable===true?{editable:true,fingerprint:source.fingerprint,cells:source.cells.map((c:any)=>({index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs:c.paragraphs.map((p:any)=>({index:p.index,text:p.text,...(p.runs.length>1?{formatSpans:p.runs.map((r:any)=>({start:r.startOffset,end:r.endOffset}))}:{})}))}))}:{editable:false,reason:'병합 셀 문단 교체에는 셀마다 원래 행·열과 쪽을 확인할 수 있는 비보호 본문 표가 필요합니다. 필드·개체·책갈피·중첩 표와 여러 쪽에 걸쳐 나뉜 셀은 편집할 수 없습니다.'}];}));
+ return Object.fromEntries(tables.map(t=>{const source=privateSources[t.id];return [t.id,source?.editable===true?{editable:true,fingerprint:source.fingerprint,cells:source.cells.map((c:any)=>({index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs:c.paragraphs.map((p:any)=>({index:p.index,text:p.text,...(p.editableFrom===undefined?{}:{editableFrom:p.editableFrom}),...(p.runs.length>1?{formatSpans:p.runs.map((r:any)=>({start:r.startOffset,end:r.endOffset}))}:{})}))}))}:{editable:false,reason:'병합 셀 문단 교체에는 셀마다 원래 행·열과 쪽을 확인할 수 있는 비보호 본문 표가 필요합니다. 경계를 확인할 수 없는 필드·개체·책갈피·중첩 표 또는 여러 쪽의 글줄을 원문과 대조할 수 없는 셀은 편집할 수 없습니다.'}];}));
 }
 /** Export bytes use portable metrics. Compare their layout with the same
  * temporary metric selection and restore the screen environment synchronously.
@@ -94,6 +146,49 @@ function portableLayout<T>(d:any,read:()=>T):T {
  try{return read();}finally{if(restore)d.selectCanvasMetrics(true);}
 }
 const pending=new WeakMap<object,any>();
+type CharacterRun={startOffset:number;endOffset:number;charShapeId:number};
+/** Build the expected definitions in an independent document using the body
+ * formatter. The live cell formatter must produce the same stored header and
+ * all original binary resources, including unreferenced ones. */
+function planCharacterFormats(d:any,base:Snapshot,op:AgentCellParagraphOp,runs:CharacterRun[],storedRuns:any[],resources:string) {
+ const scratch=new d.constructor(/\.hwp$/iu.test(base.name)?d.exportHwp():d.exportHwpx());
+ try{
+  const at=scratch.getParagraphLength(0,0);
+  checked(scratch.insertText(0,0,at,'x'));
+  if(resourceFingerprint(scratch.exportHwpx())!==resources)throw Error('새 글자 서식의 원본 정의와 자원을 대조할 수 없습니다.');
+  const spans=op.spanFormats!,boundaries=new Set(spans.flatMap(f=>[f.start,f.end]));
+  const result:CharacterRun[]=[],stored:Array<{start:number;end:number;properties:unknown}>=[];
+  const applications:Array<{start:number;end:number;properties:string}>=[];
+  let firstCharacters:any;
+  for(const [i,run] of runs.entries()){
+   const cuts=[run.startOffset,...[...boundaries].filter(n=>run.startOffset<n&&n<run.endOffset).sort((a,b)=>a-b),run.endOffset];
+   for(let j=1;j<cuts.length;j++){
+    const start=cuts[j-1],end=cuts[j],span=spans.find(s=>s.start<=start&&end<=s.end);
+    checked(scratch.setCharShapeId(0,0,at,at+1,run.charShapeId));
+    let shape=parsed(scratch.getCharPropertiesAt(0,0,at));
+    if(shape.charShapeId!==run.charShapeId||!same(normalize(shape),storedRuns[i].properties))throw Error('원래 글자 서식 정의가 달라졌습니다.');
+    if(span){
+     const properties={...(span.bold===undefined?{}:{bold:span.bold}),...(span.italic===undefined?{}:{italic:span.italic}),
+      ...(span.color===undefined?{}:{textColor:span.color.toLowerCase()}),...(span.fontSizePt===undefined?{}:{fontSize:Math.round(span.fontSizePt*100)})};
+     const expected={...normalize(shape),...properties};
+     if(!same(normalize(shape),expected)){
+      const json=JSON.stringify(properties);
+      checked(scratch.applyCharFormat(0,0,at,at+1,json));
+      shape=parsed(scratch.getCharPropertiesAt(0,0,at));
+      if(!int(shape.charShapeId)||!same(normalize(shape),expected))throw Error('요청한 속성만 바뀐 글자 서식 정의를 확인하지 못했습니다.');
+      applications.push({start,end,properties:json});
+     }
+    }
+    if(start===0)firstCharacters=shape;
+    const previous=result.at(-1);
+    if(previous?.charShapeId===shape.charShapeId){previous!.endOffset=end;stored[stored.length-1].end=end;}
+    else{result.push({startOffset:start,endOffset:end,charShapeId:shape.charShapeId});stored.push({start,end,properties:normalize(shape)});}
+   }
+  }
+  if(!applications.length&&op.text===op.originalText)throw Error('선택한 구간에 이미 같은 글자 서식이 적용되어 있습니다.');
+  return {runs:result,stored,firstCharacters,applications,resources:resourceFingerprint(scratch.exportHwpx())};
+ }finally{scratch.free();}
+}
 export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellParagraphOp):void {
  const d=nativeDocument(wasm),proof=pending.get(d);if(!proof||proof.revision!==base.revision||!same(proof.operation,op))throw new Error('셀 문단 결과의 검증 근거가 없습니다.');
  const after=capturePreservationEvidence(d);if(after.issues.length||!same(topologySemantics(after.values),proof.expected)||!same(rootBodyTexts(d),proof.body)||!same(tableTextTree(readStructure(d).tables),proof.text)||resourceFingerprint(d.exportHwpx())!==proof.resources)throw new Error('병합 셀 문단 결과 또는 다른 문서 내용·자원이 변경되었습니다.');
@@ -141,9 +236,12 @@ export function executeCellParagraph(wasm:any,base:Snapshot,op:AgentCellParagrap
   runs.push({startOffset:0,endOffset:end,charShapeId:p.characters.charShapeId});
   storedRuns.push({start:0,end,properties:normalize(p.characters)});
  }
- paraEvidence.runs=storedRuns;
+ const resources=resourceFingerprint(d.exportHwpx());
+ const formatted=op.spanFormats?planCharacterFormats(d,base,op,runs,storedRuns,resources):undefined;
+ paraEvidence.runs=formatted?.stored??storedRuns;
  const text=tableTextTree(structure.tables).map(table=>table.id===t.id?{...table,cells:table.cells.map(cell=>cell.index===c.index?{...cell,text:c.paragraphs.map((p:any)=>p.index===op.paragraph?op.text:p.text).join('\n')}:cell)}:table);
- const proof={revision:base.revision,operation:structuredClone(op),table:t,expected,runs,firstCharacters,pages:source.pages,body:rootBodyTexts(d),text,resources:resourceFingerprint(d.exportHwpx()),cells:source.cells,cellIndex:c.index};
+ const proof={revision:base.revision,operation:structuredClone(op),table:t,expected,runs:formatted?.runs??runs,firstCharacters:formatted?.firstCharacters??firstCharacters,
+  pages:source.pages,body:rootBodyTexts(d),text,resources:formatted?.resources??resources,cells:source.cells,cellIndex:c.index};
  // Edit right to left so offsets always refer to the queried source.
  for(const edit of [...edits].reverse()){
   const shape=mixed?p.runs[edit.run].charShapeId:p.characters.charShapeId;
@@ -153,6 +251,7 @@ export function executeCellParagraph(wasm:any,base:Snapshot,op:AgentCellParagrap
    checked(d.setCharShapeIdInCell(...args,edit.start,edit.start+Array.from(edit.insert).length,shape));
   }
  }
+ for(const range of formatted?.applications??[])checked(d.applyCharFormatInCell(...args,range.start,range.end,range.properties));
  pending.set(d,proof);assertCellParagraphResult(d,base,op);
  return {sectionIndex:t.section,parentParaIndex:t.paragraph,paragraphIndex:op.paragraph,charOffset:0,controlIndex:t.control,cellIndex:c.index,cellParaIndex:op.paragraph,cellPath:[{controlIndex:t.control,cellIndex:c.index,cellParaIndex:op.paragraph}]};
 }

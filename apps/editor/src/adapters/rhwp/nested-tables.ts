@@ -1,4 +1,4 @@
-import type {NestedTable, TableCellPathStep} from '../../modules/document/public/types.ts';
+import type {CellParagraphText, NestedTable, TableCellPathStep} from '../../modules/document/public/types.ts';
 
 type CellList = {isCell:boolean;listId:number;hostListId:number;sectionIndex:number;hostPara:number;controlIndex:number;cellIndex:number;paraCount:number};
 type Control = {ctrlId:string;list:number;para:number;controlIndex:number;props?:{Lock?:number}};
@@ -16,7 +16,7 @@ export function inspectNestedTables(doc:any, controls:Control[], lists:CellList[
   const byId = new Map(lists.map(l => [l.listId,l]));
   const key = (host:number, paragraph:number, control:number) => [host,paragraph,control].join('/');
   const controlAt = new Map(controls.filter(c => c.ctrlId === 'tbl').map(c => [key(c.list,c.para,c.controlIndex),c]));
-  const containsControls = new Set(controls.map(c => c.list));
+  const controlParagraphs = new Set(controls.map(c => c.list+'/'+c.para));
   const offsets = [0];
   for (let s=0;s<doc.getSectionCount();s++) offsets.push(offsets[s]+doc.getParagraphCount(s));
   const children = new Map<string,CellList[]>();
@@ -61,21 +61,24 @@ export function inspectNestedTables(doc:any, controls:Control[], lists:CellList[
       check(index(info.row) && index(info.col) && index(info.rowSpan) && info.rowSpan>0 && index(info.colSpan) && info.colSpan>0 &&
         info.row+info.rowSpan<=dimensions.rowCount && info.col+info.colSpan<=dimensions.colCount && !coords.has(coord));
       coords.add(coord);
-      const texts:string[]=[];
+      const texts:string[]=[],paragraphs:CellParagraphText[]=[];
       for (let p=0;p<l.paraCount;p++) {
         const part=JSON.stringify([...path.slice(0,-1),{...path.at(-1)!,cellParaIndex:p}]);
         const length=doc.getCellParagraphLengthByPath(...args,part);
         characters+=length;check(index(length) && characters<=120000);
-        texts.push(doc.getTextInCellByPath(...args,part,0,length));
+        const text=doc.getTextInCellByPath(...args,part,0,length);
+        texts.push(text);
+        if(!location.writable || controlParagraphs.has(l.listId+'/'+p) || length>4000 ||
+           Array.from(text).length!==length || /[\u0000-\u001f\u007f]/u.test(text))continue;
+        const runs=json(doc.getCharShapeRunsInCellByPath(...args,part,0,length));
+        if(!Array.isArray(runs)||runs.length>128||runs.some((r:any,i:number)=>!index(r.charShapeId)||
+           r.startOffset!==(i?runs[i-1].endOffset:0)||!index(r.endOffset)||r.endOffset<=r.startOffset)||
+           (runs.at(-1)?.endOffset??0)!==length)continue;
+        paragraphs.push({index:p,text,...(runs.length>1?{formatSpans:runs.map((r:any)=>({start:r.startOffset,end:r.endOffset}))}:{})});
       }
-      const text=texts.join('\n'),length=Array.from(text).length;
-      let editable=location.writable && !containsControls.has(l.listId) && l.paraCount===1 && info.rowSpan===1 && info.colSpan===1 &&
-        length<=4000 && !/[\u0000-\u001f\u007f]/u.test(text);
-      if (editable) {
-        const runs=json(doc.getCharShapeRunsInCellByPath(...args,encoded,0,length));
-        editable=length===0 ? runs.length===0 : runs.length===1 && runs[0].startOffset===0 && runs[0].endOffset===length;
-      }
-      cells.push({index:l.cellIndex,row:info.row,column:info.col,rowSpan:info.rowSpan,columnSpan:info.colSpan,text,editable});
+      const text=texts.join('\n'),editable=l.paraCount===1 && paragraphs.length===1 && !paragraphs[0].formatSpans;
+      cells.push({index:l.cellIndex,row:info.row,column:info.col,rowSpan:info.rowSpan,columnSpan:info.colSpan,text,editable,
+        ...(paragraphs.length?{paragraphs}:{})});
       ids.push(l.listId);
     }
     tables.push({id,section:host.section,paragraph:host.paragraph,ancestors:host.path,control:control.controlIndex,rows:dimensions.rowCount,columns:dimensions.colCount,cells});

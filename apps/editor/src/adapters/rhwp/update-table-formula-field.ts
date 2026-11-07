@@ -1,3 +1,4 @@
+import {tableFormulaCall} from './table-formula-location.ts';
 import type {AgentTableFormulaFields,AgentTableFormulaOp,Receipt,Snapshot,TableFormulaChange} from '../../modules/document/public/types.ts';
 import {agentTableFormulaTarget} from '../../modules/document/public/engine-integration.ts';
 import {parsed,readStructure} from './structure.ts';
@@ -40,8 +41,8 @@ function expectedFields(preview:any,target:Field,base:AgentTableFormulaFields,li
  const dependencies=preview.dependentChanges===undefined?[]:preview.dependentChanges;
  if(!Array.isArray(dependencies)||dependencies.length>live.fields.length)throw Error('의존 계산식 목록을 확인할 수 없습니다.');
  for(const item of dependencies){
-  const field=live.fields.find(f=>f.tableId===target.tableId && f.fieldId===item?.fieldId && f.path.length===1 && f.path[0].cellIndex===item.cellIndex);
-  const original=base.fields.find(f=>f.tableId===target.tableId && f.fieldId===item?.fieldId && f.path.length===1 && f.path[0].cellIndex===item.cellIndex);
+  const field=live.fields.find(f=>f.tableId===target.tableId && f.fieldId===item?.fieldId && f.path.at(-1)?.cellIndex===item.cellIndex);
+  const original=base.fields.find(f=>f.tableId===target.tableId && f.fieldId===item?.fieldId && f.path.at(-1)?.cellIndex===item.cellIndex);
   if(!field||!original||expected.has(field)||!field.expression||!field.resultFormat||field.storedCommand!==item.previousCommand||
     field.displayedValue!==item.previousValue||original.storedCommand!==item.previousCommand||original.displayedValue!==item.previousValue||
     typeof item.value!=='string'||item.command!==field.expression+'??'+field.resultFormat+';;'+item.value)
@@ -58,13 +59,13 @@ export function updateTableFormulaField(doc:any,base:Snapshot,op:AgentTableFormu
  const current=readTableFormulaFields(doc,true),structure=readStructure(doc);
  const live=agentTableFormulaTarget(op,{...base,structure,tableFormulaFields:current}).field;
  if(JSON.stringify(live)!==JSON.stringify(field))throw Error('계산식 필드가 변경되었습니다. 현재 문서를 다시 조회하세요.');
- const owner=field.path[0],args=[field.section,field.paragraph,owner.controlIndex,owner.cellIndex,field.fieldId,field.storedCommand,op.formula,op.resultFormat] as const;
- const preview=parsed(doc.previewTableFormulaField(...args));
+ const owner=field.path[0],leaf=field.path.at(-1)!,args=[field.section,field.paragraph,field.path,field.fieldId,field.storedCommand,op.formula,op.resultFormat] as const;
+ const preview=parsed(tableFormulaCall(doc,'previewTableFormulaField',...args));
  if(preview?.ok!==true || preview.fieldId!==field.fieldId || preview.formula!==op.formula || typeof preview.value!=='string' ||
     preview.command!==op.formula+'??'+op.resultFormat+';;'+preview.value || !Number.isFinite(preview.result))throw Error('계산식 원문과 표시 결과를 확인하지 못했습니다.');
  const expected=expectedFields(preview,live,base.tableFormulaFields!,current!,op);
  if(![...expected].some(([f,v])=>v.command!==f.storedCommand || v.value!==f.displayedValue))throw Error('계산식과 계산 결과가 현재 값과 같습니다.');
- const result=parsed(doc.updateTableFormulaField(...args));
+ const result=parsed(tableFormulaCall(doc,'updateTableFormulaField',...args));
  if(result?.ok!==true || result.fieldId!==preview.fieldId || result.command!==preview.command || result.formula!==preview.formula || result.value!==preview.value || result.result!==preview.result ||
     JSON.stringify(result.dependentChanges)!==JSON.stringify(preview.dependentChanges))
    throw Error('계산식 필드 변경이 검증된 예상 결과와 다릅니다.');
@@ -77,6 +78,6 @@ export function updateTableFormulaField(doc:any,base:Snapshot,op:AgentTableFormu
     expression:next.expression,resultFormat:next.resultFormat,end:original.start+Array.from(next.value).length}:original;
   if(JSON.stringify(actual)!==JSON.stringify(verified))throw Error('저장할 수식 원문·표시 값·다른 계산식 필드가 예상과 다릅니다.');
  }
- return {sectionIndex:field.section,parentParaIndex:field.paragraph,paragraphIndex:owner.cellParaIndex,controlIndex:owner.controlIndex,cellIndex:owner.cellIndex,
+ return {sectionIndex:field.section,parentParaIndex:field.paragraph,paragraphIndex:leaf.cellParaIndex,controlIndex:owner.controlIndex,cellIndex:owner.cellIndex,
    cellParaIndex:owner.cellParaIndex,cellPath:field.path,charOffset:field.start+Array.from(preview.value).length};
 }

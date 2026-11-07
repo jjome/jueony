@@ -1,3 +1,4 @@
+import {tableFormulaCall} from './table-formula-location.ts';
 import type {AgentInsertTableFormulaOp,AgentTableFormulaFields,Receipt,Snapshot,TableFormulaChange} from '../../modules/document/public/types.ts';
 import {agentFormulaInsertTarget} from '../../modules/document/public/engine-integration.ts';
 import {nativeDocument,parsed,readStructure} from './structure.ts';
@@ -12,13 +13,12 @@ function identity(f:Field) {
 }
 
 export function insertedTableFormulaReceipt(wasm:any,base:Snapshot,op:AgentInsertTableFormulaOp):NonNullable<Receipt['formulaField']> {
- const {table,cell}=agentFormulaInsertTarget(op,base),after=readTableFormulaFields(wasm);
+ const {table,cell,path}=agentFormulaInsertTarget(op,base),after=readTableFormulaFields(wasm);
  const original=base.tableFormulaFields!;
  if (!after || after.unresolved!==0 || after.fields.length!==original.fields.length+1)
   throw Error('저장할 계산식 필드 개수가 다릅니다.');
  const added=after.fields.find(f=>f.tableId===table.id&&f.row===cell.row&&f.column===cell.column);
- if(!added || added.section!==table.section || added.paragraph!==table.paragraph || added.path.length!==1 ||
-   added.path[0].controlIndex!==table.control || added.path[0].cellIndex!==cell.index || added.path[0].cellParaIndex!==0 ||
+ if(!added || added.section!==table.section || added.paragraph!==table.paragraph || JSON.stringify(added.path)!==JSON.stringify(path) ||
    added.start!==0 || added.end!==Array.from(added.displayedValue).length ||
    original.fields.some(f=>f.fieldId===added.fieldId) || added.expression!==op.formula || added.resultFormat!==op.resultFormat ||
    added.storedCommand!==op.formula+'??'+op.resultFormat+';;'+added.displayedValue)
@@ -40,13 +40,14 @@ export function insertedTableFormulaReceipt(wasm:any,base:Snapshot,op:AgentInser
 }
 
 export function insertAgentTableFormula(wasm:any,base:Snapshot,op:AgentInsertTableFormulaOp) {
- const doc=nativeDocument(wasm),{table,cell}=agentFormulaInsertTarget(op,base);
+ const doc=nativeDocument(wasm),{table,cell,path}=agentFormulaInsertTarget(op,base);
  const structure=readStructure(doc),current=readTableFormulaFields(doc,true,true);
  const live=agentFormulaInsertTarget(op,{...base,structure,tableFormulaFields:current});
- if(JSON.stringify(table.cells)!==JSON.stringify(live.table.cells) ||
+ if(table.section!==live.table.section || table.paragraph!==live.table.paragraph ||
+    JSON.stringify(path)!==JSON.stringify(live.path) || JSON.stringify(table.cells)!==JSON.stringify(live.table.cells) ||
     JSON.stringify(current?.fields)!==JSON.stringify(base.tableFormulaFields?.fields))
   throw Error('계산식에 사용할 표의 원문·서식·필드가 변경되었습니다.');
- const result=parsed(doc.insertTableFormulaField(table.section,table.paragraph,table.control,cell.index,cell.text,op.formula,op.resultFormat));
+ const result=parsed(tableFormulaCall(doc,'insertTableFormulaField',table.section,table.paragraph,path,cell.text,op.formula,op.resultFormat));
  const receipt=insertedTableFormulaReceipt(doc,base,op);
  if(result?.ok!==true || result.fieldId!==receipt.fieldId || result.command!==receipt.after.command ||
     result.value!==receipt.after.value || result.formula!==op.formula || !Number.isFinite(result.result) || !Array.isArray(result.dependentChanges))
@@ -58,6 +59,6 @@ export function insertAgentTableFormula(wasm:any,base:Snapshot,op:AgentInsertTab
  if(result.dependentChanges.length!==expected.length ||
     expected.some(want=>!result.dependentChanges.some((actual:any)=>Object.entries(want).every(([k,v])=>actual?.[k]===v))))
   throw Error('같이 변경한 의존 계산식 결과가 다릅니다.');
- return {sectionIndex:table.section,parentParaIndex:table.paragraph,paragraphIndex:0,controlIndex:table.control,
-   cellIndex:cell.index,cellParaIndex:0,cellPath:[{controlIndex:table.control,cellIndex:cell.index,cellParaIndex:0}],charOffset:Array.from(receipt.after.value).length};
+ return {sectionIndex:table.section,parentParaIndex:table.paragraph,paragraphIndex:0,controlIndex:path[0].controlIndex,
+   cellIndex:path[0].cellIndex,cellParaIndex:path[0].cellParaIndex,cellPath:path,charOffset:Array.from(receipt.after.value).length};
 }

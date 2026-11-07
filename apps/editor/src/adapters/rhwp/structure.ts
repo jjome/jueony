@@ -5,6 +5,7 @@ import {readAgentEmptySectionEligibility} from './agent-empty-section.ts';
 import {readLineNumberSettings} from './line-numbers.ts';
 import {readAgentMasterPages} from './agent-master-pages.ts';
 import {readNestedTables} from './nested-tables.ts';
+import {axisFieldSignature} from './axis-cell-fields.ts';
 export type { Cell, Table, Structure } from '../../modules/document/public/types.ts';
 // All coordinates refer to the currently open WASM document, never its disk copy.
 export const parsed = (v: any): any => typeof v === 'string' ? JSON.parse(v) : v;
@@ -43,6 +44,7 @@ export function readStructure(wasm: any): Structure {
   const controls = parsed(doc.getControls()), lists = parsed(doc.getCursorModel()).lists;
   paragraphs.forEach((p,index)=>{const at=positions[index];p.controls=controls.filter((c:any)=>c.list===0&&c.para===index).map((c:any)=>c.ctrlId);p.pageIndex=parsed(doc.getPageOfPosition(at.section,at.paragraph)).page;});
   const tables: Table[] = [], unsupportedControls: string[] = [];
+  let axisFields:any[]|undefined;
   for (const control of controls) {
     if (['secd', 'cold'].includes(control.ctrlId)) continue;
     if (control.list !== 0 || control.ctrlId !== 'tbl') { unsupportedControls.push(control.ctrlId); continue; }
@@ -58,14 +60,23 @@ export function readStructure(wasm: any): Structure {
       const count = doc.getCellParagraphCount(section, paragraph, ci, i), texts: string[] = [];
       for (let p = 0; p < count; p++) texts.push(doc.getTextInCell(section, paragraph, ci, i, p, 0, doc.getCellParagraphLength(section, paragraph, ci, i, p)));
       const list = lists.find((l: any) => l.isCell && l.sectionIndex === section && l.hostPara === paragraph && l.controlIndex === ci && l.cellIndex === i && l.hostListId === 0);
+      const children = list ? controls.filter((c:any) => c.list === list.listId) : [];
       const runs = count === 1 ? parsed(doc.getCharShapeRunsInCellByPath(section, paragraph, JSON.stringify([{ controlIndex: ci, cellIndex: i, cellParaIndex: 0 }]), 0, doc.getCellParagraphLength(section, paragraph, ci, i, 0))) : [];
-      const simple = count === 1 && new Set(runs.map((r: any) => r.charShapeId)).size <= 1 && Array.from(texts[0]).length <= 4000 && list && !controls.some((c: any) => c.list === list.listId);
+      const simple = count === 1 && new Set(runs.map((r: any) => r.charShapeId)).size <= 1 && Array.from(texts[0]).length <= 4000 && list && !children.length;
       const properties=parsed(doc.getCellProperties(section,paragraph,ci,i));
       const axisContentSafe = !simple && count > 0 && count <= 50 && texts.join('').length <= 12000
         && properties.cellProtect === false && control.props?.Lock === 0 && list
-        && !controls.some((c:any) => c.list === list.listId);
+        && !children.length;
       cells.push({ index: i, row: info.row, column: info.col, rowSpan: info.rowSpan, columnSpan: info.colSpan, text: texts.join('\n'), editable: Boolean(simple)&&properties.cellProtect===false&&control.props?.Lock===0, ...(properties.cellProtect!==false?{reason:'보호 셀 또는 보호 상태를 확인할 수 없는 셀입니다.'}:control.props?.Lock!==0?{reason:'보호 표 또는 보호 상태를 확인할 수 없는 표입니다.'}:{}), properties, characters: parsed(doc.getCellCharPropertiesAt(section, paragraph, ci, i, 0, 0)), paragraphProperties: parsed(doc.getCellParaPropertiesAt(section, paragraph, ci, i, 0)) });
       if (axisContentSafe) cells[i].axisContentSafe = true;
+      if ((children.length || properties.fieldName) && count > 0 && count <= 50 && texts.join('').length <= 12000
+          && properties.cellProtect === false && control.props?.Lock === 0 && typeof doc.getFieldList === 'function') {
+        try {
+          axisFields ??= parsed(doc.getFieldList());
+          const signature=axisFieldSignature(doc,section,paragraph,ci,i,list,children,axisFields!,properties.fieldName);
+          if (signature) cells[i].axisFieldSignature=signature;
+        } catch { /* Unknown field data remains ineligible for structural edits. */ }
+      }
     }
     const tableProps=parsed(doc.getTableProperties(section,paragraph,ci)),mode=(['none','cell','row'] as const)[tableProps.pageBreak];
     let leading=0;while(leading<dimensions.rowCount&&cells.some(c=>c.row===leading)&&cells.filter(c=>c.row===leading).every(c=>c.properties.isHeader===true))leading++;

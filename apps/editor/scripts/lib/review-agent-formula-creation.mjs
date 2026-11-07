@@ -7,15 +7,17 @@ const cases=[
  {name:'empty',source:'',request:'빈 C1 셀에 합계를 계산식 필드로 삽입해줘'},
  {name:'text',source:'합계 대기',request:'C1의 합계 대기 문구를 합계 계산식으로 바꿔줘'},
  {name:'dependent',source:'3',request:'기존 3이 있는 C1에 합계 필드를 넣고 이를 참조하는 셀도 갱신해줘'},
+ {name:'nested',source:'',request:'오른쪽 중첩 표 C1에 A1과 B1의 합계를 계산식 필드로 삽입해줘'},
 ];
 export function proposeFormulaCreation(input){
  const test=cases.find(c=>c.request===input.instruction);if(!test)return undefined;
  assert.equal(input.document.tableFormulaFields.canInsert,true);
- const t=input.document.structure.tables[0],cell=t.cells.find(c=>c.row===0&&c.column===2);
+ const t=test.name==='nested'?input.document.structure.nestedTables[1]:input.document.structure.tables[0];
+ const cell=t.cells.find(c=>c.row===0&&c.column===2);
  assert.equal(cell.editable,true);assert.equal(cell.text,test.source);
  return {kind:'insert_table_formula_field',target:t.id,row:cell.row,column:cell.column,originalText:cell.text,formula:'=SUM(A1:B1)',resultFormat:'%.2f'};
 }
-export async function reviewFormulaCreation({HwpDocument,page,fill,origin}){
+export async function reviewFormulaCreation({HwpDocument,page,fill,origin,nestedOnly=false}){
  const out=resolve(process.env.JUEONY_TEST_OUTPUT??'build/agent-formula-creation');await mkdir(out,{recursive:true});
  const results=[];
  async function action(name){
@@ -24,27 +26,35 @@ export async function reviewFormulaCreation({HwpDocument,page,fill,origin}){
   for (const button of (await page.$$('.message-actions button')).reverse()) if(await button.evaluate((e,label)=>e.textContent===label,name)){await button.click();return;}
   assert.fail('Missing action '+name);
  }
- for(const format of ['hwp','hwpx']) for(const test of cases){
+ for(const format of ['hwp','hwpx']) for(const test of cases.filter(c=>!nestedOnly||c.name==='nested')){
   const doc=HwpDocument.createEmpty();doc.createBlankDocument();
-  const t=JSON.parse(doc.createTable(0,0,0,1,4)),at=[0,t.paraIdx,t.controlIdx];
-  for(const [index,text] of ['12','7',test.source,''].entries())if(text)doc.insertTextInCell(...at,index,0,0,text);
-  if(test.name==='dependent')doc.insertTableFormulaField(...at,3,'','=C1*2','%g');
+  if(test.name==='nested'){
+   const inner='<table><tr><td>12</td><td>7</td><td></td><td></td></tr></table>';
+   doc.pasteHtml(0,0,0,`<table><tr><td>왼쪽${inner}</td><td>오른쪽${inner}</td></tr></table>`);
+  }else{
+   const t=JSON.parse(doc.createTable(0,0,0,1,4)),at=[0,t.paraIdx,t.controlIdx];
+   for(const [index,text] of ['12','7',test.source,''].entries())if(text)doc.insertTextInCell(...at,index,0,0,text);
+   if(test.name==='dependent')doc.insertTableFormulaField(...at,3,'','=C1*2','%g');
+  }
   const input=Array.from(format==='hwp'?doc.exportHwp():doc.exportHwpx());doc.free();
   const f=await(await page.$('.editor-frame:not([hidden])')).contentFrame(),name=test.name+'.'+format;
   await f.evaluate(async(bytes,name)=>{
    const dir=await navigator.storage.getDirectory(),handle=await dir.getFileHandle(name,{create:true}),w=await handle.createWritable();
    await w.write(new Uint8Array(bytes));await w.close();await window.jueonyEditor.open(new Uint8Array(bytes),name,handle,false);
   },input,name);
-  const read=()=>f.evaluate(()=>{
+  const read=()=>f.evaluate(nested=>{
    const s=window.jueonyEditor.snapshot();
-   return {fields:s.tableFormulaFields?.fields??[],cells:s.structure.tables[0].cells.map(c=>c.text)};
-  });
+   const table=nested?s.structure.nestedTables[1]:s.structure.tables[0];
+   return {fields:s.tableFormulaFields?.fields??[],cells:table.cells.map(c=>c.text),
+     ...(nested?{sibling:s.structure.nestedTables[0].cells.map(c=>c.text)}:{})};
+  },test.name==='nested');
   const before=await read();await fill('request-input',test.request);
   const sent=page.waitForResponse(r=>r.url()===origin+'/api/generate');await page.click('#send-request');await sent;
   await page.waitForFunction(()=>!document.getElementById('send-request').disabled);
   assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
-  const after=await read(),fresh=after.fields.find(v=>v.row===0&&v.column===2);
+  let after=await read(),fresh=after.fields.find(v=>v.row===0&&v.column===2);
   assert.deepEqual(after.cells,['12','7','19.00',test.name==='dependent'?'38':'']);
+  if(test.name==='nested')assert.deepEqual(after.sibling,before.sibling);
   assert.ok(fresh);assert.equal(fresh.storedCommand,'=SUM(A1:B1)??%.2f;;19.00');
   await action('변경 확인');
   const compare=await page.$eval('#structure-diff',el=>el.hidden?'':el.textContent);
@@ -54,6 +64,26 @@ export async function reviewFormulaCreation({HwpDocument,page,fill,origin}){
   await page.waitForFunction(()=>document.getElementById('app-status').textContent.includes('되돌렸습니다'));
   assert.deepEqual(await read(),before);
   assert.ok((await f.evaluate(()=>window.jueonyEditor.executeCommand('edit:redo'))).ok);assert.deepEqual(await read(),after);
+  if(test.name==='nested'){
+   await f.evaluate(field=>{
+    const automation=window.rhwpStudio.automation;
+    automation.registerCommand({id:'ext:select-nested-formula',label:'검수',canExecute:()=>true,execute:services=>{
+     const ih=services.getInputHandler(),root=field.path[0];
+     ih.cursor.moveTo({sectionIndex:field.section,paragraphIndex:0,parentParaIndex:field.paragraph,...root,cellPath:field.path,charOffset:0});
+     ih.updateCaret();ih.focus();
+    }});
+    try{automation.execute('ext:select-nested-formula');}finally{automation.unregisterCommand('ext:select-nested-formula');}
+    window.jueonyEditor.executeCommand('table:formula');
+   },fresh);
+   await f.waitForSelector('.formula-input');
+   assert.equal(await f.$eval('.formula-input',e=>e.value),'=SUM(A1:B1)');
+   await f.$eval('.formula-input',e=>{e.value='=ROUND(SQRT(16))+B1';});
+   await f.click('.modal-overlay .dialog-btn-primary');
+   assert.equal(await f.$('.formula-input'),null,await f.$eval('.formula-error',e=>e.textContent).catch(()=>''));
+   after=await read();fresh=after.fields.find(v=>v.row===0&&v.column===2);
+   assert.equal(fresh.storedCommand,'=ROUND(SQRT(16))+B1??%.2f;;11.00');
+   assert.deepEqual(after.sibling,before.sibling);
+  }
   const bytes=await f.evaluate(async()=>{
    const api=window.jueonyEditor;if(await api.save()!=='saved')throw Error('Guarded save failed');
    return [...new Uint8Array(await (await api.fileHandle().getFile()).arrayBuffer())];
@@ -67,6 +97,10 @@ export async function reviewFormulaCreation({HwpDocument,page,fill,origin}){
   try {assert.deepEqual(JSON.parse(reopened.getFieldList()).filter(v=>v.fieldType==='formula').map(v=>[v.fieldId,v.command,v.value]),
     after.fields.map(v=>[v.fieldId,v.storedCommand,v.displayedValue]));}finally{reopened.free();}
   results.push({file:name,fieldId:fresh.fieldId,command:fresh.storedCommand});console.log('PASS Agent stored formula creation',name);
+ }
+ if(nestedOnly){
+  await writeFile(resolve(out,'result.json'),JSON.stringify({results},null,2)+'\n');
+  return;
  }
  const doc=HwpDocument.createEmpty();doc.createBlankDocument();
  const {paraIdx,controlIdx}=JSON.parse(doc.createTable(0,0,0,1,4));

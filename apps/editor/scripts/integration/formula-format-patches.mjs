@@ -22,8 +22,11 @@ export function patchFormulaFormat(source) {
   private openRevision: string;
   private insertField?: HTMLInputElement;
   private formulaInput!: HTMLInputElement;`);
-  replace('    this.ctx = ctx;', `    this.ctx = ctx;
-    this.storedField = readStoredTableFormula(wasm, ctx);
+  replace('  cellIndex: number;', `  cellIndex: number;
+  cellPath?: {controlIndex:number;cellIndex:number;cellParaIndex:number}[];`);
+  replace('    this.ctx = ctx;', `    const cursorPath = this.services?.getInputHandler()?.getCursorPosition()?.cellPath;
+    this.ctx = cursorPath?.length && cursorPath.length>1 ? {...ctx,cellPath:cursorPath.map(step=>({...step}))} : ctx;
+    this.storedField = readStoredTableFormula(wasm, this.ctx);
     this.openRevision = (window as any).jueonyEditor?.revision();`);
   replace("    this.formulaInput.value = '=';", "    this.formulaInput.value = this.storedField?.formula ?? '=';");
   replace('      FUNCTIONS.forEach(f => this.funcSelect.appendChild', `      const functions = this.storedField ? FUNCTIONS.filter(f => supportsStoredFormulaFunction(f.name)) : FUNCTIONS;
@@ -46,7 +49,8 @@ export function patchFormulaFormat(source) {
       body.appendChild(label);
     }`);
   replace('      // 먼저 검증 (write_result=false)', `      const livePosition = this.services?.getInputHandler()?.getCursorPosition();
-      if (livePosition?.cellPath && livePosition.cellPath.length > 1) throw new Error('중첩 표 안의 계산식 편집은 아직 지원하지 않습니다.');
+      if ((this.ctx.cellPath || (livePosition?.cellPath?.length ?? 0)>1) &&
+        JSON.stringify(livePosition?.cellPath)!==JSON.stringify(this.ctx.cellPath)) throw new Error('계산식의 중첩 셀 경로가 변경되었습니다.');
       if (!livePosition || livePosition.sectionIndex !== this.ctx.sec || livePosition.parentParaIndex !== this.ctx.ppi
         || livePosition.controlIndex !== this.ctx.ci || livePosition.cellIndex !== this.ctx.cellIndex
         || this.openRevision !== (window as any).jueonyEditor?.revision()) {
@@ -63,6 +67,7 @@ export function patchFormulaFormat(source) {
           storedFormulaResultFormat(this.formatSelect.value, this.commaCheck.checked));
         return true;
       }
+      if (this.ctx.cellPath) throw new Error('중첩 표에는 계산식 필드로 삽입을 선택하세요.');
       // 먼저 검증 (write_result=false)`);
   replace(`      let colCount = 1;
       try {

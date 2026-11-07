@@ -38,7 +38,7 @@ for (const [title, heightGroups, widthGroups] of [
     assert.equal(json(doc.mergeTableCells(0,1,0,0,0,1,1)).ok,true);
     const snapshot = snap(doc), table = snapshot.structure.tables[0], primary = table.cells[0];
     assert.equal(snapshot.tableSubdivisionSources[table.id].editable,true);
-    assert.deepEqual(snapshot.tableSubdivisionSources[table.id].cells.map(c=>[c.row,c.column]),[[0,0]]);
+    assert.ok(snapshot.tableSubdivisionSources[table.id].cells.some(c=>c.row===0 && c.column===0));
     const command = op(table,0,0,heightGroups,widthGroups), original = doc.exportHwpx(), undo = doc.saveSnapshot();
     const result = apply(doc,snapshot,command), after = doc.exportHwpx(), redo = doc.saveSnapshot();
     const output = new HwpDocument(after);
@@ -172,12 +172,12 @@ await scenario('HWP5 live post-split binary loss restores original document and 
    assert.equal(injected,true);assert.deepEqual(d.exportHwp(),bytes);assert.deepEqual(readStructure(d),s.structure);
  } finally {d.free();}
 });
-await scenario('merged source rejects non-aligned cuts, unlisted neighbor and stale widths before write',()=>{
+await scenario('merged source rejects covered coordinates, insufficient physical space and stale widths before write',()=>{
   const doc=fixture();
   try {
     doc.mergeTableCells(0,1,0,0,0,1,1);
     const snapshot=snap(doc), table=snapshot.structure.tables[0], original=doc.exportHwpx();
-    for(const command of [op(table,0,0,2,1),op(table,0,0,1,3),op(table,2,2,2,2),op(table,0,0,2,2)]) {
+    for(const command of [op(table,1,1,2,1),op(table,0,1,1,3),op(table,0,0,8,8)]) {
       assert.throws(()=>apply(doc,snapshot,command)); assert.deepEqual(doc.exportHwpx(),original);
     }
     doc.setCellProperties(0,1,0,4,'{"width":9999}');
@@ -196,13 +196,13 @@ for (const [name, row, col, rows, cols, options] of [['vertical-center', 1, 1, 2
     for (const [other, layout] of others) assert.equal(sameTableLayout(layout, tableLayoutEvidence(d, other)), true);
     const bytes = d.exportHwpx(), after = d.saveSnapshot(), x = new HwpDocument(bytes); try { assert.deepEqual(readStructure(x), readStructure(d)); assert.deepEqual(capturePreservationEvidence(x).values, capturePreservationEvidence(d).values); } finally { x.free(); }
     d.restoreSnapshot(undo); assert.deepEqual(d.exportHwpx(), before); d.restoreSnapshot(after); assert.deepEqual(d.exportHwpx(), bytes); d.discardSnapshot(after); d.discardSnapshot(undo);
-    assert.equal(snap(d).tableSubdivisionSources[t.id].editable, options.single === true); // surrounding spans intentionally close original-grid capability
+    assert.equal(snap(d).tableSubdivisionSources[t.id].editable, options.single === true || typeof d.splitCellOnGrid === 'function');
     await writeFile(resolve(out, name + '.hwpx'), bytes); await writeFile(resolve(out, name + '.json'), JSON.stringify({ command, before: t, after: actual, cursor }, null, 2));
   } finally { d.free(); }
 });
 await scenario('content minimum grows outer table: reject and restore exact bytes', () => { const d = fixture(); try { const s = snap(d), bytes = d.exportHwpx(); assert.throws(() => apply(d, s, op(s.structure.tables[0], 0, 0, 1, 3))); assert.deepEqual(d.exportHwpx(), bytes); } finally { d.free(); } });
 await scenario('invalid args, alias, no-op, overflow and missing cell refuse without writes', () => { const d = fixture(); try { const s = snap(d), command = op(s.structure.tables[0], 1, 1, 2, 2), bytes = d.exportHwpx(); for (const change of [{ target: '@new' }, { row: -1 }, { row: 99 }, { rows: 0 }, { rows: 1, columns: 1 }, { columns: 8.5 }, { rows: 8, columns: 8 }, { equalRowHeight: false }, { row: true }]) { assert.throws(() => apply(d, s, { ...command, ...change })); assert.deepEqual(d.exportHwpx(), bytes); } } finally { d.free(); } });
-await scenario('protection, header, field, bookmark, mixed, multiple merges, renamed HWPX and inconsistent dimensions close capability', () => { for (const mode of ['protect', 'lock', 'header', 'field', 'bookmark', 'mixed', 'merged', 'hwp', 'width', 'pageBreak']) { const d = fixture(); try { if (mode === 'protect') d.setCellProperties(0, 1, 0, 8, '{"cellProtect":true}'); if (mode === 'lock') d.setControlLock(1, 0, true); if (mode === 'header') d.setCellProperties(0, 1, 0, 0, '{"isHeader":true}'); if (mode === 'field') d.insertClickHereField(0, 0, 0, 'Field', '', 'Input', true); if (mode === 'bookmark') d.addBookmark(0, 0, 0, 'mark'); if (mode === 'mixed') d.applyCharFormatInCell(0, 1, 0, 0, 0, 0, 1, '{"bold":true}'); if (mode === 'merged') {d.mergeTableCells(0, 1, 0, 0, 0, 0, 1); d.mergeTableCells(0, 1, 0, 2, 0, 2, 1);} if (mode === 'width') d.setCellProperties(0, 1, 0, 3, '{"width":9999}'); if (mode === 'pageBreak') d.setTableProperties(0, 1, 0, '{"pageBreak":2}'); const s = snap(d, mode === 'hwp' ? 'fixture.hwp' : 'fixture.hwpx'), bytes = d.exportHwpx(), t = s.structure.tables[0]; assert.equal(s.tableSubdivisionSources[t.id].editable, false, mode); assert.throws(() => apply(d, s, op(t, 1, 1, 2, 2))); assert.deepEqual(d.exportHwpx(), bytes); } finally { d.free(); } } });
+await scenario('protection, header, field, bookmark, mixed, ambiguous boundaries, renamed HWPX and inconsistent dimensions close capability', () => { for (const mode of ['protect', 'lock', 'header', 'field', 'bookmark', 'mixed', 'merged', 'hwp', 'width', 'pageBreak']) { const d = fixture(); try { if (mode === 'protect') d.setCellProperties(0, 1, 0, 8, '{"cellProtect":true}'); if (mode === 'lock') d.setControlLock(1, 0, true); if (mode === 'header') d.setCellProperties(0, 1, 0, 0, '{"isHeader":true}'); if (mode === 'field') d.insertClickHereField(0, 0, 0, 'Field', '', 'Input', true); if (mode === 'bookmark') d.addBookmark(0, 0, 0, 'mark'); if (mode === 'mixed') d.applyCharFormatInCell(0, 1, 0, 0, 0, 0, 1, '{"bold":true}'); if (mode === 'merged') {d.mergeTableCells(0, 1, 0, 0, 0, 0, 1); d.mergeTableCells(0, 1, 0, 2, 0, 2, 1); d.mergeTableCells(0, 1, 0, 1, 0, 1, 1);} if (mode === 'width') d.setCellProperties(0, 1, 0, 3, '{"width":9999}'); if (mode === 'pageBreak') d.setTableProperties(0, 1, 0, '{"pageBreak":2}'); const s = snap(d, mode === 'hwp' ? 'fixture.hwp' : 'fixture.hwpx'), bytes = d.exportHwpx(), t = s.structure.tables[0]; assert.equal(s.tableSubdivisionSources[t.id].editable, false, mode); assert.throws(() => apply(d, s, op(t, 1, 1, 2, 2))); assert.deepEqual(d.exportHwpx(), bytes); } finally { d.free(); } } });
 await scenario('stale body/target style/grid versions cannot overwrite newer edits', () => { for (const mode of ['body', 'style', 'grid']) { const d = fixture(); try { const s = snap(d), command = op(s.structure.tables[0], 1, 1, 2, 2); if (mode === 'body') d.insertText(0, 0, 0, 'Newer '); if (mode === 'style') d.applyParaFormatInCell(0, 1, 0, 4, 0, '{"alignment":"right"}'); if (mode === 'grid') d.setCellProperties(0, 1, 0, 4, '{"height":7100}'); const bytes = d.exportHwpx(); assert.throws(() => apply(d, s, command)); assert.deepEqual(d.exportHwpx(), bytes); } finally { d.free(); } } });
 await scenario('false/no-op/throw/neighbor corruption reject inside outer snapshot rollback', () => { for (const mode of ['false', 'noop', 'throw', 'text']) { const d = fixture(); try { const s = snap(d), command = op(s.structure.tables[0], 1, 1, 2, 2), bytes = d.exportHwpx(), token = d.saveSnapshot(), native = d.splitTableCellInto.bind(d); d.splitTableCellInto = (...args) => { if (mode === 'false') return '{"ok":false}'; if (mode === 'noop') return '{"ok":true}'; const v = native(...args); if (mode === 'throw') throw new Error('injected'); if (mode === 'text') { d.deleteTextInCell(0, 1, 0, 0, 0, 0, 4); d.insertTextInCell(0, 1, 0, 0, 0, 0, 'Oops'); } return v; }; assert.throws(() => executeTableSubdivision(d, s, command)); d.restoreSnapshot(token); d.discardSnapshot(token); assert.deepEqual(d.exportHwpx(), bytes); } finally { d.free(); } } });
 

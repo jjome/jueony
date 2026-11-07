@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { formatTableFormulaResult as format } from '../src/editor-actions/table-formula-format.ts';
 import { patchFormulaFormat } from '../scripts/integration/formula-format-patches.mjs';
+import { readStoredTableFormula } from '../src/adapters/rhwp/stored-table-formula.ts';
 
 test('number format applies independently of the thousands separator option', () => {
   assert.equal(format(1234.56, 'integer', false), '1235');
@@ -19,6 +20,15 @@ test('fixed decimal places, zero and negative values retain their displayed prec
 test('non-finite results and unknown formats fail before committing', () => {
   for (const value of [NaN, Infinity, -Infinity, '123', null]) assert.throws(() => format(value, 'default', false));
   assert.throws(() => format(1, 'money', false));
+});
+test('dialog selects the exact nested field and protects its containing outer cell', () => {
+  const path=[{controlIndex:1,cellIndex:2,cellParaIndex:1},{controlIndex:0,cellIndex:1,cellParaIndex:0}];
+  const location={sectionIndex:0,paraIndex:0,path:path.map(p=>({type:'cell',controlIndex:p.controlIndex,cellIndex:p.cellIndex,paraIndex:p.cellParaIndex}))};
+  const wasm={getFieldList:()=>JSON.stringify([{fieldType:'formula',fieldId:99,location,command:'=A1*2??%.2f;;4.00'}])};
+  const at={sec:0,ppi:0,ci:1,cellIndex:2};
+  assert.equal(readStoredTableFormula(wasm,{...at,cellPath:path})?.formula,'=A1*2');
+  assert.equal(readStoredTableFormula(wasm,at)?.format,'');
+  assert.equal(readStoredTableFormula(wasm,{...at,cellPath:[{...path[0],cellParaIndex:0},path[1]]}),null);
 });
 test('dialog patch preserves dry run and atomic transaction, rejecting a missing seam', () => {
   const source = readFileSync(new URL('../../../upstream/rhwp-source/rhwp-studio/src/ui/formula-dialog.ts', import.meta.url), 'utf8');

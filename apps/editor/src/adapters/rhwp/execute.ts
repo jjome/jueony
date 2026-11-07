@@ -1,3 +1,4 @@
+import {formulaInputTarget,refreshFormulaInput} from './table-formula-input.ts';
 import {agentFileKinds} from '../../modules/document/public/index.ts';
 import {executeAgentDocumentMetadata} from './agent-document-information.ts';
 import {executeCellParagraph} from './cell-paragraph.ts';
@@ -31,8 +32,9 @@ export function executeDocumentOperations(wasm: any, base: Snapshot, operations:
   if(field){if(operations.length!==1)throw Error('계산식 필드는 단독 요청으로 실행하세요.');return updateTableFormulaField(doc,snapshot,field);}
   if(operations.length===1 && operations[0].kind==='fill_table_series'){
     const {table,block,unit,output}=agentSeriesRange(snapshot,operations[0]);
-    const live=readStructure(doc).tables.find(t=>t.id===table.id);
-    if(JSON.stringify(table.cells)!==JSON.stringify(live?.cells)) throw Error('표 원문이나 서식이 달라졌습니다. 표를 다시 조회하세요.');
+    const structure=readStructure(doc);
+    const live=('ancestors' in table?structure.nestedTables:structure.tables)?.find(t=>t.id===table.id);
+    if(JSON.stringify(table)!==JSON.stringify(live)) throw Error('표 원문이나 서식이 달라졌습니다. 표를 다시 조회하세요.');
     const plan=readAutoFillPlan(doc,block,unit,output);
     if(plan.storedFill || plan.lines?.some(l=>l.storedFill)){
       const liveFields=readTableFormulaFields(doc,true)?.fields;
@@ -51,13 +53,15 @@ export function executeDocumentOperations(wasm: any, base: Snapshot, operations:
     }
     if(!changesAutoFill(plan)) throw Error('지정한 범위가 이미 같은 값으로 채워져 있습니다.');
     executeAutoFill(doc,plan);
-    const first=plan.cells[0];
-    return {sectionIndex:table.section,paragraphIndex:0,parentParaIndex:table.paragraph,controlIndex:table.control,
-      cellIndex:first.index,cellParaIndex:0,charOffset:0,cellPath:[{controlIndex:table.control,cellIndex:first.index,cellParaIndex:0}]};
+    const cellPath=[...('ancestors' in table?table.ancestors:[]),{controlIndex:table.control,cellIndex:plan.cells[0].index,cellParaIndex:0}];
+    return {sectionIndex:table.section,paragraphIndex:0,parentParaIndex:table.paragraph,...cellPath[0],charOffset:0,cellPath};
   }
   if (operations.some(op=>op.kind==='set_table_cell' && snapshot.structure?.nestedTables?.some(t=>t.id===op.target))) {
     if (operations.length!==1 || operations[0].kind!=='set_table_cell') throw Error('중첩 셀 편집은 단독 요청으로 실행하세요.');
-    return executeNestedCellEdit(doc,snapshot,operations[0]);
+    const cursor=executeNestedCellEdit(doc,snapshot,operations[0]);
+    const loc=formulaInputTarget(doc,cursor);
+    if (loc) refreshFormulaInput(doc,loc);
+    return cursor;
   }
   if(operations.length===1&&operations[0].kind==='set_document_metadata'){executeAgentDocumentMetadata(doc,snapshot,operations[0]);return;}
   if(operations.length===1&&operations[0].kind==='remove_empty_section')return executeAgentEmptySection(doc,snapshot,operations[0]);

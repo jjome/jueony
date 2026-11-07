@@ -38,7 +38,7 @@ export function describeStructure(s?: Structure) {
  });
  for (const table of s.nestedTables??[]) {
    lines.push(`중첩 표 ${table.id} · ${table.rows}행 × ${table.columns}열`);
-   for (const cell of table.cells) lines.push(`  ${cell.row+1}행 ${cell.column+1}열 · ${cell.text}${cell.editable?'':' · 읽기 전용'}`);
+   for (const cell of table.cells) lines.push(`  ${cell.row+1}행 ${cell.column+1}열 · ${cell.text}${cell.editable?'':cell.paragraphs?.length?' · 편집 가능한 문단 '+cell.paragraphs.map(p=>p.index+1).join(', '):' · 읽기 전용'}`);
  }
  if (s.nestedTableLimitation) lines.push(s.nestedTableLimitation);
  return lines.join('\n');

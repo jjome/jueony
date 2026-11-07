@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer-core';
-import {continuedMergedTable} from './lib/continued-merged-table.mjs';
+import {continuedMergedTable,fragmentedMergedCell} from './lib/continued-merged-table.mjs';
 import http from 'node:http';
 import {spawn} from 'node:child_process';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
@@ -16,7 +16,8 @@ async function execute(id){const r=await(await active()).evaluate(id=>window.jue
 async function open(ext='hwpx',source){const d=source??HwpDocument.createEmpty();if(!source){d.createBlankDocument();d.insertText(0,0,0,'첫 줄\n둘째 줄\n셋째 줄');}const bytes=[...d[ext==='hwp'?'exportHwp':'exportHwpx']()];d.free();const f=await services();await f.evaluate(async(bytes,ext)=>{const root=await navigator.storage.getDirectory(),h=await root.getFileHandle('master-review.'+ext,{create:true}),w=await h.createWritable();await w.write(new Uint8Array(bytes));await w.close();await window.jueonyEditor.open(new Uint8Array(bytes),'master-review.'+ext,h,false);const ih=window.__pageServices.getInputHandler();ih.cursor.moveTo({sectionIndex:0,paragraphIndex:0,charOffset:0});ih.focus();},bytes,ext);return f;}
 const state=async()=>(await services()).evaluate(()=>({revision:window.jueonyEditor.revision(),bytes:[...window.jueonyEditor.recovery().bytes],history:window.__pageServices.getInputHandler().history.peekUndoTop()?.type??null,dirty:window.jueonyEditor.state().dirty}));
 async function save(f,name,ext){const result=await f.evaluate(async()=>{const api=window.jueonyEditor,status=await api.save();return {status,bytes:[...new Uint8Array(await(await api.fileHandle().getFile()).arrayBuffer())]};});assert.equal(result.status,'saved');await writeFile(resolve(out,name+'.'+ext),new Uint8Array(result.bytes));return new HwpDocument(new Uint8Array(result.bytes));}
-async function scenario(name,run){if(process.env.JUEONY_HIDDEN_OWNER_ONLY==='1'&&!name.startsWith('long-table'))return;try{await run();results.push(name);console.log('PASS',name);}catch(error){failures.push({name,error:String(error),stack:error.stack});console.error('FAIL',name,error);await page.screenshot({path:resolve(out,'failure-'+failures.length+'.png')}).catch(()=>{});await(await active()).evaluate(()=>{document.querySelectorAll('.modal-overlay .dialog-close').forEach(e=>e.click());document.querySelectorAll('dialog[open]').forEach(e=>e.close());}).catch(()=>{});}}
+const casePattern=process.env.JUEONY_CASE_PATTERN?new RegExp(process.env.JUEONY_CASE_PATTERN,'u'):undefined;
+async function scenario(name,run){if(casePattern&&!casePattern.test(name))return;if(process.env.JUEONY_HIDDEN_OWNER_ONLY==='1'&&!name.startsWith('long-table'))return;try{await run();results.push(name);console.log('PASS',name);}catch(error){failures.push({name,error:String(error),stack:error.stack});console.error('FAIL',name,error);await page.screenshot({path:resolve(out,'failure-'+failures.length+'.png')}).catch(()=>{});await(await active()).evaluate(()=>{document.querySelectorAll('.modal-overlay .dialog-close').forEach(e=>e.click());document.querySelectorAll('dialog[open]').forEach(e=>e.close());}).catch(()=>{});}}
 function body(f='hwpx',second=false,makeMerge=true){const d=HwpDocument.createEmpty();d.createBlankDocument();d.insertText(0,0,0,'표 앞 본문 😀');d.splitParagraph(0,0,d.getParagraphLength(0,0));const t=JSON.parse(d.createTable(0,1,0,3,3));assert.equal(t.ok,true);for(let i=0;i<9;i++)d.setCellProperties(0,1,t.controlIdx,i,JSON.stringify({width:[6001,14000,21000][i%3]}));for(let c=0;c<9;c++)d.insertTextInCell(0,t.paraIdx,t.controlIdx,c,0,0,'업무 '+c);d.applyCharFormatInCell(0,t.paraIdx,t.controlIdx,2,0,0,4,JSON.stringify({bold:true,fontSize:1200}));if(second){d.splitParagraph(0,1,d.getParagraphLength(0,1));const other=JSON.parse(d.createTable(0,2,0,2,2));assert.equal(other.ok,true);}for(let i=0;i<9;i++)d.setCellProperties(0,1,t.controlIdx,i,JSON.stringify({height:[5001,7000,9000][Math.floor(i/3)]}));if(makeMerge){d.applyCharFormatInCell(0,1,0,1,0,0,d.getCellParagraphLength(0,1,0,1,0),JSON.stringify({bold:true}));d.applyParaFormatInCell(0,1,0,1,0,JSON.stringify({alignment:'center'}));}if(makeMerge)d.mergeTableCells(0,1,0,0,0,0,1);const x=new HwpDocument(d[f==='hwp'?'exportHwp':'exportHwpx']());d.free();return x;}
 const calls=[],providerPort=4399;
 if(await fetch('http://127.0.0.1:'+providerPort).then(()=>true,()=>false))throw new Error('Mock provider port occupied');
@@ -27,6 +28,12 @@ const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const
  const fallback=input.document.structure.tables[0]?.cells?.[0]?.text?.split('\n')[paragraph]??'';
  const operations=[{kind:'replace_cell_paragraph',target,row:cell?.row??0,column:cell?.column??0,paragraph,originalText:cell?.paragraphs?.[paragraph]?.text??fallback,text:'Agent revised paragraph 😀'}];
  if(input.instruction.includes('mixed-tail'))operations[0].text=operations[0].originalText.slice(0,-1)+'개정😀';
+ if(input.instruction.includes('split-owner'))operations[0].text=operations[0].originalText.slice(0,-6)+'Tail 2';
+ if(input.instruction.includes('field-tail'))operations[0].text=operations[0].originalText.slice(0,2)+'수정😀';
+ if(input.instruction.includes('new-character-style')){
+  operations[0].text='가😀나다';
+  operations[0].spanFormats=[{start:1,end:3,bold:false,italic:true,color:'#13579b',fontSizePt:14.5}];
+ }
  if(input.instruction.includes('remove-style')){
   operations[0].spanTexts=['','수정😀'];
   operations[0].text=operations[0].spanTexts.join('');
@@ -65,6 +72,7 @@ const paragraphOp=(s,text='Direct revised paragraph')=>{const t=s.structure.tabl
 try{
  await new Promise(r=>provider.listen(providerPort,'127.0.0.1',r));for(let i=0;i<100;i++){if(await fetch(origin+'/api/health').then(r=>r.ok,()=>false))break;await delay(100);}
  browser=await puppeteer.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,args:['--no-first-run','--disable-background-networking'],defaultViewport:{width:1400,height:1000}});page=await browser.newPage();page.setDefaultTimeout(15000);page.on('dialog',d=>{if(d.type()==='beforeunload'){beforeUnloadCount++;void d.accept();}else void d.dismiss();});page.on('pageerror',e=>pageErrors.push(String(e)));page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});await page.setRequestInterception(true);page.on('request',r=>{if(!r.url().startsWith(origin)&&!r.url().startsWith('data:')&&!r.url().startsWith('blob:')){externalRequests.push(r.url());void r.abort();}else void r.continue();});await page.goto(origin);await ready();
+ if(casePattern)await configure('openai-compatible');
  for(const id of ['openai-responses','anthropic','gemini','openai-compatible'])await scenario(id+': actual merged paragraph chat, compare, one undo/redo, safe save and UI reopen',async()=>{
   await configure(id);const f=await open('hwpx',body('hwpx',true)),before=await snap(),t=before.structure.tables[0],cap=before.cellParagraphSources[t.id],start=calls.length;
   await f.evaluate(()=>{const ih=window.__pageServices.getInputHandler();if(window.__paragraphDiagnosticInstalled)return;window.__paragraphDiagnosticInstalled=true;window.__paragraphDiagnostics=[];const native=ih.executeDocumentAgentOperation.bind(ih);ih.executeDocumentAgentOperation=(command,render)=>native(command,async()=>{try{return await render();}catch(e){window.__paragraphDiagnostics.push({message:String(e),stack:e.stack});throw e;}});});
@@ -97,6 +105,35 @@ try{
   try{assert.equal(reopened.getTextInCell(0,1,0,0,1,0,6),'변경😀 공문');
    assert.equal(JSON.parse(reopened.getCellCharPropertiesAt(0,1,0,0,1,1)).italic,false);
    assert.equal(JSON.parse(reopened.getCellCharPropertiesAt(0,1,0,0,1,5)).italic,true);
+  }finally{reopened.free();}
+ });
+ for(const format of ['hwp','hwpx'])await scenario(format+' new-character-style through chat, undo/redo and bound file reopen',async()=>{
+  const f=await open(format,body(format)),before=await snap(),target=before.structure.tables[0].id;
+  await send('new-character-style');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  assert.equal((await snap()).cellParagraphSources[target].cells[0].paragraphs[1].text,'가😀나다');
+  await undo();assert.deepEqual((await snap()).structure.tables,before.structure.tables);
+  await execute('edit:redo');const saved=await save(f,'new-character-style',format);
+  try{
+   const shape=at=>JSON.parse(saved.getCellCharPropertiesAt(0,1,0,0,1,at));
+   assert.equal(shape(0).bold,true);assert.equal(shape(3).italic,false);
+   for(const i of [1,2])assert.deepEqual([shape(i).bold,shape(i).italic,shape(i).textColor,shape(i).fontSize],[false,true,'#13579b',1450]);
+  }finally{saved.free();}
+ });
+ for(const format of ['hwp','hwpx'])for(const mode of ['split-owner','field-tail'])await scenario(format+' '+mode+' through chat, undo/redo and bound file reopen',async()=>{
+  const split=mode==='split-owner',d=split?fragmentedMergedCell(HwpDocument):body(format);
+  if(!split)d.insertClickHereFieldInCell(0,1,0,0,1,1,false,'FIELD','memo','input',true);
+  const f=await open(format,d),before=await snap(),t=before.structure.tables[0],index=split?0:1;
+  const paragraph=before.cellParagraphSources[t.id].cells[0].paragraphs[index];
+  if(!split)assert.equal(paragraph.editableFrom,2);
+  await send(split?'first split-owner':'field-tail');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const text=split?paragraph.text.slice(0,-6)+'Tail 2':paragraph.text.slice(0,2)+'수정😀';
+  assert.equal((await snap()).cellParagraphSources[t.id].cells[0].paragraphs[index].text,text);
+  await undo();assert.deepEqual((await snap()).structure.tables,before.structure.tables);
+  await execute('edit:redo');const reopened=await save(f,mode,format);
+  try{
+   assert.equal(reopened.getTextInCell(0,1,0,0,index,0,Array.from(text).length),text);
+   if(split)assert.ok(reopened.pageCount()>1);
+   else assert.deepEqual(JSON.parse(reopened.getFieldList()).map(f=>[f.name,f.guide,f.startCharIdx,f.endCharIdx]),[['input','FIELD',1,1]]);
   }finally{reopened.free();}
  });
  for(const format of ['hwp','hwpx'])await scenario(format+' delete first style run of a merged cell on a continuation page via chat',async()=>{

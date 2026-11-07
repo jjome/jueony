@@ -16,7 +16,7 @@ export class TableAutoFillDialog extends ModalDialog {
     const help = document.createElement('p'), table = document.createElement('table'), count = document.createElement('p'); table.setAttribute('aria-label', '자동 채우기 변경 미리보기');
     const limit = document.createElement('p'); limit.textContent = this.storedField?'계산식 필드는 A1 참조를 대상 셀 위치에 맞춰 옮기고 결과 표시 형식을 유지합니다. 현재 계산값은 일반 셀에 숫자 글자로 저장합니다.':this.kind === 'formula'
       ? '선택을 시작한 셀의 =수식을 복사합니다. A1은 대상까지의 거리만큼 이동하고 $는 행 또는 열을 고정합니다. 문자열은 수식 그대로 저장하고 계산값은 현재 결과를 숫자 글자로 저장합니다. 참조를 바꾼 뒤 다시 채우면 계산값이 갱신됩니다. 200셀 이하 표에서 사칙연산과 SUM·AVERAGE·MIN·MAX·COUNT를 지원합니다.'
-      : '본문의 병합 없는 단순 표에서 한 행/열을 지원합니다. 12자리 이하 정수, 2024-01-31·2024.01.31·2024/01/31·2024. 1. 31.·2024년 1월 31일 형식의 날짜, 제001호처럼 숫자 하나를 포함한 같은 문자 패턴을 사용하세요. 월·년은 첫 날짜의 일을 기준으로 계산하고 없는 날만 그달 마지막 날로 조정합니다. 예: 1/31→2/28→3/31. 월·년 간격을 직접 선택하세요. 혼합 글자 서식·보호/중첩/여러 문단 셀은 지원하지 않습니다. 첫 두 셀과 기존 서식·선택하지 않은 셀은 유지합니다.';
+      : '첫 두 셀에 정수, 제001호 같은 번호, 또는 같은 표기의 날짜를 넣으세요. 2024. 1. 31. (수)처럼 요일을 적으면 날짜에 맞춰 갱신합니다. 월·년 간격은 첫 날짜의 일을 기준으로 계산합니다. 가로·세로로 완전히 포함된 병합 셀은 한 셀로 세며, 중첩 표에서는 선택한 표 안의 셀만 채웁니다.';
     this.status = document.createElement('p'); this.status.setAttribute('role', 'alert');
     const refresh = () => {
       table.replaceChildren(); this.status.textContent = ''; help.textContent = ''; count.textContent = '';

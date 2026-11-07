@@ -5,6 +5,7 @@ import http from 'node:http';
 import {resolve} from 'node:path';
 import puppeteer from 'puppeteer-core';
 import {loadReviewEngine} from './lib/hancom-review.mjs';
+import {readStructure} from '../src/adapters/rhwp/structure.ts';
 
 const repo=resolve(import.meta.dirname,'../../..'),dist=resolve(process.env.JUEONY_TEST_DIST);
 const {HwpDocument}=await loadReviewEngine(resolve(process.env.JUEONY_ENGINE_PACKAGE));
@@ -16,9 +17,13 @@ const provider=http.createServer(async(req,res)=>{
     const wire=JSON.parse(raw),input=JSON.parse(wire.messages[1].content);
     const tables=input.document.structure.nestedTables;
     assert.equal(tables.length,2);
-    const table=tables[1],cell=table.cells[1];assert.equal(cell.text,'동일😀');assert.ok(cell.editable);
+    const table=tables[1],cell=table.cells[1],mixed=input.instruction.includes('둘째 문단');
+    const target=mixed?cell.paragraphs.find(p=>p.index===1):cell;
+    assert.equal(target.text,'동일😀');
+    if(mixed)assert.deepEqual(target.formatSpans,[{start:0,end:1},{start:1,end:3}]);
+    else assert.ok(cell.editable);
     calls.push(table.id);
-    const generation={message:'오른쪽 안쪽 표의 두 번째 셀을 바꿨습니다.',sourceIds:[],operations:[{kind:'set_table_cell',target:table.id,row:cell.row,column:cell.column,originalText:cell.text,text:'변경😀'}]};
+    const generation={message:'오른쪽 안쪽 표의 두 번째 셀을 바꿨습니다.',sourceIds:[],operations:[{kind:'set_table_cell',target:table.id,row:cell.row,column:cell.column,originalText:target.text,text:'변경😀',...(mixed?{paragraph:1,spanTexts:['변','경😀']}:{})}]};
     res.setHeader('Content-Type','application/json'); res.end(JSON.stringify({choices:[{message:{content:JSON.stringify(generation)}}]}));
   } catch (e) {res.writeHead(500);res.end(String(e));}
 });
@@ -43,23 +48,32 @@ try {
   await fill('config-model','nested-fixture');await fill('config-key','synthetic-local-fixture');
   await page.$eval('#config-remember',e=>e.checked=false);await page.click('#model-form button[type=submit]');
   await page.waitForFunction(()=>!document.getElementById('model-dialog').open);
-  for (const format of ['hwp','hwpx']) {
+  for (const format of ['hwp','hwpx']) for(const mixed of [false,true]){
     const frame=await (await page.$('.editor-frame:not([hidden])')).contentFrame();
     const doc=HwpDocument.createEmpty();doc.createBlankDocument();
     const inner='<table><tr><td>동일😀</td><td>동일😀</td></tr></table>';
     doc.pasteHtml(0,0,0,`<table><tr><td>왼쪽${inner}</td><td>오른쪽${inner}</td></tr></table>`);
+    if(mixed){
+      const table=readStructure(doc).nestedTables[1],step={controlIndex:table.control,cellIndex:1,cellParaIndex:0};
+      const path=p=>JSON.stringify([...table.ancestors,{...step,cellParaIndex:p}]);
+      const args=[table.section,table.paragraph];
+      doc.splitParagraphInCellByPath(...args,path(0),0);
+      doc.insertTextInCellByPath(...args,path(0),0,'첫 문단');
+      doc.applyCharFormatInCellByPath(...args,path(1),1,3,'{"bold":true}');
+    }
     const bytes=Array.from(format==='hwpx'?doc.exportHwpx():doc.exportHwp());doc.free();
     await frame.evaluate(async(bytes,name)=>{
       const root=await navigator.storage.getDirectory(),h=await root.getFileHandle(name,{create:true}),writer=await h.createWritable();
       await writer.write(new Uint8Array(bytes));await writer.close();await window.jueonyEditor.open(new Uint8Array(bytes),name,h,false);
     },bytes,'nested-review.'+format);
-    await fill('request-input','오른쪽 안쪽 표의 두 번째 셀을 변경해줘');
+    await fill('request-input',mixed?'오른쪽 안쪽 표의 두 번째 셀 둘째 문단을 변경해줘':'오른쪽 안쪽 표의 두 번째 셀을 변경해줘');
     const sent=page.waitForResponse(r=>r.url()===origin+'/api/generate');
     await page.click('#send-request');await sent;
     await page.waitForFunction(()=>!document.getElementById('send-request').disabled);
     assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
     const texts=()=>frame.evaluate(()=>window.jueonyEditor.snapshot().structure.nestedTables.map(t=>t.cells.map(c=>c.text)));
     const original=[['동일😀','동일😀'],['동일😀','동일😀']],edited=[['동일😀','동일😀'],['동일😀','변경😀']];
+    if(mixed){original[1][1]='첫 문단\n동일😀';edited[1][1]='첫 문단\n변경😀';}
     assert.deepEqual(await texts(),edited);
     const undo=(await page.$$('.message-actions button')).reverse();
     for (const b of undo) if (await b.evaluate(e=>e.textContent==='요청 되돌리기')) {await b.click();break;}
@@ -76,8 +90,14 @@ try {
     try {
       const hits=JSON.parse(reopened.searchAllText('변경😀',true,true));
       assert.equal(hits.length,1);assert.deepEqual(hits[0].cellPath.map(p=>p.cellIndex),[1,1]);
+      if(mixed){
+        assert.equal(hits[0].cellPath.at(-1).cellParaIndex,1);
+        const table=readStructure(reopened).nestedTables[1],args=[table.section,table.paragraph,JSON.stringify(hits[0].cellPath)];
+        assert.equal(JSON.parse(reopened.getCellCharPropertiesAtByPath(...args,0)).bold,false);
+        assert.equal(JSON.parse(reopened.getCellCharPropertiesAtByPath(...args,1)).bold,true);
+      }
     } finally {reopened.free();}
-    console.log('PASS',format,'UI chat → loopback provider → Agent application → undo/redo → bound file save and native reopen');
+    console.log('PASS',format,mixed?'mixed paragraph':'plain cell','UI chat → loopback provider → Agent application → undo/redo → bound file save and native reopen');
   }
-  assert.equal(calls.length,2);assert.deepEqual(errors,[]);
+  assert.equal(calls.length,4);assert.deepEqual(errors,[]);
 } finally {await browser?.close();launcher.kill();await new Promise(r=>provider.close(r));}

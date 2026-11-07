@@ -1,6 +1,7 @@
 /** Explicit native-adapter support contract; not a command execution bypass. */
 export {tableAxisKinds,controlKinds,charRules,tableAxisPlan,pageProperties,selectedCells,mm,validateControlOperations} from '../domain/control-operations.ts';
-export {projectTableAxis} from '../domain/table-axis-grid.ts';
+export {projectTableAxis,assertCoverage} from '../domain/table-axis-grid.ts';
+export {witnessedTrackEdges} from '../domain/witnessed-track-edges.ts';
 export {agentSeriesRange} from '../domain/agent-table-series.ts';
 export {agentTabSpacingRaw,agentLineNumberSettings} from '../domain/agent-section-settings.ts';
 export {agentMasterPagePayload,assertAgentMasterKinds} from '../domain/agent-master-pages.ts';
@@ -45,7 +46,7 @@ export {tableSplitPlan,witnessedSplitPlan} from '../domain/table-split.ts';
 
 export {tableStructurePlan} from '../domain/table-structure.ts';
 
-export {cellParagraphPlan} from '../domain/cell-paragraph.ts';
+export {cellParagraphPlan,paragraphEdits} from '../domain/cell-paragraph.ts';
 export {agentTableFormulaTarget,agentFormulaInsertTarget} from '../domain/agent-table-formula.ts';
 export {tableSubdivisionPlan} from '../domain/table-subdivision.ts';
 

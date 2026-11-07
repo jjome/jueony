@@ -209,22 +209,19 @@ function mergedTable(): Table {
   return t;
 }
 
-test('merged main or absorbed cell references and copy targets are rejected, unrelated cells work', () => {
+test('merged references resolve their owner, ranges count it once, and only its start can be a destination', () => {
   const t = mergedTable();
+  t.cells[0].text='6';
   const before = structuredClone(t);
   assert.deepEqual(values(planTableFormulaRecalculation(t)!), {'1,2': 14});
   const copy = planTableFormulaCopy(t, {row: 1, column: 2}, [{row: 2, column: 2}])!;
   assert.deepEqual(copy.changes.map(c => c.text), ['=C2*2']);
-  for (const col of [0, 1]) {
-    assert.throws(() => planTableFormulaCopy(t, {row: 1, column: 2}, [{row: 0, column: col}]), /병합/);
-    assert.throws(() => planTableFormulaRecalculation(t, [{row: 1, column: 1, originalText: '', text: `=${col === 0 ? 'A1' : 'B1'}`}]), /병합/);
+  assert.throws(() => planTableFormulaCopy(t, {row:1,column:2}, [{row:0,column:1}]), /병합/);
+  for(const formula of ['=A1','=B1','=SUM(A1:B1)']){
+    const plan=planTableFormulaRecalculation(t,[{row:1,column:1,originalText:'',text:formula}])!;
+    assert.equal(values(plan)['1,1'],6);
   }
-  const referencesMerged = mergedTable();
-  referencesMerged.cells.find(c => c.row === 1 && c.column === 2)!.text = '=A1+1';
-  assert.throws(() => planTableFormulaCopy(referencesMerged, {row: 1, column: 2}, [{row: 2, column: 2}]), /병합/);
-  const becomesMerged = mergedTable();
-  becomesMerged.cells.find(c => c.row === 1 && c.column === 2)!.text = '=B2+1';
-  assert.throws(() => planTableFormulaCopy(becomesMerged, {row: 1, column: 2}, [{row: 0, column: 2}]), /병합/);
+  assert.throws(()=>planTableFormulaRecalculation(t,[{row:0,column:0,originalText:'6',text:'=B1'}]),/순환/);
   assert.deepEqual(t, before);
 });
 

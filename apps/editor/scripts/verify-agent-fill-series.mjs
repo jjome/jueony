@@ -10,7 +10,9 @@ import {proposeFormulaCreation,reviewFormulaCreation} from './lib/review-agent-f
 const repo=resolve(import.meta.dirname,'../../..'),dist=resolve(process.env.JUEONY_TEST_DIST);
 const {HwpDocument}=await loadReviewEngine(resolve(process.env.JUEONY_ENGINE_PACKAGE));
 const port=Number(process.env.JUEONY_TEST_PORT??4576),origin='http://127.0.0.1:'+port;
-const nativeFieldReview=process.env.JUEONY_REVIEW_NATIVE_FORMULAS==='1';
+const nestedOnly=process.argv.includes('--nested-formula');
+const insertReview=nestedOnly||process.env.JUEONY_REVIEW_FORMULA_INSERT==='1';
+const nativeFieldReview=!nestedOnly&&process.env.JUEONY_REVIEW_NATIVE_FORMULAS==='1';
 const cascadeReview=process.env.JUEONY_REVIEW_FORMULA_DEPENDENTS==='1';
 const storedFillReview=process.env.JUEONY_REVIEW_STORED_FILL==='1';
 if(nativeFieldReview){
@@ -41,9 +43,10 @@ if(process.env.JUEONY_REVIEW_RECTANGLE==='1'){
       expected:['2','4','6','8','4.00','8.00','12.00','16.00','5.00','9.00','13.00','17.00']});
   }
 }
+const seriesCases=nestedOnly?[]:scenarios;
 const calls=[];
 function propose(input){
-  if(process.env.JUEONY_REVIEW_FORMULA_INSERT==='1'){
+  if(insertReview){
     const insertion=proposeFormulaCreation(input);
     if(insertion)return insertion;
   }
@@ -85,7 +88,7 @@ try {
   await fill('config-label','자동 채우기 검수');await fill('config-endpoint','http://127.0.0.1:'+provider.address().port+'/v1');
   await fill('config-model','series-fixture');await fill('config-key','synthetic-local-fixture');await page.$eval('#config-remember',e=>e.checked=false);
   await page.click('#model-form button[type=submit]');await page.waitForFunction(()=>!document.getElementById('model-dialog').open);
-  for(const format of ['hwp','hwpx']) for(const test of scenarios) {
+  for(const format of ['hwp','hwpx']) for(const test of seriesCases) {
     const frame=await(await page.$('.editor-frame:not([hidden])')).contentFrame();
     const doc=HwpDocument.createEmpty();doc.createBlankDocument();
     const table=JSON.parse(doc.createTable(0,0,0,(test.endRow??test.row)+1,4)),styled=test.row*4+2;
@@ -132,7 +135,7 @@ try {
     } finally {reopened.free();}
     console.log('PASS',format,test.stored?'native FORMULA fill':'fill',test.mode,'chat, real edit, undo/redo, saved bytes, Native reopen and formatting');
   }
-  assert.deepEqual(calls,[...scenarios,...scenarios].map(c=>c.mode));assert.deepEqual(errors,[]);
+  assert.deepEqual(calls,[...seriesCases,...seriesCases].map(c=>c.mode));assert.deepEqual(errors,[]);
   if(nativeFieldReview)for(const format of ['hwp','hwpx'])for(const fieldCase of fieldCases){
     const f=await(await page.$('.editor-frame:not([hidden])')).contentFrame();
     const source=new HwpDocument(new Uint8Array(await readFile(resolve(repo,'upstream/rhwp-source/samples/calc-cell.hwp'))));
@@ -189,6 +192,6 @@ try {
     console.log('PASS',format,fieldCase.dependent?'native FORMULA edit and dependent recalculation':'native FORMULA edit','chat, sibling fields, undo/redo, guarded save, independent file metadata and reopened result');
   }
   if(nativeFieldReview)assert.deepEqual(calls.slice(scenarios.length*2),Array(fieldCases.length*2).fill('field'));
-  if(process.env.JUEONY_REVIEW_FORMULA_INSERT==='1')await reviewFormulaCreation({HwpDocument,page,fill,origin});
+  if(insertReview)await reviewFormulaCreation({HwpDocument,page,fill,origin,nestedOnly});
   assert.deepEqual(errors,[]);
 } finally {await browser?.close();server.kill();await new Promise(r=>provider.close(r));}

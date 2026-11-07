@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {continuedMergedTable} from './lib/continued-merged-table.mjs';
+import {continuedMergedTable,fragmentedMergedCell} from './lib/continued-merged-table.mjs';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {inflateRawSync} from 'node:zlib';
 import {resolve} from 'node:path';import {pathToFileURL} from 'node:url';
@@ -36,6 +36,90 @@ for (const format of ['hwp','hwpx']) await scenario(format+' multi-run merged pa
  } finally {doc.free();}
 });
 for(const format of ['hwp','hwpx']){
+ await scenario(format+' creates only the requested character definitions at Unicode result offsets',()=>{
+  const template=fixture(),save=d=>format==='hwp'?d.exportHwp():d.exportHwpx(),args=[0,1,0,0,1];
+  template.applyCharFormatInCell(...args,1,4,'{"italic":true}');
+  const d=new HwpDocument(save(template));template.free();
+  const header=doc=>Buffer.from(resources(doc.exportHwpx())['Contents/header.xml'],'base64').toString('utf8');
+  const entries=xml=>xml.match(/<hh:charPr\s[^>]+>[\s\S]*?<\/hh:charPr>/gu);
+  const outside=xml=>xml.replace(/<hh:charProperties\b[\s\S]*?<\/hh:charProperties>/u,'');
+  try{
+   const base=snap(d,'styles.'+format),before=save(d),old=header(d),undo=d.saveSnapshot();
+   const op={...command(base,1,'A😀betaC'),spanTexts:['A😀','beta','C'],spanFormats:[
+    {start:1,end:4,bold:false,color:'#13579B',fontSizePt:14.5},{start:6,end:7,italic:true,color:'#21904f'}]};
+   transactionalCandidate(d,base,[op],'r1');
+   const next=header(d),oldEntries=entries(old),newEntries=entries(next);
+   assert.deepEqual(newEntries.slice(0,oldEntries.length),oldEntries);
+   assert.equal(outside(next),outside(old));assert.equal(newEntries.length,oldEntries.length+3);
+   const edited=save(d),reopened=new HwpDocument(edited);
+   try{
+    assert.equal(reopened.getTextInCell(...args,0,7),op.text);
+    const shape=at=>json(reopened.getCellCharPropertiesAt(...args,at));
+    assert.deepEqual([1,2,3].map(i=>shape(i).textColor),Array(3).fill('#13579b'));
+    assert.equal(shape(1).italic,false);assert.equal(shape(2).italic,true);assert.equal(shape(3).fontSize,1450);
+    assert.equal(shape(4).textColor,shape(0).textColor);assert.equal(shape(6).textColor,'#21904f');
+   }finally{reopened.free();}
+   const redo=d.saveSnapshot();d.restoreSnapshot(undo);assert.deepEqual(save(d),before);
+   d.restoreSnapshot(redo);assert.deepEqual(save(d),edited);d.discardSnapshot(undo);d.discardSnapshot(redo);
+   const after=snap(d,'styles.'+format),styleOnly={...command(after,1,op.text),spanFormats:[{start:0,end:1,italic:true}]};
+   transactionalCandidate(d,after,[styleOnly],'r1');
+   assert.equal(json(d.getCellCharPropertiesAt(...args,0)).italic,true);
+   assert.throws(()=>transactionalCandidate(d,snap(d,'styles.'+format),[styleOnly],'r1'),/이미/);
+   const beforeFault=save(d),apply=d.applyCharFormatInCell.bind(d);
+   d.applyCharFormatInCell=(...a)=>{const result=apply(...a);d.findOrCreateFontIdForLang(0,'Unexpected unused font');return result;};
+   assert.throws(()=>transactionalCandidate(d,snap(d,'styles.'+format),[{...styleOnly,spanFormats:[{start:0,end:1,bold:false}]}],'r1'));
+   assert.deepEqual(save(d),beforeFault);
+  }finally{d.free();}
+ });
+ await scenario(format+' edits only the suffix following a stored click-here field in the merged paragraph',()=>{
+  const template=fixture(),save=d=>format==='hwp'?d.exportHwp():d.exportHwpx(),args=[0,1,0,0,1];
+  const created=json(template.insertClickHereFieldInCell(...args,1,false,'FIELD','memo','input',true));
+  assert.equal(created.ok,true);
+  const doc=new HwpDocument(save(template)),name='field.'+format;template.free();
+  try{
+   const base=snap(doc,name),cap=base.cellParagraphSources[base.structure.tables[0].id];
+   assert.equal(cap.editable,true);assert.equal(cap.cells[0].paragraphs[1].editableFrom,2);
+   const original=save(doc),fields=json(doc.getFieldList()),op=command(base,1,'Ce수정😀');
+   assert.throws(()=>transactionalCandidate(doc,base,[{...op,text:'X변경'}],'r1'),/필드/);
+   assert.deepEqual(save(doc),original);
+   const undo=doc.saveSnapshot();transactionalCandidate(doc,base,[op],'r1');
+   const saved=save(doc),reopened=new HwpDocument(saved);
+   try{
+    assert.deepEqual(json(reopened.getFieldList()),fields);
+    assert.equal(reopened.getTextInCell(...args,0,5),op.text);
+   }finally{reopened.free();}
+   doc.restoreSnapshot(undo);assert.deepEqual(save(doc),original);doc.discardSnapshot(undo);
+  }finally{doc.free();}
+ });
+ await scenario(format+' edits a paragraph spanning pages and rejects duplicated rendered text',()=>{
+  const template=fragmentedMergedCell(HwpDocument),save=d=>format==='hwp'?d.exportHwp():d.exportHwpx();
+  const doc=new HwpDocument(save(template)),name='fragment.'+format;template.free();
+  try{
+   const args=[0,1,0,0,0],base=snap(doc,name),table=base.structure.tables[0],original=save(doc);
+   const parts=Array.from({length:doc.pageCount()},(_,p)=>json(doc.getPageControlLayout(p)).controls
+    .some(t=>t.type==='table'&&t.cells.some(c=>c.row===0&&c.col===0&&c.colSpan===2)));
+   assert.ok(parts.filter(Boolean).length>=2);
+   const originalText=doc.getTextInCell(...args,0,doc.getCellParagraphLength(...args)),text=originalText.slice(0,-6)+'Tail 2';
+   const op={kind:'replace_cell_paragraph',target:table.id,row:0,column:0,paragraph:0,originalText,text};
+   const undo=doc.saveSnapshot();
+   transactionalCandidate(doc,base,[op],'r1');
+   const edited=save(doc),reopened=new HwpDocument(edited);
+   try{
+    assert.equal(reopened.getTextInCell(...args,0,Array.from(text).length),text);
+    assert.equal(reopened.getTextInCell(0,1,0,0,1,0,6),'Cell 1');
+   }finally{reopened.free();}
+   const redo=doc.saveSnapshot();
+   doc.restoreSnapshot(undo);assert.deepEqual(save(doc),original);
+   doc.restoreSnapshot(redo);assert.deepEqual(save(doc),edited);doc.discardSnapshot(undo);doc.discardSnapshot(redo);
+   const layout=doc.getPageTextLayout.bind(doc),last=parts.lastIndexOf(true);
+   doc.getPageTextLayout=page=>{
+    const view=json(layout(page));
+    if(page===last)view.runs.find(r=>r.cellIdx===0&&r.cellParaIdx===0).charStart=0;
+    return JSON.stringify(view);
+   };
+   assert.equal(snap(doc,name).cellParagraphSources[table.id].editable,false);
+  }finally{doc.free();}
+ });
  await scenario(format+' merged paragraph on a continuation page binds by document coordinates and restores cleanly',()=>{
   const source=continuedMergedTable(HwpDocument);
   const save=d=>format==='hwp'?d.exportHwp():d.exportHwpx(),d=new HwpDocument(save(source));source.free();

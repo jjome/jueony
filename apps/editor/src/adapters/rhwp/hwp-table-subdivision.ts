@@ -22,7 +22,7 @@ export function verifiedSubdivisionHwp(d:any):Uint8Array {
 export function hwpSubdivisionSource(d:any,t:Table,tables:Table[]) {
   const info=parsed(d.getDocumentInfo()), p=parsed(d.getTableProperties(t.section,t.paragraph,t.control));
   if (d.getSourceFormat()!=='hwp' || !/^5\./u.test(info.version) || info.hwp3Variant!==false || info.encrypted!==false
-      || d.getSectionCount()!==1 || d.pageCount()!==1 || tables.length!==1 || t.section!==0 || !t.editable
+      || d.getSectionCount()!==1 || (d.pageCount()!==1 && !(typeof d.splitCellOnGrid==='function' && t.cells.some(c=>c.rowSpan>1||c.columnSpan>1))) || tables.length!==1 || t.section!==0 || !t.editable
       || t.rows*t.columns>200 || parsed(d.getColumnDef(0)).columnCount!==1
       || p.cellZoneCount!==0 || p.cellSpacing!==0 || p.hasCaption || p.treatAsChar || p.allowOverlap
       || p.textWrap!=='TopAndBottom' || p.vertRelTo!=='Para' || p.vertAlign!=='Top'
@@ -30,9 +30,9 @@ export function hwpSubdivisionSource(d:any,t:Table,tables:Table[]) {
       || parsed(d.getFieldList()).length || parsed(d.getBookmarks()).length
       || parsed(d.getControls()).some((c:any)=>c.list!==0 || !['tbl','secd','cold'].includes(c.ctrlId))
       || parsed(d.getCursorModel()).lists.some((l:any)=>!l.isCell || l.hostListId!==0))
-    throw new Error('HWP5 한 쪽·한 단의 보호되지 않은 본문 표 한 개가 필요합니다.');
+    throw new Error('HWP5 한 단의 보호되지 않은 본문 표 한 개와 확인된 쪽 배치가 필요합니다.');
   const merged=t.cells.some(c=>c.rowSpan>1||c.columnSpan>1);
-  const source=merged ? readMergedSplitGrid(d,t) : readAgentTablePaginationSources(d,[t])?.[t.id];
+  const source=merged ? readMergedSplitGrid(d,t,typeof d.splitCellOnGrid === 'function') : readAgentTablePaginationSources(d,[t])?.[t.id];
   if (source?.editable!==true) throw new Error('HWP 표의 원래 격자·내용·보호 상태를 확인하지 못했습니다.');
   verifiedSubdivisionHwp(d);
   return source;

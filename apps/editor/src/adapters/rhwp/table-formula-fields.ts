@@ -41,7 +41,8 @@ export function readTableFormulaFields(wasm:any,allowEdits=false):AgentTableForm
    } catch {unresolved++;}
   }
   if (!fields.length&&!unresolved) return undefined;
-  return {fields,unresolved,canEdit:fields.some(f=>f.editable),canRefreshDependents};
+  const canEdit=fields.some(f=>f.editable);
+  return {fields,unresolved,canEdit,canRefreshDependents,canFill:canEdit && typeof d.insertTableFormulaField==='function'};
  } catch {
   return {fields:[],unresolved:null,canEdit:false,canRefreshDependents:false};
  }

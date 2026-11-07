@@ -30,13 +30,20 @@ export function executeDocumentOperations(wasm: any, base: Snapshot, operations:
     const live=readStructure(doc).tables.find(t=>t.id===table.id);
     if(JSON.stringify(table.cells)!==JSON.stringify(live?.cells)) throw Error('표 원문이나 서식이 달라졌습니다. 표를 다시 조회하세요.');
     const plan=readAutoFillPlan(doc,block,unit,output);
+    if(plan.storedFill){
+      for(const cell of plan.cells){
+        const queried=snapshot.tableFormulaFields?.fields.find(f=>f.tableId===table.id&&f.row===cell.row&&f.column===cell.column);
+        if(queried?.fieldId!==cell.field?.fieldId||queried?.storedCommand!==cell.field?.storedCommand||queried?.displayedValue!==cell.field?.displayedValue)
+          throw Error('조회한 계산식 원문 또는 표시값이 변경되었습니다.');
+      }
+    }
     let total=0;
     for(const value of plan.values.slice(plan.seedCount)){
       const length=Array.from(value).length;
       total+=length;
       if(length>4000 || total>60000) throw Error('채우기 결과가 셀 4,000자 또는 요청 60,000자 한도를 넘습니다.');
     }
-    if(plan.cells.slice(plan.seedCount).every((cell,i)=>cell.text===plan.values[i+plan.seedCount])) throw Error('지정한 범위가 이미 같은 값으로 채워져 있습니다.');
+    if(plan.storedFill?!plan.storedFill.changed:plan.cells.slice(plan.seedCount).every((cell,i)=>cell.text===plan.values[i+plan.seedCount])) throw Error('지정한 범위가 이미 같은 값으로 채워져 있습니다.');
     executeAutoFill(doc,plan);
     const first=plan.cells[0];
     return {sectionIndex:table.section,paragraphIndex:0,parentParaIndex:table.paragraph,controlIndex:table.control,

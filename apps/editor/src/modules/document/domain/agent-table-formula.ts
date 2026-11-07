@@ -3,7 +3,7 @@ import type {AgentTableFormulaOp,Snapshot} from '../public/types.ts';
 export function agentTableFormulaTarget(op:AgentTableFormulaOp,base:Snapshot) {
  const keys=['kind','target','row','column','fieldId','originalCommand','formula','resultFormat'];
  if(Object.keys(op).some(k=>!keys.includes(k)) || ![op.row,op.column,op.fieldId].every(n=>Number.isSafeInteger(n)&&n>=0) ||
-   typeof op.formula!=='string' || !op.formula.startsWith('=') || op.formula.length<2 || op.formula.length>4000 ||
+   typeof op.formula!=='string' || !op.formula.startsWith('=') || op.formula.length<2 || new TextEncoder().encode(op.formula).length>512 ||
    /[\u0000-\u001f\u007f]|\?\?|;;/u.test(op.formula) || typeof op.resultFormat!=='string' || !/^%(?:g|\.[012]f),?$/u.test(op.resultFormat))
    throw Error('계산식 필드에는 유효한 셀 위치·수식·숫자 서식이 필요합니다.');
  const caps=base.tableFormulaFields;

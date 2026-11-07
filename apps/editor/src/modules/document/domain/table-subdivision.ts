@@ -1,5 +1,5 @@
 import type {Snapshot,AgentTableSubdivisionOp,Cell} from '../public/types.ts';
-import {tableSplitPlan} from './table-split.ts';
+import {witnessedSplitPlan} from './table-split.ts';
 
 /** Partition existing logical tracks using the Native split's span distribution.
  * Returned dimensions are the sums of the witnessed tracks, in HWP units. */
@@ -18,12 +18,14 @@ export function tableSubdivisionPlan(op:AgentTableSubdivisionOp, snapshot:Snapsh
   if (!op || op.kind !== 'split_table_cell_into' || Object.keys(op).some(k => !keys.includes(k) && k !== 'distributeParagraphs') || keys.some(k => !Object.hasOwn(op, k))) throw new Error('셀 임의 분할의 행·열과 분할 개수를 모두 지정하세요.');
   if (op.distributeParagraphs != null && typeof op.distributeParagraphs !== 'boolean') throw new Error('문단 분배 여부는 참 또는 거짓으로 지정하세요.');
   const table = snapshot.structure?.tables.find(t => t.id === op.target), source = snapshot.tableSubdivisionSources?.[op.target];
-  if (!/\.hwpx$/iu.test(snapshot.name) || !/^s\d+p\d+t\d+$/u.test(op.target) || !table || source?.editable !== true || !/^[a-f0-9]{64}$/u.test(source.fingerprint ?? '')) throw new Error('조회된 HWPX 임의 분할 가능 표가 필요합니다.');
+  const binary=/\.hwp$/iu.test(snapshot.name);
+  if ((!/\.hwpx$/iu.test(snapshot.name) && !(binary && source?.hwp5Grid)) || !/^s\d+p\d+t\d+$/u.test(op.target) || !table || source?.editable !== true || !/^[a-f0-9]{64}$/u.test(source.fingerprint ?? '')) throw new Error('원본 형식의 저장 재열기가 가능한 표를 다시 조회하세요.');
   if (![op.row, op.column, op.rows, op.columns].every(Number.isSafeInteger) || op.row < 0 || op.column < 0 || op.rows < 1 || op.columns < 1 || op.rows > 8 || op.columns > 8 || op.rows * op.columns === 1) throw new Error('새 행·열 수는 1~8이며 적어도 한 방향을 나누어야 합니다.');
   const merged = table.cells.find(c => c.row === op.row && c.column === op.column && (c.rowSpan > 1 || c.columnSpan > 1));
   if (merged) {
-    tableSplitPlan({kind:'split_table_cell', target:op.target, row:op.row, column:op.column}, snapshot);
-    const grid = snapshot.tableSplitSources![op.target];
+    const grid = binary ? {editable:true,fingerprint:source.fingerprint,...source.hwp5Grid!} : snapshot.tableSplitSources?.[op.target];
+    if (grid?.editable!==true || !/^[a-f0-9]{64}$/u.test(grid.fingerprint??'')) throw new Error('기본 분할 격자를 조회하세요.');
+    witnessedSplitPlan({kind:'split_table_cell', target:op.target, row:op.row, column:op.column},table,grid);
     const limits = source.cells?.find(cell => cell.row === op.row && cell.column === op.column);
     if (!limits || !source.frame || table.cells.some(cell => cell.properties.isHeader !== false))
       throw new Error('조회된 병합 주 셀의 크기·제목·배치를 확인하지 못했습니다.');

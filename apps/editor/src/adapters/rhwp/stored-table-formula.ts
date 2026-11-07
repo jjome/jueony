@@ -3,7 +3,10 @@ import { preflightDocumentEdit } from './edit-preflight.ts';
 type CellLocation = { sec: number; ppi: number; ci: number; cellIndex: number };
 type StoredField = { fieldId: number; command: string; formula: string; format: string; comma: boolean };
 const formats = new Map([['default', '%g'], ['integer', '%.0f'], ['decimal1', '%.1f'], ['decimal2', '%.2f']]);
+const storedFunctions = new Set(['SUM','AVG','AVERAGE','PRODUCT','COUNT','MIN','MAX']);
 const native = (wasm: any) => wasm.borrowDocumentHandle?.() ?? wasm;
+
+export const supportsStoredFormulaFunction = (name: string): boolean => storedFunctions.has(name);
 
 export function storedFormulaResultFormat(format: string, comma: boolean): string {
   const pattern = formats.get(format);

@@ -8,11 +8,12 @@ const repo = resolve(import.meta.dirname, '../../..'), port = Number(process.env
 await mkdir(out, { recursive: true }); const engine = await loadReviewEngine(process.env.JUEONY_ENGINE_PACKAGE), { HwpDocument } = engine;
 const results = [], failures = [], pageErrors = [], external = []; let browser, page, server;
 async function services() { const f = await (await page.$('.editor-frame:not([hidden])')).contentFrame(); await f.evaluate(() => { if (window.__dateServices) return; const a = window.rhwpStudio.automation; a.registerCommand({ id: 'ext:date-fill-review', label: '날짜 검수', canExecute: () => true, execute: s => window.__dateServices = s }); a.execute('ext:date-fill-review'); a.unregisterCommand('ext:date-fill-review'); }); return f; }
-async function open(ext = 'hwpx', seeds = ['2026-01-31', '2026-02-28'], formula = false) {
+async function open(ext = 'hwpx', seeds = ['2026-01-31', '2026-02-28'], formula = false,storedField=false) {
   const d = HwpDocument.createEmpty(); d.createBlankDocument();
   const row = formula ? 1 : 0, first = row * 4, t = JSON.parse(d.createTable(0, 0, 0, row + 1, 4));
   const contents = formula ? ['2', '4', '6', '8', ...seeds, '기존', '원문'] : [...seeds, '기존', '원문'];
   contents.forEach((v, c) => d.insertTextInCell(0, t.paraIdx, t.controlIdx, c, 0, 0, v));
+  if(storedField)d.insertTableFormulaField(0,t.paraIdx,t.controlIdx,first,seeds[0],'=A1*2','%.2f');
   d.applyCharFormatInCell(0, t.paraIdx, t.controlIdx, first + 2, 0, 0, 2, '{"bold":true}');
   const bytes = [...d[ext === 'hwp' ? 'exportHwp' : 'exportHwpx']()]; d.free();
   const f = await services();
@@ -64,6 +65,24 @@ try {
         assert.deepEqual(expected.map((_, i) => reopened.getTextInCell(0, at.paragraph, at.control, i, 0, 0, reopened.getCellParagraphLength(0, at.paragraph, at.control, i, 0))), expected);
         assert.equal(JSON.parse(reopened.getCellCharPropertiesAt(0, at.paragraph, at.control, 6, 0, 0)).bold, true);
       } finally { reopened.free(); }
+    });
+  }
+  if(process.env.JUEONY_REVIEW_STORED_FILL==='1')for(const ext of ['hwp','hwpx'])for(const output of ['formula','value']){
+    await scenario(ext+'/'+output+' stored formula modal preview, real fields, undo/redo and guarded reopen',async()=>{
+      const frame=await open(ext,['원본','대상'],true,true),before=await capture(frame);
+      await command(frame,'table:auto-fill-integers');
+      const selector='[aria-label="수식 채우기 방식"]';await frame.waitForSelector(selector);await frame.select(selector,output);
+      const preview=await frame.$eval('[aria-label="자동 채우기 변경 미리보기"]',t=>[...t.rows].map(r=>r.cells[3].textContent));
+      const expressions=['=B1*2','=C1*2','=D1*2'],expected=['8.00','12.00','16.00'];
+      assert.deepEqual(preview,output==='value'?expected:expressions.map((expr,i)=>expr+' → '+expected[i]));
+      await frame.click('.modal-overlay .dialog-btn-primary');await frame.waitForSelector(selector,{hidden:true});
+      assert.deepEqual((await values(frame)).slice(5),expected);
+      const after=await capture(frame);await command(frame,'edit:undo');assert.deepEqual((await capture(frame)).bytes,before.bytes);
+      await command(frame,'edit:redo');assert.deepEqual((await capture(frame)).bytes,after.bytes);
+      const bytes=await frame.evaluate(async()=>{const a=window.jueonyEditor;if(await a.save()!=='saved')throw Error('save');return [...new Uint8Array(await(await a.fileHandle().getFile()).arrayBuffer())];});
+      const reopened=new HwpDocument(new Uint8Array(bytes));try{
+        assert.deepEqual(JSON.parse(reopened.getFieldList()).map(f=>f.command),['=A1*2??%.2f;;4.00',...(output==='value'?[]:expressions.map((expr,i)=>expr+'??%.2f;;'+expected[i]))]);
+      }finally{reopened.free();}
     });
   }
   await scenario('cyclic numeric preview remains open and cancellation preserves all source bytes', async () => {

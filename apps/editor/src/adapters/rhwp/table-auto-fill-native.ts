@@ -1,11 +1,13 @@
 import { planTableSeries, planTableFormulaCopy, planTableFormulaRecalculation, type TableSeries, type DateFillUnit, type FormulaFillOutput } from '../../modules/document/public/table-auto-fill.ts';
 import type { Table } from '../../modules/document/public/types.ts';
 import { verifyPreservedExport } from './preservation.ts';
+import {readTableFormulaFields} from './table-formula-fields.ts';
+import {planStoredFormulaFill,executeStoredFormulaFill,type FillCell,type StoredFill} from './stored-formula-fill.ts';
 type Point = { row: number; col: number };
 export type AutoFillBlock = { sec: number; ppi: number; ci: number; cellPath?: unknown[]; anchor: Point; focus: Point; excluded?: unknown[] };
-type SeriesCell = { index: number; row: number; column: number; text: string; charShape: number; paraShape: number; style: number };
+type SeriesCell = FillCell;
 type FormulaSeries = { kind: 'formula'; step: number; values: string[]; description: string };
-export type AutoFillPlan = { section: number; paragraph: number; control: number; block: AutoFillBlock; cells: SeriesCell[]; dateUnit: DateFillUnit; seedCount: number; output: FormulaFillOutput } & (TableSeries | FormulaSeries);
+export type AutoFillPlan = { section: number; paragraph: number; control: number; block: AutoFillBlock; cells: SeriesCell[]; dateUnit: DateFillUnit; seedCount: number; output: FormulaFillOutput; storedFill?:StoredFill;changedCells?:number[];relatedCells?:number[] } & (TableSeries | FormulaSeries);
 const parsed = (v: any): any => typeof v === 'string' ? JSON.parse(v) : v;
 const native = (wasm: any) => wasm.borrowDocumentHandle?.() ?? wasm;
 const integer = (v: unknown): v is number => Number.isSafeInteger(v) && (v as number) >= 0;
@@ -58,26 +60,45 @@ export function readAutoFillPlan(value: any, block: AutoFillBlock, dateUnit: Dat
   for (let sec = 0; sec < section; sec++) rootParagraph += doc.getParagraphCount(sec);
   const owner = controls.find((c: any) => c.list === 0 && c.para === rootParagraph && c.controlIndex === control && c.ctrlId === 'tbl');
   if (owner?.props?.Lock !== 0) throw new Error('보호된 표 또는 보호 상태를 확인할 수 없는 표입니다.');
+  let storedFields:ReturnType<typeof readTableFormulaFields>,queried=false;
   for (let index = 0; index < dims.cellCount; index++) {
     const info = parsed(doc.getCellInfo(section, paragraph, control, index));
     if (info.rowSpan !== 1 || info.colSpan !== 1) throw new Error('병합된 셀이 있는 표는 아직 자동 채우기를 지원하지 않습니다.');
     if (info.row < r0 || info.row > r1 || info.col < c0 || info.col > c1) continue;
     const props = parsed(doc.getCellProperties(section, paragraph, control, index));
     const list = lists.find((l: any) => l.isCell && l.hostListId === 0 && l.sectionIndex === section && l.hostPara === paragraph && l.controlIndex === control && l.cellIndex === index);
-    if (props.cellProtect !== false || doc.getCellParagraphCount(section, paragraph, control, index) !== 1 || !list || controls.some((c: any) => c.list === list.listId)) throw new Error('보호·개체·필드·중첩 표·여러 문단 셀은 자동 채우기를 지원하지 않습니다.');
+    if (props.cellProtect !== false || doc.getCellParagraphCount(section, paragraph, control, index) !== 1 || !list) throw new Error('보호·중첩 표·여러 문단 셀은 자동 채우기를 지원하지 않습니다.');
+    let field:FillCell['field'];
+    if(controls.some((c:any)=>c.list===list.listId)){
+      if(!queried){storedFields=readTableFormulaFields(doc,true);queried=true;}
+      const matches=storedFields?.fields.filter(f=>f.section===section&&f.paragraph===paragraph&&f.path.length===1&&f.path[0].controlIndex===control&&f.path[0].cellIndex===index);
+      if(matches?.length!==1 || !matches[0].editable || !storedFields?.canFill)throw Error('개체·보호된 필드·중첩 표는 자동 채우기를 지원하지 않습니다.');
+      field=matches[0];
+    }
     const count = doc.getCellParagraphLength(section, paragraph, control, index, 0);
     if (!integer(count) || count > 4000) throw new Error('한 셀의 기존 글자는 4,000자 이하여야 합니다.');
     const runs = parsed(doc.getCharShapeRunsInCellByPath(section, paragraph, JSON.stringify([{ controlIndex: control, cellIndex: index, cellParaIndex: 0 }]), 0, count));
     if (new Set(runs.map((r: any) => r.charShapeId)).size > 1) throw new Error('혼합 글자 서식 셀은 자동 채우기를 지원하지 않습니다.');
     const charShape = parsed(doc.getCellCharPropertiesAt(section, paragraph, control, index, 0, 0)).charShapeId, para = parsed(doc.getCellParaPropertiesAt(section, paragraph, control, index, 0)), style = parsed(doc.getCellStyleAt(section, paragraph, control, index, 0)).id;
     if (![charShape, para.paraShapeId, style].every(integer) || para.headType !== 'None') throw new Error('셀의 원문 서식을 확인하지 못하거나 자동 번호가 있습니다.');
-    cells.push({ index, row: info.row, column: info.col, text: doc.getTextInCell(section, paragraph, control, index, 0, 0, count), charShape, paraShape: para.paraShapeId, style });
+    cells.push({ index, row: info.row, column: info.col, text: doc.getTextInCell(section, paragraph, control, index, 0, 0, count), charShape, paraShape: para.paraShapeId, style,...(field?{field}:{}) });
   }
   cells.sort((a, b) => a.row - b.row || a.column - b.column);
   if (cells.length !== (r1 - r0 + 1) * (c1 - c0 + 1) || new Set(cells.map(c => `${c.row}:${c.column}`)).size !== cells.length) throw new Error('선택한 셀 범위가 유효하지 않습니다.');
   const anchor = cells.find(c => c.row === block.anchor.row && c.column === block.anchor.col);
-  const formula = anchor?.text.startsWith('=') === true;
+  if(!anchor?.field && cells.some(c=>c.field))throw Error('일반 셀 자동 채우기로 기존 계산식 필드를 덮어쓸 수 없습니다.');
+  const formula = Boolean(anchor?.field)||anchor?.text.startsWith('=') === true;
   if (formula && cells[0] !== anchor) cells.reverse();
+  if(anchor?.field){
+    const storedFill=planStoredFormulaFill(doc,[section,paragraph,control],cells,dims.rowCount,dims.colCount,output);
+    const final=new Map(storedFill.finalFields.map(([id,command,value])=>[id,{command,value}]));
+    const values=[anchor.field.expression!,...storedFill.steps.map(s=>output==='formula'?s.expression+' → '+final.get(s.fieldId)!.value:s.value)];
+    const changedCells=storedFill.steps.flatMap((s,i)=>output==='formula'?s.originalField===final.get(s.fieldId)?.command?[]:[i+1]:cells[i+1].text===s.value?[]:[i+1]);
+    const selected=new Set(cells.map(c=>c.index));
+    const relatedCells=[...new Set(storedFill.steps.flatMap(step=>step.dependents.filter(f=>!selected.has(f.cellIndex)).map(f=>f.cellIndex)))];
+    return {section,paragraph,control,block:structuredClone(block),cells,kind:'formula',description:output==='formula'?'저장된 계산식':'현재 계산값',step:0,
+      values,storedFill,changedCells,relatedCells,dateUnit,output,seedCount:1};
+  }
   const series = formula
     ? formulaSeries(doc, block, dims.rowCount, dims.colCount, cells, lists, controls, output)
     : planTableSeries(cells[0]?.text ?? '', cells[1]?.text ?? '', cells.length, dateUnit);
@@ -88,6 +109,7 @@ export function readAutoFillPlan(value: any, block: AutoFillBlock, dateUnit: Dat
 export function executeAutoFill(value: any, plan: AutoFillPlan): void {
   const doc = native(value), current = readAutoFillPlan(doc, plan.block, plan.dateUnit, plan.output);
   if (JSON.stringify(current) !== JSON.stringify(plan)) throw new Error('셀 원문·서식 또는 표 범위가 바뀌었습니다. 자동 채우기를 다시 여세요.');
+  if(plan.storedFill){executeStoredFormulaFill(doc,[plan.section,plan.paragraph,plan.control],plan.cells,plan.storedFill,plan.output);return;}
   plan.cells.slice(plan.seedCount).forEach((cell, index) => {
     const text = plan.values[index + plan.seedCount]; if (text === cell.text) return;
     const args = [plan.section, plan.paragraph, plan.control, cell.index, 0], count = doc.getCellParagraphLength(...args);

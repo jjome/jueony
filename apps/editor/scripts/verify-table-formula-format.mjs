@@ -246,7 +246,10 @@ try {
   });
   await page.screenshot({ path: resolve(out, 'table-formula-format.png') });
   assert.deepEqual(pageErrors, []); assert.deepEqual(externalRequests, []);
-  await writeFile(resolve(out, 'result.json'), JSON.stringify({ results, failures, pageErrors, externalRequests, diagnostics, savedFiles, dist, enginePackage: pkg, port, limitations: 'Actual Edge formula dialog and Rust/WASM; displayed numeric precision, snapshot undo/redo and strict HWP/HWPX save/reopen. Failure injection checks rollback and refused operations. Ordinary cells receive result text. Existing supported FORMULA fields preserve the expression, cached value and format when edited. Whole-table automatic recalculation, model calls and native Hancom parity are outside these scenarios.' }, null, 2));
+  await writeFile(resolve(out, 'result.json'), JSON.stringify({ results, failures, pageErrors, externalRequests, diagnostics, savedFiles, dist, enginePackage: pkg, port,
+    scope: 'Edge formula dialog and Rust/WASM. Covers displayed precision, snapshot undo/redo, strict HWP/HWPX save/reopen, stale edits, invalid formulas and refused operations. Ordinary cells receive result text by default. Selecting the stored-field option saves the expression and creates an identifiable FORMULA field.',
+    limitations: 'Automatic recalculation on ordinary typing, unsupported formulas, live model calls and Hancom comparisons are outside these scenarios.',
+  }, null, 2));
   if (failures.length) process.exitCode = 1;
 } catch (error) { console.error(error); process.exitCode = 1; await writeFile(resolve(out, 'fatal.json'), JSON.stringify({ error: String(error), stack: error.stack, results, failures, pageErrors }, null, 2)); }
 finally { await browser?.close(); server.kill(); }

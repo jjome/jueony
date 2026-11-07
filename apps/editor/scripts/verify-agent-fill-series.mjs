@@ -11,6 +11,7 @@ const {HwpDocument}=await loadReviewEngine(resolve(process.env.JUEONY_ENGINE_PAC
 const port=Number(process.env.JUEONY_TEST_PORT??4576),origin='http://127.0.0.1:'+port;
 const nativeFieldReview=process.env.JUEONY_REVIEW_NATIVE_FORMULAS==='1';
 const cascadeReview=process.env.JUEONY_REVIEW_FORMULA_DEPENDENTS==='1';
+const storedFillReview=process.env.JUEONY_REVIEW_STORED_FILL==='1';
 if(nativeFieldReview){
   assert.equal(typeof HwpDocument.prototype.previewTableFormulaField,'function','The review engine must export stored formula preview');
   assert.equal(typeof HwpDocument.prototype.updateTableFormulaField,'function','The review engine must export stored formula editing');
@@ -25,6 +26,10 @@ const scenarios=[
   {request:'수식을 오른쪽으로 복사해줘',mode:'formula',row:1,original:formula,expected:[...formula.slice(0,5),'=B1+$A$1','=C1+$A$1','=D1+$A$1']},
   {request:'오른쪽 세 셀에 계산한 값을 써줘',mode:'calculated-value',row:1,original:formula,expected:[...formula.slice(0,5),'6','8','10']}
 ];
+if(storedFillReview)for(const mode of ['formula','calculated-value']){
+  scenarios.push({request:mode==='formula'?'실제 계산식 필드를 오른쪽 세 셀에 복사해줘':'실제 계산식의 결과만 오른쪽 세 셀에 채워줘',
+    mode,row:1,stored:true,original:['2','4','6','8','4.00','첫 대상','둘째','셋째'],expected:['2','4','6','8','4.00','8.00','12.00','16.00']});
+}
 const calls=[];
 function propose(input){
   const fieldCase=fieldCases.find(c=>c.request===input.instruction);
@@ -36,6 +41,7 @@ function propose(input){
       originalCommand:field.storedCommand,formula:fieldCase.formula,resultFormat:fieldCase.format};
   }
   const test=scenarios.find(c=>c.request===input.instruction),table=input.document.structure.tables[0];
+  if(test.stored){assert.equal(input.document.tableFormulaFields.canFill,true);assert.equal(input.document.tableFormulaFields.fields[0].expression,'=A1*2');}
   assert.deepEqual(table.cells.map(c=>c.text),test.original);calls.push(test.mode);
   return {kind:'fill_table_series',target:table.id,startRow:test.row,startColumn:0,endRow:test.row,endColumn:3,mode:test.mode};
 }
@@ -70,20 +76,26 @@ try {
     const table=JSON.parse(doc.createTable(0,0,0,test.row+1,4)),styled=test.row*4+2;
     for(const [i,text] of test.original.entries()) doc.insertTextInCell(0,table.paraIdx,table.controlIdx,i,0,0,text);
     doc.applyCharFormatInCell(0,table.paraIdx,table.controlIdx,styled,0,0,Array.from(test.original[styled]).length,'{"bold":true}');
+    if(test.stored)doc.insertTableFormulaField(0,table.paraIdx,table.controlIdx,4,'4.00','=A1*2','%.2f');
     const bytes=Array.from(format==='hwp'?doc.exportHwp():doc.exportHwpx());doc.free();
     await frame.evaluate(async(bytes,name)=>{
       const root=await navigator.storage.getDirectory(),handle=await root.getFileHandle(name,{create:true}),writer=await handle.createWritable();
       await writer.write(new Uint8Array(bytes));await writer.close();await window.jueonyEditor.open(new Uint8Array(bytes),name,handle,false);
-    },bytes,test.mode+'.'+format);
+    },bytes,(test.stored?'stored-':'')+test.mode+'.'+format);
     await fill('request-input',test.request);const sent=page.waitForResponse(r=>r.url()===origin+'/api/generate');await page.click('#send-request');await sent;
     await page.waitForFunction(()=>!document.getElementById('send-request').disabled);
     assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'',format+'/'+test.mode);
     const current=()=>frame.evaluate(()=>window.jueonyEditor.snapshot().structure.tables[0].cells.map(c=>c.text));
     assert.deepEqual(await current(),test.expected);
+    const storedCommands=()=>frame.evaluate(()=>window.jueonyEditor.snapshot().tableFormulaFields.fields.map(f=>f.storedCommand));
+    const expectedCommands=['=A1*2??%.2f;;4.00',...(test.mode==='formula'?['=B1*2??%.2f;;8.00','=C1*2??%.2f;;12.00','=D1*2??%.2f;;16.00']:[])];
+    if(test.stored)assert.deepEqual(await storedCommands(),expectedCommands);
     const buttons=(await page.$$('.message-actions button')).reverse();
     for(const b of buttons) if(await b.evaluate(e=>e.textContent==='요청 되돌리기')){await b.click();break;}
     await page.waitForFunction(()=>document.getElementById('app-status').textContent.includes('되돌렸습니다'));assert.deepEqual(await current(),test.original);
+    if(test.stored)assert.deepEqual(await storedCommands(),expectedCommands.slice(0,1));
     assert.equal((await frame.evaluate(()=>window.jueonyEditor.executeCommand('edit:redo'))).ok,true);assert.deepEqual(await current(),test.expected);
+    if(test.stored)assert.deepEqual(await storedCommands(),expectedCommands);
     const file=await frame.evaluate(async()=>{
       const api=window.jueonyEditor,status=await api.save(),t=api.snapshot().structure.tables[0],f=await api.fileHandle().getFile();
       return {status,dirty:api.state().dirty,coords:[t.section,t.paragraph,t.control],bytes:Array.from(new Uint8Array(await f.arrayBuffer()))};
@@ -93,8 +105,14 @@ try {
     try {
       assert.deepEqual(test.expected.map((_,i)=>reopened.getTextInCell(...file.coords,i,0,0,reopened.getCellParagraphLength(...file.coords,i,0))),test.expected);
       assert.equal(JSON.parse(reopened.getCellCharPropertiesAt(...file.coords,styled,0,0)).bold,true);
+      if(test.stored){
+        assert.deepEqual(JSON.parse(reopened.getFieldList()).map(f=>f.command),expectedCommands);
+        const path=resolve(await mkdtemp(resolve(repo,'build/native-formula-fill-')),'agent.'+format);await writeFile(path,new Uint8Array(file.bytes));
+        const raw=JSON.parse(execFileSync('python',[resolve(import.meta.dirname,'lib/read-native-formula-fields.py'),path],{encoding:'utf8'}));
+        assert.deepEqual(format==='hwp'?raw.fields.map(f=>f.command):raw.map(f=>f.params.find(([,key])=>key==='Command')[2]),expectedCommands);
+      }
     } finally {reopened.free();}
-    console.log('PASS',format,test.mode,'chat, real edit, undo/redo, saved bytes, Native reopen and formatting');
+    console.log('PASS',format,test.stored?'native FORMULA fill':'fill',test.mode,'chat, real edit, undo/redo, saved bytes, Native reopen and formatting');
   }
   assert.deepEqual(calls,[...scenarios,...scenarios].map(c=>c.mode));assert.deepEqual(errors,[]);
   if(nativeFieldReview)for(const format of ['hwp','hwpx'])for(const fieldCase of fieldCases){
@@ -152,6 +170,6 @@ try {
     finally{reopened.free();}
     console.log('PASS',format,fieldCase.dependent?'native FORMULA edit and dependent recalculation':'native FORMULA edit','chat, sibling fields, undo/redo, guarded save, independent file metadata and reopened result');
   }
-  if(nativeFieldReview)assert.deepEqual(calls.slice(6),Array(fieldCases.length*2).fill('field'));
+  if(nativeFieldReview)assert.deepEqual(calls.slice(scenarios.length*2),Array(fieldCases.length*2).fill('field'));
   assert.deepEqual(errors,[]);
 } finally {await browser?.close();server.kill();await new Promise(r=>provider.close(r));}

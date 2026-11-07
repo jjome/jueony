@@ -11,7 +11,7 @@ export type TableCellPathStep = {controlIndex:number;cellIndex:number;cellParaIn
 export type AgentTableFormulaFields={
  fields:Array<{tableId:string;section:number;paragraph:number;path:TableCellPathStep[];row:number;column:number;fieldId:number;
    start:number;end:number;storedCommand:string;displayedValue:string;editable:boolean;expression?:string;resultFormat?:string}>;
- unresolved:number|null;canEdit:boolean;canRefreshDependents:boolean;
+ unresolved:number|null;canEdit:boolean;canRefreshDependents:boolean;canFill?:boolean;
 };
 export type AgentTableFormulaOp={kind:'update_table_formula_field';target:string;row:number;column:number;fieldId:number;originalCommand:string;formula:string;resultFormat:string};
 export type TableFormulaChange={tableId:string;row:number;column:number;fieldId:number;before:{command:string;value:string};after:{command:string;value:string}};

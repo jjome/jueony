@@ -20,7 +20,7 @@ test('one queried native field can be edited while ordinary cell text remains pr
 });
 test('stale, injected, malformed and batched formula commands fail before execution',()=>{
  for(const override of [{row:1},{row:-1},{target:'alias'},{fieldId:44},{originalCommand:'stale'},{formula:'='},{formula:'=1\n+2'},
-  {formula:'=1;;field metadata'},{formula:'=1??%g'},{resultFormat:'%n'},{unsafe:true}]){
+  {formula:'=1;;field metadata'},{formula:'=1??%g'},{formula:'='+'1'.repeat(512)},{formula:'='+'가'.repeat(171)},{resultFormat:'%n'},{unsafe:true}]){
   assert.throws(()=>validateEditOperations([{...op,...override}],scope()));
  }
  assert.throws(()=>validateEditOperations([op,op],scope()));

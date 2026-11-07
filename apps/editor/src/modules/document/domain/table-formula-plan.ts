@@ -247,9 +247,22 @@ function finite(value: number): number {
 export function translateTableFormula(formula: string, rowDelta: number, columnDelta: number,
   dimensions: Shape): string {
   const shape = shapeOf(dimensions);
+  const result = shiftReferences(formula, parse(formula, shape).references, rowDelta, columnDelta, shape);
+  parse(result, shape);
+  return result;
+}
+
+/** Stored HWP formulas are parsed by the native engine. Keep direction names
+ * such as ABOVE intact and shift only range-checked A1 token coordinates. */
+export function translateStoredTableFormula(formula:string, rowDelta:number, columnDelta:number, dimensions:Shape):string {
+  const shape=shapeOf(dimensions);
+  const references=tokenize(formula, shape).flatMap(t=>t.reference?[t.reference]:[]);
+  return shiftReferences(formula,references,rowDelta,columnDelta,shape);
+}
+
+function shiftReferences(formula:string,references:readonly Reference[],rowDelta:number,columnDelta:number,shape:Shape):string {
   whole(rowDelta, '행 이동량', -MAX_SLOTS, MAX_SLOTS);
   whole(columnDelta, '열 이동량', -MAX_SLOTS, MAX_SLOTS);
-  const references = parse(formula, shape).references;
   let result = '', end = 0;
   for (const ref of references) {
     const row = ref.row + (ref.fixedRow ? 0 : rowDelta);
@@ -261,11 +274,7 @@ export function translateTableFormula(formula: string, rowDelta: number, columnD
       (ref.fixedRow ? '$' : '') + (row + 1);
     end = ref.end;
   }
-  const translated = result + formula.slice(end);
-  // A mixed absolute/relative range can reverse its endpoint ordering even
-  // when both addresses remain in bounds; fail before returning that formula.
-  parse(translated, shape);
-  return translated;
+  return result + formula.slice(end);
 }
 
 type Grid = Readonly<{shape: Shape; owners: readonly (readonly number[])[]; cells: readonly Cell[]}>;

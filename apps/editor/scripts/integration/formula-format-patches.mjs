@@ -16,7 +16,7 @@ export function patchFormulaFormat(source) {
     if (source.split(before).length !== 2) throw new Error('Formula transaction integration drift');
     source = source.replace(before, after);
   };
-  source = "import { readStoredTableFormula, storedFormulaResultFormat, updateStoredTableFormula } from '../jueony/adapters/rhwp/stored-table-formula.ts';\n"
+  source = "import { readStoredTableFormula, storedFormulaResultFormat, supportsStoredFormulaFunction, updateStoredTableFormula } from '../jueony/adapters/rhwp/stored-table-formula.ts';\n"
     + "import { insertStoredTableFormula } from '../jueony/adapters/rhwp/insert-stored-table-formula.ts';\n" + source;
   replace('  private formulaInput!: HTMLInputElement;', `  private storedField: ReturnType<typeof readStoredTableFormula>;
   private openRevision: string;
@@ -26,7 +26,7 @@ export function patchFormulaFormat(source) {
     this.storedField = readStoredTableFormula(wasm, ctx);
     this.openRevision = (window as any).jueonyEditor?.revision();`);
   replace("    this.formulaInput.value = '=';", "    this.formulaInput.value = this.storedField?.formula ?? '=';");
-  replace('      FUNCTIONS.forEach(f => this.funcSelect.appendChild', `      const functions = this.storedField ? FUNCTIONS.filter(f => ['SUM','AVERAGE','PRODUCT','COUNT','MIN','MAX'].includes(f.name)) : FUNCTIONS;
+  replace('      FUNCTIONS.forEach(f => this.funcSelect.appendChild', `      const functions = this.storedField ? FUNCTIONS.filter(f => supportsStoredFormulaFunction(f.name)) : FUNCTIONS;
       functions.forEach(f => this.funcSelect.appendChild`);
   replace('      return this.formatSelect;', "      if (this.storedField) this.formatSelect.value = this.storedField.format;\n      return this.formatSelect;");
   replace('    this.commaCheck.checked = true;', '    this.commaCheck.checked = this.storedField?.comma ?? true;');
@@ -39,7 +39,7 @@ export function patchFormulaFormat(source) {
       this.insertField.dataset.formulaStorage = 'field';
       this.insertField.addEventListener('change', () => {
         for (const option of Array.from(this.funcSelect.options)) {
-          option.disabled = !!this.insertField?.checked && !!option.value && !['SUM','AVERAGE','PRODUCT','COUNT','MIN','MAX'].includes(option.value);
+          option.disabled = !!this.insertField?.checked && !!option.value && !supportsStoredFormulaFunction(option.value);
         }
       });
       label.append(this.insertField, '계산식 필드로 삽입');

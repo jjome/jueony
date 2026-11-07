@@ -8,6 +8,7 @@ import { assertNativeTableWritable } from './table-write-guard.ts';
 import { capturePreservationEvidence } from './preservation.ts';
 import { topologySemantics, rootBodyTexts, tableTextTree } from './table-topology-evidence.ts';
 import { tableLayoutEvidence, sameTableLayout } from './table-layout-evidence.ts';
+import {hwpSubdivisionSource,verifiedSubdivisionHwp} from './hwp-table-subdivision.ts';
 const canonical = (v:any):any => Array.isArray(v) ? v.map(canonical) : v && typeof v === 'object' ? Object.fromEntries(Object.keys(v).sort().map(k => [k, canonical(v[k])])) : v;
 const same = (a:any, b:any) => JSON.stringify(canonical(a)) === JSON.stringify(canonical(b));
 const hash = (v:any) => Array.from(sha256(new TextEncoder().encode(JSON.stringify(canonical(v)))),n=>n.toString(16).padStart(2,'0')).join('');
@@ -16,14 +17,17 @@ function paragraphFormat(d:any, t:Table, cell:number, paragraph:number) {
   return hash([parsed(d.getCellParaPropertiesAt(...at)), parsed(d.getCellCharPropertiesAt(...at, 0)), parsed(d.getCellStyleAt(...at))]);
 }
 export function readTableSubdivisionSources(wasm:any, tables:Table[], name:string):Record<string,AgentTableSubdivisionSource> {
-  const d = nativeDocument(wasm), merge = readTableMergeSources(d, tables, name);
+  const d = nativeDocument(wasm), binary=/\.hwp$/iu.test(name);
+  const merge = binary ? undefined : readTableMergeSources(d, tables, name);
   const mergedTables = tables.filter(t => t.cells.some(c => c.rowSpan > 1 || c.columnSpan > 1));
-  const split = mergedTables.length ? readTableSplitSources(d, mergedTables, name) : undefined;
+  const split = !binary && mergedTables.length ? readTableSplitSources(d, mergedTables, name) : undefined;
   return Object.fromEntries(tables.map(t => { try {
+    if (binary && wasm.requiresPasswordForSave===true) throw new Error('protected HWP');
     const p = parsed(d.getTableProperties(t.section, t.paragraph, t.control));
     const primary = t.cells.find(c => c.rowSpan > 1 || c.columnSpan > 1);
-    const grid = split?.[t.id], authority = primary ? grid : merge?.[t.id];
-    if (!/\.hwpx$/iu.test(name) || typeof d.splitTableCellInto !== 'function' || authority?.editable !== true || p.cellZoneCount!==0 || p.repeatHeader || p.pageBreak !== 0 || t.cells.some(c => c.properties.isHeader || c.properties.textDirection !== 0)) throw new Error('unsupported');
+    const native = binary ? hwpSubdivisionSource(d,t,tables) : undefined;
+    const grid = native && 'widths' in native ? native : split?.[t.id], authority = native ?? (primary ? grid : merge?.[t.id]);
+    if (!/\.hwpx?$/iu.test(name) || typeof d.splitTableCellInto !== 'function' || authority?.editable !== true || p.cellZoneCount!==0 || p.repeatHeader || p.pageBreak !== 0 || t.cells.some(c => c.properties.isHeader || c.properties.textDirection !== 0)) throw new Error('unsupported');
     const widths = primary ? grid!.widths! : t.cells.slice(0, t.columns).map(c => Number(c.properties.width));
     const heights = primary ? grid!.heights! : Array.from({ length: t.rows }, (_, r) => Number(t.cells[r * t.columns].properties.height));
     const total = (tracks:number[], start:number, span:number) => tracks.slice(start,start+span).reduce((a,b) => a+b,0);
@@ -40,8 +44,8 @@ export function readTableSubdivisionSources(wasm:any, tables:Table[], name:strin
     const paragraphFormats = primary && count > 1 && count <= primary.rowSpan * primary.columnSpan
       && typeof d.splitCellParagraphs === 'function' && primary.text.split('\n').length === count
       ? Array.from({length:count}, (_, i) => paragraphFormat(d,t,primary.index,i)) : undefined;
-    return [t.id, { editable: true, fingerprint: hash({ merge: authority, table: t, properties: p, preservation: preservation.values }), cells, frame, ...(paragraphFormats ? {paragraphFormats} : {}) }];
-  } catch { return [t.id, { editable: false, reason: '셀 분할에는 한 쪽 HWPX 본문 표와 확인된 격자 크기가 필요합니다. 병합 원본은 둘레 격자가 확인된 주 셀 하나를 지원합니다. 보호·제목·영역 서식·중첩·복합 배치는 제외합니다.' }]; } }));
+    return [t.id, { editable: true, fingerprint: hash({ merge: authority, table: t, properties: p, preservation: preservation.values }), cells, frame, ...(binary ? {hwp5Grid:{widths,heights}} : {}), ...(paragraphFormats ? {paragraphFormats} : {}) }];
+  } catch { return [t.id, { editable: false, reason: '한 쪽 본문 표에서 확인된 격자를 분할할 수 있습니다. HWP5는 본문 표 한 개와 원본 형식의 저장·재열기 검사를 추가로 요구합니다. 보호·제목·중첩·복합 배치는 제외합니다.' }]; } }));
 }
 export function assertTableSubdivisionResult(wasm:any, base:Snapshot, op:AgentTableSubdivisionOp):void {
   const d = nativeDocument(wasm), plan = tableSubdivisionPlan(op, base), t = plan.table, actual = readStructure(d).tables.find(v => v.id === t.id);
@@ -68,8 +72,9 @@ export function assertTableSubdivisionResult(wasm:any, base:Snapshot, op:AgentTa
   const divided = plan.cells.filter(c=>c.originIndex===null||c.originIndex===plan.primary.index);
   const columns = [...new Set(divided.map(c=>c.column))], rows = [...new Set(divided.map(c=>c.row))];
   for(const c of divided){const actual=newFrame.cells.find(v=>v.index===c.index),left=plan.widths.slice(0,columns.indexOf(c.column)).reduce((a,b)=>a+b,0),top=plan.heights.slice(0,rows.indexOf(c.row)).reduce((a,b)=>a+b,0),scaleX=original.w/Number(plan.primary.properties.width),scaleY=original.h/Number(plan.primary.properties.height);if(!actual||!sameTableLayout({x:actual.x,y:actual.y,w:actual.w,h:actual.h},{x:original.x+left*scaleX,y:original.y+top*scaleY,w:Number(c.properties.width)*scaleX,h:Number(c.properties.height)*scaleY}))throw new Error('새 셀의 실제 크기·위치가 원본 영역 분배와 다릅니다.');}
-  let copy:any; try { copy = new d.constructor(d.exportHwpx());
-    if (op.distributeParagraphs) checkCells(copy, readStructure(copy).tables.find(v => v.id === t.id));
+  let copy:any; try { const binary=!!plan.source.hwp5Grid;
+    copy = new d.constructor(binary ? verifiedSubdivisionHwp(d) : d.exportHwpx());
+    if (binary || op.distributeParagraphs) checkCells(copy, readStructure(copy).tables.find(v => v.id === t.id));
     if (!sameTableLayout(after, tableLayoutEvidence(copy, actual))) throw new Error('임의 분할 뒤 저장 재열기의 셀·글줄 배치가 다릅니다.'); } finally { copy?.free(); }
 }
 export function executeTableSubdivision(wasm:any, base:Snapshot, op:AgentTableSubdivisionOp) {

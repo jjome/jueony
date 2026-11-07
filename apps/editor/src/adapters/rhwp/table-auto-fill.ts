@@ -7,7 +7,17 @@ export function installTableAutoFill(registry: any, input: () => any, eventBus: 
     return c && context.hasDocument && context.isEditable && !context.isFormMode && context.inCellSelectionMode
       && !ih.isComposing && !ih.wasm.requiresPasswordForSave && !c.isInHeaderFooter() && !c.isInFootnote() && !c.isInTextBox();
   };
-  const read = (unit: DateFillUnit = 'days', output: FormulaFillOutput = 'formula') => readAutoFillPlan(input().wasm, input().cursor.captureCellSelection(), unit, output);
+  // The command registry asks repeatedly while the selection is unchanged.
+  // Building a stored-field preview may serialize the open file and evaluate a graph.
+  let previous:{key:string;plan:ReturnType<typeof readAutoFillPlan>}|undefined;
+  const read = (unit: DateFillUnit = 'days', output: FormulaFillOutput = 'formula') => {
+    const ih=input(), api=(window as any).jueonyEditor, block=ih.cursor.captureCellSelection();
+    const key=JSON.stringify([ih.wasm.documentGeneration,api?.revision(),block,unit,output]);
+    if(previous?.key===key)return previous.plan;
+    const plan=readAutoFillPlan(ih.wasm,block,unit,output);
+    previous=plan.storedFill && api?{key,plan}:undefined;
+    return plan;
+  };
   registry.register({ id: 'table:auto-fill-integers', label: '자동 채우기 (정수·날짜·번호·수식)', opensDialog: true,
     canExecute: (context: any) => { if (!safe(context)) return false; try { read(); return true; } catch { return false; } },
     execute: () => {
@@ -16,11 +26,11 @@ export function installTableAutoFill(registry: any, input: () => any, eventBus: 
       new TableAutoFillDialog(plan.kind, (unit, output) => { assertCurrent(); return read(unit, output); }, (unit, output) => {
         assertCurrent();
         const selectedPlan = read(unit, output);
-        if (selectedPlan.cells.slice(selectedPlan.seedCount).every((c, i) => c.text === selectedPlan.values[i + selectedPlan.seedCount])) return;
+        if (selectedPlan.storedFill?!selectedPlan.storedFill.changed:selectedPlan.cells.slice(selectedPlan.seedCount).every((c, i) => c.text === selectedPlan.values[i + selectedPlan.seedCount])) return;
         preflightAutoFill(input().wasm, selectedPlan); assertCurrent();
         const ih = input(); executeAutoFillSnapshot(ih, selectedPlan);
         ih.cursor.restoreCellSelection(plan.block); ih.updateCellSelection(); ih.caret.hide(); eventBus.emit('command-state-changed');
-      }).show();
+      },Boolean(plan.storedFill)).show();
     },
   });
   const anchor = document.querySelector('.md-item[data-cmd="table:text-to-table"]');

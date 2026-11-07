@@ -109,6 +109,69 @@ await scenario('paragraph distribution refuses insufficient slots, hidden capabi
     assert.throws(()=>d.splitCellParagraphs(0,1,0,0,0,2,2));assert.deepEqual(d.exportHwpx(),protectedBytes);
   } finally {d.free();}
 });
+for (const [kind,merged,distribute] of [['plain',false,false],['merged',true,false],['distributed',true,true]]) {
+ await scenario('HWP5 '+kind+': native save/reopen, metadata, styles, positions and history', async()=>{
+   const source=fixture();
+   for(let i=0;i<9;i++)source.setCellProperties(0,1,0,i,'{"width":10000,"height":10000}');
+   source.applyParaFormatInCell(0,1,0,3,0,'{"alignment":"right"}');
+   source.applyCharFormatInCell(0,1,0,1,0,0,6,'{"bold":true}');
+   const summary=json(source.getDocumentMetadata());
+   source.setDocumentMetadata(summary.fingerprint,JSON.stringify({...summary.values,title:'표 분할',subject:'검수',author:'합성',description:'보존'}));
+   if(merged)source.mergeTableCells(0,1,0,0,0,1,1);
+   const d=new HwpDocument(source.exportHwp());source.free();
+   try {
+     const s=snap(d,'원본.hwp'), t=s.structure.tables[0], cap=s.tableSubdivisionSources[t.id];
+     assert.equal(d.getSourceFormat(),'hwp');assert.equal(cap.editable,true);assert.ok(cap.hwp5Grid);
+     const meta=d.getDocumentMetadata(),stamp=d.getDocumentStoredInformation(),bytes=d.exportHwp(),undo=d.saveSnapshot();
+     const cmd={...op(t,merged?0:1,merged?0:1,2,2),distributeParagraphs:distribute};
+     apply(d,s,cmd);
+     const target=resolve(out,'original-format-'+kind+'.hwp'), after=d.exportHwp(),redo=d.saveSnapshot();
+     await writeFile(target,after);const disk=await readFile(target);
+     assert.deepEqual([...disk.subarray(0,8)],[208,207,17,224,161,177,26,225]);
+     const copy=new HwpDocument(disk);
+     try {
+       assert.equal(copy.getSourceFormat(),'hwp');
+       assert.deepEqual(json(copy.getDocumentMetadata()).values,json(meta).values);assert.equal(copy.getDocumentStoredInformation(),stamp);
+       assert.deepEqual(readStructure(copy),readStructure(d));assert.deepEqual(capturePreservationEvidence(copy).values,capturePreservationEvidence(d).values);
+       assert.ok(sameTableLayout(tableLayoutEvidence(copy,t),tableLayoutEvidence(d,t)));
+       if(distribute) assert.deepEqual(readStructure(copy).tables[0].cells.filter(c=>c.row<2&&c.column<2).map(c=>c.text),['Cell 0','Cell 1','Cell 3','Cell 4']);
+     } finally {copy.free();}
+     d.restoreSnapshot(undo);assert.deepEqual(d.exportHwp(),bytes);d.restoreSnapshot(redo);assert.deepEqual(d.exportHwp(),after);
+     d.discardSnapshot(redo);d.discardSnapshot(undo);
+   } finally {d.free();}
+ });
+}
+await scenario('HWP5 refuses a second table, protected source, reported serialization loss, and mismatched provenance',()=>{
+ for(const mode of ['second','protected','loss','suffix','signature','password']){
+   const source=fixture({second:mode==='second'}), d=new HwpDocument(mode==='suffix'?source.exportHwpx():source.exportHwp());source.free();
+   try {
+     if(mode==='protected')d.setCellProperties(0,1,0,0,'{"cellProtect":true}');
+     const bytes=d.exportHwp();
+     if(mode==='loss'){const native=d.exportHwpWithReport.bind(d);d.exportHwpWithReport=()=>{
+       const a=native();return {takeBytes:()=>a.takeBytes(),contentLoss:()=>JSON.stringify({schemaVersion:1,outputFormat:'hwp',count:1,losses:[{code:'metadataReduced'}]}),free:()=>a.free()};};}
+     if(mode==='signature'){const native=d.exportHwpWithReport.bind(d);d.exportHwpWithReport=()=>{
+       const a=native();return {takeBytes:()=>d.exportHwpx(),contentLoss:()=>a.contentLoss(),free:()=>a.free()};};}
+     const s=snap(d,'원본.hwp'),t=s.structure.tables[0];
+     if(mode==='password') s.tableSubdivisionSources=readTableSubdivisionSources({borrowDocumentHandle:()=>d,requiresPasswordForSave:true},s.structure.tables,s.name);
+     assert.equal(s.tableSubdivisionSources[t.id].editable,false,mode);
+     assert.throws(()=>apply(d,s,op(t,1,1,2,2)));assert.deepEqual(d.exportHwp(),bytes);
+   } finally {d.free();}
+ }
+});
+await scenario('HWP5 live post-split binary loss restores original document and bytes',()=>{
+ const source=fixture(),d=new HwpDocument(source.exportHwp());source.free();
+ try {
+   const s=snap(d,'원본.hwp'), t=s.structure.tables[0], bytes=d.exportHwp(), native=d.exportHwpWithReport.bind(d);
+   assert.equal(s.tableSubdivisionSources[t.id].editable,true);
+   let injected=false;
+   d.exportHwpWithReport=()=>{
+     const a=native();if(json(d.getTableDimensions(t.section,t.paragraph,t.control)).cellCount===t.cells.length)return a;
+     injected=true;return {takeBytes:()=>bytes,contentLoss:()=>a.contentLoss(),free:()=>a.free()};
+   };
+   assert.throws(()=>apply(d,s,op(t,1,1,2,2)));
+   assert.equal(injected,true);assert.deepEqual(d.exportHwp(),bytes);assert.deepEqual(readStructure(d),s.structure);
+ } finally {d.free();}
+});
 await scenario('merged source rejects non-aligned cuts, unlisted neighbor and stale widths before write',()=>{
   const doc=fixture();
   try {
@@ -139,11 +202,11 @@ for (const [name, row, col, rows, cols, options] of [['vertical-center', 1, 1, 2
 });
 await scenario('content minimum grows outer table: reject and restore exact bytes', () => { const d = fixture(); try { const s = snap(d), bytes = d.exportHwpx(); assert.throws(() => apply(d, s, op(s.structure.tables[0], 0, 0, 1, 3))); assert.deepEqual(d.exportHwpx(), bytes); } finally { d.free(); } });
 await scenario('invalid args, alias, no-op, overflow and missing cell refuse without writes', () => { const d = fixture(); try { const s = snap(d), command = op(s.structure.tables[0], 1, 1, 2, 2), bytes = d.exportHwpx(); for (const change of [{ target: '@new' }, { row: -1 }, { row: 99 }, { rows: 0 }, { rows: 1, columns: 1 }, { columns: 8.5 }, { rows: 8, columns: 8 }, { equalRowHeight: false }, { row: true }]) { assert.throws(() => apply(d, s, { ...command, ...change })); assert.deepEqual(d.exportHwpx(), bytes); } } finally { d.free(); } });
-await scenario('protection, header, field, bookmark, mixed, multiple merges, HWP and inconsistent dimensions close capability', () => { for (const mode of ['protect', 'lock', 'header', 'field', 'bookmark', 'mixed', 'merged', 'hwp', 'width', 'pageBreak']) { const d = fixture(); try { if (mode === 'protect') d.setCellProperties(0, 1, 0, 8, '{"cellProtect":true}'); if (mode === 'lock') d.setControlLock(1, 0, true); if (mode === 'header') d.setCellProperties(0, 1, 0, 0, '{"isHeader":true}'); if (mode === 'field') d.insertClickHereField(0, 0, 0, 'Field', '', 'Input', true); if (mode === 'bookmark') d.addBookmark(0, 0, 0, 'mark'); if (mode === 'mixed') d.applyCharFormatInCell(0, 1, 0, 0, 0, 0, 1, '{"bold":true}'); if (mode === 'merged') {d.mergeTableCells(0, 1, 0, 0, 0, 0, 1); d.mergeTableCells(0, 1, 0, 2, 0, 2, 1);} if (mode === 'width') d.setCellProperties(0, 1, 0, 3, '{"width":9999}'); if (mode === 'pageBreak') d.setTableProperties(0, 1, 0, '{"pageBreak":2}'); const s = snap(d, mode === 'hwp' ? 'fixture.hwp' : 'fixture.hwpx'), bytes = d.exportHwpx(), t = s.structure.tables[0]; assert.equal(s.tableSubdivisionSources[t.id].editable, false, mode); assert.throws(() => apply(d, s, op(t, 1, 1, 2, 2))); assert.deepEqual(d.exportHwpx(), bytes); } finally { d.free(); } } });
+await scenario('protection, header, field, bookmark, mixed, multiple merges, renamed HWPX and inconsistent dimensions close capability', () => { for (const mode of ['protect', 'lock', 'header', 'field', 'bookmark', 'mixed', 'merged', 'hwp', 'width', 'pageBreak']) { const d = fixture(); try { if (mode === 'protect') d.setCellProperties(0, 1, 0, 8, '{"cellProtect":true}'); if (mode === 'lock') d.setControlLock(1, 0, true); if (mode === 'header') d.setCellProperties(0, 1, 0, 0, '{"isHeader":true}'); if (mode === 'field') d.insertClickHereField(0, 0, 0, 'Field', '', 'Input', true); if (mode === 'bookmark') d.addBookmark(0, 0, 0, 'mark'); if (mode === 'mixed') d.applyCharFormatInCell(0, 1, 0, 0, 0, 0, 1, '{"bold":true}'); if (mode === 'merged') {d.mergeTableCells(0, 1, 0, 0, 0, 0, 1); d.mergeTableCells(0, 1, 0, 2, 0, 2, 1);} if (mode === 'width') d.setCellProperties(0, 1, 0, 3, '{"width":9999}'); if (mode === 'pageBreak') d.setTableProperties(0, 1, 0, '{"pageBreak":2}'); const s = snap(d, mode === 'hwp' ? 'fixture.hwp' : 'fixture.hwpx'), bytes = d.exportHwpx(), t = s.structure.tables[0]; assert.equal(s.tableSubdivisionSources[t.id].editable, false, mode); assert.throws(() => apply(d, s, op(t, 1, 1, 2, 2))); assert.deepEqual(d.exportHwpx(), bytes); } finally { d.free(); } } });
 await scenario('stale body/target style/grid versions cannot overwrite newer edits', () => { for (const mode of ['body', 'style', 'grid']) { const d = fixture(); try { const s = snap(d), command = op(s.structure.tables[0], 1, 1, 2, 2); if (mode === 'body') d.insertText(0, 0, 0, 'Newer '); if (mode === 'style') d.applyParaFormatInCell(0, 1, 0, 4, 0, '{"alignment":"right"}'); if (mode === 'grid') d.setCellProperties(0, 1, 0, 4, '{"height":7100}'); const bytes = d.exportHwpx(); assert.throws(() => apply(d, s, command)); assert.deepEqual(d.exportHwpx(), bytes); } finally { d.free(); } } });
 await scenario('false/no-op/throw/neighbor corruption reject inside outer snapshot rollback', () => { for (const mode of ['false', 'noop', 'throw', 'text']) { const d = fixture(); try { const s = snap(d), command = op(s.structure.tables[0], 1, 1, 2, 2), bytes = d.exportHwpx(), token = d.saveSnapshot(), native = d.splitTableCellInto.bind(d); d.splitTableCellInto = (...args) => { if (mode === 'false') return '{"ok":false}'; if (mode === 'noop') return '{"ok":true}'; const v = native(...args); if (mode === 'throw') throw new Error('injected'); if (mode === 'text') { d.deleteTextInCell(0, 1, 0, 0, 0, 0, 4); d.insertTextInCell(0, 1, 0, 0, 0, 0, 'Oops'); } return v; }; assert.throws(() => executeTableSubdivision(d, s, command)); d.restoreSnapshot(token); d.discardSnapshot(token); assert.deepEqual(d.exportHwpx(), bytes); } finally { d.free(); } } });
 
 await scenario('same-effect cell zone remains observable and closes every table topology path',()=>{for(const mode of ['same','color']){const d=fixture({second:true});try{assert.equal(json(d.getTableProperties(0,1,0)).cellZoneCount,0);const old=json(d.getCellProperties(0,1,0,0));const r=json(d.setCellZoneProperties(0,1,0,0,0,2,2,mode==='same'?'{}':'{"fillType":"solid","fillColor":"#ffeeaa"}'));assert.equal(r.ok,true);assert.equal(json(d.getTableProperties(0,1,0)).cellZoneCount,1);if(mode==='same'){d.applyCellBorderFillIds(0,1,0,JSON.stringify({cells:Array.from({length:9},(_,cellIdx)=>({cellIdx,id:r.borderFillId}))}));const props=json(d.getCellProperties(0,1,0,0)),token=d.saveSnapshot();d.applyCellBorderFillIds(0,1,0,JSON.stringify({zones:[{startRow:0,startCol:0,endRow:2,endCol:2,id:null}]}));assert.deepEqual(json(d.getCellProperties(0,1,0,0)),props);d.restoreSnapshot(token);d.discardSnapshot(token);}let s=snap(d),t=s.structure.tables[0];s.tableMergeSources=readTableMergeSources(d,s.structure.tables,s.name);s.tableSplitSources=readTableSplitSources(d,s.structure.tables,s.name);s.tableStructureSources=readTableStructureSources(d,s.structure.tables,s.name);for(const key of ['tableSubdivisionSources','tableMergeSources','tableSplitSources','tableStructureSources'])assert.equal(s[key][t.id].editable,false,key);const bytes=d.exportHwpx(),commands=[op(t,1,1,2,2),{kind:'merge_table_cells',target:t.id,startRow:0,startColumn:0,rowCount:1,columnCount:2},{kind:'split_table_cell',target:t.id,row:0,column:0},{kind:'split_table',target:t.id,atRow:1},{kind:'attach_table',target:t.id,nextTarget:s.structure.tables[1].id},...['row','column'].flatMap(axis=>[{kind:'insert_table_'+axis,target:t.id,index:1,values:['','','']},{kind:'delete_table_'+axis,target:t.id,index:1}])];for(const command of commands){assert.throws(()=>executeDocumentOperations(d,s,[command]),command.kind);assert.deepEqual(d.exportHwpx(),bytes,command.kind);}const x=new HwpDocument(bytes);try{assert.equal(json(x.getTableProperties(0,1,0)).cellZoneCount,1);assert.equal(snap(x).tableSubdivisionSources[t.id].editable,false);}finally{x.free();}}finally{d.free();}}});
 await scenario('unknown Native cell zone count is readonly without changing the document',()=>{const d=fixture();try{const original=d.getTableProperties.bind(d),bytes=d.exportHwpx();d.getTableProperties=(...args)=>{const p=json(original(...args));delete p.cellZoneCount;return JSON.stringify(p);};const s=snap(d),t=s.structure.tables[0];assert.equal(s.tableSubdivisionSources[t.id].editable,false);assert.throws(()=>executeDocumentOperations(d,s,[op(t,1,1,2,2)]));assert.deepEqual(d.exportHwpx(),bytes);}finally{d.free();}});
 
-await writeFile(resolve(out, 'result.json'), JSON.stringify({ results, failures, engine: JSON.parse(await readFile(resolve(pkg, 'jueony-engine-build.json'), 'utf8')), note: 'Actual WASM subdivision of plain cells and one witnessed merged cell, with optional row-major original paragraph distribution. Fields/zones/protection/complex layout are rejected. Same-engine invariants; Native Hancom, paid providers NOT_RUN.' }, null, 2)); if (failures.length) process.exitCode = 1;
+await writeFile(resolve(out, 'result.json'), JSON.stringify({ results, failures, engine: JSON.parse(await readFile(resolve(pkg, 'jueony-engine-build.json'), 'utf8')), note: 'Actual WASM HWPX and original HWP5 subdivision of plain cells and one witnessed merged cell, with optional row-major original paragraph distribution. Fields/zones/protection/complex layout are rejected. Same-engine invariants; Native Hancom, paid providers NOT_RUN.' }, null, 2)); if (failures.length) process.exitCode = 1;

@@ -1,0 +1,63 @@
+--- a/src/document_core/commands/table_ops/subdivision_grid.rs
++++ b/src/document_core/commands/table_ops/subdivision_grid.rs
+@@ -26,6 +26,23 @@
+         previous_end = Some(range.end_char_idx);
+     }
+     true
++}
++
++// This dedicated owner has no text to reflow. Its inline table and the
++// original anchor paragraph must be retained together in the first piece.
++fn retained_nested_table(c: &Cell) -> Option<&Table> {
++    let [p] = c.paragraphs.as_slice() else { return None; };
++    let [Control::Table(inner)] = p.controls.as_slice() else { return None; };
++    if !p.text.is_empty() || !p.field_ranges.is_empty() || !p.orphan_field_ends.is_empty()
++        || !p.range_tags.is_empty() || !p.title_marks.is_empty() || !p.markpen_marks.is_empty()
++        || c.field_name.is_some() || !inner.common.treat_as_char || inner.common.allow_overlap
++        || inner.common.locked || inner.common.size_protect || inner.attr & (1 << 30) != 0
++        || inner.caption.is_some() || inner.repeat_header || !inner.zones.is_empty()
++        || inner.cells.is_empty() || inner.cells.len() > 200
++        || inner.cells.iter().any(|cell| cell.cell_protect() || cell.is_header || cell.field_name.is_some()
++            || cell.text_direction != 0 || cell.paragraphs.is_empty() || cell.paragraphs.len() > 50
++            || cell.paragraphs.iter().any(|para| !subdivision_paragraph_allowed(para, false))) { return None; }
++    Some(inner)
+ }
+ 
+ struct DivisionAxis {
+@@ -75,6 +92,7 @@
+         let table = self.get_table_mut(section, para, ctrl)?;
+         let source = table.cells.iter().find(|c| (c.row, c.col) == (row, col)).ok_or_else(invalid)?;
+         let merged = source.row_span > 1 || source.col_span > 1;
++        let nested = if merged && !distribute { retained_nested_table(source) } else { None };
+         if table.common.locked || table.common.size_protect || table.attr & (1 << 30) != 0
+             || !table.zones.is_empty() || table.repeat_header || table.caption.is_some()
+             || table.cells.iter().any(|c| {
+@@ -89,12 +107,17 @@
+                         // same cell and paragraph address. Never move a marker.
+                         let retain_inline = merged && (!is_target ||
+                             (c.field_name.is_none() && (!distribute || para == 0)));
+-                        !subdivision_paragraph_allowed(p, retain_inline)
++                        !(is_target && nested.is_some()) && !subdivision_paragraph_allowed(p, retain_inline)
+                     })
+             }) { return Err(invalid()); }
+         if distribute && !(2..=usize::from(rows * cols)).contains(&source.paragraphs.len()) { return Err(invalid()); }
+         let vertical = DivisionAxis::new(table, true, row, source.row_span, rows)?;
+         let horizontal = DivisionAxis::new(table, false, col, source.col_span, cols)?;
++        if let Some(inner) = nested {
++            if inner.common.width == 0 || inner.common.height == 0
++                || inner.common.width > horizontal.cuts[1] - horizontal.cuts[0]
++                || inner.common.height > vertical.cuts[1] - vertical.cuts[0] { return Err(invalid()); }
++        }
+         let nr = vertical.grid.len() - 1;
+         let nc = horizontal.grid.len() - 1;
+         if nr * nc > 200 { return Err(invalid()); }
+@@ -136,7 +159,8 @@
+         }
+         if covered.contains(&false) { return Err(invalid()); }
+         cells.sort_by_key(|c| (c.row, c.col));
+-        let affected: Vec<_> = cells.iter().enumerate().filter(|(_, c)| targets.contains(&(c.row, c.col)))
++        let affected: Vec<_> = cells.iter().enumerate().filter(|(_, c)| targets.contains(&(c.row, c.col))
++            && !(nested.is_some() && (c.row, c.col) == (row, col)))
+             .map(|(i,c)| (i, c.paragraphs.len())).collect();
+         table.cells = cells;
+         table.row_count = nr as u16;

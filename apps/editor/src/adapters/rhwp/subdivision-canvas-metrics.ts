@@ -19,9 +19,12 @@ export function recordPublishedCanvasMetrics(doc:CanvasDocument,generation:Gener
 export function subdivisionCopyMetrics(wasm:any,base:Snapshot,operations:EditOp[]) {
   const op=operations[0];
   if(operations.length!==1 || op.kind!=='split_table_cell_into') return;
-  const sourceCell=base.structure?.tables.find(t=>t.id===op.target)?.cells.find(c=>c.row===op.row && c.column===op.column);
+  const table=base.structure?.tables.find(t=>t.id===op.target);
+  const sourceCell=table?.cells.find(c=>c.row===op.row && c.column===op.column);
   const inline=Boolean(sourceCell?.axisFieldSignature && !sourceCell.properties.fieldName);
-  if(!inline && !base.tableSubdivisionSources?.[op.target]?.frames?.some(f=>f.cells.some(c=>c.lineSignature))) return;
+  const nested=table && sourceCell && base.structure?.nestedTables?.some(n=>n.section===table.section && n.paragraph===table.paragraph &&
+    n.ancestors[0]?.controlIndex===table.control && n.ancestors[0].cellIndex===sourceCell.index);
+  if(!inline && !nested && !base.tableSubdivisionSources?.[op.target]?.frames?.some(f=>f.cells.some(c=>c.lineSignature))) return;
   const live:CanvasDocument=wasm.borrowDocumentHandle();
   const active=live.canvasMetricsActive(), document=wasm.documentGeneration, fonts=wasm.canvasMetricFontGeneration;
   const publication=active?publications.get(live):undefined;

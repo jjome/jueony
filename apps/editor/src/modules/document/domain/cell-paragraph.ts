@@ -52,13 +52,13 @@ export function cellParagraphPlan(op:AgentCellParagraphOp,s:Snapshot){
  let edits=op.originalText===op.text?[]:paragraphEdits(op,paragraph);
  if(paragraph.editableFrom!==undefined){
   const boundary=paragraph.editableFrom,original=Array.from(op.originalText);
-  if(!Number.isSafeInteger(boundary)||boundary<1||boundary>original.length)throw Error('필드 뒤의 일반 텍스트 위치를 확인하세요.');
+  if(!Number.isSafeInteger(boundary)||boundary<1||boundary>original.length)throw Error('필드 또는 그림 뒤의 일반 텍스트 위치를 확인하세요.');
   edits=edits.map(edit=>{
    if(edit.start>=boundary)return edit;
    // Keep every character through the field end and the following boundary.
    const keep=boundary-edit.start,insert=Array.from(edit.insert);
    if(keep>edit.remove||keep>insert.length||original.slice(edit.start,boundary).join('')!==insert.slice(0,keep).join(''))
-    throw Error('필드와 경계 문자는 유지하고 뒤의 일반 텍스트만 바꿀 수 있습니다.');
+    throw Error('필드·그림과 경계 문자는 유지하고 뒤의 일반 텍스트만 바꿀 수 있습니다.');
    return {...edit,start:boundary,remove:edit.remove-keep,insert:insert.slice(keep).join('')};
   });
  }

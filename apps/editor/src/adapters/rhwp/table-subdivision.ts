@@ -11,6 +11,7 @@ import { tableLayoutEvidence, sameTableLayout } from './table-layout-evidence.ts
 import {subdivisionFrames,compareSubdivisionFrames,compareDividedPieces} from './subdivision-frames.ts';
 import {verifyFragmentLines} from './subdivision-fragment-lines.ts';
 import {inlineSubdivisionLayout} from './subdivision-inline-layout.ts';
+import {subdivisionNestedOwner,nestedSubdivisionEvidence} from './subdivision-nested-owner.ts';
 import {hwpSubdivisionSource,verifiedSubdivisionHwp} from './hwp-table-subdivision.ts';
 import type {SubdivisionCopyMetrics} from './subdivision-canvas-metrics.ts';
 import {subdivisionFieldOwners,subdivisionFieldTargets,projectSubdivisionFields,subdivisionFieldLines} from './subdivision-neighbor-fields.ts';
@@ -18,6 +19,7 @@ const canonical = (v:any):any => Array.isArray(v) ? v.map(canonical) : v && type
 const same = (a:any, b:any) => JSON.stringify(canonical(a)) === JSON.stringify(canonical(b));
 const hash = (v:any) => Array.from(sha256(new TextEncoder().encode(JSON.stringify(canonical(v)))),n=>n.toString(16).padStart(2,'0')).join('');
 const inlineProofs=new WeakMap<object,{fingerprint:string;operation:AgentTableSubdivisionOp;runs:ReturnType<typeof inlineSubdivisionLayout>}>();
+const nestedProofs=new WeakMap<object,{fingerprint:string;operation:AgentTableSubdivisionOp;evidence:ReturnType<typeof nestedSubdivisionEvidence>}>();
 function paragraphFormat(d:any, t:Table, cell:number, paragraph:number) {
   const at = [t.section, t.paragraph, t.control, cell, paragraph];
   return hash([parsed(d.getCellParaPropertiesAt(...at)), parsed(d.getCellCharPropertiesAt(...at, 0)), parsed(d.getCellStyleAt(...at))]);
@@ -41,8 +43,11 @@ export function readTableSubdivisionSources(wasm:any, tables:Table[], name:strin
     const exactGrid = hasGridSplit && (!!primary || p.pageBreak===1 && d.pageCount()>1);
     const owners=exactGrid && primary ? subdivisionFieldOwners(d,t) : undefined;
     const fieldTargets=owners?.size ? subdivisionFieldTargets(d,t,owners) : undefined;
-    const native = binary ? hwpSubdivisionSource(d,t,tables,exactGrid,owners) : undefined;
-    const grid = binary ? native && 'widths' in native ? native : undefined : primary || exactGrid ? readMergedSplitGrid(d,t,exactGrid,owners) : undefined;
+    const nested=exactGrid && primary ? subdivisionNestedOwner(d,t) : undefined;
+    if(nested && (t.cells[nested.index].rowSpan*t.cells[nested.index].columnSpan===1 || p.pageBreak!==0))throw Error('중첩 표의 병합 주 셀이 필요합니다.');
+    const nestedLayout=nested && nestedSubdivisionEvidence(d,t,nested);
+    const native = binary ? hwpSubdivisionSource(d,t,tables,exactGrid,owners,nested) : undefined;
+    const grid = binary ? native && 'widths' in native ? native : undefined : primary || exactGrid ? readMergedSplitGrid(d,t,exactGrid,owners,nested) : undefined;
     const authority = native ?? grid ?? merge?.[t.id];
     if (exactGrid && t.cells.some(c => c.properties.fieldName !== '' && !owners?.size)) throw new Error('unsupported field cell');
     const paginationAllowed = p.pageBreak === 0 || exactGrid && (p.pageBreak === 1 || p.pageBreak === 2);
@@ -65,7 +70,7 @@ export function readTableSubdivisionSources(wasm:any, tables:Table[], name:strin
           || (!exactGrid && typeof d.splitCellParagraphs !== 'function') || cell.text.split('\n').length !== count) return;
       return Array.from({length:count}, (_,i) => paragraphFormat(d,t,cell.index,i));
     };
-    const cells=t.cells.filter(c=>owners?.size ? (!c.axisFieldSignature || fieldTargets?.has(c.index)) && (c.rowSpan>1 || c.columnSpan>1)
+    const cells=t.cells.filter(c=>nested ? c.index===nested.index : owners?.size ? (!c.axisFieldSignature || fieldTargets?.has(c.index)) && (c.rowSpan>1 || c.columnSpan>1)
       : !primary || exactGrid || c.index===primary.index).map(c=>({
       row:c.row, column:c.column,
       minimumWidth:Math.max(200,Number(pads[c.index].left)+Number(pads[c.index].right)+1),
@@ -73,11 +78,11 @@ export function readTableSubdivisionSources(wasm:any, tables:Table[], name:strin
       ...(exactGrid && (multipleMerged || c !== primary) ? {paragraphFormats:formats(c)} : {}),
     }));
     if(!cells.length)throw Error('분할할 일반 병합 셀이나 이름 셀이 없습니다.');
-    if(owners?.size && !binary)verifiedSubdivisionHwpx(d);
+    if((owners?.size || nested) && !binary)verifiedSubdivisionHwpx(d);
     const preservation=capturePreservationEvidence(d);if(preservation.issues.length)throw new Error('preservation');
     const paragraphFormats = primary && !multipleMerged ? formats(primary) : undefined;
-    return [t.id, { editable: true, fingerprint: hash({ merge: authority, table: t, properties: p, preservation: preservation.values }), cells, frame, ...(frames.length>1 ? {frames} : {}), ...(exactGrid ? {exactGrid:true} : {}), ...(binary ? {hwp5Grid:{widths,heights}} : {}), ...(paragraphFormats ? {paragraphFormats} : {}) }];
-  } catch { return [t.id, { editable: false, reason: '원본 격자와 쪽별 셀·글줄을 확인한 본문 표를 분할할 수 있습니다. HWP5는 본문 표 한 개와 원본 형식의 저장·재열기 검사를 추가로 요구합니다. 보호·제목·중첩·복합 배치는 제외합니다.' }]; } }));
+    return [t.id, { editable: true, fingerprint: hash({ merge: authority, table: t, properties: p, preservation: preservation.values, ...(nestedLayout?{nestedLayout}:{}) }), cells, frame, ...(frames.length>1 ? {frames} : {}), ...(exactGrid ? {exactGrid:true} : {}), ...(binary ? {hwp5Grid:{widths,heights}} : {}), ...(paragraphFormats ? {paragraphFormats} : {}) }];
+  } catch { return [t.id, { editable: false, reason: '원본 격자와 쪽별 셀·글줄을 확인한 본문 표를 분할할 수 있습니다. HWP5는 본문 표 한 개와 원본 형식의 저장·재열기 검사를 추가로 요구합니다. 중첩 표는 첫 칸에 원래 위치를 유지할 수 있는 한 단계 인라인 표만 지원합니다.' }]; } }));
 }
 export function assertTableSubdivisionResult(wasm:any, base:Snapshot, op:AgentTableSubdivisionOp,copyMetrics?:SubdivisionCopyMetrics):void {
   const d = nativeDocument(wasm), plan = tableSubdivisionPlan(op, base), t = plan.table, actual = readStructure(d).tables.find(v => v.id === t.id);
@@ -88,6 +93,12 @@ export function assertTableSubdivisionResult(wasm:any, base:Snapshot, op:AgentTa
   function checkCells(doc:any, output:Table|undefined) {
     if (!output || output.rows !== plan.rows || output.columns !== plan.columns || output.cells.length !== plan.cells.length) throw new Error('임의 분할 뒤 표 격자가 계획과 다릅니다.');
     if(hasNeighborFields)subdivisionFieldOwners(doc,output);
+    if('nestedOwner' in plan && plan.nestedOwner){
+      const proof=nestedProofs.get(d),nested=subdivisionNestedOwner(doc,output);
+      if(!nested || nested.index!==slots[0].index || !proof || proof.fingerprint!==plan.source.fingerprint ||
+          !same(proof.operation,op) || !sameTableLayout(proof.evidence,nestedSubdivisionEvidence(doc,output,nested)))
+        throw Error('분할 뒤 안쪽 표의 경로·셀·글줄·위치가 달라졌습니다.');
+    }
     if(inlineTarget){
       const proof=inlineProofs.get(d);
       if(!proof || proof.fingerprint!==plan.source.fingerprint || !same(proof.operation,op) ||
@@ -140,7 +151,8 @@ export function assertTableSubdivisionResult(wasm:any, base:Snapshot, op:AgentTa
 export function executeTableSubdivision(wasm:any, base:Snapshot, op:AgentTableSubdivisionOp,copyMetrics?:SubdivisionCopyMetrics) {
   const source=base.tableSubdivisionSources?.[op.target];
   if (!source?.frames?.some(f=>f.cells.some(c=>c.lineSignature)) &&
-      !base.structure?.tables.find(t=>t.id===op.target)?.cells.some(c=>c.axisFieldSignature)) return applySubdivision(wasm,base,op);
+      !base.structure?.tables.find(t=>t.id===op.target)?.cells.some(c=>c.axisFieldSignature) &&
+      !base.structure?.nestedTables?.length) return applySubdivision(wasm,base,op);
   const d=nativeDocument(wasm), token=d.saveSnapshot();
   try { return applySubdivision(wasm,base,op,copyMetrics); }
   catch (error) {d.restoreSnapshot(token);throw error;}
@@ -152,6 +164,10 @@ function applySubdivision(wasm:any, base:Snapshot, op:AgentTableSubdivisionOp,co
   const comparable=(c:any)=>{const {frame,...model}=c??{};return model;};
   if (!same(structure.tables.find(v => v.id === t.id), t) || cap?.editable !== true || !same(comparable(cap),comparable(base.tableSubdivisionSources?.[t.id]))||!sameTableLayout(cap.frame,base.tableSubdivisionSources?.[t.id]?.frame)) throw new Error('문서·표 내용·서식·배치가 바뀌었습니다. 최신 상태로 다시 요청하세요.');
   assertNativeTableWritable(d, t);
+  const nested=plan.source.exactGrid ? subdivisionNestedOwner(d,t) : undefined;
+  if(Boolean(nested)!==('nestedOwner' in plan && plan.nestedOwner===true))
+    throw Error('분할할 셀의 중첩 표 소유 경로를 다시 확인하세요.');
+  if(nested)nestedProofs.set(d,{fingerprint:plan.source.fingerprint!,operation:{...op},evidence:nestedSubdivisionEvidence(d,t,nested)});
   const fieldOwners=t.cells.some(c=>c.axisFieldSignature) ? subdivisionFieldOwners(d,t) : undefined;
   const inlineTarget=Boolean(plan.primary.axisFieldSignature && !plan.primary.properties.fieldName);
   if(inlineTarget)inlineProofs.set(d,{fingerprint:plan.source.fingerprint!,operation:{...op},
@@ -173,7 +189,14 @@ function applySubdivision(wasm:any, base:Snapshot, op:AgentTableSubdivisionOp,co
       cell.paragraphs = [structuredClone(paragraph)];
     });
   }
-  const at = expected.cells.findIndex(target); expected.cells.splice(at, originals.length, ...replacements);
+  const at = expected.cells.findIndex(target);
+  if(nested){
+    const inner=expected.cells.filter((v:any)=>v.list.hostListId===nested.listId);
+    const retained=replacements.findIndex((_:any,i:number)=>plan.cells[i].originIndex===nested.index);
+    if(retained!==nested.index || !inner.length)throw Error('안쪽 표가 원래 셀 경로를 유지하지 못했습니다.');
+    replacements.splice(retained+1,0,...inner);
+    expected.cells.splice(at,originals.length+inner.length,...replacements);
+  }else expected.cells.splice(at, originals.length, ...replacements);
   const expectedText = tableTextTree(structure.tables.map(v => v.id === t.id ? { ...v, rows: plan.rows, columns: plan.columns, cells: plan.cells } : v));
   const result = parsed('useExactGrid' in plan && plan.useExactGrid
     ? d.splitCellOnGrid(t.section,t.paragraph,t.control,op.row,op.column,op.rows,op.columns,op.distributeParagraphs === true)

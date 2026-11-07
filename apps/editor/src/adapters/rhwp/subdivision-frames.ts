@@ -13,7 +13,7 @@ export function subdivisionFrames(doc:any, table:Table, properties:any, withLine
   const byAddress=new Map(table.cells.map(cell=>[cell.row+','+cell.column,cell]));
   for (let page=0; page<doc.pageCount(); page++) {
     const controls=parsed(doc.getPageControlLayout(page)).controls.filter((c:any)=>
-      c.type==='table' && c.secIdx===table.section && c.paraIdx===table.paragraph && c.controlIdx===table.control);
+      c.type==='table' && (!c.stableIndex || c.stableIndex.length===3) && c.secIdx===table.section && c.paraIdx===table.paragraph && c.controlIdx===table.control);
     if (!controls.length) continue;
     const f=controls[0], paper=parsed(doc.getPageInfo(page));
     if (controls.length!==1 || !Array.isArray(f.cells) || !f.cells.length

@@ -23,7 +23,11 @@ export function tableSubdivisionPlan(op:AgentTableSubdivisionOp, snapshot:Snapsh
   if ((!/\.hwpx$/iu.test(snapshot.name) && !(binary && source?.hwp5Grid)) || !/^s\d+p\d+t\d+$/u.test(op.target) || !table || source?.editable !== true || !/^[a-f0-9]{64}$/u.test(source.fingerprint ?? '')) throw new Error('원본 형식의 저장 재열기가 가능한 표를 다시 조회하세요.');
   if (![op.row, op.column, op.rows, op.columns].every(Number.isSafeInteger) || op.row < 0 || op.column < 0 || op.rows < 1 || op.columns < 1 || op.rows > 8 || op.columns > 8 || op.rows * op.columns === 1) throw new Error('새 행·열 수는 1~8이며 적어도 한 방향을 나누어야 합니다.');
   const merged = table.cells.find(c => c.row === op.row && c.column === op.column && (c.rowSpan > 1 || c.columnSpan > 1));
-  if (source.exactGrid) return exactSubdivisionPlan(op,table,source);
+  if (source.exactGrid) {
+    const nested=Boolean(merged && snapshot.structure?.nestedTables?.some(n=>n.section===table.section &&
+      n.paragraph===table.paragraph && n.ancestors[0]?.controlIndex===table.control && n.ancestors[0].cellIndex===merged.index));
+    return exactSubdivisionPlan(op,table,source,nested);
+  }
   if (merged) {
     const grid = binary ? {editable:true,fingerprint:source.fingerprint,...source.hwp5Grid!} : snapshot.tableSplitSources?.[op.target];
     if (grid?.editable!==true || !/^[a-f0-9]{64}$/u.test(grid.fingerprint??'')) throw new Error('기본 분할 격자를 조회하세요.');

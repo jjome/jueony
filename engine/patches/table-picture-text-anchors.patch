@@ -1,0 +1,55 @@
+--- a/src/model/paragraph.rs
++++ b/src/model/paragraph.rs
+@@ -645,4 +645,36 @@
+ 
+ impl Paragraph {
++    /// Visible-text insertion positions for pictures backed by actual eight-unit
++    /// control slots. A missing offset or a trailing unresolved control has no
++    /// proven editable suffix. Display-only fallback positions are insufficient.
++    pub(crate) fn picture_text_anchors(&self) -> Option<Vec<u32>> {
++        if self.controls.is_empty() || self.controls.len() > 200
++            || !self.controls.iter().all(|c| matches!(c, Control::Picture(_)))
++            || !self.field_ranges.is_empty() || !self.orphan_field_ends.is_empty()
++            || !self.range_tags.is_empty() || !self.title_marks.is_empty()
++            || self.char_offsets.len() > 4000 || self.char_offsets.len() != self.text.chars().count()
++        {
++            return None;
++        }
++        let mut anchors = Vec::with_capacity(self.controls.len());
++        let mut end = 0;
++        for (i, (&offset, ch)) in self.char_offsets.iter().zip(self.text.chars()).enumerate() {
++            if ch.is_control() || ch == '\u{fffc}' { return None; }
++            let gap = offset.checked_sub(end)?;
++            let count = (gap / CTRL_CHAR_CODE_UNITS) as usize;
++            if gap % CTRL_CHAR_CODE_UNITS != 0 || count > self.controls.len() - anchors.len() {
++                return None;
++            }
++            anchors.extend(std::iter::repeat_n(i as u32, count));
++            end = offset.checked_add(ch.len_utf16() as u32)?;
++        }
++        if anchors.len() != self.controls.len()
++            || self.control_text_positions().iter().copied().ne(anchors.iter().map(|&a| a as usize))
++        {
++            return None;
++        }
++        Some(anchors)
++    }
++
+     /// `ctrl_data_records` 를 `controls` 길이에 맞춰 `None` 으로 패딩한다.
+     ///
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -2833,4 +2833,13 @@
+             char_offset as usize,
+         )
++    }
++
++    /// Proven Unicode-scalar positions of all inline picture slots in a cell paragraph.
++    #[wasm_bindgen(js_name = getCellPictureTextAnchors)]
++    pub fn get_cell_picture_text_anchors(
++        &self, section: u32, paragraph: u32, table: u32, cell: u32, cell_paragraph: u32,
++    ) -> Option<Vec<u32>> {
++        self.get_cell_paragraph_ref(section as usize, paragraph as usize, table as usize,
++            cell as usize, cell_paragraph as usize)?.picture_text_anchors()
+     }
+ 

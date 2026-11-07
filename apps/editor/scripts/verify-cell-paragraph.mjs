@@ -29,6 +29,7 @@ const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const
  const fallback=input.document.structure.tables[0]?.cells?.[0]?.text?.split('\n')[paragraph]??'';
  const operations=[{kind:'replace_cell_paragraph',target,row:cell?.row??0,column:cell?.column??0,paragraph,originalText:cell?.paragraphs?.find(p=>p.index===paragraph)?.text??fallback,text:'Agent revised paragraph 😀'}];
  if(input.instruction.includes('photo-owner'))operations[0].text='개정5';
+ if(input.instruction.includes('picture-suffix'))operations[0].text=operations[0].originalText+'개정';
  if(input.instruction.includes('mixed-tail'))operations[0].text=operations[0].originalText.slice(0,-1)+'개정😀';
  if(input.instruction.includes('split-owner'))operations[0].text=operations[0].originalText.slice(0,-6)+'Tail 2';
  if(input.instruction.includes('field-tail'))operations[0].text=Array.from(operations[0].originalText).slice(0,cell.paragraphs[paragraph].editableFrom).join('')+'수정😀';
@@ -110,15 +111,27 @@ try{
    }));
   });
   const originals=await pictures();assert.equal(originals.length,4);
-  assert.deepEqual(paragraphs(before).map(p=>p.index),[1]);
+  assert.deepEqual(paragraphs(before).map(p=>[p.index,p.editableFrom]),[[0,1],[1,undefined]]);
   await send('photo-owner');
   assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
-  const after=await snap();assert.deepEqual(paragraphs(after),[{index:1,text:'개정5'}]);
+  const after=await snap();assert.deepEqual(paragraphs(after),[{index:0,text:'PicA',editableFrom:1},{index:1,text:'개정5'}]);
   await undo();assert.deepEqual((await snap()).structure,before.structure);
   await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);
   await saveAndReopen(f,'photo-owner',format);
-  const reopened=await snap();assert.deepEqual(paragraphs(reopened),[{index:1,text:'개정5'}]);
+  const reopened=await snap();assert.deepEqual(paragraphs(reopened),paragraphs(after));
   assert.deepEqual(await pictures(),originals);
+ });
+ for(const format of ['hwp','hwpx'])await scenario(format+' picture-suffix chat preserves all three anchors on undo, redo, save and reopen',async()=>{
+  const f=await open(format,await createAxisPictureFixture(HwpDocument,out,{merged:true,grouped:true})),before=await snap();
+  const owner=s=>s.structure.tables[0].cells.find(c=>c.row===1&&c.column===1);
+  const text=s=>s.cellParagraphSources.s0p1t0.cells.find(c=>c.index===owner(s).index).paragraphs[0];
+  assert.deepEqual(text(before),{index:0,text:'PicB',editableFrom:4});
+  await send('first picture-suffix');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const after=await snap();assert.equal(text(after).text,'PicB개정');same(owner(after).axisPicture,owner(before).axisPicture);
+  await undo();assert.deepEqual((await snap()).structure,before.structure);
+  await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);
+  await saveAndReopen(f,'picture-suffix',format);
+  const restored=await snap();assert.deepEqual(text(restored),text(after));same(owner(restored).axisPicture,owner(after).axisPicture);
  });
  for(const id of ['openai-responses','anthropic','gemini','openai-compatible'])await scenario(id+': actual merged paragraph chat, compare, one undo/redo, safe save and UI reopen',async()=>{
   await configure(id);const f=await open('hwpx',body('hwpx',true)),before=await snap(),t=before.structure.tables[0],cap=before.cellParagraphSources[t.id],start=calls.length;

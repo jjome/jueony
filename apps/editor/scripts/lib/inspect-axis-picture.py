@@ -50,7 +50,28 @@ def embed(source, target, mode):
             dst.writestr(entry, data)
 
 
-def inspect_pictures(path, paragraphs=False):
+def picture_anchors_in_text(raw):
+    """Read picture slots in a fixture's PARA_TEXT, counting Unicode scalars."""
+    offsets = []
+    i = start = length = 0
+    while i < len(raw):
+        unit, = struct.unpack_from("<H", raw, i)
+        if unit >= 32:
+            i += 2
+            continue
+        length += len(raw[start:i].decode("utf-16le"))
+        if unit == 13:
+            assert i + 2 == len(raw)
+            break
+        assert unit == 11 and raw[i+2:i+6] == b" osg"
+        assert struct.unpack_from("<H", raw, i + 14) == (11,)
+        offsets.append(length)
+        i += 16
+        start = i
+    return offsets
+
+
+def inspect_pictures(path, paragraphs=False, anchors=False):
     if path.suffix == ".hwpx":
         with ZipFile(path) as zipfile:
             root = ET.fromstring(zipfile.read("Contents/section0.xml"))
@@ -68,11 +89,22 @@ def inspect_pictures(path, paragraphs=False):
                 for paragraph in owner.findall("./{*}subList/{*}p"):
                     if paragraphs:
                         del paragraph.attrib["id"]
+                    picture_offsets = {}
+                    if anchors:
+                        length = 0
+                        for item in paragraph.findall("./{*}run/*"):
+                            kind = item.tag.rsplit("}", 1)[-1]
+                            if kind == "t":
+                                length += len(item.text or "")
+                            elif kind == "pic":
+                                picture_offsets[item] = length
                     for picture in paragraph.findall(".//{*}pic"):
                         ref = picture.find(".//{*}img").get("binaryItemIDRef")
                         result = {"row": int(pos.get("rowAddr")), "col": int(pos.get("colAddr")),
                                   "resource": ref, "records": [digest(ET.tostring(picture))],
                                   "image": digest(zipfile.read(assets[ref]))}
+                        if anchors:
+                            result["textOffset"] = picture_offsets[picture]
                         if paragraphs:
                             result["paragraph"] = digest(ET.tostring(paragraph))
                         pictures.append(result)
@@ -84,6 +116,8 @@ def inspect_pictures(path, paragraphs=False):
     pictures = []
     owner = None
     paragraph = []
+    raw_text = b""
+    picture_index = 0
     for i, (tag, level, data) in enumerate(entries):
         if level < 2:
             owner = None
@@ -91,6 +125,10 @@ def inspect_pictures(path, paragraphs=False):
             owner = struct.unpack_from("<HH", data, 8)
         if tag == 66 and level == 2:
             paragraph = [digest(data)]
+            raw_text = b""
+            picture_index = 0
+        if tag == 67 and level == 3:
+            raw_text = data
         if level == 3 and tag in (67, 68, 69):
             paragraph.append(digest(data))
         if tag == 71 and level == 3 and data[:4] == b" osg":
@@ -108,6 +146,9 @@ def inspect_pictures(path, paragraphs=False):
             result = {"row": row, "col": col, "resource": ref,
                       "records": [digest(d) for _, _, d in sequence],
                       "image": digest(inflate(doc.read(entry), compressed))}
+            if anchors:
+                result["textOffset"] = picture_anchors_in_text(raw_text)[picture_index]
+                picture_index += 1
             if paragraphs:
                 result["paragraph"] = list(paragraph)
             pictures.append(result)
@@ -117,11 +158,11 @@ def inspect_pictures(path, paragraphs=False):
 if sys.argv[1] in ("embed", "embed-many", "embed-grouped"):
     embed(Path(sys.argv[2]), Path(sys.argv[3]), sys.argv[1])
 else:
-    pictures = inspect_pictures(Path(sys.argv[2]), sys.argv[1] == "inspect-grouped")
+    pictures = inspect_pictures(Path(sys.argv[2]), sys.argv[1] == "inspect-grouped", sys.argv[1] == "inspect-anchors")
     if sys.argv[1] == "inspect":
         picture, = pictures
         picture.pop("resource")
         print(json.dumps(picture))
     else:
-        assert sys.argv[1] in ("inspect-many", "inspect-grouped")
+        assert sys.argv[1] in ("inspect-many", "inspect-grouped", "inspect-anchors")
         print(json.dumps(pictures))

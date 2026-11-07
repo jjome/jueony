@@ -8,6 +8,10 @@ const pictures=Object.fromEntries(await Promise.all(['png','jpg'].map(async ext=
 ])));
 const labels=['PicA','PicB','PicC','PicD'],kinds=['png','png','jpg','png'],at=[0,1,0];
 
+export function inspectPictureAnchors(file){
+ return JSON.parse(python('inspect-anchors',file));
+}
+
 export async function createAxisPictureFixture(HwpDocument,folder,{merged=false,grouped=false,mergeRange}={}){
  const d=HwpDocument.createEmpty();
  try{

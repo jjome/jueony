@@ -80,9 +80,9 @@ function paragraphPageOwners(d:any,t:Table) {
  }
  return pages;
 }
-type PictureOwner = {table:string;cell:number;paragraphs:number[];picture:NonNullable<Table['cells'][number]['axisPicture']>};
+type PictureOwner = {table:string;cell:number;paragraphs:Array<{index:number;anchors?:number[]}>;picture:NonNullable<Table['cells'][number]['axisPicture']>};
 
-function pictureOwners(tables:Table[],controls:any[],lists:any[]):PictureOwner[] {
+function pictureOwners(doc:any,tables:Table[],controls:any[],lists:any[]):PictureOwner[] {
  const owners:PictureOwner[]=[];
  for(const listId of new Set(controls.filter(c=>c.list!==0&&c.ctrlId==='gso').map(c=>c.list))){
   const matches=lists.filter(l=>l.listId===listId&&l.isCell&&l.hostListId===0);
@@ -96,7 +96,17 @@ function pictureOwners(tables:Table[],controls:any[],lists:any[]):PictureOwner[]
   const children=controls.filter(c=>c.list===listId);
   const picture=cell.axisPicture;
   if(!picture)throw Error('셀 그림의 원본과 화면 배치를 확인하지 못했습니다.');
-  owners.push({table:table.id,cell:cell.index,paragraphs:[...new Set<number>(children.map(c=>c.para))],picture});
+  const paragraphs=[...new Set<number>(children.map(c=>c.para))].map(index=>{
+   const args=[table.section,table.paragraph,table.control,cell.index,index];
+   const positions=doc.getCellPictureTextAnchors?.(...args);
+   if(!positions)return {index};
+   const anchors=Array.from<number>(positions),length=doc.getCellParagraphLength(...args);
+   const slots=children.filter(c=>c.para===index);
+   if(!anchors.length||anchors.length!==slots.length||anchors.some((n,i)=>!int(n)||n>=length||i>0&&n<anchors[i-1]||slots[i].controlIndex!==i))
+    throw Error('셀 문단의 원래 그림 위치를 확인하지 못했습니다.');
+   return {index,anchors};
+  });
+  owners.push({table:table.id,cell:cell.index,paragraphs,picture});
  }
  return owners;
 }
@@ -108,7 +118,7 @@ function samePictures(before:PictureOwner[],after:PictureOwner[]){
 /** Match every anonymous native control to its field and owning cursor list.
  * A stored table formula must reproduce its cached result without updating any field. */
 function cellFieldBoundaries(d:any,t:Table,tables:Table[],controls:any[],lists:any[]){
- const pictures=pictureOwners(tables,controls,lists);
+ const pictures=pictureOwners(d,tables,controls,lists);
  const nested=controls.filter(c=>c.list!==0&&c.ctrlId!=='gso'),allFields=parsed(d.getFieldList());
  if(!Array.isArray(allFields))throw Error();
  if(new Set(allFields.map(f=>f.fieldId)).size!==allFields.length)throw Error();
@@ -207,10 +217,14 @@ function readPrivateSources(d:any,tables:Table[],name:string){
      const args=[t.section,t.paragraph,t.control,c.index,index],length=d.getCellParagraphLength(...args),text=d.getTextInCell(...args,0,length),path=JSON.stringify([{controlIndex:t.control,cellIndex:c.index,cellParaIndex:index}]),runs=parsed(d.getCharShapeRunsInCellByPath(t.section,t.paragraph,path,0,length)),characters=parsed(d.getCellCharPropertiesAt(...args,0)),paragraph=parsed(d.getCellParaPropertiesAt(...args)),style=parsed(d.getCellStyleAt(...args));
      paragraphBudget++;characterBudget+=Array.from(text).length;
      if(paragraphBudget>200||characterBudget>40000||!plain(text)||Array.from(text).length!==length||!Array.isArray(runs)||runs.some((r:any,i:number)=>!int(r.charShapeId)||!int(r.endOffset)||r.startOffset!==(i===0?0:runs[i-1].endOffset)||r.endOffset<=r.startOffset)||(runs.at(-1)?.endOffset??0)!==length||!int(characters.charShapeId)||paragraph.headType!=='None')throw Error();
-     const editableFrom=boundaries.get(t.id+'/'+c.index+'/'+index);
-     return {index,text,length,characters,paragraph,style,runs,...(pictureParagraphs.includes(index)?{pictureParagraph:true}:{}),...(editableFrom===undefined?{}:{editableFrom})};
+     const pictureParagraph=pictureParagraphs.find(p=>p.index===index);
+     const lastAnchor=pictureParagraph?.anchors?.at(-1);
+     // Keep the character immediately after the final picture. It separates the
+     // editable suffix from the stored slot even after a deletion or insertion.
+     const editableFrom=lastAnchor===undefined?boundaries.get(t.id+'/'+c.index+'/'+index):lastAnchor+1;
+     return {index,text,length,characters,paragraph,style,runs,...(pictureParagraph&&lastAnchor===undefined?{pictureParagraph:true}:{}),...(editableFrom===undefined?{}:{editableFrom})};
     });
-    let readOnly=pictureParagraphs.length===count;
+    let readOnly=(pictureParagraphs.length>0&&c.rowSpan*c.columnSpan===1)||paragraphs.every(p=>p.pictureParagraph===true);
     if(hasLocalFormula){
      // The native graph resolves covered coordinates to their merged owner.
      // Refuse both referenced owners and any owner whose dependencies cannot be resolved.
@@ -304,7 +318,7 @@ export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellPar
  try{const loss=JSON.parse(artifact.contentLoss()),bytes=artifact.takeBytes();verifyPreservedExport(d,bytes,format,loss,b=>new d.constructor(b));reopened=new d.constructor(bytes);
   if(!sameTableLayout(tableLayoutEvidence(d,proof.table),tableLayoutEvidence(reopened,proof.table)))throw new Error('셀 문단 교체 후 실제 저장 재열기 배치가 다릅니다.');
   if(proof.pictures.length){
-   const nativePictures=(doc:any)=>pictureOwners(readStructure(doc).tables,parsed(doc.getControls()),parsed(doc.getCursorModel()).lists);
+   const nativePictures=(doc:any)=>pictureOwners(doc,readStructure(doc).tables,parsed(doc.getControls()),parsed(doc.getCursorModel()).lists);
    const current=nativePictures(d);
    if(current.length!==proof.pictures.length||!samePictures(current,nativePictures(reopened)))throw Error('저장 후 셀 그림의 소유 위치, 자원 또는 배치가 달라졌습니다.');
   }

@@ -1,4 +1,4 @@
-import {createAxisPictureFixture} from './lib/axis-picture-fixture.mjs';
+import {createAxisPictureFixture,inspectPictureAnchors} from './lib/axis-picture-fixture.mjs';
 import assert from 'node:assert/strict';
 import {continuedMergedTable,fragmentedMergedCell} from './lib/continued-merged-table.mjs';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
@@ -49,14 +49,14 @@ for(const format of ['hwp','hwpx'])await scenario(format+' merged paragraph besi
   assert.deepEqual(bytes(d),before);assert.equal(snap(d,name).cellParagraphSources.s0p1t0.editable,false);
  }finally{d.free();}
 });
-for(const format of ['hwp','hwpx'])await scenario(format+' only later plain paragraphs in a merged picture owner are editable',async()=>{
+for(const format of ['hwp','hwpx'])await scenario(format+' plain paragraph in a merged picture owner keeps the picture boundary',async()=>{
  const template=await createAxisPictureFixture(HwpDocument,out,{mergeRange:[0,2,1,2]});
  const bytes=d=>format==='hwp'?d.exportHwp():d.exportHwpx();
  const d=new HwpDocument(bytes(template));template.free();
  try{
   const s=snap(d,'서식.'+format),cell=s.cellParagraphSources.s0p1t0.cells.find(c=>c.row===0&&c.column===2);
-  assert.deepEqual(cell.paragraphs.map(p=>p.index),[1]);
-  const op={kind:'replace_cell_paragraph',target:'s0p1t0',row:0,column:2,paragraph:1,originalText:cell.paragraphs[0].text,text:'개정5'};
+  assert.deepEqual(cell.paragraphs.map(p=>[p.index,p.editableFrom]),[[0,1],[1,undefined]]);
+  const op={kind:'replace_cell_paragraph',target:'s0p1t0',row:0,column:2,paragraph:1,originalText:cell.paragraphs.find(p=>p.index===1).text,text:'개정5'};
   const original=bytes(d),rawAssets=resources(d.exportHwpx()),undo=d.saveSnapshot();
   assert.throws(()=>transactionalCandidate(d,s,[{...op,paragraph:0,originalText:'PicA'}],s.revision));
   assert.deepEqual(bytes(d),original);
@@ -64,14 +64,63 @@ for(const format of ['hwp','hwpx'])await scenario(format+' only later plain para
   const saved=new HwpDocument(bytes(d));
   try{
    const source=snap(saved,'서식.'+format).cellParagraphSources.s0p1t0;
-   assert.deepEqual(source.cells.find(c=>c.column===2&&c.row===0).paragraphs,[{index:1,text:'개정5'}]);
+   assert.deepEqual(source.cells.find(c=>c.column===2&&c.row===0).paragraphs,[{index:0,text:'PicA',editableFrom:1},{index:1,text:'개정5'}]);
    assert.equal(saved.getTextInCell(0,1,0,cell.index,0,0,4),'PicA');
    assert.deepEqual(resources(saved.exportHwpx()),rawAssets);
   }finally{saved.free();}
   d.restoreSnapshot(undo);assert.deepEqual(bytes(d),original);d.discardSnapshot(undo);
  }finally{d.free();}
 });
-await scenario('picture paragraphs at two different indices exclude both from the merged cell edit',async()=>{
+for(const format of ['hwp','hwpx'])await scenario(format+' editable suffix after three inline picture slots preserves native anchors and resources',async()=>{
+ const fixture=await createAxisPictureFixture(HwpDocument,out,{merged:true,grouped:true});
+ const bytes=d=>format==='hwp'?d.exportHwp():d.exportHwpx();
+ const initial=readStructure(fixture).tables[0].cells.find(c=>c.row===1&&c.column===1);
+ const initialArgs=[0,1,0,initial.index,0];
+ const prefix=format==='hwpx'?'😀':'';
+ fixture.insertTextInCell(...initialArgs,4,'기존');
+ if(prefix)fixture.insertTextInCell(...initialArgs,0,prefix);
+ const d=new HwpDocument(bytes(fixture));fixture.free();
+ try{
+  const source=snap(d,'사진.'+format),t=source.structure.tables[0],cell=t.cells.find(c=>c.column===1&&c.row===1);
+  const args=[t.section,t.paragraph,t.control,cell.index,0],original=bytes(d),undo=d.saveSnapshot();
+  const paragraph=source.cellParagraphSources[t.id].cells.find(c=>c.index===cell.index).paragraphs[0];
+  const anchors=Array.from(d.getCellPictureTextAnchors(...args));
+  const shift=Array.from(prefix).length;
+  assert.deepEqual(anchors,[1+shift,2+shift,3+shift]);assert.deepEqual(paragraph,{index:0,text:prefix+'PicB기존',editableFrom:4+shift});
+  const op={kind:'replace_cell_paragraph',target:t.id,row:1,column:1,paragraph:0,originalText:prefix+'PicB기존',text:prefix+'PicB개정'};
+  assert.throws(()=>transactionalCandidate(d,source,[{...op,text:'PicX'}],source.revision));
+  assert.deepEqual(bytes(d),original);
+  transactionalCandidate(d,source,[op],source.revision);
+  const after=bytes(d),redo=d.saveSnapshot(),saved=new HwpDocument(after);
+  try{
+   assert.deepEqual(Array.from(saved.getCellPictureTextAnchors(...args)),anchors);
+   assert.equal(saved.getTextInCell(...args,0,6+shift),prefix+'PicB개정');
+   assert.deepEqual(readStructure(saved).tables[0].cells[cell.index].axisPicture,cell.axisPicture);
+   const sourceFile=resolve(out,'suffix-before.'+format),savedFile=resolve(out,'suffix-after.'+format);
+   await writeFile(sourceFile,original);await writeFile(savedFile,after);
+   const records=inspectPictureAnchors(sourceFile);
+   assert.deepEqual(records.filter(r=>r.row===1&&r.col===1).map(r=>r.textOffset),anchors);
+   assert.deepEqual(inspectPictureAnchors(savedFile),records);
+  }finally{saved.free();}
+  d.restoreSnapshot(undo);assert.deepEqual(bytes(d),original);
+  d.restoreSnapshot(redo);assert.deepEqual(bytes(d),after);
+  if(format==='hwpx'){
+   d.restoreSnapshot(undo);
+   const read=d.getCellPictureTextAnchors.bind(d),insert=d.insertTextInCell.bind(d);
+   let wrote=false;
+   d.insertTextInCell=(...args)=>{const result=insert(...args);wrote=true;return result;};
+   d.getCellPictureTextAnchors=(...args)=>{
+    const positions=read(...args);
+    if(wrote&&args[3]===cell.index&&positions?.length)positions[0]--;
+    return positions;
+   };
+   assert.throws(()=>transactionalCandidate(d,source,[op],source.revision));assert.equal(wrote,true);
+   assert.deepEqual(bytes(d),original);
+  }
+  d.discardSnapshot(undo);d.discardSnapshot(redo);
+ }finally{d.free();}
+});
+await scenario('two picture paragraphs expose only their proven suffixes alongside a plain paragraph',async()=>{
  const fixtureDoc=await createAxisPictureFixture(HwpDocument,out,{merged:true,grouped:true});
  try{
   const owner=readStructure(fixtureDoc).tables[0].cells.find(c=>c.row===1&&c.column===1);
@@ -81,7 +130,9 @@ await scenario('picture paragraphs at two different indices exclude both from th
   const d=new HwpDocument(fixtureDoc.exportHwpx());
   try{
    const source=snap(d,'사진.hwpx'),cap=source.cellParagraphSources.s0p1t0;
-   assert.deepEqual(cap.cells.find(c=>c.index===owner.index).paragraphs,[{index:0,text:'앞 문단'}]);
+   const paragraphs=cap.cells.find(c=>c.index===owner.index).paragraphs;
+   assert.deepEqual(paragraphs.filter(p=>p.editableFrom===undefined),[{index:0,text:'앞 문단'}]);
+   for(const p of paragraphs.filter(p=>p.index!==0))assert.ok(p.editableFrom>0&&p.editableFrom<=Array.from(p.text).length);
    const op={kind:'replace_cell_paragraph',target:'s0p1t0',row:1,column:1,paragraph:0,originalText:'앞 문단',text:'새 문단'};
    transactionalCandidate(d,source,[op],source.revision);
    const reopened=new HwpDocument(d.exportHwpx());

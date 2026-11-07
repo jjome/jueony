@@ -15,10 +15,11 @@ function dividedAxis(old:number[], start:number, span:number, count:number) {
   return {groups, remap, count:edges.length-1};
 }
 
-export function exactSubdivisionPlan(op:AgentTableSubdivisionOp, table:Table, source:AgentTableSubdivisionSource) {
+export function exactSubdivisionPlan(op:AgentTableSubdivisionOp, table:Table, source:AgentTableSubdivisionSource,nestedOwner=false) {
   assertCoverage(table);
   const primary = table.cells.find(c => c.row === op.row && c.column === op.column);
   const limits = source.cells?.find(c => c.row === op.row && c.column === op.column);
+  if(nestedOwner && op.distributeParagraphs)throw Error('중첩 표는 원래 첫 칸에 유지하는 분할만 지원합니다.');
   if((primary?.axisFieldSignature || primary?.properties.fieldName) && (!limits || !primary.axisFieldSignature ||
       primary.rowSpan*primary.columnSpan===1))
     throw new Error('원래 필드의 값과 위치를 확인한 병합 셀이 필요합니다.');
@@ -60,8 +61,8 @@ export function exactSubdivisionPlan(op:AgentTableSubdivisionOp, table:Table, so
       && g.length === Math.floor(total/count) + (i === 0 ? total % count : 0));
   };
   const fieldGrid=Boolean(primary.axisFieldSignature && (!primary.properties.fieldName || op.distributeParagraphs));
-  const useExactGrid = fieldGrid || multi || !merged || !restoreTracks && (r.count !== table.rows || c.count !== table.columns
+  const useExactGrid = nestedOwner || fieldGrid || multi || !merged || !restoreTracks && (r.count !== table.rows || c.count !== table.columns
     || !legacyBand(r.groups,primary.rowSpan) || !legacyBand(c.groups,primary.columnSpan));
-  return {table, primary, source, rows:r.count, columns:c.count, cells, useExactGrid, restoreTracks,
+  return {table, primary, source, rows:r.count, columns:c.count, cells, useExactGrid, restoreTracks,nestedOwner,
     paragraphFormats:formats, widths:c.groups.map(g => g.length), heights:r.groups.map(g => g.length)};
 }

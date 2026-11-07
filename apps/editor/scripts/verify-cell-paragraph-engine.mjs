@@ -147,6 +147,15 @@ for(const format of ['hwp','hwpx']){
    }finally{reopened.free();}
    const redo=d.saveSnapshot();d.restoreSnapshot(undo);assert.deepEqual(json(d.getFieldList()),original);
    d.restoreSnapshot(redo);assert.deepEqual(save(d),after);d.discardSnapshot(undo);d.discardSnapshot(redo);
+   const latest=snap(d,name);
+   // Identical field lists cannot prove that the reopened ID resolves to its own value.
+   d.constructor=function(bytes){
+    const copy=new HwpDocument(bytes),get=copy.getFieldValue.bind(copy);
+    copy.getFieldValue=id=>id===owner.fieldId?get(neighbor.fieldId):get(id);
+    return copy;
+   };
+   assert.throws(()=>transactionalCandidate(d,latest,[command(latest,0,'다른 계획')],'r1'),/이름 셀/);
+   assert.deepEqual(save(d),after);
    const read=d.getFieldValue.bind(d);
    d.getFieldValue=id=>id===owner.fieldId?read(neighbor.fieldId):read(id);
    assert.equal(snap(d,name).cellParagraphSources[base.structure.tables[0].id].editable,false);

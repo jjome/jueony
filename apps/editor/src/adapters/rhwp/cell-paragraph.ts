@@ -102,6 +102,7 @@ function cellFieldBoundaries(d:any,t:Table,tables:Table[],controls:any[],lists:a
  const offsets=[0];
  for(let s=0;s<d.getSectionCount();s++)offsets.push(offsets[s]+d.getParagraphCount(s));
  const fieldEvidence=readBodyTableMarkers(d,controls.filter(c=>c.list===0),offsets,bodyFields,parsed(d.getBookmarks()));
+ for(const field of named)fieldEvidence.push({name:field.name,id:field.fieldId,location:field.location});
  const boundaries=new Map<string,number>();
  const formulaTables=new Set<string>(),checkedHosts=new Set<string>();
  if(!Array.isArray(fields)||fields.length!==nested.length)throw Error();

@@ -6,7 +6,7 @@ import {resolve} from 'node:path';
 import puppeteer from 'puppeteer-core';
 import {loadReviewEngine} from './lib/hancom-review.mjs';
 import {nestedNamedCellFixture} from './lib/nested-named-cell-fixture.mjs';
-import {nestedClickHereFixture} from './lib/nested-click-here-fixture.mjs';
+import {nestedClickHereFixture,rightSiblingLayout} from './lib/nested-click-here-fixture.mjs';
 import {readStructure} from '../src/adapters/rhwp/structure.ts';
 
 const repo=resolve(import.meta.dirname,'../../..'),dist=resolve(process.env.JUEONY_TEST_DIST);
@@ -16,7 +16,8 @@ const calls=[];
 const bodyMarkers=process.env.JUEONY_NESTED_AXIS_ONLY==='body-markers';
 const mergedAxis=process.env.JUEONY_NESTED_AXIS_ONLY==='merged';
 const namedAxis=process.env.JUEONY_NESTED_AXIS_ONLY==='named';
-const storedAxis=process.env.JUEONY_NESTED_AXIS_ONLY==='click-here';
+const leftDelete=process.env.JUEONY_NESTED_AXIS_ONLY==='left-delete';
+const storedAxis=leftDelete||process.env.JUEONY_NESTED_AXIS_ONLY==='click-here';
 const fieldAxis=namedAxis||storedAxis;
 const axisOnly=bodyMarkers||mergedAxis||fieldAxis||process.env.JUEONY_NESTED_AXIS_ONLY==='1';
 const provider=http.createServer(async(req,res)=>{
@@ -25,19 +26,19 @@ const provider=http.createServer(async(req,res)=>{
     const wire=JSON.parse(raw),input=JSON.parse(wire.messages[1].content);
     const tables=input.document.structure.nestedTables;
     assert.equal(tables.length,2);
-    const table=tables[1],cell=table.cells[1],mixed=input.instruction.includes('둘째 문단');
+    const table=tables[leftDelete?0:1],cell=table.cells[1],mixed=input.instruction.includes('둘째 문단');
     const target=mixed?cell.paragraphs.find(p=>p.index===1):cell;
-    assert.equal(target.text,storedAxis?'B우😀eta\n둘째😀':namedAxis?'Beta\n둘째😀':'동일😀');
+    assert.equal(target.text,leftDelete?'A좌😀lpha':storedAxis?'B우😀eta\n둘째😀':namedAxis?'Beta\n둘째😀':'동일😀');
     if(mixed)assert.deepEqual(target.formatSpans,[{start:0,end:1},{start:1,end:3}]);
     else if(namedAxis){assert.equal(cell.fieldName,'공통 이름');assert.equal(cell.editable,false);}
     else if(storedAxis){assert.equal(cell.clickHereFieldIds.length,2);assert.equal(cell.editable,false);}
     else assert.ok(cell.editable);
     calls.push(table.id);
-    const generation={message:'오른쪽 안쪽 표의 두 번째 셀을 바꿨습니다.',sourceIds:[],operations:[{kind:'set_table_cell',target:table.id,row:cell.row,column:cell.column,originalText:target.text,text:'변경😀',...(mixed?{paragraph:1,spanTexts:['변','경😀']}:{})}]};
+    const generation={message:leftDelete?'왼쪽 안쪽 표의 첫 행을 삭제했습니다.':'오른쪽 안쪽 표의 두 번째 셀을 바꿨습니다.',sourceIds:[],operations:[{kind:'set_table_cell',target:table.id,row:cell.row,column:cell.column,originalText:target.text,text:'변경😀',...(mixed?{paragraph:1,spanTexts:['변','경😀']}:{})}]};
     if(axisOnly){
       assert.equal(table.axisEditable,true);
       if(mergedAxis)assert.equal(table.cells[0].rowSpan,2);
-      generation.operations=[input.instruction.includes('행 추가')?{kind:'insert_table_row',target:table.id,index:fieldAxis?0:1,values:mergedAxis?['','새 행😀']:['새 행😀','']}:
+      generation.operations=[leftDelete?{kind:'delete_table_row',target:table.id,index:0}:input.instruction.includes('행 추가')?{kind:'insert_table_row',target:table.id,index:fieldAxis?0:1,values:mergedAxis?['','새 행😀']:['새 행😀','']}:
         {kind:'delete_table_column',target:table.id,index:1}];
     }
     res.setHeader('Content-Type','application/json'); res.end(JSON.stringify({choices:[{message:{content:JSON.stringify(generation)}}]}));
@@ -64,7 +65,7 @@ try {
   await fill('config-model','nested-fixture');await fill('config-key','synthetic-local-fixture');
   await page.$eval('#config-remember',e=>e.checked=false);await page.click('#model-form button[type=submit]');
   await page.waitForFunction(()=>!document.getElementById('model-dialog').open);
-  for (const format of ['hwp','hwpx']) for(const mode of (bodyMarkers||mergedAxis||fieldAxis?['insert-row']:axisOnly?['insert-row','delete-column']:['plain','mixed'])){
+  for (const format of ['hwp','hwpx']) for(const mode of (leftDelete?['delete-left-row']:bodyMarkers||mergedAxis||fieldAxis?['insert-row']:axisOnly?['insert-row','delete-column']:['plain','mixed'])){
     const mixed=mode==='mixed';
     const frame=await (await page.$('.editor-frame:not([hidden])')).contentFrame();
     const doc=storedAxis?nestedClickHereFixture(HwpDocument):namedAxis?nestedNamedCellFixture(HwpDocument):HwpDocument.createEmpty();
@@ -92,16 +93,16 @@ try {
     const originalFields=storedAxis?JSON.parse(doc.getFieldList()):undefined;
     const bytes=Array.from(format==='hwpx'?doc.exportHwpx():doc.exportHwp());doc.free();
     const records=d=>[JSON.parse(d.getFieldList()),JSON.parse(d.getBookmarks())];
-    let originalMarkers;
-    if(bodyMarkers){
+    let originalMarkers,originalRightLayout;
+    if(bodyMarkers||leftDelete){
       const source=new HwpDocument(new Uint8Array(bytes));
-      try{originalMarkers=records(source);}finally{source.free();}
+      try{if(bodyMarkers)originalMarkers=records(source);if(leftDelete)originalRightLayout=rightSiblingLayout(source);}finally{source.free();}
     }
     await frame.evaluate(async(bytes,name)=>{
       const root=await navigator.storage.getDirectory(),h=await root.getFileHandle(name,{create:true}),writer=await h.createWritable();
       await writer.write(new Uint8Array(bytes));await writer.close();await window.jueonyEditor.open(new Uint8Array(bytes),name,h,false);
     },bytes,'nested-review.'+format);
-    const request=fieldAxis?'오른쪽 안쪽 표의 필드 셀 위에 행 추가':mergedAxis?'오른쪽 안쪽 표의 세로 병합 사이에 행 추가':axisOnly?(mode==='insert-row'?'오른쪽 안쪽 표 마지막에 행 추가':'오른쪽 안쪽 표의 둘째 열 삭제'):
+    const request=leftDelete?'왼쪽 안쪽 표의 첫 행 삭제':fieldAxis?'오른쪽 안쪽 표의 필드 셀 위에 행 추가':mergedAxis?'오른쪽 안쪽 표의 세로 병합 사이에 행 추가':axisOnly?(mode==='insert-row'?'오른쪽 안쪽 표 마지막에 행 추가':'오른쪽 안쪽 표의 둘째 열 삭제'):
       mixed?'오른쪽 안쪽 표의 두 번째 셀 둘째 문단을 변경해줘':'오른쪽 안쪽 표의 두 번째 셀을 변경해줘';
     await fill('request-input',request);
     const sent=page.waitForResponse(r=>r.url()===origin+'/api/generate');
@@ -115,7 +116,8 @@ try {
     if(mergedAxis){original[1].push('끝');edited[1]=['동일😀','동일😀','새 행😀','끝'];}
     if(fieldAxis){
       [original[0],original[1]]=sourceTexts;
-      edited[0]=original[0];edited[1]=['새 행😀','',...original[1]];
+      if(leftDelete){edited[0]=[original[0][2],original[0][1],...original[0].slice(3)];edited[1]=original[1];}
+      else{edited[0]=original[0];edited[1]=['새 행😀','',...original[1]];}
     }
     assert.deepEqual(await texts(),edited);
     const undo=(await page.$$('.message-actions button')).reverse();
@@ -135,7 +137,8 @@ try {
       assert.deepEqual(tables.map(t=>t.cells.map(c=>c.text)),edited);
       if(mergedAxis)assert.deepEqual([tables[1].rows,tables[1].cells[0].rowSpan],[3,3]);
       if(storedAxis){
-        const actual=JSON.parse(reopened.getFieldList()),owner=tables[1].cells.find(c=>c.row===1&&c.column===1);
+        if(leftDelete)assert.deepEqual(rightSiblingLayout(reopened),originalRightLayout);
+        const actual=JSON.parse(reopened.getFieldList()),owner=tables[leftDelete?0:1].cells.find(c=>c.row===(leftDelete?0:1)&&c.column===1);
         assert.equal(actual.length,originalFields.length);
         for(const previous of originalFields){
           const field=actual.find(f=>f.fieldId===previous.fieldId),expected=structuredClone(previous);

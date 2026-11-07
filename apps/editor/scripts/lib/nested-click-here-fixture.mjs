@@ -22,3 +22,14 @@ export function nestedClickHereFixture(HwpDocument){
   return d;
  }catch(e){d.free();throw e;}
 }
+
+export function rightSiblingLayout(doc){
+ const [parent,,table]=JSON.parse(doc.getPageControlLayout(0)).controls;
+ const runs=JSON.parse(doc.getPageTextLayout(0)).runs.filter(r=>r.cellPath?.length===2&&r.cellPath[0].cellIndex===1);
+ assert.equal(table.rowCount,3);assert.equal(table.cells.length,5);
+ const last=table.cells.filter(c=>c.row===2);
+ assert.deepEqual(last.map(c=>c.col),[0,1]);
+ for(const c of last)assert.ok(Math.abs(c.h-table.cells[0].h)<0.2,'last row must have its full declared track');
+ assert.deepEqual(runs.filter(r=>last.some(c=>c.cellIdx===r.cellPath[1].cellIndex)).map(r=>r.text),['E','F']);
+ return {parentHeight:parent.h,table,runs};
+}

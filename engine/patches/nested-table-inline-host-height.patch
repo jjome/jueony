@@ -1,0 +1,92 @@
+--- a/src/renderer/height_measurer.rs
++++ b/src/renderer/height_measurer.rs
+@@ -2491,7 +2491,7 @@
+         control_index: usize,
+         styles: &ResolvedStyleSet,
+     ) -> MeasuredTable {
+-        self.measure_table_impl(table, para_index, control_index, styles, 0, 1.0)
++        self.measure_table_impl(table, para_index, control_index, styles, 0, 1.0, true)
+     }
+ 
+     /// 재귀적 높이 제한
+@@ -2519,7 +2519,7 @@
+                             let stretch =
+                                 self.render_normalization.nested_table_width_scale(nested);
+                             let mt =
+-                                self.measure_table_impl(nested, 0, 0, styles, depth + 1, stretch);
++                                self.measure_table_impl(nested, 0, 0, styles, depth + 1, stretch, true);
+                             Some(mt.total_height)
+                         } else {
+                             None
+@@ -2577,16 +2577,30 @@
+                 if crate::renderer::float_placement::nested_table_is_hwpx_overlay(
+                     nested,
+                     self.hwpx_stored_layout,
+-                ) || para_max_lh >= nested.common.height as i32
+-                {
++                ) {
+                     return None;
+                 }
++                let declared = i32::try_from(nested.common.height).ok()?;
++                // A single inline table owns this whole stored line. Sequential
++                // cell flow has already counted its line height, on either side
++                // of the declared height. Reserve only the unpaid part of the
++                // measured child and its outside margins.
++                let reserved = if nested.common.treat_as_char && declared > 0
++                    && p.text.is_empty() && p.controls.len() == 1 && p.line_segs.len() == 1
++                    && para_max_lh > 0 && !crate::renderer::para_has_no_stored_line_segs(p)
++                {
++                    hwpunit_to_px(para_max_lh, self.dpi)
++                } else if para_max_lh >= declared {
++                    return None;
++                } else {
++                    0.0
++                };
+                 let stretch = self.render_normalization.nested_table_width_scale(nested);
+-                let mt = self.measure_table_impl(nested, 0, 0, styles, depth + 1, stretch);
+-                let declared = hwpunit_to_px(nested.common.height as i32, self.dpi);
++                let mt = self.measure_table_impl(nested, 0, 0, styles, depth + 1, stretch, reserved == 0.0);
++                let body = mt.total_height.max(hwpunit_to_px(declared, self.dpi));
+                 let om = hwpunit_to_px(nested.outer_margin_top as i32, self.dpi)
+                     + hwpunit_to_px(nested.outer_margin_bottom as i32, self.dpi);
+-                Some(mt.total_height.max(declared) + om)
++                Some((body + om - reserved).max(0.0))
+             })
+             .sum()
+     }
+@@ -2641,7 +2655,7 @@
+                             let stretch =
+                                 self.render_normalization.nested_table_width_scale(nested);
+                             let mt =
+-                                self.measure_table_impl(nested, 0, 0, styles, depth + 1, stretch);
++                                self.measure_table_impl(nested, 0, 0, styles, depth + 1, stretch, true);
+                             let outer_margin = hwpunit_to_px(
+                                 i32::from(nested.outer_margin_top)
+                                     + i32::from(nested.outer_margin_bottom),
+@@ -2769,6 +2783,7 @@
+         // 확장은 PDF 줄바꿈·조각 높이를 바꾸므로 RenderNormalizationOverlay가
+         // 1.0을 반환한다.
+         width_scale: f64,
++        fit_declared_inline_height: bool,
+     ) -> MeasuredTable {
+         let width_scale =
+             width_scale.max(self.render_normalization.nested_table_width_scale(table));
+@@ -2821,6 +2836,7 @@
+                                 styles,
+                                 depth + 1,
+                                 width_scale,
++                                fit_declared_inline_height,
+                             );
+                         }
+                     }
+@@ -4300,7 +4316,10 @@
+         // 편집으로 셀이 자란 성장분까지 선언높이로 눌러 다른 행의 몫을 잠식한다
+         // (셀 Enter 재현: 표가 선언 높이에 고정된 채 행 경계만 위로 밀림).
+         // 편집 세션은 실측을 신뢰한다.
++        // A standalone inline child is painted from its content rows.
++        // A compressed whole-table pagination estimate cannot bound that frame.
+         let table_height = if table.common.treat_as_char
++            && fit_declared_inline_height
+             && !self.session_edited
+             && common_h > 0.0
+             && raw_table_height > common_h + shrink_threshold

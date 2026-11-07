@@ -83,6 +83,13 @@ function cellFieldBoundaries(d:any,t:Table,controls:any[],lists:any[]){
  const nested=controls.filter(c=>c.list!==0),fields=parsed(d.getFieldList());
  const boundaries=new Map<string,number>();
  if(!Array.isArray(fields)||fields.length!==nested.length)throw Error();
+ const remaining=new Map<string,number>();
+ for(const c of nested){
+  if(c.ctrlId!==''||c.ctrlCh!==0)throw Error();
+  const key=c.list+'/'+c.para;
+  remaining.set(key,(remaining.get(key)??0)+1);
+ }
+ const inspected=new Set<number>();
  for(const field of fields){
   const loc=field.location,step=loc?.path?.[0];
   if(field.fieldType!=='clickhere'||field.cellField!==false||loc?.sectionIndex!==t.section||loc.paraIndex!==t.paragraph||
@@ -90,13 +97,14 @@ function cellFieldBoundaries(d:any,t:Table,controls:any[],lists:any[]){
      !int(field.startCharIdx)||!int(field.endCharIdx)||field.endCharIdx<field.startCharIdx||field.paraInList!==step.paraIndex)throw Error();
   const list=lists.find(l=>l.hostListId===0&&l.isCell&&l.sectionIndex===t.section&&l.hostPara===t.paragraph&&
    l.controlIndex===t.control&&l.cellIndex===step.cellIndex&&l.listId===field.listId);
-  const matches=nested.filter(c=>c.list===list?.listId&&c.para===step.paraIndex);
-  if(!list||matches.length!==1||matches[0].ctrlId!==''||matches[0].ctrlCh!==0)throw Error();
+  const slot=field.listId+'/'+step.paraIndex,count=remaining.get(slot)??0;
+  if(!list||!count||!int(field.fieldId)||inspected.has(field.fieldId))throw Error();
+  inspected.add(field.fieldId); remaining.set(slot,count-1);
   const info=parsed(d.getFieldInfoAtInCell(t.section,t.paragraph,t.control,step.cellIndex,step.paraIndex,field.startCharIdx,false));
   const key=step.cellIndex+'/'+step.paraIndex;
   if(!info.inField||info.fieldId!==field.fieldId||info.fieldType!==field.fieldType||info.startCharIdx!==field.startCharIdx||
-     info.endCharIdx!==field.endCharIdx||boundaries.has(key))throw Error();
-  boundaries.set(key,field.endCharIdx+1);
+     info.endCharIdx!==field.endCharIdx)throw Error();
+  boundaries.set(key,Math.max(boundaries.get(key)??0,field.endCharIdx+1));
  }
  return boundaries;
 }

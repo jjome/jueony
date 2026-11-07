@@ -72,7 +72,7 @@ function columnNumber(letters: string): number {
   return number - 1;
 }
 
-function columnLetters(column: number): string {
+export function columnLetters(column: number): string {
   let ordinal = column + 1;
   let result = '';
   while (ordinal > 0) {
@@ -93,7 +93,7 @@ function referenceFrom(raw: string, start: number, end: number, shape: Shape): R
   return {row, column, fixedColumn: match[1] === '$', fixedRow: match[3] === '$', start, end};
 }
 
-function tokenize(formula: string, shape: Shape): Token[] {
+export function tokenizeTableFormula(formula: string, shape: Shape): Token[] {
   if (typeof formula !== 'string' || formula.length < 2 || formula.length > MAX_FORMULA_LENGTH ||
     !formula.startsWith('=')) throw new Error('=로 시작하는 길이 4,096자 이하의 수식이 필요합니다.');
   const tokens: Token[] = [];
@@ -227,7 +227,7 @@ class Parser {
 }
 
 function parse(formula: string, shape: Shape): {expression: Expression; references: readonly Reference[]} {
-  const tokens = tokenize(formula, shape);
+  const tokens = tokenizeTableFormula(formula, shape);
   const expression = new Parser(tokens).parse();
   return {expression, references: tokens.filter(t => t.kind === 'reference').map(t => t.reference!)};
 }
@@ -256,7 +256,7 @@ export function translateTableFormula(formula: string, rowDelta: number, columnD
  * such as ABOVE intact and shift only range-checked A1 token coordinates. */
 export function translateStoredTableFormula(formula:string, rowDelta:number, columnDelta:number, dimensions:Shape):string {
   const shape=shapeOf(dimensions);
-  const references=tokenize(formula, shape).flatMap(t=>t.reference?[t.reference]:[]);
+  const references=tokenizeTableFormula(formula, shape).flatMap(t=>t.reference?[t.reference]:[]);
   return shiftReferences(formula,references,rowDelta,columnDelta,shape);
 }
 

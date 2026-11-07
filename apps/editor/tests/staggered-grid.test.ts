@@ -40,7 +40,7 @@ function snapshot(doc:any, format:string):Snapshot {
   const structure=readStructure(doc), name='엇갈린 격자.'+format;
   return {structure,name,nodes:[],limitations:[],revision:'fixture',tableSubdivisionSources:readTableSubdivisionSources(doc,structure.tables,name)};
 }
-for (const format of ['hwpx','hwp']) test(format+' splits the owner on a continuation page and refuses fragmented cells',()=>{
+for (const format of ['hwpx','hwp']) test(format+' splits an intact continuation-page owner and rejects an inconsistent neighbor height',()=>{
   const source=continuedMergedTable(HwpDocument);
   if(format==='hwpx') source.setTableProperties(...at,'{"pageBreak":2}');
   const doc=new HwpDocument(serialize(source,format));source.free();
@@ -57,7 +57,13 @@ for (const format of ['hwpx','hwp']) test(format+' splits the owner on a continu
     });
   } finally { doc.free(); }
   const fragmented=fragmentedMergedCell(HwpDocument), split=new HwpDocument(serialize(fragmented,format));fragmented.free();
-  try {assert.equal(snapshot(split,format).tableSubdivisionSources![target].editable,false);}
+  try {
+    const s=snapshot(split,format), before=serialize(split,format);
+    const op:EditOp={kind:'split_table_cell_into',target,row:0,column:0,rows:1,columns:2};
+    assert.equal(s.tableSubdivisionSources![target].editable,false);
+    assert.throws(()=>executeDocumentOperations(split,s,[op]));
+    assert.deepEqual(serialize(split,format),before);
+  }
   finally {split.free();}
 });
 function roundtrip(doc:any, format:string, edit:()=>void) {

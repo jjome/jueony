@@ -1,0 +1,103 @@
+--- a/src/document_core/commands/table_ops.rs
++++ b/src/document_core/commands/table_ops.rs
+@@ -2336,6 +2336,76 @@
+                 depth, control_idx
+             ))),
+         }
++    }
++
++    /// A structural edit must resolve every ancestor as a writable table cell.
++    /// Do not allow the generic cell path resolver to traverse a text box.
++    pub(crate) fn nested_axis_table(
++        &self, section: usize, root_para: usize, path: &[(usize, usize, usize)],
++    ) -> Option<&crate::model::table::Table> {
++        if !(2..=8).contains(&path.len()) || self.document.header.encrypted
++            || self.document.header.distribution || self.document.provenance.hwp3_lineage {
++            return None;
++        }
++        let mut para = self.document.sections.get(section)?.paragraphs.get(root_para)?;
++        for (depth, &(control, cell_index, para_index)) in path.iter().enumerate() {
++            let Control::Table(table) = para.controls.get(control)? else { return None; };
++            if table.common.locked { return None; }
++            if depth + 1 == path.len() {
++                let rows = usize::from(table.row_count);
++                let cols = usize::from(table.col_count);
++                if cell_index != 0 || para_index != 0 || rows == 0 || rows > 50 || cols == 0
++                    || cols > 20 || rows * cols > 200 || table.cells.len() != rows * cols
++                    || !table.zones.is_empty() || table.caption.is_some() || table.repeat_header {
++                    return None;
++                }
++                for (i, c) in table.cells.iter().enumerate() {
++                    if usize::from(c.row) != i / cols || usize::from(c.col) != i % cols
++                        || c.row_span != 1 || c.col_span != 1 || c.is_header || c.cell_protect()
++                        || !c.field_name.as_deref().unwrap_or("").is_empty() || c.paragraphs.is_empty()
++                        || c.paragraphs.iter().any(|p| !p.controls.is_empty() || !p.field_ranges.is_empty()
++                            || !p.orphan_field_ends.is_empty() || !p.range_tags.is_empty()) {
++                        return None;
++                    }
++                }
++                return Some(table);
++            }
++            let ancestor = table.cells.get(cell_index)?;
++            if ancestor.cell_protect() || !ancestor.field_name.as_deref().unwrap_or("").is_empty() {
++                return None;
++            }
++            para = ancestor.paragraphs.get(para_index)?;
++        }
++        None
++    }
++
++    pub(crate) fn edit_nested_table_axis_native(
++        &mut self, section: usize, root_para: usize, path: &[(usize, usize, usize)],
++        row: bool, insert: bool, index: u32,
++    ) -> Result<String, HwpError> {
++        let invalid = || HwpError::RenderError("중첩 표의 격자·대상 또는 보호 상태를 확인하세요.".into());
++        let source = self.nested_axis_table(section, root_para, path).ok_or_else(invalid)?;
++        let size = if row { source.row_count } else { source.col_count };
++        let index = u16::try_from(index).map_err(|_| invalid())?;
++        let (rows, cols) = (usize::from(source.row_count), usize::from(source.col_count));
++        if index > size || (!insert && (index == size || size == 1))
++            || (insert && ((row && rows == 50) || (!row && cols == 20)
++                || (rows + usize::from(row)) * (cols + usize::from(!row)) > 200)) {
++            return Err(invalid());
++        }
++        // Publish the edited child only after its model operation has succeeded.
++        let mut updated = source.clone();
++        match (row, insert) {
++            (true, true) => updated.insert_row(index.min(size - 1), index == size),
++            (false, true) => updated.insert_column(index.min(size - 1), index == size),
++            (true, false) => updated.delete_row(index),
++            (false, false) => updated.delete_column(index),
++        }.map_err(HwpError::RenderError)?;
++        *self.resolve_table_mut_by_cell_path(section, root_para, path)? = updated;
++        self.document.sections[section].raw_stream = None;
++        self.recompose_section(section);
++        self.paginate_if_needed();
++        Ok(r#"{"ok":true}"#.into())
+     }
+ 
+     /// [#7189] 중첩 표의 셀 크기를 셀 경로로 조절한다.
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -3489,6 +3489,21 @@
+     ///
+     /// `cell_path_json`: `[{"controlIndex":0,"cellIndex":0,"cellParaIndex":9},...]`
+     /// 마지막 항목이 조절할 표를 가리킨다. 깊이 1 이면 평면 API 와 같은 경로로 처리한다.
++    #[wasm_bindgen(js_name = canEditNestedTableAxis)]
++    pub fn can_edit_nested_table_axis(&self, section: u32, para: u32, path_json: &str) -> bool {
++        parse_cell_path_arg(path_json).ok().is_some_and(|path|
++            self.nested_axis_table(section as usize, para as usize, &path).is_some())
++    }
++
++    #[wasm_bindgen(js_name = editNestedTableAxis)]
++    pub fn edit_nested_table_axis(
++        &mut self, section: u32, para: u32, path_json: &str, row: bool, insert: bool, index: u32,
++    ) -> Result<String, JsValue> {
++        let path = parse_cell_path_arg(path_json)?;
++        self.edit_nested_table_axis_native(section as usize, para as usize, &path, row, insert, index)
++            .map_err(Into::into)
++    }
++
+     #[wasm_bindgen(js_name = resizeTableCellsByPath)]
+     pub fn resize_table_cells_by_path(
+         &mut self,

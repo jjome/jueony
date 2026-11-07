@@ -1,0 +1,89 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+import {readStructure} from '../src/adapters/rhwp/structure.ts';
+import {readTableSubdivisionSources} from '../src/adapters/rhwp/table-subdivision.ts';
+import {executeDocumentOperations} from '../src/adapters/rhwp/execute.ts';
+import {validateEditOperations,type Snapshot} from '../src/modules/document/public/index.ts';
+import {fragmentedSubdivisionTable} from '../scripts/lib/fragmented-subdivision.mjs';
+
+const pkg = process.env.JUEONY_ENGINE_PACKAGE ?? fileURLToPath(new URL('../node_modules/@rhwp/core/',import.meta.url));
+const {default:init,HwpDocument} = await import(pathToFileURL(resolve(pkg,'rhwp.js')).href);
+await init({module_or_path:await readFile(resolve(pkg,'rhwp_bg.wasm'))});
+const at=[0,1,0] as const, target='s0p1t0';
+const command={kind:'split_table_cell_into',target,row:0,column:0,rows:1,columns:3} as const;
+const save=(d:any,ext:string):Uint8Array=>ext==='hwp'?d.exportHwp():d.exportHwpx();
+function snapshot(d:any,ext:string):Snapshot {
+  const name='이어진 셀.'+ext, structure=readStructure(d);
+  return {structure,name,nodes:[],revision:'fixture',limitations:[],tableSubdivisionSources:readTableSubdivisionSources(d,structure.tables,name)};
+}
+function boxes(d:any) {
+  return Array.from({length:d.pageCount()},(_,p)=>JSON.parse(d.getPageControlLayout(p)).controls.find((f:any)=>f.type==='table'));
+}
+
+for (const ext of ['hwp','hwpx']) for (const merged of [false,true]) {
+  test(ext+' splits a '+(merged?'merged multi-paragraph':'plain hard-line-break')+' cell spanning three pages',()=>{
+    const src=fragmentedSubdivisionTable(HwpDocument,{merged,hardBreaks:!merged}), d=new HwpDocument(save(src,ext));src.free();
+    try {
+      const s=snapshot(d,ext), source=boxes(d), old=save(d,ext), undo=d.saveSnapshot(), text=s.structure!.tables[0].cells[0].text;
+      assert.equal(source.length,3);
+      assert.ok(s.tableSubdivisionSources![target].frames!.every(f=>f.cells.some(c=>c.index===0&&c.lineSignature)));
+      executeDocumentOperations(d,s,validateEditOperations([command],s));
+      const after=boxes(d);
+      assert.equal(after.length,3);
+      for (const [page,f] of source.entries()) {
+        const parent=f.cells.find((c:any)=>c.row===0&&c.col===0);
+        const divided=after[page].cells.filter((c:any)=>c.row===0&&c.x>=parent.x-0.2&&c.x<parent.x+parent.w-0.2);
+        assert.equal(divided.length,3);
+        for(const [index,c] of divided.entries()) {
+          assert.equal(c.y,parent.y);assert.equal(c.h,parent.h);
+          assert.ok(Math.abs(c.x-parent.x-index*parent.w/3)<=0.2);
+          assert.ok(Math.abs(c.w-parent.w/3)<=0.2);
+        }
+      }
+      const result=save(d,ext), redo=d.saveSnapshot(), reopened=new HwpDocument(result);
+      try {
+        assert.deepEqual(boxes(reopened),after);
+        assert.equal(readStructure(reopened).tables[0].cells[0].text,text);
+        if(merged) assert.equal(JSON.parse(reopened.getCellCharPropertiesAt(...at,0,19,0)).bold,true);
+        d.restoreSnapshot(undo);assert.deepEqual(save(d,ext),old);
+        d.restoreSnapshot(redo);assert.deepEqual(save(d,ext),result);
+      } finally {reopened.free();d.discardSnapshot(redo);d.discardSnapshot(undo);}
+    } finally {d.free();}
+  });
+}
+
+for (const ext of ['hwp','hwpx']) test(ext+' restores the original bytes when a narrowed cell changes page breaks',()=>{
+  const src=fragmentedSubdivisionTable(HwpDocument,{wrapped:true}),d=new HwpDocument(save(src,ext));src.free();
+  try {
+    const s=snapshot(d,ext),before=save(d,ext);
+    assert.ok(s.tableSubdivisionSources![target].frames!.length>1);
+    assert.throws(()=>executeDocumentOperations(d,s,validateEditOperations([command],s)),/외형|쪽이 달라/);
+    assert.deepEqual(save(d,ext),before);
+  } finally {d.free();}
+});
+for (const fault of ['original index','native offset','neighbor line']) test('fragment proof rejects a changed '+fault,()=>{
+  const doc=fragmentedSubdivisionTable(HwpDocument);
+  const d=new HwpDocument(doc.exportHwpx());doc.free();
+  try {
+    const s=snapshot(d,'hwpx'), original=d.exportHwpx(), read=d.getPageTextLayout.bind(d);
+    d.getPageTextLayout=(page:number)=>{
+      const result=JSON.parse(read(page));
+      const post=JSON.parse(d.getTableDimensions(...at)).cellCount!==s.structure!.tables[0].cells.length;
+      if (fault==='neighbor line' && post && page===0) {
+        const line=result.runs.find((r:any)=>r.controlIdx===0&&r.parentParaIdx===1&&r.text==='C2');
+        assert.ok(line);line.x+=1;
+      } else if(page===1 && fault!=='neighbor line') {
+        const line=result.runs.find((r:any)=>r.controlIdx===0&&r.parentParaIdx===1&&r.cellIdx===0&&r.text);
+        assert.ok(line);
+        if(fault==='original index')line.cellIdx=1;else line.charStart++;
+      }
+      return JSON.stringify(result);
+    };
+    assert.throws(()=>executeDocumentOperations(d,s,[command]));
+    assert.deepEqual(d.exportHwpx(),original);
+    if(fault!=='neighbor line')assert.equal(snapshot(d,'hwpx').tableSubdivisionSources![target].editable,false);
+  } finally {d.free();}
+});

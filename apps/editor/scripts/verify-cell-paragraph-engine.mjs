@@ -11,7 +11,8 @@ import {validateEditOperations} from '../src/modules/document/public/index.ts';
 const pkg=resolve(process.env.JUEONY_ENGINE_PACKAGE),out=resolve(process.env.JUEONY_TEST_OUTPUT??'build/cell-paragraph-native');await mkdir(out,{recursive:true});
 const {default:init,HwpDocument}=await import(pathToFileURL(pkg+'/rhwp.js'));await init({module_or_path:await readFile(pkg+'/rhwp_bg.wasm')});
 const results=[],failures=[],json=v=>typeof v==='string'?JSON.parse(v):v;
-async function scenario(name,run){try{await run();results.push(name);console.log('PASS',name);}catch(e){failures.push({name,error:String(e),stack:e.stack});console.log('FAIL',name,e.message);}}
+const casePattern=process.env.JUEONY_CASE_PATTERN?new RegExp(process.env.JUEONY_CASE_PATTERN,'u'):undefined;
+async function scenario(name,run){if(casePattern&&!casePattern.test(name))return;try{await run();results.push(name);console.log('PASS',name);}catch(e){failures.push({name,error:String(e),stack:e.stack});console.log('FAIL',name,e.message);}}
 function fixture(){const d=HwpDocument.createEmpty();d.createBlankDocument();d.insertText(0,0,0,'Body preserved');d.splitParagraph(0,0,d.getParagraphLength(0,0));d.createTable(0,1,0,3,3);for(let i=0;i<9;i++){d.insertTextInCell(0,1,0,i,0,0,'Cell '+i);d.setCellProperties(0,1,0,i,'{"width":12000,"height":5000}');}d.applyCharFormatInCell(0,1,0,1,0,0,6,'{"bold":true}');d.applyParaFormatInCell(0,1,0,1,0,'{"alignment":"center"}');d.mergeTableCells(0,1,0,0,0,0,1);d.splitParagraph(0,1,d.getParagraphLength(0,1));d.createTable(0,2,0,2,2);d.insertTextInCell(0,2,0,0,0,0,'Other');const r=new HwpDocument(d.exportHwpx());d.free();return r;}
 const snap=(d,name='candidate.hwpx')=>{const structure=readStructure(d);return {revision:'r1',name,nodes:[],limitations:[],structure,cellParagraphSources:readCellParagraphSources(d,structure.tables,name)};};
 function transactionalCandidate(d,s,ops,revision){if(revision!==s.revision)throw Error('Stale revision');const token=d.saveSnapshot();try{validateEditOperations(ops,s);return executeDocumentOperations(d,s,ops);}catch(e){d.restoreSnapshot(token);throw e;}finally{d.discardSnapshot(token);}}
@@ -89,6 +90,23 @@ for(const format of ['hwp','hwpx']){
     assert.equal(reopened.getTextInCell(...args,0,5),op.text);
    }finally{reopened.free();}
    doc.restoreSnapshot(undo);assert.deepEqual(save(doc),original);doc.discardSnapshot(undo);
+  }finally{doc.free();}
+ });
+ await scenario(format+' preserves two click-here fields during a suffix edit',()=>{
+  const args=[0,1,0,0,1],template=fixture(),save=d=>format==='hwp'?d.exportHwp():d.exportHwpx();
+  for(const pos of [3,1])assert.equal(json(template.insertClickHereFieldInCell(...args,pos,false,'FIELD','memo','field'+pos,true)).ok,true);
+  const doc=new HwpDocument(save(template));template.free();
+  try{
+   const name='two-fields.'+format,base=snap(doc,name),cell=base.cellParagraphSources[base.structure.tables[0].id].cells[0];
+   assert.equal(cell.paragraphs[1].editableFrom,4);
+   const before=save(doc),fields=json(doc.getFieldList()),prefix=cell.paragraphs[1].text.slice(0,4);
+   const op=command(base,1,prefix+'수정😀');
+   assert.throws(()=>transactionalCandidate(doc,base,[{...op,text:prefix.slice(0,2)+'XX수정😀'}],'r1'),/필드/);
+   assert.deepEqual(save(doc),before);
+   transactionalCandidate(doc,base,[op],'r1');
+   const reopened=new HwpDocument(save(doc));
+   try{assert.deepEqual(json(reopened.getFieldList()),fields);assert.equal(reopened.getTextInCell(...args,0,7),op.text);}
+   finally{reopened.free();}
   }finally{doc.free();}
  });
  await scenario(format+' edits a paragraph spanning pages and rejects duplicated rendered text',()=>{

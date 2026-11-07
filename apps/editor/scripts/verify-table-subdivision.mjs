@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer-core';
+import {fragmentedSubdivisionTable} from './lib/fragmented-subdivision.mjs';
 import {continuedMergedTable} from './lib/continued-merged-table.mjs';
 import http from 'node:http';
 import {spawn} from 'node:child_process';
@@ -28,6 +29,7 @@ const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const
  if (input.instruction.includes('병합 주 셀')) Object.assign(operations[0],{row:0,column:0,rows:2,columns:1});
  if (input.instruction.includes('문단 분배')) Object.assign(operations[0],{row:0,column:0,rows:2,columns:2,distributeParagraphs:true});
  if(input.instruction.includes('둘째 쪽의 합친 셀')) Object.assign(operations[0],{row:17,column:0,rows:1,columns:3,distributeParagraphs:true});
+ if(input.instruction.includes('세 쪽에 걸친 셀'))Object.assign(operations[0],{row:0,column:0,rows:1,columns:3});
  if(input.instruction.includes('누름틀이 있는 표에 열 추가')) operations[0]={kind:'insert_table_column',target,index:1,values:['','','']};
  if(input.instruction.includes('범위 초과'))operations[0].row=99;
  if(input.instruction.includes('무변경')){operations[0].rows=1;operations[0].columns=1;}
@@ -78,6 +80,36 @@ try{
  await new Promise(r=>provider.listen(providerPort,'127.0.0.1',r));for(let i=0;i<100;i++){if(await fetch(origin+'/api/health').then(r=>r.ok,()=>false))break;await delay(100);}
  browser=await puppeteer.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,args:['--no-first-run','--disable-background-networking'],defaultViewport:{width:1400,height:1000}});page=await browser.newPage();page.setDefaultTimeout(15000);page.on('dialog',d=>void (d.type()==='beforeunload'?d.accept():d.dismiss()));page.on('pageerror',e=>pageErrors.push(String(e)));page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});await page.setRequestInterception(true);page.on('request',r=>{if(!r.url().startsWith(origin)&&!r.url().startsWith('data:')&&!r.url().startsWith('blob:')){externalRequests.push(r.url());void r.abort();}else void r.continue();});await page.goto(origin);await ready();
  for(const id of ['openai-responses','anthropic','gemini','openai-compatible'])await scenario(id+': chat subdivision, compare, cursor, undo/redo, save/UI reopen',async()=>{await configure(id);const f=await open('hwpx',body('hwpx',true)),before=await snap(),t=before.structure.tables[0],start=calls.length;assert.equal(before.tableSubdivisionSources[t.id].editable,true);await send('셀 2행 2열 분할');await error(false);assert.equal(calls.length,start+1);assert.equal(calls.at(-1).id,id);assert.equal(calls.at(-1).model,id+'-fixture');assert.equal(calls.at(-1).input.document.tableSubdivisionSources[t.id].editable,true);const after=await snap(),table=after.structure.tables[0],primary=table.cells.find(c=>c.row===1&&c.column===1);assert.equal(table.rows,4);assert.equal(table.columns,4);assert.equal(table.cells.length,12);assert.equal(primary.text,t.cells[4].text);for(const c of table.cells.filter(c=>c.row>=1&&c.row<=2&&c.column>=1&&c.column<=2&&c!==primary))assert.equal(c.text,'');assert.deepEqual(after.structure.tables[1],before.structure.tables[1]);assert.deepEqual(after.nodes,before.nodes);assert.equal(await f.evaluate(()=>window.__pageServices.getInputHandler().getCursorPosition().cellIndex),primary.index);await lastAction('변경 확인');await page.waitForFunction(()=>document.getElementById('change-dialog').open);await page.$eval('#change-dialog details',e=>e.open=true);await page.screenshot({path:resolve(out,'subdivision-'+id+'.png')});await page.click('#change-dialog button');await undo();assert.deepEqual((await snap()).structure,before.structure);await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);await reopen(f,'subdivision-ui-'+id);});
+ for (const ext of ['hwpx','hwp']) await scenario('fragmented subdivision - '+ext+' three-page owner with saved paragraph styles',async()=>{
+   await configure('openai-compatible');
+   const f=await open(ext,fragmentedSubdivisionTable(HwpDocument));
+   const before=await snap(),t=before.structure.tables[0],frames=before.tableSubdivisionSources[t.id].frames;
+   assert.ok(frames.length>=2 && frames.every(page=>page.cells.find(c=>c.index===0)?.lineSignature));
+   await send('세 쪽에 걸친 셀을 세 칸으로 나누고 첫 칸에 원래 문단을 유지해 줘');await error(false);
+   const after=await snap(),parts=after.structure.tables[0].cells.filter(c=>c.row===0).slice(0,3);
+   assert.deepEqual(parts.map(c=>c.text),[t.cells[0].text,'','']);
+   assert.equal(await f.evaluate(()=>JSON.parse(window.__pageServices.wasm.borrowDocumentHandle().getCellCharPropertiesAt(0,1,0,0,19,0)).bold),true);
+   const split=after.tableSubdivisionSources[t.id].frames;
+   assert.deepEqual(split.map(f=>f.page),frames.map(f=>f.page));
+   for(const [i,page] of frames.entries()) {
+     const original=page.cells.find(c=>c.index===0);
+     for(const [part,c] of parts.entries()){
+       const piece=split[i].cells.find(v=>v.index===c.index);
+       assert.ok(piece && piece.lineSignature);
+       same([piece.x,piece.y,piece.w,piece.h],[original.x+original.w*part/3,original.y,original.w/3,original.h]);
+     }
+   }
+   await undo();assert.deepEqual((await snap()).structure,before.structure);
+   await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);
+   await reopen(f,'fragmented-split-'+ext,ext);assert.deepEqual((await snap()).structure,after.structure);
+ });
+ await scenario('fragmented subdivision - changed page breaks preserve bytes and undo history',async()=>{
+   await configure('openai-compatible');
+   await open('hwpx',fragmentedSubdivisionTable(HwpDocument,{wrapped:true}));
+   const before=await state();
+   await send('세 쪽에 걸친 셀을 세 칸으로 나눠줘');await error(true);
+   assert.deepEqual(await state(),before);
+ });
  await scenario('staggered grid - second page split across new lines with formatted paragraphs',async()=>{
    await configure('openai-compatible');
    const d=continuedMergedTable(HwpDocument);

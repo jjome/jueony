@@ -7,6 +7,7 @@ import {executeTableStructure} from './table-structure.ts';
 import {executeTableSplit} from './table-split.ts';
 import {executeTableMerge} from './table-merge.ts';
 import {executeNestedCellEdit} from './nested-cell-edit.ts';
+import {executeNestedTableAxis} from './nested-table-axis.ts';
 import {insertAgentTableFormula} from './insert-agent-table-formula.ts';
 import {updateTableFormulaField} from './update-table-formula-field.ts';
 import {agentSeriesRange} from '../../modules/document/public/engine-integration.ts';
@@ -26,6 +27,12 @@ import { nativeDocument } from './structure.ts';
 export function executeDocumentOperations(wasm: any, base: Snapshot, operations: EditOp[]) {
   if(operations.some(op=>(agentFileKinds as readonly string[]).includes(op.kind)))throw Error('문서 탭 명령은 업무 소유 façade에서만 실행합니다.');
   const snapshot = structuredClone(base), doc = nativeDocument(wasm);
+  const nestedAxis=operations.find(op=>'index' in op && 'target' in op && /^(insert|delete)_table_(row|column)$/u.test(op.kind) &&
+    snapshot.structure?.nestedTables?.some(t=>t.id===op.target));
+  if(nestedAxis&&'index' in nestedAxis){
+    if(operations.length!==1)throw Error('중첩 표 행·열 변경은 단독 요청으로 실행하세요.');
+    return executeNestedTableAxis(doc,snapshot,nestedAxis);
+  }
   const add=operations.find(op=>op.kind==='insert_table_formula_field');
   if(add){if(operations.length!==1)throw Error('계산식 필드 삽입은 단독 요청으로 실행하세요.');return insertAgentTableFormula(doc,snapshot,add);}
   const field=operations.find(op=>op.kind==='update_table_formula_field');

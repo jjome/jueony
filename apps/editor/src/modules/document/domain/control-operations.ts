@@ -4,6 +4,7 @@ import {agentTableFormulaTarget,agentFormulaInsertTarget} from './agent-table-fo
 import {cellParagraphPlan,paragraphEdits} from './cell-paragraph.ts';
 import {tableSubdivisionPlan} from './table-subdivision.ts';
 import {projectTableAxis} from './table-axis-grid.ts';
+import {projectAxisFormulas} from './table-axis-formulas.ts';
 import {agentSeriesRange} from './agent-table-series.ts';
 import {tableStructurePlan} from './table-structure.ts';
 import {tableSplitPlan} from './table-split.ts';
@@ -63,7 +64,7 @@ export function tableAxisPlan(table:Table,op:AxisOperation):Table {
  const row=op.kind.endsWith('_row'),insert=op.kind.startsWith('insert_');
  only(op,insert?['kind','target','index','values']:['kind','target','index']);
  const merged=table.cells.some(c=>c.rowSpan>1||c.columnSpan>1);
- if(table.cells.some(c=>!c.editable&&!(merged&&(c.axisContentSafe===true||c.axisFieldSignature))))fail('중첩 개체·필드 또는 보존 상태를 확인할 수 없는 셀이 있는 표입니다.');
+ if(table.cells.some(c=>!c.editable&&!(merged&&(c.axisContentSafe===true||c.axisFieldSignature||c.axisFormula))))fail('중첩 개체·필드 또는 보존 상태를 확인할 수 없는 셀이 있는 표입니다.');
  const size=row?table.rows:table.columns,other=row?table.columns:table.rows;
  integer(op.index,0,insert?size:size-1);
  if(!insert&&size===1)fail('표의 마지막 행 또는 열은 삭제할 수 없습니다.');
@@ -72,6 +73,7 @@ export function tableAxisPlan(table:Table,op:AxisOperation):Table {
  const rows=table.rows+(row?(insert?1:-1):0),columns=table.columns+(!row?(insert?1:-1):0);
  if(rows>50||columns>20||rows*columns>200)fail('행·열 편집 결과는 50행·20열·200셀 이내여야 합니다.');
  const projected=projectTableAxis(table,row,insert,op.index,values);
+ projectAxisFormulas(table,projected,rows,columns,row,insert,op.index);
  if(merged && table.cells.some(c=>c.axisFieldSignature && !projected.some(v=>v.sourceIndex===c.index)))
    fail('필드를 포함한 셀이 없어지는 행·열은 삭제할 수 없습니다.');
  const cells=projected.map(({cell})=>cell);
@@ -223,8 +225,14 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
       op.rows.forEach((row: unknown[], r: number) => { if (!Array.isArray(row) || row.length !== columns) fail('표의 열 개수가 다릅니다.'); row.forEach((value: unknown, c: number) => { generated += text(value).length; cells.push({ index: r * columns + c, row: r, column: c, rowSpan: 1, columnSpan: 1, text: value as string, editable: true, properties: {} }); }); });
       created.add(op.resultId); tables.set('@' + op.resultId, { id: '@' + op.resultId, section: 0, paragraph: 0, control: 0, rows: op.rows.length, columns, cells });
     } else if('index' in op && tableAxisKinds.includes(op.kind)) {
-      const table=tables.get(op.target);if(!table)fail('현재 문서 또는 이번 요청에서 만든 표 ID가 필요합니다.');
-      tables.set(op.target,tableAxisPlan(table!,op));
+      const nested=structure?.nestedTables?.find(t=>t.id===op.target);
+      if(nested){
+        if(!nested.axisEditable||operations.length!==1)fail('중첩 표의 행·열 변경에는 편집 가능한 내부 표와 단독 요청이 필요합니다.');
+        tableAxisPlan({...nested,cells:nested.cells.map(c=>({...c,editable:true,properties:{}}))},op);
+      }else{
+        const table=tables.get(op.target);if(!table)fail('현재 문서 또는 이번 요청에서 만든 표 ID가 필요합니다.');
+        tables.set(op.target,tableAxisPlan(table!,op));
+      }
       if('values' in op)generated+=op.values.join('').length;
     } else if (op.kind === 'set_table_cell' || op.kind === 'format_table_cells') {
       const nested = snapshot.structure?.nestedTables?.find(t => t.id===op.target);

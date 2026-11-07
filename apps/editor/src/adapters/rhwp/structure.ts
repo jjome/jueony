@@ -5,7 +5,7 @@ import {readAgentEmptySectionEligibility} from './agent-empty-section.ts';
 import {readLineNumberSettings} from './line-numbers.ts';
 import {readAgentMasterPages} from './agent-master-pages.ts';
 import {readNestedTables} from './nested-tables.ts';
-import {axisFieldSignature} from './axis-cell-fields.ts';
+import {axisFieldSignature,readAxisFormula} from './axis-cell-fields.ts';
 export type { Cell, Table, Structure } from '../../modules/document/public/types.ts';
 // All coordinates refer to the currently open WASM document, never its disk copy.
 export const parsed = (v: any): any => typeof v === 'string' ? JSON.parse(v) : v;
@@ -75,6 +75,10 @@ export function readStructure(wasm: any): Structure {
           axisFields ??= parsed(doc.getFieldList());
           const signature=axisFieldSignature(doc,section,paragraph,ci,i,list,children,axisFields!,properties.fieldName);
           if (signature) cells[i].axisFieldSignature=signature;
+          else if(count===1 && typeof doc.previewTableFormulaField==='function' && typeof doc.updateTableFormulaField==='function'){
+            const formula=readAxisFormula(section,paragraph,ci,cells[i],list,children,axisFields!);
+            if(formula)cells[i].axisFormula=formula;
+          }
         } catch { /* Unknown field data remains ineligible for structural edits. */ }
       }
     }

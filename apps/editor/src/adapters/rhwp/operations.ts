@@ -1,6 +1,7 @@
 import {assertNativeTableNoCellZones} from './table-write-guard.ts';
 import {formulaInputTarget,refreshFormulaInput} from './table-formula-input.ts';
 import {mergedAxisProof} from './merged-axis-evidence.ts';
+import {prepareAxisFormulaUpdates} from './table-axis-formulas.ts';
 import {verifyPreservedExport} from './preservation.ts';
 import {executeRowHeights} from './row-heights.ts';
 import {executeEqualColumns} from './equal-columns.ts';
@@ -97,6 +98,7 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
     const checkMerged=merged(table)||merged(live);
     if(checkMerged&&JSON.stringify(table.cells)!==JSON.stringify(live.cells))throw new Error('표의 병합 범위나 셀 내용이 바뀌었습니다. 다시 요청하세요.');
     const proof=checkMerged?mergedAxisProof(doc,live,row,insert,axis.index,'values' in axis?axis.values:[]):undefined;
+    const formulas=checkMerged?prepareAxisFormulaUpdates(doc,live,expected):undefined;
     const undo=proof?doc.saveSnapshot():undefined;
     try {
       const method = {insert_table_row:'insertTableRow', insert_table_column:'insertTableColumn',
@@ -111,6 +113,7 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
         const value = axis.values[row ? cell.column : cell.row];
         if (value) replaceCellText(doc, base, cell.index, value);
       }
+      formulas?.apply(updated);
       const current = read();
       if (!current || current.rows!==expected.rows || current.columns!==expected.columns ||
           current.cells.length!==expected.cells.length || expected.cells.some((c,i)=>
@@ -118,6 +121,7 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
         throw new Error('표의 행·열 변경 결과가 명령과 다릅니다.');
       if (proof) {
         proof(current);
+        formulas?.verify(current);
         const format=/\.hwp$/i.test(snapshot.name)?'hwp':'hwpx';
         const artifact=format==='hwp'?doc.exportHwpWithReport():doc.exportHwpxWithReport();
         try { verifyPreservedExport(doc,artifact.takeBytes(),format,artifact.contentLoss(),bytes=>new doc.constructor(bytes)); }

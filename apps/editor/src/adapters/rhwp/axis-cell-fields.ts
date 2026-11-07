@@ -1,4 +1,20 @@
 import {sha256} from '@noble/hashes/sha2.js';
+import type {Cell} from '../../modules/document/public/types.ts';
+
+/** Only complete native formula fields have an expression we can remap during a structural edit. */
+export function readAxisFormula(section:number,paragraph:number,control:number,cell:Cell,list:any,children:any[],fields:any[]):Cell['axisFormula'] {
+  if(!list || cell.properties.fieldName!=='' || children.length!==1 || !Array.isArray(fields))return;
+  const [child]=children,owned=fields.filter(f=>f.listId===list.listId);
+  if(child.ctrlId!=='' || child.ctrlCh!==0 || child.controlIndex!==0 || child.para!==0 || owned.length!==1)return;
+  const [f]=owned,loc=f.location,step=loc?.path?.[0];
+  if(f.fieldType!=='formula' || f.cellField!==false || !Number.isSafeInteger(f.fieldId) || f.fieldId<0 ||
+     loc?.sectionIndex!==section || loc?.paraIndex!==paragraph || loc.path?.length!==1 || step.type!=='cell' ||
+     step.controlIndex!==control || step.cellIndex!==cell.index || step.paraIndex!==0 || f.paraInList!==0 ||
+     f.startCharIdx!==0 || f.endCharIdx!==Array.from(cell.text).length || f.value!==cell.text || typeof f.command!=='string')return;
+  const parts=/^(=[^\r\n]+)\?\?(%(?:g|\.[012]f),?);;([^\r\n]*)$/u.exec(f.command);
+  if(!parts || parts[3]!==cell.text || new TextEncoder().encode(parts[1]).length>512)return;
+  return {fieldId:f.fieldId,expression:parts[1],resultFormat:parts[2]};
+}
 
 /** Click-here fields carry text ranges and a stable stored ID. A named cell
  * instead has a virtual ID assigned from its current position. Cursor list IDs

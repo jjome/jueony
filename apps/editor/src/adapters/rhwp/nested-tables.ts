@@ -13,6 +13,9 @@ export function inspectNestedTables(doc:any, controls:Control[], lists:CellList[
   const listIds = new Map<string,number[]>();
   const nested = controls.filter(c => c.ctrlId === 'tbl' && c.list !== 0);
   if (!nested.length) return {tables,listIds};
+  const plainDocument=typeof doc.canEditNestedTableAxis==='function' &&
+    controls.every(c=>c.ctrlId==='tbl'||(c.list===0&&['secd','cold'].includes(c.ctrlId))) &&
+    lists.every(l=>l.isCell) && json(doc.getFieldList()).length===0 && json(doc.getBookmarks()).length===0;
   const byId = new Map(lists.map(l => [l.listId,l]));
   const key = (host:number, paragraph:number, control:number) => [host,paragraph,control].join('/');
   const controlAt = new Map(controls.filter(c => c.ctrlId === 'tbl').map(c => [key(c.list,c.para,c.controlIndex),c]));
@@ -81,7 +84,10 @@ export function inspectNestedTables(doc:any, controls:Control[], lists:CellList[
         ...(paragraphs.length?{paragraphs}:{})});
       ids.push(l.listId);
     }
-    tables.push({id,section:host.section,paragraph:host.paragraph,ancestors:host.path,control:control.controlIndex,rows:dimensions.rowCount,columns:dimensions.colCount,cells});
+    const tablePath=JSON.stringify([...host.path,{controlIndex:control.controlIndex,cellIndex:0,cellParaIndex:0}]);
+    const axisEditable=plainDocument&&host.writable&&doc.canEditNestedTableAxis(host.section,host.paragraph,tablePath);
+    tables.push({id,section:host.section,paragraph:host.paragraph,ancestors:host.path,control:control.controlIndex,rows:dimensions.rowCount,columns:dimensions.colCount,cells,
+      ...(axisEditable?{axisEditable:true}:{})});
     listIds.set(id,ids);
   }
   return {tables,listIds};

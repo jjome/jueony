@@ -1,3 +1,4 @@
+import {mergedAxisFormulaFixture} from './lib/merged-axis-formula-fixture.mjs';
 import puppeteer from 'puppeteer-core';
 import {spawn} from 'node:child_process';
 import {createHash} from 'node:crypto';
@@ -6,7 +7,7 @@ import {resolve,dirname} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import assert from 'node:assert/strict';
 const app=resolve(dirname(fileURLToPath(import.meta.url)),'..'),repo=resolve(app,'../..'),dist=resolve(app,process.env.JUEONY_TEST_DIST),pkg=resolve(repo,process.env.JUEONY_ENGINE_PACKAGE),out=resolve(repo,process.env.JUEONY_TEST_OUTPUT??'build/merged-row-height-browser');await mkdir(out,{recursive:true});
-const port=4421,origin=`http://127.0.0.1:${port}`,delay=ms=>new Promise(r=>setTimeout(r,ms));
+const port=Number(process.env.JUEONY_TEST_PORT??4421),origin=`http://127.0.0.1:${port}`,delay=ms=>new Promise(r=>setTimeout(r,ms));
 const {default:init,HwpDocument}=await import(pathToFileURL(resolve(pkg,'rhwp.js')).href);await init({module_or_path:await readFile(resolve(pkg,'rhwp_bg.wasm'))});if(await fetch(origin+'/api/health').then(()=>true,()=>false))throw new Error('Test port occupied');
 const server=spawn(process.execPath,['apps/launcher/server.mjs'],{cwd:repo,windowsHide:true,stdio:'ignore',env:{...process.env,JUEONY_PORT:String(port),JUEONY_DIST:dist,JUEONY_CONNECTION_STORE:'memory'}}),results=[],failures=[],pageErrors=[],consoleErrors=[],externalRequests=[];let browser,page;
 const active=async()=>(await page.$('.editor-frame:not([hidden])')).contentFrame();
@@ -15,7 +16,7 @@ async function execute(id){const r=await(await active()).evaluate(id=>window.jue
 async function open(ext='hwpx',source){const d=source??HwpDocument.createEmpty();if(!source){d.createBlankDocument();d.insertText(0,0,0,'첫 줄\n둘째 줄\n셋째 줄');}const bytes=[...d[ext==='hwp'?'exportHwp':'exportHwpx']()];d.free();const f=await services();await f.evaluate(async(bytes,ext)=>{const root=await navigator.storage.getDirectory(),h=await root.getFileHandle('master-review.'+ext,{create:true}),w=await h.createWritable();await w.write(new Uint8Array(bytes));await w.close();await window.jueonyEditor.open(new Uint8Array(bytes),'master-review.'+ext,h,false);const ih=window.__pageServices.getInputHandler();ih.cursor.moveTo({sectionIndex:0,paragraphIndex:0,charOffset:0});ih.focus();},bytes,ext);return f;}
 const state=async()=>(await services()).evaluate(()=>({revision:window.jueonyEditor.revision(),bytes:[...window.jueonyEditor.recovery().bytes],history:window.__pageServices.getInputHandler().history.peekUndoTop()?.type??null,dirty:window.jueonyEditor.state().dirty}));
 async function save(f,name,ext){const result=await f.evaluate(async()=>{const api=window.jueonyEditor,status=await api.save();return {status,bytes:[...new Uint8Array(await(await api.fileHandle().getFile()).arrayBuffer())]};});assert.equal(result.status,'saved');await writeFile(resolve(out,name+'.'+ext),new Uint8Array(result.bytes));return new HwpDocument(new Uint8Array(result.bytes));}
-async function scenario(name,run){try{await run();results.push(name);console.log('PASS',name);}catch(error){failures.push({name,error:String(error),stack:error.stack});console.error('FAIL',name,error);await page.screenshot({path:resolve(out,'failure-'+failures.length+'.png')}).catch(()=>{});await(await active()).evaluate(()=>{document.querySelectorAll('.modal-overlay .dialog-close').forEach(e=>e.click());document.querySelectorAll('dialog[open]').forEach(e=>e.close());}).catch(()=>{});}}
+async function scenario(name,run){if(process.argv.includes('--formula-axis')&&!name.includes('Agent stored formula'))return;try{await run();results.push(name);console.log('PASS',name);}catch(error){failures.push({name,error:String(error),stack:error.stack});console.error('FAIL',name,error);await page.screenshot({path:resolve(out,'failure-'+failures.length+'.png')}).catch(()=>{});await(await active()).evaluate(()=>{document.querySelectorAll('.modal-overlay .dialog-close').forEach(e=>e.click());document.querySelectorAll('dialog[open]').forEach(e=>e.close());}).catch(()=>{});}}
 const observations=[];
 const snap=async()=>(await active()).evaluate(()=>window.jueonyEditor.snapshot());
 const apply=async operations=>(await active()).evaluate(async operations=>{const api=window.jueonyEditor;return api.apply(crypto.randomUUID(),api.snapshot(),{message:'기존 제한 검사',sourceIds:[],operations});},operations);
@@ -42,6 +43,17 @@ try{
    await reopen(f,'agent-'+kind+'-'+format,format);
   });
  }
+ for(const format of ['hwp','hwpx'])await scenario(format+' Agent stored formula references after merged axis insert',async()=>{
+   const f=await open(format,mergedAxisFormulaFixture(HwpDocument)),before=await snap(),t=before.structure.tables[0];
+   await apply([{kind:'insert_table_row',target:t.id,index:0,values:['8','','','']}]);
+   const after=await snap();
+   const commands=state=>state.tableFormulaFields.fields.map(f=>f.storedCommand);
+   assert.deepEqual(commands(after),['=SUM(A3:B3)+B2??%.2f;;12.00','=C3*2??%g;;24']);
+   await execute('edit:undo');assert.deepEqual(commands(await snap()),commands(before));
+   await execute('edit:redo');assert.deepEqual(commands(await snap()),commands(after));
+   await reopen(f,'merged-formula-axis-'+format,format);
+   assert.deepEqual(commands(await snap()),commands(after));
+ });
  await scenario('form mode forbids manual row snapshot commands on protected source',async()=>{const f=await open('hwpx',body('vertical','protected'));await position(f,1,0);await f.evaluate(()=>window.__pageServices.getInputHandler().setEditMode('form'));try{const before=await state();await f.evaluate(()=>window.jueonyEditor.executeCommand('table:insert-row-below'));assert.deepEqual(await state(),before);}finally{await f.evaluate(()=>window.__pageServices.getInputHandler().setEditMode('normal'));}});
  assert.deepEqual(pageErrors,[]);assert.deepEqual(consoleErrors,[]);assert.deepEqual(externalRequests,[]);
 }finally{await writeFile(resolve(out,'result.json'),JSON.stringify({results,failures,pageErrors,consoleErrors,externalRequests,observations,scope:{uiShapes:16,columnRegression:1,sourceAmbiguity:2,agentReadonly:1,formMode:1},build:JSON.parse(await readFile(resolve(dist,'build-evidence.json'),'utf8')),note:'Real Edge manual row commands and history/save/reopen; Agent merged axes verified for crossing and anchor deletion. Protection is preserved and Agent denied; form mode blocks snapshots. Normal-mode full protection and Hancom comparison NOT_RUN.'},null,2));await browser?.close();server.kill();}if(failures.length)process.exitCode=1;

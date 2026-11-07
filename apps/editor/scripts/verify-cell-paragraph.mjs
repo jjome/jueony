@@ -29,7 +29,7 @@ const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const
  const operations=[{kind:'replace_cell_paragraph',target,row:cell?.row??0,column:cell?.column??0,paragraph,originalText:cell?.paragraphs?.[paragraph]?.text??fallback,text:'Agent revised paragraph 😀'}];
  if(input.instruction.includes('mixed-tail'))operations[0].text=operations[0].originalText.slice(0,-1)+'개정😀';
  if(input.instruction.includes('split-owner'))operations[0].text=operations[0].originalText.slice(0,-6)+'Tail 2';
- if(input.instruction.includes('field-tail'))operations[0].text=operations[0].originalText.slice(0,2)+'수정😀';
+ if(input.instruction.includes('field-tail'))operations[0].text=Array.from(operations[0].originalText).slice(0,cell.paragraphs[paragraph].editableFrom).join('')+'수정😀';
  if(input.instruction.includes('new-character-style')){
   operations[0].text='가😀나다';
   operations[0].spanFormats=[{start:1,end:3,bold:false,italic:true,color:'#13579b',fontSizePt:14.5}];
@@ -119,9 +119,11 @@ try{
    for(const i of [1,2])assert.deepEqual([shape(i).bold,shape(i).italic,shape(i).textColor,shape(i).fontSize],[false,true,'#13579b',1450]);
   }finally{saved.free();}
  });
- for(const format of ['hwp','hwpx'])for(const mode of ['split-owner','field-tail'])await scenario(format+' '+mode+' through chat, undo/redo and bound file reopen',async()=>{
+ for(const format of ['hwp','hwpx'])for(const mode of ['split-owner','field-tail','two-field-tail'])await scenario(format+' '+mode+' through chat, undo/redo and bound file reopen',async()=>{
   const split=mode==='split-owner',d=split?fragmentedMergedCell(HwpDocument):body(format);
+  if(mode==='two-field-tail')d.insertClickHereFieldInCell(0,1,0,0,1,0,false,'SECOND','memo','input2',true);
   if(!split)d.insertClickHereFieldInCell(0,1,0,0,1,1,false,'FIELD','memo','input',true);
+  const fields=JSON.parse(d.getFieldList());
   const f=await open(format,d),before=await snap(),t=before.structure.tables[0],index=split?0:1;
   const paragraph=before.cellParagraphSources[t.id].cells[0].paragraphs[index];
   if(!split)assert.equal(paragraph.editableFrom,2);
@@ -133,7 +135,7 @@ try{
   try{
    assert.equal(reopened.getTextInCell(0,1,0,0,index,0,Array.from(text).length),text);
    if(split)assert.ok(reopened.pageCount()>1);
-   else assert.deepEqual(JSON.parse(reopened.getFieldList()).map(f=>[f.name,f.guide,f.startCharIdx,f.endCharIdx]),[['input','FIELD',1,1]]);
+   else {assert.equal(fields.length,mode==='two-field-tail'?2:1);assert.deepEqual(JSON.parse(reopened.getFieldList()),fields);}
   }finally{reopened.free();}
  });
  for(const format of ['hwp','hwpx'])await scenario(format+' delete first style run of a merged cell on a continuation page via chat',async()=>{

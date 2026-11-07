@@ -4,11 +4,11 @@ export type AgentCellParagraphOp={kind:"replace_cell_paragraph";target:string;ro
 export type CellParagraphText={index:number;text:string;formatSpans?:Array<{start:number;end:number}>;editableFrom?:number};
 export type AgentCellParagraphSource={editable:boolean;fingerprint?:string;cells?:Array<{index:number;row:number;column:number;rowSpan:number;columnSpan:number;paragraphs:CellParagraphText[]}>;reason?:string};
 export type AgentTableSubdivisionOp={kind:"split_table_cell_into";target:string;row:number;column:number;rows:number;columns:number;distributeParagraphs?:boolean|null};
-export type AgentTableSubdivisionSource={editable:boolean;exactGrid?:boolean;frames?:NonNullable<AgentTableSubdivisionSource['frame']>[];fingerprint?:string;hwp5Grid?:{widths:number[];heights:number[]};paragraphFormats?:string[];cells?:Array<{row:number;column:number;minimumWidth:number;minimumHeight:number;paragraphFormats?:string[]}>;frame?:{page:number;x:number;y:number;w:number;h:number;cells:Array<{index:number;row:number;column:number;x:number;y:number;w:number;h:number}>};reason?:string};
+export type AgentTableSubdivisionSource={editable:boolean;exactGrid?:boolean;frames?:NonNullable<AgentTableSubdivisionSource['frame']>[];fingerprint?:string;hwp5Grid?:{widths:number[];heights:number[]};paragraphFormats?:string[];cells?:Array<{row:number;column:number;minimumWidth:number;minimumHeight:number;paragraphFormats?:string[]}>;frame?:{page:number;x:number;y:number;w:number;h:number;cells:Array<{index:number;row:number;column:number;x:number;y:number;w:number;h:number;lineSignature?:string}>};reason?:string};
 /** Detached JSON data. No engine handles cross this boundary. */
 export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 export type DocumentProperties = { [key: string]: JsonValue | undefined };
-export type Cell = { index: number; row: number; column: number; rowSpan: number; columnSpan: number; text: string; editable: boolean; axisContentSafe?:boolean; axisFieldSignature?:string; reason?:string; properties: DocumentProperties; characters?: DocumentProperties; paragraphProperties?: DocumentProperties };
+export type Cell = { index: number; row: number; column: number; rowSpan: number; columnSpan: number; text: string; editable: boolean; axisContentSafe?:boolean; axisFieldSignature?:string; axisFormula?:{fieldId:number;expression:string;resultFormat:string}; reason?:string; properties: DocumentProperties; characters?: DocumentProperties; paragraphProperties?: DocumentProperties };
 export type TableCellPathStep = {controlIndex:number;cellIndex:number;cellParaIndex:number};
 export type AgentTableFormulaFields={
  fields:Array<{tableId:string;section:number;paragraph:number;path:TableCellPathStep[];row:number;column:number;fieldId:number;
@@ -20,6 +20,7 @@ export type AgentInsertTableFormulaOp={kind:'insert_table_formula_field';target:
 export type TableFormulaChange={tableId:string;row:number;column:number;fieldId:number;before:{command:string|null;value:string};after:{command:string;value:string}};
 export type NestedTable = {
   id:string; section:number; paragraph:number; ancestors:TableCellPathStep[]; control:number; rows:number; columns:number;
+  axisEditable?:boolean;
   cells:Array<Pick<Cell,'index'|'row'|'column'|'rowSpan'|'columnSpan'|'text'|'editable'> & {paragraphs?:CellParagraphText[]}>;
 };
 export type TablePaginationMode='none'|'cell'|'row';

@@ -1,7 +1,10 @@
-import type {Snapshot,AgentTableSplitOp} from '../public/types.ts';
+import type {Snapshot,Table,AgentTableSplitSource,AgentTableSplitOp} from '../public/types.ts';
 export function tableSplitPlan(op:AgentTableSplitOp,s:Snapshot){
  const t=s.structure?.tables.find(t=>t.id===op.target),source=s.tableSplitSources?.[op.target];
  if(!/\.hwpx$/iu.test(s.name)||!/^s\d+p\d+t\d+$/u.test(op.target)||!t||source?.editable!==true||!/^[a-f0-9]{64}$/u.test(source.fingerprint??''))throw new Error('조회된 HWPX 기본 분할 가능 표가 필요합니다.');
+ return witnessedSplitPlan(op,t,source);
+}
+export function witnessedSplitPlan(op:AgentTableSplitOp,t:Table,source:AgentTableSplitSource){
  if(![op.row,op.column].every(Number.isSafeInteger)||op.row<0||op.column<0)throw new Error('분할할 주 셀의 행·열 좌표를 지정하세요.');
  const primary=t.cells.find(c=>c.row===op.row&&c.column===op.column);
  if(!primary||primary.properties.cellProtect!==false||t.editable===false||primary.rowSpan*primary.columnSpan<2)throw new Error('병합된 비보호 주 셀만 기본 분할할 수 있습니다.');

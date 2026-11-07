@@ -10,9 +10,9 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 35/41 · 부분 6 | 완료 0/24 · 부분 23 · 미구현 1 |
+| 구현 | 완료 37/41 · 부분 4 | 완료 0/24 · 부분 23 · 미구현 1 |
 | 검증 | 완료 3/41 · 부분 38 | 완료 0/24 · 부분 13 · 미검증 11 |
-| Agent 연결 | 연결 26/33 · 부분 7 · 해당 없음 8 | 연결 0/24 · 부분 9 · 미연결 15 |
+| Agent 연결 | 연결 28/33 · 부분 5 · 해당 없음 8 | 연결 0/24 · 부분 9 · 미연결 15 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
@@ -20,9 +20,9 @@
 
 ## 먼저 할 일
 
-- **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — HWP·HWPX에서 다쪽 표의 원래 행·열을 대조하고, 서식 구간별 교체·삭제와 빈 문단의 기본 서식 보존을 검사했다. 셀 자체의 쪽 분할, 필드·개체 포함 문단, 새 글자 서식 생성이 남음.
-- **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — HWPX와 보존 검사에 통과하는 HWP5 평면 본문 표에서 원래 격자 분할·문단 서식 분배·undo/redo·저장 재열기 확인. 다중 병합·중첩·다쪽 및 기존 격자에 맞지 않는 분할이 남음.
-- **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 중첩 표의 지정 단순 셀을 읽고 수정한 뒤 HWP/HWPX 재열기 확인. 중첩 구조 변경·보호 또는 복합 셀의 편집이 남음.
+- **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — 여러 쪽에 걸친 셀의 문단과 누름틀 뒤 문장, 기존 서식 구간, 굵게·기울임·색·크기 생성까지 양 형식으로 검수했다. 다른 인라인 개체와 필드가 있는 문단이 남음.
+- **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — 여러 병합 셀과 기존 격자에 없는 분할선, 둘째 쪽의 셀과 서식 문단 분배를 구현했다. 셀 자체가 여러 쪽에 걸친 분할, 중첩 표, 복합 개체 보존이 남음.
+- **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 중첩 표의 병합 주 셀, 여러 문단과 혼합 글자 서식 편집을 양 형식으로 확인했다. 중첩 구조 변경과 복합 필드·개체 편집이 남음.
 
 ## 기능별 작업표
 
@@ -69,7 +69,7 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B084](<08-tables.md#b084>) · 범위 | 표 자동 채우기 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [N010](<08-tables.md#n010>) · 작업 | 날짜·수식 자동 채우기 | ◐ 부분 | ◐ 부분 | ◐ 부분 |
+| [N010](<08-tables.md#n010>) · 작업 | 날짜·수식 자동 채우기 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [G121](<08-tables.md#g121>) · 작업 | 날짜 자동 채우기의 실행 거절·실패 보존 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-4"></a>
@@ -173,7 +173,7 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B167](<08-tables.md#b167>) · 범위 | 계산식 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [N009](<08-tables.md#n009>) · 작업 | 표 계산식 Agent 편집·갱신 | ◐ 부분 | ◐ 부분 | ◐ 부분 |
+| [N009](<08-tables.md#n009>) · 작업 | 표 계산식 Agent 편집·갱신 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [G122](<08-tables.md#g122>) · 작업 | 표 계산 결과 자릿수·실제 셀 주소·원자적 적용 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-13"></a>
@@ -943,11 +943,11 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 임의 여러 문단/병합 원본 읽기와 원문·서식 보존
-- 다음 작업: HWP·HWPX에서 다쪽 표의 원래 행·열을 대조하고, 서식 구간별 교체·삭제와 빈 문단의 기본 서식 보존을 검사했다. 셀 자체의 쪽 분할, 필드·개체 포함 문단, 새 글자 서식 생성이 남음.
+- 다음 작업: 여러 쪽에 걸친 셀의 문단과 누름틀 뒤 문장, 기존 서식 구간, 굵게·기울임·색·크기 생성까지 양 형식으로 검수했다. 다른 인라인 개체와 필드가 있는 문단이 남음.
 - 상위 항목: [B161](<08-tables.md#b161>) 셀 병합
 - Agent 명령: `replace_cell_paragraph`
-- 근거: [101-agent-merged-cell-paragraph.md](<../101-agent-merged-cell-paragraph.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [101-agent-merged-cell-paragraph.md](<../101-agent-merged-cell-paragraph.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
+- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08`
 
 </details>
 
@@ -958,11 +958,11 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 새 격자·행/열 참조 이관과 셀 내용 분배 명세
-- 다음 작업: HWPX와 보존 검사에 통과하는 HWP5 평면 본문 표에서 원래 격자 분할·문단 서식 분배·undo/redo·저장 재열기 확인. 다중 병합·중첩·다쪽 및 기존 격자에 맞지 않는 분할이 남음.
+- 다음 작업: 여러 병합 셀과 기존 격자에 없는 분할선, 둘째 쪽의 셀과 서식 문단 분배를 구현했다. 셀 자체가 여러 쪽에 걸친 분할, 중첩 표, 복합 개체 보존이 남음.
 - 상위 항목: [B160](<08-tables.md#b160>) 셀 분할
 - Agent 명령: `split_table_cell_into`
-- 근거: [102-agent-cell-subdivision.md](<../102-agent-cell-subdivision.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [102-agent-cell-subdivision.md](<../102-agent-cell-subdivision.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
+- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08`
 
 </details>
 
@@ -973,11 +973,11 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 부모 list 경로·stable 대상·보호·자원·저장 검증
-- 다음 작업: 중첩 표의 지정 단순 셀을 읽고 수정한 뒤 HWP/HWPX 재열기 확인. 중첩 구조 변경·보호 또는 복합 셀의 편집이 남음.
+- 다음 작업: 중첩 표의 병합 주 셀, 여러 문단과 혼합 글자 서식 편집을 양 형식으로 확인했다. 중첩 구조 변경과 복합 필드·개체 편집이 남음.
 - 상위 항목: [B153](<08-tables.md#b153>) 셀 속성
 - Agent 명령: `set_table_cell`
-- 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
+- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08`
 
 </details>
 
@@ -988,11 +988,11 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: span 교차·주 셀 제거·neighbor 영향·실패 원복
-- 다음 작업: 병합의 시작·내부를 지나는 행·열 추가·삭제, 남은 주 셀의 내용·서식, 이웃 크기와 실패 원복 확인. 복합 필드·중첩 표와 크기 근거가 없는 격자가 남음.
+- 다음 작업: 독립된 행·열 치수가 없어도 이웃 병합 셀로 크기를 확정하고 이름 셀·누름틀을 보존한다. 중첩 구조와 계산식 보유 표, 치수를 확정할 수 없는 격자는 보호한다.
 - 상위 항목: [B158](<08-tables.md#b158>) 행·열 추가
 - Agent 명령: `insert_table_row,delete_table_row,insert_table_column,delete_table_column`
-- 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
+- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08`
 
 </details>
 
@@ -1015,14 +1015,14 @@
 <summary>N009 · 표 계산식 Agent 편집·갱신</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 수식 파싱·참조 변경·오류·재계산·저장 형식
-- 다음 작업: 단순 표에서 수식 필드 생성·편집과 숫자 셀 수정에 따른 저장 결과 재계산을 확인했다. 병합·중첩 표와 지원 범위 밖의 함수가 남음.
+- 다음 작업: 본문·중첩·병합 표의 계산식 생성·편집·연쇄 갱신과 대화상자의 지원 함수, 보호·오류·저장 재열기를 검사했다. 최대 200칸, 중첩 8단계, 한 문단 전체 필드. 한글 2024 직접 비교가 남음.
 - 상위 항목: [B167](<08-tables.md#b167>) 계산식
 - Agent 명령: `insert_table_formula_field,update_table_formula_field`
-- 근거: [47-remaining-editor-implementation.md](<../47-remaining-editor-implementation.md>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [47-remaining-editor-implementation.md](<../47-remaining-editor-implementation.md>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
+- 원래 기록: `SCOPED_IMPLEMENTED_ENGINE_EDGE_2026_11_08`
 
 </details>
 
@@ -1030,14 +1030,14 @@
 <summary>N010 · 날짜·수식 자동 채우기</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☑ 연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 수열/참조 규칙·locale·중단·원복
-- 다음 작업: 날짜·번호·수식·고정값을 행별 또는 열별로 직사각형에 채우고 한 번에 되돌리며 저장·재열기 확인. 병합·중첩 범위와 추가 날짜 표기가 남음.
+- 다음 작업: 본문·중첩 표, 병합 주 셀, 직사각형에 날짜·번호·수식·고정값을 채우고 요일, 참조, 공유 셀 충돌, 원복과 저장 재열기를 확인했다. 한글 2024 직접 비교가 남음.
 - 상위 항목: [B084](<08-tables.md#b084>) 표 자동 채우기
 - Agent 명령: `fill_table_series`
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [140-table-editing-followup.md](<../140-table-editing-followup.md>) · [manifest.json](<../evidence/table-editing-2026-10-24/manifest.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>)
-- 원래 기록: `EXISTING_DATE_SUPPORT_RECONCILED_PARTIAL_2026_10_24`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [140-table-editing-followup.md](<../140-table-editing-followup.md>) · [manifest.json](<../evidence/table-editing-2026-10-24/manifest.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
+- 원래 기록: `SCOPED_IMPLEMENTED_ENGINE_2026_11_08`
 
 </details>
 

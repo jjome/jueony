@@ -73,6 +73,12 @@ test('two fill lanes must agree on their shared owner before any cell is written
     const conflict=snap(),bytes=d.exportHwpx();
     assert.throws(()=>executeDocumentOperations(d,conflict,validateEditOperations([op],conflict)),/서로 다른|여러 채우기/);
     assert.deepEqual(d.exportHwpx(),bytes);
+    for(const i of [0,4]){
+      d.deleteTextInCell(0,1,0,i,0,0,1);d.insertTextInCell(0,1,0,i,0,0,'=2');
+    }
+    const formulas=snap(),formulaOp={...op,mode:'formula'} as const;
+    executeDocumentOperations(d,formulas,validateEditOperations([formulaOp],formulas));
+    assert.equal(readStructure(d).tables[0].cells.find(c=>c.rowSpan===2)!.text,'=2');
   }finally{d.free();}
 });
 for (const format of ['hwpx','hwp']) for(const mode of ['months','formula','calculated-value'] as const) {

@@ -169,7 +169,7 @@ function rectanglePlan(doc:any,block:AutoFillBlock,ranges:Array<{anchor:Point;fo
       if(line.cells.some(c=>ownerValues.has(c.index))){
         // A shared seed may already have been written by a preceding lane.
         const original=readAutoFillPlan(doc,{...block,...range},dateUnit,output,block);
-        if(line.kind==='formula' || line.values.some((v,j)=>v!==original.values[j]))
+        if(line.kind!==original.kind || line.values.some((v,j)=>v!==original.values[j]))
           throw Error('같은 병합 셀에 여러 채우기 결과나 계산식이 지정됩니다.');
       }
       for(const [i,cell] of line.cells.entries()){

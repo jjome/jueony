@@ -40,3 +40,29 @@ test('native selected row auto fill preserves seeds, target formats, geometry, o
     d.setCellProperties(0, t.paraIdx, t.controlIdx, 5, JSON.stringify({ cellProtect: true })); assert.throws(() => readAutoFillPlan(d, block), /보호/);
   } finally { d.free(); }
 });
+
+test('native reference fill follows the selection anchor upwards and refuses stale inputs and protected targets', async () => {
+  await init({ module_or_path: await readFile(new URL('../node_modules/@rhwp/core/rhwp_bg.wasm', import.meta.url)) });
+  const d: any = HwpDocument.createEmpty(); d.createBlankDocument();
+  try {
+    const t = JSON.parse(d.createTable(0, 0, 0, 3, 2));
+    const args = (i: number) => [0, t.paraIdx, t.controlIdx, i, 0];
+    ['2', '위', '4', '중간', '6', '=$A3+A$1'].forEach((v, i) => d.insertTextInCell(...args(i), 0, v));
+    const block = { sec: 0, ppi: t.paraIdx, ci: t.controlIdx, anchor: { row: 2, col: 1 }, focus: { row: 0, col: 1 } };
+    const formulas = readAutoFillPlan(d, block);
+    assert.deepEqual(formulas.values, ['=$A3+A$1', '=$A2+A$1', '=$A1+A$1']);
+    const values = readAutoFillPlan(d, block, 'days', 'value');
+    assert.deepEqual(values.values, ['=$A3+A$1', '6', '4']);
+    d.insertTextInCell(...args(2), 1, '0');
+    const changed = d.exportHwp();
+    assert.throws(() => executeAutoFill(d, values), /바뀌었습니다/);
+    assert.deepEqual(d.exportHwp(), changed);
+    const short = { ...block, focus: { row: 1, col: 1 } };
+    const result = readAutoFillPlan(d, short, 'days', 'value');
+    assert.deepEqual(result.values, ['=$A3+A$1', '42']);
+    executeAutoFill(d, result);
+    assert.equal(d.getTextInCell(...args(3), 0, 2), '42');
+    d.setCellProperties(0, t.paraIdx, t.controlIdx, 3, JSON.stringify({ cellProtect: true }));
+    assert.throws(() => readAutoFillPlan(d, block), /보호/);
+  } finally { d.free(); }
+});

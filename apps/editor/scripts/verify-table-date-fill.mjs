@@ -8,7 +8,24 @@ const repo = resolve(import.meta.dirname, '../../..'), port = Number(process.env
 await mkdir(out, { recursive: true }); const engine = await loadReviewEngine(process.env.JUEONY_ENGINE_PACKAGE), { HwpDocument } = engine;
 const results = [], failures = [], pageErrors = [], external = []; let browser, page, server;
 async function services() { const f = await (await page.$('.editor-frame:not([hidden])')).contentFrame(); await f.evaluate(() => { if (window.__dateServices) return; const a = window.rhwpStudio.automation; a.registerCommand({ id: 'ext:date-fill-review', label: '날짜 검수', canExecute: () => true, execute: s => window.__dateServices = s }); a.execute('ext:date-fill-review'); a.unregisterCommand('ext:date-fill-review'); }); return f; }
-async function open(ext = 'hwpx', seeds = ['2026-01-31', '2026-02-28']) { const d = HwpDocument.createEmpty(); d.createBlankDocument(); const t = JSON.parse(d.createTable(0, 0, 0, 1, 4)); [...seeds, '기존', '원문'].forEach((v, c) => d.insertTextInCell(0, t.paraIdx, t.controlIdx, c, 0, 0, v)); d.applyCharFormatInCell(0, t.paraIdx, t.controlIdx, 2, 0, 0, 2, '{"bold":true}'); const bytes = [...d[ext === 'hwp' ? 'exportHwp' : 'exportHwpx']()]; d.free(); const f = await services(); await f.evaluate(async (bytes, ext, t) => { const root = await navigator.storage.getDirectory(), handle = await root.getFileHandle('date-fill.' + ext, { create: true }), w = await handle.createWritable(); await w.write(new Uint8Array(bytes)); await w.close(); await window.jueonyEditor.open(new Uint8Array(bytes), 'date-fill.' + ext, handle, false); const s = window.__dateServices, ih = s.getInputHandler(); ih.cursor.moveTo({ sectionIndex: 0, paragraphIndex: 0, charOffset: 0, parentParaIndex: t.paraIdx, controlIndex: t.controlIdx, cellIndex: 0, cellParaIndex: 0, cellPath: [{ controlIndex: t.controlIdx, cellIndex: 0, cellParaIndex: 0 }] }); ih.cursor.enterCellSelectionMode(); ih.cursor.advanceCellSelectionPhase(); ih.cursor.setCellSelectionFocus(0, 3); ih.updateCellSelection(); ih.focus(); s.eventBus.emit('command-state-changed'); }, bytes, ext, t); return f; }
+async function open(ext = 'hwpx', seeds = ['2026-01-31', '2026-02-28'], formula = false) {
+  const d = HwpDocument.createEmpty(); d.createBlankDocument();
+  const row = formula ? 1 : 0, first = row * 4, t = JSON.parse(d.createTable(0, 0, 0, row + 1, 4));
+  const contents = formula ? ['2', '4', '6', '8', ...seeds, '기존', '원문'] : [...seeds, '기존', '원문'];
+  contents.forEach((v, c) => d.insertTextInCell(0, t.paraIdx, t.controlIdx, c, 0, 0, v));
+  d.applyCharFormatInCell(0, t.paraIdx, t.controlIdx, first + 2, 0, 0, 2, '{"bold":true}');
+  const bytes = [...d[ext === 'hwp' ? 'exportHwp' : 'exportHwpx']()]; d.free();
+  const f = await services();
+  await f.evaluate(async (bytes, ext, t, row, first) => {
+    const root = await navigator.storage.getDirectory(), handle = await root.getFileHandle('auto-fill.' + ext, { create: true }), w = await handle.createWritable();
+    await w.write(new Uint8Array(bytes)); await w.close();
+    await window.jueonyEditor.open(new Uint8Array(bytes), 'auto-fill.' + ext, handle, false);
+    const s = window.__dateServices, ih = s.getInputHandler();
+    ih.cursor.moveTo({ sectionIndex: 0, paragraphIndex: 0, charOffset: 0, parentParaIndex: t.paraIdx, controlIndex: t.controlIdx, cellIndex: first, cellParaIndex: 0, cellPath: [{ controlIndex: t.controlIdx, cellIndex: first, cellParaIndex: 0 }] });
+    ih.cursor.enterCellSelectionMode(); ih.cursor.advanceCellSelectionPhase(); ih.cursor.setCellSelectionFocus(row, 3); ih.updateCellSelection(); ih.focus(); s.eventBus.emit('command-state-changed');
+  }, bytes, ext, t, row, first);
+  return f;
+}
 const capture = f => f.evaluate(() => { const s = window.__dateServices, ih = s.getInputHandler(); return { bytes: [...s.wasm.exportHwp()], revision: window.jueonyEditor.revision(), history: ih.history.peekUndoTop()?.type ?? null, block: ih.cursor.captureCellSelection() }; });
 const command = async (f, id) => { const r = await f.evaluate(id => window.jueonyEditor.executeCommand(id), id); assert.equal(r.ok, true, JSON.stringify(r)); };
 const values = f => f.evaluate(() => window.jueonyEditor.snapshot().structure.tables[0].cells.map(c => c.text));
@@ -21,8 +38,45 @@ try {
   browser = await puppeteer.launch({ executablePath: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe', userDataDir: await mkdtemp(resolve(repo, 'build/date-fill-browser-')), headless: true, args: ['--no-first-run', '--disable-background-networking'], defaultViewport: { width: 1600, height: 1000 } });
   page = await browser.newPage(); page.setDefaultTimeout(10000); page.on('pageerror', e => pageErrors.push(String(e))); page.on('dialog', d => void d.accept()); await page.setRequestInterception(true); page.on('request', r => { if (![origin, 'data:', 'blob:'].some(p => r.url().startsWith(p))) { external.push(r.url()); void r.abort(); } else void r.continue(); }); await page.goto(origin); await page.waitForFunction(() => document.getElementById('app-status')?.textContent.includes('준비 완료'), { timeout: 90000 });
   for (const ext of ['hwp', 'hwpx']) for (const [unit, expected] of [['days', ['2024-02-28', '2024-02-29', '2024-03-01', '2024-03-02']], ['months', ['2026-01-31', '2026-02-28', '2026-03-31', '2026-04-30']], ['years', ['2024-02-29', '2025-02-28', '2026-02-28', '2027-02-28']]]) await scenario(`${ext}/${unit}: preview, fill, one undo/redo and formatted safe save/reopen`, async () => { const f = await open(ext, expected.slice(0, 2)), before = await capture(f); await dialog(f, unit); assert.ok((await f.$eval('[data-jueony-table-auto-fill]', e => e.textContent)).includes(expected[2])); await f.click('.modal-overlay .dialog-btn-primary'); await f.waitForSelector('[data-jueony-table-auto-fill]', { hidden: true }); assert.deepEqual(await values(f), expected); const after = await capture(f); await command(f, 'edit:undo'); assert.deepEqual((await capture(f)).bytes, before.bytes); await command(f, 'edit:redo'); assert.deepEqual((await capture(f)).bytes, after.bytes); const bytes = await f.evaluate(async () => { if (await window.jueonyEditor.save() !== 'saved') throw new Error('save refused'); return [...new Uint8Array(await (await window.jueonyEditor.fileHandle().getFile()).arrayBuffer())]; }); const name = resolve(out, `${unit}.${ext}`); await writeFile(name, new Uint8Array(bytes)); const reopened = new HwpDocument(new Uint8Array(await readFile(name))); try { const table = JSON.parse(reopened.getControls()).find(c => c.type === 'table'); const at = await f.evaluate(() => window.jueonyEditor.snapshot().structure.tables[0]); for (let c = 0; c < 4; c++) assert.equal(reopened.getTextInCell(at.section, at.paragraph, at.control, c, 0, 0, 10), expected[c]); assert.equal(JSON.parse(reopened.getCellCharPropertiesAt(at.section, at.paragraph, at.control, 2, 0, 0)).bold, true); } finally { reopened.free(); } });
+  for (const ext of ['hwp', 'hwpx']) for (const output of ['formula', 'value']) {
+    await scenario(`${ext}/${output}: formula reference fill, one undo/redo, guarded save and reopen`, async () => {
+      const seed = '=A1+$A$1';
+      const expected = ['2', '4', '6', '8', seed, ...(output === 'value' ? ['6', '8', '10'] : ['=B1+$A$1', '=C1+$A$1', '=D1+$A$1'])];
+      const f = await open(ext, [seed, '둘째'], true), before = await capture(f);
+      await command(f, 'table:auto-fill-integers');
+      const selector = '[aria-label="수식 채우기 방식"]';
+      await f.waitForSelector(selector); await f.select(selector, output);
+      const preview = await f.$eval('[aria-label="자동 채우기 변경 미리보기"]', table => [...table.rows].map(row => row.cells[3].textContent));
+      assert.deepEqual(preview, expected.slice(5));
+      await f.click('.modal-overlay .dialog-btn-primary'); await f.waitForSelector(selector, {hidden: true});
+      assert.deepEqual(await values(f), expected);
+      const after = await capture(f);
+      await command(f, 'edit:undo'); assert.deepEqual((await capture(f)).bytes, before.bytes);
+      await command(f, 'edit:redo'); assert.deepEqual((await capture(f)).bytes, after.bytes);
+      const bytes = await f.evaluate(async () => {
+        if (await window.jueonyEditor.save() !== 'saved') throw new Error('safe save refused');
+        return [...new Uint8Array(await (await window.jueonyEditor.fileHandle().getFile()).arrayBuffer())];
+      });
+      const path = resolve(out, `reference-${output}.${ext}`); await writeFile(path, new Uint8Array(bytes));
+      const reopened = new HwpDocument(new Uint8Array(await readFile(path)));
+      try {
+        const at = await f.evaluate(() => window.jueonyEditor.snapshot().structure.tables[0]);
+        assert.deepEqual(expected.map((_, i) => reopened.getTextInCell(0, at.paragraph, at.control, i, 0, 0, reopened.getCellParagraphLength(0, at.paragraph, at.control, i, 0))), expected);
+        assert.equal(JSON.parse(reopened.getCellCharPropertiesAt(0, at.paragraph, at.control, 6, 0, 0)).bold, true);
+      } finally { reopened.free(); }
+    });
+  }
+  await scenario('cyclic numeric preview remains open and cancellation preserves all source bytes', async () => {
+    const f = await open('hwpx', ['=A2', '둘째'], true), before = await capture(f);
+    await command(f, 'table:auto-fill-integers');
+    const selector = '[aria-label="수식 채우기 방식"]';
+    await f.select(selector, 'value'); await f.click('.modal-overlay .dialog-btn-primary');
+    assert.match(await f.$eval('[data-jueony-table-auto-fill] [role=alert]', e => e.textContent), /순환/);
+    await page.keyboard.press('Escape'); await f.waitForSelector(selector, {hidden: true});
+    assert.deepEqual(await capture(f), before);
+  });
   await scenario('silent router refusal keeps dialog open and source/selection/history unchanged', async () => { const f = await open(), before = await capture(f); await dialog(f); await f.evaluate(() => { const ih = window.__dateServices.getInputHandler(); window.__oldDateOperation = ih.executeOperation; ih.executeOperation = () => {}; }); try { await f.click('.modal-overlay .dialog-btn-primary'); assert.match(await f.$eval('[data-jueony-table-auto-fill] [role=alert]', e => e.textContent), /적용하지 못했습니다/); assert.deepEqual(await capture(f), before); } finally { await f.evaluate(() => { window.__dateServices.getInputHandler().executeOperation = window.__oldDateOperation; }); await page.keyboard.press('Escape'); } });
   await scenario('live second-target mutation failure rolls all earlier date changes back', async () => { const f = await open(), before = await capture(f); await dialog(f); await f.evaluate(() => { const raw = window.__dateServices.wasm.borrowDocumentHandle(), old = raw.insertTextInCell; window.__oldDateInsert = old; raw.insertTextInCell = function (...args) { const result = old.apply(raw, args); if (args[3] === 3) throw new Error('Synthetic late date fill failure'); return result; }; }); try { await f.click('.modal-overlay .dialog-btn-primary'); assert.match(await f.$eval('[data-jueony-table-auto-fill] [role=alert]', e => e.textContent), /Synthetic late date fill failure/); assert.deepEqual(await capture(f), before); } finally { await f.evaluate(() => { window.__dateServices.wasm.borrowDocumentHandle().insertTextInCell = window.__oldDateInsert; }); await page.keyboard.press('Escape'); } });
   assert.deepEqual(pageErrors, []); assert.deepEqual(external, []);
-} finally { await browser?.close(); server?.kill(); await writeFile(resolve(out, 'result.json'), JSON.stringify({ engine: engine.metadata, verifierSha256: hash(await readFile(import.meta.filename)), results, failures, pageErrors, external, scope: 'Existing explicit date days/months/years with actual Rust/Studio dialogs, guarded save and reopen. New silent-router-refusal protection plus partial-failure rollback. Formula autofill, weekdays and native Hancom equality remain unsupported/unverified.' }, null, 2)); }
-assert.deepEqual(failures, []); console.log('PASS', results.length, 'date fill scenarios');
+} finally { await browser?.close(); server?.kill(); await writeFile(resolve(out, 'result.json'), JSON.stringify({ engine: engine.metadata, verifierSha256: hash(await readFile(import.meta.filename)), results, failures, pageErrors, external, scope: 'Date/number series and A1 formula-text/static-value fill through the real Studio dialog, one-step undo/redo, guarded save and reopen. Native calculation fields, automatic recalculation and native Hancom comparison are outside this verification.' }, null, 2)); }
+assert.deepEqual(failures, []); console.log('PASS', results.length, 'table fill scenarios');

@@ -19,6 +19,7 @@ export function exactSubdivisionPlan(op:AgentTableSubdivisionOp, table:Table, so
   assertCoverage(table);
   const primary = table.cells.find(c => c.row === op.row && c.column === op.column);
   const limits = source.cells?.find(c => c.row === op.row && c.column === op.column);
+  if(primary?.axisFieldSignature || primary?.properties.fieldName) throw new Error('누름틀이나 이름 필드가 있는 셀 자체는 분할할 수 없습니다.');
   if (!primary || !limits || table.editable === false || !source.frame
       || table.cells.some(c => c.properties.cellProtect !== false || c.properties.isHeader !== false)
       || ![limits.minimumHeight,limits.minimumWidth].every(n => Number.isSafeInteger(n) && n >= 200))

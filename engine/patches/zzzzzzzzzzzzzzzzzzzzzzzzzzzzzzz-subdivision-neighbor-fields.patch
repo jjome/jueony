@@ -1,0 +1,57 @@
+--- a/src/document_core/commands/table_ops/subdivision_grid.rs
++++ b/src/document_core/commands/table_ops/subdivision_grid.rs
+@@ -1,8 +1,31 @@
+ use super::{DocumentCore, DocumentEvent, HwpError};
+ use crate::model::table::{Cell, Table};
++use crate::model::control::{Control, FieldType};
++use crate::model::paragraph::Paragraph;
+ 
+ fn invalid() -> HwpError {
+     HwpError::RenderError("분할할 셀의 원본 격자·문단·보호 상태를 확인하지 못했습니다.".into())
++}
++
++// Neighbor cells are cloned in full. Only admit locally paired, disjoint
++// ClickHere ranges; a target cell's controls can never be cloned into new slots.
++fn subdivision_paragraph_allowed(p: &Paragraph, allow_fields: bool) -> bool {
++    let length = p.text.chars().count();
++    if length > 4000 || !p.orphan_field_ends.is_empty() || !p.range_tags.is_empty()
++        || !p.title_marks.is_empty() || !p.markpen_marks.is_empty() { return false; }
++    if p.controls.is_empty() { return p.field_ranges.is_empty(); }
++    if !allow_fields || p.controls.len() > 50 || p.controls.len() != p.field_ranges.len() { return false; }
++    let mut seen = std::collections::BTreeSet::new();
++    let mut previous_end = None;
++    for range in &p.field_ranges {
++        if !matches!(p.controls.get(range.control_idx), Some(Control::Field(f))
++            if f.field_type == FieldType::ClickHere && f.memo_paragraphs.is_empty())
++            || !seen.insert(range.control_idx) || range.inner_slot_count != 0
++            || range.start_char_idx > range.end_char_idx || range.end_char_idx > length
++            || previous_end.is_some_and(|end| end >= range.start_char_idx) { return false; }
++        previous_end = Some(range.end_char_idx);
++    }
++    true
+ }
+ 
+ struct DivisionAxis {
+@@ -50,14 +73,16 @@
+         row: u16, col: u16, rows: u16, cols: u16, distribute: bool) -> Result<String, HwpError> {
+         if !(1..=8).contains(&rows) || !(1..=8).contains(&cols) || rows * cols < 2 { return Err(invalid()); }
+         let table = self.get_table_mut(section, para, ctrl)?;
++        let source = table.cells.iter().find(|c| (c.row, c.col) == (row, col)).ok_or_else(invalid)?;
++        let merged = source.row_span > 1 || source.col_span > 1;
+         if table.common.locked || table.common.size_protect || table.attr & (1 << 30) != 0
+             || !table.zones.is_empty() || table.repeat_header || table.caption.is_some()
+-            || table.cells.iter().any(|c| c.cell_protect() || c.is_header || c.field_name.is_some()
+-                || c.text_direction != 0 || c.paragraphs.is_empty() || c.paragraphs.len() > 50
+-                || c.paragraphs.iter().any(|p| !p.controls.is_empty() || !p.field_ranges.is_empty()
+-                    || !p.orphan_field_ends.is_empty() || !p.range_tags.is_empty() || !p.title_marks.is_empty()
+-                    || !p.markpen_marks.is_empty() || p.text.chars().count() > 4000)) { return Err(invalid()); }
+-        let source = table.cells.iter().find(|c| (c.row, c.col) == (row, col)).ok_or_else(invalid)?;
++            || table.cells.iter().any(|c| {
++                let allow_fields = merged && (c.row, c.col) != (row, col);
++                c.cell_protect() || c.is_header || c.field_name.as_ref().is_some_and(|name| !allow_fields || name.is_empty())
++                    || c.text_direction != 0 || c.paragraphs.is_empty() || c.paragraphs.len() > 50
++                    || c.paragraphs.iter().any(|p| !subdivision_paragraph_allowed(p, allow_fields))
++            }) { return Err(invalid()); }
+         if distribute && !(2..=usize::from(rows * cols)).contains(&source.paragraphs.len()) { return Err(invalid()); }
+         let vertical = DivisionAxis::new(table, true, row, source.row_span, rows)?;
+         let horizontal = DivisionAxis::new(table, false, col, source.col_span, cols)?;

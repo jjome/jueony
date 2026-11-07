@@ -10,14 +10,16 @@ import {validateEditOperations} from '../src/modules/document/public/index.ts';
 import {sameAxisPicture} from '../src/adapters/rhwp/axis-cell-picture.ts';
 
 const {HwpDocument}=await loadReviewEngine(resolve(process.env.JUEONY_ENGINE_PACKAGE));
-const output=resolve(process.env.JUEONY_TEST_OUTPUT??resolve(import.meta.dirname,'../../../build/axis-grouped-pictures-native'));
+const split=process.argv.includes('--paragraphs');
+const output=resolve(process.env.JUEONY_TEST_OUTPUT??resolve(import.meta.dirname,
+ split?'../../../build/axis-paragraph-pictures-native':'../../../build/axis-grouped-pictures-native'));
 const inspect=file=>JSON.parse(execFileSync('python',[resolve(import.meta.dirname,'lib/inspect-axis-picture.py'),'inspect-grouped',file],{encoding:'utf8'}));
 const at=[0,1,0],target='s0p1t0';
 const insert={kind:'insert_table_row',target,index:1,values:['신규','','']};
 const drop={kind:'delete_table_column',target,index:0};
 const bytes=(d,ext)=>ext==='hwp'?d.exportHwp():d.exportHwpx();
 const table=d=>readStructure(d).tables[0];
-const owner=d=>table(d).cells.find(c=>c.text==='PicB');
+const owner=d=>table(d).cells.find(c=>c.text.replaceAll('\n','')==='PicB');
 function apply(d,ext,op){
  const snapshot={name:'사진.'+ext,structure:readStructure(d),revision:'1',nodes:[],limitations:[]};
  executeDocumentOperations(d,snapshot,validateEditOperations([op],snapshot));
@@ -28,8 +30,9 @@ function checkSource(raw){
  assert.equal(new Set(raw.map(p=>p.resource)).size,3);
  assert.equal(raw[0].image,raw[3].image);
  assert.notEqual(raw[0].image,raw[2].image);
- assert.deepEqual(raw[0].paragraph,raw[1].paragraph);
- assert.deepEqual(raw[0].paragraph,raw[2].paragraph);
+ if(split)assert.notDeepEqual(raw[0].paragraph,raw[1].paragraph);
+ else assert.deepEqual(raw[0].paragraph,raw[1].paragraph);
+ assert.deepEqual(raw[1].paragraph,raw[2].paragraph);
 }
 
 function damageLayoutAfterInsert(d){
@@ -56,22 +59,23 @@ function damageLayoutAfterInsert(d){
  };
 }
 
-for(const grid of ['plain','merged']){
+for(const grid of (split?['merged']:['plain','merged'])){
  const folder=resolve(output,grid);await mkdir(folder,{recursive:true});
  const source=await createAxisPictureFixture(HwpDocument,folder,{merged:grid==='merged',grouped:true});
  try{
   const cells=table(source).cells;
+  if(split)source.splitParagraphInCell(...at,owner(source).index,0,2);
   source.setCellProperties(...at,cells.find(c=>c.text==='PicA').index,'{"fieldName":"제품 코드"}');
   source.insertClickHereFieldInCell(...at,cells.find(c=>c.text==='PicC').index,0,0,false,'입력','제품 설명','설명',true);
   for(const ext of ['hwp','hwpx']){
    const original=bytes(source,ext),input=resolve(folder,'before.'+ext);await writeFile(input,original);
    const raw=inspect(input);checkSource(raw);
-   const op=grid==='plain'?insert:drop;
+   const op=grid==='plain'||split&&ext==='hwp'?insert:drop;
    const d=new HwpDocument(original);
    try{
     const before=table(d),group=owner(d).axisPicture;
-    assert.deepEqual(group.pictures.map(p=>p.controlIndex),[0,1,2]);
-    assert.equal(new Set(group.pictures.map(p=>p.left)).size,3);
+    assert.deepEqual(group.pictures.map(p=>[p.cellParaIndex,p.controlIndex]),split?[[0,0],[1,0],[1,1]]:[[0,0],[0,1],[0,2]]);
+    assert.equal(new Set(group.pictures.map(p=>JSON.stringify([p.left,p.top]))).size,3);
     const fields=before.cells.filter(c=>c.axisFieldSignature);assert.equal(fields.length,2);
     apply(d,ext,op);
     const current=table(d),survivor=owner(d);
@@ -89,7 +93,7 @@ for(const grid of ['plain','merged']){
    }finally{d.free();}
    // These four combinations exercise different failure modes, including
    // checks that can fail only on a later picture of the same owner.
-   const modes=grid==='plain'?(ext==='hwp'?['duplicate inner index','anchor order','field before']:['field after','second layout']):
+   const modes=split?(ext==='hwp'?['wrong paragraph path']:['second layout']):grid==='plain'?(ext==='hwp'?['duplicate inner index','anchor order','field before']:['field after','second layout']):
       (ext==='hwp'?['delete owner','resize owner']:['protected','third asset']);
    for(const mode of modes){
     const d=new HwpDocument(original);
@@ -107,6 +111,15 @@ for(const grid of ['plain','merged']){
       const read=d.getPageControlLayout.bind(d);
       d.getPageControlLayout=page=>{
        const layout=JSON.parse(read(page));layout.controls.find(c=>c.type==='image'&&c.controlIdx===1).controlIdx=0;
+       return JSON.stringify(layout);
+      };
+     }
+     if(mode==='wrong paragraph path'){
+      const read=d.getPageControlLayout.bind(d);
+      d.getPageControlLayout=page=>{
+       const layout=JSON.parse(read(page));
+       const image=layout.controls.find(c=>c.type==='image'&&c.cellParaIdx===1&&c.controlIdx===0);
+       image.cellParaIdx=0;image.cellPath[0].cellParaIndex=0;
        return JSON.stringify(layout);
       };
      }

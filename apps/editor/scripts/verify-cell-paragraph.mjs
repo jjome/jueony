@@ -86,8 +86,12 @@ try{
   const f=await open(format,await createAxisPictureFixture(HwpDocument,out,{merged:true})),before=await snap();
   const owners=s=>s.structure.tables[0].cells.filter(c=>c.axisPicture).map(c=>({index:c.index,picture:c.axisPicture}));
   assert.equal(owners(before).length,4);assert.equal(before.cellParagraphSources.s0p1t0.editable,true);
+  await f.evaluate(()=>{
+   const ih=window.__pageServices.getInputHandler(),execute=ih.executeDocumentAgentOperation.bind(ih);
+   ih.executeDocumentAgentOperation=(cmd,render)=>execute(cmd,async()=>{try{return await render();}catch(e){window.__pictureError=e.message;throw e;}});
+  });
   await send('merged paragraph revision');
-  assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'',await f.evaluate(()=>window.__pictureError));
   const after=await snap();assert.equal(after.cellParagraphSources.s0p1t0.cells[0].paragraphs[1].text,'Agent revised paragraph 😀');
   same(owners(before),owners(after));
   await undo();assert.deepEqual((await snap()).structure,before.structure);

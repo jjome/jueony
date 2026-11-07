@@ -11,6 +11,7 @@ const picturesRequest='제품 사진 네 장을 유지하고 두 번째 줄 앞�
 const removePictures='PicB 사진이 있는 행을 삭제해 주세요.';
 const groupedRequest='한 칸에 나란히 넣은 사진 세 장을 유지하고 그 위에 새 행을 넣어 주세요.';
 const removeGrouped='사진 세 장이 있는 행을 삭제해 주세요.';
+const splitRequest='한 칸의 두 문단에 나눠 넣은 사진 세 장을 유지하고 그 위에 새 행을 넣어 주세요.';
 
 function form(HwpDocument,inline){
  const doc=HwpDocument.createEmpty();
@@ -29,17 +30,17 @@ function form(HwpDocument,inline){
  return doc;
 }
 
-function proposal(input){
+function proposal(input,splitPictures){
  const [t]=input.document.structure.tables;
- if([pictureRequest,removePicture,picturesRequest,removePictures,groupedRequest,removeGrouped].includes(input.instruction)){
+ if([pictureRequest,removePicture,picturesRequest,removePictures,groupedRequest,splitRequest,removeGrouped].includes(input.instruction)){
   const many=[picturesRequest,removePictures].includes(input.instruction);
-  const grouped=[groupedRequest,removeGrouped].includes(input.instruction);
+  const grouped=[groupedRequest,splitRequest,removeGrouped].includes(input.instruction);
   const owners=t.cells.filter(c=>c.axisPicture);
   assert.equal(owners.length,grouped?2:many?4:1);
   const owner=grouped?owners.find(c=>c.axisPicture.pictures?.length===3):owners.find(c=>c.text===(many?'PicB':'Picture owner'));
   assert.ok(owner);
-  if(grouped)assert.deepEqual(owner.axisPicture.pictures.map(p=>p.controlIndex),[0,1,2]);
-  return [pictureRequest,picturesRequest,groupedRequest].includes(input.instruction)?{kind:'insert_table_row',target:t.id,index:1,values:['새 행','','']}:
+  if(grouped)assert.deepEqual(owner.axisPicture.pictures.map(p=>[p.cellParaIndex,p.controlIndex]),splitPictures?[[0,0],[1,0],[1,1]]:[[0,0],[0,1],[0,2]]);
+  return [pictureRequest,picturesRequest,groupedRequest,splitRequest].includes(input.instruction)?{kind:'insert_table_row',target:t.id,index:1,values:['새 행','','']}:
     {kind:'delete_table_row',target:t.id,index:owner.row};
  }
  assert.ok([insertRequest,deleteRequest].includes(input.instruction));
@@ -50,13 +51,13 @@ function proposal(input){
  return {kind:insert?'insert_table_row':'delete_table_row',target:t.id,index:named.row,...(insert?{values:['신규','']}:{})};
 }
 
-export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,state,snap,execute,reopen,pictureFolder,multiplePictures,groupedPictures}){
+export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,state,snap,execute,reopen,pictureFolder,multiplePictures,groupedPictures,splitPictures}){
  const calls=[];
  const provider=http.createServer(async(req,res)=>{
   try{
    let raw='';for await(const chunk of req)raw+=chunk;
    const input=JSON.parse(JSON.parse(raw).messages[1].content);
-   const operation=proposal(input);
+   const operation=proposal(input,splitPictures);
    calls.push(input.instruction);
    res.setHeader('Content-Type','application/json');
    res.end(JSON.stringify({choices:[{message:{content:JSON.stringify({message:'양식 표 행 편집',sourceIds:[],operations:[operation]})}}]}));
@@ -79,20 +80,21 @@ export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,
   }
   for(const ext of ['hwp','hwpx']){
    if(pictureFolder){
-    const sourceKind=groupedPictures?' with three pictures in one cell':multiplePictures?' with four products':'';
+    const sourceKind=splitPictures?' with three pictures in two cell paragraphs':groupedPictures?' with three pictures in one cell':multiplePictures?' with four products':'';
     await scenario(ext+' Agent picture owner row insertion and deletion refusal through chat'+sourceKind,async()=>{
      const source=new HwpDocument(await readFile(resolve(pictureFolder,'before.'+ext)));
      const frame=await open(ext,source),before=(await snap()).structure;
      const originals=before.tables[0].cells.filter(c=>c.axisPicture);assert.equal(originals.length,groupedPictures?2:multiplePictures?4:1);
-     assert.equal(await send(groupedPictures?groupedRequest:multiplePictures?picturesRequest:pictureRequest),'');
+     const request=splitPictures?splitRequest:groupedPictures?groupedRequest:multiplePictures?picturesRequest:pictureRequest;
+     assert.equal(await send(request),'');
      const after=(await snap()).structure;
      for(const original of originals){
       const moved=after.tables[0].cells.find(c=>c.text===original.text);
       assert.equal(moved.row,original.row+(original.row>=1?1:0));assert.equal(moved.column,original.column);
       assert.equal(moved.axisPicture.signature,original.axisPicture.signature);
       assert.ok(Math.abs(moved.axisPicture.left-original.axisPicture.left)<=.2&&Math.abs(moved.axisPicture.top-original.axisPicture.top)<=.2);
-      for(const p of original.axisPicture.pictures??[]){
-       const q=moved.axisPicture.pictures[p.controlIndex];
+      for(const [i,p] of (original.axisPicture.pictures??[]).entries()){
+       const q=moved.axisPicture.pictures[i];assert.equal(q.cellParaIndex,p.cellParaIndex);assert.equal(q.controlIndex,p.controlIndex);
        assert.equal(q.signature,p.signature);
        assert.ok(Math.abs(q.left-p.left)<=.2&&Math.abs(q.top-p.top)<=.2);
       }

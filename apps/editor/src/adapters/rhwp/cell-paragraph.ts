@@ -1,5 +1,5 @@
 import {readNestedCellFields} from './nested-cell-fields.ts';
-import {axisPictureReader,sameAxisPicture} from './axis-cell-picture.ts';
+import {sameAxisPicture} from './axis-cell-picture.ts';
 import {readBodyTableMarkers} from './body-table-markers.ts';
 import {sha256} from '@noble/hashes/sha2.js';
 import type {Snapshot,Table,AgentCellParagraphOp,AgentCellParagraphSource} from '../../modules/document/public/index.ts';
@@ -80,10 +80,9 @@ function paragraphPageOwners(d:any,t:Table) {
  }
  return pages;
 }
-type PictureOwner = {table:string;cell:number;picture:NonNullable<Table['cells'][number]['axisPicture']>};
+type PictureOwner = {table:string;cell:number;paragraphs:number[];picture:NonNullable<Table['cells'][number]['axisPicture']>};
 
-function pictureOwners(doc:any,tables:Table[],controls:any[],lists:any[]):PictureOwner[] {
- const readPicture=axisPictureReader(doc);
+function pictureOwners(tables:Table[],controls:any[],lists:any[]):PictureOwner[] {
  const owners:PictureOwner[]=[];
  for(const listId of new Set(controls.filter(c=>c.list!==0&&c.ctrlId==='gso').map(c=>c.list))){
   const matches=lists.filter(l=>l.listId===listId&&l.isCell&&l.hostListId===0);
@@ -95,21 +94,21 @@ function pictureOwners(doc:any,tables:Table[],controls:any[],lists:any[]):Pictur
   // A merged owner can also have plain paragraphs after its picture paragraph.
   // Require the same native asset and rendering proof for every child.
   const children=controls.filter(c=>c.list===listId);
-  const picture=cell.axisPicture??readPicture(table.section,table.paragraph,table.control,cell,children);
+  const picture=cell.axisPicture;
   if(!picture)throw Error('셀 그림의 원본과 화면 배치를 확인하지 못했습니다.');
-  owners.push({table:table.id,cell:cell.index,picture});
+  owners.push({table:table.id,cell:cell.index,paragraphs:[...new Set<number>(children.map(c=>c.para))],picture});
  }
  return owners;
 }
 
 function samePictures(before:PictureOwner[],after:PictureOwner[]){
  return before.length===after.length&&before.every((owner,i)=>
-  owner.table===after[i].table&&owner.cell===after[i].cell&&sameAxisPicture(owner.picture,after[i].picture));
+  owner.table===after[i].table&&owner.cell===after[i].cell&&same(owner.paragraphs,after[i].paragraphs)&&sameAxisPicture(owner.picture,after[i].picture));
 }
 /** Match every anonymous native control to its field and owning cursor list.
  * A stored table formula must reproduce its cached result without updating any field. */
 function cellFieldBoundaries(d:any,t:Table,tables:Table[],controls:any[],lists:any[]){
- const pictures=pictureOwners(d,tables,controls,lists);
+ const pictures=pictureOwners(tables,controls,lists);
  const nested=controls.filter(c=>c.list!==0&&c.ctrlId!=='gso'),allFields=parsed(d.getFieldList());
  if(!Array.isArray(allFields))throw Error();
  if(new Set(allFields.map(f=>f.fieldId)).size!==allFields.length)throw Error();
@@ -203,15 +202,15 @@ function readPrivateSources(d:any,tables:Table[],name:string){
    let paragraphBudget=0,characterBudget=0;
    const cells=t.cells.map(c=>{
     const count=d.getCellParagraphCount(t.section,t.paragraph,t.control,c.index);if(count<1||count>50||typeof c.properties.verticalAlign!=='number'||![0,1].includes(c.properties.verticalAlign)||c.properties.textDirection!==0)throw Error();
-    const ownsPicture=pictures.some(owner=>owner.table===t.id&&owner.cell===c.index);
+    const pictureParagraphs=pictures.find(owner=>owner.table===t.id&&owner.cell===c.index)?.paragraphs??[];
     const paragraphs=Array.from({length:count},(_,index)=>{
      const args=[t.section,t.paragraph,t.control,c.index,index],length=d.getCellParagraphLength(...args),text=d.getTextInCell(...args,0,length),path=JSON.stringify([{controlIndex:t.control,cellIndex:c.index,cellParaIndex:index}]),runs=parsed(d.getCharShapeRunsInCellByPath(t.section,t.paragraph,path,0,length)),characters=parsed(d.getCellCharPropertiesAt(...args,0)),paragraph=parsed(d.getCellParaPropertiesAt(...args)),style=parsed(d.getCellStyleAt(...args));
      paragraphBudget++;characterBudget+=Array.from(text).length;
      if(paragraphBudget>200||characterBudget>40000||!plain(text)||Array.from(text).length!==length||!Array.isArray(runs)||runs.some((r:any,i:number)=>!int(r.charShapeId)||!int(r.endOffset)||r.startOffset!==(i===0?0:runs[i-1].endOffset)||r.endOffset<=r.startOffset)||(runs.at(-1)?.endOffset??0)!==length||!int(characters.charShapeId)||paragraph.headType!=='None')throw Error();
      const editableFrom=boundaries.get(t.id+'/'+c.index+'/'+index);
-     return {index,text,length,characters,paragraph,style,runs,...(ownsPicture&&index===0?{pictureParagraph:true}:{}),...(editableFrom===undefined?{}:{editableFrom})};
+     return {index,text,length,characters,paragraph,style,runs,...(pictureParagraphs.includes(index)?{pictureParagraph:true}:{}),...(editableFrom===undefined?{}:{editableFrom})};
     });
-    let readOnly=ownsPicture&&count===1;
+    let readOnly=pictureParagraphs.length===count;
     if(hasLocalFormula){
      // The native graph resolves covered coordinates to their merged owner.
      // Refuse both referenced owners and any owner whose dependencies cannot be resolved.
@@ -222,9 +221,11 @@ function readPrivateSources(d:any,tables:Table[],name:string){
     return {index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs,...(nameId===undefined?{}:{nameId}),...(readOnly?{readOnly}: {})};
    });
    if(!cells.some(c=>!c.readOnly&&c.rowSpan*c.columnSpan>1))throw Error();
-   const evidence=capturePreservationEvidence(d);if(evidence.issues.length)throw Error();
+   const evidence=capturePreservationEvidence(d);if(evidence.issues.length)throw Error('문서 보존 근거를 수집하지 못했습니다.');
    source={editable:true,cells,pages,fieldEvidence,pictures,fingerprint:sha({evidence,fieldEvidence,pictures,resources:resourceFingerprint(d.exportHwpx()),body:rootBodyTexts(d),tables:tableTextTree(structure.tables),cells,properties:p,columns:col,pages,geometry:tableLayoutEvidence(d,t)})};
-  }catch{}
+  }catch(error){
+   if(error instanceof Error&&error.message)source.reason=error.message;
+  }
   sources[t.id]=source;
  }
  return {structure,sources};
@@ -290,7 +291,7 @@ function planCharacterFormats(d:any,base:Snapshot,op:AgentCellParagraphOp,runs:C
 export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellParagraphOp):void {
  const d=nativeDocument(wasm),proof=pending.get(d);if(!proof||proof.revision!==base.revision||!same(proof.operation,op))throw new Error('셀 문단 결과의 검증 근거가 없습니다.');
  const after=capturePreservationEvidence(d);if(after.issues.length||!same(topologySemantics(after.values),proof.expected)||!same(rootBodyTexts(d),proof.body)||!same(tableTextTree(readStructure(d).tables),proof.text)||resourceFingerprint(d.exportHwpx())!==proof.resources)throw new Error('병합 셀 문단 결과 또는 다른 문서 내용·자원이 변경되었습니다.');
- const source=readPrivateSources(d,[proof.table],base.name).sources[op.target];if(source?.editable!==true)throw new Error('교체 후 병합 셀 문단을 검증하지 못했습니다.');
+ const source=readPrivateSources(d,[proof.table],base.name).sources[op.target];if(source?.editable!==true)throw new Error(source?.reason||'교체 후 병합 셀 문단을 검증하지 못했습니다.');
  if(!samePictures(proof.pictures,source.pictures))throw Error('편집 후 셀 그림의 소유 위치, 자원 또는 배치가 달라졌습니다.');
  if(!same(source.fieldEvidence,proof.fieldEvidence))throw Error('문단 편집으로 책갈피, 누름틀 또는 계산식 결과가 달라졌습니다.');
  if(!same(source.pages,proof.pages))throw new Error('문단 편집으로 셀의 쪽 경계가 바뀌어 적용하지 않았습니다.');
@@ -303,7 +304,7 @@ export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellPar
  try{const loss=JSON.parse(artifact.contentLoss()),bytes=artifact.takeBytes();verifyPreservedExport(d,bytes,format,loss,b=>new d.constructor(b));reopened=new d.constructor(bytes);
   if(!sameTableLayout(tableLayoutEvidence(d,proof.table),tableLayoutEvidence(reopened,proof.table)))throw new Error('셀 문단 교체 후 실제 저장 재열기 배치가 다릅니다.');
   if(proof.pictures.length){
-   const nativePictures=(doc:any)=>pictureOwners(doc,readStructure(doc).tables,parsed(doc.getControls()),parsed(doc.getCursorModel()).lists);
+   const nativePictures=(doc:any)=>pictureOwners(readStructure(doc).tables,parsed(doc.getControls()),parsed(doc.getCursorModel()).lists);
    const current=nativePictures(d);
    if(current.length!==proof.pictures.length||!samePictures(current,nativePictures(reopened)))throw Error('저장 후 셀 그림의 소유 위치, 자원 또는 배치가 달라졌습니다.');
   }

@@ -71,6 +71,24 @@ for(const format of ['hwp','hwpx'])await scenario(format+' only later plain para
   d.restoreSnapshot(undo);assert.deepEqual(bytes(d),original);d.discardSnapshot(undo);
  }finally{d.free();}
 });
+await scenario('picture paragraphs at two different indices exclude both from the merged cell edit',async()=>{
+ const fixtureDoc=await createAxisPictureFixture(HwpDocument,out,{merged:true,grouped:true});
+ try{
+  const owner=readStructure(fixtureDoc).tables[0].cells.find(c=>c.row===1&&c.column===1);
+  fixtureDoc.splitParagraphInCell(0,1,0,owner.index,0,2);
+  fixtureDoc.splitParagraphInCell(0,1,0,owner.index,0,0);
+  fixtureDoc.insertTextInCell(0,1,0,owner.index,0,0,'앞 문단');
+  const d=new HwpDocument(fixtureDoc.exportHwpx());
+  try{
+   const source=snap(d,'사진.hwpx'),cap=source.cellParagraphSources.s0p1t0;
+   assert.deepEqual(cap.cells.find(c=>c.index===owner.index).paragraphs,[{index:0,text:'앞 문단'}]);
+   const op={kind:'replace_cell_paragraph',target:'s0p1t0',row:1,column:1,paragraph:0,originalText:'앞 문단',text:'새 문단'};
+   transactionalCandidate(d,source,[op],source.revision);
+   const reopened=new HwpDocument(d.exportHwpx());
+   try{assert.equal(reopened.getTextInCell(0,1,0,owner.index,0,0,4),'새 문단');}finally{reopened.free();}
+  }finally{d.free();}
+ }finally{fixtureDoc.free();}
+});
 for (const format of ['hwp','hwpx']) await scenario(format+' multi-run merged paragraph preserves every original style across edit, undo, redo and reopen',()=>{
  const template=fixture(),exportDoc=doc=>format==='hwp'?doc.exportHwp():doc.exportHwpx();
  template.applyCharFormatInCell(0,1,0,0,1,1,4,'{"italic":true}');

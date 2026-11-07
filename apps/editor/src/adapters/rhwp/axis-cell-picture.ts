@@ -35,33 +35,38 @@ function assetHash(bytes:Uint8Array,mime:string) {
  * gets a fresh reader, even if the engine reuses the same native handle. */
 export function axisPictureReader(doc:any) {
  let page:ReturnType<typeof picturePage>|undefined;
- return (section:number,paragraph:number,control:number,cell:Cell,children:any[]):Cell['axisPicture']=>{
+ return (section:number,paragraph:number,control:number,cell:Cell,paragraphCount:number,children:any[]):Cell['axisPicture']=>{
+  if(!Number.isSafeInteger(paragraphCount)||paragraphCount<1||paragraphCount>50||cell.text.length>4000||
+     !children.length||cell.properties.fieldName!==''||cell.properties.cellProtect!==false)return;
   if(page===undefined)page=picturePage(doc);
-  if(!page||!children.length||cell.properties.fieldName!==''||cell.properties.cellProtect!==false)return;
-  const path=JSON.stringify([{controlIndex:control,cellIndex:cell.index,cellParaIndex:0}]);
+  if(!page)return;
   if(page.fields.some((f:any)=>{
    const loc=f.location,first=loc?.path?.[0];
    return f.listId===children[0].list || loc?.sectionIndex===section && loc?.paraIndex===paragraph &&
     first?.type==='cell' && first.controlIndex===control && first.cellIndex===cell.index;
   }))return;
-  const atPath=page.pictures.filter((c:any)=>c.secIdx===section && c.parentParaIdx===paragraph &&
-    JSON.stringify(c.cellPath)===path);
-  if(atPath.length!==children.length)return;
+  const inCell=page.pictures.filter((c:any)=>c.secIdx===section && c.parentParaIdx===paragraph &&
+    c.cellPath?.length===1 && c.cellPath[0].controlIndex===control && c.cellPath[0].cellIndex===cell.index);
+  if(inCell.length!==children.length)return;
   const tables=page.layout.filter((c:any)=>c.type==='table' && c.secIdx===section && c.paraIdx===paragraph &&
     c.controlIdx===control && !c.cellPath?.length);
   const owners=tables.length===1?tables[0].cells.filter((c:any)=>c.cellIdx===cell.index&&c.row===cell.row&&c.col===cell.column):[];
   if(owners.length!==1)return;
   const pictures=[];
-  for(const [index,child] of children.entries()){
-   if(child.list!==children[0].list || child.controlIndex!==index || !Number.isSafeInteger(child.pos) ||
-      child.pos<0 || index>0 && child.pos<=children[index-1].pos)return;
-   const matches=atPath.filter((c:any)=>c.controlIdx===index);
+  for(const [i,child] of children.entries()){
+   const previous=children[i-1],para=child.para;
+   const nextIndex=previous?.para===para?previous.controlIndex+1:0;
+   if(child.list!==children[0].list || !Number.isSafeInteger(para) || para<0 || para>=paragraphCount ||
+      previous && para<previous.para || child.controlIndex!==nextIndex || !Number.isSafeInteger(child.pos) ||
+      child.pos<0 || previous?.para===para && child.pos<=previous.pos)return;
+   const path=JSON.stringify([{controlIndex:control,cellIndex:cell.index,cellParaIndex:para}]);
+   const matches=inCell.filter((c:any)=>c.controlIdx===nextIndex && JSON.stringify(c.cellPath)===path);
    if(matches.length!==1)return;
    const picture=matches[0];
-   if(picture.outerTableControlIdx!==control || picture.cellIdx!==cell.index || picture.cellParaIdx!==0)return;
+   if(picture.outerTableControlIdx!==control || picture.cellIdx!==cell.index || picture.cellParaIdx!==para)return;
    const placement=readPicture(doc,page,section,paragraph,path,child,picture,owners[0]);
    if(!placement)return;
-   pictures.push({...placement,controlIndex:index});
+   pictures.push({...placement,cellParaIndex:para,controlIndex:nextIndex});
   }
   const {left,top,signature}=pictures[0];
   if(pictures.length===1)return {signature,left,top};
@@ -72,7 +77,7 @@ export function axisPictureReader(doc:any) {
 function readPicture(doc:any,page:NonNullable<ReturnType<typeof picturePage>>,
  section:number,paragraph:number,storedPath:string,child:any,picture:any,owner:any):CellPicturePlacement|undefined {
  if(child.ctrlId!=='gso' || child.ctrlCh!==11 || child.userDesc!=='그림' ||
-    child.para!==0 || child.props?.Lock!==0 || child.props.TreatAsChar!==1)return;
+    child.props?.Lock!==0 || child.props.TreatAsChar!==1)return;
  const p=json(doc.getCellPicturePropertiesByPath(section,paragraph,storedPath,child.controlIndex));
  if(p.treatAsChar!==true || p.hasCaption!==false || p.sizeProtect!==false || p.allowOverlap!==false ||
     'externalPath' in p || p.horzFlip!==false || p.vertFlip!==false || p.effect!=='RealPic' ||
@@ -112,6 +117,6 @@ export function sameAxisPicture(a:Cell['axisPicture'],b:Cell['axisPicture']):boo
  if(!samePlacement(a,b) || a.pictures?.length!==b.pictures?.length)return false;
  return !a.pictures || a.pictures.every((p,i)=>{
   const q=b.pictures![i];
-  return p.controlIndex===q.controlIndex && samePlacement(p,q);
+  return p.cellParaIndex===q.cellParaIndex && p.controlIndex===q.controlIndex && samePlacement(p,q);
  });
 }

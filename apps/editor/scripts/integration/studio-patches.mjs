@@ -294,12 +294,38 @@ saveHistory = replaceOnce(saveHistory, '  peekUndoTop(): EditCommand | null {', 
   peekUndoTop(): EditCommand | null {`, 'save frame snapshot ownership');
 await writeFile(join(root, 'src/engine/history.ts'), saveHistory);
 fileCommands = "import { confirmDownload } from '../../jueony/download-save';\n" + fileCommands;
-fileCommands = "import { verifyPreservedExport } from '../../jueony/adapters/rhwp/preservation.ts';\n" + fileCommands;
+fileCommands = "import { PreservationError, verifyPreservedExport } from '../../jueony/adapters/rhwp/preservation.ts';\n" + fileCommands;
 fileCommands = "import { acknowledgeDownloadedFile, readDownloadedFormat } from '../../jueony/adapters/files/download-connection.ts';\n" + fileCommands;
 fileCommands = "import { rememberSavedFormat, readSavedFormat } from '../../jueony/adapters/files/saved-format.ts';\n" + fileCommands;
 fileCommands = replaceOnce(fileCommands,
-  '    const payload = createSavePayload(services, format, password ?? undefined);',
-  "    await (window as any).jueonyEditor?.prepareFileSave?.(format);\n    const payload = createSavePayload(services, format, password ?? undefined);", 'save-as live table frame transaction');
+  '    const saveName = options.fileName;\n    const payload = createSavePayload(services, format, password ?? undefined);',
+  `    let saveName = options.fileName;
+    const editor = (window as any).jueonyEditor;
+    const prepare = async (output: SaveFormat) => {
+      await editor?.prepareFileSave?.(output);
+      return createSavePayload(services, output, password ?? undefined);
+    };
+    let payload: SavePayload;
+    try {
+      payload = await prepare(format);
+    } catch (error) {
+      if (format !== 'hwp' || !(error instanceof PreservationError)
+          || error.report.alternativeFormat !== 'hwpx' || !editor) throw error;
+      const instance = editor.documentInstance(), revision = editor.revision();
+      const originalHandle = services.wasm.currentFileHandle, originalName = services.wasm.fileName;
+      const alternativeName = fileNameForFormat(saveName, 'hwpx');
+      const confirmed = await showConfirm('문단 글 방향 보존',
+        '이 문서의 문단 글 방향을 HWP로 저장할 수 없습니다. 같은 설정으로 ' + alternativeName + ' 파일을 저장할까요?');
+      if (!confirmed) return;
+      if (editor.documentInstance() !== instance || editor.revision() !== revision
+          || services.wasm.currentFileHandle !== originalHandle || services.wasm.fileName !== originalName
+          || editor.hostMutationLocked() || window.frameElement?.closest('[hidden]')) {
+        throw new Error('저장 대기 중 문서 또는 파일 연결이 바뀌었습니다. 다시 저장해 주세요.');
+      }
+      format = 'hwpx';
+      saveName = alternativeName;
+      payload = await prepare(format);
+    }`, 'save-as live table frame transaction and checked HWPX alternative');
 fileCommands = replaceOnce(fileCommands,
   '    const payload = createSavePayload(services, target.format, password ?? undefined);',
   "    await (window as any).jueonyEditor?.prepareFileSave?.(target.format);\n    const payload = createSavePayload(services, target.format, password ?? undefined);", 'save live table frame transaction');

@@ -11,6 +11,7 @@ type Format = 'hwp' | 'hwpx' | 'hml';
 export type PreservationIssue = {code:'content-loss'|'changed'|'unreadable'|'limit';path:string;message:string};
 export type PreservationReport = {
  schemaVersion:1;status:'checked'|'blocked';format:Format;checked:string[];unverified:string[];issues:PreservationIssue[];
+ alternativeFormat?:'hwpx';
 };
 export type PreservationEvidence = {values:Record<string,Json>;unverified:string[];issues:PreservationIssue[]};
 export class PreservationError extends Error {
@@ -211,6 +212,13 @@ export function capturePreservationEvidence(value:NativeDocument):PreservationEv
  return {values,issues,unverified:[...new Set(unverified)]};
 }
 
+function isParagraphDirectionLoss(loss:unknown):boolean {
+ if(!loss || typeof loss!=='object')return false;
+ const entry=loss as Record<string,unknown>;
+ return entry.code==='metadataReduced' && entry.subject==='paragraphProperties'
+  && typeof entry.path==='string' && /^docInfo\/paraShape\/\d+\/textDir$/.test(entry.path);
+}
+
 function serializerLossMessage(count:number,losses:unknown[],format:Format):string {
  const has=(subject:string,path:RegExp)=>losses.some(item=>{
   if(!item||typeof item!=='object'||Array.isArray(item))return false;
@@ -218,7 +226,7 @@ function serializerLossMessage(count:number,losses:unknown[],format:Format):stri
   return value.code==='metadataReduced'&&value.subject===subject&&typeof value.path==='string'&&path.test(value.path);
  });
  const details:string[]=[];
- if(format==='hwp'&&has('paragraphProperties',/^docInfo\/paraShape\/\d+\/textDir$/))details.push('원본의 명시적 글 방향을 HWP로 보존하는 변환은 지원하지 않습니다. HWPX로 저장해 보존 검사를 진행해 주세요');
+ if(format==='hwp'&&losses.some(isParagraphDirectionLoss))details.push('원본의 명시적 글 방향을 HWP로 보존하는 변환은 지원하지 않습니다. HWPX로 저장해 보존 검사를 진행해 주세요');
  if(has('fontProperties',/^docInfo\/font\/\d+\/\d+\/(?:substFont\/)?type$/))details.push('원본 글꼴 유형을 안전하게 보존할 수 없어 저장을 중단했습니다');
  return `직렬화기가 ${count}건의 손실을 보고했습니다`+(details.length?`. ${details.join('. ')}`:'');
 }
@@ -233,7 +241,10 @@ export function comparePreservationEvidence(before:PreservationEvidence,after:Pr
   if(!(path in before.values)||!(path in after.values)||signature(before.values[path])!==signature(after.values[path]))issues.push({code:'changed',path,message:'저장 전후 값이 다릅니다'});
   else checked.push(path);
  }
- return {schemaVersion:1,status:issues.length?'blocked':'checked',format,checked,unverified:[...new Set([...before.unverified,...after.unverified])],issues};
+ const report:PreservationReport={schemaVersion:1,status:issues.length?'blocked':'checked',format,checked,unverified:[...new Set([...before.unverified,...after.unverified])],issues};
+ if(format==='hwp'&&issues.length===1&&issues[0].code==='content-loss'&&issues[0].path==='serializer-report'
+    &&Array.isArray(loss?.losses)&&loss.losses.length>0&&loss.losses.every(isParagraphDirectionLoss))report.alternativeFormat='hwpx';
+ return report;
 }
 
 /** Call before any disk/download/recovery commit, and for each AI edited clone before applying it. */

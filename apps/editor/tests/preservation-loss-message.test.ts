@@ -9,8 +9,18 @@ function report(format:'hwp'|'hwpx',losses:unknown[]){return comparePreservation
 test('unrepresentable HWP direction remains blocked with a concrete HWPX alternative',()=>{
  const result=report('hwp',[loss('paragraphProperties','docInfo/paraShape/12/textDir')]);
  assert.equal(result.status,'blocked');assert.equal(result.issues[0].code,'content-loss');
+ assert.equal(result.alternativeFormat,'hwpx');
  assert.match(result.issues[0].message,/HWPX/);assert.match(result.issues[0].message,/1건/);
  assert.equal(result.checked.includes('serializer-report'),false);
+});
+test('only direction-only HWP loss can offer a fresh HWPX export',()=>{
+ const direction=loss('paragraphProperties','docInfo/paraShape/2/textDir');
+ assert.equal(report('hwp',[direction,loss('paragraphProperties','docInfo/paraShape/4/textDir')]).alternativeFormat,'hwpx');
+ assert.equal(report('hwpx',[direction]).alternativeFormat,undefined);
+ assert.equal(report('hwp',[]).alternativeFormat,undefined);
+ assert.equal(report('hwp',[direction,loss('fontProperties','docInfo/font/1/4/type')]).alternativeFormat,undefined);
+ const changed={...evidence,values:{text:'different'}};
+ assert.equal(comparePreservationEvidence(evidence,changed,'hwp',{schemaVersion:1,outputFormat:'hwp',count:1,losses:[direction]}).alternativeFormat,undefined);
 });
 test('font type loss remains blocked without reflecting resource names or payloads',()=>{
  const value={...loss('fontProperties','docInfo/font/0/3/substFont/type'),resourceId:'PRIVATE-FONT-PAYLOAD',reason:'PRIVATE-REASON'};

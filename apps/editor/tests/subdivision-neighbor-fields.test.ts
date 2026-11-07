@@ -8,7 +8,7 @@ import {readTableSubdivisionSources} from '../src/adapters/rhwp/table-subdivisio
 import {readTableSplitSources} from '../src/adapters/rhwp/table-split.ts';
 import {executeDocumentOperations} from '../src/adapters/rhwp/execute.ts';
 import {validateEditOperations,type Snapshot} from '../src/modules/document/public/index.ts';
-import {subdivisionNeighborFieldTable,subdivisionNamedParagraphTable} from '../scripts/lib/subdivision-neighbor-fields.mjs';
+import {subdivisionNeighborFieldTable,subdivisionNamedParagraphTable,subdivisionInlineFieldTable} from '../scripts/lib/subdivision-neighbor-fields.mjs';
 
 const pkg=process.env.JUEONY_ENGINE_PACKAGE ?? fileURLToPath(new URL('../node_modules/@rhwp/core/',import.meta.url));
 const {default:init,HwpDocument}=await import(pathToFileURL(resolve(pkg,'rhwp.js')).href);
@@ -55,7 +55,7 @@ for(const format of ['hwp','hwpx'])for(const columns of [2,3])test(format+' pres
   } finally {doc.free();}
 });
 
-for(const fault of ['target inline field','target mixed field','body field','protected neighbor'])test('subdivision rejects a '+fault+' before editing',()=>{
+for(const fault of ['target mixed field','body field','protected neighbor'])test('subdivision rejects a '+fault+' before editing',()=>{
   const d=fixture('hwpx');
   try {
     if(fault.startsWith('target'))d.insertClickHereFieldInCell(...at,0,0,0,false,'안내','설명','분할 대상',true);
@@ -66,6 +66,66 @@ for(const fault of ['target inline field','target mixed field','body field','pro
     assert.equal(s.tableSubdivisionSources![target].editable,false);
     assert.throws(()=>executeDocumentOperations(d,s,[op]));assert.deepEqual(d.exportHwpx(),old);
   } finally {d.free();}
+});
+
+for(const format of ['hwp','hwpx'])for(const distribute of [false,true])for(const filled of [false,true])
+test(format+' preserves an inline '+(filled?'value':'guide')+' in the first piece '+(distribute?'with':'without')+' paragraph distribution',()=>{
+  const src=subdivisionInlineFieldTable(HwpDocument,filled),d=new HwpDocument(bytes(src,format));src.free();
+  try{
+    const s=snapshot(d,format),original=bytes(d,format),fields=JSON.parse(d.getFieldList()),first=s.structure!.tables[0].cells[0];
+    const targetField=fields.find((f:any)=>f.name==='주누름틀');
+    const detail=(doc:any)=>JSON.parse(doc.getFieldInfoAtInCell(...at,0,0,targetField.startCharIdx,false));
+    const information=detail(d);
+    assert.equal(information.isGuide,!filled);assert.equal(targetField.value,filled?'값😀':'');
+    const undo=d.saveSnapshot();
+    try{
+      const cursor=executeDocumentOperations(d,s,validateEditOperations([{...op,distributeParagraphs:distribute}],s));
+      assert.equal(cursor?.cellIndex,1);
+      const copy=new HwpDocument(bytes(d,format));
+      try{for(const doc of [d,copy]){
+        const t=readStructure(doc).tables[0],after=JSON.parse(doc.getFieldList());
+        assert.equal(after.length,fields.length);assert.deepEqual(detail(doc),information);
+        assert.deepEqual(after.find((f:any)=>f.name===targetField.name),targetField);
+        assert.equal(t.cells[0].axisFieldSignature,first.axisFieldSignature);
+        assert.deepEqual(t.cells.slice(0,3).map(c=>c.text),distribute?[...first.text.split('\n'),'']:[first.text,'','']);
+        assert.ok(!t.cells[1].axisFieldSignature && !t.cells[2].axisFieldSignature);
+        if(distribute)assert.equal(JSON.parse(doc.getCellCharPropertiesAt(...at,1,0,0)).bold,true);
+        const named=after.find((f:any)=>f.name==='이름셀');assert.equal(named.value,fields.find((f:any)=>f.name==='이름셀').value);
+      }}finally{copy.free();}
+      d.restoreSnapshot(undo);assert.deepEqual(bytes(d,format),original);
+    }finally{d.discardSnapshot(undo);}
+  }finally{d.free();}
+});
+
+test('an inline field in a later paragraph can be retained but cannot be moved to a new cell',()=>{
+  const src=subdivisionInlineFieldTable(HwpDocument,false,1),d=new HwpDocument(src.exportHwpx());src.free();
+  try{
+    const s=snapshot(d,'hwpx'),old=d.exportHwpx();
+    assert.equal(s.tableSubdivisionSources![target].editable,true);
+    assert.throws(()=>validateEditOperations([{...op,distributeParagraphs:true}],s),/수용/);
+    assert.deepEqual(d.exportHwpx(),old);
+    executeDocumentOperations(d,s,validateEditOperations([op],s));
+    const retained=JSON.parse(d.getFieldList()).find((f:any)=>f.name==='주누름틀');
+    assert.equal(retained.location.path[0].cellIndex,0);assert.equal(retained.paraInList,1);
+  }finally{d.free();}
+});
+
+test('subdivision restores bytes when the synthetic guide paint moves away from its field marker',()=>{
+  const src=subdivisionInlineFieldTable(HwpDocument),d=new HwpDocument(src.exportHwpx());src.free();
+  try{
+    const s=snapshot(d,'hwpx'),old=d.exportHwpx(),layout=d.getPageTextLayout.bind(d),count=s.structure!.tables[0].cells.length;
+    let corrupt=false;
+    d.getPageTextLayout=(p:number)=>{
+      const page=JSON.parse(layout(p));
+      if(JSON.parse(d.getTableDimensions(...at)).cellCount>count){
+        const run=page.runs.find((r:any)=>r.text==='안내' && r.cellIdx===0 && r.charStart===undefined);
+        if(run){run.x+=1;corrupt=true;}
+      }
+      return JSON.stringify(page);
+    };
+    assert.throws(()=>executeDocumentOperations(d,s,[op]),/누름틀|안내/);
+    assert.equal(corrupt,true);assert.deepEqual(d.exportHwpx(),old);
+  }finally{d.free();}
 });
 
 for(const format of ['hwp','hwpx'])for(const columns of [2,3])test(format+' retains a merged named owner only in the first of '+columns+' pieces',()=>{

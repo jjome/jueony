@@ -1,3 +1,4 @@
+import {createAxisPictureFixture} from './lib/axis-picture-fixture.mjs';
 import assert from 'node:assert/strict';
 import {continuedMergedTable,fragmentedMergedCell} from './lib/continued-merged-table.mjs';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
@@ -18,6 +19,58 @@ const snap=(d,name='candidate.hwpx')=>{const structure=readStructure(d);return {
 function transactionalCandidate(d,s,ops,revision){if(revision!==s.revision)throw Error('Stale revision');const token=d.saveSnapshot();try{validateEditOperations(ops,s);return executeDocumentOperations(d,s,ops);}catch(e){d.restoreSnapshot(token);throw e;}finally{d.discardSnapshot(token);}}
 function resources(bytes){const b=Buffer.from(bytes),map={};let at=0;while(at+30<b.length&&b.readUInt32LE(at)===0x04034b50){const flags=b.readUInt16LE(at+6),method=b.readUInt16LE(at+8),size=b.readUInt32LE(at+18),nameLen=b.readUInt16LE(at+26),extra=b.readUInt16LE(at+28),name=b.subarray(at+30,at+30+nameLen).toString('utf8'),start=at+30+nameLen+extra;assert.equal(flags&8,0);if(name==='Contents/header.xml'||name.startsWith('BinData/'))map[name]=(method===0?b.subarray(start,start+size):inflateRawSync(b.subarray(start,start+size))).toString('base64');at=start+size;}assert.ok(map['Contents/header.xml']);return map;}
 const command=(s,p=1,text='New merged paragraph 😀')=>({kind:'replace_cell_paragraph',target:s.structure.tables[0].id,row:0,column:0,paragraph:p,originalText:s.cellParagraphSources[s.structure.tables[0].id]?.cells?.[0].paragraphs[p].text,text});
+for(const format of ['hwp','hwpx'])await scenario(format+' merged paragraph beside inline pictures preserves owners and rolls back invalid picture evidence',async()=>{
+ const fixtureDoc=await createAxisPictureFixture(HwpDocument,out,{merged:true});
+ const bytes=d=>format==='hwp'?d.exportHwp():d.exportHwpx(),original=bytes(fixtureDoc);
+ fixtureDoc.free();
+ const d=new HwpDocument(original),name='사진표.'+format;
+ const owners=doc=>readStructure(doc).tables[0].cells.filter(c=>c.axisPicture).map(c=>({index:c.index,picture:c.axisPicture}));
+ try{
+  const s=snap(d,name),cap=s.cellParagraphSources.s0p1t0,pictures=owners(d),op=command(s,1,'개정1');
+  assert.equal(pictures.length,4);assert.equal(cap.editable,true);
+  assert.ok(pictures.every(p=>!cap.cells.some(c=>c.index===p.index)));
+  const before=bytes(d),undo=d.saveSnapshot();
+  transactionalCandidate(d,s,[op],s.revision);
+  const after=bytes(d),reopened=new HwpDocument(after);
+  try{
+   assert.equal(reopened.getTextInCell(0,1,0,0,1,0,3),'개정1');
+   assert.deepEqual(owners(reopened),pictures);
+  }finally{reopened.free();}
+  const redo=d.saveSnapshot();
+  d.restoreSnapshot(undo);assert.deepEqual(bytes(d),before);
+  d.restoreSnapshot(redo);assert.deepEqual(bytes(d),after);
+  d.restoreSnapshot(undo);d.discardSnapshot(undo);d.discardSnapshot(redo);
+  const read=d.getControlImageData.bind(d);
+  let changed=false;
+  d.getControlImageData=(...args)=>changed?new Uint8Array():read(...args);
+  const insert=d.insertTextInCell.bind(d);
+  d.insertTextInCell=(...args)=>{const result=insert(...args);changed=true;return result;};
+  assert.throws(()=>transactionalCandidate(d,s,[op],s.revision));assert.equal(changed,true);
+  assert.deepEqual(bytes(d),before);assert.equal(snap(d,name).cellParagraphSources.s0p1t0.editable,false);
+ }finally{d.free();}
+});
+for(const format of ['hwp','hwpx'])await scenario(format+' only later plain paragraphs in a merged picture owner are editable',async()=>{
+ const template=await createAxisPictureFixture(HwpDocument,out,{mergeRange:[0,2,1,2]});
+ const bytes=d=>format==='hwp'?d.exportHwp():d.exportHwpx();
+ const d=new HwpDocument(bytes(template));template.free();
+ try{
+  const s=snap(d,'서식.'+format),cell=s.cellParagraphSources.s0p1t0.cells.find(c=>c.row===0&&c.column===2);
+  assert.deepEqual(cell.paragraphs.map(p=>p.index),[1]);
+  const op={kind:'replace_cell_paragraph',target:'s0p1t0',row:0,column:2,paragraph:1,originalText:cell.paragraphs[0].text,text:'개정5'};
+  const original=bytes(d),rawAssets=resources(d.exportHwpx()),undo=d.saveSnapshot();
+  assert.throws(()=>transactionalCandidate(d,s,[{...op,paragraph:0,originalText:'PicA'}],s.revision));
+  assert.deepEqual(bytes(d),original);
+  transactionalCandidate(d,s,[op],s.revision);
+  const saved=new HwpDocument(bytes(d));
+  try{
+   const source=snap(saved,'서식.'+format).cellParagraphSources.s0p1t0;
+   assert.deepEqual(source.cells.find(c=>c.column===2&&c.row===0).paragraphs,[{index:1,text:'개정5'}]);
+   assert.equal(saved.getTextInCell(0,1,0,cell.index,0,0,4),'PicA');
+   assert.deepEqual(resources(saved.exportHwpx()),rawAssets);
+  }finally{saved.free();}
+  d.restoreSnapshot(undo);assert.deepEqual(bytes(d),original);d.discardSnapshot(undo);
+ }finally{d.free();}
+});
 for (const format of ['hwp','hwpx']) await scenario(format+' multi-run merged paragraph preserves every original style across edit, undo, redo and reopen',()=>{
  const template=fixture(),exportDoc=doc=>format==='hwp'?doc.exportHwp():doc.exportHwpx();
  template.applyCharFormatInCell(0,1,0,0,1,1,4,'{"italic":true}');

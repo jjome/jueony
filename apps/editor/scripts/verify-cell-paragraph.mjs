@@ -1,3 +1,4 @@
+import {createAxisPictureFixture} from './lib/axis-picture-fixture.mjs';
 import puppeteer from 'puppeteer-core';
 import {continuedMergedTable,fragmentedMergedCell} from './lib/continued-merged-table.mjs';
 import http from 'node:http';
@@ -26,7 +27,8 @@ const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const
  const target=input.instruction.includes('missing')?'s9p0t0':input.document.structure.tables[0]?.id;
  const cell=input.document.cellParagraphSources?.[target]?.cells?.find(c=>c.rowSpan*c.columnSpan>1),paragraph=input.instruction.includes('first')?0:1;
  const fallback=input.document.structure.tables[0]?.cells?.[0]?.text?.split('\n')[paragraph]??'';
- const operations=[{kind:'replace_cell_paragraph',target,row:cell?.row??0,column:cell?.column??0,paragraph,originalText:cell?.paragraphs?.[paragraph]?.text??fallback,text:'Agent revised paragraph 😀'}];
+ const operations=[{kind:'replace_cell_paragraph',target,row:cell?.row??0,column:cell?.column??0,paragraph,originalText:cell?.paragraphs?.find(p=>p.index===paragraph)?.text??fallback,text:'Agent revised paragraph 😀'}];
+ if(input.instruction.includes('photo-owner'))operations[0].text='개정5';
  if(input.instruction.includes('mixed-tail'))operations[0].text=operations[0].originalText.slice(0,-1)+'개정😀';
  if(input.instruction.includes('split-owner'))operations[0].text=operations[0].originalText.slice(0,-6)+'Tail 2';
  if(input.instruction.includes('field-tail'))operations[0].text=Array.from(operations[0].originalText).slice(0,cell.paragraphs[paragraph].editableFrom).join('')+'수정😀';
@@ -68,11 +70,52 @@ const ready=()=>page.waitForFunction(()=>document.getElementById('app-status')?.
 const cmd=(t,properties={equalizeRows:true},start=0,count=t.rows)=>({kind:'format_table_cells',target:t.id,startRow:start,rowCount:count,startColumn:0,columnCount:t.columns,properties});
 function same(a,b,path='layout'){if(typeof a==='number'&&typeof b==='number'){assert.ok(Math.abs(a-b)<=0.2,path+': '+a+' != '+b);return;}if(Array.isArray(a)){assert.equal(a.length,b.length,path);a.forEach((v,i)=>same(v,b[i],path+'['+i+']'));return;}if(a&&typeof a==='object'){assert.deepEqual(Object.keys(a),Object.keys(b),path);for(const k of Object.keys(a))same(a[k],b[k],path+'.'+k);return;}assert.deepEqual(a,b,path);}
 async function reopen(f,name){const inspect=()=>f.evaluate(()=>{const d=window.__pageServices.wasm.borrowDocumentHandle();return Array.from({length:d.pageCount()},(_,p)=>({controls:JSON.parse(d.getPageControlLayout(p)).controls,runs:JSON.parse(d.getPageTextLayout(p)).runs}));});const live=await inspect(),x=await save(f,name,'hwpx');x.free();const bytes=[...await readFile(resolve(out,name+'.hwpx'))];await f.evaluate(async bytes=>{const api=window.jueonyEditor;await api.open(new Uint8Array(bytes),'master-review.hwpx',api.fileHandle(),false);},bytes);await delay(500);const reopened=await inspect();same(live,reopened);await writeFile(resolve(out,name+'-layout.json'),JSON.stringify({live,reopened},null,2));}
+async function saveAndReopen(f,label,format){
+ (await save(f,label,format)).free();
+ await f.evaluate(async format=>{
+  const api=window.jueonyEditor,handle=api.fileHandle(),bytes=new Uint8Array(await (await handle.getFile()).arrayBuffer());
+  await api.open(bytes,'master-review.'+format,handle,false);
+ },format);
+}
 const paragraphOp=(s,text='Direct revised paragraph')=>{const t=s.structure.tables[0],c=s.cellParagraphSources[t.id].cells.find(c=>c.rowSpan*c.columnSpan>1);return {kind:'replace_cell_paragraph',target:t.id,row:c.row,column:c.column,paragraph:1,originalText:c.paragraphs[1].text,text};};
 try{
  await new Promise(r=>provider.listen(providerPort,'127.0.0.1',r));for(let i=0;i<100;i++){if(await fetch(origin+'/api/health').then(r=>r.ok,()=>false))break;await delay(100);}
  browser=await puppeteer.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,args:['--no-first-run','--disable-background-networking'],defaultViewport:{width:1400,height:1000}});page=await browser.newPage();page.setDefaultTimeout(15000);page.on('dialog',d=>{if(d.type()==='beforeunload'){beforeUnloadCount++;void d.accept();}else void d.dismiss();});page.on('pageerror',e=>pageErrors.push(String(e)));page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});await page.setRequestInterception(true);page.on('request',r=>{if(!r.url().startsWith(origin)&&!r.url().startsWith('data:')&&!r.url().startsWith('blob:')){externalRequests.push(r.url());void r.abort();}else void r.continue();});await page.goto(origin);await ready();
  if(casePattern)await configure('openai-compatible');
+ for(const format of ['hwp','hwpx'])await scenario(format+' inline picture neighbors in a merged paragraph chat edit, undo, redo, save and UI reopen',async()=>{
+  const f=await open(format,await createAxisPictureFixture(HwpDocument,out,{merged:true})),before=await snap();
+  const owners=s=>s.structure.tables[0].cells.filter(c=>c.axisPicture).map(c=>({index:c.index,picture:c.axisPicture}));
+  assert.equal(owners(before).length,4);assert.equal(before.cellParagraphSources.s0p1t0.editable,true);
+  await send('merged paragraph revision');
+  assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const after=await snap();assert.equal(after.cellParagraphSources.s0p1t0.cells[0].paragraphs[1].text,'Agent revised paragraph 😀');
+  same(owners(before),owners(after));
+  await undo();assert.deepEqual((await snap()).structure,before.structure);
+  await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);
+  await saveAndReopen(f,'photo-paragraph',format);
+  const reopened=await snap();same(owners(after),owners(reopened));
+  assert.equal(reopened.cellParagraphSources.s0p1t0.cells[0].paragraphs[1].text,'Agent revised paragraph 😀');
+ });
+ for(const format of ['hwp','hwpx'])await scenario(format+' edit a later paragraph in a merged picture owner via chat and reopen',async()=>{
+  const f=await open(format,await createAxisPictureFixture(HwpDocument,out,{mergeRange:[0,2,1,2]})),before=await snap();
+  const paragraphs=s=>s.cellParagraphSources.s0p1t0.cells.find(c=>c.column===2&&c.row===0).paragraphs;
+  const pictures=()=>f.evaluate(()=>{
+   const d=window.__pageServices.wasm.borrowDocumentHandle();
+   return JSON.parse(d.getPageControlLayout(0)).controls.filter(c=>c.type==='image').map(c=>({
+    path:c.cellPath,control:c.controlIdx,bytes:[...d.getControlImageData(c.secIdx,c.parentParaIdx,JSON.stringify(c.cellPath),c.controlIdx)]
+   }));
+  });
+  const originals=await pictures();assert.equal(originals.length,4);
+  assert.deepEqual(paragraphs(before).map(p=>p.index),[1]);
+  await send('photo-owner');
+  assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const after=await snap();assert.deepEqual(paragraphs(after),[{index:1,text:'개정5'}]);
+  await undo();assert.deepEqual((await snap()).structure,before.structure);
+  await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);
+  await saveAndReopen(f,'photo-owner',format);
+  const reopened=await snap();assert.deepEqual(paragraphs(reopened),[{index:1,text:'개정5'}]);
+  assert.deepEqual(await pictures(),originals);
+ });
  for(const id of ['openai-responses','anthropic','gemini','openai-compatible'])await scenario(id+': actual merged paragraph chat, compare, one undo/redo, safe save and UI reopen',async()=>{
   await configure(id);const f=await open('hwpx',body('hwpx',true)),before=await snap(),t=before.structure.tables[0],cap=before.cellParagraphSources[t.id],start=calls.length;
   await f.evaluate(()=>{const ih=window.__pageServices.getInputHandler();if(window.__paragraphDiagnosticInstalled)return;window.__paragraphDiagnosticInstalled=true;window.__paragraphDiagnostics=[];const native=ih.executeDocumentAgentOperation.bind(ih);ih.executeDocumentAgentOperation=(command,render)=>native(command,async()=>{try{return await render();}catch(e){window.__paragraphDiagnostics.push({message:String(e),stack:e.stack});throw e;}});});

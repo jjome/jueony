@@ -1,0 +1,35 @@
+--- a/src/document_core/commands/table_ops/subdivision_grid.rs
++++ b/src/document_core/commands/table_ops/subdivision_grid.rs
+@@ -7,8 +7,8 @@
+     HwpError::RenderError("분할할 셀의 원본 격자·문단·보호 상태를 확인하지 못했습니다.".into())
+ }
+ 
+-// Neighbor cells are cloned in full. Only admit locally paired, disjoint
+-// ClickHere ranges; a target cell's controls can never be cloned into new slots.
++// A retained paragraph can carry locally paired, disjoint ClickHere ranges.
++// New template cells never inherit the original paragraph's field controls.
+ fn subdivision_paragraph_allowed(p: &Paragraph, allow_fields: bool) -> bool {
+     let length = p.text.chars().count();
+     if length > 4000 || !p.orphan_field_ends.is_empty() || !p.range_tags.is_empty()
+@@ -78,13 +78,19 @@
+         if table.common.locked || table.common.size_protect || table.attr & (1 << 30) != 0
+             || !table.zones.is_empty() || table.repeat_header || table.caption.is_some()
+             || table.cells.iter().any(|c| {
+-                let allow_fields = merged && (c.row, c.col) != (row, col);
++                let is_target = (c.row, c.col) == (row, col);
+                 // Named targets always retain paragraph zero (the virtual
+                 // field value) in the original named piece. Other pieces are
+                 // unnamed even when they receive an original paragraph.
+                 c.cell_protect() || c.is_header || c.field_name.as_ref().is_some_and(|name| !merged || name.is_empty())
+                     || c.text_direction != 0 || c.paragraphs.is_empty() || c.paragraphs.len() > 50
+-                    || c.paragraphs.iter().any(|p| !subdivision_paragraph_allowed(p, allow_fields))
++                    || c.paragraphs.iter().enumerate().any(|(para, p)| {
++                        // Under distribution, only paragraph zero stays at the
++                        // same cell and paragraph address. Never move a marker.
++                        let retain_inline = merged && (!is_target ||
++                            (c.field_name.is_none() && (!distribute || para == 0)));
++                        !subdivision_paragraph_allowed(p, retain_inline)
++                    })
+             }) { return Err(invalid()); }
+         if distribute && !(2..=usize::from(rows * cols)).contains(&source.paragraphs.len()) { return Err(invalid()); }
+         let vertical = DivisionAxis::new(table, true, row, source.row_span, rows)?;

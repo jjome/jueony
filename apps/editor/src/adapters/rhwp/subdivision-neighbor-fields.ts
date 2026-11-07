@@ -2,6 +2,7 @@ import type {Table} from '../../modules/document/public/index.ts';
 import {parsed} from './structure.ts';
 import {axisFieldSignature} from './axis-cell-fields.ts';
 import {tableLayoutEvidence} from './table-layout-evidence.ts';
+import {inlineSubdivisionLayout} from './subdivision-inline-layout.ts';
 
 const invalid=()=>Error('분할할 표의 이웃 누름틀·이름 셀의 원래 위치와 내용을 확인하지 못했습니다.');
 
@@ -41,15 +42,32 @@ export function subdivisionFieldOwners(doc:any,table:Table):Map<number,number> {
 /** A virtual cell field supplies its first paragraph as the field value.
  * An inline field in the same cell has a separate marker range and cannot
  * use the named-cell split contract. */
-export function namedSubdivisionTargets(doc:any,table:Table,owners:Map<number,number>):Set<number> {
-  const targets=new Set<number>();
+export function subdivisionFieldTargets(doc:any,table:Table,owners:Map<number,number>):Map<number,boolean> {
+  const targets=new Map<number,boolean>();
   if(!owners.size)return targets;
   const fields=parsed(doc.getFieldList());
   for(const [list,index] of owners){
     const owned=fields.filter((f:any)=>f.listId===list),field=owned[0];
+    if(owned.every((f:any)=>f.cellField===false)){
+      const cell=table.cells[index];
+      if(cell.rowSpan*cell.columnSpan>1){
+        try{
+          for(const f of owned){
+            const at=[table.section,table.paragraph,table.control,index,f.paraInList] as const;
+            const info=parsed(doc.getFieldInfoAtInCell(...at,f.startCharIdx,false));
+            if(typeof info.isGuide!=='boolean' || info.guideName!==f.guide || info.editableInForm!==f.editableInForm ||
+                f.endCharIdx>doc.getCellParagraphLength(...at) || doc.getTextInCell(...at,f.startCharIdx,f.endCharIdx-f.startCharIdx)!==f.value)
+              throw invalid();
+          }
+          inlineSubdivisionLayout(doc,table,cell,false);
+          targets.set(index,owned.every((f:any)=>f.paraInList===0));
+        }catch{ /* The cell can still be a verified unchanged neighbor. */ }
+      }
+      continue;
+    }
     if(owned.length!==1 || field.cellField!==true || fields.filter((f:any)=>f.name===field.name).length!==1)continue;
     const args=[table.section,table.paragraph,table.control,index,0] as const;
-    if(field.value===doc.getTextInCell(...args,0,doc.getCellParagraphLength(...args)))targets.add(index);
+    if(field.value===doc.getTextInCell(...args,0,doc.getCellParagraphLength(...args)))targets.set(index,true);
   }
   return targets;
 }

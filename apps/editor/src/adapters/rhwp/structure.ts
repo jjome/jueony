@@ -71,10 +71,10 @@ export function readStructure(wasm: any): Structure {
         && !children.length;
       cells.push({ index: i, row: info.row, column: info.col, rowSpan: info.rowSpan, columnSpan: info.colSpan, text: texts.join('\n'), editable: Boolean(simple)&&properties.cellProtect===false&&control.props?.Lock===0, ...(properties.cellProtect!==false?{reason:'보호 셀 또는 보호 상태를 확인할 수 없는 셀입니다.'}:control.props?.Lock!==0?{reason:'보호 표 또는 보호 상태를 확인할 수 없는 표입니다.'}:{}), properties, characters: parsed(doc.getCellCharPropertiesAt(section, paragraph, ci, i, 0, 0)), paragraphProperties: parsed(doc.getCellParaPropertiesAt(section, paragraph, ci, i, 0)) });
       if (axisContentSafe) cells[i].axisContentSafe = true;
-      if (count===1 && children.length===1 && children[0].ctrlId==='gso' && control.props?.Lock===0 &&
+      if (count===1 && children.length && children.every((child:any)=>child.ctrlId==='gso') && control.props?.Lock===0 &&
           dimensions.rowCount*dimensions.colCount<=200 && texts[0].length<=4000) {
         try {
-          const picture=readPicture(section,paragraph,ci,cells[i],children[0]);
+          const picture=readPicture(section,paragraph,ci,cells[i],children);
           if(picture)cells[i].axisPicture=picture;
         } catch { /* An unverified picture stays ineligible for structural edits. */ }
       }

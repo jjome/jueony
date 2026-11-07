@@ -18,8 +18,10 @@ export function recordPublishedCanvasMetrics(doc:CanvasDocument,generation:Gener
 
 export function subdivisionCopyMetrics(wasm:any,base:Snapshot,operations:EditOp[]) {
   const op=operations[0];
-  if(operations.length!==1 || op.kind!=='split_table_cell_into' ||
-      !base.tableSubdivisionSources?.[op.target]?.frames?.some(f=>f.cells.some(c=>c.lineSignature))) return;
+  if(operations.length!==1 || op.kind!=='split_table_cell_into') return;
+  const sourceCell=base.structure?.tables.find(t=>t.id===op.target)?.cells.find(c=>c.row===op.row && c.column===op.column);
+  const inline=Boolean(sourceCell?.axisFieldSignature && !sourceCell.properties.fieldName);
+  if(!inline && !base.tableSubdivisionSources?.[op.target]?.frames?.some(f=>f.cells.some(c=>c.lineSignature))) return;
   const live:CanvasDocument=wasm.borrowDocumentHandle();
   const active=live.canvasMetricsActive(), document=wasm.documentGeneration, fonts=wasm.canvasMetricFontGeneration;
   const publication=active?publications.get(live):undefined;

@@ -20,8 +20,8 @@ export function exactSubdivisionPlan(op:AgentTableSubdivisionOp, table:Table, so
   const primary = table.cells.find(c => c.row === op.row && c.column === op.column);
   const limits = source.cells?.find(c => c.row === op.row && c.column === op.column);
   if((primary?.axisFieldSignature || primary?.properties.fieldName) && (!limits || !primary.axisFieldSignature ||
-      !primary.properties.fieldName || primary.rowSpan*primary.columnSpan===1))
-    throw new Error('원래 필드 값을 확인한 병합 이름 셀이 필요합니다.');
+      primary.rowSpan*primary.columnSpan===1))
+    throw new Error('원래 필드의 값과 위치를 확인한 병합 셀이 필요합니다.');
   if (!primary || !limits || table.editable === false || !source.frame
       || table.cells.some(c => c.properties.cellProtect !== false || c.properties.isHeader !== false)
       || ![limits.minimumHeight,limits.minimumWidth].every(n => Number.isSafeInteger(n) && n >= 200))
@@ -44,7 +44,7 @@ export function exactSubdivisionPlan(op:AgentTableSubdivisionOp, table:Table, so
   for (const row of r.groups) for (const col of c.groups) {
     cells.push({...primary, row:row.start, column:col.start, rowSpan:row.span, columnSpan:col.span,
       originIndex:slot === 0 ? primary.index : null, text:paragraphs ? paragraphs[slot] ?? '' : slot === 0 ? primary.text : '',
-      ...(slot>0 && primary.properties.fieldName ? {axisFieldSignature:undefined} : {}),
+      ...(slot>0 && primary.axisFieldSignature ? {axisFieldSignature:undefined} : {}),
       properties:{...primary.properties,width:col.length,height:row.length,...(slot>0 && primary.properties.fieldName ? {fieldName:''} : {})}});
     slot++;
   }
@@ -59,8 +59,8 @@ export function exactSubdivisionPlan(op:AgentTableSubdivisionOp, table:Table, so
     return groups.every((g,i) => g.span === Math.floor(span/count) + (i < span % count ? 1 : 0)
       && g.length === Math.floor(total/count) + (i === 0 ? total % count : 0));
   };
-  const namedDistribution=Boolean(primary.properties.fieldName && op.distributeParagraphs);
-  const useExactGrid = namedDistribution || multi || !merged || !restoreTracks && (r.count !== table.rows || c.count !== table.columns
+  const fieldGrid=Boolean(primary.axisFieldSignature && (!primary.properties.fieldName || op.distributeParagraphs));
+  const useExactGrid = fieldGrid || multi || !merged || !restoreTracks && (r.count !== table.rows || c.count !== table.columns
     || !legacyBand(r.groups,primary.rowSpan) || !legacyBand(c.groups,primary.columnSpan));
   return {table, primary, source, rows:r.count, columns:c.count, cells, useExactGrid, restoreTracks,
     paragraphFormats:formats, widths:c.groups.map(g => g.length), heights:r.groups.map(g => g.length)};

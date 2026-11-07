@@ -3,7 +3,7 @@ import {projectTableAxis,validateControlOperations,witnessedTrackEdges} from '..
 import {capturePreservationEvidence,verifyPreservedExport} from './preservation.ts';
 import {resourceFingerprint} from './cell-paragraph.ts';
 import {rootBodyTexts} from './table-topology-evidence.ts';
-import {readNestedNamedFields} from './nested-named-fields.ts';
+import {readNestedCellFields} from './nested-cell-fields.ts';
 import {parsed,readStructure} from './structure.ts';
 
 type AxisOp=Extract<ControlOp,{index:number}>;
@@ -17,21 +17,22 @@ function evidence(doc:any,table:NestedTable){
  const captured=capturePreservationEvidence(doc);
  if(captured.issues.length)throw Error('중첩 표의 원래 문서 속성을 모두 읽지 못했습니다.');
  const {cells,controls,text,fields,...document}=captured.values as any;
- const named=readNestedNamedFields(doc,cells.map((c:any)=>c.list),fields);
+ const nativeControls=parsed(doc.getControls()),cellFields=readNestedCellFields(doc,cells.map((c:any)=>c.list),fields,nativeControls);
  const addresses=new Map<number,string>(),others:any[]=[],target:any[]=[];
  for(const cell of cells){
   const l=cell.list,parent=l.hostListId===0?'s'+l.sectionIndex:addresses.get(l.hostListId);
   if(parent===undefined)throw Error('중첩 셀 부모의 주소를 확인하지 못했습니다.');
   const tableId=parent+'p'+l.hostPara+'t'+l.controlIndex,id=tableId+'c'+l.cellIndex;
   addresses.set(l.listId,id);
-  const field=named.get(l.listId),content={properties:cell.properties,paragraphs:cell.paragraphs,...(field?{field:field.data}:{})};
+  const field=cellFields.get(l.listId),content={properties:cell.properties,paragraphs:cell.paragraphs,...(field?{field:field.data}:{})};
   if(tableId!==table.id){others.push({id,...content});continue;}
   const leaf=JSON.stringify(path(table,l.cellIndex));
   const first=parsed(doc.getCellCharPropertiesAtByPath(table.section,table.paragraph,leaf,0));
   target[l.cellIndex]={...content,first};
  }
  let extent:any;
- const anchoredControls=parsed(doc.getControls()).map((control:any)=>{
+ // Cell field markers are bound to their projected owner in target/others.
+ const anchoredControls=nativeControls.filter((c:any)=>c.list===0||c.ctrlId==='tbl').map((control:any)=>{
   const parent=control.list===0?0:addresses.get(control.list);
   if(parent===undefined)throw Error('중첩 표 컨트롤 주소를 확인하지 못했습니다.');
   if(parent+'p'+control.para+'t'+control.controlIndex===table.id){
@@ -41,7 +42,7 @@ function evidence(doc:any,table:NestedTable){
   return {...control,list:parent};
  });
  if(!extent||target.length!==table.cells.length)throw Error('중첩 표 크기와 셀을 모두 확인하지 못했습니다.');
- return {document:{...document,fields:fields.filter((f:any)=>f.cellField!==true),body:rootBodyTexts(doc)},namedCount:named.size,others,anchoredControls,target,extent,resources:resourceFingerprint(doc.exportHwpx())};
+ return {document:{...document,fields:fields.filter((f:any)=>f.listId===0),body:rootBodyTexts(doc)},fieldCount:fields.filter((f:any)=>f.listId!==0).length,others,anchoredControls,target,extent,resources:resourceFingerprint(doc.exportHwpx())};
 }
 
 export function executeNestedTableAxis(doc:any,base:Snapshot,op:AxisOp){
@@ -81,7 +82,7 @@ export function executeNestedTableAxis(doc:any,base:Snapshot,op:AxisOp){
    throw Error('중첩 표 행·열 변경 결과가 계획과 다릅니다.');
   const withoutTarget=(s:typeof original)=>({...s,nestedTables:s.nestedTables?.filter(t=>t.id!==table.id)});
   const after=evidence(doc,updated);
-  if(!same(withoutTarget(original),withoutTarget(result))||!same(before.document,after.document)||before.namedCount!==after.namedCount||!same(before.others,after.others)||
+  if(!same(withoutTarget(original),withoutTarget(result))||!same(before.document,after.document)||before.fieldCount!==after.fieldCount||!same(before.others,after.others)||
      !same(before.anchoredControls,after.anchoredControls)||before.resources!==after.resources||
      after.extent[track]!==before.extent[track]+(insert?delta:-delta)||after.extent[otherTrack]!==before.extent[otherTrack])
    throw Error('중첩 표 편집으로 부모·이웃 표의 내용, 배치 속성 또는 자원이 달라졌습니다.');
@@ -100,7 +101,7 @@ export function executeNestedTableAxis(doc:any,base:Snapshot,op:AxisOp){
        !same(p.paragraph,source.paragraphs[0].paragraph))throw Error('삽입한 중첩 셀에 원래 행·열의 서식을 적용하지 못했습니다.');
    }
   }
-  if(merged||before.namedCount){
+  if(merged||before.fieldCount){
    const format=doc.getSourceFormat();
    if(!['hwp','hwpx'].includes(format)||!base.name.toLowerCase().endsWith('.'+format))throw Error('중첩 병합 표의 원래 저장 형식을 확인할 수 없습니다.');
    const artifact=format==='hwp'?doc.exportHwpWithReport():doc.exportHwpxWithReport();

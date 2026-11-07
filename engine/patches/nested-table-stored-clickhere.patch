@@ -1,0 +1,59 @@
+--- a/src/document_core/commands/table_ops.rs
++++ b/src/document_core/commands/table_ops.rs
+@@ -2425,6 +2425,25 @@
+         }
+     }
+ 
++    // Only matched, paragraph-local click-here fields can move with their owning cell.
++    fn nested_axis_paragraph_supported(p: &crate::model::paragraph::Paragraph) -> bool {
++        use crate::model::control::FieldType;
++        if !p.orphan_field_ends.is_empty() || !p.range_tags.is_empty()
++            || p.controls.len() != p.field_ranges.len() || p.controls.len() > 200 { return false; }
++        if p.controls.is_empty() { return true; }
++        let length = p.text.chars().count();
++        let mut seen = vec![false; p.controls.len()];
++        let mut spans = Vec::with_capacity(p.controls.len());
++        for r in &p.field_ranges {
++            if r.start_char_idx > r.end_char_idx || r.end_char_idx > length || r.inner_slot_count != 0
++                || !matches!(p.controls.get(r.control_idx), Some(Control::Field(f)) if f.field_type == FieldType::ClickHere)
++                || std::mem::replace(&mut seen[r.control_idx], true) { return false; }
++            spans.push((r.start_char_idx, r.end_char_idx));
++        }
++        spans.sort_unstable();
++        spans.windows(2).all(|w| w[1].0 > w[0].1.saturating_add(1))
++    }
++
+     /// A structural edit must resolve every ancestor as a writable table cell.
+     /// Do not allow the generic cell path resolver to traverse a text box.
+     pub(crate) fn nested_axis_table(
+@@ -2454,8 +2473,7 @@
+                         || (i > 0 && (table.cells[i-1].row, table.cells[i-1].col) >= (c.row, c.col))
+                         || c.is_header || c.cell_protect()
+                         || c.paragraphs.is_empty()
+-                        || c.paragraphs.iter().any(|p| !p.controls.is_empty() || !p.field_ranges.is_empty()
+-                            || !p.orphan_field_ends.is_empty() || !p.range_tags.is_empty()) {
++                        || c.paragraphs.iter().any(|p| !Self::nested_axis_paragraph_supported(p)) {
+                         return None;
+                     }
+                     for r in usize::from(c.row)..bottom {
+@@ -2467,6 +2485,10 @@
+                 if owners.iter().any(Option::is_none) || owners != table.cell_grid { return None; }
+                 if table.cells.len() < owners.len() && table.witnessed_track_edges(true).is_none()
+                     && table.witnessed_track_edges(false).is_none() { return None; }
++                if table.cells.iter().flat_map(|c| &c.paragraphs).any(|p| !p.field_ranges.is_empty()) {
++                    let mut ids = std::collections::HashSet::new();
++                    if self.collect_all_fields().iter().any(|f| !ids.insert(f.field.field_id)) { return None; }
++                }
+                 return Some(table);
+             }
+             let ancestor = table.cells.get(cell_index)?;
+@@ -2494,7 +2516,8 @@
+         }
+         if !insert && source.cells.iter().any(|c| {
+             let (start, span) = if row { (c.row, c.row_span) } else { (c.col, c.col_span) };
+-            start == index && span == 1 && !c.field_name.as_deref().unwrap_or("").is_empty()
++            start == index && span == 1 && (!c.field_name.as_deref().unwrap_or("").is_empty()
++                || c.paragraphs.iter().any(|p| !p.field_ranges.is_empty()))
+         }) { return Err(invalid()); }
+         let merged = source.cells.len() < rows * cols;
+         let mut expected = (source.common.width, source.common.height);

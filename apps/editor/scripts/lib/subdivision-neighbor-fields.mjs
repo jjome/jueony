@@ -19,3 +19,11 @@ export function subdivisionNamedParagraphTable(HwpDocument) {
   d.applyParaFormatInCell(...at,'{"alignment":"right"}');
   return d;
 }
+
+export function subdivisionInlineFieldTable(HwpDocument,filled=false,paragraph=0) {
+  const d=subdivisionNeighborFieldTable(HwpDocument);
+  d.insertClickHereFieldInCell(0,1,0,0,paragraph,0,false,'안내','설명','주누름틀',true);
+  if(filled)d.setFieldValueByName('주누름틀','값😀');
+  d.applyCharFormatInCell(0,1,0,0,1,0,d.getCellParagraphLength(0,1,0,0,1),'{"bold":true}');
+  return d;
+}

@@ -235,7 +235,7 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
       const nested=structure?.nestedTables?.find(t=>t.id===op.target);
       if(nested){
         if(!nested.axisEditable||operations.length!==1)fail('중첩 표의 행·열 변경에는 편집 가능한 내부 표와 단독 요청이 필요합니다.');
-        tableAxisPlan({...nested,cells:nested.cells.map(c=>({...c,editable:true,properties:{fieldName:c.fieldName},axisFieldSignature:c.fieldName}))},op);
+        tableAxisPlan({...nested,cells:nested.cells.map(c=>({...c,editable:true,properties:{fieldName:c.fieldName},axisFieldSignature:c.fieldName||c.clickHereFieldIds?.join(',')}))},op);
       }else{
         const table=tables.get(op.target);if(!table)fail('현재 문서 또는 이번 요청에서 만든 표 ID가 필요합니다.');
         tables.set(op.target,tableAxisPlan(table!,op));

@@ -1,5 +1,5 @@
 import {readBodyTableMarkers} from './body-table-markers.ts';
-import {readNestedNamedFields} from './nested-named-fields.ts';
+import {readNestedCellFields} from './nested-cell-fields.ts';
 import type {CellParagraphText, NestedTable, TableCellPathStep} from '../../modules/document/public/types.ts';
 
 type CellList = {isCell:boolean;listId:number;hostListId:number;sectionIndex:number;hostPara:number;controlIndex:number;cellIndex:number;paraCount:number};
@@ -21,15 +21,15 @@ export function inspectNestedTables(doc:any, controls:Control[], lists:CellList[
   const controlParagraphs = new Set(controls.map(c => c.list+'/'+c.para));
   const offsets = [0];
   for (let s=0;s<doc.getSectionCount();s++) offsets.push(offsets[s]+doc.getParagraphCount(s));
-  let canCheckAxis=false,namedFields:ReturnType<typeof readNestedNamedFields>|undefined;
+  let canCheckAxis=false,cellFields:ReturnType<typeof readNestedCellFields>|undefined;
   if(typeof doc.canEditNestedTableAxis==='function' && lists.every(l=>l.isCell)){
     // Unreadable marker metadata only prevents structural edits. Independently
     // addressable cells still belong in the document snapshot.
     try{
       const fields=json(doc.getFieldList()),bookmarks=json(doc.getBookmarks());
-      if(fields.length+bookmarks.length>200||controls.some(c=>c.list!==0&&c.ctrlId!=='tbl'))throw Error();
-      readBodyTableMarkers(doc,controls,offsets,fields.filter((f:any)=>f.listId===0),bookmarks);
-      namedFields=readNestedNamedFields(doc,lists,fields);
+      if(fields.length+bookmarks.length>200)throw Error();
+      readBodyTableMarkers(doc,controls.filter(c=>c.list===0),offsets,fields.filter((f:any)=>f.listId===0),bookmarks);
+      cellFields=readNestedCellFields(doc,lists,fields,controls);
       canCheckAxis=true;
     }catch{/* read-only axis */}
   }
@@ -91,8 +91,9 @@ export function inspectNestedTables(doc:any, controls:Control[], lists:CellList[
         paragraphs.push({index:p,text,...(runs.length>1?{formatSpans:runs.map((r:any)=>({start:r.startOffset,end:r.endOffset}))}:{})});
       }
       const text=texts.join('\n'),editable=l.paraCount===1 && paragraphs.length===1 && !paragraphs[0].formatSpans;
-      const fieldName=namedFields?.get(l.listId)?.name;
-      cells.push({index:l.cellIndex,row:info.row,column:info.col,rowSpan:info.rowSpan,columnSpan:info.colSpan,text,editable,...(fieldName?{fieldName}:{}),
+      const fields=cellFields?.get(l.listId);
+      cells.push({index:l.cellIndex,row:info.row,column:info.col,rowSpan:info.rowSpan,columnSpan:info.colSpan,text,editable,
+        ...(fields?.name?{fieldName:fields.name}:{}),...(fields?.inlineIds.length?{clickHereFieldIds:fields.inlineIds}:{}),
         ...(paragraphs.length?{paragraphs}:{})});
       ids.push(l.listId);
     }

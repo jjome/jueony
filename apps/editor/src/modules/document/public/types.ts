@@ -8,7 +8,9 @@ export type AgentTableSubdivisionSource={editable:boolean;exactGrid?:boolean;fra
 /** Detached JSON data. No engine handles cross this boundary. */
 export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 export type DocumentProperties = { [key: string]: JsonValue | undefined };
-export type Cell = { index: number; row: number; column: number; rowSpan: number; columnSpan: number; text: string; editable: boolean; axisContentSafe?:boolean; axisFieldSignature?:string; axisPicture?:{signature:string;left:number;top:number}; axisFormula?:{fieldId:number;expression:string;resultFormat:string}; reason?:string; properties: DocumentProperties; characters?: DocumentProperties; paragraphProperties?: DocumentProperties };
+export type CellPicturePlacement = {signature:string;left:number;top:number};
+export type CellPictureEvidence = CellPicturePlacement & {pictures?:Array<CellPicturePlacement & {controlIndex:number}>};
+export type Cell = { index: number; row: number; column: number; rowSpan: number; columnSpan: number; text: string; editable: boolean; axisContentSafe?:boolean; axisFieldSignature?:string; axisPicture?:CellPictureEvidence; axisFormula?:{fieldId:number;expression:string;resultFormat:string}; reason?:string; properties: DocumentProperties; characters?: DocumentProperties; paragraphProperties?: DocumentProperties };
 export type TableCellPathStep = {controlIndex:number;cellIndex:number;cellParaIndex:number};
 export type AgentTableFormulaFields={
  fields:Array<{tableId:string;section:number;paragraph:number;path:TableCellPathStep[];row:number;column:number;fieldId:number;
@@ -21,7 +23,7 @@ export type TableFormulaChange={tableId:string;row:number;column:number;fieldId:
 export type NestedTable = {
   id:string; section:number; paragraph:number; ancestors:TableCellPathStep[]; control:number; rows:number; columns:number;
   axisEditable?:boolean;
-  cells:Array<Pick<Cell,'index'|'row'|'column'|'rowSpan'|'columnSpan'|'text'|'editable'> & {paragraphs?:CellParagraphText[];fieldName?:string}>;
+  cells:Array<Pick<Cell,'index'|'row'|'column'|'rowSpan'|'columnSpan'|'text'|'editable'> & {paragraphs?:CellParagraphText[];fieldName?:string;clickHereFieldIds?:number[]}>;
 };
 export type TablePaginationMode='none'|'cell'|'row';
 export type AgentRowHeightSource=AgentCellPaddingSource&{tableHeight?:number;maxTableHeight?:number};

@@ -75,8 +75,9 @@ try{
    complex.insertClickHereFieldByPath(table.section,table.paragraph,path,2,'안내','','안쪽 누름틀',true);
    const owner=named(complex,1);
    assert.deepEqual([owner.startCharIdx,owner.endCharIdx,owner.value],[0,4,'Beta']);
-   assert.ok(!state(complex,ext).structure.nestedTables[1].axisEditable);
-   console.log('PASS',ext,'virtual cell range remains the whole first paragraph with an unsupported inline field');
+   const current=state(complex,ext).structure.nestedTables[1];
+   assert.equal(current.axisEditable,true);assert.equal(current.cells[1].clickHereFieldIds.length,1);
+   console.log('PASS',ext,'named-cell range remains the whole first paragraph with a separate inline field');
   }finally{complex.free();}
  }
 }finally{fixture.free();}

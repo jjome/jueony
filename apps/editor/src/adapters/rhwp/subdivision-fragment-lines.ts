@@ -24,6 +24,13 @@ export function verifyFragmentLines(doc:any, table:Table, frames:Frame[]) {
       const key=cell.index+'/'+r.cellParaIdx, prior=previous.get(key), end=prior?.end??0;
       const args=[table.section,table.paragraph,table.control,cell.index,r.cellParaIdx] as const;
       const start=r.charStart, length=Array.from(r.text).length;
+      // An empty ClickHere guide publishes its anchor after the paragraph's
+      // source text. It consumes no source character.
+      if(!length && r.w===0 && table.cells[cell.index].axisFieldSignature){
+        const detail=parsed(doc.getFieldInfoAtInCell(...args,start,false));
+        if(detail?.inField && detail.fieldType==='clickhere' && detail.isGuide===true &&
+            detail.startCharIdx===start && detail.endCharIdx===start)continue;
+      }
       // A stored hard line break occupies one native character and paints no
       // glyph. Accept that gap only at a confirmed physical line transition.
       const hardBreak=prior && start===end+1 && (frame.page>prior.page || r.y>prior.y+0.2)

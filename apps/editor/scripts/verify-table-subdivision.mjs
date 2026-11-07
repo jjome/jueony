@@ -23,7 +23,9 @@ const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const
 
  const target=input.instruction.includes('없는 대상')?'s9p0t0':input.instruction.includes('새 표')?'@new':input.document.structure.tables[0]?.id;
  const operations=[{kind:'split_table_cell_into',target,row:1,column:1,rows:2,columns:2}];
+ if (id==='openai-responses') operations[0].distributeParagraphs=null;
  if (input.instruction.includes('병합 주 셀')) Object.assign(operations[0],{row:0,column:0,rows:2,columns:1});
+ if (input.instruction.includes('문단 분배')) Object.assign(operations[0],{row:0,column:0,rows:2,columns:2,distributeParagraphs:true});
  if(input.instruction.includes('범위 초과'))operations[0].row=99;
  if(input.instruction.includes('무변경')){operations[0].rows=1;operations[0].columns=1;}
  if(input.instruction.includes('가로')){operations[0].column=2;operations[0].rows=1;operations[0].columns=3;}
@@ -74,6 +76,32 @@ try{
  browser=await puppeteer.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,args:['--no-first-run','--disable-background-networking'],defaultViewport:{width:1400,height:1000}});page=await browser.newPage();page.setDefaultTimeout(15000);page.on('dialog',d=>void (d.type()==='beforeunload'?d.accept():d.dismiss()));page.on('pageerror',e=>pageErrors.push(String(e)));page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});await page.setRequestInterception(true);page.on('request',r=>{if(!r.url().startsWith(origin)&&!r.url().startsWith('data:')&&!r.url().startsWith('blob:')){externalRequests.push(r.url());void r.abort();}else void r.continue();});await page.goto(origin);await ready();
  for(const id of ['openai-responses','anthropic','gemini','openai-compatible'])await scenario(id+': chat subdivision, compare, cursor, undo/redo, save/UI reopen',async()=>{await configure(id);const f=await open('hwpx',body('hwpx',true)),before=await snap(),t=before.structure.tables[0],start=calls.length;assert.equal(before.tableSubdivisionSources[t.id].editable,true);await send('셀 2행 2열 분할');await error(false);assert.equal(calls.length,start+1);assert.equal(calls.at(-1).id,id);assert.equal(calls.at(-1).model,id+'-fixture');assert.equal(calls.at(-1).input.document.tableSubdivisionSources[t.id].editable,true);const after=await snap(),table=after.structure.tables[0],primary=table.cells.find(c=>c.row===1&&c.column===1);assert.equal(table.rows,4);assert.equal(table.columns,4);assert.equal(table.cells.length,12);assert.equal(primary.text,t.cells[4].text);for(const c of table.cells.filter(c=>c.row>=1&&c.row<=2&&c.column>=1&&c.column<=2&&c!==primary))assert.equal(c.text,'');assert.deepEqual(after.structure.tables[1],before.structure.tables[1]);assert.deepEqual(after.nodes,before.nodes);assert.equal(await f.evaluate(()=>window.__pageServices.getInputHandler().getCursorPosition().cellIndex),primary.index);await lastAction('변경 확인');await page.waitForFunction(()=>document.getElementById('change-dialog').open);await page.$eval('#change-dialog details',e=>e.open=true);await page.screenshot({path:resolve(out,'subdivision-'+id+'.png')});await page.click('#change-dialog button');await undo();assert.deepEqual((await snap()).structure,before.structure);await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);await reopen(f,'subdivision-ui-'+id);});
  await scenario('merged cell split into two rows in chat, undo, redo and UI reopen', verifyMergedSubdivision);
+ await scenario('chat splits four styled paragraphs into reading order and preserves request undo, redo and saved cells',async()=>{
+   const doc=body();
+   for(let i=0;i<9;i++) doc.setCellProperties(0,1,0,i,'{"width":10000,"height":9000}');
+   doc.applyCharFormatInCell(0,1,0,1,0,0,4,'{"bold":true}');
+   doc.applyParaFormatInCell(0,1,0,3,0,'{"alignment":"right"}');
+   doc.mergeTableCells(0,1,0,0,0,1,1);
+   const frame=await open('hwpx',doc),before=await snap(),table=before.structure.tables[0];
+   assert.equal(before.tableSubdivisionSources[table.id].paragraphFormats.length,4);
+   const original=await state();
+   await frame.evaluate(()=>{
+     const d=window.__pageServices.wasm.borrowDocumentHandle(),split=d.splitCellParagraphs.bind(d);
+     d.splitCellParagraphs=(...args)=>{split(...args);throw new Error('합성 문단 분배 후 실패');};
+     window.__restoreParagraphSplit=()=>d.splitCellParagraphs=split;
+   });
+   try {
+     await assert.rejects(()=>apply([{kind:'split_table_cell_into',target:table.id,row:0,column:0,rows:2,columns:2,distributeParagraphs:true}]));
+     assert.deepEqual(await state(),original);
+   } finally { await frame.evaluate(()=>window.__restoreParagraphSplit()); }
+   await send('원본 셀의 문단 분배');await error(false);
+   const after=await snap(),cells=after.structure.tables[0].cells.filter(c=>c.row<2&&c.column<2);
+   assert.deepEqual(cells.map(c=>c.text),['업무 0','업무 1','업무 3','업무 4']);
+   assert.equal(cells[1].characters.bold,true);
+   await undo();assert.deepEqual((await snap()).structure,before.structure);
+   await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);
+   await reopen(frame,'subdivision-distributed-paragraphs');assert.deepEqual((await snap()).structure,after.structure);
+ });
  for(const request of ['가로 분할','세로 분할'])await scenario(request+': one-axis unequal geometry save/reopen',async()=>{const f=await open('hwpx',body());await send(request);await error(false);const t=(await snap()).structure.tables[0];assert.equal(t.rows,request.startsWith('가로')?3:4);assert.equal(t.columns,request.startsWith('가로')?5:3);await reopen(f,'subdivision-'+(request.startsWith('가로')?'horizontal':'vertical'));});
  await scenario('alias/missing/overflow/no-op/extra args/batch refuse without writes',async()=>{for(const request of ['새 표','없는 대상','범위 초과','무변경','미지원','묶음']){await open('hwpx',body());const before=await state();await send(request);await error(true);assert.deepEqual(await state(),before);}});
  await scenario('HWP/protection/multiple merges/mixed/field/zones/unknown getter readonly',async()=>{for(const mode of ['hwp','protect','merged','mixed','field','zone','missing']){console.log('readonly fixture',mode);const d=body();if(mode==='protect')d.setCellProperties(0,1,0,7,'{"cellProtect":true}');if(mode==='merged'){d.mergeTableCells(0,1,0,0,0,0,1);d.mergeTableCells(0,1,0,2,0,2,1);}if(mode==='mixed')d.applyCharFormatInCell(0,1,0,0,0,0,1,'{"italic":true}');if(mode==='field')d.insertClickHereField(0,0,0,'필드','','입력',true);if(mode==='zone')d.setCellZoneProperties(0,1,0,0,0,2,2,'{}');const f=await open(mode==='hwp'?'hwp':'hwpx',d),before=await state();if(mode==='missing')await f.evaluate(()=>{const d=window.__pageServices.wasm.borrowDocumentHandle(),native=d.getTableProperties.bind(d);d.getTableProperties=(...a)=>{const p=JSON.parse(native(...a));delete p.cellZoneCount;return JSON.stringify(p);};window.__restoreProps=()=>d.getTableProperties=native;});try{const s=await snap(),t=s.structure.tables[0];assert.equal(s.tableSubdivisionSources[t.id].editable,false,mode);await send('셀 분할');await error(true);if(mode!=='missing')assert.deepEqual(await state(),before);}finally{if(mode==='missing')await f.evaluate(()=>window.__restoreProps());}assert.deepEqual(await state(),before);}});
@@ -83,4 +111,4 @@ try{
  await scenario('unsaved restart restores result and merged neighbors close further subdivision',async()=>{await open('hwpx',body());await send('셀 분할');const after=await snap();await delay(1400);await page.reload();await ready();await delay(600);assert.deepEqual((await snap()).structure,after.structure);const before=await state();await send('셀 분할');await error(true);assert.deepEqual(await state(),before);});
  await scenario('later-section mapping saves/reopens in UI',async()=>{const d=body();d.insertSectionBreak(0,0,0);const f=await open('hwpx',d);assert.equal((await snap()).structure.tables[0].section,1);await send('셀 분할');await error(false);await reopen(f,'subdivision-later-section');});
  assert.deepEqual(pageErrors,[]);assert.deepEqual(consoleErrors,[]);assert.deepEqual(externalRequests,[]);
-}finally{await writeFile(resolve(out,'result.json'),JSON.stringify({results,failures,pageErrors,consoleErrors,externalRequests,providerCalls:calls.map(c=>({adapterId:c.id,model:c.model,instruction:c.input.instruction,tableSubdivisionSources:c.input.document.tableSubdivisionSources})),build:JSON.parse(await readFile(resolve(dist,'build-evidence.json'),'utf8')),note:'Actual Edge with four synthetic provider protocols; narrow HWPX plain source N-by-M subdivision. Hancom and paid providers NOT_RUN.'},null,2));await browser?.close();server.kill();provider.closeAllConnections();await new Promise(r=>provider.close(r));}if(failures.length)process.exitCode=1;
+}finally{await writeFile(resolve(out,'result.json'),JSON.stringify({results,failures,pageErrors,consoleErrors,externalRequests,providerCalls:calls.map(c=>({adapterId:c.id,model:c.model,instruction:c.input.instruction,tableSubdivisionSources:c.input.document.tableSubdivisionSources})),build:JSON.parse(await readFile(resolve(dist,'build-evidence.json'),'utf8')),note:'Actual Edge with four synthetic provider protocols; HWPX fixed-grid subdivision, merged-cell paragraph distribution, request undo/redo and reopens. Hancom and paid providers NOT_RUN.'},null,2));await browser?.close();server.kill();provider.closeAllConnections();await new Promise(r=>provider.close(r));}if(failures.length)process.exitCode=1;

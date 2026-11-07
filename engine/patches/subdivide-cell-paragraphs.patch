@@ -1,0 +1,90 @@
+--- a/src/document_core/commands/table_ops.rs
++++ b/src/document_core/commands/table_ops.rs
+@@ -667,6 +667,70 @@
+             "\"cellCount\":{}",
+             cell_count
+         )))
++    }
++
++    /// Split a single merged cell and move the original paragraph records in reading order.
++    pub fn split_cell_paragraphs_native(
++        &mut self, section: usize, para: usize, ctrl: usize, row: u16, col: u16,
++        rows: u16, cols: u16,
++    ) -> Result<String, HwpError> {
++        let invalid = || HwpError::RenderError("문단 분배에 적합한 원본 셀과 격자가 필요합니다.".into());
++        if !(1..=8).contains(&rows) || !(1..=8).contains(&cols) || rows * cols < 2 {
++            return Err(invalid());
++        }
++        let table = self.get_table_mut(section, para, ctrl)?;
++        if table.common.locked || table.common.size_protect || table.attr & (1 << 30) != 0
++            || !table.zones.is_empty() || table.repeat_header || table.caption.is_some()
++            || usize::from(table.row_count) * usize::from(table.col_count) > 200
++            || table.cells.iter().any(|cell| cell.cell_protect() || cell.is_header
++                || cell.field_name.is_some() || cell.text_direction != 0
++                || cell.paragraphs.iter().any(|p| !p.controls.is_empty() || !p.field_ranges.is_empty()
++                    || !p.orphan_field_ends.is_empty()))
++        {
++            return Err(invalid());
++        }
++        let mut merged = table.cells.iter().filter(|c| c.col_span > 1 || c.row_span > 1);
++        let source = merged.next().ok_or_else(invalid)?;
++        if merged.next().is_some() || (source.row, source.col) != (row, col)
++            || source.row_span < rows || source.col_span < cols
++            || source.paragraphs.len() < 2 || source.paragraphs.len() > usize::from(rows * cols)
++            || source.paragraphs.iter().any(|p| p.text.chars().count() > 4000
++                || p.text.chars().any(char::is_control) || !p.range_tags.is_empty()
++                || !p.title_marks.is_empty() || !p.markpen_marks.is_empty()
++                || p.char_shapes.windows(2).any(|pair| pair[0].char_shape_id != pair[1].char_shape_id))
++        {
++            return Err(invalid());
++        }
++        let end_row = row.checked_add(source.row_span).ok_or_else(invalid)?;
++        let end_col = col.checked_add(source.col_span).ok_or_else(invalid)?;
++        let mut next = table.clone();
++        if (rows, cols) == (source.row_span, source.col_span) {
++            next.split_cell(row, col)
++        } else {
++            next.split_cell_into(row, col, rows, cols, true, false)
++        }.map_err(HwpError::RenderError)?;
++        let slots: Vec<_> = next.cells.iter().enumerate().filter(|(_, c)|
++            (row..end_row).contains(&c.row) && (col..end_col).contains(&c.col)
++        ).map(|(i, _)| i).collect();
++        if slots.len() != usize::from(rows * cols) || slots.iter().skip(1).any(|&i| {
++            let paras = &next.cells[i].paragraphs;
++            paras.len() != 1 || !paras[0].text.is_empty() || !paras[0].controls.is_empty()
++        }) { return Err(invalid()); }
++
++        let paragraphs = std::mem::take(&mut next.cells[slots[0]].paragraphs);
++        for (paragraph, &slot) in paragraphs.into_iter().zip(&slots) {
++            next.cells[slot].paragraphs = vec![paragraph];
++        }
++        let metrics = Self::table_cell_reflow_metrics(&next);
++        *table = next;
++        let counts: Vec<_> = slots.iter().map(|&i| (i, 1)).collect();
++        self.reflow_table_cell_paragraphs_after_split(section, para, ctrl, &counts, &metrics);
++        for slot in slots { self.rebuild_table_cell_vpos_ladder_native(section, para, ctrl, slot); }
++        self.document.sections[section].raw_stream = None;
++        self.recompose_section(section);
++        self.paginate_if_needed();
++        self.event_log.push(DocumentEvent::CellSplit { section, para, ctrl });
++        Ok(r#"{"ok":true}"#.into())
+     }
+ 
+     /// 셀을 N줄 × M칸으로 분할한다 (네이티브).
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -2423,6 +2423,14 @@
+             col as u16,
+         )
+         .map_err(|e| e.into())
++    }
++
++    #[wasm_bindgen(js_name = splitCellParagraphs)]
++    pub fn split_cell_paragraphs(
++        &mut self, section: u32, para: u32, ctrl: u32, row: u16, col: u16, rows: u16, cols: u16,
++    ) -> Result<String, JsValue> {
++        self.split_cell_paragraphs_native(section as usize, para as usize, ctrl as usize,
++            row, col, rows, cols).map_err(|e| e.into())
+     }
+ 
+     /// 셀을 N줄 × M칸으로 분할한다.

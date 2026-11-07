@@ -15,7 +15,8 @@ function groupedTracks(tracks:number[], start:number, span:number, count:number)
 }
 export function tableSubdivisionPlan(op:AgentTableSubdivisionOp, snapshot:Snapshot) {
   const keys = ['kind', 'target', 'row', 'column', 'rows', 'columns'];
-  if (!op || op.kind !== 'split_table_cell_into' || Object.keys(op).length !== keys.length || keys.some(k => !Object.hasOwn(op, k))) throw new Error('셀 임의 분할의 행·열과 분할 개수를 모두 지정하세요.');
+  if (!op || op.kind !== 'split_table_cell_into' || Object.keys(op).some(k => !keys.includes(k) && k !== 'distributeParagraphs') || keys.some(k => !Object.hasOwn(op, k))) throw new Error('셀 임의 분할의 행·열과 분할 개수를 모두 지정하세요.');
+  if (op.distributeParagraphs != null && typeof op.distributeParagraphs !== 'boolean') throw new Error('문단 분배 여부는 참 또는 거짓으로 지정하세요.');
   const table = snapshot.structure?.tables.find(t => t.id === op.target), source = snapshot.tableSubdivisionSources?.[op.target];
   if (!/\.hwpx$/iu.test(snapshot.name) || !/^s\d+p\d+t\d+$/u.test(op.target) || !table || source?.editable !== true || !/^[a-f0-9]{64}$/u.test(source.fingerprint ?? '')) throw new Error('조회된 HWPX 임의 분할 가능 표가 필요합니다.');
   if (![op.row, op.column, op.rows, op.columns].every(Number.isSafeInteger) || op.row < 0 || op.column < 0 || op.rows < 1 || op.columns < 1 || op.rows > 8 || op.columns > 8 || op.rows * op.columns === 1) throw new Error('새 행·열 수는 1~8이며 적어도 한 방향을 나누어야 합니다.');
@@ -39,16 +40,22 @@ export function tableSubdivisionPlan(op:AgentTableSubdivisionOp, snapshot:Snapsh
     if (!restoreTracks && (!matchesNative(rows, Number(merged.properties.height)) || !matchesNative(columns, Number(merged.properties.width))))
       throw new Error('요청한 분할 치수가 원래 병합 셀의 격자선과 일치하지 않습니다.');
     const cells:Array<Cell & {originIndex:number|null}> = table.cells.filter(c => c !== merged).map(c => ({...c, originIndex:c.index}));
+    const paragraphs = op.distributeParagraphs ? merged.text.split('\n') : undefined;
+    if (paragraphs && (!source.paragraphFormats || paragraphs.length !== source.paragraphFormats.length || paragraphs.length < 2 || paragraphs.length > rows.length * columns.length))
+      throw new Error('문단 분배는 새 셀 수 이하의 조회된 단순 원본 문단에 사용할 수 있습니다.');
+    let slot = 0;
     for (const row of rows) for (const column of columns) {
       const original = row.start === merged.row && column.start === merged.column;
       cells.push({...merged, row:row.start, column:column.start, rowSpan:row.span, columnSpan:column.span,
-        originIndex:original ? merged.index : null, text:original ? merged.text : '',
+        originIndex:original ? merged.index : null, text:paragraphs ? paragraphs[slot] ?? '' : original ? merged.text : '',
         properties:{...merged.properties, width:column.length, height:row.length}});
+      slot++;
     }
     cells.sort((a,b) => a.row-b.row || a.column-b.column).forEach((cell,i) => {cell.index=i;});
     return {table, source, primary:merged, rows:table.rows, columns:table.columns, cells,
       widths:columns.map(g => g.length), heights:rows.map(g => g.length), restoreTracks};
   }
+  if (op.distributeParagraphs) throw new Error('문단 분배는 여러 문단을 포함한 병합 주 셀에서 사용할 수 있습니다.');
   if (table.editable === false || ![table.rows,table.columns].every(Number.isSafeInteger) || table.rows<1 || table.columns<1 || table.cells.length !== table.rows * table.columns || table.cells.some((c, i) => c.index !== i || c.row !== Math.floor(i / table.columns) || c.column !== i % table.columns || c.rowSpan !== 1 || c.columnSpan !== 1 || !c.editable || c.properties.cellProtect !== false || c.properties.isHeader === true)) throw new Error('임의 분할은 병합·보호·제목 셀이 없는 일치하는 평면 격자를 지원합니다.');
   if (table.cells.some(c=>typeof c.properties.width!=='number'||typeof c.properties.height!=='number'||!Number.isSafeInteger(c.properties.width)||!Number.isSafeInteger(c.properties.height)||c.properties.width<200||c.properties.height<200||c.properties.width!==table.cells[c.column].properties.width||c.properties.height!==table.cells[c.row*table.columns].properties.height))throw new Error('셀 크기와 원본 행·열 격자가 일치하지 않습니다.');
   const primary = table.cells.find(c => c.row === op.row && c.column === op.column);

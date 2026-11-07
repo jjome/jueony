@@ -127,7 +127,7 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
       agentSeriesRange(snapshot,op); continue;
     }
     if(op.kind==='replace_cell_paragraph'){only(op,['kind','target','row','column','paragraph','originalText','text']);if(operations.length!==1)fail('셀 문단 교체는 단독 요청으로 실행하세요.');cellParagraphPlan(op,snapshot);continue;}
-    if(op.kind==='split_table_cell_into'){only(op,['kind','target','row','column','rows','columns']);if(operations.length!==1)fail('임의 셀 분할은 단독 요청으로 실행하세요.');tableSubdivisionPlan(op,snapshot);continue;}
+    if(op.kind==='split_table_cell_into'){only(op,['kind','target','row','column','rows','columns','distributeParagraphs']);if(operations.length!==1)fail('임의 셀 분할은 단독 요청으로 실행하세요.');tableSubdivisionPlan(op,snapshot);continue;}
     if(op.kind==='split_table'||op.kind==='attach_table'){only(op,op.kind==='split_table'?['kind','target','atRow']:['kind','target','nextTarget']);if(operations.length!==1)fail('표 나누기·붙이기는 단독 요청으로 실행하세요.');tableStructurePlan(op,snapshot);continue;}
     if(op.kind==='split_table_cell'){only(op,['kind','target','row','column']);if(operations.length!==1)fail('셀 기본 분할은 단독 요청으로 실행하세요.');tableSplitPlan(op,snapshot);continue;}
     if(op.kind==='merge_table_cells'){only(op,['kind','target','startRow','startColumn','rowCount','columnCount']);if(operations.length!==1)fail('셀 병합은 단독 요청으로 실행하세요.');tableMergePlan(op,snapshot);continue;}

@@ -31,6 +31,16 @@ if(storedFillReview)for(const mode of ['formula','calculated-value']){
   scenarios.push({request:mode==='formula'?'실제 계산식 필드를 오른쪽 세 셀에 복사해줘':'실제 계산식의 결과만 오른쪽 세 셀에 채워줘',
     mode,row:1,stored:true,original:['2','4','6','8','4.00','첫 대상','둘째','셋째'],expected:['2','4','6','8','4.00','8.00','12.00','16.00']});
 }
+if(process.env.JUEONY_REVIEW_RECTANGLE==='1'){
+  scenarios.push({request:'두 행에 월말 날짜를 가로로 채워줘',mode:'months',row:0,endRow:1,axis:'rows',
+    original:['2024-01-31','2024-02-29','기존','원문','2024-03-31','2024-04-30','옛값','기존'],
+    expected:['2024-01-31','2024-02-29','2024-03-31','2024-04-30','2024-03-31','2024-04-30','2024-05-31','2024-06-30']});
+  for(const mode of ['formula','calculated-value']){
+    scenarios.push({request:'두 행의 저장된 계산식을 '+(mode==='formula'?'필드':'고정값')+'로 가로 채워줘',mode,row:1,endRow:2,axis:'rows',stored:true,
+      original:['2','4','6','8','4.00','첫 대상','둘째','셋째','5.00','기존','기존','기존'],
+      expected:['2','4','6','8','4.00','8.00','12.00','16.00','5.00','9.00','13.00','17.00']});
+  }
+}
 const calls=[];
 function propose(input){
   if(process.env.JUEONY_REVIEW_FORMULA_INSERT==='1'){
@@ -48,7 +58,7 @@ function propose(input){
   const test=scenarios.find(c=>c.request===input.instruction),table=input.document.structure.tables[0];
   if(test.stored){assert.equal(input.document.tableFormulaFields.canFill,true);assert.equal(input.document.tableFormulaFields.fields[0].expression,'=A1*2');}
   assert.deepEqual(table.cells.map(c=>c.text),test.original);calls.push(test.mode);
-  return {kind:'fill_table_series',target:table.id,startRow:test.row,startColumn:0,endRow:test.row,endColumn:3,mode:test.mode};
+  return {kind:'fill_table_series',target:table.id,startRow:test.row,startColumn:0,endRow:test.endRow??test.row,endColumn:3,mode:test.mode,...(test.axis?{axis:test.axis}:{})};
 }
 const provider=http.createServer(async(req,res)=>{
   try {
@@ -78,10 +88,11 @@ try {
   for(const format of ['hwp','hwpx']) for(const test of scenarios) {
     const frame=await(await page.$('.editor-frame:not([hidden])')).contentFrame();
     const doc=HwpDocument.createEmpty();doc.createBlankDocument();
-    const table=JSON.parse(doc.createTable(0,0,0,test.row+1,4)),styled=test.row*4+2;
+    const table=JSON.parse(doc.createTable(0,0,0,(test.endRow??test.row)+1,4)),styled=test.row*4+2;
     for(const [i,text] of test.original.entries()) doc.insertTextInCell(0,table.paraIdx,table.controlIdx,i,0,0,text);
     doc.applyCharFormatInCell(0,table.paraIdx,table.controlIdx,styled,0,0,Array.from(test.original[styled]).length,'{"bold":true}');
     if(test.stored)doc.insertTableFormulaField(0,table.paraIdx,table.controlIdx,4,'4.00','=A1*2','%.2f');
+    if(test.stored&&test.axis)doc.insertTableFormulaField(0,table.paraIdx,table.controlIdx,8,'5.00','=A2+1','%.2f');
     const bytes=Array.from(format==='hwp'?doc.exportHwp():doc.exportHwpx());doc.free();
     await frame.evaluate(async(bytes,name)=>{
       const root=await navigator.storage.getDirectory(),handle=await root.getFileHandle(name,{create:true}),writer=await handle.createWritable();
@@ -94,11 +105,13 @@ try {
     assert.deepEqual(await current(),test.expected);
     const storedCommands=()=>frame.evaluate(()=>window.jueonyEditor.snapshot().tableFormulaFields.fields.map(f=>f.storedCommand));
     const expectedCommands=['=A1*2??%.2f;;4.00',...(test.mode==='formula'?['=B1*2??%.2f;;8.00','=C1*2??%.2f;;12.00','=D1*2??%.2f;;16.00']:[])];
+    const originalCommands=expectedCommands.slice(0,1);
+    if(test.stored&&test.axis){originalCommands.push('=A2+1??%.2f;;5.00');expectedCommands.push(originalCommands[1],...(test.mode==='formula'?['=B2+1??%.2f;;9.00','=C2+1??%.2f;;13.00','=D2+1??%.2f;;17.00']:[]));}
     if(test.stored)assert.deepEqual(await storedCommands(),expectedCommands);
     const buttons=(await page.$$('.message-actions button')).reverse();
     for(const b of buttons) if(await b.evaluate(e=>e.textContent==='요청 되돌리기')){await b.click();break;}
     await page.waitForFunction(()=>document.getElementById('app-status').textContent.includes('되돌렸습니다'));assert.deepEqual(await current(),test.original);
-    if(test.stored)assert.deepEqual(await storedCommands(),expectedCommands.slice(0,1));
+    if(test.stored)assert.deepEqual(await storedCommands(),originalCommands);
     assert.equal((await frame.evaluate(()=>window.jueonyEditor.executeCommand('edit:redo'))).ok,true);assert.deepEqual(await current(),test.expected);
     if(test.stored)assert.deepEqual(await storedCommands(),expectedCommands);
     const file=await frame.evaluate(async()=>{

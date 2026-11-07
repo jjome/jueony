@@ -8,23 +8,23 @@ const repo = resolve(import.meta.dirname, '../../..'), port = Number(process.env
 await mkdir(out, { recursive: true }); const engine = await loadReviewEngine(process.env.JUEONY_ENGINE_PACKAGE), { HwpDocument } = engine;
 const results = [], failures = [], pageErrors = [], external = []; let browser, page, server;
 async function services() { const f = await (await page.$('.editor-frame:not([hidden])')).contentFrame(); await f.evaluate(() => { if (window.__dateServices) return; const a = window.rhwpStudio.automation; a.registerCommand({ id: 'ext:date-fill-review', label: '날짜 검수', canExecute: () => true, execute: s => window.__dateServices = s }); a.execute('ext:date-fill-review'); a.unregisterCommand('ext:date-fill-review'); }); return f; }
-async function open(ext = 'hwpx', seeds = ['2026-01-31', '2026-02-28'], formula = false,storedField=false) {
+async function open(ext = 'hwpx', seeds = ['2026-01-31', '2026-02-28'], formula = false,storedField=false,matrix=false) {
   const d = HwpDocument.createEmpty(); d.createBlankDocument();
-  const row = formula ? 1 : 0, first = row * 4, t = JSON.parse(d.createTable(0, 0, 0, row + 1, 4));
-  const contents = formula ? ['2', '4', '6', '8', ...seeds, '기존', '원문'] : [...seeds, '기존', '원문'];
+  const row = formula ? 1 : 0, first = row * 4, t = JSON.parse(d.createTable(0, 0, 0, matrix?3:row + 1, 4));
+  const contents = matrix?['1','3','13','7','4','6','21','12','5','6','8','9']:formula ? ['2', '4', '6', '8', ...seeds, '기존', '원문'] : [...seeds, '기존', '원문'];
   contents.forEach((v, c) => d.insertTextInCell(0, t.paraIdx, t.controlIdx, c, 0, 0, v));
   if(storedField)d.insertTableFormulaField(0,t.paraIdx,t.controlIdx,first,seeds[0],'=A1*2','%.2f');
   d.applyCharFormatInCell(0, t.paraIdx, t.controlIdx, first + 2, 0, 0, 2, '{"bold":true}');
   const bytes = [...d[ext === 'hwp' ? 'exportHwp' : 'exportHwpx']()]; d.free();
   const f = await services();
-  await f.evaluate(async (bytes, ext, t, row, first) => {
+  await f.evaluate(async (bytes, ext, t, row, first,matrix) => {
     const root = await navigator.storage.getDirectory(), handle = await root.getFileHandle('auto-fill.' + ext, { create: true }), w = await handle.createWritable();
     await w.write(new Uint8Array(bytes)); await w.close();
     await window.jueonyEditor.open(new Uint8Array(bytes), 'auto-fill.' + ext, handle, false);
     const s = window.__dateServices, ih = s.getInputHandler();
     ih.cursor.moveTo({ sectionIndex: 0, paragraphIndex: 0, charOffset: 0, parentParaIndex: t.paraIdx, controlIndex: t.controlIdx, cellIndex: first, cellParaIndex: 0, cellPath: [{ controlIndex: t.controlIdx, cellIndex: first, cellParaIndex: 0 }] });
-    ih.cursor.enterCellSelectionMode(); ih.cursor.advanceCellSelectionPhase(); ih.cursor.setCellSelectionFocus(row, 3); ih.updateCellSelection(); ih.focus(); s.eventBus.emit('command-state-changed');
-  }, bytes, ext, t, row, first);
+    ih.cursor.enterCellSelectionMode(); ih.cursor.advanceCellSelectionPhase(); ih.cursor.setCellSelectionFocus(matrix?2:row, 3); ih.updateCellSelection(); ih.focus(); s.eventBus.emit('command-state-changed');
+  }, bytes, ext, t, row, first,matrix);
   return f;
 }
 const capture = f => f.evaluate(() => { const s = window.__dateServices, ih = s.getInputHandler(); return { bytes: [...s.wasm.exportHwp()], revision: window.jueonyEditor.revision(), history: ih.history.peekUndoTop()?.type ?? null, block: ih.cursor.captureCellSelection() }; });
@@ -82,6 +82,24 @@ try {
       const bytes=await frame.evaluate(async()=>{const a=window.jueonyEditor;if(await a.save()!=='saved')throw Error('save');return [...new Uint8Array(await(await a.fileHandle().getFile()).arrayBuffer())];});
       const reopened=new HwpDocument(new Uint8Array(bytes));try{
         assert.deepEqual(JSON.parse(reopened.getFieldList()).map(f=>f.command),['=A1*2??%.2f;;4.00',...(output==='value'?[]:expressions.map((expr,i)=>expr+'??%.2f;;'+expected[i]))]);
+      }finally{reopened.free();}
+    });
+  }
+  if(process.env.JUEONY_REVIEW_RECTANGLE==='1')for(const ext of ['hwp','hwpx']){
+    await scenario(ext+'/rectangle chooses rows or columns, previews and saves one undoable operation',async()=>{
+      const f=await open(ext,[],false,false,true),before=await capture(f),selector='[aria-label="직사각형 채우기 방향"]';
+      await command(f,'table:auto-fill-integers');await f.waitForSelector(selector);
+      const preview=()=>f.$eval('[aria-label="자동 채우기 변경 미리보기"]',t=>[...t.rows].map(r=>r.cells[3].textContent));
+      assert.equal(await f.$eval(selector,e=>e.value),'rows');assert.deepEqual(await preview(),['5','8','10','7','8']);
+      await f.select(selector,'columns');assert.deepEqual(await preview(),['7','9','29','17']);
+      await f.click('.modal-overlay .dialog-btn-primary');await f.waitForSelector(selector,{hidden:true});
+      assert.deepEqual((await values(f)).slice(8),['7','9','29','17']);const after=await capture(f);
+      await command(f,'edit:undo');assert.deepEqual((await capture(f)).bytes,before.bytes);
+      await command(f,'edit:redo');assert.deepEqual((await capture(f)).bytes,after.bytes);
+      const bytes=await f.evaluate(async()=>{const a=window.jueonyEditor;if(await a.save()!=='saved')throw Error('save');return [...new Uint8Array(await(await a.fileHandle().getFile()).arrayBuffer())];});
+      const reopened=new HwpDocument(new Uint8Array(bytes));try{
+        const t=await f.evaluate(()=>window.jueonyEditor.snapshot().structure.tables[0]);
+        assert.deepEqual([8,9,10,11].map(i=>reopened.getTextInCell(0,t.paragraph,t.control,i,0,0,2)),['7','9','29','17']);
       }finally{reopened.free();}
     });
   }

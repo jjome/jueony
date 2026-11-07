@@ -90,7 +90,7 @@ export type BodyOp =
 export type ControlOp =
   | AgentTableFormulaOp
   | AgentInsertTableFormulaOp
-  | {kind:'fill_table_series';target:string;startRow:number;startColumn:number;endRow:number;endColumn:number;mode:'days'|'months'|'years'|'formula'|'calculated-value'}
+  | {kind:'fill_table_series';target:string;startRow:number;startColumn:number;endRow:number;endColumn:number;mode:'days'|'months'|'years'|'formula'|'calculated-value';axis?:'rows'|'columns'|null}
   | AgentDocumentMetadataOp
   | AgentFileOp
   | AgentCellParagraphOp

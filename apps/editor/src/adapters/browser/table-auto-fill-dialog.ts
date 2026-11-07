@@ -1,10 +1,10 @@
 import { ModalDialog } from '../../../ui/dialog';
-import type { TableAutoFillPreview, DateFillUnit, FormulaFillOutput, TableSeries } from '../../modules/document/public/table-auto-fill.ts';
+import type { TableAutoFillPreview, DateFillUnit, FormulaFillOutput, TableSeries,FillAxis } from '../../modules/document/public/table-auto-fill.ts';
 export class TableAutoFillDialog extends ModalDialog {
   private status!: HTMLParagraphElement;
   private unit!: HTMLSelectElement;
   private output!: HTMLSelectElement;
-  constructor(private kind: TableSeries['kind'] | 'formula', private preview: (unit: DateFillUnit, output: FormulaFillOutput) => TableAutoFillPreview, private apply: (unit: DateFillUnit, output: FormulaFillOutput) => void,private storedField=false) { super('표 자동 채우기', 510); }
+  constructor(private kind: TableSeries['kind'] | 'formula', private preview: (unit: DateFillUnit, output: FormulaFillOutput,axis?:FillAxis) => TableAutoFillPreview, private apply: (unit: DateFillUnit, output: FormulaFillOutput,axis?:FillAxis) => void,private storedField=false,private axis?:FillAxis) { super('표 자동 채우기', 510); }
   protected createBody(): HTMLElement {
     const body = document.createElement('div'); body.dataset.jueonyTableAutoFill = 'true';
     this.unit = document.createElement('select'); this.unit.setAttribute('aria-label', '날짜 채우기 간격'); this.unit.disabled = this.kind !== 'date';
@@ -21,17 +21,24 @@ export class TableAutoFillDialog extends ModalDialog {
     const refresh = () => {
       table.replaceChildren(); this.status.textContent = ''; help.textContent = ''; count.textContent = '';
       try {
-        const plan = this.preview(this.unit.value as DateFillUnit, this.output.value as FormulaFillOutput);
-        help.textContent = this.kind === 'formula' ? `원본 ${plan.values[0]}의 ${plan.description}을 채웁니다.` : `첫 두 셀 ${plan.values[0]}, ${plan.values[1]}의 ${plan.description} ${plan.step}을 사용합니다. 나머지 셀의 문자열을 미리보기 값으로 바꿉니다.`;
+        const plan = this.preview(this.unit.value as DateFillUnit, this.output.value as FormulaFillOutput,this.axis);
+        help.textContent = this.axis?(this.axis==='rows'?'각 행':'각 열')+'의 시작 셀을 기준으로 '+plan.description+'을 채웁니다.':this.kind === 'formula' ? `원본 ${plan.values[0]}의 ${plan.description}을 채웁니다.` : `첫 두 셀 ${plan.values[0]}, ${plan.values[1]}의 ${plan.description} ${plan.step}을 사용합니다. 나머지 셀의 문자열을 미리보기 값으로 바꿉니다.`;
         const changes = plan.cells.slice(plan.seedCount).flatMap((cell, i) => (plan.changedCells?!plan.changedCells.includes(i+plan.seedCount):plan.values[i + plan.seedCount] === cell.text) ? [] : [{ cell, value: plan.values[i + plan.seedCount] }]);
         for (const { cell, value } of changes.slice(0, 12)) { const row = document.createElement('tr'); for (const text of [`${cell.row + 1}행 ${cell.column + 1}열`, cell.text || '(빈 셀)', '→', value]) { const td = document.createElement('td'); td.textContent = text; td.style.padding = '4px 8px'; row.append(td); } table.append(row); }
         count.textContent = `${plan.cells.length}개 선택 · ${changes.length}개 변경${changes.length > 12 ? ' · 미리보기는 처음 12개만 표시' : ''}${plan.relatedCells?.length?' · 범위 밖 연관 계산식 '+plan.relatedCells.length+'개 재계산':''}`;
       } catch (error) { this.status.textContent = error instanceof Error ? error.message : String(error); }
     };
     this.unit.onchange = this.output.onchange = refresh;
-    if (this.kind === 'date') body.append(this.unit);
-    if (this.kind === 'formula') body.append(this.output);
+    if(this.axis){
+      const direction=document.createElement('select');direction.setAttribute('aria-label','직사각형 채우기 방향');
+      for(const [value,label] of [['rows','가로 · 각 행의 시작 셀'],['columns','세로 · 각 열의 시작 셀']])direction.add(new Option(label,value));
+      direction.value=this.axis;direction.onchange=()=>{this.axis=direction.value as FillAxis;this.unit.value='days';this.output.value='formula';refresh();};
+      body.append(direction);this.unit.disabled=false;
+      limit.textContent='각 행 또는 열에서 날짜와 번호는 첫 두 셀, 계산식은 첫 셀을 원본으로 사용합니다.';
+    }
+    if (this.axis||this.kind === 'date') body.append(this.unit);
+    if (this.axis||this.kind === 'formula') body.append(this.output);
     body.append(help, table, count, limit, this.status); refresh(); return body;
   }
-  protected onConfirm(): boolean { try { this.apply(this.unit.value as DateFillUnit, this.output.value as FormulaFillOutput); return true; } catch (error) { this.status.textContent = error instanceof Error ? error.message : String(error); return false; } }
+  protected onConfirm(): boolean { try { this.apply(this.unit.value as DateFillUnit, this.output.value as FormulaFillOutput,this.axis); return true; } catch (error) { this.status.textContent = error instanceof Error ? error.message : String(error); return false; } }
 }

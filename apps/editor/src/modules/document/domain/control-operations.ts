@@ -127,7 +127,7 @@ export function validateControlOperations(operations: EditOp[], snapshot: Snapsh
   if(tabs.length&&(tabs.length!==operations.length||new Set(tabs.map(op=>(op as {target:string}).target)).size!==tabs.length))fail('문단 탭은 서로 다른 문단의 탭 명령만 한 요청으로 묶어 실행하세요.');
   for (const op of operations) {
     if(op.kind==='fill_table_series'){
-      only(op,['kind','target','startRow','startColumn','endRow','endColumn','mode']);
+      only(op,['kind','target','startRow','startColumn','endRow','endColumn','mode','axis']);
       if(operations.length!==1)fail('표 자동 채우기는 한 요청에 한 범위만 지정하세요.');
       agentSeriesRange(snapshot,op); continue;
     }

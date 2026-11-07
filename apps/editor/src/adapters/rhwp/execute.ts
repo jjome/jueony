@@ -9,7 +9,8 @@ import {executeNestedCellEdit} from './nested-cell-edit.ts';
 import {insertAgentTableFormula} from './insert-agent-table-formula.ts';
 import {updateTableFormulaField} from './update-table-formula-field.ts';
 import {agentSeriesRange} from '../../modules/document/public/engine-integration.ts';
-import {readAutoFillPlan,executeAutoFill} from './table-auto-fill-native.ts';
+import {readAutoFillPlan,executeAutoFill,changesAutoFill} from './table-auto-fill-native.ts';
+import {readTableFormulaFields} from './table-formula-fields.ts';
 import {readStructure} from './structure.ts';
 import {executeAgentSectionMerge} from './agent-section-merge.ts';
 import {executeAgentEmptySection} from './agent-empty-section.ts';
@@ -33,10 +34,12 @@ export function executeDocumentOperations(wasm: any, base: Snapshot, operations:
     const live=readStructure(doc).tables.find(t=>t.id===table.id);
     if(JSON.stringify(table.cells)!==JSON.stringify(live?.cells)) throw Error('표 원문이나 서식이 달라졌습니다. 표를 다시 조회하세요.');
     const plan=readAutoFillPlan(doc,block,unit,output);
-    if(plan.storedFill){
+    if(plan.storedFill || plan.lines?.some(l=>l.storedFill)){
+      const liveFields=readTableFormulaFields(doc,true)?.fields;
       for(const cell of plan.cells){
         const queried=snapshot.tableFormulaFields?.fields.find(f=>f.tableId===table.id&&f.row===cell.row&&f.column===cell.column);
-        if(queried?.fieldId!==cell.field?.fieldId||queried?.storedCommand!==cell.field?.storedCommand||queried?.displayedValue!==cell.field?.displayedValue)
+        const current=liveFields?.find(f=>f.tableId===table.id&&f.row===cell.row&&f.column===cell.column);
+        if(queried?.fieldId!==current?.fieldId||queried?.storedCommand!==current?.storedCommand||queried?.displayedValue!==current?.displayedValue)
           throw Error('조회한 계산식 원문 또는 표시값이 변경되었습니다.');
       }
     }
@@ -46,7 +49,7 @@ export function executeDocumentOperations(wasm: any, base: Snapshot, operations:
       total+=length;
       if(length>4000 || total>60000) throw Error('채우기 결과가 셀 4,000자 또는 요청 60,000자 한도를 넘습니다.');
     }
-    if(plan.storedFill?!plan.storedFill.changed:plan.cells.slice(plan.seedCount).every((cell,i)=>cell.text===plan.values[i+plan.seedCount])) throw Error('지정한 범위가 이미 같은 값으로 채워져 있습니다.');
+    if(!changesAutoFill(plan)) throw Error('지정한 범위가 이미 같은 값으로 채워져 있습니다.');
     executeAutoFill(doc,plan);
     const first=plan.cells[0];
     return {sectionIndex:table.section,paragraphIndex:0,parentParaIndex:table.paragraph,controlIndex:table.control,

@@ -1,15 +1,17 @@
 import type {ControlOp, Snapshot} from '../public/types.ts';
 import {planTableSeries} from './table-series.ts';
+import {rectangleFillLines} from './table-fill-range.ts';
 
 export type SeriesOperation = Extract<ControlOp,{kind:'fill_table_series'}>;
 export function agentSeriesRange(snapshot:Snapshot, op:SeriesOperation) {
   const table=snapshot.structure?.tables.find(t=>t.id===op.target);
   if(!table || table.editable!==true || table.cells.length!==table.rows*table.columns ||
       table.cells.some(c=>c.rowSpan!==1 || c.columnSpan!==1)) throw Error('본문의 병합 없는 표를 지정하세요.');
-  const {startRow:r,startColumn:c,endRow:endR,endColumn:endC,mode}=op;
-  if(![r,c,endR,endC].every(v=>Number.isSafeInteger(v)&&v>=0) || r>=table.rows || endR>=table.rows ||
-      c>=table.columns || endC>=table.columns || (r===endR)===(c===endC)) throw Error('한 행 또는 한 열의 시작 셀과 끝 셀을 지정하세요.');
+  const {mode}=op,axis=op.axis??undefined,anchor={row:op.startRow,col:op.startColumn},focus={row:op.endRow,col:op.endColumn};
+  const lines=rectangleFillLines(anchor,focus,axis,table.rows,table.columns);
   const formula=mode==='formula'||mode==='calculated-value';
+  for(const line of lines){
+  const {row:r,col:c}=line.anchor,{row:endR,col:endC}=line.focus;
   const count=1+Math.abs(r-endR)+Math.abs(c-endC);
   if(count>(formula?200:1000) || !formula&&(count<3 || endR<r || endC<c)) throw Error('수열은 첫 두 셀부터 오른쪽이나 아래로 세 셀 이상 지정하세요.');
   const selected=Array.from({length:count},(_,i)=>table.cells.find(cell=>
@@ -25,6 +27,7 @@ export function agentSeriesRange(snapshot:Snapshot, op:SeriesOperation) {
     if(mode!=='days'&&mode!=='months'&&mode!=='years') throw Error('지원하지 않는 채우기 방식입니다.');
     planTableSeries(selected[0]!.text,selected[1]!.text,count,mode);
   }
-  return {table,block:{sec:table.section,ppi:table.paragraph,ci:table.control,anchor:{row:r,col:c},focus:{row:endR,col:endC}},
+  }
+  return {table,block:{sec:table.section,ppi:table.paragraph,ci:table.control,anchor,focus,...(axis?{axis}:{})},
     unit:formula?'days' as const:mode,output:mode==='calculated-value'?'value' as const:'formula' as const};
 }

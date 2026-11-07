@@ -1,13 +1,13 @@
-import { planTableSeries, planTableFormulaCopy, planTableFormulaRecalculation, type TableSeries, type DateFillUnit, type FormulaFillOutput } from '../../modules/document/public/table-auto-fill.ts';
+import { planTableSeries, planTableFormulaCopy, planTableFormulaRecalculation, rectangleFillLines, type FillAxis, type TableSeries, type DateFillUnit, type FormulaFillOutput } from '../../modules/document/public/table-auto-fill.ts';
 import type { Table } from '../../modules/document/public/types.ts';
 import { verifyPreservedExport } from './preservation.ts';
 import {readTableFormulaFields} from './table-formula-fields.ts';
 import {planStoredFormulaFill,executeStoredFormulaFill,type FillCell,type StoredFill} from './stored-formula-fill.ts';
 type Point = { row: number; col: number };
-export type AutoFillBlock = { sec: number; ppi: number; ci: number; cellPath?: unknown[]; anchor: Point; focus: Point; excluded?: unknown[] };
+export type AutoFillBlock = { sec: number; ppi: number; ci: number; cellPath?: unknown[]; anchor: Point; focus: Point; excluded?: unknown[];axis?:FillAxis };
 type SeriesCell = FillCell;
 type FormulaSeries = { kind: 'formula'; step: number; values: string[]; description: string };
-export type AutoFillPlan = { section: number; paragraph: number; control: number; block: AutoFillBlock; cells: SeriesCell[]; dateUnit: DateFillUnit; seedCount: number; output: FormulaFillOutput; storedFill?:StoredFill;changedCells?:number[];relatedCells?:number[] } & (TableSeries | FormulaSeries);
+export type AutoFillPlan = { section: number; paragraph: number; control: number; block: AutoFillBlock; cells: SeriesCell[]; dateUnit: DateFillUnit; seedCount: number; output: FormulaFillOutput; storedFill?:StoredFill;changedCells?:number[];relatedCells?:number[];lines?:AutoFillPlan[] } & (TableSeries | FormulaSeries);
 const parsed = (v: any): any => typeof v === 'string' ? JSON.parse(v) : v;
 const native = (wasm: any) => wasm.borrowDocumentHandle?.() ?? wasm;
 const integer = (v: unknown): v is number => Number.isSafeInteger(v) && (v as number) >= 0;
@@ -53,6 +53,8 @@ export function readAutoFillPlan(value: any, block: AutoFillBlock, dateUnit: Dat
   if (![section, paragraph, control].every(integer) || section >= doc.getSectionCount() || paragraph >= doc.getParagraphCount(section)) throw new Error('표의 위치가 유효하지 않습니다.');
   const dims = parsed(doc.getTableDimensions(section, paragraph, control));
   if (![dims.rowCount, dims.colCount, dims.cellCount].every(v => integer(v) && v > 0) || dims.cellCount !== dims.rowCount * dims.colCount || dims.cellCount > 1000) throw new Error('병합 없는 1,000셀 이하 표에서 자동 채우기를 지원합니다.');
+  const lines=rectangleFillLines(block.anchor,block.focus,block.axis,dims.rowCount,dims.colCount);
+  if(lines.length>1)return rectanglePlan(doc,block,lines,dateUnit,output);
   const r0 = Math.min(block.anchor.row, block.focus.row), r1 = Math.max(block.anchor.row, block.focus.row), c0 = Math.min(block.anchor.col, block.focus.col), c1 = Math.max(block.anchor.col, block.focus.col);
   if (![r0, r1, c0, c1].every(integer) || r1 >= dims.rowCount || c1 >= dims.colCount || ((r0 !== r1) === (c0 !== c1))) throw new Error('한 행 또는 한 열에서 연속된 셀을 선택하세요.');
   const controls = parsed(doc.getControls()), lists = parsed(doc.getCursorModel()).lists, cells: SeriesCell[] = [];
@@ -105,10 +107,64 @@ export function readAutoFillPlan(value: any, block: AutoFillBlock, dateUnit: Dat
   return { section, paragraph, control, block: structuredClone(block), cells, ...series, dateUnit, output, seedCount: formula ? 1 : 2 };
 }
 
+function rectanglePlan(doc:any,block:AutoFillBlock,ranges:Array<{anchor:Point;focus:Point}>,dateUnit:DateFillUnit,output:FormulaFillOutput):AutoFillPlan {
+  const format=doc.getSourceFormat();
+  if(format!=='hwp'&&format!=='hwpx')throw Error('HWP 또는 HWPX 문서에서 직사각형 채우기를 사용할 수 있습니다.');
+  const artifact=doc[format==='hwp'?'exportHwpWithReport':'exportHwpxWithReport']();
+  let scratch:any;
+  try{
+    const bytes=artifact.takeBytes(),open=(b:Uint8Array)=>new doc.constructor(b);
+    verifyPreservedExport(doc,bytes,format,artifact.contentLoss(),open);scratch=open(bytes);
+    const lines:AutoFillPlan[]=[],cells:SeriesCell[]=[],values:string[]=[],changedCells:number[]=[],related=new Set<number>();
+    for(const range of ranges){
+      const line=readAutoFillPlan(scratch,{...block,...range},dateUnit,output);
+      if(lines.length && (line.kind!==lines[0].kind || Boolean(line.storedFill)!==Boolean(lines[0].storedFill)))
+        throw Error('각 행 또는 열의 시작 셀에는 같은 종류의 수열·수식이 필요합니다.');
+      if(line.kind!=='formula' && (range.anchor.row>range.focus.row || range.anchor.col>range.focus.col))throw Error('수열은 왼쪽 또는 위쪽 두 셀에서 시작하세요.');
+      for(const [i,cell] of line.cells.entries()){
+        if(i>=line.seedCount && (line.changedCells?line.changedCells.includes(i):line.values[i]!==cell.text))changedCells.push(cells.length+i);
+      }
+      cells.push(...line.cells);values.push(...line.values);lines.push(line);
+      for(const i of line.relatedCells??[])related.add(i);
+      applyFill(scratch,line);
+    }
+    const first=lines[0];
+    if(first.storedFill){
+      const fields=parsed(scratch.getFieldList()) as Array<{fieldId:number;command:string;value:string}>;
+      let offset=0;
+      for(const line of lines){
+        if(output==='formula')for(const [j,step] of line.storedFill!.steps.entries()){
+          const final=fields.find(f=>f.fieldId===step.fieldId);
+          if(!final)throw Error('직사각형 채우기에서 저장할 계산식이 누락되었습니다.');
+          values[offset+j+1]=step.expression+' → '+final.value;
+        }
+        offset+=line.cells.length;
+      }
+    }
+    return {kind:first.kind,step:first.step,description:first.description,section:block.sec,paragraph:block.ppi,control:block.ci,block:structuredClone(block),
+      dateUnit,output,seedCount:0,cells,values,lines,changedCells,relatedCells:[...related].filter(i=>!cells.some(c=>c.index===i))};
+  }finally{scratch?.free();artifact.free();}
+}
+
+export function changesAutoFill(plan:AutoFillPlan):boolean {
+  if(plan.lines)return plan.lines.some(changesAutoFill);
+  return plan.storedFill?plan.storedFill.changed:plan.cells.slice(plan.seedCount).some((c,i)=>c.text!==plan.values[i+plan.seedCount]);
+}
+
 /** Must run inside the caller's snapshot router, which owns rollback and one undo. */
 export function executeAutoFill(value: any, plan: AutoFillPlan): void {
   const doc = native(value), current = readAutoFillPlan(doc, plan.block, plan.dateUnit, plan.output);
   if (JSON.stringify(current) !== JSON.stringify(plan)) throw new Error('셀 원문·서식 또는 표 범위가 바뀌었습니다. 자동 채우기를 다시 여세요.');
+  if(plan.lines){
+    const original=doc.saveSnapshot();
+    try{for(const line of plan.lines)executeAutoFill(doc,line);}
+    catch(error){if(!parsed(doc.restoreSnapshot(original)).ok)throw Error('직사각형 채우기 전 상태를 복구하지 못했습니다.');throw error;}
+    finally{doc.discardSnapshot(original);}
+    return;
+  }
+  applyFill(doc,plan);
+}
+function applyFill(doc:any,plan:AutoFillPlan):void {
   if(plan.storedFill){executeStoredFormulaFill(doc,[plan.section,plan.paragraph,plan.control],plan.cells,plan.storedFill,plan.output);return;}
   plan.cells.slice(plan.seedCount).forEach((cell, index) => {
     const text = plan.values[index + plan.seedCount]; if (text === cell.text) return;

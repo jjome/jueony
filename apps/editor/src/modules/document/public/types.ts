@@ -11,10 +11,11 @@ export type TableCellPathStep = {controlIndex:number;cellIndex:number;cellParaIn
 export type AgentTableFormulaFields={
  fields:Array<{tableId:string;section:number;paragraph:number;path:TableCellPathStep[];row:number;column:number;fieldId:number;
    start:number;end:number;storedCommand:string;displayedValue:string;editable:boolean;expression?:string;resultFormat?:string}>;
- unresolved:number|null;canEdit:boolean;canRefreshDependents:boolean;canFill?:boolean;
+ unresolved:number|null;canEdit:boolean;canRefreshDependents:boolean;canFill?:boolean;canInsert?:boolean;
 };
 export type AgentTableFormulaOp={kind:'update_table_formula_field';target:string;row:number;column:number;fieldId:number;originalCommand:string;formula:string;resultFormat:string};
-export type TableFormulaChange={tableId:string;row:number;column:number;fieldId:number;before:{command:string;value:string};after:{command:string;value:string}};
+export type AgentInsertTableFormulaOp={kind:'insert_table_formula_field';target:string;row:number;column:number;originalText:string;formula:string;resultFormat:string};
+export type TableFormulaChange={tableId:string;row:number;column:number;fieldId:number;before:{command:string|null;value:string};after:{command:string;value:string}};
 export type NestedTable = {
   id:string; section:number; paragraph:number; ancestors:TableCellPathStep[]; control:number; rows:number; columns:number;
   cells:Array<Pick<Cell,'index'|'row'|'column'|'rowSpan'|'columnSpan'|'text'|'editable'>>;
@@ -88,6 +89,7 @@ export type BodyOp =
  | { kind: 'delete_body_text'; target: string; start: number; count: number };
 export type ControlOp =
   | AgentTableFormulaOp
+  | AgentInsertTableFormulaOp
   | {kind:'fill_table_series';target:string;startRow:number;startColumn:number;endRow:number;endColumn:number;mode:'days'|'months'|'years'|'formula'|'calculated-value'}
   | AgentDocumentMetadataOp
   | AgentFileOp

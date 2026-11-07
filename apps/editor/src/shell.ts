@@ -148,7 +148,7 @@ function renderMessages(){
     $('structure-diff-text').textContent='변경 전\n'+describeStructure(receipt.beforeStructure)+'\n\n변경 후\n'+describeStructure(receipt.afterStructure);
     if(receipt.formulaField){
      const primary=receipt.formulaField;
-     const changes=[primary,...(primary.dependents??[])].map((f,i)=>`${i?'연관 계산식':'계산식'} · ${f.row+1}행 ${f.column+1}열\n변경 전 ${f.before.command} · 표시값 ${f.before.value}\n변경 후 ${f.after.command} · 표시값 ${f.after.value}\n\n`);
+     const changes=[primary,...(primary.dependents??[])].map((f,i)=>`${i?'연관 계산식':'계산식'} · ${f.row+1}행 ${f.column+1}열\n변경 전 ${f.before.command??'일반 셀'} · 표시값 ${f.before.value}\n변경 후 ${f.after.command} · 표시값 ${f.after.value}\n\n`);
      $('structure-diff-text').prepend(document.createTextNode(changes.join('')));
     }
     ($('change-dialog') as HTMLDialogElement).showModal();

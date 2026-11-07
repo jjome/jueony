@@ -5,6 +5,7 @@ import {mkdtemp,mkdir,readFile,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import puppeteer from 'puppeteer-core';
 import {loadReviewEngine} from './lib/hancom-review.mjs';
+import {proposeFormulaCreation,reviewFormulaCreation} from './lib/review-agent-formula-creation.mjs';
 
 const repo=resolve(import.meta.dirname,'../../..'),dist=resolve(process.env.JUEONY_TEST_DIST);
 const {HwpDocument}=await loadReviewEngine(resolve(process.env.JUEONY_ENGINE_PACKAGE));
@@ -32,6 +33,10 @@ if(storedFillReview)for(const mode of ['formula','calculated-value']){
 }
 const calls=[];
 function propose(input){
+  if(process.env.JUEONY_REVIEW_FORMULA_INSERT==='1'){
+    const insertion=proposeFormulaCreation(input);
+    if(insertion)return insertion;
+  }
   const fieldCase=fieldCases.find(c=>c.request===input.instruction);
   if(fieldCase){
     const {fields,canRefreshDependents}=input.document.tableFormulaFields,field=fields.find(f=>f.expression===fieldCase.source);
@@ -171,5 +176,6 @@ try {
     console.log('PASS',format,fieldCase.dependent?'native FORMULA edit and dependent recalculation':'native FORMULA edit','chat, sibling fields, undo/redo, guarded save, independent file metadata and reopened result');
   }
   if(nativeFieldReview)assert.deepEqual(calls.slice(scenarios.length*2),Array(fieldCases.length*2).fill('field'));
+  if(process.env.JUEONY_REVIEW_FORMULA_INSERT==='1')await reviewFormulaCreation({HwpDocument,page,fill,origin});
   assert.deepEqual(errors,[]);
 } finally {await browser?.close();server.kill();await new Promise(r=>provider.close(r));}

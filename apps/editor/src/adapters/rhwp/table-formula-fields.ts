@@ -5,7 +5,7 @@ const index=(v:unknown):v is number=>typeof v==='number' && Number.isSafeInteger
 
 /** Reads stored field commands from the open IR. Numeric cell text and strings
  * beginning with "=" are not evidence that the author created a FORMULA field. */
-export function readTableFormulaFields(wasm:any,allowEdits=false):AgentTableFormulaFields|undefined {
+export function readTableFormulaFields(wasm:any,allowEdits=false,hasPlainCells=false):AgentTableFormulaFields|undefined {
  const d=nativeDocument(wasm);
  if (typeof d.getFieldList!=='function') return undefined;
  const fields:AgentTableFormulaFields['fields']=[];
@@ -40,9 +40,10 @@ export function readTableFormulaFields(wasm:any,allowEdits=false):AgentTableForm
     characters+=field.command.length+field.value.length;
    } catch {unresolved++;}
   }
-  if (!fields.length&&!unresolved) return undefined;
+  const canInsert=allowEdits && hasPlainCells && unresolved===0 && fields.length<200 && typeof d.insertTableFormulaField==='function';
+  if (!fields.length&&!unresolved&&!canInsert) return undefined;
   const canEdit=fields.some(f=>f.editable);
-  return {fields,unresolved,canEdit,canRefreshDependents,canFill:canEdit && typeof d.insertTableFormulaField==='function'};
+  return {fields,unresolved,canEdit,canRefreshDependents,...(canInsert?{canInsert}:{}),canFill:canEdit && typeof d.insertTableFormulaField==='function'};
  } catch {
   return {fields:[],unresolved:null,canEdit:false,canRefreshDependents:false};
  }

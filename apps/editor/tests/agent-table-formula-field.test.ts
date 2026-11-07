@@ -36,3 +36,20 @@ test('unavailable native capabilities, changed addresses, protection, duplicate 
   (s:ReturnType<typeof scope>)=>{s.tableFormulaFields.fields[0].path.push({controlIndex:0,cellIndex:0,cellParaIndex:0});},
  ]){const base=scope();change(base);assert.throws(()=>validateEditOperations([op],base));}
 });
+
+test('inserting a persistent field needs an identified, unprotected ordinary cell with its exact original text',()=>{
+ const source=()=>{const doc=scope();return {...doc,tableFormulaFields:{...doc.tableFormulaFields,fields:[],canInsert:true},
+  structure:{...doc.structure,tables:[{...doc.structure.tables[0],cells:[{...doc.structure.tables[0].cells[0],editable:true}]}]}};};
+ const insert={kind:'insert_table_formula_field',target:op.target,row:0,column:0,originalText:'10',formula:'=3+4',resultFormat:'%.2f'};
+ const doc=source();assert.deepEqual(validateEditOperations([insert],doc),[insert]);
+ for(const override of [{originalText:''},{originalText:'10 '},{fieldId:123},{originalCommand:'=3'},{row:1},{column:-1},
+  {formula:'=1??%g;;0'},{formula:'=3\n'},{resultFormat:'%x'}])assert.throws(()=>validateEditOperations([{...insert,...override}],doc));
+ assert.throws(()=>validateEditOperations([insert,insert],doc));
+ for(const change of [(d:ReturnType<typeof source>)=>{d.tableFormulaFields.canInsert=false;},
+  (d:ReturnType<typeof source>)=>{d.tableFormulaFields.unresolved=1;},(d:ReturnType<typeof source>)=>{d.structure.tables[0].cells[0].properties.cellProtect=true;},
+  (d:ReturnType<typeof source>)=>{d.structure.tables[0].cells[0].columnSpan=2;},(d:ReturnType<typeof source>)=>{d.structure.tables[0].editable=false;},
+  (d:ReturnType<typeof source>)=>{d.structure.tables[0].cells[0].editable=false;}]){
+  const untrusted=source();change(untrusted);assert.throws(()=>validateEditOperations([insert],untrusted));
+ }
+ assert.throws(()=>validateEditOperations([insert],{...doc,tableFormulaFields:{...doc.tableFormulaFields,fields:scope().tableFormulaFields.fields}}));
+});

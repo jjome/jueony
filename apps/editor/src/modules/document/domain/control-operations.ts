@@ -1,6 +1,6 @@
 import {agentFileKinds,validateAgentFileOperation} from './agent-file-operations.ts';
 import {validateAgentDocumentMetadata} from './agent-document-information.ts';
-import {agentTableFormulaTarget} from './agent-table-formula.ts';
+import {agentTableFormulaTarget,agentFormulaInsertTarget} from './agent-table-formula.ts';
 import {cellParagraphPlan} from './cell-paragraph.ts';
 import {tableSubdivisionPlan} from './table-subdivision.ts';
 import {projectTableAxis} from './table-axis-grid.ts';
@@ -83,6 +83,8 @@ export function pageProperties(current: DocumentProperties | undefined, props: R
   return next as DocumentProperties;
 }
 export function validateControlOperations(operations: EditOp[], snapshot: Snapshot): void {
+ const insertFormula=operations.find(op=>op.kind==='insert_table_formula_field');
+ if(insertFormula){if(operations.length!==1)throw Error('계산식 필드 삽입은 단독 요청으로 실행하세요.');agentFormulaInsertTarget(insertFormula,snapshot);return;}
  const formulaField=operations.find(op=>op.kind==='update_table_formula_field');
  if(formulaField){if(operations.length!==1)throw Error('계산식 필드 편집은 한 번에 하나씩 요청하세요.');agentTableFormulaTarget(formulaField,snapshot);return;}
  if(operations.some(op=>(agentFileKinds as readonly string[]).includes(op.kind))){if(operations.length!==1)throw Error('파일 명령은 문서 편집과 섞지 말고 단독 요청하세요.');validateAgentFileOperation(operations[0],snapshot.fileContext);return;}

@@ -46,7 +46,7 @@ export {tableSplitPlan,witnessedSplitPlan} from '../domain/table-split.ts';
 export {tableStructurePlan} from '../domain/table-structure.ts';
 
 export {cellParagraphPlan} from '../domain/cell-paragraph.ts';
-export {agentTableFormulaTarget} from '../domain/agent-table-formula.ts';
+export {agentTableFormulaTarget,agentFormulaInsertTarget} from '../domain/agent-table-formula.ts';
 export {tableSubdivisionPlan} from '../domain/table-subdivision.ts';
 
 export {validateAgentDocumentMetadata} from '../domain/agent-document-information.ts';

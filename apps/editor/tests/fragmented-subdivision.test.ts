@@ -5,6 +5,7 @@ import {resolve} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {readStructure} from '../src/adapters/rhwp/structure.ts';
 import {readTableSubdivisionSources} from '../src/adapters/rhwp/table-subdivision.ts';
+import {recordPublishedCanvasMetrics,subdivisionCopyMetrics} from '../src/adapters/rhwp/subdivision-canvas-metrics.ts';
 import {executeDocumentOperations} from '../src/adapters/rhwp/execute.ts';
 import {validateEditOperations,type Snapshot} from '../src/modules/document/public/index.ts';
 import {fragmentedSubdivisionTable,fragmentedParagraphBands} from '../scripts/lib/fragmented-subdivision.mjs';
@@ -83,7 +84,7 @@ for (const ext of ['hwp','hwpx']) test(ext+' distributes two long paragraphs to 
     } finally {copy.free();}
   } finally {d.free();}
 });
-for (const fault of ['original index','native offset','neighbor line']) test('fragment proof rejects a changed '+fault,()=>{
+for (const fault of ['original index','native offset','neighbor line','retained line']) test('fragment proof rejects a changed '+fault,()=>{
   const doc=fragmentedSubdivisionTable(HwpDocument);
   const d=new HwpDocument(doc.exportHwpx());doc.free();
   try {
@@ -91,10 +92,10 @@ for (const fault of ['original index','native offset','neighbor line']) test('fr
     d.getPageTextLayout=(page:number)=>{
       const result=JSON.parse(read(page));
       const post=JSON.parse(d.getTableDimensions(...at)).cellCount!==s.structure!.tables[0].cells.length;
-      if (fault==='neighbor line' && post && page===0) {
-        const line=result.runs.find((r:any)=>r.controlIdx===0&&r.parentParaIdx===1&&r.text==='C2');
+      if (fault.endsWith('line') && post && page===0) {
+        const line=result.runs.find((r:any)=>r.controlIdx===0&&r.parentParaIdx===1&&r.text===(fault==='neighbor line'?'C2':'C0'));
         assert.ok(line);line.x+=1;
-      } else if(page===1 && fault!=='neighbor line') {
+      } else if(page===1 && !fault.endsWith('line')) {
         const line=result.runs.find((r:any)=>r.controlIdx===0&&r.parentParaIdx===1&&r.cellIdx===0&&r.text);
         assert.ok(line);
         if(fault==='original index')line.cellIdx=1;else line.charStart++;
@@ -103,6 +104,33 @@ for (const fault of ['original index','native offset','neighbor line']) test('fr
     };
     assert.throws(()=>executeDocumentOperations(d,s,[command]));
     assert.deepEqual(d.exportHwpx(),original);
-    if(fault!=='neighbor line')assert.equal(snapshot(d,'hwpx').tableSubdivisionSources![target].editable,false);
+    if(!fault.endsWith('line'))assert.equal(snapshot(d,'hwpx').tableSubdivisionSources![target].editable,false);
   } finally {d.free();}
+});
+
+test('a copy uses the published Canvas batch only for the matching live document and fonts',()=>{
+  const source=fragmentedSubdivisionTable(HwpDocument),bytes=source.exportHwpx();source.free();
+  const live=new HwpDocument(bytes),copy=new HwpDocument(bytes),different=new HwpDocument(bytes);
+  const wasm={borrowDocumentHandle:()=>live,documentGeneration:5,canvasMetricFontGeneration:8};
+  const generation={document:5,fonts:8};
+  try {
+    const batch=JSON.parse(live.collectCanvasMetricRequests(5,8));
+    assert.ok(batch.requests.length);
+    const replies=JSON.stringify(batch.requests.map((r:any)=>({...r,resolvedFont:r.font,measuredAdvancePx:18.3})));
+    live.registerCanvasMetricReplies(5,8,batch.revision,replies);live.selectCanvasMetrics(true);
+    const s=snapshot(live,'hwpx');
+    assert.throws(()=>subdivisionCopyMetrics(wasm,s,[command]),/글꼴/);
+    recordPublishedCanvasMetrics(live,generation,replies);
+    const prepare=subdivisionCopyMetrics(wasm,s,[command])!;
+    assert.throws(()=>prepare(live),/사본/);
+    prepare(copy);
+    assert.deepEqual(boxes(copy),boxes(live));assert.equal(copy.getPageTextLayout(0),live.getPageTextLayout(0));
+    different.insertText(0,0,0,'🐸');
+    assert.throws(()=>prepare(different));
+    assert.equal(different.canvasMetricsActive(),false);
+    wasm.canvasMetricFontGeneration++;assert.throws(()=>prepare(different),/글꼴/);wasm.canvasMetricFontGeneration--;
+    wasm.documentGeneration++;assert.throws(()=>prepare(different),/글꼴/);wasm.documentGeneration--;
+    wasm.borrowDocumentHandle=()=>different;assert.throws(()=>prepare(different),/글꼴/);wasm.borrowDocumentHandle=()=>live;
+    recordPublishedCanvasMetrics(live,generation,'[]');assert.throws(()=>prepare(different),/글꼴/);
+  } finally {different.free();copy.free();live.free();}
 });

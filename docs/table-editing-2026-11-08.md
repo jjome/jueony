@@ -17,6 +17,10 @@
 
 행·열을 삭제할 때 그 안의 계산식을 함께 삭제하는 경우도 검사했다. 해당 셀을 참조하는 수식이 남아 있으면 거부한다. HWP·HWPX에서 수식이 1개 또는 0개 남는 저장 파일 8개를 독립 판독기와 엔진으로 다시 읽었다. 두 형식에서 기존 수식 보존과 삭제를 포함한 집중 검사 10건이 통과했다.
 
+계산식과 관계없는 병합 셀 문단은 같은 본문 표나 이웃 표에 계산식이 있어도 편집할 수 있다. 편집 가능한 셀 목록에서 계산식 셀과 그 입력 셀을 제외한다. 두 형식의 Edge 검수에서 독립적인 문단만 수정하고, 실행 취소·다시 실행과 저장 후 양쪽 표의 계산식 명령·표시값·위치를 확인했다.
+
+다쪽 셀에서는 화면의 글꼴 측정값을 검사용 사본과 재열기 사본에 등록한다. Edge에서 이모지의 글자 폭이 화면과 사본에서 각각 18.3px와 6.7px로 달랐던 사례를 재현하고, 같은 측정 조건에서 페이지별 셀·글줄 좌표가 일치하는지 확인했다. 양 형식에서 이모지를 포함한 셀 분할과 저장 재열기가 통과했다. 글줄이 실제로 다음 쪽으로 밀리는 문서는 원복을 확인했다.
+
 - [병합 문단 원본·서식 검사](../apps/editor/scripts/verify-cell-paragraph-engine.mjs) · [중첩 셀 검사](../apps/editor/scripts/verify-nested-agent-cells.mjs)
 - [격자·행열 크기 회귀 검사](../apps/editor/tests/staggered-grid.test.ts) · [셀 분할 저장·재열기](../apps/editor/scripts/verify-table-subdivision-engine.mjs)
 - [병합 계산식 파일 검사](../apps/editor/scripts/verify-merged-table-formulas.mjs) · [중첩 계산식 파일 검사](../apps/editor/scripts/verify-nested-table-formulas.mjs)

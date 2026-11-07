@@ -133,6 +133,54 @@ try{
    assert.match(await page.$eval('#request-error',e=>e.textContent),/표 외형이나 쪽|이웃 셀의 쪽|쪽별 실제 크기|원래 높이/);
    assert.deepEqual(await state(),before);
  });
+ await scenario('fragmented subdivision - real page movement after applying rolls back the live emoji document',async()=>{
+   const f=await open('hwpx',fragmentedSubdivisionTable(HwpDocument)),base=await snap(),before=await state();
+   await f.evaluate(()=>{
+     const input=window.__pageServices.getInputHandler(),doc=window.__pageServices.wasm.borrowDocumentHandle();
+     const run=input.executeDocumentAgentOperation.bind(input);
+     const y=()=>JSON.parse(doc.getPageControlLayout(0)).controls.find(c=>c.type==='table').y;
+     const trace=window.__fragmentRollback={};
+     input.executeDocumentAgentOperation=(command,render)=>run({...command,operation:wasm=>{
+       const result=command.operation(wasm);
+       // Move the rendered table on real engine pages, after the copy and
+       // live pre-render checks passed. Keep the same printable body height.
+       const paper=JSON.parse(doc.getPageDef(0));
+       trace.before=y();
+       doc.setPageDef(0,JSON.stringify({...paper,marginTop:paper.marginTop+300,marginBottom:paper.marginBottom-300}));
+       trace.moved=y();
+       return result;
+     }},async()=>{try{await render();}catch(e){trace.reason=String(e);throw e;}});
+     window.__restoreFragmentTest=()=>{input.executeDocumentAgentOperation=run;};
+   });
+   try {
+     await assert.rejects(()=>apply([{kind:'split_table_cell_into',target:base.structure.tables[0].id,row:0,column:0,rows:1,columns:3}]));
+     const trace=await f.evaluate(()=>window.__fragmentRollback);
+     assert.ok(trace.moved-trace.before>3,JSON.stringify(trace));
+     assert.match(trace.reason,/쪽|외형/);
+     assert.deepEqual(await state(),before);
+     await writeFile(resolve(out,'fragmented-live-rollback.json'),JSON.stringify(trace));
+   } finally {await f.evaluate(()=>window.__restoreFragmentTest());}
+ });
+ for(const stop of ['cancel','conflict']) await scenario('fragmented subdivision - delayed emoji request honors '+stop,async()=>{
+   await configure('openai-compatible');
+   await open('hwpx',fragmentedSubdivisionTable(HwpDocument));
+   const start=calls.length,before=await state(),base=await snap();
+   await fill('request-input','지연 세 쪽에 걸친 셀을 세 칸으로 나눠줘');await page.click('#send-request');
+   for(let i=0;i<50 && calls.length===start;i++)await delay(50);
+   assert.equal(calls.length,start+1);
+   let expected=before;
+   if(stop==='cancel'){
+     await page.click('#cancel-run');await waitIdle();
+     await delay(2100); // The provider completes after the abort.
+   } else {
+     await apply([{kind:'replace_body_text',target:base.nodes[0].id,start:0,count:1,text:'X'}]);
+     expected=await state();
+     assert.notEqual(expected.revision,before.revision);
+     await waitIdle();await error(true);
+   }
+   assert.deepEqual(await state(),expected);
+   assert.deepEqual((await snap()).structure.tables[0],base.structure.tables[0]);
+ });
  await scenario('staggered grid - second page split across new lines with formatted paragraphs',async()=>{
    await configure('openai-compatible');
    const d=continuedMergedTable(HwpDocument);

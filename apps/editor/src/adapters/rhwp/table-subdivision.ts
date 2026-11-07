@@ -88,8 +88,8 @@ export function assertTableSubdivisionResult(wasm:any, base:Snapshot, op:AgentTa
   const frames=subdivisionFrames(d,actual,parsed(d.getTableProperties(t.section,t.paragraph,t.control)),fragmented,fromFragmentedOwner);
   const {original,current}=compareSubdivisionFrames(originalFrames,frames,plan.cells,plan.primary.index);
   if(primarySpansPages && !op.distributeParagraphs) {
-    const retained=divided.find(c=>c.originIndex===plan.primary.index)!;
-    const lines=(pieces:typeof original)=>pieces.filter(p=>p.lineSignature!==hash([])).map(p=>[p.page,p.lineSignature]);
+    const retained=divided.find(c=>c.originIndex===plan.primary.index)!, empty=hash([]);
+    const lines=(pieces:typeof original)=>pieces.filter(p=>p.lineSignature!==empty).map(p=>[p.page,p.lineSignature]);
     if(!same(lines(original),lines(current.get(retained.index)??[])))
       throw Error('분할 뒤 원래 셀의 쪽별 글줄 위치가 달라졌습니다.');
   }

@@ -71,6 +71,49 @@ for(const format of ['hwp','hwpx'])await scenario(format+' plain paragraph in a 
   d.restoreSnapshot(undo);assert.deepEqual(bytes(d),original);d.discardSnapshot(undo);
  }finally{d.free();}
 });
+for(const format of ['hwp','hwpx'])await scenario(format+' picture text splice maps scalar anchors through prefix growth and middle deletion',async()=>{
+ const fixture=await createAxisPictureFixture(HwpDocument,out,{merged:true,grouped:true});
+ const bytes=d=>format==='hwp'?d.exportHwp():d.exportHwpx(),name='그림교체.'+format;
+ const cell=readStructure(fixture).tables[0].cells.find(c=>c.row===1&&c.column===1),args=[0,1,0,cell.index,0];
+ fixture.insertTextInCell(...args,2,'abc');fixture.insertTextInCell(...args,0,'xy');
+ const d=new HwpDocument(bytes(fixture));fixture.free();
+ try{
+  const before=bytes(d),first=resolve(out,'splice-original.'+format);await writeFile(first,before);
+  const records=inspectPictureAnchors(first),assets=doc=>Object.entries(resources(doc.exportHwpx())).filter(([n])=>n.startsWith('BinData/'));
+  const originalAssets=assets(d),history=d.saveSnapshot();
+  for(const [stage,text,mapped] of [['prefix','양😀yPiabccB',[4,8,9]],['middle','양😀yPi닫ccB',[4,7,8]]]){
+   const s=snap(d,name),p=s.cellParagraphSources.s0p1t0.cells.find(c=>c.index===cell.index).paragraphs[0];
+   assert.ok(p.pictureTextRanges?.length);
+   const op={kind:'replace_cell_paragraph',target:'s0p1t0',row:1,column:1,paragraph:0,originalText:p.text,text};
+   if(stage==='prefix'){
+    assert.throws(()=>validateEditOperations([{...op,text:'x새롭cB'}],s));
+    assert.throws(()=>executeCellParagraph(d,s,{...op,text:'양'.repeat(80)+p.text.slice(1)}));
+    assert.deepEqual(bytes(d),before);
+   }
+   transactionalCandidate(d,s,[op],s.revision);
+   const file=resolve(out,'splice-'+stage+'.'+format);await writeFile(file,bytes(d));
+   let slot=0;
+   assert.deepEqual(inspectPictureAnchors(file),records.map(r=>r.row===1&&r.col===1?{...r,textOffset:mapped[slot++]}:r));
+   const saved=new HwpDocument(await readFile(file));
+   try{for(const doc of [d,saved]){
+    assert.equal(doc.getTextInCell(...args,0,Array.from(text).length),text);
+    assert.deepEqual([...doc.getCellPictureTextAnchors(...args)],mapped);
+    assert.deepEqual(assets(doc),originalAssets);
+    assert.equal(json(doc.getPageTextLayout(0)).runs.filter(r=>r.parentParaIdx===1&&r.cellIdx===cell.index).map(r=>r.text).join(''),text);
+   }}finally{saved.free();}
+  }
+  d.restoreSnapshot(history);assert.deepEqual(bytes(d),before);d.discardSnapshot(history);
+  const originalSource=snap(d,name),readAnchors=d.getCellPictureTextAnchors.bind(d),insert=d.insertTextInCell.bind(d);
+  let wrote=false;
+  d.insertTextInCell=(...a)=>{const result=insert(...a);wrote=true;return result;};
+  d.getCellPictureTextAnchors=(...a)=>{
+   const value=readAnchors(...a);if(wrote && value?.length && a[3]===cell.index)value[0]--;return value;
+  };
+  assert.throws(()=>executeCellParagraph(d,originalSource,{kind:'replace_cell_paragraph',target:'s0p1t0',row:1,column:1,
+    paragraph:0,originalText:'xyPiabccB',text:'양😀yPiabccB'}));
+  assert.ok(wrote);assert.deepEqual(bytes(d),before);
+ }finally{d.free();}
+});
 for(const format of ['hwp','hwpx'])await scenario(format+' picture prefix and middle colors retain every glyph and serialized image slot',async()=>{
  const fixture=await createAxisPictureFixture(HwpDocument,out,{merged:true,grouped:true});
  const bytes=d=>format==='hwp'?d.exportHwp():d.exportHwpx(),cell=readStructure(fixture).tables[0].cells.find(c=>c.row===1&&c.column===1);
@@ -120,7 +163,7 @@ for(const format of ['hwp','hwpx'])await scenario(format+' editable suffix after
   const paragraph=source.cellParagraphSources[t.id].cells.find(c=>c.index===cell.index).paragraphs[0];
   const anchors=Array.from(d.getCellPictureTextAnchors(...args));
   const shift=Array.from(prefix).length;
-  assert.deepEqual(anchors,[1+shift,2+shift,3+shift]);assert.deepEqual(paragraph,{index:0,text:prefix+'PicB기존',editableFrom:4+shift,...(shift?{formatOnlyRanges:[{start:0,end:1}]}:{})});
+  assert.deepEqual(anchors,[1+shift,2+shift,3+shift]);assert.deepEqual(paragraph,{index:0,text:prefix+'PicB기존',editableFrom:4+shift,...(shift?{formatOnlyRanges:[{start:0,end:1}],pictureTextRanges:[{start:0,end:1}]}:{})});
   const op={kind:'replace_cell_paragraph',target:t.id,row:1,column:1,paragraph:0,originalText:prefix+'PicB기존',text:prefix+'PicB개정'};
   assert.throws(()=>transactionalCandidate(d,source,[{...op,text:'PicX'}],source.revision));
   assert.deepEqual(bytes(d),original);

@@ -32,6 +32,7 @@ const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const
  if(input.instruction.includes('picture-suffix'))operations[0].text=operations[0].originalText+'개정';
  if(input.instruction.includes('picture prefix color'))Object.assign(operations[0],{text:operations[0].originalText,
    spanFormats:[{start:0,end:1,color:'#246789'},{start:5,end:6,color:'#148061'}]});
+ if(input.instruction.includes('picture text splice'))operations[0].text=input.instruction.includes('middle')?'양😀yPi닫ccB':'양😀yPiabccB';
  if(input.instruction.includes('mixed-tail'))operations[0].text=operations[0].originalText.slice(0,-1)+'개정😀';
  if(input.instruction.includes('split-owner'))operations[0].text=operations[0].originalText.slice(0,-6)+'Tail 2';
  if(input.instruction.includes('field-tail'))operations[0].text=Array.from(operations[0].originalText).slice(0,cell.paragraphs[paragraph].editableFrom).join('')+'수정😀';
@@ -122,6 +123,28 @@ try{
   await saveAndReopen(f,'photo-owner',format);
   const reopened=await snap();assert.deepEqual(paragraphs(reopened),paragraphs(after));
   assert.deepEqual(await pictures(),originals);
+ });
+ for(const format of ['hwp','hwpx'])await scenario(format+' picture text splice remaps all stored slots across two chat edits and bound save',async()=>{
+  const source=await createAxisPictureFixture(HwpDocument,out,{merged:true,grouped:true}),args=[0,1,0,4,0];
+  source.insertTextInCell(...args,2,'abc');source.insertTextInCell(...args,0,'xy');
+  const original=resolve(out,'picture-splice-original.'+format);
+  await writeFile(original,format==='hwp'?source.exportHwp():source.exportHwpx());
+  const records=inspectPictureAnchors(original),f=await open(format,source);
+  const inspect=()=>f.evaluate(args=>{
+   const d=window.__pageServices.wasm.borrowDocumentHandle();
+   return {slots:[...d.getCellPictureTextAnchors(...args)],
+     text:JSON.parse(d.getPageTextLayout(0)).runs.filter(r=>r.parentParaIdx===1&&r.cellIdx===4).map(r=>r.text).join('')};
+  },args);
+  const initial=await inspect();assert.deepEqual(initial,{slots:[3,7,8],text:'xyPiabccB'});
+  await send('first picture text splice prefix');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const prefix=await inspect();assert.deepEqual(prefix,{slots:[4,8,9],text:'양😀yPiabccB'});
+  await send('first picture text splice middle');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const result=await inspect();assert.deepEqual(result,{slots:[4,7,8],text:'양😀yPi닫ccB'});
+  await undo();assert.deepEqual(await inspect(),prefix);
+  await execute('edit:redo');assert.deepEqual(await inspect(),result);
+  await saveAndReopen(f,'picture-splice',format);assert.deepEqual(await inspect(),result);
+  let i=0;assert.deepEqual(inspectPictureAnchors(resolve(out,'picture-splice.'+format)),
+   records.map(r=>r.row===1&&r.col===1?{...r,textOffset:result.slots[i++]}:r));
  });
  for(const format of ['hwp','hwpx'])await scenario(format+' picture prefix color before and between stored slots through chat, redo and bound save',async()=>{
   await configure('openai-compatible');

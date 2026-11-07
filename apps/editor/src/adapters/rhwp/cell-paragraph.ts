@@ -1,5 +1,5 @@
 import {readNestedCellFields} from './nested-cell-fields.ts';
-import {sameAxisPicture} from './axis-cell-picture.ts';
+import {axisPictureReader,sameAxisPicture} from './axis-cell-picture.ts';
 import {readBodyTableMarkers} from './body-table-markers.ts';
 import {sha256} from '@noble/hashes/sha2.js';
 import type {Snapshot,Table,AgentCellParagraphOp,AgentCellParagraphSource} from '../../modules/document/public/index.ts';
@@ -228,8 +228,12 @@ function readPrivateSources(d:any,tables:Table[],name:string){
       const start=Math.max(fieldBoundary??0,i?anchors[i-1]+1:0),end=anchor-1;
       return start<end?[{start,end}]:[];
      });
+     let pictureTextRanges;
+     if(formatOnlyRanges?.length && c.rowSpan*c.columnSpan>1 && anchors){
+      try{pictureSpliceLayout(d,t,c.index,index,text,anchors);pictureTextRanges=formatOnlyRanges;}catch{/* Keep the existing suffix and format-only permissions. */}
+     }
      return {index,text,length,characters,paragraph,style,runs,...(pictureParagraph&&lastAnchor===undefined?{pictureParagraph:true}:{}),
-      ...(editableFrom===undefined?{}:{editableFrom}),...(formatOnlyRanges?.length?{formatOnlyRanges}:{})};
+      ...(editableFrom===undefined?{}:{editableFrom}),...(formatOnlyRanges?.length?{formatOnlyRanges}:{}),...(pictureTextRanges?{pictureTextRanges}:{})};
     });
     let readOnly=(pictureParagraphs.length>0&&c.rowSpan*c.columnSpan===1)||paragraphs.every(p=>p.pictureParagraph===true);
     if(hasLocalFormula){
@@ -255,7 +259,7 @@ function readPrivateSources(d:any,tables:Table[],name:string){
 export function readCellParagraphSources(wasm:any,tables:Table[],name:string):Record<string,AgentCellParagraphSource>|undefined {
  const d=nativeDocument(wasm);if(typeof d.setCharShapeIdInCell!=='function'||typeof d.exportHwpx!=='function')return;
  const privateSources=readPrivateSources(d,tables,name).sources;
- return Object.fromEntries(tables.map(t=>{const source=privateSources[t.id];return [t.id,source?.editable===true?{editable:true,fingerprint:source.fingerprint,cells:source.cells.filter((c:any)=>!c.readOnly).map((c:any)=>({index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs:c.paragraphs.filter((p:any)=>!p.pictureParagraph).map((p:any)=>({index:p.index,text:p.text,...(p.editableFrom===undefined?{}:{editableFrom:p.editableFrom}),...(p.formatOnlyRanges?{formatOnlyRanges:p.formatOnlyRanges}:{}),...(p.runs.length>1?{formatSpans:p.runs.map((r:any)=>({start:r.startOffset,end:r.endOffset}))}:{})}))}))}:{editable:false,reason:'병합 셀 문단 교체에는 셀마다 원래 행·열과 쪽을 확인할 수 있는 비보호 본문 표가 필요합니다. 경계를 확인할 수 없는 필드·개체·책갈피·중첩 표 또는 여러 쪽의 글줄을 원문과 대조할 수 없는 셀은 편집할 수 없습니다.'}];}));
+ return Object.fromEntries(tables.map(t=>{const source=privateSources[t.id];return [t.id,source?.editable===true?{editable:true,fingerprint:source.fingerprint,cells:source.cells.filter((c:any)=>!c.readOnly).map((c:any)=>({index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs:c.paragraphs.filter((p:any)=>!p.pictureParagraph).map((p:any)=>({index:p.index,text:p.text,...(p.editableFrom===undefined?{}:{editableFrom:p.editableFrom}),...(p.formatOnlyRanges?{formatOnlyRanges:p.formatOnlyRanges}:{}),...(p.pictureTextRanges?{pictureTextRanges:p.pictureTextRanges}:{}),...(p.runs.length>1?{formatSpans:p.runs.map((r:any)=>({start:r.startOffset,end:r.endOffset}))}:{})}))}))}:{editable:false,reason:'병합 셀 문단 교체에는 셀마다 원래 행·열과 쪽을 확인할 수 있는 비보호 본문 표가 필요합니다. 경계를 확인할 수 없는 필드·개체·책갈피·중첩 표 또는 여러 쪽의 글줄을 원문과 대조할 수 없는 셀은 편집할 수 없습니다.'}];}));
 }
 /** Export bytes use portable metrics. Compare their layout with the same
  * temporary metric selection and restore the screen environment synchronously.
@@ -285,6 +289,60 @@ function pictureTextLayout(doc:any,t:Table,cell:number,paragraph:number,text:str
  }
  if(glyphs.map(g=>g.char).join('')!==text)throw Error('그림 문단의 표시 글자와 원문이 다릅니다.');
  return {pages,glyphs};
+}
+type PictureEdit={start:number;remove:number;insert:string};
+/** Reconstruct the published line in stored slot order. Text on both sides of
+ * every image must paint in the owning cell, without crossing its neighbor. */
+function pictureSpliceLayout(doc:any,t:Table,cell:number,paragraph:number,text:string,anchors:number[]){
+ const {pages,glyphs}=pictureTextLayout(doc,t,cell,paragraph,text),page=glyphs[0]?.page;
+ const invalid=()=>Error('그림과 주변 글자가 한 줄에서 원래 슬롯 순서대로 배치되지 않았습니다.');
+ const owns=(v:any)=>v.secIdx===t.section && v.parentParaIdx===t.paragraph && v.cellIdx===cell &&
+   v.cellPath?.length===1 && v.cellPath[0].controlIndex===t.control && v.cellPath[0].cellParaIndex===paragraph;
+ if(page===undefined || glyphs.some(g=>g.page!==page))throw invalid();
+ const images=pages[page].filter((v:any)=>v.type==='image'&&owns(v)).sort((a:any,b:any)=>a.controlIdx-b.controlIdx);
+ const outer=pages[page].find((v:any)=>v.type==='table'&&v.secIdx===t.section&&v.paraIdx===t.paragraph&&v.controlIdx===t.control);
+ const owner=t.cells[cell],box=outer?.cells.find((c:any)=>c.row===owner.row && c.col===owner.column);
+ if(!box || images.length!==anchors.length || images.some((v:any,i:number)=>v.controlIdx!==i))throw invalid();
+ const line:Array<{value:string;x:number;y:number;w:number;h:number}>=[];
+ let slot=0;
+ for(const [i,g] of glyphs.entries()){
+  while(slot<anchors.length && anchors[slot]===i){
+   const p=images[slot];line.push({value:'pic'+slot,x:p.x,y:p.y,w:p.w,h:p.h});slot++;
+  }
+  line.push({value:g.char,x:g.left,y:g.y,w:g.right-g.left,h:g.h});
+ }
+ if(slot!==anchors.length || Math.max(...line.map(v=>v.y))>=Math.min(...line.map(v=>v.y+v.h)) ||
+    line.some((v,i)=>!Number.isFinite(v.w)||v.w<=0||v.x<box.x-.2||v.y<box.y-.2||
+      v.x+v.w>box.x+box.w+.2||v.y+v.h>box.y+box.h+.2||i>0&&v.x<line[i-1].x+line[i-1].w-.2))throw invalid();
+ const controls=pages.map((items:any[])=>items.map(v=>v.type==='image'&&owns(v)?{...v,x:0}:v));
+ const bystanders=Array.from({length:doc.pageCount()},(_,p)=>parsed(doc.getPageTextLayout(p)).runs.filter((r:any)=>!owns(r)));
+ return {page,line,controls,bystanders};
+}
+function assertPictureSplice(before:ReturnType<typeof pictureSpliceLayout>,after:ReturnType<typeof pictureSpliceLayout>,
+ anchors:number[],edit:PictureEdit){
+ const start=edit.start+anchors.filter(a=>a<edit.start).length,tail=start+Array.from(edit.insert).length;
+ const oldSuffix=before.line.slice(start+edit.remove),newSuffix=after.line.slice(tail);
+ const noLayout={...after,line:before.line};
+ const dx=newSuffix[0]?.x-oldSuffix[0]?.x;
+ const end=(line:typeof before.line,i:number)=>i===0?line[0].x:line[i-1].x+line[i-1].w;
+ const widthChange=end(after.line,tail)-end(before.line,start+edit.remove);
+ if(!oldSuffix.length || !newSuffix.length || !sameTableLayout(before,noLayout) ||
+    !sameTableLayout(before.line[start].x,after.line[start].x) || !sameTableLayout(dx,widthChange) ||
+    !sameTableLayout(before.line.slice(0,start),after.line.slice(0,start)) ||
+    !sameTableLayout(oldSuffix,newSuffix.map(v=>({...v,x:v.x-dx}))))
+  throw Error('교체한 텍스트 폭 이외에 주변 그림·글자 또는 다른 문단의 배치가 바뀌었습니다.');
+}
+/** Re-read the native assets, properties, and paint operations at each actual
+ * path. Neutral positions allow comparison of payloads across a proven splice. */
+function picturePayload(doc:any,t:Table,cell:number){
+ const lists=parsed(doc.getCursorModel()).lists,list=lists.find((l:any)=>l.isCell&&l.hostListId===0&&l.sectionIndex===t.section&&
+   l.hostPara===t.paragraph&&l.controlIndex===t.control&&l.cellIndex===cell);
+ if(!list)throw Error('그림의 원래 셀 주소가 없습니다.');
+ const children=parsed(doc.getControls()).filter((c:any)=>c.list===list.listId);
+ const checked=axisPictureReader(doc)(t.section,t.paragraph,t.control,t.cells[cell],list.paraCount,
+   children.map((v:any)=>({...v,pos:v.controlIndex})));
+ if(!checked)throw Error('그림 위치별 원본 자원과 표시 자원을 다시 확인하지 못했습니다.');
+ return checked.signature;
 }
 const pending=new WeakMap<object,any>();
 type CharacterRun={startOffset:number;endOffset:number;charShapeId:number};
@@ -334,7 +392,21 @@ export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellPar
  const d=nativeDocument(wasm),proof=pending.get(d);if(!proof||proof.revision!==base.revision||!same(proof.operation,op))throw new Error('셀 문단 결과의 검증 근거가 없습니다.');
  const after=capturePreservationEvidence(d);if(after.issues.length||!same(topologySemantics(after.values),proof.expected)||!same(rootBodyTexts(d),proof.body)||!same(tableTextTree(readStructure(d).tables),proof.text)||resourceFingerprint(d.exportHwpx())!==proof.resources)throw new Error('병합 셀 문단 결과 또는 다른 문서 내용·자원이 변경되었습니다.');
  const source=readPrivateSources(d,[proof.table],base.name).sources[op.target];if(source?.editable!==true)throw new Error(source?.reason||'교체 후 병합 셀 문단을 검증하지 못했습니다.');
- if(!samePictures(proof.pictures,source.pictures))throw Error('편집 후 셀 그림의 소유 위치, 자원 또는 배치가 달라졌습니다.');
+ const targetPicture=(owner:PictureOwner)=>owner.table===op.target && owner.cell===proof.cellIndex;
+ const others=(v:PictureOwner[])=>proof.splice?v.filter(p=>!targetPicture(p)):v;
+ if(!samePictures(others(proof.pictures),others(source.pictures)))throw Error('편집 후 셀 그림의 소유 위치, 자원 또는 배치가 달라졌습니다.');
+ const checkSplice=(doc:any,original:ReturnType<typeof pictureSpliceLayout>)=>{
+  const {anchors,mapped,edit,payload}=proof.splice;
+  const current=Array.from(doc.getCellPictureTextAnchors(proof.table.section,proof.table.paragraph,proof.table.control,proof.cellIndex,op.paragraph)??[]);
+  if(!same(current,mapped)||picturePayload(doc,proof.table,proof.cellIndex)!==payload)throw Error('그림의 원래 자원 또는 교체 후 슬롯이 계획과 다릅니다.');
+  assertPictureSplice(original,pictureSpliceLayout(doc,proof.table,proof.cellIndex,op.paragraph,op.text,mapped),anchors,edit);
+ };
+ if(proof.splice){
+  const previous=proof.pictures.find(targetPicture),current=source.pictures.find(targetPicture);
+  if(!previous || !current || !same(current.paragraphs,previous.paragraphs.map((p:any)=>p.index===op.paragraph?
+      {...p,anchors:proof.splice.mapped}:p)))throw Error('그림을 소유한 다른 문단의 저장 슬롯이 달라졌습니다.');
+  checkSplice(d,proof.splice.screen);
+ }
  const layout=(doc:any)=>pictureTextLayout(doc,proof.table,proof.cellIndex,op.paragraph,op.text);
  if(proof.pictureText && !sameTableLayout(proof.pictureText.screen,layout(d)))
   throw Error('서식 변경으로 그림 문단의 글자 또는 개체 위치가 달라졌습니다.');
@@ -347,6 +419,7 @@ export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellPar
  }
  portableLayout(d,()=>{const format=/\.hwp$/iu.test(base.name)?'hwp':'hwpx';const artifact=format==='hwp'?d.exportHwpWithReport():d.exportHwpxWithReport();let reopened:any;
  try{const loss=JSON.parse(artifact.contentLoss()),bytes=artifact.takeBytes();verifyPreservedExport(d,bytes,format,loss,b=>new d.constructor(b));reopened=new d.constructor(bytes);
+  if(proof.splice){checkSplice(d,proof.splice.portable);checkSplice(reopened,proof.splice.portable);}
   if(proof.pictureText && (!sameTableLayout(proof.pictureText.portable,layout(d)) ||
       !sameTableLayout(proof.pictureText.portable,layout(reopened))))
    throw Error('저장한 그림 문단의 글자 또는 개체 위치가 원본과 다릅니다.');
@@ -409,10 +482,19 @@ export function executeCellParagraph(wasm:any,base:Snapshot,op:AgentCellParagrap
  const beforePictures=op.spanFormats?.some(f=>f.start<(p.editableFrom??0));
  const readLayout=()=>pictureTextLayout(d,t,c.index,op.paragraph,op.originalText);
  const pictureText=beforePictures?{screen:readLayout(),portable:portableLayout(d,readLayout)}:undefined;
- const proof={revision:base.revision,operation:structuredClone(op),table:t,expected,pictureText,runs:formatted?.runs??runs,firstCharacters:formatted?.firstCharacters??firstCharacters,
+ let splice;
+ if(plan.pictureEdit){
+  const edit=plan.pictureEdit,anchors=Array.from<number>(d.getCellPictureTextAnchors(...args));
+  const delta=Array.from(edit.insert).length-edit.remove,mapped=anchors.map(a=>a>edit.start?a+delta:a);
+  if(anchors.some(a=>a>=edit.start&&a<=edit.start+edit.remove))throw Error('그림의 저장 슬롯에 닿는 텍스트 교체입니다.');
+  const layout=()=>pictureSpliceLayout(d,t,c.index,op.paragraph,op.originalText,anchors);
+  splice={edit,anchors,mapped,screen:layout(),portable:portableLayout(d,layout),payload:picturePayload(d,t,c.index)};
+ }
+ const proof={revision:base.revision,operation:structuredClone(op),table:t,expected,pictureText,splice,runs:formatted?.runs??runs,firstCharacters:formatted?.firstCharacters??firstCharacters,
   pages:source.pages,pictures:source.pictures,fieldEvidence:source.fieldEvidence,body:rootBodyTexts(d),text,resources:formatted?.resources??resources,cells:source.cells,cellIndex:c.index};
  // Edit right to left so offsets always refer to the queried source.
- for(const edit of [...edits].reverse()){
+ const token=pictureText||splice?d.saveSnapshot():undefined;
+ try{for(const edit of [...edits].reverse()){
   const shape=mixed?p.runs[edit.run].charShapeId:p.characters.charShapeId;
   if(edit.remove)checked(d.deleteTextInCell(...args,edit.start,edit.remove));
   if(edit.insert){
@@ -420,8 +502,6 @@ export function executeCellParagraph(wasm:any,base:Snapshot,op:AgentCellParagrap
    checked(d.setCharShapeIdInCell(...args,edit.start,edit.start+Array.from(edit.insert).length,shape));
   }
  }
- const token=pictureText?d.saveSnapshot():undefined;
- try{
   for(const range of formatted?.applications??[])checked(d.applyCharFormatInCell(...args,range.start,range.end,range.properties));
   pending.set(d,proof);assertCellParagraphResult(d,base,op);
  }catch(error){if(token!==undefined){pending.delete(d);d.restoreSnapshot(token);}throw error;}

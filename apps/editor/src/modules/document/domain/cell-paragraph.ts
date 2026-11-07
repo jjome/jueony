@@ -54,6 +54,7 @@ export function cellParagraphPlan(op:AgentCellParagraphOp,s:Snapshot){
   }
  }
  let edits=op.originalText===op.text?[]:paragraphEdits(op,paragraph);
+ let pictureEdit:typeof edits[number]|undefined;
  if(paragraph.editableFrom!==undefined){
   const boundary=paragraph.editableFrom,original=Array.from(op.originalText);
   if(!Number.isSafeInteger(boundary)||boundary<1||boundary>original.length)throw Error('필드 또는 그림 뒤의 일반 텍스트 위치를 확인하세요.');
@@ -61,12 +62,26 @@ export function cellParagraphPlan(op:AgentCellParagraphOp,s:Snapshot){
    if(edit.start>=boundary)return edit;
    // Keep every character through the field end and the following boundary.
    const keep=boundary-edit.start,insert=Array.from(edit.insert);
+   if(paragraph.pictureTextRanges?.length && !op.spanFormats && edits.length===1){
+    // Remove equal leading/trailing characters from the native mutation. A
+    // repeated suffix/prefix must not leave multiple possible picture owners.
+    const removed=original.slice(edit.start,edit.start+edit.remove),limit=Math.min(removed.length,insert.length);
+    let left=0,right=0;
+    while(left<limit && removed[left]===insert[left])left++;
+    while(right<limit && removed[removed.length-1-right]===insert[insert.length-1-right])right++;
+    const start=edit.start+left,end=edit.start+edit.remove-right;
+    if(left+right<=limit && paragraph.pictureTextRanges.some(r=>Number.isSafeInteger(r.start)&&Number.isSafeInteger(r.end)&&
+        r.start>=0 && r.end<=boundary && r.start<=start && end<=r.end)){
+     pictureEdit={...edit,start,remove:end-start,insert:insert.slice(left,insert.length-right).join('')};
+     return pictureEdit;
+    }
+   }
    if(keep>edit.remove||keep>insert.length||original.slice(edit.start,boundary).join('')!==insert.slice(0,keep).join(''))
     throw Error('필드·그림과 경계 문자는 유지하고 뒤의 일반 텍스트만 바꿀 수 있습니다.');
    return {...edit,start:boundary,remove:edit.remove-keep,insert:insert.slice(keep).join('')};
   });
  }
- return {table,cell,paragraph,edits};
+ return {table,cell,paragraph,edits,pictureEdit};
 }
 export function paragraphEdits(op:Pick<AgentCellParagraphOp,'originalText'|'text'|'spanTexts'>,paragraph:CellParagraphText){
  const spans=paragraph.formatSpans;

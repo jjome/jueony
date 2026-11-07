@@ -18,7 +18,8 @@ async function open(ext='hwpx',source){const d=source??HwpDocument.createEmpty()
 const state=async()=>(await services()).evaluate(()=>({revision:window.jueonyEditor.revision(),bytes:[...window.jueonyEditor.recovery().bytes],history:window.__pageServices.getInputHandler().history.peekUndoTop()?.type??null,dirty:window.jueonyEditor.state().dirty}));
 async function save(f,name,ext){const result=await f.evaluate(async()=>{const api=window.jueonyEditor,status=await api.save();return {status,bytes:[...new Uint8Array(await(await api.fileHandle().getFile()).arrayBuffer())]};});assert.equal(result.status,'saved');await writeFile(resolve(out,name+'.'+ext),new Uint8Array(result.bytes));return new HwpDocument(new Uint8Array(result.bytes));}
 const formAxisOnly=process.argv.includes('--form-axis');
-const pagedPictures=process.argv.includes('--paged-pictures-axis');
+const repeatPictures=process.argv.includes('--repeated-picture-header');
+const pagedPictures=repeatPictures||process.argv.includes('--paged-pictures-axis');
 const splitPictures=process.argv.includes('--paragraph-pictures-axis');
 const groupedPictures=pagedPictures||splitPictures||process.argv.includes('--grouped-pictures-axis');
 const multiplePictures=process.argv.includes('--pictures-axis');
@@ -63,9 +64,9 @@ try{
  });
  await scenario('form mode forbids manual row snapshot commands on protected source',async()=>{const f=await open('hwpx',body('vertical','protected'));await position(f,1,0);await f.evaluate(()=>window.__pageServices.getInputHandler().setEditMode('form'));try{const before=await state();await f.evaluate(()=>window.jueonyEditor.executeCommand('table:insert-row-below'));assert.deepEqual(await state(),before);}finally{await f.evaluate(()=>window.__pageServices.getInputHandler().setEditMode('normal'));}});
  if(formAxisOnly||pictureOnly){
-  const defaultPictureFolder=pagedPictures?'build/axis-paged-pictures-native':splitPictures?'build/axis-paragraph-pictures-native/merged':groupedPictures?'build/axis-grouped-pictures-native/merged':multiplePictures?'build/axis-pictures-native/plain':'build/axis-picture-native/png';
+  const defaultPictureFolder=repeatPictures?'build/axis-repeat-picture-header':pagedPictures?'build/axis-paged-pictures-native':splitPictures?'build/axis-paragraph-pictures-native/merged':groupedPictures?'build/axis-grouped-pictures-native/merged':multiplePictures?'build/axis-pictures-native/plain':'build/axis-picture-native/png';
   const pictureFolder=pictureOnly?resolve(repo,process.env.JUEONY_PICTURE_AXIS_FIXTURES??defaultPictureFolder):undefined;
-  await reviewFormAxisChat({HwpDocument,page,origin,scenario,open,state,snap,execute,reopen,pictureFolder,multiplePictures,groupedPictures,splitPictures,pagedPictures});
+  await reviewFormAxisChat({HwpDocument,page,origin,scenario,open,state,snap,execute,reopen,pictureFolder,multiplePictures,groupedPictures,splitPictures,pagedPictures,repeatPictures});
  }
  assert.deepEqual(pageErrors,[]);assert.deepEqual(consoleErrors,[]);assert.deepEqual(externalRequests,[]);
 }finally{await writeFile(resolve(out,'result.json'),JSON.stringify({results,failures,pageErrors,consoleErrors,externalRequests,observations,scope:pictureOnly?{pictureAxisChat:2}:formAxisOnly?{formAxisChat:4}:{uiShapes:16,columnRegression:1,sourceAmbiguity:2,agentReadonly:1,formMode:1},build:JSON.parse(await readFile(resolve(dist,'build-evidence.json'),'utf8')),note:pictureOnly?'HWP and HWPX inline picture preservation, chat insertion, undo/redo, bound save/reopen and owner deletion refusal.':formAxisOnly?'HWP and HWPX ordinary form-table Agent chat against a local fixture provider, one insertion and one named owner rejection per format.':'Real Edge manual row commands and history/save/reopen; Agent merged axes verified for crossing and anchor deletion. Protection is preserved and Agent denied; form mode blocks snapshots. Normal-mode full protection and Hancom comparison NOT_RUN.'},null,2));await browser?.close();server.kill();}if(failures.length)process.exitCode=1;

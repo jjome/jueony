@@ -20,9 +20,9 @@
 
 ## 먼저 할 일
 
-- **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — 병합 셀에서 실제 그림 슬롯 뒤의 경계 글자를 보존하며 이후 텍스트와 글자 서식을 수정한다. 그림 앞·사이의 편집, 같은 위치의 필드와 복합 개체가 남았다.
-- **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — 전용 문단의 한 단계 인라인 중첩 표를 첫 칸에 남기는 분할을 지원한다. 여러 개체·더 깊은 중첩 표를 포함한 셀의 분할이 남았다.
-- **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 동명 이름 셀과 저장된 누름틀을 전체 경로와 ID로 대조하며 중첩 표 행·열을 변경한다. 개체·캡션과 겹치는 필드, HWP 행 삭제 후 부모 표 높이 차이가 남았다.
+- **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — 병합 셀의 그림 뒤 텍스트와 그림 앞·사이의 안전한 글자 서식을 변경한다. 그림 앞·사이 텍스트 교체, 겹친 필드와 복합 개체 처리가 남았다.
+- **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — 여러 쪽 문서에서도 한 쪽에 온전히 표시된 중첩 표 하나를 첫 칸에 유지하며 분할한다. 여러 개체·더 깊은 중첩 표를 포함한 셀의 분할이 남았다.
+- **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 중첩 행·열 편집 후 HWP/HWPX 재열기에서 이웃 표의 마지막 행과 동명 누름틀 값을 보존한다. 개체·캡션이나 겹치는 필드를 담은 셀의 구조 변경이 남았다.
 
 ## 기능별 작업표
 
@@ -943,7 +943,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 임의 여러 문단/병합 원본 읽기와 원문·서식 보존
-- 다음 작업: 병합 셀에서 실제 그림 슬롯 뒤의 경계 글자를 보존하며 이후 텍스트와 글자 서식을 수정한다. 그림 앞·사이의 편집, 같은 위치의 필드와 복합 개체가 남았다.
+- 다음 작업: 병합 셀의 그림 뒤 텍스트와 그림 앞·사이의 안전한 글자 서식을 변경한다. 그림 앞·사이 텍스트 교체, 겹친 필드와 복합 개체 처리가 남았다.
 - 상위 항목: [B161](<08-tables.md#b161>) 셀 병합
 - Agent 명령: `replace_cell_paragraph`
 - 근거: [101-agent-merged-cell-paragraph.md](<../101-agent-merged-cell-paragraph.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
@@ -958,7 +958,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 새 격자·행/열 참조 이관과 셀 내용 분배 명세
-- 다음 작업: 전용 문단의 한 단계 인라인 중첩 표를 첫 칸에 남기는 분할을 지원한다. 여러 개체·더 깊은 중첩 표를 포함한 셀의 분할이 남았다.
+- 다음 작업: 여러 쪽 문서에서도 한 쪽에 온전히 표시된 중첩 표 하나를 첫 칸에 유지하며 분할한다. 여러 개체·더 깊은 중첩 표를 포함한 셀의 분할이 남았다.
 - 상위 항목: [B160](<08-tables.md#b160>) 셀 분할
 - Agent 명령: `split_table_cell_into`
 - 근거: [102-agent-cell-subdivision.md](<../102-agent-cell-subdivision.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
@@ -973,7 +973,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 부모 list 경로·stable 대상·보호·자원·저장 검증
-- 다음 작업: 동명 이름 셀과 저장된 누름틀을 전체 경로와 ID로 대조하며 중첩 표 행·열을 변경한다. 개체·캡션과 겹치는 필드, HWP 행 삭제 후 부모 표 높이 차이가 남았다.
+- 다음 작업: 중첩 행·열 편집 후 HWP/HWPX 재열기에서 이웃 표의 마지막 행과 동명 누름틀 값을 보존한다. 개체·캡션이나 겹치는 필드를 담은 셀의 구조 변경이 남았다.
 - 상위 항목: [B153](<08-tables.md#b153>) 셀 속성
 - Agent 명령: `set_table_cell,insert_table_row,delete_table_row,insert_table_column,delete_table_column`
 - 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
@@ -988,7 +988,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: span 교차·주 셀 제거·neighbor 영향·실패 원복
-- 다음 작업: 행 사이에서 쪽이 나뉘는 사진 표는 저장된 셀 주소로 그림의 쪽 이동을 검증한다. 반복 제목 행·쪽에 잘린 셀·부동·회전·캡션 그림이 남았다.
+- 다음 작업: 단순 제목 한 줄이 반복되는 여러 쪽 사진 표에서 본문 행을 편집한다. 여러 줄·병합·그림 제목, 쪽에서 잘린 셀과 부동·회전·캡션 그림이 남았다.
 - 상위 항목: [B158](<08-tables.md#b158>) 행·열 추가
 - Agent 명령: `insert_table_row,delete_table_row,insert_table_column,delete_table_column`
 - 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)

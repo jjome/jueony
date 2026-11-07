@@ -78,3 +78,44 @@ test('an inner cell painted over its neighbor rejects even when both layout APIs
     assert.throws(()=>nestedSubdivisionEvidence(d,table,owner),/중첩 표/);
   }finally{d.free();}
 });
+for(const ext of ['hwp','hwpx'])test(ext+' subdivides an intact nested table on the second page of a report',()=>{
+  const src=subdivisionNestedTable(HwpDocument);
+  src.insertPageBreak(0,0,2);
+  const d=new HwpDocument(bytes(src,ext));src.free();
+  try{
+    const s=snapshot(d,ext),table=s.structure!.tables[0],operation={...op,target:table.id};
+    const saved=bytes(d,ext),previousPage=d.getPageTextLayout(0);
+    const evidence=(doc:any)=>{
+      const parent=readStructure(doc).tables[0];
+      return nestedSubdivisionEvidence(doc,parent,subdivisionNestedOwner(doc,parent)!);
+    };
+    const original=evidence(d),undo=d.saveSnapshot();
+    try{
+      assert.deepEqual([original.page,original.pageCount],[1,2]);
+      executeDocumentOperations(d,s,validateEditOperations([operation],s));
+      const reopened=new HwpDocument(bytes(d,ext));
+      try{
+        for(const result of [d,reopened]){
+          assert.equal(readStructure(result).tables[0].cells.length,table.cells.length+2);
+          assert.deepEqual(evidence(result),original);
+          assert.equal(result.getPageTextLayout(0),previousPage);
+        }
+      }finally{reopened.free();}
+      d.restoreSnapshot(undo);assert.deepEqual(bytes(d,ext),saved);
+    }finally{d.discardSnapshot(undo);}
+  }finally{d.free();}
+});
+test('a duplicate inner table frame on an earlier page refuses subdivision',()=>{
+  const d=subdivisionNestedTable(HwpDocument);
+  try{
+    d.insertPageBreak(0,0,2);
+    const table=readStructure(d).tables[0],owner=subdivisionNestedOwner(d,table)!;
+    const read=d.getPageControlLayout.bind(d),inner=JSON.parse(read(1)).controls.find((c:any)=>c.stableIndex?.length>3);
+    d.getPageControlLayout=(page:number)=>{
+      const layout=JSON.parse(read(page));
+      if(page===0)layout.controls.push(inner);
+      return JSON.stringify(layout);
+    };
+    assert.throws(()=>nestedSubdivisionEvidence(d,table,owner),/중첩 표/);
+  }finally{d.free();}
+});

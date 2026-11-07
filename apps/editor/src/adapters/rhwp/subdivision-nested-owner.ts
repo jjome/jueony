@@ -10,7 +10,7 @@ const invalid=()=>Error('분할할 칸의 중첩 표와 모든 내부 셀·글�
 export function subdivisionNestedOwner(doc:any,t:Table):NestedSubdivisionOwner|undefined {
   const controls=parsed(doc.getControls()),children=controls.filter((v:any)=>v.list!==0);
   if(!children.some((v:any)=>v.ctrlId==='tbl'))return;
-  if(children.length!==1 || doc.pageCount()!==1 || parsed(doc.getFieldList()).length)throw invalid();
+  if(children.length!==1 || parsed(doc.getFieldList()).length)throw invalid();
   const [child]=children, lists=parsed(doc.getCursorModel()).lists;
   const host=lists.find((v:any)=>v.listId===child.list);
   if(!host?.isCell || host.hostListId!==0 || host.sectionIndex!==t.section || host.hostPara!==t.paragraph ||
@@ -34,11 +34,21 @@ export function nestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisio
   const path=(i:number,p:number)=>JSON.stringify([host,{controlIndex:0,cellIndex:i,cellParaIndex:p}]);
   const dimensions=parsed(doc.getTableDimensionsByPath(...at,path(0,0)));
   const boxes=parsed(doc.getTableCellBboxesByPath(...at,path(0,0)));
-  const tables=parsed(doc.getPageControlLayout(0)).controls.filter((v:any)=>v.type==='table');
-  const outer=tables.find((v:any)=>sameTableLayout(v.stableIndex,[...at,t.control]));
-  const inner=tables.filter((v:any)=>v.stableIndex?.length>3);
-  if(!outer || inner.length!==1 || !boxes.length || boxes.length!==dimensions.cellCount ||
-      boxes.length>200 || boxes.some((c:any,i:number)=>c.pageIndex!==0 || c.cellIdx!==i) ||
+  const pages=doc.pageCount(),page=boxes[0]?.pageIndex;
+  if(!Number.isSafeInteger(pages) || pages<1 || pages>200 || !Number.isSafeInteger(page) || page<0 || page>=pages ||
+      boxes.length!==dimensions.cellCount || boxes.length>200 ||
+      boxes.some((c:any,i:number)=>c.pageIndex!==page || c.cellIdx!==i))throw invalid();
+  const isOuter=(v:any)=>v.type==='table' && sameTableLayout(v.stableIndex,[...at,t.control]);
+  const isInner=(v:any)=>v.type==='table' && v.stableIndex?.length>3;
+  for(let other=0;other<pages;other++){
+    if(other===page)continue;
+    const controls=parsed(doc.getPageControlLayout(other)).controls;
+    if(controls.some((v:any)=>isOuter(v)||isInner(v)) ||
+        parsed(doc.getPageTextLayout(other)).runs.some((r:any)=>r.cellPath?.length>1))throw invalid();
+  }
+  const tables=parsed(doc.getPageControlLayout(page)).controls,outerFrames=tables.filter(isOuter);
+  const [outer]=outerFrames,inner=tables.filter(isInner);
+  if(outerFrames.length!==1 || inner.length!==1 ||
       inner[0].rowCount!==dimensions.rowCount || inner[0].colCount!==dimensions.colCount)throw invalid();
   const source=t.cells[owner.index],box=outer.cells.find((c:any)=>c.row===source.row && c.col===source.column);
   if(!box || !inside(inner[0],box) || outer.cells.some((c:any)=>c!==box && overlap(inner[0],c)) ||
@@ -60,7 +70,7 @@ export function nestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisio
     }
   }
   const lines=[];
-  for(const r of parsed(doc.getPageTextLayout(0)).runs){
+  for(const r of parsed(doc.getPageTextLayout(page)).runs){
     if(r.cellPath?.length!==2)continue;
     const [parent,leaf]=r.cellPath,b=boxes[leaf.cellIndex],key=leaf.cellIndex+'/'+leaf.cellParaIndex;
     if(r.secIdx!==t.section || r.parentParaIdx!==t.paragraph || !sameTableLayout(parent,host) || leaf.controlIndex!==0 ||
@@ -71,5 +81,5 @@ export function nestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisio
     ends.set(key,end);lines.push(r);
   }
   for(const [key,text] of texts)if((ends.get(key)??0)!==Array.from(text).length)throw invalid();
-  return {table:inner[0],boxes,cellProperties,lines,texts:[...texts]};
+  return {page,pageCount:pages,table:inner[0],boxes,cellProperties,lines,texts:[...texts]};
 }

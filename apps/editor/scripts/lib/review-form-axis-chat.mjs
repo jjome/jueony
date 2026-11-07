@@ -51,7 +51,21 @@ function proposal(input,splitPictures){
  return {kind:insert?'insert_table_row':'delete_table_row',target:t.id,index:named.row,...(insert?{values:['신규','']}:{})};
 }
 
-export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,state,snap,execute,reopen,pictureFolder,multiplePictures,groupedPictures,splitPictures}){
+async function checkPicturePages(frame,expected){
+ const layouts=await frame.evaluate(()=>{
+  const d=window.__pageServices.wasm.borrowDocumentHandle(),active=d.canvasMetricsActive();
+  const pages=()=>Array.from({length:d.pageCount()},(_,i)=>JSON.parse(d.getPageControlLayout(i)).controls.filter(c=>c.type==='image').length);
+  try{
+   d.selectCanvasMetrics(true);
+   const screen=pages(),canvas=d.canvasMetricsActive();
+   d.selectCanvasMetrics(false);return {canvas,screen,portable:pages()};
+  }finally{d.selectCanvasMetrics(active);}
+ });
+ assert.equal(layouts.canvas,true);
+ assert.deepEqual(layouts.screen,expected);assert.deepEqual(layouts.portable,expected);
+}
+
+export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,state,snap,execute,reopen,pictureFolder,multiplePictures,groupedPictures,splitPictures,pagedPictures}){
  const calls=[];
  const provider=http.createServer(async(req,res)=>{
   try{
@@ -80,14 +94,16 @@ export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,
   }
   for(const ext of ['hwp','hwpx']){
    if(pictureFolder){
-    const sourceKind=splitPictures?' with three pictures in two cell paragraphs':groupedPictures?' with three pictures in one cell':multiplePictures?' with four products':'';
+    const sourceKind=pagedPictures?' with a merged photo cell moving between pages':splitPictures?' with three pictures in two cell paragraphs':groupedPictures?' with three pictures in one cell':multiplePictures?' with four products':'';
     await scenario(ext+' Agent picture owner row insertion and deletion refusal through chat'+sourceKind,async()=>{
      const source=new HwpDocument(await readFile(resolve(pictureFolder,'before.'+ext)));
      const frame=await open(ext,source),before=(await snap()).structure;
+     if(pagedPictures)await checkPicturePages(frame,[3,1]);
      const originals=before.tables[0].cells.filter(c=>c.axisPicture);assert.equal(originals.length,groupedPictures?2:multiplePictures?4:1);
      const request=splitPictures?splitRequest:groupedPictures?groupedRequest:multiplePictures?picturesRequest:pictureRequest;
      assert.equal(await send(request),'');
      const after=(await snap()).structure;
+     if(pagedPictures)await checkPicturePages(frame,[0,4]);
      for(const original of originals){
       const moved=after.tables[0].cells.find(c=>c.text===original.text);
       assert.equal(moved.row,original.row+(original.row>=1?1:0));assert.equal(moved.column,original.column);
@@ -102,6 +118,7 @@ export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,
      await execute('edit:undo');assert.deepEqual((await snap()).structure,before);
      await execute('edit:redo');assert.deepEqual((await snap()).structure,after);
      await reopen(frame,'picture-axis-'+ext,ext);assert.deepEqual((await snap()).structure,after);
+     if(pagedPictures)await checkPicturePages(frame,[0,4]);
      const saved=await state();assert.match(await send(groupedPictures?removeGrouped:multiplePictures?removePictures:removePicture),/그림/);assert.deepEqual(await state(),saved);
     });
     continue;

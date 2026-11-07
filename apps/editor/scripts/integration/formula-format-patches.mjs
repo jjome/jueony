@@ -105,4 +105,73 @@ export function patchFormulaFormat(source) {
 export async function applyFormulaFormatPatches({ root }) {
   const file = join(root, 'src/ui/formula-dialog.ts');
   await writeFile(file, patchFormulaFormat(await readFile(file, 'utf8')));
+  const inputFile = join(root, 'src/engine/input-handler.ts');
+  const textFile = join(root, 'src/engine/input-handler-text.ts');
+  const modify = (source, before, after) => {
+    if (source.split(before).length !== 2) throw new Error('Formula input integration drift');
+    return source.replace(before, after);
+  };
+  const imports = "import { formulaInputTarget, refreshFormulaInput, sameInputCell } from '../jueony/adapters/rhwp/table-formula-input.ts';\n";
+  let handler = imports + (await readFile(inputFile, 'utf8')).replace(/\r\n/g, '\n');
+  const gate = '    if (!this.isOperationAllowedInEditMode(desc)) return;';
+  handler = modify(handler, gate, gate + `
+    if (desc.kind === 'command' && ['insertText','deleteText','deleteSelection'].includes(desc.command.type)) {
+      const cmd = desc.command;
+      const before = this.cursor.getPosition();
+      try {
+        const input = formulaInputTarget(this.wasm, before);
+        if (input) {
+          const selection = cmd.selectionBefore?.() as {start: DocumentPosition; end: DocumentPosition; blockPhase:number|null} | undefined;
+          if (selection && !sameInputCell(selection.start, selection.end)) throw Error('계산식 참조 셀은 한 번에 한 셀씩 수정하세요.');
+          desc = {kind:'snapshot',operationType:'tableFormulaInput',selectionBefore:selection,
+            operation: wasm => {
+              try {
+                const after = cmd.execute(wasm);
+                refreshFormulaInput(wasm, input);
+                if (cmd.type === 'insertText') this.advancePendingCharShapeAnchor(before, after);
+                return after;
+              } finally { cmd.discard?.(wasm); }
+            }};
+        }
+      } catch (error) { alert(String(error)); return; }
+    }`);
+  handler = modify(handler, '        const newPos = this.history.execute(cmd, this.wasm);', `        let newPos: DocumentPosition;
+        try { newPos = this.history.execute(cmd, this.wasm); }
+        catch (error) {
+          if (desc.operationType !== 'tableFormulaInput') throw error;
+          alert(String(error));
+          return;
+        }`);
+  await writeFile(inputFile, handler);
+
+  let body = imports + (await readFile(textFile, 'utf8')).replace(/\r\n/g, '\n');
+  const selected = '  const hadSelection = this.cursor.hasSelection();';
+  body = modify(body, selected, selected + `
+  // Replace a selected number in one transaction, without evaluating an intermediate empty cell.
+  if (hadSelection) {
+    const selected = this.cursor.getSelectionOrdered();
+    try {
+      const input = selected && formulaInputTarget(this.wasm, selected.start);
+      if (input) {
+        if (!sameInputCell(selected.start, selected.end)) throw Error('계산식 참조 셀은 한 번에 한 셀씩 수정하세요.');
+        if (this.editMode === 'form' || !this.canDeleteSelectionInFormMode() || !this.canInsertTextInFormMode(selected.start)) return;
+        const {start,end} = selected, format = this.getPendingCharShape?.();
+        this.executeOperation({kind:'snapshot',operationType:'tableFormulaInput',
+          selectionBefore:{start,end,blockPhase:this.cursor.blockSelectionPhase()},
+          operation:(wasm: any) => {
+            const remove = new DeleteTextCommand(start, end.charOffset-start.charOffset, 'forward');
+            const insert = new InsertTextCommand(start, text, undefined, format);
+            try {
+              remove.execute(wasm);
+              const after = insert.execute(wasm);
+              refreshFormulaInput(wasm,input);
+              this.cursor.clearSelection();
+              return after;
+            } finally { remove.discard(wasm); insert.discard(wasm); }
+          }});
+        return;
+      }
+    } catch (error) { alert(String(error)); return; }
+  }`);
+  await writeFile(textFile, body);
 }

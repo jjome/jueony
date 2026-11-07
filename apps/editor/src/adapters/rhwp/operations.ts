@@ -1,4 +1,5 @@
 import {assertNativeTableNoCellZones} from './table-write-guard.ts';
+import {formulaInputTarget,refreshFormulaInput} from './table-formula-input.ts';
 import {mergedAxisProof} from './merged-axis-evidence.ts';
 import {verifyPreservedExport} from './preservation.ts';
 import {executeRowHeights} from './row-heights.ts';
@@ -164,7 +165,9 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
     const length = doc.getCellParagraphLength(...base, cell.index, 0);
     if (doc.getTextInCell(...base, cell.index, 0, 0, length) !== op.originalText) fail('적용 직전 셀 원문이 달라졌습니다.');
     const protectedBefore=protectedTableEvidence(doc,table);
+    const input = formulaInputTarget(doc, {sectionIndex:table.section,parentParaIndex:table.paragraph,controlIndex:table.control,cellIndex:cell.index});
     replaceCellText(doc,base,cell.index,op.text);
+    if (input) refreshFormulaInput(doc,input);
     assertProtectedTableUnchanged(doc,table,protectedBefore);
     if (doc.getTextInCell(...base, cell.index, 0, 0, doc.getCellParagraphLength(...base, cell.index, 0)) !== op.text) fail('셀 편집 결과가 다릅니다.');
     cell.text = op.text;

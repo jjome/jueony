@@ -17,7 +17,7 @@
 | [파일·저장·복구·형식 보존](<docs/features/05-files-storage-recovery.md>) | 0/10 | 24/25 · 부분 1 | 22/25 · 부분 3 | 🟢 **6/6** | 구현 [N046](<docs/features/05-files-storage-recovery.md#n046>) HWPX 문단 textDir의 HWP5 형식 보존 |
 | [본문 편집·입력·선택·찾기](<docs/features/06-editing-and-selection.md>) | 0/20 | 🟢 **15/15** | 0/15 · 부분 15 | 🟢 **4/4** | 검증 [A001](<docs/features/06-editing-and-selection.md#a001>) 새 본문 문서 작성 |
 | [글자·문단·스타일·번호](<docs/features/07-formatting-and-styles.md>) | 0/18 | 21/25 · 부분 2 | 0/25 · 부분 21 | 13/16 | 구현 [N011](<docs/features/07-formatting-and-styles.md#n011>) 스타일 가져오기·내보내기 |
-| [표·셀·크기·계산](<docs/features/08-tables.md>) | 0/24 | 35/41 · 부분 3 | 3/41 · 부분 35 | 26/33 · 부분 3 | 구현 [N004](<docs/features/08-tables.md#n004>) 기존 병합 원본의 후속 Agent 셀 편집 |
+| [표·셀·크기·계산](<docs/features/08-tables.md>) | 0/24 | 35/41 · 부분 6 | 3/41 · 부분 38 | 26/33 · 부분 6 | 구현 [N004](<docs/features/08-tables.md#n004>) 기존 병합 원본의 후속 Agent 셀 편집 |
 | [쪽·구역·용지·배경](<docs/features/09-pages-and-sections.md>) | 0/18 | 🟢 **23/23** | 0/23 · 부분 23 | 12/17 · 부분 5 | Agent 연결 [G053](<docs/features/09-pages-and-sections.md#g053>) 수동 쪽 테두리의 적용 범위/포함 정책 |
 | [머리말·각주·필드·책갈피](<docs/features/10-headers-notes-fields.md>) | 0/11 | 🟢 **9/9** | 0/9 · 부분 9 | 🟢 **8/8** | 검증 [A018](<docs/features/10-headers-notes-fields.md#a018>) 본문 점 책갈피 추가 |
 | [그림·도형·글상자·수식·개체](<docs/features/11-objects.md>) | 0/18 | 🟢 **1/1** | 0/1 · 부분 1 | 해당 없음 | 검증 [G022](<docs/features/11-objects.md#g022>) 선택 개체 속성 키 경로 |

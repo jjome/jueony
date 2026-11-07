@@ -113,7 +113,7 @@ test('요청 내 새 표 참조와 연속 행열 편집, 복잡한 셀과 마지
   assert.throws(()=>validate([{kind:'delete_table_row',target:table.id,index:0},{kind:'delete_table_row',target:table.id,index:0}]),/마지막/);
   assert.throws(()=>validate([{kind:'insert_table_column',target:table.id,index:3,values:['a','b']}]),/범위/);
   const merged=structuredClone(current);merged.structure!.tables[0].cells[0].rowSpan=2;
-  assert.throws(()=>validate([{kind:'delete_table_row',target:table.id,index:0}],merged),/단순 표/);
+  assert.throws(()=>validate([{kind:'delete_table_row',target:table.id,index:0}],merged),/셀 범위가 겹칩니다/);
  }finally{doc.free();}
 });
 

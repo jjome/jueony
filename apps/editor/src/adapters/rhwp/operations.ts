@@ -93,12 +93,12 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
     const base=[table.section,table.paragraph,table.control],size=row?table.rows:table.columns;
     const read=()=>readStructure(doc).tables.find(t=>t.section===table.section&&t.paragraph===table.paragraph&&t.control===table.control);
     const live=read();
-    const merged=(t:Table)=>t.cells.some(c=>c.rowSpan>1||c.columnSpan>1);
+    const needsAxisProof=(t:Table)=>t.cells.some(c=>c.rowSpan>1||c.columnSpan>1||c.axisFieldSignature||c.properties.fieldName);
     if(!live)throw new Error('대상 표가 없어졌습니다.');
-    const checkMerged=merged(table)||merged(live);
-    if(checkMerged&&JSON.stringify(table.cells)!==JSON.stringify(live.cells))throw new Error('표의 병합 범위나 셀 내용이 바뀌었습니다. 다시 요청하세요.');
-    const proof=checkMerged?mergedAxisProof(doc,live,row,insert,axis.index,'values' in axis?axis.values:[]):undefined;
-    const formulas=checkMerged?prepareAxisFormulaUpdates(doc,live,expected):undefined;
+    const checkAxis=needsAxisProof(table)||needsAxisProof(live);
+    if(checkAxis&&JSON.stringify(table.cells)!==JSON.stringify(live.cells))throw new Error('표의 병합 범위나 셀 내용이 바뀌었습니다. 다시 요청하세요.');
+    const proof=checkAxis?mergedAxisProof(doc,live,row,insert,axis.index,'values' in axis?axis.values:[]):undefined;
+    const formulas=checkAxis?prepareAxisFormulaUpdates(doc,live,expected):undefined;
     const undo=proof?doc.saveSnapshot():undefined;
     try {
       const method = {insert_table_row:'insertTableRow', insert_table_column:'insertTableColumn',

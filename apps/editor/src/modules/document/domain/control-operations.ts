@@ -64,7 +64,9 @@ export function tableAxisPlan(table:Table,op:AxisOperation):Table {
  const row=op.kind.endsWith('_row'),insert=op.kind.startsWith('insert_');
  only(op,insert?['kind','target','index','values']:['kind','target','index']);
  const merged=table.cells.some(c=>c.rowSpan>1||c.columnSpan>1);
- if(table.cells.some(c=>!c.editable&&!(merged&&(c.axisContentSafe===true||c.axisFieldSignature||c.axisFormula))))fail('중첩 개체·필드 또는 보존 상태를 확인할 수 없는 셀이 있는 표입니다.');
+ if(table.cells.some(c=>!c.axisFieldSignature && (c.properties.fieldName ||
+    !c.editable && !(merged && (c.axisContentSafe===true || c.axisFormula)))))
+   fail('중첩 개체·필드 또는 보존 상태를 확인할 수 없는 셀이 있는 표입니다.');
  const size=row?table.rows:table.columns,other=row?table.columns:table.rows;
  integer(op.index,0,insert?size:size-1);
  if(!insert&&size===1)fail('표의 마지막 행 또는 열은 삭제할 수 없습니다.');
@@ -74,7 +76,7 @@ export function tableAxisPlan(table:Table,op:AxisOperation):Table {
  if(rows>50||columns>20||rows*columns>200)fail('행·열 편집 결과는 50행·20열·200셀 이내여야 합니다.');
  const projected=projectTableAxis(table,row,insert,op.index,values);
  projectAxisFormulas(table,projected,rows,columns,row,insert,op.index);
- if(merged && table.cells.some(c=>c.axisFieldSignature && !projected.some(v=>v.sourceIndex===c.index)))
+ if(table.cells.some(c=>c.axisFieldSignature && !projected.some(v=>v.sourceIndex===c.index)))
    fail('필드를 포함한 셀이 없어지는 행·열은 삭제할 수 없습니다.');
  const cells=projected.map(({cell})=>cell);
  return {...table,rows,columns,cells};

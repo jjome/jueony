@@ -143,6 +143,34 @@ try{
   assert.deepEqual(await fields(),originalFields);
   assert.equal((await snap()).cellParagraphSources[table.id].cells[0].paragraphs[1].text,revised);
  });
+ for(const format of ['hwp','hwpx'])await scenario(format+' click-here boundaries in two root tables through chat and editor reopen',async()=>{
+  const d=body(format,true),local=[0,1,0,0,0],remote=[0,2,0,0,0];
+  d.mergeTableCells(0,2,0,0,0,0,1);d.insertTextInCell(...remote,0,'둘째 표 원문');
+  d.insertClickHereFieldInCell(...local,1,false,'대상 안내','','대상',true);
+  const field=JSON.parse(d.insertClickHereFieldInCell(...remote,1,false,'다른 안내','','다른 표',true));
+  assert.equal(JSON.parse(d.setFieldValue(field.fieldId,'값😀칸')).ok,true);
+  const f=await open(format,d),before=await snap(),[first,second]=before.structure.tables;
+  const fields=()=>f.evaluate(()=>JSON.parse(window.__pageServices.wasm.borrowDocumentHandle().getFieldList()));
+  const original=await fields();assert.equal(original.length,2);
+  await send('first field-tail: 첫 표의 누름틀 뒤를 수정해 주세요.');
+  assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const caps=calls.at(-1).input.document.cellParagraphSources;
+  assert.equal(caps[first.id].cells[0].paragraphs[0].editableFrom,2);
+  assert.equal(caps[second.id].cells[0].paragraphs[0].editableFrom,5);
+  const edited=await snap();assert.equal(edited.cellParagraphSources[first.id].cells[0].paragraphs[0].text,'업무수정😀');
+  assert.deepEqual(edited.structure.tables[1],second);
+  await undo();assert.deepEqual((await snap()).structure.tables,before.structure.tables);
+  await execute('edit:redo');const saved=await save(f,'two-table-click-here',format);
+  try{assert.deepEqual(JSON.parse(saved.getFieldList()),original);}finally{saved.free();}
+  await f.evaluate(async()=>{
+   const api=window.jueonyEditor,handle=api.fileHandle(),file=await handle.getFile();
+   await api.open(new Uint8Array(await file.arrayBuffer()),file.name,handle,false);
+  });
+  const reopened=await snap();
+  assert.equal(reopened.cellParagraphSources[first.id].cells[0].paragraphs[0].text,'업무수정😀');
+  assert.deepEqual(reopened.cellParagraphSources[second.id].cells[0].paragraphs[0],{index:0,text:'둘값😀칸째 표 원문',editableFrom:5});
+  assert.deepEqual(await fields(),original);
+ });
  for(const format of ['hwp','hwpx'])for(const mode of ['split-owner','field-tail','two-field-tail'])await scenario(format+' '+mode+' through chat, undo/redo and bound file reopen',async()=>{
   const split=mode==='split-owner',d=split?fragmentedMergedCell(HwpDocument):body(format);
   if(mode==='two-field-tail'){

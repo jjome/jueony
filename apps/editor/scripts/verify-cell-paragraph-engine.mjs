@@ -16,6 +16,24 @@ const snap=(d,name='candidate.hwpx')=>{const structure=readStructure(d);return {
 function transactionalCandidate(d,s,ops,revision){if(revision!==s.revision)throw Error('Stale revision');const token=d.saveSnapshot();try{validateEditOperations(ops,s);return executeDocumentOperations(d,s,ops);}catch(e){d.restoreSnapshot(token);throw e;}finally{d.discardSnapshot(token);}}
 function resources(bytes){const b=Buffer.from(bytes),map={};let at=0;while(at+30<b.length&&b.readUInt32LE(at)===0x04034b50){const flags=b.readUInt16LE(at+6),method=b.readUInt16LE(at+8),size=b.readUInt32LE(at+18),nameLen=b.readUInt16LE(at+26),extra=b.readUInt16LE(at+28),name=b.subarray(at+30,at+30+nameLen).toString('utf8'),start=at+30+nameLen+extra;assert.equal(flags&8,0);if(name==='Contents/header.xml'||name.startsWith('BinData/'))map[name]=(method===0?b.subarray(start,start+size):inflateRawSync(b.subarray(start,start+size))).toString('base64');at=start+size;}assert.ok(map['Contents/header.xml']);return map;}
 const command=(s,p=1,text='New merged paragraph 😀')=>({kind:'replace_cell_paragraph',target:s.structure.tables[0].id,row:0,column:0,paragraph:p,originalText:s.cellParagraphSources[s.structure.tables[0].id]?.cells?.[0].paragraphs[p].text,text});
+for (const format of ['hwp','hwpx']) await scenario(format+' multi-run merged paragraph preserves every original style across edit, undo, redo and reopen',()=>{
+ const template=fixture(),exportDoc=doc=>format==='hwp'?doc.exportHwp():doc.exportHwpx();
+ template.applyCharFormatInCell(0,1,0,0,1,1,4,'{"italic":true}');
+ const doc=new HwpDocument(exportDoc(template));template.free();
+ const name='runs.'+format,args=[0,1,0,0,1],styles=(d,positions)=>positions.map(n=>json(d.getCellCharPropertiesAt(...args,n)));
+ try {
+  const base=snap(doc,name),original=exportDoc(doc),old=styles(doc,[0,1,4]),undo=doc.saveSnapshot();
+  const parts=['앞😀','가운데','뒤'],text=parts.join('');
+  transactionalCandidate(doc,base,[{...command(base,1,text),spanTexts:parts}],'r1');
+  const bytes=exportDoc(doc),reopened=new HwpDocument(bytes);
+  try {assert.equal(reopened.getTextInCell(...args,0,6),text);assert.deepEqual(styles(reopened,[0,2,5]),old);}
+  finally {reopened.free();}
+  const redo=doc.saveSnapshot();
+  doc.restoreSnapshot(undo);assert.deepEqual(exportDoc(doc),original);
+  doc.restoreSnapshot(redo);assert.deepEqual(exportDoc(doc),bytes);
+  doc.discardSnapshot(undo);doc.discardSnapshot(redo);
+ } finally {doc.free();}
+});
 await scenario('mixed merged paragraph preserves surrounding raw styles, Unicode offsets, definitions and persisted text',()=>{
  const initial=fixture();
  initial.applyCharFormatInCell(0,1,0,0,1,1,4,'{"italic":true}');

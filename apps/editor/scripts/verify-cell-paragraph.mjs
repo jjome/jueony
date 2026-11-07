@@ -26,6 +26,10 @@ const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const
  const fallback=input.document.structure.tables[0]?.cells?.[0]?.text?.split('\n')[paragraph]??'';
  const operations=[{kind:'replace_cell_paragraph',target,row:cell?.row??0,column:cell?.column??0,paragraph,originalText:cell?.paragraphs?.[paragraph]?.text??fallback,text:'Agent revised paragraph 😀'}];
  if(input.instruction.includes('mixed-tail'))operations[0].text=operations[0].originalText.slice(0,-1)+'개정😀';
+ if(input.instruction.includes('mixed-spans')){
+  operations[0].spanTexts=['변경😀 ','공문'];
+  operations[0].text=operations[0].spanTexts.join('');
+ }
  if(input.instruction.includes('absorbed'))operations[0].column=1;
  if(input.instruction.includes('alias'))operations[0].kind='set_cell_paragraph';
  if(input.instruction.includes('overflow'))operations[0].paragraph=99;
@@ -77,7 +81,20 @@ try{
   try{assert.equal(x.getTextInCell(0,1,0,0,1,0,6),'업무 개정😀');assert.equal(JSON.parse(x.getCellCharPropertiesAt(0,1,0,0,1,2)).italic,false);assert.equal(JSON.parse(x.getCellCharPropertiesAt(0,1,0,0,1,5)).italic,true);}
   finally{x.free();}
  });
- await scenario('HWP, protection, lock, cross-style replacement, field and bookmark remain readonly',async()=>{for(const mode of ['hwp','protect','locked','mixed','field','bookmark','zone']){const d=body();if(mode==='protect')d.setCellProperties(0,1,0,1,'{"cellProtect":true}');if(mode==='locked')d.setControlLock(1,0,true);if(mode==='zone')d.setCellZoneProperties(0,1,0,0,0,1,1,JSON.stringify({background:'#aabbcc'}));if(mode==='mixed')d.applyCharFormatInCell(0,1,0,0,1,0,1,'{"italic":true}');if(mode==='field')d.insertClickHereField(0,0,0,'field','','input',true);if(mode==='bookmark')d.addBookmark(0,0,0,'mark');await open(mode==='hwp'?'hwp':'hwpx',d);const before=await state();await send('paragraph revision');assert.equal(await page.$eval('#request-error',e=>e.hidden),false,mode);assert.deepEqual(await state(),before);}});
+ for(const format of ['hwp','hwpx']) await scenario(format+' mixed paragraph explicit style spans through chat, undo, redo and saved reopen',async()=>{
+  const d=body();d.applyCharFormatInCell(0,1,0,0,1,3,4,'{"italic":true}');
+  const f=await open(format,d),before=await snap(),target=before.structure.tables[0].id;
+  assert.equal(before.cellParagraphSources[target].editable,true);
+  await send('mixed-spans');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  assert.equal((await snap()).cellParagraphSources[target].cells[0].paragraphs[1].text,'변경😀 공문');
+  await undo();assert.deepEqual((await snap()).structure.tables,before.structure.tables);
+  await execute('edit:redo');const reopened=await save(f,'mixed-spans',format);
+  try{assert.equal(reopened.getTextInCell(0,1,0,0,1,0,6),'변경😀 공문');
+   assert.equal(JSON.parse(reopened.getCellCharPropertiesAt(0,1,0,0,1,1)).italic,false);
+   assert.equal(JSON.parse(reopened.getCellCharPropertiesAt(0,1,0,0,1,5)).italic,true);
+  }finally{reopened.free();}
+ });
+ await scenario('protection, lock, ambiguous cross-style replacement, field and bookmark remain readonly',async()=>{for(const mode of ['protect','locked','mixed','field','bookmark','zone']){const d=body();if(mode==='protect')d.setCellProperties(0,1,0,1,'{"cellProtect":true}');if(mode==='locked')d.setControlLock(1,0,true);if(mode==='zone')d.setCellZoneProperties(0,1,0,0,0,1,1,JSON.stringify({background:'#aabbcc'}));if(mode==='mixed')d.applyCharFormatInCell(0,1,0,0,1,0,1,'{"italic":true}');if(mode==='field')d.insertClickHereField(0,0,0,'field','','input',true);if(mode==='bookmark')d.addBookmark(0,0,0,'mark');await open('hwpx',d);const before=await state();await send('paragraph revision');assert.equal(await page.$eval('#request-error',e=>e.hidden),false,mode);assert.deepEqual(await state(),before);}});
  await scenario('actual live fault restores bytes/history/dirty/cursor without an extra undo entry',async()=>{for(const mode of ['throw','neighbor','resource','raw-id']){
   const d=body('hwpx',true);d.insertTextInCell(0,2,0,0,0,0,'원본');const f=await open('hwpx',d),before=await state(),op=paragraphOp(await snap()),position=await f.evaluate(()=>window.__pageServices.getInputHandler().getCursorPosition());
   await f.evaluate(mode=>{const d=window.__pageServices.wasm.borrowDocumentHandle(),insert=d.insertTextInCell.bind(d),shape=d.setCharShapeIdInCell.bind(d),chars=d.getCellCharPropertiesAt.bind(d);let armed=false;

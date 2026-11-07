@@ -11,5 +11,14 @@ test('existing set_table_cell does not gain merged or multiparagraph support',()
 test('empty replacement is an empty paragraph, while a no-op refuses',()=>{assert.equal(cellParagraphPlan({...op,text:''},base()).paragraph.text,op.originalText);assert.throws(()=>cellParagraphPlan({...op,text:op.originalText},base()));});
 test('unknown paragraph fields and malformed numeric/text args refuse',()=>{for(const change of [{force:true},{properties:{}},{paragraph:-1},{paragraph:0.5},{paragraph:'1'},{text:'x\nnext'},{text:'x\tbad'},{text:'x'.repeat(4001)},{text:null},{row:NaN},{column:Infinity}])assert.throws(()=>cellParagraphPlan({...op,...change},base()));});
 test('unmerged and absorbed coordinates, aliases and incorrect original text refuse',()=>{for(const change of [{row:1,column:0},{column:1},{paragraph:999},{originalText:'incorrect'},{target:'@new'},{kind:'set_cell_paragraph'}])assert.throws(()=>cellParagraphPlan({...op,...change},base()));});
-test('HWP, unread/forged caps and protection refuse',()=>{for(const change of [(s:any)=>s.name='merged.hwp',(s:any)=>delete s.cellParagraphSources,(s:any)=>s.cellParagraphSources[op.target].editable=false,(s:any)=>s.cellParagraphSources[op.target].fingerprint='wrong',(s:any)=>s.structure.tables[0].editable=false,(s:any)=>s.structure.tables[0].cells[0].properties.cellProtect=true,(s:any)=>s.cellParagraphSources[op.target].cells[0].index=1]){const s=base();change(s);assert.throws(()=>cellParagraphPlan(op,s));}});
+test('unknown formats, unread/forged caps and protection refuse',()=>{for(const change of [(s:any)=>s.name='merged.docx',(s:any)=>delete s.cellParagraphSources,(s:any)=>s.cellParagraphSources[op.target].editable=false,(s:any)=>s.cellParagraphSources[op.target].fingerprint='wrong',(s:any)=>s.structure.tables[0].editable=false,(s:any)=>s.structure.tables[0].cells[0].properties.cellProtect=true,(s:any)=>s.cellParagraphSources[op.target].cells[0].index=1]){const s=base();change(s);assert.throws(()=>cellParagraphPlan(op,s));}});
 test('single-operation and macro restrictions remain explicit',()=>{assert.throws(()=>validateEditOperations([op,op],base()),/단독/);assert.throws(()=>captureTemplate('병합 셀',[op]));});
+
+test('explicit run replacements keep Unicode boundaries and reject missing, empty or extra runs',()=>{
+ const s=base(),p=s.cellParagraphSources[op.target].cells[0].paragraphs[1];
+ p.formatSpans=[{start:0,end:2},{start:2,end:Array.from(op.originalText).length}];
+ const change={...op,spanTexts:['계획😀 ','수정'],text:'계획😀 수정'};
+ assert.equal(cellParagraphPlan(change,s).edits.length,2);
+ for(const spanTexts of [['','계획😀 수정'],['계획😀 수정'],['계획😀 ','수정','extra'],['계획','수정']])
+  assert.throws(()=>cellParagraphPlan({...change,spanTexts},s));
+});

@@ -34,7 +34,7 @@ function readPrivateSources(d:any,tables:Table[],name:string){
  for(const t of tables){
   let source:any={editable:false,reason:'Plain merged cell paragraph only; HWPX root table, one page, no protected/complex source.'};
   try{
-   if(!/\.hwpx$/iu.test(name)||t.rows*t.columns>200||!t.cells.some(c=>c.rowSpan*c.columnSpan>1)||t.editable!==true)throw Error();
+   if(!/\.hwpx?$/iu.test(name)||d.getSourceFormat()!==(/\.hwp$/iu.test(name)?'hwp':'hwpx')||t.rows*t.columns>200||!t.cells.some(c=>c.rowSpan*c.columnSpan>1)||t.editable!==true)throw Error();
    assertNativeTableWritable(d,t);
    const controls=parsed(d.getControls()),lists=parsed(d.getCursorModel()).lists;
    if(parsed(d.getFieldList()).length||parsed(d.getBookmarks()).length||controls.some((c:any)=>c.list!==0||!['tbl','secd','cold'].includes(c.ctrlId))||lists.some((l:any)=>!l.isCell||l.hostListId!==0))throw Error();
@@ -63,7 +63,7 @@ function readPrivateSources(d:any,tables:Table[],name:string){
 export function readCellParagraphSources(wasm:any,tables:Table[],name:string):Record<string,AgentCellParagraphSource>|undefined {
  const d=nativeDocument(wasm);if(typeof d.setCharShapeIdInCell!=='function'||typeof d.exportHwpx!=='function')return;
  const privateSources=readPrivateSources(d,tables,name).sources;
- return Object.fromEntries(tables.map(t=>{const source=privateSources[t.id];return [t.id,source?.editable===true?{editable:true,fingerprint:source.fingerprint,cells:source.cells.map((c:any)=>({index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs:c.paragraphs.map((p:any)=>({index:p.index,text:p.text,...(p.runs.length>1?{formatSpans:p.runs.map((r:any)=>({start:r.startOffset,end:r.endOffset}))}:{})}))}))}:{editable:false,reason:'AI 병합 셀 문단 교체는 HWPX 한 쪽 평면 비보호 표의 단순 문단만 지원합니다. 필드·개체·책갈피·중첩·복합 배치와 쪽을 나누는 긴 결과는 제외합니다. 혼합 서식은 한 서식 범위 안에서 위치가 명확한 수정만 가능합니다.'}];}));
+ return Object.fromEntries(tables.map(t=>{const source=privateSources[t.id];return [t.id,source?.editable===true?{editable:true,fingerprint:source.fingerprint,cells:source.cells.map((c:any)=>({index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs:c.paragraphs.map((p:any)=>({index:p.index,text:p.text,...(p.runs.length>1?{formatSpans:p.runs.map((r:any)=>({start:r.startOffset,end:r.endOffset}))}:{})}))}))}:{editable:false,reason:'AI 병합 셀 문단 교체는 HWP/HWPX 한 쪽 평면 비보호 표의 단순 문단만 지원합니다. 필드·개체·책갈피·중첩·복합 배치와 쪽을 나누는 긴 결과는 제외합니다. 혼합 서식의 여러 구간을 수정하려면 구간별 교체문을 지정하세요.'}];}));
 }
 /** Export bytes use portable metrics. Compare their layout with the same
  * temporary metric selection and restore the screen environment synchronously.
@@ -79,8 +79,8 @@ export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellPar
  const after=capturePreservationEvidence(d);if(after.issues.length||!same(topologySemantics(after.values),proof.expected)||!same(rootBodyTexts(d),proof.body)||!same(tableTextTree(readStructure(d).tables),proof.text)||resourceFingerprint(d.exportHwpx())!==proof.resources)throw new Error('병합 셀 문단 결과 또는 다른 문서 내용·자원이 변경되었습니다.');
  const source=readPrivateSources(d,[proof.table],base.name).sources[op.target];if(source?.editable!==true)throw new Error('교체 후 병합 셀 문단을 검증하지 못했습니다.');
  for(const cell of source.cells)for(const para of cell.paragraphs){const old=proof.cells.find((c:any)=>c.index===cell.index)?.paragraphs[para.index];if(!old||!same(para.characters,old.characters)||!same(para.paragraph,old.paragraph)||!same(para.style,old.style)||!same(para.runs,cell.index===proof.cellIndex&&para.index===op.paragraph?proof.runs:old.runs))throw new Error('선택 또는 다른 셀 문단의 원래 서식이 달라졌습니다.');}
- portableLayout(d,()=>{const artifact=d.exportHwpxWithReport();let reopened:any;
- try{const loss=JSON.parse(artifact.contentLoss()),bytes=artifact.takeBytes();verifyPreservedExport(d,bytes,'hwpx',loss,b=>new d.constructor(b));reopened=new d.constructor(bytes);if(!sameTableLayout(tableLayoutEvidence(d,proof.table),tableLayoutEvidence(reopened,proof.table)))throw new Error('셀 문단 교체 후 실제 저장 재열기 배치가 다릅니다.');}finally{reopened?.free();artifact.free();}});
+ portableLayout(d,()=>{const format=/\.hwp$/iu.test(base.name)?'hwp':'hwpx';const artifact=format==='hwp'?d.exportHwpWithReport():d.exportHwpxWithReport();let reopened:any;
+ try{const loss=JSON.parse(artifact.contentLoss()),bytes=artifact.takeBytes();verifyPreservedExport(d,bytes,format,loss,b=>new d.constructor(b));reopened=new d.constructor(bytes);if(!sameTableLayout(tableLayoutEvidence(d,proof.table),tableLayoutEvidence(reopened,proof.table)))throw new Error('셀 문단 교체 후 실제 저장 재열기 배치가 다릅니다.');}finally{reopened?.free();artifact.free();}});
 }
 export function executeCellParagraph(wasm:any,base:Snapshot,op:AgentCellParagraphOp){
  const d=nativeDocument(wasm);pending.delete(d);const plan=cellParagraphPlan(op,base),t=plan.table,structure=readStructure(d),cap=readCellParagraphSources(d,structure.tables,base.name)?.[t.id];
@@ -88,16 +88,26 @@ export function executeCellParagraph(wasm:any,base:Snapshot,op:AgentCellParagrap
  assertNativeTableWritable(d,t);const source=readPrivateSources(d,[t],base.name).sources[t.id],c=source.cells.find((c:any)=>c.index===plan.cell.index),p=c.paragraphs[op.paragraph];
  const before=capturePreservationEvidence(d);if(before.issues.length)throw new Error('셀 문단 교체 전 전체 보존 정보를 읽지 못했습니다.');const expected=topologySemantics(before.values),target=expected.cells.find((c:any)=>c.list.hostListId===0&&c.list.sectionIndex===t.section&&c.list.hostPara===t.paragraph&&c.list.controlIndex===t.control&&c.list.cellIndex===plan.cell.index);
  if(!target)throw new Error('원래 셀 문단의 보존 정보가 없습니다.');
- const splice=plan.splice,inserted=Array.from(splice.insert).length,delta=inserted-splice.remove;
- const mixed=p.runs.length>1,shape=mixed?p.runs[splice.run].charShapeId:p.characters.charShapeId;
- const runs=mixed?p.runs.map((r:any,i:number)=>({...r,startOffset:r.startOffset+(i>splice.run?delta:0),endOffset:r.endOffset+(i>=splice.run?delta:0)})):
-   op.text?[{startOffset:0,endOffset:inserted,charShapeId:shape}]:[];
+ const mixed=p.runs.length>1,edits=plan.edits;
+ let offset=0;
+ const runs=mixed?p.runs.map((r:any,i:number)=>{
+   const edit=edits.find(e=>e.run===i),startOffset=offset;
+   offset+=r.endOffset-r.startOffset+(edit?Array.from(edit.insert).length-edit.remove:0);
+   return {...r,startOffset,endOffset:offset};
+ }):op.text?[{startOffset:0,endOffset:Array.from(op.text).length,charShapeId:p.characters.charShapeId}]:[];
  const paraEvidence=target.paragraphs[op.paragraph];
  paraEvidence.runs=runs.map((r:any,i:number)=>({start:r.startOffset,end:r.endOffset,properties:mixed?paraEvidence.runs[i].properties:normalize(p.characters)}));
  const text=tableTextTree(structure.tables).map(table=>table.id===t.id?{...table,cells:table.cells.map(cell=>cell.index===c.index?{...cell,text:c.paragraphs.map((p:any)=>p.index===op.paragraph?op.text:p.text).join('\n')}:cell)}:table);
  const proof={revision:base.revision,operation:structuredClone(op),table:t,expected,runs,body:rootBodyTexts(d),text,resources:resourceFingerprint(d.exportHwpx()),cells:source.cells,cellIndex:c.index},args=[t.section,t.paragraph,t.control,c.index,op.paragraph];
- if(splice.remove)checked(d.deleteTextInCell(...args,splice.start,splice.remove));
- if(splice.insert){checked(d.insertTextInCell(...args,splice.start,splice.insert));checked(d.setCharShapeIdInCell(...args,splice.start,splice.start+inserted,shape));}
+ // Edit right to left so offsets always refer to the queried source.
+ for(const edit of [...edits].reverse()){
+  const shape=mixed?p.runs[edit.run].charShapeId:p.characters.charShapeId;
+  if(edit.remove)checked(d.deleteTextInCell(...args,edit.start,edit.remove));
+  if(edit.insert){
+   checked(d.insertTextInCell(...args,edit.start,edit.insert));
+   checked(d.setCharShapeIdInCell(...args,edit.start,edit.start+Array.from(edit.insert).length,shape));
+  }
+ }
  pending.set(d,proof);assertCellParagraphResult(d,base,op);
  return {sectionIndex:t.section,parentParaIndex:t.paragraph,paragraphIndex:op.paragraph,charOffset:0,controlIndex:t.control,cellIndex:c.index,cellParaIndex:op.paragraph,cellPath:[{controlIndex:t.control,cellIndex:c.index,cellParaIndex:op.paragraph}]};
 }

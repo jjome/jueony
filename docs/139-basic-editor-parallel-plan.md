@@ -80,3 +80,13 @@
 진행표는 구현·검증·Agent 연결을 독립 집계하고, 부분 항목을 완료 수에서 제외한다. N046 문단 textDir의 HWP5 변환은 **구현 부분**으로 남는다. 파일 영역24/25를24/24로 숨기거나 상위 범위0/10을 완료로 올리지 않는다. 한글 직접 비교도 미실행 상태를 유지한다.
 
 사용자의 잔여 사용량15% 마감 지시에 따라 마지막 검증·기록·커밋 단위로 작업을 정리한다. 이번 결과는 기존 미커밋 변경을 제외한 격리 검수 빌드에서 확인했다. 사용 중인 앱·문서를 종료하거나 설치 실행본을 교체하지 않았다. 코드 반영과 실제 설치 실행본 갱신은 구분한다.
+
+### N046 대체 저장의 원본 보호와 문단 방향 근거
+
+명시 문단 방향이 있는 HWPX에서 HWP로 다른 이름 저장을 요청하고 대체 형식을 수락한 뒤, 선택 창에서 원본 HWPX를 다시 선택하면 수정 전에는 실제 원본 쓰기 스트림이 한 번 열렸다. 이제 같은 이름이면 `(글 방향 보존).hwpx` 사본명을 제안한다. 연결된 원본은 파일 핸들의 실제 동일성을 검사하고, 드래그 등으로 열어 원본 핸들이 없으면 원래 파일명과 같은 대상은 거절한다. 이름 지정 창이나 사본 선택 창이 열린 사이 문서가 바뀌어도 기록을 중단한다. 일반 HWPX 다른 이름 저장과 원본 저장은 기존 경로를 사용한다.
+
+합성 문서로 단위 검사 30개와 실엔진 Edge 시나리오 12개가 통과했다. 원본을 가리키는 다른 핸들, 핸들 없는 원본, 파일 선택 중 문서 교체에서 쓰기 횟수는 모두 0이었다. 세 방향의 HWPX 사본, 취소, 암호화 사본을 검사했다. [Edge 검증 스크립트](../apps/editor/scripts/verify-direction-save-as.mjs)
+
+한컴의 2025년 4월 오토메이션 파라미터 표 104~106쪽은 `ParaShape.TextDir`를 한 바이트 API 값으로 정의한다. 0은 자동, 1은 오른쪽에서 왼쪽, 2는 왼쪽에서 오른쪽이며 한/글 2022부터 지원한다. 이후 한글 직접 검수에서 세 조건을 지정할 수 있는 근거다. HWP5 공개 명세의 문단 모양 표 43~46에서는 이 값의 바이너리 위치를 확인할 수 없었다. [한컴 ParameterSetTable 2504](https://github.com/hancom-io/devcenter-archive/blob/main/hwp-automation/ParameterSetTable_2504.pdf) · [한컴 HWP 5.0 개정 1.3](https://cdn.hancom.com/link/docs/%ED%95%9C%EA%B8%80%EB%AC%B8%EC%84%9C%ED%8C%8C%EC%9D%BC%ED%98%95%EC%8B%9D_5.0_revision1.3.pdf)
+
+한컴의 공개 OWPML 모델에서 문단 모양의 XML 읽기·쓰기 속성을 확인했고, 독립 HWP→HWPX 변환기의 문단 속성 변환도 대조했다. 둘 다 문단 방향의 바이너리 대응을 제공하지 않는다. 해당 PC에 설치된 한컴 배포 폴더에서 HWP 55개, HWPX 0개를 확인해 여기서 직접 같은 원본의 형식별 대조 쌍을 얻을 수 없었다. 실제 한글을 조작하지 않았으며 N046의 HWP5 변환은 계속 부분 구현이다. [한컴 OWPML 문단 모양 구현](https://github.com/hancom-io/hwpx-owpml-model/blob/1453388472c703a4b299a0834f425cdac16644b9/OWPML/Class/Head/ParaShapeType.cpp) · [독립 변환기 문단 속성](https://github.com/neolord0/hwp2hwpx/blob/62d95b980a4e3a6766877dd3fb6f7f45f4afcf3d/src/main/java/kr/dogfoot/hwp2hwpx/header/ForParaProperties.java)

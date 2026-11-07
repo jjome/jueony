@@ -297,10 +297,30 @@ fileCommands = "import { confirmDownload } from '../../jueony/download-save';\n"
 fileCommands = "import { PreservationError, verifyPreservedExport } from '../../jueony/adapters/rhwp/preservation.ts';\n" + fileCommands;
 fileCommands = "import { acknowledgeDownloadedFile, readDownloadedFormat } from '../../jueony/adapters/files/download-connection.ts';\n" + fileCommands;
 fileCommands = "import { rememberSavedFormat, readSavedFormat } from '../../jueony/adapters/files/saved-format.ts';\n" + fileCommands;
+fileCommands = "import { directionCopyName, requireDistinctDirectionCopy } from '../../jueony/adapters/files/direction-save-copy.ts';\n" + fileCommands;
+fileCommands = replaceOnce(fileCommands,
+  '    const options = await promptSaveAsOptions(services, format);\n    if (options === null) return;',
+  `    const editor = (window as any).jueonyEditor;
+    const currentSource = () => ({
+      instance: editor?.documentInstance(), revision: editor?.revision(),
+      handle: services.wasm.currentFileHandle, name: services.wasm.fileName,
+    });
+    const requireSource = (expected: ReturnType<typeof currentSource>, requireActive = false) => {
+      const current = currentSource();
+      if (current.instance !== expected.instance || current.revision !== expected.revision
+          || current.handle !== expected.handle || current.name !== expected.name
+          || (requireActive && (editor?.hostMutationLocked() || window.frameElement?.closest('[hidden]')))) {
+        throw new Error('저장 대기 중 문서 또는 파일 연결이 바뀌었습니다. 다시 저장해 주세요.');
+      }
+    };
+    const requestedSource = currentSource();
+    const options = await promptSaveAsOptions(services, format);
+    if (options === null) return;
+    requireSource(requestedSource);`, 'save-as dialog document ownership');
 fileCommands = replaceOnce(fileCommands,
   '    const saveName = options.fileName;\n    const payload = createSavePayload(services, format, password ?? undefined);',
   `    let saveName = options.fileName;
-    const editor = (window as any).jueonyEditor;
+    let protectDirectionSource = false;
     const prepare = async (output: SaveFormat) => {
       await editor?.prepareFileSave?.(output);
       return createSavePayload(services, output, password ?? undefined);
@@ -311,21 +331,38 @@ fileCommands = replaceOnce(fileCommands,
     } catch (error) {
       if (format !== 'hwp' || !(error instanceof PreservationError)
           || error.report.alternativeFormat !== 'hwpx' || !editor) throw error;
-      const instance = editor.documentInstance(), revision = editor.revision();
-      const originalHandle = services.wasm.currentFileHandle, originalName = services.wasm.fileName;
-      const alternativeName = fileNameForFormat(saveName, 'hwpx');
+      const confirmationSource = currentSource();
+      const alternativeName = directionCopyName(fileNameForFormat(saveName, 'hwpx'), confirmationSource.name, confirmationSource.handle);
       const confirmed = await showConfirm('문단 글 방향 보존',
         '이 문서의 문단 글 방향을 HWP로 저장할 수 없습니다. 같은 설정으로 ' + alternativeName + ' 파일을 저장할까요?');
       if (!confirmed) return;
-      if (editor.documentInstance() !== instance || editor.revision() !== revision
-          || services.wasm.currentFileHandle !== originalHandle || services.wasm.fileName !== originalName
-          || editor.hostMutationLocked() || window.frameElement?.closest('[hidden]')) {
-        throw new Error('저장 대기 중 문서 또는 파일 연결이 바뀌었습니다. 다시 저장해 주세요.');
-      }
+      requireSource(confirmationSource, true);
+      protectDirectionSource = true;
       format = 'hwpx';
       saveName = alternativeName;
       payload = await prepare(format);
     }`, 'save-as live table frame transaction and checked HWPX alternative');
+fileCommands = replaceOnce(fileCommands, "  currentHandle: FileSystemFileHandleLike | null,\n): Promise<SaveDocumentResult | 'cancelled'>",
+  "  currentHandle: FileSystemFileHandleLike | null,\n  validateCopy?: (handle: FileSystemFileHandleLike) => Promise<void>,\n): Promise<SaveDocumentResult | 'cancelled'>", 'validate converted copy before writing');
+fileCommands = replaceOnce(fileCommands, '      windowLike: window as FileSystemWindowLike,',
+  `      windowLike: validateCopy && (window as FileSystemWindowLike).showSaveFilePicker ? {
+        showSaveFilePicker: async options => {
+          const handle = await (window as FileSystemWindowLike).showSaveFilePicker!(options);
+          await validateCopy(handle);
+          return handle;
+        },
+      } : window as FileSystemWindowLike,`, 'guard converted copy picker');
+fileCommands = replaceOnce(fileCommands,
+  "    const originalHandle = sourceFormat === 'hml' ? services.wasm.currentFileHandle : null;",
+  "    const preparedSource = currentSource();\n    const originalHandle = sourceFormat === 'hml' ? services.wasm.currentFileHandle : null;",
+  'capture converted copy owner');
+fileCommands = replaceOnce(fileCommands, '        originalHandle,\n      ),',
+  `        originalHandle,
+        protectDirectionSource ? async handle => {
+          await requireDistinctDirectionCopy(handle, preparedSource.name, preparedSource.handle);
+          requireSource(preparedSource, true);
+        } : undefined,
+      ),`, 'protect original file during direction fallback');
 fileCommands = replaceOnce(fileCommands,
   '    const payload = createSavePayload(services, target.format, password ?? undefined);',
   "    await (window as any).jueonyEditor?.prepareFileSave?.(target.format);\n    const payload = createSavePayload(services, target.format, password ?? undefined);", 'save live table frame transaction');

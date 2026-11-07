@@ -101,6 +101,17 @@ for(const format of ['hwp','hwpx'])await scenario(format+' editable suffix after
    const records=inspectPictureAnchors(sourceFile);
    assert.deepEqual(records.filter(r=>r.row===1&&r.col===1).map(r=>r.textOffset),anchors);
    assert.deepEqual(inspectPictureAnchors(savedFile),records);
+   const restyled=snap(saved,'서식.'+format),style={...op,originalText:op.text,spanFormats:[{start:4+shift,end:6+shift,color:'#246789'}]};
+   const prefixColor=json(saved.getCellCharPropertiesAt(...args,3+shift)).textColor;
+   assert.throws(()=>transactionalCandidate(saved,restyled,[{...style,spanFormats:[{start:3+shift,end:6+shift,color:'#246789'}]}],restyled.revision));
+   transactionalCandidate(saved,restyled,[style],restyled.revision);
+   const styledFile=resolve(out,'suffix-styled.'+format);await writeFile(styledFile,bytes(saved));
+   assert.deepEqual(inspectPictureAnchors(styledFile),records);
+   const opened=new HwpDocument(await readFile(styledFile));
+   try{
+    assert.equal(json(opened.getCellCharPropertiesAt(...args,3+shift)).textColor,prefixColor);
+    assert.equal(json(opened.getCellCharPropertiesAt(...args,5+shift)).textColor,'#246789');
+   }finally{opened.free();}
   }finally{saved.free();}
   d.restoreSnapshot(undo);assert.deepEqual(bytes(d),original);
   d.restoreSnapshot(redo);assert.deepEqual(bytes(d),after);

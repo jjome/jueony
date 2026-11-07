@@ -26,6 +26,8 @@ function inside(v:any,box:any){
   return [v.x,v.y,v.w,v.h].every(Number.isFinite) && v.w>=0 && v.h>0 && v.x>=box.x-0.2 && v.y>=box.y-0.2 &&
     v.x+v.w<=box.x+box.w+0.2 && v.y+v.h<=box.y+box.h+0.2;
 }
+const overlap=(a:any,b:any)=>Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)>0.2 &&
+  Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y)>0.2;
 
 export function nestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisionOwner) {
   const at=[t.section,t.paragraph] as const,host={controlIndex:t.control,cellIndex:owner.index,cellParaIndex:0};
@@ -39,7 +41,9 @@ export function nestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisio
       boxes.length>200 || boxes.some((c:any,i:number)=>c.pageIndex!==0 || c.cellIdx!==i) ||
       inner[0].rowCount!==dimensions.rowCount || inner[0].colCount!==dimensions.colCount)throw invalid();
   const source=t.cells[owner.index],box=outer.cells.find((c:any)=>c.row===source.row && c.col===source.column);
-  if(!box || !inside(inner[0],box) || !sameTableLayout(inner[0].cells.map((c:any)=>[c.cellIdx,c.row,c.col,c.rowSpan,c.colSpan,rect(c)]),
+  if(!box || !inside(inner[0],box) || outer.cells.some((c:any)=>c!==box && overlap(inner[0],c)) ||
+      boxes.some((c:any,i:number)=>boxes.slice(i+1).some((other:any)=>overlap(c,other))) ||
+      !sameTableLayout(inner[0].cells.map((c:any)=>[c.cellIdx,c.row,c.col,c.rowSpan,c.colSpan,rect(c)]),
       boxes.map((c:any)=>[c.cellIdx,c.row,c.col,c.rowSpan,c.colSpan,rect(c)])))throw invalid();
   const lists=parsed(doc.getCursorModel()).lists.filter((l:any)=>l.hostListId===owner.listId);
   if(lists.length!==boxes.length)throw invalid();

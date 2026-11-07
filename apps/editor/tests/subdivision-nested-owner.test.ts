@@ -5,6 +5,7 @@ import {resolve} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {readStructure} from '../src/adapters/rhwp/structure.ts';
 import {readTableSubdivisionSources} from '../src/adapters/rhwp/table-subdivision.ts';
+import {nestedSubdivisionEvidence,subdivisionNestedOwner} from '../src/adapters/rhwp/subdivision-nested-owner.ts';
 import {executeDocumentOperations} from '../src/adapters/rhwp/execute.ts';
 import {validateEditOperations,type Snapshot} from '../src/modules/document/public/index.ts';
 import {subdivisionNestedTable} from '../scripts/lib/subdivision-nested-table.mjs';
@@ -59,5 +60,21 @@ for(const fault of ['too wide','displaced'])test('a '+fault+' nested table leave
     assert.throws(()=>executeDocumentOperations(d,s,[op]));
     if(fault==='displaced')assert.equal(changed,true);
     assert.deepEqual(d.exportHwpx(),old);assert.deepEqual(nestedInk(d),ink);
+  }finally{d.free();}
+});
+test('an inner cell painted over its neighbor rejects even when both layout APIs report the same box',()=>{
+  const d=subdivisionNestedTable(HwpDocument);
+  try{
+    const table=readStructure(d).tables[0],owner=subdivisionNestedOwner(d,table)!;
+    const readPage=d.getPageControlLayout.bind(d),readPath=d.getTableCellBboxesByPath.bind(d);
+    d.getPageControlLayout=(page:number)=>{
+      const layout=JSON.parse(readPage(page));
+      layout.controls.find((c:any)=>c.stableIndex?.length>3).cells[0].w+=2;
+      return JSON.stringify(layout);
+    };
+    d.getTableCellBboxesByPath=(...args:any[])=>{
+      const boxes=JSON.parse(readPath(...args));boxes[0].w+=2;return JSON.stringify(boxes);
+    };
+    assert.throws(()=>nestedSubdivisionEvidence(d,table,owner),/중첩 표/);
   }finally{d.free();}
 });

@@ -1,6 +1,6 @@
 import puppeteer from 'puppeteer-core';
 import {fragmentedSubdivisionTable} from './lib/fragmented-subdivision.mjs';
-import {subdivisionNeighborFieldTable} from './lib/subdivision-neighbor-fields.mjs';
+import {subdivisionNeighborFieldTable,subdivisionNamedParagraphTable} from './lib/subdivision-neighbor-fields.mjs';
 import {continuedMergedTable} from './lib/continued-merged-table.mjs';
 import http from 'node:http';
 import {spawn} from 'node:child_process';
@@ -33,6 +33,7 @@ const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const
  if(input.instruction.includes('세 쪽에 걸친 셀'))Object.assign(operations[0],{row:0,column:0,rows:1,columns:3});
  if(input.instruction.includes('이웃 누름틀'))Object.assign(operations[0],{row:0,column:0,rows:1,columns:3});
  if(input.instruction.includes('이름을 첫 칸'))Object.assign(operations[0],{row:0,column:0,rows:1,columns:input.instruction.includes('두 칸')?2:3});
+ if(input.instruction.includes('이름 셀의 두 문단'))Object.assign(operations[0],{row:0,column:0,rows:1,columns:3,distributeParagraphs:true});
  if(input.instruction.includes('누름틀이 있는 표에 열 추가')) operations[0]={kind:'insert_table_column',target,index:1,values:['','','']};
  if(input.instruction.includes('범위 초과'))operations[0].row=99;
  if(input.instruction.includes('무변경')){operations[0].rows=1;operations[0].columns=1;}
@@ -83,6 +84,27 @@ try{
  await new Promise(r=>provider.listen(providerPort,'127.0.0.1',r));for(let i=0;i<100;i++){if(await fetch(origin+'/api/health').then(r=>r.ok,()=>false))break;await delay(100);}
  browser=await puppeteer.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,args:['--no-first-run','--disable-background-networking'],defaultViewport:{width:1400,height:1000}});page=await browser.newPage();page.setDefaultTimeout(15000);page.on('dialog',d=>void (d.type()==='beforeunload'?d.accept():d.dismiss()));page.on('pageerror',e=>pageErrors.push(String(e)));page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});await page.setRequestInterception(true);page.on('request',r=>{if(!r.url().startsWith(origin)&&!r.url().startsWith('data:')&&!r.url().startsWith('blob:')){externalRequests.push(r.url());void r.abort();}else void r.continue();});await page.goto(origin);await ready();
  for(const id of ['openai-responses','anthropic','gemini','openai-compatible'])await scenario(id+': chat subdivision, compare, cursor, undo/redo, save/UI reopen',async()=>{await configure(id);const f=await open('hwpx',body('hwpx',true)),before=await snap(),t=before.structure.tables[0],start=calls.length;assert.equal(before.tableSubdivisionSources[t.id].editable,true);await send('셀 2행 2열 분할');await error(false);assert.equal(calls.length,start+1);assert.equal(calls.at(-1).id,id);assert.equal(calls.at(-1).model,id+'-fixture');assert.equal(calls.at(-1).input.document.tableSubdivisionSources[t.id].editable,true);const after=await snap(),table=after.structure.tables[0],primary=table.cells.find(c=>c.row===1&&c.column===1);assert.equal(table.rows,4);assert.equal(table.columns,4);assert.equal(table.cells.length,12);assert.equal(primary.text,t.cells[4].text);for(const c of table.cells.filter(c=>c.row>=1&&c.row<=2&&c.column>=1&&c.column<=2&&c!==primary))assert.equal(c.text,'');assert.deepEqual(after.structure.tables[1],before.structure.tables[1]);assert.deepEqual(after.nodes,before.nodes);assert.equal(await f.evaluate(()=>window.__pageServices.getInputHandler().getCursorPosition().cellIndex),primary.index);await lastAction('변경 확인');await page.waitForFunction(()=>document.getElementById('change-dialog').open);await page.$eval('#change-dialog details',e=>e.open=true);await page.screenshot({path:resolve(out,'subdivision-'+id+'.png')});await page.click('#change-dialog button');await undo();assert.deepEqual((await snap()).structure,before.structure);await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);await reopen(f,'subdivision-ui-'+id);});
+ for(const ext of ['hwp','hwpx'])await scenario('named paragraph distribution - '+ext+' keeps the field and moves original formatting',async()=>{
+   await configure('openai-compatible');
+   const f=await open(ext,subdivisionNamedParagraphTable(HwpDocument)),before=await snap();
+   const inspect=(cell,para)=>f.evaluate((cell,para)=>{
+     const doc=window.__pageServices.wasm.borrowDocumentHandle();
+     return {fields:JSON.parse(doc.getFieldList()),para:JSON.parse(doc.getCellParaPropertiesAt(0,1,0,cell,para)),
+       char:JSON.parse(doc.getCellCharPropertiesAt(0,1,0,cell,para,0))};
+   },cell,para);
+   const original=await inspect(0,1),named=original.fields.find(f=>f.name==='계약번호');
+   assert.equal(original.char.bold,true);assert.equal(named.value,'칸0');
+   await send('이름 셀의 두 문단을 세 칸에 차례로 분배하고 이름은 첫 칸에 유지해 줘');await error(false);
+   const after=await snap(),actual=await inspect(1,0),parts=after.structure.tables[0].cells.slice(0,3);
+   assert.deepEqual(parts.map(c=>c.text),['칸0','칸1','']);
+   assert.deepEqual(parts.map(c=>c.properties.fieldName),['계약번호','','']);
+   assert.deepEqual(actual.fields.filter(f=>f.name===named.name),[named]);
+   assert.deepEqual(actual.para,original.para);assert.deepEqual(actual.char,original.char);
+   await undo();assert.deepEqual(await inspect(0,1),original);assert.deepEqual((await snap()).structure,before.structure);
+   await execute('edit:redo');assert.deepEqual(await inspect(1,0),actual);
+   await reopen(f,'split-named-paragraphs-'+ext,ext);
+   assert.deepEqual(await inspect(1,0),actual);assert.deepEqual((await snap()).structure,after.structure);
+ });
  for(const ext of ['hwp','hwpx'])for(const columns of [2,3])await scenario('named owner subdivision - '+ext+' keeps one field in '+columns+' pieces',async()=>{
    await configure('openai-compatible');
    const f=await open(ext,subdivisionNeighborFieldTable(HwpDocument,true)),before=await snap(),table=before.structure.tables[0];

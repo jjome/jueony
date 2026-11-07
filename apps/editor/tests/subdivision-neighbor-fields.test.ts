@@ -8,7 +8,7 @@ import {readTableSubdivisionSources} from '../src/adapters/rhwp/table-subdivisio
 import {readTableSplitSources} from '../src/adapters/rhwp/table-split.ts';
 import {executeDocumentOperations} from '../src/adapters/rhwp/execute.ts';
 import {validateEditOperations,type Snapshot} from '../src/modules/document/public/index.ts';
-import {subdivisionNeighborFieldTable} from '../scripts/lib/subdivision-neighbor-fields.mjs';
+import {subdivisionNeighborFieldTable,subdivisionNamedParagraphTable} from '../scripts/lib/subdivision-neighbor-fields.mjs';
 
 const pkg=process.env.JUEONY_ENGINE_PACKAGE ?? fileURLToPath(new URL('../node_modules/@rhwp/core/',import.meta.url));
 const {default:init,HwpDocument}=await import(pathToFileURL(resolve(pkg,'rhwp.js')).href);
@@ -74,7 +74,6 @@ for(const format of ['hwp','hwpx'])for(const columns of [2,3])test(format+' reta
     const s=snapshot(d,format),source=s.structure!.tables[0].cells[0],name=source.properties.fieldName;
     const old=bytes(d,format),fields=JSON.parse(d.getFieldList()),original=fields.find((f:any)=>f.name===name);
     assert.ok(original.cellField && original.value && source.axisFieldSignature);
-    assert.throws(()=>validateEditOperations([{...op,columns,distributeParagraphs:true}],s),/이름/);
     const undo=d.saveSnapshot();
     try{
       executeDocumentOperations(d,s,validateEditOperations([{...op,columns}],s));
@@ -115,6 +114,68 @@ test('a name accidentally cloned onto a second piece restores the original field
     };
     assert.throws(()=>executeDocumentOperations(d,s,[{...op,columns:2}]));
     assert.equal(mutated,true);assert.equal(d.getFieldList(),fields);assert.deepEqual(d.exportHwp(),old);
+  }finally{d.free();}
+});
+
+for(const format of ['hwp','hwpx'])for(const columns of [2,3])test(format+' distributes two styled paragraphs from a named cell to '+columns+' pieces',()=>{
+  const src=subdivisionNamedParagraphTable(HwpDocument),d=new HwpDocument(bytes(src,format));src.free();
+  try{
+    const s=snapshot(d,format),old=bytes(d,format),before=s.structure!.tables[0],first=before.cells[0];
+    const fields=JSON.parse(d.getFieldList()),targetField=fields.find((f:any)=>f.name===first.properties.fieldName);
+    const paraProps=d.getCellParaPropertiesAt(...at,0,1),charProps=d.getCellCharPropertiesAt(...at,0,1,0);
+    assert.ok(JSON.parse(charProps).bold);assert.equal(targetField.value,'칸0');
+    const undo=d.saveSnapshot();
+    try{
+      executeDocumentOperations(d,s,validateEditOperations([{...op,columns,distributeParagraphs:true}],s));
+      const reopened=new HwpDocument(bytes(d,format));
+      try{for(const doc of [d,reopened]){
+        const parts=readStructure(doc).tables[0].cells.slice(0,columns),after=JSON.parse(doc.getFieldList());
+        assert.deepEqual(parts.map(c=>c.text),columns===2?['칸0','칸1']:['칸0','칸1','']);
+        assert.equal(parts[0].properties.fieldName,first.properties.fieldName);
+        for(const part of parts.slice(1))assert.equal(part.properties.fieldName,'');
+        assert.deepEqual(after.filter((f:any)=>f.name===targetField.name),[targetField]);
+        assert.equal(doc.getCellParaPropertiesAt(...at,1,0),paraProps);
+        assert.equal(doc.getCellCharPropertiesAt(...at,1,0,0),charProps);
+        assert.equal(after.length,fields.length);
+        for(const f of fields.filter((v:any)=>v.name!==targetField.name)){
+          const to=after.find((v:any)=>v.name===f.name);
+          assert.equal(to.value,f.value);assert.equal(to.guide,f.guide);
+          assert.equal(to.location.path[0].cellIndex,f.location.path[0].cellIndex+columns-1);
+        }
+      }}finally{reopened.free();}
+      d.restoreSnapshot(undo);assert.deepEqual(bytes(d,format),old);
+    }finally{d.discardSnapshot(undo);}
+  }finally{d.free();}
+});
+
+test('distributing a named cell refuses an omitted original paragraph before mutation',()=>{
+  const src=subdivisionNamedParagraphTable(HwpDocument);
+  src.splitParagraphInCell(...at,0,1,2);src.insertTextInCell(...at,0,2,0,'세 번째');
+  for(const i of [0,1])src.setCellProperties(...at,i,'{"height":8500}');
+  const d=new HwpDocument(src.exportHwpx());src.free();
+  try{
+    const s=snapshot(d,'hwpx'),old=d.exportHwpx();
+    assert.throws(()=>validateEditOperations([{...op,columns:2,distributeParagraphs:true}],s),/수용/);
+    assert.deepEqual(d.exportHwpx(),old);
+  }finally{d.free();}
+});
+
+test('distributed text painted into the neighboring piece restores the named source',()=>{
+  const src=subdivisionNamedParagraphTable(HwpDocument),d=new HwpDocument(src.exportHwpx());src.free();
+  try{
+    const s=snapshot(d,'hwpx'),old=d.exportHwpx(),count=s.structure!.tables[0].cells.length;
+    const layout=d.getPageTextLayout.bind(d);
+    let moved=false;
+    d.getPageTextLayout=(page:number)=>{
+      const result=JSON.parse(layout(page));
+      if(JSON.parse(d.getTableDimensions(...at)).cellCount>count){
+        const run=result.runs.find((r:any)=>r.parentParaIdx===1 && r.controlIdx===0 && r.cellIdx===1 && r.text);
+        if(run){run.x+=200;moved=true;}
+      }
+      return JSON.stringify(result);
+    };
+    assert.throws(()=>executeDocumentOperations(d,s,[{...op,distributeParagraphs:true}]),/글줄|범위/);
+    assert.equal(moved,true);assert.deepEqual(d.exportHwpx(),old);
   }finally{d.free();}
 });
 

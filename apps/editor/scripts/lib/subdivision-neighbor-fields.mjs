@@ -12,3 +12,10 @@ export function subdivisionNeighborFieldTable(HwpDocument,namedTarget=false) {
   d.setCellProperties(...at,5,'{"fieldName":"이름셀"}');
   return d;
 }
+
+export function subdivisionNamedParagraphTable(HwpDocument) {
+  const d=subdivisionNeighborFieldTable(HwpDocument,true),at=[0,1,0,0,1];
+  d.applyCharFormatInCell(...at,0,d.getCellParagraphLength(...at),'{"bold":true}');
+  d.applyParaFormatInCell(...at,'{"alignment":"right"}');
+  return d;
+}

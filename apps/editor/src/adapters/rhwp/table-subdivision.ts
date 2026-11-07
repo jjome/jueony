@@ -9,6 +9,7 @@ import { capturePreservationEvidence, verifyPreservedExport } from './preservati
 import { topologySemantics, rootBodyTexts, tableTextTree } from './table-topology-evidence.ts';
 import { tableLayoutEvidence, sameTableLayout } from './table-layout-evidence.ts';
 import {subdivisionFrames,compareSubdivisionFrames,compareDividedPieces} from './subdivision-frames.ts';
+import {verifyFragmentLines} from './subdivision-fragment-lines.ts';
 import {hwpSubdivisionSource,verifiedSubdivisionHwp} from './hwp-table-subdivision.ts';
 import type {SubdivisionCopyMetrics} from './subdivision-canvas-metrics.ts';
 import {subdivisionFieldOwners,namedSubdivisionTargets,projectSubdivisionFields,subdivisionFieldLines} from './subdivision-neighbor-fields.ts';
@@ -56,7 +57,7 @@ export function readTableSubdivisionSources(wasm:any, tables:Table[], name:strin
     if (frames.length>1 && !exactGrid) throw Error('unsupported split table layout');
     const multipleMerged = t.cells.filter(c => c.rowSpan > 1 || c.columnSpan > 1).length > 1;
     const formats = (cell:Table['cells'][number]) => {
-      if(cell.axisFieldSignature)return;
+      if(cell.axisFieldSignature && !namedTargets?.has(cell.index))return;
       const count = d.getCellParagraphCount(t.section,t.paragraph,t.control,cell.index);
       if (count < 2 || count > (exactGrid ? 64 : cell.rowSpan * cell.columnSpan)
           || (!exactGrid && typeof d.splitCellParagraphs !== 'function') || cell.text.split('\n').length !== count) return;
@@ -112,6 +113,8 @@ export function assertTableSubdivisionResult(wasm:any, base:Snapshot, op:AgentTa
   }
   const columns = [...new Set(divided.map(c=>c.column))], rows = [...new Set(divided.map(c=>c.row))];
   for(const c of divided) compareDividedPieces(original,current.get(c.index),plan.widths,plan.heights,columns.indexOf(c.column),rows.indexOf(c.row));
+  const singlePageNamedDistribution=!fragmented && op.distributeParagraphs && Boolean(plan.primary.properties.fieldName);
+  if(singlePageNamedDistribution)verifyFragmentLines(d,actual,frames);
   let copy:any; try { const binary=!!plan.source.hwp5Grid;
     let bytes:Uint8Array;
     if (binary) bytes=verifiedSubdivisionHwp(d);
@@ -120,6 +123,7 @@ export function assertTableSubdivisionResult(wasm:any, base:Snapshot, op:AgentTa
     copy = new d.constructor(bytes);
     copyMetrics?.(copy);
     if (binary || op.distributeParagraphs || plan.source.exactGrid) checkCells(copy, readStructure(copy).tables.find(v => v.id === t.id));
+    if(singlePageNamedDistribution)subdivisionFrames(copy,actual,parsed(copy.getTableProperties(t.section,t.paragraph,t.control)),true);
     if (fragmented && !sameTableLayout(frames,subdivisionFrames(copy,actual,parsed(copy.getTableProperties(t.section,t.paragraph,t.control)),true,fromFragmentedOwner)))
       throw Error('저장한 셀의 쪽별 원본 범위나 글줄이 달라졌습니다.');
     if (!sameTableLayout(after, tableLayoutEvidence(copy, actual))) throw new Error('임의 분할 뒤 저장 재열기의 셀·글줄 배치가 다릅니다.'); } finally { copy?.free(); }
@@ -140,7 +144,7 @@ function applySubdivision(wasm:any, base:Snapshot, op:AgentTableSubdivisionOp,co
   if (!same(structure.tables.find(v => v.id === t.id), t) || cap?.editable !== true || !same(comparable(cap),comparable(base.tableSubdivisionSources?.[t.id]))||!sameTableLayout(cap.frame,base.tableSubdivisionSources?.[t.id]?.frame)) throw new Error('문서·표 내용·서식·배치가 바뀌었습니다. 최신 상태로 다시 요청하세요.');
   assertNativeTableWritable(d, t);
   const fieldOwners=t.cells.some(c=>c.axisFieldSignature) ? subdivisionFieldOwners(d,t) : undefined;
-  const originalFieldLines=fieldOwners?.size ? subdivisionFieldLines(d,t,fieldOwners,plan.cells) : undefined;
+  const originalFieldLines=fieldOwners?.size ? subdivisionFieldLines(d,t,fieldOwners,plan.cells,op.distributeParagraphs ? plan.primary.index : undefined) : undefined;
   const evidence = capturePreservationEvidence(d); if (evidence.issues.length) throw new Error('분할 전 전체 문서 보존 정보를 확인하지 못했습니다.');
   const expected = topologySemantics(evidence.values), body = rootBodyTexts(d), target = (c:any) => c.list.hostListId === 0 && c.list.sectionIndex === t.section && c.list.hostPara === t.paragraph && c.list.controlIndex === t.control, originals = expected.cells.filter(target) as any[], primary = originals.find((c:any) => c.list.cellIndex === plan.primary.index);
   if (!primary || originals.length !== t.cells.length) throw new Error('분할할 원본 셀의 보존 정보가 없습니다.');
@@ -169,7 +173,7 @@ function applySubdivision(wasm:any, base:Snapshot, op:AgentTableSubdivisionOp,co
   const after = capturePreservationEvidence(d);
   if(fieldOwners?.size)projectSubdivisionFields(expected,t,fieldOwners,plan.cells,parsed(d.getCursorModel()).lists);
   if(originalFieldLines){
-    const indices=new Set(plan.cells.filter(c=>c.axisFieldSignature).map(c=>c.index));
+    const indices=new Set(plan.cells.filter(c=>c.axisFieldSignature && (!op.distributeParagraphs || c.originIndex!==plan.primary.index)).map(c=>c.index));
     const actualFieldLines=tableLayoutEvidence(d,t).filter((v:any)=>indices.has(v.cell));
     if(!sameTableLayout(originalFieldLines,actualFieldLines))throw Error('분할 뒤 이웃 필드 셀의 실제 쪽이나 글줄 위치가 달라졌습니다.');
   }

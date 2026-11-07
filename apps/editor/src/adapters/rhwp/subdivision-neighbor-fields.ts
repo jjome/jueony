@@ -81,12 +81,15 @@ export function projectSubdivisionFields(expected:any,table:Table,owners:Map<num
   }
 }
 
-export function subdivisionFieldLines(doc:any,table:Table,owners:Map<number,number>,cells:Array<{index:number;originIndex:number|null}>) {
+export function subdivisionFieldLines(doc:any,table:Table,owners:Map<number,number>,cells:Array<{index:number;originIndex:number|null}>,distributing?:number) {
   const map=new Map<number,number>();
   for(const index of owners.values()){
     const planned=cells.find(c=>c.originIndex===index);
     if(!planned)throw invalid();
     map.set(index,planned.index);
   }
-  return tableLayoutEvidence(doc,table).filter((v:any)=>map.has(v.cell)).map((v:any)=>({...v,cell:map.get(v.cell)}));
+  // Distributing centered paragraphs changes the first line's vertical
+  // position. All target runs are checked inside their new owner rectangles.
+  return tableLayoutEvidence(doc,table).filter((v:any)=>map.has(v.cell) && v.cell!==distributing)
+    .map((v:any)=>({...v,cell:map.get(v.cell)}));
 }

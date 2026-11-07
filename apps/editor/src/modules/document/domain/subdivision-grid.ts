@@ -20,8 +20,8 @@ export function exactSubdivisionPlan(op:AgentTableSubdivisionOp, table:Table, so
   const primary = table.cells.find(c => c.row === op.row && c.column === op.column);
   const limits = source.cells?.find(c => c.row === op.row && c.column === op.column);
   if((primary?.axisFieldSignature || primary?.properties.fieldName) && (!limits || !primary.axisFieldSignature ||
-      !primary.properties.fieldName || op.distributeParagraphs || primary.rowSpan*primary.columnSpan===1))
-    throw new Error('이름만 있는 병합 셀은 원래 칸에 내용을 유지하는 분할만 지원합니다.');
+      !primary.properties.fieldName || primary.rowSpan*primary.columnSpan===1))
+    throw new Error('원래 필드 값을 확인한 병합 이름 셀이 필요합니다.');
   if (!primary || !limits || table.editable === false || !source.frame
       || table.cells.some(c => c.properties.cellProtect !== false || c.properties.isHeader !== false)
       || ![limits.minimumHeight,limits.minimumWidth].every(n => Number.isSafeInteger(n) && n >= 200))
@@ -59,7 +59,8 @@ export function exactSubdivisionPlan(op:AgentTableSubdivisionOp, table:Table, so
     return groups.every((g,i) => g.span === Math.floor(span/count) + (i < span % count ? 1 : 0)
       && g.length === Math.floor(total/count) + (i === 0 ? total % count : 0));
   };
-  const useExactGrid = multi || !merged || !restoreTracks && (r.count !== table.rows || c.count !== table.columns
+  const namedDistribution=Boolean(primary.properties.fieldName && op.distributeParagraphs);
+  const useExactGrid = namedDistribution || multi || !merged || !restoreTracks && (r.count !== table.rows || c.count !== table.columns
     || !legacyBand(r.groups,primary.rowSpan) || !legacyBand(c.groups,primary.columnSpan));
   return {table, primary, source, rows:r.count, columns:c.count, cells, useExactGrid, restoreTracks,
     paragraphFormats:formats, widths:c.groups.map(g => g.length), heights:r.groups.map(g => g.length)};

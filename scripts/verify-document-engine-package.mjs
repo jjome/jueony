@@ -46,6 +46,24 @@ try {
 } finally { table.free(); }
 
 const formulas = new HwpDocument(await readFile(fixture));
+const source = HwpDocument.createEmpty();
+try {
+  source.createBlankDocument();
+  const t = json(source.createTable(0, 0, 0, 1, 3));
+  const at = [0, t.paraIdx, t.controlIdx];
+  source.insertTextInCell(...at, 0, 0, 0, '2');
+  source.insertTableFormulaField(...at, 1, '', '=A1*2', '%.1f');
+  source.insertTableFormulaField(...at, 2, '', '=B1+1', '%g');
+  assert.equal(source.tableFormulaInputHasDependents(...at, 0), true);
+  source.insertTextInCell(...at, 0, 0, 1, '3');
+  assert.deepEqual(json(source.refreshTableFormulaInput(...at, 0)), {ok:true, changed:2});
+  for (const bytes of [source.exportHwp(), source.exportHwpx()]) {
+    const reopened = new HwpDocument(bytes);
+    try {
+      assert.deepEqual(json(reopened.getFieldList()).map(f=>f.command), ['=A1*2??%.1f;;46.0', '=B1+1??%g;;47']);
+    } finally { reopened.free(); }
+  }
+} finally { source.free(); }
 try {
   const fields = () => json(formulas.getFieldList()).filter(f => f.fieldType === 'formula');
   const originals = fields();

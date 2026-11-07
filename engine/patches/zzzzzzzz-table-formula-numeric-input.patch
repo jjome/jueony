@@ -1,0 +1,114 @@
+--- a/src/document_core/queries/table_formula_field.rs
++++ b/src/document_core/queries/table_formula_field.rs
+@@ -9,6 +9,8 @@
+ 
+ #[path = "table_formula_insert.rs"]
+ mod insert;
++#[path = "table_formula_input.rs"]
++mod input;
+ 
+ fn err(msg: &str) -> HwpError {
+     HwpError::InvalidField(msg.to_owned())
+@@ -404,6 +406,10 @@
+         format: &str,
+     ) -> Result<String, HwpError> {
+         let plan = self.plan_table_formula_field(s, p, t, i, id, expected, formula, format)?;
++        self.commit_formula_plan(s, plan)
++    }
++
++    fn commit_formula_plan(&mut self, s: usize, plan: Plan) -> Result<String, HwpError> {
+         if plan.changes.is_empty() { return Ok(plan.response); }
+         for change in &plan.changes { self.validate_field_reflow_location(&change.location)?; }
+         let saved_section = self.document.sections[s].clone();
+--- /dev/null
++++ b/src/document_core/queries/table_formula_input.rs
+@@ -0,0 +1,68 @@
++use super::*;
++
++impl DocumentCore {
++    fn input_formula_cells(&self, s: usize, p: usize, t: usize, i: usize)
++        -> Result<(&Table, BTreeSet<usize>), HwpError> {
++        let Some(Control::Table(table)) = self.document.sections.get(s)
++            .and_then(|section| section.paragraphs.get(p))
++            .and_then(|para| para.controls.get(t)) else { return Err(err("본문 표 위치가 변경되었습니다.")); };
++        let has_formula = table.cells.iter().flat_map(|cell| &cell.paragraphs).flat_map(|para| &para.controls)
++            .any(|ctrl| matches!(ctrl, Control::Field(field) if field.field_type == FieldType::Formula));
++        if !has_formula { return Ok((table, BTreeSet::new())); }
++        let columns = usize::from(table.col_count);
++        if columns == 0 || table.cells.len() != columns * usize::from(table.row_count)
++            || table.cells.len() > 200 || table.cells.iter().enumerate().any(|(n, c)|
++                c.col_span != 1 || c.row_span != 1 || usize::from(c.row) != n / columns || usize::from(c.col) != n % columns) {
++            return Err(err("이 표 배치에서는 계산식 참조를 안전하게 갱신할 수 없습니다."));
++        }
++        let cell = table.cells.get(i).ok_or_else(|| err("참조할 셀 위치가 변경되었습니다."))?;
++        if cell.paragraphs.iter().flat_map(|p| &p.controls).any(|ctrl|
++            matches!(ctrl, Control::Field(f) if f.field_type == FieldType::Formula)) {
++            return Err(err("계산식 필드는 표 계산식 편집창에서 수정하세요."));
++        }
++        let mut affected = affected_formula_cells(table, i)?;
++        affected.remove(&i);
++        if !affected.is_empty() {
++            if table.common.locked || cell.cell_protect() || self.document.header.distribution
++                || self.document.header.encrypted || self.document.provenance.hwp3_lineage {
++                return Err(err("보호된 계산식 참조 셀을 변경할 수 없습니다."));
++            }
++            let [plain] = cell.paragraphs.as_slice() else { return Err(err("계산식 참조 셀은 한 문단이어야 합니다.")); };
++            if !plain.controls.is_empty() || !plain.field_ranges.is_empty() {
++                return Err(err("복합 내용을 가진 계산식 참조 셀은 변경할 수 없습니다."));
++            }
++        }
++        Ok((table, affected))
++    }
++
++    pub fn table_formula_input_has_dependents(&self, s: usize, p: usize, t: usize, i: usize) -> Result<bool, HwpError> {
++        Ok(!self.input_formula_cells(s, p, t, i)?.1.is_empty())
++    }
++
++    pub fn refresh_table_formula_input(&mut self, s: usize, p: usize, t: usize, i: usize) -> Result<String, HwpError> {
++        let (table, affected) = self.input_formula_cells(s, p, t, i)?;
++        // Every expression comes from its stored field. No formula override is applied to the source number.
++        let calc = Calculation { table, root: usize::MAX, formula: "", memo: RefCell::default(), stack: RefCell::default() };
++        let mut changes = Vec::new();
++        let mut counts = BTreeMap::new();
++        if !affected.is_empty() {
++            for entry in self.collect_all_fields() { *counts.entry(entry.field.field_id).or_insert(0usize) += 1; }
++        }
++        for index in affected {
++            let cell = &table.cells[index];
++            let field = plain_field(&cell.paragraphs[0])?;
++            if counts.get(&field.field_id) != Some(&1) { return Err(err("중복된 계산식 필드 ID가 있습니다.")); }
++            let (expr, tail) = field.command.rsplit_once("??").unwrap();
++            let (fmt, _) = tail.split_once(";;").unwrap();
++            let value = display(calc.value(index)?.ok_or_else(|| err("계산 결과가 없습니다."))?, fmt)?;
++            let command = format!("{expr}??{fmt};;{value}");
++            if command == field.command { continue; }
++            if cell.cell_protect() { return Err(err("연쇄 갱신 대상에 보호된 셀이 있습니다.")); }
++            changes.push(FieldChange { location: FieldLocation { section_index:s, para_index:p,
++                nested_path:vec![NestedEntry::TableCell {control_index:t, cell_index:index, para_index:0}] },
++                previous_command:field.command.clone(), command, formula:expr.to_owned(), format:fmt.to_owned(), value });
++        }
++        let response = serde_json::json!({"ok":true,"changed":changes.len()}).to_string();
++        self.commit_formula_plan(s, Plan { changes, response })
++    }
++}
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -8116,6 +8116,18 @@
+             .map_err(|e| e.into())
+     }
+ 
++    #[wasm_bindgen(js_name = tableFormulaInputHasDependents)]
++    pub fn table_formula_input_has_dependents(&self, section: usize, paragraph: usize, control: usize,
++        cell: usize) -> Result<bool, JsValue> {
++        self.core.table_formula_input_has_dependents(section, paragraph, control, cell).map_err(Into::into)
++    }
++
++    #[wasm_bindgen(js_name = refreshTableFormulaInput)]
++    pub fn refresh_table_formula_input(&mut self, section: usize, paragraph: usize, control: usize,
++        cell: usize) -> Result<String, JsValue> {
++        self.core.refresh_table_formula_input(section, paragraph, control, cell).map_err(Into::into)
++    }
++
+     #[wasm_bindgen(js_name = insertTableFormulaField)]
+     pub fn insert_table_formula_field(&mut self, section: usize, paragraph: usize, control: usize, cell: usize,
+         expected_text: &str, formula: &str, format: &str) -> Result<String, JsValue> {

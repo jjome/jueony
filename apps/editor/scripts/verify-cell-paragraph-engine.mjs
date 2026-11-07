@@ -109,6 +109,16 @@ for(const format of ['hwp','hwpx']){
    finally{reopened.free();}
   }finally{doc.free();}
  });
+ await scenario(format+' rejects adjacent click-here fields before editing',()=>{
+  const args=[0,1,0,0,1],template=fixture(),save=d=>format==='hwp'?d.exportHwp():d.exportHwpx();
+  for(const pos of [1,0])assert.equal(json(template.insertClickHereFieldInCell(...args,pos,false,'FIELD','memo','field'+pos,true)).ok,true);
+  const doc=new HwpDocument(save(template));template.free();
+  try{
+   const before=save(doc),s=snap(doc,'adjacent.'+format);
+   assert.equal(s.cellParagraphSources[s.structure.tables[0].id].editable,false);
+   assert.deepEqual(save(doc),before);
+  }finally{doc.free();}
+ });
  await scenario(format+' edits a paragraph spanning pages and rejects duplicated rendered text',()=>{
   const template=fragmentedMergedCell(HwpDocument),save=d=>format==='hwp'?d.exportHwp():d.exportHwpx();
   const doc=new HwpDocument(save(template)),name='fragment.'+format;template.free();

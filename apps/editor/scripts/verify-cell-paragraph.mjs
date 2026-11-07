@@ -121,14 +121,17 @@ try{
  });
  for(const format of ['hwp','hwpx'])for(const mode of ['split-owner','field-tail','two-field-tail'])await scenario(format+' '+mode+' through chat, undo/redo and bound file reopen',async()=>{
   const split=mode==='split-owner',d=split?fragmentedMergedCell(HwpDocument):body(format);
-  if(mode==='two-field-tail')d.insertClickHereFieldInCell(0,1,0,0,1,0,false,'SECOND','memo','input2',true);
+  if(mode==='two-field-tail'){
+   d.insertTextInCell(0,1,0,0,1,d.getCellParagraphLength(0,1,0,0,1),' 원래 문장');
+   d.insertClickHereFieldInCell(0,1,0,0,1,3,false,'SECOND','memo','input2',true);
+  }
   if(!split)d.insertClickHereFieldInCell(0,1,0,0,1,1,false,'FIELD','memo','input',true);
   const fields=JSON.parse(d.getFieldList());
   const f=await open(format,d),before=await snap(),t=before.structure.tables[0],index=split?0:1;
   const paragraph=before.cellParagraphSources[t.id].cells[0].paragraphs[index];
-  if(!split)assert.equal(paragraph.editableFrom,2);
+  if(!split)assert.equal(paragraph.editableFrom,mode==='two-field-tail'?4:2);
   await send(split?'first split-owner':'field-tail');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
-  const text=split?paragraph.text.slice(0,-6)+'Tail 2':paragraph.text.slice(0,2)+'수정😀';
+  const text=split?paragraph.text.slice(0,-6)+'Tail 2':Array.from(paragraph.text).slice(0,paragraph.editableFrom).join('')+'수정😀';
   assert.equal((await snap()).cellParagraphSources[t.id].cells[0].paragraphs[index].text,text);
   await undo();assert.deepEqual((await snap()).structure.tables,before.structure.tables);
   await execute('edit:redo');const reopened=await save(f,mode,format);

@@ -7,7 +7,7 @@ import {readStructure} from '../src/adapters/rhwp/structure.ts';
 import {readTableSubdivisionSources} from '../src/adapters/rhwp/table-subdivision.ts';
 import {executeDocumentOperations} from '../src/adapters/rhwp/execute.ts';
 import {validateEditOperations,type Snapshot} from '../src/modules/document/public/index.ts';
-import {fragmentedSubdivisionTable} from '../scripts/lib/fragmented-subdivision.mjs';
+import {fragmentedSubdivisionTable,fragmentedParagraphBands} from '../scripts/lib/fragmented-subdivision.mjs';
 
 const pkg = process.env.JUEONY_ENGINE_PACKAGE ?? fileURLToPath(new URL('../node_modules/@rhwp/core/',import.meta.url));
 const {default:init,HwpDocument} = await import(pathToFileURL(resolve(pkg,'rhwp.js')).href);
@@ -62,6 +62,25 @@ for (const ext of ['hwp','hwpx']) test(ext+' restores the original bytes when a 
     assert.ok(s.tableSubdivisionSources![target].frames!.length>1);
     assert.throws(()=>executeDocumentOperations(d,s,validateEditOperations([command],s)),/외형|쪽이 달라/);
     assert.deepEqual(save(d,ext),before);
+  } finally {d.free();}
+});
+for (const ext of ['hwp','hwpx']) test(ext+' distributes two long paragraphs to equal vertical bands across pages',()=>{
+  const src=fragmentedParagraphBands(HwpDocument),d=new HwpDocument(save(src,ext));src.free();
+  try {
+    const s=snapshot(d,ext), source=boxes(d);
+    const bands={...command,rows:2,columns:1,distributeParagraphs:true};
+    executeDocumentOperations(d,s,validateEditOperations([bands],s));
+    const copy=new HwpDocument(save(d,ext));
+    try {
+      const originalHeight=source.reduce((n,f)=>n+(f.cells.find((c:any)=>c.row===0)?.h??0),0);
+      const after=boxes(copy);
+      assert.equal(after.length,source.length);
+      for(const row of [0,1]) {
+        const fragments=after.flatMap(f=>f.cells.filter((c:any)=>c.row===row&&c.col===0));
+        assert.ok(Math.abs(fragments.reduce((n,c)=>n+c.h,0)-originalHeight/2)<0.2);
+        assert.equal(readStructure(copy).tables[0].cells.find(c=>c.row===row&&c.column===0)?.text,'word '.repeat(110)+row);
+      }
+    } finally {copy.free();}
   } finally {d.free();}
 });
 for (const fault of ['original index','native offset','neighbor line']) test('fragment proof rejects a changed '+fault,()=>{

@@ -90,6 +90,7 @@ function cellFieldBoundaries(d:any,t:Table,controls:any[],lists:any[]){
   remaining.set(key,(remaining.get(key)??0)+1);
  }
  const inspected=new Set<number>();
+ const ranges=new Map<string,Array<[number,number]>>();
  for(const field of fields){
   const loc=field.location,step=loc?.path?.[0];
   if(field.fieldType!=='clickhere'||field.cellField!==false||loc?.sectionIndex!==t.section||loc.paraIndex!==t.paragraph||
@@ -104,7 +105,15 @@ function cellFieldBoundaries(d:any,t:Table,controls:any[],lists:any[]){
   const key=step.cellIndex+'/'+step.paraIndex;
   if(!info.inField||info.fieldId!==field.fieldId||info.fieldType!==field.fieldType||info.startCharIdx!==field.startCharIdx||
      info.endCharIdx!==field.endCharIdx)throw Error();
-  boundaries.set(key,Math.max(boundaries.get(key)??0,field.endCharIdx+1));
+  const group=ranges.get(key)??[];
+  // Adjacent inline markers can coalesce on re-export. Only advertise a
+  // suffix when a plain character separates every pair of stored fields.
+  group.push([field.startCharIdx,field.endCharIdx]);ranges.set(key,group);
+ }
+ for(const [key,group] of ranges){
+  group.sort((a,b)=>a[0]-b[0]);
+  if(group.some(([start],i)=>i>0&&start<=group[i-1][1]+1))throw Error();
+  boundaries.set(key,group[group.length-1][1]+1);
  }
  return boundaries;
 }

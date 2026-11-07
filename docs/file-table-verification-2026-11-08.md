@@ -2,7 +2,7 @@
 
 | 작업 | 이번에 실제로 동작하는 범위 | 남은 범위 |
 | --- | --- | --- |
-| N046 문단 글 방향 | Jueony는 세 방향을 HWPX 사본에 보존한다. 한글 2024에서 같은 본문으로 만든 HWP 세 건을 다시 열어 AUTO→LTR, LTR→LTR, RTL→RTL을 확인했다. | Rust 엔진에 명시 LTR·RTL의 HWP5 읽기·쓰기를 연결하고 원본 AUTO를 정확히 보존하는 저장 경로를 검증 |
+| N046 문단 글 방향 | Rust가 LTR·RTL HWP를 읽고 쓴다. 한글 2024가 Jueony 저장본 두 건을 다시 읽어 같은 값을 내보냈다. 명시 AUTO는 HWP 형식 저장에서 확인 후 HWPX 사본으로 보존한다. | 요청한 파일 보존 범위 완료 |
 | N004 병합 셀 본문 | HWP·HWPX에서 구간별 교체·삭제와 여러 쪽 표의 병합 문단 수정을 지원한다. 저장·재열기 후 남은 글자의 서식과 수정한 셀의 실제 행·열을 확인했다. | 필드·개체 포함 문단, 셀 자체가 둘 이상의 쪽에 걸친 경우, 새 글자 서식 생성 |
 | N005 셀 분할 | 단일 병합 주 셀을 이웃에서 확인한 원래 격자로 복원하거나 기존 격자선에 맞춰 더 적은 행·열로 나눈다. HWPX 및 원본 보존을 확인한 HWP5 평면 표에서 불균등한 크기를 보존하고 문단을 행 순서대로 여러 셀에 분배할 수 있다. 글자·문단 서식도 함께 옮긴다. | 여러 병합 셀, 중첩 표, 확인되지 않는 분할선과 영역 서식 |
 | N006 중첩 표 | Agent가 부모 표·셀·문단 경로를 따라 내부의 단순 셀을 읽고 수정한다. 동일한 텍스트가 여러 곳에 있어도 지정한 셀만 바꾼다. | 중첩 표의 구조 변경 및 복합 셀 편집 |
@@ -24,13 +24,33 @@ Windows 한글 2024 `13.0.0.711`로 HWPX 시험 문서 세 개를 각각 **한�
 
 세 파일의 본문 레코드 12개는 모두 같았다. AUTO와 LTR은 문서 요약 정보만 달랐다. RTL과 LTR의 `DocInfo` 레코드 75개 중 한 바이트만 달랐다. 각 HWP의 내장 미리보기는 재열기 뒤 한글이 생성한 HWPX 미리보기와 바이트 단위로 일치했다. [측정값과 파일 지문](evidence/n046-hancom-2026-11-08/comparison.json) · [LTR 미리보기](evidence/n046-hancom-2026-11-08/LTR-preview.png) · [RTL 미리보기](evidence/n046-hancom-2026-11-08/RTL-preview.png)
 
-이 문단에서는 HWP만으로 원래 AUTO와 명시 LTR을 구별할 수 없었다. RTL 문자로 시작하는 AUTO의 결과는 이번 세 문서로 확정할 수 없다. Jueony의 N046은 부분 구현이다. 정확한 AUTO 보존이 필요한 문서에는 기존 HWPX 보존 사본 경로를 사용한다.
+이 문단에서는 HWP만으로 원래 AUTO와 명시 LTR을 구별할 수 없었다. Jueony는 명시 AUTO를 보존할 때 본문의 첫 글자에 관계없이 HWPX 사본을 사용한다.
 
 로컬 원본과 저장본은 `build/n046-native-1108/`에 있다. `MODE.hwpx`가 입력이고, `MODE-native.hwp`가 한글 저장본이며, `MODE-reopened.hwpx`가 재열기 후 출력이다. 저장본에는 한글의 작성자 메타데이터가 있어 저장소에는 비교 기록과 미리보기만 싣는다. 한글을 다시 실행하지 않고 기록을 확인하는 명령은 다음과 같다.
 
 ```powershell
 python -B apps/editor/scripts/lib/compare-hancom-paragraph-direction.py build/n046-native-1108
 npm --prefix apps/editor test -- tests/direction-save-copy.test.ts
+```
+
+### Jueony 저장본 검수
+
+Rust 엔진 `ce7f9b363991d6c5`가 한글 원본 HWP 두 건에서 LTR·RTL을 읽었다. Edge에서 **HWP 형식으로 저장**을 실행해 세 사본을 만들고 각각 다시 열었다. 이때 문단의 영문·숫자 자동 간격도 켜서 바로 옆 비트가 함께 보존되는지 검사했다.
+
+| 입력 | 편집기가 저장한 파일 | 독립 검사 | 한글 2024에서 확인한 값 |
+| --- | --- | --- | --- |
+| LTR | `LTR.hwp` | `attr2 = 0x38` (방향 `0x08`, 자동 간격 `0x30`) | LTR, 두 자동 간격 켜짐 |
+| RTL | `RTL.hwp` | `attr2 = 0x34` (방향 `0x04`, 자동 간격 `0x30`) | RTL, 두 자동 간격 켜짐 |
+| AUTO | `AUTO.hwpx` | 본문 문단이 참조하는 `paraPr`에 `textDir="AUTO"`, 두 자동 간격 켜짐 | HWPX의 명시값은 원본 XML과 Jueony 재열기로 검증 |
+
+Jueony는 세 경우 모두 원본 파일의 바이트를 유지했다. 한글 검수에서는 Jueony의 HWP를 한글 2024에서 열고 별도 HWPX로 내보내 본문, 방향과 간격 값을 대조했다. 저장·재열기 검수 파일은 `build/n046-editor-output/`에 있다. [검수 결과와 SHA-256](evidence/n046-hancom-2026-11-08/editor-roundtrip.json)
+
+세 가지 저장 경로만 다시 확인하려면 새 출력 폴더를 지정한다. 두 HWP를 한글에서 열어 각 출력 폴더의 `LTR-hancom-readback.hwpx`와 `RTL-hancom-readback.hwpx`로 저장하면 마지막 명령으로 해당 결과까지 비교할 수 있다.
+
+```powershell
+node --experimental-strip-types apps/editor/scripts/verify-direction-save-as.mjs <편집기-dist> <엔진-pkg> <Edge-실행파일> <새-출력폴더> build/n046-native-1108
+python -B apps/editor/scripts/lib/compare-hancom-paragraph-direction.py --editor <새-출력폴더>
+python -B apps/editor/scripts/lib/compare-hancom-paragraph-direction.py --editor <새-출력폴더> --hancom-readback
 ```
 
 ## 11월 8일 추가 검수
@@ -64,7 +84,7 @@ Agent 채팅은 로컬 모의 제공자를 사용했다. 최종 21건에는 두 
 
 - 복합 배치·병합 격자 등의 공식 합본에서 합성 문서 네 검사 묶음의 시나리오 77회(9·24·8·36)와 HWP/HWPX 디스크 저장·재열기 402회(18·120·48·216)를 통과했다. 배치 한도를 넘는 별도 4건은 저장 전에 차단됐다. 문서 정보와 날짜·시각 보존은 17건을 통과했다. [복합 문서](../apps/editor/scripts/verify-complex-stories178.mjs) · [병합 격자](../apps/editor/scripts/verify-merged-grid176.mjs) · [부호 있는 좌표](../apps/editor/scripts/verify-signed-short177.mjs) · [복합 배치](../apps/editor/scripts/verify-complex-retained178.mjs) · [한도 초과 차단](../apps/editor/scripts/verify-signed-oversize179.mjs) · [문서 정보](../apps/editor/scripts/verify-stored-information95.mjs)
 - 복구 단위 검사 36건과 별도 Edge 프로필의 강제 종료·복구·재저장 등 10건을 통과했다. 글 방향 저장에 대해서는 보존 회귀 31건과 Edge 8건을 통과했다. [복구 검수](../apps/editor/scripts/verify-recovery-integrity.mjs) · [글 방향과 암호 저장 검수](../apps/editor/scripts/verify-direction-save-as.mjs)
-- N046에서 확인할 값은 문단의 AUTO·LTR·RTL이다. 한컴의 공개 HWP 5.0 개정 1.3 문단 모양 표에서는 이 세 값의 대응 비트를 확인할 수 없었다. 실제 한글 검수 때에는 내용과 서식이 같은 문서에서 방향만 각각 바꾸어 HWP와 HWPX로 저장하고 문단이 참조하는 레코드를 대조한다. [한컴 HWP 5.0 공개 명세](https://cdn.hancom.com/link/docs/%ED%95%9C%EA%B8%80%EB%AC%B8%EC%84%9C%ED%8C%8C%EC%9D%BC%ED%98%95%EC%8B%9D_5.0_revision1.3.pdf)
+- N046의 대응 비트는 위 한글 직접 검수에서 확인했다. 문단 모양 레코드의 공개 규격도 함께 참고했다. [한컴 HWP 5.0 공개 명세](https://cdn.hancom.com/link/docs/%ED%95%9C%EA%B8%80%EB%AC%B8%EC%84%9C%ED%8C%8C%EC%9D%BC%ED%98%95%EC%8B%9D_5.0_revision1.3.pdf)
 
 ## 표 편집
 

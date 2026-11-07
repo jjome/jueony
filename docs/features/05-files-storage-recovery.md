@@ -2,9 +2,9 @@
 
 [← 종합 진행 현황](<../jueony-progress.md>) · [전체 검색](<../jueony-work-checklist.html>) · [완료 규칙](<../97-master-work-checklist.md>)
 
-열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 직렬화 결함과 보존.
+열기·저장·재열기, 버전 충돌과 원복, HWP/HWPX 형식 보존.
 
-**N001의 기록된 구현 범위 마감:** 기존 24개 세부 작업의 구현과 해당 자동 검사는 통과했다. 기능 전체 완료는 아니다. 설명에만 남아 있던 명시 `textDir` 변환 제한을 N046으로 별도 등록하여 현재 구현24/25·부분1, 검증22/25·부분3으로 표시한다. N001 직접 비교, N002 후속 비교와 N046 구현·검증이 남았다. Rust182 최종 합본: 유효 짧은 다쪽8/48·3/4열 병합24/120·다쪽 캡션/중첩36/216 완료. 합본501·unit1036·Native126·실제App29·추가75·실행묶음7 통과. 기존 보호 검사와 원본44·WIP45 유지. N046에서는 한글 2024의 세 HWP 저장·재열기를 확인했다. 다른 한글 직접 비교는 보류했다. [최종 구현·검증 근거](../138-n001-storage-current-closure.md).
+세부 구현은 25/25, 세부 검증은 23/25이다. N046은 LTR·RTL을 HWP로, 명시 AUTO를 HWPX 사본으로 보존한다. N001의 복합 배치와 N002의 공개 문서 변환은 한글 직접 검수가 남아 있다. [N046 한글 검수](../file-table-verification-2026-11-08.md) · [N001 합본 근거](../138-n001-storage-current-closure.md)
 
 ## 진행 요약
 
@@ -12,8 +12,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 24/25 · 부분 1 | 완료 0/10 · 부분 10 |
-| 검증 | 완료 22/25 · 부분 3 | 완료 0/10 · 부분 10 |
+| 구현 | 완료 🟢 **25/25** · 부분 0 | 완료 0/10 · 부분 10 |
+| 검증 | 완료 23/25 · 부분 2 | 완료 0/10 · 부분 10 |
 | Agent 연결 | 연결 🟢 **6/6** · 부분 0 · 해당 없음 19 | 연결 0/10 · 부분 5 · 미연결 5 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -22,7 +22,6 @@
 
 ## 먼저 할 일
 
-- **구현** [N046](<05-files-storage-recovery.md#n046>) **HWPX 문단 textDir의 HWP5 형식 보존** — 한글 저장본의 문단 모양 오프셋 42에서 확인한 LTR 0x08·RTL 0x04를 Rust 읽기·쓰기에 반영하고, AUTO 원본 보존 경로와 함께 검증한다.
 - **검증** [N001](<05-files-storage-recovery.md#n001>) **HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존** — Rust182 최종 합본: 유효 짧은 다쪽8/48·3/4열 병합24/120·다쪽 캡션/중첩36/216 완료. 합본501·unit1036·Native126·실제App29·추가75·실행묶음7 통과. 기존 보호 검사와 원본44·WIP45 유지. 한글 직접 비교는 사용자 요청으로 보류;138참조. 남은 검수는 실제 한글 합본 비교이며 N002와 분리한다. 기준 구현 커밋 f2e19c5b, 커밋 아카이브 증거140개 해시 일치.
 - **검증** [N002](<05-files-storage-recovery.md#n002>) **공개 형식 변환의 필드 보존 차이 4건** — 107패치 합본에서 표준 날짜·정확 OLE summary 정보까지 보존 읽기/양형식 왕복·손상 거절 추가. 명시 textDir HWP5 매핑과 최초 조판 차이는 별도 잔여이며 손실 변환 차단 유지.117참조; 한글 직접 비교 보류.
 
@@ -73,7 +72,7 @@
 | [B011](<05-files-storage-recovery.md#b011>) · 범위 | 다른 이름 저장 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [G094](<05-files-storage-recovery.md#g094>) · 작업 | 다른 형식 저장 뒤 출력 형식 유지·취소·재저장 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 | [G103](<05-files-storage-recovery.md#g103>) · 작업 | 다운로드 최종 승인·출력 형식·원본 연결 수명 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
-| [N046](<05-files-storage-recovery.md#n046>) · 작업 | HWPX 문단 textDir의 HWP5 형식 보존 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [N046](<05-files-storage-recovery.md#n046>) · 작업 | HWPX 문단 textDir의 HWP5 형식 보존 | ☑ 완료 | ☑ 완료 | — 해당 없음 |
 
 <a id="work-4"></a>
 
@@ -621,13 +620,13 @@
 <summary>N046 · HWPX 문단 textDir의 HWP5 형식 보존</summary>
 
 - 종류: 실행 작업 · 우선순위: P0.
-- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
-- 검증 구분: 자동 **PARTIAL** / 한글 **PARTIAL**.
-- 완료 범위: HWPX 사본은 명시 글 방향을 보존한다. 한글 2024에서 같은 혼합 문단의 실제 HWP 세 건을 저장·재열기했다. AUTO와 LTR은 LTR로, RTL은 RTL로 돌아왔다.
-- 다음 작업: 한글 저장본의 문단 모양 오프셋 42에서 확인한 LTR 0x08·RTL 0x04를 Rust 읽기·쓰기에 반영하고, AUTO 원본 보존 경로와 함께 검증한다.
+- 상태: 구현 ☑ 완료 / 검증 ☑ 완료 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **DONE**.
+- 완료 범위: 명시 LTR·RTL은 HWP5 문단 모양 attr2의 방향 비트로 읽고 쓴다. AUTO는 HWPX 사본에 명시값을 보존한다. Edge에서 세 파일을 저장·재열기하고 한글 2024에서 Jueony의 두 HWP를 다시 열어 방향과 자동 간격을 확인했다.
+- 다음 작업: 요청한 세 방향의 파일 보존 검수를 마쳤다.
 - 상위 항목: [B011](<05-files-storage-recovery.md#b011>) 다른 이름 저장
-- 근거: [116-reflowed-native-storage.md](<../116-reflowed-native-storage.md>) · [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>) · [verify-font-fallback-storage-engine.json](<../evidence/basic-editor-2026-10-24/second/existing-conversion-limitation/verify-font-fallback-storage-engine.json>) · [font-fallback-baseline182.json](<../evidence/basic-editor-2026-10-24/second/existing-conversion-limitation/font-fallback-baseline182.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [comparison.json](<../evidence/n046-hancom-2026-11-08/comparison.json>)
-- 원래 기록: `PREEXISTING_UNRESOLVED_DIRECTION_MAPPING_EXPLICITLY_COUNTED_2026_10_24`
+- 근거: [116-reflowed-native-storage.md](<../116-reflowed-native-storage.md>) · [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>) · [verify-font-fallback-storage-engine.json](<../evidence/basic-editor-2026-10-24/second/existing-conversion-limitation/verify-font-fallback-storage-engine.json>) · [font-fallback-baseline182.json](<../evidence/basic-editor-2026-10-24/second/existing-conversion-limitation/font-fallback-baseline182.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [comparison.json](<../evidence/n046-hancom-2026-11-08/comparison.json>) · [editor-roundtrip.json](<../evidence/n046-hancom-2026-11-08/editor-roundtrip.json>)
+- 원래 기록: `PREEXISTING_UNRESOLVED_DIRECTION_MAPPING_EXPLICITLY_COUNTED_2026_10_24;VERIFIED_RUST_EDGE_AND_HANCOM_2026_11_08`
 
 </details>
 

@@ -1,19 +1,35 @@
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
-import {readFile} from 'node:fs/promises';
+import {mkdir, readFile, writeFile} from 'node:fs/promises';
 import {resolve, join} from 'node:path';
 import {setTimeout as delay} from 'node:timers/promises';
 import puppeteer from 'puppeteer-core';
-import {loadReviewEngine} from './lib/hancom-review.mjs';
+import {hash, loadReviewEngine} from './lib/hancom-review.mjs';
 import {readOwnedZip, writeOwnedZip} from './lib/owned-zip.mjs';
 
 // Run against a profile built using this engine. Only synthetic documents and
 // the isolated browser's origin-private filesystem are used.
-const [distPath, enginePath, browserPath] = process.argv.slice(2);
+const [distPath, enginePath, browserPath, outputDir, hancomDir] = process.argv.slice(2);
 assert.ok(distPath && enginePath && browserPath, 'Supply dist, engine package and browser executable paths');
 const dist = resolve(distPath), engine = await loadReviewEngine(resolve(enginePath));
 const build = JSON.parse(await readFile(join(dist, 'build-evidence.json'), 'utf8'));
 assert.equal(build.engineWasmSha256, engine.metadata.wasmSha256);
+// Native Hancom files have no Jueony sidecar that could mask a binary reader regression.
+if (hancomDir) {
+  const evidence = JSON.parse(await readFile(new URL('../../../docs/evidence/n046-hancom-2026-11-08/comparison.json', import.meta.url), 'utf8'));
+  for (const direction of ['LTR', 'RTL']) {
+    const bytes = await readFile(join(hancomDir, direction + '-disk.hwp'));
+    assert.equal(hash(bytes), evidence[direction].hwpSha256);
+    const native = new engine.HwpDocument(bytes);
+    try {
+      const parts = new Map(readOwnedZip(native.exportHwpx()));
+      const id = evidence[direction].paraShapeId;
+      assert.match(parts.get('Contents/section0.xml').toString(), new RegExp('<hp:p [^>]*paraPrIDRef="' + id + '"'));
+      assert.match(parts.get('Contents/header.xml').toString(), new RegExp('<hh:paraPr id="' + id + '"[^>]* textDir="' + direction + '"'));
+    } finally { native.free(); }
+    console.log('PASS', direction, 'read native Hancom HWP');
+  }
+}
 const port = Number(process.env.JUEONY_TEST_PORT ?? 4748);
 assert.ok(Number.isInteger(port) && port > 1024 && port < 65536);
 const origin = 'http://127.0.0.1:' + port;
@@ -41,14 +57,28 @@ try {
   await page.goto(origin);
   await page.waitForFunction(() => document.querySelector('#app-status')?.textContent.includes('준비 완료'), {timeout: 60000});
   const frame = await (await page.$('.editor-frame:not([hidden])')).contentFrame();
-  const cases = ['RTL', 'AUTO', 'LTR'].flatMap(direction => ['cancel','save'].map(action => ({direction, action})));
-  cases.unshift({direction:'RTL', action:'original-handle'}, {direction:'AUTO', action:'unbound-original'}, {direction:'LTR', action:'switch-in-picker'});
-  cases.push({direction:'RTL', action:'password'}, {direction:'RTL', action:'switch'}, {direction:'LTR', action:'switch-before-options'});
+  // Supplying an output directory runs just the three disk round trips.
+  const cases = ['LTR', 'RTL', 'AUTO'].map(direction => ({direction, action:'save'}));
+  if (outputDir) {
+    await mkdir(outputDir, {recursive:true});
+  } else {
+    for (const action of ['cancel','password','switch','switch-before-options','original-handle','unbound-original','switch-in-picker']) {
+      cases.push({direction:'AUTO', action});
+    }
+  }
   for (const {direction, action} of cases) {
     const parts = new Map(readOwnedZip(base));
     const header = parts.get('Contents/header.xml').toString('utf8');
-    assert.match(header, /<hh:paraPr id="0" /);
-    parts.set('Contents/header.xml', header.replace('<hh:paraPr id="0" ', '<hh:paraPr id="0" textDir="' + direction + '" '));
+    const shapeTag = /<hh:paraPr id="0"\s[^>]*>/;
+    assert.match(header, shapeTag);
+    let sourceHeader = header.replace(shapeTag, tag => tag.replace(/ textDir="[^"]*"/, '').slice(0, -1) + ' textDir="' + direction + '">');
+    if (outputDir) {
+      // These spacing settings share the HWP attr2 word with text direction.
+      const spacing = '<hh:autoSpacing eAsianEng="0" eAsianNum="0"';
+      assert.ok(sourceHeader.includes(spacing));
+      sourceHeader = sourceHeader.replace(spacing, '<hh:autoSpacing eAsianEng="1" eAsianNum="1"');
+    }
+    parts.set('Contents/header.xml', sourceHeader);
     const source = writeOwnedZip([...parts]);
     await frame.evaluate(async ({bytes, direction, action}) => {
       const dir = await navigator.storage.getDirectory(), src = await dir.getFileHandle('source-' + direction + '.hwpx', {create:true});
@@ -94,6 +124,27 @@ try {
       await frame.type('#hwp-save-password-confirmation', password);
     }
     await frame.click('.modal-overlay .dialog-btn-primary');
+    if (direction !== 'AUTO') {
+      const expected = name + '.hwp';
+      await frame.waitForFunction(fileName => window.jueonyEditor.fileHandle()?.name === fileName, {}, expected);
+      const saved = await frame.evaluate(async () => {
+        const bytes = async handle => [...new Uint8Array(await (await handle.getFile()).arrayBuffer())];
+        return {picks:window.__directionPicks, original:await bytes(window.__directionSource), current:await bytes(window.jueonyEditor.fileHandle())};
+      });
+      assert.deepEqual(saved.picks, [expected]);
+      assert.deepEqual(saved.original, [...source]);
+      const bytes = Uint8Array.from(saved.current);
+      assert.equal(Buffer.from(bytes.subarray(0, 8)).toString('hex'), 'd0cf11e0a1b11ae1');
+      const reopened = new engine.HwpDocument(bytes);
+      try {
+        assert.equal(reopened.getTextRange(0,0,0,reopened.getParagraphLength(0,0)), '글 방향 보존 확인');
+        const parts = new Map(readOwnedZip(reopened.exportHwpx()));
+        assert.match(parts.get('Contents/header.xml').toString('utf8'), new RegExp('<hh:paraPr id="0"[^>]* textDir="' + direction + '"'));
+      } finally { reopened.free(); }
+      if (outputDir) await writeFile(join(outputDir, direction + '.hwp'), bytes);
+      console.log('PASS', direction, 'HWP save and reopen');
+      continue;
+    }
     await frame.waitForFunction(() => document.querySelector('.modal-overlay')?.textContent.includes('문단 글 방향 보존'));
     if (['original-handle','unbound-original','switch-in-picker'].includes(action)) {
       await frame.click('.dialog-footer .dialog-btn-primary');
@@ -133,6 +184,7 @@ try {
         assert.equal(reopened.getTextRange(0,0,0,reopened.getParagraphLength(0,0)), '글 방향 보존 확인');
         const xml = new Map(readOwnedZip(action === 'password' ? reopened.exportHwpx() : bytes)).get('Contents/header.xml').toString('utf8');
         assert.match(xml, new RegExp('<hh:paraPr id="0"[^>]* textDir="' + direction + '"'));
+        if (outputDir) await writeFile(join(outputDir, direction + '.hwpx'), bytes);
       }
       finally { reopened.free(); }
     } else assert.deepEqual(result.current, [...source]);

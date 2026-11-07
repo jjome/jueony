@@ -226,7 +226,7 @@ function serializerLossMessage(count:number,losses:unknown[],format:Format):stri
   return value.code==='metadataReduced'&&value.subject===subject&&typeof value.path==='string'&&path.test(value.path);
  });
  const details:string[]=[];
- if(format==='hwp'&&losses.some(isParagraphDirectionLoss))details.push('원본의 명시적 글 방향을 HWP로 보존하는 변환은 지원하지 않습니다. HWPX로 저장해 보존 검사를 진행해 주세요');
+ if(format==='hwp'&&losses.some(isParagraphDirectionLoss))details.push('일부 문단의 글 방향 값을 HWP에 그대로 저장할 수 없습니다. 원래 값을 유지하려면 HWPX로 저장해 주세요');
  if(has('fontProperties',/^docInfo\/font\/\d+\/\d+\/(?:substFont\/)?type$/))details.push('원본 글꼴 유형을 안전하게 보존할 수 없어 저장을 중단했습니다');
  return `직렬화기가 ${count}건의 손실을 보고했습니다`+(details.length?`. ${details.join('. ')}`:'');
 }

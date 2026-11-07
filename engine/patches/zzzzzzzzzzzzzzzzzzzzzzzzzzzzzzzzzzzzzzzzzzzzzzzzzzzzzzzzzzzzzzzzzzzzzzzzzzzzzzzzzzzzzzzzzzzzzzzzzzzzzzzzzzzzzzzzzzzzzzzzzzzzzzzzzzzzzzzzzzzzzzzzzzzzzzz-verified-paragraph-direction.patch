@@ -1,0 +1,107 @@
+--- a/src/model/style.rs
++++ b/src/model/style.rs
+@@ -333,12 +333,35 @@
+     Bullet,
+ }
+ 
+-/// Explicit XML paragraph direction, retained separately from unproven HWP5 bits.
++/// Paragraph direction from a native paragraph shape or an explicit XML attribute.
+ /// Known lexical values acquire a semantic enum; unknown source values keep their
+ /// exact original spelling and never silently become AUTO.
+ #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+ pub enum ParagraphTextDirection { Auto, Ltr, Rtl, Unknown(String) }
+ impl ParagraphTextDirection {
++    // Hancom 2024 PARA_SHAPE offset 42, attr2 bits 2..3. The other bits
++    // include line wrapping and automatic spacing.
++    const MASK: u32 = 0x0c;
++    const RTL: u32 = 0x04;
++    const LTR: u32 = 0x08;
++
++    pub fn from_attr2(attr2: u32) -> Option<Self> {
++        match attr2 & Self::MASK {
++            Self::RTL => Some(Self::Rtl),
++            Self::LTR => Some(Self::Ltr),
++            _ => None,
++        }
++    }
++
++    pub fn encode_attr2(&self, attr2: u32) -> Option<u32> {
++        let bits = match self {
++            Self::Rtl => Self::RTL,
++            Self::Ltr => Self::LTR,
++            Self::Auto | Self::Unknown(_) => return None,
++        };
++        Some((attr2 & !Self::MASK) | bits)
++    }
++
+     pub fn from_lexical(value: String) -> Self { match value.as_str() {
+         "AUTO" => Self::Auto, "LTR" => Self::Ltr, "RTL" => Self::Rtl,
+         _ => Self::Unknown(value),
+@@ -352,7 +375,7 @@
+ /// 문단 모양 (HWPTAG_PARA_SHAPE)
+ #[derive(Debug, Clone, Default, serde::Serialize)]
+ pub struct ParaShape {
+-    /// Original hh:paraPr@textDir, including explicit AUTO versus absence.
++    /// Resolved native direction or original XML value, including explicit AUTO.
+     /// Metadata preservation only; this does not add RTL shaping support.
+     pub hwpx_text_direction: Option<ParagraphTextDirection>,
+     /// HWPX paragraph line-number suppression; binary mapping is not inferred.
+--- a/src/parser/doc_info.rs
++++ b/src/parser/doc_info.rs
+@@ -821,8 +821,7 @@
+     let para_level = (((attr1 >> 25) & 0x07) as u8).max(outline_level_tail.min(9) as u8);
+ 
+     Ok(ParaShape {
+-        // No HWP5 direction bit is inferred from reserved or undocumented bits.
+-        hwpx_text_direction: None,
++        hwpx_text_direction: crate::model::style::ParagraphTextDirection::from_attr2(attr2),
+         suppress_line_numbers: false,
+         raw_data: None,
+         attr1,
+--- a/src/parser/hwpx/header.rs
++++ b/src/parser/hwpx/header.rs
+@@ -928,7 +928,11 @@
+                     ps.attr1 &= !(1 << 22);
+                 }
+             }
+-            b"textDir" => ps.hwpx_text_direction=Some(crate::model::style::ParagraphTextDirection::from_lexical(attr_str(&attr))),
++            b"textDir" => {
++                let direction = crate::model::style::ParagraphTextDirection::from_lexical(attr_str(&attr));
++                ps.attr2 = direction.encode_attr2(ps.attr2).unwrap_or(ps.attr2);
++                ps.hwpx_text_direction = Some(direction);
++            }
+             b"suppressLineNumbers" => ps.suppress_line_numbers=parse_bool(&attr),
+             b"snapToGrid" => {
+                 if parse_bool(&attr) {
+--- a/src/serializer/doc_info.rs
++++ b/src/serializer/doc_info.rs
+@@ -829,7 +829,10 @@
+         w.write_i16(spacing).unwrap();
+     }
+     // 속성2 (5.0.1.7 이상)
+-    w.write_u32(ps.attr2).unwrap();
++    let attr2 = ps.hwpx_text_direction.as_ref()
++        .and_then(|direction| direction.encode_attr2(ps.attr2))
++        .unwrap_or(ps.attr2);
++    w.write_u32(attr2).unwrap();
+     // 속성3 - 줄 간격 종류 확장 (5.0.2.5 이상)
+     w.write_u32(ps.attr3).unwrap();
+     // 줄 간격 (5.0.2.5 이상)
+--- a/src/serializer/paragraph_metadata_loss.rs
++++ b/src/serializer/paragraph_metadata_loss.rs
+@@ -13,12 +13,11 @@
+ fn caption<'a>(stack:&mut Vec<Node<'a>>,value:Option<&'a crate::model::shape::Caption>,path:&str){if let Some(c)=value{paragraphs(stack,&c.paragraphs,&format!("{path}/caption"));}}
+ fn drawing<'a>(stack:&mut Vec<Node<'a>>,value:&'a crate::model::shape::DrawingObjAttr,path:&str){caption(stack,value.caption.as_ref(),path);if let Some(t)=&value.text_box{paragraphs(stack,&t.paragraphs,&format!("{path}/textbox"));}}
+ pub(super) fn record(doc:&Document,report:&mut ContentLossReport){
+-    // The XML attribute is retained exactly, but this HWP5 writer has no proven
+-    // binary mapping. Report each source resource once (including unused styles)
+-    // rather than manufacturing a direction from reserved bits or dropping it.
++    // Explicit AUTO and unknown XML values require a lossless HWPX copy.
++    // Include unused resources, since a style can be applied after reopening.
+     if report.output_format()==super::content_loss::SerializedFormat::Hwp {
+         for(i,shape)in doc.doc_info.para_shapes.iter().enumerate(){
+-            if shape.hwpx_text_direction.is_some(){report.record(ContentLoss{
++            if shape.hwpx_text_direction.as_ref().is_some_and(|d| d.encode_attr2(shape.attr2).is_none()){report.record(ContentLoss{
+                 code:ContentLossCode::MetadataReduced,subject:ContentLossSubject::ParagraphProperties,
+                 path:format!("docInfo/paraShape/{i}/textDir"),reason:ContentLossReason::SerializerNotImplemented,resource_id:None,
+             });}

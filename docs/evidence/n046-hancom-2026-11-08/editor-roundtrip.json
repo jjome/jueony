@@ -1,0 +1,37 @@
+{
+  "engineSourceId": "ce7f9b363991d6c5",
+  "wasmSha256": "c314eb6e2709672d335fec0a2f5a55ac000914ffd97eec0337598e03cc6da4cd",
+  "hancomVersion": "13.0.0.711",
+  "edgeVersion": "157.0.4341.42",
+  "browserAndEngineChecks": [
+    "PASS LTR read native Hancom HWP",
+    "PASS RTL read native Hancom HWP",
+    "PASS LTR HWP save and reopen",
+    "PASS RTL HWP save and reopen",
+    "PASS AUTO save"
+  ],
+  "independentFileChecks": {
+    "LTR": {
+      "shapeId": 0,
+      "attr2": "0x38",
+      "sha256": "6624030e3da6a79bd05e2c1bbc5766ce413f8adf85b4b70a5fe33980ace08969",
+      "hancomReadback": {
+        "textDir": "LTR",
+        "sha256": "6316c86780b0254aa0e076fee06a0f8723fea713fe811bd9a7bbb39cdc9e183b"
+      }
+    },
+    "RTL": {
+      "shapeId": 0,
+      "attr2": "0x34",
+      "sha256": "f1ee4fc76e11cd155e49c7361c0521b814b58893907fdb26f9fcdd4aafcfe154",
+      "hancomReadback": {
+        "textDir": "RTL",
+        "sha256": "b55531319713440d45c64335b7055254048ee077d69e948f4a933fdf364e6db9"
+      }
+    },
+    "AUTO": {
+      "textDir": "AUTO",
+      "sha256": "3b5032009b96f3464c31e6e26fa0000a94c4432e0a6993a1a8f34b53166f5401"
+    }
+  }
+}

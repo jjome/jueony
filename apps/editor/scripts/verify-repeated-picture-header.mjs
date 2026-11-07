@@ -9,7 +9,9 @@ import {executeDocumentOperations} from '../src/adapters/rhwp/execute.ts';
 import {validateEditOperations} from '../src/modules/document/public/index.ts';
 
 const {HwpDocument}=await loadReviewEngine(resolve(process.env.JUEONY_ENGINE_PACKAGE));
-const out=resolve(process.env.JUEONY_TEST_OUTPUT??resolve(import.meta.dirname,'../../../build/axis-repeat-picture-header'));
+const paragraphs=process.argv.includes('--paragraphs');
+const expectedTitle=paragraphs?[['항','목0'],[''],['PicA']]:[['항목0'],['항목1'],['PicA']];
+const out=resolve(process.env.JUEONY_TEST_OUTPUT??resolve(import.meta.dirname,'../../../build/'+(paragraphs?'axis-repeat-header-paragraphs':'axis-repeat-picture-header')));
 await mkdir(out,{recursive:true});
 const base=[0,1,0],op={kind:'insert_table_row',target:'s0p1t0',index:2,values:['새 행','','']};
 const raw=(file,kind)=>JSON.parse(execFileSync('python',[resolve(import.meta.dirname,'lib/inspect-axis-picture.py'),kind,file],{encoding:'utf8'}));
@@ -24,16 +26,24 @@ function layout(d){
   const controls=JSON.parse(d.getPageControlLayout(i)).controls,table=controls.find(c=>c.type==='table');
   assert.deepEqual(table.cells.filter(c=>c.row===0).map(c=>c.col),[0,1,2]);
   const runs=JSON.parse(d.getPageTextLayout(i)).runs;
-  assert.deepEqual([0,1,2].map(cell=>runs.filter(r=>r.cellPath?.[0]?.cellIndex===cell).map(r=>r.text).join('')),['항목0','항목1','PicA']);
+  for(const [cell,parts] of expectedTitle.entries()){
+   const actual=runs.filter(r=>r.cellPath?.[0]?.cellIndex===cell);
+   assert.deepEqual([...new Set(actual.map(r=>r.cellParaIdx))],parts.map((_,i)=>i));
+   assert.deepEqual(parts.map((_,p)=>actual.filter(r=>r.cellParaIdx===p).map(r=>r.text).join('')),parts);
+  }
   return controls.filter(c=>c.type==='image').length;
  });
 }
 const fixture=await createAxisPictureFixture(HwpDocument,out,{merged:true,grouped:true});
 try{
  fixture.insertTableRow(...base,1,false);
- for(const index of [0,1,2])fixture.setCellProperties(...base,index,'{"height":1800,"isHeader":true}');
+ if(paragraphs){
+  fixture.splitParagraphInCell(...base,0,0,1);
+  fixture.deleteTextInCell(...base,1,0,0,fixture.getCellParagraphLength(...base,1,0));
+ }
+ for(const index of [0,1,2])fixture.setCellProperties(...base,index,JSON.stringify({height:paragraphs?3900:1800,isHeader:true}));
  for(const index of [3,4,5])fixture.setCellProperties(...base,index,'{"height":3000}');
- fixture.setPageDef(0,JSON.stringify({...JSON.parse(fixture.getPageDef(0)),height:21000,marginTop:2000,marginBottom:2000,marginHeader:0,marginFooter:0}));
+ fixture.setPageDef(0,JSON.stringify({...JSON.parse(fixture.getPageDef(0)),height:paragraphs?23000:21000,marginTop:2000,marginBottom:2000,marginHeader:0,marginFooter:0}));
  fixture.setTableProperties(...base,'{"pageBreak":2,"repeatHeader":true}');
  for(const format of ['hwp','hwpx']){
   const source=resolve(out,'before.'+format),original=bytes(fixture,format);await writeFile(source,original);
@@ -50,10 +60,21 @@ try{
    console.log('PASS',format,'one stored title row, two copies on screen, four pictures, original records/bytes, reopen');
   }finally{d.free();}
   const modes=format==='hwp'?['wrong source','missing title','inherited header','field in title']:['changed label','crop','lost repeat flag','changed title style'];
+  if(paragraphs)modes.push(format==='hwp'?'missing empty paragraph':'wrong paragraph');
   for(const mode of modes){
    const d=new HwpDocument(original);
    try{
     if(mode==='field in title')d.insertClickHereFieldInCell(...base,0,0,0,false,'입력','번호','번호',true);
+    if(mode==='missing empty paragraph'||mode==='wrong paragraph'){
+     const read=d.getPageTextLayout.bind(d);d.getPageTextLayout=page=>{
+      const view=JSON.parse(read(page));
+      if(page===1){
+       if(mode==='missing empty paragraph')view.runs=view.runs.filter(r=>r.cellPath?.[0]?.cellIndex!==1);
+       else view.runs.find(r=>r.cellPath?.[0]?.cellIndex===0&&r.cellParaIdx===1).cellPath[0].cellParaIndex=0;
+      }
+      return JSON.stringify(view);
+     };
+    }
     if(mode==='wrong source'||mode==='changed label'){
      const read=d.getPageTextLayout.bind(d);d.getPageTextLayout=page=>{
       const view=JSON.parse(read(page)),run=view.runs.find(r=>r.cellPath?.[0]?.cellIndex===2);

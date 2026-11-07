@@ -56,26 +56,29 @@ function proposal(input,splitPictures){
  return {kind:insert?'insert_table_row':'delete_table_row',target:t.id,index:named.row,...(insert?{values:['신규','']}:{})};
 }
 
-async function checkPicturePages(frame,expected,repeat=false){
- const layouts=await frame.evaluate(repeat=>{
+async function checkPicturePages(frame,expected,headings){
+ const layouts=await frame.evaluate(headings=>{
   const d=window.__pageServices.wasm.borrowDocumentHandle(),active=d.canvasMetricsActive();
   const pages=()=>Array.from({length:d.pageCount()},(_,i)=>{
    const controls=JSON.parse(d.getPageControlLayout(i)).controls,images=controls.filter(c=>c.type==='image').length;
-   if(!repeat)return images;
+   if(!headings)return images;
    const table=controls.find(c=>c.type==='table'&&c.secIdx===0&&c.paraIdx===1&&c.controlIdx===0);
    const runs=JSON.parse(d.getPageTextLayout(i)).runs;
    return {images,cols:table.cells.filter(c=>c.row===0).map(c=>c.col),
-    labels:[0,1,2].map(cell=>runs.filter(r=>r.secIdx===0&&r.parentParaIdx===1&&r.controlIdx===0&&
-     r.cellPath?.length===1&&r.cellPath[0].cellIndex===cell&&r.cellPath[0].cellParaIndex===0).map(r=>r.text).join(''))};
+    labels:headings.map((parts,cell)=>parts.map((_,p)=>{
+     const owned=runs.filter(r=>r.secIdx===0&&r.parentParaIdx===1&&r.controlIdx===0&&r.cellPath?.length===1&&
+      r.cellPath[0].cellIndex===cell&&r.cellPath[0].cellParaIndex===p);
+     return owned.length?owned.map(r=>r.text).join(''):null;
+    }))};
   });
   try{
    d.selectCanvasMetrics(true);
    const screen=pages(),canvas=d.canvasMetricsActive();
    d.selectCanvasMetrics(false);return {canvas,screen,portable:pages()};
   }finally{d.selectCanvasMetrics(active);}
- },repeat);
+ },headings);
  assert.equal(layouts.canvas,true);
- const wanted=repeat?expected.map(images=>({images,cols:[0,1,2],labels:['항목0','항목1','PicA']})):expected;
+ const wanted=headings?expected.map(images=>({images,cols:[0,1,2],labels:headings})):expected;
  assert.deepEqual(layouts.screen,wanted);assert.deepEqual(layouts.portable,wanted);
 }
 
@@ -111,13 +114,14 @@ export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,
     const sourceKind=repeatPictures?' with an existing repeated title row':pagedPictures?' with a merged photo cell moving between pages':splitPictures?' with three pictures in two cell paragraphs':groupedPictures?' with three pictures in one cell':multiplePictures?' with four products':'';
     await scenario(ext+' Agent picture owner row insertion and deletion refusal through chat'+sourceKind,async()=>{
      const source=new HwpDocument(await readFile(resolve(pictureFolder,'before.'+ext)));
+     const headings=repeatPictures?(source.getCellParagraphCount(0,1,0,0)===2?[['항','목0'],[''],['PicA']]:[['항목0'],['항목1'],['PicA']]):undefined;
      const frame=await open(ext,source),before=(await snap()).structure;
-     if(pagedPictures)await checkPicturePages(frame,[3,1],repeatPictures);
+     if(pagedPictures)await checkPicturePages(frame,[3,1],headings);
      const originals=before.tables[0].cells.filter(c=>c.axisPicture);assert.equal(originals.length,groupedPictures?2:multiplePictures?4:1);
      const request=repeatPictures?repeatRequest:splitPictures?splitRequest:groupedPictures?groupedRequest:multiplePictures?picturesRequest:pictureRequest;
      assert.equal(await send(request),'');
      const after=(await snap()).structure;
-     if(pagedPictures)await checkPicturePages(frame,[0,4],repeatPictures);
+     if(pagedPictures)await checkPicturePages(frame,[0,4],headings);
      if(repeatPictures)assert.equal(after.tables[0].cells.find(c=>c.text==='새 행').row,2);
      for(const original of originals){
       const moved=after.tables[0].cells.find(c=>c.text===original.text);
@@ -132,11 +136,11 @@ export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,
       }
      }
      await execute('edit:undo');assert.deepEqual((await snap()).structure,before);
-     if(repeatPictures)await checkPicturePages(frame,[3,1],true);
+     if(repeatPictures)await checkPicturePages(frame,[3,1],headings);
      await execute('edit:redo');assert.deepEqual((await snap()).structure,after);
-     if(repeatPictures)await checkPicturePages(frame,[0,4],true);
+     if(repeatPictures)await checkPicturePages(frame,[0,4],headings);
      await reopen(frame,'picture-axis-'+ext,ext);assert.deepEqual((await snap()).structure,after);
-     if(pagedPictures)await checkPicturePages(frame,[0,4],repeatPictures);
+     if(pagedPictures)await checkPicturePages(frame,[0,4],headings);
      const saved=await state();assert.match(await send(groupedPictures?removeGrouped:multiplePictures?removePictures:removePicture),/그림/);assert.deepEqual(await state(),saved);
     });
     continue;

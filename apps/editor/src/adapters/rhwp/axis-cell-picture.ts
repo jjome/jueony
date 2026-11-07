@@ -55,7 +55,7 @@ function picturePages(doc:any) {
  }
 }
 
-type HeaderCell={index:number;text:string;properties:any};
+type HeaderCell={index:number;paragraphs:string[];properties:any};
 function plainHeader(doc:any,base:number[],dimensions:any,fields:any[]):HeaderCell[]|null{
  const [section,paragraph,control]=base;
  const lists=json(doc.getCursorModel()).lists,children=json(doc.getControls());
@@ -66,14 +66,20 @@ function plainHeader(doc:any,base:number[],dimensions:any,fields:any[]):HeaderCe
   if(info.row!==0)continue;
   if(info.rowSpan!==1||info.colSpan!==1||properties.fieldName!==''||properties.cellProtect!==false||header[info.col])return null;
   const paths=lists.filter((l:any)=>l.hostListId===0&&l.isCell&&l.sectionIndex===section&&l.hostPara===paragraph&&l.controlIndex===control&&l.cellIndex===i);
-  if(paths.length!==1||paths[0].paraCount!==1||children.some((c:any)=>c.list===paths[0].listId)||
+  if(paths.length!==1||!Number.isSafeInteger(paths[0].paraCount)||paths[0].paraCount<1||paths[0].paraCount>50||
+     children.some((c:any)=>c.list===paths[0].listId)||
      fields.some(f=>f.listId===paths[0].listId||f.location?.sectionIndex===section&&f.location?.paraIndex===paragraph&&
       f.location.path?.[0]?.type==='cell'&&f.location.path[0].controlIndex===control&&f.location.path[0].cellIndex===i))return null;
-  const length=doc.getCellParagraphLength(...base,i,0);
-  if(!Number.isSafeInteger(length)||length<1||length>4000)return null;
-  const text=doc.getTextInCell(...base,i,0,0,length);
-  if(Array.from(text).length!==length)return null;
-  header[info.col]={index:i,text,properties};
+  const paragraphs:string[]=[];
+  let total=0;
+  for(let p=0;p<paths[0].paraCount;p++){
+   const length=doc.getCellParagraphLength(...base,i,p);
+   if(!Number.isSafeInteger(length)||length<0||(total+=length)>4000)return null;
+   const text=doc.getTextInCell(...base,i,p,0,length);
+   if(typeof text!=='string'||Array.from(text).length!==length)return null;
+   paragraphs.push(text);
+  }
+  header[info.col]={index:i,paragraphs,properties};
  }
  return header.length===dimensions.colCount&&Array.from(header).every(Boolean)?header:null;
 }
@@ -99,14 +105,23 @@ function renderedHeader(view:HeaderLayout|undefined,controls:any[],frame:any,hea
   const runs=view.runs.filter(r=>r.secIdx===section&&r.parentParaIdx===paragraph&&
    r.cellPath?.[0]?.controlIndex===control&&r.cellPath[0].cellIndex===source.index);
   if(controls.some(c=>c!==frame&&overlaps(c,cell))||view.runs.filter(r=>overlaps(r,cell)).length!==runs.length)return null;
-  let offset=0,text='';
-  for(const {x,y,...r} of runs){
-   if(r.cellPath.length!==1||r.cellPath[0].cellParaIndex!==0||r.controlIdx!==control||r.cellIdx!==source.index||
-      r.paraIdx!==0||r.cellParaIdx!==0||r.charStart!==offset||typeof r.text!=='string'||!r.text||!inside({x,y,w:r.w,h:r.h},cell))return null;
-   offset+=Array.from(r.text).length;text+=r.text;
-   evidence.push({x:x-cell.x,y:y-cell.y,record:JSON.stringify(r)});
+  let cursor=0;
+  for(const [paragraph,expected] of source.paragraphs.entries()){
+   let offset=0,text='';
+   const first=cursor;
+   while(cursor<runs.length && runs[cursor].cellParaIdx===paragraph){
+    const {x,y,...r}=runs[cursor++];
+    if(r.cellPath.length!==1||r.cellPath[0].cellParaIndex!==paragraph||r.controlIdx!==control||r.cellIdx!==source.index||
+       r.paraIdx!==paragraph||r.charStart!==offset||typeof r.text!=='string'||(!r.text && (expected!==''||cursor!==first+1))||
+       !inside({x,y,w:r.w,h:r.h},cell))return null;
+    offset+=Array.from(r.text).length;text+=r.text;
+    evidence.push({x:x-cell.x,y:y-cell.y,record:JSON.stringify(r)});
+   }
+   // The renderer publishes a line box even for an empty paragraph.
+   // Without it we cannot distinguish a blank cell from missing content.
+   if(cursor===first || text!==expected)return null;
   }
-  if(text!==source.text)return null;
+  if(cursor!==runs.length)return null;
  }
  return evidence;
 }

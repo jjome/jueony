@@ -185,4 +185,5 @@ try{
  });
  await scenario('no unexpected console/page errors or external assets',()=>{assert.deepEqual(pageErrors,[]);assert.deepEqual(consoleErrors,[]);assert.deepEqual(externalRequests,[]);});
 }finally{await browser?.close();server.kill();await new Promise(r=>provider.close(r));}
+if(casePattern&&!results.length&&!failures.length)throw Error('No matching cell paragraph scenario: '+casePattern);
 await writeFile(resolve(out,'result.json'),JSON.stringify({results,failures,calls:calls.map(({id,model,input})=>({id,model,publicCapOnly:Object.values(input.document.cellParagraphSources??{}).every(s=>!JSON.stringify(s).includes('charShapeId'))})),pageErrors,consoleErrors,externalRequests,beforeUnloadCount,engine:JSON.parse(await readFile(resolve(pkg,'jueony-engine-build.json'),'utf8')),applicationBuild:JSON.parse(await readFile(resolve(dist,'build-evidence.json'),'utf8')),note:'Four synthetic protocol adapters, actual document/undo/save/reopen. Paid calls and Hancom NOT_RUN.'},null,2));if(failures.length)process.exitCode=1;

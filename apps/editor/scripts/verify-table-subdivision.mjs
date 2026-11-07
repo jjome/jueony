@@ -82,7 +82,7 @@ try{
  for(const id of ['openai-responses','anthropic','gemini','openai-compatible'])await scenario(id+': chat subdivision, compare, cursor, undo/redo, save/UI reopen',async()=>{await configure(id);const f=await open('hwpx',body('hwpx',true)),before=await snap(),t=before.structure.tables[0],start=calls.length;assert.equal(before.tableSubdivisionSources[t.id].editable,true);await send('셀 2행 2열 분할');await error(false);assert.equal(calls.length,start+1);assert.equal(calls.at(-1).id,id);assert.equal(calls.at(-1).model,id+'-fixture');assert.equal(calls.at(-1).input.document.tableSubdivisionSources[t.id].editable,true);const after=await snap(),table=after.structure.tables[0],primary=table.cells.find(c=>c.row===1&&c.column===1);assert.equal(table.rows,4);assert.equal(table.columns,4);assert.equal(table.cells.length,12);assert.equal(primary.text,t.cells[4].text);for(const c of table.cells.filter(c=>c.row>=1&&c.row<=2&&c.column>=1&&c.column<=2&&c!==primary))assert.equal(c.text,'');assert.deepEqual(after.structure.tables[1],before.structure.tables[1]);assert.deepEqual(after.nodes,before.nodes);assert.equal(await f.evaluate(()=>window.__pageServices.getInputHandler().getCursorPosition().cellIndex),primary.index);await lastAction('변경 확인');await page.waitForFunction(()=>document.getElementById('change-dialog').open);await page.$eval('#change-dialog details',e=>e.open=true);await page.screenshot({path:resolve(out,'subdivision-'+id+'.png')});await page.click('#change-dialog button');await undo();assert.deepEqual((await snap()).structure,before.structure);await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);await reopen(f,'subdivision-ui-'+id);});
  for (const ext of ['hwpx','hwp']) await scenario('fragmented subdivision - '+ext+' three-page owner with saved paragraph styles',async()=>{
    await configure('openai-compatible');
-   const f=await open(ext,fragmentedSubdivisionTable(HwpDocument));
+   const f=await open(ext,fragmentedSubdivisionTable(HwpDocument,{emoji:false}));
    const before=await snap(),t=before.structure.tables[0],frames=before.tableSubdivisionSources[t.id].frames;
    assert.ok(frames.length>=2 && frames.every(page=>page.cells.find(c=>c.index===0)?.lineSignature));
    await send('세 쪽에 걸친 셀을 세 칸으로 나누고 첫 칸에 원래 문단을 유지해 줘');await error(false);
@@ -102,6 +102,20 @@ try{
    await undo();assert.deepEqual((await snap()).structure,before.structure);
    await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);
    await reopen(f,'fragmented-split-'+ext,ext);assert.deepEqual((await snap()).structure,after.structure);
+ });
+ await scenario('fragmented subdivision - compare live and reopened emoji glyph width before editing',async()=>{
+   await configure('openai-compatible');
+   const f=await open('hwpx',fragmentedSubdivisionTable(HwpDocument)),before=await state();
+   const widths=await f.evaluate(()=>{
+     const wasm=window.__pageServices.wasm,live=wasm.borrowDocumentHandle();
+     const copy=new (wasm.getWasmModuleExports().HwpDocument)(live.exportHwpx());
+     const width=d=>JSON.parse(d.getPageTextLayout(0)).runs.find(r=>r.text==='😀').w;
+     try {return [width(live),width(copy)];} finally {copy.free();}
+   });
+   await writeFile(resolve(out,'live-reopened-emoji-width.json'),JSON.stringify(widths));
+   await send('세 쪽에 걸친 셀을 세 칸으로 나눠줘');
+   if(Math.abs(widths[0]-widths[1])>0.2) {await error(true);assert.deepEqual(await state(),before);}
+   else {await error(false);await reopen(f,'fragmented-same-glyph-width');}
  });
  await scenario('fragmented subdivision - changed page breaks preserve bytes and undo history',async()=>{
    await configure('openai-compatible');

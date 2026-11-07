@@ -14,7 +14,71 @@ const out=resolve(process.env.JUEONY_TEST_OUTPUT??resolve(import.meta.dirname,'.
 await mkdir(out,{recursive:true});
 const seed=mergedAxisFormulaFixture(HwpDocument);
 const table=readStructure(seed).tables[0],at=[table.section,table.paragraph,table.control];
-const stored=d=>readTableFormulaFields(d).fields.map(f=>[f.row,f.column,f.fieldId,f.storedCommand]);
+const stored=d=>(readTableFormulaFields(d)?.fields??[]).map(f=>[f.row,f.column,f.fieldId,f.storedCommand]);
+
+async function checkDeletedHosts(doc,format,axis,state,apply,target){
+ const exportName=format==='hwp'?'exportHwp':'exportHwpx';
+ const original=stored(doc),coordinate=axis==='row'?0:1;
+ const op=host=>({kind:'delete_table_'+axis,target,index:host[coordinate]});
+ const removeLeaf=op(original[1]),removeSource=op(original[0]);
+ const before=doc[exportName](),initial=state(doc).structure;
+ // The source is still referenced by the leaf.
+ assert.throws(()=>apply(removeSource),/계산식/);
+ assert.deepEqual(doc[exportName](),before);
+ const withRange=new HwpDocument(before);
+ try{
+  const setLeaf=expr=>{
+   const f=readTableFormulaFields(withRange).fields[1];
+   const reply=JSON.parse(withRange.updateTableFormulaField(...at,f.path[0].cellIndex,f.fieldId,f.storedCommand,expr,f.resultFormat));
+   assert.equal(reply.ok,true);
+  };
+  // The deleted source lies inside the range, away from its endpoints.
+  setLeaf(axis==='row'?'=SUM(C1:C4)':'=SUM(A2:D2)');
+  const rangeBytes=withRange[exportName]();
+  assert.throws(()=>apply(removeSource,withRange),/계산식/);
+  assert.deepEqual(withRange[exportName](),rangeBytes);
+  // C02 is read as C2 by the native evaluator. Equal replacement values
+  // must never hide a reference whose owner cannot be identified.
+  const replacement=state(withRange).structure.tables[0].cells.find(c=>axis==='row'?c.row===2&&c.column===2:c.row===1&&c.column===3);
+  withRange.insertTextInCell(...at,replacement.index,0,0,'12');
+  setLeaf('=C02');
+  const aliasBytes=withRange[exportName]();
+  assert.throws(()=>apply(removeSource,withRange),/계산식/);
+  assert.deepEqual(withRange[exportName](),aliasBytes);
+ }finally{withRange.free();}
+ const protectedCopy=new HwpDocument(before);
+ try{
+  const leaf=readTableFormulaFields(protectedCopy).fields[1];
+  protectedCopy.setCellProperties(...at,leaf.path[0].cellIndex,'{"cellProtect":true}');
+  const protectedBytes=protectedCopy[exportName]();
+  assert.throws(()=>apply(removeLeaf,protectedCopy),/보호/);
+  assert.deepEqual(protectedCopy[exportName](),protectedBytes);
+ }finally{protectedCopy.free();}
+ const deleteMethod=axis==='row'?'deleteTableRow':'deleteTableColumn';
+ const badNative=new Proxy(doc,{get(d,key){
+  if(key===deleteMethod)return (...args)=>{d[deleteMethod](...args);return '{"ok":false}';};
+  const value=Reflect.get(d,key,d);return typeof value==='function'?value.bind(d):value;
+ }});
+ assert.throws(()=>apply(removeLeaf,badNative),/거절/);
+ assert.deepEqual(state(doc).structure,initial);assert.deepEqual(doc[exportName](),before);
+ const undo=doc.saveSnapshot();
+ try{
+  for(const [operation,expected] of [[removeLeaf,original.slice(0,1)],[removeSource,[]]]){
+   apply(operation);assert.deepEqual(stored(doc),expected);
+   const file=resolve(out,'delete-'+axis+'-remaining-'+expected.length+'.'+format);
+   await writeFile(file,doc[exportName]());
+   const raw=JSON.parse(execFileSync('python',[resolve(import.meta.dirname,'lib/read-native-formula-fields.py'),file],{encoding:'utf8'}));
+   const fields=format==='hwp'?raw.fields:raw;
+   assert.deepEqual(fields.map(f=>[f.id,f.command??f.params.find(([,name])=>name==='Command')[2]]),expected.map(f=>f.slice(2)));
+   if(format==='hwp')assert.deepEqual(raw.endProps,expected.map(()=>8));
+   const reopened=new HwpDocument(await readFile(file));
+   try{assert.deepEqual(state(reopened).structure,state(doc).structure);assert.deepEqual(stored(reopened),expected);}
+   finally{reopened.free();}
+  }
+  doc.restoreSnapshot(undo);assert.deepEqual(state(doc).structure,initial);assert.deepEqual(doc[exportName](),before);
+ }finally{doc.discardSnapshot(undo);}
+ console.log('PASS',format,axis,'unreferenced formula host deletion, protected/referenced refusal, rollback, raw fields and reopen');
+}
 try{
  for(const format of ['hwp','hwpx']){
   const exportName=format==='hwp'?'exportHwp':'exportHwpx';
@@ -61,6 +125,7 @@ try{
     }});
     assert.throws(()=>apply(insert,intercepted),/계산식/);assert.deepEqual(doc[exportName](),unchanged);
     console.log('PASS',format,axis,'A1/range and dependent-field remap, mixed-format results, undo/redo, rejected edits, rollback, raw disk and reopen');
+    await checkDeletedHosts(doc,format,axis,state,apply,target);
    }finally{doc.free();}
   }
   const doc=new HwpDocument(seed[exportName]());

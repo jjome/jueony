@@ -55,9 +55,11 @@ export function projectAxisFormulas(table:Table,projected:Projection,rows:number
    throw Error('행·열 변경으로 계산식 범위의 참조 셀이 달라집니다.');
  }
  for(const host of hosts){
-  const moved=projectedOwner.get(host.index);
-  if(!moved)throw Error('계산식 필드가 있는 셀을 삭제할 수 없습니다.');
   const formula=host.axisFormula!,source=formula.expression,tokens=tokenizeTableFormula(source,table);
+  const moved=projectedOwner.get(host.index);
+  // A removed host has no outgoing references to remap. Every survivor must
+  // still prove all its original owners exist, including inside ranges.
+  if(!moved)continue;
   let text='',end=0;
   for(const [i,token] of tokens.entries()){
    const ref=token.reference;
@@ -75,6 +77,10 @@ export function projectAxisFormulas(table:Table,projected:Projection,rows:number
    }else if(token.kind==='name' && ['LEFT','RIGHT','ABOVE','BELOW'].includes(token.raw.toUpperCase())){
     const name=token.raw.toUpperCase();
     sameMembers(direction(name,host,table.rows,table.columns),direction(name,moved,rows,columns),host.index);
+   }else if(token.kind==='name' && tokens[i+1]?.raw!=='('){
+    // The native reader accepts aliases such as A01. Never treat an
+    // unclassified operand as an independent value during a structural edit.
+    throw Error('계산식 참조의 원래 셀을 확인할 수 없습니다.');
    }
   }
   moved.axisFormula={...formula,expression:text+source.slice(end)};

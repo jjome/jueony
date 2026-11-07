@@ -20,9 +20,9 @@
 
 ## 먼저 할 일
 
-- **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — 여러 쪽에 걸친 셀의 문단과 누름틀 뒤 문장, 기존 서식 구간, 굵게·기울임·색·크기 생성까지 양 형식으로 검수했다. 다른 인라인 개체와 필드가 있는 문단이 남음.
-- **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — 여러 병합 셀과 기존 격자에 없는 분할선, 둘째 쪽의 셀과 서식 문단 분배를 구현했다. 셀 자체가 여러 쪽에 걸친 분할, 중첩 표, 복합 개체 보존이 남음.
-- **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 중첩 표의 병합 주 셀, 여러 문단과 혼합 글자 서식 편집을 양 형식으로 확인했다. 중첩 구조 변경과 복합 필드·개체 편집이 남음.
+- **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — 서로 떨어진 누름틀 여러 개 뒤의 본문과 서식 구간을 두 형식에서 검수했다. 인접 누름틀, 다른 인라인 개체와 필드가 있는 문단이 남음.
+- **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — 여러 쪽에 걸친 병합 셀의 가로·세로 분할과 문단 분배를 확인했다. 쪽별 글줄·이웃 셀·저장 재열기 배치가 일치해야 한다. 중첩 표 분할과 복합 개체 보존이 남음.
+- **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 직사각형 내부 표의 행·열 추가·삭제, 부모·이웃 보존과 저장 재열기를 검수했다. 내부 병합·필드·개체가 있는 구조 변경은 남음.
 
 ## 기능별 작업표
 
@@ -943,7 +943,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 임의 여러 문단/병합 원본 읽기와 원문·서식 보존
-- 다음 작업: 여러 쪽에 걸친 셀의 문단과 누름틀 뒤 문장, 기존 서식 구간, 굵게·기울임·색·크기 생성까지 양 형식으로 검수했다. 다른 인라인 개체와 필드가 있는 문단이 남음.
+- 다음 작업: 서로 떨어진 누름틀 여러 개 뒤의 본문과 서식 구간을 두 형식에서 검수했다. 인접 누름틀, 다른 인라인 개체와 필드가 있는 문단이 남음.
 - 상위 항목: [B161](<08-tables.md#b161>) 셀 병합
 - Agent 명령: `replace_cell_paragraph`
 - 근거: [101-agent-merged-cell-paragraph.md](<../101-agent-merged-cell-paragraph.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
@@ -958,7 +958,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 새 격자·행/열 참조 이관과 셀 내용 분배 명세
-- 다음 작업: 여러 병합 셀과 기존 격자에 없는 분할선, 둘째 쪽의 셀과 서식 문단 분배를 구현했다. 셀 자체가 여러 쪽에 걸친 분할, 중첩 표, 복합 개체 보존이 남음.
+- 다음 작업: 여러 쪽에 걸친 병합 셀의 가로·세로 분할과 문단 분배를 확인했다. 쪽별 글줄·이웃 셀·저장 재열기 배치가 일치해야 한다. 중첩 표 분할과 복합 개체 보존이 남음.
 - 상위 항목: [B160](<08-tables.md#b160>) 셀 분할
 - Agent 명령: `split_table_cell_into`
 - 근거: [102-agent-cell-subdivision.md](<../102-agent-cell-subdivision.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
@@ -973,9 +973,9 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 부모 list 경로·stable 대상·보호·자원·저장 검증
-- 다음 작업: 중첩 표의 병합 주 셀, 여러 문단과 혼합 글자 서식 편집을 양 형식으로 확인했다. 중첩 구조 변경과 복합 필드·개체 편집이 남음.
+- 다음 작업: 직사각형 내부 표의 행·열 추가·삭제, 부모·이웃 보존과 저장 재열기를 검수했다. 내부 병합·필드·개체가 있는 구조 변경은 남음.
 - 상위 항목: [B153](<08-tables.md#b153>) 셀 속성
-- Agent 명령: `set_table_cell`
+- Agent 명령: `set_table_cell,insert_table_row,delete_table_row,insert_table_column,delete_table_column`
 - 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
 - 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08`
 
@@ -988,7 +988,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: span 교차·주 셀 제거·neighbor 영향·실패 원복
-- 다음 작업: 독립된 행·열 치수가 없어도 이웃 병합 셀로 크기를 확정하고 이름 셀·누름틀을 보존한다. 중첩 구조와 계산식 보유 표, 치수를 확정할 수 없는 격자는 보호한다.
+- 다음 작업: 본문 병합 표에서 행·열 이동 후 계산식 참조·연쇄 결과와 이름 셀·누름틀을 보존한다. 참조 입력 범위가 바뀌는 편집과 치수를 확정할 수 없는 격자는 남음.
 - 상위 항목: [B158](<08-tables.md#b158>) 행·열 추가
 - Agent 명령: `insert_table_row,delete_table_row,insert_table_column,delete_table_column`
 - 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)

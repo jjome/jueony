@@ -1,5 +1,5 @@
 /** Short lines preserve their page breaks when the cell is divided into columns. */
-export function fragmentedSubdivisionTable(HwpDocument,{merged=true,hardBreaks=false,wrapped=false}={}) {
+export function fragmentedSubdivisionTable(HwpDocument,{merged=true,hardBreaks=false,wrapped=false,emoji=true}={}) {
   const d=HwpDocument.createEmpty(), at=[0,1,0];
   d.createBlankDocument();
   d.insertText(0,0,0,'Title');d.splitParagraph(0,0,5);
@@ -17,10 +17,25 @@ export function fragmentedSubdivisionTable(HwpDocument,{merged=true,hardBreaks=f
   else {
     for(let i=0;i<31;i++) {
       d.splitParagraphInCell(...at,0,i,d.getCellParagraphLength(...at,0,i));
-      d.insertTextInCell(...at,0,i+1,0,'줄'+i+'😀');
+      d.insertTextInCell(...at,0,i+1,0,'줄'+i+(emoji?'😀':''));
     }
     const p=19;
     d.applyCharFormatInCell(...at,0,p,0,d.getCellParagraphLength(...at,0,p),'{"bold":true}');
   }
+  return d;
+}
+
+export function fragmentedParagraphBands(HwpDocument) {
+  const d=HwpDocument.createEmpty(), at=[0,1,0];
+  d.createBlankDocument();d.insertText(0,0,0,'Title');d.splitParagraph(0,0,5);
+  d.createTable(...at,2,2);
+  for(let i=0;i<4;i++){
+    d.setCellProperties(...at,i,'{"width":12000,"height":2200,"applyInnerMargin":true,"paddingTop":0,"paddingBottom":0}');
+    d.insertTextInCell(...at,i,0,0,i<2?'word '.repeat(110)+i:'other '+i);
+  }
+  d.mergeTableCells(...at,0,0,0,1);
+  d.setTableProperties(...at,'{"pageBreak":1,"paddingTop":0,"paddingBottom":0}');
+  const paper=JSON.parse(d.getPageDef(0));
+  d.setPageDef(0,JSON.stringify({...paper,height:42000,marginTop:4400,marginBottom:4400}));
   return d;
 }

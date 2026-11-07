@@ -77,11 +77,12 @@ function paragraphPageOwners(d:any,t:Table) {
  }
  return pages;
 }
-/** An empty ctrlId alone cannot identify the native control. Match each one
- * to its click-here field by both cursor list and native field-at-position. */
-function cellFieldBoundaries(d:any,t:Table,controls:any[],lists:any[]){
+/** Match every anonymous native control to its field and owning cursor list.
+ * A stored table formula must reproduce its cached result without updating any field. */
+function cellFieldBoundaries(d:any,t:Table,tables:Table[],controls:any[],lists:any[]){
  const nested=controls.filter(c=>c.list!==0),fields=parsed(d.getFieldList());
  const boundaries=new Map<string,number>();
+ const formulaTables=new Set<string>(),formulaResults:Array<{id:number;result:number}>=[];
  if(!Array.isArray(fields)||fields.length!==nested.length)throw Error();
  const remaining=new Map<string,number>();
  for(const c of nested){
@@ -93,14 +94,27 @@ function cellFieldBoundaries(d:any,t:Table,controls:any[],lists:any[]){
  const ranges=new Map<string,Array<[number,number]>>();
  for(const field of fields){
   const loc=field.location,step=loc?.path?.[0];
-  if(field.fieldType!=='clickhere'||field.cellField!==false||loc?.sectionIndex!==t.section||loc.paraIndex!==t.paragraph||
-     loc.path?.length!==1||step.type!=='cell'||step.controlIndex!==t.control||!int(step.cellIndex)||!int(step.paraIndex)||
+  if(!['clickhere','formula'].includes(field.fieldType)||field.cellField!==false||
+     loc?.path?.length!==1||step.type!=='cell'||!int(step.cellIndex)||!int(step.paraIndex)||
      !int(field.startCharIdx)||!int(field.endCharIdx)||field.endCharIdx<field.startCharIdx||field.paraInList!==step.paraIndex)throw Error();
-  const list=lists.find(l=>l.hostListId===0&&l.isCell&&l.sectionIndex===t.section&&l.hostPara===t.paragraph&&
-   l.controlIndex===t.control&&l.cellIndex===step.cellIndex&&l.listId===field.listId);
+  const host=tables.find(table=>table.section===loc.sectionIndex&&table.paragraph===loc.paraIndex&&table.control===step.controlIndex);
+  if(!host||field.fieldType==='clickhere'&&host.id!==t.id)throw Error();
+  const list=lists.find(l=>l.hostListId===0&&l.isCell&&l.sectionIndex===host.section&&l.hostPara===host.paragraph&&
+   l.controlIndex===host.control&&l.cellIndex===step.cellIndex&&l.listId===field.listId);
   const slot=field.listId+'/'+step.paraIndex,count=remaining.get(slot)??0;
   if(!list||!count||!int(field.fieldId)||inspected.has(field.fieldId))throw Error();
   inspected.add(field.fieldId); remaining.set(slot,count-1);
+  if(field.fieldType==='formula'){
+   const cell=host.cells.find(c=>c.index===step.cellIndex),formula=cell?.axisFormula;
+   if(!cell||!formula||formula.fieldId!==field.fieldId||host.rows*host.columns>200||host.cellZoneCount!==0)throw Error();
+   if(!formulaTables.has(host.id))assertNativeTableWritable(d,host);
+   const preview=parsed(d.previewTableFormulaField(host.section,host.paragraph,host.control,cell.index,
+    formula.fieldId,field.command,formula.expression,formula.resultFormat));
+   if(preview.ok!==true||preview.fieldId!==formula.fieldId||!Number.isFinite(preview.result)||
+      preview.command!==field.command||preview.value!==cell.text||preview.dependentChanges?.length!==0)throw Error();
+   formulaTables.add(host.id);formulaResults.push({id:formula.fieldId,result:preview.result});
+   continue;
+  }
   const info=parsed(d.getFieldInfoAtInCell(t.section,t.paragraph,t.control,step.cellIndex,step.paraIndex,field.startCharIdx,false));
   const key=step.cellIndex+'/'+step.paraIndex;
   if(!info.inField||info.fieldId!==field.fieldId||info.fieldType!==field.fieldType||info.startCharIdx!==field.startCharIdx||
@@ -115,7 +129,7 @@ function cellFieldBoundaries(d:any,t:Table,controls:any[],lists:any[]){
   if(group.some(([start],i)=>i>0&&start<=group[i-1][1]+1))throw Error();
   boundaries.set(key,group[group.length-1][1]+1);
  }
- return boundaries;
+ return {boundaries,formulaResults,hasLocalFormula:formulaTables.has(t.id)};
 }
 function readPrivateSources(d:any,tables:Table[],name:string){
  const structure=readStructure(d),sources:Record<string,any>={};
@@ -126,7 +140,7 @@ function readPrivateSources(d:any,tables:Table[],name:string){
    assertNativeTableWritable(d,t);
    const controls=parsed(d.getControls()),lists=parsed(d.getCursorModel()).lists;
    if(parsed(d.getBookmarks()).length||controls.some((c:any)=>c.list===0&&!['tbl','secd','cold'].includes(c.ctrlId))||lists.some((l:any)=>!l.isCell||l.hostListId!==0))throw Error();
-   const fieldBoundaries=cellFieldBoundaries(d,t,controls,lists);
+   const {boundaries,formulaResults,hasLocalFormula}=cellFieldBoundaries(d,t,structure.tables,controls,lists);
    const p=parsed(d.getTableProperties(t.section,t.paragraph,t.control)),col=parsed(d.getColumnDef(t.section));
    if(p.cellZoneCount!==0||p.hasCaption||p.cellSpacing!==0||p.treatAsChar||p.allowOverlap||p.repeatHeader||p.textWrap!=='TopAndBottom'||p.vertRelTo!=='Para'||p.vertAlign!=='Top'||p.horzRelTo!=='Para'&&p.horzRelTo!=='Column'||p.horzAlign!=='Left'||col.columnCount!==1)throw Error();
    const pages=paragraphPageOwners(d,t);
@@ -137,12 +151,21 @@ function readPrivateSources(d:any,tables:Table[],name:string){
      const args=[t.section,t.paragraph,t.control,c.index,index],length=d.getCellParagraphLength(...args),text=d.getTextInCell(...args,0,length),path=JSON.stringify([{controlIndex:t.control,cellIndex:c.index,cellParaIndex:index}]),runs=parsed(d.getCharShapeRunsInCellByPath(t.section,t.paragraph,path,0,length)),characters=parsed(d.getCellCharPropertiesAt(...args,0)),paragraph=parsed(d.getCellParaPropertiesAt(...args)),style=parsed(d.getCellStyleAt(...args));
      paragraphBudget++;characterBudget+=Array.from(text).length;
      if(paragraphBudget>200||characterBudget>40000||!plain(text)||Array.from(text).length!==length||!Array.isArray(runs)||runs.some((r:any,i:number)=>!int(r.charShapeId)||!int(r.endOffset)||r.startOffset!==(i===0?0:runs[i-1].endOffset)||r.endOffset<=r.startOffset)||(runs.at(-1)?.endOffset??0)!==length||!int(characters.charShapeId)||paragraph.headType!=='None')throw Error();
-     const editableFrom=fieldBoundaries.get(c.index+'/'+index);
+     const editableFrom=boundaries.get(c.index+'/'+index);
      return {index,text,length,characters,paragraph,style,runs,...(editableFrom===undefined?{}:{editableFrom})};
-    });return {index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs};
+    });
+    let formulaReadOnly=false;
+    if(hasLocalFormula){
+     // The native graph resolves covered coordinates to their merged owner.
+     // Refuse both referenced owners and any owner whose dependencies cannot be resolved.
+     try{formulaReadOnly=d.tableFormulaInputHasDependents(t.section,t.paragraph,t.control,c.index)!==false;}
+     catch{formulaReadOnly=true;}
+    }
+    return {index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs,...(formulaReadOnly?{formulaReadOnly}: {})};
    });
+   if(!cells.some(c=>!c.formulaReadOnly&&c.rowSpan*c.columnSpan>1))throw Error();
    const evidence=capturePreservationEvidence(d);if(evidence.issues.length)throw Error();
-   source={editable:true,cells,pages,fingerprint:sha({evidence,resources:resourceFingerprint(d.exportHwpx()),body:rootBodyTexts(d),tables:tableTextTree(structure.tables),cells,properties:p,columns:col,pages,geometry:tableLayoutEvidence(d,t)})};
+   source={editable:true,cells,pages,formulaResults,fingerprint:sha({evidence,formulaResults,resources:resourceFingerprint(d.exportHwpx()),body:rootBodyTexts(d),tables:tableTextTree(structure.tables),cells,properties:p,columns:col,pages,geometry:tableLayoutEvidence(d,t)})};
   }catch{}
   sources[t.id]=source;
  }
@@ -152,7 +175,7 @@ function readPrivateSources(d:any,tables:Table[],name:string){
 export function readCellParagraphSources(wasm:any,tables:Table[],name:string):Record<string,AgentCellParagraphSource>|undefined {
  const d=nativeDocument(wasm);if(typeof d.setCharShapeIdInCell!=='function'||typeof d.exportHwpx!=='function')return;
  const privateSources=readPrivateSources(d,tables,name).sources;
- return Object.fromEntries(tables.map(t=>{const source=privateSources[t.id];return [t.id,source?.editable===true?{editable:true,fingerprint:source.fingerprint,cells:source.cells.map((c:any)=>({index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs:c.paragraphs.map((p:any)=>({index:p.index,text:p.text,...(p.editableFrom===undefined?{}:{editableFrom:p.editableFrom}),...(p.runs.length>1?{formatSpans:p.runs.map((r:any)=>({start:r.startOffset,end:r.endOffset}))}:{})}))}))}:{editable:false,reason:'병합 셀 문단 교체에는 셀마다 원래 행·열과 쪽을 확인할 수 있는 비보호 본문 표가 필요합니다. 경계를 확인할 수 없는 필드·개체·책갈피·중첩 표 또는 여러 쪽의 글줄을 원문과 대조할 수 없는 셀은 편집할 수 없습니다.'}];}));
+ return Object.fromEntries(tables.map(t=>{const source=privateSources[t.id];return [t.id,source?.editable===true?{editable:true,fingerprint:source.fingerprint,cells:source.cells.filter((c:any)=>!c.formulaReadOnly).map((c:any)=>({index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs:c.paragraphs.map((p:any)=>({index:p.index,text:p.text,...(p.editableFrom===undefined?{}:{editableFrom:p.editableFrom}),...(p.runs.length>1?{formatSpans:p.runs.map((r:any)=>({start:r.startOffset,end:r.endOffset}))}:{})}))}))}:{editable:false,reason:'병합 셀 문단 교체에는 셀마다 원래 행·열과 쪽을 확인할 수 있는 비보호 본문 표가 필요합니다. 경계를 확인할 수 없는 필드·개체·책갈피·중첩 표 또는 여러 쪽의 글줄을 원문과 대조할 수 없는 셀은 편집할 수 없습니다.'}];}));
 }
 /** Export bytes use portable metrics. Compare their layout with the same
  * temporary metric selection and restore the screen environment synchronously.
@@ -210,6 +233,7 @@ export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellPar
  const d=nativeDocument(wasm),proof=pending.get(d);if(!proof||proof.revision!==base.revision||!same(proof.operation,op))throw new Error('셀 문단 결과의 검증 근거가 없습니다.');
  const after=capturePreservationEvidence(d);if(after.issues.length||!same(topologySemantics(after.values),proof.expected)||!same(rootBodyTexts(d),proof.body)||!same(tableTextTree(readStructure(d).tables),proof.text)||resourceFingerprint(d.exportHwpx())!==proof.resources)throw new Error('병합 셀 문단 결과 또는 다른 문서 내용·자원이 변경되었습니다.');
  const source=readPrivateSources(d,[proof.table],base.name).sources[op.target];if(source?.editable!==true)throw new Error('교체 후 병합 셀 문단을 검증하지 못했습니다.');
+ if(!same(source.formulaResults,proof.formulaResults))throw Error('문단 편집으로 계산식 결과가 달라졌습니다.');
  if(!same(source.pages,proof.pages))throw new Error('문단 편집으로 셀의 쪽 경계가 바뀌어 적용하지 않았습니다.');
  for(const cell of source.cells)for(const para of cell.paragraphs){
   const old=proof.cells.find((c:any)=>c.index===cell.index)?.paragraphs[para.index];
@@ -217,7 +241,13 @@ export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellPar
   if(!old||!same(para.characters,target?proof.firstCharacters:old.characters)||!same(para.paragraph,old.paragraph)||!same(para.style,old.style)||!same(para.runs,target?proof.runs:old.runs))throw new Error('선택 또는 다른 셀 문단의 원래 서식이 달라졌습니다.');
  }
  portableLayout(d,()=>{const format=/\.hwp$/iu.test(base.name)?'hwp':'hwpx';const artifact=format==='hwp'?d.exportHwpWithReport():d.exportHwpxWithReport();let reopened:any;
- try{const loss=JSON.parse(artifact.contentLoss()),bytes=artifact.takeBytes();verifyPreservedExport(d,bytes,format,loss,b=>new d.constructor(b));reopened=new d.constructor(bytes);if(!sameTableLayout(tableLayoutEvidence(d,proof.table),tableLayoutEvidence(reopened,proof.table)))throw new Error('셀 문단 교체 후 실제 저장 재열기 배치가 다릅니다.');}finally{reopened?.free();artifact.free();}});
+ try{const loss=JSON.parse(artifact.contentLoss()),bytes=artifact.takeBytes();verifyPreservedExport(d,bytes,format,loss,b=>new d.constructor(b));reopened=new d.constructor(bytes);
+  if(!sameTableLayout(tableLayoutEvidence(d,proof.table),tableLayoutEvidence(reopened,proof.table)))throw new Error('셀 문단 교체 후 실제 저장 재열기 배치가 다릅니다.');
+  if(proof.formulaResults.length){
+   const stored=cellFieldBoundaries(reopened,proof.table,readStructure(reopened).tables,parsed(reopened.getControls()),parsed(reopened.getCursorModel()).lists);
+   if(!same(stored.formulaResults,proof.formulaResults))throw Error('저장 후 계산식 결과가 달라졌습니다.');
+  }
+ }finally{reopened?.free();artifact.free();}});
 }
 export function executeCellParagraph(wasm:any,base:Snapshot,op:AgentCellParagraphOp){
  const d=nativeDocument(wasm);pending.delete(d);const plan=cellParagraphPlan(op,base),t=plan.table,structure=readStructure(d),cap=readCellParagraphSources(d,structure.tables,base.name)?.[t.id];
@@ -258,7 +288,7 @@ export function executeCellParagraph(wasm:any,base:Snapshot,op:AgentCellParagrap
  paraEvidence.runs=formatted?.stored??storedRuns;
  const text=tableTextTree(structure.tables).map(table=>table.id===t.id?{...table,cells:table.cells.map(cell=>cell.index===c.index?{...cell,text:c.paragraphs.map((p:any)=>p.index===op.paragraph?op.text:p.text).join('\n')}:cell)}:table);
  const proof={revision:base.revision,operation:structuredClone(op),table:t,expected,runs:formatted?.runs??runs,firstCharacters:formatted?.firstCharacters??firstCharacters,
-  pages:source.pages,body:rootBodyTexts(d),text,resources:formatted?.resources??resources,cells:source.cells,cellIndex:c.index};
+  pages:source.pages,formulaResults:source.formulaResults,body:rootBodyTexts(d),text,resources:formatted?.resources??resources,cells:source.cells,cellIndex:c.index};
  // Edit right to left so offsets always refer to the queried source.
  for(const edit of [...edits].reverse()){
   const shape=mixed?p.runs[edit.run].charShapeId:p.characters.charShapeId;

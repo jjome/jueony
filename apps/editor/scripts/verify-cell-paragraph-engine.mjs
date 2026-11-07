@@ -119,6 +119,58 @@ for(const format of ['hwp','hwpx']){
    assert.deepEqual(save(doc),before);
   }finally{doc.free();}
  });
+ await scenario(format+' preserves neighbor FORMULA fields in the same and another root table',()=>{
+  const template=fixture(),save=d=>format==='hwp'?d.exportHwp():d.exportHwpx(),name='neighbor-formula.'+format;
+  template.deleteTextInCell(0,1,0,1,0,0,6);template.insertTextInCell(0,1,0,1,0,0,'3');
+  assert.equal(json(template.insertTableFormulaField(0,1,0,4,'Cell 5','=C1*2','%g')).value,'6');
+  template.mergeTableCells(0,2,0,1,0,1,1);
+  assert.equal(json(template.insertTableFormulaField(0,2,0,1,'','=2+3','%g')).value,'5');
+  const doc=new HwpDocument(save(template));template.free();
+  try{
+   const base=snap(doc,name),table=base.structure.tables[0],allowed=base.cellParagraphSources[table.id];
+   assert.equal(allowed.editable,true);
+   assert.ok(!allowed.cells.some(c=>c.index===1||c.index===4));
+   const op=command(base,1,'이웃 계산식 보존'),fields=json(doc.getFieldList());
+   transactionalCandidate(doc,base,[op],'r1');
+   const reopened=new HwpDocument(save(doc));
+   try{
+    assert.deepEqual(json(reopened.getFieldList()),fields);
+    assert.equal(reopened.getTextInCell(0,1,0,0,1,0,9),op.text);
+   }finally{reopened.free();}
+   const changed=snap(doc,name),beforeFault=save(doc),insert=doc.insertTextInCell.bind(doc);
+   const field=fields.find(f=>f.location.paraIndex===1);
+   doc.insertTextInCell=(...args)=>{
+    const result=insert(...args);
+    // A collateral command change can keep the same displayed value.
+    assert.equal(json(doc.updateTableFormulaField(0,1,0,4,field.fieldId,field.command,'=C1+3','%g')).value,'6');
+    return result;
+   };
+   try{assert.throws(()=>transactionalCandidate(doc,changed,[command(changed,1,'변경 시도')],'r1'),/보존|변경/);}
+   finally{doc.insertTextInCell=insert;}
+   assert.deepEqual(save(doc),beforeFault);
+   // Simulate a stale cached formula. Reading capabilities must neither expose
+   // this document for paragraph edits nor repair its stored display value.
+   doc.deleteTextInCell(0,1,0,1,0,0,1);doc.insertTextInCell(0,1,0,1,0,0,'7');
+   const stale=save(doc);assert.equal(snap(doc,name).cellParagraphSources[table.id].editable,false);
+   assert.deepEqual(save(doc),stale);
+  }finally{doc.free();}
+ });
+ await scenario(format+' rejects a neighbor FORMULA referencing a covered merged coordinate',()=>{
+  const template=fixture(),save=d=>format==='hwp'?d.exportHwp():d.exportHwpx();
+  template.mergeTableCells(0,2,0,1,0,1,1);
+  assert.equal(template.getCellParagraphCount(0,2,0,2),1);
+  template.insertTextInCell(0,2,0,2,0,0,'2');
+  assert.equal(json(template.insertTableFormulaField(0,2,0,1,'','=B2*2','%g')).value,'4');
+  const doc=new HwpDocument(save(template));template.free();
+  try{
+   const base=snap(doc,'covered-formula.'+format),table=base.structure.tables[1],before=save(doc);
+   assert.equal(base.cellParagraphSources[base.structure.tables[0].id].editable,true);
+   assert.equal(base.cellParagraphSources[table.id].editable,false);
+   assert.throws(()=>transactionalCandidate(doc,base,[{kind:'replace_cell_paragraph',target:table.id,row:1,column:0,
+    paragraph:0,originalText:'2',text:'3'}],'r1'));
+   assert.deepEqual(save(doc),before);
+  }finally{doc.free();}
+ });
  await scenario(format+' edits a paragraph spanning pages and rejects duplicated rendered text',()=>{
   const template=fragmentedMergedCell(HwpDocument),save=d=>format==='hwp'?d.exportHwp():d.exportHwpx();
   const doc=new HwpDocument(save(template)),name='fragment.'+format;template.free();

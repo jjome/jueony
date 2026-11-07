@@ -4,13 +4,31 @@ import type {Cell,CellPicturePlacement} from '../../modules/document/public/type
 const json=(value:any)=>typeof value==='string'?JSON.parse(value):value;
 const digest=(bytes:Uint8Array)=>Array.from(sha256(bytes),v=>v.toString(16).padStart(2,'0')).join('');
 
-type PicturePage={screen:any[];portable:any[];pictures:any[];portablePictures:any[];painted:any[];keys:Set<string>;assets:Map<string,string>};
-type OwnerFrame={page:number;screen:any;portable:any};
+type HeaderLayout={runs:any[];width:number;height:number};
+type PicturePage={screen:any[];portable:any[];pictures:any[];portablePictures:any[];painted:any[];keys:Set<string>;assets:Map<string,string>;screenHeader?:HeaderLayout;portableHeader?:HeaderLayout};
+type OwnerFrame={page:number;screen:any;portable:any;headerSignature?:string};
+
+function repeatedPages(screen:any[][]){
+ const occurrences=new Map<string,number[]>();
+ for(const [page,controls] of screen.entries())for(const frame of controls){
+  if(frame.type!=='table'||frame.cellPath?.length||!frame.cells.some((c:any)=>c.row===0))continue;
+  const id=JSON.stringify([frame.secIdx,frame.paraIdx,frame.controlIdx]);
+  const found=occurrences.get(id)??[];found.push(page);occurrences.set(id,found);
+ }
+ return new Set([...occurrences.values()].filter(pages=>pages.length>1).flat());
+}
+
+function headerLayout(doc:any,page:number):HeaderLayout{
+ const {width,height}=json(doc.getPageInfo(page)),{runs}=json(doc.getPageTextLayout(page));
+ return {width,height,runs};
+}
 
 function picturePages(doc:any) {
  const count=doc.pageCount();
  if(!Number.isSafeInteger(count)||count<1||count>200)return null;
  const screen=Array.from({length:count},(_,i)=>json(doc.getPageControlLayout(i)).controls as any[]);
+ const repeats=repeatedPages(screen);
+ const headerViews=screen.map((_,page)=>repeats.has(page)?headerLayout(doc,page):undefined);
  const canvas=doc.canvasMetricsActive?.()===true;
  const assets=new Map<string,string>();
  // Export paint operations require portable font metrics. Retain the actual
@@ -25,7 +43,8 @@ function picturePages(doc:any) {
    const painted=json(doc.getPageFlowImageOps(i)),resources=json(doc.getPageSourceImageKeys(i));
    if(portablePictures.length!==pictures.length||painted.cacheable!==true||!Array.isArray(painted.images)||
       resources.cacheable!==true||!Array.isArray(resources.keys))return null;
-   pages.push({screen:layout,portable,pictures,portablePictures,painted:painted.images,keys:new Set(resources.keys),assets});
+   const screenHeader=headerViews[i],portableHeader=canvas&&screenHeader?headerLayout(doc,i):screenHeader;
+   pages.push({screen:layout,portable,pictures,portablePictures,painted:painted.images,keys:new Set(resources.keys),assets,screenHeader,portableHeader});
   }
   return {pages,fields:json(doc.getFieldList()),tables:new Map<string,Map<number,OwnerFrame>|null>()};
  }finally{
@@ -36,10 +55,69 @@ function picturePages(doc:any) {
  }
 }
 
+type HeaderCell={index:number;text:string;properties:any};
+function plainHeader(doc:any,base:number[],dimensions:any,fields:any[]):HeaderCell[]|null{
+ const [section,paragraph,control]=base;
+ const lists=json(doc.getCursorModel()).lists,children=json(doc.getControls());
+ const header:HeaderCell[]=[];
+ for(let i=0;i<dimensions.cellCount;i++){
+  const info=json(doc.getCellInfo(...base,i)),properties=json(doc.getCellProperties(...base,i));
+  if(properties.isHeader!==(info.row===0))return null;
+  if(info.row!==0)continue;
+  if(info.rowSpan!==1||info.colSpan!==1||properties.fieldName!==''||properties.cellProtect!==false||header[info.col])return null;
+  const paths=lists.filter((l:any)=>l.hostListId===0&&l.isCell&&l.sectionIndex===section&&l.hostPara===paragraph&&l.controlIndex===control&&l.cellIndex===i);
+  if(paths.length!==1||paths[0].paraCount!==1||children.some((c:any)=>c.list===paths[0].listId)||
+     fields.some(f=>f.listId===paths[0].listId||f.location?.sectionIndex===section&&f.location?.paraIndex===paragraph&&
+      f.location.path?.[0]?.type==='cell'&&f.location.path[0].controlIndex===control&&f.location.path[0].cellIndex===i))return null;
+  const length=doc.getCellParagraphLength(...base,i,0);
+  if(!Number.isSafeInteger(length)||length<1||length>4000)return null;
+  const text=doc.getTextInCell(...base,i,0,0,length);
+  if(Array.from(text).length!==length)return null;
+  header[info.col]={index:i,text,properties};
+ }
+ return header.length===dimensions.colCount&&Array.from(header).every(Boolean)?header:null;
+}
+
+const near=(a:number,b:number)=>Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-b)<=.2;
+function inside(box:any,parent:any){
+ return [box.x,box.y,box.w,box.h,parent.x,parent.y,parent.w,parent.h].every(Number.isFinite)&&box.w>0&&box.h>0&&
+  box.x>=parent.x-.2&&box.y>=parent.y-.2&&box.x+box.w<=parent.x+parent.w+.2&&box.y+box.h<=parent.y+parent.h+.2;
+}
+function overlaps(a:any,b:any){
+ return Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)>.2&&Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y)>.2;
+}
+type HeaderRun={x:number;y:number;record:string};
+function renderedHeader(view:HeaderLayout|undefined,controls:any[],frame:any,header:HeaderCell[],base:number[]){
+ if(!view||!Array.isArray(view.runs)||!inside(frame,{x:0,y:0,w:view.width,h:view.height})||frame.cells.length<=header.length)return null;
+ const [section,paragraph,control]=base;
+ const evidence:HeaderRun[]=[];
+ for(const [col,source] of header.entries()){
+  const cell=frame.cells[col];
+  if(cell.row!==0||cell.col!==col||cell.rowSpan!==1||cell.colSpan!==1||cell.cellIdx!==col||!inside(cell,frame))return null;
+  if(frame.cells.slice(header.length).some((c:any)=>c.y<cell.y+cell.h-.2))return null;
+  evidence.push({x:cell.x-frame.x,y:cell.y-frame.y,record:JSON.stringify([cell.w,cell.h])});
+  const runs=view.runs.filter(r=>r.secIdx===section&&r.parentParaIdx===paragraph&&
+   r.cellPath?.[0]?.controlIndex===control&&r.cellPath[0].cellIndex===source.index);
+  if(controls.some(c=>c!==frame&&overlaps(c,cell))||view.runs.filter(r=>overlaps(r,cell)).length!==runs.length)return null;
+  let offset=0,text='';
+  for(const {x,y,...r} of runs){
+   if(r.cellPath.length!==1||r.cellPath[0].cellParaIndex!==0||r.controlIdx!==control||r.cellIdx!==source.index||
+      r.paraIdx!==0||r.cellParaIdx!==0||r.charStart!==offset||typeof r.text!=='string'||!r.text||!inside({x,y,w:r.w,h:r.h},cell))return null;
+   offset+=Array.from(r.text).length;text+=r.text;
+   evidence.push({x:x-cell.x,y:y-cell.y,record:JSON.stringify(r)});
+  }
+  if(text!==source.text)return null;
+ }
+ return evidence;
+}
+function sameHeader(a:HeaderRun[],b:HeaderRun[]){
+ return a.length===b.length&&a.every((r,i)=>r.record===b[i].record&&near(r.x,b[i].x)&&near(r.y,b[i].y));
+}
+
 // On continuation pages each table frame numbers its visible cells from zero.
 // Picture paths use the physical index in the stored table. Join the complete
 // ordered frame set to stored owners by logical address and exact span.
-function tableFrames(doc:any,pages:PicturePage[],section:number,paragraph:number,control:number){
+function tableFrames(doc:any,pages:PicturePage[],fields:any[],section:number,paragraph:number,control:number){
  const base=[section,paragraph,control];
  const dimensions=json(doc.getTableDimensions(...base));
  if(!Number.isSafeInteger(dimensions.cellCount)||dimensions.cellCount<1||dimensions.cellCount>200)return null;
@@ -48,6 +126,13 @@ function tableFrames(doc:any,pages:PicturePage[],section:number,paragraph:number
  for(let i=0;i<dimensions.cellCount;i++)stored.set(address(json(doc.getCellInfo(...base,i))),i);
  if(stored.size!==dimensions.cellCount)return null;
  const isTable=(c:any)=>c.type==='table'&&c.secIdx===section&&c.paraIdx===paragraph&&c.controlIdx===control&&!c.cellPath?.length;
+ const split=pages.filter(p=>p.screen.some(isTable)).length>1;
+ const settings=split?json(doc.getTableProperties(...base)):null;
+ if(split&&(settings.pageBreak!==2||typeof settings.repeatHeader!=='boolean'))return null;
+ const header=settings?.repeatHeader?plainHeader(doc,base,dimensions,fields):[];
+ if(!header)return null;
+ let headerSignature:string|undefined;
+ let firstScreen:HeaderRun[]|undefined,firstPortable:HeaderRun[]|undefined;
  const owners=new Map<number,OwnerFrame>();
  let nextRow=0,lastPage=-1,frameCount=0;
  for(const [pageNumber,page] of pages.entries()){
@@ -59,18 +144,28 @@ function tableFrames(doc:any,pages:PicturePage[],section:number,paragraph:number
   lastPage=pageNumber;frameCount++;
   if(a.rowCount!==dimensions.rowCount||a.colCount!==dimensions.colCount||a.rowCount!==b.rowCount||a.colCount!==b.colCount||
      !Array.isArray(a.cells)||!Array.isArray(b.cells)||!a.cells.length||a.cells.length!==b.cells.length)return null;
-  if(Math.min(...a.cells.map((c:any)=>c.row))!==nextRow)return null;
+  if(header.length){
+   const screen=renderedHeader(page.screenHeader,page.screen,a,header,base),portable=renderedHeader(page.portableHeader,page.portable,b,header,base);
+   if(!screen||!portable||firstScreen&&!sameHeader(firstScreen,screen)||firstPortable&&!sameHeader(firstPortable,portable))return null;
+   if(!firstPortable){
+    const title=portable.map(r=>[Math.round(r.x*10),Math.round(r.y*10),r.record]);
+    headerSignature=digest(new TextEncoder().encode(JSON.stringify([header,title])));
+   }
+   firstScreen??=screen;firstPortable??=portable;
+  }
+  const repeated=frameCount>1?header.length:0;
+  if(Math.min(...a.cells.slice(repeated).map((c:any)=>c.row))!==nextRow)return null;
   for(const [slot,c] of a.cells.entries()){
    const other=b.cells[slot],key=address(c),index=stored.get(key);
-   if(index===undefined||owners.has(index)||key!==address(other)||c.cellIdx!==slot||other.cellIdx!==slot)return null;
-   owners.set(index,{page:pageNumber,screen:c,portable:other});
+   if(index===undefined||key!==address(other)||c.cellIdx!==slot||other.cellIdx!==slot)return null;
+   if(slot<repeated){if(index!==header[slot].index||!owners.has(index))return null;continue;}
+   if(owners.has(index))return null;
+   owners.set(index,{page:pageNumber,screen:c,portable:other,headerSignature});
   }
   nextRow=Math.max(...a.cells.map((c:any)=>c.row+c.rowSpan));
  }
  if(owners.size!==stored.size||nextRow!==dimensions.rowCount)return null;
  if(frameCount>1){
-  const settings=json(doc.getTableProperties(...base));
-  if(settings.pageBreak!==2||settings.repeatHeader!==false)return null;
   // A frame may be clipped at the page edge even though its last logical row
   // is listed. Every surviving row must fit both published metric profiles.
   for(const [index,owner] of owners){
@@ -113,7 +208,7 @@ export function axisPictureReader(doc:any) {
     first?.type==='cell' && first.controlIndex===control && first.cellIndex===cell.index;
   }))return;
   const tableKey=JSON.stringify([section,paragraph,control]);
-  if(!snapshot.tables.has(tableKey))snapshot.tables.set(tableKey,tableFrames(doc,snapshot.pages,section,paragraph,control));
+  if(!snapshot.tables.has(tableKey))snapshot.tables.set(tableKey,tableFrames(doc,snapshot.pages,snapshot.fields,section,paragraph,control));
   const owner=snapshot.tables.get(tableKey)?.get(cell.index);
   if(!owner||owner.screen.row!==cell.row||owner.screen.col!==cell.column||
      owner.screen.rowSpan!==cell.rowSpan||owner.screen.colSpan!==cell.columnSpan)return;
@@ -185,7 +280,9 @@ function readPicture(doc:any,page:PicturePage,
  const storedHash=assetHash(doc.getControlImageData(section,paragraph,storedPath,child.controlIndex),mime);
  if(storedHash!==renderedHash)return;
  const {list:slot,...record}=child;
- const signature=digest(new TextEncoder().encode(JSON.stringify([record,p,asset[1],storedHash,picture.plane,picture.zOrder,picture.w,picture.h,owner.w,owner.h])));
+ const evidence=[record,p,asset[1],storedHash,picture.plane,picture.zOrder,picture.w,picture.h,owner.w,owner.h];
+ if(frame.headerSignature)evidence.push(frame.headerSignature);
+ const signature=digest(new TextEncoder().encode(JSON.stringify(evidence)));
  return {signature,left,top};
 }
 

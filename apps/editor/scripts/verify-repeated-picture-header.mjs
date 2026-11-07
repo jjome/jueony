@@ -1,0 +1,93 @@
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+import {mkdir,readFile,writeFile} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {createAxisPictureFixture} from './lib/axis-picture-fixture.mjs';
+import {loadReviewEngine} from './lib/hancom-review.mjs';
+import {readStructure} from '../src/adapters/rhwp/structure.ts';
+import {executeDocumentOperations} from '../src/adapters/rhwp/execute.ts';
+import {validateEditOperations} from '../src/modules/document/public/index.ts';
+
+const {HwpDocument}=await loadReviewEngine(resolve(process.env.JUEONY_ENGINE_PACKAGE));
+const out=resolve(process.env.JUEONY_TEST_OUTPUT??resolve(import.meta.dirname,'../../../build/axis-repeat-picture-header'));
+await mkdir(out,{recursive:true});
+const base=[0,1,0],op={kind:'insert_table_row',target:'s0p1t0',index:2,values:['새 행','','']};
+const raw=(file,kind)=>JSON.parse(execFileSync('python',[resolve(import.meta.dirname,'lib/inspect-axis-picture.py'),kind,file],{encoding:'utf8'}));
+const bytes=(d,format)=>format==='hwp'?d.exportHwp():d.exportHwpx();
+function apply(d,format,operation=op){
+ const snapshot={name:'제품표.'+format,nodes:[],limitations:[],revision:'1',structure:readStructure(d)};
+ executeDocumentOperations(d,snapshot,validateEditOperations([operation],snapshot));
+}
+function layout(d){
+ assert.equal(d.pageCount(),2);
+ return [0,1].map(i=>{
+  const controls=JSON.parse(d.getPageControlLayout(i)).controls,table=controls.find(c=>c.type==='table');
+  assert.deepEqual(table.cells.filter(c=>c.row===0).map(c=>c.col),[0,1,2]);
+  const runs=JSON.parse(d.getPageTextLayout(i)).runs;
+  assert.deepEqual([0,1,2].map(cell=>runs.filter(r=>r.cellPath?.[0]?.cellIndex===cell).map(r=>r.text).join('')),['항목0','항목1','PicA']);
+  return controls.filter(c=>c.type==='image').length;
+ });
+}
+const fixture=await createAxisPictureFixture(HwpDocument,out,{merged:true,grouped:true});
+try{
+ fixture.insertTableRow(...base,1,false);
+ for(const index of [0,1,2])fixture.setCellProperties(...base,index,'{"height":1800,"isHeader":true}');
+ for(const index of [3,4,5])fixture.setCellProperties(...base,index,'{"height":3000}');
+ fixture.setPageDef(0,JSON.stringify({...JSON.parse(fixture.getPageDef(0)),height:21000,marginTop:2000,marginBottom:2000,marginHeader:0,marginFooter:0}));
+ fixture.setTableProperties(...base,'{"pageBreak":2,"repeatHeader":true}');
+ for(const format of ['hwp','hwpx']){
+  const source=resolve(out,'before.'+format),original=bytes(fixture,format);await writeFile(source,original);
+  const d=new HwpDocument(original);
+  try{
+   assert.deepEqual(layout(d),[3,1]);const initial=readStructure(d).tables[0];
+   assert.equal(initial.cells.filter(c=>c.axisPicture).length,2);
+   apply(d,format);assert.deepEqual(layout(d),[0,4]);
+   const after=resolve(out,'insert_table_row.'+format);await writeFile(after,bytes(d,format));
+   assert.deepEqual(raw(after,'inspect-title'),raw(source,'inspect-title'));
+   assert.deepEqual(raw(after,'inspect-grouped'),raw(source,'inspect-grouped').map(p=>({...p,row:p.row+1})));
+   const copy=new HwpDocument(await readFile(after));
+   try{assert.deepEqual(layout(copy),[0,4]);assert.deepEqual(readStructure(copy),readStructure(d));}finally{copy.free();}
+   console.log('PASS',format,'one stored title row, two copies on screen, four pictures, original records/bytes, reopen');
+  }finally{d.free();}
+  const modes=format==='hwp'?['wrong source','missing title','inherited header','field in title']:['changed label','crop','lost repeat flag','changed title style'];
+  for(const mode of modes){
+   const d=new HwpDocument(original);
+   try{
+    if(mode==='field in title')d.insertClickHereFieldInCell(...base,0,0,0,false,'입력','번호','번호',true);
+    if(mode==='wrong source'||mode==='changed label'){
+     const read=d.getPageTextLayout.bind(d);d.getPageTextLayout=page=>{
+      const view=JSON.parse(read(page)),run=view.runs.find(r=>r.cellPath?.[0]?.cellIndex===2);
+      if(page===1){if(mode==='wrong source')run.cellPath[0].cellIndex=1;else run.text='PicZ';}
+      return JSON.stringify(view);
+     };
+    }
+    if(mode==='missing title'||mode==='crop'){
+     const read=d.getPageControlLayout.bind(d);d.getPageControlLayout=page=>{
+      const view=JSON.parse(read(page)),t=view.controls.find(c=>c.type==='table');
+      if(page===1){if(mode==='missing title')t.cells.splice(1,1);else t.cells[1].h-=2;}
+      return JSON.stringify(view);
+     };
+    }
+    if(mode==='lost repeat flag'){
+     const insert=d.insertTableRow.bind(d);d.insertTableRow=(...args)=>{
+      const result=insert(...args);d.setTableProperties(...base,'{"repeatHeader":false}');return result;
+     };
+    }
+    if(mode==='changed title style'){
+     const insert=d.insertTableRow.bind(d),read=d.getPageTextLayout.bind(d);
+     let changed=false;
+     d.insertTableRow=(...args)=>{const result=insert(...args);changed=true;return result;};
+     d.getPageTextLayout=page=>{
+      const view=JSON.parse(read(page));
+      if(changed)for(const r of view.runs)if(r.cellPath?.[0]?.cellIndex===2)r.bold=!r.bold;
+      return JSON.stringify(view);
+     };
+    }
+    const before=bytes(d,format);
+    assert.throws(()=>apply(d,format,mode==='inherited header'?{...op,index:0}:op),/그림|필드|보존/,mode);
+    assert.deepEqual(bytes(d,format),before);
+   }finally{d.free();}
+  }
+  console.log('PASS',format,'original bytes on refusal:',modes.join(', '));
+ }
+}finally{fixture.free();}

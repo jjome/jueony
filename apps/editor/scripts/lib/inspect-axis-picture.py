@@ -155,8 +155,50 @@ def inspect_pictures(path, paragraphs=False, anchors=False):
     return pictures
 
 
+def repeated_title(path):
+    if path.suffix == ".hwpx":
+        with ZipFile(path) as archive:
+            root = ET.fromstring(archive.read("Contents/section0.xml"))
+            table, = root.findall(".//{*}tbl")
+            assert table.get("repeatHeader") == "1" and table.get("pageBreak") == "CELL"
+            headers = []
+            for row in table.findall("./{*}tr"):
+                for cell in row.findall("./{*}tc"):
+                    index = int(cell.find("./{*}cellAddr").get("rowAddr"))
+                    assert cell.get("header") == ("1" if index == 0 else "0")
+                    if index == 0:
+                        headers.append(digest(ET.tostring(cell)))
+            assert len(headers) == int(table.get("colCnt"))
+            return headers
+    doc = Cfb(path.read_bytes())
+    compressed = doc.read("FileHeader")[36] & 1
+    entries = list(records(inflate(doc.read("Section0"), compressed)))
+    table, = [data for tag, _, data in entries if tag == 77]
+    flags, _, columns = struct.unpack_from("<IHH", table)
+    assert flags & 7 == 6  # row breaks and repeated title
+    headers = []
+    current = None
+    for tag, level, data in entries:
+        if level < 2:
+            current = None
+        if tag == 72 and level == 2:
+            flags, col, row = struct.unpack_from("<HHH", data, 6)
+            assert bool(flags & 4) == (row == 0)
+            current = None
+            if row == 0:
+                assert col == len(headers)
+                current = []
+                headers.append(current)
+        if current is not None:
+            current.append([tag, level, digest(data)])
+    assert len(headers) == columns
+    return headers
+
+
 if sys.argv[1] in ("embed", "embed-many", "embed-grouped"):
     embed(Path(sys.argv[2]), Path(sys.argv[3]), sys.argv[1])
+elif sys.argv[1] == "inspect-title":
+    print(json.dumps(repeated_title(Path(sys.argv[2]))))
 else:
     pictures = inspect_pictures(Path(sys.argv[2]), sys.argv[1] == "inspect-grouped", sys.argv[1] == "inspect-anchors")
     if sys.argv[1] == "inspect":

@@ -11,7 +11,8 @@ const repo=resolve(import.meta.dirname,'../../..'),dist=resolve(process.env.JUEO
 const {HwpDocument}=await loadReviewEngine(resolve(process.env.JUEONY_ENGINE_PACKAGE));
 const port=Number(process.env.JUEONY_TEST_PORT??4573),origin='http://127.0.0.1:'+port;
 const calls=[];
-const axisOnly=process.env.JUEONY_NESTED_AXIS_ONLY==='1';
+const bodyMarkers=process.env.JUEONY_NESTED_AXIS_ONLY==='body-markers';
+const axisOnly=bodyMarkers||process.env.JUEONY_NESTED_AXIS_ONLY==='1';
 const provider=http.createServer(async(req,res)=>{
   try {
     let raw=''; for await(const part of req) raw+=part;
@@ -54,12 +55,20 @@ try {
   await fill('config-model','nested-fixture');await fill('config-key','synthetic-local-fixture');
   await page.$eval('#config-remember',e=>e.checked=false);await page.click('#model-form button[type=submit]');
   await page.waitForFunction(()=>!document.getElementById('model-dialog').open);
-  for (const format of ['hwp','hwpx']) for(const mode of (axisOnly?['insert-row','delete-column']:['plain','mixed'])){
+  for (const format of ['hwp','hwpx']) for(const mode of (bodyMarkers?['insert-row']:axisOnly?['insert-row','delete-column']:['plain','mixed'])){
     const mixed=mode==='mixed';
     const frame=await (await page.$('.editor-frame:not([hidden])')).contentFrame();
     const doc=HwpDocument.createEmpty();doc.createBlankDocument();
     const inner='<table><tr><td>동일😀</td><td>동일😀</td></tr></table>';
-    doc.pasteHtml(0,0,0,`<table><tr><td>왼쪽${inner}</td><td>오른쪽${inner}</td></tr></table>`);
+    if(bodyMarkers){
+      doc.insertText(0,0,0,'작성자: 이름 / 업무');
+      doc.splitParagraph(0,0,doc.getParagraphLength(0,0));
+    }
+    doc.pasteHtml(0,bodyMarkers?1:0,0,`<table><tr><td>왼쪽${inner}</td><td>오른쪽${inner}</td></tr></table>`);
+    if(bodyMarkers){
+      doc.insertClickHereField(0,0,5,'이름','담당 부서','작성자',true);
+      doc.addBookmark(0,0,9,'업무 위치');
+    }
     if(mixed){
       const table=readStructure(doc).nestedTables[1],step={controlIndex:table.control,cellIndex:1,cellParaIndex:0};
       const path=p=>JSON.stringify([...table.ancestors,{...step,cellParaIndex:p}]);
@@ -69,6 +78,12 @@ try {
       doc.applyCharFormatInCellByPath(...args,path(1),1,3,'{"bold":true}');
     }
     const bytes=Array.from(format==='hwpx'?doc.exportHwpx():doc.exportHwp());doc.free();
+    const records=d=>[JSON.parse(d.getFieldList()),JSON.parse(d.getBookmarks())];
+    let originalMarkers;
+    if(bodyMarkers){
+      const source=new HwpDocument(new Uint8Array(bytes));
+      try{originalMarkers=records(source);}finally{source.free();}
+    }
     await frame.evaluate(async(bytes,name)=>{
       const root=await navigator.storage.getDirectory(),h=await root.getFileHandle(name,{create:true}),writer=await h.createWritable();
       await writer.write(new Uint8Array(bytes));await writer.close();await window.jueonyEditor.open(new Uint8Array(bytes),name,h,false);
@@ -99,6 +114,7 @@ try {
     const reopened=new HwpDocument(new Uint8Array(saved.bytes));
     try {
       assert.deepEqual(readStructure(reopened).nestedTables.map(t=>t.cells.map(c=>c.text)),edited);
+      if(bodyMarkers)assert.deepEqual(records(reopened),originalMarkers);
       const hits=JSON.parse(reopened.searchAllText('변경😀',true,true));
       if(!axisOnly){assert.equal(hits.length,1);assert.deepEqual(hits[0].cellPath.map(p=>p.cellIndex),[1,1]);}
       if(mixed){
@@ -110,5 +126,5 @@ try {
     } finally {reopened.free();}
     console.log('PASS',format,mode,'UI chat → loopback provider → Agent application → undo/redo → bound file save and native reopen');
   }
-  assert.equal(calls.length,4);assert.deepEqual(errors,[]);
+  assert.equal(calls.length,bodyMarkers?2:4);assert.deepEqual(errors,[]);
 } finally {await browser?.close();launcher.kill();await new Promise(r=>provider.close(r));}

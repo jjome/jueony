@@ -119,6 +119,69 @@ for(const format of ['hwp','hwpx']){
    assert.deepEqual(save(doc),before);
   }finally{doc.free();}
  });
+ await scenario(format+' scopes click-here boundaries to their own root table and cell',()=>{
+  const template=fixture(),save=d=>format==='hwp'?d.exportHwp():d.exportHwpx(),name='foreign-fields.'+format;
+  template.mergeTableCells(0,2,0,0,0,0,1);
+  const add=(para,cell,label)=>json(template.insertClickHereFieldInCell(0,para,0,cell,0,1,false,'안내','도움말',label,true)).fieldId;
+  add(1,0,'대상');add(1,2,'같은 표 이웃');const remote=add(2,0,'다른 표');
+  assert.equal(json(template.setFieldValue(remote,'자😀료')).ok,true);
+  template.splitParagraph(0,2,template.getParagraphLength(0,2));template.createTable(0,3,0,1,1);
+  assert.equal(json(template.insertTableFormulaField(0,3,0,0,'','=4','%g')).value,'4');
+  const doc=new HwpDocument(save(template));template.free();
+  try{
+   const base=snap(doc,name),[table,other]=base.structure.tables,fields=json(doc.getFieldList());
+   const local=base.cellParagraphSources[table.id],foreign=base.cellParagraphSources[other.id];
+   assert.equal(local.cells[0].paragraphs[0].editableFrom,2);
+   assert.equal(local.cells.find(c=>c.index===2).paragraphs[0].editableFrom,2);
+   assert.equal(local.cells[0].paragraphs[1].editableFrom,undefined);
+   assert.equal(foreign.cells[0].paragraphs[0].editableFrom,5);
+   assert.equal(fields.find(f=>f.fieldId===remote).value,'자😀료');
+   const before=save(doc),op=command(base,0,'Ce수정😀');
+   assert.throws(()=>transactionalCandidate(doc,base,[{...op,text:'C수정😀'}],'r1'),/필드/);
+   assert.deepEqual(save(doc),before);
+   transactionalCandidate(doc,base,[op],'r1');
+   const reopened=new HwpDocument(save(doc));
+   try{
+    assert.equal(reopened.getTextInCell(0,1,0,0,0,0,5),op.text);
+    assert.equal(reopened.getTextInCell(0,2,0,0,0,0,8),'O자😀료ther');
+    assert.deepEqual(json(reopened.getFieldList()),fields);
+   }finally{reopened.free();}
+   // Losing the guide state on reopen need not change the field list or its text.
+   const edited=snap(doc,name),beforeFault=save(doc);
+   doc.constructor=function(bytes){
+    const copy=new HwpDocument(bytes),read=copy.getFieldInfoAtInCell.bind(copy);
+    copy.getFieldInfoAtInCell=(...args)=>{
+     const info=json(read(...args));
+     if(info.fieldId===remote)info.isGuide=!info.isGuide;
+     return JSON.stringify(info);
+    };
+    return copy;
+   };
+   assert.throws(()=>transactionalCandidate(doc,edited,[command(edited,0,'Ce다시 수정')],'r1'),/저장 후 누름틀/);
+   assert.deepEqual(save(doc),beforeFault);
+  }finally{doc.free();}
+ });
+ await scenario(format+' rejects adjacent, protected or misidentified click-here fields in another root table',()=>{
+  const save=d=>format==='hwp'?d.exportHwp():d.exportHwpx(),args=[0,2,0,0,0];
+  for(const mode of ['adjacent','protected','wrong-field']){
+   const template=fixture();
+   template.insertClickHereFieldInCell(...args,1,false,'하나','','입력1',true);
+   if(mode==='adjacent')template.insertClickHereFieldInCell(...args,0,false,'둘','','입력2',true);
+   if(mode==='protected')template.setCellProperties(0,2,0,0,'{"cellProtect":true}');
+   const doc=new HwpDocument(save(template));template.free();
+   try{
+    if(mode==='wrong-field'){
+     const read=doc.getFieldInfoAtInCell.bind(doc);
+     doc.getFieldInfoAtInCell=(...a)=>{const info=json(read(...a));return JSON.stringify({...info,fieldId:info.fieldId+1});};
+    }
+    const before=save(doc),base=snap(doc,'foreign-invalid.'+format),t=base.structure.tables[0];
+    assert.equal(base.cellParagraphSources[t.id].editable,false,mode);
+    assert.throws(()=>transactionalCandidate(doc,base,[{kind:'replace_cell_paragraph',target:t.id,row:0,column:0,
+     paragraph:0,originalText:'Cell 0',text:'시도'}],'r1'));
+    assert.deepEqual(save(doc),before);
+   }finally{doc.free();}
+  }
+ });
  await scenario(format+' preserves neighbor FORMULA fields in the same and another root table',()=>{
   const template=fixture(),save=d=>format==='hwp'?d.exportHwp():d.exportHwpx(),name='neighbor-formula.'+format;
   template.deleteTextInCell(0,1,0,1,0,0,6);template.insertTextInCell(0,1,0,1,0,0,'3');

@@ -82,7 +82,8 @@ function paragraphPageOwners(d:any,t:Table) {
 function cellFieldBoundaries(d:any,t:Table,tables:Table[],controls:any[],lists:any[]){
  const nested=controls.filter(c=>c.list!==0),fields=parsed(d.getFieldList());
  const boundaries=new Map<string,number>();
- const formulaTables=new Set<string>(),formulaResults:Array<{id:number;result:number}>=[];
+ const formulaTables=new Set<string>(),checkedHosts=new Set<string>();
+ const fieldEvidence:Array<{id:number;result:number}|{id:number;location:unknown;info:unknown;value:string}>=[];
  if(!Array.isArray(fields)||fields.length!==nested.length)throw Error();
  const remaining=new Map<string,number>();
  for(const c of nested){
@@ -98,27 +99,34 @@ function cellFieldBoundaries(d:any,t:Table,tables:Table[],controls:any[],lists:a
      loc?.path?.length!==1||step.type!=='cell'||!int(step.cellIndex)||!int(step.paraIndex)||
      !int(field.startCharIdx)||!int(field.endCharIdx)||field.endCharIdx<field.startCharIdx||field.paraInList!==step.paraIndex)throw Error();
   const host=tables.find(table=>table.section===loc.sectionIndex&&table.paragraph===loc.paraIndex&&table.control===step.controlIndex);
-  if(!host||field.fieldType==='clickhere'&&host.id!==t.id)throw Error();
+  if(!host)throw Error();
   const list=lists.find(l=>l.hostListId===0&&l.isCell&&l.sectionIndex===host.section&&l.hostPara===host.paragraph&&
    l.controlIndex===host.control&&l.cellIndex===step.cellIndex&&l.listId===field.listId);
   const slot=field.listId+'/'+step.paraIndex,count=remaining.get(slot)??0;
   if(!list||!count||!int(field.fieldId)||inspected.has(field.fieldId))throw Error();
   inspected.add(field.fieldId); remaining.set(slot,count-1);
+  if(!checkedHosts.has(host.id)){
+   if(host.rows*host.columns>200||host.cellZoneCount!==0)throw Error();
+   assertNativeTableWritable(d,host);checkedHosts.add(host.id);
+  }
   if(field.fieldType==='formula'){
    const cell=host.cells.find(c=>c.index===step.cellIndex),formula=cell?.axisFormula;
-   if(!cell||!formula||formula.fieldId!==field.fieldId||host.rows*host.columns>200||host.cellZoneCount!==0)throw Error();
-   if(!formulaTables.has(host.id))assertNativeTableWritable(d,host);
+   if(!cell||!formula||formula.fieldId!==field.fieldId)throw Error();
    const preview=parsed(d.previewTableFormulaField(host.section,host.paragraph,host.control,cell.index,
     formula.fieldId,field.command,formula.expression,formula.resultFormat));
    if(preview.ok!==true||preview.fieldId!==formula.fieldId||!Number.isFinite(preview.result)||
       preview.command!==field.command||preview.value!==cell.text||preview.dependentChanges?.length!==0)throw Error();
-   formulaTables.add(host.id);formulaResults.push({id:formula.fieldId,result:preview.result});
+   formulaTables.add(host.id);fieldEvidence.push({id:formula.fieldId,result:preview.result});
    continue;
   }
-  const info=parsed(d.getFieldInfoAtInCell(t.section,t.paragraph,t.control,step.cellIndex,step.paraIndex,field.startCharIdx,false));
-  const key=step.cellIndex+'/'+step.paraIndex;
+  const args=[host.section,host.paragraph,host.control,step.cellIndex,step.paraIndex] as const;
+  const info=parsed(d.getFieldInfoAtInCell(...args,field.startCharIdx,false));
+  const key=host.id+'/'+step.cellIndex+'/'+step.paraIndex;
   if(!info.inField||info.fieldId!==field.fieldId||info.fieldType!==field.fieldType||info.startCharIdx!==field.startCharIdx||
-     info.endCharIdx!==field.endCharIdx)throw Error();
+     info.endCharIdx!==field.endCharIdx||field.endCharIdx>d.getCellParagraphLength(...args)||
+     info.editableInForm!==field.editableInForm||info.guideName!==field.guide||typeof info.isGuide!=='boolean'||
+     d.getTextInCell(...args,field.startCharIdx,field.endCharIdx-field.startCharIdx)!==field.value)throw Error();
+  fieldEvidence.push({id:field.fieldId,location:loc,info,value:field.value});
   const group=ranges.get(key)??[];
   // Adjacent inline markers can coalesce on re-export. Only advertise a
   // suffix when a plain character separates every pair of stored fields.
@@ -129,7 +137,7 @@ function cellFieldBoundaries(d:any,t:Table,tables:Table[],controls:any[],lists:a
   if(group.some(([start],i)=>i>0&&start<=group[i-1][1]+1))throw Error();
   boundaries.set(key,group[group.length-1][1]+1);
  }
- return {boundaries,formulaResults,hasLocalFormula:formulaTables.has(t.id)};
+ return {boundaries,fieldEvidence,hasLocalFormula:formulaTables.has(t.id)};
 }
 function readPrivateSources(d:any,tables:Table[],name:string){
  const structure=readStructure(d),sources:Record<string,any>={};
@@ -140,7 +148,7 @@ function readPrivateSources(d:any,tables:Table[],name:string){
    assertNativeTableWritable(d,t);
    const controls=parsed(d.getControls()),lists=parsed(d.getCursorModel()).lists;
    if(parsed(d.getBookmarks()).length||controls.some((c:any)=>c.list===0&&!['tbl','secd','cold'].includes(c.ctrlId))||lists.some((l:any)=>!l.isCell||l.hostListId!==0))throw Error();
-   const {boundaries,formulaResults,hasLocalFormula}=cellFieldBoundaries(d,t,structure.tables,controls,lists);
+   const {boundaries,fieldEvidence,hasLocalFormula}=cellFieldBoundaries(d,t,structure.tables,controls,lists);
    const p=parsed(d.getTableProperties(t.section,t.paragraph,t.control)),col=parsed(d.getColumnDef(t.section));
    if(p.cellZoneCount!==0||p.hasCaption||p.cellSpacing!==0||p.treatAsChar||p.allowOverlap||p.repeatHeader||p.textWrap!=='TopAndBottom'||p.vertRelTo!=='Para'||p.vertAlign!=='Top'||p.horzRelTo!=='Para'&&p.horzRelTo!=='Column'||p.horzAlign!=='Left'||col.columnCount!==1)throw Error();
    const pages=paragraphPageOwners(d,t);
@@ -151,7 +159,7 @@ function readPrivateSources(d:any,tables:Table[],name:string){
      const args=[t.section,t.paragraph,t.control,c.index,index],length=d.getCellParagraphLength(...args),text=d.getTextInCell(...args,0,length),path=JSON.stringify([{controlIndex:t.control,cellIndex:c.index,cellParaIndex:index}]),runs=parsed(d.getCharShapeRunsInCellByPath(t.section,t.paragraph,path,0,length)),characters=parsed(d.getCellCharPropertiesAt(...args,0)),paragraph=parsed(d.getCellParaPropertiesAt(...args)),style=parsed(d.getCellStyleAt(...args));
      paragraphBudget++;characterBudget+=Array.from(text).length;
      if(paragraphBudget>200||characterBudget>40000||!plain(text)||Array.from(text).length!==length||!Array.isArray(runs)||runs.some((r:any,i:number)=>!int(r.charShapeId)||!int(r.endOffset)||r.startOffset!==(i===0?0:runs[i-1].endOffset)||r.endOffset<=r.startOffset)||(runs.at(-1)?.endOffset??0)!==length||!int(characters.charShapeId)||paragraph.headType!=='None')throw Error();
-     const editableFrom=boundaries.get(c.index+'/'+index);
+     const editableFrom=boundaries.get(t.id+'/'+c.index+'/'+index);
      return {index,text,length,characters,paragraph,style,runs,...(editableFrom===undefined?{}:{editableFrom})};
     });
     let formulaReadOnly=false;
@@ -165,7 +173,7 @@ function readPrivateSources(d:any,tables:Table[],name:string){
    });
    if(!cells.some(c=>!c.formulaReadOnly&&c.rowSpan*c.columnSpan>1))throw Error();
    const evidence=capturePreservationEvidence(d);if(evidence.issues.length)throw Error();
-   source={editable:true,cells,pages,formulaResults,fingerprint:sha({evidence,formulaResults,resources:resourceFingerprint(d.exportHwpx()),body:rootBodyTexts(d),tables:tableTextTree(structure.tables),cells,properties:p,columns:col,pages,geometry:tableLayoutEvidence(d,t)})};
+   source={editable:true,cells,pages,fieldEvidence,fingerprint:sha({evidence,fieldEvidence,resources:resourceFingerprint(d.exportHwpx()),body:rootBodyTexts(d),tables:tableTextTree(structure.tables),cells,properties:p,columns:col,pages,geometry:tableLayoutEvidence(d,t)})};
   }catch{}
   sources[t.id]=source;
  }
@@ -233,7 +241,7 @@ export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellPar
  const d=nativeDocument(wasm),proof=pending.get(d);if(!proof||proof.revision!==base.revision||!same(proof.operation,op))throw new Error('셀 문단 결과의 검증 근거가 없습니다.');
  const after=capturePreservationEvidence(d);if(after.issues.length||!same(topologySemantics(after.values),proof.expected)||!same(rootBodyTexts(d),proof.body)||!same(tableTextTree(readStructure(d).tables),proof.text)||resourceFingerprint(d.exportHwpx())!==proof.resources)throw new Error('병합 셀 문단 결과 또는 다른 문서 내용·자원이 변경되었습니다.');
  const source=readPrivateSources(d,[proof.table],base.name).sources[op.target];if(source?.editable!==true)throw new Error('교체 후 병합 셀 문단을 검증하지 못했습니다.');
- if(!same(source.formulaResults,proof.formulaResults))throw Error('문단 편집으로 계산식 결과가 달라졌습니다.');
+ if(!same(source.fieldEvidence,proof.fieldEvidence))throw Error('문단 편집으로 누름틀 필드 또는 계산식 결과가 달라졌습니다.');
  if(!same(source.pages,proof.pages))throw new Error('문단 편집으로 셀의 쪽 경계가 바뀌어 적용하지 않았습니다.');
  for(const cell of source.cells)for(const para of cell.paragraphs){
   const old=proof.cells.find((c:any)=>c.index===cell.index)?.paragraphs[para.index];
@@ -243,9 +251,9 @@ export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellPar
  portableLayout(d,()=>{const format=/\.hwp$/iu.test(base.name)?'hwp':'hwpx';const artifact=format==='hwp'?d.exportHwpWithReport():d.exportHwpxWithReport();let reopened:any;
  try{const loss=JSON.parse(artifact.contentLoss()),bytes=artifact.takeBytes();verifyPreservedExport(d,bytes,format,loss,b=>new d.constructor(b));reopened=new d.constructor(bytes);
   if(!sameTableLayout(tableLayoutEvidence(d,proof.table),tableLayoutEvidence(reopened,proof.table)))throw new Error('셀 문단 교체 후 실제 저장 재열기 배치가 다릅니다.');
-  if(proof.formulaResults.length){
+  if(proof.fieldEvidence.length){
    const stored=cellFieldBoundaries(reopened,proof.table,readStructure(reopened).tables,parsed(reopened.getControls()),parsed(reopened.getCursorModel()).lists);
-   if(!same(stored.formulaResults,proof.formulaResults))throw Error('저장 후 계산식 결과가 달라졌습니다.');
+   if(!same(stored.fieldEvidence,proof.fieldEvidence))throw Error('저장 후 누름틀 필드 또는 계산식 결과가 달라졌습니다.');
   }
  }finally{reopened?.free();artifact.free();}});
 }
@@ -288,7 +296,7 @@ export function executeCellParagraph(wasm:any,base:Snapshot,op:AgentCellParagrap
  paraEvidence.runs=formatted?.stored??storedRuns;
  const text=tableTextTree(structure.tables).map(table=>table.id===t.id?{...table,cells:table.cells.map(cell=>cell.index===c.index?{...cell,text:c.paragraphs.map((p:any)=>p.index===op.paragraph?op.text:p.text).join('\n')}:cell)}:table);
  const proof={revision:base.revision,operation:structuredClone(op),table:t,expected,runs:formatted?.runs??runs,firstCharacters:formatted?.firstCharacters??firstCharacters,
-  pages:source.pages,formulaResults:source.formulaResults,body:rootBodyTexts(d),text,resources:formatted?.resources??resources,cells:source.cells,cellIndex:c.index};
+  pages:source.pages,fieldEvidence:source.fieldEvidence,body:rootBodyTexts(d),text,resources:formatted?.resources??resources,cells:source.cells,cellIndex:c.index};
  // Edit right to left so offsets always refer to the queried source.
  for(const edit of [...edits].reverse()){
   const shape=mixed?p.runs[edit.run].charShapeId:p.characters.charShapeId;

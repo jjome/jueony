@@ -139,6 +139,25 @@ try {
     await frame.$eval('.formula-dialog-body input[type=checkbox]', (element, value) => { element.checked = value; }, comma);
   }
   const cellValue = frame => frame.evaluate(() => { const s=window.__shortcutServices,t=window.__formulaTable;return s.wasm.getTextInCell(0,t.paraIdx,t.controlIdx,2,0,0,s.wasm.getCellParagraphLength(0,t.paraIdx,t.controlIdx,2,0)); });
+  for (const extension of ['hwp','hwpx']) await scenario(`${extension}: opt in to inserting a stored formula in a plain cell, undo, redo and reopen`, async () => {
+    const frame = await openFormula(extension), before = await immutable(frame);
+    await dialog(frame, 'decimal2', true, '=SUM(A1:B1)');
+    const toggle = 'input[data-formula-storage=field]';
+    assert.equal(await frame.$eval(toggle, el => el.checked), false);
+    await frame.click(toggle);
+    await frame.click('.modal-overlay .dialog-btn-primary');
+    assert.equal(await frame.$('.formula-input'), null, await frame.$eval('.formula-error', el => el.textContent).catch(() => ''));
+    const fields = () => frame.evaluate(() => JSON.parse(window.__shortcutServices.wasm.borrowDocumentHandle().getFieldList()).filter(f => f.fieldType === 'formula'));
+    const [created] = await fields(); assert.equal(created.command, '=SUM(A1:B1)??%.2f,;;1,234.56');
+    await frame.evaluate(() => window.jueonyEditor.executeCommand('edit:undo'));
+    assert.deepEqual(await fields(), []); assert.deepEqual((await immutable(frame)).bytes, before.bytes);
+    await frame.evaluate(() => window.jueonyEditor.executeCommand('edit:redo'));
+    assert.equal((await fields())[0].fieldId, created.fieldId);
+    await saved(frame, 'inserted-formula.' + extension, doc => {
+      const [stored] = JSON.parse(doc.getFieldList()).filter(f => f.fieldType === 'formula');
+      assert.equal(stored.command, created.command); assert.equal(stored.fieldId, created.fieldId);
+    });
+  });
   for (const extension of ['hwp', 'hwpx']) for (const [format,comma,formula,expected] of [
     ['integer',false,'=SUM(A1:B1)','1235'], ['decimal1',false,'=SUM(A1:B1)','1234.6'],
     ['decimal2',false,'=A1','1234.50'], ['decimal2',true,'=A1','1,234.50'],

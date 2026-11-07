@@ -11,7 +11,7 @@ if (!pkg || !fixture || !isAbsolute(pkg) || !isAbsolute(fixture)) {
 }
 const { default: initialize, HwpDocument } = await import(pathToFileURL(join(pkg, 'rhwp.js')).href);
 await initialize({ module_or_path: await readFile(join(pkg, 'rhwp_bg.wasm')) });
-for (const method of ['splitCellParagraphs', 'previewTableFormulaField', 'updateTableFormulaField']) {
+for (const method of ['splitCellParagraphs', 'previewTableFormulaField', 'updateTableFormulaField', 'insertTableFormulaField']) {
   assert.equal(typeof HwpDocument.prototype[method], 'function', 'Missing WASM binding ' + method);
 }
 const json = JSON.parse;
@@ -28,6 +28,20 @@ try {
   for (const [i, text] of ['A', 'B'].entries()) {
     assert.equal(table.getCellParagraphLength(...at, i, 0), 1);
     assert.equal(table.getTextInCell(...at, i, 0, 0, 1), text);
+  }
+  const first = json(table.insertTableFormulaField(...at, 0, 'A', '=2+3', '%g'));
+  const second = json(table.insertTableFormulaField(...at, 1, 'B', '=A1*2', '%.1f'));
+  assert.equal(first.value, '5');
+  assert.equal(second.value, '10.0');
+  assert.notEqual(first.fieldId, second.fieldId);
+  for (const bytes of [table.exportHwp(), table.exportHwpx()]) {
+    const reopened = new HwpDocument(bytes);
+    try {
+      const stored = json(reopened.getFieldList()).filter(f => f.fieldType === 'formula');
+      assert.deepEqual(stored.map(f => [f.fieldId, f.command, f.value]), [
+        [first.fieldId, '=2+3??%g;;5', '5'], [second.fieldId, '=A1*2??%.1f;;10.0', '10.0'],
+      ]);
+    } finally { reopened.free(); }
   }
 } finally { table.free(); }
 
@@ -58,4 +72,4 @@ try {
   assert.equal(stored.command, '=A3*2??%g;;6');
   assert.equal(stored.value, '6');
 } finally { formulas.free(); }
-console.log('PASS compiled WASM split-cell paragraph distribution and stored formula dependency update');
+console.log('PASS compiled WASM split-cell paragraph distribution, native formula creation, dependency update and save/reopen');

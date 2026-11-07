@@ -16,9 +16,11 @@ export function patchFormulaFormat(source) {
     if (source.split(before).length !== 2) throw new Error('Formula transaction integration drift');
     source = source.replace(before, after);
   };
-  source = "import { readStoredTableFormula, updateStoredTableFormula } from '../jueony/adapters/rhwp/stored-table-formula.ts';\n" + source;
+  source = "import { readStoredTableFormula, storedFormulaResultFormat, updateStoredTableFormula } from '../jueony/adapters/rhwp/stored-table-formula.ts';\n"
+    + "import { insertStoredTableFormula } from '../jueony/adapters/rhwp/insert-stored-table-formula.ts';\n" + source;
   replace('  private formulaInput!: HTMLInputElement;', `  private storedField: ReturnType<typeof readStoredTableFormula>;
   private openRevision: string;
+  private insertField?: HTMLInputElement;
   private formulaInput!: HTMLInputElement;`);
   replace('    this.ctx = ctx;', `    this.ctx = ctx;
     this.storedField = readStoredTableFormula(wasm, ctx);
@@ -28,6 +30,21 @@ export function patchFormulaFormat(source) {
       functions.forEach(f => this.funcSelect.appendChild`);
   replace('      return this.formatSelect;', "      if (this.storedField) this.formatSelect.value = this.storedField.format;\n      return this.formatSelect;");
   replace('    this.commaCheck.checked = true;', '    this.commaCheck.checked = this.storedField?.comma ?? true;');
+  replace('    body.appendChild(commaRow);', `    body.appendChild(commaRow);
+    if (!this.storedField && typeof this.wasm.borrowDocumentHandle?.()?.insertTableFormulaField === 'function') {
+      const label = document.createElement('label');
+      label.className = 'formula-row';
+      this.insertField = document.createElement('input');
+      this.insertField.type = 'checkbox';
+      this.insertField.dataset.formulaStorage = 'field';
+      this.insertField.addEventListener('change', () => {
+        for (const option of Array.from(this.funcSelect.options)) {
+          option.disabled = !!this.insertField?.checked && !!option.value && !['SUM','AVERAGE','PRODUCT','COUNT','MIN','MAX'].includes(option.value);
+        }
+      });
+      label.append(this.insertField, '계산식 필드로 삽입');
+      body.appendChild(label);
+    }`);
   replace('      // 먼저 검증 (write_result=false)', `      const livePosition = this.services?.getInputHandler()?.getCursorPosition();
       if (livePosition?.cellPath && livePosition.cellPath.length > 1) throw new Error('중첩 표 안의 계산식 편집은 아직 지원하지 않습니다.');
       if (!livePosition || livePosition.sectionIndex !== this.ctx.sec || livePosition.parentParaIndex !== this.ctx.ppi
@@ -41,6 +58,11 @@ export function patchFormulaFormat(source) {
         return true;
       }
       if (readStoredTableFormula(this.wasm, this.ctx)) throw new Error('셀에 계산식 필드가 추가되었습니다. 창을 다시 여세요.');
+      if (this.insertField?.checked) {
+        insertStoredTableFormula(this.wasm, this.services?.getInputHandler(), this.ctx, this.openRevision, formula,
+          storedFormulaResultFormat(this.formatSelect.value, this.commaCheck.checked));
+        return true;
+      }
       // 먼저 검증 (write_result=false)`);
   replace(`      let colCount = 1;
       try {

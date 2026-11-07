@@ -5,6 +5,12 @@ type StoredField = { fieldId: number; command: string; formula: string; format: 
 const formats = new Map([['default', '%g'], ['integer', '%.0f'], ['decimal1', '%.1f'], ['decimal2', '%.2f']]);
 const native = (wasm: any) => wasm.borrowDocumentHandle?.() ?? wasm;
 
+export function storedFormulaResultFormat(format: string, comma: boolean): string {
+  const pattern = formats.get(format);
+  if (!pattern) throw new Error('지원하지 않는 계산식 결과 형식입니다.');
+  return pattern + (comma ? ',' : '');
+}
+
 export function readStoredTableFormula(wasm: any, at: CellLocation): StoredField | null {
   const fields = JSON.parse(native(wasm).getFieldList()).filter((f: any) => {
     const p = f.location?.path?.[0];
@@ -27,9 +33,8 @@ export function updateStoredTableFormula(wasm: any, ih: any, at: CellLocation, s
   if (typeof raw.previewTableFormulaField !== 'function' || typeof raw.updateTableFormulaField !== 'function') {
     throw new Error('현재 문서 엔진에서 기존 계산식 필드 편집을 지원하지 않습니다.');
   }
-  const resultFormat = formats.get(format);
-  if (!source.format || !resultFormat) throw new Error('이 계산식의 저장 형식을 확인할 수 없습니다.');
-  const args = [at.sec, at.ppi, at.ci, at.cellIndex, source.fieldId, source.command, expression, resultFormat + (comma ? ',' : '')];
+  if (!source.format) throw new Error('이 계산식의 저장 형식을 확인할 수 없습니다.');
+  const args = [at.sec, at.ppi, at.ci, at.cellIndex, source.fieldId, source.command, expression, storedFormulaResultFormat(format, comma)];
   const preview = JSON.parse(raw.previewTableFormulaField(...args));
   if (preview.ok !== true) throw new Error('계산식의 저장 상태를 확인할 수 없습니다.');
   if (preview.command === source.command && !preview.dependentChanges?.length) return;

@@ -1,0 +1,114 @@
+--- a/src/document_core/queries/table_formula_field.rs
++++ b/src/document_core/queries/table_formula_field.rs
+@@ -6,6 +6,9 @@
+ use crate::model::table::Table;
+ use std::cell::RefCell;
+ use std::collections::{BTreeMap, BTreeSet};
++
++#[path = "table_formula_insert.rs"]
++mod insert;
+ 
+ fn err(msg: &str) -> HwpError {
+     HwpError::InvalidField(msg.to_owned())
+--- /dev/null
++++ b/src/document_core/queries/table_formula_insert.rs
+@@ -0,0 +1,83 @@
++use super::super::collect_max_field_id;
++use super::{err, Control, DocumentCore, Field, FieldLocation, FieldType, HwpError, NestedEntry, Paragraph};
++use crate::model::paragraph::FieldRange;
++use crate::parser::tags::FIELD_FORMULA;
++
++// Prepare a private, full-cell field. Its temporary numeric value is consumed
++// by the ordinary stored-field planner before this command can return.
++fn wrap_number(paragraph: &Paragraph, expected: &str, id: u32, seed_command: &str) -> Result<Paragraph, HwpError> {
++    if paragraph.text != expected || expected.chars().count() > 4000 ||
++        expected.chars().any(|c| c.is_control() || c == '\u{fffc}') ||
++        !paragraph.controls.is_empty() || !paragraph.field_ranges.is_empty() ||
++        !paragraph.range_tags.is_empty() || !paragraph.orphan_field_ends.is_empty() ||
++        !paragraph.markpen_marks.is_empty() || !paragraph.title_marks.is_empty() ||
++        !paragraph.tab_extended.is_empty() || !paragraph.ctrl_data_records.is_empty() ||
++        paragraph.char_shapes.windows(2).any(|r| r[0].char_shape_id != r[1].char_shape_id) {
++        return Err(err("변경되지 않은 일반 텍스트 한 문단 셀에 계산식을 삽입할 수 있습니다."));
++    }
++    // HWPX may have no stored binary char_count. Verify the actual text
++    // offsets to avoid discarding hidden binary control slots.
++    let mut utf16 = 0;
++    if paragraph.char_offsets.len() != expected.chars().count() ||
++        paragraph.char_offsets.iter().zip(expected.chars()).any(|(&offset, ch)| {
++            let matches = offset == utf16;
++            utf16 += ch.len_utf16() as u32;
++            !matches
++        }) {
++        return Err(err("셀 문단의 문자와 제어 위치를 확인할 수 없습니다."));
++    }
++    let mut p = paragraph.clone();
++    if !expected.is_empty() { p.delete_text_at(0, expected.chars().count()); }
++    p.insert_text_at(0, "0");
++    p.controls.push(Control::Field(Field {
++        field_type: FieldType::Formula, command: seed_command.to_owned(),
++        properties: 0, extra_properties: 8, field_id: id, ctrl_id: FIELD_FORMULA,
++        instance_id: Some(FIELD_FORMULA), raw_type: None, ctrl_data_name: None,
++        memo_index: 0, memo_paragraphs: Vec::new(), memo_text_direction: None,
++        raw_parameters_xml: None, parameters: Default::default(), guide_residue: None, hyperlink_format: None,
++    }));
++    p.ctrl_data_records.push(None);
++    p.field_ranges.push(FieldRange { start_char_idx: 0, end_char_idx: 1, control_idx: 0, end_field_id: FIELD_FORMULA, inner_slot_count: 0 });
++    // HWP5 stores eight UTF-16 units for each marker. Align the text, run
++    // and line offsets around the new field as on the native HWP samples.
++    p.shift_position_metadata_for_stream_insertion(1, 8);
++    p.shift_position_metadata_for_stream_insertion(0, 8);
++    p.char_offsets[0] = 8;
++    p.char_count = 18; // begin + "0" + end + paragraph terminator
++    p.has_para_text = true;
++    p.control_mask |= (1 << 3) | (1 << 4);
++    p.invalidate_layout_inputs();
++    Ok(p)
++}
++
++impl DocumentCore {
++    pub fn insert_table_formula_field(&mut self, section: usize, paragraph: usize, control: usize,
++        cell: usize, expected: &str, formula: &str, format: &str) -> Result<String, HwpError> {
++        let location = FieldLocation { section_index: section, para_index: paragraph,
++            nested_path: vec![NestedEntry::TableCell { control_index: control, cell_index: cell, para_index: 0 }] };
++        self.validate_field_reflow_location(&location)?;
++        // Reserve IDs over the entire document, including captions and master
++        // pages. Overflow must never silently reuse an existing field ID.
++        let mut max_id = FIELD_FORMULA;
++        for sec in &self.document.sections {
++            for p in sec.paragraphs.iter().chain(sec.section_def.master_pages.iter().flat_map(|m| m.paragraphs.iter())) {
++                collect_max_field_id(p, &mut max_id);
++            }
++        }
++        let id = max_id.checked_add(1).ok_or_else(|| err("문서의 새 계산식 ID를 할당할 수 없습니다."))?;
++        let seed = if formula == "=0" { "=0+0??%.0f;;0" } else { "=0??%.0f;;0" };
++        let target = self.get_para_mut_at_location(&location)?;
++        let wrapped = wrap_number(target, expected, id, seed)?;
++        let original = std::mem::replace(target, wrapped);
++        // The same planner validates protection, formula, dependency graph
++        // and format, and recomposes every affected cell atomically.
++        match self.update_table_formula_field(section, paragraph, control, cell, id, seed, formula, format) {
++            Ok(result) => Ok(result),
++            Err(error) => {
++                *self.get_para_mut_at_location(&location)? = original;
++                self.rebuild_derived_state();
++                Err(error)
++            }
++        }
++    }
++}
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -8116,6 +8116,13 @@
+             .map_err(|e| e.into())
+     }
+ 
++    #[wasm_bindgen(js_name = insertTableFormulaField)]
++    pub fn insert_table_formula_field(&mut self, section: usize, paragraph: usize, control: usize, cell: usize,
++        expected_text: &str, formula: &str, format: &str) -> Result<String, JsValue> {
++        self.core.insert_table_formula_field(section, paragraph, control, cell, expected_text, formula, format)
++            .map_err(Into::into)
++    }
++
+     #[wasm_bindgen(js_name = previewTableFormulaField)]
+     pub fn preview_table_formula_field(&mut self, section: usize, paragraph: usize, control: usize, cell: usize,
+         field_id: u32, expected: &str, formula: &str, format: &str) -> Result<String, JsValue> {

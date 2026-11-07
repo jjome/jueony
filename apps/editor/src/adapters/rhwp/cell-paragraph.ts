@@ -1,3 +1,5 @@
+import {readNestedNamedFields} from './nested-named-fields.ts';
+import {readBodyTableMarkers} from './body-table-markers.ts';
 import {sha256} from '@noble/hashes/sha2.js';
 import type {Snapshot,Table,AgentCellParagraphOp,AgentCellParagraphSource} from '../../modules/document/public/index.ts';
 import {cellParagraphPlan} from '../../modules/document/public/engine-integration.ts';
@@ -80,10 +82,28 @@ function paragraphPageOwners(d:any,t:Table) {
 /** Match every anonymous native control to its field and owning cursor list.
  * A stored table formula must reproduce its cached result without updating any field. */
 function cellFieldBoundaries(d:any,t:Table,tables:Table[],controls:any[],lists:any[]){
- const nested=controls.filter(c=>c.list!==0),fields=parsed(d.getFieldList());
+ const nested=controls.filter(c=>c.list!==0),allFields=parsed(d.getFieldList());
+ if(!Array.isArray(allFields))throw Error();
+ if(new Set(allFields.map(f=>f.fieldId)).size!==allFields.length)throw Error();
+ const bodyFields=allFields.filter(f=>f.listId===0);
+ const fields=allFields.filter(f=>f.listId!==0&&f.cellField!==true);
+ // A virtual field has no inline control. Verify the actual path, first
+ // paragraph and ID lookup before planning a change to its displayed value.
+ const named=allFields.filter(f=>f.cellField===true),names=new Map<string,number>();
+ if(named.length||tables.some(table=>table.cells.some(c=>Boolean(c.properties.fieldName)))){
+  const owners=readNestedNamedFields(d,lists,named);
+  for(const f of named){
+   if(!owners.has(f.listId)||controls.some(c=>c.list===f.listId))throw Error();
+   const loc=f.location,step=loc.path[0];
+   if(loc.path.length!==1)throw Error();
+   names.set('s'+loc.sectionIndex+'p'+loc.paraIndex+'t'+step.controlIndex+'/'+step.cellIndex,f.fieldId);
+  }
+ }
+ const offsets=[0];
+ for(let s=0;s<d.getSectionCount();s++)offsets.push(offsets[s]+d.getParagraphCount(s));
+ const fieldEvidence=readBodyTableMarkers(d,controls.filter(c=>c.list===0),offsets,bodyFields,parsed(d.getBookmarks()));
  const boundaries=new Map<string,number>();
  const formulaTables=new Set<string>(),checkedHosts=new Set<string>();
- const fieldEvidence:Array<{id:number;result:number}|{id:number;location:unknown;info:unknown;value:string}>=[];
  if(!Array.isArray(fields)||fields.length!==nested.length)throw Error();
  const remaining=new Map<string,number>();
  for(const c of nested){
@@ -91,7 +111,7 @@ function cellFieldBoundaries(d:any,t:Table,tables:Table[],controls:any[],lists:a
   const key=c.list+'/'+c.para;
   remaining.set(key,(remaining.get(key)??0)+1);
  }
- const inspected=new Set<number>();
+ const inspected=new Set<number>(bodyFields.map(f=>f.fieldId));
  const ranges=new Map<string,Array<[number,number]>>();
  for(const field of fields){
   const loc=field.location,step=loc?.path?.[0];
@@ -136,7 +156,7 @@ function cellFieldBoundaries(d:any,t:Table,tables:Table[],controls:any[],lists:a
   if(group.some(([start],i)=>i>0&&start<=group[i-1][1]))throw Error();
   boundaries.set(key,group[group.length-1][1]+1);
  }
- return {boundaries,fieldEvidence,hasLocalFormula:formulaTables.has(t.id)};
+ return {boundaries,fieldEvidence,names,hasLocalFormula:formulaTables.has(t.id)};
 }
 function readPrivateSources(d:any,tables:Table[],name:string){
  const structure=readStructure(d),sources:Record<string,any>={};
@@ -146,14 +166,14 @@ function readPrivateSources(d:any,tables:Table[],name:string){
    if(!/\.hwpx?$/iu.test(name)||d.getSourceFormat()!==(/\.hwp$/iu.test(name)?'hwp':'hwpx')||t.rows*t.columns>200||!t.cells.some(c=>c.rowSpan*c.columnSpan>1)||t.editable!==true)throw Error();
    assertNativeTableWritable(d,t);
    const controls=parsed(d.getControls()),lists=parsed(d.getCursorModel()).lists;
-   if(parsed(d.getBookmarks()).length||controls.some((c:any)=>c.list===0&&!['tbl','secd','cold'].includes(c.ctrlId))||lists.some((l:any)=>!l.isCell||l.hostListId!==0))throw Error();
-   const {boundaries,fieldEvidence,hasLocalFormula}=cellFieldBoundaries(d,t,structure.tables,controls,lists);
+   if(lists.some((l:any)=>!l.isCell||l.hostListId!==0))throw Error();
+   const {boundaries,fieldEvidence,names,hasLocalFormula}=cellFieldBoundaries(d,t,structure.tables,controls,lists);
    const p=parsed(d.getTableProperties(t.section,t.paragraph,t.control)),col=parsed(d.getColumnDef(t.section));
    if(p.cellZoneCount!==0||p.hasCaption||p.cellSpacing!==0||p.treatAsChar||p.allowOverlap||p.repeatHeader||p.textWrap!=='TopAndBottom'||p.vertRelTo!=='Para'||p.vertAlign!=='Top'||p.horzRelTo!=='Para'&&p.horzRelTo!=='Column'||p.horzAlign!=='Left'||col.columnCount!==1)throw Error();
    const pages=paragraphPageOwners(d,t);
    let paragraphBudget=0,characterBudget=0;
    const cells=t.cells.map(c=>{
-    const count=d.getCellParagraphCount(t.section,t.paragraph,t.control,c.index);if(count<1||count>50||typeof c.properties.verticalAlign!=='number'||![0,1].includes(c.properties.verticalAlign)||c.properties.textDirection!==0||c.properties.fieldName!=='')throw Error();
+    const count=d.getCellParagraphCount(t.section,t.paragraph,t.control,c.index);if(count<1||count>50||typeof c.properties.verticalAlign!=='number'||![0,1].includes(c.properties.verticalAlign)||c.properties.textDirection!==0)throw Error();
     const paragraphs=Array.from({length:count},(_,index)=>{
      const args=[t.section,t.paragraph,t.control,c.index,index],length=d.getCellParagraphLength(...args),text=d.getTextInCell(...args,0,length),path=JSON.stringify([{controlIndex:t.control,cellIndex:c.index,cellParaIndex:index}]),runs=parsed(d.getCharShapeRunsInCellByPath(t.section,t.paragraph,path,0,length)),characters=parsed(d.getCellCharPropertiesAt(...args,0)),paragraph=parsed(d.getCellParaPropertiesAt(...args)),style=parsed(d.getCellStyleAt(...args));
      paragraphBudget++;characterBudget+=Array.from(text).length;
@@ -168,7 +188,8 @@ function readPrivateSources(d:any,tables:Table[],name:string){
      try{formulaReadOnly=d.tableFormulaInputHasDependents(t.section,t.paragraph,t.control,c.index)!==false;}
      catch{formulaReadOnly=true;}
     }
-    return {index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs,...(formulaReadOnly?{formulaReadOnly}: {})};
+    const nameId=names.get(t.id+'/'+c.index);
+    return {index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs,...(nameId===undefined?{}:{nameId}),...(formulaReadOnly?{formulaReadOnly}: {})};
    });
    if(!cells.some(c=>!c.formulaReadOnly&&c.rowSpan*c.columnSpan>1))throw Error();
    const evidence=capturePreservationEvidence(d);if(evidence.issues.length)throw Error();
@@ -240,7 +261,7 @@ export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellPar
  const d=nativeDocument(wasm),proof=pending.get(d);if(!proof||proof.revision!==base.revision||!same(proof.operation,op))throw new Error('셀 문단 결과의 검증 근거가 없습니다.');
  const after=capturePreservationEvidence(d);if(after.issues.length||!same(topologySemantics(after.values),proof.expected)||!same(rootBodyTexts(d),proof.body)||!same(tableTextTree(readStructure(d).tables),proof.text)||resourceFingerprint(d.exportHwpx())!==proof.resources)throw new Error('병합 셀 문단 결과 또는 다른 문서 내용·자원이 변경되었습니다.');
  const source=readPrivateSources(d,[proof.table],base.name).sources[op.target];if(source?.editable!==true)throw new Error('교체 후 병합 셀 문단을 검증하지 못했습니다.');
- if(!same(source.fieldEvidence,proof.fieldEvidence))throw Error('문단 편집으로 누름틀 필드 또는 계산식 결과가 달라졌습니다.');
+ if(!same(source.fieldEvidence,proof.fieldEvidence))throw Error('문단 편집으로 책갈피, 누름틀 또는 계산식 결과가 달라졌습니다.');
  if(!same(source.pages,proof.pages))throw new Error('문단 편집으로 셀의 쪽 경계가 바뀌어 적용하지 않았습니다.');
  for(const cell of source.cells)for(const para of cell.paragraphs){
   const old=proof.cells.find((c:any)=>c.index===cell.index)?.paragraphs[para.index];
@@ -252,7 +273,7 @@ export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellPar
   if(!sameTableLayout(tableLayoutEvidence(d,proof.table),tableLayoutEvidence(reopened,proof.table)))throw new Error('셀 문단 교체 후 실제 저장 재열기 배치가 다릅니다.');
   if(proof.fieldEvidence.length){
    const stored=cellFieldBoundaries(reopened,proof.table,readStructure(reopened).tables,parsed(reopened.getControls()),parsed(reopened.getCursorModel()).lists);
-   if(!same(stored.fieldEvidence,proof.fieldEvidence))throw Error('저장 후 누름틀 필드 또는 계산식 결과가 달라졌습니다.');
+   if(!same(stored.fieldEvidence,proof.fieldEvidence))throw Error('저장 후 책갈피, 누름틀 또는 계산식 결과가 달라졌습니다.');
   }
  }finally{reopened?.free();artifact.free();}});
 }
@@ -262,6 +283,12 @@ export function executeCellParagraph(wasm:any,base:Snapshot,op:AgentCellParagrap
  assertNativeTableWritable(d,t);const source=readPrivateSources(d,[t],base.name).sources[t.id],c=source.cells.find((c:any)=>c.index===plan.cell.index),p=c.paragraphs[op.paragraph];
  const before=capturePreservationEvidence(d);if(before.issues.length)throw new Error('셀 문단 교체 전 전체 보존 정보를 읽지 못했습니다.');const expected=topologySemantics(before.values),target=expected.cells.find((c:any)=>c.list.hostListId===0&&c.list.sectionIndex===t.section&&c.list.hostPara===t.paragraph&&c.list.controlIndex===t.control&&c.list.cellIndex===plan.cell.index);
  if(!target)throw new Error('원래 셀 문단의 보존 정보가 없습니다.');
+ if(c.nameId!==undefined&&op.paragraph===0){
+  const field=expected.fields.find((f:any)=>f.cellField===true&&f.fieldId===c.nameId);
+  if(!field||field.value!==op.originalText)throw Error('원래 이름 셀의 값을 확인하지 못했습니다.');
+  field.value=op.text;
+  field.endCharIdx=Array.from(op.text).length;
+ }
  const mixed=p.runs.length>1,edits=plan.edits;
  const paraEvidence=target.paragraphs[op.paragraph];
  const args=[t.section,t.paragraph,t.control,c.index,op.paragraph];

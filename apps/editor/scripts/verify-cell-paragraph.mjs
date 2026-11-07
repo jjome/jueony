@@ -143,6 +143,45 @@ try{
   assert.deepEqual(await fields(),originalFields);
   assert.equal((await snap()).cellParagraphSources[table.id].cells[0].paragraphs[1].text,revised);
  });
+ for(const format of ['hwp','hwpx'])await scenario(format+' named merged owner value through chat and bound file reopen',async()=>{
+  const d=body(format);
+  d.setCellProperties(0,1,0,0,JSON.stringify({fieldName:'계획명'}));
+  d.setCellProperties(0,1,0,2,JSON.stringify({fieldName:'담당부서'}));
+  const f=await open(format,d),before=await snap(),id=before.structure.tables[0].id;
+  const fields=()=>f.evaluate(()=>JSON.parse(window.__pageServices.wasm.borrowDocumentHandle().getFieldList()));
+  const original=await fields(),[owner,neighbor]=original;
+  await send('first: 제목 셀의 첫 문단을 수정해 주세요.');
+  assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const text=(await snap()).cellParagraphSources[id].cells[0].paragraphs[0].text;
+  assert.notEqual(text,owner.value);
+  const expected=[{...owner,value:text,endCharIdx:Array.from(text).length},neighbor];
+  assert.deepEqual(await fields(),expected);
+  await undo();assert.deepEqual(await fields(),original);await execute('edit:redo');
+  const reopened=await save(f,'named-merged-paragraph',format);
+  try{assert.deepEqual(JSON.parse(reopened.getFieldList()),expected);assert.equal(JSON.parse(reopened.getFieldValue(owner.fieldId)).value,text);}
+  finally{reopened.free();}
+ });
+ for(const format of ['hwp','hwpx'])await scenario(format+' anchored body markers and a merged cell through chat and reopen',async()=>{
+  const d=body(format);
+  const field=JSON.parse(d.insertClickHereField(0,0,2,'담당자','','작성자',true));
+  assert.equal(JSON.parse(d.setFieldValue(field.fieldId,'김😀')).ok,true);
+  assert.equal(JSON.parse(d.addBookmark(0,0,1,'기안 위치')).ok,true);
+  d.insertClickHereFieldInCell(0,1,0,0,1,1,false,'제목','','업무명',true);
+  const f=await open(format,d),original=await snap(),table=original.structure.tables[0];
+  const stored=await f.evaluate(()=>{
+   const doc=window.__pageServices.wasm.borrowDocumentHandle();
+   return [JSON.parse(doc.getBookmarks()),JSON.parse(doc.getFieldList()),doc.getTextRange(0,0,0,doc.getParagraphLength(0,0))];
+  });
+  await send('field-tail: 병합 셀의 누름틀 뒤를 수정해 주세요.');
+  assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const target=()=>snap().then(s=>s.cellParagraphSources[table.id].cells[0].paragraphs[1].text);
+  assert.equal(await target(),'업무수정😀');
+  await undo();assert.equal(await target(),original.cellParagraphSources[table.id].cells[0].paragraphs[1].text);
+  await execute('edit:redo');const reopened=await save(f,'body-markers',format);
+  try{assert.deepEqual([JSON.parse(reopened.getBookmarks()),JSON.parse(reopened.getFieldList()),reopened.getTextRange(0,0,0,reopened.getParagraphLength(0,0))],stored);
+   assert.equal(reopened.getTextInCell(0,1,0,0,1,0,5),'업무수정😀');}
+  finally{reopened.free();}
+ });
  for(const format of ['hwp','hwpx'])await scenario(format+' click-here boundaries in two root tables through chat and editor reopen',async()=>{
   const d=body(format,true),local=[0,1,0,0,0],remote=[0,2,0,0,0];
   d.mergeTableCells(0,2,0,0,0,0,1);d.insertTextInCell(...remote,0,'둘째 표 원문');

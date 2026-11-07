@@ -1,3 +1,5 @@
+import {readBodyTableMarkers} from './body-table-markers.ts';
+import {readNestedNamedFields} from './nested-named-fields.ts';
 import type {CellParagraphText, NestedTable, TableCellPathStep} from '../../modules/document/public/types.ts';
 
 type CellList = {isCell:boolean;listId:number;hostListId:number;sectionIndex:number;hostPara:number;controlIndex:number;cellIndex:number;paraCount:number};
@@ -6,45 +8,6 @@ type Location = {section:number;paragraph:number;path:TableCellPathStep[];writab
 const json = (value:any) => typeof value === 'string' ? JSON.parse(value) : value;
 const index = (value:number) => Number.isSafeInteger(value) && value >= 0;
 const check = (ok:boolean) => {if (!ok) throw Error('중첩 표 경로 또는 조회 한도를 확인해 주세요.');};
-
-/** A point bookmark and a click-here field in body text retain their original
- * addresses when a nested table grows. Require a matching control for each
- * record. The axis transaction separately compares all records after editing. */
-function verifiedBodyMarkers(doc:any,controls:Control[],offsets:number[]):boolean {
-  const fields=json(doc.getFieldList()), bookmarks=json(doc.getBookmarks());
-  if(!Array.isArray(fields)||!Array.isArray(bookmarks)||fields.length+bookmarks.length>200)return false;
-  const fieldParagraphs=new Set<number>(), bookmarkSlots=new Set<string>();
-  for(const c of controls){
-    if(c.ctrlId==='tbl'||(c.list===0&&['secd','cold'].includes(c.ctrlId)))continue;
-    if(c.list!==0)return false;
-    if(c.ctrlId==='bokm'){
-      const slot=c.para+'/'+c.controlIndex;
-      if(!index(c.controlIndex)||bookmarkSlots.has(slot))return false;
-      bookmarkSlots.add(slot);
-    }
-    else if(c.ctrlId===''&&c.ctrlCh===0&&!fieldParagraphs.has(c.para))fieldParagraphs.add(c.para);
-    else return false;
-  }
-  const inBody=(s:number,p:number)=>index(s)&&s<offsets.length-1&&index(p)&&p<offsets[s+1]-offsets[s];
-  for(const b of bookmarks){
-    if(!b||typeof b.name!=='string'||!b.name||!inBody(b.sec,b.para)||!index(b.ctrlIdx)||!index(b.charPos)||b.charPos>doc.getParagraphLength(b.sec,b.para)||
-        !bookmarkSlots.delete((offsets[b.sec]+b.para)+'/'+b.ctrlIdx))return false;
-  }
-  const ids=new Set<number>();
-  for(const f of fields){
-    const loc=f.location;
-    if(f.fieldType!=='clickhere'||f.cellField!==false||f.listId!==0||!loc||loc.path?.length||
-        !inBody(loc.sectionIndex,loc.paraIndex)||!index(f.fieldId)||ids.has(f.fieldId)||
-        !index(f.startCharIdx)||!index(f.endCharIdx)||f.startCharIdx>f.endCharIdx||
-        f.endCharIdx>doc.getParagraphLength(loc.sectionIndex,loc.paraIndex)||
-        !fieldParagraphs.delete(offsets[loc.sectionIndex]+loc.paraIndex))return false;
-    const detail=json(doc.getFieldInfoAt(loc.sectionIndex,loc.paraIndex,f.startCharIdx));
-    if(!detail.inField||detail.fieldId!==f.fieldId||detail.fieldType!==f.fieldType||
-        detail.startCharIdx!==f.startCharIdx||detail.endCharIdx!==f.endCharIdx)return false;
-    ids.add(f.fieldId);
-  }
-  return !bookmarkSlots.size&&!fieldParagraphs.size;
-}
 
 /** Worksheet coordinates belong to a table. List IDs belong to a single native handle. */
 export function inspectNestedTables(doc:any, controls:Control[], lists:CellList[]) {
@@ -58,11 +21,17 @@ export function inspectNestedTables(doc:any, controls:Control[], lists:CellList[
   const controlParagraphs = new Set(controls.map(c => c.list+'/'+c.para));
   const offsets = [0];
   for (let s=0;s<doc.getSectionCount();s++) offsets.push(offsets[s]+doc.getParagraphCount(s));
-  let canCheckAxis=false;
+  let canCheckAxis=false,namedFields:ReturnType<typeof readNestedNamedFields>|undefined;
   if(typeof doc.canEditNestedTableAxis==='function' && lists.every(l=>l.isCell)){
     // Unreadable marker metadata only prevents structural edits. Independently
     // addressable cells still belong in the document snapshot.
-    try{canCheckAxis=verifiedBodyMarkers(doc,controls,offsets);}catch{/* read-only axis */}
+    try{
+      const fields=json(doc.getFieldList()),bookmarks=json(doc.getBookmarks());
+      if(fields.length+bookmarks.length>200||controls.some(c=>c.list!==0&&c.ctrlId!=='tbl'))throw Error();
+      readBodyTableMarkers(doc,controls,offsets,fields.filter((f:any)=>f.listId===0),bookmarks);
+      namedFields=readNestedNamedFields(doc,lists,fields);
+      canCheckAxis=true;
+    }catch{/* read-only axis */}
   }
   const children = new Map<string,CellList[]>();
   for (const l of lists) {
@@ -122,7 +91,8 @@ export function inspectNestedTables(doc:any, controls:Control[], lists:CellList[
         paragraphs.push({index:p,text,...(runs.length>1?{formatSpans:runs.map((r:any)=>({start:r.startOffset,end:r.endOffset}))}:{})});
       }
       const text=texts.join('\n'),editable=l.paraCount===1 && paragraphs.length===1 && !paragraphs[0].formatSpans;
-      cells.push({index:l.cellIndex,row:info.row,column:info.col,rowSpan:info.rowSpan,columnSpan:info.colSpan,text,editable,
+      const fieldName=namedFields?.get(l.listId)?.name;
+      cells.push({index:l.cellIndex,row:info.row,column:info.col,rowSpan:info.rowSpan,columnSpan:info.colSpan,text,editable,...(fieldName?{fieldName}:{}),
         ...(paragraphs.length?{paragraphs}:{})});
       ids.push(l.listId);
     }

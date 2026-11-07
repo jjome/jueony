@@ -21,7 +21,7 @@ export type TableFormulaChange={tableId:string;row:number;column:number;fieldId:
 export type NestedTable = {
   id:string; section:number; paragraph:number; ancestors:TableCellPathStep[]; control:number; rows:number; columns:number;
   axisEditable?:boolean;
-  cells:Array<Pick<Cell,'index'|'row'|'column'|'rowSpan'|'columnSpan'|'text'|'editable'> & {paragraphs?:CellParagraphText[]}>;
+  cells:Array<Pick<Cell,'index'|'row'|'column'|'rowSpan'|'columnSpan'|'text'|'editable'> & {paragraphs?:CellParagraphText[];fieldName?:string}>;
 };
 export type TablePaginationMode='none'|'cell'|'row';
 export type AgentRowHeightSource=AgentCellPaddingSource&{tableHeight?:number;maxTableHeight?:number};

@@ -1,0 +1,55 @@
+--- a/src/document_core/commands/table_ops.rs
++++ b/src/document_core/commands/table_ops.rs
+@@ -2453,7 +2453,7 @@
+                     if c.row_span == 0 || c.col_span == 0 || bottom > rows || right > cols
+                         || (i > 0 && (table.cells[i-1].row, table.cells[i-1].col) >= (c.row, c.col))
+                         || c.is_header || c.cell_protect()
+-                        || !c.field_name.as_deref().unwrap_or("").is_empty() || c.paragraphs.is_empty()
++                        || c.paragraphs.is_empty()
+                         || c.paragraphs.iter().any(|p| !p.controls.is_empty() || !p.field_ranges.is_empty()
+                             || !p.orphan_field_ends.is_empty() || !p.range_tags.is_empty()) {
+                         return None;
+@@ -2492,6 +2492,10 @@
+                 || (rows + usize::from(row)) * (cols + usize::from(!row)) > 200)) {
+             return Err(invalid());
+         }
++        if !insert && source.cells.iter().any(|c| {
++            let (start, span) = if row { (c.row, c.row_span) } else { (c.col, c.col_span) };
++            start == index && span == 1 && !c.field_name.as_deref().unwrap_or("").is_empty()
++        }) { return Err(invalid()); }
+         let merged = source.cells.len() < rows * cols;
+         let mut expected = (source.common.width, source.common.height);
+         if merged {
+--- a/src/document_core/queries/field_query.rs
++++ b/src/document_core/queries/field_query.rs
+@@ -140,6 +140,22 @@
+                     nested_path: Vec::new(),
+                 };
+                 collect_fields_from_paragraph(para, &loc, ROOT_LIST_ID, &mut walk, &mut result);
++            }
++        }
++        // Cell names have no stored ID. Separate them from real fields and from
++        // identically positioned cells in other tables, preserving every usable
++        // legacy ID and the first legacy lookup when only virtual IDs collide.
++        if result.iter().any(|f| f.field.ctrl_id == 0) {
++            use std::collections::HashSet;
++            let reserved: HashSet<u32> = result.iter().map(|f| f.field.field_id).collect();
++            let mut assigned: HashSet<u32> = result.iter().filter(|f| f.field.ctrl_id != 0)
++                .map(|f| f.field.field_id).collect();
++            let mut available = (0..=u32::MAX).rev().filter(|id| !reserved.contains(id));
++            for f in result.iter_mut().filter(|f| f.field.ctrl_id == 0) {
++                if !assigned.insert(f.field.field_id) {
++                    // Each duplicate frees one ID relative to the number of fields.
++                    if let Some(id) = available.next() { f.field.field_id = id; }
++                }
+             }
+         }
+         (result, walk.lists)
+@@ -2307,6 +2323,7 @@
+ }
+ 
+ fn field_range_bounds(core: &DocumentCore, fi: &FieldInfo) -> Option<(usize, usize)> {
++    if fi.field.ctrl_id == 0 { return Some((0, fi.value.chars().count())); }
+     let para = para_at_location(core, &fi.location)?;
+     let range = para.field_ranges.get(fi.field_range_index)?;
+     Some((range.start_char_idx, range.end_char_idx))

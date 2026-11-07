@@ -130,6 +130,55 @@ for(const format of ['hwp','hwpx']){
    }finally{reopened.free();}
   }finally{doc.free();}
  });
+ await scenario(format+' updates only the value of the addressed named merged cell',()=>{
+  const template=fixture(),save=d=>format==='hwp'?d.exportHwp():d.exportHwpx();
+  template.setCellProperties(0,1,0,0,JSON.stringify({fieldName:'계획명'}));
+  template.setCellProperties(0,1,0,2,JSON.stringify({fieldName:'담당부서'}));
+  const d=new HwpDocument(save(template));template.free();
+  try{
+   const name='named.'+format,base=snap(d,name),original=json(d.getFieldList()),[owner,neighbor]=original;
+   const op=command(base,0,'계획😀'),undo=d.saveSnapshot();
+   transactionalCandidate(d,base,[op],'r1');
+   const after=save(d),reopened=new HwpDocument(after);
+   try{
+    assert.deepEqual(json(reopened.getFieldList()),[{...owner,value:op.text,endCharIdx:3},neighbor]);
+    assert.equal(json(reopened.getFieldValue(owner.fieldId)).value,op.text);
+    assert.equal(reopened.getTextInCell(0,1,0,0,1,0,6),'Cell 1');
+   }finally{reopened.free();}
+   const redo=d.saveSnapshot();d.restoreSnapshot(undo);assert.deepEqual(json(d.getFieldList()),original);
+   d.restoreSnapshot(redo);assert.deepEqual(save(d),after);d.discardSnapshot(undo);d.discardSnapshot(redo);
+   const read=d.getFieldValue.bind(d);
+   d.getFieldValue=id=>id===owner.fieldId?read(neighbor.fieldId):read(id);
+   assert.equal(snap(d,name).cellParagraphSources[base.structure.tables[0].id].editable,false);
+  }finally{d.free();}
+ });
+ await scenario(format+' edits a merged form cell with a verified body bookmark and filled field',()=>{
+  const template=fixture(),save=d=>format==='hwp'?d.exportHwp():d.exportHwpx();
+  const body=json(template.insertClickHereField(0,0,4,'담당자','','작성자',true));
+  assert.equal(json(template.setFieldValue(body.fieldId,'김😀')).ok,true);
+  assert.equal(json(template.addBookmark(0,0,2,'기안 위치')).ok,true);
+  template.insertClickHereFieldInCell(0,1,0,0,1,1,false,'제목','','업무명',true);
+  const doc=new HwpDocument(save(template));template.free();
+  const records=d=>[json(d.getBookmarks()),json(d.getFieldList()),d.getTextRange(0,0,0,d.getParagraphLength(0,0))];
+  try{
+   const before=records(doc),bytes=save(doc),state=snap(doc,'form.'+format);
+   const paragraph=state.cellParagraphSources[state.structure.tables[0].id].cells[0].paragraphs[1];
+   assert.equal(paragraph.editableFrom,2);
+   const op=command(state,1,Array.from(paragraph.text).slice(0,2).join('')+'수정😀');
+   const insert=doc.insertTextInCell.bind(doc);
+   doc.insertTextInCell=(...args)=>{const result=insert(...args);doc.renameBookmark('기안 위치','변경');return result;};
+   assert.throws(()=>transactionalCandidate(doc,state,[op],'r1'));
+   assert.deepEqual(save(doc),bytes);
+   doc.insertTextInCell=insert;
+   transactionalCandidate(doc,state,[op],'r1');
+   const reopened=new HwpDocument(save(doc));
+   try{assert.deepEqual(records(reopened),before);assert.equal(reopened.getTextInCell(0,1,0,0,1,0,5),op.text);}
+   finally{reopened.free();}
+   const detail=doc.getFieldInfoAt.bind(doc);
+   doc.getFieldInfoAt=(...args)=>JSON.stringify({...json(detail(...args)),fieldId:0});
+   assert.equal(snap(doc,'form.'+format).cellParagraphSources[state.structure.tables[0].id].editable,false);
+  }finally{doc.free();}
+ });
  await scenario(format+' scopes click-here boundaries to their own root table and cell',()=>{
   const template=fixture(),save=d=>format==='hwp'?d.exportHwp():d.exportHwpx(),name='foreign-fields.'+format;
   template.mergeTableCells(0,2,0,0,0,0,1);
@@ -168,7 +217,7 @@ for(const format of ['hwp','hwpx']){
     };
     return copy;
    };
-   assert.throws(()=>transactionalCandidate(doc,edited,[command(edited,0,'Ce다시 수정')],'r1'),/저장 후 누름틀/);
+   assert.throws(()=>transactionalCandidate(doc,edited,[command(edited,0,'Ce다시 수정')],'r1'),/저장 후 (책갈피|누름틀)/);
    assert.deepEqual(save(doc),beforeFault);
   }finally{doc.free();}
  });

@@ -3,6 +3,7 @@ import {execFileSync} from 'node:child_process';
 import {mkdir,readFile,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {createAxisPictureFixture} from './lib/axis-picture-fixture.mjs';
+import {expectedPictureHeading} from './lib/repeated-picture-heading.mjs';
 import {loadReviewEngine} from './lib/hancom-review.mjs';
 import {readStructure} from '../src/adapters/rhwp/structure.ts';
 import {executeDocumentOperations} from '../src/adapters/rhwp/execute.ts';
@@ -10,11 +11,12 @@ import {validateEditOperations} from '../src/modules/document/public/index.ts';
 
 const {HwpDocument}=await loadReviewEngine(resolve(process.env.JUEONY_ENGINE_PACKAGE));
 const paragraphs=process.argv.includes('--paragraphs');
-const expectedTitle=paragraphs?[['항','목0'],[''],['PicA']]:[['항목0'],['항목1'],['PicA']];
-const out=resolve(process.env.JUEONY_TEST_OUTPUT??resolve(import.meta.dirname,'../../../build/'+(paragraphs?'axis-repeat-header-paragraphs':'axis-repeat-picture-header')));
+const bands=process.argv.includes('--merged-headings'),headerRows=bands?2:1;
+const expectedTitle=expectedPictureHeading(bands,paragraphs);
+const out=resolve(process.env.JUEONY_TEST_OUTPUT??resolve(import.meta.dirname,'../../../build/'+(bands?'axis-repeat-header-bands':paragraphs?'axis-repeat-header-paragraphs':'axis-repeat-picture-header')));
 await mkdir(out,{recursive:true});
-const base=[0,1,0],op={kind:'insert_table_row',target:'s0p1t0',index:2,values:['새 행','','']};
-const raw=(file,kind)=>JSON.parse(execFileSync('python',[resolve(import.meta.dirname,'lib/inspect-axis-picture.py'),kind,file],{encoding:'utf8'}));
+const base=[0,1,0],op={kind:'insert_table_row',target:'s0p1t0',index:headerRows+1,values:['새 행','','']};
+const raw=(file,kind)=>JSON.parse(execFileSync('python',[resolve(import.meta.dirname,'lib/inspect-axis-picture.py'),kind,file,String(headerRows)],{encoding:'utf8'}));
 const bytes=(d,format)=>format==='hwp'?d.exportHwp():d.exportHwpx();
 function apply(d,format,operation=op){
  const snapshot={name:'제품표.'+format,nodes:[],limitations:[],revision:'1',structure:readStructure(d)};
@@ -24,9 +26,10 @@ function layout(d){
  assert.equal(d.pageCount(),2);
  return [0,1].map(i=>{
   const controls=JSON.parse(d.getPageControlLayout(i)).controls,table=controls.find(c=>c.type==='table');
-  assert.deepEqual(table.cells.filter(c=>c.row===0).map(c=>c.col),[0,1,2]);
+  assert.deepEqual(table.cells.filter(c=>c.row<headerRows).map(c=>[c.row,c.col,c.rowSpan,c.colSpan]),
+   expectedTitle.map(c=>[c.row,c.col,c.rowSpan,c.colSpan]));
   const runs=JSON.parse(d.getPageTextLayout(i)).runs;
-  for(const [cell,parts] of expectedTitle.entries()){
+  for(const [cell,{paragraphs:parts}] of expectedTitle.entries()){
    const actual=runs.filter(r=>r.cellPath?.[0]?.cellIndex===cell);
    assert.deepEqual([...new Set(actual.map(r=>r.cellParaIdx))],parts.map((_,i)=>i));
    assert.deepEqual(parts.map((_,p)=>actual.filter(r=>r.cellParaIdx===p).map(r=>r.text).join('')),parts);
@@ -43,7 +46,16 @@ try{
  }
  for(const index of [0,1,2])fixture.setCellProperties(...base,index,JSON.stringify({height:paragraphs?3900:1800,isHeader:true}));
  for(const index of [3,4,5])fixture.setCellProperties(...base,index,'{"height":3000}');
- fixture.setPageDef(0,JSON.stringify({...JSON.parse(fixture.getPageDef(0)),height:paragraphs?23000:21000,marginTop:2000,marginBottom:2000,marginHeader:0,marginFooter:0}));
+ if(bands){
+  fixture.insertTableRow(...base,1,false);
+  for(let i=0;i<6;i++){
+   fixture.setCellProperties(...base,i,'{"isHeader":true,"height":2100}');
+   if(i>=3)fixture.insertTextInCell(...base,i,0,0,'계'+i);
+  }
+  fixture.mergeTableCells(...base,0,1,0,2);
+  fixture.mergeTableCells(...base,0,0,1,0);
+ }
+ fixture.setPageDef(0,JSON.stringify({...JSON.parse(fixture.getPageDef(0)),height:bands?24500:paragraphs?23000:21000,marginTop:2000,marginBottom:2000,marginHeader:0,marginFooter:0}));
  fixture.setTableProperties(...base,'{"pageBreak":2,"repeatHeader":true}');
  for(const format of ['hwp','hwpx']){
   const source=resolve(out,'before.'+format),original=bytes(fixture,format);await writeFile(source,original);
@@ -57,14 +69,23 @@ try{
    assert.deepEqual(raw(after,'inspect-grouped'),raw(source,'inspect-grouped').map(p=>({...p,row:p.row+1})));
    const copy=new HwpDocument(await readFile(after));
    try{assert.deepEqual(layout(copy),[0,4]);assert.deepEqual(readStructure(copy),readStructure(d));}finally{copy.free();}
-   console.log('PASS',format,'one stored title row, two copies on screen, four pictures, original records/bytes, reopen');
+   console.log('PASS',format,headerRows,'stored title rows, two copies on screen, four pictures, original records/bytes, reopen');
   }finally{d.free();}
   const modes=format==='hwp'?['wrong source','missing title','inherited header','field in title']:['changed label','crop','lost repeat flag','changed title style'];
   if(paragraphs)modes.push(format==='hwp'?'missing empty paragraph':'wrong paragraph');
+  if(bands)modes.push(format==='hwp'?'unmarked header slot':'wrong repeated span');
   for(const mode of modes){
    const d=new HwpDocument(original);
    try{
     if(mode==='field in title')d.insertClickHereFieldInCell(...base,0,0,0,false,'입력','번호','번호',true);
+    if(mode==='unmarked header slot')d.setCellProperties(...base,2,'{"isHeader":false}');
+    if(mode==='wrong repeated span'){
+     const read=d.getPageControlLayout.bind(d);d.getPageControlLayout=page=>{
+      const view=JSON.parse(read(page));
+      if(page===1)view.controls.find(c=>c.type==='table').cells[0].rowSpan=1;
+      return JSON.stringify(view);
+     };
+    }
     if(mode==='missing empty paragraph'||mode==='wrong paragraph'){
      const read=d.getPageTextLayout.bind(d);d.getPageTextLayout=page=>{
       const view=JSON.parse(read(page));

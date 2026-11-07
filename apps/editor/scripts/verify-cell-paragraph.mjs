@@ -1,4 +1,5 @@
 import {createAxisPictureFixture,inspectPictureAnchors} from './lib/axis-picture-fixture.mjs';
+import {multilinePictureParagraph} from './lib/cell-paragraph-pictures.mjs';
 import puppeteer from 'puppeteer-core';
 import {continuedMergedTable,fragmentedMergedCell} from './lib/continued-merged-table.mjs';
 import http from 'node:http';
@@ -33,6 +34,8 @@ const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const
  if(input.instruction.includes('picture prefix color'))Object.assign(operations[0],{text:operations[0].originalText,
    spanFormats:[{start:0,end:1,color:'#246789'},{start:5,end:6,color:'#148061'}]});
  if(input.instruction.includes('picture text splice'))operations[0].text=input.instruction.includes('middle')?'양😀yPi닫ccB':'양😀yPiabccB';
+ if(input.instruction.includes('multiline picture edit'))operations[0].text='타파하마바사아자😀나다라마바사아Pi'+
+   (input.instruction.includes('middle')?'한약라':'한글가나다라')+'cB';
  if(input.instruction.includes('mixed-tail'))operations[0].text=operations[0].originalText.slice(0,-1)+'개정😀';
  if(input.instruction.includes('split-owner'))operations[0].text=operations[0].originalText.slice(0,-6)+'Tail 2';
  if(input.instruction.includes('field-tail'))operations[0].text=Array.from(operations[0].originalText).slice(0,cell.paragraphs[paragraph].editableFrom).join('')+'수정😀';
@@ -123,6 +126,29 @@ try{
   await saveAndReopen(f,'photo-owner',format);
   const reopened=await snap();assert.deepEqual(paragraphs(reopened),paragraphs(after));
   assert.deepEqual(await pictures(),originals);
+ });
+ for(const format of ['hwp','hwpx'])await scenario(format+' multiline picture edit reflows the first image to line two and preserves native slots',async()=>{
+  const source=await multilinePictureParagraph(HwpDocument,out),args=[0,1,0,4,0];
+  const initial=resolve(out,'multiline-original.'+format);
+  await writeFile(initial,format==='hwp'?source.exportHwp():source.exportHwpx());
+  const records=inspectPictureAnchors(initial),f=await open(format,source);
+  const inspect=()=>f.evaluate(args=>{
+   const d=window.__pageServices.wasm.borrowDocumentHandle();
+   const runs=JSON.parse(d.getPageTextLayout(0)).runs.filter(r=>r.parentParaIdx===1&&r.cellIdx===4);
+   const rows=[...new Set(runs.map(r=>r.y))];
+   const images=JSON.parse(d.getPageControlLayout(0)).controls.filter(c=>c.type==='image'&&c.cellIdx===4);
+   return {text:runs.map(r=>r.text).join(''),images:images.map(c=>rows.indexOf(c.y)),slots:[...d.getCellPictureTextAnchors(...args)]};
+  },args);
+  assert.deepEqual((await inspect()).images,[0,1,1]);
+  await send('first multiline picture edit prefix');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const prefix=await inspect();assert.deepEqual(prefix.images,[1,1,1]);assert.deepEqual(prefix.slots,[17,24,25]);
+  await send('first multiline picture edit middle');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const result=await inspect();assert.deepEqual(result,{text:'타파하마바사아자😀나다라마바사아Pi한약라cB',images:[1,1,1],slots:[17,21,22]});
+  await undo();assert.deepEqual(await inspect(),prefix);
+  await execute('edit:redo');assert.deepEqual(await inspect(),result);
+  await saveAndReopen(f,'multiline-edit',format);assert.deepEqual(await inspect(),result);
+  let i=0;assert.deepEqual(inspectPictureAnchors(resolve(out,'multiline-edit.'+format)),
+   records.map(r=>r.row===1&&r.col===1?{...r,textOffset:result.slots[i++]}:r));
  });
  for(const format of ['hwp','hwpx'])await scenario(format+' picture text splice remaps all stored slots across two chat edits and bound save',async()=>{
   const source=await createAxisPictureFixture(HwpDocument,out,{merged:true,grouped:true}),args=[0,1,0,4,0];

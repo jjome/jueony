@@ -291,11 +291,44 @@ function pictureTextLayout(doc:any,t:Table,cell:number,paragraph:number,text:str
  return {pages,glyphs};
 }
 type PictureEdit={start:number;remove:number;insert:string};
-/** Reconstruct the published line in stored slot order. Text on both sides of
+type PictureLineItem={value:string;x:number;y:number;w:number;h:number};
+/** Check the independently navigable lines of the cell against the complete
+ * visible text and the native picture slots interleaved with that text. */
+function pictureRows(doc:any,t:Table,cell:number,paragraph:number,page:number,items:PictureLineItem[]){
+ const near=(a:number,b:number)=>Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-b)<=.2;
+ const invalid=()=>Error('그림 문단의 줄 경계와 글자·그림 배치를 일치시킬 수 없습니다.');
+ const args=[t.section,t.paragraph,t.control,cell,paragraph];
+ const count=parsed(doc.getLineInfoInCell(...args,0)).lineCount;
+ if(!int(count)||count<1||count>200)throw invalid();
+ const ranges=[];
+ let item=0,visible=0,lastBottom=-Infinity;
+ for(let i=0;i<count;i++){
+  const caret=(end:boolean)=>parsed(doc.getCursorRectOnLine(t.section,paragraph,i,end,t.paragraph,t.control,cell,paragraph));
+  const left=caret(false),right=caret(true),from=item;
+  if(left.pageIndex!==page||right.pageIndex!==page||!near(left.y,right.y)||!near(left.height,right.height)||
+     !(left.height>0 && right.x>left.x && left.y>=lastBottom-.2))throw invalid();
+  const info=parsed(doc.getLineInfoInCell(...args,visible));
+  if(info.lineIndex!==i||info.lineCount!==count||info.charStart!==visible)throw invalid();
+  for(;item<items.length;item++){
+   const v=items[item];
+   if(!near(v.y,left.y))break;
+   if(!near(v.x,item===from?left.x:items[item-1].x+items[item-1].w)||
+       v.y+v.h>left.y+left.height+.2)throw invalid();
+   if(Array.from(v.value).length===1)visible++;
+  }
+  if(item===from||!near(items[item-1].x+items[item-1].w,right.x)||
+     info.charEnd!==(i===count-1?items.length:visible))throw invalid();
+  ranges.push({start:from,end:item,x:left.x,y:left.y,height:left.height});
+  lastBottom=left.y+left.height;
+ }
+ if(item!==items.length)throw invalid();
+ return ranges;
+}
+/** Reconstruct the published paragraph in stored slot order. Text on both sides of
  * every image must paint in the owning cell, without crossing its neighbor. */
-function pictureSpliceLayout(doc:any,t:Table,cell:number,paragraph:number,text:string,anchors:number[]){
+function pictureSpliceLayout(doc:any,t:Table,cell:number,paragraph:number,text:string,anchors:number[],transition=false){
  const {pages,glyphs}=pictureTextLayout(doc,t,cell,paragraph,text),page=glyphs[0]?.page;
- const invalid=()=>Error('그림과 주변 글자가 한 줄에서 원래 슬롯 순서대로 배치되지 않았습니다.');
+ const invalid=()=>Error('그림과 주변 글자가 원래 셀과 슬롯 순서대로 배치되지 않았습니다.');
  const owns=(v:any)=>v.secIdx===t.section && v.parentParaIdx===t.paragraph && v.cellIdx===cell &&
    v.cellPath?.length===1 && v.cellPath[0].controlIndex===t.control && v.cellPath[0].cellParaIndex===paragraph;
  if(page===undefined || glyphs.some(g=>g.page!==page))throw invalid();
@@ -303,7 +336,7 @@ function pictureSpliceLayout(doc:any,t:Table,cell:number,paragraph:number,text:s
  const outer=pages[page].find((v:any)=>v.type==='table'&&v.secIdx===t.section&&v.paraIdx===t.paragraph&&v.controlIdx===t.control);
  const owner=t.cells[cell],box=outer?.cells.find((c:any)=>c.row===owner.row && c.col===owner.column);
  if(!box || images.length!==anchors.length || images.some((v:any,i:number)=>v.controlIdx!==i))throw invalid();
- const line:Array<{value:string;x:number;y:number;w:number;h:number}>=[];
+ const line:PictureLineItem[]=[];
  let slot=0;
  for(const [i,g] of glyphs.entries()){
   while(slot<anchors.length && anchors[slot]===i){
@@ -311,18 +344,34 @@ function pictureSpliceLayout(doc:any,t:Table,cell:number,paragraph:number,text:s
   }
   line.push({value:g.char,x:g.left,y:g.y,w:g.right-g.left,h:g.h});
  }
- if(slot!==anchors.length || Math.max(...line.map(v=>v.y))>=Math.min(...line.map(v=>v.y+v.h)) ||
-    line.some((v,i)=>!Number.isFinite(v.w)||v.w<=0||v.x<box.x-.2||v.y<box.y-.2||
-      v.x+v.w>box.x+box.w+.2||v.y+v.h>box.y+box.h+.2||i>0&&v.x<line[i-1].x+line[i-1].w-.2))throw invalid();
- const controls=pages.map((items:any[])=>items.map(v=>v.type==='image'&&owns(v)?{...v,x:0}:v));
+ if(slot!==anchors.length || line.some(v=>!Number.isFinite(v.w)||v.w<=0||v.x<box.x-.2||v.y<box.y-.2||
+      v.x+v.w>box.x+box.w+.2||v.y+v.h>box.y+box.h+.2))throw invalid();
+ const wraps=Math.max(...line.map(v=>v.y))>=Math.min(...line.map(v=>v.y+v.h));
+ let rows;
+ if(wraps)rows=pictureRows(doc,t,cell,paragraph,page,line);
+ else if(transition){
+  try{rows=pictureRows(doc,t,cell,paragraph,page,line);}catch{/* Retain the existing single-line proof when its layout stays on one line. */}
+ }
+ if(!wraps && line.some((v,i)=>i>0&&v.x<line[i-1].x+line[i-1].w-.2))throw invalid();
+ const controls=pages.map((items:any[])=>items.map(v=>v.type==='image'&&owns(v)?{...v,x:0,y:0}:v));
  const bystanders=Array.from({length:doc.pageCount()},(_,p)=>parsed(doc.getPageTextLayout(p)).runs.filter((r:any)=>!owns(r)));
- return {page,line,controls,bystanders};
+ return {page,line,rows,wraps,controls,bystanders};
 }
 function assertPictureSplice(before:ReturnType<typeof pictureSpliceLayout>,after:ReturnType<typeof pictureSpliceLayout>,
  anchors:number[],edit:PictureEdit){
  const start=edit.start+anchors.filter(a=>a<edit.start).length,tail=start+Array.from(edit.insert).length;
  const oldSuffix=before.line.slice(start+edit.remove),newSuffix=after.line.slice(tail);
- const noLayout={...after,line:before.line};
+ const noLayout={...after,line:before.line,rows:before.rows,wraps:before.wraps};
+ if(before.wraps || after.wraps){
+  const shape=({value,w,h}:PictureLineItem)=>({value,w,h});
+  if(!before.rows || !after.rows || !sameTableLayout(before,noLayout) ||
+     !sameTableLayout(before.line.slice(0,start),after.line.slice(0,start)) ||
+     !sameTableLayout(oldSuffix.map(shape),newSuffix.map(shape)) ||
+     !before.rows.slice(0,after.rows.length).every((r,i)=>{
+      const q=after.rows![i];return sameTableLayout([r.x,r.y,r.height],[q.x,q.y,q.height]);
+     }))throw Error('여러 줄 그림 문단에서 편집 범위 밖의 글자·그림 또는 줄 시작 위치가 달라졌습니다.');
+  return;
+ }
  const dx=newSuffix[0]?.x-oldSuffix[0]?.x;
  const end=(line:typeof before.line,i:number)=>i===0?line[0].x:line[i-1].x+line[i-1].w;
  const widthChange=end(after.line,tail)-end(before.line,start+edit.remove);
@@ -399,7 +448,7 @@ export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellPar
   const {anchors,mapped,edit,payload}=proof.splice;
   const current=Array.from(doc.getCellPictureTextAnchors(proof.table.section,proof.table.paragraph,proof.table.control,proof.cellIndex,op.paragraph)??[]);
   if(!same(current,mapped)||picturePayload(doc,proof.table,proof.cellIndex)!==payload)throw Error('그림의 원래 자원 또는 교체 후 슬롯이 계획과 다릅니다.');
-  assertPictureSplice(original,pictureSpliceLayout(doc,proof.table,proof.cellIndex,op.paragraph,op.text,mapped),anchors,edit);
+  assertPictureSplice(original,pictureSpliceLayout(doc,proof.table,proof.cellIndex,op.paragraph,op.text,mapped,true),anchors,edit);
  };
  if(proof.splice){
   const previous=proof.pictures.find(targetPicture),current=source.pictures.find(targetPicture);
@@ -487,7 +536,7 @@ export function executeCellParagraph(wasm:any,base:Snapshot,op:AgentCellParagrap
   const edit=plan.pictureEdit,anchors=Array.from<number>(d.getCellPictureTextAnchors(...args));
   const delta=Array.from(edit.insert).length-edit.remove,mapped=anchors.map(a=>a>edit.start?a+delta:a);
   if(anchors.some(a=>a>=edit.start&&a<=edit.start+edit.remove))throw Error('그림의 저장 슬롯에 닿는 텍스트 교체입니다.');
-  const layout=()=>pictureSpliceLayout(d,t,c.index,op.paragraph,op.originalText,anchors);
+  const layout=()=>pictureSpliceLayout(d,t,c.index,op.paragraph,op.originalText,anchors,true);
   splice={edit,anchors,mapped,screen:layout(),portable:portableLayout(d,layout),payload:picturePayload(d,t,c.index)};
  }
  const proof={revision:base.revision,operation:structuredClone(op),table:t,expected,pictureText,splice,runs:formatted?.runs??runs,firstCharacters:formatted?.firstCharacters??firstCharacters,

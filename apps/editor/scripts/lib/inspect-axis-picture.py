@@ -155,7 +155,16 @@ def inspect_pictures(path, paragraphs=False, anchors=False):
     return pictures
 
 
-def repeated_title(path):
+def repeated_title(path, rows):
+    slots = set()
+
+    def collect(col, row, col_span, row_span):
+        assert col_span > 0 and row_span > 0 and row + row_span <= rows
+        for r in range(row, row + row_span):
+            for c in range(col, col + col_span):
+                assert (r, c) not in slots
+                slots.add((r, c))
+
     if path.suffix == ".hwpx":
         with ZipFile(path) as archive:
             root = ET.fromstring(archive.read("Contents/section0.xml"))
@@ -164,11 +173,13 @@ def repeated_title(path):
             headers = []
             for row in table.findall("./{*}tr"):
                 for cell in row.findall("./{*}tc"):
-                    index = int(cell.find("./{*}cellAddr").get("rowAddr"))
-                    assert cell.get("header") == ("1" if index == 0 else "0")
-                    if index == 0:
+                    address, span = cell.find("./{*}cellAddr"), cell.find("./{*}cellSpan")
+                    index = int(address.get("rowAddr"))
+                    assert cell.get("header") == ("1" if index < rows else "0")
+                    if index < rows:
+                        collect(int(address.get("colAddr")), index, int(span.get("colSpan")), int(span.get("rowSpan")))
                         headers.append(digest(ET.tostring(cell)))
-            assert len(headers) == int(table.get("colCnt"))
+            assert slots == {(r, c) for r in range(rows) for c in range(int(table.get("colCnt")))}
             return headers
     doc = Cfb(path.read_bytes())
     compressed = doc.read("FileHeader")[36] & 1
@@ -182,23 +193,23 @@ def repeated_title(path):
         if level < 2:
             current = None
         if tag == 72 and level == 2:
-            flags, col, row = struct.unpack_from("<HHH", data, 6)
-            assert bool(flags & 4) == (row == 0)
+            flags, col, row, col_span, row_span = struct.unpack_from("<5H", data, 6)
+            assert bool(flags & 4) == (row < rows)
             current = None
-            if row == 0:
-                assert col == len(headers)
+            if row < rows:
+                collect(col, row, col_span, row_span)
                 current = []
                 headers.append(current)
         if current is not None:
             current.append([tag, level, digest(data)])
-    assert len(headers) == columns
+    assert slots == {(r, c) for r in range(rows) for c in range(columns)}
     return headers
 
 
 if sys.argv[1] in ("embed", "embed-many", "embed-grouped"):
     embed(Path(sys.argv[2]), Path(sys.argv[3]), sys.argv[1])
 elif sys.argv[1] == "inspect-title":
-    print(json.dumps(repeated_title(Path(sys.argv[2]))))
+    print(json.dumps(repeated_title(Path(sys.argv[2]), int(sys.argv[3]) if len(sys.argv) > 3 else 1)))
 else:
     pictures = inspect_pictures(Path(sys.argv[2]), sys.argv[1] == "inspect-grouped", sys.argv[1] == "inspect-anchors")
     if sys.argv[1] == "inspect":

@@ -1,4 +1,5 @@
 import {createAxisPictureFixture,inspectPictureAnchors} from './lib/axis-picture-fixture.mjs';
+import {multilinePictureParagraph} from './lib/cell-paragraph-pictures.mjs';
 import assert from 'node:assert/strict';
 import {continuedMergedTable,fragmentedMergedCell} from './lib/continued-merged-table.mjs';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
@@ -69,6 +70,45 @@ for(const format of ['hwp','hwpx'])await scenario(format+' plain paragraph in a 
    assert.deepEqual(resources(saved.exportHwpx()),rawAssets);
   }finally{saved.free();}
   d.restoreSnapshot(undo);assert.deepEqual(bytes(d),original);d.discardSnapshot(undo);
+ }finally{d.free();}
+});
+for(const format of ['hwp','hwpx'])await scenario(format+' multiline picture text shifts the first image onto the next verified line',async()=>{
+ const src=await multilinePictureParagraph(HwpDocument,out),bytes=d=>format==='hwp'?d.exportHwp():d.exportHwpx();
+ const d=new HwpDocument(bytes(src));src.free();
+ try{
+  const args=[0,1,0,4,0],original=bytes(d),initial=resolve(out,'multiline-original.'+format),name='그림문단.'+format;
+  await writeFile(initial,original);const records=inspectPictureAnchors(initial);
+  const published=doc=>{
+   const runs=json(doc.getPageTextLayout(0)).runs.filter(r=>r.parentParaIdx===1&&r.cellIdx===4);
+   const rows=[...new Set(runs.map(r=>r.y))];
+   return {rows,text:runs.map(r=>r.text).join(''),images:json(doc.getPageControlLayout(0)).controls.filter(c=>c.type==='image'&&c.cellIdx===4).map(c=>rows.indexOf(c.y))};
+  };
+  assert.deepEqual(published(d).images,[0,1,1]);
+  for(const [stage,text,slots] of [['prefix','타파하마바사아자😀나다라마바사아Pi한글가나다라cB',[17,24,25]],
+    ['middle','타파하마바사아자😀나다라마바사아Pi한약라cB',[17,21,22]],['one-line','앞Pi한약라cB',[2,6,7]],
+    ['two-lines','타파하마바사아자😀나다라마바사아Pi한약라cB',[17,21,22]]]){
+   const s=snap(d,name),p=s.cellParagraphSources.s0p1t0.cells.find(c=>c.index===4).paragraphs[0];
+   assert.ok(p.pictureTextRanges?.length);
+   const op={kind:'replace_cell_paragraph',target:'s0p1t0',row:1,column:1,paragraph:0,originalText:p.text,text};
+   transactionalCandidate(d,s,[op],s.revision);
+   const file=resolve(out,'multiline-'+stage+'.'+format);await writeFile(file,bytes(d));let i=0;
+   assert.deepEqual(inspectPictureAnchors(file),records.map(r=>r.row===1&&r.col===1?{...r,textOffset:slots[i++]}:r));
+   const copy=new HwpDocument(await readFile(file));
+   try{
+    assert.deepEqual([...copy.getCellPictureTextAnchors(...args)],slots);
+    assert.equal(published(d).text,text);assert.deepEqual(published(d).images,stage==='one-line'?[0,0,0]:[1,1,1]);
+    assert.deepEqual(published(copy),published(d));
+   }finally{copy.free();}
+  }
+  const broken=new HwpDocument(original);
+  try{
+   const s=snap(broken,name),p=s.cellParagraphSources.s0p1t0.cells.find(c=>c.index===4).paragraphs[0];
+   const read=broken.getCursorRectOnLine.bind(broken),insert=broken.insertTextInCell.bind(broken);let wrote=false;
+   broken.insertTextInCell=(...a)=>{const result=insert(...a);wrote=true;return result;};
+   broken.getCursorRectOnLine=(...a)=>{const v=json(read(...a));if(wrote&&a[2]===1&&a[3]===true)v.x+=2;return JSON.stringify(v);};
+   assert.throws(()=>executeCellParagraph(broken,s,{kind:'replace_cell_paragraph',target:'s0p1t0',row:1,column:1,paragraph:0,
+    originalText:p.text,text:'타파하마바사아자😀'+p.text.slice(1)}));assert.ok(wrote);assert.deepEqual(bytes(broken),original);
+  }finally{broken.free();}
  }finally{d.free();}
 });
 for(const format of ['hwp','hwpx'])await scenario(format+' picture text splice maps scalar anchors through prefix growth and middle deletion',async()=>{

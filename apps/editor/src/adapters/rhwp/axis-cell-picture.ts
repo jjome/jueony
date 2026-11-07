@@ -55,16 +55,19 @@ function picturePages(doc:any) {
  }
 }
 
-type HeaderCell={index:number;paragraphs:string[];properties:any};
+type HeaderCell={index:number;row:number;col:number;rowSpan:number;colSpan:number;paragraphs:string[];properties:any};
 function plainHeader(doc:any,base:number[],dimensions:any,fields:any[]):HeaderCell[]|null{
  const [section,paragraph,control]=base;
  const lists=json(doc.getCursorModel()).lists,children=json(doc.getControls());
  const header:HeaderCell[]=[];
+ let firstBodyRow=dimensions.rowCount;
  for(let i=0;i<dimensions.cellCount;i++){
   const info=json(doc.getCellInfo(...base,i)),properties=json(doc.getCellProperties(...base,i));
-  if(properties.isHeader!==(info.row===0))return null;
-  if(info.row!==0)continue;
-  if(info.rowSpan!==1||info.colSpan!==1||properties.fieldName!==''||properties.cellProtect!==false||header[info.col])return null;
+  const {row,col,rowSpan,colSpan}=info;
+  if(![row,col,rowSpan,colSpan].every(Number.isSafeInteger)||row<0||col<0||rowSpan<1||colSpan<1||
+     row+rowSpan>dimensions.rowCount||col+colSpan>dimensions.colCount||typeof properties.isHeader!=='boolean')return null;
+  if(!properties.isHeader){firstBodyRow=Math.min(firstBodyRow,row);continue;}
+  if(properties.fieldName!==''||properties.cellProtect!==false)return null;
   const paths=lists.filter((l:any)=>l.hostListId===0&&l.isCell&&l.sectionIndex===section&&l.hostPara===paragraph&&l.controlIndex===control&&l.cellIndex===i);
   if(paths.length!==1||!Number.isSafeInteger(paths[0].paraCount)||paths[0].paraCount<1||paths[0].paraCount>50||
      children.some((c:any)=>c.list===paths[0].listId)||
@@ -79,9 +82,15 @@ function plainHeader(doc:any,base:number[],dimensions:any,fields:any[]):HeaderCe
    if(typeof text!=='string'||Array.from(text).length!==length)return null;
    paragraphs.push(text);
   }
-  header[info.col]={index:i,paragraphs,properties};
+  header.push({index:i,row,col,rowSpan,colSpan,paragraphs,properties});
  }
- return header.length===dimensions.colCount&&Array.from(header).every(Boolean)?header:null;
+ // Every slot above the first body row must belong to exactly one header.
+ // Use rectangle areas so a large merged span never allocates a dense grid.
+ if(!header.length || firstBodyRow===dimensions.rowCount ||
+    header.some((h,i)=>h.row+h.rowSpan>firstBodyRow || header.slice(i+1).some(k=>
+      h.row<k.row+k.rowSpan && k.row<h.row+h.rowSpan && h.col<k.col+k.colSpan && k.col<h.col+h.colSpan)) ||
+    header.reduce((area,h)=>area+h.rowSpan*h.colSpan,0)!==firstBodyRow*dimensions.colCount)return null;
+ return header.sort((a,b)=>a.row-b.row || a.col-b.col);
 }
 
 const near=(a:number,b:number)=>Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-b)<=.2;
@@ -97,9 +106,10 @@ function renderedHeader(view:HeaderLayout|undefined,controls:any[],frame:any,hea
  if(!view||!Array.isArray(view.runs)||!inside(frame,{x:0,y:0,w:view.width,h:view.height})||frame.cells.length<=header.length)return null;
  const [section,paragraph,control]=base;
  const evidence:HeaderRun[]=[];
- for(const [col,source] of header.entries()){
-  const cell=frame.cells[col];
-  if(cell.row!==0||cell.col!==col||cell.rowSpan!==1||cell.colSpan!==1||cell.cellIdx!==col||!inside(cell,frame))return null;
+ for(const [slot,source] of header.entries()){
+  const cell=frame.cells[slot];
+  if(cell.row!==source.row||cell.col!==source.col||cell.rowSpan!==source.rowSpan||cell.colSpan!==source.colSpan||
+     cell.cellIdx!==slot||!inside(cell,frame)||frame.cells.slice(0,slot).some((c:any)=>overlaps(c,cell)))return null;
   if(frame.cells.slice(header.length).some((c:any)=>c.y<cell.y+cell.h-.2))return null;
   evidence.push({x:cell.x-frame.x,y:cell.y-frame.y,record:JSON.stringify([cell.w,cell.h])});
   const runs=view.runs.filter(r=>r.secIdx===section&&r.parentParaIdx===paragraph&&

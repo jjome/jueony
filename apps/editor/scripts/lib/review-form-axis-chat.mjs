@@ -2,6 +2,7 @@ import http from 'node:http';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
+import {expectedPictureHeading} from './repeated-picture-heading.mjs';
 
 const insertRequest='첫 번째 양식 표의 결재란 바로 위에 새 행을 넣어 주세요.';
 const deleteRequest='첫 번째 양식 표에서 결재란이 들어 있는 행을 삭제해 주세요.';
@@ -42,7 +43,7 @@ function proposal(input,splitPictures){
   assert.ok(owner);
   if(grouped)assert.deepEqual(owner.axisPicture.pictures.map(p=>[p.cellParaIndex,p.controlIndex]),splitPictures?[[0,0],[1,0],[1,1]]:[[0,0],[0,1],[0,2]]);
   if(input.instruction===repeatRequest){
-   assert.equal(t.headerRows,1);assert.equal(t.pagination.repeatHeader,true);assert.equal(owner.row,2);
+   assert.ok([1,2].includes(t.headerRows));assert.equal(t.pagination.repeatHeader,true);assert.equal(owner.row,t.headerRows+1);
    return {kind:'insert_table_row',target:t.id,index:owner.row,values:['새 행','','']};
   }
   return [pictureRequest,picturesRequest,groupedRequest,splitRequest].includes(input.instruction)?{kind:'insert_table_row',target:t.id,index:1,values:['새 행','','']}:
@@ -64,8 +65,9 @@ async function checkPicturePages(frame,expected,headings){
    if(!headings)return images;
    const table=controls.find(c=>c.type==='table'&&c.secIdx===0&&c.paraIdx===1&&c.controlIdx===0);
    const runs=JSON.parse(d.getPageTextLayout(i)).runs;
-   return {images,cols:table.cells.filter(c=>c.row===0).map(c=>c.col),
-    labels:headings.map((parts,cell)=>parts.map((_,p)=>{
+   const headerRows=Math.max(...headings.map(c=>c.row+c.rowSpan));
+   return {images,cells:table.cells.filter(c=>c.row<headerRows).map(c=>[c.row,c.col,c.rowSpan,c.colSpan]),
+    labels:headings.map(({paragraphs},cell)=>paragraphs.map((_,p)=>{
      const owned=runs.filter(r=>r.secIdx===0&&r.parentParaIdx===1&&r.controlIdx===0&&r.cellPath?.length===1&&
       r.cellPath[0].cellIndex===cell&&r.cellPath[0].cellParaIndex===p);
      return owned.length?owned.map(r=>r.text).join(''):null;
@@ -78,7 +80,7 @@ async function checkPicturePages(frame,expected,headings){
   }finally{d.selectCanvasMetrics(active);}
  },headings);
  assert.equal(layouts.canvas,true);
- const wanted=headings?expected.map(images=>({images,cols:[0,1,2],labels:headings})):expected;
+ const wanted=headings?expected.map(images=>({images,cells:headings.map(c=>[c.row,c.col,c.rowSpan,c.colSpan]),labels:headings.map(c=>c.paragraphs)})):expected;
  assert.deepEqual(layouts.screen,wanted);assert.deepEqual(layouts.portable,wanted);
 }
 
@@ -114,7 +116,7 @@ export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,
     const sourceKind=repeatPictures?' with an existing repeated title row':pagedPictures?' with a merged photo cell moving between pages':splitPictures?' with three pictures in two cell paragraphs':groupedPictures?' with three pictures in one cell':multiplePictures?' with four products':'';
     await scenario(ext+' Agent picture owner row insertion and deletion refusal through chat'+sourceKind,async()=>{
      const source=new HwpDocument(await readFile(resolve(pictureFolder,'before.'+ext)));
-     const headings=repeatPictures?(source.getCellParagraphCount(0,1,0,0)===2?[['항','목0'],[''],['PicA']]:[['항목0'],['항목1'],['PicA']]):undefined;
+     const headings=repeatPictures?expectedPictureHeading(JSON.parse(source.getCellInfo(0,1,0,0)).rowSpan===2,source.getCellParagraphCount(0,1,0,0)===2):undefined;
      const frame=await open(ext,source),before=(await snap()).structure;
      if(pagedPictures)await checkPicturePages(frame,[3,1],headings);
      const originals=before.tables[0].cells.filter(c=>c.axisPicture);assert.equal(originals.length,groupedPictures?2:multiplePictures?4:1);
@@ -122,10 +124,10 @@ export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,
      assert.equal(await send(request),'');
      const after=(await snap()).structure;
      if(pagedPictures)await checkPicturePages(frame,[0,4],headings);
-     if(repeatPictures)assert.equal(after.tables[0].cells.find(c=>c.text==='새 행').row,2);
+     const insertionRow=repeatPictures?before.tables[0].headerRows+1:1;
+     if(repeatPictures)assert.equal(after.tables[0].cells.find(c=>c.text==='새 행').row,insertionRow);
      for(const original of originals){
       const moved=after.tables[0].cells.find(c=>c.text===original.text);
-      const insertionRow=repeatPictures?2:1;
       assert.equal(moved.row,original.row+(original.row>=insertionRow?1:0));assert.equal(moved.column,original.column);
       assert.equal(moved.axisPicture.signature,original.axisPicture.signature);
       assert.ok(Math.abs(moved.axisPicture.left-original.axisPicture.left)<=.2&&Math.abs(moved.axisPicture.top-original.axisPicture.top)<=.2);

@@ -121,7 +121,8 @@ for(const format of ['hwp','hwpx']){
    assert.throws(()=>transactionalCandidate(doc,s,[command(s,1,'금지')],'r1'),/필드/);
    assert.deepEqual(save(doc),before);
    const op=command(s,1,prefix+'수정😀');
-   transactionalCandidate(doc,s,[op],'r1');
+   const cursor=transactionalCandidate(doc,s,[op],'r1');
+   assert.equal(cursor.charOffset,paragraph.editableFrom);
    const reopened=new HwpDocument(save(doc));
    try{
     assert.deepEqual(json(reopened.getFieldList()),fields);

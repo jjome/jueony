@@ -307,5 +307,7 @@ export function executeCellParagraph(wasm:any,base:Snapshot,op:AgentCellParagrap
  }
  for(const range of formatted?.applications??[])checked(d.applyCharFormatInCell(...args,range.start,range.end,range.properties));
  pending.set(d,proof);assertCellParagraphResult(d,base,op);
- return {sectionIndex:t.section,parentParaIndex:t.paragraph,paragraphIndex:op.paragraph,charOffset:0,controlIndex:t.control,cellIndex:c.index,cellParaIndex:op.paragraph,cellPath:[{controlIndex:t.control,cellIndex:c.index,cellParaIndex:op.paragraph}]};
+ // Keep the caret in the editable suffix. Focusing a leading field activates it
+ // and hides its guide, so the live layout would differ from the saved document.
+ return {sectionIndex:t.section,parentParaIndex:t.paragraph,paragraphIndex:op.paragraph,charOffset:p.editableFrom??0,controlIndex:t.control,cellIndex:c.index,cellParaIndex:op.paragraph,cellPath:[{controlIndex:t.control,cellIndex:c.index,cellParaIndex:op.paragraph}]};
 }

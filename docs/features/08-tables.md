@@ -20,9 +20,9 @@
 
 ## 먼저 할 일
 
-- **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — 별도 위치에 연속된 누름틀 둘 뒤의 본문을 저장·재열기했다. 같은 위치를 공유하는 필드와 다른 종류의 인라인 개체·필드 편집이 남았다.
-- **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — 이름이 있는 병합 셀을 원래 두 칸 또는 새 세 칸으로 분할하고 첫 칸의 이름과 문단을 보존한다. 인라인 필드를 소유한 셀의 분할, 이름 셀의 내용 분배와 중첩·복합 개체 분할이 남았다.
-- **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 내부 병합 셀의 격자선과 치수가 결정되면 행·열을 삽입·삭제한다. 치수가 결정되지 않는 축, 내부 표의 필드·개체·캡션을 포함하는 구조 변경이 남았다.
+- **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — 이름 있는 병합 셀의 첫 문단과 가상 필드 값을 함께 수정한다. 본문의 점 책갈피와 위치가 구분되는 여러 누름틀, 셀 누름틀을 보존한다. 같은 위치의 필드, 다른 종류의 인라인 개체·복합 필드가 남았다.
+- **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — 이름이 있는 병합 셀에서 원문단을 두 칸 또는 세 칸으로 분배하고 첫 칸에 이름·값을 유지한다. 인라인 필드·중첩 표·복합 개체를 담은 주 셀의 분할이 남았다.
+- **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 중첩 표에 동명 셀이 있어도 각 전체 경로와 고유 ID로 첫 문단 값을 보존하며 행·열을 변경한다. 소유 셀 삭제는 차단한다. 내부 누름틀·그림·캡션을 포함한 구조 변경이 남았다.
 
 ## 기능별 작업표
 
@@ -943,7 +943,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 임의 여러 문단/병합 원본 읽기와 원문·서식 보존
-- 다음 작업: 별도 위치에 연속된 누름틀 둘 뒤의 본문을 저장·재열기했다. 같은 위치를 공유하는 필드와 다른 종류의 인라인 개체·필드 편집이 남았다.
+- 다음 작업: 이름 있는 병합 셀의 첫 문단과 가상 필드 값을 함께 수정한다. 본문의 점 책갈피와 위치가 구분되는 여러 누름틀, 셀 누름틀을 보존한다. 같은 위치의 필드, 다른 종류의 인라인 개체·복합 필드가 남았다.
 - 상위 항목: [B161](<08-tables.md#b161>) 셀 병합
 - Agent 명령: `replace_cell_paragraph`
 - 근거: [101-agent-merged-cell-paragraph.md](<../101-agent-merged-cell-paragraph.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
@@ -958,7 +958,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 새 격자·행/열 참조 이관과 셀 내용 분배 명세
-- 다음 작업: 이름이 있는 병합 셀을 원래 두 칸 또는 새 세 칸으로 분할하고 첫 칸의 이름과 문단을 보존한다. 인라인 필드를 소유한 셀의 분할, 이름 셀의 내용 분배와 중첩·복합 개체 분할이 남았다.
+- 다음 작업: 이름이 있는 병합 셀에서 원문단을 두 칸 또는 세 칸으로 분배하고 첫 칸에 이름·값을 유지한다. 인라인 필드·중첩 표·복합 개체를 담은 주 셀의 분할이 남았다.
 - 상위 항목: [B160](<08-tables.md#b160>) 셀 분할
 - Agent 명령: `split_table_cell_into`
 - 근거: [102-agent-cell-subdivision.md](<../102-agent-cell-subdivision.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
@@ -973,7 +973,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 부모 list 경로·stable 대상·보호·자원·저장 검증
-- 다음 작업: 내부 병합 셀의 격자선과 치수가 결정되면 행·열을 삽입·삭제한다. 치수가 결정되지 않는 축, 내부 표의 필드·개체·캡션을 포함하는 구조 변경이 남았다.
+- 다음 작업: 중첩 표에 동명 셀이 있어도 각 전체 경로와 고유 ID로 첫 문단 값을 보존하며 행·열을 변경한다. 소유 셀 삭제는 차단한다. 내부 누름틀·그림·캡션을 포함한 구조 변경이 남았다.
 - 상위 항목: [B153](<08-tables.md#b153>) 셀 속성
 - Agent 명령: `set_table_cell,insert_table_row,delete_table_row,insert_table_column,delete_table_column`
 - 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
@@ -988,7 +988,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: span 교차·주 셀 제거·neighbor 영향·실패 원복
-- 다음 작업: 병합 표에서 단일 인라인 PNG·JPEG가 있는 이웃 셀의 크기와 그림을 보존하며 행·열을 변경한다. 그림 소유 셀의 삭제·크기 변경, 여러 그림·캡션·회전·부동 개체를 포함하는 표는 남았다.
+- 다음 작업: 일반·병합 표의 여러 셀에 각각 글자처럼 놓인 PNG·JPEG의 자원 ID, 원본 바이트, 셀 안 배치를 보존한다. 한 셀의 복수 개체, 여러 쪽의 그림 표, 부동·회전·캡션 그림 편집이 남았다.
 - 상위 항목: [B158](<08-tables.md#b158>) 행·열 추가
 - Agent 명령: `insert_table_row,delete_table_row,insert_table_column,delete_table_column`
 - 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)

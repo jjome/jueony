@@ -36,7 +36,7 @@ test('native selected row auto fill preserves seeds, target formats, geometry, o
     }
     const equal = readAutoFillPlan(d, block), before = d.exportHwpx(); executeAutoFill(d, equal); assert.deepEqual(d.exportHwpx(), before);
     assert.throws(() => executeAutoFill(d, plan), /바뀌었습니다/);
-    assert.throws(() => readAutoFillPlan(d, { ...block, anchor: { row: 0, col: 0 }, focus: { row: 1, col: 2 } }), /한 행/);
+    assert.throws(() => readAutoFillPlan(d, { ...block, anchor: { row: 0, col: 0 }, focus: { row: 1, col: 2 } }), /가로 또는 세로 채우기 방향/);
     d.setCellProperties(0, t.paraIdx, t.controlIdx, 5, JSON.stringify({ cellProtect: true })); assert.throws(() => readAutoFillPlan(d, block), /보호/);
   } finally { d.free(); }
 });

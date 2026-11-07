@@ -12,7 +12,7 @@
 | :--- | :---: | :---: |
 | 구현 | 완료 35/41 · 부분 6 | 완료 0/24 · 부분 23 · 미구현 1 |
 | 검증 | 완료 3/41 · 부분 38 | 완료 0/24 · 부분 13 · 미검증 11 |
-| Agent 연결 | 연결 26/33 · 부분 6 · 미연결 1 · 해당 없음 8 | 연결 0/24 · 부분 9 · 미연결 15 |
+| Agent 연결 | 연결 26/33 · 부분 7 · 해당 없음 8 | 연결 0/24 · 부분 9 · 미연결 15 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
 
@@ -20,8 +20,8 @@
 
 ## 먼저 할 일
 
-- **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — 혼합 서식 병합 문단의 단일 서식 구간 교체와 이웃 서식 보존 확인. 여러 구간을 가로지르는 변경 및 필드·개체 포함 문단이 남음.
-- **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — 기존 병합 셀의 원래 비균등 격자 전체·부분 분할과 이웃 크기 보존 확인. 중첩 표·영역 서식 및 격자를 복원할 수 없는 경우가 남음.
+- **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — HWP·HWPX 혼합 서식 병합 문단의 단일 구간 교체와 명시적으로 지정한 여러 구간 교체를 검증했다. 필드·개체 포함 문단, 다쪽 병합 표 및 구간 삭제·재구성이 남음.
+- **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — HWPX와 보존 검사에 통과하는 HWP5 평면 본문 표에서 원래 격자 분할·문단 서식 분배·undo/redo·저장 재열기 확인. 다중 병합·중첩·다쪽 및 기존 격자에 맞지 않는 분할이 남음.
 - **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 중첩 표의 지정 단순 셀을 읽고 수정한 뒤 HWP/HWPX 재열기 확인. 중첩 구조 변경·보호 또는 복합 셀의 편집이 남음.
 
 ## 기능별 작업표
@@ -173,7 +173,7 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B167](<08-tables.md#b167>) · 범위 | 계산식 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [N009](<08-tables.md#n009>) · 작업 | 표 계산식 Agent 편집·갱신 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
+| [N009](<08-tables.md#n009>) · 작업 | 표 계산식 Agent 편집·갱신 | ◐ 부분 | ◐ 부분 | ◐ 부분 |
 | [G122](<08-tables.md#g122>) · 작업 | 표 계산 결과 자릿수·실제 셀 주소·원자적 적용 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-13"></a>
@@ -943,7 +943,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 임의 여러 문단/병합 원본 읽기와 원문·서식 보존
-- 다음 작업: 혼합 서식 병합 문단의 단일 서식 구간 교체와 이웃 서식 보존 확인. 여러 구간을 가로지르는 변경 및 필드·개체 포함 문단이 남음.
+- 다음 작업: HWP·HWPX 혼합 서식 병합 문단의 단일 구간 교체와 명시적으로 지정한 여러 구간 교체를 검증했다. 필드·개체 포함 문단, 다쪽 병합 표 및 구간 삭제·재구성이 남음.
 - 상위 항목: [B161](<08-tables.md#b161>) 셀 병합
 - Agent 명령: `replace_cell_paragraph`
 - 근거: [101-agent-merged-cell-paragraph.md](<../101-agent-merged-cell-paragraph.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>)
@@ -958,7 +958,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 새 격자·행/열 참조 이관과 셀 내용 분배 명세
-- 다음 작업: 기존 병합 셀의 원래 비균등 격자 전체·부분 분할과 이웃 크기 보존 확인. 중첩 표·영역 서식 및 격자를 복원할 수 없는 경우가 남음.
+- 다음 작업: HWPX와 보존 검사에 통과하는 HWP5 평면 본문 표에서 원래 격자 분할·문단 서식 분배·undo/redo·저장 재열기 확인. 다중 병합·중첩·다쪽 및 기존 격자에 맞지 않는 분할이 남음.
 - 상위 항목: [B160](<08-tables.md#b160>) 셀 분할
 - Agent 명령: `split_table_cell_into`
 - 근거: [102-agent-cell-subdivision.md](<../102-agent-cell-subdivision.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>)
@@ -1015,11 +1015,12 @@
 <summary>N009 · 표 계산식 Agent 편집·갱신</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 수식 파싱·참조 변경·오류·재계산·저장 형식
-- 다음 작업: 실제 한글 수식 필드와 필드 끝 표식의 HWP/HWPX 보존 확인. 단순 본문 표의 저장된 수식 읽기·수정·재계산을 검수 중.
+- 다음 작업: 단순 본문 표에서 수식 필드 생성·읽기·수정·명시적 재계산 및 의존 필드 연쇄 갱신을 확인했다. 직접 숫자 입력 즉시 갱신, 병합·중첩 표, 지원 범위 밖의 함수가 남음.
 - 상위 항목: [B167](<08-tables.md#b167>) 계산식
+- Agent 명령: `insert_table_formula_field,update_table_formula_field`
 - 근거: [47-remaining-editor-implementation.md](<../47-remaining-editor-implementation.md>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>)
 - 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
 
@@ -1032,7 +1033,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 수열/참조 규칙·locale·중단·원복
-- 다음 작업: 날짜·공문 연월일·수식 문자열 상대/절대 참조·계산값을 수동 및 Agent로 채우고 HWP/HWPX 재열기 확인. 실제 수식 필드 자체의 복제·자동 채우기가 남음.
+- 다음 작업: 날짜·번호 수열·참조 문자열과 실제 수식 필드·고정값 자동 채우기를 수동/Agent 경로에서 검증했다. 병합·중첩 및 직사각형 전체 채우기, 현재 인식하지 않는 날짜 표기가 남음.
 - 상위 항목: [B084](<08-tables.md#b084>) 표 자동 채우기
 - Agent 명령: `fill_table_series`
 - 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [140-table-editing-followup.md](<../140-table-editing-followup.md>) · [manifest.json](<../evidence/table-editing-2026-10-24/manifest.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>)

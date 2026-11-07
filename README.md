@@ -1,6 +1,6 @@
 # Jueony — 공무원용 AI 문서 편집기
 
-[파일·저장·복구 최종 구현·자동검증](docs/138-n001-storage-current-closure.md) — **남은 N001 구현을 마감했습니다. 구현24/24.** Rust182 최종 합본: 유효 짧은 다쪽8/48·3/4열 병합24/120·다쪽 캡션/중첩36/216 완료. 합본501·unit1036·Native126·실제App29·추가75·실행묶음7 통과. 기존 보호 검사와 원본44·WIP45 유지. 한글 직접 비교는 사용자 요청으로 보류;138참조. 검수 실행: [Start-Jueony-FileReview.cmd](Start-Jueony-FileReview.cmd).
+파일 저장·복구의 N001 복합 배치 수정은 자동 검수를 통과했다. 문단 글 방향을 HWP5로 변환하는 N046과 한글 2024 직접 비교가 남아 있다. [파일·표 최신 검수](docs/file-table-verification-2026-11-08.md) · [N001 합본 검수 기록](docs/138-n001-storage-current-closure.md)
 
 ## [전체 진행 현황 · 기능별 작업 문서 바로가기](docs/jueony-progress.md)
 
@@ -17,7 +17,7 @@
 | [파일·저장·복구·형식 보존](<docs/features/05-files-storage-recovery.md>) | 0/10 | 24/25 · 부분 1 | 22/25 · 부분 3 | 🟢 **6/6** | 구현 [N046](<docs/features/05-files-storage-recovery.md#n046>) HWPX 문단 textDir의 HWP5 형식 보존 |
 | [본문 편집·입력·선택·찾기](<docs/features/06-editing-and-selection.md>) | 0/20 | 🟢 **15/15** | 0/15 · 부분 15 | 🟢 **4/4** | 검증 [A001](<docs/features/06-editing-and-selection.md#a001>) 새 본문 문서 작성 |
 | [글자·문단·스타일·번호](<docs/features/07-formatting-and-styles.md>) | 0/18 | 21/25 · 부분 2 | 0/25 · 부분 21 | 13/16 | 구현 [N011](<docs/features/07-formatting-and-styles.md#n011>) 스타일 가져오기·내보내기 |
-| [표·셀·크기·계산](<docs/features/08-tables.md>) | 0/24 | 35/41 · 부분 6 | 3/41 · 부분 38 | 26/33 · 부분 6 | 구현 [N004](<docs/features/08-tables.md#n004>) 기존 병합 원본의 후속 Agent 셀 편집 |
+| [표·셀·크기·계산](<docs/features/08-tables.md>) | 0/24 | 35/41 · 부분 6 | 3/41 · 부분 38 | 26/33 · 부분 7 | 구현 [N004](<docs/features/08-tables.md#n004>) 기존 병합 원본의 후속 Agent 셀 편집 |
 | [쪽·구역·용지·배경](<docs/features/09-pages-and-sections.md>) | 0/18 | 🟢 **23/23** | 0/23 · 부분 23 | 12/17 · 부분 5 | Agent 연결 [G053](<docs/features/09-pages-and-sections.md#g053>) 수동 쪽 테두리의 적용 범위/포함 정책 |
 | [머리말·각주·필드·책갈피](<docs/features/10-headers-notes-fields.md>) | 0/11 | 🟢 **9/9** | 0/9 · 부분 9 | 🟢 **8/8** | 검증 [A018](<docs/features/10-headers-notes-fields.md#a018>) 본문 점 책갈피 추가 |
 | [그림·도형·글상자·수식·개체](<docs/features/11-objects.md>) | 0/18 | 🟢 **1/1** | 0/1 · 부분 1 | 해당 없음 | 검증 [G022](<docs/features/11-objects.md#g022>) 선택 개체 속성 키 경로 |

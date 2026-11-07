@@ -1,0 +1,160 @@
+{
+  "applicationCommit": "6c08fcb207d3fc07fa83bbea051d0b375a512d49",
+  "sourceDirty": false,
+  "engineSourceId": "22271f5c2f914e3d",
+  "wasmSha256": "b864bdba60e33008feb59b3df42ba0119a1de2567b3ef598cf68ab17d4ff6aab",
+  "directHancom2024": "NOT_RUN",
+  "agentProvider": "local deterministic fixture",
+  "releaseSuites": [
+    {
+      "suite": "editor",
+      "passed": 1215,
+      "logSha256": "5ed49f8ce232995c5a33b66f5334abb08483c5bc176fb5887ec38045f9c8b746"
+    },
+    {
+      "suite": "launcher",
+      "passed": 52,
+      "logSha256": "5fa5c159433f3853f812b356cbf9bcf674bda9b510aadbb67e0c5dc4f8e65ddf"
+    },
+    {
+      "suite": "paragraph direction save in Edge",
+      "passed": 8,
+      "logSha256": "e7cd700fad89e4b602cbc717100a807fad4d20739344f273338a4c135c66d6b8"
+    },
+    {
+      "suite": "agent chat in Edge",
+      "passed": 21,
+      "logSha256": "9ec1b9cafb0ece1ec55d3ec416880c7b2e5cbae3d40d8313ba49741f626ef796"
+    },
+    {
+      "suite": "nested cell chat in Edge",
+      "passed": 2,
+      "logSha256": "4814fa62a4df5a1f128e21ac6950109d2da76f0f01c358a967c5f33ad3180242"
+    }
+  ],
+  "fileFormat": {
+    "scenarios": 77,
+    "diskSaveAndReopen": 402,
+    "overLimitRefusals": 4
+  },
+  "reports": [
+    {
+      "area": "file format",
+      "verifier": "apps/editor/scripts/verify-complex-stories178.mjs",
+      "cases": 9,
+      "reportSha256": "05e7dff3419192f97ed316c17e7da2766ea0044a9c34bd32f1a29581b7dd9a39",
+      "diskSaveAndReopen": 18,
+      "engineSourceId": "22271f5c2f914e3d"
+    },
+    {
+      "area": "file format",
+      "verifier": "apps/editor/scripts/verify-merged-grid176.mjs",
+      "cases": 24,
+      "reportSha256": "729e679d585b2de2d9fac82e3b2930adbfe4d5cdd7c2ee78c9f0513695dde20c",
+      "diskSaveAndReopen": 120,
+      "engineSourceId": "22271f5c2f914e3d"
+    },
+    {
+      "area": "file format",
+      "verifier": "apps/editor/scripts/verify-signed-short177.mjs",
+      "cases": 8,
+      "reportSha256": "6e134cd91dffab06b614fac12bfe860328f3b2688984196c3014f236ffbccf26",
+      "diskSaveAndReopen": 48,
+      "engineSourceId": "22271f5c2f914e3d"
+    },
+    {
+      "area": "file format",
+      "verifier": "apps/editor/scripts/verify-complex-retained178.mjs",
+      "cases": 36,
+      "reportSha256": "a192aedb6b20148c394037c947d62d4ae1c96a7a29dcb0f87aab16fe2cea8e2e",
+      "diskSaveAndReopen": 216,
+      "engineSourceId": "22271f5c2f914e3d"
+    },
+    {
+      "area": "file format",
+      "verifier": "apps/editor/scripts/verify-signed-oversize179.mjs",
+      "cases": 4,
+      "reportSha256": "aafd332f54b284c7fc656b4f5452d9334e96d60922093e89578d8f161bce9e2b",
+      "engineSourceId": "22271f5c2f914e3d"
+    },
+    {
+      "area": "file format",
+      "verifier": "apps/editor/scripts/verify-stored-information95.mjs",
+      "cases": 17,
+      "reportSha256": "0b61f4687509a13699f0b34147ca2cc698fc1fd962d5f1c32fad6272eaad55bb",
+      "engineSourceId": "22271f5c2f914e3d"
+    },
+    {
+      "area": "mixed paragraph engine",
+      "verifier": "apps/editor/scripts/verify-cell-paragraph-engine.mjs",
+      "cases": 34,
+      "reportSha256": "2cf79df35db069cc913af61254ecbad3cf7bb368d20ab40ddb57a9df1d3fe604",
+      "engineSourceId": "38914156a7d57d81"
+    },
+    {
+      "area": "split with paragraph distribution",
+      "verifier": "apps/editor/scripts/verify-table-subdivision-engine.mjs",
+      "cases": 27,
+      "reportSha256": "aae96094c59c10de1a079a0cc85b2ae07f74820c39a3587fce1d81e6d7fcf5f4",
+      "engineSourceId": "0f431347cca9b6ad"
+    },
+    {
+      "area": "native formula metadata",
+      "verifier": "apps/editor/scripts/verify-native-formula-fields.mjs",
+      "cases": 8,
+      "reportSha256": "7d47a3e4829627087c859d8e82ba678fad15eb81261a46428942233c6e226081"
+    },
+    {
+      "area": "dependent fields",
+      "verifier": "apps/editor/scripts/verify-native-formula-update.mjs",
+      "cases": 2,
+      "reportSha256": "7566f86e1501f18c7282b1e4b1e88815a6cac05b3fff5b69c6fb6174534bc323"
+    },
+    {
+      "area": "new formula field",
+      "verifier": "apps/editor/scripts/verify-new-table-formula-field.mjs",
+      "cases": 2,
+      "reportSha256": "ec90f138a534b2b7acac9c2361d69f9fe2bffe12950275e5c5806d49c45e6dcd"
+    },
+    {
+      "area": "manual field creation",
+      "verifier": "apps/editor/scripts/verify-table-formula-format.mjs",
+      "cases": 15,
+      "reportSha256": "f7014943a0d76138db1248c4d36cce90c752c4e495661053c660eb134888ae0d"
+    },
+    {
+      "area": "split in Edge",
+      "verifier": "apps/editor/scripts/verify-table-subdivision.mjs",
+      "cases": 16,
+      "reportSha256": "90fed3098401f6d959c5730c0b23e6148d730e1c32f8b281d513f63de0267a9a",
+      "engineSourceId": "22271f5c2f914e3d"
+    },
+    {
+      "area": "fill in Edge",
+      "verifier": "apps/editor/scripts/verify-table-date-fill.mjs",
+      "cases": 17,
+      "reportSha256": "d458a1f8b3d188fe689baad8b5938a9978be8c32afe630cce7a28f4eee1843e6",
+      "engineSourceId": "22271f5c2f914e3d"
+    },
+    {
+      "area": "recovery in Edge",
+      "verifier": "apps/editor/scripts/verify-recovery-integrity.mjs",
+      "cases": 10,
+      "reportSha256": "03990407cd9532e7e9bba44de0a7db2a0164384345c0f936496fb51903271203"
+    },
+    {
+      "area": "mixed paragraphs in Edge",
+      "verifier": "apps/editor/scripts/verify-cell-paragraph.mjs",
+      "cases": 15,
+      "reportSha256": "3b5e0917d0fe42e9c21d858bb9aa9ae75e1091cc679d989e6130cd88278b73bc",
+      "engineSourceId": "22271f5c2f914e3d"
+    },
+    {
+      "area": "merged axes and row heights in Edge",
+      "verifier": "apps/editor/scripts/verify-merged-row-height.mjs",
+      "cases": 25,
+      "reportSha256": "738f49978550860fa6eab4d3e3b514ea212f57038b8c1da78874eb03a193658e",
+      "engineSourceId": "22271f5c2f914e3d"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-export function subdivisionNeighborFieldTable(HwpDocument) {
+export function subdivisionNeighborFieldTable(HwpDocument,namedTarget=false) {
   const d=HwpDocument.createEmpty(),at=[0,1,0];
   d.createBlankDocument();d.insertText(0,0,0,'앞');d.splitParagraph(0,0,1);d.createTable(...at,3,3);
   for(let i=0;i<9;i++){
@@ -6,6 +6,7 @@ export function subdivisionNeighborFieldTable(HwpDocument) {
     d.insertTextInCell(...at,i,0,0,'칸'+i);
   }
   d.mergeTableCells(...at,0,0,0,1);
+  if(namedTarget)d.setCellProperties(...at,0,'{"fieldName":"계약번호"}');
   d.insertClickHereFieldInCell(...at,1,0,0,false,'안내','설명','누름틀',true);
   d.setFieldValueByName('누름틀','확정');
   d.setCellProperties(...at,5,'{"fieldName":"이름셀"}');

@@ -1,0 +1,14 @@
+--- a/src/document_core/commands/table_ops/subdivision_grid.rs
++++ b/src/document_core/commands/table_ops/subdivision_grid.rs
+@@ -79,7 +79,10 @@
+             || !table.zones.is_empty() || table.repeat_header || table.caption.is_some()
+             || table.cells.iter().any(|c| {
+                 let allow_fields = merged && (c.row, c.col) != (row, col);
+-                c.cell_protect() || c.is_header || c.field_name.as_ref().is_some_and(|name| !allow_fields || name.is_empty())
++                // A named target keeps its original paragraphs and field name in
++                // the first piece. new_from_template creates unnamed empty cells.
++                let allow_name = allow_fields || (merged && !distribute);
++                c.cell_protect() || c.is_header || c.field_name.as_ref().is_some_and(|name| !allow_name || name.is_empty())
+                     || c.text_direction != 0 || c.paragraphs.is_empty() || c.paragraphs.len() > 50
+                     || c.paragraphs.iter().any(|p| !subdivision_paragraph_allowed(p, allow_fields))
+             }) { return Err(invalid()); }

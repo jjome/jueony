@@ -1,0 +1,57 @@
+--- a/src/document_core/commands/text_editing.rs
++++ b/src/document_core/commands/text_editing.rs
+@@ -1186,7 +1186,17 @@
+     }
+ }
+ 
+-fn has_clickhere_field_range(para: &Paragraph) -> bool {
++fn needs_field_offsets_after_insert(para: &Paragraph, offset: usize) -> bool {
++    // insert_text_at already shifts the raw stream positions. For an ordinary suffix
++    // after all balanced fields, rebuilding would count a leading FIELD_END as a
++    // second FIELD_BEGIN and move a later field into the prefix on HWPX export.
++    if para.controls.len() == para.field_ranges.len()
++        && para.orphan_field_ends.is_empty()
++        && para.controls.iter().all(|control| matches!(control, Control::Field(_)))
++        && para.field_ranges.iter().all(|range| range.end_char_idx < offset)
++    {
++        return false;
++    }
+     para.field_ranges.iter().any(|fr| {
+         matches!(
+             para.controls.get(fr.control_idx),
+@@ -1272,7 +1282,7 @@
+             para.insert_text_at(char_offset, text);
+             keep_inactive_field_start_outside(para, &before_insertions, new_chars_count);
+             keep_inactive_field_end_outside(para, &outside_insertions, new_chars_count);
+-            if has_clickhere_field_range(para) {
++            if needs_field_offsets_after_insert(para, char_offset) {
+                 rebuild_char_offsets(para);
+             }
+         }
+@@ -1480,7 +1490,7 @@
+             para.insert_text_at_caret(char_offset, text, after_inline_control);
+             keep_inactive_field_start_outside(para, &before_insertions, new_chars_count);
+             keep_inactive_field_end_outside(para, &outside_insertions, new_chars_count);
+-            if has_clickhere_field_range(para) {
++            if needs_field_offsets_after_insert(para, char_offset) {
+                 rebuild_char_offsets(para);
+             }
+         };
+@@ -1937,7 +1947,7 @@
+             cell_para.insert_text_at(char_offset, text);
+             keep_inactive_field_start_outside(cell_para, &before_insertions, new_chars_count);
+             keep_inactive_field_end_outside(cell_para, &outside_insertions, new_chars_count);
+-            if has_clickhere_field_range(cell_para) {
++            if needs_field_offsets_after_insert(cell_para, char_offset) {
+                 rebuild_char_offsets(cell_para);
+             }
+         }
+@@ -5910,7 +5920,7 @@
+         cell_para.insert_text_at(char_offset, text);
+         keep_inactive_field_start_outside(cell_para, &before_insertions, new_chars_count);
+         keep_inactive_field_end_outside(cell_para, &outside_insertions, new_chars_count);
+-        if has_clickhere_field_range(cell_para) {
++        if needs_field_offsets_after_insert(cell_para, char_offset) {
+             rebuild_char_offsets(cell_para);
+         }
+ 

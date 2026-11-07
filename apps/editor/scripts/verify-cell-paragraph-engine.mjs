@@ -109,14 +109,24 @@ for(const format of ['hwp','hwpx']){
    finally{reopened.free();}
   }finally{doc.free();}
  });
- await scenario(format+' rejects adjacent click-here fields before editing',()=>{
+ await scenario(format+' preserves adjacent click-here fields when editing ordinary suffix text',()=>{
   const args=[0,1,0,0,1],template=fixture(),save=d=>format==='hwp'?d.exportHwp():d.exportHwpx();
   for(const pos of [1,0])assert.equal(json(template.insertClickHereFieldInCell(...args,pos,false,'FIELD','memo','field'+pos,true)).ok,true);
   const doc=new HwpDocument(save(template));template.free();
   try{
-   const before=save(doc),s=snap(doc,'adjacent.'+format);
-   assert.equal(s.cellParagraphSources[s.structure.tables[0].id].editable,false);
+   const before=save(doc),fields=json(doc.getFieldList()),s=snap(doc,'adjacent.'+format);
+   const paragraph=s.cellParagraphSources[s.structure.tables[0].id].cells[0].paragraphs[1];
+   assert.equal(paragraph.editableFrom,2);
+   const prefix=Array.from(paragraph.text).slice(0,2).join('');
+   assert.throws(()=>transactionalCandidate(doc,s,[command(s,1,'금지')],'r1'),/필드/);
    assert.deepEqual(save(doc),before);
+   const op=command(s,1,prefix+'수정😀');
+   transactionalCandidate(doc,s,[op],'r1');
+   const reopened=new HwpDocument(save(doc));
+   try{
+    assert.deepEqual(json(reopened.getFieldList()),fields);
+    assert.equal(reopened.getTextInCell(...args,0,reopened.getCellParagraphLength(...args)),op.text);
+   }finally{reopened.free();}
   }finally{doc.free();}
  });
  await scenario(format+' scopes click-here boundaries to their own root table and cell',()=>{
@@ -161,12 +171,12 @@ for(const format of ['hwp','hwpx']){
    assert.deepEqual(save(doc),beforeFault);
   }finally{doc.free();}
  });
- await scenario(format+' rejects adjacent, protected or misidentified click-here fields in another root table',()=>{
+ await scenario(format+' rejects overlapping, protected or misidentified click-here fields in another root table',()=>{
   const save=d=>format==='hwp'?d.exportHwp():d.exportHwpx(),args=[0,2,0,0,0];
-  for(const mode of ['adjacent','protected','wrong-field']){
+  for(const mode of ['overlap','protected','wrong-field']){
    const template=fixture();
    template.insertClickHereFieldInCell(...args,1,false,'하나','','입력1',true);
-   if(mode==='adjacent')template.insertClickHereFieldInCell(...args,0,false,'둘','','입력2',true);
+   if(mode==='overlap')template.insertClickHereFieldInCell(...args,1,false,'둘','','입력2',true);
    if(mode==='protected')template.setCellProperties(0,2,0,0,'{"cellProtect":true}');
    const doc=new HwpDocument(save(template));template.free();
    try{

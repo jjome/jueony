@@ -171,11 +171,12 @@ try{
   assert.deepEqual(reopened.cellParagraphSources[second.id].cells[0].paragraphs[0],{index:0,text:'둘값😀칸째 표 원문',editableFrom:5});
   assert.deepEqual(await fields(),original);
  });
- for(const format of ['hwp','hwpx'])for(const mode of ['split-owner','field-tail','two-field-tail'])await scenario(format+' '+mode+' through chat, undo/redo and bound file reopen',async()=>{
+ for(const format of ['hwp','hwpx'])for(const mode of ['split-owner','field-tail','two-field-tail','adjacent-field-tail'])await scenario(format+' '+mode+' through chat, undo/redo and bound file reopen',async()=>{
   const split=mode==='split-owner',d=split?fragmentedMergedCell(HwpDocument):body(format);
-  if(mode==='two-field-tail'){
+  const pair=mode==='two-field-tail'||mode==='adjacent-field-tail';
+  if(pair){
    d.insertTextInCell(0,1,0,0,1,d.getCellParagraphLength(0,1,0,0,1),' 원래 문장');
-   d.insertClickHereFieldInCell(0,1,0,0,1,3,false,'SECOND','memo','input2',true);
+   d.insertClickHereFieldInCell(0,1,0,0,1,mode==='adjacent-field-tail'?0:3,false,'SECOND','memo','input2',true);
   }
   if(!split)d.insertClickHereFieldInCell(0,1,0,0,1,1,false,'FIELD','memo','input',true);
   const fields=JSON.parse(d.getFieldList());
@@ -190,7 +191,7 @@ try{
   try{
    assert.equal(reopened.getTextInCell(0,1,0,0,index,0,Array.from(text).length),text);
    if(split)assert.ok(reopened.pageCount()>1);
-   else {assert.equal(fields.length,mode==='two-field-tail'?2:1);assert.deepEqual(JSON.parse(reopened.getFieldList()),fields);}
+   else {assert.equal(fields.length,pair?2:1);assert.deepEqual(JSON.parse(reopened.getFieldList()),fields);}
   }finally{reopened.free();}
  });
  for(const format of ['hwp','hwpx'])await scenario(format+' delete first style run of a merged cell on a continuation page via chat',async()=>{

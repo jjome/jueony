@@ -11,7 +11,7 @@ import { tableLayoutEvidence, sameTableLayout } from './table-layout-evidence.ts
 import {subdivisionFrames,compareSubdivisionFrames,compareDividedPieces} from './subdivision-frames.ts';
 import {hwpSubdivisionSource,verifiedSubdivisionHwp} from './hwp-table-subdivision.ts';
 import type {SubdivisionCopyMetrics} from './subdivision-canvas-metrics.ts';
-import {subdivisionFieldOwners,projectSubdivisionFields,subdivisionFieldLines} from './subdivision-neighbor-fields.ts';
+import {subdivisionFieldOwners,namedSubdivisionTargets,projectSubdivisionFields,subdivisionFieldLines} from './subdivision-neighbor-fields.ts';
 const canonical = (v:any):any => Array.isArray(v) ? v.map(canonical) : v && typeof v === 'object' ? Object.fromEntries(Object.keys(v).sort().map(k => [k, canonical(v[k])])) : v;
 const same = (a:any, b:any) => JSON.stringify(canonical(a)) === JSON.stringify(canonical(b));
 const hash = (v:any) => Array.from(sha256(new TextEncoder().encode(JSON.stringify(canonical(v)))),n=>n.toString(16).padStart(2,'0')).join('');
@@ -37,6 +37,7 @@ export function readTableSubdivisionSources(wasm:any, tables:Table[], name:strin
     const primary = t.cells.find(c => c.rowSpan > 1 || c.columnSpan > 1);
     const exactGrid = hasGridSplit && (!!primary || p.pageBreak===1 && d.pageCount()>1);
     const owners=exactGrid && primary ? subdivisionFieldOwners(d,t) : undefined;
+    const namedTargets=owners?.size ? namedSubdivisionTargets(d,t,owners) : undefined;
     const native = binary ? hwpSubdivisionSource(d,t,tables,exactGrid,owners) : undefined;
     const grid = binary ? native && 'widths' in native ? native : undefined : primary || exactGrid ? readMergedSplitGrid(d,t,exactGrid,owners) : undefined;
     const authority = native ?? grid ?? merge?.[t.id];
@@ -55,19 +56,20 @@ export function readTableSubdivisionSources(wasm:any, tables:Table[], name:strin
     if (frames.length>1 && !exactGrid) throw Error('unsupported split table layout');
     const multipleMerged = t.cells.filter(c => c.rowSpan > 1 || c.columnSpan > 1).length > 1;
     const formats = (cell:Table['cells'][number]) => {
+      if(cell.axisFieldSignature)return;
       const count = d.getCellParagraphCount(t.section,t.paragraph,t.control,cell.index);
       if (count < 2 || count > (exactGrid ? 64 : cell.rowSpan * cell.columnSpan)
           || (!exactGrid && typeof d.splitCellParagraphs !== 'function') || cell.text.split('\n').length !== count) return;
       return Array.from({length:count}, (_,i) => paragraphFormat(d,t,cell.index,i));
     };
-    const cells=t.cells.filter(c=>owners?.size ? !c.axisFieldSignature && (c.rowSpan>1 || c.columnSpan>1)
+    const cells=t.cells.filter(c=>owners?.size ? (!c.axisFieldSignature || namedTargets?.has(c.index)) && (c.rowSpan>1 || c.columnSpan>1)
       : !primary || exactGrid || c.index===primary.index).map(c=>({
       row:c.row, column:c.column,
       minimumWidth:Math.max(200,Number(pads[c.index].left)+Number(pads[c.index].right)+1),
       minimumHeight:Math.max(200,Number(pads[c.index].top)+Number(pads[c.index].bottom)+1),
       ...(exactGrid && (multipleMerged || c !== primary) ? {paragraphFormats:formats(c)} : {}),
     }));
-    if(!cells.length)throw Error('분할할 일반 병합 셀이 없습니다.');
+    if(!cells.length)throw Error('분할할 일반 병합 셀이나 이름 셀이 없습니다.');
     if(owners?.size && !binary)verifiedSubdivisionHwpx(d);
     const preservation=capturePreservationEvidence(d);if(preservation.issues.length)throw new Error('preservation');
     const paragraphFormats = primary && !multipleMerged ? formats(primary) : undefined;
@@ -142,7 +144,7 @@ function applySubdivision(wasm:any, base:Snapshot, op:AgentTableSubdivisionOp,co
   const evidence = capturePreservationEvidence(d); if (evidence.issues.length) throw new Error('분할 전 전체 문서 보존 정보를 확인하지 못했습니다.');
   const expected = topologySemantics(evidence.values), body = rootBodyTexts(d), target = (c:any) => c.list.hostListId === 0 && c.list.sectionIndex === t.section && c.list.hostPara === t.paragraph && c.list.controlIndex === t.control, originals = expected.cells.filter(target) as any[], primary = originals.find((c:any) => c.list.cellIndex === plan.primary.index);
   if (!primary || originals.length !== t.cells.length) throw new Error('분할할 원본 셀의 보존 정보가 없습니다.');
-  const replacements = plan.cells.map(c => { const v = structuredClone(c.originIndex === null ? primary : originals.find((v:any) => v.list.cellIndex === c.originIndex)); Object.assign(v.list, { cellIndex: c.index, cellCount: plan.cells.length, row: c.row, col: c.column, rowSpan: c.rowSpan, colSpan: c.columnSpan }); Object.assign(v.properties, { width: c.properties.width, height: c.properties.height }); if (c.originIndex === null) { v.list.paraCount = 1; v.paragraphs = [{ paragraph: structuredClone(primary.paragraphs[0].paragraph), runs: [] }]; } return v; });
+  const replacements = plan.cells.map(c => { const v = structuredClone(c.originIndex === null ? primary : originals.find((v:any) => v.list.cellIndex === c.originIndex)); Object.assign(v.list, { cellIndex: c.index, cellCount: plan.cells.length, row: c.row, col: c.column, rowSpan: c.rowSpan, colSpan: c.columnSpan }); Object.assign(v.properties, { width: c.properties.width, height: c.properties.height }); if (c.originIndex === null) { v.properties.fieldName=c.properties.fieldName; v.list.paraCount = 1; v.paragraphs = [{ paragraph: structuredClone(primary.paragraphs[0].paragraph), runs: [] }]; } return v; });
   if (op.distributeParagraphs) {
     const slots = plan.cells.filter(c => c.originIndex === null || c.originIndex === plan.primary.index);
     const formats = ('paragraphFormats' in plan ? plan.paragraphFormats : plan.source.paragraphFormats)!;

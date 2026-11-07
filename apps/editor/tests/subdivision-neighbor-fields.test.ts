@@ -16,8 +16,8 @@ await init({module_or_path:await readFile(resolve(pkg,'rhwp_bg.wasm'))});
 const at=[0,1,0] as const, target='s0p1t0';
 const op={kind:'split_table_cell_into',target,row:0,column:0,rows:1,columns:3} as const;
 const bytes=(d:any,format:string):Uint8Array=>format==='hwp'?d.exportHwp():d.exportHwpx();
-function fixture(format:string) {
-  const src=subdivisionNeighborFieldTable(HwpDocument);
+function fixture(format:string,namedTarget=false) {
+  const src=subdivisionNeighborFieldTable(HwpDocument,namedTarget);
   try {
     return new HwpDocument(bytes(src,format));
   } finally {src.free();}
@@ -55,16 +55,67 @@ for(const format of ['hwp','hwpx'])for(const columns of [2,3])test(format+' pres
   } finally {doc.free();}
 });
 
-for(const fault of ['target field','body field','protected neighbor'])test('subdivision rejects a '+fault+' before editing',()=>{
+for(const fault of ['target inline field','target mixed field','body field','protected neighbor'])test('subdivision rejects a '+fault+' before editing',()=>{
   const d=fixture('hwpx');
   try {
-    if(fault==='target field')d.setCellProperties(...at,0,'{"fieldName":"분할대상"}');
+    if(fault.startsWith('target'))d.insertClickHereFieldInCell(...at,0,0,0,false,'안내','설명','분할 대상',true);
+    if(fault==='target mixed field')d.setCellProperties(...at,0,'{"fieldName":"분할대상"}');
     if(fault==='body field')d.insertClickHereField(0,0,0,'안내','','본문 필드',true);
     if(fault==='protected neighbor')d.setCellProperties(...at,1,'{"cellProtect":true}');
     const old=d.exportHwpx(),s=snapshot(d,'hwpx');
     assert.equal(s.tableSubdivisionSources![target].editable,false);
     assert.throws(()=>executeDocumentOperations(d,s,[op]));assert.deepEqual(d.exportHwpx(),old);
   } finally {d.free();}
+});
+
+for(const format of ['hwp','hwpx'])for(const columns of [2,3])test(format+' retains a merged named owner only in the first of '+columns+' pieces',()=>{
+  const d=fixture(format,true);
+  try{
+    const s=snapshot(d,format),source=s.structure!.tables[0].cells[0],name=source.properties.fieldName;
+    const old=bytes(d,format),fields=JSON.parse(d.getFieldList()),original=fields.find((f:any)=>f.name===name);
+    assert.ok(original.cellField && original.value && source.axisFieldSignature);
+    assert.throws(()=>validateEditOperations([{...op,columns,distributeParagraphs:true}],s),/이름/);
+    const undo=d.saveSnapshot();
+    try{
+      executeDocumentOperations(d,s,validateEditOperations([{...op,columns}],s));
+      const saved=bytes(d,format),copy=new HwpDocument(saved);
+      try{for(const output of [d,copy]){
+        const items=JSON.parse(output.getFieldList()),sameName=items.filter((f:any)=>f.name===name);
+        assert.deepEqual(sameName,[original]);
+        const {cells}=readStructure(output).tables[0],parts=cells.slice(0,columns);
+        assert.deepEqual(parts.map(c=>c.properties.fieldName),[name,...Array(columns-1).fill('')]);
+        assert.deepEqual(parts.map(c=>c.text),[source.text,...Array(columns-1).fill('')]);
+        assert.equal(parts[0].axisFieldSignature,source.axisFieldSignature);
+        assert.equal(items.length,fields.length);assert.equal(cells.filter(c=>c.properties.fieldName===name).length,1);
+      }}finally{copy.free();}
+      d.restoreSnapshot(undo);assert.deepEqual(bytes(d,format),old);assert.deepEqual(JSON.parse(d.getFieldList()),fields);
+    }finally{d.discardSnapshot(undo);}
+  }finally{d.free();}
+});
+
+test('a duplicated target name cannot advertise a unique retained field',()=>{
+  const d=fixture('hwpx',true);
+  try{
+    d.setCellProperties(...at,5,'{"fieldName":"계약번호"}');
+    const s=snapshot(d,'hwpx'),before=d.exportHwpx();
+    assert.equal(s.tableSubdivisionSources![target].editable,false);
+    assert.throws(()=>executeDocumentOperations(d,s,[op]));assert.deepEqual(d.exportHwpx(),before);
+  }finally{d.free();}
+});
+
+test('a name accidentally cloned onto a second piece restores the original fields and bytes',()=>{
+  const d=fixture('hwp',true);
+  try{
+    const s=snapshot(d,'hwp'),old=d.exportHwp(),fields=d.getFieldList(),split=d.splitTableCell.bind(d);
+    let mutated=false;
+    d.splitTableCell=(...args:any[])=>{
+      const result=split(...args);
+      d.setCellProperties(...at,1,'{"fieldName":"계약번호"}');mutated=true;
+      return result;
+    };
+    assert.throws(()=>executeDocumentOperations(d,s,[{...op,columns:2}]));
+    assert.equal(mutated,true);assert.equal(d.getFieldList(),fields);assert.deepEqual(d.exportHwp(),old);
+  }finally{d.free();}
 });
 
 for(const fault of ['guide','synthetic named ID','line position'])test('subdivision rolls back a changed neighbor '+fault,()=>{

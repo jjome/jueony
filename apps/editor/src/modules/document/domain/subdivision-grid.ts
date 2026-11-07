@@ -19,7 +19,9 @@ export function exactSubdivisionPlan(op:AgentTableSubdivisionOp, table:Table, so
   assertCoverage(table);
   const primary = table.cells.find(c => c.row === op.row && c.column === op.column);
   const limits = source.cells?.find(c => c.row === op.row && c.column === op.column);
-  if(primary?.axisFieldSignature || primary?.properties.fieldName) throw new Error('누름틀이나 이름 필드가 있는 셀 자체는 분할할 수 없습니다.');
+  if((primary?.axisFieldSignature || primary?.properties.fieldName) && (!limits || !primary.axisFieldSignature ||
+      !primary.properties.fieldName || op.distributeParagraphs || primary.rowSpan*primary.columnSpan===1))
+    throw new Error('이름만 있는 병합 셀은 원래 칸에 내용을 유지하는 분할만 지원합니다.');
   if (!primary || !limits || table.editable === false || !source.frame
       || table.cells.some(c => c.properties.cellProtect !== false || c.properties.isHeader !== false)
       || ![limits.minimumHeight,limits.minimumWidth].every(n => Number.isSafeInteger(n) && n >= 200))
@@ -42,7 +44,8 @@ export function exactSubdivisionPlan(op:AgentTableSubdivisionOp, table:Table, so
   for (const row of r.groups) for (const col of c.groups) {
     cells.push({...primary, row:row.start, column:col.start, rowSpan:row.span, columnSpan:col.span,
       originIndex:slot === 0 ? primary.index : null, text:paragraphs ? paragraphs[slot] ?? '' : slot === 0 ? primary.text : '',
-      properties:{...primary.properties,width:col.length,height:row.length}});
+      ...(slot>0 && primary.properties.fieldName ? {axisFieldSignature:undefined} : {}),
+      properties:{...primary.properties,width:col.length,height:row.length,...(slot>0 && primary.properties.fieldName ? {fieldName:''} : {})}});
     slot++;
   }
   cells.sort((a,b) => a.row-b.row || a.column-b.column).forEach((v,i) => {v.index=i;});

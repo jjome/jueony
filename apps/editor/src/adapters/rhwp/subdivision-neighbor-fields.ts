@@ -38,6 +38,22 @@ export function subdivisionFieldOwners(doc:any,table:Table):Map<number,number> {
   return owners;
 }
 
+/** A virtual cell field supplies its first paragraph as the field value.
+ * An inline field in the same cell has a separate marker range and cannot
+ * use the named-cell split contract. */
+export function namedSubdivisionTargets(doc:any,table:Table,owners:Map<number,number>):Set<number> {
+  const targets=new Set<number>();
+  if(!owners.size)return targets;
+  const fields=parsed(doc.getFieldList());
+  for(const [list,index] of owners){
+    const owned=fields.filter((f:any)=>f.listId===list),field=owned[0];
+    if(owned.length!==1 || field.cellField!==true || fields.filter((f:any)=>f.name===field.name).length!==1)continue;
+    const args=[table.section,table.paragraph,table.control,index,0] as const;
+    if(field.value===doc.getTextInCell(...args,0,doc.getCellParagraphLength(...args)))targets.add(index);
+  }
+  return targets;
+}
+
 /** Predict all owner changes using the planned old-to-new cell addresses.
  * Named cells have a synthetic ID derived from that address. Inline field
  * IDs, field content, ranges and child control records must match unchanged. */

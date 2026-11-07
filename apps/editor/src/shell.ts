@@ -144,8 +144,13 @@ function renderMessages(){
    if(run.events?.length){const note=document.createElement('div');note.className='run-meta';note.textContent='검토 기록: '+run.events.map(e=>(phaseLabels[e.phase]??e.phase)+' '+e.call+'/'+e.maxCalls).join(' → ');card.append(note);}
    if(run.receipt){const actions=document.createElement('div');actions.className='message-actions';actions.append(button('변경 확인',()=>{
     const receipt=run.receipt!;$('diff-before').textContent=receipt.before;$('diff-after').textContent=receipt.after;
-    $('structure-diff').hidden=JSON.stringify(receipt.beforeStructure)===JSON.stringify(receipt.afterStructure);
+    $('structure-diff').hidden=!receipt.formulaField && JSON.stringify(receipt.beforeStructure)===JSON.stringify(receipt.afterStructure);
     $('structure-diff-text').textContent='변경 전\n'+describeStructure(receipt.beforeStructure)+'\n\n변경 후\n'+describeStructure(receipt.afterStructure);
+    if(receipt.formulaField){
+     const primary=receipt.formulaField;
+     const changes=[primary,...(primary.dependents??[])].map((f,i)=>`${i?'연관 계산식':'계산식'} · ${f.row+1}행 ${f.column+1}열\n변경 전 ${f.before.command} · 표시값 ${f.before.value}\n변경 후 ${f.after.command} · 표시값 ${f.after.value}\n\n`);
+     $('structure-diff-text').prepend(document.createTextNode(changes.join('')));
+    }
     ($('change-dialog') as HTMLDialogElement).showModal();
    }),button('요청 되돌리기',async()=>{if(running)throw new Error('진행 중 요청을 먼저 중지해 주세요.');const tab=tabs.find(t=>t.id===run.documentId&&t.workspaceId===run.workspaceId);if(!tab)throw new Error('열린 문서에서만 되돌릴 수 있습니다. 재시작 후에는 보존된 문서를 직접 편집해 주세요.');selectTab(tab);await tab.api!.undoRequest(run.receipt!);await persistTab(tab);status('이 요청의 변경을 되돌렸습니다.');}));if(run.macroTemplate)actions.append(button('반복 작업으로 저장',async()=>{const name=prompt('반복 작업 이름');if(!name?.trim())return;const macro:CommandMacro={id:uid(),workspaceId:run.workspaceId,name:name.trim(),createdAt:Date.now(),template:structuredClone(run.macroTemplate!)};state.macros??=[];state.macros.push(macro);await persist();status('이 업무의 반복 작업에 저장했습니다.');}));card.append(actions);}
   }

@@ -1,0 +1,300 @@
+--- a/src/document_core/table_calc/evaluator.rs
++++ b/src/document_core/table_calc/evaluator.rs
+@@ -35,6 +35,12 @@
+ 
+ /// Validate every reference before enumerating a range from untrusted input.
+ pub(crate) fn evaluate_stored_formula(formula: &str, ctx: &TableContext, get_cell: CellValueFn) -> Result<f64, String> {
++    let ast = checked_stored_expression(formula, ctx)?;
++    let result = eval_node(&ast, ctx, get_cell)?;
++    if result.is_finite() { Ok(result) } else { Err("계산 결과가 유한한 숫자가 아닙니다.".into()) }
++}
++
++fn checked_stored_expression(formula: &str, ctx: &TableContext) -> Result<FormulaNode, String> {
+     let ast = super::parser::parse_checked_formula(formula).ok_or("계산식 구문을 확인하세요.")?;
+     let mut pending = vec![&ast];
+     while let Some(node) = pending.pop() {
+@@ -57,8 +63,28 @@
+             _ => {}
+         }
+     }
+-    let result = eval_node(&ast, ctx, get_cell)?;
+-    if result.is_finite() { Ok(result) } else { Err("계산 결과가 유한한 숫자가 아닙니다.".into()) }
++    Ok(ast)
++}
++
++/// Extract addresses without evaluating with dummy values (a legal expression may divide by them).
++pub(crate) fn stored_formula_references(formula: &str, ctx: &TableContext) -> Result<std::collections::BTreeSet<usize>, String> {
++    let ast = checked_stored_expression(formula, ctx)?;
++    let mut nodes = vec![&ast];
++    let mut refs = std::collections::BTreeSet::new();
++    while let Some(node) = nodes.pop() {
++        match node {
++            FormulaNode::Range { .. } | FormulaNode::Direction(_) | FormulaNode::CellRef { .. } => {
++                for (col, row) in collect_cells(node, ctx)? {
++                    refs.insert(row * ctx.col_count + col);
++                }
++            }
++            FormulaNode::BinOp { left, right, .. } => { nodes.push(left); nodes.push(right); }
++            FormulaNode::Negate(inner) => nodes.push(inner),
++            FormulaNode::FuncCall { args, .. } => nodes.extend(args),
++            FormulaNode::Number(_) => {}
++        }
++    }
++    Ok(refs)
+ }
+ 
+ fn eval_node(node: &FormulaNode, ctx: &TableContext, get_cell: CellValueFn) -> Result<f64, String> {
+--- a/src/document_core/table_calc/mod.rs
++++ b/src/document_core/table_calc/mod.rs
+@@ -15,5 +15,5 @@
+ mod tokenizer;
+ 
+ pub use evaluator::{evaluate_formula, TableContext};
+-pub(crate) use evaluator::evaluate_stored_formula;
++pub(crate) use evaluator::{evaluate_stored_formula, stored_formula_references};
+ pub use parser::FormulaNode;
+--- a/src/document_core/queries/table_formula_field.rs
++++ b/src/document_core/queries/table_formula_field.rs
+@@ -1,11 +1,11 @@
+ use super::{DocumentCore, FieldLocation, NestedEntry};
+-use crate::document_core::table_calc::{evaluate_stored_formula, TableContext};
++use crate::document_core::table_calc::{evaluate_stored_formula, stored_formula_references, TableContext};
+ use crate::error::HwpError;
+ use crate::model::control::{Control, Field, FieldType, Parameter};
+ use crate::model::paragraph::Paragraph;
+ use crate::model::table::Table;
+ use std::cell::RefCell;
+-use std::collections::BTreeMap;
++use std::collections::{BTreeMap, BTreeSet};
+ 
+ fn err(msg: &str) -> HwpError {
+     HwpError::InvalidField(msg.to_owned())
+@@ -231,49 +231,49 @@
+     }
+ }
+ 
+-// A single-cell operation cannot leave a dependent's stored display stale.
+-fn reject_dependents(table: &Table, target: usize) -> Result<(), HwpError> {
++// Only fields reachable from the edited cell get new stored values. Check every
++// formula first: a reference in an opaque expression could otherwise go stale.
++fn affected_formula_cells(table: &Table, target: usize) -> Result<BTreeSet<usize>, HwpError> {
++    let mut users = vec![Vec::new(); table.cells.len()];
+     for (index, cell) in table.cells.iter().enumerate() {
+-        if index == target {
+-            continue;
+-        }
++        if index == target { continue; }
+         for p in &cell.paragraphs {
+-            if p.controls.is_empty() && p.field_ranges.is_empty() {
+-                continue;
+-            }
++            if p.controls.is_empty() && p.field_ranges.is_empty() { continue; }
+             if cell.paragraphs.len() != 1 {
+                 return Err(err("복합 셀의 역참조를 확인할 수 없습니다."));
+             }
+             let field = plain_field(p)?;
+             let ctx = TableContext {
+-                row_count: table.row_count.into(),
+-                col_count: table.col_count.into(),
+-                current_row: cell.row.into(),
+-                current_col: cell.col.into(),
++                row_count: table.row_count.into(), col_count: table.col_count.into(),
++                current_row: cell.row.into(), current_col: cell.col.into(),
+             };
+-            let expression = field.command.rsplit_once("??").unwrap().0;
+-            let refers = std::cell::Cell::new(false);
+-            evaluate_stored_formula(expression, &ctx, &|c, r| {
+-                if r * ctx.col_count + c == target {
+-                    refers.set(true);
+-                }
+-                Some(1.0)
+-            })
+-            .map_err(|_| err("다른 계산식의 참조 범위를 확인할 수 없습니다."))?;
+-            if refers.get() {
+-                return Err(err(
+-                    "이 셀을 참조하는 계산식이 있습니다. 연쇄 갱신이 필요한 편집입니다.",
+-                ));
+-            }
+-        }
+-    }
+-    Ok(())
++            let (formula, _) = field.command.rsplit_once("??").unwrap();
++            for referenced in stored_formula_references(formula, &ctx).map_err(|e| err(&e))? {
++                users[referenced].push(index);
++            }
++        }
++    }
++    let mut visited = BTreeSet::from([target]);
++    let mut queue = vec![target];
++    while let Some(index) = queue.pop() {
++        for &user in &users[index] {
++            if visited.insert(user) { queue.push(user); }
++        }
++    }
++    Ok(visited)
++}
++
++struct FieldChange {
++    location: FieldLocation,
++    previous_command: String,
++    command: String,
++    formula: String,
++    format: String,
++    value: String,
+ }
+ 
+ struct Plan {
+-    location: FieldLocation,
+-    command: String,
+-    value: String,
++    changes: Vec<FieldChange>,
+     response: String,
+ }
+ 
+@@ -330,45 +330,47 @@
+             return Err(err("보호·복합 셀에 계산식을 쓸 수 없습니다."));
+         }
+         let f = plain_field(&cell.paragraphs[0])?;
+-        if f.field_id != field_id
+-            || f.command != expected
+-            || self
+-                .collect_all_fields()
+-                .iter()
+-                .filter(|v| v.field.field_id == field_id)
+-                .count()
+-                != 1
+-        {
+-            return Err(err("계산식 원문 또는 필드 ID가 변경되었거나 중복됩니다."));
+-        }
+-        reject_dependents(table, index)?;
+-        let calc = Calculation {
+-            table,
+-            root: index,
+-            formula,
+-            memo: RefCell::default(),
+-            stack: RefCell::default(),
+-        };
+-        let result = calc
+-            .value(index)?
+-            .ok_or_else(|| err("계산값이 없습니다."))?;
++        if f.field_id != field_id || f.command != expected {
++            return Err(err("계산식 원문 또는 필드 ID가 변경되었습니다."));
++        }
++        let mut id_counts = BTreeMap::new();
++        for entry in self.collect_all_fields() {
++            *id_counts.entry(entry.field.field_id).or_insert(0usize) += 1;
++        }
++        let calc = Calculation { table, root: index, formula, memo: RefCell::default(), stack: RefCell::default() };
++        let result = calc.value(index)?.ok_or_else(|| err("계산값이 없습니다."))?;
+         let value = display(result, format)?;
+         let command = format!("{formula}??{format};;{value}");
+-        let response = serde_json::json!({"ok":true,"fieldId":field_id,"formula":formula,"command":command,"value":value,"result":result}).to_string();
+-        Ok(Plan {
+-            location: FieldLocation {
+-                section_index: section,
+-                para_index: paragraph,
+-                nested_path: vec![NestedEntry::TableCell {
+-                    control_index: control,
+-                    cell_index: index,
+-                    para_index: 0,
+-                }],
+-            },
+-            command,
+-            value,
+-            response,
+-        })
++        let mut response = serde_json::json!({"ok":true,"fieldId":field_id,"formula":formula,"command":command,"value":value,"result":result});
++        let mut dependents = Vec::new();
++        let mut changes = Vec::new();
++        for i in affected_formula_cells(table, index)? {
++            let candidate = &table.cells[i];
++            let p = &candidate.paragraphs[0];
++            let field = plain_field(p)?;
++            if id_counts.get(&field.field_id) != Some(&1) {
++                return Err(err("중복된 계산식 필드 ID가 있습니다."));
++            }
++            let (expr, fmt) = if i == index { (formula, format) } else {
++                let (expr, tail) = field.command.rsplit_once("??").unwrap();
++                (expr, tail.split_once(";;").unwrap().0)
++            };
++            let next = display(calc.value(i)?.ok_or_else(|| err("계산값이 없습니다."))?, fmt)?;
++            let next_command = format!("{expr}??{fmt};;{next}");
++            if next_command == field.command { continue; }
++            if candidate.cell_protect() { return Err(err("연쇄 갱신 대상에 보호된 셀이 있습니다.")); }
++            if i != index {
++                dependents.push(serde_json::json!({"cellIndex":i,"fieldId":field.field_id,
++                    "previousCommand":field.command,"previousValue":p.text,"command":next_command,"value":next}));
++            }
++            changes.push(FieldChange {
++                location: FieldLocation { section_index: section, para_index: paragraph,
++                    nested_path: vec![NestedEntry::TableCell {control_index:control, cell_index:i, para_index:0}] },
++                previous_command:field.command.clone(), command:next_command, formula:expr.to_owned(), format:fmt.to_owned(), value:next,
++            });
++        }
++        response["dependentChanges"] = serde_json::Value::Array(dependents);
++        Ok(Plan { changes, response:response.to_string() })
+     }
+ 
+     pub fn preview_table_formula_field(
+@@ -399,35 +401,37 @@
+         format: &str,
+     ) -> Result<String, HwpError> {
+         let plan = self.plan_table_formula_field(s, p, t, i, id, expected, formula, format)?;
+-        if plan.command == expected {
+-            return Ok(plan.response);
+-        }
+-        self.validate_field_reflow_location(&plan.location)?;
++        if plan.changes.is_empty() { return Ok(plan.response); }
++        for change in &plan.changes { self.validate_field_reflow_location(&change.location)?; }
+         let saved_section = self.document.sections[s].clone();
+         let saved_paths = self.text_reflowed_table_paths_for_snapshot();
+-        let stored_end = self.field_body_flow_end(&plan.location);
+         let result = (|| {
+-            let para = self.get_para_mut_at_location(&plan.location)?;
+-            let original_props = plain_field(para)?.properties;
+-            Self::replace_field_text_model(para, 0, &plan.value)?;
+-            let Control::Field(f) = &mut para.controls[0] else {
+-                return Err(err("계산식 필드가 변경되었습니다."));
+-            };
+-            f.properties = original_props;
+-            for item in &mut f.parameters.items {
+-                if let Parameter::String { name, value, .. } = item {
+-                    match name.as_deref() {
+-                        Some("Command") => *value = plan.command.clone(),
+-                        Some("Formula") => *value = formula.to_owned(),
+-                        Some("ResultFormat") => *value = format.to_owned(),
+-                        Some("LastResult") => *value = plan.value.clone(),
+-                        _ => {}
++            for change in &plan.changes {
++                let stored_end = self.field_body_flow_end(&change.location);
++                let para = self.get_para_mut_at_location(&change.location)?;
++                let original = plain_field(para)?;
++                if original.command != change.previous_command { return Err(err("계산식 원문이 변경되었습니다.")); }
++                let original_props = original.properties;
++                Self::replace_field_text_model(para, 0, &change.value)?;
++                let Control::Field(f) = &mut para.controls[0] else {
++                    return Err(err("계산식 필드가 변경되었습니다."));
++                };
++                f.properties = original_props;
++                for item in &mut f.parameters.items {
++                    if let Parameter::String { name, value, .. } = item {
++                        match name.as_deref() {
++                            Some("Command") => *value = change.command.clone(),
++                            Some("Formula") => *value = change.formula.clone(),
++                            Some("ResultFormat") => *value = change.format.clone(),
++                            Some("LastResult") => *value = change.value.clone(),
++                            _ => {}
++                        }
+                     }
+                 }
+-            }
+-            f.raw_parameters_xml = None;
+-            f.command = plan.command.clone();
+-            self.reflow_field_location_after_edit(&plan.location, stored_end)?;
++                f.raw_parameters_xml = None;
++                f.command = change.command.clone();
++                self.reflow_field_location_after_edit(&change.location, stored_end)?;
++            }
+             self.document.sections[s].raw_stream = None;
+             self.recompose_section(s);
+             Ok(())

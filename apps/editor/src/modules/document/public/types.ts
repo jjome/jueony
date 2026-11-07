@@ -2,12 +2,19 @@ import type {DocumentMetadataValues} from '../domain/document-metadata-values.ts
 export type AgentCellParagraphOp={kind:"replace_cell_paragraph";target:string;row:number;column:number;paragraph:number;originalText:string;text:string;spanTexts?:string[]};
 export type AgentCellParagraphSource={editable:boolean;fingerprint?:string;cells?:Array<{index:number;row:number;column:number;rowSpan:number;columnSpan:number;paragraphs:Array<{index:number;text:string;formatSpans?:Array<{start:number;end:number}>}>}>;reason?:string};
 export type AgentTableSubdivisionOp={kind:"split_table_cell_into";target:string;row:number;column:number;rows:number;columns:number;distributeParagraphs?:boolean|null};
-export type AgentTableSubdivisionSource={editable:boolean;fingerprint?:string;paragraphFormats?:string[];cells?:Array<{row:number;column:number;minimumWidth:number;minimumHeight:number}>;frame?:{page:number;x:number;y:number;w:number;h:number;cells:Array<{index:number;row:number;column:number;x:number;y:number;w:number;h:number}>};reason?:string};
+export type AgentTableSubdivisionSource={editable:boolean;fingerprint?:string;hwp5Grid?:{widths:number[];heights:number[]};paragraphFormats?:string[];cells?:Array<{row:number;column:number;minimumWidth:number;minimumHeight:number}>;frame?:{page:number;x:number;y:number;w:number;h:number;cells:Array<{index:number;row:number;column:number;x:number;y:number;w:number;h:number}>};reason?:string};
 /** Detached JSON data. No engine handles cross this boundary. */
 export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 export type DocumentProperties = { [key: string]: JsonValue | undefined };
 export type Cell = { index: number; row: number; column: number; rowSpan: number; columnSpan: number; text: string; editable: boolean; axisContentSafe?:boolean; reason?:string; properties: DocumentProperties; characters?: DocumentProperties; paragraphProperties?: DocumentProperties };
 export type TableCellPathStep = {controlIndex:number;cellIndex:number;cellParaIndex:number};
+export type AgentTableFormulaFields={
+ fields:Array<{tableId:string;section:number;paragraph:number;path:TableCellPathStep[];row:number;column:number;fieldId:number;
+   start:number;end:number;storedCommand:string;displayedValue:string;editable:boolean;expression?:string;resultFormat?:string}>;
+ unresolved:number|null;canEdit:boolean;canRefreshDependents:boolean;
+};
+export type AgentTableFormulaOp={kind:'update_table_formula_field';target:string;row:number;column:number;fieldId:number;originalCommand:string;formula:string;resultFormat:string};
+export type TableFormulaChange={tableId:string;row:number;column:number;fieldId:number;before:{command:string;value:string};after:{command:string;value:string}};
 export type NestedTable = {
   id:string; section:number; paragraph:number; ancestors:TableCellPathStep[]; control:number; rows:number; columns:number;
   cells:Array<Pick<Cell,'index'|'row'|'column'|'rowSpan'|'columnSpan'|'text'|'editable'>>;
@@ -73,13 +80,14 @@ export type AgentFileOp={kind:'list_document_tabs';contextStamp:string}|{kind:'n
 export type AgentFileReceipt={runId:string;kind:AgentFileOp['kind'];status:'completed';beforeStamp:string;after:AgentFileContext;operationCount:1;documentMutations:0;message:string;save?:{status:'saved';tabId:string;beforeRevision:string;afterRevision:string}};
 export type AgentDocumentInformation={metadata:{editable:boolean;values?:DocumentMetadataValues;fingerprint?:string;reason?:string};statistics?:Record<string,JsonValue>;reason?:string};
 export type AgentDocumentMetadataOp={kind:'set_document_metadata';originalFingerprint:string;values:DocumentMetadataValues};
-export type Snapshot = { fileContext?:AgentFileContext; documentInformation?:AgentDocumentInformation; cellParagraphSources?:Record<string,AgentCellParagraphSource>; tableSubdivisionSources?:Record<string,AgentTableSubdivisionSource>; tableStructureSources?:Record<string,AgentTableStructureSource>; tableSplitSources?:Record<string,AgentTableSplitSource>; tableMergeSources?:Record<string,AgentTableMergeSource>; rowHeightSources?:Record<string,AgentRowHeightSource>; equalColumnSources?:Record<string,AgentEqualColumnSource>; cellPaddingSources?:Record<string,AgentCellPaddingSource>; tableHeaderSources?:Record<string,AgentTableHeaderSource>; tablePaginationSources?:Record<string,AgentTablePaginationSource>; revision: string; name: string; plainText?: string; styleNextSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string;currentNextStyleId:number}>; styleNextTargets?:Record<string,{fingerprint:string}>; styleRenameSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; styleCreationSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; paragraphOutlineSources?:Record<string,AgentParagraphOutlineSource>; numberingDefinitionSources?:AgentNumberingDefinitionSource[]; paragraphTabSources?:Record<string,AgentParagraphTabSource>; basicNumberingSources?:Record<string,AgentParagraphTabSource>; basicBulletSources?:Record<string,AgentParagraphTabSource>; paragraphListSources?:Record<string,AgentParagraphTabSource>; listCatalog?:AgentListCatalog; paragraphDecorationSources?:Record<string,AgentParagraphDecorationSource>; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
+export type Snapshot = { tableFormulaFields?:AgentTableFormulaFields; fileContext?:AgentFileContext; documentInformation?:AgentDocumentInformation; cellParagraphSources?:Record<string,AgentCellParagraphSource>; tableSubdivisionSources?:Record<string,AgentTableSubdivisionSource>; tableStructureSources?:Record<string,AgentTableStructureSource>; tableSplitSources?:Record<string,AgentTableSplitSource>; tableMergeSources?:Record<string,AgentTableMergeSource>; rowHeightSources?:Record<string,AgentRowHeightSource>; equalColumnSources?:Record<string,AgentEqualColumnSource>; cellPaddingSources?:Record<string,AgentCellPaddingSource>; tableHeaderSources?:Record<string,AgentTableHeaderSource>; tablePaginationSources?:Record<string,AgentTablePaginationSource>; revision: string; name: string; plainText?: string; styleNextSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string;currentNextStyleId:number}>; styleNextTargets?:Record<string,{fingerprint:string}>; styleRenameSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; styleCreationSources?:Record<string,{editable:boolean;fingerprint?:string;reason?:string}>; paragraphOutlineSources?:Record<string,AgentParagraphOutlineSource>; numberingDefinitionSources?:AgentNumberingDefinitionSource[]; paragraphTabSources?:Record<string,AgentParagraphTabSource>; basicNumberingSources?:Record<string,AgentParagraphTabSource>; basicBulletSources?:Record<string,AgentParagraphTabSource>; paragraphListSources?:Record<string,AgentParagraphTabSource>; listCatalog?:AgentListCatalog; paragraphDecorationSources?:Record<string,AgentParagraphDecorationSource>; nodes: BodyNode[]; limitations: string[]; structure?: Structure };
 export type BodyOp =
  | { kind: 'create_document'; paragraphs: string[] }
  | { kind: 'insert_body_paragraphs'; after: string; paragraphs: string[] }
  | { kind: 'replace_body_text'; target: string; start: number; count: number; text: string }
  | { kind: 'delete_body_text'; target: string; start: number; count: number };
 export type ControlOp =
+  | AgentTableFormulaOp
   | {kind:'fill_table_series';target:string;startRow:number;startColumn:number;endRow:number;endColumn:number;mode:'days'|'months'|'years'|'formula'|'calculated-value'}
   | AgentDocumentMetadataOp
   | AgentFileOp
@@ -123,7 +131,7 @@ export type ControlOp =
   | { kind: 'delete_table_row' | 'delete_table_column'; target: string; index: number }
   | { kind: 'set_page_setup'; section: number; properties: Record<string, unknown> };
 export type EditOp = BodyOp | ControlOp;
-export type Receipt = { metadata?:{before:DocumentMetadataValues;after:DocumentMetadataValues}; runId: string; beforeRevision: string; afterRevision: string; before: string; after: string; operationCount: number; beforeStructure?: Structure; afterStructure?: Structure };
+export type Receipt = { formulaField?:(TableFormulaChange&{dependents?:TableFormulaChange[]}); metadata?:{before:DocumentMetadataValues;after:DocumentMetadataValues}; runId: string; beforeRevision: string; afterRevision: string; before: string; after: string; operationCount: number; beforeStructure?: Structure; afterStructure?: Structure };
 export function plainSnapshot(snapshot: Snapshot): string { return snapshot.nodes.map(node => node.text).join('\n'); }
 
 /** Metadata accompanying a batch proposed by a caller; no agent implementation types. */

@@ -16,6 +16,32 @@ export function patchFormulaFormat(source) {
     if (source.split(before).length !== 2) throw new Error('Formula transaction integration drift');
     source = source.replace(before, after);
   };
+  source = "import { readStoredTableFormula, updateStoredTableFormula } from '../jueony/adapters/rhwp/stored-table-formula.ts';\n" + source;
+  replace('  private formulaInput!: HTMLInputElement;', `  private storedField: ReturnType<typeof readStoredTableFormula>;
+  private openRevision: string;
+  private formulaInput!: HTMLInputElement;`);
+  replace('    this.ctx = ctx;', `    this.ctx = ctx;
+    this.storedField = readStoredTableFormula(wasm, ctx);
+    this.openRevision = (window as any).jueonyEditor?.revision();`);
+  replace("    this.formulaInput.value = '=';", "    this.formulaInput.value = this.storedField?.formula ?? '=';");
+  replace('      FUNCTIONS.forEach(f => this.funcSelect.appendChild', `      const functions = this.storedField ? FUNCTIONS.filter(f => ['SUM','AVERAGE','PRODUCT','COUNT','MIN','MAX'].includes(f.name)) : FUNCTIONS;
+      functions.forEach(f => this.funcSelect.appendChild`);
+  replace('      return this.formatSelect;', "      if (this.storedField) this.formatSelect.value = this.storedField.format;\n      return this.formatSelect;");
+  replace('    this.commaCheck.checked = true;', '    this.commaCheck.checked = this.storedField?.comma ?? true;');
+  replace('      // 먼저 검증 (write_result=false)', `      const livePosition = this.services?.getInputHandler()?.getCursorPosition();
+      if (livePosition?.cellPath && livePosition.cellPath.length > 1) throw new Error('중첩 표 안의 계산식 편집은 아직 지원하지 않습니다.');
+      if (!livePosition || livePosition.sectionIndex !== this.ctx.sec || livePosition.parentParaIndex !== this.ctx.ppi
+        || livePosition.controlIndex !== this.ctx.ci || livePosition.cellIndex !== this.ctx.cellIndex
+        || this.openRevision !== (window as any).jueonyEditor?.revision()) {
+        throw new Error('문서가 변경되었습니다. 계산식 창을 다시 여세요.');
+      }
+      if (this.storedField) {
+        updateStoredTableFormula(this.wasm, this.services?.getInputHandler(), this.ctx, this.storedField,
+          this.openRevision, formula, this.formatSelect.value, this.commaCheck.checked);
+        return true;
+      }
+      if (readStoredTableFormula(this.wasm, this.ctx)) throw new Error('셀에 계산식 필드가 추가되었습니다. 창을 다시 여세요.');
+      // 먼저 검증 (write_result=false)`);
   replace(`      let colCount = 1;
       try {
         const props = this.wasm.getTableProperties(this.ctx.sec, this.ctx.ppi, this.ctx.ci);

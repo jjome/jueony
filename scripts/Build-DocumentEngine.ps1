@@ -50,7 +50,7 @@ if ($Runtime -eq 'Wsl') {
 $env:RUSTUP_HOME = Join-Path $projectRoot '.tools/rustup'
 $env:CARGO_HOME = Join-Path $projectRoot '.tools/cargo'
 $env:CARGO = Join-Path $env:CARGO_HOME 'bin/cargo.exe'
-$env:CARGO_TARGET_DIR = Join-Path $buildRoot 'target/pr-review'
+$env:CARGO_TARGET_DIR = Join-Path $buildRoot "target/source-$sourceId"
 $bindgen = Join-Path $projectRoot '.tools/downloads/wasm-bindgen-0.2.127-x86_64-pc-windows-msvc/wasm-bindgen.exe'
 if (-not (Test-Path -LiteralPath $bindgen)) { throw 'Install official wasm-bindgen 0.2.127 under .tools/downloads first.' }
 $env:PATH = (Join-Path $env:CARGO_HOME 'bin') + ';' + $env:PATH
@@ -67,10 +67,15 @@ try {
 } finally { Pop-Location }
 }
 $pkg = Join-Path $sourceRoot 'pkg'
-if (-not (Select-String -LiteralPath (Join-Path $pkg 'rhwp.js') -SimpleMatch 'insertSectionBreak(' -Quiet)) { throw 'Compiled engine is missing the patched section-break API.' }
-if (-not (Select-String -LiteralPath (Join-Path $pkg 'rhwp.js') -SimpleMatch 'mergeSectionBoundary(' -Quiet)) { throw 'Compiled engine is missing the patched section-merge API.' }
+$requiredMethods = @('insertSectionBreak', 'mergeSectionBoundary', 'splitCellParagraphs', 'previewTableFormulaField', 'updateTableFormulaField')
+$bindings = [IO.File]::ReadAllText((Join-Path $pkg 'rhwp.js'))
+foreach ($method in $requiredMethods) {
+    if (-not $bindings.Contains("    $method(")) { throw "Compiled engine is missing the expected WASM binding $method." }
+}
 Copy-Item -LiteralPath (Join-Path $sourceRoot 'LICENSE') -Destination (Join-Path $pkg 'LICENSE')
 '{"name":"@jueony/rhwp-engine-review","version":"0.8.7","type":"module","main":"rhwp.js","types":"rhwp.d.ts","license":"MIT"}' | Set-Content -LiteralPath (Join-Path $pkg 'package.json') -Encoding utf8NoBOM
+& node.exe (Join-Path $PSScriptRoot 'verify-document-engine-package.mjs') $pkg (Join-Path $reference 'samples/calc-cell.hwp')
+if ($LASTEXITCODE -ne 0) { throw 'Compiled engine failed the table edit and saved-formula capability check.' }
 $manifest = @{baseCommit=$baseCommit;patches=$patchEvidence;sourceId=$sourceId;builtAt=[DateTime]::UtcNow.ToString('o');optimized=$false;buildMode=($Runtime.ToLowerInvariant()+'-review-no-opt');wasmSha256=(Get-FileHash -LiteralPath (Join-Path $pkg 'rhwp_bg.wasm') -Algorithm SHA256).Hash.ToLowerInvariant();jsSha256=(Get-FileHash -LiteralPath (Join-Path $pkg 'rhwp.js') -Algorithm SHA256).Hash.ToLowerInvariant()}
 $manifest | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $pkg 'jueony-engine-build.json') -Encoding utf8NoBOM
 Write-Output "JUEONY_ENGINE_PACKAGE=$pkg"

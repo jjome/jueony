@@ -59,6 +59,7 @@ if (process.env.JUEONY_ENGINE_PACKAGE) {
   }
   const currentPatches=(await readdir(join(projectRoot,'engine/patches'))).filter(name=>name.endsWith('.patch')).sort();
   if(JSON.stringify(currentPatches)!==JSON.stringify(engineEvidence.patches.map(p=>p.name).sort()))throw new Error('Local engine patch set changed; rebuild WASM first');
+  execFileSync(process.execPath, [join(projectRoot, 'scripts/verify-document-engine-package.mjs'), engineRoot, join(upstream, 'samples/calc-cell.hwp')], {stdio:'inherit'});
 }
 const commit = execFileSync('git', ['-C', upstream, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 if (commit !== expectedCommit) throw new Error(`참조 커밋이 다릅니다: ${commit}`);

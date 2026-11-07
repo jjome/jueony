@@ -6,6 +6,7 @@ import {executeTableStructure} from './table-structure.ts';
 import {executeTableSplit} from './table-split.ts';
 import {executeTableMerge} from './table-merge.ts';
 import {executeNestedCellEdit} from './nested-cell-edit.ts';
+import {updateTableFormulaField} from './update-table-formula-field.ts';
 import {agentSeriesRange} from '../../modules/document/public/engine-integration.ts';
 import {readAutoFillPlan,executeAutoFill} from './table-auto-fill-native.ts';
 import {readStructure} from './structure.ts';
@@ -22,6 +23,8 @@ import { nativeDocument } from './structure.ts';
 export function executeDocumentOperations(wasm: any, base: Snapshot, operations: EditOp[]) {
   if(operations.some(op=>(agentFileKinds as readonly string[]).includes(op.kind)))throw Error('문서 탭 명령은 업무 소유 façade에서만 실행합니다.');
   const snapshot = structuredClone(base), doc = nativeDocument(wasm);
+  const field=operations.find(op=>op.kind==='update_table_formula_field');
+  if(field){if(operations.length!==1)throw Error('계산식 필드는 단독 요청으로 실행하세요.');return updateTableFormulaField(doc,snapshot,field);}
   if(operations.length===1 && operations[0].kind==='fill_table_series'){
     const {table,block,unit,output}=agentSeriesRange(snapshot,operations[0]);
     const live=readStructure(doc).tables.find(t=>t.id===table.id);

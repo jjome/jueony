@@ -156,6 +156,69 @@ try {
       assert.equal(d.getTextInCell(0,table.paraIdx,table.controlIdx,0,0,0,6),'1234.5');
     });
   });
+  async function openStoredFormula(extension) {
+    const sample = new HwpDocument(await readFile(resolve(repo, 'upstream/rhwp-source/samples/calc-cell.hwp')));
+    const first = JSON.parse(sample.getFieldList()).find(f => f.fieldType === 'formula');
+    const bytes = [...sample[extension === 'hwp' ? 'exportHwp' : 'exportHwpx']()];
+    sample.free();
+    const frame = await openBytes(bytes, extension);
+    await frame.evaluate(f => {
+      const ih = window.__shortcutServices.getInputHandler(), position = f.location.path[0];
+      ih.cursor.moveTo({ sectionIndex: f.location.sectionIndex, paragraphIndex: 0, parentParaIndex: f.location.paraIndex,
+        controlIndex: position.controlIndex, cellIndex: position.cellIndex, cellParaIndex: 0, charOffset: 0,
+        cellPath: [{ controlIndex: position.controlIndex, cellIndex: position.cellIndex, cellParaIndex: 0 }] });
+      ih.updateCaret(); ih.focus();
+    }, first);
+    return { frame, first };
+  }
+  for (const extension of ['hwp', 'hwpx']) await scenario(`${extension}: edit an existing stored calculation, one undo/redo, safe save and reopen`, async () => {
+    const { frame, first } = await openStoredFormula(extension);
+    const field = () => frame.evaluate(() => JSON.parse(window.__shortcutServices.wasm.borrowDocumentHandle().getFieldList()).find(f => f.fieldType === 'formula'));
+    const before = await immutable(frame);
+    assert.equal((await frame.evaluate(() => window.jueonyEditor.executeCommand('table:formula'))).ok, true);
+    await frame.waitForSelector('.formula-input');
+    assert.equal(await frame.$eval('.formula-input', el => el.value), '=AVG(ABOVE)');
+    assert.equal(await frame.$$eval('.formula-select', els => els[2].value), 'decimal2');
+    assert.equal(await frame.$$eval('.formula-select', els => Boolean(els[0].querySelector('option[value=ROUND]'))), false);
+    await frame.$eval('.formula-input', el => { el.value = '=SUM(A1:B2)'; });
+    await frame.click('.modal-overlay .dialog-btn-primary');
+    assert.equal(await frame.$('.formula-input'), null, await frame.$eval('.formula-error', el => el.textContent).catch(() => ''));
+    assert.equal((await field()).command, '=SUM(A1:B2)??%.2f,;;13.00');
+    await frame.evaluate(() => window.jueonyEditor.executeCommand('edit:undo'));
+    assert.deepEqual((await immutable(frame)).bytes, before.bytes);
+    await frame.evaluate(() => window.jueonyEditor.executeCommand('edit:redo'));
+    assert.equal((await field()).value, '13.00');
+    await saved(frame, `stored-formula.${extension}`, reopened => {
+      const stored = JSON.parse(reopened.getFieldList()).find(f => f.fieldId === first.fieldId);
+      assert.equal(stored.command, '=SUM(A1:B2)??%.2f,;;13.00');
+      assert.equal(stored.value, '13.00');
+    });
+  });
+  await scenario('existing field: stale dialog and invalid references leave bytes and history intact', async () => {
+    const { frame } = await openStoredFormula('hwp');
+    await frame.evaluate(() => window.jueonyEditor.executeCommand('table:formula'));
+    await frame.waitForSelector('.formula-input');
+    await frame.$eval('.formula-input', input => { input.value = '=SUM(A1:Z90000)'; });
+    const original = await immutable(frame);
+    await frame.click('.modal-overlay .dialog-btn-primary');
+    assert.ok(await frame.$('.formula-input')); assert.ok(await frame.$eval('.formula-error', el => el.textContent.length > 0));
+    assert.deepEqual(await immutable(frame), original);
+    await frame.evaluate(() => {
+      const services = window.__shortcutServices, ih = services.getInputHandler();
+      const f = JSON.parse(services.wasm.borrowDocumentHandle().getFieldList()).find(entry => entry.fieldType === 'formula');
+      ih.executeOperation({ kind: 'snapshot', operationType: 'tableFormula', operation: current => {
+        current.insertTextInCell(f.location.sectionIndex, f.location.paraIndex, f.location.path[0].controlIndex, 0, 0, 0, '1');
+        return ih.getCursorPosition();
+      } });
+    });
+    const changed = await immutable(frame);
+    assert.notEqual(changed.revision, original.revision);
+    await frame.$eval('.formula-input', input => { input.value = '=SUM(A1:B2)'; });
+    await frame.click('.modal-overlay .dialog-btn-primary');
+    assert.match(await frame.$eval('.formula-error', el => el.textContent), /문서가 변경/);
+    assert.deepEqual(await immutable(frame), changed);
+    await frame.click('.modal-overlay .dialog-close');
+  });
   for(const mode of ['insert-failure','operation-refused']) await scenario(`${mode}: original bytes, revision and history survive; dialog remains open`,async()=>{
     const frame=await openFormula(),before=await immutable(frame);await dialog(frame,'decimal2',false);
     await frame.evaluate(mode=>{const s=window.__shortcutServices,ih=s.getInputHandler();if(mode==='insert-failure'){window.__oldFormulaMethod=s.wasm.insertTextInCell;s.wasm.insertTextInCell=()=>{throw new Error('Injected formula insert failure');};}else{window.__oldFormulaMethod=ih.executeOperation;ih.executeOperation=()=>{};}},mode);
@@ -164,7 +227,7 @@ try {
   });
   await page.screenshot({ path: resolve(out, 'table-formula-format.png') });
   assert.deepEqual(pageErrors, []); assert.deepEqual(externalRequests, []);
-  await writeFile(resolve(out, 'result.json'), JSON.stringify({ results, failures, pageErrors, externalRequests, diagnostics, savedFiles, dist, enginePackage: pkg, port, limitations: 'Actual Edge formula dialog and Rust/WASM; displayed numeric precision, snapshot undo/redo and strict HWP/HWPX save/reopen. Failure injection checks rollback and refused operations. Static result text only: formula dependency graphs, automatic recalculation, Agent formula editing and direct Hancom parity remain unsupported/unverified.' }, null, 2));
+  await writeFile(resolve(out, 'result.json'), JSON.stringify({ results, failures, pageErrors, externalRequests, diagnostics, savedFiles, dist, enginePackage: pkg, port, limitations: 'Actual Edge formula dialog and Rust/WASM; displayed numeric precision, snapshot undo/redo and strict HWP/HWPX save/reopen. Failure injection checks rollback and refused operations. Ordinary cells receive result text. Existing supported FORMULA fields preserve the expression, cached value and format when edited. Whole-table automatic recalculation, model calls and native Hancom parity are outside these scenarios.' }, null, 2));
   if (failures.length) process.exitCode = 1;
 } catch (error) { console.error(error); process.exitCode = 1; await writeFile(resolve(out, 'fatal.json'), JSON.stringify({ error: String(error), stack: error.stack, results, failures, pageErrors }, null, 2)); }
 finally { await browser?.close(); server.kill(); }

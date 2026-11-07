@@ -1,6 +1,7 @@
 import type { Table } from '../../modules/document/public/index.ts';
 import { projectTableAxis, witnessedTrackEdges } from '../../modules/document/public/engine-integration.ts';
 import { parsed } from './structure.ts';
+import {sameAxisPicture} from './axis-cell-picture.ts';
 
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -119,6 +120,8 @@ export function mergedAxisProof(doc: any, table: Table, row: boolean, insert: bo
       }
       if (actual.axisFieldSignature !== (sourceIndex === null ? undefined : table.cells[sourceIndex].axisFieldSignature))
         throw new Error('셀의 누름틀·이름 필드나 그 내용·범위가 바뀌었습니다.');
+      if (!sameAxisPicture(sourceIndex===null?undefined:table.cells[sourceIndex].axisPicture,actual.axisPicture))
+        throw new Error('그림 셀의 원본 이미지·개체 속성 또는 셀 안의 배치가 바뀌었습니다.');
       if (sourceIndex !== null && (!same(properties[i], actual.properties) || !same(source[sourceIndex], content(doc, after, i))))
         throw new Error('남아야 할 셀의 내용·서식 또는 크기가 달라졌습니다.');
     });

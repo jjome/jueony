@@ -12,7 +12,8 @@ const {HwpDocument}=await loadReviewEngine(resolve(process.env.JUEONY_ENGINE_PAC
 const port=Number(process.env.JUEONY_TEST_PORT??4573),origin='http://127.0.0.1:'+port;
 const calls=[];
 const bodyMarkers=process.env.JUEONY_NESTED_AXIS_ONLY==='body-markers';
-const axisOnly=bodyMarkers||process.env.JUEONY_NESTED_AXIS_ONLY==='1';
+const mergedAxis=process.env.JUEONY_NESTED_AXIS_ONLY==='merged';
+const axisOnly=bodyMarkers||mergedAxis||process.env.JUEONY_NESTED_AXIS_ONLY==='1';
 const provider=http.createServer(async(req,res)=>{
   try {
     let raw=''; for await(const part of req) raw+=part;
@@ -28,7 +29,8 @@ const provider=http.createServer(async(req,res)=>{
     const generation={message:'오른쪽 안쪽 표의 두 번째 셀을 바꿨습니다.',sourceIds:[],operations:[{kind:'set_table_cell',target:table.id,row:cell.row,column:cell.column,originalText:target.text,text:'변경😀',...(mixed?{paragraph:1,spanTexts:['변','경😀']}:{})}]};
     if(axisOnly){
       assert.equal(table.axisEditable,true);
-      generation.operations=[input.instruction.includes('행 추가')?{kind:'insert_table_row',target:table.id,index:1,values:['새 행😀','']}:
+      if(mergedAxis)assert.equal(table.cells[0].rowSpan,2);
+      generation.operations=[input.instruction.includes('행 추가')?{kind:'insert_table_row',target:table.id,index:1,values:mergedAxis?['','새 행😀']:['새 행😀','']}:
         {kind:'delete_table_column',target:table.id,index:1}];
     }
     res.setHeader('Content-Type','application/json'); res.end(JSON.stringify({choices:[{message:{content:JSON.stringify(generation)}}]}));
@@ -55,7 +57,7 @@ try {
   await fill('config-model','nested-fixture');await fill('config-key','synthetic-local-fixture');
   await page.$eval('#config-remember',e=>e.checked=false);await page.click('#model-form button[type=submit]');
   await page.waitForFunction(()=>!document.getElementById('model-dialog').open);
-  for (const format of ['hwp','hwpx']) for(const mode of (bodyMarkers?['insert-row']:axisOnly?['insert-row','delete-column']:['plain','mixed'])){
+  for (const format of ['hwp','hwpx']) for(const mode of (bodyMarkers||mergedAxis?['insert-row']:axisOnly?['insert-row','delete-column']:['plain','mixed'])){
     const mixed=mode==='mixed';
     const frame=await (await page.$('.editor-frame:not([hidden])')).contentFrame();
     const doc=HwpDocument.createEmpty();doc.createBlankDocument();
@@ -64,7 +66,8 @@ try {
       doc.insertText(0,0,0,'작성자: 이름 / 업무');
       doc.splitParagraph(0,0,doc.getParagraphLength(0,0));
     }
-    doc.pasteHtml(0,bodyMarkers?1:0,0,`<table><tr><td>왼쪽${inner}</td><td>오른쪽${inner}</td></tr></table>`);
+    const right=mergedAxis?'<table><tr><td rowspan="2">동일😀</td><td>동일😀</td></tr><tr><td>끝</td></tr></table>':inner;
+    doc.pasteHtml(0,bodyMarkers?1:0,0,`<table><tr><td>왼쪽${inner}</td><td>오른쪽${right}</td></tr></table>`);
     if(bodyMarkers){
       doc.insertClickHereField(0,0,5,'이름','담당 부서','작성자',true);
       doc.addBookmark(0,0,9,'업무 위치');
@@ -88,7 +91,7 @@ try {
       const root=await navigator.storage.getDirectory(),h=await root.getFileHandle(name,{create:true}),writer=await h.createWritable();
       await writer.write(new Uint8Array(bytes));await writer.close();await window.jueonyEditor.open(new Uint8Array(bytes),name,h,false);
     },bytes,'nested-review.'+format);
-    const request=axisOnly?(mode==='insert-row'?'오른쪽 안쪽 표 마지막에 행 추가':'오른쪽 안쪽 표의 둘째 열 삭제'):
+    const request=mergedAxis?'오른쪽 안쪽 표의 세로 병합 사이에 행 추가':axisOnly?(mode==='insert-row'?'오른쪽 안쪽 표 마지막에 행 추가':'오른쪽 안쪽 표의 둘째 열 삭제'):
       mixed?'오른쪽 안쪽 표의 두 번째 셀 둘째 문단을 변경해줘':'오른쪽 안쪽 표의 두 번째 셀을 변경해줘';
     await fill('request-input',request);
     const sent=page.waitForResponse(r=>r.url()===origin+'/api/generate');
@@ -99,6 +102,7 @@ try {
     const original=[['동일😀','동일😀'],['동일😀','동일😀']],edited=[['동일😀','동일😀'],['동일😀','변경😀']];
     if(mixed){original[1][1]='첫 문단\n동일😀';edited[1][1]='첫 문단\n변경😀';}
     if(axisOnly)edited[1]=mode==='insert-row'?[...original[1],'새 행😀','']:[original[1][0]];
+    if(mergedAxis){original[1].push('끝');edited[1]=['동일😀','동일😀','새 행😀','끝'];}
     assert.deepEqual(await texts(),edited);
     const undo=(await page.$$('.message-actions button')).reverse();
     for (const b of undo) if (await b.evaluate(e=>e.textContent==='요청 되돌리기')) {await b.click();break;}
@@ -113,7 +117,9 @@ try {
     assert.equal(saved.status,'saved');assert.equal(saved.dirty,false);
     const reopened=new HwpDocument(new Uint8Array(saved.bytes));
     try {
-      assert.deepEqual(readStructure(reopened).nestedTables.map(t=>t.cells.map(c=>c.text)),edited);
+      const tables=readStructure(reopened).nestedTables;
+      assert.deepEqual(tables.map(t=>t.cells.map(c=>c.text)),edited);
+      if(mergedAxis)assert.deepEqual([tables[1].rows,tables[1].cells[0].rowSpan],[3,3]);
       if(bodyMarkers)assert.deepEqual(records(reopened),originalMarkers);
       const hits=JSON.parse(reopened.searchAllText('변경😀',true,true));
       if(!axisOnly){assert.equal(hits.length,1);assert.deepEqual(hits[0].cellPath.map(p=>p.cellIndex),[1,1]);}
@@ -126,5 +132,5 @@ try {
     } finally {reopened.free();}
     console.log('PASS',format,mode,'UI chat → loopback provider → Agent application → undo/redo → bound file save and native reopen');
   }
-  assert.equal(calls.length,bodyMarkers?2:4);assert.deepEqual(errors,[]);
+  assert.equal(calls.length,bodyMarkers||mergedAxis?2:4);assert.deepEqual(errors,[]);
 } finally {await browser?.close();launcher.kill();await new Promise(r=>provider.close(r));}

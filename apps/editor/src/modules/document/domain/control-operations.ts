@@ -65,7 +65,7 @@ export function tableAxisPlan(table:Table,op:AxisOperation):Table {
  only(op,insert?['kind','target','index','values']:['kind','target','index']);
  const merged=table.cells.some(c=>c.rowSpan>1||c.columnSpan>1);
  if(table.cells.some(c=>!c.axisFieldSignature && (c.properties.fieldName ||
-    !c.editable && !(merged && (c.axisContentSafe===true || c.axisFormula)))))
+    !c.editable && !(merged && (c.axisContentSafe===true || c.axisFormula || c.axisPicture)))))
    fail('중첩 개체·필드 또는 보존 상태를 확인할 수 없는 셀이 있는 표입니다.');
  const size=row?table.rows:table.columns,other=row?table.columns:table.rows;
  integer(op.index,0,insert?size:size-1);
@@ -75,6 +75,11 @@ export function tableAxisPlan(table:Table,op:AxisOperation):Table {
  const rows=table.rows+(row?(insert?1:-1):0),columns=table.columns+(!row?(insert?1:-1):0);
  if(rows>50||columns>20||rows*columns>200)fail('행·열 편집 결과는 50행·20열·200셀 이내여야 합니다.');
  const projected=projectTableAxis(table,row,insert,op.index,values);
+ for(const cell of table.cells.filter(c=>c.axisPicture)){
+   const next=projected.find(p=>p.sourceIndex===cell.index)?.cell;
+   if(!next || next.rowSpan!==cell.rowSpan || next.columnSpan!==cell.columnSpan)
+     fail('그림 셀을 삭제하거나 그 병합 범위를 바꾸는 행·열 편집은 지원하지 않습니다.');
+ }
  projectAxisFormulas(table,projected,rows,columns,row,insert,op.index);
  if(table.cells.some(c=>c.axisFieldSignature && !projected.some(v=>v.sourceIndex===c.index)))
    fail('필드를 포함한 셀이 없어지는 행·열은 삭제할 수 없습니다.');

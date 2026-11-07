@@ -1,6 +1,7 @@
 import {assertNativeTableNoCellZones} from './table-write-guard.ts';
 import {formulaInputTarget,refreshFormulaInput} from './table-formula-input.ts';
 import {mergedAxisProof} from './merged-axis-evidence.ts';
+import {sameAxisPicture} from './axis-cell-picture.ts';
 import {prepareAxisFormulaUpdates} from './table-axis-formulas.ts';
 import {verifyPreservedExport} from './preservation.ts';
 import {executeRowHeights} from './row-heights.ts';
@@ -124,7 +125,18 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
         formulas?.verify(current);
         const format=/\.hwp$/i.test(snapshot.name)?'hwp':'hwpx';
         const artifact=format==='hwp'?doc.exportHwpWithReport():doc.exportHwpxWithReport();
-        try { verifyPreservedExport(doc,artifact.takeBytes(),format,artifact.contentLoss(),bytes=>new doc.constructor(bytes)); }
+        try {
+          const bytes=artifact.takeBytes();
+          verifyPreservedExport(doc,bytes,format,artifact.contentLoss(),data=>new doc.constructor(data));
+          if(current.cells.some(c=>c.axisPicture)){
+            const copy=new doc.constructor(bytes);
+            try {
+              const saved=readStructure(copy).tables.find(t=>t.id===current.id);
+              if(!saved || current.cells.some(c=>!sameAxisPicture(c.axisPicture,saved.cells[c.index]?.axisPicture)))
+                throw Error('저장 후 표 안 그림의 자원·속성 또는 위치가 달라졌습니다.');
+            } finally { copy.free(); }
+          }
+        }
         finally { artifact.free(); }
       }
       tables.set(axis.target,current);

@@ -6,6 +6,7 @@ import {readLineNumberSettings} from './line-numbers.ts';
 import {readAgentMasterPages} from './agent-master-pages.ts';
 import {readNestedTables} from './nested-tables.ts';
 import {axisFieldSignature,readAxisFormula} from './axis-cell-fields.ts';
+import {readAxisPicture} from './axis-cell-picture.ts';
 export type { Cell, Table, Structure } from '../../modules/document/public/types.ts';
 // All coordinates refer to the currently open WASM document, never its disk copy.
 export const parsed = (v: any): any => typeof v === 'string' ? JSON.parse(v) : v;
@@ -69,6 +70,13 @@ export function readStructure(wasm: any): Structure {
         && !children.length;
       cells.push({ index: i, row: info.row, column: info.col, rowSpan: info.rowSpan, columnSpan: info.colSpan, text: texts.join('\n'), editable: Boolean(simple)&&properties.cellProtect===false&&control.props?.Lock===0, ...(properties.cellProtect!==false?{reason:'보호 셀 또는 보호 상태를 확인할 수 없는 셀입니다.'}:control.props?.Lock!==0?{reason:'보호 표 또는 보호 상태를 확인할 수 없는 표입니다.'}:{}), properties, characters: parsed(doc.getCellCharPropertiesAt(section, paragraph, ci, i, 0, 0)), paragraphProperties: parsed(doc.getCellParaPropertiesAt(section, paragraph, ci, i, 0)) });
       if (axisContentSafe) cells[i].axisContentSafe = true;
+      if (count===1 && children.length===1 && children[0].ctrlId==='gso' && control.props?.Lock===0 &&
+          dimensions.rowCount*dimensions.colCount<=200 && texts[0].length<=4000) {
+        try {
+          const picture=readAxisPicture(doc,section,paragraph,ci,cells[i],children[0]);
+          if(picture)cells[i].axisPicture=picture;
+        } catch { /* An unverified picture stays ineligible for structural edits. */ }
+      }
       if ((children.length || properties.fieldName) && count > 0 && count <= 50 && texts.join('').length <= 12000
           && properties.cellProtect === false && control.props?.Lock === 0 && typeof doc.getFieldList === 'function') {
         try {

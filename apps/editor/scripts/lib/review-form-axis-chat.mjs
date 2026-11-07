@@ -1,8 +1,12 @@
 import http from 'node:http';
 import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {resolve} from 'node:path';
 
 const insertRequest='첫 번째 양식 표의 결재란 바로 위에 새 행을 넣어 주세요.';
 const deleteRequest='첫 번째 양식 표에서 결재란이 들어 있는 행을 삭제해 주세요.';
+const pictureRequest='표에 있는 결재 도장을 유지하고 두 번째 줄 앞에 새 행을 넣어 주세요.';
+const removePicture='그림이 들어 있는 행을 삭제해 주세요.';
 
 function form(HwpDocument,inline){
  const doc=HwpDocument.createEmpty();
@@ -21,18 +25,28 @@ function form(HwpDocument,inline){
  return doc;
 }
 
-export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,state,snap,execute,reopen}){
+function proposal(input){
+ const [t]=input.document.structure.tables;
+ if([pictureRequest,removePicture].includes(input.instruction)){
+  const owner=t.cells.find(c=>c.text==='Picture owner');assert.ok(owner.axisPicture);
+  return input.instruction===pictureRequest?{kind:'insert_table_row',target:t.id,index:1,values:['새 행','','']}:
+    {kind:'delete_table_row',target:t.id,index:owner.row};
+ }
+ assert.ok([insertRequest,deleteRequest].includes(input.instruction));
+ const named=t.cells.find(c=>c.properties.fieldName==='결재란');
+ assert.ok(named.axisFieldSignature);assert.ok(t.cells.every(c=>c.rowSpan===1&&c.columnSpan===1));
+ const insert=input.instruction===insertRequest;
+ if(insert)assert.ok(t.cells.find(c=>c.text.startsWith('김민수')).axisFieldSignature);
+ return {kind:insert?'insert_table_row':'delete_table_row',target:t.id,index:named.row,...(insert?{values:['신규','']}:{})};
+}
+
+export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,state,snap,execute,reopen,pictureFolder}){
  const calls=[];
  const provider=http.createServer(async(req,res)=>{
   try{
    let raw='';for await(const chunk of req)raw+=chunk;
    const input=JSON.parse(JSON.parse(raw).messages[1].content);
-   assert.ok([insertRequest,deleteRequest].includes(input.instruction));
-   const [t]=input.document.structure.tables,named=t.cells.find(c=>c.properties.fieldName==='결재란');
-   assert.ok(named.axisFieldSignature);assert.ok(t.cells.every(c=>c.rowSpan===1&&c.columnSpan===1));
-   const insert=input.instruction===insertRequest;
-   if(insert)assert.ok(t.cells.find(c=>c.text.startsWith('김민수')).axisFieldSignature);
-   const operation={kind:insert?'insert_table_row':'delete_table_row',target:t.id,index:named.row,...(insert?{values:['신규','']}:{})};
+   const operation=proposal(input);
    calls.push(input.instruction);
    res.setHeader('Content-Type','application/json');
    res.end(JSON.stringify({choices:[{message:{content:JSON.stringify({message:'양식 표 행 편집',sourceIds:[],operations:[operation]})}}]}));
@@ -54,6 +68,23 @@ export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,
    return page.$eval('#request-error',e=>e.hidden?'':e.textContent);
   }
   for(const ext of ['hwp','hwpx']){
+   if(pictureFolder){
+    await scenario(ext+' Agent picture owner row insertion and deletion refusal through chat',async()=>{
+     const source=new HwpDocument(await readFile(resolve(pictureFolder,'before.'+ext)));
+     const frame=await open(ext,source),before=(await snap()).structure;
+     const original=before.tables[0].cells.find(c=>c.axisPicture);assert.ok(original);
+     assert.equal(await send(pictureRequest),'');
+     const after=(await snap()).structure,moved=after.tables[0].cells.find(c=>c.axisPicture);
+     assert.equal(moved.row,original.row+1);assert.equal(moved.column,original.column);
+     assert.equal(moved.axisPicture.signature,original.axisPicture.signature);
+     assert.ok(Math.abs(moved.axisPicture.left-original.axisPicture.left)<=.2&&Math.abs(moved.axisPicture.top-original.axisPicture.top)<=.2);
+     await execute('edit:undo');assert.deepEqual((await snap()).structure,before);
+     await execute('edit:redo');assert.deepEqual((await snap()).structure,after);
+     await reopen(frame,'picture-axis-'+ext,ext);assert.deepEqual((await snap()).structure,after);
+     const saved=await state();assert.match(await send(removePicture),/그림/);assert.deepEqual(await state(),saved);
+    });
+    continue;
+   }
    await scenario(ext+' Agent form table insert through chat',async()=>{
     const frame=await open(ext,form(HwpDocument,true)),before=(await snap()).structure;
     assert.equal(await send(insertRequest),'');

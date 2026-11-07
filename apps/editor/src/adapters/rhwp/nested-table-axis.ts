@@ -1,7 +1,8 @@
 import type {ControlOp,NestedTable,Snapshot} from '../../modules/document/public/types.ts';
-import {projectTableAxis,validateControlOperations} from '../../modules/document/public/engine-integration.ts';
-import {capturePreservationEvidence} from './preservation.ts';
+import {projectTableAxis,validateControlOperations,witnessedTrackEdges} from '../../modules/document/public/engine-integration.ts';
+import {capturePreservationEvidence,verifyPreservedExport} from './preservation.ts';
 import {resourceFingerprint} from './cell-paragraph.ts';
+import {rootBodyTexts} from './table-topology-evidence.ts';
 import {parsed,readStructure} from './structure.ts';
 
 type AxisOp=Extract<ControlOp,{index:number}>;
@@ -37,7 +38,7 @@ function evidence(doc:any,table:NestedTable){
   return {...control,list:parent};
  });
  if(!extent||target.length!==table.cells.length)throw Error('중첩 표 크기와 셀을 모두 확인하지 못했습니다.');
- return {document,others,anchoredControls,target,extent,resources:resourceFingerprint(doc.exportHwpx())};
+ return {document:{...document,body:rootBodyTexts(doc)},others,anchoredControls,target,extent,resources:resourceFingerprint(doc.exportHwpx())};
 }
 
 export function executeNestedTableAxis(doc:any,base:Snapshot,op:AxisOp){
@@ -50,11 +51,21 @@ export function executeNestedTableAxis(doc:any,base:Snapshot,op:AxisOp){
  const logical={...table,cells:table.cells.map((c,i)=>({...c,properties:before.target[i].properties}))};
  const projected=projectTableAxis(logical,row,insert,op.index,values);
  const templateAt=Math.min(op.index,size-1);
- const donor=(r:number,c:number)=>table.cells.find(cell=>cell.row===(row?templateAt:r)&&cell.column===(row?c:templateAt))!;
- const sizes=new Set(table.cells.filter(c=>(row?c.row:c.column)===templateAt).map(c=>before.target[c.index].properties[track]));
- if(sizes.size!==1)throw Error('중첩 표의 원래 행 높이 또는 열 너비를 확정할 수 없습니다.');
- const delta=[...sizes][0];
+ const coord=row?'row':'column',span=row?'rowSpan':'columnSpan';
+ const across=row?'column':'row',acrossSpan=row?'columnSpan':'rowSpan';
+ const merged=table.cells.some(c=>c.rowSpan>1||c.columnSpan>1);
+ const edges=merged?witnessedTrackEdges(logical,row):undefined;
+ const crossEdges=merged&&projected.some(p=>p.sourceIndex===null)?witnessedTrackEdges(logical,!row):undefined;
+ const sizes=new Set(logical.cells.filter(c=>c[coord]===templateAt&&c[span]===1).map(c=>c.properties[track]));
+ if(!edges&&sizes.size!==1)throw Error('중첩 표의 원래 행 높이 또는 열 너비를 확정할 수 없습니다.');
+ const delta=edges?edges[templateAt+1]-edges[templateAt]:[...sizes][0];
  if(!Number.isSafeInteger(delta)||delta<=0)throw Error('중첩 표의 원래 행·열 크기를 읽지 못했습니다.');
+ // The native model copies the first matching template on the next track,
+ // previous track, then the first single-width owner in this row or column.
+ const template=(i:number)=>{
+  const candidates=table.cells.filter(c=>c[across]===i&&c[acrossSpan]===1);
+  return candidates.find(c=>c[coord]===op.index)??candidates.find(c=>c[coord]===op.index-1)??candidates[0]??table.cells[0];
+ };
  const checkpoint=doc.saveSnapshot();
  try{
   checked(doc.editNestedTableAxis(table.section,table.paragraph,JSON.stringify(path(table,0)),row,insert,op.index));
@@ -62,7 +73,7 @@ export function executeNestedTableAxis(doc:any,base:Snapshot,op:AxisOp){
    if(sourceIndex===null&&cell.text)checked(doc.insertTextInCellByPath(table.section,table.paragraph,JSON.stringify(path(table,cell.index)),0,cell.text));
   }
   const result=readStructure(doc),updated=result.nestedTables?.find(t=>t.id===table.id);
-  if(!updated?.axisEditable||updated.rows!==table.rows+(row?(insert?1:-1):0)||
+  if(!updated||updated.rows!==table.rows+(row?(insert?1:-1):0)||
      updated.columns!==table.columns+(row?0:(insert?1:-1))||updated.cells.length!==projected.length)
    throw Error('중첩 표 행·열 변경 결과가 계획과 다릅니다.');
   const withoutTarget=(s:typeof original)=>({...s,nestedTables:s.nestedTables?.filter(t=>t.id!==table.id)});
@@ -73,17 +84,35 @@ export function executeNestedTableAxis(doc:any,base:Snapshot,op:AxisOp){
    throw Error('중첩 표 편집으로 부모·이웃 표의 내용, 배치 속성 또는 자원이 달라졌습니다.');
   for(const {cell,sourceIndex} of projected){
    const actual=updated.cells[cell.index],content=after.target[cell.index];
-   if(actual.row!==cell.row||actual.column!==cell.column||actual.rowSpan!==1||actual.columnSpan!==1||actual.text!==cell.text)
+   if(actual.row!==cell.row||actual.column!==cell.column||actual.rowSpan!==cell.rowSpan||actual.columnSpan!==cell.columnSpan||actual.text!==cell.text)
     throw Error('중첩 표 셀 좌표 또는 텍스트가 계획과 다릅니다.');
    if(sourceIndex!==null){
-    if(!same(content,before.target[sourceIndex]))throw Error('남아야 할 중첩 셀의 문단·서식 또는 크기가 달라졌습니다.');
+    const old=before.target[sourceIndex],change=cell[span]-table.cells[sourceIndex][span];
+    const expected=change?{...old,properties:{...old.properties,[track]:old.properties[track]+change*delta}}:old;
+    if(!same(content,expected))throw Error('남아야 할 중첩 셀의 문단·서식 또는 크기가 달라졌습니다.');
    }else{
-    const source=before.target[donor(cell.row,cell.column).index],p=content.paragraphs[0];
-    if(!actual.editable||content.paragraphs.length!==1||!same(content.properties,source.properties)||!same(content.first,source.first)||
+    const i=cell[across],source=before.target[template(i).index],p=content.paragraphs[0];
+    const properties=crossEdges?{...source.properties,[track]:delta,[otherTrack]:crossEdges[i+1]-crossEdges[i]}:source.properties;
+    if(!actual.editable||content.paragraphs.length!==1||!same(content.properties,properties)||!same(content.first,source.first)||
        !same(p.paragraph,source.paragraphs[0].paragraph))throw Error('삽입한 중첩 셀에 원래 행·열의 서식을 적용하지 못했습니다.');
    }
   }
-  const selected=updated.cells.find(c=>(row?c.row:c.column)===Math.min(op.index,size-(insert?0:2)))??updated.cells[0];
+  if(merged){
+   const format=doc.getSourceFormat();
+   if(!['hwp','hwpx'].includes(format)||!base.name.toLowerCase().endsWith('.'+format))throw Error('중첩 병합 표의 원래 저장 형식을 확인할 수 없습니다.');
+   const artifact=format==='hwp'?doc.exportHwpWithReport():doc.exportHwpxWithReport();
+   let reopened;
+   try{
+    const bytes=artifact.takeBytes();
+    verifyPreservedExport(doc,bytes,format,artifact.contentLoss(),b=>new doc.constructor(b));
+    reopened=new doc.constructor(bytes);
+    const stored=readStructure(reopened),child=stored.nestedTables?.find(t=>t.id===table.id);
+    if(!child||!same(stored,result)||!same(evidence(reopened,child),after))throw Error('중첩 병합 표 또는 이웃 내용이 저장 후 달라졌습니다.');
+   }finally{reopened?.free();artifact.free();}
+  }
+  const focus=Math.min(op.index,(row?updated.rows:updated.columns)-1);
+  const selected=updated.cells.find(c=>c[coord]===focus)??updated.cells.find(c=>c[coord]<focus&&focus<c[coord]+c[span]);
+  if(!selected)throw Error('변경한 중첩 행·열의 커서 위치를 확인하지 못했습니다.');
   const cellPath=path(table,selected.index);
   return {sectionIndex:table.section,paragraphIndex:0,parentParaIndex:table.paragraph,...cellPath[0],cellPath,charOffset:0};
  }catch(error){checked(doc.restoreSnapshot(checkpoint));throw error;}

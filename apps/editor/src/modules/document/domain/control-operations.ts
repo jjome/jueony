@@ -65,7 +65,7 @@ export function tableAxisPlan(table:Table,op:AxisOperation):Table {
  only(op,insert?['kind','target','index','values']:['kind','target','index']);
  const merged=table.cells.some(c=>c.rowSpan>1||c.columnSpan>1);
  if(table.cells.some(c=>!c.axisFieldSignature && (c.properties.fieldName ||
-    !c.editable && !(merged && (c.axisContentSafe===true || c.axisFormula || c.axisPicture)))))
+    !c.editable && !c.axisPicture && !(merged && (c.axisContentSafe===true || c.axisFormula)))))
    fail('중첩 개체·필드 또는 보존 상태를 확인할 수 없는 셀이 있는 표입니다.');
  const size=row?table.rows:table.columns,other=row?table.columns:table.rows;
  integer(op.index,0,insert?size:size-1);

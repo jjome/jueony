@@ -17,7 +17,7 @@ def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 
-def embed(source, target):
+def embed(source, target, many=False):
     # insertPicture at a table cursor creates a sibling floating picture.
     # Keep its native picture and image resource, move the picture to the
     # selected cell's paragraph in the source fixture only.
@@ -26,26 +26,41 @@ def embed(source, target):
             data = src.read(entry)
             if entry.filename == "Contents/section0.xml":
                 matches = re.findall(rb"<hp:pic\b.*?</hp:pic>", data, re.DOTALL)
-                needle = b"<hp:t>Picture</hp:t>"
-                assert len(matches) == 1 and data.count(needle) == 1
-                data = data.replace(matches[0], b"", 1).replace(needle, matches[0]+needle, 1)
+                labels = [b"PicA", b"PicB", b"PicC", b"PicD"] if many else [b"Picture"]
+                assert len(matches) == len(labels)
+                for picture in matches:
+                    data = data.replace(picture, b"", 1)
+                for i, (label, picture) in enumerate(zip(labels, matches)):
+                    if many and i == 1:
+                        # Two independent objects share one stored resource. A
+                        # third PNG has the same bytes and its own resource ID.
+                        ref = rb'binaryItemIDRef="[^"]+"'
+                        picture = re.sub(ref, re.search(ref, matches[0])[0], picture, count=1)
+                    needle = b"<hp:t>" + label + b"</hp:t>"
+                    assert data.count(needle) == 1
+                    data = data.replace(needle, picture+needle, 1)
             dst.writestr(entry, data)
 
 
-def inspect(path):
+def inspect_pictures(path):
     if path.suffix == ".hwpx":
         with ZipFile(path) as zipfile:
             root = ET.fromstring(zipfile.read("Contents/section0.xml"))
-            owner, = [c for c in root.findall(".//{*}tc") if c.find(".//{*}pic") is not None]
-            picture, = owner.findall(".//{*}pic")
-            asset, = [name for name in zipfile.namelist() if name.startswith("BinData/")]
-            assert picture.find(".//{*}img").get("binaryItemIDRef") == Path(asset).stem
-            pos = owner.find("./{*}cellAddr")
-            return {"row": int(pos.get("rowAddr")), "col": int(pos.get("colAddr")),
-                    "records": [digest(ET.tostring(picture))], "image": digest(zipfile.read(asset))}
+            manifest = ET.fromstring(zipfile.read("Contents/content.hpf"))
+            assets = {x.get("id"): x.get("href") for x in manifest.findall(".//{*}item")}
+            pictures = []
+            for owner in root.findall(".//{*}tc"):
+                pos = owner.find("./{*}cellAddr")
+                for picture in owner.findall(".//{*}pic"):
+                    ref = picture.find(".//{*}img").get("binaryItemIDRef")
+                    pictures.append({"row": int(pos.get("rowAddr")), "col": int(pos.get("colAddr")),
+                                     "resource": ref, "records": [digest(ET.tostring(picture))],
+                                     "image": digest(zipfile.read(assets[ref]))})
+            return pictures
     doc = Cfb(path.read_bytes())
     compressed = doc.read("FileHeader")[36] & 1
     entries = list(records(inflate(doc.read("Section0"), compressed)))
+    bin_records = [data for tag, _, data in records(inflate(doc.read("DocInfo"), compressed)) if tag == 18]
     pictures = []
     owner = None
     for i, (tag, level, data) in enumerate(entries):
@@ -57,13 +72,28 @@ def inspect(path):
             assert owner is not None
             sequence = [entries[i], entries[i+1], entries[i+2]]
             assert [t for t, _, _ in sequence] == [71, 76, 85]
-            pictures.append((owner, [digest(d) for _, _, d in sequence]))
-    ((col, row), payload), = pictures
-    entry, = [n for n in doc.names() if re.fullmatch(r"BIN[0-9A-Fa-f]+\.(?:png|jpg|jpeg)", n, re.I)]
-    return {"row": row, "col": col, "records": payload, "image": digest(inflate(doc.read(entry), compressed))}
+            # Picture's 1-based BinData index follows the three effect bytes.
+            ref, = struct.unpack_from("<H", sequence[2][2], 71)
+            assert 0 < ref <= len(bin_records)
+            flags, storage, chars = struct.unpack_from("<HHH", bin_records[ref-1])
+            assert flags & 15 == 1  # embedded resource
+            ext = bin_records[ref-1][6:6+chars*2].decode("utf-16le")
+            entry = f"BIN{storage:04X}.{ext}"
+            col, row = owner
+            pictures.append({"row": row, "col": col, "resource": ref,
+                             "records": [digest(d) for _, _, d in sequence],
+                             "image": digest(inflate(doc.read(entry), compressed))})
+    return pictures
 
 
-if sys.argv[1] == "embed":
-    embed(Path(sys.argv[2]), Path(sys.argv[3]))
+if sys.argv[1] in ("embed", "embed-many"):
+    embed(Path(sys.argv[2]), Path(sys.argv[3]), sys.argv[1] == "embed-many")
 else:
-    print(json.dumps(inspect(Path(sys.argv[2]))))
+    pictures = inspect_pictures(Path(sys.argv[2]))
+    if sys.argv[1] == "inspect":
+        picture, = pictures
+        picture.pop("resource")
+        print(json.dumps(picture))
+    else:
+        assert sys.argv[1] == "inspect-many"
+        print(json.dumps(pictures))

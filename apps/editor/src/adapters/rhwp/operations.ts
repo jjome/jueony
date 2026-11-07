@@ -94,7 +94,7 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
     const base=[table.section,table.paragraph,table.control],size=row?table.rows:table.columns;
     const read=()=>readStructure(doc).tables.find(t=>t.section===table.section&&t.paragraph===table.paragraph&&t.control===table.control);
     const live=read();
-    const needsAxisProof=(t:Table)=>t.cells.some(c=>c.rowSpan>1||c.columnSpan>1||c.axisFieldSignature||c.properties.fieldName);
+    const needsAxisProof=(t:Table)=>t.cells.some(c=>c.rowSpan>1||c.columnSpan>1||c.axisPicture||c.axisFieldSignature||c.properties.fieldName);
     if(!live)throw new Error('대상 표가 없어졌습니다.');
     const checkAxis=needsAxisProof(table)||needsAxisProof(live);
     if(checkAxis&&JSON.stringify(table.cells)!==JSON.stringify(live.cells))throw new Error('표의 병합 범위나 셀 내용이 바뀌었습니다. 다시 요청하세요.');

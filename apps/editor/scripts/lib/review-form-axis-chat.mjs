@@ -7,6 +7,8 @@ const insertRequest='첫 번째 양식 표의 결재란 바로 위에 새 행을
 const deleteRequest='첫 번째 양식 표에서 결재란이 들어 있는 행을 삭제해 주세요.';
 const pictureRequest='표에 있는 결재 도장을 유지하고 두 번째 줄 앞에 새 행을 넣어 주세요.';
 const removePicture='그림이 들어 있는 행을 삭제해 주세요.';
+const picturesRequest='제품 사진 네 장을 유지하고 두 번째 줄 앞에 새 행을 추가해 주세요.';
+const removePictures='PicB 사진이 있는 행을 삭제해 주세요.';
 
 function form(HwpDocument,inline){
  const doc=HwpDocument.createEmpty();
@@ -27,9 +29,11 @@ function form(HwpDocument,inline){
 
 function proposal(input){
  const [t]=input.document.structure.tables;
- if([pictureRequest,removePicture].includes(input.instruction)){
-  const owner=t.cells.find(c=>c.text==='Picture owner');assert.ok(owner.axisPicture);
-  return input.instruction===pictureRequest?{kind:'insert_table_row',target:t.id,index:1,values:['새 행','','']}:
+ if([pictureRequest,removePicture,picturesRequest,removePictures].includes(input.instruction)){
+  const many=[picturesRequest,removePictures].includes(input.instruction);
+  assert.equal(t.cells.filter(c=>c.axisPicture).length,many?4:1);
+  const owner=t.cells.find(c=>c.text===(many?'PicB':'Picture owner'));assert.ok(owner.axisPicture);
+  return [pictureRequest,picturesRequest].includes(input.instruction)?{kind:'insert_table_row',target:t.id,index:1,values:['새 행','','']}:
     {kind:'delete_table_row',target:t.id,index:owner.row};
  }
  assert.ok([insertRequest,deleteRequest].includes(input.instruction));
@@ -40,7 +44,7 @@ function proposal(input){
  return {kind:insert?'insert_table_row':'delete_table_row',target:t.id,index:named.row,...(insert?{values:['신규','']}:{})};
 }
 
-export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,state,snap,execute,reopen,pictureFolder}){
+export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,state,snap,execute,reopen,pictureFolder,multiplePictures}){
  const calls=[];
  const provider=http.createServer(async(req,res)=>{
   try{
@@ -69,19 +73,22 @@ export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,
   }
   for(const ext of ['hwp','hwpx']){
    if(pictureFolder){
-    await scenario(ext+' Agent picture owner row insertion and deletion refusal through chat',async()=>{
+    await scenario(ext+' Agent picture owner row insertion and deletion refusal through chat'+(multiplePictures?' with four products':''),async()=>{
      const source=new HwpDocument(await readFile(resolve(pictureFolder,'before.'+ext)));
      const frame=await open(ext,source),before=(await snap()).structure;
-     const original=before.tables[0].cells.find(c=>c.axisPicture);assert.ok(original);
-     assert.equal(await send(pictureRequest),'');
-     const after=(await snap()).structure,moved=after.tables[0].cells.find(c=>c.axisPicture);
-     assert.equal(moved.row,original.row+1);assert.equal(moved.column,original.column);
-     assert.equal(moved.axisPicture.signature,original.axisPicture.signature);
-     assert.ok(Math.abs(moved.axisPicture.left-original.axisPicture.left)<=.2&&Math.abs(moved.axisPicture.top-original.axisPicture.top)<=.2);
+     const originals=before.tables[0].cells.filter(c=>c.axisPicture);assert.equal(originals.length,multiplePictures?4:1);
+     assert.equal(await send(multiplePictures?picturesRequest:pictureRequest),'');
+     const after=(await snap()).structure;
+     for(const original of originals){
+      const moved=after.tables[0].cells.find(c=>c.text===original.text);
+      assert.equal(moved.row,original.row+(original.row>=1?1:0));assert.equal(moved.column,original.column);
+      assert.equal(moved.axisPicture.signature,original.axisPicture.signature);
+      assert.ok(Math.abs(moved.axisPicture.left-original.axisPicture.left)<=.2&&Math.abs(moved.axisPicture.top-original.axisPicture.top)<=.2);
+     }
      await execute('edit:undo');assert.deepEqual((await snap()).structure,before);
      await execute('edit:redo');assert.deepEqual((await snap()).structure,after);
      await reopen(frame,'picture-axis-'+ext,ext);assert.deepEqual((await snap()).structure,after);
-     const saved=await state();assert.match(await send(removePicture),/그림/);assert.deepEqual(await state(),saved);
+     const saved=await state();assert.match(await send(multiplePictures?removePictures:removePicture),/그림/);assert.deepEqual(await state(),saved);
     });
     continue;
    }

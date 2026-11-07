@@ -6,7 +6,7 @@ import {readLineNumberSettings} from './line-numbers.ts';
 import {readAgentMasterPages} from './agent-master-pages.ts';
 import {readNestedTables} from './nested-tables.ts';
 import {axisFieldSignature,readAxisFormula} from './axis-cell-fields.ts';
-import {readAxisPicture} from './axis-cell-picture.ts';
+import {axisPictureReader} from './axis-cell-picture.ts';
 export type { Cell, Table, Structure } from '../../modules/document/public/types.ts';
 // All coordinates refer to the currently open WASM document, never its disk copy.
 export const parsed = (v: any): any => typeof v === 'string' ? JSON.parse(v) : v;
@@ -46,6 +46,7 @@ export function readStructure(wasm: any): Structure {
   paragraphs.forEach((p,index)=>{const at=positions[index];p.controls=controls.filter((c:any)=>c.list===0&&c.para===index).map((c:any)=>c.ctrlId);p.pageIndex=parsed(doc.getPageOfPosition(at.section,at.paragraph)).page;});
   const tables: Table[] = [], unsupportedControls: string[] = [];
   let axisFields:any[]|undefined;
+  const readPicture=axisPictureReader(doc);
   for (const control of controls) {
     if (['secd', 'cold'].includes(control.ctrlId)) continue;
     if (control.list !== 0 || control.ctrlId !== 'tbl') { unsupportedControls.push(control.ctrlId); continue; }
@@ -73,7 +74,7 @@ export function readStructure(wasm: any): Structure {
       if (count===1 && children.length===1 && children[0].ctrlId==='gso' && control.props?.Lock===0 &&
           dimensions.rowCount*dimensions.colCount<=200 && texts[0].length<=4000) {
         try {
-          const picture=readAxisPicture(doc,section,paragraph,ci,cells[i],children[0]);
+          const picture=readPicture(section,paragraph,ci,cells[i],children[0]);
           if(picture)cells[i].axisPicture=picture;
         } catch { /* An unverified picture stays ineligible for structural edits. */ }
       }

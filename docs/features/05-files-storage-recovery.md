@@ -22,7 +22,7 @@
 
 ## 먼저 할 일
 
-- **구현** [N046](<05-files-storage-recovery.md#n046>) **HWPX 문단 textDir의 HWP5 형식 보존** — 다른 이름 저장 시 HWP5 문단 글 방향만 손실되는 경우 HWPX 보존 저장을 선택할 수 있다. AUTO·LTR·RTL HWP5 대응값 및 직접 비교는 미확정.
+- **구현** [N046](<05-files-storage-recovery.md#n046>) **HWPX 문단 textDir의 HWP5 형식 보존** — HWPX 보존 사본 저장에서 원본과 같은 파일을 선택하면 쓰기 전에 차단한다. HWP5의 AUTO·LTR·RTL 대응값과 한글 직접 비교는 미확정.
 - **검증** [N001](<05-files-storage-recovery.md#n001>) **HWP 겹침 표의 복잡 배치·불명확 원점 저장 보존** — Rust182 최종 합본: 유효 짧은 다쪽8/48·3/4열 병합24/120·다쪽 캡션/중첩36/216 완료. 합본501·unit1036·Native126·실제App29·추가75·실행묶음7 통과. 기존 보호 검사와 원본44·WIP45 유지. 한글 직접 비교는 사용자 요청으로 보류;138참조. 남은 검수는 실제 한글 합본 비교이며 N002와 분리한다. 기준 구현 커밋 f2e19c5b, 커밋 아카이브 증거140개 해시 일치.
 - **검증** [N002](<05-files-storage-recovery.md#n002>) **공개 형식 변환의 필드 보존 차이 4건** — 107패치 합본에서 표준 날짜·정확 OLE summary 정보까지 보존 읽기/양형식 왕복·손상 거절 추가. 명시 textDir HWP5 매핑과 최초 조판 차이는 별도 잔여이며 손실 변환 차단 유지.117참조; 한글 직접 비교 보류.
 
@@ -624,7 +624,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: HWPX 명시 문단 글 방향은 XML로 보존하고 HWP5 매핑 미확인 시 쓰기를 차단한다. 실제 binary 매핑 또는 표현 불가 범위 확정과 왕복 검증은 남았다. 기존 N002의 완료된 4개 필드 차이 수정과 별도 범위다.
-- 다음 작업: 다른 이름 저장 시 HWP5 문단 글 방향만 손실되는 경우 HWPX 보존 저장을 선택할 수 있다. AUTO·LTR·RTL HWP5 대응값 및 직접 비교는 미확정.
+- 다음 작업: HWPX 보존 사본 저장에서 원본과 같은 파일을 선택하면 쓰기 전에 차단한다. HWP5의 AUTO·LTR·RTL 대응값과 한글 직접 비교는 미확정.
 - 상위 항목: [B011](<05-files-storage-recovery.md#b011>) 다른 이름 저장
 - 근거: [116-reflowed-native-storage.md](<../116-reflowed-native-storage.md>) · [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>) · [verify-font-fallback-storage-engine.json](<../evidence/basic-editor-2026-10-24/second/existing-conversion-limitation/verify-font-fallback-storage-engine.json>) · [font-fallback-baseline182.json](<../evidence/basic-editor-2026-10-24/second/existing-conversion-limitation/font-fallback-baseline182.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>)
 - 원래 기록: `PREEXISTING_UNRESOLVED_DIRECTION_MAPPING_EXPLICITLY_COUNTED_2026_10_24`

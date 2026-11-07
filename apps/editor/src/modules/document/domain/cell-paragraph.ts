@@ -36,7 +36,7 @@ export function cellParagraphPlan(op:AgentCellParagraphOp,s:Snapshot){
  if(op.spanTexts===undefined)return {table,cell,paragraph,edits:[paragraphSplice(op.originalText,op.text,spans)]};
  const parts=op.spanTexts;
  if(!Array.isArray(parts)||!spans||spans.length<2||spans.length>128||parts.length!==spans.length||
-    parts.some(part=>!plain(part)||part.length===0)||parts.join('')!==op.text)throw Error('기존 글자 서식 구간마다 비어 있지 않은 교체문이 필요합니다.');
+    parts.some(part=>!plain(part))||parts.join('')!==op.text)throw Error('기존 글자 서식 구간 순서대로 교체문을 지정하세요. 지울 구간에는 빈 문자열을 넣으세요.');
  const original=Array.from(op.originalText);
  const edits=spans.flatMap(({start,end},run)=>{
   if(!Number.isSafeInteger(start)||!Number.isSafeInteger(end)||start!==(run?spans[run-1].end:0)||end<=start||end>original.length)

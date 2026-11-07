@@ -29,10 +29,31 @@ export function resourceFingerprint(bytes:Uint8Array){
  if(entries.filter(e=>e.name==='Contents/header.xml').length!==1||new Set(entries.map(e=>e.name)).size!==entries.length)throw new Error('문서 정의 또는 저장 자원의 식별이 불명확합니다.');
  return sha(entries.sort((a,b)=>a.name.localeCompare(b.name)));
 }
+/** Rendered cell indices restart on each continuation page. The document
+ * model supplies the stable row and column of each merged-cell owner. */
+function paragraphPageOwners(d:any,t:Table) {
+ const remaining=new Map(t.cells.map(cell=>[`${cell.row},${cell.column}`,cell]));
+ const pages:Array<{page:number;owners:number[]}>=[];
+ for(let page=0;page<d.pageCount();page++){
+  const frames=parsed(d.getPageControlLayout(page)).controls.filter((frame:any)=>
+   frame.type==='table'&&frame.secIdx===t.section&&frame.paraIdx===t.paragraph&&frame.controlIdx===t.control);
+  if(!frames.length)continue;
+  if(frames.length!==1||!frames[0].cells.length)throw Error('표의 쪽 경계를 확인하지 못했습니다.');
+  const owners=frames[0].cells.map((frame:any)=>{
+   const address=`${frame.row},${frame.col}`,cell=remaining.get(address);
+   if(!cell||cell.rowSpan!==frame.rowSpan||cell.columnSpan!==frame.colSpan)throw Error('한 셀이 여러 부분으로 나뉘었거나 표의 격자가 달라졌습니다.');
+   remaining.delete(address);
+   return cell.index;
+  });
+  pages.push({page,owners});
+ }
+ if(!pages.length||remaining.size)throw Error('화면의 표에서 모든 셀을 확인하지 못했습니다.');
+ return pages;
+}
 function readPrivateSources(d:any,tables:Table[],name:string){
  const structure=readStructure(d),sources:Record<string,any>={};
  for(const t of tables){
-  let source:any={editable:false,reason:'Plain merged cell paragraph only; HWPX root table, one page, no protected/complex source.'};
+  let source:any={editable:false};
   try{
    if(!/\.hwpx?$/iu.test(name)||d.getSourceFormat()!==(/\.hwp$/iu.test(name)?'hwp':'hwpx')||t.rows*t.columns>200||!t.cells.some(c=>c.rowSpan*c.columnSpan>1)||t.editable!==true)throw Error();
    assertNativeTableWritable(d,t);
@@ -40,8 +61,7 @@ function readPrivateSources(d:any,tables:Table[],name:string){
    if(parsed(d.getFieldList()).length||parsed(d.getBookmarks()).length||controls.some((c:any)=>c.list!==0||!['tbl','secd','cold'].includes(c.ctrlId))||lists.some((l:any)=>!l.isCell||l.hostListId!==0))throw Error();
    const p=parsed(d.getTableProperties(t.section,t.paragraph,t.control)),col=parsed(d.getColumnDef(t.section));
    if(p.cellZoneCount!==0||p.hasCaption||p.cellSpacing!==0||p.treatAsChar||p.allowOverlap||p.repeatHeader||p.textWrap!=='TopAndBottom'||p.vertRelTo!=='Para'||p.vertAlign!=='Top'||p.horzRelTo!=='Para'&&p.horzRelTo!=='Column'||p.horzAlign!=='Left'||col.columnCount!==1)throw Error();
-   const frames=Array.from({length:d.pageCount()},(_,i)=>parsed(d.getPageControlLayout(i)).controls.filter((c:any)=>c.type==='table'&&c.secIdx===t.section&&c.paraIdx===t.paragraph&&c.controlIdx===t.control)).flat();
-   if(frames.length!==1||frames[0].cells.length!==t.cells.length)throw Error();
+   const pages=paragraphPageOwners(d,t);
    let paragraphBudget=0,characterBudget=0;
    const cells=t.cells.map(c=>{
     const count=d.getCellParagraphCount(t.section,t.paragraph,t.control,c.index);if(count<1||count>50||typeof c.properties.verticalAlign!=='number'||![0,1].includes(c.properties.verticalAlign)||c.properties.textDirection!==0||c.properties.fieldName!=='')throw Error();
@@ -53,7 +73,7 @@ function readPrivateSources(d:any,tables:Table[],name:string){
     });return {index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs};
    });
    const evidence=capturePreservationEvidence(d);if(evidence.issues.length)throw Error();
-   source={editable:true,cells,fingerprint:sha({evidence,resources:resourceFingerprint(d.exportHwpx()),body:rootBodyTexts(d),tables:tableTextTree(structure.tables),cells,properties:p,columns:col,geometry:tableLayoutEvidence(d,t)})};
+   source={editable:true,cells,pages,fingerprint:sha({evidence,resources:resourceFingerprint(d.exportHwpx()),body:rootBodyTexts(d),tables:tableTextTree(structure.tables),cells,properties:p,columns:col,pages,geometry:tableLayoutEvidence(d,t)})};
   }catch{}
   sources[t.id]=source;
  }
@@ -63,7 +83,7 @@ function readPrivateSources(d:any,tables:Table[],name:string){
 export function readCellParagraphSources(wasm:any,tables:Table[],name:string):Record<string,AgentCellParagraphSource>|undefined {
  const d=nativeDocument(wasm);if(typeof d.setCharShapeIdInCell!=='function'||typeof d.exportHwpx!=='function')return;
  const privateSources=readPrivateSources(d,tables,name).sources;
- return Object.fromEntries(tables.map(t=>{const source=privateSources[t.id];return [t.id,source?.editable===true?{editable:true,fingerprint:source.fingerprint,cells:source.cells.map((c:any)=>({index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs:c.paragraphs.map((p:any)=>({index:p.index,text:p.text,...(p.runs.length>1?{formatSpans:p.runs.map((r:any)=>({start:r.startOffset,end:r.endOffset}))}:{})}))}))}:{editable:false,reason:'AI 병합 셀 문단 교체는 HWP/HWPX 한 쪽 평면 비보호 표의 단순 문단만 지원합니다. 필드·개체·책갈피·중첩·복합 배치와 쪽을 나누는 긴 결과는 제외합니다. 혼합 서식의 여러 구간을 수정하려면 구간별 교체문을 지정하세요.'}];}));
+ return Object.fromEntries(tables.map(t=>{const source=privateSources[t.id];return [t.id,source?.editable===true?{editable:true,fingerprint:source.fingerprint,cells:source.cells.map((c:any)=>({index:c.index,row:c.row,column:c.column,rowSpan:c.rowSpan,columnSpan:c.columnSpan,paragraphs:c.paragraphs.map((p:any)=>({index:p.index,text:p.text,...(p.runs.length>1?{formatSpans:p.runs.map((r:any)=>({start:r.startOffset,end:r.endOffset}))}:{})}))}))}:{editable:false,reason:'병합 셀 문단 교체에는 셀마다 원래 행·열과 쪽을 확인할 수 있는 비보호 본문 표가 필요합니다. 필드·개체·책갈피·중첩 표와 여러 쪽에 걸쳐 나뉜 셀은 편집할 수 없습니다.'}];}));
 }
 /** Export bytes use portable metrics. Compare their layout with the same
  * temporary metric selection and restore the screen environment synchronously.
@@ -78,7 +98,12 @@ export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellPar
  const d=nativeDocument(wasm),proof=pending.get(d);if(!proof||proof.revision!==base.revision||!same(proof.operation,op))throw new Error('셀 문단 결과의 검증 근거가 없습니다.');
  const after=capturePreservationEvidence(d);if(after.issues.length||!same(topologySemantics(after.values),proof.expected)||!same(rootBodyTexts(d),proof.body)||!same(tableTextTree(readStructure(d).tables),proof.text)||resourceFingerprint(d.exportHwpx())!==proof.resources)throw new Error('병합 셀 문단 결과 또는 다른 문서 내용·자원이 변경되었습니다.');
  const source=readPrivateSources(d,[proof.table],base.name).sources[op.target];if(source?.editable!==true)throw new Error('교체 후 병합 셀 문단을 검증하지 못했습니다.');
- for(const cell of source.cells)for(const para of cell.paragraphs){const old=proof.cells.find((c:any)=>c.index===cell.index)?.paragraphs[para.index];if(!old||!same(para.characters,old.characters)||!same(para.paragraph,old.paragraph)||!same(para.style,old.style)||!same(para.runs,cell.index===proof.cellIndex&&para.index===op.paragraph?proof.runs:old.runs))throw new Error('선택 또는 다른 셀 문단의 원래 서식이 달라졌습니다.');}
+ if(!same(source.pages,proof.pages))throw new Error('문단 편집으로 셀의 쪽 경계가 바뀌어 적용하지 않았습니다.');
+ for(const cell of source.cells)for(const para of cell.paragraphs){
+  const old=proof.cells.find((c:any)=>c.index===cell.index)?.paragraphs[para.index];
+  const target=cell.index===proof.cellIndex&&para.index===op.paragraph;
+  if(!old||!same(para.characters,target?proof.firstCharacters:old.characters)||!same(para.paragraph,old.paragraph)||!same(para.style,old.style)||!same(para.runs,target?proof.runs:old.runs))throw new Error('선택 또는 다른 셀 문단의 원래 서식이 달라졌습니다.');
+ }
  portableLayout(d,()=>{const format=/\.hwp$/iu.test(base.name)?'hwp':'hwpx';const artifact=format==='hwp'?d.exportHwpWithReport():d.exportHwpxWithReport();let reopened:any;
  try{const loss=JSON.parse(artifact.contentLoss()),bytes=artifact.takeBytes();verifyPreservedExport(d,bytes,format,loss,b=>new d.constructor(b));reopened=new d.constructor(bytes);if(!sameTableLayout(tableLayoutEvidence(d,proof.table),tableLayoutEvidence(reopened,proof.table)))throw new Error('셀 문단 교체 후 실제 저장 재열기 배치가 다릅니다.');}finally{reopened?.free();artifact.free();}});
 }
@@ -89,16 +114,36 @@ export function executeCellParagraph(wasm:any,base:Snapshot,op:AgentCellParagrap
  const before=capturePreservationEvidence(d);if(before.issues.length)throw new Error('셀 문단 교체 전 전체 보존 정보를 읽지 못했습니다.');const expected=topologySemantics(before.values),target=expected.cells.find((c:any)=>c.list.hostListId===0&&c.list.sectionIndex===t.section&&c.list.hostPara===t.paragraph&&c.list.controlIndex===t.control&&c.list.cellIndex===plan.cell.index);
  if(!target)throw new Error('원래 셀 문단의 보존 정보가 없습니다.');
  const mixed=p.runs.length>1,edits=plan.edits;
- let offset=0;
- const runs=mixed?p.runs.map((r:any,i:number)=>{
-   const edit=edits.find(e=>e.run===i),startOffset=offset;
-   offset+=r.endOffset-r.startOffset+(edit?Array.from(edit.insert).length-edit.remove:0);
-   return {...r,startOffset,endOffset:offset};
- }):op.text?[{startOffset:0,endOffset:Array.from(op.text).length,charShapeId:p.characters.charShapeId}]:[];
  const paraEvidence=target.paragraphs[op.paragraph];
- paraEvidence.runs=runs.map((r:any,i:number)=>({start:r.startOffset,end:r.endOffset,properties:mixed?paraEvidence.runs[i].properties:normalize(p.characters)}));
+ const args=[t.section,t.paragraph,t.control,c.index,op.paragraph];
+ // Removing a run can expose or join neighboring original styles. Derive both
+ // the first-character binding and the expected run evidence before mutation.
+ const runs:Array<{startOffset:number;endOffset:number;charShapeId:number}>=[];
+ const storedRuns:Array<{start:number;end:number;properties:unknown}>=[];
+ let firstCharacters=p.characters;
+ if(mixed){
+  for(const [i,run] of p.runs.entries()){
+   const edit=edits.find(e=>e.run===i);
+   const length=run.endOffset-run.startOffset+(edit?Array.from(edit.insert).length-edit.remove:0);
+   if(length===0)continue;
+   const previous=runs.at(-1),start=previous?.endOffset??0,end=start+length;
+   if(previous&&previous.charShapeId===run.charShapeId){
+    previous.endOffset=end;
+    storedRuns[storedRuns.length-1].end=end;
+   }else{
+    if(!previous)firstCharacters=parsed(d.getCellCharPropertiesAt(...args,run.startOffset));
+    runs.push({startOffset:start,endOffset:end,charShapeId:run.charShapeId});
+    storedRuns.push({start,end,properties:paraEvidence.runs[i].properties});
+   }
+  }
+ }else if(op.text){
+  const end=Array.from(op.text).length;
+  runs.push({startOffset:0,endOffset:end,charShapeId:p.characters.charShapeId});
+  storedRuns.push({start:0,end,properties:normalize(p.characters)});
+ }
+ paraEvidence.runs=storedRuns;
  const text=tableTextTree(structure.tables).map(table=>table.id===t.id?{...table,cells:table.cells.map(cell=>cell.index===c.index?{...cell,text:c.paragraphs.map((p:any)=>p.index===op.paragraph?op.text:p.text).join('\n')}:cell)}:table);
- const proof={revision:base.revision,operation:structuredClone(op),table:t,expected,runs,body:rootBodyTexts(d),text,resources:resourceFingerprint(d.exportHwpx()),cells:source.cells,cellIndex:c.index},args=[t.section,t.paragraph,t.control,c.index,op.paragraph];
+ const proof={revision:base.revision,operation:structuredClone(op),table:t,expected,runs,firstCharacters,pages:source.pages,body:rootBodyTexts(d),text,resources:resourceFingerprint(d.exportHwpx()),cells:source.cells,cellIndex:c.index};
  // Edit right to left so offsets always refer to the queried source.
  for(const edit of [...edits].reverse()){
   const shape=mixed?p.runs[edit.run].charShapeId:p.characters.charShapeId;

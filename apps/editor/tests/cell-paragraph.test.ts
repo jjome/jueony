@@ -14,11 +14,12 @@ test('unmerged and absorbed coordinates, aliases and incorrect original text ref
 test('unknown formats, unread/forged caps and protection refuse',()=>{for(const change of [(s:any)=>s.name='merged.docx',(s:any)=>delete s.cellParagraphSources,(s:any)=>s.cellParagraphSources[op.target].editable=false,(s:any)=>s.cellParagraphSources[op.target].fingerprint='wrong',(s:any)=>s.structure.tables[0].editable=false,(s:any)=>s.structure.tables[0].cells[0].properties.cellProtect=true,(s:any)=>s.cellParagraphSources[op.target].cells[0].index=1]){const s=base();change(s);assert.throws(()=>cellParagraphPlan(op,s));}});
 test('single-operation and macro restrictions remain explicit',()=>{assert.throws(()=>validateEditOperations([op,op],base()),/단독/);assert.throws(()=>captureTemplate('병합 셀',[op]));});
 
-test('explicit run replacements keep Unicode boundaries and reject missing, empty or extra runs',()=>{
+test('explicit run replacements keep Unicode boundaries and can remove exactly the requested style',()=>{
  const s=base(),p=s.cellParagraphSources[op.target].cells[0].paragraphs[1];
  p.formatSpans=[{start:0,end:2},{start:2,end:Array.from(op.originalText).length}];
  const change={...op,spanTexts:['계획😀 ','수정'],text:'계획😀 수정'};
  assert.equal(cellParagraphPlan(change,s).edits.length,2);
- for(const spanTexts of [['','계획😀 수정'],['계획😀 수정'],['계획😀 ','수정','extra'],['계획','수정']])
+ assert.deepEqual(cellParagraphPlan({...change,spanTexts:['','계획😀 수정']},s).edits[0],{run:0,start:0,remove:2,insert:''});
+ for(const spanTexts of [['계획😀 수정'],['계획😀 ','수정','extra'],['계획','수정']])
   assert.throws(()=>cellParagraphPlan({...change,spanTexts},s));
 });

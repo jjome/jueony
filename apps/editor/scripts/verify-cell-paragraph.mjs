@@ -1,4 +1,5 @@
 import puppeteer from 'puppeteer-core';
+import {continuedMergedTable} from './lib/continued-merged-table.mjs';
 import http from 'node:http';
 import {spawn} from 'node:child_process';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
@@ -26,6 +27,10 @@ const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const
  const fallback=input.document.structure.tables[0]?.cells?.[0]?.text?.split('\n')[paragraph]??'';
  const operations=[{kind:'replace_cell_paragraph',target,row:cell?.row??0,column:cell?.column??0,paragraph,originalText:cell?.paragraphs?.[paragraph]?.text??fallback,text:'Agent revised paragraph 😀'}];
  if(input.instruction.includes('mixed-tail'))operations[0].text=operations[0].originalText.slice(0,-1)+'개정😀';
+ if(input.instruction.includes('remove-style')){
+  operations[0].spanTexts=['','수정😀'];
+  operations[0].text=operations[0].spanTexts.join('');
+ }
  if(input.instruction.includes('mixed-spans')){
   operations[0].spanTexts=['변경😀 ','공문'];
   operations[0].text=operations[0].spanTexts.join('');
@@ -92,6 +97,23 @@ try{
   try{assert.equal(reopened.getTextInCell(0,1,0,0,1,0,6),'변경😀 공문');
    assert.equal(JSON.parse(reopened.getCellCharPropertiesAt(0,1,0,0,1,1)).italic,false);
    assert.equal(JSON.parse(reopened.getCellCharPropertiesAt(0,1,0,0,1,5)).italic,true);
+  }finally{reopened.free();}
+ });
+ for(const format of ['hwp','hwpx'])await scenario(format+' delete first style run of a merged cell on a continuation page via chat',async()=>{
+  const d=continuedMergedTable(HwpDocument);
+  d.applyCharFormatInCell(0,1,0,34,0,5,7,'{"italic":true}');
+  const f=await open(format,d),before=await snap();
+  await send('first remove-style');
+  assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const bound=before.cellParagraphSources[before.structure.tables[0].id].cells.find(c=>c.row===17&&c.column===0);
+  assert.equal(bound.index,34);
+  await undo();assert.deepEqual((await snap()).structure.tables,before.structure.tables);
+  await execute('edit:redo');const reopened=await save(f,'continued-remove',format);
+  try{
+   assert.ok(reopened.pageCount()>1);
+   assert.equal(reopened.getTextInCell(0,1,0,34,0,0,3),'수정😀');
+   assert.equal(JSON.parse(reopened.getCellCharPropertiesAt(0,1,0,34,0,0)).italic,true);
+   assert.equal(reopened.getTextInCell(0,1,0,0,0,0,6),'cell 0');
   }finally{reopened.free();}
  });
  await scenario('protection, lock, ambiguous cross-style replacement, field and bookmark remain readonly',async()=>{for(const mode of ['protect','locked','mixed','field','bookmark','zone']){const d=body();if(mode==='protect')d.setCellProperties(0,1,0,1,'{"cellProtect":true}');if(mode==='locked')d.setControlLock(1,0,true);if(mode==='zone')d.setCellZoneProperties(0,1,0,0,0,1,1,JSON.stringify({background:'#aabbcc'}));if(mode==='mixed')d.applyCharFormatInCell(0,1,0,0,1,0,1,'{"italic":true}');if(mode==='field')d.insertClickHereField(0,0,0,'field','','input',true);if(mode==='bookmark')d.addBookmark(0,0,0,'mark');await open('hwpx',d);const before=await state();await send('paragraph revision');assert.equal(await page.$eval('#request-error',e=>e.hidden),false,mode);assert.deepEqual(await state(),before);}});

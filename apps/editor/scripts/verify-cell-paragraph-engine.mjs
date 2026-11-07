@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {continuedMergedTable} from './lib/continued-merged-table.mjs';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {inflateRawSync} from 'node:zlib';
 import {resolve} from 'node:path';import {pathToFileURL} from 'node:url';
@@ -34,6 +35,59 @@ for (const format of ['hwp','hwpx']) await scenario(format+' multi-run merged pa
   doc.discardSnapshot(undo);doc.discardSnapshot(redo);
  } finally {doc.free();}
 });
+for(const format of ['hwp','hwpx']){
+ await scenario(format+' merged paragraph on a continuation page binds by document coordinates and restores cleanly',()=>{
+  const source=continuedMergedTable(HwpDocument);
+  const save=d=>format==='hwp'?d.exportHwp():d.exportHwpx(),d=new HwpDocument(save(source));source.free();
+  try{
+   const base=snap(d,'continued.'+format),table=base.structure.tables[0],cap=base.cellParagraphSources[table.id];
+   assert.equal(cap.editable,true);assert.ok(d.pageCount()>1);
+   const frame=JSON.parse(d.getPageControlLayout(1)).controls.find(c=>c.type==='table');
+   const cell=cap.cells.find(c=>c.row===17&&c.column===0);
+   assert.notEqual(frame.cells.find(c=>c.row===17&&c.col===0).cellIdx,cell.index);
+   const old=save(d),undo=d.saveSnapshot(),text='다음 쪽 셀';
+   transactionalCandidate(d,base,[{kind:'replace_cell_paragraph',target:table.id,row:17,column:0,paragraph:0,originalText:'cell 34',text}],'r1');
+   const saved=save(d),reopened=new HwpDocument(saved);
+   try{
+    assert.equal(reopened.getTextInCell(0,1,0,cell.index,0,0,Array.from(text).length),text);
+    assert.equal(reopened.getTextInCell(0,1,0,0,0,0,6),'cell 0');
+    assert.equal(reopened.pageCount(),d.pageCount());
+   }finally{reopened.free();}
+   const redo=d.saveSnapshot();d.restoreSnapshot(undo);assert.deepEqual(save(d),old);
+   d.restoreSnapshot(redo);assert.deepEqual(save(d),saved);d.discardSnapshot(undo);d.discardSnapshot(redo);
+   const layout=d.getPageControlLayout.bind(d);
+   d.getPageControlLayout=page=>{
+    const view=json(layout(page));if(page===1){const cells=view.controls.find(c=>c.type==='table').cells;cells[1]={...cells[0]};}
+    return JSON.stringify(view);
+   };
+   assert.equal(snap(d,'continued.'+format).cellParagraphSources[table.id].editable,false);
+  }finally{d.free();}
+ });
+ for(const [label,parts] of [
+  ['first',['','ell',' 1']],['middle',['C','',' 1']],['last',['C','ell','']],
+  ['middle alone',['','수정😀','']],['clear',['','','']],
+ ])await scenario(format+' explicit style run deletion: '+label,()=>{
+  const template=fixture(),save=d=>format==='hwp'?d.exportHwp():d.exportHwpx(),args=[0,1,0,0,1];
+  template.applyCharFormatInCell(...args,1,4,'{"italic":true}');
+  const d=new HwpDocument(save(template));template.free();
+  try{
+   const base=snap(d,'delete.'+format),text=parts.join(''),old=save(d),undo=d.saveSnapshot();
+   const style=(doc,at)=>json(doc.getCellCharPropertiesAt(...args,at));
+   const sourceStyles=[0,1,4].map(at=>style(d,at)),expected=parts.flatMap((part,index)=>Array.from(part,()=>sourceStyles[index]));
+   transactionalCandidate(d,base,[{...command(base,1,text),spanTexts:parts}],'r1');
+   const bytes=save(d),reopened=new HwpDocument(bytes);
+   try{
+    assert.equal(reopened.getTextInCell(...args,0,Array.from(text).length),text);
+    for(const [offset,properties] of expected.entries())assert.deepEqual(style(reopened,offset),properties);
+    if(!text)assert.deepEqual(style(reopened,0),sourceStyles[0]);
+   }finally{reopened.free();}
+   const redo=d.saveSnapshot();
+   d.restoreSnapshot(undo);assert.deepEqual(save(d),old);
+   d.restoreSnapshot(redo);assert.deepEqual(save(d),bytes);
+   d.discardSnapshot(undo);d.discardSnapshot(redo);
+  }finally{d.free();}
+ });
+}
 await scenario('mixed merged paragraph preserves surrounding raw styles, Unicode offsets, definitions and persisted text',()=>{
  const initial=fixture();
  initial.applyCharFormatInCell(0,1,0,0,1,1,4,'{"italic":true}');

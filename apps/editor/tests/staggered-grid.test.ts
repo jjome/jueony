@@ -211,17 +211,38 @@ for(const format of ['hwp','hwpx'])test(format+' retains the cross-axis size whe
  const seed=HwpDocument.createEmpty();
  try{
   seed.createBlankDocument();seed.insertText(0,0,0,'표');seed.splitParagraph(0,0,1);seed.createTable(...at,2,3);
-  for(let i=0;i<6;i++)seed.setCellProperties(...at,i,JSON.stringify({width:[5000,7000,9000][i%3],height:4000}));
+  for(let i=0;i<6;i++){
+   seed.setCellProperties(...at,i,JSON.stringify({width:[5000,7000,9000][i%3],height:4000}));
+   seed.insertTextInCell(...at,i,0,0,'셀'+i);
+  }
+  seed.applyCharFormatInCell(...at,4,0,0,2,'{"bold":true}');
   seed.mergeTableCells(...at,1,0,1,1);
   const doc=new HwpDocument(serialize(seed,format));
   try{
    const s=snapshot(doc,format),before=serialize(doc,format);
    const op:EditOp={kind:'delete_table_row',target,index:0};
-   // Only the first row stores 5000 and 7000 separately. After removing it,
-   // the native operation can shrink the outer width from 21000 to 12600.
-   assert.throws(()=>executeDocumentOperations(doc,s,validateEditOperations([op],s)),/표 외곽 치수/);
-   assert.equal(JSON.parse(doc.getTableProperties(...at)).tableWidth,21000);
+   const layout=(d:any)=>JSON.parse(d.getPageControlLayout(0)).controls.find((c:any)=>c.type==='table');
+   const footprint=(d:any,row:number)=>layout(d).cells.filter((c:any)=>c.row===row).map((c:any)=>[c.x,c.w,c.h]);
+   const expectedFootprint=footprint(doc,1),expectedOuterWidth=layout(doc).w;
+   const originalResize=doc.resizeControlAt.bind(doc);
+   doc.resizeControlAt=()=> '{"ok":true}'; // A writer that does nothing must roll back.
+   const edit=()=>executeDocumentOperations(doc,s,validateEditOperations([op],s));
+   assert.throws(edit,/표 외곽 치수/);
    assert.deepEqual(readStructure(doc),s.structure);assert.deepEqual(serialize(doc,format),before);
+   doc.resizeControlAt=originalResize;
+   roundtrip(doc,format,()=>{
+    edit();
+    const check=(d:any)=>{
+     assert.equal(JSON.parse(d.getTableProperties(...at)).tableWidth,21000);
+     assert.equal(layout(d).w,expectedOuterWidth);assert.deepEqual(footprint(d,0),expectedFootprint);
+     const survivors=readStructure(d).tables[0].cells;
+     assert.deepEqual(survivors.map(c=>[c.column,c.columnSpan,c.properties.width,c.properties.height,c.text]),
+      [[0,2,12000,4000,'셀3\n셀4'],[2,1,9000,4000,'셀5']]);
+     assert.equal(JSON.parse(d.getCellCharPropertiesAt(...at,0,1,0)).bold,true);
+    };
+    check(doc);
+    const saved=new HwpDocument(serialize(doc,format));try{check(saved);}finally{saved.free();}
+   });
   }finally{doc.free();}
  }finally{seed.free();}
 });

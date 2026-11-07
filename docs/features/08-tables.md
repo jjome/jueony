@@ -988,7 +988,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: span 교차·주 셀 제거·neighbor 영향·실패 원복
-- 다음 작업: 본문 병합 표에서 행·열 이동 후 계산식 참조·연쇄 결과와 이름 셀·누름틀을 보존한다. 참조 입력 범위가 바뀌는 편집과 치수를 확정할 수 없는 격자는 남음.
+- 다음 작업: 새 셀의 양쪽 치수와 원래 표 너비를 검증한다. 마지막 너비 증거 행 삭제 시 총폭을 복원하고 계산식 참조·연쇄 결과를 보존한다. 복합 개체를 포함하는 병합 표 구조 편집이 남음.
 - 상위 항목: [B158](<08-tables.md#b158>) 행·열 추가
 - Agent 명령: `insert_table_row,delete_table_row,insert_table_column,delete_table_column`
 - 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)

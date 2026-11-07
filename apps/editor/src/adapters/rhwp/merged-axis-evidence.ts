@@ -17,6 +17,26 @@ function content(doc: any, table: Table, index: number) {
   });
 }
 
+/** Removing the last row that exposes an interior grid line makes the native
+ * width calculation use 1800 for columns without a single-column owner. The
+ * original outer width is still known and the remaining cell widths are kept. */
+function restoreWidthAfterWitnessLoss(doc:any,source:Table,after:Table,original:number,current:number) {
+  if (typeof doc.resizeControlAt !== 'function' || after.columns !== source.columns ||
+      !Number.isSafeInteger(current) || current < 0 || original > 0x7fffffff || current > 0x7fffffff ||
+      witnessedTrackEdges(source,false).at(-1) !== original) return;
+  const boundaries = new Set(after.cells.map(c=>c.column));
+  if (boundaries.size === source.columns) return;
+  const fallback = Array.from({length:after.columns},(_,col)=>{
+    const widths = after.cells.filter(c=>c.column===col && c.columnSpan===1).map(c=>Number(c.properties.width));
+    return widths.length ? Math.max(...widths) : 1800;
+  });
+  if (fallback.reduce((total,w)=>total+w,0) !== current) return;
+  let flat = source.paragraph;
+  for (let s=0;s<source.section;s++) flat += doc.getParagraphCount(s);
+  if (parsed(doc.resizeControlAt(flat,source.control,original-current,0))?.ok !== true)
+    throw new Error('삭제한 행의 증거로 표의 원래 외곽 너비를 복원하지 못했습니다.');
+}
+
 /** Derive each affected dimension from stored cell sizes, including distances
  * between boundaries of overlapping spans in a staggered grid. */
 export function mergedAxisProof(doc: any, table: Table, row: boolean, insert: boolean, at: number, values: string[]) {
@@ -57,9 +77,7 @@ export function mergedAxisProof(doc: any, table: Table, row: boolean, insert: bo
     const difference = track(Math.min(at, size - 1));
     return { ...old.properties, [dimension]: originalSize + (insert ? difference : -difference) };
   });
-  return (after: Table) => {
-    if (readAcrossSize() !== originalAcrossSize)
-      throw new Error('행·열 변경으로 반대 축의 표 외곽 치수가 달라졌습니다.');
+  return (after: Table,justEdited=false) => {
     projected.forEach(({cell, sourceIndex}, i) => {
       const actual = after.cells[i];
       if (!actual || actual.index !== i || actual.row !== cell.row || actual.column !== cell.column
@@ -76,5 +94,11 @@ export function mergedAxisProof(doc: any, table: Table, row: boolean, insert: bo
       if (sourceIndex !== null && (!same(properties[i], actual.properties) || !same(source[sourceIndex], content(doc, after, i))))
         throw new Error('남아야 할 셀의 내용·서식 또는 크기가 달라졌습니다.');
     });
+    const current = readAcrossSize();
+    if (current !== originalAcrossSize) {
+      if (justEdited && row && !insert) restoreWidthAfterWitnessLoss(doc,table,after,originalAcrossSize,current);
+      if (readAcrossSize() !== originalAcrossSize)
+        throw new Error('행·열 변경으로 반대 축의 표 외곽 치수가 달라졌습니다.');
+    }
   };
 }

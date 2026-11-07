@@ -107,7 +107,7 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
       else checked(doc[method](...base, axis.index));
       const updated = read();
       if (!updated) throw new Error('변경한 표를 확인하지 못했습니다.');
-      proof?.(updated);
+      proof?.(updated,true);
       if ('values' in axis) for (const cell of updated.cells) {
         if ((row ? cell.row : cell.column) !== axis.index) continue;
         const value = axis.values[row ? cell.column : cell.row];

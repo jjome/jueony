@@ -21,6 +21,8 @@
 
 다쪽 셀에서는 화면의 글꼴 측정값을 검사용 사본과 재열기 사본에 등록한다. Edge에서 이모지의 글자 폭이 화면과 사본에서 각각 18.3px와 6.7px로 달랐던 사례를 재현하고, 같은 측정 조건에서 페이지별 셀·글줄 좌표가 일치하는지 확인했다. 양 형식에서 이모지를 포함한 셀 분할과 저장 재열기가 통과했다. 글줄이 실제로 다음 쪽으로 밀리는 문서는 원복을 확인했다.
 
+행 삭제 시 열 너비를 개별적으로 기록한 마지막 행이 사라지면, 엔진이 21000이던 표 너비를 12600으로 줄이는 결함이 있었다. 삭제 전 치수와 삭제 직후 엔진이 계산한 대체값을 모두 확인할 수 있을 때 원래 전체 너비를 복원한다. 실제 HWP 레코드와 HWPX XML에서 너비 21000과 높이 4000을 확인했고, 남은 셀의 너비 12000·9000과 글자 서식이 유지됐다. 삽입 시에도 새 셀의 너비와 높이를 원본 격자에서 확정할 수 있어야 한다. 원본에 없는 개별 너비를 관례적인 기본값으로 채우는 동작은 차단한다.
+
 - [병합 문단 원본·서식 검사](../apps/editor/scripts/verify-cell-paragraph-engine.mjs) · [중첩 셀 검사](../apps/editor/scripts/verify-nested-agent-cells.mjs)
 - [격자·행열 크기 회귀 검사](../apps/editor/tests/staggered-grid.test.ts) · [셀 분할 저장·재열기](../apps/editor/scripts/verify-table-subdivision-engine.mjs)
 - [병합 계산식 파일 검사](../apps/editor/scripts/verify-merged-table-formulas.mjs) · [중첩 계산식 파일 검사](../apps/editor/scripts/verify-nested-table-formulas.mjs)

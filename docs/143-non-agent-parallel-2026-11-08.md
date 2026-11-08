@@ -11,8 +11,8 @@
 | N014 / G091 | 단일 root Rectangle의 0~359° 정수 회전 커서·정/역방향 선택 복원·회전각 변경 시 stale 복원 차단 | 단위 9/9·실제 WASM HWP/HWPX 9/9 | 그룹·중첩·캡션·뒤집기·비-Rectangle·신규 Edge 빌드·한글 비교 |
 | N015 | root vector shape 2~32개와 중첩 group 선택의 순서/활성 개체·소유 구조·개체/문서 지문·stale 차단을 SessionCursor/Studio capture·restore wire에 연결 | 실제 WASM HWP/HWPX 4/4·root 재검증 31 pass/기존 2 skip·격리 build 666 modules·해당 프로필 TypeScript 통과 | **부분 유지:** 이미지/수식/OLE/표/특수 story 등 비벡터 선택·브라우저 재시작·한글 비교 |
 | N016 | root-body 미주의 owner·note locator·3중 지문·Unicode 커서/방향성 선택·각주 분리와 SessionCursor·Studio callback 연결 | root 선택 8/8·실제 WASM HWP/HWPX 4/4·격리 build 671 modules·TypeScript 통과 | **부분 유지:** 실제 앱 재시작·한글 직접 비교·중첩/표/도형 note·필드/삽입 개체 |
-| N017 | stable 8개 설정 키의 scope·재실행·reset·dirty/undo·backup·validator 계약과 read-only 시작 진단·fail-closed 분류 | 시작 진단 8/8·strict TypeScript 통과 | **부분 유지:** 실제 앱 시작점·설정 저장소 통합·실제 한글/Windows/origin/DPI 실측 |
-| N020 | modal owner·foreground·일반/상승 권한·세션·stale capture/input binding 정책과 1회 재선택·사용자 조치 분류 | 순수 정책 8/8·strict TypeScript 통과 | **부분 유지:** 실제 host/Computer Use 관찰·실행 경로 미연결·실제 한글 대화상자 재검증 미실행 |
+| N017 | read-only diagnostic을 typed startup gate로 연결하고 missing은 memory-only default로 두며 corrupt/future/read-error를 키별 차단·scope/backup projection | 진단·gate 13/13·strict TypeScript 통과 | **부분 유지:** 실제 app shell 시작점·memory activation 구현·설정 저장소 통합·실제 Windows/한글 실측 미연결 |
+| N020 | 증거 수집→정책→최대 1회 refresh→activate→post evidence 재검증→semantic input의 fail-closed coordinator | 정책·coordinator 19/19·strict TypeScript 통과 | **부분 유지:** 실제 host/Computer Use 관찰·실행 경로 미연결·실제 한글 대화상자 재검증 미실행 |
 | N018 | live atomic recipe의 프로세스/문서/버전/bytes/history top 결합·저장 실패 유지·검증된 rebase·재열기/복구/명명 이력/재시작 초기화 | 신규 5/5·문서 이력/복구 선별 포함 17/17 | 실제 InputHandler·save/recovery 연결·수동 편집·저장 frame·프로세스 재시작·한글 기준 |
 | N004 | 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset 일치·가운데 정렬 재조판·실패 시 exact rollback | HWP/HWPX 네이티브 저장·재열기·undo/redo·4개 fault rollback 및 Edge 실제 편집→bound-save→UI 재열기 | 임의 필드 경계·중첩 셀·복합 개체·한글 비교 |
 | N012 | 저장 글자 스타일과 직접 서식 타입 분리·독립 charShape 소유·정의 변경 전파·중복/stale/race fail-closed; Studio 패치는 style ID가 아니라 캡처·검증한 stored character-style reference를 적용 경계에 전달 | 실제 Rust HWP/HWPX 3/3·앱 경계/범위/patch 보호 합계 8/8·격리 build 663 modules·해당 프로필 TypeScript 검사 통과 | **부분 유지:** 실제 UI 동작 검수·Agent 연결·한글 비교 |
@@ -20,7 +20,7 @@
 | N023 | 열린 통합 메뉴를 visual viewport의 CSS 좌표로 경계 제한하고 아래 공간 부족 시 위로 전환; 브라우저 zoom에 `devicePixelRatio`를 다시 곱하지 않으며 visual viewport resize/scroll에 재배치 | 순수 배치와 기존 메뉴 회귀 7/7·격리 build 665 modules·해당 프로필 TypeScript 검사 통과 | **부분 유지:** 실제 Windows 125/150/200%·다중 모니터·좌표/선택/보기 전체 수명·한글 비교 |
 | N041 | 자체 생성한 본문·명시 글꼴, 2쪽 경계·용지, 표·셀, 내장 PNG, 본문 누름틀의 5종 manifest를 HWP/HWPX 입력 10개로 만들고 open→같은 형식 save→reopen; production preservation evidence·published layout 0.2 허용치·기능 최소조건·입력 SHA 불변을 fail-closed 검사 | custom Rust/WASM `source-c932adab64d8bc4e`에서 10/10·manifest 계약/위조 거절 3/3·구문/diff 검사 통과 | **부분 유지:** 같은 엔진의 합성 문서 기술 검수이며 실제 한글 2024 화면·인쇄·복구 경고, 기관 실문서·공개 문서 코퍼스 독립 비교는 미실행 |
 | N042 | 같은 글꼴·DPI·용지와 실제 page definition을 봉인한 published layout baseline에서 쪽 수·텍스트 재조판·개체 위치 차이를 분류하고 교차 생산자·글꼴 SHA-256이 없으면 차단 | 계약 4/4·2쪽 표/그림/필드 복합 HWP/HWPX baseline 2/2 | **부분 유지:** Jueony 엔진 baseline일 뿐 실제 한글 2024·PDF raster·인쇄 드라이버·실제 글꼴 바이너리 비교는 미실행 |
-| N043 | picker 취소 no-op와 canonical path·identity·size·mtime·SHA 증거·preflight/final replace 재검증·atomic/no-clobber/readback host capability·typed 오류의 fail-closed 정책 | 순수 정책 9/9·strict TypeScript 통과 | **부분 유지:** 실제 Windows picker·ACL·identity 수집과 Rust/Tauri host 원자 교체/readback 미연결·실제 Windows 검증 미실행 |
+| N043 | preflight→temp write/flush→final probe/revalidate→atomic compare-replace/readback coordinator와 race replace 0회·실패 cleanup·committed 후 `save-state-uncertain`/reopen 분류 | 정책·coordinator 15/15·strict TypeScript 통과 | **부분 유지:** 실제 Windows picker·ACL·identity 수집과 Rust/Tauri host 원자 교체/readback·실파일 Windows 검증 미연결 |
 | N045 | 로컬 WASM·런타임·폰트·third-party notices·hash·기관 endpoint allowlist와 외부 URL을 fail-closed 감사 | 계약 4/4; 실제 격리 dist에서 CDN 글꼴 URL 269개를 검출해 `FAIL_OFFLINE_BUNDLE` | **부분 유지·배포 차단:** CDN 글꼴 로컬화·WebView2 포함 최종 설치본·기관 allowlist 확정·고지 합본 검수 필요 |
 | N005 | 보이지 않는 0길이 이웃 ClickHere의 셀 분할 이동을 앱·Rust에서 차단하고 guide-only 0길이 필드는 유지 | HWP/HWPX 저장·재열기 2/2·관련 회귀 32/32 | 겹친 필드·개체 혼합 셀·캡션 내부 필드·한글 비교 |
 | N011 추가 | 문단 테두리 동작 플래그 `borderConnect`·`borderIgnoreMargin`의 portable style 교환·전체 롤백 | HWP/HWPX 가져오기→저장→재열기 2/2 | TabDef·실제 BorderFill·배경·간격·UI·한글 비교 |
@@ -70,10 +70,16 @@ JUEONY_ENGINE_PACKAGE=build/rhwp-engine/source-c932adab64d8bc4e/pkg node apps/ed
 HWP/HWPX engine save-reopen 4/4 passed
 node --experimental-strip-types --test apps/editor/tests/preference-startup-diagnostic-n017.test.ts
 8 tests passed; strict TypeScript passed separately
+node --experimental-strip-types --test apps/editor/tests/preference-startup-diagnostic-n017.test.ts apps/editor/tests/preference-startup-gate-n017.test.ts
+13 tests passed; strict TypeScript passed separately
 node --experimental-strip-types --test apps/editor/tests/native-dialog-activation-policy-n020.test.ts
 8 tests passed; strict TypeScript passed separately
+node --experimental-strip-types --test apps/editor/tests/native-dialog-activation-policy-n020.test.ts apps/editor/tests/native-dialog-activation-coordinator-n020.test.ts
+19 tests passed; strict TypeScript passed separately
 node --experimental-strip-types --test apps/editor/tests/windows-file-preflight-n043.test.ts
 9 tests passed; strict TypeScript passed separately
+node --experimental-strip-types --test apps/editor/tests/windows-file-preflight-n043.test.ts apps/editor/tests/windows-atomic-save-coordinator-n043.test.ts
+15 tests passed; strict TypeScript passed separately
 node --test apps/editor/tests/undo-lifetime.test.ts apps/editor/tests/document-history95.test.ts apps/editor/tests/recovery-record.test.ts
 17 tests passed
 node --test apps/editor/tests/shortcut-audit.test.ts apps/editor/tests/hangul-shortcuts.test.ts apps/editor/tests/navigation.test.ts
@@ -145,6 +151,9 @@ B071 Edge 검수에서는 차트 시나리오의 page 오류·console 오류·�
 - `08c02ce5 test(editor): add fail closed preference startup diagnostics`
 - `b014e627 test(editor): model native dialog activation safety`
 - `3eedb6e5 test(editor): add safe Windows file preflight`
+- `d419acd3 feat(editor): gate preference startup activation`
+- `06d5af57 feat(editor): coordinate safe native dialog activation`
+- `1d5ce959 feat(editor): coordinate fail-safe Windows atomic saves`
 - `f9524b4f test(editor): define undo history lifetime policy`
 - `2bd2c75b feat(editor): preserve portable style references`
 - `4ea193ce feat(editor): delete verified page hide controls`

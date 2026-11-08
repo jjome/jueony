@@ -795,11 +795,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: stable 8개 설정 키의 scope·재실행·reset·dirty/undo·backup/validator 계약과 read-only 시작 진단의 missing/valid/corrupt/unsupported-version/read-error·fail-closed 분류
-- 다음 작업: 시작 진단 8/8과 strict TypeScript 검사를 통과했다. 정책 모듈만 있으며 실제 앱 시작점·설정 저장소 통합과 실제 한글/Windows/origin/DPI 수명 실측은 남아 부분이다.
+- 완료 범위: stable 8개 설정 키의 read-only diagnostic을 typed startup gate로 연결해 missing은 memory-only default로 두고 corrupt/future/read-error는 키별 차단하며 scope와 backup projection만 허용
+- 다음 작업: 진단·gate 13/13과 strict TypeScript 검사를 통과했다. 실제 app shell 시작점과 memory activation 구현·설정 저장소 통합 및 실제 한글/Windows/origin/DPI 수명 실측은 남아 부분이다.
 - 상위 항목: [B151](<12-ui-and-shortcuts.md#b151>) 환경 설정
 - 근거: [25-hangul-parity-and-state-plan.md](<../25-hangul-parity-and-state-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;PREFERENCE_LIFETIME_AUDIT_2026_11_08;PREFERENCE_STARTUP_DIAGNOSTIC_2026_11_09`
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;PREFERENCE_LIFETIME_AUDIT_2026_11_08;PREFERENCE_STARTUP_DIAGNOSTIC_2026_11_09;PREFERENCE_STARTUP_GATE_2026_11_09`
 
 </details>
 

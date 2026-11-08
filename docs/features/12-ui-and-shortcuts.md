@@ -21,7 +21,7 @@
 ## 먼저 할 일
 
 - **구현** [N019](<12-ui-and-shortcuts.md#n019>) **한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교** — 정적 메뉴·리본·빠른 도구·본문/표/개체 문맥 메뉴의 command reachability를 감사해 미등록·동일 위치 중복 0건을 확인했다. 실제 placeholder insert:comment·insert:para-band 2건을 안정 ID로 기록했고 선별 15/15를 통과했다. 동적 disabled 조건·두 placeholder 구현·한글 비교는 남아 부분이다.
-- **구현** [N020](<12-ui-and-shortcuts.md#n020>) **한글 대화상자 활성화 오류 재현·해결** — 정책 검사 8/8과 strict TypeScript 검사를 통과했다. 실제 host/Computer Use의 관찰 수집·실행 경로에는 미연결이며 실제 한글 대화상자 재검증도 남아 부분이다. OS 보호 우회와 무한 재시도는 허용하지 않는다.
+- **구현** [N020](<12-ui-and-shortcuts.md#n020>) **한글 대화상자 활성화 오류 재현·해결** — 정책·coordinator 19/19와 strict TypeScript 검사를 통과했다. 실제 host/Computer Use 관찰·실행 경로와 실제 한글 대화상자 검증은 미연결·미실행이라 부분이다. OS 보호 우회와 SendKeys fallback·무한 재시도는 없다.
 - **구현** [N021](<12-ui-and-shortcuts.md#n021>) **본문/표/특수 영역 전체 단축키 매트릭스** — 177개 binding 감사·명시적 문맥 우선순위·Ctrl+- 글자 스타일 해제를 구현했다. 쪽 번호는 PageNumberPos 원자 API가 없어 pending이다. 스크립트 매크로도 dispatcher 성공 이벤트·IME/선택 기록·revision preflight·단일 undo/rollback 계약이 없어 pending이며 기존 AI 명령 매크로와 구분한다. 셀/특수 story·혼합 run·한글 비교도 남아 부분이다.
 
 ## 기능별 작업표
@@ -661,11 +661,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: modal owner·foreground·일반/상승 권한·세션·stale capture/input binding을 fail-closed 분류하고 재선택을 1회로 제한하는 순수 정책
-- 다음 작업: 정책 검사 8/8과 strict TypeScript 검사를 통과했다. 실제 host/Computer Use의 관찰 수집·실행 경로에는 미연결이며 실제 한글 대화상자 재검증도 남아 부분이다. OS 보호 우회와 무한 재시도는 허용하지 않는다.
+- 완료 범위: capture/foreground/modal owner/session/integrity/input binding 증거 수집에서 정책 판정·최대 1회 refresh·activate·post-activation 증거 재검증·semantic input까지 순서화하고 모든 drift와 권한 실패를 입력 전에 fail-closed
+- 다음 작업: 정책·coordinator 19/19와 strict TypeScript 검사를 통과했다. 실제 host/Computer Use 관찰·실행 경로와 실제 한글 대화상자 검증은 미연결·미실행이라 부분이다. OS 보호 우회와 SendKeys fallback·무한 재시도는 없다.
 - 상위 항목: [B098](<07-formatting-and-styles.md#b098>) 스타일
 - 근거: [39-native-dialog-investigation.md](<../39-native-dialog-investigation.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;NATIVE_DIALOG_ACTIVATION_POLICY_2026_11_09`
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;NATIVE_DIALOG_ACTIVATION_POLICY_2026_11_09;NATIVE_DIALOG_ACTIVATION_COORDINATOR_2026_11_09`
 
 </details>
 

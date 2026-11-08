@@ -21,7 +21,7 @@
 | N041 | 자체 생성한 본문·명시 글꼴, 2쪽 경계·용지, 표·셀, 내장 PNG, 본문 누름틀의 5종 manifest를 HWP/HWPX 입력 10개로 만들고 open→같은 형식 save→reopen; production preservation evidence·published layout 0.2 허용치·기능 최소조건·입력 SHA 불변을 fail-closed 검사 | custom Rust/WASM `source-c932adab64d8bc4e`에서 10/10·manifest 계약/위조 거절 3/3·구문/diff 검사 통과 | **부분 유지:** 같은 엔진의 합성 문서 기술 검수이며 실제 한글 2024 화면·인쇄·복구 경고, 기관 실문서·공개 문서 코퍼스 독립 비교는 미실행 |
 | N042 | 같은 글꼴·DPI·용지와 실제 page definition을 봉인한 published layout baseline에서 쪽 수·텍스트 재조판·개체 위치 차이를 분류하고 교차 생산자·글꼴 SHA-256이 없으면 차단 | 계약 4/4·2쪽 표/그림/필드 복합 HWP/HWPX baseline 2/2 | **부분 유지:** Jueony 엔진 baseline일 뿐 실제 한글 2024·PDF raster·인쇄 드라이버·실제 글꼴 바이너리 비교는 미실행 |
 | N043 | preflight→temp write/flush→final probe/revalidate→atomic compare-replace/readback coordinator와 race replace 0회·실패 cleanup·committed 후 `save-state-uncertain`/reopen 분류 | 정책·coordinator 15/15·strict TypeScript 통과 | **부분 유지:** 실제 Windows picker·ACL·identity 수집과 Rust/Tauri host 원자 교체/readback·실파일 Windows 검증 미연결 |
-| N044 | 별도 v1 checkpoint의 source identity/revision/bytes hash·generation/token/CAS와 not-committed 보존·committed readback 이상 state-uncertain·exact clean-close delete·corrupt/future/foreign 무변경 계약 | 정책·coordinator 24/24·strict TypeScript 통과 | **부분 유지:** 실제 IndexedDB/Tauri host·비정상 종료 실파일 복구·Windows 검증 미연결 |
+| N044 | 별도 v1 checkpoint 정책·coordinator와 IndexedDB CAS adapter: source identity/revision/bytes hash·generation/token/CAS, not-committed 보존, committed readback 이상 state-uncertain, exact clean-close delete, corrupt/future/foreign 무변경 | 정책·coordinator 24/24·IndexedDB adapter 19/19·모듈 경계 검사 통과 | **부분 유지:** 실제 앱 boot/close host 주입·실제 browser blocked/versionchange 수명 검수·Tauri/비정상 종료 실파일 복구·Windows 검증 미연결 |
 | N045 | 로컬 WASM·런타임·폰트·third-party notices·hash·기관 endpoint allowlist와 외부 URL을 fail-closed 감사 | 계약 4/4; 실제 격리 dist에서 CDN 글꼴 URL 269개를 검출해 `FAIL_OFFLINE_BUNDLE` | **부분 유지·배포 차단:** CDN 글꼴 로컬화·WebView2 포함 최종 설치본·기관 allowlist 확정·고지 합본 검수 필요 |
 | N005 | 보이지 않는 0길이 이웃 ClickHere의 셀 분할 이동을 앱·Rust에서 차단하고 guide-only 0길이 필드는 유지 | HWP/HWPX 저장·재열기 2/2·관련 회귀 32/32 | 겹친 필드·개체 혼합 셀·캡션 내부 필드·한글 비교 |
 | N011 추가 | 문단 테두리 동작 플래그 `borderConnect`·`borderIgnoreMargin`의 portable style 교환·전체 롤백 | HWP/HWPX 가져오기→저장→재열기 2/2 | TabDef·실제 BorderFill·배경·간격·UI·한글 비교 |
@@ -32,7 +32,7 @@
 | N022 | 설치 한글 저장 증거 기준 Ctrl+F7 양쪽 여백 증가·Ctrl+F8 감소와 공개 표 차이 감사 | 문단 여백·IME·navigation 회귀 37/37·TypeScript compile | 공개 표와 설치본 차이의 근본 원인·한글 재비교 |
 | N006 | 1문단·단일 글자 서식의 위/아래 중첩 표 캡션을 경로·원문·revision·보존 상태 재검증 후 교체 | HWP/HWPX 저장·재열기·undo와 음성 사례 3/3·회귀 4/4 | 빈/여러 문단·혼합 서식·좌우 캡션·필드·책갈피·개체·UI |
 | N013 추가 | 프로필·항목·slot 계획·문서 style ID를 고정한 순수 preview와 snapshot apply controller | HWP/HWPX 저장·재열기·stale/충돌/중간 실패 복구 포함 9/9 | 전역 단축키 설정 저장·실제 UI·Agent·한글 비교 |
-| N019 | 메뉴·리본·빠른 도구·문맥 메뉴의 정적 command reachability·중복·placeholder 감사 | N019 5/5·N021/N022 포함 15/15·TypeScript compile | `insert:comment`·`insert:para-band` placeholder·동적 disabled 정책·한글 비교 |
+| N019 | 메뉴·리본·빠른 도구·문맥 메뉴의 정적 reachability 감사와 `insert:comment`·`insert:para-band` native API/durable model/atomic history/HWP·HWPX 재열기 증거의 fail-closed capability gate | 신규 gate 5/5·기존 N019 감사 5/5·strict TypeScript 통과 | **부분 유지:** 실제 native API·durable model·undo/HWP·HWPX adapter와 Studio CommandDispatcher 연결·동적 disabled 정책·한글 비교 |
 | N006 추가 | 최대 32문단의 위/아래 중첩 표 캡션에서 명시한 문단 하나를 경로·원문·revision·전체 문단 서식 재검증 후 교체 | HWP/HWPX 저장·재열기·undo 포함 5/5·회귀 4/4 | 빈 문단·혼합 글자 서식·좌우 캡션·필드·책갈피·개체 |
 | N013 추가 | preview 증거를 재검증하는 원자적 번호키 설정 저장·손상/상위 버전/쓰기 후 실패 복구 | 저장 adapter 5/5·TypeScript compile | 실제 UI와 keymap 소비·Agent·한글 비교 |
 | N021 추가 | Ctrl+-로 일반 본문 단일 문단·단일 char-run의 직접 서식을 문단 스타일 정의로 복원 | HWP/HWPX 저장·재열기·undo/redo 포함 14/14·TypeScript compile | 쪽 번호·매크로 pending·셀/특수 story·혼합 run·한글 비교 |
@@ -87,6 +87,12 @@ node --experimental-strip-types --test apps/editor/tests/undo-lifetime.test.ts a
 12 tests passed; strict TypeScript passed separately
 node --experimental-strip-types --test apps/editor/tests/recovery-checkpoint-transaction-n044.test.ts
 24 tests passed; strict TypeScript passed separately
+node --experimental-strip-types --test apps/editor/tests/indexeddb-recovery-checkpoint-n044.test.ts
+19 tests passed; module boundary audit passed separately
+JUEONY_ENGINE_PACKAGE=build/rhwp-engine/source-4843b7d7aa6cc842/pkg npm test -- tests/insert-placeholder-capability-n019.test.ts
+5 tests passed; actual HWP/HWPX export/reopen remained unchanged
+npm test -- tests/menu-reachability-audit.test.ts
+5 existing N019 audit tests passed; strict TypeScript for the capability source passed separately
 node --test apps/editor/tests/shortcut-audit.test.ts apps/editor/tests/hangul-shortcuts.test.ts apps/editor/tests/navigation.test.ts
 34 tests passed
 node --test apps/editor/tests/character-style-reference.test.ts apps/editor/tests/style-flow.test.ts
@@ -161,6 +167,8 @@ B071 Edge 검수에서는 차트 시나리오의 page 오류·console 오류·�
 - `1d5ce959 feat(editor): coordinate fail-safe Windows atomic saves`
 - `e3637581 feat(editor): coordinate undo lifecycle boundaries`
 - `9f2be03a feat(editor): coordinate verified recovery checkpoints`
+- `e5bacd63 feat(editor): add durable recovery checkpoint storage`
+- `6769bcb0 feat(editor): fail closed unsupported insert placeholders`
 - `f9524b4f test(editor): define undo history lifetime policy`
 - `2bd2c75b feat(editor): preserve portable style references`
 - `4ea193ce feat(editor): delete verified page hide controls`

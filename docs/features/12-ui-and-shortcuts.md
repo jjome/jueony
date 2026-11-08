@@ -20,7 +20,7 @@
 
 ## 먼저 할 일
 
-- **구현** [N019](<12-ui-and-shortcuts.md#n019>) **한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교** — 정적 메뉴·리본·빠른 도구·본문/표/개체 문맥 메뉴의 command reachability를 감사해 미등록·동일 위치 중복 0건을 확인했다. 실제 placeholder insert:comment·insert:para-band 2건을 안정 ID로 기록했고 선별 15/15를 통과했다. 동적 disabled 조건·두 placeholder 구현·한글 비교는 남아 부분이다.
+- **구현** [N019](<12-ui-and-shortcuts.md#n019>) **한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교** — 정적 command reachability 감사에 더해 insert:comment·insert:para-band가 현재 Rust/WASM native mutation API를 갖지 않음을 확인하고 native API→durable model→atomic undo/redo→HWP/HWPX 재열기 증거를 요구하는 fail-closed capability gate를 추가했다. 신규 gate 5/5와 기존 N019 감사 5/5를 통과했으며 API 선언만으로 enabled/success를 노출하지 않는다. 실제 native API·durable model·undo/HWP·HWPX adapter와 Studio CommandDispatcher 연결·한글 비교는 남아 부분이다.
 - **구현** [N020](<12-ui-and-shortcuts.md#n020>) **한글 대화상자 활성화 오류 재현·해결** — 정책·coordinator 19/19와 strict TypeScript 검사를 통과했다. 실제 host/Computer Use 관찰·실행 경로와 실제 한글 대화상자 검증은 미연결·미실행이라 부분이다. OS 보호 우회와 SendKeys fallback·무한 재시도는 없다.
 - **구현** [N021](<12-ui-and-shortcuts.md#n021>) **본문/표/특수 영역 전체 단축키 매트릭스** — 177개 binding 감사·명시적 문맥 우선순위·Ctrl+- 글자 스타일 해제를 구현했다. 쪽 번호는 PageNumberPos 원자 API가 없어 pending이다. 스크립트 매크로도 dispatcher 성공 이벤트·IME/선택 기록·revision preflight·단일 undo/rollback 계약이 없어 pending이며 기존 AI 명령 매크로와 구분한다. 셀/특수 story·혼합 run·한글 비교도 남아 부분이다.
 
@@ -648,10 +648,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 하위 dialog/표·개체·특수 영역·disabled 조건까지
-- 다음 작업: 정적 메뉴·리본·빠른 도구·본문/표/개체 문맥 메뉴의 command reachability를 감사해 미등록·동일 위치 중복 0건을 확인했다. 실제 placeholder insert:comment·insert:para-band 2건을 안정 ID로 기록했고 선별 15/15를 통과했다. 동적 disabled 조건·두 placeholder 구현·한글 비교는 남아 부분이다.
+- 다음 작업: 정적 command reachability 감사에 더해 insert:comment·insert:para-band가 현재 Rust/WASM native mutation API를 갖지 않음을 확인하고 native API→durable model→atomic undo/redo→HWP/HWPX 재열기 증거를 요구하는 fail-closed capability gate를 추가했다. 신규 gate 5/5와 기존 N019 감사 5/5를 통과했으며 API 선언만으로 enabled/success를 노출하지 않는다. 실제 native API·durable model·undo/HWP·HWPX adapter와 Studio CommandDispatcher 연결·한글 비교는 남아 부분이다.
 - 상위 항목: [B054](<12-ui-and-shortcuts.md#b054>) 기본 도구 상자
-- 근거: [25-hangul-parity-and-state-plan.md](<../25-hangul-parity-and-state-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;STATIC_MENU_REACHABILITY_2026_11_08`
+- 근거: [25-hangul-parity-and-state-plan.md](<../25-hangul-parity-and-state-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [insert-placeholder-capability-n019.ts](<../../apps/editor/src/shortcuts/insert-placeholder-capability-n019.ts>) · [insert-placeholder-capability-n019.test.ts](<../../apps/editor/tests/insert-placeholder-capability-n019.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;STATIC_MENU_REACHABILITY_2026_11_08;INSERT_PLACEHOLDER_CAPABILITY_GATE_2026_11_09`
 
 </details>
 

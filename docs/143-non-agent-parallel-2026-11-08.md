@@ -13,7 +13,7 @@
 | N016 | root-body 미주의 owner·note locator·3중 지문·Unicode 커서/방향성 선택·각주 분리와 SessionCursor·Studio callback 연결 | root 선택 8/8·실제 WASM HWP/HWPX 4/4·격리 build 671 modules·TypeScript 통과 | **부분 유지:** 실제 앱 재시작·한글 직접 비교·중첩/표/도형 note·필드/삽입 개체 |
 | N017 | read-only diagnostic을 typed startup gate로 연결하고 missing은 memory-only default로 두며 corrupt/future/read-error를 키별 차단·scope/backup projection | 진단·gate 13/13·strict TypeScript 통과 | **부분 유지:** 실제 app shell 시작점·memory activation 구현·설정 저장소 통합·실제 Windows/한글 실측 미연결 |
 | N020 | 증거 수집→정책→최대 1회 refresh→activate→post evidence 재검증→semantic input의 fail-closed coordinator | 정책·coordinator 19/19·strict TypeScript 통과 | **부분 유지:** 실제 host/Computer Use 관찰·실행 경로 미연결·실제 한글 대화상자 재검증 미실행 |
-| N018 | live atomic recipe의 프로세스/문서/버전/bytes/history top 결합·저장 실패 유지·검증된 rebase·재열기/복구/명명 이력/재시작 초기화 | 신규 5/5·문서 이력/복구 선별 포함 17/17 | 실제 InputHandler·save/recovery 연결·수동 편집·저장 frame·프로세스 재시작·한글 기준 |
+| N018 | live 관찰→continuity·정확한 top recipe retain·verified save rebase와 reload/recovery/named history/document swap/process restart/manual edit/top mismatch reset·port 실패 state-uncertain coordinator | 정책·coordinator 12/12·strict TypeScript 통과 | **부분 유지:** 실제 InputHandler/history port와 process restart·실제 앱 수명 통합 미연결 |
 | N004 | 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset 일치·가운데 정렬 재조판·실패 시 exact rollback | HWP/HWPX 네이티브 저장·재열기·undo/redo·4개 fault rollback 및 Edge 실제 편집→bound-save→UI 재열기 | 임의 필드 경계·중첩 셀·복합 개체·한글 비교 |
 | N012 | 저장 글자 스타일과 직접 서식 타입 분리·독립 charShape 소유·정의 변경 전파·중복/stale/race fail-closed; Studio 패치는 style ID가 아니라 캡처·검증한 stored character-style reference를 적용 경계에 전달 | 실제 Rust HWP/HWPX 3/3·앱 경계/범위/patch 보호 합계 8/8·격리 build 663 modules·해당 프로필 TypeScript 검사 통과 | **부분 유지:** 실제 UI 동작 검수·Agent 연결·한글 비교 |
 | N021 | 177개 단축키 감사·object > cells > table > document 우선순위·IME/repeat/도달성 회귀 보호 | 단축키 감사·기존 한글 단축키·navigation 34/34·TypeScript compile | pending 3건·머리말/각주/미주/글상자 story 정책·한글 비교 |
@@ -21,6 +21,7 @@
 | N041 | 자체 생성한 본문·명시 글꼴, 2쪽 경계·용지, 표·셀, 내장 PNG, 본문 누름틀의 5종 manifest를 HWP/HWPX 입력 10개로 만들고 open→같은 형식 save→reopen; production preservation evidence·published layout 0.2 허용치·기능 최소조건·입력 SHA 불변을 fail-closed 검사 | custom Rust/WASM `source-c932adab64d8bc4e`에서 10/10·manifest 계약/위조 거절 3/3·구문/diff 검사 통과 | **부분 유지:** 같은 엔진의 합성 문서 기술 검수이며 실제 한글 2024 화면·인쇄·복구 경고, 기관 실문서·공개 문서 코퍼스 독립 비교는 미실행 |
 | N042 | 같은 글꼴·DPI·용지와 실제 page definition을 봉인한 published layout baseline에서 쪽 수·텍스트 재조판·개체 위치 차이를 분류하고 교차 생산자·글꼴 SHA-256이 없으면 차단 | 계약 4/4·2쪽 표/그림/필드 복합 HWP/HWPX baseline 2/2 | **부분 유지:** Jueony 엔진 baseline일 뿐 실제 한글 2024·PDF raster·인쇄 드라이버·실제 글꼴 바이너리 비교는 미실행 |
 | N043 | preflight→temp write/flush→final probe/revalidate→atomic compare-replace/readback coordinator와 race replace 0회·실패 cleanup·committed 후 `save-state-uncertain`/reopen 분류 | 정책·coordinator 15/15·strict TypeScript 통과 | **부분 유지:** 실제 Windows picker·ACL·identity 수집과 Rust/Tauri host 원자 교체/readback·실파일 Windows 검증 미연결 |
+| N044 | 별도 v1 checkpoint의 source identity/revision/bytes hash·generation/token/CAS와 not-committed 보존·committed readback 이상 state-uncertain·exact clean-close delete·corrupt/future/foreign 무변경 계약 | 정책·coordinator 24/24·strict TypeScript 통과 | **부분 유지:** 실제 IndexedDB/Tauri host·비정상 종료 실파일 복구·Windows 검증 미연결 |
 | N045 | 로컬 WASM·런타임·폰트·third-party notices·hash·기관 endpoint allowlist와 외부 URL을 fail-closed 감사 | 계약 4/4; 실제 격리 dist에서 CDN 글꼴 URL 269개를 검출해 `FAIL_OFFLINE_BUNDLE` | **부분 유지·배포 차단:** CDN 글꼴 로컬화·WebView2 포함 최종 설치본·기관 allowlist 확정·고지 합본 검수 필요 |
 | N005 | 보이지 않는 0길이 이웃 ClickHere의 셀 분할 이동을 앱·Rust에서 차단하고 guide-only 0길이 필드는 유지 | HWP/HWPX 저장·재열기 2/2·관련 회귀 32/32 | 겹친 필드·개체 혼합 셀·캡션 내부 필드·한글 비교 |
 | N011 추가 | 문단 테두리 동작 플래그 `borderConnect`·`borderIgnoreMargin`의 portable style 교환·전체 롤백 | HWP/HWPX 가져오기→저장→재열기 2/2 | TabDef·실제 BorderFill·배경·간격·UI·한글 비교 |
@@ -82,6 +83,10 @@ node --experimental-strip-types --test apps/editor/tests/windows-file-preflight-
 15 tests passed; strict TypeScript passed separately
 node --test apps/editor/tests/undo-lifetime.test.ts apps/editor/tests/document-history95.test.ts apps/editor/tests/recovery-record.test.ts
 17 tests passed
+node --experimental-strip-types --test apps/editor/tests/undo-lifetime.test.ts apps/editor/tests/undo-lifecycle-coordinator-n018.test.ts
+12 tests passed; strict TypeScript passed separately
+node --experimental-strip-types --test apps/editor/tests/recovery-checkpoint-transaction-n044.test.ts
+24 tests passed; strict TypeScript passed separately
 node --test apps/editor/tests/shortcut-audit.test.ts apps/editor/tests/hangul-shortcuts.test.ts apps/editor/tests/navigation.test.ts
 34 tests passed
 node --test apps/editor/tests/character-style-reference.test.ts apps/editor/tests/style-flow.test.ts
@@ -154,6 +159,8 @@ B071 Edge 검수에서는 차트 시나리오의 page 오류·console 오류·�
 - `d419acd3 feat(editor): gate preference startup activation`
 - `06d5af57 feat(editor): coordinate safe native dialog activation`
 - `1d5ce959 feat(editor): coordinate fail-safe Windows atomic saves`
+- `e3637581 feat(editor): coordinate undo lifecycle boundaries`
+- `9f2be03a feat(editor): coordinate verified recovery checkpoints`
 - `f9524b4f test(editor): define undo history lifetime policy`
 - `2bd2c75b feat(editor): preserve portable style references`
 - `4ea193ce feat(editor): delete verified page hide controls`

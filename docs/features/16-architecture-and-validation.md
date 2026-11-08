@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | 완료 7/25 · 부분 18 | — 상위 범위 없음 |
-| 검증 | 완료 7/25 · 부분 17 · 미검증 1 | — 상위 범위 없음 |
+| 검증 | 완료 7/25 · 부분 18 | — 상위 범위 없음 |
 | Agent 연결 | 해당 없음 25 | — 상위 범위 없음 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -81,7 +81,7 @@
 | [N041](<16-architecture-and-validation.md#n041>) · 작업 | 독립 한글에서 복합 코퍼스 일괄 검수 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 | [N042](<16-architecture-and-validation.md#n042>) · 작업 | 한글·Jueony 인쇄/PDF 조판 비교 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 | [N043](<16-architecture-and-validation.md#n043>) · 작업 | 실제 Windows 파일 picker·권한·외부 수정 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [N044](<16-architecture-and-validation.md#n044>) · 작업 | 비정상 종료·저장 실패·복구 통합 | ◐ 부분 | ☐ 미검증 | — 해당 없음 |
+| [N044](<16-architecture-and-validation.md#n044>) · 작업 | 비정상 종료·저장 실패·복구 통합 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 | [N045](<16-architecture-and-validation.md#n045>) · 작업 | 기관 배포용 완전 오프라인 자산/허용 서버 정책 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 
 ## 항목별 완료조건·근거
@@ -408,13 +408,13 @@
 <summary>N044 · 비정상 종료·저장 실패·복구 통합</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: disk full·권한·손상·부분 write·원본/복구본 유지
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 별도 v1 checkpoint record에 source identity/revision/bytes hash와 generation/token/CAS를 봉인하고 not-committed만 보존을 주장하며 committed readback 이상은 state-uncertain으로 분류하고 exact clean-close만 삭제하며 corrupt/future/foreign record에는 write/delete하지 않음
+- 다음 작업: checkpoint 정책·coordinator 24/24와 strict TypeScript 검사를 통과했다. 실제 IndexedDB/Tauri host와 비정상 종료 실파일 복구 통합·Windows 검증은 미연결·미실행이라 부분이다.
 - 상위 항목: [B010](<05-files-storage-recovery.md#b010>) 저장
-- 근거: [37-basic-editing-state-result.md](<../37-basic-editing-state-result.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [37-basic-editing-state-result.md](<../37-basic-editing-state-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;RECOVERY_CHECKPOINT_TRANSACTION_2026_11_09`
 
 </details>
 

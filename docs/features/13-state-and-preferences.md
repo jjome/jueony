@@ -809,11 +809,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
-- 완료 범위: live atomic recipe를 processEpoch·documentInstance·revision·bytesSha256·historyTop으로 결합; 저장 실패/검증된 rebase와 reload/recovery/named-history/restart 초기화 계약
-- 다음 작업: 정책·반례·기존 문서 이력/복구 경계 검사를 완료함. 실제 InputHandler history·save/recovery 초기화 연결·수동 편집·저장 frame absorption·프로세스 재시작·한글 기준은 남음.
+- 완료 범위: live 관찰의 continuity와 정확한 top recipe retain·verified save rebase를 검사하고 reload/recovery/named history/document swap/process restart/manual edit/top mismatch에는 reset하며 port 실패를 state-uncertain으로 분류
+- 다음 작업: 정책·coordinator 12/12와 strict TypeScript 검사를 통과했다. 실제 InputHandler/history port와 process restart 통합·실제 앱 수명 검증은 미연결이라 부분이다.
 - 상위 항목: [S029](<13-state-and-preferences.md#s029>) 일반 undo/redo
 - 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;UNDO_LIFETIME_POLICY_2026_11_08`
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;UNDO_LIFETIME_POLICY_2026_11_08;UNDO_LIFECYCLE_COORDINATOR_2026_11_09`
 
 </details>
 

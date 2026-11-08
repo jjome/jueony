@@ -20,9 +20,9 @@
 
 ## 먼저 할 일
 
-- **구현** [N014](<13-state-and-preferences.md#n014>) **글상자 내부 커서·선택 복원** — HWP/HWPX 저장·재열기에서 0~359° 정수 회전 글상자의 커서·정/역방향 선택과 stale 복원 차단을 검증함. 그룹·중첩·캡션·뒤집기·비-Rectangle·Edge 신규 빌드·한글 비교는 남음.
+- **구현** [N014](<13-state-and-preferences.md#n014>) **글상자 내부 커서·선택 복원** — 선별 검사 27 pass·환경 의존 2 skip과 strict source TypeScript 검사를 통과했다. 그룹·중첩·캡션·비-Rectangle·실제 앱 재시작·한글 비교는 남아 부분이다.
 - **구현** [N015](<13-state-and-preferences.md#n015>) **다중 개체·그룹 선택 복원** — 선택 검증 28/28과 embedded 다중 이미지 HWP/HWPX 저장·재열기·byte invariant를 통과했다. equation/OLE/table·nested/caption/locked/linked image와 실제 앱 재시작·한글 비교는 남아 부분이다.
-- **구현** [N016](<13-state-and-preferences.md#n016>) **미주·나머지 특수 영역 선택 복원** — root 선택 8/8·실제 WASM HWP/HWPX 저장·재열기 4/4·격리 build 671 modules·해당 프로필 TypeScript 검사를 통과했다. 실제 앱 재시작·한글 직접 비교와 중첩/표/도형 note owner·필드/삽입 개체 선택 복원은 남아 부분이다.
+- **구현** [N016](<13-state-and-preferences.md#n016>) **미주·나머지 특수 영역 선택 복원** — 기존 root 선택 8/8·실제 WASM HWP/HWPX 4/4에 더해 table-cell engine 검사 3/3을 통과했다. nested owner 복원과 실제 앱 재시작·한글 직접 비교·필드/삽입 개체 선택 복원은 지원으로 표시하지 않고 남긴다.
 
 ## 기능별 작업표
 
@@ -753,11 +753,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
-- 완료 범위: 단일 root Rectangle의 문단 경로·전체 story 문맥 hash·정역 회전각·원본·포커스
-- 다음 작업: HWP/HWPX 저장·재열기에서 0~359° 정수 회전 글상자의 커서·정/역방향 선택과 stale 복원 차단을 검증함. 그룹·중첩·캡션·뒤집기·비-Rectangle·Edge 신규 빌드·한글 비교는 남음.
+- 완료 범위: commit 54c91718 기준 단일 root Rectangle의 0~359° 정수 회전과 명시 boolean horz/vert flip을 포함한 logical textbox story 커서·정/역방향 선택 복원·flip/회전 변경 stale 차단
+- 다음 작업: 선별 검사 27 pass·환경 의존 2 skip과 strict source TypeScript 검사를 통과했다. 그룹·중첩·캡션·비-Rectangle·실제 앱 재시작·한글 비교는 남아 부분이다.
 - 상위 항목: [S018](<13-state-and-preferences.md#s018>) 본문/표/개체 선택과 모드
-- 근거: [103-textbox-state-and-storage.md](<../103-textbox-state-and-storage.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;ROTATED_RECTANGLE_STATE_2026_11_08`
+- 근거: [103-textbox-state-and-storage.md](<../103-textbox-state-and-storage.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [session-textbox.ts](<../../apps/editor/src/adapters/rhwp/session-textbox.ts>) · [session-textbox.test.ts](<../../apps/editor/tests/session-textbox.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;ROTATED_RECTANGLE_STATE_2026_11_08;FLIPPED_TEXTBOX_STATE_2026_11_09`
 
 </details>
 
@@ -781,11 +781,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
-- 완료 범위: root-body 미주의 exact owner·note locator·owner/story/locator 3중 지문·Unicode 커서/방향성 선택·각주 분리·stale/위조 차단과 SessionCursor/Studio capture·restore callback 연결
-- 다음 작업: root 선택 8/8·실제 WASM HWP/HWPX 저장·재열기 4/4·격리 build 671 modules·해당 프로필 TypeScript 검사를 통과했다. 실제 앱 재시작·한글 직접 비교와 중첩/표/도형 note owner·필드/삽입 개체 선택 복원은 남아 부분이다.
+- 완료 범위: commit 99d903c2 기준 root-body 복원 계약에 custom Rust engine의 table-cell 미주 owner 지문·저장 bytes 불변 HWP/HWPX save/reopen 증거를 추가하고 nested·shape owner는 root-only story/layout/Studio 주소와 shape kind ambiguity 때문에 fail-closed
+- 다음 작업: 기존 root 선택 8/8·실제 WASM HWP/HWPX 4/4에 더해 table-cell engine 검사 3/3을 통과했다. nested owner 복원과 실제 앱 재시작·한글 직접 비교·필드/삽입 개체 선택 복원은 지원으로 표시하지 않고 남긴다.
 - 상위 항목: [S018](<13-state-and-preferences.md#s018>) 본문/표/개체 선택과 모드
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;DETACHED_ENDNOTE_SELECTION_2026_11_08;ENDNOTE_SELECTION_SESSION_WIRE_2026_11_09`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [session-endnote-owner-capability-n016.ts](<../../apps/editor/src/adapters/rhwp/session-endnote-owner-capability-n016.ts>) · [session-endnote-owner-capability-n016.test.ts](<../../apps/editor/tests/session-endnote-owner-capability-n016.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;DETACHED_ENDNOTE_SELECTION_2026_11_08;ENDNOTE_SELECTION_SESSION_WIRE_2026_11_09;TABLE_CELL_ENDNOTE_CAPABILITY_2026_11_09`
 
 </details>
 
@@ -809,11 +809,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
-- 완료 범위: live 관찰→continuity 정책과 atomic history port capability gate를 연결해 정확한 top recipe retain·verified save rebase만 허용하고 reload/recovery/named history/document swap/process restart/manual edit/top mismatch에는 원자 reset하며 bridge 실패를 state-uncertain으로 분류
-- 다음 작업: N017/N018/N044 통합 선별 검사 59/59와 strict TypeScript·모듈 경계 455 files diagnostics 0을 통과했다. upstream InputHandler atomic bridge와 실제 runtime/process restart 통합은 남아 부분이다.
+- 완료 범위: commit b7923dde 기준 실제 upstream EventBus의 document-mutated·history-jumped·document-swapped callback을 continuity 정책과 capability gate에 연결하고 bridge 부족·callback 실패는 state-uncertain으로 차단
+- 다음 작업: 선별 검사 26/26·strict TypeScript·모듈 경계 diagnostics 0을 통과했다. public InputHandler에 exact top recipe·atomic state·compare-apply reset/rebase가 없어 성공을 주장하지 않으며 실제 runtime/process restart 통합도 남아 부분이다.
 - 상위 항목: [S029](<13-state-and-preferences.md#s029>) 일반 undo/redo
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [undo-history-port-n018.ts](<../../apps/editor/src/adapters/rhwp/undo-history-port-n018.ts>) · [undo-history-port-n018.test.ts](<../../apps/editor/tests/undo-history-port-n018.test.ts>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;UNDO_LIFETIME_POLICY_2026_11_08;UNDO_LIFECYCLE_COORDINATOR_2026_11_09;ATOMIC_UNDO_HISTORY_PORT_2026_11_09`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [undo-history-port-n018.ts](<../../apps/editor/src/adapters/rhwp/undo-history-port-n018.ts>) · [undo-history-port-n018.test.ts](<../../apps/editor/tests/undo-history-port-n018.test.ts>) · [input-handler-undo-callback-n018.ts](<../../apps/editor/src/adapters/rhwp/input-handler-undo-callback-n018.ts>) · [input-handler-undo-callback-n018.test.ts](<../../apps/editor/tests/input-handler-undo-callback-n018.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;UNDO_LIFETIME_POLICY_2026_11_08;UNDO_LIFECYCLE_COORDINATOR_2026_11_09;ATOMIC_UNDO_HISTORY_PORT_2026_11_09;UPSTREAM_UNDO_CALLBACK_2026_11_09`
 
 </details>
 

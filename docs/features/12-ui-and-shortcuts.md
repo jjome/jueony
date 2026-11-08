@@ -689,11 +689,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: visualViewport CSS 좌표의 메뉴 경계 clamp·아래 공간 부족 시 상단 flip·resize/scroll 재배치·devicePixelRatio 이중 적용 방지
-- 다음 작업: 순수 배치와 기존 메뉴 회귀 7/7·격리 build 665 modules·해당 프로필 TypeScript 검사를 통과했다. 실제 Windows 125/150/200%·다중 모니터·좌표/선택/보기 전체 수명·한글 비교는 남아 부분이다.
+- 완료 범위: commit 0e48110b 기준 visualViewport CSS 좌표의 실제 통합 메뉴 DOM 경계 clamp·상단 flip·resize/scroll 재배치·devicePixelRatio 이중 적용 방지를 Edge 157에서 검사
+- 다음 작업: 실제 Edge 157에서 DPR 1.25/1.5/2.0·narrow·resize·visualViewport scroll·pageScale 1.5의 6 scenarios가 통과했고 page/console/external/missing 오류는 0이었다. 실제 Windows OS DPI·다중 모니터·native 좌표·한글 비교는 미검증이라 부분을 유지한다.
 - 상위 항목: [B061](<12-ui-and-shortcuts.md#b061>) 문서 탭·상황선·눈금자
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;VISUAL_VIEWPORT_MENU_PLACEMENT_2026_11_09`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [viewport-placement-browser-n023.html](<../../apps/editor/scripts/fixtures/viewport-placement-browser-n023.html>) · [viewport-placement-browser-n023.ts](<../../apps/editor/scripts/fixtures/viewport-placement-browser-n023.ts>) · [verify-viewport-placement-browser-n023.mjs](<../../apps/editor/scripts/verify-viewport-placement-browser-n023.mjs>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;VISUAL_VIEWPORT_MENU_PLACEMENT_2026_11_09;EDGE_VIEWPORT_PLACEMENT_2026_11_09`
 
 </details>
 

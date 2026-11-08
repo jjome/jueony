@@ -32,6 +32,14 @@ export async function createRepeatedTitlePictures(HwpDocument,folder){
 }
 
 export const crossingTitleText='가나다라마바사아자차😀카타파하가나다라마';
+export const titleRowOriginalText='항목0😀';
+export async function createTitleRowPictures(HwpDocument,folder){
+ const d=await createRepeatedTitlePictures(HwpDocument,folder);
+ // Require a real Canvas publication in Edge; the Hangul-only source has no
+ // supplementary-cluster metric requests and legitimately stays portable.
+ d.insertTextInCell(0,1,0,0,0,d.getCellParagraphLength(0,1,0,0,0),'😀');
+ return d;
+}
 export async function createCrossingTitlePictures(HwpDocument,folder){
  const d=await createRepeatedTitlePictures(HwpDocument,folder),base=[0,1,0];
  d.deleteTextInCell(...base,0,0,0,d.getCellParagraphLength(...base,0,0));

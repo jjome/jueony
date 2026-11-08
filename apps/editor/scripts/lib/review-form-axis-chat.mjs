@@ -2,7 +2,7 @@ import http from 'node:http';
 import assert from 'node:assert/strict';
 import {readFile,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
-import {crossingTitleText,expectedPictureHeading} from './repeated-picture-heading.mjs';
+import {crossingTitleText,titleRowOriginalText,expectedPictureHeading} from './repeated-picture-heading.mjs';
 import {inspectPictureAnchors} from './axis-picture-fixture.mjs';
 
 const insertRequest='첫 번째 양식 표의 결재란 바로 위에 새 행을 넣어 주세요.';
@@ -156,6 +156,7 @@ export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,
         return {cells:table.cells.filter(c=>c.row<t.headerRows).map(c=>[c.row,c.col,c.rowSpan,c.colSpan]),
          labels:t.cells.filter(c=>c.row<t.headerRows).map(c=>Array.from({length:d.getCellParagraphCount(0,1,0,c.index)},(_,p)=>
           runs.filter(r=>r.cellPath?.[0]?.cellIndex===c.index&&r.cellParaIdx===p).map(r=>r.text).join(''))),
+         emoji:runs.flatMap(r=>Array.from(r.text).flatMap((c,i)=>c==='😀'?[r.charX[i+1]-r.charX[i]]:[])),
          images:controls.filter(c=>c.type==='image').length};
        });
        try{const screen=layout();d.selectCanvasMetrics(false);
@@ -170,8 +171,14 @@ export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,
       assert.deepEqual(v.cells,[...(inserted?[[0,0,true],[0,1,true],[0,2,true]]:[]),[h-1,0,true],[h-1,2,true],
        ...[h,h+1,h+2].flatMap(r=>[0,1,2].map(c=>[r,c,false]))]);
       const wanted=[2,3].map(images=>({images,cells:[...(inserted?[[0,0,1,1],[0,1,1,1],[0,2,1,1]]:[]),[h-1,0,1,2],[h-1,2,1,1]],
-       labels:[...(inserted?[['새 제목'],['분류'],['안내']]:[]),['항목0','항목1'],['PicA']]}));
-      assert.deepEqual(v.screen,wanted);assert.deepEqual(v.portable,wanted);measurements.push(v);
+       labels:[...(inserted?[['새 제목'],['분류'],['안내']]:[]),[titleRowOriginalText,'항목1'],['PicA']]}));
+      const withoutMetrics=pages=>pages.map(({emoji,...p})=>p);
+      assert.deepEqual(withoutMetrics(v.screen),wanted);assert.deepEqual(withoutMetrics(v.portable),wanted);
+      for(let page=0;page<2;page++){
+       assert.equal(v.screen[page].emoji.length,1);assert.equal(v.portable[page].emoji.length,1);
+       assert.ok(Math.abs(v.screen[page].emoji[0]-v.portable[page].emoji[0])>.2);
+      }
+      measurements.push(v);
      };
      await verify(false);
      for(const [index,request] of titleRowRequests.slice(0,2).entries()){

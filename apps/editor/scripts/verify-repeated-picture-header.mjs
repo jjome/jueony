@@ -3,7 +3,7 @@ import {execFileSync} from 'node:child_process';
 import {mkdir,readFile,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {createAxisPictureFixture,inspectPictureAnchors} from './lib/axis-picture-fixture.mjs';
-import {createRepeatedTitlePictures,createCrossingTitlePictures,crossingTitleText,expectedPictureHeading} from './lib/repeated-picture-heading.mjs';
+import {createRepeatedTitlePictures,createTitleRowPictures,titleRowOriginalText,createCrossingTitlePictures,crossingTitleText,expectedPictureHeading} from './lib/repeated-picture-heading.mjs';
 import {loadReviewEngine} from './lib/hancom-review.mjs';
 import {readStructure} from '../src/adapters/rhwp/structure.ts';
 import {executeDocumentOperations} from '../src/adapters/rhwp/execute.ts';
@@ -41,7 +41,7 @@ function layout(d){
  });
 }
 if(process.argv.includes('--title-rows')){
- const fixture=await createRepeatedTitlePictures(HwpDocument,out),results=[];
+ const fixture=await createTitleRowPictures(HwpDocument,out),results=[];
  const operation=insert=>({kind:insert?'insert_table_row':'delete_table_row',target:'s0p1t0',index:0,
   ...(insert?{values:['새 제목','분류','안내']}: {})});
  const verify=(d,inserted)=>{
@@ -54,7 +54,7 @@ if(process.argv.includes('--title-rows')){
   assert.equal(JSON.parse(d.getControls()).filter(c=>c.ctrlId==='gso').length,4);
   assert.equal(t.cells.filter(c=>c.axisPicture).length,4);assert.equal(d.pageCount(),2);
   const wanted=[...(inserted?[[0,0,1,['새 제목']],[0,1,1,['분류']],[0,2,1,['안내']]]:[]),
-   [h-1,0,2,['항목0','항목1']],[h-1,2,1,['PicA']]];
+   [h-1,0,2,[titleRowOriginalText,'항목1']],[h-1,2,1,['PicA']]];
   for(let page=0;page<2;page++){
    const controls=JSON.parse(d.getPageControlLayout(page)).controls,table=controls.find(c=>c.type==='table');
    assert.deepEqual(table.cells.filter(c=>c.row<h).map(c=>[c.row,c.col,c.colSpan]),wanted.map(c=>c.slice(0,3)));

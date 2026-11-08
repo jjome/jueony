@@ -20,8 +20,8 @@
 
 ## 먼저 할 일
 
-- **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — 채워진 누름틀과 그림이 함께 있는 문단의 조회된 일반 글을 편집하며 필드ID·범위·서식·그림슬롯을 보존한다. +2자 슬롯 이동과 실제Canvas 끝부분 편집·원복·양형식 저장재열기를 검증했다. 필드 내부·미조회 경계·빈/그림포함 필드·복합개체는 남았다.
-- **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — 최대7단계 인라인 중첩 표·하위셀1000개를 첫칸에 보존한다. 위·오른쪽 일반글 캡션의 원문·혼합서식·경계·겹침을 화면/저장용 배치로 검증하고 양형식 채팅·저장재열기를 확인했다. 필드·개체 혼합 캡션과 복합셀 분할은 남았다.
+- **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — 필드 앞·사이 글의 +3자/+4UTF16 및 -2자 이동은 8pt 한줄 원본에서 양형식 네이티브 검사를 통과했다. 10pt 두줄 변경은 줄끝 커서 오류로 실패했다. 로컬 수정안의 새줄 x검증 보강·재빌드·저장재열기·Edge 검수가 남았다. 필드경계·복합개체도 부분이다.
+- **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — 최대7단계 중첩표·일반글캡션·말단셀의 채워진 ClickHere를 첫칸에 보존한다. HWP 원본하위트리 레코드와 HWPX XML을 정확히 대조하고 실제Canvas 채팅·저장재열기를 확인했다. 빈/겹친필드·개체혼합캡션·일반복합셀 분할은 남았다.
 - **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 캡션의 전체 조상 경로·구역과 빈문단·한글·이모지 커서 조회를 수정했다. 캡션이 부모 셀 bbox로 잘못 잡히는 결함도 해결하고 양 형식 재열기를 확인했다. 캡션 직접 텍스트 변경·필드·개체·복합 구역은 남았다.
 
 ## 기능별 작업표
@@ -941,9 +941,9 @@
 
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
-- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: 임의 여러 문단/병합 원본 읽기와 원문·서식 보존
-- 다음 작업: 채워진 누름틀과 그림이 함께 있는 문단의 조회된 일반 글을 편집하며 필드ID·범위·서식·그림슬롯을 보존한다. +2자 슬롯 이동과 실제Canvas 끝부분 편집·원복·양형식 저장재열기를 검증했다. 필드 내부·미조회 경계·빈/그림포함 필드·복합개체는 남았다.
+- 다음 작업: 필드 앞·사이 글의 +3자/+4UTF16 및 -2자 이동은 8pt 한줄 원본에서 양형식 네이티브 검사를 통과했다. 10pt 두줄 변경은 줄끝 커서 오류로 실패했다. 로컬 수정안의 새줄 x검증 보강·재빌드·저장재열기·Edge 검수가 남았다. 필드경계·복합개체도 부분이다.
 - 상위 항목: [B161](<08-tables.md#b161>) 셀 병합
 - Agent 명령: `replace_cell_paragraph`
 - 근거: [101-agent-merged-cell-paragraph.md](<../101-agent-merged-cell-paragraph.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
@@ -958,7 +958,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 새 격자·행/열 참조 이관과 셀 내용 분배 명세
-- 다음 작업: 최대7단계 인라인 중첩 표·하위셀1000개를 첫칸에 보존한다. 위·오른쪽 일반글 캡션의 원문·혼합서식·경계·겹침을 화면/저장용 배치로 검증하고 양형식 채팅·저장재열기를 확인했다. 필드·개체 혼합 캡션과 복합셀 분할은 남았다.
+- 다음 작업: 최대7단계 중첩표·일반글캡션·말단셀의 채워진 ClickHere를 첫칸에 보존한다. HWP 원본하위트리 레코드와 HWPX XML을 정확히 대조하고 실제Canvas 채팅·저장재열기를 확인했다. 빈/겹친필드·개체혼합캡션·일반복합셀 분할은 남았다.
 - 상위 항목: [B160](<08-tables.md#b160>) 셀 분할
 - Agent 명령: `split_table_cell_into`
 - 근거: [102-agent-cell-subdivision.md](<../102-agent-cell-subdivision.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
@@ -988,7 +988,7 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
 - 완료 범위: span 교차·주 셀 제거·neighbor 영향·실패 원복
-- 다음 작업: 반복그림제목의 일반글 병합셀을 가로지르는 열 삽입삭제 후 실제Canvas 제목2→1→2줄·원본그림4개/표시5개·양형식 저장재열기를 검증했다. 제목행 자체 변경·그림소유 크기/범위변경/삭제·쪽에서 잘린 그림셀·부동/회전/캡션그림은 남았다.
+- 다음 작업: 반복그림제목의 병합열 변경과 안전한 제목행 삽입삭제를 지원한다. 실제Canvas 제목행1→2→1·원본그림4개/표시5개와 양형식 저장재열기를 검증했다. 마지막제목/본문·제목span교차·그림/필드/병합주셀삭제·잘린/부동/회전/캡션그림은 남았다.
 - 상위 항목: [B158](<08-tables.md#b158>) 행·열 추가
 - Agent 명령: `insert_table_row,delete_table_row,insert_table_column,delete_table_column`
 - 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)

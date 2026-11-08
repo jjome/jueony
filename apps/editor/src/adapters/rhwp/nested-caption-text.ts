@@ -13,8 +13,9 @@ export type NestedCaptionTextEdit={target:string;revision:string;paragraph:numbe
 
 const fail=()=>Error('중첩 표 캡션의 경로·원문·revision 또는 단일 글자 서식을 확인하지 못했습니다.');
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
-const validText=(text:unknown):text is string=>typeof text==='string'&&Array.from(text).length>0&&
-  Array.from(text).length<=4000&&!Array.from(text).some(c=>{const n=c.codePointAt(0)!;return n<32||n===127;});
+const safeText=(text:unknown):text is string=>typeof text==='string'&&Array.from(text).length<=4000&&
+  !Array.from(text).some(c=>{const n=c.codePointAt(0)!;return n<32||n===127;});
+const validText=(text:unknown):text is string=>safeText(text)&&Array.from(text).length>0;
 const captionPath=(table:NestedTable,paragraph:number):PathStep[]=>[...table.ancestors,
   {controlIndex:table.control,cellIndex:65534,cellParaIndex:paragraph}];
 
@@ -25,7 +26,9 @@ function source(doc:any,structure:Structure,table:NestedTable,revision:string):E
   if(!['Top','Bottom'].includes(value?.direction)||!Array.isArray(values)||!values.length||values.length>32||
       !captions.drawing||!captions.portableDrawing)throw fail();
   const paragraphs:ParagraphSource[]=values.map((paragraph:any,index:number)=>{
-    if(!validText(paragraph?.text)||!Array.isArray(paragraph.runs)||paragraph.runs.length!==1||
+    const existingSingleBlank=values.length===1&&paragraph?.text==='';
+    if((!validText(paragraph?.text)&&!existingSingleBlank)||!safeText(paragraph?.text)||
+        !Array.isArray(paragraph.runs)||paragraph.runs.length!==1||
         paragraph.runs[0]?.start_pos!==0||!Number.isSafeInteger(paragraph.paragraphShape)||
         !Number.isSafeInteger(paragraph.style)||!Number.isSafeInteger(paragraph.runs[0]?.char_shape_id))throw fail();
     const path=captionPath(table,index),encoded=JSON.stringify(path),length=doc.getCellParagraphLengthByPath(table.section,table.paragraph,encoded);
@@ -39,7 +42,7 @@ function source(doc:any,structure:Structure,table:NestedTable,revision:string):E
 
 export function readNestedCaptionTextSources(doc:any,structure:Structure,revision:string):Record<string,NestedCaptionTextSource>{
   return Object.fromEntries((structure.nestedTables??[]).map(table=>{try{return [table.id,source(doc,structure,table,revision)];}
-    catch{return [table.id,{editable:false,target:table.id,reason:'비어 있지 않은 한 문단·단일 글자 서식의 위/아래 중첩 표 캡션만 직접 바꿀 수 있습니다.'}];}}));
+    catch{return [table.id,{editable:false,target:table.id,reason:'검증된 위/아래 중첩 표 캡션만 직접 바꿀 수 있습니다. 빈 캡션은 기존 단일 빈 문단만 채울 수 있습니다.'}];}}));
 }
 
 function checked(value:unknown){if(parsed(value)?.ok!==true)throw fail();}
@@ -82,7 +85,7 @@ export function replaceNestedCaptionText(doc:any,structure:Structure,expected:Ne
   const before=preservation(doc),token=doc.saveSnapshot(),encoded=JSON.stringify(currentParagraph.path);
   try{
     const length=Array.from(edit.originalText).length;
-    checked(doc.deleteTextInCellByPath(current.section,current.paragraph,encoded,0,length));
+    if(length>0)checked(doc.deleteTextInCellByPath(current.section,current.paragraph,encoded,0,length));
     checked(doc.insertTextInCellByPath(current.section,current.paragraph,encoded,0,edit.text));
     const afterSource=readNestedCaptionTextSources(doc,structure,edit.revision)[edit.target],after=preservation(doc);
     const afterParagraph=afterSource?.editable?afterSource.paragraphs[edit.paragraph]:undefined;

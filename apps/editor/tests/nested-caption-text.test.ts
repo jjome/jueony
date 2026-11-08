@@ -6,6 +6,7 @@ import {fileURLToPath,pathToFileURL} from 'node:url';
 import {readStructure} from '../src/adapters/rhwp/structure.ts';
 import {readNestedCaptionTextSources,replaceNestedCaptionText} from '../src/adapters/rhwp/nested-caption-text.ts';
 import {captionedSubdivisionNestedTable} from '../scripts/lib/subdivision-caption-fixture.mjs';
+import {labeledSubdivisionNestedTable} from '../scripts/lib/subdivision-nested-table.mjs';
 import {readOwnedZip,writeOwnedZip} from '../scripts/lib/owned-zip.mjs';
 
 const pkg=process.env.JUEONY_ENGINE_PACKAGE??fileURLToPath(new URL('../node_modules/@rhwp/core/',import.meta.url));
@@ -66,6 +67,52 @@ for(const format of ['hwp','hwpx'])test(format+' changes one verified paragraph 
       doc.restoreSnapshot(token);assert.deepEqual(bytes(doc,format),original);
     }finally{doc.discardSnapshot(token);}
   }finally{doc.free();}
+});
+
+for(const format of ['hwp','hwpx'])test(format+' fills one existing verified blank caption paragraph and reopens it',()=>{
+  const fixture=uniformCaption(['']),doc=new HwpDocument(bytes(fixture,format));fixture.free();
+  try{
+    const original=bytes(doc,format),{structure,source}=editable(doc),paragraph=source.paragraphs[0],token=doc.saveSnapshot();
+    assert.equal(paragraph.originalText,'');
+    const last=paragraph.path.at(-1)!;
+    assert.ok(Number.isSafeInteger(last.controlIndex));assert.equal(last.cellIndex,65534);assert.equal(last.cellParaIndex,0);
+    assert.ok(Number.isSafeInteger(paragraph.paragraphShape));
+    assert.ok(Number.isSafeInteger(paragraph.style));
+    assert.ok(Number.isSafeInteger(paragraph.charShape));
+    const encoded=JSON.stringify(paragraph.path);
+    assert.equal(doc.getCellParagraphLengthByPath(source.section,source.paragraph,encoded),0);
+    assert.equal(doc.getTextInCellByPath(source.section,source.paragraph,encoded,0,0),'');
+    try{
+      replaceNestedCaptionText(doc,structure,source,{target:source.target,revision:source.revision,paragraph:0,
+        path:paragraph.path,originalText:'',text:'새 캡션'});
+      const reopened=new HwpDocument(bytes(doc,format));
+      try{
+        const next=readNestedCaptionTextSources(reopened,readStructure(reopened),'r2')[source.target];
+        assert.ok(next?.editable);assert.equal(next.paragraphs[0].originalText,'새 캡션');
+        assert.deepEqual(next.paragraphs[0].path,paragraph.path);
+        assert.equal(next.paragraphs[0].paragraphShape,paragraph.paragraphShape);
+        assert.equal(next.paragraphs[0].style,paragraph.style);
+        assert.equal(next.paragraphs[0].charShape,paragraph.charShape);
+      }finally{reopened.free();}
+      doc.restoreSnapshot(token);assert.deepEqual(bytes(doc,format),original);
+    }finally{doc.discardSnapshot(token);}
+  }finally{doc.free();}
+});
+
+test('missing captions and multiple blank caption paragraphs remain fail closed',()=>{
+  const missing=labeledSubdivisionNestedTable(HwpDocument,'접수 제목',4400),missingBytes=missing.exportHwpx();
+  try{
+    const sources=readNestedCaptionTextSources(missing,readStructure(missing),'r1');
+    assert.equal(Object.values(sources).some(value=>value.editable),false);
+    assert.deepEqual(missing.exportHwpx(),missingBytes);
+  }finally{missing.free();}
+  for(const format of ['hwp','hwpx'])for(const paragraphs of [['',''],['','둘째 문단']]){
+    const fixture=uniformCaption(paragraphs),doc=new HwpDocument(bytes(fixture,format));fixture.free();
+    try{
+      const sources=readNestedCaptionTextSources(doc,readStructure(doc),'r1');
+      assert.equal(Object.values(sources).some(value=>value.editable),false);
+    }finally{doc.free();}
+  }
 });
 
 test('stale revision, path, original, empty text and mixed or complex captions fail closed',()=>{

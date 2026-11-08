@@ -20,6 +20,7 @@ import { installSnippets } from '../adapters/rhwp/snippets.ts';
 import { deleteBodyByShortcut, isBodyNavigationContext, navigateBody } from './body-navigation.ts';
 import { installCharacterCycles } from './character-cycle.ts';
 import { installClearCharacterStyle } from '../adapters/rhwp/clear-character-style.ts';
+import {resolveShortcutAtInputBoundaryN021} from './special-story-context-n021.ts';
 
 export function installHangulKeys({ automation, registry, input, eventBus }: { automation: any; registry: any; input: () => any; eventBus: any }) {
   const resolver = new HangulKeyResolver();
@@ -117,12 +118,12 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
     if ((c.inTable || c.inCellSelectionMode) && event.key === 'Tab' && event.shiftKey && !event.ctrlKey && !event.altKey) { resolver.reset(); return; }
     if (event.isComposing || ih?.isComposing || event.keyCode === 229) {
       if (event.ctrlKey || event.altKey) {
-        const candidate = resolver.resolve({ key: event.key, code: event.code, ctrlKey: event.ctrlKey, altKey: event.altKey, shiftKey: event.shiftKey, metaKey: event.metaKey, repeat: event.repeat, isComposing: false }, { table: c.inTable || c.inCellSelectionMode, cells: c.inCellSelectionMode, object: c.inPictureObjectSelection || c.inTableObjectSelection });
+        const candidate = resolveShortcutAtInputBoundaryN021(resolver, { key: event.key, code: event.code, ctrlKey: event.ctrlKey, altKey: event.altKey, shiftKey: event.shiftKey, metaKey: event.metaKey, repeat: event.repeat, isComposing: false }, c, ih);
         if (candidate.handled && !candidate.binding?.nativeClipboard) { event.preventDefault(); event.stopImmediatePropagation(); hint('한글 조합을 마친 뒤 단축키를 다시 사용하세요.'); }
       }
       resolver.reset(); return;
     }
-    const result = resolver.resolve(event, { table: c.inTable || c.inCellSelectionMode, cells: c.inCellSelectionMode, object: c.inPictureObjectSelection || c.inTableObjectSelection });
+    const result = resolveShortcutAtInputBoundaryN021(resolver, event, c, ih);
     if (!result.handled) return;
     // Trusted native clipboard events carry HWP/HTML/text data and OS consent.
     if (result.binding?.nativeClipboard) return;

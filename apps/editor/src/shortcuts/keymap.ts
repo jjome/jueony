@@ -3,6 +3,7 @@
  * Do not assign a browser workaround to a different Hangul command's key.
  */
 import { defaultStyleNames } from './style-slots.ts';
+import type {ShortcutStoryContextN021} from './special-story-context-n021.ts';
 export type Scope = 'document' | 'table' | 'cells' | 'object';
 export type Binding = { keys: string; command: string; label: string; scope: Scope; params?: Record<string, unknown>; nativeClipboard?: boolean; repeatable?: boolean };
 const repeatableCommands = new Set([
@@ -121,7 +122,7 @@ export const hangulBindings: Binding[] = [
   binding('Ctrl+-', 'ext:jueony-clear-char-style', '글자 스타일 해제'),
 ];
 export type Key = Pick<KeyboardEvent, 'key' | 'code' | 'ctrlKey' | 'altKey' | 'shiftKey' | 'metaKey' | 'repeat' | 'isComposing'> & Partial<Pick<KeyboardEvent, 'getModifierState'>>;
-export type KeyContext = { table: boolean; cells: boolean; object: boolean };
+export type KeyContext = { table: boolean; cells: boolean; object: boolean; story?: ShortcutStoryContextN021 };
 /**
  * A restored or nested editor state can briefly expose more than one context
  * flag. Object selection is the most explicit target, followed by a cell
@@ -147,11 +148,14 @@ export class HangulKeyResolver {
       if (e.repeat) return { handled: true };
       const prefix = this.pending.prefix; this.reset();
       const key = stroke.replace(/^Ctrl\+/, '');
-      const found = this.find(prefix + ',' + key, ctx);
+      const sequence = prefix + ',' + key;
+      const found = this.find(sequence, ctx);
+      if (!found && this.documentFallbackBlocked(sequence, ctx)) return {handled: true, hint: this.storyHint(ctx)};
       return found ? { handled: true, binding: found } : { handled: true, hint: '이 연속키는 현재 지원하지 않습니다.' };
     }
     const found = this.find(stroke, ctx);
     if (found) return e.repeat && !found.repeatable ? { handled: true } : { handled: true, binding: found };
+    if (this.documentFallbackBlocked(stroke, ctx)) return {handled: true, hint: this.storyHint(ctx)};
     if ((e.ctrlKey || e.altKey) && hangulBindings.some(b => b.keys === stroke)) return { handled: true, hint: '현재 선택 문맥에서 사용할 수 없는 단축키입니다.' };
     if (hangulBindings.some(b => b.keys.startsWith(stroke + ','))) {
       this.pending = { prefix: stroke, until: now + 3000 };
@@ -160,11 +164,23 @@ export class HangulKeyResolver {
     return { handled: false };
   }
   private find(keys: string, ctx: KeyContext) {
-    const candidates = hangulBindings.filter(b => b.keys === keys && (b.scope === 'document' || ctx[b.scope]));
+    const documentAllowed = !ctx.story || ctx.story.kind === 'body';
+    const candidates = hangulBindings.filter(b => b.keys === keys && (
+      b.scope === 'document' ? documentAllowed || b.nativeClipboard === true : ctx[b.scope]
+    ));
     for (const scope of keyContextPriority) {
       const found = candidates.find(binding => binding.scope === scope);
       if (found) return found;
     }
     return undefined;
+  }
+  private documentFallbackBlocked(keys: string, ctx: KeyContext): boolean {
+    return Boolean(ctx.story && ctx.story.kind !== 'body'
+      && hangulBindings.some(binding => binding.keys === keys && binding.scope === 'document' && binding.nativeClipboard !== true));
+  }
+  private storyHint(ctx: KeyContext): string {
+    return ctx.story?.kind === 'unknown'
+      ? '편집 영역을 확인하지 못해 본문 단축키를 실행하지 않습니다.'
+      : '특수 편집 영역에서는 본문 단축키를 실행하지 않습니다.';
   }
 }

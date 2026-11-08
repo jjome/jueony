@@ -115,19 +115,16 @@ test('capture installation contains the IME 229 and AltGraph guards outside the 
   assert.match(source, /getModifierState\?\.\('AltGraph'\)/);
   assert.match(source, /!candidate\.binding\?\.nativeClipboard/);
   assert.match(source, /stopImmediatePropagation\(\)/);
+  assert.equal(source.match(/resolveShortcutAtInputBoundaryN021\(/g)?.length, 2);
+  assert.doesNotMatch(source, /resolver\.resolve\(/);
 });
 
-test('N021 exposes special-story context gaps without claiming feature completion', () => {
-  assert.deepEqual(effectiveSpecialScopes, ['table', 'cells', 'object']);
+test('N021 models special-story contexts without claiming story-specific command support', () => {
+  assert.deepEqual(effectiveSpecialScopes, ['table', 'cells', 'object', 'header-footer', 'footnote', 'endnote', 'textbox']);
   const gaps = auditRequiredContexts(effectiveSpecialScopes, [
     'table', 'cells', 'object', 'header-footer', 'footnote', 'endnote', 'textbox',
   ]);
-  assert.deepEqual(gaps.map(item => item.id), [
-    'N021-CONTEXT-MODEL-MISSING-header-footer',
-    'N021-CONTEXT-MODEL-MISSING-footnote',
-    'N021-CONTEXT-MODEL-MISSING-endnote',
-    'N021-CONTEXT-MODEL-MISSING-textbox',
-  ]);
+  assert.deepEqual(gaps, []);
 });
 
 test('registry reachability audit distinguishes pending reservations from missing commands', () => {

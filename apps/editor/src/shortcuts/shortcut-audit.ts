@@ -178,7 +178,15 @@ export function auditRequiredContexts(
   }));
 }
 
-export const effectiveSpecialScopes = [...specialScopes] as const;
+/** Contexts represented by the resolver/install boundary; this is not a claim
+ * that every story has story-specific commands. */
+export const effectiveSpecialScopes = [
+  ...specialScopes,
+  'header-footer',
+  'footnote',
+  'endnote',
+  'textbox',
+] as const;
 
 export type ParagraphSpacingShortcutExpectation = {
   keys: string;

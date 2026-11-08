@@ -239,12 +239,12 @@
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
-- 완료 범위: 단일 구역 root-body의 2~200개 일반 문단 선택을 여러 줄 plain text로 치환한다. 적용 직전 전체 본문 identity·원문·글자/문단 서식·revision·선택을 재검증하고 단일 snapshot으로 실패 rollback과 정확한 undo를 보호한다.
-- 다음 작업: 신규 어댑터와 기존 text-transform 회귀의 HWP/HWPX 저장·재열기·앞뒤 서식 보존·stale/부분 실패 불변을 9/9로 검증했다. UI/basic-text-commands에는 아직 연결하지 않았고 다구역·표/필드/책갈피/개체/특수 story, HTML/그림/HWP 조각과 한글 비교가 남아 PARTIAL을 유지한다.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 단일 구역 root-body의 2~200개 일반 문단 선택을 여러 줄 plain text로 치환한다. edit:paste-special이 identity·revision·선택을 봉인한 전용 command를 호출하며 snapshot 하나를 history resource로 소유해 execute·undo·redo·discard를 처리한다. 기존 한 문단 경로는 유지한다.
+- 다음 작업: 엔진 어댑터 HWP/HWPX 9/9에 더해 Studio 명령 연결 선별 7/7, 프로필 TypeScript 검사와 격리 build 664 modules를 통과했다. 표/필드/책갈피/개체/특수 story는 fail-closed다. 다구역·미지원 구조·HTML/그림/HWP 조각·실제 UI·한글 비교가 남아 PARTIAL을 유지한다.
 - UI 명령: `edit:paste-special`
 - 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [basic-text-browser.json](<../evidence/remaining-editor-2026-10-13/basic-text-browser.json>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `PARTIAL;MULTI_PARAGRAPH_PLAIN_TEXT_2026_11_09;HWP_HWPX_REOPEN_9_OF_9;UI_NOT_CONNECTED`
+- 원래 기록: `PARTIAL;MULTI_PARAGRAPH_PLAIN_TEXT_2026_11_09;HWP_HWPX_REOPEN_9_OF_9;PASTE_SPECIAL_STUDIO_COMMAND_7_OF_7;ISOLATED_BUILD_664;PROFILE_TYPESCRIPT_PASS`
 
 </details>
 

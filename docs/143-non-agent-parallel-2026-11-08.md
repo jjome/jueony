@@ -37,7 +37,7 @@
 | N021 조사 | 한글 스크립트 매크로와 기존 AI 명령 템플릿을 구분하고 Studio command/input recording 계약 부재 확인 | 단축키 회귀 11/11·코드 무변경 | dispatcher 성공 이벤트·IME/선택 기록·recordable capability·revision preflight·단일 undo/부분 실패 rollback·녹화 UI/저장 |
 | B046 | 앱 보기 설정 `pageOutline`·메뉴·상태바·탭 간 동기화와 page gap·canvas shadow를 단일 렌더 트랜잭션으로 토글 | HWP/HWPX 바이트 비변경·재열기·설정 backup·고정 upstream 통합 patch 11/11·격리 build·실제 Edge 메뉴/상태바/교차 탭 smoke | 빈 문서 stored-time 초기화 경고·한글 직접 비교 |
 | B025 / B027 | Studio 머리말·꼬리말 선택에서만 내부 JSON·plain text clipboard payload에 문서 identity·story owner·revision·selection·원문을 봉인하고 copy/cut/paste를 단일 snapshot으로 실행 | HWP/HWPX 저장·재열기·undo·실패 rollback·OS clipboard 실패/불일치 차단 포함 12/12·hfclipboard 격리 build 661 modules | 각주/미주 원자 API·RTF·그림·전체 OS clipboard 형식·한글 비교 |
-| B028 | 단일 구역 root-body의 2~200개 일반 문단 선택을 여러 줄 plain text로 치환하고 전체 본문 identity·원문·글자/문단 서식·revision·선택을 적용 직전 재검증; 단일 snapshot으로 실패 rollback·정확한 undo | 신규 다중 문단 어댑터 4/4와 기존 text-transform 회귀 5/5, 합계 9/9·HWP/HWPX 저장·재열기·앞뒤 서식 보존·부분 실패 바이트 불변·TypeScript compile | **부분 유지:** UI/basic-text-commands 미연결·다구역·표/필드/책갈피/개체/특수 story·HTML/그림/HWP 조각·한글 비교 |
+| B028 | 단일 구역 root-body의 2~200개 일반 문단 선택을 여러 줄 plain text로 치환하고 edit:paste-special에서 identity·revision·선택을 봉인한 전용 command로 분기; snapshot 하나를 history resource로 소유해 execute·undo·redo·discard, 기존 한 문단 경로 유지 | 엔진 HWP/HWPX 9/9·Studio 연결 선별 7/7·프로필 TypeScript 통과·격리 build 664 modules; 원문/서식 보존·stale/부분 실패 rollback, 표/필드/책갈피/개체/특수 story fail-closed | **부분 유지:** 다구역·미지원 구조·HTML/그림/HWP 조각·실제 UI·한글 비교 |
 | B071 | 기존 category/scatter 차트의 단일 숫자 cache 값·동일 차트의 2~128개 숫자 값 원자 일괄 변경·단일 계열 이름·단일 범주명을 revision·원문·구조 재검증과 dry-run 뒤 교체하고 Studio 제목줄의 차트 데이터 창에서 단일 명령 실행 | 일괄 adapter 13/13·기존 Studio 명령 14/14·격리 build 663 modules·실제 Edge HWP/HWPX 단일 값 편집→저장 바이트→UI 재열기·유형/축/범례/수식/unknown OOXML/비차트 자산 보존 | **부분 유지:** 실제 UI 다중 선택·여러 차트·복합 label·수식 자체 변경·up/down bars·Agent 연결·한글 비교 |
 | N013 추가 | 저장된 Ctrl+1~Ctrl+0 slot만 기존 스타일 적용 명령으로 연결하고 IME·대화상자·표/개체/특수 story와 stale 설정을 차단; 설정 UI에서 표시·해제·초기화 | 통합 patch 보호·HWP/HWPX 저장·재열기·undo·stale 불변 3/3·격리 build·실제 Edge 설정창/단축키 smoke | 빈 문서 stored-time 초기화 경고·portable package UI·Agent·한글 비교 |
 | 실행 기반 | 엔진 조건부 `DefaultTabSpacingDialog`가 없는 공식 npm build와 있는 custom-engine build를 구분하되 일반 Char/Para stale target 보호는 항상 유지 | patch seam 3/3·격리 전체 build 659 modules·N013/B046 marker·실제 Edge smoke 4건 확인 | 현재 공식 npm 엔진의 빈 문서 stored-time 초기화 경고 |
@@ -82,6 +82,10 @@ npm test -- tests/multi-paragraph-plain-text.test.ts tests/text-transform.test.t
 9 tests passed; HWP/HWPX reopen and exact snapshot undo passed
 npx tsc --noEmit --target ES2022 --module ESNext --moduleResolution Bundler --strict src/adapters/rhwp/multi-paragraph-plain-text.ts
 passed
+npm test -- tests/multi-paragraph-paste-special-command.test.ts tests/multi-paragraph-plain-text.test.ts
+7 tests passed; Studio command routing, single snapshot execute/undo/redo/discard and single-paragraph regression passed
+JUEONY_BUILD_PROFILE=paste-special-multi npm run build
+664 modules transformed; isolated build and profile TypeScript passed
 node apps/editor/scripts/verify-n013-b046-browser-smoke.mjs
 4 Edge smoke scenarios passed; pageErrors/consoleErrors/externalRequests 0
 ```

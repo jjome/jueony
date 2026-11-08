@@ -1,0 +1,51 @@
+diff --git a/src/document_core/commands/table_ops.rs b/src/document_core/commands/table_ops.rs
+--- a/src/document_core/commands/table_ops.rs
++++ b/src/document_core/commands/table_ops.rs
+@@ -112,11 +112,23 @@
+         right: bool,
+     ) -> Result<String, HwpError> {
+         let table = self.get_table_mut(section_idx, parent_para_idx, control_idx)?;
++        let at = col_idx.saturating_add(u16::from(right));
++        let changed: Vec<_> = table.cells.iter()
++            .filter(|cell| cell.col < at && cell.col.saturating_add(cell.col_span) > at)
++            .map(|cell| (cell.row, cell.col, cell.width)).collect();
+         table
+             .insert_column(col_idx, right)
+             .map_err(|e| HwpError::RenderError(e))?;
+         let row_count = table.row_count;
+         let col_count = table.col_count;
++        // Only surviving merged owners whose width changed need new line segments.
++        // Resolve their post-sort indices; physical indices shift with new cells.
++        let reflow: Vec<_> = table.cells.iter().enumerate().filter_map(|(index, cell)| {
++            changed.iter().any(|&(row, col, width)|
++                cell.row == row && cell.col == col && cell.width != width)
++                .then_some((index, cell.paragraphs.len()))
++        }).collect();
++        self.reflow_table_cell_paragraphs(section_idx, parent_para_idx, control_idx, &reflow);
+ 
+         self.document.sections[section_idx].raw_stream = None;
+         self.recompose_section(section_idx);
+@@ -172,11 +184,23 @@
+         col_idx: u16,
+     ) -> Result<String, HwpError> {
+         let table = self.get_table_mut(section_idx, parent_para_idx, control_idx)?;
++        let changed: Vec<_> = table.cells.iter()
++            .filter(|cell| cell.col_span > 1 && cell.col <= col_idx
++                && cell.col.saturating_add(cell.col_span) > col_idx)
++            .map(|cell| (cell.row, cell.col, cell.width)).collect();
+         table
+             .delete_column(col_idx)
+             .map_err(|e| HwpError::RenderError(e))?;
+         let row_count = table.row_count;
+         let col_count = table.col_count;
++        // Only surviving merged owners whose width changed need new line segments.
++        // Resolve their post-sort indices; physical indices shift with new cells.
++        let reflow: Vec<_> = table.cells.iter().enumerate().filter_map(|(index, cell)| {
++            changed.iter().any(|&(row, col, width)|
++                cell.row == row && cell.col == col && cell.width != width)
++                .then_some((index, cell.paragraphs.len()))
++        }).collect();
++        self.reflow_table_cell_paragraphs(section_idx, parent_para_idx, control_idx, &reflow);
+ 
+         self.document.sections[section_idx].raw_stream = None;
+         self.recompose_section(section_idx);

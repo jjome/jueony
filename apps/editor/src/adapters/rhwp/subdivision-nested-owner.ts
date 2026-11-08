@@ -1,6 +1,7 @@
 import type {Table} from '../../modules/document/public/index.ts';
 import {parsed} from './structure.ts';
 import {sameTableLayout} from './table-layout-evidence.ts';
+import {subdivisionNestedCaptions} from './subdivision-nested-captions.ts';
 
 type CellPath={controlIndex:number;cellIndex:number;cellParaIndex:number}[];
 type NestedSubdivisionTable={listId:number;paragraph:number;path:CellPath};
@@ -101,7 +102,7 @@ function readInner(doc:any,t:Table,table:NestedSubdivisionTable,lists:any[]){
   return {paragraph,host,ancestors,page,dimensions,boxes,cells};
 }
 
-export function nestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisionOwner) {
+function readNestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisionOwner) {
   const at=[t.section,t.paragraph] as const,lists=parsed(doc.getCursorModel()).lists;
   const children=owner.tables.map(c=>readInner(doc,t,c,lists.filter((l:any)=>l.hostListId===c.listId && l.hostPara===c.paragraph)));
   const pages=doc.pageCount(),page=children[0]?.page;
@@ -134,7 +135,9 @@ export function nestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisio
   const outer=outerFrames[0],source=t.cells[owner.index],box=outer.cells.find((c:any)=>c.cellIdx===owner.index && c.row===source.row && c.col===source.column);
   if(!box || inner.some((frame:any)=>!inside(frame,box) ||
       outer.cells.some((c:any)=>c!==box && overlap(frame,c))))throw invalid();
-  const runs=parsed(doc.getPageTextLayout(page)).runs,innerRuns=runs.filter((r:any)=>r.cellPath?.length>1);
+  const runs=parsed(doc.getPageTextLayout(page)).runs;
+  const captions=subdivisionNestedCaptions(doc,t,children.map(c=>c.ancestors),page,runs);
+  const innerRuns=runs.filter((r:any)=>r.cellPath?.length>1 && r.cellPath.at(-1).cellIndex!==65534);
   const nested=children.map(child=>{
     const {paragraph,ancestors,dimensions,cells,boxes}=child;
     // The renderer publishes the local anchor paragraph and its full enclosing cell path.
@@ -204,5 +207,38 @@ export function nestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisio
     ownerLines.push(ink);
   }
   if(ownerParagraphs.some((p,i)=>offsets[i]!==Array.from(p.text).length))throw invalid();
-  return {page,pageCount:pages,nested,ownerParagraphs,ownerLines};
+  for(const caption of captions){
+    const parent=nested.find(p=>sameTableLayout(p.ancestors,caption.path.slice(0,-1)));
+    const parentCell=parent ? parent.boxes[caption.path.at(-1)!.cellIndex] : box;
+    if(caption.path.length>1 && !parent || !parentCell)throw invalid();
+    for(const line of caption.lines){
+      if(!inside(line,parentCell) || !inside(line,box) || typeof line.text!=='string' || !Array.isArray(line.charX) ||
+          line.charX.length!==Array.from(line.text).length+1 || Math.abs(line.charX[0])>0.2 ||
+          Math.abs(line.charX.at(-1)-line.w)>0.2 ||
+          line.charX.some((x:number,i:number)=>!Number.isFinite(x) || i>0 && x<line.charX[i-1] ||
+            line.x+x<parentCell.x-0.2 || line.x+x>parentCell.x+parentCell.w+0.2) ||
+          nested.some(other=>!(other.ancestors.length<caption.path.length &&
+            sameTableLayout(other.ancestors,caption.path.slice(0,other.ancestors.length))) && overlap(line,other.frame)) ||
+          [...ownerLines,...nested.flatMap(c=>c.lines)].some((r:any)=>r.text && overlap(line,r)) ||
+          captions.some(other=>other!==caption && other.lines.some((r:any)=>overlap(line,r))))
+        throw Error('안쪽 표 캡션의 글줄이 첫 칸 안에 겹치지 않고 들어가지 않습니다.');
+    }
+  }
+  return {page,pageCount:pages,nested,ownerParagraphs,ownerLines,captions};
+}
+
+export function nestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisionOwner) {
+  const live=readNestedSubdivisionEvidence(doc,t,owner);
+  if(!live.captions.length)return live;
+  // A side caption can fit with Canvas widths but overflow using file metrics.
+  // Prove the same parent bounds and non-overlap under both measurement modes.
+  if(doc.canvasMetricsActive?.()!==true)return {...live,portable:live};
+  try{
+    doc.selectCanvasMetrics(false);
+    if(doc.canvasMetricsActive()!==false)throw invalid();
+    return {...live,portable:readNestedSubdivisionEvidence(doc,t,owner)};
+  }finally{
+    doc.selectCanvasMetrics(true);
+    if(doc.canvasMetricsActive()!==true)throw invalid();
+  }
 }

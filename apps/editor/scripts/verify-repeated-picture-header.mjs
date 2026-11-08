@@ -3,11 +3,13 @@ import {execFileSync} from 'node:child_process';
 import {mkdir,readFile,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {createAxisPictureFixture,inspectPictureAnchors} from './lib/axis-picture-fixture.mjs';
-import {createRepeatedTitlePictures,expectedPictureHeading} from './lib/repeated-picture-heading.mjs';
+import {createRepeatedTitlePictures,createCrossingTitlePictures,crossingTitleText,expectedPictureHeading} from './lib/repeated-picture-heading.mjs';
 import {loadReviewEngine} from './lib/hancom-review.mjs';
 import {readStructure} from '../src/adapters/rhwp/structure.ts';
 import {executeDocumentOperations} from '../src/adapters/rhwp/execute.ts';
 import {validateEditOperations} from '../src/modules/document/public/index.ts';
+import {recordPublishedCanvasMetrics,subdivisionCopyMetrics} from '../src/adapters/rhwp/subdivision-canvas-metrics.ts';
+import {assertAxisTitleResult} from '../src/adapters/rhwp/axis-title-layout.ts';
 
 const {HwpDocument}=await loadReviewEngine(resolve(process.env.JUEONY_ENGINE_PACKAGE));
 const paragraphs=process.argv.includes('--paragraphs');
@@ -37,6 +39,76 @@ function layout(d){
   }
   return controls.filter(c=>c.type==='image').length;
  });
+}
+if(process.argv.includes('--crossing-title')){
+ const fixture=await createCrossingTitlePictures(HwpDocument,out),results=[];
+ const profile=d=>{
+  const q=JSON.parse(d.collectCanvasMetricRequests(3,4));
+  const replies=JSON.stringify(q.requests.map(r=>({...r,resolvedFont:r.font,measuredAdvancePx:18.3})));
+  d.registerCanvasMetricReplies(3,4,q.revision,replies);d.selectCanvasMetrics(true);
+  recordPublishedCanvasMetrics(d,{document:3,fonts:4},replies);
+  return {borrowDocumentHandle:()=>d,documentGeneration:3,canvasMetricFontGeneration:4};
+ };
+ const lines=(d,count,span,width)=>{
+  assert.equal(d.pageCount(),2);assert.equal(d.canvasMetricsActive(),true);
+  assert.equal(JSON.parse(d.getCellInfo(...base,0)).colSpan,span);
+  assert.equal(JSON.parse(d.getCellProperties(...base,0)).width,width);
+  assert.equal(JSON.parse(d.getControls()).filter(c=>c.ctrlId==='gso').length,4);
+  let images=0;
+  for(let page=0;page<2;page++){
+   const runs=JSON.parse(d.getPageTextLayout(page)).runs.filter(r=>r.parentParaIdx===1&&r.cellIdx===0&&r.cellParaIdx===0);
+   assert.equal(runs.map(r=>r.text).join(''),crossingTitleText);assert.equal(new Set(runs.map(r=>r.y)).size,count);
+   images+=JSON.parse(d.getPageControlLayout(page)).controls.filter(c=>c.type==='image').length;
+  }
+  assert.equal(images,5);
+ };
+ const operation=insert=>({kind:insert?'insert_table_column':'delete_table_column',target:'s0p1t0',index:1,...(insert?{values:['','','','']}: {})});
+ function command(d,format,wasm,insert,beforeRenderedCheck){
+  const snapshot={name:'제목.'+format,nodes:[],limitations:[],revision:'1',structure:readStructure(d)},op=operation(insert);
+  const metrics=subdivisionCopyMetrics(wasm,snapshot,[op]);
+  const token=d.saveSnapshot();
+  try{
+   executeDocumentOperations(d,snapshot,validateEditOperations([op],snapshot),metrics);
+   beforeRenderedCheck?.();assertAxisTitleResult(d,snapshot,op);return {snapshot,op};
+  }catch(error){d.restoreSnapshot(token);throw error;}finally{d.discardSnapshot(token);}
+ }
+ try{for(const format of ['hwp','hwpx']){
+  const d=new HwpDocument(bytes(fixture,format));let original;
+  try{
+   original=bytes(d,format);const beforeFile=resolve(out,'before.'+format);await writeFile(beforeFile,original);
+   const records=inspectPictureAnchors(beforeFile),wasm=profile(d);lines(d,2,2,13500);
+   for(const insert of [true,false]){
+    const before=bytes(d,format),undo=d.saveSnapshot();command(d,format,wasm,insert);
+    lines(d,insert?1:2,insert?3:2,insert?21000:13500);
+    const saved=bytes(d,format),file=resolve(out,(insert?'insert':'delete')+'.'+format);await writeFile(file,saved);
+    assert.deepEqual(inspectPictureAnchors(file),records.map(p=>({...p,col:p.col+(insert&&p.col>=1?1:0)})));
+    const copy=new HwpDocument(saved);try{profile(copy);lines(copy,insert?1:2,insert?3:2,insert?21000:13500);}finally{copy.free();}
+    const redo=d.saveSnapshot();d.restoreSnapshot(undo);assert.deepEqual(bytes(d,format),before);
+    d.restoreSnapshot(redo);assert.deepEqual(bytes(d,format),saved);d.discardSnapshot(undo);d.discardSnapshot(redo);
+   }
+  }finally{d.free();}
+  for(const fault of ['width','line','style','late line','metric generation']){
+   const d=new HwpDocument(original),wasm=profile(d);let wrote=false,rendered=false;
+   try{
+    const edit=d.insertTableColumn.bind(d);d.insertTableColumn=(...args)=>{const r=edit(...args);wrote=true;
+     if(fault==='width')d.setCellProperties(...base,0,'{"width":21075}');return r;};
+    if(fault==='line'||fault==='style'||fault==='late line'){
+     const read=d.getPageTextLayout.bind(d);d.getPageTextLayout=page=>{const value=JSON.parse(read(page));
+      if(wrote&&(fault!=='late line'||rendered))for(const r of value.runs)if(r.parentParaIdx===1&&r.cellIdx===0&&r.cellParaIdx===0){
+       if(fault==='style')r.bold=!r.bold;else r.y+=1;
+      }return JSON.stringify(value);};
+    }
+    const before=bytes(d,format);assert.throws(()=>command(d,format,wasm,true,()=>{
+     rendered=true;if(fault==='metric generation')wasm.canvasMetricFontGeneration++;
+    }),/제목|그림|측정|높이/);
+    assert.ok(wrote);assert.deepEqual(bytes(d,format),before);
+   }finally{d.free();}
+  }
+  results.push({format,lines:[2,1,2],spans:[2,3,2],widths:[13500,21000,13500],rollbackFaults:5,storedPictures:4,displayedPictures:5});
+  console.log('PASS',format,'crossing title column insert/delete, Canvas 2→1→2, native source/slots, save/reopen and five rollback faults');
+ }}finally{fixture.free();}
+ await writeFile(resolve(out,'result.json'),JSON.stringify({results,engine:JSON.parse(await readFile(resolve(process.env.JUEONY_ENGINE_PACKAGE,'jueony-engine-build.json'),'utf8'))},null,2));
+ process.exit(0);
 }
 if(process.argv.includes('--title-pictures')){
  const fixture=await createRepeatedTitlePictures(HwpDocument,out),results=[];

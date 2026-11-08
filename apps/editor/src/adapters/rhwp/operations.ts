@@ -1,6 +1,7 @@
 import {assertNativeTableNoCellZones} from './table-write-guard.ts';
 import {formulaInputTarget,refreshFormulaInput} from './table-formula-input.ts';
 import {mergedAxisProof} from './merged-axis-evidence.ts';
+import type {SubdivisionCopyMetrics} from './subdivision-canvas-metrics.ts';
 import {sameAxisPicture} from './axis-cell-picture.ts';
 import {prepareAxisFormulaUpdates} from './table-axis-formulas.ts';
 import {verifyPreservedExport} from './preservation.ts';
@@ -49,7 +50,7 @@ function replaceCellText(doc:any,base:number[],cell:number,value:string) {
  if(length)checked(doc.deleteTextInCell(...base,cell,0,0,length));
  if(value){checked(doc.insertTextInCell(...base,cell,0,0,value));checked(doc.setCharShapeIdInCell(...base,cell,0,0,doc.getCellParagraphLength(...base,cell,0),shape));}
 }
-export function executeControlOperation(wasm: any, snapshot: Snapshot, op: ControlOp, tables: Map<string, Table>): { section: number; after: number; count: number } | undefined {
+export function executeControlOperation(wasm: any, snapshot: Snapshot, op: ControlOp, tables: Map<string, Table>,copyMetrics?:SubdivisionCopyMetrics): { section: number; after: number; count: number } | undefined {
   const doc = nativeDocument(wasm);
   if(op.kind==='format_table_cells'&&(Object.hasOwn(op.properties,'equalizeRows')||Object.hasOwn(op.properties,'rowHeightMm'))){executeRowHeights(doc,snapshot,op);return;}
   if(op.kind==='format_table_cells'&&(Object.hasOwn(op.properties,'equalizeColumns')||Object.hasOwn(op.properties,'columnWidthMm'))){executeEqualColumns(doc,snapshot,op);return;}
@@ -98,7 +99,7 @@ export function executeControlOperation(wasm: any, snapshot: Snapshot, op: Contr
     if(!live)throw new Error('대상 표가 없어졌습니다.');
     const checkAxis=needsAxisProof(table)||needsAxisProof(live);
     if(checkAxis&&JSON.stringify(table.cells)!==JSON.stringify(live.cells))throw new Error('표의 병합 범위나 셀 내용이 바뀌었습니다. 다시 요청하세요.');
-    const proof=checkAxis?mergedAxisProof(doc,live,row,insert,axis.index,'values' in axis?axis.values:[]):undefined;
+    const proof=checkAxis?mergedAxisProof(doc,live,row,insert,axis.index,'values' in axis?axis.values:[],copyMetrics,snapshot.revision):undefined;
     const formulas=checkAxis?prepareAxisFormulaUpdates(doc,live,expected):undefined;
     const undo=proof?doc.saveSnapshot():undefined;
     try {

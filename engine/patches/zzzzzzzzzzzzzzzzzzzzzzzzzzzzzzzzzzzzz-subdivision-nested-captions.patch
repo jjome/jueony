@@ -1,0 +1,12 @@
+--- a/src/document_core/commands/table_ops/subdivision_grid.rs
++++ b/src/document_core/commands/table_ops/subdivision_grid.rs
+@@ -57,7 +57,8 @@
+         || inner.common.width == 0 || inner.common.height == 0
+         || !inner.common.treat_as_char || inner.common.allow_overlap
+         || inner.common.locked || inner.common.size_protect || inner.attr & (1 << 30) != 0
+-        || inner.caption.is_some() || inner.repeat_header || !inner.zones.is_empty()
++        || inner.caption.as_ref().is_some_and(|c| !DocumentCore::simple_nested_axis_caption(c))
++        || inner.repeat_header || !inner.zones.is_empty()
+         || inner.cells.is_empty() || inner.cells.len() > 200 { return None; }
+     *cell_budget = (*cell_budget).checked_sub(inner.cells.len())?;
+     if inner.cells.iter().any(|cell| cell.cell_protect() || cell.is_header || cell.field_name.is_some()

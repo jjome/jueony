@@ -1,0 +1,87 @@
+--- a/src/model/paragraph.rs
++++ b/src/model/paragraph.rs
+@@ -648,6 +648,9 @@
+     /// control slots. A missing offset or a trailing unresolved control has no
+     /// proven editable suffix. Display-only fallback positions are insufficient.
+     pub(crate) fn picture_text_anchors(&self) -> Option<Vec<u32>> {
++        if self.controls.iter().any(|c| matches!(c, Control::Field(_))) {
++            return self.picture_field_text_anchors();
++        }
+         if self.controls.is_empty() || self.controls.len() > 200
+             || !self.controls.iter().all(|c| matches!(c, Control::Picture(_)))
+             || !self.field_ranges.is_empty() || !self.orphan_field_ends.is_empty()
+@@ -674,6 +677,53 @@
+             return None;
+         }
+         Some(anchors)
++    }
++
++    /// Pictures mixed with filled ClickHere fields need both stored field
++    /// markers accounted for. Never infer a marker at the paragraph end or
++    /// accept a picture touching/inside a field's visible range.
++    fn picture_field_text_anchors(&self) -> Option<Vec<u32>> {
++        let length = self.text.chars().count();
++        if self.controls.is_empty() || self.controls.len() > 200
++            || length > 4000 || self.char_offsets.len() != length
++            || !self.orphan_field_ends.is_empty() || !self.range_tags.is_empty()
++            || !self.title_marks.is_empty()
++            || !self.controls.iter().all(|c| matches!(c, Control::Picture(_))
++                || matches!(c, Control::Field(f) if f.field_type == FieldType::ClickHere))
++        { return None; }
++        let mut ranges = self.field_ranges.iter().collect::<Vec<_>>();
++        ranges.sort_by_key(|r| r.start_char_idx);
++        if ranges.is_empty() || ranges.len() != self.controls.iter().filter(|c| matches!(c, Control::Field(_))).count()
++            || ranges.iter().enumerate().any(|(i, r)| r.start_char_idx >= r.end_char_idx
++                || r.end_char_idx >= length || r.inner_slot_count != 0
++                || !matches!(self.controls.get(r.control_idx), Some(Control::Field(_)))
++                || ranges[..i].iter().any(|p| p.control_idx == r.control_idx)
++                || i > 0 && r.start_char_idx <= ranges[i - 1].end_char_idx)
++        { return None; }
++        let mut positions = Vec::with_capacity(self.controls.len());
++        let mut end = 0;
++        for (i, (&offset, ch)) in self.char_offsets.iter().zip(self.text.chars()).enumerate() {
++            if ch.is_control() || ch == '\u{fffc}' { return None; }
++            let gap = offset.checked_sub(end)?;
++            if gap % CTRL_CHAR_CODE_UNITS != 0 { return None; }
++            let hidden = ranges.iter().filter(|r| r.end_char_idx == i).count();
++            let count = ((gap / CTRL_CHAR_CODE_UNITS) as usize).checked_sub(hidden)?;
++            if count > self.controls.len() - positions.len() { return None; }
++            positions.extend(std::iter::repeat_n(i, count));
++            end = offset.checked_add(ch.len_utf16() as u32)?;
++        }
++        if positions.len() != self.controls.len() || self.char_count != end.checked_add(1)?
++            || self.control_text_positions() != positions
++            || ranges.iter().any(|r| positions[r.control_idx] != r.start_char_idx)
++        { return None; }
++        let mut anchors = Vec::new();
++        for (c, &at) in self.controls.iter().zip(&positions) {
++            if matches!(c, Control::Picture(_)) {
++                if ranges.iter().any(|r| r.start_char_idx <= at && at <= r.end_char_idx) { return None; }
++                anchors.push(at as u32);
++            }
++        }
++        (!anchors.is_empty()).then_some(anchors)
+     }
+ 
+     /// `ctrl_data_records` 를 `controls` 길이에 맞춰 `None` 으로 패딩한다.
+--- a/src/document_core/commands/text_editing.rs
++++ b/src/document_core/commands/text_editing.rs
+@@ -1190,10 +1190,14 @@
+     // insert_text_at already shifts the raw stream positions. For an ordinary suffix
+     // after all balanced fields, rebuilding would count a leading FIELD_END as a
+     // second FIELD_BEGIN and move a later field into the prefix on HWPX export.
+-    if para.controls.len() == para.field_ranges.len()
+-        && para.orphan_field_ends.is_empty()
+-        && para.controls.iter().all(|control| matches!(control, Control::Field(_)))
+-        && para.field_ranges.iter().all(|range| range.end_char_idx < offset)
++    // A proven mixed picture/ClickHere paragraph also retains its original
++    // raw slots after a text-only insertion beyond every field. Rebuilding it
++    // mistakes FIELD_END gaps for picture slots and moves controls on save.
++    if para.field_ranges.iter().all(|range| range.end_char_idx < offset)
++        && ((para.controls.len() == para.field_ranges.len()
++            && para.orphan_field_ends.is_empty()
++            && para.controls.iter().all(|control| matches!(control, Control::Field(_))))
++            || para.picture_text_anchors().is_some())
+     {
+         return false;
+     }

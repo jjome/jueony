@@ -82,7 +82,7 @@ export function executeDocumentOperations(wasm: any, base: Snapshot, operations:
   const tables = new Map((snapshot.structure?.tables ?? []).map(t => [t.id, t]));
   for (const op of operations) {
     let insertion: { section: number; after: number; count: number } | undefined;
-    if (controlKinds.includes(op.kind)) insertion = executeControlOperation(doc, snapshot, op as ControlOp, tables);
+    if (controlKinds.includes(op.kind)) insertion = executeControlOperation(doc, snapshot, op as ControlOp, tables,copyMetrics);
     else {
       const body = op as BodyOp;
       executeBodyOperations(doc, snapshot, [body]);

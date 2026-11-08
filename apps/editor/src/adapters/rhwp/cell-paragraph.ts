@@ -1,5 +1,5 @@
 import {readNestedCellFields} from './nested-cell-fields.ts';
-import {axisPictureReader,sameAxisPicture} from './axis-cell-picture.ts';
+import {axisPictureReader,cellParagraphPictureReader,sameAxisPicture} from './axis-cell-picture.ts';
 import {readBodyTableMarkers} from './body-table-markers.ts';
 import {sha256} from '@noble/hashes/sha2.js';
 import type {Snapshot,Table,AgentCellParagraphOp,AgentCellParagraphSource} from '../../modules/document/public/index.ts';
@@ -82,8 +82,9 @@ function paragraphPageOwners(d:any,t:Table) {
 }
 type PictureOwner = {table:string;cell:number;paragraphs:Array<{index:number;anchors?:number[]}>;picture:NonNullable<Table['cells'][number]['axisPicture']>};
 
-function pictureOwners(doc:any,tables:Table[],controls:any[],lists:any[]):PictureOwner[] {
+function pictureOwners(doc:any,tables:Table[],controls:any[],lists:any[],verifiedFieldLists:ReadonlySet<number>=new Set()):PictureOwner[] {
  const owners:PictureOwner[]=[];
+ const mixedReader=cellParagraphPictureReader(doc,verifiedFieldLists);
  for(const listId of new Set(controls.filter(c=>c.list!==0&&c.ctrlId==='gso').map(c=>c.list))){
   const matches=lists.filter(l=>l.listId===listId&&l.isCell&&l.hostListId===0);
   if(matches.length!==1)throw Error('그림의 소유 셀 경로가 불명확합니다.');
@@ -93,8 +94,8 @@ function pictureOwners(doc:any,tables:Table[],controls:any[],lists:any[]):Pictur
   if(!table||!cell||table.editable!==true||table.rows*table.columns>200)throw Error('그림의 소유 표를 확인하지 못했습니다.');
   // A merged owner can also have plain paragraphs after its picture paragraph.
   // Require the same native asset and rendering proof for every child.
-  const children=controls.filter(c=>c.list===listId);
-  const picture=cell.axisPicture;
+  const owned=controls.filter(c=>c.list===listId),children=owned.filter(c=>c.ctrlId==='gso');
+  const picture=verifiedFieldLists.has(listId)?mixedReader(table.section,table.paragraph,table.control,cell,list.paraCount,owned):cell.axisPicture;
   if(!picture)throw Error('셀 그림의 원본과 화면 배치를 확인하지 못했습니다.');
   const paragraphs=[...new Set<number>(children.map(c=>c.para))].map(index=>{
    const args=[table.section,table.paragraph,table.control,cell.index,index];
@@ -102,7 +103,8 @@ function pictureOwners(doc:any,tables:Table[],controls:any[],lists:any[]):Pictur
    if(!positions)return {index};
    const anchors=Array.from<number>(positions),length=doc.getCellParagraphLength(...args);
    const slots=children.filter(c=>c.para===index);
-   if(!anchors.length||anchors.length!==slots.length||anchors.some((n,i)=>!int(n)||n>=length||i>0&&n<anchors[i-1]||slots[i].controlIndex!==i))
+   if(!anchors.length||anchors.length!==slots.length||anchors.some((n,i)=>!int(n)||n>=length||i>0&&n<anchors[i-1]||
+      !int(slots[i].controlIndex)||i>0&&slots[i].controlIndex<=slots[i-1].controlIndex))
     throw Error('셀 문단의 원래 그림 위치를 확인하지 못했습니다.');
    return {index,anchors};
   });
@@ -118,7 +120,6 @@ function samePictures(before:PictureOwner[],after:PictureOwner[]){
 /** Match every anonymous native control to its field and owning cursor list.
  * A stored table formula must reproduce its cached result without updating any field. */
 function cellFieldBoundaries(d:any,t:Table,tables:Table[],controls:any[],lists:any[]){
- const pictures=pictureOwners(d,tables,controls,lists);
  const nested=controls.filter(c=>c.list!==0&&c.ctrlId!=='gso'),allFields=parsed(d.getFieldList());
  if(!Array.isArray(allFields))throw Error();
  if(new Set(allFields.map(f=>f.fieldId)).size!==allFields.length)throw Error();
@@ -150,6 +151,7 @@ function cellFieldBoundaries(d:any,t:Table,tables:Table[],controls:any[],lists:a
   remaining.set(key,(remaining.get(key)??0)+1);
  }
  const inspected=new Set<number>(bodyFields.map(f=>f.fieldId));
+ const verifiedFieldLists=new Set<number>();
  const ranges=new Map<string,Array<[number,number]>>();
  for(const field of fields){
   const loc=field.location,step=loc?.path?.[0];
@@ -179,12 +181,16 @@ function cellFieldBoundaries(d:any,t:Table,tables:Table[],controls:any[],lists:a
   }
   const args=[host.section,host.paragraph,host.control,step.cellIndex,step.paraIndex] as const;
   const info=parsed(d.getFieldInfoAtInCell(...args,field.startCharIdx,false));
+  const lookup=parsed(d.getFieldValue(field.fieldId));
   const key=host.id+'/'+step.cellIndex+'/'+step.paraIndex;
   if(!info.inField||info.fieldId!==field.fieldId||info.fieldType!==field.fieldType||info.startCharIdx!==field.startCharIdx||
      info.endCharIdx!==field.endCharIdx||field.endCharIdx>d.getCellParagraphLength(...args)||
      info.editableInForm!==field.editableInForm||info.guideName!==field.guide||typeof info.isGuide!=='boolean'||
-     d.getTextInCell(...args,field.startCharIdx,field.endCharIdx-field.startCharIdx)!==field.value)throw Error();
-  fieldEvidence.push({id:field.fieldId,location:loc,info,value:field.value});
+     d.getTextInCell(...args,field.startCharIdx,field.endCharIdx-field.startCharIdx)!==field.value||
+     lookup.ok!==true||lookup.value!==field.value)throw Error();
+  const mixed=controls.some(c=>c.list===field.listId&&c.ctrlId==='gso');
+  if(mixed)verifiedFieldLists.add(field.listId);
+  fieldEvidence.push({id:field.fieldId,location:loc,info,value:field.value,...(mixed?{stored:field}: {})});
   const group=ranges.get(key)??[];
   group.push([field.startCharIdx,field.endCharIdx]);ranges.set(key,group);
  }
@@ -194,6 +200,7 @@ function cellFieldBoundaries(d:any,t:Table,tables:Table[],controls:any[],lists:a
   if(group.some(([start],i)=>i>0&&start<=group[i-1][1]))throw Error();
   boundaries.set(key,group[group.length-1][1]+1);
  }
+ const pictures=pictureOwners(d,tables,controls,lists,verifiedFieldLists);
  return {boundaries,fieldEvidence,names,pictures,hasLocalFormula:formulaTables.has(t.id)};
 }
 function readPrivateSources(d:any,tables:Table[],name:string){
@@ -335,7 +342,12 @@ function pictureSpliceLayout(doc:any,t:Table,cell:number,paragraph:number,text:s
  const images=pages[page].filter((v:any)=>v.type==='image'&&owns(v)).sort((a:any,b:any)=>a.controlIdx-b.controlIdx);
  const outer=pages[page].find((v:any)=>v.type==='table'&&v.secIdx===t.section&&v.paraIdx===t.paragraph&&v.controlIdx===t.control);
  const owner=t.cells[cell],box=outer?.cells.find((c:any)=>c.row===owner.row && c.col===owner.column);
- if(!box || images.length!==anchors.length || images.some((v:any,i:number)=>v.controlIdx!==i))throw invalid();
+ const lists=parsed(doc.getCursorModel()).lists,owners=lists.filter((l:any)=>l.hostListId===0&&l.isCell&&
+  l.sectionIndex===t.section&&l.hostPara===t.paragraph&&l.controlIndex===t.control&&l.cellIndex===cell);
+ if(owners.length!==1)throw invalid();
+ const slots=parsed(doc.getControls()).filter((c:any)=>c.list===owners[0].listId&&c.para===paragraph&&c.ctrlId==='gso');
+ if(!box || images.length!==anchors.length || slots.length!==anchors.length ||
+    images.some((v:any,i:number)=>v.controlIdx!==slots[i].controlIndex))throw invalid();
  const line:PictureLineItem[]=[];
  const caretWidths=new Set<number>();
  const carets=new Map<number,any>();
@@ -405,8 +417,14 @@ function picturePayload(doc:any,t:Table,cell:number){
  const lists=parsed(doc.getCursorModel()).lists,list=lists.find((l:any)=>l.isCell&&l.hostListId===0&&l.sectionIndex===t.section&&
    l.hostPara===t.paragraph&&l.controlIndex===t.control&&l.cellIndex===cell);
  if(!list)throw Error('그림의 원래 셀 주소가 없습니다.');
- const children=parsed(doc.getControls()).filter((c:any)=>c.list===list.listId);
- const checked=axisPictureReader(doc)(t.section,t.paragraph,t.control,t.cells[cell],list.paraCount,
+ const controls=parsed(doc.getControls()),children=controls.filter((c:any)=>c.list===list.listId);
+ const mixed=children.some((c:any)=>c.ctrlId!=='gso');
+ if(mixed){
+  const proof=cellFieldBoundaries(doc,t,readStructure(doc).tables,controls,lists);
+  if(!proof.pictures.some(p=>p.table===t.id&&p.cell===cell))throw Error('필드와 그림의 원래 소유 문단을 확인하지 못했습니다.');
+ }
+ const read=mixed?cellParagraphPictureReader(doc,new Set([list.listId])):axisPictureReader(doc);
+ const checked=read(t.section,t.paragraph,t.control,t.cells[cell],list.paraCount,
    children.map((v:any)=>({...v,pos:v.controlIndex})));
  if(!checked)throw Error('그림 위치별 원본 자원과 표시 자원을 다시 확인하지 못했습니다.');
  return checked.signature;
@@ -492,7 +510,7 @@ export function assertCellParagraphResult(wasm:any,base:Snapshot,op:AgentCellPar
    throw Error('저장한 그림 문단의 글자 또는 개체 위치가 원본과 다릅니다.');
   if(!sameTableLayout(tableLayoutEvidence(d,proof.table),tableLayoutEvidence(reopened,proof.table)))throw new Error('셀 문단 교체 후 실제 저장 재열기 배치가 다릅니다.');
   if(proof.pictures.length){
-   const nativePictures=(doc:any)=>pictureOwners(doc,readStructure(doc).tables,parsed(doc.getControls()),parsed(doc.getCursorModel()).lists);
+   const nativePictures=(doc:any)=>cellFieldBoundaries(doc,proof.table,readStructure(doc).tables,parsed(doc.getControls()),parsed(doc.getCursorModel()).lists).pictures;
    const current=nativePictures(d);
    if(current.length!==proof.pictures.length||!samePictures(current,nativePictures(reopened)))throw Error('저장 후 셀 그림의 소유 위치, 자원 또는 배치가 달라졌습니다.');
   }

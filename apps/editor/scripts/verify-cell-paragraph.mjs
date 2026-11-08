@@ -1,5 +1,6 @@
 import {createAxisPictureFixture,inspectPictureAnchors} from './lib/axis-picture-fixture.mjs';
 import {multilinePictureParagraph,repeatedSpacePictureParagraph} from './lib/cell-paragraph-pictures.mjs';
+import {createPictureFieldParagraph,mixedPictureFieldArgs,inspectMixedPictureFields} from './lib/cell-paragraph-picture-fields.mjs';
 import puppeteer from 'puppeteer-core';
 import {continuedMergedTable,fragmentedMergedCell} from './lib/continued-merged-table.mjs';
 import http from 'node:http';
@@ -9,7 +10,7 @@ import {resolve,dirname} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import assert from 'node:assert/strict';
 const app=resolve(dirname(fileURLToPath(import.meta.url)),'..'),repo=resolve(app,'../..'),dist=resolve(app,process.env.JUEONY_TEST_DIST),pkg=resolve(repo,process.env.JUEONY_ENGINE_PACKAGE),out=resolve(repo,process.env.JUEONY_TEST_OUTPUT??'build/cell-paragraph-browser');await mkdir(out,{recursive:true});
-const port=4397,origin=`http://127.0.0.1:${port}`,delay=ms=>new Promise(r=>setTimeout(r,ms)),png=resolve(app,'fixtures/page-background/background-bands.png'),jpg=resolve(app,'fixtures/page-background/background-bands.jpg');
+const port=Number(process.env.JUEONY_TEST_PORT??4397),origin=`http://127.0.0.1:${port}`,delay=ms=>new Promise(r=>setTimeout(r,ms)),png=resolve(app,'fixtures/page-background/background-bands.png'),jpg=resolve(app,'fixtures/page-background/background-bands.jpg');
 const {default:init,HwpDocument}=await import(pathToFileURL(resolve(pkg,'rhwp.js')).href);await init({module_or_path:await readFile(resolve(pkg,'rhwp_bg.wasm'))});if(await fetch(origin+'/api/health').then(()=>true,()=>false))throw new Error('Test port occupied');
 const server=spawn(process.execPath,['apps/launcher/server.mjs'],{cwd:repo,windowsHide:true,stdio:'ignore',env:{...process.env,JUEONY_PORT:String(port),JUEONY_DIST:dist,JUEONY_CONNECTION_STORE:'memory'}}),results=[],failures=[],pageErrors=[],consoleErrors=[],externalRequests=[];let browser,page;let beforeUnloadCount=0;let expectedSaveFailure=false;const expectedSaveErrors=[];
 const active=async()=>(await page.$('.editor-frame:not([hidden])')).contentFrame();
@@ -21,7 +22,7 @@ async function save(f,name,ext){const result=await f.evaluate(async()=>{const ap
 const casePattern=process.env.JUEONY_CASE_PATTERN?new RegExp(process.env.JUEONY_CASE_PATTERN,'u'):undefined;
 async function scenario(name,run){if(casePattern&&!casePattern.test(name))return;if(process.env.JUEONY_HIDDEN_OWNER_ONLY==='1'&&!name.startsWith('long-table'))return;try{await run();results.push(name);console.log('PASS',name);}catch(error){failures.push({name,error:String(error),stack:error.stack});console.error('FAIL',name,error);await page.screenshot({path:resolve(out,'failure-'+failures.length+'.png')}).catch(()=>{});await(await active()).evaluate(()=>{document.querySelectorAll('.modal-overlay .dialog-close').forEach(e=>e.click());document.querySelectorAll('dialog[open]').forEach(e=>e.close());}).catch(()=>{});}}
 function body(f='hwpx',second=false,makeMerge=true){const d=HwpDocument.createEmpty();d.createBlankDocument();d.insertText(0,0,0,'표 앞 본문 😀');d.splitParagraph(0,0,d.getParagraphLength(0,0));const t=JSON.parse(d.createTable(0,1,0,3,3));assert.equal(t.ok,true);for(let i=0;i<9;i++)d.setCellProperties(0,1,t.controlIdx,i,JSON.stringify({width:[6001,14000,21000][i%3]}));for(let c=0;c<9;c++)d.insertTextInCell(0,t.paraIdx,t.controlIdx,c,0,0,'업무 '+c);d.applyCharFormatInCell(0,t.paraIdx,t.controlIdx,2,0,0,4,JSON.stringify({bold:true,fontSize:1200}));if(second){d.splitParagraph(0,1,d.getParagraphLength(0,1));const other=JSON.parse(d.createTable(0,2,0,2,2));assert.equal(other.ok,true);}for(let i=0;i<9;i++)d.setCellProperties(0,1,t.controlIdx,i,JSON.stringify({height:[5001,7000,9000][Math.floor(i/3)]}));if(makeMerge){d.applyCharFormatInCell(0,1,0,1,0,0,d.getCellParagraphLength(0,1,0,1,0),JSON.stringify({bold:true}));d.applyParaFormatInCell(0,1,0,1,0,JSON.stringify({alignment:'center'}));}if(makeMerge)d.mergeTableCells(0,1,0,0,0,0,1);const x=new HwpDocument(d[f==='hwp'?'exportHwp':'exportHwpx']());d.free();return x;}
-const calls=[],providerPort=4399;
+const calls=[],providerPort=Number(process.env.JUEONY_PROVIDER_PORT??4399);
 if(await fetch('http://127.0.0.1:'+providerPort).then(()=>true,()=>false))throw new Error('Mock provider port occupied');
 const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const chunk of req)raw+=chunk;const request=JSON.parse(raw),id=req.url.endsWith('/responses')?'openai-responses':req.url.endsWith('/messages')?'anthropic':req.url.includes(':generateContent')?'gemini':'openai-compatible';const input=JSON.parse(id==='gemini'?request.contents[0].parts[0].text:id==='anthropic'?request.messages[0].content:id==='openai-responses'?request.input[1].content:request.messages[1].content);calls.push({id,model:request.model??req.url.split('/models/')[1]?.split(':')[0],input});
 
@@ -31,6 +32,8 @@ const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const
  const operations=[{kind:'replace_cell_paragraph',target,row:cell?.row??0,column:cell?.column??0,paragraph,originalText:cell?.paragraphs?.find(p=>p.index===paragraph)?.text??fallback,text:'Agent revised paragraph 😀'}];
  if(input.instruction.includes('photo-owner'))operations[0].text='개정5';
  if(input.instruction.includes('picture-suffix'))operations[0].text=operations[0].originalText+'개정';
+ if(input.instruction.includes('picture-field'))operations[0].text=operations[0].originalText.replace(
+  ...input.instruction.includes('forbidden')?['필드😀','변경😀']:input.instruction.includes('middle')?['중간문구','변경문구']:['일반문구','수정문구']);
  if(input.instruction.includes('picture prefix color'))Object.assign(operations[0],{text:operations[0].originalText,
    spanFormats:[{start:0,end:1,color:'#246789'},{start:5,end:6,color:'#148061'}]});
  if(input.instruction.includes('picture text splice'))operations[0].text=input.instruction.includes('middle')?'양😀yPi닫ccB':'양😀yPiabccB';
@@ -91,6 +94,33 @@ try{
  await new Promise(r=>provider.listen(providerPort,'127.0.0.1',r));for(let i=0;i<100;i++){if(await fetch(origin+'/api/health').then(r=>r.ok,()=>false))break;await delay(100);}
  browser=await puppeteer.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,args:['--no-first-run','--disable-background-networking'],defaultViewport:{width:1400,height:1000}});page=await browser.newPage();page.setDefaultTimeout(15000);page.on('dialog',d=>{if(d.type()==='beforeunload'){beforeUnloadCount++;void d.accept();}else void d.dismiss();});page.on('pageerror',e=>pageErrors.push(String(e)));page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});await page.setRequestInterception(true);page.on('request',r=>{if(!r.url().startsWith(origin)&&!r.url().startsWith('data:')&&!r.url().startsWith('blob:')){externalRequests.push(r.url());void r.abort();}else void r.continue();});await page.goto(origin);await ready();
  if(casePattern)await configure('openai-compatible');
+ for(const format of ['hwp','hwpx'])await scenario(format+' picture-field stored ClickHere and pictures retain full identity through chat undo redo save reopen',async()=>{
+  const source=await createPictureFieldParagraph(HwpDocument,resolve(out,'mixed-'+format));
+  const original=resolve(out,'picture-field-before.'+format);
+  await writeFile(original,format==='hwp'?source.exportHwp():source.exportHwpx());
+  const slots=inspectMixedPictureFields(original),f=await open(format,source);
+  const inspect=()=>f.evaluate(args=>{
+   const d=window.__pageServices.wasm.borrowDocumentHandle();
+   return {text:d.getTextInCell(...args,0,d.getCellParagraphLength(...args)),fields:JSON.parse(d.getFieldList()),fieldStyle:JSON.parse(d.getCellCharPropertiesAt(...args,1)),
+    slots:[...d.getCellPictureTextAnchors(...args)],pictures:Array.from({length:d.pageCount()},(_,page)=>
+     JSON.parse(d.getPageControlLayout(page)).controls.filter(c=>c.type==='image').map(c=>({
+      frame:c,bytes:[...d.getControlImageData(c.secIdx,c.parentParaIdx,JSON.stringify(c.cellPath),c.controlIdx)]}))).flat()};
+  },mixedPictureFieldArgs);
+  const before=await inspect(),s=await snap();assert.equal(before.fields[0].value,'필드😀');
+  const owner=s.cellParagraphSources.s0p1t0.cells.find(c=>c.index===4);
+  assert.equal(owner.paragraphs[0].editableFrom,18);
+  assert.deepEqual(owner.paragraphs[0].pictureTextRanges,[{start:5,end:9},{start:11,end:15}]);
+  const unchanged=await state();await send('first picture-field forbidden');
+  assert.equal(await page.$eval('#request-error',e=>e.hidden),false);assert.deepEqual(await state(),unchanged);
+  await send('first picture-field suffix');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const suffix=await inspect();assert.deepEqual(suffix,{...before,text:before.text.replace('일반문구','수정문구')});
+  await send('first picture-field middle');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const expected={...suffix,text:suffix.text.replace('중간문구','변경문구')};assert.deepEqual(await inspect(),expected);
+  await undo();assert.deepEqual(await inspect(),suffix);
+  await execute('edit:redo');assert.deepEqual(await inspect(),expected);
+  await saveAndReopen(f,'picture-field',format);assert.deepEqual(await inspect(),expected);
+  assert.deepEqual(inspectMixedPictureFields(resolve(out,'picture-field.'+format)),slots.map(c=>c.row===1&&c.col===1?{...c,text:expected.text}:c));
+ });
  for(const format of ['hwp','hwpx'])await scenario(format+' inline picture neighbors in a merged paragraph chat edit, undo, redo, save and UI reopen',async()=>{
   const f=await open(format,await createAxisPictureFixture(HwpDocument,out,{merged:true})),before=await snap();
   const owners=s=>s.structure.tables[0].cells.filter(c=>c.axisPicture).map(c=>({index:c.index,picture:c.axisPicture}));

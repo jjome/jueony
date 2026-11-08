@@ -2,6 +2,8 @@ import type { Table } from '../../modules/document/public/index.ts';
 import { projectTableAxis, witnessedTrackEdges } from '../../modules/document/public/engine-integration.ts';
 import { parsed } from './structure.ts';
 import {axisPictureHeaderEvidence,axisPictureSourceEvidence,sameAxisPicture} from './axis-cell-picture.ts';
+import {prepareAxisTitleLayout} from './axis-title-layout.ts';
+import type {SubdivisionCopyMetrics} from './subdivision-canvas-metrics.ts';
 
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -65,7 +67,7 @@ function restoreWidthAfterWitnessLoss(doc:any,source:Table,after:Table,original:
 
 /** Derive each affected dimension from stored cell sizes, including distances
  * between boundaries of overlapping spans in a staggered grid. */
-export function mergedAxisProof(doc: any, table: Table, row: boolean, insert: boolean, at: number, values: string[]) {
+export function mergedAxisProof(doc: any, table: Table, row: boolean, insert: boolean, at: number, values: string[],copyMetrics?:SubdivisionCopyMetrics,revision?:string) {
   const coord = row ? 'row' : 'column', span = row ? 'rowSpan' : 'columnSpan';
   const dimension = row ? 'height' : 'width', size = row ? table.rows : table.columns;
   const projected = projectTableAxis(table, row, insert, at, values);
@@ -108,6 +110,8 @@ export function mergedAxisProof(doc: any, table: Table, row: boolean, insert: bo
     const difference = track(Math.min(at, size - 1));
     return { ...old.properties, [dimension]: originalSize + (insert ? difference : -difference) };
   });
+  const titleLayout=prepareAxisTitleLayout({doc,table,projected,properties,source,readContent:(d,index)=>content(d,table,index),
+    titles,pictures,row,insert,at,values,copyMetrics,revision});
   return (after: Table,justEdited=false) => {
     const currentTitles=titles?axisPictureHeaderEvidence(doc,after):undefined;
     const currentPictures=pictures?axisPictureSourceEvidence(doc,after):undefined;
@@ -130,7 +134,7 @@ export function mergedAxisProof(doc: any, table: Table, row: boolean, insert: bo
           throw Error('추가한 반복 제목 칸의 제목 표시 또는 내용이 요청과 다릅니다.');
       }
       if(titles?.size){
-        const title=sourceIndex===null?undefined:titles.get(sourceIndex),current=currentTitles?.get(i);
+        const title=titleLayout?.expected.get(i)?.portable??(sourceIndex===null?undefined:titles.get(sourceIndex)),current=currentTitles?.get(i);
         if(title!==undefined?current!==title:actual.properties.isHeader===true?!current:current!==undefined)
           throw Error('반복 제목 셀의 원문·서식 또는 쪽별 상대 배치가 바뀌었습니다.');
       }
@@ -142,6 +146,7 @@ export function mergedAxisProof(doc: any, table: Table, row: boolean, insert: bo
       if (sourceIndex !== null && (!same(properties[i], actual.properties) || !same(source[sourceIndex], content(doc, after, i))))
         throw new Error('남아야 할 셀의 내용·서식 또는 크기가 달라졌습니다.');
     });
+    titleLayout?.verify();
     const current = readAcrossSize();
     if (current !== originalAcrossSize) {
       if (justEdited && row && !insert) restoreWidthAfterWitnessLoss(doc,table,after,originalAcrossSize,current);

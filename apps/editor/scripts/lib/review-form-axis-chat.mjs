@@ -2,7 +2,7 @@ import http from 'node:http';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
-import {expectedPictureHeading} from './repeated-picture-heading.mjs';
+import {crossingTitleText,expectedPictureHeading} from './repeated-picture-heading.mjs';
 import {inspectPictureAnchors} from './axis-picture-fixture.mjs';
 
 const insertRequest='첫 번째 양식 표의 결재란 바로 위에 새 행을 넣어 주세요.';
@@ -18,6 +18,8 @@ const repeatRequest='각 쪽의 제목 행을 유지하고 사진 세 장이 든
 const titlePictureRequests=['제목 그림 원본을 유지하고 본문 두 번째 행 앞에 새 행을 넣어 주세요.',
  '반복 제목 그림을 유지하고 맨 앞에 새 제목 열을 넣어 주세요.', '방금 만든 맨 앞 제목 열을 삭제해 주세요.',
  '그림이 들어 있는 반복 제목 행을 삭제해 주세요.'];
+const crossingTitleRequests=['병합된 반복 제목 안의 두 번째 열 앞에 빈 열을 삽입해 주세요.',
+ '방금 병합 제목 안에 넣은 두 번째 열을 삭제해 주세요.'];
 
 function form(HwpDocument,inline){
  const doc=HwpDocument.createEmpty();
@@ -38,6 +40,12 @@ function form(HwpDocument,inline){
 
 function proposal(input,splitPictures){
  const [t]=input.document.structure.tables;
+ if(crossingTitleRequests.includes(input.instruction)){
+  assert.equal(t.cells[0].properties.isHeader,true);assert.ok(t.cells.some(c=>c.text==='PicA'&&c.axisPicture));
+  const insert=input.instruction===crossingTitleRequests[0];
+  assert.equal(t.cells[0].columnSpan,insert?2:3);
+  return {kind:insert?'insert_table_column':'delete_table_column',target:t.id,index:1,...(insert?{values:Array(t.rows).fill('')}: {})};
+ }
  if(titlePictureRequests.includes(input.instruction)){
   assert.equal(t.cells.filter(c=>c.axisPicture).length,4);assert.equal(t.headerRows,1);
   assert.ok(t.cells.find(c=>c.text==='PicA').axisPicture);
@@ -96,7 +104,7 @@ async function checkPicturePages(frame,expected,headings){
  assert.deepEqual(layouts.screen,wanted);assert.deepEqual(layouts.portable,wanted);
 }
 
-export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,state,snap,execute,reopen,pictureFolder,multiplePictures,groupedPictures,splitPictures,pagedPictures,repeatPictures,titlePictureOwner,outputFolder}){
+export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,state,snap,execute,reopen,pictureFolder,multiplePictures,groupedPictures,splitPictures,pagedPictures,repeatPictures,titlePictureOwner,crossingTitleOwner,outputFolder}){
  const calls=[];
  const provider=http.createServer(async(req,res)=>{
   try{
@@ -124,6 +132,41 @@ export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,
    return page.$eval('#request-error',e=>e.hidden?'':e.textContent);
   }
   for(const ext of ['hwp','hwpx']){
+   if(crossingTitleOwner){
+    await scenario(ext+' Agent picture owner crossing merged title columns reflows Canvas lines 2→1→2',async()=>{
+     const sourceFile=resolve(pictureFolder,'before.'+ext),source=new HwpDocument(await readFile(sourceFile));
+     const records=inspectPictureAnchors(sourceFile),frame=await open(ext,source);
+     const verify=async(count,span,width)=>{
+      const v=await frame.evaluate(()=>{
+       const d=window.__pageServices.wasm.borrowDocumentHandle(),active=d.canvasMetricsActive();
+       const read=()=>Array.from({length:d.pageCount()},(_,page)=>{
+        const runs=JSON.parse(d.getPageTextLayout(page)).runs.filter(r=>r.parentParaIdx===1&&r.cellIdx===0&&r.cellParaIdx===0);
+        return {text:runs.map(r=>r.text).join(''),lines:new Set(runs.map(r=>r.y)).size,
+         images:JSON.parse(d.getPageControlLayout(page)).controls.filter(c=>c.type==='image').length};
+       });
+       try{d.selectCanvasMetrics(true);const screen=read(),canvas=d.canvasMetricsActive();d.selectCanvasMetrics(false);
+        return {canvas,screen,portable:read(),stored:JSON.parse(d.getControls()).filter(c=>c.ctrlId==='gso').length,
+         span:JSON.parse(d.getCellInfo(0,1,0,0)).colSpan,width:JSON.parse(d.getCellProperties(0,1,0,0)).width};
+       }finally{d.selectCanvasMetrics(active);}
+      });
+      assert.equal(v.canvas,true);assert.equal(v.stored,4);assert.equal(v.span,span);assert.equal(v.width,width);
+      const expected=[2,3].map(images=>({text:crossingTitleText,lines:count,images}));
+      assert.deepEqual(v.screen,expected);assert.deepEqual(v.portable,expected);
+     };
+     await verify(2,2,13500);
+     for(const [index,request] of crossingTitleRequests.entries()){
+      const before=(await snap()).structure;assert.equal(await send(request),'');const after=(await snap()).structure;
+      await verify(index===0?1:2,index===0?3:2,index===0?21000:13500);
+      await execute('edit:undo');assert.deepEqual((await snap()).structure,before);
+      await execute('edit:redo');assert.deepEqual((await snap()).structure,after);
+      const label='crossing-title-'+index+'-'+ext;await reopen(frame,label,ext);
+      await verify(index===0?1:2,index===0?3:2,index===0?21000:13500);
+      assert.deepEqual(inspectPictureAnchors(resolve(outputFolder,label+'.'+ext)),
+       records.map(p=>({...p,col:p.col+(index===0&&p.col>=1?1:0)})));
+     }
+    });
+    continue;
+   }
    if(titlePictureOwner){
     await scenario(ext+' Agent picture owner repeated title row and column edits preserve one stored source',async()=>{
      const sourceFile=resolve(pictureFolder,'before.'+ext),source=new HwpDocument(await readFile(sourceFile));

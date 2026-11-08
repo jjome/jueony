@@ -5,6 +5,7 @@ import {readDocumentMetadata,DOCUMENT_METADATA_KEYS} from './document-metadata.t
 import {readCellParagraphSources,assertCellParagraphResult} from './cell-paragraph.ts';
 import {readTableSubdivisionSources,assertTableSubdivisionResult} from './table-subdivision.ts';
 import {subdivisionCopyMetrics} from './subdivision-canvas-metrics.ts';
+import {assertAxisTitleResult} from './axis-title-layout.ts';
 import {readTableStructureSources,assertTableStructureResult} from './table-structure.ts';
 import {readTableSplitSources,assertTableSplitResult} from './table-split.ts';
 import {readTableMergeSources,assertTableMergeResult} from './table-merge.ts';
@@ -225,7 +226,7 @@ export function installAgentBridge(d:Deps){
      if(validated.operations[0]?.kind==='insert_table_formula_field' && JSON.stringify(formulaField)!==JSON.stringify(insertedTableFormulaReceipt(d.wasm,base,validated.operations[0])))throw Error('조판 후 삽입한 계산식이 달라졌습니다.');
      if(validated.operations[0]?.kind==='update_table_formula_field' && JSON.stringify(formulaField)!==JSON.stringify(tableFormulaReceipt(d.wasm,base,validated.operations[0])))
       throw Error('조판 후 계산식 원문 또는 연관 셀의 결과가 달라졌습니다.');
-     afterStructure=readStructure(d.wasm);for(const op of validated.operations){if(op.kind==='set_document_metadata')assertAgentDocumentMetadata(d.wasm,op);if(op.kind==='replace_cell_paragraph')assertCellParagraphResult(d.wasm,base,op);if(op.kind==='split_table_cell_into')assertTableSubdivisionResult(d.wasm,base,op,copyMetrics);if(op.kind==='split_table'||op.kind==='attach_table')assertTableStructureResult(d.wasm,base,op);if(op.kind==='split_table_cell')assertTableSplitResult(d.wasm,base,op);if(op.kind==='merge_table_cells')assertTableMergeResult(d.wasm,base,op);if(op.kind==='format_table_cells'&&(Object.hasOwn(op.properties,'equalizeRows')||Object.hasOwn(op.properties,'rowHeightMm')))assertRowHeightResult(d.wasm,base,op);}});
+     afterStructure=readStructure(d.wasm);for(const op of validated.operations){assertAxisTitleResult(d.wasm,base,op);if(op.kind==='set_document_metadata')assertAgentDocumentMetadata(d.wasm,op);if(op.kind==='replace_cell_paragraph')assertCellParagraphResult(d.wasm,base,op);if(op.kind==='split_table_cell_into')assertTableSubdivisionResult(d.wasm,base,op,copyMetrics);if(op.kind==='split_table'||op.kind==='attach_table')assertTableStructureResult(d.wasm,base,op);if(op.kind==='split_table_cell')assertTableSplitResult(d.wasm,base,op);if(op.kind==='merge_table_cells')assertTableMergeResult(d.wasm,base,op);if(op.kind==='format_table_cells'&&(Object.hasOwn(op.properties,'equalizeRows')||Object.hasOwn(op.properties,'rowHeightMm')))assertRowHeightResult(d.wasm,base,op);}});
     const afterRevision=revision();applying=false;
     // snapshot requires the busy gate to be removed; read the body directly while still gated.
     const after:string[]=[];for(let s=0;s<d.wasm.getSectionCount();s++)for(let p=0;p<d.wasm.getParagraphCount(s);p++)after.push(d.wasm.getTextRange(s,p,0,d.wasm.getParagraphLength(s,p)));

@@ -25,6 +25,11 @@ export function subdivisionCopyMetrics(wasm:any,base:Snapshot,operations:EditOp[
     const paragraph=cell?.paragraphs.find(p=>p.index===op.paragraph && p.text===op.originalText);
     if(!paragraph?.pictureTextRanges?.length || op.text===op.originalText || !cellParagraphPlan(op,base).pictureEdit ||
         !wasm.borrowDocumentHandle().canvasMetricsActive())return;
+  }else if(op.kind==='insert_table_column'||op.kind==='delete_table_column'){
+    const table=base.structure?.tables.find(t=>t.id===op.target),insert=op.kind==='insert_table_column';
+    if(!table?.pagination?.repeatHeader || !table.cells.some(c=>c.axisPicture) ||
+       !table.cells.some(c=>c.properties.isHeader===true && c.columnSpan>1 &&
+        (insert?c.column<op.index:c.column<=op.index) && op.index<c.column+c.columnSpan))return;
   }else if(op.kind==='split_table_cell_into'){
     const table=base.structure?.tables.find(t=>t.id===op.target);
     const sourceCell=table?.cells.find(c=>c.row===op.row && c.column===op.column);
@@ -43,7 +48,7 @@ export function subdivisionCopyMetrics(wasm:any,base:Snapshot,operations:EditOp[
       throw Error('편집을 검사하는 동안 화면의 글꼴 측정 상태가 바뀌었습니다. 최신 상태로 다시 요청하세요.');
   }
   assertCurrent();
-  return (copy:CanvasDocument)=>{
+  const apply=(copy:CanvasDocument)=>{
     assertCurrent();
     if(copy===live || copy.canvasMetricsActive()) throw Error('독립된 편집 검사용 사본을 확인하지 못했습니다.');
     if(!publication) return;
@@ -54,5 +59,6 @@ export function subdivisionCopyMetrics(wasm:any,base:Snapshot,operations:EditOp[
     copy.selectCanvasMetrics(true);
     if(!copy.canvasMetricsActive()) throw Error('편집 사본에 화면의 글꼴 측정을 적용하지 못했습니다.');
   };
+  return Object.assign(apply,{assertCurrent});
 }
 export type SubdivisionCopyMetrics = ReturnType<typeof subdivisionCopyMetrics>;

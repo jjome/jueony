@@ -6,7 +6,7 @@ const digest=(bytes:Uint8Array)=>Array.from(sha256(bytes),v=>v.toString(16).padS
 
 type HeaderLayout={runs:any[];width:number;height:number};
 type PicturePage={screen:any[];portable:any[];pictures:any[];portablePictures:any[];painted:any[];keys:Set<string>;assets:Map<string,string>;screenHeader?:HeaderLayout;portableHeader?:HeaderLayout};
-type OwnerFrame={page:number;screen:any;portable:any;headerSignature?:string;titleSignature?:string;copies?:OwnerFrame[]};
+type OwnerFrame={page:number;screen:any;portable:any;headerSignature?:string;titleSignature?:string;titleScreenSignature?:string;copies?:OwnerFrame[]};
 
 function repeatedPages(screen:any[][]){
  const occurrences=new Map<string,number[]>();
@@ -182,6 +182,7 @@ function tableFrames(doc:any,pages:PicturePage[],fields:any[],section:number,par
  const header=settings?.repeatHeader?plainHeader(doc,base,dimensions,fields):[];
  if(!header)return null;
  const headerSignatures=new Map<number,string>();
+ const screenSignatures=new Map<number,string>();
  let headerSignature:string|undefined;
  let firstScreen:HeaderRun[]|undefined,firstPortable:HeaderRun[]|undefined;
  const owners=new Map<number,OwnerFrame>();
@@ -208,6 +209,8 @@ function tableFrames(doc:any,pages:PicturePage[],fields:any[],section:number,par
      const title=portable.filter(r=>r.owner===source.index).map(r=>[Math.round(r.x*10),Math.round(r.y*10),r.record]);
      const stored=[source.paragraphs,source.properties,source.children.map(({list,...c})=>c),source.anchors];
      headerSignatures.set(source.index,digest(new TextEncoder().encode(JSON.stringify([stored,title]))));
+     const screenTitle=screen.filter(r=>r.owner===source.index).map(r=>[Math.round(r.x*10),Math.round(r.y*10),r.record]);
+     screenSignatures.set(source.index,digest(new TextEncoder().encode(JSON.stringify([stored,screenTitle]))));
     }
     // Keep the complete heading proof on public picture evidence for existing
     // paragraph/subdivision callers. Only axis edits compare projected sources.
@@ -222,7 +225,7 @@ function tableFrames(doc:any,pages:PicturePage[],fields:any[],section:number,par
   for(const [slot,c] of a.cells.entries()){
    const other=b.cells[slot],key=address(c),index=stored.get(key);
    if(index===undefined||key!==address(other)||c.cellIdx!==slot||other.cellIdx!==slot)return null;
-   const frame={page:pageNumber,screen:c,portable:other,headerSignature,titleSignature:headerSignatures.get(index)};
+   const frame={page:pageNumber,screen:c,portable:other,headerSignature,titleSignature:headerSignatures.get(index),titleScreenSignature:screenSignatures.get(index)};
    if(slot<repeated){
     if(index!==header[slot].index||!owners.has(index))return null;
     const owner=owners.get(index)!;(owner.copies??=[]).push(frame);continue;
@@ -249,12 +252,13 @@ function tableFrames(doc:any,pages:PicturePage[],fields:any[],section:number,par
 
 /** Per-source title evidence is compared through the axis projection, so an
  * inserted column can move an existing source without duplicating its image. */
-export function axisPictureHeaderEvidence(doc:any,table:{section:number;paragraph:number;control:number}) {
+export function axisPictureHeaderEvidence(doc:any,table:{section:number;paragraph:number;control:number},profile:'portable'|'screen'='portable') {
  const snapshot=picturePages(doc);
  if(!snapshot)throw Error('반복 제목의 그림 표시 근거를 읽지 못했습니다.');
  const owners=tableFrames(doc,snapshot.pages,snapshot.fields,table.section,table.paragraph,table.control);
  if(!owners)throw Error('반복 제목의 원본 셀과 쪽별 표시를 검증하지 못했습니다.');
- return new Map([...owners].filter(([,owner])=>owner.titleSignature).map(([index,owner])=>[index,owner.titleSignature!]));
+ return new Map([...owners].filter(([,owner])=>owner.titleSignature).map(([index,owner])=>[index,
+  profile==='screen'?owner.titleScreenSignature!:owner.titleSignature!]));
 }
 
 /** Original image/slot/relative-placement proof without the whole heading's
@@ -314,18 +318,32 @@ function picturePaintMatches(properties:any,paint:any) {
 /** Layout and asset keys are local to one read-only snapshot. An edit or reopen
  * gets a fresh reader, even if the engine reuses the same native handle. */
 export function axisPictureReader(doc:any) {return pictureReader(doc,true);}
-function pictureReader(doc:any,includeHeading:boolean) {
+/** N004 only: the caller has proved every inline field ID, path and range.
+ * The default structural reader continues to reject all field-bearing owners. */
+export function cellParagraphPictureReader(doc:any,verifiedFieldLists:ReadonlySet<number>) {
+ return pictureReader(doc,false,verifiedFieldLists);
+}
+function pictureReader(doc:any,includeHeading:boolean,verifiedFieldLists?:ReadonlySet<number>) {
  let snapshot:ReturnType<typeof picturePages>|undefined;
  return (section:number,paragraph:number,control:number,cell:Cell,paragraphCount:number,children:any[]):Cell['axisPicture']=>{
   if(!Number.isSafeInteger(paragraphCount)||paragraphCount<1||paragraphCount>50||cell.text.length>4000||
      !children.length||cell.properties.fieldName!==''||cell.properties.cellProtect!==false)return;
   if(snapshot===undefined){snapshot=null;snapshot=picturePages(doc);}
   if(!snapshot)return;
-  if(snapshot.fields.some((f:any)=>{
+  const ownedFields=snapshot.fields.filter((f:any)=>{
    const loc=f.location,first=loc?.path?.[0];
    return f.listId===children[0].list || loc?.sectionIndex===section && loc?.paraIndex===paragraph &&
     first?.type==='cell' && first.controlIndex===control && first.cellIndex===cell.index;
-  }))return;
+  });
+  const mixed=verifiedFieldLists?.has(children[0].list)===true;
+  if(ownedFields.length&&(!mixed||ownedFields.some((f:any)=>f.cellField!==false||f.fieldType!=='clickhere')))return;
+  if(mixed){
+   if(!ownedFields.length||children.filter(c=>c.ctrlId===''&&c.ctrlCh===0).length!==ownedFields.length||
+      children.some((c,i)=>c.list!==children[0].list||c.ctrlId!=='gso'&&!(c.ctrlId===''&&c.ctrlCh===0)||
+       c.controlIndex!==(children[i-1]?.para===c.para?children[i-1].controlIndex+1:0)))return;
+   children=children.filter(c=>c.ctrlId==='gso');
+   if(!children.length)return;
+  }
   const tableKey=JSON.stringify([section,paragraph,control]);
   if(!snapshot.tables.has(tableKey))snapshot.tables.set(tableKey,tableFrames(doc,snapshot.pages,snapshot.fields,section,paragraph,control));
   const owner=snapshot.tables.get(tableKey)?.get(cell.index);
@@ -338,7 +356,7 @@ function pictureReader(doc:any,includeHeading:boolean) {
   let pictures:ReturnType<typeof readOwnedPictures>;
   for(const frame of frames){
    const current=readOwnedPictures(doc,snapshot.pages[frame.page],[section,paragraph,control],cell.index,paragraphCount,children,
-    includeHeading?frame:{...frame,headerSignature:undefined});
+    includeHeading?frame:{...frame,headerSignature:undefined},mixed);
    if(!current||pictures&&current.some((p,i)=>!samePlacement(p,pictures![i])))return;
    pictures??=current;
   }
@@ -349,7 +367,7 @@ function pictureReader(doc:any,includeHeading:boolean) {
  };
 }
 
-function readOwnedPictures(doc:any,page:PicturePage,base:number[],index:number,paragraphCount:number,children:any[],owner:OwnerFrame){
+function readOwnedPictures(doc:any,page:PicturePage,base:number[],index:number,paragraphCount:number,children:any[],owner:OwnerFrame,sparseIndices=false){
   const [section,paragraph,control]=base;
   const inOwner=(c:any)=>c.secIdx===section && c.parentParaIdx===paragraph &&
     c.cellPath?.length===1 && c.cellPath[0].controlIndex===control && c.cellPath[0].cellIndex===index;
@@ -358,9 +376,10 @@ function readOwnedPictures(doc:any,page:PicturePage,base:number[],index:number,p
   const pictures:Array<CellPicturePlacement&{cellParaIndex:number;controlIndex:number}>=[];
   for(const [i,child] of children.entries()){
    const previous=children[i-1],para=child.para;
-   const nextIndex=previous?.para===para?previous.controlIndex+1:0;
+   const nextIndex=sparseIndices?child.controlIndex:previous?.para===para?previous.controlIndex+1:0;
    if(child.list!==children[0].list || !Number.isSafeInteger(para) || para<0 || para>=paragraphCount ||
-      previous && para<previous.para || child.controlIndex!==nextIndex || !Number.isSafeInteger(child.pos) ||
+      previous && para<previous.para || !Number.isSafeInteger(nextIndex)||nextIndex<0||
+      previous?.para===para&&nextIndex<=previous.controlIndex || child.controlIndex!==nextIndex || !Number.isSafeInteger(child.pos) ||
       child.pos<0 || previous?.para===para && child.pos<=previous.pos)return;
    const path=JSON.stringify([{controlIndex:control,cellIndex:index,cellParaIndex:para}]);
    const matches=inCell.filter((c:any)=>c.controlIdx===nextIndex && JSON.stringify(c.cellPath)===path);

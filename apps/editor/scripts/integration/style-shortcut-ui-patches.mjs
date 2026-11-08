@@ -14,7 +14,7 @@ export function patchStyleShortcutUiSource(source){
   if(source.includes(marker))throw new Error('Style shortcut UI patch was already applied');
   source=replaceOnce(source,
     "import { installEqualCells, equalCellHelp } from '../editor-actions/equal-cells.ts';",
-    `${marker}\nimport {sha256} from '@noble/hashes/sha2.js';\nimport {createStyleGalleryProfileStore} from '../adapters/browser/style-gallery-profile.ts';\nimport {createStyleShortcutProfileStore,STYLE_SHORTCUT_PROFILE_KEY} from '../adapters/browser/style-shortcut-profile.ts';\nimport {resolveStoredStyleShortcut} from '../adapters/rhwp/style-shortcut-consumer.ts';\nimport { installEqualCells, equalCellHelp } from '../editor-actions/equal-cells.ts';`,
+    `${marker}\nimport {sha256} from '@noble/hashes/sha2.js';\nimport {createStyleGalleryProfileStore} from '../adapters/browser/style-gallery-profile.ts';\nimport {commitPortableStyleGalleryImport,exportPortableStyleGalleryPackage,exportPortableStyleGalleryProfile,previewPortableStyleGalleryImport} from '../adapters/browser/style-gallery-portable.ts';\nimport {createStyleShortcutProfileStore,STYLE_SHORTCUT_PROFILE_KEY} from '../adapters/browser/style-shortcut-profile.ts';\nimport {resolveStoredStyleShortcut} from '../adapters/rhwp/style-shortcut-consumer.ts';\nimport { installEqualCells, equalCellHelp } from '../editor-actions/equal-cells.ts';`,
     'imports');
   source=replaceOnce(source,
     '  const resolver = new HangulKeyResolver();',
@@ -87,6 +87,42 @@ export function patchStyleShortcutUiSource(source){
     };
     reset.onclick=()=>{try{jueonyResetShortcutProfile();render();}catch(error){status.textContent=error instanceof Error?error.message:String(error);}};
     dialog.append(title,status,list,reset,close);document.body.append(dialog);dialog.addEventListener('close',()=>dialog.remove(),{once:true});render();dialog.showModal();close.focus();
+  };
+  const jueonyDownloadJson=(name:string,value:string)=>{
+    const blob=new Blob([value],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+    link.href=url;link.download=name;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),0);
+  };
+  const jueonyOpenGalleryPortable=()=>{
+    const dialog=document.createElement('dialog');dialog.style.cssText='max-width:760px;width:85%;max-height:82vh;border:1px solid #ccd5df;border-radius:8px;padding:20px';
+    const title=document.createElement('h2');title.textContent='스타일마당 JSON 가져오기·내보내기';
+    const description=document.createElement('p');description.textContent='기관 프로필 전체 또는 선택한 스타일 패키지만 이동합니다. 가져오기는 검증과 저장 확인이 끝난 경우에만 현재 설정을 바꿉니다.';
+    const status=document.createElement('p');status.setAttribute('role','status');status.setAttribute('aria-live','polite');
+    const fileLabel=document.createElement('label');fileLabel.textContent='가져올 JSON 파일 ';
+    const file=document.createElement('input');file.type='file';file.accept='.json,application/json';fileLabel.append(file);
+    const sourceLabel=document.createElement('label');sourceLabel.textContent='JSON 내용';sourceLabel.style.display='block';
+    const source=document.createElement('textarea');source.rows=12;source.style.cssText='box-sizing:border-box;width:100%;font-family:monospace';sourceLabel.append(source);
+    const packageFields=document.createElement('fieldset'),legend=document.createElement('legend');legend.textContent='단일 패키지를 추가할 때의 새 항목 정보';
+    const idLabel=document.createElement('label');idLabel.textContent='항목 ID ';
+    const id=document.createElement('input');id.type='text';id.pattern='[a-z0-9][a-z0-9._-]{0,79}';id.autocomplete='off';idLabel.append(id);
+    const nameLabel=document.createElement('label');nameLabel.textContent=' 표시 이름 ';
+    const label=document.createElement('input');label.type='text';label.maxLength=120;label.autocomplete='off';nameLabel.append(label);packageFields.append(legend,idLabel,nameLabel);
+    const exportLabel=document.createElement('label');exportLabel.textContent='내보낼 패키지 ';
+    const exportEntry=document.createElement('select');exportLabel.append(exportEntry);
+    const profileExport=document.createElement('button');profileExport.type='button';profileExport.textContent='프로필 내보내기';
+    const packageExport=document.createElement('button');packageExport.type='button';packageExport.textContent='선택 패키지 내보내기';
+    const importButton=document.createElement('button');importButton.type='button';importButton.textContent='검증 후 가져오기';
+    const close=document.createElement('button');close.type='button';close.textContent='닫기';close.onclick=()=>dialog.close();
+    const renderEntries=()=>{
+      exportEntry.replaceChildren();let profile;
+      try{profile=jueonyGalleryProfiles.read();}catch(error){status.textContent=error instanceof Error?error.message:String(error);return;}
+      for(const entry of profile?.gallery??[]){const option=document.createElement('option');option.value=entry.id;option.textContent=entry.label+' ('+entry.id+')';exportEntry.append(option);}
+      packageExport.disabled=!exportEntry.value;
+    };
+    file.onchange=async()=>{const selected=file.files?.[0];if(!selected)return;if(selected.size>2_000_000){status.textContent='가져올 스타일마당 JSON은 2MB 이하여야 합니다.';file.value='';return;}try{source.value=await selected.text();status.textContent=selected.name+' 파일을 읽었습니다. 검증 후 가져오기를 누르세요.';}catch{status.textContent='선택한 JSON 파일을 읽지 못했습니다.';}};
+    profileExport.onclick=()=>{try{jueonyDownloadJson('jueony-style-gallery-profile.json',exportPortableStyleGalleryProfile(localStorage));status.textContent='스타일마당 프로필을 내보냈습니다.';}catch(error){status.textContent=error instanceof Error?error.message:String(error);}};
+    packageExport.onclick=()=>{try{jueonyDownloadJson('jueony-style-package-'+exportEntry.value+'.json',exportPortableStyleGalleryPackage(localStorage,exportEntry.value));status.textContent='선택한 스타일 패키지를 내보냈습니다.';}catch(error){status.textContent=error instanceof Error?error.message:String(error);}};
+    importButton.onclick=()=>{try{const preview=previewPortableStyleGalleryImport(localStorage,source.value,{id:id.value,label:label.value});commitPortableStyleGalleryImport(localStorage,preview);status.textContent=preview.kind==='profile'?'스타일마당 프로필을 가져왔습니다.':'스타일 패키지를 현재 프로필에 추가했습니다.';source.value='';file.value='';renderEntries();}catch(error){status.textContent=error instanceof Error?error.message:String(error);}};
+    dialog.append(title,description,status,fileLabel,sourceLabel,packageFields,exportLabel,profileExport,packageExport,importButton,close);document.body.append(dialog);dialog.addEventListener('close',()=>dialog.remove(),{once:true});renderEntries();dialog.showModal();close.focus();
   };`,
     'runtime setup');
   source=replaceOnce(source,
@@ -106,7 +142,8 @@ export function patchStyleShortcutUiSource(source){
     'number key dispatch');
   source=replaceOnce(source,
     "  const button = document.createElement('button'); button.textContent = '단축키'; button.type = 'button'; button.title = '한글 2024 단축키와 지원 상태';",
-    `  const styleShortcutButton=document.createElement('button');styleShortcutButton.type='button';styleShortcutButton.textContent='스타일 번호키';styleShortcutButton.title='현재 사용자 스타일 번호키 설정';styleShortcutButton.onclick=jueonyOpenShortcutSettings;document.getElementById('jueony-title')?.append(styleShortcutButton);
+    `  const styleGalleryPortableButton=document.createElement('button');styleGalleryPortableButton.type='button';styleGalleryPortableButton.textContent='스타일마당 JSON';styleGalleryPortableButton.title='스타일마당 프로필과 패키지 가져오기·내보내기';styleGalleryPortableButton.onclick=jueonyOpenGalleryPortable;document.getElementById('jueony-title')?.append(styleGalleryPortableButton);
+  const styleShortcutButton=document.createElement('button');styleShortcutButton.type='button';styleShortcutButton.textContent='스타일 번호키';styleShortcutButton.title='현재 사용자 스타일 번호키 설정';styleShortcutButton.onclick=jueonyOpenShortcutSettings;document.getElementById('jueony-title')?.append(styleShortcutButton);
   const button = document.createElement('button'); button.textContent = '단축키'; button.type = 'button'; button.title = '한글 2024 단축키와 지원 상태';`,
     'settings button');
   return source;

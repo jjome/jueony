@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
+import {parse} from '@babel/parser';
 import init,{HwpDocument} from '../node_modules/@rhwp/core/rhwp.js';
 import {patchStyleShortcutUiSource} from '../scripts/integration/style-shortcut-ui-patches.mjs';
 import {currentStyleCatalogSha256,resolveStoredStyleShortcut} from '../src/adapters/rhwp/style-shortcut-consumer.ts';
@@ -19,6 +20,15 @@ test('generated shortcut integration is fail-closed and only dispatches the exis
   assert.match(patched,/if\(!command\).*return;/s);
   assert.match(patched,/automation\.execute\('format:apply-style',\{styleId:command\.styleId\}\)/);
   assert.match(patched,/기본 번호키로 재설정/);assert.match(patched,/clear\.textContent='해제'/);
+  assert.match(patched,/스타일마당 JSON 가져오기·내보내기/);
+  assert.match(patched,/profileExport\.textContent='프로필 내보내기'/);
+  assert.match(patched,/packageExport\.textContent='선택 패키지 내보내기'/);
+  assert.match(patched,/importButton\.textContent='검증 후 가져오기'/);
+  assert.match(patched,/previewPortableStyleGalleryImport\(localStorage,source\.value/);
+  assert.match(patched,/commitPortableStyleGalleryImport\(localStorage,preview\)/);
+  assert.match(patched,/styleGalleryPortableButton\.textContent='스타일마당 JSON'/);
+  assert.match(patched,/file\.type='file'/);assert.match(patched,/new Blob\(\[value\]/);
+  assert.doesNotThrow(()=>parse(patched,{sourceType:'module',plugins:['typescript']}));
   assert.throws(()=>patchStyleShortcutUiSource(patched),/already applied/);
   assert.throws(()=>patchStyleShortcutUiSource(source.replace('  const resolver = new HangulKeyResolver();','  const resolver = createResolver();')),/seam drift/);
 });

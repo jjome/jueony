@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | 완료 🟢 **1/1** · 부분 0 | 완료 0/18 · 부분 11 · 미구현 7 |
-| 검증 | 완료 0/1 · 부분 1 | 완료 0/18 · 부분 2 · 미검증 16 |
+| 검증 | 완료 0/1 · 부분 1 | 완료 0/18 · 부분 3 · 미검증 15 |
 | Agent 연결 | 해당 없음 1 | 연결 0/18 · 부분 0 · 미연결 18 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -50,7 +50,7 @@
 | [B065](<11-objects.md#b065>) · 범위 | 그림 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B066](<11-objects.md#b066>) · 범위 | 그리기마당·스크린샷·OCR | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B070](<11-objects.md#b070>) · 범위 | 차트 생성 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B071](<11-objects.md#b071>) · 범위 | 차트 데이터 편집 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B071](<11-objects.md#b071>) · 범위 | 차트 데이터 편집 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B072](<11-objects.md#b072>) · 범위 | 글상자 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B073](<11-objects.md#b073>) · 범위 | 멀티미디어 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B074](<11-objects.md#b074>) · 범위 | 수식 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
@@ -162,13 +162,13 @@
 <summary>B071 · 차트 데이터 편집</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 유형·축·범례·보존 범위 추가 검수
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 기존 category/scatter 차트의 공유 단일 단계 label과 단일 숫자 cache 값을 revision·원문·구조 재검증 뒤 dry-run·snapshot rollback으로 편집한다.
+- 다음 작업: HWP/HWPX 저장·재열기에서 유형·축·범례·unknown OOXML·비차트 자산과 undo를 3/3 확인했다. 일반 차트 유형·축/범례/label/series 이름 편집·복합 label·up/down bars·UI 범위와 한글 비교는 남았다.
 - UI 명령: `insert:chart-data-edit`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `WIRED;NOT_RUN`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `WIRED;SCOPED_CHART_VALUE_EDIT_2026_11_09;PARTIAL`
 
 </details>
 

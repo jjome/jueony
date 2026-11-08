@@ -32,6 +32,9 @@
 | N013 추가 | import 후 현재 catalog digest와 style ID·이름·종류·source를 원자적 shortcut 설정에 결합하고 저장 단계별 실패 상태를 rollback/applied/disconnected로 구분 | HWP/HWPX 재열기 consumer 연결과 실패 복구 14/14·TypeScript compile | 실제 keymap/UI·Agent·한글 비교 |
 | N021 조사 | 한글 스크립트 매크로와 기존 AI 명령 템플릿을 구분하고 Studio command/input recording 계약 부재 확인 | 단축키 회귀 11/11·코드 무변경 | dispatcher 성공 이벤트·IME/선택 기록·recordable capability·revision preflight·단일 undo/부분 실패 rollback·녹화 UI/저장 |
 | B046 | 앱 보기 설정 `pageOutline`·메뉴·상태바·탭 간 동기화와 page gap·canvas shadow를 단일 렌더 트랜잭션으로 토글 | HWP/HWPX 바이트 비변경·재열기·설정 backup·고정 upstream 통합 patch 11/11·TypeScript compile | 기존 format-dialog seam drift 해소 후 전체 build·한글 직접 비교 |
+| B025 / B027 | 머리말·꼬리말 평문 내부 clipboard payload에 문서 identity·story owner·revision·selection·원문을 봉인하고 cut/paste를 단일 snapshot으로 실행 | copy bytes 불변·HWP/HWPX 저장·재열기·undo·실패 rollback 포함 6/6·TypeScript compile | 실제 메뉴/단축키·OS clipboard·RTF·그림·각주/미주·한글 비교 |
+| B071 | 기존 category/scatter 차트의 단일 숫자 cache 값을 revision·원문·구조 재검증과 dry-run 뒤 교체 | HWP/HWPX 저장·재열기·undo·유형/축/범례/unknown OOXML/비차트 자산 보존 3/3·TypeScript compile | 일반 유형·축/범례/label/series 이름 편집·복합 label·up/down bars·UI 범위·한글 비교 |
+| N013 추가 | 저장된 Ctrl+1~Ctrl+0 slot만 기존 스타일 적용 명령으로 연결하고 IME·대화상자·표/개체/특수 story와 stale 설정을 차단; 설정 UI에서 표시·해제·초기화 | 통합 patch 보호·HWP/HWPX 저장·재열기·undo·stale 불변 3/3·TypeScript compile | 기존 format-dialog seam drift 해소 후 브라우저 클릭 smoke·Agent·한글 비교 |
 
 ## 실행한 선별 검사
 

@@ -197,12 +197,12 @@
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 본문·셀·일부 개체의 clipboard 실패 보호와 undo/저장 자동 검사 완료. 특수 story 및 실제 OS clipboard 전체 형식 비교 남음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 본문·셀·일부 개체와 머리말·꼬리말 평문 내부 cut을 원문·story owner·identity·revision·selection 재검증과 단일 snapshot rollback으로 보호한다.
+- 다음 작업: 머리말·꼬리말 adapter의 HWP/HWPX 저장·재열기·정확한 undo를 포함해 clipboard 선별 6/6을 통과했다. 실제 메뉴·단축키 연결과 OS clipboard·RTF·그림·각주/미주 및 한글 비교는 남았다.
 - UI 명령: `edit:cut`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>)
-- 원래 기록: `WIRED;NOT_RUN`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `WIRED;HEADER_FOOTER_CLIPBOARD_ADAPTER_2026_11_09;PARTIAL`
 
 </details>
 
@@ -225,12 +225,12 @@
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: HTML 실패 시 원문·undo 복원 자동 검사 완료. OS clipboard·RTF·내부 JSON·그림과 특수 문맥 및 한글 비교 남음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: HTML 실패 복구와 머리말·꼬리말 평문 내부 붙이기를 원문·story owner·identity·revision·selection 재검증 및 단일 snapshot rollback으로 보호한다.
+- 다음 작업: 머리말·꼬리말 adapter의 HWP/HWPX 저장·재열기·실패 원복을 포함해 clipboard 선별 6/6을 통과했다. 실제 메뉴·단축키 연결과 OS clipboard·RTF·그림·각주/미주 및 한글 비교는 남았다.
 - UI 명령: `edit:paste`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [manifest.json](<../evidence/basic-editor-2026-10-24/fourth/manifest.json>)
-- 원래 기록: `WIRED;NOT_RUN`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [manifest.json](<../evidence/basic-editor-2026-10-24/fourth/manifest.json>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `WIRED;HEADER_FOOTER_CLIPBOARD_ADAPTER_2026_11_09;PARTIAL`
 
 </details>
 

@@ -22,7 +22,7 @@
 
 - **구현** [N019](<12-ui-and-shortcuts.md#n019>) **한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교** — 정적 command reachability 감사에 더해 insert:comment·insert:para-band가 현재 Rust/WASM native mutation API를 갖지 않음을 확인하고 native API→durable model→atomic undo/redo→HWP/HWPX 재열기 증거를 요구하는 fail-closed capability gate를 추가했다. 신규 gate 5/5와 기존 N019 감사 5/5를 통과했으며 API 선언만으로 enabled/success를 노출하지 않는다. 실제 native API·durable model·undo/HWP·HWPX adapter와 Studio CommandDispatcher 연결·한글 비교는 남아 부분이다.
 - **구현** [N020](<12-ui-and-shortcuts.md#n020>) **한글 대화상자 활성화 오류 재현·해결** — 정책·coordinator 19/19와 strict TypeScript 검사를 통과했다. 실제 host/Computer Use 관찰·실행 경로와 실제 한글 대화상자 검증은 미연결·미실행이라 부분이다. OS 보호 우회와 SendKeys fallback·무한 재시도는 없다.
-- **구현** [N021](<12-ui-and-shortcuts.md#n021>) **본문/표/특수 영역 전체 단축키 매트릭스** — commit 86e629d4 기준 body fallback·chord escape를 차단하고 검증된 nested textbox table depth만 table scope로 유지했다. 선택 검사 36/36·strict core TypeScript·module boundaries diagnostics 0을 통과했다. story별/global shortcut 허용 semantics와 실제 앱·한글 비교, 쪽 번호·스크립트 매크로·혼합 run은 남아 부분이다.
+- **구현** [N021](<12-ui-and-shortcuts.md#n021>) **본문/표/특수 영역 전체 단축키 매트릭스** — commit 1ec65059 기준 exact special story에서는 upstream/registry 계약으로 증명한 undo·redo·goto·select-all·save만 허용하고 나머지 본문/파일/보기/서식 명령은 차단한다. 전용 검사 25/25와 전체 선택 묶음 61/61·strict TypeScript·경계 diagnostics 0을 통과했다. 실제 앱·한글 비교와 나머지 명령의 story별 허용 의미·쪽 번호·매크로·혼합 run은 남아 부분이다.
 
 ## 기능별 작업표
 
@@ -675,11 +675,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 한컴 기본 매핑·선택/IME/대화상자/OS 예약키 조합과 header/footer/footnote/endnote/textbox exact story context DTO·unknown/conflict fail-closed·InputHandler normal/IME guard boundary
-- 다음 작업: commit 86e629d4 기준 body fallback·chord escape를 차단하고 검증된 nested textbox table depth만 table scope로 유지했다. 선택 검사 36/36·strict core TypeScript·module boundaries diagnostics 0을 통과했다. story별/global shortcut 허용 semantics와 실제 앱·한글 비교, 쪽 번호·스크립트 매크로·혼합 run은 남아 부분이다.
+- 완료 범위: 한컴 기본 매핑과 header/footer/footnote/endnote/textbox exact story DTO·unknown/conflict fail-closed·normal/IME guard·body fallback/chord escape 차단·검증된 nested textbox table depth
+- 다음 작업: commit 1ec65059 기준 exact special story에서는 upstream/registry 계약으로 증명한 undo·redo·goto·select-all·save만 허용하고 나머지 본문/파일/보기/서식 명령은 차단한다. 전용 검사 25/25와 전체 선택 묶음 61/61·strict TypeScript·경계 diagnostics 0을 통과했다. 실제 앱·한글 비교와 나머지 명령의 story별 허용 의미·쪽 번호·매크로·혼합 run은 남아 부분이다.
 - 상위 항목: [B169](<08-tables.md#b169>) 첫 셀·셀 블록
-- 근거: [16-hangul-shortcuts-plan.md](<../16-hangul-shortcuts-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [special-story-context-n021.ts](<../../apps/editor/src/shortcuts/special-story-context-n021.ts>) · [special-story-shortcut-context-n021.test.ts](<../../apps/editor/tests/special-story-shortcut-context-n021.test.ts>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SHORTCUT_CONTEXT_AUDIT_2026_11_08;CLEAR_CHARACTER_STYLE_2026_11_09;PAGE_NUMBER_API_BLOCKER_2026_11_09;MACRO_RECORDING_API_BLOCKER_2026_11_09;SPECIAL_STORY_CONTEXT_2026_11_09`
+- 근거: [16-hangul-shortcuts-plan.md](<../16-hangul-shortcuts-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [special-story-context-n021.ts](<../../apps/editor/src/shortcuts/special-story-context-n021.ts>) · [special-story-command-scope-n021.ts](<../../apps/editor/src/shortcuts/special-story-command-scope-n021.ts>) · [special-story-command-scope-n021.test.ts](<../../apps/editor/tests/special-story-command-scope-n021.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SHORTCUT_CONTEXT_AUDIT_2026_11_08;CLEAR_CHARACTER_STYLE_2026_11_09;PAGE_NUMBER_API_BLOCKER_2026_11_09;MACRO_RECORDING_API_BLOCKER_2026_11_09;SPECIAL_STORY_CONTEXT_2026_11_09;SPECIAL_STORY_SAFE_GLOBALS_2026_11_09`
 
 </details>
 

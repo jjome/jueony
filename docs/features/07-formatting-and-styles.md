@@ -20,8 +20,8 @@
 
 ## 먼저 할 일
 
-- **구현** [N011](<07-formatting-and-styles.md#n011>) **스타일 가져오기·내보내기** — portable v1의 사용자 탭과 기본 없음/실선 테두리·없음/단색 배경·네 방향 간격을 원본 참조 인증 뒤 이식한다. 최신 검수 엔진에서 HWP/HWPX 재열기·exact-byte undo·stale ID 불변·실패 전체 롤백 3/3을 통과했다. 번호/개요는 문서별 동일 ID가 서로 다른 정의에 결합되는 오결합을 실측했고 createNumbering은 부분 필드만 만들며 clone은 동일 문서에 한정되고 outline은 기존 구역 정의만 사용하므로 명시 차단한다. complete definition·글자/글꼴 자원 graph export와 원자적 import/remap·구역 outline binding·rollback/stale 계약이 Rust/WASM에 추가되어야 한다. 글자 스타일 BorderFill·번호/개요·점선/무늬/그러데이션/그림/3D/대각선/투명도·특수 영역·UI·Agent·한글 비교는 남아 부분이다.
-- **구현** [N012](<07-formatting-and-styles.md#n012>) **범위 글자 스타일의 영구 정의 연결** — 저장 글자 스타일과 직접 서식을 타입으로 분리하고 독립 charShape 소유·정의 변경 전파·중복/stale/race fail-closed를 구현했다. Studio 스타일 패치도 style ID 대신 검증된 stored character-style reference를 캡처해 적용 경계에 전달한다. 실제 Rust HWP/HWPX 3/3과 앱 경계·범위·patch 보호 합계 8/8·격리 build 663 modules·해당 프로필 TypeScript 검사를 통과했다. 실제 UI 동작 검수·Agent 연결·한글 비교는 남아 부분이다.
+- **구현** [N011](<07-formatting-and-styles.md#n011>) **스타일 가져오기·내보내기** — commit 7db995bd 기준 basic character BorderFill의 HWP/HWPX 가져오기·저장·재열기와 보존·실패 보호 6/6을 통과했다. 고급 BorderFill과 번호/개요 complete definition·글자/글꼴 자원 graph export·원자적 import/remap·특수 영역·UI·Agent·한글 비교는 남아 부분이다.
+- **구현** [N012](<07-formatting-and-styles.md#n012>) **범위 글자 스타일의 영구 정의 연결** — commit 66ab2768 기준 UI stored-style 소비 경계 9/9과 격리 build 673 modules를 통과했다. 실제 브라우저 UI 동작·한글 비교·Agent 연결은 남아 부분이다.
 - **구현** [N013](<07-formatting-and-styles.md#n013>) **스타일마당과 사용자 번호키 재할당** — 설정 UI의 매핑 표시·개별 해제·전체 재설정과 HWP/HWPX 스타일 적용·재열기·undo·stale/IME 불변 3/3·격리 전체 build·실제 Edge 설정창/단축키 smoke를 통과했다. 빈 문서 stored-time 초기화 경고 때문에 소유 HWPX를 연 뒤 검증했으며 이 제한과 portable package UI·Agent·한글 비교는 남아 부분이다.
 
 ## 기능별 작업표
@@ -707,11 +707,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 평면 스타일의 언어별 글꼴·충돌 이름·다음 스타일 순환·문단 테두리 동작 플래그·문단 사용자 TabDef·기본 BorderFill·기존 본문/정의 불변·중간 실패 전체 롤백
-- 다음 작업: portable v1의 사용자 탭과 기본 없음/실선 테두리·없음/단색 배경·네 방향 간격을 원본 참조 인증 뒤 이식한다. 최신 검수 엔진에서 HWP/HWPX 재열기·exact-byte undo·stale ID 불변·실패 전체 롤백 3/3을 통과했다. 번호/개요는 문서별 동일 ID가 서로 다른 정의에 결합되는 오결합을 실측했고 createNumbering은 부분 필드만 만들며 clone은 동일 문서에 한정되고 outline은 기존 구역 정의만 사용하므로 명시 차단한다. complete definition·글자/글꼴 자원 graph export와 원자적 import/remap·구역 outline binding·rollback/stale 계약이 Rust/WASM에 추가되어야 한다. 글자 스타일 BorderFill·번호/개요·점선/무늬/그러데이션/그림/3D/대각선/투명도·특수 영역·UI·Agent·한글 비교는 남아 부분이다.
+- 완료 범위: portable v1의 언어별 글꼴·충돌 이름·다음 스타일 순환·문단 TabDef/기본 BorderFill과 basic character BorderFill의 원본 자원 인증·이식·중간 실패 전체 롤백
+- 다음 작업: commit 7db995bd 기준 basic character BorderFill의 HWP/HWPX 가져오기·저장·재열기와 보존·실패 보호 6/6을 통과했다. 고급 BorderFill과 번호/개요 complete definition·글자/글꼴 자원 graph export·원자적 import/remap·특수 영역·UI·Agent·한글 비교는 남아 부분이다.
 - 상위 항목: [B098](<07-formatting-and-styles.md#b098>) 스타일
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_STYLE_PACKAGE_ROLLBACK_2026_11_08;STYLE_BORDER_BEHAVIOR_FLAGS_2026_11_08;PORTABLE_TABDEF_BASIC_BORDERFILL_2026_11_09;NUMBERING_OUTLINE_PORTABILITY_BLOCKED_2026_11_09`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [style-package-native.ts](<../../apps/editor/src/adapters/rhwp/style-package-native.ts>) · [style-package-character-border-n011.test.ts](<../../apps/editor/tests/style-package-character-border-n011.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_STYLE_PACKAGE_ROLLBACK_2026_11_08;STYLE_BORDER_BEHAVIOR_FLAGS_2026_11_08;PORTABLE_TABDEF_BASIC_BORDERFILL_2026_11_09;NUMBERING_OUTLINE_PORTABILITY_BLOCKED_2026_11_09;BASIC_CHARACTER_BORDERFILL_2026_11_09`
 
 </details>
 
@@ -721,11 +721,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 직접 모양 복사와 정의 ID 연결을 구분·재열기 전파
-- 다음 작업: 저장 글자 스타일과 직접 서식을 타입으로 분리하고 독립 charShape 소유·정의 변경 전파·중복/stale/race fail-closed를 구현했다. Studio 스타일 패치도 style ID 대신 검증된 stored character-style reference를 캡처해 적용 경계에 전달한다. 실제 Rust HWP/HWPX 3/3과 앱 경계·범위·patch 보호 합계 8/8·격리 build 663 modules·해당 프로필 TypeScript 검사를 통과했다. 실제 UI 동작 검수·Agent 연결·한글 비교는 남아 부분이다.
+- 완료 범위: 저장 글자 스타일과 직접 서식을 타입으로 분리하고 stored character-style reference의 capture·검증·UI 적용 시점 재해석·stale/race fail-closed·정의 변경 재열기 전파
+- 다음 작업: commit 66ab2768 기준 UI stored-style 소비 경계 9/9과 격리 build 673 modules를 통과했다. 실제 브라우저 UI 동작·한글 비교·Agent 연결은 남아 부분이다.
 - 상위 항목: [B098](<07-formatting-and-styles.md#b098>) 스타일
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;STORED_CHARACTER_STYLE_REFERENCE_2026_11_08;STUDIO_STORED_STYLE_CAPTURE_2026_11_09`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [stored-character-style-ui-consumer-n012.ts](<../../apps/editor/src/adapters/rhwp/stored-character-style-ui-consumer-n012.ts>) · [stored-character-style-ui-consumer-n012.test.ts](<../../apps/editor/tests/stored-character-style-ui-consumer-n012.test.ts>) · [style-flow-patch.test.ts](<../../apps/editor/tests/style-flow-patch.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;STORED_CHARACTER_STYLE_REFERENCE_2026_11_08;STUDIO_STORED_STYLE_CAPTURE_2026_11_09;STORED_STYLE_UI_CONSUMER_2026_11_09`
 
 </details>
 

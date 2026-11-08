@@ -6,7 +6,7 @@
 
 | 항목 | 구현·보호 범위 | 검증 | 남은 제한 |
 |---|---|---|---|
-| N011 | 평면 스타일 JSON 가져오기·내보내기·언어별 글꼴·이름 충돌·다음 스타일 순환·중간 실패 전체 롤백 | HWP/HWPX 저장·재열기를 포함한 `style-package.test.ts` 2/2 | 번호·개요·탭·테두리·배경·특수 영역·UI·Agent·한글 비교 |
+| N011 | portable v1 언어별 글꼴·충돌 이름·다음 스타일 순환·문단 TabDef/기본 BorderFill과 basic character BorderFill의 원본 자원 인증·이식·실패 전체 롤백 | `7db995bd` basic character BorderFill HWP/HWPX 가져오기·저장·재열기·보존 보호 6/6 | **부분 유지:** 고급 BorderFill·번호/개요 complete definition·특수 영역·UI·Agent·한글 비교 |
 | N013 | 기관 프로필 v1 검증·갤러리/번호키 충돌·손상/상위 버전/쓰기 실패 보호·정확한 이름 해석 | 프로필·기본 스타일 단축키 테스트 6/6 | portable package UI·Agent·한글 비교 |
 | N014 / G091 | `ee0f5a75`까지 단일 root Rectangle의 회전·명시 boolean flip logical textbox story 복원에 더해 public HWP/HWPX 엔진의 root owner·story·geometry capability를 확인하고 caption ambiguity·nested owner chain·group child hidden을 exact blocker로 fail-closed | 신규 capability 검사 15/15; 기존 root flip 지원과 public engine 양 형식 관찰 | **부분 유지:** group·nested·caption actual restore·Studio browser callback·실제 앱 재시작·한글 비교 |
 | N015 | root vector shape 2~32개·중첩 group·embedded 이미지 2개 이상과 root 수식 2개 이상의 ordered selection·활성 개체·수식 속성·host/document private SHA 지문·stale 차단을 SessionCursor/Studio capture·restore wire에 연결 | 선택 검증 36/36·actual custom engine 수식 HWP/HWPX 저장·재열기·bytes invariant | **부분 유지:** 단일·mixed·nested 수식·OLE·table은 fail-closed; OLE payload typed property API와 table multi-restore port 없음·실제 앱 재시작·한글 비교 |
@@ -15,14 +15,14 @@
 | N020 | 증거 수집→정책→최대 1회 refresh→activate→post evidence 재검증→semantic input의 fail-closed coordinator | 정책·coordinator 19/19·strict TypeScript 통과 | **부분 유지:** 실제 host/Computer Use 관찰·실행 경로 미연결·실제 한글 대화상자 재검증 미실행 |
 | N018 | `b7923dde` 기준 실제 upstream EventBus `document-mutated`·`history-jumped`·`document-swapped` callback을 continuity 정책과 capability gate에 연결하고 bridge 부족·callback 실패는 state-uncertain으로 차단 | 선별 검사 26/26·strict TypeScript·모듈 경계 diagnostics 0 | **부분 유지:** public InputHandler에 exact top recipe·atomic state·compare-apply reset/rebase가 없어 성공 주장 불가·실제 runtime/process restart 통합 미연결 |
 | N004 | 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset 일치·가운데 정렬 재조판·실패 시 exact rollback | HWP/HWPX 네이티브 저장·재열기·undo/redo·4개 fault rollback 및 Edge 실제 편집→bound-save→UI 재열기 | 임의 필드 경계·중첩 셀·복합 개체·한글 비교 |
-| N012 | 저장 글자 스타일과 직접 서식 타입 분리·독립 charShape 소유·정의 변경 전파·중복/stale/race fail-closed; Studio 패치는 style ID가 아니라 캡처·검증한 stored character-style reference를 적용 경계에 전달 | 실제 Rust HWP/HWPX 3/3·앱 경계/범위/patch 보호 합계 8/8·격리 build 663 modules·해당 프로필 TypeScript 검사 통과 | **부분 유지:** 실제 UI 동작 검수·Agent 연결·한글 비교 |
-| N021 | 177개 단축키 감사에 header/footer/footnote/endnote/textbox exact context DTO를 추가하고 unknown/conflict fail-closed·InputHandler normal/IME guard 연결·body fallback/chord escape 차단·nested textbox table depth 검증 | 선택 검사 36/36·strict core TypeScript·module boundaries diagnostics 0 | **부분 유지:** story별/global shortcut allow semantics·실제 앱·한글 비교·쪽 번호/매크로 pending·혼합 run |
+| N012 | 저장 글자 스타일과 직접 서식 타입 분리·stored character-style reference capture·UI 적용 시점 재해석·stale/race fail-closed·정의 변경 재열기 전파 | `66ab2768` UI stored-time 소비 경계 9/9·격리 build 673 modules | **부분 유지:** 실제 브라우저 UI·한글 비교·Agent 연결 |
+| N021 | exact header/footer/footnote/endnote/textbox story에서 upstream/registry 계약으로 증명한 undo·redo·goto·select-all·save만 허용하고 unknown과 나머지 본문/파일/보기/서식 명령은 fail-closed | `1ec65059` 전용 25/25·전체 선택 묶음 61/61·strict TypeScript·module boundaries diagnostics 0 | **부분 유지:** 실제 앱·한글 비교·나머지 명령 story 의미·쪽 번호/매크로 pending·혼합 run |
 | N023 | `0e48110b` 기준 실제 통합 메뉴 DOM을 visual viewport의 CSS 좌표로 경계 제한하고 DPR 이중 적용 없이 좁은 화면·resize·scroll에 재배치 | 실제 Edge 157에서 DPR 1.25/1.5/2.0·narrow·resize·visualViewport scroll·pageScale 1.5의 6 scenarios PASS; page/console/external/missing 0 | **부분 유지:** 실제 Windows OS DPI·다중 모니터·native 좌표·한글 비교 미검증 |
 | N041 | 자체 생성한 본문·명시 글꼴, 2쪽 경계·용지, 표·셀, 내장 PNG, 본문 누름틀의 5종 manifest를 HWP/HWPX 입력 10개로 만들고 open→같은 형식 save→reopen; production preservation evidence·published layout 0.2 허용치·기능 최소조건·입력 SHA 불변을 fail-closed 검사 | custom Rust/WASM `source-c932adab64d8bc4e`에서 10/10·manifest 계약/위조 거절 3/3·구문/diff 검사 통과 | **부분 유지:** 같은 엔진의 합성 문서 기술 검수이며 실제 한글 2024 화면·인쇄·복구 경고, 기관 실문서·공개 문서 코퍼스 독립 비교는 미실행 |
 | N042 | 같은 글꼴·DPI·용지와 실제 page definition을 봉인한 published layout baseline에서 쪽 수·텍스트 재조판·개체 위치 차이를 분류하고 교차 생산자·글꼴 SHA-256이 없으면 차단 | 계약 4/4·2쪽 표/그림/필드 복합 HWP/HWPX baseline 2/2 | **부분 유지:** Jueony 엔진 baseline일 뿐 실제 한글 2024·PDF raster·인쇄 드라이버·실제 글꼴 바이너리 비교는 미실행 |
 | N043 | preflight→temp write/flush→final probe/revalidate→atomic compare-replace/readback coordinator와 race replace 0회·실패 cleanup·committed 후 `save-state-uncertain`/reopen 분류 | 정책·coordinator 15/15·strict TypeScript 통과 | **부분 유지:** 실제 Windows picker·ACL·identity 수집과 Rust/Tauri host 원자 교체/readback·실파일 Windows 검증 미연결 |
 | N044 | 별도 v1 checkpoint·IndexedDB CAS와 document lifecycle을 실제 설치 Edge 157 격리 IndexedDB에서 commit·strict transaction complete·CAS conflict·blocked/versionchange fail-closed 분류까지 검증 | 실제 Edge 3 scenarios PASS·page/console/external/missing resource 모두 0 | **부분 유지:** 실제 app boot/shell 주입·Tauri/Windows 비정상 종료·사용자 문서 복구 미연결 |
-| N045 | 로컬 WASM·런타임·폰트·third-party notices·hash·기관 endpoint allowlist와 외부 URL을 fail-closed 감사 | 계약 4/4; 실제 격리 dist에서 CDN 글꼴 URL 269개를 검출해 `FAIL_OFFLINE_BUNDLE` | **부분 유지·배포 차단:** CDN 글꼴 로컬화·WebView2 포함 최종 설치본·기관 allowlist 확정·고지 합본 검수 필요 |
+| N045 | 빌드 입력의 CDN font literal 256개를 제거하고 로컬 WASM·런타임·폰트·third-party notices·hash·외부 URL을 fail-closed 감사 | `41b44529` 격리 build 673 modules; dist 외부 endpoint가 5개로 감소 | **부분 유지·FAIL/배포 차단:** AI 영역 제외·기관 allowlist·WebView2 포함 최종 설치본·고지 합본 검수 필요 |
 | N005 | 보이지 않는 0길이 이웃 ClickHere의 셀 분할 이동을 앱·Rust에서 차단하고 guide-only 0길이 필드는 유지 | HWP/HWPX 저장·재열기 2/2·관련 회귀 32/32 | 겹친 필드·개체 혼합 셀·캡션 내부 필드·한글 비교 |
 | N011 추가 | 문단 테두리 동작 플래그 `borderConnect`·`borderIgnoreMargin`의 portable style 교환·전체 롤백 | HWP/HWPX 가져오기→저장→재열기 2/2 | TabDef·실제 BorderFill·배경·간격·UI·한글 비교 |
 | N011 추가 | portable v1 문단 사용자 TabDef와 기본 없음/실선 BorderFill·없음/단색 배경·네 방향 간격을 엄격 검증하고 원본 참조 인증 뒤 이식; 실패 전체 snapshot 복원 | 최신 검수 엔진의 HWP/HWPX 저장·재열기·exact-byte undo·stale ID 불변·중간 실패 rollback 3/3 | **부분 유지:** 글자 스타일 BorderFill·번호/개요·점선/무늬/그러데이션/그림/3D/대각선/투명도·특수 영역·UI·Agent·한글 비교 |
@@ -99,6 +99,14 @@ N015 root equation multi-selection verification with actual custom engine HWP/HW
 36/36 passed; single/mixed/nested equation, OLE and table selection remained fail-closed
 N021 special-story shortcut boundary verification
 36/36 passed; strict core TypeScript and module boundary audit passed with 0 diagnostics
+N011 basic character BorderFill HWP/HWPX verification
+6/6 passed; advanced BorderFill and numbering/outline remained partial
+N012 stored character-style UI consumer boundary verification
+9/9 passed; isolated build transformed 673 modules
+N021 exact special-story safe global command verification
+25/25 focused and 61/61 selected bundle passed; strict TypeScript and module boundary audit passed with 0 diagnostics
+N045 offline font source rewrite and isolated bundle audit
+256 CDN font literals removed; isolated build transformed 673 modules; five external endpoints remained and release stayed FAIL/PARTIAL
 node apps/editor/scripts/verify-recovery-checkpoint-browser-n044.mjs
 Edge 157 IndexedDB 3 scenarios passed; page/console/external/missing resource arrays were all empty
 JUEONY_ENGINE_PACKAGE=build/rhwp-engine/source-4843b7d7aa6cc842/pkg npm test -- tests/insert-placeholder-capability-n019.test.ts
@@ -191,6 +199,10 @@ B071 Edge 검수에서는 차트 시나리오의 page 오류·console 오류·�
 - `ee0f5a75 feat(editor): audit nested textbox restore capability`
 - `0daeb3c7 feat(editor): restore verified equation selections`
 - `86e629d4 feat(editor): guard shortcuts by special story`
+- `7db995bd feat(editor): preserve basic character style borders`
+- `66ab2768 feat(editor): resolve stored character styles at UI apply`
+- `1ec65059 feat(editor): admit verified global special-story shortcuts`
+- `41b44529 build(editor): strip external font URLs from offline bundle`
 - `2bd2c75b feat(editor): preserve portable style references`
 - `4ea193ce feat(editor): delete verified page hide controls`
 - AI·Agent 실행과 참고 자료·검색·RAG 코드는 이 묶음에서 변경하지 않았다.

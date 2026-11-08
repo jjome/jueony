@@ -22,7 +22,7 @@
 
 - **구현** [N019](<12-ui-and-shortcuts.md#n019>) **한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교** — 정적 메뉴·리본·빠른 도구·본문/표/개체 문맥 메뉴의 command reachability를 감사해 미등록·동일 위치 중복 0건을 확인했다. 실제 placeholder insert:comment·insert:para-band 2건을 안정 ID로 기록했고 선별 15/15를 통과했다. 동적 disabled 조건·두 placeholder 구현·한글 비교는 남아 부분이다.
 - **재점검** [N020](<12-ui-and-shortcuts.md#n020>) **한글 대화상자 활성화 오류 재현·해결** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- **구현** [N021](<12-ui-and-shortcuts.md#n021>) **본문/표/특수 영역 전체 단축키 매트릭스** — 177개 binding 감사와 명시적 문맥 우선순위에 더해 Ctrl+- 글자 스타일 해제를 실제 명령으로 연결했다. 일반 본문의 단일 문단·단일 char-run에서 문단 스타일 정의로 복원하며 원문·범위·revision·정의를 재검증하고 HWP/HWPX·undo/redo 포함 14/14를 통과했다. 쪽 번호·매크로 pending 2건과 셀/특수 story·혼합 run·한글 비교는 남아 부분이다.
+- **구현** [N021](<12-ui-and-shortcuts.md#n021>) **본문/표/특수 영역 전체 단축키 매트릭스** — 177개 binding 감사·명시적 문맥 우선순위·Ctrl+- 글자 스타일 해제를 구현했다. 쪽 번호 매기기는 새 번호로 시작과 다른 기능이며 현재 엔진에 PageNumberPos 생성·수정·삭제 API와 대화상자가 없어 pending을 유지한다. 매크로 pending과 셀/특수 story·혼합 run·한글 비교도 남아 부분이다.
 
 ## 기능별 작업표
 
@@ -676,10 +676,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한컴 기본 매핑·선택/IME/대화상자/OS 예약키 조합
-- 다음 작업: 177개 binding 감사와 명시적 문맥 우선순위에 더해 Ctrl+- 글자 스타일 해제를 실제 명령으로 연결했다. 일반 본문의 단일 문단·단일 char-run에서 문단 스타일 정의로 복원하며 원문·범위·revision·정의를 재검증하고 HWP/HWPX·undo/redo 포함 14/14를 통과했다. 쪽 번호·매크로 pending 2건과 셀/특수 story·혼합 run·한글 비교는 남아 부분이다.
+- 다음 작업: 177개 binding 감사·명시적 문맥 우선순위·Ctrl+- 글자 스타일 해제를 구현했다. 쪽 번호 매기기는 새 번호로 시작과 다른 기능이며 현재 엔진에 PageNumberPos 생성·수정·삭제 API와 대화상자가 없어 pending을 유지한다. 매크로 pending과 셀/특수 story·혼합 run·한글 비교도 남아 부분이다.
 - 상위 항목: [B169](<08-tables.md#b169>) 첫 셀·셀 블록
 - 근거: [16-hangul-shortcuts-plan.md](<../16-hangul-shortcuts-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SHORTCUT_CONTEXT_AUDIT_2026_11_08;CLEAR_CHARACTER_STYLE_2026_11_09`
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SHORTCUT_CONTEXT_AUDIT_2026_11_08;CLEAR_CHARACTER_STYLE_2026_11_09;PAGE_NUMBER_API_BLOCKER_2026_11_09`
 
 </details>
 

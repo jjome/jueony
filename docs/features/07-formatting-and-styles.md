@@ -22,7 +22,7 @@
 
 - **구현** [N011](<07-formatting-and-styles.md#n011>) **스타일 가져오기·내보내기** — 포터블 JSON과 HWP/HWPX 저장·재열기에서 borderConnect·borderIgnoreMargin 보존과 전체 롤백을 검증했다. 사용자 탭·실제 테두리선·배경·간격은 mutation 전에 차단한다. 번호·개요·TabDef/BorderFill 생성·특수 영역·UI·Agent·한글 비교는 남아 부분이다.
 - **구현** [N012](<07-formatting-and-styles.md#n012>) **범위 글자 스타일의 영구 정의 연결** — 저장 글자 스타일과 직접 서식을 타입으로 분리하고 독립 charShape 소유·정의 변경 전파·중복/stale/race fail-closed를 구현했다. 실제 Rust HWP/HWPX 3/3과 앱 경계·범위 보호 7/7을 통과했다. 새 WASM UI 스모크·공유 UI·Agent 연결·한글 비교는 남아 부분이다.
-- **구현** [N013](<07-formatting-and-styles.md#n013>) **스타일마당과 사용자 번호키 재할당** — preview/apply controller와 원자적 번호키 설정 저장 adapter를 구현했다. profile/document digest·slot/style 계획을 저장 직전 재검증하고 손상·상위 버전·쓰기 실패에서 기존 raw 설정을 보존한다. HWP/HWPX 포함 controller 9/9와 저장 5/5를 통과했다. 실제 UI·keymap 소비·Agent·한글 비교는 남아 부분이다.
+- **구현** [N013](<07-formatting-and-styles.md#n013>) **스타일마당과 사용자 번호키 재할당** — preview/apply controller·원자적 번호키 설정 저장·현재 style catalog를 재대조하는 read-only consumer를 구현했다. stale·누락·중복·이름 충돌에서는 명령을 반환하지 않으며 HWP/HWPX 재열기에서 bytes 불변과 정확한 후보를 3/3 확인했다. 적용 후 catalog digest 저장 연결·실제 keymap/UI·Agent·한글 비교는 남아 부분이다.
 
 ## 기능별 작업표
 
@@ -735,11 +735,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 기관 프로필 v1·갤러리/이름/번호키 충돌·재실행 수명·손상/상위 버전 보호·정확한 이름 해석·preview/apply 및 설정 저장 stale 보호
-- 다음 작업: preview/apply controller와 원자적 번호키 설정 저장 adapter를 구현했다. profile/document digest·slot/style 계획을 저장 직전 재검증하고 손상·상위 버전·쓰기 실패에서 기존 raw 설정을 보존한다. HWP/HWPX 포함 controller 9/9와 저장 5/5를 통과했다. 실제 UI·keymap 소비·Agent·한글 비교는 남아 부분이다.
+- 완료 범위: 기관 프로필 v1·갤러리/이름/번호키 충돌·재실행 수명·손상/상위 버전 보호·preview/apply·설정 저장·read-only 소비 stale 보호
+- 다음 작업: preview/apply controller·원자적 번호키 설정 저장·현재 style catalog를 재대조하는 read-only consumer를 구현했다. stale·누락·중복·이름 충돌에서는 명령을 반환하지 않으며 HWP/HWPX 재열기에서 bytes 불변과 정확한 후보를 3/3 확인했다. 적용 후 catalog digest 저장 연결·실제 keymap/UI·Agent·한글 비교는 남아 부분이다.
 - 상위 항목: [B184](<07-formatting-and-styles.md#b184>) 스타일마당
 - 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_STYLE_GALLERY_PROFILE_2026_11_08;STYLE_GALLERY_CONTROLLER_2026_11_08;ATOMIC_STYLE_SHORTCUT_PROFILE_2026_11_09`
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_STYLE_GALLERY_PROFILE_2026_11_08;STYLE_GALLERY_CONTROLLER_2026_11_08;ATOMIC_STYLE_SHORTCUT_PROFILE_2026_11_09;STYLE_SHORTCUT_CONSUMER_2026_11_09`
 
 </details>
 

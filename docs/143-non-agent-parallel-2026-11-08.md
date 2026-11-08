@@ -25,6 +25,9 @@
 | N006 추가 | 최대 32문단의 위/아래 중첩 표 캡션에서 명시한 문단 하나를 경로·원문·revision·전체 문단 서식 재검증 후 교체 | HWP/HWPX 저장·재열기·undo 포함 5/5·회귀 4/4 | 빈 문단·혼합 글자 서식·좌우 캡션·필드·책갈피·개체 |
 | N013 추가 | preview 증거를 재검증하는 원자적 번호키 설정 저장·손상/상위 버전/쓰기 후 실패 복구 | 저장 adapter 5/5·TypeScript compile | 실제 UI와 keymap 소비·Agent·한글 비교 |
 | N021 추가 | Ctrl+-로 일반 본문 단일 문단·단일 char-run의 직접 서식을 문단 스타일 정의로 복원 | HWP/HWPX 저장·재열기·undo/redo 포함 14/14·TypeScript compile | 쪽 번호·매크로 pending·셀/특수 story·혼합 run·한글 비교 |
+| N006 추가 | 기존 위/아래 캡션의 정확히 하나인 빈 문단을 검증된 path·문단/글자 서식으로 채움 | HWP/HWPX 저장·재열기·undo 포함 8/8·회귀 4/4 | 캡션 생성·여러 빈 문단·좌우·혼합 서식·필드·개체 |
+| N013 추가 | 저장된 번호키 profile을 현재 catalog digest·ID·이름·종류·source에 맞춰 read-only resolve | HWP/HWPX 재열기 후보·bytes 불변·stale/충돌 포함 3/3 | post-apply digest 생산 연결·실제 keymap/UI·Agent |
+| N021 조사 | Ctrl+N,P 쪽 번호 매기기와 기존 새 번호 시작 명령을 구분하고 현재 API 부재 확인 | 단축키 회귀 11/11·코드 무변경 | Rust PageNumberPos 원자 API·WASM bridge·대화상자·명령 연결 |
 
 ## 실행한 선별 검사
 

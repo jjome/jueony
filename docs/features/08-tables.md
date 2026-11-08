@@ -22,7 +22,7 @@
 
 - **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset과 가운데 정렬 재조판을 수정했다. HWP/HWPX 네이티브 저장·재열기·undo/redo·4종 rollback과 Edge 실제 편집→bound-save→UI 재열기를 통과했다. 임의 필드 경계·중첩 셀·복합 개체와 한글 비교는 남아 부분이다.
 - **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — 최대7단계 중첩표·일반글캡션·말단셀의 채워진 ClickHere를 보존한다. 완전히 보이지 않는 0길이 이웃 ClickHere는 앱과 Rust 모두 mutation 전에 차단하고 정상 guide-only 0길이 필드는 유지한다. HWP/HWPX 저장·재열기 2/2와 관련 회귀 32/32를 통과했다. 겹친 필드·개체 혼합 셀·캡션 내부 필드는 남아 부분이다.
-- **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 캡션의 전체 조상 경로·구역과 커서 조회·bbox를 보존하며 비어 있지 않은 최대 32문단·문단별 단일 글자 서식의 위/아래 캡션을 명시적 문단 경로·원문·revision 재검증 후 교체한다. HWP/HWPX 저장·재열기·undo 포함 5/5와 회귀 4/4를 통과했다. 빈 문단·혼합 글자 서식·좌우 캡션·필드·책갈피·개체는 남아 부분이다.
+- **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 캡션의 전체 조상 경로·구역과 커서 조회·bbox를 보존하며 최대 32문단·문단별 단일 글자 서식의 위/아래 캡션을 명시적 문단 경로·원문·revision 재검증 후 교체한다. 기존 단일 빈 문단은 새 plain text로 채울 수 있다. HWP/HWPX 저장·재열기·undo 포함 8/8과 회귀 4/4를 통과했다. 캡션 생성·여러 빈 문단·혼합 서식·좌우 캡션·필드·책갈피·개체는 남아 부분이다.
 
 ## 기능별 작업표
 
@@ -973,11 +973,11 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 부모 list 경로·stable 대상·보호·자원·저장 검증
-- 다음 작업: 캡션의 전체 조상 경로·구역과 커서 조회·bbox를 보존하며 비어 있지 않은 최대 32문단·문단별 단일 글자 서식의 위/아래 캡션을 명시적 문단 경로·원문·revision 재검증 후 교체한다. HWP/HWPX 저장·재열기·undo 포함 5/5와 회귀 4/4를 통과했다. 빈 문단·혼합 글자 서식·좌우 캡션·필드·책갈피·개체는 남아 부분이다.
+- 다음 작업: 캡션의 전체 조상 경로·구역과 커서 조회·bbox를 보존하며 최대 32문단·문단별 단일 글자 서식의 위/아래 캡션을 명시적 문단 경로·원문·revision 재검증 후 교체한다. 기존 단일 빈 문단은 새 plain text로 채울 수 있다. HWP/HWPX 저장·재열기·undo 포함 8/8과 회귀 4/4를 통과했다. 캡션 생성·여러 빈 문단·혼합 서식·좌우 캡션·필드·책갈피·개체는 남아 부분이다.
 - 상위 항목: [B153](<08-tables.md#b153>) 셀 속성
 - Agent 명령: `set_table_cell,insert_table_row,delete_table_row,insert_table_column,delete_table_column`
 - 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08;NESTED_CAPTION_TEXT_2026_11_08;MULTIPARAGRAPH_CAPTION_2026_11_09`
+- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08;NESTED_CAPTION_TEXT_2026_11_08;MULTIPARAGRAPH_CAPTION_2026_11_09;EMPTY_CAPTION_FILL_2026_11_09`
 
 </details>
 

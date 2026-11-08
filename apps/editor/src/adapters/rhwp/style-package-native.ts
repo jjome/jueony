@@ -5,11 +5,18 @@ const raw = (wasm: any) => wasm.borrowDocumentHandle?.() ?? wasm;
 const canonical = (value: any): any => Array.isArray(value) ? value.map(canonical) : value && typeof value === 'object' ? Object.fromEntries(Object.keys(value).sort().map(key => [key, canonical(value[key])])) : value;
 const same = (left: any, right: any) => JSON.stringify(canonical(left)) === JSON.stringify(canonical(right));
 function plain(detail: any, type: number): void {
-  const p = detail.charProps;
-  if (p.fillType !== 'none' || ['borderLeft', 'borderRight', 'borderTop', 'borderBottom'].some(key => p[key]?.type || p[key]?.width)) throw new Error('글자 스타일의 테두리·배경 참조는 아직 안전하게 교환할 수 없습니다. 원본 정의는 유지합니다.');
+  portableCharReference(detail.charProps);
   if (type === 0 && detail.paraProps.headType !== 'None') throw new Error('번호·개요를 포함한 스타일 교환은 아직 지원하지 않습니다. 원본 정의는 유지합니다.');
 }
 const borderKeys = ['borderLeft', 'borderRight', 'borderTop', 'borderBottom'] as const;
+const activeBorderFill = (p: any) => p.fillType !== 'none' || borderKeys.some(key => p[key]?.type || p[key]?.width);
+function portableCharReference(p: any): Record<string, any> {
+  if (!activeBorderFill(p)) return {};
+  const decoration = { ...Object.fromEntries(borderKeys.map(key => [key, p[key]])), fillType: p.fillType, fillColor: p.fillColor, patternColor: p.patternColor, patternType: p.patternType };
+  const basePara = { alignment:'justify',lineSpacingType:'Percent',lineSpacing:160,marginLeft:0,marginRight:0,indent:0,spacingBefore:0,spacingAfter:0,widowOrphan:false,keepWithNext:false,keepLines:false,pageBreakBefore:false,fontLineHeight:false,singleLine:false,autoSpaceKrEn:false,autoSpaceKrNum:false,verticalAlign:0,englishBreakUnit:0,koreanBreakUnit:1,borderConnect:false,borderIgnoreMargin:false };
+  try { return { decoration: validatePortableShapes({ ...p, decoration }, basePara).char.decoration }; }
+  catch { throw new Error('글자 스타일의 고급 테두리·무늬·그라데이션 배경은 안전하게 교환할 수 없습니다. 원본 정의는 유지합니다.'); }
+}
 const activeTabs = (p: any) => Boolean(p.tabAutoLeft || p.tabAutoRight || p.tabStops?.length);
 const activeDecoration = (p: any) => p.fillType !== 'none' || borderKeys.some(key => p[key]?.type || p[key]?.width) || p.borderSpacing?.some((v: number) => v !== 0);
 function portableReferences(p: any): Record<string, any> {
@@ -48,7 +55,8 @@ export function exportStylePackage(wasm: any, selected: number[]): StylePackage 
   return validateStylePackage({ format: 'jueony-styles', version: 1, styles: ids.map(id => {
     const style = list.find((style: any) => style.id === id), detail = parsed(doc.getStyleDetail(id)); plain(detail, style.type);
     const para = style.type === 0 ? { ...detail.paraProps, ...certifyPortableReferences(doc, id, detail) } : detail.paraProps;
-    return { name: style.name, englishName: style.englishName, type: style.type, next: ids.indexOf(style.type === 0 ? style.nextStyleId : 0), ...validatePortableShapes(detail.charProps, para) };
+    const char = { ...detail.charProps, ...portableCharReference(detail.charProps) };
+    return { name: style.name, englishName: style.englishName, type: style.type, next: ids.indexOf(style.type === 0 ? style.nextStyleId : 0), ...validatePortableShapes(char, para) };
   }) });
 }
 export function importStyleNames(wasm: any, value: StylePackage): { name: string; englishName: string }[] {
@@ -64,6 +72,7 @@ export function importStylePackage(wasm: any, value: StylePackage): number[] {
   const defaultDetail = parsed(doc.getStyleDetail(0)); plain(defaultDetail, 0);
   certifyPortableReferences(doc, 0, defaultDetail);
   if (Object.keys(portableReferences(defaultDetail.paraProps)).length) throw new Error('현재 문서의 바탕글에 사용자 탭·테두리·배경이 있어 새 스타일의 기본 참조로 사용할 수 없습니다.');
+  if (Object.keys(portableCharReference(defaultDetail.charProps)).length) throw new Error('현재 문서의 바탕글에 글자 테두리·배경이 있어 새 스타일의 기본 참조로 사용할 수 없습니다.');
   const checkpoint = doc.saveSnapshot();
   try {
     const body = () => JSON.stringify(Array.from({ length: doc.getSectionCount() }, (_, section) => Array.from({ length: doc.getParagraphCount(section) }, (_, paragraph) => doc.getTextRange(section, paragraph, 0, doc.getParagraphLength(section, paragraph)))));
@@ -78,13 +87,23 @@ export function importStylePackage(wasm: any, value: StylePackage): number[] {
       if (parsed(doc.deleteParagraph(section, paragraph))?.ok !== true || body() !== before) throw new Error('스타일 참조 자원 생성 뒤 임시 문단을 제거하지 못했습니다.');
       return shape.paraShapeId;
     });
-    const ids = packageValue.styles.map((style, index) => { const id = doc.createStyle(JSON.stringify({ ...names[index], type: style.type, nextStyleId: 0, baseCharShapeId: existing[0].charShapeId, baseParaShapeId: baseParaShapeIds[index] })); if (!Number.isInteger(id) || id < existing.length || id > 255) throw new Error('스타일을 만들지 못했습니다.'); return id; });
+    const baseCharShapeIds = packageValue.styles.map(style => {
+      if (!style.char.decoration) return existing[0].charShapeId;
+      const before = body(), section = doc.getSectionCount() - 1, count = doc.getParagraphCount(section), inserted = parsed(doc.insertParagraph(section, count - 1)), paragraph = inserted?.paraIdx;
+      if (inserted?.ok !== true || !Number.isInteger(paragraph) || paragraph < 0 || paragraph >= count + 1 || doc.getParagraphCount(section) !== count + 1) throw new Error('글자 스타일 테두리·배경 참조를 만들 임시 문단을 추가하지 못했습니다.');
+      if (parsed(doc.insertText(section, paragraph, 0, '가'))?.ok !== true || parsed(doc.applyCharFormat(section, paragraph, 0, 1, JSON.stringify(style.char.decoration)))?.ok !== true) throw new Error('글자 스타일 테두리·배경 참조를 만들지 못했습니다.');
+      const shape = parsed(doc.getCharPropertiesAt(section, paragraph, 0)), actual = portableCharReference(shape);
+      if (!Number.isInteger(shape.charShapeId) || shape.charShapeId < 0 || !same(actual, { decoration: style.char.decoration })) throw new Error('글자 스타일 테두리·배경 참조 생성 결과가 파일과 다릅니다.');
+      if (parsed(doc.deleteParagraph(section, paragraph))?.ok !== true || body() !== before) throw new Error('글자 스타일 참조 생성 뒤 임시 문단을 제거하지 못했습니다.');
+      return shape.charShapeId;
+    });
+    const ids = packageValue.styles.map((style, index) => { const id = doc.createStyle(JSON.stringify({ ...names[index], type: style.type, nextStyleId: 0, baseCharShapeId: baseCharShapeIds[index], baseParaShapeId: baseParaShapeIds[index] })); if (!Number.isInteger(id) || id < existing.length || id > 255) throw new Error('스타일을 만들지 못했습니다.'); return id; });
     packageValue.styles.forEach((style, index) => {
-      const { fontFamilies, ...char } = style.char, fontIds = fontFamilies.map((name: string, language: number) => doc.findOrCreateFontIdForLang(language, name));
+      const { fontFamilies, decoration, ...char } = style.char, fontIds = fontFamilies.map((name: string, language: number) => doc.findOrCreateFontIdForLang(language, name));
       if (fontIds.some((id: number) => !Number.isInteger(id) || id < 0 || id > 65535)) throw new Error('스타일의 언어별 글꼴을 등록하지 못했습니다.');
       const para = nativePara(style.para, false);
       if (!doc.updateStyle(ids[index], JSON.stringify({ ...names[index], nextStyleId: style.type === 0 ? ids[style.next] : 0 })) || !doc.updateStyleShapes(ids[index], JSON.stringify({ ...char, fontIds }), style.type === 0 ? JSON.stringify(para) : '{}')) throw new Error('스타일의 모양 또는 다음 스타일을 연결하지 못했습니다.');
-      const detail = parsed(doc.getStyleDetail(ids[index])), actual = validatePortableShapes(detail.charProps, style.type === 0 ? { ...detail.paraProps, ...portableReferences(detail.paraProps) } : detail.paraProps);
+      const detail = parsed(doc.getStyleDetail(ids[index])), actual = validatePortableShapes({ ...detail.charProps, ...portableCharReference(detail.charProps) }, style.type === 0 ? { ...detail.paraProps, ...portableReferences(detail.paraProps) } : detail.paraProps);
       if (JSON.stringify(actual.char) !== JSON.stringify(style.char) || style.type === 0 && JSON.stringify(actual.para) !== JSON.stringify(style.para)) throw new Error('가져온 스타일 모양이 파일과 다릅니다.');
     });
     if (doc.getTextFileUnicode() !== beforeText || JSON.stringify(parsed(doc.getStyleList()).slice(0, existing.length)) !== JSON.stringify(existing)) throw new Error('스타일 가져오기 중 기존 문서나 정의가 바뀌었습니다.');

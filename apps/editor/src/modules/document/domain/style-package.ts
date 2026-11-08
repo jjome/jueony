@@ -31,6 +31,14 @@ function portableDecoration(value: unknown): Record<string, any> {
   result.borderSpacing = decoration.borderSpacing.map((value: unknown) => { const spacing = num(value, 0, 5669); if (!Number.isInteger(spacing)) throw new Error('스타일 테두리 간격은 정수여야 합니다.'); return spacing; });
   return result;
 }
+function portableCharDecoration(value: unknown): Record<string, any> {
+  const decoration = object(value), keys = [...borderKeys, 'fillType', 'fillColor', 'patternColor', 'patternType']; exact(decoration, keys);
+  const result: Record<string, any> = {};
+  for (const key of borderKeys) { const border = object(decoration[key]); exact(border, ['type', 'width', 'color']); const type = num(border.type, 0, 1), width = num(border.width, 0, 15), borderColor = color(border.color); if (!Number.isInteger(type) || !Number.isInteger(width) || type === 0 && (width !== 0 || borderColor !== '#000000')) throw new Error('글자 스타일 테두리는 기본 없음 또는 실선만 지원합니다.'); result[key] = { type, width, color: borderColor }; }
+  result.fillType = choice(decoration.fillType, ['none', 'solid']); result.fillColor = color(decoration.fillColor); result.patternColor = color(decoration.patternColor); result.patternType = num(decoration.patternType, -1, -1);
+  if (result.fillType === 'none' && (result.fillColor !== '#ffffff' || result.patternColor !== '#999999')) throw new Error('글자 스타일 배경 없음의 비활성 색상은 기본값이어야 합니다.');
+  return result;
+}
 export function validatePortableShapes(charValue: unknown, paraValue: unknown): { char: Record<string, any>; para: Record<string, any> } {
   const source = object(charValue), p = object(paraValue), char: Record<string, any> = {}, para: Record<string, any> = {};
   if (!Array.isArray(source.fontFamilies) || source.fontFamilies.length !== 7) throw new Error('언어별 글꼴 7개를 확인하세요.'); char.fontFamilies = source.fontFamilies.map(value => text(value));
@@ -41,6 +49,7 @@ export function validatePortableShapes(charValue: unknown, paraValue: unknown): 
   for (const key of ['shadowType', 'outlineType', 'emphasisDot', 'underlineShape', 'strikeShape']) { const max = key === 'shadowType' ? 2 : key === 'outlineType' ? 6 : key === 'emphasisDot' ? 15 : 16; char[key] = num(source[key], 0, max); if (!Number.isInteger(char[key])) throw new Error('스타일 종류 값은 정수여야 합니다.'); }
   for (const key of ['shadowOffsetX', 'shadowOffsetY']) char[key] = num(source[key], -128, 127);
   for (const key of ['ratios', 'spacings', 'relativeSizes', 'charOffsets']) { if (!Array.isArray(source[key]) || source[key].length !== 7) throw new Error('언어별 글자 모양 7개를 확인하세요.'); char[key] = source[key].map((value: unknown) => { const n = num(value, key === 'ratios' || key === 'relativeSizes' ? 1 : -128, key === 'ratios' || key === 'relativeSizes' ? 255 : 127); if (!Number.isInteger(n)) throw new Error('언어별 글자 모양은 정수여야 합니다.'); return n; }); }
+  if (source.decoration !== undefined) char.decoration = portableCharDecoration(source.decoration);
   para.alignment = choice(p.alignment, ['justify', 'left', 'right', 'center', 'distribute', 'distribute-space']);
   para.lineSpacingType = choice(p.lineSpacingType, ['Percent', 'Fixed', 'SpaceOnly', 'Minimum']); para.lineSpacing = num(p.lineSpacing, 0, 1000);
   for (const key of ['marginLeft', 'marginRight', 'indent']) para[key] = num(p[key], -1000, 1000);

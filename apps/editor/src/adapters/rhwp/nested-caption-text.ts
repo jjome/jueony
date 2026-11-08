@@ -5,9 +5,10 @@ import {readNestedAxisCaptions} from './nested-axis-captions.ts';
 import {parsed} from './structure.ts';
 
 type PathStep={controlIndex:number;cellIndex:number;cellParaIndex:number};
-type ParagraphSource={paragraph:number;path:PathStep[];originalText:string;paragraphShape:number;style:number;charShape:number};
+type CharacterRun={startOffset:number;endOffset:number;charShapeId:number};
+type ParagraphSource={paragraph:number;path:PathStep[];originalText:string;paragraphShape:number;style:number;charShape:number;runs:CharacterRun[]};
 type EditableSource={editable:true;target:string;revision:string;section:number;paragraph:number;path:PathStep[];
-  paragraphs:ParagraphSource[];caption:Record<string,unknown>;stored:Array<{id:string;value:unknown}>};
+  paragraphs:ParagraphSource[];caption:Record<string,unknown>;stored:Array<{id:string;value:unknown}>;placement:unknown};
 export type NestedCaptionTextSource=EditableSource|{editable:false;target:string;reason:string};
 export type NestedCaptionTextEdit={target:string;revision:string;paragraph:number;path:PathStep[];originalText:string;text:string};
 
@@ -18,6 +19,14 @@ const safeText=(text:unknown):text is string=>typeof text==='string'&&Array.from
 const validText=(text:unknown):text is string=>safeText(text)&&Array.from(text).length>0;
 const captionPath=(table:NestedTable,paragraph:number):PathStep[]=>[...table.ancestors,
   {controlIndex:table.control,cellIndex:65534,cellParaIndex:paragraph}];
+function placementEvidence(captions:ReturnType<typeof readNestedAxisCaptions>){
+  const select=(drawing:any)=>{
+    if(!Number.isSafeInteger(drawing?.page)||!Array.isArray(drawing.positions)||drawing.positions.length<2||
+        drawing.positions.slice(0,2).some((value:any)=>!Number.isFinite(value))||!Array.isArray(drawing.siblings))throw fail();
+    return {page:drawing.page,anchor:drawing.positions.slice(0,2),siblings:structuredClone(drawing.siblings)};
+  };
+  return {live:select(captions.drawing),portable:select(captions.portableDrawing)};
+}
 
 function source(doc:any,structure:Structure,table:NestedTable,revision:string):EditableSource{
   if(!revision||table.ancestors.length<1)throw fail();
@@ -28,16 +37,25 @@ function source(doc:any,structure:Structure,table:NestedTable,revision:string):E
   const paragraphs:ParagraphSource[]=values.map((paragraph:any,index:number)=>{
     const existingSingleBlank=values.length===1&&paragraph?.text==='';
     if((!validText(paragraph?.text)&&!existingSingleBlank)||!safeText(paragraph?.text)||
-        !Array.isArray(paragraph.runs)||paragraph.runs.length!==1||
+        !Array.isArray(paragraph.runs)||!paragraph.runs.length||paragraph.runs.length>128||
         paragraph.runs[0]?.start_pos!==0||!Number.isSafeInteger(paragraph.paragraphShape)||
-        !Number.isSafeInteger(paragraph.style)||!Number.isSafeInteger(paragraph.runs[0]?.char_shape_id))throw fail();
+        !Number.isSafeInteger(paragraph.style)||paragraph.runs.some((run:any,i:number)=>
+          !Number.isSafeInteger(run?.start_pos)||run.start_pos<0||!Number.isSafeInteger(run?.char_shape_id)||run.char_shape_id<0||
+          (i>0&&paragraph.runs[i-1].start_pos>=run.start_pos))||
+        (paragraph.runs.length>1&&(paragraph.text===''||paragraph.text.length!==Array.from(paragraph.text).length)))throw fail();
     const path=captionPath(table,index),encoded=JSON.stringify(path),length=doc.getCellParagraphLengthByPath(table.section,table.paragraph,encoded);
     if(length!==Array.from(paragraph.text).length||doc.getTextInCellByPath(table.section,table.paragraph,encoded,0,length)!==paragraph.text)throw fail();
+    const runs:CharacterRun[]=paragraph.runs.map((run:any,i:number)=>({startOffset:run.start_pos,
+      endOffset:i+1<paragraph.runs.length?paragraph.runs[i+1].start_pos:length,charShapeId:run.char_shape_id}));
+    if((length===0?(runs.length!==1||runs[0].startOffset!==0||runs[0].endOffset!==0):
+        runs.some(run=>run.startOffset>=run.endOffset)||
+        !same(parsed(doc.getCharShapeRunsInCellByPath(table.section,table.paragraph,encoded,0,length)),runs)))throw fail();
     return {paragraph:index,path,originalText:paragraph.text,paragraphShape:paragraph.paragraphShape,
-      style:paragraph.style,charShape:paragraph.runs[0].char_shape_id};
+      style:paragraph.style,charShape:paragraph.runs[0].char_shape_id,runs};
   });
   return {editable:true,target:table.id,revision,section:table.section,paragraph:table.paragraph,
-    path:paragraphs[0].path.slice(0,-1),paragraphs,caption:structuredClone(value),stored:structuredClone(captions.stored)};
+    path:paragraphs[0].path.slice(0,-1),paragraphs,caption:structuredClone(value),stored:structuredClone(captions.stored),
+    placement:placementEvidence(captions)};
 }
 
 export function readNestedCaptionTextSources(doc:any,structure:Structure,revision:string):Record<string,NestedCaptionTextSource>{
@@ -82,16 +100,21 @@ export function replaceNestedCaptionText(doc:any,structure:Structure,expected:Ne
     controlIndex:currentParagraph.path[0].controlIndex,cellIndex:currentParagraph.path[0].cellIndex,
     cellParaIndex:currentParagraph.path[0].cellParaIndex,cellPath:structuredClone(currentParagraph.path),charOffset:Array.from(edit.text).length};
   if(edit.text===edit.originalText)return cursor;
+  if(currentParagraph.runs.length>1&&(edit.text.length!==Array.from(edit.text).length||
+      Array.from(edit.text).length!==Array.from(edit.originalText).length))throw fail();
   const before=preservation(doc),token=doc.saveSnapshot(),encoded=JSON.stringify(currentParagraph.path);
   try{
     const length=Array.from(edit.originalText).length;
     if(length>0)checked(doc.deleteTextInCellByPath(current.section,current.paragraph,encoded,0,length));
     checked(doc.insertTextInCellByPath(current.section,current.paragraph,encoded,0,edit.text));
+    if(currentParagraph.runs.length>1)checked(doc.setCharShapeRunsInCellByPath(current.section,current.paragraph,encoded,
+      0,Array.from(edit.text).length,JSON.stringify(currentParagraph.runs)));
     const afterSource=readNestedCaptionTextSources(doc,structure,edit.revision)[edit.target],after=preservation(doc);
     const afterParagraph=afterSource?.editable?afterSource.paragraphs[edit.paragraph]:undefined;
     const checks={source:Boolean(afterSource?.editable),text:afterParagraph?.originalText===edit.text,
       path:Boolean(afterParagraph)&&same(afterParagraph!.path,currentParagraph.path),stored:afterSource?.editable&&
         same(withoutEditedParagraph(current.stored,current.target,edit.paragraph),withoutEditedParagraph(afterSource.stored,current.target,edit.paragraph)),
+      placement:afterSource?.editable&&same(current.placement,afterSource.placement),
       documentText:before.text===after.text||singleReplacement(before.text,after.text,edit.originalText,edit.text),rest:same(before.rest,after.rest),
       resources:before.resources===after.resources};
     const failed=Object.entries(checks).find(([,ok])=>!ok)?.[0];if(failed)throw Error(fail().message+' ('+failed+')');

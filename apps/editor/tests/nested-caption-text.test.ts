@@ -12,6 +12,8 @@ import {readOwnedZip,writeOwnedZip} from '../scripts/lib/owned-zip.mjs';
 const pkg=process.env.JUEONY_ENGINE_PACKAGE??fileURLToPath(new URL('../node_modules/@rhwp/core/',import.meta.url));
 const {default:init,HwpDocument}=await import(pathToFileURL(resolve(pkg,'rhwp.js')).href);
 await init({module_or_path:await readFile(resolve(pkg,'rhwp_bg.wasm'))});
+const hasCaptionPathEvidence=typeof HwpDocument.prototype.getTableAxisCaptionEvidenceByPath==='function';
+const patchedOnly={skip:hasCaptionPathEvidence?false:'requires the Jueony Rust caption-path evidence contract'};
 const bytes=(d:any,format:string):Uint8Array=>format==='hwp'?d.exportHwp():d.exportHwpx();
 
 function uniformCaption(paragraphs=['접수 설명']){
@@ -30,7 +32,7 @@ function editable(doc:any,revision='r1'){
   assert.ok(value?.editable);return {structure,source:value};
 }
 
-for(const format of ['hwp','hwpx'])test(format+' changes only a verified plain nested-table caption and reopens it',()=>{
+for(const format of ['hwp','hwpx'])test(format+' changes only a verified plain nested-table caption and reopens it',patchedOnly,()=>{
   const fixture=uniformCaption(),original=bytes(fixture,format),doc=new HwpDocument(original);fixture.free();
   try{
     const {structure,source}=editable(doc),before=bytes(doc,format),token=doc.saveSnapshot();
@@ -50,7 +52,7 @@ for(const format of ['hwp','hwpx'])test(format+' changes only a verified plain n
   }finally{doc.free();}
 });
 
-for(const format of ['hwp','hwpx'])test(format+' changes one verified paragraph of a multi-paragraph plain caption',()=>{
+for(const format of ['hwp','hwpx'])test(format+' changes one verified paragraph of a multi-paragraph plain caption',patchedOnly,()=>{
   const fixture=uniformCaption(['첫 문단','둘째 문단']),doc=new HwpDocument(bytes(fixture,format));fixture.free();
   try{
     const original=bytes(doc,format),{structure,source}=editable(doc),paragraph=source.paragraphs[1],token=doc.saveSnapshot();
@@ -69,7 +71,28 @@ for(const format of ['hwp','hwpx'])test(format+' changes one verified paragraph 
   }finally{doc.free();}
 });
 
-for(const format of ['hwp','hwpx'])test(format+' fills one existing verified blank caption paragraph and reopens it',()=>{
+for(const format of ['hwp','hwpx'])test(format+' replaces an equal-length multi-run caption and preserves every run',patchedOnly,()=>{
+  const fixture=captionedSubdivisionNestedTable(HwpDocument),doc=new HwpDocument(bytes(fixture,format));fixture.free();
+  try{
+    const original=bytes(doc,format),{structure,source}=editable(doc),paragraph=source.paragraphs[0],token=doc.saveSnapshot();
+    assert.equal(paragraph.originalText,'접수 설명');assert.equal(paragraph.runs.length,2);
+    const beforeRuns=structuredClone(paragraph.runs);
+    try{
+      replaceNestedCaptionText(doc,structure,source,{target:source.target,revision:source.revision,paragraph:0,
+        path:paragraph.path,originalText:paragraph.originalText,text:'검토 내용'});
+      const reopened=new HwpDocument(bytes(doc,format));
+      try{
+        const next=readNestedCaptionTextSources(reopened,readStructure(reopened),'r2')[source.target];
+        assert.ok(next?.editable);assert.equal(next.paragraphs[0].originalText,'검토 내용');
+        assert.deepEqual(next.paragraphs[0].path,paragraph.path);assert.deepEqual(next.paragraphs[0].runs,beforeRuns);
+        assert.deepEqual(next.placement,source.placement);
+      }finally{reopened.free();}
+      doc.restoreSnapshot(token);assert.deepEqual(bytes(doc,format),original);
+    }finally{doc.discardSnapshot(token);}
+  }finally{doc.free();}
+});
+
+for(const format of ['hwp','hwpx'])test(format+' fills one existing verified blank caption paragraph and reopens it',patchedOnly,()=>{
   const fixture=uniformCaption(['']),doc=new HwpDocument(bytes(fixture,format));fixture.free();
   try{
     const original=bytes(doc,format),{structure,source}=editable(doc),paragraph=source.paragraphs[0],token=doc.saveSnapshot();
@@ -115,7 +138,17 @@ test('missing captions and multiple blank caption paragraphs remain fail closed'
   }
 });
 
-test('stale revision, path, original, empty text and mixed or complex captions fail closed',()=>{
+test('an engine without caption-path evidence keeps every nested caption fail closed',
+  {skip:hasCaptionPathEvidence?'unpatched-engine guard':false},()=>{
+    const doc=captionedSubdivisionNestedTable(HwpDocument),before=doc.exportHwpx();
+    try{
+      const sources=readNestedCaptionTextSources(doc,readStructure(doc),'r1');
+      assert.ok(Object.keys(sources).length>0);assert.equal(Object.values(sources).some(value=>value.editable),false);
+      assert.deepEqual(doc.exportHwpx(),before);
+    }finally{doc.free();}
+  });
+
+test('stale revision, path, original, empty text and mixed or complex captions fail closed',patchedOnly,()=>{
   const doc=uniformCaption();
   try{
     const {structure,source}=editable(doc),old=doc.exportHwpx(),paragraph=source.paragraphs[0],base={target:source.target,
@@ -125,9 +158,16 @@ test('stale revision, path, original, empty text and mixed or complex captions f
       assert.throws(()=>replaceNestedCaptionText(doc,structure,source,edit));assert.deepEqual(doc.exportHwpx(),old);
     }
   }finally{doc.free();}
-  for(const complex of [false,true]){
-    const blocked=captionedSubdivisionNestedTable(HwpDocument,{complex});
-    try{assert.equal(Object.values(readNestedCaptionTextSources(blocked,readStructure(blocked),'r1')).some(v=>v.editable),false);}
-    finally{blocked.free();}
-  }
+  const mixed=captionedSubdivisionNestedTable(HwpDocument);
+  try{
+    const {structure,source}=editable(mixed),before=mixed.exportHwpx(),paragraph=source.paragraphs[0],base={target:source.target,
+      revision:source.revision,paragraph:0,path:paragraph.path,originalText:paragraph.originalText};
+    for(const text of ['길이가 다름','검😀 내용','검토\u0007내용']){
+      assert.throws(()=>replaceNestedCaptionText(mixed,structure,source,{...base,text}));assert.deepEqual(mixed.exportHwpx(),before);
+    }
+    assert.equal(Object.values(readNestedCaptionTextSources(mixed,structure,'r1')).some(v=>!v.editable),true);
+  }finally{mixed.free();}
+  const complex=captionedSubdivisionNestedTable(HwpDocument,{complex:true});
+  try{assert.equal(Object.values(readNestedCaptionTextSources(complex,readStructure(complex),'r1')).some(v=>v.editable),false);}
+  finally{complex.free();}
 });

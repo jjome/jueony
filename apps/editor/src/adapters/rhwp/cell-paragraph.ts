@@ -337,11 +337,25 @@ function pictureSpliceLayout(doc:any,t:Table,cell:number,paragraph:number,text:s
  const owner=t.cells[cell],box=outer?.cells.find((c:any)=>c.row===owner.row && c.col===owner.column);
  if(!box || images.length!==anchors.length || images.some((v:any,i:number)=>v.controlIdx!==i))throw invalid();
  const line:PictureLineItem[]=[];
+ const caretWidths=new Set<number>();
+ const carets=new Map<number,any>();
+ const caret=(offset:number)=>{
+  if(!carets.has(offset))carets.set(offset,parsed(doc.getCursorRectInCell(t.section,t.paragraph,t.control,cell,paragraph,offset)));
+  return carets.get(offset);
+ };
+ const atGlyph=(r:any,x:number,g:typeof glyphs[number])=>r.pageIndex===page && r.cellOverflowed===false &&
+   ['x','y','w','h'].every(k=>sameTableLayout(r.cellBounds?.[k],box[k])) &&
+   sameTableLayout(r.x,x) && sameTableLayout(r.height,g.h) && r.y+g.h/2>=g.y && r.y+g.h/2<=g.y+g.h;
  let slot=0;
  for(const [i,g] of glyphs.entries()){
   while(slot<anchors.length && anchors[slot]===i){
    const p=images[slot];line.push({value:'pic'+slot,x:p.x,y:p.y,w:p.w,h:p.h});slot++;
   }
+  // Canvas can redistribute advances when fitting a changed run to the line.
+  // Keep independent start/end caret evidence for bounded paragraphs. A
+  // missing or ambiguous endpoint still requires the original glyph width.
+  if(transition && glyphs.length<=512 && atGlyph(caret(g.offset),g.left,g) &&
+      atGlyph(caret(g.offset+1),g.right,g))caretWidths.add(line.length);
   line.push({value:g.char,x:g.left,y:g.y,w:g.right-g.left,h:g.h});
  }
  if(slot!==anchors.length || line.some(v=>!Number.isFinite(v.w)||v.w<=0||v.x<box.x-.2||v.y<box.y-.2||
@@ -355,7 +369,7 @@ function pictureSpliceLayout(doc:any,t:Table,cell:number,paragraph:number,text:s
  if(!wraps && line.some((v,i)=>i>0&&v.x<line[i-1].x+line[i-1].w-.2))throw invalid();
  const controls=pages.map((items:any[])=>items.map(v=>v.type==='image'&&owns(v)?{...v,x:0,y:0}:v));
  const bystanders=Array.from({length:doc.pageCount()},(_,p)=>parsed(doc.getPageTextLayout(p)).runs.filter((r:any)=>!owns(r)));
- return {page,line,rows,wraps,controls,bystanders};
+ return {page,line,rows,wraps,caretWidths,controls,bystanders};
 }
 function assertPictureSplice(before:ReturnType<typeof pictureSpliceLayout>,after:ReturnType<typeof pictureSpliceLayout>,
  anchors:number[],edit:PictureEdit){
@@ -363,10 +377,14 @@ function assertPictureSplice(before:ReturnType<typeof pictureSpliceLayout>,after
  const oldSuffix=before.line.slice(start+edit.remove),newSuffix=after.line.slice(tail);
  const noLayout={...after,line:before.line,rows:before.rows,wraps:before.wraps};
  if(before.wraps || after.wraps){
-  const shape=({value,w,h}:PictureLineItem)=>({value,w,h});
+  const retained=oldSuffix.length===newSuffix.length && oldSuffix.every((v,i)=>{
+   const n=newSuffix[i];
+   return v.value===n.value && sameTableLayout(v.h,n.h) && (sameTableLayout(v.w,n.w) ||
+    before.caretWidths.has(start+edit.remove+i) && after.caretWidths.has(tail+i));
+  });
   if(!before.rows || !after.rows || !sameTableLayout(before,noLayout) ||
      !sameTableLayout(before.line.slice(0,start),after.line.slice(0,start)) ||
-     !sameTableLayout(oldSuffix.map(shape),newSuffix.map(shape)) ||
+     !retained ||
      !before.rows.slice(0,after.rows.length).every((r,i)=>{
       const q=after.rows![i];return sameTableLayout([r.x,r.y,r.height],[q.x,q.y,q.height]);
      }))throw Error('여러 줄 그림 문단에서 편집 범위 밖의 글자·그림 또는 줄 시작 위치가 달라졌습니다.');

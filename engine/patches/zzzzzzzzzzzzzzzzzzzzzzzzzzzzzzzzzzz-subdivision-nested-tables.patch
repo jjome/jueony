@@ -1,0 +1,65 @@
+--- a/src/document_core/commands/table_ops/subdivision_grid.rs
++++ b/src/document_core/commands/table_ops/subdivision_grid.rs
+@@ -28,19 +28,30 @@
+     true
+ }
+ 
+-// The original owner and all its paragraphs stay in the first piece. The
+-// inline table needs a dedicated anchor, with only plain paragraphs around it.
+-fn retained_nested_table(c: &Cell) -> Option<&Table> {
+-    let mut anchors = c.paragraphs.iter().filter(|p| !p.controls.is_empty());
+-    let p = anchors.next()?;
+-    if anchors.next().is_some() || c.paragraphs.iter().any(|other|
+-        other.controls.is_empty() && !subdivision_paragraph_allowed(other, false)) {
+-        return None;
++// All original paragraphs stay in the first piece. Each inline table needs
++// its own otherwise empty paragraph. Its stored size is a lower bound;
++// the caller also checks the exact rendered frames and text after subdivision.
++fn retained_nested_size(c: &Cell) -> Option<(u32, u32)> {
++    if c.field_name.is_some() || c.paragraphs.len() > 50 { return None; }
++    let (mut width, mut height) = (0, 0u32);
++    for p in &c.paragraphs {
++        if p.controls.is_empty() {
++            if !subdivision_paragraph_allowed(p, false) { return None; }
++            continue;
++        }
++        let inner = retained_inline_table(p)?;
++        width = width.max(inner.common.width);
++        height = height.checked_add(inner.common.height)?;
+     }
++    (height > 0).then_some((width, height))
++}
++
++fn retained_inline_table(p: &Paragraph) -> Option<&Table> {
+     let [Control::Table(inner)] = p.controls.as_slice() else { return None; };
+     if !p.text.is_empty() || !p.field_ranges.is_empty() || !p.orphan_field_ends.is_empty()
+         || !p.range_tags.is_empty() || !p.title_marks.is_empty() || !p.markpen_marks.is_empty()
+-        || c.field_name.is_some() || !inner.common.treat_as_char || inner.common.allow_overlap
++        || inner.common.width == 0 || inner.common.height == 0
++        || !inner.common.treat_as_char || inner.common.allow_overlap
+         || inner.common.locked || inner.common.size_protect || inner.attr & (1 << 30) != 0
+         || inner.caption.is_some() || inner.repeat_header || !inner.zones.is_empty()
+         || inner.cells.is_empty() || inner.cells.len() > 200
+@@ -97,7 +108,7 @@
+         let table = self.get_table_mut(section, para, ctrl)?;
+         let source = table.cells.iter().find(|c| (c.row, c.col) == (row, col)).ok_or_else(invalid)?;
+         let merged = source.row_span > 1 || source.col_span > 1;
+-        let nested = if merged && !distribute { retained_nested_table(source) } else { None };
++        let nested = if merged && !distribute { retained_nested_size(source) } else { None };
+         if table.common.locked || table.common.size_protect || table.attr & (1 << 30) != 0
+             || !table.zones.is_empty() || table.repeat_header || table.caption.is_some()
+             || table.cells.iter().any(|c| {
+@@ -118,10 +129,9 @@
+         if distribute && !(2..=usize::from(rows * cols)).contains(&source.paragraphs.len()) { return Err(invalid()); }
+         let vertical = DivisionAxis::new(table, true, row, source.row_span, rows)?;
+         let horizontal = DivisionAxis::new(table, false, col, source.col_span, cols)?;
+-        if let Some(inner) = nested {
+-            if inner.common.width == 0 || inner.common.height == 0
+-                || inner.common.width > horizontal.cuts[1] - horizontal.cuts[0]
+-                || inner.common.height > vertical.cuts[1] - vertical.cuts[0] { return Err(invalid()); }
++        if let Some((width, height)) = nested {
++            if width > horizontal.cuts[1] - horizontal.cuts[0]
++                || height > vertical.cuts[1] - vertical.cuts[0] { return Err(invalid()); }
+         }
+         let nr = vertical.grid.len() - 1;
+         let nc = horizontal.grid.len() - 1;

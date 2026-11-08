@@ -84,6 +84,9 @@ for(const format of ['hwp','hwpx'])await scenario(format+' multiline picture tex
    return {rows,text:runs.map(r=>r.text).join(''),images:json(doc.getPageControlLayout(0)).controls.filter(c=>c.type==='image'&&c.cellIdx===4).map(c=>rows.indexOf(c.y))};
   };
   assert.deepEqual(published(d).images,[0,1,1]);
+  const advances=doc=>json(doc.getPageTextLayout(0)).runs.filter(r=>r.parentParaIdx===1&&r.cellIdx===4)
+   .flatMap(r=>r.charX.slice(1).map((x,i)=>x-r.charX[i]));
+  const originalAdvance=advances(d)[1];
   for(const [stage,text,slots] of [['prefix','타파하마바사아자😀나다라마바사아Pi한글가나다라cB',[17,24,25]],
     ['middle','타파하마바사아자😀나다라마바사아Pi한약라cB',[17,21,22]],['one-line','앞Pi한약라cB',[2,6,7]],
     ['two-lines','타파하마바사아자😀나다라마바사아Pi한약라cB',[17,21,22]]]){
@@ -91,6 +94,17 @@ for(const format of ['hwp','hwpx'])await scenario(format+' multiline picture tex
    assert.ok(p.pictureTextRanges?.length);
    const op={kind:'replace_cell_paragraph',target:'s0p1t0',row:1,column:1,paragraph:0,originalText:p.text,text};
    transactionalCandidate(d,s,[op],s.revision);
+   if(stage==='prefix'){
+    const batch=json(d.collectCanvasMetricRequests(9,2));
+    assert.ok(batch.requests.some(r=>r.text==='😀'||r.cluster==='😀'));
+    const replies=batch.requests.map(r=>({...r,resolvedFont:r.font,measuredAdvancePx:18.3}));
+    d.registerCanvasMetricReplies(9,2,batch.revision,JSON.stringify(replies));d.selectCanvasMetrics(true);
+    assert.ok(Math.abs(originalAdvance-advances(d)[9])>.2);
+    const readCaret=d.getCursorRectInCell.bind(d);
+    d.getCursorRectInCell=(...a)=>{const v=json(readCaret(...a));if(a[3]===4&&a[5]===9)v.x+=2;return JSON.stringify(v);};
+    assert.throws(()=>assertCellParagraphResult(d,s,op),/편집 범위 밖/);
+    d.getCursorRectInCell=readCaret;assertCellParagraphResult(d,s,op);d.selectCanvasMetrics(false);
+   }
    const file=resolve(out,'multiline-'+stage+'.'+format);await writeFile(file,bytes(d));let i=0;
    assert.deepEqual(inspectPictureAnchors(file),records.map(r=>r.row===1&&r.col===1?{...r,textOffset:slots[i++]}:r));
    const copy=new HwpDocument(await readFile(file));

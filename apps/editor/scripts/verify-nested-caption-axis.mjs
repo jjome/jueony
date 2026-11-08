@@ -60,7 +60,7 @@ for(const ext of ['hwp','hwpx']){
   const copy=new HwpDocument(save(pair));try{assert.deepEqual(markers(copy),original);}finally{copy.free();}
   console.log('PASS',ext,'duplicate sibling caption text resolved by its painted table owner');
  }finally{pair.free();}
- for(const options of [{direction:'LEFT'},{extraParagraph:true}]){
+ for(const options of [{complex:'empty'},{complex:'bookmark'}]){
   const seed=nestedCaptionFixture(HwpDocument,options),d=new HwpDocument(save(seed));seed.free();
   try{
    const [left,right]=readStructure(d).nestedTables,before=save(d),at=[right.section,right.paragraph,nativePath(right)];
@@ -79,6 +79,6 @@ for(const ext of ['hwp','hwpx']){
   };
   assert.throws(()=>executeDocumentOperations(d,s,[{kind:'delete_table_column',target:t.id,index:0}]),/캡션/);
   assert.deepEqual(save(d),bytes);
-  console.log('PASS',ext,'side and multiparagraph captions refused; changed stored position rolled back');
+  console.log('PASS',ext,'empty and control-bearing captions refused; changed stored position rolled back');
  }finally{d.free();}
 }

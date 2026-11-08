@@ -1,0 +1,151 @@
+--- a/src/document_core/commands/table_ops.rs
++++ b/src/document_core/commands/table_ops.rs
+@@ -2445,20 +2445,22 @@
+     }
+ 
+     fn simple_nested_axis_caption(caption: &crate::model::shape::Caption) -> bool {
+-        use crate::model::shape::CaptionDirection;
+-        let [p] = caption.paragraphs.as_slice() else { return false; };
+-        if !matches!(caption.direction, CaptionDirection::Top | CaptionDirection::Bottom)
+-            || p.text.is_empty() || p.text.len() > 16_000 || p.text.chars().any(char::is_control)
+-            || !p.controls.is_empty() || !p.field_ranges.is_empty() || !p.orphan_field_ends.is_empty()
+-            || !p.range_tags.is_empty() || !p.markpen_marks.is_empty() || !p.title_marks.is_empty()
+-            || !p.tab_extended.is_empty() || p.numbering_restart.is_some() || p.raw_break_type != 0
+-            || p.char_shapes.len() > 128 || p.char_shapes.first().map(|s| s.start_pos) != Some(0)
+-        {
+-            return false;
+-        }
+-        let len = p.text.encode_utf16().count() as u32;
+-        p.char_shapes.iter().all(|s| s.start_pos < len && p.char_offsets.contains(&s.start_pos))
+-            && p.char_shapes.windows(2).all(|w| w[0].start_pos < w[1].start_pos)
++        if caption.paragraphs.is_empty() || caption.paragraphs.len() > 32 { return false; }
++        let mut bytes = 0usize;
++        caption.paragraphs.iter().all(|p| {
++            bytes = bytes.saturating_add(p.text.len());
++            if p.text.is_empty() || bytes > 16_000 || p.text.chars().any(char::is_control)
++                || !p.controls.is_empty() || !p.field_ranges.is_empty() || !p.orphan_field_ends.is_empty()
++                || !p.range_tags.is_empty() || !p.markpen_marks.is_empty() || !p.title_marks.is_empty()
++                || !p.tab_extended.is_empty() || p.numbering_restart.is_some() || p.raw_break_type != 0
++                || p.line_segs.len() > 128 || p.char_shapes.len() > 128 || p.char_shapes.first().map(|s| s.start_pos) != Some(0)
++            {
++                return false;
++            }
++            let len = p.text.encode_utf16().count() as u32;
++            p.char_shapes.iter().all(|s| s.start_pos < len && p.char_offsets.contains(&s.start_pos))
++                && p.char_shapes.windows(2).all(|w| w[0].start_pos < w[1].start_pos)
++        })
+     }
+ 
+     pub(crate) fn table_axis_caption_evidence(
+@@ -2472,11 +2474,24 @@
+             return Ok(serde_json::json!({"kind":"complex",
+                 "digest":crate::model::raw_provenance::record_digest(c)}).to_string());
+         }
+-        let p = &c.paragraphs[0];
+-        Ok(serde_json::json!({"kind":"plain","direction":c.direction,"align":c.vert_align,
+-            "width":c.width,"maxWidth":c.max_width,"spacing":c.spacing,"includeMargin":c.include_margin,
+-            "text":p.text,"paragraphShape":p.para_shape_id,"style":p.style_id,"runs":p.char_shapes,
+-            "lines":p.serializable_line_segs()}).to_string())
++        use crate::model::shape::CaptionDirection;
++        let mut evidence=serde_json::json!({"direction":c.direction,"align":c.vert_align,
++            "width":c.width,"maxWidth":c.max_width,"spacing":c.spacing,"includeMargin":c.include_margin});
++        let mut paragraphs=c.paragraphs.iter().map(|p| serde_json::json!({"text":p.text,
++            "paragraphShape":p.para_shape_id,"style":p.style_id,"runs":p.char_shapes,
++            "lines":p.serializable_line_segs()}));
++        if c.paragraphs.len()==1 && c.paragraphs[0].serializable_line_segs().len()<=1
++            && matches!(c.direction,CaptionDirection::Top|CaptionDirection::Bottom) {
++            // Keep the original single-line observation wire shape.
++            evidence["kind"]="plain".into();
++            if let Some(serde_json::Value::Object(paragraph))=paragraphs.next() {
++                evidence.as_object_mut().unwrap().extend(paragraph);
++            }
++        } else {
++            evidence["kind"]="paragraphs".into();
++            evidence["paragraphs"]=serde_json::Value::Array(paragraphs.collect());
++        }
++        Ok(evidence.to_string())
+     }
+ 
+     /// A structural edit must resolve every ancestor as a writable table cell.
+--- a/src/renderer/composer.rs
++++ b/src/renderer/composer.rs
+@@ -924,6 +924,20 @@
+ /// (`2d973021c`가 `samples/rowbreak-problem-pages.hwpx`에서 고친 오버랩이 이 경우다).
+ /// `line_segs`가 비어 있으면(레이아웃 전/미저장 캡션) `compose_paragraph`로만 계산한다.
+ pub fn caption_height_px(caption: &Option<Caption>, dpi: f64) -> f64 {
++    measured_caption_height(caption, dpi, false)
++}
++
++/// The nested table caption painter lays out paragraphs consecutively. For a
++/// stored, control-free caption, the final line of each non-final paragraph
++/// advances by its spacing before the next paragraph begins.
++pub(crate) fn nested_caption_height_px(caption: &Option<Caption>, dpi: f64) -> f64 {
++    let consecutive = caption.as_ref().is_some_and(|c| c.paragraphs.len() > 1
++        && c.paragraphs.iter().all(|p| !p.text.is_empty() && p.controls.is_empty()
++            && !p.line_segs.is_empty() && p.line_segs.iter().all(|s| s.line_height > 0 && s.line_spacing >= 0)));
++    measured_caption_height(caption, dpi, consecutive)
++}
++
++fn measured_caption_height(caption: &Option<Caption>, dpi: f64, consecutive: bool) -> f64 {
+     let caption = match caption {
+         Some(c) => c,
+         None => return 0.0,
+@@ -938,7 +952,7 @@
+ 
+     let mut line_seg_height = 0.0f64;
+     let mut composed_height = 0.0f64;
+-    for para in &caption.paragraphs {
++    for (pi, para) in caption.paragraphs.iter().enumerate() {
+         if let (Some(first), Some(last)) = (para.line_segs.first(), para.line_segs.last()) {
+             let para_top = first.vertical_pos.min(0);
+             let para_bottom = last.vertical_pos.saturating_add(last.line_height);
+@@ -951,7 +965,7 @@
+         } else {
+             for (i, line) in composed.lines.iter().enumerate() {
+                 let line_h = hwpunit_to_px(line.line_height, dpi);
+-                let spacing = if i < composed.lines.len() - 1 {
++                let spacing = if i + 1 < composed.lines.len() || (consecutive && pi + 1 < caption.paragraphs.len()) {
+                     hwpunit_to_px(line.line_spacing, dpi)
+                 } else {
+                     0.0 // 마지막 줄은 line_spacing 제외
+--- a/src/renderer/layout/table_layout.rs
++++ b/src/renderer/layout/table_layout.rs
+@@ -3253,7 +3253,8 @@
+ 
+         let render_caption = should_render_table_caption(table);
+         let (caption_height, caption_spacing) = if render_caption {
+-            let ch = self.calculate_caption_height(&table.caption, styles);
++            let ch = if depth > 0 { crate::renderer::composer::nested_caption_height_px(&table.caption, self.dpi) }
++                else { self.calculate_caption_height(&table.caption, styles) };
+             let cs = table
+                 .caption
+                 .as_ref()
+@@ -12506,7 +12507,7 @@
+                     // 모자란 몫이 조각 셀 상자(= 유닛 합 + 안 여백)를 그만큼 짧게 만들어,
+                     // 마지막 중첩 표 밑줄이 바깥 표 밑줄을 4.16px 넘어 겹쳤다.
+                     let (nt_cap_top, nt_cap_bot) = {
+-                        let ch = self.calculate_caption_height(&nt.caption, styles);
++                        let ch = crate::renderer::composer::nested_caption_height_px(&nt.caption, self.dpi);
+                         let cs = nt
+                             .caption
+                             .as_ref()
+@@ -19811,7 +19812,7 @@
+         // The auto-row producer includes captions in its edge units. Keep those
+         // source-owned reservations while comparing the actual child row boxes.
+         if child.caption.is_some() {
+-            let height = self.calculate_caption_height(&child.caption, styles);
++            let height = crate::renderer::composer::nested_caption_height_px(&child.caption, self.dpi);
+             let spacing = child
+                 .caption
+                 .as_ref()
+--- a/src/renderer/height_measurer.rs
++++ b/src/renderer/height_measurer.rs
+@@ -4569,6 +4569,8 @@
+         });
+         let caption_height = if is_lr_caption {
+             0.0
++        } else if depth > 0 {
++            super::composer::nested_caption_height_px(&table.caption, self.dpi)
+         } else {
+             self.measure_caption(&table.caption)
+         };

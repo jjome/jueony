@@ -87,10 +87,11 @@ try{
  await new Promise(r=>provider.listen(providerPort,'127.0.0.1',r));for(let i=0;i<100;i++){if(await fetch(origin+'/api/health').then(r=>r.ok,()=>false))break;await delay(100);}
  browser=await puppeteer.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,args:['--no-first-run','--disable-background-networking'],defaultViewport:{width:1400,height:1000}});page=await browser.newPage();page.setDefaultTimeout(15000);page.on('dialog',d=>void (d.type()==='beforeunload'?d.accept():d.dismiss()));page.on('pageerror',e=>pageErrors.push(String(e)));page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});await page.setRequestInterception(true);page.on('request',r=>{if(!r.url().startsWith(origin)&&!r.url().startsWith('data:')&&!r.url().startsWith('blob:')){externalRequests.push(r.url());void r.abort();}else void r.continue();});await page.goto(origin);await ready();
  for(const id of ['openai-responses','anthropic','gemini','openai-compatible'])await scenario(id+': chat subdivision, compare, cursor, undo/redo, save/UI reopen',async()=>{await configure(id);const f=await open('hwpx',body('hwpx',true)),before=await snap(),t=before.structure.tables[0],start=calls.length;assert.equal(before.tableSubdivisionSources[t.id].editable,true);await send('셀 2행 2열 분할');await error(false);assert.equal(calls.length,start+1);assert.equal(calls.at(-1).id,id);assert.equal(calls.at(-1).model,id+'-fixture');assert.equal(calls.at(-1).input.document.tableSubdivisionSources[t.id].editable,true);const after=await snap(),table=after.structure.tables[0],primary=table.cells.find(c=>c.row===1&&c.column===1);assert.equal(table.rows,4);assert.equal(table.columns,4);assert.equal(table.cells.length,12);assert.equal(primary.text,t.cells[4].text);for(const c of table.cells.filter(c=>c.row>=1&&c.row<=2&&c.column>=1&&c.column<=2&&c!==primary))assert.equal(c.text,'');assert.deepEqual(after.structure.tables[1],before.structure.tables[1]);assert.deepEqual(after.nodes,before.nodes);assert.equal(await f.evaluate(()=>window.__pageServices.getInputHandler().getCursorPosition().cellIndex),primary.index);await lastAction('변경 확인');await page.waitForFunction(()=>document.getElementById('change-dialog').open);await page.$eval('#change-dialog details',e=>e.open=true);await page.screenshot({path:resolve(out,'subdivision-'+id+'.png')});await page.click('#change-dialog button');await undo();assert.deepEqual((await snap()).structure,before.structure);await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);await reopen(f,'subdivision-ui-'+id);});
- for(const [hostPage,labeled] of [[0,false],[1,false],[1,true]])for(const ext of ['hwp','hwpx'])await scenario(
-   (labeled?'titled nested owner':'nested owner')+' subdivision - '+ext+' on page '+(hostPage+1),async()=>{
+ for(const [hostPage,kind] of [[0,'nested owner'],[1,'nested owner'],[1,'titled nested owner'],[1,'two nested forms']])for(const ext of ['hwp','hwpx'])await scenario(
+   kind+' subdivision - '+ext+' on page '+(hostPage+1),async()=>{
    await configure('openai-compatible');
-   const source=labeled?labeledSubdivisionNestedTable(HwpDocument):subdivisionNestedTable(HwpDocument);
+   const paired=kind==='two nested forms',labeled=kind!=='nested owner';
+   const source=labeled?labeledSubdivisionNestedTable(HwpDocument,undefined,paired?4400:undefined):subdivisionNestedTable(HwpDocument);
    if(hostPage===1)source.insertPageBreak(0,0,2);
    const f=await open(ext,source),before=await snap(),table=before.structure.tables[0];
    const ink=()=>f.evaluate(p=>{
@@ -103,16 +104,18 @@ try{
    const original=await ink();
    assert.equal(original.pages,hostPage+1);
    assert.deepEqual(before.tableSubdivisionSources[table.id].cells.map(c=>[c.row,c.column]),[[0,0]]);
-   assert.equal(original.tables.length,1);assert.deepEqual(original.lines.map(r=>r.text),['X','Y']);
-   if(labeled)assert.deepEqual(original.ownerLines.map(r=>[r.text,r.bold,r.italic]),[['접수 제목',true,false],['설명',false,true]]);
-   await send((labeled?'제목, 설명과 함께 ':'')+'안쪽 표를 첫 칸에 유지하고 바깥 병합 셀을 세 칸으로 나누어 줘');await error(false);
+   assert.equal(original.tables.length,paired?2:1);assert.deepEqual(original.lines.map(r=>r.text),paired?['X','Y','A','B']:['X','Y']);
+   if(paired)assert.deepEqual(original.lines.map(r=>[r.cellPath[0].cellParaIndex,r.bold]),[[1,false],[1,false],[3,true],[3,false]]);
+   if(labeled)assert.deepEqual(original.ownerLines.map(r=>[r.text,r.bold,r.italic]),[
+     ['접수 제목',true,false],...(paired?[['결재',false,false]]:[]),['설명',false,true]]);
+   await send((labeled?'제목, 설명과 함께 ':'')+(paired?'두 ':'')+'안쪽 표를 첫 칸에 유지하고 바깥 병합 셀을 세 칸으로 나누어 줘');await error(false);
    const after=await snap(),changed=after.structure.tables[0];
    assert.deepEqual(after.structure.nestedTables,before.structure.nestedTables);
    assert.deepEqual(changed.cells.map(c=>c.text),[table.cells[0].text,'','',...table.cells.slice(1).map(c=>c.text)]);
    assert.deepEqual(await ink(),original);
    await undo();assert.deepEqual((await snap()).structure,before.structure);assert.deepEqual(await ink(),original);
    await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);
-   await reopen(f,(labeled?'split-titled-owner-':'split-nested-owner-')+ext+'-p'+(hostPage+1),ext);assert.deepEqual(await ink(),original);
+   await reopen(f,(paired?'split-two-nested-':labeled?'split-titled-owner-':'split-nested-owner-')+ext+'-p'+(hostPage+1),ext);assert.deepEqual(await ink(),original);
    assert.deepEqual((await snap()).structure,after.structure);
  });
  await scenario('inline field subdivision - narrowed emoji value rewraps and preserves original document',async()=>{

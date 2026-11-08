@@ -8,15 +8,15 @@
 |---|---|---|---|
 | N011 | 평면 스타일 JSON 가져오기·내보내기·언어별 글꼴·이름 충돌·다음 스타일 순환·중간 실패 전체 롤백 | HWP/HWPX 저장·재열기를 포함한 `style-package.test.ts` 2/2 | 번호·개요·탭·테두리·배경·특수 영역·UI·Agent·한글 비교 |
 | N013 | 기관 프로필 v1 검증·갤러리/번호키 충돌·손상/상위 버전/쓰기 실패 보호·정확한 이름 해석 | 프로필·기본 스타일 단축키 테스트 6/6 | portable package UI·Agent·한글 비교 |
-| N014 / G091 | `54c91718` 기준 단일 root Rectangle의 0~359° 정수 회전과 명시 boolean horz/vert flip을 포함한 logical textbox story 커서·정/역방향 선택 복원; flip·회전 변경 시 기존 지문으로 stale 복원 차단 | 선별 검사 27 pass·환경 의존 2 skip·strict source TypeScript | **부분 유지:** 그룹·중첩·캡션·비-Rectangle·실제 앱 재시작·한글 비교 |
-| N015 | root vector shape 2~32개·중첩 group과 검증된 상위 embedded 이미지 2개 이상의 선택 순서/활성 개체·owner/개체/문서 지문·stale 차단을 SessionCursor/Studio capture·restore wire에 연결 | 선택 검증 28/28·embedded 다중 이미지 HWP/HWPX 저장·재열기·byte invariant | **부분 유지:** equation/OLE/table·nested/caption/locked/linked image·실제 앱 재시작·한글 비교 |
+| N014 / G091 | `ee0f5a75`까지 단일 root Rectangle의 회전·명시 boolean flip logical textbox story 복원에 더해 public HWP/HWPX 엔진의 root owner·story·geometry capability를 확인하고 caption ambiguity·nested owner chain·group child hidden을 exact blocker로 fail-closed | 신규 capability 검사 15/15; 기존 root flip 지원과 public engine 양 형식 관찰 | **부분 유지:** group·nested·caption actual restore·Studio browser callback·실제 앱 재시작·한글 비교 |
+| N015 | root vector shape 2~32개·중첩 group·embedded 이미지 2개 이상과 root 수식 2개 이상의 ordered selection·활성 개체·수식 속성·host/document private SHA 지문·stale 차단을 SessionCursor/Studio capture·restore wire에 연결 | 선택 검증 36/36·actual custom engine 수식 HWP/HWPX 저장·재열기·bytes invariant | **부분 유지:** 단일·mixed·nested 수식·OLE·table은 fail-closed; OLE payload typed property API와 table multi-restore port 없음·실제 앱 재시작·한글 비교 |
 | N016 | `99d903c2` 기준 root-body 복원 계약에 custom Rust engine의 table-cell 미주 owner 지문·저장 bytes 불변 HWP/HWPX save/reopen 증거를 추가; nested·shape owner는 root-only story/layout/Studio 주소와 shape kind ambiguity 때문에 fail-closed | 기존 root 선택 8/8·실제 WASM HWP/HWPX 4/4·table-cell engine 3/3 | **부분 유지:** nested owner 복원·실제 앱 재시작·한글 직접 비교·필드/삽입 개체 선택 복원 |
 | N017 | read-only diagnostic→typed startup gate→memory-only activation→read-only runtime facade를 연결해 값 복사와 scope/backup projection만 노출하고 blocked/unknown key는 fail-closed | N015/N017 공동 선별 검사를 포함한 28/28·strict TypeScript·모듈 경계 diagnostics 0 | **부분 유지:** 실제 shell boot 주입·UI/facade consumer migration·Windows/한글/origin/DPI 수명 실측 미연결 |
 | N020 | 증거 수집→정책→최대 1회 refresh→activate→post evidence 재검증→semantic input의 fail-closed coordinator | 정책·coordinator 19/19·strict TypeScript 통과 | **부분 유지:** 실제 host/Computer Use 관찰·실행 경로 미연결·실제 한글 대화상자 재검증 미실행 |
 | N018 | `b7923dde` 기준 실제 upstream EventBus `document-mutated`·`history-jumped`·`document-swapped` callback을 continuity 정책과 capability gate에 연결하고 bridge 부족·callback 실패는 state-uncertain으로 차단 | 선별 검사 26/26·strict TypeScript·모듈 경계 diagnostics 0 | **부분 유지:** public InputHandler에 exact top recipe·atomic state·compare-apply reset/rebase가 없어 성공 주장 불가·실제 runtime/process restart 통합 미연결 |
 | N004 | 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset 일치·가운데 정렬 재조판·실패 시 exact rollback | HWP/HWPX 네이티브 저장·재열기·undo/redo·4개 fault rollback 및 Edge 실제 편집→bound-save→UI 재열기 | 임의 필드 경계·중첩 셀·복합 개체·한글 비교 |
 | N012 | 저장 글자 스타일과 직접 서식 타입 분리·독립 charShape 소유·정의 변경 전파·중복/stale/race fail-closed; Studio 패치는 style ID가 아니라 캡처·검증한 stored character-style reference를 적용 경계에 전달 | 실제 Rust HWP/HWPX 3/3·앱 경계/범위/patch 보호 합계 8/8·격리 build 663 modules·해당 프로필 TypeScript 검사 통과 | **부분 유지:** 실제 UI 동작 검수·Agent 연결·한글 비교 |
-| N021 | 177개 단축키 감사·object > cells > table > document 우선순위·IME/repeat/도달성 회귀 보호 | 단축키 감사·기존 한글 단축키·navigation 34/34·TypeScript compile | pending 3건·머리말/각주/미주/글상자 story 정책·한글 비교 |
+| N021 | 177개 단축키 감사에 header/footer/footnote/endnote/textbox exact context DTO를 추가하고 unknown/conflict fail-closed·InputHandler normal/IME guard 연결·body fallback/chord escape 차단·nested textbox table depth 검증 | 선택 검사 36/36·strict core TypeScript·module boundaries diagnostics 0 | **부분 유지:** story별/global shortcut allow semantics·실제 앱·한글 비교·쪽 번호/매크로 pending·혼합 run |
 | N023 | `0e48110b` 기준 실제 통합 메뉴 DOM을 visual viewport의 CSS 좌표로 경계 제한하고 DPR 이중 적용 없이 좁은 화면·resize·scroll에 재배치 | 실제 Edge 157에서 DPR 1.25/1.5/2.0·narrow·resize·visualViewport scroll·pageScale 1.5의 6 scenarios PASS; page/console/external/missing 0 | **부분 유지:** 실제 Windows OS DPI·다중 모니터·native 좌표·한글 비교 미검증 |
 | N041 | 자체 생성한 본문·명시 글꼴, 2쪽 경계·용지, 표·셀, 내장 PNG, 본문 누름틀의 5종 manifest를 HWP/HWPX 입력 10개로 만들고 open→같은 형식 save→reopen; production preservation evidence·published layout 0.2 허용치·기능 최소조건·입력 SHA 불변을 fail-closed 검사 | custom Rust/WASM `source-c932adab64d8bc4e`에서 10/10·manifest 계약/위조 거절 3/3·구문/diff 검사 통과 | **부분 유지:** 같은 엔진의 합성 문서 기술 검수이며 실제 한글 2024 화면·인쇄·복구 경고, 기관 실문서·공개 문서 코퍼스 독립 비교는 미실행 |
 | N042 | 같은 글꼴·DPI·용지와 실제 page definition을 봉인한 published layout baseline에서 쪽 수·텍스트 재조판·개체 위치 차이를 분류하고 교차 생산자·글꼴 SHA-256이 없으면 차단 | 계약 4/4·2쪽 표/그림/필드 복합 HWP/HWPX baseline 2/2 | **부분 유지:** Jueony 엔진 baseline일 뿐 실제 한글 2024·PDF raster·인쇄 드라이버·실제 글꼴 바이너리 비교는 미실행 |
@@ -93,6 +93,12 @@ npm test -- tests/preference-startup-gate-n017.test.ts tests/preference-memory-a
 59 tests passed; strict TypeScript passed for the three committed source files and module boundary audit passed with 455 files and 0 diagnostics
 N015/N017 committed selected verification bundle (embedded image selection + read-only preference runtime and regressions)
 28 tests passed; strict TypeScript and module boundary audit passed with 0 diagnostics
+N014 public HWP/HWPX textbox owner/story/geometry capability verification
+15/15 passed; caption ambiguity, nested owner chain and hidden group child remained exact fail-closed blockers
+N015 root equation multi-selection verification with actual custom engine HWP/HWPX save/reopen and bytes invariant
+36/36 passed; single/mixed/nested equation, OLE and table selection remained fail-closed
+N021 special-story shortcut boundary verification
+36/36 passed; strict core TypeScript and module boundary audit passed with 0 diagnostics
 node apps/editor/scripts/verify-recovery-checkpoint-browser-n044.mjs
 Edge 157 IndexedDB 3 scenarios passed; page/console/external/missing resource arrays were all empty
 JUEONY_ENGINE_PACKAGE=build/rhwp-engine/source-4843b7d7aa6cc842/pkg npm test -- tests/insert-placeholder-capability-n019.test.ts
@@ -182,6 +188,9 @@ B071 Edge 검수에서는 차트 시나리오의 page 오류·console 오류·�
 - `24bc5eb6 feat(editor): expose read only preference runtime`
 - `2d486daf feat(editor): restore verified multi image selections`
 - `7ab73783 test(editor): verify recovery checkpoints in browser`
+- `ee0f5a75 feat(editor): audit nested textbox restore capability`
+- `0daeb3c7 feat(editor): restore verified equation selections`
+- `86e629d4 feat(editor): guard shortcuts by special story`
 - `2bd2c75b feat(editor): preserve portable style references`
 - `4ea193ce feat(editor): delete verified page hide controls`
 - AI·Agent 실행과 참고 자료·검색·RAG 코드는 이 묶음에서 변경하지 않았다.

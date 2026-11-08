@@ -29,11 +29,27 @@ async function captionScreen(frame){
     automation.registerCommand({id:'ext:nested-caption-review',label:'캡션 검수',canExecute:()=>true,execute:s=>services=s});
     automation.execute('ext:nested-caption-review');automation.unregisterCommand('ext:nested-caption-review');
     const doc=services.wasm.borrowDocumentHandle();
-    return {canvas:doc.canvasMetricsActive(),runs:JSON.parse(doc.getPageTextLayout(0)).runs.filter(r=>r.cellIdx===65534),
-      sibling:JSON.parse(doc.getPageControlLayout(0)).controls[1]};
+    const [,sibling,owner]=JSON.parse(doc.getPageControlLayout(0)).controls;
+    // Growing a centered child table moves its top edge. Keep the caption's
+    // offset from its owner and the untouched sibling's absolute placement.
+    const runs=JSON.parse(doc.getPageTextLayout(0)).runs.filter(r=>r.cellIdx===65534).map(r=>({
+      ...r,x:r.x-owner.x,y:r.y-owner.y
+    }));
+    return {canvas:doc.canvasMetricsActive(),runs,sibling};
   });
   assert.equal(result.canvas,true);
   return result;
+}
+function sameCaptionScreen(actual,expected){
+  assert.equal(actual.canvas,expected.canvas);assert.deepEqual(actual.sibling,expected.sibling);
+  assert.equal(actual.runs.length,expected.runs.length);
+  for(const [i,{x,y,...run}] of actual.runs.entries()){
+    const {x:beforeX,y:beforeY,...original}=expected.runs[i];
+    // Native page layout coordinates are published to 0.1px. Subtraction
+    // combines two rounded coordinates, matching the adapter's 0.21 bound.
+    assert.ok(Math.abs(x-beforeX)<=.21&&Math.abs(y-beforeY)<=.21);
+    assert.deepEqual(run,original);
+  }
 }
 const provider=http.createServer(async(req,res)=>{
   try {
@@ -144,15 +160,15 @@ try {
       else{edited[0]=original[0];edited[1]=['새 행😀','',...original[1]];}
     }
     assert.deepEqual(await texts(),edited);
-    if(captionFlow)assert.deepEqual(await captionScreen(frame),sourceScreen);
+    if(captionFlow)sameCaptionScreen(await captionScreen(frame),sourceScreen);
     const undo=(await page.$$('.message-actions button')).reverse();
     for (const b of undo) if (await b.evaluate(e=>e.textContent==='요청 되돌리기')) {await b.click();break;}
     await page.waitForFunction(()=>document.getElementById('app-status').textContent.includes('되돌렸습니다'));
     assert.deepEqual(await texts(),original);
-    if(captionFlow)assert.deepEqual(await captionScreen(frame),sourceScreen);
+    if(captionFlow)sameCaptionScreen(await captionScreen(frame),sourceScreen);
     assert.equal((await frame.evaluate(()=>window.jueonyEditor.executeCommand('edit:redo'))).ok,true);
     assert.deepEqual(await texts(),edited);
-    if(captionFlow)assert.deepEqual(await captionScreen(frame),sourceScreen);
+    if(captionFlow)sameCaptionScreen(await captionScreen(frame),sourceScreen);
     const saved=await frame.evaluate(async()=>{
       const api=window.jueonyEditor,status=await api.save(),file=await api.fileHandle().getFile();
       return {status,bytes:Array.from(new Uint8Array(await file.arrayBuffer())),dirty:api.state().dirty};
@@ -209,7 +225,7 @@ try {
         await api.open(new Uint8Array(bytes),api.fileHandle().name,api.fileHandle(),false);
       },saved.bytes);
       assert.deepEqual(await texts(),edited);
-      assert.deepEqual(await captionScreen(frame),sourceScreen);
+      sameCaptionScreen(await captionScreen(frame),sourceScreen);
     }
     console.log('PASS',format,mode,'UI chat → loopback provider → Agent application → undo/redo → bound file save and native reopen');
   }

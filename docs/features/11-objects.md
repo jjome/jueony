@@ -164,11 +164,11 @@
 - 종류: 한글 상위 기능 · 우선순위: P2.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 기존 category/scatter 차트의 공유 단일 단계 label에서 단일 숫자 cache 값·단일 계열 이름·단일 범주명을 revision·원문·구조 재검증 뒤 dry-run·snapshot rollback으로 편집하고 Studio 제목줄의 차트 데이터 창에서 세 명령을 실행한다.
-- 다음 작업: 어댑터·Studio 명령 14/14와 격리 build 663 modules를 통과했다. 실제 Edge에서 HWP/HWPX의 단일 값 변경·저장 바이트·UI 재열기를 확인했고 원본 c:f 수식·유형·축·나머지 범례·값·unknown OOXML·비차트 자산과 undo를 보존했다. 다중 항목·다중 계열·복합 label·수식 자체 변경·up/down bars와 한글 비교는 남았다. 검수 빌드에서 favicon 404와 빈 문서 stored-time 초기화의 공식 WASM API 불일치가 별도 제한으로 관찰됐다.
+- 완료 범위: 기존 category/scatter 차트의 공유 단일 단계 label에서 단일 숫자 cache 값·동일 차트의 2~128개 숫자 값 원자 일괄 변경·단일 계열 이름·단일 범주명을 revision·원문·구조 재검증 뒤 dry-run·snapshot rollback으로 편집한다. Studio 제목줄의 차트 데이터 창은 단일 값·계열명·범주명 명령을 실행한다.
+- 다음 작업: 일괄 값 adapter 13/13에서 HWP/HWPX 저장·재열기·exact undo·부분 실패 전체 rollback과 원본 c:f 수식·유형·축·범례·unknown OOXML·비차트 자산 보존을 확인했다. 기존 Studio 명령 14/14·격리 build 663 modules와 실제 Edge 단일 값 저장 바이트·UI 재열기도 통과했다. 실제 UI 다중 선택·여러 차트/복합 label/수식 자체 변경·up/down bars·Agent 연결·한글 비교는 남았다. 검수 빌드에서 favicon 404와 빈 문서 stored-time 초기화의 공식 WASM API 불일치가 별도 제한으로 관찰됐다.
 - UI 명령: `insert:chart-data-edit`
 - 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `WIRED;SCOPED_CHART_VALUE_EDIT_2026_11_09;SCOPED_CHART_SERIES_NAME_2026_11_09;SCOPED_CHART_CATEGORY_NAME_2026_11_09;SCOPED_CHART_STUDIO_UI_2026_11_09;PARTIAL`
+- 원래 기록: `WIRED;SCOPED_CHART_VALUE_EDIT_2026_11_09;SCOPED_CHART_VALUE_BATCH_2026_11_09;SCOPED_CHART_SERIES_NAME_2026_11_09;SCOPED_CHART_CATEGORY_NAME_2026_11_09;SCOPED_CHART_STUDIO_UI_2026_11_09;PARTIAL`
 
 </details>
 

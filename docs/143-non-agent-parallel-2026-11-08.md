@@ -38,10 +38,11 @@
 | B046 | 앱 보기 설정 `pageOutline`·메뉴·상태바·탭 간 동기화와 page gap·canvas shadow를 단일 렌더 트랜잭션으로 토글 | HWP/HWPX 바이트 비변경·재열기·설정 backup·고정 upstream 통합 patch 11/11·격리 build·실제 Edge 메뉴/상태바/교차 탭 smoke | 빈 문서 stored-time 초기화 경고·한글 직접 비교 |
 | B025 / B027 | Studio 머리말·꼬리말 선택에서만 내부 JSON·plain text clipboard payload에 문서 identity·story owner·revision·selection·원문을 봉인하고 copy/cut/paste를 단일 snapshot으로 실행 | HWP/HWPX 저장·재열기·undo·실패 rollback·OS clipboard 실패/불일치 차단 포함 12/12·hfclipboard 격리 build 661 modules | 각주/미주 원자 API·RTF·그림·전체 OS clipboard 형식·한글 비교 |
 | B028 | 단일 구역 root-body의 2~200개 일반 문단 선택을 여러 줄 plain text로 치환하고 전체 본문 identity·원문·글자/문단 서식·revision·선택을 적용 직전 재검증; 단일 snapshot으로 실패 rollback·정확한 undo | 신규 다중 문단 어댑터 4/4와 기존 text-transform 회귀 5/5, 합계 9/9·HWP/HWPX 저장·재열기·앞뒤 서식 보존·부분 실패 바이트 불변·TypeScript compile | **부분 유지:** UI/basic-text-commands 미연결·다구역·표/필드/책갈피/개체/특수 story·HTML/그림/HWP 조각·한글 비교 |
-| B071 | 기존 category/scatter 차트의 단일 숫자 cache 값·단일 계열 이름·단일 범주명을 revision·원문·구조 재검증과 dry-run 뒤 교체하고 Studio 제목줄의 차트 데이터 창에서 실행 | 어댑터·Studio 명령 14/14·격리 build 663 modules·실제 Edge HWP/HWPX 값 편집→저장 바이트→UI 재열기·유형/축/범례/수식/unknown OOXML/비차트 자산 보존 | **부분 유지:** 다중 항목/계열·복합 label·수식 자체 변경·up/down bars·한글 비교 |
+| B071 | 기존 category/scatter 차트의 단일 숫자 cache 값·동일 차트의 2~128개 숫자 값 원자 일괄 변경·단일 계열 이름·단일 범주명을 revision·원문·구조 재검증과 dry-run 뒤 교체하고 Studio 제목줄의 차트 데이터 창에서 단일 명령 실행 | 일괄 adapter 13/13·기존 Studio 명령 14/14·격리 build 663 modules·실제 Edge HWP/HWPX 단일 값 편집→저장 바이트→UI 재열기·유형/축/범례/수식/unknown OOXML/비차트 자산 보존 | **부분 유지:** 실제 UI 다중 선택·여러 차트·복합 label·수식 자체 변경·up/down bars·Agent 연결·한글 비교 |
 | N013 추가 | 저장된 Ctrl+1~Ctrl+0 slot만 기존 스타일 적용 명령으로 연결하고 IME·대화상자·표/개체/특수 story와 stale 설정을 차단; 설정 UI에서 표시·해제·초기화 | 통합 patch 보호·HWP/HWPX 저장·재열기·undo·stale 불변 3/3·격리 build·실제 Edge 설정창/단축키 smoke | 빈 문서 stored-time 초기화 경고·portable package UI·Agent·한글 비교 |
 | 실행 기반 | 엔진 조건부 `DefaultTabSpacingDialog`가 없는 공식 npm build와 있는 custom-engine build를 구분하되 일반 Char/Para stale target 보호는 항상 유지 | patch seam 3/3·격리 전체 build 659 modules·N013/B046 marker·실제 Edge smoke 4건 확인 | 현재 공식 npm 엔진의 빈 문서 stored-time 초기화 경고 |
 | B071 추가 | 단일 계열 이름과 공유 단일 범주명 cache 변경 시 원본 `c:f` 수식과 다른 범례·값·축·unknown OOXML·비차트 자산을 보존하고 실제 Studio UI를 같은 보호 계약에 연결 | HWP/HWPX 저장·재열기·undo·rollback과 UI 명령 포함 차트 전체 14/14·TypeScript compile | 다중 변경·복합 label·수식 자체 변경·한글 비교 |
+| B071 일괄 | 동일 차트의 서로 다른 series/point 2~128개를 원문·중복·revision·source·owner 전체 사전 검증 후 dry-run하고 snapshot 하나로 원자 적용 | HWP/HWPX 저장·재열기·exact undo·부분 결과 rollback·수식/unknown OOXML/비차트 자산 보존과 1/129개·중복·stale·owner 교체 음성 사례 13/13 | **부분 유지:** Studio UI 다중 선택·다중 계열명/범주명·여러 차트·Agent·한글 비교 |
 | B025 / B027 조사 | 각주·미주의 읽기 API와 단일 문단 mutation은 있으나 원자적 선택 복사·다문단 치환 계약 부재 확인 | 코드 무변경 | Rust/WASM `copySelectionInNote`·`replaceRangeInNote`와 형식 재열기 계약 |
 
 ## 실행한 선별 검사
@@ -66,7 +67,7 @@ JUEONY_ENGINE_PACKAGE=build/rhwp-engine/source-c932adab64d8bc4e/pkg node --exper
 node --experimental-strip-types --test apps/editor/tests/page-hide-control-delete.test.ts
 4 tests passed
 npm test -- tests/chart-data-edit.test.ts
-9 tests passed
+13 tests passed
 npm test -- tests/chart-data-edit.test.ts tests/chart-data-edit-studio.test.ts
 14 tests passed
 npm run build

@@ -1,12 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {characterStyleSpans,applySelectedCharacterStyle,nextParagraphStyle} from '../src/adapters/rhwp/style-flow.ts';
+import {captureStoredCharacterStyle} from '../src/adapters/rhwp/character-style-reference.ts';
 const pos=(paragraphIndex:number,charOffset:number)=>({sectionIndex:0,paragraphIndex,charOffset});
-const wasm={getSectionCount:()=>1,getParagraphCount:()=>3,getParagraphLength:()=>10,getStyleList:()=>[{id:0,type:0,nextStyleId:2},{id:1,type:1,charShapeId:8},{id:2,type:0,nextStyleId:2}],getStyleAt:()=>({id:0})};
+const styles=[{id:0,name:'바탕글',type:0,charShapeId:0,nextStyleId:2},{id:1,name:'강조',type:1,charShapeId:8},{id:2,name:'본문',type:0,charShapeId:2,nextStyleId:2}];
+const wasm={getSectionCount:()=>1,getParagraphCount:()=>3,getParagraphLength:()=>10,getStyleList:()=>styles,getStyleDetail:(id:number)=>({id,charProps:{bold:id===1}}),getStyleAt:()=>({id:0})};
 test('character style applies only selected text across paragraphs, preserving outside text and paragraph style',()=>{
  const writes:any[]=[];let history=0;
  const input={cursor:Object.fromEntries(['isInHeaderFooter','isInFootnote','isInTextBox','isInCellSelectionMode','isInTableObjectSelection','isInPictureObjectSelection'].map(k=>[k,()=>false])),getSelection:()=>({start:pos(0,3),end:pos(2,2)}),getPosition:()=>pos(2,2),executeOperation:(op:any)=>{history++;op.operation({...wasm,setCharShapeRuns:(...args:any[])=>{writes.push(args);return '{"ok":true}';}});}};
- assert.equal(applySelectedCharacterStyle(input,wasm,1),true);assert.equal(history,1);
+ assert.equal(applySelectedCharacterStyle(input,wasm,captureStoredCharacterStyle(wasm,1)),true);assert.equal(history,1);
  assert.deepEqual(writes.map(a=>a.slice(0,4)),[[0,0,3,10],[0,1,0,10],[0,2,0,2]]);
  assert.ok(writes.every(a=>a[4][0].charShapeId===8));
 });

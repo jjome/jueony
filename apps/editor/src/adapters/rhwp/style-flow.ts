@@ -1,4 +1,7 @@
-/** Selection styles use existing native shape IDs; paragraph style and text stay intact. */
+import type {StoredCharacterStyleReference} from '../../modules/document/public/character-style-reference.ts';
+import {verifyStoredCharacterStyle} from './character-style-reference.ts';
+
+/** Selection styles use verified native definition IDs; paragraph style and text stay intact. */
 type Position = {sectionIndex:number;paragraphIndex:number;charOffset:number;parentParaIndex?:number;controlIndex?:number;cellIndex?:number;cellParaIndex?:number;cellPath?:{controlIndex:number;cellIndex:number;cellParaIndex:number}[];isTextBox?:boolean};
 type Span = {section:number;paragraph:number;start:number;end:number;parent?:number;path?:Position['cellPath']};
 const integer=(v:unknown):v is number=>Number.isSafeInteger(v)&&(v as number)>=0;
@@ -36,16 +39,17 @@ export function characterStyleSpans(wasm:any,start:Position,end:Position):Span[]
     if(span.end>span.start)spans.push(span);
   }
 }
-export function applySelectedCharacterStyle(input:any,wasm:any,styleId:number):boolean {
-  const style=wasm.getStyleList().find((s:any)=>s.id===styleId);
-  if(!style||style.type!==1||!integer(style.charShapeId))throw new Error('적용할 글자 스타일을 다시 선택하세요.');
+export function applySelectedCharacterStyle(input:any,wasm:any,reference:StoredCharacterStyleReference):boolean {
+  const style=verifyStoredCharacterStyle(wasm,reference);
   if(input.cursor.isInHeaderFooter()||input.cursor.isInFootnote()||input.cursor.isInTextBox()||input.cursor.isInCellSelectionMode()||input.cursor.isInTableObjectSelection()||input.cursor.isInPictureObjectSelection())throw new Error('본문 또는 같은 표 셀의 글자를 선택하세요.');
   const range=input.getSelection();if(!range)return false;
   const spans=characterStyleSpans(wasm,range.start,range.end);if(!spans.length)return true;
   const position=input.getPosition();
   input.executeOperation({kind:'snapshot',operationType:'applySelectedCharacterStyle',operation:(native:any)=>{
+    const confirmed=verifyStoredCharacterStyle(native,reference);
+    if(confirmed.charShapeId!==style.charShapeId)throw new Error('글자 스타일 정의가 바뀌었습니다. 최신 목록에서 다시 선택하세요.');
     for(const span of spans){
-      const runs=[{startOffset:span.start,endOffset:span.end,charShapeId:style.charShapeId}];
+      const runs=[{startOffset:span.start,endOffset:span.end,charShapeId:confirmed.charShapeId}];
       const response=span.path?native.setCharShapeRunsInCellByPath(span.section,span.parent,JSON.stringify(span.path),span.start,span.end,runs):native.setCharShapeRuns(span.section,span.paragraph,span.start,span.end,runs);
       const result=typeof response==='string'?JSON.parse(response):response;
       if(result?.ok===false)throw new Error('선택한 글자 스타일을 적용하지 못했습니다.');

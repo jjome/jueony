@@ -1,0 +1,215 @@
+diff --git a/src/document_core/commands/style_references.rs b/src/document_core/commands/style_references.rs
+--- a/src/document_core/commands/style_references.rs
++++ b/src/document_core/commands/style_references.rs
+@@ -15,7 +15,11 @@ fn paragraphs(items: &mut [Paragraph], mapping: &StyleRemap) {
+     for paragraph in items {
+         remap(&mut paragraph.style_id, mapping);
+         if let StyleRemap::Shapes {id,kind,old_char,new_char,old_para,new_para,old_indent,new_indent}=mapping {
+-            if paragraph.style_id==*id {
++            // Paragraph styles carry an explicit style_id. Character styles do not:
++            // HWP/HWPX persist their definition link as the exact CharShape ID used by
++            // the range. A direct format owns a different CharShape ID even when its
++            // visible properties happen to be identical.
++            if (*kind==0 && paragraph.style_id==*id) || (*kind==1 && paragraph.char_shapes.iter().any(|shape| shape.char_shape_id==*old_char)) {
+                 if *kind==0 && paragraph.para_shape_id==*old_para {
+                     paragraph.para_shape_id=*new_para;
+                     restamp_indentation(&mut paragraph.line_segs,*old_indent,*new_indent);
+diff --git a/src/wasm_api.rs b/src/wasm_api.rs
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -7397,6 +7397,15 @@ impl HwpDocument {
+         let old_psid = style.para_shape_id;
+         let style_type = style.style_type;
+ 
++        // A range has no separate character-style ID in HWP/HWPX. Its durable
++        // identity is the definition's CharShape ID, so a shared definition is
++        // ambiguous and must fail before allocating or mutating anything.
++        if style_type == 1 && styles.iter().enumerate().any(|(index, other)| {
++            index != style_id as usize && other.char_shape_id as u32 == old_csid
++        }) {
++            return false;
++        }
++
+         // CharShape 수정
+         if !char_mods_json.is_empty() && char_mods_json != "{}" {
+             let char_mods = crate::document_core::helpers::parse_char_shape_mods(char_mods_json);
+@@ -7530,8 +7539,25 @@ impl HwpDocument {
+             .map(|id| id as u16)
+             .filter(|id| (*id as usize) < self.core.document.doc_info.char_shapes.len())
+             .unwrap_or(fallback_char_shape_id);
++        // Character styles need an owned CharShape ID. HWP/HWPX runs persist
++        // that exact ID as their only durable link to the definition. Sharing the
++        // base shape would make later definition edits indistinguishable from
++        // ordinary direct formatting after reopen.
++        let char_shape_id = if style_type == 1 {
++            let next = self.core.document.doc_info.char_shapes.len();
++            if next > usize::from(u16::MAX) {
++                return -1;
++            }
++            let Some(base) = self.core.document.doc_info.char_shapes.get(char_shape_id as usize).cloned() else {
++                return -1;
++            };
++            self.core.document.doc_info.char_shapes.push(base);
++            next as u16
++        } else {
++            char_shape_id
++        };
+         let para_shape_id = json_i32(json, "baseParaShapeId")
+             .filter(|id| *id >= 0)
+             .map(|id| id as u16)
+             .filter(|id| (*id as usize) < self.core.document.doc_info.para_shapes.len())
+             .unwrap_or(fallback_para_shape_id);
+diff --git a/src/model/document.rs b/src/model/document.rs
+--- a/src/model/document.rs
++++ b/src/model/document.rs
+@@ -606,9 +606,19 @@ impl HwpDocument {
+             .unwrap_or_default();
+         let modified = mods.apply_to(&base);
+ 
+-        // 동일한 CharShape가 이미 있는지 검색
++        // Character-style definitions own their CharShape IDs. Direct formatting
++        // must never reuse one of those IDs, even when every visible property is
++        // equal; otherwise a later definition edit would accidentally propagate to
++        // ordinary direct formatting after an HWP/HWPX reopen.
++        let definition_shapes: std::collections::HashSet<u32> = self
++            .doc_info
++            .styles
++            .iter()
++            .filter(|style| style.style_type == 1)
++            .map(|style| u32::from(style.char_shape_id))
++            .collect();
+         for (i, cs) in self.doc_info.char_shapes.iter().enumerate() {
+-            if *cs == modified {
++            if *cs == modified && !definition_shapes.contains(&(i as u32)) {
+                 return i as u32;
+             }
+         }
+diff --git a/Cargo.toml b/Cargo.toml
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -222,5 +222,9 @@ name = "overflow_cell_baseline"
+ path = "tests/overflow_cell_baseline.rs"
+ 
++[[test]]
++name = "character_style_range_reference"
++path = "tests/character_style_range_reference.rs"
++
+ # END RHWP GENERATED TEST TARGETS
+ 
+ [dependencies]
+diff --git a/tests/character_style_range_reference.rs b/tests/character_style_range_reference.rs
+new file mode 100644
+--- /dev/null
++++ b/tests/character_style_range_reference.rs
+@@ -0,0 +1,111 @@
++//! Character-style ranges keep a durable definition link through their owned
++//! CharShape ID. Direct formatting with equal visible properties stays separate.
++#![cfg(not(target_arch = "wasm32"))]
++
++use rhwp::wasm_api::HwpDocument;
++
++fn style_shape(doc: &HwpDocument, style: usize) -> u32 {
++    u32::from(doc.document().doc_info.styles[style].char_shape_id)
++}
++
++fn shape_at(doc: &HwpDocument, offset: usize) -> u32 {
++    doc.document().sections[0].paragraphs[0]
++        .char_shape_id_at(offset)
++        .expect("character shape at offset")
++}
++
++fn fixture() -> (HwpDocument, usize, u32) {
++    let mut doc = HwpDocument::create_empty();
++    doc.create_blank_document_native().expect("blank document");
++    doc.insert_text_native(0, 0, 0, "가나다라마바사")
++        .expect("body text");
++    let normal = style_shape(&doc, 0);
++    let style = doc.create_style(
++        &format!(
++            r#"{{"name":"범위 강조","englishName":"RangeEmphasis","type":1,"nextStyleId":0,"baseCharShapeId":{normal},"baseParaShapeId":0}}"#
++        ),
++    );
++    assert!(style > 0, "character definition created");
++    let style = style as usize;
++    let owned = style_shape(&doc, style);
++    assert_ne!(owned, normal, "character definition owns its initial shape");
++    assert!(doc.update_style_shapes(style as u32, r#"{"bold":true}"#, "{}"));
++    let linked = style_shape(&doc, style);
++    assert_ne!(linked, owned, "definition edit allocates a replacement shape");
++    doc.set_char_shape_id_native(0, 0, 1, 3, linked)
++        .expect("apply definition shape to exact range");
++    doc.apply_char_format_native(0, 0, 4, 5, r#"{"bold":true}"#)
++        .expect("equal-looking direct format");
++    let direct = shape_at(&doc, 4);
++    assert_ne!(direct, linked, "direct format is not a definition link");
++    (doc, style, direct)
++}
++
++fn assert_initial_reopen(doc: &HwpDocument, style: usize, direct: u32) {
++    let linked = style_shape(doc, style);
++    assert_eq!(shape_at(doc, 1), linked);
++    assert_eq!(shape_at(doc, 2), linked);
++    assert_eq!(shape_at(doc, 4), direct);
++    assert_ne!(shape_at(doc, 0), linked);
++    assert_ne!(direct, linked);
++}
++
++fn assert_updated(doc: &HwpDocument, style: usize, old_link: u32, direct: u32) {
++    let linked = style_shape(doc, style);
++    assert_ne!(linked, old_link, "definition receives a new CharShape ID");
++    assert_eq!(shape_at(doc, 1), linked, "linked range follows definition");
++    assert_eq!(shape_at(doc, 2), linked, "whole linked range follows definition");
++    assert_eq!(shape_at(doc, 4), direct, "equal-looking direct format stays direct");
++    assert_ne!(shape_at(doc, 0), linked, "outside text is unchanged");
++}
++
++fn verify_roundtrip(format: &str) {
++    let (doc, style, direct) = fixture();
++    let first = match format {
++        "hwp" => doc.export_hwp_native().expect("first HWP export"),
++        "hwpx" => doc.export_hwpx_native().expect("first HWPX export"),
++        _ => unreachable!(),
++    };
++    let mut reopened = HwpDocument::from_bytes(&first).expect("first reopen");
++    assert_initial_reopen(&reopened, style, direct);
++    let old_link = style_shape(&reopened, style);
++    assert!(reopened.update_style_shapes(
++        style as u32,
++        r##"{"italic":true,"textColor":"#224466"}"##,
++        "{}"
++    ));
++    assert_updated(&reopened, style, old_link, direct);
++    let second = match format {
++        "hwp" => reopened.export_hwp_native().expect("updated HWP export"),
++        "hwpx" => reopened.export_hwpx_native().expect("updated HWPX export"),
++        _ => unreachable!(),
++    };
++    let saved = HwpDocument::from_bytes(&second).expect("updated reopen");
++    assert_updated(&saved, style, old_link, direct);
++}
++
++#[test]
++fn character_style_range_link_survives_hwp_reopen_and_definition_edit() {
++    verify_roundtrip("hwp");
++}
++
++#[test]
++fn character_style_range_link_survives_hwpx_reopen_and_definition_edit() {
++    verify_roundtrip("hwpx");
++}
++
++#[test]
++fn ambiguous_shared_character_definition_refuses_before_mutation() {
++    let (mut doc, style, _) = fixture();
++    let duplicate = doc.create_style(
++        r#"{"name":"중복 정의","englishName":"Duplicate","type":1,"nextStyleId":0}"#,
++    );
++    assert!(duplicate > 0);
++    let linked = style_shape(&doc, style);
++    doc.document_mut().doc_info.styles[duplicate as usize].char_shape_id = linked as u16;
++    let before = doc.export_hwpx_native().expect("before bytes");
++    assert!(!doc.update_style_shapes(style as u32, r#"{"italic":true}"#, "{}"));
++    assert_eq!(doc.export_hwpx_native().expect("after bytes"), before);
++    assert_eq!(style_shape(&doc, style), linked);
++    assert_eq!(shape_at(&doc, 1), linked);
++}

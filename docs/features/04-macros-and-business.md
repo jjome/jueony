@@ -153,7 +153,7 @@
 - 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
 - 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 한글 스크립트/키 입력 녹화는 미지원. Jueony 지원 AI 명령 저장·재실행 매크로는 별도 구현(28번 문서)
+- 다음 작업: 한글 스크립트/키 입력 녹화는 미지원. 기존 AI 명령 템플릿은 별도 기능이다. 실제 구현에는 dispatcher 성공 이벤트·IME/선택 의미 기록·recordable capability·revision preflight·단일 undo/부분 실패 rollback·녹화 UI와 저장 계약이 먼저 필요하다.
 - UI 명령: `pending:macro-record`
 - 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
 - 원래 기록: `MISSING;NOT_RUN`

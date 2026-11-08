@@ -986,13 +986,13 @@
 
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
-- 완료 범위: span 교차·주 셀 제거·neighbor 영향·실패 원복
-- 다음 작업: 반복그림제목의 병합열 변경과 안전한 제목행 삽입삭제를 지원한다. 실제Canvas 제목행1→2→1·원본그림4개/표시5개와 양형식 저장재열기를 검증했다. 마지막제목/본문·제목span교차·그림/필드/병합주셀삭제·잘린/부동/회전/캡션그림은 남았다.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 반복 제목행의 마지막 제목행·첫 본문행 경계에서만 삽입·삭제하고 제목/본문 분류·행 span·셀 값·원본 문서 구조를 재검증하며 HWP/HWPX 저장·재열기와 undo/redo를 보존
+- 다음 작업: commit 067e79f3 기준 마지막 제목행·첫 본문행 경계 삽입삭제와 HWP/HWPX 저장·재열기·undo/redo 선별 검사 77/77을 통과했다. 제목 span 교차·필드·그림/개체·병합/복합 주 셀 삭제와 한글 직접 비교는 남아 부분이다.
 - 상위 항목: [B158](<08-tables.md#b158>) 행·열 추가
 - Agent 명령: `insert_table_row,delete_table_row,insert_table_column,delete_table_column`
-- 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
-- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08`
+- 근거: [96-agent-table-merge.md](<../96-agent-table-merge.md>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [table-title-boundary-n007.test.ts](<../../apps/editor/tests/table-title-boundary-n007.test.ts>)
+- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08;TABLE_TITLE_BOUNDARY_2026_11_09`
 
 </details>
 

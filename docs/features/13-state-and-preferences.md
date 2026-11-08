@@ -20,7 +20,7 @@
 
 ## 먼저 할 일
 
-- **구현** [N014](<13-state-and-preferences.md#n014>) **글상자 내부 커서·선택 복원** — 선별 capability 검사 15/15를 통과했다. caption ambiguity·nested owner chain·group child hidden을 exact blocker로 분류했으며 group·nested·caption 실제 복원과 Studio browser callback·실제 앱 재시작·한글 비교는 남아 부분이다.
+- **구현** [N014](<13-state-and-preferences.md#n014>) **글상자 내부 커서·선택 복원** — commit 5e98da17 기준 실제 Studio callback 연결과 exact pre/post owner·story·path·geometry 감사·HWP/HWPX byte invariant 선별 검사 27/27 및 build·typecheck·boundary 검사를 통과했다. group·nested·caption 실제 복원과 앱 재시작·한글 직접 비교는 남아 부분이다.
 - **구현** [N015](<13-state-and-preferences.md#n015>) **다중 개체·그룹 선택 복원** — 선택 검증 36/36과 실제 custom engine의 수식 HWP/HWPX 저장·재열기·bytes invariant를 통과했다. 단일·mixed·nested 수식과 OLE·table 선택은 계속 fail-closed이며 OLE payload typed property API와 table multi-restore port가 없다. 실제 앱 재시작·한글 비교도 남아 부분이다.
 - **구현** [N016](<13-state-and-preferences.md#n016>) **미주·나머지 특수 영역 선택 복원** — commit 3a9d86b8 기준 custom engine root body nonempty ClickHere full selection 순방향·역방향 포함 29/29를 통과했다. 기존 root 선택·table-cell HWP/HWPX 증거를 유지하며 partial/empty/cell/nested/기타 field와 nested/caption object·실제 앱 재시작·한글 직접 비교는 남아 부분이다.
 
@@ -753,11 +753,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
-- 완료 범위: commit ee0f5a75까지 단일 root Rectangle의 회전·명시 boolean flip을 포함한 logical textbox story 복원과 public HWP/HWPX 엔진의 root owner·story·geometry capability를 확인하고 모호하거나 숨겨진 소유 경로는 fail-closed
-- 다음 작업: 선별 capability 검사 15/15를 통과했다. caption ambiguity·nested owner chain·group child hidden을 exact blocker로 분류했으며 group·nested·caption 실제 복원과 Studio browser callback·실제 앱 재시작·한글 비교는 남아 부분이다.
+- 완료 범위: 단일 root Rectangle의 logical textbox story 커서·선택을 실제 Studio callback에서 exact root owner·story·path·geometry로 적용 전후 감사하고 HWP/HWPX 바이트 불변을 확인하며 모호하거나 숨겨진 소유 경로는 fail-closed
+- 다음 작업: commit 5e98da17 기준 실제 Studio callback 연결과 exact pre/post owner·story·path·geometry 감사·HWP/HWPX byte invariant 선별 검사 27/27 및 build·typecheck·boundary 검사를 통과했다. group·nested·caption 실제 복원과 앱 재시작·한글 직접 비교는 남아 부분이다.
 - 상위 항목: [S018](<13-state-and-preferences.md#s018>) 본문/표/개체 선택과 모드
-- 근거: [103-textbox-state-and-storage.md](<../103-textbox-state-and-storage.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [session-textbox.ts](<../../apps/editor/src/adapters/rhwp/session-textbox.ts>) · [session-textbox.test.ts](<../../apps/editor/tests/session-textbox.test.ts>) · [session-textbox-owner-capability-n014.ts](<../../apps/editor/src/adapters/rhwp/session-textbox-owner-capability-n014.ts>) · [session-textbox-owner-capability-n014.test.ts](<../../apps/editor/tests/session-textbox-owner-capability-n014.test.ts>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;ROTATED_RECTANGLE_STATE_2026_11_08;FLIPPED_TEXTBOX_STATE_2026_11_09;TEXTBOX_OWNER_CAPABILITY_2026_11_09`
+- 근거: [103-textbox-state-and-storage.md](<../103-textbox-state-and-storage.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [session-textbox.ts](<../../apps/editor/src/adapters/rhwp/session-textbox.ts>) · [session-textbox.test.ts](<../../apps/editor/tests/session-textbox.test.ts>) · [session-textbox-owner-capability-n014.ts](<../../apps/editor/src/adapters/rhwp/session-textbox-owner-capability-n014.ts>) · [session-textbox-owner-capability-n014.test.ts](<../../apps/editor/tests/session-textbox-owner-capability-n014.test.ts>) · [session-textbox-studio-restore-n014.ts](<../../apps/editor/src/adapters/rhwp/session-textbox-studio-restore-n014.ts>) · [session-textbox-studio-restore-n014.test.ts](<../../apps/editor/tests/session-textbox-studio-restore-n014.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;ROTATED_RECTANGLE_STATE_2026_11_08;FLIPPED_TEXTBOX_STATE_2026_11_09;TEXTBOX_OWNER_CAPABILITY_2026_11_09;TEXTBOX_STUDIO_RESTORE_2026_11_09`
 
 </details>
 
@@ -809,11 +809,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
-- 완료 범위: commit b7923dde 기준 실제 upstream EventBus의 document-mutated·history-jumped·document-swapped callback을 continuity 정책과 capability gate에 연결하고 bridge 부족·callback 실패는 state-uncertain으로 차단
-- 다음 작업: 선별 검사 26/26·strict TypeScript·모듈 경계 diagnostics 0을 통과했다. public InputHandler에 exact top recipe·atomic state·compare-apply reset/rebase가 없어 성공을 주장하지 않으며 실제 runtime/process restart 통합도 남아 부분이다.
+- 완료 범위: 실제 upstream EventBus callback을 continuity 정책과 capability gate에 연결하되 exact top recipe producer·원자 state read/apply·동일 token event payload·verified save transition 포트가 없으면 retain/rebase/reset 성공을 주장하지 않고 state-uncertain으로 차단
+- 다음 작업: 현재 실제 InputHandler/CommandHistory에 필요한 포트가 없어 코드 연결을 추가하지 않았다. fail-closed 선택 검사 21/21을 통과했으며 snapshot release가 가능한 clear(wasm)는 확인했다. exact top recipe producer/read/apply/event payload/save transition과 실제 runtime/process restart 통합이 남아 부분이다.
 - 상위 항목: [S029](<13-state-and-preferences.md#s029>) 일반 undo/redo
 - 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [undo-history-port-n018.ts](<../../apps/editor/src/adapters/rhwp/undo-history-port-n018.ts>) · [undo-history-port-n018.test.ts](<../../apps/editor/tests/undo-history-port-n018.test.ts>) · [input-handler-undo-callback-n018.ts](<../../apps/editor/src/adapters/rhwp/input-handler-undo-callback-n018.ts>) · [input-handler-undo-callback-n018.test.ts](<../../apps/editor/tests/input-handler-undo-callback-n018.test.ts>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;UNDO_LIFETIME_POLICY_2026_11_08;UNDO_LIFECYCLE_COORDINATOR_2026_11_09;ATOMIC_UNDO_HISTORY_PORT_2026_11_09;UPSTREAM_UNDO_CALLBACK_2026_11_09`
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;UNDO_LIFETIME_POLICY_2026_11_08;UNDO_LIFECYCLE_COORDINATOR_2026_11_09;ATOMIC_UNDO_HISTORY_PORT_2026_11_09;UPSTREAM_UNDO_CALLBACK_2026_11_09;INPUT_HANDLER_PORT_BLOCKED_2026_11_09`
 
 </details>
 

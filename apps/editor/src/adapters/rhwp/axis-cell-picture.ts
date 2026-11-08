@@ -6,7 +6,7 @@ const digest=(bytes:Uint8Array)=>Array.from(sha256(bytes),v=>v.toString(16).padS
 
 type HeaderLayout={runs:any[];width:number;height:number};
 type PicturePage={screen:any[];portable:any[];pictures:any[];portablePictures:any[];painted:any[];keys:Set<string>;assets:Map<string,string>;screenHeader?:HeaderLayout;portableHeader?:HeaderLayout};
-type OwnerFrame={page:number;screen:any;portable:any;headerSignature?:string};
+type OwnerFrame={page:number;screen:any;portable:any;headerSignature?:string;titleSignature?:string;copies?:OwnerFrame[]};
 
 function repeatedPages(screen:any[][]){
  const occurrences=new Map<string,number[]>();
@@ -55,7 +55,7 @@ function picturePages(doc:any) {
  }
 }
 
-type HeaderCell={index:number;row:number;col:number;rowSpan:number;colSpan:number;paragraphs:string[];properties:any};
+type HeaderCell={index:number;row:number;col:number;rowSpan:number;colSpan:number;paragraphs:string[];properties:any;children:any[];anchors:number[][]};
 function plainHeader(doc:any,base:number[],dimensions:any,fields:any[]):HeaderCell[]|null{
  const [section,paragraph,control]=base;
  const lists=json(doc.getCursorModel()).lists,children=json(doc.getControls());
@@ -70,10 +70,11 @@ function plainHeader(doc:any,base:number[],dimensions:any,fields:any[]):HeaderCe
   if(properties.fieldName!==''||properties.cellProtect!==false)return null;
   const paths=lists.filter((l:any)=>l.hostListId===0&&l.isCell&&l.sectionIndex===section&&l.hostPara===paragraph&&l.controlIndex===control&&l.cellIndex===i);
   if(paths.length!==1||!Number.isSafeInteger(paths[0].paraCount)||paths[0].paraCount<1||paths[0].paraCount>50||
-     children.some((c:any)=>c.list===paths[0].listId)||
      fields.some(f=>f.listId===paths[0].listId||f.location?.sectionIndex===section&&f.location?.paraIndex===paragraph&&
       f.location.path?.[0]?.type==='cell'&&f.location.path[0].controlIndex===control&&f.location.path[0].cellIndex===i))return null;
-  const paragraphs:string[]=[];
+  const owned=children.filter((c:any)=>c.list===paths[0].listId);
+  if(owned.some((c:any)=>c.ctrlId!=='gso'))return null;
+  const paragraphs:string[]=[],anchors:number[][]=[];
   let total=0;
   for(let p=0;p<paths[0].paraCount;p++){
    const length=doc.getCellParagraphLength(...base,i,p);
@@ -81,8 +82,12 @@ function plainHeader(doc:any,base:number[],dimensions:any,fields:any[]):HeaderCe
    const text=doc.getTextInCell(...base,i,p,0,length);
    if(typeof text!=='string'||Array.from(text).length!==length)return null;
    paragraphs.push(text);
+   const pictures=owned.filter((c:any)=>c.para===p);
+   const slots=pictures.length?Array.from<number>(doc.getCellPictureTextAnchors(...base,i,p)??[]):[];
+   if(slots.length!==pictures.length||slots.some((v,j)=>!Number.isSafeInteger(v)||v<0||v>length||j>0&&v<slots[j-1]))return null;
+   anchors.push(slots);
   }
-  header.push({index:i,row,col,rowSpan,colSpan,paragraphs,properties});
+  header.push({index:i,row,col,rowSpan,colSpan,paragraphs,properties,children:owned,anchors});
  }
  // Every slot above the first body row must belong to exactly one header.
  // Use rectangle areas so a large merged span never allocates a dense grid.
@@ -101,7 +106,7 @@ function inside(box:any,parent:any){
 function overlaps(a:any,b:any){
  return Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)>.2&&Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y)>.2;
 }
-type HeaderRun={x:number;y:number;record:string};
+type HeaderRun={x:number;y:number;record:string;owner:number};
 function renderedHeader(view:HeaderLayout|undefined,controls:any[],frame:any,header:HeaderCell[],base:number[]){
  if(!view||!Array.isArray(view.runs)||!inside(frame,{x:0,y:0,w:view.width,h:view.height})||frame.cells.length<=header.length)return null;
  const [section,paragraph,control]=base;
@@ -111,10 +116,15 @@ function renderedHeader(view:HeaderLayout|undefined,controls:any[],frame:any,hea
   if(cell.row!==source.row||cell.col!==source.col||cell.rowSpan!==source.rowSpan||cell.colSpan!==source.colSpan||
      cell.cellIdx!==slot||!inside(cell,frame)||frame.cells.slice(0,slot).some((c:any)=>overlaps(c,cell)))return null;
   if(frame.cells.slice(header.length).some((c:any)=>c.y<cell.y+cell.h-.2))return null;
-  evidence.push({x:cell.x-frame.x,y:cell.y-frame.y,record:JSON.stringify([cell.w,cell.h])});
+  if(!near(cell.w,source.properties.width/75))return null;
+  evidence.push({owner:source.index,x:0,y:0,record:JSON.stringify([cell.w,cell.h])});
+  const images=controls.filter(c=>c.type==='image'&&c.secIdx===section&&c.parentParaIdx===paragraph&&
+   c.cellPath?.length===1&&c.cellPath[0].controlIndex===control&&c.cellPath[0].cellIndex===source.index);
+  if(images.length!==source.children.length||images.some((image,i)=>!inside(image,cell)||images.slice(0,i).some(p=>overlaps(p,image))))return null;
   const runs=view.runs.filter(r=>r.secIdx===section&&r.parentParaIdx===paragraph&&
    r.cellPath?.[0]?.controlIndex===control&&r.cellPath[0].cellIndex===source.index);
-  if(controls.some(c=>c!==frame&&overlaps(c,cell))||view.runs.filter(r=>overlaps(r,cell)).length!==runs.length)return null;
+  if(controls.some(c=>c!==frame&&!images.includes(c)&&overlaps(c,cell))||view.runs.filter(r=>overlaps(r,cell)).length!==runs.length||
+     runs.some(r=>images.some(image=>overlaps(image,r))))return null;
   let cursor=0;
   for(const [paragraph,expected] of source.paragraphs.entries()){
    let offset=0,text='';
@@ -122,16 +132,31 @@ function renderedHeader(view:HeaderLayout|undefined,controls:any[],frame:any,hea
    while(cursor<runs.length && runs[cursor].cellParaIdx===paragraph){
     const {x,y,...r}=runs[cursor++];
     if(r.cellPath.length!==1||r.cellPath[0].cellParaIndex!==paragraph||r.controlIdx!==control||r.cellIdx!==source.index||
-       r.paraIdx!==paragraph||r.charStart!==offset||typeof r.text!=='string'||(!r.text && (expected!==''||cursor!==first+1))||
+       r.paraIdx!==paragraph||r.charStart!==offset+source.anchors[paragraph].filter(a=>a<=offset).length||typeof r.text!=='string'||(!r.text && (expected!==''||cursor!==first+1))||
        !inside({x,y,w:r.w,h:r.h},cell))return null;
     offset+=Array.from(r.text).length;text+=r.text;
-    evidence.push({x:x-cell.x,y:y-cell.y,record:JSON.stringify(r)});
+    // Physical cell indices can move during an axis edit. Validate them above,
+    // then retain the run's source paragraph/style and relative placement.
+    const {cellIdx,cellPath,...record}=r;
+    evidence.push({owner:source.index,x:x-cell.x,y:y-cell.y,
+     record:JSON.stringify({...record,cellPath:cellPath.map(({cellIndex,...p}:any)=>p)})});
    }
    // The renderer publishes a line box even for an empty paragraph.
    // Without it we cannot distinguish a blank cell from missing content.
    if(cursor===first || text!==expected)return null;
   }
   if(cursor!==runs.length)return null;
+ }
+ // A repeated heading must fill each logical row without gaps or overlap.
+ // This preserves the logical address/geometry link when column indices move.
+ const rows=Math.max(...header.map(c=>c.row+c.rowSpan));
+ for(let row=0;row<rows;row++){
+  let x=frame.x;
+  const active=header.map((source,slot)=>({source,slot})).filter(({source})=>source.row<=row&&row<source.row+source.rowSpan).sort((a,b)=>a.source.col-b.source.col);
+  for(const {slot} of active){
+   const cell=frame.cells[slot];if(!near(cell.x,x))return null;x+=cell.w;
+  }
+  if(!near(x,frame.x+frame.w))return null;
  }
  return evidence;
 }
@@ -156,6 +181,7 @@ function tableFrames(doc:any,pages:PicturePage[],fields:any[],section:number,par
  if(split&&(settings.pageBreak!==2||typeof settings.repeatHeader!=='boolean'))return null;
  const header=settings?.repeatHeader?plainHeader(doc,base,dimensions,fields):[];
  if(!header)return null;
+ const headerSignatures=new Map<number,string>();
  let headerSignature:string|undefined;
  let firstScreen:HeaderRun[]|undefined,firstPortable:HeaderRun[]|undefined;
  const owners=new Map<number,OwnerFrame>();
@@ -170,11 +196,24 @@ function tableFrames(doc:any,pages:PicturePage[],fields:any[],section:number,par
   if(a.rowCount!==dimensions.rowCount||a.colCount!==dimensions.colCount||a.rowCount!==b.rowCount||a.colCount!==b.colCount||
      !Array.isArray(a.cells)||!Array.isArray(b.cells)||!a.cells.length||a.cells.length!==b.cells.length)return null;
   if(header.length){
+   for(const [slot,source] of header.entries())if(source.children.length){
+    const frame={page:pageNumber,screen:a.cells[slot],portable:b.cells[slot]};
+    const pictures=readOwnedPictures(doc,page,base,source.index,source.paragraphs.length,source.children,frame);
+    if(!pictures)return null;
+   }
    const screen=renderedHeader(page.screenHeader,page.screen,a,header,base),portable=renderedHeader(page.portableHeader,page.portable,b,header,base);
    if(!screen||!portable||firstScreen&&!sameHeader(firstScreen,screen)||firstPortable&&!sameHeader(firstPortable,portable))return null;
    if(!firstPortable){
-    const title=portable.map(r=>[Math.round(r.x*10),Math.round(r.y*10),r.record]);
-    headerSignature=digest(new TextEncoder().encode(JSON.stringify([header,title])));
+    for(const source of header){
+     const title=portable.filter(r=>r.owner===source.index).map(r=>[Math.round(r.x*10),Math.round(r.y*10),r.record]);
+     const stored=[source.paragraphs,source.properties,source.children.map(({list,...c})=>c),source.anchors];
+     headerSignatures.set(source.index,digest(new TextEncoder().encode(JSON.stringify([stored,title]))));
+    }
+    // Keep the complete heading proof on public picture evidence for existing
+    // paragraph/subdivision callers. Only axis edits compare projected sources.
+    const whole=header.map((source,slot)=>[source.index,source.row,source.col,source.rowSpan,source.colSpan,
+     b.cells[slot].x-b.x,b.cells[slot].y-b.y,headerSignatures.get(source.index)]);
+    headerSignature=digest(new TextEncoder().encode(JSON.stringify(whole)));
    }
    firstScreen??=screen;firstPortable??=portable;
   }
@@ -183,9 +222,13 @@ function tableFrames(doc:any,pages:PicturePage[],fields:any[],section:number,par
   for(const [slot,c] of a.cells.entries()){
    const other=b.cells[slot],key=address(c),index=stored.get(key);
    if(index===undefined||key!==address(other)||c.cellIdx!==slot||other.cellIdx!==slot)return null;
-   if(slot<repeated){if(index!==header[slot].index||!owners.has(index))return null;continue;}
+   const frame={page:pageNumber,screen:c,portable:other,headerSignature,titleSignature:headerSignatures.get(index)};
+   if(slot<repeated){
+    if(index!==header[slot].index||!owners.has(index))return null;
+    const owner=owners.get(index)!;(owner.copies??=[]).push(frame);continue;
+   }
    if(owners.has(index))return null;
-   owners.set(index,{page:pageNumber,screen:c,portable:other,headerSignature});
+   owners.set(index,frame);
   }
   nextRow=Math.max(...a.cells.map((c:any)=>c.row+c.rowSpan));
  }
@@ -202,6 +245,32 @@ function tableFrames(doc:any,pages:PicturePage[],fields:any[],section:number,par
   }
  }
  return owners;
+}
+
+/** Per-source title evidence is compared through the axis projection, so an
+ * inserted column can move an existing source without duplicating its image. */
+export function axisPictureHeaderEvidence(doc:any,table:{section:number;paragraph:number;control:number}) {
+ const snapshot=picturePages(doc);
+ if(!snapshot)throw Error('반복 제목의 그림 표시 근거를 읽지 못했습니다.');
+ const owners=tableFrames(doc,snapshot.pages,snapshot.fields,table.section,table.paragraph,table.control);
+ if(!owners)throw Error('반복 제목의 원본 셀과 쪽별 표시를 검증하지 못했습니다.');
+ return new Map([...owners].filter(([,owner])=>owner.titleSignature).map(([index,owner])=>[index,owner.titleSignature!]));
+}
+
+/** Original image/slot/relative-placement proof without the whole heading's
+ * address hash. The caller must separately project axisPictureHeaderEvidence. */
+export function axisPictureSourceEvidence(doc:any,table:{section:number;paragraph:number;control:number;cells:Cell[]}) {
+ const read=pictureReader(doc,false),lists=json(doc.getCursorModel()).lists,controls=json(doc.getControls());
+ const result=new Map<number,NonNullable<Cell['axisPicture']>>();
+ for(const cell of table.cells.filter(c=>c.axisPicture)){
+  const owners=lists.filter((l:any)=>l.hostListId===0&&l.isCell&&l.sectionIndex===table.section&&
+   l.hostPara===table.paragraph&&l.controlIndex===table.control&&l.cellIndex===cell.index);
+  if(owners.length!==1)throw Error('그림 원본 셀의 저장 경로를 확인하지 못했습니다.');
+  const source=read(table.section,table.paragraph,table.control,cell,owners[0].paraCount,controls.filter((c:any)=>c.list===owners[0].listId));
+  if(!source)throw Error('그림 원본의 슬롯과 쪽별 표시를 확인하지 못했습니다.');
+  result.set(cell.index,source);
+ }
+ return result;
 }
 
 // Layout rounds to tenths of a pixel and paint ops to thousandths. Accept only
@@ -244,7 +313,8 @@ function picturePaintMatches(properties:any,paint:any) {
 
 /** Layout and asset keys are local to one read-only snapshot. An edit or reopen
  * gets a fresh reader, even if the engine reuses the same native handle. */
-export function axisPictureReader(doc:any) {
+export function axisPictureReader(doc:any) {return pictureReader(doc,true);}
+function pictureReader(doc:any,includeHeading:boolean) {
  let snapshot:ReturnType<typeof picturePages>|undefined;
  return (section:number,paragraph:number,control:number,cell:Cell,paragraphCount:number,children:any[]):Cell['axisPicture']=>{
   if(!Number.isSafeInteger(paragraphCount)||paragraphCount<1||paragraphCount>50||cell.text.length>4000||
@@ -261,32 +331,47 @@ export function axisPictureReader(doc:any) {
   const owner=snapshot.tables.get(tableKey)?.get(cell.index);
   if(!owner||owner.screen.row!==cell.row||owner.screen.col!==cell.column||
      owner.screen.rowSpan!==cell.rowSpan||owner.screen.colSpan!==cell.columnSpan)return;
-  const page=snapshot.pages[owner.page];
   const inOwner=(c:any)=>c.secIdx===section && c.parentParaIdx===paragraph &&
     c.cellPath?.length===1 && c.cellPath[0].controlIndex===control && c.cellPath[0].cellIndex===cell.index;
+  const frames=[owner,...owner.copies??[]],pages=new Set(frames.map(f=>f.page));
+  if(snapshot.pages.some((p,i)=>!pages.has(i)&&(p.pictures.some(inOwner)||p.portablePictures.some(inOwner))))return;
+  let pictures:ReturnType<typeof readOwnedPictures>;
+  for(const frame of frames){
+   const current=readOwnedPictures(doc,snapshot.pages[frame.page],[section,paragraph,control],cell.index,paragraphCount,children,
+    includeHeading?frame:{...frame,headerSignature:undefined});
+   if(!current||pictures&&current.some((p,i)=>!samePlacement(p,pictures![i])))return;
+   pictures??=current;
+  }
+  if(!pictures?.length)return;
+  const {left,top,signature}=pictures[0];
+  if(pictures.length===1)return {signature,left,top};
+  return {signature:digest(new TextEncoder().encode(JSON.stringify(pictures.map(p=>p.signature)))),left,top,pictures};
+ };
+}
+
+function readOwnedPictures(doc:any,page:PicturePage,base:number[],index:number,paragraphCount:number,children:any[],owner:OwnerFrame){
+  const [section,paragraph,control]=base;
+  const inOwner=(c:any)=>c.secIdx===section && c.parentParaIdx===paragraph &&
+    c.cellPath?.length===1 && c.cellPath[0].controlIndex===control && c.cellPath[0].cellIndex===index;
   const inCell=page.pictures.filter(inOwner);
-  if(inCell.length!==children.length||page.portablePictures.filter(inOwner).length!==children.length||
-     snapshot.pages.some(p=>p!==page&&(p.pictures.some(inOwner)||p.portablePictures.some(inOwner))))return;
-  const pictures=[];
+  if(inCell.length!==children.length||page.portablePictures.filter(inOwner).length!==children.length)return;
+  const pictures:Array<CellPicturePlacement&{cellParaIndex:number;controlIndex:number}>=[];
   for(const [i,child] of children.entries()){
    const previous=children[i-1],para=child.para;
    const nextIndex=previous?.para===para?previous.controlIndex+1:0;
    if(child.list!==children[0].list || !Number.isSafeInteger(para) || para<0 || para>=paragraphCount ||
       previous && para<previous.para || child.controlIndex!==nextIndex || !Number.isSafeInteger(child.pos) ||
       child.pos<0 || previous?.para===para && child.pos<=previous.pos)return;
-   const path=JSON.stringify([{controlIndex:control,cellIndex:cell.index,cellParaIndex:para}]);
+   const path=JSON.stringify([{controlIndex:control,cellIndex:index,cellParaIndex:para}]);
    const matches=inCell.filter((c:any)=>c.controlIdx===nextIndex && JSON.stringify(c.cellPath)===path);
    if(matches.length!==1)return;
    const picture=matches[0];
-   if(picture.outerTableControlIdx!==control || picture.cellIdx!==cell.index || picture.cellParaIdx!==para)return;
+   if(picture.outerTableControlIdx!==control || picture.cellIdx!==index || picture.cellParaIdx!==para)return;
    const placement=readPicture(doc,page,section,paragraph,path,child,picture,owner);
    if(!placement)return;
    pictures.push({...placement,cellParaIndex:para,controlIndex:nextIndex});
   }
-  const {left,top,signature}=pictures[0];
-  if(pictures.length===1)return {signature,left,top};
-  return {signature:digest(new TextEncoder().encode(JSON.stringify(pictures.map(p=>p.signature)))),left,top,pictures};
- };
+  return pictures;
 }
 
 function readPicture(doc:any,page:PicturePage,

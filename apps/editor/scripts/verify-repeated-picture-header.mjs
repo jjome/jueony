@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import {execFileSync} from 'node:child_process';
 import {mkdir,readFile,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
-import {createAxisPictureFixture} from './lib/axis-picture-fixture.mjs';
-import {expectedPictureHeading} from './lib/repeated-picture-heading.mjs';
+import {createAxisPictureFixture,inspectPictureAnchors} from './lib/axis-picture-fixture.mjs';
+import {createRepeatedTitlePictures,expectedPictureHeading} from './lib/repeated-picture-heading.mjs';
 import {loadReviewEngine} from './lib/hancom-review.mjs';
 import {readStructure} from '../src/adapters/rhwp/structure.ts';
 import {executeDocumentOperations} from '../src/adapters/rhwp/execute.ts';
@@ -37,6 +37,75 @@ function layout(d){
   }
   return controls.filter(c=>c.type==='image').length;
  });
+}
+if(process.argv.includes('--title-pictures')){
+ const fixture=await createRepeatedTitlePictures(HwpDocument,out),results=[];
+ const view=d=>{
+  assert.equal(d.pageCount(),2);
+  assert.equal(JSON.parse(d.getControls()).filter(c=>c.ctrlId==='gso').length,4);
+  const t=readStructure(d).tables[0],title=t.cells.find(c=>c.text==='PicA');
+  assert.equal(t.cells.filter(c=>c.axisPicture).length,4);assert.ok(title.axisPicture);
+  return [0,1].map(page=>{
+   const controls=JSON.parse(d.getPageControlLayout(page)).controls;
+   const pictures=controls.filter(c=>c.type==='image'),copies=pictures.filter(c=>c.cellPath?.[0]?.cellIndex===title.index);
+   assert.equal(copies.length,1);assert.equal(copies[0].controlIdx,0);
+   assert.deepEqual(copies[0].cellPath,[{controlIndex:0,cellIndex:title.index,cellParaIndex:0}]);
+   return pictures.length;
+  });
+ };
+ try{for(const format of ['hwp','hwpx']){
+  const d=new HwpDocument(bytes(fixture,format));let original;
+  try{
+   original=bytes(d,format);const file=resolve(out,'before.'+format);await writeFile(file,original);
+   const records=inspectPictureAnchors(file);assert.equal(records.length,4);assert.deepEqual(view(d),[2,3]);
+   const operations=[{kind:'insert_table_row',target:'s0p1t0',index:2,values:['새 행','','']},
+    {kind:'insert_table_column',target:'s0p1t0',index:0,values:['새 제목','','','','']},
+    {kind:'delete_table_column',target:'s0p1t0',index:0},{kind:'delete_table_row',target:'s0p1t0',index:2}];
+   let rowDelta=0,colDelta=0;
+   for(const [stage,operation] of operations.entries()){
+    const before=bytes(d,format),undo=d.saveSnapshot();apply(d,format,operation);
+    rowDelta+=stage===0?1:stage===3?-1:0;colDelta+=stage===1?1:stage===2?-1:0;
+    assert.deepEqual(view(d),stage===3?[2,3]:[1,4]);
+    const after=resolve(out,operation.kind+'.'+format),saved=bytes(d,format);await writeFile(after,saved);
+    assert.deepEqual(inspectPictureAnchors(after),records.map(p=>({...p,row:p.row+(p.row>=2?rowDelta:0),col:p.col+colDelta})));
+    const copy=new HwpDocument(saved);
+    try{assert.deepEqual(view(copy),view(d));assert.deepEqual(readStructure(copy),readStructure(d));}finally{copy.free();}
+    const redo=d.saveSnapshot();d.restoreSnapshot(undo);assert.deepEqual(bytes(d,format),before);
+    d.restoreSnapshot(redo);assert.deepEqual(bytes(d,format),saved);d.discardSnapshot(undo);d.discardSnapshot(redo);
+   }
+  }finally{d.free();}
+  const faults=['wrong repeated path','duplicate repeated picture','wrong repeated paint','changed title style','new header flag','new header text'];
+  for(const fault of faults){
+   const d=new HwpDocument(original);let wrote=false;
+   try{
+    const column=fault.startsWith('new header'),method=column?'insertTableColumn':'insertTableRow',edit=d[method].bind(d);
+    d[method]=(...args)=>{const r=edit(...args);wrote=true;
+     if(fault==='new header flag')d.setCellProperties(...base,0,'{"isHeader":false}');
+     if(fault==='new header text')d.insertTextInCell(...base,0,0,0,'불청객');return r;};
+    if(fault==='wrong repeated path'||fault==='duplicate repeated picture'){
+     const read=d.getPageControlLayout.bind(d);d.getPageControlLayout=page=>{
+      const value=JSON.parse(read(page));if(wrote&&page===1){const p=value.controls.find(c=>c.type==='image'&&c.cellIdx===1);
+       if(fault==='wrong repeated path')p.cellPath[0].cellIndex=0;else value.controls.push({...p,x:p.x+25});}return JSON.stringify(value);};
+    }
+    if(fault==='wrong repeated paint'){
+     const read=d.getPageFlowImageOps.bind(d);d.getPageFlowImageOps=page=>{const value=JSON.parse(read(page));
+      if(wrote&&page===1)value.images[0].transform.horzFlip=!value.images[0].transform.horzFlip;return JSON.stringify(value);};
+    }
+    if(fault==='changed title style'){
+     const read=d.getPageTextLayout.bind(d);d.getPageTextLayout=page=>{const value=JSON.parse(read(page));
+      if(wrote)for(const r of value.runs)if(r.cellIdx===0)r.bold=!r.bold;return JSON.stringify(value);};
+    }
+    const before=bytes(d,format);
+    assert.throws(()=>apply(d,format,column?{kind:'insert_table_column',target:'s0p1t0',index:0,values:['새 제목','','','']}:
+     {kind:'insert_table_row',target:'s0p1t0',index:2,values:['새 행','','']}),/그림|제목|보존/);
+    assert.ok(wrote);assert.deepEqual(bytes(d,format),before);
+   }finally{d.free();}
+  }
+  results.push({format,operations:4,rollbackFaults:faults.length,storedPictures:4,displayedPictures:5});
+  console.log('PASS',format,'repeated source picture row/column insert/delete, native slots/resources, reopen, undo/redo and',faults.length,'rollback faults');
+ }}finally{fixture.free();}
+ await writeFile(resolve(out,'result.json'),JSON.stringify({results,engine:JSON.parse(await readFile(resolve(process.env.JUEONY_ENGINE_PACKAGE,'jueony-engine-build.json'),'utf8'))},null,2));
+ process.exit(0);
 }
 const fixture=await createAxisPictureFixture(HwpDocument,out,{merged:true,grouped:true});
 try{
@@ -158,7 +227,7 @@ try{
      };
     }
     const before=bytes(d,format);
-    assert.throws(()=>apply(d,format,mode==='inherited header'?{...op,index:0}:op),/그림|필드|보존/,mode);
+    assert.throws(()=>apply(d,format,mode==='inherited header'?{...op,index:0}:op),/그림|필드|보존|제목/,mode);
     assert.deepEqual(bytes(d,format),before);
    }finally{d.free();}
   }

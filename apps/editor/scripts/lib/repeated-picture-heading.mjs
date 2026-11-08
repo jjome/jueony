@@ -1,3 +1,5 @@
+import {createAxisPictureFixture} from './axis-picture-fixture.mjs';
+
 // Stored coordinates and text of the three source forms, independent of the renderer.
 export function expectedPictureHeading(twoRows,multiParagraph){
  const slots=twoRows?[
@@ -8,4 +10,23 @@ export function expectedPictureHeading(twoRows,multiParagraph){
   [0,1,1,1,multiParagraph?['']:['항목1']], [0,2,1,1,['PicA']],
  ];
  return slots.map(([row,col,rowSpan,colSpan,paragraphs])=>({row,col,rowSpan,colSpan,paragraphs}));
+}
+
+export async function createRepeatedTitlePictures(HwpDocument,folder){
+ const d=await createAxisPictureFixture(HwpDocument,folder,{merged:true}),base=[0,1,0];
+ d.insertTableRow(...base,1,false);
+ for(let i=0;i<2;i++)d.setCellProperties(...base,i,'{"height":3000,"isHeader":true}');
+ for(let i=2;i<5;i++)d.setCellProperties(...base,i,'{"height":3000}');
+ d.setPageDef(0,JSON.stringify({...JSON.parse(d.getPageDef(0)),height:23000,
+  marginTop:2000,marginBottom:2000,marginHeader:0,marginFooter:0}));
+ d.setTableProperties(...base,'{"pageBreak":2,"repeatHeader":true}');
+ const lists=JSON.parse(d.getCursorModel()).lists;
+ for(const [i,c] of JSON.parse(d.getControls()).filter(c=>c.userDesc==='그림').entries()){
+  const owner=lists.find(l=>l.listId===c.list);
+  const path=JSON.stringify([{controlIndex:0,cellIndex:owner.cellIndex,cellParaIndex:c.para}]);
+  d.setCellPicturePropertiesByPath(0,1,path,c.controlIndex,JSON.stringify({
+   cropLeft:225,cropRight:450,cropTop:150,cropBottom:225,horzFlip:i%2===0,vertFlip:i%2===1
+  }));
+ }
+ return d;
 }

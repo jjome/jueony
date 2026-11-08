@@ -23,12 +23,13 @@ function paintedCaption(doc:any,target:NestedTable,page:number,left:number,top:n
  }
  const tree=parsed(doc.getPageRenderTree(page));visit(tree);
  if(owners.length!==1)throw fail();
- const pageRuns=parsed(doc.getPageTextLayout(page)).runs.filter((r:any)=>r.cellIdx===65534);
+ const pageRuns=parsed(doc.getPageTextLayout(page)).runs.filter((r:any)=>r.secIdx===target.section&&r.parentParaIdx===target.paragraph&&
+  r.cellPath?.at(-1)?.cellIndex===65534&&r.cellPath.at(-1).controlIndex===target.control&&same(r.cellPath.slice(0,-1),target.ancestors));
  const lines=owners[0].lines.map(line=>{
   const ordinal=line.captionOwner.captionOrdinal;
   const runs=(line.children??[]).map((child:any)=>{
    if(child.type!=='TextRun')throw fail();
-   const b=child.bbox,hits=pageRuns.filter((r:any)=>r.cellParaIdx===ordinal&&r.text===child.text&&r.x===b.x&&r.y===b.y&&r.w===b.w&&r.h===b.h);
+   const b=child.bbox,hits=pageRuns.filter((r:any)=>r.cellPath.at(-1).cellParaIndex===ordinal&&r.text===child.text&&r.x===b.x&&r.y===b.y&&r.w===b.w&&r.h===b.h);
    if(hits.length!==1||b.x<-.2||b.y<-.2||b.x+b.w>tree.bbox.w+.2||b.y+b.h>tree.bbox.h+.2)throw fail();
    return hits[0];
   });
@@ -58,9 +59,11 @@ function captionDrawing(doc:any,t:NestedTable,caption:any,boxes:(table:Table|Nes
       r.charShapeId!==p.runs[0].char_shape_id||r.paraShapeId!==p.paragraphShape||
       !Number.isFinite(line.box.h+line.box.w+r.h+r.w)||line.box.h<=0||line.box.w<=0||r.h<=0||r.w<=0)throw fail();
    const hit=parsed(doc.hitTest(page,r.x+Math.min(1,r.w/2),r.y+r.h/2)),caret=hit?.cursorRect;
-   if(hit?.sectionIndex!==t.section||hit.parentParaIndex!==t.ancestors.at(-1)!.cellParaIndex||
-      hit.controlIndex!==t.control||hit.cellIndex!==65534||hit.cellParaIndex!==ordinal||hit.charOffset!==0||
+   const captionPath=[...t.ancestors,{controlIndex:t.control,cellIndex:65534,cellParaIndex:ordinal}];
+   if(hit?.sectionIndex!==t.section||hit.parentParaIndex!==t.paragraph||!same(hit.cellPath,captionPath)||hit.charOffset!==0||
       caret?.pageIndex!==page||!near(caret.x,r.x)||!near(caret.y,r.y)||!near(caret.height,r.h))throw fail();
+   const resolved=parsed(doc.getCursorRectByPath(t.section,t.paragraph,JSON.stringify(captionPath),0));
+   if(resolved.pageIndex!==page||!near(resolved.x,r.x)||!near(resolved.y,r.y)||!near(resolved.height,r.h))throw fail();
    next++;
    continue;
   }

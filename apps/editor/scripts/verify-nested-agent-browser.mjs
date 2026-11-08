@@ -33,7 +33,7 @@ async function captionScreen(frame){
     const [,sibling,owner]=JSON.parse(doc.getPageControlLayout(0)).controls;
     // Growing a centered child table moves its top edge. Keep the caption's
     // offset from its owner and the untouched sibling's absolute placement.
-    const runs=JSON.parse(doc.getPageTextLayout(0)).runs.filter(r=>r.cellIdx===65534).map(r=>({
+    const runs=JSON.parse(doc.getPageTextLayout(0)).runs.filter(r=>r.cellPath?.at(-1)?.cellIndex===65534).map(r=>({
       ...r,x:r.x-owner.x,y:r.y-owner.y
     }));
     return {canvas:doc.canvasMetricsActive(),runs,sibling};
@@ -184,8 +184,8 @@ try {
         const t=tables[1],p=JSON.stringify([...t.ancestors,{controlIndex:t.control,cellIndex:0,cellParaIndex:0}]);
         assert.deepEqual(JSON.parse(reopened.getTableAxisCaptionEvidenceByPath(t.section,t.paragraph,p)),originalCaption);
         assert.deepEqual(JSON.parse(reopened.getPageControlLayout(0)).controls[1],originalSibling);
-        const runs=JSON.parse(reopened.getPageTextLayout(0)).runs.filter(r=>r.cellIdx===65534);
-        if(captionFlow)assert.deepEqual(runs.map(r=>[r.text,r.bold,r.cellParaIdx,r.charStart]),[
+        const runs=JSON.parse(reopened.getPageTextLayout(0)).runs.filter(r=>r.cellPath?.at(-1)?.cellIndex===65534);
+        if(captionFlow)assert.deepEqual(runs.map(r=>[r.text,r.bold,r.cellPath.at(-1).cellParaIndex,r.charStart]),[
           ['캡션 ',false,0,0],['제목😀',true,0,3],['뒤',true,0,6],...(captionSpacers?[['',true,1,0]]:[]),
           ['둘째 ',false,captionSpacers?2:1,0],['설명',true,captionSpacers?2:1,3]
         ]);

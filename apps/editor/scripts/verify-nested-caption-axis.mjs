@@ -10,7 +10,7 @@ const {HwpDocument}=await loadReviewEngine(resolve(process.env.JUEONY_ENGINE_PAC
 const state=(d,ext)=>({name:'중첩 캡션.'+ext,revision:'v1',structure:readStructure(d),nodes:[],limitations:[]});
 const nativePath=t=>JSON.stringify([...t.ancestors,{controlIndex:t.control,cellIndex:0,cellParaIndex:0}]);
 function drawn(d){
- const rows=JSON.parse(d.getPageTextLayout(0)).runs.filter(r=>r.cellIdx===65534);
+ const rows=JSON.parse(d.getPageTextLayout(0)).runs.filter(r=>r.cellPath?.at(-1)?.cellIndex===65534);
  assert.deepEqual(rows.map(r=>[r.text,r.bold,r.charStart]),[['캡션 ',false,0],['제목',true,3]]);
  const [parent,sibling,target]=JSON.parse(d.getPageControlLayout(0)).controls;
  const story=JSON.parse(d.getDocumentStoryInformation()).paragraphs.filter(p=>p.story==='caption');

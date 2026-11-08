@@ -1,7 +1,7 @@
 import type { Table } from '../../modules/document/public/index.ts';
 import { projectTableAxis, witnessedTrackEdges } from '../../modules/document/public/engine-integration.ts';
 import { parsed } from './structure.ts';
-import {sameAxisPicture} from './axis-cell-picture.ts';
+import {axisPictureHeaderEvidence,axisPictureSourceEvidence,sameAxisPicture} from './axis-cell-picture.ts';
 
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -75,6 +75,10 @@ export function mergedAxisProof(doc: any, table: Table, row: boolean, insert: bo
   if (!Number.isSafeInteger(originalAcrossSize) || originalAcrossSize < 0)
     throw new Error('표의 원래 외곽 치수를 확인하지 못했습니다.');
   const source = table.cells.map(cell => content(doc, table, cell.index));
+  const titles=table.cells.some(c=>c.axisPicture)?axisPictureHeaderEvidence(doc,table):undefined;
+  const pictures=titles?.size?axisPictureSourceEvidence(doc,table):undefined;
+  if(titles?.size && row && at<(table.headerRows??0))
+    throw Error('반복 제목 행 자체를 추가하거나 삭제하는 편집은 지원하지 않습니다.');
   const otherStoredFields = table.cells.some(c=>c.axisFieldSignature) ? otherFields(doc,table) : undefined;
   if (table.cells.some(c => c.properties.cellProtect !== false || c.properties.fieldName !== '' && !c.axisFieldSignature))
     throw new Error('필드 또는 보호 상태가 불분명한 표는 행·열을 변경할 수 없습니다.');
@@ -105,6 +109,10 @@ export function mergedAxisProof(doc: any, table: Table, row: boolean, insert: bo
     return { ...old.properties, [dimension]: originalSize + (insert ? difference : -difference) };
   });
   return (after: Table,justEdited=false) => {
+    const currentTitles=titles?axisPictureHeaderEvidence(doc,after):undefined;
+    const currentPictures=pictures?axisPictureSourceEvidence(doc,after):undefined;
+    if(Boolean(titles?.size)!==Boolean(currentTitles?.size))
+      throw Error('행·열 편집 전후 반복 제목의 표시 범위가 달라졌습니다.');
     if (otherStoredFields && !same(otherFields(doc,after),otherStoredFields))
       throw new Error('편집한 표 밖에 있는 필드의 위치 또는 값이 달라졌습니다.');
     projected.forEach(({cell, sourceIndex}, i) => {
@@ -117,10 +125,19 @@ export function mergedAxisProof(doc: any, table: Table, row: boolean, insert: bo
         const r = row ? Math.min(at, table.rows-1) : cell.row;
         if (actual.properties.width !== x[col+1]-x[col] || actual.properties.height !== y[r+1]-y[r])
           throw new Error('추가한 셀의 행 높이 또는 열 너비가 원래 격자와 다릅니다.');
+        if(titles?.size && (actual.properties.isHeader!==(cell.row<(table.headerRows??0)) ||
+            actual.text!==(justEdited?'':cell.text)))
+          throw Error('추가한 반복 제목 칸의 제목 표시 또는 내용이 요청과 다릅니다.');
+      }
+      if(titles?.size){
+        const title=sourceIndex===null?undefined:titles.get(sourceIndex),current=currentTitles?.get(i);
+        if(title!==undefined?current!==title:actual.properties.isHeader===true?!current:current!==undefined)
+          throw Error('반복 제목 셀의 원문·서식 또는 쪽별 상대 배치가 바뀌었습니다.');
       }
       if (actual.axisFieldSignature !== (sourceIndex === null ? undefined : table.cells[sourceIndex].axisFieldSignature))
         throw new Error('셀의 누름틀·이름 필드나 그 내용·범위가 바뀌었습니다.');
-      if (!sameAxisPicture(sourceIndex===null?undefined:table.cells[sourceIndex].axisPicture,actual.axisPicture))
+      if (!sameAxisPicture(sourceIndex===null?undefined:pictures?pictures.get(sourceIndex):table.cells[sourceIndex].axisPicture,
+          pictures?currentPictures?.get(i):actual.axisPicture))
         throw new Error('그림 셀의 원본 이미지·개체 속성 또는 셀 안의 배치가 바뀌었습니다.');
       if (sourceIndex !== null && (!same(properties[i], actual.properties) || !same(source[sourceIndex], content(doc, after, i))))
         throw new Error('남아야 할 셀의 내용·서식 또는 크기가 달라졌습니다.');

@@ -5,27 +5,39 @@ import {sameTableLayout} from './table-layout-evidence.ts';
 type CellPath={controlIndex:number;cellIndex:number;cellParaIndex:number}[];
 type NestedSubdivisionTable={listId:number;paragraph:number;path:CellPath};
 export type NestedSubdivisionOwner={index:number;listId:number;paragraphs:number[];tables:NestedSubdivisionTable[];controlLists:number[];descendantLists:number[]};
+// nested_axis_table accepts 2..=8 path entries. nested-tables.ts also limits
+// locate to eight entries, including the root and final leaf cell.
+const MAX_CELL_PATH=8,MAX_NESTED_CELLS=1000;
 const invalid=()=>Error('분할할 칸의 중첩 표와 모든 내부 셀·글줄의 원래 위치를 확인하지 못했습니다.');
 
-/** Up to two inline table levels, each anchored in an otherwise empty paragraph. */
+/** Every inline table has a unique, fully resolved path and an empty anchor paragraph. */
 export function subdivisionNestedOwner(doc:any,t:Table):NestedSubdivisionOwner|undefined {
   const controls=parsed(doc.getControls()),children=controls.filter((v:any)=>v.list!==0);
   if(!children.some((v:any)=>v.ctrlId==='tbl'))return;
   if(parsed(doc.getFieldList()).length)throw invalid();
   const lists=parsed(doc.getCursorModel()).lists,byId=new Map<number,any>(lists.map((l:any)=>[l.listId,l]));
   if(byId.size!==lists.length || lists.some((l:any)=>!Number.isSafeInteger(l.listId) || l.listId<=0))throw invalid();
+  const descendantLists=lists.filter((l:any)=>l.hostListId!==0);
+  const physicalCells=new Set(descendantLists.map((l:any)=>[l.hostListId,l.hostPara,l.controlIndex,l.cellIndex].join('/')));
+  if(descendantLists.length>MAX_NESTED_CELLS || children.length>MAX_NESTED_CELLS ||
+      physicalCells.size!==descendantLists.length || lists.some((l:any)=>!l.isCell))throw invalid();
   const roots=children.map((c:any)=>byId.get(c.list)).filter((l:any)=>l?.hostListId===0);
   const host=roots[0];
   if(!host?.isCell || host.sectionIndex!==t.section || host.hostPara!==t.paragraph ||
       host.controlIndex!==t.control || !t.cells[host.cellIndex] || roots.some((l:any)=>l.listId!==host.listId))throw invalid();
-  const cellPath=(id:number,paragraph:number,depth=0):CellPath=>{
-    const list=byId.get(id);
-    if(depth>1 || !list?.isCell || list.sectionIndex!==t.section || !Number.isSafeInteger(list.paraCount) ||
-        list.paraCount<1 || list.paraCount>50 || !Number.isSafeInteger(paragraph) || paragraph<0 || paragraph>=list.paraCount)throw invalid();
-    const part={controlIndex:list.controlIndex,cellIndex:list.cellIndex,cellParaIndex:paragraph};
-    if(list.listId===host.listId)return [part];
-    if(list.hostListId===0)throw invalid();
-    return [...cellPath(list.hostListId,list.hostPara,depth+1),part];
+  const cellPath=(id:number,paragraph:number):CellPath=>{
+    const path:CellPath=[],visited=new Set<number>();
+    for(;;){
+      const list=byId.get(id);
+      if(visited.has(id) || path.length>=MAX_CELL_PATH-1 || !list?.isCell || list.sectionIndex!==t.section ||
+          ![list.controlIndex,list.cellIndex,list.hostListId,list.hostPara,paragraph].every(n=>Number.isSafeInteger(n) && n>=0) ||
+          !Number.isSafeInteger(list.paraCount) || list.paraCount<1 || list.paraCount>50 || paragraph>=list.paraCount)throw invalid();
+      visited.add(id);
+      path.unshift({controlIndex:list.controlIndex,cellIndex:list.cellIndex,cellParaIndex:paragraph});
+      if(list.listId===host.listId)return path;
+      if(list.hostListId===0)throw invalid();
+      id=list.hostListId;paragraph=list.hostPara;
+    }
   };
   const tables:NestedSubdivisionTable[]=[],keys=new Set<string>();
   for(const child of children){
@@ -37,9 +49,7 @@ export function subdivisionNestedOwner(doc:any,t:Table):NestedSubdivisionOwner|u
     keys.add(encoded);
     tables.push({listId:child.list,paragraph:child.para,path});
   }
-  const descendantLists=lists.filter((l:any)=>l.hostListId!==0);
-  if(descendantLists.length>1000 || lists.some((l:any)=>!l.isCell) ||
-      descendantLists.some((l:any)=>!tables.some(c=>c.listId===l.hostListId && c.paragraph===l.hostPara && l.controlIndex===0)))throw invalid();
+  if(descendantLists.some((l:any)=>!tables.some(c=>c.listId===l.hostListId && c.paragraph===l.hostPara && l.controlIndex===0)))throw invalid();
   return {index:host.cellIndex,listId:host.listId,
     paragraphs:tables.filter(c=>c.listId===host.listId).map(c=>c.paragraph).sort((a,b)=>a-b),
     tables,controlLists:[...new Set(tables.map(c=>c.listId))],descendantLists:descendantLists.map((l:any)=>l.listId)};
@@ -158,6 +168,7 @@ export function nestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisio
   for(const child of nested){
     const ancestors=child.ancestors,anchor=ancestors.at(-1)!;
     const parent=nested.find(p=>sameTableLayout(p.ancestors,ancestors.slice(0,-1)));
+    if(ancestors.length>1 && !parent)throw invalid();
     const parentCells=parent?.boxes ?? [box],ownerCell=parent ? parentCells[anchor.cellIndex] : box;
     if(!ownerCell || !inside(child.frame,ownerCell) ||
         parentCells.some((c:any)=>c!==ownerCell && overlap(child.frame,c)) ||

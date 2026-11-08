@@ -1,0 +1,177 @@
+--- a/src/document_core/queries/cursor_rect.rs
++++ b/src/document_core/queries/cursor_rect.rs
+@@ -3560,7 +3560,19 @@
+             return Err(HwpError::RenderError("경로가 비어있습니다".to_string()));
+         }
+ 
+-        let _para = self.resolve_paragraph_by_path(section_idx, parent_para_idx, &path)?;
++        let caption = path.last().filter(|entry| entry.1 == 65534);
++        if let Some(&(_, _, ordinal)) = caption {
++            // Caption pseudo-cells are a read-only cursor address. The general
++            // paragraph resolvers used by mutations retain their cell checks.
++            let table = self.resolve_table_by_path(section_idx, parent_para_idx, &path)?;
++            let paragraph = table.caption.as_ref().and_then(|c| c.paragraphs.get(ordinal))
++                .ok_or_else(|| HwpError::RenderError("캡션 문단 경로가 유효하지 않습니다".into()))?;
++            if char_offset > paragraph.text.chars().count() {
++                return Err(HwpError::RenderError("캡션 문자 위치가 범위를 벗어났습니다".into()));
++            }
++        } else {
++            self.resolve_paragraph_by_path(section_idx, parent_para_idx, &path)?;
++        }
+ 
+         // 커서 좌표를 렌더 트리에서 찾기 ([#2021] 힌트 페이지 우선 탐색)
+         // [#4128] 바깥 표 셀 기준으로 후보를 좁힌다. depth 1 이면 char_offset 까지,
+@@ -3571,16 +3583,12 @@
+         } else {
+             None
+         };
+-        let pages = Self::order_pages_by_hint(
+-            self.find_pages_for_cell_position(
+-                section_idx,
+-                parent_para_idx,
+-                ctrl0,
+-                cell0,
+-                cell_target,
+-            )?,
+-            hint_page,
+-        );
++        let candidates = if caption.is_some() && path.len() == 1 {
++            self.find_pages_for_paragraph(section_idx, parent_para_idx)?
++        } else {
++            self.find_pages_for_cell_position(section_idx, parent_para_idx, ctrl0, cell0, cell_target)?
++        };
++        let pages = Self::order_pages_by_hint(candidates, hint_page);
+ 
+         fn table_ctx_from_node(
+             node: &RenderNode,
+@@ -3727,7 +3735,7 @@
+                 }
+                 // 번호/글머리표 TextRun (char_start: None)은 건너뛴다
+                 if let (true, Some(cs)) = (
+-                    cell_context_matches(&cell_context, parent_para, path),
++                    tr.section_index == Some(section_idx) && cell_context_matches(&cell_context, parent_para, path),
+                     tr.char_start,
+                 ) {
+                     let cc = effective_char_count(tr);
+@@ -3788,8 +3796,13 @@
+                 None,
+                 None,
+             ) {
+-                return Ok(format_cursor_rect_json(pi, x, y, h, cell_bounds));
+-            }
++                // Captions can paint outside the parent cell's content box.
++                return Ok(format_cursor_rect_json(pi, x, y, h, if caption.is_some() { None } else { cell_bounds }));
++            }
++        }
++
++        if caption.is_some() {
++            return Err(HwpError::RenderError("캡션 커서의 실제 글줄을 찾지 못했습니다".into()));
+         }
+ 
+         // fallback: 아무 TextRun이라도 찾기
+@@ -3958,6 +3971,7 @@
+         // 렌더 트리에서 TextRun의 cell_context.path가 일치하는 TableCell의 부모 Table 노드를 찾는다
+         fn find_nested_table_cells(
+             node: &RenderNode,
++            section: usize,
+             parent_para: usize,
+             path: &[(usize, usize, usize)],
+             page_idx: usize,
+@@ -3968,12 +3982,17 @@
+                 // 이 테이블의 셀에서 TextRun을 찾아 경로 매칭 여부 확인
+                 fn check_table_match(
+                     node: &RenderNode,
++                    section: usize,
+                     parent_para: usize,
+                     path: &[(usize, usize, usize)],
+                 ) -> bool {
+                     if let RenderNodeType::TextRun(ref tr) = node.node_type {
+-                        return tr.cell_context.as_ref().map_or(false, |ctx| {
+-                            ctx.parent_para_index == parent_para
++                        return tr.section_index == Some(section) && tr.cell_context.as_ref().map_or(false, |ctx| {
++                            // A nested caption is painted beside its table,
++                            // inside an ancestor cell. It cannot identify that
++                            // ancestor as the table whose cell boxes are queried.
++                            ctx.innermost().is_some_and(|entry| entry.cell_index != 65534)
++                                && ctx.parent_para_index == parent_para
+                                 && ctx.path.len() == path.len()
+                                 && ctx.path.iter().zip(path.iter()).enumerate().all(
+                                     |(i, (a, b))| {
+@@ -3995,14 +4014,14 @@
+                         if matches!(child.node_type, RenderNodeType::Table(_)) {
+                             continue;
+                         }
+-                        if check_table_match(child, parent_para, path) {
++                        if check_table_match(child, section, parent_para, path) {
+                             return true;
+                         }
+                     }
+                     false
+                 }
+ 
+-                if check_table_match(node, parent_para, path) {
++                if check_table_match(node, section, parent_para, path) {
+                     // 이 테이블의 직속 셀 bbox 수집
+                     for (cell_idx, child) in node.children.iter().enumerate() {
+                         if let RenderNodeType::TableCell(ref cn) = child.node_type {
+@@ -4019,7 +4038,7 @@
+             }
+ 
+             for child in &node.children {
+-                if find_nested_table_cells(child, parent_para, path, page_idx, result) {
++                if find_nested_table_cells(child, section, parent_para, path, page_idx, result) {
+                     return true;
+                 }
+             }
+@@ -4034,7 +4053,7 @@
+             // 때마다 같은 페이지를 다시 조판하면 keydown을 수백 ms 막으므로, 문서
+             // mutation 시 함께 무효화되는 표준 page-tree cache를 재사용한다 (#4252).
+             let tree = self.build_page_tree_cached(page_num as u32)?;
+-            if find_nested_table_cells(&tree.root, parent_para_idx, &path, page_num, &mut cells) {
++            if find_nested_table_cells(&tree.root, section_idx, parent_para_idx, &path, page_num, &mut cells) {
+                 found = true;
+             } else if found {
+                 // 이전 페이지에서 표를 찾았으나 이 페이지에는 없음 → 표가 끝남
+--- a/src/renderer/layout/table_layout.rs
++++ b/src/renderer/layout/table_layout.rs
+@@ -3664,27 +3664,27 @@
+                         (cx, cw, cy)
+                     }
+                 };
+-                let cap_cell_ctx = table_meta
+-                    .map(|(pi, ci)| CellContext {
++                // A nested table already carries its complete ancestor path.
++                // table_meta alone identifies only the leaf's host paragraph.
++                let cap_cell_ctx = enclosing_cell_ctx.as_ref().map(|ctx| {
++                    let mut cc = ctx.clone();
++                    if let Some(last) = cc.path.last_mut() {
++                        last.cell_index = 65534;
++                        last.cell_para_index = 0;
++                    }
++                    cc
++                }).or_else(|| {
++                    table_meta.map(|(pi, ci)| CellContext {
+                         in_textbox: false,
+                         parent_para_index: pi,
+                         path: vec![CellPathEntry {
+                             control_index: ci,
+-                            cell_index: 65534, // 캡션 식별 센티널
++                            cell_index: 65534,
+                             cell_para_index: 0,
+                             text_direction: 0,
+                         }],
+                     })
+-                    .or_else(|| {
+-                        enclosing_cell_ctx.as_ref().map(|ctx| {
+-                            let mut cc = ctx.clone();
+-                            if let Some(last) = cc.path.last_mut() {
+-                                last.cell_index = 65534;
+-                                last.cell_para_index = 0;
+-                            }
+-                            cc
+-                        })
+-                    });
++                });
+                 self.layout_caption(
+                     tree,
+                     col_node,

@@ -8,7 +8,7 @@ import {readTableSubdivisionSources} from '../src/adapters/rhwp/table-subdivisio
 import {nestedSubdivisionEvidence,subdivisionNestedOwner} from '../src/adapters/rhwp/subdivision-nested-owner.ts';
 import {executeDocumentOperations} from '../src/adapters/rhwp/execute.ts';
 import {validateEditOperations,type Snapshot} from '../src/modules/document/public/index.ts';
-import {deepSubdivisionNestedTable,emphasizedSubdivisionNestedTable,labeledSubdivisionNestedTable,subdivisionNestedTable} from '../scripts/lib/subdivision-nested-table.mjs';
+import {deepSubdivisionNestedTable,emphasizedSubdivisionNestedTable,labeledSubdivisionNestedTable,nestedBudgetSubdivisionTable,nestedDepthSubdivisionTable,subdivisionNestedTable} from '../scripts/lib/subdivision-nested-table.mjs';
 import {readOwnedZip,writeOwnedZip} from '../scripts/lib/owned-zip.mjs';
 const pkg=process.env.JUEONY_ENGINE_PACKAGE ?? fileURLToPath(new URL('../node_modules/@rhwp/core/',import.meta.url));
 const {default:init,HwpDocument}=await import(pathToFileURL(resolve(pkg,'rhwp.js')).href);
@@ -384,6 +384,90 @@ test('two nested levels reject duplicated cursor IDs and unidentified table fram
         };
       }
       assert.throws(()=>nestedSubdivisionEvidence(d,table,subdivisionNestedOwner(d,table)!),/중첩 표/);
+      assert.deepEqual(d.exportHwpx(),old);
+    }finally{d.free();}
+  }
+});
+
+for(const ext of ['hwp','hwpx'])test(ext+' supports nested depth three and seven within the eight-entry path contract',()=>{
+  for(const depth of [3,7]){
+    const src=nestedDepthSubdivisionTable(HwpDocument,depth),d=new HwpDocument(bytes(src,ext));src.free();
+    try{
+      const s=snapshot(d,ext),t=s.structure!.tables[0],operation={...op,columns:2},old=bytes(d,ext),undo=d.saveSnapshot();
+      const inspect=(doc:any)=>{
+        const table=readStructure(doc).tables[0];
+        return nestedSubdivisionEvidence(doc,table,subdivisionNestedOwner(doc,table)!);
+      };
+      try{
+        const original=inspect(d),paragraphs=storedOwnerParagraphs(d);
+        assert.deepEqual(original.nested.map(n=>n.ancestors.length),Array.from({length:depth},(_,i)=>i+1));
+        assert.deepEqual(original.nested.at(-1)!.lines.map((r:any)=>[r.text,r.bold,r.cellPath.length]),[['Q',false,depth+1],['R',true,depth+1]]);
+        assert.equal(original.pageCount,1);
+        executeDocumentOperations(d,s,validateEditOperations([operation],s));
+        const reopened=new HwpDocument(bytes(d,ext));
+        try{for(const result of [d,reopened]){
+          assert.deepEqual(inspect(result),original);
+          assert.equal(storedOwnerParagraphs(result),paragraphs);
+          const structure=readStructure(result);
+          assert.deepEqual(structure.nestedTables,s.structure!.nestedTables);
+          assert.deepEqual(structure.tables[0].cells.map(c=>c.text),[t.cells[0].text,'',...t.cells.slice(1).map(c=>c.text)]);
+        }}finally{reopened.free();}
+        d.restoreSnapshot(undo);assert.deepEqual(bytes(d,ext),old);
+      }finally{d.discardSnapshot(undo);}
+    }finally{d.free();}
+  }
+  for(const [depth,protectedLeaf] of [[8,false],[7,true]] as const){
+    const src=nestedDepthSubdivisionTable(HwpDocument,depth,protectedLeaf),d=new HwpDocument(bytes(src,ext));src.free();
+    try{
+      const s=snapshot(d,ext),old=bytes(d,ext);
+      assert.equal(s.tableSubdivisionSources![op.target].editable,false);
+      assert.throws(()=>validateEditOperations([{...op,columns:2}],s));
+      assert.throws(()=>d.splitCellOnGrid(0,1,0,0,0,1,2,false));
+      assert.deepEqual(bytes(d,ext),old);
+    }finally{d.free();}
+  }
+});
+
+for(const ext of ['hwp','hwpx'])test(ext+' enforces the aggregate nested-cell budget across sibling tables',()=>{
+  for(const count of [1000,1001]){
+    const src=nestedBudgetSubdivisionTable(HwpDocument,count),d=new HwpDocument(bytes(src,ext));src.free();
+    try{
+      const table=readStructure(d).tables[0],old=bytes(d,ext);
+      assert.equal(JSON.parse(d.getCursorModel()).lists.filter((l:any)=>l.hostListId!==0).length,count);
+      if(count===1000){
+        assert.equal(subdivisionNestedOwner(d,table)!.descendantLists.length,count);
+        assert.equal(JSON.parse(d.splitCellOnGrid(0,1,0,0,0,1,2,false)).ok,true);
+      }else{
+        assert.throws(()=>subdivisionNestedOwner(d,table),/중첩 표/);
+        assert.throws(()=>d.splitCellOnGrid(0,1,0,0,0,1,2,false));
+        assert.deepEqual(bytes(d,ext),old);
+      }
+    }finally{d.free();}
+  }
+});
+
+test('nested depth traversal rejects cycles, missing ancestors and duplicate physical paths',()=>{
+  for(const fault of ['cycle','missing ancestor','duplicate cell','duplicate control']){
+    const d=nestedDepthSubdivisionTable(HwpDocument,3);
+    try{
+      const table=readStructure(d).tables[0],old=d.exportHwpx();
+      if(fault==='duplicate control'){
+        const read=d.getControls.bind(d);
+        d.getControls=()=>{
+          const controls=JSON.parse(read()),last=controls.filter((c:any)=>c.list!==0).at(-1);
+          controls.push({...last});return JSON.stringify(controls);
+        };
+      }else{
+        const read=d.getCursorModel.bind(d);
+        d.getCursorModel=()=>{
+          const model=JSON.parse(read()),nested=model.lists.filter((l:any)=>l.hostListId!==0),parent=nested[1];
+          if(fault==='cycle')parent.hostListId=parent.listId;
+          if(fault==='missing ancestor')parent.hostListId=9999;
+          if(fault==='duplicate cell')model.lists.push({...nested.at(-1),listId:9999});
+          return JSON.stringify(model);
+        };
+      }
+      assert.throws(()=>subdivisionNestedOwner(d,table),/중첩 표/);
       assert.deepEqual(d.exportHwpx(),old);
     }finally{d.free();}
   }

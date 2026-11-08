@@ -78,3 +78,60 @@ export function deepSubdivisionNestedTable(HwpDocument) {
   ]),0,1,'{"bold":true}');
   return doc;
 }
+
+export function nestedDepthSubdivisionTable(HwpDocument,depth,protectedLeaf=false) {
+  if(!Number.isInteger(depth) || depth<1 || depth>8)throw Error('Invalid depth fixture');
+  const source=labeledSubdivisionNestedTable(HwpDocument),parts=readOwnedZip(source.exportHwpx());source.free();
+  const section=parts.find(([name])=>name==='Contents/section0.xml'),xml=section[1].toString('utf8');
+  const start=xml.indexOf('<hp:tbl ',xml.indexOf('<hp:tbl ')+1),end=xml.indexOf('</hp:tbl>',start)+9;
+  const template=xml.slice(start,end),firstCell=template.match(/<hp:tc\b[\s\S]*?<\/hp:tc>/)?.[0];
+  if(!firstCell)throw Error('Missing nested depth template');
+  const size=(value,width,height,cellWidth,level)=>value
+    .replace(/(<hp:(?:p|tbl) id=")(\d+)"/g,(_,tag,id)=>tag+(level*1000+Number(id))+'"')
+    .replace(/<hp:sz width="\d+"([^>]*?)height="\d+"/,'<hp:sz width="'+width+'"$1height="'+height+'"')
+    .replace(/<hp:cellSz width="\d+" height="\d+"/g,'<hp:cellSz width="'+cellWidth+'" height="'+height+'"');
+  let nested=size(template,2600,2100,1300,depth).replace('>X<','>Q<').replace('>Y<','>R<');
+  if(protectedLeaf){
+    const cellStart=nested.lastIndexOf('<hp:tc ',nested.indexOf('>R<')),cellEnd=nested.indexOf('>',cellStart);
+    nested=nested.slice(0,cellStart)+nested.slice(cellStart,cellEnd).replace('protect="0"','protect="1"')+nested.slice(cellEnd);
+  }
+  const wrapper=template.replace('colCnt="2"','colCnt="1"').replace(/<hp:tr>[\s\S]*?<\/hp:tr>/,'<hp:tr>'+firstCell+'</hp:tr>');
+  for(let level=depth-1;level>=1;level--){
+    const width=2600+1600*(depth-level),height=2100*(depth-level+1);
+    nested=size(wrapper,width,height,width,level).replace('<hp:t>X</hp:t>',nested);
+  }
+  section[1]=Buffer.from(xml.slice(0,start)+nested+xml.slice(end));
+  const doc=new HwpDocument(writeOwnedZip(parts));
+  for(const [i,width] of [36000,12000,18000,18000,12000].entries())
+    doc.setCellProperties(0,1,0,i,JSON.stringify({width,height:24000}));
+  if(!protectedLeaf)doc.applyCharFormatInCellByPath(0,1,JSON.stringify([
+    {controlIndex:0,cellIndex:0,cellParaIndex:1},
+    ...Array.from({length:depth-1},()=>({controlIndex:0,cellIndex:0,cellParaIndex:0})),
+    {controlIndex:0,cellIndex:1,cellParaIndex:0},
+  ]),0,1,'{"bold":true}');
+  return doc;
+}
+
+/** Isolate the native aggregate-cell guard using five full 200-cell tables. */
+export function nestedBudgetSubdivisionTable(HwpDocument,count) {
+  if(![1000,1001].includes(count))throw Error('Invalid cell-budget fixture');
+  const source=labeledSubdivisionNestedTable(HwpDocument),parts=readOwnedZip(source.exportHwpx());source.free();
+  const section=parts.find(([name])=>name==='Contents/section0.xml'),xml=section[1].toString('utf8');
+  const start=xml.indexOf('<hp:tbl ',xml.indexOf('<hp:tbl ')+1),end=xml.indexOf('</hp:tbl>',start)+9;
+  const template=xml.slice(start,end),cell=template.match(/<hp:tc\b[\s\S]*?<\/hp:tc>/)?.[0];
+  if(!cell)throw Error('Missing budget cell template');
+  const anchorStart=xml.lastIndexOf('<hp:p ',start),anchorEnd=xml.indexOf('</hp:p>',end)+7;
+  const anchor=xml.slice(anchorStart,anchorEnd),paragraphs=[];
+  for(let offset=0;offset<count;offset+=200){
+    const cells=Math.min(200,count-offset),row=Array.from({length:cells},(_,i)=>cell
+      .replace(/(<hp:p id=")(\d+)"/,(_,tag,id)=>tag+(Number(id)+i)+'"')
+      .replace('>X<','><').replace('colAddr="0"','colAddr="'+i+'"').replace('width="2600"','width="20"')).join('');
+    const table=template.replace('colCnt="2"','colCnt="'+cells+'"').replace('<hp:sz width="5200"','<hp:sz width="'+cells*20+'"')
+      .replace(/<hp:tr>[\s\S]*?<\/hp:tr>/,'<hp:tr>'+row+'</hp:tr>');
+    paragraphs.push(anchor.replace(template,table).replace(/(<hp:(?:p|tbl) id=")(\d+)"/g,(_,tag,id)=>tag+(10000+offset*10+Number(id))+'"'));
+  }
+  section[1]=Buffer.from(xml.slice(0,anchorStart)+paragraphs.join('')+xml.slice(anchorEnd));
+  const doc=new HwpDocument(writeOwnedZip(parts));
+  for(let i=0;i<5;i++)doc.setCellProperties(0,1,0,i,'{"height":24000}');
+  return doc;
+}

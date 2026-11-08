@@ -20,11 +20,11 @@ function inspect(d,table,count,multiline){
   assert.equal(p.lines[0].line_height,1000);assert.equal(p.lines[0].line_spacing,600);
  }
  const controls=JSON.parse(d.getPageControlLayout(0)).controls,owner=controls[2];
- const runs=JSON.parse(d.getPageTextLayout(0)).runs.filter(r=>r.cellIdx===65534).slice(-(multiline?5+count:4+count));
+ const runs=JSON.parse(d.getPageTextLayout(0)).runs.filter(r=>r.cellPath?.at(-1)?.cellIndex===65534).slice(-(multiline?5+count:4+count));
  const blanks=runs.filter(r=>r.text==='');
  assert.equal(blanks.length,count);
  for(const [i,r] of blanks.entries()){
-  assert.equal(r.cellParaIdx,i+1);assert.equal(r.charStart,0);assert.equal(r.bold,true);assert.deepEqual(r.charX,[0]);
+  assert.equal(r.cellPath.at(-1).cellParaIndex,i+1);assert.equal(r.charStart,0);assert.equal(r.bold,true);assert.deepEqual(r.charX,[0]);
   assert.equal(r.charShapeId,source.paragraphs[i+1].runs[0].char_shape_id);
   assert.equal(r.paraShapeId,source.paragraphs[i+1].paragraphShape);
   assert.ok(Math.abs(r.h-1000/75)<.11);
@@ -76,7 +76,7 @@ for(const ext of ['hwp','hwpx']){
   let changed=false;
   d.editNestedTableAxis=(...args)=>{const result=edit(...args);changed=true;return result;};
   d.getPageTextLayout=(...args)=>{const value=JSON.parse(layout(...args));
-   if(changed)for(const r of value.runs)if(r.cellIdx===65534&&r.text==='')r.charX=[2];
+   if(changed)for(const r of value.runs)if(r.cellPath?.at(-1)?.cellIndex===65534&&r.text==='')r.charX=[2];
    return JSON.stringify(value);
   };
   assert.throws(()=>executeDocumentOperations(d,snapshot,[{kind:'delete_table_row',target:t.id,index:0}]),/캡션/);

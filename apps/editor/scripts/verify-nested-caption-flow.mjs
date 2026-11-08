@@ -14,13 +14,13 @@ const axisProof=(d,t)=>JSON.parse(d.getTableAxisCaptionEvidenceByPath(t.section,
 const close=(a,b)=>assert.ok(Math.abs(a-b)<=.21,`${a} differs from ${b}`);
 function rendered(d,direction,align){
  const [,sibling,table]=JSON.parse(d.getPageControlLayout(0)).controls;
- const all=JSON.parse(d.getPageTextLayout(0)).runs.filter(r=>r.cellIdx===65534);
+ const all=JSON.parse(d.getPageTextLayout(0)).runs.filter(r=>r.cellPath?.at(-1)?.cellIndex===65534);
  // The fixture paints the left host before the right one. With twins, check
  // the first caption against its own table independently of the target.
  const other=all.slice(0,-5),runs=all.slice(-5);
  assert.equal(other.length,direction==='BOTTOM'?5:0);
  if(other.length)close(other[0].y-sibling.y-sibling.h,283*96/7200);
- assert.deepEqual(runs.map(r=>[r.text,r.bold,r.cellParaIdx,r.charStart]),[
+ assert.deepEqual(runs.map(r=>[r.text,r.bold,r.cellPath.at(-1).cellParaIndex,r.charStart]),[
   ['캡션 ',false,0,0],['제목😀',true,0,3],['뒤',true,0,6],['둘째 ',false,1,0],['설명',true,1,3]
  ]);
  const first=runs[0],last=runs.at(-1),end=last.y+last.h,height=end-first.y;

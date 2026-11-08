@@ -1,0 +1,44 @@
+--- a/src/document_core/commands/table_ops/subdivision_grid.rs
++++ b/src/document_core/commands/table_ops/subdivision_grid.rs
+@@ -34,19 +34,22 @@
+ fn retained_nested_size(c: &Cell) -> Option<(u32, u32)> {
+     if c.field_name.is_some() || c.paragraphs.len() > 50 { return None; }
+     let (mut width, mut height) = (0, 0u32);
++    // The public nested table path includes the root cell and permits 8 entries.
++    // Keep at most 7 nested tables and the same 1000-cell budget as the adapter.
++    let mut cell_budget = 1000usize;
+     for p in &c.paragraphs {
+         if p.controls.is_empty() {
+             if !subdivision_paragraph_allowed(p, false) { return None; }
+             continue;
+         }
+-        let inner = retained_inline_table(p, 2)?;
++        let inner = retained_inline_table(p, 7, &mut cell_budget)?;
+         width = width.max(inner.common.width);
+         height = height.checked_add(inner.common.height)?;
+     }
+     (height > 0).then_some((width, height))
+ }
+ 
+-fn retained_inline_table(p: &Paragraph, remaining: u8) -> Option<&Table> {
++fn retained_inline_table<'a>(p: &'a Paragraph, remaining: u8, cell_budget: &mut usize) -> Option<&'a Table> {
+     if remaining == 0 { return None; }
+     let [Control::Table(inner)] = p.controls.as_slice() else { return None; };
+     if !p.text.is_empty() || !p.field_ranges.is_empty() || !p.orphan_field_ends.is_empty()
+@@ -55,12 +58,13 @@
+         || !inner.common.treat_as_char || inner.common.allow_overlap
+         || inner.common.locked || inner.common.size_protect || inner.attr & (1 << 30) != 0
+         || inner.caption.is_some() || inner.repeat_header || !inner.zones.is_empty()
+-        || inner.cells.is_empty() || inner.cells.len() > 200
+-        || inner.cells.iter().any(|cell| cell.cell_protect() || cell.is_header || cell.field_name.is_some()
++        || inner.cells.is_empty() || inner.cells.len() > 200 { return None; }
++    *cell_budget = (*cell_budget).checked_sub(inner.cells.len())?;
++    if inner.cells.iter().any(|cell| cell.cell_protect() || cell.is_header || cell.field_name.is_some()
+             || cell.text_direction != 0 || cell.paragraphs.is_empty() || cell.paragraphs.len() > 50
+             || cell.paragraphs.iter().any(|para| {
+                 if para.controls.is_empty() { return !subdivision_paragraph_allowed(para, false); }
+-                retained_inline_table(para, remaining - 1).map_or(true, |child|
++                retained_inline_table(para, remaining - 1, cell_budget).map_or(true, |child|
+                     child.common.width > cell.width || child.common.height > cell.height)
+             })) { return None; }
+     Some(inner)

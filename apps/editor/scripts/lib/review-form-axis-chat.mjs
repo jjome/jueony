@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {expectedPictureHeading} from './repeated-picture-heading.mjs';
+import {inspectPictureAnchors} from './axis-picture-fixture.mjs';
 
 const insertRequest='첫 번째 양식 표의 결재란 바로 위에 새 행을 넣어 주세요.';
 const deleteRequest='첫 번째 양식 표에서 결재란이 들어 있는 행을 삭제해 주세요.';
@@ -14,6 +15,9 @@ const groupedRequest='한 칸에 나란히 넣은 사진 세 장을 유지하고
 const removeGrouped='사진 세 장이 있는 행을 삭제해 주세요.';
 const splitRequest='한 칸의 두 문단에 나눠 넣은 사진 세 장을 유지하고 그 위에 새 행을 넣어 주세요.';
 const repeatRequest='각 쪽의 제목 행을 유지하고 사진 세 장이 든 본문 행 바로 위에 새 행을 넣어 주세요.';
+const titlePictureRequests=['제목 그림 원본을 유지하고 본문 두 번째 행 앞에 새 행을 넣어 주세요.',
+ '반복 제목 그림을 유지하고 맨 앞에 새 제목 열을 넣어 주세요.', '방금 만든 맨 앞 제목 열을 삭제해 주세요.',
+ '그림이 들어 있는 반복 제목 행을 삭제해 주세요.'];
 
 function form(HwpDocument,inline){
  const doc=HwpDocument.createEmpty();
@@ -34,6 +38,14 @@ function form(HwpDocument,inline){
 
 function proposal(input,splitPictures){
  const [t]=input.document.structure.tables;
+ if(titlePictureRequests.includes(input.instruction)){
+  assert.equal(t.cells.filter(c=>c.axisPicture).length,4);assert.equal(t.headerRows,1);
+  assert.ok(t.cells.find(c=>c.text==='PicA').axisPicture);
+  const index=titlePictureRequests.indexOf(input.instruction);
+  return index===0?{kind:'insert_table_row',target:t.id,index:2,values:['새 행','','']}:
+   index===1?{kind:'insert_table_column',target:t.id,index:0,values:['새 제목',...Array(t.rows-1).fill('')]}:
+   {kind:index===2?'delete_table_column':'delete_table_row',target:t.id,index:0};
+ }
  if([pictureRequest,removePicture,picturesRequest,removePictures,groupedRequest,splitRequest,repeatRequest,removeGrouped].includes(input.instruction)){
   const many=[picturesRequest,removePictures].includes(input.instruction);
   const grouped=[groupedRequest,splitRequest,repeatRequest,removeGrouped].includes(input.instruction);
@@ -84,7 +96,7 @@ async function checkPicturePages(frame,expected,headings){
  assert.deepEqual(layouts.screen,wanted);assert.deepEqual(layouts.portable,wanted);
 }
 
-export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,state,snap,execute,reopen,pictureFolder,multiplePictures,groupedPictures,splitPictures,pagedPictures,repeatPictures}){
+export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,state,snap,execute,reopen,pictureFolder,multiplePictures,groupedPictures,splitPictures,pagedPictures,repeatPictures,titlePictureOwner,outputFolder}){
  const calls=[];
  const provider=http.createServer(async(req,res)=>{
   try{
@@ -112,6 +124,41 @@ export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,
    return page.$eval('#request-error',e=>e.hidden?'':e.textContent);
   }
   for(const ext of ['hwp','hwpx']){
+   if(titlePictureOwner){
+    await scenario(ext+' Agent picture owner repeated title row and column edits preserve one stored source',async()=>{
+     const sourceFile=resolve(pictureFolder,'before.'+ext),source=new HwpDocument(await readFile(sourceFile));
+     const records=inspectPictureAnchors(sourceFile),frame=await open(ext,source);
+     const verify=async expected=>{
+      const views=await frame.evaluate(()=>{
+       const d=window.__pageServices.wasm.borrowDocumentHandle(),active=d.canvasMetricsActive();
+       const t=window.jueonyEditor.snapshot().structure.tables[0],title=t.cells.find(c=>c.text==='PicA');
+       const layout=()=>Array.from({length:d.pageCount()},(_,p)=>{
+        const images=JSON.parse(d.getPageControlLayout(p)).controls.filter(c=>c.type==='image');
+        return {images:images.length,paths:images.filter(c=>c.cellPath?.[0]?.cellIndex===title.index).map(c=>[c.controlIdx,c.cellPath])};
+       });
+       try{d.selectCanvasMetrics(true);const screen=layout(),canvas=d.canvasMetricsActive();d.selectCanvasMetrics(false);
+        return {canvas,screen,portable:layout(),stored:JSON.parse(d.getControls()).filter(c=>c.ctrlId==='gso').length,title:title.index};
+       }finally{d.selectCanvasMetrics(active);}
+      });
+      assert.equal(views.canvas,true);assert.equal(views.stored,4);
+      const wanted=expected.map(images=>({images,paths:[[0,[{controlIndex:0,cellIndex:views.title,cellParaIndex:0}]]]}));
+      assert.deepEqual(views.screen,wanted);assert.deepEqual(views.portable,wanted);
+     };
+     await verify([2,3]);
+     for(const request of titlePictureRequests.slice(0,3)){
+      const before=(await snap()).structure;assert.equal(await send(request),'');const after=(await snap()).structure;
+      await verify([1,4]);await execute('edit:undo');assert.deepEqual((await snap()).structure,before);
+      await execute('edit:redo');assert.deepEqual((await snap()).structure,after);
+     }
+     const after=(await snap()).structure;
+     await reopen(frame,'picture-title-axis-'+ext,ext);assert.deepEqual((await snap()).structure,after);await verify([1,4]);
+     assert.deepEqual(inspectPictureAnchors(resolve(outputFolder,'picture-title-axis-'+ext+'.'+ext)),
+      records.map(p=>({...p,row:p.row+(p.row>=2?1:0)})));
+     const beforeRefusal=await state();assert.match(await send(titlePictureRequests[3]),/그림|제목/);
+     assert.deepEqual(await state(),beforeRefusal);
+    });
+    continue;
+   }
    if(pictureFolder){
     const sourceKind=repeatPictures?' with an existing repeated title row':pagedPictures?' with a merged photo cell moving between pages':splitPictures?' with three pictures in two cell paragraphs':groupedPictures?' with three pictures in one cell':multiplePictures?' with four products':'';
     await scenario(ext+' Agent picture owner row insertion and deletion refusal through chat'+sourceKind,async()=>{

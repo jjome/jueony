@@ -22,7 +22,7 @@
 
 - **구현** [N014](<13-state-and-preferences.md#n014>) **글상자 내부 커서·선택 복원** — HWP/HWPX 저장·재열기에서 0~359° 정수 회전 글상자의 커서·정/역방향 선택과 stale 복원 차단을 검증함. 그룹·중첩·캡션·뒤집기·비-Rectangle·Edge 신규 빌드·한글 비교는 남음.
 - **구현** [N015](<13-state-and-preferences.md#n015>) **다중 개체·그룹 선택 복원** — HWP/HWPX 저장·재열기와 stale/그룹 해제 차단 4/4에 더해 SessionCursor/Studio wire를 연결하고 root 재검증 31 pass·기존 2 skip, 격리 build 666 modules와 해당 프로필 TypeScript 검사를 통과했다. 이미지/수식/OLE/표/특수 story 등 비벡터 선택·브라우저 재시작·한글 비교는 남아 부분이다.
-- **구현** [N016](<13-state-and-preferences.md#n016>) **미주·나머지 특수 영역 선택 복원** — HWP/HWPX 저장·재열기·read-only bytes 불변·동일 길이 변경/소유자 삭제 차단은 검증함. SessionCursor/Studio restore callback 연결·중첩/표/도형 note owner·필드/삽입 개체·브라우저 재시작·한글 비교는 남음.
+- **구현** [N016](<13-state-and-preferences.md#n016>) **미주·나머지 특수 영역 선택 복원** — root 선택 8/8·실제 WASM HWP/HWPX 저장·재열기 4/4·격리 build 671 modules·해당 프로필 TypeScript 검사를 통과했다. 실제 앱 재시작·한글 직접 비교와 중첩/표/도형 note owner·필드/삽입 개체 선택 복원은 남아 부분이다.
 
 ## 기능별 작업표
 
@@ -781,11 +781,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
-- 완료 범위: root-body 미주의 exact owner·note locator·owner/story/locator 3중 지문·Unicode 커서/방향성 선택·각주 분리·stale/위조 차단
-- 다음 작업: HWP/HWPX 저장·재열기·read-only bytes 불변·동일 길이 변경/소유자 삭제 차단은 검증함. SessionCursor/Studio restore callback 연결·중첩/표/도형 note owner·필드/삽입 개체·브라우저 재시작·한글 비교는 남음.
+- 완료 범위: root-body 미주의 exact owner·note locator·owner/story/locator 3중 지문·Unicode 커서/방향성 선택·각주 분리·stale/위조 차단과 SessionCursor/Studio capture·restore callback 연결
+- 다음 작업: root 선택 8/8·실제 WASM HWP/HWPX 저장·재열기 4/4·격리 build 671 modules·해당 프로필 TypeScript 검사를 통과했다. 실제 앱 재시작·한글 직접 비교와 중첩/표/도형 note owner·필드/삽입 개체 선택 복원은 남아 부분이다.
 - 상위 항목: [S018](<13-state-and-preferences.md#s018>) 본문/표/개체 선택과 모드
 - 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;DETACHED_ENDNOTE_SELECTION_2026_11_08`
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;DETACHED_ENDNOTE_SELECTION_2026_11_08;ENDNOTE_SELECTION_SESSION_WIRE_2026_11_09`
 
 </details>
 
@@ -795,11 +795,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 현재 stable 8개 설정 키의 사용자/업무·문서 scope·재실행·reset·dirty·undo·backup·validator 계약과 HWP/HWPX 및 대화상자 임시 상태 분리
-- 다음 작업: 읽기 전용 audit이 missing/valid/corrupt/unsupported-version/read-error를 쓰기 없이 분류함. Studio 전체 schema·backup 제외 정책·설정 UI/시작 진단·실제 한글/Windows/origin/DPI 수명 실측은 남음.
+- 완료 범위: stable 8개 설정 키의 scope·재실행·reset·dirty/undo·backup/validator 계약과 read-only 시작 진단의 missing/valid/corrupt/unsupported-version/read-error·fail-closed 분류
+- 다음 작업: 시작 진단 8/8과 strict TypeScript 검사를 통과했다. 정책 모듈만 있으며 실제 앱 시작점·설정 저장소 통합과 실제 한글/Windows/origin/DPI 수명 실측은 남아 부분이다.
 - 상위 항목: [B151](<12-ui-and-shortcuts.md#b151>) 환경 설정
 - 근거: [25-hangul-parity-and-state-plan.md](<../25-hangul-parity-and-state-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;PREFERENCE_LIFETIME_AUDIT_2026_11_08`
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;PREFERENCE_LIFETIME_AUDIT_2026_11_08;PREFERENCE_STARTUP_DIAGNOSTIC_2026_11_09`
 
 </details>
 

@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | 완료 7/11 · 부분 3 · 재점검 1 | 완료 1/30 · 부분 18 · 미구현 11 |
-| 검증 | 완료 4/11 · 부분 5 · 미검증 2 | 완료 0/30 · 부분 3 · 미검증 27 |
+| 검증 | 완료 4/11 · 부분 6 · 미검증 1 | 완료 0/30 · 부분 3 · 미검증 27 |
 | Agent 연결 | 연결 🟢 **1/1** · 부분 0 · 해당 없음 10 | 연결 0/30 · 부분 0 · 미연결 30 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -96,7 +96,7 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B061](<12-ui-and-shortcuts.md#b061>) · 범위 | 문서 탭·상황선·눈금자 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [N023](<12-ui-and-shortcuts.md#n023>) · 작업 | 큰 DPI·배율·좁은 화면 전체 환경 | ◐ 부분 | ☐ 미검증 | — 해당 없음 |
+| [N023](<12-ui-and-shortcuts.md#n023>) · 작업 | 큰 DPI·배율·좁은 화면 전체 환경 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-6"></a>
 
@@ -687,13 +687,13 @@
 <summary>N023 · 큰 DPI·배율·좁은 화면 전체 환경</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 125/150/200%·다중 모니터·좌표/선택·보기 수명
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: visualViewport CSS 좌표의 메뉴 경계 clamp·아래 공간 부족 시 상단 flip·resize/scroll 재배치·devicePixelRatio 이중 적용 방지
+- 다음 작업: 순수 배치와 기존 메뉴 회귀 7/7·격리 build 665 modules·해당 프로필 TypeScript 검사를 통과했다. 실제 Windows 125/150/200%·다중 모니터·좌표/선택/보기 전체 수명·한글 비교는 남아 부분이다.
 - 상위 항목: [B061](<12-ui-and-shortcuts.md#b061>) 문서 탭·상황선·눈금자
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;VISUAL_VIEWPORT_MENU_PLACEMENT_2026_11_09`
 
 </details>
 

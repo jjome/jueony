@@ -16,6 +16,8 @@
 | N004 | 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset 일치·가운데 정렬 재조판·실패 시 exact rollback | HWP/HWPX 네이티브 저장·재열기·undo/redo·4개 fault rollback 및 Edge 실제 편집→bound-save→UI 재열기 | 임의 필드 경계·중첩 셀·복합 개체·한글 비교 |
 | N012 | 저장 글자 스타일과 직접 서식 타입 분리·독립 charShape 소유·정의 변경 전파·중복/stale/race fail-closed; Studio 패치는 style ID가 아니라 캡처·검증한 stored character-style reference를 적용 경계에 전달 | 실제 Rust HWP/HWPX 3/3·앱 경계/범위/patch 보호 합계 8/8·격리 build 663 modules·해당 프로필 TypeScript 검사 통과 | **부분 유지:** 실제 UI 동작 검수·Agent 연결·한글 비교 |
 | N021 | 177개 단축키 감사·object > cells > table > document 우선순위·IME/repeat/도달성 회귀 보호 | 단축키 감사·기존 한글 단축키·navigation 34/34·TypeScript compile | pending 3건·머리말/각주/미주/글상자 story 정책·한글 비교 |
+| N023 | 열린 통합 메뉴를 visual viewport의 CSS 좌표로 경계 제한하고 아래 공간 부족 시 위로 전환; 브라우저 zoom에 `devicePixelRatio`를 다시 곱하지 않으며 visual viewport resize/scroll에 재배치 | 순수 배치와 기존 메뉴 회귀 7/7·격리 build 665 modules·해당 프로필 TypeScript 검사 통과 | **부분 유지:** 실제 Windows 125/150/200%·다중 모니터·좌표/선택/보기 전체 수명·한글 비교 |
+| N041 | 자체 생성한 본문·명시 글꼴, 2쪽 경계·용지, 표·셀, 내장 PNG, 본문 누름틀의 5종 manifest를 HWP/HWPX 입력 10개로 만들고 open→같은 형식 save→reopen; production preservation evidence·published layout 0.2 허용치·기능 최소조건·입력 SHA 불변을 fail-closed 검사 | custom Rust/WASM `source-c932adab64d8bc4e`에서 10/10·manifest 계약/위조 거절 3/3·구문/diff 검사 통과 | **부분 유지:** 같은 엔진의 합성 문서 기술 검수이며 실제 한글 2024 화면·인쇄·복구 경고, 기관 실문서·공개 문서 코퍼스 독립 비교는 미실행 |
 | N005 | 보이지 않는 0길이 이웃 ClickHere의 셀 분할 이동을 앱·Rust에서 차단하고 guide-only 0길이 필드는 유지 | HWP/HWPX 저장·재열기 2/2·관련 회귀 32/32 | 겹친 필드·개체 혼합 셀·캡션 내부 필드·한글 비교 |
 | N011 추가 | 문단 테두리 동작 플래그 `borderConnect`·`borderIgnoreMargin`의 portable style 교환·전체 롤백 | HWP/HWPX 가져오기→저장→재열기 2/2 | TabDef·실제 BorderFill·배경·간격·UI·한글 비교 |
 | N011 추가 | portable v1 문단 사용자 TabDef와 기본 없음/실선 BorderFill·없음/단색 배경·네 방향 간격을 엄격 검증하고 원본 참조 인증 뒤 이식; 실패 전체 snapshot 복원 | 최신 검수 엔진의 HWP/HWPX 저장·재열기·exact-byte undo·stale ID 불변·중간 실패 rollback 3/3 | **부분 유지:** 글자 스타일 BorderFill·번호/개요·점선/무늬/그러데이션/그림/3D/대각선/투명도·특수 영역·UI·Agent·한글 비교 |
@@ -86,6 +88,14 @@ npm test -- tests/multi-paragraph-paste-special-command.test.ts tests/multi-para
 7 tests passed; Studio command routing, single snapshot execute/undo/redo/discard and single-paragraph regression passed
 JUEONY_BUILD_PROFILE=paste-special-multi npm run build
 664 modules transformed; isolated build and profile TypeScript passed
+npm test -- tests/viewport-placement.test.ts tests/unified-chrome.test.ts
+7 tests passed; visual viewport clamp, above/below flip and existing menu navigation passed
+JUEONY_BUILD_PROFILE=dpi-viewport npm run build
+665 modules transformed; isolated build and profile TypeScript passed
+JUEONY_ENGINE_PACKAGE=build/rhwp-engine/source-c932adab64d8bc4e/pkg node apps/editor/scripts/verify-n041-engine-corpus.mjs
+synthetic C01~C05 × HWP/HWPX open-save-reopen 10/10 passed; production preservation evidence, published layout tolerance, feature minima and input SHA checked
+npm test -- tests/n041-corpus-contract.test.ts
+3 tests passed; manifest coverage, forged input rejection and bounded failure classification checked
 node apps/editor/scripts/verify-n013-b046-browser-smoke.mjs
 4 Edge smoke scenarios passed; pageErrors/consoleErrors/externalRequests 0
 ```

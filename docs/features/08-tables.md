@@ -21,7 +21,7 @@
 ## 먼저 할 일
 
 - **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset과 가운데 정렬 재조판을 수정했다. HWP/HWPX 네이티브 저장·재열기·undo/redo·4종 rollback과 Edge 실제 편집→bound-save→UI 재열기를 통과했다. 임의 필드 경계·중첩 셀·복합 개체와 한글 비교는 남아 부분이다.
-- **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — 최대7단계 중첩표·일반글캡션·말단셀의 채워진 ClickHere를 첫칸에 보존한다. HWP 원본하위트리 레코드와 HWPX XML을 정확히 대조하고 실제Canvas 채팅·저장재열기를 확인했다. 빈/겹친필드·개체혼합캡션·일반복합셀 분할은 남았다.
+- **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — 최대7단계 중첩표·일반글캡션·말단셀의 채워진 ClickHere를 보존한다. 완전히 보이지 않는 0길이 이웃 ClickHere는 앱과 Rust 모두 mutation 전에 차단하고 정상 guide-only 0길이 필드는 유지한다. HWP/HWPX 저장·재열기 2/2와 관련 회귀 32/32를 통과했다. 겹친 필드·개체 혼합 셀·캡션 내부 필드는 남아 부분이다.
 - **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 캡션의 전체 조상 경로·구역과 빈문단·한글·이모지 커서 조회를 수정했다. 캡션이 부모 셀 bbox로 잘못 잡히는 결함도 해결하고 양 형식 재열기를 확인했다. 캡션 직접 텍스트 변경·필드·개체·복합 구역은 남았다.
 
 ## 기능별 작업표
@@ -958,11 +958,11 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 새 격자·행/열 참조 이관과 셀 내용 분배 명세
-- 다음 작업: 최대7단계 중첩표·일반글캡션·말단셀의 채워진 ClickHere를 첫칸에 보존한다. HWP 원본하위트리 레코드와 HWPX XML을 정확히 대조하고 실제Canvas 채팅·저장재열기를 확인했다. 빈/겹친필드·개체혼합캡션·일반복합셀 분할은 남았다.
+- 다음 작업: 최대7단계 중첩표·일반글캡션·말단셀의 채워진 ClickHere를 보존한다. 완전히 보이지 않는 0길이 이웃 ClickHere는 앱과 Rust 모두 mutation 전에 차단하고 정상 guide-only 0길이 필드는 유지한다. HWP/HWPX 저장·재열기 2/2와 관련 회귀 32/32를 통과했다. 겹친 필드·개체 혼합 셀·캡션 내부 필드는 남아 부분이다.
 - 상위 항목: [B160](<08-tables.md#b160>) 셀 분할
 - Agent 명령: `split_table_cell_into`
-- 근거: [102-agent-cell-subdivision.md](<../102-agent-cell-subdivision.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>)
-- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08`
+- 근거: [102-agent-cell-subdivision.md](<../102-agent-cell-subdivision.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08;EMPTY_NEIGHBOR_FIELD_GUARD_2026_11_08`
 
 </details>
 

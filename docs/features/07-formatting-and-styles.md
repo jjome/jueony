@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | 완료 21/25 · 부분 4 | 완료 0/18 · 부분 15 · 미구현 2 · stub 1 |
-| 검증 | 완료 0/25 · 부분 24 · 미검증 1 | 완료 0/18 · 부분 6 · 미검증 12 |
+| 검증 | 완료 0/25 · 부분 25 | 완료 0/18 · 부분 6 · 미검증 12 |
 | Agent 연결 | 연결 13/16 · 부분 0 · 미연결 3 · 해당 없음 9 | 연결 0/18 · 부분 10 · 미연결 8 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -20,7 +20,7 @@
 
 ## 먼저 할 일
 
-- **구현** [N011](<07-formatting-and-styles.md#n011>) **스타일 가져오기·내보내기** — 포터블 JSON과 HWP/HWPX 저장·재열기를 검증함. 번호·개요·사용자 탭·테두리·배경·특수 영역과 UI·Agent·한글 비교는 남음.
+- **구현** [N011](<07-formatting-and-styles.md#n011>) **스타일 가져오기·내보내기** — 포터블 JSON과 HWP/HWPX 저장·재열기에서 borderConnect·borderIgnoreMargin 보존과 전체 롤백을 검증했다. 사용자 탭·실제 테두리선·배경·간격은 mutation 전에 차단한다. 번호·개요·TabDef/BorderFill 생성·특수 영역·UI·Agent·한글 비교는 남아 부분이다.
 - **구현** [N012](<07-formatting-and-styles.md#n012>) **범위 글자 스타일의 영구 정의 연결** — 저장 글자 스타일과 직접 서식을 타입으로 분리하고 독립 charShape 소유·정의 변경 전파·중복/stale/race fail-closed를 구현했다. 실제 Rust HWP/HWPX 3/3과 앱 경계·범위 보호 7/7을 통과했다. 새 WASM UI 스모크·공유 UI·Agent 연결·한글 비교는 남아 부분이다.
 - **구현** [N013](<07-formatting-and-styles.md#n013>) **스타일마당과 사용자 번호키 재할당** — 독립 도메인·저장·단축키 기반을 검증함. 설정 UI·스타일마당 미리보기/적용·실제 단축키 설치부·Agent·한글 비교는 남음.
 
@@ -145,7 +145,7 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B109](<07-formatting-and-styles.md#b109>) · 범위 | 문단 여백·첫줄 빠른키 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [N022](<07-formatting-and-styles.md#n022>) · 작업 | 문단 여백 복합키의 한글 차이 해결 | ◐ 부분 | ☐ 미검증 | — 해당 없음 |
+| [N022](<07-formatting-and-styles.md#n022>) · 작업 | 문단 여백 복합키의 한글 차이 해결 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-11"></a>
 
@@ -707,11 +707,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 평면 스타일의 언어별 글꼴·충돌 이름·다음 스타일 순환·기존 본문/정의 불변·중간 실패 전체 롤백
-- 다음 작업: 포터블 JSON과 HWP/HWPX 저장·재열기를 검증함. 번호·개요·사용자 탭·테두리·배경·특수 영역과 UI·Agent·한글 비교는 남음.
+- 완료 범위: 평면 스타일의 언어별 글꼴·충돌 이름·다음 스타일 순환·문단 테두리 동작 플래그·기존 본문/정의 불변·중간 실패 전체 롤백
+- 다음 작업: 포터블 JSON과 HWP/HWPX 저장·재열기에서 borderConnect·borderIgnoreMargin 보존과 전체 롤백을 검증했다. 사용자 탭·실제 테두리선·배경·간격은 mutation 전에 차단한다. 번호·개요·TabDef/BorderFill 생성·특수 영역·UI·Agent·한글 비교는 남아 부분이다.
 - 상위 항목: [B098](<07-formatting-and-styles.md#b098>) 스타일
 - 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_STYLE_PACKAGE_ROLLBACK_2026_11_08`
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_STYLE_PACKAGE_ROLLBACK_2026_11_08;STYLE_BORDER_BEHAVIOR_FLAGS_2026_11_08`
 
 </details>
 
@@ -747,13 +747,13 @@
 <summary>N022 · 문단 여백 복합키의 한글 차이 해결</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 기록된 개별 delta와 복합 조합 차이를 각각 재현
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 다음 작업: 기존 실제 한글 저장 증거에 맞춰 Ctrl+F7을 양쪽 여백 증가·Ctrl+F8을 감소로 교정하고 공개 단축키 표의 반대 매핑 차이는 감사 경고 2건으로 유지했다. 문단 계산·IME·navigation 포함 회귀 37/37을 통과했다. 공개 표와 설치본 차이의 근본 원인·한글 재비교는 남아 부분이다.
 - 상위 항목: [B109](<07-formatting-and-styles.md#b109>) 문단 여백·첫줄 빠른키
-- 근거: [38-paragraph-selection-state-result.md](<../38-paragraph-selection-state-result.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [38-paragraph-selection-state-result.md](<../38-paragraph-selection-state-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;INSTALLED_PARAGRAPH_SPACING_KEYS_2026_11_08`
 
 </details>
 

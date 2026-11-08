@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import init, { HwpDocument } from '../node_modules/@rhwp/core/rhwp.js';
 import { parseStylePackage } from '../src/modules/document/public/style-package.ts';
 import { exportStylePackage, importStylePackage, importStyleNames } from '../src/adapters/rhwp/style-package-native.ts';
@@ -43,4 +45,27 @@ test('advanced styles are refused explicitly and malformed portable shapes never
     const badFlag = structuredClone(value); badFlag.styles[0].para.borderConnect = 'yes'; assert.throws(() => importStylePackage(source, badFlag), /켜짐\/꺼짐/); assert.deepEqual(source.exportHwpx(), before);
     source.updateStyleShapes(0, '{}', JSON.stringify({ headType: 'Outline' })); assert.throws(() => exportStylePackage(source, [0]), /번호·개요/);
   } finally { source.free(); }
+});
+test('portable paragraph TabDef and basic BorderFill references survive HWP/HWPX, undo and failed-import rollback', { skip: !process.env.JUEONY_ENGINE_PACKAGE }, async () => {
+  const packagePath = resolve(process.env.JUEONY_ENGINE_PACKAGE!); const engine: any = await import(pathToFileURL(resolve(packagePath, 'rhwp.js')).href + `?style-package=${Date.now()}`);
+  await engine.default({ module_or_path: await readFile(resolve(packagePath, 'rhwp_bg.wasm')) }); const Native = engine.HwpDocument;
+  const source: any = Native.createEmpty(); source.createBlankDocument(); const target: any = Native.createEmpty(); target.createBlankDocument();
+  try {
+    source.insertParagraph(0, 0); const props = { tabStops: [{ position: 7200, type: 0, fill: 0 }, { position: 14400, type: 3, fill: 2 }], tabAutoLeft: true, tabAutoRight: false, borderLeft: { type: 1, width: 5, color: '#123456' }, borderRight: { type: 0, width: 0, color: '#000000' }, borderTop: { type: 0, width: 0, color: '#000000' }, borderBottom: { type: 1, width: 3, color: '#654321' }, fillType: 'solid', fillColor: '#abcdef', patternColor: '#000000', patternType: -1, borderSpacing: [100, 200, 300, 400] };
+    assert.equal(JSON.parse(source.applyParaFormat(0, 1, JSON.stringify(props))).ok, true); const paraShapeId = JSON.parse(source.getParaPropertiesAt(0, 1)).paraShapeId;
+    const advanced = source.createStyle(JSON.stringify({ name: '탭 테두리', englishName: 'TabBorder', type: 0, nextStyleId: 0, baseParaShapeId: paraShapeId })); source.deleteParagraph(0, 1);
+    const sourceHwp = source.exportHwp(), sourceHwpx = source.exportHwpx(), value = exportStylePackage(source, [advanced]);
+    assert.deepEqual(source.exportHwp(), sourceHwp); assert.deepEqual(source.exportHwpx(), sourceHwpx);
+    assert.throws(() => exportStylePackage(source, [65535]), /다시 선택/); assert.deepEqual(source.exportHwp(), sourceHwp); assert.deepEqual(source.exportHwpx(), sourceHwpx);
+    assert.deepEqual(value.styles[0].para.tabs, { autoLeft: true, autoRight: false, stops: props.tabStops });
+    assert.deepEqual(value.styles[0].para.decoration, { borderLeft: props.borderLeft, borderRight: props.borderRight, borderTop: props.borderTop, borderBottom: props.borderBottom, fillType: 'solid', fillColor: '#abcdef', patternColor: '#000000', patternType: -1, borderSpacing: props.borderSpacing });
+    source.insertParagraph(0, 0); source.applyParaFormat(0, 0, JSON.stringify({ borderLeft: { type: 2, width: 5, color: '#123456' } })); const opaqueShape = JSON.parse(source.getParaPropertiesAt(0, 0)).paraShapeId, opaque = source.createStyle(JSON.stringify({ name: '점선 원본', englishName: 'OpaqueBorder', type: 0, nextStyleId: 0, baseParaShapeId: opaqueShape })); source.deleteParagraph(0, 0); const opaqueBytes = source.exportHwpx(); assert.throws(() => exportStylePackage(source, [opaque]), /고급 효과|해석되지 않은/); assert.deepEqual(source.exportHwpx(), opaqueBytes);
+    target.insertText(0, 0, 0, '기존 문서'); const originalHwp = target.exportHwp(), originalHwpx = target.exportHwpx(), undo = target.saveSnapshot(), ids = importStylePackage(target, value);
+    for (const method of ['exportHwp', 'exportHwpx']) { const reopened: any = new Native(target[method]()); try { const detail = JSON.parse(reopened.getStyleDetail(ids[0])).paraProps; assert.deepEqual(detail.tabStops, props.tabStops); assert.equal(detail.tabAutoLeft, true); assert.deepEqual(detail.borderLeft, props.borderLeft); assert.deepEqual(detail.borderBottom, props.borderBottom); assert.equal(detail.fillType, 'solid'); assert.equal(detail.fillColor, '#abcdef'); assert.deepEqual(detail.borderSpacing, props.borderSpacing); assert.equal(reopened.getTextRange(0, 0, 0, 5), '기존 문서'); } finally { reopened.free(); } }
+    assert.notDeepEqual(target.exportHwpx(), originalHwpx); assert.notEqual(JSON.parse(target.restoreSnapshot(undo)).ok, false); target.discardSnapshot(undo); assert.deepEqual(target.exportHwp(), originalHwp); assert.deepEqual(target.exportHwpx(), originalHwpx);
+    const invalid = structuredClone(value); invalid.styles[0].para.tabs.stops[0].type = 4; assert.throws(() => importStylePackage(target, invalid), /허용 범위/); assert.deepEqual(target.exportHwpx(), originalHwpx);
+    const beforeFailureHwp = target.exportHwp(), beforeFailureHwpx = target.exportHwpx(), remove = target.deleteParagraph.bind(target); target.deleteParagraph = () => JSON.stringify({ ok: false });
+    try { assert.throws(() => importStylePackage(target, value), /임시 문단/); } finally { target.deleteParagraph = remove; }
+    assert.deepEqual(target.exportHwp(), beforeFailureHwp); assert.deepEqual(target.exportHwpx(), beforeFailureHwpx); assert.equal(target.getTextRange(0, 0, 0, 5), '기존 문서');
+  } finally { source.free(); target.free(); }
 });

@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | 완료 7/11 · 부분 3 · 재점검 1 | 완료 0/30 · 부분 18 · 미구현 12 |
-| 검증 | 완료 4/11 · 부분 4 · 미검증 3 | 완료 0/30 · 부분 2 · 미검증 28 |
+| 검증 | 완료 4/11 · 부분 5 · 미검증 2 | 완료 0/30 · 부분 2 · 미검증 28 |
 | Agent 연결 | 연결 🟢 **1/1** · 부분 0 · 해당 없음 10 | 연결 0/30 · 부분 0 · 미연결 30 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -20,7 +20,7 @@
 
 ## 먼저 할 일
 
-- **구현** [N019](<12-ui-and-shortcuts.md#n019>) **한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- **구현** [N019](<12-ui-and-shortcuts.md#n019>) **한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교** — 정적 메뉴·리본·빠른 도구·본문/표/개체 문맥 메뉴의 command reachability를 감사해 미등록·동일 위치 중복 0건을 확인했다. 실제 placeholder insert:comment·insert:para-band 2건을 안정 ID로 기록했고 선별 15/15를 통과했다. 동적 disabled 조건·두 placeholder 구현·한글 비교는 남아 부분이다.
 - **재점검** [N020](<12-ui-and-shortcuts.md#n020>) **한글 대화상자 활성화 오류 재현·해결** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
 - **구현** [N021](<12-ui-and-shortcuts.md#n021>) **본문/표/특수 영역 전체 단축키 매트릭스** — 177개 binding 감사와 object>cells>table>document 우선순위를 구현해 P의 표 셀/개체 충돌을 제거했고 단축키·navigation 34/34를 통과했다. 쪽 번호·매크로 기록·글자 스타일 해제 pending 3건과 머리말/각주/미주/글상자 story 정책·한글 비교는 남아 부분이다.
 
@@ -87,7 +87,7 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B054](<12-ui-and-shortcuts.md#b054>) · 범위 | 기본 도구 상자 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [N019](<12-ui-and-shortcuts.md#n019>) · 작업 | 한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교 | ◐ 부분 | ☐ 미검증 | — 해당 없음 |
+| [N019](<12-ui-and-shortcuts.md#n019>) · 작업 | 한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-5"></a>
 
@@ -645,13 +645,13 @@
 <summary>N019 · 한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 하위 dialog/표·개체·특수 영역·disabled 조건까지
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 다음 작업: 정적 메뉴·리본·빠른 도구·본문/표/개체 문맥 메뉴의 command reachability를 감사해 미등록·동일 위치 중복 0건을 확인했다. 실제 placeholder insert:comment·insert:para-band 2건을 안정 ID로 기록했고 선별 15/15를 통과했다. 동적 disabled 조건·두 placeholder 구현·한글 비교는 남아 부분이다.
 - 상위 항목: [B054](<12-ui-and-shortcuts.md#b054>) 기본 도구 상자
-- 근거: [25-hangul-parity-and-state-plan.md](<../25-hangul-parity-and-state-plan.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [25-hangul-parity-and-state-plan.md](<../25-hangul-parity-and-state-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;STATIC_MENU_REACHABILITY_2026_11_08`
 
 </details>
 

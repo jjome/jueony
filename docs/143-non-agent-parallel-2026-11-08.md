@@ -19,6 +19,9 @@
 | N005 | 보이지 않는 0길이 이웃 ClickHere의 셀 분할 이동을 앱·Rust에서 차단하고 guide-only 0길이 필드는 유지 | HWP/HWPX 저장·재열기 2/2·관련 회귀 32/32 | 겹친 필드·개체 혼합 셀·캡션 내부 필드·한글 비교 |
 | N011 추가 | 문단 테두리 동작 플래그 `borderConnect`·`borderIgnoreMargin`의 portable style 교환·전체 롤백 | HWP/HWPX 가져오기→저장→재열기 2/2 | TabDef·실제 BorderFill·배경·간격·UI·한글 비교 |
 | N022 | 설치 한글 저장 증거 기준 Ctrl+F7 양쪽 여백 증가·Ctrl+F8 감소와 공개 표 차이 감사 | 문단 여백·IME·navigation 회귀 37/37·TypeScript compile | 공개 표와 설치본 차이의 근본 원인·한글 재비교 |
+| N006 | 1문단·단일 글자 서식의 위/아래 중첩 표 캡션을 경로·원문·revision·보존 상태 재검증 후 교체 | HWP/HWPX 저장·재열기·undo와 음성 사례 3/3·회귀 4/4 | 빈/여러 문단·혼합 서식·좌우 캡션·필드·책갈피·개체·UI |
+| N013 추가 | 프로필·항목·slot 계획·문서 style ID를 고정한 순수 preview와 snapshot apply controller | HWP/HWPX 저장·재열기·stale/충돌/중간 실패 복구 포함 9/9 | 전역 단축키 설정 저장·실제 UI·Agent·한글 비교 |
+| N019 | 메뉴·리본·빠른 도구·문맥 메뉴의 정적 command reachability·중복·placeholder 감사 | N019 5/5·N021/N022 포함 15/15·TypeScript compile | `insert:comment`·`insert:para-band` placeholder·동적 disabled 정책·한글 비교 |
 
 ## 실행한 선별 검사
 

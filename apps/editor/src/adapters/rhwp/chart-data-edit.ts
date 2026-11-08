@@ -8,6 +8,7 @@ export type ChartDataSource={
  labelsShared:boolean;labelsMultiLevel:boolean;labels:string[];series:ChartSeries[];
 };
 export type ChartValueEdit={revision:string;index:number;series:number;point:number;original:string;value:string};
+export type ChartValueBatchEdit={revision:string;index:number;edits:Array<{series:number;point:number;original:string;value:string}>};
 export type ChartSeriesNameEdit={revision:string;index:number;series:number;original:string;value:string};
 export type ChartCategoryLabelEdit={revision:string;index:number;point:number;original:string;value:string};
 
@@ -83,6 +84,45 @@ export function replaceChartValue(value:any,expected:ChartDataSource,edit:ChartV
   const preservationAfter=capturePreservationEvidence(doc);if(preservationAfter.issues.length||exact(preservationBefore.values)!==exact(preservationAfter.values))throw new Error('차트 외 문서 내용이 함께 바뀌었습니다.');
   return{before:current,after:allAfter[edit.index]};
  }catch(error){const restored=checked(method(doc,'restoreSnapshot')(token),'실패 복구');if(restored.ok!==true)throw new Error('차트 편집 실패 뒤 문서를 복구하지 못했습니다.',{cause:error});throw error;}
+ finally{method(doc,'discardSnapshot')(token);}
+}
+
+/** Atomically replaces 2..128 numeric cache values in one verified chart and one engine snapshot. */
+export function replaceChartValues(value:any,expected:ChartDataSource,request:ChartValueBatchEdit,currentRevision:()=>string):{before:ChartDataSource;after:ChartDataSource}{
+ const doc=native(value),sealed=clone(expected),edit=clone(request),assertOwner=()=>{if(native(value)!==doc)throw new Error('차트 편집 대상 문서의 소유권이 바뀌었습니다.');};assertOwner();
+ const liveRevision=revision(currentRevision());assertOwner();
+ if(liveRevision!==sealed.revision||revision(edit.revision)!==sealed.revision||edit.index!==sealed.index)throw new Error('차트 편집 요청의 문서 버전이 오래되었습니다.');
+ if(!Array.isArray(edit.edits)||edit.edits.length<2||edit.edits.length>128)throw new Error('차트 일괄 편집은 2개 이상 128개 이하의 값이어야 합니다.');
+ const positions=new Set<string>();for(const [i,item] of edit.edits.entries()){
+  if(!item||typeof item!=='object'||Array.isArray(item))throw new Error(`차트 일괄 편집 ${i}번 값이 올바르지 않습니다.`);
+  integer(item.series,`${i}번 계열 번호`);integer(item.point,`${i}번 값 번호`);if(item.series>=sealed.series.length||item.point>=sealed.labels.length)throw new Error('차트 일괄 편집 대상 범위를 벗어났습니다.');
+  const key=`${item.series}:${item.point}`;if(positions.has(key))throw new Error('차트 일괄 편집에 중복된 계열·값 위치가 있습니다.');positions.add(key);
+  const original=text(item.original,`${i}번 원래 값`,128),next=text(item.value,`${i}번 새 값`,128);if(!original||original.trim()!==original||!Number.isFinite(Number(original))||!next||next.trim()!==next||!Number.isFinite(Number(next)))throw new Error('차트 일괄 편집 값은 유한한 숫자 문자열이어야 합니다.');
+  if(sealed.series[item.series].values[item.point]!==original||original===next)throw new Error('차트 일괄 편집 원문 또는 새 값이 요청과 다릅니다.');
+ }
+ for(const name of ['saveSnapshot','restoreSnapshot','discardSnapshot','setChartDataByIndex'])method(doc,name);
+ assertOwner();const current=source(doc,edit.index,sealed.revision);assertOwner();if(exact(current)!==exact(sealed))throw new Error('차트 데이터가 요청을 만든 뒤 바뀌었습니다.');
+ const allBefore=current.charts.map((_,i)=>source(doc,i,sealed.revision,current.charts)),preservationBefore=capturePreservationEvidence(doc);assertOwner();
+ if(preservationBefore.issues.length)throw new Error('차트 편집 전 문서 보존 상태를 확인하지 못했습니다.');
+ const payload={dryRun:true,labels:clone(current.labels),series:clone(current.series)};for(const item of edit.edits)payload.series[item.series].values[item.point]=item.value;
+ const checkResult=(result:JsonRecord,dryRun:boolean)=>{
+  if(result.dryRun!==dryRun||result.chart!==current.chart||result.changedCount!==edit.edits.length||!Array.isArray(result.changed)||result.changed.length!==edit.edits.length||!Array.isArray(result.wrote))throw new Error('차트 일괄 편집 결과가 요청과 다릅니다.');
+  const remaining=new Map(edit.edits.map(item=>[`${item.series}:${item.point}`,item]));for(const raw of result.changed){const changed=object(raw),series=integer(changed.series,'결과 계열 번호'),point=integer(changed.point,'결과 값 번호'),key=`${series}:${point}`,item=remaining.get(key);if(!item||changed.from!==item.original||changed.to!==item.value)throw new Error('차트 일괄 편집 결과가 모든 대상 값을 증명하지 못했습니다.');remaining.delete(key);}if(remaining.size)throw new Error('차트 일괄 편집 결과에 누락된 값이 있습니다.');
+  const wrote=dryRun?[]:current.representations.zipPart?['zipPart','nestedCopy']:['nestedCopy'];if(exact(result.wrote)!==exact(wrote))throw new Error('차트 원본 사본을 모두 갱신하지 못했습니다.');
+ };
+ const dry=checked(method(doc,'setChartDataByIndex')(edit.index,JSON.stringify(payload)),'일괄 사전 검사');checkResult(dry,true);assertOwner();
+ if(revision(currentRevision())!==sealed.revision||exact(source(doc,edit.index,sealed.revision))!==exact(current))throw new Error('차트 일괄 사전 검사 중 문서가 바뀌었습니다.');assertOwner();
+ const token=method(doc,'saveSnapshot')();if(!Number.isSafeInteger(token))throw new Error('차트 일괄 편집 복구 지점을 만들지 못했습니다.');
+ try{
+  assertOwner();const apply=checked(method(doc,'setChartDataByIndex')(edit.index,JSON.stringify({...payload,dryRun:false})),'일괄 값 변경');checkResult(apply,false);assertOwner();
+  if(revision(currentRevision())!==sealed.revision)throw new Error('차트 일괄 편집 도중 문서 버전이 바뀌었습니다.');assertOwner();
+  const listAfter=charts(doc);if(exact(listAfter)!==exact(current.charts))throw new Error('차트 일괄 편집 뒤 차트 위치가 바뀌었습니다.');
+  const allAfter=listAfter.map((_,i)=>source(doc,i,sealed.revision,listAfter)),target=clone(current);for(const item of edit.edits)target.series[item.series].values[item.point]=item.value;
+  if(exact(allAfter[edit.index])!==exact(target))throw new Error('차트 일괄 편집 뒤 대상 값 외의 구조·축·범례·계열이 바뀌었습니다.');
+  for(let i=0;i<allBefore.length;i++)if(i!==edit.index&&exact(allBefore[i])!==exact(allAfter[i]))throw new Error('다른 차트 데이터가 함께 바뀌었습니다.');
+  const preservationAfter=capturePreservationEvidence(doc);if(preservationAfter.issues.length||exact(preservationBefore.values)!==exact(preservationAfter.values))throw new Error('차트 외 문서 내용이 함께 바뀌었습니다.');
+  return{before:current,after:allAfter[edit.index]};
+ }catch(error){checked(method(doc,'restoreSnapshot')(token),'일괄 실패 복구');throw error;}
  finally{method(doc,'discardSnapshot')(token);}
 }
 

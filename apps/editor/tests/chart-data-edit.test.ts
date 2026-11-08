@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {inflateRawSync} from 'node:zlib';
 import init,{HwpDocument} from '../node_modules/@rhwp/core/rhwp.js';
-import {readChartDataSource,replaceChartCategoryLabel,replaceChartSeriesName,replaceChartValue} from '../src/adapters/rhwp/chart-data-edit.ts';
+import {readChartDataSource,replaceChartCategoryLabel,replaceChartSeriesName,replaceChartValue,replaceChartValues} from '../src/adapters/rhwp/chart-data-edit.ts';
 import {hwpLogicalStreams} from '../scripts/lib/hwp-summary-evidence.mjs';
 import {readOwnedZip} from '../scripts/lib/owned-zip.mjs';
 
@@ -37,6 +37,11 @@ function expectedXml(before:string):string{
  const needle='<c:pt idx="0"><c:v>4.3</c:v></c:pt>',replacement='<c:pt idx="0"><c:v>9.9</c:v></c:pt>';
  assert.equal(before.split(needle).length-1,1);assert.match(before,/<c:barChart>/);assert.match(before,/<c:catAx>/);assert.match(before,/<c:valAx>/);assert.match(before,/<c:legendPos val="r"\/>/);
  assert.match(before,/<c:ext uri="CC8EB2C9-7E31-499d-B8F2-F6CE61031016"><ho:hncChartStyle /);return before.replace(needle,replacement);
+}
+function expectedBatchXml(before:string):string{
+ const edits=[['<c:pt idx="0"><c:v>4.3</c:v></c:pt>','<c:pt idx="0"><c:v>9.9</c:v></c:pt>'],['<c:pt idx="3"><c:v>5</c:v></c:pt>','<c:pt idx="3"><c:v>8.8</c:v></c:pt>']] as const;
+ for(const [needle] of edits)assert.equal(before.split(needle).length-1,1);assert.match(before,/<c:barChart>/);assert.match(before,/<c:catAx>/);assert.match(before,/<c:valAx>/);assert.match(before,/<c:legendPos val="r"\/>/);assert.match(before,/<c:ext uri="CC8EB2C9-7E31-499d-B8F2-F6CE61031016"><ho:hncChartStyle /);
+ return edits.reduce((xml,[needle,replacement])=>xml.replace(needle,replacement),before);
 }
 function expectedSeriesNameXml(before:string):string{
  const formula='<c:f>Sheet1!$B$1</c:f>',needle='계열 1';assert.equal(before.split(formula).length-1,1);assert.equal(before.split(needle).length-1,1);
@@ -73,6 +78,16 @@ for(const format of ['hwp','hwpx'] as const)test(`one ${format.toUpperCase()} ch
    assert.equal(result.after.series[0].values[0],'9.9');const saved=bytes(doc,format);assertRawPreservation(format,original,saved);
    const reopened:any=new HwpDocument(saved);try{const actual=readChartDataSource(reopened,0,'document:2');assert.deepEqual(same(actual),same(result.after));assert.equal(actual.plot,'bar');assert.equal(actual.axis,'category');assert.deepEqual(actual.series.map(series=>series.name),['계열 1','계열 2','계열 3']);}
    finally{reopened.free();}
+   doc.restoreSnapshot(undo);assert.deepEqual(bytes(doc,format),beforeExport);
+  }finally{doc.discardSnapshot(undo);}
+ }finally{doc.free();}
+});
+
+for(const format of ['hwp','hwpx'] as const)test(`one ${format.toUpperCase()} chart atomically replaces multiple values and preserves formulas, unknown OOXML and non-chart assets`,async()=>{
+ const original=await readFile(samples[format]),doc:any=new HwpDocument(original);try{
+  const beforeExport=bytes(doc,format),source=readChartDataSource(doc,0,'document:batch'),undo=doc.saveSnapshot(),edit={revision:'document:batch',index:0,edits:[{series:0,point:0,original:'4.3',value:'9.9'},{series:2,point:3,original:'5',value:'8.8'}]};
+  try{const result=replaceChartValues(doc,source,edit,()=> 'document:batch');assert.equal(result.after.series[0].values[0],'9.9');assert.equal(result.after.series[2].values[3],'8.8');const saved=bytes(doc,format);assertRawPreservation(format,original,saved,expectedBatchXml);
+   const reopened:any=new HwpDocument(saved);try{const actual=readChartDataSource(reopened,0,'document:reopened');assert.deepEqual(same(actual),same(result.after));assert.equal(actual.series[0].values[0],'9.9');assert.equal(actual.series[2].values[3],'8.8');}finally{reopened.free();}
    doc.restoreSnapshot(undo);assert.deepEqual(bytes(doc,format),beforeExport);
   }finally{doc.discardSnapshot(undo);}
  }finally{doc.free();}
@@ -117,6 +132,25 @@ test('stale revisions and stale source are fail-closed and a malformed engine re
    const value=Reflect.get(target,key,target);return typeof value==='function'?value.bind(target):value;
   }});
   assert.throws(()=>replaceChartValue(proxy,source,edit,()=> 'document:1'),/실패/);assert.deepEqual(doc.exportHwpx(),before);
+ }finally{doc.free();}
+});
+
+test('batch value edit rejects count, duplicate, stale source and owner changes before mutation',async()=>{
+ const doc:any=new HwpDocument(await readFile(samples.hwpx)),other:any=new HwpDocument(await readFile(samples.hwpx));try{
+  const source=readChartDataSource(doc,0,'document:batch'),before=doc.exportHwpx(),base={revision:'document:batch',index:0,edits:[{series:0,point:0,original:'4.3',value:'9.9'},{series:2,point:3,original:'5',value:'8.8'}]};
+  assert.throws(()=>replaceChartValues(doc,source,{...base,edits:base.edits.slice(0,1)},()=> 'document:batch'),/2개/);assert.deepEqual(doc.exportHwpx(),before);
+  assert.throws(()=>replaceChartValues(doc,source,{...base,edits:Array.from({length:129},()=>base.edits[0])},()=> 'document:batch'),/128개/);assert.deepEqual(doc.exportHwpx(),before);
+  assert.throws(()=>replaceChartValues(doc,source,base,()=> 'document:stale'),/버전/);assert.deepEqual(doc.exportHwpx(),before);
+  assert.throws(()=>replaceChartValues(doc,source,{...base,edits:[base.edits[0],{...base.edits[0],value:'8.8'}]},()=> 'document:batch'),/중복/);assert.deepEqual(doc.exportHwpx(),before);
+  assert.throws(()=>replaceChartValues(doc,source,{...base,edits:[base.edits[0],{...base.edits[1],original:'3'}]},()=> 'document:batch'),/원문/);assert.deepEqual(doc.exportHwpx(),before);
+  let owned:any=doc,calls=0;const wrapper={borrowDocumentHandle:()=>owned};assert.throws(()=>replaceChartValues(wrapper,source,base,()=>{if(++calls===1)owned=other;return'document:batch';}),/소유권/);assert.deepEqual(doc.exportHwpx(),before);assert.deepEqual(other.exportHwpx(),before);
+ }finally{doc.free();other.free();}
+});
+
+test('batch value edit restores the exact document when a post-mutation result is incomplete',async()=>{
+ const doc:any=new HwpDocument(await readFile(samples.hwp));try{const source=readChartDataSource(doc,0,'document:batch'),before=doc.exportHwp(),edit={revision:'document:batch',index:0,edits:[{series:0,point:0,original:'4.3',value:'9.9'},{series:2,point:3,original:'5',value:'8.8'}]};
+  const proxy=new Proxy(doc,{get(target,key){if(key==='setChartDataByIndex')return(index:number,payload:string)=>{const result=JSON.parse(target.setChartDataByIndex(index,payload));if(JSON.parse(payload).dryRun)return JSON.stringify(result);return JSON.stringify({...result,changed:result.changed.slice(0,1)});};const value=Reflect.get(target,key,target);return typeof value==='function'?value.bind(target):value;}});
+  assert.throws(()=>replaceChartValues(proxy,source,edit,()=> 'document:batch'),/요청과 다릅니다/);assert.deepEqual(doc.exportHwp(),before);
  }finally{doc.free();}
 });
 

@@ -7,7 +7,7 @@
 | 항목 | 구현·보호 범위 | 검증 | 남은 제한 |
 |---|---|---|---|
 | N011 | 평면 스타일 JSON 가져오기·내보내기·언어별 글꼴·이름 충돌·다음 스타일 순환·중간 실패 전체 롤백 | HWP/HWPX 저장·재열기를 포함한 `style-package.test.ts` 2/2 | 번호·개요·탭·테두리·배경·특수 영역·UI·Agent·한글 비교 |
-| N013 | 기관 프로필 v1 검증·갤러리/번호키 충돌·손상/상위 버전/쓰기 실패 보호·정확한 이름 해석 | 프로필·기본 스타일 단축키 테스트 6/6 | 설정 UI·미리보기/적용·설치부 연결·Agent·한글 비교 |
+| N013 | 기관 프로필 v1 검증·갤러리/번호키 충돌·손상/상위 버전/쓰기 실패 보호·정확한 이름 해석 | 프로필·기본 스타일 단축키 테스트 6/6 | portable package UI·Agent·한글 비교 |
 | N014 / G091 | 단일 root Rectangle의 0~359° 정수 회전 커서·정/역방향 선택 복원·회전각 변경 시 stale 복원 차단 | 단위 9/9·실제 WASM HWP/HWPX 9/9 | 그룹·중첩·캡션·뒤집기·비-Rectangle·신규 Edge 빌드·한글 비교 |
 | N015 | root vector shape 2~32개와 중첩 group 선택의 순서/활성 개체·소유 구조·개체/문서 지문·stale 차단 | 단위 5/5·실제 WASM HWP/HWPX 4/4·바이트 비변경 | 공유 SessionCursor·validator·Studio callback·wire 연결과 이미지/수식/OLE/표/특수 story·브라우저/한글 검증 |
 | N016 | root-body 미주의 owner·note locator·3중 지문·Unicode 커서/방향성 선택·각주 분리 | 단위 6/6·실제 WASM HWP/HWPX 4/4·bytes 불변·stale 차단 | SessionCursor·Studio callback 연결·중첩/표/도형 note·필드/삽입 개체·브라우저/한글 검증 |
@@ -31,12 +31,12 @@
 | N006 추가 | 단일 캡션 문단의 연속 2~128개 글자 run을 동일 길이 BMP 텍스트로 교체하고 기존 run 경계·charShapeId·위치·인접 중첩 표 배치를 보존 | 기본 엔진 fail-closed 2/2·Jueony 패치 엔진 HWP/HWPX 저장·재열기·undo 10/10·회귀 4/4·TypeScript compile | 길이 변화·surrogate/emoji·제어문자·좌우 캡션·필드·책갈피·개체 |
 | N013 추가 | import 후 현재 catalog digest와 style ID·이름·종류·source를 원자적 shortcut 설정에 결합하고 저장 단계별 실패 상태를 rollback/applied/disconnected로 구분 | HWP/HWPX 재열기 consumer 연결과 실패 복구 14/14·TypeScript compile | 실제 keymap/UI·Agent·한글 비교 |
 | N021 조사 | 한글 스크립트 매크로와 기존 AI 명령 템플릿을 구분하고 Studio command/input recording 계약 부재 확인 | 단축키 회귀 11/11·코드 무변경 | dispatcher 성공 이벤트·IME/선택 기록·recordable capability·revision preflight·단일 undo/부분 실패 rollback·녹화 UI/저장 |
-| B046 | 앱 보기 설정 `pageOutline`·메뉴·상태바·탭 간 동기화와 page gap·canvas shadow를 단일 렌더 트랜잭션으로 토글 | HWP/HWPX 바이트 비변경·재열기·설정 backup·고정 upstream 통합 patch 11/11·TypeScript compile | 기존 format-dialog seam drift 해소 후 전체 build·한글 직접 비교 |
-| B025 / B027 | 머리말·꼬리말 평문 내부 clipboard payload에 문서 identity·story owner·revision·selection·원문을 봉인하고 cut/paste를 단일 snapshot으로 실행 | copy bytes 불변·HWP/HWPX 저장·재열기·undo·실패 rollback 포함 6/6·TypeScript compile | 실제 메뉴/단축키·OS clipboard·RTF·그림·각주/미주·한글 비교 |
-| B071 | 기존 category/scatter 차트의 단일 숫자 cache 값을 revision·원문·구조 재검증과 dry-run 뒤 교체 | HWP/HWPX 저장·재열기·undo·유형/축/범례/unknown OOXML/비차트 자산 보존 3/3·TypeScript compile | 일반 유형·축/범례/label/series 이름 편집·복합 label·up/down bars·UI 범위·한글 비교 |
-| N013 추가 | 저장된 Ctrl+1~Ctrl+0 slot만 기존 스타일 적용 명령으로 연결하고 IME·대화상자·표/개체/특수 story와 stale 설정을 차단; 설정 UI에서 표시·해제·초기화 | 통합 patch 보호·HWP/HWPX 저장·재열기·undo·stale 불변 3/3·TypeScript compile | 기존 format-dialog seam drift 해소 후 브라우저 클릭 smoke·Agent·한글 비교 |
-| 실행 기반 | 엔진 조건부 `DefaultTabSpacingDialog`가 없는 공식 npm build와 있는 custom-engine build를 구분하되 일반 Char/Para stale target 보호는 항상 유지 | patch seam 3/3·격리 전체 build 659 modules·N013/B046 marker 적용 확인 | 실제 브라우저 클릭 smoke |
-| B071 추가 | 단일 계열 이름 cache 변경 시 원본 `c:f` 수식과 다른 범례·값·축·unknown OOXML·비차트 자산 보존 | HWP/HWPX 저장·재열기·undo·rollback 포함 차트 전체 6/6·TypeScript compile | 일반 label·다중 변경·수식 자체 변경·복합 label·UI·한글 비교 |
+| B046 | 앱 보기 설정 `pageOutline`·메뉴·상태바·탭 간 동기화와 page gap·canvas shadow를 단일 렌더 트랜잭션으로 토글 | HWP/HWPX 바이트 비변경·재열기·설정 backup·고정 upstream 통합 patch 11/11·격리 build·실제 Edge 메뉴/상태바/교차 탭 smoke | 빈 문서 stored-time 초기화 경고·한글 직접 비교 |
+| B025 / B027 | Studio 머리말·꼬리말 선택에서만 내부 JSON·plain text clipboard payload에 문서 identity·story owner·revision·selection·원문을 봉인하고 copy/cut/paste를 단일 snapshot으로 실행 | HWP/HWPX 저장·재열기·undo·실패 rollback·OS clipboard 실패/불일치 차단 포함 12/12·hfclipboard 격리 build 661 modules | 각주/미주 원자 API·RTF·그림·전체 OS clipboard 형식·한글 비교 |
+| B071 | 기존 category/scatter 차트의 단일 숫자 cache 값·단일 계열 이름·단일 범주명을 revision·원문·구조 재검증과 dry-run 뒤 교체 | HWP/HWPX 저장·재열기·undo·유형/축/범례/수식/unknown OOXML/비차트 자산 보존 9/9·TypeScript compile | 다중 항목/계열·복합 label·수식 자체 변경·UI 범위·한글 비교 |
+| N013 추가 | 저장된 Ctrl+1~Ctrl+0 slot만 기존 스타일 적용 명령으로 연결하고 IME·대화상자·표/개체/특수 story와 stale 설정을 차단; 설정 UI에서 표시·해제·초기화 | 통합 patch 보호·HWP/HWPX 저장·재열기·undo·stale 불변 3/3·격리 build·실제 Edge 설정창/단축키 smoke | 빈 문서 stored-time 초기화 경고·portable package UI·Agent·한글 비교 |
+| 실행 기반 | 엔진 조건부 `DefaultTabSpacingDialog`가 없는 공식 npm build와 있는 custom-engine build를 구분하되 일반 Char/Para stale target 보호는 항상 유지 | patch seam 3/3·격리 전체 build 659 modules·N013/B046 marker·실제 Edge smoke 4건 확인 | 현재 공식 npm 엔진의 빈 문서 stored-time 초기화 경고 |
+| B071 추가 | 단일 계열 이름과 공유 단일 범주명 cache 변경 시 원본 `c:f` 수식과 다른 범례·값·축·unknown OOXML·비차트 자산 보존 | HWP/HWPX 저장·재열기·undo·rollback 포함 차트 전체 9/9·TypeScript compile | 다중 변경·복합 label·수식 자체 변경·UI·한글 비교 |
 | B025 / B027 조사 | 각주·미주의 읽기 API와 단일 문단 mutation은 있으나 원자적 선택 복사·다문단 치환 계약 부재 확인 | 코드 무변경 | Rust/WASM `copySelectionInNote`·`replaceRangeInNote`와 형식 재열기 계약 |
 
 ## 실행한 선별 검사
@@ -56,6 +56,14 @@ node --test apps/editor/tests/shortcut-audit.test.ts apps/editor/tests/hangul-sh
 34 tests passed
 node --test apps/editor/tests/character-style-reference.test.ts apps/editor/tests/style-flow.test.ts
 7 tests passed
+npm test -- tests/chart-data-edit.test.ts
+9 tests passed
+npm test -- tests/header-footer-clipboard.test.ts tests/header-footer-clipboard-integration.test.ts
+12 tests passed
+JUEONY_BUILD_PROFILE=hfclipboard npm run build
+661 modules transformed; isolated build passed
+node apps/editor/scripts/verify-n013-b046-browser-smoke.mjs
+4 Edge smoke scenarios passed; pageErrors/consoleErrors/externalRequests 0
 ```
 
 회전 글상자의 실제 WASM 검사는 `source-cc7eb97e2669dc19` 엔진으로 HWP·HWPX 저장·재열기와 바이트 비변경을 확인했다. 기존 공유 dirty 빌드를 덮어쓰지 않기 위해 새 Edge 전체 빌드는 실행하지 않았다.

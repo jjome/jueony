@@ -21,7 +21,7 @@
 ## 먼저 할 일
 
 - **구현** [N014](<13-state-and-preferences.md#n014>) **글상자 내부 커서·선택 복원** — HWP/HWPX 저장·재열기에서 0~359° 정수 회전 글상자의 커서·정/역방향 선택과 stale 복원 차단을 검증함. 그룹·중첩·캡션·뒤집기·비-Rectangle·Edge 신규 빌드·한글 비교는 남음.
-- **구현** [N015](<13-state-and-preferences.md#n015>) **다중 개체·그룹 선택 복원** — HWP/HWPX 저장·재열기와 stale/그룹 해제 차단은 검증함. SessionCursor/validator/capture·restore callback/wire 연결·이미지/수식/OLE/표/특수 story·브라우저 재시작·한글 비교는 남음.
+- **구현** [N015](<13-state-and-preferences.md#n015>) **다중 개체·그룹 선택 복원** — HWP/HWPX 저장·재열기와 stale/그룹 해제 차단 4/4에 더해 SessionCursor/Studio wire를 연결하고 root 재검증 31 pass·기존 2 skip, 격리 build 666 modules와 해당 프로필 TypeScript 검사를 통과했다. 이미지/수식/OLE/표/특수 story 등 비벡터 선택·브라우저 재시작·한글 비교는 남아 부분이다.
 - **구현** [N016](<13-state-and-preferences.md#n016>) **미주·나머지 특수 영역 선택 복원** — HWP/HWPX 저장·재열기·read-only bytes 불변·동일 길이 변경/소유자 삭제 차단은 검증함. SessionCursor/Studio restore callback 연결·중첩/표/도형 note owner·필드/삽입 개체·브라우저 재시작·한글 비교는 남음.
 
 ## 기능별 작업표
@@ -767,11 +767,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
-- 완료 범위: top-level root vector shape 2~32개와 중첩 group 선택의 순서/활성 개체·root 주소·Lock/캡션/story/기하/개체 지문·canonical HWPX 문서 지문
-- 다음 작업: HWP/HWPX 저장·재열기와 stale/그룹 해제 차단은 검증함. SessionCursor/validator/capture·restore callback/wire 연결·이미지/수식/OLE/표/특수 story·브라우저 재시작·한글 비교는 남음.
+- 완료 범위: top-level root vector shape 2~32개와 중첩 group 선택의 순서/활성 개체·root 주소·Lock/캡션/story/기하/개체 지문·canonical HWPX 문서 지문·SessionCursor/Studio capture·restore wire
+- 다음 작업: HWP/HWPX 저장·재열기와 stale/그룹 해제 차단 4/4에 더해 SessionCursor/Studio wire를 연결하고 root 재검증 31 pass·기존 2 skip, 격리 build 666 modules와 해당 프로필 TypeScript 검사를 통과했다. 이미지/수식/OLE/표/특수 story 등 비벡터 선택·브라우저 재시작·한글 비교는 남아 부분이다.
 - 상위 항목: [S018](<13-state-and-preferences.md#s018>) 본문/표/개체 선택과 모드
 - 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;DETACHED_GROUP_SELECTION_2026_11_08`
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;DETACHED_GROUP_SELECTION_2026_11_08;GROUP_SELECTION_SESSION_WIRE_2026_11_09`
 
 </details>
 

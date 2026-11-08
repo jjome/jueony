@@ -20,6 +20,7 @@
 | N023 | 열린 통합 메뉴를 visual viewport의 CSS 좌표로 경계 제한하고 아래 공간 부족 시 위로 전환; 브라우저 zoom에 `devicePixelRatio`를 다시 곱하지 않으며 visual viewport resize/scroll에 재배치 | 순수 배치와 기존 메뉴 회귀 7/7·격리 build 665 modules·해당 프로필 TypeScript 검사 통과 | **부분 유지:** 실제 Windows 125/150/200%·다중 모니터·좌표/선택/보기 전체 수명·한글 비교 |
 | N041 | 자체 생성한 본문·명시 글꼴, 2쪽 경계·용지, 표·셀, 내장 PNG, 본문 누름틀의 5종 manifest를 HWP/HWPX 입력 10개로 만들고 open→같은 형식 save→reopen; production preservation evidence·published layout 0.2 허용치·기능 최소조건·입력 SHA 불변을 fail-closed 검사 | custom Rust/WASM `source-c932adab64d8bc4e`에서 10/10·manifest 계약/위조 거절 3/3·구문/diff 검사 통과 | **부분 유지:** 같은 엔진의 합성 문서 기술 검수이며 실제 한글 2024 화면·인쇄·복구 경고, 기관 실문서·공개 문서 코퍼스 독립 비교는 미실행 |
 | N042 | 같은 글꼴·DPI·용지와 실제 page definition을 봉인한 published layout baseline에서 쪽 수·텍스트 재조판·개체 위치 차이를 분류하고 교차 생산자·글꼴 SHA-256이 없으면 차단 | 계약 4/4·2쪽 표/그림/필드 복합 HWP/HWPX baseline 2/2 | **부분 유지:** Jueony 엔진 baseline일 뿐 실제 한글 2024·PDF raster·인쇄 드라이버·실제 글꼴 바이너리 비교는 미실행 |
+| N043 | picker 취소 no-op와 canonical path·identity·size·mtime·SHA 증거·preflight/final replace 재검증·atomic/no-clobber/readback host capability·typed 오류의 fail-closed 정책 | 순수 정책 9/9·strict TypeScript 통과 | **부분 유지:** 실제 Windows picker·ACL·identity 수집과 Rust/Tauri host 원자 교체/readback 미연결·실제 Windows 검증 미실행 |
 | N045 | 로컬 WASM·런타임·폰트·third-party notices·hash·기관 endpoint allowlist와 외부 URL을 fail-closed 감사 | 계약 4/4; 실제 격리 dist에서 CDN 글꼴 URL 269개를 검출해 `FAIL_OFFLINE_BUNDLE` | **부분 유지·배포 차단:** CDN 글꼴 로컬화·WebView2 포함 최종 설치본·기관 allowlist 확정·고지 합본 검수 필요 |
 | N005 | 보이지 않는 0길이 이웃 ClickHere의 셀 분할 이동을 앱·Rust에서 차단하고 guide-only 0길이 필드는 유지 | HWP/HWPX 저장·재열기 2/2·관련 회귀 32/32 | 겹친 필드·개체 혼합 셀·캡션 내부 필드·한글 비교 |
 | N011 추가 | 문단 테두리 동작 플래그 `borderConnect`·`borderIgnoreMargin`의 portable style 교환·전체 롤백 | HWP/HWPX 가져오기→저장→재열기 2/2 | TabDef·실제 BorderFill·배경·간격·UI·한글 비교 |
@@ -71,6 +72,8 @@ node --experimental-strip-types --test apps/editor/tests/preference-startup-diag
 8 tests passed; strict TypeScript passed separately
 node --experimental-strip-types --test apps/editor/tests/native-dialog-activation-policy-n020.test.ts
 8 tests passed; strict TypeScript passed separately
+node --experimental-strip-types --test apps/editor/tests/windows-file-preflight-n043.test.ts
+9 tests passed; strict TypeScript passed separately
 node --test apps/editor/tests/undo-lifetime.test.ts apps/editor/tests/document-history95.test.ts apps/editor/tests/recovery-record.test.ts
 17 tests passed
 node --test apps/editor/tests/shortcut-audit.test.ts apps/editor/tests/hangul-shortcuts.test.ts apps/editor/tests/navigation.test.ts
@@ -141,6 +144,7 @@ B071 Edge 검수에서는 차트 시나리오의 page 오류·console 오류·�
 - `9f3b431a feat(editor): restore verified endnote selections`
 - `08c02ce5 test(editor): add fail closed preference startup diagnostics`
 - `b014e627 test(editor): model native dialog activation safety`
+- `3eedb6e5 test(editor): add safe Windows file preflight`
 - `f9524b4f test(editor): define undo history lifetime policy`
 - `2bd2c75b feat(editor): preserve portable style references`
 - `4ea193ce feat(editor): delete verified page hide controls`

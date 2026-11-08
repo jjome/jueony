@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | 완료 7/25 · 부분 18 | — 상위 범위 없음 |
-| 검증 | 완료 7/25 · 부분 16 · 미검증 2 | — 상위 범위 없음 |
+| 검증 | 완료 7/25 · 부분 17 · 미검증 1 | — 상위 범위 없음 |
 | Agent 연결 | 해당 없음 25 | — 상위 범위 없음 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -20,7 +20,7 @@
 
 - **구현** [N041](<16-architecture-and-validation.md#n041>) **독립 한글에서 복합 코퍼스 일괄 검수** — 합성 5종×HWP/HWPX 10/10과 manifest 계약 3/3을 통과했다. 같은 Jueony Rust/WASM 엔진의 기술 검수이며 실제 한글 2024 화면·인쇄·복구 경고, 기관 실문서와 공개 문서 코퍼스의 독립 비교는 남아 부분이다.
 - **구현** [N042](<16-architecture-and-validation.md#n042>) **한글·Jueony 인쇄/PDF 조판 비교** — 계약 4/4와 2쪽 표·그림·필드 복합 문서의 HWP/HWPX baseline 2/2를 통과했다. 실제 한글 2024·PDF raster·인쇄 드라이버·실제 글꼴 바이너리 fingerprint 비교는 실행하지 않아 부분이다.
-- **구현** [N043](<16-architecture-and-validation.md#n043>) **실제 Windows 파일 picker·권한·외부 수정** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- **구현** [N043](<16-architecture-and-validation.md#n043>) **실제 Windows 파일 picker·권한·외부 수정** — 정책 검사 9/9와 strict TypeScript 검사를 통과했다. 실제 Windows picker·ACL·identity 수집과 Rust/Tauri host의 원자 교체/readback 연결·실제 Windows 검증은 남아 부분이다.
 
 ## 기능별 작업표
 
@@ -80,7 +80,7 @@
 | --- | --- | --- | --- | --- |
 | [N041](<16-architecture-and-validation.md#n041>) · 작업 | 독립 한글에서 복합 코퍼스 일괄 검수 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 | [N042](<16-architecture-and-validation.md#n042>) · 작업 | 한글·Jueony 인쇄/PDF 조판 비교 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [N043](<16-architecture-and-validation.md#n043>) · 작업 | 실제 Windows 파일 picker·권한·외부 수정 | ◐ 부분 | ☐ 미검증 | — 해당 없음 |
+| [N043](<16-architecture-and-validation.md#n043>) · 작업 | 실제 Windows 파일 picker·권한·외부 수정 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 | [N044](<16-architecture-and-validation.md#n044>) · 작업 | 비정상 종료·저장 실패·복구 통합 | ◐ 부분 | ☐ 미검증 | — 해당 없음 |
 | [N045](<16-architecture-and-validation.md#n045>) · 작업 | 기관 배포용 완전 오프라인 자산/허용 서버 정책 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 
@@ -394,13 +394,13 @@
 <summary>N043 · 실제 Windows 파일 picker·권한·외부 수정</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 취소·read-only·이동/삭제·외부 hash 충돌·원본 보존
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: picker 취소 no-op와 canonical path·identity·size·mtime·SHA 증거를 봉인하고 read-only/권한/이동·삭제·replacement/외부 수정·preflight/final replace 불일치를 fail-closed 분류하며 atomic/no-clobber/readback host capability와 안전한 typed 오류를 요구
+- 다음 작업: 정책 검사 9/9와 strict TypeScript 검사를 통과했다. 실제 Windows picker·ACL·identity 수집과 Rust/Tauri host의 원자 교체/readback 연결·실제 Windows 검증은 남아 부분이다.
 - 상위 항목: [B010](<05-files-storage-recovery.md#b010>) 저장
-- 근거: [12-mvp-implementation.md](<../12-mvp-implementation.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [12-mvp-implementation.md](<../12-mvp-implementation.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;WINDOWS_FILE_PREFLIGHT_POLICY_2026_11_09`
 
 </details>
 

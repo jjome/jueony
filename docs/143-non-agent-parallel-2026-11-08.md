@@ -35,10 +35,10 @@
 | N021 조사 | 한글 스크립트 매크로와 기존 AI 명령 템플릿을 구분하고 Studio command/input recording 계약 부재 확인 | 단축키 회귀 11/11·코드 무변경 | dispatcher 성공 이벤트·IME/선택 기록·recordable capability·revision preflight·단일 undo/부분 실패 rollback·녹화 UI/저장 |
 | B046 | 앱 보기 설정 `pageOutline`·메뉴·상태바·탭 간 동기화와 page gap·canvas shadow를 단일 렌더 트랜잭션으로 토글 | HWP/HWPX 바이트 비변경·재열기·설정 backup·고정 upstream 통합 patch 11/11·격리 build·실제 Edge 메뉴/상태바/교차 탭 smoke | 빈 문서 stored-time 초기화 경고·한글 직접 비교 |
 | B025 / B027 | Studio 머리말·꼬리말 선택에서만 내부 JSON·plain text clipboard payload에 문서 identity·story owner·revision·selection·원문을 봉인하고 copy/cut/paste를 단일 snapshot으로 실행 | HWP/HWPX 저장·재열기·undo·실패 rollback·OS clipboard 실패/불일치 차단 포함 12/12·hfclipboard 격리 build 661 modules | 각주/미주 원자 API·RTF·그림·전체 OS clipboard 형식·한글 비교 |
-| B071 | 기존 category/scatter 차트의 단일 숫자 cache 값·단일 계열 이름·단일 범주명을 revision·원문·구조 재검증과 dry-run 뒤 교체 | HWP/HWPX 저장·재열기·undo·유형/축/범례/수식/unknown OOXML/비차트 자산 보존 9/9·TypeScript compile | 다중 항목/계열·복합 label·수식 자체 변경·UI 범위·한글 비교 |
+| B071 | 기존 category/scatter 차트의 단일 숫자 cache 값·단일 계열 이름·단일 범주명을 revision·원문·구조 재검증과 dry-run 뒤 교체하고 Studio 제목줄의 차트 데이터 창에서 실행 | 어댑터·Studio 명령 14/14·격리 build 663 modules·실제 Edge HWP/HWPX 값 편집→저장 바이트→UI 재열기·유형/축/범례/수식/unknown OOXML/비차트 자산 보존 | **부분 유지:** 다중 항목/계열·복합 label·수식 자체 변경·up/down bars·한글 비교 |
 | N013 추가 | 저장된 Ctrl+1~Ctrl+0 slot만 기존 스타일 적용 명령으로 연결하고 IME·대화상자·표/개체/특수 story와 stale 설정을 차단; 설정 UI에서 표시·해제·초기화 | 통합 patch 보호·HWP/HWPX 저장·재열기·undo·stale 불변 3/3·격리 build·실제 Edge 설정창/단축키 smoke | 빈 문서 stored-time 초기화 경고·portable package UI·Agent·한글 비교 |
 | 실행 기반 | 엔진 조건부 `DefaultTabSpacingDialog`가 없는 공식 npm build와 있는 custom-engine build를 구분하되 일반 Char/Para stale target 보호는 항상 유지 | patch seam 3/3·격리 전체 build 659 modules·N013/B046 marker·실제 Edge smoke 4건 확인 | 현재 공식 npm 엔진의 빈 문서 stored-time 초기화 경고 |
-| B071 추가 | 단일 계열 이름과 공유 단일 범주명 cache 변경 시 원본 `c:f` 수식과 다른 범례·값·축·unknown OOXML·비차트 자산 보존 | HWP/HWPX 저장·재열기·undo·rollback 포함 차트 전체 9/9·TypeScript compile | 다중 변경·복합 label·수식 자체 변경·UI·한글 비교 |
+| B071 추가 | 단일 계열 이름과 공유 단일 범주명 cache 변경 시 원본 `c:f` 수식과 다른 범례·값·축·unknown OOXML·비차트 자산을 보존하고 실제 Studio UI를 같은 보호 계약에 연결 | HWP/HWPX 저장·재열기·undo·rollback과 UI 명령 포함 차트 전체 14/14·TypeScript compile | 다중 변경·복합 label·수식 자체 변경·한글 비교 |
 | B025 / B027 조사 | 각주·미주의 읽기 API와 단일 문단 mutation은 있으나 원자적 선택 복사·다문단 치환 계약 부재 확인 | 코드 무변경 | Rust/WASM `copySelectionInNote`·`replaceRangeInNote`와 형식 재열기 계약 |
 
 ## 실행한 선별 검사
@@ -64,6 +64,12 @@ node --experimental-strip-types --test apps/editor/tests/page-hide-control-delet
 4 tests passed
 npm test -- tests/chart-data-edit.test.ts
 9 tests passed
+npm test -- tests/chart-data-edit.test.ts tests/chart-data-edit-studio.test.ts
+14 tests passed
+npm run build
+663 modules transformed; isolated build passed
+node scripts/verify-chart-data-edit-ui.mjs
+Edge HWP/HWPX value edit, saved-byte reopen and UI reopen passed; page/chart console/external errors 0
 npm test -- tests/header-footer-clipboard.test.ts tests/header-footer-clipboard-integration.test.ts
 12 tests passed
 JUEONY_BUILD_PROFILE=hfclipboard npm run build
@@ -75,6 +81,8 @@ node apps/editor/scripts/verify-n013-b046-browser-smoke.mjs
 회전 글상자의 실제 WASM 검사는 `source-cc7eb97e2669dc19` 엔진으로 HWP·HWPX 저장·재열기와 바이트 비변경을 확인했다. 기존 공유 dirty 빌드를 덮어쓰지 않기 위해 새 Edge 전체 빌드는 실행하지 않았다.
 
 N004는 동결된 206개 patch 엔진 `source-1c95e8f557d95b73`으로 네이티브 양형식과 격리 Edge 검사를 완료했다. N012는 실제 Rust 엔진의 양형식 저장·재열기에서 정의 연결 전파와 직접 서식 비전파를 확인했다. 한글 2024 직접 비교는 지시대로 실행하지 않았다.
+
+B071 Edge 검수에서는 차트 시나리오의 page 오류·console 오류·외부 요청이 모두 0이었다. 다만 공유 검수 빌드에서 차트와 무관한 favicon 404와 빈 문서 stored-time 초기화 API가 공식 npm WASM에 없는 오류가 별도로 관찰됐다. 소유 HWP/HWPX를 직접 연 차트 검수에는 영향을 주지 않았으며, 이 두 항목은 해결된 것으로 표시하지 않는다.
 
 ## 변경 집합
 

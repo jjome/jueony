@@ -4,11 +4,11 @@ export async function applyStyleFlowPatches({root}){
  const edit=async(file,fn)=>{const p=join(root,'src',file);await writeFile(p,fn((await readFile(p,'utf8')).replace(/\r\n/g,'\n')));};
  const replace=(s,b,a)=>{if(s.split(b).length!==2)throw new Error('Style flow seam drift: '+b);return s.replace(b,a);};
  await edit('engine/input-handler.ts',s=>{
-  s="import {applySelectedCharacterStyle} from '../jueony/adapters/rhwp/style-flow.ts';\n"+s;
+  s="import {captureStoredCharacterStyle} from '../jueony/adapters/rhwp/character-style-reference.ts';\nimport {applySelectedCharacterStyle} from '../jueony/adapters/rhwp/style-flow.ts';\n"+s;
   return replace(s,'  applyStyle(styleId: number): void {\n    try {',`  applyStyle(styleId: number): void {
     const style=this.wasm.getStyleList().find(s=>s.id===styleId);
     if(style?.type===1){
-      if(applySelectedCharacterStyle(this,this.wasm,styleId))return;
+      if(applySelectedCharacterStyle(this,this.wasm,captureStoredCharacterStyle(this.wasm,styleId)))return;
       this.applyCharFormat(this.wasm.getStyleDetail(styleId).charProps);return;
     }
     try {`);

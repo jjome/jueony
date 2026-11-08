@@ -18,6 +18,8 @@ const repeatRequest='각 쪽의 제목 행을 유지하고 사진 세 장이 든
 const titlePictureRequests=['제목 그림 원본을 유지하고 본문 두 번째 행 앞에 새 행을 넣어 주세요.',
  '반복 제목 그림을 유지하고 맨 앞에 새 제목 열을 넣어 주세요.', '방금 만든 맨 앞 제목 열을 삭제해 주세요.',
  '그림이 들어 있는 반복 제목 행을 삭제해 주세요.'];
+const titleRowRequests=['기존 그림 제목 앞에 제목 행을 넣고 새 제목, 분류, 안내를 적어 주세요.',
+ '방금 넣은 맨 앞 제목 행을 삭제해 주세요.', '원래 그림을 소유한 제목 행을 삭제해 주세요.'];
 const crossingTitleRequests=['병합된 반복 제목 안의 두 번째 열 앞에 빈 열을 삽입해 주세요.',
  '방금 병합 제목 안에 넣은 두 번째 열을 삭제해 주세요.'];
 
@@ -40,6 +42,13 @@ function form(HwpDocument,inline){
 
 function proposal(input,splitPictures){
  const [t]=input.document.structure.tables;
+ if(titleRowRequests.includes(input.instruction)){
+  assert.ok(t.cells.some(c=>c.text==='PicA'&&c.axisPicture));assert.equal(t.pagination.repeatHeader,true);
+  const i=titleRowRequests.indexOf(input.instruction);
+  if(i<2)assert.equal(t.headerRows,i===0?1:2);
+  return {kind:i===0?'insert_table_row':'delete_table_row',target:t.id,index:i===2?t.headerRows-1:0,
+   ...(i===0?{values:['새 제목','분류','안내']}: {})};
+ }
  if(crossingTitleRequests.includes(input.instruction)){
   assert.equal(t.cells[0].properties.isHeader,true);assert.ok(t.cells.some(c=>c.text==='PicA'&&c.axisPicture));
   const insert=input.instruction===crossingTitleRequests[0];
@@ -104,7 +113,7 @@ async function checkPicturePages(frame,expected,headings){
  assert.deepEqual(layouts.screen,wanted);assert.deepEqual(layouts.portable,wanted);
 }
 
-export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,state,snap,execute,reopen,pictureFolder,multiplePictures,groupedPictures,splitPictures,pagedPictures,repeatPictures,titlePictureOwner,crossingTitleOwner,outputFolder}){
+export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,state,snap,execute,reopen,pictureFolder,multiplePictures,groupedPictures,splitPictures,pagedPictures,repeatPictures,titlePictureOwner,crossingTitleOwner,titleRowOwner,outputFolder}){
  const calls=[];
  const provider=http.createServer(async(req,res)=>{
   try{
@@ -132,6 +141,51 @@ export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,
    return page.$eval('#request-error',e=>e.hidden?'':e.textContent);
   }
   for(const ext of ['hwp','hwpx']){
+   if(titleRowOwner){
+    await scenario(ext+' Agent picture owner repeated title row insert/delete preserves flags and source owners',async()=>{
+     const sourceFile=resolve(pictureFolder,'before.'+ext),source=new HwpDocument(await readFile(sourceFile));
+     const records=inspectPictureAnchors(sourceFile),frame=await open(ext,source),measurements=[];
+     const verify=async inserted=>{
+      await frame.waitForFunction(()=>window.__pageServices.wasm.borrowDocumentHandle().canvasMetricsActive()===true,{timeout:15000});
+      const v=await frame.evaluate(()=>{
+       const d=window.__pageServices.wasm.borrowDocumentHandle(),active=d.canvasMetricsActive();
+       const t=window.jueonyEditor.snapshot().structure.tables[0];
+       const layout=()=>Array.from({length:d.pageCount()},(_,page)=>{
+        const controls=JSON.parse(d.getPageControlLayout(page)).controls,runs=JSON.parse(d.getPageTextLayout(page)).runs;
+        const table=controls.find(c=>c.type==='table');
+        return {cells:table.cells.filter(c=>c.row<t.headerRows).map(c=>[c.row,c.col,c.rowSpan,c.colSpan]),
+         labels:t.cells.filter(c=>c.row<t.headerRows).map(c=>Array.from({length:d.getCellParagraphCount(0,1,0,c.index)},(_,p)=>
+          runs.filter(r=>r.cellPath?.[0]?.cellIndex===c.index&&r.cellParaIdx===p).map(r=>r.text).join(''))),
+         images:controls.filter(c=>c.type==='image').length};
+       });
+       try{const screen=layout();d.selectCanvasMetrics(false);
+        return {active,screen,portable:layout(),stored:JSON.parse(d.getControls()).filter(c=>c.ctrlId==='gso').length,
+         rows:t.rows,columns:t.columns,headers:t.headerRows,pagination:t.pagination,
+         cells:t.cells.map(c=>[c.row,c.column,c.properties.isHeader])};
+       }finally{d.selectCanvasMetrics(active);}
+      });
+      const h=inserted?2:1;
+      assert.equal(v.active,true);assert.equal(v.stored,4);assert.equal(v.headers,h);assert.equal(v.rows,h+3);assert.equal(v.columns,3);
+      assert.deepEqual(v.pagination,{mode:'row',repeatHeader:true});
+      assert.deepEqual(v.cells,[...(inserted?[[0,0,true],[0,1,true],[0,2,true]]:[]),[h-1,0,true],[h-1,2,true],
+       ...[h,h+1,h+2].flatMap(r=>[0,1,2].map(c=>[r,c,false]))]);
+      const wanted=[2,3].map(images=>({images,cells:[...(inserted?[[0,0,1,1],[0,1,1,1],[0,2,1,1]]:[]),[h-1,0,1,2],[h-1,2,1,1]],
+       labels:[...(inserted?[['새 제목'],['분류'],['안내']]:[]),['항목0','항목1'],['PicA']]}));
+      assert.deepEqual(v.screen,wanted);assert.deepEqual(v.portable,wanted);measurements.push(v);
+     };
+     await verify(false);
+     for(const [index,request] of titleRowRequests.slice(0,2).entries()){
+      const before=(await snap()).structure;assert.equal(await send(request),'');const after=(await snap()).structure;
+      await verify(index===0);await execute('edit:undo');assert.deepEqual((await snap()).structure,before);
+      await execute('edit:redo');assert.deepEqual((await snap()).structure,after);
+      const label='title-row-'+index+'-'+ext;await reopen(frame,label,ext);await verify(index===0);
+      assert.deepEqual(inspectPictureAnchors(resolve(outputFolder,label+'.'+ext)),records.map(p=>({...p,row:p.row+(index===0?1:0)})));
+      const beforeRefusal=await state();assert.match(await send(titleRowRequests[2]),/그림|제목/);assert.deepEqual(await state(),beforeRefusal);
+     }
+     await writeFile(resolve(outputFolder,'title-row-evidence-'+ext+'.json'),JSON.stringify(measurements,null,2));
+    });
+    continue;
+   }
    if(crossingTitleOwner){
     await scenario(ext+' Agent picture owner crossing merged title columns reflows Canvas lines 2→1→2',async()=>{
      const sourceFile=resolve(pictureFolder,'before.'+ext),source=new HwpDocument(await readFile(sourceFile));

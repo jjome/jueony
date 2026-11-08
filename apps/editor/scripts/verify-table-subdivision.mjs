@@ -2,6 +2,7 @@ import puppeteer from 'puppeteer-core';
 import {fragmentedSubdivisionTable} from './lib/fragmented-subdivision.mjs';
 import {deepSubdivisionNestedTable,emphasizedSubdivisionNestedTable,labeledSubdivisionNestedTable,nestedDepthSubdivisionTable,subdivisionNestedTable} from './lib/subdivision-nested-table.mjs';
 import {captionedSubdivisionNestedTable} from './lib/subdivision-caption-fixture.mjs';
+import {fieldSubdivisionNestedTable} from './lib/subdivision-field-fixture.mjs';
 import {subdivisionNeighborFieldTable,subdivisionNamedParagraphTable,subdivisionInlineFieldTable} from './lib/subdivision-neighbor-fields.mjs';
 import {continuedMergedTable} from './lib/continued-merged-table.mjs';
 import http from 'node:http';
@@ -96,35 +97,41 @@ try{
    'two nested levels':()=>deepSubdivisionNestedTable(HwpDocument),
    'maximum nested depth':()=>nestedDepthSubdivisionTable(HwpDocument,7),
    'captioned nested owner':()=>captionedSubdivisionNestedTable(HwpDocument),
+   'filled nested fields':()=>fieldSubdivisionNestedTable(HwpDocument),
  };
- for(const [hostPage,kind] of [[0,'nested owner'],[1,'nested owner'],[1,'titled nested owner'],[1,'two nested forms'],[1,'emphasized nested owner'],[0,'two nested levels'],[0,'maximum nested depth'],[0,'captioned nested owner']])for(const ext of ['hwp','hwpx'])await scenario(
+ for(const [hostPage,kind] of [[0,'nested owner'],[1,'nested owner'],[1,'titled nested owner'],[1,'two nested forms'],[1,'emphasized nested owner'],[0,'two nested levels'],[0,'maximum nested depth'],[0,'captioned nested owner'],[0,'filled nested fields']])for(const ext of ['hwp','hwpx'])await scenario(
    kind+' subdivision - '+ext+' on page '+(hostPage+1),async()=>{
    await configure('openai-compatible');
    const captioned=kind==='captioned nested owner',paired=kind==='two nested forms'||captioned,deep=kind==='two nested levels',maximum=kind==='maximum nested depth',emphasized=kind==='emphasized nested owner',labeled=kind!=='nested owner';
+   const filled=kind==='filled nested fields',metricsRequired=captioned||filled;
    const twoPieces=maximum||captioned;
    const source=nestedFixtures[kind]();
    // A real unsupported glyph requests the Studio Canvas provider. The plain
    // Korean/Latin fixture needs no supplemental metrics and correctly stays portable.
-   if(captioned){source.insertText(0,0,2,' 😀');await writeFile(resolve(out,'before-captioned-owner.'+ext),source[ext==='hwp'?'exportHwp':'exportHwpx']());}
+   if(metricsRequired){source.insertText(0,0,2,' 😀');await writeFile(resolve(out,'before-'+(filled?'filled-fields':'captioned-owner')+'.'+ext),source[ext==='hwp'?'exportHwp':'exportHwpx']());}
    if(hostPage===1)source.insertPageBreak(0,0,2);
    const f=await open(ext,source);
    const canvasReady=()=>f.waitForFunction(()=>window.__pageServices.wasm.borrowDocumentHandle().canvasMetricsActive(),{timeout:15000});
-   if(captioned)await canvasReady();
+   if(metricsRequired)await canvasReady();
    const before=await snap(),table=before.structure.tables[0];
-   const ink=async()=>{if(captioned)await canvasReady();return f.evaluate(p=>{
+   const ink=async()=>{if(metricsRequired)await canvasReady();return f.evaluate(p=>{
      const d=window.__pageServices.wasm.borrowDocumentHandle();
-     return {canvasMetrics:d.canvasMetricsActive(),pages:d.pageCount(),earlier:p?d.getPageTextLayout(0):null,
+     return {canvasMetrics:d.canvasMetricsActive(),fields:JSON.parse(d.getFieldList()),pages:d.pageCount(),earlier:p?d.getPageTextLayout(0):null,
        tables:JSON.parse(d.getPageControlLayout(p)).controls.filter(v=>v.type==='table' && v.stableIndex?.length>3),
        ownerLines:JSON.parse(d.getPageTextLayout(p)).runs.filter(r=>r.cellPath?.length===1 && r.cellIdx===0 && r.text),
        lines:JSON.parse(d.getPageTextLayout(p)).runs.filter(r=>r.cellPath?.length>1)};
    },hostPage);};
    const original=await ink();
-   if(captioned)assert.equal(original.canvasMetrics,true);
+   if(metricsRequired)assert.equal(original.canvasMetrics,true);
    assert.equal(original.pages,hostPage+1);
    assert.deepEqual(before.tableSubdivisionSources[table.id].cells.map(c=>[c.row,c.column]),[[0,0]]);
    assert.equal(original.tables.length,maximum?7:paired||deep?2:1);
    const cellLines=original.lines.filter(r=>r.cellPath.at(-1).cellIndex!==65534);
-   assert.deepEqual(cellLines.map(r=>r.text),maximum?[...Array(6).fill(''),'Q','R']:deep?['','Q','R','Y']:paired?['X','Y','A','B']:['X','Y']);
+   assert.deepEqual(cellLines.map(r=>r.text),filled?['X','😀','Y','을']:maximum?[...Array(6).fill(''),'Q','R']:deep?['','Q','R','Y']:paired?['X','Y','A','B']:['X','Y']);
+   if(filled){
+     assert.deepEqual(original.fields.map(f=>[f.fieldId,f.value,f.startPos,f.endPos,f.location.path.at(-1).cellIndex]),[[1,'😀',9,10,0],[2,'을',9,10,1]]);
+     assert.deepEqual(cellLines.filter(r=>['😀','을'].includes(r.text)).map(r=>[r.text,r.bold,r.italic]),[['😀',true,false],['을',false,true]]);
+   }
    if(captioned)assert.deepEqual(original.lines.filter(r=>r.cellPath.at(-1).cellIndex===65534).map(r=>[r.cellPath[0].cellParaIndex,r.text,r.bold]),[
      [1,'접수',true],[1,' 설명',false],[3,'결재',true],[3,' 설명',false],
    ]);
@@ -136,18 +143,19 @@ try{
    if(emphasized)assert.deepEqual(original.ownerLines.map(r=>[r.text,r.bold,r.italic,r.textColor]),[
      ['접수 ',true,false,'#000000'],['제목',false,false,'#dc2626'],['설',false,false,'#000000'],['명',false,true,'#000000'],
    ]);
-   await send((captioned?'위쪽과 오른쪽 캡션, ':'')+(labeled?'제목, 설명과 함께 ':'')+(maximum?'7단계 ':deep?'두 단계로 들어간 ':paired?'두 ':'')+
+   await send((filled?'채워진 누름틀 두 개와 ':captioned?'위쪽과 오른쪽 캡션, ':'')+(labeled?'제목, 설명과 함께 ':'')+(maximum?'7단계 ':deep?'두 단계로 들어간 ':paired?'두 ':'')+
      '안쪽 표를 첫 칸에 유지하고 바깥 병합 셀을 '+(twoPieces?'두':'세')+' 칸으로 나누어 줘');await error(false);
    const after=await snap(),changed=after.structure.tables[0];
-   if(captioned)assert.deepEqual(after.nodes,before.nodes);
+   if(metricsRequired)assert.deepEqual(after.nodes,before.nodes);
    assert.deepEqual(after.structure.nestedTables,before.structure.nestedTables);
    assert.deepEqual(changed.cells.map(c=>c.text),[table.cells[0].text,'',...(twoPieces?[]:['']),...table.cells.slice(1).map(c=>c.text)]);
    assert.deepEqual(await ink(),original);
    await undo();assert.deepEqual((await snap()).structure,before.structure);assert.deepEqual(await ink(),original);
    await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);
-   await reopen(f,(captioned?'split-captioned-owner-':maximum?'split-max-depth-':deep?'split-two-levels-':emphasized?'split-emphasized-owner-':paired?'split-two-nested-':labeled?'split-titled-owner-':'split-nested-owner-')+ext+'-p'+(hostPage+1),ext);assert.deepEqual(await ink(),original);
+   await reopen(f,(filled?'split-filled-fields-':captioned?'split-captioned-owner-':maximum?'split-max-depth-':deep?'split-two-levels-':emphasized?'split-emphasized-owner-':paired?'split-two-nested-':labeled?'split-titled-owner-':'split-nested-owner-')+ext+'-p'+(hostPage+1),ext);assert.deepEqual(await ink(),original);
    assert.deepEqual((await snap()).structure,after.structure);
-   if(captioned)assert.deepEqual((await snap()).nodes,before.nodes);
+   if(metricsRequired)assert.deepEqual((await snap()).nodes,before.nodes);
+   if(metricsRequired)await writeFile(resolve(out,(filled?'filled-fields':'captioned-owner')+'-canvas-'+ext+'.json'),JSON.stringify({original,reopened:await ink()},null,2));
  });
  await scenario('inline field subdivision - narrowed emoji value rewraps and preserves original document',async()=>{
    await configure('openai-compatible');await open('hwpx',subdivisionInlineFieldTable(HwpDocument,true,0,7000));

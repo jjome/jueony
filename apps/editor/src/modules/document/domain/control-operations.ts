@@ -4,6 +4,7 @@ import {agentTableFormulaTarget,agentFormulaInsertTarget} from './agent-table-fo
 import {cellParagraphPlan,paragraphEdits} from './cell-paragraph.ts';
 import {tableSubdivisionPlan} from './table-subdivision.ts';
 import {projectTableAxis} from './table-axis-grid.ts';
+import {tableTitleRowPlan} from './table-title-row.ts';
 import {projectAxisFormulas} from './table-axis-formulas.ts';
 import {agentSeriesRange} from './agent-table-series.ts';
 import {tableStructurePlan} from './table-structure.ts';
@@ -75,6 +76,7 @@ export function tableAxisPlan(table:Table,op:AxisOperation):Table {
  const rows=table.rows+(row?(insert?1:-1):0),columns=table.columns+(!row?(insert?1:-1):0);
  if(rows>50||columns>20||rows*columns>200)fail('행·열 편집 결과는 50행·20열·200셀 이내여야 합니다.');
  const projected=projectTableAxis(table,row,insert,op.index,values);
+  const headerRows=tableTitleRowPlan(table,row,insert,op.index);
  for(const cell of table.cells.filter(c=>c.axisPicture)){
    const next=projected.find(p=>p.sourceIndex===cell.index)?.cell;
    if(!next || next.rowSpan!==cell.rowSpan || next.columnSpan!==cell.columnSpan)
@@ -83,8 +85,9 @@ export function tableAxisPlan(table:Table,op:AxisOperation):Table {
  projectAxisFormulas(table,projected,rows,columns,row,insert,op.index);
  if(table.cells.some(c=>c.axisFieldSignature && !projected.some(v=>v.sourceIndex===c.index)))
    fail('필드를 포함한 셀이 없어지는 행·열은 삭제할 수 없습니다.');
- const cells=projected.map(({cell})=>cell);
- return {...table,rows,columns,cells};
+ const cells=projected.map(({cell,sourceIndex})=>headerRows!==undefined&&sourceIndex===null
+   ?{...cell,properties:{...cell.properties,isHeader:cell.row<headerRows}}:cell);
+ return {...table,rows,columns,cells,...(headerRows!==undefined?{headerRows}:{})};
 }
 export function pageProperties(current: DocumentProperties | undefined, props: Record<string, unknown>) {
   const next: Record<string, unknown> = { ...current };

@@ -1,5 +1,5 @@
 import type { Table } from '../../modules/document/public/index.ts';
-import { projectTableAxis, witnessedTrackEdges } from '../../modules/document/public/engine-integration.ts';
+import { projectTableAxis, witnessedTrackEdges, tableTitleRowPlan } from '../../modules/document/public/engine-integration.ts';
 import { parsed } from './structure.ts';
 import {axisPictureHeaderEvidence,axisPictureSourceEvidence,sameAxisPicture} from './axis-cell-picture.ts';
 import {prepareAxisTitleLayout} from './axis-title-layout.ts';
@@ -79,8 +79,7 @@ export function mergedAxisProof(doc: any, table: Table, row: boolean, insert: bo
   const source = table.cells.map(cell => content(doc, table, cell.index));
   const titles=table.cells.some(c=>c.axisPicture)?axisPictureHeaderEvidence(doc,table):undefined;
   const pictures=titles?.size?axisPictureSourceEvidence(doc,table):undefined;
-  if(titles?.size && row && at<(table.headerRows??0))
-    throw Error('반복 제목 행 자체를 추가하거나 삭제하는 편집은 지원하지 않습니다.');
+  const headerRows=tableTitleRowPlan(table,row,insert,at)??table.headerRows;
   const otherStoredFields = table.cells.some(c=>c.axisFieldSignature) ? otherFields(doc,table) : undefined;
   if (table.cells.some(c => c.properties.cellProtect !== false || c.properties.fieldName !== '' && !c.axisFieldSignature))
     throw new Error('필드 또는 보호 상태가 불분명한 표는 행·열을 변경할 수 없습니다.');
@@ -117,6 +116,10 @@ export function mergedAxisProof(doc: any, table: Table, row: boolean, insert: bo
     const currentPictures=pictures?axisPictureSourceEvidence(doc,after):undefined;
     if(Boolean(titles?.size)!==Boolean(currentTitles?.size))
       throw Error('행·열 편집 전후 반복 제목의 표시 범위가 달라졌습니다.');
+    if(titles?.size&&(after.headerRows!==headerRows||!same(after.pagination,table.pagination)||
+        after.cells.some(c=>c.properties.isHeader!==(c.row<(headerRows??0)))||
+        currentTitles?.size!==projected.filter(p=>p.cell.row<(headerRows??0)).length))
+      throw Error('반복 제목 행 수·각 셀의 제목 표시 또는 반복 설정이 요청과 다릅니다.');
     if (otherStoredFields && !same(otherFields(doc,after),otherStoredFields))
       throw new Error('편집한 표 밖에 있는 필드의 위치 또는 값이 달라졌습니다.');
     projected.forEach(({cell, sourceIndex}, i) => {
@@ -129,8 +132,8 @@ export function mergedAxisProof(doc: any, table: Table, row: boolean, insert: bo
         const r = row ? Math.min(at, table.rows-1) : cell.row;
         if (actual.properties.width !== x[col+1]-x[col] || actual.properties.height !== y[r+1]-y[r])
           throw new Error('추가한 셀의 행 높이 또는 열 너비가 원래 격자와 다릅니다.');
-        if(titles?.size && (actual.properties.isHeader!==(cell.row<(table.headerRows??0)) ||
-            actual.text!==(justEdited?'':cell.text)))
+        if(titles?.size && (actual.properties.isHeader!==(cell.row<(headerRows??0)) ||
+            actual.text!==(justEdited?'':cell.text)||actual.properties.fieldName!==''||actual.properties.cellProtect!==false))
           throw Error('추가한 반복 제목 칸의 제목 표시 또는 내용이 요청과 다릅니다.');
       }
       if(titles?.size){

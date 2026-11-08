@@ -1,0 +1,28 @@
+--- a/src/document_core/commands/table_ops/subdivision_grid.rs
++++ b/src/document_core/commands/table_ops/subdivision_grid.rs
+@@ -61,13 +61,22 @@
+         || inner.repeat_header || !inner.zones.is_empty()
+         || inner.cells.is_empty() || inner.cells.len() > 200 { return None; }
+     *cell_budget = (*cell_budget).checked_sub(inner.cells.len())?;
+-    if inner.cells.iter().any(|cell| cell.cell_protect() || cell.is_header || cell.field_name.is_some()
++    if inner.cells.iter().any(|cell| {
++        let leaf = !cell.paragraphs.iter().any(|para|
++            para.controls.iter().any(|ctrl| matches!(ctrl, Control::Table(_))));
++        cell.cell_protect() || cell.is_header || cell.field_name.is_some()
+             || cell.text_direction != 0 || cell.paragraphs.is_empty() || cell.paragraphs.len() > 50
+             || cell.paragraphs.iter().any(|para| {
+-                if para.controls.is_empty() { return !subdivision_paragraph_allowed(para, false); }
++                if leaf || para.controls.is_empty() {
++                    return !subdivision_paragraph_allowed(para, leaf)
++                        || para.field_ranges.iter().any(|range| range.start_char_idx >= range.end_char_idx)
++                        || para.controls.iter().any(|ctrl| !matches!(ctrl, Control::Field(field)
++                            if field.is_editable_in_form()));
++                }
+                 retained_inline_table(para, remaining - 1, cell_budget).map_or(true, |child|
+                     child.common.width > cell.width || child.common.height > cell.height)
+-            })) { return None; }
++            })
++    }) { return None; }
+     Some(inner)
+ }
+ 

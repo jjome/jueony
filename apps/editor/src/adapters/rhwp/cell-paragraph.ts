@@ -201,7 +201,22 @@ function cellFieldBoundaries(d:any,t:Table,tables:Table[],controls:any[],lists:a
   boundaries.set(key,group[group.length-1][1]+1);
  }
  const pictures=pictureOwners(d,tables,controls,lists,verifiedFieldLists);
- return {boundaries,fieldEvidence,names,pictures,hasLocalFormula:formulaTables.has(t.id)};
+ return {boundaries,fieldRanges:ranges,fieldEvidence,names,pictures,hasLocalFormula:formulaTables.has(t.id)};
+}
+/** Keep one original character on each side of every field/picture marker.
+ * Only the gaps below the existing suffix boundary need explicit publication. */
+function pictureFieldTextRanges(anchors:number[],fields:Array<[number,number]>,boundary:number){
+ const blocked=[...anchors.map(a=>[a-1,a+1]),...fields.map(([start,end])=>[start-1,end+1])]
+  .sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
+ const ranges:Array<{start:number;end:number}>=[];
+ let start=0;
+ for(const [left,right] of blocked){
+  const end=Math.min(left,boundary);
+  if(start<end)ranges.push({start,end});
+  start=Math.max(start,right);
+ }
+ if(start<boundary)ranges.push({start,end:boundary});
+ return ranges;
 }
 function readPrivateSources(d:any,tables:Table[],name:string){
  const structure=readStructure(d),sources:Record<string,any>={};
@@ -212,7 +227,7 @@ function readPrivateSources(d:any,tables:Table[],name:string){
    assertNativeTableWritable(d,t);
    const controls=parsed(d.getControls()),lists=parsed(d.getCursorModel()).lists;
    if(lists.some((l:any)=>!l.isCell||l.hostListId!==0))throw Error();
-   const {boundaries,fieldEvidence,names,pictures,hasLocalFormula}=cellFieldBoundaries(d,t,structure.tables,controls,lists);
+   const {boundaries,fieldRanges,fieldEvidence,names,pictures,hasLocalFormula}=cellFieldBoundaries(d,t,structure.tables,controls,lists);
    const p=parsed(d.getTableProperties(t.section,t.paragraph,t.control)),col=parsed(d.getColumnDef(t.section));
    if(p.cellZoneCount!==0||p.hasCaption||p.cellSpacing!==0||p.treatAsChar||p.allowOverlap||p.repeatHeader||p.textWrap!=='TopAndBottom'||p.vertRelTo!=='Para'||p.vertAlign!=='Top'||p.horzRelTo!=='Para'&&p.horzRelTo!=='Column'||p.horzAlign!=='Left'||col.columnCount!==1)throw Error();
    const pages=paragraphPageOwners(d,t);
@@ -235,9 +250,11 @@ function readPrivateSources(d:any,tables:Table[],name:string){
       const start=Math.max(fieldBoundary??0,i?anchors[i-1]+1:0),end=anchor-1;
       return start<end?[{start,end}]:[];
      });
+     const textRanges=anchors&&editableFrom!==undefined?pictureFieldTextRanges(anchors,
+      fieldRanges.get(t.id+'/'+c.index+'/'+index)??[],editableFrom):undefined;
      let pictureTextRanges;
-     if(formatOnlyRanges?.length && c.rowSpan*c.columnSpan>1 && anchors){
-      try{pictureSpliceLayout(d,t,c.index,index,text,anchors);pictureTextRanges=formatOnlyRanges;}catch{/* Keep the existing suffix and format-only permissions. */}
+     if(textRanges?.length && c.rowSpan*c.columnSpan>1 && anchors){
+      try{pictureSpliceLayout(d,t,c.index,index,text,anchors);pictureTextRanges=textRanges;}catch{/* Keep the existing suffix and format-only permissions. */}
      }
      return {index,text,length,characters,paragraph,style,runs,...(pictureParagraph&&lastAnchor===undefined?{pictureParagraph:true}:{}),
       ...(editableFrom===undefined?{}:{editableFrom}),...(formatOnlyRanges?.length?{formatOnlyRanges}:{}),...(pictureTextRanges?{pictureTextRanges}:{})};
@@ -298,6 +315,32 @@ function pictureTextLayout(doc:any,t:Table,cell:number,paragraph:number,text:str
  return {pages,glyphs};
 }
 type PictureEdit={start:number;remove:number;insert:string};
+/** A prefix/gap splice moves later fields in the visible-text coordinate model.
+ * Native HWP positions count scalar characters plus control slots; raw UTF-16
+ * slots are separately certified by getCellPictureTextAnchors and roundtrip. */
+function remapPictureFields(fields:any[],evidence:any[],t:Table,cell:number,paragraph:number,edit:PictureEdit){
+ const delta=Array.from(edit.insert).length-edit.remove,end=edit.start+edit.remove;
+ const mapped=new Map<number,any>();
+ for(const field of fields){
+  const location=field.location,step=location?.path?.[0];
+  if(location?.sectionIndex!==t.section||location.paraIndex!==t.paragraph||location.path?.length!==1||
+     step?.type!=='cell'||step.controlIndex!==t.control||step.cellIndex!==cell||step.paraIndex!==paragraph)continue;
+  const proof=evidence.find(e=>e.id===field.fieldId&&e.stored);
+  if(field.cellField!==false||field.fieldType!=='clickhere'||!proof||!same(proof.stored,field)||
+     !(end<field.startCharIdx||edit.start>field.endCharIdx))throw Error('누름틀의 원래 경계에 닿거나 이동할 범위가 불명확합니다.');
+  if(end<field.startCharIdx){
+   for(const key of ['startCharIdx','endCharIdx','startPos','endPos']){
+    if(!int(field[key])||!int(field[key]+delta))throw Error('이동한 누름틀 위치를 증명하지 못했습니다.');
+    field[key]+=delta;
+   }
+  }
+  mapped.set(field.fieldId,field);
+ }
+ return evidence.map(e=>{
+  const field=mapped.get(e.id);if(!field)return e;
+  return {...e,stored:structuredClone(field),info:{...e.info,startCharIdx:field.startCharIdx,endCharIdx:field.endCharIdx}};
+ });
+}
 type PictureLineItem={value:string;x:number;y:number;w:number;h:number};
 /** Check the independently navigable lines of the cell against the complete
  * visible text and the native picture slots interleaved with that text. */
@@ -567,16 +610,18 @@ export function executeCellParagraph(wasm:any,base:Snapshot,op:AgentCellParagrap
  const beforePictures=op.spanFormats?.some(f=>f.start<(p.editableFrom??0));
  const readLayout=()=>pictureTextLayout(d,t,c.index,op.paragraph,op.originalText);
  const pictureText=beforePictures?{screen:readLayout(),portable:portableLayout(d,readLayout)}:undefined;
- let splice;
+ let splice,fieldEvidence=source.fieldEvidence,caretOffset=p.editableFrom??0;
  if(plan.pictureEdit){
   const edit=plan.pictureEdit,anchors=Array.from<number>(d.getCellPictureTextAnchors(...args));
   const delta=Array.from(edit.insert).length-edit.remove,mapped=anchors.map(a=>a>edit.start?a+delta:a);
   if(anchors.some(a=>a>=edit.start&&a<=edit.start+edit.remove))throw Error('그림의 저장 슬롯에 닿는 텍스트 교체입니다.');
   const layout=()=>pictureSpliceLayout(d,t,c.index,op.paragraph,op.originalText,anchors,true);
   splice={edit,anchors,mapped,screen:layout(),portable:portableLayout(d,layout),payload:picturePayload(d,t,c.index)};
+  fieldEvidence=remapPictureFields(expected.fields,fieldEvidence,t,c.index,op.paragraph,edit);
+  if(caretOffset>edit.start)caretOffset+=delta;
  }
  const proof={revision:base.revision,operation:structuredClone(op),table:t,expected,pictureText,splice,runs:formatted?.runs??runs,firstCharacters:formatted?.firstCharacters??firstCharacters,
-  pages:source.pages,pictures:source.pictures,fieldEvidence:source.fieldEvidence,body:rootBodyTexts(d),text,resources:formatted?.resources??resources,cells:source.cells,cellIndex:c.index};
+  pages:source.pages,pictures:source.pictures,fieldEvidence,body:rootBodyTexts(d),text,resources:formatted?.resources??resources,cells:source.cells,cellIndex:c.index};
  // Edit right to left so offsets always refer to the queried source.
  const token=pictureText||splice?d.saveSnapshot():undefined;
  try{for(const edit of [...edits].reverse()){
@@ -593,5 +638,5 @@ export function executeCellParagraph(wasm:any,base:Snapshot,op:AgentCellParagrap
  finally{if(token!==undefined)d.discardSnapshot(token);}
  // Keep the caret in the editable suffix. Focusing a leading field activates it
  // and hides its guide, so the live layout would differ from the saved document.
- return {sectionIndex:t.section,parentParaIndex:t.paragraph,paragraphIndex:op.paragraph,charOffset:p.editableFrom??0,controlIndex:t.control,cellIndex:c.index,cellParaIndex:op.paragraph,cellPath:[{controlIndex:t.control,cellIndex:c.index,cellParaIndex:op.paragraph}]};
+ return {sectionIndex:t.section,parentParaIndex:t.paragraph,paragraphIndex:op.paragraph,charOffset:caretOffset,controlIndex:t.control,cellIndex:c.index,cellParaIndex:op.paragraph,cellPath:[{controlIndex:t.control,cellIndex:c.index,cellParaIndex:op.paragraph}]};
 }

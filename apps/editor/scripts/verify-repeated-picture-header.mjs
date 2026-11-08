@@ -40,6 +40,91 @@ function layout(d){
   return controls.filter(c=>c.type==='image').length;
  });
 }
+if(process.argv.includes('--title-rows')){
+ const fixture=await createRepeatedTitlePictures(HwpDocument,out),results=[];
+ const operation=insert=>({kind:insert?'insert_table_row':'delete_table_row',target:'s0p1t0',index:0,
+  ...(insert?{values:['새 제목','분류','안내']}: {})});
+ const verify=(d,inserted)=>{
+  const t=readStructure(d).tables[0],h=inserted?2:1;
+  assert.equal(t.headerRows,h);assert.deepEqual(t.pagination,{mode:'row',repeatHeader:true});
+  assert.equal(t.rows,inserted?5:4);assert.equal(t.columns,3);
+  assert.deepEqual(t.cells.map(c=>[c.row,c.column,c.properties.isHeader]),[
+   ...(inserted?[[0,0,true],[0,1,true],[0,2,true]]:[]),
+   [h-1,0,true],[h-1,2,true],...[h,h+1,h+2].flatMap(r=>[0,1,2].map(c=>[r,c,false]))]);
+  assert.equal(JSON.parse(d.getControls()).filter(c=>c.ctrlId==='gso').length,4);
+  assert.equal(t.cells.filter(c=>c.axisPicture).length,4);assert.equal(d.pageCount(),2);
+  const wanted=[...(inserted?[[0,0,1,['새 제목']],[0,1,1,['분류']],[0,2,1,['안내']]]:[]),
+   [h-1,0,2,['항목0','항목1']],[h-1,2,1,['PicA']]];
+  for(let page=0;page<2;page++){
+   const controls=JSON.parse(d.getPageControlLayout(page)).controls,table=controls.find(c=>c.type==='table');
+   assert.deepEqual(table.cells.filter(c=>c.row<h).map(c=>[c.row,c.col,c.colSpan]),wanted.map(c=>c.slice(0,3)));
+   const runs=JSON.parse(d.getPageTextLayout(page)).runs;
+   for(const [row,col,span,texts] of wanted){
+    const cell=t.cells.find(c=>c.row===row&&c.column===col);
+    assert.deepEqual(texts.map((_,p)=>runs.filter(r=>r.cellPath?.[0]?.cellIndex===cell.index&&r.cellParaIdx===p).map(r=>r.text).join('')),texts);
+   }
+   assert.equal(controls.filter(c=>c.type==='image').length,[2,3][page]);
+  }
+  return t;
+ };
+ try{for(const format of ['hwp','hwpx']){
+  const original=bytes(fixture,format),d=new HwpDocument(original),file=resolve(out,'before.'+format);
+  await writeFile(file,original);const records=inspectPictureAnchors(file);assert.equal(records.length,4);
+  try{
+   verify(d,false);
+   for(const insert of [true,false]){
+    const before=bytes(d,format),undo=d.saveSnapshot();apply(d,format,operation(insert));verify(d,insert);
+    const saved=bytes(d,format),path=resolve(out,(insert?'insert':'delete')+'.'+format);await writeFile(path,saved);
+    assert.deepEqual(inspectPictureAnchors(path),records.map(p=>({...p,row:p.row+(insert?1:0)})));
+    const copy=new HwpDocument(saved);try{verify(copy,insert);assert.deepEqual(readStructure(copy),readStructure(d));}finally{copy.free();}
+    const redo=d.saveSnapshot();d.restoreSnapshot(undo);assert.deepEqual(bytes(d,format),before);
+    d.restoreSnapshot(redo);assert.deepEqual(bytes(d,format),saved);d.discardSnapshot(undo);d.discardSnapshot(redo);
+   }
+  }finally{d.free();}
+  const refusals=['last title','picture owner','merged primary','span insertion','span deletion','last body','mixed flags','field owner'];
+  for(const refusal of refusals){
+   const d=new HwpDocument(original);
+   try{
+    let request=operation(false);
+    if(['picture owner','merged primary','span insertion','span deletion'].includes(refusal)){
+     apply(d,format,operation(true));request={kind:'delete_table_row',target:'s0p1t0',index:1};
+     if(refusal==='merged primary')d.deleteTableColumn(...base,2);
+     if(refusal.startsWith('span')){
+      d.mergeTableCells(...base,0,0,1,1);
+      if(refusal==='span insertion')request={kind:'insert_table_row',target:'s0p1t0',index:1,values:['','','']};
+     }
+    }
+    if(refusal==='last body'){
+     d.deleteTableRow(...base,1);d.deleteTableRow(...base,1);request={kind:'delete_table_row',target:'s0p1t0',index:1};
+    }
+    if(refusal==='mixed flags')d.setCellProperties(...base,0,'{"isHeader":false}');
+    if(refusal==='field owner'){apply(d,format,operation(true));d.setCellProperties(...base,0,'{"fieldName":"제목 이름"}');}
+    const before=bytes(d,format);assert.throws(()=>apply(d,format,request),/제목|본문|그림|복잡|보존|필드|중첩/);
+    assert.deepEqual(bytes(d,format),before);
+   }finally{d.free();}
+  }
+  const faults=['header flag','repeat flag','repeated path','retained text'];
+  for(const fault of faults){
+   const d=new HwpDocument(original);let wrote=false;
+   try{
+    const edit=d.insertTableRow.bind(d);d.insertTableRow=(...args)=>{const r=edit(...args);wrote=true;
+     if(fault==='header flag')d.setCellProperties(...base,0,'{"isHeader":false}');
+     if(fault==='repeat flag')d.setTableProperties(...base,'{"repeatHeader":false}');
+     if(fault==='retained text')d.insertTextInCell(...base,3,0,0,'오염');return r;};
+    if(fault==='repeated path'){
+     const read=d.getPageControlLayout.bind(d);d.getPageControlLayout=page=>{const v=JSON.parse(read(page));
+      if(wrote&&page===1)v.controls.find(c=>c.type==='image').cellPath[0].cellIndex=0;return JSON.stringify(v);};
+    }
+    const before=bytes(d,format);assert.throws(()=>apply(d,format,operation(true)),/제목|그림|보존|범위/);
+    assert.ok(wrote);assert.deepEqual(bytes(d,format),before);
+   }finally{d.free();}
+  }
+  results.push({format,headerRows:[1,2,1],operations:2,refusals:refusals.length,rollbackFaults:faults.length,storedPictures:4,displayedPictures:5});
+  console.log('PASS',format,'title row insert/delete, exact header flags/content, source slots/resources, reopen, undo/redo,',refusals.length,'refusals and',faults.length,'rollback faults');
+ }}finally{fixture.free();}
+ await writeFile(resolve(out,'result.json'),JSON.stringify({results,engine:JSON.parse(await readFile(resolve(process.env.JUEONY_ENGINE_PACKAGE,'jueony-engine-build.json'),'utf8'))},null,2));
+ process.exit(0);
+}
 if(process.argv.includes('--crossing-title')){
  const fixture=await createCrossingTitlePictures(HwpDocument,out),results=[];
  const profile=d=>{

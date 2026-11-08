@@ -28,8 +28,8 @@ export function hwpSubdivisionSource(d:any,t:Table,tables:Table[],exactGrid:bool
       || p.cellZoneCount!==0 || p.cellSpacing!==0 || p.hasCaption || p.treatAsChar || p.allowOverlap
       || p.textWrap!=='TopAndBottom' || p.vertRelTo!=='Para' || p.vertAlign!=='Top'
       || !['Para','Column'].includes(p.horzRelTo) || p.horzAlign!=='Left'
-      || (!fieldOwners?.size && parsed(d.getFieldList()).length) || parsed(d.getBookmarks()).length
-      || parsed(d.getControls()).some((c:any)=>c.list===0 ? !['tbl','secd','cold'].includes(c.ctrlId) : !(fieldOwners?.has(c.list) || c.ctrlId==='tbl' && nested?.controlLists.includes(c.list)))
+      || (!fieldOwners?.size && parsed(d.getFieldList()).some((f:any)=>!nested?.fieldLists.includes(f.listId))) || parsed(d.getBookmarks()).length
+      || parsed(d.getControls()).some((c:any)=>c.list===0 ? !['tbl','secd','cold'].includes(c.ctrlId) : !(fieldOwners?.has(c.list) || c.ctrlId==='tbl' && nested?.controlLists.includes(c.list) || c.ctrlId==='' && c.ctrlCh===0 && nested?.fieldLists.includes(c.list)))
       || parsed(d.getCursorModel()).lists.some((l:any)=>!l.isCell || l.hostListId!==0 && !nested?.descendantLists.includes(l.listId)))
     throw new Error('HWP5 한 단의 보호되지 않은 본문 표 한 개와 확인된 쪽 배치가 필요합니다.');
   const merged=t.cells.some(c=>c.rowSpan>1||c.columnSpan>1);

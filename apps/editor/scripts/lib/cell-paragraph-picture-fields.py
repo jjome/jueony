@@ -1,6 +1,5 @@
 """Stored mixed-field/picture fixture and independent saved slot evidence."""
 import json
-import re
 import struct
 import sys
 from pathlib import Path
@@ -21,7 +20,10 @@ def fixture(source, target, mode):
             if entry.filename == 'Contents/section0.xml':
                 xml = data.decode('utf-8')
                 assert xml.count('<hp:t>P</hp:t>') == 1
-                xml = xml.replace('<hp:t>P</hp:t>', '<hp:t>앞</hp:t>' + begin + '<hp:t>필드😀</hp:t>' + end + '<hp:t> 뒤문구 P</hp:t>')
+                prefix = '<hp:t>앞</hp:t>' + begin + '<hp:t>필드😀</hp:t>' + end
+                if mode == 'multiple':
+                    prefix = '<hp:t>문서 앞글 </hp:t>' + begin + '<hp:t>필드😀</hp:t>' + end + '<hp:t> 사이문구 </hp:t>' + begin.replace('id="702"', 'id="703"') + '<hp:t>둘째값</hp:t>' + end.replace('702', '703')
+                xml = xml.replace('<hp:t>P</hp:t>', prefix + '<hp:t> 뒤문구 P</hp:t>')
                 xml = xml.replace('<hp:t>i</hp:t>', '<hp:t>i중간문구 </hp:t>')
                 xml = xml.replace('<hp:t>B</hp:t>', '<hp:t>B 일반문구</hp:t>')
                 if mode == 'empty':
@@ -30,7 +32,7 @@ def fixture(source, target, mode):
                     xml = xml.replace(end, '', 1)
                     xml = xml.replace('</hp:pic>', '</hp:pic>' + end, 1)
                 else:
-                    assert mode == 'filled'
+                    assert mode in ('filled', 'multiple')
                 data = xml.encode('utf-8')
             dst.writestr(entry, data)
 
@@ -49,7 +51,7 @@ def scan(raw):
             return text, slots
         assert unit in (3, 4, 11), (unit, i)
         assert struct.unpack_from('<H', raw, i + 14) == (unit,)
-        slots.append({'offset': len(text), 'kind': unit, 'raw': raw[i:i+16].hex()})
+        slots.append({'offset': len(text), 'utf16Offset': i//2, 'kind': unit, 'raw': raw[i:i+16].hex()})
         i += 16
         start = i
     raise AssertionError('Missing paragraph end')
@@ -63,19 +65,22 @@ def inspect(path):
         for cell in root.findall('.//{*}tc'):
             address = cell.find('./{*}cellAddr')
             for index, paragraph in enumerate(cell.findall('./{*}subList/{*}p')):
-                text, slots = '', []
+                text, slots, units = '', [], 0
                 for run in paragraph.findall('./{*}run'):
                     for child in run:
                         kind = child.tag.rsplit('}', 1)[-1]
                         if kind == 't':
                             text += child.text or ''
+                            units += len((child.text or '').encode('utf-16le'))//2
                         elif kind == 'pic':
-                            slots.append({'offset': len(text), 'kind': 11, 'resource': child.find('.//{*}img').get('binaryItemIDRef')})
+                            slots.append({'offset': len(text), 'utf16Offset': units, 'kind': 11, 'resource': child.find('.//{*}img').get('binaryItemIDRef')})
+                            units += 8
                         elif kind == 'ctrl':
                             for field in child:
                                 tag = field.tag.rsplit('}', 1)[-1]
                                 assert tag in ('fieldBegin', 'fieldEnd'), tag
-                                slots.append({'offset': len(text), 'kind': 3 if tag == 'fieldBegin' else 4, 'record': ET.tostring(field, encoding='unicode')})
+                                slots.append({'offset': len(text), 'utf16Offset': units, 'kind': 3 if tag == 'fieldBegin' else 4, 'record': ET.tostring(field, encoding='unicode')})
+                                units += 8
                         else:
                             raise AssertionError(kind)
                 output.append({'row': int(address.get('rowAddr')), 'col': int(address.get('colAddr')), 'paragraph': index, 'text': text, 'slots': slots})

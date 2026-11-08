@@ -3,7 +3,7 @@ import {mkdir,readFile,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {inflateRawSync} from 'node:zlib';
-import {createPictureFieldParagraph,mixedPictureFieldArgs as args,mixedPictureFieldText,inspectMixedPictureFields} from './lib/cell-paragraph-picture-fields.mjs';
+import {createPictureFieldParagraph,mixedPictureFieldArgs as args,mixedPictureFieldText,multiplePictureFieldText,inspectMixedPictureFields} from './lib/cell-paragraph-picture-fields.mjs';
 import {readStructure} from '../src/adapters/rhwp/structure.ts';
 import {readCellParagraphSources} from '../src/adapters/rhwp/cell-paragraph.ts';
 import {executeDocumentOperations} from '../src/adapters/rhwp/execute.ts';
@@ -14,6 +14,7 @@ await mkdir(out,{recursive:true});
 const {default:init,HwpDocument}=await import(pathToFileURL(pkg+'/rhwp.js'));
 await init({module_or_path:await readFile(pkg+'/rhwp_bg.wasm')});
 const json=v=>typeof v==='string'?JSON.parse(v):v,results=[];
+const pattern=process.env.JUEONY_CASE_PATTERN?new RegExp(process.env.JUEONY_CASE_PATTERN,'u'):undefined;
 const snap=(d,name)=>{const structure=readStructure(d);return {revision:'r1',name,nodes:[],limitations:[],structure,cellParagraphSources:readCellParagraphSources(d,structure.tables,name)};};
 const paragraph=s=>s.cellParagraphSources.s0p1t0.cells?.find(c=>c.index===4)?.paragraphs.find(p=>p.index===0);
 const command=(s,text)=>({kind:'replace_cell_paragraph',target:'s0p1t0',row:1,column:1,paragraph:0,originalText:paragraph(s)?.text,text});
@@ -30,7 +31,7 @@ function resources(bytes){
  assert.ok(map['Contents/header.xml']);return map;
 }
 for(const format of ['hwp','hwpx']){
- if(process.env.JUEONY_CASE_PATTERN&&!new RegExp(process.env.JUEONY_CASE_PATTERN,'u').test(format))continue;
+ if(pattern&&!pattern.test(format+' mixed picture-field suffix and picture gaps'))continue;
  const template=await createPictureFieldParagraph(HwpDocument,resolve(out,'fixture-'+format));
  const save=d=>format==='hwp'?d.exportHwp():d.exportHwpx(),original=save(template);template.free();
  const d=new HwpDocument(original),name='그림 누름틀.'+format;
@@ -59,7 +60,7 @@ for(const format of ['hwp','hwpx']){
    if(label==='before-picture')anchorShift=2;
    const file=resolve(out,label+'.'+format);await writeFile(file,save(d));
    assert.deepEqual(inspectMixedPictureFields(file),nativeSource.map(c=>c.row===1&&c.col===1?{...c,text,
-    slots:c.slots.map(s=>s.kind===11?{...s,offset:s.offset+anchorShift}:s)}:c));
+    slots:c.slots.map(s=>s.kind===11?{...s,offset:s.offset+anchorShift,utf16Offset:s.utf16Offset+anchorShift}:s)}:c));
    const reopened=new HwpDocument(await readFile(file));
    try{
     assert.equal(reopened.getTextInCell(...args,0,reopened.getCellParagraphLength(...args)),text);
@@ -94,6 +95,67 @@ for(const format of ['hwp','hwpx']){
   }
   results.push({format,edits:3,allPictureAnchorsShiftedBy:anchorShift,rejectedEdits:3,undoRedo:true,reopenedFieldIdentityFault:true,foreignLookup:true,namedOwnerRejected:true,protectedOwnerRejected:true,emptyAndEnclosingFieldsRejected:true});
   console.log('PASS',format,'mixed picture/ClickHere: suffix, before/between pictures, raw slots, fields, resources, reopen, undo/redo, refusals and rollback');
+ }finally{d.free();}
+}
+for(const format of ['hwp','hwpx']){
+ if(pattern&&!pattern.test(format+' prefix and inter-field picture text'))continue;
+ const template=await createPictureFieldParagraph(HwpDocument,resolve(out,'prefix-'+format),'multiple');
+ const save=d=>format==='hwp'?d.exportHwp():d.exportHwpx(),d=new HwpDocument(save(template));template.free();
+ const name='누름틀 앞과 사이.'+format;
+ try{
+  const s=snap(d,name),p=paragraph(s),before=save(d),fields=json(d.getFieldList()),assets=resources(d.exportHwpx());
+  assert.equal(p.text,multiplePictureFieldText);
+  assert.deepEqual(fields.map(f=>[f.fieldId,f.name,f.startCharIdx,f.endCharIdx,f.value]),[
+   [702,'입력값',6,9,'필드😀'],[703,'입력값',15,18,'둘째값']]);
+  assert.deepEqual(p.pictureTextRanges,[{start:0,end:5},{start:10,end:14},{start:19,end:23},{start:25,end:29}]);
+  const file=resolve(out,'prefix-original.'+format);await writeFile(file,before);
+  const raw=inspectMixedPictureFields(file),originalSlots=raw.find(c=>c.row===1&&c.col===1).slots;
+  assert.deepEqual(originalSlots.map(s=>s.offset),[6,9,15,18,24,30,31]);
+  assert.deepEqual(originalSlots.map(s=>s.utf16Offset),[6,18,32,43,57,71,80]);
+  const replaceAt=(text,at)=>Array.from(text).map((c,i)=>i===at?'X':c).join('');
+  for(const at of [5,6,9,14,15,18]){
+   assert.throws(()=>candidate(d,s,command(s,replaceAt(p.text,at))),undefined,'field boundary '+at);
+   assert.deepEqual(save(d),before);
+  }
+  assert.throws(()=>candidate(d,s,command(s,p.text.replace('앞글 필드😀 사이문구','잘못된 범위'))));
+  assert.deepEqual(save(d),before);
+  const readFields=d.getFieldList.bind(d);
+  d.getFieldList=()=>JSON.stringify(json(readFields()).map(f=>f.fieldId===703?{...f,fieldId:702}:f));
+  assert.equal(snap(d,name).cellParagraphSources.s0p1t0.editable,false);d.getFieldList=readFields;
+  const undo=d.saveSnapshot();
+  let text=p.text;
+  const phases=[
+   {label:'prefix-emoji',text:'😀추가'+text,scalars:[9,12,18,21,27,33,34],units:[10,22,36,47,61,75,84],shift:[3,3]},
+   {label:'inter-field-delete',text:('😀추가'+text).replace('사이문구','사이'),scalars:[9,12,16,19,25,31,32],units:[10,22,34,45,59,73,82],shift:[3,1]},
+  ];
+  for(const phase of phases){
+   const current=snap(d,name),cursor=candidate(d,current,command(current,phase.text));text=phase.text;
+   assert.equal(cursor.charOffset,paragraph(snap(d,name)).editableFrom);
+   const saved=resolve(out,phase.label+'.'+format);await writeFile(saved,save(d));
+   assert.deepEqual(inspectMixedPictureFields(saved),raw.map(c=>c.row===1&&c.col===1?{...c,text,
+    slots:originalSlots.map((slot,i)=>({...slot,offset:phase.scalars[i],utf16Offset:phase.units[i]}))}:c));
+   const expectedFields=fields.map((f,i)=>({...f,...Object.fromEntries(['startCharIdx','endCharIdx','startPos','endPos'].map(k=>[k,f[k]+phase.shift[i]]))}));
+   const reopened=new HwpDocument(await readFile(saved));
+   try{
+    assert.deepEqual(json(d.getFieldList()),expectedFields);assert.deepEqual(json(reopened.getFieldList()),expectedFields);
+    assert.deepEqual(Array.from(reopened.getCellPictureTextAnchors(...args)),phase.scalars.slice(4));
+    for(const [i,field] of expectedFields.entries()){
+     assert.equal(json(reopened.getFieldValue(field.fieldId)).value,field.value);
+     assert.equal(json(reopened.getCellCharPropertiesAt(...args,field.startCharIdx)).textColor,['#246789','#975324'][i]);
+    }
+    assert.deepEqual(resources(reopened.exportHwpx()),assets);
+   }finally{reopened.free();}
+  }
+  const after=save(d),redo=d.saveSnapshot();d.restoreSnapshot(undo);assert.deepEqual(save(d),before);
+  d.restoreSnapshot(redo);assert.deepEqual(save(d),after);d.discardSnapshot(undo);d.discardSnapshot(redo);
+  // A mutated same-name neighbor field must not be accepted as a planned move.
+  const current=snap(d,name),insert=d.insertTextInCell.bind(d);let changed=false;
+  d.insertTextInCell=(...a)=>{const result=insert(...a);changed=true;d.setFieldValue(703,'잘못된 값');return result;};
+  assert.throws(()=>candidate(d,current,command(current,'앞'+text)));assert.equal(changed,true);
+  d.insertTextInCell=insert;assert.deepEqual(save(d),after);
+  results.push({format,case:'prefix-and-inter-field',edits:2,prefixScalarDelta:3,prefixUtf16Delta:4,
+   interFieldDelta:-2,boundaryRefusals:7,duplicateFieldIdRejected:true,neighborFieldFaultRollback:true,undoRedo:true});
+  console.log('PASS',format,'prefix +3 scalars/+4 UTF16 and inter-field -2: two same-name field IDs, values/styles, raw field/picture slots, reopen, boundary refusal and rollback');
  }finally{d.free();}
 }
 await writeFile(resolve(out,'results.json'),JSON.stringify({engine:pkg,results},null,2));

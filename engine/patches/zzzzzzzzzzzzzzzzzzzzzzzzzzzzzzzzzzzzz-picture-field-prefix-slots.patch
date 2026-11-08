@@ -1,0 +1,27 @@
+--- a/src/document_core/commands/text_editing.rs
++++ b/src/document_core/commands/text_editing.rs
+@@ -1190,14 +1190,16 @@
+     // insert_text_at already shifts the raw stream positions. For an ordinary suffix
+     // after all balanced fields, rebuilding would count a leading FIELD_END as a
+     // second FIELD_BEGIN and move a later field into the prefix on HWPX export.
+-    // A proven mixed picture/ClickHere paragraph also retains its original
+-    // raw slots after a text-only insertion beyond every field. Rebuilding it
+-    // mistakes FIELD_END gaps for picture slots and moves controls on save.
+-    if para.field_ranges.iter().all(|range| range.end_char_idx < offset)
+-        && ((para.controls.len() == para.field_ranges.len()
+-            && para.orphan_field_ends.is_empty()
+-            && para.controls.iter().all(|control| matches!(control, Control::Field(_))))
+-            || para.picture_text_anchors().is_some())
++    // A proven mixed picture/ClickHere paragraph retains its raw slots for
++    // an insertion strictly outside every field, including a prefix or gap
++    // between fields. The strict anchor query verifies both field markers,
++    // all picture slots and the updated stream length before skipping repair.
++    if (para.field_ranges.iter().all(|range| range.end_char_idx < offset)
++        && para.controls.len() == para.field_ranges.len()
++        && para.orphan_field_ends.is_empty()
++        && para.controls.iter().all(|control| matches!(control, Control::Field(_))))
++        || (para.field_ranges.iter().all(|range| offset < range.start_char_idx || offset > range.end_char_idx)
++            && para.picture_text_anchors().is_some())
+     {
+         return false;
+     }

@@ -2,10 +2,11 @@ import type {Table} from '../../modules/document/public/index.ts';
 import {parsed} from './structure.ts';
 import {sameTableLayout} from './table-layout-evidence.ts';
 import {subdivisionNestedCaptions} from './subdivision-nested-captions.ts';
+import {subdivisionNestedFields} from './subdivision-nested-fields.ts';
 
 type CellPath={controlIndex:number;cellIndex:number;cellParaIndex:number}[];
 type NestedSubdivisionTable={listId:number;paragraph:number;path:CellPath};
-export type NestedSubdivisionOwner={index:number;listId:number;paragraphs:number[];tables:NestedSubdivisionTable[];controlLists:number[];descendantLists:number[]};
+export type NestedSubdivisionOwner={index:number;listId:number;paragraphs:number[];tables:NestedSubdivisionTable[];controlLists:number[];descendantLists:number[];fieldLists:number[]};
 // nested_axis_table accepts 2..=8 path entries. nested-tables.ts also limits
 // locate to eight entries, including the root and final leaf cell.
 const MAX_CELL_PATH=8,MAX_NESTED_CELLS=1000;
@@ -13,9 +14,8 @@ const invalid=()=>Error('분할할 칸의 중첩 표와 모든 내부 셀·글�
 
 /** Every inline table has a unique, fully resolved path and an empty anchor paragraph. */
 export function subdivisionNestedOwner(doc:any,t:Table):NestedSubdivisionOwner|undefined {
-  const controls=parsed(doc.getControls()),children=controls.filter((v:any)=>v.list!==0);
-  if(!children.some((v:any)=>v.ctrlId==='tbl'))return;
-  if(parsed(doc.getFieldList()).length)throw invalid();
+  const controls=parsed(doc.getControls()),children=controls.filter((v:any)=>v.list!==0 && v.ctrlId==='tbl');
+  if(!children.length)return;
   const lists=parsed(doc.getCursorModel()).lists,byId=new Map<number,any>(lists.map((l:any)=>[l.listId,l]));
   if(byId.size!==lists.length || lists.some((l:any)=>!Number.isSafeInteger(l.listId) || l.listId<=0))throw invalid();
   const descendantLists=lists.filter((l:any)=>l.hostListId!==0);
@@ -51,9 +51,11 @@ export function subdivisionNestedOwner(doc:any,t:Table):NestedSubdivisionOwner|u
     tables.push({listId:child.list,paragraph:child.para,path});
   }
   if(descendantLists.some((l:any)=>!tables.some(c=>c.listId===l.hostListId && c.paragraph===l.hostPara && l.controlIndex===0)))throw invalid();
-  return {index:host.cellIndex,listId:host.listId,
+  const owner:NestedSubdivisionOwner={index:host.cellIndex,listId:host.listId,
     paragraphs:tables.filter(c=>c.listId===host.listId).map(c=>c.paragraph).sort((a,b)=>a-b),
-    tables,controlLists:[...new Set(tables.map(c=>c.listId))],descendantLists:descendantLists.map((l:any)=>l.listId)};
+    tables,controlLists:[...new Set(tables.map(c=>c.listId))],descendantLists:descendantLists.map((l:any)=>l.listId),fieldLists:[]};
+  owner.fieldLists=subdivisionNestedFields(doc,t,owner,lists,controls).map(r=>r.listId);
+  return owner;
 }
 
 const rect=(v:any)=>({x:v.x,y:v.y,w:v.w,h:v.h});
@@ -104,6 +106,8 @@ function readInner(doc:any,t:Table,table:NestedSubdivisionTable,lists:any[]){
 
 function readNestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisionOwner) {
   const at=[t.section,t.paragraph] as const,lists=parsed(doc.getCursorModel()).lists;
+  const fields=subdivisionNestedFields(doc,t,owner,lists);
+  if(!sameTableLayout(fields.map(f=>f.listId),owner.fieldLists))throw invalid();
   const children=owner.tables.map(c=>readInner(doc,t,c,lists.filter((l:any)=>l.hostListId===c.listId && l.hostPara===c.paragraph)));
   const pages=doc.pageCount(),page=children[0]?.page;
   if(!Number.isSafeInteger(pages) || pages<1 || pages>200 || !Number.isSafeInteger(page) || page<0 || page>=pages ||
@@ -224,7 +228,7 @@ function readNestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisionOw
         throw Error('안쪽 표 캡션의 글줄이 첫 칸 안에 겹치지 않고 들어가지 않습니다.');
     }
   }
-  return {page,pageCount:pages,nested,ownerParagraphs,ownerLines,captions};
+  return {page,pageCount:pages,nested,ownerParagraphs,ownerLines,captions,fields};
 }
 
 export function nestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisionOwner) {

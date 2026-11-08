@@ -41,9 +41,9 @@ export function readTableSubdivisionSources(wasm:any, tables:Table[], name:strin
     const p = parsed(d.getTableProperties(t.section, t.paragraph, t.control));
     const primary = t.cells.find(c => c.rowSpan > 1 || c.columnSpan > 1);
     const exactGrid = hasGridSplit && (!!primary || p.pageBreak===1 && d.pageCount()>1);
-    const owners=exactGrid && primary ? subdivisionFieldOwners(d,t) : undefined;
-    const fieldTargets=owners?.size ? subdivisionFieldTargets(d,t,owners) : undefined;
     const nested=exactGrid && primary ? subdivisionNestedOwner(d,t) : undefined;
+    const owners=exactGrid && primary && !nested ? subdivisionFieldOwners(d,t) : undefined;
+    const fieldTargets=owners?.size ? subdivisionFieldTargets(d,t,owners) : undefined;
     if(nested && (t.cells[nested.index].rowSpan*t.cells[nested.index].columnSpan===1 || p.pageBreak!==0))throw Error('중첩 표의 병합 주 셀이 필요합니다.');
     const nestedLayout=nested && nestedSubdivisionEvidence(d,t,nested);
     const native = binary ? hwpSubdivisionSource(d,t,tables,exactGrid,owners,nested) : undefined;

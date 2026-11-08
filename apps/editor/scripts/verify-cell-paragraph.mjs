@@ -34,6 +34,9 @@ const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const
  if(input.instruction.includes('picture-suffix'))operations[0].text=operations[0].originalText+'개정';
  if(input.instruction.includes('picture-field'))operations[0].text=operations[0].originalText.replace(
   ...input.instruction.includes('forbidden')?['필드😀','변경😀']:input.instruction.includes('middle')?['중간문구','변경문구']:['일반문구','수정문구']);
+ if(input.instruction.includes('field-prefix'))operations[0].text=input.instruction.includes('forbidden')?
+  operations[0].originalText.replace('필드😀','변경😀'):input.instruction.includes('between')?
+  operations[0].originalText.replace('사이문구','사이'):'😀추가'+operations[0].originalText;
  if(input.instruction.includes('picture prefix color'))Object.assign(operations[0],{text:operations[0].originalText,
    spanFormats:[{start:0,end:1,color:'#246789'},{start:5,end:6,color:'#148061'}]});
  if(input.instruction.includes('picture text splice'))operations[0].text=input.instruction.includes('middle')?'양😀yPi닫ccB':'양😀yPiabccB';
@@ -94,6 +97,46 @@ try{
  await new Promise(r=>provider.listen(providerPort,'127.0.0.1',r));for(let i=0;i<100;i++){if(await fetch(origin+'/api/health').then(r=>r.ok,()=>false))break;await delay(100);}
  browser=await puppeteer.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,args:['--no-first-run','--disable-background-networking'],defaultViewport:{width:1400,height:1000}});page=await browser.newPage();page.setDefaultTimeout(15000);page.on('dialog',d=>{if(d.type()==='beforeunload'){beforeUnloadCount++;void d.accept();}else void d.dismiss();});page.on('pageerror',e=>pageErrors.push(String(e)));page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});await page.setRequestInterception(true);page.on('request',r=>{if(!r.url().startsWith(origin)&&!r.url().startsWith('data:')&&!r.url().startsWith('blob:')){externalRequests.push(r.url());void r.abort();}else void r.continue();});await page.goto(origin);await ready();
  if(casePattern)await configure('openai-compatible');
+ for(const format of ['hwp','hwpx'])await scenario(format+' field-prefix and inter-field length changes retain stored IDs and UTF16 slots through chat',async()=>{
+  const source=await createPictureFieldParagraph(HwpDocument,resolve(out,'field-prefix-'+format),'multiple');
+  const original=resolve(out,'field-prefix-before.'+format);await writeFile(original,format==='hwp'?source.exportHwp():source.exportHwpx());
+  const raw=inspectMixedPictureFields(original),f=await open(format,source);
+  const canvas=()=>f.waitForFunction(()=>window.__pageServices.wasm.borrowDocumentHandle().canvasMetricsActive()===true,{timeout:15000});
+  await canvas();
+  const inspect=()=>f.evaluate(args=>{
+   const d=window.__pageServices.wasm.borrowDocumentHandle(),fields=JSON.parse(d.getFieldList());
+   return {text:d.getTextInCell(...args,0,d.getCellParagraphLength(...args)),fields,
+    styles:fields.map(field=>JSON.parse(d.getCellCharPropertiesAt(...args,field.startCharIdx))),
+    anchors:[...d.getCellPictureTextAnchors(...args)],pictures:Array.from({length:d.pageCount()},(_,p)=>JSON.parse(d.getPageControlLayout(p)).controls
+     .filter(c=>c.type==='image').map(c=>({frame:c,bytes:[...d.getControlImageData(c.secIdx,c.parentParaIdx,JSON.stringify(c.cellPath),c.controlIdx)]}))).flat()};
+  },mixedPictureFieldArgs);
+  const before=await inspect(),s=await snap();
+  assert.deepEqual(s.cellParagraphSources.s0p1t0.cells.find(c=>c.index===4).paragraphs[0].pictureTextRanges,
+   [{start:0,end:5},{start:10,end:14},{start:19,end:23},{start:25,end:29}]);
+  const stateBefore=await state();await send('first field-prefix forbidden');
+  assert.equal(await page.$eval('#request-error',e=>e.hidden),false);assert.deepEqual(await state(),stateBefore);
+  const expectedFields=shifts=>before.fields.map((field,i)=>({...field,...Object.fromEntries(
+   ['startCharIdx','endCharIdx','startPos','endPos'].map(key=>[key,field[key]+shifts[i]]))}));
+  await send('first field-prefix grow');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const prefix=await inspect();
+  assert.equal(prefix.text,'😀추가'+before.text);assert.deepEqual(prefix.fields,expectedFields([3,3]));
+  assert.deepEqual(prefix.anchors,[27,33,34]);assert.deepEqual(prefix.styles,before.styles);
+  const displacement=prefix.pictures.filter(p=>p.frame.cellIdx===4).map((p,i)=>{
+   const old=before.pictures.filter(p=>p.frame.cellIdx===4)[i];
+   assert.deepEqual({...p,frame:{...p.frame,x:old.frame.x}},old);return p.frame.x-old.frame.x;
+  });
+  assert.equal(displacement.length,3);assert.ok(displacement.every(dx=>dx>0));displacement.forEach(dx=>same(dx,displacement[0]));
+  assert.deepEqual(prefix.pictures.filter(p=>p.frame.cellIdx!==4),before.pictures.filter(p=>p.frame.cellIdx!==4));
+  await send('first field-prefix between');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const after=await inspect();assert.equal(after.text,prefix.text.replace('사이문구','사이'));
+  assert.deepEqual(after.fields,expectedFields([3,1]));assert.deepEqual(after.anchors,[25,31,32]);assert.deepEqual(after.styles,before.styles);
+  await undo();assert.deepEqual(await inspect(),prefix);
+  await execute('edit:redo');assert.deepEqual(await inspect(),after);
+  await saveAndReopen(f,'field-prefix',format);await canvas();same(await inspect(),after);
+  const offsets=[9,12,16,19,25,31,32],units=[10,22,34,45,59,73,82];
+  assert.deepEqual(inspectMixedPictureFields(resolve(out,'field-prefix.'+format)),raw.map(c=>c.row===1&&c.col===1?{...c,text:after.text,
+   slots:c.slots.map((slot,i)=>({...slot,offset:offsets[i],utf16Offset:units[i]}))}:c));
+ });
  for(const format of ['hwp','hwpx'])await scenario(format+' picture-field stored ClickHere and pictures retain full identity through chat undo redo save reopen',async()=>{
   const source=await createPictureFieldParagraph(HwpDocument,resolve(out,'mixed-'+format));
   const original=resolve(out,'picture-field-before.'+format);

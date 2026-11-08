@@ -4,14 +4,23 @@ export async function applyStyleFlowPatches({root}){
  const edit=async(file,fn)=>{const p=join(root,'src',file);await writeFile(p,fn((await readFile(p,'utf8')).replace(/\r\n/g,'\n')));};
  const replace=(s,b,a)=>{if(s.split(b).length!==2)throw new Error('Style flow seam drift: '+b);return s.replace(b,a);};
  await edit('engine/input-handler.ts',s=>{
-  s="import {captureStoredCharacterStyle} from '../jueony/adapters/rhwp/character-style-reference.ts';\nimport {applySelectedCharacterStyle} from '../jueony/adapters/rhwp/style-flow.ts';\n"+s;
-  return replace(s,'  applyStyle(styleId: number): void {\n    try {',`  applyStyle(styleId: number): void {
+  s="import {storeCharacterStyleUiSelectionN012,consumeCharacterStyleUiSelectionN012} from '../jueony/adapters/rhwp/stored-character-style-ui-consumer-n012.ts';\nimport type {StoredCharacterStyleUiTokenN012} from '../jueony/adapters/rhwp/stored-character-style-ui-consumer-n012.ts';\n"+s;
+  s=replace(s,'  applyStyle(styleId: number): void {\n    try {',`  applyStyle(styleId: number): void {
     const style=this.wasm.getStyleList().find(s=>s.id===styleId);
     if(style?.type===1){
-      if(applySelectedCharacterStyle(this,this.wasm,captureStoredCharacterStyle(this.wasm,styleId)))return;
+      const stored=storeCharacterStyleUiSelectionN012(this.wasm,styleId);
+      if(stored.status!=='stored')throw new Error('저장 글자 스타일을 최신 목록에서 다시 선택하세요.');
+      if(this.applyStoredCharacterStyleUiSelectionN012(stored.token))return;
       this.applyCharFormat(this.wasm.getStyleDetail(styleId).charProps);return;
     }
     try {`);
+  return replace(s,'  applyStyle(styleId: number): void {',`  private applyStoredCharacterStyleUiSelectionN012(token: StoredCharacterStyleUiTokenN012): boolean {
+    const result=consumeCharacterStyleUiSelectionN012(this,this.wasm,token);
+    if(result.status==='rejected')throw new Error('저장 글자 스타일을 최신 목록에서 다시 선택하세요.');
+    return result.status==='applied';
+  }
+
+  applyStyle(styleId: number): void {`);
  });
  await edit('engine/command.ts',s=>{
   s="import {nextParagraphStyle} from '../jueony/adapters/rhwp/style-flow.ts';\n"+s;

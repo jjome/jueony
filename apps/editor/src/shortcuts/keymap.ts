@@ -119,6 +119,12 @@ export const hangulBindings: Binding[] = [
 ];
 export type Key = Pick<KeyboardEvent, 'key' | 'code' | 'ctrlKey' | 'altKey' | 'shiftKey' | 'metaKey' | 'repeat' | 'isComposing'> & Partial<Pick<KeyboardEvent, 'getModifierState'>>;
 export type KeyContext = { table: boolean; cells: boolean; object: boolean };
+/**
+ * A restored or nested editor state can briefly expose more than one context
+ * flag. Object selection is the most explicit target, followed by a cell
+ * block, a table caret, and finally the document fallback.
+ */
+export const keyContextPriority: readonly Scope[] = ['object', 'cells', 'table', 'document'];
 export function keyStroke(e: Key): string {
   const code = e.code ?? '';
   const key = /^Key[A-Z]$/.test(code) ? code.slice(3) : /^Digit\d$/.test(code) ? code.slice(5) : ({ BracketLeft: '[', BracketRight: ']', Equal: '=', Minus: '-', Space: 'Space' } as Record<string, string>)[code] ?? (e.key === ' ' ? 'Space' : e.key.length === 1 ? e.key.toUpperCase() : e.key);
@@ -152,6 +158,10 @@ export class HangulKeyResolver {
   }
   private find(keys: string, ctx: KeyContext) {
     const candidates = hangulBindings.filter(b => b.keys === keys && (b.scope === 'document' || ctx[b.scope]));
-    return candidates.find(b => b.scope !== 'document') ?? candidates[0];
+    for (const scope of keyContextPriority) {
+      const found = candidates.find(binding => binding.scope === scope);
+      if (found) return found;
+    }
+    return undefined;
   }
 }

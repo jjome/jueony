@@ -9,9 +9,9 @@
 | N011 | 평면 스타일 JSON 가져오기·내보내기·언어별 글꼴·이름 충돌·다음 스타일 순환·중간 실패 전체 롤백 | HWP/HWPX 저장·재열기를 포함한 `style-package.test.ts` 2/2 | 번호·개요·탭·테두리·배경·특수 영역·UI·Agent·한글 비교 |
 | N013 | 기관 프로필 v1 검증·갤러리/번호키 충돌·손상/상위 버전/쓰기 실패 보호·정확한 이름 해석 | 프로필·기본 스타일 단축키 테스트 6/6 | portable package UI·Agent·한글 비교 |
 | N014 / G091 | 단일 root Rectangle의 0~359° 정수 회전 커서·정/역방향 선택 복원·회전각 변경 시 stale 복원 차단 | 단위 9/9·실제 WASM HWP/HWPX 9/9 | 그룹·중첩·캡션·뒤집기·비-Rectangle·신규 Edge 빌드·한글 비교 |
-| N015 | root vector shape 2~32개와 중첩 group 선택의 순서/활성 개체·소유 구조·개체/문서 지문·stale 차단을 SessionCursor/Studio capture·restore wire에 연결 | 실제 WASM HWP/HWPX 4/4·root 재검증 31 pass/기존 2 skip·격리 build 666 modules·해당 프로필 TypeScript 통과 | **부분 유지:** 이미지/수식/OLE/표/특수 story 등 비벡터 선택·브라우저 재시작·한글 비교 |
+| N015 | root vector shape 2~32개·중첩 group과 검증된 상위 embedded 이미지 2개 이상의 선택 순서/활성 개체·owner/개체/문서 지문·stale 차단을 SessionCursor/Studio capture·restore wire에 연결 | 선택 검증 28/28·embedded 다중 이미지 HWP/HWPX 저장·재열기·byte invariant | **부분 유지:** equation/OLE/table·nested/caption/locked/linked image·실제 앱 재시작·한글 비교 |
 | N016 | root-body 미주의 owner·note locator·3중 지문·Unicode 커서/방향성 선택·각주 분리와 SessionCursor·Studio callback 연결 | root 선택 8/8·실제 WASM HWP/HWPX 4/4·격리 build 671 modules·TypeScript 통과 | **부분 유지:** 실제 앱 재시작·한글 직접 비교·중첩/표/도형 note·필드/삽입 개체 |
-| N017 | read-only diagnostic→typed startup gate→memory-only activation을 연결하고 missing은 비영속 기본값으로 활성화하며 corrupt/future/read-error는 키별 차단·scope/backup projection만 허용 | N017/N018/N044 통합 59/59·strict TypeScript·모듈 경계 455 files diagnostics 0 | **부분 유지:** 실제 shell boot 주입·facade consumer·Windows/한글/origin/DPI 수명 실측 미연결 |
+| N017 | read-only diagnostic→typed startup gate→memory-only activation→read-only runtime facade를 연결해 값 복사와 scope/backup projection만 노출하고 blocked/unknown key는 fail-closed | N015/N017 공동 선별 검사를 포함한 28/28·strict TypeScript·모듈 경계 diagnostics 0 | **부분 유지:** 실제 shell boot 주입·UI/facade consumer migration·Windows/한글/origin/DPI 수명 실측 미연결 |
 | N020 | 증거 수집→정책→최대 1회 refresh→activate→post evidence 재검증→semantic input의 fail-closed coordinator | 정책·coordinator 19/19·strict TypeScript 통과 | **부분 유지:** 실제 host/Computer Use 관찰·실행 경로 미연결·실제 한글 대화상자 재검증 미실행 |
 | N018 | live 관찰→continuity 정책과 atomic history port capability gate를 연결해 정확한 top recipe retain·verified save rebase만 허용하고 reload/recovery/named history/document swap/process restart/manual edit/top mismatch에는 원자 reset·bridge 실패에는 state-uncertain | N017/N018/N044 통합 59/59·strict TypeScript·모듈 경계 455 files diagnostics 0 | **부분 유지:** upstream InputHandler atomic bridge·실제 runtime/process restart 통합 미연결 |
 | N004 | 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset 일치·가운데 정렬 재조판·실패 시 exact rollback | HWP/HWPX 네이티브 저장·재열기·undo/redo·4개 fault rollback 및 Edge 실제 편집→bound-save→UI 재열기 | 임의 필드 경계·중첩 셀·복합 개체·한글 비교 |
@@ -21,7 +21,7 @@
 | N041 | 자체 생성한 본문·명시 글꼴, 2쪽 경계·용지, 표·셀, 내장 PNG, 본문 누름틀의 5종 manifest를 HWP/HWPX 입력 10개로 만들고 open→같은 형식 save→reopen; production preservation evidence·published layout 0.2 허용치·기능 최소조건·입력 SHA 불변을 fail-closed 검사 | custom Rust/WASM `source-c932adab64d8bc4e`에서 10/10·manifest 계약/위조 거절 3/3·구문/diff 검사 통과 | **부분 유지:** 같은 엔진의 합성 문서 기술 검수이며 실제 한글 2024 화면·인쇄·복구 경고, 기관 실문서·공개 문서 코퍼스 독립 비교는 미실행 |
 | N042 | 같은 글꼴·DPI·용지와 실제 page definition을 봉인한 published layout baseline에서 쪽 수·텍스트 재조판·개체 위치 차이를 분류하고 교차 생산자·글꼴 SHA-256이 없으면 차단 | 계약 4/4·2쪽 표/그림/필드 복합 HWP/HWPX baseline 2/2 | **부분 유지:** Jueony 엔진 baseline일 뿐 실제 한글 2024·PDF raster·인쇄 드라이버·실제 글꼴 바이너리 비교는 미실행 |
 | N043 | preflight→temp write/flush→final probe/revalidate→atomic compare-replace/readback coordinator와 race replace 0회·실패 cleanup·committed 후 `save-state-uncertain`/reopen 분류 | 정책·coordinator 15/15·strict TypeScript 통과 | **부분 유지:** 실제 Windows picker·ACL·identity 수집과 Rust/Tauri host 원자 교체/readback·실파일 Windows 검증 미연결 |
-| N044 | 별도 v1 checkpoint·IndexedDB CAS를 document open→periodic checkpoint→verified save rebase→clean close lifecycle로 조립해 source identity/revision/bytes hash·generation/token을 유지하고 stale·overlap·host uncertain·중복 close를 fail-closed 처리하며 exact checkpoint만 삭제 | N017/N018/N044 통합 59/59·strict TypeScript·모듈 경계 455 files diagnostics 0 | **부분 유지:** 실제 app boot/shell 주입·real browser blocked/versionchange·Tauri/비정상 종료 실파일 복구·Windows 검증 미연결 |
+| N044 | 별도 v1 checkpoint·IndexedDB CAS와 document lifecycle을 실제 설치 Edge 157 격리 IndexedDB에서 commit·strict transaction complete·CAS conflict·blocked/versionchange fail-closed 분류까지 검증 | 실제 Edge 3 scenarios PASS·page/console/external/missing resource 모두 0 | **부분 유지:** 실제 app boot/shell 주입·Tauri/Windows 비정상 종료·사용자 문서 복구 미연결 |
 | N045 | 로컬 WASM·런타임·폰트·third-party notices·hash·기관 endpoint allowlist와 외부 URL을 fail-closed 감사 | 계약 4/4; 실제 격리 dist에서 CDN 글꼴 URL 269개를 검출해 `FAIL_OFFLINE_BUNDLE` | **부분 유지·배포 차단:** CDN 글꼴 로컬화·WebView2 포함 최종 설치본·기관 allowlist 확정·고지 합본 검수 필요 |
 | N005 | 보이지 않는 0길이 이웃 ClickHere의 셀 분할 이동을 앱·Rust에서 차단하고 guide-only 0길이 필드는 유지 | HWP/HWPX 저장·재열기 2/2·관련 회귀 32/32 | 겹친 필드·개체 혼합 셀·캡션 내부 필드·한글 비교 |
 | N011 추가 | 문단 테두리 동작 플래그 `borderConnect`·`borderIgnoreMargin`의 portable style 교환·전체 롤백 | HWP/HWPX 가져오기→저장→재열기 2/2 | TabDef·실제 BorderFill·배경·간격·UI·한글 비교 |
@@ -91,6 +91,10 @@ node --experimental-strip-types --test apps/editor/tests/indexeddb-recovery-chec
 19 tests passed; module boundary audit passed separately
 npm test -- tests/preference-startup-gate-n017.test.ts tests/preference-memory-activation-n017.test.ts tests/undo-lifetime.test.ts tests/undo-lifecycle-coordinator-n018.test.ts tests/undo-history-port-n018.test.ts tests/recovery-checkpoint-transaction-n044.test.ts tests/indexeddb-recovery-checkpoint-n044.test.ts tests/recovery-checkpoint-lifecycle-n044.test.ts
 59 tests passed; strict TypeScript passed for the three committed source files and module boundary audit passed with 455 files and 0 diagnostics
+N015/N017 committed selected verification bundle (embedded image selection + read-only preference runtime and regressions)
+28 tests passed; strict TypeScript and module boundary audit passed with 0 diagnostics
+node apps/editor/scripts/verify-recovery-checkpoint-browser-n044.mjs
+Edge 157 IndexedDB 3 scenarios passed; page/console/external/missing resource arrays were all empty
 JUEONY_ENGINE_PACKAGE=build/rhwp-engine/source-4843b7d7aa6cc842/pkg npm test -- tests/insert-placeholder-capability-n019.test.ts
 5 tests passed; actual HWP/HWPX export/reopen remained unchanged
 npm test -- tests/menu-reachability-audit.test.ts
@@ -175,6 +179,9 @@ B071 Edge 검수에서는 차트 시나리오의 page 오류·console 오류·�
 - `88fb3974 feat(editor): activate safe preference defaults in memory`
 - `c8635b9b feat(editor): gate undo lifecycle through atomic history port`
 - `4ef8c385 feat(editor): coordinate recovery checkpoints across document lifecycle`
+- `24bc5eb6 feat(editor): expose read only preference runtime`
+- `2d486daf feat(editor): restore verified multi image selections`
+- `7ab73783 test(editor): verify recovery checkpoints in browser`
 - `2bd2c75b feat(editor): preserve portable style references`
 - `4ea193ce feat(editor): delete verified page hide controls`
 - AI·Agent 실행과 참고 자료·검색·RAG 코드는 이 묶음에서 변경하지 않았다.

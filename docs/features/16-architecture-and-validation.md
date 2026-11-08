@@ -410,11 +410,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 별도 v1 checkpoint record와 IndexedDB CAS adapter를 document open→periodic checkpoint→verified save rebase→clean close lifecycle로 조립해 source identity/revision/bytes hash와 generation/token을 유지하고 stale·overlap·host uncertain·중복 close를 fail-closed 처리하며 exact checkpoint만 삭제
-- 다음 작업: N017/N018/N044 통합 선별 검사 59/59와 strict TypeScript·모듈 경계 455 files diagnostics 0을 통과했다. 실제 app boot/shell 주입과 실제 browser blocked/versionchange·Tauri/비정상 종료 실파일 복구·Windows 검증은 남아 부분이다.
+- 완료 범위: 별도 v1 checkpoint·IndexedDB CAS와 document lifecycle을 실제 설치 Edge 157의 격리 IndexedDB에서 commit·strict transaction complete·CAS conflict·blocked/versionchange fail-closed 분류까지 검증
+- 다음 작업: 실제 Edge 3 scenarios PASS이며 page/console/external/missing resource가 모두 0이었다. 실제 app boot/shell 주입과 Tauri/Windows 비정상 종료·사용자 문서 복구는 남아 부분이다.
 - 상위 항목: [B010](<05-files-storage-recovery.md#b010>) 저장
-- 근거: [37-basic-editing-state-result.md](<../37-basic-editing-state-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [indexeddb-recovery-checkpoint-n044.ts](<../../apps/editor/src/adapters/storage/indexeddb-recovery-checkpoint-n044.ts>) · [indexeddb-recovery-checkpoint-n044.test.ts](<../../apps/editor/tests/indexeddb-recovery-checkpoint-n044.test.ts>) · [recovery-checkpoint-lifecycle-n044.ts](<../../apps/editor/src/composition/recovery-checkpoint-lifecycle-n044.ts>) · [recovery-checkpoint-lifecycle-n044.test.ts](<../../apps/editor/tests/recovery-checkpoint-lifecycle-n044.test.ts>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;RECOVERY_CHECKPOINT_TRANSACTION_2026_11_09;INDEXEDDB_RECOVERY_CHECKPOINT_CAS_2026_11_09;RECOVERY_CHECKPOINT_LIFECYCLE_2026_11_09`
+- 근거: [37-basic-editing-state-result.md](<../37-basic-editing-state-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [indexeddb-recovery-checkpoint-n044.ts](<../../apps/editor/src/adapters/storage/indexeddb-recovery-checkpoint-n044.ts>) · [recovery-checkpoint-lifecycle-n044.ts](<../../apps/editor/src/composition/recovery-checkpoint-lifecycle-n044.ts>) · [verify-recovery-checkpoint-browser-n044.mjs](<../../apps/editor/scripts/verify-recovery-checkpoint-browser-n044.mjs>) · [recovery-checkpoint-browser-n044.ts](<../../apps/editor/scripts/fixtures/recovery-checkpoint-browser-n044.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;RECOVERY_CHECKPOINT_TRANSACTION_2026_11_09;INDEXEDDB_RECOVERY_CHECKPOINT_CAS_2026_11_09;RECOVERY_CHECKPOINT_LIFECYCLE_2026_11_09;EDGE_INDEXEDDB_RECOVERY_VERIFICATION_2026_11_09`
 
 </details>
 

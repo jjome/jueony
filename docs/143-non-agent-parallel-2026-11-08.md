@@ -28,6 +28,10 @@
 | N006 추가 | 기존 위/아래 캡션의 정확히 하나인 빈 문단을 검증된 path·문단/글자 서식으로 채움 | HWP/HWPX 저장·재열기·undo 포함 8/8·회귀 4/4 | 캡션 생성·여러 빈 문단·좌우·혼합 서식·필드·개체 |
 | N013 추가 | 저장된 번호키 profile을 현재 catalog digest·ID·이름·종류·source에 맞춰 read-only resolve | HWP/HWPX 재열기 후보·bytes 불변·stale/충돌 포함 3/3 | post-apply digest 생산 연결·실제 keymap/UI·Agent |
 | N021 조사 | Ctrl+N,P 쪽 번호 매기기와 기존 새 번호 시작 명령을 구분하고 현재 API 부재 확인 | 단축키 회귀 11/11·코드 무변경 | Rust PageNumberPos 원자 API·WASM bridge·대화상자·명령 연결 |
+| N006 추가 | 단일 캡션 문단의 연속 2~128개 글자 run을 동일 길이 BMP 텍스트로 교체하고 기존 run 경계·charShapeId·위치·인접 중첩 표 배치를 보존 | 기본 엔진 fail-closed 2/2·Jueony 패치 엔진 HWP/HWPX 저장·재열기·undo 10/10·회귀 4/4·TypeScript compile | 길이 변화·surrogate/emoji·제어문자·좌우 캡션·필드·책갈피·개체 |
+| N013 추가 | import 후 현재 catalog digest와 style ID·이름·종류·source를 원자적 shortcut 설정에 결합하고 저장 단계별 실패 상태를 rollback/applied/disconnected로 구분 | HWP/HWPX 재열기 consumer 연결과 실패 복구 14/14·TypeScript compile | 실제 keymap/UI·Agent·한글 비교 |
+| N021 조사 | 한글 스크립트 매크로와 기존 AI 명령 템플릿을 구분하고 Studio command/input recording 계약 부재 확인 | 단축키 회귀 11/11·코드 무변경 | dispatcher 성공 이벤트·IME/선택 기록·recordable capability·revision preflight·단일 undo/부분 실패 rollback·녹화 UI/저장 |
+| B046 | 앱 보기 설정 `pageOutline`·메뉴·상태바·탭 간 동기화와 page gap·canvas shadow를 단일 렌더 트랜잭션으로 토글 | HWP/HWPX 바이트 비변경·재열기·설정 backup·고정 upstream 통합 patch 11/11·TypeScript compile | 기존 format-dialog seam drift 해소 후 전체 build·한글 직접 비교 |
 
 ## 실행한 선별 검사
 

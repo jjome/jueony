@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 7/11 · 부분 3 · 재점검 1 | 완료 0/30 · 부분 18 · 미구현 12 |
-| 검증 | 완료 4/11 · 부분 5 · 미검증 2 | 완료 0/30 · 부분 2 · 미검증 28 |
+| 구현 | 완료 7/11 · 부분 3 · 재점검 1 | 완료 1/30 · 부분 18 · 미구현 11 |
+| 검증 | 완료 4/11 · 부분 5 · 미검증 2 | 완료 0/30 · 부분 3 · 미검증 27 |
 | Agent 연결 | 연결 🟢 **1/1** · 부분 0 · 해당 없음 10 | 연결 0/30 · 부분 0 · 미연결 30 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -22,7 +22,7 @@
 
 - **구현** [N019](<12-ui-and-shortcuts.md#n019>) **한글의 모든 리본·빠른 메뉴·문맥 메뉴 비교** — 정적 메뉴·리본·빠른 도구·본문/표/개체 문맥 메뉴의 command reachability를 감사해 미등록·동일 위치 중복 0건을 확인했다. 실제 placeholder insert:comment·insert:para-band 2건을 안정 ID로 기록했고 선별 15/15를 통과했다. 동적 disabled 조건·두 placeholder 구현·한글 비교는 남아 부분이다.
 - **재점검** [N020](<12-ui-and-shortcuts.md#n020>) **한글 대화상자 활성화 오류 재현·해결** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- **구현** [N021](<12-ui-and-shortcuts.md#n021>) **본문/표/특수 영역 전체 단축키 매트릭스** — 177개 binding 감사·명시적 문맥 우선순위·Ctrl+- 글자 스타일 해제를 구현했다. 쪽 번호 매기기는 새 번호로 시작과 다른 기능이며 현재 엔진에 PageNumberPos 생성·수정·삭제 API와 대화상자가 없어 pending을 유지한다. 매크로 pending과 셀/특수 story·혼합 run·한글 비교도 남아 부분이다.
+- **구현** [N021](<12-ui-and-shortcuts.md#n021>) **본문/표/특수 영역 전체 단축키 매트릭스** — 177개 binding 감사·명시적 문맥 우선순위·Ctrl+- 글자 스타일 해제를 구현했다. 쪽 번호는 PageNumberPos 원자 API가 없어 pending이다. 스크립트 매크로도 dispatcher 성공 이벤트·IME/선택 기록·revision preflight·단일 undo/rollback 계약이 없어 pending이며 기존 AI 명령 매크로와 구분한다. 셀/특수 story·혼합 run·한글 비교도 남아 부분이다.
 
 ## 기능별 작업표
 
@@ -49,7 +49,7 @@
 | [B043](<12-ui-and-shortcuts.md#b043>) · 범위 | 조판 부호 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B044](<12-ui-and-shortcuts.md#b044>) · 범위 | 문단 부호 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B045](<12-ui-and-shortcuts.md#b045>) · 범위 | 투명 선 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B046](<12-ui-and-shortcuts.md#b046>) · 범위 | 쪽 윤곽 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B046](<12-ui-and-shortcuts.md#b046>) · 범위 | 쪽 윤곽 | ☑ 완료 | ◐ 부분 | ☐ 미연결 |
 | [B047](<12-ui-and-shortcuts.md#b047>) · 범위 | 교정 부호·그림 표시 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B048](<12-ui-and-shortcuts.md#b048>) · 범위 | 메모 표시·안내선 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 
@@ -220,12 +220,12 @@
 <summary>B046 · 쪽 윤곽</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 페이지 여백 숨김 경로 대조 필요
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 앱 보기 설정·메뉴·상태바·탭 간 동기화와 page gap·canvas shadow를 한 렌더 트랜잭션으로 토글한다. 문서 revision·dirty·undo·저장 bytes에는 관여하지 않는다.
+- 다음 작업: HWP/HWPX 바이트 비변경·재열기와 고정 upstream 통합 patch 11/11을 통과했다. 전체 build는 기존 format-dialog seam drift로 이 patch 전 단계에서 막혀 있고 한글 직접 비교는 남았다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `PAGE_OUTLINE_VIEW_2026_11_09;PARTIAL_VERIFICATION`
 
 </details>
 
@@ -676,10 +676,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한컴 기본 매핑·선택/IME/대화상자/OS 예약키 조합
-- 다음 작업: 177개 binding 감사·명시적 문맥 우선순위·Ctrl+- 글자 스타일 해제를 구현했다. 쪽 번호 매기기는 새 번호로 시작과 다른 기능이며 현재 엔진에 PageNumberPos 생성·수정·삭제 API와 대화상자가 없어 pending을 유지한다. 매크로 pending과 셀/특수 story·혼합 run·한글 비교도 남아 부분이다.
+- 다음 작업: 177개 binding 감사·명시적 문맥 우선순위·Ctrl+- 글자 스타일 해제를 구현했다. 쪽 번호는 PageNumberPos 원자 API가 없어 pending이다. 스크립트 매크로도 dispatcher 성공 이벤트·IME/선택 기록·revision preflight·단일 undo/rollback 계약이 없어 pending이며 기존 AI 명령 매크로와 구분한다. 셀/특수 story·혼합 run·한글 비교도 남아 부분이다.
 - 상위 항목: [B169](<08-tables.md#b169>) 첫 셀·셀 블록
 - 근거: [16-hangul-shortcuts-plan.md](<../16-hangul-shortcuts-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SHORTCUT_CONTEXT_AUDIT_2026_11_08;CLEAR_CHARACTER_STYLE_2026_11_09;PAGE_NUMBER_API_BLOCKER_2026_11_09`
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SHORTCUT_CONTEXT_AUDIT_2026_11_08;CLEAR_CHARACTER_STYLE_2026_11_09;PAGE_NUMBER_API_BLOCKER_2026_11_09;MACRO_RECORDING_API_BLOCKER_2026_11_09`
 
 </details>
 

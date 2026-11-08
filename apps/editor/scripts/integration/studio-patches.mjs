@@ -236,6 +236,24 @@ caretInput = replaceOnce(caretInput, '  getCursorPosition(): DocumentPosition { 
         this.cursor.enterPictureObjectSelectionDirect(ref.sec,ref.ppi,ref.ci,'image');
         this.updateCaret();this.eventBus.emit('picture-object-selection-changed',true);this.eventBus.emit('command-state-changed');return true;
       },
+      restoreSessionObjectSelection: (refs: import('../jueony/modules/preferences/public/index.ts').RestorableObjectRef[]) => {
+        if(!Array.isArray(refs)||refs.length<1||refs.length>32)return false;
+        try{
+          this.cursor.clearSelection();this.cursor.exitCellSelectionMode();this.cursor.exitTableObjectSelection();this.cursor.exitPictureObjectSelection();
+          for(let index=0;index<refs.length;index++){
+            const ref=refs[index];
+            if(index===0)this.cursor.enterPictureObjectSelectionDirect(ref.section,ref.paragraph,ref.control,ref.type);
+            else this.cursor.togglePictureObjectSelection(ref.section,ref.paragraph,ref.control,ref.type);
+          }
+          const restored=this.cursor.getSelectedPictureRefs();
+          if(restored.length!==refs.length||!refs.every((ref,index)=>{const actual=restored[index];return actual?.sec===ref.section&&actual.ppi===ref.paragraph&&actual.ci===ref.control&&actual.type===ref.type;})){
+            this.cursor.exitPictureObjectSelection();return false;
+          }
+          this.renderPictureObjectSelection();this.updateCaret();this.eventBus.emit('picture-object-selection-changed',true);this.eventBus.emit('command-state-changed');return true;
+        }catch{
+          this.cursor.exitPictureObjectSelection();return false;
+        }
+      },
       restoreSessionTableObject: (ref: {sec:number;ppi:number;ci:number}) => {
         this.cursor.clearSelection(); this.cursor.exitCellSelectionMode();
         this.cursor.moveTo({sectionIndex:ref.sec,paragraphIndex:ref.ppi,charOffset:0});

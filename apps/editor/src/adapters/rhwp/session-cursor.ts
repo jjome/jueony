@@ -1,5 +1,7 @@
 import {readSessionHeaderFooterStory,readSessionFootnoteStory} from './session-story.ts';
 import {captureTextBoxCursor,restoreTextBoxCursor} from './session-textbox.ts';
+import {captureObjectSelection,restoreObjectSelection} from './session-object-selection.ts';
+import type {RestorableObjectRef} from './session-object-selection.ts';
 import type {TextBoxBookmark} from '../../modules/preferences/public/index.ts';
 import {sha256} from '@noble/hashes/sha2.js';
 import {validateBodyCaret, validateSessionCursor} from '../../modules/preferences/public/index.ts';
@@ -12,13 +14,15 @@ export type SessionCursorInput = {
   restoreSessionSelection(focus:Position,anchor:Position|undefined,phase:number|null,block:Block|undefined):boolean;
   restoreSessionTableObject?(ref:{sec:number;ppi:number;ci:number}):boolean;
   restoreSessionPictureObject?(ref:{sec:number;ppi:number;ci:number;type:'image'}):boolean;
+  restoreSessionObjectSelection?(refs:RestorableObjectRef[]):boolean;
   restoreSessionHeaderFooter?(saved:HeaderFooterBookmark):boolean;
   restoreSessionFootnote?(saved:FootnoteBookmark):boolean;
   restoreSessionTextBox?(saved:TextBoxBookmark):boolean;
   cursor:{hasSelection():boolean;getSelection():{anchor:Position;focus:Position}|null;blockSelectionPhase():number|null;captureCellSelection():Block|null;
     isInHeaderFooter():boolean;isInFootnote():boolean;isInTextBox():boolean;isInTableObjectSelection():boolean;isInPictureObjectSelection():boolean;
     getSelectedTableRef?():{sec:number;ppi:number;ci:number;cellPath?:unknown[]}|null;
-    getSelectedPictureRef?():{sec:number;ppi:number;ci:number;type:string;cellIdx?:number;cellPath?:unknown[];headerFooter?:unknown;noteRef?:unknown;missing?:boolean}|null;
+    getSelectedPictureRef?():{sec:number;ppi:number;ci:number;type:string;cellIdx?:number;cellParaIdx?:number;outerTableControlIdx?:number;cellPath?:unknown[];headerFooter?:unknown;noteRef?:unknown;missing?:boolean;pageIndex?:number}|null;
+    getSelectedPictureRefs?():{sec:number;ppi:number;ci:number;type:string;cellIdx?:number;cellParaIdx?:number;outerTableControlIdx?:number;cellPath?:unknown[];headerFooter?:unknown;noteRef?:unknown;missing?:boolean;pageIndex?:number}[];
     isMultiPictureSelection?():boolean;
     readonly headerFooterMode?:'none'|'header'|'footer';readonly hfSectionIdx?:number;readonly hfApplyTo?:number;readonly hfParaIdx?:number;readonly hfCharOffset?:number;
     getHeaderFooterSelectionOrdered?():{start:{sectionIdx:number;isHeader:boolean;applyTo:number;paraIdx:number;charOffset:number};end:{sectionIdx:number;isHeader:boolean;applyTo:number;paraIdx:number;charOffset:number}}|null;
@@ -190,6 +194,10 @@ export function captureSessionCursor(input:SessionCursorInput|undefined):Session
   }catch{return;}
   return;
  }
+ if(input?.cursor.isInPictureObjectSelection()&&input.restoreSessionObjectSelection){
+  const saved=captureObjectSelection(input);
+  if(saved)return validateSessionCursor(saved);
+ }
  if(input?.cursor.isInPictureObjectSelection()&&input.restoreSessionPictureObject&&!input.wasm.requiresPasswordForSave
    &&!input.cursor.isInHeaderFooter()&&!input.cursor.isInFootnote()&&!input.cursor.isInTextBox()&&!input.cursor.isMultiPictureSelection?.()){
   try{
@@ -228,6 +236,7 @@ export function captureSessionCursor(input:SessionCursorInput|undefined):Session
 export function restoreSessionCursor(input:SessionCursorInput|undefined,value:unknown):boolean{
  const saved=validateSessionCursor(value);if(!input||!saved)return false;
  if(saved.kind==='textbox')return restoreTextBoxCursor(input,saved);
+ if(saved.kind==='object-selection')return restoreObjectSelection(input,saved);
  if(saved.kind==='header-footer'||saved.kind==='footnote'){
   if(input.wasm.requiresPasswordForSave||input.cursor.isInTextBox()||input.cursor.isInTableObjectSelection()||input.cursor.isInPictureObjectSelection())return false;
   try{

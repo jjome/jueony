@@ -4,7 +4,8 @@ import { captureSessionCursor, restoreSessionCursor } from './session-cursor.ts'
 
 /** One live-document history, discarded on swap; never written to a file or storage. */
 export function installNavigationHistory(registry: any, input: () => any, eventBus: any) {
-  const history = createNavigationHistory<SessionCursor>(value => JSON.stringify(value));
+  type NavigationCursor = Extract<SessionCursor, {kind:'text'}>;
+  const history = createNavigationHistory<NavigationCursor>(value => JSON.stringify(value));
   let timer: ReturnType<typeof setTimeout> | undefined, traveling = false;
   let generation: number | undefined;
   function atStoredPoint() {

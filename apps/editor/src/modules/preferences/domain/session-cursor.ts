@@ -1,8 +1,24 @@
 import {validateTextBoxBookmark} from './textbox-bookmark.ts';
-import type { SessionCursor, SessionPoint, SessionCellPath, CellBlockBookmark } from '../public/contracts.ts';
+import type { SessionCursor, SessionPoint, SessionCellPath, CellBlockBookmark, ObjectSelectionBookmark, ObjectSelectionEntry } from '../public/contracts.ts';
 import {validateBodyCaret} from './body-caret.ts';
 const integer = (value: unknown): value is number => Number.isSafeInteger(value) && (value as number) >= 0 && (value as number) <= 2147483647;
 const digest = (value: unknown): value is string => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
+function objectSelection(value:any):ObjectSelectionBookmark|undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value) || value.version !== 1 || value.kind !== 'object-selection'
+    || !Array.isArray(value.objects) || value.objects.length < 1 || value.objects.length > 32
+    || !integer(value.active) || value.active !== value.objects.length - 1 || !digest(value.documentFingerprint)) return;
+  const objects:ObjectSelectionEntry[]=[];
+  const keys=new Set<string>();
+  for (const item of value.objects) {
+    if (!item || typeof item !== 'object' || Array.isArray(item) || !integer(item.section) || !integer(item.paragraph)
+      || !integer(item.control) || !['shape','group'].includes(item.type) || !digest(item.objectFingerprint)) return;
+    const key=`${item.section}:${item.paragraph}:${item.control}:${item.type}`;
+    if(keys.has(key))return;keys.add(key);
+    objects.push({section:item.section,paragraph:item.paragraph,control:item.control,type:item.type,objectFingerprint:item.objectFingerprint});
+  }
+  if(objects.length===1&&objects[0].type!=='group')return;
+  return {version:1,kind:'object-selection',objects,active:value.active,documentFingerprint:value.documentFingerprint};
+}
 function point(value: any): SessionPoint | undefined {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return;
   const caret = validateBodyCaret(value.caret); if (!caret) return;
@@ -24,6 +40,7 @@ function sameCell(a: Extract<SessionPoint,{kind:'cell'}>, b: Extract<SessionPoin
 }
 export function validateSessionCursor(value: any): SessionCursor | undefined {
   if(value?.kind==='textbox')return validateTextBoxBookmark(value);
+  if(value?.kind==='object-selection')return objectSelection(value);
   if (!value || typeof value !== 'object' || Array.isArray(value)) return;
   const focus = point(value.focus); if (!focus) return;
   if (value.kind === 'header-footer' || value.kind === 'footnote') {

@@ -50,6 +50,13 @@ export type HeaderFooterClipboardReceipt={
  readonly beforeStoryFingerprint:string;
  readonly afterStoryFingerprint:string;
 };
+export type HeaderFooterClipboardMutationGuard={
+ readonly operation:'cut'|'paste';
+ readonly replacement:string;
+ readonly selection:HeaderFooterTextSelection;
+ preflight():void;
+ verify():void;
+};
 
 type Story={owner:StoryOwner;paragraphs:string[];fingerprint:string};
 type ReceiptState={document:any;snapshot:number;owner:StoryOwner;before:Story;after:Story;consumed:boolean};
@@ -143,6 +150,13 @@ function expectedParagraphs(story:Story,selection:HeaderFooterTextSelection,repl
 function assertSeal(observed:ReturnType<typeof current>,seal:{documentIdentity:string;revision:ClipboardRevision;owner:StoryOwner;selection:HeaderFooterTextSelection;storyFingerprint:string;originalText:string},allowCollapsed:boolean){
  if(observed.identity!==seal.documentIdentity||observed.revision!==seal.revision||!same(observed.selection,seal.selection)||!same(observed.story.owner,seal.owner)||observed.story.fingerprint!==seal.storyFingerprint||selectedText(observed.story,observed.selection,allowCollapsed)!==seal.originalText)throw new Error('문서·story·revision·선택 또는 원문이 바뀌었습니다.');
 }
+function mutationGuard(session:HeaderFooterClipboardSession,operation:'cut'|'paste',seal:SourceSeal|HeaderFooterPasteTarget,replacement:string):HeaderFooterClipboardMutationGuard{
+ const initial=current(session,seal.selection);assertSeal(initial,seal,operation==='paste');const expected=expectedParagraphs(initial.story,initial.selection,replacement),owner=initial.story.owner,identity=initial.identity,rev=initial.revision;
+ return Object.freeze({operation,replacement,selection:structuredClone(initial.selection),preflight(){const observed=current(session,seal.selection);assertSeal(observed,seal,operation==='paste');},verify(){if(session.documentIdentity()!==identity||session.revision()!==rev)throw new Error('머리말/꼬리말 변경 중 문서 identity 또는 revision이 바뀌었습니다.');const collapsed:HeaderFooterTextSelection={section:owner.section,isHeader:owner.isHeader,applyTo:owner.applyTo,anchor:{paragraph:0,offset:0},focus:{paragraph:0,offset:0}},after=readStory(session.document,collapsed);if(!same(after.owner,owner)||!same(after.paragraphs,expected))throw new Error('머리말/꼬리말 치환 결과가 예상 결과와 다릅니다.');}});
+}
+export function prepareHeaderFooterCutGuard(session:HeaderFooterClipboardSession,payload:unknown):HeaderFooterClipboardMutationGuard{const valid=validateHeaderFooterClipboardPayload(payload);if(!valid)throw new Error('내부 머리말/꼬리말 클립보드 payload가 손상되었습니다.');return mutationGuard(session,'cut',valid.source,'');}
+export function prepareHeaderFooterPasteGuard(session:HeaderFooterClipboardSession,payload:unknown,target:unknown):HeaderFooterClipboardMutationGuard{const validPayload=validateHeaderFooterClipboardPayload(payload),validTarget=validateTarget(target);if(!validPayload||!validTarget||validPayload.text.length===0)throw new Error('내부 클립보드 payload 또는 붙여넣기 대상이 손상되었습니다.');return mutationGuard(session,'paste',validTarget,validPayload.text);}
+export function prepareHeaderFooterPlainPasteGuard(session:HeaderFooterClipboardSession,text:unknown,target:unknown):HeaderFooterClipboardMutationGuard{const validTarget=validateTarget(target);if(typeof text!=='string'||text.length===0||chars(text).length>100000||!validTarget)throw new Error('평문 클립보드 또는 붙여넣기 대상이 손상되었습니다.');return mutationGuard(session,'paste',validTarget,text);}
 function mutate(session:HeaderFooterClipboardSession,operation:'cut'|'paste',seal:SourceSeal|HeaderFooterPasteTarget,replacement:string):HeaderFooterClipboardReceipt{
  const observed=current(session,seal.selection);assertSeal(observed,seal,operation==='paste');const expected=expectedParagraphs(observed.story,observed.selection,replacement),range=ordered(observed.selection),snapshot=session.document.saveSnapshot();if(!integer(snapshot))throw new Error('문서 snapshot을 만들지 못했습니다.');
  try{

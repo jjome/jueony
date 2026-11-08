@@ -122,20 +122,40 @@ for(const format of ['hwp','hwpx'])test(format+' fills one existing verified bla
   }finally{doc.free();}
 });
 
-test('missing captions and multiple blank caption paragraphs remain fail closed',()=>{
+for(const format of ['hwp','hwpx'])test(format+' fills only the selected verified blank among multiple caption paragraphs',patchedOnly,()=>{
+  const fixture=uniformCaption(['','', '보존 문단']),doc=new HwpDocument(bytes(fixture,format));fixture.free();
+  try{
+    const original=bytes(doc,format),{structure,source}=editable(doc),paragraph=source.paragraphs[1],token=doc.saveSnapshot();
+    assert.deepEqual(source.paragraphs.map(value=>value.originalText),['','', '보존 문단']);
+    const before=structuredClone(source.paragraphs);
+    try{
+      replaceNestedCaptionText(doc,structure,source,{target:source.target,revision:source.revision,paragraph:1,
+        path:paragraph.path,originalText:'',text:'새 둘째 캡션'});
+      const reopened=new HwpDocument(bytes(doc,format));
+      try{
+        const next=readNestedCaptionTextSources(reopened,readStructure(reopened),'r2')[source.target];
+        assert.ok(next?.editable);
+        assert.deepEqual(next.paragraphs.map(value=>value.originalText),['','새 둘째 캡션','보존 문단']);
+        assert.deepEqual(next.paragraphs.map(value=>value.path),before.map(value=>value.path));
+        for(const index of [0,2])assert.deepEqual(next.paragraphs[index],before[index]);
+        assert.equal(next.paragraphs[1].paragraphShape,paragraph.paragraphShape);
+        assert.equal(next.paragraphs[1].style,paragraph.style);
+        assert.equal(next.paragraphs[1].charShape,paragraph.charShape);
+        assert.deepEqual(next.paragraphs[1].runs,[{startOffset:0,endOffset:Array.from('새 둘째 캡션').length,
+          charShapeId:paragraph.charShape}]);
+      }finally{reopened.free();}
+      doc.restoreSnapshot(token);assert.deepEqual(bytes(doc,format),original);
+    }finally{doc.discardSnapshot(token);}
+  }finally{doc.free();}
+});
+
+test('missing captions remain fail closed',()=>{
   const missing=labeledSubdivisionNestedTable(HwpDocument,'접수 제목',4400),missingBytes=missing.exportHwpx();
   try{
     const sources=readNestedCaptionTextSources(missing,readStructure(missing),'r1');
     assert.equal(Object.values(sources).some(value=>value.editable),false);
     assert.deepEqual(missing.exportHwpx(),missingBytes);
   }finally{missing.free();}
-  for(const format of ['hwp','hwpx'])for(const paragraphs of [['',''],['','둘째 문단']]){
-    const fixture=uniformCaption(paragraphs),doc=new HwpDocument(bytes(fixture,format));fixture.free();
-    try{
-      const sources=readNestedCaptionTextSources(doc,readStructure(doc),'r1');
-      assert.equal(Object.values(sources).some(value=>value.editable),false);
-    }finally{doc.free();}
-  }
 });
 
 test('an engine without caption-path evidence keeps every nested caption fail closed',
@@ -154,7 +174,8 @@ test('stale revision, path, original, empty text and mixed or complex captions f
     const {structure,source}=editable(doc),old=doc.exportHwpx(),paragraph=source.paragraphs[0],base={target:source.target,
       revision:source.revision,paragraph:0,path:paragraph.path,originalText:paragraph.originalText,text:'새 설명'};
     for(const edit of [{...base,revision:'stale'},{...base,originalText:'다름'},
-      {...base,path:[...base.path.slice(0,-1),{...base.path.at(-1)!,cellParaIndex:1}]},{...base,text:''}]){
+      {...base,path:[...base.path.slice(0,-1),{...base.path.at(-1)!,cellParaIndex:1}]},{...base,text:''},
+      {...base,text:'새😀설명'}]){
       assert.throws(()=>replaceNestedCaptionText(doc,structure,source,edit));assert.deepEqual(doc.exportHwpx(),old);
     }
   }finally{doc.free();}

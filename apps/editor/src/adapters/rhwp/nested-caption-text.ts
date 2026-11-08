@@ -15,7 +15,7 @@ export type NestedCaptionTextEdit={target:string;revision:string;paragraph:numbe
 const fail=()=>Error('중첩 표 캡션의 경로·원문·revision 또는 단일 글자 서식을 확인하지 못했습니다.');
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 const safeText=(text:unknown):text is string=>typeof text==='string'&&Array.from(text).length<=4000&&
-  !Array.from(text).some(c=>{const n=c.codePointAt(0)!;return n<32||n===127;});
+  !Array.from(text).some(c=>{const n=c.codePointAt(0)!;return n<32||n===127||n>0xffff;});
 const validText=(text:unknown):text is string=>safeText(text)&&Array.from(text).length>0;
 const captionPath=(table:NestedTable,paragraph:number):PathStep[]=>[...table.ancestors,
   {controlIndex:table.control,cellIndex:65534,cellParaIndex:paragraph}];
@@ -27,6 +27,33 @@ function placementEvidence(captions:ReturnType<typeof readNestedAxisCaptions>){
   };
   return {live:select(captions.drawing),portable:select(captions.portableDrawing)};
 }
+const near=(a:number,b:number)=>Math.abs(a-b)<=1e-6;
+function translatedSiblings(before:any[],after:any[]){
+  if(!Array.isArray(before)||!Array.isArray(after)||before.length!==after.length)return undefined;
+  const left=structuredClone(before),right=structuredClone(after),deltas:number[]=[];
+  for(let i=0;i<left.length;i++){
+    if(left[i]?.id!==right[i]?.id||!Array.isArray(left[i]?.boxes)||!Array.isArray(right[i]?.boxes)||
+        left[i].boxes.length!==right[i].boxes.length||!Array.isArray(left[i]?.drawing?.origin)||
+        !Array.isArray(right[i]?.drawing?.origin)||left[i].drawing.origin.length<2||right[i].drawing.origin.length<2)return undefined;
+    for(let j=0;j<left[i].boxes.length;j++){
+      const a=left[i].boxes[j]?.y,b=right[i].boxes[j]?.y;if(!Number.isFinite(a)||!Number.isFinite(b))return undefined;
+      deltas.push(b-a);delete left[i].boxes[j].y;delete right[i].boxes[j].y;
+    }
+    const a=left[i].drawing.origin[1],b=right[i].drawing.origin[1];if(!Number.isFinite(a)||!Number.isFinite(b))return undefined;
+    deltas.push(b-a);left[i].drawing.origin[1]=0;right[i].drawing.origin[1]=0;
+  }
+  if(!same(left,right))return undefined;
+  const delta=deltas[0]??0;return deltas.every(value=>near(value,delta))?delta:undefined;
+}
+function samePlacementAfterCaptionReflow(before:any,after:any){
+  const compare=(a:any,b:any)=>{
+    if(a?.page!==b?.page||!Array.isArray(a?.anchor)||!Array.isArray(b?.anchor)||a.anchor.length!==2||b.anchor.length!==2||
+        !a.anchor.every((value:any,index:number)=>Number.isFinite(value)&&Number.isFinite(b.anchor[index])&&near(value,b.anchor[index])))return undefined;
+    return translatedSiblings(a.siblings,b.siblings);
+  };
+  const live=compare(before?.live,after?.live),portable=compare(before?.portable,after?.portable);
+  return live!==undefined&&portable!==undefined&&near(live,portable);
+}
 
 function source(doc:any,structure:Structure,table:NestedTable,revision:string):EditableSource{
   if(!revision||table.ancestors.length<1)throw fail();
@@ -35,8 +62,8 @@ function source(doc:any,structure:Structure,table:NestedTable,revision:string):E
   if(!['Top','Bottom'].includes(value?.direction)||!Array.isArray(values)||!values.length||values.length>32||
       !captions.drawing||!captions.portableDrawing)throw fail();
   const paragraphs:ParagraphSource[]=values.map((paragraph:any,index:number)=>{
-    const existingSingleBlank=values.length===1&&paragraph?.text==='';
-    if((!validText(paragraph?.text)&&!existingSingleBlank)||!safeText(paragraph?.text)||
+    const existingVerifiedBlank=paragraph?.text==='';
+    if((!validText(paragraph?.text)&&!existingVerifiedBlank)||!safeText(paragraph?.text)||
         !Array.isArray(paragraph.runs)||!paragraph.runs.length||paragraph.runs.length>128||
         paragraph.runs[0]?.start_pos!==0||!Number.isSafeInteger(paragraph.paragraphShape)||
         !Number.isSafeInteger(paragraph.style)||paragraph.runs.some((run:any,i:number)=>
@@ -60,7 +87,7 @@ function source(doc:any,structure:Structure,table:NestedTable,revision:string):E
 
 export function readNestedCaptionTextSources(doc:any,structure:Structure,revision:string):Record<string,NestedCaptionTextSource>{
   return Object.fromEntries((structure.nestedTables??[]).map(table=>{try{return [table.id,source(doc,structure,table,revision)];}
-    catch{return [table.id,{editable:false,target:table.id,reason:'검증된 위/아래 중첩 표 캡션만 직접 바꿀 수 있습니다. 빈 캡션은 기존 단일 빈 문단만 채울 수 있습니다.'}];}}));
+    catch{return [table.id,{editable:false,target:table.id,reason:'검증된 위/아래 중첩 표 캡션만 직접 바꿀 수 있습니다. 빈 문단도 정확한 경로·서식을 확인한 경우에만 채웁니다.'}];}}));
 }
 
 function checked(value:unknown){if(parsed(value)?.ok!==true)throw fail();}
@@ -81,8 +108,10 @@ function normalizedStored(stored:EditableSource['stored'],target:string){
 }
 function withoutEditedParagraph(stored:EditableSource['stored'],target:string,paragraph:number){
   const normalized=normalizedStored(stored,target),entry:any=normalized.find(v=>v.id===target),value=entry?.value;
-  const item=value?.kind==='plain'?value:value?.kind==='paragraphs'?value.paragraphs?.[paragraph]:undefined;
-  if(!item)throw fail();delete item.text;delete item.lines;return normalized;
+  const items=value?.kind==='plain'?[value]:value?.kind==='paragraphs'?value.paragraphs:undefined;
+  const item=items?.[paragraph];if(!item)throw fail();
+  for(const current of items)delete current.lines;
+  delete item.text;return normalized;
 }
 
 /** Runs inside the caller's one undoable snapshot. This local token only makes
@@ -114,7 +143,7 @@ export function replaceNestedCaptionText(doc:any,structure:Structure,expected:Ne
     const checks={source:Boolean(afterSource?.editable),text:afterParagraph?.originalText===edit.text,
       path:Boolean(afterParagraph)&&same(afterParagraph!.path,currentParagraph.path),stored:afterSource?.editable&&
         same(withoutEditedParagraph(current.stored,current.target,edit.paragraph),withoutEditedParagraph(afterSource.stored,current.target,edit.paragraph)),
-      placement:afterSource?.editable&&same(current.placement,afterSource.placement),
+      placement:afterSource?.editable&&samePlacementAfterCaptionReflow(current.placement,afterSource.placement),
       documentText:before.text===after.text||singleReplacement(before.text,after.text,edit.originalText,edit.text),rest:same(before.rest,after.rest),
       resources:before.resources===after.resources};
     const failed=Object.entries(checks).find(([,ok])=>!ok)?.[0];if(failed)throw Error(fail().message+' ('+failed+')');

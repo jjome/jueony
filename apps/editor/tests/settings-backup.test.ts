@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createSettingsBackup, parseSettingsBackup, projectEditorSettings, defaultDocumentDefaults, captureSettingsVersion, importSettingsBackup, SETTINGS_BACKUP_KEYS, EDITOR_CHROME_KEY, LEGACY_STYLE_PANEL_KEY, readEditorChromePreferences } from '../src/modules/preferences/public/index.ts';
-const settings = () => ({ version: 1, font: { fontSets: [], showRecentFonts: true, recentFontCount: 3 }, theme: { mode: 'light', skin: 'default', skinChosen: true }, dialog: { picturePropsKeepRatio: true, showPdfPrintGuidance: true }, view: { showParagraphMarks: false, showControlCodes: false, clipView: true, toolbarBasic: true, toolbarFormat: true, pageArrangement: { kind: 'single' }, pageMovement: { direction: 'vertical', wheelHorizontal: true }, zoomFitMode: 'none' }, autosave: { recoveryEnabled: true, recoveryIntervalMinutes: 10, idleSaveEnabled: true, idleDelaySeconds: 10 } });
+const settings = () => ({ version: 1, font: { fontSets: [], showRecentFonts: true, recentFontCount: 3 }, theme: { mode: 'light', skin: 'default', skinChosen: true }, dialog: { picturePropsKeepRatio: true, showPdfPrintGuidance: true }, view: { showParagraphMarks: false, showControlCodes: false, clipView: true, toolbarBasic: true, toolbarFormat: true, pageOutline: true, pageArrangement: { kind: 'single' }, pageMovement: { direction: 'vertical', wheelHorizontal: true }, zoomFitMode: 'none' }, autosave: { recoveryEnabled: true, recoveryIntervalMinutes: 10, idleSaveEnabled: true, idleDelaySeconds: 10 } });
 function store(initial: [string, string][] = []) { const values = new Map(initial); return { values, getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value); }, removeItem: (key: string) => { values.delete(key); } }; }
 test('environment export is an explicit detached projection with no credential or content fields', () => {
   const source: any = settings(); source.apiKey = 'synthetic-secret'; source.view.conversation = 'synthetic-message';
@@ -11,7 +11,7 @@ test('environment export is an explicit detached projection with no credential o
 test('backup rejects bad version, broken types, large data, malformed JSON and excessive values', () => {
   const backup = createSettingsBackup(settings(), defaultDocumentDefaults());
   for (const text of ['broken', '{}', JSON.stringify({ ...backup, version: 2 }), ' '.repeat(256001)]) assert.throws(() => parseSettingsBackup(text));
-  for (const edit of [(v: any) => { v.version = 2; }, (v: any) => { v.view.toolbarBasic = 'true'; }, (v: any) => { v.autosave.idleDelaySeconds = 1; }, (v: any) => { v.view.pageArrangement = { kind: 'multiple', rows: 9, columns: 1 }; }]) { const value = settings(); edit(value); assert.throws(() => projectEditorSettings(value)); }
+  for (const edit of [(v: any) => { v.version = 2; }, (v: any) => { v.view.toolbarBasic = 'true'; }, (v: any) => { v.view.pageOutline = 'true'; }, (v: any) => { v.autosave.idleDelaySeconds = 1; }, (v: any) => { v.view.pageArrangement = { kind: 'multiple', rows: 9, columns: 1 }; }]) { const value = settings(); edit(value); assert.throws(() => projectEditorSettings(value)); }
 });
 test('import preserves local unknown fields, validates input first and refuses concurrently changed settings', () => {
   const source: any = settings(); source.futureSetting = 7; source.view.futureSetting = 9;

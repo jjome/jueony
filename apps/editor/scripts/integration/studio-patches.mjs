@@ -1,5 +1,6 @@
 import {readFile,writeFile,cp} from 'node:fs/promises';
 import {join} from 'node:path';
+import {applyPageOutlinePatches} from './page-outline-patches.mjs';
 // Pinned upstream integration only. Product policies live in modules/adapters.
 export async function applyStudioPatches({root,upstream,app}){
 function replaceOnce(text, before, after, label) {
@@ -75,12 +76,13 @@ function jueonyApplyPreferences(paths: string[]) {
   if(paths.some(path => path === 'font' || path.startsWith('font.'))) toolbar?.initFontDropdown(currentDocumentFonts);
   if (wasm.pageCount > 0) {
     applySavedTextMarkSettings();
-    if (paths.some(path => path === 'view' || /view\\.(pageArrangement|pageMovement)/.test(path))) jueonyPendingView = true;
+    if (paths.some(path => path === 'view' || /view\\.(pageArrangement|pageMovement|pageOutline)/.test(path))) jueonyPendingView = true;
     const view = userSettings.getViewSettings();
+    syncPageOutlineMenu(view.pageOutline);
     const container = document.getElementById('scroll-container');
     if (jueonyPendingView && container && container.clientWidth > 0) {
       jueonyPendingView = false;
-      eventBus.emit('page-view-settings-changed', { arrangement: view.pageArrangement, pageMovement: view.pageMovement });
+      eventBus.emit('page-view-settings-changed', { arrangement: view.pageArrangement, pageMovement: view.pageMovement, pageOutline: view.pageOutline });
       // Existing tabs own their zoom; the stored fit rule initializes new documents only.
     }
     eventBus.emit('document-view-changed');
@@ -442,5 +444,7 @@ fileSystem = replaceOnce(fileSystem,
   'const writable = await handle.createWritable();\n  await writable.write(blob);\n  await writable.close();',
   'await writeSnapshot(handle, blob);', 'save transaction guard');
 await writeFile(join(root, 'src/command/file-system-access.ts'), fileSystem);
+
+await applyPageOutlinePatches({root});
 
 }

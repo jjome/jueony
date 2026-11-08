@@ -3,7 +3,7 @@ import {sha256} from '@noble/hashes/sha2.js';
 type Position={sectionIndex:number;paragraphIndex:number;charOffset:number;parentParaIndex?:number;controlIndex?:number;cellIndex?:number;cellParaIndex?:number;cellPath?:unknown[];isTextBox?:boolean};
 type Selection={anchor:Position;focus:Position};
 
-export type RootClickHereFieldSelectionBookmarkN016={
+type RootFieldBookmark={
  version:1;
  kind:'root-clickhere-field-selection';
  fieldId:number;
@@ -16,6 +16,14 @@ export type RootClickHereFieldSelectionBookmarkN016={
  paragraphFingerprint:string;
  selectionFingerprint:string;
 };
+type CellPathEntry={controlIndex:number;cellIndex:number;cellParaIndex:number};
+type CellFieldBookmark={
+ version:1;kind:'root-clickhere-field-selection';owner:'cell';fieldId:number;section:number;parentParagraph:number;listId:number;
+ path:[CellPathEntry];start:number;end:number;direction:'forward'|'backward';ownerFingerprint:string;fieldFingerprint:string;
+ paragraphFingerprint:string;geometryFingerprint:string;selectionFingerprint:string;
+};
+export type RootClickHereFieldSelectionBookmarkN016=RootFieldBookmark|CellFieldBookmark;
+const isCellBookmark=(value:RootClickHereFieldSelectionBookmarkN016):value is CellFieldBookmark=>'owner' in value&&value.owner==='cell';
 
 export type FieldSelectionSessionInputN016={
  getCursorPosition():Position;
@@ -46,12 +54,22 @@ type NativeDocument={
  getFieldInfoAt(section:number,paragraph:number,offset:number):unknown;
  getFieldValue(fieldId:number):unknown;
  getCursorRect(section:number,paragraph:number,offset:number):unknown;
+ getCursorModel?():unknown;
+ getCellParagraphLengthByPath?(section:number,parent:number,path:string):number;
+ getTextInCellByPath?(section:number,parent:number,path:string,offset:number,count:number):string;
+ getFieldInfoAtByPath?(section:number,parent:number,path:string,offset:number):unknown;
+ getCursorRectByPath?(section:number,parent:number,path:string,offset:number):unknown;
 };
 
 type Field={
  fieldId:number;fieldType:'clickhere';cellField:false;location:{sectionIndex:number;paraIndex:number};
  startCharIdx:number;endCharIdx:number;listId:0;paraInList:number;editableInForm:boolean;
 };
+type CellField={
+ fieldId:number;fieldType:'clickhere';cellField:false;location:{sectionIndex:number;paraIndex:number;path:[{type:'cell';controlIndex:number;cellIndex:number;paraIndex:number}]};
+ startCharIdx:number;endCharIdx:number;listId:number;paraInList:number;editableInForm:boolean;value:string;
+};
+type CellOwner={listId:number;isCell:true;hostListId:0;sectionIndex:number;hostPara:number;controlIndex:number;cellIndex:number;paraCount:number};
 
 const integer=(value:unknown):value is number=>Number.isSafeInteger(value)&&(value as number)>=0&&(value as number)<=2147483647;
 const positive=(value:unknown):value is number=>integer(value)&&value>0;
@@ -72,6 +90,14 @@ function documentOf(input:FieldSelectionSessionInputN016):NativeDocument|undefin
   .every(name=>typeof (document as any)[name]==='function'))return;
  return document as NativeDocument;
 }
+function cellPosition(value:Position|undefined):{section:number;parent:number;path:[CellPathEntry]}|undefined{
+ if(!value||!integer(value.sectionIndex)||!integer(value.parentParaIndex)||!integer(value.paragraphIndex)||!integer(value.charOffset)||value.isTextBox===true
+  ||!Array.isArray(value.cellPath)||value.cellPath.length!==1)return;
+ const entry=value.cellPath[0] as any;
+ if(!entry||!integer(entry.controlIndex)||!integer(entry.cellIndex)||!integer(entry.cellParaIndex)
+  ||value.controlIndex!==entry.controlIndex||value.cellIndex!==entry.cellIndex||value.cellParaIndex!==entry.cellParaIndex||value.paragraphIndex!==entry.cellParaIndex)return;
+ return {section:value.sectionIndex,parent:value.parentParaIndex,path:[{controlIndex:entry.controlIndex,cellIndex:entry.cellIndex,cellParaIndex:entry.cellParaIndex}]};
+}
 function blocked(input:FieldSelectionSessionInputN016):boolean{
  const cursor=input.cursor;
  return input.wasm.requiresPasswordForSave===true||cursor.isInHeaderFooter()||cursor.isInFootnote()||cursor.isInTextBox()
@@ -85,6 +111,20 @@ function bodyPosition(value:Position|undefined):value is Position{
 function samePosition(left:Position,right:Position):boolean{
  return left.sectionIndex===right.sectionIndex&&left.paragraphIndex===right.paragraphIndex&&left.charOffset===right.charOffset;
 }
+function sameCellPosition(left:Position|undefined,right:Position):boolean{
+ if(!left||!samePosition(left,right)||left.parentParaIndex!==right.parentParaIndex||left.controlIndex!==right.controlIndex
+  ||left.cellIndex!==right.cellIndex||left.cellParaIndex!==right.cellParaIndex)return false;
+ return JSON.stringify(left.cellPath)===JSON.stringify(right.cellPath);
+}
+function restoreCellSelectionWithReadback(input:FieldSelectionSessionInputN016,focus:Position,anchor:Position):boolean{
+ const previousFocus=structuredClone(input.getCursorPosition()),previousRange=input.cursor.getSelection(),previousAnchor=previousRange?structuredClone(previousRange.anchor):undefined;
+ const restored=input.restoreSessionSelection(focus,anchor,null,undefined);
+ const readback=input.cursor.getSelection(),matches=restored&&sameCellPosition(input.getCursorPosition(),focus)
+  &&sameCellPosition(readback?.focus,focus)&&sameCellPosition(readback?.anchor,anchor);
+ if(matches)return true;
+ try{input.restoreSessionSelection(previousFocus,previousAnchor,null,undefined);}catch{/* Selection state remains untrusted; never report success. */}
+ return false;
+}
 function validRect(value:unknown):boolean{
  const rect=parse(value);
  return Boolean(rect)&&typeof rect==='object'&&!Array.isArray(rect)&&integer(rect.pageIndex)
@@ -96,6 +136,20 @@ function asField(value:any):Field|undefined{
   ||!integer(value.startCharIdx)||!integer(value.endCharIdx)||value.endCharIdx<=value.startCharIdx||value.listId!==0
   ||!integer(value.paraInList)||value.paraInList!==value.location.paraIndex||typeof value.editableInForm!=='boolean')return;
  return value as Field;
+}
+function asCellField(value:any):CellField|undefined{
+ const path=value?.location?.path;
+ if(!value||typeof value!=='object'||Array.isArray(value)||!positive(value.fieldId)||value.fieldType!=='clickhere'||value.cellField!==false
+  ||!value.location||!integer(value.location.sectionIndex)||!integer(value.location.paraIndex)||!Array.isArray(path)||path.length!==1
+  ||path[0]?.type!=='cell'||!integer(path[0].controlIndex)||!integer(path[0].cellIndex)||!integer(path[0].paraIndex)
+  ||!integer(value.startCharIdx)||!integer(value.endCharIdx)||value.endCharIdx<=value.startCharIdx||!positive(value.listId)
+  ||!integer(value.paraInList)||value.paraInList!==path[0].paraIndex||typeof value.editableInForm!=='boolean'||typeof value.value!=='string')return;
+ return value as CellField;
+}
+function asCellOwner(value:any):CellOwner|undefined{
+ if(!value||typeof value!=='object'||Array.isArray(value)||!positive(value.listId)||value.isCell!==true||value.hostListId!==0
+  ||!integer(value.sectionIndex)||!integer(value.hostPara)||!integer(value.controlIndex)||!integer(value.cellIndex)||!positive(value.paraCount))return;
+ return value as CellOwner;
 }
 function fieldInfoMatches(value:unknown,field:Field):boolean{
  const info=parse(value);
@@ -126,13 +180,54 @@ function fieldEvidence(document:NativeDocument,fieldId:number,section:number,par
  const paragraphFingerprint=hash({section,paragraph,length,text});
  return {fieldFingerprint,paragraphFingerprint,selectionFingerprint:hash({fieldFingerprint,paragraphFingerprint,start,end,selected})};
 }
+function cellFieldEvidence(document:NativeDocument,fieldId:number,section:number,parent:number,path:[CellPathEntry],listId:number,start:number,end:number){
+ if(!document.getCursorModel||!document.getCellParagraphLengthByPath||!document.getTextInCellByPath||!document.getFieldInfoAtByPath||!document.getCursorRectByPath)return;
+ const pathJson=JSON.stringify(path),entry=path[0];
+ const length=document.getCellParagraphLengthByPath(section,parent,pathJson);
+ if(!integer(length)||end>length||length>100000)return;
+ const text=document.getTextInCellByPath(section,parent,pathJson,0,length);
+ if(typeof text!=='string'||[...text].length!==length)return;
+ const fields=parse(document.getFieldList());if(!Array.isArray(fields)||fields.length>100000)return;
+ const matches=fields.filter(value=>value?.fieldId===fieldId);if(matches.length!==1)return;
+ const field=asCellField(matches[0]);if(!field||field.listId!==listId||field.location.sectionIndex!==section||field.location.paraIndex!==parent
+  ||field.location.path[0].controlIndex!==entry.controlIndex||field.location.path[0].cellIndex!==entry.cellIndex||field.paraInList!==entry.cellParaIndex
+  ||field.startCharIdx!==start||field.endCharIdx!==end)return;
+ const model=parse(document.getCursorModel()),owners=Array.isArray(model?.lists)?model.lists.map(asCellOwner).filter(Boolean) as CellOwner[]:[];
+ const ownerMatches=owners.filter(owner=>owner.listId===listId);if(ownerMatches.length!==1)return;
+ const owner=ownerMatches[0];
+ if(owner.sectionIndex!==section||owner.hostPara!==parent||owner.controlIndex!==entry.controlIndex||owner.cellIndex!==entry.cellIndex||entry.cellParaIndex>=owner.paraCount)return;
+ const overlaps=fields.map(asCellField).filter((candidate):candidate is CellField=>Boolean(candidate)&&candidate!.listId===listId
+  &&candidate!.paraInList===entry.cellParaIndex&&Math.max(candidate!.startCharIdx,start)<Math.min(candidate!.endCharIdx,end));
+ if(overlaps.length!==1||overlaps[0].fieldId!==fieldId)return;
+ const startInfo=parse(document.getFieldInfoAtByPath(section,parent,pathJson,start));
+ const endInfo=parse(document.getFieldInfoAtByPath(section,parent,pathJson,end));
+ if(!fieldInfoMatches(startInfo,field as any)||!fieldInfoMatches(endInfo,field as any))return;
+ const startRect=parse(document.getCursorRectByPath(section,parent,pathJson,start)),endRect=parse(document.getCursorRectByPath(section,parent,pathJson,end));
+ if(!validRect(startRect)||!validRect(endRect))return;
+ const value=parse(document.getFieldValue(fieldId));
+ if(!value||typeof value!=='object'||Array.isArray(value)||value.ok!==true||typeof value.value!=='string'||value.value!==field.value)return;
+ const selected=[...text].slice(start,end).join('');if(selected.length===0||selected!==value.value)return;
+ const ownerFingerprint=hash({owner,path,location:field.location,listId});
+ const fieldFingerprint=hash({field:matches[0],startInfo,endInfo,value});
+ const paragraphFingerprint=hash({ownerFingerprint,length,text});
+ const geometryFingerprint=hash({start:startRect,end:endRect});
+ return {ownerFingerprint,fieldFingerprint,paragraphFingerprint,geometryFingerprint,
+  selectionFingerprint:hash({ownerFingerprint,fieldFingerprint,paragraphFingerprint,geometryFingerprint,start,end,selected})};
+}
 
 export function validateRootClickHereFieldSelectionN016(value:unknown):RootClickHereFieldSelectionBookmarkN016|undefined{
  if(!value||typeof value!=='object'||Array.isArray(value))return;
  const item=value as Record<string,unknown>;
- if(item.version!==1||item.kind!=='root-clickhere-field-selection'||!positive(item.fieldId)||!integer(item.section)||!integer(item.paragraph)
+ if(item.version!==1||item.kind!=='root-clickhere-field-selection'||!positive(item.fieldId)||!integer(item.section)
   ||!integer(item.start)||!integer(item.end)||(item.end as number)<=(item.start as number)||!['forward','backward'].includes(item.direction as string)
   ||!digest(item.fieldFingerprint)||!digest(item.paragraphFingerprint)||!digest(item.selectionFingerprint))return;
+ if(item.owner==='cell'){
+  const path=item.path as any;
+  if(!integer(item.parentParagraph)||!positive(item.listId)||!Array.isArray(path)||path.length!==1||!integer(path[0]?.controlIndex)
+   ||!integer(path[0]?.cellIndex)||!integer(path[0]?.cellParaIndex)||!digest(item.ownerFingerprint)||!digest(item.geometryFingerprint))return;
+  return value as CellFieldBookmark;
+ }
+ if(item.owner!==undefined||!integer(item.paragraph))return;
  return value as RootClickHereFieldSelectionBookmarkN016;
 }
 
@@ -148,8 +243,30 @@ export function inspectRootClickHereFieldSelectionN016(input:FieldSelectionSessi
   if(!selection||!document)return {status:'not-field-selection'};
   const fields=parse(document.getFieldList());
   if(!Array.isArray(fields))return {status:'unsupported-field-selection'};
+  const anchorCell=cellPosition(selection.anchor),focusCell=cellPosition(selection.focus),currentCell=cellPosition(current);
+  if(anchorCell||focusCell||currentCell){
+   if(!anchorCell||!focusCell||!currentCell||!samePosition(current,selection.focus)
+    ||JSON.stringify(anchorCell)!==JSON.stringify(focusCell)||JSON.stringify(focusCell)!==JSON.stringify(currentCell))return {status:'unsupported-field-selection'};
+   const start=Math.min(selection.anchor.charOffset,selection.focus.charOffset),end=Math.max(selection.anchor.charOffset,selection.focus.charOffset);
+   if(start===end)return {status:'unsupported-field-selection'};
+   const entry=focusCell.path[0];
+   const candidates=fields.filter(raw=>{
+    const field=asCellField(raw),owner=field?.location.path[0];
+    return field?.location.sectionIndex===focusCell.section&&field.location.paraIndex===focusCell.parent&&owner?.controlIndex===entry.controlIndex
+     &&owner.cellIndex===entry.cellIndex&&field.paraInList===entry.cellParaIndex&&field.startCharIdx===start&&field.endCharIdx===end;
+   });
+   if(candidates.length!==1)return {status:'unsupported-field-selection'};
+   const field=asCellField(candidates[0]);if(!field)return {status:'unsupported-field-selection'};
+   const evidence=cellFieldEvidence(document,field.fieldId,focusCell.section,focusCell.parent,focusCell.path,field.listId,start,end);
+   if(!evidence)return {status:'unsupported-field-selection'};
+   const bookmark=validateRootClickHereFieldSelectionN016({version:1,kind:'root-clickhere-field-selection',owner:'cell',fieldId:field.fieldId,
+    section:focusCell.section,parentParagraph:focusCell.parent,listId:field.listId,path:focusCell.path,start,end,
+    direction:selection.focus.charOffset===end?'forward':'backward',...evidence});
+   return bookmark?{status:'captured',bookmark}:{status:'unsupported-field-selection'};
+  }
   if(!bodyPosition(selection.anchor)||!bodyPosition(selection.focus)||!bodyPosition(current)||!samePosition(current,selection.focus)){
-   return fields.some(field=>field?.cellField===true)?{status:'unsupported-field-selection'}:{status:'not-field-selection'};
+   return fields.some(field=>field?.cellField===true||Array.isArray(field?.location?.path)&&field.location.path.length>0)
+    ?{status:'unsupported-field-selection'}:{status:'not-field-selection'};
   }
   const ordered=[selection.anchor,selection.focus].sort((left,right)=>left.sectionIndex-right.sectionIndex||left.paragraphIndex-right.paragraphIndex||left.charOffset-right.charOffset);
   const [rangeStart,rangeEnd]=ordered;
@@ -182,6 +299,17 @@ export function restoreRootClickHereFieldSelectionN016(input:FieldSelectionSessi
  const saved=validateRootClickHereFieldSelectionN016(value);
  if(!input||!saved||blocked(input))return false;
  try{
+  if(isCellBookmark(saved)){
+   const evidence=documentOf(input)&&cellFieldEvidence(documentOf(input)!,saved.fieldId,saved.section,saved.parentParagraph,saved.path,saved.listId,saved.start,saved.end);
+   if(!evidence||evidence.ownerFingerprint!==saved.ownerFingerprint||evidence.fieldFingerprint!==saved.fieldFingerprint
+    ||evidence.paragraphFingerprint!==saved.paragraphFingerprint||evidence.geometryFingerprint!==saved.geometryFingerprint
+    ||evidence.selectionFingerprint!==saved.selectionFingerprint)return false;
+   const entry=saved.path[0],position=(offset:number):Position=>({sectionIndex:saved.section,parentParaIndex:saved.parentParagraph,
+    paragraphIndex:entry.cellParaIndex,charOffset:offset,controlIndex:entry.controlIndex,cellIndex:entry.cellIndex,cellParaIndex:entry.cellParaIndex,
+    cellPath:[{...entry}]});
+   return saved.direction==='forward'?restoreCellSelectionWithReadback(input,position(saved.end),position(saved.start))
+    :restoreCellSelectionWithReadback(input,position(saved.start),position(saved.end));
+  }
   const document=documentOf(input),evidence=document&&fieldEvidence(document,saved.fieldId,saved.section,saved.paragraph,saved.start,saved.end);
   if(!evidence||evidence.fieldFingerprint!==saved.fieldFingerprint||evidence.paragraphFingerprint!==saved.paragraphFingerprint
    ||evidence.selectionFingerprint!==saved.selectionFingerprint)return false;

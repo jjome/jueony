@@ -25,8 +25,18 @@ function objectSelection(value:any):ObjectSelectionBookmark|undefined {
 }
 function rootClickHereFieldSelection(value:any):RootClickHereFieldSelectionBookmarkN016|undefined {
  if(!value||typeof value!=='object'||Array.isArray(value)||value.version!==1||value.kind!=='root-clickhere-field-selection'
-  ||!integer(value.fieldId)||value.fieldId===0||!integer(value.section)||!integer(value.paragraph)||!integer(value.start)||!integer(value.end)||value.end<=value.start
+  ||!integer(value.fieldId)||value.fieldId===0||!integer(value.section)||!integer(value.start)||!integer(value.end)||value.end<=value.start
   ||!['forward','backward'].includes(value.direction)||!digest(value.fieldFingerprint)||!digest(value.paragraphFingerprint)||!digest(value.selectionFingerprint))return;
+ if(value.owner==='cell'){
+  if(!integer(value.parentParagraph)||!integer(value.listId)||value.listId===0||!Array.isArray(value.path)||value.path.length!==1
+   ||!integer(value.path[0]?.controlIndex)||!integer(value.path[0]?.cellIndex)||!integer(value.path[0]?.cellParaIndex)
+   ||!digest(value.ownerFingerprint)||!digest(value.geometryFingerprint))return;
+  return {version:1,kind:'root-clickhere-field-selection',owner:'cell',fieldId:value.fieldId,section:value.section,parentParagraph:value.parentParagraph,
+   listId:value.listId,path:[{controlIndex:value.path[0].controlIndex,cellIndex:value.path[0].cellIndex,cellParaIndex:value.path[0].cellParaIndex}],start:value.start,end:value.end,
+   direction:value.direction,ownerFingerprint:value.ownerFingerprint,fieldFingerprint:value.fieldFingerprint,paragraphFingerprint:value.paragraphFingerprint,
+   geometryFingerprint:value.geometryFingerprint,selectionFingerprint:value.selectionFingerprint};
+ }
+ if(value.owner!==undefined||!integer(value.paragraph))return;
  return {version:1,kind:'root-clickhere-field-selection',fieldId:value.fieldId,section:value.section,paragraph:value.paragraph,start:value.start,end:value.end,
   direction:value.direction,fieldFingerprint:value.fieldFingerprint,paragraphFingerprint:value.paragraphFingerprint,selectionFingerprint:value.selectionFingerprint};
 }

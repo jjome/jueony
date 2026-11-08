@@ -118,3 +118,87 @@ test('unsupported or forged bookmarks fail without exposing a false success',()=
   assert.equal(restoreRootClickHereFieldSelectionN016(fixture.session,saved),false);
  }finally{native.free();}
 });
+
+function cellDocument(value='김민수'){
+ const native=HwpDocument.createEmpty();
+ native.createBlankDocument();native.insertText(0,0,0,'본문');native.splitParagraph(0,0,2);native.createTable(0,1,0,1,1);
+ native.insertTextInCell(0,1,0,0,0,0,'앞뒤');native.insertClickHereFieldInCell(0,1,0,0,0,1,false,'입력 안내','설명','셀 성명',true);
+ native.setFieldValueByName('셀 성명',value);return native;
+}
+function cellInput(native:any,direction:'forward'|'backward'='forward'){
+ const field=JSON.parse(native.getFieldList()).find((item:any)=>item.location?.path?.[0]?.type==='cell');
+ const owner=JSON.parse(native.getCursorModel()).lists.find((item:any)=>item.listId===field.listId);
+ const cellPath=[{controlIndex:owner.controlIndex,cellIndex:owner.cellIndex,cellParaIndex:field.paraInList}];
+ const at=(offset:number)=>({sectionIndex:owner.sectionIndex,parentParaIndex:owner.hostPara,paragraphIndex:field.paraInList,charOffset:offset,
+  controlIndex:owner.controlIndex,cellIndex:owner.cellIndex,cellParaIndex:field.paraInList,cellPath:structuredClone(cellPath)});
+ let anchor=at(direction==='forward'?field.startCharIdx:field.endCharIdx),focus=at(direction==='forward'?field.endCharIdx:field.startCharIdx);
+ let calls=0,restored:any;
+ const session:any={getCursorPosition:()=>focus,restoreSessionSelection:(next:any,previous:any,phase:any,block:any)=>{
+  calls++;focus=structuredClone(next);anchor=structuredClone(previous);restored={focus:next,anchor:previous,phase,block};return true;
+ },cursor:{hasSelection:()=>true,getSelection:()=>({anchor,focus}),isInHeaderFooter:()=>false,isInFootnote:()=>false,isInTextBox:()=>false,
+  isInTableObjectSelection:()=>false,isInPictureObjectSelection:()=>false},wasm:{borrowDocumentHandle:()=>native,requiresPasswordForSave:false}};
+ return {session,field,owner,cellPath,at,calls:()=>calls,restored:()=>restored,setSelection:(a:any,f:any)=>{anchor=a;focus=f;}};
+}
+function cellFieldState(native:any){
+ const field=JSON.parse(native.getFieldList()).find((item:any)=>item.location?.path?.[0]?.type==='cell');
+ const owner=JSON.parse(native.getCursorModel()).lists.find((item:any)=>item.listId===field.listId);
+ const path=JSON.stringify([{controlIndex:owner.controlIndex,cellIndex:owner.cellIndex,cellParaIndex:field.paraInList}]);
+ const length=native.getCellParagraphLengthByPath(owner.sectionIndex,owner.hostPara,path);
+ return {field,owner,text:native.getTextInCellByPath(owner.sectionIndex,owner.hostPara,path,0,length),
+  start:JSON.parse(native.getFieldInfoAtByPath(owner.sectionIndex,owner.hostPara,path,field.startCharIdx)),
+  end:JSON.parse(native.getFieldInfoAtByPath(owner.sectionIndex,owner.hostPara,path,field.endCharIdx)),
+  startRect:JSON.parse(native.getCursorRectByPath(owner.sectionIndex,owner.hostPara,path,field.startCharIdx)),
+  endRect:JSON.parse(native.getCursorRectByPath(owner.sectionIndex,owner.hostPara,path,field.endCharIdx))};
+}
+
+test('top-level table-cell ClickHere full selection restores both directions across HWP/HWPX without changing bytes',()=>{
+ const source=cellDocument();
+ try{
+  const sourceState=cellFieldState(source),forward=captureSessionCursor(cellInput(source).session),backward=captureSessionCursor(cellInput(source,'backward').session);
+  assert.ok(forward&&backward);assert.equal((forward as any).owner,'cell');assert.equal((backward as any).direction,'backward');
+  assert.doesNotMatch(JSON.stringify(forward),/김민수|셀 성명|입력 안내|설명/u);
+  for(const format of ['hwp','hwpx'] as const){
+   const savedBytes=bytes(source,format),reopened=new HwpDocument(savedBytes);
+   try{
+    const fixture=cellInput(reopened),before=bytes(reopened,format),saved=captureSessionCursor(fixture.session);
+    assert.deepEqual(cellFieldState(reopened),sourceState,`${format} exact owner/range/text/geometry`);assert.deepEqual(saved,forward);
+    assert.equal(restoreSessionCursor(fixture.session,saved),true);assert.equal(fixture.calls(),1);
+    assert.deepEqual(fixture.restored(),{focus:fixture.at(fixture.field.endCharIdx),anchor:fixture.at(fixture.field.startCharIdx),phase:null,block:undefined});
+    assert.deepEqual(captureSessionCursor(fixture.session),forward,`${format} readback`);assert.deepEqual(bytes(reopened,format),before,`${format} byte invariant`);
+    const reverse=cellInput(reopened,'backward');assert.equal(restoreSessionCursor(reverse.session,backward),true);
+    assert.deepEqual(reverse.restored()?.focus,reverse.at(reverse.field.startCharIdx));assert.deepEqual(bytes(reopened,format),before);
+   }finally{reopened.free();}
+  }
+ }finally{source.free();}
+});
+
+test('cell ClickHere partial, empty, nested, caption-like, overlapping, stale and other-story selections fail closed',()=>{
+ const native=cellDocument();
+ try{
+  const fixture=cellInput(native),saved=captureSessionCursor(fixture.session)!;
+  fixture.setSelection(fixture.at(fixture.field.startCharIdx+1),fixture.at(fixture.field.endCharIdx));assert.equal(captureSessionCursor(fixture.session),undefined);
+  const nested=cellInput(native),nestedPath=[...nested.cellPath,{controlIndex:1,cellIndex:0,cellParaIndex:0}];
+  nested.setSelection({...nested.at(nested.field.startCharIdx),cellPath:nestedPath},{...nested.at(nested.field.endCharIdx),cellPath:nestedPath});assert.equal(captureSessionCursor(nested.session),undefined);
+  const caption=cellInput(native),originalList=native.getFieldList.bind(native);native.getFieldList=()=>JSON.stringify(JSON.parse(originalList()).map((field:any)=>({...field,location:{...field.location,path:[{...field.location.path[0],type:'caption'}]}})));
+  assert.equal(captureSessionCursor(caption.session),undefined);native.getFieldList=originalList;
+  const overlap=cellInput(native),list=native.getFieldList.bind(native);native.getFieldList=()=>{const fields=JSON.parse(list());return JSON.stringify([...fields,{...fields[0],fieldId:fields[0].fieldId+100}]);};
+  assert.equal(captureSessionCursor(overlap.session),undefined);native.getFieldList=list;
+  native.setFieldValueByName('셀 성명','이순신');assert.equal(restoreSessionCursor(cellInput(native).session,saved),false);
+  const story=cellInput(native);story.session.cursor.isInFootnote=()=>true;assert.equal(captureSessionCursor(story.session),undefined);
+ }finally{native.free();}
+ const empty=cellDocument('');try{assert.equal(captureSessionCursor(cellInput(empty).session),undefined);}finally{empty.free();}
+});
+
+test('cell selection restore verifies callback readback and attempts rollback before reporting failure',()=>{
+ const native=cellDocument();try{
+  const fixture=cellInput(native),saved=captureSessionCursor(fixture.session)!;let callbacks=0;
+  fixture.session.restoreSessionSelection=(focus:any,anchor:any)=>{
+   callbacks++;
+   if(callbacks===1)fixture.setSelection(fixture.at(fixture.field.startCharIdx),fixture.at(fixture.field.startCharIdx));
+   else fixture.setSelection(anchor??focus,focus);
+   return true;
+  };
+  assert.equal(restoreSessionCursor(fixture.session,saved),false);assert.equal(callbacks,2,'failed readback invokes the previous-selection rollback');
+  assert.deepEqual(fixture.session.cursor.getSelection(),{anchor:fixture.at(fixture.field.startCharIdx),focus:fixture.at(fixture.field.endCharIdx)});
+ }finally{native.free();}
+});

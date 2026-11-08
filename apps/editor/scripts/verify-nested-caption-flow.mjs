@@ -82,6 +82,20 @@ for(const ext of ['hwp','hwpx']){
   assert.throws(()=>executeDocumentOperations(d,s,[{kind:'delete_table_row',target:t.id,index:0}]),/캡션/);
   assert.equal(changed,true);
   assert.deepEqual(save(d),bytes);
+  // A live Canvas view can stay unchanged while portable evidence fails.
+  // Check that the second measurement pass also rejects and restores both
+  // the original document bytes and the active view's metric selection.
+  let canvas=true;changed=false;
+  d.canvasMetricsActive=()=>canvas;
+  d.selectCanvasMetrics=enabled=>{canvas=enabled;return true;};
+  d.getPageRenderTree=(...args)=>{
+   const root=JSON.parse(render(...args));
+   function move(n){if(n.captionOwner?.captionOrdinal===1)n.bbox.y+=2;for(const c of n.children??[])move(c);}
+   if(changed&&!canvas)move(root);return JSON.stringify(root);
+  };
+  assert.throws(()=>executeDocumentOperations(d,s,[{kind:'delete_table_row',target:t.id,index:0}]),/캡션/);
+  assert.equal(changed,true);assert.equal(canvas,true);assert.deepEqual(save(d),bytes);
   console.log('PASS',ext,'off-page side caption refused; changed justification and displaced later caption line rolled back');
+  console.log('PASS',ext,'portable caption mismatch rolled back and Canvas metric selection restored');
  }finally{d.free();}
 }

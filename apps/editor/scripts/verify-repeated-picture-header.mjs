@@ -11,6 +11,7 @@ import {validateEditOperations} from '../src/modules/document/public/index.ts';
 
 const {HwpDocument}=await loadReviewEngine(resolve(process.env.JUEONY_ENGINE_PACKAGE));
 const paragraphs=process.argv.includes('--paragraphs');
+const transformed=process.argv.includes('--cropped-flipped');
 const bands=process.argv.includes('--merged-headings'),headerRows=bands?2:1;
 const expectedTitle=expectedPictureHeading(bands,paragraphs);
 const out=resolve(process.env.JUEONY_TEST_OUTPUT??resolve(import.meta.dirname,'../../../build/'+(bands?'axis-repeat-header-bands':paragraphs?'axis-repeat-header-paragraphs':'axis-repeat-picture-header')));
@@ -57,6 +58,17 @@ try{
  }
  fixture.setPageDef(0,JSON.stringify({...JSON.parse(fixture.getPageDef(0)),height:bands?24500:paragraphs?23000:21000,marginTop:2000,marginBottom:2000,marginHeader:0,marginFooter:0}));
  fixture.setTableProperties(...base,'{"pageBreak":2,"repeatHeader":true}');
+ if(transformed){
+  const controls=JSON.parse(fixture.getControls()).filter(c=>c.userDesc==='그림');
+  const lists=JSON.parse(fixture.getCursorModel()).lists;
+  for(const [i,c] of controls.entries()){
+   const owner=lists.find(l=>l.listId===c.list);
+   const path=JSON.stringify([{controlIndex:0,cellIndex:owner.cellIndex,cellParaIndex:c.para}]);
+   fixture.setCellPicturePropertiesByPath(0,1,path,c.controlIndex,JSON.stringify({
+    cropLeft:225,cropRight:450,cropTop:150,cropBottom:225,horzFlip:i%2===0,vertFlip:i%2===1
+   }));
+  }
+ }
  for(const format of ['hwp','hwpx']){
   const source=resolve(out,'before.'+format),original=bytes(fixture,format);await writeFile(source,original);
   const d=new HwpDocument(original);
@@ -74,9 +86,29 @@ try{
   const modes=format==='hwp'?['wrong source','missing title','inherited header','field in title']:['changed label','crop','lost repeat flag','changed title style'];
   if(paragraphs)modes.push(format==='hwp'?'missing empty paragraph':'wrong paragraph');
   if(bands)modes.push(format==='hwp'?'unmarked header slot':'wrong repeated span');
+  if(transformed)modes.push('wrong paint crop','wrong paint flip','lost picture crop');
   for(const mode of modes){
    const d=new HwpDocument(original);
    try{
+    if(mode==='lost picture crop'){
+     const insert=d.insertTableRow.bind(d);d.insertTableRow=(...args)=>{
+      const result=insert(...args),child=JSON.parse(d.getControls()).find(c=>c.userDesc==='그림');
+      const owner=JSON.parse(d.getCursorModel()).lists.find(l=>l.listId===child.list);
+      const path=JSON.stringify([{controlIndex:0,cellIndex:owner.cellIndex,cellParaIndex:child.para}]);
+      d.setCellPicturePropertiesByPath(0,1,path,child.controlIndex,'{"cropLeft":0}');
+      return result;
+     };
+    }
+    if(mode==='wrong paint crop'||mode==='wrong paint flip'){
+     const read=d.getPageFlowImageOps.bind(d);d.getPageFlowImageOps=page=>{
+      const view=JSON.parse(read(page));
+      if(view.images.length){
+       if(mode==='wrong paint crop')view.images[0].crop.left+=75;
+       else view.images[0].transform.horzFlip=!view.images[0].transform.horzFlip;
+      }
+      return JSON.stringify(view);
+     };
+    }
     if(mode==='field in title')d.insertClickHereFieldInCell(...base,0,0,0,false,'입력','번호','번호',true);
     if(mode==='unmarked header slot')d.setCellProperties(...base,2,'{"isHeader":false}');
     if(mode==='wrong repeated span'){

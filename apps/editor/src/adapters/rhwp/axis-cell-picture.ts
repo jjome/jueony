@@ -218,6 +218,30 @@ function assetHash(bytes:Uint8Array,mime:string) {
  if(png||jpeg)return digest(bytes);
 }
 
+function picturePaintMatches(properties:any,paint:any) {
+ const {horzFlip,vertFlip,originalWidth,originalHeight,cropLeft,cropTop,cropRight,cropBottom}=properties;
+ if(typeof horzFlip!=='boolean'||typeof vertFlip!=='boolean'||paint.transform?.rotation!==0||
+    paint.transform.horzFlip!==horzFlip||paint.transform.vertFlip!==vertFlip)return false;
+ const crop=[cropLeft,cropTop,cropRight,cropBottom];
+ if(!crop.every(v=>Number.isSafeInteger(v)&&v>=0))return false;
+ if(paint.originalSizeHu!==undefined&&(!Array.isArray(paint.originalSizeHu)||paint.originalSizeHu.length!==2||
+    !paint.originalSizeHu.every((v:number)=>Number.isSafeInteger(v)&&v>0)))return false;
+ if(crop.every(v=>v===0)){
+  if(paint.crop==null)return true;
+  // With no imgDim, both painters infer the full-source extent from a crop
+  // beginning at zero. HWPX imgDim can differ from the resized shape extent.
+  const c=paint.crop;
+  return c.left===0&&c.top===0&&[c.right,c.bottom].every(v=>Number.isSafeInteger(v)&&v>0)&&
+   (!paint.originalSizeHu||(c.right===paint.originalSizeHu[0]&&c.bottom===paint.originalSizeHu[1]));
+ }
+ if(![originalWidth,originalHeight].every(v=>Number.isSafeInteger(v)&&v>0))return false;
+ // Stored properties report removed margins. The paint operation reports
+ // retained source coordinates, before applying its horizontal/vertical flip.
+ return cropLeft+cropRight<originalWidth&&cropTop+cropBottom<originalHeight&&
+  paint.crop?.left===cropLeft&&paint.crop.top===cropTop&&
+  paint.crop.right===originalWidth-cropRight&&paint.crop.bottom===originalHeight-cropBottom;
+}
+
 /** Layout and asset keys are local to one read-only snapshot. An edit or reopen
  * gets a fresh reader, even if the engine reuses the same native handle. */
 export function axisPictureReader(doc:any) {
@@ -271,8 +295,8 @@ function readPicture(doc:any,page:PicturePage,
     child.props?.Lock!==0 || child.props.TreatAsChar!==1)return;
  const p=json(doc.getCellPicturePropertiesByPath(section,paragraph,storedPath,child.controlIndex));
  if(p.treatAsChar!==true || p.hasCaption!==false || p.sizeProtect!==false || p.allowOverlap!==false ||
-    'externalPath' in p || p.horzFlip!==false || p.vertFlip!==false || p.effect!=='RealPic' ||
-    [p.cropLeft,p.cropRight,p.cropTop,p.cropBottom,p.rotationAngle,p.transparency,p.brightness,p.contrast].some(v=>v!==0) ||
+    'externalPath' in p || p.effect!=='RealPic' ||
+    [p.rotationAngle,p.transparency,p.brightness,p.contrast].some(v=>v!==0) ||
     ![p.width,p.height].every(v=>Number.isSafeInteger(v)&&v>0) ||
     p.width!==child.props.Width || p.height!==child.props.Height)return;
  const owner=frame.screen,left=picture.x-owner.x,top=picture.y-owner.y;
@@ -290,7 +314,8 @@ function readPicture(doc:any,page:PicturePage,
  const screenBox={x:picture.x,y:picture.y,width:picture.w,height:picture.h};
  if(page.pictures.filter((c:any)=>sameBounds(c,screenBox)).length!==1)return;
  const ops=page.painted.filter(op=>sameBounds(portable[0],op.bbox));
- if(ops.length!==1||page.portablePictures.filter((c:any)=>sameBounds(c,ops[0].bbox)).length!==1)return;
+ if(ops.length!==1||page.portablePictures.filter((c:any)=>sameBounds(c,ops[0].bbox)).length!==1||
+    !picturePaintMatches(p,ops[0]))return;
  const {sourceImageKey:key,mime}=ops[0];
  const asset=typeof key==='string' && /^bin:\d+:([1-9]\d*):src$/.exec(key);
  if(!asset || !page.keys.has(key))return;
@@ -305,7 +330,8 @@ function readPicture(doc:any,page:PicturePage,
  const storedHash=assetHash(doc.getControlImageData(section,paragraph,storedPath,child.controlIndex),mime);
  if(storedHash!==renderedHash)return;
  const {list:slot,...record}=child;
- const evidence=[record,p,asset[1],storedHash,picture.plane,picture.zOrder,picture.w,picture.h,owner.w,owner.h];
+ const evidence=[record,p,asset[1],storedHash,picture.plane,picture.zOrder,picture.w,picture.h,owner.w,owner.h,
+  ops[0].crop,ops[0].originalSizeHu,ops[0].transform];
  if(frame.headerSignature)evidence.push(frame.headerSignature);
  const signature=digest(new TextEncoder().encode(JSON.stringify(evidence)));
  return {signature,left,top};

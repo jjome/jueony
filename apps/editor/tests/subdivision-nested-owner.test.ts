@@ -8,7 +8,7 @@ import {readTableSubdivisionSources} from '../src/adapters/rhwp/table-subdivisio
 import {nestedSubdivisionEvidence,subdivisionNestedOwner} from '../src/adapters/rhwp/subdivision-nested-owner.ts';
 import {executeDocumentOperations} from '../src/adapters/rhwp/execute.ts';
 import {validateEditOperations,type Snapshot} from '../src/modules/document/public/index.ts';
-import {labeledSubdivisionNestedTable,subdivisionNestedTable} from '../scripts/lib/subdivision-nested-table.mjs';
+import {emphasizedSubdivisionNestedTable,labeledSubdivisionNestedTable,subdivisionNestedTable} from '../scripts/lib/subdivision-nested-table.mjs';
 import {readOwnedZip,writeOwnedZip} from '../scripts/lib/owned-zip.mjs';
 const pkg=process.env.JUEONY_ENGINE_PACKAGE ?? fileURLToPath(new URL('../node_modules/@rhwp/core/',import.meta.url));
 const {default:init,HwpDocument}=await import(pathToFileURL(resolve(pkg,'rhwp.js')).href);
@@ -23,6 +23,16 @@ const nestedInk=(d:any)=>({
   boxes:JSON.parse(d.getPageControlLayout(0)).controls.filter((c:any)=>c.type==='table'&&c.stableIndex?.length>3),
   runs:JSON.parse(d.getPageTextLayout(0)).runs.filter((r:any)=>r.cellPath?.length===2),
 });
+function storedOwnerParagraphs(doc:any){
+  const xml=readOwnedZip(doc.exportHwpx()).find(([n]:[string,Buffer])=>n==='Contents/section0.xml')![1].toString('utf8');
+  let depth=0,start=0;
+  for(const tag of xml.matchAll(/<hp:subList\b[^>]*>|<\/hp:subList>/g)){
+    if(tag[0].startsWith('</')){
+      if(--depth===0)return xml.slice(start,tag.index+tag[0].length);
+    }else if(depth++===0)start=tag.index;
+  }
+  assert.fail('Missing owner paragraph XML');
+}
 function storedInnerTables(doc:any){
   const xml=readOwnedZip(doc.exportHwpx()).find(([n]:[string,Buffer])=>n==='Contents/section0.xml')![1].toString('utf8');
   const tables:string[]=[];let depth=0,start=0;
@@ -252,5 +262,45 @@ test('a field inside the explanation blocks both native and chat subdivision wit
     assert.throws(()=>validateEditOperations([op],s));
     assert.throws(()=>d.splitCellOnGrid(0,1,0,0,0,1,3,false));
     assert.deepEqual(d.exportHwpx(),old);assert.deepEqual(JSON.parse(d.getFieldList()),fields);
+  }finally{d.free();}
+});
+
+for(const ext of ['hwp','hwpx'])test(ext+' retains emphasized title and explanation runs in the first nested-owner piece',()=>{
+  const src=emphasizedSubdivisionNestedTable(HwpDocument);src.insertPageBreak(0,0,2);
+  const d=new HwpDocument(bytes(src,ext));src.free();
+  try{
+    const s=snapshot(d,ext),table=s.structure!.tables[0],operation={...op,target:table.id},undo=d.saveSnapshot(),old=bytes(d,ext);
+    const inspect=(doc:any)=>{
+      const t=readStructure(doc).tables[0];
+      return nestedSubdivisionEvidence(doc,t,subdivisionNestedOwner(doc,t)!);
+    };
+    try{
+      const original=inspect(d),paragraphs=storedOwnerParagraphs(d),previousPage=d.getPageTextLayout(0);
+      assert.deepEqual(original.ownerLines.filter(r=>r.text).map(r=>[r.text,r.bold,r.italic,r.textColor]),[
+        ['접수 ',true,false,'#000000'],['제목',false,false,'#dc2626'],['설',false,false,'#000000'],['명',false,true,'#000000'],
+      ]);
+      assert.deepEqual(original.ownerParagraphs.map(p=>p.shapes.length),[2,0,2]);
+      assert.throws(()=>validateEditOperations([{...operation,distributeParagraphs:true}],s),/중첩/);
+      executeDocumentOperations(d,s,validateEditOperations([operation],s));
+      const reopened=new HwpDocument(bytes(d,ext));
+      try{for(const result of [d,reopened]){
+        assert.deepEqual(inspect(result),original);
+        assert.equal(storedOwnerParagraphs(result),paragraphs);
+        assert.equal(result.getPageTextLayout(0),previousPage);
+        const cells=readStructure(result).tables[0].cells;
+        assert.deepEqual(cells.map(c=>c.text),[table.cells[0].text,'','',...table.cells.slice(1).map(c=>c.text)]);
+      }}finally{reopened.free();}
+      d.restoreSnapshot(undo);assert.deepEqual(bytes(d,ext),old);
+      const split=d.splitCellOnGrid.bind(d);
+      let changed=false;
+      d.splitCellOnGrid=(...args:any[])=>{
+        const result=split(...args);
+        d.applyCharFormatInCell(0,table.paragraph,0,0,0,3,5,'{"textColor":"#000000"}');
+        changed=true;return result;
+      };
+      assert.throws(()=>executeDocumentOperations(d,s,validateEditOperations([operation],s)));
+      assert.equal(changed,true);
+      assert.deepEqual(bytes(d,ext),old);assert.deepEqual(inspect(d),original);
+    }finally{d.discardSnapshot(undo);}
   }finally{d.free();}
 });

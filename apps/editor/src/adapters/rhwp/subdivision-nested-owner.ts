@@ -36,6 +36,15 @@ const overlap=(a:any,b:any)=>Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)>0.2 &&
 const cellBox=(c:any)=>[c.cellIdx,c.row,c.col,c.rowSpan,c.colSpan,rect(c)];
 const segment=(t:Table,owner:NestedSubdivisionOwner,p:number)=>({controlIndex:t.control,cellIndex:owner.index,cellParaIndex:p});
 
+function characterRuns(doc:any,at:readonly [number,number],path:string,length:number){
+  const shapes=parsed(doc.getCharShapeRunsInCellByPath(...at,path,0,length));
+  if(!Array.isArray(shapes) || shapes.length>4000 || shapes.some((s:any,i:number)=>
+      !Number.isSafeInteger(s.endOffset) || !Number.isSafeInteger(s.charShapeId) || s.charShapeId<0 ||
+      s.startOffset!==(i?shapes[i-1].endOffset:0) || s.endOffset<=s.startOffset) ||
+      (shapes.at(-1)?.endOffset??0)!==length)throw invalid();
+  return shapes.map((s:any)=>({...s,characters:parsed(doc.getCellCharPropertiesAtByPath(...at,path,s.startOffset))}));
+}
+
 function readInner(doc:any,t:Table,owner:NestedSubdivisionOwner,paragraph:number,lists:any[]){
   const at=[t.section,t.paragraph] as const,host=segment(t,owner,paragraph);
   const path=(i:number,p:number)=>JSON.stringify([host,{controlIndex:0,cellIndex:i,cellParaIndex:p}]);
@@ -53,12 +62,10 @@ function readInner(doc:any,t:Table,owner:NestedSubdivisionOwner,paragraph:number
     const paragraphs=Array.from({length:l.paraCount},(_,p)=>{
       const leaf=path(index,p),n=doc.getCellParagraphLengthByPath(...at,leaf);
       if(!Number.isSafeInteger(n) || n<0 || n>4000)throw invalid();
-      const text=doc.getTextInCellByPath(...at,leaf,0,n),shapes=parsed(doc.getCharShapeRunsInCellByPath(...at,leaf,0,n));
-      if(typeof text!=='string' || Array.from(text).length!==n || !Array.isArray(shapes) ||
-          shapes.some((s:any,i:number)=>!Number.isSafeInteger(s.endOffset) || !Number.isSafeInteger(s.charShapeId) ||
-            s.startOffset!==(i?shapes[i-1].endOffset:0) || s.endOffset<=s.startOffset) || (shapes.at(-1)?.endOffset??0)!==n)throw invalid();
+      const text=doc.getTextInCellByPath(...at,leaf,0,n),shapes=characterRuns(doc,at,leaf,n);
+      if(typeof text!=='string' || Array.from(text).length!==n)throw invalid();
       return {text,paragraph:parsed(doc.getParaShapeSet(l.listId,p)),characters:parsed(doc.getCellCharPropertiesAtByPath(...at,leaf,0)),
-        shapes:shapes.map((s:any)=>({...s,characters:parsed(doc.getCellCharPropertiesAtByPath(...at,leaf,s.startOffset))}))};
+        shapes};
     });
     return {index,properties,paragraphs};
   });
@@ -122,7 +129,7 @@ export function nestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisio
     if(!Number.isSafeInteger(n) || n<0 || n>4000)throw invalid();
     const text=doc.getTextInCell(...args,0,n),loc=JSON.stringify([segment(t,owner,paragraph)]);
     if(typeof text!=='string' || Array.from(text).length!==n || owner.paragraphs.includes(paragraph) && text!=='')throw invalid();
-    const shapes=parsed(doc.getCharShapeRunsInCellByPath(...at,loc,0,n));
+    const shapes=characterRuns(doc,at,loc,n);
     return {text,style:parsed(doc.getCellStyleAt(...args)),paragraph:parsed(doc.getCellParaPropertiesAt(...args)),
       characters:parsed(doc.getCellCharPropertiesAt(...args,0)),shapes};
   });
@@ -134,6 +141,8 @@ export function nestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisio
         !sameTableLayout(r.cellPath,[segment(t,owner,para)]) || r.paraIdx!==para ||
         r.charStart!==offsets[para] || n<0 || Array.from(content.text).slice(r.charStart,r.charStart+n).join('')!==r.text ||
         !Array.isArray(r.charX) || r.charX.length!==n+1 || !r.charX.every(Number.isFinite))throw invalid();
+    if(n && !content.shapes.some((s:any)=>s.startOffset<=r.charStart && s.endOffset>=r.charStart+n &&
+        s.charShapeId===r.charShapeId))throw invalid();
     // An empty line publishes the available width. Its caret and height are retained.
     const ink=n ? r : {...r,w:0};
     if(!inside(ink,box) || r.charX.some((x:number)=>r.x+x<box.x-0.2 || r.x+x>box.x+box.w+0.2) ||

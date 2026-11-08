@@ -36,6 +36,7 @@ const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const
  if(input.instruction.includes('picture text splice'))operations[0].text=input.instruction.includes('middle')?'양😀yPi닫ccB':'양😀yPiabccB';
  if(input.instruction.includes('multiline picture edit'))operations[0].text='타파하마바사아자😀나다라마바사아Pi'+
    (input.instruction.includes('middle')?'한약라':'한글가나다라')+'cB';
+ if(input.instruction.includes('repeated picture text'))operations[0].text=input.instruction.includes('middle')?'😀Pi나다cB':'😀Pi나나다cB';
  if(input.instruction.includes('mixed-tail'))operations[0].text=operations[0].originalText.slice(0,-1)+'개정😀';
  if(input.instruction.includes('split-owner'))operations[0].text=operations[0].originalText.slice(0,-6)+'Tail 2';
  if(input.instruction.includes('field-tail'))operations[0].text=Array.from(operations[0].originalText).slice(0,cell.paragraphs[paragraph].editableFrom).join('')+'수정😀';
@@ -126,6 +127,29 @@ try{
   await saveAndReopen(f,'photo-owner',format);
   const reopened=await snap();assert.deepEqual(paragraphs(reopened),paragraphs(after));
   assert.deepEqual(await pictures(),originals);
+ });
+ for(const format of ['hwp','hwpx'])await scenario(format+' repeated picture text removes duplicates while preserving original styles and saved slots',async()=>{
+  const source=await createAxisPictureFixture(HwpDocument,out,{merged:true,grouped:true}),args=[0,1,0,4,0];
+  source.insertTextInCell(...args,2,'나나다');source.insertTextInCell(...args,0,'😀😀');
+  source.applyCharFormatInCell(...args,0,2,'{"textColor":"#246789"}');
+  const initial=resolve(out,'repetition-original.'+format);
+  await writeFile(initial,format==='hwp'?source.exportHwp():source.exportHwpx());
+  const records=inspectPictureAnchors(initial),f=await open(format,source);
+  const inspect=()=>f.evaluate(args=>{
+   const d=window.__pageServices.wasm.borrowDocumentHandle();
+   return {text:JSON.parse(d.getPageTextLayout(0)).runs.filter(r=>r.parentParaIdx===1&&r.cellIdx===4).map(r=>r.text).join(''),
+    slots:[...d.getCellPictureTextAnchors(...args)],color:JSON.parse(d.getCellCharPropertiesAt(...args,0)).textColor};
+  },args);
+  const before=await inspect();assert.deepEqual(before,{text:'😀😀Pi나나다cB',slots:[3,7,8],color:'#246789'});
+  await send('first repeated picture text prefix');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const prefix=await inspect();assert.deepEqual(prefix,{text:'😀Pi나나다cB',slots:[2,6,7],color:'#246789'});
+  await send('first repeated picture text middle');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const result=await inspect();assert.deepEqual(result,{text:'😀Pi나다cB',slots:[2,5,6],color:'#246789'});
+  await undo();assert.deepEqual(await inspect(),prefix);
+  await execute('edit:redo');assert.deepEqual(await inspect(),result);
+  await saveAndReopen(f,'repeated-text',format);assert.deepEqual(await inspect(),result);
+  let i=0;assert.deepEqual(inspectPictureAnchors(resolve(out,'repeated-text.'+format)),
+   records.map(r=>r.row===1&&r.col===1?{...r,textOffset:result.slots[i++]}:r));
  });
  for(const format of ['hwp','hwpx'])await scenario(format+' multiline picture edit reflows the first image to line two and preserves native slots',async()=>{
   const source=await multilinePictureParagraph(HwpDocument,out),args=[0,1,0,4,0];

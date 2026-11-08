@@ -25,6 +25,33 @@ function paragraphSplice(original:string,replacement:string,spans?:Array<{start:
  if (!insert.length && start===spans[run].start && end===spans[run].end) refuse();
  return {run,start,remove:end-start,insert};
 }
+/** Repeated text permits several minimal deletions. Every candidate must
+ * preserve the same style owner, picture region and UTF-16 slot displacement. */
+function repeatedPictureDeletion(op:AgentCellParagraphOp,paragraph:CellParagraphText){
+ if(op.spanTexts!==undefined || op.spanFormats!==undefined || !paragraph.pictureTextRanges?.length)return;
+ const a=Array.from(op.originalText),b=Array.from(op.text),remove=a.length-b.length;
+ if(remove<=0)return;
+ let prefix=0,suffix=0;
+ while(prefix<b.length && a[prefix]===b[prefix])prefix++;
+ while(suffix<b.length && a[a.length-1-suffix]===b[b.length-1-suffix])suffix++;
+ if(prefix+suffix<=b.length)return;
+ // For every start in this inclusive interval, the retained prefix and
+ // suffix reconstruct the exact replacement. Keep all possible owners.
+ const first=b.length-suffix,last=prefix,end=last+remove;
+ const spans=paragraph.formatSpans??[{start:0,end:a.length}];
+ if(paragraph.formatSpans && spans.length<2)return;
+ if(spans.some((r,i)=>!Number.isSafeInteger(r.start)||!Number.isSafeInteger(r.end)||
+    r.start!==(i?spans[i-1].end:0)||r.end<=r.start) || spans.at(-1)?.end!==a.length)return;
+ const run=spans.findIndex(r=>r.start<=first && end<=r.end);
+ if(run<0 || !paragraph.pictureTextRanges.some(r=>Number.isSafeInteger(r.start)&&Number.isSafeInteger(r.end)&&
+    r.start>=0 && r.end<=(paragraph.editableFrom??0) && r.start<=first && end<=r.end))return;
+ const units=[0];
+ for(const char of a)units.push(units.at(-1)!+char.length);
+ const removedUnits=units[first+remove]-units[first];
+ for(let start=first+1;start<=last;start++)
+  if(units[start+remove]-units[start]!==removedUnits)return;
+ return {run,start:first,remove,insert:''};
+}
 export function cellParagraphPlan(op:AgentCellParagraphOp,s:Snapshot){
  if(!op||op.kind!=='replace_cell_paragraph'||Object.keys(op).some(k=>!['kind','target','row','column','paragraph','originalText','text','spanTexts','spanFormats'].includes(k)))throw new Error('지원하지 않는 셀 문단 명령입니다.');
  if(![op.row,op.column,op.paragraph].every(v=>Number.isSafeInteger(v)&&v>=0)||!plain(op.originalText)||!plain(op.text)||
@@ -53,12 +80,14 @@ export function cellParagraphPlan(op:AgentCellParagraphOp,s:Snapshot){
    previous=format.end;
   }
  }
- let edits=op.originalText===op.text?[]:paragraphEdits(op,paragraph);
- let pictureEdit:typeof edits[number]|undefined;
+ const repeated=repeatedPictureDeletion(op,paragraph);
+ let edits=op.originalText===op.text?[]:repeated?[repeated]:paragraphEdits(op,paragraph);
+ let pictureEdit:typeof edits[number]|undefined=repeated;
  if(paragraph.editableFrom!==undefined){
   const boundary=paragraph.editableFrom,original=Array.from(op.originalText);
   if(!Number.isSafeInteger(boundary)||boundary<1||boundary>original.length)throw Error('필드 또는 그림 뒤의 일반 텍스트 위치를 확인하세요.');
   edits=edits.map(edit=>{
+   if(edit===repeated)return edit;
    if(edit.start>=boundary)return edit;
    // Keep every character through the field end and the following boundary.
    const keep=boundary-edit.start,insert=Array.from(edit.insert);

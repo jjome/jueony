@@ -23,6 +23,18 @@ const fieldAxis=namedAxis||storedAxis;
 const captionFlow=process.env.JUEONY_NESTED_AXIS_ONLY==='caption-flow';
 const captionAxis=captionFlow||process.env.JUEONY_NESTED_AXIS_ONLY==='caption';
 const axisOnly=captionAxis||bodyMarkers||mergedAxis||fieldAxis||process.env.JUEONY_NESTED_AXIS_ONLY==='1';
+async function captionScreen(frame){
+  const result=await frame.evaluate(()=>{
+    const automation=window.rhwpStudio.automation;let services;
+    automation.registerCommand({id:'ext:nested-caption-review',label:'캡션 검수',canExecute:()=>true,execute:s=>services=s});
+    automation.execute('ext:nested-caption-review');automation.unregisterCommand('ext:nested-caption-review');
+    const doc=services.wasm.borrowDocumentHandle();
+    return {canvas:doc.canvasMetricsActive(),runs:JSON.parse(doc.getPageTextLayout(0)).runs.filter(r=>r.cellIdx===65534),
+      sibling:JSON.parse(doc.getPageControlLayout(0)).controls[1]};
+  });
+  assert.equal(result.canvas,true);
+  return result;
+}
 const provider=http.createServer(async(req,res)=>{
   try {
     let raw=''; for await(const part of req) raw+=part;
@@ -110,6 +122,7 @@ try {
       const root=await navigator.storage.getDirectory(),h=await root.getFileHandle(name,{create:true}),writer=await h.createWritable();
       await writer.write(new Uint8Array(bytes));await writer.close();await window.jueonyEditor.open(new Uint8Array(bytes),name,h,false);
     },bytes,'nested-review.'+format);
+    const sourceScreen=captionFlow?await captionScreen(frame):undefined;
     const request=captionFlow?'여러 줄 캡션의 두 문단을 유지하고 오른쪽 안쪽 표의 두 행 사이에 행 추가':captionAxis?'아래 캡션을 유지하고 오른쪽 안쪽 표의 두 행 사이에 행 추가':leftDelete?'왼쪽 안쪽 표의 첫 행 삭제':fieldAxis?'오른쪽 안쪽 표의 필드 셀 위에 행 추가':mergedAxis?'오른쪽 안쪽 표의 세로 병합 사이에 행 추가':axisOnly?(mode==='insert-row'?'오른쪽 안쪽 표 마지막에 행 추가':'오른쪽 안쪽 표의 둘째 열 삭제'):
       mixed?'오른쪽 안쪽 표의 두 번째 셀 둘째 문단을 변경해줘':'오른쪽 안쪽 표의 두 번째 셀을 변경해줘';
     await fill('request-input',request);
@@ -131,12 +144,15 @@ try {
       else{edited[0]=original[0];edited[1]=['새 행😀','',...original[1]];}
     }
     assert.deepEqual(await texts(),edited);
+    if(captionFlow)assert.deepEqual(await captionScreen(frame),sourceScreen);
     const undo=(await page.$$('.message-actions button')).reverse();
     for (const b of undo) if (await b.evaluate(e=>e.textContent==='요청 되돌리기')) {await b.click();break;}
     await page.waitForFunction(()=>document.getElementById('app-status').textContent.includes('되돌렸습니다'));
     assert.deepEqual(await texts(),original);
+    if(captionFlow)assert.deepEqual(await captionScreen(frame),sourceScreen);
     assert.equal((await frame.evaluate(()=>window.jueonyEditor.executeCommand('edit:redo'))).ok,true);
     assert.deepEqual(await texts(),edited);
+    if(captionFlow)assert.deepEqual(await captionScreen(frame),sourceScreen);
     const saved=await frame.evaluate(async()=>{
       const api=window.jueonyEditor,status=await api.save(),file=await api.fileHandle().getFile();
       return {status,bytes:Array.from(new Uint8Array(await file.arrayBuffer())),dirty:api.state().dirty};
@@ -187,6 +203,14 @@ try {
         assert.equal(JSON.parse(reopened.getCellCharPropertiesAtByPath(...args,1)).bold,true);
       }
     } finally {reopened.free();}
+    if(captionFlow){
+      await frame.evaluate(async bytes=>{
+        const api=window.jueonyEditor;
+        await api.open(new Uint8Array(bytes),api.fileHandle().name,api.fileHandle(),false);
+      },saved.bytes);
+      assert.deepEqual(await texts(),edited);
+      assert.deepEqual(await captionScreen(frame),sourceScreen);
+    }
     console.log('PASS',format,mode,'UI chat → loopback provider → Agent application → undo/redo → bound file save and native reopen');
   }
   assert.equal(calls.length,bodyMarkers||mergedAxis||fieldAxis||captionAxis?2:4);assert.deepEqual(errors,[]);

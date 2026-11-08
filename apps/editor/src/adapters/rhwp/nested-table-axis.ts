@@ -3,7 +3,7 @@ import {projectTableAxis,validateControlOperations,witnessedTrackEdges} from '..
 import {capturePreservationEvidence,verifyPreservedExport} from './preservation.ts';
 import {resourceFingerprint} from './cell-paragraph.ts';
 import {rootBodyTexts} from './table-topology-evidence.ts';
-import {readNestedAxisCaptions,sameNestedCaptionPlacement} from './nested-axis-captions.ts';
+import {readNestedAxisCaptions,sameNestedCaptionPlacement,sameNestedCaptionRoundtrip} from './nested-axis-captions.ts';
 import {readNestedCellFields} from './nested-cell-fields.ts';
 import {parsed,readStructure} from './structure.ts';
 
@@ -113,7 +113,11 @@ export function executeNestedTableAxis(doc:any,base:Snapshot,op:AxisOp){
     verifyPreservedExport(doc,bytes,format,artifact.contentLoss(),b=>new doc.constructor(b));
     reopened=new doc.constructor(bytes);
     const stored=readStructure(reopened),child=stored.nestedTables?.find(t=>t.id===table.id);
-    if(!child||!same(stored,result)||!same(evidence(reopened,child,stored),after))throw Error('중첩 병합 표 또는 이웃 내용이 저장 후 달라졌습니다.');
+    if(!child||!same(stored,result))throw Error('중첩 병합 표 또는 이웃 내용이 저장 후 달라졌습니다.');
+    const {captions:reopenedCaptions,...reopenedEvidence}=evidence(reopened,child,stored);
+    const {captions:liveCaptions,...liveEvidence}=after;
+    if(!same(reopenedEvidence,liveEvidence)||!sameNestedCaptionRoundtrip(liveCaptions,reopenedCaptions))
+     throw Error('중첩 병합 표 또는 이웃 내용이 저장 후 달라졌습니다.');
    }finally{reopened?.free();artifact.free();}
   }
   const focus=Math.min(op.index,(row?updated.rows:updated.columns)-1);

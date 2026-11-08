@@ -46,3 +46,10 @@ export function labeledSubdivisionNestedTable(HwpDocument,title='접수 제목',
   ]),0,1,'{"bold":true}');
   return doc;
 }
+
+export function emphasizedSubdivisionNestedTable(HwpDocument) {
+  const doc=labeledSubdivisionNestedTable(HwpDocument);
+  doc.applyCharFormatInCell(0,1,0,0,0,3,5,'{"bold":false,"textColor":"#dc2626"}');
+  doc.applyCharFormatInCell(0,1,0,0,2,0,1,'{"italic":false}');
+  return doc;
+}

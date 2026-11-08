@@ -28,6 +28,25 @@ test('new character styles can change formatting alone and reject overlapping, u
  s.cellParagraphSources[op.target].cells[0].paragraphs[1].editableFrom=2;
  assert.throws(()=>cellParagraphPlan(style,s));assert.doesNotThrow(()=>cellParagraphPlan({...style,spanFormats:[{start:2,end:3,bold:true}]},s));
 });
+test('repeated picture deletion requires all equivalent positions to share one style and picture region',()=>{
+ const s=base(),originalText='가😀가😀P',change={...op,originalText,text:'가😀P'};
+ const p=s.cellParagraphSources[op.target].cells[0].paragraphs[1];
+ Object.assign(p,{text:originalText,editableFrom:5,pictureTextRanges:[{start:0,end:4}],
+   formatSpans:[{start:0,end:4},{start:4,end:5}]});
+ const before=structuredClone(s),edit={run:0,start:0,remove:2,insert:''};
+ assert.deepEqual(cellParagraphPlan(change,s).pictureEdit,edit);
+ assert.deepEqual(cellParagraphPlan(change,s).edits,[edit]);assert.deepEqual(s,before);
+ for(const patch of [
+   {formatSpans:[{start:0,end:2},{start:2,end:4},{start:4,end:5}]},
+   {pictureTextRanges:[{start:0,end:2},{start:3,end:4}]},
+   {pictureTextRanges:undefined},
+   {editableFrom:3},
+ ]){
+  const invalid=structuredClone(s);Object.assign(invalid.cellParagraphSources[op.target].cells[0].paragraphs[1],patch);
+  assert.throws(()=>cellParagraphPlan(change,invalid));
+ }
+ assert.throws(()=>cellParagraphPlan({...change,spanFormats:[{start:0,end:1,bold:true}]},s));
+});
 test('cell paragraph is an explicit neutral single-paragraph contract',()=>{const shapes=generationSchema().properties.operations.items.anyOf,shape=shapes.find(s=>s.properties.kind.enum[0]===op.kind);assert.ok(shape);assert.deepEqual(shape.required,['kind','target','row','column','paragraph','originalText','text']);});
 test('exact merged anchor and paragraph content returns a pure plan',()=>{const s=base(),before=structuredClone(s),plan=cellParagraphPlan(op,s);assert.equal(plan.cell.index,0);assert.equal(plan.paragraph.index,1);assert.deepEqual(s,before);assert.deepEqual(validateEditOperations([op],s),[op]);});
 test('existing set_table_cell does not gain merged or multiparagraph support',()=>{const {paragraph,...whole}=op;assert.throws(()=>validateEditOperations([{...whole,kind:'set_table_cell',originalText:'첫 문단\n두 번째 문단'}],base()));});

@@ -72,6 +72,47 @@ for(const format of ['hwp','hwpx'])await scenario(format+' plain paragraph in a 
   d.restoreSnapshot(undo);assert.deepEqual(bytes(d),original);d.discardSnapshot(undo);
  }finally{d.free();}
 });
+for(const format of ['hwp','hwpx'])await scenario(format+' repeated picture text removes duplicate emoji and Hangul with identical slot effects',async()=>{
+ const src=await createAxisPictureFixture(HwpDocument,out,{merged:true,grouped:true}),args=[0,1,0,4,0];
+ const bytes=d=>format==='hwp'?d.exportHwp():d.exportHwpx(),name='중복 문구.'+format;
+ src.insertTextInCell(...args,2,'나나다');src.insertTextInCell(...args,0,'😀😀');
+ src.applyCharFormatInCell(...args,0,2,'{"textColor":"#246789"}');
+ const d=new HwpDocument(bytes(src));src.free();
+ try{
+  const original=bytes(d),undo=d.saveSnapshot(),file=resolve(out,'repeat-before.'+format);
+  await writeFile(file,original);const records=inspectPictureAnchors(file);
+  for(const [label,text,anchors] of [['emoji','😀Pi나나다cB',[2,6,7]],['hangul','😀Pi나다cB',[2,5,6]]]){
+   const s=snap(d,name),p=s.cellParagraphSources.s0p1t0.cells.find(c=>c.index===4).paragraphs[0];
+   const op={kind:'replace_cell_paragraph',target:'s0p1t0',row:1,column:1,paragraph:0,originalText:p.text,text};
+   transactionalCandidate(d,s,[op],s.revision);
+   const saved=resolve(out,'repeat-'+label+'.'+format);await writeFile(saved,bytes(d));let i=0;
+   assert.deepEqual(inspectPictureAnchors(saved),records.map(r=>r.row===1&&r.col===1?{...r,textOffset:anchors[i++]}:r));
+   const copy=new HwpDocument(await readFile(saved));
+   try{
+    assert.equal(copy.getTextInCell(...args,0,Array.from(text).length),text);
+    assert.deepEqual([...copy.getCellPictureTextAnchors(...args)],anchors);
+    assert.equal(json(copy.getCellCharPropertiesAt(...args,0)).textColor,'#246789');
+   }finally{copy.free();}
+  }
+  d.restoreSnapshot(undo);assert.deepEqual(bytes(d),original);d.discardSnapshot(undo);
+  for(const fault of ['style','slot']){
+   const unsafe=new HwpDocument(original);
+   try{
+    if(fault==='style')unsafe.applyCharFormatInCell(...args,0,1,'{"bold":true}');
+    else{unsafe.deleteTextInCell(...args,0,2);unsafe.insertTextInCell(...args,0,'P');}
+    const s=snap(unsafe,name),p=s.cellParagraphSources.s0p1t0.cells.find(c=>c.index===4).paragraphs[0],before=bytes(unsafe);
+    assert.throws(()=>transactionalCandidate(unsafe,s,[{kind:'replace_cell_paragraph',target:'s0p1t0',row:1,column:1,
+     paragraph:0,originalText:p.text,text:Array.from(p.text).slice(1).join('')}],s.revision));
+    assert.deepEqual(bytes(unsafe),before);
+   }finally{unsafe.free();}
+  }
+  const s=snap(d,name),remove=d.deleteTextInCell.bind(d),read=d.getCellPictureTextAnchors.bind(d);let wrote=false;
+  d.deleteTextInCell=(...a)=>{const r=remove(...a);wrote=true;return r;};
+  d.getCellPictureTextAnchors=(...a)=>{const r=read(...a);if(wrote&&a[3]===4&&r?.length)r[0]++;return r;};
+  assert.throws(()=>executeCellParagraph(d,s,{kind:'replace_cell_paragraph',target:'s0p1t0',row:1,column:1,paragraph:0,
+   originalText:'😀😀Pi나나다cB',text:'😀Pi나나다cB'}));assert.ok(wrote);assert.deepEqual(bytes(d),original);
+ }finally{d.free();}
+});
 for(const format of ['hwp','hwpx'])await scenario(format+' multiline picture text shifts the first image onto the next verified line',async()=>{
  const src=await multilinePictureParagraph(HwpDocument,out),bytes=d=>format==='hwp'?d.exportHwp():d.exportHwpx();
  const d=new HwpDocument(bytes(src));src.free();

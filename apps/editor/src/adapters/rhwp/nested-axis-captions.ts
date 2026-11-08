@@ -87,7 +87,7 @@ export function readNestedAxisCaptions(doc:any,structure:Structure,target:Nested
  if(typeof doc.getTableAxisCaptionEvidenceByPath!=='function'){
   const stories=parsed(doc.getDocumentStoryInformation()).paragraphs;
   if(stories.some((p:any)=>p.story==='caption'))throw fail();
-  return {stored:[],drawing:null};
+  return {stored:[],drawing:null,portableDrawing:null};
  }
  const tables=[...structure.tables,...(structure.nestedTables??[])];
  const stored=tables.flatMap(t=>{
@@ -97,7 +97,7 @@ export function readNestedAxisCaptions(doc:any,structure:Structure,target:Nested
   return [{id:t.id,value}];
  });
  const caption=stored.find(c=>c.id===target.id)?.value;
- if(!caption)return {stored,drawing:null};
+ if(!caption)return {stored,drawing:null,portableDrawing:null};
  const paragraphs:StoredParagraph[]=caption.kind==='plain'?[caption]:caption.paragraphs;
  if(!Array.isArray(paragraphs))throw fail();
  const prefix='section/'+target.section+'/body/p/'+target.paragraph+
@@ -106,18 +106,39 @@ export function readNestedAxisCaptions(doc:any,structure:Structure,target:Nested
  const stories=parsed(doc.getDocumentStoryInformation()).paragraphs.filter((p:any)=>p.story==='caption'&&p.path.startsWith(prefix));
  if(stories.length!==paragraphs.length||stories.some((s:any,i:number)=>s.path!==prefix+i||s.text!==paragraphs[i].text))throw fail();
  const boxes=(t:Table|NestedTable):any[]=>parsed(doc.getTableCellBboxesByPath(t.section,t.paragraph,tablePath(t)));
- const siblings=tables.filter(t=>t.id!==target.id&&!target.id.startsWith(t.id+'c')).map(t=>{
-  const cap=stored.find(c=>c.id===t.id)?.value;
-  const drawing='ancestors' in t&&cap&&cap.kind!=='complex'?captionDrawing(doc,t,cap,boxes):null;
-  return {id:t.id,boxes:boxes(t),drawing};
- });
- const {origin,...drawing}=captionDrawing(doc,target,caption,boxes);
- return {stored,drawing:{...drawing,siblings}};
+ const readDrawing=()=>{
+  const siblings=tables.filter(t=>t.id!==target.id&&!target.id.startsWith(t.id+'c')).map(t=>{
+   const cap=stored.find(c=>c.id===t.id)?.value;
+   const drawing='ancestors' in t&&cap&&cap.kind!=='complex'?captionDrawing(doc,t,cap,boxes):null;
+   return {id:t.id,boxes:boxes(t),drawing};
+  });
+  const {origin,...drawing}=captionDrawing(doc,target,caption,boxes);
+  return {...drawing,siblings};
+ };
+ const drawing=readDrawing();
+ if(doc.canvasMetricsActive?.()!==true)return {stored,drawing,portableDrawing:drawing};
+ // The live view can use published Canvas widths. File constructors use
+ // portable font metrics, so retain evidence under both measurement systems.
+ try{
+  doc.selectCanvasMetrics(false);
+  if(doc.canvasMetricsActive()!==false)throw fail();
+  return {stored,drawing,portableDrawing:readDrawing()};
+ }finally{
+  doc.selectCanvasMetrics(true);
+  if(doc.canvasMetricsActive()!==true)throw fail();
+ }
 }
 
-export function sameNestedCaptionPlacement(before:ReturnType<typeof readNestedAxisCaptions>,after:ReturnType<typeof readNestedAxisCaptions>){
- if(!same(before.stored,after.stored))return false;
- const a=before.drawing,b=after.drawing;
+type Captions=ReturnType<typeof readNestedAxisCaptions>;
+function sameDrawing(a:Captions['drawing'],b:Captions['drawing']){
  if(!a||!b)return a===b;
  return a.page===b.page&&a.positions.length===b.positions.length&&a.positions.every((v,i)=>near(v,b.positions[i]))&&same(a.styles,b.styles)&&same(a.siblings,b.siblings);
+}
+
+export function sameNestedCaptionPlacement(before:Captions,after:Captions){
+ return same(before.stored,after.stored)&&sameDrawing(before.drawing,after.drawing)&&sameDrawing(before.portableDrawing,after.portableDrawing);
+}
+
+export function sameNestedCaptionRoundtrip(before:Captions,reopened:Captions){
+ return same(before.stored,reopened.stored)&&same(before.portableDrawing,reopened.portableDrawing)&&same(reopened.drawing,reopened.portableDrawing);
 }

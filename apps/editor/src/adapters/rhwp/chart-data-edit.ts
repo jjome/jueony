@@ -8,6 +8,7 @@ export type ChartDataSource={
  labelsShared:boolean;labelsMultiLevel:boolean;labels:string[];series:ChartSeries[];
 };
 export type ChartValueEdit={revision:string;index:number;series:number;point:number;original:string;value:string};
+export type ChartSeriesNameEdit={revision:string;index:number;series:number;original:string;value:string};
 
 const CONTROL=/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/u;
 const json=(value:unknown):unknown=>typeof value==='string'?JSON.parse(value):value;
@@ -81,5 +82,38 @@ export function replaceChartValue(value:any,expected:ChartDataSource,edit:ChartV
   const preservationAfter=capturePreservationEvidence(doc);if(preservationAfter.issues.length||exact(preservationBefore.values)!==exact(preservationAfter.values))throw new Error('차트 외 문서 내용이 함께 바뀌었습니다.');
   return{before:current,after:allAfter[edit.index]};
  }catch(error){const restored=checked(method(doc,'restoreSnapshot')(token),'실패 복구');if(restored.ok!==true)throw new Error('차트 편집 실패 뒤 문서를 복구하지 못했습니다.',{cause:error});throw error;}
+ finally{method(doc,'discardSnapshot')(token);}
+}
+
+/** Renames one existing series cache entry; its c:f cell reference and every other chart byte stay owned by the engine. */
+export function replaceChartSeriesName(value:any,expected:ChartDataSource,edit:ChartSeriesNameEdit,currentRevision:()=>string):{before:ChartDataSource;after:ChartDataSource}{
+ const doc=native(value),liveRevision=revision(currentRevision());
+ if(liveRevision!==expected.revision||revision(edit.revision)!==expected.revision||edit.index!==expected.index)throw new Error('차트 편집 요청의 문서 버전이 오래되었습니다.');
+ integer(edit.series,'계열 번호');if(edit.series>=expected.series.length)throw new Error('차트 계열 범위를 벗어났습니다.');
+ text(edit.original,'원래 계열 이름',4096);const next=text(edit.value,'새 계열 이름',4096);if(!next||/[<>&]/u.test(next))throw new Error('차트 계열 이름은 비어 있거나 XML 특수문자를 포함할 수 없습니다.');
+ if(expected.series[edit.series].name!==edit.original||edit.original===edit.value)throw new Error('차트 계열 원문 또는 새 이름이 요청과 다릅니다.');
+ for(const name of ['saveSnapshot','restoreSnapshot','discardSnapshot','setChartDataByIndex'])method(doc,name);
+ const current=source(doc,edit.index,expected.revision);if(exact(current)!==exact(expected))throw new Error('차트 데이터가 요청을 만든 뒤 바뀌었습니다.');
+ const allBefore=current.charts.map((_,i)=>source(doc,i,expected.revision,current.charts));const preservationBefore=capturePreservationEvidence(doc);
+ if(preservationBefore.issues.length)throw new Error('차트 편집 전 문서 보존 상태를 확인하지 못했습니다.');
+ const request={dryRun:true,structure:true,labels:clone(current.labels),series:clone(current.series)};request.series[edit.series].name=edit.value;
+ const checkResult=(result:JsonRecord,dryRun:boolean)=>{
+  if(result.dryRun!==dryRun||result.chart!==current.chart||result.changedCount!==1||!Array.isArray(result.changed)||result.changed.length!==1||!Array.isArray(result.wrote))throw new Error('차트 계열 이름 편집 결과가 요청과 다릅니다.');
+  const changed=object(result.changed[0]);if(changed.op!=='renameSeries'||changed.series!==edit.series||changed.from!==edit.original||changed.to!==edit.value)throw new Error('차트 계열 이름 편집 결과가 대상을 증명하지 못했습니다.');
+  const wrote=dryRun?[]:current.representations.zipPart?['zipPart','nestedCopy']:['nestedCopy'];if(exact(result.wrote)!==exact(wrote))throw new Error('차트 원본 사본을 모두 갱신하지 못했습니다.');
+ };
+ const dry=checked(method(doc,'setChartDataByIndex')(edit.index,JSON.stringify(request)),'계열 이름 사전 검사');checkResult(dry,true);
+ if(exact(source(doc,edit.index,expected.revision))!==exact(current))throw new Error('차트 계열 이름 사전 검사가 문서를 변경했습니다.');
+ const token=method(doc,'saveSnapshot')();if(!Number.isSafeInteger(token))throw new Error('차트 편집 복구 지점을 만들지 못했습니다.');
+ try{
+  const apply=checked(method(doc,'setChartDataByIndex')(edit.index,JSON.stringify({...request,dryRun:false})),'계열 이름 변경');checkResult(apply,false);
+  if(revision(currentRevision())!==expected.revision)throw new Error('차트 편집 도중 문서 버전이 바뀌었습니다.');
+  const listAfter=charts(doc);if(exact(listAfter)!==exact(current.charts))throw new Error('차트 편집 뒤 차트 위치가 바뀌었습니다.');
+  const allAfter=listAfter.map((_,i)=>source(doc,i,expected.revision,listAfter)),target=clone(current);target.series[edit.series].name=edit.value;
+  if(exact(allAfter[edit.index])!==exact(target))throw new Error('차트 계열 이름 외의 구조·축·범례·값이 바뀌었습니다.');
+  for(let i=0;i<allBefore.length;i++)if(i!==edit.index&&exact(allBefore[i])!==exact(allAfter[i]))throw new Error('다른 차트 데이터가 함께 바뀌었습니다.');
+  const preservationAfter=capturePreservationEvidence(doc);if(preservationAfter.issues.length||exact(preservationBefore.values)!==exact(preservationAfter.values))throw new Error('차트 외 문서 내용이 함께 바뀌었습니다.');
+  return{before:current,after:allAfter[edit.index]};
+ }catch(error){checked(method(doc,'restoreSnapshot')(token),'실패 복구');throw error;}
  finally{method(doc,'discardSnapshot')(token);}
 }

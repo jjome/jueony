@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {inflateRawSync} from 'node:zlib';
 import init,{HwpDocument} from '../node_modules/@rhwp/core/rhwp.js';
-import {readChartDataSource,replaceChartValue} from '../src/adapters/rhwp/chart-data-edit.ts';
+import {readChartDataSource,replaceChartSeriesName,replaceChartValue} from '../src/adapters/rhwp/chart-data-edit.ts';
 import {hwpLogicalStreams} from '../scripts/lib/hwp-summary-evidence.mjs';
 import {readOwnedZip} from '../scripts/lib/owned-zip.mjs';
 
@@ -38,17 +38,22 @@ function expectedXml(before:string):string{
  assert.equal(before.split(needle).length-1,1);assert.match(before,/<c:barChart>/);assert.match(before,/<c:catAx>/);assert.match(before,/<c:valAx>/);assert.match(before,/<c:legendPos val="r"\/>/);
  assert.match(before,/<c:ext uri="CC8EB2C9-7E31-499d-B8F2-F6CE61031016"><ho:hncChartStyle /);return before.replace(needle,replacement);
 }
+function expectedSeriesNameXml(before:string):string{
+ const formula='<c:f>Sheet1!$B$1</c:f>',needle='계열 1';assert.equal(before.split(formula).length-1,1);assert.equal(before.split(needle).length-1,1);
+ assert.match(before,/<c:barChart>/);assert.match(before,/<c:catAx>/);assert.match(before,/<c:valAx>/);assert.match(before,/<c:legendPos val="r"\/>/);
+ assert.match(before,/<c:ext uri="CC8EB2C9-7E31-499d-B8F2-F6CE61031016"><ho:hncChartStyle /);const after=before.replace(needle,'첫 계열');assert.equal(after.split(formula).length-1,1);return after;
+}
 function assertNestedPreserved(before:Map<string,Buffer>,after:Map<string,Buffer>){
  assert.deepEqual([...after.keys()].sort(),[...before.keys()].sort());
  for(const [name,value] of before)if(name!=='OOXMLChartContents')assert.deepEqual(after.get(name),value,`non-chart nested OLE stream changed: ${name}`);
 }
-function assertRawPreservation(format:Format,original:Uint8Array,saved:Uint8Array){
+function assertRawPreservation(format:Format,original:Uint8Array,saved:Uint8Array,expected:(xml:string)=>string=expectedXml){
  if(format==='hwp'){
-  const before=hwpEvidence(original),after=hwpEvidence(saved);assert.equal(after.path,before.path);assert.equal(after.xml,expectedXml(before.xml));assertNestedPreserved(before.nested,after.nested);
+  const before=hwpEvidence(original),after=hwpEvidence(saved);assert.equal(after.path,before.path);assert.equal(after.xml,expected(before.xml));assertNestedPreserved(before.nested,after.nested);
   assert.deepEqual([...after.streams.keys()].sort(),[...before.streams.keys()].sort());
   for(const [name,value] of before.streams)if(name!==before.path&&!/^DocInfo$|^BodyText\//.test(name))assert.deepEqual(after.streams.get(name),value,`non-chart HWP asset changed: ${name}`);
  }else{
-  const before=hwpxEvidence(original),after=hwpxEvidence(saved);assert.equal(after.path,before.path);assert.equal(after.xml,expectedXml(before.xml));assert.equal(after.nestedXml,expectedXml(before.nestedXml));assertNestedPreserved(before.nested,after.nested);
+  const before=hwpxEvidence(original),after=hwpxEvidence(saved);assert.equal(after.path,before.path);assert.equal(after.xml,expected(before.xml));assert.equal(after.nestedXml,expected(before.nestedXml));assertNestedPreserved(before.nested,after.nested);
   for(const [name,value] of before.parts)if(/^Preview\//.test(name))assert.deepEqual(after.parts.get(name),value,`non-chart HWPX asset changed: ${name}`);
  }
 }
@@ -68,6 +73,20 @@ for(const format of ['hwp','hwpx'] as const)test(`one ${format.toUpperCase()} ch
  }finally{doc.free();}
 });
 
+for(const format of ['hwp','hwpx'] as const)test(`one ${format.toUpperCase()} series name change preserves its formula, chart structure, unknown OOXML and non-chart assets`,async()=>{
+ const original=await readFile(samples[format]),doc:any=new HwpDocument(original);
+ try{
+  const beforeExport=bytes(doc,format),source=readChartDataSource(doc,0,'document:1'),undo=doc.saveSnapshot();
+  try{
+   const result=replaceChartSeriesName(doc,source,{revision:'document:1',index:0,series:0,original:'계열 1',value:'첫 계열'},()=> 'document:1');
+   assert.equal(result.after.series[0].name,'첫 계열');assert.deepEqual(result.after.series[0].values,source.series[0].values);const saved=bytes(doc,format);assertRawPreservation(format,original,saved,expectedSeriesNameXml);
+   const reopened:any=new HwpDocument(saved);try{const actual=readChartDataSource(reopened,0,'document:2');assert.deepEqual(same(actual),same(result.after));assert.equal(actual.plot,'bar');assert.equal(actual.axis,'category');assert.deepEqual(actual.series.map(series=>series.name),['첫 계열','계열 2','계열 3']);}
+   finally{reopened.free();}
+   doc.restoreSnapshot(undo);assert.deepEqual(bytes(doc,format),beforeExport);
+  }finally{doc.discardSnapshot(undo);}
+ }finally{doc.free();}
+});
+
 test('stale revisions and stale source are fail-closed and a malformed engine result rolls back atomically',async()=>{
  const doc:any=new HwpDocument(await readFile(samples.hwpx));
  try{
@@ -79,5 +98,19 @@ test('stale revisions and stale source are fail-closed and a malformed engine re
    const value=Reflect.get(target,key,target);return typeof value==='function'?value.bind(target):value;
   }});
   assert.throws(()=>replaceChartValue(proxy,source,edit,()=> 'document:1'),/실패/);assert.deepEqual(doc.exportHwpx(),before);
+ }finally{doc.free();}
+});
+
+test('series name edit rejects stale ownership and rolls back after a malformed post-mutation result',async()=>{
+ const doc:any=new HwpDocument(await readFile(samples.hwp));
+ try{
+  const source=readChartDataSource(doc,0,'document:1'),before=doc.exportHwp(),edit={revision:'document:1',index:0,series:0,original:'계열 1',value:'첫 계열'};
+  assert.throws(()=>replaceChartSeriesName(doc,source,edit,()=> 'document:2'),/버전/);assert.deepEqual(doc.exportHwp(),before);
+  assert.throws(()=>replaceChartSeriesName(doc,source,{...edit,original:'계열 2'},()=> 'document:1'),/원문/);assert.deepEqual(doc.exportHwp(),before);
+  const proxy=new Proxy(doc,{get(target,key){
+   if(key==='setChartDataByIndex')return(index:number,payload:string)=>{const result=JSON.parse(target.setChartDataByIndex(index,payload));if(JSON.parse(payload).dryRun)return JSON.stringify(result);return JSON.stringify({...result,ok:false});};
+   const value=Reflect.get(target,key,target);return typeof value==='function'?value.bind(target):value;
+  }});
+  assert.throws(()=>replaceChartSeriesName(proxy,source,edit,()=> 'document:1'),/실패/);assert.deepEqual(doc.exportHwp(),before);
  }finally{doc.free();}
 });

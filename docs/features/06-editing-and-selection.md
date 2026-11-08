@@ -240,11 +240,11 @@
 - 종류: 한글 상위 기능 · 우선순위: P2.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 텍스트만 골라 붙이기: 본문 한 문단 선택→여러 줄, 원문·서식·undo·양 형식 저장 검사. HTML/그림/HWP 조각, 표와 특수 영역·여러 문단 선택 남음.
+- 완료 범위: 단일 구역 root-body의 2~200개 일반 문단 선택을 여러 줄 plain text로 치환한다. 적용 직전 전체 본문 identity·원문·글자/문단 서식·revision·선택을 재검증하고 단일 snapshot으로 실패 rollback과 정확한 undo를 보호한다.
+- 다음 작업: 신규 어댑터와 기존 text-transform 회귀의 HWP/HWPX 저장·재열기·앞뒤 서식 보존·stale/부분 실패 불변을 9/9로 검증했다. UI/basic-text-commands에는 아직 연결하지 않았고 다구역·표/필드/책갈피/개체/특수 story, HTML/그림/HWP 조각과 한글 비교가 남아 PARTIAL을 유지한다.
 - UI 명령: `edit:paste-special`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [basic-text-browser.json](<../evidence/remaining-editor-2026-10-13/basic-text-browser.json>)
-- 원래 기록: `PARTIAL;BROWSER_TESTED_NATIVE_PENDING`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [basic-text-browser.json](<../evidence/remaining-editor-2026-10-13/basic-text-browser.json>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `PARTIAL;MULTI_PARAGRAPH_PLAIN_TEXT_2026_11_09;HWP_HWPX_REOPEN_9_OF_9;UI_NOT_CONNECTED`
 
 </details>
 

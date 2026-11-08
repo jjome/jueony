@@ -20,7 +20,7 @@
 
 ## 먼저 할 일
 
-- **구현** [N011](<07-formatting-and-styles.md#n011>) **스타일 가져오기·내보내기** — 포터블 JSON과 HWP/HWPX 저장·재열기에서 borderConnect·borderIgnoreMargin 보존과 전체 롤백을 검증했다. 사용자 탭·실제 테두리선·배경·간격은 mutation 전에 차단한다. 번호·개요·TabDef/BorderFill 생성·특수 영역·UI·Agent·한글 비교는 남아 부분이다.
+- **구현** [N011](<07-formatting-and-styles.md#n011>) **스타일 가져오기·내보내기** — portable v1의 사용자 탭과 기본 없음/실선 테두리·없음/단색 배경·네 방향 간격을 원본 참조 인증 뒤 이식한다. 최신 검수 엔진에서 HWP/HWPX 재열기·exact-byte undo·stale ID 불변·실패 전체 롤백 3/3을 통과했다. 글자 스타일 BorderFill·번호/개요·점선/무늬/그러데이션/그림/3D/대각선/투명도·특수 영역·UI·Agent·한글 비교는 남아 부분이다.
 - **구현** [N012](<07-formatting-and-styles.md#n012>) **범위 글자 스타일의 영구 정의 연결** — 저장 글자 스타일과 직접 서식을 타입으로 분리하고 독립 charShape 소유·정의 변경 전파·중복/stale/race fail-closed를 구현했다. 실제 Rust HWP/HWPX 3/3과 앱 경계·범위 보호 7/7을 통과했다. 새 WASM UI 스모크·공유 UI·Agent 연결·한글 비교는 남아 부분이다.
 - **구현** [N013](<07-formatting-and-styles.md#n013>) **스타일마당과 사용자 번호키 재할당** — 설정 UI의 매핑 표시·개별 해제·전체 재설정과 HWP/HWPX 스타일 적용·재열기·undo·stale/IME 불변 3/3·격리 전체 build·실제 Edge 설정창/단축키 smoke를 통과했다. 빈 문서 stored-time 초기화 경고 때문에 소유 HWPX를 연 뒤 검증했으며 이 제한과 portable package UI·Agent·한글 비교는 남아 부분이다.
 
@@ -707,11 +707,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 평면 스타일의 언어별 글꼴·충돌 이름·다음 스타일 순환·문단 테두리 동작 플래그·기존 본문/정의 불변·중간 실패 전체 롤백
-- 다음 작업: 포터블 JSON과 HWP/HWPX 저장·재열기에서 borderConnect·borderIgnoreMargin 보존과 전체 롤백을 검증했다. 사용자 탭·실제 테두리선·배경·간격은 mutation 전에 차단한다. 번호·개요·TabDef/BorderFill 생성·특수 영역·UI·Agent·한글 비교는 남아 부분이다.
+- 완료 범위: 평면 스타일의 언어별 글꼴·충돌 이름·다음 스타일 순환·문단 테두리 동작 플래그·문단 사용자 TabDef·기본 BorderFill·기존 본문/정의 불변·중간 실패 전체 롤백
+- 다음 작업: portable v1의 사용자 탭과 기본 없음/실선 테두리·없음/단색 배경·네 방향 간격을 원본 참조 인증 뒤 이식한다. 최신 검수 엔진에서 HWP/HWPX 재열기·exact-byte undo·stale ID 불변·실패 전체 롤백 3/3을 통과했다. 글자 스타일 BorderFill·번호/개요·점선/무늬/그러데이션/그림/3D/대각선/투명도·특수 영역·UI·Agent·한글 비교는 남아 부분이다.
 - 상위 항목: [B098](<07-formatting-and-styles.md#b098>) 스타일
 - 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_STYLE_PACKAGE_ROLLBACK_2026_11_08;STYLE_BORDER_BEHAVIOR_FLAGS_2026_11_08`
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_STYLE_PACKAGE_ROLLBACK_2026_11_08;STYLE_BORDER_BEHAVIOR_FLAGS_2026_11_08;PORTABLE_TABDEF_BASIC_BORDERFILL_2026_11_09`
 
 </details>
 

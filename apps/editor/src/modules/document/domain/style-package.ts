@@ -7,9 +7,10 @@ const bool = (v: unknown) => { if (typeof v !== 'boolean') throw new Error('스�
 const choice = (v: unknown, values: string[]) => { if (typeof v !== 'string' || !values.includes(v)) throw new Error('지원하지 않는 스타일 모양 값입니다.'); return v; };
 const colors = ['underlineColor', 'strikeColor', 'textColor', 'shadeColor', 'shadowColor'];
 const charBooleans = ['bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', 'emboss', 'engrave', 'kerning'];
-// These two paragraph-border behavior flags do not require creating or remapping
-// a BorderFill resource. Actual lines, fills, spacing and TabDef stay unsupported.
-const paraBooleans = ['widowOrphan', 'keepWithNext', 'keepLines', 'pageBreakBefore', 'fontLineHeight', 'singleLine', 'autoSpaceKrEn', 'autoSpaceKrNum', 'borderConnect', 'borderIgnoreMargin'];
+const paraBooleans = ['widowOrphan', 'keepWithNext', 'keepLines', 'pageBreakBefore', 'fontLineHeight', 'singleLine', 'autoSpaceKrEn', 'autoSpaceKrNum'];
+// Added to portable v1 after its first release. Missing values in an older v1
+// record mean the native defaults, while present values are still strict.
+const optionalParaBooleans = ['borderConnect', 'borderIgnoreMargin'];
 export function validatePortableShapes(charValue: unknown, paraValue: unknown): { char: Record<string, any>; para: Record<string, any> } {
   const source = object(charValue), p = object(paraValue), char: Record<string, any> = {}, para: Record<string, any> = {};
   if (!Array.isArray(source.fontFamilies) || source.fontFamilies.length !== 7) throw new Error('언어별 글꼴 7개를 확인하세요.'); char.fontFamilies = source.fontFamilies.map(value => text(value));
@@ -25,6 +26,7 @@ export function validatePortableShapes(charValue: unknown, paraValue: unknown): 
   for (const key of ['marginLeft', 'marginRight', 'indent']) para[key] = num(p[key], -1000, 1000);
   for (const key of ['spacingBefore', 'spacingAfter']) para[key] = num(p[key], 0, 1000);
   for (const key of paraBooleans) para[key] = bool(p[key]);
+  for (const key of optionalParaBooleans) para[key] = p[key] === undefined ? false : bool(p[key]);
   for (const key of ['verticalAlign', 'englishBreakUnit', 'koreanBreakUnit']) { para[key] = num(p[key], 0, 3); if (!Number.isInteger(para[key])) throw new Error('문단 모양 종류 값은 정수여야 합니다.'); }
   return { char, para };
 }

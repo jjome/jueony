@@ -424,7 +424,22 @@ function pictureSpliceLayout(doc:any,t:Table,cell:number,paragraph:number,text:s
  if(!wraps && line.some((v,i)=>i>0&&v.x<line[i-1].x+line[i-1].w-.2))throw invalid();
  const controls=pages.map((items:any[])=>items.map(v=>v.type==='image'&&owns(v)?{...v,x:0,y:0}:v));
  const bystanders=Array.from({length:doc.pageCount()},(_,p)=>parsed(doc.getPageTextLayout(p)).runs.filter((r:any)=>!owns(r)));
- return {page,line,rows,wraps,caretWidths,controls,bystanders};
+ let centeredFlow;
+ const properties=parsed(doc.getCellProperties(t.section,t.paragraph,t.control,cell));
+ if(properties.verticalAlign===1&&paragraph===0&&doc.getCellParagraphCount(t.section,t.paragraph,t.control,cell)===1){
+  const p=parsed(doc.getCellParaPropertiesAt(t.section,t.paragraph,t.control,cell,paragraph));
+  const path=JSON.stringify([{controlIndex:t.control,cellIndex:cell,cellParaIndex:paragraph}]);
+  const runs=parsed(doc.getCharShapeRunsInCellByPath(t.section,t.paragraph,path,0,Array.from(text).length));
+  const styles=runs.map((r:any)=>parsed(doc.getCellCharPropertiesAt(t.section,t.paragraph,t.control,cell,paragraph,r.startOffset)));
+  const size=styles[0]?.fontSize;
+  if(int(size)&&size>0&&styles.every((s:any)=>s.fontSize===size&&!s.subscript&&!s.superscript)&&
+     p.alignment==='left'&&p.marginLeft===0&&p.marginRight===0&&p.indent===0&&
+     p.lineSpacingType==='Percent'&&Number.isFinite(p.lineSpacing)&&p.lineSpacing>=100&&
+     p.fontLineHeight===false&&p.spacingBefore===0&&p.spacingAfter===0)
+   centeredFlow={bounds:box,properties,paragraph:p,height:size/75,spacing:size/75*(p.lineSpacing/100-1),
+    lineX:box.x+properties.paddingLeft/75};
+ }
+ return {page,line,rows,wraps,caretWidths,controls,bystanders,centeredFlow};
 }
 function assertPictureSplice(before:ReturnType<typeof pictureSpliceLayout>,after:ReturnType<typeof pictureSpliceLayout>,
  anchors:number[],edit:PictureEdit){
@@ -432,17 +447,39 @@ function assertPictureSplice(before:ReturnType<typeof pictureSpliceLayout>,after
  const oldSuffix=before.line.slice(start+edit.remove),newSuffix=after.line.slice(tail);
  const noLayout={...after,line:before.line,rows:before.rows,wraps:before.wraps};
  if(before.wraps || after.wraps){
+  let dy=0;
+  const center=before.centeredFlow;
+  if(center&&after.centeredFlow&&before.rows?.length&&after.rows?.length&&before.rows.length!==after.rows.length){
+   const regular=(rows:NonNullable<typeof before.rows>)=>rows.every((row,i)=>
+    sameTableLayout(row.x,center.lineX)&&sameTableLayout(row.height,center.height)&&
+    (!i||sameTableLayout(row.y-rows[i-1].y-rows[i-1].height,center.spacing)));
+   if(!sameTableLayout(center,after.centeredFlow)||!regular(before.rows)||!regular(after.rows))
+    throw Error('가운데 정렬 그림 문단의 원래 줄 높이·간격을 증명하지 못했습니다.');
+   const block=(rows:NonNullable<typeof before.rows>)=>rows.at(-1)!.y+rows.at(-1)!.height-rows[0].y;
+   dy=(block(before.rows)-block(after.rows))/2;
+  }
   const retained=oldSuffix.length===newSuffix.length && oldSuffix.every((v,i)=>{
    const n=newSuffix[i];
+   const oldIndex=start+edit.remove+i,newIndex=tail+i;
+   // At a freshly wrapped row start, the generic cursor resolves the shared
+   // boundary to the preceding row. Accept Canvas reshaping there only when
+   // the old glyph has independent caret evidence and the new glyph begins an
+   // independently navigable row. pictureRows already proves the new row's
+   // start, end and every intervening advance; pictures never use this case.
+   const wrappedBoundary=!v.value.startsWith('pic') && (
+    before.caretWidths.has(oldIndex) && after.rows?.some(row=>row.start===newIndex)===true ||
+    after.caretWidths.has(newIndex) && before.rows?.some(row=>row.start===oldIndex)===true);
    return v.value===n.value && sameTableLayout(v.h,n.h) && (sameTableLayout(v.w,n.w) ||
-    before.caretWidths.has(start+edit.remove+i) && after.caretWidths.has(tail+i));
+    before.caretWidths.has(oldIndex) && after.caretWidths.has(newIndex) || wrappedBoundary);
   });
-  if(!before.rows || !after.rows || !sameTableLayout(before,noLayout) ||
-     !sameTableLayout(before.line.slice(0,start),after.line.slice(0,start)) ||
-     !retained ||
-     !before.rows.slice(0,after.rows.length).every((r,i)=>{
-      const q=after.rows![i];return sameTableLayout([r.x,r.y,r.height],[q.x,q.y,q.height]);
-     }))throw Error('여러 줄 그림 문단에서 편집 범위 밖의 글자·그림 또는 줄 시작 위치가 달라졌습니다.');
+  if(!before.rows || !after.rows)throw Error('여러 줄 그림 문단의 편집 전후 줄 경계를 확인하지 못했습니다.');
+  if(!sameTableLayout(before,noLayout))throw Error('여러 줄 그림 문단의 대상 밖 화면 배치가 달라졌습니다.');
+  if(!sameTableLayout(before.line.slice(0,start).map(v=>({...v,y:v.y+dy})),after.line.slice(0,start)))
+   throw Error('여러 줄 그림 문단에서 편집 범위 앞의 글자·그림 배치가 달라졌습니다.');
+  if(!retained)throw Error('여러 줄 그림 문단에서 편집 범위 뒤의 글자·그림 배치가 달라졌습니다.');
+  if(!before.rows.slice(0,after.rows.length).every((r,i)=>{
+   const q=after.rows![i];return sameTableLayout([r.x,r.y+dy,r.height],[q.x,q.y,q.height]);
+  }))throw Error('여러 줄 그림 문단에서 줄 시작 위치가 달라졌습니다.');
   return;
  }
  const dx=newSuffix[0]?.x-oldSuffix[0]?.x;

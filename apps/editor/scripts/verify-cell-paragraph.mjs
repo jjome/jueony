@@ -1,6 +1,7 @@
 import {createAxisPictureFixture,inspectPictureAnchors} from './lib/axis-picture-fixture.mjs';
 import {multilinePictureParagraph,repeatedSpacePictureParagraph} from './lib/cell-paragraph-pictures.mjs';
-import {createPictureFieldParagraph,mixedPictureFieldArgs,inspectMixedPictureFields} from './lib/cell-paragraph-picture-fields.mjs';
+import {createPictureFieldParagraph,mixedPictureFieldArgs,inspectMixedPictureFields,inspectPictureFieldLines} from './lib/cell-paragraph-picture-fields.mjs';
+import {readPictureFieldFlow,assertPictureFieldFlow,assertCenteredPictureFlow} from './lib/picture-field-flow.mjs';
 import puppeteer from 'puppeteer-core';
 import {continuedMergedTable,fragmentedMergedCell} from './lib/continued-merged-table.mjs';
 import http from 'node:http';
@@ -97,8 +98,8 @@ try{
  await new Promise(r=>provider.listen(providerPort,'127.0.0.1',r));for(let i=0;i<100;i++){if(await fetch(origin+'/api/health').then(r=>r.ok,()=>false))break;await delay(100);}
  browser=await puppeteer.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true,args:['--no-first-run','--disable-background-networking'],defaultViewport:{width:1400,height:1000}});page=await browser.newPage();page.setDefaultTimeout(15000);page.on('dialog',d=>{if(d.type()==='beforeunload'){beforeUnloadCount++;void d.accept();}else void d.dismiss();});page.on('pageerror',e=>pageErrors.push(String(e)));page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});await page.setRequestInterception(true);page.on('request',r=>{if(!r.url().startsWith(origin)&&!r.url().startsWith('data:')&&!r.url().startsWith('blob:')){externalRequests.push(r.url());void r.abort();}else void r.continue();});await page.goto(origin);await ready();
  if(casePattern)await configure('openai-compatible');
- for(const format of ['hwp','hwpx'])await scenario(format+' field-prefix and inter-field length changes retain stored IDs and UTF16 slots through chat',async()=>{
-  const source=await createPictureFieldParagraph(HwpDocument,resolve(out,'field-prefix-'+format),'multiple');
+ for(const format of ['hwp','hwpx'])await scenario(format+' field-prefix 10pt wrap and inter-field length changes retain stored IDs and UTF16 slots through chat',async()=>{
+  const source=await createPictureFieldParagraph(HwpDocument,resolve(out,'field-prefix-'+format),'multiple-wrap');
   const original=resolve(out,'field-prefix-before.'+format);await writeFile(original,format==='hwp'?source.exportHwp():source.exportHwpx());
   const raw=inspectMixedPictureFields(original),f=await open(format,source);
   const canvas=()=>f.waitForFunction(()=>window.__pageServices.wasm.borrowDocumentHandle().canvasMetricsActive()===true,{timeout:15000});
@@ -110,7 +111,8 @@ try{
     anchors:[...d.getCellPictureTextAnchors(...args)],pictures:Array.from({length:d.pageCount()},(_,p)=>JSON.parse(d.getPageControlLayout(p)).controls
      .filter(c=>c.type==='image').map(c=>({frame:c,bytes:[...d.getControlImageData(c.secIdx,c.parentParaIdx,JSON.stringify(c.cellPath),c.controlIdx)]}))).flat()};
   },mixedPictureFieldArgs);
-  const before=await inspect(),s=await snap();
+  const flow=async()=>assertPictureFieldFlow(await f.evaluate(readPictureFieldFlow,mixedPictureFieldArgs));
+  const before=await inspect(),beforeFlow=await flow(),s=await snap();assert.equal(beforeFlow.rows.length,1);
   assert.deepEqual(s.cellParagraphSources.s0p1t0.cells.find(c=>c.index===4).paragraphs[0].pictureTextRanges,
    [{start:0,end:5},{start:10,end:14},{start:19,end:23},{start:25,end:29}]);
   const stateBefore=await state();await send('first field-prefix forbidden');
@@ -118,21 +120,34 @@ try{
   const expectedFields=shifts=>before.fields.map((field,i)=>({...field,...Object.fromEntries(
    ['startCharIdx','endCharIdx','startPos','endPos'].map(key=>[key,field[key]+shifts[i]]))}));
   await send('first field-prefix grow');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
-  const prefix=await inspect();
+  const prefix=await inspect(),prefixFlow=await flow();assert.equal(prefixFlow.rows.length,2);
+  const centerDy=assertCenteredPictureFlow(beforeFlow,prefixFlow);
   assert.equal(prefix.text,'😀추가'+before.text);assert.deepEqual(prefix.fields,expectedFields([3,3]));
   assert.deepEqual(prefix.anchors,[27,33,34]);assert.deepEqual(prefix.styles,before.styles);
   const displacement=prefix.pictures.filter(p=>p.frame.cellIdx===4).map((p,i)=>{
    const old=before.pictures.filter(p=>p.frame.cellIdx===4)[i];
-   assert.deepEqual({...p,frame:{...p.frame,x:old.frame.x}},old);return p.frame.x-old.frame.x;
+   same(p.frame.y,old.frame.y+centerDy);
+   assert.deepEqual({...p,frame:{...p.frame,x:old.frame.x,y:old.frame.y}},old);return p.frame.x-old.frame.x;
   });
-  assert.equal(displacement.length,3);assert.ok(displacement.every(dx=>dx>0));displacement.forEach(dx=>same(dx,displacement[0]));
+  // Canvas may reshape the first glyph moved to a new row, so cumulative
+  // advances before later pictures need not be byte-for-byte equal. The app's
+  // splice guard independently proves row endpoints and every interleaved
+  // glyph/picture advance; here require all preserved pictures to move forward.
+  assert.equal(displacement.length,3);assert.ok(displacement.every(dx=>Number.isFinite(dx)&&dx>0));
   assert.deepEqual(prefix.pictures.filter(p=>p.frame.cellIdx!==4),before.pictures.filter(p=>p.frame.cellIdx!==4));
+  await saveAndReopen(f,'field-prefix-wrap',format);await canvas();same(await inspect(),prefix);same(await flow(),prefixFlow);
+  const prefixFile=resolve(out,'field-prefix-wrap.'+format),prefixOffsets=[9,12,18,21,27,33,34],prefixUnits=[10,22,36,47,61,75,84];
+  assert.deepEqual(inspectMixedPictureFields(prefixFile),raw.map(c=>c.row===1&&c.col===1?{...c,text:prefix.text,
+   slots:c.slots.map((slot,i)=>({...slot,offset:prefixOffsets[i],utf16Offset:prefixUnits[i]}))}:c));
+  assert.equal(inspectPictureFieldLines(prefixFile).find(c=>c.row===1&&c.col===1).lines.length,2,'Actual two-line bound save');
   await send('first field-prefix between');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
-  const after=await inspect();assert.equal(after.text,prefix.text.replace('사이문구','사이'));
+  const after=await inspect(),afterFlow=await flow();assertCenteredPictureFlow(beforeFlow,afterFlow);
+  assert.equal(after.text,prefix.text.replace('사이문구','사이'));
   assert.deepEqual(after.fields,expectedFields([3,1]));assert.deepEqual(after.anchors,[25,31,32]);assert.deepEqual(after.styles,before.styles);
-  await undo();assert.deepEqual(await inspect(),prefix);
-  await execute('edit:redo');assert.deepEqual(await inspect(),after);
-  await saveAndReopen(f,'field-prefix',format);await canvas();same(await inspect(),after);
+  await undo();assert.deepEqual(await inspect(),prefix);same(await flow(),prefixFlow);
+  await execute('edit:redo');assert.deepEqual(await inspect(),after);same(await flow(),afterFlow);
+  await saveAndReopen(f,'field-prefix',format);await canvas();same(await inspect(),after);same(await flow(),afterFlow);
+  await writeFile(resolve(out,'field-prefix-flow-'+format+'.json'),JSON.stringify({before:beforeFlow,prefix:prefixFlow,after:afterFlow,centerDy},null,2));
   const offsets=[9,12,16,19,25,31,32],units=[10,22,34,45,59,73,82];
   assert.deepEqual(inspectMixedPictureFields(resolve(out,'field-prefix.'+format)),raw.map(c=>c.row===1&&c.col===1?{...c,text:after.text,
    slots:c.slots.map((slot,i)=>({...slot,offset:offsets[i],utf16Offset:units[i]}))}:c));

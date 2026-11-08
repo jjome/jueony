@@ -21,7 +21,7 @@ def fixture(source, target, mode):
                 xml = data.decode('utf-8')
                 assert xml.count('<hp:t>P</hp:t>') == 1
                 prefix = '<hp:t>앞</hp:t>' + begin + '<hp:t>필드😀</hp:t>' + end
-                if mode == 'multiple':
+                if mode in ('multiple', 'multiple-wrap'):
                     prefix = '<hp:t>문서 앞글 </hp:t>' + begin + '<hp:t>필드😀</hp:t>' + end + '<hp:t> 사이문구 </hp:t>' + begin.replace('id="702"', 'id="703"') + '<hp:t>둘째값</hp:t>' + end.replace('702', '703')
                 xml = xml.replace('<hp:t>P</hp:t>', prefix + '<hp:t> 뒤문구 P</hp:t>')
                 xml = xml.replace('<hp:t>i</hp:t>', '<hp:t>i중간문구 </hp:t>')
@@ -32,7 +32,7 @@ def fixture(source, target, mode):
                     xml = xml.replace(end, '', 1)
                     xml = xml.replace('</hp:pic>', '</hp:pic>' + end, 1)
                 else:
-                    assert mode in ('filled', 'multiple')
+                    assert mode in ('filled', 'multiple', 'multiple-wrap')
                 data = xml.encode('utf-8')
             dst.writestr(entry, data)
 
@@ -57,7 +57,7 @@ def scan(raw):
     raise AssertionError('Missing paragraph end')
 
 
-def inspect(path):
+def inspect(path, lines=False):
     output = []
     if path.suffix == '.hwpx':
         with ZipFile(path) as archive:
@@ -83,7 +83,12 @@ def inspect(path):
                                 units += 8
                         else:
                             raise AssertionError(kind)
-                output.append({'row': int(address.get('rowAddr')), 'col': int(address.get('colAddr')), 'paragraph': index, 'text': text, 'slots': slots})
+                record = {'row': int(address.get('rowAddr')), 'col': int(address.get('colAddr')), 'paragraph': index}
+                if lines:
+                    record['lines'] = [[int(row.get(k)) for k in ('textpos', 'vertpos', 'vertsize', 'textheight', 'baseline', 'spacing', 'horzpos', 'horzsize', 'flags')] for row in paragraph.findall('./{*}linesegarray/{*}lineseg')]
+                else:
+                    record.update(text=text, slots=slots)
+                output.append(record)
         return output
     doc = Cfb(path.read_bytes())
     compressed = doc.read('FileHeader')[36] & 1
@@ -97,7 +102,11 @@ def inspect(path):
             paragraph = -1
         if owner is not None and tag == 66 and level == 2:
             paragraph += 1
-        if owner is not None and tag == 67 and level == 3:
+        if owner is not None and tag == 69 and level == 3 and lines:
+            col, row = owner
+            assert len(data) % 36 == 0
+            output.append({'row': row, 'col': col, 'paragraph': paragraph, 'lines': [list(struct.unpack_from('<9i', data, i)) for i in range(0, len(data), 36)]})
+        if owner is not None and tag == 67 and level == 3 and not lines:
             text, slots = scan(data)
             col, row = owner
             output.append({'row': row, 'col': col, 'paragraph': paragraph, 'text': text, 'slots': slots})
@@ -107,5 +116,5 @@ def inspect(path):
 if sys.argv[1] == 'fixture':
     fixture(Path(sys.argv[2]), Path(sys.argv[3]), sys.argv[4])
 else:
-    assert sys.argv[1] == 'inspect'
-    print(json.dumps(inspect(Path(sys.argv[2])), ensure_ascii=True))
+    assert sys.argv[1] in ('inspect', 'inspect-lines')
+    print(json.dumps(inspect(Path(sys.argv[2]), sys.argv[1] == 'inspect-lines'), ensure_ascii=True))

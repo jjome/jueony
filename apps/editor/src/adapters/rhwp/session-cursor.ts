@@ -2,6 +2,7 @@ import {readSessionHeaderFooterStory,readSessionFootnoteStory} from './session-s
 import {captureTextBoxCursor,restoreTextBoxCursor} from './session-textbox.ts';
 import {captureObjectSelection,restoreObjectSelection} from './session-object-selection.ts';
 import {captureEndnoteSelection,restoreEndnoteSelection} from './session-endnote.ts';
+import {inspectRootClickHereFieldSelectionN016,restoreRootClickHereFieldSelectionN016} from './session-field-selection-n016.ts';
 import type {RestorableObjectRef} from './session-object-selection.ts';
 import type {EndnoteRestoreTarget,TextBoxBookmark} from '../../modules/preferences/public/index.ts';
 import {sha256} from '@noble/hashes/sha2.js';
@@ -219,6 +220,9 @@ export function captureSessionCursor(input:SessionCursorInput|undefined):Session
    return focus?.kind==='body'&&table?validateSessionCursor({kind:'table-object',focus,control:ref.ci,tableFingerprint:table.fingerprint}):undefined;
   }catch{return;}
  }
+ const fieldSelection=inspectRootClickHereFieldSelectionN016(input);
+ if(fieldSelection.status==='captured')return validateSessionCursor(fieldSelection.bookmark);
+ if(fieldSelection.status==='unsupported-field-selection')return;
  if(!input||unsupported(input))return;
  try{
   const read=evidence(input),focus=read.point(input.getCursorPosition());if(!focus)return;
@@ -240,6 +244,7 @@ export function captureSessionCursor(input:SessionCursorInput|undefined):Session
 }
 export function restoreSessionCursor(input:SessionCursorInput|undefined,value:unknown):boolean{
  const saved=validateSessionCursor(value);if(!input||!saved)return false;
+ if(saved.kind==='root-clickhere-field-selection')return restoreRootClickHereFieldSelectionN016(input,saved);
  if(saved.kind==='textbox')return restoreTextBoxCursor(input,saved);
  if(saved.kind==='object-selection')return restoreObjectSelection(input,saved);
  if(saved.kind==='endnote-selection')return restoreEndnoteSelection(input,saved);

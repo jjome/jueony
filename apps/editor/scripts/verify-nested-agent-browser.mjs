@@ -20,7 +20,8 @@ const namedAxis=process.env.JUEONY_NESTED_AXIS_ONLY==='named';
 const leftDelete=process.env.JUEONY_NESTED_AXIS_ONLY==='left-delete';
 const storedAxis=leftDelete||process.env.JUEONY_NESTED_AXIS_ONLY==='click-here';
 const fieldAxis=namedAxis||storedAxis;
-const captionFlow=process.env.JUEONY_NESTED_AXIS_ONLY==='caption-flow';
+const captionSpacers=process.env.JUEONY_NESTED_AXIS_ONLY==='caption-spacers';
+const captionFlow=captionSpacers||process.env.JUEONY_NESTED_AXIS_ONLY==='caption-flow';
 const captionAxis=captionFlow||process.env.JUEONY_NESTED_AXIS_ONLY==='caption';
 const axisOnly=captionAxis||bodyMarkers||mergedAxis||fieldAxis||process.env.JUEONY_NESTED_AXIS_ONLY==='1';
 async function captionScreen(frame){
@@ -99,7 +100,7 @@ try {
   for (const format of ['hwp','hwpx']) for(const mode of (leftDelete?['delete-left-row']:bodyMarkers||mergedAxis||fieldAxis||captionAxis?['insert-row']:axisOnly?['insert-row','delete-column']:['plain','mixed'])){
     const mixed=mode==='mixed';
     const frame=await (await page.$('.editor-frame:not([hidden])')).contentFrame();
-    const captionOptions=captionFlow?{direction:format==='hwp'?'TOP':'RIGHT',compact:true,multiline:true,extraParagraph:true}:{};
+    const captionOptions=captionFlow?{direction:format==='hwp'?'TOP':'RIGHT',compact:true,multiline:true,extraParagraph:true,emptyParagraphs:captionSpacers?1:0}:{};
     const doc=captionAxis?nestedCaptionFixture(HwpDocument,captionOptions):storedAxis?nestedClickHereFixture(HwpDocument):namedAxis?nestedNamedCellFixture(HwpDocument):HwpDocument.createEmpty();
     if(!fieldAxis&&!captionAxis)doc.createBlankDocument();
     const inner='<table><tr><td>동일😀</td><td>동일😀</td></tr></table>';
@@ -131,7 +132,8 @@ try {
       try{if(bodyMarkers)originalMarkers=records(source);if(leftDelete)originalRightLayout=rightSiblingLayout(source);
        if(captionAxis){const t=readStructure(source).nestedTables[1],p=JSON.stringify([...t.ancestors,{controlIndex:t.control,cellIndex:0,cellParaIndex:0}]);
         originalCaption=JSON.parse(source.getTableAxisCaptionEvidenceByPath(t.section,t.paragraph,p));
-        if(captionFlow)assert.deepEqual(originalCaption.paragraphs.map(p=>[p.text,p.lines.map(l=>l.text_start)]),[['캡션 제목😀뒤',[0,7]],['둘째 설명',[0]]]);
+        if(captionFlow)assert.deepEqual(originalCaption.paragraphs.map(p=>[p.text,p.lines.map(l=>l.text_start)]),
+          [['캡션 제목😀뒤',[0,7]],...(captionSpacers?[['',[0]]]:[]),['둘째 설명',[0]]]);
         originalSibling=JSON.parse(source.getPageControlLayout(0)).controls[1];}}finally{source.free();}
     }
     await frame.evaluate(async(bytes,name)=>{
@@ -139,7 +141,7 @@ try {
       await writer.write(new Uint8Array(bytes));await writer.close();await window.jueonyEditor.open(new Uint8Array(bytes),name,h,false);
     },bytes,'nested-review.'+format);
     const sourceScreen=captionFlow?await captionScreen(frame):undefined;
-    const request=captionFlow?'여러 줄 캡션의 두 문단을 유지하고 오른쪽 안쪽 표의 두 행 사이에 행 추가':captionAxis?'아래 캡션을 유지하고 오른쪽 안쪽 표의 두 행 사이에 행 추가':leftDelete?'왼쪽 안쪽 표의 첫 행 삭제':fieldAxis?'오른쪽 안쪽 표의 필드 셀 위에 행 추가':mergedAxis?'오른쪽 안쪽 표의 세로 병합 사이에 행 추가':axisOnly?(mode==='insert-row'?'오른쪽 안쪽 표 마지막에 행 추가':'오른쪽 안쪽 표의 둘째 열 삭제'):
+    const request=captionSpacers?'캡션 제목과 설명 사이의 빈 줄을 유지하고 오른쪽 안쪽 표의 두 행 사이에 행 추가':captionFlow?'여러 줄 캡션의 두 문단을 유지하고 오른쪽 안쪽 표의 두 행 사이에 행 추가':captionAxis?'아래 캡션을 유지하고 오른쪽 안쪽 표의 두 행 사이에 행 추가':leftDelete?'왼쪽 안쪽 표의 첫 행 삭제':fieldAxis?'오른쪽 안쪽 표의 필드 셀 위에 행 추가':mergedAxis?'오른쪽 안쪽 표의 세로 병합 사이에 행 추가':axisOnly?(mode==='insert-row'?'오른쪽 안쪽 표 마지막에 행 추가':'오른쪽 안쪽 표의 둘째 열 삭제'):
       mixed?'오른쪽 안쪽 표의 두 번째 셀 둘째 문단을 변경해줘':'오른쪽 안쪽 표의 두 번째 셀을 변경해줘';
     await fill('request-input',request);
     const sent=page.waitForResponse(r=>r.url()===origin+'/api/generate');
@@ -184,7 +186,8 @@ try {
         assert.deepEqual(JSON.parse(reopened.getPageControlLayout(0)).controls[1],originalSibling);
         const runs=JSON.parse(reopened.getPageTextLayout(0)).runs.filter(r=>r.cellIdx===65534);
         if(captionFlow)assert.deepEqual(runs.map(r=>[r.text,r.bold,r.cellParaIdx,r.charStart]),[
-          ['캡션 ',false,0,0],['제목😀',true,0,3],['뒤',true,0,6],['둘째 ',false,1,0],['설명',true,1,3]
+          ['캡션 ',false,0,0],['제목😀',true,0,3],['뒤',true,0,6],...(captionSpacers?[['',true,1,0]]:[]),
+          ['둘째 ',false,captionSpacers?2:1,0],['설명',true,captionSpacers?2:1,3]
         ]);
         else assert.deepEqual(runs.map(r=>[r.text,r.bold]),[['캡션 ',false],['제목',true]]);
       }

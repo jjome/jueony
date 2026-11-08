@@ -6,7 +6,7 @@ const tablePath=(t:Table|NestedTable)=>JSON.stringify([...('ancestors' in t?t.an
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
 const near=(a:number,b:number)=>Math.abs(a-b)<=.21;
 type Box={x:number;y:number;w:number;h:number};
-type StoredParagraph={text:string;runs:{char_shape_id:number;start_pos:number}[];lines:{text_start:number}[]};
+type StoredParagraph={text:string;paragraphShape:number;runs:{char_shape_id:number;start_pos:number}[];lines:{text_start:number;tag:number}[]};
 
 function paintedCaption(doc:any,target:NestedTable,page:number,left:number,top:number){
  const host=target.ancestors.at(-1)!.cellParaIndex,owners:{box:Box;lines:any[]}[]=[];
@@ -50,6 +50,20 @@ function captionDrawing(doc:any,t:NestedTable,caption:any,boxes:(table:Table|Nes
  for(const [ordinal,p] of paragraphs.entries()){
   const group=lines.filter(l=>l.ordinal===ordinal);
   if(!group.length||group.some((line,i)=>line!==lines[next+i])||(p.lines.length>0&&p.lines.length!==group.length))throw fail();
+  if(p.text===''){
+   const line=group[0],r=line.runs[0];
+   if(group.length!==1||p.lines.length!==1||p.lines[0].text_start!==0||!Number.isSafeInteger(p.lines[0].tag)||(p.lines[0].tag&0x80000000)!==0||
+      p.runs.length!==1||p.runs[0].start_pos!==0||
+      line.runs.length!==1||r.text!==''||r.charStart!==0||!same(r.charX,[0])||
+      r.charShapeId!==p.runs[0].char_shape_id||r.paraShapeId!==p.paragraphShape||
+      !Number.isFinite(line.box.h+line.box.w+r.h+r.w)||line.box.h<=0||line.box.w<=0||r.h<=0||r.w<=0)throw fail();
+   const hit=parsed(doc.hitTest(page,r.x+Math.min(1,r.w/2),r.y+r.h/2)),caret=hit?.cursorRect;
+   if(hit?.sectionIndex!==t.section||hit.parentParaIndex!==t.ancestors.at(-1)!.cellParaIndex||
+      hit.controlIndex!==t.control||hit.cellIndex!==65534||hit.cellParaIndex!==ordinal||hit.charOffset!==0||
+      caret?.pageIndex!==page||!near(caret.x,r.x)||!near(caret.y,r.y)||!near(caret.height,r.h))throw fail();
+   next++;
+   continue;
+  }
   let utf16=0,scalars=0,shape=0;
   for(const [i,line] of group.entries()){
    if(p.lines.length&&p.lines[i].text_start!==utf16)throw fail();
@@ -77,7 +91,11 @@ function captionDrawing(doc:any,t:NestedTable,caption:any,boxes:(table:Table|Nes
   positions.push(line.box.x-x,line.box.y-y,line.box.h);
   if(side)positions.push(line.box.w);
   return {ordinal:line.ordinal,runs:line.runs.map(({x:runX,y:runY,cellPath,...style}:any)=>{
-   positions.push(runX-x,runY-y);return style;
+   positions.push(runX-x,runY-y);
+   // Empty runs publish available line width, while their sole caret stays
+   // at charX[0]. Top/bottom captions follow the target table's width.
+   if(style.text===''&&!side)return {...style,w:style.w-box.w};
+   return style;
   })};
  });
  return {page,positions,styles,origin:[x,y]};

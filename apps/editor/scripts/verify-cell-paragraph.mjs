@@ -1,5 +1,5 @@
 import {createAxisPictureFixture,inspectPictureAnchors} from './lib/axis-picture-fixture.mjs';
-import {multilinePictureParagraph} from './lib/cell-paragraph-pictures.mjs';
+import {multilinePictureParagraph,repeatedSpacePictureParagraph} from './lib/cell-paragraph-pictures.mjs';
 import puppeteer from 'puppeteer-core';
 import {continuedMergedTable,fragmentedMergedCell} from './lib/continued-merged-table.mjs';
 import http from 'node:http';
@@ -37,6 +37,7 @@ const provider=http.createServer(async(req,res)=>{try{let raw='';for await(const
  if(input.instruction.includes('multiline picture edit'))operations[0].text='타파하마바사아자😀나다라마바사아Pi'+
    (input.instruction.includes('middle')?'한약라':'한글가나다라')+'cB';
  if(input.instruction.includes('repeated picture text'))operations[0].text=input.instruction.includes('middle')?'😀Pi나다cB':'😀Pi나나다cB';
+ if(input.instruction.includes('repeated picture spaces'))operations[0].text='😀Pi 다cB';
  if(input.instruction.includes('mixed-tail'))operations[0].text=operations[0].originalText.slice(0,-1)+'개정😀';
  if(input.instruction.includes('split-owner'))operations[0].text=operations[0].originalText.slice(0,-6)+'Tail 2';
  if(input.instruction.includes('field-tail'))operations[0].text=Array.from(operations[0].originalText).slice(0,cell.paragraphs[paragraph].editableFrom).join('')+'수정😀';
@@ -150,6 +151,33 @@ try{
   await saveAndReopen(f,'repeated-text',format);assert.deepEqual(await inspect(),result);
   let i=0;assert.deepEqual(inspectPictureAnchors(resolve(out,'repeated-text.'+format)),
    records.map(r=>r.row===1&&r.col===1?{...r,textOffset:result.slots[i++]}:r));
+ });
+ for(const format of ['hwp','hwpx'])await scenario(format+' repeated picture spaces keep exact Canvas advances through undo redo and saved slots',async()=>{
+  const source=await repeatedSpacePictureParagraph(HwpDocument,out),args=[0,1,0,4,0],initial=resolve(out,'spaces-original.'+format);
+  await writeFile(initial,format==='hwp'?source.exportHwp():source.exportHwpx());
+  const records=inspectPictureAnchors(initial),f=await open(format,source);
+  const inspect=()=>f.evaluate(args=>{
+   const d=window.__pageServices.wasm.borrowDocumentHandle();
+   const runs=JSON.parse(d.getPageTextLayout(0)).runs.filter(r=>r.parentParaIdx===1&&r.cellIdx===4);
+   return {text:runs.map(r=>r.text).join(''),slots:[...d.getCellPictureTextAnchors(...args)],canvas:d.canvasMetricsActive(),
+    color:JSON.parse(d.getCellCharPropertiesAt(...args,0)).textColor,
+    runs:runs.map(r=>({text:r.text,x:r.x,y:r.y,w:r.w,charX:r.charX}))};
+  },args);
+  await f.waitForFunction(()=>window.__pageServices.wasm.borrowDocumentHandle().canvasMetricsActive());
+  const before=await inspect();assert.equal(before.text,'😀Pi  다cB');assert.deepEqual(before.slots,[2,6,7]);
+  await send('first repeated picture spaces');assert.equal(await page.$eval('#request-error',e=>e.hidden?'':e.textContent),'');
+  const after=await inspect(),tail=after.runs.find(r=>r.text==='i '),next=after.runs.find(r=>r.text==='다');
+  assert.equal(after.text,'😀Pi 다cB');assert.deepEqual(after.slots,[2,5,6]);assert.equal(after.canvas,true);
+  assert.equal(after.color,'#246789');assert.ok(tail&&next);
+  assert.ok(Math.abs(tail.w-tail.charX.at(-1))<=.11,JSON.stringify(tail));
+  assert.ok(Math.abs(tail.x+tail.charX.at(-1)-next.x)<=.11,JSON.stringify({tail,next}));
+  await undo();same(await inspect(),before);await execute('edit:redo');same(await inspect(),after);
+  await saveAndReopen(f,'repeated-spaces',format);
+  await f.waitForFunction(()=>window.__pageServices.wasm.borrowDocumentHandle().canvasMetricsActive());
+  const reopened=await inspect();same(reopened,after);
+  let i=0;assert.deepEqual(inspectPictureAnchors(resolve(out,'repeated-spaces.'+format)),
+   records.map(r=>r.row===1&&r.col===1?{...r,textOffset:after.slots[i++]}:r));
+  await writeFile(resolve(out,'spaces-layout-'+format+'.json'),JSON.stringify({before,after,reopened},null,2));
  });
  for(const format of ['hwp','hwpx'])await scenario(format+' multiline picture edit reflows the first image to line two and preserves native slots',async()=>{
   const source=await multilinePictureParagraph(HwpDocument,out),args=[0,1,0,4,0];

@@ -2,28 +2,47 @@ import type {Table} from '../../modules/document/public/index.ts';
 import {parsed} from './structure.ts';
 import {sameTableLayout} from './table-layout-evidence.ts';
 
-export type NestedSubdivisionOwner={index:number;listId:number;paragraphs:number[]};
+type CellPath={controlIndex:number;cellIndex:number;cellParaIndex:number}[];
+type NestedSubdivisionTable={listId:number;paragraph:number;path:CellPath};
+export type NestedSubdivisionOwner={index:number;listId:number;paragraphs:number[];tables:NestedSubdivisionTable[];controlLists:number[];descendantLists:number[]};
 const invalid=()=>Error('분할할 칸의 중첩 표와 모든 내부 셀·글줄의 원래 위치를 확인하지 못했습니다.');
 
-/** All child controls must be inline tables in separate, otherwise empty paragraphs of one root cell. */
+/** Up to two inline table levels, each anchored in an otherwise empty paragraph. */
 export function subdivisionNestedOwner(doc:any,t:Table):NestedSubdivisionOwner|undefined {
   const controls=parsed(doc.getControls()),children=controls.filter((v:any)=>v.list!==0);
   if(!children.some((v:any)=>v.ctrlId==='tbl'))return;
   if(parsed(doc.getFieldList()).length)throw invalid();
-  const lists=parsed(doc.getCursorModel()).lists,host=lists.find((v:any)=>v.listId===children[0].list);
-  if(!host?.isCell || host.hostListId!==0 || host.sectionIndex!==t.section || host.hostPara!==t.paragraph ||
-      host.controlIndex!==t.control || !t.cells[host.cellIndex] || !Number.isSafeInteger(host.paraCount) ||
-      host.paraCount<1 || host.paraCount>50 || host.paraCount!==doc.getCellParagraphCount(t.section,t.paragraph,t.control,host.cellIndex) ||
-      lists.some((v:any)=>!v.isCell || v.hostListId!==0 && v.hostListId!==host.listId))throw invalid();
-  const paragraphs:number[]=[];
+  const lists=parsed(doc.getCursorModel()).lists,byId=new Map<number,any>(lists.map((l:any)=>[l.listId,l]));
+  if(byId.size!==lists.length || lists.some((l:any)=>!Number.isSafeInteger(l.listId) || l.listId<=0))throw invalid();
+  const roots=children.map((c:any)=>byId.get(c.list)).filter((l:any)=>l?.hostListId===0);
+  const host=roots[0];
+  if(!host?.isCell || host.sectionIndex!==t.section || host.hostPara!==t.paragraph ||
+      host.controlIndex!==t.control || !t.cells[host.cellIndex] || roots.some((l:any)=>l.listId!==host.listId))throw invalid();
+  const cellPath=(id:number,paragraph:number,depth=0):CellPath=>{
+    const list=byId.get(id);
+    if(depth>1 || !list?.isCell || list.sectionIndex!==t.section || !Number.isSafeInteger(list.paraCount) ||
+        list.paraCount<1 || list.paraCount>50 || !Number.isSafeInteger(paragraph) || paragraph<0 || paragraph>=list.paraCount)throw invalid();
+    const part={controlIndex:list.controlIndex,cellIndex:list.cellIndex,cellParaIndex:paragraph};
+    if(list.listId===host.listId)return [part];
+    if(list.hostListId===0)throw invalid();
+    return [...cellPath(list.hostListId,list.hostPara,depth+1),part];
+  };
+  const tables:NestedSubdivisionTable[]=[],keys=new Set<string>();
   for(const child of children){
-    if(child.ctrlId!=='tbl' || child.list!==host.listId || !Number.isSafeInteger(child.para) || child.para<0 ||
-        child.para>=host.paraCount || paragraphs.includes(child.para) || child.controlIndex!==0 || child.pos!==0 ||
+    const path=cellPath(child.list,child.para),encoded=JSON.stringify(path);
+    if(child.ctrlId!=='tbl' || keys.has(encoded) || child.controlIndex!==0 || child.pos!==0 ||
         child.props?.Lock!==0 || child.props.TreatAsChar!==1 || child.props.AllowOverlap!==0 ||
-        !(child.props.Width>0 && child.props.Height>0) || doc.getCellParagraphLength(t.section,t.paragraph,t.control,host.cellIndex,child.para)!==0)throw invalid();
-    paragraphs.push(child.para);
+        !(child.props.Width>0 && child.props.Height>0) || doc.getCellParagraphLengthByPath(t.section,t.paragraph,encoded)!==0 ||
+        byId.get(child.list).paraCount!==doc.getCellParagraphCountByPath(t.section,t.paragraph,encoded))throw invalid();
+    keys.add(encoded);
+    tables.push({listId:child.list,paragraph:child.para,path});
   }
-  return {index:host.cellIndex,listId:host.listId,paragraphs:paragraphs.sort((a,b)=>a-b)};
+  const descendantLists=lists.filter((l:any)=>l.hostListId!==0);
+  if(descendantLists.length>1000 || lists.some((l:any)=>!l.isCell) ||
+      descendantLists.some((l:any)=>!tables.some(c=>c.listId===l.hostListId && c.paragraph===l.hostPara && l.controlIndex===0)))throw invalid();
+  return {index:host.cellIndex,listId:host.listId,
+    paragraphs:tables.filter(c=>c.listId===host.listId).map(c=>c.paragraph).sort((a,b)=>a-b),
+    tables,controlLists:[...new Set(tables.map(c=>c.listId))],descendantLists:descendantLists.map((l:any)=>l.listId)};
 }
 
 const rect=(v:any)=>({x:v.x,y:v.y,w:v.w,h:v.h});
@@ -45,9 +64,9 @@ function characterRuns(doc:any,at:readonly [number,number],path:string,length:nu
   return shapes.map((s:any)=>({...s,characters:parsed(doc.getCellCharPropertiesAtByPath(...at,path,s.startOffset))}));
 }
 
-function readInner(doc:any,t:Table,owner:NestedSubdivisionOwner,paragraph:number,lists:any[]){
-  const at=[t.section,t.paragraph] as const,host=segment(t,owner,paragraph);
-  const path=(i:number,p:number)=>JSON.stringify([host,{controlIndex:0,cellIndex:i,cellParaIndex:p}]);
+function readInner(doc:any,t:Table,table:NestedSubdivisionTable,lists:any[]){
+  const at=[t.section,t.paragraph] as const,{paragraph,path:ancestors}=table,host=ancestors.at(-1)!;
+  const path=(i:number,p:number)=>JSON.stringify([...ancestors,{controlIndex:0,cellIndex:i,cellParaIndex:p}]);
   const dimensions=parsed(doc.getTableDimensionsByPath(...at,path(0,0)));
   const boxes=parsed(doc.getTableCellBboxesByPath(...at,path(0,0))),page=boxes[0]?.pageIndex;
   if(!boxes.length || boxes.length>200 || boxes.length!==dimensions.cellCount || boxes.length!==lists.length ||
@@ -69,16 +88,26 @@ function readInner(doc:any,t:Table,owner:NestedSubdivisionOwner,paragraph:number
     });
     return {index,properties,paragraphs};
   });
-  return {paragraph,host,page,dimensions,boxes,cells};
+  return {paragraph,host,ancestors,page,dimensions,boxes,cells};
 }
 
 export function nestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisionOwner) {
-  const at=[t.section,t.paragraph] as const,lists=parsed(doc.getCursorModel()).lists.filter((l:any)=>l.hostListId===owner.listId);
-  if(lists.length>1000 || lists.some((l:any)=>!owner.paragraphs.includes(l.hostPara)))throw invalid();
-  const children=owner.paragraphs.map(p=>readInner(doc,t,owner,p,lists.filter((l:any)=>l.hostPara===p)));
+  const at=[t.section,t.paragraph] as const,lists=parsed(doc.getCursorModel()).lists;
+  const children=owner.tables.map(c=>readInner(doc,t,c,lists.filter((l:any)=>l.hostListId===c.listId && l.hostPara===c.paragraph)));
   const pages=doc.pageCount(),page=children[0]?.page;
   if(!Number.isSafeInteger(pages) || pages<1 || pages>200 || !Number.isSafeInteger(page) || page<0 || page>=pages ||
       children.some(c=>c.page!==page))throw invalid();
+  const pageControls=Array.from({length:pages},(_,p)=>parsed(doc.getPageControlLayout(p)).controls);
+  const rootTables=parsed(doc.getControls()).filter((c:any)=>c.list===0 && c.ctrlId==='tbl');
+  const counts=Array.from({length:doc.getSectionCount()},(_,section)=>doc.getParagraphCount(section) as number);
+  const sectionOffsets=counts.map((_,section)=>counts.slice(0,section).reduce((sum,count)=>sum+count,0));
+  for(const controls of pageControls)for(const frame of controls.filter((c:any)=>c.type==='table')){
+    if(!Array.isArray(frame.stableIndex) || frame.stableIndex.length<3 ||
+        frame.stableIndex.some((n:any)=>!Number.isSafeInteger(n) || n<0))throw invalid();
+    if(frame.stableIndex.length===3 && (frame.paraIdx>=counts[frame.secIdx] ||
+        !sameTableLayout(frame.stableIndex,[frame.secIdx,frame.paraIdx,frame.controlIdx]) ||
+        !rootTables.some((c:any)=>c.para===sectionOffsets[frame.secIdx]+frame.paraIdx && c.controlIndex===frame.controlIdx)))throw invalid();
+  }
   const isOuter=(v:any)=>v.type==='table' && sameTableLayout(v.stableIndex,[...at,t.control]);
   const isInner=(v:any)=>v.type==='table' && v.stableIndex?.length>3;
   const ownerRun=(r:any)=>r.secIdx===t.section && r.parentParaIdx===t.paragraph &&
@@ -86,43 +115,56 @@ export function nestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisio
      r.cellPath?.[0]?.controlIndex===t.control && r.cellPath[0].cellIndex===owner.index);
   for(let other=0;other<pages;other++){
     if(other===page)continue;
-    const controls=parsed(doc.getPageControlLayout(other)).controls;
+    const controls=pageControls[other];
     if(controls.some((v:any)=>isOuter(v)||isInner(v)) ||
         parsed(doc.getPageTextLayout(other)).runs.some((r:any)=>r.cellPath?.length>1 || ownerRun(r)))throw invalid();
   }
-  const tables=parsed(doc.getPageControlLayout(page)).controls,outerFrames=tables.filter(isOuter),inner=tables.filter(isInner);
+  const tables=pageControls[page],outerFrames=tables.filter(isOuter),inner=tables.filter(isInner);
   if(outerFrames.length!==1 || inner.length!==children.length)throw invalid();
   const outer=outerFrames[0],source=t.cells[owner.index],box=outer.cells.find((c:any)=>c.cellIdx===owner.index && c.row===source.row && c.col===source.column);
-  if(!box || inner.some((frame:any,i:number)=>!inside(frame,box) || inner.slice(i+1).some((other:any)=>overlap(frame,other)) ||
+  if(!box || inner.some((frame:any)=>!inside(frame,box) ||
       outer.cells.some((c:any)=>c!==box && overlap(frame,c))))throw invalid();
   const runs=parsed(doc.getPageTextLayout(page)).runs,innerRuns=runs.filter((r:any)=>r.cellPath?.length>1);
   const nested=children.map(child=>{
-    const {paragraph,host,dimensions,cells,boxes}=child;
+    const {paragraph,ancestors,dimensions,cells,boxes}=child;
     // The renderer publishes the local anchor paragraph and its full enclosing cell path.
     // Match both to the independently queried rectangles, even for two identical tables.
     const matches=inner.filter((f:any)=>f.secIdx===t.section && f.paraIdx===paragraph && f.controlIdx===0 &&
-      sameTableLayout(f.stableIndex.slice(2,5),[t.control,owner.index,paragraph]));
+      sameTableLayout(f.stableIndex,[t.section,paragraph,...ancestors.flatMap(p=>[p.controlIndex,p.cellIndex,p.cellParaIndex]),0,0,0,0]));
     if(matches.length!==1)throw invalid();
     const frame=matches[0];
     if(frame.rowCount!==dimensions.rowCount || frame.colCount!==dimensions.colCount ||
         !sameTableLayout(frame.cells.map(cellBox),boxes.map(cellBox)) || boxes.some((b:any)=>!inside(b,frame)))throw invalid();
-    const lines=innerRuns.filter((r:any)=>sameTableLayout(r.cellPath[0],host)),ends=new Map<string,number>();
+    const lines=innerRuns.filter((r:any)=>r.cellPath.length===ancestors.length+1 && sameTableLayout(r.cellPath.slice(0,-1),ancestors)),ends=new Map<string,number>();
     for(const r of lines){
-      const leaf=r.cellPath[1],key=leaf.cellIndex+'/'+leaf.cellParaIndex,text=cells[leaf.cellIndex]?.paragraphs[leaf.cellParaIndex]?.text;
-      if(r.cellPath.length!==2 || !ownerRun(r) || r.controlIdx!==t.control || r.cellIdx!==owner.index ||
-          r.cellParaIdx!==paragraph || leaf.controlIndex!==0 || r.paraIdx!==leaf.cellParaIndex || typeof text!=='string' ||
-          !inside(r,boxes[leaf.cellIndex]) || typeof r.text!=='string' || r.charStart!==(ends.get(key)??0) ||
-          !Array.isArray(r.charX) || !r.charX.every(Number.isFinite))throw invalid();
-      const end=r.charStart+Array.from(r.text).length;
+      const leaf=r.cellPath.at(-1),key=leaf.cellIndex+'/'+leaf.cellParaIndex,content=cells[leaf.cellIndex]?.paragraphs[leaf.cellParaIndex],text=content?.text;
+      const box=boxes[leaf.cellIndex],length=typeof r.text==='string' ? Array.from(r.text).length : -1,ink=r.text ? r : {...r,w:0};
+      if(!ownerRun(r) || r.controlIdx!==t.control || r.cellIdx!==owner.index ||
+          r.cellParaIdx!==ancestors[0].cellParaIndex || leaf.controlIndex!==0 || r.paraIdx!==leaf.cellParaIndex || typeof text!=='string' ||
+          !box || !inside(ink,box) || length<0 || r.charStart!==(ends.get(key)??0) ||
+          !Array.isArray(r.charX) || r.charX.length!==length+1 || !r.charX.every(Number.isFinite) ||
+          r.charX.some((x:number)=>r.x+x<box.x-0.2 || r.x+x>box.x+box.w+0.2))throw invalid();
+      const end=r.charStart+length;
+      if(r.text && !content.shapes.some((s:any)=>s.startOffset<=r.charStart && s.endOffset>=end && s.charShapeId===r.charShapeId))throw invalid();
       if(Array.from(text).slice(r.charStart,end).join('')!==r.text)throw invalid();
       ends.set(key,end);
     }
     for(const cell of cells)for(const [i,p] of cell.paragraphs.entries()){
       if((ends.get(cell.index+'/'+i)??0)!==Array.from(p.text).length)throw invalid();
     }
-    return {...child,frame,lines};
+    return {...child,frame,lines:lines.map((r:any)=>r.text ? r : {...r,w:0})};
   });
   if(nested.reduce((sum,c)=>sum+c.lines.length,0)!==innerRuns.length)throw invalid();
+  for(const child of nested){
+    const ancestors=child.ancestors,anchor=ancestors.at(-1)!;
+    const parent=nested.find(p=>sameTableLayout(p.ancestors,ancestors.slice(0,-1)));
+    const parentCells=parent?.boxes ?? [box],ownerCell=parent ? parentCells[anchor.cellIndex] : box;
+    if(!ownerCell || !inside(child.frame,ownerCell) ||
+        parentCells.some((c:any)=>c!==ownerCell && overlap(child.frame,c)) ||
+        parent?.lines.some((r:any)=>r.text && overlap(child.frame,r)) ||
+        nested.some(sibling=>sibling!==child && sameTableLayout(sibling.ancestors.slice(0,-1),ancestors.slice(0,-1)) &&
+          overlap(child.frame,sibling.frame)))throw invalid();
+  }
   const count=doc.getCellParagraphCount(...at,t.control,owner.index);
   const ownerParagraphs=Array.from({length:count},(_,paragraph)=>{
     const args=[...at,t.control,owner.index,paragraph],n=doc.getCellParagraphLength(...args);
@@ -135,7 +177,7 @@ export function nestedSubdivisionEvidence(doc:any,t:Table,owner:NestedSubdivisio
   });
   if(ownerParagraphs.map(p=>p.text).join('\n')!==source.text)throw invalid();
   const ownerLines=[],offsets=Array<number>(count).fill(0);
-  for(const r of runs.filter((v:any)=>ownerRun(v) && v.cellPath?.length!==2)){
+  for(const r of runs.filter((v:any)=>ownerRun(v) && !(v.cellPath?.length>1))){
     const para=r.cellParaIdx,content=ownerParagraphs[para],n=typeof r.text==='string' ? Array.from(r.text).length : -1;
     if(!content || r.controlIdx!==t.control || r.cellIdx!==owner.index ||
         !sameTableLayout(r.cellPath,[segment(t,owner,para)]) || r.paraIdx!==para ||

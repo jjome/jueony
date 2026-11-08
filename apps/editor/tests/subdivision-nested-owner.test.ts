@@ -8,7 +8,7 @@ import {readTableSubdivisionSources} from '../src/adapters/rhwp/table-subdivisio
 import {nestedSubdivisionEvidence,subdivisionNestedOwner} from '../src/adapters/rhwp/subdivision-nested-owner.ts';
 import {executeDocumentOperations} from '../src/adapters/rhwp/execute.ts';
 import {validateEditOperations,type Snapshot} from '../src/modules/document/public/index.ts';
-import {emphasizedSubdivisionNestedTable,labeledSubdivisionNestedTable,subdivisionNestedTable} from '../scripts/lib/subdivision-nested-table.mjs';
+import {deepSubdivisionNestedTable,emphasizedSubdivisionNestedTable,labeledSubdivisionNestedTable,subdivisionNestedTable} from '../scripts/lib/subdivision-nested-table.mjs';
 import {readOwnedZip,writeOwnedZip} from '../scripts/lib/owned-zip.mjs';
 const pkg=process.env.JUEONY_ENGINE_PACKAGE ?? fileURLToPath(new URL('../node_modules/@rhwp/core/',import.meta.url));
 const {default:init,HwpDocument}=await import(pathToFileURL(resolve(pkg,'rhwp.js')).href);
@@ -303,4 +303,88 @@ for(const ext of ['hwp','hwpx'])test(ext+' retains emphasized title and explanat
       assert.deepEqual(bytes(d,ext),old);assert.deepEqual(inspect(d),original);
     }finally{d.discardSnapshot(undo);}
   }finally{d.free();}
+});
+
+for(const ext of ['hwp','hwpx'])test(ext+' preserves two nested levels in the first piece and rejects clipped or altered descendants',()=>{
+  const src=deepSubdivisionNestedTable(HwpDocument),d=new HwpDocument(bytes(src,ext));src.free();
+  try{
+    const s=snapshot(d,ext),table=s.structure!.tables[0],old=bytes(d,ext),undo=d.saveSnapshot();
+    const inspect=(doc:any)=>{
+      const t=readStructure(doc).tables[0];
+      return nestedSubdivisionEvidence(doc,t,subdivisionNestedOwner(doc,t)!);
+    };
+    try{
+      const original=inspect(d),paragraphs=storedOwnerParagraphs(d);
+      assert.deepEqual([original.page,original.pageCount],[0,1]);
+      assert.deepEqual(original.nested.map(n=>[n.ancestors.length,n.cells.map(c=>c.paragraphs.map(p=>p.text))]),
+        [[1,[[''],['Y']]],[2,[['Q'],['R']]]]);
+      assert.equal(original.nested[1].lines.find((r:any)=>r.text==='R').bold,true);
+      assert.throws(()=>validateEditOperations([{...op,distributeParagraphs:true}],s),/중첩/);
+      executeDocumentOperations(d,s,validateEditOperations([op],s));
+      const reopened=new HwpDocument(bytes(d,ext));
+      try{for(const result of [d,reopened]){
+        assert.deepEqual(inspect(result),original);
+        assert.equal(storedOwnerParagraphs(result),paragraphs);
+        const st=readStructure(result);
+        assert.equal(st.nestedTables!.length,2);
+        assert.deepEqual(st.nestedTables,s.structure!.nestedTables);
+        assert.deepEqual(st.tables[0].cells.map(c=>c.text),[table.cells[0].text,'','',...table.cells.slice(1).map(c=>c.text)]);
+      }}finally{reopened.free();}
+      d.restoreSnapshot(undo);assert.deepEqual(bytes(d,ext),old);
+      assert.throws(()=>executeDocumentOperations(d,s,validateEditOperations([{...op,columns:4}],s)),/중첩 표/);
+      assert.deepEqual(bytes(d,ext),old);
+      const split=d.splitCellOnGrid.bind(d);let changed=false;
+      d.splitCellOnGrid=(...args:any[])=>{
+        const result=split(...args),path=JSON.stringify([
+          {controlIndex:0,cellIndex:0,cellParaIndex:1},
+          {controlIndex:0,cellIndex:0,cellParaIndex:0},
+          {controlIndex:0,cellIndex:1,cellParaIndex:0},
+        ]);
+        d.applyCharFormatInCellByPath(0,1,path,0,1,'{"bold":false}');
+        changed=true;return result;
+      };
+      assert.throws(()=>executeDocumentOperations(d,s,validateEditOperations([op],s)));
+      assert.equal(changed,true);assert.deepEqual(bytes(d,ext),old);assert.deepEqual(inspect(d),original);
+    }finally{d.discardSnapshot(undo);}
+  }finally{d.free();}
+});
+
+test('two nested levels reject a protected deepest cell before subdivision',()=>{
+  const src=deepSubdivisionNestedTable(HwpDocument),parts=readOwnedZip(src.exportHwpx());src.free();
+  const section=parts.find(([name]:[string,Buffer])=>name==='Contents/section0.xml')!,xml=section[1].toString('utf8');
+  const start=xml.lastIndexOf('<hp:tc ',xml.indexOf('>R<')),end=xml.indexOf('>',start);
+  assert.ok(start>=0);assert.match(xml.slice(start,end),/ protect="0"/);
+  section[1]=Buffer.from(xml.slice(0,start)+xml.slice(start,end).replace(' protect="0"',' protect="1"')+xml.slice(end));
+  const d=new HwpDocument(writeOwnedZip(parts));
+  try{
+    const s=snapshot(d,'hwpx'),old=d.exportHwpx();
+    assert.equal(s.tableSubdivisionSources![op.target].editable,false);
+    assert.throws(()=>d.splitCellOnGrid(0,1,0,0,0,1,3,false));
+    assert.deepEqual(d.exportHwpx(),old);
+  }finally{d.free();}
+});
+
+test('two nested levels reject duplicated cursor IDs and unidentified table frames',()=>{
+  for(const fault of ['duplicate list','missing frame path','unknown root frame']){
+    const d=deepSubdivisionNestedTable(HwpDocument);
+    try{
+      const table=readStructure(d).tables[0],old=d.exportHwpx();
+      if(fault==='duplicate list'){
+        const read=d.getCursorModel.bind(d);
+        d.getCursorModel=()=>{
+          const model=JSON.parse(read());model.lists.push({...model.lists[0]});return JSON.stringify(model);
+        };
+      }else{
+        const read=d.getPageControlLayout.bind(d);
+        d.getPageControlLayout=(page:number)=>{
+          const layout=JSON.parse(read(page)),frame={...layout.controls.find((c:any)=>c.type==='table')};
+          if(fault==='missing frame path')delete frame.stableIndex;
+          else {frame.paraIdx=999;frame.stableIndex=[0,999,0];}
+          layout.controls.push(frame);return JSON.stringify(layout);
+        };
+      }
+      assert.throws(()=>nestedSubdivisionEvidence(d,table,subdivisionNestedOwner(d,table)!),/중첩 표/);
+      assert.deepEqual(d.exportHwpx(),old);
+    }finally{d.free();}
+  }
 });

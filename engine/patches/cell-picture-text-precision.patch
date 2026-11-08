@@ -1,0 +1,15 @@
+diff --git a/src/renderer/layout/paragraph_layout.rs b/src/renderer/layout/paragraph_layout.rs
+--- a/src/renderer/layout/paragraph_layout.rs
++++ b/src/renderer/layout/paragraph_layout.rs
+@@ -8904,7 +8904,10 @@
+                             &composed.tab_extended,
+                         );
+                     }
+-                    let seg_w = estimate_text_width(&remaining, &seg_style);
++                    // Keep the post-object tail on the same exact advances as the
++                    // text before an inline object and compute_char_positions. Rounding
++                    // e.g. "i " from 10.5px to 10px overlaps the following language run.
++                    let seg_w = estimate_text_width_exact(&remaining, &seg_style);
+                     let trailing_space_count =
+                         line_trailing_space_by_run[run_idx].min(remaining.chars().count());
+                     let (seg_w, seg_layout_positions) = emitted_run_layout_positions(

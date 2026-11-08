@@ -82,7 +82,7 @@ export function readTableSubdivisionSources(wasm:any, tables:Table[], name:strin
     const preservation=capturePreservationEvidence(d);if(preservation.issues.length)throw new Error('preservation');
     const paragraphFormats = primary && !multipleMerged ? formats(primary) : undefined;
     return [t.id, { editable: true, fingerprint: hash({ merge: authority, table: t, properties: p, preservation: preservation.values, ...(nestedLayout?{nestedLayout}:{}) }), cells, frame, ...(frames.length>1 ? {frames} : {}), ...(exactGrid ? {exactGrid:true} : {}), ...(binary ? {hwp5Grid:{widths,heights}} : {}), ...(paragraphFormats ? {paragraphFormats} : {}) }];
-  } catch { return [t.id, { editable: false, reason: '원본 격자와 쪽별 셀·글줄을 확인한 본문 표를 분할할 수 있습니다. HWP5는 본문 표 한 개와 원본 형식의 저장·재열기 검사를 추가로 요구합니다. 중첩 표는 첫 칸에 원래 위치를 유지할 수 있는 한 단계 인라인 표만 지원합니다.' }]; } }));
+  } catch { return [t.id, { editable: false, reason: '원본 격자와 쪽별 셀·글줄을 확인한 본문 표를 분할할 수 있습니다. HWP5는 본문 표 한 개와 원본 형식의 저장·재열기 검사를 추가로 요구합니다. 중첩 표는 첫 칸에 원래 위치를 유지할 수 있는 두 단계까지의 인라인 표를 지원합니다.' }]; } }));
 }
 export function assertTableSubdivisionResult(wasm:any, base:Snapshot, op:AgentTableSubdivisionOp,copyMetrics?:SubdivisionCopyMetrics):void {
   const d = nativeDocument(wasm), plan = tableSubdivisionPlan(op, base), t = plan.table, actual = readStructure(d).tables.find(v => v.id === t.id);
@@ -191,7 +191,7 @@ function applySubdivision(wasm:any, base:Snapshot, op:AgentTableSubdivisionOp,co
   }
   const at = expected.cells.findIndex(target);
   if(nested){
-    const inner=expected.cells.filter((v:any)=>v.list.hostListId===nested.listId);
+    const inner=expected.cells.filter((v:any)=>nested.controlLists.includes(v.list.hostListId));
     const retained=replacements.findIndex((_:any,i:number)=>plan.cells[i].originIndex===nested.index);
     if(retained!==nested.index || !inner.length)throw Error('안쪽 표가 원래 셀 경로를 유지하지 못했습니다.');
     replacements.splice(retained+1,0,...inner);

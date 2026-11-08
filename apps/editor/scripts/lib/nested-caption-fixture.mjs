@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readOwnedZip,writeOwnedZip} from './owned-zip.mjs';
 
-export function nestedCaptionFixture(HwpDocument,{direction='BOTTOM',extraParagraph=false,siblingCaption=false,multiline=false,align='TOP',complex,compact=false,tall=false}={}){
+export function nestedCaptionFixture(HwpDocument,{direction='BOTTOM',extraParagraph=false,siblingCaption=false,multiline=false,align='TOP',complex,compact=false,tall=false,emptyParagraphs=0}={}){
  const seed=HwpDocument.createEmpty();seed.createBlankDocument();
  try{
   const left='<table><tr><td><strong>좌강조</strong></td></tr>'+('<tr><td>왼쪽 이웃</td></tr>'.repeat(tall||multiline?13:7))+'</table>';
@@ -17,7 +17,8 @@ export function nestedCaptionFixture(HwpDocument,{direction='BOTTOM',extraParagr
   const first=multiline?para.replace('>제목<','>제목😀뒤<').replace('</hp:linesegarray>',line.match(/<hp:lineseg [^>]+\/>/)[0]
     .replace('textpos="0" vertpos="0"','textpos="7" vertpos="1600"')+'</hp:linesegarray>'):para;
   const second=para.replace('id="193"','id="194"').replace('>캡션 <','>둘째 <').replace('>제목<','>설명<');
-  let body=first+(extraParagraph?second:'');
+  const empty='<hp:p id="195" paraPrIDRef="0" styleIDRef="0" pageBreak="0" columnBreak="0" merged="0"><hp:run charPrIDRef="'+boldId+'"><hp:t/></hp:run>'+line+'</hp:p>';
+  let body=first+empty.repeat(emptyParagraphs)+(extraParagraph?second:'');
   if(complex==='bookmark')body=body.replace('<hp:t>캡션 ', '<hp:ctrl><hp:bookmark name="캡션 안"/></hp:ctrl><hp:t>캡션 ');
   if(complex==='empty')body+=para.replace(/<hp:t>[^<]*<\/hp:t>/g,'<hp:t/>');
   const cap='<hp:caption side="'+direction+'" fullSz="0" width="8504" gap="283" lastWidth="42520"><hp:subList id="" textDirection="HORIZONTAL" lineWrap="BREAK" vertAlign="'+align+'" linkListIDRef="0" linkListNextIDRef="0" textWidth="0" textHeight="0" hasTextRef="0" hasNumRef="0">'+body+'</hp:subList></hp:caption>';

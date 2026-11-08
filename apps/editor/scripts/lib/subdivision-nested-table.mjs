@@ -53,3 +53,28 @@ export function emphasizedSubdivisionNestedTable(HwpDocument) {
   doc.applyCharFormatInCell(0,1,0,0,2,0,1,'{"italic":false}');
   return doc;
 }
+
+export function deepSubdivisionNestedTable(HwpDocument) {
+  const source=labeledSubdivisionNestedTable(HwpDocument);
+  const parts=readOwnedZip(source.exportHwpx());source.free();
+  const section=parts.find(([name])=>name==='Contents/section0.xml'),xml=section[1].toString('utf8');
+  const tableStart=xml.indexOf('<hp:tbl ',xml.indexOf('<hp:tbl ')+1),tableEnd=xml.indexOf('</hp:tbl>',tableStart)+9;
+  const original=xml.slice(tableStart,tableEnd);
+  const child=original.replace(/(<hp:(?:p|tbl) id=")(\d+)"/g,(_,tag,id)=>tag+(800+Number(id))+'"')
+    .replace('<hp:sz width="5200"','<hp:sz width="2600"')
+    .replaceAll('<hp:cellSz width="2600"','<hp:cellSz width="1300"')
+    .replace('>X<','>Q<').replace('>Y<','>R<');
+  let parent=original.replace(/<hp:sz width="5200"([^>]*?)height="2100"/,'<hp:sz width="5600"$1height="4800"')
+    .replace('<hp:cellSz width="2600" height="2100"','<hp:cellSz width="4000" height="4800"')
+    .replace('<hp:cellSz width="2600" height="2100"','<hp:cellSz width="1600" height="4800"');
+  parent=parent.replace('<hp:t>X</hp:t>',child);
+  section[1]=Buffer.from(xml.slice(0,tableStart)+parent+xml.slice(tableEnd));
+  const doc=new HwpDocument(writeOwnedZip(parts));
+  for(let i=0;i<5;i++)doc.setCellProperties(0,1,0,i,'{"height":12000}');
+  doc.applyCharFormatInCellByPath(0,1,JSON.stringify([
+    {controlIndex:0,cellIndex:0,cellParaIndex:1},
+    {controlIndex:0,cellIndex:0,cellParaIndex:0},
+    {controlIndex:0,cellIndex:1,cellParaIndex:0},
+  ]),0,1,'{"bold":true}');
+  return doc;
+}

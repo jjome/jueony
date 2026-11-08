@@ -1,5 +1,5 @@
 import {createAxisPictureFixture,inspectPictureAnchors} from './lib/axis-picture-fixture.mjs';
-import {multilinePictureParagraph} from './lib/cell-paragraph-pictures.mjs';
+import {multilinePictureParagraph,repeatedSpacePictureParagraph} from './lib/cell-paragraph-pictures.mjs';
 import assert from 'node:assert/strict';
 import {continuedMergedTable,fragmentedMergedCell} from './lib/continued-merged-table.mjs';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
@@ -112,6 +112,55 @@ for(const format of ['hwp','hwpx'])await scenario(format+' repeated picture text
   assert.throws(()=>executeCellParagraph(d,s,{kind:'replace_cell_paragraph',target:'s0p1t0',row:1,column:1,paragraph:0,
    originalText:'😀😀Pi나나다cB',text:'😀Pi나나다cB'}));assert.ok(wrote);assert.deepEqual(bytes(d),original);
  }finally{d.free();}
+});
+for(const format of ['hwp','hwpx'])await scenario(format+' repeated picture spaces use exact advances and roll back actual overlap',async()=>{
+ const src=await repeatedSpacePictureParagraph(HwpDocument,out),args=[0,1,0,4,0];
+ const bytes=d=>format==='hwp'?d.exportHwp():d.exportHwpx(),original=bytes(src);src.free();
+ const initial=resolve(out,'spaces-original.'+format);await writeFile(initial,original);
+ const records=inspectPictureAnchors(initial),slots=[2,5,6];
+ const layout=doc=>json(doc.getPageTextLayout(0)).runs.filter(r=>r.parentParaIdx===1&&r.cellIdx===4);
+ const exactTail=doc=>{
+  const runs=layout(doc),tail=runs.find(r=>r.text==='i '),next=runs.find(r=>r.text==='다');
+  assert.ok(tail&&next);assert.ok(Math.abs(tail.w-tail.charX.at(-1))<=.1,JSON.stringify(tail));
+  assert.ok(Math.abs(tail.x+tail.charX.at(-1)-next.x)<=.1,JSON.stringify({tail,next}));
+  return runs.map(r=>({text:r.text,x:r.x,y:r.y,w:r.w,charX:r.charX}));
+ };
+ for(const canvas of [false,true]){
+  const d=new HwpDocument(original),name='반복 공백.'+format;
+  try{
+   if(canvas){
+    const q=json(d.collectCanvasMetricRequests(5,7));assert.ok(q.requests.some(r=>r.text==='😀'||r.cluster==='😀'));
+    d.registerCanvasMetricReplies(5,7,q.revision,JSON.stringify(q.requests.map(r=>({...r,resolvedFont:r.font,measuredAdvancePx:18.3}))));
+    d.selectCanvasMetrics(true);assert.equal(d.canvasMetricsActive(),true);
+   }
+   const before=bytes(d),undo=d.saveSnapshot(),s=snap(d,name),p=s.cellParagraphSources.s0p1t0.cells.find(c=>c.index===4).paragraphs[0];
+   const op={kind:'replace_cell_paragraph',target:'s0p1t0',row:1,column:1,paragraph:0,originalText:p.text,text:'😀Pi 다cB'};
+   assert.equal(p.text,'😀Pi  다cB');transactionalCandidate(d,s,[op],s.revision);
+   exactTail(d);assert.equal(layout(d).map(r=>r.text).join(''),op.text);
+   assert.deepEqual([...d.getCellPictureTextAnchors(...args)],slots);
+   assert.equal(json(d.getCellCharPropertiesAt(...args,0)).textColor,'#246789');
+   const file=resolve(out,'spaces-'+(canvas?'canvas':'portable')+'.'+format),saved=bytes(d);
+   await writeFile(file,saved);let i=0;
+   assert.deepEqual(inspectPictureAnchors(file),records.map(r=>r.row===1&&r.col===1?{...r,textOffset:slots[i++]}:r));
+   const copy=new HwpDocument(saved);
+   try{
+    if(canvas)d.selectCanvasMetrics(false);
+    assert.deepEqual(exactTail(copy),exactTail(d));
+    assert.equal(copy.getTextInCell(...args,0,Array.from(op.text).length),op.text);
+    assert.deepEqual([...copy.getCellPictureTextAnchors(...args)],slots);
+   }finally{copy.free();}
+   const redo=d.saveSnapshot();d.restoreSnapshot(undo);assert.deepEqual(bytes(d),before);
+   d.restoreSnapshot(redo);assert.deepEqual(bytes(d),saved);d.restoreSnapshot(undo);
+   d.discardSnapshot(undo);d.discardSnapshot(redo);
+   // Recreate the old half-pixel overlap after mutation; the product guard
+   // must still reject it and restore native text, slots, styles and resources.
+   const fresh=snap(d,name),rollbackBytes=bytes(d),read=d.getPageTextLayout.bind(d),remove=d.deleteTextInCell.bind(d);let wrote=false;
+   d.deleteTextInCell=(...a)=>{const r=remove(...a);wrote=true;return r;};
+   d.getPageTextLayout=(...a)=>{const v=json(read(...a));if(wrote){const run=v.runs.find(r=>r.cellIdx===4&&r.text==='다');if(run)run.x-=.5;}return JSON.stringify(v);};
+   assert.throws(()=>executeCellParagraph(d,fresh,op),/겹|배치|그림|문단/);assert.ok(wrote);
+   assert.deepEqual(bytes(d),rollbackBytes);
+  }finally{d.free();}
+ }
 });
 for(const format of ['hwp','hwpx'])await scenario(format+' multiline picture text shifts the first image onto the next verified line',async()=>{
  const src=await multilinePictureParagraph(HwpDocument,out),bytes=d=>format==='hwp'?d.exportHwp():d.exportHwpx();

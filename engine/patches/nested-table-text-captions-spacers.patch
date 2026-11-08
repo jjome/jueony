@@ -1,0 +1,38 @@
+--- a/src/document_core/commands/table_ops.rs
++++ b/src/document_core/commands/table_ops.rs
+@@ -2449,13 +2449,23 @@
+         let mut bytes = 0usize;
+         caption.paragraphs.iter().all(|p| {
+             bytes = bytes.saturating_add(p.text.len());
+-            if p.text.is_empty() || bytes > 16_000 || p.text.chars().any(char::is_control)
++            if bytes > 16_000 || p.text.chars().any(char::is_control)
+                 || !p.controls.is_empty() || !p.field_ranges.is_empty() || !p.orphan_field_ends.is_empty()
+                 || !p.range_tags.is_empty() || !p.markpen_marks.is_empty() || !p.title_marks.is_empty()
+                 || !p.tab_extended.is_empty() || p.numbering_restart.is_some() || p.raw_break_type != 0
+                 || p.line_segs.len() > 128 || p.char_shapes.len() > 128 || p.char_shapes.first().map(|s| s.start_pos) != Some(0)
+             {
+                 return false;
++            }
++            if p.text.is_empty() {
++                // A blank paragraph still owns one stored line and one caret
++                // style. Missing/synthetic lines cannot prove its geometry.
++                let lines = p.serializable_line_segs();
++                let [line] = lines else { return false; };
++                return p.char_count == 1 && p.char_offsets.is_empty() && p.char_shapes.len() == 1
++                    && line.text_start == 0 && line.vertical_pos == 0 && line.segment_width > 0
++                    && line.line_height > 0 && line.text_height > 0 && line.line_spacing >= 0
++                    && line.baseline_distance >= 0 && line.baseline_distance <= line.line_height;
+             }
+             let len = p.text.encode_utf16().count() as u32;
+             p.char_shapes.iter().all(|s| s.start_pos < len && p.char_offsets.contains(&s.start_pos))
+--- a/src/renderer/composer.rs
++++ b/src/renderer/composer.rs
+@@ -932,7 +932,7 @@
+ /// advances by its spacing before the next paragraph begins.
+ pub(crate) fn nested_caption_height_px(caption: &Option<Caption>, dpi: f64) -> f64 {
+     let consecutive = caption.as_ref().is_some_and(|c| c.paragraphs.len() > 1
+-        && c.paragraphs.iter().all(|p| !p.text.is_empty() && p.controls.is_empty()
++        && c.paragraphs.iter().all(|p| p.controls.is_empty()
+             && !p.line_segs.is_empty() && p.line_segs.iter().all(|s| s.line_height > 0 && s.line_spacing >= 0)));
+     measured_caption_height(caption, dpi, consecutive)
+ }

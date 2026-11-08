@@ -172,7 +172,7 @@ scalarCursor=replaceOnce(scalarCursor,"this._fnCharOffset = (info.texts[this._fn
 scalarCursor=replaceOnce(scalarCursor,'const charCount = currentText.length;','const charCount = [...currentText].length;','note Right scalar offset');
 scalarCursor=replaceOnce(scalarCursor,'this._fnCharOffset = prevText.length;','this._fnCharOffset = [...prevText].length;','note previous scalar offset');
 await writeFile(join(root,'src/engine/cursor.ts'),scalarCursor);
-caretInput = "import { paragraphSpacingChange } from '../jueony/shortcuts/paragraph-spacing.ts';\nimport {createParagraphSpacingReader} from '../jueony/adapters/rhwp/paragraph-spacing.ts';\n" + caretInput;
+caretInput = "import { paragraphSpacingChange } from '../jueony/shortcuts/paragraph-spacing.ts';\nimport {createParagraphSpacingReader} from '../jueony/adapters/rhwp/paragraph-spacing.ts';\nimport {restoreStudioTextBoxCursorN014} from '../jueony/adapters/rhwp/session-textbox-studio-restore-n014.ts';\n" + caretInput;
 caretInput = replaceOnce(caretInput, '  getCursorPosition(): DocumentPosition { return this.cursor.getPosition(); }', `  getCursorPosition(): DocumentPosition { return this.cursor.getPosition(); }
 
   /** Relative values per paragraph, preflighted then recorded as one atomic undo step. */
@@ -209,10 +209,8 @@ caretInput = replaceOnce(caretInput, '  getCursorPosition(): DocumentPosition { 
     return { cursor: this.cursor, wasm: this.wasm,
       getCursorPosition: () => this.cursor.getPosition(),
       restoreSessionTextBox: (saved: import('../jueony/modules/preferences/public/index.ts').TextBoxBookmark): boolean => {
-        this.cursor.exitHeaderFooterMode();this.cursor.exitFootnoteMode();this.cursor.clearSelection();this.cursor.exitCellSelectionMode();this.cursor.exitBlockSelectionMode();this.cursor.exitTableObjectSelection();this.cursor.exitPictureObjectSelection();
-        const point=(caret:typeof saved.caret):DocumentPosition=>({sectionIndex:caret.section,paragraphIndex:caret.paragraph,charOffset:caret.offset,parentParaIndex:saved.focus.caret.paragraph,controlIndex:saved.control,cellIndex:0,cellParaIndex:caret.paragraph,cellPath:[{controlIndex:saved.control,cellIndex:0,cellParaIndex:caret.paragraph}],isTextBox:true});
-        if(saved.anchor){this.cursor.moveTo(point(saved.anchor));this.cursor.setAnchor();}
-        this.cursor.moveTo(point(saved.caret));this.cursor.resetPreferredX();this.updateCaret();this.eventBus.emit('command-state-changed');return true;
+        if(!restoreStudioTextBoxCursorN014({cursor:this.cursor,wasm:this.wasm},saved))return false;
+        this.updateCaret();this.eventBus.emit('command-state-changed');return true;
       },
       restoreSessionHeaderFooter: (saved: import('../jueony/modules/preferences/public/index.ts').HeaderFooterBookmark) => {
         this.cursor.exitHeaderFooterMode();this.cursor.exitFootnoteMode();this.cursor.clearSelection();this.cursor.exitCellSelectionMode();this.cursor.exitTableObjectSelection();this.cursor.exitPictureObjectSelection();

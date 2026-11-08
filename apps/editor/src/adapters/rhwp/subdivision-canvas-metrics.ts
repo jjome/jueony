@@ -23,8 +23,11 @@ export function subdivisionCopyMetrics(wasm:any,base:Snapshot,operations:EditOp[
   if(op.kind==='replace_cell_paragraph'){
     const cell=base.cellParagraphSources?.[op.target]?.cells?.find(c=>c.row===op.row && c.column===op.column);
     const paragraph=cell?.paragraphs.find(p=>p.index===op.paragraph && p.text===op.originalText);
-    if(!paragraph?.pictureTextRanges?.length || op.text===op.originalText || !cellParagraphPlan(op,base).pictureEdit ||
+    if(!paragraph?.pictureTextRanges?.length || op.text===op.originalText ||
         !wasm.borrowDocumentHandle().canvasMetricsActive())return;
+    // The suffix retains picture geometry too. Its preflight copy must use
+    // the published screen measurements just like a splice before a picture.
+    cellParagraphPlan(op,base);
   }else if(op.kind==='insert_table_column'||op.kind==='delete_table_column'){
     const table=base.structure?.tables.find(t=>t.id===op.target),insert=op.kind==='insert_table_column';
     if(!table?.pagination?.repeatHeader || !table.cells.some(c=>c.axisPicture) ||

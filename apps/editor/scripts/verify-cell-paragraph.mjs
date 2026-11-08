@@ -99,6 +99,7 @@ try{
   const original=resolve(out,'picture-field-before.'+format);
   await writeFile(original,format==='hwp'?source.exportHwp():source.exportHwpx());
   const slots=inspectMixedPictureFields(original),f=await open(format,source);
+  await f.waitForFunction(()=>window.__pageServices.wasm.borrowDocumentHandle().canvasMetricsActive()===true,{timeout:15000});
   const inspect=()=>f.evaluate(args=>{
    const d=window.__pageServices.wasm.borrowDocumentHandle();
    return {text:d.getTextInCell(...args,0,d.getCellParagraphLength(...args)),fields:JSON.parse(d.getFieldList()),fieldStyle:JSON.parse(d.getCellCharPropertiesAt(...args,1)),
@@ -118,7 +119,9 @@ try{
   const expected={...suffix,text:suffix.text.replace('중간문구','변경문구')};assert.deepEqual(await inspect(),expected);
   await undo();assert.deepEqual(await inspect(),suffix);
   await execute('edit:redo');assert.deepEqual(await inspect(),expected);
-  await saveAndReopen(f,'picture-field',format);assert.deepEqual(await inspect(),expected);
+  await saveAndReopen(f,'picture-field',format);
+  await f.waitForFunction(()=>window.__pageServices.wasm.borrowDocumentHandle().canvasMetricsActive()===true,{timeout:15000});
+  assert.deepEqual(await inspect(),expected);
   assert.deepEqual(inspectMixedPictureFields(resolve(out,'picture-field.'+format)),slots.map(c=>c.row===1&&c.col===1?{...c,text:expected.text}:c));
  });
  for(const format of ['hwp','hwpx'])await scenario(format+' inline picture neighbors in a merged paragraph chat edit, undo, redo, save and UI reopen',async()=>{

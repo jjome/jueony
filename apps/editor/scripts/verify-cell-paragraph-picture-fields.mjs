@@ -53,18 +53,20 @@ for(const format of ['hwp','hwpx']){
    assert.throws(()=>candidate(d,s,command(s,text)),undefined,label);
    assert.deepEqual(save(d),before,label+' rollback');
   }
-  let text=p.text;
-  for(const [label,from,to] of [['suffix','일반문구','수정문구'],['before-picture','뒤문구','새문구'],['between-pictures','중간문구','변경문구']]){
+  let text=p.text,anchorShift=0;
+  for(const [label,from,to] of [['suffix','일반문구','수정문구'],['before-picture','뒤문구','새문구추가'],['between-pictures','중간문구','변경문구']]){
    const current=snap(d,name);text=text.replace(from,to);candidate(d,current,command(current,text));
+   if(label==='before-picture')anchorShift=2;
    const file=resolve(out,label+'.'+format);await writeFile(file,save(d));
-   assert.deepEqual(inspectMixedPictureFields(file),nativeSource.map(c=>c.row===1&&c.col===1?{...c,text}:c));
+   assert.deepEqual(inspectMixedPictureFields(file),nativeSource.map(c=>c.row===1&&c.col===1?{...c,text,
+    slots:c.slots.map(s=>s.kind===11?{...s,offset:s.offset+anchorShift}:s)}:c));
    const reopened=new HwpDocument(await readFile(file));
    try{
     assert.equal(reopened.getTextInCell(...args,0,reopened.getCellParagraphLength(...args)),text);
     assert.deepEqual(json(reopened.getFieldList()),originalFields);
     assert.equal(json(reopened.getFieldValue(originalFields[0].fieldId)).value,'필드😀');
     assert.equal(json(reopened.getCellCharPropertiesAt(...args,1)).textColor,'#246789');
-    assert.deepEqual(Array.from(reopened.getCellPictureTextAnchors(...args)),anchors);
+    assert.deepEqual(Array.from(reopened.getCellPictureTextAnchors(...args)),anchors.map(a=>a+anchorShift));
     assert.deepEqual(resources(reopened.exportHwpx()),originalAssets);
    }finally{reopened.free();}
   }
@@ -90,7 +92,7 @@ for(const format of ['hwp','hwpx']){
     assert.equal(snap(guarded,name).cellParagraphSources.s0p1t0.editable,false,mode+' owner');
    }finally{guarded.free();}
   }
-  results.push({format,edits:3,rejectedEdits:3,undoRedo:true,reopenedFieldIdentityFault:true,foreignLookup:true,namedOwnerRejected:true,protectedOwnerRejected:true,emptyAndEnclosingFieldsRejected:true});
+  results.push({format,edits:3,allPictureAnchorsShiftedBy:anchorShift,rejectedEdits:3,undoRedo:true,reopenedFieldIdentityFault:true,foreignLookup:true,namedOwnerRejected:true,protectedOwnerRejected:true,emptyAndEnclosingFieldsRejected:true});
   console.log('PASS',format,'mixed picture/ClickHere: suffix, before/between pictures, raw slots, fields, resources, reopen, undo/redo, refusals and rollback');
  }finally{d.free();}
 }

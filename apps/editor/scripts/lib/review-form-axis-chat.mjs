@@ -1,6 +1,6 @@
 import http from 'node:http';
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
+import {readFile,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {crossingTitleText,expectedPictureHeading} from './repeated-picture-heading.mjs';
 import {inspectPictureAnchors} from './axis-picture-fixture.mjs';
@@ -135,23 +135,31 @@ export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,
    if(crossingTitleOwner){
     await scenario(ext+' Agent picture owner crossing merged title columns reflows Canvas lines 2→1→2',async()=>{
      const sourceFile=resolve(pictureFolder,'before.'+ext),source=new HwpDocument(await readFile(sourceFile));
-     const records=inspectPictureAnchors(sourceFile),frame=await open(ext,source);
+     const records=inspectPictureAnchors(sourceFile),frame=await open(ext,source),measurements=[];
      const verify=async(count,span,width)=>{
+      await frame.waitForFunction(()=>window.__pageServices.wasm.borrowDocumentHandle().canvasMetricsActive()===true,{timeout:15000});
       const v=await frame.evaluate(()=>{
        const d=window.__pageServices.wasm.borrowDocumentHandle(),active=d.canvasMetricsActive();
        const read=()=>Array.from({length:d.pageCount()},(_,page)=>{
         const runs=JSON.parse(d.getPageTextLayout(page)).runs.filter(r=>r.parentParaIdx===1&&r.cellIdx===0&&r.cellParaIdx===0);
         return {text:runs.map(r=>r.text).join(''),lines:new Set(runs.map(r=>r.y)).size,
+         emoji:runs.flatMap(r=>Array.from(r.text).flatMap((c,i)=>c==='😀'?[r.charX[i+1]-r.charX[i]]:[])),
          images:JSON.parse(d.getPageControlLayout(page)).controls.filter(c=>c.type==='image').length};
        });
        try{d.selectCanvasMetrics(true);const screen=read(),canvas=d.canvasMetricsActive();d.selectCanvasMetrics(false);
-        return {canvas,screen,portable:read(),stored:JSON.parse(d.getControls()).filter(c=>c.ctrlId==='gso').length,
+        return {active,canvas,screen,portable:read(),stored:JSON.parse(d.getControls()).filter(c=>c.ctrlId==='gso').length,
          span:JSON.parse(d.getCellInfo(0,1,0,0)).colSpan,width:JSON.parse(d.getCellProperties(0,1,0,0)).width};
        }finally{d.selectCanvasMetrics(active);}
       });
-      assert.equal(v.canvas,true);assert.equal(v.stored,4);assert.equal(v.span,span);assert.equal(v.width,width);
+      assert.equal(v.active,true);assert.equal(v.canvas,true);assert.equal(v.stored,4);assert.equal(v.span,span);assert.equal(v.width,width);
       const expected=[2,3].map(images=>({text:crossingTitleText,lines:count,images}));
-      assert.deepEqual(v.screen,expected);assert.deepEqual(v.portable,expected);
+      const withoutMetrics=pages=>pages.map(({emoji,...p})=>p);
+      assert.deepEqual(withoutMetrics(v.screen),expected);assert.deepEqual(withoutMetrics(v.portable),expected);
+      for(let page=0;page<2;page++){
+       assert.equal(v.screen[page].emoji.length,1);assert.equal(v.portable[page].emoji.length,1);
+       assert.ok(Math.abs(v.screen[page].emoji[0]-v.portable[page].emoji[0])>.2,'The actual published emoji advance must differ from the portable fallback.');
+      }
+      measurements.push({expectedLines:count,span,width,...v});
      };
      await verify(2,2,13500);
      for(const [index,request] of crossingTitleRequests.entries()){
@@ -164,6 +172,7 @@ export async function reviewFormAxisChat({HwpDocument,page,origin,scenario,open,
       assert.deepEqual(inspectPictureAnchors(resolve(outputFolder,label+'.'+ext)),
        records.map(p=>({...p,col:p.col+(index===0&&p.col>=1?1:0)})));
      }
+     await writeFile(resolve(outputFolder,'crossing-title-metrics-'+ext+'.json'),JSON.stringify(measurements,null,2));
     });
     continue;
    }

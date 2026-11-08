@@ -103,16 +103,23 @@ try{
    const captioned=kind==='captioned nested owner',paired=kind==='two nested forms'||captioned,deep=kind==='two nested levels',maximum=kind==='maximum nested depth',emphasized=kind==='emphasized nested owner',labeled=kind!=='nested owner';
    const twoPieces=maximum||captioned;
    const source=nestedFixtures[kind]();
+   // A real unsupported glyph requests the Studio Canvas provider. The plain
+   // Korean/Latin fixture needs no supplemental metrics and correctly stays portable.
+   if(captioned){source.insertText(0,0,2,' 😀');await writeFile(resolve(out,'before-captioned-owner.'+ext),source[ext==='hwp'?'exportHwp':'exportHwpx']());}
    if(hostPage===1)source.insertPageBreak(0,0,2);
-   const f=await open(ext,source),before=await snap(),table=before.structure.tables[0];
-   const ink=()=>f.evaluate(p=>{
+   const f=await open(ext,source);
+   const canvasReady=()=>f.waitForFunction(()=>window.__pageServices.wasm.borrowDocumentHandle().canvasMetricsActive(),{timeout:15000});
+   if(captioned)await canvasReady();
+   const before=await snap(),table=before.structure.tables[0];
+   const ink=async()=>{if(captioned)await canvasReady();return f.evaluate(p=>{
      const d=window.__pageServices.wasm.borrowDocumentHandle();
-     return {pages:d.pageCount(),earlier:p?d.getPageTextLayout(0):null,
+     return {canvasMetrics:d.canvasMetricsActive(),pages:d.pageCount(),earlier:p?d.getPageTextLayout(0):null,
        tables:JSON.parse(d.getPageControlLayout(p)).controls.filter(v=>v.type==='table' && v.stableIndex?.length>3),
        ownerLines:JSON.parse(d.getPageTextLayout(p)).runs.filter(r=>r.cellPath?.length===1 && r.cellIdx===0 && r.text),
        lines:JSON.parse(d.getPageTextLayout(p)).runs.filter(r=>r.cellPath?.length>1)};
-   },hostPage);
+   },hostPage);};
    const original=await ink();
+   if(captioned)assert.equal(original.canvasMetrics,true);
    assert.equal(original.pages,hostPage+1);
    assert.deepEqual(before.tableSubdivisionSources[table.id].cells.map(c=>[c.row,c.column]),[[0,0]]);
    assert.equal(original.tables.length,maximum?7:paired||deep?2:1);
@@ -132,6 +139,7 @@ try{
    await send((captioned?'위쪽과 오른쪽 캡션, ':'')+(labeled?'제목, 설명과 함께 ':'')+(maximum?'7단계 ':deep?'두 단계로 들어간 ':paired?'두 ':'')+
      '안쪽 표를 첫 칸에 유지하고 바깥 병합 셀을 '+(twoPieces?'두':'세')+' 칸으로 나누어 줘');await error(false);
    const after=await snap(),changed=after.structure.tables[0];
+   if(captioned)assert.deepEqual(after.nodes,before.nodes);
    assert.deepEqual(after.structure.nestedTables,before.structure.nestedTables);
    assert.deepEqual(changed.cells.map(c=>c.text),[table.cells[0].text,'',...(twoPieces?[]:['']),...table.cells.slice(1).map(c=>c.text)]);
    assert.deepEqual(await ink(),original);
@@ -139,6 +147,7 @@ try{
    await execute('edit:redo');assert.deepEqual((await snap()).structure,after.structure);
    await reopen(f,(captioned?'split-captioned-owner-':maximum?'split-max-depth-':deep?'split-two-levels-':emphasized?'split-emphasized-owner-':paired?'split-two-nested-':labeled?'split-titled-owner-':'split-nested-owner-')+ext+'-p'+(hostPage+1),ext);assert.deepEqual(await ink(),original);
    assert.deepEqual((await snap()).structure,after.structure);
+   if(captioned)assert.deepEqual((await snap()).nodes,before.nodes);
  });
  await scenario('inline field subdivision - narrowed emoji value rewraps and preserves original document',async()=>{
    await configure('openai-compatible');await open('hwpx',subdivisionInlineFieldTable(HwpDocument,true,0,7000));

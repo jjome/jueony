@@ -4,7 +4,7 @@ const parsed = (value: any): any => typeof value === 'string' ? JSON.parse(value
 const raw = (wasm: any) => wasm.borrowDocumentHandle?.() ?? wasm;
 function plain(detail: any, type: number): void {
   const props = [detail.charProps, ...(type === 0 ? [detail.paraProps] : [])];
-  if (props.some(p => p.fillType !== 'none' || ['borderLeft', 'borderRight', 'borderTop', 'borderBottom'].some(key => p[key]?.type || p[key]?.width)) || type === 0 && (detail.paraProps.headType !== 'None' || detail.paraProps.tabStops?.length || detail.paraProps.tabAutoLeft || detail.paraProps.tabAutoRight || detail.paraProps.borderConnect || detail.paraProps.borderIgnoreMargin || detail.paraProps.borderSpacing?.some((v: number) => v !== 0))) throw new Error('번호·개요·사용자 탭·테두리·배경을 포함한 스타일 교환은 아직 지원하지 않습니다. 원본 정의는 유지합니다.');
+  if (props.some(p => p.fillType !== 'none' || ['borderLeft', 'borderRight', 'borderTop', 'borderBottom'].some(key => p[key]?.type || p[key]?.width)) || type === 0 && (detail.paraProps.headType !== 'None' || detail.paraProps.tabStops?.length || detail.paraProps.tabAutoLeft || detail.paraProps.tabAutoRight || detail.paraProps.borderSpacing?.some((v: number) => v !== 0))) throw new Error('번호·개요·사용자 탭·테두리·배경을 포함한 스타일 교환은 아직 지원하지 않습니다. 원본 정의는 유지합니다.');
 }
 export function exportStylePackage(wasm: any, selected: number[]): StylePackage {
   const doc = raw(wasm), list = parsed(doc.getStyleList()), ids: number[] = [];

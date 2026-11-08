@@ -7,7 +7,9 @@ const bool = (v: unknown) => { if (typeof v !== 'boolean') throw new Error('스�
 const choice = (v: unknown, values: string[]) => { if (typeof v !== 'string' || !values.includes(v)) throw new Error('지원하지 않는 스타일 모양 값입니다.'); return v; };
 const colors = ['underlineColor', 'strikeColor', 'textColor', 'shadeColor', 'shadowColor'];
 const charBooleans = ['bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', 'emboss', 'engrave', 'kerning'];
-const paraBooleans = ['widowOrphan', 'keepWithNext', 'keepLines', 'pageBreakBefore', 'fontLineHeight', 'singleLine', 'autoSpaceKrEn', 'autoSpaceKrNum'];
+// These two paragraph-border behavior flags do not require creating or remapping
+// a BorderFill resource. Actual lines, fills, spacing and TabDef stay unsupported.
+const paraBooleans = ['widowOrphan', 'keepWithNext', 'keepLines', 'pageBreakBefore', 'fontLineHeight', 'singleLine', 'autoSpaceKrEn', 'autoSpaceKrNum', 'borderConnect', 'borderIgnoreMargin'];
 export function validatePortableShapes(charValue: unknown, paraValue: unknown): { char: Record<string, any>; para: Record<string, any> } {
   const source = object(charValue), p = object(paraValue), char: Record<string, any> = {}, para: Record<string, any> = {};
   if (!Array.isArray(source.fontFamilies) || source.fontFamilies.length !== 7) throw new Error('언어별 글꼴 7개를 확인하세요.'); char.fontFamilies = source.fontFamilies.map(value => text(value));

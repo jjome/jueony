@@ -22,7 +22,7 @@
 
 - **구현** [N014](<13-state-and-preferences.md#n014>) **글상자 내부 커서·선택 복원** — 선별 capability 검사 15/15를 통과했다. caption ambiguity·nested owner chain·group child hidden을 exact blocker로 분류했으며 group·nested·caption 실제 복원과 Studio browser callback·실제 앱 재시작·한글 비교는 남아 부분이다.
 - **구현** [N015](<13-state-and-preferences.md#n015>) **다중 개체·그룹 선택 복원** — 선택 검증 36/36과 실제 custom engine의 수식 HWP/HWPX 저장·재열기·bytes invariant를 통과했다. 단일·mixed·nested 수식과 OLE·table 선택은 계속 fail-closed이며 OLE payload typed property API와 table multi-restore port가 없다. 실제 앱 재시작·한글 비교도 남아 부분이다.
-- **구현** [N016](<13-state-and-preferences.md#n016>) **미주·나머지 특수 영역 선택 복원** — 기존 root 선택 8/8·실제 WASM HWP/HWPX 4/4에 더해 table-cell engine 검사 3/3을 통과했다. nested owner 복원과 실제 앱 재시작·한글 직접 비교·필드/삽입 개체 선택 복원은 지원으로 표시하지 않고 남긴다.
+- **구현** [N016](<13-state-and-preferences.md#n016>) **미주·나머지 특수 영역 선택 복원** — commit 3a9d86b8 기준 custom engine root body nonempty ClickHere full selection 순방향·역방향 포함 29/29를 통과했다. 기존 root 선택·table-cell HWP/HWPX 증거를 유지하며 partial/empty/cell/nested/기타 field와 nested/caption object·실제 앱 재시작·한글 직접 비교는 남아 부분이다.
 
 ## 기능별 작업표
 
@@ -781,11 +781,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
-- 완료 범위: commit 99d903c2 기준 root-body 복원 계약에 custom Rust engine의 table-cell 미주 owner 지문·저장 bytes 불변 HWP/HWPX save/reopen 증거를 추가하고 nested·shape owner는 root-only story/layout/Studio 주소와 shape kind ambiguity 때문에 fail-closed
-- 다음 작업: 기존 root 선택 8/8·실제 WASM HWP/HWPX 4/4에 더해 table-cell engine 검사 3/3을 통과했다. nested owner 복원과 실제 앱 재시작·한글 직접 비교·필드/삽입 개체 선택 복원은 지원으로 표시하지 않고 남긴다.
+- 완료 범위: root-body 복원 계약과 table-cell 미주 owner 지문·저장 bytes 불변 증거를 유지하고 root body nonempty ClickHere의 전체 선택만 순방향·역방향으로 복원한다. partial/empty/cell/nested/기타 field와 nested/caption object는 fail-closed
+- 다음 작업: commit 3a9d86b8 기준 custom engine root body nonempty ClickHere full selection 순방향·역방향 포함 29/29를 통과했다. 기존 root 선택·table-cell HWP/HWPX 증거를 유지하며 partial/empty/cell/nested/기타 field와 nested/caption object·실제 앱 재시작·한글 직접 비교는 남아 부분이다.
 - 상위 항목: [S018](<13-state-and-preferences.md#s018>) 본문/표/개체 선택과 모드
 - 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [session-endnote-owner-capability-n016.ts](<../../apps/editor/src/adapters/rhwp/session-endnote-owner-capability-n016.ts>) · [session-endnote-owner-capability-n016.test.ts](<../../apps/editor/tests/session-endnote-owner-capability-n016.test.ts>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;DETACHED_ENDNOTE_SELECTION_2026_11_08;ENDNOTE_SELECTION_SESSION_WIRE_2026_11_09;TABLE_CELL_ENDNOTE_CAPABILITY_2026_11_09`
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;DETACHED_ENDNOTE_SELECTION_2026_11_08;ENDNOTE_SELECTION_SESSION_WIRE_2026_11_09;TABLE_CELL_ENDNOTE_CAPABILITY_2026_11_09;CLICKHERE_FULL_SELECTION_2026_11_09`
 
 </details>
 

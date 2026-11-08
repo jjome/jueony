@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 16/21 · 부분 1 · 미구현 1 · 재점검 3 | 완료 4/33 · 부분 6 · 재점검 23 |
-| 검증 | 완료 0/21 · 부분 17 · 미검증 4 | 완료 0/33 · 부분 33 |
+| 구현 | 완료 16/21 · 부분 5 | 완료 4/33 · 부분 6 · 재점검 23 |
+| 검증 | 완료 0/21 · 부분 21 | 완료 0/33 · 부분 33 |
 | Agent 연결 | 연결 🟢 **1/1** · 부분 0 · 해당 없음 20 | 해당 없음 33 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -20,9 +20,9 @@
 
 ## 먼저 할 일
 
-- **구현** [N014](<13-state-and-preferences.md#n014>) **글상자 내부 커서·선택 복원** — Rectangle 글상자와 일반 H/F·root body 각주의 커서/선택·재시작 복원 검증. 미주 UI locator·필드/중첩/불명 graph 및 전체 상태·한글 동등성은 남음.
-- **구현** [N015](<13-state-and-preferences.md#n015>) **다중 개체·그룹 선택 복원** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- **재점검** [N016](<13-state-and-preferences.md#n016>) **미주·나머지 특수 영역 선택 복원** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- **구현** [N014](<13-state-and-preferences.md#n014>) **글상자 내부 커서·선택 복원** — HWP/HWPX 저장·재열기에서 0~359° 정수 회전 글상자의 커서·정/역방향 선택과 stale 복원 차단을 검증함. 그룹·중첩·캡션·뒤집기·비-Rectangle·Edge 신규 빌드·한글 비교는 남음.
+- **구현** [N015](<13-state-and-preferences.md#n015>) **다중 개체·그룹 선택 복원** — HWP/HWPX 저장·재열기와 stale/그룹 해제 차단은 검증함. SessionCursor/validator/capture·restore callback/wire 연결·이미지/수식/OLE/표/특수 story·브라우저 재시작·한글 비교는 남음.
+- **구현** [N016](<13-state-and-preferences.md#n016>) **미주·나머지 특수 영역 선택 복원** — HWP/HWPX 저장·재열기·read-only bytes 불변·동일 길이 변경/소유자 삭제 차단은 검증함. SessionCursor/Studio restore callback 연결·중첩/표/도형 note owner·필드/삽입 개체·브라우저 재시작·한글 비교는 남음.
 
 ## 기능별 작업표
 
@@ -131,8 +131,8 @@
 | --- | --- | --- | --- | --- |
 | [S018](<13-state-and-preferences.md#s018>) · 범위 | 본문/표/개체 선택과 모드 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 | [N014](<13-state-and-preferences.md#n014>) · 작업 | 글상자 내부 커서·선택 복원 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
-| [N015](<13-state-and-preferences.md#n015>) · 작업 | 다중 개체·그룹 선택 복원 | ☐ 미구현 | ☐ 미검증 | — 해당 없음 |
-| [N016](<13-state-and-preferences.md#n016>) · 작업 | 미주·나머지 특수 영역 선택 복원 | ? 재점검 | ☐ 미검증 | — 해당 없음 |
+| [N015](<13-state-and-preferences.md#n015>) · 작업 | 다중 개체·그룹 선택 복원 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
+| [N016](<13-state-and-preferences.md#n016>) · 작업 | 미주·나머지 특수 영역 선택 복원 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 | [G091](<13-state-and-preferences.md#g091>) · 작업 | Rectangle 글상자 커서·선택·미저장 재시작 복원 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G099](<13-state-and-preferences.md#g099>) · 작업 | 머리말·본문 각주의 소유·서식 지문과 재시작 복원 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 
@@ -143,7 +143,7 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [S029](<13-state-and-preferences.md#s029>) · 범위 | 일반 undo/redo | ? 재점검 | ◐ 부분 | — 해당 없음 |
-| [N018](<13-state-and-preferences.md#n018>) · 작업 | undo/redo 이력의 재실행 지속 정책 | ? 재점검 | ☐ 미검증 | — 해당 없음 |
+| [N018](<13-state-and-preferences.md#n018>) · 작업 | undo/redo 이력의 재실행 지속 정책 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 
 <a id="work-10"></a>
 
@@ -169,7 +169,7 @@
 | [G033](<13-state-and-preferences.md#g033>) · 작업 | 용지·글꼴 기본값은 새 문서에만 적용 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G034](<13-state-and-preferences.md#g034>) · 작업 | 환경 백업 JSON과 버전/손상 보호 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G035](<13-state-and-preferences.md#g035>) · 작업 | 문서 bytes·dirty의 미저장 workspace 복원 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
-| [N017](<13-state-and-preferences.md#n017>) · 작업 | 전체 환경의 한글 기본값·저장 수명 실측 | ? 재점검 | ☐ 미검증 | — 해당 없음 |
+| [N017](<13-state-and-preferences.md#n017>) · 작업 | 전체 환경의 한글 기본값·저장 수명 실측 | ◐ 부분 | ◐ 부분 | — 해당 없음 |
 
 ## 항목별 완료조건·근거
 
@@ -753,11 +753,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
-- 완료 범위: 문단 경로·문맥 hash·원본 확인·포커스
-- 다음 작업: Rectangle 글상자와 일반 H/F·root body 각주의 커서/선택·재시작 복원 검증. 미주 UI locator·필드/중첩/불명 graph 및 전체 상태·한글 동등성은 남음.
+- 완료 범위: 단일 root Rectangle의 문단 경로·전체 story 문맥 hash·정역 회전각·원본·포커스
+- 다음 작업: HWP/HWPX 저장·재열기에서 0~359° 정수 회전 글상자의 커서·정/역방향 선택과 stale 복원 차단을 검증함. 그룹·중첩·캡션·뒤집기·비-Rectangle·Edge 신규 빌드·한글 비교는 남음.
 - 상위 항목: [S018](<13-state-and-preferences.md#s018>) 본문/표/개체 선택과 모드
-- 근거: [103-textbox-state-and-storage.md](<../103-textbox-state-and-storage.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [103-textbox-state-and-storage.md](<../103-textbox-state-and-storage.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [105-file-storage-preservation.md](<../105-file-storage-preservation.md>) · [verification-summary.json](<../evidence/state-storage-2026-10-16/verification-summary.json>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;ROTATED_RECTANGLE_STATE_2026_11_08`
 
 </details>
 
@@ -765,13 +765,13 @@
 <summary>N015 · 다중 개체·그룹 선택 복원</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
-- 완료 범위: 그룹 자산/소유·좌표·검증 실패 시 안전 초기화
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: top-level root vector shape 2~32개와 중첩 group 선택의 순서/활성 개체·root 주소·Lock/캡션/story/기하/개체 지문·canonical HWPX 문서 지문
+- 다음 작업: HWP/HWPX 저장·재열기와 stale/그룹 해제 차단은 검증함. SessionCursor/validator/capture·restore callback/wire 연결·이미지/수식/OLE/표/특수 story·브라우저 재시작·한글 비교는 남음.
 - 상위 항목: [S018](<13-state-and-preferences.md#s018>) 본문/표/개체 선택과 모드
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;DETACHED_GROUP_SELECTION_2026_11_08`
 
 </details>
 
@@ -779,13 +779,13 @@
 <summary>N016 · 미주·나머지 특수 영역 선택 복원</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ? 재점검 / 검증 ☐ 미검증 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
-- 완료 범위: 영역별 수명·본문 복귀·문서 버전·재시작
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: root-body 미주의 exact owner·note locator·owner/story/locator 3중 지문·Unicode 커서/방향성 선택·각주 분리·stale/위조 차단
+- 다음 작업: HWP/HWPX 저장·재열기·read-only bytes 불변·동일 길이 변경/소유자 삭제 차단은 검증함. SessionCursor/Studio restore callback 연결·중첩/표/도형 note owner·필드/삽입 개체·브라우저 재시작·한글 비교는 남음.
 - 상위 항목: [S018](<13-state-and-preferences.md#s018>) 본문/표/개체 선택과 모드
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;DETACHED_ENDNOTE_SELECTION_2026_11_08`
 
 </details>
 
@@ -793,13 +793,13 @@
 <summary>N017 · 전체 환경의 한글 기본값·저장 수명 실측</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ? 재점검 / 검증 ☐ 미검증 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 사용자/업무/문서/구역/임시 scope·reset·dirty·undo 구분
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 현재 stable 8개 설정 키의 사용자/업무·문서 scope·재실행·reset·dirty·undo·backup·validator 계약과 HWP/HWPX 및 대화상자 임시 상태 분리
+- 다음 작업: 읽기 전용 audit이 missing/valid/corrupt/unsupported-version/read-error를 쓰기 없이 분류함. Studio 전체 schema·backup 제외 정책·설정 UI/시작 진단·실제 한글/Windows/origin/DPI 수명 실측은 남음.
 - 상위 항목: [B151](<12-ui-and-shortcuts.md#b151>) 환경 설정
-- 근거: [25-hangul-parity-and-state-plan.md](<../25-hangul-parity-and-state-plan.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [25-hangul-parity-and-state-plan.md](<../25-hangul-parity-and-state-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;PREFERENCE_LIFETIME_AUDIT_2026_11_08`
 
 </details>
 
@@ -807,13 +807,13 @@
 <summary>N018 · undo/redo 이력의 재실행 지속 정책</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ? 재점검 / 검증 ☐ 미검증 / Agent — 해당 없음.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NA**.
-- 완료 범위: 원본 bytes/revision과 atomic recipe 수명; 한글 기준 확인
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
+- 검증 구분: 자동 **PASS** / 한글 **NA**.
+- 완료 범위: live atomic recipe를 processEpoch·documentInstance·revision·bytesSha256·historyTop으로 결합; 저장 실패/검증된 rebase와 reload/recovery/named-history/restart 초기화 계약
+- 다음 작업: 정책·반례·기존 문서 이력/복구 경계 검사를 완료함. 실제 InputHandler history·save/recovery 초기화 연결·수동 편집·저장 frame absorption·프로세스 재시작·한글 기준은 남음.
 - 상위 항목: [S029](<13-state-and-preferences.md#s029>) 일반 undo/redo
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;UNDO_LIFETIME_POLICY_2026_11_08`
 
 </details>
 
@@ -823,11 +823,11 @@
 - 종류: 실행 작업 · 우선순위: P0.
 - 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 단일 root Rectangle의 정체성/전체 story 텍스트·서식·문맥/Unicode 선택·실제 cursor rect; 탭/workspace/dirty 복원·채팅 focus 유지
-- 다음 작업: 자체 예제로 최종 한글 2024 비교; 복합 원본은 별도 작업.
+- 완료 범위: 단일 root Rectangle의 정체성/전체 story 텍스트·서식·문맥/Unicode 선택·0~359° 정수 회전·실제 cursor rect; 탭/workspace/dirty 복원·채팅 focus 유지
+- 다음 작업: HWP/HWPX 자체 예제 검증 완료. 그룹/중첩/캡션/뒤집기/비-Rectangle과 최종 한글 2024 비교는 별도 작업.
 - 상위 항목: [N014](<13-state-and-preferences.md#n014>) 글상자 내부 커서·선택 복원
-- 근거: [103-textbox-state-and-storage.md](<../103-textbox-state-and-storage.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>)
-- 원래 기록: `SCOPED_PARALLEL_EDITOR_STATE_STORAGE`
+- 근거: [103-textbox-state-and-storage.md](<../103-textbox-state-and-storage.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `SCOPED_PARALLEL_EDITOR_STATE_STORAGE;ROTATED_RECTANGLE_STATE_2026_11_08`
 
 </details>
 

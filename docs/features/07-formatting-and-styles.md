@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 21/25 · 부분 2 · 미구현 2 | 완료 0/18 · 부분 15 · 미구현 2 · stub 1 |
-| 검증 | 완료 0/25 · 부분 21 · 미검증 4 | 완료 0/18 · 부분 6 · 미검증 12 |
+| 구현 | 완료 21/25 · 부분 4 | 완료 0/18 · 부분 15 · 미구현 2 · stub 1 |
+| 검증 | 완료 0/25 · 부분 24 · 미검증 1 | 완료 0/18 · 부분 6 · 미검증 12 |
 | Agent 연결 | 연결 13/16 · 부분 0 · 미연결 3 · 해당 없음 9 | 연결 0/18 · 부분 10 · 미연결 8 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -20,9 +20,9 @@
 
 ## 먼저 할 일
 
-- **구현** [N011](<07-formatting-and-styles.md#n011>) **스타일 가져오기·내보내기** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- **구현** [N012](<07-formatting-and-styles.md#n012>) **범위 글자 스타일의 영구 정의 연결** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
-- **구현** [N013](<07-formatting-and-styles.md#n013>) **스타일마당과 사용자 번호키 재할당** — 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- **구현** [N011](<07-formatting-and-styles.md#n011>) **스타일 가져오기·내보내기** — 포터블 JSON과 HWP/HWPX 저장·재열기를 검증함. 번호·개요·사용자 탭·테두리·배경·특수 영역과 UI·Agent·한글 비교는 남음.
+- **구현** [N012](<07-formatting-and-styles.md#n012>) **범위 글자 스타일의 영구 정의 연결** — 저장 글자 스타일과 직접 서식을 타입으로 분리하고 독립 charShape 소유·정의 변경 전파·중복/stale/race fail-closed를 구현했다. 실제 Rust HWP/HWPX 3/3과 앱 경계·범위 보호 7/7을 통과했다. 새 WASM UI 스모크·공유 UI·Agent 연결·한글 비교는 남아 부분이다.
+- **구현** [N013](<07-formatting-and-styles.md#n013>) **스타일마당과 사용자 번호키 재할당** — 독립 도메인·저장·단축키 기반을 검증함. 설정 UI·스타일마당 미리보기/적용·실제 단축키 설치부·Agent·한글 비교는 남음.
 
 ## 기능별 작업표
 
@@ -83,8 +83,8 @@
 | [A009](<07-formatting-and-styles.md#a009>) · 작업 | 문단 스타일 이름 변경 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [A010](<07-formatting-and-styles.md#a010>) · 작업 | 저장 모양을 공유하는 스타일 생성 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
 | [A039](<07-formatting-and-styles.md#a039>) · 작업 | 기존 문단 스타일 적용 | ☑ 완료 | ◐ 부분 | ☑ 연결 |
-| [N011](<07-formatting-and-styles.md#n011>) · 작업 | 스타일 가져오기·내보내기 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [N012](<07-formatting-and-styles.md#n012>) · 작업 | 범위 글자 스타일의 영구 정의 연결 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [N011](<07-formatting-and-styles.md#n011>) · 작업 | 스타일 가져오기·내보내기 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
+| [N012](<07-formatting-and-styles.md#n012>) · 작업 | 범위 글자 스타일의 영구 정의 연결 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-5"></a>
 
@@ -154,7 +154,7 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B184](<07-formatting-and-styles.md#b184>) · 범위 | 스타일마당 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [N013](<07-formatting-and-styles.md#n013>) · 작업 | 스타일마당과 사용자 번호키 재할당 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [N013](<07-formatting-and-styles.md#n013>) · 작업 | 스타일마당과 사용자 번호키 재할당 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-12"></a>
 
@@ -705,13 +705,13 @@
 <summary>N011 · 스타일 가져오기·내보내기</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 참조 그래프·충돌 이름·다음 스타일·특수 영역
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 평면 스타일의 언어별 글꼴·충돌 이름·다음 스타일 순환·기존 본문/정의 불변·중간 실패 전체 롤백
+- 다음 작업: 포터블 JSON과 HWP/HWPX 저장·재열기를 검증함. 번호·개요·사용자 탭·테두리·배경·특수 영역과 UI·Agent·한글 비교는 남음.
 - 상위 항목: [B098](<07-formatting-and-styles.md#b098>) 스타일
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_STYLE_PACKAGE_ROLLBACK_2026_11_08`
 
 </details>
 
@@ -719,13 +719,13 @@
 <summary>N012 · 범위 글자 스타일의 영구 정의 연결</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 직접 모양 복사와 정의 ID 연결을 구분·재열기 전파
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 다음 작업: 저장 글자 스타일과 직접 서식을 타입으로 분리하고 독립 charShape 소유·정의 변경 전파·중복/stale/race fail-closed를 구현했다. 실제 Rust HWP/HWPX 3/3과 앱 경계·범위 보호 7/7을 통과했다. 새 WASM UI 스모크·공유 UI·Agent 연결·한글 비교는 남아 부분이다.
 - 상위 항목: [B098](<07-formatting-and-styles.md#b098>) 스타일
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;STORED_CHARACTER_STYLE_REFERENCE_2026_11_08`
 
 </details>
 
@@ -733,13 +733,13 @@
 <summary>N013 · 스타일마당과 사용자 번호키 재할당</summary>
 
 - 종류: 실행 작업 · 우선순위: P1.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 기관 서식·profile·충돌·재실행 수명
-- 다음 작업: 반례/완료조건 고정 → 구현 → 자동 검사 → 실제 한글 또는 실제 모델 검증 → Agent 연결 회귀
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 기관 프로필 v1·갤러리/이름/번호키 충돌·재실행 수명·손상/상위 버전 보호·정확한 이름 해석
+- 다음 작업: 독립 도메인·저장·단축키 기반을 검증함. 설정 UI·스타일마당 미리보기/적용·실제 단축키 설치부·Agent·한글 비교는 남음.
 - 상위 항목: [B184](<07-formatting-and-styles.md#b184>) 스타일마당
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_STYLE_GALLERY_PROFILE_2026_11_08`
 
 </details>
 

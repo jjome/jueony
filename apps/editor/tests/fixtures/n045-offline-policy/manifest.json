@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "policyId": "jueony-institution-offline-v1",
+  "runtimeFiles": [
+    { "path": "index.html", "minBytes": 100 },
+    { "path": "editor.html", "minBytes": 100 },
+    { "path": "print.html", "minBytes": 100 },
+    { "path": "jueony-boot.js", "minBytes": 10 },
+    { "path": "locale-init.js", "minBytes": 10 },
+    { "path": "theme-init.js", "minBytes": 10 }
+  ],
+  "wasmAssets": [
+    { "kind": "rhwp-engine", "minBytes": 1000000, "evidenceSha256Key": "engineWasmSha256" },
+    { "kind": "canvaskit", "minBytes": 1000000, "evidenceSha256Key": null }
+  ],
+  "fonts": [
+    { "path": "fonts/NotoSansKR-Regular.woff2", "minBytes": 1000 },
+    { "path": "fonts/NotoSerifKR-Regular.woff2", "minBytes": 1000 },
+    { "path": "fonts/LatinModernMath-Regular.woff2", "minBytes": 1000 },
+    { "path": "fonts/SourceHanSerifK-OldHangul-subset.woff2", "minBytes": 1000 }
+  ],
+  "noticeFiles": [
+    { "path": "LICENSE.txt", "minBytes": 10 },
+    { "path": "LICENSE.rhwp.txt", "minBytes": 10 },
+    { "path": "THIRD_PARTY_NOTICES.md", "minBytes": 10 },
+    { "path": "THIRD_PARTY_LICENSES.rhwp.md", "minBytes": 10 },
+    { "path": "fonts/FONTS.md", "minBytes": 10 },
+    { "path": "fonts/SourceHanSerifK-OFL.txt", "minBytes": 10 }
+  ],
+  "scanExtensions": [".html", ".css", ".js", ".webmanifest"]
+}

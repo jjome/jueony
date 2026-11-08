@@ -1,14 +1,15 @@
 import { createCalendarFormatPreference } from './calendar-format-preference.ts';
 import { readRecoverySettings } from './recovery-settings.ts';
-import { readDocumentDefaults } from '../../modules/preferences/application/document-defaults.ts';
-import { readEditorChromePreferences } from '../../modules/preferences/application/editor-chrome.ts';
-import { readRecentFonts } from '../../modules/preferences/application/recent-fonts.ts';
-import { readSnippetLibrary } from '../../modules/preferences/application/snippets.ts';
-import { createDocumentViewJournal } from '../../modules/preferences/application/view-journal.ts';
-import { PreferenceStorageError } from '../../modules/preferences/public/contracts.ts';
-import type { PreferenceStorage } from '../../modules/preferences/ports/storage.ts';
-import { preferenceLifetimeContracts } from '../../modules/preferences/domain/preference-lifetime.ts';
-import type { PreferenceLifetimeContract } from '../../modules/preferences/domain/preference-lifetime.ts';
+import {
+  createDocumentViewJournal,
+  PreferenceStorageError,
+  preferenceLifetimeContracts,
+  readDocumentDefaults,
+  readEditorChromePreferences,
+  readRecentFonts,
+  readSnippetLibrary,
+} from '../../modules/preferences/public/index.ts';
+import type { PreferenceLifetimeContract, PreferenceStorage } from '../../modules/preferences/public/index.ts';
 
 export type PreferenceLifetimeAuditStatus = 'missing' | 'valid' | 'corrupt' | 'unsupported-version' | 'read-error';
 export type PreferenceLifetimeAuditResult = {

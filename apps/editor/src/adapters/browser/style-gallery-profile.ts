@@ -1,5 +1,5 @@
-import { parseStyleGalleryProfile, validateStyleGalleryProfile } from '../../modules/document/domain/style-gallery-profile.ts';
-import type { StyleGalleryProfile } from '../../modules/document/domain/style-gallery-profile.ts';
+import { parseStyleGalleryProfile, validateStyleGalleryProfile } from '../../modules/document/public/style-gallery-profile.ts';
+import type { StyleGalleryProfile } from '../../modules/document/public/style-gallery-profile.ts';
 
 export const STYLE_GALLERY_PROFILE_KEY = 'jueony-style-gallery-profile';
 export type StyleGalleryProfileStorage = Pick<Storage, 'getItem' | 'setItem'>;

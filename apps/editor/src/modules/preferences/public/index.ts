@@ -36,3 +36,5 @@ export { RECENT_FONTS_KEY, readRecentFonts, rememberRecentFont } from '../applic
 export type { FontSetDefinition, FontSetChange } from '../domain/font-sets.ts';
 export { FONT_SET_LANGUAGES, validateFontSet, validateFontSetLibrary, prepareFontSetChange } from '../domain/font-sets.ts';
 export { commitFontSetChange } from '../application/font-sets.ts';
+export type { PreferenceLifetimeContract, PreferenceScope, PreferenceBackup, PreferenceValidation, PreferenceVersion, NonPersistentStateContract } from '../domain/preference-lifetime.ts';
+export { preferenceLifetimeContracts, nonPersistentStateContracts } from '../domain/preference-lifetime.ts';

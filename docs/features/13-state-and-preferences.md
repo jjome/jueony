@@ -795,11 +795,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: stable 8개 설정 키의 read-only diagnostic을 typed startup gate로 연결해 missing은 memory-only default로 두고 corrupt/future/read-error는 키별 차단하며 scope와 backup projection만 허용
-- 다음 작업: 진단·gate 13/13과 strict TypeScript 검사를 통과했다. 실제 app shell 시작점과 memory activation 구현·설정 저장소 통합 및 실제 한글/Windows/origin/DPI 수명 실측은 남아 부분이다.
+- 완료 범위: stable 8개 설정 키의 read-only diagnostic→typed startup gate→memory-only activation을 연결해 missing은 비영속 기본값으로 활성화하고 corrupt/future/read-error는 키별 차단하며 scope와 backup projection만 허용
+- 다음 작업: N017/N018/N044 통합 선별 검사 59/59와 strict TypeScript·모듈 경계 455 files diagnostics 0을 통과했다. 실제 shell boot 주입·facade consumer와 Windows/한글/origin/DPI 수명 실측은 남아 부분이다.
 - 상위 항목: [B151](<12-ui-and-shortcuts.md#b151>) 환경 설정
-- 근거: [25-hangul-parity-and-state-plan.md](<../25-hangul-parity-and-state-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;PREFERENCE_LIFETIME_AUDIT_2026_11_08;PREFERENCE_STARTUP_DIAGNOSTIC_2026_11_09;PREFERENCE_STARTUP_GATE_2026_11_09`
+- 근거: [25-hangul-parity-and-state-plan.md](<../25-hangul-parity-and-state-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [preference-memory-activation-n017.ts](<../../apps/editor/src/adapters/browser/preference-memory-activation-n017.ts>) · [preference-memory-activation-n017.test.ts](<../../apps/editor/tests/preference-memory-activation-n017.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;PREFERENCE_LIFETIME_AUDIT_2026_11_08;PREFERENCE_STARTUP_DIAGNOSTIC_2026_11_09;PREFERENCE_STARTUP_GATE_2026_11_09;PREFERENCE_MEMORY_ACTIVATION_2026_11_09`
 
 </details>
 
@@ -809,11 +809,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
-- 완료 범위: live 관찰의 continuity와 정확한 top recipe retain·verified save rebase를 검사하고 reload/recovery/named history/document swap/process restart/manual edit/top mismatch에는 reset하며 port 실패를 state-uncertain으로 분류
-- 다음 작업: 정책·coordinator 12/12와 strict TypeScript 검사를 통과했다. 실제 InputHandler/history port와 process restart 통합·실제 앱 수명 검증은 미연결이라 부분이다.
+- 완료 범위: live 관찰→continuity 정책과 atomic history port capability gate를 연결해 정확한 top recipe retain·verified save rebase만 허용하고 reload/recovery/named history/document swap/process restart/manual edit/top mismatch에는 원자 reset하며 bridge 실패를 state-uncertain으로 분류
+- 다음 작업: N017/N018/N044 통합 선별 검사 59/59와 strict TypeScript·모듈 경계 455 files diagnostics 0을 통과했다. upstream InputHandler atomic bridge와 실제 runtime/process restart 통합은 남아 부분이다.
 - 상위 항목: [S029](<13-state-and-preferences.md#s029>) 일반 undo/redo
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;UNDO_LIFETIME_POLICY_2026_11_08;UNDO_LIFECYCLE_COORDINATOR_2026_11_09`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [undo-history-port-n018.ts](<../../apps/editor/src/adapters/rhwp/undo-history-port-n018.ts>) · [undo-history-port-n018.test.ts](<../../apps/editor/tests/undo-history-port-n018.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;UNDO_LIFETIME_POLICY_2026_11_08;UNDO_LIFECYCLE_COORDINATOR_2026_11_09;ATOMIC_UNDO_HISTORY_PORT_2026_11_09`
 
 </details>
 

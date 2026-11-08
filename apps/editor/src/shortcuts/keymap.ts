@@ -118,7 +118,7 @@ export const hangulBindings: Binding[] = [
   // Reserve former upstream shortcuts that would run a DIFFERENT Hangul function.
   binding('Alt+Shift+H', 'pending:macro-record', '스크립트 매크로 정의'),
   binding('Ctrl+=', 'ext:jueony-previous-cursor', '이전 커서 위치'), binding('Ctrl+Shift+=', 'ext:jueony-next-cursor', '다음 커서 위치'),
-  binding('Ctrl+-', 'pending:clear-char-style', '글자 스타일 해제'),
+  binding('Ctrl+-', 'ext:jueony-clear-char-style', '글자 스타일 해제'),
 ];
 export type Key = Pick<KeyboardEvent, 'key' | 'code' | 'ctrlKey' | 'altKey' | 'shiftKey' | 'metaKey' | 'repeat' | 'isComposing'> & Partial<Pick<KeyboardEvent, 'getModifierState'>>;
 export type KeyContext = { table: boolean; cells: boolean; object: boolean };

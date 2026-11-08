@@ -19,6 +19,7 @@ import { installWorkTemplates } from '../adapters/rhwp/work-templates.ts';
 import { installSnippets } from '../adapters/rhwp/snippets.ts';
 import { deleteBodyByShortcut, isBodyNavigationContext, navigateBody } from './body-navigation.ts';
 import { installCharacterCycles } from './character-cycle.ts';
+import { installClearCharacterStyle } from '../adapters/rhwp/clear-character-style.ts';
 
 export function installHangulKeys({ automation, registry, input, eventBus }: { automation: any; registry: any; input: () => any; eventBus: any }) {
   const resolver = new HangulKeyResolver();
@@ -37,6 +38,7 @@ export function installHangulKeys({ automation, registry, input, eventBus }: { a
   installWorkTemplates(registry, input, eventBus);
   installSnippets(registry, input, eventBus);
   installCharacterCycles(registry, input, eventBus, automation);
+  installClearCharacterStyle(registry, input, eventBus);
   registry.register({ id: 'ext:jueony-context-menu', label: '빠른 메뉴', canExecute: (context: any) => context.hasDocument && !input()?.isComposing, execute: () => { if (!input()?.showKeyboardContextMenu?.()) throw new Error('현재 문맥의 빠른 메뉴를 열 수 없습니다.'); } });
   // The pinned Studio marked the entire caption submenu as a stub; child state is now registry-owned.
   document.querySelector('[data-cmd="insert:caption-top"]')?.closest('.md-sub')?.classList.remove('disabled');

@@ -81,10 +81,15 @@ test('N021 enumerates intentional document/special overrides instead of calling 
 test('N021 records all pending shortcuts and no other command is treated as pending', () => {
   const pending = auditShortcutMatrix(hangulBindings).filter(item => item.category === 'pending');
   assert.deepEqual(pending.map(item => item.commands[0]).sort(), [
-    'pending:clear-char-style',
     'pending:macro-record',
     'pending:page-number-dialog',
   ]);
+});
+
+test('N021 Ctrl+- reaches the guarded character-style reset command', () => {
+  const binding = hangulBindings.find(item => item.keys === 'Ctrl+-');
+  assert.equal(binding?.command, 'ext:jueony-clear-char-style');
+  assert.equal(resolveBinding(binding!).binding?.command, 'ext:jueony-clear-char-style');
 });
 
 test('every binding is reachable in its minimal context and repeat policy is enforced', () => {

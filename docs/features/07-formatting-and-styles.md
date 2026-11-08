@@ -22,7 +22,7 @@
 
 - **구현** [N011](<07-formatting-and-styles.md#n011>) **스타일 가져오기·내보내기** — 포터블 JSON과 HWP/HWPX 저장·재열기에서 borderConnect·borderIgnoreMargin 보존과 전체 롤백을 검증했다. 사용자 탭·실제 테두리선·배경·간격은 mutation 전에 차단한다. 번호·개요·TabDef/BorderFill 생성·특수 영역·UI·Agent·한글 비교는 남아 부분이다.
 - **구현** [N012](<07-formatting-and-styles.md#n012>) **범위 글자 스타일의 영구 정의 연결** — 저장 글자 스타일과 직접 서식을 타입으로 분리하고 독립 charShape 소유·정의 변경 전파·중복/stale/race fail-closed를 구현했다. 실제 Rust HWP/HWPX 3/3과 앱 경계·범위 보호 7/7을 통과했다. 새 WASM UI 스모크·공유 UI·Agent 연결·한글 비교는 남아 부분이다.
-- **구현** [N013](<07-formatting-and-styles.md#n013>) **스타일마당과 사용자 번호키 재할당** — 설정 UI의 매핑 표시·개별 해제·전체 재설정과 HWP/HWPX 스타일 적용·재열기·undo·stale 불변 3/3을 추가했다. format-dialog 조건부 seam 수정 뒤 격리 전체 build와 marker 적용을 확인했다. 실제 브라우저 클릭 smoke·Agent·한글 비교는 남아 부분이다.
+- **구현** [N013](<07-formatting-and-styles.md#n013>) **스타일마당과 사용자 번호키 재할당** — 설정 UI의 매핑 표시·개별 해제·전체 재설정과 HWP/HWPX 스타일 적용·재열기·undo·stale/IME 불변 3/3·격리 전체 build·실제 Edge 설정창/단축키 smoke를 통과했다. 빈 문서 stored-time 초기화 경고 때문에 소유 HWPX를 연 뒤 검증했으며 이 제한과 portable package UI·Agent·한글 비교는 남아 부분이다.
 
 ## 기능별 작업표
 
@@ -736,10 +736,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 기관 프로필 v1·preview/apply·post-import digest·설정 저장·read-only 소비와 Ctrl+1~Ctrl+0 keymap/UI에서 profile/document/style stale·IME·대화상자·표/개체/특수 story를 fail-closed한다.
-- 다음 작업: 설정 UI의 매핑 표시·개별 해제·전체 재설정과 HWP/HWPX 스타일 적용·재열기·undo·stale 불변 3/3을 추가했다. format-dialog 조건부 seam 수정 뒤 격리 전체 build와 marker 적용을 확인했다. 실제 브라우저 클릭 smoke·Agent·한글 비교는 남아 부분이다.
+- 다음 작업: 설정 UI의 매핑 표시·개별 해제·전체 재설정과 HWP/HWPX 스타일 적용·재열기·undo·stale/IME 불변 3/3·격리 전체 build·실제 Edge 설정창/단축키 smoke를 통과했다. 빈 문서 stored-time 초기화 경고 때문에 소유 HWPX를 연 뒤 검증했으며 이 제한과 portable package UI·Agent·한글 비교는 남아 부분이다.
 - 상위 항목: [B184](<07-formatting-and-styles.md#b184>) 스타일마당
 - 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_STYLE_GALLERY_PROFILE_2026_11_08;STYLE_GALLERY_CONTROLLER_2026_11_08;ATOMIC_STYLE_SHORTCUT_PROFILE_2026_11_09;STYLE_SHORTCUT_CONSUMER_2026_11_09;POST_IMPORT_SHORTCUT_BINDING_2026_11_09;STYLE_SHORTCUT_UI_2026_11_09;FULL_BUILD_2026_11_09`
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SCOPED_STYLE_GALLERY_PROFILE_2026_11_08;STYLE_GALLERY_CONTROLLER_2026_11_08;ATOMIC_STYLE_SHORTCUT_PROFILE_2026_11_09;STYLE_SHORTCUT_CONSUMER_2026_11_09;POST_IMPORT_SHORTCUT_BINDING_2026_11_09;STYLE_SHORTCUT_UI_2026_11_09;FULL_BUILD_2026_11_09;EDGE_SMOKE_2026_11_09;EMPTY_DOCUMENT_STORED_TIME_WARNING_2026_11_09`
 
 </details>
 

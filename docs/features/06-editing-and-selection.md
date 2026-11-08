@@ -198,11 +198,11 @@
 - 종류: 한글 상위 기능 · 우선순위: P2.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 본문·셀·일부 개체와 머리말·꼬리말 평문 내부 cut을 원문·story owner·identity·revision·selection 재검증과 단일 snapshot rollback으로 보호한다.
-- 다음 작업: 머리말·꼬리말 adapter의 HWP/HWPX 저장·재열기·정확한 undo 포함 6/6을 통과했다. 각주/미주는 copySelectionInNote·replaceRangeInNote 원자 API가 없어 차단한다. 실제 UI·OS clipboard·RTF·그림과 한글 비교는 남았다.
+- 완료 범위: 본문·셀·일부 개체와 Studio 머리말·꼬리말 평문 cut을 내부 JSON·plain text clipboard 경로에서 원문·story owner·identity·revision·selection 재검증과 단일 snapshot rollback으로 보호한다.
+- 다음 작업: 머리말·꼬리말 adapter와 Studio copy/cut 이벤트 연결의 HWP/HWPX 저장·재열기·정확한 undo·OS clipboard 실패 보호 포함 12/12와 hfclipboard 격리 build를 통과했다. 각주/미주는 copySelectionInNote·replaceRangeInNote 원자 API가 없어 차단한다. RTF·그림·전체 OS clipboard 형식과 한글 비교는 남았다.
 - UI 명령: `edit:cut`
 - 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [139-basic-editor-parallel-plan.md](<../139-basic-editor-parallel-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `WIRED;HEADER_FOOTER_CLIPBOARD_ADAPTER_2026_11_09;NOTE_CLIPBOARD_API_BLOCKER_2026_11_09;PARTIAL`
+- 원래 기록: `WIRED;HEADER_FOOTER_CLIPBOARD_ADAPTER_2026_11_09;HEADER_FOOTER_CLIPBOARD_STUDIO_2026_11_09;ISOLATED_BUILD_2026_11_09;NOTE_CLIPBOARD_API_BLOCKER_2026_11_09;PARTIAL`
 
 </details>
 
@@ -226,11 +226,11 @@
 - 종류: 한글 상위 기능 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: HTML 실패 복구와 머리말·꼬리말 평문 내부 붙이기를 원문·story owner·identity·revision·selection 재검증 및 단일 snapshot rollback으로 보호한다.
-- 다음 작업: 머리말·꼬리말 adapter의 HWP/HWPX 저장·재열기·실패 원복 포함 6/6을 통과했다. 각주/미주는 copySelectionInNote·replaceRangeInNote 원자 API가 없어 차단한다. 실제 UI·OS clipboard·RTF·그림과 한글 비교는 남았다.
+- 완료 범위: HTML 실패 복구와 Studio 머리말·꼬리말 평문 paste를 내부 JSON·plain text clipboard 경로에서 원문·story owner·identity·revision·selection 재검증 및 단일 snapshot rollback으로 보호한다.
+- 다음 작업: 머리말·꼬리말 adapter와 Studio paste 이벤트 연결의 HWP/HWPX 저장·재열기·실패 원복·OS clipboard 불일치 차단 포함 12/12와 hfclipboard 격리 build를 통과했다. 각주/미주는 copySelectionInNote·replaceRangeInNote 원자 API가 없어 차단한다. RTF·그림·전체 OS clipboard 형식과 한글 비교는 남았다.
 - UI 명령: `edit:paste`
 - 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [manifest.json](<../evidence/basic-editor-2026-10-24/fourth/manifest.json>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `WIRED;HEADER_FOOTER_CLIPBOARD_ADAPTER_2026_11_09;NOTE_CLIPBOARD_API_BLOCKER_2026_11_09;PARTIAL`
+- 원래 기록: `WIRED;HEADER_FOOTER_CLIPBOARD_ADAPTER_2026_11_09;HEADER_FOOTER_CLIPBOARD_STUDIO_2026_11_09;ISOLATED_BUILD_2026_11_09;NOTE_CLIPBOARD_API_BLOCKER_2026_11_09;PARTIAL`
 
 </details>
 

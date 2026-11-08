@@ -164,11 +164,11 @@
 - 종류: 한글 상위 기능 · 우선순위: P2.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 기존 category/scatter 차트의 공유 단일 단계 label에서 단일 숫자 cache 값 또는 단일 계열 이름을 revision·원문·구조 재검증 뒤 dry-run·snapshot rollback으로 편집한다.
-- 다음 작업: HWP/HWPX 저장·재열기에서 원본 c:f 수식·유형·축·나머지 범례·값·unknown OOXML·비차트 자산과 undo를 6/6 확인했다. 일반 label·여러 계열 일괄 변경·수식 자체 변경·복합 label·up/down bars·UI 범위와 한글 비교는 남았다.
+- 완료 범위: 기존 category/scatter 차트의 공유 단일 단계 label에서 단일 숫자 cache 값·단일 계열 이름·단일 범주명을 revision·원문·구조 재검증 뒤 dry-run·snapshot rollback으로 편집한다.
+- 다음 작업: HWP/HWPX 저장·재열기에서 원본 c:f 수식·유형·축·나머지 범례·값·unknown OOXML·비차트 자산과 undo를 9/9 확인했다. 다중 항목·다중 계열·복합 label·수식 자체 변경·up/down bars·UI 범위와 한글 비교는 남았다.
 - UI 명령: `insert:chart-data-edit`
 - 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `WIRED;SCOPED_CHART_VALUE_EDIT_2026_11_09;SCOPED_CHART_SERIES_NAME_2026_11_09;PARTIAL`
+- 원래 기록: `WIRED;SCOPED_CHART_VALUE_EDIT_2026_11_09;SCOPED_CHART_SERIES_NAME_2026_11_09;SCOPED_CHART_CATEGORY_NAME_2026_11_09;PARTIAL`
 
 </details>
 

@@ -223,9 +223,9 @@
 - 상태: 구현 ☑ 완료 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 앱 보기 설정·메뉴·상태바·탭 간 동기화와 page gap·canvas shadow를 한 렌더 트랜잭션으로 토글한다. 문서 revision·dirty·undo·저장 bytes에는 관여하지 않는다.
-- 다음 작업: HWP/HWPX 바이트 비변경·재열기와 고정 upstream 통합 patch 11/11을 통과했다. format-dialog 조건부 seam 수정 뒤 격리 전체 build에서 patch 적용까지 확인했다. 실제 브라우저 클릭 smoke와 한글 비교는 남았다.
+- 다음 작업: HWP/HWPX 바이트 비변경·재열기와 고정 upstream 통합 patch 11/11·격리 전체 build·실제 Edge 메뉴/상태바 클릭과 교차 탭 동기화 smoke를 통과했다. 빈 문서 stored-time 초기화는 현재 엔진에서 경고가 발생해 소유 HWPX를 연 뒤 검증했으며 이 제한과 한글 비교는 남았다.
 - 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `PAGE_OUTLINE_VIEW_2026_11_09;FULL_BUILD_2026_11_09;PARTIAL_VERIFICATION`
+- 원래 기록: `PAGE_OUTLINE_VIEW_2026_11_09;FULL_BUILD_2026_11_09;EDGE_SMOKE_2026_11_09;EMPTY_DOCUMENT_STORED_TIME_WARNING_2026_11_09;PARTIAL_VERIFICATION`
 
 </details>
 

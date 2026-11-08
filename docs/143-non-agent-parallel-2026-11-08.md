@@ -22,6 +22,9 @@
 | N006 | 1문단·단일 글자 서식의 위/아래 중첩 표 캡션을 경로·원문·revision·보존 상태 재검증 후 교체 | HWP/HWPX 저장·재열기·undo와 음성 사례 3/3·회귀 4/4 | 빈/여러 문단·혼합 서식·좌우 캡션·필드·책갈피·개체·UI |
 | N013 추가 | 프로필·항목·slot 계획·문서 style ID를 고정한 순수 preview와 snapshot apply controller | HWP/HWPX 저장·재열기·stale/충돌/중간 실패 복구 포함 9/9 | 전역 단축키 설정 저장·실제 UI·Agent·한글 비교 |
 | N019 | 메뉴·리본·빠른 도구·문맥 메뉴의 정적 command reachability·중복·placeholder 감사 | N019 5/5·N021/N022 포함 15/15·TypeScript compile | `insert:comment`·`insert:para-band` placeholder·동적 disabled 정책·한글 비교 |
+| N006 추가 | 최대 32문단의 위/아래 중첩 표 캡션에서 명시한 문단 하나를 경로·원문·revision·전체 문단 서식 재검증 후 교체 | HWP/HWPX 저장·재열기·undo 포함 5/5·회귀 4/4 | 빈 문단·혼합 글자 서식·좌우 캡션·필드·책갈피·개체 |
+| N013 추가 | preview 증거를 재검증하는 원자적 번호키 설정 저장·손상/상위 버전/쓰기 후 실패 복구 | 저장 adapter 5/5·TypeScript compile | 실제 UI와 keymap 소비·Agent·한글 비교 |
+| N021 추가 | Ctrl+-로 일반 본문 단일 문단·단일 char-run의 직접 서식을 문단 스타일 정의로 복원 | HWP/HWPX 저장·재열기·undo/redo 포함 14/14·TypeScript compile | 쪽 번호·매크로 pending·셀/특수 story·혼합 run·한글 비교 |
 
 ## 실행한 선별 검사
 

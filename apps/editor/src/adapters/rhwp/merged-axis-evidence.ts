@@ -77,6 +77,7 @@ export function mergedAxisProof(doc: any, table: Table, row: boolean, insert: bo
   if (!Number.isSafeInteger(originalAcrossSize) || originalAcrossSize < 0)
     throw new Error('표의 원래 외곽 치수를 확인하지 못했습니다.');
   const source = table.cells.map(cell => content(doc, table, cell.index));
+  const repeated=table.pagination?.repeatHeader===true;
   const titles=table.cells.some(c=>c.axisPicture)?axisPictureHeaderEvidence(doc,table):undefined;
   const pictures=titles?.size?axisPictureSourceEvidence(doc,table):undefined;
   const headerRows=tableTitleRowPlan(table,row,insert,at)??table.headerRows;
@@ -116,9 +117,9 @@ export function mergedAxisProof(doc: any, table: Table, row: boolean, insert: bo
     const currentPictures=pictures?axisPictureSourceEvidence(doc,after):undefined;
     if(Boolean(titles?.size)!==Boolean(currentTitles?.size))
       throw Error('행·열 편집 전후 반복 제목의 표시 범위가 달라졌습니다.');
-    if(titles?.size&&(after.headerRows!==headerRows||!same(after.pagination,table.pagination)||
+    if(repeated&&(after.headerRows!==headerRows||!same(after.pagination,table.pagination)||
         after.cells.some(c=>c.properties.isHeader!==(c.row<(headerRows??0)))||
-        currentTitles?.size!==projected.filter(p=>p.cell.row<(headerRows??0)).length))
+        titles?.size&&currentTitles?.size!==projected.filter(p=>p.cell.row<(headerRows??0)).length))
       throw Error('반복 제목 행 수·각 셀의 제목 표시 또는 반복 설정이 요청과 다릅니다.');
     if (otherStoredFields && !same(otherFields(doc,after),otherStoredFields))
       throw new Error('편집한 표 밖에 있는 필드의 위치 또는 값이 달라졌습니다.');
@@ -132,7 +133,7 @@ export function mergedAxisProof(doc: any, table: Table, row: boolean, insert: bo
         const r = row ? Math.min(at, table.rows-1) : cell.row;
         if (actual.properties.width !== x[col+1]-x[col] || actual.properties.height !== y[r+1]-y[r])
           throw new Error('추가한 셀의 행 높이 또는 열 너비가 원래 격자와 다릅니다.');
-        if(titles?.size && (actual.properties.isHeader!==(cell.row<(headerRows??0)) ||
+        if(repeated && (actual.properties.isHeader!==(cell.row<(headerRows??0)) ||
             actual.text!==(justEdited?'':cell.text)||actual.properties.fieldName!==''||actual.properties.cellProtect!==false))
           throw Error('추가한 반복 제목 칸의 제목 표시 또는 내용이 요청과 다릅니다.');
       }

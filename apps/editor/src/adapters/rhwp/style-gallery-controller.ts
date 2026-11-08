@@ -3,12 +3,16 @@ import type {StyleGalleryProfile} from '../../modules/document/public/style-gall
 import {validateStyleGalleryProfile} from '../../modules/document/public/style-gallery-profile.ts';
 import {importStyleNames,importStylePackage} from './style-package-native.ts';
 import {currentStyleCatalogSha256} from './style-shortcut-consumer.ts';
+import {inspectStyleStoredTimeGuard} from './style-stored-time-warning-n013.ts';
+import type {StyleStoredTimeGuard,StyleStoredTimeWarning} from './style-stored-time-warning-n013.ts';
 
 type ProfileStore={read():StyleGalleryProfile|undefined};
 type PlannedSlot={slot:number;styleId:number;styleName:string;styleType:0|1;source:'package'|'document'};
 type ShortcutStore={save(value:any,revalidate:()=>any):unknown};
-export type StyleGalleryPreview=Readonly<{version:1;profileId:string;profileName:string;entryId:string;entryLabel:string;profileSha256:string;documentSha256:string;expectedStyleIds:readonly number[];slots:readonly PlannedSlot[]}>;
-export type StyleGalleryApplyResult=Readonly<{styleIds:readonly number[];slots:readonly PlannedSlot[]}>;
+export type StyleGalleryWarning=StyleStoredTimeWarning;
+type StoredTimeGuard=StyleStoredTimeGuard;
+export type StyleGalleryPreview=Readonly<{version:1;profileId:string;profileName:string;entryId:string;entryLabel:string;profileSha256:string;documentSha256:string;expectedStyleIds:readonly number[];slots:readonly PlannedSlot[];storedTime:StoredTimeGuard}>;
+export type StyleGalleryApplyResult=Readonly<{styleIds:readonly number[];slots:readonly PlannedSlot[];warnings:readonly StyleGalleryWarning[]}>;
 const parsed=(value:any):any=>typeof value==='string'?JSON.parse(value):value;
 const raw=(wasm:any)=>wasm.borrowDocumentHandle?.()??wasm;
 const canonical=(value:any):any=>Array.isArray(value)?value.map(canonical):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(key=>[key,canonical(value[key])])):value;
@@ -38,7 +42,7 @@ function planning(store:ProfileStore,wasm:any,selection:{profileId:string;profil
     if(packageMatches.length===1){const index=packageMatches[0];slots.push({slot:assignment.slot,styleId:expectedStyleIds[index],styleName:importedNames[index].name,styleType:entry.package.styles[index].type,source:'package'});}
     else slots.push({slot:assignment.slot,styleId:documentMatches[0].id,styleName:documentMatches[0].name,styleType:documentMatches[0].type,source:'document'});
   }
-  return {checked,entry,styles,expectedStyleIds,slots,profileSha256:digest(checked),documentSha256:digest(styles)};
+  return {checked,entry,styles,expectedStyleIds,slots,profileSha256:digest(checked),documentSha256:digest(styles),storedTime:inspectStyleStoredTimeGuard(document)};
 }
 
 export class StyleGalleryBindingError extends Error{
@@ -47,11 +51,11 @@ export class StyleGalleryBindingError extends Error{
 }
 
 /** Apply, derive post-import evidence and bind shortcut settings as one observable operation. */
-export function applyAndBindStyleGalleryPreview(profileStore:ProfileStore,shortcutStore:ShortcutStore,wasm:any,preview:StyleGalleryPreview,options:{persistDocument?:()=>void}={}):StyleGalleryApplyResult&{documentSha256:string}{
+export function applyAndBindStyleGalleryPreview(profileStore:ProfileStore,shortcutStore:ShortcutStore,wasm:any,preview:StyleGalleryPreview,options:{persistDocument?:()=>void;acknowledgeWarnings?:readonly StyleGalleryWarning['code'][]}={}):StyleGalleryApplyResult&{documentSha256:string}{
   const document=raw(wasm),checkpoint=document.saveSnapshot();let persisted=false;
   const rollback=()=>{try{return parsed(document.restoreSnapshot(checkpoint))?.ok!==false;}catch{return false;}};
   try{
-    const result=applyStyleGalleryPreview(profileStore,wasm,preview),styles=catalog(document),documentSha256=currentStyleCatalogSha256(document);
+    const result=applyStyleGalleryPreview(profileStore,wasm,preview,{acknowledgeWarnings:options.acknowledgeWarnings}),styles=catalog(document),documentSha256=currentStyleCatalogSha256(document);
     for(const slot of result.slots){const style=styles[slot.styleId];if(!style||style.name!==slot.styleName||style.type!==slot.styleType||styles.filter(value=>value.name.normalize('NFC')===slot.styleName.normalize('NFC')).length!==1)throw new Error('적용 후 번호키 스타일 정의가 미리보기와 다릅니다.');}
     const evidence=()=>{const currentProfile=profile(profileStore,preview.profileId,preview.profileName);if(digest(currentProfile)!==preview.profileSha256)throw new Error('스타일마당 프로필이 바뀌었습니다.');const currentSha=currentStyleCatalogSha256(document);if(currentSha!==documentSha256)throw new Error('적용 후 문서 스타일이 바뀌었습니다.');return{version:1,profileId:preview.profileId,profileName:preview.profileName,entryId:preview.entryId,profileSha256:preview.profileSha256,documentSha256:currentSha,expectedStyleIds:[...result.styleIds],slots:result.slots};};
     if(options.persistDocument){try{options.persistDocument();persisted=true;}catch{rollback();throw new StyleGalleryBindingError('문서 저장 결과를 확정하지 못해 스타일 단축키 연결을 중단했습니다.','disconnected','unchanged');}}
@@ -64,21 +68,22 @@ export function applyAndBindStyleGalleryPreview(profileStore:ProfileStore,shortc
 /** Pure preview. It never imports definitions or writes profile/shortcut settings. */
 export function previewStyleGallery(store:ProfileStore,wasm:any,selection:{profileId:string;profileName:string;entryId:string}):StyleGalleryPreview {
   const plan=planning(store,wasm,selection);
-  return {version:1,profileId:plan.checked.id,profileName:plan.checked.name,entryId:plan.entry.id,entryLabel:plan.entry.label,profileSha256:plan.profileSha256,documentSha256:plan.documentSha256,expectedStyleIds:plan.expectedStyleIds,slots:plan.slots};
+  return {version:1,profileId:plan.checked.id,profileName:plan.checked.name,entryId:plan.entry.id,entryLabel:plan.entry.label,profileSha256:plan.profileSha256,documentSha256:plan.documentSha256,expectedStyleIds:plan.expectedStyleIds,slots:plan.slots,storedTime:plan.storedTime};
 }
 
 /** Apply the exact preview; every stale/conflict check completes before mutation. */
-export function applyStyleGalleryPreview(store:ProfileStore,wasm:any,preview:StyleGalleryPreview):StyleGalleryApplyResult {
-  if(!preview||preview.version!==1||!/^[0-9a-f]{64}$/u.test(preview.profileSha256)||!/^[0-9a-f]{64}$/u.test(preview.documentSha256))throw new Error('스타일마당 미리보기 정보가 올바르지 않습니다.');
+export function applyStyleGalleryPreview(store:ProfileStore,wasm:any,preview:StyleGalleryPreview,options:{acknowledgeWarnings?:readonly StyleGalleryWarning['code'][]}={}):StyleGalleryApplyResult {
+  if(!preview||preview.version!==1||!/^[0-9a-f]{64}$/u.test(preview.profileSha256)||!/^[0-9a-f]{64}$/u.test(preview.documentSha256)||!preview.storedTime||!/^[0-9a-f]{64}$/u.test(preview.storedTime.evidenceSha256)||!Array.isArray(preview.storedTime.warnings))throw new Error('스타일마당 미리보기 정보가 올바르지 않습니다.');
   const plan=planning(store,wasm,{profileId:preview.profileId,profileName:preview.profileName,entryId:preview.entryId});
-  if(plan.profileSha256!==preview.profileSha256||plan.documentSha256!==preview.documentSha256||digest(plan.expectedStyleIds)!==digest(preview.expectedStyleIds)||digest(plan.slots)!==digest(preview.slots))throw new Error('프로필, 번호키 또는 문서 스타일이 바뀌었습니다. 다시 미리 보세요.');
+  if(plan.profileSha256!==preview.profileSha256||plan.documentSha256!==preview.documentSha256||digest(plan.expectedStyleIds)!==digest(preview.expectedStyleIds)||digest(plan.slots)!==digest(preview.slots)||digest(plan.storedTime)!==digest(preview.storedTime))throw new Error('프로필, 번호키, 문서 스타일 또는 저장 날짜 상태가 바뀌었습니다. 다시 미리 보세요.');
+  for(const item of plan.storedTime.warnings)if(item.code==='new-document-stored-time-initialization'&&!options.acknowledgeWarnings?.includes(item.code))throw new Error(item.message+' 확인 후 다시 적용하세요.');
   const document=raw(wasm),checkpoint=document.saveSnapshot();
   try{
     const styleIds=importStylePackage(document,plan.entry.package);
     if(digest(styleIds)!==digest(plan.expectedStyleIds))throw new Error('가져온 스타일 ID가 미리보기와 다릅니다.');
     const after=catalog(document);
     for(const slot of plan.slots)if(!after.some(style=>style.id===slot.styleId&&style.name===slot.styleName))throw new Error('번호키 대상 스타일이 가져오기 결과와 다릅니다.');
-    return {styleIds,slots:plan.slots};
+    return {styleIds,slots:plan.slots,warnings:plan.storedTime.warnings};
   }catch(error){
     const restored=parsed(document.restoreSnapshot(checkpoint));
     if(restored?.ok===false)throw new Error('실패한 스타일마당 적용을 원래 문서로 되돌리지 못했습니다.');

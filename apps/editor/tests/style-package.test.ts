@@ -20,6 +20,13 @@ test('portable style import preserves language fonts, mixed definitions, next-st
       try { const styles = JSON.parse(reopened.getStyleList()), detail = JSON.parse(reopened.getStyleDetail(ids[0])); assert.equal(styles[ids[0]].nextStyleId, ids[1]); assert.equal(styles[ids[1]].nextStyleId, ids[0]); assert.equal(detail.charProps.fontSize, 1600); assert.equal(detail.charProps.bold, true); assert.equal(detail.paraProps.marginLeft, 4); assert.equal(detail.paraProps.spacingAfter, 6); assert.equal(detail.paraProps.lineSpacing, 180); assert.equal(reopened.getTextRange(0, 0, 0, 7), '기존 본문😀'); } finally { reopened.free(); }
     }
     const names = importStyleNames(target, value); assert.match(names[0].name, /가져옴/); assert.match(names[0].englishName, /가져옴/);
+    const beforeFailureHwp = target.exportHwp(), beforeFailureHwpx = target.exportHwpx(), beforeFailureStyles = target.getStyleList(), beforeFailureText = target.getTextFileUnicode();
+    const updateStyleShapes = target.updateStyleShapes.bind(target); let shapeWrites = 0;
+    target.updateStyleShapes = (...args: any[]) => ++shapeWrites === 2 ? false : updateStyleShapes(...args);
+    try { assert.throws(() => importStylePackage(target, value), /모양 또는 다음 스타일/); }
+    finally { target.updateStyleShapes = updateStyleShapes; }
+    assert.equal(shapeWrites, 2); assert.deepEqual(target.exportHwp(), beforeFailureHwp); assert.deepEqual(target.exportHwpx(), beforeFailureHwpx);
+    assert.equal(target.getStyleList(), beforeFailureStyles); assert.equal(target.getTextFileUnicode(), beforeFailureText);
   } finally { source.free(); target.free(); }
 });
 test('advanced styles are refused explicitly and malformed portable shapes never mutate document', async () => {

@@ -25,20 +25,27 @@ export function importStyleNames(wasm: any, value: StylePackage): { name: string
 export function importStylePackage(wasm: any, value: StylePackage): number[] {
   const doc = raw(wasm), packageValue = validateStylePackage(value), names = importStyleNames(doc, packageValue), existing = parsed(doc.getStyleList()), beforeText = doc.getTextFileUnicode();
   plain(parsed(doc.getStyleDetail(0)), 0);
-  const ids = packageValue.styles.map((style, index) => { const id = doc.createStyle(JSON.stringify({ ...names[index], type: style.type, nextStyleId: 0, baseCharShapeId: existing[0].charShapeId, baseParaShapeId: existing[0].paraShapeId })); if (!Number.isInteger(id) || id < existing.length || id > 255) throw new Error('스타일을 만들지 못했습니다.'); return id; });
-  packageValue.styles.forEach((style, index) => {
-    const { fontFamilies, ...char } = style.char, fontIds = fontFamilies.map((name: string, language: number) => doc.findOrCreateFontIdForLang(language, name));
-    if (fontIds.some((id: number) => !Number.isInteger(id) || id < 0 || id > 65535)) throw new Error('스타일의 언어별 글꼴을 등록하지 못했습니다.');
-    const para: Record<string, any> = { ...style.para, headType: 'None', paraLevel: 0, numberingId: 0 };
-    for (const key of ['marginLeft', 'marginRight', 'indent']) para[key] = Math.round(para[key] * 150);
-    for (const key of ['spacingBefore', 'spacingAfter']) para[key] = Math.round(para[key] * 75);
-    para.lineSpacing = Math.round(para.lineSpacing * (para.lineSpacingType === 'Percent' ? 1 : 75));
-    if (!doc.updateStyle(ids[index], JSON.stringify({ ...names[index], nextStyleId: style.type === 0 ? ids[style.next] : 0 })) || !doc.updateStyleShapes(ids[index], JSON.stringify({ ...char, fontIds }), style.type === 0 ? JSON.stringify(para) : '{}')) throw new Error('스타일의 모양 또는 다음 스타일을 연결하지 못했습니다.');
-    const detail = parsed(doc.getStyleDetail(ids[index])), actual = validatePortableShapes(detail.charProps, detail.paraProps);
-    if (JSON.stringify(actual.char) !== JSON.stringify(style.char) || style.type === 0 && JSON.stringify(actual.para) !== JSON.stringify(style.para)) throw new Error('가져온 스타일 모양이 파일과 다릅니다.');
-  });
-  if (doc.getTextFileUnicode() !== beforeText || JSON.stringify(parsed(doc.getStyleList()).slice(0, existing.length)) !== JSON.stringify(existing)) throw new Error('스타일 가져오기 중 기존 문서나 정의가 바뀌었습니다.');
-  return ids;
+  const checkpoint = doc.saveSnapshot();
+  try {
+    const ids = packageValue.styles.map((style, index) => { const id = doc.createStyle(JSON.stringify({ ...names[index], type: style.type, nextStyleId: 0, baseCharShapeId: existing[0].charShapeId, baseParaShapeId: existing[0].paraShapeId })); if (!Number.isInteger(id) || id < existing.length || id > 255) throw new Error('스타일을 만들지 못했습니다.'); return id; });
+    packageValue.styles.forEach((style, index) => {
+      const { fontFamilies, ...char } = style.char, fontIds = fontFamilies.map((name: string, language: number) => doc.findOrCreateFontIdForLang(language, name));
+      if (fontIds.some((id: number) => !Number.isInteger(id) || id < 0 || id > 65535)) throw new Error('스타일의 언어별 글꼴을 등록하지 못했습니다.');
+      const para: Record<string, any> = { ...style.para, headType: 'None', paraLevel: 0, numberingId: 0 };
+      for (const key of ['marginLeft', 'marginRight', 'indent']) para[key] = Math.round(para[key] * 150);
+      for (const key of ['spacingBefore', 'spacingAfter']) para[key] = Math.round(para[key] * 75);
+      para.lineSpacing = Math.round(para.lineSpacing * (para.lineSpacingType === 'Percent' ? 1 : 75));
+      if (!doc.updateStyle(ids[index], JSON.stringify({ ...names[index], nextStyleId: style.type === 0 ? ids[style.next] : 0 })) || !doc.updateStyleShapes(ids[index], JSON.stringify({ ...char, fontIds }), style.type === 0 ? JSON.stringify(para) : '{}')) throw new Error('스타일의 모양 또는 다음 스타일을 연결하지 못했습니다.');
+      const detail = parsed(doc.getStyleDetail(ids[index])), actual = validatePortableShapes(detail.charProps, detail.paraProps);
+      if (JSON.stringify(actual.char) !== JSON.stringify(style.char) || style.type === 0 && JSON.stringify(actual.para) !== JSON.stringify(style.para)) throw new Error('가져온 스타일 모양이 파일과 다릅니다.');
+    });
+    if (doc.getTextFileUnicode() !== beforeText || JSON.stringify(parsed(doc.getStyleList()).slice(0, existing.length)) !== JSON.stringify(existing)) throw new Error('스타일 가져오기 중 기존 문서나 정의가 바뀌었습니다.');
+    return ids;
+  } catch (error) {
+    const restored = parsed(doc.restoreSnapshot(checkpoint));
+    if (restored?.ok === false) throw new Error('실패한 스타일 가져오기를 원래 문서로 되돌리지 못했습니다.');
+    throw error;
+  } finally { doc.discardSnapshot(checkpoint); }
 }
 export function preflightStylePackage(wasm: any, value: StylePackage): void {
   const { HwpDocument } = wasm.getWasmModuleExports(), format = /\.hwpx$/iu.test(wasm.fileName) ? 'hwpx' : 'hwp', open = (bytes: Uint8Array) => new HwpDocument(bytes);

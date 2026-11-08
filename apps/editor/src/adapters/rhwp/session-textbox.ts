@@ -7,6 +7,10 @@ type Position={sectionIndex:number;paragraphIndex:number;charOffset:number;paren
 export type TextBoxSessionInput={getCursorPosition():Position;restoreSessionTextBox?(saved:TextBoxBookmark):boolean;cursor:{isInTextBox():boolean;isInHeaderFooter():boolean;isInFootnote():boolean;isInTableObjectSelection():boolean;isInPictureObjectSelection():boolean;hasSelection():boolean;getSelection():{anchor:Position;focus:Position}|null;};wasm:{requiresPasswordForSave?:boolean;borrowDocumentHandle?():any;}};
 const integer=(v:unknown):v is number=>Number.isSafeInteger(v)&&(v as number)>=0&&(v as number)<=2147483647;
 const instanceId=(v:unknown):v is number=>Number.isSafeInteger(v)&&(v as number)>0&&(v as number)<=4294967295;
+// The native shape contract reports clockwise rotation in whole degrees.  A
+// rotated textbox keeps the same story path, so it is safe to restore as long
+// as the angle is explicit and is included in the story fingerprint below.
+const rotationAngle=(v:unknown):v is number=>Number.isSafeInteger(v)&&(v as number)>=0&&(v as number)<360;
 const json=(v:any):any=>typeof v==='string'?JSON.parse(v):v;
 function normalized(v:any):any{if(Array.isArray(v))return v.map(normalized);if(v&&typeof v==='object')return Object.fromEntries(Object.keys(v).sort().filter(k=>!['charShapeId','paraShapeId','borderFillId'].includes(k)&&!(v.fillType==='none'&&['fillColor','patternColor','patternType'].includes(k))).map(k=>[k,normalized(v[k])]));return v;}
 const hash=(v:any)=>Array.from(sha256(new TextEncoder().encode(JSON.stringify(normalized(v)))),n=>n.toString(16).padStart(2,'0')).join('');
@@ -20,7 +24,7 @@ function story(input:TextBoxSessionInput,section:number,parent:number,control:nu
  const hostControl=controls.find((c:any)=>c.list===0&&c.para===flat&&c.controlIndex===control),p=json(d.getShapeProperties(section,parent,control)),owned=lists.filter((l:any)=>l.hostListId===0&&l.sectionIndex===section&&l.hostPara===parent&&l.controlIndex===control);
  // roundRate is emitted only for a Rectangle, never a grouped child. A caption
  // opens a second non-cell list; a nested object is visible in this story list.
- if(hostControl?.ctrlId!=='gso'||hostControl.props?.Lock!==0||!Object.hasOwn(p,'roundRate')||!Number.isFinite(p.roundRate)||p.sizeProtect!==false||p.tbVerticalAlignKnown!==true||p.hasCaption!==false||p.rotationAngle!==0||p.horzFlip!==false||p.vertFlip!==false||!['none','solid'].includes(p.fillType)||!['tbMarginLeft','tbMarginRight','tbMarginTop','tbMarginBottom'].every(k=>integer(p[k]))||!instanceId(p.instanceId)||!instanceId(p.scInstId)||!['Top','Center','Bottom'].includes(p.tbVerticalAlign)||owned.length!==1||owned[0].isCell!==false||owned[0].cellIndex!==0||!integer(owned[0].paraCount)||owned[0].paraCount<1||owned[0].paraCount>1024||controls.some((c:any)=>c.list===owned[0].listId)||lists.some((l:any)=>l.hostListId===owned[0].listId))return;
+ if(hostControl?.ctrlId!=='gso'||hostControl.props?.Lock!==0||!Object.hasOwn(p,'roundRate')||!Number.isFinite(p.roundRate)||p.sizeProtect!==false||p.tbVerticalAlignKnown!==true||p.hasCaption!==false||!rotationAngle(p.rotationAngle)||p.horzFlip!==false||p.vertFlip!==false||!['none','solid'].includes(p.fillType)||!['tbMarginLeft','tbMarginRight','tbMarginTop','tbMarginBottom'].every(k=>integer(p[k]))||!instanceId(p.instanceId)||!instanceId(p.scInstId)||!['Top','Center','Bottom'].includes(p.tbVerticalAlign)||owned.length!==1||owned[0].isCell!==false||owned[0].cellIndex!==0||!integer(owned[0].paraCount)||owned[0].paraCount<1||owned[0].paraCount>1024||controls.some((c:any)=>c.list===owned[0].listId)||lists.some((l:any)=>l.hostListId===owned[0].listId))return;
  const texts:string[]=[],paragraphs:any[]=[];let size=0,runsCount=0;
  if(d.getCellParagraphCount(section,parent,control,0)!==owned[0].paraCount)return;
  for(let paragraph=0;paragraph<owned[0].paraCount;paragraph++){

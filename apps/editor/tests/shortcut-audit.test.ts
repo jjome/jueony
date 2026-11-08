@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import { hangulBindings, HangulKeyResolver, keyContextPriority, type Binding, type KeyContext } from '../src/shortcuts/keymap.ts';
 import {
   auditCommandReachability,
+  auditParagraphSpacingShortcuts,
   auditRequiredContexts,
   auditShortcutMatrix,
   effectiveSpecialScopes,
@@ -132,4 +133,37 @@ test('registry reachability audit distinguishes pending reservations from missin
   ];
   const findings = auditCommandReachability(sample, new Set(['known:command']));
   assert.deepEqual(findings.map(item => item.id), ['N021-UNREGISTERED-document-f2-missing-command']);
+});
+
+test('N022 follows recorded installed-Hangul F7/F8 evidence and retains the public-table divergence', () => {
+  const nativeRecord = JSON.parse(readFileSync(resolve(root, '../../docs/evidence/navigation-history-2026-10-12/native-key-sequence.json'), 'utf8'));
+  const recorded = new Map(nativeRecord.sequence.map((item: { key: string; file: string }) => [item.key, item.file]));
+  assert.equal(recorded.get('Ctrl+F7'), 'both-f7.hwpx');
+  assert.equal(recorded.get('Ctrl+F8'), 'both-f8.hwpx');
+  const spacingRecord = JSON.parse(readFileSync(resolve(root, '../../docs/evidence/navigation-history-2026-10-12/native-spacing.json'), 'utf8'));
+  const margins = new Map(spacingRecord.files.map((item: any) => [item.file, item.paragraphs[0].margins.case]));
+  assert.deepEqual(margins.get('both-f7.hwpx'), {
+    left: { value: '100', unit: 'HWPUNIT' }, right: { value: '100', unit: 'HWPUNIT' }, intent: { value: '100', unit: 'HWPUNIT' },
+  });
+  assert.deepEqual(margins.get('both-f8.hwpx'), {
+    left: { value: '0', unit: 'HWPUNIT' }, right: { value: '0', unit: 'HWPUNIT' }, intent: { value: '100', unit: 'HWPUNIT' },
+  });
+
+  const installedEvidence = [
+    { keys: 'Ctrl+F7', operation: 'both-more', source: 'installed-hangul-2024' },
+    { keys: 'Ctrl+F8', operation: 'both-less', source: 'installed-hangul-2024' },
+  ];
+  assert.deepEqual(auditParagraphSpacingShortcuts(hangulBindings, installedEvidence), []);
+
+  const publicTable = [
+    { keys: 'Ctrl+F7', operation: 'both-less', source: 'public-shortcut-table' },
+    { keys: 'Ctrl+F8', operation: 'both-more', source: 'public-shortcut-table' },
+  ];
+  assert.deepEqual(
+    auditParagraphSpacingShortcuts(hangulBindings, publicTable).map(item => item.id),
+    [
+      'N022-PARAGRAPH-SPACING-ctrl-f7-public-shortcut-table',
+      'N022-PARAGRAPH-SPACING-ctrl-f8-public-shortcut-table',
+    ],
+  );
 });

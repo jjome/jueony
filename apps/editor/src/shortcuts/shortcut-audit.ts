@@ -179,3 +179,33 @@ export function auditRequiredContexts(
 }
 
 export const effectiveSpecialScopes = [...specialScopes] as const;
+
+export type ParagraphSpacingShortcutExpectation = {
+  keys: string;
+  operation: string;
+  source: string;
+};
+
+export function auditParagraphSpacingShortcuts(
+  bindings: readonly Binding[],
+  expectations: readonly ParagraphSpacingShortcutExpectation[],
+): ShortcutAuditFinding[] {
+  const findings: ShortcutAuditFinding[] = [];
+  for (const expected of expectations) {
+    const matches = bindings.filter(item => item.keys === expected.keys && item.command === 'ext:jueony-paragraph-spacing');
+    const operations = unique(matches.map(item => String(item.params?.operation ?? '')));
+    if (matches.length === 1 && operations[0] === expected.operation) continue;
+    findings.push({
+      id: `N022-PARAGRAPH-SPACING-${slug(expected.keys)}-${slug(expected.source)}`,
+      severity: 'warning',
+      category: 'context-conflict',
+      keys: expected.keys,
+      commands: matches.map(item => item.command),
+      scopes: matches.map(item => item.scope),
+      detail: matches.length === 0
+        ? `${expected.source} 근거의 ${expected.operation} 조합이 keymap에 없습니다.`
+        : `${expected.source} 근거는 ${expected.operation}, 현재 keymap은 ${operations.join(', ') || 'operation 없음'}입니다.`,
+    });
+  }
+  return findings;
+}

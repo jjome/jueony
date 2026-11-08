@@ -51,8 +51,11 @@ export const hangulBindings: Binding[] = [
     ['Ctrl+Alt+F8', 'Ctrl+Shift+F', 'right-less', '오른쪽 여백 줄이기'],
     ['Ctrl+F5', 'Ctrl+Shift+O', 'indent-less', '첫 줄 내어쓰기'],
     ['Ctrl+F6', 'Ctrl+Shift+I', 'indent-more', '첫 줄 들여쓰기'],
-    ['Ctrl+F7', '', 'both-less', '양쪽 여백 줄이기'],
-    ['Ctrl+F8', '', 'both-more', '양쪽 여백 늘이기'],
+    // The installed Hangul 2024 evidence is the reverse of the public shortcut
+    // table: F7 increases both margins and F8 decreases them. Keep this pair
+    // explicit until the native key-profile difference is resolved upstream.
+    ['Ctrl+F7', '', 'both-more', '양쪽 여백 늘이기'],
+    ['Ctrl+F8', '', 'both-less', '양쪽 여백 줄이기'],
   ].flatMap(([primary, alternate, operation, label]) => [primary, alternate].filter(Boolean).map(keys => ({...binding(keys, 'ext:jueony-paragraph-spacing', label, 'document', { operation }), repeatable: true}))),
   ...defaultStyleNames.map((name, slot) => binding(`Ctrl+${(slot + 1) % 10}`, 'ext:jueony-default-style', `${name} 기본 스타일`, 'document', { slot })),
   binding('Ctrl+B', 'format:bold', '진하게'), binding('Alt+Shift+B', 'format:bold', '진하게'),

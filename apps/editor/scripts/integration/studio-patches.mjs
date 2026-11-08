@@ -1,6 +1,7 @@
 import {readFile,writeFile,cp} from 'node:fs/promises';
 import {join} from 'node:path';
 import {applyPageOutlinePatches} from './page-outline-patches.mjs';
+import {applyStyleShortcutUiPatches} from './style-shortcut-ui-patches.mjs';
 // Pinned upstream integration only. Product policies live in modules/adapters.
 export async function applyStudioPatches({root,upstream,app}){
 function replaceOnce(text, before, after, label) {
@@ -446,5 +447,6 @@ fileSystem = replaceOnce(fileSystem,
 await writeFile(join(root, 'src/command/file-system-access.ts'), fileSystem);
 
 await applyPageOutlinePatches({root});
+await applyStyleShortcutUiPatches({root});
 
 }

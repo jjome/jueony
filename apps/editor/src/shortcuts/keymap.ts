@@ -4,6 +4,7 @@
  */
 import { defaultStyleNames } from './style-slots.ts';
 import type {ShortcutStoryContextN021} from './special-story-context-n021.ts';
+import {isExactSpecialStoryShortcutAllowedN021} from './special-story-command-scope-n021.ts';
 export type Scope = 'document' | 'table' | 'cells' | 'object';
 export type Binding = { keys: string; command: string; label: string; scope: Scope; params?: Record<string, unknown>; nativeClipboard?: boolean; repeatable?: boolean };
 const repeatableCommands = new Set([
@@ -164,9 +165,8 @@ export class HangulKeyResolver {
     return { handled: false };
   }
   private find(keys: string, ctx: KeyContext) {
-    const documentAllowed = !ctx.story || ctx.story.kind === 'body';
     const candidates = hangulBindings.filter(b => b.keys === keys && (
-      b.scope === 'document' ? documentAllowed || b.nativeClipboard === true : ctx[b.scope]
+      b.scope === 'document' ? this.documentBindingAllowed(b, ctx) : ctx[b.scope]
     ));
     for (const scope of keyContextPriority) {
       const found = candidates.find(binding => binding.scope === scope);
@@ -176,7 +176,14 @@ export class HangulKeyResolver {
   }
   private documentFallbackBlocked(keys: string, ctx: KeyContext): boolean {
     return Boolean(ctx.story && ctx.story.kind !== 'body'
-      && hangulBindings.some(binding => binding.keys === keys && binding.scope === 'document' && binding.nativeClipboard !== true));
+      && hangulBindings.some(binding => binding.keys === keys
+        && binding.scope === 'document'
+        && !this.documentBindingAllowed(binding, ctx)));
+  }
+  private documentBindingAllowed(binding: Binding, ctx: KeyContext): boolean {
+    if (binding.nativeClipboard === true || !ctx.story || ctx.story.kind === 'body') return true;
+    return ctx.story.exact === true
+      && isExactSpecialStoryShortcutAllowedN021(binding.command, ctx.story.kind);
   }
   private storyHint(ctx: KeyContext): string {
     return ctx.story?.kind === 'unknown'

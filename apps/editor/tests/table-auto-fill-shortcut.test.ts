@@ -12,6 +12,7 @@ test('generated Hangul A binding invokes integer autofill only with cell-block s
     const app = resolve(dirname(fileURLToPath(import.meta.url)), '..'), generated = join(root, 'src/jueony/shortcuts'); await mkdir(generated, { recursive: true });
     await writeFile(join(generated, 'install.ts'), '  installDocumentInsertion(registry, input, eventBus);\n');
     await writeFile(join(generated, 'keymap.ts'), await readFile(join(app, 'src/shortcuts/keymap.ts'), 'utf8'));
+    await writeFile(join(generated, 'special-story-command-scope-n021.ts'), await readFile(join(app, 'src/shortcuts/special-story-command-scope-n021.ts'), 'utf8'));
     await writeFile(join(generated, 'style-slots.ts'), await readFile(join(app, 'src/shortcuts/style-slots.ts'), 'utf8'));
     await applyTableConversionPatches({ root });
     const { HangulKeyResolver, hangulBindings } = await import(pathToFileURL(join(generated, 'keymap.ts')).href);

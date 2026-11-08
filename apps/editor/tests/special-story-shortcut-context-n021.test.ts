@@ -6,6 +6,7 @@ import {
   resolveShortcutAtInputBoundaryN021,
   shortcutKeyContextN021,
 } from '../src/shortcuts/special-story-context-n021.ts';
+import {specialStoryShortcutPermissionsN021} from '../src/shortcuts/special-story-command-scope-n021.ts';
 
 const key = (code: string, mods: Record<string, unknown> = {}) => ({
   key: code.startsWith('Key') ? code.slice(3).toLowerCase() : code,
@@ -83,6 +84,49 @@ test('document body fallback is handled without a binding in every special story
   assert.equal(result.handled, true);
   assert.equal(result.binding, undefined);
   assert.match(result.hint ?? '', /확인하지 못해/);
+});
+
+test('only explicitly proven global and story-safe commands cross an exact special-story boundary', () => {
+  const cases = [
+    [key('KeyS', {ctrlKey: true}), 'file:save'],
+    [key('KeyZ', {ctrlKey: true}), 'edit:undo'],
+    [key('KeyZ', {ctrlKey: true, shiftKey: true}), 'edit:redo'],
+    [key('KeyG', {altKey: true}), 'edit:goto'],
+    [key('KeyA', {ctrlKey: true}), 'edit:select-all'],
+  ] as const;
+  for (const story of ['header', 'footer', 'footnote', 'endnote', 'textbox'] as const) {
+    for (const [event, command] of cases) {
+      const result = resolveShortcutAtInputBoundaryN021(new HangulKeyResolver(), event, {}, input(story));
+      assert.equal(result.binding?.command, command, `${story}:${command}`);
+    }
+  }
+  assert.deepEqual(Object.keys(specialStoryShortcutPermissionsN021).sort(), [
+    'edit:goto', 'edit:redo', 'edit:select-all', 'edit:undo', 'file:save',
+  ]);
+});
+
+test('unknown story evidence never receives the exact-special allow-list', () => {
+  for (const event of [key('KeyS', {ctrlKey: true}), key('KeyZ', {ctrlKey: true}), key('KeyG', {altKey: true})]) {
+    const result = resolveShortcutAtInputBoundaryN021(new HangulKeyResolver(), event, {}, {cursor: {}});
+    assert.equal(result.handled, true);
+    assert.equal(result.binding, undefined);
+    assert.match(result.hint ?? '', /확인하지 못해/);
+  }
+});
+
+test('file dialogs and document/body mutations stay blocked without an explicit special-story contract', () => {
+  const cases = [
+    key('KeyV', {altKey: true}), // save as
+    key('KeyP', {ctrlKey: true}), // print
+    key('Enter', {ctrlKey: true}), // body page break
+    key('KeyB', {ctrlKey: true}), // body formatting
+  ];
+  for (const event of cases) {
+    const result = resolveShortcutAtInputBoundaryN021(new HangulKeyResolver(), event, {}, input('header'));
+    assert.equal(result.handled, true);
+    assert.equal(result.binding, undefined);
+    assert.match(result.hint ?? '', /본문 단축키/);
+  }
 });
 
 test('body fallback resolves only in body while a verified nested textbox table keeps its explicit table scope', () => {

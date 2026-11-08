@@ -1,4 +1,5 @@
 import {validateTextBoxBookmark} from './textbox-bookmark.ts';
+import {validateEndnoteSelectionBookmark} from './endnote-bookmark.ts';
 import type { SessionCursor, SessionPoint, SessionCellPath, CellBlockBookmark, ObjectSelectionBookmark, ObjectSelectionEntry } from '../public/contracts.ts';
 import {validateBodyCaret} from './body-caret.ts';
 const integer = (value: unknown): value is number => Number.isSafeInteger(value) && (value as number) >= 0 && (value as number) <= 2147483647;
@@ -40,6 +41,7 @@ function sameCell(a: Extract<SessionPoint,{kind:'cell'}>, b: Extract<SessionPoin
 }
 export function validateSessionCursor(value: any): SessionCursor | undefined {
   if(value?.kind==='textbox')return validateTextBoxBookmark(value);
+  if(value?.kind==='endnote-selection')return validateEndnoteSelectionBookmark(value);
   if(value?.kind==='object-selection')return objectSelection(value);
   if (!value || typeof value !== 'object' || Array.isArray(value)) return;
   const focus = point(value.focus); if (!focus) return;

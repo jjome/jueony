@@ -1,8 +1,9 @@
 import {readSessionHeaderFooterStory,readSessionFootnoteStory} from './session-story.ts';
 import {captureTextBoxCursor,restoreTextBoxCursor} from './session-textbox.ts';
 import {captureObjectSelection,restoreObjectSelection} from './session-object-selection.ts';
+import {captureEndnoteSelection,restoreEndnoteSelection} from './session-endnote.ts';
 import type {RestorableObjectRef} from './session-object-selection.ts';
-import type {TextBoxBookmark} from '../../modules/preferences/public/index.ts';
+import type {EndnoteRestoreTarget,TextBoxBookmark} from '../../modules/preferences/public/index.ts';
 import {sha256} from '@noble/hashes/sha2.js';
 import {validateBodyCaret, validateSessionCursor} from '../../modules/preferences/public/index.ts';
 import type {BodyCaret, SessionCursor, SessionPoint, CellBlockBookmark,HeaderFooterBookmark,FootnoteBookmark} from '../../modules/preferences/public/index.ts';
@@ -17,6 +18,7 @@ export type SessionCursorInput = {
   restoreSessionObjectSelection?(refs:RestorableObjectRef[]):boolean;
   restoreSessionHeaderFooter?(saved:HeaderFooterBookmark):boolean;
   restoreSessionFootnote?(saved:FootnoteBookmark):boolean;
+  restoreSessionEndnoteSelection?(target:EndnoteRestoreTarget):boolean;
   restoreSessionTextBox?(saved:TextBoxBookmark):boolean;
   cursor:{hasSelection():boolean;getSelection():{anchor:Position;focus:Position}|null;blockSelectionPhase():number|null;captureCellSelection():Block|null;
     isInHeaderFooter():boolean;isInFootnote():boolean;isInTextBox():boolean;isInTableObjectSelection():boolean;isInPictureObjectSelection():boolean;
@@ -163,6 +165,9 @@ function position(point:SessionPoint):Position{
 }
 export function captureSessionCursor(input:SessionCursorInput|undefined):SessionCursor|undefined{
  if(input?.cursor.isInTextBox())return captureTextBoxCursor(input);
+ if(input?.cursor.isInFootnote()&&input.restoreSessionEndnoteSelection){
+  const saved=captureEndnoteSelection(input);if(saved)return validateSessionCursor(saved);
+ }
  if(input&&!input.wasm.requiresPasswordForSave&&!input.cursor.isInTextBox()&&!input.cursor.isInTableObjectSelection()&&!input.cursor.isInPictureObjectSelection()
    &&(input.cursor.isInHeaderFooter()||input.cursor.isInFootnote())){
   try{
@@ -237,6 +242,7 @@ export function restoreSessionCursor(input:SessionCursorInput|undefined,value:un
  const saved=validateSessionCursor(value);if(!input||!saved)return false;
  if(saved.kind==='textbox')return restoreTextBoxCursor(input,saved);
  if(saved.kind==='object-selection')return restoreObjectSelection(input,saved);
+ if(saved.kind==='endnote-selection')return restoreEndnoteSelection(input,saved);
  if(saved.kind==='header-footer'||saved.kind==='footnote'){
   if(input.wasm.requiresPasswordForSave||input.cursor.isInTextBox()||input.cursor.isInTableObjectSelection()||input.cursor.isInPictureObjectSelection())return false;
   try{

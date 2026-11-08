@@ -230,6 +230,25 @@ caretInput = replaceOnce(caretInput, '  getCursorPosition(): DocumentPosition { 
         this.cursor.setFnCursorPosition(saved.caret.paragraph,saved.caret.offset);
         this.updateCaret();this.eventBus.emit('footnoteModeChanged',true);this.eventBus.emit('command-state-changed');return true;
       },
+      restoreSessionEndnoteSelection: (target: import('../jueony/modules/preferences/public/index.ts').EndnoteRestoreTarget): boolean => {
+        let edit:ReturnType<typeof this.wasm.getNoteEditInfo>;
+        try{edit=this.wasm.getNoteEditInfo(target.section,target.parent,target.control);}catch{return false;}
+        if(!edit?.ok||edit.kind!=='endnote'||edit.pageNum!==target.page||edit.footnoteIndex!==target.index||edit.virtualParaIndex!==target.virtualParagraph)return false;
+        const original=this.cursor.getPosition();
+        const abort=()=>{const wasNote=this.cursor.isInFootnote();this.cursor.exitFootnoteMode();this.cursor.moveTo(original);this.cursor.clearSelection();this.updateCaret();if(wasNote)this.eventBus.emit('footnoteModeChanged',false);this.eventBus.emit('command-state-changed');return false;};
+        try{
+          this.cursor.exitHeaderFooterMode();this.cursor.exitFootnoteMode();this.cursor.clearSelection();this.cursor.exitCellSelectionMode();this.cursor.exitBlockSelectionMode();this.cursor.exitTableObjectSelection();this.cursor.exitPictureObjectSelection();
+          this.cursor.moveTo({sectionIndex:target.section,paragraphIndex:target.parent,charOffset:0});
+          this.cursor.enterFootnoteMode(target.section,target.parent,target.control,target.index,target.page);
+          if(target.anchor){this.cursor.setFnCursorPosition(target.anchor.paragraph,target.anchor.offset);this.cursor.setFnAnchor();}
+          this.cursor.setFnCursorPosition(target.focus.paragraph,target.focus.offset);
+          if(!this.cursor.isInFootnote()||this.cursor.fnSectionIdx!==target.section||this.cursor.fnParaIdx!==target.parent||this.cursor.fnControlIdx!==target.control||this.cursor.fnPageNum!==target.page||this.cursor.fnFootnoteIndex!==target.index||this.cursor.fnInnerParaIdx!==target.focus.paragraph||this.cursor.fnCharOffset!==target.focus.offset)return abort();
+          const selection=this.cursor.getFootnoteSelection();
+          if(target.anchor){if(!selection||selection.pageNum!==target.page||selection.footnoteIndex!==target.index||selection.anchor.fnParaIdx!==target.anchor.paragraph||selection.anchor.charOffset!==target.anchor.offset||selection.focus.fnParaIdx!==target.focus.paragraph||selection.focus.charOffset!==target.focus.offset)return abort();}
+          else if(selection)return abort();
+          this.updateCaret();this.eventBus.emit('footnoteModeChanged',true);this.eventBus.emit('command-state-changed');return true;
+        }catch{return abort();}
+      },
       restoreSessionPictureObject: (ref: {sec:number;ppi:number;ci:number;type:'image'}) => {
         this.cursor.clearSelection();this.cursor.exitCellSelectionMode();this.cursor.exitTableObjectSelection();
         this.cursor.moveTo({sectionIndex:ref.sec,paragraphIndex:ref.ppi,charOffset:0});

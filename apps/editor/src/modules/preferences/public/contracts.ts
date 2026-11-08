@@ -15,6 +15,9 @@ export type CellBlockBookmark = { anchor: { row: number; col: number }; focus: {
 export type HeaderFooterBookmark = {kind:'header-footer';focus:Extract<SessionPoint,{kind:'body'}>;caret:BodyCaret;anchor?:BodyCaret;isHeader:boolean;applyTo:number;storyFingerprint:string};
 export type FootnoteBookmark = {kind:'footnote';focus:Extract<SessionPoint,{kind:'body'}>;caret:BodyCaret;anchor?:BodyCaret;parentParagraph:number;control:number;page:number;index:number;sourceType:string;storyFingerprint:string};
 export type TextBoxBookmark = {kind:"textbox";focus:Extract<SessionPoint,{kind:"body"}>;control:number;caret:BodyCaret;anchor?:BodyCaret;storyFingerprint:string};
+export type EndnotePoint = {paragraph:number;offset:number;paragraphLength:number;before:string;after:string};
+export type EndnoteRestoreTarget = {section:number;parent:number;control:number;page:number;index:number;virtualParagraph:number;focus:{paragraph:number;offset:number};anchor?:{paragraph:number;offset:number}};
+export type EndnoteSelectionBookmark = {version:1;kind:'endnote-selection';section:number;parent:number;control:number;page:number;index:number;virtualParagraph:number;focus:EndnotePoint;anchor?:EndnotePoint;locatorFingerprint:string;ownerFingerprint:string;storyFingerprint:string};
 export type RestorableObjectType = 'shape' | 'group';
 export type RestorableObjectRef = {section:number;paragraph:number;control:number;type:RestorableObjectType};
 export type ObjectSelectionEntry = RestorableObjectRef & {objectFingerprint:string};
@@ -23,7 +26,7 @@ export type SessionCursor = { kind: 'text'; focus: SessionPoint; anchor?: Sessio
   | { kind: 'cells'; focus: Extract<SessionPoint, { kind: 'cell' }>; block: CellBlockBookmark }
   | { kind: 'table-object'; focus: Extract<SessionPoint, { kind: 'body' }>; control: number; tableFingerprint: string }
   | { kind: 'picture-object'; focus: Extract<SessionPoint, { kind: 'body' }>; control: number; pictureFingerprint: string }
-  | HeaderFooterBookmark | FootnoteBookmark | TextBoxBookmark | ObjectSelectionBookmark;
+  | HeaderFooterBookmark | FootnoteBookmark | TextBoxBookmark | EndnoteSelectionBookmark | ObjectSelectionBookmark;
 export type DocumentViewState = { version: 1; zoom: number; fitMode: DocumentFitMode; scrollX: number; scrollY: number; caret?: BodyCaret; cursor?: SessionCursor };
 
 export type PreferenceErrorCode = 'read' | 'write' | 'corrupt' | 'version';

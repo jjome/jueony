@@ -6,8 +6,9 @@ export type { DocumentViewport, DocumentViewAdapterOptions } from '../ports/view
 export { preferenceChangedPaths } from '../domain/merge.ts';
 export { defaultDocumentDefaults, validateDocumentDefaults } from '../domain/document-defaults.ts';
 export { validateDocumentView, validateBodyCaret } from '../domain/document-view.ts';
-export type {SessionCursor, SessionPoint, SessionCellPath, CellBlockBookmark, HeaderFooterBookmark, FootnoteBookmark, ObjectSelectionBookmark, ObjectSelectionEntry, RestorableObjectRef, RestorableObjectType} from './contracts.ts';
+export type {SessionCursor, SessionPoint, SessionCellPath, CellBlockBookmark, HeaderFooterBookmark, FootnoteBookmark, EndnotePoint, EndnoteRestoreTarget, EndnoteSelectionBookmark, ObjectSelectionBookmark, ObjectSelectionEntry, RestorableObjectRef, RestorableObjectType} from './contracts.ts';
 export {validateSessionCursor} from '../domain/session-cursor.ts';
+export {validateEndnoteSelectionBookmark} from '../domain/endnote-bookmark.ts';
 export {createDocumentViewJournal,VIEW_JOURNAL_KEY} from '../application/view-journal.ts';
 export type {ViewJournalEntry} from '../application/view-journal.ts';
 export { createPreferencesFacade, createPreferencesFacade as createPreferencesPersistence } from '../application/persistence.ts';

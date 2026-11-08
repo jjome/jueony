@@ -12,7 +12,15 @@ const WASM_PATTERNS = {
 };
 const HASH = /^[a-f0-9]{64}$/u;
 const NETWORK_LITERAL = /\b(?:https?|wss?):\/\/[^\s"'`<>\\)]+/giu;
-const INERT_NAMESPACE_IDENTIFIERS = new Set(['http://www.w3.org/2000/svg', 'http://www.w3.org/1999/xlink']);
+const INERT_NAMESPACE_IDENTIFIERS = new Set([
+  'http://www.w3.org/2000/svg',
+  'http://www.w3.org/1999/xlink',
+  'http://www.w3.org/TR/REC-html40',
+  'http://www.w3.org/2001/XMLSchema',
+  'http://www.w3.org/2000/xmlns/',
+  'http://www.mozilla.org/newlayout/xml/parsererror.xml',
+]);
+const INERT_HELP_LITERALS = new Set(['https://example.com', 'https://로']);
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const exact = (value, keys) => Object.keys(value).sort().join(',') === [...keys].sort().join(',');
 const text = (value, max = 200) => typeof value === 'string' && value.length > 0 && value.length <= max && !/[\u0000-\u001f]/u.test(value);
@@ -92,17 +100,19 @@ export async function auditN045OfflineBundle(directory, rawPolicy) {
   }
   const externalNetworkLiterals = [];
   const inertNamespaceLiterals = [];
+  const inertHelpLiterals = [];
   for (const file of files) {
     if (!policy.scanExtensions.includes(extname(file.path).toLowerCase())) continue;
     const source = await readFile(file.absolute, 'utf8');
     for (const match of source.matchAll(NETWORK_LITERAL)) {
       const found = { path: file.path, value: match[0].slice(0, 500) };
       if (INERT_NAMESPACE_IDENTIFIERS.has(found.value)) inertNamespaceLiterals.push(found);
+      else if (INERT_HELP_LITERALS.has(found.value)) inertHelpLiterals.push(found);
       else externalNetworkLiterals.push(found);
     }
   }
   if (externalNetworkLiterals.length) throw Error(`external network literal rejected (${externalNetworkLiterals.length}): ${externalNetworkLiterals[0].path} ${externalNetworkLiterals[0].value}`);
-  return { schemaVersion: 1, policyId: policy.policyId, status: 'PASS_OFFLINE_BUNDLE', filesScanned: files.length, runtimeFiles, wasm, fonts, notices, externalNetworkLiterals, inertNamespaceLiterals };
+  return { schemaVersion: 1, policyId: policy.policyId, status: 'PASS_OFFLINE_BUNDLE', filesScanned: files.length, runtimeFiles, wasm, fonts, notices, externalNetworkLiterals, inertNamespaceLiterals, inertHelpLiterals };
 }
 
 export function classifyN045OfflineFailure(error) {

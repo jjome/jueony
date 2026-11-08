@@ -4,8 +4,10 @@ import {applyPageOutlinePatches} from './page-outline-patches.mjs';
 import {applyStyleShortcutUiPatches} from './style-shortcut-ui-patches.mjs';
 import {applyHeaderFooterClipboardPatches} from './header-footer-clipboard-patches.mjs';
 import {applyChartDataEditUiPatches} from './chart-data-edit-ui-patches.mjs';
+import {applyOfflineFontSourcePatches} from './offline-font-source-patches.mjs';
 // Pinned upstream integration only. Product policies live in modules/adapters.
 export async function applyStudioPatches({root,upstream,app}){
+await applyOfflineFontSourcePatches({root});
 function replaceOnce(text, before, after, label) {
   if (text.split(before).length !== 2) throw new Error(`소스 패치 기준 불일치: ${label}`);
   return text.replace(before, after);

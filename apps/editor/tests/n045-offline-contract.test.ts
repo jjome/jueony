@@ -45,6 +45,7 @@ test('N045 bundle audit hashes local assets and rejects external literals and ev
     assert.equal(report.wasm.length, 2);
     assert.equal(report.externalNetworkLiterals.length, 0);
     assert.equal(report.inertNamespaceLiterals.length, 0);
+    assert.equal(report.inertHelpLiterals.length, 0);
     await writeFile(join(root, 'jueony-boot.js'), 'fetch("https://outside.invalid/x")');
     await assert.rejects(auditN045OfflineBundle(root, policy), /external network literal rejected/u);
     await writeFile(join(root, 'jueony-boot.js'), 'local');
@@ -52,6 +53,23 @@ test('N045 bundle audit hashes local assets and rejects external literals and ev
     evidence.engineWasmSha256 = '0'.repeat(64);
     await writeFile(join(root, 'build-evidence.json'), JSON.stringify(evidence));
     await assert.rejects(auditN045OfflineBundle(root, policy), /WASM evidence hash mismatch/u);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test('N045 audit distinguishes exact namespace and help text identifiers from requestable endpoints', async () => {
+  const { root, policy } = await syntheticBundle();
+  try {
+    await writeFile(join(root, 'jueony-boot.js'), [
+      'const svg="http://www.w3.org/2000/svg";',
+      'const xsd="http://www.w3.org/2001/XMLSchema";',
+      'const help="https://example.com";',
+    ].join('\n'));
+    const report = await auditN045OfflineBundle(root, policy);
+    assert.equal(report.externalNetworkLiterals.length, 0);
+    assert.equal(report.inertNamespaceLiterals.length, 2);
+    assert.equal(report.inertHelpLiterals.length, 1);
+    await writeFile(join(root, 'jueony-boot.js'), 'const endpoint="https://api.example.invalid/v1";');
+    await assert.rejects(auditN045OfflineBundle(root, policy), /external network literal rejected/u);
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 

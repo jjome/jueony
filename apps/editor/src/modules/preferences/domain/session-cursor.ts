@@ -12,13 +12,15 @@ function objectSelection(value:any):ObjectSelectionBookmark|undefined {
   const keys=new Set<string>();
   for (const item of value.objects) {
     if (!item || typeof item !== 'object' || Array.isArray(item) || !integer(item.section) || !integer(item.paragraph)
-      || !integer(item.control) || !['shape','group','image'].includes(item.type) || !digest(item.objectFingerprint)) return;
+      || !integer(item.control) || !['shape','group','image','equation'].includes(item.type) || !digest(item.objectFingerprint)) return;
     const key=`${item.section}:${item.paragraph}:${item.control}:${item.type}`;
     if(keys.has(key))return;keys.add(key);
     objects.push({section:item.section,paragraph:item.paragraph,control:item.control,type:item.type,objectFingerprint:item.objectFingerprint});
   }
   const images=objects.every(object=>object.type==='image');
-  if(images?objects.length<2:(!objects.every(object=>object.type==='shape'||object.type==='group')||(objects.length===1&&objects[0].type!=='group')))return;
+  const equations=objects.every(object=>object.type==='equation');
+  if(images||equations){if(objects.length<2)return;}
+  else if(!objects.every(object=>object.type==='shape'||object.type==='group')||(objects.length===1&&objects[0].type!=='group'))return;
   return {version:1,kind:'object-selection',objects,active:value.active,documentFingerprint:value.documentFingerprint};
 }
 function point(value: any): SessionPoint | undefined {

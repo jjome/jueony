@@ -92,6 +92,45 @@ for(const format of ['hwp','hwpx'])test(format+' replaces an equal-length multi-
   }finally{doc.free();}
 });
 
+for(const format of ['hwp','hwpx'])test(format+' preserves scalar run boundaries when an equal-length caption contains emoji',patchedOnly,()=>{
+  const fixture=captionedSubdivisionNestedTable(HwpDocument),doc=new HwpDocument(bytes(fixture,format));fixture.free();
+  try{
+    const original=bytes(doc,format),{structure,source}=editable(doc),paragraph=source.paragraphs[0];
+    const beforeToken=doc.saveSnapshot();let afterToken:string|undefined;
+    assert.equal(paragraph.originalText,'접수 설명');assert.equal(Array.from(paragraph.originalText).length,5);
+    assert.equal(paragraph.runs.length,2);assert.ok(paragraph.path.length>1);
+    const beforeRuns=structuredClone(paragraph.runs),beforePlacement=structuredClone(source.placement);
+    const beforeCaption:any=source.caption,beforeStored=beforeCaption.kind==='plain'?beforeCaption:beforeCaption.paragraphs[0];
+    assert.equal(beforeStored.runs[1].start_pos,2);
+    try{
+      const cursor=replaceNestedCaptionText(doc,structure,source,{target:source.target,revision:source.revision,paragraph:0,
+        path:paragraph.path,originalText:paragraph.originalText,text:'검😀 내용'});
+      assert.equal(cursor.charOffset,5);assert.deepEqual(cursor.cellPath,paragraph.path);
+      const edited=bytes(doc,format);afterToken=doc.saveSnapshot();
+      const reopened=new HwpDocument(edited);
+      try{
+        const next=readNestedCaptionTextSources(reopened,readStructure(reopened),'r2')[source.target];
+        assert.ok(next?.editable);assert.equal(next.paragraphs[0].originalText,'검😀 내용');
+        assert.equal(Array.from(next.paragraphs[0].originalText).length,5);
+        assert.deepEqual(next.paragraphs[0].path,paragraph.path);
+        assert.deepEqual(next.paragraphs[0].runs,beforeRuns);
+        assert.deepEqual(next.placement,beforePlacement);
+        const afterCaption:any=next.caption,afterStored=afterCaption.kind==='plain'?afterCaption:afterCaption.paragraphs[0];
+        assert.equal(afterStored.runs[1].start_pos,3);
+      }finally{reopened.free();}
+      doc.restoreSnapshot(beforeToken);
+      const undone=readNestedCaptionTextSources(doc,readStructure(doc),'undo')[source.target];
+      assert.ok(undone?.editable);assert.equal(undone.paragraphs[0].originalText,'접수 설명');
+      assert.deepEqual(bytes(doc,format),original);
+      doc.restoreSnapshot(afterToken);
+      const redone=readNestedCaptionTextSources(doc,readStructure(doc),'redo')[source.target];
+      assert.ok(redone?.editable);assert.equal(redone.paragraphs[0].originalText,'검😀 내용');
+      assert.deepEqual(redone.paragraphs[0].runs,beforeRuns);assert.deepEqual(redone.placement,beforePlacement);
+      assert.deepEqual(bytes(doc,format),edited);
+    }finally{if(afterToken)doc.discardSnapshot(afterToken);doc.discardSnapshot(beforeToken);}
+  }finally{doc.free();}
+});
+
 for(const format of ['hwp','hwpx'])test(format+' fills one existing verified blank caption paragraph and reopens it',patchedOnly,()=>{
   const fixture=uniformCaption(['']),doc=new HwpDocument(bytes(fixture,format));fixture.free();
   try{
@@ -183,7 +222,7 @@ test('stale revision, path, original, empty text and mixed or complex captions f
   try{
     const {structure,source}=editable(mixed),before=mixed.exportHwpx(),paragraph=source.paragraphs[0],base={target:source.target,
       revision:source.revision,paragraph:0,path:paragraph.path,originalText:paragraph.originalText};
-    for(const text of ['길이가 다름','검😀 내용','검토\u0007내용']){
+    for(const text of ['길이가 다름','검😀 긴내용','검토\u0007내용','검토\ud800내용']){
       assert.throws(()=>replaceNestedCaptionText(mixed,structure,source,{...base,text}));assert.deepEqual(mixed.exportHwpx(),before);
     }
     assert.equal(Object.values(readNestedCaptionTextSources(mixed,structure,'r1')).some(v=>!v.editable),true);

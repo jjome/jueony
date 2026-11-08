@@ -6,7 +6,7 @@ import {currentStyleCatalogSha256,resolveStoredStyleShortcut} from '../src/adapt
 
 const profile='a'.repeat(64);
 const scope={profileId:'ministry.report',entryId:'annual',profileSha256:profile};
-const record=(document:any,styleId:number,styleName:string,source:'package'|'document'='package')=>({format:'jueony-style-shortcut-profile' as const,version:1 as const,profileId:scope.profileId,profileName:'기관 보고서',entryId:scope.entryId,profileSha256:profile,documentSha256:currentStyleCatalogSha256(document),slots:[{slot:0,styleId,styleName,source}]});
+const record=(document:any,styleId:number,styleName:string,source:'package'|'document'='package')=>({format:'jueony-style-shortcut-profile' as const,version:1 as const,profileId:scope.profileId,profileName:'기관 보고서',entryId:scope.entryId,profileSha256:profile,documentSha256:currentStyleCatalogSha256(document),slots:[{slot:0,styleId,styleName,styleType:0 as const,source}]});
 
 test('current catalog resolves the exact stored style after HWP and HWPX reopen without mutation',async()=>{
   await init({module_or_path:await readFile(new URL('../node_modules/@rhwp/core/rhwp_bg.wasm',import.meta.url))});

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createStyleShortcutProfileStore,STYLE_SHORTCUT_PROFILE_KEY} from '../src/adapters/browser/style-shortcut-profile.ts';
 
 const hash=(value:string)=>value.repeat(64).slice(0,64);
-const evidence=()=>({version:1 as const,profileId:'ministry.report',profileName:'기관 보고서',entryId:'annual',profileSha256:hash('a'),documentSha256:hash('b'),expectedStyleIds:[11],slots:[{slot:0,styleId:11,styleName:'기관 제목',source:'package' as const},{slot:9,styleId:2,styleName:'본문',source:'document' as const}]});
+const evidence=()=>({version:1 as const,profileId:'ministry.report',profileName:'기관 보고서',entryId:'annual',profileSha256:hash('a'),documentSha256:hash('b'),expectedStyleIds:[11],slots:[{slot:0,styleId:11,styleName:'기관 제목',styleType:0 as const,source:'package' as const},{slot:9,styleId:2,styleName:'본문',styleType:0 as const,source:'document' as const}]});
 function memory(){const values=new Map<string,string>();return{values,storage:{getItem:(key:string)=>values.get(key)??null,setItem:(key:string,value:string)=>{values.set(key,value);},removeItem:(key:string)=>{values.delete(key);}}};}
 
 test('verified preview saves atomically and survives restart without private preview fields',()=>{

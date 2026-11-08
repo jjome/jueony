@@ -16,7 +16,7 @@ test('preview is pure and apply survives HWP/HWPX reopen with exact slot style I
   try{
     const preview=previewStyleGallery(settings.store,doc,{profileId:'ministry.report',profileName:'기관 보고서',entryId:'annual'});
     assert.deepEqual(doc.exportHwp(),beforeHwp);assert.deepEqual(doc.exportHwpx(),beforeHwpx);assert.equal(settings.raw(),beforeSettings);
-    const result=applyStyleGalleryPreview(settings.store,doc,preview);assert.equal(result.styleIds.length,1);assert.deepEqual(result.slots,[{slot:0,styleId:result.styleIds[0],styleName:'기관 제목',source:'package'}]);assert.equal(settings.raw(),beforeSettings);
+    const result=applyStyleGalleryPreview(settings.store,doc,preview);assert.equal(result.styleIds.length,1);assert.deepEqual(result.slots,[{slot:0,styleId:result.styleIds[0],styleName:'기관 제목',styleType:0,source:'package'}]);assert.equal(settings.raw(),beforeSettings);
     for(const method of ['exportHwp','exportHwpx'] as const){const reopened:any=new HwpDocument(doc[method]());try{const styles=JSON.parse(reopened.getStyleList());assert.equal(styles[result.styleIds[0]].name,'기관 제목');assert.equal(JSON.parse(reopened.getStyleDetail(result.styleIds[0])).charProps.bold,true);assert.equal(reopened.getTextRange(0,0,0,5),'기존 본문');}finally{reopened.free();}}
   }finally{doc.free();}
 });

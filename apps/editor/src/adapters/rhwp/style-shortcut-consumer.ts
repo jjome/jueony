@@ -30,8 +30,8 @@ export function resolveStoredStyleShortcut(document:any,stored:StoredStyleShortc
     const styles=catalog(document);if(hash(styles)!==stored.documentSha256)return;
     if(!Array.isArray(stored.slots)||stored.slots.length>10||new Set(stored.slots.map(value=>value.slot)).size!==stored.slots.length)return;
     const assignments=stored.slots.filter(value=>value?.slot===slot);if(assignments.length!==1)return;
-    const assignment=assignments[0];if(!integer(assignment.styleId,0,255)||typeof assignment.styleName!=='string'||!['package','document'].includes(assignment.source))return;
-    const style=styles[assignment.styleId];if(!style||normalized(style.name)!==normalized(assignment.styleName))return;
+    const assignment=assignments[0];if(!integer(assignment.styleId,0,255)||typeof assignment.styleName!=='string'||![0,1].includes(assignment.styleType)||!['package','document'].includes(assignment.source))return;
+    const style=styles[assignment.styleId];if(!style||normalized(style.name)!==normalized(assignment.styleName)||style.type!==assignment.styleType)return;
     if(styles.filter(value=>normalized(value.name)===normalized(assignment.styleName)).length!==1)return;
     return{kind:'apply-stored-style',slot:slot as number,styleId:style.id,styleName:style.name,styleType:style.type,source:assignment.source};
   }catch{return;}

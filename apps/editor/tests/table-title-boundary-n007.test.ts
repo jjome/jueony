@@ -53,10 +53,12 @@ function roundtrip(doc:any,format:string,edit:()=>void,verify:(doc:any)=>void){
  }finally{doc.discardSnapshot(undo);}
 }
 
-for(const format of ['hwp','hwpx'])test(format+' safely inserts and deletes at the last-title/first-body boundary',()=>{
+for(const format of ['hwp','hwpx'])test(format+' safely inserts and deletes throughout a simple continuous title span and its body boundary',()=>{
  const cases:Array<{op:EditOp;rows:number;titles:number;texts:string[]}>= [
+  {op:{kind:'insert_table_row',target,index:0,values:['첫 새 제목','첫 새 제목2','첫 새 제목3']},rows:6,titles:3,texts:['첫 새 제목','제목0-0','제목1-0','본문2-0','본문3-0','본문4-0']},
   {op:{kind:'insert_table_row',target,index:1,values:['새 제목','새 제목2','새 제목3']},rows:6,titles:3,texts:['제목0-0','새 제목','제목1-0','본문2-0','본문3-0','본문4-0']},
   {op:{kind:'insert_table_row',target,index:2,values:['새 본문','새 본문2','새 본문3']},rows:6,titles:2,texts:['제목0-0','제목1-0','새 본문','본문2-0','본문3-0','본문4-0']},
+  {op:{kind:'delete_table_row',target,index:0},rows:4,titles:1,texts:['제목1-0','본문2-0','본문3-0','본문4-0']},
   {op:{kind:'delete_table_row',target,index:1},rows:4,titles:1,texts:['제목0-0','본문2-0','본문3-0','본문4-0']},
   {op:{kind:'delete_table_row',target,index:2},rows:4,titles:2,texts:['제목0-0','제목1-0','본문3-0','본문4-0']},
  ];
@@ -80,12 +82,16 @@ for(const format of ['hwp','hwpx'])test(format+' boundary edit rejects stale sel
  }finally{doc.free();}
 });
 
-for(const format of ['hwp','hwpx'])for(const failure of ['proof','save'] as const)test(format+' boundary edit rolls back a '+failure+' failure',()=>{
+for(const format of ['hwp','hwpx'])for(const action of ['insert','delete'] as const)for(const failure of ['proof','save'] as const)test(
+ format+' '+action+' title-span edit rolls back a '+failure+' failure',()=>{
  const doc=fixture(format);
  try{
-  const state=snapshot(doc,format),before=bytes(doc,format),op:EditOp={kind:'insert_table_row',target,index:1,values:['','','']};
+  const state=snapshot(doc,format),before=bytes(doc,format),op:EditOp=action==='insert'?
+   {kind:'insert_table_row',target,index:0,values:['','','']}:{kind:'delete_table_row',target,index:0};
   const injected=new Proxy(doc,{get(owner,property){
-   if(failure==='proof'&&property==='insertTableRow')return(...args:any[])=>{const result=owner.insertTableRow(...args);owner.setCellProperties(...base,0,JSON.stringify({isHeader:false}));return result;};
+   const method=action==='insert'?'insertTableRow':'deleteTableRow';
+   if(failure==='proof'&&property===method)return(...args:any[])=>{const result=owner[method](...args);
+    owner.setCellProperties(...base,action==='insert'?3:0,JSON.stringify({isHeader:false}));return result;};
    if(failure==='save'&&property===(format==='hwp'?'exportHwpWithReport':'exportHwpxWithReport'))return()=>{throw Error('시험 저장 실패');};
    const value=Reflect.get(owner,property);return typeof value==='function'?value.bind(owner):value;
   }});

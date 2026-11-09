@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 21/25 · 부분 4 | 완료 0/18 · 부분 16 · 미구현 1 · stub 1 |
-| 검증 | 완료 0/25 · 부분 25 | 완료 0/18 · 부분 7 · 미검증 11 |
+| 구현 | 완료 21/25 · 부분 4 | 완료 0/18 · 부분 17 · stub 1 |
+| 검증 | 완료 0/25 · 부분 25 | 완료 0/18 · 부분 8 · 미검증 10 |
 | Agent 연결 | 연결 13/16 · 부분 0 · 미연결 3 · 해당 없음 9 | 연결 0/18 · 부분 10 · 미연결 8 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -153,7 +153,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B184](<07-formatting-and-styles.md#b184>) · 범위 | 스타일마당 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B184](<07-formatting-and-styles.md#b184>) · 범위 | 스타일마당 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [N013](<07-formatting-and-styles.md#n013>) · 작업 | 스타일마당과 사용자 번호키 재할당 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-12"></a>
@@ -419,12 +419,12 @@
 <summary>B184 · 스타일마당</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 한 쪽의 완전한 일반 본문 문단 지우기·설정 유지·단일 undo·안전 저장 구현. 본문 없는 문단 하나의 구역은 별도 명령으로 삭제하며 남은 구역 설정 보존. 유일한 구역/공백/복잡한 문서 차단. 걸친 문단·표·개체·여러 쪽 삭제와 자동 정리 남음. HWPX 파일 캐럿은 미지원, 로컬 상태 복원은 검증.
-- 근거: [result.json](<../evidence/empty-section-2026-10-14/empty-native/result.json>) · [result.json](<../evidence/empty-section-2026-10-14/empty-browser/result.json>) · [59-empty-body-section-removal.md](<../59-empty-body-section-removal.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 기관 스타일 프로필·스타일 패키지·번호키 배정과 문서 적용을 안전한 가져오기/미리보기/원자 적용 계약으로 제공한다.
+- 다음 작업: 프로필 저장·portable JSON 가져오기/내보내기·충돌/stale/readback 차단·HWP/HWPX 적용 및 snapshot undo·번호키 스타일 ID 재결합을 선별 검사 16개로 재검증했다. 실제 앱 shell 메뉴 진입·전체 스타일마당 UI·한글 직접 비교·Agent 연결은 남음.
+- 근거: [style-gallery-profile.ts](<../../apps/editor/src/modules/document/domain/style-gallery-profile.ts>) · [style-gallery-portable.ts](<../../apps/editor/src/adapters/browser/style-gallery-portable.ts>) · [style-gallery-controller.ts](<../../apps/editor/src/adapters/rhwp/style-gallery-controller.ts>) · [style-gallery-profile.test.ts](<../../apps/editor/tests/style-gallery-profile.test.ts>) · [style-gallery-controller.test.ts](<../../apps/editor/tests/style-gallery-controller.test.ts>) · [style-gallery-binding.test.ts](<../../apps/editor/tests/style-gallery-binding.test.ts>) · [style-gallery-portable-n013.test.ts](<../../apps/editor/tests/style-gallery-portable-n013.test.ts>)
+- 원래 기록: `PARTIAL;STYLE_GALLERY_CORE_REVERIFIED_2026_11_09;SHELL_HANCOM_AGENT_PENDING`
 
 </details>
 

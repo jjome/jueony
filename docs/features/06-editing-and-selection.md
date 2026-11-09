@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | 완료 🟢 **15/15** · 부분 0 | 완료 0/20 · 부분 20 |
-| 검증 | 완료 0/15 · 부분 15 | 완료 0/20 · 부분 8 · 미검증 12 |
+| 검증 | 완료 0/15 · 부분 15 | 완료 0/20 · 부분 9 · 미검증 11 |
 | Agent 연결 | 연결 🟢 **4/4** · 부분 0 · 해당 없음 11 | 연결 0/20 · 부분 2 · 미연결 18 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -128,7 +128,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B170](<06-editing-and-selection.md#b170>) · 범위 | 본문 블록 확대 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B170](<06-editing-and-selection.md#b170>) · 범위 | 본문 블록 확대 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [G110](<06-editing-and-selection.md#g110>) · 작업 | 본문 경계 선택과 기본 서식 단축키 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G115](<06-editing-and-selection.md#g115>) · 작업 | Unicode 단어 삭제와 블록 선택 경계 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
 | [G118](<06-editing-and-selection.md#g118>) · 작업 | 표 셀 경계의 자동 단어 삭제 보호 | ☑ 완료 | ◐ 부분 | — 해당 없음 |
@@ -419,12 +419,12 @@
 <summary>B170 · 본문 블록 확대</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 엔진 5단계와 공식 4회 기준 차이
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `PARTIAL;NOT_RUN`
+- 다음 작업: 실측 기록의 F3 4회 흐름을 현재 엔진의 내부 5단계에 진입→단어→문단→문서로 안전하게 매핑하고 선택 범위·실패 rollback을 검증했다. 정식 Studio keyboard hook·특수 story·한글 재비교는 남아 부분이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [body-block-selection-b170.ts](<../../apps/editor/src/shortcuts/body-block-selection-b170.ts>) · [body-block-selection-b170.test.ts](<../../apps/editor/tests/body-block-selection-b170.test.ts>)
+- 원래 기록: `PARTIAL;SELECTED_F3_STAGE_MAPPING_2026_11_09`
 
 </details>
 

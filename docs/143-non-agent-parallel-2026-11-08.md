@@ -60,6 +60,10 @@
 | B128 | HWP/HWPX 암호 설정·변경·해제를 source identity/revision/fingerprint와 export 전후 drift·재열기 검증으로 보호하고 암호를 결과·저장소에 남기지 않음 | `f6bd7527` 선별 8/8; 양형식 설정·변경·해제 저장 재열기와 이전 암호 거절·원본 불변·native artifact 해제 확인 | **부분 유지:** 정식 보안 UI·키 저장 정책·한글 비교 |
 | B154 / B155 | L/C 각 셀 및 B/F 여러 셀 테두리·배경 대상의 InputHandler·cursor·WASM bbox 증거를 교차 검증하고 보호·중첩·비직사각·병합 경계·drift를 fail-closed | `38040b55` 선별 7/7·strict TypeScript·경계 diagnostics 0 | **부분 유지:** 정식 Studio hook·실제 테두리/배경 적용·한글 비교 |
 | B169 | F5 셀 선택 1→2→3단계와 Shift+F5 즉시 확장을 exact owner/path/anchor/focus/reason/excluded 상태 및 실패 전체 rollback으로 보호 | `4c8f3c95` 선별 8/8·실제 upstream CursorState API 감사·strict TypeScript·경계 diagnostics 0 | **부분 유지:** 정식 Studio hook·전체 선택 조합·한글 비교 |
+| B170 | 실측 기록의 F3 네 번을 현재 엔진의 내부 다섯 단계에 진입→단어→문단→문서로 매핑하고 중간 sentence/section 단계를 사용자 흐름에 노출하지 않음 | `3d45c5d9` 선별 8/8·선택 범위 사후 검증·오류 exact rollback·strict TypeScript·경계 diagnostics 0 | **부분 유지:** 정식 Studio keyboard hook·표/특수 story·한글 재비교 |
+| B133 | 문서 내부 변경 추적과 AI receipt/compare diff를 분리하고 명시적 native v1 계약·revision/token CAS·사후 상태 검증 없이는 모두 unsupported로 차단 | `e44c46f7` 선별 7/7·현재 Rust/WASM 공개 API 및 원시 TRACKCHANGE 보존 경로 감사·strict TypeScript·경계 diagnostics 0 | **미구현 유지:** 실제 조회·표시·기록·승인·거절 Rust/WASM API와 UI가 없음 |
+| B137 | 오프라인 ko-KR provider의 단일 최상위 본문 선택을 identity·revision·원문·범위로 봉인하고 검증된 제안 하나만 한 snapshot으로 적용 | `c605f6d3` 선별 5/5·실제 npm WASM HWP/HWPX 저장·재열기·굵은 글자 서식 보존·strict TypeScript | **부분 유지:** 실제 사전 데이터/라이선스·UI·F8 배정·다문단/표/사용자 사전 |
+| B143 | 기존 TOC field의 exact 읽기 inventory와 색인/차례 mutation 6종의 native API·durable model·atomic history·readback·양형식 증거 gate | `8131305d` 선별 8/8·차단 상태 HWP/HWPX 바이트 불변·재열기·strict TypeScript·경계 diagnostics 0 | **부분 유지·명시 차단:** index-mark exact query와 추가/수정·TOC 생성/갱신·title-mark 표시 API 및 Studio UI가 없음 |
 
 ## 실행한 선별 검사
 

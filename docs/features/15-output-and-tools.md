@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | — 상세 작업 없음 | 완료 0/23 · 부분 3 · 미구현 20 |
-| 검증 | — 상세 작업 없음 | 완료 0/23 · 부분 0 · 미검증 23 |
+| 구현 | — 상세 작업 없음 | 완료 0/23 · 부분 5 · 미구현 18 |
+| 검증 | — 상세 작업 없음 | 완료 0/23 · 부분 2 · 미검증 21 |
 | Agent 연결 | — 상세 작업 없음 | 연결 0/23 · 부분 0 · 미연결 23 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -69,11 +69,11 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B137](<15-output-and-tools.md#b137>) · 범위 | 맞춤법 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B137](<15-output-and-tools.md#b137>) · 범위 | 맞춤법 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B138](<15-output-and-tools.md#b138>) · 범위 | 한컴·한자·유의어 사전 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B139](<15-output-and-tools.md#b139>) · 범위 | 번역 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B140](<15-output-and-tools.md#b140>) · 범위 | 빠른 교정·자동 실행 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B143](<15-output-and-tools.md#b143>) · 범위 | 차례·색인 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B143](<15-output-and-tools.md#b143>) · 범위 | 차례·색인 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B144](<15-output-and-tools.md#b144>) · 범위 | 참고 문헌 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B145](<15-output-and-tools.md#b145>) · 범위 | 문서 찾기 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B147](<15-output-and-tools.md#b147>) · 범위 | 프레젠테이션 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
@@ -254,12 +254,12 @@
 <summary>B137 · 맞춤법</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 셀 블록 F8은 별도 선택 동작
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 다음 작업: 명시적 오프라인 ko-KR 사전 provider와 단일 최상위 본문 선택의 stale 보호·응답 검증·한 snapshot 교정을 구현하고 HWP/HWPX 재열기를 확인했다. 실제 사전 데이터·라이선스·UI·F8 배정·다문단/표/사용자 사전은 남아 부분이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [spellcheck-session-b137.ts](<../../apps/editor/src/adapters/rhwp/spellcheck-session-b137.ts>) · [spellcheck-session-b137.test.ts](<../../apps/editor/tests/spellcheck-session-b137.test.ts>)
+- 원래 기록: `PARTIAL;SELECTED_OFFLINE_PROVIDER_REOPEN_2026_11_09`
 
 </details>
 
@@ -306,12 +306,12 @@
 <summary>B143 · 차례·색인</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 추가·갱신·숨김·표시 하위 항목
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 다음 작업: 기존 TOC field의 정확한 읽기 inventory와 여섯 mutation 작업의 native/model/history/readback/HWP/HWPX capability gate를 구현했다. 색인 표식 조회·추가/수정·차례 생성/갱신·표식 숨김/표시는 공개 API 부재로 차단되어 부분이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [toc-index-capability-b143.ts](<../../apps/editor/src/adapters/rhwp/toc-index-capability-b143.ts>) · [toc-index-capability-b143.test.ts](<../../apps/editor/tests/toc-index-capability-b143.test.ts>)
+- 원래 기록: `PARTIAL;READ_ONLY_TOC_INVENTORY_AND_MUTATION_GATE_2026_11_09`
 
 </details>
 

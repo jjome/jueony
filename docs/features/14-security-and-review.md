@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | — 상세 작업 없음 | 완료 0/11 · 부분 3 · 미구현 6 · stub 2 |
-| 검증 | — 상세 작업 없음 | 완료 0/11 · 부분 1 · 미검증 10 |
+| 검증 | — 상세 작업 없음 | 완료 0/11 · 부분 2 · 미검증 9 |
 | Agent 연결 | — 상세 작업 없음 | 연결 0/11 · 부분 0 · 미연결 11 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -55,7 +55,7 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B132](<14-security-and-review.md#b132>) · 범위 | 교정 부호·자료 연결 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B133](<14-security-and-review.md#b133>) · 범위 | 변경 내용 추적·표시 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B133](<14-security-and-review.md#b133>) · 범위 | 변경 내용 추적·표시 | ☐ 미구현 | ◐ 부분 | ☐ 미연결 |
 | [B134](<14-security-and-review.md#b134>) · 범위 | 문서 이력 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B135](<14-security-and-review.md#b135>) · 범위 | 문서 비교 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B136](<14-security-and-review.md#b136>) · 범위 | 메모 넣기·모양·표시 | ☐ stub | ☐ 미검증 | ☐ 미연결 |
@@ -154,12 +154,12 @@
 <summary>B133 · 변경 내용 추적·표시</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ☐ 미구현 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: AI receipt와 파일 내부 추적 기능 구분
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 다음 작업: 현재 Rust/WASM의 원시 TRACKCHANGE 보존은 조회·표시·기록·승인·거절 API가 아니므로 구현으로 승격하지 않았다. document-internal v1 계약과 revision/token CAS·사후 상태 검증 seam만 추가했으며 실제 기능은 여전히 미구현이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [document-track-changes-b133.ts](<../../apps/editor/src/adapters/rhwp/document-track-changes-b133.ts>) · [document-track-changes-b133.test.ts](<../../apps/editor/tests/document-track-changes-b133.test.ts>)
+- 원래 기록: `MISSING;CAPABILITY_AUDITED_FAIL_CLOSED_2026_11_09`
 
 </details>
 

@@ -72,7 +72,7 @@ function source(doc:any,structure:Structure,table:NestedTable,revision:string):E
   if(!revision||table.ancestors.length<1)throw fail();
   const captions=readNestedAxisCaptions(doc,structure,table),entry=captions.stored.find(c=>c.id===table.id),value:any=entry?.value;
   const values=value?.kind==='plain'?[value]:value?.kind==='paragraphs'?value.paragraphs:undefined;
-  if(!['Top','Bottom'].includes(value?.direction)||!Array.isArray(values)||!values.length||values.length>32||
+  if(!['Top','Bottom','Left','Right'].includes(value?.direction)||!Array.isArray(values)||!values.length||values.length>32||
       !captions.drawing||!captions.portableDrawing)throw fail();
   const paragraphs:ParagraphSource[]=values.map((paragraph:any,index:number)=>{
     const existingVerifiedBlank=paragraph?.text==='';

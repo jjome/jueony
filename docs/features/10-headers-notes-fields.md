@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | 완료 🟢 **9/9** · 부분 0 | 완료 0/11 · 부분 8 · 미구현 3 |
-| 검증 | 완료 0/9 · 부분 9 | 완료 0/11 · 부분 4 · 미검증 7 |
+| 검증 | 완료 0/9 · 부분 9 | 완료 0/11 · 부분 5 · 미검증 6 |
 | Agent 연결 | 연결 🟢 **8/8** · 부분 0 · 해당 없음 1 | 연결 0/11 · 부분 2 · 미연결 9 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -45,7 +45,7 @@
 | [B087](<10-headers-notes-fields.md#b087>) · 범위 | 각주·미주 모양 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B088](<10-headers-notes-fields.md#b088>) · 범위 | 날짜·시간·파일명 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B089](<10-headers-notes-fields.md#b089>) · 범위 | 덧말 | ☐ 미구현 | ◐ 부분 | ☐ 미연결 |
-| [B093](<10-headers-notes-fields.md#b093>) · 범위 | 상호 참조 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B093](<10-headers-notes-fields.md#b093>) · 범위 | 상호 참조 | ☐ 미구현 | ◐ 부분 | ☐ 미연결 |
 | [B095](<10-headers-notes-fields.md#b095>) · 범위 | 하이퍼링크 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 
 <a id="work-2"></a>
@@ -185,12 +185,12 @@
 <summary>B093 · 상호 참조</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 필드 업데이트 포함 구현 필요
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ☐ 미구현 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 안전한 책갈피 상호참조 계약은 있으나 현재 Rust/WASM 삽입 API가 없어 실제 기능은 미구현이다.
+- 다음 작업: commit 0e5fd9c4 기준 일반 본문의 유일한 명명 책갈피에 대한 identity·revision·bookmark fingerprint·보호·story·중복·명령 형식 검사와 snapshot rollback 계약을 만들었다. fake port 7/7은 삽입·표시 갱신·undo/redo·실패 복원을 검증하지만 실제 엔진에는 insertCrossReferenceB093가 없어 capability가 mutation 전에 차단된다. 실제 Rust/WASM HWP/HWPX 저장·재열기·renderer·UI·한글 비교는 NOT_RUN이며 일반 텍스트 대체도 만들지 않았다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [cross-reference-b093.ts](<../../apps/editor/src/adapters/rhwp/cross-reference-b093.ts>) · [cross-reference-b093.test.ts](<../../apps/editor/tests/cross-reference-b093.test.ts>)
+- 원래 기록: `MISSING;SAFE_CROSS_REFERENCE_CONTRACT_FAKE_PORT_PASS_2026_11_09;NATIVE_INSERT_API_MISSING`
 
 </details>
 

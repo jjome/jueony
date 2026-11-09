@@ -26,6 +26,8 @@ export type TableCellBoxB173 = Readonly<{
   col: number;
   rowSpan: number;
   colSpan: number;
+  /** Canonical cell/paragraph-format proof. Required by the atomic append adapter. */
+  formatFingerprint?: string;
 }>;
 
 export type TableCellPositionB173 = Readonly<{
@@ -55,6 +57,8 @@ export type TableCellTabEvidenceB173 = Readonly<{
   cells?: readonly TableCellBoxB173[];
   /** The current engine has an undoable snapshot operation for top-level row append. */
   atomicAppendRow: boolean;
+  /** Stable identity of the borrowed open document, never a file path. */
+  documentIdentity?: object;
 }>;
 
 export type TableCellTabActionB173 =
@@ -72,7 +76,32 @@ export interface TableCellTabPortB173 {
   capture(): TableCellTabEvidenceB173;
   moveToCellNext(): void;
   moveToCellPrevious(): void;
-  appendRowAfterLastCell(): boolean;
+  appendRowAfterLastCell(): AtomicRowAppendTransitionB173 | false;
+}
+
+export interface AtomicRowAppendDocumentB173 {
+  saveSnapshot(): number;
+  restoreSnapshot(token: number): unknown;
+  discardSnapshot(token: number): unknown;
+  insertTableRow(section: number, paragraph: number, control: number, row: number, after: boolean): unknown;
+}
+
+export interface AtomicRowAppendTransitionB173 {
+  readonly beforeRevision: number;
+  readonly afterRevision: number;
+  undo(): boolean;
+  commit(): void;
+  rollback(): boolean;
+}
+
+export type AtomicRowAppendHostB173 = Readonly<{
+  document: AtomicRowAppendDocumentB173;
+  capture(): TableCellTabEvidenceB173;
+  moveToCellNext(): void;
+}>;
+
+export class AtomicRowAppendStateUncertainB173 extends Error {
+  constructor() { super('표 마지막 행 추가 실패 뒤 원래 상태를 확인하지 못했습니다.'); }
 }
 
 export type TableCellTabEventControlB173 = Readonly<{
@@ -84,7 +113,7 @@ export type TableCellTabExecutionB173 =
   | Readonly<{status: 'pass-through'; owner: 'document-tab-cycle' | 'editor-default'; reason: string}>
   | Readonly<{status: 'table-shortcut'; owner: 'literal-tab' | 'hanging-indent'}>
   | Readonly<{status: 'blocked'; reason: string}>
-  | Readonly<{status: 'applied'; action: TableCellTabActionB173}>
+  | Readonly<{status: 'applied'; action: TableCellTabActionB173; transition?: AtomicRowAppendTransitionB173}>
   | Readonly<{status: 'state-uncertain'; reason: string}>;
 
 function integer(value: unknown): value is number {
@@ -119,6 +148,14 @@ function normalizedCells(cells: readonly TableCellBoxB173[] | undefined): TableC
   return result;
 }
 
+function accepted(value: unknown): boolean {
+  if (typeof value === 'string') {
+    try { return accepted(JSON.parse(value)); } catch { return false; }
+  }
+  return value === undefined || value === true || (value !== null && typeof value === 'object'
+    && !Array.isArray(value) && (value as {ok?: unknown}).ok !== false);
+}
+
 function isTab(key: TableCellTabKeyB173): boolean {
   return key.key === 'Tab' || key.code === 'Tab';
 }
@@ -134,7 +171,36 @@ function stamp(evidence: TableCellTabEvidenceB173, cells: readonly TableCellBoxB
     `${entry.controlIndex}:${entry.cellIndex}:${entry.cellParaIndex}`).join('/') ?? '-';
   return [evidence.revision, position.sectionIndex, position.parentParaIndex,
     position.controlIndex, position.cellIndex, path,
-    cells.map(cell => `${cell.cellIndex}:${cell.row}:${cell.col}:${cell.rowSpan}:${cell.colSpan}`).join('|')].join(';');
+    cells.map(cell => `${cell.cellIndex}:${cell.row}:${cell.col}:${cell.rowSpan}:${cell.colSpan}:${cell.formatFingerprint ?? '-'}`).join('|')].join(';');
+}
+
+function tableStateStamp(evidence: TableCellTabEvidenceB173): string | undefined {
+  if (!exactPosition(evidence.position)) return undefined;
+  const cells = normalizedCells(evidence.cells);
+  if (!cells) return undefined;
+  const position = evidence.position;
+  return [position.sectionIndex, position.parentParaIndex, position.controlIndex,
+    cells.map(cell => `${cell.cellIndex}:${cell.row}:${cell.col}:${cell.rowSpan}:${cell.colSpan}:${cell.formatFingerprint ?? '-'}`).join('|')].join(';');
+}
+
+function exactSimpleLastRow(evidence: TableCellTabEvidenceB173): {
+  cells: TableCellBoxB173[]; rows: number; columns: number; firstColumn: number; lastRow: number;
+} | undefined {
+  const cells = normalizedCells(evidence.cells);
+  if (!cells?.length || cells.some(cell => cell.rowSpan !== 1 || cell.colSpan !== 1
+    || typeof cell.formatFingerprint !== 'string' || cell.formatFingerprint.length < 1)) return undefined;
+  const firstColumn = Math.min(...cells.map(cell => cell.col));
+  const lastColumn = Math.max(...cells.map(cell => cell.col));
+  const firstRow = Math.min(...cells.map(cell => cell.row));
+  const lastRow = Math.max(...cells.map(cell => cell.row));
+  if (firstColumn !== 0 || firstRow !== 0) return undefined;
+  const columns = lastColumn + 1, rows = lastRow + 1;
+  if (columns < 1 || rows < 1 || cells.length !== rows * columns || rows >= 50 || cells.length + columns > 200) return undefined;
+  const slots = new Set(cells.map(cell => `${cell.row}:${cell.col}`));
+  if (slots.size !== cells.length) return undefined;
+  for (let row = 0; row < rows; row += 1) for (let column = 0; column < columns; column += 1)
+    if (!slots.has(`${row}:${column}`)) return undefined;
+  return {cells, rows, columns, firstColumn, lastRow};
 }
 
 /**
@@ -238,6 +304,80 @@ function validateAfter(
 }
 
 /**
+ * Performs the last-cell row append through the real document API.  Only a
+ * rectangular, unmerged top-level table with exact format fingerprints is
+ * accepted.  The returned transition owns the sole snapshot: callers must
+ * either keep it for one undo step or call commit after their history layer
+ * has adopted the operation.
+ */
+export function appendLastTableRowAtomicB173(host: AtomicRowAppendHostB173): AtomicRowAppendTransitionB173 | false {
+  const before = host.capture();
+  const simple = exactSimpleLastRow(before);
+  const position = before.position;
+  if (!before.atomicAppendRow || !before.documentIdentity || before.documentIdentity !== host.document
+    || !exactPosition(position) || (position.cellPath?.length ?? 0) > 1 || !simple) return false;
+  const last = simple.cells[simple.cells.length - 1];
+  if (position.cellIndex !== last.cellIndex) return false;
+  const beforeState = tableStateStamp(before);
+  const live = host.capture();
+  if (live.documentIdentity !== before.documentIdentity || live.revision !== before.revision
+    || tableStateStamp(live) !== beforeState) return false;
+  const token = host.document.saveSnapshot();
+  if (!integer(token)) return false;
+  let active = true;
+  const restore = (): boolean => {
+    if (!active) return false;
+    try {
+      if (!accepted(host.document.restoreSnapshot(token))) return false;
+      const restored = host.capture();
+      if (restored.documentIdentity !== before.documentIdentity || tableStateStamp(restored) !== beforeState) return false;
+      if (!accepted(host.document.discardSnapshot(token))) return false;
+      active = false;
+      return true;
+    } catch { return false; }
+  };
+  try {
+    if (!accepted(host.document.insertTableRow(position.sectionIndex, position.parentParaIndex,
+      position.controlIndex, simple.lastRow, true))) throw new Error('row append rejected');
+    host.moveToCellNext();
+    const after = host.capture(), afterSimple = exactSimpleLastRow(after);
+    if (after.documentIdentity !== before.documentIdentity || after.revision <= before.revision
+      || !afterSimple || afterSimple.rows !== simple.rows + 1 || afterSimple.columns !== simple.columns
+      || !validateAfter({kind: 'append-row', afterRow: simple.lastRow, expectedFirstColumn: simple.firstColumn}, before, after))
+      throw new Error('row append readback mismatch');
+    const sourceRow = simple.cells.filter(cell => cell.row === simple.lastRow).sort((a, b) => a.col - b.col);
+    const appendedRow = afterSimple.cells.filter(cell => cell.row === simple.rows).sort((a, b) => a.col - b.col);
+    if (sourceRow.length !== simple.columns || appendedRow.length !== simple.columns
+      || sourceRow.some((cell, index) => cell.col !== appendedRow[index].col
+        || cell.rowSpan !== appendedRow[index].rowSpan || cell.colSpan !== appendedRow[index].colSpan
+        || cell.formatFingerprint !== appendedRow[index].formatFingerprint))
+      throw new Error('row append format mismatch');
+    const afterState = tableStateStamp(after)!;
+    const afterRevision = after.revision;
+    const transition: AtomicRowAppendTransitionB173 = Object.freeze({
+      beforeRevision: before.revision,
+      afterRevision,
+      undo(): boolean {
+        const current = host.capture();
+        if (!active || current.documentIdentity !== before.documentIdentity
+          || current.revision !== afterRevision || tableStateStamp(current) !== afterState) return false;
+        return restore();
+      },
+      commit(): void {
+        if (!active) return;
+        if (!accepted(host.document.discardSnapshot(token))) throw new Error('row append snapshot discard failed');
+        active = false;
+      },
+      rollback: restore,
+    });
+    return transition;
+  } catch {
+    if (!restore()) throw new AtomicRowAppendStateUncertainB173();
+    return false;
+  }
+}
+
+/**
  * Executes only a certified plain cell Tab.  A second evidence capture closes
  * the host capture/InputHandler race.  A consumed failure is never retried as
  * document-tab cycling.
@@ -261,21 +401,27 @@ export function executeTableCellTabB173(
   if (liveDecision.status !== 'ready' || liveDecision.stamp !== decision.stamp) {
     return {status: 'blocked', reason: 'cell-tab-evidence-stale'};
   }
+  let transition: AtomicRowAppendTransitionB173 | undefined;
   try {
     if (decision.action.kind === 'move') {
       if (decision.action.direction === 'next') port.moveToCellNext();
       else port.moveToCellPrevious();
     } else if (decision.action.kind === 'exit-table') {
       port.moveToCellPrevious();
-    } else if (!port.appendRowAfterLastCell()) {
-      return {status: 'blocked', reason: 'row-append-rejected'};
+    } else {
+      const appended = port.appendRowAfterLastCell();
+      if (!appended) return {status: 'blocked', reason: 'row-append-rejected'};
+      transition = appended;
     }
-  } catch {
+  } catch (error) {
+    if (error instanceof AtomicRowAppendStateUncertainB173)
+      return {status: 'state-uncertain', reason: 'row-append-rollback-unverified'};
     return {status: 'blocked', reason: 'cell-tab-operation-failed'};
   }
   const after = port.capture();
   if (!validateAfter(decision.action, live, after)) {
+    if (transition?.rollback()) return {status: 'blocked', reason: 'row-append-readback-rolled-back'};
     return {status: 'state-uncertain', reason: 'cell-tab-readback-mismatch'};
   }
-  return {status: 'applied', action: decision.action};
+  return {status: 'applied', action: decision.action, ...(transition ? {transition} : {})};
 }

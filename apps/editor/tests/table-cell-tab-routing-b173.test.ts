@@ -1,11 +1,17 @@
 import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
 import test from 'node:test';
+import init, {HwpDocument} from '@rhwp/core';
 import {
+  appendLastTableRowAtomicB173,
+  AtomicRowAppendStateUncertainB173,
   executeTableCellTabB173,
   resolveTableCellTabB173,
   type TableCellTabEvidenceB173,
   type TableCellTabPortB173,
 } from '../src/shortcuts/table-cell-tab-routing-b173.ts';
+
+await init({module_or_path:await readFile(new URL('../node_modules/@rhwp/core/rhwp_bg.wasm',import.meta.url))});
 
 const key = (override: Record<string, unknown> = {}) => ({
   key: 'Tab', code: 'Tab', shiftKey: false, ctrlKey: false, altKey: false,
@@ -132,7 +138,8 @@ function port(initial = evidence()): MutablePort {
         {cellIndex: 21, row: 2, col: 1, rowSpan: 1, colSpan: 1}];
       this.state = evidence({...this.state, revision: this.state.revision + 1,
         position: {...this.state.position!, cellIndex: 20}, cells: appendedCells});
-      return true;
+      return {beforeRevision:this.state.revision-1,afterRevision:this.state.revision,
+        undo:()=>true,commit:()=>{},rollback:()=>true};
     },
   };
 }
@@ -181,6 +188,12 @@ test('stale evidence, rejected mutation and lying readback call no fallback docu
     status: 'state-uncertain', reason: 'cell-tab-readback-mismatch',
   });
   assert.equal(lying.next, 1);
+
+  const uncertain = port(evidence({position: {...evidence().position!, cellIndex: 12}}));
+  uncertain.appendRowAfterLastCell = () => { throw new AtomicRowAppendStateUncertainB173(); };
+  assert.deepEqual(executeTableCellTabB173(key(), control().api, uncertain), {
+    status: 'state-uncertain', reason: 'row-append-rollback-unverified',
+  });
 });
 
 test('invalid duplicate geometry and unsupported modifiers are fail-closed in a table', () => {
@@ -192,4 +205,60 @@ test('invalid duplicate geometry and unsupported modifiers are fail-closed in a 
     const result = resolveTableCellTabB173(key(modifier), evidence());
     assert.equal(result.status, 'blocked');
   }
+});
+
+function accepted(value:unknown){
+ if(typeof value==='string'){try{return accepted(JSON.parse(value));}catch{return false;}}
+ return value===undefined||value===true||Boolean(value&&typeof value==='object'&&(value as any).ok!==false);
+}
+
+test('atomic top-level append owns one snapshot, preserves last-row formats and survives HWP/HWPX reopen',()=>{
+ for(const format of ['Hwp','Hwpx'] as const){
+  const doc:any=HwpDocument.createEmpty();doc.createBlankDocument();let reopened:any;
+  try{
+   const made=JSON.parse(doc.createTable(0,0,0,2,2));assert.equal(made.ok,true);
+   let revision=7,cellIndex=3,saved=0,restored=0,discarded=0;
+   const originalSave=doc.saveSnapshot.bind(doc),originalRestore=doc.restoreSnapshot.bind(doc),originalDiscard=doc.discardSnapshot.bind(doc);
+   doc.saveSnapshot=()=>{saved+=1;return originalSave();};
+   doc.restoreSnapshot=(token:number)=>{restored+=1;const value=originalRestore(token);revision+=1;return value;};
+   doc.discardSnapshot=(token:number)=>{discarded+=1;return originalDiscard(token);};
+   const capture=():TableCellTabEvidenceB173=>{
+    const dimensions=JSON.parse(doc.getTableDimensions(0,made.paraIdx,made.controlIdx));
+    const currentCells=[];
+    for(let index=0;index<dimensions.cellCount;index+=1){
+     const info=JSON.parse(doc.getCellInfo(0,made.paraIdx,made.controlIdx,index));
+     const properties=JSON.parse(doc.getCellProperties(0,made.paraIdx,made.controlIdx,index));
+     currentCells.push({cellIndex:index,row:info.row,col:info.col,rowSpan:info.rowSpan,colSpan:info.colSpan,
+       formatFingerprint:JSON.stringify(properties)});
+    }
+    return evidence({revision,documentIdentity:doc,position:{sectionIndex:0,parentParaIndex:made.paraIdx,
+      controlIndex:made.controlIdx,cellIndex},cells:currentCells});
+   };
+   const transition=appendLastTableRowAtomicB173({document:doc,capture,moveToCellNext(){revision+=1;cellIndex=4;}});
+   assert.ok(transition);assert.deepEqual(JSON.parse(doc.getTableDimensions(0,made.paraIdx,made.controlIdx)),
+     {rowCount:3,colCount:2,cellCount:6});
+   assert.deepEqual([saved,restored,discarded],[1,0,0]);
+   reopened=new HwpDocument(doc[`export${format}`]());
+   const table=JSON.parse(reopened.getControls()).find((item:any)=>item.ctrlId==='tbl');assert.ok(table,format);
+   assert.deepEqual(JSON.parse(reopened.getTableDimensions(0,table.para,table.controlIndex)),
+     {rowCount:3,colCount:2,cellCount:6});
+   transition.commit();assert.deepEqual([saved,restored,discarded],[1,0,1]);
+  }finally{reopened?.free();doc.free();}
+ }
+});
+
+test('atomic append rollback restores the exact table when cursor/readback lies',()=>{
+ const doc:any=HwpDocument.createEmpty();doc.createBlankDocument();
+ try{
+  const made=JSON.parse(doc.createTable(0,0,0,2,2));let revision=1,cellIndex=3;
+  const capture=():TableCellTabEvidenceB173=>{
+   const dimensions=JSON.parse(doc.getTableDimensions(0,made.paraIdx,made.controlIdx)),currentCells=[];
+   for(let index=0;index<dimensions.cellCount;index+=1){const info=JSON.parse(doc.getCellInfo(0,made.paraIdx,made.controlIdx,index));
+    currentCells.push({cellIndex:index,row:info.row,col:info.col,rowSpan:info.rowSpan,colSpan:info.colSpan,
+      formatFingerprint:JSON.stringify(JSON.parse(doc.getCellProperties(0,made.paraIdx,made.controlIdx,index)))});}
+   return evidence({revision,documentIdentity:doc,position:{sectionIndex:0,parentParaIndex:made.paraIdx,controlIndex:made.controlIdx,cellIndex},cells:currentCells});
+  };
+  assert.equal(appendLastTableRowAtomicB173({document:doc,capture,moveToCellNext(){revision+=1;}}),false);
+  assert.deepEqual(JSON.parse(doc.getTableDimensions(0,made.paraIdx,made.controlIdx)),{rowCount:2,colCount:2,cellCount:4});
+ }finally{doc.free();}
 });

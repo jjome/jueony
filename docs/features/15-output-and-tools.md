@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | — 상세 작업 없음 | 완료 0/23 · 부분 8 · 미구현 15 |
-| 검증 | — 상세 작업 없음 | 완료 0/23 · 부분 5 · 미검증 18 |
+| 구현 | — 상세 작업 없음 | 완료 0/23 · 부분 10 · 미구현 13 |
+| 검증 | — 상세 작업 없음 | 완료 0/23 · 부분 7 · 미검증 16 |
 | Agent 연결 | — 상세 작업 없음 | 연결 0/23 · 부분 0 · 미연결 23 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -60,8 +60,8 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B083](<15-output-and-tools.md#b083>) · 범위 | 로마자·외래어 표기 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B091](<15-output-and-tools.md#b091>) · 범위 | 한자 입력 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B083](<15-output-and-tools.md#b083>) · 범위 | 로마자·외래어 표기 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
+| [B091](<15-output-and-tools.md#b091>) · 범위 | 한자 입력 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-4"></a>
 
@@ -228,12 +228,12 @@
 <summary>B083 · 로마자·외래어 표기</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 변환·등록 UI 없음
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 명시적 버전의 offline 제공자가 한국어→로마자·외래어→한국어 후보를 만들고 단일 본문 선택·최대 16개 후보·문서 revision·원문·계획 fingerprint를 검증한 뒤 한 snapshot으로 적용한다.
+- 다음 작업: 커밋 7017009f에서 HWP/HWPX 저장 재열기와 정확한 undo·redo 4/4 통과. 실제 표준 사전 데이터와 Studio 후보 UI·사용자 사전은 미구현.
+- 근거: [romanization-conversion-b083.ts](<../../apps/editor/src/adapters/rhwp/romanization-conversion-b083.ts>) · [romanization-conversion-b083.test.ts](<../../apps/editor/tests/romanization-conversion-b083.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_OFFLINE_ROMANIZATION_CONVERSION_2026_11_09`
 
 </details>
 
@@ -241,12 +241,12 @@
 <summary>B091 · 한자 입력</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 변환·사전·사용자 등록 필요
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 버전이 고정된 offline 한자 후보 제공자를 단일 본문 선택에 연결하고 최대 32개 후보·중복·제어문자·비한자·문서 identity·revision·원문·후보 fingerprint를 검증한 뒤 한 snapshot으로 적용한다.
+- 다음 작업: 커밋 a16c31b6에서 HWP/HWPX 저장 재열기와 정확한 undo·redo·실패 rollback 4/4 통과. 실제 한자 사전 데이터와 Studio 후보 UI·사용자 사전은 미구현.
+- 근거: [hanja-input-b091.ts](<../../apps/editor/src/adapters/rhwp/hanja-input-b091.ts>) · [hanja-input-b091.test.ts](<../../apps/editor/tests/hanja-input-b091.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_OFFLINE_HANJA_INPUT_2026_11_09`
 
 </details>
 

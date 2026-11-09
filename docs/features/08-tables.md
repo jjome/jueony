@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 37/41 · 부분 4 | 완료 0/24 · 부분 23 · 미구현 1 |
-| 검증 | 완료 3/41 · 부분 38 | 완료 0/24 · 부분 16 · 미검증 8 |
+| 구현 | 완료 37/41 · 부분 4 | 완료 0/24 · 부분 24 |
+| 검증 | 완료 3/41 · 부분 38 | 완료 0/24 · 부분 17 · 미검증 7 |
 | Agent 연결 | 연결 28/33 · 부분 5 · 해당 없음 8 | 연결 0/24 · 부분 9 · 미연결 15 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -59,7 +59,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B068](<08-tables.md#b068>) · 범위 | 표 그리기·지우개 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B068](<08-tables.md#b068>) · 범위 | 표 그리기·지우개 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B069](<08-tables.md#b069>) · 범위 | 문자열-표 변환 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-3"></a>
@@ -236,12 +236,12 @@
 <summary>B068 · 표 그리기·지우개</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 기본 생성과 별도
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한 쪽의 잠금 해제된 빈 단순 표에서 인접 단위 셀 경계를 지우고 검증된 병합 셀의 원래 격자를 다시 그리며 identity·revision·table topology fingerprint를 재검증한다.
+- 다음 작업: 커밋 0a2baf63에서 실제 HWP/HWPX 재열기와 정확한 undo·redo·실패 rollback 4/4 통과. 자유 그리기 UI와 내용이 있거나 복잡한 셀은 미지원.
+- 근거: [table-boundary-tool-b068.ts](<../../apps/editor/src/adapters/rhwp/table-boundary-tool-b068.ts>) · [table-boundary-tool-b068.test.ts](<../../apps/editor/tests/table-boundary-tool-b068.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_EMPTY_TABLE_BOUNDARY_TOOL_2026_11_09`
 
 </details>
 

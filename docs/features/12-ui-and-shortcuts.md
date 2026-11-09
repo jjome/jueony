@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 7/11 · 부분 4 | 완료 1/30 · 부분 27 · 미구현 2 |
-| 검증 | 완료 4/11 · 부분 7 | 완료 0/30 · 부분 12 · 미검증 18 |
+| 구현 | 완료 7/11 · 부분 4 | 완료 1/30 · 부분 28 · 미구현 1 |
+| 검증 | 완료 4/11 · 부분 7 | 완료 0/30 · 부분 13 · 미검증 17 |
 | Agent 연결 | 연결 🟢 **1/1** · 부분 0 · 해당 없음 10 | 연결 0/30 · 부분 0 · 미연결 30 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -59,7 +59,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B049](<12-ui-and-shortcuts.md#b049>) · 범위 | 한자 발음 표시 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B049](<12-ui-and-shortcuts.md#b049>) · 범위 | 한자 발음 표시 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B050](<12-ui-and-shortcuts.md#b050>) · 범위 | 격자 표시 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B051](<12-ui-and-shortcuts.md#b051>) · 범위 | 격자 설정 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B052](<12-ui-and-shortcuts.md#b052>) · 범위 | 개체 이동 안내선 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
@@ -260,12 +260,12 @@
 <summary>B049 · 한자 발음 표시</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 발음 데이터·설정 필요
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 명시적으로 주입된 offline·ko-KR 사전만 사용해 본문 viewport 한자 원문의 발음 overlay를 만들고 문서 identity·revision·범위·원문·provider fingerprint를 재검증하며 문서 바이트를 변경하지 않는다.
+- 다음 작업: 커밋 98426582에서 실제 HWP/HWPX export와 undo snapshot 불변 4/4 통과. 실제 발음 사전 데이터와 Studio 표시 UI·설정은 미구현.
+- 근거: [hanja-pronunciation-overlay-b049.ts](<../../apps/editor/src/adapters/rhwp/hanja-pronunciation-overlay-b049.ts>) · [hanja-pronunciation-overlay-b049.test.ts](<../../apps/editor/tests/hanja-pronunciation-overlay-b049.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_OFFLINE_HANJA_PRONUNCIATION_OVERLAY_2026_11_09`
 
 </details>
 

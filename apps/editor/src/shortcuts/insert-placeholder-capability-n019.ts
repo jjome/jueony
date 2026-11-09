@@ -107,6 +107,39 @@ export interface InsertPlaceholderDispatchRejectionN019 {
   requiredNativeApi: InsertPlaceholderNativeApiN019;
 }
 
+export interface InsertPlaceholderStudioContextN019 {
+  hasDocument: boolean;
+  isEditable: boolean;
+  isFormMode: boolean;
+  inTable: boolean;
+  inCellSelectionMode: boolean;
+  inTableObjectSelection: boolean;
+  inPictureObjectSelection: boolean;
+}
+
+export interface InsertPlaceholderStudioCommandN019 {
+  readonly id: InsertPlaceholderCommandIdN019;
+  readonly label: string;
+  readonly icon?: string;
+  canExecute(context: InsertPlaceholderStudioContextN019): false;
+  execute(): never;
+}
+
+/**
+ * The checked-in runtime has no explicit native/model/history/round-trip
+ * evidence for either placeholder.  Discovering a similarly named WASM
+ * method must not silently turn a menu item on.
+ */
+export const NO_INSERT_PLACEHOLDER_CAPABILITY_EVIDENCE_N019:
+InsertPlaceholderCapabilityEvidenceN019 = Object.freeze({
+  schemaVersion: 1,
+  nativeMethodNames: Object.freeze([]),
+  durableModelContracts: Object.freeze([]),
+  atomicHistoryCommands: Object.freeze([]),
+  hwpRoundTripCommands: Object.freeze([]),
+  hwpxRoundTripCommands: Object.freeze([]),
+});
+
 function isStringArray(value: unknown): value is readonly string[] {
   return Array.isArray(value) && value.every(item => typeof item === 'string');
 }
@@ -198,4 +231,51 @@ export function rejectInsertPlaceholderDispatchN019(
     capabilityReason: projection.reason,
     requiredNativeApi: projection.requirement.nativeApi,
   };
+}
+
+function projectStudioContextN019(
+  context: InsertPlaceholderStudioContextN019,
+): InsertPlaceholderContextN019 {
+  const objectSelected = context.inTableObjectSelection || context.inPictureObjectSelection;
+  const table = context.inTable || context.inCellSelectionMode;
+  return {
+    hasDocument: context.hasDocument,
+    editable: context.isEditable,
+    formMode: context.isFormMode,
+    kind: objectSelected ? 'object-selection' : table ? 'table-cell' : 'body-caret',
+  };
+}
+
+/**
+ * Registry definition used by the Studio patch seam.  It remains disabled
+ * even if all declaration evidence is supplied because no executable native
+ * adapter is connected.  A direct execute bypass throws and cannot report a
+ * successful command.
+ */
+export function createInsertPlaceholderStudioCommandN019(
+  commandId: InsertPlaceholderCommandIdN019,
+  label: string,
+  icon?: string,
+  evidence: InsertPlaceholderCapabilityEvidenceN019 = NO_INSERT_PLACEHOLDER_CAPABILITY_EVIDENCE_N019,
+): InsertPlaceholderStudioCommandN019 {
+  return Object.freeze({
+    id: commandId,
+    label,
+    ...(icon ? { icon } : {}),
+    canExecute(context: InsertPlaceholderStudioContextN019): false {
+      projectInsertPlaceholderRegistryN019(commandId, projectStudioContextN019(context), evidence);
+      return false;
+    },
+    execute(): never {
+      const projection = projectInsertPlaceholderRegistryN019(
+        commandId,
+        { hasDocument: true, editable: true, formMode: false, kind: 'body-caret' },
+        evidence,
+      );
+      const rejection = rejectInsertPlaceholderDispatchN019(projection);
+      throw new Error(
+        `N019 ${commandId} rejected: ${rejection.capabilityReason}; requires ${rejection.requiredNativeApi}`,
+      );
+    },
+  });
 }

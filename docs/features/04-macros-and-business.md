@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 3/6 · 부분 1 · 미구현 2 | 완료 0/5 · 부분 3 · 미구현 2 |
-| 검증 | 완료 3/6 · 부분 0 · 미검증 3 | 완료 0/5 · 부분 3 · 미검증 2 |
+| 구현 | 완료 3/6 · 부분 1 · 미구현 2 | 완료 0/5 · 부분 4 · 미구현 1 |
+| 검증 | 완료 3/6 · 부분 0 · 미검증 3 | 완료 0/5 · 부분 4 · 미검증 1 |
 | Agent 연결 | 연결 3/6 · 부분 0 · 미연결 3 | 연결 0/5 · 부분 0 · 미연결 5 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -50,7 +50,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B004](<04-macros-and-business.md#b004>) · 범위 | 문서 시작 도우미 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B004](<04-macros-and-business.md#b004>) · 범위 | 문서 시작 도우미 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-3"></a>
 
@@ -110,12 +110,12 @@
 <summary>B004 · 문서 시작 도우미</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 초기 작성 경로 없음
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 빈 문서·정확한 recent fingerprint·승인된 로컬 HWP/HWPX 템플릿만 새 문서 owner로 열도록 제한한다.
+- 다음 작업: catalog/workspace/choice fingerprint 재검증·단일 실행·취소·malformed completion 차단·불투명 최근 선택 저장과 실제 WASM HWP/HWPX 활성 문서 바이트 불변을 검증했다. 실제 시작 화면·recent/template host 배선·한글 직접 비교는 남음.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [document-start-assistant-b004.ts](<../../apps/editor/src/adapters/browser/document-start-assistant-b004.ts>) · [document-start-assistant-b004.test.ts](<../../apps/editor/tests/document-start-assistant-b004.test.ts>)
+- 원래 기록: `PARTIAL;SAFE_START_ASSISTANT_CONTRACT_PASS_2026_11_09;UI_HOST_WIRING_PENDING`
 
 </details>
 

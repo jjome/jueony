@@ -20,7 +20,7 @@
 
 ## 먼저 할 일
 
-- **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset과 가운데 정렬 재조판을 수정했다. HWP/HWPX 네이티브 저장·재열기·undo/redo·4종 rollback과 Edge 실제 편집→bound-save→UI 재열기를 통과했다. 임의 필드 경계·중첩 셀·복합 개체와 한글 비교는 남아 부분이다.
+- **구현** [N004](<08-tables.md#n004>) **기존 병합 원본의 후속 Agent 셀 편집** — 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset과 가운데 정렬 재조판을 수정했다. HWP/HWPX 네이티브 저장·재열기·undo/redo·4종 rollback과 Edge 실제 편집→bound-save→UI 재열기를 통과했다. 추가 감사에서 ClickHere half-open end caret 소유권과 복수 owner가 모호하고 nested cell의 line/cursor/paragraph/picture ByPath 증거 API 및 복합 개체 source↔run/cursor interleave 증거가 없음을 확인해 시험 변경을 모두 되돌렸다. 임의 필드 경계·중첩 셀·복합 개체와 한글 비교는 남아 부분이다.
 - **구현** [N005](<08-tables.md#n005>) **임의 N×M 셀 분할 Agent** — 최대7단계 중첩표·일반글캡션·말단셀의 채워진 ClickHere를 보존한다. 같은 owner·문단에서 정확히 한 plain scalar로 분리된 두 filled ClickHere는 ID·range·full path·value·marker controlIndex/raw position·stored position을 교차 검증한 뒤 일반/중첩 셀 분할에 보존한다. commit aa2ac0b3 기준 HWP/HWPX 재열기·exact undo/redo와 관련 회귀 44/44를 통과했다. 완전히 보이지 않는 0길이 이웃과 boundary-touch/실제 overlap은 engine inner owner 식별이 불가능해 mutation 전에 차단한다. object 혼합·caption field·실제 앱·한글 직접 비교는 남아 부분이다.
 - **구현** [N006](<08-tables.md#n006>) **중첩 표 Agent 조회·경로·편집** — 캡션의 전체 조상 경로·구역과 커서 조회·bbox를 보존하며 최대 32문단의 위/아래 캡션을 명시적 문단 경로·원문·revision 재검증 후 교체한다. 다중 빈 캡션 문단 중 검증된 하나를 채우고 동일 페이지·동일 구조의 균일 수직 재조판만 허용한다. Left/Right 중첩 캡션도 full path와 live·portable geometry를 재검증하며 단일 문단의 2~128개 연속 글자 run은 동일 Unicode scalar 길이의 BMP 또는 emoji 텍스트로 바꾸고 UTF-16/scalar run 경계·charShapeId·배치를 보존한다. commit e67ca6ee 기준 custom engine HWP/HWPX 저장·재열기·undo/redo 선별 검사는 18 pass·1 expected skip이다. 캡션 생성·일반 길이 변화·필드·책갈피·개체·실제 앱·한글 직접 비교는 fail-closed로 남아 부분이다.
 
@@ -943,11 +943,11 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 임의 여러 문단/병합 원본 읽기와 원문·서식 보존
-- 다음 작업: 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset과 가운데 정렬 재조판을 수정했다. HWP/HWPX 네이티브 저장·재열기·undo/redo·4종 rollback과 Edge 실제 편집→bound-save→UI 재열기를 통과했다. 임의 필드 경계·중첩 셀·복합 개체와 한글 비교는 남아 부분이다.
+- 다음 작업: 10pt 1→2줄 혼합 그림·필드 셀의 source/run/cursor offset과 가운데 정렬 재조판을 수정했다. HWP/HWPX 네이티브 저장·재열기·undo/redo·4종 rollback과 Edge 실제 편집→bound-save→UI 재열기를 통과했다. 추가 감사에서 ClickHere half-open end caret 소유권과 복수 owner가 모호하고 nested cell의 line/cursor/paragraph/picture ByPath 증거 API 및 복합 개체 source↔run/cursor interleave 증거가 없음을 확인해 시험 변경을 모두 되돌렸다. 임의 필드 경계·중첩 셀·복합 개체와 한글 비교는 남아 부분이다.
 - 상위 항목: [B161](<08-tables.md#b161>) 셀 병합
 - Agent 명령: `replace_cell_paragraph`
 - 근거: [101-agent-merged-cell-paragraph.md](<../101-agent-merged-cell-paragraph.md>) · [verification-summary.json](<../evidence/parallel-editor-2026-10-15/verification-summary.json>) · [file-table-verification-2026-11-08.md](<../file-table-verification-2026-11-08.md>) · [table-editing-2026-11-08.md](<../table-editing-2026-11-08.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>)
-- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08;PICTURE_FIELD_WRAP_2026_11_08`
+- 원래 기록: `SCOPED_TABLE_EXTENSION_2026_11_08;PICTURE_FIELD_WRAP_2026_11_08;NESTED_CELL_BYPATH_BLOCKED_2026_11_09`
 
 </details>
 

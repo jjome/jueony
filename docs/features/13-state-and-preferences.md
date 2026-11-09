@@ -796,10 +796,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: stable 8개 설정 키의 read-only diagnostic→typed startup gate→memory-only activation→read-only preference runtime facade를 연결해 값 복사와 scope·backup projection만 노출하고 blocked/unknown key는 fail-closed
-- 다음 작업: N015/N017 공동 선별 검사를 포함한 28/28과 strict TypeScript·모듈 경계 diagnostics 0을 통과했다. 실제 shell boot 주입·UI/facade consumer migration과 Windows/한글/origin/DPI 수명 실측은 남아 부분이다.
+- 다음 작업: N015/N017 공동 선별 검사 28/28에 더해 실제 boot 소비 감사를 수행했다. session facade는 실제 shell에서 소비하지만 preference runtime은 테스트 전용이고 boot의 직접 localStorage write와 shell direct read가 남아 있다. dirty 사용자 WIP인 shell을 수정하지 않았으며 N017·session 회귀 29/29와 strict TypeScript를 통과했다. 실제 shell boot 주입·UI/facade migration과 Windows/한글/origin/DPI 수명 실측은 남아 부분이다.
 - 상위 항목: [B151](<12-ui-and-shortcuts.md#b151>) 환경 설정
 - 근거: [25-hangul-parity-and-state-plan.md](<../25-hangul-parity-and-state-plan.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [preference-memory-activation-n017.ts](<../../apps/editor/src/adapters/browser/preference-memory-activation-n017.ts>) · [preference-memory-activation-n017.test.ts](<../../apps/editor/tests/preference-memory-activation-n017.test.ts>) · [preference-runtime-n017.ts](<../../apps/editor/src/composition/preference-runtime-n017.ts>) · [preference-runtime-n017.test.ts](<../../apps/editor/tests/preference-runtime-n017.test.ts>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;PREFERENCE_LIFETIME_AUDIT_2026_11_08;PREFERENCE_STARTUP_DIAGNOSTIC_2026_11_09;PREFERENCE_STARTUP_GATE_2026_11_09;PREFERENCE_MEMORY_ACTIVATION_2026_11_09;READ_ONLY_PREFERENCE_RUNTIME_2026_11_09`
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;PREFERENCE_LIFETIME_AUDIT_2026_11_08;PREFERENCE_STARTUP_DIAGNOSTIC_2026_11_09;PREFERENCE_STARTUP_GATE_2026_11_09;PREFERENCE_MEMORY_ACTIVATION_2026_11_09;READ_ONLY_PREFERENCE_RUNTIME_2026_11_09;ACTUAL_BOOT_CONSUMER_BLOCKED_2026_11_09`
 
 </details>
 

@@ -425,9 +425,9 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
 - 완료 범위: 로컬 WASM·런타임·폰트·third-party notices·hash와 기관 endpoint allowlist를 fail-closed 검사하고 외부 URL을 분류하는 오프라인 번들 감사 계약
-- 다음 작업: commit 41b44529 기준 빌드 입력에서 CDN font literal 256개를 제거하고 격리 build 673 modules를 통과했다. dist 감사의 외부 endpoint는 5개로 감소했지만 AI 영역은 이번 범위에서 제외됐고 기관 allowlist·WebView2 포함 최종 설치본·고지 합본 검수가 남아 FAIL/PARTIAL 배포 차단을 유지한다.
-- 근거: [06-license-inventory.md](<../06-license-inventory.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [offline-font-source-patches.mjs](<../../apps/editor/scripts/integration/offline-font-source-patches.mjs>) · [offline-font-source-patches.test.ts](<../../apps/editor/tests/offline-font-source-patches.test.ts>) · [n045-offline-contract.mjs](<../../apps/editor/scripts/lib/n045-offline-contract.mjs>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;OFFLINE_BUNDLE_AUDIT_2026_11_09;CDN_FONT_LITERALS_REMOVED_256;EXTERNAL_ENDPOINTS_REMAINING_5;FAIL_OFFLINE_BUNDLE`
+- 다음 작업: commit 7d2bea41 기준 WebView2 고정 버전 오프라인 manifest에 정확한 버전·아키텍처·로컬 경로·SHA-256·license/notice 바이트와 링크 검증을 추가하고 7/7을 통과했다. 범위 버전·경로 탈출·변조·누락은 fail-closed다. 최종 설치본의 실제 runtime 로딩·패키지 서명·기관 allowlist/배포 승인과 AI 제외 endpoint 확인은 남아 FAIL/PARTIAL 배포 차단을 유지한다.
+- 근거: [06-license-inventory.md](<../06-license-inventory.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [offline-font-source-patches.mjs](<../../apps/editor/scripts/integration/offline-font-source-patches.mjs>) · [offline-font-source-patches.test.ts](<../../apps/editor/tests/offline-font-source-patches.test.ts>) · [n045-offline-contract.mjs](<../../apps/editor/scripts/lib/n045-offline-contract.mjs>) · [n045-offline-contract.test.ts](<../../apps/editor/tests/n045-offline-contract.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;OFFLINE_BUNDLE_AUDIT_2026_11_09;CDN_FONT_LITERALS_REMOVED_256;EXTERNAL_ENDPOINTS_REMAINING_5;WEBVIEW2_FIXED_RUNTIME_MANIFEST_2026_11_09;FAIL_OFFLINE_BUNDLE`
 
 </details>
 

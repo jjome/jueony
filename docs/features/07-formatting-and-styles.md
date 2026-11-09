@@ -21,7 +21,7 @@
 ## 먼저 할 일
 
 - **구현** [N011](<07-formatting-and-styles.md#n011>) **스타일 가져오기·내보내기** — commit 7db995bd 기준 basic character BorderFill의 HWP/HWPX 가져오기·저장·재열기와 보존·실패 보호 6/6을 통과했다. 번호/개요는 getAgentNumberingDefinitions가 id·editable·startNumbers만 제공하고 cloneAgentNumbering은 동일 문서 전용이며 createNumbering은 축약 생성·getAgentOutlineDefinition은 definitionId만 제공해 complete head·level·CharShape/font/BorderFill graph export와 target remap·충돌·section binding·원자 rollback/readback을 증명할 수 없다. 고급 BorderFill·특수 영역·UI·Agent·한글 비교와 이 Rust/WASM 포트는 남아 부분이다.
-- **구현** [N012](<07-formatting-and-styles.md#n012>) **범위 글자 스타일의 영구 정의 연결** — commit 66ab2768 기준 UI stored-style 소비 경계 9/9과 격리 build 673 modules를 통과했다. 실제 브라우저 UI 동작·한글 비교·Agent 연결은 남아 부분이다.
+- **구현** [N012](<07-formatting-and-styles.md#n012>) **범위 글자 스타일의 영구 정의 연결** — commit 4e1fcd17 기준 실제 격리 Edge 157 DOM 드롭다운→format:apply-style→실제 InputHandler→공식 @rhwp/core 0.8.7 WASM 적용을 검증했다. HWP/HWPX 선택 범위와 exact byte undo/redo·저장 재열기·stale/race write 0 및 page/console/external/missing 0을 통과했다. 전체 앱 shell과 정식 CommandDispatcher 전체 부팅·한글 비교·Agent 연결은 남아 부분이다.
 - **구현** [N013](<07-formatting-and-styles.md#n013>) **스타일마당과 사용자 번호키 재할당** — commit 4ac67c16 기준 공식 npm WASM과 실제 격리 Edge DOM에서 capability unavailable 빈 문서의 경고·확인란 표시와 미확인 confirm 차단·확인 후 apply 정확히 1회·stale evidence 재차단·nonblank 무경고를 1/1로 검증했고 외부 요청·page/console 오류·누락 리소스는 모두 0이었다. 기존 custom Rust/WASM HWP/HWPX 및 portable/style 회귀 14/14와 build 678 modules를 유지한다. 실제 앱 shell 메뉴 진입·한글 비교·Agent 연결은 남아 부분이다.
 
 ## 기능별 작업표
@@ -722,10 +722,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 저장 글자 스타일과 직접 서식을 타입으로 분리하고 stored character-style reference의 capture·검증·UI 적용 시점 재해석·stale/race fail-closed·정의 변경 재열기 전파
-- 다음 작업: commit 66ab2768 기준 UI stored-style 소비 경계 9/9과 격리 build 673 modules를 통과했다. 실제 브라우저 UI 동작·한글 비교·Agent 연결은 남아 부분이다.
+- 다음 작업: commit 4e1fcd17 기준 실제 격리 Edge 157 DOM 드롭다운→format:apply-style→실제 InputHandler→공식 @rhwp/core 0.8.7 WASM 적용을 검증했다. HWP/HWPX 선택 범위와 exact byte undo/redo·저장 재열기·stale/race write 0 및 page/console/external/missing 0을 통과했다. 전체 앱 shell과 정식 CommandDispatcher 전체 부팅·한글 비교·Agent 연결은 남아 부분이다.
 - 상위 항목: [B098](<07-formatting-and-styles.md#b098>) 스타일
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [stored-character-style-ui-consumer-n012.ts](<../../apps/editor/src/adapters/rhwp/stored-character-style-ui-consumer-n012.ts>) · [stored-character-style-ui-consumer-n012.test.ts](<../../apps/editor/tests/stored-character-style-ui-consumer-n012.test.ts>) · [style-flow-patch.test.ts](<../../apps/editor/tests/style-flow-patch.test.ts>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;STORED_CHARACTER_STYLE_REFERENCE_2026_11_08;STUDIO_STORED_STYLE_CAPTURE_2026_11_09;STORED_STYLE_UI_CONSUMER_2026_11_09`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [stored-character-style-ui-consumer-n012.ts](<../../apps/editor/src/adapters/rhwp/stored-character-style-ui-consumer-n012.ts>) · [stored-character-style-ui-consumer-n012.test.ts](<../../apps/editor/tests/stored-character-style-ui-consumer-n012.test.ts>) · [style-flow-patch.test.ts](<../../apps/editor/tests/style-flow-patch.test.ts>) · [stored-character-style-browser-n012.test.ts](<../../apps/editor/tests/stored-character-style-browser-n012.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;STORED_CHARACTER_STYLE_REFERENCE_2026_11_08;STUDIO_STORED_STYLE_CAPTURE_2026_11_09;STORED_STYLE_UI_CONSUMER_2026_11_09;STORED_STYLE_EDGE_UI_ROUNDTRIP_2026_11_09`
 
 </details>
 

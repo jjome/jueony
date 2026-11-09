@@ -407,11 +407,11 @@
 - 종류: 한글 상위 기능 · 우선순위: P2.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 1~8개 Unicode scalar와 옛한글 자모열을 정규화 없이 삽입하고 제어문자·stale·보호/특수 문맥을 차단한다. 최근 문자 20개 검증·중복 제거·best-effort 저장과 HWP/HWPX 재열기를 확인함. 실제 문자표 대화상자·범주/검색·Studio insert:symbols 연결은 남음.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 현재 안전 문자표 대화상자와 제한된 이름 검색·옛한글 자모열·최근 문자까지 연결됐지만 한글 2024 전체 문자 범주/검색과 동등한 데이터베이스는 완료 범위가 아님.
+- 다음 작업: 실제 insert:symbols 명령에 U+·0x·리터럴 1~8문자 입력과 명명된 기본 문자 검색·옛한글 프리셋/자모 순서·최근 문자 20개를 연결함. 선택 없음·취소 무동작·제어문자·stale·보호/특수 문맥 차단과 한 snapshot 삽입 및 HWP/HWPX 재열기 통과. 전체 Unicode 이름 데이터베이스와 한글 2024 범주 동등성은 남음.
 - UI 명령: `insert:symbols`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [symbol-insertion-b090.ts](<../../apps/editor/src/adapters/rhwp/symbol-insertion-b090.ts>) · [symbol-insertion-b090.test.ts](<../../apps/editor/tests/symbol-insertion-b090.test.ts>)
-- 원래 기록: `PARTIAL;SCOPED_UNICODE_ROUNDTRIP_PASS_2026_11_09`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [symbol-insertion-b090.ts](<../../apps/editor/src/adapters/rhwp/symbol-insertion-b090.ts>) · [symbol-dialog-b090.ts](<../../apps/editor/src/adapters/browser/symbol-dialog-b090.ts>) · [symbol-insertion-b090.test.ts](<../../apps/editor/tests/symbol-insertion-b090.test.ts>) · [symbol-dialog-b090.test.ts](<../../apps/editor/tests/symbol-dialog-b090.test.ts>) · [symbol-command-b090.test.ts](<../../apps/editor/tests/symbol-command-b090.test.ts>)
+- 원래 기록: `PARTIAL;SCOPED_SYMBOL_DIALOG_COMMAND_AND_UNICODE_ROUNDTRIP_PASS_2026_11_09`
 
 </details>
 

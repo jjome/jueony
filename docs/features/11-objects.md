@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 🟢 **1/1** · 부분 0 | 완료 0/18 · 부분 11 · 미구현 7 |
-| 검증 | 완료 0/1 · 부분 1 | 완료 0/18 · 부분 4 · 미검증 14 |
+| 구현 | 완료 🟢 **1/1** · 부분 0 | 완료 0/18 · 부분 12 · 미구현 6 |
+| 검증 | 완료 0/1 · 부분 1 | 완료 0/18 · 부분 5 · 미검증 13 |
 | Agent 연결 | 해당 없음 1 | 연결 0/18 · 부분 0 · 미연결 18 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -75,7 +75,7 @@
 | [B174](<11-objects.md#b174>) · 범위 | 개체 속성 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B175](<11-objects.md#b175>) · 범위 | 개체 묶기·풀기 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B176](<11-objects.md#b176>) · 범위 | 개체 순서 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B177](<11-objects.md#b177>) · 범위 | 개체 배치 앞·뒤 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B177](<11-objects.md#b177>) · 범위 | 개체 배치 앞·뒤 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B178](<11-objects.md#b178>) · 범위 | 개체 크기·위치 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 
 <a id="work-5"></a>
@@ -312,12 +312,13 @@
 <summary>B177 · 개체 배치 앞·뒤</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 본문 선택 동작이 대신 실행되지 않게 점검
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 현재는 최상위 단일 도형의 맨 앞·맨 뒤와 역연산 undo만 검증됐으며 그림·표·수식은 완료 범위가 아님.
+- 다음 작업: Rust z-order 변경·절대 복원 쌍과 Studio 명령이 단일 도형에서 연결됨. Shift+PageUp/Shift+PageDown은 개체 문맥에서만 명령으로 해석되고 본문에서는 네이티브 선택 동작을 유지함. HWP/HWPX 저장·재열기 2종 통과. 그림·표·수식 및 다중·중첩 개체 배치는 남음.
+- UI 명령: `insert:arrange-front;insert:arrange-back`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [object-z-order-b177.test.ts](<../../apps/editor/tests/object-z-order-b177.test.ts>)
+- 원래 기록: `PARTIAL;PARTIAL;SHAPE_Z_ORDER_HWP_HWPX_REOPEN_PASS_2026_11_09`
 
 </details>
 

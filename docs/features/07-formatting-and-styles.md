@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 21/25 · 부분 4 | 완료 0/18 · 부분 17 · stub 1 |
-| 검증 | 완료 0/25 · 부분 25 | 완료 0/18 · 부분 8 · 미검증 10 |
+| 구현 | 완료 21/25 · 부분 4 | 완료 0/18 · 부분 18 |
+| 검증 | 완료 0/25 · 부분 25 | 완료 0/18 · 부분 9 · 미검증 9 |
 | Agent 연결 | 연결 13/16 · 부분 0 · 미연결 3 · 해당 없음 9 | 연결 0/18 · 부분 10 · 미연결 8 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -48,7 +48,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B080](<07-formatting-and-styles.md#b080>) · 범위 | 문단 띠 | ☐ stub | ☐ 미검증 | ☐ 미연결 |
+| [B080](<07-formatting-and-styles.md#b080>) · 범위 | 문단 띠 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-2"></a>
 
@@ -184,12 +184,13 @@
 <summary>B080 · 문단 띠</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ stub / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 명령은 등록됐지만 canExecute=false, 빈 execute.
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `STUB;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 한글 도움말 규격에 맞춰 높이 300 HWPUNIT·문단 너비·검정 채움·테두리 없음의 문단 기준 사각형으로 생성한다.
+- 다음 작업: 단일단 최상위 본문에서 기존 shape 모델 생성·속성 검증·snapshot rollback/undo·본문 보존·HWP/HWPX 저장 재열기와 byte-exact undo를 검증했다. 다단 계산·Studio insert:para-band 명령 배선·UI·한글 직접 비교는 남음.
+- UI 명령: `insert:para-band`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [paragraph-band-b080.ts](<../../apps/editor/src/adapters/rhwp/paragraph-band-b080.ts>) · [paragraph-band-b080.test.ts](<../../apps/editor/tests/paragraph-band-b080.test.ts>)
+- 원래 기록: `PARTIAL;PARAGRAPH_BAND_SHAPE_ROUNDTRIP_PASS_2026_11_09;STUDIO_COMMAND_STUB_PENDING`
 
 </details>
 

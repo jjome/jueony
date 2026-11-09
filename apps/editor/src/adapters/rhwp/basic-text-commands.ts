@@ -123,7 +123,7 @@ export function installBasicTextCommands(registry: any, input: () => any, eventB
     } catch { return false; }
   };
   registry.register({
-    id: 'insert:symbols', label: '문자표', icon: 'icon-symbols', shortcutLabel: 'Alt+F10', opensDialog: true, canExecute: symbolCan,
+    id: 'insert:symbols', label: '문자표', icon: 'icon-symbols', shortcutLabel: 'Ctrl+F10', opensDialog: true, canExecute: symbolCan,
     execute: () => {
       const editor = api(), ih = input(), context = automation().getContext(), openedRevision = revision(editor.revision());
       const seed = captureSymbolInsertionB090(ih, context, openedRevision, '·');

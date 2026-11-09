@@ -36,7 +36,7 @@ test('B090 replaces the exact insert:symbols command and fails closed after stal
   (globalThis as any).document = { querySelector: () => null };
   try {
     installBasicTextCommands({ register(value: any) { definitions.set(value.id, value); } }, () => input, { emit() { emitted++; } });
-    const command = definitions.get('insert:symbols'); assert.ok(command); assert.equal(command.id, 'insert:symbols'); assert.equal(command.opensDialog, true); assert.equal(command.canExecute(context), true);
+    const command = definitions.get('insert:symbols'); assert.ok(command); assert.equal(command.id, 'insert:symbols'); assert.equal(command.shortcutLabel, 'Ctrl+F10'); assert.equal(command.opensDialog, true); assert.equal(command.canExecute(context), true);
     command.execute(); assert.equal((globalThis as any).__b090Shown, true); (globalThis as any).__b090Apply('간');
     assert.equal(native.getTextRange(0, 0, 0, native.getParagraphLength(0, 0)), '앞간뒤'); assert.equal(emitted, 1);
 

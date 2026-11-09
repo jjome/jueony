@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | 완료 7/11 · 부분 4 | 완료 1/30 · 부분 29 |
-| 검증 | 완료 4/11 · 부분 7 | 완료 0/30 · 부분 14 · 미검증 16 |
+| 검증 | 완료 4/11 · 부분 7 | 완료 0/30 · 부분 15 · 미검증 15 |
 | Agent 연결 | 연결 🟢 **1/1** · 부분 0 · 해당 없음 10 | 연결 0/30 · 부분 0 · 미연결 30 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -104,7 +104,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B148](<12-ui-and-shortcuts.md#b148>) · 범위 | 글자판 설정 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B148](<12-ui-and-shortcuts.md#b148>) · 범위 | 글자판 설정 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B150](<12-ui-and-shortcuts.md#b150>) · 범위 | 사용자 설정 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B151](<12-ui-and-shortcuts.md#b151>) · 범위 | 환경 설정 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B152](<12-ui-and-shortcuts.md#b152>) · 범위 | 스킨 설정 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
@@ -461,12 +461,12 @@
 <summary>B148 · 글자판 설정</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: Windows IME 사용; 한글의 별도 자판 관리 없음
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `PARTIAL;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: system-ime·두벌식·세벌식390·로마자의 앱 내부 전역 선택만 버전·크기 제한 설정으로 보존하고 활성 문서 identity·instance와 IME 조합 상태를 재검증한다.
+- 다음 작업: 커밋 71eeb1b6에서 실제 HWP/HWPX export 바이트·재열기·기존 undo snapshot 불변과 설정 손상/저장 실패 차단 4/4 통과. Windows IME·한글 글자판 자체 변경·Studio UI는 미구현.
+- 근거: [keyboard-profile-b148.ts](<../../apps/editor/src/adapters/browser/keyboard-profile-b148.ts>) · [keyboard-profile-b148.test.ts](<../../apps/editor/tests/keyboard-profile-b148.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_APP_LOCAL_KEYBOARD_PROFILE_2026_11_09`
 
 </details>
 

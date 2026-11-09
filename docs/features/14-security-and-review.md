@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | — 상세 작업 없음 | 완료 0/11 · 부분 7 · 미구현 4 |
-| 검증 | — 상세 작업 없음 | 완료 0/11 · 부분 6 · 미검증 5 |
+| 검증 | — 상세 작업 없음 | 완료 0/11 · 부분 8 · 미검증 3 |
 | Agent 연결 | — 상세 작업 없음 | 연결 0/11 · 부분 0 · 미연결 11 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -56,8 +56,8 @@
 | --- | --- | --- | --- | --- |
 | [B132](<14-security-and-review.md#b132>) · 범위 | 교정 부호·자료 연결 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B133](<14-security-and-review.md#b133>) · 범위 | 변경 내용 추적·표시 | ☐ 미구현 | ◐ 부분 | ☐ 미연결 |
-| [B134](<14-security-and-review.md#b134>) · 범위 | 문서 이력 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B135](<14-security-and-review.md#b135>) · 범위 | 문서 비교 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B134](<14-security-and-review.md#b134>) · 범위 | 문서 이력 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
+| [B135](<14-security-and-review.md#b135>) · 범위 | 문서 비교 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B136](<14-security-and-review.md#b136>) · 범위 | 메모 넣기·모양·표시 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-4"></a>
@@ -167,13 +167,13 @@
 <summary>B134 · 문서 이력</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 비교 세션 이력과 한글 파일 이력 의미 대조
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 명시적으로 검증된 편집 영수증만 문서 identity·instance·revision 연속성과 HWP/HWPX 전후 SHA-256으로 연결해 최대 256개의 변조 감지 세션 이력을 만들며 문서 내용이나 키는 기록하지 않는다.
+- 다음 작업: 커밋 3c451999에서 실제 HWP/HWPX 편집 digest·재열기·undo 원문 복원과 이력 자체의 문서/undo 비변경 5/5 통과. 파일 내부 이력·재실행 영속화·작성자·UI·한글 이력 동등성은 미구현.
 - UI 명령: `edit:document-history`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `PARTIAL;NOT_RUN`
+- 근거: [document-history-b134.ts](<../../apps/editor/src/adapters/rhwp/document-history-b134.ts>) · [document-history-b134.test.ts](<../../apps/editor/tests/document-history-b134.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_TAMPER_EVIDENT_SESSION_HISTORY_2026_11_09`
 
 </details>
 
@@ -181,13 +181,13 @@
 <summary>B135 · 문서 비교</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 보존·비교 범위·표/서식 검수
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 명시적으로 제공된 두 열린 문서의 최상위 본문 일반 텍스트 문단을 제한된 예산과 Unicode scalar 범위로 비교하고 equal·insert·delete·replace hunk와 source/result fingerprint를 만든다.
+- 다음 작업: 커밋 7cefd439에서 실제 HWP↔HWPX 혼합 비교·재열기·export 바이트·기존 undo snapshot 불변 4/4 통과. 표·서식·개체·특수 story·이동 감지·Studio UI는 미구현.
 - UI 명령: `edit:compare-documents`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `WIRED;NOT_RUN`
+- 근거: [document-compare-b135.ts](<../../apps/editor/src/adapters/rhwp/document-compare-b135.ts>) · [document-compare-b135.test.ts](<../../apps/editor/tests/document-compare-b135.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_BODY_TEXT_DOCUMENT_COMPARE_2026_11_09`
 
 </details>
 

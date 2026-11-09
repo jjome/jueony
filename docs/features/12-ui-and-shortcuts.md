@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 7/11 · 부분 4 | 완료 1/30 · 부분 18 · 미구현 11 |
-| 검증 | 완료 4/11 · 부분 7 | 완료 0/30 · 부분 3 · 미검증 27 |
+| 구현 | 완료 7/11 · 부분 4 | 완료 1/30 · 부분 19 · 미구현 10 |
+| 검증 | 완료 4/11 · 부분 7 | 완료 0/30 · 부분 4 · 미검증 26 |
 | Agent 연결 | 연결 🟢 **1/1** · 부분 0 · 해당 없음 10 | 연결 0/30 · 부분 0 · 미연결 30 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -50,7 +50,7 @@
 | [B044](<12-ui-and-shortcuts.md#b044>) · 범위 | 문단 부호 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B045](<12-ui-and-shortcuts.md#b045>) · 범위 | 투명 선 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B046](<12-ui-and-shortcuts.md#b046>) · 범위 | 쪽 윤곽 | ☑ 완료 | ◐ 부분 | ☐ 미연결 |
-| [B047](<12-ui-and-shortcuts.md#b047>) · 범위 | 교정 부호·그림 표시 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B047](<12-ui-and-shortcuts.md#b047>) · 범위 | 교정 부호·그림 표시 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B048](<12-ui-and-shortcuts.md#b048>) · 범위 | 메모 표시·안내선 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 
 <a id="work-2"></a>
@@ -233,12 +233,13 @@
 <summary>B047 · 교정 부호·그림 표시</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 표시 옵션 미연결
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 현재 문단 부호와 조판 부호는 실제 명령·설정·렌더러까지 연결됐지만 그림 표시/숨기기는 완료 범위가 아님.
+- 다음 작업: Ctrl+G+C와 Ctrl+G+T가 실제 Studio 명령으로 해석되고 WASM 표시 상태·사용자 설정·document-view-changed를 거쳐 페이지 렌더 트리에 문단 끝 부호와 제어 라벨을 출력함을 검증. 그림 가시성 상태·이미지 렌더 필터·설정/메뉴 연결과 한글 직접 비교는 남음.
+- UI 명령: `view:ctrl-mark;view:para-mark`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [view-marks-b047.test.ts](<../../apps/editor/tests/view-marks-b047.test.ts>)
+- 원래 기록: `PARTIAL;SCOPED_PARAGRAPH_CONTROL_MARK_RENDER_PASS_2026_11_09`
 
 </details>
 

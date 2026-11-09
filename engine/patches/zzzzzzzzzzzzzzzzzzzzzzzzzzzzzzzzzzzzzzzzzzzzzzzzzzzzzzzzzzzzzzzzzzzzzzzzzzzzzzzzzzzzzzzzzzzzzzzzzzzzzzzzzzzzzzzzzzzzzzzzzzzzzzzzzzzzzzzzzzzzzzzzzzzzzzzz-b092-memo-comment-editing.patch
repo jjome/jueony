@@ -1,0 +1,466 @@
+diff --git a/src/document_core/queries/field_query.rs b/src/document_core/queries/field_query.rs
+index 20a028f..1e7a924 100644
+--- a/src/document_core/queries/field_query.rs
++++ b/src/document_core/queries/field_query.rs
+@@ -8,7 +8,7 @@ use crate::document_core::DocumentCore;
+ use crate::error::HwpError;
+ use crate::model::control::{Control, Field, FieldType};
+ use crate::model::event::DocumentEvent;
+-use crate::model::paragraph::{FieldRange, Paragraph};
++use crate::model::paragraph::{CharShapeRef, FieldRange, Paragraph};
+ use crate::parser::tags;
+ 
+ /// 필드 위치 정보
+@@ -218,6 +218,73 @@ impl DocumentCore {
+         ))
+     }
+ 
++    /// 본문 커서 위치에 한컴 MEMO 필드를 삽입한다.
++    ///
++    /// 첫 구현은 안전하게 본문 단일 지점 메모만 허용한다. 범위 메모와 셀/글상자 메모는
++    /// 별도 저장 실측 전까지 지원하지 않는다. 메모 본문은 필드의 subList에 들어가므로
++    /// 본문 텍스트나 누름틀 값으로 가장하지 않는다.
++    pub fn insert_comment_at_cursor_v1(
++        &mut self,
++        section_idx: usize,
++        para_idx: usize,
++        char_offset: usize,
++        text: &str,
++        author: &str,
++    ) -> Result<String, HwpError> {
++        validate_memo_input(text, author)?;
++        let field_id = self.next_click_here_field_id();
++        let memo_index = self.next_memo_index();
++        let inserted_offset = {
++            let section = self
++                .document
++                .sections
++                .get_mut(section_idx)
++                .ok_or_else(|| HwpError::InvalidField("구역 인덱스 초과".into()))?;
++            section.raw_stream = None;
++            let para = section
++                .paragraphs
++                .get_mut(para_idx)
++                .ok_or_else(|| HwpError::InvalidField("문단 인덱스 초과".into()))?;
++            insert_memo_field_in_para(
++                para,
++                char_offset,
++                field_id,
++                memo_index,
++                text,
++                author,
++            )?
++        };
++
++        let stored_end_for_reset = crate::renderer::composer::paragraph_flow_end(
++            &self.document.sections[section_idx].paragraphs[para_idx],
++        );
++        self.reflow_paragraph(section_idx, para_idx);
++        let doc_hwp3_layout = self.document.layout_profile().hwp3_layout();
++        crate::renderer::composer::recalculate_section_vpos(
++            &mut self.document.sections[section_idx].paragraphs,
++            para_idx,
++            None,
++            stored_end_for_reset,
++            &self.styles,
++            self.dpi,
++            doc_hwp3_layout,
++        );
++        self.recompose_paragraph(section_idx, para_idx);
++        self.paginate_if_needed();
++        self.invalidate_page_tree_cache();
++        self.event_log.push(DocumentEvent::TextInserted {
++            section: section_idx,
++            para: para_idx,
++            offset: inserted_offset,
++            len: 0,
++        });
++
++        Ok(format!(
++            "{{\"ok\":true,\"fieldId\":{},\"memoIndex\":{},\"charOffset\":{}}}",
++            field_id, memo_index, inserted_offset
++        ))
++    }
++
+     /// 셀/글상자 내 문단의 현재 커서 위치에 빈 ClickHere 누름틀을 삽입한다.
+     pub fn insert_click_here_field_at_in_cell(
+         &mut self,
+@@ -384,6 +451,39 @@ impl DocumentCore {
+         format!("[{}]", entries.join(","))
+     }
+ 
++    /// MEMO 필드의 본문과 본문 앵커를 명시적으로 조회한다.
++    pub fn get_comment_list_v1_json(&self) -> String {
++        let entries: Vec<String> = self
++            .collect_all_fields()
++            .iter()
++            .filter(|info| info.field.field_type == FieldType::Memo)
++            .map(|info| {
++                let text = info
++                    .field
++                    .memo_paragraphs
++                    .iter()
++                    .map(|para| para.text.as_str())
++                    .collect::<Vec<_>>()
++                    .join("\n");
++                let author = memo_author(&info.field.command).unwrap_or("");
++                let location = field_location_json(&info.location);
++                let (start, end) = field_range_bounds(self, info).unwrap_or((0, 0));
++                format!(
++                    "{{\"fieldId\":{},\"memoIndex\":{},\"text\":{},\"author\":{},\"location\":{},\"startCharIdx\":{},\"endCharIdx\":{},\"pointComment\":{}}}",
++                    info.field.field_id,
++                    info.field.memo_index,
++                    json_escape(&text),
++                    json_escape(author),
++                    location,
++                    start,
++                    end,
++                    start == end,
++                )
++            })
++            .collect();
++        format!("[{}]", entries.join(","))
++    }
++
+     /// 아무 내용도 없는 빈 문서인가 — 웹한글컨트롤 `IsEmpty`(§8.2.7).
+     ///
+     /// 구역·단 정의는 새 문서에도 늘 있으므로 "내용"으로 세지 않는다. 글자 하나, 표 하나라도
+@@ -1312,6 +1418,54 @@ impl DocumentCore {
+         Ok(r#"{"ok":true}"#.to_string())
+     }
+ 
++    /// API가 만든 본문 단일 지점 MEMO 필드를 field id로 제거한다.
++    ///
++    /// 범위 메모는 본문 텍스트를 지우면 안 되므로 이 메서드는 실패로 닫는다. 저장 실측이
++    /// 끝난 뒤 범위 앵커 슬롯만 제거하는 별도 계약으로 확장해야 한다.
++    pub fn remove_comment_v1(&mut self, field_id: u32) -> Result<String, HwpError> {
++        let (section_idx, para_idx) = self
++            .document
++            .sections
++            .iter()
++            .enumerate()
++            .find_map(|(section_idx, section)| {
++                section.paragraphs.iter().enumerate().find_map(|(para_idx, para)| {
++                    para.controls.iter().any(|control| {
++                        matches!(control, Control::Field(field)
++                            if field.field_type == FieldType::Memo && field.field_id == field_id)
++                    }).then_some((section_idx, para_idx))
++                })
++            })
++            .ok_or_else(|| HwpError::InvalidField("본문 메모 필드를 찾을 수 없습니다.".into()))?;
++
++        let stored_end_for_reset = crate::renderer::composer::paragraph_flow_end(
++            &self.document.sections[section_idx].paragraphs[para_idx],
++        );
++        {
++            let para = self.document.sections[section_idx]
++                .paragraphs
++                .get_mut(para_idx)
++                .ok_or_else(|| HwpError::InvalidField("문단 위치 초과".into()))?;
++            remove_point_memo_in_para(para, field_id)?;
++        }
++        self.document.sections[section_idx].raw_stream = None;
++        self.reflow_paragraph(section_idx, para_idx);
++        let hwp3_layout = self.document.layout_profile().hwp3_layout();
++        crate::renderer::composer::recalculate_section_vpos(
++            &mut self.document.sections[section_idx].paragraphs,
++            para_idx,
++            None,
++            stored_end_for_reset,
++            &self.styles,
++            self.dpi,
++            hwp3_layout,
++        );
++        self.recompose_section(section_idx);
++        self.paginate();
++        self.invalidate_page_tree_cache();
++        Ok(format!("{{\"ok\":true,\"fieldId\":{}}}", field_id))
++    }
++
+     /// 셀/글상자 내 문단의 커서 위치에서 필드를 제거한다.
+     pub fn remove_field_at_in_cell(
+         &mut self,
+@@ -2394,6 +2548,17 @@ impl DocumentCore {
+         }
+         max_id.saturating_add(1).max(1)
+     }
++
++    fn next_memo_index(&self) -> u32 {
++        self.collect_all_fields()
++            .iter()
++            .filter(|info| info.field.field_type == FieldType::Memo)
++            .map(|info| info.field.memo_index)
++            .max()
++            .unwrap_or(1)
++            .saturating_add(1)
++            .max(2)
++    }
+ }
+ 
+ pub(crate) fn collect_max_field_id(para: &Paragraph, max_id: &mut u32) {
+@@ -2501,6 +2666,94 @@ fn collect_shape_field_ids(shape: &ShapeObject, max_id: &mut u32) {
+     }
+ }
+ 
++fn validate_memo_input(text: &str, author: &str) -> Result<(), HwpError> {
++    let text_units = text.encode_utf16().count();
++    if text_units == 0 || text_units > 4000 || text.chars().any(char::is_control) {
++        return Err(HwpError::InvalidField(
++            "메모 본문은 제어 문자 없이 UTF-16 1~4000자여야 합니다.".into(),
++        ));
++    }
++    let author_len = author.chars().count();
++    if author_len == 0
++        || author_len > 128
++        || author
++            .chars()
++            .any(|ch| ch.is_control() || matches!(ch, '/' | '\\' | ';'))
++    {
++        return Err(HwpError::InvalidField(
++            "메모 작성자는 1~128자이며 '/', '\\', ';' 또는 제어 문자를 포함할 수 없습니다."
++                .into(),
++        ));
++    }
++    Ok(())
++}
++
++fn memo_author(command: &str) -> Option<&str> {
++    let mut parts = command.split('/');
++    if parts.next()? != "MEMO" {
++        return None;
++    }
++    parts.nth(4)
++}
++
++fn insert_memo_field_in_para(
++    para: &mut Paragraph,
++    char_offset: usize,
++    field_id: u32,
++    memo_index: u32,
++    text: &str,
++    author: &str,
++) -> Result<usize, HwpError> {
++    let host_para_shape = para.para_shape_id;
++    let host_style = para.style_id;
++    let host_char_shape = para
++        .char_shapes
++        .iter()
++        .filter(|shape| shape.start_pos as usize <= char_offset)
++        .last()
++        .map(|shape| shape.char_shape_id)
++        .unwrap_or(0);
++    let start = insert_click_here_field_in_para(para, char_offset, field_id, "", "", "", false)?;
++
++    let mut utf16_offset = 0u32;
++    let char_offsets = text
++        .chars()
++        .map(|ch| {
++            let current = utf16_offset;
++            utf16_offset += ch.len_utf16() as u32;
++            current
++        })
++        .collect();
++    let memo_para = Paragraph {
++        char_count: utf16_offset + 1,
++        para_shape_id: host_para_shape,
++        style_id: host_style,
++        text: text.to_string(),
++        char_offsets,
++        char_shapes: vec![CharShapeRef { start_pos: 0, char_shape_id: host_char_shape }],
++        has_para_text: true,
++        ..Default::default()
++    };
++    let field = para.controls.iter_mut().find_map(|control| match control {
++        Control::Field(field) if field.field_id == field_id => Some(field),
++        _ => None,
++    }).ok_or_else(|| HwpError::InvalidField("삽입한 메모 필드를 찾을 수 없습니다.".into()))?;
++    *field = Field {
++        field_type: FieldType::Memo,
++        command: format!("MEMO/65535/{}/{}/{}/{}/\\;;", memo_index, field_id, field_id, author),
++        properties: 0,
++        extra_properties: 0,
++        field_id,
++        ctrl_id: tags::FIELD_MEMO,
++        instance_id: Some(field_id),
++        memo_index,
++        memo_paragraphs: vec![memo_para],
++        memo_text_direction: Some("HORIZONTAL".to_string()),
++        ..Default::default()
++    };
++    Ok(start)
++}
++
+ fn insert_click_here_field_in_para(
+     para: &mut Paragraph,
+     char_offset: usize,
+@@ -2703,6 +2961,69 @@ fn remove_field_in_para(para: &mut Paragraph, char_offset: usize) -> Result<usize
+     Ok(control_idx)
+ }
+ 
++fn remove_point_memo_in_para(para: &mut Paragraph, field_id: u32) -> Result<usize, HwpError> {
++    let control_idx = para.controls.iter().position(|control| {
++        matches!(control, Control::Field(field)
++            if field.field_type == FieldType::Memo && field.field_id == field_id)
++    }).ok_or_else(|| HwpError::InvalidField("메모 필드를 찾을 수 없습니다.".into()))?;
++    let range_idx = para.field_ranges.iter().position(|range| range.control_idx == control_idx)
++        .ok_or_else(invalid_raw_slots)?;
++    let start = para.field_ranges[range_idx].start_char_idx;
++    let end = para.field_ranges[range_idx].end_char_idx;
++    if start != end {
++        return Err(HwpError::InvalidField(
++            "범위 메모 삭제는 본문 보존 실측 전까지 지원하지 않습니다.".into(),
++        ));
++    }
++    let gaps = raw_slot_gaps(para)?;
++    let merged = gaps[start].1.saturating_sub(gaps[start].0);
++    if merged < 16 {
++        return Err(invalid_raw_slots());
++    }
++    let para_end = gaps[gaps.len() - 1].1.checked_sub(16).ok_or_else(invalid_raw_slots)?;
++    para.field_ranges.remove(range_idx);
++    let slots = gaps[start].0 + merged - 16;
++    let shift = |position: &mut u32| {
++        if *position > slots {
++            *position = position.saturating_sub(16).max(slots);
++        }
++    };
++    for position in &mut para.char_offsets {
++        shift(position);
++    }
++    for shape in &mut para.char_shapes {
++        shift(&mut shape.start_pos);
++    }
++    for range in &mut para.range_tags {
++        shift(&mut range.start);
++        shift(&mut range.end);
++    }
++    for mark in &mut para.markpen_marks {
++        if let Some(position) = &mut mark.utf16_pos {
++            shift(position);
++        }
++    }
++    para.char_count = para_end + 1;
++    let shapes = std::mem::take(&mut para.char_shapes);
++    for shape in shapes {
++        if para.char_shapes.last().is_some_and(|last| last.start_pos == shape.start_pos) {
++            para.char_shapes.pop();
++        }
++        para.char_shapes.push(shape);
++    }
++    para.invalidate_layout_inputs();
++    para.controls.remove(control_idx);
++    if control_idx < para.ctrl_data_records.len() {
++        para.ctrl_data_records.remove(control_idx);
++    }
++    for range in &mut para.field_ranges {
++        if range.control_idx > control_idx {
++            range.control_idx -= 1;
++        }
++    }
++    Ok(control_idx)
++}
++
+ fn invalid_raw_slots() -> HwpError {
+     HwpError::InvalidField("누름틀의 원시 슬롯 위치를 확인할 수 없습니다.".into())
+ }
+diff --git a/src/serializer/hwpx/section.rs b/src/serializer/hwpx/section.rs
+index cfd3560..ad6924b 100644
+--- a/src/serializer/hwpx/section.rs
++++ b/src/serializer/hwpx/section.rs
+@@ -2705,6 +2705,30 @@ fn generated_field_parameters(field: &Field) -> Option<String> {
+             }
+         }
+     }
++    // API로 만든 MEMO도 Number/Author를 명시해야 HWPX 재열기 뒤 memo_index와 작성자가
++    // 보존된다. Command 하나만 쓰면 본문과 앵커는 남지만 Number가 0으로 저하되어,
++    // 이어서 HWP로 저장할 때 memo list 결합 근거가 사라진다.
++    if field.field_type == crate::model::control::FieldType::Memo
++        && field.command.starts_with("MEMO/")
++    {
++        let tokens: Vec<&str> = field.command.split('/').collect();
++        let shape = tokens.get(1).copied().unwrap_or("65535");
++        let number = tokens.get(2).copied().unwrap_or("1");
++        let author = tokens.get(5).copied().unwrap_or("");
++        return Some(format!(
++            concat!(
++                r#"<hp:parameters cnt="6" name="">"#,
++                r#"<hp:integerParam name="Prop">0</hp:integerParam>"#,
++                r#"<hp:stringParam name="Command">{}</hp:stringParam>"#,
++                r#"<hp:stringParam name="ID">memo{}</hp:stringParam>"#,
++                r#"<hp:integerParam name="Number">{}</hp:integerParam>"#,
++                r#"<hp:stringParam name="Author">{}</hp:stringParam>"#,
++                r#"<hp:stringParam name="MemoShapeIDRef">{}</hp:stringParam></hp:parameters>"#,
++            ),
++            xml_escape(&field.command), xml_escape(number), xml_escape(number),
++            xml_escape(author), xml_escape(shape),
++        ));
++    }
+     Some(format!(
+         r#"<hp:parameters cnt="1" name=""><hp:stringParam name="Command">{}</hp:stringParam></hp:parameters>"#,
+         xml_escape(&field.command),
+diff --git a/src/wasm_api.rs b/src/wasm_api.rs
+index a2f8978..b63fc7a 100644
+--- a/src/wasm_api.rs
++++ b/src/wasm_api.rs
+@@ -5430,6 +5430,12 @@ impl HwpDocument {
+         self.get_field_list_json()
+     }
+ 
++    /// MEMO 필드의 본문과 앵커 목록을 반환한다 (B092/B136 최소 안전 범위).
++    #[wasm_bindgen(js_name = getCommentListV1)]
++    pub fn get_comment_list_v1(&self) -> String {
++        self.get_comment_list_v1_json()
++    }
++
+     /// field_id로 필드 값을 조회한다.
+     ///
+     /// 반환: `{ok, value}`
+@@ -5491,6 +5497,26 @@ impl HwpDocument {
+         .map_err(|e| e.into())
+     }
+ 
++    /// 본문 단일 지점에 MEMO 필드를 삽입한다.
++    #[wasm_bindgen(js_name = insertCommentAtCursorV1)]
++    pub fn insert_comment_at_cursor_v1_api(
++        &mut self,
++        section_idx: u32,
++        para_idx: u32,
++        char_offset: u32,
++        text: &str,
++        author: &str,
++    ) -> Result<String, JsValue> {
++        self.insert_comment_at_cursor_v1(
++            section_idx as usize,
++            para_idx as usize,
++            char_offset as usize,
++            text,
++            author,
++        )
++        .map_err(|error| error.into())
++    }
++
+     /// `insertClickHereField` 의 options object 변형 (#1413).
+     ///
+     /// options JSON 키: `{ sectionIdx, paraIdx, charOffset?, guide?, memo?, name?, editable? }`.
+@@ -5913,6 +5938,21 @@ impl HwpDocument {
+         }
+     }
+ 
++    /// API가 만든 본문 단일 지점 MEMO 필드를 id로 제거한다.
++    #[wasm_bindgen(js_name = removeCommentV1)]
++    pub fn remove_comment_v1_api(&mut self, field_id: u32) -> String {
++        match self.remove_comment_v1(field_id) {
++            Ok(value) => value,
++            Err(error) => {
++                let escaped = error
++                    .to_string()
++                    .replace('\\', "\\\\")
++                    .replace('"', "\\\"");
++                format!("{{\"ok\":false,\"error\":\"{}\"}}", escaped)
++            }
++        }
++    }
++
+     /// 커서 위치의 누름틀 필드를 제거한다 (셀/글상자 내 문단).
+     #[wasm_bindgen(js_name = removeFieldAtInCell)]
+     pub fn remove_field_at_in_cell_api(

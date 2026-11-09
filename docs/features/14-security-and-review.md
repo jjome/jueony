@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | — 상세 작업 없음 | 완료 0/11 · 부분 5 · 미구현 6 |
-| 검증 | — 상세 작업 없음 | 완료 0/11 · 부분 4 · 미검증 7 |
+| 구현 | — 상세 작업 없음 | 완료 0/11 · 부분 6 · 미구현 5 |
+| 검증 | — 상세 작업 없음 | 완료 0/11 · 부분 5 · 미검증 6 |
 | Agent 연결 | — 상세 작업 없음 | 연결 0/11 · 부분 0 · 미연결 11 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -66,7 +66,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B146](<14-security-and-review.md#b146>) · 범위 | 개인 정보 변환 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B146](<14-security-and-review.md#b146>) · 범위 | 개인 정보 변환 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 ## 항목별 완료조건·근거
 
@@ -208,12 +208,12 @@
 <summary>B146 · 개인 정보 변환</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 찾기·바로 바꾸기 대상별 검사
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 단일 최상위 본문 선택에서 주민등록번호·국내 전화번호·전자우편을 명시적으로 선택해 길이와 구분자를 보존한 채 마스킹하고 문서·revision·선택·원문·계획 fingerprint를 재검증한다.
+- 다음 작업: dbdb307f 선택 검사 4/4 및 실제 HWP/HWPX 재열기·정확한 undo/redo·stale/실패 바이트 불변 통과. 문서 전체 찾기·바로 바꾸기 UI와 사용자 패턴은 남음.
+- 근거: [personal-info-conversion-b146.ts](<../../apps/editor/src/adapters/rhwp/personal-info-conversion-b146.ts>) · [personal-info-conversion-b146.test.ts](<../../apps/editor/tests/personal-info-conversion-b146.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_SELECTED_PERSONAL_INFO_MASKING_2026_11_09`
 
 </details>
 

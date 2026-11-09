@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | — 상세 작업 없음 | 완료 0/23 · 부분 6 · 미구현 17 |
-| 검증 | — 상세 작업 없음 | 완료 0/23 · 부분 3 · 미검증 20 |
+| 구현 | — 상세 작업 없음 | 완료 0/23 · 부분 8 · 미구현 15 |
+| 검증 | — 상세 작업 없음 | 완료 0/23 · 부분 5 · 미검증 18 |
 | Agent 연결 | — 상세 작업 없음 | 연결 0/23 · 부분 0 · 미연결 23 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -41,7 +41,7 @@
 | [B012](<15-output-and-tools.md#b012>) · 범위 | PDF 저장 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B013](<15-output-and-tools.md#b013>) · 범위 | 모바일 문서 저장 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B015](<15-output-and-tools.md#b015>) · 범위 | DAISY 문서 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B016](<15-output-and-tools.md#b016>) · 범위 | CCL·공공누리 표시 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B016](<15-output-and-tools.md#b016>) · 범위 | CCL·공공누리 표시 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B017](<15-output-and-tools.md#b017>) · 범위 | 점자 변환 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B018](<15-output-and-tools.md#b018>) · 범위 | 한컴독스·메일·웹 보내기 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 
@@ -76,7 +76,7 @@
 | [B143](<15-output-and-tools.md#b143>) · 범위 | 차례·색인 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B144](<15-output-and-tools.md#b144>) · 범위 | 참고 문헌 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B145](<15-output-and-tools.md#b145>) · 범위 | 문서 찾기 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B147](<15-output-and-tools.md#b147>) · 범위 | 프레젠테이션 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B147](<15-output-and-tools.md#b147>) · 범위 | 프레젠테이션 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-5"></a>
 
@@ -162,12 +162,12 @@
 <summary>B016 · CCL·공공누리 표시</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 하위 라이선스 표시 기능 없음
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: CCL 6종과 공공누리 4종을 닫힌 enum으로 제한하고 외부 이미지·URL·네트워크 없이 검증된 텍스트 표식을 최상위 본문 커서에 한 snapshot으로 삽입한다.
+- 다음 작업: 67ee760c 선택 검사 4/4 및 실제 HWP/HWPX 재열기·정확한 undo/redo·실패 rollback 통과. 시각 로고·표시 위치 UI·명령 등록은 남음.
+- 근거: [license-mark-b016.ts](<../../apps/editor/src/adapters/rhwp/license-mark-b016.ts>) · [license-mark-b016.test.ts](<../../apps/editor/tests/license-mark-b016.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_OFFLINE_LICENSE_TEXT_MARK_2026_11_09`
 
 </details>
 
@@ -345,12 +345,12 @@
 <summary>B147 · 프레젠테이션</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 실행·범위·설정 없음
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 문서 전체 또는 단일 구역의 고정된 쪽 범위에서 전체 화면 시작·다음·이전·지정 쪽·종료를 수행하며 identity·revision·쪽 목록 fingerprint 변경을 이동 전에 차단한다.
+- 다음 작업: 5fe1df94 선택 검사 5/5 및 실제 HWP/HWPX 세션·재열기·export 바이트·기존 undo snapshot 불변 통과. Studio 전체화면·페이지 렌더러 UI 연결은 남음.
+- 근거: [presentation-session-b147.ts](<../../apps/editor/src/adapters/browser/presentation-session-b147.ts>) · [presentation-session-b147.test.ts](<../../apps/editor/tests/presentation-session-b147.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_PRESENTATION_SESSION_CORE_2026_11_09`
 
 </details>
 

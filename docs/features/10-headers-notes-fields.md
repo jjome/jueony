@@ -147,10 +147,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 미주 내용 번호 작은 크기를 section 소유 shape API·stale guard·snapshot undo/redo로 적용하고 HWP/HWPX 저장 재열기를 검증함. 실제 대화상자 연결과 각주 대응 public API는 남음.
+- 다음 작업: 미주에 이어 각주 내용 번호 작은 크기의 전용 Rust shape API를 추가하고 section 소유·문서/revision/shape fingerprint·snapshot undo/redo를 보호했다. 새 고정 WASM에서 각주 HWP/HWPX 저장 재열기와 정확한 undo/redo를 검증함. 실제 각주·미주 대화상자 연결과 다른 모양 옵션은 남음.
 - UI 명령: `insert:endnote-shape`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [endnote-content-number-size-b087.ts](<../../apps/editor/src/adapters/rhwp/endnote-content-number-size-b087.ts>) · [endnote-content-number-size-b087.test.ts](<../../apps/editor/tests/endnote-content-number-size-b087.test.ts>)
-- 원래 기록: `PARTIAL;SCOPED_WASM_ROUNDTRIP_PASS_2026_11_09`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [endnote-content-number-size-b087.ts](<../../apps/editor/src/adapters/rhwp/endnote-content-number-size-b087.ts>) · [endnote-content-number-size-b087.test.ts](<../../apps/editor/tests/endnote-content-number-size-b087.test.ts>) · [footnote-content-number-size-b087.ts](<../../apps/editor/src/adapters/rhwp/footnote-content-number-size-b087.ts>) · [footnote-content-number-size-b087.test.ts](<../../apps/editor/tests/footnote-content-number-size-b087.test.ts>) · [zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-footnote-number-size-api.patch](<../../engine/patches/zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-footnote-number-size-api.patch>)
+- 원래 기록: `PARTIAL;SCOPED_FOOTNOTE_ENDNOTE_WASM_ROUNDTRIP_PASS_2026_11_09`
 
 </details>
 

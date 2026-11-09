@@ -225,10 +225,10 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ◐ 부분.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 8×10 격자와 1~256 키 입력·4096칸 상한·stale 차단·단일 snapshot·HWP/HWPX 재열기 검증 완료. 실제 Studio table:create 입력 경로 연결과 비어 있지 않은 문단·다구역·고급 크기 옵션은 남음.
+- 다음 작업: 8×10 격자·1~256 키 입력·4096칸 상한과 비어 있지 않은 최상위 본문 문단의 중간/끝 삽입을 단일 snapshot으로 구현하고 앞뒤 텍스트·글자 서식·HWP/HWPX 재열기를 검증함. 실제 Studio table:create 경로·글 있는 문단 offset 0·다구역·고급 크기 옵션은 남음.
 - UI 명령: `table:create`
 - 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [table-create-b067.ts](<../../apps/editor/src/adapters/rhwp/table-create-b067.ts>) · [table-create-b067.test.ts](<../../apps/editor/tests/table-create-b067.test.ts>)
-- 원래 기록: `PARTIAL;SCOPED_WASM_ROUNDTRIP_PASS_2026_11_09`
+- 원래 기록: `PARTIAL;SCOPED_BODY_INSERT_ROUNDTRIP_PASS_2026_11_09`
 
 </details>
 
@@ -548,9 +548,9 @@
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 일반 Tab·Shift+Tab과 문서 Ctrl+Tab 소유권을 분리하고 stale·IME·선택·중첩 마지막 셀을 차단하는 실행 경계를 검증함. 실제 InputHandler와 원자적 마지막 행 추가 연결은 남음.
+- 다음 작업: 일반 Tab·Shift+Tab과 문서 Ctrl+Tab 소유권을 분리하고 단순 최상위 표 마지막 셀에서 실제 insertTableRow·단일 snapshot·서식 fingerprint·새 첫 셀 이동·rollback을 검증했다. HWP/HWPX 재열기도 통과했다. 실제 InputHandler가 정확한 증거를 공급하고 transition을 전역 undo 이력에 채택하는 연결은 남음.
 - 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [table-cell-tab-routing-b173.ts](<../../apps/editor/src/shortcuts/table-cell-tab-routing-b173.ts>) · [table-cell-tab-routing-b173.test.ts](<../../apps/editor/tests/table-cell-tab-routing-b173.test.ts>)
-- 원래 기록: `PARTIAL;SCOPED_ROUTING_TEST_PASS_2026_11_09`
+- 원래 기록: `PARTIAL;SCOPED_ATOMIC_APPEND_ROUNDTRIP_PASS_2026_11_09`
 
 </details>
 

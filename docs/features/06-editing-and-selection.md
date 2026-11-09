@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | 완료 🟢 **15/15** · 부분 0 | 완료 0/20 · 부분 20 |
-| 검증 | 완료 0/15 · 부분 15 | 완료 0/20 · 부분 9 · 미검증 11 |
+| 검증 | 완료 0/15 · 부분 15 | 완료 0/20 · 부분 10 · 미검증 10 |
 | Agent 연결 | 연결 🟢 **4/4** · 부분 0 · 해당 없음 11 | 연결 0/20 · 부분 2 · 미연결 18 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -120,7 +120,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B090](<06-editing-and-selection.md#b090>) · 범위 | 문자표 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B090](<06-editing-and-selection.md#b090>) · 범위 | 문자표 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-9"></a>
 
@@ -405,13 +405,13 @@
 <summary>B090 · 문자표</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 유니코드·옛한글·최근 값 검사
+- 다음 작업: 1~8개 Unicode scalar와 옛한글 자모열을 정규화 없이 삽입하고 제어문자·stale·보호/특수 문맥을 차단한다. 최근 문자 20개 검증·중복 제거·best-effort 저장과 HWP/HWPX 재열기를 확인함. 실제 문자표 대화상자·범주/검색·Studio insert:symbols 연결은 남음.
 - UI 명령: `insert:symbols`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `WIRED;NOT_RUN`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [symbol-insertion-b090.ts](<../../apps/editor/src/adapters/rhwp/symbol-insertion-b090.ts>) · [symbol-insertion-b090.test.ts](<../../apps/editor/tests/symbol-insertion-b090.test.ts>)
+- 원래 기록: `PARTIAL;SCOPED_UNICODE_ROUNDTRIP_PASS_2026_11_09`
 
 </details>
 

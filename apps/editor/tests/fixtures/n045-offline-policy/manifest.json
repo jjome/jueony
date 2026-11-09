@@ -25,8 +25,16 @@
     { "path": "LICENSE.rhwp.txt", "minBytes": 10 },
     { "path": "THIRD_PARTY_NOTICES.md", "minBytes": 10 },
     { "path": "THIRD_PARTY_LICENSES.rhwp.md", "minBytes": 10 },
+    { "path": "runtime/webview2/LICENSE.txt", "minBytes": 10 },
+    { "path": "runtime/webview2/THIRD_PARTY_NOTICES.txt", "minBytes": 10 },
     { "path": "fonts/FONTS.md", "minBytes": 10 },
     { "path": "fonts/SourceHanSerifK-OFL.txt", "minBytes": 10 }
   ],
+  "webView2FixedRuntimeManifest": {
+    "path": "runtime/webview2/fixed-runtime.manifest.json",
+    "minBytes": 100,
+    "version": "130.0.2849.80",
+    "architecture": "x64"
+  },
   "scanExtensions": [".html", ".css", ".js", ".webmanifest"]
 }

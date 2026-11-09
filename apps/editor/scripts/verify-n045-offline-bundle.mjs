@@ -14,9 +14,9 @@ try { report = await auditN045OfflineBundle(root, policy); } catch (error) { fai
 const result = report ? { ...report } : { schemaVersion: 1, policyId: policy.policyId, status: 'FAIL_OFFLINE_BUNDLE', failure };
 result.endpointPolicy = { configuredEntries: 0, defaultExternalRequestAllowed: false };
 result.limitations = [
-  '정적 번들 자산과 절대 네트워크 literal을 검사한 결과이며 운영체제 전체 트래픽 계측은 아니다.',
+  '정적 번들 자산과 WebView2 고정 버전 오프라인 artifact manifest를 검사한 결과이며, 최종 설치본의 실제 런타임 로딩과 운영체제 전체 트래픽 계측은 아니다.',
   '기관 endpoint allowlist는 비어 있어 외부 요청을 기본 거절한다. 실제 기관 주소는 배포 승인 뒤 별도 주입해야 한다.',
-  'WebView2 고정 버전/오프라인 설치 파일과 최종 설치 패키지 서명·고지는 이 검사 범위 밖이다.',
+  'WebView2 artifact·license·notice는 로컬 상대경로와 정확한 SHA-256으로 확인하지만 최종 설치 패키지 서명과 기관 배포 승인 여부는 이 검사 범위 밖이다.',
 ];
 const output = process.env.JUEONY_OFFLINE_OUTPUT;
 if (output) {

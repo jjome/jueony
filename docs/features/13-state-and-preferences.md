@@ -21,8 +21,8 @@
 ## 먼저 할 일
 
 - **구현** [N014](<13-state-and-preferences.md#n014>) **글상자 내부 커서·선택 복원** — commit 170787f4 기준 root Rectangle 글상자의 다문단 정·역방향 선택과 빈 문단 caret을 identity·revision·story·owner·geometry seal로 복원했다. 실제 HWP/HWPX 재열기·bytes 불변·undo snapshot과 stale/tamper/caption/nested 사전 차단 선별 3/3을 통과했다. Preferences/UI 연결·nested/caption owner 복원·그룹 특수 story·실제 앱 재시작·한글 비교는 남아 부분이다.
-- **구현** [N015](<13-state-and-preferences.md#n015>) **다중 개체·그룹 선택 복원** — 선택 검증 36/36과 실제 custom engine의 수식 HWP/HWPX 저장·재열기·bytes invariant를 통과했다. 단일·mixed·nested 수식과 OLE·table 선택은 계속 fail-closed이며 OLE payload typed property API와 table multi-restore port가 없다. 실제 앱 재시작·한글 비교도 남아 부분이다.
-- **구현** [N016](<13-state-and-preferences.md#n016>) **미주·나머지 특수 영역 선택 복원** — commit b096acda 기준 nested table-cell depth 1~8 신규 선별 10/10과 root 회귀 29/29 및 관련 묶음 42/42를 통과했다. 기존 root 선택·table-cell HWP/HWPX 증거를 유지하며 partial/empty/caption/overlap/기타 field와 nested/caption object·실제 앱 재시작·한글 직접 비교는 남아 부분이다.
+- **구현** [N015](<13-state-and-preferences.md#n015>) **다중 개체·그룹 선택 복원** — commit f28152cf 기준 단일 root 수식 신규 3/3과 기존 선택 묶음을 통과했다. 실제 HWP/HWPX 저장·재열기·exact bytes invariant 및 선택 상태 undo/redo를 검증했다. mixed·nested 수식과 OLE·table 선택은 계속 fail-closed이며 OLE payload typed property API와 table multi-restore port가 없다. 실제 Studio 통합·앱 재시작·한글 비교도 남아 부분이다.
+- **구현** [N016](<13-state-and-preferences.md#n016>) **미주·나머지 특수 영역 선택 복원** — commit 414dfa55 기준 partial ClickHere 신규 3/3을 통과했고 실제 HWP/HWPX 저장·재열기에서 정·역방향 readback·bytes와 undo snapshot 불변을 검증했다. 기존 nested full selection 증거도 유지한다. 빈 필드 커서·셀 안 partial·caption·overlap·기타 field·nested/caption object·실제 앱 재시작·한글 직접 비교는 남아 부분이다.
 
 ## 기능별 작업표
 
@@ -767,11 +767,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
-- 완료 범위: top-level root vector shape 2~32개·중첩 group·embedded 이미지 2개 이상과 root 수식 2개 이상의 ordered selection·활성 개체·owner/root 주소·수식 속성·host/document private SHA 지문·canonical 문서 지문을 SessionCursor/Studio capture·restore wire에 연결
-- 다음 작업: 선택 검증 36/36과 실제 custom engine의 수식 HWP/HWPX 저장·재열기·bytes invariant를 통과했다. 단일·mixed·nested 수식과 OLE·table 선택은 계속 fail-closed이며 OLE payload typed property API와 table multi-restore port가 없다. 실제 앱 재시작·한글 비교도 남아 부분이다.
+- 완료 범위: top-level root vector shape 2~32개·중첩 group·embedded 이미지 2개 이상과 root 수식 단일 또는 2개 이상의 ordered selection·활성 개체·owner/root 주소·수식 속성·host/document private SHA 지문·canonical 문서 지문을 검증해 복원한다.
+- 다음 작업: commit f28152cf 기준 단일 root 수식 신규 3/3과 기존 선택 묶음을 통과했다. 실제 HWP/HWPX 저장·재열기·exact bytes invariant 및 선택 상태 undo/redo를 검증했다. mixed·nested 수식과 OLE·table 선택은 계속 fail-closed이며 OLE payload typed property API와 table multi-restore port가 없다. 실제 Studio 통합·앱 재시작·한글 비교도 남아 부분이다.
 - 상위 항목: [S018](<13-state-and-preferences.md#s018>) 본문/표/개체 선택과 모드
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [session-object-selection.ts](<../../apps/editor/src/adapters/rhwp/session-object-selection.ts>) · [session-object-selection-images-n015.test.ts](<../../apps/editor/tests/session-object-selection-images-n015.test.ts>) · [session-object-selection-equations-n015.test.ts](<../../apps/editor/tests/session-object-selection-equations-n015.test.ts>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;DETACHED_GROUP_SELECTION_2026_11_08;GROUP_SELECTION_SESSION_WIRE_2026_11_09;EMBEDDED_MULTI_IMAGE_SELECTION_2026_11_09;ROOT_EQUATION_MULTI_SELECTION_2026_11_09`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [session-object-selection.ts](<../../apps/editor/src/adapters/rhwp/session-object-selection.ts>) · [object-selection-n015-single-equation.ts](<../../apps/editor/src/adapters/rhwp/object-selection-n015-single-equation.ts>) · [object-selection-n015-single-equation.test.ts](<../../apps/editor/tests/object-selection-n015-single-equation.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;DETACHED_GROUP_SELECTION_2026_11_08;GROUP_SELECTION_SESSION_WIRE_2026_11_09;EMBEDDED_MULTI_IMAGE_SELECTION_2026_11_09;ROOT_EQUATION_MULTI_SELECTION_2026_11_09;SINGLE_ROOT_EQUATION_SELECTION_2026_11_09`
 
 </details>
 
@@ -781,11 +781,11 @@
 - 종류: 실행 작업 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent — 해당 없음.
 - 검증 구분: 자동 **PASS** / 한글 **NA**.
-- 완료 범위: root-body 복원 계약과 table-cell 미주 owner 지문·저장 bytes 불변 증거를 유지하고 nested table-cell depth 1~8의 nonempty ClickHere exact full selection을 전체 owner chain으로 순방향·역방향 복원한다. partial/empty/caption/overlap/기타 field와 nested/caption object는 fail-closed
-- 다음 작업: commit b096acda 기준 nested table-cell depth 1~8 신규 선별 10/10과 root 회귀 29/29 및 관련 묶음 42/42를 통과했다. 기존 root 선택·table-cell HWP/HWPX 증거를 유지하며 partial/empty/caption/overlap/기타 field와 nested/caption object·실제 앱 재시작·한글 직접 비교는 남아 부분이다.
+- 완료 범위: root-body 복원 계약과 table-cell 미주 owner 지문·저장 bytes 불변 증거를 유지하고 nested table-cell depth 1~8의 nonempty ClickHere exact full selection과 최상위 본문 단일 ClickHere의 nonempty strict partial selection을 순방향·역방향 복원한다. empty/caption/overlap/기타 field와 nested/caption object는 fail-closed
+- 다음 작업: commit 414dfa55 기준 partial ClickHere 신규 3/3을 통과했고 실제 HWP/HWPX 저장·재열기에서 정·역방향 readback·bytes와 undo snapshot 불변을 검증했다. 기존 nested full selection 증거도 유지한다. 빈 필드 커서·셀 안 partial·caption·overlap·기타 field·nested/caption object·실제 앱 재시작·한글 직접 비교는 남아 부분이다.
 - 상위 항목: [S018](<13-state-and-preferences.md#s018>) 본문/표/개체 선택과 모드
-- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [session-endnote-owner-capability-n016.ts](<../../apps/editor/src/adapters/rhwp/session-endnote-owner-capability-n016.ts>) · [session-endnote-owner-capability-n016.test.ts](<../../apps/editor/tests/session-endnote-owner-capability-n016.test.ts>)
-- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;DETACHED_ENDNOTE_SELECTION_2026_11_08;ENDNOTE_SELECTION_SESSION_WIRE_2026_11_09;TABLE_CELL_ENDNOTE_CAPABILITY_2026_11_09;CLICKHERE_FULL_SELECTION_2026_11_09;TOP_LEVEL_CELL_CLICKHERE_2026_11_09;NESTED_CELL_CLICKHERE_2026_11_09`
+- 근거: [44-editor-stages-result.md](<../44-editor-stages-result.md>) · [143-non-agent-parallel-2026-11-08.md](<../143-non-agent-parallel-2026-11-08.md>) · [session-endnote-owner-capability-n016.ts](<../../apps/editor/src/adapters/rhwp/session-endnote-owner-capability-n016.ts>) · [special-selection-n016-clickhere-partial.ts](<../../apps/editor/src/adapters/rhwp/special-selection-n016-clickhere-partial.ts>) · [special-selection-n016-clickhere-partial.test.ts](<../../apps/editor/tests/special-selection-n016-clickhere-partial.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;DETACHED_ENDNOTE_SELECTION_2026_11_08;ENDNOTE_SELECTION_SESSION_WIRE_2026_11_09;TABLE_CELL_ENDNOTE_CAPABILITY_2026_11_09;CLICKHERE_FULL_SELECTION_2026_11_09;TOP_LEVEL_CELL_CLICKHERE_2026_11_09;NESTED_CELL_CLICKHERE_2026_11_09;TOP_LEVEL_CLICKHERE_PARTIAL_2026_11_09`
 
 </details>
 

@@ -202,6 +202,13 @@ existing HWP/HWPX picture+field wrap, save/reopen, exact undo/redo and rollback 
 
 N004는 동결된 206개 patch 엔진 `source-1c95e8f557d95b73`으로 네이티브 양형식과 격리 Edge 검사를 완료했다. N012는 실제 Rust 엔진의 양형식 저장·재열기에서 정의 연결 전파와 직접 서식 비전파를 확인했다. 한글 2024 직접 비교는 지시대로 실행하지 않았다.
 
+## 2026-11-09 08:43 KST 선택·개인정보 병렬 묶음
+
+- N015는 단일 최상위 root 수식 선택을 공개 Studio 포트로 복원한다. 실제 HWP/HWPX 저장·재열기와 선택 상태 undo/redo에서 export bytes가 바뀌지 않았고 신규 3/3을 통과했다. mixed·nested·OLE·table 선택과 앱 재시작 통합은 계속 fail-closed 또는 미지원이다.
+- N016은 최상위 본문에서 겹치지 않는 단일 ClickHere 필드의 비어 있지 않은 strict partial 선택을 정방향·역방향으로 복원한다. 신규 3/3과 양형식 재열기·readback·bytes/undo snapshot 불변을 통과했다. 빈 필드 커서·셀 안 partial·caption·기타 field는 남았다.
+- B130은 B146의 검증된 선택 마스킹을 동일 세션에서만 해제·재보호할 수 있는 메타데이터 영수증으로 감쌌다. B130+B146 7/7과 실제 HWP/HWPX 보호본·해제본 재열기 및 exact undo/redo를 통과했다. 영수증에는 원문·대체문·snapshot token·키가 없고 복제·다른 세션·dispose·stale 문서는 거절한다. UI·영속 보호·암호화·재시작 후 해제·한글 동등성은 완료로 표시하지 않는다.
+- 모듈 경계 감사 결과는 ok: true, diagnostics 0이었다. 이 묶음에서도 AI·Agent 실행과 참고 자료·검색·RAG는 수정하지 않았다.
+
 B071 Edge 검수에서는 차트 시나리오의 page 오류·console 오류·외부 요청이 모두 0이었다. 다만 공유 검수 빌드에서 차트와 무관한 favicon 404와 빈 문서 stored-time 초기화 API가 공식 npm WASM에 없는 오류가 별도로 관찰됐다. 소유 HWP/HWPX를 직접 연 차트 검수에는 영향을 주지 않았으며, 이 두 항목은 해결된 것으로 표시하지 않는다.
 
 ## 변경 집합
@@ -246,4 +253,7 @@ B071 Edge 검수에서는 차트 시나리오의 page 오류·console 오류·�
 - `8e3512eb feat(editor): warn before blank stored-time style apply`
 - `7d2bea41 build(editor): pin offline WebView2 runtime`
 - `4e1fcd17 test(editor): verify stored style UI roundtrip`
+- `f28152cf feat(editor): restore single equation selection`
+- `414dfa55 feat(editor): restore partial ClickHere selections`
+- `176ef801 feat(security): add session personal info protection`
 - AI·Agent 실행과 참고 자료·검색·RAG 코드는 이 묶음에서 변경하지 않았다.

@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | — 상세 작업 없음 | 완료 0/11 · 부분 8 · 미구현 3 |
-| 검증 | — 상세 작업 없음 | 완료 0/11 · 부분 8 · 미검증 3 |
+| 구현 | — 상세 작업 없음 | 완료 0/11 · 부분 9 · 미구현 2 |
+| 검증 | — 상세 작업 없음 | 완료 0/11 · 부분 9 · 미검증 2 |
 | Agent 연결 | — 상세 작업 없음 | 연결 0/11 · 부분 0 · 미연결 11 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -45,7 +45,7 @@
 | --- | --- | --- | --- | --- |
 | [B128](<14-security-and-review.md#b128>) · 범위 | 문서 암호 설정·변경·해제 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B129](<14-security-and-review.md#b129>) · 범위 | 배포용 문서 저장·편집 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B130](<14-security-and-review.md#b130>) · 범위 | 개인정보 보호·해제 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B130](<14-security-and-review.md#b130>) · 범위 | 개인정보 보호·해제 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B131](<14-security-and-review.md#b131>) · 범위 | 문서 보안 설정 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 
 <a id="work-3"></a>
@@ -115,12 +115,12 @@
 <summary>B130 · 개인정보 보호·해제</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 선택 및 검색·암호 변경 하위 항목
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 선택 영역 개인정보 마스킹을 세션 한정 보호 영수증과 exact snapshot 해제로 묶는다. 영수증에는 문서 identity·revision·범위·양형식 digest만 노출하고 원문·키·snapshot token은 반환하지 않는다.
+- 다음 작업: commit 176ef801 기준 B130+B146 선별 7/7과 실제 HWP/HWPX 보호·해제 저장 재열기 및 exact undo/redo를 통과했다. 복제 영수증·다른 세션·dispose·stale identity/revision/digest는 fail-closed다. UI·영속 보호·암호화·재시작 후 해제·한글 2024 동등성은 남아 부분이다.
+- 근거: [personal-info-protection-b130-session.ts](<../../apps/editor/src/adapters/rhwp/personal-info-protection-b130-session.ts>) · [personal-info-protection-b130-session.test.ts](<../../apps/editor/tests/personal-info-protection-b130-session.test.ts>) · [personal-info-conversion-b146.ts](<../../apps/editor/src/adapters/rhwp/personal-info-conversion-b146.ts>) · [personal-info-conversion-b146.test.ts](<../../apps/editor/tests/personal-info-conversion-b146.test.ts>)
+- 원래 기록: `EXPLICIT_REMAINING_OR_AUDIT;SESSION_PERSONAL_INFO_PROTECTION_2026_11_09`
 
 </details>
 

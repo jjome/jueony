@@ -1,10 +1,12 @@
 import { TextTransformDialog } from '../browser/text-transform-dialog.ts';
 import { PlainTextDialog } from '../browser/plain-text-dialog.ts';
+import { SymbolDialogB090, createSymbolRecentStoreB090 } from '../browser/symbol-dialog-b090.ts';
 import { executeTextTransform, preflightTextTransform, readTextTransformPlan } from './text-transform-native.ts';
 import { executePlainText, preflightPlainText, readPlainTextPlan } from './plain-text-native.ts';
 import { readMultiParagraphPlainTextPlan, replaceMultiParagraphPlainText } from './multi-paragraph-plain-text.ts';
 import type { MultiParagraphPlainTextPlan, MultiParagraphPlainTextReceipt, MultiParagraphTextRange } from './multi-paragraph-plain-text.ts';
 import type { TextTransform } from '../../modules/document/public/text-transform.ts';
+import { applySymbolInsertionB090, captureSymbolInsertionB090, validateSymbolB090, type SymbolInsertionPlanB090 } from './symbol-insertion-b090.ts';
 
 const same = (left: unknown, right: unknown): boolean => JSON.stringify(left) === JSON.stringify(right);
 const revision = (value: unknown): string => {
@@ -111,6 +113,29 @@ export function installBasicTextCommands(registry: any, input: () => any, eventB
     eventBus.emit('command-state-changed');
   };
   registry.register({ id: 'edit:paste-special', label: '골라 붙이기 (텍스트만)', opensDialog: true, canExecute: plainCan, execute: () => { const current = guard(plainCan); new PlainTextDialog(text => insert(text, current)).show(); } });
+  const symbolCan = (context: any) => {
+    try {
+      const editor = api(), ih = input();
+      if (!safe(context) || context.inTable || ih?.active !== true || ih.cursor.hasSelection()
+        || typeof editor?.revision !== 'function') return false;
+      captureSymbolInsertionB090(ih, context, revision(editor.revision()), '·');
+      return true;
+    } catch { return false; }
+  };
+  registry.register({
+    id: 'insert:symbols', label: '문자표', icon: 'icon-symbols', shortcutLabel: 'Alt+F10', opensDialog: true, canExecute: symbolCan,
+    execute: () => {
+      const editor = api(), ih = input(), context = automation().getContext(), openedRevision = revision(editor.revision());
+      const seed = captureSymbolInsertionB090(ih, context, openedRevision, '·');
+      let store;
+      try { store = createSymbolRecentStoreB090(window.localStorage); } catch { store = undefined; }
+      new SymbolDialogB090(symbol => {
+        const plan: SymbolInsertionPlanB090 = Object.freeze({ ...seed, symbol: validateSymbolB090(symbol) });
+        applySymbolInsertionB090(input(), automation().getContext(), revision(editor.revision()), plan, store);
+        eventBus.emit('command-state-changed');
+      }, store).show();
+    },
+  });
   const characters = [
     ['insert:nonbreaking-space', '묶음 빈 칸 (Unicode)', '\u00a0'],
     ['insert:fixed-space', '고정폭 빈 칸 (Unicode)', '\u2007'],

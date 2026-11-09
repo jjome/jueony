@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 7/11 · 부분 4 | 완료 1/30 · 부분 25 · 미구현 4 |
-| 검증 | 완료 4/11 · 부분 7 | 완료 0/30 · 부분 10 · 미검증 20 |
+| 구현 | 완료 7/11 · 부분 4 | 완료 1/30 · 부분 27 · 미구현 2 |
+| 검증 | 완료 4/11 · 부분 7 | 완료 0/30 · 부분 12 · 미검증 18 |
 | Agent 연결 | 연결 🟢 **1/1** · 부분 0 · 해당 없음 10 | 연결 0/30 · 부분 0 · 미연결 30 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -75,7 +75,7 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B058](<12-ui-and-shortcuts.md#b058>) · 범위 | 탐색 작업 창 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B059](<12-ui-and-shortcuts.md#b059>) · 범위 | 책갈피·개요·클립보드 작업 창 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B059](<12-ui-and-shortcuts.md#b059>) · 범위 | 책갈피·개요·클립보드 작업 창 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B060](<12-ui-and-shortcuts.md#b060>) · 범위 | 번역·사전·스크립트 작업 창 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B062](<12-ui-and-shortcuts.md#b062>) · 범위 | 편집 화면 분할 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B063](<12-ui-and-shortcuts.md#b063>) · 범위 | 문서 창 배열 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
@@ -105,7 +105,7 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B148](<12-ui-and-shortcuts.md#b148>) · 범위 | 글자판 설정 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
-| [B150](<12-ui-and-shortcuts.md#b150>) · 범위 | 사용자 설정 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B150](<12-ui-and-shortcuts.md#b150>) · 범위 | 사용자 설정 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B151](<12-ui-and-shortcuts.md#b151>) · 범위 | 환경 설정 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B152](<12-ui-and-shortcuts.md#b152>) · 범위 | 스킨 설정 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 
@@ -396,12 +396,12 @@
 <summary>B059 · 책갈피·개요·클립보드 작업 창</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 대화상자 기능과 작업창 구분
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 검증된 본문 책갈피·개요와 업무별 클립보드 기록을 하나의 읽기 전용 작업 창 상태로 투영하고 문서 identity·revision·목록 fingerprint·workspace scope를 재검증한다.
+- 다음 작업: a0a381ab 선택 검사 5/5 및 실제 HWP/HWPX 바이트·undo snapshot 불변 통과. Studio 작업 창 UI와 설정 저장 연결은 남음.
+- 근거: [bookmark-outline-clipboard-pane-b059.ts](<../../apps/editor/src/adapters/browser/bookmark-outline-clipboard-pane-b059.ts>) · [bookmark-outline-clipboard-pane-b059.test.ts](<../../apps/editor/tests/bookmark-outline-clipboard-pane-b059.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_READ_ONLY_TASK_PANE_STATE_2026_11_09`
 
 </details>
 
@@ -474,12 +474,12 @@
 <summary>B150 · 사용자 설정</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 메뉴/도구/키매핑 사용자 편집 없음
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 메뉴·도구 모음·키매핑만 포함하는 이식 가능 v1 사용자 프로필과 allowlist·크기 제한·단축키 충돌 검사·revision CAS·원자적 롤백 저장소를 제공한다.
+- 다음 작업: 0bed1a17·3418b2da 선택 검사 6/6 및 strict TypeScript·모듈 경계 검사 통과. 실제 설정 UI와 Studio 명령 소비 연결은 남음.
+- 근거: [user-profile-b150.ts](<../../apps/editor/src/modules/preferences/application/user-profile-b150.ts>) · [index.ts](<../../apps/editor/src/modules/preferences/public/index.ts>) · [atomic-user-profile-repository-b150.ts](<../../apps/editor/src/adapters/browser/atomic-user-profile-repository-b150.ts>) · [user-profile-b150.test.ts](<../../apps/editor/tests/user-profile-b150.test.ts>)
+- 원래 기록: `PARTIAL;PASS;PORTABLE_USER_CUSTOMIZATION_PROFILE_2026_11_09`
 
 </details>
 

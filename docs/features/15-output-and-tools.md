@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | — 상세 작업 없음 | 완료 0/23 · 부분 5 · 미구현 18 |
-| 검증 | — 상세 작업 없음 | 완료 0/23 · 부분 2 · 미검증 21 |
+| 구현 | — 상세 작업 없음 | 완료 0/23 · 부분 6 · 미구현 17 |
+| 검증 | — 상세 작업 없음 | 완료 0/23 · 부분 3 · 미검증 20 |
 | Agent 연결 | — 상세 작업 없음 | 연결 0/23 · 부분 0 · 미연결 23 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -72,7 +72,7 @@
 | [B137](<15-output-and-tools.md#b137>) · 범위 | 맞춤법 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B138](<15-output-and-tools.md#b138>) · 범위 | 한컴·한자·유의어 사전 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B139](<15-output-and-tools.md#b139>) · 범위 | 번역 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B140](<15-output-and-tools.md#b140>) · 범위 | 빠른 교정·자동 실행 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B140](<15-output-and-tools.md#b140>) · 범위 | 빠른 교정·자동 실행 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B143](<15-output-and-tools.md#b143>) · 범위 | 차례·색인 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B144](<15-output-and-tools.md#b144>) · 범위 | 참고 문헌 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B145](<15-output-and-tools.md#b145>) · 범위 | 문서 찾기 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
@@ -293,12 +293,12 @@
 <summary>B140 · 빠른 교정·자동 실행</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 사용자 사전·옵션·수명 비교 필요
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 명시적 사용자 오타 규칙으로 단일 최상위 본문 선택을 안전하게 교정하며 문서·revision·선택·원문·규칙 fingerprint를 적용 직전에 재검증한다.
+- 다음 작업: ac0a4f29 실제 HWP/HWPX 저장·재열기와 정확한 undo/redo 및 실패 시 바이트 불변 4/4 통과. 입력 자동 감시와 UI·사용자 사전 저장은 남음.
+- 근거: [quick-correction-manual-b140.ts](<../../apps/editor/src/adapters/rhwp/quick-correction-manual-b140.ts>) · [quick-correction-manual-b140.test.ts](<../../apps/editor/tests/quick-correction-manual-b140.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_MANUAL_QUICK_CORRECTION_2026_11_09`
 
 </details>
 

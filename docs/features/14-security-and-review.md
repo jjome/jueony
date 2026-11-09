@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | — 상세 작업 없음 | 완료 0/11 · 부분 6 · 미구현 5 |
-| 검증 | — 상세 작업 없음 | 완료 0/11 · 부분 5 · 미검증 6 |
+| 구현 | — 상세 작업 없음 | 완료 0/11 · 부분 7 · 미구현 4 |
+| 검증 | — 상세 작업 없음 | 완료 0/11 · 부분 6 · 미검증 5 |
 | Agent 연결 | — 상세 작업 없음 | 연결 0/11 · 부분 0 · 미연결 11 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -54,7 +54,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B132](<14-security-and-review.md#b132>) · 범위 | 교정 부호·자료 연결 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B132](<14-security-and-review.md#b132>) · 범위 | 교정 부호·자료 연결 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B133](<14-security-and-review.md#b133>) · 범위 | 변경 내용 추적·표시 | ☐ 미구현 | ◐ 부분 | ☐ 미연결 |
 | [B134](<14-security-and-review.md#b134>) · 범위 | 문서 이력 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B135](<14-security-and-review.md#b135>) · 범위 | 문서 비교 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
@@ -141,12 +141,12 @@
 <summary>B132 · 교정 부호·자료 연결</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 검토 도구 미연결
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 명시적 local source의 삽입·삭제·바꾸기·자리 바꿈·띄어쓰기·문장 부호 표식을 최상위 본문 범위에 검증하고 문서 identity·revision·원문·문단 fingerprint로 결정적 읽기 전용 overlay anchor를 만든다.
+- 다음 작업: 커밋 213e1ef3에서 실제 HWP/HWPX export·재열기·기존 undo snapshot 불변 4/4 통과. 네이티브 교정부호 저장·자료 연결·Studio overlay UI·특수 story는 미구현.
+- 근거: [proofreading-marks-b132.ts](<../../apps/editor/src/adapters/rhwp/proofreading-marks-b132.ts>) · [proofreading-marks-b132.test.ts](<../../apps/editor/tests/proofreading-marks-b132.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_LOCAL_PROOFREADING_MARK_OVERLAY_2026_11_09`
 
 </details>
 

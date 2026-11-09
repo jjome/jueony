@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | — 상세 작업 없음 | 완료 0/23 · 부분 13 · 미구현 10 |
-| 검증 | — 상세 작업 없음 | 완료 0/23 · 부분 10 · 미검증 13 |
+| 구현 | — 상세 작업 없음 | 완료 0/23 · 부분 14 · 미구현 9 |
+| 검증 | — 상세 작업 없음 | 완료 0/23 · 부분 11 · 미검증 12 |
 | Agent 연결 | — 상세 작업 없음 | 연결 0/23 · 부분 0 · 미연결 23 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -71,7 +71,7 @@
 | --- | --- | --- | --- | --- |
 | [B137](<15-output-and-tools.md#b137>) · 범위 | 맞춤법 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B138](<15-output-and-tools.md#b138>) · 범위 | 한컴·한자·유의어 사전 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [B139](<15-output-and-tools.md#b139>) · 범위 | 번역 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B139](<15-output-and-tools.md#b139>) · 범위 | 번역 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B140](<15-output-and-tools.md#b140>) · 범위 | 빠른 교정·자동 실행 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B143](<15-output-and-tools.md#b143>) · 범위 | 차례·색인 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B144](<15-output-and-tools.md#b144>) · 범위 | 참고 문헌 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
@@ -280,12 +280,12 @@
 <summary>B139 · 번역</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: Agent와 별도 도구 기준
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 버전이 고정된 명시적 offline 제공자와 출발·도착 locale로 단일 최상위 본문 선택을 번역하고 문서 identity·revision·선택·원문·글자 서식·provider·요청/응답·plan fingerprint를 재검증한다.
+- 다음 작업: 커밋 a9d3778b에서 실제 HWP/HWPX 저장 재열기·byte-exact undo/redo·실패 rollback 4/4 통과. 실제 번역 모델·자동 언어 감지·용어집·다중 문단/표/특수 story·Studio UI는 미구현.
+- 근거: [offline-translation-b139.ts](<../../apps/editor/src/adapters/rhwp/offline-translation-b139.ts>) · [offline-translation-b139.test.ts](<../../apps/editor/tests/offline-translation-b139.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_OFFLINE_SELECTED_TRANSLATION_2026_11_09`
 
 </details>
 

@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | — 상세 작업 없음 | 완료 0/23 · 부분 10 · 미구현 13 |
-| 검증 | — 상세 작업 없음 | 완료 0/23 · 부분 7 · 미검증 16 |
+| 구현 | — 상세 작업 없음 | 완료 0/23 · 부분 13 · 미구현 10 |
+| 검증 | — 상세 작업 없음 | 완료 0/23 · 부분 10 · 미검증 13 |
 | Agent 연결 | — 상세 작업 없음 | 연결 0/23 · 부분 0 · 미연결 23 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -70,12 +70,12 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B137](<15-output-and-tools.md#b137>) · 범위 | 맞춤법 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [B138](<15-output-and-tools.md#b138>) · 범위 | 한컴·한자·유의어 사전 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B138](<15-output-and-tools.md#b138>) · 범위 | 한컴·한자·유의어 사전 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B139](<15-output-and-tools.md#b139>) · 범위 | 번역 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B140](<15-output-and-tools.md#b140>) · 범위 | 빠른 교정·자동 실행 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B143](<15-output-and-tools.md#b143>) · 범위 | 차례·색인 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [B144](<15-output-and-tools.md#b144>) · 범위 | 참고 문헌 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
-| [B145](<15-output-and-tools.md#b145>) · 범위 | 문서 찾기 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B144](<15-output-and-tools.md#b144>) · 범위 | 참고 문헌 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
+| [B145](<15-output-and-tools.md#b145>) · 범위 | 문서 찾기 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B147](<15-output-and-tools.md#b147>) · 범위 | 프레젠테이션 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 
 <a id="work-5"></a>
@@ -267,12 +267,12 @@
 <summary>B138 · 한컴·한자·유의어 사전</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 별도 사전 데이터/권한 조건 포함
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 명시적으로 주입한 버전 고정 offline·ko-KR 제공자만 사용해 단일 최상위 본문 선택 또는 커서 낱말의 국어·한자·유의어 결과를 조회하고 문서 identity·revision·원문·provider·응답 seal을 재검증한다.
+- 다음 작업: 커밋 d7b2969e에서 실제 HWP/HWPX 조회·재열기·export 바이트와 기존 undo snapshot 불변 3/3 통과. 실제 사전 데이터·한컴 사전 라이선스 연계·Studio UI·사용자 사전은 미구현.
+- 근거: [offline-dictionary-b138.ts](<../../apps/editor/src/adapters/rhwp/offline-dictionary-b138.ts>) · [offline-dictionary-b138.test.ts](<../../apps/editor/tests/offline-dictionary-b138.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_OFFLINE_DICTIONARY_LOOKUP_2026_11_09`
 
 </details>
 
@@ -319,12 +319,12 @@
 <summary>B144 · 참고 문헌</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 출처 인용 형식·관리 UI
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 최대 128개 로컬 출처 registry와 단일 jueony-korean-author-year-v1 형식을 검증해 최상위 본문에 정적 인용 또는 참고 문헌 문단을 한 snapshot으로 삽입하고 문서·선택·원문·registry·source·plan fingerprint를 재검증한다.
+- 다음 작업: 커밋 c86397e6에서 실제 HWP/HWPX 저장 재열기·정확한 undo·redo·실패 rollback 4/4 통과. CSL/APA 호환·동적 인용 필드·외부 검색·다중 스타일·Studio UI는 미구현.
+- 근거: [bibliography-b144.ts](<../../apps/editor/src/adapters/rhwp/bibliography-b144.ts>) · [bibliography-b144.test.ts](<../../apps/editor/tests/bibliography-b144.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_LOCAL_STATIC_BIBLIOGRAPHY_2026_11_09`
 
 </details>
 
@@ -332,12 +332,12 @@
 <summary>B145 · 문서 찾기</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 현재 문서 검색과 별개
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 현재 열린 문서의 최상위 본문 문단에서 리터럴·대소문자 선택 검색을 제한된 예산으로 수행하고 scalar 범위·snippet·focus target을 문서 identity·revision·원문 fingerprint로 재검증한다.
+- 다음 작업: 커밋 f9df2c09에서 실제 HWP/HWPX 검색·재열기·export 바이트와 기존 undo snapshot 불변 4/4 통과. 외부 파일 검색·정규식·특수 story·Studio 검색 UI는 미구현.
+- 근거: [document-find-b145.ts](<../../apps/editor/src/adapters/rhwp/document-find-b145.ts>) · [document-find-b145.test.ts](<../../apps/editor/tests/document-find-b145.test.ts>)
+- 원래 기록: `PARTIAL;PASS;SAFE_OPEN_DOCUMENT_LITERAL_FIND_2026_11_09`
 
 </details>
 

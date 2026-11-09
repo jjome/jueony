@@ -25,7 +25,7 @@
 | N043 | preflight→temp write/flush→final probe/revalidate→atomic compare-replace/readback coordinator와 race replace 0회·실패 cleanup·committed 후 `save-state-uncertain`/reopen 분류 | 정책·coordinator 15/15·strict TypeScript 통과 | **부분 유지:** 실제 Windows picker·ACL·identity 수집과 Rust/Tauri host 원자 교체/readback·실파일 Windows 검증 미연결 |
 | N044 | 별도 v1 checkpoint·IndexedDB CAS와 document lifecycle을 실제 설치 Edge 157 격리 IndexedDB에서 commit·strict transaction complete·CAS conflict·blocked/versionchange fail-closed 분류까지 검증 | 실제 Edge 3 scenarios PASS·page/console/external/missing resource 모두 0 | **부분 유지:** 실제 app boot/shell 주입·Tauri/Windows 비정상 종료·사용자 문서 복구 미연결 |
 | N045 | 빌드 입력의 CDN font literal 256개를 제거하고 로컬 WASM·런타임·폰트·third-party notices·hash·외부 URL을 fail-closed 감사 | `41b44529` 격리 build 673 modules; dist 외부 endpoint가 5개로 감소 | **부분 유지·FAIL/배포 차단:** AI 영역 제외·기관 allowlist·WebView2 포함 최종 설치본·고지 합본 검수 필요 |
-| N005 | 보이지 않는 0길이 이웃 ClickHere의 셀 분할 이동을 앱·Rust에서 차단하고 guide-only 0길이 필드는 유지 | HWP/HWPX 저장·재열기 2/2·관련 회귀 32/32 | 겹친 필드·개체 혼합 셀·캡션 내부 필드·한글 비교 |
+| N005 | 같은 owner·문단에서 한 plain scalar로 분리된 두 filled ClickHere의 ID·range·full path·value·marker controlIndex/raw position·stored position을 교차 검증해 일반/중첩 셀 분할에 보존 | `aa2ac0b3` HWP/HWPX 재열기·exact undo/redo와 관련 회귀 44/44 | **부분 유지:** boundary-touch/실제 overlap은 engine inner owner 식별 불가로 mutation 전 차단·object 혼합·caption field·실제 앱·한글 비교 |
 | N011 추가 | 문단 테두리 동작 플래그 `borderConnect`·`borderIgnoreMargin`의 portable style 교환·전체 롤백 | HWP/HWPX 가져오기→저장→재열기 2/2 | TabDef·실제 BorderFill·배경·간격·UI·한글 비교 |
 | N011 추가 | portable v1 문단 사용자 TabDef와 기본 없음/실선 BorderFill·없음/단색 배경·네 방향 간격을 엄격 검증하고 원본 참조 인증 뒤 이식; 실패 전체 snapshot 복원 | 최신 검수 엔진의 HWP/HWPX 저장·재열기·exact-byte undo·stale ID 불변·중간 실패 rollback 3/3 | **부분 유지:** 글자 스타일 BorderFill·번호/개요·점선/무늬/그러데이션/그림/3D/대각선/투명도·특수 영역·UI·Agent·한글 비교 |
 | N011 조사 | 문서별 번호/개요 complete definition portability를 최신 custom Rust/WASM read/write API에서 재감사 | 코드 변경 없음·기존 basic character BorderFill 회귀 6/6 | **명시 차단·부분 유지:** `getAgentNumberingDefinitions`는 id·editable·startNumbers만, `cloneAgentNumbering`은 동일 문서 전용, `createNumbering`은 levelFormats·numberFormats·startNumber만 쓰는 축약 생성, `getAgentOutlineDefinition`은 definitionId만 제공한다. 전체 7-level head와 level start/format, CharShape·font·BorderFill graph 인증 export, target resource/ID remap·충돌 정책, section outline binding, 원자 import/rollback과 HWP/HWPX readback 포트가 필요하다. |
@@ -102,6 +102,8 @@ N014 public HWP/HWPX top-level group document graph restore verification
 19/19 passed; exact owner/type/properties/geometry, restore readback and lying callback rollback covered; nested/caption owner path remained fail-closed
 N007 non-merged contiguous title segment index-0 verification
 15/15 passed; HWP/HWPX reopen, exact undo/redo, insert/delete proof and save rollback covered; crossing rowSpan>1 remained fail-closed
+N005 two filled ClickHere cell-split preservation verification
+44/44 related tests passed; HWP/HWPX reopen and exact undo/redo covered; boundary-touch and actual overlap remained fail-closed before mutation
 N015 root equation multi-selection verification with actual custom engine HWP/HWPX save/reopen and bytes invariant
 36/36 passed; single/mixed/nested equation, OLE and table selection remained fail-closed
 N021 special-story shortcut boundary verification

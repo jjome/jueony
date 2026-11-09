@@ -10,7 +10,7 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | — 상세 작업 없음 | 완료 0/11 · 부분 7 · 미구현 4 |
+| 구현 | — 상세 작업 없음 | 완료 0/11 · 부분 8 · 미구현 3 |
 | 검증 | — 상세 작업 없음 | 완료 0/11 · 부분 8 · 미검증 3 |
 | Agent 연결 | — 상세 작업 없음 | 연결 0/11 · 부분 0 · 미연결 11 |
 
@@ -55,7 +55,7 @@
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
 | [B132](<14-security-and-review.md#b132>) · 범위 | 교정 부호·자료 연결 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
-| [B133](<14-security-and-review.md#b133>) · 범위 | 변경 내용 추적·표시 | ☐ 미구현 | ◐ 부분 | ☐ 미연결 |
+| [B133](<14-security-and-review.md#b133>) · 범위 | 변경 내용 추적·표시 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B134](<14-security-and-review.md#b134>) · 범위 | 문서 이력 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B135](<14-security-and-review.md#b135>) · 범위 | 문서 비교 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B136](<14-security-and-review.md#b136>) · 범위 | 메모 넣기·모양·표시 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
@@ -154,12 +154,12 @@
 <summary>B133 · 변경 내용 추적·표시</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ☐ 미구현 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
 - 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 원시 TRACKCHANGE 보존과 불투명 레코드 진단은 의미 기반 변경 추적 기능의 구현으로 보지 않는다.
-- 다음 작업: document-internal v1 계약과 revision/token CAS·사후 상태 검증 seam에 더해 HWP5 DocInfo +80/+81 레코드의 종류·크기만 최대 64개 읽는 진단 API를 추가하고 HWP 저장·재열기 및 HWPX 미지원 fail-close를 검증했다. payload 의미 모델·범위 파서·작성자 연결·표시·기록·승인·거절은 여전히 미구현이다.
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [document-track-changes-b133.ts](<../../apps/editor/src/adapters/rhwp/document-track-changes-b133.ts>) · [document-track-changes-b133.test.ts](<../../apps/editor/tests/document-track-changes-b133.test.ts>) · [document-track-change-inventory-b133.ts](<../../apps/editor/src/adapters/rhwp/document-track-change-inventory-b133.ts>) · [document-track-change-inventory-b133.test.ts](<../../apps/editor/tests/document-track-change-inventory-b133.test.ts>)
-- 원래 기록: `MISSING;OPAQUE_HWP_DOCINFO_INVENTORY_PASS_2026_11_09;SEMANTIC_TRACK_CHANGES_UNAVAILABLE`
+- 완료 범위: 원시 TRACKCHANGE 보존·불투명 레코드 진단과 별도로 명시적으로 선택한 두 열린 문서의 검증된 본문 비교 결과를 읽기 전용 변경 표시 snapshot으로 투영한다. 실시간 편집 추적은 포함하지 않는다.
+- 다음 작업: commit ac15e48a 기준 insert·delete·replace 표시와 Unicode scalar 범위·문서 revision·SHA-256 결과 지문을 검증했다. 실제 HWP/HWPX 혼합 비교·재열기·bytes 불변·undo snapshot 보존 선별 3/3을 통과했다. 표·서식·개체·특수 story·작성자·실시간 기록·승인/거절·UI·한글 비교는 남아 부분이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [document-track-changes-b133.ts](<../../apps/editor/src/adapters/rhwp/document-track-changes-b133.ts>) · [document-track-changes-b133.test.ts](<../../apps/editor/tests/document-track-changes-b133.test.ts>) · [document-track-change-inventory-b133.ts](<../../apps/editor/src/adapters/rhwp/document-track-change-inventory-b133.ts>) · [document-track-change-inventory-b133.test.ts](<../../apps/editor/tests/document-track-change-inventory-b133.test.ts>) · [tracked-changes-b133.ts](<../../apps/editor/src/adapters/rhwp/tracked-changes-b133.ts>) · [tracked-changes-b133.test.ts](<../../apps/editor/tests/tracked-changes-b133.test.ts>)
+- 원래 기록: `PARTIAL;OPAQUE_HWP_DOCINFO_INVENTORY_PASS_2026_11_09;SAFE_READ_ONLY_CHANGE_MARK_VIEW_2026_11_09;LIVE_SEMANTIC_TRACK_CHANGES_UNAVAILABLE`
 
 </details>
 

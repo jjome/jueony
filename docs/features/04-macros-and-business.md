@@ -10,8 +10,8 @@
 
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
-| 구현 | 완료 3/6 · 부분 1 · 미구현 2 | 완료 0/5 · 부분 2 · 미구현 3 |
-| 검증 | 완료 3/6 · 부분 0 · 미검증 3 | 완료 0/5 · 부분 2 · 미검증 3 |
+| 구현 | 완료 3/6 · 부분 1 · 미구현 2 | 완료 0/5 · 부분 3 · 미구현 2 |
+| 검증 | 완료 3/6 · 부분 0 · 미검증 3 | 완료 0/5 · 부분 3 · 미검증 2 |
 | Agent 연결 | 연결 3/6 · 부분 0 · 미연결 3 | 연결 0/5 · 부분 0 · 미연결 5 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -74,7 +74,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B142](<04-macros-and-business.md#b142>) · 범위 | 스크립트 매크로 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
+| [B142](<04-macros-and-business.md#b142>) · 범위 | 스크립트 매크로 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [N039](<04-macros-and-business.md#n039>) · 작업 | 수동 편집 동작의 매크로 기록·재생 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 
 <a id="work-6"></a>
@@ -150,13 +150,13 @@
 <summary>B142 · 스크립트 매크로</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P2.
-- 상태: 구현 ☐ 미구현 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
-- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 한글 스크립트/키 입력 녹화는 미지원. 기존 AI 명령 템플릿은 별도 기능이다. 실제 구현에는 dispatcher 성공 이벤트·IME/선택 의미 기록·recordable capability·revision preflight·단일 undo/부분 실패 rollback·녹화 UI와 저장 계약이 먼저 필요하다.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
+- 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. 현재는 안전 명령 카탈로그·기록/직렬화·원자적 재생 코어만 구현됐으며 실제 Studio 디스패처 이벤트·UI·저장 수명은 완료 범위가 아님.
+- 다음 작업: 성공한 등록 명령만 기록하고 IME/선택/raw 키/실패 명령을 차단한다. bounded canonical JSON과 document identity/revision preflight를 적용하고 재생 전체를 단일 snapshot undo 거래로 요구하며 실패·중지·취소 시 전체 rollback을 검증함. Studio CommandDispatcher 성공 이벤트와 외부 snapshot raw-step 실행 seam·녹화 UI·영구 저장 연결은 남음.
 - UI 명령: `pending:macro-record`
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `MISSING;NOT_RUN`
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [script-macro-b142.ts](<../../apps/editor/src/modules/script-macros/domain/script-macro-b142.ts>) · [script-macro-runtime-b142.ts](<../../apps/editor/src/adapters/rhwp/script-macro-runtime-b142.ts>) · [script-macro-runtime-b142.test.ts](<../../apps/editor/tests/script-macro-runtime-b142.test.ts>)
+- 원래 기록: `PARTIAL;SCOPED_SAFE_RECORD_REPLAY_CORE_PASS_2026_11_09`
 
 </details>
 

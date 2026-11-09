@@ -56,6 +56,10 @@
 | B071 추가 | 단일 계열 이름과 공유 단일 범주명 cache 변경 시 원본 `c:f` 수식과 다른 범례·값·축·unknown OOXML·비차트 자산을 보존하고 실제 Studio UI를 같은 보호 계약에 연결 | HWP/HWPX 저장·재열기·undo·rollback과 UI 명령 포함 차트 전체 14/14·TypeScript compile | 다중 변경·복합 label·수식 자체 변경·한글 비교 |
 | B071 일괄 | 동일 차트의 서로 다른 series/point 2~128개를 원문·중복·revision·source·owner 전체 사전 검증 후 dry-run하고 snapshot 하나로 원자 적용 | HWP/HWPX 저장·재열기·exact undo·부분 결과 rollback·수식/unknown OOXML/비차트 자산 보존과 1/129개·중복·stale·owner 교체 음성 사례 13/13 | **부분 유지:** Studio UI 다중 선택·다중 계열명/범주명·여러 차트·Agent·한글 비교 |
 | B025 / B027 조사 | 각주·미주의 읽기 API와 단일 문단 mutation은 있으나 원자적 선택 복사·다문단 치환 계약 부재 확인 | 코드 무변경 | Rust/WASM `copySelectionInNote`·`replaceRangeInNote`와 형식 재열기 계약 |
+| B116 | 단일 구역 최상위 본문에서 현재 쪽·전체 쪽 AutoNumber를 한 snapshot으로 삽입하고 위치·컨트롤 변화·외부 문단 불변을 재검증 | `edbc3fa3` 선별 7/7; 실제 Rust/WASM HWP/HWPX 저장·재열기와 strict TypeScript·경계 diagnostics 0 | **부분 유지:** 정식 Studio 메뉴 hook·다구역·특수 story·기존 필드 교체·한글 비교 |
+| B128 | HWP/HWPX 암호 설정·변경·해제를 source identity/revision/fingerprint와 export 전후 drift·재열기 검증으로 보호하고 암호를 결과·저장소에 남기지 않음 | `f6bd7527` 선별 8/8; 양형식 설정·변경·해제 저장 재열기와 이전 암호 거절·원본 불변·native artifact 해제 확인 | **부분 유지:** 정식 보안 UI·키 저장 정책·한글 비교 |
+| B154 / B155 | L/C 각 셀 및 B/F 여러 셀 테두리·배경 대상의 InputHandler·cursor·WASM bbox 증거를 교차 검증하고 보호·중첩·비직사각·병합 경계·drift를 fail-closed | `38040b55` 선별 7/7·strict TypeScript·경계 diagnostics 0 | **부분 유지:** 정식 Studio hook·실제 테두리/배경 적용·한글 비교 |
+| B169 | F5 셀 선택 1→2→3단계와 Shift+F5 즉시 확장을 exact owner/path/anchor/focus/reason/excluded 상태 및 실패 전체 rollback으로 보호 | `4c8f3c95` 선별 8/8·실제 upstream CursorState API 감사·strict TypeScript·경계 diagnostics 0 | **부분 유지:** 정식 Studio hook·전체 선택 조합·한글 비교 |
 
 ## 실행한 선별 검사
 

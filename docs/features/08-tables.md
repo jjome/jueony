@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | 완료 37/41 · 부분 4 | 완료 0/24 · 부분 23 · 미구현 1 |
-| 검증 | 완료 3/41 · 부분 38 | 완료 0/24 · 부분 13 · 미검증 11 |
+| 검증 | 완료 3/41 · 부분 38 | 완료 0/24 · 부분 14 · 미검증 10 |
 | Agent 연결 | 연결 28/33 · 부분 5 · 해당 없음 8 | 연결 0/24 · 부분 9 · 미연결 15 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -182,7 +182,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B169](<08-tables.md#b169>) · 범위 | 첫 셀·셀 블록 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B169](<08-tables.md#b169>) · 범위 | 첫 셀·셀 블록 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B171](<08-tables.md#b171>) · 범위 | 칸 전체 블록 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B172](<08-tables.md#b172>) · 범위 | 줄 전체 블록 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
 | [B173](<08-tables.md#b173>) · 범위 | 셀 이동·표 안 탭 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
@@ -292,12 +292,12 @@
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 셀 블록 L/C 연결 및 테두리/배경 초기 탭 전달 구현. 실제 한글 문맥·혼합 셀 비교 필요.
+- 다음 작업: L/C의 단일·다중 셀 owner와 InputHandler·cursor·WASM bbox 증거를 교차 검증하고 보호·중첩·비직사각·병합 경계·선택 drift는 대화상자 전에 차단한다. 정식 Studio hook·실제 서식 적용·한글 비교는 남아 부분이다.
 - UI 명령: `table:border-each`
-- 근거: [parity-result.json](<../evidence/features-2026-10-11/parity-result.json>) · [editor-tests.txt](<../evidence/features-2026-10-11/editor-tests.txt>)
-- 원래 기록: `PARTIAL;UNIT_TESTED_NATIVE_PENDING`
+- 근거: [parity-result.json](<../evidence/features-2026-10-11/parity-result.json>) · [editor-tests.txt](<../evidence/features-2026-10-11/editor-tests.txt>) · [cell-border-shortcut-capability-b154-b155.ts](<../../apps/editor/src/shortcuts/cell-border-shortcut-capability-b154-b155.ts>) · [cell-border-shortcut-capability-b154-b155.test.ts](<../../apps/editor/tests/cell-border-shortcut-capability-b154-b155.test.ts>)
+- 원래 기록: `PARTIAL;SELECTED_SHORTCUT_CAPABILITY_2026_11_09`
 
 </details>
 
@@ -306,12 +306,12 @@
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
 - 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
-- 검증 구분: 자동 **PARTIAL** / 한글 **NOT_RUN**.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 셀 블록 B/F 연결 및 테두리/배경 초기 탭 전달 구현. 실제 한글 문맥·혼합 셀 비교 필요.
+- 다음 작업: B/F의 복수 exact owner와 InputHandler·cursor·WASM bbox 증거를 교차 검증하고 보호·중첩·비직사각·병합 경계·선택 drift는 대화상자 전에 차단한다. 정식 Studio hook·실제 서식 적용·한글 비교는 남아 부분이다.
 - UI 명령: `table:border-one`
-- 근거: [parity-result.json](<../evidence/features-2026-10-11/parity-result.json>) · [editor-tests.txt](<../evidence/features-2026-10-11/editor-tests.txt>)
-- 원래 기록: `PARTIAL;UNIT_TESTED_NATIVE_PENDING`
+- 근거: [parity-result.json](<../evidence/features-2026-10-11/parity-result.json>) · [editor-tests.txt](<../evidence/features-2026-10-11/editor-tests.txt>) · [cell-border-shortcut-capability-b154-b155.ts](<../../apps/editor/src/shortcuts/cell-border-shortcut-capability-b154-b155.ts>) · [cell-border-shortcut-capability-b154-b155.test.ts](<../../apps/editor/tests/cell-border-shortcut-capability-b154-b155.test.ts>)
+- 원래 기록: `PARTIAL;SELECTED_SHORTCUT_CAPABILITY_2026_11_09`
 
 </details>
 
@@ -504,12 +504,12 @@
 <summary>B169 · 첫 셀·셀 블록</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 엔진 F5 있음; 표 개체/Shift+F5 세부 다름
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `PARTIAL;NOT_RUN`
+- 다음 작업: F5 1→2→3단계와 Shift+F5 즉시 확장을 exact owner/path/selection/reason/excluded 상태와 실패 전체 rollback으로 검증했다. 정식 Studio hook·전체 선택 조합·한글 비교는 남아 부분이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [cell-selection-shortcuts-b169.ts](<../../apps/editor/src/shortcuts/cell-selection-shortcuts-b169.ts>) · [cell-selection-shortcuts-b169.test.ts](<../../apps/editor/tests/cell-selection-shortcuts-b169.test.ts>)
+- 원래 기록: `PARTIAL;SELECTED_CELL_SELECTION_SHORTCUT_2026_11_09`
 
 </details>
 

@@ -11,7 +11,7 @@
 | 구분 | 실행 작업 | 상위 범위 |
 | :--- | :---: | :---: |
 | 구현 | — 상세 작업 없음 | 완료 0/11 · 부분 3 · 미구현 6 · stub 2 |
-| 검증 | — 상세 작업 없음 | 완료 0/11 · 부분 0 · 미검증 11 |
+| 검증 | — 상세 작업 없음 | 완료 0/11 · 부분 1 · 미검증 10 |
 | Agent 연결 | — 상세 작업 없음 | 연결 0/11 · 부분 0 · 미연결 11 |
 
 ☑ 완료/연결 · ◐ 부분 · ☐ 대기 · ? 재점검 · — 해당 없음. 검증 완료에는 필요한 한글 직접 비교도 포함한다. 구현 완료만으로 세 축 완료가 되지 않는다.
@@ -43,7 +43,7 @@
 
 | ID | 항목 | 구현 | 검증 | Agent 연결 |
 | --- | --- | --- | --- | --- |
-| [B128](<14-security-and-review.md#b128>) · 범위 | 문서 암호 설정·변경·해제 | ◐ 부분 | ☐ 미검증 | ☐ 미연결 |
+| [B128](<14-security-and-review.md#b128>) · 범위 | 문서 암호 설정·변경·해제 | ◐ 부분 | ◐ 부분 | ☐ 미연결 |
 | [B129](<14-security-and-review.md#b129>) · 범위 | 배포용 문서 저장·편집 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B130](<14-security-and-review.md#b130>) · 범위 | 개인정보 보호·해제 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
 | [B131](<14-security-and-review.md#b131>) · 범위 | 문서 보안 설정 | ☐ 미구현 | ☐ 미검증 | ☐ 미연결 |
@@ -89,12 +89,12 @@
 <summary>B128 · 문서 암호 설정·변경·해제</summary>
 
 - 종류: 한글 상위 기능 · 우선순위: P1.
-- 상태: 구현 ◐ 부분 / 검증 ☐ 미검증 / Agent ☐ 미연결.
-- 검증 구분: 자동 **NOT_RUN** / 한글 **NOT_RUN**.
+- 상태: 구현 ◐ 부분 / 검증 ◐ 부분 / Agent ☐ 미연결.
+- 검증 구분: 자동 **PASS** / 한글 **NOT_RUN**.
 - 완료 범위: 한글 2024 전체 해당 기능·문맥·대화상자·저장 수명을 포함한 상위 항목. WIRED는 완료가 아님.
-- 다음 작업: 암호 열기와 다른 이름 저장의 암호화 export 존재. 변경/해제 통합 보안 UX·암호 복구 검증 필요.
-- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>)
-- 원래 기록: `PARTIAL;NOT_RUN`
+- 다음 작업: HWP/HWPX 암호 설정·변경·해제를 source identity/revision/fingerprint와 export 직후·재열기 검증으로 보호했다. 암호는 반환·저장하지 않으며 기존 키 폐기와 원본 불변을 확인했다. 정식 보안 UI·키 저장 정책·한글 비교는 남아 부분이다.
+- 근거: [editor-code-audit.md](<../evidence/hangul-comparison-2026-10-11/editor-code-audit.md>) · [engine-code-audit.md](<../evidence/hangul-comparison-2026-10-11/engine-code-audit.md>) · [password-transition-b128.ts](<../../apps/editor/src/adapters/files/password-transition-b128.ts>) · [password-transition-b128.test.ts](<../../apps/editor/tests/password-transition-b128.test.ts>)
+- 원래 기록: `PARTIAL;SELECTED_PASSWORD_TRANSITION_REOPEN_2026_11_09`
 
 </details>
 
